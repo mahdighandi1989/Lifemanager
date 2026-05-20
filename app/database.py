@@ -1,19 +1,27 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+
 from app.config import settings
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# تبدیل به async engine
+engine = create_async_engine(settings.DATABASE_URL, echo=True)
+
+# استفاده از async_sessionmaker به جای sessionmaker
+SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
 Base = declarative_base()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def init_db():
+    """ایجاد جداول دیتابیس به صورت async"""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+async def get_db():
+    """ارائه session دیتابیس به صورت async"""
+    async with SessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()
