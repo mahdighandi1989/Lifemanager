@@ -29,8 +29,13 @@ setup_middleware(app)
 @app.on_event("startup")
 async def startup():
     """ایجاد جداول دیتابیس در زمان راه‌اندازی"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        print(f"⚠️  Warning: Could not connect to database: {e}")
+        print(f"⚠️  DATABASE_URL used: {settings.DATABASE_URL}")
+        print("⚠️  App will start without database. Set DATABASE_URL env var in Render.")
 
 
 app.include_router(auth_router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["Auth"])
