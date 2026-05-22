@@ -3,5 +3,5 @@ from fastapi import APIRouter
 router = APIRouter()
 
 @router.get("/")
-async def ai_root():
-    return {"message": "AI routes working"}
+async def root():
+    return {"message": "AI endpoint"}

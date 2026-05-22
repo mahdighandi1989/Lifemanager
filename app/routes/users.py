@@ -3,5 +3,5 @@ from fastapi import APIRouter
 router = APIRouter()
 
 @router.get("/")
-async def users_root():
-    return {"message": "Users routes working"}
+async def root():
+    return {"message": "Users endpoint"}
