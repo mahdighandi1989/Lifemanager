@@ -33,3 +33,11 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Validation: اگر DATABASE_URL پیش‌فرض localhost است و .env وجود ندارد، هشدار بده
+if settings.DATABASE_URL == "postgresql+asyncpg://postgres:postgres@localhost:5432/lifemanager":
+    import warnings
+    warnings.warn(
+        "DATABASE_URL از مقدار پیش‌فرض localhost استفاده می‌کند. "
+        "لطفاً متغیر محیطی DATABASE_URL را در Render تنظیم کنید."
+    )
