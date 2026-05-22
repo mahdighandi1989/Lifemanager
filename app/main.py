@@ -24,7 +24,8 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"⚠️  Warning: Could not connect to database: {e}")
         logger.warning("  warnings.warn(")
-        logger.warning(f"  {settings.DATABASE_URL} از مقدار پیش‌فرض localhost استفاده می‌کند. لطفاً متغیر محیطی DATABASE_URL را در Render تنظیم کنید.")
+        logger.warning("⚠️  Warning: Could not connect to database: [Errno 111] Connection refused")
+    logger.warning("⚠️  Frontend dist directory not found at /opt/render/project/src/dist")
 
 # Include routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
