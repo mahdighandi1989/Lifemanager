@@ -43,6 +43,29 @@ if frontend_dist.exists():
     
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
+        """
+        Serve frontend static files for SPA routing.
+        
+        NOTE: This catch-all route intentionally matches any path not handled by
+        API routers above. This is the standard pattern for single-page applications
+        where the frontend router handles client-side routing.
+        
+        IMPORTANT: All API routes MUST be registered BEFORE this catch-all handler.
+        If an API endpoint returns 404, it means the route is not registered.
+        This catch-all only serves files from the dist directory and does NOT
+        interfere with registered API routes (FastAPI matches specific routes first).
+        """
+        # Guard: Prevent serving files outside the dist directory
+        # Resolve the requested path and ensure it stays within frontend_dist
+        try:
+            requested_path = (frontend_dist / full_path).resolve()
+            if not str(requested_path).startswith(str(frontend_dist.resolve())):
+                logger.warning(f"Blocked path traversal attempt: {full_path}")
+                return {"detail": "Not Found"}
+        except (ValueError, OSError):
+            logger.warning(f"Invalid path requested: {full_path}")
+            return {"detail": "Not Found"}
+            
         file_path = frontend_dist / full_path
         if file_path.exists() and file_path.is_file():
             return FileResponse(str(file_path))
