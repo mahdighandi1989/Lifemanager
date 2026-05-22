@@ -1,36 +1,37 @@
-FROM node:20-alpine AS frontend-builder
-
-WORKDIR /app/frontend
-
+# Stage 1: Build frontend
+FROM node:18-alpine AS frontend-builder
+WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
-
-COPY frontend/ ./frontend/
+COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.12-slim AS backend
-
+# Stage 2: Backend
+FROM python:3.12-slim
 WORKDIR /app
 
-# Install system dependencies including Rust for pydantic-core compilation
-RUN apt-get update && apt-get install -y \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    libpq-dev \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Rust toolchain for compiling pydantic-core
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
+# Copy backend requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy frontend build artifacts
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+# Copy backend code
+COPY app/ ./app/
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
 
-COPY . .
+# Copy built frontend from stage 1
+COPY --from=frontend-builder /app/dist ./dist
 
+# Create runtime.txt for Render
+RUN echo "python-3.12.7" > runtime.txt
+
+# Expose port
 EXPOSE 8000
 
+# Run the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
