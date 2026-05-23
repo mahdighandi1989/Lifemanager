@@ -1,18 +1,27 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const navLinks = [
     { to: '/', label: 'Dashboard' },
     { to: '/tasks', label: 'Tasks' },
     { to: '/projects', label: 'Projects' },
+    { to: '/notifications', label: 'اعلان‌ها' },
   ];
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -29,21 +38,49 @@ function Header() {
               <span className="text-xl font-bold text-gray-900">Lifemanager</span>
             </Link>
           </div>
-          <nav className="flex items-center space-x-1">
-            {navLinks.map(({ to, label }) => (
+
+          {isAuthenticated && (
+            <nav className="flex items-center space-x-1">
+              {navLinks.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive(to)
+                      ? 'bg-blue-50 text-blue-600 font-semibold'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          )}
+
+          <div className="flex items-center space-x-3">
+            {isAuthenticated ? (
+              <>
+                {user && (
+                  <span className="text-sm text-gray-500 hidden sm:block">
+                    {user.username || user.email}
+                  </span>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                >
+                  خروج
+                </button>
+              </>
+            ) : (
               <Link
-                key={to}
-                to={to}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(to)
-                    ? 'bg-blue-50 text-blue-600 font-semibold'
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
-                }`}
+                to="/login"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
               >
-                {label}
+                ورود
               </Link>
-            ))}
-          </nav>
+            )}
+          </div>
         </div>
       </div>
     </header>
