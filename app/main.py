@@ -45,7 +45,10 @@ if not frontend_dist.exists():
     if _alt.exists():
         frontend_dist = _alt
 if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
+    # Only mount the /assets directory for built files, not raw source
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
     
     @app.get("/{full_path:path}", tags=["frontend"])
     async def serve_frontend(full_path: str):
