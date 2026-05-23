@@ -157,9 +157,8 @@ cython_debug/
 # Node
 node_modules/
 
-# Frontend build artifacts - these are built during deployment on Render
-# frontend/dist/ is intentionally NOT in .gitignore because Render builds it
-# during the build step and serves it via staticPublishPath
+# Frontend build artifacts - built during deployment on Render
+frontend/dist/
 
-# Ensure requirements.txt is NOT ignored (it's a .txt file, not .py)
+# Ensure requirements.txt is NOT ignored
 !requirements.txt
