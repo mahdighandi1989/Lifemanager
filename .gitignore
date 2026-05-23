@@ -9,5 +9,7 @@ venv/
 frontend/node_modules/
 frontend/.env
 
-# Allow frontend dist index.html for deployment
+# Allow frontend dist for deployment
+!frontend/dist/
 !frontend/dist/index.html
+!frontend/dist/assets/
