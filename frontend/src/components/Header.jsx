@@ -1,7 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function Header() {
+  const location = useLocation();
+
+  const navLinks = [
+    { to: '/', label: 'Dashboard' },
+    { to: '/tasks', label: 'Tasks' },
+    { to: '/projects', label: 'Projects' },
+  ];
+
+  const isActive = (path) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,16 +29,20 @@ function Header() {
               <span className="text-xl font-bold text-gray-900">Lifemanager</span>
             </Link>
           </div>
-          <nav className="flex items-center space-x-4">
-            <Link to="/" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Dashboard
-            </Link>
-            <Link to="/tasks" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Tasks
-            </Link>
-            <Link to="/projects" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-              Projects
-            </Link>
+          <nav className="flex items-center space-x-1">
+            {navLinks.map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive(to)
+                    ? 'bg-blue-50 text-blue-600 font-semibold'
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>
