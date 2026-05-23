@@ -1,51 +1,14 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="ltr">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Lifemanager — مدیریت هوشمند زندگی، وظایف و پروژه‌ها" />
     <title>Lifemanager</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body {
-        font-family: system-ui, -apple-system, sans-serif;
-        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-      }
-      .container {
-        text-align: center;
-        padding: 2rem;
-      }
-      h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-      p { font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem; }
-      .badge {
-        display: inline-block;
-        background: rgba(255,255,255,0.15);
-        border: 1px solid rgba(255,255,255,0.3);
-        border-radius: 9999px;
-        padding: 0.5rem 1.5rem;
-        font-size: 0.9rem;
-      }
-      .api-link {
-        display: inline-block;
-        margin-top: 1.5rem;
-        color: #a5b4fc;
-        text-decoration: none;
-        font-size: 0.95rem;
-      }
-      .api-link:hover { text-decoration: underline; }
-    </style>
   </head>
   <body>
-    <div class="container">
-      <h1>🚀 Lifemanager</h1>
-      <p>اپلیکیشن مدیریت زندگی — در حال آماده‌سازی</p>
-      <div class="badge">✅ Backend API در حال اجرا است</div>
-      <br/>
-      <a class="api-link" href="/docs">📖 مستندات API (Swagger)</a>
-    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
