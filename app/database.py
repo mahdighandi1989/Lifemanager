@@ -13,9 +13,22 @@ Base = declarative_base()
 
 
 async def init_db():
-    """ایجاد جداول دیتابیس به صورت async"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """ایجاد جداول دیتابیس به صورت async
+    
+    Returns:
+        bool: True اگر جداول با موفقیت ایجاد شدند، False در غیر این صورت
+    
+    Raises:
+        Exception: خطاهای غیرمنتظره را به caller منتقل می‌کند
+    """
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("[INFO] Database tables created successfully.")
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to create database tables: {e}")
+        return False
 
 
 async def get_db():
