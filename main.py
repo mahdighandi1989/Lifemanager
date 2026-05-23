@@ -3,8 +3,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from pathlib import Path
 import os
+import logging
 
 app = FastAPI(title="LifeManager API")
+
+# Configure logging for Render.com
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Health check endpoint
 @app.get("/api/health")
@@ -14,8 +19,10 @@ async def health_check():
 # Mount static files ONLY from dist/ directory - NEVER from src/
 frontend_dist = Path("frontend/dist")
 if frontend_dist.exists() and frontend_dist.is_dir():
+    logger.info("frontend/dist/ found — serving static files")
     app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
 else:
+    logger.critical("CRITICAL: frontend/dist/ NOT FOUND — serving fallback. Frontend build may have failed.")
     # Fallback for development - serve nothing, return 404 for static files
     @app.get("/{full_path:path}")
     async def catch_all(full_path: str):
