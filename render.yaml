@@ -2,36 +2,7 @@ services:
   - type: web
     name: lifemanager
     env: python
-    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: lifemanager-db
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: lifemanager-redis
-          property: connectionString
-
-  - type: web
-    name: lifemanager-frontend
-    env: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://lifemanager.onrender.com
-
-  - type: redis
-    name: lifemanager-redis
-    ipAllowList: []
-    plan: free
-
-  - type: postgresql
-    name: lifemanager-db
-    ipAllowList: []
-    plan: free
+    buildCommand: |
+      cd frontend && npm install && npm run build && cd .. && pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
