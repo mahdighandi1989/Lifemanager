@@ -47,7 +47,7 @@ if not frontend_dist.exists():
 if frontend_dist.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_dist)), name="static")
     
-    @app.get("/{full_path:path}")
+    @app.get("/{full_path:path}", tags=["frontend"])
     async def serve_frontend(full_path: str):
         """
         Serve frontend static files for SPA routing.
@@ -60,6 +60,9 @@ if frontend_dist.exists():
         If an API endpoint returns 404, it means the route is not registered.
         This catch-all only serves files from the dist directory and does NOT
         interfere with registered API routes (FastAPI matches specific routes first).
+        
+        This is an internal endpoint used by the SPA frontend. It is not intended
+        for direct external API consumption.
         """
         # Guard: Prevent serving files outside the dist directory
         try:
