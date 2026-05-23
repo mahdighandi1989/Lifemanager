@@ -31,3 +31,6 @@ class Task(Base):
     due_date = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    def __repr__(self):
+        return f"<Task(id={self.id}, title='{self.title}', status='{self.status.value}' if self.status else None)>"
