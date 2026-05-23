@@ -1,21 +1,24 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: '../frontend/dist',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
-      '/auth': 'http://localhost:8000',
-      '/tasks': 'http://localhost:8000',
-      '/projects': 'http://localhost:8000',
-      '/notifications': 'http://localhost:8000',
-      '/users': 'http://localhost:8000',
-      '/ai': 'http://localhost:8000',
-    },
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      }
+    }
   },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
-  },
-});
+  }
+})
