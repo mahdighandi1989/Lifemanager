@@ -45,7 +45,7 @@ if not frontend_dist.exists():
     if _alt.exists():
         frontend_dist = _alt
 if frontend_dist.exists():
-    app.mount("/static", StaticFiles(directory=str(frontend_dist)), name="static")
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
     
     @app.get("/{full_path:path}", tags=["frontend"])
     async def serve_frontend(full_path: str):
