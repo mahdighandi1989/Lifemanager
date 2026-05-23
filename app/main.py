@@ -36,7 +36,14 @@ app.include_router(integrations.router, prefix="/integrations", tags=["integrati
 app.include_router(webhook.router, prefix="/webhook", tags=["webhook"])
 
 # Serve static files (frontend)
-frontend_dist = Path(__file__).parent.parent / "dist"
+# در Native Render runtime، CWD ریشه پروژه است
+# Vite خروجی را در frontend/dist می‌گذارد
+frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"
+# fallback: اگر frontend/dist نبود، dist در ریشه را امتحان کن (Docker)
+if not frontend_dist.exists():
+    _alt = Path(__file__).parent.parent / "dist"
+    if _alt.exists():
+        frontend_dist = _alt
 if frontend_dist.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_dist)), name="static")
     
