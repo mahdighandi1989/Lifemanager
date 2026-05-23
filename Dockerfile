@@ -1,3 +1,26 @@
+# =============================================================================
+# Dockerfile — LifeManager Application
+# =============================================================================
+# Purpose:
+#   Multi-stage Docker build for the LifeManager full-stack application.
+#   Stage 1 (frontend-builder): Builds the React/Vite frontend into static assets.
+#   Stage 2 (runtime): Installs Python backend dependencies, copies backend code
+#   and the pre-built frontend assets, then serves the FastAPI application via uvicorn.
+#
+# Inputs:
+#   - frontend/ directory (React source)
+#   - app/ directory (FastAPI backend source)
+#   - requirements.txt (Python dependencies)
+#   - alembic.ini + alembic/ (database migrations)
+#
+# Outputs:
+#   - Docker image exposing port 8000, running uvicorn on app.main:app
+#
+# Side effects:
+#   - Installs system packages (gcc) for Python native extensions
+#   - Creates runtime.txt for Render deployment compatibility
+# =============================================================================
+
 # Stage 1: Build frontend
 FROM node:18-alpine AS frontend-builder
 WORKDIR /app

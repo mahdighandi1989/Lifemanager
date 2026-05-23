@@ -1,3 +1,15 @@
+/**
+ * Projects Page
+ * 
+ * Purpose: Displays a list of projects fetched from the backend API, allows users to view
+ * project details (name, description, status, creation date), and provides a form to create
+ * new projects. This component is the main project management interface for the LifeManager app.
+ * 
+ * Upstream: Fetches data from GET /projects and POST /projects endpoints.
+ * Downstream: Used by the main App router as a page component.
+ * Side effects: Makes HTTP requests to the backend API on mount and on project creation.
+ */
+
 import React, { useState, useEffect } from 'react';
 
 const API_BASE = '';
