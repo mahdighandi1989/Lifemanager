@@ -23,9 +23,7 @@ async def startup_event():
         logger.info("✅ Database tables created successfully")
     except Exception as e:
         logger.warning(f"⚠️  Warning: Could not connect to database: {e}")
-        logger.warning("  warnings.warn(")
-        logger.warning("⚠️  Warning: Could not connect to database: [Errno 111] Connection refused")
-    logger.warning("⚠️  Frontend dist directory not found at /opt/render/project/src/dist")
+        logger.warning("   App will continue without database — set DATABASE_URL in Render env vars.")
 
 # Include routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -57,7 +55,6 @@ if frontend_dist.exists():
         interfere with registered API routes (FastAPI matches specific routes first).
         """
         # Guard: Prevent serving files outside the dist directory
-        # Resolve the requested path and ensure it stays within frontend_dist
         try:
             requested_path = (frontend_dist / full_path).resolve()
             if not str(requested_path).startswith(str(frontend_dist.resolve())):
