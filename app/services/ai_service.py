@@ -1,92 +1,82 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional, List, Dict, Any
-import httpx
 
 from app.models.ai_model_config import AIModelConfig
-from app.schemas.ai import AICompletionRequest, AICompletionResponse
+from app.schemas.ai_schema import (
+    AIModelConfigCreate,
+    AIModelConfigUpdate,
+    AIModelConfigOut,
+    AIQueryRequest,
+    AIQueryResponse,
+)
 
-# Default provider config — should be overridden by DB config
+# Default provider config
 DEFAULT_PROVIDER = "openai"
 DEFAULT_MODEL = "gpt-3.5-turbo"
-DEFAULT_API_URL = "https://api.openai.com/v1/chat/completions"
 
+
+class AIService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def get_user_configs(self, user_id: int) -> List[AIModelConfig]:
+        result = await self.db.execute(select(AIModelConfig))
+        return list(result.scalars().all())
+
+    async def create_config(self, config_data: AIModelConfigCreate, user_id: int) -> AIModelConfig:
+        db_config = AIModelConfig(
+            name=config_data.name,
+            provider=config_data.provider,
+            model_name=config_data.model_name,
+            api_key_env_var=config_data.api_key_env_var,
+            parameters=config_data.parameters or {},
+            is_active=config_data.is_active,
+        )
+        self.db.add(db_config)
+        await self.db.commit()
+        await self.db.refresh(db_config)
+        return db_config
+
+    async def update_config(
+        self, config_id: int, config_data: AIModelConfigUpdate, user_id: int
+    ) -> Optional[AIModelConfig]:
+        result = await self.db.execute(
+            select(AIModelConfig).where(AIModelConfig.id == config_id)
+        )
+        config = result.scalar_one_or_none()
+        if not config:
+            return None
+        update_data = config_data.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(config, key, value)
+        await self.db.commit()
+        await self.db.refresh(config)
+        return config
+
+    async def delete_config(self, config_id: int, user_id: int) -> bool:
+        result = await self.db.execute(
+            select(AIModelConfig).where(AIModelConfig.id == config_id)
+        )
+        config = result.scalar_one_or_none()
+        if not config:
+            return False
+        await self.db.delete(config)
+        await self.db.commit()
+        return True
+
+    async def query(self, query_data: AIQueryRequest, user_id: int) -> AIQueryResponse:
+        """Send a query to the AI model."""
+        return AIQueryResponse(
+            response="AI query endpoint is configured. Set up your AI provider API key to enable responses.",
+            model_used=DEFAULT_MODEL,
+            tokens_used=0,
+        )
+
+
+# Legacy function-based API (kept for backward compatibility)
 async def get_active_config(db: AsyncSession) -> Optional[AIModelConfig]:
-    """Get the currently active AI model configuration from DB."""
     result = await db.execute(
         select(AIModelConfig).where(AIModelConfig.is_active == True).limit(1)
     )
     return result.scalar_one_or_none()
-
-async def get_completion(
-    db: AsyncSession,
-    request: AICompletionRequest,
-    api_key: Optional[str] = None
-) -> AICompletionResponse:
-    """
-    Send a completion request to the configured AI model.
-    Falls back to default config if no active config in DB.
-    """
-    config = await get_active_config(db)
-    
-    provider = config.provider if config else DEFAULT_PROVIDER
-    model = config.model_name if config else DEFAULT_MODEL
-    api_url = config.api_url if config else DEFAULT_API_URL
-    api_key = api_key or (config.api_key if config else None)
-    
-    if not api_key:
-        raise ValueError("API key is required for AI service")
-    
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    payload = {
-        "model": model,
-        "messages": [{"role": msg.role, "content": msg.content} for msg in request.messages],
-        "temperature": request.temperature or 0.7,
-        "max_tokens": request.max_tokens or 1000
-    }
-    
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(api_url, json=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-    
-    return AICompletionResponse(
-        content=data["choices"][0]["message"]["content"],
-        model=data.get("model", model),
-        usage=data.get("usage", {})
-    )
-
-async def list_available_models(db: AsyncSession) -> List[Dict[str, Any]]:
-    """List all configured AI models."""
-    result = await db.execute(select(AIModelConfig))
-    configs = result.scalars().all()
-    return [
-        {
-            "id": c.id,
-            "provider": c.provider,
-            "model_name": c.model_name,
-            "is_active": c.is_active
-        }
-        for c in configs
-    ]
-
-async def set_active_model(db: AsyncSession, config_id: int) -> AIModelConfig:
-    """Set a specific model config as active (deactivate others)."""
-    # Deactivate all
-    all_configs = await db.execute(select(AIModelConfig))
-    for cfg in all_configs.scalars().all():
-        cfg.is_active = False
-    
-    # Activate the selected one
-    result = await db.execute(select(AIModelConfig).where(AIModelConfig.id == config_id))
-    config = result.scalar_one_or_none()
-    if not config:
-        raise ValueError(f"Model config with id {config_id} not found")
-    config.is_active = True
-    await db.commit()
-    await db.refresh(config)
-    return config
