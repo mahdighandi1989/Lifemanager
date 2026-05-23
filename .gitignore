@@ -8,3 +8,6 @@ venv/
 # Frontend specific
 frontend/node_modules/
 frontend/.env
+
+# Allow frontend dist index.html for deployment
+!frontend/dist/index.html
