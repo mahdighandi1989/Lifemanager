@@ -1,13 +1,3 @@
-from fastapi import FastAPI
-from app.routes import auth, tasks, projects
-
-app = FastAPI(title="LifeManager API", version="1.0.0")
-
-app.include_router(auth.router)
-app.include_router(tasks.router)
-app.include_router(projects.router)
-
-
-@app.get("/")
-async def root():
-    return {"message": "LifeManager API is running"}
+# app/__init__.py — intentionally minimal
+# The FastAPI app instance is defined in app/main.py
+# This file exists only to make 'app' a Python package.
