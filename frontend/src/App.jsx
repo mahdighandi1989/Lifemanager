@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -25,9 +25,9 @@ function LoginDisabled() {
         </div>
         <h1 className="text-xl font-semibold text-gray-900 mb-2">صفحه ورود موقتاً غیرفعال است</h1>
         <p className="text-gray-500 text-sm mb-6">این صفحه به‌زودی در دسترس خواهد بود.</p>
-        <a href="/" className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+        <Link to="/" className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
           بازگشت به صفحه اصلی
-        </a>
+        </Link>
       </div>
     </div>
   );

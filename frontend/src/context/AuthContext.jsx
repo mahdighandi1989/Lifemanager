@@ -8,6 +8,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  // ⚠️ Temporary: Set to true to bypass login for development/testing
+  const isLoginBypassEnabled = true;
 
   const fetchMe = useCallback(async (t) => {
     if (!t) { setLoading(false); return; }
@@ -74,7 +76,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated: !!token || isLoginBypassEnabled }}>
       {children}
     </AuthContext.Provider>
   );
