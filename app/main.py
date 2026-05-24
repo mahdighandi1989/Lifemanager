@@ -22,8 +22,8 @@ async def startup_event():
             await conn.run_sync(Base.metadata.create_all)
         logger.info("✅ Database tables created successfully")
     except Exception as e:
-        logger.warning(f"⚠️  Warning: Could not connect to database: {e}")
-        logger.warning("   App will continue without database — set DATABASE_URL in Render env vars.")
+        logger.critical(f"❌ CRITICAL: Database connection failed: {e}")
+        logger.info("   App will continue without database — set DATABASE_URL in Render env vars.")
 
 # Include routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
