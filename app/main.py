@@ -89,6 +89,25 @@ async def startup_event():
         logger.critical(f"❌ CRITICAL: Database connection failed: {e}")
         logger.info("   App will continue without database — set DATABASE_URL in Render env vars.")
 
+    # Best-effort idempotent migration: tasks.user_id and projects.user_id
+    # used to be NOT NULL. The current model declares them nullable, but
+    # Base.metadata.create_all does NOT alter existing tables — so an
+    # anonymous POST /api/{tasks,projects} hits the legacy NOT NULL
+    # constraint and blows up with 500. ALTER COLUMN runs in its own
+    # transaction per table so a SQLite/permission failure on one doesn't
+    # roll back the other. Errors are swallowed: the column is already
+    # nullable, the dialect doesn't support ALTER COLUMN, or the table
+    # doesn't exist yet — all benign.
+    for table in ("projects", "tasks"):
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE {table} ALTER COLUMN user_id DROP NOT NULL")
+                )
+                logger.info("relaxed NOT NULL on %s.user_id", table)
+        except Exception as exc:
+            logger.debug("skip user_id NOT NULL relaxation on %s: %s", table, exc)
+
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
 # `/api/health` matches the path configured in render.yaml's healthCheckPath.
