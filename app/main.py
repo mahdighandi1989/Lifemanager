@@ -1,10 +1,12 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse
-from pathlib import Path
+import asyncio
 import logging
+from pathlib import Path
 
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
+from sqlalchemy.exc import TimeoutError as SQLATimeoutError
 
 from app.config import settings
 from app.database import engine, Base, get_db
@@ -15,6 +17,28 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Lifemanager API", version="0.1.0")
+
+
+# When the connection pool is saturated, SQLAlchemy raises QueuePool.TimeoutError
+# (a subclass of sqlalchemy.exc.TimeoutError) after settings.DB_POOL_TIMEOUT
+# seconds. Surface this as a proper 503 instead of a generic 500 so clients and
+# load balancers can react.
+@app.exception_handler(SQLATimeoutError)
+async def _db_pool_timeout_handler(request: Request, exc: SQLATimeoutError) -> JSONResponse:
+    logger.warning("DB pool timeout on %s %s: %s", request.method, request.url.path, exc)
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "database connection pool exhausted, please retry"},
+    )
+
+
+@app.exception_handler(asyncio.TimeoutError)
+async def _async_timeout_handler(request: Request, exc: asyncio.TimeoutError) -> JSONResponse:
+    logger.warning("async timeout on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "request timed out waiting for a database connection"},
+    )
 
 
 # Database initialization with graceful degradation
