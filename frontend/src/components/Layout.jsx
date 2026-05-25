@@ -1,25 +1,29 @@
 import React from 'react';
-import Header from './Header';
+
 import Footer from './Footer';
+import Header from './Header';
+import Sidebar from './Sidebar';
 
 /**
- * Layout component — provides the main page structure for the application.
+ * Layout — the global page chrome.
  *
- * This component wraps page content with a consistent header, main content area,
- * and footer. It uses Tailwind CSS classes for a full-height flex layout with
- * a light gray background.
+ *   ┌── Header ─────────────────────────────┐
+ *   │ Sidebar │   main content (children)   │
+ *   └─────────┴─────────────────────────────┘
+ *   Footer
  *
- * @param {Object} props
- * @param {React.ReactNode} props.children - The page content to render inside the main area.
- * @returns {JSX.Element} The full page layout wrapper.
+ * Sidebar is hidden on mobile (md: breakpoint) — Header carries the nav
+ * there. Test selectors ([data-testid='header'|'sidebar'|'footer']) live on
+ * the respective components.
  */
 function Layout({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-      <main className="flex-1">
-        {children}
-      </main>
+      <div className="flex flex-1">
+        <Sidebar />
+        <main className="flex-1">{children}</main>
+      </div>
       <Footer />
     </div>
   );

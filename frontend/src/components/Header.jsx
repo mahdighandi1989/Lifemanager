@@ -25,7 +25,7 @@ function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header data-testid="header" className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -40,11 +40,12 @@ function Header() {
           </div>
 
           {isAuthenticated && (
-            <nav className="flex items-center space-x-1">
+            <nav className="flex items-center space-x-1" aria-label="Primary">
               {navLinks.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}
+                  data-testid={`header-link-${to === '/' ? 'home' : to.slice(1)}`}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive(to)
                       ? 'bg-blue-50 text-blue-600 font-semibold'
@@ -66,6 +67,7 @@ function Header() {
                   </span>
                 )}
                 <button
+                  data-testid="logout-button"
                   onClick={handleLogout}
                   className="px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
                 >
@@ -73,12 +75,22 @@ function Header() {
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-              >
-                ورود
-              </Link>
+              <>
+                <Link
+                  to="/login"
+                  data-testid="login-link"
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                >
+                  ورود
+                </Link>
+                <Link
+                  to="/register"
+                  data-testid="register-link"
+                  className="px-4 py-2 rounded-lg text-sm font-medium border border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors"
+                >
+                  ثبت‌نام
+                </Link>
+              </>
             )}
           </div>
         </div>
