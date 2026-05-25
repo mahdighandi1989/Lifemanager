@@ -61,14 +61,43 @@ class StrictCORSMiddleware(BaseHTTPMiddleware):
 
     Echoes the allowed Origin back in Access-Control-Allow-Origin when the
     request passes — never returns a wildcard. Same-origin requests (no
-    Origin header) are always allowed through.
+    Origin header, OR Origin matches the request's own Host) are always
+    allowed through — this matters in production because Vite's built
+    HTML uses `<script type="module" crossorigin src=...>`, which makes
+    the browser send `Origin` even for same-origin asset fetches.
     """
 
     async def dispatch(self, request: Request, call_next):
         origin = request.headers.get("origin")
         allowed = _current_allowed_origins()
 
-        if origin and allowed and origin not in allowed:
+        # Same-origin requests are always safe — the Origin matches the
+        # request's own scheme+host. Skip CORS enforcement for them so
+        # Render-served bundles (which fetch /assets/*.js with crossorigin)
+        # don't get 403'd by the strict allowlist.
+        same_origin = False
+        if origin:
+            try:
+                from urllib.parse import urlparse
+
+                origin_parts = urlparse(origin)
+                request_host = request.url.hostname
+                request_scheme = request.url.scheme
+                # request.url.hostname reflects the inbound URL, which on
+                # Render is the public origin — exactly what we want.
+                same_origin = (
+                    origin_parts.hostname == request_host
+                    and (
+                        origin_parts.scheme == request_scheme
+                        # behind Render's TLS terminator the inbound scheme
+                        # arrives as http even though the browser sees https
+                        or request_scheme == "http"
+                    )
+                )
+            except Exception:
+                same_origin = False
+
+        if origin and not same_origin and allowed and origin not in allowed:
             logger.info("CORS reject: %s not in allowlist", origin)
             return JSONResponse(
                 status_code=403,
@@ -77,7 +106,7 @@ class StrictCORSMiddleware(BaseHTTPMiddleware):
 
         # CORS preflight short-circuit so OPTIONS requests don't fall
         # through to route handlers that would 405.
-        if request.method == "OPTIONS" and origin and origin in allowed:
+        if request.method == "OPTIONS" and origin and (same_origin or origin in allowed):
             return JSONResponse(
                 status_code=204,
                 content=None,
@@ -93,7 +122,7 @@ class StrictCORSMiddleware(BaseHTTPMiddleware):
             )
 
         response = await call_next(request)
-        if origin and origin in allowed:
+        if origin and (same_origin or origin in allowed):
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
             response.headers["Vary"] = "Origin"
