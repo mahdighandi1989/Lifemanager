@@ -8,9 +8,17 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.exc import TimeoutError as SQLATimeoutError
 
-from app.config import settings
-from app.database import engine, Base, get_db
-from app.routes import auth, tasks, projects, notifications, ai, users, integrations, webhook
+from app.database import Base, engine
+from app.routes import (
+    ai,
+    auth,
+    integrations,
+    notifications,
+    projects,
+    tasks,
+    users,
+    webhook,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
