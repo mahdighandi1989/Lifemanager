@@ -42,16 +42,11 @@ def _serialize(p: Project) -> dict:
 
 # --- LIST -------------------------------------------------------------------
 
-# Stacked decorators register every list/create endpoint at four variants:
-#   /api/projects, /api/projects/, /projects, /projects/
-# The SPA catch-all in app/main.py matches GET on any path, so without the
-# no-trailing-slash variant FastAPI's redirect_slashes never fires and a
-# POST /api/projects collides with the catch-all GET → 405. Stacking the
-# decorator explicitly removes the ambiguity.
+# Registered at the canonical /api path only. The plain /projects path is
+# an SPA URL handled by the React frontend; the frontend fetches data
+# from /api/projects.
 @router.get("/api/projects", tags=["projects"])
 @router.get("/api/projects/", tags=["projects"])
-@router.get("/projects", tags=["projects"])
-@router.get("/projects/", tags=["projects"])
 async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
     try:
         result = await db.execute(select(Project))
@@ -64,7 +59,6 @@ async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
 # --- GET ONE ----------------------------------------------------------------
 
 @router.get("/api/projects/{project_id}", tags=["projects"])
-@router.get("/projects/{project_id}", tags=["projects"])
 async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         project = await db.get(Project, project_id)
@@ -80,8 +74,6 @@ async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> di
 
 @router.post("/api/projects", status_code=status.HTTP_201_CREATED, tags=["projects"])
 @router.post("/api/projects/", status_code=status.HTTP_201_CREATED, tags=["projects"])
-@router.post("/projects", status_code=status.HTTP_201_CREATED, tags=["projects"])
-@router.post("/projects/", status_code=status.HTTP_201_CREATED, tags=["projects"])
 async def create_project(
     payload: ProjectCreate,
     db: AsyncSession = Depends(get_db),
@@ -108,7 +100,6 @@ async def create_project(
 # --- UPDATE -----------------------------------------------------------------
 
 @router.put("/api/projects/{project_id}", tags=["projects"])
-@router.put("/projects/{project_id}", tags=["projects"])
 async def update_project(
     project_id: int,
     payload: ProjectUpdate,
@@ -140,11 +131,6 @@ async def update_project(
 
 @router.delete(
     "/api/projects/{project_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    tags=["projects"],
-)
-@router.delete(
-    "/projects/{project_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["projects"],
 )

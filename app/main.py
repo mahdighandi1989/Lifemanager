@@ -168,12 +168,16 @@ if frontend_dist.exists():
     if assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
-    # API prefixes that must NOT be swallowed by the SPA catch-all below.
-    # Without this, requests like GET /tasks (no trailing slash) would be
-    # served the SPA index.html — fetch() in the frontend would then fail
-    # to parse it as JSON and report the API as offline.
+    # Path prefixes that belong to the backend API and must NOT be served the
+    # SPA shell. The catch-all redirects these to the trailing-slash form so
+    # that frontend-style calls like fetch('/auth/login') reach the real
+    # API instead of getting index.html.
+    #
+    # Note: 'tasks' and 'projects' are intentionally absent. Those paths are
+    # SPA routes (React renders the Tasks/Projects page) and the data lives
+    # under /api/tasks and /api/projects.
     _API_PREFIXES = (
-        "auth", "tasks", "projects", "notifications", "ai",
+        "auth", "notifications", "ai",
         "users", "integrations", "webhook", "health", "api",
     )
 

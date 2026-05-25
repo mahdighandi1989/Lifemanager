@@ -113,14 +113,25 @@ def test_list_tasks_after_create(api_client):
     assert len(r.json()) == 2
 
 
-def test_list_tasks_also_served_at_legacy_path(api_client):
-    """Frontend uses /tasks/; both paths must hit the same handler."""
+def test_legacy_tasks_path_is_not_an_api_endpoint(api_client):
+    """/tasks is the SPA URL — it must NOT return JSON. Otherwise a browser
+    navigating there would see raw JSON instead of the React Tasks page.
+
+    In tests there is no built frontend/dist, so /tasks/ falls through to
+    the framework default 404. In production the SPA catch-all serves
+    index.html. Either is correct; the failure mode we're guarding against
+    is the route returning the JSON list.
+    """
     api_client.post("/api/tasks/", json={"title": "shared"})
-    legacy = api_client.get("/tasks/")
-    canonical = api_client.get("/api/tasks/")
-    assert legacy.status_code == 200
-    assert canonical.status_code == 200
-    assert legacy.json() == canonical.json()
+    r = api_client.get("/tasks/")
+    if r.status_code == 200:
+        try:
+            body = r.json()
+        except ValueError:
+            return  # non-JSON body (HTML/SPA shell) is fine
+        assert not isinstance(body, list), (
+            "GET /tasks/ must not return the API task list — that path is the SPA URL"
+        )
 
 
 # --- get one ----------------------------------------------------------------

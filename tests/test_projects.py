@@ -61,12 +61,18 @@ def test_list_projects_after_create(api_client):
     assert len(r.json()) == 2
 
 
-def test_list_projects_also_served_at_legacy_path(api_client):
+def test_legacy_projects_path_is_not_an_api_endpoint(api_client):
+    """/projects is the SPA URL — must NOT return the API JSON list."""
     api_client.post("/api/projects/", json={"name": "shared"})
-    legacy = api_client.get("/projects/")
-    canonical = api_client.get("/api/projects/")
-    assert legacy.status_code == 200
-    assert canonical.json() == legacy.json()
+    r = api_client.get("/projects/")
+    if r.status_code == 200:
+        try:
+            body = r.json()
+        except ValueError:
+            return
+        assert not isinstance(body, list), (
+            "GET /projects/ must not return the API project list"
+        )
 
 
 # --- get one ----------------------------------------------------------------
