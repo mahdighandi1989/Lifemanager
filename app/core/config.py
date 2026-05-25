@@ -1,12 +1,10 @@
-from pydantic_settings import BaseSettings
+"""Compatibility shim.
 
-class Settings(BaseSettings):
-    SECRET_KEY: str = "your-secret-key-change-in-production"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    DATABASE_URL: str = "postgresql+asyncpg://user:pass@localhost/dbname"
+Some modules (e.g. app/dependencies/auth.py, app/services/google_auth.py)
+import `from app.core.config import settings`. The canonical Settings now
+live in app.config — re-export here so we don't drift two copies of
+SECRET_KEY/ALGORITHM/... out of sync.
+"""
+from app.config import settings  # noqa: F401  (re-export)
 
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
+__all__ = ["settings"]
