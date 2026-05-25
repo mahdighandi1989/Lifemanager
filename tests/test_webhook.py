@@ -151,3 +151,51 @@ async def test_deliver_webhook_gives_up_after_max_attempts():
     )
     assert fake.calls == 3
     assert result["delivered"] is False
+
+
+# --- helper functions on integration_service ---------------------------------
+
+def test_get_provider_secret_falls_back_to_generic(monkeypatch):
+    """get_provider_secret returns WEBHOOK_SECRET when no provider-specific."""
+    from app.services.integration_service import get_provider_secret
+
+    monkeypatch.delenv("WEBHOOK_SECRET_GITHUB", raising=False)
+    monkeypatch.setenv("WEBHOOK_SECRET", "generic-secret")
+    assert get_provider_secret("github") == "generic-secret"
+
+
+def test_get_provider_secret_prefers_specific(monkeypatch):
+    from app.services.integration_service import get_provider_secret
+
+    monkeypatch.setenv("WEBHOOK_SECRET_STRIPE", "stripe-secret")
+    monkeypatch.setenv("WEBHOOK_SECRET", "fallback-secret")
+    assert get_provider_secret("stripe") == "stripe-secret"
+
+
+def test_get_provider_secret_empty_when_neither_set(monkeypatch):
+    from app.services.integration_service import get_provider_secret
+
+    monkeypatch.delenv("WEBHOOK_SECRET_FOO", raising=False)
+    monkeypatch.delenv("WEBHOOK_SECRET", raising=False)
+    assert get_provider_secret("foo") == ""
+
+
+@pytest.mark.asyncio
+async def test_process_webhook_returns_audit_record():
+    from app.services.integration_service import process_webhook
+
+    result = await process_webhook(
+        "github", {"event": "push", "data": {"ref": "main"}}
+    )
+    assert result["provider"] == "github"
+    assert result["event"] == "push"
+    assert "processed_at" in result
+
+
+@pytest.mark.asyncio
+async def test_process_webhook_handles_missing_event_field():
+    """Falls back to 'unknown' rather than raising."""
+    from app.services.integration_service import process_webhook
+
+    result = await process_webhook("stripe", {"data": {"amount": 1000}})
+    assert result["event"] == "unknown"
