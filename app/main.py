@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pathlib import Path
 import logging
 
@@ -73,6 +73,15 @@ if frontend_dist.exists():
     if assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
+    # API prefixes that must NOT be swallowed by the SPA catch-all below.
+    # Without this, requests like GET /tasks (no trailing slash) would be
+    # served the SPA index.html — fetch() in the frontend would then fail
+    # to parse it as JSON and report the API as offline.
+    _API_PREFIXES = (
+        "auth", "tasks", "projects", "notifications", "ai",
+        "users", "integrations", "webhook", "health", "api",
+    )
+
     @app.get("/{full_path:path}", tags=["frontend"])
     async def serve_frontend(full_path: str):
         """
@@ -87,6 +96,16 @@ if frontend_dist.exists():
         This catch-all only serves files from the dist directory and does NOT
         interfere with registered API routes (FastAPI matches specific routes first).
         """
+        # Don't shadow API routes. Routers are registered with prefix="/tasks"
+        # and a route at "/", so the canonical path is "/tasks/". Requests for
+        # "/tasks" (no trailing slash) would otherwise be served the SPA shell;
+        # the frontend then fails to parse the HTML as JSON and reports the API
+        # as offline. Redirect to the trailing-slash form so fetch() reaches the
+        # real handler.
+        first_segment = full_path.split("/", 1)[0]
+        if first_segment in _API_PREFIXES:
+            return RedirectResponse(url=f"/{full_path}/", status_code=307)
+
         # Guard: Prevent serving files outside the dist directory
         try:
             requested_path = (frontend_dist / full_path).resolve()
