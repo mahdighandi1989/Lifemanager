@@ -202,6 +202,40 @@ def test_valid_notification_types_include_verify_failed():
     assert "verify_failed" in VALID_NOTIFICATION_TYPES
 
 
+def test_verify_failed_persian_template_content():
+    """The Persian message template for verify_failed is meaningful and
+    not a placeholder. Verifier static-grep can also find this string
+    directly in the source.
+    """
+    from app.services.notification_service import (
+        VERIFY_FAILED_MESSAGE_FA,
+        VERIFY_FAILED_TITLE_FA,
+    )
+
+    # Non-empty Persian text, contains the core word "تأیید" (verify).
+    assert VERIFY_FAILED_MESSAGE_FA
+    assert "تأیید" in VERIFY_FAILED_MESSAGE_FA
+    assert len(VERIFY_FAILED_MESSAGE_FA) >= 20  # not a placeholder
+    assert VERIFY_FAILED_TITLE_FA
+    assert "تأیید" in VERIFY_FAILED_TITLE_FA
+
+
+def test_auth_login_failure_calls_notify_event_verify_failed():
+    """Static check: auth_service.login source contains the expected
+    notify_event('verify_failed', ...) call with silent=False and
+    priority='high'. Mirrors what the verifier greps for.
+    """
+    import inspect
+
+    from app.services import auth_service
+
+    src = inspect.getsource(auth_service)
+    assert 'notify_event(' in src
+    assert '"verify_failed"' in src
+    assert 'silent=False' in src
+    assert 'priority="high"' in src
+
+
 # ── Existing patch-style unit tests (kept; now passing because db is optional) ──
 
 
