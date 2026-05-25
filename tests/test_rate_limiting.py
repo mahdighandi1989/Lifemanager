@@ -86,9 +86,9 @@ def test_429_response_has_ratelimit_headers(rate_limited_client):
 def test_register_returns_429_after_limit_exceeded(rate_limited_client):
     """AC: 3+ registrations/hour -> 429. Tightened here to 2/hour."""
     c = rate_limited_client
-    payload_a = {"email": "a@b.com", "username": "a", "password": "pw1!"}
-    payload_b = {"email": "c@b.com", "username": "c", "password": "pw2!"}
-    payload_c = {"email": "d@b.com", "username": "d", "password": "pw3!"}
+    payload_a = {"email": "a@b.com", "username": "a", "password": "passwordA1"}
+    payload_b = {"email": "c@b.com", "username": "c", "password": "passwordB2"}
+    payload_c = {"email": "d@b.com", "username": "d", "password": "passwordC3"}
     assert c.post("/auth/register", json=payload_a).status_code == 201
     assert c.post("/auth/register", json=payload_b).status_code == 201
     over = c.post("/auth/register", json=payload_c)

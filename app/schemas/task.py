@@ -1,21 +1,10 @@
-from pydantic import BaseModel
-from typing import Optional
-from uuid import UUID
-from datetime import datetime
+"""Backwards-compatibility re-export.
 
-
-class TaskCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
-
-
-class TaskResponse(BaseModel):
-    id: UUID
-    title: str
-    description: Optional[str]
-    user_id: UUID
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
+The canonical task schemas now live in app.schemas.task_schema. Older
+imports keep working because we re-export the same names.
+"""
+from app.schemas.task_schema import (  # noqa: F401
+    TaskCreate,
+    TaskResponse,
+    TaskUpdate,
+)

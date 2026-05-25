@@ -66,12 +66,12 @@ def test_register_creates_user(client):
 
 
 def test_register_rejects_duplicate_email(client):
-    payload = {"email": "dup@b.com", "username": "u1", "password": "pw"}
+    payload = {"email": "dup@b.com", "username": "u1", "password": "longenough"}
     r1 = client.post("/auth/register", json=payload)
     assert r1.status_code == 201
     r2 = client.post(
         "/auth/register",
-        json={"email": "dup@b.com", "username": "u2", "password": "pw"},
+        json={"email": "dup@b.com", "username": "u2", "password": "longenough"},
     )
     assert r2.status_code == 409
 
@@ -79,11 +79,11 @@ def test_register_rejects_duplicate_email(client):
 def test_login_with_correct_password_returns_200(client):
     client.post(
         "/auth/register",
-        json={"email": "ok@b.com", "username": "ok", "password": "right-pw"},
+        json={"email": "ok@b.com", "username": "ok", "password": "longenough-pw"},
     )
     r = client.post(
         "/auth/login",
-        json={"email": "ok@b.com", "password": "right-pw"},
+        json={"email": "ok@b.com", "password": "longenough-pw"},
     )
     assert r.status_code == 200, r.text
     body = r.json()
@@ -95,7 +95,7 @@ def test_login_wrong_password_returns_401(client):
     """AC: status code 401 for wrong password (NOT 500)."""
     client.post(
         "/auth/register",
-        json={"email": "u@b.com", "username": "u", "password": "right-pw"},
+        json={"email": "u@b.com", "username": "u", "password": "longenough-pw"},
     )
     r = client.post(
         "/auth/login",
