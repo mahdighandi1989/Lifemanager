@@ -11,6 +11,7 @@ from app.models.project import Project
 from app.models.task import Task
 from app.models.user import User
 from app.models.user_oauth import OAuthUser
+from app.models.webhook_event import WebhookEvent
 
 __all__ = [
     "AIModelConfig",
@@ -20,4 +21,5 @@ __all__ = [
     "Project",
     "Task",
     "User",
+    "WebhookEvent",
 ]

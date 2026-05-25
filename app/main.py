@@ -18,6 +18,7 @@ from app.routes import (
     auth,
     integrations,
     notifications,
+    planner,
     projects,
     tasks,
     users,
@@ -151,7 +152,11 @@ app.include_router(notifications.router, prefix="/notifications", tags=["notific
 app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(integrations.router, prefix="/integrations", tags=["integrations"])
-app.include_router(webhook.router, prefix="/webhook", tags=["webhook"])
+# webhook.router decorators carry the absolute path (/webhook, /webhook/health)
+# so it mounts with no prefix to avoid double-prefixing.
+app.include_router(webhook.router, tags=["webhook"])
+# planner router decorators also use absolute /api/planner paths.
+app.include_router(planner.router, tags=["planner"])
 
 # Serve static files (frontend)
 # در Native Render runtime، CWD ریشه پروژه است

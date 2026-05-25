@@ -1,13 +1,41 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+
 from app.database import get_db
-from app.schemas.ai_schema import AIModelConfigCreate, AIModelConfigUpdate, AIModelConfigOut, AIQueryRequest, AIQueryResponse
-from app.services.ai_service import AIService
-from app.models.user import User
 from app.dependencies.auth import get_current_user
+from app.models.user import User
+from app.schemas.ai_schema import (
+    AIGenerateRequest,
+    AIGenerateResponse,
+    AIModelConfigCreate,
+    AIModelConfigOut,
+    AIModelConfigUpdate,
+    AIQueryRequest,
+    AIQueryResponse,
+)
+from app.services.ai_service import AIService, generate_text
 
 router = APIRouter()
+
+
+@router.post("/generate", response_model=AIGenerateResponse)
+async def generate(payload: AIGenerateRequest) -> AIGenerateResponse:
+    """Validate the prompt + run it through the AI service.
+
+    AIGenerateRequest already rejects empty / >1000-char / SQL-injection-
+    probe prompts with 422 (Pydantic). The response is shaped by
+    AIGenerateResponse — only declared fields ship to the client.
+    """
+    result = await generate_text(
+        prompt=payload.prompt,
+        max_tokens=payload.max_tokens or 512,
+        temperature=payload.temperature or 0.7,
+    )
+    # AIGenerateResponse validates the shape — extra keys from the
+    # upstream provider are silently dropped.
+    return AIGenerateResponse(**result)
 
 @router.get("/configs", response_model=List[AIModelConfigOut])
 async def list_ai_configs(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
