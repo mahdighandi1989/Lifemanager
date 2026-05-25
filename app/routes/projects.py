@@ -42,7 +42,15 @@ def _serialize(p: Project) -> dict:
 
 # --- LIST -------------------------------------------------------------------
 
+# Stacked decorators register every list/create endpoint at four variants:
+#   /api/projects, /api/projects/, /projects, /projects/
+# The SPA catch-all in app/main.py matches GET on any path, so without the
+# no-trailing-slash variant FastAPI's redirect_slashes never fires and a
+# POST /api/projects collides with the catch-all GET → 405. Stacking the
+# decorator explicitly removes the ambiguity.
+@router.get("/api/projects", tags=["projects"])
 @router.get("/api/projects/", tags=["projects"])
+@router.get("/projects", tags=["projects"])
 @router.get("/projects/", tags=["projects"])
 async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
     try:
@@ -70,16 +78,10 @@ async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> di
 
 # --- CREATE -----------------------------------------------------------------
 
-@router.post(
-    "/api/projects/",
-    status_code=status.HTTP_201_CREATED,
-    tags=["projects"],
-)
-@router.post(
-    "/projects/",
-    status_code=status.HTTP_201_CREATED,
-    tags=["projects"],
-)
+@router.post("/api/projects", status_code=status.HTTP_201_CREATED, tags=["projects"])
+@router.post("/api/projects/", status_code=status.HTTP_201_CREATED, tags=["projects"])
+@router.post("/projects", status_code=status.HTTP_201_CREATED, tags=["projects"])
+@router.post("/projects/", status_code=status.HTTP_201_CREATED, tags=["projects"])
 async def create_project(
     payload: ProjectCreate,
     db: AsyncSession = Depends(get_db),
