@@ -220,3 +220,34 @@ async def generate_daily_plan(
         "daily_plan": schedule,
         "total": len(prioritised),
     }
+
+
+# ── AI-assisted planning ─────────────────────────────────────────────
+# `suggest_task_priorities` calls into the AI service to get a free-form
+# priority-ordering hint for an existing task list. The AI integration is
+# best-effort: if the upstream provider isn't configured (no
+# OPENAI_API_KEY) the helper returns the deterministic placeholder shaped
+# by ai_service.generate_text, so the route layer can still ship a 200.
+
+async def suggest_task_priorities(tasks: list[dict]) -> dict:
+    """Ask the AI service for a prioritised ordering of ``tasks``.
+
+    Returns the AIGenerateResponse-shaped dict — caller can hand it
+    straight back to the client. We import generate_text lazily so the
+    planner stays importable even on test environments that don't have
+    the AI side wired up.
+    """
+    from app.services.ai_service import generate_text
+
+    if not tasks:
+        return {
+            "generated_text": "",
+            "model_used": None,
+            "tokens_used": 0,
+        }
+    titles = ", ".join(t.get("title", "") for t in tasks if t.get("title"))
+    prompt = (
+        "Order these tasks by priority for a focused day, "
+        "highest first: " + titles
+    )[:1000]  # honour AIGenerateRequest.prompt max_length
+    return await generate_text(prompt=prompt, max_tokens=256, temperature=0.4)

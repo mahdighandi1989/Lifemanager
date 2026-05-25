@@ -110,3 +110,36 @@ async def test_search_tasks_treats_injection_payload_as_literal(session_factory)
     # The probe is treated as literal text in a LIKE pattern and matches
     # nothing real. user_id=2's row is NOT returned.
     assert rows == []
+
+
+# --- AI integration ---------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_suggest_task_priorities_returns_ai_response_shape(monkeypatch):
+    """planner_service.suggest_task_priorities feeds the task titles into
+    ai_service.generate_text and surfaces the AIGenerateResponse shape.
+
+    Without OPENAI_API_KEY the helper returns the deterministic placeholder
+    so the test doesn't depend on a live upstream.
+    """
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    from app.services.planner_service import suggest_task_priorities
+
+    result = await suggest_task_priorities(
+        [{"title": "write report"}, {"title": "buy milk"}]
+    )
+    assert "generated_text" in result
+    assert "model_used" in result
+    assert "tokens_used" in result
+    assert "write report" in result["generated_text"] or result["generated_text"].startswith(
+        "[ai-"
+    )
+
+
+@pytest.mark.asyncio
+async def test_suggest_task_priorities_handles_empty_list():
+    from app.services.planner_service import suggest_task_priorities
+
+    result = await suggest_task_priorities([])
+    assert result["generated_text"] == ""
+    assert result["tokens_used"] == 0
