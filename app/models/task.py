@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum as SAEnum
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text, Enum as SAEnum
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
@@ -30,7 +30,10 @@ class Task(Base):
     # this from the authenticated principal once auth is wired in.
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
-    due_date = Column(DateTime(timezone=True), nullable=True)
+    # Date (not DateTime) — matches TaskCreate.due_date: date in
+    # app/schemas/task_schema.py. Legacy deploys that already have a
+    # TIMESTAMP column are migrated to DATE at startup (see app/main.py).
+    due_date = Column(Date, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

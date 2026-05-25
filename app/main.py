@@ -108,6 +108,18 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip user_id NOT NULL relaxation on %s: %s", table, exc)
 
+    # tasks.due_date used to be TIMESTAMP; the model now declares Date to
+    # match the Pydantic schema. Convert the existing column on Postgres so
+    # ORM reads/writes line up. USING due_date::date drops any time portion.
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("ALTER TABLE tasks ALTER COLUMN due_date TYPE DATE USING due_date::date")
+            )
+            logger.info("migrated tasks.due_date to DATE")
+    except Exception as exc:
+        logger.debug("skip due_date type migration: %s", exc)
+
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
 # `/api/health` matches the path configured in render.yaml's healthCheckPath.

@@ -54,13 +54,17 @@ def test_create_task_description_too_long_returns_422(api_client):
 
 
 def test_create_task_with_due_date_accepts_iso_date(api_client):
-    """AC for due_date: POST with `{"due_date": "2025-03-15"}` -> 201."""
+    """AC for due_date: POST with `{"due_date": "2025-03-15"}` -> 201.
+
+    The schema (date) and the model (Date) now match — the response
+    serializes the date as the plain ISO 'YYYY-MM-DD' string.
+    """
     r = api_client.post(
         "/api/tasks/",
         json={"title": "ok", "due_date": "2025-03-15"},
     )
     assert r.status_code == 201, r.text
-    assert r.json()["due_date"].startswith("2025-03-15")
+    assert r.json()["due_date"] == "2025-03-15"
 
 
 def test_create_task_priority_out_of_range_returns_422(api_client):
