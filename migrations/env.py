@@ -17,9 +17,19 @@ import app.models  # noqa: F401
 
 config = context.config
 
+# Prefer an explicit override set via Config.set_main_option (used by
+# tests/test_migrations.py) over the runtime DATABASE_URL — that lets us
+# point Alembic at SQLite for hermetic migration smoke tests without
+# requiring psycopg2 to be installed.
+_explicit_url = config.get_main_option("sqlalchemy.url")
+_DEFAULT_INI_URL = "postgresql+psycopg2://user:pass@localhost:5432/lifemanager"
+if _explicit_url and _explicit_url != _DEFAULT_INI_URL:
+    url = _explicit_url
+else:
+    url = settings.DATABASE_URL
+
 # Switch the runtime URL onto the (sync) psycopg2 driver: the asyncpg URL
 # used by the app does not work with Alembic's offline/online runner.
-url = settings.DATABASE_URL
 if url.startswith("postgresql+asyncpg://"):
     url = "postgresql+psycopg2://" + url[len("postgresql+asyncpg://"):]
 elif url.startswith("postgres://"):

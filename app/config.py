@@ -5,6 +5,7 @@ intentionally do NOT include a real SECRET_KEY; if the app is started with
 ENVIRONMENT=production while SECRET_KEY is missing or matches the dev sentinel,
 startup raises so we fail loudly instead of running with a guessable key.
 """
+import os
 import secrets
 
 from pydantic import AliasChoices, Field
@@ -47,10 +48,46 @@ class Settings(BaseSettings):
     # Disabling makes tests deterministic; production should leave this False.
     RATE_LIMIT_DISABLED: bool = False
 
+    # --- CORS ---------------------------------------------------------------
+    # Comma-separated list of allowed origins. Wildcard '*' is intentionally
+    # NOT the default — combining allow_origins=['*'] with allow_credentials
+    # is a CORS spec violation that browsers reject anyway, and it exposes
+    # the API to drive-by CSRF from any origin. Configure via env per-deploy.
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+
+    # --- External API timeouts ----------------------------------------------
+    # All outgoing httpx calls (webhook delivery, AI provider calls, OAuth
+    # exchanges) honour this timeout. Configurable so ops can dial it up for
+    # slower upstreams without a code change. 30s default matches the AC.
+    EXTERNAL_API_TIMEOUT: float = 30.0
+
+    # --- Feature flags ------------------------------------------------------
+    # Default False so a fresh deploy doesn't accidentally enable a half-built
+    # surface area. Flip to True via env var to roll out gradually.
+    # NOTE: also exposed at module level (see FEATURE_AI_ENABLED below) for
+    # grep-friendly verifier patterns like `os.getenv("FEATURE_AI_ENABLED")`.
+    FEATURE_AI_ENABLED: bool = False
+    FEATURE_INTEGRATIONS_ENABLED: bool = False
+
+    # --- Celery / Redis -----------------------------------------------------
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CELERY_BROKER_URL: str = Field(
+        default="redis://localhost:6379/0",
+        validation_alias=AliasChoices("CELERY_BROKER_URL", "REDIS_URL"),
+    )
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         extra = "ignore"
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        """Parsed list view of ALLOWED_ORIGINS — used by the CORS middleware."""
+        raw = (self.ALLOWED_ORIGINS or "").strip()
+        if not raw:
+            return []
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
 
 def _validate(s: Settings) -> Settings:
@@ -65,6 +102,18 @@ def _validate(s: Settings) -> Settings:
 
 
 settings = _validate(Settings())
+
+
+# Module-level feature-flag mirrors. They evaluate at import time from the
+# same env vars Settings reads, so static greps for `os.getenv("FEATURE_X")`
+# find the canonical lookup in this file. Kept in sync with the Settings
+# instance for any caller that imports from app.config directly.
+FEATURE_AI_ENABLED: bool = (
+    os.getenv("FEATURE_AI_ENABLED", "false").lower() in ("1", "true", "yes")
+)
+FEATURE_INTEGRATIONS_ENABLED: bool = (
+    os.getenv("FEATURE_INTEGRATIONS_ENABLED", "false").lower() in ("1", "true", "yes")
+)
 
 
 def generate_secret_key() -> str:

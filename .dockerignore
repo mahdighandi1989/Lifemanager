@@ -1,0 +1,36 @@
+# Files excluded from Docker build context.
+# Keep secrets and developer-local state out of production images.
+
+# Secrets / local config — .env.example is documentation but still
+# excluded from the runtime image (the deployment platform injects env vars).
+.env
+.env.*
+.env.example
+
+# VCS / IDE
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+
+# Python caches and build artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov/
+*.egg-info
+
+# Node modules (frontend builder stage installs them fresh)
+frontend/node_modules
+frontend/dist
+
+# Tests + local docs
+tests/
+docs/
+*.md
