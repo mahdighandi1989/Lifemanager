@@ -26,7 +26,9 @@ class Task(Base):
     description = Column(Text, nullable=True)
     status = Column(SAEnum(TaskStatus), default=TaskStatus.TODO, nullable=False)
     priority = Column(SAEnum(TaskPriority), default=TaskPriority.MEDIUM, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # nullable: anonymous task creation is allowed today; routes populate
+    # this from the authenticated principal once auth is wired in.
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     due_date = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
