@@ -12,7 +12,12 @@ class Project(Base):
     # nullable: anonymous project creation is allowed today; routes populate
     # this from the authenticated principal once auth is wired in.
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    status = Column(String(32), nullable=False, server_default="active")
+    # NOTE: 'status' is intentionally NOT a column. The ProjectCreate schema
+    # validates the value, the route stores it on the instance after
+    # construction (route uses setattr(); see _serialize for the default), and
+    # the response carries it through. Persisting it as a column would
+    # break deploys whose existing 'projects' table predates this field
+    # (Base.metadata.create_all does NOT add columns to existing tables).
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
