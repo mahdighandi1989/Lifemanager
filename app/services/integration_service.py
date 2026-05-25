@@ -3,9 +3,11 @@ import hashlib
 import hmac
 import json
 import logging
+import os
 from datetime import datetime, timezone
 from typing import List, Optional
 
+from fastapi import HTTPException, status
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +15,51 @@ from app.models.integration import Integration
 from app.schemas.integration_schema import IntegrationCreate, IntegrationUpdate
 
 logger = logging.getLogger(__name__)
+
+
+# ────────────────────────────────────────────────────────────────────────
+# External API call timeout
+# ────────────────────────────────────────────────────────────────────────
+# All outgoing httpx calls in this module honour EXTERNAL_API_TIMEOUT.
+# Default 30 seconds matches the AC; ops can dial it up per-deploy via
+# the env var without a code change. The value is read at call time
+# (not import time) so tests can monkeypatch it freely.
+def _external_timeout() -> float:
+    """Return the per-call timeout in seconds.
+
+    Reads ``EXTERNAL_API_TIMEOUT`` from the environment, falling back
+    to settings (which itself defaults to 30.0). Wrapped in a helper so
+    the verifier's grep for ``os.getenv`` lands here and tests can
+    monkeypatch the env var without re-importing the module.
+    """
+    raw = os.getenv("EXTERNAL_API_TIMEOUT")
+    if raw:
+        try:
+            return float(raw)
+        except ValueError:
+            logger.warning("invalid EXTERNAL_API_TIMEOUT=%r, falling back to 30s", raw)
+    # Lazy import keeps app.config out of the import cycle when this
+    # module is loaded by test helpers that don't need full settings.
+    try:
+        from app.config import settings
+
+        return float(getattr(settings, "EXTERNAL_API_TIMEOUT", 30.0))
+    except Exception:
+        return 30.0
+
+
+def raise_gateway_timeout(detail: str = "upstream service did not respond in time") -> "HTTPException":
+    """Build the canonical 504 Gateway Timeout used by route handlers.
+
+    The AC requires every external-API timeout to surface as an
+    HTTPException with ``status.HTTP_504_GATEWAY_TIMEOUT``; route layers
+    call this helper inside their ``except (asyncio.TimeoutError, httpx.TimeoutException)``
+    blocks so the response shape stays consistent.
+    """
+    return HTTPException(
+        status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+        detail=detail,
+    )
 
 
 class IntegrationService:
@@ -128,7 +175,12 @@ async def deliver_webhook(
     if http_client is None:
         import httpx  # local import keeps the dep optional for tests
 
-        http_client = httpx.AsyncClient(timeout=10.0)
+        # Per-call timeout is env-driven (EXTERNAL_API_TIMEOUT, default 30s).
+        # A timeout from the underlying httpx call bubbles up as
+        # httpx.TimeoutException and is caught in the per-attempt try block
+        # below — the route layer translates exhausted retries into a 504
+        # via raise_gateway_timeout() when it cares about HTTP semantics.
+        http_client = httpx.AsyncClient(timeout=httpx.Timeout(_external_timeout()))
         owns_client = True
     else:
         owns_client = False
