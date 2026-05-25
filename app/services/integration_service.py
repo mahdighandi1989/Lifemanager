@@ -174,3 +174,41 @@ async def deliver_webhook(
         "attempt": max_attempts,
         "error": repr(last_error),
     }
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Convenience helpers — thin wrappers used by app/routes/webhook.py and any
+# future integration code that needs to look up a provider's secret or
+# process an incoming verified payload.
+# ────────────────────────────────────────────────────────────────────────
+
+
+def get_provider_secret(provider: str) -> str:
+    """Return the HMAC shared secret for ``provider``.
+
+    Reads from env vars ``WEBHOOK_SECRET_<PROVIDER>`` first, then falls
+    back to the generic ``WEBHOOK_SECRET`` used by app/routes/webhook.py.
+    Returning '' means 'no secret configured' — verify_signature treats
+    that as auth failure.
+    """
+    import os
+
+    specific = os.environ.get(f"WEBHOOK_SECRET_{provider.upper()}", "")
+    return specific or os.environ.get("WEBHOOK_SECRET", "")
+
+
+async def process_webhook(provider: str, payload: dict) -> dict:
+    """Apply provider-specific handling for an already-verified webhook.
+
+    Today this is a thin dispatcher — most providers want the payload
+    persisted as a WebhookEvent (which the route already does). The hook
+    is here so a future GitHub/Stripe/Slack integration can add per-
+    provider parsing without touching the route. Returns a small audit
+    dict the caller can fold into the HTTP response.
+    """
+    timestamp = datetime.now(timezone.utc).isoformat()
+    event = payload.get("event") or payload.get("type") or "unknown"
+    logger.info(
+        "process_webhook provider=%s event=%s at %s", provider, event, timestamp,
+    )
+    return {"provider": provider, "event": event, "processed_at": timestamp}
