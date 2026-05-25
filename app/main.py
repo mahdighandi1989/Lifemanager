@@ -5,10 +5,14 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import TimeoutError as SQLATimeoutError
 
 from app.database import Base, engine
+from app.rate_limit import limiter
 from app.routes import (
     ai,
     auth,
@@ -25,6 +29,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Lifemanager API", version="0.1.0")
+
+# --- Rate limiting -----------------------------------------------------------
+# Per-IP throttling for sensitive endpoints (login/register). The SlowAPI
+# middleware injects X-RateLimit-Limit / -Remaining / -Reset headers on every
+# response routed through a @limiter.limit(...) endpoint, and raises
+# RateLimitExceeded — which we translate to a 429.
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 # When the connection pool is saturated, SQLAlchemy raises QueuePool.TimeoutError

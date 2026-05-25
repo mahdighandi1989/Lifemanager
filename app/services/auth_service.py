@@ -1,31 +1,86 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from passlib.context import CryptContext
-from jose import jwt, JWTError
+"""Authentication service — single source of truth for JWT and password ops.
+
+Functions exposed:
+    hash_password / verify_password   — bcrypt via passlib
+    create_access_token               — sign a JWT with the canonical secret
+    validate_token                    — decode + verify a JWT; returns payload
+                                        or None. THE only place that calls
+                                        jwt.decode for our own access tokens.
+    register / login                  — pure service layer, raise ValueError on
+                                        invalid input so routes can translate
+                                        to the correct HTTP status code.
+    get_current_user                  — async helper that resolves a token to
+                                        a User row; raises ValueError if not
+                                        found or token invalid.
+
+Class wrappers (AuthService, UserService) preserve the existing call-sites
+in app/dependencies/auth.py and app/routes/users.py.
+"""
 from datetime import datetime, timedelta
 from typing import Optional
 
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config import settings
 from app.models.user import User
-from app.schemas.auth import UserCreate, UserLogin, TokenResponse
-from app.database import get_db
+from app.schemas.auth import TokenResponse, UserCreate, UserLogin
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = "your-secret-key-here"  # TODO: move to env
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+# --- Password helpers --------------------------------------------------------
+
+def hash_password(plain: str) -> str:
+    return pwd_context.hash(plain)
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+
+# --- JWT helpers -------------------------------------------------------------
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def validate_token(token: str) -> Optional[dict]:
+    """Decode and verify a JWT. Returns the payload dict, or None on any
+    failure (bad signature, expired, malformed, missing 'sub').
+
+    Every caller that needs to validate one of OUR access tokens MUST use
+    this function so signature/algorithm/expiry handling stays consistent.
+    """
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+    except JWTError:
+        return None
+    if "sub" not in payload:
+        return None
+    return payload
+
+
+# --- High-level operations ---------------------------------------------------
 
 async def register(db: AsyncSession, user_data: UserCreate) -> User:
     existing = await db.execute(select(User).where(User.email == user_data.email))
     if existing.scalar_one_or_none():
         raise ValueError("Email already registered")
 
-    hashed_password = pwd_context.hash(user_data.password)
     db_user = User(
         email=user_data.email,
         username=user_data.username,
-        hashed_password=hashed_password
+        hashed_password=hash_password(user_data.password),
     )
     db.add(db_user)
     await db.commit()
@@ -36,19 +91,21 @@ async def register(db: AsyncSession, user_data: UserCreate) -> User:
 async def login(db: AsyncSession, credentials: UserLogin) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == credentials.email))
     user = result.scalar_one_or_none()
-    if not user or not pwd_context.verify(credentials.password, user.hashed_password):
+    if not user or not verify_password(credentials.password, user.hashed_password):
         raise ValueError("Invalid email or password")
 
-    access_token = create_access_token(data={"sub": str(user.id), "email": user.email})
-    return TokenResponse(access_token=access_token, token_type="bearer")
+    token = create_access_token(data={"sub": str(user.id), "email": user.email})
+    return TokenResponse(access_token=token, token_type="bearer")
 
 
 async def get_current_user(db: AsyncSession, token: str) -> User:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get("sub"))
-    except (JWTError, ValueError, AttributeError):
+    payload = validate_token(token)
+    if payload is None:
         raise ValueError("Invalid token")
+    try:
+        user_id = int(payload["sub"])
+    except (TypeError, ValueError):
+        raise ValueError("Invalid token") from None
 
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
@@ -57,15 +114,10 @@ async def get_current_user(db: AsyncSession, token: str) -> User:
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
+# --- Class wrappers (preserve existing call-sites) ---------------------------
 
 class AuthService:
-    """Class-based wrapper used by app/dependencies/auth.py"""
+    """Used by app/dependencies/auth.py via Depends."""
 
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -78,7 +130,7 @@ class AuthService:
 
 
 class UserService:
-    """Class-based wrapper used by app/routes/users.py"""
+    """Used by app/routes/users.py."""
 
     def __init__(self, db: AsyncSession):
         self.db = db
