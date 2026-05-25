@@ -1,18 +1,22 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
+
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
+import { ProjectProvider } from './context/ProjectContext';
+import { TaskProvider } from './context/TaskContext';
 import Dashboard from './pages/Dashboard';
-import Tasks from './pages/Tasks';
-import Projects from './pages/Projects';
-import Notifications from './pages/Notifications';
+import Home from './pages/Home';
 import Login from './pages/Login';
+import Notifications from './pages/Notifications';
+import Projects from './pages/Projects';
 import Register from './pages/Register';
+import Tasks from './pages/Tasks';
 
 /**
  * ⏸️ Temporary placeholder — Login page is disabled.
- * To re-enable: change <LoginDisabled /> back to <Login /> in the route below.
+ * To re-enable: swap <LoginDisabled /> back to <Login /> in the route below.
  */
 function LoginDisabled() {
   return (
@@ -35,58 +39,65 @@ function LoginDisabled() {
 
 function App() {
   return (
+    // Provider order matters: Auth on the outside so Project/Task can read
+    // the token from useAuth() if they ever need to.
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes — Login temporarily disabled */}
-          <Route path="/login" element={<LoginDisabled />} />
-          <Route path="/register" element={<Register />} />
+      <ProjectProvider>
+        <TaskProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes — Login temporarily disabled */}
+              <Route path="/login" element={<LoginDisabled />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/welcome" element={<Home />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Tasks />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/projects"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Projects />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Notifications />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+              {/* Protected routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tasks"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Tasks />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projects"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Projects />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Notifications />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </TaskProvider>
+      </ProjectProvider>
     </AuthProvider>
   );
 }
