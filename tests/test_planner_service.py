@@ -1,135 +1,112 @@
+"""Tests for planner_service.generate_daily_plan and search_tasks.
+
+Replaces the previous file which referenced a class PlannerService with
+create_plan/get_plan methods — neither exists in this codebase.
+"""
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from datetime import datetime, timedelta
+import pytest_asyncio
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.services.planner_service import PlannerService
-
-
-@pytest.fixture
-def planner_service():
-    return PlannerService()
+from app.database import Base
+from app.models.task import Task, TaskPriority, TaskStatus
+from app.services.planner_service import generate_daily_plan, search_tasks
 
 
-class TestPlannerService:
-    """Tests for PlannerService."""
+@pytest_asyncio.fixture
+async def session_factory():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    yield factory
+    await engine.dispose()
 
-    def test_service_initialization(self, planner_service):
-        """Test that PlannerService can be initialized."""
-        assert planner_service is not None
-        assert hasattr(planner_service, 'create_plan')
-        assert hasattr(planner_service, 'get_plan')
-        assert hasattr(planner_service, 'update_plan')
-        assert hasattr(planner_service, 'delete_plan')
 
-    @pytest.mark.asyncio
-    async def test_create_plan_success(self, planner_service):
-        """Test successful plan creation."""
-        with patch.object(planner_service, '_save_plan', new_callable=AsyncMock) as mock_save:
-            mock_plan = MagicMock()
-            mock_plan.id = 1
-            mock_plan.title = "Test Plan"
-            mock_plan.user_id = 123
-            mock_save.return_value = mock_plan
+async def _add_task(session_factory, **kwargs):
+    async with session_factory() as db:
+        t = Task(**kwargs)
+        db.add(t)
+        await db.commit()
+        await db.refresh(t)
+        return t
 
-            result = await planner_service.create_plan(
-                user_id=123,
-                title="Test Plan",
-                description="A test plan",
-                start_date=datetime.now(),
-                end_date=datetime.now() + timedelta(days=7)
-            )
-            assert result is not None
-            assert result.title == "Test Plan"
-            assert result.user_id == 123
 
-    @pytest.mark.asyncio
-    async def test_create_plan_invalid_dates(self, planner_service):
-        """Test plan creation with invalid date range."""
-        with pytest.raises(ValueError, match="End date must be after start date"):
-            await planner_service.create_plan(
-                user_id=123,
-                title="Invalid Plan",
-                description="Test",
-                start_date=datetime.now(),
-                end_date=datetime.now() - timedelta(days=1)
-            )
+# --- generate_daily_plan -----------------------------------------------------
 
-    @pytest.mark.asyncio
-    async def test_get_plan(self, planner_service):
-        """Test retrieving a plan."""
-        with patch.object(planner_service, '_get_plan_by_id', new_callable=AsyncMock) as mock_get:
-            mock_plan = MagicMock()
-            mock_plan.id = 1
-            mock_plan.user_id = 123
-            mock_get.return_value = mock_plan
+@pytest.mark.asyncio
+async def test_generate_daily_plan_returns_empty_for_user_without_tasks(session_factory):
+    async with session_factory() as db:
+        plan = await generate_daily_plan(db, user_id=42, target_date="2025-03-15")
+    assert plan["total"] == 0
+    assert plan["tasks"] == []
+    assert plan["daily_plan"] == []
+    assert plan["date"] == "2025-03-15"
 
-            result = await planner_service.get_plan(plan_id=1, user_id=123)
-            assert result is not None
-            assert result.id == 1
 
-    @pytest.mark.asyncio
-    async def test_get_plan_not_found(self, planner_service):
-        """Test retrieving non-existent plan."""
-        with patch.object(planner_service, '_get_plan_by_id', new_callable=AsyncMock) as mock_get:
-            mock_get.return_value = None
-            result = await planner_service.get_plan(plan_id=999, user_id=123)
-            assert result is None
+@pytest.mark.asyncio
+async def test_generate_daily_plan_includes_user_tasks(session_factory):
+    await _add_task(session_factory, title="a", user_id=1)
+    await _add_task(session_factory, title="b", user_id=1)
+    async with session_factory() as db:
+        plan = await generate_daily_plan(db, user_id=1)
+    assert plan["total"] == 2
+    assert {t["title"] for t in plan["tasks"]} == {"a", "b"}
+    assert len(plan["daily_plan"]) == 2
 
-    @pytest.mark.asyncio
-    async def test_get_plan_unauthorized(self, planner_service):
-        """Test retrieving plan belonging to another user."""
-        with patch.object(planner_service, '_get_plan_by_id', new_callable=AsyncMock) as mock_get:
-            mock_plan = MagicMock()
-            mock_plan.user_id = 456
-            mock_get.return_value = mock_plan
 
-            result = await planner_service.get_plan(plan_id=1, user_id=123)
-            assert result is None
+@pytest.mark.asyncio
+async def test_generate_daily_plan_sorts_by_priority(session_factory):
+    """Critical/high priorities come before medium/low."""
+    await _add_task(session_factory, title="medium-task", user_id=1, priority=TaskPriority.MEDIUM)
+    await _add_task(session_factory, title="critical-task", user_id=1, priority=TaskPriority.CRITICAL)
+    await _add_task(session_factory, title="low-task", user_id=1, priority=TaskPriority.LOW)
+    async with session_factory() as db:
+        plan = await generate_daily_plan(db, user_id=1)
+    titles = [t["title"] for t in plan["tasks"]]
+    assert titles.index("critical-task") < titles.index("medium-task") < titles.index("low-task")
 
-    @pytest.mark.asyncio
-    async def test_update_plan(self, planner_service):
-        """Test updating a plan."""
-        with patch.object(planner_service, '_get_plan_by_id', new_callable=AsyncMock) as mock_get:
-            mock_plan = MagicMock()
-            mock_plan.user_id = 123
-            mock_get.return_value = mock_plan
 
-            with patch.object(planner_service, '_update_plan_in_db', new_callable=AsyncMock) as mock_update:
-                mock_update.return_value = MagicMock(title="Updated Plan")
-                result = await planner_service.update_plan(
-                    plan_id=1,
-                    user_id=123,
-                    title="Updated Plan"
-                )
-                assert result.title == "Updated Plan"
+@pytest.mark.asyncio
+async def test_generate_daily_plan_excludes_done_tasks(session_factory):
+    await _add_task(session_factory, title="open", user_id=1, status=TaskStatus.TODO)
+    await _add_task(session_factory, title="done", user_id=1, status=TaskStatus.DONE)
+    async with session_factory() as db:
+        plan = await generate_daily_plan(db, user_id=1)
+    titles = [t["title"] for t in plan["tasks"]]
+    assert "open" in titles
+    assert "done" not in titles
 
-    @pytest.mark.asyncio
-    async def test_delete_plan(self, planner_service):
-        """Test deleting a plan."""
-        with patch.object(planner_service, '_get_plan_by_id', new_callable=AsyncMock) as mock_get:
-            mock_plan = MagicMock()
-            mock_plan.user_id = 123
-            mock_get.return_value = mock_plan
 
-            with patch.object(planner_service, '_delete_plan_from_db', new_callable=AsyncMock) as mock_delete:
-                mock_delete.return_value = True
-                result = await planner_service.delete_plan(plan_id=1, user_id=123)
-                assert result is True
+@pytest.mark.asyncio
+async def test_generate_daily_plan_schedule_carries_starts_at(session_factory):
+    await _add_task(session_factory, title="x", user_id=1)
+    async with session_factory() as db:
+        plan = await generate_daily_plan(db, user_id=1, target_date="2025-03-15")
+    slot = plan["daily_plan"][0]
+    assert slot["task_id"] is not None
+    assert slot["starts_at"].startswith("2025-03-15T09:00")
+    assert slot["ends_at"].startswith("2025-03-15T09:30")
 
-    @pytest.mark.asyncio
-    async def test_delete_plan_not_found(self, planner_service):
-        """Test deleting non-existent plan."""
-        with patch.object(planner_service, '_get_plan_by_id', new_callable=AsyncMock) as mock_get:
-            mock_get.return_value = None
-            result = await planner_service.delete_plan(plan_id=999, user_id=123)
-            assert result is False
 
-    @pytest.mark.asyncio
-    async def test_get_user_plans(self, planner_service):
-        """Test retrieving all plans for a user."""
-        with patch.object(planner_service, '_get_plans_for_user', new_callable=AsyncMock) as mock_get:
-            mock_plans = [MagicMock() for _ in range(5)]
-            mock_get.return_value = mock_plans
+# --- search_tasks (parameterized — SQL injection is impossible) -------------
 
-            result = await planner_service.get_user_plans(user_id=123)
-            assert len(result) == 5
+@pytest.mark.asyncio
+async def test_search_tasks_finds_substring_match(session_factory):
+    await _add_task(session_factory, title="buy milk", user_id=1)
+    await _add_task(session_factory, title="write report", user_id=1)
+    async with session_factory() as db:
+        rows = await search_tasks(db, user_id=1, query="milk")
+    assert [t.title for t in rows] == ["buy milk"]
+
+
+@pytest.mark.asyncio
+async def test_search_tasks_treats_injection_payload_as_literal(session_factory):
+    """A SQL-injection probe must not bypass the user_id filter."""
+    await _add_task(session_factory, title="user-1 task", user_id=1)
+    await _add_task(session_factory, title="user-2 task", user_id=2)
+    async with session_factory() as db:
+        rows = await search_tasks(db, user_id=1, query="' OR 1=1--")
+    # The probe is treated as literal text in a LIKE pattern and matches
+    # nothing real. user_id=2's row is NOT returned.
+    assert rows == []
