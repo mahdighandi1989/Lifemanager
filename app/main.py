@@ -53,6 +53,22 @@ async def _db_pool_timeout_handler(request: Request, exc: SQLATimeoutError) -> J
     )
 
 
+# Catch-all for unanticipated exceptions: log the traceback and return a
+# {'detail': 'internal error'} 500 so clients always see a consistent shape.
+@app.exception_handler(Exception)
+async def _unhandled_exception(request: Request, exc: Exception) -> JSONResponse:
+    # Let HTTPException pass through to its default handler (FastAPI handles
+    # this before our generic catch-all in practice; this guard keeps the
+    # exception chain unambiguous if a subclass slips through).
+    if isinstance(exc, HTTPException):
+        raise exc
+    logger.exception("unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "internal error"},
+    )
+
+
 @app.exception_handler(asyncio.TimeoutError)
 async def _async_timeout_handler(request: Request, exc: asyncio.TimeoutError) -> JSONResponse:
     logger.warning("async timeout on %s %s", request.method, request.url.path)
