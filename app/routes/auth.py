@@ -14,7 +14,7 @@ Set RATE_LIMIT_DISABLED=true to bypass enforcement in tests.
 Authentication failures intentionally return 401 with a generic message
 ("Invalid email or password") so we don't leak whether the email exists.
 """
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -31,9 +31,13 @@ router = APIRouter()
     response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
 )
-@limiter.limit(settings.RATE_LIMIT_REGISTER)
+# Pass a lambda so settings.RATE_LIMIT_REGISTER is read at request time;
+# this lets tests (and runtime config flips) adjust the limit without
+# rebuilding the app.
+@limiter.limit(lambda: settings.RATE_LIMIT_REGISTER)
 async def register(
     request: Request,
+    response: Response,  # slowapi injects X-RateLimit-* headers into this
     payload: UserCreate,
     db: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
@@ -52,9 +56,10 @@ async def register(
 
 
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit(settings.RATE_LIMIT_LOGIN)
+@limiter.limit(lambda: settings.RATE_LIMIT_LOGIN)
 async def login(
     request: Request,
+    response: Response,  # slowapi injects X-RateLimit-* headers into this
     payload: UserLogin,
     db: AsyncSession = Depends(get_db),
 ) -> TokenResponse:

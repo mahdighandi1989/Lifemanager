@@ -1,73 +1,182 @@
+"""Unit tests for app/services/auth_service.py.
+
+Covers the public service surface:
+    hash_password / verify_password   (bcrypt round-trip)
+    create_access_token / validate_token  (JWT round-trip + tamper / expiry)
+    register / login                  (DB-backed flows, with bad creds path)
+
+The previous tests/test_auth_service.py referenced methods that never
+existed on AuthService (authenticate, create_user, _get_user_by_email, ...)
+and could not run.
+"""
+from datetime import timedelta
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+import pytest_asyncio
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.services.auth_service import AuthService
-
-
-@pytest.fixture
-def auth_service():
-    return AuthService()
+from app.database import Base
+from app.schemas.auth import UserCreate, UserLogin
+from app.services import auth_service
 
 
-class TestAuthService:
-    """Tests for AuthService."""
+@pytest_asyncio.fixture
+async def session_factory():
+    """Per-test in-memory SQLite engine + session factory.
 
-    def test_service_initialization(self, auth_service):
-        """Test that AuthService can be initialized."""
-        assert auth_service is not None
-        assert hasattr(auth_service, 'authenticate')
-        assert hasattr(auth_service, 'create_user')
+    Must be an async fixture so the engine binds to the test's event loop;
+    sync fixtures that asyncio.run() a setup leave the engine attached to a
+    closed loop and the test then RuntimeErrors on use.
+    """
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    yield factory
+    await engine.dispose()
 
-    @pytest.mark.asyncio
-    async def test_authenticate_success(self, auth_service):
-        """Test successful authentication."""
-        with patch.object(auth_service, '_get_user_by_email', new_callable=AsyncMock) as mock_get_user:
-            mock_user = MagicMock()
-            mock_user.email = "test@example.com"
-            mock_user.password_hash = "$2b$12$LJ3m4ys3Lk0TSwHn9s8XoO"
-            mock_get_user.return_value = mock_user
 
-            with patch.object(auth_service, '_verify_password') as mock_verify:
-                mock_verify.return_value = True
-                result = await auth_service.authenticate("test@example.com", "password123")
-                assert result is not None
-                assert result.email == "test@example.com"
+# --- Password hashing --------------------------------------------------------
 
-    @pytest.mark.asyncio
-    async def test_authenticate_invalid_credentials(self, auth_service):
-        """Test authentication with invalid credentials."""
-        with patch.object(auth_service, '_get_user_by_email', new_callable=AsyncMock) as mock_get_user:
-            mock_get_user.return_value = None
-            result = await auth_service.authenticate("invalid@example.com", "wrongpassword")
-            assert result is None
+def test_password_hashing_and_verification():
+    """bcrypt round-trip works and rejects wrong passwords."""
+    h = auth_service.hash_password("correct horse battery staple")
+    assert h != "correct horse battery staple", "hash must not be the plain text"
+    assert h.startswith("$2"), "expected a bcrypt $2x/$2b hash"
+    assert auth_service.verify_password("correct horse battery staple", h)
+    assert not auth_service.verify_password("wrong password", h)
 
-    @pytest.mark.asyncio
-    async def test_create_user_success(self, auth_service):
-        """Test successful user creation."""
-        with patch.object(auth_service, '_hash_password') as mock_hash:
-            mock_hash.return_value = "$2b$12$hashedpassword"
-            with patch.object(auth_service, '_save_user', new_callable=AsyncMock) as mock_save:
-                mock_user = MagicMock()
-                mock_user.id = 1
-                mock_user.email = "new@example.com"
-                mock_save.return_value = mock_user
 
-                result = await auth_service.create_user("new@example.com", "securepassword")
-                assert result is not None
-                assert result.email == "new@example.com"
+def test_password_hash_is_salted():
+    """Two hashes of the same password must differ (random salt)."""
+    a = auth_service.hash_password("same")
+    b = auth_service.hash_password("same")
+    assert a != b
+    assert auth_service.verify_password("same", a)
+    assert auth_service.verify_password("same", b)
 
-    @pytest.mark.asyncio
-    async def test_create_user_duplicate_email(self, auth_service):
-        """Test user creation with duplicate email."""
-        with patch.object(auth_service, '_get_user_by_email', new_callable=AsyncMock) as mock_get_user:
-            mock_get_user.return_value = MagicMock()
-            with pytest.raises(ValueError, match="Email already exists"):
-                await auth_service.create_user("existing@example.com", "password123")
 
-    def test_password_hashing(self, auth_service):
-        """Test password hashing and verification."""
-        password = "my_secret_password"
-        hashed = auth_service._hash_password(password)
-        assert hashed != password
-        assert auth_service._verify_password(password, hashed) is True
-        assert auth_service._verify_password("wrong_password", hashed) is False
+# --- JWT --------------------------------------------------------------------
+
+def test_verify_token_with_valid_token():
+    t = auth_service.create_access_token({"sub": "42", "email": "a@b.c"})
+    payload = auth_service.validate_token(t)
+    assert payload is not None
+    assert payload["sub"] == "42"
+    assert payload["email"] == "a@b.c"
+
+
+def test_verify_token_with_expired_token():
+    expired = auth_service.create_access_token(
+        {"sub": "42"}, expires_delta=timedelta(seconds=-1)
+    )
+    assert auth_service.validate_token(expired) is None
+
+
+def test_verify_token_with_tampered_token():
+    t = auth_service.create_access_token({"sub": "42"})
+    # Flip one character in the signature
+    head, body, sig = t.split(".")
+    bad_sig = ("A" if sig[0] != "A" else "B") + sig[1:]
+    tampered = ".".join([head, body, bad_sig])
+    assert auth_service.validate_token(tampered) is None
+
+
+def test_verify_token_with_garbage():
+    assert auth_service.validate_token("not.a.jwt") is None
+    assert auth_service.validate_token("") is None
+
+
+def test_verify_token_rejects_missing_sub():
+    """A token without a 'sub' claim must not validate even if signature is good."""
+    from jose import jwt as jose_jwt
+
+    from app.config import settings
+
+    bad = jose_jwt.encode(
+        {"email": "a@b.c"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
+    assert auth_service.validate_token(bad) is None
+
+
+# --- register / login (DB-backed) -------------------------------------------
+
+@pytest.mark.asyncio
+async def test_register(session_factory):
+    async with session_factory() as db:
+        user = await auth_service.register(
+            db,
+            UserCreate(email="a@b.com", username="al", password="hunter2!"),
+        )
+        assert user.id is not None
+        assert user.email == "a@b.com"
+        # Password must NOT be stored plain.
+        assert user.hashed_password != "hunter2!"
+        assert auth_service.verify_password("hunter2!", user.hashed_password)
+
+
+@pytest.mark.asyncio
+async def test_register_rejects_duplicate_email(session_factory):
+    async with session_factory() as db:
+        await auth_service.register(
+            db, UserCreate(email="dup@b.com", username="one", password="pw1!")
+        )
+    async with session_factory() as db:
+        with pytest.raises(ValueError, match="already registered"):
+            await auth_service.register(
+                db,
+                UserCreate(email="dup@b.com", username="two", password="pw2!"),
+            )
+
+
+@pytest.mark.asyncio
+async def test_login_with_correct_password(session_factory):
+    async with session_factory() as db:
+        await auth_service.register(
+            db, UserCreate(email="x@y.com", username="xx", password="ok-password")
+        )
+    async with session_factory() as db:
+        tok = await auth_service.login(
+            db, UserLogin(email="x@y.com", password="ok-password")
+        )
+    assert tok.token_type == "bearer"
+    assert auth_service.validate_token(tok.access_token) is not None
+
+
+@pytest.mark.asyncio
+async def test_login_with_wrong_password_raises(session_factory):
+    async with session_factory() as db:
+        await auth_service.register(
+            db, UserCreate(email="x@y.com", username="xx", password="right-pw")
+        )
+    async with session_factory() as db:
+        with pytest.raises(ValueError, match="Invalid"):
+            await auth_service.login(
+                db, UserLogin(email="x@y.com", password="wrong-pw")
+            )
+
+
+@pytest.mark.asyncio
+async def test_login_unknown_email_raises(session_factory):
+    async with session_factory() as db:
+        with pytest.raises(ValueError, match="Invalid"):
+            await auth_service.login(
+                db, UserLogin(email="ghost@y.com", password="anything")
+            )
+
+
+# --- refresh-token semantics (validate_token round-trip stays consistent) ----
+
+def test_refresh_token_round_trip():
+    """Re-issuing a token from a previously validated payload preserves
+    identity. (We don't have a separate refresh-token type yet; this checks
+    the building block.)"""
+    t1 = auth_service.create_access_token({"sub": "7"})
+    p = auth_service.validate_token(t1)
+    assert p is not None
+    t2 = auth_service.create_access_token({"sub": p["sub"]})
+    assert auth_service.validate_token(t2)["sub"] == "7"
+
+
+def test_refresh_with_invalid_old_token_fails():
+    assert auth_service.validate_token("invalid") is None
