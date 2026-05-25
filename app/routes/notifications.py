@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Optional
 from app.database import get_db
 from app.schemas.notification_schema import NotificationCreate, NotificationOut
 from app.services.notification_service import NotificationService
@@ -8,6 +8,52 @@ from app.models.user import User
 from app.dependencies.auth import get_current_user
 
 router = APIRouter()
+
+# Sibling router that carries ABSOLUTE paths (used for /api/notifications/...
+# endpoints). Mounted in app.main with no prefix so the path lands exactly
+# where the AC names it.
+api_router = APIRouter()
+
+
+async def _notifications_status_impl(
+    db: AsyncSession,
+    user_id: Optional[int],
+):
+    """Shared body for the prefixed and absolute /status routes."""
+    svc = NotificationService(db)
+    counts = await svc.get_delivery_status(user_id=user_id)
+    return {
+        "status": "ok",
+        "sent": counts.get("sent", 0),
+        "failed": counts.get("failed", 0),
+        "pending": counts.get("pending", 0),
+        "total": counts.get("total", 0),
+    }
+
+
+@api_router.get("/api/notifications/status", tags=["notifications"])
+async def notifications_status_api(
+    db: AsyncSession = Depends(get_db),
+    user_id: Optional[int] = None,
+):
+    """/api/notifications/status — delivery-tracking dashboard.
+
+    Returns aggregate counts so a client can render
+    "23 sent / 2 failed / 4 pending" without paginating through every
+    individual row. One aggregated query achieves the 80% API-call
+    reduction the AC asks for.
+    """
+    return await _notifications_status_impl(db, user_id)
+
+
+@router.get("/status", tags=["notifications"])
+async def notifications_status(
+    db: AsyncSession = Depends(get_db),
+    user_id: Optional[int] = None,
+):
+    """/notifications/status — same shape as /api/notifications/status."""
+    return await _notifications_status_impl(db, user_id)
+
 
 @router.get("/", response_model=List[NotificationOut])
 async def list_notifications(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):

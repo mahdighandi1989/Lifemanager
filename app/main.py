@@ -109,6 +109,28 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip user_id NOT NULL relaxation on %s: %s", table, exc)
 
+    # notifications: add delivery-tracking columns introduced by the
+    # notification-system composite. create_all() won't ALTER existing
+    # tables, so each ADD COLUMN runs in its own swallowed transaction
+    # — IF NOT EXISTS keeps it idempotent on engines that support it.
+    _notification_columns = [
+        ("status", "VARCHAR(32) DEFAULT 'pending'"),
+        ("attempts", "INTEGER DEFAULT 0"),
+        ("priority", "VARCHAR(16) DEFAULT 'normal'"),
+        ("silent", "BOOLEAN DEFAULT FALSE"),
+        ("channel", "VARCHAR(32)"),
+        ("last_error", "TEXT"),
+        ("delivered_at", "TIMESTAMP"),
+    ]
+    for col_name, col_type in _notification_columns:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE notifications ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip notifications.%s migration: %s", col_name, exc)
+
     # tasks.due_date used to be TIMESTAMP; the model now declares Date to
     # match the Pydantic schema. Convert the existing column on Postgres so
     # ORM reads/writes line up. USING due_date::date drops any time portion.
@@ -149,6 +171,10 @@ app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(tasks.router)
 app.include_router(projects.router)
 app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+# Absolute-path routes (/api/notifications/...) live on a sibling router
+# so they aren't prefixed twice. The status endpoint is the AC for the
+# delivery-tracking subtask.
+app.include_router(notifications.api_router, tags=["notifications"])
 app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(integrations.router, prefix="/integrations", tags=["integrations"])

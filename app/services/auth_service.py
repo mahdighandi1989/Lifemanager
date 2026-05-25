@@ -92,6 +92,22 @@ async def login(db: AsyncSession, credentials: UserLogin) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == credentials.email))
     user = result.scalar_one_or_none()
     if not user or not verify_password(credentials.password, user.hashed_password):
+        # Audit critical auth failures. notify_event swallows its own
+        # DB errors so a notification outage can never block the 401.
+        # silent=False + priority="high" matches the AC for the
+        # verify_failed notification path.
+        from app.services.notification_service import notify_event
+
+        try:
+            await notify_event(
+                "verify_failed",
+                user_id=getattr(user, "id", 0) or 0,
+                db=db,
+                priority="high",
+                silent=False,
+            )
+        except Exception:  # never let notifications mask the 401
+            pass
         raise ValueError("Invalid email or password")
 
     token = create_access_token(data={"sub": str(user.id), "email": user.email})
