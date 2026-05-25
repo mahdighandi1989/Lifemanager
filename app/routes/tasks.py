@@ -29,7 +29,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.task import Task, TaskPriority, TaskStatus
-from app.schemas.task_schema import TaskCreate, TaskResponse, TaskUpdate
+from app.schemas.task_schema import TaskCreate, TaskUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -58,12 +58,14 @@ def _priority_from_int(level: int) -> TaskPriority:
 
 
 def _priority_to_int(prio: TaskPriority | None) -> int:
+    if prio is None:
+        return 2
     return {
         TaskPriority.LOW: 1,
         TaskPriority.MEDIUM: 2,
         TaskPriority.HIGH: 4,
         TaskPriority.CRITICAL: 5,
-    }.get(prio, 2)
+    }[prio]
 
 
 def _serialize(t: Task) -> dict:

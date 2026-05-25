@@ -119,13 +119,13 @@ async def test_register(session_factory):
 async def test_register_rejects_duplicate_email(session_factory):
     async with session_factory() as db:
         await auth_service.register(
-            db, UserCreate(email="dup@b.com", username="one", password="pw1!")
+            db, UserCreate(email="dup@b.com", username="one", password="passwordA1")
         )
     async with session_factory() as db:
         with pytest.raises(ValueError, match="already registered"):
             await auth_service.register(
                 db,
-                UserCreate(email="dup@b.com", username="two", password="pw2!"),
+                UserCreate(email="dup@b.com", username="two", password="passwordB2"),
             )
 
 
@@ -147,12 +147,12 @@ async def test_login_with_correct_password(session_factory):
 async def test_login_with_wrong_password_raises(session_factory):
     async with session_factory() as db:
         await auth_service.register(
-            db, UserCreate(email="x@y.com", username="xx", password="right-pw")
+            db, UserCreate(email="x@y.com", username="xx", password="longenough-pw")
         )
     async with session_factory() as db:
         with pytest.raises(ValueError, match="Invalid"):
             await auth_service.login(
-                db, UserLogin(email="x@y.com", password="wrong-pw")
+                db, UserLogin(email="x@y.com", password="wrong-password")
             )
 
 

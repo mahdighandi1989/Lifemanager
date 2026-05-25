@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, Enum as SAEnum
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum as SAEnum
 from sqlalchemy.sql import func
 from app.database import Base
 import enum

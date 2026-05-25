@@ -30,7 +30,7 @@ class UserPublic(BaseModel):
     is_superuser: bool = False
     created_at: Optional[datetime] = None
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def name(self) -> str:
         """Stable alias for `username` so the frontend's expected `name`

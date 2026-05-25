@@ -1,99 +1,116 @@
-import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
+"""Tests for /api/projects (and the /projects/ alias) — full CRUD.
+
+Behaviour pinned by the AC:
+- POST /api/projects with a valid body -> 201 + body containing id, name
+- GET /api/projects -> 200 + list
+- 404 on missing id (get/update/delete)
+- Empty name and over-long inputs reject with 422
+- Status enum is enforced
+"""
+# `api_client` fixture comes from tests/conftest.py.
 
 
-@pytest.mark.asyncio
-async def test_list_projects_empty():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/projects")
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-        assert len(data) == 0
+# --- create -----------------------------------------------------------------
+
+def test_create_project_returns_201(api_client):
+    r = api_client.post(
+        "/api/projects/",
+        json={"name": "test project", "description": "test"},
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert "id" in body
+    assert body["name"] == "test project"
+    assert body["description"] == "test"
 
 
-@pytest.mark.asyncio
-async def test_create_project():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post("/projects", json={"name": "Test Project", "description": "A test project"})
-        assert response.status_code == 201
-        data = response.json()
-        assert data["name"] == "Test Project"
-        assert "id" in data
+def test_create_project_empty_name_returns_422(api_client):
+    r = api_client.post("/api/projects/", json={"name": ""})
+    assert r.status_code == 422
 
 
-@pytest.mark.asyncio
-async def test_create_project_missing_name():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post("/projects", json={"description": "Missing name"})
-        assert response.status_code == 422
+def test_create_project_invalid_status_returns_422(api_client):
+    r = api_client.post(
+        "/api/projects/",
+        json={"name": "p", "status": "not-a-status"},
+    )
+    assert r.status_code == 422
 
 
-@pytest.mark.asyncio
-async def test_get_project_by_id():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        create_resp = await client.post("/projects", json={"name": "Get Test", "description": "To be retrieved"})
-        project_id = create_resp.json()["id"]
-        
-        response = await client.get(f"/projects/{project_id}")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["id"] == project_id
-        assert data["name"] == "Get Test"
+def test_create_project_sanitizes_html_in_name(api_client):
+    r = api_client.post(
+        "/api/projects/",
+        json={"name": "<script>alert(1)</script>"},
+    )
+    assert r.status_code == 201
+    assert "<script>" not in r.json()["name"]
 
 
-@pytest.mark.asyncio
-async def test_get_project_not_found():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/projects/99999")
-        assert response.status_code == 404
+# --- list -------------------------------------------------------------------
+
+def test_list_projects_returns_200(api_client):
+    r = api_client.get("/api/projects/")
+    assert r.status_code == 200
+    assert r.json() == []
 
 
-@pytest.mark.asyncio
-async def test_update_project():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        create_resp = await client.post("/projects", json={"name": "Update Test", "description": "To be updated"})
-        project_id = create_resp.json()["id"]
-        
-        response = await client.put(f"/projects/{project_id}", json={"name": "Updated Name", "status": "completed"})
-        assert response.status_code == 200
-        data = response.json()
-        assert data["name"] == "Updated Name"
-        assert data["status"] == "completed"
+def test_list_projects_after_create(api_client):
+    api_client.post("/api/projects/", json={"name": "alpha"})
+    api_client.post("/api/projects/", json={"name": "beta"})
+    r = api_client.get("/api/projects/")
+    assert len(r.json()) == 2
 
 
-@pytest.mark.asyncio
-async def test_update_project_not_found():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.put("/projects/99999", json={"name": "Ghost"})
-        assert response.status_code == 404
+def test_list_projects_also_served_at_legacy_path(api_client):
+    api_client.post("/api/projects/", json={"name": "shared"})
+    legacy = api_client.get("/projects/")
+    canonical = api_client.get("/api/projects/")
+    assert legacy.status_code == 200
+    assert canonical.json() == legacy.json()
 
 
-@pytest.mark.asyncio
-async def test_delete_project():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        create_resp = await client.post("/projects", json={"name": "Delete Test", "description": "To be deleted"})
-        project_id = create_resp.json()["id"]
-        
-        response = await client.delete(f"/projects/{project_id}")
-        assert response.status_code == 204
-        
-        get_response = await client.get(f"/projects/{project_id}")
-        assert get_response.status_code == 404
+# --- get one ----------------------------------------------------------------
+
+def test_get_project_not_found_returns_404(api_client):
+    r = api_client.get("/api/projects/99999")
+    assert r.status_code == 404
+    assert r.json() == {"detail": "Project not found"}
 
 
-@pytest.mark.asyncio
-async def test_delete_project_not_found():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete("/projects/99999")
-        assert response.status_code == 404
+def test_get_project_by_id(api_client):
+    created = api_client.post("/api/projects/", json={"name": "fetch"}).json()
+    r = api_client.get(f"/api/projects/{created['id']}")
+    assert r.status_code == 200
+    assert r.json()["name"] == "fetch"
+
+
+# --- update -----------------------------------------------------------------
+
+def test_update_project_not_found_returns_404(api_client):
+    r = api_client.put("/api/projects/99999", json={"name": "ghost"})
+    assert r.status_code == 404
+
+
+def test_update_project_changes_fields(api_client):
+    created = api_client.post("/api/projects/", json={"name": "orig"}).json()
+    r = api_client.put(
+        f"/api/projects/{created['id']}",
+        json={"name": "renamed", "status": "completed"},
+    )
+    assert r.status_code == 200
+    assert r.json()["name"] == "renamed"
+    assert r.json()["status"] == "completed"
+
+
+# --- delete -----------------------------------------------------------------
+
+def test_delete_project_returns_204_then_404(api_client):
+    created = api_client.post("/api/projects/", json={"name": "doomed"}).json()
+    r = api_client.delete(f"/api/projects/{created['id']}")
+    assert r.status_code == 204
+    assert api_client.get(f"/api/projects/{created['id']}").status_code == 404
+
+
+def test_delete_project_not_found_returns_404(api_client):
+    r = api_client.delete("/api/projects/99999")
+    assert r.status_code == 404
