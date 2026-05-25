@@ -113,3 +113,38 @@ async def test_search_does_not_return_other_users_rows(session_factory):
     async with session_factory() as db:
         rows = await search_tasks(db, user_id=1, query="apple")
     assert {r.title for r in rows} == {"alice apple"}
+
+
+# --- HTTP endpoint: /api/tasks/search returns 200 with results field --------
+
+def test_search_endpoint_with_sql_injection_payload_returns_200_with_no_data(api_client):
+    """AC for task 2: GET /api/search?q=' OR 1=1-- → 200 with 'results' field
+    and no unexpected data leaked.
+
+    Routed through planner_service.search_tasks which uses parameterised
+    ilike(); the probe becomes a literal LIKE pattern and matches no rows.
+    """
+    # seed two users' data via direct POST to /api/tasks
+    api_client.post(
+        "/api/tasks/",
+        json={"title": "alice-task", "user_id": 1},
+    )
+    api_client.post(
+        "/api/tasks/",
+        json={"title": "bob-secret-task", "user_id": 2},
+    )
+    r = api_client.get("/api/tasks/search?q=' OR 1=1--&user_id=1")
+    assert r.status_code == 200
+    body = r.json()
+    assert "results" in body
+    # no rows pierce the user filter
+    for row in body["results"]:
+        assert "bob" not in row["title"], (
+            f"SQL injection leaked another user's row: {row['title']}"
+        )
+
+
+def test_search_endpoint_empty_query_returns_empty_results(api_client):
+    r = api_client.get("/api/tasks/search?q=")
+    assert r.status_code == 200
+    assert r.json()["results"] == []

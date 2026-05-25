@@ -83,6 +83,38 @@ def _serialize(t: Task) -> dict:
     }
 
 
+# --- SEARCH (parameterised — SQL injection is structurally impossible) ----
+
+@router.get("/api/tasks/search", tags=["tasks"])
+@router.get("/api/search", tags=["tasks"])
+async def search_tasks_endpoint(
+    q: str = "",
+    user_id: int = 0,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """GET /api/tasks/search?q=... — case-insensitive substring search.
+
+    The query string is bound to a SQLAlchemy .ilike() parameter inside
+    planner_service.search_tasks, so SQL-injection payloads like
+    `' OR 1=1--` are treated as literal LIKE patterns and match nothing
+    real. Result rows are scoped to ``user_id`` (defaults to 0 = no
+    rows) so a probe cannot pivot into another tenant's data.
+    """
+    from app.services.planner_service import search_tasks as _search
+
+    if not q:
+        return {"results": [], "query": q}
+    try:
+        rows = await _search(db, user_id=user_id, query=q)
+    except SQLAlchemyError as exc:
+        logger.exception("search_tasks failed")
+        raise HTTPException(status_code=500, detail="internal error") from exc
+    return {
+        "results": [_serialize(t) for t in rows],
+        "query": q,
+    }
+
+
 # --- LIST -------------------------------------------------------------------
 
 # Registered at the canonical /api path only. The plain /tasks path is
