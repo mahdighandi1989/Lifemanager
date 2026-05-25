@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = '';
+// All task data lives under /api/tasks. The bare /tasks path is the SPA
+// route that renders this page.
+const API_BASE = '/api';
 
 const STATUS_LABELS = {
   pending: 'در انتظار',

@@ -12,7 +12,9 @@
 
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = '';
+// All project data lives under /api/projects. The bare /projects path is
+// the SPA route that renders this page.
+const API_BASE = '/api';
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-700',

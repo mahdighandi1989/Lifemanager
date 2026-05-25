@@ -85,15 +85,13 @@ def _serialize(t: Task) -> dict:
 
 # --- LIST -------------------------------------------------------------------
 
-# Stacked decorators register every list/create endpoint at four variants:
-#   /api/tasks, /api/tasks/, /tasks, /tasks/
-# The SPA catch-all in app/main.py matches GET on any path, so without the
-# no-trailing-slash variant FastAPI's redirect_slashes never fires and a
-# POST /api/tasks collides with the catch-all GET → 405.
+# Registered at the canonical /api path only. The plain /tasks path is
+# intentionally NOT a backend route — it's an SPA URL handled by the React
+# frontend, which then fetches data from /api/tasks. Returning JSON from
+# /tasks would hijack the browser navigation and show raw JSON instead of
+# the Tasks page.
 @router.get("/api/tasks", tags=["tasks"])
 @router.get("/api/tasks/", tags=["tasks"])
-@router.get("/tasks", tags=["tasks"])
-@router.get("/tasks/", tags=["tasks"])
 async def list_tasks(db: AsyncSession = Depends(get_db)) -> List[dict]:
     try:
         result = await db.execute(select(Task))
@@ -106,7 +104,6 @@ async def list_tasks(db: AsyncSession = Depends(get_db)) -> List[dict]:
 # --- GET ONE ----------------------------------------------------------------
 
 @router.get("/api/tasks/{task_id}", tags=["tasks"])
-@router.get("/tasks/{task_id}", tags=["tasks"])
 async def get_task(task_id: int, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         task = await db.get(Task, task_id)
@@ -122,8 +119,6 @@ async def get_task(task_id: int, db: AsyncSession = Depends(get_db)) -> dict:
 
 @router.post("/api/tasks", status_code=status.HTTP_201_CREATED, tags=["tasks"])
 @router.post("/api/tasks/", status_code=status.HTTP_201_CREATED, tags=["tasks"])
-@router.post("/tasks", status_code=status.HTTP_201_CREATED, tags=["tasks"])
-@router.post("/tasks/", status_code=status.HTTP_201_CREATED, tags=["tasks"])
 async def create_task(
     payload: TaskCreate,
     db: AsyncSession = Depends(get_db),
@@ -157,7 +152,6 @@ async def create_task(
 # --- UPDATE -----------------------------------------------------------------
 
 @router.put("/api/tasks/{task_id}", tags=["tasks"])
-@router.put("/tasks/{task_id}", tags=["tasks"])
 async def update_task(
     task_id: int,
     payload: TaskUpdate,
@@ -197,11 +191,6 @@ async def update_task(
 
 @router.delete(
     "/api/tasks/{task_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    tags=["tasks"],
-)
-@router.delete(
-    "/tasks/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["tasks"],
 )

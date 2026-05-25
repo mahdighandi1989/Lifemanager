@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const API_BASE = '';
+// Use /api so the fetches reach the JSON endpoints, not the SPA route.
+const API_BASE = '/api';
 
 function StatCard({ title, value, icon, color, linkTo }) {
   return (
