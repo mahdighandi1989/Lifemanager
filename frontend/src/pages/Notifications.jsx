@@ -1,0 +1,134 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+
+const TYPE_ICONS = {
+  info: { bg: 'bg-blue-100', text: 'text-blue-600' },
+  warning: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
+  error: { bg: 'bg-red-100', text: 'text-red-600' },
+  success: { bg: 'bg-green-100', text: 'text-green-600' },
+};
+
+function NotificationItem({ notification, onMarkRead }) {
+  const colors = TYPE_ICONS[notification.type] || TYPE_ICONS.info;
+  return (
+    <div className={`flex items-start space-x-4 p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors ${!notification.is_read ? 'bg-blue-50/30' : ''}`}>
+      <div className={`w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+        <svg className={`w-5 h-5 ${colors.text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <p className={`text-sm font-medium ${!notification.is_read ? 'text-gray-900' : 'text-gray-600'}`}>
+            {notification.title}
+          </p>
+          {!notification.is_read && (
+            <button
+              onClick={() => onMarkRead(notification.id)}
+              className="text-xs text-blue-600 hover:underline flex-shrink-0 ml-2"
+            >
+              خوانده شد
+            </button>
+          )}
+        </div>
+        {notification.message && (
+          <p className="text-sm text-gray-500 mt-0.5">{notification.message}</p>
+        )}
+        {notification.created_at && (
+          <p className="text-xs text-gray-400 mt-1">
+            {new Date(notification.created_at).toLocaleDateString('fa-IR')}
+          </p>
+        )}
+      </div>
+      {!notification.is_read && (
+        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />
+      )}
+    </div>
+  );
+}
+
+function Notifications() {
+  const { token } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchNotifications = async () => {
+    if (!token) { setLoading(false); return; }
+    try {
+      const res = await fetch('/notifications/', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setNotifications(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (e) {
+      setError('خطا در دریافت اعلان‌ها: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchNotifications(); }, [token]);
+
+  const handleMarkRead = async (id) => {
+    try {
+      const res = await fetch(`/notifications/${id}/read`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+      }
+    } catch {
+      // silent fail
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">اعلان‌ها</h1>
+            <p className="text-gray-500 mt-1">
+              {unreadCount > 0 ? `${unreadCount} اعلان خوانده‌نشده` : 'همه اعلان‌ها خوانده شده‌اند'}
+            </p>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>
+        )}
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          {loading ? (
+            <div className="p-8 text-center text-gray-400">
+              <svg className="w-8 h-8 mx-auto mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              در حال بارگذاری...
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="p-12 text-center">
+              <svg className="w-16 h-16 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <p className="text-gray-500 font-medium">اعلانی وجود ندارد</p>
+            </div>
+          ) : (
+            notifications.map(n => (
+              <NotificationItem key={n.id} notification={n} onMarkRead={handleMarkRead} />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Notifications;

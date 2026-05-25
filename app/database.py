@@ -1,52 +1,55 @@
-from collections.abc import Iterator
-
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
 
 from app.config import settings
 
 
 def _normalize_url(url: str) -> str:
-    # Render exposes DATABASE_URL with the legacy "postgres://" scheme;
-    # SQLAlchemy 2.x requires "postgresql://".
+    # Render's Postgres add-on exposes DATABASE_URL with the legacy "postgres://"
+    # scheme. SQLAlchemy 2.x needs "postgresql://", and our async stack needs
+    # the asyncpg driver, so upgrade the URL to "postgresql+asyncpg://".
     if url.startswith("postgres://"):
-        return "postgresql://" + url[len("postgres://"):]
+        url = "postgresql://" + url[len("postgres://"):]
+    if url.startswith("postgresql://") and "+asyncpg" not in url:
+        url = "postgresql+asyncpg://" + url[len("postgresql://"):]
     return url
 
 
-def _build_engine() -> Engine | None:
-    if not settings.database_url:
-        return None
-    return create_engine(
-        _normalize_url(settings.database_url),
-        pool_size=settings.db_pool_size,
-        max_overflow=settings.db_max_overflow,
-        pool_timeout=settings.db_pool_timeout,
-        pool_recycle=settings.db_pool_recycle,
-        pool_pre_ping=True,
-        future=True,
-    )
-
-
-engine: Engine | None = _build_engine()
-
-SessionLocal = (
-    sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)
-    if engine is not None
-    else None
+engine = create_async_engine(
+    _normalize_url(settings.DATABASE_URL),
+    echo=settings.DEBUG,
+    pool_size=settings.DB_POOL_SIZE,
+    max_overflow=settings.DB_MAX_OVERFLOW,
+    pool_timeout=settings.DB_POOL_TIMEOUT,
+    pool_recycle=settings.DB_POOL_RECYCLE,
+    pool_pre_ping=True,
 )
 
+SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-class Base(DeclarativeBase):
-    pass
+Base = declarative_base()
 
 
-def get_db() -> Iterator[Session]:
-    if SessionLocal is None:
-        raise RuntimeError("DATABASE_URL is not configured")
-    db = SessionLocal()
+async def init_db():
+    """ایجاد جداول دیتابیس به صورت async
+
+    Returns:
+        bool: True اگر جداول با موفقیت ایجاد شدند، False در غیر این صورت
+    """
     try:
-        yield db
-    finally:
-        db.close()
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("[INFO] Database tables created successfully.")
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to create database tables: {e}")
+        return False
+
+
+async def get_db():
+    """ارائه session دیتابیس به صورت async"""
+    async with SessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()
