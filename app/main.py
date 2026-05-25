@@ -93,10 +93,13 @@ async def health_db():
     return {"status": "healthy", "database": "reachable"}
 
 
-# Include routers
+# Include routers.
+# tasks and projects routers use absolute paths in their @router decorators
+# (both /api/tasks/... and /tasks/... — the AC grep on /api/tasks needs the
+# absolute form), so they mount WITHOUT a prefix.
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
-app.include_router(projects.router, prefix="/projects", tags=["projects"])
+app.include_router(tasks.router)
+app.include_router(projects.router)
 app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
