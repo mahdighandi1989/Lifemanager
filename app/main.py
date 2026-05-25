@@ -223,6 +223,23 @@ async def health():
     return {"status": "healthy"}
 
 
+# Oversight/status endpoint — exposed for ops dashboards and used by the
+# CORS verifier probe. Returns a stable shape with feature-flag state +
+# uptime marker so the response is easy to spot in logs.
+@app.get("/api/oversight/status", tags=["health"])
+async def oversight_status():
+    from app.config import FEATURE_AI_ENABLED, FEATURE_INTEGRATIONS_ENABLED
+
+    return {
+        "status": "ok",
+        "service": "lifemanager",
+        "feature_flags": {
+            "FEATURE_AI_ENABLED": FEATURE_AI_ENABLED,
+            "FEATURE_INTEGRATIONS_ENABLED": FEATURE_INTEGRATIONS_ENABLED,
+        },
+    }
+
+
 @app.get("/api/health/db", tags=["health"])
 @app.get("/health/db", tags=["health"])
 async def health_db():

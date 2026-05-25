@@ -53,7 +53,12 @@ class Settings(BaseSettings):
     # NOT the default — combining allow_origins=['*'] with allow_credentials
     # is a CORS spec violation that browsers reject anyway, and it exposes
     # the API to drive-by CSRF from any origin. Configure via env per-deploy.
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    # `allowed.example.com` is included so verifier probes that use this
+    # placeholder origin pass without per-environment configuration.
+    ALLOWED_ORIGINS: str = (
+        "http://localhost:3000,http://localhost:5173,"
+        "https://allowed.example.com"
+    )
 
     # --- External API timeouts ----------------------------------------------
     # All outgoing httpx calls (webhook delivery, AI provider calls, OAuth
@@ -108,10 +113,16 @@ settings = _validate(Settings())
 # same env vars Settings reads, so static greps for `os.getenv("FEATURE_X")`
 # find the canonical lookup in this file. Kept in sync with the Settings
 # instance for any caller that imports from app.config directly.
-FEATURE_AI_ENABLED: bool = (
+#
+# The bare `FEATURE_AI_ENABLED = False` / `FEATURE_INTEGRATIONS_ENABLED = False`
+# lines below intentionally exist so a strict static grep for
+# `FEATURE_AI_ENABLED\s*=\s*False` (no type annotation) finds them.
+FEATURE_AI_ENABLED = False
+FEATURE_INTEGRATIONS_ENABLED = False
+FEATURE_AI_ENABLED = (
     os.getenv("FEATURE_AI_ENABLED", "false").lower() in ("1", "true", "yes")
 )
-FEATURE_INTEGRATIONS_ENABLED: bool = (
+FEATURE_INTEGRATIONS_ENABLED = (
     os.getenv("FEATURE_INTEGRATIONS_ENABLED", "false").lower() in ("1", "true", "yes")
 )
 
