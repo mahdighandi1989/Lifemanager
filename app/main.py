@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 import logging
+
+from sqlalchemy import text
 
 from app.config import settings
 from app.database import engine, Base, get_db
@@ -14,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Lifemanager API", version="0.1.0")
 
+
 # Database initialization with graceful degradation
 @app.on_event("startup")
 async def startup_event():
@@ -24,6 +27,26 @@ async def startup_event():
     except Exception as e:
         logger.critical(f"❌ CRITICAL: Database connection failed: {e}")
         logger.info("   App will continue without database — set DATABASE_URL in Render env vars.")
+
+
+# Health endpoints — registered BEFORE the SPA catch-all so they always win.
+# `/api/health` matches the path configured in render.yaml's healthCheckPath.
+@app.get("/api/health", tags=["health"])
+@app.get("/health", tags=["health"])
+async def health():
+    return {"status": "healthy"}
+
+
+@app.get("/api/health/db", tags=["health"])
+@app.get("/health/db", tags=["health"])
+async def health_db():
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"database unreachable: {exc}") from exc
+    return {"status": "healthy", "database": "reachable"}
+
 
 # Include routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -49,23 +72,20 @@ if frontend_dist.exists():
     assets_dir = frontend_dist / "assets"
     if assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
-    
+
     @app.get("/{full_path:path}", tags=["frontend"])
     async def serve_frontend(full_path: str):
         """
         Serve frontend static files for SPA routing.
-        
+
         NOTE: This catch-all route intentionally matches any path not handled by
         API routers above. This is the standard pattern for single-page applications
         where the frontend router handles client-side routing.
-        
+
         IMPORTANT: All API routes MUST be registered BEFORE this catch-all handler.
         If an API endpoint returns 404, it means the route is not registered.
         This catch-all only serves files from the dist directory and does NOT
         interfere with registered API routes (FastAPI matches specific routes first).
-        
-        This is an internal endpoint used by the SPA frontend. It is not intended
-        for direct external API consumption.
         """
         # Guard: Prevent serving files outside the dist directory
         try:
@@ -76,7 +96,7 @@ if frontend_dist.exists():
         except (ValueError, OSError):
             logger.warning(f"Invalid path requested: {full_path}")
             return {"detail": "Not Found"}
-            
+
         file_path = frontend_dist / full_path
         if file_path.exists() and file_path.is_file():
             return FileResponse(str(file_path))
@@ -86,7 +106,7 @@ if frontend_dist.exists():
         return {"detail": "Not Found"}
 else:
     logger.warning(f"⚠️  Frontend dist directory not found at {frontend_dist}")
-    
+
     @app.get("/")
     async def root():
         return {"message": "Lifemanager API is running. Frontend not built yet."}
