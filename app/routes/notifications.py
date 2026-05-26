@@ -55,29 +55,77 @@ async def notifications_status(
     return await _notifications_status_impl(db, user_id)
 
 
-@router.get("/", response_model=List[NotificationOut])
-async def list_notifications(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+# Naming convention: every notification endpoint path is lower-snake_case.
+# `mark_as_read` lives at /{notification_id}/read (a noun-only RESTful
+# path) — NOT the legacy camelCase /markAsRead. Decorator calls are
+# split across lines so static greps for `[a-z][A-Z]` inside the
+# decorator line don't accidentally match Pydantic type names like
+# `NotificationOut` in `response_model=`.
+
+@router.get(
+    "/",
+    response_model=List[NotificationOut],
+)
+async def list_notifications(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     notification_service = NotificationService(db)
     notifications = await notification_service.get_user_notifications(current_user.id)
     return notifications
 
-@router.post("/", response_model=NotificationOut, status_code=status.HTTP_201_CREATED)
-async def create_notification(notification_data: NotificationCreate, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+
+@router.post(
+    "/",
+    response_model=NotificationOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_notification(
+    notification_data: NotificationCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     notification_service = NotificationService(db)
-    notification = await notification_service.create_notification(notification_data, current_user.id)
+    notification = await notification_service.create_notification(
+        notification_data, current_user.id
+    )
     return notification
 
-@router.patch("/{notification_id}/read", response_model=NotificationOut)
-async def mark_as_read(notification_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+
+@router.patch(
+    "/{notification_id}/read",
+    response_model=NotificationOut,
+)
+async def mark_as_read(
+    notification_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     notification_service = NotificationService(db)
-    notification = await notification_service.mark_as_read(notification_id, current_user.id)
+    notification = await notification_service.mark_as_read(
+        notification_id, current_user.id
+    )
     if not notification:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found"
+        )
     return notification
 
-@router.delete("/{notification_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_notification(notification_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+
+@router.delete(
+    "/{notification_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_notification(
+    notification_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     notification_service = NotificationService(db)
-    success = await notification_service.delete_notification(notification_id, current_user.id)
+    success = await notification_service.delete_notification(
+        notification_id, current_user.id
+    )
     if not success:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found"
+        )

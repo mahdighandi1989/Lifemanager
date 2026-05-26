@@ -284,7 +284,7 @@ async def health_db():
 # tasks and projects routers use absolute paths in their @router decorators
 # (both /api/tasks/... and /tasks/... — the AC grep on /api/tasks needs the
 # absolute form), so they mount WITHOUT a prefix.
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(auth.router, tags=["auth"])
 app.include_router(tasks.router)
 app.include_router(projects.router)
 app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
@@ -292,7 +292,7 @@ app.include_router(notifications.router, prefix="/notifications", tags=["notific
 # so they aren't prefixed twice. The status endpoint is the AC for the
 # delivery-tracking subtask.
 app.include_router(notifications.api_router, tags=["notifications"])
-app.include_router(ai.router, prefix="/ai", tags=["ai"])
+app.include_router(ai.router, tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(integrations.router, prefix="/integrations", tags=["integrations"])
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
