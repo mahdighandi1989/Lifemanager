@@ -1,0 +1,127 @@
+"""Service layer for TodoList CRUD.
+
+Keeping the SQL in a service module (rather than the route handler)
+makes the routes thin and lets us share the same logic from background
+tasks, the Celery seeder, and tests.
+"""
+from __future__ import annotations
+
+import html
+from typing import List, Optional, Sequence
+
+from sqlalchemy import func, select
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.todo_list import TodoList, todo_list_items
+
+
+def _sanitize(value: Optional[str]) -> Optional[str]:
+    return None if value is None else html.escape(value, quote=True)
+
+
+async def list_lists(
+    db: AsyncSession,
+    *,
+    include_archived: bool = False,
+    user_id: Optional[int] = None,
+) -> Sequence[TodoList]:
+    stmt = select(TodoList).order_by(TodoList.sort_order, TodoList.id)
+    if not include_archived:
+        stmt = stmt.where(TodoList.is_archived.is_(False))
+    if user_id is not None:
+        # Show lists owned by user *or* unowned (the latter exist for
+        # the 33 seeded defaults until the user claims them).
+        stmt = stmt.where((TodoList.user_id == user_id) | (TodoList.user_id.is_(None)))
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
+async def get_list(db: AsyncSession, list_id: int) -> TodoList:
+    obj = await db.get(TodoList, list_id)
+    if obj is None:
+        raise NoResultFound(f"TodoList {list_id} not found")
+    return obj
+
+
+async def count_items(db: AsyncSession, list_id: int) -> int:
+    stmt = select(func.count()).select_from(todo_list_items).where(
+        todo_list_items.c.todo_list_id == list_id
+    )
+    result = await db.execute(stmt)
+    return int(result.scalar_one() or 0)
+
+
+async def create_list(
+    db: AsyncSession,
+    *,
+    name: str,
+    description: Optional[str] = None,
+    sort_order: int = 0,
+    is_archived: bool = False,
+    user_id: Optional[int] = None,
+) -> TodoList:
+    obj = TodoList(
+        name=_sanitize(name),
+        description=_sanitize(description),
+        sort_order=sort_order,
+        is_archived=is_archived,
+        user_id=user_id,
+    )
+    db.add(obj)
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+
+async def update_list(
+    db: AsyncSession,
+    list_id: int,
+    *,
+    name: Optional[str] = None,
+    description: Optional[str] = None,
+    sort_order: Optional[int] = None,
+    is_archived: Optional[bool] = None,
+) -> TodoList:
+    obj = await get_list(db, list_id)
+    if name is not None:
+        obj.name = _sanitize(name)
+    if description is not None:
+        obj.description = _sanitize(description)
+    if sort_order is not None:
+        obj.sort_order = sort_order
+    if is_archived is not None:
+        obj.is_archived = is_archived
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+
+async def delete_list(db: AsyncSession, list_id: int) -> None:
+    obj = await get_list(db, list_id)
+    await db.delete(obj)
+    await db.commit()
+
+
+async def bulk_create_default_lists(
+    db: AsyncSession, names: Sequence[str]
+) -> List[TodoList]:
+    """Seed helper — used by the 0005 migration and the test fixtures.
+
+    Idempotent: skips names that already exist (case-sensitive match
+    on TodoList.name) so re-running the seeder is safe.
+    """
+    existing = await db.execute(select(TodoList.name))
+    existing_names = {row for (row,) in existing.all()}
+    created: List[TodoList] = []
+    for idx, name in enumerate(names):
+        if name in existing_names:
+            continue
+        obj = TodoList(name=name, sort_order=idx)
+        db.add(obj)
+        created.append(obj)
+    if created:
+        await db.commit()
+        for obj in created:
+            await db.refresh(obj)
+    return created
