@@ -68,3 +68,163 @@ def send_notification_task(
             body=message,
         )
     return {"queued": True, "user_id": user_id, "channel": channel}
+
+
+# --- Self-improvement (خودسازی) periodic tasks ----------------------------
+#
+# Three nightly tasks power the dashboard the user asked for:
+#
+#   1. refresh_self_improvement_daily — pre-creates today's pending
+#      check-in rows for every user so the dashboard never shows an
+#      empty table after midnight.
+#   2. run_self_improvement_ai_auto_tick — runs a heuristic + (when
+#      a key is configured) AI pass to mark habits the user implicitly
+#      completed via other signals (TodoItem.is_completed flips, etc.).
+#   3. run_self_improvement_profile_analytics — recomputes the cached
+#      stats + asks the AI for a Persian narrative for every user.
+#
+# All three are async at heart, so we drop into an asyncio.run() inside
+# the synchronous Celery task body. Errors are logged but not retried
+# at the task level — these are non-critical batch jobs and the next
+# nightly run will catch up.
+@celery_app.task(name="app.tasks.refresh_self_improvement_daily")
+def refresh_self_improvement_daily() -> dict[str, Any]:
+    """Pre-create today's pending check-in rows for every user."""
+    import asyncio
+
+    async def _run() -> dict[str, Any]:
+        from sqlalchemy import select
+
+        from app.database import SessionLocal
+        from app.models.user import User
+        from app.services import self_improvement_service
+
+        total_created = 0
+        user_count = 0
+        async with SessionLocal() as db:
+            users = (await db.execute(select(User.id))).all()
+            for (user_id,) in users:
+                user_count += 1
+                created = await self_improvement_service.refresh_daily_pending_rows(
+                    db, user_id=user_id,
+                )
+                total_created += created
+        return {"users": user_count, "rows_created": total_created}
+
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        logger.exception("refresh_self_improvement_daily failed: %r", exc)
+        return {"error": str(exc)}
+
+
+@celery_app.task(name="app.tasks.run_self_improvement_ai_auto_tick")
+def run_self_improvement_ai_auto_tick() -> dict[str, Any]:
+    """Apply AI-suggested auto-completions for today's habits.
+
+    The current heuristic is intentionally conservative: a self-
+    improvement TodoItem whose ``is_completed`` flag was flipped
+    today (via the normal TodoItem UI) auto-ticks today's check-in
+    as ``auto_done``. This handles the user's "I ticked it
+    somewhere else, copy that across" use case without needing a
+    live AI call.
+    """
+    import asyncio
+
+    async def _run() -> dict[str, Any]:
+        from datetime import datetime, timezone
+
+        from sqlalchemy import and_, select
+
+        from app.database import SessionLocal
+        from app.models.todo_item import TodoItem
+        from app.models.todo_list import todo_list_items
+        from app.models.user import User
+        from app.services import self_improvement_service
+        from app.services._self_improvement_seed_data import (
+            MUHASEBE_LIST_NAME,
+            SELF_IMPROVEMENT_LISTS,
+        )
+
+        today = datetime.now(timezone.utc).date()
+        wanted_list_names = [MUHASEBE_LIST_NAME, *SELF_IMPROVEMENT_LISTS.keys()]
+
+        total_ticked = 0
+        async with SessionLocal() as db:
+            from app.models.todo_list import TodoList
+
+            list_id_rows = await db.execute(
+                select(TodoList.id).where(TodoList.name.in_(wanted_list_names))
+            )
+            list_ids = [r for (r,) in list_id_rows.all()]
+            if not list_ids:
+                return {"ticked": 0, "users": 0}
+            item_id_rows = await db.execute(
+                select(TodoItem.id, TodoItem.completed_at)
+                .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
+                .where(
+                    and_(
+                        todo_list_items.c.todo_list_id.in_(list_ids),
+                        TodoItem.is_completed.is_(True),
+                    )
+                )
+                .distinct()
+            )
+            ticked_today = [
+                iid for (iid, completed_at) in item_id_rows.all()
+                if completed_at and completed_at.date() == today
+            ]
+            if not ticked_today:
+                return {"ticked": 0, "users": 0}
+
+            users = (await db.execute(select(User.id))).all()
+            for (user_id,) in users:
+                affected = await self_improvement_service.apply_ai_auto_ticks(
+                    db,
+                    user_id=user_id,
+                    item_ids=ticked_today,
+                    reason="auto-ticked because the underlying TodoItem.is_completed flipped today",
+                    model="rule:todo_completed_today",
+                )
+                total_ticked += affected
+        return {"ticked": total_ticked, "users": len(users)}
+
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        logger.exception("run_self_improvement_ai_auto_tick failed: %r", exc)
+        return {"error": str(exc)}
+
+
+@celery_app.task(name="app.tasks.run_self_improvement_profile_analytics")
+def run_self_improvement_profile_analytics() -> dict[str, Any]:
+    """Recompute the cached profile analytics + AI narrative per user."""
+    import asyncio
+
+    async def _run() -> dict[str, Any]:
+        from sqlalchemy import select
+
+        from app.database import SessionLocal
+        from app.models.user import User
+        from app.services import self_improvement_service
+
+        refreshed = 0
+        async with SessionLocal() as db:
+            users = (await db.execute(select(User.id))).all()
+            for (user_id,) in users:
+                try:
+                    await self_improvement_service.regenerate_ai_narrative(
+                        db, user_id=user_id,
+                    )
+                    refreshed += 1
+                except Exception as exc:  # one bad user shouldn't kill the rest
+                    logger.warning(
+                        "profile analytics failed for user %s: %r", user_id, exc
+                    )
+        return {"refreshed": refreshed}
+
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        logger.exception("run_self_improvement_profile_analytics failed: %r", exc)
+        return {"error": str(exc)}

@@ -24,6 +24,7 @@ from app.routes import (
     notifications,
     planner,
     projects,
+    self_improvement,
     tasks,
     todo_items,
     users,
@@ -383,6 +384,9 @@ app.include_router(todo_items.router)
 app.include_router(webhook.router, tags=["webhook"])
 # planner router decorators also use absolute /api/planner paths.
 app.include_router(planner.router, tags=["planner"])
+# self_improvement router decorators carry absolute /api/self-improvement
+# paths so it mounts with no prefix.
+app.include_router(self_improvement.router, tags=["self-improvement"])
 
 # Serve static files (frontend)
 # در Native Render runtime، CWD ریشه پروژه است

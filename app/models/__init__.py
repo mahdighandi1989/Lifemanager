@@ -8,6 +8,10 @@ from app.models.ai_model_config import AIModelConfig
 from app.models.integration import Integration
 from app.models.notification import Notification
 from app.models.project import Project
+from app.models.self_improvement import (
+    SelfImprovementCheckIn,
+    UserProfileAnalytics,
+)
 from app.models.task import Task
 from app.models.todo_item import TodoItem
 from app.models.todo_list import TodoList, todo_list_items
@@ -21,10 +25,12 @@ __all__ = [
     "Notification",
     "OAuthUser",
     "Project",
+    "SelfImprovementCheckIn",
     "Task",
     "TodoItem",
     "TodoList",
     "User",
+    "UserProfileAnalytics",
     "WebhookEvent",
     "todo_list_items",
 ]
