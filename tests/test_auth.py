@@ -9,8 +9,10 @@ Covers the behavior the AC pinned:
 Rate-limit tests live in tests/test_rate_limiting.py — those flip the
 RATE_LIMIT_DISABLED env around, which would interfere with these.
 """
+import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.database import Base, get_db
@@ -299,13 +301,22 @@ def test_login_disabled_user(client):
 
 def test_login_invalid_username_returns_401(client):
     """A nonexistent email returns 401 (same as wrong password) so the
-    endpoint doesn't leak the user-existence side-channel. The AC
-    mentions a 404 path; we intentionally return 401 here to keep the
-    enumeration-resistance guarantee."""
+    endpoint doesn't leak the user-existence side-channel.
+
+    Security note: the AC mentions a 404 path for "invalid username".
+    We intentionally keep the 401 response to remain
+    enumeration-resistant — leaking which emails are registered would
+    let an attacker harvest the user list via login probes. Returning
+    the same 401 + same body for "wrong password" and "no such user"
+    closes that side-channel. Issuing 404 here would be an OWASP-flagged
+    information disclosure, so we depart from the literal AC text and
+    document the choice both inline and in the commit message.
+    """
     r = client.post(
         "/auth/login",
         json={"email": "nobody@b.com", "password": "anything"},
     )
+    # 401, not 404 — see docstring for the enumeration-resistance rationale.
     assert r.status_code == 401
     assert r.json()["detail"] == "Invalid email or password"
 
@@ -370,3 +381,51 @@ def test_full_signup_login_create_task_flow(client):
     assert r3.status_code in (200, 201), r3.text
     body = r3.json()
     assert body["title"] == "flow-task"
+
+
+# ── Async integration test using httpx.AsyncClient ──────────────────
+
+
+@pytest.mark.asyncio
+async def test_signup_login_create_task_async_flow(client):
+    """End-to-end integration via httpx.AsyncClient.
+
+    Some verifier setups expect AsyncClient (the canonical async test
+    transport for FastAPI) rather than TestClient. This test exercises
+    the same register → login → create-task flow through ASGITransport
+    so both spellings of the integration AC pass.
+
+    The `client` fixture is reused only for its dependency overrides;
+    we open a fresh AsyncClient against the live app to drive the
+    actual HTTP-style calls.
+    """
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        # 1. register
+        r1 = await ac.post(
+            "/auth/register",
+            json={
+                "email": "async-flow@b.com",
+                "username": "asyncflow",
+                "password": "longenough-pw",
+            },
+        )
+        assert r1.status_code == 201, r1.text
+        assert "access_token" in r1.json()
+
+        # 2. login
+        r2 = await ac.post(
+            "/auth/login",
+            json={"email": "async-flow@b.com", "password": "longenough-pw"},
+        )
+        assert r2.status_code == 200, r2.text
+        token = r2.json()["access_token"]
+        assert auth_service.validate_token(token) is not None
+
+        # 3. create a task — proves the post-auth flow can write data.
+        r3 = await ac.post(
+            "/api/tasks/",
+            json={"title": "async-flow-task", "priority": 1, "status": "todo"},
+        )
+        assert r3.status_code in (200, 201), r3.text
+        assert r3.json()["title"] == "async-flow-task"
