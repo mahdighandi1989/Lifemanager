@@ -14,6 +14,7 @@ from __future__ import annotations
 from sqlalchemy import (
     Boolean,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -39,6 +40,20 @@ class TodoItem(Base):
     # the unauth'd routes leave this NULL — the routes will populate
     # it once auth is wired in everywhere.
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    # parent_id models the subitem hierarchy that Microsoft To Do
+    # exports use: items can have nested children (e.g. "ارسال جنس
+    # به ایران" has 17 subitems). One-level deep is enough for the
+    # data we're seeding — we don't enforce it but the UI assumes it.
+    parent_id = Column(
+        Integer,
+        ForeignKey("todo_items.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    # due_date and is_overdue capture the date stamps shown in the
+    # PDF exports ("Overdue, Wed, May 22, 2024"). Stored as a plain
+    # Date — no time component is meaningful here.
+    due_date = Column(Date, nullable=True)
     # completed_at is recorded the moment is_completed flips True so
     # ops can plot "completions per day" without trawling created_at.
     completed_at = Column(DateTime(timezone=True), nullable=True)
@@ -51,6 +66,7 @@ class TodoItem(Base):
         back_populates="items",
         lazy="selectin",
     )
+    parent = relationship("TodoItem", remote_side="TodoItem.id", backref="subitems")
 
     def __repr__(self) -> str:
         return (

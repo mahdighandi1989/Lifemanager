@@ -123,6 +123,8 @@ async def create_item(
     description: Optional[str] = None,
     is_completed: bool = False,
     is_starred: bool = False,
+    parent_id: Optional[int] = None,
+    due_date=None,
     owner_id: Optional[int] = None,
     list_ids: Optional[Iterable[int]] = None,
 ) -> TodoItem:
@@ -131,6 +133,8 @@ async def create_item(
         description=_sanitize(description),
         is_completed=is_completed,
         is_starred=is_starred,
+        parent_id=parent_id,
+        due_date=due_date,
         owner_id=owner_id,
         completed_at=_now() if is_completed else None,
     )
@@ -151,6 +155,8 @@ async def update_item(
     description: Optional[str] = None,
     is_completed: Optional[bool] = None,
     is_starred: Optional[bool] = None,
+    parent_id: Optional[int] = None,
+    due_date=None,
 ) -> TodoItem:
     obj = await get_item(db, item_id)
     if content is not None:
@@ -162,6 +168,10 @@ async def update_item(
         obj.completed_at = _now() if is_completed else None
     if is_starred is not None:
         obj.is_starred = is_starred
+    if parent_id is not None:
+        obj.parent_id = parent_id if parent_id != 0 else None
+    if due_date is not None:
+        obj.due_date = due_date
     await db.commit()
     await db.refresh(obj)
     return obj
