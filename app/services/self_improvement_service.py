@@ -480,6 +480,9 @@ async def compute_basic_analytics(
         })
 
     # --- Weekly completion chart (last 7 days) --------------------------
+    # Dates are serialised as ISO strings here because the payload
+    # ends up in a JSON column — SQLAlchemy's default json_serializer
+    # (json.dumps) doesn't know how to encode datetime.date.
     weekly_completion: list[dict] = []
     total_items = sum(len(v) for v in items_by_category.values())
     for offset in range(6, -1, -1):
@@ -488,7 +491,7 @@ async def compute_basic_analytics(
         completed = sum(1 for c in day_checkins if c.status in done_states)
         pct = (completed / total_items * 100.0) if total_items else 0.0
         weekly_completion.append({
-            "date": d,
+            "date": d.isoformat(),
             "completed": completed,
             "total": total_items,
             "pct": round(pct, 2),

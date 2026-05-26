@@ -112,9 +112,15 @@ class SelfImprovementOverviewOut(BaseModel):
 # --- Profile analytics -----------------------------------------------------
 
 class WeeklyCompletionPoint(BaseModel):
-    """One bar in the weekly-completion chart."""
+    """One bar in the weekly-completion chart.
 
-    date: date
+    ``date`` is exposed as a string (ISO format) because the value
+    lives inside a JSON column on UserProfileAnalytics.payload —
+    the JSON serializer rejects datetime.date and storing it as a
+    string keeps both write and read paths simple.
+    """
+
+    date: str
     completed: int
     total: int
     pct: float

@@ -29,9 +29,9 @@ a user_id from the request body.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -102,19 +102,33 @@ async def get_overview(
 )
 @handle_errors
 async def post_daily_update(
-    payload: Union[SelfImprovementBulkDailyUpdate, SelfImprovementDailyUpdate],
+    payload: Dict[str, Any] = Body(...),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """Tick / untick one or many items.
 
-    Accepts either a single update or a `{updates: [...]}` envelope.
-    Returns the persisted check-in rows + a count for convenience.
+    Accepts two body shapes for ergonomic clients:
+
+      * Single: ``{"item_id": 7, "status": "done"}``
+      * Bulk:   ``{"updates": [{"item_id": 7, "status": "done"}, ...]}``
+
+    The route normalises both into a list of validated
+    ``SelfImprovementDailyUpdate`` rows before calling the service.
+    Returns the persisted check-in rows + a count.
     """
-    if isinstance(payload, SelfImprovementBulkDailyUpdate):
-        updates = [u.model_dump() for u in payload.updates]
+    if "updates" in payload:
+        try:
+            envelope = SelfImprovementBulkDailyUpdate.model_validate(payload)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        updates = [u.model_dump() for u in envelope.updates]
     else:
-        updates = [payload.model_dump()]
+        try:
+            single = SelfImprovementDailyUpdate.model_validate(payload)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        updates = [single.model_dump()]
 
     rows = await self_improvement_service.bulk_upsert_checkins(
         db, user_id=current_user.id, updates=updates,
