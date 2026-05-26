@@ -4,6 +4,9 @@ Mirrors the tasks router: every handler is exposed at both
 `/api/projects/...` and `/projects/...` for frontend backwards-compat.
 All DB calls go through SQLAlchemy's parameterised query API (no raw
 string interpolation). Text fields are HTML-escaped before persisting.
+
+Error handling is centralized via @handle_errors (app/middleware.py)
+so each route stays focused on its business logic.
 """
 import html
 import logging
@@ -11,10 +14,10 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.middleware import handle_errors
 from app.models.project import Project
 from app.schemas.project_schema import ProjectCreate, ProjectUpdate
 
@@ -47,24 +50,18 @@ def _serialize(p: Project) -> dict:
 # from /api/projects.
 @router.get("/api/projects", tags=["projects"])
 @router.get("/api/projects/", tags=["projects"])
+@handle_errors
 async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
-    try:
-        result = await db.execute(select(Project))
-        return [_serialize(p) for p in result.scalars().all()]
-    except SQLAlchemyError as exc:
-        logger.exception("list_projects failed")
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    result = await db.execute(select(Project))
+    return [_serialize(p) for p in result.scalars().all()]
 
 
 # --- GET ONE ----------------------------------------------------------------
 
 @router.get("/api/projects/{project_id}", tags=["projects"])
+@handle_errors
 async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> dict:
-    try:
-        project = await db.get(Project, project_id)
-    except SQLAlchemyError as exc:
-        logger.exception("get_project(%s) failed", project_id)
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    project = await db.get(Project, project_id)
     if project is None:
         raise HTTPException(status_code=404, detail="Project not found")
     return _serialize(project)
@@ -74,56 +71,46 @@ async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> di
 
 @router.post("/api/projects", status_code=status.HTTP_201_CREATED, tags=["projects"])
 @router.post("/api/projects/", status_code=status.HTTP_201_CREATED, tags=["projects"])
+@handle_errors
 async def create_project(
     payload: ProjectCreate,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     """POST /api/projects with a valid body returns 201 + the new row."""
-    try:
-        project = Project(
-            name=_sanitize(payload.name),
-            description=_sanitize(payload.description),
-            user_id=payload.user_id,
-        )
-        if hasattr(project, "status"):
-            project.status = payload.status
-        db.add(project)
-        await db.commit()
-        await db.refresh(project)
-    except SQLAlchemyError as exc:
-        await db.rollback()
-        logger.exception("create_project failed")
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    project = Project(
+        name=_sanitize(payload.name),
+        description=_sanitize(payload.description),
+        user_id=payload.user_id,
+    )
+    if hasattr(project, "status"):
+        project.status = payload.status
+    db.add(project)
+    await db.commit()
+    await db.refresh(project)
     return _serialize(project)
 
 
 # --- UPDATE -----------------------------------------------------------------
 
 @router.put("/api/projects/{project_id}", tags=["projects"])
+@handle_errors
 async def update_project(
     project_id: int,
     payload: ProjectUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    try:
-        project = await db.get(Project, project_id)
-        if project is None:
-            raise HTTPException(status_code=404, detail="Project not found")
-        data = payload.model_dump(exclude_unset=True)
-        if "name" in data:
-            project.name = _sanitize(data["name"])
-        if "description" in data:
-            project.description = _sanitize(data["description"])
-        if "status" in data and hasattr(project, "status"):
-            project.status = data["status"]
-        await db.commit()
-        await db.refresh(project)
-    except HTTPException:
-        raise
-    except SQLAlchemyError as exc:
-        await db.rollback()
-        logger.exception("update_project(%s) failed", project_id)
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    project = await db.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    data = payload.model_dump(exclude_unset=True)
+    if "name" in data:
+        project.name = _sanitize(data["name"])
+    if "description" in data:
+        project.description = _sanitize(data["description"])
+    if "status" in data and hasattr(project, "status"):
+        project.status = data["status"]
+    await db.commit()
+    await db.refresh(project)
     return _serialize(project)
 
 
@@ -134,17 +121,11 @@ async def update_project(
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["projects"],
 )
+@handle_errors
 async def delete_project(project_id: int, db: AsyncSession = Depends(get_db)) -> None:
-    try:
-        project = await db.get(Project, project_id)
-        if project is None:
-            raise HTTPException(status_code=404, detail="Project not found")
-        await db.delete(project)
-        await db.commit()
-    except HTTPException:
-        raise
-    except SQLAlchemyError as exc:
-        await db.rollback()
-        logger.exception("delete_project(%s) failed", project_id)
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    project = await db.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    await db.delete(project)
+    await db.commit()
     return None
