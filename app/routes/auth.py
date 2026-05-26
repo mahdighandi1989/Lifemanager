@@ -96,8 +96,17 @@ async def login(
     payload: UserLogin,
     db: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
+    from app.services.auth_service import UserDisabledError
+
     try:
         return await auth_service.login(db, payload)
+    except UserDisabledError as exc:
+        # Disabled accounts get 403 — the client should know the
+        # account exists but is locked, distinct from 401 bad creds.
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is disabled",
+        ) from exc
     except ValueError as exc:
         # Bad credentials must return 401 (the AC) with a generic message so
         # we don't leak which half (email vs. password) was wrong.
