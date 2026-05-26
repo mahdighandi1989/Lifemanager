@@ -320,6 +320,22 @@ async def startup_event():
     except Exception as exc:
         logger.debug("skip todo-list seed: %s", exc)
 
+    # Self-improvement (خودسازی) seed — four sub-lists + 90 items.
+    # Mirrors migration 0008 for Render's free-tier startup path that
+    # only runs Base.metadata.create_all (no alembic). Idempotent:
+    # repeats are no-ops because ensure_lists_seeded skips lists that
+    # already exist with any items in them.
+    try:
+        from app.database import SessionLocal
+        from app.services.self_improvement_service import ensure_lists_seeded
+
+        async with SessionLocal() as session:
+            inserted = await ensure_lists_seeded(session)
+            if inserted:
+                logger.info("seeded %d self-improvement items", inserted)
+    except Exception as exc:
+        logger.debug("skip self-improvement seed: %s", exc)
+
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
 # `/api/health` matches the path configured in render.yaml's healthCheckPath.
