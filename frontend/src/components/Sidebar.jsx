@@ -13,6 +13,7 @@ const LINKS = [
   { to: '/', label: 'Dashboard', testid: 'sidebar-link-dashboard' },
   { to: '/tasks', label: 'Tasks', testid: 'sidebar-link-tasks' },
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
+  { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
   {
     to: '/notifications',
     label: 'اعلان‌ها',

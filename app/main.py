@@ -20,10 +20,12 @@ from app.routes import (
     ai,
     auth,
     integrations,
+    lists,
     notifications,
     planner,
     projects,
     tasks,
+    todo_items,
     users,
     webhook,
 )
@@ -278,6 +280,21 @@ async def startup_event():
     except Exception as exc:
         logger.debug("skip due_date type migration: %s", exc)
 
+    # Seed the 33 default TodoLists from the user's profile PDFs if
+    # the todo_lists table is empty. Idempotent — does nothing once
+    # at least one list exists, so re-runs and post-alembic deploys
+    # are no-ops.
+    try:
+        from app.database import SessionLocal
+        from app.services.list_service import seed_default_lists_if_empty
+
+        async with SessionLocal() as session:
+            inserted = await seed_default_lists_if_empty(session)
+            if inserted:
+                logger.info("seeded %d default todo lists", inserted)
+    except Exception as exc:
+        logger.debug("skip todo-list seed: %s", exc)
+
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
 # `/api/health` matches the path configured in render.yaml's healthCheckPath.
@@ -332,6 +349,11 @@ app.include_router(users.router, prefix="/users", tags=["users"])
 # Sibling router for absolute-path users endpoints (/api/users/...).
 app.include_router(users.api_router, tags=["users"])
 app.include_router(integrations.router, prefix="/integrations", tags=["integrations"])
+# Todo-list system: both routers use absolute `/api/...` decorators
+# (so they aren't double-prefixed) and ship the full CRUD + the
+# share / unshare / move / toggle actions.
+app.include_router(lists.router)
+app.include_router(todo_items.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
@@ -364,6 +386,8 @@ if frontend_dist.exists():
     _API_PREFIXES = (
         "auth", "notifications", "ai",
         "users", "integrations", "webhook", "health", "api",
+        # Todo-list system endpoints — purely API, no SPA route.
+        "todo-items",
     )
 
     @app.get("/{full_path:path}", tags=["frontend"])

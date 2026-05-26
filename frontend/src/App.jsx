@@ -8,6 +8,8 @@ import { ProjectProvider } from './context/ProjectContext';
 import { TaskProvider } from './context/TaskContext';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
+import ListDetail from './pages/ListDetail';
+import Lists from './pages/Lists';
 import Login from './pages/Login';
 import Notifications from './pages/Notifications';
 import Projects from './pages/Projects';
@@ -78,6 +80,26 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Projects />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lists"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Lists />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lists/:listId"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <ListDetail />
                     </Layout>
                   </ProtectedRoute>
                 }
