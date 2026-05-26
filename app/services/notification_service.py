@@ -47,6 +47,8 @@ VALID_NOTIFICATION_TYPES = {
     "warning",
     "error",
     "email",
+    "sms",
+    "push",
     "verify_failed",
 }
 
@@ -123,6 +125,13 @@ class NotificationService:
         )
         if email or notification_type == "email":
             await self._send_email(email or "", message)
+        # SMS / push channel fan-out — module-level helpers handle the
+        # provider call. Channel is encoded in the notification_type so
+        # the same send_notification() entry point covers every transport.
+        if notification_type == "sms":
+            send_sms(to=channel or "", body=message)
+        elif notification_type == "push":
+            send_push(device_token=channel or "", title=title or "notification", body=message)
         return record
 
     async def get_user_notifications(
@@ -596,6 +605,67 @@ def send_email(
         return True
     except Exception as exc:
         logger.warning("send_email failed: %r", exc)
+        return False
+
+
+def send_sms(*, to: str, body: str) -> bool:
+    """Stub SMS transport.
+
+    Reads ``SMS_PROVIDER_URL`` + ``SMS_PROVIDER_TOKEN`` from the env. In
+    dev / test (no env set) it logs and returns True so the test suite
+    can exercise the call site without a paid SMS provider account.
+    """
+    import os
+
+    provider = os.environ.get("SMS_PROVIDER_URL")
+    if not provider:
+        logger.info("send_sms (no SMS_PROVIDER_URL): to=%s body=%r", to, body[:80])
+        return True
+
+    try:
+        import httpx
+
+        token = os.environ.get("SMS_PROVIDER_TOKEN", "")
+        with httpx.Client(timeout=15.0) as client:
+            r = client.post(
+                provider,
+                headers={"Authorization": f"Bearer {token}"},
+                json={"to": to, "body": body},
+            )
+            return 200 <= r.status_code < 300
+    except Exception as exc:
+        logger.warning("send_sms failed: %r", exc)
+        return False
+
+
+def send_push(*, device_token: str, title: str, body: str) -> bool:
+    """Stub push-notification transport.
+
+    Same shape as send_sms — reads PUSH_PROVIDER_URL / PUSH_PROVIDER_TOKEN,
+    logs-and-returns-True when unset.
+    """
+    import os
+
+    provider = os.environ.get("PUSH_PROVIDER_URL")
+    if not provider:
+        logger.info(
+            "send_push (no PUSH_PROVIDER_URL): device=%s title=%r", device_token, title
+        )
+        return True
+
+    try:
+        import httpx
+
+        token = os.environ.get("PUSH_PROVIDER_TOKEN", "")
+        with httpx.Client(timeout=15.0) as client:
+            r = client.post(
+                provider,
+                headers={"Authorization": f"Bearer {token}"},
+                json={"to": device_token, "title": title, "body": body},
+            )
+            return 200 <= r.status_code < 300
+    except Exception as exc:
+        logger.warning("send_push failed: %r", exc)
         return False
 
 
