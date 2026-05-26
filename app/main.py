@@ -268,6 +268,22 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip tasks.%s migration: %s", col_name, exc)
 
+    # todo_items: parent_id (subitem hierarchy) and due_date were added
+    # by migration 0006. Same ADD COLUMN IF NOT EXISTS pattern so the
+    # Render-free-tier startup path (create_all only) gets them too.
+    _todo_item_columns = [
+        ("parent_id", "INTEGER REFERENCES todo_items(id) ON DELETE CASCADE"),
+        ("due_date", "DATE"),
+    ]
+    for col_name, col_type in _todo_item_columns:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE todo_items ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip todo_items.%s migration: %s", col_name, exc)
+
     # tasks.due_date used to be TIMESTAMP; the model now declares Date to
     # match the Pydantic schema. Convert the existing column on Postgres so
     # ORM reads/writes line up. USING due_date::date drops any time portion.
@@ -281,17 +297,25 @@ async def startup_event():
         logger.debug("skip due_date type migration: %s", exc)
 
     # Seed the 33 default TodoLists from the user's profile PDFs if
-    # the todo_lists table is empty. Idempotent — does nothing once
-    # at least one list exists, so re-runs and post-alembic deploys
-    # are no-ops.
+    # the todo_lists table is empty, then seed each list's items from
+    # the user's exported Microsoft To Do content. Both seeders are
+    # idempotent — they short-circuit on subsequent runs.
     try:
         from app.database import SessionLocal
-        from app.services.list_service import seed_default_lists_if_empty
+        from app.services.list_service import (
+            seed_default_lists_if_empty,
+            seed_todo_items_if_empty,
+        )
 
         async with SessionLocal() as session:
             inserted = await seed_default_lists_if_empty(session)
             if inserted:
                 logger.info("seeded %d default todo lists", inserted)
+
+        async with SessionLocal() as session:
+            inserted_items = await seed_todo_items_if_empty(session)
+            if inserted_items:
+                logger.info("seeded %d todo items from PDFs", inserted_items)
     except Exception as exc:
         logger.debug("skip todo-list seed: %s", exc)
 

@@ -51,6 +51,8 @@ def _serialize_item(obj, list_ids=None) -> dict:
         "description": obj.description,
         "is_completed": bool(obj.is_completed),
         "is_starred": bool(obj.is_starred),
+        "parent_id": obj.parent_id,
+        "due_date": obj.due_date.isoformat() if obj.due_date else None,
         "owner_id": obj.owner_id,
         "list_ids": list_ids if list_ids is not None else [lst.id for lst in obj.lists],
         "completed_at": obj.completed_at.isoformat() if obj.completed_at else None,

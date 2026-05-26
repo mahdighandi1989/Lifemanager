@@ -145,6 +145,88 @@ DEFAULT_LIST_NAMES: tuple[str, ...] = (
 )
 
 
+async def seed_todo_items_if_empty(db: AsyncSession) -> int:
+    """Seed the TodoItem rows from the user's 33 Microsoft To Do PDFs.
+
+    Imports `LISTS_DATA` lazily so the seed payload (~600 lines of
+    Persian item text) only loads when this seeder runs. Returns the
+    number of items inserted across all lists.
+
+    Idempotent per-list: if a list already has any items, that list
+    is skipped — so partial seeds are safe to re-run.
+    """
+    from sqlalchemy import insert, select
+
+    from app.models.todo_item import TodoItem
+    from app.models.todo_list import TodoList, todo_list_items
+    from app.services._todo_seed_data import LISTS_DATA
+
+    total_inserted = 0
+    shared_item_ids: dict[str, int] = {}
+
+    for list_name, items in LISTS_DATA.items():
+        result = await db.execute(select(TodoList).where(TodoList.name == list_name))
+        lst = result.scalar_one_or_none()
+        if lst is None:
+            continue
+        # Skip lists that already have any items linked.
+        result = await db.execute(
+            select(func.count()).select_from(todo_list_items).where(
+                todo_list_items.c.todo_list_id == lst.id
+            )
+        )
+        if int(result.scalar_one() or 0) > 0:
+            continue
+
+        for position, item in enumerate(items):
+            shared = item.get("shared_key")
+            if shared and shared in shared_item_ids:
+                try:
+                    await db.execute(
+                        insert(todo_list_items).values(
+                            todo_list_id=lst.id,
+                            todo_item_id=shared_item_ids[shared],
+                            position=position,
+                        )
+                    )
+                except Exception:
+                    pass
+                continue
+
+            obj = TodoItem(
+                content=item["content"],
+                description=item.get("description"),
+                is_completed=item.get("is_completed", False),
+                is_starred=item.get("is_starred", False),
+                due_date=item.get("due_date"),
+            )
+            db.add(obj)
+            await db.flush()
+            total_inserted += 1
+            await db.execute(
+                insert(todo_list_items).values(
+                    todo_list_id=lst.id, todo_item_id=obj.id, position=position
+                )
+            )
+            if shared:
+                shared_item_ids[shared] = obj.id
+
+            for sub in item.get("subitems", []):
+                child = TodoItem(
+                    content=sub["content"],
+                    description=sub.get("description"),
+                    is_completed=sub.get("is_completed", False),
+                    is_starred=sub.get("is_starred", False),
+                    due_date=sub.get("due_date"),
+                    parent_id=obj.id,
+                )
+                db.add(child)
+                total_inserted += 1
+
+        await db.commit()
+    return total_inserted
+
+
 async def seed_default_lists_if_empty(db: AsyncSession) -> int:
     """Insert DEFAULT_LIST_NAMES iff the todo_lists table is empty.
 

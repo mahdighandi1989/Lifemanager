@@ -33,14 +33,24 @@ router = APIRouter()
 
 
 def _serialize(obj) -> dict:
+    # `subitems` is loaded lazily via backref — touching the attribute
+    # triggers an implicit SELECT. We guard with a try/except so a row
+    # fetched without the relationship eagerly loaded still serializes.
+    try:
+        subitem_ids = [child.id for child in (obj.subitems or [])]
+    except Exception:
+        subitem_ids = []
     return {
         "id": obj.id,
         "content": obj.content,
         "description": obj.description,
         "is_completed": bool(obj.is_completed),
         "is_starred": bool(obj.is_starred),
+        "parent_id": obj.parent_id,
+        "due_date": obj.due_date.isoformat() if obj.due_date else None,
         "owner_id": obj.owner_id,
         "list_ids": [lst.id for lst in obj.lists],
+        "subitem_ids": subitem_ids,
         "completed_at": obj.completed_at.isoformat() if obj.completed_at else None,
         "created_at": obj.created_at.isoformat() if obj.created_at else None,
         "updated_at": obj.updated_at.isoformat() if obj.updated_at else None,
