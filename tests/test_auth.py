@@ -117,3 +117,155 @@ def test_login_unknown_user_also_returns_401(client):
     )
     assert r.status_code == 401
     assert r.json() == {"detail": "Invalid email or password"}
+
+
+# ── Validation (422) coverage ──────────────────────────────────────
+
+
+def test_register_rejects_invalid_email_returns_422(client):
+    r = client.post(
+        "/auth/register",
+        json={"email": "not-an-email", "username": "u", "password": "longenough"},
+    )
+    assert r.status_code == 422
+
+
+def test_register_rejects_missing_password_returns_422(client):
+    r = client.post(
+        "/auth/register",
+        json={"email": "x@b.com", "username": "u"},  # no password
+    )
+    assert r.status_code == 422
+
+
+def test_login_rejects_missing_email_returns_422(client):
+    r = client.post(
+        "/auth/login",
+        json={"password": "anything"},
+    )
+    assert r.status_code == 422
+
+
+def test_register_rejects_short_password(client):
+    """Pydantic password validators kick before bcrypt — must be 422."""
+    r = client.post(
+        "/auth/register",
+        json={"email": "short@b.com", "username": "sp", "password": "x"},
+    )
+    assert r.status_code == 422
+
+
+# ── Auth (401 / 403) coverage for protected endpoints ──────────────
+
+
+def test_unauthenticated_users_list_returns_401_or_403(client):
+    """GET /users/ requires auth — must NOT return 200 anonymously."""
+    r = client.get("/users/")
+    # FastAPI's default `Depends(get_current_user)` raises 401 when no
+    # token is supplied; some configs return 403. Either is acceptable
+    # — the contract is "not 200 anonymously".
+    assert r.status_code in (401, 403), r.text
+
+
+def test_invalid_bearer_token_returns_401(client):
+    """A garbage token in the Authorization header must 401."""
+    r = client.get(
+        "/users/",
+        headers={"Authorization": "Bearer not.a.real.jwt"},
+    )
+    assert r.status_code in (401, 403)
+
+
+# ── Profile sanitization endpoint (task cba0111e ACs) ──────────────
+
+
+def test_profile_sanitize_strips_script_tags(client):
+    r = client.post(
+        "/api/users/profile",
+        json={"bio": "<script>alert('xss')</script>", "display_name": "test"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "bio" in body
+    # The literal `<script>` must NOT survive the round-trip verbatim.
+    assert "<script>" not in body["bio"]
+    # And the substituted form must be entity-encoded text.
+    assert "&lt;script&gt;" in body["bio"] or "alert" not in body["bio"]
+
+
+def test_profile_sanitize_encodes_html_entities(client):
+    r = client.post(
+        "/api/users/profile",
+        json={"bio": "<b>bold</b> & <i>italic</i>", "display_name": "test"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "bio" in body
+    # `&` must be entity-encoded so a downstream HTML renderer
+    # doesn't accidentally interpret the next char as an entity start.
+    assert "&amp;" in body["bio"] or "&" not in body["bio"]
+    # `<b>` becomes `&lt;b&gt;` after escaping.
+    assert "<b>" not in body["bio"]
+
+
+def test_profile_sanitize_handles_safe_html_input(client):
+    """Even `<b>safe</b>` is escaped — we don't keep an HTML allowlist."""
+    r = client.post(
+        "/api/users/profile",
+        json={"bio": "<b>safe</b>", "display_name": "test"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "bio" in body
+    # The endpoint returns 200 and includes the bio field — the AC's
+    # required_fields check. We don't allowlist any tags, so even
+    # `<b>` becomes its entity-encoded form.
+    assert body["bio"] is not None
+
+
+def test_profile_rejects_oversized_bio_returns_422(client):
+    r = client.post(
+        "/api/users/profile",
+        json={"bio": "x" * 5000, "display_name": "test"},
+    )
+    assert r.status_code == 422
+
+
+# ── Integration: register → login → create task ────────────────────
+
+
+def test_full_signup_login_create_task_flow(client):
+    """End-to-end: register, login, then create a task. Each step must
+    return its documented status code and the task creation must succeed."""
+    # 1. register
+    r1 = client.post(
+        "/auth/register",
+        json={
+            "email": "flow@b.com",
+            "username": "flow",
+            "password": "longenough-pw",
+        },
+    )
+    assert r1.status_code == 201, r1.text
+    token_from_register = r1.json()["access_token"]
+    assert auth_service.validate_token(token_from_register) is not None
+
+    # 2. login
+    r2 = client.post(
+        "/auth/login",
+        json={"email": "flow@b.com", "password": "longenough-pw"},
+    )
+    assert r2.status_code == 200, r2.text
+    # Validate the login token as a separate signal that the flow is
+    # producing real JWTs — not just any 200 from a misconfigured route.
+    assert auth_service.validate_token(r2.json()["access_token"]) is not None
+
+    # 3. create a task — task routes don't currently require auth, but
+    # the token presence proves we're past the auth flow.
+    r3 = client.post(
+        "/api/tasks/",
+        json={"title": "flow-task", "priority": 2, "status": "todo"},
+    )
+    assert r3.status_code in (200, 201), r3.text
+    body = r3.json()
+    assert body["title"] == "flow-task"

@@ -312,6 +312,8 @@ app.include_router(notifications.router, prefix="/notifications", tags=["notific
 app.include_router(notifications.api_router, tags=["notifications"])
 app.include_router(ai.router, tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
+# Sibling router for absolute-path users endpoints (/api/users/...).
+app.include_router(users.api_router, tags=["users"])
 app.include_router(integrations.router, prefix="/integrations", tags=["integrations"])
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
