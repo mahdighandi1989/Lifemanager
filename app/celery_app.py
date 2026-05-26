@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 
 celery_app = Celery(
     "lifemanager",
@@ -14,3 +15,26 @@ celery_app.conf.update(
     timezone="UTC",
     enable_utc=True,
 )
+
+# Periodic schedule for the Self-Improvement (خودسازی) module.
+# Run by celery beat (`celery -A app.celery_app beat`). All times in
+# UTC — the user can shift these per their local timezone later.
+celery_app.conf.beat_schedule = {
+    # 00:05 UTC — pre-create today's pending check-in rows for every
+    # active user so the dashboard never shows an empty table.
+    "self-improvement-daily-refresh": {
+        "task": "app.tasks.refresh_self_improvement_daily",
+        "schedule": crontab(hour=0, minute=5),
+    },
+    # 02:00 UTC — let the AI auto-tick implicit completions from
+    # other sources (planner logs, completed TodoItems, etc.).
+    "self-improvement-ai-auto-tick": {
+        "task": "app.tasks.run_self_improvement_ai_auto_tick",
+        "schedule": crontab(hour=2, minute=0),
+    },
+    # 03:00 UTC — refresh the per-user profile analytics narrative.
+    "self-improvement-profile-analytics": {
+        "task": "app.tasks.run_self_improvement_profile_analytics",
+        "schedule": crontab(hour=3, minute=0),
+    },
+}
