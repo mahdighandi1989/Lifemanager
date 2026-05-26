@@ -408,6 +408,85 @@ def test_schedule_notification_returns_none_when_celery_unreachable(monkeypatch)
     assert result is None or isinstance(result, str)
 
 
+def test_send_sms_no_provider_returns_true(monkeypatch):
+    """No SMS_PROVIDER_URL → log-only path returns True."""
+    from app.services.notification_service import send_sms
+
+    monkeypatch.delenv("SMS_PROVIDER_URL", raising=False)
+    assert send_sms(to="+15551234", body="hello") is True
+
+
+def test_send_sms_calls_provider_when_url_set(monkeypatch):
+    """With SMS_PROVIDER_URL set, send_sms POSTs to the provider."""
+    from app.services import notification_service
+
+    captured: dict = {}
+
+    class _FakeResp:
+        status_code = 200
+
+    class _FakeClient:
+        def __init__(self, timeout=15.0):
+            captured["timeout"] = timeout
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def post(self, url, headers=None, json=None):
+            captured["url"] = url
+            captured["headers"] = headers
+            captured["json"] = json
+            return _FakeResp()
+
+    monkeypatch.setenv("SMS_PROVIDER_URL", "https://sms.example.com/send")
+    monkeypatch.setenv("SMS_PROVIDER_TOKEN", "secret")
+    monkeypatch.setattr("httpx.Client", _FakeClient)
+    ok = notification_service.send_sms(to="+15551234", body="hi")
+    assert ok is True
+    assert captured["url"] == "https://sms.example.com/send"
+    assert captured["headers"]["Authorization"] == "Bearer secret"
+    assert captured["json"] == {"to": "+15551234", "body": "hi"}
+
+
+def test_send_push_no_provider_returns_true(monkeypatch):
+    from app.services.notification_service import send_push
+
+    monkeypatch.delenv("PUSH_PROVIDER_URL", raising=False)
+    assert send_push(device_token="abc", title="t", body="b") is True
+
+
+def test_send_push_calls_provider_when_url_set(monkeypatch):
+    from app.services import notification_service
+
+    captured: dict = {}
+
+    class _FakeResp:
+        status_code = 200
+
+    class _FakeClient:
+        def __init__(self, timeout=15.0):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def post(self, url, headers=None, json=None):
+            captured["url"] = url
+            captured["json"] = json
+            return _FakeResp()
+
+    monkeypatch.setenv("PUSH_PROVIDER_URL", "https://push.example.com/api/send")
+    monkeypatch.setattr("httpx.Client", _FakeClient)
+    assert notification_service.send_push(device_token="dev1", title="t", body="b") is True
+    assert captured["json"] == {"to": "dev1", "title": "t", "body": "b"}
+
+
 def test_send_notification_email_channel_uses_send_email(monkeypatch):
     """When channel='email' is passed, the public send_notification
     routes through _send_email — patched here so we can assert it was

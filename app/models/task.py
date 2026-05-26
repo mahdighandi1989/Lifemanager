@@ -58,6 +58,10 @@ class Task(Base):
     # "interval": 1, "byweekday": ["MO", "WE"]}) so the planner can
     # expand recurring tasks without a separate recurrence table.
     recurrence = Column(JSON, nullable=True)
+    # attachment is a storage key resolved by app/services/__init__.py's
+    # get_storage_backend() — opaque to the database. Production deploys
+    # set STORAGE_BACKEND=s3 to route reads/writes through S3Storage.
+    attachment = Column(String(500), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

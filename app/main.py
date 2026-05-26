@@ -255,6 +255,7 @@ async def startup_event():
         ("estimated_duration", "INTEGER"),
         ("deadline", "TIMESTAMP WITH TIME ZONE"),
         ("recurrence", "JSON"),
+        ("attachment", "VARCHAR(500)"),
     ]
     for col_name, col_type in _task_planning_columns:
         try:
