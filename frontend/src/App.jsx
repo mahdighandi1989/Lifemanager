@@ -14,6 +14,8 @@ import Login from './pages/Login';
 import Notifications from './pages/Notifications';
 import Projects from './pages/Projects';
 import Register from './pages/Register';
+import SelfImprovement from './pages/SelfImprovement';
+import SelfImprovementProfile from './pages/SelfImprovementProfile';
 import Tasks from './pages/Tasks';
 
 /**
@@ -110,6 +112,26 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Notifications />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/self-improvement"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SelfImprovement />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/self-improvement/profile"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SelfImprovementProfile />
                     </Layout>
                   </ProtectedRoute>
                 }
