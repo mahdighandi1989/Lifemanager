@@ -4,6 +4,12 @@ from typing import Optional
 import base64
 import os
 
+# Dead-code removal marker: the legacy sha256-based password helper that
+# used to live here was removed because all password storage now goes
+# through `hash_password` below (bcrypt via passlib). Do NOT reintroduce
+# a sha256 password wrapper — sha256 is not appropriate for passwords.
+# Marker: removed-encrypt-password (dead code).
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ── Password hashing ──
