@@ -14,9 +14,10 @@ Behaviour:
   DB call below goes through SQLAlchemy's parameterised query API
   (no raw string interpolation).
 - 404 raised when the resource is missing.
-- Database / unexpected errors are caught and translated to a 500 with a
-  consistent {"detail": "..."} body, and logged at .exception level so the
-  traceback ends up in the deploy logs.
+- Database / unexpected errors are caught by ``@handle_errors`` (see
+  app/middleware.py) and translated to a consistent HTTPException —
+  removing the per-route try/except boilerplate that previously lived
+  inline.
 """
 import html
 import logging
@@ -24,10 +25,10 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.middleware import handle_errors
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.schemas.task_schema import TaskCreate, TaskUpdate
 
@@ -87,6 +88,7 @@ def _serialize(t: Task) -> dict:
 
 @router.get("/api/tasks/search", tags=["tasks"])
 @router.get("/api/search", tags=["tasks"])
+@handle_errors
 async def search_tasks_endpoint(
     q: str = "",
     user_id: int = 0,
@@ -104,11 +106,7 @@ async def search_tasks_endpoint(
 
     if not q:
         return {"results": [], "query": q}
-    try:
-        rows = await _search(db, user_id=user_id, query=q)
-    except SQLAlchemyError as exc:
-        logger.exception("search_tasks failed")
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    rows = await _search(db, user_id=user_id, query=q)
     return {
         "results": [_serialize(t) for t in rows],
         "query": q,
@@ -124,24 +122,18 @@ async def search_tasks_endpoint(
 # the Tasks page.
 @router.get("/api/tasks", tags=["tasks"])
 @router.get("/api/tasks/", tags=["tasks"])
+@handle_errors
 async def list_tasks(db: AsyncSession = Depends(get_db)) -> List[dict]:
-    try:
-        result = await db.execute(select(Task))
-        return [_serialize(t) for t in result.scalars().all()]
-    except SQLAlchemyError as exc:
-        logger.exception("list_tasks failed")
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    result = await db.execute(select(Task))
+    return [_serialize(t) for t in result.scalars().all()]
 
 
 # --- GET ONE ----------------------------------------------------------------
 
 @router.get("/api/tasks/{task_id}", tags=["tasks"])
+@handle_errors
 async def get_task(task_id: int, db: AsyncSession = Depends(get_db)) -> dict:
-    try:
-        task = await db.get(Task, task_id)
-    except SQLAlchemyError as exc:
-        logger.exception("get_task(%s) failed", task_id)
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    task = await db.get(Task, task_id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return _serialize(task)
@@ -151,6 +143,7 @@ async def get_task(task_id: int, db: AsyncSession = Depends(get_db)) -> dict:
 
 @router.post("/api/tasks", status_code=status.HTTP_201_CREATED, tags=["tasks"])
 @router.post("/api/tasks/", status_code=status.HTTP_201_CREATED, tags=["tasks"])
+@handle_errors
 async def create_task(
     payload: TaskCreate,
     db: AsyncSession = Depends(get_db),
@@ -161,61 +154,50 @@ async def create_task(
     POST /api/tasks with title > 255 chars returns 422 (max_length=200 here).
     POST /api/tasks with valid title succeeds.
     """
-    try:
-        task = Task(
-            title=_sanitize(payload.title),
-            description=_sanitize(payload.description),
-            status=TaskStatus(payload.status),
-            priority=_priority_from_int(payload.priority),
-            user_id=payload.user_id,
-            project_id=payload.project_id,
-            due_date=payload.due_date,
-        )
-        db.add(task)
-        await db.commit()
-        await db.refresh(task)
-    except SQLAlchemyError as exc:
-        await db.rollback()
-        logger.exception("create_task failed")
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    task = Task(
+        title=_sanitize(payload.title),
+        description=_sanitize(payload.description),
+        status=TaskStatus(payload.status),
+        priority=_priority_from_int(payload.priority),
+        user_id=payload.user_id,
+        project_id=payload.project_id,
+        due_date=payload.due_date,
+    )
+    db.add(task)
+    await db.commit()
+    await db.refresh(task)
     return _serialize(task)
 
 
 # --- UPDATE -----------------------------------------------------------------
 
 @router.put("/api/tasks/{task_id}", tags=["tasks"])
+@handle_errors
 async def update_task(
     task_id: int,
     payload: TaskUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    try:
-        task = await db.get(Task, task_id)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
+    task = await db.get(Task, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
 
-        data = payload.model_dump(exclude_unset=True)
-        if "title" in data:
-            task.title = _sanitize(data["title"])
-        if "description" in data:
-            task.description = _sanitize(data["description"])
-        if "status" in data:
-            task.status = TaskStatus(data["status"])
-        if "priority" in data:
-            task.priority = _priority_from_int(data["priority"])
-        if "due_date" in data:
-            task.due_date = data["due_date"]
-        if "project_id" in data:
-            task.project_id = data["project_id"]
+    data = payload.model_dump(exclude_unset=True)
+    if "title" in data:
+        task.title = _sanitize(data["title"])
+    if "description" in data:
+        task.description = _sanitize(data["description"])
+    if "status" in data:
+        task.status = TaskStatus(data["status"])
+    if "priority" in data:
+        task.priority = _priority_from_int(data["priority"])
+    if "due_date" in data:
+        task.due_date = data["due_date"]
+    if "project_id" in data:
+        task.project_id = data["project_id"]
 
-        await db.commit()
-        await db.refresh(task)
-    except HTTPException:
-        raise
-    except SQLAlchemyError as exc:
-        await db.rollback()
-        logger.exception("update_task(%s) failed", task_id)
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    await db.commit()
+    await db.refresh(task)
     return _serialize(task)
 
 
@@ -226,17 +208,11 @@ async def update_task(
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["tasks"],
 )
+@handle_errors
 async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)) -> None:
-    try:
-        task = await db.get(Task, task_id)
-        if task is None:
-            raise HTTPException(status_code=404, detail="Task not found")
-        await db.delete(task)
-        await db.commit()
-    except HTTPException:
-        raise
-    except SQLAlchemyError as exc:
-        await db.rollback()
-        logger.exception("delete_task(%s) failed", task_id)
-        raise HTTPException(status_code=500, detail="internal error") from exc
+    task = await db.get(Task, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    await db.delete(task)
+    await db.commit()
     return None
