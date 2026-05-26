@@ -13,9 +13,11 @@ Routes and other callers can keep importing from app.services.ai_service:
 …and stay agnostic of the split.
 """
 from app.services.ai import (  # noqa: F401  re-export
+    AIImageService,
+    AIService,
     DEFAULT_MODEL,
     DEFAULT_PROVIDER,
-    AIService,
+    analyze_image,
     call_openai_chat,
     generate_text,
     get_active_config,
@@ -23,9 +25,11 @@ from app.services.ai import (  # noqa: F401  re-export
 )
 
 __all__ = [
+    "AIImageService",
     "AIService",
     "DEFAULT_MODEL",
     "DEFAULT_PROVIDER",
+    "analyze_image",
     "call_openai_chat",
     "generate_text",
     "get_active_config",

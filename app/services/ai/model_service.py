@@ -5,6 +5,7 @@ Split out of the legacy app/services/ai_service.py so each concern
 its own < 250 line module. The legacy module re-exports `AIService`
 for callers that still import from app.services.ai_service.
 """
+import os
 from typing import List, Optional
 
 from sqlalchemy import select
@@ -27,13 +28,25 @@ DEFAULT_MODEL = "gpt-3.5-turbo"
 class AIService:
     """CRUD façade over the ai_model_configs table.
 
-    Dependency injection: the session is passed in by the route layer
-    (``Depends(get_db)``) so tests can swap a fake session without
-    monkeypatching module globals.
+    Dependency injection: both the db session and the upstream provider
+    API key are passed in by the route layer. Tests can swap a fake
+    session or a stub api_key without monkeypatching module globals.
+    The api_key defaults to ``os.environ["OPENAI_API_KEY"]`` so callers
+    that don't care can keep the previous one-arg constructor signature.
     """
 
-    def __init__(self, db: AsyncSession):
+    def __init__(
+        self,
+        db: AsyncSession,
+        api_key: Optional[str] = None,
+    ):
         self.db = db
+        # Read once at construction so a test can inject a deterministic
+        # value without touching os.environ. The env lookup happens lazily
+        # only when no explicit key is passed.
+        self.api_key: Optional[str] = (
+            api_key if api_key is not None else os.environ.get("OPENAI_API_KEY")
+        )
 
     async def get_user_configs(self, user_id: int) -> List[AIModelConfig]:
         result = await self.db.execute(select(AIModelConfig))

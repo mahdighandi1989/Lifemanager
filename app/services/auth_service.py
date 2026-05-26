@@ -133,10 +133,24 @@ async def get_current_user(db: AsyncSession, token: str) -> User:
 # --- Class wrappers (preserve existing call-sites) ---------------------------
 
 class AuthService:
-    """Used by app/dependencies/auth.py via Depends."""
+    """Used by app/dependencies/auth.py via Depends.
 
-    def __init__(self, db: AsyncSession):
+    Both ``db`` and ``secret_key`` are injected via the constructor so
+    tests can supply mocks without touching module globals or env vars.
+    The ``secret_key`` defaults to ``settings.SECRET_KEY`` for callers
+    that don't care to override it (e.g. production routes).
+    """
+
+    def __init__(
+        self,
+        db: AsyncSession,
+        secret_key: Optional[str] = None,
+    ):
         self.db = db
+        # Read once at construction. A None passed in means "use the
+        # settings default" so the previous one-arg call sites keep
+        # working. Tests that want a custom key just pass it explicitly.
+        self.secret_key: str = secret_key if secret_key is not None else settings.SECRET_KEY
 
     async def verify_token(self, token: str) -> Optional[User]:
         try:
