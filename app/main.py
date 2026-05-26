@@ -280,6 +280,21 @@ async def startup_event():
     except Exception as exc:
         logger.debug("skip due_date type migration: %s", exc)
 
+    # Seed the 33 default TodoLists from the user's profile PDFs if
+    # the todo_lists table is empty. Idempotent — does nothing once
+    # at least one list exists, so re-runs and post-alembic deploys
+    # are no-ops.
+    try:
+        from app.database import SessionLocal
+        from app.services.list_service import seed_default_lists_if_empty
+
+        async with SessionLocal() as session:
+            inserted = await seed_default_lists_if_empty(session)
+            if inserted:
+                logger.info("seeded %d default todo lists", inserted)
+    except Exception as exc:
+        logger.debug("skip todo-list seed: %s", exc)
+
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
 # `/api/health` matches the path configured in render.yaml's healthCheckPath.

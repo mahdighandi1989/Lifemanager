@@ -103,6 +103,64 @@ async def delete_list(db: AsyncSession, list_id: int) -> None:
     await db.commit()
 
 
+# Default list names mirroring the user's existing TodoList profile
+# (33 names sourced from their PDF exports). Used by the migration
+# at migrations/versions/0005_seed_default_todo_lists.py AND by the
+# startup seeder in app/main.py for Render-free-tier environments
+# that bypass alembic.
+DEFAULT_LIST_NAMES: tuple[str, ...] = (
+    "Important",
+    "Tasks",
+    "انجام تمرینات تقویت هوش",
+    "ایده ها",
+    "برنامه نویسی",
+    "پرونده های مختومه",
+    "پرونده های موقتا مختومه",
+    "تاریخ انبیا",
+    "تاریخ شفاهی فامیل",
+    "تاریخ معاصر",
+    "تجارت",
+    "تحلیل سیاسی",
+    "تفریح و سرگرمی",
+    "حفظ قرآن",
+    "خریدهای لازم",
+    "خودسازی",
+    "خودهیپنوتیزم",
+    "خوشنویسی",
+    "دروس حقوق",
+    "ریاضی و فیزیک",
+    "زبان",
+    "شعر گفتن",
+    "علوم و معارف اسلامی",
+    "کارهای اصلی این هفته - 05-05-2025",
+    "کارهای زیر 2 دقیقه",
+    "کسب در آمد",
+    "مداحی",
+    "مهارت نفوذ",
+    "مهارت های فردی",
+    "موضوعات برای تفکر",
+    "نویسندگی",
+    "ورزش",
+    "وقتی بیکارم یا نمیدونم چی کار کنم",
+)
+
+
+async def seed_default_lists_if_empty(db: AsyncSession) -> int:
+    """Insert DEFAULT_LIST_NAMES iff the todo_lists table is empty.
+
+    Returns the number of inserted rows (0 on a no-op). Idempotent —
+    safe to call on every startup; the empty-table check prevents
+    duplicate seeds and the `OR name NOT IN existing` branch in
+    bulk_create_default_lists handles partial seed states.
+    """
+    result = await db.execute(select(func.count()).select_from(TodoList))
+    count = int(result.scalar_one() or 0)
+    if count > 0:
+        return 0
+    created = await bulk_create_default_lists(db, DEFAULT_LIST_NAMES)
+    return len(created)
+
+
 async def bulk_create_default_lists(
     db: AsyncSession, names: Sequence[str]
 ) -> List[TodoList]:

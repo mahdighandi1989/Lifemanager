@@ -207,6 +207,34 @@ async def test_archive_excludes_from_default_listing(api_client):
 
 
 @pytest.mark.asyncio
+async def test_seed_default_lists_creates_33_entries(api_client):
+    """The seeder pulls in the user's 33-list PDF profile when empty."""
+    from app.services.list_service import (
+        DEFAULT_LIST_NAMES,
+        seed_default_lists_if_empty,
+    )
+    # Pull a fresh session from the test fixture's override.
+    from app.database import get_db
+    from app.main import app
+
+    override = app.dependency_overrides[get_db]
+    async for session in override():
+        inserted = await seed_default_lists_if_empty(session)
+        assert inserted == len(DEFAULT_LIST_NAMES) == 33
+        # Re-running is a no-op.
+        again = await seed_default_lists_if_empty(session)
+        assert again == 0
+        break
+
+    # The default Persian-named lists are now visible via the API.
+    r = api_client.get("/api/lists")
+    names = {item["name"] for item in r.json()}
+    assert "Important" in names
+    assert "خودسازی" in names
+    assert "برنامه نویسی" in names
+
+
+@pytest.mark.asyncio
 async def test_404_on_missing_list_or_item(api_client):
     assert api_client.get("/api/lists/9999").status_code == 404
     assert api_client.get("/api/todo-items/9999").status_code == 404
