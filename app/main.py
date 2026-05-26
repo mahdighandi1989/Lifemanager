@@ -231,6 +231,22 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip notifications.%s migration: %s", col_name, exc)
 
+    # users profile fields — bio / display_name — added so the
+    # /api/users/profile sanitiser can actually persist the sanitised
+    # values. Idempotent ADD COLUMN IF NOT EXISTS for legacy DBs.
+    _user_profile_columns = [
+        ("bio", "TEXT"),
+        ("display_name", "VARCHAR(120)"),
+    ]
+    for col_name, col_type in _user_profile_columns:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip users.%s migration: %s", col_name, exc)
+
     # tasks planning fields — estimated_duration / deadline / recurrence —
     # were added by migration 0003. ADD COLUMN IF NOT EXISTS keeps the
     # startup path idempotent for environments that haven't run alembic
