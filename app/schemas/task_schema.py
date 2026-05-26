@@ -1,16 +1,18 @@
 """Canonical Pydantic schemas for /api/tasks endpoints.
 
 Field constraints:
-    title       1..200 characters (non-empty, HTML-escaped at the route layer)
-    description 0..1000 characters (HTML-escaped at the route layer)
-    priority    0..5 (Field(ge=0, le=5))
-    due_date    date (ISO-8601 'YYYY-MM-DD'); SQLAlchemy DateTime column
-                accepts a date and stores it at midnight UTC.
-    status      one of {'todo', 'in_progress', 'done', 'cancelled'}
-    project_id  optional FK
+    title              1..200 characters (non-empty, HTML-escaped at the route layer)
+    description        0..1000 characters (HTML-escaped at the route layer)
+    priority           0..5 (Field(ge=0, le=5))
+    due_date           date (ISO-8601 'YYYY-MM-DD'); the SQLAlchemy column is Date.
+    status             one of {'todo', 'in_progress', 'done', 'cancelled'}
+    project_id         optional FK
+    estimated_duration optional minutes (Integer, ≥ 0)
+    deadline           optional datetime (full timestamp)
+    recurrence         optional dict (RFC-5545-ish: {"freq", "interval", ...})
 """
 from datetime import date, datetime
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +30,11 @@ class TaskCreate(BaseModel):
     project_id: Optional[int] = None
     user_id: Optional[int] = None  # populated from auth when available
 
+    # Planning fields — all optional so existing clients aren't broken.
+    estimated_duration: Optional[int] = Field(default=None, ge=0)
+    deadline: Optional[datetime] = None
+    recurrence: Optional[dict[str, Any]] = None
+
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = Field(default=None, min_length=1, max_length=200)
@@ -36,6 +43,9 @@ class TaskUpdate(BaseModel):
     due_date: Optional[date] = None
     status: Optional[str] = Field(default=None, pattern="^(todo|in_progress|done|cancelled)$")
     project_id: Optional[int] = None
+    estimated_duration: Optional[int] = Field(default=None, ge=0)
+    deadline: Optional[datetime] = None
+    recurrence: Optional[dict[str, Any]] = None
 
 
 class TaskResponse(BaseModel):
@@ -47,6 +57,9 @@ class TaskResponse(BaseModel):
     user_id: Optional[int] = None
     project_id: Optional[int] = None
     due_date: Optional[datetime] = None
+    estimated_duration: Optional[int] = None
+    deadline: Optional[datetime] = None
+    recurrence: Optional[dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
