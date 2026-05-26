@@ -22,8 +22,37 @@ from app.database import get_db
 from app.rate_limit import limiter
 from app.schemas.auth import TokenResponse, UserCreate, UserLogin
 from app.services import auth_service
+from app.services.auth_service import AuthService
 
 router = APIRouter()
+
+
+# ── DI providers ────────────────────────────────────────────────────
+
+
+def get_jwt_secret_key() -> str:
+    """Resolve the JWT signing key used by AuthService.
+
+    Reads from ``settings.SECRET_KEY`` (which itself is sourced from the
+    env via pydantic-settings). Wrapped in a Depends so tests can
+    override ``auth.get_jwt_secret_key`` with a deterministic key
+    without monkey-patching settings.
+    """
+    return settings.SECRET_KEY
+
+
+def get_auth_service(
+    db: AsyncSession = Depends(get_db),
+    secret_key: str = Depends(get_jwt_secret_key),
+) -> AuthService:
+    """Build an AuthService with both db and secret_key injected.
+
+    Routes that need to verify tokens take this dependency directly;
+    register/login keep using the module-level auth_service.register /
+    auth_service.login helpers because those functions already encode
+    the bespoke 401/409 status mapping the auth flow requires.
+    """
+    return AuthService(db, secret_key=secret_key)
 
 
 @router.post(
