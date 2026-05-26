@@ -334,3 +334,173 @@ def test_api_notifications_status_endpoint_returns_counts(api_client):
     for field in ("status", "sent", "failed", "pending", "total"):
         assert field in body, f"missing {field}"
     assert body["status"] == "ok"
+
+
+# ── Email channel + Celery scheduling (task ad64dde0) ──────────────
+
+
+def test_send_email_no_smtp_host_returns_true(monkeypatch):
+    """Default dev/test mode: no SMTP_HOST → log + return True."""
+    from app.services.notification_service import send_email
+
+    monkeypatch.delenv("SMTP_HOST", raising=False)
+    assert send_email(to="a@b.com", subject="hi", body="hello") is True
+
+
+def test_send_email_uses_smtp_when_host_set(monkeypatch):
+    """When SMTP_HOST is set, send_email goes through smtplib.SMTP.
+
+    We patch smtplib.SMTP with a fake context manager that records the
+    sent message — the real send_email path runs end-to-end against
+    that fake without touching a network.
+    """
+    from app.services import notification_service
+
+    captured: dict = {}
+
+    class _FakeSMTP:
+        def __init__(self, host, port, timeout=15):
+            captured["host"] = host
+            captured["port"] = port
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def starttls(self):
+            captured["starttls"] = True
+
+        def login(self, user, pw):
+            captured["login"] = (user, pw)
+
+        def send_message(self, msg):
+            captured["msg"] = msg
+
+    monkeypatch.setenv("SMTP_HOST", "smtp.example.com")
+    monkeypatch.setenv("SMTP_PORT", "2525")
+    monkeypatch.setenv("SMTP_USER", "u")
+    monkeypatch.setenv("SMTP_PASSWORD", "p")
+    monkeypatch.setattr("smtplib.SMTP", _FakeSMTP)
+
+    ok = notification_service.send_email(
+        to="x@y.com", subject="s", body="b"
+    )
+    assert ok is True
+    assert captured["host"] == "smtp.example.com"
+    assert captured["port"] == 2525
+    assert captured.get("starttls") is True
+    assert captured.get("login") == ("u", "p")
+    assert captured["msg"]["To"] == "x@y.com"
+
+
+def test_schedule_notification_returns_none_when_celery_unreachable(monkeypatch):
+    """In test environments without a Redis broker, the schedule call
+    returns None instead of raising — caller is expected to fall back."""
+    from app.services.notification_service import schedule_notification
+
+    result = schedule_notification(
+        user_id=1, message="hi", channel="email", email="t@e.com"
+    )
+    # Either None (broker unreachable) or a string task id (if Redis is
+    # somehow alive in this env). Both are valid responses.
+    assert result is None or isinstance(result, str)
+
+
+def test_send_notification_email_channel_uses_send_email(monkeypatch):
+    """When channel='email' is passed, the public send_notification
+    routes through _send_email — patched here so we can assert it was
+    called with the address that was passed in."""
+    import asyncio
+
+    svc = NotificationService()
+    sent: dict = {}
+
+    async def fake_send_email(self, address, message):
+        sent["address"] = address
+        sent["message"] = message
+        return True
+
+    monkeypatch.setattr(NotificationService, "_send_email", fake_send_email)
+
+    result = asyncio.get_event_loop().run_until_complete(
+        svc.send_notification(
+            user_id=42,
+            message="welcome",
+            notification_type="email",
+            email="hi@there.com",
+        )
+    )
+    assert result is not None
+    assert sent["address"] == "hi@there.com"
+    assert sent["message"] == "welcome"
+
+
+# ── Storage abstraction (task 44ddf42d) ─────────────────────────────
+
+
+def test_storage_backend_interface_exists():
+    """StorageBackend abstract interface with upload/download/exists/delete."""
+    from app.services import StorageBackend
+
+    for method in ("upload", "download", "exists", "delete"):
+        assert hasattr(StorageBackend, method), f"missing {method}"
+
+
+def test_local_storage_round_trips_bytes(tmp_path):
+    from app.services import LocalStorage
+
+    backend = LocalStorage(base_dir=str(tmp_path))
+    path = backend.upload("hello.txt", b"hello world")
+    assert backend.exists("hello.txt")
+    assert backend.download("hello.txt") == b"hello world"
+    assert "hello.txt" in path
+    assert backend.delete("hello.txt") is True
+    assert not backend.exists("hello.txt")
+
+
+def test_local_storage_rejects_path_traversal(tmp_path):
+    from app.services import LocalStorage
+
+    backend = LocalStorage(base_dir=str(tmp_path))
+    with pytest.raises(ValueError):
+        backend.upload("../escape.txt", b"x")
+
+
+def test_s3_storage_requires_bucket(monkeypatch):
+    from app.services import S3Storage
+
+    monkeypatch.delenv("STORAGE_S3_BUCKET", raising=False)
+    with pytest.raises(RuntimeError, match="STORAGE_S3_BUCKET"):
+        S3Storage()
+
+
+def test_s3_storage_construction_with_explicit_bucket():
+    from app.services import S3Storage
+
+    # Just constructs — doesn't touch boto3 until a method is called.
+    storage = S3Storage(bucket="explicit-bucket")
+    assert storage.bucket == "explicit-bucket"
+
+
+def test_get_storage_backend_defaults_to_local(monkeypatch, tmp_path):
+    monkeypatch.setenv("STORAGE_LOCAL_DIR", str(tmp_path))
+    monkeypatch.delenv("STORAGE_BACKEND", raising=False)
+    from app.services import LocalStorage, get_storage_backend
+
+    backend = get_storage_backend(refresh=True)
+    assert isinstance(backend, LocalStorage)
+
+
+def test_get_storage_backend_switches_on_env(monkeypatch, tmp_path):
+    monkeypatch.setenv("STORAGE_BACKEND", "s3")
+    monkeypatch.setenv("STORAGE_S3_BUCKET", "test-bucket")
+    from app.services import S3Storage, get_storage_backend
+
+    backend = get_storage_backend(refresh=True)
+    assert isinstance(backend, S3Storage)
+    # Reset to local so other tests aren't affected.
+    monkeypatch.setenv("STORAGE_BACKEND", "local")
+    monkeypatch.setenv("STORAGE_LOCAL_DIR", str(tmp_path))
+    get_storage_backend(refresh=True)
