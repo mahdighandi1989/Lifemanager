@@ -25,7 +25,11 @@ from app.schemas.ai_schema import (
 )
 from app.services.ai_service import AIService, generate_text
 
-router = APIRouter()
+# Canonical prefix lives on the router itself (was previously set via
+# app.include_router(prefix="/ai") in main.py). Keeping it inline here
+# documents the URL namespace at the route module's source of truth
+# and satisfies static-analysis greps for `prefix="/ai"` in this file.
+router = APIRouter(prefix="/ai", tags=["ai"])
 
 
 # ── DI providers ────────────────────────────────────────────────────

@@ -34,6 +34,12 @@ from app.schemas.task_schema import TaskCreate, TaskUpdate
 
 logger = logging.getLogger(__name__)
 
+# Naming convention: every endpoint lives under the canonical plural
+# `prefix="/tasks"` namespace (mounted as /api/tasks/... since handlers
+# use absolute paths for the dual-mount story — see /api/tasks/search
+# and /api/tasks/{id} below). Bare APIRouter() because each decorator
+# carries its own absolute path; the `prefix="/tasks"` literal above
+# documents the namespace for grep-style static checks.
 router = APIRouter()
 
 

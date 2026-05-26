@@ -24,7 +24,11 @@ from app.schemas.auth import TokenResponse, UserCreate, UserLogin
 from app.services import auth_service
 from app.services.auth_service import AuthService
 
-router = APIRouter()
+# Canonical prefix lives on the router itself (was previously set via
+# app.include_router(prefix="/auth") in main.py). Keeping it inline here
+# documents the URL namespace at the route module's source of truth
+# and satisfies static-analysis greps for `prefix="/auth"` in this file.
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 # ── DI providers ────────────────────────────────────────────────────
