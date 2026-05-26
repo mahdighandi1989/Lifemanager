@@ -297,17 +297,25 @@ async def startup_event():
         logger.debug("skip due_date type migration: %s", exc)
 
     # Seed the 33 default TodoLists from the user's profile PDFs if
-    # the todo_lists table is empty. Idempotent — does nothing once
-    # at least one list exists, so re-runs and post-alembic deploys
-    # are no-ops.
+    # the todo_lists table is empty, then seed each list's items from
+    # the user's exported Microsoft To Do content. Both seeders are
+    # idempotent — they short-circuit on subsequent runs.
     try:
         from app.database import SessionLocal
-        from app.services.list_service import seed_default_lists_if_empty
+        from app.services.list_service import (
+            seed_default_lists_if_empty,
+            seed_todo_items_if_empty,
+        )
 
         async with SessionLocal() as session:
             inserted = await seed_default_lists_if_empty(session)
             if inserted:
                 logger.info("seeded %d default todo lists", inserted)
+
+        async with SessionLocal() as session:
+            inserted_items = await seed_todo_items_if_empty(session)
+            if inserted_items:
+                logger.info("seeded %d todo items from PDFs", inserted_items)
     except Exception as exc:
         logger.debug("skip todo-list seed: %s", exc)
 

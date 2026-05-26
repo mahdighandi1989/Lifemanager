@@ -235,6 +235,52 @@ async def test_seed_default_lists_creates_33_entries(api_client):
 
 
 @pytest.mark.asyncio
+async def test_seed_todo_items_inserts_pdf_content(api_client):
+    """The PDF-derived seed creates real items inside named lists."""
+    from app.services.list_service import (
+        seed_default_lists_if_empty,
+        seed_todo_items_if_empty,
+    )
+    from app.database import get_db
+    from app.main import app
+
+    override = app.dependency_overrides[get_db]
+
+    # First populate the 33 default list names …
+    async for session in override():
+        n = await seed_default_lists_if_empty(session)
+        assert n == 33
+        # … then seed the items.
+        inserted = await seed_todo_items_if_empty(session)
+        # 24 lists in this pass — Important + Tasks alone account for
+        # 30+ items each, so total > 100 is a reasonable lower bound.
+        assert inserted > 100
+        # Re-running is a no-op.
+        again = await seed_todo_items_if_empty(session)
+        assert again == 0
+        break
+
+    # Find the Important list and confirm its starred items are there.
+    lists_resp = api_client.get("/api/lists")
+    important = next(l for l in lists_resp.json() if l["name"] == "Important")
+    assert important["item_count"] >= 10  # 10 top-level starred items
+
+    detail = api_client.get(f"/api/lists/{important['id']}").json()
+    starred = [it for it in detail["items"] if it["is_starred"]]
+    assert len(starred) >= 10
+    # The cross-list shared items (e.g. "فن بیان") must appear in BOTH
+    # Important and "مهارت های فردی" as the SAME row (single id).
+    fan_bayan_imp = next(it for it in detail["items"] if it["content"] == "فن بیان")
+    skills = next(l for l in lists_resp.json() if l["name"] == "مهارت های فردی")
+    skills_detail = api_client.get(f"/api/lists/{skills['id']}").json()
+    fan_bayan_skills = next(it for it in skills_detail["items"] if it["content"] == "فن بیان")
+    assert fan_bayan_imp["id"] == fan_bayan_skills["id"]
+    # The cross-membership means the item carries both list ids.
+    assert important["id"] in fan_bayan_imp["list_ids"]
+    assert skills["id"] in fan_bayan_imp["list_ids"]
+
+
+@pytest.mark.asyncio
 async def test_404_on_missing_list_or_item(api_client):
     assert api_client.get("/api/lists/9999").status_code == 404
     assert api_client.get("/api/todo-items/9999").status_code == 404
