@@ -60,6 +60,11 @@ def upgrade() -> None:
             sa.Column("user_id", sa.Integer(), sa.ForeignKey("users.id"), nullable=True),
             sa.Column("project_id", sa.Integer(), sa.ForeignKey("projects.id"), nullable=True),
             sa.Column("due_date", sa.Date(), nullable=True),
+            # Planning fields. Migration 0003 also ADD COLUMNs them via
+            # ADD COLUMN IF NOT EXISTS so older databases stay in sync.
+            sa.Column("estimated_duration", sa.Integer(), nullable=True),
+            sa.Column("deadline", sa.DateTime(timezone=True), nullable=True),
+            sa.Column("recurrence", sa.JSON(), nullable=True),
             sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
             sa.Column("updated_at", sa.DateTime(timezone=True), onupdate=sa.func.now()),
         )

@@ -231,6 +231,24 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip notifications.%s migration: %s", col_name, exc)
 
+    # tasks planning fields — estimated_duration / deadline / recurrence —
+    # were added by migration 0003. ADD COLUMN IF NOT EXISTS keeps the
+    # startup path idempotent for environments that haven't run alembic
+    # yet (Render's free tier uses create_all + startup ALTERs).
+    _task_planning_columns = [
+        ("estimated_duration", "INTEGER"),
+        ("deadline", "TIMESTAMP WITH TIME ZONE"),
+        ("recurrence", "JSON"),
+    ]
+    for col_name, col_type in _task_planning_columns:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE tasks ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip tasks.%s migration: %s", col_name, exc)
+
     # tasks.due_date used to be TIMESTAMP; the model now declares Date to
     # match the Pydantic schema. Convert the existing column on Postgres so
     # ORM reads/writes line up. USING due_date::date drops any time portion.

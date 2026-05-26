@@ -1,4 +1,14 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text, Enum as SAEnum
+from sqlalchemy import (
+    Column,
+    Date,
+    DateTime,
+    Enum as SAEnum,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Text,
+)
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
@@ -34,6 +44,21 @@ class Task(Base):
     # app/schemas/task_schema.py. Legacy deploys that already have a
     # TIMESTAMP column are migrated to DATE at startup (see app/main.py).
     due_date = Column(Date, nullable=True)
+
+    # Planning fields (added for the database-evolution composite).
+    # estimated_duration is stored as integer minutes so the column type
+    # is portable across Postgres (would use INTERVAL) and SQLite (no
+    # INTERVAL type). Callers convert to/from timedelta as needed.
+    estimated_duration = Column(Integer, nullable=True)
+    # deadline is a full timestamp — distinct from due_date which is the
+    # calendar date a task is scheduled for. Use deadline for the hard
+    # cutoff (when it stops mattering); due_date for the planning bucket.
+    deadline = Column(DateTime(timezone=True), nullable=True)
+    # recurrence stores an RFC-5545-ish dict ({"freq": "weekly",
+    # "interval": 1, "byweekday": ["MO", "WE"]}) so the planner can
+    # expand recurring tasks without a separate recurrence table.
+    recurrence = Column(JSON, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
