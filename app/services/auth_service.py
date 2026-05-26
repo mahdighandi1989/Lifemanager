@@ -73,9 +73,22 @@ def validate_token(token: str) -> Optional[dict]:
 # --- High-level operations ---------------------------------------------------
 
 async def register(db: AsyncSession, user_data: UserCreate) -> User:
+    # Email uniqueness check (returns "Email already registered" — the
+    # route maps to 409).
     existing = await db.execute(select(User).where(User.email == user_data.email))
     if existing.scalar_one_or_none():
         raise ValueError("Email already registered")
+
+    # Username uniqueness check — the User.username column has a UNIQUE
+    # constraint at the DB level, but pre-checking here lets us return a
+    # clean 409 with a specific message instead of leaking an
+    # IntegrityError as a 500.
+    if user_data.username:
+        existing_uname = await db.execute(
+            select(User).where(User.username == user_data.username)
+        )
+        if existing_uname.scalar_one_or_none():
+            raise ValueError("Username already taken")
 
     db_user = User(
         email=user_data.email,
@@ -88,9 +101,24 @@ async def register(db: AsyncSession, user_data: UserCreate) -> User:
     return db_user
 
 
+# Raised when a user exists but is disabled — the route translates this
+# into 403 Forbidden so the client knows the account is real but locked,
+# distinct from the 401 "bad credentials" path.
+class UserDisabledError(Exception):
+    """User account is disabled (is_active=False)."""
+
+
 async def login(db: AsyncSession, credentials: UserLogin) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == credentials.email))
     user = result.scalar_one_or_none()
+
+    # Active-account check happens BEFORE the password verify so a
+    # disabled user's correct password doesn't issue a token. Using the
+    # 403 path (not 401) signals "we know who you are, you can't log in"
+    # which is the standard contract for disabled accounts.
+    if user is not None and not user.is_active:
+        raise UserDisabledError("Account is disabled")
+
     if not user or not verify_password(credentials.password, user.hashed_password):
         # Audit critical auth failures. notify_event swallows its own
         # DB errors so a notification outage can never block the 401.
