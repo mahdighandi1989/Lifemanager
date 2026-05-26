@@ -87,10 +87,14 @@ class SelfImprovementItemStatus(BaseModel):
 class SelfImprovementCategorySection(BaseModel):
     """Grouped view: one category (e.g. willpower) with its items."""
 
-    category: str  # 'willpower' | 'love_god' | 'fears' | 'muhasebe'
+    category: str  # 'willpower' | 'love_god' | 'fears' | 'divine_man' | 'muhasebe'
     label_fa: str
     list_id: int
     list_name: str
+    # The user's long-form framing for this list, mirrored from
+    # TodoList.description. Optional — love_god has no form-level
+    # description so the field is None there.
+    list_description: Optional[str] = None
     items: List[SelfImprovementItemStatus] = Field(default_factory=list)
     # Quick stat: completed_today / total — convenient for the sidebar
     # progress badge without re-iterating items on the client.
