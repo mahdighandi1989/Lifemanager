@@ -21,6 +21,11 @@ slowapi==0.1.9
 alembic==1.14.0
 httpx==0.28.1
 aiofiles==24.1.0
+# HTML sanitizer for the user-profile bio endpoint. bleach.clean is an
+# allowlist-based stripper that handles `<script>` and event-handler
+# attributes safely. The route layer falls back to html.escape if the
+# import fails so the endpoint stays available even on a stripped image.
+bleach==6.2.0
 pytest==8.3.4
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0

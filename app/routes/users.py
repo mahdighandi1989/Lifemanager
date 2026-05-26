@@ -4,15 +4,21 @@ No per-route try/except blocks: app.middleware.handle_errors maps
 service-layer exceptions onto the canonical HTTPException codes.
 
 Profile sanitization: POST /api/users/profile accepts a `bio` +
-`display_name` body and html-escapes both fields before responding so
-stored XSS (script tags, raw HTML) can't pierce the API surface.
+`display_name` body and sanitizes both fields before responding so
+stored XSS (script tags, event handlers) can't pierce the API surface.
+
+We prefer `bleach.clean(..., strip=True)` because it understands HTML
+semantics (strips entire `<script>` blocks including their contents,
+neutralises `onerror=` style event handlers, etc.). When bleach isn't
+installed (stripped runtime images) the route falls back to
+`html.escape` which also neutralises XSS, just less surgically.
 """
 import html
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
 
 from app.database import get_db
 from app.dependencies.auth import get_current_user
@@ -20,6 +26,17 @@ from app.middleware import handle_errors
 from app.models.user import User
 from app.schemas.user_schema import UserOut, UserUpdate
 from app.services.auth_service import UserService
+
+# Allowlist: tags that survive sanitisation when bleach is available.
+# Kept tight on purpose — only purely-presentational inline elements.
+_SAFE_HTML_TAGS = ("b", "i", "em", "strong", "u", "br", "p")
+_SAFE_HTML_ATTRS: dict = {}
+
+try:
+    import bleach as _bleach  # type: ignore[import-untyped]
+    _HAS_BLEACH = True
+except ImportError:
+    _HAS_BLEACH = False
 
 router = APIRouter()
 
@@ -32,9 +49,9 @@ api_router = APIRouter()
 class UserProfileUpdate(BaseModel):
     """Profile update payload — both fields are user-controlled free text.
 
-    The route layer html-escapes them before persisting / responding so a
+    The route layer sanitises them before persisting / responding so a
     payload like ``{"bio": "<script>alert('xss')</script>"}`` lands as
-    HTML-entity-encoded text and cannot execute in a downstream renderer.
+    inert text and cannot execute in a downstream renderer.
     """
 
     bio: Optional[str] = Field(default=None, max_length=2000)
@@ -42,15 +59,28 @@ class UserProfileUpdate(BaseModel):
 
 
 def _sanitize_html(value: Optional[str]) -> Optional[str]:
-    """HTML-escape ``value`` so embedded tags become inert text.
+    """Strip XSS from ``value`` while preserving plain text.
 
-    `html.escape(..., quote=True)` is the same primitive
-    `app/routes/tasks.py::_sanitize` uses — strips no characters,
-    just converts `<`, `>`, `&`, `"`, `'` to their entity forms. That
-    neutralises stored XSS in any downstream renderer that pastes the
-    field into HTML, including legitimate-looking tags like `<b>`.
+    With bleach available: runs ``bleach.clean(value, tags=_SAFE_HTML_TAGS,
+    strip=True)`` — drops disallowed tags (and their contents for
+    ``<script>`` / ``<style>``), HTML-encodes anything that survives,
+    and lets `<b>`, `<i>` style purely-presentational tags pass.
+
+    Without bleach: falls back to ``html.escape(..., quote=True)``,
+    which entity-encodes every special char. Both modes neutralise XSS;
+    bleach is preferred because it satisfies the "Existing safe HTML is
+    preserved" AC literally.
     """
-    return None if value is None else html.escape(value, quote=True)
+    if value is None:
+        return None
+    if _HAS_BLEACH:
+        return _bleach.clean(  # type: ignore[attr-defined]
+            value,
+            tags=list(_SAFE_HTML_TAGS),
+            attributes=_SAFE_HTML_ATTRS,
+            strip=True,
+        )
+    return html.escape(value, quote=True)
 
 
 @api_router.post("/api/users/profile", tags=["users"])
