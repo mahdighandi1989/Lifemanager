@@ -22,9 +22,13 @@ Routes:
       Force-rebuild the analytics row (stats + AI narrative). Useful
       for the "refresh" button on the profile page.
 
-Auth: every endpoint requires a valid bearer token via
-``get_current_user``. The route reads ``user.id`` and never trusts
-a user_id from the request body.
+Auth: routes use ``get_optional_user_id`` so they keep working
+while the frontend's login bypass is enabled (AuthContext.jsx
+sets ``isLoginBypassEnabled = true``). Anonymous traffic resolves
+to ``DEFAULT_ANON_USER_ID`` — a single shared scope — so the user
+always sees their own data even before re-enabling login. When
+auth is reinstated, swapping ``get_optional_user_id`` for
+``get_current_user`` is a one-line per-route change.
 """
 from __future__ import annotations
 
@@ -35,9 +39,8 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
-from app.models.user import User
 from app.schemas.self_improvement_schema import (
     SelfImprovementBulkDailyUpdate,
     SelfImprovementCheckInOut,
@@ -77,19 +80,22 @@ def _serialize_checkin(row) -> dict:
 @handle_errors
 async def get_overview(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """Dashboard payload — four sections + aggregate totals.
 
     Lazily backfills today's pending rows on the first read so the
     user never sees an empty table after midnight even if the Celery
-    refresh hasn't run yet.
+    refresh hasn't run yet. Also lazily seeds the four خودسازی
+    sub-lists on first read for environments where migration 0008
+    hasn't been applied (Render free tier).
     """
+    await self_improvement_service.ensure_lists_seeded(db)
     await self_improvement_service.refresh_daily_pending_rows(
-        db, user_id=current_user.id
+        db, user_id=user_id
     )
     return await self_improvement_service.build_overview(
-        db, user_id=current_user.id
+        db, user_id=user_id
     )
 
 
@@ -104,7 +110,7 @@ async def get_overview(
 async def post_daily_update(
     payload: Dict[str, Any] = Body(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ) -> Dict[str, Any]:
     """Tick / untick one or many items.
 
@@ -131,7 +137,7 @@ async def post_daily_update(
         updates = [single.model_dump()]
 
     rows = await self_improvement_service.bulk_upsert_checkins(
-        db, user_id=current_user.id, updates=updates,
+        db, user_id=user_id, updates=updates,
     )
     return {
         "applied": len(rows),
@@ -149,25 +155,24 @@ async def post_daily_update(
 @handle_errors
 async def get_profile_analytics(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """Return cached analytics; compute deterministic part on first read.
 
     The AI narrative is left blank on first read — the user (or the
     nightly Celery task) calls ``/refresh`` to populate it.
     """
+    await self_improvement_service.ensure_lists_seeded(db)
     row = await self_improvement_service.get_profile_analytics(
-        db, user_id=current_user.id
+        db, user_id=user_id
     )
     if row is None:
-        # Materialise an empty-state row so the frontend always gets
-        # a 200 with a real shape (chart-ready stats, no summary yet).
         payload = await self_improvement_service.compute_basic_analytics(
-            db, user_id=current_user.id,
+            db, user_id=user_id,
         )
         row = await self_improvement_service.upsert_profile_analytics(
             db,
-            user_id=current_user.id,
+            user_id=user_id,
             summary=None,
             payload=payload,
             ai_model=None,
@@ -190,11 +195,12 @@ async def get_profile_analytics(
 @handle_errors
 async def refresh_profile_analytics(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """Force-rebuild stats + AI narrative."""
+    await self_improvement_service.ensure_lists_seeded(db)
     row = await self_improvement_service.regenerate_ai_narrative(
-        db, user_id=current_user.id,
+        db, user_id=user_id,
     )
     return {
         "user_id": row.user_id,

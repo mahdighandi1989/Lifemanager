@@ -20,7 +20,7 @@ import logging
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Sequence
 
-from sqlalchemy import and_, delete, func, select, update
+from sqlalchemy import and_, delete, func, insert, select, update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -94,6 +94,63 @@ async def _self_improvement_lists(db: AsyncSession) -> Sequence[TodoList]:
     order = {name: i for i, name in enumerate(wanted)}
     lists.sort(key=lambda lst: order.get(lst.name, len(order)))
     return lists
+
+
+async def ensure_lists_seeded(db: AsyncSession) -> int:
+    """Lazily seed the four خودسازی sub-lists + their items.
+
+    Called on the first read of each route so environments that
+    skip alembic (Render's free tier just runs Base.metadata.create_all
+    on startup) still end up with the canonical content. Idempotent:
+
+      * a list whose name already exists is reused, not duplicated.
+      * a list that already has any items is left untouched (we don't
+        want to overwrite user edits made through the regular
+        TodoItem UI).
+
+    Returns the count of newly inserted items so callers can log
+    "seeded N items" the first time it runs.
+    """
+    wanted = [
+        (MUHASEBE_LIST_NAME, MUHASEBE_ITEMS),
+        *SELF_IMPROVEMENT_LISTS.items(),
+    ]
+    total_new_items = 0
+    for list_name, items in wanted:
+        existing = (
+            await db.execute(select(TodoList).where(TodoList.name == list_name))
+        ).scalar_one_or_none()
+        if existing is None:
+            lst = TodoList(name=list_name)
+            db.add(lst)
+            await db.commit()
+            await db.refresh(lst)
+            existing = lst
+        # If the list already has any items, leave it alone.
+        n_items = (
+            await db.execute(
+                select(func.count())
+                .select_from(todo_list_items)
+                .where(todo_list_items.c.todo_list_id == existing.id)
+            )
+        ).scalar_one()
+        if n_items:
+            continue
+        for position, content in enumerate(items):
+            item = TodoItem(content=content)
+            db.add(item)
+            await db.commit()
+            await db.refresh(item)
+            await db.execute(
+                insert(todo_list_items).values(
+                    todo_list_id=existing.id,
+                    todo_item_id=item.id,
+                    position=position,
+                )
+            )
+            total_new_items += 1
+        await db.commit()
+    return total_new_items
 
 
 async def _items_for_list(db: AsyncSession, list_id: int) -> List[tuple[TodoItem, int]]:

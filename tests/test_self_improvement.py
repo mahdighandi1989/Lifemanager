@@ -25,7 +25,7 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.database import Base, get_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_optional_user_id
 from app.main import app
 from app.models.self_improvement import (
     CHECKIN_STATUS_AUTO_DONE,
@@ -45,14 +45,7 @@ from app.services._self_improvement_seed_data import (
 # --- Fixtures ---------------------------------------------------------------
 
 
-class _StubUser:
-    """Tiny stand-in for the User row the auth dependency would return.
-
-    The routes only read ``id``, so a duck-type is enough — no need to
-    INSERT a real User and chase the password-hash branch.
-    """
-
-    id = 1
+_STUB_USER_ID = 1
 
 
 @pytest_asyncio.fixture
@@ -73,15 +66,15 @@ async def si_client():
         async with factory() as session:
             yield session
 
-    async def _get_current_user():
-        return _StubUser()
+    async def _get_optional_user_id():
+        return _STUB_USER_ID
 
     # Seed the four خودسازی sub-lists + items.
     async with factory() as session:
         await _seed_self_improvement_lists(session)
 
     app.dependency_overrides[get_db] = _get_db
-    app.dependency_overrides[get_current_user] = _get_current_user
+    app.dependency_overrides[get_optional_user_id] = _get_optional_user_id
     try:
         client = TestClient(app)
         yield client, factory
@@ -249,7 +242,7 @@ async def test_profile_analytics_lazy_backfill_returns_200(si_client):
     r = client.get("/api/self-improvement/profile-analytics")
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["user_id"] == 1
+    assert body["user_id"] == _STUB_USER_ID
     assert body["payload"] is not None
     # Empty-state payload still has the per_category list populated
     # (with zeroes) for each category that has items in the DB.
@@ -371,7 +364,27 @@ async def test_refresh_daily_pending_rows_is_idempotent(db_session):
 # --- Auth coverage ---------------------------------------------------------
 
 
-def test_overview_requires_auth(api_client):
-    """Without the dependency override, anonymous requests must 401/403."""
+def test_overview_works_anonymously_during_login_bypass(api_client):
+    """While the frontend's login bypass is enabled, anonymous reads
+    of /overview must NOT 403/401 — they fall back to the default
+    anon user_id scope. This matches AuthContext.jsx's behaviour and
+    keeps the dashboard usable until real auth is reinstated.
+
+    The first call lazily seeds the four خودسازی sub-lists, so the
+    response carries the canonical 90-item shape.
+    """
     r = api_client.get("/api/self-improvement/overview")
-    assert r.status_code in (401, 403), r.text
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["items_total"] == 90
+    cats = {s["category"] for s in body["sections"]}
+    assert {"muhasebe", "willpower", "love_god", "fears"} <= cats
+
+
+def test_overview_with_garbage_token_falls_back_to_anon(api_client):
+    """Invalid bearer must NOT 401 — same fallback as the no-header case."""
+    r = api_client.get(
+        "/api/self-improvement/overview",
+        headers={"Authorization": "Bearer not.a.real.jwt"},
+    )
+    assert r.status_code == 200, r.text
