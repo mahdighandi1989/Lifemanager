@@ -150,6 +150,109 @@ async def test_overview_persists_pending_rows_idempotently(si_client):
 
 
 @pytest.mark.asyncio
+async def test_realign_runs_even_when_list_already_full(si_client):
+    """Reproduces the *exact* production state after the previous
+    deploy: divine_man has all 41 rows (35 traits + note + header +
+    4 reflections) BUT the note and header sit at the end (positions
+    39 + 40) instead of between items 35 and 36. The catch-up
+    branch can't fire (n_items == len(items)) so the realign must
+    run from the n_items-already-full branch too — otherwise the
+    bad order stays forever.
+    """
+    from sqlalchemy import insert, select, delete as _del
+    from app.services._self_improvement_seed_data import (
+        SELF_IMPROVEMENT_LISTS,
+    )
+    from app.services.self_improvement_service import (
+        _parse_seed_item,
+        SI_DESCRIPTION_NOTE,
+        SI_DESCRIPTION_HEADER,
+        ensure_lists_seeded,
+    )
+
+    client, factory = si_client
+    divine_name = "شخصیت یک مرد الهی – مردِ خدا ..."
+    seed_items = SELF_IMPROVEMENT_LISTS[divine_name]
+
+    # Wipe the fixture-seeded rows and re-insert in WRONG order:
+    # the 39 checklist rows first, then the note + header tacked
+    # on at the end — mirroring what an old catch-up append would
+    # have produced on production.
+    async with factory() as db:
+        lst = (await db.execute(
+            select(TodoList).where(TodoList.name == divine_name)
+        )).scalar_one()
+        await db.execute(todo_list_items.delete().where(
+            todo_list_items.c.todo_list_id == lst.id
+        ))
+        # Also clear orphaned TodoItems from this list.
+        orphan_ids = (await db.execute(
+            select(TodoItem.id)
+            .join(todo_list_items,
+                  todo_list_items.c.todo_item_id == TodoItem.id,
+                  isouter=True)
+            .where(todo_list_items.c.todo_item_id.is_(None))
+        )).all()
+        if orphan_ids:
+            await db.execute(_del(TodoItem).where(
+                TodoItem.id.in_([r[0] for r in orphan_ids])
+            ))
+        await db.commit()
+
+        pos = 0
+        # All checklist rows first (in their original seed order
+        # but with note/header skipped).
+        for raw in seed_items:
+            content, kind = _parse_seed_item(raw)
+            if kind is not None:
+                continue
+            it = TodoItem(content=content)
+            db.add(it)
+            await db.commit()
+            await db.refresh(it)
+            await db.execute(insert(todo_list_items).values(
+                todo_list_id=lst.id, todo_item_id=it.id, position=pos,
+            ))
+            pos += 1
+        # Then note + header tacked on at the end.
+        for raw in seed_items:
+            content, kind = _parse_seed_item(raw)
+            if kind is None:
+                continue
+            it = TodoItem(content=content, description=kind)
+            db.add(it)
+            await db.commit()
+            await db.refresh(it)
+            await db.execute(insert(todo_list_items).values(
+                todo_list_id=lst.id, todo_item_id=it.id, position=pos,
+            ))
+            pos += 1
+        await db.commit()
+
+    # Sanity: list is "full" (41/41) so the catch-up branch will
+    # NOT enter. Realign must fire from the already-full branch.
+    async with factory() as db:
+        await ensure_lists_seeded(db)
+
+    async with factory() as db:
+        lst = (await db.execute(
+            select(TodoList).where(TodoList.name == divine_name)
+        )).scalar_one()
+        rows = (await db.execute(
+            select(TodoItem.content, TodoItem.description, todo_list_items.c.position)
+            .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
+            .where(todo_list_items.c.todo_list_id == lst.id)
+            .order_by(todo_list_items.c.position)
+        )).all()
+    assert len(rows) == 41
+    assert rows[34][0].startswith("خارج از چشم بقیه")  # item 35
+    assert rows[35][1] == SI_DESCRIPTION_NOTE  # note
+    assert rows[36][1] == SI_DESCRIPTION_HEADER  # header
+    assert rows[37][0].startswith("وارد جزئیات بیخود")  # item 36
+    assert rows[40][0].startswith("شب ها در دل شب")  # item 39
+
+
+@pytest.mark.asyncio
 async def test_catch_up_realigns_note_header_to_canonical_position(si_client):
     """Reproduces the production state the user flagged: divine_man had
     all 39 checklist rows already (from the previous cut), but the

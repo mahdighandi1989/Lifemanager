@@ -87,6 +87,20 @@ async def list_lists(
 )
 @handle_errors
 async def get_list(list_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+    # Trigger the self-improvement seeder on every list read so the
+    # خودسازی lists get their canonical ordering + new descriptions
+    # without needing the (now-removed) /self-improvement page or a
+    # successful startup hook. Idempotent for non-SI lists and for
+    # already-aligned SI lists, so the cost is dominated by a few
+    # short SELECTs in the steady state.
+    try:
+        from app.services.self_improvement_service import ensure_lists_seeded
+        await ensure_lists_seeded(db)
+    except Exception:
+        # Don't let a seeder hiccup turn the user's list view into a
+        # 500. The next request will retry.
+        pass
+
     lst = await list_service.get_list(db, list_id)
     items = await todo_item_service.list_items(db, list_id=list_id)
     payload = _serialize_list(lst, item_count=len(items))
