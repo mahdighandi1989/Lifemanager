@@ -128,12 +128,27 @@ function ListHeader({ list, onUpdated }) {
             </button>
           </div>
           {desc && (
-            <div className="mt-3 text-sm text-gray-700 leading-7 whitespace-pre-wrap border-r-4 border-indigo-200 pr-4">
-              {preview}
+            <div className="mt-4 space-y-3">
+              {/* Split the description on blank lines so each
+                  paragraph renders as its own panel — gives the
+                  reader an unambiguous "this is a NEW thought,
+                  not a continuation of the previous one" cue,
+                  which is the user's explicit ask for the
+                  multi-paragraph form intros. */}
+              {(showFull ? desc : preview)
+                .split(/\n{2,}/)
+                .map((para, i, arr) => (
+                  <div
+                    key={i}
+                    className="text-sm text-gray-700 leading-8 whitespace-pre-wrap bg-indigo-50/40 border-r-4 border-indigo-300 rounded-md py-3 pr-4 pl-3"
+                  >
+                    {para}
+                  </div>
+                ))}
               {isLong && (
                 <button
                   onClick={() => setShowFull((v) => !v)}
-                  className="block mt-2 text-xs text-indigo-600 hover:underline"
+                  className="text-xs text-indigo-600 hover:underline"
                 >
                   {showFull ? 'جمع کن' : 'متن کامل'}
                 </button>

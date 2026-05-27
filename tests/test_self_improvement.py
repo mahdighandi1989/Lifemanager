@@ -238,9 +238,9 @@ async def test_lists_have_long_form_descriptions(si_client):
     # muhasebe + willpower + fears + divine_man have multi-hundred-char
     # framings; love_god is intentionally short (no form-level desc).
     assert len(desc_by_name["خودسازی - محاسبه میان و پایان هفته"] or "") > 500
-    assert len(desc_by_name["خودسازی - کارهایی که اراده من رو تقویت یا ضعیف میکنه"] or "") > 500
-    assert len(desc_by_name["خودسازی - لیست ترس هایی که دارم و یا کارهایی که منو شجاع میکنه"] or "") > 1500
-    assert len(desc_by_name["خودسازی - شخصیت یک مرد الهی – مردِ خدا ..."] or "") > 500
+    assert len(desc_by_name["کارهایی که اراده من رو تقویت یا ضعیف میکنه"] or "") > 500
+    assert len(desc_by_name["لیست ترس هایی که دارم و یا کارهایی که منو شجاع میکنه"] or "") > 1500
+    assert len(desc_by_name["شخصیت یک مرد الهی – مردِ خدا ..."] or "") > 500
 
 
 @pytest.mark.asyncio
@@ -363,7 +363,7 @@ async def test_partially_seeded_list_is_topped_up(si_client):
     from app.services.self_improvement_service import ensure_lists_seeded
 
     client, factory = si_client
-    love_god_name = "خودسازی - کارهایی که منو عاشق خدا میکنه"
+    love_god_name = "کارهایی که منو عاشق خدا میکنه"
     expected_items = SELF_IMPROVEMENT_LISTS[love_god_name]
     assert len(expected_items) == 12
 
