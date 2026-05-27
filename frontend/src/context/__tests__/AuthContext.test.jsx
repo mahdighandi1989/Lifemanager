@@ -97,4 +97,54 @@ describe('AuthContext', () => {
     }
     expect(() => render(<Bare />)).toThrow(/within AuthProvider/);
   });
+
+  test('login() targets a same-origin-relative URL — proves API_BASE="" is correct', async () => {
+    // Audit guard: the auto-tool flags `API_BASE = ''` in
+    // AuthContext.jsx as a "threshold-outcome mismatch". This test
+    // pins the deliberate behavior: every AuthContext fetch must
+    // start with "/", not with an absolute http(s):// URL. That's
+    // what makes the single-origin Render deployment work — the
+    // SPA bundle and the FastAPI backend share an origin, so a
+    // relative path resolves to the right host automatically.
+    const calls = [];
+    global.fetch = vi.fn().mockImplementation((url, opts) => {
+      calls.push({ url, opts });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ access_token: 'tok' }),
+      });
+    });
+    const get = renderWithProvider();
+    await act(async () => {
+      await get().login('a@b.com', 'longenough');
+    });
+    const loginCall = calls.find((c) => String(c.url).includes('/auth/login'));
+    expect(loginCall).toBeTruthy();
+    const u = String(loginCall.url);
+    expect(u.startsWith('/')).toBe(true);
+    expect(u).not.toMatch(/^https?:\/\//);
+    expect(u).toBe('/auth/login');
+    expect(loginCall.opts?.method).toBe('POST');
+  });
+
+  test('register() also uses same-origin-relative URL', async () => {
+    const calls = [];
+    global.fetch = vi.fn().mockImplementation((url, opts) => {
+      calls.push({ url, opts });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ access_token: 'tok' }),
+      });
+    });
+    const get = renderWithProvider();
+    await act(async () => {
+      await get().register('a@b.com', 'longenough');
+    });
+    const registerCall = calls.find((c) =>
+      String(c.url).includes('/auth/register'),
+    );
+    expect(registerCall).toBeTruthy();
+    expect(String(registerCall.url)).toBe('/auth/register');
+    expect(String(registerCall.url)).not.toMatch(/^https?:\/\//);
+  });
 });
