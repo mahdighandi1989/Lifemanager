@@ -104,7 +104,7 @@ async def mark_as_read(
     """Mark a notification as read.
 
     Consumer: frontend/src/pages/Notifications.jsx line 77 —
-    `fetch(\`/notifications/${id}/read\`, { method: 'PATCH' })`.
+    fetch(`/notifications/${id}/read`, { method: 'PATCH' }).
     The audit's grep missed it because the URL is built from a
     template literal instead of a static string. Keep.
     """
