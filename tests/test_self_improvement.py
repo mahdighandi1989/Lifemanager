@@ -84,66 +84,40 @@ async def si_client():
 
 
 async def _seed_self_improvement_lists(session):
-    """Mirror migration 0008's seed pattern in the in-memory DB."""
-    from app.services._self_improvement_seed_data import MUHASEBE_ITEMS
-    from sqlalchemy import insert
+    """Seed the five خودسازی lists into the in-memory DB.
 
-    # Master list.
-    muhasebe = TodoList(name=MUHASEBE_LIST_NAME)
-    session.add(muhasebe)
-    await session.commit()
-    await session.refresh(muhasebe)
-    for pos, content in enumerate(MUHASEBE_ITEMS):
-        item = TodoItem(content=content)
-        session.add(item)
-        await session.commit()
-        await session.refresh(item)
-        await session.execute(
-            insert(todo_list_items).values(
-                todo_list_id=muhasebe.id, todo_item_id=item.id, position=pos
-            )
-        )
-    await session.commit()
-
-    # Three sub-lists.
-    for list_name, items in SELF_IMPROVEMENT_LISTS.items():
-        lst = TodoList(name=list_name)
-        session.add(lst)
-        await session.commit()
-        await session.refresh(lst)
-        for pos, content in enumerate(items):
-            item = TodoItem(content=content)
-            session.add(item)
-            await session.commit()
-            await session.refresh(item)
-            await session.execute(
-                insert(todo_list_items).values(
-                    todo_list_id=lst.id, todo_item_id=item.id, position=pos
-                )
-            )
-        await session.commit()
+    Delegates to the runtime seeder so the tests exercise the same
+    code path the production startup hook uses (no duplication of
+    insert logic). The runtime helper also handles descriptions and
+    the new divine-man list — features migration 0008 alone doesn't
+    cover.
+    """
+    from app.services.self_improvement_service import ensure_lists_seeded
+    await ensure_lists_seeded(session)
 
 
 # --- Overview endpoint -----------------------------------------------------
 
 
 @pytest.mark.asyncio
-async def test_overview_returns_four_sections_with_expected_counts(si_client):
+async def test_overview_returns_five_sections_with_expected_counts(si_client):
     client, _factory = si_client
     r = client.get("/api/self-improvement/overview")
     assert r.status_code == 200, r.text
     body = r.json()
-    # Four sections in priority order: muhasebe first, then the three habit cats.
+    # Five sections in priority order: muhasebe first, then the four habit cats.
     cats = [s["category"] for s in body["sections"]]
     assert cats[0] == "muhasebe"
-    assert set(cats[1:]) == {"willpower", "love_god", "fears"}
+    assert set(cats[1:]) == {"willpower", "love_god", "fears", "divine_man"}
 
     counts_by_cat = {s["category"]: s["total"] for s in body["sections"]}
     assert counts_by_cat["willpower"] == 28
     assert counts_by_cat["love_god"] == 12
     assert counts_by_cat["fears"] == 40
-    # Aggregate total: 28+12+40 + len(muhasebe items)=10 = 90.
-    assert body["items_total"] == 90
+    assert counts_by_cat["divine_man"] == 39
+    assert counts_by_cat["muhasebe"] == 21
+    # Aggregate total: 21 + 28 + 12 + 40 + 39 = 140.
+    assert body["items_total"] == 140
     # Nothing ticked yet.
     assert body["completed_today_total"] == 0
     for s in body["sections"]:
@@ -159,13 +133,72 @@ async def test_overview_persists_pending_rows_idempotently(si_client):
     async with factory() as db:
         from sqlalchemy import func, select
         n1 = (await db.execute(select(func.count()).select_from(SelfImprovementCheckIn))).scalar_one()
-    assert n1 == 90  # one per item
+    assert n1 == 140  # one per item across all five lists
     # Second call must NOT duplicate.
     client.get("/api/self-improvement/overview")
     async with factory() as db:
         from sqlalchemy import func, select
         n2 = (await db.execute(select(func.count()).select_from(SelfImprovementCheckIn))).scalar_one()
-    assert n2 == 90
+    assert n2 == 140
+
+
+@pytest.mark.asyncio
+async def test_lists_have_long_form_descriptions(si_client):
+    """Three habit lists + muhasebe master carry the user's framing text.
+
+    Description backfill is part of the seeding contract — the user
+    explicitly asked for the per-list philosophy text to come along
+    for the ride so the /lists view surfaces it.
+    """
+    client, factory = si_client
+    client.get("/api/self-improvement/overview")
+    from sqlalchemy import select
+    async with factory() as db:
+        rows = (await db.execute(select(TodoList.name, TodoList.description))).all()
+    desc_by_name = {n: d for n, d in rows}
+    # muhasebe + willpower + fears + divine_man have multi-hundred-char
+    # framings; love_god is intentionally short (no form-level desc).
+    assert len(desc_by_name["خودسازی - محاسبه میان و پایان هفته"] or "") > 500
+    assert len(desc_by_name["خودسازی - تقویت اراده"] or "") > 500
+    assert len(desc_by_name["خودسازی - ترس‌ها و شجاعت"] or "") > 1500
+    assert len(desc_by_name["خودسازی - شخصیت مرد الهی"] or "") > 500
+
+
+@pytest.mark.asyncio
+async def test_placeholder_muhasebe_items_are_replaced(si_client):
+    """If an older deploy seeded the muhasebe list with the auto-generated
+    placeholders, a subsequent overview read replaces them with the
+    real PDF content. Idempotent — second read is a no-op."""
+    from sqlalchemy import insert, select
+    from app.services._self_improvement_seed_data import MUHASEBE_LIST_NAME
+    from app.services.self_improvement_service import ensure_lists_seeded
+
+    client, factory = si_client
+    # Wipe the seeded muhasebe items and insert the OLD placeholder
+    # set, mimicking a production DB that landed before the OCR fix.
+    async with factory() as db:
+        ml = (await db.execute(select(TodoList).where(TodoList.name == MUHASEBE_LIST_NAME))).scalar_one()
+        await db.execute(todo_list_items.delete().where(todo_list_items.c.todo_list_id == ml.id))
+        await db.commit()
+        old_items = [
+            "این هفته چند مورد از لیست تقویت اراده را رعایت کردم؟",
+            "stale placeholder #2",
+        ]
+        for pos, content in enumerate(old_items):
+            it = TodoItem(content=content)
+            db.add(it)
+            await db.commit()
+            await db.refresh(it)
+            await db.execute(insert(todo_list_items).values(
+                todo_list_id=ml.id, todo_item_id=it.id, position=pos))
+        await db.commit()
+
+    # Now hit the overview endpoint — replacement happens inside.
+    r = client.get("/api/self-improvement/overview")
+    body = r.json()
+    muhasebe = [s for s in body["sections"] if s["category"] == "muhasebe"][0]
+    assert muhasebe["total"] == 21
+    assert muhasebe["items"][0]["content"].startswith("مشارطه")
 
 
 # --- Daily-update endpoint -------------------------------------------------
@@ -354,7 +387,7 @@ async def test_refresh_daily_pending_rows_is_idempotent(db_session):
     n1 = await self_improvement_service.refresh_daily_pending_rows(
         db_session, user_id=99,
     )
-    assert n1 == 90  # 10 + 28 + 12 + 40
+    assert n1 == 140  # 21 + 28 + 12 + 40 + 39 across the five lists
     n2 = await self_improvement_service.refresh_daily_pending_rows(
         db_session, user_id=99,
     )
@@ -376,9 +409,9 @@ def test_overview_works_anonymously_during_login_bypass(api_client):
     r = api_client.get("/api/self-improvement/overview")
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["items_total"] == 90
+    assert body["items_total"] == 140
     cats = {s["category"] for s in body["sections"]}
-    assert {"muhasebe", "willpower", "love_god", "fears"} <= cats
+    assert {"muhasebe", "willpower", "love_god", "fears", "divine_man"} <= cats
 
 
 def test_overview_with_garbage_token_falls_back_to_anon(api_client):

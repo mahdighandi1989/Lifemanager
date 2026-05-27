@@ -36,6 +36,8 @@ from app.models.todo_list import TodoList, todo_list_items
 from app.services._self_improvement_seed_data import (
     CATEGORY_BY_LIST_NAME,
     CATEGORY_LABELS_FA,
+    LIST_DESCRIPTIONS,
+    MUHASEBE_DESCRIPTION,
     MUHASEBE_ITEMS,
     MUHASEBE_LIST_NAME,
     SELF_IMPROVEMENT_LISTS,
@@ -49,6 +51,15 @@ logger = logging.getLogger(__name__)
 # a daily habit tracker.
 MUHASEBE_CATEGORY = "muhasebe"
 MUHASEBE_LABEL_FA = "محاسبه میان و پایان هفته"
+
+
+# First item of the placeholder set we seeded in commit 70f7e78 before
+# the PDF OCR succeeded. Used as a sentinel by ensure_lists_seeded to
+# detect "the user hasn't touched the auto-generated placeholders, it's
+# safe to replace them with the real PDF content".
+_PLACEHOLDER_MUHASEBE_FIRST_ITEM = (
+    "این هفته چند مورد از لیست تقویت اراده را رعایت کردم؟"
+)
 
 
 # --- Helpers ---------------------------------------------------------------
@@ -97,43 +108,97 @@ async def _self_improvement_lists(db: AsyncSession) -> Sequence[TodoList]:
 
 
 async def ensure_lists_seeded(db: AsyncSession) -> int:
-    """Lazily seed the four خودسازی sub-lists + their items.
+    """Lazily seed the five خودسازی sub-lists + their items.
 
     Called on the first read of each route so environments that
     skip alembic (Render's free tier just runs Base.metadata.create_all
-    on startup) still end up with the canonical content. Idempotent:
+    on startup) still end up with the canonical content. Idempotent
+    on three axes so it's safe to call on every request:
 
       * a list whose name already exists is reused, not duplicated.
-      * a list that already has any items is left untouched (we don't
-        want to overwrite user edits made through the regular
-        TodoItem UI).
+      * a list that already has any items keeps them — we don't
+        overwrite user edits made through the regular TodoItem UI.
+      * descriptions are backfilled only when missing/empty. The
+        user can replace a description in-app at any time and the
+        next seeder run won't clobber their text.
 
     Returns the count of newly inserted items so callers can log
     "seeded N items" the first time it runs.
     """
-    wanted = [
-        (MUHASEBE_LIST_NAME, MUHASEBE_ITEMS),
-        *SELF_IMPROVEMENT_LISTS.items(),
+    # (list_name, description, items)
+    wanted: list[tuple[str, str, list[str]]] = [
+        (MUHASEBE_LIST_NAME, MUHASEBE_DESCRIPTION, MUHASEBE_ITEMS),
     ]
+    for list_name, items in SELF_IMPROVEMENT_LISTS.items():
+        wanted.append((
+            list_name,
+            LIST_DESCRIPTIONS.get(list_name, ""),
+            items,
+        ))
+
     total_new_items = 0
-    for list_name, items in wanted:
+    for list_name, description, items in wanted:
         existing = (
             await db.execute(select(TodoList).where(TodoList.name == list_name))
         ).scalar_one_or_none()
         if existing is None:
-            lst = TodoList(name=list_name)
+            lst = TodoList(
+                name=list_name,
+                description=description or None,
+            )
             db.add(lst)
             await db.commit()
             await db.refresh(lst)
             existing = lst
-        # If the list already has any items, leave it alone.
-        n_items = (
+        else:
+            # Backfill the description only when the list has no
+            # description yet — never overwrite user edits.
+            if description and not (existing.description or "").strip():
+                existing.description = description
+                await db.commit()
+                await db.refresh(existing)
+
+        # If the list already has items, leave them alone UNLESS this
+        # is the muhasebe list still holding the auto-generated
+        # placeholder set — those landed before the PDF OCR succeeded,
+        # so a fresh deploy with the real PDF content needs to replace
+        # them once. Detection is exact-match on the first item so the
+        # moment the user edits anything in-app, this branch becomes a
+        # no-op forever.
+        existing_items = (
             await db.execute(
-                select(func.count())
-                .select_from(todo_list_items)
+                select(TodoItem.id, TodoItem.content, todo_list_items.c.position)
+                .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
                 .where(todo_list_items.c.todo_list_id == existing.id)
+                .order_by(todo_list_items.c.position)
             )
-        ).scalar_one()
+        ).all()
+        n_items = len(existing_items)
+
+        is_placeholder_muhasebe = (
+            list_name == MUHASEBE_LIST_NAME
+            and n_items > 0
+            and existing_items[0][1] == _PLACEHOLDER_MUHASEBE_FIRST_ITEM
+        )
+        if is_placeholder_muhasebe:
+            # Hard-replace: delete association rows, then orphaned
+            # items. We deliberately don't touch any SelfImprovementCheckIn
+            # rows that reference the placeholder items — those just
+            # become history pointing at deleted item ids, which the
+            # overview tolerates.
+            placeholder_item_ids = [iid for (iid, _c, _p) in existing_items]
+            await db.execute(
+                todo_list_items.delete().where(
+                    todo_list_items.c.todo_list_id == existing.id
+                )
+            )
+            from sqlalchemy import delete as _delete
+            await db.execute(
+                _delete(TodoItem).where(TodoItem.id.in_(placeholder_item_ids))
+            )
+            await db.commit()
+            n_items = 0
+
         if n_items:
             continue
         for position, content in enumerate(items):
@@ -317,6 +382,10 @@ async def build_overview(
             "label_fa": _category_label_fa(cat),
             "list_id": lst.id,
             "list_name": lst.name,
+            # Surface the user's long-form framing so the dashboard
+            # can render the original philosophical context as a
+            # collapsible note above the items.
+            "list_description": lst.description or None,
             "items": items_payload,
             "completed_today": done_in_section,
             "total": len(items_payload),

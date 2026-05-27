@@ -119,6 +119,32 @@ function ItemRow({ item, selected, onToggleSelect, onToggleStatus }) {
   );
 }
 
+function ListDescription({ text, category }) {
+  // Collapsed by default — the longest description is 2200+ chars and
+  // we don't want it pushing the actionable items below the fold.
+  const [open, setOpen] = React.useState(false);
+  if (!text) return null;
+  const preview = text.length > 160 ? `${text.slice(0, 160)}…` : text;
+  return (
+    <div
+      className="mb-3 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg p-3"
+      data-testid={`si-desc-${category}`}
+    >
+      <div className="whitespace-pre-wrap">{open ? text : preview}</div>
+      {text.length > 160 && (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="mt-2 text-blue-600 hover:underline text-[11px]"
+          data-testid={`si-desc-toggle-${category}`}
+        >
+          {open ? 'جمع کن' : 'متن کامل'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function CategorySection({ section, selectedIds, onToggleSelect, onToggleStatus }) {
   return (
     <section
@@ -126,6 +152,7 @@ function CategorySection({ section, selectedIds, onToggleSelect, onToggleStatus 
       data-testid={`si-section-${section.category}`}
     >
       <SectionHeader section={section} />
+      <ListDescription text={section.list_description} category={section.category} />
       <ul className="space-y-1.5">
         {section.items.map((item) => (
           <ItemRow
