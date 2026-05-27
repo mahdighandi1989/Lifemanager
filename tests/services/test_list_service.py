@@ -42,8 +42,16 @@ async def db_session():
 
 
 @pytest.mark.asyncio
-async def test_shared_item_reattach_logs_debug_and_continues(db_session, caplog, monkeypatch):
-    """The IntegrityError branch must log debug and keep seeding."""
+async def test_edge_case_failure_handled(db_session, caplog, monkeypatch):
+    """The IntegrityError branch must log debug and keep seeding.
+
+    Path matches the audit's verify_plan
+    (tests/services/test_list_service.py::test_edge_case_failure_handled).
+    Validates the previously-bare-except path: a duplicate
+    (todo_list_id, todo_item_id) attach raises IntegrityError,
+    which the patched handler routes to logger.debug so the
+    seed completes without surfacing a warning/error.
+    """
     # Build two empty lists.
     list_a = TodoList(name="A")
     list_b = TodoList(name="B")
