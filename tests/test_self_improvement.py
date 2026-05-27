@@ -150,6 +150,78 @@ async def test_overview_persists_pending_rows_idempotently(si_client):
 
 
 @pytest.mark.asyncio
+async def test_divine_man_carries_note_and_header_between_items_35_and_36(si_client):
+    """User's restructure: between items 35 and 36 of the شخصیت یک مرد
+    الهی list, a paragraph (kind=note) and a section header
+    (kind=header) sit between the original 35 character traits and
+    the final 4 reflections. The frontend renders these specially
+    (no checkbox), and they don't count toward the list's tickable
+    `total`. They DO ride in the items payload so the prose lives
+    inline with the surrounding checklist."""
+    client, _factory = si_client
+    body = client.get("/api/self-improvement/overview").json()
+    divine = [s for s in body["sections"] if s["category"] == "divine_man"][0]
+    kinds = [it["kind"] for it in divine["items"]]
+    assert kinds.count("note") == 1
+    assert kinds.count("header") == 1
+    # Note + header sit AFTER 35 checklist rows and BEFORE the last 4.
+    checklist_before = sum(
+        1 for k in kinds[:kinds.index("note")] if k == "checklist"
+    )
+    assert checklist_before == 35
+    # Tickable total excludes the two prose rows.
+    assert divine["total"] == 39
+    # But the items payload includes them (35 + 2 + 4 = 41).
+    assert len(divine["items"]) == 41
+    # Verify the actual content sentinel-free.
+    note = next(it for it in divine["items"] if it["kind"] == "note")
+    assert note["content"].startswith("همه این موارد")
+    assert "__SI_" not in note["content"]
+    header = next(it for it in divine["items"] if it["kind"] == "header")
+    assert header["content"] == "مرد خدا اینجوریه که:"
+
+
+@pytest.mark.asyncio
+async def test_old_list_names_are_renamed_to_form_titles(si_client):
+    """The user asked for list names to match the form titles exactly
+    (e.g. "خودسازی - عشق به خدا" → "خودسازی - کارهایی که منو عاشق خدا
+    میکنه"). The seeder's rename step must promote any old-name list
+    to the new name while preserving its items."""
+    from sqlalchemy import insert, select
+    from app.services.self_improvement_service import (
+        LIST_NAME_RENAMES,
+        ensure_lists_seeded,
+    )
+
+    client, factory = si_client
+    # Seed already ran in the fixture. Recreate the OLD-named list
+    # (the form the user landed on after the previous deploy) so we
+    # can prove the rename step finds and renames it.
+    async with factory() as db:
+        # Pick one rename: love_god list.
+        old_name = "خودسازی - عشق به خدا"
+        new_name = LIST_NAME_RENAMES[old_name]
+        # The seeder already created the NEW name. Drop the NEW list
+        # association rows so we can simulate "only old-name list
+        # exists in production".
+        new = (await db.execute(
+            select(TodoList).where(TodoList.name == new_name)
+        )).scalar_one()
+        # Rename it backward to simulate the legacy state.
+        new.name = old_name
+        await db.commit()
+
+    # Run the seeder — rename step must restore the new name.
+    async with factory() as db:
+        await ensure_lists_seeded(db)
+
+    async with factory() as db:
+        all_names = {r[0] for r in (await db.execute(select(TodoList.name))).all()}
+    assert new_name in all_names
+    assert old_name not in all_names
+
+
+@pytest.mark.asyncio
 async def test_lists_have_long_form_descriptions(si_client):
     """Three habit lists + muhasebe master carry the user's framing text.
 
@@ -166,9 +238,9 @@ async def test_lists_have_long_form_descriptions(si_client):
     # muhasebe + willpower + fears + divine_man have multi-hundred-char
     # framings; love_god is intentionally short (no form-level desc).
     assert len(desc_by_name["خودسازی - محاسبه میان و پایان هفته"] or "") > 500
-    assert len(desc_by_name["خودسازی - تقویت اراده"] or "") > 500
-    assert len(desc_by_name["خودسازی - ترس‌ها و شجاعت"] or "") > 1500
-    assert len(desc_by_name["خودسازی - شخصیت مرد الهی"] or "") > 500
+    assert len(desc_by_name["خودسازی - کارهایی که اراده من رو تقویت یا ضعیف میکنه"] or "") > 500
+    assert len(desc_by_name["خودسازی - لیست ترس هایی که دارم و یا کارهایی که منو شجاع میکنه"] or "") > 1500
+    assert len(desc_by_name["خودسازی - شخصیت یک مرد الهی – مردِ خدا ..."] or "") > 500
 
 
 @pytest.mark.asyncio
@@ -291,7 +363,7 @@ async def test_partially_seeded_list_is_topped_up(si_client):
     from app.services.self_improvement_service import ensure_lists_seeded
 
     client, factory = si_client
-    love_god_name = "خودسازی - عشق به خدا"
+    love_god_name = "خودسازی - کارهایی که منو عاشق خدا میکنه"
     expected_items = SELF_IMPROVEMENT_LISTS[love_god_name]
     assert len(expected_items) == 12
 

@@ -82,6 +82,11 @@ class SelfImprovementItemStatus(BaseModel):
     ai_reason: Optional[str] = None
     note: Optional[str] = None
     position: int = 0
+    # Render kind: "checklist" (default — tickable row), "note"
+    # (paragraph in a soft panel, no checkbox), or "header" (section
+    # divider, no checkbox). Server-derived from TodoItem.description
+    # sentinels so the client never has to parse the convention.
+    kind: str = "checklist"
 
 
 class SelfImprovementCategorySection(BaseModel):

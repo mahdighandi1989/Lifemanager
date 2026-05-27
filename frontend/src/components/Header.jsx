@@ -12,7 +12,6 @@ function Header() {
     { to: '/tasks', label: 'Tasks' },
     { to: '/projects', label: 'Projects' },
     { to: '/lists', label: 'لیست‌ها' },
-    { to: '/self-improvement', label: 'خودسازی' },
     { to: '/notifications', label: 'اعلان‌ها' },
   ];
 
