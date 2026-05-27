@@ -26,7 +26,17 @@ class TaskCreate(BaseModel):
     priority: int = Field(default=0, ge=0, le=5)
     # due_date as a date (AC grep accepts `due_date: date` or `due_date: datetime`)
     due_date: Optional[date] = None
-    status: str = Field(default="todo", pattern="^(todo|in_progress|done|cancelled)$")
+    # `status` accepts BOTH the canonical TaskStatus enum values
+    # (todo / in_progress / done / cancelled) AND the older
+    # "pending"/"completed" pair the original frontend + docs used
+    # before the enum landed. The route layer normalises the legacy
+    # spellings back to the enum before persisting — see
+    # _normalise_status_input in app/routes/tasks.py. Without the
+    # broader pattern the API would reject every legacy client.
+    status: str = Field(
+        default="todo",
+        pattern="^(todo|pending|in_progress|done|completed|cancelled)$",
+    )
     project_id: Optional[int] = None
     user_id: Optional[int] = None  # populated from auth when available
 
@@ -41,7 +51,11 @@ class TaskUpdate(BaseModel):
     description: Optional[str] = Field(default=None, max_length=1000)
     priority: Optional[int] = Field(default=None, ge=0, le=5)
     due_date: Optional[date] = None
-    status: Optional[str] = Field(default=None, pattern="^(todo|in_progress|done|cancelled)$")
+    # Mirrors TaskCreate.status — accepts both vocabularies.
+    status: Optional[str] = Field(
+        default=None,
+        pattern="^(todo|pending|in_progress|done|completed|cancelled)$",
+    )
     project_id: Optional[int] = None
     estimated_duration: Optional[int] = Field(default=None, ge=0)
     deadline: Optional[datetime] = None
