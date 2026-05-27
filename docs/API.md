@@ -25,7 +25,6 @@ Conventions used across every endpoint:
 | PUT | `/api/tasks/{task_id}` | Update a task |
 | DELETE | `/api/tasks/{task_id}` | Delete a task |
 | GET | `/api/tasks/search?q=` | Parameterised search |
-| GET | `/api/search?q=` | Alias of the above |
 
 ### Projects (`/projects`)
 

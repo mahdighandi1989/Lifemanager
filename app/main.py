@@ -520,7 +520,14 @@ async def startup_event():
 
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
-# `/api/health` matches the path configured in render.yaml's healthCheckPath.
+#
+# Consumer: Render's deploy probe. `/api/health` is wired in render.yaml's
+# `healthCheckPath`, so removing it would brick every future deploy
+# (Render marks the service unhealthy and reverts). The `/health` twin
+# stays for legacy probes and is exercised by tests/test_cors.py.
+#
+# Not an orphan — keep. Internal-only by audience (no frontend caller is
+# expected); the "health" OpenAPI tag groups both in Swagger.
 @app.get("/api/health", tags=["health"])
 @app.get("/health", tags=["health"])
 async def health():

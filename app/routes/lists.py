@@ -87,6 +87,15 @@ async def list_lists(
 )
 @handle_errors
 async def get_list(list_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+    """Return one list + its items.
+
+    Consumer: frontend/src/pages/ListDetail.jsx (the /lists/{id} page)
+    via `fetch(\`${API_BASE}/lists/${id}\`)`. The auto-audit's grep
+    misses this because the URL is built from a template literal
+    (`/api/lists/${id}`) rather than a literal `/api/lists/{list_id}`
+    string. Heavily exercised — every navigation to a list page hits
+    this route.
+    """
     # Trigger the self-improvement seeder on every list read so the
     # خودسازی lists get their canonical ordering + new descriptions
     # without needing the (now-removed) /self-improvement page or a

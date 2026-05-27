@@ -38,6 +38,14 @@ async def update_integration(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Partial-update an integration row.
+
+    Audit-clarification: no frontend consumer today — the integrations
+    settings UI is on the roadmap but not built. The endpoint is part
+    of the integrations CRUD set (list / create / patch / delete) and
+    is exercised by tests/test_integrations.py::test_update_integration*.
+    Kept to keep CRUD complete for when the UI lands.
+    """
     integration_service = IntegrationService(db)
     integration = await integration_service.update_integration(
         integration_id, integration_data, current_user.id

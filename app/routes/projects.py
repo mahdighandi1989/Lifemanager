@@ -61,6 +61,15 @@ async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
 @router.get("/api/projects/{project_id}", tags=["projects"])
 @handle_errors
 async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+    """Return one project by id.
+
+    Audit-clarification: no frontend caller today (the React
+    ProjectContext only fetches the list + handles create / update /
+    delete), but the endpoint is covered by
+    tests/test_projects.py::test_get_project_by_id and rounds out the
+    project CRUD set. Kept so the API stays symmetric — a project
+    detail page is a likely near-term addition.
+    """
     project = await db.get(Project, project_id)
     if project is None:
         raise HTTPException(status_code=404, detail="Project not found")
