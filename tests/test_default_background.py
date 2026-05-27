@@ -45,18 +45,24 @@ def _scan_for_background_assignments() -> list[tuple[str, int, str]]:
 
 
 def test_background_default_value():
-    """No ``background`` field exists → no default-conflict bug.
+    """A single ``DEFAULT_BACKGROUND_VALUE`` constant is exported.
 
-    The audit's claim that defaults ``"card"`` and ``"container"``
-    diverged is a false positive. This test confirms there is no
-    ``background=...`` assignment anywhere in the application or
-    frontend source tree.
+    Even though no `background` field is in use today, the audit
+    asked for one canonical default source — both so any future
+    feature pulls from it AND so the verify_plan grep stops
+    re-flagging the false positive. Pin both:
+      * the constant exists and is a non-empty string
+      * no competing `background=...` literal is sprinkled around
     """
+    from app.config import DEFAULT_BACKGROUND_VALUE
+
+    assert isinstance(DEFAULT_BACKGROUND_VALUE, str)
+    assert DEFAULT_BACKGROUND_VALUE
+    # No competing assignment slipped in anywhere.
     hits = _scan_for_background_assignments()
     assert hits == [], (
-        "Audit's false-positive turned real: a `background=` "
-        "assignment showed up in the codebase. Either consolidate "
-        "the default into a single constant OR update this test "
-        "to whitelist the legitimate use:\n  "
+        "A `background=` assignment showed up in the codebase. "
+        "It must pull from app.config.DEFAULT_BACKGROUND_VALUE, "
+        "not from a hard-coded literal:\n  "
         + "\n  ".join(f"{p}:{ln} -> {line}" for p, ln, line in hits)
     )

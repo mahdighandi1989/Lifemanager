@@ -75,6 +75,24 @@ def _priority_to_int(prio: TaskPriority | None) -> int:
     }[prio]
 
 
+# Map the legacy "pending"/"completed" status names a client may
+# still send back to the canonical TaskStatus enum values. Anything
+# already in the enum-canonical form passes through unchanged. Used
+# by both the create and update routes so the contract stays
+# symmetric: the API accepts BOTH vocabularies on the way in, even
+# though the DB column only ever stores enum-canonical values.
+_STATUS_INPUT_ALIASES = {
+    "pending": "todo",
+    "completed": "done",
+}
+
+
+def _normalise_status_input(value: str | None) -> str | None:
+    if value is None:
+        return None
+    return _STATUS_INPUT_ALIASES.get(value, value)
+
+
 def _serialize(t: Task) -> dict:
     return {
         "id": t.id,
@@ -167,7 +185,7 @@ async def create_task(
     task = Task(
         title=_sanitize(payload.title),
         description=_sanitize(payload.description),
-        status=TaskStatus(payload.status),
+        status=TaskStatus(_normalise_status_input(payload.status) or "todo"),
         priority=_priority_from_int(payload.priority),
         user_id=payload.user_id,
         project_id=payload.project_id,
@@ -198,7 +216,9 @@ async def update_task(
     if "description" in data:
         task.description = _sanitize(data["description"])
     if "status" in data:
-        task.status = TaskStatus(data["status"])
+        task.status = TaskStatus(
+            _normalise_status_input(data["status"]) or "todo"
+        )
     if "priority" in data:
         task.priority = _priority_from_int(data["priority"])
     if "due_date" in data:

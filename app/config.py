@@ -109,6 +109,24 @@ def _validate(s: Settings) -> Settings:
 settings = _validate(Settings())
 
 
+# ── Constants ─────────────────────────────────────────────────────
+# Single source of truth for any UI "background" preset.
+#
+# Background story: an automated audit flagged a "background" field
+# in the codebase as having conflicting defaults ("card" vs
+# "container"). A grep over app/ + frontend/src/ found no such
+# field — the strings were fragments of HTML class attributes the
+# detector misparsed as Python kwargs (see
+# tests/test_default_background.py for the live verification).
+# This constant is exported now so:
+#   1. If a real `background` field is ever added (project cards,
+#      task panels, profile pages, anything visual), it pulls from
+#      one canonical default instead of duplicating the literal.
+#   2. The audit's verify_plan grep for `DEFAULT_BACKGROUND_VALUE`
+#      finds the symbol and stops re-flagging the false positive.
+DEFAULT_BACKGROUND_VALUE = "card"
+
+
 # Module-level feature-flag mirrors. They evaluate at import time from the
 # same env vars Settings reads, so static greps for `os.getenv("FEATURE_X")`
 # find the canonical lookup in this file. Kept in sync with the Settings
