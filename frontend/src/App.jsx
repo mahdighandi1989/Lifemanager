@@ -14,8 +14,6 @@ import Login from './pages/Login';
 import Notifications from './pages/Notifications';
 import Projects from './pages/Projects';
 import Register from './pages/Register';
-import SelfImprovement from './pages/SelfImprovement';
-import SelfImprovementProfile from './pages/SelfImprovementProfile';
 import Tasks from './pages/Tasks';
 
 /**
@@ -116,26 +114,9 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/self-improvement"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SelfImprovement />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/self-improvement/profile"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SelfImprovementProfile />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
+              {/* /self-improvement and /self-improvement/profile removed
+                  per user request — the eight خودسازی lists are now
+                  accessed from /lists like any other todo list. */}
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

@@ -302,6 +302,22 @@ async def startup_event():
     except Exception as exc:
         logger.debug("skip todo_items.content TEXT migration: %s", exc)
 
+    # todo_lists.name used to be VARCHAR(255); the renamed
+    # self-improvement lists (e.g. "خودسازی - لیست ترس هایی که دارم
+    # و یا کارهایی که منو شجاع میکنه") run to 90+ chars but Postgres
+    # accepts them within the legacy limit — still, widening to TEXT
+    # future-proofs longer titles and matches the model (no explicit
+    # length cap on TodoList.name now that the form-title rename
+    # landed). Idempotent.
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("ALTER TABLE todo_lists ALTER COLUMN name TYPE TEXT")
+            )
+            logger.info("widened todo_lists.name to TEXT")
+    except Exception as exc:
+        logger.debug("skip todo_lists.name TEXT migration: %s", exc)
+
     # tasks.due_date used to be TIMESTAMP; the model now declares Date to
     # match the Pydantic schema. Convert the existing column on Postgres so
     # ORM reads/writes line up. USING due_date::date drops any time portion.

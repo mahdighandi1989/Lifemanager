@@ -15,11 +15,6 @@ const LINKS = [
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
   {
-    to: '/self-improvement',
-    label: 'خودسازی',
-    testid: 'sidebar-link-self-improvement',
-  },
-  {
     to: '/notifications',
     label: 'اعلان‌ها',
     testid: 'sidebar-link-notifications',

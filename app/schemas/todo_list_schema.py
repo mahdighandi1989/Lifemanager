@@ -13,15 +13,20 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class TodoListCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = Field(default=None, max_length=2000)
+    # Length caps widened: form-title list names run to ~90 chars
+    # ("خودسازی - لیست ترس هایی که دارم …") and description prose
+    # runs into the thousands for the four خودسازی forms. The
+    # underlying columns are both TEXT, so the only purpose of the
+    # cap is sanity-limiting accidental megablob uploads.
+    name: str = Field(..., min_length=1, max_length=500)
+    description: Optional[str] = Field(default=None, max_length=20000)
     sort_order: int = Field(default=0)
     is_archived: bool = Field(default=False)
 
 
 class TodoListUpdate(BaseModel):
-    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    description: Optional[str] = Field(default=None, max_length=2000)
+    name: Optional[str] = Field(default=None, min_length=1, max_length=500)
+    description: Optional[str] = Field(default=None, max_length=20000)
     sort_order: Optional[int] = None
     is_archived: Optional[bool] = None
 

@@ -20,7 +20,7 @@ import logging
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional, Sequence
 
-from sqlalchemy import and_, delete, func, insert, select, update
+from sqlalchemy import and_, delete, func, insert, or_, select, update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -92,6 +92,46 @@ _OLD_MUHASEBE_PREFIX_CLEANUP = (
 )
 
 
+# ── Special-item conventions ─────────────────────────────────────
+# Seed strings prefixed with one of these markers are inserted as
+# TodoItems with the corresponding TodoItem.description sentinel
+# (and the prefix stripped from .content). The frontend uses the
+# sentinel to render the row as a paragraph note or section header
+# instead of a tickable checkbox. Avoids a schema change while
+# letting us splice prose between checklist items in the same list.
+_KIND_PREFIX_NOTE = "__SI_NOTE__|"
+_KIND_PREFIX_HEADER = "__SI_HEADER__|"
+SI_DESCRIPTION_NOTE = "__SI_NOTE__"
+SI_DESCRIPTION_HEADER = "__SI_HEADER__"
+
+
+def _parse_seed_item(raw: str) -> tuple[str, Optional[str]]:
+    """Split a seed string into (content, description-sentinel).
+
+    Returns (raw, None) for normal items. For "__SI_NOTE__|<text>"
+    or "__SI_HEADER__|<text>" returns (<text>, sentinel) so the
+    caller can persist the kind in TodoItem.description while
+    keeping TodoItem.content user-readable.
+    """
+    if raw.startswith(_KIND_PREFIX_NOTE):
+        return raw[len(_KIND_PREFIX_NOTE):], SI_DESCRIPTION_NOTE
+    if raw.startswith(_KIND_PREFIX_HEADER):
+        return raw[len(_KIND_PREFIX_HEADER):], SI_DESCRIPTION_HEADER
+    return raw, None
+
+
+# Names the lists carried in earlier deploys. The startup rename
+# step (see app.main.startup_event) UPDATEs todo_lists.name from
+# the old form to the new form so the seeder lookup matches and the
+# user's existing items/check-ins stay attached.
+LIST_NAME_RENAMES: dict[str, str] = {
+    "خودسازی - عشق به خدا": "خودسازی - کارهایی که منو عاشق خدا میکنه",
+    "خودسازی - ترس‌ها و شجاعت": "خودسازی - لیست ترس هایی که دارم و یا کارهایی که منو شجاع میکنه",
+    "خودسازی - تقویت اراده": "خودسازی - کارهایی که اراده من رو تقویت یا ضعیف میکنه",
+    "خودسازی - شخصیت مرد الهی": "خودسازی - شخصیت یک مرد الهی – مردِ خدا ...",
+}
+
+
 # --- Helpers ---------------------------------------------------------------
 
 def _today_utc() -> date:
@@ -155,6 +195,42 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
     Returns the count of newly inserted items so callers can log
     "seeded N items" the first time it runs.
     """
+    # ── List rename step ───────────────────────────────────────────
+    # Earlier deploys carried shorter, paraphrased list names
+    # ("خودسازی - عشق به خدا" etc). The user asked for the names to
+    # match the form titles verbatim. Apply the rename here so the
+    # lookup below finds the existing list and reattaches the user's
+    # items / check-ins instead of creating a duplicate.
+    for old_name, new_name in LIST_NAME_RENAMES.items():
+        old = (await db.execute(
+            select(TodoList).where(TodoList.name == old_name)
+        )).scalar_one_or_none()
+        if old is None:
+            continue
+        new = (await db.execute(
+            select(TodoList).where(TodoList.name == new_name)
+        )).scalar_one_or_none()
+        if new is None:
+            # No conflict — just rename.
+            old.name = new_name
+            await db.commit()
+            logger.info("self-improvement: renamed list '%s' → '%s'", old_name, new_name)
+        else:
+            # Conflict (new name already exists, e.g. from a fresh
+            # deploy that ran the seeder before this rename block).
+            # Move items from old to new, then drop the empty old.
+            await db.execute(
+                update(todo_list_items)
+                .where(todo_list_items.c.todo_list_id == old.id)
+                .values(todo_list_id=new.id)
+            )
+            await db.execute(delete(TodoList).where(TodoList.id == old.id))
+            await db.commit()
+            logger.info(
+                "self-improvement: merged '%s' into existing '%s'",
+                old_name, new_name,
+            )
+
     # (list_name, description, items)
     wanted: list[tuple[str, str, list[str]]] = [
         (MUHASEBE_LIST_NAME, MUHASEBE_DESCRIPTION, MUHASEBE_ITEMS),
@@ -181,9 +257,15 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
             await db.refresh(lst)
             existing = lst
         else:
-            # Backfill the description only when the list has no
-            # description yet — never overwrite user edits.
-            if description and not (existing.description or "").strip():
+            # Keep the canonical description in sync with the seed.
+            # Earlier revisions only backfilled when empty, but the
+            # user's latest pass rewrote every description verbatim
+            # and explicitly asked for the new wording to land — so
+            # we overwrite when the stored text differs from the
+            # canonical. (The user edits descriptions through a
+            # different code path that bypasses ensure_lists_seeded,
+            # so this doesn't fight their changes.)
+            if description and (existing.description or "") != description:
                 existing.description = description
                 await db.commit()
                 await db.refresh(existing)
@@ -275,13 +357,19 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
         # in, and the failed row is retried on the next request once
         # the startup ALTER widens the column to TEXT.
         if 0 < n_items < len(items):
-            existing_contents = {c for (_i, c, _p) in existing_items}
+            # Build the (content, kind) pair set of existing rows so
+            # repeated catch-up runs don't duplicate paragraph notes
+            # or headers (which carry kind on .description).
+            existing_pairs = {(c, _p) for (_i, c, _p) in existing_items}
             start_pos = max(p for (_i, _c, p) in existing_items) + 1
-            for offset, content in enumerate(items):
-                if content in existing_contents:
+            for offset, raw in enumerate(items):
+                content, kind = _parse_seed_item(raw)
+                # Match on content alone — the rebuild stays idempotent
+                # even if the user manually toggled the kind sentinel.
+                if content in {c for (c, _k) in existing_pairs}:
                     continue
                 try:
-                    item = TodoItem(content=content)
+                    item = TodoItem(content=content, description=kind)
                     db.add(item)
                     await db.commit()
                     await db.refresh(item)
@@ -304,9 +392,10 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
 
         if n_items:
             continue
-        for position, content in enumerate(items):
+        for position, raw in enumerate(items):
+            content, kind = _parse_seed_item(raw)
             try:
-                item = TodoItem(content=content)
+                item = TodoItem(content=content, description=kind)
                 db.add(item)
                 await db.commit()
                 await db.refresh(item)
@@ -467,24 +556,46 @@ async def build_overview(
 
         items_payload: list[dict] = []
         done_in_section = 0
+        # Counted toward "total" only for tickable rows. Notes /
+        # headers ride in the payload (so the frontend can render
+        # the inline prose) but they aren't habits to complete.
+        tickable_in_section = 0
         for item, position in items_pos:
+            # Map TodoItem.description sentinels onto a clean
+            # `kind` enum the frontend can switch on. Avoids
+            # leaking the internal "__SI_…__" convention to the UI
+            # while still letting paragraph notes and section
+            # headers ride along inside the items list.
+            if item.description == SI_DESCRIPTION_NOTE:
+                kind = "note"
+                desc_payload = None
+            elif item.description == SI_DESCRIPTION_HEADER:
+                kind = "header"
+                desc_payload = None
+            else:
+                kind = "checklist"
+                desc_payload = item.description
+
             ci = checkins_by_item.get(item.id)
             status = ci.status if ci else CHECKIN_STATUS_PENDING
             is_auto = bool(
                 ci
                 and ci.status == CHECKIN_STATUS_AUTO_DONE
             )
-            if status in (CHECKIN_STATUS_DONE, CHECKIN_STATUS_AUTO_DONE):
-                done_in_section += 1
+            if kind == "checklist":
+                tickable_in_section += 1
+                if status in (CHECKIN_STATUS_DONE, CHECKIN_STATUS_AUTO_DONE):
+                    done_in_section += 1
             items_payload.append({
                 "item_id": item.id,
                 "content": item.content,
-                "description": item.description,
+                "description": desc_payload,
                 "status": status,
                 "is_auto": is_auto,
                 "ai_reason": ci.ai_reason if ci else None,
                 "note": ci.note if ci else None,
                 "position": position,
+                "kind": kind,
             })
         cat = _category_for_list(lst.name)
         sections.append({
@@ -498,10 +609,12 @@ async def build_overview(
             "list_description": lst.description or None,
             "items": items_payload,
             "completed_today": done_in_section,
-            "total": len(items_payload),
+            # Tickable rows only — notes / headers ride in `items`
+            # but aren't counted against progress.
+            "total": tickable_in_section,
         })
         total_done += done_in_section
-        total_items += len(items_payload)
+        total_items += tickable_in_section
 
     return {
         "as_of": on_date,
@@ -529,11 +642,22 @@ async def refresh_daily_pending_rows(db: AsyncSession, *, user_id: int,
     list_ids = [lst.id for lst in lists]
     if not list_ids:
         return 0
-    # All items across the four lists.
+    # All TICKABLE items across the lists — note/header rows
+    # (TodoItem.description ∈ {SI_DESCRIPTION_NOTE, …_HEADER}) are
+    # display-only and don't need check-in rows.
     stmt = (
         select(TodoItem.id)
         .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
         .where(todo_list_items.c.todo_list_id.in_(list_ids))
+        .where(
+            or_(
+                TodoItem.description.is_(None),
+                and_(
+                    TodoItem.description != SI_DESCRIPTION_NOTE,
+                    TodoItem.description != SI_DESCRIPTION_HEADER,
+                ),
+            )
+        )
         .distinct()
     )
     item_ids = [r for (r,) in (await db.execute(stmt)).all()]

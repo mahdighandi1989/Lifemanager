@@ -25,7 +25,161 @@ import { Link, useParams } from 'react-router-dom';
 
 const API_BASE = '/api';
 
-function ItemRow({ item, listId, allLists, onChanged, onDeleted }) {
+// Sentinels the backend seeder writes into TodoItem.description to
+// mark non-tickable prose rows in the خودسازی lists. Mirrored from
+// app/services/self_improvement_service.py — kept here only as
+// frontend-side literals so we don't need a config trip.
+const SI_DESC_NOTE = '__SI_NOTE__';
+const SI_DESC_HEADER = '__SI_HEADER__';
+
+function ListHeader({ list, onUpdated }) {
+  // Inline-editable list title + description. Click "ویرایش" to
+  // switch to text inputs; "ذخیره" PATCHes the list and exits
+  // edit mode. Description preserves the user's paragraph breaks
+  // via whitespace-pre-wrap so the multi-paragraph form intros
+  // render exactly as they were written.
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(list.name);
+  const [description, setDescription] = useState(list.description || '');
+  const [saving, setSaving] = useState(false);
+  const [showFull, setShowFull] = useState(false);
+
+  useEffect(() => {
+    setName(list.name);
+    setDescription(list.description || '');
+  }, [list.id]);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE}/lists/${list.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description: description || null }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        onUpdated(updated);
+        setEditing(false);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const cancel = () => {
+    setName(list.name);
+    setDescription(list.description || '');
+    setEditing(false);
+  };
+
+  const desc = list.description || '';
+  const isLong = desc.length > 320;
+  const preview = isLong && !showFull ? desc.slice(0, 320) + '…' : desc;
+
+  return (
+    <div className="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      {editing ? (
+        <>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full text-2xl font-bold text-gray-900 border-b border-indigo-200 focus:outline-none focus:border-indigo-500 pb-2 mb-3"
+            data-testid="list-edit-name"
+          />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={8}
+            placeholder="توضیح این لیست…"
+            className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg p-3 focus:outline-none focus:border-indigo-500 leading-7"
+            data-testid="list-edit-desc"
+          />
+          <div className="flex gap-2 mt-3 justify-end">
+            <button
+              onClick={cancel}
+              disabled={saving}
+              className="px-4 py-1.5 text-sm text-gray-600 hover:text-gray-900"
+            >
+              لغو
+            </button>
+            <button
+              onClick={save}
+              disabled={saving || !name.trim()}
+              className="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+              data-testid="list-edit-save"
+            >
+              {saving ? 'در حال ذخیره…' : 'ذخیره'}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight flex-1">
+              {list.name}
+            </h1>
+            <button
+              onClick={() => setEditing(true)}
+              className="text-xs text-indigo-600 hover:underline shrink-0 mt-2"
+              data-testid="list-edit-toggle"
+            >
+              ویرایش
+            </button>
+          </div>
+          {desc && (
+            <div className="mt-3 text-sm text-gray-700 leading-7 whitespace-pre-wrap border-r-4 border-indigo-200 pr-4">
+              {preview}
+              {isLong && (
+                <button
+                  onClick={() => setShowFull((v) => !v)}
+                  className="block mt-2 text-xs text-indigo-600 hover:underline"
+                >
+                  {showFull ? 'جمع کن' : 'متن کامل'}
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// Western digits → Persian digits for the row counter.
+const toPersianDigits = (n) =>
+  String(n).replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+function NoteRow({ item }) {
+  // Paragraph-style prose between checklist rows. No checkbox, no
+  // star, no actions — purely informational.
+  return (
+    <div
+      className="px-5 py-4 border-b border-gray-100 last:border-0 bg-amber-50/40"
+      data-testid={`item-note-${item.id}`}
+    >
+      <p className="text-sm leading-7 text-gray-700 whitespace-pre-wrap">
+        {item.content}
+      </p>
+    </div>
+  );
+}
+
+function HeaderRow({ item }) {
+  // Section divider — bold, larger, sits flush with the list edges.
+  return (
+    <div
+      className="px-5 py-3 border-b border-gray-100 last:border-0 bg-gradient-to-l from-indigo-50 to-transparent"
+      data-testid={`item-header-${item.id}`}
+    >
+      <h3 className="text-base font-bold text-indigo-900">
+        {item.content}
+      </h3>
+    </div>
+  );
+}
+
+function ItemRow({ item, index, listId, allLists, onChanged, onDeleted }) {
   const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -113,6 +267,11 @@ function ItemRow({ item, listId, allLists, onChanged, onDeleted }) {
 
         <div className="flex-1 cursor-pointer" onClick={() => setExpanded((v) => !v)}>
           <p className={`font-medium ${item.is_completed ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+            {typeof index === 'number' && (
+              <span className="text-gray-400 font-normal me-2 text-sm tabular-nums">
+                {toPersianDigits(index)}.
+              </span>
+            )}
             {item.content}
           </p>
           {item.list_ids && item.list_ids.length > 1 && (
@@ -236,14 +395,12 @@ function ListDetail() {
             ← بازگشت به لیست‌ها
           </Link>
         </div>
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {list ? list.name : '…'}
-          </h1>
-          {list && list.description && (
-            <p className="text-gray-500 mt-1">{list.description}</p>
-          )}
-        </div>
+        {list && (
+          <ListHeader
+            list={list}
+            onUpdated={(updated) => setList((prev) => ({ ...prev, ...updated }))}
+          />
+        )}
 
         <NewItemForm listId={id} onCreated={onCreated} />
 
@@ -258,16 +415,38 @@ function ListDetail() {
           ) : items.length === 0 ? (
             <div className="p-8 text-center text-gray-400">آیتمی وجود ندارد</div>
           ) : (
-            items.map((item) => (
-              <ItemRow
-                key={item.id}
-                item={item}
-                listId={id}
-                allLists={allLists}
-                onChanged={onChanged}
-                onDeleted={onDeleted}
-              />
-            ))
+            (() => {
+              // Walk through items keeping a running counter that
+              // only increments on checklist rows — so the user
+              // sees ۱،۲،۳،… on tickable items while paragraph
+              // notes and section headers slot inline without
+              // disrupting the numbering.
+              let checklistIdx = 0;
+              return items.map((item) => {
+                if (item.description === SI_DESC_NOTE) {
+                  return <NoteRow key={item.id} item={item} />;
+                }
+                if (item.description === SI_DESC_HEADER) {
+                  // Header doesn't reset the counter — the user's
+                  // original numbering runs continuously 1-39, the
+                  // header is just a visual divider between the
+                  // first 35 traits and the final 4 reflections.
+                  return <HeaderRow key={item.id} item={item} />;
+                }
+                checklistIdx += 1;
+                return (
+                  <ItemRow
+                    key={item.id}
+                    item={item}
+                    index={checklistIdx}
+                    listId={id}
+                    allLists={allLists}
+                    onChanged={onChanged}
+                    onDeleted={onDeleted}
+                  />
+                );
+              });
+            })()
           )}
         </div>
 
