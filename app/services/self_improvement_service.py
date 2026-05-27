@@ -482,6 +482,15 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
             continue
 
         if n_items:
+            # Already-populated list: nothing to insert, but we
+            # still realign positions so any earlier deploy that
+            # appended rows to the end (instead of dropping them
+            # into their canonical seed slot — the divine_man note
+            # + header case) gets healed on the next request. The
+            # realign is content-keyed, so it's a no-op when the
+            # order is already correct.
+            if items:
+                await _realign_positions(db, existing.id, items)
             continue
         for position, raw in enumerate(items):
             content, kind = _parse_seed_item(raw)
