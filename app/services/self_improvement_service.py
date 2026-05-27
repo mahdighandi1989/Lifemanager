@@ -186,6 +186,82 @@ async def _self_improvement_lists(db: AsyncSession) -> Sequence[TodoList]:
     return lists
 
 
+async def _realign_positions(
+    db: AsyncSession, list_id: int, seed_items: Sequence[str]
+) -> None:
+    """Rewrite todo_list_items.position so the rows match seed order.
+
+    Builds a canonical content→index map from the seed strings (with
+    NOTE/HEADER prefixes stripped). For each existing row in the
+    list, looks up its position by content; user-added rows that
+    aren't in the seed are parked after the canonical block in their
+    current relative order.
+
+    The two-step write (move everything into a high temporary band
+    first, then back down to its final value) sidesteps the
+    UNIQUE(todo_list_id, position) constraint that would otherwise
+    fire mid-update when two rows transiently share a position.
+    """
+    canonical_pos: dict[str, int] = {}
+    for idx, raw in enumerate(seed_items):
+        content, _kind = _parse_seed_item(raw)
+        canonical_pos[content] = idx
+
+    rows = (
+        await db.execute(
+            select(todo_list_items.c.todo_item_id, TodoItem.content,
+                   todo_list_items.c.position)
+            .join(TodoItem, todo_list_items.c.todo_item_id == TodoItem.id)
+            .where(todo_list_items.c.todo_list_id == list_id)
+            .order_by(todo_list_items.c.position)
+        )
+    ).all()
+    if not rows:
+        return
+
+    desired: list[tuple[int, int]] = []  # (item_id, new_position)
+    user_added: list[int] = []
+    for item_id, content, _old_pos in rows:
+        if content in canonical_pos:
+            desired.append((item_id, canonical_pos[content]))
+        else:
+            user_added.append(item_id)
+    # Park user-added items right after the canonical tail.
+    tail_start = len(seed_items)
+    for off, item_id in enumerate(user_added):
+        desired.append((item_id, tail_start + off))
+
+    # Phase 1: move every row into a high temporary band so the
+    # final writes don't collide with each other.
+    REALIGN_TMP_BASE = 100000
+    for off, (item_id, _new_pos) in enumerate(desired):
+        await db.execute(
+            update(todo_list_items)
+            .where(
+                and_(
+                    todo_list_items.c.todo_list_id == list_id,
+                    todo_list_items.c.todo_item_id == item_id,
+                )
+            )
+            .values(position=REALIGN_TMP_BASE + off)
+        )
+    await db.commit()
+
+    # Phase 2: write the desired positions.
+    for item_id, new_pos in desired:
+        await db.execute(
+            update(todo_list_items)
+            .where(
+                and_(
+                    todo_list_items.c.todo_list_id == list_id,
+                    todo_list_items.c.todo_item_id == item_id,
+                )
+            )
+            .values(position=new_pos)
+        )
+    await db.commit()
+
+
 async def ensure_lists_seeded(db: AsyncSession) -> int:
     """Lazily seed the five خودسازی sub-lists + their items.
 
@@ -358,24 +434,25 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
 
         # ── Catch-up branch ─────────────────────────────────────────
         # A list with FEWER items than the canonical seed is treated
-        # as partially seeded — top it up by appending whatever's
-        # missing. Each insert lives in its own transaction so one
-        # truncation (a stale VARCHAR(1000) column rejecting a 2.3k
-        # love_god row, the original production incident) doesn't
-        # abort the whole catch-up — the rest of the list still gets
-        # in, and the failed row is retried on the next request once
-        # the startup ALTER widens the column to TEXT.
+        # as partially seeded — top it up with whatever's missing,
+        # AND reorder so the canonical seed order is preserved. The
+        # original "append at end" version was wrong for divine_man:
+        # the inline note + header belong between checklist rows 35
+        # and 36, but production already had items 1-39 contiguous,
+        # so appending dumped the prose to the bottom. We now insert
+        # at high positions to avoid the unique-position collision,
+        # then do a final realign pass that sets each row's position
+        # to its seed index (and parks any user-added rows after the
+        # canonical block).
         if 0 < n_items < len(items):
-            # Build the (content, kind) pair set of existing rows so
-            # repeated catch-up runs don't duplicate paragraph notes
-            # or headers (which carry kind on .description).
-            existing_pairs = {(c, _p) for (_i, c, _p) in existing_items}
-            start_pos = max(p for (_i, _c, p) in existing_items) + 1
+            # Use a high temporary offset so newly inserted positions
+            # never collide with the existing ones — the realign pass
+            # below overrides them anyway.
+            TMP_BASE = 10000
+            existing_contents = {c for (_i, c, _p) in existing_items}
             for offset, raw in enumerate(items):
                 content, kind = _parse_seed_item(raw)
-                # Match on content alone — the rebuild stays idempotent
-                # even if the user manually toggled the kind sentinel.
-                if content in {c for (c, _k) in existing_pairs}:
+                if content in existing_contents:
                     continue
                 try:
                     item = TodoItem(content=content, description=kind)
@@ -386,7 +463,7 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
                         insert(todo_list_items).values(
                             todo_list_id=existing.id,
                             todo_item_id=item.id,
-                            position=start_pos + offset,
+                            position=TMP_BASE + offset,
                         )
                     )
                     await db.commit()
@@ -397,6 +474,11 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
                         "self-improvement catch-up: skip item len=%d in '%s': %s",
                         len(content), list_name, exc,
                     )
+
+            # Realign every row's position to its seed index so the
+            # canonical order is restored even if the previous deploy
+            # left items at unexpected positions.
+            await _realign_positions(db, existing.id, items)
             continue
 
         if n_items:
