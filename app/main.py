@@ -364,10 +364,54 @@ async def startup_event():
 
         async with SessionLocal() as session:
             inserted = await ensure_lists_seeded(session)
-            if inserted:
-                logger.info("seeded %d self-improvement items", inserted)
+            logger.info(
+                "self-improvement seed: %d new items inserted at startup",
+                inserted,
+            )
     except Exception as exc:
-        logger.debug("skip self-improvement seed: %s", exc)
+        logger.warning("skip self-improvement seed: %s", exc, exc_info=True)
+
+    # Belt-and-suspenders: an earlier deploy appended the divine_man
+    # note + header rows at the END of the list instead of dropping
+    # them between checklist rows 35 and 36. ensure_lists_seeded
+    # above SHOULD realign positions on its own, but the user has
+    # reported the layout staying wrong across multiple deploys, so
+    # we re-run the realign explicitly for every SI list here with
+    # loud logging. Each call is a no-op once the order is canonical.
+    try:
+        from app.database import SessionLocal
+        from app.services.self_improvement_service import _realign_positions
+        from app.services._self_improvement_seed_data import (
+            SELF_IMPROVEMENT_LISTS,
+        )
+        from app.models.todo_list import TodoList
+        from sqlalchemy import select as _select
+
+        async with SessionLocal() as session:
+            for list_name, seed_items in SELF_IMPROVEMENT_LISTS.items():
+                if not seed_items:
+                    continue
+                row = (await session.execute(
+                    _select(TodoList).where(TodoList.name == list_name)
+                )).scalar_one_or_none()
+                if row is None:
+                    continue
+                try:
+                    n_moved = await _realign_positions(
+                        session, row.id, seed_items
+                    )
+                    if n_moved:
+                        logger.info(
+                            "startup realign: '%s' (id=%s) — %d rows moved",
+                            list_name, row.id, n_moved,
+                        )
+                except Exception as exc:
+                    logger.warning(
+                        "startup realign failed for '%s': %s",
+                        list_name, exc, exc_info=True,
+                    )
+    except Exception as exc:
+        logger.warning("skip startup realign block: %s", exc, exc_info=True)
 
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.

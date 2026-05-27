@@ -188,7 +188,7 @@ async def _self_improvement_lists(db: AsyncSession) -> Sequence[TodoList]:
 
 async def _realign_positions(
     db: AsyncSession, list_id: int, seed_items: Sequence[str]
-) -> None:
+) -> int:
     """Rewrite todo_list_items.position so the rows match seed order.
 
     Builds a canonical content→index map from the seed strings (with
@@ -201,6 +201,10 @@ async def _realign_positions(
     first, then back down to its final value) sidesteps the
     UNIQUE(todo_list_id, position) constraint that would otherwise
     fire mid-update when two rows transiently share a position.
+
+    Returns the number of rows whose position actually changed —
+    callers log this so we can confirm in production that the
+    realign fired and what it touched.
     """
     canonical_pos: dict[str, int] = {}
     for idx, raw in enumerate(seed_items):
@@ -217,24 +221,29 @@ async def _realign_positions(
         )
     ).all()
     if not rows:
-        return
+        return 0
 
-    desired: list[tuple[int, int]] = []  # (item_id, new_position)
-    user_added: list[int] = []
-    for item_id, content, _old_pos in rows:
+    desired: list[tuple[int, int, int]] = []  # (item_id, new_pos, old_pos)
+    user_added: list[tuple[int, int]] = []  # (item_id, old_pos)
+    for item_id, content, old_pos in rows:
         if content in canonical_pos:
-            desired.append((item_id, canonical_pos[content]))
+            desired.append((item_id, canonical_pos[content], old_pos))
         else:
-            user_added.append(item_id)
-    # Park user-added items right after the canonical tail.
+            user_added.append((item_id, old_pos))
+    # Park user-added items right after the canonical tail in their
+    # current relative order.
     tail_start = len(seed_items)
-    for off, item_id in enumerate(user_added):
-        desired.append((item_id, tail_start + off))
+    for off, (item_id, old_pos) in enumerate(user_added):
+        desired.append((item_id, tail_start + off, old_pos))
+
+    changed = sum(1 for (_iid, new_pos, old_pos) in desired if new_pos != old_pos)
+    if not changed:
+        return 0
 
     # Phase 1: move every row into a high temporary band so the
     # final writes don't collide with each other.
     REALIGN_TMP_BASE = 100000
-    for off, (item_id, _new_pos) in enumerate(desired):
+    for off, (item_id, _new_pos, _old_pos) in enumerate(desired):
         await db.execute(
             update(todo_list_items)
             .where(
@@ -248,7 +257,7 @@ async def _realign_positions(
     await db.commit()
 
     # Phase 2: write the desired positions.
-    for item_id, new_pos in desired:
+    for item_id, new_pos, _old_pos in desired:
         await db.execute(
             update(todo_list_items)
             .where(
@@ -260,6 +269,12 @@ async def _realign_positions(
             .values(position=new_pos)
         )
     await db.commit()
+
+    logger.info(
+        "self-improvement realign: list_id=%s, %d/%d rows repositioned",
+        list_id, changed, len(desired),
+    )
+    return changed
 
 
 async def ensure_lists_seeded(db: AsyncSession) -> int:
