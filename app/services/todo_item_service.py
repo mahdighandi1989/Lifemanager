@@ -38,14 +38,26 @@ async def list_items(
 ) -> Sequence[TodoItem]:
     stmt = select(TodoItem)
     if list_id is not None:
+        # Order by todo_list_items.position when scoped to a list so
+        # the user-visible order matches what the seeder + reorder
+        # endpoints write. Without this the rows come back in
+        # TodoItem.id order (i.e. insertion order), which leaks the
+        # historical sequence of catch-up inserts into the UI — the
+        # divine_man note + header looked like they lived at the
+        # END of the list even after _realign_positions had set
+        # them to position 35/36, because the response order
+        # ignored the position column entirely.
         stmt = stmt.join(
             todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id
-        ).where(todo_list_items.c.todo_list_id == list_id)
+        ).where(todo_list_items.c.todo_list_id == list_id).order_by(
+            todo_list_items.c.position, TodoItem.id,
+        )
+    else:
+        stmt = stmt.order_by(TodoItem.id)
     if starred_only:
         stmt = stmt.where(TodoItem.is_starred.is_(True))
     if completed is not None:
         stmt = stmt.where(TodoItem.is_completed.is_(completed))
-    stmt = stmt.order_by(TodoItem.id)
     result = await db.execute(stmt)
     return result.scalars().unique().all()
 
