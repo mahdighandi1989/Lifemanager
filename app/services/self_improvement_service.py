@@ -61,6 +61,19 @@ _PLACEHOLDER_MUHASEBE_FIRST_ITEM = (
     "این هفته چند مورد از لیست تقویت اراده را رعایت کردم؟"
 )
 
+# Four "ثبت روزانه: …" rows that landed in commit a9b81c1 as tickable
+# items in the muhasebe list. The user pushed back: these aren't habits
+# to check off but meta-instructions describing how to populate the
+# sub-lists during the week (the content now lives in
+# MUHASEBE_DESCRIPTION). Detected by exact content match so the cleanup
+# is idempotent and a no-op once they're gone.
+_OLD_MUHASEBE_DAILY_LOG_ITEMS = {
+    "ثبت روزانه: ترس ها و شجاعت های امروز (جهت محاسبه در پایان هفته)",
+    "ثبت روزانه: قوت و ضعف های نیروی اراده ام در امروز (جهت محاسبه پایان هفته)",
+    "ثبت روزانه: کارهایی که امروز انجام دادی و احساس میکنی یک مرد الهی و یک مرد ایده آل انجام میده (جهت محاسبه در پایان هفته)",
+    "ثبت روزانه: کارهایی که خلاف کاراکترهای یک مرد الهی و ایده آل است",
+}
+
 
 # --- Helpers ---------------------------------------------------------------
 
@@ -175,6 +188,42 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
         ).all()
         n_items = len(existing_items)
 
+        # Drop the four stale "ثبت روزانه: …" rows from the muhasebe
+        # list — they were tickable items in commit a9b81c1 but the
+        # user pointed out they belong in the description, not as
+        # habits. Match by exact content so this only fires once and
+        # never touches anything the user added themselves.
+        if list_name == MUHASEBE_LIST_NAME and n_items > 0:
+            stale = [
+                (iid, _p) for (iid, c, _p) in existing_items
+                if c in _OLD_MUHASEBE_DAILY_LOG_ITEMS
+            ]
+            if stale:
+                stale_ids = [iid for iid, _p in stale]
+                await db.execute(
+                    todo_list_items.delete().where(
+                        and_(
+                            todo_list_items.c.todo_list_id == existing.id,
+                            todo_list_items.c.todo_item_id.in_(stale_ids),
+                        )
+                    )
+                )
+                await db.execute(
+                    delete(TodoItem).where(TodoItem.id.in_(stale_ids))
+                )
+                await db.commit()
+                logger.info(
+                    "self-improvement: removed %d stale 'ثبت روزانه' rows from muhasebe",
+                    len(stale),
+                )
+                # Refresh the working copy so the catch-up branch
+                # below sees the new (smaller) row count.
+                existing_items = [
+                    (iid, c, p) for (iid, c, p) in existing_items
+                    if iid not in set(stale_ids)
+                ]
+                n_items = len(existing_items)
+
         is_placeholder_muhasebe = (
             list_name == MUHASEBE_LIST_NAME
             and n_items > 0
@@ -192,9 +241,8 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
                     todo_list_items.c.todo_list_id == existing.id
                 )
             )
-            from sqlalchemy import delete as _delete
             await db.execute(
-                _delete(TodoItem).where(TodoItem.id.in_(placeholder_item_ids))
+                delete(TodoItem).where(TodoItem.id.in_(placeholder_item_ids))
             )
             await db.commit()
             n_items = 0

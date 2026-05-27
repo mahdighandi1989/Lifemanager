@@ -207,14 +207,39 @@ MUHASEBE_DESCRIPTION = (
     "قوی باشم؛ ترس یکی از جلوه های هوای نفسه و کم کم شخصیت مرد الهی "
     "رو هم شکل میده. چیزهایی که در لیست ها اومده مصادیقی از هرکدوم "
     "از خصلت های بدمه که ذیل یک صفتی از من قرار میگیره که باید "
-    "ویژه تر اون رو بررسی کنم."
+    "ویژه تر اون رو بررسی کنم.\n\n"
+    "── راهنمای ثبت روزانه (در پایان هفته محاسبه شود) ──\n"
+    "  • ترس ها و شجاعت های امروزم: هر ترس جدید یا از ترس های لیست "
+    "شده یا کارهایی که شجاعت میخواد رو انجام دادم بنویسم و پایان "
+    "هفته با لیست اصلی مقایسه و بررسی بشه.\n"
+    "  • قوت و ضعف های نیروی اراده ام در امروز: هر کاری که تونستم "
+    "با اراده خوب انجامش بدم یا تنبلی و بی ارادگی نذاشت کاری رو "
+    "پیش ببرم بنویسم و پایان هفته با لیست اصلی مقایسه و بررسی بشه.\n"
+    "  • کارهایی که امروز انجام دادی و احساس میکنی یک مرد الهی و "
+    "یک مرد ایده آل عموم مردم و دارای کاریزما و جذابیت انجام میده.\n"
+    "  • همچنین نوشتن کارهایی که خلاف کاراکترهای یک مرد الهی و "
+    "ایده آل است."
 )
 
-# Items inside the محاسبه list — these are the daily / weekly
-# review prompts straight from the PDF (page 2-3). Each is
-# stored as a regular TodoItem so the user can tick them
-# alongside the per-category sub-lists.
+# Items inside the محاسبه list — actionable habits from the PDF
+# (page 2), plus the two handwritten attachments the user kept at
+# the bottom of the original form ("لیست مراقبه ۱" and the
+# "چند نکته جدید" page), plus a daily slot for dream tracking.
+#
+# The four daily-log prompts that used to live here as tickable
+# rows ("ثبت روزانه: ...") have been moved into MUHASEBE_DESCRIPTION
+# above — they describe HOW to populate the sub-lists during the
+# week, not standalone habits to tick off. The runtime seeder
+# (ensure_lists_seeded → _OLD_MUHASEBE_DAILY_LOG_ITEMS) removes
+# those rows from any production list still carrying them.
+#
+# Handwritten content was transcribed from photos the user
+# uploaded ("لیست مراقبه ۱" page + the longer reflection page).
+# The originals are old and partially illegible; words I'm not
+# confident about are marked with [؟] so the user can correct them
+# directly in the UI without re-deploying.
 MUHASEBE_ITEMS: list[str] = [
+    # ── Daily habits (PDF page 2) ─────────────────────────────────
     "مشارطه در صبح با خودم شرط کنم که امروز بر خلاف فرموده خدا رفتار نکنم. اينکه بنای من مبارزه با هوای نفس باشد",
     "تلاش برای اینکه قبل از هر کار اون لیست هفتگانه ای که سالها قبل طراحی کردم را اجرا کنم",
     "نماز اول وقت خوندن",
@@ -232,10 +257,26 @@ MUHASEBE_ITEMS: list[str] = [
     "به خاطر به خدا رسیدن از گناه و لذت آن عبور کردن",
     "به خاطر رسیدن به خدا از برخی از لذت های سطحی گذشتن تا به لذت عمیقتر الهی برسم",
     "اجرای خوب برنامه روزانه",
-    "ثبت روزانه: ترس ها و شجاعت های امروز (جهت محاسبه در پایان هفته)",
-    "ثبت روزانه: قوت و ضعف های نیروی اراده ام در امروز (جهت محاسبه پایان هفته)",
-    "ثبت روزانه: کارهایی که امروز انجام دادی و احساس میکنی یک مرد الهی و یک مرد ایده آل انجام میده (جهت محاسبه در پایان هفته)",
-    "ثبت روزانه: کارهایی که خلاف کاراکترهای یک مرد الهی و ایده آل است",
+    # ── Dream / vision tracking (the slot at the bottom of the
+    # original PDF that wasn't yet on the list) ──────────────────
+    "ثبت خواب‌ها و رویاها (شب قبل و پیغام احتمالی آنها)",
+    # ── "لیست مراقبه ۱" — questions to ask before any action
+    # (transcribed from handwritten image). These are meant as
+    # daily self-check prompts before starting a new task. ──────
+    "مراقبه: چه خدایی، چه کاری کنی؟",
+    "مراقبه: قصدت چیست؟ آیا مناسب اوست؟",
+    "مراقبه: برای چه و نیست برای کیست؟",
+    "مراقبه: آیا این کار در بازار آخرت مناسب است؟",
+    "مراقبه: چه موقع میخواهی این کار را انجام دهی؟ چه مکان؟",
+    "مراقبه: خود راهی [؟] جانی [؟] آن نزد یا سدّ وجود گذار [؟]",
+    "مراقبه: با احرام [؟] مشغول این انجام پیدا کردن را [؟]",
+    # ── "چند نکته جدید" — wisdom points from the longer
+    # handwritten page. The top paragraph is too dense to OCR
+    # reliably; only the bottom three-point list is included
+    # here. Marked [؟] where uncertain — please correct in the UI. ──
+    "نکته: هیچ وقت گله نکن — نشانش این است که با اهلیت رضا و موافقت [؟] حتی برای دیدنمان [؟] روبه‌رو شوی",
+    "نکته: همیشه سکوت کن، گر سخن گفتن از لازم احوال باشد [؟]",
+    "نکته: کم خور و کم خواب با وضع عنای منوی [؟] جنبر [؟] تا نفس را میراند کرد [؟]",
 ]
 
 __all__ = [
