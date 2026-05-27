@@ -61,18 +61,35 @@ _PLACEHOLDER_MUHASEBE_FIRST_ITEM = (
     "این هفته چند مورد از لیست تقویت اراده را رعایت کردم؟"
 )
 
-# Four "ثبت روزانه: …" rows that landed in commit a9b81c1 as tickable
-# items in the muhasebe list. The user pushed back: these aren't habits
-# to check off but meta-instructions describing how to populate the
-# sub-lists during the week (the content now lives in
-# MUHASEBE_DESCRIPTION). Detected by exact content match so the cleanup
-# is idempotent and a no-op once they're gone.
+# Rows that landed in the muhasebe list under earlier revisions but
+# the user later asked to move elsewhere:
+#
+#   * "ثبت روزانه: …" (a9b81c1) — meta-instructions, demoted into
+#     MUHASEBE_DESCRIPTION.
+#   * "مراقبه: …" + "نکته: …" + "ثبت خواب‌ها …" (d5951e9) — promoted
+#     into dedicated lists (MURAQEBE_LIST_NAME / TAZAKKOR_LIST_NAME /
+#     DREAMS_LIST_NAME) so they're structurally separate from the
+#     weekly review and read with the right semantics.
+#
+# Detection is exact content match — the cleanup is idempotent (a
+# no-op once gone) and surgical (only the listed rows are touched,
+# so anything the user added themselves stays put). Prefix-based
+# matches catch the مراقبه/نکته families regardless of which exact
+# wording I tried last time.
 _OLD_MUHASEBE_DAILY_LOG_ITEMS = {
     "ثبت روزانه: ترس ها و شجاعت های امروز (جهت محاسبه در پایان هفته)",
     "ثبت روزانه: قوت و ضعف های نیروی اراده ام در امروز (جهت محاسبه پایان هفته)",
     "ثبت روزانه: کارهایی که امروز انجام دادی و احساس میکنی یک مرد الهی و یک مرد ایده آل انجام میده (جهت محاسبه در پایان هفته)",
     "ثبت روزانه: کارهایی که خلاف کاراکترهای یک مرد الهی و ایده آل است",
+    "ثبت خواب‌ها و رویاها (شب قبل و پیغام احتمالی آنها)",
 }
+
+# Prefix-based muhasebe cleanup — any row whose content starts with
+# one of these is treated as relocated content from the prior cut.
+_OLD_MUHASEBE_PREFIX_CLEANUP = (
+    "مراقبه:",
+    "نکته:",
+)
 
 
 # --- Helpers ---------------------------------------------------------------
@@ -188,15 +205,16 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
         ).all()
         n_items = len(existing_items)
 
-        # Drop the four stale "ثبت روزانه: …" rows from the muhasebe
-        # list — they were tickable items in commit a9b81c1 but the
-        # user pointed out they belong in the description, not as
-        # habits. Match by exact content so this only fires once and
-        # never touches anything the user added themselves.
+        # Drop stale rows from the muhasebe list — exact-match against
+        # _OLD_MUHASEBE_DAILY_LOG_ITEMS (meta-instructions + dream
+        # tracker), plus prefix-match for "مراقبه: …" / "نکته: …" rows
+        # that were promoted to their own lists. Idempotent and
+        # surgical so anything the user added themselves stays.
         if list_name == MUHASEBE_LIST_NAME and n_items > 0:
             stale = [
                 (iid, _p) for (iid, c, _p) in existing_items
                 if c in _OLD_MUHASEBE_DAILY_LOG_ITEMS
+                or any(c.startswith(p) for p in _OLD_MUHASEBE_PREFIX_CLEANUP)
             ]
             if stale:
                 stale_ids = [iid for iid, _p in stale]

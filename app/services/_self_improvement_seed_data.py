@@ -160,6 +160,9 @@ SELF_IMPROVEMENT_LISTS: dict[str, list[str]] = {
 # Written by the user as the form intro. Persisted on the
 # TodoList.description column so /lists/{id} surfaces them.
 LIST_DESCRIPTIONS: dict[str, str] = {
+    # The three new lists are appended below via dict.update calls
+    # at module bottom — keeps the user's original four form descs
+    # visually grouped together up here.
     "خودسازی - تقویت اراده": "همه مواردی که در لیست \"کارهایی که من رو عاشق خدا میکنه\" نوشتم اراده میخواد. اراده یعنی استقامت برای طی طریق در همه حالت های روحی و همه سختی ها و اسونی ها بیرونی. داشتم فکر میکردم اینکه هر کار خوب رو تو حال روحی و معنوی خوب انجام دادن هیچ هنری نیست و هنر انجام اون در سختی هاس و یا فشارهای جسنی و یا حالت های روحی که هیچ حس معنوی وجود نداره . اگر حال معنوی خوب رو شمر هم داشت حتما مرتکب جنایت نمیشد و حتما حسناتش از من هم بیشتر بود . با حال معنوی خوب همه خوبن . حسی تجربه م لذت معنوی حال خوب اونقدر زیاد هست و کشش داره که نخوای سمت بدی بری . پس هرکی داشته باشه سمت این خوبی ها میره . پس انتظار حداقلی خدا اینه که تو حال خوب معنوی حداقل بدی نکنیو ولی انتظار واقعیش اینه که بتونیم تو زمانی که حال معنوی نداریم خوب باشیم فقط همینه که رشد میده و ارزش افزوده تولید میکنه . اما باید یه لیست از کارها هم که اراده رو تقویت میکنه تهیه کنم و مثل لیست بالا تو برنامه مراقبه روزانم بگنجونم که در طول روز انجامش بدم و آخر شب تیک بزنم که انجام شده یا نه",
     "خودسازی - ترس‌ها و شجاعت": "ترس باعث میشه از زندگیم لذت نبرم و آخرت هم نصیبی نداشته باشم . آدم ترسو درغگو میشه غیبت میکنه اهل تهمت میشه جنایت های بزرگ هم رقم میزنه . آدم ترسو همیشه ذلیل . آدم شجاع فقط یکبار میمیره همون روزی که تو تقدیرش هست ولی ترسو هر روز و هر ساعت میمیره – احتیاط مرگ رو عقب نمیندازه که مرگ زودرس میاره از درون میپوسونه جوری که اگر تقدیرت به مرگ در 120 سالگی هم باشه ولی از درون مردی هیچ لذتی نمیبری و یا دوست داری زودتر بمیری . پناهیان میگفت لیست ترس هات رو بنویس و برای هرکدومش بگو خدا هست. این کارو یه مدت کردم خیلی عالی بود خیلی . . ترسم کاملا از بین رفت در مقطعی . وقتی ترسی رو بررسی میکردم پشتش ترس های دیگه ای میدیدم که برای هرکدوم میگفتم خدا هست و تا اینکه میرسیدم به ترس ریشه ای تر . خدا هست یعنی بقیه ترس ها یه حباب . خدا هست یعنی اینکه خدا که ته مهربونیه داره الان میبینتت که این ترس جلوته پس چیزی نیست اگر بد بود برات که نمیذاشت سر راهت یعنی اصلا چیزی نیست داره نگات میکنه زل زده به چشات . اگر برای تو نبود که سر راهت قرار نمیگرفت . خدا هست یعنی از بالا نگاه کن ببین وقتی از بالا به قضیه نگاه میکنه بازم ترس داری؟ از بالا نگاه کردن یه وجهش اینه که واقعا از ارتفاع بالا نگاه کنی وق خودت رو و اون ترس رو و اون مکان و اون زمان واقعه رو در مقیاس بالاتر تصور کنی و وجه دیگرش اینه که در طول تاریخ و گذشته نگاه کنی که این موارد برای ملیون ها انسان دیگه پیش اومده . خدا هست یعنی بالاخره یه چیزی میشه و وقتی چیزی شد همون رو همون خدای مهربون مطلق فقط برای من خواسته و ماموریتم بوده و خوب انجامش دادم ویعنی وقتی اونجوری شد بازم خدا هست همونقدر همون اندازه ... خدا هست یعنی نه اینکه تصادف نمیکنی یا کتک نمیخوری یعنی اینکه اگر تصادف کردی و اسیب جدید دیدی یا کنک خوردی و خون خالی شدی بازم خدا هست همینجوری داره مهربون اروم نگات میکنه و زل زده بهت فکر کنم تصور لحظه به لحظه این درد تصادف و کتک رو از بین میبره – خدا هست یعنی اینکه هیچی ترسناک نیست جز اینکه کاری که تو رو از خدا دور کنه و عاقبتت رو خراب کنه – حدا هست یعنی اینکه جمجمه ت رو به خدا بسپار مرگ سر وقتش میاد . مثل شهید سلیمانی که روی تپه راه میرفت و میدونست کی از دنیا میره مثل چمران و یا مثل شهید خرازی . پناهیان میگفت ادم مخلص از هیچی نمیترسه . و راحت تو دل خطر میره . پناهیان میگفت ملک اشتر جوری بود که امیرالمومنین میگفت اگر تو دل شب تو یه بیابون تاریک تنها قدم بزنه و بدون اینکه حواسش باشه پش رو دم یه توله سگ بره از صدای پارس کردن ناگهانی مادر توله حتی پلک هم نمیزنه .",
     "خودسازی - شخصیت مرد الهی": "اکیدا و قویا معتقدم که اگر تمام هم و غم و تلاش رو برای کسب رضایت خدا و رسیدن به قرب الهی در چهارچوب احکام دین بذاره خود به خود به تمام خلق و خوی یک مرد الهی در یک بازه زمانی که از فرد تا فرد بنا به همت و تلاشش فرق داره نایل میشه ولی اگر در کنارش یک تمرکزی برای مرد الهی بودن هم داشته باشه و تجربه خودش و دیگران در این رابطه که بخشی از اون در لیست بالا اومده و پختگی رو بهش اضافه کنه و برخی از عادات نامذموم که حاصل القائات و فضای زندگی از کودکی درونش نفوذ کرده رو رفع کنه و کاملا ایده آل میشه\n\nهمه این موارد رو باز هم باید برای کسی یا چیزی انجام بدم تا ادامه دار باشه اون هم خداست... وگرنه چون دنیا ناپایداره اگر به هر نیت غیر الهی کاری رو انجام بدی بعدا که اون مخاطب خاص غیر خداییت از بین رفت تمام چیزایی هم که روش بنا کرده بودی از بین میره پس مرد خدا فقط برای خداست تمام حرکات و سکناتش برای خداست. یعنی اگر میخوایم چیزایی به کاراکترهای مردانه خودمون اضافه کنیم که در دین مباحه ولی در بیرون جذابیت های مردونه حساب میشه باید این نیت رو در ذهنم و عمق دلم بگنجونم که برای این میخوام مرد جذابی باشم که مردم ببینن و بدونن این که جذاب یه مسلمون شیعه انقلابی که دینش باعث این جذابیت شده و نباید برای اینکه فکر کنم جذابیتم کمتر میشه از عقایدم فاصله بگیرم یا دچار مصلحت اندیشی بیجا بشم.",
@@ -173,14 +176,20 @@ CATEGORY_BY_LIST_NAME: dict[str, str] = {
     "خودسازی - عشق به خدا": "love_god",
     "خودسازی - ترس‌ها و شجاعت": "fears",
     "خودسازی - شخصیت مرد الهی": "divine_man",
+    "خودسازی - مراقبه قبل از هر کار": "muraqebe",
+    "خودسازی - تذکر و یادآوری": "tazakkor",
+    "خودسازی - ثبت خواب و رویا": "dreams",
 }
 
-# Persian labels for the four habit categories.
+# Persian labels for the habit categories.
 CATEGORY_LABELS_FA: dict[str, str] = {
     "willpower": "تقویت اراده",
     "love_god": "عشق به خدا",
     "fears": "ترس‌ها و شجاعت",
     "divine_man": "شخصیت مرد الهی",
+    "muraqebe": "مراقبه قبل از هر کار",
+    "tazakkor": "تذکر و یادآوری",
+    "dreams": "ثبت خواب و رویا",
 }
 
 # ── Master "محاسبه" list ────────────────────────────────────────
@@ -221,25 +230,28 @@ MUHASEBE_DESCRIPTION = (
     "ایده آل است."
 )
 
-# Items inside the محاسبه list — actionable habits from the PDF
-# (page 2), plus the two handwritten attachments the user kept at
-# the bottom of the original form ("لیست مراقبه ۱" and the
-# "چند نکته جدید" page), plus a daily slot for dream tracking.
+# Items inside the محاسبه list — actionable habits from PDF page 2.
 #
-# The four daily-log prompts that used to live here as tickable
-# rows ("ثبت روزانه: ...") have been moved into MUHASEBE_DESCRIPTION
-# above — they describe HOW to populate the sub-lists during the
-# week, not standalone habits to tick off. The runtime seeder
-# (ensure_lists_seeded → _OLD_MUHASEBE_DAILY_LOG_ITEMS) removes
-# those rows from any production list still carrying them.
+# Earlier revisions parked four "ثبت روزانه: …" rows here plus the
+# handwritten attachments and a dream slot. The user's feedback was:
 #
-# Handwritten content was transcribed from photos the user
-# uploaded ("لیست مراقبه ۱" page + the longer reflection page).
-# The originals are old and partially illegible; words I'm not
-# confident about are marked with [؟] so the user can correct them
-# directly in the UI without re-deploying.
+#   * The four daily-log rows describe HOW to populate the sub-lists
+#     during the week, not standalone habits — moved into
+#     MUHASEBE_DESCRIPTION above.
+#   * The seven "مراقبه:" questions are a quick pre-action checklist
+#     used dozens of times a day — promoted to their own list
+#     (MURAQEBE_LIST_NAME) so they're visually separate from the
+#     weekly review items.
+#   * The "نکته:" wisdom points belong to a reflection-text page,
+#     not a checklist — moved to TAZAKKOR_DESCRIPTION as
+#     reminder text.
+#   * Dream tracking is free-form journaling, not a ticked habit —
+#     given its own empty list (DREAMS_LIST_NAME) the user populates
+#     on the fly.
+#
+# The cleanup block in ensure_lists_seeded removes the now-stale rows
+# from any production list that still carries them.
 MUHASEBE_ITEMS: list[str] = [
-    # ── Daily habits (PDF page 2) ─────────────────────────────────
     "مشارطه در صبح با خودم شرط کنم که امروز بر خلاف فرموده خدا رفتار نکنم. اينکه بنای من مبارزه با هوای نفس باشد",
     "تلاش برای اینکه قبل از هر کار اون لیست هفتگانه ای که سالها قبل طراحی کردم را اجرا کنم",
     "نماز اول وقت خوندن",
@@ -257,27 +269,104 @@ MUHASEBE_ITEMS: list[str] = [
     "به خاطر به خدا رسیدن از گناه و لذت آن عبور کردن",
     "به خاطر رسیدن به خدا از برخی از لذت های سطحی گذشتن تا به لذت عمیقتر الهی برسم",
     "اجرای خوب برنامه روزانه",
-    # ── Dream / vision tracking (the slot at the bottom of the
-    # original PDF that wasn't yet on the list) ──────────────────
-    "ثبت خواب‌ها و رویاها (شب قبل و پیغام احتمالی آنها)",
-    # ── "لیست مراقبه ۱" — questions to ask before any action
-    # (transcribed from handwritten image). These are meant as
-    # daily self-check prompts before starting a new task. ──────
-    "مراقبه: چه خدایی، چه کاری کنی؟",
-    "مراقبه: قصدت چیست؟ آیا مناسب اوست؟",
-    "مراقبه: برای چه و نیست برای کیست؟",
-    "مراقبه: آیا این کار در بازار آخرت مناسب است؟",
-    "مراقبه: چه موقع میخواهی این کار را انجام دهی؟ چه مکان؟",
-    "مراقبه: خود راهی [؟] جانی [؟] آن نزد یا سدّ وجود گذار [؟]",
-    "مراقبه: با احرام [؟] مشغول این انجام پیدا کردن را [؟]",
-    # ── "چند نکته جدید" — wisdom points from the longer
-    # handwritten page. The top paragraph is too dense to OCR
-    # reliably; only the bottom three-point list is included
-    # here. Marked [؟] where uncertain — please correct in the UI. ──
-    "نکته: هیچ وقت گله نکن — نشانش این است که با اهلیت رضا و موافقت [؟] حتی برای دیدنمان [؟] روبه‌رو شوی",
-    "نکته: همیشه سکوت کن، گر سخن گفتن از لازم احوال باشد [؟]",
-    "نکته: کم خور و کم خواب با وضع عنای منوی [؟] جنبر [؟] تا نفس را میراند کرد [؟]",
 ]
+
+
+# ── "مراقبه قبل از هر کار" — quick pre-action checklist ──────────
+# Seven questions the user asks before starting ANY task, even a
+# small one. Lives in its own list so it visually stands apart from
+# the weekly-review habits. Transcription is the user's verified
+# wording (replaces my earlier best-effort OCR which was wrong).
+MURAQEBE_LIST_NAME = "خودسازی - مراقبه قبل از هر کار"
+
+MURAQEBE_DESCRIPTION = (
+    "این لیست یک چک‌لیست سریع است که باید قبل از انجام حتی "
+    "کوچک‌ترین کارهای روزانه به آن مراجعه کنی و خودت را در "
+    "برابر این هفت سؤال محک بزنی. هدف: تربیت نگاه و نیت قبل از "
+    "هر حرکت."
+)
+
+MURAQEBE_ITEMS: list[str] = [
+    "میخوای چی کار کنی؟",
+    "قصدت چیه؟ آیا فایده ای داره؟",
+    "برای چه یا نیتت برای کیست؟",
+    "چه موقع میخوای این کار را انجام دهی؟",
+    "چه مکان؟",
+    "خود را مقابل آن فرد یا موجود گذار؟",
+    "با احترام مقابل ا... انجام بده کار را",
+]
+
+
+# ── "تذکر و یادآوری" — reflection text (NOT a checklist) ────────
+# The longer handwritten page from the original profile. Stored as
+# a single reminder description on the list, with zero items, so the
+# user reads it (not ticks it). Verbatim from the user's typed
+# transcription — no [؟] markers because they hand-typed it.
+TAZAKKOR_LIST_NAME = "خودسازی - تذکر و یادآوری"
+
+TAZAKKOR_DESCRIPTION = (
+    "قرار شد کسی باشم که فکرمو مشغول افکار بیهوده و شهوت‌آلود "
+    "نکنم، مخصوصاً راجع به خودنمایی، خودنمایی‌های دخترها و اینکه "
+    "چه‌جوری باشم که خوششون بیاد. یاد دینا بیفت که چی شد، عبرت "
+    "بگیر، ارزش نداره. وقار داشته باش.\n\n"
+    "قرار شد کسی باشم که احساس کنم — (زیر «احساس کنم» یه خط بکش "
+    "و بنویس «مطمئن باشم») — که خدا و امام زمان همین الان کنارم "
+    "یا جلوم ایستادن و دارن نگاهم می‌کنن. پس روت میشه گناه کنی؟ "
+    "اصلاً غیر از اینه که نگات می‌کنن همیشه؟\n\n"
+    "قرار شد به هر کاری که می‌کنی قبلش یه ذره فکر کنی، عواقبشو "
+    "در نظر بگیری و اگر خالصانه بود انجام بدی.\n\n"
+    "قرار شد فکر کنی هر لحظه داری می‌میری و تبعات خوب این تصور رو "
+    "در نظر بگیری. فکر کنی که امروز یا چند روز دیگه مردنی هستی، "
+    "پس کینه، حسادت، غرور واسه چی؟ اصلاً غیر از اینه که این "
+    "امکان هست؟ همه فکر می‌کنن جاویدانن یا مرگ واسه همسایه‌ست یا "
+    "خودشون تو پیری می‌میرن.\n\n"
+    "و قرار شد تصمیم بگیری که زندگی رو تو بستر شهادت پرورش بدی. "
+    "به زندگی‌ای که بهت بچسبه، قابل هدیه به خدا باشه. به دنیا دل "
+    "نبند ولی به هر صورت زندگی بساز، بیکار نشی. یاد بگیر و یاد "
+    "بده و بعد از خدا بخواه شهید بشی. و اخلاقتو به همه خوب کنی. "
+    "و کسایی رو بیشتر تحویل بگیری که تو جامعه از قشر مستضعفین "
+    "هستن که همین واسه سرمایه‌ست و پشتوانه.\n\n"
+    "── چند نکته ──\n"
+    "  • هیچ‌وقت کینه نداشته باش مگر برای دشمنان اهل‌بیت و خدا و "
+    "منافقان، آن هم برای بدی‌شان.\n"
+    "  • همیشه سکوت کن مگر در مواقعی که لازمه صحبت باشه.\n"
+    "  • همیشه کم بخور ولی وقتی می‌خوری غذای مقوی بخور تا ضعف "
+    "رو جبران کرده."
+)
+
+# Intentionally empty — this list carries no actionable items.
+# Surfaces as a description-only section on the dashboard.
+TAZAKKOR_ITEMS: list[str] = []
+
+
+# ── "ثبت خواب و رویا" — free-form dream journal ──────────────
+# Empty seed — the user adds entries as dreams happen. Each entry
+# becomes a regular TodoItem where the content can carry the date
+# and the description carries the dream details.
+DREAMS_LIST_NAME = "خودسازی - ثبت خواب و رویا"
+
+DREAMS_DESCRIPTION = (
+    "جای ثبت خواب‌های شب قبل و پیغام احتمالی آنها. این لیست برای "
+    "تیک زدن نیست؛ هر شب یا صبح بعد، خواب خود را به‌عنوان یک "
+    "آیتم جدید با تاریخ ثبت کن و در توضیح آن جزئیات و برداشت "
+    "احتمالی را بنویس."
+)
+
+DREAMS_ITEMS: list[str] = []
+
+
+# Wire the three new lists into the per-list maps so the runtime
+# seeder + dashboard pick them up automatically without code changes
+# elsewhere. Order matters here for dashboard rendering — sub-list
+# additions appear after the four habit categories.
+SELF_IMPROVEMENT_LISTS[MURAQEBE_LIST_NAME] = MURAQEBE_ITEMS
+SELF_IMPROVEMENT_LISTS[TAZAKKOR_LIST_NAME] = TAZAKKOR_ITEMS
+SELF_IMPROVEMENT_LISTS[DREAMS_LIST_NAME] = DREAMS_ITEMS
+
+LIST_DESCRIPTIONS[MURAQEBE_LIST_NAME] = MURAQEBE_DESCRIPTION
+LIST_DESCRIPTIONS[TAZAKKOR_LIST_NAME] = TAZAKKOR_DESCRIPTION
+LIST_DESCRIPTIONS[DREAMS_LIST_NAME] = DREAMS_DESCRIPTION
+
 
 __all__ = [
     "SELF_IMPROVEMENT_LISTS",
@@ -287,4 +376,13 @@ __all__ = [
     "MUHASEBE_LIST_NAME",
     "MUHASEBE_DESCRIPTION",
     "MUHASEBE_ITEMS",
+    "MURAQEBE_LIST_NAME",
+    "MURAQEBE_DESCRIPTION",
+    "MURAQEBE_ITEMS",
+    "TAZAKKOR_LIST_NAME",
+    "TAZAKKOR_DESCRIPTION",
+    "TAZAKKOR_ITEMS",
+    "DREAMS_LIST_NAME",
+    "DREAMS_DESCRIPTION",
+    "DREAMS_ITEMS",
 ]
