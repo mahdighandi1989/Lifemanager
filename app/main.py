@@ -645,6 +645,17 @@ if frontend_dist.exists():
         # real handler.
         first_segment = full_path.split("/", 1)[0]
         if first_segment in _API_PREFIXES:
+            # If this request already has a trailing slash, the
+            # previous redirect didn't find a handler either —
+            # return a clean 404 instead of looping back to
+            # ourselves. (Without this guard, an obsolete API path
+            # like /api/search redirected forever to /api/search/,
+            # /api/search//, …, blowing the client's redirect cap.)
+            if full_path.endswith("/"):
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Not Found"},
+                )
             return RedirectResponse(url=f"/{full_path}/", status_code=307)
 
         # Guard: Prevent serving files outside the dist directory
