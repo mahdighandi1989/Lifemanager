@@ -20,7 +20,15 @@ router = APIRouter(prefix="", tags=["google-auth"])
 
 @router.get("/auth/google")
 async def google_login():
-    """Redirect to Google OAuth consent screen."""
+    """Redirect to Google OAuth consent screen.
+
+    Consumer: direct browser navigation. The Persian "تلاش مجدد"
+    (Try again) anchor in the /auth/pending HTML response points
+    here (see line ~153 of this file), and end-users hit the URL
+    directly when they click "Login with Google". Not invoked
+    from frontend JS — that's why the no-frontend-fetch audit
+    flags it as orphan. Keep.
+    """
     if not settings.GOOGLE_CLIENT_ID:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

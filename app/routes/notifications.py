@@ -101,6 +101,13 @@ async def mark_as_read(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Mark a notification as read.
+
+    Consumer: frontend/src/pages/Notifications.jsx line 77 —
+    `fetch(\`/notifications/${id}/read\`, { method: 'PATCH' })`.
+    The audit's grep missed it because the URL is built from a
+    template literal instead of a static string. Keep.
+    """
     notification_service = NotificationService(db)
     notification = await notification_service.mark_as_read(
         notification_id, current_user.id

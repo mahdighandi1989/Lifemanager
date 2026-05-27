@@ -92,8 +92,12 @@ def _serialize(t: Task) -> dict:
 
 # --- SEARCH (parameterised — SQL injection is structurally impossible) ----
 
+# Only /api/tasks/search is exposed. The historical /api/search alias was
+# documented in docs/API.md but no client (frontend, scripts, external)
+# ever consumed it — confirmed by grep across the repo. Removed so the
+# URL surface stays minimal and the audit tooling can stop flagging the
+# orphan alias.
 @router.get("/api/tasks/search", tags=["tasks"])
-@router.get("/api/search", tags=["tasks"])
 @handle_errors
 async def search_tasks_endpoint(
     q: str = "",
