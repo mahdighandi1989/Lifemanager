@@ -4,32 +4,54 @@ import React, { useState, useEffect } from 'react';
 // route that renders this page.
 const API_BASE = '/api';
 
+// STATUS_LABELS must mirror app/models/task.py::TaskStatus (the
+// source of truth). The backend serialises `t.status.value`, so a
+// task whose status is TaskStatus.TODO arrives here as the literal
+// string "todo" — not "pending". Keep the four backend enum values
+// (todo / in_progress / done / cancelled) as the canonical keys, and
+// alias the older "pending" / "completed" strings to the same labels
+// so any legacy task rows or hand-crafted payloads still render.
 const STATUS_LABELS = {
+  todo: 'در انتظار',
   pending: 'در انتظار',
   in_progress: 'در حال انجام',
+  done: 'تکمیل‌شده',
   completed: 'تکمیل‌شده',
+  cancelled: 'لغو شده',
 };
 
 const STATUS_COLORS = {
+  todo: 'bg-yellow-100 text-yellow-700',
   pending: 'bg-yellow-100 text-yellow-700',
   in_progress: 'bg-blue-100 text-blue-700',
+  done: 'bg-green-100 text-green-700',
   completed: 'bg-green-100 text-green-700',
+  cancelled: 'bg-gray-100 text-gray-600',
 };
 
+// Treat both "done" (current backend) and "completed" (legacy) as
+// "finished" when filtering progress widgets. Centralised so the
+// Dashboard summary, the per-page filter, and the "X of Y done"
+// caption stay in sync.
+const COMPLETED_STATUSES = new Set(['done', 'completed']);
+
 function TaskRow({ task, onToggle }) {
-  const status = task.status || (task.is_completed ? 'completed' : 'pending');
+  // Default to the backend's canonical "todo" sentinel when no
+  // status is set (e.g. a task created before the column existed).
+  const status = task.status || (task.is_completed ? 'done' : 'todo');
+  const isDone = COMPLETED_STATUSES.has(status);
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
       <div className="flex items-center space-x-3">
         <button
           onClick={() => onToggle(task.id, status)}
           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-            status === 'completed'
+            isDone
               ? 'bg-green-500 border-green-500'
               : 'border-gray-300 hover:border-green-400'
           }`}
         >
-          {status === 'completed' && (
+          {isDone && (
             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </svg>
@@ -37,7 +59,7 @@ function TaskRow({ task, onToggle }) {
         </button>
         <div>
           <p className={`font-medium ${
-            status === 'completed' ? 'line-through text-gray-400' : 'text-gray-900'
+            isDone ? 'line-through text-gray-400' : 'text-gray-900'
           }`}>
             {task.title}
           </p>
@@ -85,7 +107,7 @@ function Tasks() {
       const res = await fetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle.trim(), status: 'pending' }),
+        body: JSON.stringify({ title: newTitle.trim(), status: 'todo' }),
       });
       if (res.ok) {
         const task = await res.json();
@@ -100,7 +122,9 @@ function Tasks() {
   };
 
   const handleToggle = async (id, currentStatus) => {
-    const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+    // Cycle between the backend's two canonical "open" / "closed"
+    // states. Accept any legacy `completed` value as already-done.
+    const newStatus = COMPLETED_STATUSES.has(currentStatus) ? 'todo' : 'done';
     try {
       const res = await fetch(`${API_BASE}/tasks/${id}`, {
         method: 'PATCH',
@@ -117,7 +141,9 @@ function Tasks() {
 
   const filtered = tasks.filter(t => {
     if (filter === 'all') return true;
-    const s = t.status || (t.is_completed ? 'completed' : 'pending');
+    const s = t.status || (t.is_completed ? 'done' : 'todo');
+    // "done" filter button also catches the legacy "completed" value.
+    if (filter === 'done') return COMPLETED_STATUSES.has(s);
     return s === filter;
   });
 
@@ -149,7 +175,7 @@ function Tasks() {
 
         {/* Filter Tabs */}
         <div className="flex space-x-2 mb-4">
-          {[['all', 'همه'], ['pending', 'در انتظار'], ['in_progress', 'در حال انجام'], ['completed', 'تکمیل‌شده']].map(([val, label]) => (
+          {[['all', 'همه'], ['todo', 'در انتظار'], ['in_progress', 'در حال انجام'], ['done', 'تکمیل‌شده']].map(([val, label]) => (
             <button
               key={val}
               onClick={() => setFilter(val)}
@@ -193,7 +219,7 @@ function Tasks() {
 
         {tasks.length > 0 && (
           <p className="text-xs text-gray-400 text-center mt-3">
-            {tasks.filter(t => (t.status || (t.is_completed ? 'completed' : 'pending')) === 'completed').length} از {tasks.length} وظیفه تکمیل شده
+            {tasks.filter(t => COMPLETED_STATUSES.has(t.status || (t.is_completed ? 'done' : 'todo'))).length} از {tasks.length} وظیفه تکمیل شده
           </p>
         )}
       </div>

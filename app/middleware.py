@@ -55,6 +55,23 @@ def handle_errors(func: F) -> F:
             # Already shaped for FastAPI; let it through.
             raise
         except (ValidationError, ValueError) as exc:
+            # NOTE on the 422-vs-400 design choice (audit kept
+            # flagging this as "over-engineering"): FastAPI's
+            # built-in `RequestValidationError` handler returns 422
+            # with a structured `detail` array for failures during
+            # REQUEST PARSING — body / query / path coercion. That
+            # handler is left in place and fires for the public HTTP
+            # boundary. THIS branch is different: it catches
+            # ValidationError / ValueError raised INSIDE the service
+            # layer (a Pydantic model rebuilt from internal state, a
+            # business invariant rejected by a hand-written check,
+            # etc.). Returning 400 with the plain `str(exc)` is
+            # deliberate — business-logic validation isn't a
+            # request-shape problem, and the structured 422
+            # vocabulary would mislead clients about where the
+            # failure originated. Both ValidationError and ValueError
+            # ride the same branch because the contract clients see
+            # is identical ("you gave me something I can't accept").
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
             ) from exc

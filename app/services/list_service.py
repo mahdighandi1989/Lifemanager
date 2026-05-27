@@ -7,13 +7,17 @@ tasks, the Celery seeder, and tests.
 from __future__ import annotations
 
 import html
+import logging
 from typing import List, Optional, Sequence
 
 from sqlalchemy import func, select
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.todo_list import TodoList, todo_list_items
+
+
+logger = logging.getLogger(__name__)
 
 
 def _sanitize(value: Optional[str]) -> Optional[str]:
@@ -189,8 +193,29 @@ async def seed_todo_items_if_empty(db: AsyncSession) -> int:
                             position=position,
                         )
                     )
-                except Exception:
-                    pass
+                except IntegrityError as exc:
+                    # The shared item is already attached to this list
+                    # from a previous run — the UNIQUE constraint on
+                    # (todo_list_id, todo_item_id) fires. Treat as
+                    # idempotent-success: the row is already where we
+                    # want it. Logged at debug because this is the
+                    # expected path for re-seeds, not a real error.
+                    logger.debug(
+                        "skip shared-item re-attach (already linked): "
+                        "list_id=%s item_id=%s shared_key=%s: %s",
+                        lst.id, shared_item_ids[shared], shared, exc,
+                    )
+                except SQLAlchemyError as exc:
+                    # Any OTHER DB error here is a real problem (broken
+                    # FK, schema mismatch, connection drop). Log at
+                    # warning so it shows up in production logs but
+                    # don't kill the rest of the seed — we'd rather
+                    # finish what we can than blow up startup.
+                    logger.warning(
+                        "shared-item re-attach failed: list_id=%s "
+                        "item_id=%s shared_key=%s: %s",
+                        lst.id, shared_item_ids[shared], shared, exc,
+                    )
                 continue
 
             obj = TodoItem(
