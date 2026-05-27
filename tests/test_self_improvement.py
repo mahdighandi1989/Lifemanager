@@ -100,24 +100,31 @@ async def _seed_self_improvement_lists(session):
 
 
 @pytest.mark.asyncio
-async def test_overview_returns_five_sections_with_expected_counts(si_client):
+async def test_overview_returns_eight_sections_with_expected_counts(si_client):
     client, _factory = si_client
     r = client.get("/api/self-improvement/overview")
     assert r.status_code == 200, r.text
     body = r.json()
-    # Five sections in priority order: muhasebe first, then the four habit cats.
     cats = [s["category"] for s in body["sections"]]
+    # muhasebe leads; the four habit categories + three new lists follow.
     assert cats[0] == "muhasebe"
-    assert set(cats[1:]) == {"willpower", "love_god", "fears", "divine_man"}
+    assert set(cats[1:]) == {
+        "willpower", "love_god", "fears", "divine_man",
+        "muraqebe", "tazakkor", "dreams",
+    }
 
     counts_by_cat = {s["category"]: s["total"] for s in body["sections"]}
+    assert counts_by_cat["muhasebe"] == 17
     assert counts_by_cat["willpower"] == 28
     assert counts_by_cat["love_god"] == 12
     assert counts_by_cat["fears"] == 40
     assert counts_by_cat["divine_man"] == 39
-    assert counts_by_cat["muhasebe"] == 28
-    # Aggregate total: 28 + 28 + 12 + 40 + 39 = 147.
-    assert body["items_total"] == 147
+    assert counts_by_cat["muraqebe"] == 7
+    # tazakkor + dreams are description-only / user-journal lists.
+    assert counts_by_cat["tazakkor"] == 0
+    assert counts_by_cat["dreams"] == 0
+    # Aggregate: 17 + 28 + 12 + 40 + 39 + 7 + 0 + 0 = 143.
+    assert body["items_total"] == 143
     # Nothing ticked yet.
     assert body["completed_today_total"] == 0
     for s in body["sections"]:
@@ -133,13 +140,13 @@ async def test_overview_persists_pending_rows_idempotently(si_client):
     async with factory() as db:
         from sqlalchemy import func, select
         n1 = (await db.execute(select(func.count()).select_from(SelfImprovementCheckIn))).scalar_one()
-    assert n1 == 147  # one per item across all five lists
+    assert n1 == 143  # one per item across all eight lists
     # Second call must NOT duplicate.
     client.get("/api/self-improvement/overview")
     async with factory() as db:
         from sqlalchemy import func, select
         n2 = (await db.execute(select(func.count()).select_from(SelfImprovementCheckIn))).scalar_one()
-    assert n2 == 147
+    assert n2 == 143
 
 
 @pytest.mark.asyncio
@@ -197,29 +204,40 @@ async def test_placeholder_muhasebe_items_are_replaced(si_client):
     r = client.get("/api/self-improvement/overview")
     body = r.json()
     muhasebe = [s for s in body["sections"] if s["category"] == "muhasebe"][0]
-    assert muhasebe["total"] == 28
+    assert muhasebe["total"] == 17
     assert muhasebe["items"][0]["content"].startswith("مشارطه")
 
 
 @pytest.mark.asyncio
-async def test_stale_daily_log_rows_are_removed_from_muhasebe(si_client):
-    """The four "ثبت روزانه: …" rows that landed in commit a9b81c1
-    were the wrong shape — they describe how to populate the
-    sub-lists during the week, not standalone habits to tick. The
-    user asked to demote them to descriptive notes; the runtime
-    seeder must therefore strip them from any production list that
-    still carries them, without touching anything the user added.
+async def test_stale_muhasebe_rows_are_removed_by_seeder(si_client):
+    """Three families of stale rows accumulated in the muhasebe list
+    across earlier seed revisions:
+      * four "ثبت روزانه: …" meta-instructions (a9b81c1) — moved
+        into MUHASEBE_DESCRIPTION.
+      * seven "مراقبه: …" pre-action questions + three "نکته: …"
+        wisdom points + one "ثبت خواب‌ها …" row (d5951e9) — promoted
+        to dedicated lists.
+    The runtime seeder must strip them all from any production list
+    that still carries them, while leaving user-added rows alone.
     """
     from sqlalchemy import insert, select
     from app.services._self_improvement_seed_data import MUHASEBE_LIST_NAME
     from app.services.self_improvement_service import (
         _OLD_MUHASEBE_DAILY_LOG_ITEMS,
+        _OLD_MUHASEBE_PREFIX_CLEANUP,
         ensure_lists_seeded,
     )
 
     client, factory = si_client
-    # Inject the four stale rows + one user-added row into muhasebe.
+    # Inject every flavour of stale row + one user-added row that
+    # must survive the cleanup.
+    stale_rows = list(_OLD_MUHASEBE_DAILY_LOG_ITEMS) + [
+        "مراقبه: چه خدایی، چه کاری کنی؟",
+        "مراقبه: قصدت چیست؟ آیا مناسب اوست؟",
+        "نکته: همیشه سکوت کن، گر سخن گفتن از لازم احوال باشد",
+    ]
     user_added = "آیتم دلخواه کاربر — نباید حذف شود"
+
     async with factory() as db:
         ml = (await db.execute(
             select(TodoList).where(TodoList.name == MUHASEBE_LIST_NAME)
@@ -230,9 +248,7 @@ async def test_stale_daily_log_rows_are_removed_from_muhasebe(si_client):
             )
         )).all()
         start = (max((p for (p,) in next_pos), default=-1)) + 1
-        for offset, content in enumerate(
-            list(_OLD_MUHASEBE_DAILY_LOG_ITEMS) + [user_added]
-        ):
+        for offset, content in enumerate(stale_rows + [user_added]):
             it = TodoItem(content=content)
             db.add(it)
             await db.commit()
@@ -242,8 +258,6 @@ async def test_stale_daily_log_rows_are_removed_from_muhasebe(si_client):
             ))
         await db.commit()
 
-    # Run the seeder — the four stale rows should disappear; user
-    # row stays.
     async with factory() as db:
         await ensure_lists_seeded(db)
 
@@ -255,7 +269,12 @@ async def test_stale_daily_log_rows_are_removed_from_muhasebe(si_client):
             .where(todo_list_items.c.todo_list_id == ml.id)
         )).all()
     contents = {r[0] for r in rows}
+    # No exact-match stale row, no prefix-match stale row.
     assert _OLD_MUHASEBE_DAILY_LOG_ITEMS.isdisjoint(contents)
+    assert not any(
+        c.startswith(p) for c in contents for p in _OLD_MUHASEBE_PREFIX_CLEANUP
+    )
+    # User row survives.
     assert user_added in contents
 
 
@@ -510,7 +529,7 @@ async def test_refresh_daily_pending_rows_is_idempotent(db_session):
     n1 = await self_improvement_service.refresh_daily_pending_rows(
         db_session, user_id=99,
     )
-    assert n1 == 147  # 28 + 28 + 12 + 40 + 39 across the five lists
+    assert n1 == 143  # 17 + 28 + 12 + 40 + 39 + 7 + 0 + 0 across eight lists
     n2 = await self_improvement_service.refresh_daily_pending_rows(
         db_session, user_id=99,
     )
@@ -532,7 +551,7 @@ def test_overview_works_anonymously_during_login_bypass(api_client):
     r = api_client.get("/api/self-improvement/overview")
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["items_total"] == 147
+    assert body["items_total"] == 143
     cats = {s["category"] for s in body["sections"]}
     assert {"muhasebe", "willpower", "love_god", "fears", "divine_man"} <= cats
 
