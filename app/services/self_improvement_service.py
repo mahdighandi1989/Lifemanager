@@ -201,19 +201,45 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
 
         # ── Catch-up branch ─────────────────────────────────────────
         # A list with FEWER items than the canonical seed is treated
-        # as partially seeded — we top it up by appending whatever's
-        # missing. This recovers gracefully from the production
-        # incident where Postgres rejected long items (VARCHAR(1000)
-        # vs 2.3k-char love_god items) and left the list with only
-        # the short rows committed. After migration 0010 widens the
-        # column to TEXT, the next overview call quietly fills the
-        # gap without manual intervention.
+        # as partially seeded — top it up by appending whatever's
+        # missing. Each insert lives in its own transaction so one
+        # truncation (a stale VARCHAR(1000) column rejecting a 2.3k
+        # love_god row, the original production incident) doesn't
+        # abort the whole catch-up — the rest of the list still gets
+        # in, and the failed row is retried on the next request once
+        # the startup ALTER widens the column to TEXT.
         if 0 < n_items < len(items):
             existing_contents = {c for (_i, c, _p) in existing_items}
             start_pos = max(p for (_i, _c, p) in existing_items) + 1
             for offset, content in enumerate(items):
                 if content in existing_contents:
                     continue
+                try:
+                    item = TodoItem(content=content)
+                    db.add(item)
+                    await db.commit()
+                    await db.refresh(item)
+                    await db.execute(
+                        insert(todo_list_items).values(
+                            todo_list_id=existing.id,
+                            todo_item_id=item.id,
+                            position=start_pos + offset,
+                        )
+                    )
+                    await db.commit()
+                    total_new_items += 1
+                except Exception as exc:
+                    await db.rollback()
+                    logger.warning(
+                        "self-improvement catch-up: skip item len=%d in '%s': %s",
+                        len(content), list_name, exc,
+                    )
+            continue
+
+        if n_items:
+            continue
+        for position, content in enumerate(items):
+            try:
                 item = TodoItem(content=content)
                 db.add(item)
                 await db.commit()
@@ -222,29 +248,17 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
                     insert(todo_list_items).values(
                         todo_list_id=existing.id,
                         todo_item_id=item.id,
-                        position=start_pos + offset,
+                        position=position,
                     )
                 )
+                await db.commit()
                 total_new_items += 1
-            await db.commit()
-            continue
-
-        if n_items:
-            continue
-        for position, content in enumerate(items):
-            item = TodoItem(content=content)
-            db.add(item)
-            await db.commit()
-            await db.refresh(item)
-            await db.execute(
-                insert(todo_list_items).values(
-                    todo_list_id=existing.id,
-                    todo_item_id=item.id,
-                    position=position,
+            except Exception as exc:
+                await db.rollback()
+                logger.warning(
+                    "self-improvement seed: skip item len=%d in '%s': %s",
+                    len(content), list_name, exc,
                 )
-            )
-            total_new_items += 1
-        await db.commit()
     return total_new_items
 
 
