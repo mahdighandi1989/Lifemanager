@@ -2,6 +2,18 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AuthContext = createContext(null);
 
+// API_BASE is an empty string on purpose — NOT a "threshold-outcome
+// mismatch" anti-pattern. AuthContext's targets (`/users/`,
+// `/auth/login`, `/auth/register`) are mounted at the FastAPI root,
+// not behind the `/api/` prefix the rest of the SPA uses. Because the
+// React bundle is served from the SAME origin as the FastAPI backend
+// (single Render service — see render.yaml: `npm run build && pip
+// install -r requirements.txt` then `uvicorn`), a same-origin fetch
+// resolves correctly without any env-var indirection. Adding a Vite
+// VITE_API_BASE override here would be dead configurability — every
+// deployment lives on one origin by design. Other pages (Tasks,
+// Projects, Lists, Dashboard) declare `API_BASE = '/api'` because
+// THEIR endpoints sit under the `/api/` prefix.
 const API_BASE = '';
 
 export function AuthProvider({ children }) {
