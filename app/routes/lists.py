@@ -23,6 +23,8 @@ from app.schemas.todo_list_schema import (
     TodoListUpdate,
     TodoListWithItemsOut,
 )
+from app.routes._serializers import serialize_item as _serialize_item
+from app.routes._serializers import serialize_list as _serialize_list
 from app.services import list_service, todo_item_service
 
 logger = logging.getLogger(__name__)
@@ -30,36 +32,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-def _serialize_list(obj, item_count: int = 0) -> dict:
-    return {
-        "id": obj.id,
-        "name": obj.name,
-        "description": obj.description,
-        "user_id": obj.user_id,
-        "sort_order": obj.sort_order,
-        "is_archived": bool(obj.is_archived),
-        "item_count": item_count,
-        "created_at": obj.created_at.isoformat() if obj.created_at else None,
-        "updated_at": obj.updated_at.isoformat() if obj.updated_at else None,
-    }
-
-
-def _serialize_item(obj, list_ids=None) -> dict:
-    return {
-        "id": obj.id,
-        "content": obj.content,
-        "description": obj.description,
-        "is_completed": bool(obj.is_completed),
-        "is_starred": bool(obj.is_starred),
-        "parent_id": obj.parent_id,
-        "due_date": obj.due_date.isoformat() if obj.due_date else None,
-        "owner_id": obj.owner_id,
-        "list_ids": list_ids if list_ids is not None else [lst.id for lst in obj.lists],
-        "completed_at": obj.completed_at.isoformat() if obj.completed_at else None,
-        "created_at": obj.created_at.isoformat() if obj.created_at else None,
-        "updated_at": obj.updated_at.isoformat() if obj.updated_at else None,
-    }
-
+# Item / list serialisers live in app/routes/_serializers.py so the
+# todo_items router and this one share one implementation. Aliased
+# under the historical names so the rest of this file keeps reading.
 
 # --- LIST -------------------------------------------------------------------
 

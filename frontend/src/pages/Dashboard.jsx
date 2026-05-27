@@ -39,7 +39,14 @@ function Dashboard() {
           const projects = await projectsRes.json();
           const taskList = Array.isArray(tasks) ? tasks : [];
           const projectList = Array.isArray(projects) ? projects : [];
-          const completed = taskList.filter(t => t.status === 'completed').length;
+          // Backend's TaskStatus enum uses "done" as the finished
+          // marker (see app/models/task.py). Older rows may still
+          // carry the legacy "completed" string — treat both as
+          // finished here so the dashboard counter doesn't silently
+          // misreport progress.
+          const completed = taskList.filter(
+            t => t.status === 'done' || t.status === 'completed',
+          ).length;
           setStats({ tasks: taskList.length, projects: projectList.length, completed });
           setApiStatus('connected');
         } else {
