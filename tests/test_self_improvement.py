@@ -201,6 +201,71 @@ async def test_placeholder_muhasebe_items_are_replaced(si_client):
     assert muhasebe["items"][0]["content"].startswith("مشارطه")
 
 
+@pytest.mark.asyncio
+async def test_partially_seeded_list_is_topped_up(si_client):
+    """Reproduces the production incident: VARCHAR(1000) on Postgres
+    rejected long love_god items, leaving the list with 2/12 rows
+    committed. After the column is widened (migration 0010) the
+    runtime helper must recognise the partial seed and append the
+    missing items without duplicating the survivors.
+    """
+    from sqlalchemy import select
+    from app.services._self_improvement_seed_data import SELF_IMPROVEMENT_LISTS
+    from app.services.self_improvement_service import ensure_lists_seeded
+
+    client, factory = si_client
+    love_god_name = "خودسازی - عشق به خدا"
+    expected_items = SELF_IMPROVEMENT_LISTS[love_god_name]
+    assert len(expected_items) == 12
+
+    # Delete 10 of the 12 items to simulate partial seeding.
+    async with factory() as db:
+        lst = (await db.execute(
+            select(TodoList).where(TodoList.name == love_god_name)
+        )).scalar_one()
+        survivors = (await db.execute(
+            select(TodoItem.id, TodoItem.content, todo_list_items.c.position)
+            .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
+            .where(todo_list_items.c.todo_list_id == lst.id)
+            .order_by(todo_list_items.c.position)
+        )).all()
+        # Keep first 2 short items (mimic VARCHAR(1000) survival pattern).
+        keep = sorted(survivors, key=lambda r: len(r[1]))[:2]
+        keep_ids = {r[0] for r in keep}
+        drop_ids = [r[0] for r in survivors if r[0] not in keep_ids]
+        from sqlalchemy import delete as _d
+        await db.execute(todo_list_items.delete().where(
+            todo_list_items.c.todo_item_id.in_(drop_ids)
+        ))
+        await db.execute(_d(TodoItem).where(TodoItem.id.in_(drop_ids)))
+        await db.commit()
+
+    # Sanity: list now has 2 items.
+    async with factory() as db:
+        lst = (await db.execute(select(TodoList).where(TodoList.name == love_god_name))).scalar_one()
+        n_before = (await db.execute(
+            select(todo_list_items).where(todo_list_items.c.todo_list_id == lst.id)
+        )).all()
+        assert len(n_before) == 2
+
+    # Trigger the catch-up via the runtime helper.
+    async with factory() as db:
+        added = await ensure_lists_seeded(db)
+        assert added == 10  # exactly the 10 missing love_god items
+
+    # Final state: 12 items, no duplicates.
+    async with factory() as db:
+        lst = (await db.execute(select(TodoList).where(TodoList.name == love_god_name))).scalar_one()
+        rows = (await db.execute(
+            select(TodoItem.content)
+            .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
+            .where(todo_list_items.c.todo_list_id == lst.id)
+        )).all()
+    contents = [r[0] for r in rows]
+    assert len(contents) == 12
+    assert set(contents) == set(expected_items)
+
+
 # --- Daily-update endpoint -------------------------------------------------
 
 

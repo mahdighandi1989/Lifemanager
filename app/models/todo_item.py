@@ -32,7 +32,13 @@ class TodoItem(Base):
     __tablename__ = "todo_items"
 
     id = Column(Integer, primary_key=True, index=True)
-    content = Column(String(1000), nullable=False)
+    # Text (not VARCHAR(1000)) — the self-improvement seed includes
+    # paragraph-length items (up to ~2.3k chars for the "عشق به خدا"
+    # form where each row is a habit + a multi-sentence explanation).
+    # VARCHAR(1000) on Postgres rejected those inserts with
+    # StringDataRightTruncation, partially seeding the list (12 → 2,
+    # 28 → 25) and bricking /api/self-improvement/overview with a 500.
+    content = Column(Text, nullable=False)
     description = Column(Text, nullable=True)
     is_completed = Column(Boolean, nullable=False, server_default="0", default=False)
     is_starred = Column(Boolean, nullable=False, server_default="0", default=False)
