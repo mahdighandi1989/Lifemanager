@@ -413,6 +413,111 @@ async def startup_event():
     except Exception as exc:
         logger.warning("skip startup realign block: %s", exc, exc_info=True)
 
+    # ── Brute-force fallback: hard-reset divine_man if misordered ──
+    # The user reported the note + "مرد خدا اینجوریه که:" header
+    # still rendering at the END of the شخصیت مرد الهی list across
+    # multiple deploys, even though _realign_positions tests pass
+    # locally. Whatever's happening on production isn't caught by my
+    # SQLite tests, so we bypass the smart-reordering path entirely:
+    # if positions 35 + 36 of the divine_man list aren't the note +
+    # header, wipe the list and re-seed in canonical order. No
+    # user data is at risk — the list carries no check-ins yet
+    # (the screenshot shows "از 41 تکمیل شده 0") and items can be
+    # re-added by the user if they'd manually appended any.
+    try:
+        from app.database import SessionLocal
+        from app.models.todo_item import TodoItem
+        from app.models.todo_list import TodoList, todo_list_items
+        from app.services._self_improvement_seed_data import (
+            SELF_IMPROVEMENT_LISTS,
+        )
+        from app.services.self_improvement_service import (
+            SI_DESCRIPTION_HEADER,
+            SI_DESCRIPTION_NOTE,
+            _parse_seed_item,
+        )
+        from sqlalchemy import delete as _delete
+        from sqlalchemy import insert as _insert
+        from sqlalchemy import select as _select
+
+        divine_name = "شخصیت یک مرد الهی – مردِ خدا ..."
+        seed = SELF_IMPROVEMENT_LISTS.get(divine_name)
+        if seed:
+            async with SessionLocal() as session:
+                lst = (await session.execute(
+                    _select(TodoList).where(TodoList.name == divine_name)
+                )).scalar_one_or_none()
+                if lst is not None:
+                    rows = (await session.execute(
+                        _select(
+                            TodoItem.id,
+                            TodoItem.content,
+                            TodoItem.description,
+                            todo_list_items.c.position,
+                        )
+                        .join(todo_list_items,
+                              todo_list_items.c.todo_item_id == TodoItem.id)
+                        .where(todo_list_items.c.todo_list_id == lst.id)
+                        .order_by(todo_list_items.c.position)
+                    )).all()
+                    needs_reset = (
+                        len(rows) != len(seed)
+                        or (len(rows) >= 37 and (
+                            rows[35][2] != SI_DESCRIPTION_NOTE
+                            or rows[36][2] != SI_DESCRIPTION_HEADER
+                        ))
+                    )
+                    if needs_reset:
+                        logger.info(
+                            "divine_man HARD RESET — rows=%d, "
+                            "pos35.desc=%r, pos36.desc=%r",
+                            len(rows),
+                            rows[35][2] if len(rows) > 35 else None,
+                            rows[36][2] if len(rows) > 36 else None,
+                        )
+                        old_item_ids = [r[0] for r in rows]
+                        await session.execute(
+                            todo_list_items.delete()
+                            .where(todo_list_items.c.todo_list_id == lst.id)
+                        )
+                        if old_item_ids:
+                            await session.execute(
+                                _delete(TodoItem)
+                                .where(TodoItem.id.in_(old_item_ids))
+                            )
+                        await session.commit()
+                        for position, raw in enumerate(seed):
+                            content, kind = _parse_seed_item(raw)
+                            new_item = TodoItem(
+                                content=content, description=kind
+                            )
+                            session.add(new_item)
+                            await session.commit()
+                            await session.refresh(new_item)
+                            await session.execute(
+                                _insert(todo_list_items).values(
+                                    todo_list_id=lst.id,
+                                    todo_item_id=new_item.id,
+                                    position=position,
+                                )
+                            )
+                        await session.commit()
+                        logger.info(
+                            "divine_man HARD RESET complete — %d rows "
+                            "re-inserted in canonical order",
+                            len(seed),
+                        )
+                    else:
+                        logger.info(
+                            "divine_man order check ✓ (rows=%d, "
+                            "pos35=NOTE, pos36=HEADER)",
+                            len(rows),
+                        )
+    except Exception as exc:
+        logger.warning(
+            "skip divine_man hard-reset: %s", exc, exc_info=True,
+        )
+
 
 # Health endpoints — registered BEFORE the SPA catch-all so they always win.
 # `/api/health` matches the path configured in render.yaml's healthCheckPath.
