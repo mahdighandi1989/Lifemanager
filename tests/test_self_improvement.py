@@ -150,6 +150,93 @@ async def test_overview_persists_pending_rows_idempotently(si_client):
 
 
 @pytest.mark.asyncio
+async def test_catch_up_realigns_note_header_to_canonical_position(si_client):
+    """Reproduces the production state the user flagged: divine_man had
+    all 39 checklist rows already (from the previous cut), but the
+    inline note + header rows that the latest seed adds between
+    items 35 and 36 don't exist yet. A naive catch-up that just
+    appends at the end of the list would dump the prose to position
+    39/40 — visually AFTER item 39 instead of between 35 and 36.
+    The realign pass must restore the canonical seed order."""
+    from sqlalchemy import insert, select
+    from app.services._self_improvement_seed_data import (
+        SELF_IMPROVEMENT_LISTS,
+    )
+    from app.services.self_improvement_service import (
+        _parse_seed_item,
+        ensure_lists_seeded,
+    )
+
+    client, factory = si_client
+    divine_name = "شخصیت یک مرد الهی – مردِ خدا ..."
+    seed_items = SELF_IMPROVEMENT_LISTS[divine_name]
+
+    # Build a "no-prose" version of the list: 39 checklist rows in
+    # their relative order, no note + no header. This mirrors what
+    # an old-cut production DB looks like.
+    async with factory() as db:
+        lst = (await db.execute(
+            select(TodoList).where(TodoList.name == divine_name)
+        )).scalar_one()
+        await db.execute(todo_list_items.delete().where(
+            todo_list_items.c.todo_list_id == lst.id
+        ))
+        # Also wipe the orphaned TodoItem rows from the fixture seed.
+        from sqlalchemy import delete as _del
+        old_ids = (await db.execute(
+            select(TodoItem.id)
+            .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id, isouter=True)
+            .where(todo_list_items.c.todo_item_id.is_(None))
+        )).all()
+        if old_ids:
+            await db.execute(_del(TodoItem).where(TodoItem.id.in_([r[0] for r in old_ids])))
+        await db.commit()
+        # Insert only the 39 checklist rows, contiguous positions 0-38.
+        pos = 0
+        for raw in seed_items:
+            content, kind = _parse_seed_item(raw)
+            if kind is not None:
+                continue  # skip note/header
+            it = TodoItem(content=content)
+            db.add(it)
+            await db.commit()
+            await db.refresh(it)
+            await db.execute(insert(todo_list_items).values(
+                todo_list_id=lst.id, todo_item_id=it.id, position=pos,
+            ))
+            pos += 1
+        await db.commit()
+
+    # Run the seeder — catch-up should add the note + header AND
+    # realign so the canonical seed order is restored.
+    async with factory() as db:
+        await ensure_lists_seeded(db)
+
+    # Final inspection: items ordered by position. Position 35 must
+    # be the note, position 36 must be the header, position 37 the
+    # first "after-header" checklist row.
+    async with factory() as db:
+        lst = (await db.execute(
+            select(TodoList).where(TodoList.name == divine_name)
+        )).scalar_one()
+        rows = (await db.execute(
+            select(TodoItem.content, TodoItem.description, todo_list_items.c.position)
+            .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
+            .where(todo_list_items.c.todo_list_id == lst.id)
+            .order_by(todo_list_items.c.position)
+        )).all()
+    assert len(rows) == 41  # 35 + 1 note + 1 header + 4
+    # Spot-check critical positions.
+    assert rows[34][0].startswith("خارج از چشم بقیه")  # item 35
+    assert rows[35][1] == "__SI_NOTE__"  # paragraph
+    assert rows[35][0].startswith("همه این موارد")
+    assert rows[36][1] == "__SI_HEADER__"  # header
+    assert rows[36][0] == "مرد خدا اینجوریه که:"
+    assert rows[37][0].startswith("وارد جزئیات بیخود")  # item 36 (user's #)
+    assert rows[40][0].startswith("شب ها در دل شب")  # item 39 (user's #)
+
+
+@pytest.mark.asyncio
 async def test_divine_man_carries_note_and_header_between_items_35_and_36(si_client):
     """User's restructure: between items 35 and 36 of the شخصیت یک مرد
     الهی list, a paragraph (kind=note) and a section header
