@@ -86,6 +86,18 @@ _STATUS_INPUT_ALIASES = {
     "completed": "done",
 }
 
+# Reverse mapping for the outbound contract. The audit asked for the
+# API to speak the "pending"/"completed" vocabulary the original
+# frontend and docs use; we keep the DB enum on
+# {todo,in_progress,done,cancelled} (no schema migration needed) and
+# translate at the serialiser instead. Clients that explicitly want
+# the enum-canonical names can still read TaskStatus directly via
+# OpenAPI or the model.
+_STATUS_OUTPUT_ALIASES = {
+    "todo": "pending",
+    "done": "completed",
+}
+
 
 def _normalise_status_input(value: str | None) -> str | None:
     if value is None:
@@ -93,12 +105,19 @@ def _normalise_status_input(value: str | None) -> str | None:
     return _STATUS_INPUT_ALIASES.get(value, value)
 
 
+def _normalise_status_output(value: str | None) -> str | None:
+    """DB enum → public API name (todo→pending, done→completed)."""
+    if value is None:
+        return None
+    return _STATUS_OUTPUT_ALIASES.get(value, value)
+
+
 def _serialize(t: Task) -> dict:
     return {
         "id": t.id,
         "title": t.title,
         "description": t.description,
-        "status": t.status.value if t.status else "todo",
+        "status": _normalise_status_output(t.status.value if t.status else "todo"),
         "priority": _priority_to_int(t.priority),
         "user_id": t.user_id,
         "project_id": t.project_id,
