@@ -285,6 +285,23 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip todo_items.%s migration: %s", col_name, exc)
 
+    # todo_items.content used to be VARCHAR(1000) — too narrow for the
+    # self-improvement seed where each "عشق به خدا" row is a 1500–2300
+    # char habit-plus-explanation paragraph. Postgres rejected those
+    # inserts with StringDataRightTruncation, leaving the list at 2/12
+    # and bricking /api/self-improvement/overview with a 500. Migration
+    # 0010 ALTERs the column to TEXT, but Render's free tier skips
+    # alembic — so the ALTER must also live in the startup path. It's
+    # idempotent on Postgres (a no-op once the column is already TEXT).
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("ALTER TABLE todo_items ALTER COLUMN content TYPE TEXT")
+            )
+            logger.info("widened todo_items.content to TEXT")
+    except Exception as exc:
+        logger.debug("skip todo_items.content TEXT migration: %s", exc)
+
     # tasks.due_date used to be TIMESTAMP; the model now declares Date to
     # match the Pydantic schema. Convert the existing column on Postgres so
     # ORM reads/writes line up. USING due_date::date drops any time portion.
