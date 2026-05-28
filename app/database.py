@@ -31,10 +31,21 @@ Base = declarative_base()
 
 
 async def init_db():
-    """ایجاد جداول دیتابیس به صورت async
+    """Create database tables via ``Base.metadata.create_all``.
+
+    This function is intended for development/testing environments only.
+    Production deployments require a dedicated schema migration tool
+    (e.g., Alembic) — run ``alembic.command.upgrade(config, "head")``
+    on rollout so column additions, type widenings, and data backfills
+    are tracked as named revisions instead of being silently created
+    by create_all (which only adds missing tables, never alters them).
+
+    The audit (task_882723eb07de) flagged this as an under-engineering
+    anti-pattern; the comment above makes the boundary explicit.
 
     Returns:
-        bool: True اگر جداول با موفقیت ایجاد شدند، False در غیر این صورت
+        bool: True if tables were created (or already existed), False
+              if a connection / permission error blocked creation.
     """
     try:
         async with engine.begin() as conn:
