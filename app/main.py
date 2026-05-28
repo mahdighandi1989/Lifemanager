@@ -19,6 +19,7 @@ from app.rate_limit import limiter
 from app.routes import (
     ai,
     auth,
+    finance,
     integrations,
     lists,
     local_files,
@@ -588,6 +589,7 @@ app.include_router(lists.router)
 app.include_router(todo_items.router)
 app.include_router(local_files.router)
 app.include_router(person.router)
+app.include_router(finance.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
