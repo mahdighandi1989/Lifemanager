@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-05-28T19:53:56.425850+00:00",
+  "generated_at": "2026-05-28T19:56:27.463448+00:00",
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
   "total": 20,
@@ -183,7 +183,7 @@
       "path": "prompt/task-a997baa8-89fe-483d-b0ff-f0b0c36175c0.md",
       "external_attempts": 0,
       "created_at": "2026-05-26T20:27:04.768022+00:00",
-      "updated_at": "2026-05-26T23:07:41.293131+00:00"
+      "updated_at": "2026-05-28T19:56:24.080399+00:00"
     },
     {
       "task_id": "b7638cb2-238e-4f55-8544-2b9065f84023",
