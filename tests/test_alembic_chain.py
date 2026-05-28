@@ -73,14 +73,16 @@ def test_every_down_revision_exists():
             assert down in revs, f"{rev}: down_revision {down!r} does not exist"
 
 
-def test_head_is_0012_recent_models():
-    """Audit task 3ea5622b — the head revision must be the new
-    0012_recent_models migration so a fresh alembic upgrade head
-    creates every recently added table."""
+def test_head_is_latest_sync_migration():
+    """Audit task 3ea5622b — there is exactly one head and it is the latest
+    sync migration (0014_sync_remaining_model_tables), so a fresh
+    `alembic upgrade head` creates every model table. The head advanced from
+    0012 when 0013_drive_files and 0014_sync_remaining_model_tables were added
+    to close the migrations-vs-models drift."""
     revs = _parse_revs()
     children: dict[str, list[str]] = {}
     for rev, down in revs.items():
         if down is not None:
             children.setdefault(down, []).append(rev)
     heads = [r for r in revs if r not in children]
-    assert heads == ["0012_recent_models"], f"unexpected head(s): {heads}"
+    assert heads == ["0014_sync_remaining_model_tables"], f"unexpected head(s): {heads}"

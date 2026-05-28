@@ -34,19 +34,26 @@ def upgrade() -> None:
     bind = op.get_bind()
 
     if not _has_column(bind, "todo_items", "parent_id"):
-        # SQLite can't add a column with an inline FOREIGN KEY in older
-        # versions, but the version bundled with our test rig supports
-        # it. The Postgres path obviously does too.
-        op.add_column(
-            "todo_items",
-            sa.Column(
-                "parent_id",
-                sa.Integer(),
-                sa.ForeignKey("todo_items.id", ondelete="CASCADE"),
-                nullable=True,
-                index=True,
-            ),
-        )
+        if bind.dialect.name == "sqlite":
+            # SQLite raises "No support for ALTER of constraints" when an
+            # ADD COLUMN carries an inline FOREIGN KEY. Add the plain column;
+            # the self-referential parent link is enforced at the app layer
+            # (and SQLite is the test rig, not production).
+            op.add_column(
+                "todo_items",
+                sa.Column("parent_id", sa.Integer(), nullable=True, index=True),
+            )
+        else:
+            op.add_column(
+                "todo_items",
+                sa.Column(
+                    "parent_id",
+                    sa.Integer(),
+                    sa.ForeignKey("todo_items.id", ondelete="CASCADE"),
+                    nullable=True,
+                    index=True,
+                ),
+            )
 
     if not _has_column(bind, "todo_items", "due_date"):
         op.add_column(
