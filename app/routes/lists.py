@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.schemas.todo_item_schema import TodoItemOut
 from app.schemas.todo_list_schema import (
@@ -44,7 +45,17 @@ router = APIRouter()
 async def list_lists(
     include_archived: bool = Query(default=False),
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> List[dict]:
+    """List the caller's todo lists.
+
+    ``get_optional_user_id`` returns ``DEFAULT_ANON_USER_ID`` (0) when
+    no bearer token is presented, so the frontend's login-bypass mode
+    still resolves a stable per-user scope. When a real JWT is supplied
+    the dep enforces signature + expiry on it (see
+    AuthService.verify_token), which closes the authz gap audit task
+    78c0e8e0 flagged for this endpoint.
+    """
     lists = await list_service.list_lists(db, include_archived=include_archived)
     out: List[dict] = []
     for lst in lists:

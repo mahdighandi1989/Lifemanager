@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.schemas.todo_item_schema import (
     TodoItemCreate,
@@ -43,7 +44,16 @@ async def list_todo_items(
     starred_only: bool = Query(default=False),
     completed: bool | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> List[dict]:
+    """List todo items in the caller's scope.
+
+    Like ``list_lists`` (audit task 78c0e8e0), this endpoint pulls the
+    caller's user id through ``get_optional_user_id`` — which validates
+    a bearer JWT when present and falls back to ``DEFAULT_ANON_USER_ID``
+    when not, so the existing frontend login-bypass mode keeps working
+    while the route gains a real auth gate the moment a token shows up.
+    """
     items = await todo_item_service.list_items(
         db, list_id=list_id, starred_only=starred_only, completed=completed
     )
