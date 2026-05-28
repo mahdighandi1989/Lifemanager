@@ -137,6 +137,22 @@ settings = _validate(Settings())
 DEFAULT_BACKGROUND_VALUE = "card"
 
 
+# Rules table consumed by app/services/data_classification_service.py
+# (audit task 7367c6f0). An operator can tune the essential-window
+# without redeploying by overriding individual keys from an env
+# loader; the service falls back to its own DEFAULT_RULES if this
+# constant is empty.
+DATA_CLASSIFICATION_RULES = {
+    "essential_window_days": 7,
+}
+
+# Hard cap on user-facing TodoItem content. The migration 0010
+# widened the column to TEXT for the seeded self-improvement rows;
+# regular user-supplied content stays bounded here so a UI bug
+# can't drop a multi-megabyte string into the DB.
+MAX_TODO_ITEM_CONTENT_LENGTH = 4096
+
+
 # Module-level feature-flag mirrors. They evaluate at import time from the
 # same env vars Settings reads, so static greps for `os.getenv("FEATURE_X")`
 # find the canonical lookup in this file. Kept in sync with the Settings
