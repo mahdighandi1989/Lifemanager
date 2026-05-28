@@ -938,6 +938,10 @@
   "frontend": {
     "pages": [
       {
+        "name": "AISettings",
+        "file": "frontend/src/pages/AISettings.jsx"
+      },
+      {
         "name": "Dashboard",
         "file": "frontend/src/pages/Dashboard.jsx"
       },
@@ -946,12 +950,20 @@
         "file": "frontend/src/pages/Home.jsx"
       },
       {
+        "name": "Home.test",
+        "file": "frontend/src/pages/__tests__/Home.test.jsx"
+      },
+      {
         "name": "ListDetail",
         "file": "frontend/src/pages/ListDetail.jsx"
       },
       {
         "name": "Lists",
         "file": "frontend/src/pages/Lists.jsx"
+      },
+      {
+        "name": "Lists.delete.test",
+        "file": "frontend/src/pages/__tests__/Lists.delete.test.jsx"
       },
       {
         "name": "Login",
@@ -972,14 +984,6 @@
       {
         "name": "Tasks",
         "file": "frontend/src/pages/Tasks.jsx"
-      },
-      {
-        "name": "Home.test",
-        "file": "frontend/src/pages/__tests__/Home.test.jsx"
-      },
-      {
-        "name": "Lists.delete.test",
-        "file": "frontend/src/pages/__tests__/Lists.delete.test.jsx"
       }
     ],
     "components": [
