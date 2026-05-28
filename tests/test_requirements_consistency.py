@@ -50,6 +50,33 @@ def test_bcrypt_pinned_below_4_1_for_passlib_compat():
     )
 
 
+def test_no_bcrypt_declaration_permits_4_1_or_higher():
+    """AC2 (task 850097a9): "no OTHER line with a higher bcrypt version".
+
+    The check above only asserts the `bcrypt<4.1` cap is PRESENT — a stray
+    second line like `bcrypt==4.2` would still satisfy it yet reintroduce
+    the passlib 1.7.4 breakage at install time. This pins the stronger
+    invariant: the bare `bcrypt` package is declared exactly once and that
+    single declaration caps below 4.1. (`passlib[bcrypt]` is the passlib
+    package with a bcrypt extra — not a bcrypt version pin — so it is
+    excluded.)"""
+    bcrypt_lines: list[str] = []
+    for raw in REQ.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        match = _PACKAGE_NAME_RE.match(line)
+        if match and match.group(1).lower() == "bcrypt":
+            bcrypt_lines.append(line)
+
+    assert len(bcrypt_lines) == 1, (
+        f"expected exactly one bare `bcrypt` declaration, found {bcrypt_lines}"
+    )
+    assert re.search(r"<\s*4\.1|<=\s*4\.0(\.\d+)?\b", bcrypt_lines[0]), (
+        f"the bcrypt declaration must cap below 4.1, got: {bcrypt_lines[0]!r}"
+    )
+
+
 def test_requirements_file_is_pip_parseable():
     """AC 1 of audit task 850097a9: ``pip install -r requirements.txt``
     must succeed. We can't run pip in a unit test, but we can verify
