@@ -95,6 +95,10 @@ class AIGenerateRequest(BaseModel):
     # `prompt` so the model sees both.
     system_role_prompt: Optional[str] = Field(default=None, max_length=4000)
     task_context: Optional[str] = Field(default=None, max_length=10_000)
+    # AC 23 — UserActivityContext piggybacks here optionally; when the
+    # caller doesn't provide it the route falls back to assembling a
+    # fresh one via get_user_activity_context.
+    user_context: Optional["UserActivityContext"] = None
 
     @field_validator("prompt")
     @classmethod
@@ -107,12 +111,23 @@ class AIGenerateRequest(BaseModel):
         return value
 
 
+class UserActivityContext(BaseModel):
+    """Audit task e606cca6 AC 22 — snapshot of a user's open work, used
+    by the AI flow to ground its responses in the caller's actual
+    surface (open tasks, recent completions, active projects)."""
+
+    open_tasks: list = Field(default_factory=list)
+    recently_completed_tasks: list = Field(default_factory=list)
+    active_projects: list = Field(default_factory=list)
+
+
 class DynamicAnalysisRequest(BaseModel):
     """Payload for POST /ai/dynamic-analyze (audit task e606cca6)."""
 
     prompt: str = Field(..., min_length=1, max_length=10_000)
     system_role_prompt: Optional[str] = None
     task_context: Optional[str] = None
+    user_context: Optional[UserActivityContext] = None
 
 
 class DynamicAnalysisResponse(BaseModel):
@@ -136,3 +151,8 @@ class AIGenerateResponse(BaseModel):
     generated_text: str
     model_used: Optional[str] = None
     tokens_used: Optional[int] = None
+
+
+# Resolve the forward reference now that UserActivityContext is defined
+# below AIGenerateRequest's class body.
+AIGenerateRequest.model_rebuild()

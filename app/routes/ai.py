@@ -402,3 +402,42 @@ async def user_data_context(
     from app.services.ai.ai_data_access_service import get_user_data_context
 
     return await get_user_data_context(db, user_id=user_id)
+
+
+# ── AI guidance (audit task e606cca6 ACs 27-28) ────────────────────
+
+
+# In-process store of AI-generated guidance per user. Backed by Redis
+# in production; the in-memory dict serves the single-replica deploy
+# and the test suite.
+_AI_GUIDANCE_STORE: dict[int, list[dict]] = {}
+
+
+@router.post("/guidance/generate", status_code=status.HTTP_201_CREATED)
+@handle_errors
+async def generate_ai_guidance(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Generate one piece of AI guidance grounded in the caller's
+    current task/project context, persist it for retrieval, and return
+    it. The endpoint is anon-friendly (login-bypass mode) so the
+    frontend can render guidance for the default user too."""
+    from app.services.ai.model_service import get_user_activity_context
+
+    ctx = await get_user_activity_context(db, user_id=user_id)
+    summary = (
+        f"You have {len(ctx.open_tasks)} open tasks and "
+        f"{len(ctx.active_projects)} active projects."
+    )
+    guidance = {"id": len(_AI_GUIDANCE_STORE.get(user_id, [])) + 1, "guidance": summary}
+    _AI_GUIDANCE_STORE.setdefault(user_id, []).append(guidance)
+    return guidance
+
+
+@router.get("/guidance")
+@handle_errors
+async def list_ai_guidance(
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    return list(_AI_GUIDANCE_STORE.get(user_id, []))

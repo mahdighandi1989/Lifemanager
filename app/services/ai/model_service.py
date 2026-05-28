@@ -140,3 +140,23 @@ async def get_active_config(db: AsyncSession) -> Optional[AIModelConfig]:
         select(AIModelConfig).where(AIModelConfig.is_active.is_(True)).limit(1)
     )
     return result.scalar_one_or_none()
+
+
+async def get_user_activity_context(db, *, user_id: int):
+    """Audit task e606cca6 AC 24 — assemble the caller's UserActivityContext
+    from app/models/task.py, app/models/project.py and app/models/todo_item.py.
+    Returns a fully populated schema instance (open tasks, recently
+    completed tasks, active projects)."""
+    from app.schemas.ai_schema import UserActivityContext
+    from app.services.ai.ai_data_access_service import (
+        get_user_data_context,
+    )
+
+    raw = await get_user_data_context(db, user_id=user_id)
+    open_tasks = [t for t in raw["tasks"] if t.get("status") != "completed"]
+    recent_completed = [t for t in raw["tasks"] if t.get("status") == "completed"][:5]
+    return UserActivityContext(
+        open_tasks=open_tasks,
+        recently_completed_tasks=recent_completed,
+        active_projects=raw["projects"],
+    )
