@@ -10,7 +10,7 @@ verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:20:22.917998+00:00'
-updated_at: '2026-05-28T10:26:58.056723+00:00'
+updated_at: '2026-05-28T11:50:24.146866+00:00'
 tags:
 - consolidated
 - post_verify_merge
@@ -1118,7 +1118,7 @@ _(مستقل)_
 ```
 
 ### Step 3: نوشتن message template فارسی و معنادار برای verify_failed
-**Status:** `done` (100%)
+**Status:** `partial` (50%)
 **Scope:** این مرحله شامل نوشتن یک message template به زبان فارسی است که معنادار و قابل فهم باشد. خارج از این مرحله: اضافه کردن notify_event call یا تنظیم silent/priority. نکته حیاتی: message باید به گونه‌ای باشد که کاربر متوجه شود چه event ای رخ داده است.
 **Excerpt:**
 ```
@@ -1126,7 +1126,7 @@ _(مستقل)_
 ```
 
 ### Step 4: تنظیم silent=False و priority='high' برای notify_event verify_failed
-**Status:** `done` (100%)
+**Status:** `partial` (50%)
 **Scope:** این مرحله شامل تنظیم پارامترهای silent=False و priority='high' در notify_event("verify_failed", ...) در فایل backend/app/handlers/failure_handler.py است. خارج از این مرحله: اضافه کردن notify_event call یا نوشتن message template. نکته حیاتی: این تنظیمات باید در همان call که اضافه شده است اعمال شوند.
 **Excerpt:**
 ```
@@ -1167,7 +1167,7 @@ _(مستقل)_
 ```
 
 ### Step 9: بررسی ثبت event_type task_done در event registry
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن register_event('task_done') در فایل‌های backend/app/notifications/event_registry.py و backend/app/notifications/events.py است. هدف تعیین این است که آیا این event از قبل ثبت شده است یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر event ثبت شده است، مرحله بعدی (ثبت) را رد کن.
 — [merged] این مرحله شامل ثبت event_type 'task_done' در فایل‌های backend/app/notifications/event_registry.py و backend/app/notifications/events.py است. خارج از این مرحله: اضافه کردن notify_event call یا UI. نکته حیاتی: اگر event از قبل ثبت شده است، این مرحله را رد کن.
 — [merged] این مرحله شامل جستجوی grep برای یافتن '"task_done"' در فایل‌های app/events/registry.py, backend/app/notifications/events.py, و backend/app/notifications/events.py است. هدف تعیین این است که آیا این event از قبل ثبت شده است یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر event ثبت شده است، مرحله بعدی (ثبت) را رد کن.
@@ -1187,7 +1187,7 @@ _(مستقل)_
 ```
 
 ### Step 11: بررسی وجود notify_event با event_type صریح در auth_service.py
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن notify_event(event='[a-z_]+') در فایل app/services/auth_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله بعدی (اضافه کردن) را رد کن.
 **Excerpt:**
 ```
@@ -1195,7 +1195,7 @@ _(مستقل)_
 ```
 
 ### Step 12: ثبت event_type task_done در event registry (auth_service)
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل ثبت event_type 'task_done' در فایل‌های app/events/registry.py, backend/app/notifications/events.py, و backend/app/notifications/events.py است. خارج از این مرحله: اضافه کردن notify_event call یا UI. نکته حیاتی: اگر event از قبل ثبت شده است، این مرحله را رد کن.
 **Excerpt:**
 ```
@@ -1203,7 +1203,7 @@ _(مستقل)_
 ```
 
 ### Step 13: اجرای pytest برای اطمینان از عدم شکست تست‌ها
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل اجرای دستور pytest برای اطمینان از اینکه هیچ تستی fail نمی‌شود. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1219,7 +1219,7 @@ _(مستقل)_
 ```
 
 ### Step 15: اجرای type-check برای اطمینان از موفقیت
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل اجرای type-check (مانند mypy) برای اطمینان از موفقیت آن. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1227,7 +1227,7 @@ _(مستقل)_
 ```
 
 ### Step 16: اجرای npm run build برای اطمینان از موفقیت build
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل اجرای دستور npm run build برای اطمینان از موفقیت build پروژه frontend است. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1243,7 +1243,7 @@ _(مستقل)_
 ```
 
 ### Step 18: بررسی و اضافه کردن rate-limit برای event verify_failed
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل بررسی نیاز به rate-limit برای event verify_failed و اضافه کردن آن در صورت لزوم است. خارج از این مرحله: تغییرات دیگر در notification pipeline. نکته حیاتی: اگر event پر-تکرار است، rate-limit اضافه کن تا spam نشود.
 **Excerpt:**
 ```
@@ -1251,7 +1251,7 @@ _(مستقل)_
 ```
 
 ### Step 19: بررسی و رفع مشکل orphan records در صورت rename event_type
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل بررسی و رفع مشکل orphan records در صورت rename event_type در database است. خارج از این مرحله: تغییرات دیگر. نکته حیاتی: اگر event_type قبلاً به نام دیگری در DB ذخیره شده، rename باعث می‌شود old records orphan شوند.
 — [merged] این مرحله شامل بررسی و رفع مشکل orphan records در صورت rename event_type در database است. خارج از این مرحله: تغییرات دیگر. نکته حیاتی: اگر event_type قبلاً به نام دیگری در DB ذخیره شده، rename باعث می‌شود old records orphan شوند.
 **Excerpt:**
