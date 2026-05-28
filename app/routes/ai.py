@@ -385,3 +385,20 @@ async def put_global_prompt(
     await db.commit()
     await db.refresh(prompt)
     return prompt
+
+
+# ── User data context for AI (audit task 1a08ded2 AC 29-31) ────────
+
+
+@router.get("/user_data_context")
+@handle_errors
+async def user_data_context(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Aggregate the caller's task/project/todo/notification surface
+    so the AI flow has user-scoped context. Always scoped to the
+    bearer's user_id — never leaks cross-user data (AC 31)."""
+    from app.services.ai.ai_data_access_service import get_user_data_context
+
+    return await get_user_data_context(db, user_id=user_id)
