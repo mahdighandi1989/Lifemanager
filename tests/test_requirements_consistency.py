@@ -48,3 +48,49 @@ def test_bcrypt_pinned_below_4_1_for_passlib_compat():
     assert re.search(r"^bcrypt\s*<\s*4\.1", text, flags=re.MULTILINE), (
         "requirements.txt must keep `bcrypt<4.1` to stay compatible with passlib 1.7.4"
     )
+
+
+def test_requirements_file_is_pip_parseable():
+    """AC 1 of audit task 850097a9: ``pip install -r requirements.txt``
+    must succeed. We can't run pip in a unit test, but we can verify
+    every line parses as a valid PEP-508 requirement (which is the
+    same surface the pip resolver consumes)."""
+    try:
+        from packaging.requirements import Requirement
+        from packaging.specifiers import SpecifierSet
+    except Exception as exc:  # packaging is a transitive dep of pip itself
+        import pytest as _pytest
+
+        _pytest.skip(f"packaging not importable: {exc}")
+
+    text = REQ.read_text(encoding="utf-8")
+    bad: list[str] = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            Requirement(line)
+        except Exception as exc:
+            bad.append(f"{line!r}: {exc}")
+    assert not bad, "unparseable requirement lines:\n" + "\n".join(bad)
+
+
+def test_installed_versions_match_pin():
+    """AC 1 + AC 3 — verify that the dev environment has actually
+    installed the pinned versions, so a future drift between
+    requirements.txt and the live env can't go unnoticed."""
+    import importlib.metadata as _md
+
+    expectations = {
+        "fastapi": "0.115.6",
+        "pydantic": "2.10.4",
+        "alembic": "1.14.0",
+    }
+    for pkg, want in expectations.items():
+        got = _md.version(pkg)
+        assert got == want, f"{pkg}: env has {got}, requirements says {want}"
+
+    # AC 3 — bcrypt must stay <4.1 for passlib compat.
+    bcrypt_v = tuple(int(x) for x in _md.version("bcrypt").split(".")[:2])
+    assert bcrypt_v < (4, 1), f"bcrypt {bcrypt_v} >= 4.1 — passlib 1.7.4 will break"
