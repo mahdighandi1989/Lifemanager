@@ -275,11 +275,13 @@ async def startup_event():
             logger.debug("skip tasks.%s migration: %s", col_name, exc)
 
     # todo_items: parent_id (subitem hierarchy) and due_date were added
-    # by migration 0006. Same ADD COLUMN IF NOT EXISTS pattern so the
+    # by migration 0006; ``type`` was added by migration 0012 (audit
+    # task 2165524b). Same ADD COLUMN IF NOT EXISTS pattern so the
     # Render-free-tier startup path (create_all only) gets them too.
     _todo_item_columns = [
         ("parent_id", "INTEGER REFERENCES todo_items(id) ON DELETE CASCADE"),
         ("due_date", "DATE"),
+        ("type", "VARCHAR(32) DEFAULT 'task' NOT NULL"),
     ]
     for col_name, col_type in _todo_item_columns:
         try:
