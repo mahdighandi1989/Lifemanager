@@ -33,3 +33,16 @@ class IntegrationOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+# AC 3 of audit task d2146781 — re-export the adapter dataclasses so
+# downstream schemas can refer to them without reaching into the
+# services/ tree.
+from app.services.integrations.external_project_interface import (  # noqa: E402
+    ExternalProjectConfig,
+    ExternalProjectInfo,
+)
+
+__all__ = [
+    "ExternalProjectConfig",
+    "ExternalProjectInfo",
+]
