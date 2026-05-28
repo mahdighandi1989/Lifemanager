@@ -7,7 +7,7 @@ route helpers below stay thin — error mapping lives in @handle_errors.
 import os
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -189,3 +189,151 @@ async def get_ai_metrics() -> dict:
     plus the SLO targets so a caller can render a green/red status.
     """
     return metrics_snapshot()
+
+
+# ── AI Providers + Global Analysis Prompt (audit task 1a08ded2) ─────
+
+
+from sqlalchemy import select as _select
+from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
+from app.schemas.ai_provider_schema import (
+    AIProviderCreate,
+    AIProviderResponse,
+    AIProviderUpdate,
+    GlobalAnalysisPromptResponse,
+    GlobalAnalysisPromptUpdate,
+)
+from app.dependencies.auth import get_optional_user_id
+
+
+@router.post(
+    "/providers",
+    response_model=AIProviderResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+@handle_errors
+async def create_ai_provider(
+    payload: AIProviderCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    provider = AIProvider(
+        user_id=user_id,
+        name=payload.name,
+        description=payload.description,
+        is_enabled=payload.is_enabled,
+    )
+    db.add(provider)
+    await db.commit()
+    await db.refresh(provider)
+    return provider
+
+
+@router.get("/providers", response_model=List[AIProviderResponse])
+@handle_errors
+async def list_ai_providers(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(AIProvider.user_id == user_id)
+    )
+    return list(result.scalars().all())
+
+
+@router.get("/providers/{provider_id}", response_model=AIProviderResponse)
+@handle_errors
+async def get_ai_provider(
+    provider_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+    return provider
+
+
+@router.patch("/providers/{provider_id}", response_model=AIProviderResponse)
+@handle_errors
+async def update_ai_provider(
+    provider_id: int,
+    payload: AIProviderUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+    if payload.name is not None:
+        provider.name = payload.name
+    if payload.description is not None:
+        provider.description = payload.description
+    if payload.is_enabled is not None:
+        provider.is_enabled = payload.is_enabled
+    await db.commit()
+    await db.refresh(provider)
+    return provider
+
+
+@router.delete("/providers/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)
+@handle_errors
+async def delete_ai_provider(
+    provider_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+    await db.delete(provider)
+    await db.commit()
+
+
+@router.get("/global-prompt", response_model=GlobalAnalysisPromptResponse)
+@handle_errors
+async def get_global_prompt(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(_select(GlobalAnalysisPrompt))
+    prompt = result.scalars().first()
+    if prompt is None:
+        # Default empty surface so the frontend can render the editor
+        # the very first time the page is opened.
+        return GlobalAnalysisPromptResponse(prompt_text="")
+    return prompt
+
+
+@router.put("/global-prompt", response_model=GlobalAnalysisPromptResponse)
+@handle_errors
+async def put_global_prompt(
+    payload: GlobalAnalysisPromptUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(_select(GlobalAnalysisPrompt))
+    prompt = result.scalars().first()
+    if prompt is None:
+        prompt = GlobalAnalysisPrompt(
+            prompt_text=payload.prompt_text, edited_by_user_id=user_id
+        )
+        db.add(prompt)
+    else:
+        prompt.prompt_text = payload.prompt_text
+        prompt.edited_by_user_id = user_id
+    await db.commit()
+    await db.refresh(prompt)
+    return prompt
