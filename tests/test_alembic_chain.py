@@ -71,3 +71,16 @@ def test_every_down_revision_exists():
     for rev, down in revs.items():
         if down is not None:
             assert down in revs, f"{rev}: down_revision {down!r} does not exist"
+
+
+def test_head_is_0012_recent_models():
+    """Audit task 3ea5622b — the head revision must be the new
+    0012_recent_models migration so a fresh alembic upgrade head
+    creates every recently added table."""
+    revs = _parse_revs()
+    children: dict[str, list[str]] = {}
+    for rev, down in revs.items():
+        if down is not None:
+            children.setdefault(down, []).append(rev)
+    heads = [r for r in revs if r not in children]
+    assert heads == ["0012_recent_models"], f"unexpected head(s): {heads}"
