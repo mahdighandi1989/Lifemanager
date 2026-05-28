@@ -47,6 +47,84 @@ function NotificationItem({ notification, onMarkRead }) {
   );
 }
 
+// Notification event types the user can opt in/out of from the settings
+// tab. `verify_failed` (audit task task_92fa5ea15e2b, AC8) is the
+// failed-login/verification alert — it must be toggleable here. Each
+// preference persists to localStorage under `notif_pref_<event>` so the
+// choice survives reloads without a backend round-trip.
+const EVENT_TYPES = [
+  { key: 'verify_failed', label: 'ورود ناموفق / تأیید ناموفق' },
+  { key: 'system', label: 'سیستم' },
+  { key: 'warning', label: 'هشدار' },
+  { key: 'error', label: 'خطا' },
+  { key: 'info', label: 'اطلاع‌رسانی' },
+];
+
+function readPref(key) {
+  try {
+    const stored = localStorage.getItem(`notif_pref_${key}`);
+    return stored === null ? true : stored === 'true';
+  } catch {
+    return true;
+  }
+}
+
+function NotificationSettings() {
+  const [prefs, setPrefs] = useState(() => {
+    const init = {};
+    for (const ev of EVENT_TYPES) init[ev.key] = readPref(ev.key);
+    return init;
+  });
+
+  const toggle = (key) => {
+    setPrefs((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      try {
+        localStorage.setItem(`notif_pref_${key}`, String(next[key]));
+      } catch {
+        // localStorage unavailable (private mode) — keep in-memory only.
+      }
+      return next;
+    });
+  };
+
+  return (
+    <div
+      className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-5"
+      data-testid="notification-settings"
+    >
+      <h2 className="text-lg font-semibold text-gray-900 mb-1">تنظیمات اعلان‌ها</h2>
+      <p className="text-sm text-gray-500 mb-4">
+        انتخاب کنید برای کدام رویدادها اعلان دریافت کنید.
+      </p>
+      <ul className="space-y-3">
+        {EVENT_TYPES.map((ev) => (
+          <li key={ev.key} className="flex items-center justify-between">
+            <span className="text-sm text-gray-700">{ev.label}</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={prefs[ev.key]}
+              aria-label={ev.label}
+              data-testid={`notif-toggle-${ev.key}`}
+              onClick={() => toggle(ev.key)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                prefs[ev.key] ? 'bg-blue-600' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  prefs[ev.key] ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Notifications() {
   const { token } = useAuth();
   const [notifications, setNotifications] = useState([]);
@@ -103,6 +181,8 @@ function Notifications() {
         {error && (
           <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>
         )}
+
+        <NotificationSettings />
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           {loading ? (
