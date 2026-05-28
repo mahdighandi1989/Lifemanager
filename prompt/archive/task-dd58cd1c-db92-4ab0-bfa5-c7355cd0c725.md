@@ -1,0 +1,150 @@
+---
+task_id: dd58cd1c-db92-4ab0-bfa5-c7355cd0c725
+title: افزودن نوتیفیکیشن برای event 'verify_failed'
+type: notification_audit
+priority: high
+execution_priority: 100
+status: pending
+external_status: pending
+verification_status: pending
+watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
+project: mahdighandi1989/Lifemanager
+created_at: '2026-05-19T20:23:24.958015+00:00'
+updated_at: '2026-05-25T06:43:51.786843+00:00'
+archived: true
+archived_at: '2026-05-25T06:43:51.786843+00:00'
+tags:
+- merged
+---
+
+# افزودن نوتیفیکیشن برای event 'verify_failed'
+
+## Raw Idea
+
+## 📋 شرح (severity: high)
+event `verify_failed` در سیستم به‌عنوان critical شناخته شده ولی هیچ `notify_event` call برای آن پیدا نشد.
+
+## 🤔 چرا مهم است
+critical event بدون notification یعنی کاربر هرگز از وقوع آن باخبر نمی‌شود. اگر «task failed» critical است ولی notification ندارد، کاربر روزها نمی‌فهمد سیستم خاموش بوده.
+
+## 🔍 جزئیات
+- علت: event critical 'verify_failed' هیچ notification ندارد
+- پیشنهاد: اضافه کردن notify_event برای 'verify_failed' در failure handler مربوطه
+---
+[scan #2 at 2026-05-19T20:23:24.984077+00:00]
+## 📋 شرح (severity: high)
+event `scan_failed` در سیستم به‌عنوان critical شناخته شده ولی هیچ `notify_event` call برای آن پیدا نشد.
+
+## 🤔 چرا مهم است
+critical event بدون notification یعنی کاربر هرگز از وقوع آن باخبر نمی‌شود. اگر «task failed» critical است ولی notification ندارد، کاربر روزها نمی‌فهمد س
+---
+[scan #3 at 2026-05-19T20:23:24.996999+00:00]
+## 📋 شرح (severity: high)
+event `task_failed` در سیستم به‌عنوان critical شناخته شده ولی هیچ `notify_event` call برای آن پیدا نشد.
+
+## 🤔 چرا مهم است
+critical event بدون notification یعنی کاربر هرگز از وقوع آن باخبر نمی‌شود. اگر «task failed» critical است ولی notification ندارد، کاربر روزها نمی‌فهمد س
+
+## Prompt
+
+## ⚠️ یادداشت مهم برای مدل اجراکننده — قبل از شروع بخوان
+
+این پرامپت بر اساس یک **بررسی اولیهٔ خودکار** از repo ساخته شده — ممکن است
+حاوی اشتباه، تشخیص نادرست، یا حذف موارد مهم باشد. به‌عنوان منبع نهایی به
+آن استناد نکن.
+
+♻️ **احتمال پیاده‌سازی قبلی (مهم):**
+- ممکن است **بخشی یا تمامِ** این درخواست قبلاً (به صورت کامل یا ناقص) در
+  repo پیاده‌سازی شده باشد. پیش از شروع، با grep/search و خواندن فایل‌های
+  مرتبط بررسی کن که چه چیزی **از قبل وجود دارد**.
+- اگر یک قابلیت/فایل/تابع از قبل موجود است: آن را **دوباره نساز**؛ فقط
+  موارد ناقص یا اشتباه را اصلاح/تکمیل کن.
+- اگر همه چیز از قبل به‌درستی انجام شده: یک کامیت توضیحی (no-op) ثبت کن که
+  چرا تغییری لازم نبود و دقیقاً کدام فایل‌ها این درخواست را پوشش می‌دهند.
+
+🔍 **مسئولیت تو (مدل اجراکننده):**
+- پیش از هر تغییر، خودت ساختار repo، فایل‌های ذکرشده، و وابستگی‌های آن‌ها را
+  مستقل بررسی کن.
+- اگر تشخیص دادی موقعیت ذکرشده در پرامپت اشتباه است یا فایل دیگری مناسب‌تر
+  است، بر اساس قضاوت خودت عمل کن — این پرامپت نمی‌تواند بهانهٔ کار اشتباه
+  باشد ("خودت گفتی" قابل قبول نیست).
+- اگر معیارهای پذیرش (AC) مبهم/ناقص بودند، بهترین تفسیر را انتخاب کن و در
+  commit message توضیح بده.
+
+📦 **اگر کار طولانی است:**
+- **خلاصه‌اش نکن.** همه را به‌طور کامل انجام بده.
+- اگر یک کامیت گنجایش ندارد، در **چندین کامیت متوالی** انجام بده — ولی
+  هیچ بخشی را skip نکن.
+- ترتیب کامیت‌ها را منطقی نگه‌دار (foundation → core → integration → tests).
+- در آخر یک checklist از همه‌ی کامیت‌ها در PR description بنویس.
+
+---
+
+
+## 🎯 هدف (خلاصه ساختاریافته)
+event critical 'verify_failed' هیچ notification ندارد
+
+## 📍 موقعیت دقیق در پروژه
+_(فایل‌های دقیق توسط مجری شناسایی شوند — هیچ موقعیت مشخصی استخراج نشد)_
+
+## 🧭 هدف اصلی پروژه (از یادداشت کاربر)
+## ⚠️ یادداشت مهم برای مدل اجراکننده — قبل از شروع بخوان
+
+این پرامپت بر اساس یک **بررسی اولیهٔ خودکار** از repo ساخته شده — ممکن است
+حاوی اشتباه، تشخیص نادرست، یا حذف موارد مهم باشد. به‌عنوان منبع نهایی به
+آن استناد نکن.
+
+♻️ **احتمال پیاده‌سازی قبلی (مهم):**
+- ممکن است **بخشی یا تمامِ** این درخواست
+
+## 🌐 نقشهٔ وابستگی‌ها
+این مورد روی notification pipeline تأثیر می‌گذارد — همه consumer های این event باید چک شوند.
+
+## 🔍 Context و وضعیت فعلی
+## 📋 شرح (severity: high)
+event `verify_failed` در سیستم به‌عنوان critical شناخته شده ولی هیچ `notify_event` call برای آن پیدا نشد.
+
+## 🤔 چرا مهم است
+critical event بدون notification یعنی کاربر هرگز از وقوع آن باخبر نمی‌شود. اگر «task failed» critical است ولی notification ندارد، کاربر روزها نمی‌فهمد سیستم خاموش بوده.
+
+## 🔍 جزئیات
+- علت: event critical 'verify_failed' هیچ notification ندارد
+- پیشنهاد: اضافه کردن notify_event برای 'verify_failed' در failure handler مربوطه
+
+## ✅ معیار پذیرش (Acceptance Criteria) — رفتار-محور
+**مهم:** هر AC رفتار قابل مشاهده را تعریف می‌کند، نه نام فایل/کلاس.
+verify می‌تواند پیاده‌سازی متفاوت ولی هم‌ارز را قبول کند.
+
+- [ ] `notify_event("verify_failed", ...)` call در نقطه وقوع اضافه شد
+- [ ] message template فارسی و معنادار است
+- [ ] silent=False + priority="high"
+- [ ] تست: trigger مصنوعی → notification در Telegram دیده می‌شود
+- [ ] هیچ تستی fail نمی‌شود (`npm run test` / `pytest`)
+- [ ] linter بدون warning عبور می‌کند
+- [ ] type-check موفق است (`tsc --noEmit` / `mypy`)
+
+## 🪜 مراحل اجرایی پیشنهادی
+1. گام ۱: محل وقوع `verify_failed` در کد را پیدا کن.
+گام ۲: `notification_service.notify_event("verify_failed", message, silent=False, priority="high", ...)` اضافه کن.
+گام ۳: template message فارسی معنادار بنویس.
+
+## 📤 خروجی مورد انتظار
+تغییر کد در فایل‌های مرتبط، commit یا PR جدید با پیام واضح، و عبور تمام معیارهای پذیرش.
+
+## ⚠️ ریسک‌ها و موارد احتیاط
+اگر event پر-تکرار است، rate-limit اضافه کن تا spam نشود.
+
+## 🔗 وابستگی‌های تسکی
+_(مستقل)_
+
+## 🏷 دسته‌بندی
+- نوع: notification_audit
+- اولویت: high
+- تخمین زمان: medium
+
+## Acceptance Criteria
+
+1. `notify_event("verify_failed", ...)` call در نقطه وقوع اضافه شد _(verify: static)_
+2. message template فارسی و معنادار است _(verify: static)_
+3. silent=False + priority="high" _(verify: static)_
+4. تست: trigger مصنوعی → notification در Telegram دیده می‌شود _(verify: manual_only)_
