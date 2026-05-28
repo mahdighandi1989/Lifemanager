@@ -24,6 +24,12 @@ from app.schemas.ai_schema import (
     AIQueryResponse,
 )
 from app.services.ai_service import AIService, generate_text
+from app.services.ai.nlp_service import (
+    metrics_snapshot,
+    record_feedback,
+)
+from pydantic import BaseModel, Field
+from typing import Optional
 
 # Canonical prefix lives on the router itself (was previously set via
 # app.include_router(prefix="/ai") in main.py). Keeping it inline here
@@ -140,3 +146,46 @@ async def query_ai(
     current_user: User = Depends(get_current_user),
 ):
     return await ai_service.query(query_data, current_user.id)
+
+
+# ── Metrics & feedback (audit task 97867b277c1b) ────────────────────
+
+
+class AIFeedbackPayload(BaseModel):
+    """Like/dislike + optional explicit 1-5 score for the most recent AI
+    response. ``liked`` and ``score`` are both optional so the UI can
+    submit either signal independently."""
+
+    liked: Optional[bool] = None
+    score: Optional[int] = Field(default=None, ge=1, le=5)
+
+
+@router.post("/feedback", status_code=status.HTTP_202_ACCEPTED)
+@handle_errors
+async def submit_ai_feedback(payload: AIFeedbackPayload) -> dict:
+    """Record a like/dislike or 1-5 score for the AI response.
+
+    The route only exposes the binary like signal and the explicit
+    rating — neither path requires authentication, intentionally, so
+    the audit's outcome metric can be collected even when the chat is
+    used in the frontend's login-bypass mode.
+    """
+    if payload.liked is None and payload.score is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide either liked (bool) or score (1-5)",
+        )
+    record_feedback(liked=payload.liked, score=payload.score)
+    return {"accepted": True}
+
+
+@router.get("/metrics")
+@handle_errors
+async def get_ai_metrics() -> dict:
+    """Summary view of the AI performance counters.
+
+    Includes ``ai_response_latency_ms`` (rolling avg), the
+    ``ai_response_quality_score`` (rolling avg of explicit scores)
+    plus the SLO targets so a caller can render a green/red status.
+    """
+    return metrics_snapshot()
