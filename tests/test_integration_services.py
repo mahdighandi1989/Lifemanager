@@ -174,3 +174,121 @@ async def test_image_service_returns_documented_placeholder_shape():
 
     out2 = await analyze_image_fn("https://example.com/dog.jpg")
     assert "description" in out2
+
+
+# ── AuthService edge paths (duplicate username, disabled login) ─────
+# Audit task b7894694 AC4 asks for >=80% coverage of the core services.
+# The prior pass left app/services/auth_service.py at ~71% — the
+# UserService CRUD class and the module-level get_current_user error
+# branches were never exercised. The tests below close those holes
+# against the real DB boundary (not mocks).
+
+
+@pytest.mark.asyncio
+async def test_auth_register_rejects_duplicate_username(db_session):
+    """Same username, different email -> 'Username already taken'."""
+    await auth_service.register(
+        db_session,
+        UserCreate(email="u-a@example.com", password="hunter2-long", username="dupname"),
+    )
+    with pytest.raises(ValueError, match="Username already taken"):
+        await auth_service.register(
+            db_session,
+            UserCreate(email="u-b@example.com", password="hunter2-long", username="dupname"),
+        )
+
+
+@pytest.mark.asyncio
+async def test_auth_login_rejects_disabled_user(db_session):
+    """A disabled account raises UserDisabledError BEFORE the password
+    check, so even a correct password cannot mint a token."""
+    user = await auth_service.register(
+        db_session,
+        UserCreate(email="disabled@example.com", password="hunter2-long", username="disabled"),
+    )
+    user.is_active = False
+    await db_session.commit()
+    with pytest.raises(auth_service.UserDisabledError):
+        await auth_service.login(
+            db_session,
+            UserLogin(email="disabled@example.com", password="hunter2-long"),
+        )
+
+
+# ── module-level get_current_user (token -> User) ──────────────────
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_resolves_valid_token(db_session):
+    user = await auth_service.register(
+        db_session,
+        UserCreate(email="gcu@example.com", password="hunter2-long", username="gcu"),
+    )
+    token = auth_service.create_access_token({"sub": str(user.id)})
+    resolved = await auth_service.get_current_user(db_session, token)
+    assert resolved.id == user.id
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_rejects_garbage_token(db_session):
+    with pytest.raises(ValueError, match="Invalid token"):
+        await auth_service.get_current_user(db_session, "not-a-jwt")
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_rejects_non_integer_sub(db_session):
+    """A token whose `sub` is not an int is rejected by the int() guard
+    rather than 500-ing on the DB lookup."""
+    token = auth_service.create_access_token({"sub": "not-an-int"})
+    with pytest.raises(ValueError, match="Invalid token"):
+        await auth_service.get_current_user(db_session, token)
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_rejects_unknown_user(db_session):
+    """A well-formed token for a user id that no longer exists raises
+    'User not found'."""
+    token = auth_service.create_access_token({"sub": "999999"})
+    with pytest.raises(ValueError, match="User not found"):
+        await auth_service.get_current_user(db_session, token)
+
+
+# ── UserService CRUD against a real DB ─────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_user_service_crud_roundtrip(db_session):
+    """End-to-end UserService lifecycle: list (empty) -> create via
+    register -> fetch by id -> update profile fields -> delete, plus the
+    not-found branches of get/update/delete."""
+    from app.schemas.user_schema import UserUpdate
+
+    svc = auth_service.UserService(db_session)
+    assert await svc.get_all_users() == []
+
+    user = await auth_service.register(
+        db_session,
+        UserCreate(email="svc@example.com", password="hunter2-long", username="svcuser"),
+    )
+    assert len(await svc.get_all_users()) == 1
+
+    fetched = await svc.get_user_by_id(user.id)
+    assert fetched is not None and fetched.email == "svc@example.com"
+    assert await svc.get_user_by_id(999999) is None
+
+    updated = await svc.update_user(
+        user.id,
+        UserUpdate(bio="hello", display_name="Svc User"),
+        current_user_id=user.id,
+    )
+    assert updated is not None
+    assert updated.bio == "hello" and updated.display_name == "Svc User"
+    # not-found update returns None
+    assert (
+        await svc.update_user(999999, UserUpdate(bio="x"), current_user_id=user.id)
+        is None
+    )
+
+    assert await svc.delete_user(user.id, current_user_id=user.id) is True
+    assert await svc.delete_user(999999, current_user_id=user.id) is False
+    assert await svc.get_all_users() == []
