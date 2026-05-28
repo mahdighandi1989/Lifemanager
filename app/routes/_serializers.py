@@ -68,6 +68,7 @@ def serialize_item(obj, list_ids: Optional[Iterable[int]] = None) -> dict:
         "description": obj.description,
         "is_completed": bool(obj.is_completed),
         "is_starred": bool(obj.is_starred),
+        "type": getattr(obj, "type", None) or "task",
         "parent_id": obj.parent_id,
         "due_date": obj.due_date.isoformat() if obj.due_date else None,
         "owner_id": obj.owner_id,

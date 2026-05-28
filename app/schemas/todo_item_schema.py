@@ -19,6 +19,10 @@ class TodoItemCreate(BaseModel):
     is_starred: bool = False
     parent_id: Optional[int] = None
     due_date: Optional[date] = None
+    # AC 2 (audit task 2165524b) — open-set classifier so the UI can
+    # mark items as shopping / errand / task / etc. Default 'task'
+    # keeps existing client code unchanged.
+    type: str = Field(default="task", max_length=32)
     # When provided, the item is also linked to each list. Without it
     # the item is created free-floating (useful for the "move into a
     # list later" UX). Duplicate ids are de-duplicated by the route.
@@ -32,6 +36,7 @@ class TodoItemUpdate(BaseModel):
     is_starred: Optional[bool] = None
     parent_id: Optional[int] = None
     due_date: Optional[date] = None
+    type: Optional[str] = Field(default=None, max_length=32)
 
 
 class TodoItemMove(BaseModel):
@@ -58,6 +63,7 @@ class TodoItemOut(BaseModel):
     description: Optional[str] = None
     is_completed: bool = False
     is_starred: bool = False
+    type: str = "task"  # AC 2 — classifier field surfaced to clients
     parent_id: Optional[int] = None
     due_date: Optional[date] = None
     owner_id: Optional[int] = None

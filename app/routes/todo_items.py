@@ -94,6 +94,7 @@ async def create_todo_item(
         is_completed=payload.is_completed,
         is_starred=payload.is_starred,
         list_ids=payload.list_ids,
+        type=payload.type,
     )
     return _serialize(item)
 

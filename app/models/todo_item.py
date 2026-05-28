@@ -63,6 +63,10 @@ class TodoItem(Base):
     # completed_at is recorded the moment is_completed flips True so
     # ops can plot "completions per day" without trawling created_at.
     completed_at = Column(DateTime(timezone=True), nullable=True)
+    # ``type`` classifies the item beyond is_starred/is_completed —
+    # audit task 2165524b AC 1 asked for {task, shopping, errand, ...}.
+    # Default 'task' keeps every existing row's classification stable.
+    type = Column(String(32), nullable=False, server_default="task", default="task")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
