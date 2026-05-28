@@ -497,8 +497,11 @@ async def notify_event(
     user_id: int,
     db: Optional[AsyncSession] = None,
     message: Optional[str] = None,
+    title: Optional[str] = None,
     priority: str = "normal",
     silent: bool = False,
+    action_link: Optional[str] = None,
+    action_text: Optional[str] = None,
 ) -> Optional[Notification]:
     """Fire a critical-event notification.
 
@@ -507,13 +510,23 @@ async def notify_event(
     failure here is logged but not raised, so a notification outage
     never blocks the originating request.
 
-    The default Persian message template covers ``verify_failed`` —
-    the most common caller — so call sites stay terse.
+    Per audit task 92fa5ea15e2b sub-task #2, critical events should be
+    able to carry their own call-to-action — ``action_link`` (URL) and
+    ``action_text`` (button caption). When supplied they're appended to
+    the persisted message as ``<text>: <link>`` so the existing message
+    column carries the routing without a schema change; when omitted the
+    behaviour is identical to before. ``title`` is explicit too —
+    callers can override the default Persian template title without
+    having to know the internal ``_DEFAULT_EVENT_TITLES`` mapping.
     """
     if not message:
         message = _DEFAULT_EVENT_MESSAGES.get(
             event_name, f"رویداد سیستمی: {event_name}"
         )
+    if action_link:
+        caption = action_text or action_link
+        message = f"{message}\n{caption}: {action_link}"
+    resolved_title = title or _DEFAULT_EVENT_TITLES.get(event_name, event_name)
     try:
         svc = NotificationService(db)
         return await svc.send_notification(
@@ -522,7 +535,7 @@ async def notify_event(
             notification_type=event_name if event_name in VALID_NOTIFICATION_TYPES else "system",
             priority=priority,
             silent=silent,
-            title=_DEFAULT_EVENT_TITLES.get(event_name, event_name),
+            title=resolved_title,
             channel="event",
         )
     except Exception as exc:
