@@ -50,3 +50,42 @@ async def list_external_projects(
         select(ExternalProject).where(ExternalProject.user_id == user_id)
     )
     return list(result.scalars().all())
+
+
+class ExternalProjectService:
+    """Class wrapper exposing the sync behaviour (audit task d2146781, AC4).
+
+    ``sync_project_data`` pulls the latest payload from an external project's
+    API. The HTTP fetch is injectable (``fetcher``) so tests exercise the sync
+    against a mock project without a live upstream; the default fetcher does a
+    real timeout-bounded httpx GET. It never raises on an upstream failure so a
+    scheduled sync loop can keep going for the user's other projects.
+    """
+
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def sync_project_data(self, project, fetcher=None) -> dict:
+        base_url = getattr(project, "base_url", None)
+        if not base_url:
+            return {"ok": False, "error": "missing base_url", "project_id": getattr(project, "id", None)}
+        if fetcher is None:
+            fetcher = self._default_fetch
+        try:
+            data = await fetcher(base_url, getattr(project, "api_key", None))
+        except Exception as exc:  # noqa: BLE001 — sync must not crash the loop
+            return {"ok": False, "error": str(exc), "project_id": getattr(project, "id", None)}
+        synced = len(data) if hasattr(data, "__len__") else 1
+        return {"ok": True, "project_id": getattr(project, "id", None), "synced_items": synced, "data": data}
+
+    async def _default_fetch(self, base_url: str, api_key: Optional[str]):
+        import httpx
+
+        from app.config import settings
+
+        headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+        timeout = getattr(settings, "EXTERNAL_API_TIMEOUT", 30.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            resp = await client.get(base_url, headers=headers)
+            resp.raise_for_status()
+            return resp.json()

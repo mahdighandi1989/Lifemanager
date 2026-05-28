@@ -1,8 +1,16 @@
 {
   "version": 1,
   "generated_at": "2026-05-28T23:05:00+00:00",
-  "total": 4,
+  "total": 5,
   "items": [
+    {
+      "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
+      "title": "پروژه‌های خارجی (External Projects)",
+      "todo_file": "TO-DO/todo-task-d2146781.md",
+      "execution_priority": 3000,
+      "manual_actions": 1,
+      "summary": "صفحهٔ /external-projects فرانت‌اند (AC6). AC1/2/3 (مدل/endpoints) و AC4 (sync_project_data) و AC5 (analyze_time_allocation) انجام شد."
+    },
     {
       "task_id": "task_78c0e8e0a9b5",
       "title": "پیاده‌سازی احراز هویت JWT و کنترل دسترسی کاربر",
