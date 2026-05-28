@@ -59,3 +59,22 @@ async def soft_api_client():
     yield TestClient(app, raise_server_exceptions=False)
     app.dependency_overrides.clear()
     await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def db_session():
+    """A real AsyncSession bound to a per-test in-memory SQLite engine.
+
+    Provided as a top-level fixture (audit task b7894694) so service-level
+    integration tests don't each repeat the engine + sessionmaker setup.
+    The session participates in real SQL — INSERT/SELECT/UPDATE against
+    the same metadata the app uses — so contract drift between services
+    and the schema fails the test rather than silently passing.
+    """
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        yield session
+    await engine.dispose()
