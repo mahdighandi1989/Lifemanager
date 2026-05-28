@@ -40,6 +40,17 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # --- Google OAuth -------------------------------------------------------
+    # Read by app/services/google_auth.py and app/routes/auth_google.py.
+    # All three are optional — the router is unmounted in main.py until the
+    # operator decides to expose the OAuth flow. GOOGLE_REDIRECT_URI must
+    # match the value registered in the Google Cloud Console; an empty
+    # string lets the route fall back to the local dev callback
+    # http://localhost:8000/auth/google/callback.
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = ""
+
     # --- Rate limiting -------------------------------------------------------
     # Per-IP limits for sensitive auth endpoints. Format follows slowapi's
     # "<count>/<period>" syntax (e.g. "5/minute", "3/hour").

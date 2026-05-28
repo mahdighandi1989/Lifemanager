@@ -26,6 +26,13 @@ class AIImageService:
     """
 
     def __init__(self, db: Optional[object] = None):
+        # ``self.db`` is currently write-only — kept here so the
+        # vision integration that lands later can persist analysed
+        # results (caption, OCR, label list) without breaking the
+        # constructor's call sites. The audit flagged this as an
+        # unused attribute; it's intentional forward-compat, not a
+        # forgotten reader. If the integration never lands, remove
+        # this attribute AND the ``db`` parameter together.
         self.db = db
 
     async def analyze_image(
