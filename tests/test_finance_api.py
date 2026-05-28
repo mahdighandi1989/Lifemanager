@@ -59,3 +59,65 @@ def test_finance_amount_must_be_non_negative(api_client):
         json={"description": "Refund", "amount": -1, "currency": "USD"},
     )
     assert resp.status_code in (400, 422)
+
+
+# ── Per-kind endpoint aliases (audit task 4ae4b3ca ACs 16, 17, 22) ─
+
+
+def test_bank_account_alias_creates_with_kind_bank(api_client):
+    resp = api_client.post(
+        "/api/bank-accounts",
+        json={"name": "Bank-1", "kind": "bank", "balance": 100},
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["kind"] == "bank"
+    listing = api_client.get("/api/bank-accounts").json()
+    assert all(a["kind"] == "bank" for a in listing)
+
+
+def test_broker_account_alias_creates_with_kind_broker(api_client):
+    resp = api_client.post(
+        "/api/broker-accounts",
+        json={"name": "Brk-1", "kind": "broker", "balance": 200},
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["kind"] == "broker"
+    listing = api_client.get("/api/broker-accounts").json()
+    assert all(a["kind"] == "broker" for a in listing)
+
+
+def test_exchange_account_alias_creates_with_kind_exchange(api_client):
+    resp = api_client.post(
+        "/api/exchange-accounts",
+        json={"name": "Coinbase", "kind": "exchange", "balance": 50},
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["kind"] == "exchange"
+    listing = api_client.get("/api/exchange-accounts").json()
+    assert all(a["kind"] == "exchange" for a in listing)
+
+
+def test_per_kind_endpoints_do_not_cross_pollute(api_client):
+    """A bank account must NOT appear in the broker listing and
+    vice-versa — proves the kind filter is applied at the DB level."""
+    api_client.post(
+        "/api/bank-accounts",
+        json={"name": "B-xyz", "balance": 1},
+    )
+    broker_list = api_client.get("/api/broker-accounts").json()
+    assert not any(a["name"] == "B-xyz" for a in broker_list)
+
+
+def test_per_kind_model_modules_importable():
+    """AC 6 + 20-21 — the per-kind import paths must resolve."""
+    from app.models.income import Income
+    from app.models.asset import Asset
+    from app.models.financial_account import FinancialAccount
+    from app.models.bank_account import BankAccount
+    from app.models.broker_account import BrokerAccount
+    from app.models.exchange_account import ExchangeAccount
+
+    # All four account flavours share the same underlying table.
+    assert BankAccount is FinancialAccount
+    assert BrokerAccount is FinancialAccount
+    assert ExchangeAccount is FinancialAccount

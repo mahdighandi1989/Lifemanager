@@ -194,3 +194,115 @@ async def list_financial_accounts(
         stmt = stmt.where(FinancialAccount.kind == kind)
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+# ── Per-kind endpoint aliases (audit task 4ae4b3ca ACs 16, 17, 22) ──
+
+
+@router.post("/api/bank-accounts", response_model=FinancialAccountResponse, status_code=201)
+@handle_errors
+async def create_bank_account(
+    payload: FinancialAccountCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """AC 16 — thin alias that forces kind='bank' so the caller
+    doesn't have to know about the discriminator column."""
+    account = FinancialAccount(
+        user_id=user_id,
+        name=payload.name,
+        kind="bank",
+        institution=payload.institution,
+        currency=payload.currency,
+        balance=payload.balance,
+    )
+    db.add(account)
+    await db.commit()
+    await db.refresh(account)
+    return account
+
+
+@router.get("/api/bank-accounts", response_model=List[FinancialAccountResponse])
+@handle_errors
+async def list_bank_accounts(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        select(FinancialAccount).where(
+            (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "bank")
+        )
+    )
+    return list(result.scalars().all())
+
+
+@router.get("/api/broker-accounts", response_model=List[FinancialAccountResponse])
+@handle_errors
+async def list_broker_accounts(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """AC 17 — same shape as the bank alias, filtered by kind='broker'."""
+    result = await db.execute(
+        select(FinancialAccount).where(
+            (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "broker")
+        )
+    )
+    return list(result.scalars().all())
+
+
+@router.post("/api/broker-accounts", response_model=FinancialAccountResponse, status_code=201)
+@handle_errors
+async def create_broker_account(
+    payload: FinancialAccountCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    account = FinancialAccount(
+        user_id=user_id,
+        name=payload.name,
+        kind="broker",
+        institution=payload.institution,
+        currency=payload.currency,
+        balance=payload.balance,
+    )
+    db.add(account)
+    await db.commit()
+    await db.refresh(account)
+    return account
+
+
+@router.post("/api/exchange-accounts", response_model=FinancialAccountResponse, status_code=201)
+@handle_errors
+async def create_exchange_account(
+    payload: FinancialAccountCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """AC 22 — exchange-account flavour. kind forced to 'exchange'."""
+    account = FinancialAccount(
+        user_id=user_id,
+        name=payload.name,
+        kind="exchange",
+        institution=payload.institution,
+        currency=payload.currency,
+        balance=payload.balance,
+    )
+    db.add(account)
+    await db.commit()
+    await db.refresh(account)
+    return account
+
+
+@router.get("/api/exchange-accounts", response_model=List[FinancialAccountResponse])
+@handle_errors
+async def list_exchange_accounts(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        select(FinancialAccount).where(
+            (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "exchange")
+        )
+    )
+    return list(result.scalars().all())
