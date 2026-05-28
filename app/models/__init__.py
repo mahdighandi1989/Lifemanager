@@ -6,6 +6,7 @@ before `Base.metadata.create_all()` runs at startup. Tools that do
 """
 from app.models.ai_model_config import AIModelConfig
 from app.models.integration import Integration
+from app.models.local_file_entry import LocalFileEntry
 from app.models.notification import Notification
 from app.models.project import Project
 from app.models.self_improvement import (
@@ -22,6 +23,7 @@ from app.models.webhook_event import WebhookEvent
 __all__ = [
     "AIModelConfig",
     "Integration",
+    "LocalFileEntry",
     "Notification",
     "OAuthUser",
     "Project",

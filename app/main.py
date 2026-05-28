@@ -21,6 +21,7 @@ from app.routes import (
     auth,
     integrations,
     lists,
+    local_files,
     notifications,
     planner,
     projects,
@@ -584,6 +585,7 @@ app.include_router(integrations.router, prefix="/integrations", tags=["integrati
 # share / unshare / move / toggle actions.
 app.include_router(lists.router)
 app.include_router(todo_items.router)
+app.include_router(local_files.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])

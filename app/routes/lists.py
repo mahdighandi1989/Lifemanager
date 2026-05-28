@@ -11,7 +11,7 @@ maps NoResultFound → 404, IntegrityError → 409, ValueError → 400.
 import logging
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -183,6 +183,47 @@ async def list_items_in_list(
     await list_service.get_list(db, list_id)
     items = await todo_item_service.list_items(db, list_id=list_id)
     return [_serialize_item(it) for it in items]
+
+
+@router.post(
+    "/api/lists/sync-from-file",
+    tags=["todo-lists"],
+)
+@handle_errors
+async def sync_lists_from_file(
+    upload: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Sync one TodoList + its items from an uploaded JSON file.
+
+    Per audit task 217909d2 ACs 6-8, the file format is a JSON
+    document of shape ``{"name": str, "items": [{"content": str, ...}, ...]}``.
+    The route is idempotent: re-uploading the same file produces no
+    change; items present in the DB but absent from the file are
+    removed from the list (deletion AC).
+    """
+    import json
+
+    raw = await upload.read()
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"file must be UTF-8 JSON: {exc}",
+        )
+    if not isinstance(payload, dict):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="top-level JSON must be an object",
+        )
+    try:
+        return await list_service.sync_todo_lists_from_source(
+            db, user_id=user_id, payload=payload
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.post(
