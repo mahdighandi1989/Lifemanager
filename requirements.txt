@@ -2,10 +2,12 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 sqlalchemy[asyncio]==2.0.36
 asyncpg==0.30.0
-pydantic==2.10.4
+# pydantic[email] pulls in pydantic+email-validator in one line so the
+# duplicate `pydantic==2.10.4` + `pydantic[email]==2.10.4` pair that the
+# audit (task 850097a9) flagged is collapsed to a single declaration.
+pydantic[email]==2.10.4
 pydantic-core==2.27.2
 pydantic-settings==2.7.1
-pydantic[email]==2.10.4
 email-validator>=2.0.0
 cryptography>=42.0.0
 python-dotenv==1.0.1
