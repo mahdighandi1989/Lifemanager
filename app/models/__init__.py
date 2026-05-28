@@ -13,6 +13,10 @@ from app.models.integration import Integration
 from app.models.local_file_entry import LocalFileEntry
 from app.models.notification import Notification
 from app.models.person import Person
+from app.models.interaction import Interaction, InteractionType
+from app.models.ai_assessment import AIAssessment
+from app.models.user_comment import UserComment
+from app.models.behavior_log import BehaviorLog, BehaviorType
 from app.models.user_location import UserLocation
 from app.models.project import Project
 from app.models.self_improvement import (
@@ -38,6 +42,12 @@ __all__ = [
     "LocalFileEntry",
     "Notification",
     "Person",
+    "Interaction",
+    "InteractionType",
+    "AIAssessment",
+    "UserComment",
+    "BehaviorLog",
+    "BehaviorType",
     "UserLocation",
     "OAuthUser",
     "Project",
