@@ -101,3 +101,23 @@ CRUD over third-party connection configs (Slack, Telegram, etc).
 | GET | `/health` / `/api/health` | Liveness probe |
 | GET | `/health/db` / `/api/health/db` | DB reachability probe |
 | GET | `/api/oversight/status` | Status dashboard with feature flags |
+
+### AI (audit task 1a08ded2)
+
+AI **model configs** carry a `provider` field (string), and the list
+endpoint accepts a `?provider=` query parameter to filter by it.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/ai/configs` | List model configs. `?provider=<name>` filters to one provider. Each item includes `id`, `name`, `provider`, `model_name`. |
+| POST | `/api/ai/configs` | Create a model config; body must set `provider`. Returns 201 with `id`, `name`, `provider`. |
+| PATCH | `/api/ai/configs/{id}` | Update a config (including `provider`). |
+| DELETE | `/api/ai/configs/{id}` | Delete a config (204). |
+| GET / POST | `/api/ai/providers` | List / create AI providers (user-scoped). |
+| GET / PATCH / DELETE | `/api/ai/providers/{id}` | Fetch / update / delete a provider. |
+| GET / PUT | `/api/ai/global-prompt` | Read / update the global analysis prompt. |
+| GET | `/api/ai/user_data_context` | Authenticated caller's own Task/Project/TodoItem/Notification context for AI. |
+| POST | `/api/ai/dynamic-analyze` | Free-form AI analysis; 403 when `FEATURE_AI_ENABLED` is off. |
+
+The settings UI for providers + model configs lives at
+`frontend/src/pages/AISettings.jsx` (route `/ai-settings`).

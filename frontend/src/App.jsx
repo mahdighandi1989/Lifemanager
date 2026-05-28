@@ -8,6 +8,7 @@ import { ProjectProvider } from './context/ProjectContext';
 import { TaskProvider } from './context/TaskContext';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
+import AISettings from './pages/AISettings';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Login from './pages/Login';
@@ -110,6 +111,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Notifications />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai-settings"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <AISettings />
                     </Layout>
                   </ProtectedRoute>
                 }
