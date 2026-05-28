@@ -44,6 +44,33 @@ def test_ai_generate_accepts_system_role_and_task_context(api_client):
     assert resp.status_code == 200, resp.text
 
 
+def test_dynamic_analyze_sends_full_prompt_not_truncated(api_client, monkeypatch):
+    """AC2 (task e606cca6): the full merged request must reach the model — no
+    1000-char truncation. Captures the prompt the AIService actually receives
+    and asserts the long prompt + the framing system_role_prompt survive."""
+    from app.routes import ai as ai_routes
+    from app.services.ai_service import AIService
+
+    monkeypatch.setattr(ai_routes, "FEATURE_AI_ENABLED", True)
+    captured = {}
+
+    async def fake_generate_text(self, prompt, **kwargs):
+        captured["prompt"] = prompt
+        return {"generated_text": "ok", "model_used": "test"}
+
+    monkeypatch.setattr(AIService, "generate_text", fake_generate_text)
+
+    long_prompt = "x" * 3000
+    resp = api_client.post(
+        "/ai/dynamic-analyze",
+        json={"prompt": long_prompt, "system_role_prompt": "FRAMEWORK"},
+    )
+    assert resp.status_code == 200, resp.text
+    # Pre-fix this clipped to 1000 chars; the full merged prompt must arrive.
+    assert len(captured["prompt"]) >= 3000
+    assert "FRAMEWORK" in captured["prompt"]
+
+
 def test_ai_model_config_has_prompt_template_column():
     """AC 6: AIModelConfig.prompt_template column exists."""
     from app.models.ai_model_config import AIModelConfig

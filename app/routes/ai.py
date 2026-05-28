@@ -358,7 +358,11 @@ async def dynamic_analyze(
     parts.append(payload.prompt)
     merged = "\n\n".join(parts)
 
-    out = await ai_service.generate_text(prompt=merged[:1000])
+    # AC2 (task e606cca6): send the FULL request to the model — do not
+    # truncate. The request schema already bounds the prompt (max_length
+    # 10_000), so the merged system+context+prompt reaches the model intact
+    # instead of being clipped to the first 1000 chars.
+    out = await ai_service.generate_text(prompt=merged)
     return DynamicAnalysisResponse(
         insights=out.get("generated_text", ""),
         model_used=out.get("model_used"),
