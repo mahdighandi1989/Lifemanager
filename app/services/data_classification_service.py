@@ -68,3 +68,19 @@ def classify_todo_item_essentiality(item: Any, rules: dict | None = None) -> str
     if now <= due_aware <= now + window:
         return "essential"
     return "deferred"
+
+
+class DataClassificationService:
+    """Class wrapper around the module-level classifier helpers
+    (audit task 7367c6f0 ACs 19-20). Some callers prefer the OO
+    surface (``svc.classify_task_essentiality(task)``) for easier
+    DI in tests."""
+
+    def __init__(self, rules: dict | None = None):
+        self.rules = rules or DEFAULT_RULES
+
+    def classify_task_essentiality(self, task) -> str:
+        return classify_task_essentiality(task, self.rules)
+
+    def classify_todo_item_essentiality(self, item) -> str:
+        return classify_todo_item_essentiality(item, self.rules)

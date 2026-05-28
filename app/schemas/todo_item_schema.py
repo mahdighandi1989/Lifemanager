@@ -12,8 +12,13 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
+# AC 25 (audit task 7367c6f0) — the schema's max_length comes from the
+# config so an operator can dial it without editing this file.
+from app.config import MAX_TODO_ITEM_CONTENT_LENGTH as _MAX_CONTENT_LEN
+
+
 class TodoItemCreate(BaseModel):
-    content: str = Field(..., min_length=1, max_length=1000)
+    content: str = Field(..., min_length=1, max_length=_MAX_CONTENT_LEN)
     description: Optional[str] = Field(default=None, max_length=20000)
     is_completed: bool = False
     is_starred: bool = False
@@ -30,7 +35,7 @@ class TodoItemCreate(BaseModel):
 
 
 class TodoItemUpdate(BaseModel):
-    content: Optional[str] = Field(default=None, min_length=1, max_length=1000)
+    content: Optional[str] = Field(default=None, min_length=1, max_length=_MAX_CONTENT_LEN)
     description: Optional[str] = Field(default=None, max_length=20000)
     is_completed: Optional[bool] = None
     is_starred: Optional[bool] = None
