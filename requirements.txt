@@ -8,6 +8,8 @@ asyncpg==0.30.0
 pydantic[email]==2.10.4
 pydantic-core==2.27.2
 pydantic-settings==2.7.1
+# email-validator is also re-pinned explicitly so pip never has to
+# re-resolve the pydantic line just to pull the extras.
 email-validator>=2.0.0
 cryptography>=42.0.0
 python-dotenv==1.0.1

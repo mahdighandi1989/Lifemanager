@@ -595,6 +595,20 @@ app.include_router(location.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
+
+# auth_google.router is INTENTIONALLY UNMOUNTED. The OAuth flow lives in
+# app/routes/auth_google.py and depends on the GOOGLE_CLIENT_ID /
+# GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI settings (see app/config.py).
+# The flow's UX (admin approval, pending-user screen, redirect chain)
+# isn't finalised; mounting it would expose /auth/google → /auth/google/callback
+# → /auth/pending while the back-end still treats the password-auth User
+# as the canonical identity. Mount it explicitly when the operator
+# enables Google sign-in:
+#     from app.routes import auth_google
+#     app.include_router(auth_google.router, tags=["google-auth"])
+# The "audit: file without import reference" finding (task 3b90d409)
+# correctly identified this as orphan code, but the file is kept for
+# the forthcoming integration — not dead.
 # planner router decorators also use absolute /api/planner paths.
 app.include_router(planner.router, tags=["planner"])
 # self_improvement router decorators carry absolute /api/self-improvement

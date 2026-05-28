@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     # GOOGLE_CLIENT_ID is non-empty (audit task 3b90d409 — without an
     # operator-supplied client id the OAuth consent redirect would 500,
     # so we keep the surface area off the public schema entirely).
+    # GOOGLE_REDIRECT_URI must match the value registered in the Google
+    # Cloud Console; an empty string lets the route fall back to the
+    # local dev callback http://localhost:8000/auth/google/callback.
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""

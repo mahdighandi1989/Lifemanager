@@ -1,0 +1,157 @@
+---
+task_id: 8ca2af99-2dbe-4f81-bd7f-70a2f98fff57
+title: تعیین event_type صریح برای نوتیفیکیشن auth_service
+type: notification_audit
+priority: medium
+execution_priority: 100
+status: awaiting_review
+external_status: pending
+verification_status: partial
+watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
+project: mahdighandi1989/Lifemanager
+created_at: '2026-05-26T20:28:05.735965+00:00'
+updated_at: '2026-05-26T23:20:36.999668+00:00'
+archived: true
+archived_at: '2026-05-26T23:20:36.999668+00:00'
+tags:
+- merged
+target_files:
+- app/services/auth_service.py
+---
+
+# تعیین event_type صریح برای نوتیفیکیشن auth_service
+
+## Raw Idea
+
+## 📋 شرح
+در `app/services/auth_service.py` یک `notify_event` call پیدا شد که اولین پارامتر (event_type) رشته‌ای ساده/مبهم است یا خالی.
+
+## 🤔 چرا مهم است
+event_type کلید routing و filter در سیستم notification است. بدون آن، نمی‌توان آن event را به‌صورت per-event mute/customize کرد.
+
+## 🔍 جزئیات
+- علت: notification call بدون event_type صریح — audit و filtering مشکل می‌شود
+- پیشنهاد: event="task_done" یا مشابه اضافه کن
+
+## Prompt
+
+## ⚠️ یادداشت مهم برای مدل اجراکننده — قبل از شروع بخوان
+
+این پرامپت بر اساس یک **بررسی اولیهٔ خودکار** از repo ساخته شده — ممکن است
+حاوی اشتباه، تشخیص نادرست، یا حذف موارد مهم باشد. به‌عنوان منبع نهایی به
+آن استناد نکن.
+
+♻️ **احتمال پیاده‌سازی قبلی (مهم):**
+- ممکن است **بخشی یا تمامِ** این درخواست قبلاً (به صورت کامل یا ناقص) در
+  repo پیاده‌سازی شده باشد. پیش از شروع، با grep/search و خواندن فایل‌های
+  مرتبط بررسی کن که چه چیزی **از قبل وجود دارد**.
+- اگر یک قابلیت/فایل/تابع از قبل موجود است: آن را **دوباره نساز**؛ فقط
+  موارد ناقص یا اشتباه را اصلاح/تکمیل کن.
+- اگر همه چیز از قبل به‌درستی انجام شده: یک کامیت توضیحی (no-op) ثبت کن که
+  چرا تغییری لازم نبود و دقیقاً کدام فایل‌ها این درخواست را پوشش می‌دهند.
+
+🔍 **مسئولیت تو (مدل اجراکننده):**
+- پیش از هر تغییر، خودت ساختار repo، فایل‌های ذکرشده، و وابستگی‌های آن‌ها را
+  مستقل بررسی کن.
+- اگر تشخیص دادی موقعیت ذکرشده در پرامپت اشتباه است یا فایل دیگری مناسب‌تر
+  است، بر اساس قضاوت خودت عمل کن — این پرامپت نمی‌تواند بهانهٔ کار اشتباه
+  باشد ("خودت گفتی" قابل قبول نیست).
+- اگر معیارهای پذیرش (AC) مبهم/ناقص بودند، بهترین تفسیر را انتخاب کن و در
+  commit message توضیح بده.
+
+📦 **اگر کار طولانی است:**
+- **خلاصه‌اش نکن.** همه را به‌طور کامل انجام بده.
+- اگر یک کامیت گنجایش ندارد، در **چندین کامیت متوالی** انجام بده — ولی
+  هیچ بخشی را skip نکن.
+- ترتیب کامیت‌ها را منطقی نگه‌دار (foundation → core → integration → tests).
+- در آخر یک checklist از همه‌ی کامیت‌ها در PR description بنویس.
+
+---
+
+
+## 🎯 هدف (خلاصه ساختاریافته)
+notification بدون event_type صریح در auth_service.py
+
+## 📍 موقعیت دقیق در پروژه
+_(file:line — symbol — snippet)_
+
+- `app/services/auth_service.py:130`
+
+## 🧭 هدف اصلی پروژه (از یادداشت کاربر)
+## ⚠️ یادداشت مهم برای مدل اجراکننده — قبل از شروع بخوان
+
+این پرامپت بر اساس یک **بررسی اولیهٔ خودکار** از repo ساخته شده — ممکن است
+حاوی اشتباه، تشخیص نادرست، یا حذف موارد مهم باشد. به‌عنوان منبع نهایی به
+آن استناد نکن.
+
+♻️ **احتمال پیاده‌سازی قبلی (مهم):**
+- ممکن است **بخشی یا تمامِ** این درخواست 
+[auto-re-registered from github_import at 2026-05-20T04:25:49.854717+00:00]
+
+## 🧱 پشتهٔ فناوری و معماری
+Stack: fastapi, react, vite.
+
+## 🔗 فایل‌های مرتبط (Cross-references)
+_(فایل‌هایی که با موقعیت‌های هدف در ارتباط هستند — import، caller، shared state)_
+
+- `app/config.py` — `auth_service.py` این فایل را import می‌کند
+- `config/settings.py` — `auth_service.py` این فایل را import می‌کند
+- `app/models/user.py` — `auth_service.py` این فایل را import می‌کند
+- `app/schemas/auth.py` — `auth_service.py` این فایل را import می‌کند
+- `app/routes/auth.py` — این فایل `auth_service.py` را import می‌کند (caller)
+- `app/routes/users.py` — این فایل `auth_service.py` را import می‌کند (caller)
+
+## 🌐 نقشهٔ وابستگی‌ها
+این مورد روی notification pipeline تأثیر می‌گذارد — همه consumer های این event باید چک شوند.
+
+## 🔍 Context و وضعیت فعلی
+## 📋 شرح
+در `app/services/auth_service.py` یک `notify_event` call پیدا شد که اولین پارامتر (event_type) رشته‌ای ساده/مبهم است یا خالی.
+
+## 🤔 چرا مهم است
+event_type کلید routing و filter در سیستم notification است. بدون آن، نمی‌توان آن event را به‌صورت per-event mute/customize کرد.
+
+## 🔍 جزئیات
+- علت: notification call بدون event_type صریح — audit و filtering مشکل می‌شود
+- پیشنهاد: event="task_done" یا مشابه اضافه کن
+
+## ✅ معیار پذیرش (Acceptance Criteria) — رفتار-محور
+**مهم:** هر AC رفتار قابل مشاهده را تعریف می‌کند، نه نام فایل/کلاس.
+verify می‌تواند پیاده‌سازی متفاوت ولی هم‌ارز را قبول کند.
+
+- [ ] event_type معنادار snake_case تعیین شد
+- [ ] در event registry ثبت شد
+- [ ] از UI tab notification settings این event قابل toggle است
+- [ ] هیچ تستی fail نمی‌شود (`npm run test` / `pytest`)
+- [ ] linter بدون warning عبور می‌کند
+- [ ] type-check موفق است (`tsc --noEmit` / `mypy`)
+
+## 🪜 مراحل اجرایی پیشنهادی
+1. گام ۱: event_type معنادار snake_case انتخاب کن (مثل `task_done_user_alert`).
+گام ۲: در `notification_events.json` (اگر هست) registry به‌روز کن.
+گام ۳: UI tab notification routing را تست کن.
+
+## 📤 خروجی مورد انتظار
+تغییر کد در فایل‌های مرتبط، commit یا PR جدید با پیام واضح، و عبور تمام معیارهای پذیرش.
+
+## 🧪 دستورات اعتبارسنجی
+- `python -m py_compile app/services/auth_service.py`
+- `ruff check app/services/auth_service.py`
+- `pytest -x`
+
+## ⚠️ ریسک‌ها و موارد احتیاط
+اگر event_type قبلاً به نام دیگری در DB ذخیره شده، rename باعث می‌شود old records orphan شوند.
+
+## 🔗 وابستگی‌های تسکی
+_(مستقل)_
+
+## 🏷 دسته‌بندی
+- نوع: notification_audit
+- اولویت: medium
+- تخمین زمان: medium
+
+## Acceptance Criteria
+
+1. event_type معنادار snake_case تعیین شد _(verify: static)_
+2. در event registry ثبت شد _(verify: static)_
+3. از UI tab notification settings این event قابل toggle است _(verify: ui_interaction)_

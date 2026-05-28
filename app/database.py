@@ -43,6 +43,15 @@ async def init_db():
     The audit (task_882723eb07de) flagged this as an under-engineering
     anti-pattern; the comment above makes the boundary explicit.
 
+    Pool tuning lives at the engine constructor above and the matching
+    SQLATimeoutError handler in app/main.py:
+      * pool_size / max_overflow sized from settings (env-tunable).
+      * pool_timeout paired with a clean 503 on exhaustion.
+      * pool_recycle stops Postgres from killing idle conns.
+      * pool_pre_ping=True catches half-dead conns before the first query.
+      * expire_on_commit=False on SessionLocal — read attributes after
+        commit without an extra SELECT.
+
     Returns:
         bool: True if tables were created (or already existed), False
               if a connection / permission error blocked creation.
