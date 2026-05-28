@@ -133,6 +133,36 @@ class AIService:
             tokens_used=0,
         )
 
+    async def analyze_person_behavior(self, person_name: str, interactions: list) -> dict:
+        """Score a relationship from a person's interaction history (audit
+        task 3cc09436, AC3). Deterministic + rule-based so it runs without an
+        upstream model and stays testable: each interaction is weighted by
+        type (a meeting counts more than a message), the weighted sum maps to
+        an ai_score (0-100), and the score buckets into a relationship_type.
+        This is the payload the POST /people-profiles/{id}/analyze route
+        (ai_score + relationship_type) surfaces."""
+        items = list(interactions or [])
+        type_weights = {"meeting": 3, "call": 2, "email": 1, "message": 1, "other": 1}
+        weighted = 0
+        for it in items:
+            raw = getattr(it, "type", None)
+            kind = getattr(raw, "value", None) or (str(raw).lower() if raw is not None else "other")
+            weighted += type_weights.get(kind, 1)
+        ai_score = min(100, weighted * 10)
+        if ai_score >= 60:
+            relationship_type = "close"
+        elif ai_score >= 20:
+            relationship_type = "regular"
+        else:
+            relationship_type = "distant"
+        return {
+            "person_name": person_name,
+            "ai_score": ai_score,
+            "relationship_type": relationship_type,
+            "interaction_count": len(items),
+            "summary": f"{len(items)} interaction(s); weighted engagement {weighted}.",
+        }
+
 
 async def get_active_config(db: AsyncSession) -> Optional[AIModelConfig]:
     """Return the single is_active=True config row, if any."""

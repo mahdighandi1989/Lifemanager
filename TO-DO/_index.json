@@ -1,8 +1,16 @@
 {
   "version": 1,
   "generated_at": "2026-05-28T23:25:00+00:00",
-  "total": 8,
+  "total": 9,
   "items": [
+    {
+      "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
+      "title": "مدیریت پروفایل افراد و تحلیل رفتاری",
+      "todo_file": "TO-DO/todo-task-3cc09436.md",
+      "execution_priority": 3300,
+      "manual_actions": 3,
+      "summary": "هم‌ترازی نام /api/people-profiles + analyze endpoint (AC1/4/5/6)، PersonTask M2M (AC2)، frontend (AC7/8/9). AC3 (analyze_person_behavior) انجام شد."
+    },
     {
       "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
       "title": "اسکن دارایی‌ها و تحلیل محتوا",
