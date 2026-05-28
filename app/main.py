@@ -187,14 +187,27 @@ async def _async_timeout_handler(request: Request, exc: asyncio.TimeoutError) ->
     )
 
 
-# Database initialization with graceful degradation
+# Database initialization with graceful degradation.
+#
+# ``database_available`` is the module-level health signal the startup probe
+# sets: True once Base.metadata.create_all succeeds, False if the initial
+# connection raised. The app keeps serving DB-free routes (health, webhook
+# stub) either way — the audit (task task_882723eb07de) requires "app
+# continues without database" — but exposing the flag lets health checks and
+# tests assert which branch the startup probe took.
+database_available: bool = False
+
+
 @app.on_event("startup")
 async def startup_event():
+    global database_available
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+        database_available = True
         logger.info("✅ Database tables created successfully")
     except Exception as e:
+        database_available = False
         logger.critical(f"❌ CRITICAL: Database connection failed: {e}")
         logger.info("   App will continue without database — set DATABASE_URL in Render env vars.")
 
