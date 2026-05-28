@@ -23,11 +23,15 @@ from app.schemas.ai_schema import (
     AIQueryRequest,
     AIQueryResponse,
 )
-from app.services.ai_service import AIService, generate_text
+from app.services.ai_service import AIService
 from app.services.ai.nlp_service import (
     metrics_snapshot,
     record_feedback,
 )
+# AC 5 (task 97867b277c1b): the module-level `generate_text` import
+# has been removed in favour of AIService.generate_text(). The
+# /ai/generate route below calls the instance method via the
+# already-DI'd ai_service Depends.
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -70,14 +74,21 @@ def get_ai_service(
 
 @router.post("/generate", response_model=AIGenerateResponse)
 @handle_errors
-async def generate(payload: AIGenerateRequest) -> AIGenerateResponse:
+async def generate(
+    payload: AIGenerateRequest,
+    ai_service: AIService = Depends(get_ai_service),
+) -> AIGenerateResponse:
     """Validate the prompt + run it through the AI service.
 
     AIGenerateRequest already rejects empty / >1000-char / SQL-injection-
     probe prompts with 422 (Pydantic). The response is shaped by
     AIGenerateResponse — only declared fields ship to the client.
+
+    Per audit task 97867b277c1b AC 6, the route now calls
+    ``ai_service.generate_text(...)`` instead of the module-level
+    helper — the AIService surface is the canonical entry point.
     """
-    result = await generate_text(
+    result = await ai_service.generate_text(
         prompt=payload.prompt,
         max_tokens=payload.max_tokens or 512,
         temperature=payload.temperature or 0.7,
@@ -331,6 +342,7 @@ from app.config import FEATURE_AI_ENABLED
 @handle_errors
 async def dynamic_analyze(
     payload: DynamicAnalysisRequest = Body(...),
+    ai_service: AIService = Depends(get_ai_service),
 ) -> DynamicAnalysisResponse:
     """Dynamic AI analysis on free-form text. Gated on FEATURE_AI_ENABLED
     so a deploy without AI infrastructure doesn't accidentally bill the
@@ -346,7 +358,7 @@ async def dynamic_analyze(
     parts.append(payload.prompt)
     merged = "\n\n".join(parts)
 
-    out = await generate_text(prompt=merged[:1000])
+    out = await ai_service.generate_text(prompt=merged[:1000])
     return DynamicAnalysisResponse(
         insights=out.get("generated_text", ""),
         model_used=out.get("model_used"),

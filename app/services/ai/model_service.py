@@ -48,6 +48,25 @@ class AIService:
             api_key if api_key is not None else os.environ.get("OPENAI_API_KEY")
         )
 
+    async def generate_text(
+        self,
+        prompt: str,
+        *,
+        max_tokens: int = 512,
+        temperature: float = 0.7,
+    ) -> dict:
+        """Per audit task 97867b277c1b AC 6, the /ai/generate route now
+        calls this instance method instead of the module-level
+        ``generate_text`` helper. Delegates to the same nlp_service
+        implementation so the metrics + placeholder branches stay
+        consistent — the route just no longer needs the bare-function
+        import."""
+        from app.services.ai.nlp_service import generate_text as _generate_text
+
+        return await _generate_text(
+            prompt, max_tokens=max_tokens, temperature=temperature
+        )
+
     async def get_user_configs(self, user_id: int) -> List[AIModelConfig]:
         result = await self.db.execute(select(AIModelConfig))
         return list(result.scalars().all())
