@@ -593,6 +593,16 @@ app.include_router(planner.router, tags=["planner"])
 # paths so it mounts with no prefix.
 app.include_router(self_improvement.router, tags=["self-improvement"])
 
+# Google OAuth router is conditionally mounted: only when the operator
+# has actually configured a GOOGLE_CLIENT_ID. Without that, the consent-
+# screen redirect would 500 anyway, so we keep the surface area off the
+# public schema entirely. This is the wiring that makes auth_google
+# stop being an orphan file (audit task 3b90d409).
+if settings.GOOGLE_CLIENT_ID:
+    from app.routes import auth_google  # noqa: E402 (conditional import)
+    app.include_router(auth_google.router, tags=["google-auth"])
+    logger.info("Google OAuth router mounted (GOOGLE_CLIENT_ID is set)")
+
 # Serve static files (frontend)
 # در Native Render runtime، CWD ریشه پروژه است
 # Vite خروجی را در frontend/dist می‌گذارد
