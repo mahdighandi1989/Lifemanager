@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generated_at": "2026-05-28T23:25:00+00:00",
-  "total": 6,
+  "total": 7,
   "items": [
     {
       "task_id": "task_78c0e8e0a9b5",
@@ -50,6 +50,14 @@
       "execution_priority": 3000,
       "manual_actions": 4,
       "summary": "فیچر merge/consolidation (similarity TF-IDF، /api/merge، Task.merged_into_id، UI). deliverable واقعی (inventory) کامل + regression رفع شد."
+    },
+    {
+      "task_id": "7367c6f0-ba56-46c4-8436-0970a7075314",
+      "title": "انتقال داده به Google Drive + طبقه‌بندی سرد",
+      "todo_file": "TO-DO/todo-task-7367c6f0.md",
+      "execution_priority": 3000,
+      "manual_actions": 5,
+      "summary": "Google Drive/Sheets + endpointها + Celery OCR/ASR workers + tiering (نیازمند Google creds/Celery/OCR). AC3 (مدل DriveFile) + AC8/11 (DataClassificationService) انجام شد."
     }
   ]
 }
