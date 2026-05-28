@@ -11,6 +11,7 @@ from app.models.integration import Integration
 from app.models.local_file_entry import LocalFileEntry
 from app.models.notification import Notification
 from app.models.person import Person
+from app.models.user_location import UserLocation
 from app.models.project import Project
 from app.models.self_improvement import (
     SelfImprovementCheckIn,
@@ -34,6 +35,7 @@ __all__ = [
     "LocalFileEntry",
     "Notification",
     "Person",
+    "UserLocation",
     "OAuthUser",
     "Project",
     "SelfImprovementCheckIn",

@@ -50,6 +50,13 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""
 
+    # Google Maps key — used by the (future) /api/location/search
+    # geocoding service. Empty by default so a deploy without Maps
+    # credentials still boots; the route layer is responsible for
+    # short-circuiting to 503 / a stub response when the key is
+    # missing rather than blowing up on an httpx call.
+    GOOGLE_MAPS_API_KEY: str = ""
+
     # --- Rate limiting -------------------------------------------------------
     # Per-IP limits for sensitive auth endpoints. Format follows slowapi's
     # "<count>/<period>" syntax (e.g. "5/minute", "3/hour").
