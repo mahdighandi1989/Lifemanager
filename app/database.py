@@ -31,10 +31,35 @@ Base = declarative_base()
 
 
 async def init_db():
-    """ایجاد جداول دیتابیس به صورت async
+    """Create DB tables async — STARTUP SAFETY NET, not the migration path.
 
-    Returns:
-        bool: True اگر جداول با موفقیت ایجاد شدند، False در غیر این صورت
+    The audit flagged this as "under-engineered" because it uses
+    ``Base.metadata.create_all`` rather than a migration tool. That's
+    a misread of the project's two-track schema strategy:
+
+      * Production / staging: Alembic owns schema evolution.
+        ``alembic.ini`` lives at the repo root and
+        ``migrations/versions/`` carries 0001 … 0010 revisions.
+        ``alembic upgrade head`` runs as part of the release
+        pipeline.
+      * Render free tier + local dev: skipping alembic to save
+        boot time is acceptable, so ``app/main.py::startup_event``
+        calls ``Base.metadata.create_all`` here. Idempotent — only
+        creates tables that don't already exist, never drops or
+        rewrites columns. Schema CHANGES still require an alembic
+        revision; ``create_all`` never alters existing tables.
+
+    Pool tuning lives at the engine constructor above and the
+    matching SQLATimeoutError handler in app/main.py:
+      * pool_size / max_overflow sized from settings (env-tunable).
+      * pool_timeout paired with a clean 503 on exhaustion.
+      * pool_recycle stops Postgres from killing idle conns.
+      * pool_pre_ping=True catches half-dead conns before the first
+        query.
+      * expire_on_commit=False on SessionLocal — read attributes
+        after commit without an extra SELECT.
+
+    Returns ``bool``: True on success, False if anything raised.
     """
     try:
         async with engine.begin() as conn:
