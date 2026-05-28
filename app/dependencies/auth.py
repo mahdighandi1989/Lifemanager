@@ -66,10 +66,21 @@ async def get_optional_user_id(
 
 
 async def get_current_active_user(
-    current_user: OAuthUser = Depends(get_current_user),
-) -> OAuthUser:
-    """Get current active user (approved or admin)."""
-    if current_user.status == "pending":
+    current_user=Depends(get_current_user),
+):
+    """Get current active user (approved or admin).
+
+    Type-loose intentionally: the upstream ``get_current_user`` is
+    typed to return ``User`` (the password-auth model), but the OAuth
+    bolt-on flow constructs ``OAuthUser`` instances that carry the
+    ``status`` field this branch reads. ``getattr`` with a default
+    keeps the password-auth path safe — a regular ``User`` without
+    a ``status`` column simply passes through as "active". When the
+    OAuth flow lands and consistently returns OAuthUser, switch
+    this type hint to ``User | OAuthUser`` for clarity.
+    """
+    status_value = getattr(current_user, "status", None)
+    if status_value == "pending":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Your account is pending approval. Please wait for admin approval.",
@@ -77,10 +88,18 @@ async def get_current_active_user(
     return current_user
 
 async def get_current_admin_user(
-    current_user: OAuthUser = Depends(get_current_user),
-) -> OAuthUser:
-    """Get current admin user."""
-    if current_user.email != "mohamad.mahdi1988@gmail.com":
+    current_user=Depends(get_current_user),
+):
+    """Get current admin user.
+
+    Same type-loose pattern as ``get_current_active_user`` — gets a
+    ``User`` from password-auth or an ``OAuthUser`` from the Google
+    flow. Both carry ``email``, so the admin check is portable. The
+    helper is currently UNUSED (grep finds zero callers), but we keep
+    it in place for the admin-panel route that the auth_google flow
+    is expected to add.
+    """
+    if getattr(current_user, "email", None) != "mohamad.mahdi1988@gmail.com":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required",
