@@ -5,7 +5,10 @@ asyncpg==0.30.0
 pydantic==2.10.4
 pydantic-core==2.27.2
 pydantic-settings==2.7.1
-pydantic[email]==2.10.4
+# email-validator is the only optional pydantic extra the codebase
+# actually consumes (EmailStr in schemas). Pinned explicitly here
+# instead of pulling it via `pydantic[email]` so pip doesn't try to
+# resolve the same `pydantic` line twice.
 email-validator>=2.0.0
 cryptography>=42.0.0
 python-dotenv==1.0.1
