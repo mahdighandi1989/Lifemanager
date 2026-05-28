@@ -23,6 +23,7 @@ from app.routes import (
     lists,
     local_files,
     notifications,
+    person,
     planner,
     projects,
     self_improvement,
@@ -586,6 +587,7 @@ app.include_router(integrations.router, prefix="/integrations", tags=["integrati
 app.include_router(lists.router)
 app.include_router(todo_items.router)
 app.include_router(local_files.router)
+app.include_router(person.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
