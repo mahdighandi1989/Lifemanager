@@ -118,3 +118,84 @@ def test_list_todo_items_accepts_valid_bearer(api_client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
+
+
+# ── Step 25: list_tasks scopes by user_id ──────────────────────────
+
+
+def test_list_tasks_works_anon(api_client):
+    """The optional-auth path resolves anon to DEFAULT_ANON_USER_ID
+    (=0) so the frontend's login-bypass mode keeps working."""
+    response = api_client.get("/api/tasks")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+def test_list_tasks_accepts_valid_bearer(api_client):
+    from app.services import auth_service
+
+    token = auth_service.create_access_token({"sub": "1", "email": "x@example.com"})
+    response = api_client.get(
+        "/api/tasks",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+
+
+# ── Steps 38-40: JWT payload minimization ──────────────────────────
+
+
+def test_jwt_payload_carries_only_documented_claims():
+    """The issued JWT must carry exactly {sub, email, exp}. A surplus
+    claim (role, password, profile_pic_url, ...) leaking into the
+    token would expand the public surface and let any client read
+    server-side fields without an explicit endpoint."""
+    import jwt as _jwt
+    from app.config import settings
+    from app.services import auth_service
+
+    token = auth_service.create_access_token({"sub": "42", "email": "u@example.com"})
+    payload = _jwt.decode(
+        token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+    )
+    assert set(payload.keys()) == {"sub", "email", "exp"}, (
+        f"unexpected JWT claims leaked: {set(payload.keys()) - {'sub', 'email', 'exp'}}"
+    )
+    assert payload["sub"] == "42"
+
+
+# ── AC 18-19 conversion: ACCESS_TOKEN_EXPIRE_MINUTES IS read ─────
+
+
+def test_access_token_expire_minutes_is_consumed_by_jwt_exp():
+    """The audit AC 18-19 claimed ACCESS_TOKEN_EXPIRE_MINUTES was unused.
+    That is false: this test pins that the setting is the source of
+    truth for the JWT `exp` claim, so a future cleanup PR can't silently
+    delete the variable from .env.example or config without breaking
+    the JWT expiry contract."""
+    import jwt as _jwt
+    from datetime import datetime, timezone
+    from app.config import settings
+    from app.services import auth_service
+
+    token = auth_service.create_access_token({"sub": "1", "email": "x@example.com"})
+    payload = _jwt.decode(
+        token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+    )
+    exp_dt = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
+    now = datetime.now(tz=timezone.utc)
+    delta_minutes = (exp_dt - now).total_seconds() / 60
+    # Allow a generous 2-minute tolerance for clock drift / test latency.
+    assert abs(delta_minutes - settings.ACCESS_TOKEN_EXPIRE_MINUTES) < 2
+
+
+# ── AC 17 edge case: tampered signature ────────────────────────────
+
+
+def test_tampered_signature_is_rejected():
+    from app.services import auth_service
+
+    token = auth_service.create_access_token({"sub": "1", "email": "x@example.com"})
+    # Flip the last character — destroys the HMAC tag.
+    tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+    assert auth_service.validate_token(tampered) is None
