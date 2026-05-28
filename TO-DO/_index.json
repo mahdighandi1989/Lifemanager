@@ -1,31 +1,15 @@
 {
   "version": 1,
-  "generated_at": "2026-05-28T23:25:00+00:00",
+  "generated_at": "2026-05-28T23:59:00+00:00",
   "total": 9,
   "items": [
-    {
-      "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
-      "title": "مدیریت پروفایل افراد و تحلیل رفتاری",
-      "todo_file": "TO-DO/todo-task-3cc09436.md",
-      "execution_priority": 3300,
-      "manual_actions": 3,
-      "summary": "هم‌ترازی نام /api/people-profiles + analyze endpoint (AC1/4/5/6)، PersonTask M2M (AC2)، frontend (AC7/8/9). AC3 (analyze_person_behavior) انجام شد."
-    },
-    {
-      "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
-      "title": "اسکن دارایی‌ها و تحلیل محتوا",
-      "todo_file": "TO-DO/todo-task-217909d2.md",
-      "execution_priority": 3300,
-      "manual_actions": 5,
-      "summary": "scan endpoint + WebSocket + AssetDashboard/Settings UI + drive-mount + Google Drive. AC1 (UserAsset) + AC6 (AssetToTaskLinker) انجام شد."
-    },
     {
       "task_id": "task_78c0e8e0a9b5",
       "title": "پیاده‌سازی احراز هویت JWT و کنترل دسترسی کاربر",
       "todo_file": "TO-DO/todo-task-78c0e8e0.md",
       "execution_priority": 1300,
       "manual_actions": 3,
-      "summary": "تنظیم JWT_SECRET_KEY و WEBHOOK_SECRET واقعی در production (Render)."
+      "summary": "تنظیم JWT_SECRET_KEY و WEBHOOK_SECRET واقعی در production (Render). guard سخت‌شدهٔ startup بدون کلید معتبر در production بالا نمی‌آید."
     },
     {
       "task_id": "1a08ded2-2801-4389-905c-94972c928461",
@@ -41,7 +25,7 @@
       "todo_file": "TO-DO/todo-task-4ae4b3ca.md",
       "execution_priority": 3000,
       "manual_actions": 2,
-      "summary": "BudgetPage فرانت‌اند + nav (AC3/6) و نوتیفیکیشن بودجه‌ای (AC5). AC1/2/4 انجام شد."
+      "summary": "BudgetPage فرانت‌اند + nav (AC3/6) و نوتیفیکیشن بودجه‌ای با Task.estimated_cost (AC5). AC1/2/4 انجام شد."
     },
     {
       "task_id": "2165524b-5614-4c95-938c-0587d7748436",
@@ -49,7 +33,7 @@
       "todo_file": "TO-DO/todo-task-2165524b.md",
       "execution_priority": 3000,
       "manual_actions": 3,
-      "summary": "فیلدهای Task+migration (AC2)، Celery (AC4)، Smart Suggestions UI (AC5). AC1+AC3 انجام شد."
+      "summary": "فیلدهای Task+migration (AC2)، Celery analyze_user_context (AC4)، Smart Suggestions UI (AC5). AC1 (پکیج) + AC3 (endpoint) انجام شد."
     },
     {
       "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
@@ -57,7 +41,7 @@
       "todo_file": "TO-DO/todo-task-d2146781.md",
       "execution_priority": 3000,
       "manual_actions": 1,
-      "summary": "صفحهٔ /external-projects فرانت‌اند (AC6). AC1/2/3/4/5 انجام شد."
+      "summary": "صفحهٔ /external-projects فرانت‌اند (AC6). AC1/2/3 + AC4 (sync_project_data) + AC5 (analyze_time_allocation) انجام شد."
     },
     {
       "task_id": "fbd9bd36-2c64-4014-921b-ded8e3dd5cb5",
@@ -65,7 +49,7 @@
       "todo_file": "TO-DO/todo-task-fbd9bd36.md",
       "execution_priority": 3000,
       "manual_actions": 4,
-      "summary": "فیچر merge/consolidation (similarity TF-IDF، /api/merge، Task.merged_into_id، UI). deliverable واقعی (inventory) کامل + regression رفع شد."
+      "summary": "فیچر merge/consolidation (similarity TF-IDF، /api/merge، Task.merged_into_id، UI). deliverable واقعی (architecture inventory) کامل + regression رفع شد."
     },
     {
       "task_id": "7367c6f0-ba56-46c4-8436-0970a7075314",
@@ -73,7 +57,23 @@
       "todo_file": "TO-DO/todo-task-7367c6f0.md",
       "execution_priority": 3000,
       "manual_actions": 5,
-      "summary": "Google Drive/Sheets + endpointها + Celery OCR/ASR workers + tiering (نیازمند Google creds/Celery/OCR). AC3 (مدل DriveFile) + AC8/11 (DataClassificationService) انجام شد."
+      "summary": "Google Drive/Sheets + endpointها + Celery OCR/ASR + tiering (نیازمند Google creds/Celery/OCR). AC3 (مدل DriveFile) + AC8/11 (DataClassificationService) انجام شد."
+    },
+    {
+      "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
+      "title": "اسکن دارایی‌ها و تحلیل محتوا",
+      "todo_file": "TO-DO/todo-task-217909d2.md",
+      "execution_priority": 3300,
+      "manual_actions": 5,
+      "summary": "scan endpoint + WebSocket + AssetDashboard/Settings UI + drive-mount + Google Drive. AC1 (UserAsset) + AC6 (AssetToTaskLinker) انجام شد."
+    },
+    {
+      "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
+      "title": "مدیریت پروفایل افراد و تحلیل رفتاری",
+      "todo_file": "TO-DO/todo-task-3cc09436.md",
+      "execution_priority": 3300,
+      "manual_actions": 3,
+      "summary": "هم‌ترازی نام /api/people-profiles + analyze endpoint (AC1/4/5/6)، PersonTask M2M (AC2)، frontend (AC7/8/9). AC3 (analyze_person_behavior) انجام شد."
     }
   ]
 }
