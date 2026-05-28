@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON, Text
 from sqlalchemy.sql import func
 from app.database import Base
 
@@ -12,6 +12,11 @@ class AIModelConfig(Base):
     model_name = Column(String(255), nullable=False)
     api_key_env_var = Column(String(255), nullable=True)
     parameters = Column(JSON, nullable=True, default=dict)
+    # Optional per-config template (audit task e606cca6). Stored as TEXT
+    # so a long system prompt + placeholder tokens fit without a
+    # VARCHAR cap. The route layer fills the placeholders before
+    # sending the rendered prompt upstream.
+    prompt_template = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

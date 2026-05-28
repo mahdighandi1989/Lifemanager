@@ -1,3 +1,27 @@
+"""Auth dependencies for FastAPI routes.
+
+The codebase has two distinct user ORM models, each backing a distinct
+authentication flow (audit task b7638cb2):
+
+  * ``app.models.user.User`` — table ``users``. Username/email +
+    bcrypt password. Powers the local register/login flow served by
+    ``app/routes/auth.py`` and ``app/services/auth_service.py``.
+  * ``app.models.user_oauth.OAuthUser`` — table ``oauth_users``.
+    Google-issued identity (no password), plus ``role`` /
+    ``permissions`` / ``status`` columns for the admin-approval flow
+    served by ``app/routes/auth_google.py``.
+
+Both models live behind the same JWT — ``get_current_user`` returns
+whichever ORM instance ``AuthService.verify_token`` looked up — so
+downstream helpers cannot assume a single concrete shape. They probe
+attributes with ``getattr`` (defensive: a User token answers
+``status="active"``, an OAuthUser token answers its real status).
+The active/admin gates are still meaningful — a pending OAuthUser
+still gets 403 — but they no longer crash on a User-backed token
+where the column doesn't exist.
+"""
+from typing import Union
+
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +30,9 @@ from app.models.user import User
 from app.services.auth_service import AuthService
 from app.models.user_oauth import OAuthUser
 from app.core.config import settings
+
+
+AuthContext = Union[User, OAuthUser]
 
 security = HTTPBearer()
 # Optional bearer — auto_error=False so the dependency returns None
@@ -24,7 +51,16 @@ optional_security = HTTPBearer(auto_error=False)
 DEFAULT_ANON_USER_ID = 0
 
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: AsyncSession = Depends(get_db)) -> User:
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> AuthContext:
+    """Resolve the bearer token to a user row.
+
+    The return type is ``AuthContext`` — either a ``User`` or an
+    ``OAuthUser``. Downstream helpers must not assume one concrete
+    shape; they probe attributes with ``getattr``.
+    """
     token = credentials.credentials
     auth_service = AuthService(db)
     user = await auth_service.verify_token(token)
@@ -66,18 +102,15 @@ async def get_optional_user_id(
 
 
 async def get_current_active_user(
-    current_user=Depends(get_current_user),
-):
-    """Get current active user (approved or admin).
+    current_user: AuthContext = Depends(get_current_user),
+) -> AuthContext:
+    """Block the OAuth ``pending`` state from active routes.
 
-    Type-loose intentionally: the upstream ``get_current_user`` is
-    typed to return ``User`` (the password-auth model), but the OAuth
-    bolt-on flow constructs ``OAuthUser`` instances that carry the
-    ``status`` field this branch reads. ``getattr`` with a default
-    keeps the password-auth path safe — a regular ``User`` without
-    a ``status`` column simply passes through as "active". When the
-    OAuth flow lands and consistently returns OAuthUser, switch
-    this type hint to ``User | OAuthUser`` for clarity.
+    ``status`` is OAuthUser-only. Local ``User`` rows have no such
+    column, so we probe with ``getattr`` and treat its absence as
+    "active enough" — local users are gated by ``is_active`` on the
+    User model and the login flow has its own UserDisabledError path,
+    so they never reach here in the disabled state.
     """
     status_value = getattr(current_user, "status", None)
     if status_value == "pending":
@@ -88,17 +121,10 @@ async def get_current_active_user(
     return current_user
 
 async def get_current_admin_user(
-    current_user=Depends(get_current_user),
-):
-    """Get current admin user.
-
-    Same type-loose pattern as ``get_current_active_user`` — gets a
-    ``User`` from password-auth or an ``OAuthUser`` from the Google
-    flow. Both carry ``email``, so the admin check is portable. The
-    helper is currently UNUSED (grep finds zero callers), but we keep
-    it in place for the admin-panel route that the auth_google flow
-    is expected to add.
-    """
+    current_user: AuthContext = Depends(get_current_user),
+) -> AuthContext:
+    """Admin gate. Works for both User and OAuthUser shapes — ``email``
+    exists on both, so the comparison is safe across the union."""
     if getattr(current_user, "email", None) != "mohamad.mahdi1988@gmail.com":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

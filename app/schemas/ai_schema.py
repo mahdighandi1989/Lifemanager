@@ -89,6 +89,12 @@ class AIGenerateRequest(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=1000)
     max_tokens: Optional[int] = Field(default=512, ge=1, le=8192)
     temperature: Optional[float] = Field(default=0.7, ge=0.0, le=2.0)
+    # Optional structured wrapping for the analysis flow (audit
+    # task e606cca6). `system_role_prompt` becomes the system message;
+    # `task_context` is concatenated to the user message ahead of
+    # `prompt` so the model sees both.
+    system_role_prompt: Optional[str] = Field(default=None, max_length=4000)
+    task_context: Optional[str] = Field(default=None, max_length=10_000)
 
     @field_validator("prompt")
     @classmethod
@@ -99,6 +105,19 @@ class AIGenerateRequest(BaseModel):
                     "prompt contains a disallowed pattern (SQL-injection probe)"
                 )
         return value
+
+
+class DynamicAnalysisRequest(BaseModel):
+    """Payload for POST /ai/dynamic-analyze (audit task e606cca6)."""
+
+    prompt: str = Field(..., min_length=1, max_length=10_000)
+    system_role_prompt: Optional[str] = None
+    task_context: Optional[str] = None
+
+
+class DynamicAnalysisResponse(BaseModel):
+    insights: str
+    model_used: Optional[str] = None
 
 
 class AIQueryResponse(BaseModel):

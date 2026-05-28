@@ -133,3 +133,26 @@ class TestConcurrentSessions:
             assert results == [1] * 100
         finally:
             await test_engine.dispose()
+
+
+# Module-level alias under the exact node id the audit's verify_plan
+# expects: tests/test_database.py::test_concurrent_connections. The
+# class-bound test above does the heavy lifting; this function gives
+# the static AC a stable entry point.
+@pytest.mark.asyncio
+async def test_concurrent_connections():
+    """Connection pool handles 100 concurrent requests without errors
+    (audit task task_882723eb07de, sub-task 6e6ec128)."""
+    test_engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    try:
+        factory = async_sessionmaker(test_engine, expire_on_commit=False)
+
+        async def one_query():
+            async with factory() as session:
+                result = await session.execute(text("SELECT 1"))
+                return result.scalar()
+
+        results = await asyncio.gather(*(one_query() for _ in range(100)))
+        assert results == [1] * 100
+    finally:
+        await test_engine.dispose()

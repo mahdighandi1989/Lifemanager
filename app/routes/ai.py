@@ -7,7 +7,7 @@ route helpers below stay thin — error mapping lives in @handle_errors.
 import os
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -24,6 +24,12 @@ from app.schemas.ai_schema import (
     AIQueryResponse,
 )
 from app.services.ai_service import AIService, generate_text
+from app.services.ai.nlp_service import (
+    metrics_snapshot,
+    record_feedback,
+)
+from pydantic import BaseModel, Field
+from typing import Optional
 
 # Canonical prefix lives on the router itself (was previously set via
 # app.include_router(prefix="/ai") in main.py). Keeping it inline here
@@ -140,3 +146,230 @@ async def query_ai(
     current_user: User = Depends(get_current_user),
 ):
     return await ai_service.query(query_data, current_user.id)
+
+
+# ── Metrics & feedback (audit task 97867b277c1b) ────────────────────
+
+
+class AIFeedbackPayload(BaseModel):
+    """Like/dislike + optional explicit 1-5 score for the most recent AI
+    response. ``liked`` and ``score`` are both optional so the UI can
+    submit either signal independently."""
+
+    liked: Optional[bool] = None
+    score: Optional[int] = Field(default=None, ge=1, le=5)
+
+
+@router.post("/feedback", status_code=status.HTTP_202_ACCEPTED)
+@handle_errors
+async def submit_ai_feedback(payload: AIFeedbackPayload) -> dict:
+    """Record a like/dislike or 1-5 score for the AI response.
+
+    The route only exposes the binary like signal and the explicit
+    rating — neither path requires authentication, intentionally, so
+    the audit's outcome metric can be collected even when the chat is
+    used in the frontend's login-bypass mode.
+    """
+    if payload.liked is None and payload.score is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide either liked (bool) or score (1-5)",
+        )
+    record_feedback(liked=payload.liked, score=payload.score)
+    return {"accepted": True}
+
+
+@router.get("/metrics")
+@handle_errors
+async def get_ai_metrics() -> dict:
+    """Summary view of the AI performance counters.
+
+    Includes ``ai_response_latency_ms`` (rolling avg), the
+    ``ai_response_quality_score`` (rolling avg of explicit scores)
+    plus the SLO targets so a caller can render a green/red status.
+    """
+    return metrics_snapshot()
+
+
+# ── AI Providers + Global Analysis Prompt (audit task 1a08ded2) ─────
+
+
+from sqlalchemy import select as _select
+from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
+from app.schemas.ai_provider_schema import (
+    AIProviderCreate,
+    AIProviderResponse,
+    AIProviderUpdate,
+    GlobalAnalysisPromptResponse,
+    GlobalAnalysisPromptUpdate,
+)
+from app.dependencies.auth import get_optional_user_id
+
+
+@router.post(
+    "/providers",
+    response_model=AIProviderResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+@handle_errors
+async def create_ai_provider(
+    payload: AIProviderCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    provider = AIProvider(
+        user_id=user_id,
+        name=payload.name,
+        description=payload.description,
+        is_enabled=payload.is_enabled,
+    )
+    db.add(provider)
+    await db.commit()
+    await db.refresh(provider)
+    return provider
+
+
+@router.get("/providers", response_model=List[AIProviderResponse])
+@handle_errors
+async def list_ai_providers(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(AIProvider.user_id == user_id)
+    )
+    return list(result.scalars().all())
+
+
+@router.get("/providers/{provider_id}", response_model=AIProviderResponse)
+@handle_errors
+async def get_ai_provider(
+    provider_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+    return provider
+
+
+@router.patch("/providers/{provider_id}", response_model=AIProviderResponse)
+@handle_errors
+async def update_ai_provider(
+    provider_id: int,
+    payload: AIProviderUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+    if payload.name is not None:
+        provider.name = payload.name
+    if payload.description is not None:
+        provider.description = payload.description
+    if payload.is_enabled is not None:
+        provider.is_enabled = payload.is_enabled
+    await db.commit()
+    await db.refresh(provider)
+    return provider
+
+
+@router.delete("/providers/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)
+@handle_errors
+async def delete_ai_provider(
+    provider_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+    await db.delete(provider)
+    await db.commit()
+
+
+@router.get("/global-prompt", response_model=GlobalAnalysisPromptResponse)
+@handle_errors
+async def get_global_prompt(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(_select(GlobalAnalysisPrompt))
+    prompt = result.scalars().first()
+    if prompt is None:
+        # Default empty surface so the frontend can render the editor
+        # the very first time the page is opened.
+        return GlobalAnalysisPromptResponse(prompt_text="")
+    return prompt
+
+
+# ── Dynamic AI analysis (audit task e606cca6) ─────────────────────
+
+
+from app.schemas.ai_schema import (
+    DynamicAnalysisRequest,
+    DynamicAnalysisResponse,
+)
+from app.config import FEATURE_AI_ENABLED
+
+
+@router.post("/dynamic-analyze", response_model=DynamicAnalysisResponse)
+@handle_errors
+async def dynamic_analyze(
+    payload: DynamicAnalysisRequest = Body(...),
+) -> DynamicAnalysisResponse:
+    """Dynamic AI analysis on free-form text. Gated on FEATURE_AI_ENABLED
+    so a deploy without AI infrastructure doesn't accidentally bill the
+    upstream provider. Returns 403 when the flag is off."""
+    if not FEATURE_AI_ENABLED:
+        raise HTTPException(status_code=403, detail="AI analysis is disabled")
+
+    parts = []
+    if payload.system_role_prompt:
+        parts.append(payload.system_role_prompt)
+    if payload.task_context:
+        parts.append(payload.task_context)
+    parts.append(payload.prompt)
+    merged = "\n\n".join(parts)
+
+    out = await generate_text(prompt=merged[:1000])
+    return DynamicAnalysisResponse(
+        insights=out.get("generated_text", ""),
+        model_used=out.get("model_used"),
+    )
+
+
+@router.put("/global-prompt", response_model=GlobalAnalysisPromptResponse)
+@handle_errors
+async def put_global_prompt(
+    payload: GlobalAnalysisPromptUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    result = await db.execute(_select(GlobalAnalysisPrompt))
+    prompt = result.scalars().first()
+    if prompt is None:
+        prompt = GlobalAnalysisPrompt(
+            prompt_text=payload.prompt_text, edited_by_user_id=user_id
+        )
+        db.add(prompt)
+    else:
+        prompt.prompt_text = payload.prompt_text
+        prompt.edited_by_user_id = user_id
+    await db.commit()
+    await db.refresh(prompt)
+    return prompt

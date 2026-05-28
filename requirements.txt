@@ -2,13 +2,14 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 sqlalchemy[asyncio]==2.0.36
 asyncpg==0.30.0
-pydantic==2.10.4
+# pydantic[email] pulls in pydantic+email-validator in one line so the
+# duplicate `pydantic==2.10.4` + `pydantic[email]==2.10.4` pair that the
+# audit (task 850097a9) flagged is collapsed to a single declaration.
+pydantic[email]==2.10.4
 pydantic-core==2.27.2
 pydantic-settings==2.7.1
-# email-validator is the only optional pydantic extra the codebase
-# actually consumes (EmailStr in schemas). Pinned explicitly here
-# instead of pulling it via `pydantic[email]` so pip doesn't try to
-# resolve the same `pydantic` line twice.
+# email-validator is also re-pinned explicitly so pip never has to
+# re-resolve the pydantic line just to pull the extras.
 email-validator>=2.0.0
 cryptography>=42.0.0
 python-dotenv==1.0.1

@@ -268,6 +268,107 @@ async def seed_default_lists_if_empty(db: AsyncSession) -> int:
     return len(created)
 
 
+async def sync_todo_lists_from_source(
+    db: AsyncSession,
+    *,
+    user_id: int,
+    payload: dict,
+) -> dict:
+    """Idempotent sync of one list + its items from an external source.
+
+    ``payload`` shape (the audit task 217909d2 contract):
+        {"name": str, "description": str|None, "items": [{"content": str, ...}, ...]}
+
+    Behaviour:
+      * If a list with ``name`` already exists, reuse it; otherwise create.
+      * Items whose ``content`` matches an existing row are left alone
+        (description/starred can update in place).
+      * Items present on the list but NOT in the payload are removed
+        from the list (the deletion AC #34).
+
+    Returns a summary dict matching ``ListSyncSummary``.
+    """
+    from app.models.todo_item import TodoItem
+    from app.models.todo_list import TodoList, todo_list_items
+
+    name = (payload.get("name") or "").strip()
+    if not name:
+        raise ValueError("payload.name is required")
+    description = payload.get("description")
+    items_in = payload.get("items") or []
+    if not isinstance(items_in, list):
+        raise ValueError("payload.items must be a list")
+
+    result = await db.execute(select(TodoList).where(TodoList.name == name))
+    lst = result.scalar_one_or_none()
+    if lst is None:
+        lst = TodoList(
+            name=_sanitize(name),
+            description=_sanitize(description),
+            user_id=user_id,
+        )
+        db.add(lst)
+        await db.commit()
+        await db.refresh(lst)
+
+    # Existing items in the list keyed by content.
+    existing_result = await db.execute(
+        select(TodoItem)
+        .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
+        .where(todo_list_items.c.todo_list_id == lst.id)
+    )
+    existing_items = {it.content: it for it in existing_result.scalars().all()}
+
+    incoming_contents = set()
+    created = 0
+    updated = 0
+    for raw in items_in:
+        if not isinstance(raw, dict):
+            continue
+        content = (raw.get("content") or "").strip()
+        if not content:
+            continue
+        incoming_contents.add(content)
+        existing = existing_items.get(content)
+        if existing is not None:
+            new_desc = raw.get("description")
+            if new_desc and new_desc != existing.description:
+                existing.description = _sanitize(new_desc)
+                updated += 1
+            continue
+        new_item = TodoItem(content=content, description=_sanitize(raw.get("description")))
+        db.add(new_item)
+        await db.flush()
+        await db.execute(
+            todo_list_items.insert().values(
+                todo_list_id=lst.id,
+                todo_item_id=new_item.id,
+                position=created,
+            )
+        )
+        created += 1
+
+    deleted = 0
+    for content, item in existing_items.items():
+        if content not in incoming_contents:
+            await db.execute(
+                todo_list_items.delete().where(
+                    (todo_list_items.c.todo_list_id == lst.id)
+                    & (todo_list_items.c.todo_item_id == item.id)
+                )
+            )
+            deleted += 1
+
+    await db.commit()
+    return {
+        "message": f"Synced list '{name}'",
+        "list_id": lst.id,
+        "created_items": created,
+        "updated_items": updated,
+        "deleted_items": deleted,
+    }
+
+
 async def bulk_create_default_lists(
     db: AsyncSession, names: Sequence[str]
 ) -> List[TodoList]:

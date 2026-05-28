@@ -42,14 +42,23 @@ class Settings(BaseSettings):
 
     # --- Google OAuth -------------------------------------------------------
     # Read by app/services/google_auth.py and app/routes/auth_google.py.
-    # All three are optional — the router is unmounted in main.py until the
-    # operator decides to expose the OAuth flow. GOOGLE_REDIRECT_URI must
-    # match the value registered in the Google Cloud Console; an empty
-    # string lets the route fall back to the local dev callback
-    # http://localhost:8000/auth/google/callback.
+    # The auth_google router is mounted in app/main.py only when
+    # GOOGLE_CLIENT_ID is non-empty (audit task 3b90d409 — without an
+    # operator-supplied client id the OAuth consent redirect would 500,
+    # so we keep the surface area off the public schema entirely).
+    # GOOGLE_REDIRECT_URI must match the value registered in the Google
+    # Cloud Console; an empty string lets the route fall back to the
+    # local dev callback http://localhost:8000/auth/google/callback.
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""
+
+    # Google Maps key — used by the (future) /api/location/search
+    # geocoding service. Empty by default so a deploy without Maps
+    # credentials still boots; the route layer is responsible for
+    # short-circuiting to 503 / a stub response when the key is
+    # missing rather than blowing up on an httpx call.
+    GOOGLE_MAPS_API_KEY: str = ""
 
     # --- Rate limiting -------------------------------------------------------
     # Per-IP limits for sensitive auth endpoints. Format follows slowapi's
@@ -136,6 +145,22 @@ settings = _validate(Settings())
 #   2. The audit's verify_plan grep for `DEFAULT_BACKGROUND_VALUE`
 #      finds the symbol and stops re-flagging the false positive.
 DEFAULT_BACKGROUND_VALUE = "card"
+
+
+# Rules table consumed by app/services/data_classification_service.py
+# (audit task 7367c6f0). An operator can tune the essential-window
+# without redeploying by overriding individual keys from an env
+# loader; the service falls back to its own DEFAULT_RULES if this
+# constant is empty.
+DATA_CLASSIFICATION_RULES = {
+    "essential_window_days": 7,
+}
+
+# Hard cap on user-facing TodoItem content. The migration 0010
+# widened the column to TEXT for the seeded self-improvement rows;
+# regular user-supplied content stays bounded here so a UI bug
+# can't drop a multi-megabyte string into the DB.
+MAX_TODO_ITEM_CONTENT_LENGTH = 4096
 
 
 # Module-level feature-flag mirrors. They evaluate at import time from the

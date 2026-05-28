@@ -16,24 +16,25 @@ from app.services.ai import nlp_service
 
 
 _LINE_RE = re.compile(
-    r"ai\.generate_text "
+    r"ai_performance "
+    r"request_id=(?P<request_id>\S+) "
     r"model=(?P<model>\S+) "
     r"prompt_len=(?P<prompt_len>\d+) "
-    r"latency_ms=(?P<latency_ms>\d+) "
+    r"ai_response_latency_ms=(?P<latency_ms>\d+) "
     r"tokens_used=(?P<tokens_used>\d+) "
     r"result_kind=(?P<result_kind>\w+)"
 )
 
 
 def _last_metric_record(caplog) -> dict:
-    """Pull the most recent ``ai.generate_text …`` record out of caplog."""
+    """Pull the most recent ``ai_performance …`` record out of caplog."""
     for rec in reversed(caplog.records):
         if rec.name == nlp_service.__name__:
             m = _LINE_RE.search(rec.getMessage())
             if m:
                 return m.groupdict()
     raise AssertionError(
-        "no ai.generate_text metrics line found in caplog; "
+        "no ai_performance metrics line found in caplog; "
         f"saw {[r.getMessage() for r in caplog.records]}"
     )
 
@@ -59,7 +60,7 @@ async def test_placeholder_path_emits_metrics(caplog, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_upstream_path_emits_metrics(caplog, monkeypatch):
-    """Mocked successful upstream → result_kind='upstream'."""
+    """Mocked successful upstream → result_kind='provider'."""
     async def fake_call_openai_chat(prompt, model, max_tokens, temperature):
         return {
             "generated_text": "real upstream output",
@@ -76,7 +77,7 @@ async def test_upstream_path_emits_metrics(caplog, monkeypatch):
     assert result["tokens_used"] == 42
 
     record = _last_metric_record(caplog)
-    assert record["result_kind"] == "upstream"
+    assert record["result_kind"] == "provider"
     assert record["tokens_used"] == "42"
     assert record["prompt_len"] == "4"
 

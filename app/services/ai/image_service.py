@@ -21,19 +21,11 @@ class AIImageService:
     """Placeholder image-analysis service.
 
     Kept as a class for parity with AIService — when a real vision
-    provider is wired in, the constructor can take a db session, an
-    httpx client, or any other dependency without breaking callers.
+    provider is wired in, the constructor can take whatever dependency
+    (httpx client, db session, etc.) it needs at that time. The unused
+    ``db`` parameter was removed because no caller ever supplied it
+    and no method ever read it.
     """
-
-    def __init__(self, db: Optional[object] = None):
-        # ``self.db`` is currently write-only — kept here so the
-        # vision integration that lands later can persist analysed
-        # results (caption, OCR, label list) without breaking the
-        # constructor's call sites. The audit flagged this as an
-        # unused attribute; it's intentional forward-compat, not a
-        # forgotten reader. If the integration never lands, remove
-        # this attribute AND the ``db`` parameter together.
-        self.db = db
 
     async def analyze_image(
         self,
