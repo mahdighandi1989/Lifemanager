@@ -264,3 +264,21 @@ async def process_webhook(provider: str, payload: dict) -> dict:
         "process_webhook provider=%s event=%s at %s", provider, event, timestamp,
     )
     return {"provider": provider, "event": event, "processed_at": timestamp}
+
+
+# AC 4 of audit task d2146781 — placeholder hook so callers can grab
+# the right ExternalProjectInterface adapter by name when concrete
+# adapters (Jira, Linear, Asana, GitHub Projects, …) are wired in.
+def get_external_project_interface(provider: str):
+    """Return the ``ExternalProjectInterface`` adapter for ``provider``.
+
+    No concrete adapters ship yet — this hook exists so the route /
+    service layer can call it today and have the integration light up
+    the moment an adapter is registered. Raises NotImplementedError
+    until then so a misroute can't silently fall back to a no-op.
+    """
+    raise NotImplementedError(
+        f"no ExternalProjectInterface adapter registered for {provider!r}; "
+        "see app/services/integrations/external_project_interface.py "
+        "for the contract"
+    )

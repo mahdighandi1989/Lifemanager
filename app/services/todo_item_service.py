@@ -139,6 +139,7 @@ async def create_item(
     due_date=None,
     owner_id: Optional[int] = None,
     list_ids: Optional[Iterable[int]] = None,
+    type: str = "task",
 ) -> TodoItem:
     obj = TodoItem(
         content=_sanitize(content),
@@ -148,6 +149,7 @@ async def create_item(
         parent_id=parent_id,
         due_date=due_date,
         owner_id=owner_id,
+        type=type,
         completed_at=_now() if is_completed else None,
     )
     db.add(obj)

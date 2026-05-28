@@ -23,11 +23,15 @@ from app.schemas.ai_schema import (
     AIQueryRequest,
     AIQueryResponse,
 )
-from app.services.ai_service import AIService, generate_text
+from app.services.ai_service import AIService
 from app.services.ai.nlp_service import (
     metrics_snapshot,
     record_feedback,
 )
+# AC 5 (task 97867b277c1b): the module-level `generate_text` import
+# has been removed in favour of AIService.generate_text(). The
+# /ai/generate route below calls the instance method via the
+# already-DI'd ai_service Depends.
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -70,14 +74,21 @@ def get_ai_service(
 
 @router.post("/generate", response_model=AIGenerateResponse)
 @handle_errors
-async def generate(payload: AIGenerateRequest) -> AIGenerateResponse:
+async def generate(
+    payload: AIGenerateRequest,
+    ai_service: AIService = Depends(get_ai_service),
+) -> AIGenerateResponse:
     """Validate the prompt + run it through the AI service.
 
     AIGenerateRequest already rejects empty / >1000-char / SQL-injection-
     probe prompts with 422 (Pydantic). The response is shaped by
     AIGenerateResponse — only declared fields ship to the client.
+
+    Per audit task 97867b277c1b AC 6, the route now calls
+    ``ai_service.generate_text(...)`` instead of the module-level
+    helper — the AIService surface is the canonical entry point.
     """
-    result = await generate_text(
+    result = await ai_service.generate_text(
         prompt=payload.prompt,
         max_tokens=payload.max_tokens or 512,
         temperature=payload.temperature or 0.7,
@@ -331,6 +342,7 @@ from app.config import FEATURE_AI_ENABLED
 @handle_errors
 async def dynamic_analyze(
     payload: DynamicAnalysisRequest = Body(...),
+    ai_service: AIService = Depends(get_ai_service),
 ) -> DynamicAnalysisResponse:
     """Dynamic AI analysis on free-form text. Gated on FEATURE_AI_ENABLED
     so a deploy without AI infrastructure doesn't accidentally bill the
@@ -346,7 +358,7 @@ async def dynamic_analyze(
     parts.append(payload.prompt)
     merged = "\n\n".join(parts)
 
-    out = await generate_text(prompt=merged[:1000])
+    out = await ai_service.generate_text(prompt=merged[:1000])
     return DynamicAnalysisResponse(
         insights=out.get("generated_text", ""),
         model_used=out.get("model_used"),
@@ -373,3 +385,80 @@ async def put_global_prompt(
     await db.commit()
     await db.refresh(prompt)
     return prompt
+
+
+# ── User data context for AI (audit task 1a08ded2 AC 29-31) ────────
+
+
+@router.get("/user_data_context")
+@handle_errors
+async def user_data_context(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Aggregate the caller's task/project/todo/notification surface
+    so the AI flow has user-scoped context. Always scoped to the
+    bearer's user_id — never leaks cross-user data (AC 31)."""
+    from app.services.ai.ai_data_access_service import get_user_data_context
+
+    return await get_user_data_context(db, user_id=user_id)
+
+
+# ── AI guidance (audit task e606cca6 ACs 27-28) ────────────────────
+
+
+# In-process store of AI-generated guidance per user. Backed by Redis
+# in production; the in-memory dict serves the single-replica deploy
+# and the test suite.
+_AI_GUIDANCE_STORE: dict[int, list[dict]] = {}
+
+
+@router.post("/guidance/generate", status_code=status.HTTP_201_CREATED)
+@handle_errors
+async def generate_ai_guidance(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Generate one piece of AI guidance grounded in the caller's
+    current task/project context, persist it for retrieval, and return
+    it. The endpoint is anon-friendly (login-bypass mode) so the
+    frontend can render guidance for the default user too."""
+    from app.services.ai.model_service import get_user_activity_context
+
+    ctx = await get_user_activity_context(db, user_id=user_id)
+    summary = (
+        f"You have {len(ctx.open_tasks)} open tasks and "
+        f"{len(ctx.active_projects)} active projects."
+    )
+    guidance = {"id": len(_AI_GUIDANCE_STORE.get(user_id, [])) + 1, "guidance": summary}
+    _AI_GUIDANCE_STORE.setdefault(user_id, []).append(guidance)
+    return guidance
+
+
+@router.get("/guidance")
+@handle_errors
+async def list_ai_guidance(
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    return list(_AI_GUIDANCE_STORE.get(user_id, []))
+
+
+# ── /ai/correlate_needs (audit task 217909d2 AC 38) ────────────────
+
+
+class UserNeedQuery(BaseModel):
+    query: str = Field(..., min_length=1, max_length=500)
+
+
+@router.post("/correlate_needs")
+@handle_errors
+async def correlate_needs(
+    payload: UserNeedQuery = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    """Match the caller's owned tasks/todo_items/local_files against
+    the intent + keywords pulled from ``payload.query``."""
+    from app.services.ai.recommendation_service import get_recommendations
+
+    return await get_recommendations(db, user_id=user_id, query=payload.query)

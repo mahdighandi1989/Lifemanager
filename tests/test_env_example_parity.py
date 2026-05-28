@@ -34,3 +34,24 @@ def test_google_oauth_env_vars_declared():
     keys = _env_example_keys()
     for required in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REDIRECT_URI"):
         assert required in keys, f"{required} missing from .env.example"
+
+
+def test_no_referenced_google_env_var_undocumented():
+    """A stronger contract — anywhere code reads os.environ for
+    ``GOOGLE_*`` or settings.GOOGLE_*, the same name must appear in
+    .env.example. Catches a future drift where a new GOOGLE_FOO env
+    var lands in code but the example file isn't updated."""
+    import re
+    code_dirs = (REPO_ROOT / "app",)
+    used: set[str] = set()
+    for d in code_dirs:
+        for f in d.rglob("*.py"):
+            text = f.read_text(encoding="utf-8", errors="ignore")
+            used.update(re.findall(r"GOOGLE_[A-Z_]+", text))
+    documented = _env_example_keys()
+    missing = sorted(name for name in used if name not in documented)
+    # Allow internal symbols that aren't env vars (e.g. constants
+    # exported as Python identifiers but never read from env).
+    allowed_internal = {"GOOGLE_OAUTH"}
+    missing = [m for m in missing if m not in allowed_internal]
+    assert not missing, f"GOOGLE_* env vars referenced in code but missing from .env.example: {missing}"

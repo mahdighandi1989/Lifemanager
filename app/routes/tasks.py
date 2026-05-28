@@ -28,6 +28,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.dependencies.auth import DEFAULT_ANON_USER_ID, get_optional_user_id
 from app.middleware import handle_errors
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.schemas.task_schema import TaskCreate, TaskUpdate
@@ -170,8 +171,20 @@ async def search_tasks_endpoint(
 @router.get("/api/tasks", tags=["tasks"])
 @router.get("/api/tasks/", tags=["tasks"])
 @handle_errors
-async def list_tasks(db: AsyncSession = Depends(get_db)) -> List[dict]:
-    result = await db.execute(select(Task))
+async def list_tasks(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    """List tasks scoped to the caller (audit task 78c0e8e0 Step 25).
+
+    ``get_optional_user_id`` returns ``DEFAULT_ANON_USER_ID`` (0) when
+    no bearer is present, so the frontend's login-bypass mode keeps
+    working: those rows live under user_id=0 and the filter still
+    matches. With a real JWT, the dep validates signature + expiry
+    and the query is correctly scoped.
+    """
+    stmt = select(Task).where(Task.user_id == user_id)
+    result = await db.execute(stmt)
     return [_serialize(t) for t in result.scalars().all()]
 
 
@@ -194,19 +207,25 @@ async def get_task(task_id: int, db: AsyncSession = Depends(get_db)) -> dict:
 async def create_task(
     payload: TaskCreate,
     db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """POST /api/tasks: create a task.
 
     POST /api/tasks with empty title returns 422 validation error (Pydantic).
     POST /api/tasks with title > 255 chars returns 422 (max_length=200 here).
     POST /api/tasks with valid title succeeds.
+
+    The row's ``user_id`` is taken from the caller's JWT (audit task
+    78c0e8e0 Step 25 — symmetric with list_tasks). An explicit
+    payload.user_id wins when supplied so legacy clients that
+    construct the field themselves keep working.
     """
     task = Task(
         title=_sanitize(payload.title),
         description=_sanitize(payload.description),
         status=TaskStatus(_normalise_status_input(payload.status) or "todo"),
         priority=_priority_from_int(payload.priority),
-        user_id=payload.user_id,
+        user_id=payload.user_id if payload.user_id is not None else caller_user_id,
         project_id=payload.project_id,
         due_date=payload.due_date,
     )

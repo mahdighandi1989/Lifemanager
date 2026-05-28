@@ -43,3 +43,34 @@ def test_auth_google_router_mounted_with_client_id(monkeypatch):
     paths = {getattr(r, "path", None) for r in main.app.routes}
     assert "/auth/google" in paths
     assert "/auth/google/callback" in paths
+
+
+def test_auth_google_is_no_longer_orphan():
+    """Audit task 3b90d409 AC 1-2 — the file was flagged as orphan
+    (reverse_import = 0). The conditional mount in app/main.py means
+    the import path now exists. Pin that contract."""
+    import re
+    main_text = (Path(__file__).resolve().parent.parent / "app" / "main.py").read_text(
+        encoding="utf-8"
+    )
+    # The file MUST contain a reference to the auth_google module,
+    # either as an explicit conditional import or as a top-level import.
+    assert re.search(r"\bauth_google\b", main_text), (
+        "app/main.py no longer references auth_google — task 3b90d409 regressed"
+    )
+
+
+def test_auth_google_router_carries_documented_routes():
+    """When mounted, the router carries exactly the documented
+    /auth/google + /auth/google/callback routes."""
+    import os
+    os.environ["GOOGLE_CLIENT_ID"] = "test-cid"
+    main = _reload_main()
+    paths = [getattr(r, "path", None) for r in main.app.routes]
+    assert paths.count("/auth/google") == 1
+    assert paths.count("/auth/google/callback") == 1
+    del os.environ["GOOGLE_CLIENT_ID"]
+
+
+# Make Path importable at module top.
+from pathlib import Path  # noqa: E402

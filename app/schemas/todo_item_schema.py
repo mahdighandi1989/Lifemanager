@@ -12,13 +12,22 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
+# AC 25 (audit task 7367c6f0) — the schema's max_length comes from the
+# config so an operator can dial it without editing this file.
+from app.config import MAX_TODO_ITEM_CONTENT_LENGTH as _MAX_CONTENT_LEN
+
+
 class TodoItemCreate(BaseModel):
-    content: str = Field(..., min_length=1, max_length=1000)
+    content: str = Field(..., min_length=1, max_length=_MAX_CONTENT_LEN)
     description: Optional[str] = Field(default=None, max_length=20000)
     is_completed: bool = False
     is_starred: bool = False
     parent_id: Optional[int] = None
     due_date: Optional[date] = None
+    # AC 2 (audit task 2165524b) — open-set classifier so the UI can
+    # mark items as shopping / errand / task / etc. Default 'task'
+    # keeps existing client code unchanged.
+    type: str = Field(default="task", max_length=32)
     # When provided, the item is also linked to each list. Without it
     # the item is created free-floating (useful for the "move into a
     # list later" UX). Duplicate ids are de-duplicated by the route.
@@ -26,12 +35,13 @@ class TodoItemCreate(BaseModel):
 
 
 class TodoItemUpdate(BaseModel):
-    content: Optional[str] = Field(default=None, min_length=1, max_length=1000)
+    content: Optional[str] = Field(default=None, min_length=1, max_length=_MAX_CONTENT_LEN)
     description: Optional[str] = Field(default=None, max_length=20000)
     is_completed: Optional[bool] = None
     is_starred: Optional[bool] = None
     parent_id: Optional[int] = None
     due_date: Optional[date] = None
+    type: Optional[str] = Field(default=None, max_length=32)
 
 
 class TodoItemMove(BaseModel):
@@ -58,6 +68,7 @@ class TodoItemOut(BaseModel):
     description: Optional[str] = None
     is_completed: bool = False
     is_starred: bool = False
+    type: str = "task"  # AC 2 — classifier field surfaced to clients
     parent_id: Optional[int] = None
     due_date: Optional[date] = None
     owner_id: Optional[int] = None
