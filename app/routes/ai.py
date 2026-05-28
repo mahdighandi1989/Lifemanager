@@ -317,6 +317,42 @@ async def get_global_prompt(db: AsyncSession = Depends(get_db)):
     return prompt
 
 
+# ── Dynamic AI analysis (audit task e606cca6) ─────────────────────
+
+
+from app.schemas.ai_schema import (
+    DynamicAnalysisRequest,
+    DynamicAnalysisResponse,
+)
+from app.config import FEATURE_AI_ENABLED
+
+
+@router.post("/dynamic-analyze", response_model=DynamicAnalysisResponse)
+@handle_errors
+async def dynamic_analyze(
+    payload: DynamicAnalysisRequest = Body(...),
+) -> DynamicAnalysisResponse:
+    """Dynamic AI analysis on free-form text. Gated on FEATURE_AI_ENABLED
+    so a deploy without AI infrastructure doesn't accidentally bill the
+    upstream provider. Returns 403 when the flag is off."""
+    if not FEATURE_AI_ENABLED:
+        raise HTTPException(status_code=403, detail="AI analysis is disabled")
+
+    parts = []
+    if payload.system_role_prompt:
+        parts.append(payload.system_role_prompt)
+    if payload.task_context:
+        parts.append(payload.task_context)
+    parts.append(payload.prompt)
+    merged = "\n\n".join(parts)
+
+    out = await generate_text(prompt=merged[:1000])
+    return DynamicAnalysisResponse(
+        insights=out.get("generated_text", ""),
+        model_used=out.get("model_used"),
+    )
+
+
 @router.put("/global-prompt", response_model=GlobalAnalysisPromptResponse)
 @handle_errors
 async def put_global_prompt(
