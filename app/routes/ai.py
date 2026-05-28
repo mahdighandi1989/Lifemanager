@@ -441,3 +441,24 @@ async def list_ai_guidance(
     user_id: int = Depends(get_optional_user_id),
 ) -> List[dict]:
     return list(_AI_GUIDANCE_STORE.get(user_id, []))
+
+
+# ── /ai/correlate_needs (audit task 217909d2 AC 38) ────────────────
+
+
+class UserNeedQuery(BaseModel):
+    query: str = Field(..., min_length=1, max_length=500)
+
+
+@router.post("/correlate_needs")
+@handle_errors
+async def correlate_needs(
+    payload: UserNeedQuery = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    """Match the caller's owned tasks/todo_items/local_files against
+    the intent + keywords pulled from ``payload.query``."""
+    from app.services.ai.recommendation_service import get_recommendations
+
+    return await get_recommendations(db, user_id=user_id, query=payload.query)

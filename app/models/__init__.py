@@ -7,6 +7,7 @@ before `Base.metadata.create_all()` runs at startup. Tools that do
 from app.models.ai_model_config import AIModelConfig
 from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
 from app.models.external_project import ExternalProject
+from app.models.indexed_data_source_entry import IndexedDataSourceEntry
 from app.models.finance import Asset, FinancialAccount, Income
 from app.models.integration import Integration
 from app.models.local_file_entry import LocalFileEntry
