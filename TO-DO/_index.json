@@ -1,8 +1,16 @@
 {
   "version": 1,
   "generated_at": "2026-05-28T23:25:00+00:00",
-  "total": 7,
+  "total": 8,
   "items": [
+    {
+      "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
+      "title": "اسکن دارایی‌ها و تحلیل محتوا",
+      "todo_file": "TO-DO/todo-task-217909d2.md",
+      "execution_priority": 3300,
+      "manual_actions": 5,
+      "summary": "scan endpoint + WebSocket + AssetDashboard/Settings UI + drive-mount + Google Drive. AC1 (UserAsset) + AC6 (AssetToTaskLinker) انجام شد."
+    },
     {
       "task_id": "task_78c0e8e0a9b5",
       "title": "پیاده‌سازی احراز هویت JWT و کنترل دسترسی کاربر",

@@ -39,6 +39,7 @@ _TABLES = [
     "user_comments",
     "behavior_logs",
     "indexed_data_source_entries",
+    "user_assets",
 ]
 
 
