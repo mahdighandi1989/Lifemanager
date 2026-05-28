@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-28T21:40:00+00:00",
+  "total": 1,
+  "items": [
+    {
+      "task_id": "task_78c0e8e0a9b5",
+      "title": "پیاده‌سازی احراز هویت JWT و کنترل دسترسی کاربر",
+      "todo_file": "TO-DO/todo-task-78c0e8e0.md",
+      "execution_priority": 1300,
+      "manual_actions": 3,
+      "summary": "تنظیم JWT_SECRET_KEY و WEBHOOK_SECRET واقعی در production (Render). guard سخت‌شدهٔ startup بدون JWT_SECRET_KEY معتبر در production بالا نمی‌آید."
+    }
+  ]
+}

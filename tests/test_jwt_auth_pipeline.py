@@ -18,7 +18,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-import jwt
+from jose import jwt
 import pytest
 
 from app.config import _DEV_SECRET_SENTINEL
@@ -51,6 +51,24 @@ def test_production_accepts_real_secret_key(monkeypatch):
     cfg = importlib.import_module("app.config")
     assert cfg.settings.ENVIRONMENT.lower() == "production"
     # Restore.
+    sys.modules.pop("app.config", None)
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    monkeypatch.setenv("JWT_SECRET_KEY", "test-key-not-for-prod")
+    importlib.import_module("app.config")
+
+
+def test_production_refuses_env_example_placeholder(monkeypatch):
+    """A ``.env`` copied verbatim from ``.env.example`` leaves
+    JWT_SECRET_KEY as the literal "<YOUR_JWT_SECRET_KEY>" placeholder.
+    Production must refuse that too — not only the in-code dev sentinel —
+    or a deploy boots with a guessable key (task task_78c0e8e0a9b5,
+    sub-task 2)."""
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("JWT_SECRET_KEY", "<YOUR_JWT_SECRET_KEY>")
+    sys.modules.pop("app.config", None)
+    with pytest.raises(RuntimeError, match="ENVIRONMENT=production"):
+        importlib.import_module("app.config")
+    # Leave the module space clean for the rest of the suite.
     sys.modules.pop("app.config", None)
     monkeypatch.setenv("ENVIRONMENT", "development")
     monkeypatch.setenv("JWT_SECRET_KEY", "test-key-not-for-prod")
@@ -150,7 +168,7 @@ def test_jwt_payload_carries_only_documented_claims():
     claim (role, password, profile_pic_url, ...) leaking into the
     token would expand the public surface and let any client read
     server-side fields without an explicit endpoint."""
-    import jwt as _jwt
+    from jose import jwt as _jwt
     from app.config import settings
     from app.services import auth_service
 
@@ -173,7 +191,7 @@ def test_access_token_expire_minutes_is_consumed_by_jwt_exp():
     truth for the JWT `exp` claim, so a future cleanup PR can't silently
     delete the variable from .env.example or config without breaking
     the JWT expiry contract."""
-    import jwt as _jwt
+    from jose import jwt as _jwt
     from datetime import datetime, timezone
     from app.config import settings
     from app.services import auth_service
@@ -196,6 +214,13 @@ def test_tampered_signature_is_rejected():
     from app.services import auth_service
 
     token = auth_service.create_access_token({"sub": "1", "email": "x@example.com"})
-    # Flip the last character — destroys the HMAC tag.
-    tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+    header, payload, signature = token.split(".")
+    # Corrupt the FIRST signature character, not the last. A JWS signature is
+    # base64url with no padding, so its final char carries 2 "don't-care"
+    # padding bits — flipping only that char can decode to the same HMAC
+    # bytes and leave the token valid (a flaky check that passed in isolation
+    # but failed inside the full suite when the timestamp-dependent signature
+    # ended on such a char). Mutating the leading char always changes the tag.
+    bad_first = "B" if signature[0] != "B" else "C"
+    tampered = f"{header}.{payload}.{bad_first}{signature[1:]}"
     assert auth_service.validate_token(tampered) is None

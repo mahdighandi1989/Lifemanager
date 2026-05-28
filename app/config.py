@@ -115,12 +115,41 @@ class Settings(BaseSettings):
         return [o.strip() for o in raw.split(",") if o.strip()]
 
 
+# Values that must never sign a production JWT. ``_DEV_SECRET_SENTINEL`` is
+# the in-code default; "change-me-in-production" is the legacy default; the
+# angle-bracket form is what a deployer ends up with if they copy
+# ``.env.example`` verbatim without filling the secret in. The earlier guard
+# only caught ``_DEV_SECRET_SENTINEL``, so a ``.env`` copied straight from
+# ``.env.example`` (SECRET_KEY="<YOUR_JWT_SECRET_KEY>") sailed past it and
+# booted production with a guessable key (audit task task_78c0e8e0a9b5,
+# sub-task 2 — "prevent startup with default/placeholder JWT_SECRET_KEY").
+_WEAK_SECRET_KEYS = {
+    _DEV_SECRET_SENTINEL,
+    "change-me-in-production",
+    "<YOUR_JWT_SECRET_KEY>",
+    "",
+}
+
+
+def _is_placeholder_secret(value: str) -> bool:
+    """True when the secret is empty, a known-weak literal, or an unfilled
+    ``<...>`` template placeholder left over from ``.env.example``."""
+    v = (value or "").strip()
+    if v in _WEAK_SECRET_KEYS:
+        return True
+    # An unfilled template placeholder like "<YOUR_JWT_SECRET_KEY>".
+    if v.startswith("<") and v.endswith(">"):
+        return True
+    return False
+
+
 def _validate(s: Settings) -> Settings:
-    """Refuse to start in production with the dev SECRET_KEY sentinel."""
-    if s.ENVIRONMENT.lower() == "production" and s.SECRET_KEY == _DEV_SECRET_SENTINEL:
+    """Refuse to start in production with a default/placeholder SECRET_KEY."""
+    if s.ENVIRONMENT.lower() == "production" and _is_placeholder_secret(s.SECRET_KEY):
         raise RuntimeError(
-            "ENVIRONMENT=production but JWT_SECRET_KEY is not set. "
-            "Generate one with `python -c \"import secrets; print(secrets.token_urlsafe(64))\"` "
+            "ENVIRONMENT=production but JWT_SECRET_KEY is unset or still a "
+            "placeholder/dev default. Generate one with "
+            "`python -c \"import secrets; print(secrets.token_urlsafe(64))\"` "
             "and set it via the deployment platform's secret manager."
         )
     return s
