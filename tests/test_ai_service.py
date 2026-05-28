@@ -40,6 +40,29 @@ def test_ai_service_runs():
     assert callable(get_active_config)
 
 
+def test_ai_service_initializes_without_import_errors():
+    """AC7 (task 97867b277c1b): removing the dead module-level
+    ``generate_text`` import from ``app/routes/ai.py`` must not leave the AI
+    surface unimportable. Importing the routes module raises no ImportError,
+    the removed symbol does not leak back into the routes namespace (AC5),
+    and ``/ai/generate`` still resolves through the AIService instance
+    method rather than a module-level helper (AC6)."""
+    import importlib
+    import inspect
+
+    routes_ai = importlib.import_module("app.routes.ai")
+    # The dead `generate_text` symbol must NOT be bound in the routes module
+    # namespace — that import was the thing removed (AC5).
+    assert not hasattr(routes_ai, "generate_text"), (
+        "app/routes/ai.py still binds a module-level generate_text — the "
+        "dead import should have been removed."
+    )
+    # AIService remains the canonical entry point and is constructible.
+    assert callable(AIService)
+    # The generate endpoint routes through the AIService instance method.
+    assert "ai_service.generate_text" in inspect.getsource(routes_ai.generate)
+
+
 # --- generate_text (no API key -> placeholder) ------------------------------
 
 @pytest.mark.asyncio

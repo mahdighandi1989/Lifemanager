@@ -192,6 +192,19 @@ DATA_CLASSIFICATION_RULES = {
 MAX_TODO_ITEM_CONTENT_LENGTH = 4096
 
 
+# Measurable outcome targets for the AI performance metrics (audit task
+# task_97867b277c1b — AC1 "outcome target rewritten measurably" + Step 9
+# "baseline/target in config"). The ``ai_performance`` log line in
+# app/services/ai/nlp_service.py and the /api/ai/stats endpoint emit the
+# matching ``ai_response_quality_score`` and ``ai_response_latency_ms``
+# values; keeping the goal here (not only in the task prompt) gives a
+# dashboard/alert one canonical, code-resident source of truth.
+AI_PERFORMANCE_TARGETS = {
+    "quality_score_min": 4.0,   # rolling mean of explicit 1-5 ratings
+    "latency_p95_ms_max": 500,  # 95th-percentile AI response latency
+}
+
+
 # Module-level feature-flag mirrors. They evaluate at import time from the
 # same env vars Settings reads, so static greps for `os.getenv("FEATURE_X")`
 # find the canonical lookup in this file. Kept in sync with the Settings
