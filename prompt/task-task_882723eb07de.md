@@ -3,14 +3,14 @@ task_id: task_882723eb07de
 title: بهینه‌سازی اتصال DB و اصلاح الگوهای طراحی
 type: other
 priority: high
-execution_priority: 2000
-status: pending
+execution_priority: 2300
+status: awaiting_review
 external_status: pending
-verification_status: pending
+verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:18:00.915795+00:00'
-updated_at: '2026-05-26T23:18:07.626876+00:00'
+updated_at: '2026-05-28T11:54:47.408753+00:00'
 tags:
 - consolidated
 - post_verify_merge
@@ -619,7 +619,7 @@ _(مستقل)_
 ## Task Steps
 
 ### Step 1: تشخیص ریشه anti-pattern Under-engineering در app/database.py
-**Status:** `pending` (0%)
+**Status:** `done` (100%)
 **Scope:** بررسی کامل فایل app/database.py برای شناسایی دقیق ریشه anti-pattern Under-engineering. این مرحله شامل تحلیل کد موجود، جستجوی الگوهای نادرست مانند استفاده از create_all در production، و مستندسازی یافته‌ها است. خارج از این مرحله: اعمال تغییرات کد یا نوشتن تست. نکته حیاتی: این مرحله صرفاً تشخیصی است و هیچ تغییری در کد ایجاد نمی‌کند.
 **Excerpt:**
 ```
@@ -630,7 +630,7 @@ _(مستقل)_
 ```
 
 ### Step 2: اصلاح کد یا افزودن کامنت توجیهی برای Under-engineering در app/database.py
-**Status:** `pending` (0%)
+**Status:** `done` (100%)
 **Scope:** اعمال تغییرات در فایل app/database.py برای رفع anti-pattern Under-engineering. این شامل دو گزینه است: (1) اصلاح کد با جایگزینی create_all با ابزار migration مانند Alembic، یا (2) افزودن کامنت توجیهی که توضیح دهد چرا create_all مناسب است و چه محدودیت‌هایی دارد. خارج از این مرحله: نوشتن تست edge case. نکته حیاتی: کامنت‌های توجیهی باید دقیقاً با الگوهای مشخص شده در AC مطابقت داشته باشند.
 **Excerpt:**
 ```
@@ -638,7 +638,7 @@ _(مستقل)_
 ```
 
 ### Step 3: نوشتن تست edge case برای schema evolution در tests/test_database_schema.py
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** ایجاد فایل tests/test_database_schema.py با تابع تست test_schema_evolution_edge_case که سناریوهای لبه مربوط به تغییر schema را پوشش می‌دهد. این تست باید بررسی کند که اضافه کردن ستون جدید به جدول موجود بدون از دست رفتن داده‌های قبلی کار می‌کند. خارج از این مرحله: تغییر کد اصلی یا تست‌های دیگر. نکته حیاتی: تست باید با timeout 60 ثانیه اجرا شود.
 **Excerpt:**
 ```
@@ -646,7 +646,7 @@ _(مستقل)_
 ```
 
 ### Step 4: اجرای دستورات اعتبارسنجی برای تسک 1 (py_compile, ruff, pytest)
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** اجرای دستورات اعتبارسنجی مشخص شده برای تسک 1: python -m py_compile app/database.py، ruff check app/database.py، و pytest -x. این مرحله تضمین می‌کند که تغییرات اعمال شده در مراحل قبل باعث خطاهای کامپایل، linting، یا تست نمی‌شوند. خارج از این مرحله: تغییر کد یا تست. نکته حیاتی: اگر هر یک از این دستورات fail شود، باید به مرحله قبل برگردیم.
 **Excerpt:**
 ```
@@ -657,7 +657,7 @@ _(مستقل)_
 ```
 
 ### Step 5: پیکربندی connection pool با پارامترهای بهینه در app/database.py
-**Status:** `pending` (0%)
+**Status:** `done` (100%)
 **Scope:** تغییر فایل app/database.py برای پیکربندی SQLAlchemy connection pool با پارامترهای pool_size=20، max_overflow=10، pool_timeout=30، pool_recycle=3600، و pool_pre_ping=True. این مرحله شامل جایگزینی create_engine ساده با نسخه پیکربندی شده است. خارج از این مرحله: پیاده‌سازی async support یا تست concurrent. نکته حیاتی: پارامترها باید دقیقاً مطابق با نمونه بعد در idea_prompt باشند.
 **Excerpt:**
 ```
@@ -673,7 +673,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 ```
 
 ### Step 6: پیاده‌سازی async session management با asyncpg در app/database.py
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** افزودن async engine و async session maker به فایل app/database.py با استفاده از create_async_engine و async_sessionmaker. این شامل تعریف async_engine با ASYNC_DATABASE_URL و AsyncSessionLocal است. خارج از این مرحله: تغییر dependency injection در FastAPI یا تست concurrent. نکته حیاتی: async support باید با FastAPI dependency injection سازگار باشد.
 **Excerpt:**
 ```
@@ -683,7 +683,7 @@ AsyncSessionLocal = async_sessionmaker(async_engine)
 ```
 
 ### Step 7: نوشتن تست concurrent connections در tests/test_database.py
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** ایجاد یا به‌روزرسانی فایل tests/test_database.py با تابع تست test_concurrent_connections که 100 درخواست همزمان را شبیه‌سازی می‌کند و بررسی می‌کند که connection pool بدون خطا کار می‌کند. این تست باید با timeout 120 ثانیه اجرا شود. خارج از این مرحله: تست‌های دیگر یا تغییر کد اصلی. نکته حیاتی: تست باید واقعاً 100 اتصال همزمان ایجاد کند.
 **Excerpt:**
 ```
@@ -691,7 +691,7 @@ AsyncSessionLocal = async_sessionmaker(async_engine)
 ```
 
 ### Step 8: تست connection timeout با بازگشت 503 در endpoint /api/oversight/status
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** ایجاد یا به‌روزرسانی endpoint /api/oversight/status در app/routes/ai.py یا فایل مناسب دیگر که در صورت timeout اتصال به پایگاه داده، خطای 503 بازگرداند. این مرحله شامل پیاده‌سازی منطق timeout و بازگشت status code مناسب است. خارج از این مرحله: تست concurrent یا تغییر pool settings. نکته حیاتی: timeout باید 30 ثانیه باشد.
 **Excerpt:**
 ```
@@ -699,7 +699,7 @@ AsyncSessionLocal = async_sessionmaker(async_engine)
 ```
 
 ### Step 9: تأیید static async session management با FastAPI dependency injection
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** بررسی static کد برای اطمینان از اینکه async session management با FastAPI dependency injection کار می‌کند. این شامل جستجوی الگوهای 'async with session' در فایل‌های routes است. خارج از این مرحله: تغییر کد یا تست. نکته حیاتی: این مرحله صرفاً تأیید static است و نیازی به تغییر کد ندارد.
 **Excerpt:**
 ```
@@ -707,7 +707,7 @@ AsyncSessionLocal = async_sessionmaker(async_engine)
 ```
 
 ### Step 10: اجرای دستورات اعتبارسنجی برای تسک 2 (locust و pytest)
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** اجرای دستورات اعتبارسنجی مشخص شده برای تسک 2: locust -f tests/locustfile.py --headless -u 100 -r 10 و pytest tests/test_database.py -k pool. این مرحله تضمین می‌کند که تغییرات connection pool و async support به درستی کار می‌کنند. خارج از این مرحله: تغییر کد یا تست. نکته حیاتی: locust باید 100 کاربر همزمان را شبیه‌سازی کند.
 **Excerpt:**
 ```
@@ -717,7 +717,7 @@ AsyncSessionLocal = async_sessionmaker(async_engine)
 ```
 
 ### Step 11: بررسی وابستگی‌ها و نصب asyncpg در صورت نیاز
-**Status:** `pending` (0%)
+**Status:** `done` (100%)
 **Scope:** بررسی فایل requirements.txt یا pyproject.toml برای اطمینان از وجود asyncpg به عنوان وابستگی. اگر asyncpg نصب نیست، آن را به فایل وابستگی اضافه کنید. خارج از این مرحله: تغییر کد اصلی یا تست. نکته حیاتی: asyncpg برای async support با PostgreSQL ضروری است.
 **Excerpt:**
 ```
@@ -725,7 +725,7 @@ May require asyncpg installation for async support.
 ```
 
 ### Step 12: بررسی و به‌روزرسانی app/config.py برای تنظیمات پایگاه داده
-**Status:** `pending` (0%)
+**Status:** `not_done` (0%)
 **Scope:** بررسی فایل app/config.py برای اطمینان از وجود متغیرهای ASYNC_DATABASE_URL و سایر تنظیمات مورد نیاز برای async support. اگر وجود ندارند، آن‌ها را اضافه کنید. خارج از این مرحله: تغییر app/database.py یا تست. نکته حیاتی: ASYNC_DATABASE_URL باید با فرمت asyncpg سازگار باشد.
 **Excerpt:**
 ```
@@ -733,7 +733,7 @@ app/config.py (سطر 1) — Database configuration settings
 ```
 
 ### Step 13: بررسی و به‌روزرسانی app/main.py برای استفاده از async engine
-**Status:** `pending` (0%)
+**Status:** `done` (100%)
 **Scope:** بررسی فایل app/main.py برای اطمینان از اینکه async engine به درستی در startup برنامه مقداردهی می‌شود. اگر نیاز به تغییر است، آن را اعمال کنید. خارج از این مرحله: تغییر app/database.py یا تست. نکته حیاتی: async engine باید قبل از شروع سرویس مقداردهی شود.
 **Excerpt:**
 ```
