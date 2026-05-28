@@ -1,6 +1,6 @@
 ---
 task_id: task_92fa5ea15e2b
-title: افزودن نوتیفیکیشن `verify_failed` و رفع `caption_incomplete`
+title: افزودن نوتیفیکیشن `verify_failed` و بهبود مدیریت رویدادها
 type: other
 priority: high
 execution_priority: 2300
@@ -10,13 +10,13 @@ verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:20:22.917998+00:00'
-updated_at: '2026-05-28T10:26:45.696584+00:00'
+updated_at: '2026-05-28T10:26:58.056723+00:00'
 tags:
 - consolidated
 - post_verify_merge
 ---
 
-# افزودن نوتیفیکیشن `verify_failed` و رفع `caption_incomplete`
+# افزودن نوتیفیکیشن `verify_failed` و بهبود مدیریت رویدادها
 
 ## Raw Idea
 
