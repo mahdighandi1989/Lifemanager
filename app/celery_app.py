@@ -14,6 +14,15 @@ celery_app.conf.update(
     result_serializer="json",
     timezone="UTC",
     enable_utc=True,
+    # Fail fast when the broker is unreachable instead of hanging the
+    # caller. The AI-ingestion publish (event_publisher) runs on the
+    # request hot path (POST /api/todo-items), so a down/blipping Redis
+    # must not add many seconds of connect-retry latency to every write.
+    broker_transport_options={
+        "socket_connect_timeout": 1,
+        "socket_timeout": 1,
+    },
+    broker_connection_retry_on_startup=False,
 )
 
 # Periodic schedule for the Self-Improvement (خودسازی) module.

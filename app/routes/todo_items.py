@@ -96,6 +96,14 @@ async def create_todo_item(
         list_ids=payload.list_ids,
         type=payload.type,
     )
+    # Audit task 1a08ded2 AC 66 — fan the new item into the AI ingestion
+    # pipeline so its content becomes available for analysis "quickly" (the
+    # user's voice memo: newly added data must reach the models without a
+    # manual re-index). Best-effort: publish_data_change_event swallows a
+    # broker outage so the 201 still lands.
+    from app.services.event_publisher import publish_data_change_event
+
+    publish_data_change_event("todo_item", item.id, "created")
     return _serialize(item)
 
 

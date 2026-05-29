@@ -277,3 +277,35 @@ def tier_cold_data() -> dict[str, Any]:
     except Exception as exc:
         logger.exception("tier_cold_data failed: %r", exc)
         return {"error": str(exc)}
+
+
+@celery_app.task(name="app.tasks.process_ai_ingestion_event")
+def process_ai_ingestion_event(
+    *, entity_type: str, entity_id: int, action: str = "created"
+) -> dict[str, Any]:
+    """Audit task 1a08ded2 AC 65-67 — ingest a changed entity for AI analysis.
+
+    Enqueued by ``app.services.event_publisher.publish_data_change_event`` on
+    create/update of a TodoItem (and, in future, other entity types). Loads
+    the row, runs ``nlp_service.analyze_content`` via ``ai_ingestion_service``,
+    and logs the outcome. Best-effort batch job: errors are logged, not
+    retried — the next write re-publishes.
+    """
+    import asyncio
+
+    async def _run() -> dict[str, Any]:
+        from app.database import SessionLocal
+        from app.services.ai_ingestion_service import ingest_entity
+
+        async with SessionLocal() as db:
+            return await ingest_entity(
+                db, entity_type=entity_type, entity_id=entity_id, action=action
+            )
+
+    try:
+        result = asyncio.run(_run())
+        logger.info("process_ai_ingestion_event: %s", result)
+        return result
+    except Exception as exc:
+        logger.exception("process_ai_ingestion_event failed: %r", exc)
+        return {"error": str(exc)}
