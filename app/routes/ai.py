@@ -332,10 +332,13 @@ async def get_global_prompt(db: AsyncSession = Depends(get_db)):
 
 
 from app.schemas.ai_schema import (
+    AIAnalysisRequest,
+    AIAnalysisResult,
     DynamicAnalysisRequest,
     DynamicAnalysisResponse,
 )
 from app.config import FEATURE_AI_ENABLED
+from app.dependencies.auth import get_optional_user_id
 
 
 @router.post("/dynamic-analyze", response_model=DynamicAnalysisResponse)
@@ -367,6 +370,26 @@ async def dynamic_analyze(
         insights=out.get("generated_text", ""),
         model_used=out.get("model_used"),
     )
+
+
+@router.post("/analyze", response_model=AIAnalysisResult)
+@handle_errors
+async def analyze(
+    payload: AIAnalysisRequest = Body(...),
+    ai_service: AIService = Depends(get_ai_service),
+    user_id: int = Depends(get_optional_user_id),
+) -> AIAnalysisResult:
+    """Analyse the caller's page data according to the editable global prompt
+    + this request (audit task 1a08ded2 AC 34-37). Composes global-prompt +
+    user data context + the request via AIService.orchestrate_analysis. Gated
+    on FEATURE_AI_ENABLED so a deploy without AI infra returns 403 instead of
+    billing a provider."""
+    if not FEATURE_AI_ENABLED:
+        raise HTTPException(status_code=403, detail="AI analysis is disabled")
+    result = await ai_service.orchestrate_analysis(
+        prompt=payload.prompt, user_id=user_id, model=payload.model_id
+    )
+    return AIAnalysisResult(**result)
 
 
 @router.put("/global-prompt", response_model=GlobalAnalysisPromptResponse)

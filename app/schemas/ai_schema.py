@@ -135,6 +135,38 @@ class DynamicAnalysisResponse(BaseModel):
     model_used: Optional[str] = None
 
 
+# ── AI analysis context + orchestration (audit task 1a08ded2 AC 32, 34) ──
+class AIContextItem(BaseModel):
+    """One piece of user-scoped context handed to the model for analysis."""
+
+    kind: str  # "task" | "project" | "todo_item" | "notification"
+    id: int
+    text: str
+
+
+class AIContextResponse(BaseModel):
+    """Structured view of a user's data context (AC 32)."""
+
+    items: list[AIContextItem] = []
+    count: int = 0
+
+
+class AIAnalysisRequest(BaseModel):
+    """Payload for POST /ai/analyze (AC 34): analyse the caller's page data
+    according to the editable global prompt + this request prompt."""
+
+    prompt: str = Field(..., min_length=1, max_length=10_000)
+    model_id: Optional[str] = None
+
+
+class AIAnalysisResult(BaseModel):
+    """Result of orchestrate_analysis (AC 34/35)."""
+
+    insights: str
+    model_used: Optional[str] = None
+    context_items_count: int = 0
+
+
 class AIQueryResponse(BaseModel):
     response: str
     model_used: Optional[str] = None

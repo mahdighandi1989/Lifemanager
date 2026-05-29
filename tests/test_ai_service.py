@@ -147,3 +147,49 @@ async def test_aiservice_query_returns_response(session_factory):
 async def test_get_active_config_returns_none_when_empty(session_factory):
     async with session_factory() as db:
         assert await get_active_config(db) is None
+
+
+# --- orchestrate_analysis (task 1a08ded2 AC 35/38) --------------------------
+
+@pytest.mark.asyncio
+async def test_orchestrate_analysis_returns_full_shape(session_factory):
+    """AC 35: returns the AIAnalysisResult shape, with a context count, even
+    against an empty DB (no global prompt row, no user data)."""
+    async with session_factory() as db:
+        svc = AIService(db)
+        result = await svc.orchestrate_analysis(prompt="analyze my data", user_id=0)
+        assert set(result) == {"insights", "model_used", "context_items_count"}
+        assert isinstance(result["context_items_count"], int)
+        assert result["insights"]  # placeholder text is non-empty
+
+
+@pytest.mark.asyncio
+async def test_orchestrate_analysis_merges_global_prompt_and_context(
+    session_factory, monkeypatch
+):
+    """AC 35: the model sees the editable global prompt + the DATA CONTEXT +
+    the request prompt, merged (no truncation)."""
+    from app.models.ai_provider import GlobalAnalysisPrompt
+
+    async with session_factory() as db:
+        db.add(GlobalAnalysisPrompt(prompt_text="ALWAYS BE CONCISE", edited_by_user_id=0))
+        await db.commit()
+
+        svc = AIService(db)
+        captured: dict = {}
+
+        async def _fake_gen(prompt, **kwargs):
+            captured["prompt"] = prompt
+            return {"generated_text": "ok", "model_used": "test-model"}
+
+        monkeypatch.setattr(svc, "generate_text", _fake_gen)
+        result = await svc.orchestrate_analysis(
+            prompt="summarize my tasks", user_id=0, model="gpt-x"
+        )
+
+        assert result["insights"] == "ok"
+        assert result["model_used"] == "gpt-x"  # explicit model_id wins
+        assert "ALWAYS BE CONCISE" in captured["prompt"]
+        assert "DATA CONTEXT:" in captured["prompt"]
+        assert "REQUEST:" in captured["prompt"]
+        assert "summarize my tasks" in captured["prompt"]

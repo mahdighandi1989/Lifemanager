@@ -76,3 +76,28 @@ def test_ai_model_config_has_prompt_template_column():
     from app.models.ai_model_config import AIModelConfig
 
     assert hasattr(AIModelConfig, "prompt_template")
+
+
+# ── POST /ai/analyze (task 1a08ded2 AC 34/36/37) ────────────────────
+
+def test_analyze_403_when_feature_disabled(api_client, monkeypatch):
+    """AC 37: /ai/analyze 403s when FEATURE_AI_ENABLED is off."""
+    from app.routes import ai as ai_routes
+
+    monkeypatch.setattr(ai_routes, "FEATURE_AI_ENABLED", False)
+    resp = api_client.post("/ai/analyze", json={"prompt": "analyze my pages"})
+    assert resp.status_code == 403
+
+
+def test_analyze_200_when_feature_enabled(api_client, monkeypatch):
+    """AC 34/36: with the flag on, /ai/analyze returns an AIAnalysisResult."""
+    from app.routes import ai as ai_routes
+
+    monkeypatch.setattr(ai_routes, "FEATURE_AI_ENABLED", True)
+    resp = api_client.post(
+        "/ai/analyze", json={"prompt": "analyze my pages", "model_id": "gpt-x"}
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert "insights" in body
+    assert "context_items_count" in body

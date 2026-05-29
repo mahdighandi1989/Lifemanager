@@ -67,6 +67,58 @@ class AIService:
             prompt, max_tokens=max_tokens, temperature=temperature
         )
 
+    async def orchestrate_analysis(
+        self,
+        *,
+        prompt: str,
+        user_id: int = 0,
+        model: Optional[str] = None,
+    ) -> dict:
+        """Compose the editable global analysis prompt + the caller's data
+        context + this request prompt, then run the model (audit task
+        1a08ded2 AC 35). This is the user's core ask — "analyze the data on my
+        pages according to my editable prompt." Returns the AIAnalysisResult
+        shape: insights / model_used / context_items_count.
+        """
+        import json
+
+        from app.models.ai_provider import GlobalAnalysisPrompt
+        from app.services.ai.ai_data_access_service import get_user_data_context
+
+        # 1. The editable global analysis prompt (empty on first run).
+        global_prompt = ""
+        try:
+            res = await self.db.execute(select(GlobalAnalysisPrompt))
+            gp = res.scalars().first()
+            if gp is not None:
+                global_prompt = gp.prompt_text or ""
+        except Exception:  # table not migrated yet / no row — analyse anyway
+            pass
+
+        # 2. The caller's user-scoped data context (pages/data).
+        context = await get_user_data_context(self.db, user_id=user_id)
+        context_items_count = sum(
+            len(v) for v in context.values() if isinstance(v, list)
+        )
+
+        # 3. Merge into one prompt the model sees in full (no truncation).
+        merged = "\n\n".join(
+            part
+            for part in (
+                global_prompt,
+                "DATA CONTEXT:\n" + json.dumps(context, ensure_ascii=False),
+                "REQUEST:\n" + prompt,
+            )
+            if part
+        )
+
+        out = await self.generate_text(prompt=merged)
+        return {
+            "insights": out.get("generated_text", ""),
+            "model_used": model or out.get("model_used"),
+            "context_items_count": context_items_count,
+        }
+
     async def get_user_configs(self, user_id: int) -> List[AIModelConfig]:
         result = await self.db.execute(select(AIModelConfig))
         return list(result.scalars().all())
