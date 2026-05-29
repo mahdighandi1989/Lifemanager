@@ -1,3 +1,20 @@
+"""Crypto helpers — password hashing + Fernet encryption-at-rest.
+
+Audit task 3b90d409 (Step 2): an early automated scan flagged this module as an
+"orphan"/dead-code candidate. That verdict is STALE — it is actively imported
+and NOT dead. Current consumers (do not delete):
+
+  * ``app/services/external_project_service.py`` — ``encrypt_data`` /
+    ``decrypt_data`` so an external-PM API token is encrypted before it ever
+    hits the DB (audit task d2146781).
+  * ``app/routes/oversight.py`` — encrypts the connection token at rest.
+  * ``tests/test_services.py::test_crypt_service_has_no_dead_encrypt_function``
+    pins the module's surface.
+
+Surface: ``hash_password`` / ``verify_password`` (bcrypt via passlib),
+``get_fernet_key`` / ``generate_key`` / ``encrypt_data`` / ``decrypt_data``
+(Fernet), ``generate_api_key`` / ``hash_api_key``.
+"""
 from passlib.context import CryptContext
 from cryptography.fernet import Fernet
 from typing import Optional
