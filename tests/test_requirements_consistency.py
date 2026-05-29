@@ -41,6 +41,20 @@ def test_no_duplicate_top_level_package_declarations():
     assert not duplicates, f"duplicate package declarations: {duplicates}"
 
 
+def test_pydantic_keeps_email_extra():
+    """Step 2 (task 850097a9) de-duplicated pydantic by KEEPING the
+    ``pydantic[email]`` form — that extra pulls email-validator, which
+    UserCreate's ``EmailStr`` field depends on. A future "cleanup" that drops
+    the ``[email]`` extra would still pass the no-duplicate guard above yet
+    silently break email validation, so lock the chosen resolution here.
+    Version-agnostic on purpose: only the extra is asserted, not the pin."""
+    text = REQ.read_text(encoding="utf-8")
+    assert re.search(r"^pydantic\[email\]\s*==", text, flags=re.MULTILINE), (
+        "requirements.txt must declare pydantic with the [email] extra "
+        "(task 850097a9 Step 2 kept pydantic[email] for email-validator)"
+    )
+
+
 def test_bcrypt_pinned_below_4_1_for_passlib_compat():
     """passlib 1.7.4 reads bcrypt's __about__ module which 4.1+ removed.
     Until passlib ships a fix, the cap must stay."""
