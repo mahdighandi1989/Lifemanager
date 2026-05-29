@@ -11,7 +11,9 @@ from app.models.drive_file import DriveFile
 from app.models.user_asset import UserAsset
 from app.models.person_task import person_tasks  # noqa: F401  (association table)
 from app.models.indexed_data_source_entry import IndexedDataSourceEntry
-from app.models.finance import Asset, FinancialAccount, Income
+from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
+from app.models.context import UserContext
+from app.models.recommendation import ContextualRecommendation
 from app.models.integration import Integration
 from app.models.local_file_entry import LocalFileEntry
 from app.models.notification import Notification
@@ -38,9 +40,13 @@ __all__ = [
     "AIProvider",
     "ExternalProject",
     "Asset",
+    "BudgetPlan",
+    "ContextualRecommendation",
     "FinancialAccount",
     "GlobalAnalysisPrompt",
     "Income",
+    "Transaction",
+    "UserContext",
     "Integration",
     "LocalFileEntry",
     "Notification",
