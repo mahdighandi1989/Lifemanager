@@ -1052,6 +1052,10 @@
         "file": "frontend/src/components/RecommendationPanel.jsx"
       },
       {
+        "name": "DeduplicationPanel",
+        "file": "frontend/src/components/deduplication/DeduplicationPanel.jsx"
+      },
+      {
         "name": "Dashboard.test",
         "file": "frontend/src/components/__tests__/Dashboard.test.jsx"
       },

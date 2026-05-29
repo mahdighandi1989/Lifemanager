@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
+import DeduplicationPanel from '../components/deduplication/DeduplicationPanel';
 
 // Merge management page (audit task fbd9bd36, AC5 + AC7): shows duplicate-task
 // suggestions from POST /api/merge/suggestions and a "تأیید ادغام" button per
@@ -47,6 +48,12 @@ function MergeManagement() {
             ? `${suggestions.length} گروه تسک مشابه پیدا شد.`
             : 'تسک‌های مشابه برای ادغام شناسایی می‌شوند.'}
         </p>
+
+        {/* Cross-entity deduplication (audit task fbd9bd36 AC4): scan + merge
+            similar tasks / projects / lists. */}
+        <div className="mb-6">
+          <DeduplicationPanel />
+        </div>
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>

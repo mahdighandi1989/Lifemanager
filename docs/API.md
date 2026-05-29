@@ -171,3 +171,21 @@ location-based suggestions when `GOOGLE_MAPS_API_KEY` is set.
 `OversightService` carries `connect_to_external_project`, `analyze_time_allocation`,
 and `fetch_project_data`; the `sync_external_project` Celery task syncs a
 connection.
+
+### Deduplication / consolidation (audit task fbd9bd36)
+
+Reduce chaos by consolidating similar entities **without summarizing or
+deleting** anything — a merge moves the source's content to the target and
+SOFT-DELETES the source (Task `merged_into_id` / Project `is_active=False` /
+TodoList `is_archived=True`).
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/deduplication/scan` | Scan for similar Task/Project/List groups; returns a `job_id` + `group_count`. |
+| GET | `/api/deduplication/groups` | The similar-entity groups (`?job_id=` for a prior scan, else a fresh scan). |
+| POST | `/api/deduplication/merge` | Body `{source_id, target_id, entity_type}` — move source content to target, soft-delete source. |
+
+`DeduplicationService.scan_for_duplicates` / `merge` reuse `similarity_service`
+(Jaccard grouping) + `consolidation_service` (task merge). UI:
+`frontend/src/components/deduplication/DeduplicationPanel.jsx`, surfaced on the
+merge page (`/merge`).
