@@ -89,3 +89,43 @@ async def test_admin_user_rejects_other_email():
         await get_current_admin_user(current_user=user)
     assert exc.value.status_code == 403
     assert "Admin" in exc.value.detail
+
+
+# ── Model references in auth.py (audit task b7638cb2 Step 5) ──────────
+# The pipeline keeps TWO distinct user models aligned via a Union; pin the
+# references (imports + type hints match the real models, tables are separate).
+import inspect  # noqa: E402
+import typing  # noqa: E402
+
+
+def test_auth_context_is_union_of_both_models():
+    from app.dependencies import auth as auth_deps
+    from app.models.user import User
+    from app.models.user_oauth import OAuthUser
+
+    assert set(typing.get_args(auth_deps.AuthContext)) == {User, OAuthUser}
+
+
+def test_user_and_oauthuser_are_distinct_tables():
+    from app.models.user import User
+    from app.models.user_oauth import OAuthUser
+
+    assert User.__tablename__ == "users"
+    assert OAuthUser.__tablename__ == "oauth_users"
+    assert User is not OAuthUser
+
+
+def test_get_current_user_return_type_is_auth_context():
+    from app.dependencies import auth as auth_deps
+
+    ann = inspect.signature(auth_deps.get_current_user).return_annotation
+    assert ann is auth_deps.AuthContext or (
+        isinstance(ann, str) and "AuthContext" in ann
+    )
+
+
+def test_auth_deps_imports_both_models():
+    from app.dependencies import auth as auth_deps
+
+    assert getattr(auth_deps, "User", None) is not None
+    assert getattr(auth_deps, "OAuthUser", None) is not None

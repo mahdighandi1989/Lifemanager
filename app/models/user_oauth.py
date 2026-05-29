@@ -1,3 +1,13 @@
+"""Google-OAuth user model (audit task b7638cb2).
+
+``OAuthUser`` (table ``oauth_users``) is the GOOGLE OAuth identity — no
+password; carries ``role`` / ``permissions`` / ``status`` for the
+admin-approval flow in ``app/routes/auth_google.py``. It is a SEPARATE model
+from the local ``app.models.user.User`` (table ``users``); the two share no FK.
+Both are issued the same JWT, so ``app/dependencies/auth.py::get_current_user``
+returns ``Union[User, OAuthUser]`` and downstream gates probe attributes with
+``getattr`` (see app/models/user.py + app/dependencies/auth.py module docstrings).
+"""
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SAEnum
 from sqlalchemy.sql import func
 from app.database import Base
