@@ -1,5 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+
+// PeopleProfiles now links each person to /people/:id/profile (task 3cc09436
+// AC5), so it must render inside a Router. Wrap renders accordingly.
+const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 // Mock the shared axios client so the pages render without a backend.
 vi.mock('../../lib/api', () => ({
@@ -40,7 +45,7 @@ describe('Frontend pages wired into the nav (tasks 4ae4b3ca / d2146781 / 3cc0943
   });
 
   test('PeopleProfiles renders the people list', async () => {
-    render(<PeopleProfiles />);
+    renderWithRouter(<PeopleProfiles />);
     expect(screen.getByTestId('people-profiles-page')).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Ali')).toBeInTheDocument());
   });
