@@ -6,7 +6,8 @@ before `Base.metadata.create_all()` runs at startup. Tools that do
 """
 from app.models.ai_model_config import AIModelConfig
 from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
-from app.models.external_project import ExternalProject
+from app.models.external_project import ExternalProject, ExternalProjectConnection
+from app.models.oversight_task import OversightTask
 from app.models.drive_file import DriveFile
 from app.models.user_asset import UserAsset
 from app.models.person_task import person_tasks  # noqa: F401  (association table)
@@ -39,6 +40,8 @@ __all__ = [
     "AIModelConfig",
     "AIProvider",
     "ExternalProject",
+    "ExternalProjectConnection",
+    "OversightTask",
     "Asset",
     "BudgetPlan",
     "ContextualRecommendation",

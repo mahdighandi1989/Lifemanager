@@ -339,3 +339,30 @@ def process_finance_updates() -> dict[str, Any]:
     # (When a source is wired in, iterate its new messages through the two
     # parsers and apply the detected balances/movements to FinancialAccount.)
     return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
+
+
+@celery_app.task(name="app.tasks.sync_external_project")
+def sync_external_project(*, connection_id: int) -> dict[str, Any]:
+    """Audit task d2146781 AC 6 — sync one external-project connection.
+
+    Calls OversightService.fetch_project_data(connection_id) to pull the latest
+    data and stamp last_sync_at. (The AC names oversight_tasks.py; this repo
+    keeps Celery tasks in the single app/tasks.py module.) Best-effort: errors
+    are logged, never retried — the next schedule re-runs.
+    """
+    import asyncio
+
+    async def _run() -> dict[str, Any]:
+        from app.database import SessionLocal
+        from app.services.oversight_service import OversightService
+
+        async with SessionLocal() as db:
+            return await OversightService(db).fetch_project_data(connection_id)
+
+    try:
+        result = asyncio.run(_run())
+        logger.info("sync_external_project(%s): %s", connection_id, result)
+        return result
+    except Exception as exc:
+        logger.exception("sync_external_project failed: %r", exc)
+        return {"error": str(exc)}

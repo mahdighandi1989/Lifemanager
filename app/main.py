@@ -30,6 +30,7 @@ from app.routes import (
     local_files,
     location,
     notifications,
+    oversight,
     person,
     planner,
     projects,
@@ -621,6 +622,7 @@ app.include_router(person.router)
 app.include_router(finance.router)
 app.include_router(location.router)
 app.include_router(context.router, tags=["context"])
+app.include_router(oversight.router, tags=["oversight"])
 app.include_router(assets.router, tags=["assets"])
 app.include_router(merge.router, tags=["merge"])
 app.include_router(drive.router, tags=["drive"])
