@@ -13,6 +13,8 @@ import importlib
 import os
 import sys
 
+import pytest
+
 
 def _reload_main() -> object:
     """Re-import app.main fresh so the module-level mount logic re-runs
@@ -25,6 +27,49 @@ def _reload_main() -> object:
     ]:
         sys.modules.pop(mod, None)
     return importlib.import_module("app.main")
+
+
+@pytest.fixture(autouse=True)
+def _restore_reloaded_modules():
+    """Contain the ``_reload_main`` side effect to this file.
+
+    ``_reload_main`` pops app.main / app.config / app.core.config /
+    app.routes.auth_google from ``sys.modules`` and re-imports them, which
+    swaps in brand-new module objects. Without restoring the originals, a
+    later test that does ``patch("app.main.engine", ...)`` patches the fresh
+    module object while its own imported ``app`` / ``engine`` still reference
+    the original one — so the patch silently misses and the real Postgres
+    engine is probed (observed: tests/test_database_startup.py failing only in
+    the full suite). Snapshot the originals and restore them after each test so
+    the reload can't leak into the rest of the session.
+    """
+    names = ("app.main", "app.config", "app.core.config", "app.routes.auth_google")
+    saved = {name: sys.modules.get(name) for name in names}
+    try:
+        yield
+    finally:
+        for name, original in saved.items():
+            if original is not None:
+                sys.modules[name] = original
+            else:
+                sys.modules.pop(name, None)
+            # Re-importing also rebinds the submodule as an attribute on its
+            # parent package (e.g. ``app.config`` on ``app``). Restoring only
+            # sys.modules would leave attribute access (``app.config``) and the
+            # import system (``from app.config import ...``) pointing at
+            # different module objects — which silently breaks reload-based
+            # tests like tests/test_database.py::test_echo_enabled_in_debug.
+            # Keep both in sync.
+            parent_name, _, child = name.rpartition(".")
+            parent = sys.modules.get(parent_name)
+            if parent is not None:
+                if original is not None:
+                    setattr(parent, child, original)
+                else:
+                    try:
+                        delattr(parent, child)
+                    except AttributeError:
+                        pass
 
 
 def test_auth_google_router_unmounted_without_client_id(monkeypatch):
