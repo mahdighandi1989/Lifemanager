@@ -14,6 +14,18 @@ const LINKS = [
   { to: '/tasks', label: 'Tasks', testid: 'sidebar-link-tasks' },
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
+  { to: '/budget', label: 'برنامه و بودجه', testid: 'sidebar-link-budget' },
+  { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people' },
+  {
+    to: '/external-projects',
+    label: 'پروژه‌های خارجی',
+    testid: 'sidebar-link-external-projects',
+  },
+  {
+    to: '/ai-settings',
+    label: 'تنظیمات هوش مصنوعی',
+    testid: 'sidebar-link-ai-settings',
+  },
   {
     to: '/notifications',
     label: 'اعلان‌ها',

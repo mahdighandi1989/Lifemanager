@@ -9,6 +9,9 @@ import { TaskProvider } from './context/TaskContext';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import AISettings from './pages/AISettings';
+import BudgetPage from './pages/BudgetPage';
+import ExternalProjects from './pages/ExternalProjects';
+import PeopleProfiles from './pages/PeopleProfiles';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Login from './pages/Login';
@@ -121,6 +124,36 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <AISettings />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/budget"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <BudgetPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/people-profiles"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PeopleProfiles />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/external-projects"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <ExternalProjects />
                     </Layout>
                   </ProtectedRoute>
                 }
