@@ -77,6 +77,22 @@ def test_metrics_targets_are_measurable():
     assert 1.0 <= nlp_service.AI_RESPONSE_QUALITY_TARGET <= 5.0
 
 
+def test_metrics_targets_track_config_single_source():
+    """nlp_service SLO targets are derived from config.AI_PERFORMANCE_TARGETS
+    (single source of truth — audit task 97867b277c1b, Step 9). Guards against
+    the metrics module and the dashboard/alert config drifting apart."""
+    from app.config import AI_PERFORMANCE_TARGETS
+
+    assert (
+        nlp_service.AI_RESPONSE_LATENCY_TARGET_MS
+        == AI_PERFORMANCE_TARGETS["latency_p95_ms_max"]
+    )
+    assert (
+        nlp_service.AI_RESPONSE_QUALITY_TARGET
+        == AI_PERFORMANCE_TARGETS["quality_score_min"]
+    )
+
+
 def test_feedback_helper_rejects_out_of_range_score():
     with pytest.raises(ValueError):
         nlp_service.record_feedback(score=7)

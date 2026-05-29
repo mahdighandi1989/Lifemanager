@@ -22,6 +22,7 @@ from collections import defaultdict
 from threading import Lock
 from typing import Optional
 
+from app.config import AI_PERFORMANCE_TARGETS
 from .model_service import DEFAULT_MODEL
 from .provider_service import call_openai_chat, has_openai_key
 
@@ -29,10 +30,13 @@ from .provider_service import call_openai_chat, has_openai_key
 logger = logging.getLogger(__name__)
 
 
-# Performance targets (SLO) — restated as measurable values per the
-# audit's outcome target so verify_plan greps for both literals.
-AI_RESPONSE_LATENCY_TARGET_MS = 500  # p95 SLO
-AI_RESPONSE_QUALITY_TARGET = 4.0  # avg user score (1-5)
+# Performance targets (SLO) — sourced from the single canonical table in
+# app/config.py (AI_PERFORMANCE_TARGETS) so the metrics module and the
+# dashboard/alert config can't drift out of sync (audit task
+# task_97867b277c1b, Step 9 — "baseline/target in config"). The numeric
+# literals (500 p95-ms, 4.0 quality) live in config.py.
+AI_RESPONSE_LATENCY_TARGET_MS = AI_PERFORMANCE_TARGETS["latency_p95_ms_max"]  # p95 SLO
+AI_RESPONSE_QUALITY_TARGET = AI_PERFORMANCE_TARGETS["quality_score_min"]  # avg user score (1-5)
 
 
 # In-process rolling counters. The summary endpoint reads these, the
