@@ -1,150 +1,126 @@
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+"""Integration tests for IntegrationService — a core service (audit task
+b7894694: "integration tests for core services").
 
+The previous version of this file targeted a phantom API
+(``connect_service`` / ``_save_connection`` / ``sync_data`` …) that the real
+``IntegrationService`` never exposed, so every test errored at collection
+(``IntegrationService()`` also dropped the now-required ``db`` arg). It is
+rewritten here to exercise the *actual* CRUD surface end-to-end against the
+shared in-memory ``db_session`` fixture from conftest, so service↔schema↔DB
+contract drift fails the test instead of passing silently.
+"""
+from __future__ import annotations
+
+import pytest
+
+from app.schemas.integration_schema import IntegrationCreate, IntegrationUpdate
 from app.services.integration_service import IntegrationService
 
 
-@pytest.fixture
-def integration_service():
-    return IntegrationService()
+def _payload(name: str = "My Calendar", service_type: str = "google_calendar") -> IntegrationCreate:
+    return IntegrationCreate(
+        name=name,
+        service_type=service_type,
+        api_key="secret-token",
+        base_url="https://example.test/api",
+        config={"scope": "read"},
+        is_active=True,
+    )
 
 
-class TestIntegrationService:
-    """Tests for IntegrationService."""
+@pytest.mark.asyncio
+async def test_create_integration_persists_row(db_session):
+    svc = IntegrationService(db_session)
+    created = await svc.create_integration(_payload(), user_id=1)
 
-    def test_service_initialization(self, integration_service):
-        """Test that IntegrationService can be initialized."""
-        assert integration_service is not None
-        assert hasattr(integration_service, 'connect_service')
-        assert hasattr(integration_service, 'disconnect_service')
-        assert hasattr(integration_service, 'get_connected_services')
-        assert hasattr(integration_service, 'sync_data')
+    assert created.id is not None
+    assert created.name == "My Calendar"
+    assert created.service_type == "google_calendar"
+    assert created.user_id == 1
+    assert created.is_active is True
 
-    @pytest.mark.asyncio
-    async def test_connect_service_success(self, integration_service):
-        """Test successful service connection."""
-        with patch.object(integration_service, '_save_connection', new_callable=AsyncMock) as mock_save:
-            mock_connection = MagicMock()
-            mock_connection.id = 1
-            mock_connection.service_name = "google_calendar"
-            mock_connection.user_id = 123
-            mock_save.return_value = mock_connection
+    rows = await svc.get_user_integrations(user_id=1)
+    assert [r.id for r in rows] == [created.id]
 
-            result = await integration_service.connect_service(
-                user_id=123,
-                service_name="google_calendar",
-                credentials={"access_token": "token123", "refresh_token": "refresh123"}
-            )
-            assert result is not None
-            assert result.service_name == "google_calendar"
 
-    @pytest.mark.asyncio
-    async def test_connect_service_duplicate(self, integration_service):
-        """Test connecting already connected service."""
-        with patch.object(integration_service, '_get_existing_connection', new_callable=AsyncMock) as mock_get:
-            mock_get.return_value = MagicMock()
-            with pytest.raises(ValueError, match="Service already connected"):
-                await integration_service.connect_service(
-                    user_id=123,
-                    service_name="google_calendar",
-                    credentials={}
-                )
+@pytest.mark.asyncio
+async def test_get_user_integrations_scopes_by_user(db_session):
+    svc = IntegrationService(db_session)
+    await svc.create_integration(_payload("u1-a"), user_id=1)
+    await svc.create_integration(_payload("u1-b"), user_id=1)
+    await svc.create_integration(_payload("u2-a"), user_id=2)
 
-    @pytest.mark.asyncio
-    async def test_disconnect_service(self, integration_service):
-        """Test disconnecting a service."""
-        with patch.object(integration_service, '_get_connection', new_callable=AsyncMock) as mock_get:
-            mock_connection = MagicMock()
-            mock_connection.user_id = 123
-            mock_get.return_value = mock_connection
+    u1 = await svc.get_user_integrations(user_id=1)
+    u2 = await svc.get_user_integrations(user_id=2)
 
-            with patch.object(integration_service, '_delete_connection', new_callable=AsyncMock) as mock_delete:
-                mock_delete.return_value = True
-                result = await integration_service.disconnect_service(
-                    user_id=123,
-                    connection_id=1
-                )
-                assert result is True
+    assert {r.name for r in u1} == {"u1-a", "u1-b"}
+    assert {r.name for r in u2} == {"u2-a"}
 
-    @pytest.mark.asyncio
-    async def test_disconnect_service_not_found(self, integration_service):
-        """Test disconnecting non-existent service."""
-        with patch.object(integration_service, '_get_connection', new_callable=AsyncMock) as mock_get:
-            mock_get.return_value = None
-            result = await integration_service.disconnect_service(
-                user_id=123,
-                connection_id=999
-            )
-            assert result is False
 
-    @pytest.mark.asyncio
-    async def test_get_connected_services(self, integration_service):
-        """Test retrieving connected services."""
-        with patch.object(integration_service, '_get_connections_for_user', new_callable=AsyncMock) as mock_get:
-            mock_connections = [
-                MagicMock(service_name="google_calendar"),
-                MagicMock(service_name="github"),
-                MagicMock(service_name="slack")
-            ]
-            mock_get.return_value = mock_connections
+@pytest.mark.asyncio
+async def test_update_integration_modifies_owned_row(db_session):
+    svc = IntegrationService(db_session)
+    created = await svc.create_integration(_payload(), user_id=1)
 
-            result = await integration_service.get_connected_services(user_id=123)
-            assert len(result) == 3
-            assert result[0].service_name == "google_calendar"
+    updated = await svc.update_integration(
+        created.id,
+        IntegrationUpdate(name="Renamed", is_active=False),
+        user_id=1,
+    )
 
-    @pytest.mark.asyncio
-    async def test_get_connected_services_empty(self, integration_service):
-        """Test retrieving connected services when none exist."""
-        with patch.object(integration_service, '_get_connections_for_user', new_callable=AsyncMock) as mock_get:
-            mock_get.return_value = []
-            result = await integration_service.get_connected_services(user_id=999)
-            assert len(result) == 0
+    assert updated is not None
+    assert updated.name == "Renamed"
+    assert updated.is_active is False
+    # service_type untouched (exclude_unset semantics)
+    assert updated.service_type == "google_calendar"
 
-    @pytest.mark.asyncio
-    async def test_sync_data_success(self, integration_service):
-        """Test successful data synchronization."""
-        with patch.object(integration_service, '_get_connection', new_callable=AsyncMock) as mock_get:
-            mock_connection = MagicMock()
-            mock_connection.service_name = "google_calendar"
-            mock_connection.user_id = 123
-            mock_get.return_value = mock_connection
 
-            with patch.object(integration_service, '_sync_with_service', new_callable=AsyncMock) as mock_sync:
-                mock_sync.return_value = {"synced_items": 10, "status": "success"}
-                result = await integration_service.sync_data(
-                    user_id=123,
-                    connection_id=1
-                )
-                assert result["status"] == "success"
-                assert result["synced_items"] == 10
+@pytest.mark.asyncio
+async def test_update_integration_other_user_returns_none(db_session):
+    svc = IntegrationService(db_session)
+    created = await svc.create_integration(_payload(), user_id=1)
 
-    @pytest.mark.asyncio
-    async def test_sync_data_connection_lost(self, integration_service):
-        """Test sync when connection is lost."""
-        with patch.object(integration_service, '_get_connection', new_callable=AsyncMock) as mock_get:
-            mock_connection = MagicMock()
-            mock_connection.service_name = "google_calendar"
-            mock_connection.user_id = 123
-            mock_get.return_value = mock_connection
+    # A different user must not be able to mutate the row.
+    result = await svc.update_integration(
+        created.id, IntegrationUpdate(name="hijacked"), user_id=999
+    )
+    assert result is None
 
-            with patch.object(integration_service, '_sync_with_service', new_callable=AsyncMock) as mock_sync:
-                mock_sync.side_effect = Exception("Connection lost")
-                with pytest.raises(Exception, match="Sync failed"):
-                    await integration_service.sync_data(
-                        user_id=123,
-                        connection_id=1
-                    )
+    # Original row is unchanged.
+    rows = await svc.get_user_integrations(user_id=1)
+    assert rows[0].name == "My Calendar"
 
-    @pytest.mark.asyncio
-    async def test_sync_data_unauthorized(self, integration_service):
-        """Test sync with unauthorized access."""
-        with patch.object(integration_service, '_get_connection', new_callable=AsyncMock) as mock_get:
-            mock_connection = MagicMock()
-            mock_connection.user_id = 456
-            mock_get.return_value = mock_connection
 
-            with pytest.raises(PermissionError, match="Unauthorized access to connection"):
-                await integration_service.sync_data(
-                    user_id=123,
-                    connection_id=1
-                )
+@pytest.mark.asyncio
+async def test_update_integration_missing_returns_none(db_session):
+    svc = IntegrationService(db_session)
+    result = await svc.update_integration(
+        12345, IntegrationUpdate(name="nope"), user_id=1
+    )
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_delete_integration_removes_owned_row(db_session):
+    svc = IntegrationService(db_session)
+    created = await svc.create_integration(_payload(), user_id=1)
+
+    assert await svc.delete_integration(created.id, user_id=1) is True
+    assert await svc.get_user_integrations(user_id=1) == []
+
+
+@pytest.mark.asyncio
+async def test_delete_integration_missing_returns_false(db_session):
+    svc = IntegrationService(db_session)
+    assert await svc.delete_integration(999, user_id=1) is False
+
+
+@pytest.mark.asyncio
+async def test_delete_integration_other_user_returns_false(db_session):
+    svc = IntegrationService(db_session)
+    created = await svc.create_integration(_payload(), user_id=1)
+
+    # Wrong owner → no row deleted, returns False, row survives.
+    assert await svc.delete_integration(created.id, user_id=2) is False
+    rows = await svc.get_user_integrations(user_id=1)
+    assert [r.id for r in rows] == [created.id]
