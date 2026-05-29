@@ -60,8 +60,17 @@ def validate_token(token: str) -> Optional[dict]:
     this function so signature/algorithm/expiry handling stays consistent.
     """
     try:
+        # verify_exp is True by default in python-jose, but we pass it
+        # explicitly so expiry enforcement is visible at the call site and
+        # can't be silently lost if a future jose default changes (audit
+        # task task_78c0e8e0a9b5, sub-task 3 — "add JWT expiry check"). An
+        # expired token raises ExpiredSignatureError (a JWTError subclass)
+        # and falls into the None path below → 401 at the dependency layer.
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            options={"verify_exp": True},
         )
     except JWTError:
         return None
