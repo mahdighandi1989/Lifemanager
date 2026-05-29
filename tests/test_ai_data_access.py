@@ -11,7 +11,7 @@ async def test_get_user_data_context_returns_shape(db_session):
     """The aggregator returns the documented dict with all four keys
     even when the user has no rows yet."""
     out = await get_user_data_context(db_session, user_id=1)
-    assert set(out.keys()) == {"tasks", "projects", "todo_items", "notifications"}
+    assert set(out.keys()) == {"tasks", "projects", "todo_items", "notifications", "financial_accounts"}
     assert all(isinstance(out[k], list) for k in out)
 
 
@@ -40,7 +40,7 @@ def test_endpoint_responds_with_context(api_client):
     resp = api_client.get("/ai/user_data_context")
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert set(body.keys()) == {"tasks", "projects", "todo_items", "notifications"}
+    assert set(body.keys()) == {"tasks", "projects", "todo_items", "notifications", "financial_accounts"}
 
 
 def test_endpoint_scopes_per_caller(api_client):

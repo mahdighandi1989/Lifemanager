@@ -12,6 +12,7 @@ from typing import List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.finance import FinancialAccount
 from app.models.notification import Notification
 from app.models.project import Project
 from app.models.task import Task
@@ -55,6 +56,17 @@ async def get_user_notifications(
     return list(result.scalars().all())
 
 
+async def get_user_financial_accounts(
+    db: AsyncSession, *, user_id: int
+) -> List[FinancialAccount]:
+    """Bank/broker/exchange accounts for the user (audit task 4ae4b3ca AC 13 —
+    so the AI analysis flow can reason over the caller's financial picture)."""
+    result = await db.execute(
+        select(FinancialAccount).where(FinancialAccount.user_id == user_id)
+    )
+    return list(result.scalars().all())
+
+
 async def get_user_data_context(db: AsyncSession, *, user_id: int) -> dict:
     """Return a single dict carrying every per-user signal the AI
     pipeline cares about. The shape is intentionally flat so the
@@ -63,6 +75,7 @@ async def get_user_data_context(db: AsyncSession, *, user_id: int) -> dict:
     projects = await get_user_projects(db, user_id=user_id)
     todos = await get_user_todo_items(db, user_id=user_id)
     notifications = await get_user_notifications(db, user_id=user_id, limit=20)
+    accounts = await get_user_financial_accounts(db, user_id=user_id)
     return {
         "tasks": [
             {"id": t.id, "title": t.title, "status": getattr(t, "status", None)}
@@ -76,5 +89,17 @@ async def get_user_data_context(db: AsyncSession, *, user_id: int) -> dict:
         "notifications": [
             {"id": n.id, "title": n.title, "priority": n.priority}
             for n in notifications
+        ],
+        # Financial picture (audit task 4ae4b3ca AC 13) — feeds the AI
+        # analysis so it can surface budget-aware suggestions.
+        "financial_accounts": [
+            {
+                "id": a.id,
+                "name": a.name,
+                "kind": a.kind,
+                "balance": float(a.balance or 0),
+                "currency": a.currency,
+            }
+            for a in accounts
         ],
     }

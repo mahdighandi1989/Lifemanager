@@ -7,6 +7,8 @@ process_finance_updates Celery task (AC 11).
 """
 from __future__ import annotations
 
+import pytest
+
 
 # ── Models (AC 2, 3) ─────────────────────────────────────────────────
 
@@ -122,3 +124,23 @@ def test_process_finance_updates_runs_noop_without_source():
 
     result = process_finance_updates.run()
     assert result["balances_updated"] == 0
+
+
+# ── Finance data reaches the AI analysis context (AC 13) ─────────────
+
+@pytest.mark.asyncio
+async def test_user_data_context_includes_financial_accounts(db_session):
+    from app.models.finance import FinancialAccount
+    from app.services.ai.ai_data_access_service import get_user_data_context
+
+    db_session.add(
+        FinancialAccount(user_id=0, name="Acct", kind="bank", currency="USD", balance=500)
+    )
+    await db_session.commit()
+
+    ctx = await get_user_data_context(db_session, user_id=0)
+    assert "financial_accounts" in ctx
+    assert any(
+        a["name"] == "Acct" and a["balance"] == 500.0
+        for a in ctx["financial_accounts"]
+    )
