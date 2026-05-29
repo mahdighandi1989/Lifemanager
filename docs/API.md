@@ -342,14 +342,19 @@ history, and keep free-text notes + a behaviour log per person.
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/api/people/{id}/profile` | The person's profile: `ai_score`, `user_notes`, `behavior_log`, `relationship_type` (auto-creates an empty profile). |
-| POST | `/api/people/{id}/profile/analyze` | Score the relationship from interaction history; persists `ai_score` + `relationship_type` and appends a snapshot to `behavior_log`. |
-| POST | `/api/people/{id}/profile/note` | Save a free-text `user_notes` note. |
+| POST | `/api/people/{id}/profile/analyze` | Blend interaction-history + deed/note scores; persists `ai_score` + `relationship_type` + a `behavior_log` snapshot. |
+| POST | `/api/people/{id}/profile/note` | Save a note AND analyze its tone (Step 10) — the sentiment becomes a valenced log entry that feeds the score. |
+| POST | `/api/people/{id}/profile/deed` | Record a good/bad deed (`{kind, note, important}`) and recompute (Step 4-5 — "کارهای بد و خوبش ثبت بشه"). |
+| GET | `/api/people/{id}/profile/reminders` | Important deeds flagged to not forget (Step 8). |
+| GET | `/api/people/{id}/profile/suggestions` | Actionable suggestions from relationship + deed balance (Step 9). |
 
 Model: `PersonProfile` (one per `Person` — `ai_score`, `user_notes`,
-`behavior_log` JSON, `relationship_type`, `last_analyzed_at`; migration 0024).
-Service: `person_profile_service` (reuses `AIService.analyze_person_behavior`).
-UI: `PersonProfilePage` (`/people/:id/profile`) with score, note form, and
-behaviour history; `PeopleProfiles` links each person to their profile.
+`behavior_log` JSON of deeds/notes/analyses, `relationship_type`,
+`last_analyzed_at`; migration 0024). Scoring: `person_behavior.score_from_deeds`
+weighs good/bad deeds with **time decay** (recent deeds dominate — "با یه کار
+خوبش هزار تا کار بد رو فراموش نکنم"); note tone feeds it. UI: `PersonProfilePage`
+(`/people/:id/profile`) — score, note + deed forms, reminders, suggestions, and a
+good/bad-filterable behaviour timeline; `PeopleProfiles` links each person.
 
 ### Notification events (audit task 92fa5ea15e2b)
 

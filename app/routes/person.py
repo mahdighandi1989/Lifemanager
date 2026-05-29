@@ -217,7 +217,7 @@ async def add_person_profile_note(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> dict:
-    """AC6: persist a free-text user note on the person's profile."""
+    """AC6 + Step10: persist a note AND analyze its tone (feeds the score)."""
     from app.services import person_profile_service
 
     person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
@@ -227,3 +227,62 @@ async def add_person_profile_note(
         db, person_id=person_id, note=payload.user_notes
     )
     return person_profile_service.serialize(profile)
+
+
+class _DeedPayload(BaseModel):
+    kind: str = Field(..., pattern="^(good|bad)$")
+    note: str = Field(default="", max_length=2000)
+    important: bool = False
+
+
+@router.post("/api/people/{person_id}/profile/deed", tags=["persons"])
+@handle_errors
+async def record_person_deed(
+    person_id: int,
+    payload: _DeedPayload = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Record a good/bad deed (Step 4-5 — "کارهای بد و خوبش ثبت بشه") and
+    recompute the score with time decay."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    profile = await person_profile_service.record_deed(
+        db, person_id=person_id, kind=payload.kind, note=payload.note, important=payload.important
+    )
+    return person_profile_service.serialize(profile)
+
+
+@router.get("/api/people/{person_id}/profile/reminders", tags=["persons"])
+@handle_errors
+async def person_reminders(
+    person_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Important deeds flagged to not forget (Step 8 — "فراموش نکنم")."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    return {"reminders": await person_profile_service.get_reminders(db, person_id=person_id)}
+
+
+@router.get("/api/people/{person_id}/profile/suggestions", tags=["persons"])
+@handle_errors
+async def person_suggestions(
+    person_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Actionable suggestions from relationship + deed balance (Step 9)."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    return {"suggestions": await person_profile_service.get_suggestions(db, person_id=person_id)}
