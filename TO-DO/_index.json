@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-05-29T02:10:00+00:00",
+  "generated_at": "2026-05-29T02:30:00+00:00",
   "total": 4,
   "items": [
     {
@@ -32,8 +32,8 @@
       "title": "اسکن دارایی‌ها و تحلیل محتوا",
       "todo_file": "TO-DO/todo-task-217909d2.md",
       "execution_priority": 3300,
-      "manual_actions": 4,
-      "summary": "[backend/infra] scan endpoint (AC2) + WebSocket (AC3) + drive-mount (AC7) + Google Drive (AC8). frontend (AssetsPage + GET /api/assets + nav)، AC1/AC6 انجام شد."
+      "manual_actions": 2,
+      "summary": "[external] فقط AC7 (تشخیص mount درایو — سطح OS) و AC8 (Google Drive — creds). AC1/AC2/AC3/AC4/AC5/AC6 (مدل/scan/WebSocket/linker/UI/فرم اسکن) انجام شد."
     }
   ]
 }

@@ -22,3 +22,6 @@ data_ingestion_service، recommendation_service — موجود و تست‌شد�
 
 ---
 **به‌روزرسانی (frontend):** صفحهٔ مربوطه ساخته و به Sidebar/نویگیشن وصل شد و تست دارد. موارد باقی‌مانده در این فایل صرفاً backend/infra/تصمیم هستند.
+
+---
+**به‌روزرسانی (AC2/AC3/AC5):** انجام شد. `POST /api/assets/scan` (پیمایش پوشه + ثبت UserAsset، dedupe بر اساس path)، WebSocket `/api/assets/scan-status` (stream پیشرفت)، و فرم اسکن در صفحهٔ دارایی‌ها (ورودی مسیر + دکمهٔ اسکن). تنها AC7 (تشخیص mount درایو خارجی — نیازمند agent سطح OS) و AC8 (Google Drive — نیازمند creds) باقی مانده که ذاتاً خارجی‌اند.
