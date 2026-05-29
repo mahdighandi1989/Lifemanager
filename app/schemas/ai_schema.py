@@ -39,6 +39,10 @@ class AIModelConfigCreate(BaseModel):
     api_key_env_var: Optional[str] = None
     parameters: Optional[Dict[str, Any]] = None
     is_active: bool = True
+    # Dynamic-context controls (audit task e606cca6 AC1).
+    context_type: str = "tasks"
+    dynamic_response: bool = True
+    token_limit: Optional[int] = None
 
 
 class AIModelConfigUpdate(BaseModel):
@@ -48,6 +52,9 @@ class AIModelConfigUpdate(BaseModel):
     api_key_env_var: Optional[str] = None
     parameters: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
+    context_type: Optional[str] = None
+    dynamic_response: Optional[bool] = None
+    token_limit: Optional[int] = None
 
 
 class AIModelConfigOut(BaseModel):
@@ -58,6 +65,9 @@ class AIModelConfigOut(BaseModel):
     api_key_env_var: Optional[str] = None
     parameters: Optional[Dict[str, Any]] = None
     is_active: bool
+    context_type: Optional[str] = "tasks"
+    dynamic_response: Optional[bool] = True
+    token_limit: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -165,6 +175,13 @@ class AIAnalysisResult(BaseModel):
     insights: str
     model_used: Optional[str] = None
     context_items_count: int = 0
+
+
+class AnalyzeTasksRequest(BaseModel):
+    """Payload for POST /ai/analyze-tasks (audit task e606cca6 AC4)."""
+
+    task_id: Optional[int] = None
+    user_id: Optional[int] = None
 
 
 class AIQueryResponse(BaseModel):

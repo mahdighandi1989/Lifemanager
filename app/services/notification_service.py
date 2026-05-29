@@ -52,6 +52,7 @@ VALID_NOTIFICATION_TYPES = {
     "verify_failed",
     "budget_alert",
     "recommendation",
+    "ai_feedback",
 }
 
 
@@ -567,6 +568,30 @@ _DEFAULT_EVENT_MESSAGES = {
 _DEFAULT_EVENT_TITLES = {
     "verify_failed": VERIFY_FAILED_TITLE_FA,
 }
+
+
+async def send_ai_feedback(
+    db: Optional[AsyncSession],
+    *,
+    user_id: int,
+    feedback: str,
+    title: str = "بازخورد هوش مصنوعی",
+    priority: str = "normal",
+) -> Optional[Notification]:
+    """Persist an AI feedback/guidance message as a notification (audit task
+    e606cca6 AC5). Best-effort via notify_event — a notification outage never
+    blocks the analysis that produced the feedback. silent=True so it lands in
+    the bell/log without an intrusive push.
+    """
+    return await notify_event(
+        "ai_feedback",
+        user_id=user_id,
+        db=db,
+        message=feedback,
+        title=title,
+        priority=priority,
+        silent=True,
+    )
 
 
 # ── Module-level email + Celery scheduling helpers ──────────────────

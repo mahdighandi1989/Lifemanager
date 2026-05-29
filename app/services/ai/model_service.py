@@ -119,6 +119,43 @@ class AIService:
             "context_items_count": context_items_count,
         }
 
+    async def get_task_context(self, user_id: int) -> dict:
+        """Full task context for the AI (audit task e606cca6 AC2): counts of
+        ``total / completed / pending / overdue`` tasks for the user. The
+        caller sends this whole context to the model — no token cap."""
+        from datetime import date
+
+        from app.models.task import Task
+
+        rows = (
+            await self.db.execute(
+                select(Task).where(
+                    Task.user_id == user_id, Task.merged_into_id.is_(None)
+                )
+            )
+        ).scalars().all()
+
+        def _status(t) -> str:
+            return str(getattr(t.status, "value", t.status) or "")
+
+        today = date.today()
+        total = len(rows)
+        completed = sum(1 for t in rows if _status(t) == "done")
+        pending = sum(1 for t in rows if _status(t) not in ("done", "cancelled"))
+        overdue = sum(
+            1
+            for t in rows
+            if t.due_date
+            and t.due_date < today
+            and _status(t) not in ("done", "cancelled")
+        )
+        return {
+            "total": total,
+            "completed": completed,
+            "pending": pending,
+            "overdue": overdue,
+        }
+
     async def get_user_configs(self, user_id: int) -> List[AIModelConfig]:
         result = await self.db.execute(select(AIModelConfig))
         return list(result.scalars().all())

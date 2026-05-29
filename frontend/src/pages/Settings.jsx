@@ -23,6 +23,13 @@ function Settings() {
   const [error, setError] = useState(null);
   const [provForm, setProvForm] = useState({ name: '', description: '' });
   const [modelForm, setModelForm] = useState({ name: '', provider: '', model_name: '' });
+  // AI Context Settings (audit task e606cca6 AC3): per-model dynamic-context
+  // controls included when a model is created.
+  const [contextSettings, setContextSettings] = useState({
+    context_type: 'tasks',
+    dynamic_response: true,
+    token_limit: 0, // 0 = no limit
+  });
 
   const load = useCallback(async () => {
     try {
@@ -66,7 +73,12 @@ function Settings() {
     const res = await fetch('/api/ai/configs', {
       method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify(modelForm),
+      body: JSON.stringify({
+        ...modelForm,
+        context_type: contextSettings.context_type,
+        dynamic_response: contextSettings.dynamic_response,
+        token_limit: Number(contextSettings.token_limit) || null,
+      }),
     });
     if (res.ok) {
       setModelForm({ name: '', provider: '', model_name: '' });
@@ -183,6 +195,53 @@ function Settings() {
               ))
             )}
           </ul>
+        </section>
+
+        {/* AI Context Settings (audit task e606cca6 AC3) */}
+        <section data-testid="ai-context-settings" className="bg-white rounded-xl shadow p-5">
+          <h2 className="text-lg font-semibold mb-3">تنظیمات زمینهٔ هوش مصنوعی</h2>
+          <div className="space-y-3">
+            <label className="block text-sm">
+              <span className="text-gray-700">نوع زمینه</span>
+              <select
+                data-testid="context-type-select"
+                value={contextSettings.context_type}
+                onChange={(e) => setContextSettings({ ...contextSettings, context_type: e.target.value })}
+                className="mt-1 border rounded-lg px-3 py-2 text-sm w-full"
+              >
+                <option value="tasks">تسک‌ها</option>
+                <option value="all">همهٔ داده‌ها</option>
+                <option value="none">بدون زمینه</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                data-testid="dynamic-response-toggle"
+                checked={contextSettings.dynamic_response}
+                onChange={(e) => setContextSettings({ ...contextSettings, dynamic_response: e.target.checked })}
+              />
+              <span className="text-gray-700">پاسخ داینامیک (نه هاردکد)</span>
+            </label>
+            <label className="block text-sm">
+              <span className="text-gray-700">
+                حد توکن: {Number(contextSettings.token_limit) === 0 ? 'بدون محدودیت' : contextSettings.token_limit}
+              </span>
+              <input
+                type="range"
+                data-testid="token-limit-slider"
+                min="0"
+                max="32000"
+                step="1000"
+                value={contextSettings.token_limit}
+                onChange={(e) => setContextSettings({ ...contextSettings, token_limit: e.target.value })}
+                className="mt-1 w-full"
+              />
+            </label>
+            <p className="text-xs text-gray-400">
+              این مقادیر هنگام افزودن مدل جدید اعمال می‌شوند. حد توکن صفر یعنی بدون محدودیت.
+            </p>
+          </div>
         </section>
 
         {/* Editable analysis prompt box */}

@@ -18,5 +18,12 @@ class AIModelConfig(Base):
     # sending the rendered prompt upstream.
     prompt_template = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
+    # Dynamic-context controls (audit task e606cca6 AC1): how much app context
+    # the model receives (context_type), whether it reasons dynamically vs a
+    # fixed template (dynamic_response), and an optional token cap
+    # (token_limit; NULL/0 = "no limit", per the user's "no token restriction").
+    context_type = Column(String(32), nullable=False, server_default="tasks", default="tasks")
+    dynamic_response = Column(Boolean, nullable=False, server_default="1", default=True)
+    token_limit = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

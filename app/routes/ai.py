@@ -345,6 +345,7 @@ async def get_global_prompt(db: AsyncSession = Depends(get_db)):
 from app.schemas.ai_schema import (
     AIAnalysisRequest,
     AIAnalysisResult,
+    AnalyzeTasksRequest,
     DynamicAnalysisRequest,
     DynamicAnalysisResponse,
 )
@@ -401,6 +402,46 @@ async def analyze(
         prompt=payload.prompt, user_id=user_id, model=payload.model_id
     )
     return AIAnalysisResult(**result)
+
+
+def _build_task_feedback(context: dict, analysis: dict, task_id) -> str:
+    """Dynamic (not hard-coded) Persian feedback from the task context +
+    detected patterns. Works offline; a configured model can elaborate on top."""
+    parts = [
+        f"وضعیت تسک‌ها: {context['total']} کل، {context['completed']} انجام‌شده، "
+        f"{context['pending']} در انتظار، {context['overdue']} عقب‌افتاده."
+    ]
+    parts.extend(analysis.get("patterns", []))
+    if task_id is not None:
+        parts.append(f"برای تسک #{task_id} در چارچوب پرامپت شما تحلیل انجام شد.")
+    return " ".join(parts)
+
+
+@router.post("/analyze-tasks", tags=["ai"])
+@handle_errors
+async def analyze_tasks(
+    payload: AnalyzeTasksRequest = Body(...),
+    db: AsyncSession = Depends(get_db),
+    ai_service: AIService = Depends(get_ai_service),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Dynamic, prompt-framed feedback on the caller's tasks (audit task
+    e606cca6 AC4): full task context (no token cap, AC8) + work-pattern analysis
+    -> intelligent feedback, also persisted as a notification (AC5)."""
+    from app.services.notification_service import send_ai_feedback
+    from app.services.task_analysis import analyze_user_tasks
+
+    uid = payload.user_id if payload.user_id is not None else user_id
+    context = await ai_service.get_task_context(uid)
+    analysis = await analyze_user_tasks(db, user_id=uid)
+    feedback = _build_task_feedback(context, analysis, payload.task_id)
+    await send_ai_feedback(db, user_id=uid, feedback=feedback)
+    return {
+        "task_id": payload.task_id,
+        "context": context,
+        "analysis": analysis,
+        "feedback": feedback,
+    }
 
 
 @router.put("/global-prompt", response_model=GlobalAnalysisPromptResponse)

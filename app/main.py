@@ -18,6 +18,7 @@ from app.database import Base, engine
 from app.rate_limit import limiter
 from app.routes import (
     ai,
+    ai_stream,
     assets,
     auth,
     context,
@@ -634,6 +635,7 @@ app.include_router(settings_routes.router, tags=["settings"])
 app.include_router(assets.router, tags=["assets"])
 app.include_router(merge.router, tags=["merge"])
 app.include_router(deduplication.router, tags=["deduplication"])
+app.include_router(ai_stream.router, tags=["ai"])
 app.include_router(drive.router, tags=["drive"])
 app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)

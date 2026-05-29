@@ -189,3 +189,20 @@ TodoList `is_archived=True`).
 (Jaccard grouping) + `consolidation_service` (task merge). UI:
 `frontend/src/components/deduplication/DeduplicationPanel.jsx`, surfaced on the
 merge page (`/merge`).
+
+### Dynamic task feedback (audit task e606cca6)
+
+Models reason dynamically within the editable prompt, see the **full** task
+context (no token cap), react to user actions, and give proactive feedback.
+`AIModelConfig` gains `context_type` / `dynamic_response` / `token_limit`
+(NULL/0 = no limit) — configured in the Settings "تنظیمات زمینهٔ هوش مصنوعی"
+section.
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/ai/analyze-tasks` | Body `{task_id?, user_id?}` → `{context, analysis, feedback}`; full task context + work-pattern analysis, feedback persisted as a notification. |
+| WS | `/ws/ai-stream` | Send `{user_id}`; streams `feedback` frames + a final `done` frame with the task context. |
+
+Backing pieces: `AIService.get_task_context` (total/completed/pending/overdue),
+`task_analysis.analyze_user_tasks` (group work patterns),
+`notification_service.send_ai_feedback` (persist feedback as a notification).

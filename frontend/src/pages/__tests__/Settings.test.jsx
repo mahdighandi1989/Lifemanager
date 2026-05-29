@@ -94,4 +94,28 @@ describe('Settings page (task 1a08ded2)', () => {
       ),
     );
   });
+
+  test('renders AI Context Settings with the three controls (task e606cca6 AC3)', () => {
+    render(<Settings />);
+    expect(screen.getByTestId('ai-context-settings')).toBeInTheDocument();
+    expect(screen.getByTestId('context-type-select')).toBeInTheDocument();
+    expect(screen.getByTestId('dynamic-response-toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('token-limit-slider')).toBeInTheDocument();
+  });
+
+  test('model POST carries the chosen context settings (AC1/AC3)', async () => {
+    render(<Settings />);
+    fireEvent.change(screen.getByTestId('context-type-select'), { target: { value: 'all' } });
+    fireEvent.change(screen.getByTestId('model-name-input'), { target: { value: 'm-ctx' } });
+    fireEvent.click(screen.getByTestId('add-model-btn'));
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/ai/configs',
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('"context_type":"all"'),
+        }),
+      ),
+    );
+  });
 });
