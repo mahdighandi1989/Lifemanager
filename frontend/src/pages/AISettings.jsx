@@ -14,8 +14,9 @@ function AISettings() {
   const [providers, setProviders] = useState([]);
   const [models, setModels] = useState([]);
   const [error, setError] = useState(null);
-  const [provForm, setProvForm] = useState({ name: '', description: '' });
+  const [provForm, setProvForm] = useState({ name: '', description: '', base_url: '', api_key: '', default_model: '' });
   const [modelForm, setModelForm] = useState({ name: '', provider: '', model_name: '' });
+  const [testResult, setTestResult] = useState({});
 
   const authHeaders = useCallback(
     (extra = {}) => (token ? { Authorization: `Bearer ${token}`, ...extra } : { ...extra }),
@@ -48,10 +49,36 @@ function AISettings() {
         body: JSON.stringify(provForm),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setProvForm({ name: '', description: '' });
+      setProvForm({ name: '', description: '', base_url: '', api_key: '', default_model: '' });
       await load();
     } catch (e) {
       setError('خطا در افزودن ارائه‌دهنده: ' + e.message);
+    }
+  };
+
+  const deleteProvider = async (id) => {
+    try {
+      const res = await fetch(`/api/ai/providers/${id}`, { method: 'DELETE', headers: authHeaders() });
+      if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
+      await load();
+    } catch (e) {
+      setError('خطا در حذف ارائه‌دهنده: ' + e.message);
+    }
+  };
+
+  const testProvider = async (id) => {
+    try {
+      const res = await fetch(`/api/ai/providers/${id}/test`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+      });
+      const data = await res.json();
+      setTestResult((prev) => ({
+        ...prev,
+        [id]: data.configured ? (data.reachable === false ? data.detail : 'متصل/پیکربندی‌شده') : 'کلید تنظیم نشده',
+      }));
+    } catch (e) {
+      setTestResult((prev) => ({ ...prev, [id]: 'خطا: ' + e.message }));
     }
   };
 
@@ -101,6 +128,28 @@ function AISettings() {
               value={provForm.description}
               onChange={(e) => setProvForm({ ...provForm, description: e.target.value })}
             />
+            <input
+              data-testid="provider-baseurl-input"
+              className="flex-1 min-w-[160px] border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              placeholder="Base URL (مثلاً https://api.deepseek.com/v1)"
+              value={provForm.base_url}
+              onChange={(e) => setProvForm({ ...provForm, base_url: e.target.value })}
+            />
+            <input
+              data-testid="provider-apikey-input"
+              type="password"
+              className="flex-1 min-w-[160px] border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              placeholder="API key (رمزنگاری‌شده ذخیره می‌شود)"
+              value={provForm.api_key}
+              onChange={(e) => setProvForm({ ...provForm, api_key: e.target.value })}
+            />
+            <input
+              data-testid="provider-model-input"
+              className="flex-1 min-w-[140px] border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              placeholder="مدل پیش‌فرض"
+              value={provForm.default_model}
+              onChange={(e) => setProvForm({ ...provForm, default_model: e.target.value })}
+            />
             <button type="submit" data-testid="add-provider-btn" className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-blue-700">
               افزودن
             </button>
@@ -110,11 +159,17 @@ function AISettings() {
               <li className="text-sm text-gray-400 py-2">هنوز ارائه‌دهنده‌ای ثبت نشده.</li>
             ) : (
               providers.map((p) => (
-                <li key={p.id} className="py-2 text-sm text-gray-700 flex justify-between">
-                  <span>{p.name}</span>
-                  <span className={p.is_enabled ? 'text-green-600' : 'text-gray-400'}>
-                    {p.is_enabled ? 'فعال' : 'غیرفعال'}
+                <li key={p.id} data-testid={`provider-row-${p.id}`} className="py-2 text-sm text-gray-700 flex justify-between items-center gap-2">
+                  <span className="flex-1">
+                    {p.name}
+                    {p.has_api_key && <span className="text-[11px] text-green-600 mr-2"> 🔑 کلید</span>}
+                    {p.base_url && <span className="text-[11px] text-gray-400 mr-2"> {p.base_url}</span>}
                   </span>
+                  {testResult[p.id] && (
+                    <span data-testid={`provider-test-result-${p.id}`} className="text-[11px] text-indigo-600">{testResult[p.id]}</span>
+                  )}
+                  <button data-testid={`provider-test-${p.id}`} onClick={() => testProvider(p.id)} className="text-xs text-indigo-600 hover:underline">تست</button>
+                  <button data-testid={`provider-delete-${p.id}`} onClick={() => deleteProvider(p.id)} className="text-xs text-red-600 hover:underline">حذف</button>
                 </li>
               ))
             )}

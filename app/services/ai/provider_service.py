@@ -22,6 +22,44 @@ def has_openai_key() -> bool:
     return bool(os.environ.get("OPENAI_API_KEY"))
 
 
+async def resolve_provider_routing(db, *, user_id: int, model: str | None = None):
+    """Resolve the caller's selected AI provider to a routing tuple
+    ``(model_name, api_key, base_url)`` (audit task 1a08ded2 — make the
+    registered providers ACTUALLY drive the analysis call).
+
+    Picks the user's first enabled AIProvider that has a stored key, decrypts
+    it, and uses its base_url + default_model. Falls back to
+    ``(model or "gpt-3.5-turbo", None, None)`` → the env OpenAI key path. Never
+    raises: any DB/crypto error degrades to the fallback so analysis still runs.
+    """
+    default_model = model or "gpt-3.5-turbo"
+    try:
+        from sqlalchemy import select
+
+        from app.models.ai_provider import AIProvider
+
+        rows = (
+            await db.execute(
+                select(AIProvider).where(
+                    AIProvider.user_id == user_id, AIProvider.is_enabled.is_(True)
+                )
+            )
+        ).scalars().all()
+    except Exception:
+        return (default_model, None, None)
+
+    for p in rows:
+        if p.api_key_encrypted:
+            try:
+                from app.services.crypt_service import decrypt_data
+
+                key = decrypt_data(p.api_key_encrypted)
+            except Exception:
+                continue
+            return (model or p.default_model or "gpt-3.5-turbo", key, p.base_url)
+    return (default_model, None, None)
+
+
 def _resolved_timeout() -> float:
     """30s default, configurable via EXTERNAL_API_TIMEOUT env var."""
     raw = os.environ.get("EXTERNAL_API_TIMEOUT")
@@ -33,30 +71,38 @@ def _resolved_timeout() -> float:
     return 30.0
 
 
+OPENAI_BASE_URL = "https://api.openai.com/v1"
+
+
 async def call_openai_chat(
     *,
     prompt: str,
     model: str,
     max_tokens: int,
     temperature: float,
+    api_key: str | None = None,
+    base_url: str | None = None,
 ) -> dict:
-    """POST ``prompt`` to the OpenAI chat completions endpoint.
+    """POST ``prompt`` to an OpenAI-compatible chat-completions endpoint.
 
-    Returns the AIGenerateResponse-shaped dict. Raises any underlying
-    httpx exception — the caller (nlp_service.generate_text) wraps the
-    error so the route still returns a 200 with a placeholder.
+    Multi-provider routing (audit task 1a08ded2): ``base_url`` + ``api_key`` let
+    the caller target any OpenAI-compatible vendor (DeepSeek / Grok / Perplexity
+    / OpenRouter / a local server). When omitted they fall back to OpenAI +
+    ``OPENAI_API_KEY`` — preserving the prior single-provider behaviour.
 
-    Lazy-imports httpx so test environments without it can still
-    import this module to assert on the placeholder branch.
+    Returns the AIGenerateResponse-shaped dict. Raises any underlying httpx
+    exception — the caller wraps it so the route still returns a 200 with a
+    placeholder. Lazy-imports httpx so test envs without it can still import.
     """
     import httpx  # local import keeps the dep optional for tests
 
-    api_key = os.environ["OPENAI_API_KEY"]  # caller has already checked
+    key = api_key or os.environ.get("OPENAI_API_KEY", "")
+    root = (base_url or OPENAI_BASE_URL).rstrip("/")
     async with httpx.AsyncClient(timeout=_resolved_timeout()) as client:
         response = await client.post(
-            "https://api.openai.com/v1/chat/completions",
+            f"{root}/chat/completions",
             headers={
-                "Authorization": f"Bearer {api_key}",
+                "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
             },
             json={

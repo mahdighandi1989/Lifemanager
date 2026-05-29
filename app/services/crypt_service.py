@@ -50,12 +50,21 @@ def get_fernet_key(secret: Optional[str] = None) -> bytes:
         # Use the secret to generate a deterministic 32-byte key
         key = base64.urlsafe_b64encode(secret.encode().ljust(32)[:32])
     else:
-        # Fallback: use environment variable or generate a new one
-        key = os.environ.get("ENCRYPTION_KEY")
-        if not key:
-            key = Fernet.generate_key()
+        # Fallback order: explicit ENCRYPTION_KEY env, else derive a STABLE key
+        # from the app SECRET_KEY. A random per-call key (the previous default)
+        # made encrypt/decrypt non-round-trippable — anything encrypted at rest
+        # (oversight tokens, AI provider keys) could never be decrypted again.
+        env_key = os.environ.get("ENCRYPTION_KEY")
+        if env_key:
+            key = env_key.encode()
         else:
-            key = key.encode()
+            try:
+                from app.config import settings as _settings
+
+                seed = _settings.SECRET_KEY or "lifemanager-dev-encryption-seed"
+            except Exception:
+                seed = "lifemanager-dev-encryption-seed"
+            key = base64.urlsafe_b64encode(seed.encode().ljust(32)[:32])
     return key if isinstance(key, bytes) else key.encode()
 
 def generate_key() -> str:

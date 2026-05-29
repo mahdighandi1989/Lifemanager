@@ -61,7 +61,9 @@ async def test_placeholder_path_emits_metrics(caplog, monkeypatch):
 @pytest.mark.asyncio
 async def test_upstream_path_emits_metrics(caplog, monkeypatch):
     """Mocked successful upstream → result_kind='provider'."""
-    async def fake_call_openai_chat(prompt, model, max_tokens, temperature):
+    async def fake_call_openai_chat(prompt, model, max_tokens, temperature, **kwargs):
+        # **kwargs tolerates the multi-provider routing args (api_key/base_url)
+        # added in task 1a08ded2.
         return {
             "generated_text": "real upstream output",
             "model_used": model,
@@ -85,7 +87,7 @@ async def test_upstream_path_emits_metrics(caplog, monkeypatch):
 @pytest.mark.asyncio
 async def test_error_path_emits_metrics(caplog, monkeypatch):
     """Upstream raises → result_kind='error', tokens_used=0."""
-    async def boom(prompt, model, max_tokens, temperature):
+    async def boom(prompt, model, max_tokens, temperature, **kwargs):
         raise RuntimeError("upstream blew up")
 
     monkeypatch.setattr(nlp_service, "has_openai_key", lambda: True)

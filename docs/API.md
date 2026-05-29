@@ -113,8 +113,16 @@ endpoint accepts a `?provider=` query parameter to filter by it.
 | POST | `/api/ai/configs` | Create a model config; body must set `provider`. Returns 201 with `id`, `name`, `provider`. |
 | PATCH | `/api/ai/configs/{id}` | Update a config (including `provider`). |
 | DELETE | `/api/ai/configs/{id}` | Delete a config (204). |
-| GET / POST | `/api/ai/providers` | List / create AI providers (user-scoped). |
+| GET / POST | `/api/ai/providers` | List / create AI providers (user-scoped). Create/patch accept `base_url`, `api_key` (write-only — encrypted at rest via crypt_service, never returned), `default_model`; responses expose `has_api_key` only. |
 | GET / PATCH / DELETE | `/api/ai/providers/{id}` | Fetch / update / delete a provider. |
+| POST | `/api/ai/providers/{id}/test` | Test-connection probe: reports `configured` + (when keyed) best-effort `reachable`. |
+
+Multi-provider routing (audit task 1a08ded2 AC5/7): `/api/ai/analyze` resolves
+the caller's enabled provider via `resolve_provider_routing` and calls its
+`base_url` + decrypted key + `default_model` through `call_openai_chat` (any
+OpenAI-compatible vendor — DeepSeek/Grok/Perplexity/OpenRouter/local); falls
+back to env `OPENAI_API_KEY`, then the deterministic placeholder. Keys are
+stored encrypted (`AIProvider.api_key_encrypted`, migration 0026).
 | GET / PUT | `/api/ai/global-prompt` | Read / update the global analysis prompt. |
 | GET | `/api/ai/user_data_context` | Authenticated caller's own Task/Project/TodoItem/Notification context for AI. |
 | POST | `/api/ai/dynamic-analyze` | Free-form AI analysis; 403 when `FEATURE_AI_ENABLED` is off. |
@@ -337,7 +345,7 @@ Settings page. Model `AIFeedback` (migration 0025).
 
 ### Migrations & startup (audit task 3ea5622b)
 
-The Alembic chain (`migrations/versions/`, head `0025_ai_feedback`)
+The Alembic chain (`migrations/versions/`, head `0026_ai_provider_routing`)
 is kept in sync with `Base.metadata` — `tests/test_migration.py` /
 `test_migrations.py` assert every model table is created by `alembic upgrade head`.
 

@@ -19,6 +19,14 @@ class AIProvider(Base):
     name = Column(String(120), nullable=False)
     description = Column(Text, nullable=True)
     is_enabled = Column(Boolean, default=True, nullable=False)
+    # Routing config (audit task 1a08ded2 AC5/7). ``base_url`` points at any
+    # OpenAI-compatible endpoint (DeepSeek/Grok/Perplexity/OpenRouter/local);
+    # ``api_key_encrypted`` stores the per-provider key encrypted-at-rest via
+    # app/services/crypt_service (never plaintext); ``default_model`` is used
+    # when a request doesn't name a model.
+    base_url = Column(String(512), nullable=True)
+    api_key_encrypted = Column(Text, nullable=True)
+    default_model = Column(String(120), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

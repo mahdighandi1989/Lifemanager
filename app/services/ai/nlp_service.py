@@ -149,6 +149,8 @@ async def generate_text(
     max_tokens: int = 512,
     temperature: float = 0.7,
     model: str = DEFAULT_MODEL,
+    api_key: Optional[str] = None,
+    base_url: Optional[str] = None,
 ) -> dict:
     """Generate text for ``prompt``.
 
@@ -169,7 +171,10 @@ async def generate_text(
     request_id = uuid.uuid4().hex
     start_ns = time.perf_counter_ns()
 
-    if not has_openai_key():
+    # A per-provider api_key (from a registered AIProvider) routes to that
+    # vendor; otherwise fall back to the env OPENAI_API_KEY. Only when NEITHER
+    # is present do we serve the deterministic placeholder (audit task 1a08ded2).
+    if not (api_key or has_openai_key()):
         result = _placeholder_response(prompt, model)
         latency_ms = (time.perf_counter_ns() - start_ns) // 1_000_000
         _emit_metrics(
@@ -188,6 +193,8 @@ async def generate_text(
             model=model,
             max_tokens=max_tokens,
             temperature=temperature,
+            api_key=api_key,
+            base_url=base_url,
         )
         kind = "provider"
     except Exception as exc:  # network / provider failure

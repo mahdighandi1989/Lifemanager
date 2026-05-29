@@ -54,17 +54,19 @@ class AIService:
         *,
         max_tokens: int = 512,
         temperature: float = 0.7,
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
     ) -> dict:
-        """Per audit task 97867b277c1b AC 6, the /ai/generate route now
-        calls this instance method instead of the module-level
-        ``generate_text`` helper. Delegates to the same nlp_service
-        implementation so the metrics + placeholder branches stay
-        consistent — the route just no longer needs the bare-function
-        import."""
+        """Delegates to nlp_service.generate_text (AC6, task 97867b277c1b).
+        ``api_key``/``base_url`` route to a registered provider (task 1a08ded2);
+        omitted → env OpenAI path / placeholder."""
+        from app.services.ai.nlp_service import DEFAULT_MODEL
         from app.services.ai.nlp_service import generate_text as _generate_text
 
         return await _generate_text(
-            prompt, max_tokens=max_tokens, temperature=temperature
+            prompt, max_tokens=max_tokens, temperature=temperature,
+            model=model or DEFAULT_MODEL, api_key=api_key, base_url=base_url,
         )
 
     async def orchestrate_analysis(
@@ -112,7 +114,17 @@ class AIService:
             if part
         )
 
-        out = await self.generate_text(prompt=merged)
+        # 4. Resolve the user's registered provider (base_url + decrypted key +
+        # model) so analysis actually routes to their chosen vendor (task
+        # 1a08ded2); falls back to env OpenAI / placeholder when none.
+        from app.services.ai.provider_service import resolve_provider_routing
+
+        model_name, api_key, base_url = await resolve_provider_routing(
+            self.db, user_id=user_id, model=model
+        )
+        out = await self.generate_text(
+            prompt=merged, model=model_name, api_key=api_key, base_url=base_url
+        )
         return {
             "insights": out.get("generated_text", ""),
             "model_used": model or out.get("model_used"),
@@ -191,34 +203,12 @@ class AIService:
         )
 
     async def analyze_person_behavior(self, person_name: str, interactions: list) -> dict:
-        """Score a relationship from a person's interaction history (audit
-        task 3cc09436, AC3). Deterministic + rule-based so it runs without an
-        upstream model and stays testable: each interaction is weighted by
-        type (a meeting counts more than a message), the weighted sum maps to
-        an ai_score (0-100), and the score buckets into a relationship_type.
-        This is the payload the POST /people-profiles/{id}/analyze route
-        (ai_score + relationship_type) surfaces."""
-        items = list(interactions or [])
-        type_weights = {"meeting": 3, "call": 2, "email": 1, "message": 1, "other": 1}
-        weighted = 0
-        for it in items:
-            raw = getattr(it, "type", None)
-            kind = getattr(raw, "value", None) or (str(raw).lower() if raw is not None else "other")
-            weighted += type_weights.get(kind, 1)
-        ai_score = min(100, weighted * 10)
-        if ai_score >= 60:
-            relationship_type = "close"
-        elif ai_score >= 20:
-            relationship_type = "regular"
-        else:
-            relationship_type = "distant"
-        return {
-            "person_name": person_name,
-            "ai_score": ai_score,
-            "relationship_type": relationship_type,
-            "interaction_count": len(items),
-            "summary": f"{len(items)} interaction(s); weighted engagement {weighted}.",
-        }
+        """Relationship score from interaction history (task 3cc09436 AC3) —
+        delegates to person_behavior.score_person_behavior (kept out of this
+        module so it stays under the 250-line split cap)."""
+        from app.services.ai.person_behavior import score_person_behavior
+
+        return score_person_behavior(person_name, interactions)
 
 
 async def get_active_config(db: AsyncSession) -> Optional[AIModelConfig]:

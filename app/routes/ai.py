@@ -272,6 +272,32 @@ from app.schemas.ai_provider_schema import (
 from app.dependencies.auth import get_optional_user_id
 
 
+def _provider_to_response(p: AIProvider) -> AIProviderResponse:
+    """Map an AIProvider ORM row to its response, exposing only ``has_api_key``
+    (never the encrypted/raw key)."""
+    return AIProviderResponse(
+        id=p.id,
+        user_id=p.user_id,
+        name=p.name,
+        description=p.description,
+        is_enabled=p.is_enabled,
+        base_url=p.base_url,
+        default_model=p.default_model,
+        has_api_key=bool(p.api_key_encrypted),
+        created_at=p.created_at,
+        updated_at=p.updated_at,
+    )
+
+
+def _encrypt_key(raw: Optional[str]) -> Optional[str]:
+    """Encrypt a provider API key at rest (audit task 1a08ded2 AC5/7)."""
+    if not raw:
+        return None
+    from app.services.crypt_service import encrypt_data
+
+    return encrypt_data(raw)
+
+
 @router.post(
     "/providers",
     response_model=AIProviderResponse,
@@ -288,11 +314,14 @@ async def create_ai_provider(
         name=payload.name,
         description=payload.description,
         is_enabled=payload.is_enabled,
+        base_url=payload.base_url,
+        default_model=payload.default_model,
+        api_key_encrypted=_encrypt_key(payload.api_key),
     )
     db.add(provider)
     await db.commit()
     await db.refresh(provider)
-    return provider
+    return _provider_to_response(provider)
 
 
 @router.get("/providers", response_model=List[AIProviderResponse])
@@ -304,7 +333,7 @@ async def list_ai_providers(
     result = await db.execute(
         _select(AIProvider).where(AIProvider.user_id == user_id)
     )
-    return list(result.scalars().all())
+    return [_provider_to_response(p) for p in result.scalars().all()]
 
 
 @router.get("/providers/{provider_id}", response_model=AIProviderResponse)
@@ -322,7 +351,7 @@ async def get_ai_provider(
     provider = result.scalar_one_or_none()
     if provider is None:
         raise HTTPException(status_code=404, detail="AI provider not found")
-    return provider
+    return _provider_to_response(provider)
 
 
 @router.patch("/providers/{provider_id}", response_model=AIProviderResponse)
@@ -347,9 +376,63 @@ async def update_ai_provider(
         provider.description = payload.description
     if payload.is_enabled is not None:
         provider.is_enabled = payload.is_enabled
+    if payload.base_url is not None:
+        provider.base_url = payload.base_url
+    if payload.default_model is not None:
+        provider.default_model = payload.default_model
+    if payload.api_key is not None:
+        # empty string clears the key; any value (re)encrypts it
+        provider.api_key_encrypted = _encrypt_key(payload.api_key) if payload.api_key else None
     await db.commit()
     await db.refresh(provider)
-    return provider
+    return _provider_to_response(provider)
+
+
+@router.post("/providers/{provider_id}/test")
+@handle_errors
+async def test_ai_provider(
+    provider_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Test-connection probe (audit task 1a08ded2). Reports whether the
+    provider has a key + base_url configured and, when a key is present, makes
+    a best-effort tiny chat call to confirm reachability. Never leaks the key;
+    degrades to a configuration report when offline / unkeyed."""
+    result = await db.execute(
+        _select(AIProvider).where(
+            (AIProvider.id == provider_id) & (AIProvider.user_id == user_id)
+        )
+    )
+    provider = result.scalar_one_or_none()
+    if provider is None:
+        raise HTTPException(status_code=404, detail="AI provider not found")
+
+    configured = bool(provider.api_key_encrypted)
+    reachable = None
+    detail = "No API key configured — add one to enable live calls." if not configured else "configured"
+    if configured:
+        from app.services.crypt_service import decrypt_data
+        from app.services.ai.model_service import DEFAULT_MODEL
+        from app.services.ai.provider_service import call_openai_chat
+
+        try:
+            key = decrypt_data(provider.api_key_encrypted)
+            await call_openai_chat(
+                prompt="ping", model=provider.default_model or DEFAULT_MODEL,
+                max_tokens=1, temperature=0.0, api_key=key, base_url=provider.base_url,
+            )
+            reachable, detail = True, "reachable"
+        except Exception as exc:
+            reachable, detail = False, f"unreachable: {type(exc).__name__}"
+    return {
+        "provider_id": provider.id,
+        "name": provider.name,
+        "configured": configured,
+        "base_url": provider.base_url,
+        "reachable": reachable,
+        "detail": detail,
+    }
 
 
 @router.delete("/providers/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)

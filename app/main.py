@@ -317,6 +317,10 @@ async def startup_event():
         # Drive cold-tiering bookkeeping (audit task 7367c6f0).
         ("drive_files", "storage_location", "VARCHAR(16) DEFAULT 'local'"),
         ("drive_files", "last_accessed_at", "TIMESTAMP WITH TIME ZONE"),
+        # AI provider routing + encrypted key (audit task 1a08ded2).
+        ("ai_providers", "base_url", "VARCHAR(512)"),
+        ("ai_providers", "api_key_encrypted", "TEXT"),
+        ("ai_providers", "default_model", "VARCHAR(120)"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:
