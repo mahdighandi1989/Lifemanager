@@ -35,6 +35,7 @@ from app.routes import (
     planner,
     projects,
     self_improvement,
+    settings as settings_routes,
     tasks,
     todo_items,
     users,
@@ -608,6 +609,11 @@ app.include_router(notifications.router, prefix="/notifications", tags=["notific
 # delivery-tracking subtask.
 app.include_router(notifications.api_router, tags=["notifications"])
 app.include_router(ai.router, tags=["ai"])
+# Dual-mount the AI router under /api as well, so the SPA's documented
+# contract (frontend AISettings/Settings call /api/ai/...) is actually served
+# — the router's own prefix is /ai, mirroring the notifications/users dual
+# mount pattern above (audit task 1a08ded2).
+app.include_router(ai.router, prefix="/api", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 # Sibling router for absolute-path users endpoints (/api/users/...).
 app.include_router(users.api_router, tags=["users"])
@@ -623,6 +629,7 @@ app.include_router(finance.router)
 app.include_router(location.router)
 app.include_router(context.router, tags=["context"])
 app.include_router(oversight.router, tags=["oversight"])
+app.include_router(settings_routes.router, tags=["settings"])
 app.include_router(assets.router, tags=["assets"])
 app.include_router(merge.router, tags=["merge"])
 app.include_router(drive.router, tags=["drive"])

@@ -14,6 +14,7 @@ from app.models.person_task import person_tasks  # noqa: F401  (association tabl
 from app.models.indexed_data_source_entry import IndexedDataSourceEntry
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
 from app.models.context import UserContext
+from app.models.global_setting import GlobalSetting
 from app.models.recommendation import ContextualRecommendation
 from app.models.integration import Integration
 from app.models.local_file_entry import LocalFileEntry
@@ -47,6 +48,7 @@ __all__ = [
     "ContextualRecommendation",
     "FinancialAccount",
     "GlobalAnalysisPrompt",
+    "GlobalSetting",
     "Income",
     "Transaction",
     "UserContext",

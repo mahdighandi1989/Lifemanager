@@ -11,7 +11,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user, get_optional_user_id
 from app.middleware import handle_errors
 from app.models.user import User
 from app.schemas.ai_schema import (
@@ -96,13 +96,24 @@ async def generate(
     return AIGenerateResponse(**result)
 
 
+# AI model-config CRUD is scoped by get_optional_user_id (login-bypass design,
+# audit task 78c0e8e0a9b5) — anon traffic resolves to user 0 so the settings
+# page can list/manage models without a bearer, consistent with tasks/lists/
+# finance/context. (Was get_current_user, which 403'd the SPA's /api/ai/configs
+# calls under login-bypass — task 1a08ded2 AC 45-48, 51-54.)
 @router.get("/configs", response_model=List[AIModelConfigOut])
 @handle_errors
 async def list_ai_configs(
+    provider: Optional[str] = None,
     ai_service: AIService = Depends(get_ai_service),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ):
-    return await ai_service.get_user_configs(current_user.id)
+    # AC 15 (task 1a08ded2): optional ?provider= filter — documented in
+    # docs/API.md, now enforced here so the contract holds.
+    configs = await ai_service.get_user_configs(user_id)
+    if provider:
+        configs = [c for c in configs if getattr(c, "provider", None) == provider]
+    return configs
 
 
 @router.post(
@@ -114,9 +125,9 @@ async def list_ai_configs(
 async def create_ai_config(
     config_data: AIModelConfigCreate,
     ai_service: AIService = Depends(get_ai_service),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ):
-    return await ai_service.create_config(config_data, current_user.id)
+    return await ai_service.create_config(config_data, user_id)
 
 
 @router.patch("/configs/{config_id}", response_model=AIModelConfigOut)
@@ -125,9 +136,9 @@ async def update_ai_config(
     config_id: int,
     config_data: AIModelConfigUpdate,
     ai_service: AIService = Depends(get_ai_service),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ):
-    config = await ai_service.update_config(config_id, config_data, current_user.id)
+    config = await ai_service.update_config(config_id, config_data, user_id)
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="AI config not found"
@@ -140,9 +151,9 @@ async def update_ai_config(
 async def delete_ai_config(
     config_id: int,
     ai_service: AIService = Depends(get_ai_service),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_optional_user_id),
 ):
-    success = await ai_service.delete_config(config_id, current_user.id)
+    success = await ai_service.delete_config(config_id, user_id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="AI config not found"
