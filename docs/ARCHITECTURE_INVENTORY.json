@@ -1072,6 +1072,10 @@
         "file": "frontend/src/components/CareerPathPanel.jsx"
       },
       {
+        "name": "AIFeedbackWidget",
+        "file": "frontend/src/components/AIFeedbackWidget.jsx"
+      },
+      {
         "name": "DeduplicationPanel",
         "file": "frontend/src/components/deduplication/DeduplicationPanel.jsx"
       },

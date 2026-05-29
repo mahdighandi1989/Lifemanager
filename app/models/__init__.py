@@ -23,6 +23,7 @@ from app.models.person import Person
 from app.models.person_profile import PersonProfile
 from app.models.interaction import Interaction, InteractionType
 from app.models.ai_assessment import AIAssessment
+from app.models.ai_feedback import AIFeedback
 from app.models.user_comment import UserComment
 from app.models.behavior_log import BehaviorLog, BehaviorType
 from app.models.user_location import UserLocation
@@ -64,6 +65,7 @@ __all__ = [
     "Interaction",
     "InteractionType",
     "AIAssessment",
+    "AIFeedback",
     "UserComment",
     "BehaviorLog",
     "BehaviorType",

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import AIFeedbackWidget from '../components/AIFeedbackWidget';
 
 // AI settings page (audit task 1a08ded2, AC4): view / add AI providers and
 // model configs. Talks to the existing backend surface:
@@ -76,6 +77,8 @@ function AISettings() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">تنظیمات هوش مصنوعی</h1>
         <p className="text-gray-500 mb-6">مدیریت ارائه‌دهندگان و مدل‌های هوش مصنوعی.</p>
+
+        <AIFeedbackWidget />
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>

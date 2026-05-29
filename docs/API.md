@@ -308,9 +308,19 @@ Service: `person_profile_service` (reuses `AIService.analyze_person_behavior`).
 UI: `PersonProfilePage` (`/people/:id/profile`) with score, note form, and
 behaviour history; `PeopleProfiles` links each person to their profile.
 
+### AI performance feedback & metrics (audit task 97867b277c1b)
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/ai/feedback` | Body `{liked?: bool, score?: 1-5, response_ref?}` — persists an `AIFeedback` row (per-user, durable) + bumps in-process counters. 400 if neither signal given. |
+| GET | `/api/ai/metrics` | Latency/throughput from rolling counters; likes/dislikes + `ai_response_quality_score` aggregated from the `ai_feedback` table (survive restart) with SLO targets from `AI_PERFORMANCE_TARGETS`. |
+
+UI: `AIFeedbackWidget` (like/dislike + 1-5 stars + live metrics) on the AI
+Settings page. Model `AIFeedback` (migration 0025).
+
 ### Migrations & startup (audit task 3ea5622b)
 
-The Alembic chain (`migrations/versions/`, head `0024_person_profiles`)
+The Alembic chain (`migrations/versions/`, head `0025_ai_feedback`)
 is kept in sync with `Base.metadata` — `tests/test_migration.py` /
 `test_migrations.py` assert every model table is created by `alembic upgrade head`.
 

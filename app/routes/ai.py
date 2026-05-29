@@ -180,37 +180,81 @@ class AIFeedbackPayload(BaseModel):
 
     liked: Optional[bool] = None
     score: Optional[int] = Field(default=None, ge=1, le=5)
+    response_ref: Optional[str] = Field(default=None, max_length=128)
 
 
 @router.post("/feedback", status_code=status.HTTP_202_ACCEPTED)
 @handle_errors
-async def submit_ai_feedback(payload: AIFeedbackPayload) -> dict:
+async def submit_ai_feedback(
+    payload: AIFeedbackPayload,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
     """Record a like/dislike or 1-5 score for the AI response.
 
-    The route only exposes the binary like signal and the explicit
-    rating — neither path requires authentication, intentionally, so
-    the audit's outcome metric can be collected even when the chat is
-    used in the frontend's login-bypass mode.
+    Persists an ``AIFeedback`` row (durable, per-user — audit task
+    97867b277c1b) AND bumps the in-process counters. Anon-friendly under
+    login-bypass so the outcome metric is collectable from the chat UI.
     """
     if payload.liked is None and payload.score is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Provide either liked (bool) or score (1-5)",
         )
+    from app.models.ai_feedback import AIFeedback
+
+    db.add(
+        AIFeedback(
+            user_id=user_id,
+            liked=payload.liked,
+            score=payload.score,
+            response_ref=payload.response_ref,
+        )
+    )
+    await db.commit()
     record_feedback(liked=payload.liked, score=payload.score)
     return {"accepted": True}
 
 
 @router.get("/metrics")
 @handle_errors
-async def get_ai_metrics() -> dict:
+async def get_ai_metrics(db: AsyncSession = Depends(get_db)) -> dict:
     """Summary view of the AI performance counters.
 
-    Includes ``ai_response_latency_ms`` (rolling avg), the
-    ``ai_response_quality_score`` (rolling avg of explicit scores)
-    plus the SLO targets so a caller can render a green/red status.
+    Latency/throughput come from the in-process rolling counters; the
+    user-feedback aggregates (likes / dislikes / quality score) are read from
+    the persisted ``ai_feedback`` table so they survive a restart (audit task
+    97867b277c1b). Falls back to the in-memory snapshot if the table is absent.
     """
-    return metrics_snapshot()
+    snap = metrics_snapshot()
+    try:
+        from sqlalchemy import func as _f
+
+        from app.models.ai_feedback import AIFeedback
+
+        likes = (await db.execute(
+            _select(_f.count()).select_from(AIFeedback).where(AIFeedback.liked.is_(True))
+        )).scalar() or 0
+        dislikes = (await db.execute(
+            _select(_f.count()).select_from(AIFeedback).where(AIFeedback.liked.is_(False))
+        )).scalar() or 0
+        avg_row = (await db.execute(
+            _select(_f.avg(AIFeedback.score), _f.count(AIFeedback.score)).where(
+                AIFeedback.score.isnot(None)
+            )
+        )).first()
+        avg_score = float(avg_row[0]) if avg_row and avg_row[0] is not None else snap["ai_response_quality_score"]
+        snap.update(
+            {
+                "feedback_likes": int(likes),
+                "feedback_dislikes": int(dislikes),
+                "ai_response_quality_score": avg_score,
+                "feedback_persisted_count": int(avg_row[1]) if avg_row else 0,
+            }
+        )
+    except Exception:
+        pass  # table not migrated yet — serve the in-memory snapshot
+    return snap
 
 
 # ── AI Providers + Global Analysis Prompt (audit task 1a08ded2) ─────
