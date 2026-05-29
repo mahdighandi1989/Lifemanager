@@ -30,7 +30,16 @@ function RecommendationPanel() {
     load();
   }, [load]);
 
-  const dismiss = (idx) => setRecs((r) => r.filter((_, i) => i !== idx));
+  const dismiss = (idx) => {
+    // Persist accept/reject server-side when the rec has a real id (audit task
+    // 2165524b AC5) — no longer client-only. Best-effort; the card dismisses
+    // regardless so the UI stays responsive.
+    const rec = recs[idx];
+    if (rec && rec.id != null) {
+      api.patch(`/recommendations/${rec.id}/read`).catch(() => {});
+    }
+    setRecs((r) => r.filter((_, i) => i !== idx));
+  };
 
   return (
     <div data-testid="recommendation-panel" className="space-y-4">

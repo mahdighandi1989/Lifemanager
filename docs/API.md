@@ -167,6 +167,9 @@ task (every 30 min).
 | Method | Path | Notes |
 |---|---|---|
 | POST | `/api/context/location` | Save the caller's latest location into their `UserContext`. |
+| POST | `/api/context/physiological` | Ingest a wearable heart-rate/activity sample → UserContext → fresh context recs (audit task 2165524b Steps 6-7; device pairing external). |
+| POST | `/api/context/voice` | Infer mood from a voice transcript → UserContext.mood (Step 10; continuous capture/ASR external). |
+| PATCH | `/api/recommendations/{id}/read` | Persist accept/reject (marks the recommendation read — AC5, no longer client-only). |
 | GET | `/api/recommendations` | Context-fused recommendations (location / physiological / behavioral). |
 | GET | `/api/notifications` | Anon-friendly notification list for the header `NotificationBell`. |
 
