@@ -12,6 +12,8 @@ import AISettings from './pages/AISettings';
 import BudgetPage from './pages/BudgetPage';
 import ExternalProjects from './pages/ExternalProjects';
 import PeopleProfiles from './pages/PeopleProfiles';
+import SmartAssistant from './pages/SmartAssistant';
+import AssetsPage from './pages/AssetsPage';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Login from './pages/Login';
@@ -154,6 +156,26 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ExternalProjects />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/assistant"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SmartAssistant />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/assets"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <AssetsPage />
                     </Layout>
                   </ProtectedRoute>
                 }

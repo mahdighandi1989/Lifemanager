@@ -26,6 +26,8 @@ const LINKS = [
     label: 'تنظیمات هوش مصنوعی',
     testid: 'sidebar-link-ai-settings',
   },
+  { to: '/assistant', label: 'پیشنهادات هوشمند', testid: 'sidebar-link-assistant' },
+  { to: '/assets', label: 'دارایی‌ها', testid: 'sidebar-link-assets' },
   {
     to: '/notifications',
     label: 'اعلان‌ها',
