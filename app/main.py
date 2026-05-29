@@ -321,6 +321,8 @@ async def startup_event():
         ("ai_providers", "base_url", "VARCHAR(512)"),
         ("ai_providers", "api_key_encrypted", "TEXT"),
         ("ai_providers", "default_model", "VARCHAR(120)"),
+        # Oversight per-connection time budget (audit task d2146781).
+        ("external_project_connections", "time_budget_minutes", "INTEGER"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:

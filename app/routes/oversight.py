@@ -86,3 +86,74 @@ async def list_connections(
 ):
     svc = OversightService(db)
     return await svc.list_connections(user_id=user_id, active_only=True)
+
+
+@router.post("/api/v1/oversight/connections/{connection_id}/sync", tags=["oversight"])
+@handle_errors
+async def sync_connection(
+    connection_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Pull the latest data for one connection (audit task d2146781 AC6) — runs
+    the generic adapter when base_url+key are set, else stamps last_sync_at."""
+    return await OversightService(db).fetch_project_data(connection_id)
+
+
+@router.get("/api/v1/oversight/tasks", tags=["oversight"])
+@handle_errors
+async def list_oversight_tasks(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> list:
+    rows = await OversightService(db).list_oversight_tasks(user_id)
+    return [
+        {"id": t.id, "external_project_id": t.external_project_id, "task_type": t.task_type,
+         "status": t.status, "priority": t.priority,
+         "due_date": t.due_date.isoformat() if t.due_date else None}
+        for t in rows
+    ]
+
+
+@router.get("/api/v1/oversight/time-allocation", tags=["oversight"])
+@handle_errors
+async def time_allocation(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    return await OversightService(db).analyze_time_allocation(user_id)
+
+
+@router.get("/api/v1/oversight/neglected", tags=["oversight"])
+@handle_errors
+async def neglected_items(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """The memo's "مغفول مونده رو بگه" + "فلان مشکل هست": stale connections +
+    overdue oversight tasks."""
+    svc = OversightService(db)
+    return {
+        "neglected": await svc.detect_neglected_items(user_id),
+        "problems": await svc.detect_problems(user_id),
+    }
+
+
+class TimeBudgetIn(BaseModel):
+    minutes: int = Field(..., ge=0, le=100_000)
+
+
+@router.patch("/api/v1/oversight/connections/{connection_id}/time-budget", tags=["oversight"])
+@handle_errors
+async def set_time_budget(
+    connection_id: int,
+    payload: TimeBudgetIn = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    conn = await OversightService(db).set_time_budget(connection_id, minutes=payload.minutes)
+    if conn is None:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail="Connection not found")
+    return {"connection_id": connection_id, "time_budget_minutes": payload.minutes}

@@ -43,6 +43,10 @@ class ExternalProjectConnection(Base):
     connection_type = Column(String(64), nullable=False, default="generic")
     sync_frequency = Column(String(32), nullable=False, default="manual")
     is_active = Column(Boolean, nullable=False, default=True)
+    # Minutes/week the user intends to spend overseeing this project — the
+    # "زمانی که باید برای هر کدومشون بذاره" budget (audit task d2146781). The
+    # oversight time-allocation + neglect analysis compares this to last_sync_at.
+    time_budget_minutes = Column(Integer, nullable=True)
     last_sync_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

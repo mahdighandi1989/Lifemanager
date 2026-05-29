@@ -6,13 +6,18 @@ dashboard can flag projects that are over/under-weighted.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.external_project import ExternalProject, ExternalProjectConnection
+from app.models.oversight_task import OversightTask
+
+# A connection unsynced for longer than this is "neglected" (the memo's
+# "مغفول مونده رو بگه"). Tunable per call.
+NEGLECT_THRESHOLD_DAYS = 14
 
 
 class OversightService:
@@ -68,13 +73,91 @@ class OversightService:
         conn = await self.db.get(ExternalProjectConnection, connection_id)
         if conn is None:
             return {"fetched": False, "reason": "connection_not_found"}
+        items: list = []
+        # When the connection carries a base_url + key, run it through the
+        # generic adapter to pull real project items; degrades to [] offline.
+        if conn.base_url and conn.api_key_encrypted:
+            try:
+                from app.services.crypt_service import decrypt_data
+                from app.services.integrations.external_project_interface import (
+                    ExternalProjectConfig,
+                )
+                from app.services.integrations.generic_http_adapter import (
+                    GenericHttpAdapter,
+                )
+
+                cfg = ExternalProjectConfig(
+                    base_url=conn.base_url, api_key=decrypt_data(conn.api_key_encrypted)
+                )
+                infos = await GenericHttpAdapter().list_projects(cfg)
+                items = [{"external_id": i.external_id, "name": i.name, "url": i.url} for i in infos]
+            except Exception:
+                items = []  # upstream unreachable / bad creds — best-effort
         conn.last_sync_at = datetime.now(timezone.utc)
         await self.db.commit()
-        return {
-            "fetched": True,
-            "connection_id": connection_id,
-            "items": [],  # populated once a concrete adapter is registered
-        }
+        return {"fetched": True, "connection_id": connection_id, "items": items}
+
+    async def set_time_budget(self, connection_id: int, *, minutes: int) -> Optional[ExternalProjectConnection]:
+        conn = await self.db.get(ExternalProjectConnection, connection_id)
+        if conn is None:
+            return None
+        conn.time_budget_minutes = minutes
+        await self.db.commit()
+        await self.db.refresh(conn)
+        return conn
+
+    async def detect_neglected_items(
+        self, user_id: int, *, threshold_days: int = NEGLECT_THRESHOLD_DAYS
+    ) -> list[dict]:
+        """Connections never synced or untouched beyond ``threshold_days`` — the
+        memo's "مغفول مونده رو بگه". Returns one entry per neglected connection
+        with the days since last sync."""
+        conns = await self.list_connections(user_id=user_id, active_only=True)
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(days=threshold_days)
+        out: list[dict] = []
+        for c in conns:
+            last = c.last_sync_at
+            if last is not None and last.tzinfo is None:
+                last = last.replace(tzinfo=timezone.utc)
+            if last is None or last < cutoff:
+                days = None if last is None else (now - last).days
+                out.append({
+                    "connection_id": c.id, "name": c.name,
+                    "days_since_sync": days, "reason": "never synced" if last is None else "stale",
+                })
+        return out
+
+    async def detect_problems(self, user_id: int) -> list[dict]:
+        """Surface problems across the user's oversight tasks — overdue ones
+        (the memo's "اینجا فلان مشکل هست"). Joins OversightTask → connection."""
+        conn_ids = [c.id for c in await self.list_connections(user_id=user_id, active_only=False)]
+        if not conn_ids:
+            return []
+        rows = (
+            await self.db.execute(
+                select(OversightTask).where(OversightTask.external_project_id.in_(conn_ids))
+            )
+        ).scalars().all()
+        now = datetime.now(timezone.utc)
+        problems: list[dict] = []
+        for t in rows:
+            due = t.due_date
+            if due is not None and due.tzinfo is None:
+                due = due.replace(tzinfo=timezone.utc)
+            if due is not None and due < now and t.status not in ("done", "completed", "cancelled"):
+                problems.append({"task_id": t.id, "task_type": t.task_type, "status": t.status, "issue": "overdue"})
+        return problems
+
+    async def list_oversight_tasks(self, user_id: int) -> list[OversightTask]:
+        conn_ids = [c.id for c in await self.list_connections(user_id=user_id, active_only=False)]
+        if not conn_ids:
+            return []
+        return list(
+            (await self.db.execute(
+                select(OversightTask).where(OversightTask.external_project_id.in_(conn_ids))
+            )).scalars().all()
+        )
 
     async def analyze_time_allocation(self, user_id: int) -> dict:
         """Summarise how the user's attention is spread across external
@@ -102,8 +185,29 @@ class OversightService:
             }
             for provider, count in sorted(by_provider.items())
         ]
+
+        # Per-connection time budget (the "زمانی که باید برای هر کدومشون بذاره"
+        # ask) + a neglected flag, so the dashboard shows allocated time and
+        # what's been ignored — not just a count proxy.
+        conns = await self.list_connections(user_id=user_id, active_only=True)
+        now = datetime.now(timezone.utc)
+        budget_total = 0
+        connection_budgets = []
+        for c in conns:
+            mins = c.time_budget_minutes or 0
+            budget_total += mins
+            last = c.last_sync_at
+            if last is not None and last.tzinfo is None:
+                last = last.replace(tzinfo=timezone.utc)
+            neglected = last is None or last < now - timedelta(days=NEGLECT_THRESHOLD_DAYS)
+            connection_budgets.append({
+                "connection_id": c.id, "name": c.name,
+                "time_budget_minutes": mins, "neglected": neglected,
+            })
         return {
             "user_id": user_id,
             "external_project_count": total,
             "by_provider": breakdown,
+            "total_budget_minutes": budget_total,
+            "connections": connection_budgets,
         }

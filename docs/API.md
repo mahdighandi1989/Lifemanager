@@ -185,6 +185,18 @@ location-based suggestions when `GOOGLE_MAPS_API_KEY` is set.
 |---|---|---|
 | POST | `/api/v1/oversight/connections` | Create a connection to an external PM project (token encrypted at rest). 201 with `id`, `name`. |
 | GET | `/api/v1/oversight/connections` | List the caller's active connections. |
+| POST | `/api/v1/oversight/connections/{id}/sync` | Pull latest data (generic HTTP adapter when base_url+key set; else stamps last_sync_at). |
+| PATCH | `/api/v1/oversight/connections/{id}/time-budget` | Set the per-project time budget (minutes). |
+| GET | `/api/v1/oversight/time-allocation` | Per-provider + per-connection budget breakdown with neglect flags. |
+| GET | `/api/v1/oversight/tasks` | The caller's `OversightTask` rows across connections. |
+| GET | `/api/v1/oversight/neglected` | Stale connections ("مغفول مونده") + overdue oversight tasks ("فلان مشکل هست"). |
+
+`OversightService` adds `detect_neglected_items`, `detect_problems`,
+`set_time_budget`, `list_oversight_tasks`; `fetch_project_data` runs
+`GenericHttpAdapter` (an `ExternalProjectInterface`) when a connection has a
+base_url + key. `ExternalProjectConnection` gains `time_budget_minutes`
+(migration 0027). UI: `ExternalProjects` surfaces a neglected/problems summary.
+Live third-party PM credentials are the only external piece (TO-DO/).
 
 `OversightService` carries `connect_to_external_project`, `analyze_time_allocation`,
 and `fetch_project_data`; the `sync_external_project` Celery task syncs a
@@ -355,7 +367,7 @@ Settings page. Model `AIFeedback` (migration 0025).
 
 ### Migrations & startup (audit task 3ea5622b)
 
-The Alembic chain (`migrations/versions/`, head `0026_ai_provider_routing`)
+The Alembic chain (`migrations/versions/`, head `0027_oversight_time_budget`)
 is kept in sync with `Base.metadata` — `tests/test_migration.py` /
 `test_migrations.py` assert every model table is created by `alembic upgrade head`.
 

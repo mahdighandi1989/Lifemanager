@@ -8,6 +8,7 @@ function ExternalProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [oversight, setOversight] = useState({ neglected: [], problems: [] });
 
   useEffect(() => {
     let active = true;
@@ -16,6 +17,12 @@ function ExternalProjects() {
       .then((res) => active && setProjects(Array.isArray(res.data) ? res.data : []))
       .catch((e) => active && setError('خطا در دریافت پروژه‌ها: ' + (e.message || '')))
       .finally(() => active && setLoading(false));
+    // Oversight summary — neglected projects + problems (the memo's
+    // "مغفول مونده رو بگه ... فلان مشکل هست").
+    api
+      .get('/v1/oversight/neglected')
+      .then((res) => active && setOversight(res.data || { neglected: [], problems: [] }))
+      .catch(() => {});
     return () => {
       active = false;
     };
@@ -29,6 +36,23 @@ function ExternalProjects() {
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>
+        )}
+
+        {/* Oversight: neglected projects + problems */}
+        {(oversight.neglected?.length > 0 || oversight.problems?.length > 0) && (
+          <div data-testid="oversight-summary" className="mb-6 bg-amber-50 border border-amber-100 rounded-xl p-4">
+            <h2 className="font-semibold text-amber-800 mb-2">رسیدگی و هشدارها</h2>
+            {oversight.neglected?.length > 0 && (
+              <p data-testid="oversight-neglected" className="text-sm text-amber-700">
+                {oversight.neglected.length} پروژه مغفول مانده (مدتی همگام‌سازی نشده).
+              </p>
+            )}
+            {oversight.problems?.length > 0 && (
+              <p data-testid="oversight-problems" className="text-sm text-red-700">
+                {oversight.problems.length} مورد مشکل‌دار (عقب‌افتاده).
+              </p>
+            )}
+          </div>
         )}
 
         <div className="space-y-3" data-testid="external-projects-list">
