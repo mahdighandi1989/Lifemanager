@@ -942,8 +942,20 @@
         "file": "frontend/src/pages/AISettings.jsx"
       },
       {
+        "name": "AssetsPage",
+        "file": "frontend/src/pages/AssetsPage.jsx"
+      },
+      {
+        "name": "BudgetPage",
+        "file": "frontend/src/pages/BudgetPage.jsx"
+      },
+      {
         "name": "Dashboard",
         "file": "frontend/src/pages/Dashboard.jsx"
+      },
+      {
+        "name": "ExternalProjects",
+        "file": "frontend/src/pages/ExternalProjects.jsx"
       },
       {
         "name": "Home",
@@ -970,8 +982,16 @@
         "file": "frontend/src/pages/Login.jsx"
       },
       {
+        "name": "MergeManagement",
+        "file": "frontend/src/pages/MergeManagement.jsx"
+      },
+      {
         "name": "Notifications",
         "file": "frontend/src/pages/Notifications.jsx"
+      },
+      {
+        "name": "PeopleProfiles",
+        "file": "frontend/src/pages/PeopleProfiles.jsx"
       },
       {
         "name": "Projects",
@@ -980,6 +1000,10 @@
       {
         "name": "Register",
         "file": "frontend/src/pages/Register.jsx"
+      },
+      {
+        "name": "SmartAssistant",
+        "file": "frontend/src/pages/SmartAssistant.jsx"
       },
       {
         "name": "Tasks",

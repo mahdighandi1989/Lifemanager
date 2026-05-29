@@ -35,13 +35,16 @@ def test_list_external_projects_returns_user_rows(api_client):
 
 
 def test_api_key_stored_encrypted_with_marker(api_client, db_session=None):
-    """AC 10 — confirm the api_key column is wrapped via the
-    encryption hook (prefix marker today; real ciphertext when
-    crypt_service lands)."""
-    from app.services.external_project_service import _encrypt_api_key
+    """AC 10 — the api_key column is now wrapped with real Fernet encryption
+    via crypt_service (the old "enc::" placeholder marker was replaced). The
+    stored value must not be plaintext and must round-trip back."""
+    from app.services.external_project_service import _encrypt_api_key, decrypt_api_key
 
     assert _encrypt_api_key(None) is None
-    assert _encrypt_api_key("secret").startswith("enc::")
+    encrypted = _encrypt_api_key("secret")
+    assert encrypted != "secret"  # not plaintext
+    assert not encrypted.startswith("enc::")  # no longer the placeholder
+    assert decrypt_api_key(encrypted) == "secret"  # real round-trip
 
 
 def test_integration_schema_reexports_interface_dataclasses():
