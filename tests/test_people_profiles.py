@@ -46,7 +46,11 @@ def test_link_persons_to_task(api_client):
 
 
 def test_person_tasks_table_registered():
-    """AC2: the person_tasks M2M association table exists on the metadata."""
+    """AC2: the person_tasks M2M association table exists on the metadata.
+
+    Import app.models first so the association table is registered regardless
+    of test order (Base.metadata only reflects imported models)."""
+    import app.models  # noqa: F401 — registers every model incl. person_tasks
     from app.database import Base
 
     assert "person_tasks" in Base.metadata.tables
