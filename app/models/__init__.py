@@ -20,6 +20,7 @@ from app.models.integration import Integration
 from app.models.local_file_entry import LocalFileEntry
 from app.models.notification import Notification
 from app.models.person import Person
+from app.models.person_profile import PersonProfile
 from app.models.interaction import Interaction, InteractionType
 from app.models.ai_assessment import AIAssessment
 from app.models.user_comment import UserComment
@@ -59,6 +60,7 @@ __all__ = [
     "LocalFileEntry",
     "Notification",
     "Person",
+    "PersonProfile",
     "Interaction",
     "InteractionType",
     "AIAssessment",

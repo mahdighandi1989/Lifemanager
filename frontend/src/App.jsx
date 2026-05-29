@@ -18,6 +18,7 @@ import Recommendations from './pages/Recommendations';
 import PersonalityProfilePage from './pages/PersonalityProfilePage';
 import CareerPlanningPage from './pages/CareerPlanningPage';
 import DriveFiles from './pages/DriveFiles';
+import PersonProfilePage from './pages/PersonProfilePage';
 import AssetsPage from './pages/AssetsPage';
 import MergeManagement from './pages/MergeManagement';
 import ListDetail from './pages/ListDetail';
@@ -182,6 +183,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <PeopleProfiles />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/people/:id/profile"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PersonProfilePage />
                     </Layout>
                   </ProtectedRoute>
                 }

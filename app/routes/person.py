@@ -7,6 +7,7 @@ works while a real JWT switches the route into per-user enforcement.
 from typing import List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -161,3 +162,68 @@ async def analyze_people_profile(
         await db.execute(select(Interaction).where(Interaction.person_id == person_id))
     ).scalars().all()
     return await AIService(db).analyze_person_behavior(getattr(person, "name", ""), list(rows))
+
+
+# ── PersonProfile endpoints (audit task 3cc09436 AC2/AC3/AC6) ────────────
+
+
+class _NotePayload(BaseModel):
+    user_notes: str = Field(..., max_length=4000)
+
+
+@router.get("/api/people/{person_id}/profile", tags=["persons"])
+@handle_errors
+async def get_person_profile(
+    person_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """AC2: return the person's behavioural profile (ai_score / user_notes /
+    behavior_log / relationship_type)."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    profile = await person_profile_service.get_or_create_profile(db, person_id=person_id)
+    return person_profile_service.serialize(profile)
+
+
+@router.post("/api/people/{person_id}/profile/analyze", tags=["persons"])
+@handle_errors
+async def analyze_person_profile(
+    person_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """AC3: run AI analysis over the person's interactions and persist the
+    score + relationship type onto the profile."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    profile = await person_profile_service.analyze_person(
+        db, person_id=person_id, person_name=getattr(person, "name", "")
+    )
+    return person_profile_service.serialize(profile)
+
+
+@router.post("/api/people/{person_id}/profile/note", tags=["persons"])
+@handle_errors
+async def add_person_profile_note(
+    person_id: int,
+    payload: _NotePayload = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """AC6: persist a free-text user note on the person's profile."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    profile = await person_profile_service.set_note(
+        db, person_id=person_id, note=payload.user_notes
+    )
+    return person_profile_service.serialize(profile)

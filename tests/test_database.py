@@ -13,6 +13,23 @@ from app.database import _normalize_url, engine
 class TestDatabaseEchoSetting:
     """تست‌های مربوط به تنظیم echo در database engine"""
 
+    @pytest.fixture(autouse=True)
+    def _restore_database_module(self):
+        """Reloading app.database rebinds ``Base`` to a fresh, empty metadata —
+        orphaning every model still bound to the original Base and breaking
+        later tests that read ``Base.metadata.tables`` (e.g.
+        test_people_profiles::test_person_tasks_table_registered). Snapshot the
+        module's globals before each reload test and restore them after so the
+        reload never leaks into the rest of the suite."""
+        import app.database as dbmod
+
+        saved = dict(dbmod.__dict__)
+        try:
+            yield
+        finally:
+            dbmod.__dict__.clear()
+            dbmod.__dict__.update(saved)
+
     def _reload_database_with(self, debug: bool):
         """Patch the real settings object then reload app.database.
 

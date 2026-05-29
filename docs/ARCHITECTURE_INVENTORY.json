@@ -1028,6 +1028,10 @@
       {
         "name": "DriveFiles",
         "file": "frontend/src/pages/DriveFiles.jsx"
+      },
+      {
+        "name": "PersonProfilePage",
+        "file": "frontend/src/pages/PersonProfilePage.jsx"
       }
     ],
     "components": [

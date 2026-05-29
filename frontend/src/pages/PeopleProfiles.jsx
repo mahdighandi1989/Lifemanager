@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../lib/api';
 
 // People profiles page (audit task 3cc09436, AC7): lists the people the user
@@ -63,15 +64,24 @@ function PeopleProfiles() {
                     )}
                   </div>
                 </div>
-                {person.relationship_type && (
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                      REL_COLORS[person.relationship_type] || 'bg-gray-100 text-gray-600'
-                    }`}
+                <div className="flex items-center gap-3">
+                  {person.relationship_type && (
+                    <span
+                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                        REL_COLORS[person.relationship_type] || 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {person.relationship_type}
+                    </span>
+                  )}
+                  <Link
+                    to={`/people/${person.id}/profile`}
+                    data-testid={`person-profile-link-${person.id}`}
+                    className="text-xs text-blue-600 hover:underline"
                   >
-                    {person.relationship_type}
-                  </span>
-                )}
+                    پروفایل
+                  </Link>
+                </div>
               </div>
             ))
           )}

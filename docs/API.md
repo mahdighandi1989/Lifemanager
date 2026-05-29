@@ -291,9 +291,26 @@ policy — AC4), `transcription_service` (`extract_text` for audio/image — AC6
 UI: `DriveFiles` page (`/drive-files`) badges Drive-stored files + links to the
 blob (AC8). The `tier_cold_data` Celery task runs the sweep daily.
 
+### People profiles & behavioural analysis (audit task 3cc09436)
+
+Track the people you interact with, score the relationship from interaction
+history, and keep free-text notes + a behaviour log per person.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/people/{id}/profile` | The person's profile: `ai_score`, `user_notes`, `behavior_log`, `relationship_type` (auto-creates an empty profile). |
+| POST | `/api/people/{id}/profile/analyze` | Score the relationship from interaction history; persists `ai_score` + `relationship_type` and appends a snapshot to `behavior_log`. |
+| POST | `/api/people/{id}/profile/note` | Save a free-text `user_notes` note. |
+
+Model: `PersonProfile` (one per `Person` — `ai_score`, `user_notes`,
+`behavior_log` JSON, `relationship_type`, `last_analyzed_at`; migration 0024).
+Service: `person_profile_service` (reuses `AIService.analyze_person_behavior`).
+UI: `PersonProfilePage` (`/people/:id/profile`) with score, note form, and
+behaviour history; `PeopleProfiles` links each person to their profile.
+
 ### Migrations & startup (audit task 3ea5622b)
 
-The Alembic chain (`migrations/versions/`, head `0023_drive_file_storage_location`)
+The Alembic chain (`migrations/versions/`, head `0024_person_profiles`)
 is kept in sync with `Base.metadata` — `tests/test_migration.py` /
 `test_migrations.py` assert every model table is created by `alembic upgrade head`.
 
