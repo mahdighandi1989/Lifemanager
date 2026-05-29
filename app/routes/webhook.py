@@ -54,6 +54,24 @@ async def handle_webhook(
             "rejected webhook with invalid signature at %s",
             datetime.now(timezone.utc).isoformat(),
         )
+        # Surface the signature failure as a verify_failed notification to the
+        # owner (audit task 92fa5ea15e2b — the wiring deferred "until the
+        # per-event rate-limit lands"; it now has). The per-(user,event)
+        # rate-limit in notify_event caps a forged-request flood so this can't
+        # be used to spam the notification table. Best-effort, never blocks 401.
+        try:
+            from app.services.notification_service import notify_event
+
+            await notify_event(
+                "verify_failed",
+                user_id=0,
+                db=db,
+                title="تأیید امضای وب‌هوک ناموفق",
+                message="یک درخواست وب‌هوک با امضای نامعتبر رد شد.",
+                priority="high",
+            )
+        except Exception as exc:  # notification must never block the 401
+            logger.debug("verify_failed notify on bad webhook skipped: %r", exc)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid signature")
 
     try:

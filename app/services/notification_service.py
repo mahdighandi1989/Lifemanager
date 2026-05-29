@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Iterable, List, Optional
@@ -527,17 +528,30 @@ async def notify_event(
     callers can override the default Persian template title without
     having to know the internal ``_DEFAULT_EVENT_TITLES`` mapping.
     """
+    # Per-event rate-limit (Step 18): cap repeats per (user, event) so a flood
+    # — e.g. a forged-webhook storm now wired to notify (see app/routes/webhook.py)
+    # — can't DoS the notification table. Generous window so normal traffic is
+    # unaffected; tunable via EVENT_RATE_LIMIT_* env vars.
+    if _event_rate_limited(user_id, event_name):
+        logger.info("notify_event(%s) rate-limited for user=%s", event_name, user_id)
+        return None
+
+    reg = EVENT_REGISTRY.get(event_name, {})
     if not message:
-        message = _DEFAULT_EVENT_MESSAGES.get(
-            event_name, f"رویداد سیستمی: {event_name}"
+        message = (
+            reg.get("message")
+            or _DEFAULT_EVENT_MESSAGES.get(event_name)
+            or f"رویداد سیستمی: {event_name}"
         )
     if action_link:
         caption = action_text or action_link
         message = f"{message}\n{caption}: {action_link}"
-    resolved_title = title or _DEFAULT_EVENT_TITLES.get(event_name, event_name)
+    resolved_title = (
+        title or reg.get("title") or _DEFAULT_EVENT_TITLES.get(event_name, event_name)
+    )
     try:
         svc = NotificationService(db)
-        return await svc.send_notification(
+        result = await svc.send_notification(
             user_id=user_id,
             message=message,
             notification_type=event_name if event_name in VALID_NOTIFICATION_TYPES else "system",
@@ -546,6 +560,14 @@ async def notify_event(
             title=resolved_title,
             channel="event",
         )
+        # Channel routing from the registry: high-signal events (e.g.
+        # verify_failed) also fan out to Telegram when registered + not silent.
+        if not silent and "telegram" in reg.get("channels", []):
+            try:
+                send_telegram(body=f"{resolved_title}: {message}")
+            except Exception as tg_exc:
+                logger.debug("telegram fan-out skipped: %r", tg_exc)
+        return result
     except Exception as exc:
         # Critical: a notification failure must not propagate up into the
         # request handler — log and swallow.
@@ -568,6 +590,74 @@ _DEFAULT_EVENT_MESSAGES = {
 _DEFAULT_EVENT_TITLES = {
     "verify_failed": VERIFY_FAILED_TITLE_FA,
 }
+
+
+# ── Event registry (audit task 92fa5ea15e2b, sub-tasks 3 & 4) ───────────
+# First-class registry of the system's snake_case event types: each carries a
+# default title/message/priority and the channels it fans out to. notify_event
+# reads it for defaults + channel routing, so adding a new critical event is a
+# single register_event(...) call rather than scattering literals.
+EVENT_REGISTRY: dict[str, dict] = {}
+
+
+def register_event(
+    event_type: str,
+    *,
+    title: Optional[str] = None,
+    message: Optional[str] = None,
+    priority: str = "normal",
+    silent: bool = False,
+    channels: Optional[list] = None,
+) -> dict:
+    """Register (or update) a notification event type. Returns its config."""
+    EVENT_REGISTRY[event_type] = {
+        "event_type": event_type,
+        "title": title,
+        "message": message,
+        "priority": priority,
+        "silent": silent,
+        "channels": channels or ["in_app"],
+    }
+    return EVENT_REGISTRY[event_type]
+
+
+# Register the known critical events. verify_failed fans out to Telegram (the
+# raw task's "notification در Telegram دیده می‌شود").
+register_event(
+    "verify_failed",
+    title=VERIFY_FAILED_TITLE_FA,
+    message=VERIFY_FAILED_MESSAGE_FA,
+    priority="high",
+    silent=False,
+    channels=["in_app", "telegram"],
+)
+register_event("budget_alert", title="هشدار بودجه", priority="high", channels=["in_app", "telegram"])
+register_event("recommendation", title="پیشنهاد جدید", channels=["in_app"])
+register_event("ai_feedback", title="بازخورد هوش مصنوعی", channels=["in_app"])
+
+
+# ── Per-event rate-limit (Step 18) ──────────────────────────────────────
+import time as _time  # noqa: E402
+
+EVENT_RATE_LIMIT_MAX = int(os.getenv("EVENT_RATE_LIMIT_MAX", "60"))
+EVENT_RATE_LIMIT_WINDOW_S = float(os.getenv("EVENT_RATE_LIMIT_WINDOW_S", "60"))
+_EVENT_RATE: dict = {}
+
+
+def _event_rate_limited(user_id: int, event_name: str) -> bool:
+    """True when (user_id, event_name) has fired EVENT_RATE_LIMIT_MAX times
+    within the rolling window. Pure in-process — enough for a single-replica
+    deploy + the forged-webhook flood guard; a multi-replica deploy would back
+    this with Redis."""
+    key = (user_id, event_name)
+    now = _time.monotonic()
+    bucket = [t for t in _EVENT_RATE.get(key, []) if now - t < EVENT_RATE_LIMIT_WINDOW_S]
+    if len(bucket) >= EVENT_RATE_LIMIT_MAX:
+        _EVENT_RATE[key] = bucket
+        return True
+    bucket.append(now)
+    _EVENT_RATE[key] = bucket
+    return False
 
 
 async def send_ai_feedback(
@@ -711,6 +801,36 @@ def send_push(*, device_token: str, title: str, body: str) -> bool:
             return 200 <= r.status_code < 300
     except Exception as exc:
         logger.warning("send_push failed: %r", exc)
+        return False
+
+
+def send_telegram(*, body: str, chat_id: Optional[str] = None) -> bool:
+    """Telegram bot transport (audit task 92fa5ea15e2b).
+
+    Reads ``TELEGRAM_BOT_TOKEN`` + ``TELEGRAM_CHAT_ID`` from the env. In dev /
+    test (no token set) it logs and returns ``True`` so the call site is
+    exercised without a real bot — exactly the seam the verify_failed
+    fan-out needs. With a token it POSTs to the Bot API ``sendMessage``.
+    """
+    import os
+
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    target = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+    if not token:
+        logger.info("send_telegram (no TELEGRAM_BOT_TOKEN): chat=%s body=%r", target, body[:80])
+        return True
+
+    try:
+        import httpx
+
+        with httpx.Client(timeout=15.0) as client:
+            r = client.post(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                json={"chat_id": target, "text": body},
+            )
+            return 200 <= r.status_code < 300
+    except Exception as exc:
+        logger.warning("send_telegram failed: %r", exc)
         return False
 
 

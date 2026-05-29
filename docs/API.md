@@ -308,6 +308,23 @@ Service: `person_profile_service` (reuses `AIService.analyze_person_behavior`).
 UI: `PersonProfilePage` (`/people/:id/profile`) with score, note form, and
 behaviour history; `PeopleProfiles` links each person to their profile.
 
+### Notification events (audit task 92fa5ea15e2b)
+
+Critical events fire through `notify_event(event_type, *, user_id, db, title?,
+message?, priority?, silent?, action_link?, action_text?)`. Event types are
+first-class in `EVENT_REGISTRY` (`register_event(...)`): each carries a default
+title/message/priority + the channels it fans out to.
+
+- `verify_failed` (high, channels `in_app`+`telegram`) — fired by
+  `auth_service.login()` on a bad credential check, and by `POST /webhook` when
+  an inbound HMAC signature fails (the owner is alerted; the request still 401s).
+- `budget_alert`, `recommendation`, `ai_feedback` are also registered.
+
+Transports: `send_email` / `send_sms` / `send_push` / **`send_telegram`** (Bot
+API `sendMessage`; logs+no-ops without `TELEGRAM_BOT_TOKEN`). A per-`(user,event)`
+rate-limit (`EVENT_RATE_LIMIT_MAX`/`_WINDOW_S`, default 60/60s) guards against a
+forged-webhook flood. Toggleable per type in the `/notifications` settings tab.
+
 ### AI performance feedback & metrics (audit task 97867b277c1b)
 
 | Method | Path | Notes |
