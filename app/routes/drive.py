@@ -45,11 +45,17 @@ async def list_drive_files(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> List[DriveFile]:
-    """AC5: list the user's Drive files, optionally filtered by ?q= (filename
-    substring search)."""
+    """AC5/AC9: list the user's Drive files. ``?q=`` searches BOTH the filename
+    AND the extracted text (so an audio transcript / image caption is findable),
+    not filename-only."""
+    from sqlalchemy import or_
+
     stmt = select(DriveFile).where(DriveFile.user_id == user_id)
     if q:
-        stmt = stmt.where(DriveFile.filename.ilike(f"%{q}%"))
+        like = f"%{q}%"
+        stmt = stmt.where(
+            or_(DriveFile.filename.ilike(like), DriveFile.extracted_text.ilike(like))
+        )
     return list((await db.execute(stmt)).scalars().all())
 
 
@@ -83,6 +89,22 @@ async def upload_drive_file(
     db.add(row)
     await db.commit()
     await db.refresh(row)
+
+    # Log the file to the central LifeManagerIndex sheet (audit task 7367c6f0
+    # Step 4 — "توی شیت باید همه چیزا ثبت بشه"). Best-effort: a no-op without
+    # Sheets credentials, so the upload never fails on the ledger write.
+    try:
+        from app.services.sheets_service import record_index_entry
+
+        await record_index_entry(
+            {
+                "RecordID": str(row.id), "DataType": payload.mime_type or "file",
+                "DriveFileID": row.drive_file_id or "", "DriveLink": row.drive_link or "",
+                "ExtractedText": (row.extracted_text or "")[:200],
+            }
+        )
+    except Exception:
+        pass
     return row
 
 

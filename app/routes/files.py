@@ -55,3 +55,32 @@ async def get_file(
         "download_url": row.drive_link if row.storage_location == "drive" else f"/api/files/{row.id}/raw",
         "extracted_text": row.extracted_text,
     }
+
+
+@router.get("/api/files/{file_id}/raw", tags=["drive", "files"])
+@handle_errors
+async def get_file_raw(
+    file_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Return the file's content representation (audit task 7367c6f0 AC5/Step7).
+
+    This app stores metadata + extracted TEXT only (never raw bytes — AC8: "نه
+    اینکه فایل رو دانلود بکنه ... به صورت متنی"). So for a Drive-tiered file we
+    hand back the Drive link to fetch the blob; for a local file we return the
+    extracted text (the textual form). Touches last_accessed_at."""
+    row = (
+        await db.execute(
+            select(DriveFile).where(
+                DriveFile.id == file_id, DriveFile.user_id == user_id
+            )
+        )
+    ).scalar_one_or_none()
+    if row is None:
+        raise HTTPException(status_code=404, detail="File not found")
+    row.last_accessed_at = datetime.now(timezone.utc)
+    await db.commit()
+    if row.storage_location == "drive" and row.drive_link:
+        return {"id": row.id, "kind": "drive_link", "drive_link": row.drive_link}
+    return {"id": row.id, "kind": "text", "content": row.extracted_text or ""}

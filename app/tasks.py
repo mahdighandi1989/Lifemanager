@@ -257,6 +257,7 @@ def tier_cold_data() -> dict[str, Any]:
 
         from app.database import SessionLocal
         from app.models.task import Task
+        from app.services.cold_tiering_service import tier_cold_files
         from app.services.data_classification_service import DataClassificationService
 
         svc = DataClassificationService()
@@ -268,7 +269,10 @@ def tier_cold_data() -> dict[str, Any]:
                 total += 1
                 if svc.classify_task_essentiality(task) != "essential":
                     cold += 1
-        return {"total": total, "cold_eligible": cold}
+            # Actually migrate cold DriveFiles (>30 days untouched) out to Drive
+            # — the AC4 tiering, not just a task tally (audit task 7367c6f0).
+            tiered = await tier_cold_files(db)
+        return {"total": total, "cold_eligible": cold, "files_migrated": tiered["migrated"]}
 
     try:
         result = asyncio.run(_run())

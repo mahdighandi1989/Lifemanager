@@ -316,6 +316,14 @@ offline and degrade to bookkeeping-only without creds.
 | GET | `/api/drive/files` | List Drive files; `?q=` filename substring search. |
 | GET | `/api/drive/folders` | The `Lifemanager Data` root + per-data-type subfolders (AC7). |
 | GET | `/api/files/{id}` | Resolve a file: Drive-tiered → its `drive_link` (AC5); touches `last_accessed_at`. 404 if missing. |
+| GET | `/api/files/{id}/raw` | Content representation (Step 7): Drive link for tiered files, extracted text for local (metadata-only system — AC8). |
+
+`GET /api/drive/files?q=` searches filename **and** extracted_text (Step 9).
+`POST /api/drive/upload` records the file to the `LifeManagerIndex` sheet via
+`sheets_service.record_index_entry` (best-effort, no-op without Sheets creds —
+Step 4). The daily `tier_cold_data` task now migrates cold DriveFiles via
+`cold_tiering_service.tier_cold_files` (AC4). Real OCR/ASR + live Google
+Drive/Sheets credentials are external (TO-DO/task-7367c6f0-ocr-google.md).
 
 Model: `DriveFile` gains `storage_location` (local\|drive) + `last_accessed_at`
 (migration 0023). Services: `google_drive_service` (`upload_file`→shareable

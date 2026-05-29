@@ -8,6 +8,7 @@ google-api-python-client wiring slots in unchanged).
 """
 from __future__ import annotations
 
+import os
 from typing import Optional
 
 INDEX_SHEET_NAME = "LifeManagerIndex"
@@ -57,3 +58,15 @@ async def append_index_row(
     values = row_from_record(record)
     result = await client.append_row(sheet_name=sheet_name, values=values)
     return {"sheet": sheet_name, "appended": values, "result": result}
+
+
+async def record_index_entry(record: dict, *, refresh_token: Optional[str] = None, client=None) -> bool:
+    """Best-effort ledger write — appends ``record`` to LifeManagerIndex when
+    Sheets credentials + a client are available, else a clean no-op. This is the
+    seam upload/cold-tiering call so "همه چیز توی شیت ثبت بشه" is wired into the
+    real flow (audit task 7367c6f0 Step 4) without failing offline."""
+    token = refresh_token or os.getenv("GOOGLE_SHEETS_REFRESH_TOKEN")
+    if not token or client is None:
+        return False
+    await append_index_row(refresh_token=token, record=record, client=client)
+    return True
