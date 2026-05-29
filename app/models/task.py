@@ -6,6 +6,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     JSON,
+    Numeric,
     String,
     Text,
 )
@@ -50,6 +51,10 @@ class Task(Base):
     # is portable across Postgres (would use INTERVAL) and SQLite (no
     # INTERVAL type). Callers convert to/from timedelta as needed.
     estimated_duration = Column(Integer, nullable=True)
+    # estimated_cost — money a task needs (audit task 4ae4b3ca, AC5). When the
+    # user's total account balance covers it, the budget notifier flags the
+    # task as affordable.
+    estimated_cost = Column(Numeric(18, 2), nullable=True)
     # deadline is a full timestamp — distinct from due_date which is the
     # calendar date a task is scheduled for. Use deadline for the hard
     # cutoff (when it stops mattering); due_date for the planning bucket.

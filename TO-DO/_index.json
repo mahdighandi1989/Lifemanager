@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-05-29T00:30:00+00:00",
-  "total": 7,
+  "generated_at": "2026-05-29T01:10:00+00:00",
+  "total": 6,
   "items": [
     {
       "task_id": "task_78c0e8e0a9b5",
@@ -18,14 +18,6 @@
       "execution_priority": 3000,
       "manual_actions": 2,
       "summary": "[decision] admin-only vs user-scoped (AC8/10) + رمزنگاری کلید API (AC5). frontend (AISettings + nav) و backend انجام شد."
-    },
-    {
-      "task_id": "4ae4b3ca-1a0e-4057-8e62-99365abb1576",
-      "title": "برنامه و بودجه (Finance)",
-      "todo_file": "TO-DO/todo-task-4ae4b3ca.md",
-      "execution_priority": 3000,
-      "manual_actions": 1,
-      "summary": "[backend] نوتیفیکیشن بودجه‌ای با Task.estimated_cost (AC5). frontend (BudgetPage + nav)، AC1/2/4 انجام شد."
     },
     {
       "task_id": "2165524b-5614-4c95-938c-0587d7748436",
