@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotificationBell from './NotificationBell';
 
 function Header() {
   const location = useLocation();
@@ -60,6 +61,7 @@ function Header() {
           )}
 
           <div className="flex items-center space-x-3">
+            {isAuthenticated && <NotificationBell />}
             {isAuthenticated ? (
               <>
                 {user && (

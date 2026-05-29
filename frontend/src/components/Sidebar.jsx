@@ -28,6 +28,7 @@ const LINKS = [
   },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings' },
   { to: '/assistant', label: 'پیشنهادات هوشمند', testid: 'sidebar-link-assistant' },
+  { to: '/recommendations', label: 'تاریخچه پیشنهادات', testid: 'sidebar-link-recommendations' },
   { to: '/assets', label: 'دارایی‌ها', testid: 'sidebar-link-assets' },
   { to: '/merge', label: 'ادغام تسک‌ها', testid: 'sidebar-link-merge' },
   {

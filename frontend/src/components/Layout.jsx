@@ -2,6 +2,7 @@ import React from 'react';
 
 import Footer from './Footer';
 import Header from './Header';
+import LocationTracker from './LocationTracker';
 import Sidebar from './Sidebar';
 
 /**
@@ -19,6 +20,8 @@ import Sidebar from './Sidebar';
 function Layout({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Invisible — pings /api/context/location every 5 min (task 2165524b AC6) */}
+      <LocationTracker />
       <Header />
       <div className="flex flex-1">
         <Sidebar />

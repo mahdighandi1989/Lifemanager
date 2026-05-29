@@ -5,7 +5,7 @@ from app.database import get_db
 from app.schemas.notification_schema import NotificationCreate, NotificationOut
 from app.services.notification_service import NotificationService
 from app.models.user import User
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user, get_optional_user_id
 
 router = APIRouter()
 
@@ -53,6 +53,21 @@ async def notifications_status(
 ):
     """/notifications/status — same shape as /api/notifications/status."""
     return await _notifications_status_impl(db, user_id)
+
+
+@api_router.get(
+    "/api/notifications",
+    response_model=List[NotificationOut],
+    tags=["notifications"],
+)
+async def list_notifications_api(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """Anon-friendly list (login-bypass) for the NotificationBell (audit task
+    2165524b AC 9). Scoped to the caller's user_id; anon -> user 0."""
+    svc = NotificationService(db)
+    return await svc.get_user_notifications(user_id)
 
 
 # Naming convention: every notification endpoint path is lower-snake_case.

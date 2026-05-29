@@ -14,6 +14,7 @@ import BudgetPage from './pages/BudgetPage';
 import ExternalProjects from './pages/ExternalProjects';
 import PeopleProfiles from './pages/PeopleProfiles';
 import SmartAssistant from './pages/SmartAssistant';
+import Recommendations from './pages/Recommendations';
 import AssetsPage from './pages/AssetsPage';
 import MergeManagement from './pages/MergeManagement';
 import ListDetail from './pages/ListDetail';
@@ -198,6 +199,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <SmartAssistant />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/recommendations"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Recommendations />
                     </Layout>
                   </ProtectedRoute>
                 }

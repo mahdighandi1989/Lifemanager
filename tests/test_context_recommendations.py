@@ -46,6 +46,13 @@ def test_get_recommendations_returns_list(api_client):
     assert isinstance(resp.json(), list)
 
 
+def test_api_notifications_list_anon(api_client):
+    # NotificationBell endpoint (AC 9): anon-friendly list under login-bypass.
+    resp = api_client.get("/api/notifications")
+    assert resp.status_code == 200, resp.text
+    assert isinstance(resp.json(), list)
+
+
 def test_post_location_then_recommendations_roundtrip(api_client):
     assert api_client.post(
         "/api/context/location", json={"lat": 1.0, "lng": 2.0}
