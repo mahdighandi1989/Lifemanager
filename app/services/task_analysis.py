@@ -25,6 +25,35 @@ def _priority(t) -> str:
     return str(getattr(t.priority, "value", t.priority) or "")
 
 
+async def get_task_context(db: AsyncSession, *, user_id: int) -> dict:
+    """Counts of ``total / completed / pending / overdue`` tasks for the user
+    (audit task e606cca6 AC2). The AI flow sends this whole context to the model
+    — no token cap. Lives here (not on AIService) so model_service stays under
+    the 250-line split cap; AIService.get_task_context delegates to it."""
+    rows = (
+        await db.execute(
+            select(Task).where(Task.user_id == user_id, Task.merged_into_id.is_(None))
+        )
+    ).scalars().all()
+    today = date.today()
+    total = len(rows)
+    completed = sum(1 for t in rows if _status(t) == "done")
+    pending = sum(1 for t in rows if _status(t) not in ("done", "cancelled"))
+    overdue = sum(
+        1
+        for t in rows
+        if t.due_date
+        and t.due_date < today
+        and _status(t) not in ("done", "cancelled")
+    )
+    return {
+        "total": total,
+        "completed": completed,
+        "pending": pending,
+        "overdue": overdue,
+    }
+
+
 def _derive_patterns(by_status: Counter, total: int, overdue: List[int]) -> List[str]:
     patterns: List[str] = []
     if overdue:
