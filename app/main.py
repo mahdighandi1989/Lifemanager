@@ -27,6 +27,7 @@ from app.routes import (
     drive,
     merge,
     external_projects,
+    files,
     finance,
     integrations,
     interests,
@@ -313,6 +314,9 @@ async def startup_event():
         ("ai_assessments", "sentiment_score", "DOUBLE PRECISION"),
         ("ai_assessments", "dominant_emotion", "VARCHAR(64)"),
         ("ai_assessments", "mood_timestamp", "TIMESTAMP WITH TIME ZONE"),
+        # Drive cold-tiering bookkeeping (audit task 7367c6f0).
+        ("drive_files", "storage_location", "VARCHAR(16) DEFAULT 'local'"),
+        ("drive_files", "last_accessed_at", "TIMESTAMP WITH TIME ZONE"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:
@@ -702,6 +706,7 @@ app.include_router(merge.router, tags=["merge"])
 app.include_router(deduplication.router, tags=["deduplication"])
 app.include_router(ai_stream.router, tags=["ai"])
 app.include_router(drive.router, tags=["drive"])
+app.include_router(files.router, tags=["files"])
 app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.

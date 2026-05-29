@@ -28,6 +28,7 @@ class DriveFileResponse(BaseModel):
     mime_type: Optional[str] = None
     drive_file_id: Optional[str] = None
     drive_link: Optional[str] = None
+    storage_location: str = "local"
     storage_tier: str
     extracted_text: Optional[str] = None
 
@@ -64,16 +65,38 @@ async def upload_drive_file(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> DriveFile:
-    """AC4: receive a file's metadata and persist a DriveFile row. The push to
-    Google Drive happens once operator credentials exist; the metadata is
-    stored now regardless so nothing is lost."""
+    """AC4/AC6: receive a file's metadata and persist a DriveFile row. The push
+    to Google Drive happens once operator credentials exist; the metadata is
+    stored now regardless so nothing is lost. For audio/image files we extract
+    text up front (AC6) so it's searchable even before the blob migrates."""
+    from app.services.transcription_service import extract_text
+
+    extracted = extract_text(payload.filename, mime_type=payload.mime_type)
     row = DriveFile(
         user_id=user_id,
         filename=payload.filename,
         mime_type=payload.mime_type,
+        storage_location="local",
         storage_tier="hot",
+        extracted_text=extracted,
     )
     db.add(row)
     await db.commit()
     await db.refresh(row)
     return row
+
+
+@router.get("/api/drive/folders", tags=["drive"])
+@handle_errors
+async def drive_folder_layout() -> dict:
+    """AC7: the Drive folder layout — a single app root with per-data-type
+    subfolders that every migrated file lands under."""
+    from app.services.google_drive_service import (
+        APP_ROOT_FOLDER_NAME,
+        DEFAULT_SUBFOLDERS,
+    )
+
+    return {
+        "root_folder": APP_ROOT_FOLDER_NAME,
+        "subfolders": list(DEFAULT_SUBFOLDERS),
+    }

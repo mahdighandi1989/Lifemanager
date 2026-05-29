@@ -31,6 +31,7 @@ const LINKS = [
   { to: '/recommendations', label: 'تاریخچه پیشنهادات', testid: 'sidebar-link-recommendations' },
   { to: '/personality', label: 'پروفایل شخصیت', testid: 'sidebar-link-personality' },
   { to: '/career-planning', label: 'ترسیم آینده', testid: 'sidebar-link-career-planning' },
+  { to: '/drive-files', label: 'فایل‌های من', testid: 'sidebar-link-drive-files' },
   { to: '/assets', label: 'دارایی‌ها', testid: 'sidebar-link-assets' },
   { to: '/merge', label: 'ادغام تسک‌ها', testid: 'sidebar-link-merge' },
   {

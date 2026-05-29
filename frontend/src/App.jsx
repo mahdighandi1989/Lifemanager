@@ -17,6 +17,7 @@ import SmartAssistant from './pages/SmartAssistant';
 import Recommendations from './pages/Recommendations';
 import PersonalityProfilePage from './pages/PersonalityProfilePage';
 import CareerPlanningPage from './pages/CareerPlanningPage';
+import DriveFiles from './pages/DriveFiles';
 import AssetsPage from './pages/AssetsPage';
 import MergeManagement from './pages/MergeManagement';
 import ListDetail from './pages/ListDetail';
@@ -231,6 +232,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <CareerPlanningPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/drive-files"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <DriveFiles />
                     </Layout>
                   </ProtectedRoute>
                 }

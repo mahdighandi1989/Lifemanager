@@ -1024,6 +1024,10 @@
       {
         "name": "CareerPlanningPage",
         "file": "frontend/src/pages/CareerPlanningPage.jsx"
+      },
+      {
+        "name": "DriveFiles",
+        "file": "frontend/src/pages/DriveFiles.jsx"
       }
     ],
     "components": [

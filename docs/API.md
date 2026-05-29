@@ -267,9 +267,33 @@ prune, `sync_source` both — AC3/Steps 6-7), `asset_to_task_linker` (asset↔ta
 `recommendation_engine.get_recommendations` (intent + keyword correlation),
 `google_drive_service`, `local_file_service`.
 
+### Google Drive file mgmt & cold-tiering (audit task 7367c6f0)
+
+Tier files that haven't been touched in 30 days out to Google Drive (metadata
++ extracted text stay hot in the DB), log each move to a central Google Sheet,
+and resolve reads back through the Drive link. OCR/ASR + the real Google calls
+are credentialed; the services take injectable clients so they're testable
+offline and degrade to bookkeeping-only without creds.
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/drive/upload` | Record a `DriveFile` (metadata only). Audio/image files get `extracted_text` populated up front (AC6). |
+| GET | `/api/drive/files` | List Drive files; `?q=` filename substring search. |
+| GET | `/api/drive/folders` | The `Lifemanager Data` root + per-data-type subfolders (AC7). |
+| GET | `/api/files/{id}` | Resolve a file: Drive-tiered → its `drive_link` (AC5); touches `last_accessed_at`. 404 if missing. |
+
+Model: `DriveFile` gains `storage_location` (local\|drive) + `last_accessed_at`
+(migration 0023). Services: `google_drive_service` (`upload_file`→shareable
+link, `download_file`, `build_share_link`, folder helpers — AC1/AC7),
+`sheets_service` (`append_index_row` to `LifeManagerIndex` — AC2),
+`cold_tiering_service` (`is_cold`/`find_cold_files`/`tier_cold_files`, 30-day
+policy — AC4), `transcription_service` (`extract_text` for audio/image — AC6).
+UI: `DriveFiles` page (`/drive-files`) badges Drive-stored files + links to the
+blob (AC8). The `tier_cold_data` Celery task runs the sweep daily.
+
 ### Migrations & startup (audit task 3ea5622b)
 
-The Alembic chain (`migrations/versions/`, head `0022_profile_interest_personality`)
+The Alembic chain (`migrations/versions/`, head `0023_drive_file_storage_location`)
 is kept in sync with `Base.metadata` — `tests/test_migration.py` /
 `test_migrations.py` assert every model table is created by `alembic upgrade head`.
 
