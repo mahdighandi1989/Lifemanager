@@ -56,3 +56,44 @@ class FinancialAccount(Base):
     extra = Column(Text, nullable=True)  # JSON-as-text for portability
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class Transaction(Base):
+    """A money movement against a FinancialAccount (audit task 4ae4b3ca AC 2).
+
+    ``transaction_type`` is ``income`` | ``expense``; posting one updates the
+    parent account's ``balance`` (see POST /api/finance/transactions). The
+    email/SMS auto-update pipeline records its detected movements here too.
+    """
+
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    account_id = Column(
+        Integer,
+        ForeignKey("financial_accounts.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    amount = Column(Numeric(18, 2), nullable=False, default=0)
+    transaction_type = Column(String(16), nullable=False, default="expense")
+    description = Column(String(255), nullable=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class BudgetPlan(Base):
+    """A per-user budget envelope (audit task 4ae4b3ca AC 3).
+
+    ``period`` is ``monthly`` | ``yearly``. ``remaining_budget`` is what the
+    task-module integration checks before flagging an over-budget purchase.
+    """
+
+    __tablename__ = "budget_plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
+    total_budget = Column(Numeric(18, 2), nullable=False, default=0)
+    remaining_budget = Column(Numeric(18, 2), nullable=False, default=0)
+    period = Column(String(16), nullable=False, default="monthly")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

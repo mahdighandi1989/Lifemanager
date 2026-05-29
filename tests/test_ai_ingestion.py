@@ -117,6 +117,7 @@ def test_publish_data_change_event_swallows_broker_failure(monkeypatch):
 # ── Celery task registration (AC 65) ────────────────────────────────
 
 def test_process_ai_ingestion_event_task_registered():
+    import app.tasks  # noqa: F401 — importing runs the @celery_app.task decorator
     from app.celery_app import celery_app
 
     assert "app.tasks.process_ai_ingestion_event" in celery_app.tasks

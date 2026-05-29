@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
-from app.models.finance import Asset, FinancialAccount, Income
+from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
 
 
 router = APIRouter()
@@ -305,4 +305,89 @@ async def list_exchange_accounts(
             (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "exchange")
         )
     )
+    return list(result.scalars().all())
+
+
+# ── Transactions (audit task 4ae4b3ca AC 7) ─────────────────────────
+
+
+class TransactionCreate(BaseModel):
+    account_id: int
+    amount: Decimal = Field(..., ge=0)
+    transaction_type: str = Field(default="expense", pattern="^(income|expense)$")
+    description: Optional[str] = Field(default=None, max_length=255)
+
+
+class TransactionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    account_id: int
+    amount: Decimal
+    transaction_type: str
+    description: Optional[str]
+
+
+@router.post(
+    "/api/finance/transactions",
+    response_model=TransactionResponse,
+    status_code=201,
+)
+@handle_errors
+async def create_transaction(
+    payload: TransactionCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """Record a transaction and update the parent account's balance (AC 7).
+
+    income credits the account, expense debits it. The account must belong to
+    the caller (scoped by user_id) — otherwise 404 so balances can't be moved
+    on someone else's account.
+    """
+    result = await db.execute(
+        select(FinancialAccount).where(
+            (FinancialAccount.id == payload.account_id)
+            & (FinancialAccount.user_id == user_id)
+        )
+    )
+    account = result.scalar_one_or_none()
+    if account is None:
+        raise HTTPException(status_code=404, detail="account not found")
+
+    txn = Transaction(
+        account_id=payload.account_id,
+        amount=payload.amount,
+        transaction_type=payload.transaction_type,
+        description=payload.description,
+    )
+    db.add(txn)
+    # Update the running balance: income adds, expense subtracts.
+    delta = payload.amount if payload.transaction_type == "income" else -payload.amount
+    account.balance = (account.balance or Decimal(0)) + delta
+    await db.commit()
+    await db.refresh(txn)
+    return txn
+
+
+@router.get(
+    "/api/finance/transactions",
+    response_model=List[TransactionResponse],
+)
+@handle_errors
+async def list_transactions(
+    account_id: Optional[int] = None,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """List the caller's transactions (optionally filtered by account).
+
+    Scoped by joining to the caller's own accounts so one user can't read
+    another's transaction history.
+    """
+    owned = select(FinancialAccount.id).where(FinancialAccount.user_id == user_id)
+    stmt = select(Transaction).where(Transaction.account_id.in_(owned))
+    if account_id is not None:
+        stmt = stmt.where(Transaction.account_id == account_id)
+    result = await db.execute(stmt)
     return list(result.scalars().all())

@@ -58,4 +58,10 @@ celery_app.conf.beat_schedule = {
         "task": "app.tasks.tier_cold_data",
         "schedule": crontab(hour=4, minute=0),
     },
+    # Every 30 minutes — refresh finance account balances from new bank
+    # emails/SMS (audit task 4ae4b3ca, AC 11).
+    "process-finance-updates": {
+        "task": "app.tasks.process_finance_updates",
+        "schedule": crontab(minute="*/30"),
+    },
 }

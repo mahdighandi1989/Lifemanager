@@ -1,0 +1,124 @@
+"""Finance transactions + budget + SMS + periodic refresh (task 4ae4b3ca).
+
+Covers the gaps on top of the existing Income/Asset/FinancialAccount surface:
+Transaction + BudgetPlan models (AC 2-3), POST/GET /api/finance/transactions
+with balance update (AC 7), SmsListenerService (AC 10), and the 30-min
+process_finance_updates Celery task (AC 11).
+"""
+from __future__ import annotations
+
+
+# ── Models (AC 2, 3) ─────────────────────────────────────────────────
+
+def test_transaction_model_fields():
+    from app.models.finance import Transaction
+
+    cols = set(Transaction.__table__.columns.keys())
+    assert {"account_id", "amount", "transaction_type", "description", "timestamp"} <= cols
+
+
+def test_budget_plan_model_fields():
+    from app.models.finance import BudgetPlan
+
+    cols = set(BudgetPlan.__table__.columns.keys())
+    assert {"user_id", "total_budget", "remaining_budget", "period"} <= cols
+
+
+# ── POST/GET /api/finance/transactions + balance update (AC 7) ───────
+
+def _make_account(api_client, *, balance=100, kind="bank"):
+    resp = api_client.post(
+        "/api/finance/accounts",
+        json={"name": "Acct", "kind": kind, "currency": "USD", "balance": balance},
+    )
+    assert resp.status_code == 201, resp.text
+    return resp.json()["id"]
+
+
+def test_transaction_income_credits_balance(api_client):
+    acct_id = _make_account(api_client, balance=100)
+    resp = api_client.post(
+        "/api/finance/transactions",
+        json={"account_id": acct_id, "amount": 50, "transaction_type": "income"},
+    )
+    assert resp.status_code == 201, resp.text
+    accounts = api_client.get("/api/finance/accounts").json()
+    bal = next(float(a["balance"]) for a in accounts if a["id"] == acct_id)
+    assert bal == 150.0
+
+
+def test_transaction_expense_debits_balance(api_client):
+    acct_id = _make_account(api_client, balance=100)
+    resp = api_client.post(
+        "/api/finance/transactions",
+        json={"account_id": acct_id, "amount": 30, "transaction_type": "expense"},
+    )
+    assert resp.status_code == 201, resp.text
+    accounts = api_client.get("/api/finance/accounts").json()
+    bal = next(float(a["balance"]) for a in accounts if a["id"] == acct_id)
+    assert bal == 70.0
+
+
+def test_transaction_unknown_account_404(api_client):
+    resp = api_client.post(
+        "/api/finance/transactions",
+        json={"account_id": 999999, "amount": 10, "transaction_type": "expense"},
+    )
+    assert resp.status_code == 404
+
+
+def test_list_transactions_returns_created(api_client):
+    acct_id = _make_account(api_client)
+    api_client.post(
+        "/api/finance/transactions",
+        json={"account_id": acct_id, "amount": 5, "transaction_type": "expense",
+              "description": "coffee"},
+    )
+    rows = api_client.get("/api/finance/transactions").json()
+    assert any(r["account_id"] == acct_id and r["description"] == "coffee" for r in rows)
+
+
+# ── SmsListenerService (AC 10) ───────────────────────────────────────
+
+def test_sms_listener_parses_persian_balance():
+    from app.services.sms_listener_service import parse_sms
+
+    parsed = parse_sms("بانك ملت: موجودی: 12,500,000 ریال")
+    assert parsed.balance == 12_500_000.0
+    assert parsed.currency in ("ریال", "RIAL")
+
+
+def test_sms_listener_parses_withdrawal_direction():
+    from app.services.sms_listener_service import parse_sms
+
+    parsed = parse_sms("برداشت 1,200,000 از حساب شما")
+    assert parsed.amount == 1_200_000.0
+    assert parsed.direction == "debit"
+
+
+def test_sms_listener_empty_body():
+    from app.services.sms_listener_service import parse_sms
+
+    parsed = parse_sms("")
+    assert parsed.balance is None and parsed.amount is None
+
+
+# ── Periodic finance refresh task (AC 11) ────────────────────────────
+
+def test_process_finance_updates_task_registered_and_scheduled():
+    import app.tasks  # noqa: F401 — importing runs the @celery_app.task decorator
+    from app.celery_app import celery_app
+
+    assert "app.tasks.process_finance_updates" in celery_app.tasks
+    schedule = celery_app.conf.beat_schedule
+    assert any(
+        entry["task"] == "app.tasks.process_finance_updates"
+        for entry in schedule.values()
+    )
+
+
+def test_process_finance_updates_runs_noop_without_source():
+    from app.tasks import process_finance_updates
+
+    result = process_finance_updates.run()
+    assert result["balances_updated"] == 0
