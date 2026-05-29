@@ -20,3 +20,6 @@ interactionها، خروجی `ai_score` + `relationship_type`) ✓ با ۳ تس�
    `person_tasks` + relationship.
 3. **[LOW] فرانت‌اند (AC7/AC8/AC9).** صفحهٔ `/people-profiles` (لیست)، فیلد
    انتخاب افراد در فرم Task، و طراحی کاربرپسند (JSX).
+
+---
+**به‌روزرسانی (frontend):** صفحهٔ مربوطه ساخته و به Sidebar/نویگیشن وصل شد و تست دارد. موارد باقی‌مانده در این فایل صرفاً backend/infra/تصمیم هستند.

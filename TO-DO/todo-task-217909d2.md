@@ -19,3 +19,6 @@ data_ingestion_service، recommendation_service — موجود و تست‌شد�
    (نیازمند دسترسی OS/agent — تصمیم/زیرساخت شما).
 5. **[LOW] یکپارچه‌سازی Google Drive (AC8).** نمایش فایل‌های Drive در assets
    (نیازمند Google creds — مشترک با تسک 7367c6f0).
+
+---
+**به‌روزرسانی (frontend):** صفحهٔ مربوطه ساخته و به Sidebar/نویگیشن وصل شد و تست دارد. موارد باقی‌مانده در این فایل صرفاً backend/infra/تصمیم هستند.

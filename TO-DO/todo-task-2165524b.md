@@ -25,3 +25,6 @@ location/biometric/activity/audio → پیشنهاد هوشمند) هستند، 
 3. **[MEDIUM] بخش «پیشنهادات هوشمند» در فرانت‌اند (AC5).** افزودن بخش Smart
    Suggestions به صفحهٔ تسک‌ها که از `/api/v1/context/analyze` تغذیه شود
    (frontend پروژه JSX است، نه `TaskList.tsx`).
+
+---
+**به‌روزرسانی (frontend):** صفحهٔ مربوطه ساخته و به Sidebar/نویگیشن وصل شد و تست دارد. موارد باقی‌مانده در این فایل صرفاً backend/infra/تصمیم هستند.

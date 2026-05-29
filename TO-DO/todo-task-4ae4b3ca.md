@@ -19,3 +19,6 @@ AC4 (`EmailParserService` در `app/services/email_parser_service.py` + ۵ تس�
    نیازمند افزودن فیلد `estimated_cost` به مدل `Task` (+ migration) و سپس
    منطق مقایسهٔ موجودی در NotificationService است — یک تصمیم مدل‌داده که بهتر
    است با شما هماهنگ شود (واحد پول/ارز حساب‌ها در مقایسه).
+
+---
+**به‌روزرسانی (frontend):** صفحهٔ مربوطه ساخته و به Sidebar/نویگیشن وصل شد و تست دارد. موارد باقی‌مانده در این فایل صرفاً backend/infra/تصمیم هستند.
