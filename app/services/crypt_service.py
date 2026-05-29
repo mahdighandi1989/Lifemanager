@@ -41,8 +41,24 @@ def get_fernet_key(secret: Optional[str] = None) -> bytes:
             key = key.encode()
     return key if isinstance(key, bytes) else key.encode()
 
+def generate_key() -> str:
+    """Return a fresh, random Fernet key as a urlsafe-base64 ``str``.
+
+    Each call yields a unique key (``Fernet.generate_key`` draws from
+    ``os.urandom``). Returned as ``str`` so it round-trips cleanly through
+    ``encrypt_data``/``decrypt_data``'s ``secret`` parameter, which derives
+    its Fernet key from the string via :func:`get_fernet_key`.
+    """
+    return Fernet.generate_key().decode()
+
+
 def encrypt_data(data: str, secret: Optional[str] = None) -> str:
     """Encrypt a string using Fernet symmetric encryption."""
+    if not isinstance(data, str):
+        # Fernet operates on bytes; encoding ``None``/non-str would raise an
+        # opaque AttributeError. Surface a clear TypeError instead so callers
+        # get an actionable contract violation.
+        raise TypeError("encrypt_data() expects `data` to be a str")
     key = get_fernet_key(secret)
     cipher = Fernet(key)
     encrypted = cipher.encrypt(data.encode())
