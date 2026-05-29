@@ -149,6 +149,23 @@ function Dashboard() {
                 <p className="text-sm text-gray-500">سازماندهی و پیشرفت پروژه‌ها</p>
               </div>
             </Link>
+            {/* Dedup / consolidation entry (audit task fbd9bd36 AC4 — reachable
+                from the Dashboard, not only the sidebar). */}
+            <Link
+              to="/merge"
+              data-testid="dashboard-merge-link"
+              className="flex items-center space-x-3 p-4 rounded-lg border border-gray-200 hover:border-amber-300 hover:bg-amber-50 transition-colors"
+            >
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">ادغام موارد مشابه</p>
+                <p className="text-sm text-gray-500">شناسایی و تلفیق تسک/پروژه/لیست‌های مشابه</p>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
