@@ -206,3 +206,17 @@ section.
 Backing pieces: `AIService.get_task_context` (total/completed/pending/overdue),
 `task_analysis.analyze_user_tasks` (group work patterns),
 `notification_service.send_ai_feedback` (persist feedback as a notification).
+
+### Migrations & startup (audit task 3ea5622b)
+
+The Alembic chain (`migrations/versions/`, head `0021_ai_config_context_fields`)
+is kept in sync with `Base.metadata` — `tests/test_migration.py` /
+`test_migrations.py` assert every model table is created by `alembic upgrade head`.
+
+Startup can optionally auto-migrate: set `RUN_ALEMBIC_MIGRATIONS_ON_STARTUP=true`
+and the app runs `alembic upgrade head` programmatically at startup **only when
+`ENVIRONMENT != production`** (production logs a warning and skips — migrate as a
+controlled deploy step). Off by default; migration errors are logged and
+swallowed so startup never crashes (`app/services/migration_runner.py`). The
+legacy idempotent `ALTER TABLE` block in `startup_event` remains as
+belt-and-suspenders for the create_all (no-alembic) path on Render's free tier.

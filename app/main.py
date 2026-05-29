@@ -219,6 +219,16 @@ async def startup_event():
         logger.critical(f"❌ CRITICAL: Database connection failed: {e}")
         logger.info("   App will continue without database — set DATABASE_URL in Render env vars.")
 
+    # Optional Alembic auto-migration (audit task 3ea5622b): gated by
+    # RUN_ALEMBIC_MIGRATIONS_ON_STARTUP + non-production. No-op by default;
+    # errors are logged and swallowed so startup never crashes on it.
+    try:
+        from app.services.migration_runner import run_migrations_if_enabled
+
+        await run_migrations_if_enabled()
+    except Exception as exc:  # belt-and-suspenders around the gated helper
+        logger.error("startup migration hook error (continuing): %r", exc)
+
     # Best-effort idempotent migration: tasks.user_id and projects.user_id
     # used to be NOT NULL. The current model declares them nullable, but
     # Base.metadata.create_all does NOT alter existing tables — so an

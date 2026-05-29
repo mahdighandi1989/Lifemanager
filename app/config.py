@@ -94,6 +94,13 @@ class Settings(BaseSettings):
     FEATURE_AI_ENABLED: bool = False
     FEATURE_INTEGRATIONS_ENABLED: bool = False
 
+    # --- Migrations ---------------------------------------------------------
+    # When true AND ENVIRONMENT != production, startup runs `alembic upgrade
+    # head` programmatically (audit task 3ea5622b). Off by default; production
+    # never auto-migrates (it's a controlled deploy step). The startup hook in
+    # app/services/migration_runner.py reads this via os.getenv too.
+    RUN_ALEMBIC_MIGRATIONS_ON_STARTUP: bool = False
+
     # --- Celery / Redis -----------------------------------------------------
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = Field(
