@@ -10,11 +10,11 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T20:58:36.200085+00:00'
-updated_at: '2026-05-28T19:44:45.111227+00:00'
+updated_at: '2026-05-29T09:10:40.330401+00:00'
 target_files:
-- backend/app/services/oversight_service.py
+- backend/app/services/task_service.py
 - backend/app/models/task.py
-- backend/app/models/list.py
+- frontend/src/pages/Dashboard.tsx
 ---
 
 # [ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (6 مرحله)
@@ -325,12 +325,150 @@ Dependencies synced:
 frontend↔db↔infra) / side شناسایی نشد» تا مشخص باشد بررسی **انجام شده**
 نه اینکه فراموش شده.
 
+📋 **مدیریت TO-DO برای اقدامات دستی کاربر (همیشه چک کن):**
+
+⚠️ **هشدار بحرانی — قاعدهٔ ضد-فرار:** TO-DO فقط برای کارهایی است که
+**واقعاً غیرممکن** برای agent است (نیاز به انسان مطلق)، نه برای کارهایی
+که «بزرگ‌اند»، «وقت می‌برند»، یا «نیازمند fixture/setup» هستند. اگر یک
+agent در یک سشن بیش از **۲۰٪ از تسک‌ها** را با TO-DO ببندد، یعنی از کار
+فرار می‌کند — این الگو در سشن‌های قبلی **مشاهده** شده و الان ممنوع است.
+
+✅ **فقط برای این موارد TO-DO بساز** (لیست بسته — هرچه خارج این لیست
+ممنوع است):
+
+  ۱. **Credential/secret که فقط کاربر دارد**:
+     - تنظیم API key واقعی در پنل ادمین خارجی (Render، AWS، Stripe، …)
+     - تأیید OAuth client روی console آن سرویس
+     - paste کردن webhook secret که فقط بعد از ساخت در dashboard ظاهر می‌شود
+
+  ۲. **Account/billing روی سرویس خارجی که کاربر باید عضو شود**:
+     - ساخت account جدید روی Stripe/SendGrid/Twilio/Google Cloud
+     - تأیید verification شماره یا ID
+     - فعال‌سازی subscription پولی
+
+  ۳. **داده/asset خصوصی که فقط کاربر دارد**:
+     - آپلود لوگو/تصویر/فونت برند
+     - paste کردن داده‌ای که در محل کار کاربر است
+     - import داده‌ای که فقط روی device کاربر است
+
+  ۴. **تصمیم سلیقه‌ای/حقوقی/کسب‌وکار**:
+     - انتخاب رنگ‌بندی نهایی یا تم
+     - متن دقیق Terms of Service / Privacy Policy
+     - تعرفهٔ قیمت‌گذاری
+     - نام نهایی برند یا دامنه
+
+⛔ **هرگز TO-DO نکن برای** (لیست سیاه — هر چیزی که در این لیست است
+**قابل اجرا** توسط agent است، حتی اگر بزرگ یا چندبخشی باشد):
+
+  ❌ UI component / page / dashboard (هر فریم‌ورک: React, Vue, Angular,
+     Svelte، حتی اگر معماری بزرگ دارد) — می‌توانی stub اولیه + state
+     management + layout + استایل بسازی
+  ❌ "نیازمند Google Drive / Stripe / Twilio API" — می‌توانی **client
+     stub** با abstraction layer بسازی که با env var واقعی plug-in شود؛
+     کد integration یعنی پیاده‌سازی، نه TO-DO
+  ❌ "feature بزرگ، چند روز کار می‌برد" — اندازه دلیل defer نیست؛ کوچک
+     شروع کن، iterate کن، در همین سشن کامل کن
+  ❌ Celery / background worker / scheduler — یک task ساده + register
+     می‌توانی بسازی
+  ❌ Migration / model / schema — حتی اگر فیلد جدید نیاز دارد، اضافه کن
+  ❌ REST endpoint / GraphQL resolver / WebSocket route — هرگز TO-DO
+  ❌ test (unit/integration/e2e) — همیشه قابل نوشتن
+  ❌ Documentation / README / API docs — همیشه قابل نوشتن
+  ❌ Config file / .env.example / Dockerfile / CI workflow — همیشه قابل
+     نوشتن
+  ❌ "می‌توانستی .tsx ولی repo .jsx است" — از .jsx استفاده کن، TO-DO نکن
+  ❌ "نیازمند فیلد X در مدل دیگر" — اضافه کن فیلد را، TO-DO نکن
+  ❌ "تصمیم admin-vs-user-scoped" — پرامپت اولیه scope را معلوم کرده،
+     یا با محتاطانه‌ترین تفسیر پیش برو
+  ❌ "credential در production هنوز ست نیست" — این TO-DO ساده برای
+     تنظیم env var است (مورد ۱ بالا)، نه دلیل برای defer کردن کد
+  ❌ "نیازمند verification از کاربر" — اگر اقدام واقعی غیرممکن نیست،
+     پیش برو
+  ❌ هر چیزی که در یک کامنت `# TODO` معمولی نوشته می‌شد — این فایل
+     TO-DO نیست، کامنت inline است
+
+🔬 **قاعدهٔ «حداقل تلاش» قبل از TO-DO**: قبل از TO-DO کردن یک AC، **اثبات
+کن** که قابل انجام نیست:
+
+  ۱. آیا می‌توانم یک stub/placeholder بسازم که با env واقعی plug-in شود؟
+     → اگر بله، بساز و TO-DO نکن
+  ۲. آیا می‌توانم برای این بخش یک test (حتی mock-based) بنویسم؟
+     → اگر بله، بنویس و TO-DO نکن
+  ۳. آیا می‌توانم abstraction/interface را تعریف کنم، حتی اگر backend
+     واقعی نیست؟ → اگر بله، تعریف کن و TO-DO نکن
+  ۴. آیا فقط یک حالت سلیقه‌ای/decision کاربر در میان است؟
+     → فقط آن یک decision را TO-DO کن، نه کل feature را
+
+اگر یکی از این چهار راه‌حل ممکن بود ولی به TO-DO رفتی، **اعتبار شما از
+بین می‌رود**.
+
+📊 **آستانهٔ TO-DO per session**: در یک حلقهٔ اجرای N تسک، اگر بیشتر از
+**۲۰٪** تسک‌ها فایل TO-DO ساختی، خودت در گزارش پایانی صریحاً اعلام کن:
+
+  "⚠️ نسبت TO-DO من {K}/{N} = {%} است که از آستانهٔ ۲۰٪ بالاتر است.
+   احتمالاً برخی از این TO-DO ها قابل اجرا بودند ولی من فرار کردم.
+   لیست TO-DO ها را کاربر باید بازبینی کند که آیا واقعاً Manual-required
+   بودند یا agent ضعیف کار کرده."
+
+**یادآوری همیشگی:** اگر در آینده قابلیت‌های شما گسترش پیدا کرد و توانستید
+یکی از موارد لیست سفید را خودکار انجام دهید (مثلاً managed credential
+injection، یا integration پولی automate شود)، انجام دهید و TO-DO نسازید.
+لیست سفید بسته است ولی **بسته از پایین** (می‌تواند کوچک‌تر شود اگر
+قابلیت‌ها رشد کنند، ولی هرگز بزرگ‌تر نشود برای فرار).
+
+**اگر هیچ بخش Manual-required نبود (تمام تسک Auto-capable است)**:
+  → فایل TO-DO **نساز**. فولدر TO-DO/ باید پاک و معنادار بماند.
+  → اگر برای این task از قبل `TO-DO/todo-task-{task_id_first_8}.md` بود
+     (یعنی در run قبلی نیاز به دخالت کاربر بود ولی الان نه): فایل قدیمی
+     را پاک کن و entry را از `TO-DO/_index.json` حذف کن.
+
+**اگر بخش Manual-required دارد** (همه‌جانبه یا hybrid):
+  1. فولدر TO-DO/ را در ریشه ریپو ایجاد کن اگر نیست
+  2. فایل `TO-DO/todo-task-{task_id_first_8}.md` بساز با front-matter
+     شامل: task_id, task_title, execution_priority, created_at,
+     updated_at, status: "pending"
+     و در بدنه: «چرا این فایل ساخته شد»، «وضعیت بخش‌های خودکار»
+     (commit ها reference)، «کارهایی که باید انجام دهی» با اولویت
+     بالا/متوسط/پایین به ترتیب، «وقتی این کارها را تمام کردی»
+  3. `TO-DO/_index.json` را با **merge** آپدیت کن (نه overwrite):
+     - فایل موجود را بخوان
+     - entry های orphan (فایلشان پاک شده) را حذف کن
+     - entry این task را اضافه/replace کن
+     - بر اساس execution_priority صعودی مرتب کن
+     - ساختار: `{"version":1, "generated_at": ISO, "total": N, "items": [...]}`
+  4. این تغییرات TO-DO را در **همان commit کد** شامل کن (نه commit جداگانه)
+
+⛔ **ممنوعات مطلق TO-DO**:
+  ❌ ساختن TO-DO برای کاری که می‌توانستی خودت انجام دهی (شلوغی فولدر)
+  ❌ overwrite کردن `TO-DO/_index.json` بدون merge (data loss)
+  ❌ نگه‌داشتن entry هایی که فایل‌شان پاک شده (broken reference)
+  ❌ فراموش کردن نوشتن «خروجی مورد انتظار» در هر آیتم TO-DO
+
+این بخش الزامی است. حتی اگر فکر می‌کنی "این تسک کاملاً auto است و نیازی
+به TO-DO نیست"، صریحاً در commit message یا report بنویس:
+"بررسی شد — این تسک هیچ بخش Manual-required ندارد، TO-DO ساخته نشد."
+
 📦 **اگر کار طولانی است:**
 - **خلاصه‌اش نکن.** همه را به‌طور کامل انجام بده.
 - اگر یک کامیت گنجایش ندارد، در **چندین کامیت متوالی** انجام بده — ولی
   هیچ بخشی را skip نکن.
 - ترتیب کامیت‌ها را منطقی نگه‌دار (foundation → core → integration → tests).
 - در آخر یک checklist از همه‌ی کامیت‌ها در PR description بنویس.
+
+🔁 **Commit + Push فوری per-task (بسیار مهم برای جریان کار صحیح):**
+
+پس از اتمام پیاده‌سازی این تسک، **بلافاصله** commit کن و **همان موقع**
+به default branch (main/master) push کن. سپس به تسک بعدی برو.
+
+✓ چرا این قانون حیاتی است:
+  - تسک‌های بعدی ممکن است به فایل‌ها/تغییراتی که این تسک ایجاد کرده
+    نیاز داشته باشند. اگر push نکنی، `git pull` بعدی آن‌ها را نمی‌بیند.
+  - جمع‌کردن تغییرات چند تسک منجر به conflict های بزرگ می‌شود.
+  - اگر در میانه fail کنی، task های push شده ضایع نمی‌شوند.
+
+⛔ ممنوع: "همه task ها را تمام می‌کنم بعد یک‌جا push می‌زنم"
+⛔ ممنوع: branch جدا برای task — مستقیم به default branch
+⛔ ممنوع: task بعدی بدون push کامل task قبلی
 
 ---
 
@@ -425,42 +563,46 @@ _mime=audio/ogg • model=gemini-2.5-flash • 7 segment استخراج شد •
 ```
 
 ## 🎯 هدف (خلاصه ساختاریافته)
-طراحی و پیاده‌سازی سیستم ادغام و تلفیق صفحات و تسک‌های تکراری
+طراحی زیرساخت ادغام هوشمند صفحات و تسک‌های تکراری
 
 ## 📍 موقعیت دقیق در پروژه
 _(file:line — symbol — snippet)_
 
-- `backend/app/services/oversight_service.py:1-50` — `class OversightService` — این سرویس باید به سرویس تشخیص شباهت متصل شود تا بتواند تسک‌ها و لیست‌های تکراری را شناسایی کند.
+- `backend/app/services/task_service.py:1-50` — `TaskService` — سرویس فعلی تسک‌ها که باید قابلیت ادغام (merge) به آن اضافه شود. متد `merge_tasks` باید در اینجا پیاده‌سازی شود.
   ```python
-  class OversightService:
+  class TaskService:
       def __init__(self, db: Session):
           self.db = db
   
-      def get_all_tasks(self) -> list[Task]:
-          return self.db.query(Task).filter(Task.is_active == True).all()
-  
-      def get_all_lists(self) -> list[List]:
-          return self.db.query(List).filter(List.is_archived == False).all()
+      def create_task(self, task_data: TaskCreate) -> Task:
+          db_task = Task(**task_data.dict())
+          self.db.add(db_task)
+          self.db.commit()
+          self.db.refresh(db_task)
+          return db_task
   ```
-- `backend/app/models/task.py:1-40` — `class Task` — نیاز به اضافه کردن فیلدهای `merged_into_id` و `merge_history` برای ردیابی ادغام‌ها.
+- `backend/app/models/task.py:1-30` — `Task` — مدل Task که باید فیلد `merged_into_id` (ForeignKey به خودش) برای ردیابی ادغام‌ها به آن اضافه شود.
   ```python
   class Task(Base):
-      __tablename__ = 'tasks'
+      __tablename__ = "tasks"
       id = Column(Integer, primary_key=True, index=True)
-      title = Column(String, nullable=False)
-      description = Column(Text, default='')
-      status = Column(String, default='pending')
+      title = Column(String, index=True)
+      description = Column(Text, nullable=True)
+      project_id = Column(Integer, ForeignKey("projects.id"))
+      list_id = Column(Integer, ForeignKey("lists.id"), nullable=True)
       is_active = Column(Boolean, default=True)
-      list_id = Column(Integer, ForeignKey('lists.id'))
   ```
-- `backend/app/models/list.py:1-35` — `class List` — نیاز به اضافه کردن فیلدهای `merged_into_id` و `merge_history` برای ردیابی ادغام‌ها.
-  ```python
-  class List(Base):
-      __tablename__ = 'lists'
-      id = Column(Integer, primary_key=True, index=True)
-      name = Column(String, nullable=False)
-      description = Column(Text, default='')
-      is_archived = Column(Boolean, default=False)
+- `frontend/src/pages/Dashboard.tsx:1-20` — `Dashboard` — صفحه داشبورد که دکمه 'اسن و ادغام' باید به آن اضافه شود.
+  ```tsx
+  const Dashboard: React.FC = () => {
+    return (
+      <div className="dashboard">
+        <h1>Dashboard</h1>
+        <TaskList />
+        <ProjectList />
+      </div>
+    );
+  };
   ```
 
 ## 🧭 هدف اصلی پروژه (از یادداشت کاربر)
@@ -475,173 +617,101 @@ _(file:line — symbol — snippet)_
 [auto-re-registered from github_import at 2026-05-20T04:25:49.854717+00:00]
 
 ## 🧱 پشتهٔ فناوری و معماری
-Stack شناسایی‌شده:
-- Backend: FastAPI, SQLAlchemy, Pydantic, Alembic
-- Frontend: React, Vite, TypeScript, React Router
-- کتابخانه‌های جدید: scikit-learn (برای TF-IDF), numpy
-- دیتابیس: PostgreSQL (احتمالی)
-- تست: pytest (backend), Vitest (frontend)
+FastAPI (Python) برای بک‌اند، SQLAlchemy برای ORM، React (TypeScript) برای فرانت‌اند، Alembic برای میگریشن دیتابیس. کتابخانه‌های مرتبط: `difflib` برای تشخیص شباهت متنی، `sqlalchemy` برای کوئری‌های دیتابیس.
 
 ## 🔗 فایل‌های مرتبط (Cross-references)
 _(فایل‌هایی که با موقعیت‌های هدف در ارتباط هستند — import، caller، shared state)_
 
-- `backend/app/services/similarity_service.py` (سطر 1) — سرویس جدید برای تشخیص شباهت بین تسک‌ها و لیست‌ها. باید ایجاد شود.
-- `backend/app/services/consolidation_service.py` (سطر 1) — سرویس جدید برای ادغام و تلفیق موجودیت‌های مشابه. باید ایجاد شود.
-- `backend/app/api/routes/merge_routes.py` (سطر 1) — مسیرهای API جدید برای دریافت پیشنهادات و اجرای ادغام. باید ایجاد شود.
-- `frontend/src/components/MergeSuggestionPanel.tsx` (سطر 1) — کامپوننت React برای نمایش پیشنهادات ادغام به کاربر. باید ایجاد شود.
-- `frontend/src/pages/MergeManagementPage.tsx` (سطر 1) — صفحه مدیریت ادغام برای نمایش آمار و تاریخچه. باید ایجاد شود.
-- `backend/app/core/database.py` (سطر 20) — برای مدیریت session و تراکنش‌های ادغام استفاده می‌شود.
-- `backend/app/api/dependencies.py` (سطر 15) — برای تزریق وابستگی‌های سرویس‌های جدید به API.
+- `backend/app/models/project.py` (سطر 1) — مدل Project که ممکن است با Project دیگر ادغام شود.
+- `backend/app/models/list.py` (سطر 1) — مدل List که ممکن است تکراری باشد و نیاز به ادغام دارد.
+- `backend/app/api/api_v1/endpoints/tasks.py` (سطر 1) — روتر API تسک‌ها که endpoint جدید merge باید به آن اضافه شود.
+- `frontend/src/api/tasks.ts` (سطر 1) — فایل API calls فرانت‌اند که باید توابع جدید برای scan و merge را شامل شود.
+- `backend/app/db/base.py` (سطر 1) — پایه دیتابیس که مدل جدید SimilarityGroup باید به آن ثبت شود.
 
 ## 🌐 نقشهٔ وابستگی‌ها
-این تغییرات وابستگی‌های زیر را ایجاد می‌کند:
-1. `backend/app/services/similarity_service.py` به `sklearn` و `numpy` وابسته است.
-2. `backend/app/services/consolidation_service.py` به `similarity_service` و `oversight_service` و `database` وابسته است.
-3. `backend/app/api/routes/merge_routes.py` به `consolidation_service` و `database` وابسته است.
-4. `frontend/src/components/MergeSuggestionPanel.tsx` به API جدید `/api/merge/suggestions` وابسته است.
-5. `frontend/src/pages/MergeManagementPage.tsx` به API جدید `/api/merge/execute` وابسته است.
-6. مدل‌های `Task` و `List` نیاز به migration دیتابیس دارند (با Alembic).
-7. `backend/app/api/routers.py` باید مسیر جدید `merge_routes` را ثبت کند.
+این قابلیت به شدت به مدل‌های Task، Project، List و Page وابسته است. سرویس `DeduplicationService` باید از `TaskService` و `ProjectService` برای عملیات ادغام استفاده کند. API endpoints جدید به روترهای موجود اضافه می‌شوند. فرانت‌اند نیازمند کامپوننت جدید و به‌روزرسانی صفحات Dashboard و ProjectDetail است. دیتابیس نیازمند میگریشن برای اضافه کردن فیلد `merged_into_id` به مدل‌ها و ایجاد جدول `similarity_groups` است.
 
 ## 🔍 Context و وضعیت فعلی
-کاربر درخواست طراحی یک پلن/پلتفرم (plan/pedicke) داده که بتواند در زمان اجرا (runtime) تمام لیست‌ها، تسک‌ها و صفحات موجود در برنامه را که دارای مشابهت‌هایی هستند، به صورت دقیق و بدون هیچ خلاصه‌سازی یا حذفی، شناسایی و تلفیق (merge/consolidate) کند. هدف اصلی نجات برنامه از 'هرج و مرج فعلی' (chaos) است. کاربر به موارد زیر اشاره کرده:
-
-1. **صفحات بی‌دلیل اولیه**: صفحاتی که در ابتدای کار ساخته شده‌اند اما الان تأثیری ندارند.
-2. **صفحات مشابه**: صفحاتی که محتوای مشابهی دارند و می‌توانند ادغام شوند.
-3. **تسک‌ها و لیست‌های تکراری**: تسک‌ها و لیست‌هایی که ممکن است مشابهت‌هایی داشته باشند.
-4. **ساختار زیرساختی**: طراحی زیرساخت برنامه به گونه‌ای که قابل ارتقا (upgradable) باشد و از هرج و مرج فعلی خارج شود.
-
-این درخواست از طریق فایل صوتی `voice_838329_AgADph0A.ogg` (7 segment استخراج شده) ارائه شده و در 7 بخش مختلف (عنوان و معرفی ایده، مشکل و راه‌حل، ویژگی‌های کلیدی، مکانیسم‌های انگیزشی، طراحی UI/UX، بازار هدف و نقشه راه) تکرار شده است.
-
-**شواهد در کد**: با بررسی `deep_context`، فایل‌های زیر مرتبط هستند:
-- `backend/app/services/oversight_service.py`: سرویس اصلی مدیریت و نظارت بر تسک‌ها.
-- `backend/app/models/task.py`: مدل تسک با فیلدهای `title`, `description`, `status`, `is_active`.
-- `backend/app/models/list.py`: مدل لیست با فیلدهای `name`, `description`, `is_archived`.
-- `backend/app/services/similarity_service.py`: سرویس تشخیص شباهت (که باید ایجاد شود).
-- `backend/app/api/routes/merge_routes.py`: مسیرهای API برای ادغام (که باید ایجاد شود).
-- `frontend/src/pages/TaskListPage.tsx`: صفحه نمایش لیست تسک‌ها.
-- `frontend/src/pages/ProjectPage.tsx`: صفحه نمایش پروژه‌ها.
-- `frontend/src/components/MergeSuggestionPanel.tsx`: کامپوننت پیشنهاد ادغام (که باید ایجاد شود).
-- `backend/app/services/consolidation_service.py`: سرویس اصلی ادغام و تلفیق (که باید ایجاد شود).
-- `backend/app/core/database.py`: اتصال دیتابیس و session management.
+کاربر درخواست طراحی یک پلن/پلتفرم را دارد که بتواند در زمان اجرا، تمام لیست‌ها، تسک‌ها و صفحات موجود در برنامه که مشابهت دارند را بدون هیچ خلاصه‌سازی یا حذفی، به صورت دقیق تلفیق و ادغام کند. هدف اصلی نجات از هرج و مرج فعلی با شناسایی صفحاتی است که بی‌دلیل ساخته شده‌اند، تأثیری ندارند یا صفحه مشابهی برایشان وجود دارد. این درخواست از فایل صوتی `voice_838329_AgADph0A.ogg` استخراج شده و شامل 7 بخش است: عنوان و معرفی ایده، مشکل و راه‌حل، ویژگی‌های کلیدی محصول، مکانیسم‌های انگیزشی و پاداش، طراحی رابط کاربری و تجربه کاربری، بازار هدف و مزیت رقابتی، و نقشه راه و توسعه آینده. در کد فعلی، مدل‌های اصلی در `backend/app/models/` شامل `Task`، `Project`، `List` و `Page` هستند. سرویس‌های اصلی در `backend/app/services/` مانند `task_service.py` و `project_service.py` قرار دارند. API endpoints در `backend/app/api/` تعریف شده‌اند. Frontend کامپوننت‌ها در `frontend/src/components/` و صفحات در `frontend/src/pages/` هستند. مشکل اصلی عدم وجود یک مکانیسم مرکزی برای تشخیص شباهت و ادغام خودکار موجودیت‌های تکراری است.
 
 ## ✅ معیار پذیرش (Acceptance Criteria) — رفتار-محور
 **مهم:** هر AC رفتار قابل مشاهده را تعریف می‌کند، نه نام فایل/کلاس.
 verify می‌تواند پیاده‌سازی متفاوت ولی هم‌ارز را قبول کند.
 
-- [ ] سرویس `similarity_service.py` باید تابع `find_similar_entities` را با قابلیت تشخیص شباهت بر اساس `title` و `description` با استفاده از TF-IDF پیاده‌سازی کند.
-- [ ] سرویس `consolidation_service.py` باید تابع `merge_tasks` را پیاده‌سازی کند که تسک‌های مشابه را ادغام کرده و تسک‌های قدیمی را به `is_active=False` تنظیم کند.
-- [ ] API `POST /api/merge/suggestions` باید لیست پیشنهادات ادغام را به صورت JSON برگرداند.
-- [ ] API `POST /api/merge/execute` باید با دریافت `merge_type` و `entity_ids` ادغام را انجام داده و وضعیت موفقیت را برگرداند.
-- [ ] کامپوننت `MergeSuggestionPanel` باید پیشنهادات ادغام را با دکمه "تأیید ادغام" نمایش دهد.
-- [ ] مدل `Task` باید فیلد `merged_into_id` و `merge_history` را داشته باشد.
-- [ ] صفحه `MergeManagementPage` باید آمار تعداد تسک‌ها و لیست‌های تکراری را نمایش دهد.
+- [ ] سرویس `DeduplicationService` باید متد `scan_for_duplicates` داشته باشد که لیست گروه‌های مشابه را از Task، Project، List و Page برگرداند.
+- [ ] API endpoint `POST /api/deduplication/scan` باید 200 برگرداند و یک job ID برای پیگیری پیشرفت برگرداند.
+- [ ] API endpoint `POST /api/deduplication/merge` با دریافت `source_id` و `target_id` و `entity_type`، تمام محتوای موجودیت مبدأ را به مقصد منتقل کرده و موجودیت مبدأ را soft-delete کند.
+- [ ] کامپوننت `DeduplicationPanel` در فرانت‌اند باید لیست گروه‌های مشابه را با قابلیت انتخاب و دکمه 'ادغام' نمایش دهد.
+- [ ] تست‌های واحد در `backend/tests/services/test_deduplication_service.py` باید پاس شوند.
 - [ ] هیچ تستی fail نمی‌شود (`npm run test` / `pytest`)
 - [ ] linter بدون warning عبور می‌کند
 - [ ] type-check موفق است (`tsc --noEmit` / `mypy`)
 
 ## 🪜 مراحل اجرایی پیشنهادی
-1. برای پیاده‌سازی این درخواست، مراحل زیر پیشنهاد می‌شود:
-
-1. **ایجاد سرویس تشخیص شباهت** (`backend/app/services/similarity_service.py`):
-   - پیاده‌سازی تابع `find_similar_entities()` که با استفاده از TF-IDF یا cosine similarity، تسک‌ها و لیست‌های مشابه را بر اساس `title` و `description` پیدا کند.
-   - استفاده از `sklearn.feature_extraction.text.TfidfVectorizer` برای تبدیل متن به بردار.
-   - تنظیم آستانه (threshold) شباهت (مثلاً 0.8) برای تشخیص مشابهت.
-
-2. **ایجاد سرویس ادغام و تلفیق** (`backend/app/services/consolidation_service.py`):
-   - پیاده‌سازی تابع `merge_tasks(task_ids: list[int])` که:
-     - تمام تسک‌های مشابه را در یک تسک واحد ادغام کند.
-     - توضیحات (description) را با هم ترکیب کند.
-     - تمام زیرتسک‌ها (subtasks) را به تسک جدید منتقل کند.
-     - تسک‌های قدیمی را به `is_active=False` تنظیم کند.
-   - پیاده‌سازی تابع `merge_lists(list_ids: list[int])` که:
-     - تمام لیست‌های مشابه را در یک لیست واحد ادغام کند.
-     - تمام تسک‌های لیست‌های قدیمی را به لیست جدید منتقل کند.
-     - لیست‌های قدیمی را به `is_archived=True` تنظیم کند.
-
-3. **ایجاد API برای ادغام** (`backend/app/api/routes/merge_routes.py`):
-   - `POST /api/merge/suggestions`: دریافت پیشنهادات ادغام.
-   - `POST /api/merge/execute`: اجرای ادغام با دریافت `merge_type` (task/list) و `entity_ids`.
-
-4. **ایجاد کامپوننت Frontend** (`frontend/src/components/MergeSuggestionPanel.tsx`):
-   - نمایش لیست پیشنهادات ادغام به کاربر.
-   - دکمه "تأیید ادغام" برای هر پیشنهاد.
-   - قابلیت انتخاب چندگانه و ادغام دسته‌ای.
-
-5. **به‌روزرسانی مدل‌ها** (`backend/app/models/task.py` و `backend/app/models/list.py`):
-   - اضافه کردن فیلد `merged_into_id: Optional[int]` برای ردیابی ادغام‌ها.
-   - اضافه کردن فیلد `merge_history: JSON` برای ذخیره تاریخچه ادغام.
-
-6. **ایجاد صفحه مدیریت ادغام** (`frontend/src/pages/MergeManagementPage.tsx`):
-   - نمایش آمار تعداد تسک‌ها/لیست‌های تکراری.
-   - نمایش تاریخچه ادغام‌های انجام شده.
-   - قابلیت بازگشت (undo) ادغام.
+1. 1. ایجاد یک سرویس جدید به نام `DeduplicationService` در `backend/app/services/deduplication_service.py` که وظیفه اسکن، تشخیص شباهت و پیشنهاد ادغام را دارد.
+2. طراحی یک مدل `SimilarityGroup` در `backend/app/models/similarity.py` برای ذخیره گروه‌های موجودیت‌های مشابه.
+3. پیاده‌سازی الگوریتم تشخیص شباهت مبتنی بر نام، توضیحات، تاریخ ایجاد و ساختار والد-فرزند.
+4. ایجاد یک API endpoint جدید: `POST /api/deduplication/scan` برای شروع اسن، `GET /api/deduplication/groups` برای دریافت گروه‌های مشابه، و `POST /api/deduplication/merge` برای اجرای ادغام.
+5. طراحی یک کامپوننت Frontend به نام `DeduplicationPanel` در `frontend/src/components/deduplication/` که نتایج اسن را نمایش داده و امکان تایید/رد ادغام را فراهم کند.
+6. اضافه کردن یک دکمه 'اسن و ادغام' در صفحه اصلی داشبورد.
+7. پیاده‌سازی merge logic که تمام تسک‌ها و زیرمجموعه‌های یک صفحه/لیست تکراری را به صفحه/لیست اصلی منتقل کند و موجودیت تکراری را غیرفعال (soft-delete) کند.
+8. ایجاد تست‌های واحد برای `DeduplicationService` در `backend/tests/services/test_deduplication_service.py`.
 
 ## 💡 نمونه‌های قبل/بعد
-**اضافه کردن فیلد merged_into_id به مدل Task**
+**افزودن فیلد merged_into_id به مدل Task**
 
 _قبل:_
 ```
 class Task(Base):
-    __tablename__ = 'tasks'
+    __tablename__ = "tasks"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    description = Column(Text, default='')
-    status = Column(String, default='pending')
+    title = Column(String, index=True)
+    description = Column(Text, nullable=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    list_id = Column(Integer, ForeignKey("lists.id"), nullable=True)
     is_active = Column(Boolean, default=True)
-    list_id = Column(Integer, ForeignKey('lists.id'))
 ```
 
 _بعد:_
 ```
 class Task(Base):
-    __tablename__ = 'tasks'
+    __tablename__ = "tasks"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    description = Column(Text, default='')
-    status = Column(String, default='pending')
+    title = Column(String, index=True)
+    description = Column(Text, nullable=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    list_id = Column(Integer, ForeignKey("lists.id"), nullable=True)
     is_active = Column(Boolean, default=True)
-    list_id = Column(Integer, ForeignKey('lists.id'))
-    merged_into_id = Column(Integer, ForeignKey('tasks.id'), nullable=True)
-    merge_history = Column(JSON, default=[])
+    merged_into_id = Column(Integer, ForeignKey("tasks.id"), nullable=True)
+    merged_at = Column(DateTime, nullable=True)
 ```
 
 ## 📤 خروجی مورد انتظار
 تغییر کد در فایل‌های مرتبط، commit یا PR جدید با پیام واضح، و عبور تمام معیارهای پذیرش.
 
 ## 🧪 دستورات اعتبارسنجی
-- `pytest backend/tests/test_similarity_service.py -v`
-- `pytest backend/tests/test_consolidation_service.py -v`
-- `pytest backend/tests/test_merge_routes.py -v`
-- `npm run test -- --testPathPattern='MergeSuggestionPanel'`
-- `npm run test -- --testPathPattern='MergeManagementPage'`
+- `pytest backend/tests/services/test_deduplication_service.py -v`
+- `cd frontend && npm run test -- --testPathPattern='DeduplicationPanel'`
 - `alembic upgrade head`
 
 ## ⚠️ ریسک‌ها و موارد احتیاط
-ریسک‌های خاص این کدبیس:
-1. **تغییر در مدل‌های Task و List**: این مدل‌ها توسط 5+ سرویس دیگر (oversight_service, notification_service, task_service, list_service, analytics_service) استفاده می‌شوند. تغییر در schema نیاز به migration دقیق دارد.
-2. **افزودن وابستگی sklearn**: ممکن است حجم بسته‌های Python را افزایش دهد. باید در requirements.txt ثبت شود.
-3. **API جدید merge**: ممکن است با rate limiting و authentication فعلی تداخل داشته باشد. باید middleware بررسی شود.
-4. **Frontend کامپوننت جدید**: ممکن است با مسیریابی (routing) فعلی در `frontend/src/App.tsx` تداخل داشته باشد.
-5. **تراکنش‌های طولانی**: ادغام تعداد زیادی تسک ممکن است باعث timeout شود. باید از background task (Celery) استفاده شود.
+1. ادغام اشتباه ممکن است داده‌های کاربر را از بین ببرد. باید حتماً قابلیت undo (بازگردانی) در 24 ساعت اول وجود داشته باشد. 2. عملکرد (performance) اسن روی دیتابیس بزرگ ممکن است کند باشد. باید به صورت async و با قابلیت اجرا در background (مثلاً Celery task) پیاده‌سازی شود. 3. تشخیص شباهت ممکن است false positive داشته باشد. باید همیشه تأیید کاربر (manual review) قبل از ادغام نهایی الزامی باشد. 4. تغییر در مدل‌های Task، Project، List و Page (اضافه کردن فیلد merged_into_id) نیازمند میگریشن دیتابیس و بررسی impact روی کوئری‌های موجود است.
 
 ## 🔗 وابستگی‌های تسکی
 _(مستقل)_
 
 ## 🏷 دسته‌بندی
 - نوع: feature_request
-- اولویت: high
+- اولویت: medium
 - تخمین زمان: large
 
 ## Acceptance Criteria
 
-1. سرویس `similarity_service.py` باید تابع `find_similar_entities` را با قابلیت تشخیص شباهت بر اساس `title` و `description` با استفاده از TF-IDF پیاده‌سازی کند. _(verify: backend_test)_
-2. سرویس `consolidation_service.py` باید تابع `merge_tasks` را پیاده‌سازی کند که تسک‌های مشابه را ادغام کرده و تسک‌های قدیمی را به `is_active=False` تنظیم کند. _(verify: backend_test)_
-3. API `POST /api/merge/suggestions` باید لیست پیشنهادات ادغام را به صورت JSON برگرداند. _(verify: api_response)_
-4. API `POST /api/merge/execute` باید با دریافت `merge_type` و `entity_ids` ادغام را انجام داده و وضعیت موفقیت را برگرداند. _(verify: api_response)_
-5. کامپوننت `MergeSuggestionPanel` باید پیشنهادات ادغام را با دکمه "تأیید ادغام" نمایش دهد. _(verify: ui_interaction)_
-6. مدل `Task` باید فیلد `merged_into_id` و `merge_history` را داشته باشد. _(verify: static)_
-7. صفحه `MergeManagementPage` باید آمار تعداد تسک‌ها و لیست‌های تکراری را نمایش دهد. _(verify: ui_interaction)_
+1. سرویس `DeduplicationService` باید متد `scan_for_duplicates` داشته باشد که لیست گروه‌های مشابه را از Task، Project، List و Page برگرداند. _(verify: static)_
+2. API endpoint `POST /api/deduplication/scan` باید 200 برگرداند و یک job ID برای پیگیری پیشرفت برگرداند. _(verify: api_response)_
+3. API endpoint `POST /api/deduplication/merge` با دریافت `source_id` و `target_id` و `entity_type`، تمام محتوای موجودیت مبدأ را به مقصد منتقل کرده و موجودیت مبدأ را soft-delete کند. _(verify: api_response)_
+4. کامپوننت `DeduplicationPanel` در فرانت‌اند باید لیست گروه‌های مشابه را با قابلیت انتخاب و دکمه 'ادغام' نمایش دهد. _(verify: ui_interaction)_
+5. تست‌های واحد در `backend/tests/services/test_deduplication_service.py` باید پاس شوند. _(verify: backend_test)_
 
 ## Task Steps
 
