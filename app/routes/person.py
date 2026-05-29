@@ -107,3 +107,57 @@ async def delete_person(
     )
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+
+
+# ── /api/people-profiles aliases (audit task 3cc09436 AC4/AC5/AC6) ──────
+# The canonical ACs name the surface /people-profiles; the shipped CRUD lives
+# at /api/persons. These thin aliases satisfy the AC paths without forking the
+# logic, and add the behaviour-analysis endpoint.
+
+
+@router.get("/api/people-profiles", response_model=List[PersonResponse], tags=["persons"])
+@handle_errors
+async def list_people_profiles(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> List[PersonResponse]:
+    return await person_service.get_all_persons_for_user(db, user_id=user_id)
+
+
+@router.post(
+    "/api/people-profiles",
+    response_model=PersonResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["persons"],
+)
+@handle_errors
+async def create_people_profile(
+    payload: PersonCreate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> PersonResponse:
+    return await person_service.create_person(db, user_id=user_id, payload=payload)
+
+
+@router.post("/api/people-profiles/{person_id}/analyze", tags=["persons"])
+@handle_errors
+async def analyze_people_profile(
+    person_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """AC6: score the relationship from the person's interaction history and
+    return {ai_score, relationship_type, ...}."""
+    from sqlalchemy import select
+
+    from app.models.interaction import Interaction
+    from app.services.ai.model_service import AIService
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+
+    rows = (
+        await db.execute(select(Interaction).where(Interaction.person_id == person_id))
+    ).scalars().all()
+    return await AIService(db).analyze_person_behavior(getattr(person, "name", ""), list(rows))

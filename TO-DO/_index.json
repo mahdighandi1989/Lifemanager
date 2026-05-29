@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generated_at": "2026-05-29T00:30:00+00:00",
-  "total": 8,
+  "total": 7,
   "items": [
     {
       "task_id": "task_78c0e8e0a9b5",
@@ -58,14 +58,6 @@
       "execution_priority": 3300,
       "manual_actions": 4,
       "summary": "[backend/infra] scan endpoint (AC2) + WebSocket (AC3) + drive-mount (AC7) + Google Drive (AC8). frontend (AssetsPage + GET /api/assets + nav)، AC1/AC6 انجام شد."
-    },
-    {
-      "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
-      "title": "مدیریت پروفایل افراد و تحلیل رفتاری",
-      "todo_file": "TO-DO/todo-task-3cc09436.md",
-      "execution_priority": 3300,
-      "manual_actions": 3,
-      "summary": "[backend/decision] هم‌ترازی /api/people-profiles + analyze endpoint (AC4/5/6) + PersonTask M2M (AC2) + person-picker در فرم Task (AC8). frontend (PeopleProfiles + nav، AC7) و AC3 انجام شد."
     }
   ]
 }

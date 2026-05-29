@@ -9,6 +9,7 @@ from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
 from app.models.external_project import ExternalProject
 from app.models.drive_file import DriveFile
 from app.models.user_asset import UserAsset
+from app.models.person_task import person_tasks  # noqa: F401  (association table)
 from app.models.indexed_data_source_entry import IndexedDataSourceEntry
 from app.models.finance import Asset, FinancialAccount, Income
 from app.models.integration import Integration

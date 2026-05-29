@@ -74,15 +74,25 @@ def test_every_down_revision_exists():
 
 
 def test_head_is_latest_sync_migration():
-    """Audit task 3ea5622b — there is exactly one head and it is the latest
-    sync migration (0014_sync_remaining_model_tables), so a fresh
-    `alembic upgrade head` creates every model table. The head advanced from
-    0012 when 0013_drive_files and 0014_sync_remaining_model_tables were added
-    to close the migrations-vs-models drift."""
+    """Audit task 3ea5622b — there is exactly one head and it is the
+    highest-numbered migration, so a fresh `alembic upgrade head` reaches
+    every table/column. Asserted dynamically (by NNNN_ prefix) so adding new
+    migrations doesn't require editing this test, only keeping the chain
+    single-headed and linear."""
+    import re
+
     revs = _parse_revs()
     children: dict[str, list[str]] = {}
     for rev, down in revs.items():
         if down is not None:
             children.setdefault(down, []).append(rev)
     heads = [r for r in revs if r not in children]
-    assert heads == ["0014_sync_remaining_model_tables"], f"unexpected head(s): {heads}"
+    assert len(heads) == 1, f"expected a single head, found {heads}"
+
+    def _num(rev: str) -> int:
+        m = re.match(r"(\d+)", rev)
+        return int(m.group(1)) if m else -1
+
+    assert _num(heads[0]) == max(_num(r) for r in revs), (
+        f"head {heads[0]} is not the newest migration"
+    )

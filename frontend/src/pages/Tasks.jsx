@@ -82,6 +82,21 @@ function Tasks() {
   const [newTitle, setNewTitle] = useState('');
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState('all');
+  // Person picker (audit task 3cc09436, AC8): pick people to link to the task.
+  const [persons, setPersons] = useState([]);
+  const [selectedPersonIds, setSelectedPersonIds] = useState([]);
+
+  const fetchPersons = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/persons`);
+      if (res.ok) {
+        const data = await res.json();
+        setPersons(Array.isArray(data) ? data : []);
+      }
+    } catch {
+      // non-fatal — the task form still works without the picker
+    }
+  };
 
   const fetchTasks = async () => {
     try {
@@ -97,7 +112,7 @@ function Tasks() {
     }
   };
 
-  useEffect(() => { fetchTasks(); }, []);
+  useEffect(() => { fetchTasks(); fetchPersons(); }, []);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -113,6 +128,19 @@ function Tasks() {
         const task = await res.json();
         setTasks(prev => [task, ...prev]);
         setNewTitle('');
+        // Link any picked people to the new task (AC8).
+        if (selectedPersonIds.length && task?.id) {
+          try {
+            await fetch(`${API_BASE}/tasks/${task.id}/persons`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ person_ids: selectedPersonIds }),
+            });
+          } catch {
+            // association is best-effort; the task is already created
+          }
+          setSelectedPersonIds([]);
+        }
       }
     } catch (e) {
       setError('خطا در افزودن وظیفه');
@@ -156,21 +184,53 @@ function Tasks() {
         </div>
 
         {/* Add Task Form */}
-        <form onSubmit={handleAdd} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 flex gap-3">
-          <input
-            type="text"
-            value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
-            placeholder="وظیفه جدید را بنویسید..."
-            className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
-          />
-          <button
-            type="submit"
-            disabled={adding || !newTitle.trim()}
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {adding ? 'در حال افزودن...' : 'افزودن'}
-          </button>
+        <form onSubmit={handleAdd} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 flex flex-col gap-3">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              placeholder="وظیفه جدید را بنویسید..."
+              className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+            />
+            <button
+              type="submit"
+              disabled={adding || !newTitle.trim()}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {adding ? 'در حال افزودن...' : 'افزودن'}
+            </button>
+          </div>
+          {persons.length > 0 && (
+            <div data-testid="task-person-picker">
+              <label className="text-xs text-gray-500">افراد مرتبط (اختیاری):</label>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {persons.map((p) => {
+                  const checked = selectedPersonIds.includes(p.id);
+                  return (
+                    <button
+                      type="button"
+                      key={p.id}
+                      data-testid={`task-person-${p.id}`}
+                      aria-pressed={checked}
+                      onClick={() =>
+                        setSelectedPersonIds((prev) =>
+                          checked ? prev.filter((id) => id !== p.id) : [...prev, p.id],
+                        )
+                      }
+                      className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+                        checked
+                          ? 'bg-pink-600 text-white border-pink-600'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'
+                      }`}
+                    >
+                      {p.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </form>
 
         {/* Filter Tabs */}

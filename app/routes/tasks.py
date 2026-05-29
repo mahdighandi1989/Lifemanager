@@ -284,3 +284,48 @@ async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)) -> None:
     await db.delete(task)
     await db.commit()
     return None
+
+
+# --- Associate people with a task (audit task 3cc09436, AC8) ----------------
+
+from pydantic import BaseModel  # noqa: E402
+
+
+class _PersonLinkRequest(BaseModel):
+    person_ids: List[int] = []
+
+
+@router.post("/api/tasks/{task_id}/persons", tags=["tasks"])
+@handle_errors
+async def link_persons_to_task(
+    task_id: int,
+    payload: _PersonLinkRequest,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Link PersonProfiles to a task via the person_tasks M2M table — the
+    backend for the task form's person picker. Idempotent: already-linked
+    people are skipped."""
+    from app.models.person_task import person_tasks
+
+    task = await db.get(Task, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    linked: List[int] = []
+    for pid in payload.person_ids:
+        existing = (
+            await db.execute(
+                person_tasks.select().where(
+                    (person_tasks.c.task_id == task_id)
+                    & (person_tasks.c.person_id == pid)
+                )
+            )
+        ).first()
+        if existing is None:
+            await db.execute(
+                person_tasks.insert().values(task_id=task_id, person_id=pid)
+            )
+            linked.append(pid)
+    await db.commit()
+    return {"task_id": task_id, "linked_person_ids": linked}
