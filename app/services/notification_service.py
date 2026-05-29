@@ -505,10 +505,15 @@ async def notify_event(
 ) -> Optional[Notification]:
     """Fire a critical-event notification.
 
-    Used by auth_service.login() to record ``verify_failed`` and by the
-    /webhook route when an HMAC verification fails. Best-effort: a DB
-    failure here is logged but not raised, so a notification outage
-    never blocks the originating request.
+    Used today by auth_service.login() to record ``verify_failed`` on a
+    failed credential check. It is a general critical-event helper — any
+    call site that has a ``user_id`` and (optionally) a ``db`` session can
+    fire it. The /webhook route detects HMAC-signature failures but only
+    *logs* them: turning every forged inbound request into a persisted
+    notification would be a flood/DoS vector, so that wiring is deliberately
+    deferred until the per-event rate-limit (this task's Step 18) lands.
+    Best-effort: a DB failure here is logged but not raised, so a
+    notification outage never blocks the originating request.
 
     Per audit task 92fa5ea15e2b sub-task #2, critical events should be
     able to carry their own call-to-action — ``action_link`` (URL) and
