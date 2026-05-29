@@ -63,6 +63,28 @@ async def list_external_drives() -> dict:
     return {"drives": detect_external_drives()}
 
 
+class SyncRequest(BaseModel):
+    paths: List[str] = []
+
+
+@router.post("/api/assets/sync", tags=["assets"])
+@handle_errors
+async def sync_assets(
+    payload: SyncRequest,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Periodic dynamic sync (audit task 217909d2 AC3, Steps 6-7): reconcile the
+    user's data list against the current file set — add new paths, prune ones
+    that vanished. Drives the mobile/periodic "اگر اضافه شدن اضافه کن، اگه حذف
+    شدن پاک کن" loop; a scheduler / mobile client posts the current paths."""
+    from app.services.data_ingestion_service import DataIngestionService
+
+    svc = DataIngestionService(db)
+    scanned = await svc.scan_external_source(payload.paths)
+    return await svc.sync_source(user_id=user_id, scanned=scanned)
+
+
 @router.post("/api/assets/scan", tags=["assets"])
 @handle_errors
 async def scan_assets(

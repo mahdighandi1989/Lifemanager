@@ -291,7 +291,8 @@ assets with needs ("می‌خوام فیلمی ببینم" → "you have Incepti
 | POST | `/api/assets/scan` | Walk a server-side directory, classify by extension, persist `UserAsset` rows (deduped by path). Metadata only — no download (AC1, AC8). |
 | WS | `/api/assets/scan-status` | Stream per-file scan progress. |
 | GET | `/api/assets/external-drives` | Detect connected external/removable drives to scan (AC6); graceful `[]` without a detection backend. |
-| GET / POST | `/api/local-files` | List / create local-file entries (summary + keywords extracted, no content stored). |
+| POST | `/api/assets/sync` | Periodic dynamic sync (AC3): reconcile a path set — add new, prune vanished (the mobile add/remove loop). |
+| GET / POST | `/api/local-files` | List (`?q=` free-text search over path/summary/keywords/extracted_text — AC7) / create local-file entries (no content stored). |
 | GET | `/api/drive/files`, POST connect | Google Drive file metadata once an account is linked (AC5). |
 | POST | `/api/ai/correlate_needs` | Match a free-text need against the caller's tasks/todos/files (AC4, AC7). |
 

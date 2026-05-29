@@ -34,3 +34,12 @@ pytest==8.3.4
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0
 aiosqlite==0.20.0
+
+# File processing / Drive integration (audit tasks 217909d2 / 7367c6f0).
+# psutil powers external-drive detection (asset_scan_service falls back to a
+# mount-dir walk without it); the google-api libs power real Drive listing/
+# upload (the services degrade to injectable stubs offline). Pinned but the
+# code lazy-imports them so a stripped image still boots.
+psutil==6.1.0
+google-api-python-client==2.155.0
+google-auth-oauthlib==1.2.1

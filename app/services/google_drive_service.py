@@ -116,6 +116,24 @@ async def upload_file(
     }
 
 
+async def list_files(
+    *,
+    refresh_token: Optional[str],
+    folder_id: Optional[str] = None,
+    client=None,
+) -> list[dict]:
+    """List the user's Drive file metadata (audit task 217909d2 AC5 — read the
+    user's Drive, not just files this app uploaded). Returns
+    ``[{id, name, mime_type}]`` — metadata only, never file bytes (AC8).
+    Requires credentials + a client (stub in tests / real google-api client)."""
+    _require_credentials(refresh_token)
+    if client is None:
+        raise NotImplementedError(
+            "wire google-api-python-client before calling without a stub client"
+        )
+    return await client.list_files(folder_id=folder_id)
+
+
 async def download_file(
     *,
     refresh_token: Optional[str],
