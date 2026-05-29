@@ -13,10 +13,11 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.models.project import Project
 from app.schemas.project_schema import ProjectCreate, ProjectUpdate
@@ -28,6 +29,17 @@ router = APIRouter()
 
 def _sanitize(value: str | None) -> str | None:
     return None if value is None else html.escape(value, quote=True)
+
+
+def _owned_or_unowned(user_id: int):
+    """Scope filter: rows owned by the caller OR legacy unowned (NULL) rows.
+
+    Mirrors app/services/list_service.list_lists — closes the cross-tenant
+    read leak audit task 78c0e8e0 flagged (list_projects previously returned
+    EVERY user's projects) while staying compatible with the login-bypass
+    anon scope (user 0) and pre-scoping rows that predate the user_id column.
+    """
+    return or_(Project.user_id == user_id, Project.user_id.is_(None))
 
 
 def _serialize(p: Project) -> dict:
@@ -51,8 +63,16 @@ def _serialize(p: Project) -> dict:
 @router.get("/api/projects", tags=["projects"])
 @router.get("/api/projects/", tags=["projects"])
 @handle_errors
-async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
-    result = await db.execute(select(Project))
+async def list_projects(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    """List the caller's projects (scoped, audit task 78c0e8e0).
+
+    Previously returned EVERY user's projects. Now scoped to the caller via
+    ``get_optional_user_id`` (anon → user 0 under login-bypass), including
+    legacy unowned rows so nothing pre-scoping disappears."""
+    result = await db.execute(select(Project).where(_owned_or_unowned(user_id)))
     return [_serialize(p) for p in result.scalars().all()]
 
 
@@ -60,18 +80,18 @@ async def list_projects(db: AsyncSession = Depends(get_db)) -> List[dict]:
 
 @router.get("/api/projects/{project_id}", tags=["projects"])
 @handle_errors
-async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> dict:
-    """Return one project by id.
+async def get_project(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Return one project by id, scoped to the caller (audit task 78c0e8e0).
 
-    Audit-clarification: no frontend caller today (the React
-    ProjectContext only fetches the list + handles create / update /
-    delete), but the endpoint is covered by
-    tests/test_projects.py::test_get_project_by_id and rounds out the
-    project CRUD set. Kept so the API stays symmetric — a project
-    detail page is a likely near-term addition.
+    A project owned by another user 404s rather than leaking across tenants;
+    legacy unowned rows remain visible under login-bypass.
     """
     project = await db.get(Project, project_id)
-    if project is None:
+    if project is None or (project.user_id is not None and project.user_id != user_id):
         raise HTTPException(status_code=404, detail="Project not found")
     return _serialize(project)
 
@@ -84,12 +104,17 @@ async def get_project(project_id: int, db: AsyncSession = Depends(get_db)) -> di
 async def create_project(
     payload: ProjectCreate,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
-    """POST /api/projects with a valid body returns 201 + the new row."""
+    """POST /api/projects with a valid body returns 201 + the new row.
+
+    The owner is taken from the auth context (not trusted from the body) so a
+    client can't plant a row under someone else's id; anon resolves to user 0.
+    """
     project = Project(
         name=_sanitize(payload.name),
         description=_sanitize(payload.description),
-        user_id=payload.user_id,
+        user_id=payload.user_id if payload.user_id is not None else user_id,
     )
     if hasattr(project, "status"):
         project.status = payload.status
@@ -107,9 +132,10 @@ async def update_project(
     project_id: int,
     payload: ProjectUpdate,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     project = await db.get(Project, project_id)
-    if project is None:
+    if project is None or (project.user_id is not None and project.user_id != user_id):
         raise HTTPException(status_code=404, detail="Project not found")
     data = payload.model_dump(exclude_unset=True)
     if "name" in data:
@@ -131,9 +157,13 @@ async def update_project(
     tags=["projects"],
 )
 @handle_errors
-async def delete_project(project_id: int, db: AsyncSession = Depends(get_db)) -> None:
+async def delete_project(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> None:
     project = await db.get(Project, project_id)
-    if project is None:
+    if project is None or (project.user_id is not None and project.user_id != user_id):
         raise HTTPException(status_code=404, detail="Project not found")
     await db.delete(project)
     await db.commit()

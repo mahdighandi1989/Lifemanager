@@ -55,7 +55,8 @@ async def list_todo_items(
     while the route gains a real auth gate the moment a token shows up.
     """
     items = await todo_item_service.list_items(
-        db, list_id=list_id, starred_only=starred_only, completed=completed
+        db, list_id=list_id, starred_only=starred_only, completed=completed,
+        user_id=user_id,
     )
     return [_serialize(it) for it in items]
 

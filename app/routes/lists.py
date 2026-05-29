@@ -56,7 +56,9 @@ async def list_lists(
     AuthService.verify_token), which closes the authz gap audit task
     78c0e8e0 flagged for this endpoint.
     """
-    lists = await list_service.list_lists(db, include_archived=include_archived)
+    lists = await list_service.list_lists(
+        db, include_archived=include_archived, user_id=user_id
+    )
     out: List[dict] = []
     for lst in lists:
         count = await list_service.count_items(db, lst.id)

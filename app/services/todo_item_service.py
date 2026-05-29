@@ -11,7 +11,7 @@ import html
 from datetime import datetime, timezone
 from typing import Iterable, List, Optional, Sequence
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import NoResultFound
@@ -35,6 +35,7 @@ async def list_items(
     list_id: Optional[int] = None,
     starred_only: bool = False,
     completed: Optional[bool] = None,
+    user_id: Optional[int] = None,
 ) -> Sequence[TodoItem]:
     stmt = select(TodoItem)
     if list_id is not None:
@@ -58,6 +59,20 @@ async def list_items(
         stmt = stmt.where(TodoItem.is_starred.is_(True))
     if completed is not None:
         stmt = stmt.where(TodoItem.is_completed.is_(completed))
+    if user_id is not None:
+        # Scope to items on lists the caller owns (or legacy unowned lists),
+        # closing the cross-tenant read leak audit task 78c0e8e0 flagged.
+        # Items not linked to any list (orphans) stay visible so a standalone
+        # item isn't hidden. Mirrors list_service's owned-or-unowned rule.
+        owned_items = (
+            select(todo_list_items.c.todo_item_id)
+            .join(TodoList, TodoList.id == todo_list_items.c.todo_list_id)
+            .where(or_(TodoList.user_id == user_id, TodoList.user_id.is_(None)))
+        )
+        linked_items = select(todo_list_items.c.todo_item_id)
+        stmt = stmt.where(
+            or_(TodoItem.id.in_(owned_items), TodoItem.id.notin_(linked_items))
+        )
     result = await db.execute(stmt)
     return result.scalars().unique().all()
 
