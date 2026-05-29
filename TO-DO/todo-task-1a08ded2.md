@@ -18,3 +18,6 @@ provider و model، endpointهای `/api/ai/providers`،`/api/ai/configs`،`/glo
 2. **[MEDIUM] تأیید رمزنگاری کلیدهای API در حالت ذخیره (AC5).** اگر deployment شما
    کلید provider/custom را در DB ذخیره می‌کند، تأیید کنید که با `crypt_service`
    رمزنگاری می‌شود (و در صورت لزوم این مسیر در سرویس فعال شود).
+
+---
+**به‌روزرسانی (AC5 — رمزنگاری):** انجام شد. `external_project.api_key` اکنون با Fernet (کلید مشتق از `SECRET_KEY`) قبل از ذخیره رمزنگاری و هنگام sync رمزگشایی می‌شود (`_encrypt_api_key`/`decrypt_api_key`). کلیدهای AI به‌صورت `api_key_env_var` (ارجاع، نه raw) ذخیره می‌شوند. تنها مورد باقی‌مانده تصمیم admin-only vs user-scoped (AC8/10) است که به رول‌اوت auth واقعی فرانت‌اند گره خورده.

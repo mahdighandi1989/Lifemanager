@@ -11,15 +11,34 @@ from app.schemas.external_project_schema import ExternalProjectCreate
 
 
 def _encrypt_api_key(plaintext: Optional[str]) -> Optional[str]:
-    """AC 10 — opaque hook for the future crypt_service. For now we
-    prefix the stored value with a marker so the encryption upgrade
-    path is testable without immediately breaking unencrypted rows
-    written before the helper landed."""
+    """Encrypt an external-project API token before it is persisted
+    (audit task d2146781 AC10 / task 1a08ded2 AC5). Uses Fernet symmetric
+    encryption via crypt_service so the raw token never sits in the DB in
+    plaintext."""
     if plaintext is None:
         return None
-    # Placeholder marker — when crypt_service.encrypt lands, replace
-    # this with the real ciphertext-wrap call.
-    return f"enc::{plaintext}"
+    from app.config import settings
+    from app.services.crypt_service import encrypt_data
+
+    # Key the Fernet cipher off the app SECRET_KEY so encrypt/decrypt are
+    # deterministic across calls (the no-secret path derives a random key
+    # each time, which can't round-trip).
+    return encrypt_data(plaintext, secret=settings.SECRET_KEY)
+
+
+def decrypt_api_key(stored: Optional[str]) -> Optional[str]:
+    """Inverse of :func:`_encrypt_api_key`. Falls back to returning the value
+    unchanged if it isn't valid ciphertext (e.g. a legacy unencrypted row),
+    so retrieval never hard-fails on historical data."""
+    if stored is None:
+        return None
+    from app.config import settings
+    from app.services.crypt_service import decrypt_data
+
+    try:
+        return decrypt_data(stored, secret=settings.SECRET_KEY)
+    except Exception:
+        return stored
 
 
 async def create_external_project(
@@ -72,7 +91,7 @@ class ExternalProjectService:
         if fetcher is None:
             fetcher = self._default_fetch
         try:
-            data = await fetcher(base_url, getattr(project, "api_key", None))
+            data = await fetcher(base_url, decrypt_api_key(getattr(project, "api_key", None)))
         except Exception as exc:  # noqa: BLE001 — sync must not crash the loop
             return {"ok": False, "error": str(exc), "project_id": getattr(project, "id", None)}
         synced = len(data) if hasattr(data, "__len__") else 1
