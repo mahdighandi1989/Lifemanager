@@ -16,8 +16,8 @@ How they interact in the auth pipeline: both are issued the same JWT, so
 with ``getattr`` rather than assuming one concrete shape (a local ``User`` has
 no ``status``; an ``OAuthUser`` has no ``hashed_password``).
 """
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy.orm import validates
+from sqlalchemy import JSON, Boolean, Column, DateTime, Integer, String, Text
+from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 
 from app.database import Base
@@ -42,8 +42,28 @@ class User(Base):
     # land an XSS payload in the column.
     bio = Column(Text, nullable=True)
     display_name = Column(String(120), nullable=True)
+    # Analyzed-profile cache (audit task 14e65214, Step 3). The structured
+    # rows live in user_interests / user_tastes / personality_assessments;
+    # these JSON columns hold the denormalised summary the recommendation +
+    # career-path engines read without re-joining ("علائق من ... شخصیت منو
+    # ... روحیات منو تحلیل کنن"). SQLite stores JSON as TEXT transparently.
+    interests = Column(JSON, nullable=True)
+    personality_traits = Column(JSON, nullable=True)
+    mood_patterns = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Structured profile rows (audit task 14e65214). Named *_records so they
+    # don't collide with the JSON ``interests`` summary column above.
+    interest_records = relationship(
+        "UserInterest", back_populates="user", cascade="all, delete-orphan"
+    )
+    taste_records = relationship(
+        "UserTaste", back_populates="user", cascade="all, delete-orphan"
+    )
+    personality_assessments = relationship(
+        "PersonalityAssessment", back_populates="user", cascade="all, delete-orphan"
+    )
 
     @validates("bio", "display_name")
     def _scrub_html(self, key, value):

@@ -18,6 +18,7 @@ from app.database import Base, engine
 from app.rate_limit import limiter
 from app.routes import (
     ai,
+    ai_profile,
     ai_stream,
     assets,
     auth,
@@ -28,6 +29,7 @@ from app.routes import (
     external_projects,
     finance,
     integrations,
+    interests,
     lists,
     local_files,
     location,
@@ -285,6 +287,52 @@ async def startup_event():
                 )
         except Exception as exc:
             logger.debug("skip users.%s migration: %s", col_name, exc)
+
+    # Profiling columns (audit task 14e65214). create_all() won't ALTER
+    # existing tables, so each new column on users / user_contexts /
+    # contextual_recommendations / ai_assessments gets an idempotent
+    # ADD COLUMN IF NOT EXISTS for the Render-free-tier startup path. Mirrors
+    # migration 0022 (which the alembic-driven deploy runs instead).
+    _profiling_columns = [
+        ("users", "interests", "JSON"),
+        ("users", "personality_traits", "JSON"),
+        ("users", "mood_patterns", "JSON"),
+        ("user_contexts", "personality_traits", "JSON"),
+        ("user_contexts", "mood_history", "JSON"),
+        ("user_contexts", "career_interests", "JSON"),
+        ("user_contexts", "general_interests", "JSON"),
+        ("contextual_recommendations", "type", "VARCHAR(64)"),
+        ("contextual_recommendations", "source_context", "JSON"),
+        ("ai_assessments", "user_id", "INTEGER"),
+        ("ai_assessments", "assessment_type", "VARCHAR(64)"),
+        ("ai_assessments", "openness", "DOUBLE PRECISION"),
+        ("ai_assessments", "conscientiousness", "DOUBLE PRECISION"),
+        ("ai_assessments", "extraversion", "DOUBLE PRECISION"),
+        ("ai_assessments", "agreeableness", "DOUBLE PRECISION"),
+        ("ai_assessments", "neuroticism", "DOUBLE PRECISION"),
+        ("ai_assessments", "sentiment_score", "DOUBLE PRECISION"),
+        ("ai_assessments", "dominant_emotion", "VARCHAR(64)"),
+        ("ai_assessments", "mood_timestamp", "TIMESTAMP WITH TIME ZONE"),
+    ]
+    for table, col_name, col_type in _profiling_columns:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip %s.%s migration: %s", table, col_name, exc)
+
+    # ai_assessments.person_id used to be NOT NULL (it was person-scoped only).
+    # A user-level holistic_profile row has no person, so relax it. Idempotent;
+    # swallowed on dialects that don't support ALTER COLUMN.
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("ALTER TABLE ai_assessments ALTER COLUMN person_id DROP NOT NULL")
+            )
+    except Exception as exc:
+        logger.debug("skip ai_assessments.person_id NOT NULL relaxation: %s", exc)
 
     # tasks planning fields — estimated_duration / deadline / recurrence —
     # were added by migration 0003. ADD COLUMN IF NOT EXISTS keeps the
@@ -626,6 +674,13 @@ app.include_router(ai.router, tags=["ai"])
 # — the router's own prefix is /ai, mirroring the notifications/users dual
 # mount pattern above (audit task 1a08ded2).
 app.include_router(ai.router, prefix="/api", tags=["ai"])
+# Profiling routes (interests/sentiment/personality/holistic/career — audit
+# task 14e65214). Same /ai prefix on the router, dual-mounted like ai.router so
+# both /ai/... and the SPA's /api/ai/... resolve.
+app.include_router(ai_profile.router, tags=["ai"])
+app.include_router(ai_profile.router, prefix="/api", tags=["ai"])
+# Interest CRUD — router carries its own /api/interests prefix.
+app.include_router(interests.router, tags=["interests"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 # Sibling router for absolute-path users endpoints (/api/users/...).
 app.include_router(users.api_router, tags=["users"])

@@ -205,3 +205,113 @@ class AIGenerateResponse(BaseModel):
 # Resolve the forward reference now that UserActivityContext is defined
 # below AIGenerateRequest's class body.
 AIGenerateRequest.model_rebuild()
+
+
+# ── Profiling: interests / sentiment / personality / career (task 14e65214) ──
+
+
+class IdentifyInterestsResponse(BaseModel):
+    """202 payload for POST /ai/identify_interests (Step 2)."""
+
+    message: str
+    identified: int = 0
+    verified: int = 0
+
+
+class PersonalizedRecommendation(BaseModel):
+    """One personalized suggestion (Step 3 AC16) — id/content/type/score."""
+
+    id: int
+    content: str
+    type: str
+    score: float = 0.0
+    reason: Optional[str] = None
+
+
+class SentimentAnalysisRequestSchema(BaseModel):
+    """Input for POST /ai/sentiment/analyze (Step 5). Any one signal suffices."""
+
+    text: Optional[str] = Field(default=None, max_length=10_000)
+    audio_url: Optional[str] = Field(default=None, max_length=1000)
+    behavior_type: Optional[str] = Field(default=None, max_length=64)
+    user_id: Optional[int] = None
+
+
+class UserSentimentProfileSchema(BaseModel):
+    """Latest mood/sentiment snapshot (Step 5)."""
+
+    user_id: Optional[int] = None
+    sentiment_score: Optional[float] = None  # -1.0 .. 1.0
+    dominant_emotion: Optional[str] = None
+    mood_timestamp: Optional[datetime] = None
+    summary: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class PersonalityAnalyzeRequest(BaseModel):
+    """Optional knobs for POST /ai/personality/analyze (Step 6)."""
+
+    text: Optional[str] = Field(default=None, max_length=10_000)
+    user_id: Optional[int] = None
+
+
+class PersonalityProfileResponse(BaseModel):
+    """Big-Five profile returned by GET /ai/personality/profile (Step 6)."""
+
+    user_id: Optional[int] = None
+    openness: Optional[float] = None
+    conscientiousness: Optional[float] = None
+    extraversion: Optional[float] = None
+    agreeableness: Optional[float] = None
+    neuroticism: Optional[float] = None
+    summary: Optional[str] = None
+    traits: list[dict] = Field(default_factory=list)
+
+    class Config:
+        from_attributes = True
+
+
+class HolisticAssessmentCreate(BaseModel):
+    """Write payload for POST /ai/assessments/holistic_profile (Step 7)."""
+
+    user_id: int
+    assessment_type: str = "holistic_profile"
+    openness: Optional[float] = None
+    conscientiousness: Optional[float] = None
+    extraversion: Optional[float] = None
+    agreeableness: Optional[float] = None
+    neuroticism: Optional[float] = None
+    sentiment_score: Optional[float] = None
+    dominant_emotion: Optional[str] = None
+    mood_timestamp: Optional[datetime] = None
+
+
+class HolisticAssessmentResponse(HolisticAssessmentCreate):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class CareerPathRequest(BaseModel):
+    """Input for POST /ai/career_paths (Step 8). All optional — the engine
+    leans on the stored profile when the caller passes nothing."""
+
+    focus: Optional[str] = Field(default=None, max_length=120)
+    horizon_years: Optional[int] = Field(default=5, ge=1, le=40)
+    user_id: Optional[int] = None
+
+
+class CareerPath(BaseModel):
+    title: str
+    rationale: str
+    fit_score: float = 0.0  # 0.0 – 1.0, how well it matches the profile
+    first_steps: list[str] = Field(default_factory=list)
+    success_potential: Optional[str] = None
+
+
+class CareerPathResponse(BaseModel):
+    paths: list[CareerPath] = Field(default_factory=list)
+    based_on: dict = Field(default_factory=dict)  # profile signals used

@@ -1016,6 +1016,14 @@
       {
         "name": "Recommendations",
         "file": "frontend/src/pages/Recommendations.jsx"
+      },
+      {
+        "name": "PersonalityProfilePage",
+        "file": "frontend/src/pages/PersonalityProfilePage.jsx"
+      },
+      {
+        "name": "CareerPlanningPage",
+        "file": "frontend/src/pages/CareerPlanningPage.jsx"
       }
     ],
     "components": [
@@ -1050,6 +1058,10 @@
       {
         "name": "RecommendationPanel",
         "file": "frontend/src/components/RecommendationPanel.jsx"
+      },
+      {
+        "name": "CareerPathPanel",
+        "file": "frontend/src/components/CareerPathPanel.jsx"
       },
       {
         "name": "DeduplicationPanel",

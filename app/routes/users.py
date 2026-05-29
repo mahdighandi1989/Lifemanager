@@ -108,6 +108,30 @@ async def update_user_profile(payload: UserProfileUpdate) -> dict:
     }
 
 
+@api_router.get("/api/users/{user_id}/interests", tags=["users", "interests"])
+@handle_errors
+async def get_user_identified_interests(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Return the interests + tastes identified for ``user_id`` (audit task
+    14e65214, Step 2 AC10). Public read in the login-bypass single-tenant
+    design — the same scope every other read uses."""
+    from app.schemas.user_interest_schema import (
+        UserInterestSchema,
+        UserTasteSchema,
+    )
+    from app.services.user_interest_service import UserInterestService
+
+    service = UserInterestService(db)
+    interests = await service.get_interests_by_user(user_id)
+    tastes = await service.get_tastes_by_user(user_id)
+    return {
+        "interests": [UserInterestSchema.model_validate(i).model_dump() for i in interests],
+        "tastes": [UserTasteSchema.model_validate(t).model_dump() for t in tastes],
+    }
+
+
 @router.get("/", response_model=List[UserOut])
 @handle_errors
 async def list_users(

@@ -77,6 +77,25 @@ async def save_context_location(
     return {"status": "ok", "current_location": ctx.current_location}
 
 
+@router.get("/api/context/recommendations", tags=["context"])
+@handle_errors
+async def list_context_recommendations(
+    type: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> list:
+    """Diverse, profile-aware recommendations (audit task 14e65214, Step 4).
+
+    Combines the personalized interest/taste/career suggestions, each carrying
+    a ``type`` field, and supports filtering with ``?type=career`` (AC22-23)."""
+    from app.services.ai.recommendation_service import RecommendationService
+
+    recs = await RecommendationService(db).generate_personalized_recommendations(user_id)
+    if type:
+        recs = [r for r in recs if r.get("type") == type]
+    return recs
+
+
 @router.get("/api/recommendations", tags=["context"])
 @handle_errors
 async def list_recommendations(

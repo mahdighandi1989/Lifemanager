@@ -15,6 +15,8 @@ import ExternalProjects from './pages/ExternalProjects';
 import PeopleProfiles from './pages/PeopleProfiles';
 import SmartAssistant from './pages/SmartAssistant';
 import Recommendations from './pages/Recommendations';
+import PersonalityProfilePage from './pages/PersonalityProfilePage';
+import CareerPlanningPage from './pages/CareerPlanningPage';
 import AssetsPage from './pages/AssetsPage';
 import MergeManagement from './pages/MergeManagement';
 import ListDetail from './pages/ListDetail';
@@ -209,6 +211,26 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Recommendations />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/personality"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PersonalityProfilePage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/career-planning"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <CareerPlanningPage />
                     </Layout>
                   </ProtectedRoute>
                 }

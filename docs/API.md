@@ -207,9 +207,47 @@ Backing pieces: `AIService.get_task_context` (total/completed/pending/overdue),
 `task_analysis.analyze_user_tasks` (group work patterns),
 `notification_service.send_ai_feedback` (persist feedback as a notification).
 
+### Interest / personality / career profiling (audit task 14e65214)
+
+Identify the user's interests + tastes, analyze mood + personality, and draw
+personalized, **non-clichéd** career/life paths. Every score is derived from the
+user's real data (their words, task-completion rate, interactions, mood), so the
+output is grounded rather than templated. All routes are scoped by
+`get_optional_user_id` (login-bypass single-tenant design).
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/interests` | Create an interest (201). Body `{interest_type?, value, category?, source?, confidence_score?}`. |
+| GET | `/api/interests` | List the caller's interests. |
+| DELETE | `/api/interests/{id}` | Delete an interest (204; 404 if missing / not owned). |
+| GET | `/api/users/{user_id}/interests` | `{interests, tastes}` identified for the user. |
+| POST | `/api/ai/identify_interests` | Scan the user's data → persist interests/tastes; 202 with `{identified, verified}`. A theme is `is_verified` only when it recurs (≥ 2×). |
+| GET | `/api/ai/personalized_recommendations` | Ranked `[{id, content, type, score}]` from interests + personality + mood. |
+| GET | `/api/context/recommendations` | Same, with `?type=career` filtering; each item carries `type`. |
+| POST | `/api/ai/sentiment/analyze` | Body `{text? \| audio_url? \| behavior_type?}` → `UserSentimentProfile`; appends to `UserContext.mood_history`. |
+| GET | `/api/ai/sentiment/profile` | Latest mood/sentiment snapshot. |
+| POST | `/api/ai/personality/analyze` | Big-Five analysis from real behaviour (202) → `PersonalityProfile`. |
+| GET | `/api/ai/personality/profile` | Latest Big-Five profile. |
+| POST | `/api/ai/assessments/holistic_profile` | Upsert the combined personality+mood row (201). |
+| GET | `/api/ai/assessments/holistic_profile/{user_id}` | Read the holistic profile (404 if absent). |
+| POST | `/api/ai/career_paths` | Personalized paths → `CareerPathResponse`. Gated on `FEATURE_AI_ENABLED` (403 when off); deterministic + key-less so it degrades gracefully. |
+
+Models: `UserInterest`, `UserTaste`, `PersonalityTrait`, `PersonalityAssessment`;
+`User` gains `interests` / `personality_traits` / `mood_patterns` (JSON);
+`UserContext` gains `personality_traits` / `mood_history` / `career_interests` /
+`general_interests`; `ContextualRecommendation` gains `type` / `source_context`;
+`AIAssessment` gains the Big-Five + `sentiment_score` / `dominant_emotion` /
+`mood_timestamp` (and `person_id` relaxed to nullable for user-level rows).
+Services: `interest_identification_service`, `sentiment_personality_service`,
+`personality_service`, `holistic_profile_service`, `career_path_service`, and
+`RecommendationService` (personalized + holistic-aware). UI:
+`PersonalityProfilePage` (`/personality`), `CareerPlanningPage`
+(`/career-planning`) + `CareerPathPanel`, and personalized items in
+`RecommendationPanel` (`data-testid='personalized-recommendation-item'`).
+
 ### Migrations & startup (audit task 3ea5622b)
 
-The Alembic chain (`migrations/versions/`, head `0021_ai_config_context_fields`)
+The Alembic chain (`migrations/versions/`, head `0022_profile_interest_personality`)
 is kept in sync with `Base.metadata` — `tests/test_migration.py` /
 `test_migrations.py` assert every model table is created by `alembic upgrade head`.
 

@@ -67,6 +67,28 @@ async def get_user_financial_accounts(
     return list(result.scalars().all())
 
 
+async def get_user_interests(db: AsyncSession, *, user_id: int) -> List["UserInterest"]:
+    """Retrieve the user's identified interests (audit task 14e65214 AC5) so
+    the recommendation + career-path engines can ground their output in what
+    we actually know the user cares about. Read-only, user-scoped."""
+    from app.models.user_interest import UserInterest
+
+    result = await db.execute(
+        select(UserInterest).where(UserInterest.user_id == user_id)
+    )
+    return list(result.scalars().all())
+
+
+async def get_user_tastes(db: AsyncSession, *, user_id: int) -> List["UserTaste"]:
+    """Companion to get_user_interests — the softer style/preference rows."""
+    from app.models.user_taste import UserTaste
+
+    result = await db.execute(
+        select(UserTaste).where(UserTaste.user_id == user_id)
+    )
+    return list(result.scalars().all())
+
+
 async def get_user_data_context(db: AsyncSession, *, user_id: int) -> dict:
     """Return a single dict carrying every per-user signal the AI
     pipeline cares about. The shape is intentionally flat so the

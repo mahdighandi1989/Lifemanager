@@ -34,6 +34,9 @@ from app.models.task import Task
 from app.models.todo_item import TodoItem
 from app.models.todo_list import TodoList, todo_list_items
 from app.models.user import User
+from app.models.user_interest import UserInterest
+from app.models.user_taste import UserTaste
+from app.models.personality import PersonalityAssessment, PersonalityTrait
 from app.models.user_oauth import OAuthUser
 from app.models.webhook_event import WebhookEvent
 
@@ -70,6 +73,10 @@ __all__ = [
     "TodoItem",
     "TodoList",
     "User",
+    "UserInterest",
+    "UserTaste",
+    "PersonalityAssessment",
+    "PersonalityTrait",
     "UserProfileAnalytics",
     "WebhookEvent",
     "todo_list_items",
