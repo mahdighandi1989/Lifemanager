@@ -38,13 +38,29 @@ class ScanRequest(BaseModel):
 @router.get("/api/assets", response_model=List[UserAssetResponse], tags=["assets"])
 @handle_errors
 async def list_assets(
+    asset_type: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> List[UserAsset]:
-    result = await db.execute(
-        select(UserAsset).where(UserAsset.user_id == user_id)
-    )
+    """List the user's assets. ``?asset_type=movie`` filters to one kind so the
+    caller can pull "all movies from /Movies" after a scan (audit task 217909d2
+    AC2)."""
+    stmt = select(UserAsset).where(UserAsset.user_id == user_id)
+    if asset_type:
+        stmt = stmt.where(UserAsset.asset_type == asset_type)
+    result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+@router.get("/api/assets/external-drives", tags=["assets"])
+@handle_errors
+async def list_external_drives() -> dict:
+    """Detect currently-connected external/removable drives (audit task
+    217909d2 AC6). The caller can then POST /api/assets/scan each mountpoint.
+    Degrades gracefully (empty list) when no detection backend is available."""
+    from app.services.asset_scan_service import detect_external_drives
+
+    return {"drives": detect_external_drives()}
 
 
 @router.post("/api/assets/scan", tags=["assets"])

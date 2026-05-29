@@ -245,6 +245,28 @@ Services: `interest_identification_service`, `sentiment_personality_service`,
 (`/career-planning`) + `CareerPathPanel`, and personalized items in
 `RecommendationPanel` (`data-testid='personalized-recommendation-item'`).
 
+### File processing & content analysis (audit task 217909d2)
+
+Scan the user's files across sources, store **text metadata only** (never the
+files themselves), keep the index in sync as files come and go, and correlate
+assets with needs ("می‌خوام فیلمی ببینم" → "you have Inception.mp4").
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/assets` | List the user's scanned assets; `?asset_type=movie` filters to one kind (AC2). |
+| POST | `/api/assets/scan` | Walk a server-side directory, classify by extension, persist `UserAsset` rows (deduped by path). Metadata only — no download (AC1, AC8). |
+| WS | `/api/assets/scan-status` | Stream per-file scan progress. |
+| GET | `/api/assets/external-drives` | Detect connected external/removable drives to scan (AC6); graceful `[]` without a detection backend. |
+| GET / POST | `/api/local-files` | List / create local-file entries (summary + keywords extracted, no content stored). |
+| GET | `/api/drive/files`, POST connect | Google Drive file metadata once an account is linked (AC5). |
+| POST | `/api/ai/correlate_needs` | Match a free-text need against the caller's tasks/todos/files (AC4, AC7). |
+
+Services: `asset_scan_service` (`classify` / `scan_directory` / `detect_external_drives`),
+`data_ingestion_service` (`compare_and_ingest_new_data` add, `compare_and_remove_deleted`
+prune, `sync_source` both — AC3/Steps 6-7), `asset_to_task_linker` (asset↔task),
+`recommendation_engine.get_recommendations` (intent + keyword correlation),
+`google_drive_service`, `local_file_service`.
+
 ### Migrations & startup (audit task 3ea5622b)
 
 The Alembic chain (`migrations/versions/`, head `0022_profile_interest_personality`)

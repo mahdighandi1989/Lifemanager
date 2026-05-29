@@ -60,3 +60,36 @@ class DataIngestionService:
         await self.db.commit()
         await self.db.refresh(row)
         return row
+
+    async def compare_and_remove_deleted(
+        self, *, user_id: int, present_paths: Iterable[str]
+    ) -> dict:
+        """Drop indexed entries whose source_path is no longer present in the
+        latest scan (audit task 217909d2 AC3 / Step 7 — "اگه حذف شدن ازش پاک
+        بکنه"). Returns ``{"removed": n}``."""
+        present = set(present_paths)
+        result = await self.db.execute(
+            select(IndexedDataSourceEntry).where(
+                IndexedDataSourceEntry.user_id == user_id
+            )
+        )
+        removed = 0
+        for row in result.scalars().all():
+            if row.source_path not in present:
+                await self.db.delete(row)
+                removed += 1
+        if removed:
+            await self.db.commit()
+        return {"removed": removed}
+
+    async def sync_source(
+        self, *, user_id: int, scanned: List[dict]
+    ) -> dict:
+        """One-shot periodic sync (Steps 6+7): add new entries AND prune the
+        ones whose path vanished since the last scan. Returns the combined
+        ``{created, skipped, removed}`` summary."""
+        added = await self.compare_and_ingest_new_data(user_id=user_id, scanned=scanned)
+        pruned = await self.compare_and_remove_deleted(
+            user_id=user_id, present_paths=[e["source_path"] for e in scanned]
+        )
+        return {**added, **pruned}
