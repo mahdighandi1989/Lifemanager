@@ -21,6 +21,7 @@ from app.routes import (
     assets,
     auth,
     context,
+    merge,
     external_projects,
     finance,
     integrations,
@@ -285,6 +286,8 @@ async def startup_event():
         ("heart_rate_threshold", "INTEGER"),
         ("activity_required", "VARCHAR(64)"),
         ("mood_tag", "VARCHAR(64)"),
+        ("merged_into_id", "INTEGER"),
+        ("merge_history", "TEXT"),
     ]
     for col_name, col_type in _task_planning_columns:
         try:
@@ -618,6 +621,7 @@ app.include_router(finance.router)
 app.include_router(location.router)
 app.include_router(context.router, tags=["context"])
 app.include_router(assets.router, tags=["assets"])
+app.include_router(merge.router, tags=["merge"])
 app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.

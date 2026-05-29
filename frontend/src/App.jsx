@@ -14,6 +14,7 @@ import ExternalProjects from './pages/ExternalProjects';
 import PeopleProfiles from './pages/PeopleProfiles';
 import SmartAssistant from './pages/SmartAssistant';
 import AssetsPage from './pages/AssetsPage';
+import MergeManagement from './pages/MergeManagement';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Login from './pages/Login';
@@ -176,6 +177,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <AssetsPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/merge"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <MergeManagement />
                     </Layout>
                   </ProtectedRoute>
                 }

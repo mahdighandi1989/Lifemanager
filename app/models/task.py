@@ -63,6 +63,13 @@ class Task(Base):
     heart_rate_threshold = Column(Integer, nullable=True)
     activity_required = Column(String(64), nullable=True)
     mood_tag = Column(String(64), nullable=True)
+    # Consolidation (audit task fbd9bd36): merged_into_id is a soft self-
+    # reference to the primary task this duplicate was folded into (plain
+    # Integer — no DB FK so the SQLite ALTER stays simple); merge_history is a
+    # JSON log kept on the primary. A task with merged_into_id set is treated
+    # as merged-away (the equivalent of is_active=False).
+    merged_into_id = Column(Integer, nullable=True)
+    merge_history = Column(Text, nullable=True)
     # deadline is a full timestamp — distinct from due_date which is the
     # calendar date a task is scheduled for. Use deadline for the hard
     # cutoff (when it stops mattering); due_date for the planning bucket.

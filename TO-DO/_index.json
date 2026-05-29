@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-05-29T01:50:00+00:00",
-  "total": 5,
+  "generated_at": "2026-05-29T02:10:00+00:00",
+  "total": 4,
   "items": [
     {
       "task_id": "task_78c0e8e0a9b5",
@@ -18,14 +18,6 @@
       "execution_priority": 3000,
       "manual_actions": 1,
       "summary": "[decision] فقط تصمیم admin-only vs user-scoped (AC8/10، گره به auth واقعی). رمزنگاری کلید API (AC5) + AISettings + backend انجام شد."
-    },
-    {
-      "task_id": "fbd9bd36-2c64-4014-921b-ded8e3dd5cb5",
-      "title": "ادغام/Consolidation تسک‌ها",
-      "todo_file": "TO-DO/todo-task-fbd9bd36.md",
-      "execution_priority": 3000,
-      "manual_actions": 4,
-      "summary": "[feature] فیچر merge/consolidation (similarity TF-IDF + /api/merge + Task.merged_into_id + UI). deliverable واقعی (architecture inventory) کامل + regression رفع شد."
     },
     {
       "task_id": "7367c6f0-ba56-46c4-8436-0970a7075314",
