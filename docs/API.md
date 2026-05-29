@@ -120,4 +120,54 @@ endpoint accepts a `?provider=` query parameter to filter by it.
 | POST | `/api/ai/dynamic-analyze` | Free-form AI analysis; 403 when `FEATURE_AI_ENABLED` is off. |
 
 The settings UI for providers + model configs lives at
-`frontend/src/pages/AISettings.jsx` (route `/ai-settings`).
+`frontend/src/pages/AISettings.jsx` (route `/ai-settings`). The consolidated
+**Settings** page (`frontend/src/pages/Settings.jsx`, route `/settings`) carries
+three sections — AI providers, AI models (with a provider `<select>`), and the
+editable analysis-prompt box. The whole `/ai` router is also dual-mounted under
+`/api/ai` so the SPA's `/api/ai/...` calls resolve.
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/ai/analyze` | Orchestrated analysis: global prompt + the caller's data context + the request prompt → `AIAnalysisResult`. 403 when `FEATURE_AI_ENABLED` is off. |
+| GET / PUT | `/api/settings/global-analysis-prompt` | Admin-only (403 for non-admin) global analysis prompt, stored in `global_settings`. |
+
+### Finance (audit task 4ae4b3ca)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET / POST | `/api/finance/accounts` | List / create financial accounts (bank/broker/exchange). |
+| GET / POST | `/api/finance/incomes`, `/api/finance/assets` | Incomes / assets CRUD. |
+| POST | `/api/finance/transactions` | Record a transaction (income/expense) and update the account balance. |
+| GET | `/api/finance/transactions` | List the caller's transactions (`?account_id=` filter). |
+| POST | `/api/finance/budget/evaluate` | Weigh a purchase vs the budget → `{affordable, priority, available_budget}`; fires a `budget_alert` notification when over budget. |
+
+Finance UI: `frontend/src/pages/BudgetPage.jsx` (routes `/budget` and `/finance`)
+— accounts summary, a budget-aware purchase check, and an AI budget insight.
+Bank email/SMS balance updates run via `EmailParserService.parse_balance` +
+`SmsListenerService.parse_sms`, polled by the `process_finance_updates` Celery
+task (every 30 min).
+
+### Smart assistant / context (audit task 2165524b)
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/context/location` | Save the caller's latest location into their `UserContext`. |
+| GET | `/api/recommendations` | Context-fused recommendations (location / physiological / behavioral). |
+| GET | `/api/notifications` | Anon-friendly notification list for the header `NotificationBell`. |
+
+UI: `RecommendationPanel` (accept/reject), `LocationTracker` (geolocation every
+5 min), `NotificationBell` (📍 icon for recommendation-type notifications), and
+the `/recommendations` page (history + per-type priority toggles).
+`google_maps_service` (`geocode_address` / `find_nearby_places`) powers
+location-based suggestions when `GOOGLE_MAPS_API_KEY` is set.
+
+### Oversight — external projects (audit task d2146781)
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/v1/oversight/connections` | Create a connection to an external PM project (token encrypted at rest). 201 with `id`, `name`. |
+| GET | `/api/v1/oversight/connections` | List the caller's active connections. |
+
+`OversightService` carries `connect_to_external_project`, `analyze_time_allocation`,
+and `fetch_project_data`; the `sync_external_project` Celery task syncs a
+connection.

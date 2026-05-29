@@ -1008,6 +1008,14 @@
       {
         "name": "Tasks",
         "file": "frontend/src/pages/Tasks.jsx"
+      },
+      {
+        "name": "Settings",
+        "file": "frontend/src/pages/Settings.jsx"
+      },
+      {
+        "name": "Recommendations",
+        "file": "frontend/src/pages/Recommendations.jsx"
       }
     ],
     "components": [
@@ -1030,6 +1038,18 @@
       {
         "name": "Sidebar",
         "file": "frontend/src/components/Sidebar.jsx"
+      },
+      {
+        "name": "NotificationBell",
+        "file": "frontend/src/components/NotificationBell.jsx"
+      },
+      {
+        "name": "LocationTracker",
+        "file": "frontend/src/components/LocationTracker.jsx"
+      },
+      {
+        "name": "RecommendationPanel",
+        "file": "frontend/src/components/RecommendationPanel.jsx"
       },
       {
         "name": "Dashboard.test",
