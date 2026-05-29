@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import api from '../lib/api';
 
-// Budget page (audit task 4ae4b3ca, AC3 + AC6): lists the user's financial
-// accounts (the AccountList) with a small Dashboard summary on top. Reads
-// GET /api/finance/accounts via the shared axios client (JWT auto-attached).
+// Budget page (audit task 4ae4b3ca). Lists the user's financial accounts with
+// a summary, a budget-aware purchase check (AC 12), and an AI budget insight
+// (AC 13). Reachable at both /budget and /finance.
 
 const KIND_LABELS = {
   bank: 'بانک',
+  broker: 'بروکر/فارکس',
+  exchange: 'صرافی',
   broker_forex: 'بروکر/فارکس',
   exchange_iranian: 'صرافی ایرانی',
   exchange_foreign: 'صرافی خارجی',
   cash: 'نقد',
+};
+
+const PRIORITY_LABELS = {
+  blocked: 'بیش از بودجه — متوقف',
+  high: 'اولویت بالا (به‌راحتی در بودجه)',
+  normal: 'اولویت متوسط',
+  low: 'در بودجه ولی سنگین',
 };
 
 function AccountCard({ account }) {
@@ -37,6 +46,15 @@ function BudgetPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Purchase check (AC 12)
+  const [amount, setAmount] = useState('');
+  const [label, setLabel] = useState('');
+  const [evalResult, setEvalResult] = useState(null);
+
+  // AI insight (AC 13)
+  const [insight, setInsight] = useState(null);
+  const [insightLoading, setInsightLoading] = useState(false);
+
   useEffect(() => {
     let active = true;
     api
@@ -53,9 +71,41 @@ function BudgetPage() {
 
   const total = accounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
 
+  const checkPurchase = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.post('/finance/budget/evaluate', {
+        amount: Number(amount) || 0,
+        label: label || null,
+      });
+      setEvalResult(res.data);
+    } catch (err) {
+      setEvalResult({ error: err.message });
+    }
+  };
+
+  const fetchInsight = async () => {
+    setInsightLoading(true);
+    try {
+      const res = await api.post('/ai/analyze', {
+        prompt: 'بر اساس حساب‌ها و بودجهٔ من، پیشنهادهای خرید و مدیریت بودجه بده.',
+      });
+      setInsight(res.data?.insights || 'پاسخی دریافت نشد.');
+    } catch (err) {
+      // FEATURE_AI_ENABLED off -> 403; degrade gracefully.
+      setInsight(
+        err?.response?.status === 403
+          ? 'تحلیل هوش مصنوعی غیرفعال است (FEATURE_AI_ENABLED).'
+          : 'خطا در تحلیل: ' + (err.message || ''),
+      );
+    } finally {
+      setInsightLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8" data-testid="budget-page">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8" dir="rtl">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">برنامه و بودجه</h1>
         <p className="text-gray-500 mb-6">حساب‌های مالی شما و موجودی کل.</p>
 
@@ -65,6 +115,58 @@ function BudgetPage() {
           <p className="text-3xl font-bold mt-1" data-testid="budget-total">
             {total.toLocaleString('fa-IR')}
           </p>
+        </div>
+
+        {/* Budget-aware purchase check (AC 12) */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6" data-testid="purchase-check">
+          <h2 className="font-semibold text-gray-900 mb-3">بررسی خرید بر اساس بودجه</h2>
+          <form onSubmit={checkPurchase} className="flex flex-wrap gap-2">
+            <input
+              data-testid="purchase-amount-input"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="مبلغ خرید"
+              className="border rounded-lg px-3 py-2 text-sm flex-1"
+            />
+            <input
+              data-testid="purchase-label-input"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="عنوان (اختیاری)"
+              className="border rounded-lg px-3 py-2 text-sm flex-1"
+            />
+            <button type="submit" data-testid="purchase-check-btn" className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-blue-700">
+              بررسی
+            </button>
+          </form>
+          {evalResult && !evalResult.error && (
+            <div
+              data-testid="purchase-result"
+              className={`mt-3 text-sm rounded-lg p-3 ${
+                evalResult.affordable ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+              }`}
+            >
+              {evalResult.affordable ? 'در بودجه است. ' : 'فراتر از بودجه! '}
+              اولویت: {PRIORITY_LABELS[evalResult.priority] || evalResult.priority}
+              {' — '}بودجهٔ قابل‌دسترس: {Number(evalResult.available_budget).toLocaleString('fa-IR')}
+            </div>
+          )}
+        </div>
+
+        {/* AI budget insight (AC 13) */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6" data-testid="ai-insight">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-semibold text-gray-900">تحلیل هوش مصنوعی بودجه</h2>
+            <button data-testid="ai-insight-btn" onClick={fetchInsight} disabled={insightLoading} className="bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-indigo-700 disabled:opacity-50">
+              {insightLoading ? 'در حال تحلیل...' : 'تحلیل کن'}
+            </button>
+          </div>
+          {insight && (
+            <p data-testid="ai-insight-text" className="text-sm text-gray-700 whitespace-pre-wrap">
+              {insight}
+            </p>
+          )}
         </div>
 
         {error && (

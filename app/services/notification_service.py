@@ -50,6 +50,8 @@ VALID_NOTIFICATION_TYPES = {
     "sms",
     "push",
     "verify_failed",
+    "budget_alert",
+    "recommendation",
 }
 
 

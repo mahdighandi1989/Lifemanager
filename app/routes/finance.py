@@ -391,3 +391,28 @@ async def list_transactions(
         stmt = stmt.where(Transaction.account_id == account_id)
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+# ── Budget-aware purchase evaluation (audit task 4ae4b3ca AC 12) ─────
+
+
+class PurchaseEvalRequest(BaseModel):
+    amount: Decimal = Field(..., ge=0)
+    label: Optional[str] = Field(default=None, max_length=255)
+
+
+@router.post("/api/finance/budget/evaluate", tags=["finance"])
+@handle_errors
+async def evaluate_budget_purchase(
+    payload: PurchaseEvalRequest = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Weigh a prospective purchase against the user's budget: returns a
+    priority and an ``affordable`` flag, and fires a budget_alert notification
+    when the amount exceeds the available budget (AC 12)."""
+    from app.services.budget_service import evaluate_purchase
+
+    return await evaluate_purchase(
+        db, user_id=user_id, amount=payload.amount, label=payload.label
+    )

@@ -126,6 +126,60 @@ def test_process_finance_updates_runs_noop_without_source():
     assert result["balances_updated"] == 0
 
 
+# ── Budget-aware purchase evaluation (AC 12) ─────────────────────────
+
+@pytest.mark.asyncio
+async def test_evaluate_purchase_affordable(db_session):
+    from app.models.finance import FinancialAccount
+    from app.services.budget_service import evaluate_purchase
+
+    db_session.add(FinancialAccount(user_id=0, name="A", kind="bank", currency="USD", balance=1000))
+    await db_session.commit()
+
+    out = await evaluate_purchase(db_session, user_id=0, amount=100)
+    assert out["affordable"] is True
+    assert out["priority"] in ("high", "normal", "low")
+    assert out["notified"] is False
+
+
+@pytest.mark.asyncio
+async def test_evaluate_purchase_over_budget_notifies(db_session):
+    from sqlalchemy import select
+
+    from app.models.finance import FinancialAccount
+    from app.models.notification import Notification
+    from app.services.budget_service import evaluate_purchase
+
+    db_session.add(FinancialAccount(user_id=0, name="A", kind="bank", currency="USD", balance=50))
+    await db_session.commit()
+
+    out = await evaluate_purchase(db_session, user_id=0, amount=500, label="laptop")
+    assert out["affordable"] is False
+    assert out["priority"] == "blocked"
+    assert out["notified"] is True
+
+    rows = (
+        await db_session.execute(
+            select(Notification).where(Notification.priority == "high")
+        )
+    ).scalars().all()
+    assert len(rows) >= 1
+
+
+def test_budget_evaluate_endpoint(api_client):
+    api_client.post(
+        "/api/finance/accounts",
+        json={"name": "A", "kind": "bank", "currency": "USD", "balance": 200},
+    )
+    r = api_client.post(
+        "/api/finance/budget/evaluate", json={"amount": 50, "label": "book"}
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["affordable"] is True
+    assert "priority" in body and "available_budget" in body
+
+
 # ── Finance data reaches the AI analysis context (AC 13) ─────────────
 
 @pytest.mark.asyncio

@@ -163,6 +163,16 @@ function App() {
                 }
               />
               <Route
+                path="/finance"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <BudgetPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/people-profiles"
                 element={
                   <ProtectedRoute>
