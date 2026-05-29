@@ -416,3 +416,43 @@ async def evaluate_budget_purchase(
     return await evaluate_purchase(
         db, user_id=user_id, amount=payload.amount, label=payload.label
     )
+
+
+class IngestMessageRequest(BaseModel):
+    channel: str = Field(default="email", pattern="^(email|sms)$")
+    body: str = Field(..., min_length=1, max_length=10_000)
+    account_id: Optional[int] = None
+
+
+@router.post("/api/finance/ingest-message", tags=["finance"])
+@handle_errors
+async def ingest_finance_message(
+    payload: IngestMessageRequest = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Apply an inbound bank/exchange email or SMS to the user's balances
+    (audit task 4ae4b3ca). An operator's IMAP poller / SMS gateway forwards the
+    message body here; the parser extracts the balance, the matching account is
+    updated, a Transaction records the delta, and the affordable-tasks reminder
+    fires. Live mailbox/SMS polling is the only external piece (see TO-DO/)."""
+    from app.services.finance_ingest_service import apply_bank_message
+
+    return await apply_bank_message(
+        db, user_id=user_id, channel=payload.channel, body=payload.body,
+        account_id=payload.account_id,
+    )
+
+
+@router.get("/api/finance/affordable-tasks", tags=["finance"])
+@handle_errors
+async def list_affordable_tasks(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Tasks the user can now afford given their budget — the reminder the memo
+    asked for ("بهم اعلام بکنه"). Returns the affected task ids (a
+    budget-affordability notification is fired per task)."""
+    from app.services.budget_notification_service import notify_affordable_tasks
+
+    return {"affordable_task_ids": await notify_affordable_tasks(db, user_id)}

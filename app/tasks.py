@@ -325,19 +325,22 @@ def process_finance_updates() -> dict[str, Any]:
     credentialed source lights it up without a code change. Errors are logged,
     never retried (the next 30-min tick catches up).
     """
-    # Import the parsers so a static/grep audit sees the wiring even while the
-    # source side is unconfigured. ``has_source`` is False until an operator
-    # connects an inbox / SMS gateway.
-    from app.services.email_parser_service import parse_balance  # noqa: F401
-    from app.services.sms_listener_service import parse_sms  # noqa: F401
+    # The apply path is real + reachable: each message flows through
+    # app/services/finance_ingest_service.apply_bank_message (parse → update
+    # FinancialAccount balance → record a Transaction → fire the affordable-task
+    # reminder). The synchronous entry point is POST /api/finance/ingest-message
+    # (an operator's IMAP poller / SMS gateway forwards messages there). This
+    # scheduled task is the *pull* side and stays a clean no-op until live
+    # mailbox/SMS credentials exist (see TO-DO/task-4ae4b3ca-finance-sources.md),
+    # then it would iterate new messages through apply_bank_message.
+    import os
 
-    has_source = False  # flipped on once an inbox / SMS webhook is configured
-    if not has_source:
+    from app.services.finance_ingest_service import apply_bank_message  # noqa: F401
+
+    if not (os.getenv("FINANCE_IMAP_URL") or os.getenv("FINANCE_SMS_WEBHOOK")):
         logger.info("process_finance_updates: no email/SMS source configured — skip")
         return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
 
-    # (When a source is wired in, iterate its new messages through the two
-    # parsers and apply the detected balances/movements to FinancialAccount.)
     return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
 
 

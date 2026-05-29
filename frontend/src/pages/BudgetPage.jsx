@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
 
 // Budget page (audit task 4ae4b3ca). Lists the user's financial accounts with
@@ -55,19 +55,54 @@ function BudgetPage() {
   const [insight, setInsight] = useState(null);
   const [insightLoading, setInsightLoading] = useState(false);
 
-  useEffect(() => {
-    let active = true;
+  // Manual entry forms (the raw memo's first ask — "اینجا ثبت بکنم").
+  const [acctForm, setAcctForm] = useState({ name: '', kind: 'bank', balance: '', currency: 'IRR' });
+  const [incomeForm, setIncomeForm] = useState({ description: '', amount: '', currency: 'IRR' });
+
+  const loadAccounts = useCallback(() => {
+    setLoading(true);
     api
       .get('/finance/accounts')
-      .then((res) => {
-        if (active) setAccounts(Array.isArray(res.data) ? res.data : []);
-      })
-      .catch((e) => active && setError('خطا در دریافت حساب‌ها: ' + (e.message || '')))
-      .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
+      .then((res) => setAccounts(Array.isArray(res.data) ? res.data : []))
+      .catch((e) => setError('خطا در دریافت حساب‌ها: ' + (e.message || '')))
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadAccounts();
+  }, [loadAccounts]);
+
+  const addAccount = async (e) => {
+    e.preventDefault();
+    if (!acctForm.name.trim()) return;
+    try {
+      await api.post('/finance/accounts', {
+        name: acctForm.name,
+        kind: acctForm.kind,
+        balance: Number(acctForm.balance) || 0,
+        currency: acctForm.currency || null,
+      });
+      setAcctForm({ name: '', kind: 'bank', balance: '', currency: 'IRR' });
+      loadAccounts();
+    } catch (err) {
+      setError('خطا در افزودن حساب: ' + (err.message || ''));
+    }
+  };
+
+  const addIncome = async (e) => {
+    e.preventDefault();
+    if (!incomeForm.description.trim()) return;
+    try {
+      await api.post('/finance/incomes', {
+        description: incomeForm.description,
+        amount: Number(incomeForm.amount) || 0,
+        currency: incomeForm.currency || null,
+      });
+      setIncomeForm({ description: '', amount: '', currency: 'IRR' });
+    } catch (err) {
+      setError('خطا در افزودن درآمد: ' + (err.message || ''));
+    }
+  };
 
   const total = accounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
 
@@ -115,6 +150,70 @@ function BudgetPage() {
           <p className="text-3xl font-bold mt-1" data-testid="budget-total">
             {total.toLocaleString('fa-IR')}
           </p>
+        </div>
+
+        {/* Manual entry — record accounts + incomes (raw memo: "اینجا ثبت بکنم") */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6" data-testid="add-account">
+          <h2 className="font-semibold text-gray-900 mb-3">افزودن حساب</h2>
+          <form onSubmit={addAccount} className="flex flex-wrap gap-2">
+            <input
+              data-testid="account-name-input"
+              value={acctForm.name}
+              onChange={(e) => setAcctForm({ ...acctForm, name: e.target.value })}
+              placeholder="نام حساب (بانک/بروکر/صرافی)"
+              className="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[140px]"
+            />
+            <select
+              data-testid="account-kind-select"
+              value={acctForm.kind}
+              onChange={(e) => setAcctForm({ ...acctForm, kind: e.target.value })}
+              className="border rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="bank">بانک</option>
+              <option value="broker">بروکر/فارکس</option>
+              <option value="exchange">صرافی</option>
+            </select>
+            <input
+              data-testid="account-balance-input"
+              type="number"
+              value={acctForm.balance}
+              onChange={(e) => setAcctForm({ ...acctForm, balance: e.target.value })}
+              placeholder="موجودی"
+              className="border rounded-lg px-3 py-2 text-sm w-28"
+            />
+            <input
+              data-testid="account-currency-input"
+              value={acctForm.currency}
+              onChange={(e) => setAcctForm({ ...acctForm, currency: e.target.value })}
+              placeholder="ارز"
+              className="border rounded-lg px-3 py-2 text-sm w-20"
+            />
+            <button type="submit" data-testid="add-account-btn" className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-blue-700">
+              ثبت حساب
+            </button>
+          </form>
+
+          <h2 className="font-semibold text-gray-900 mt-4 mb-3">افزودن درآمد</h2>
+          <form onSubmit={addIncome} className="flex flex-wrap gap-2">
+            <input
+              data-testid="income-desc-input"
+              value={incomeForm.description}
+              onChange={(e) => setIncomeForm({ ...incomeForm, description: e.target.value })}
+              placeholder="شرح درآمد"
+              className="border rounded-lg px-3 py-2 text-sm flex-1 min-w-[140px]"
+            />
+            <input
+              data-testid="income-amount-input"
+              type="number"
+              value={incomeForm.amount}
+              onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
+              placeholder="مبلغ"
+              className="border rounded-lg px-3 py-2 text-sm w-28"
+            />
+            <button type="submit" data-testid="add-income-btn" className="bg-green-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-green-700">
+              ثبت درآمد
+            </button>
+          </form>
         </div>
 
         {/* Budget-aware purchase check (AC 12) */}

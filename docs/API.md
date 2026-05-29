@@ -148,6 +148,13 @@ editable analysis-prompt box. The whole `/ai` router is also dual-mounted under
 | POST | `/api/finance/transactions` | Record a transaction (income/expense) and update the account balance. |
 | GET | `/api/finance/transactions` | List the caller's transactions (`?account_id=` filter). |
 | POST | `/api/finance/budget/evaluate` | Weigh a purchase vs the budget → `{affordable, priority, available_budget}`; fires a `budget_alert` notification when over budget. |
+| POST | `/api/finance/ingest-message` | Apply an inbound bank/exchange `email`/`sms` body: parse the balance → update the account → record a `Transaction` → fire the affordable-task reminder (audit task 4ae4b3ca). |
+| GET | `/api/finance/affordable-tasks` | Tasks the user can now afford given their budget (the "بهم اعلام بکنه" reminder). |
+
+Manual entry UI (BudgetPage) records accounts + incomes. The auto-update apply
+path (`finance_ingest_service.apply_bank_message`) is reachable via the
+ingest-message webhook now; live IMAP/SMS polling needs operator credentials
+(`process_finance_updates` puller, see TO-DO/task-4ae4b3ca-finance-sources.md).
 
 Finance UI: `frontend/src/pages/BudgetPage.jsx` (routes `/budget` and `/finance`)
 — accounts summary, a budget-aware purchase check, and an AI budget insight.
