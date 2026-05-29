@@ -230,8 +230,12 @@ section.
 
 | Method | Path | Notes |
 |---|---|---|
-| POST | `/api/ai/analyze-tasks` | Body `{task_id?, user_id?}` → `{context, analysis, feedback}`; full task context + work-pattern analysis, feedback persisted as a notification. |
-| WS | `/ws/ai-stream` | Send `{user_id}`; streams `feedback` frames + a final `done` frame with the task context. |
+| POST | `/api/ai/analyze-tasks` | Body `{task_id?, user_id?}` → `{context, analysis, feedback, model_generated}`; full context + patterns run through the configured model **within the editable global prompt box** (Steps 7-8), deterministic fallback offline. Feedback persisted as a notification. |
+| WS | `/ws/ai-stream` | Send `{user_id, task_id?}`; streams baseline `feedback` frames, then the model-framed chunk when a provider answers, then `done` with `model_generated`. |
+
+`task_feedback.generate_task_feedback` assembles global-prompt + full context +
+patterns and routes through `resolve_provider_routing` → `AIService.generate_text`
+(no token cap); the model output is used verbatim when a real provider answers.
 
 Backing pieces: `AIService.get_task_context` (total/completed/pending/overdue),
 `task_analysis.analyze_user_tasks` (group work patterns),

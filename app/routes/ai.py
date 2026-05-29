@@ -559,15 +559,24 @@ async def analyze_tasks(
     from app.services.task_analysis import analyze_user_tasks
 
     uid = payload.user_id if payload.user_id is not None else user_id
+    from app.services.ai.task_feedback import generate_task_feedback
+
     context = await ai_service.get_task_context(uid)
     analysis = await analyze_user_tasks(db, user_id=uid)
-    feedback = _build_task_feedback(context, analysis, payload.task_id)
-    await send_ai_feedback(db, user_id=uid, feedback=feedback)
+    # Run the full context through the configured model within the editable
+    # prompt box (Steps 7-8); the deterministic text is the offline fallback.
+    deterministic = _build_task_feedback(context, analysis, payload.task_id)
+    fb = await generate_task_feedback(
+        db, user_id=uid, context=context, analysis=analysis,
+        fallback=deterministic, task_id=payload.task_id,
+    )
+    await send_ai_feedback(db, user_id=uid, feedback=fb["feedback"])
     return {
         "task_id": payload.task_id,
         "context": context,
         "analysis": analysis,
-        "feedback": feedback,
+        "feedback": fb["feedback"],
+        "model_generated": fb["model_generated"],
     }
 
 
