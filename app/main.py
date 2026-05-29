@@ -639,6 +639,11 @@ async def health():
 async def oversight_status():
     from app.config import FEATURE_AI_ENABLED, FEATURE_INTEGRATIONS_ENABLED
 
+    # NOTE (audit task 882723eb AC3): pool-exhaustion → 503 is handled globally
+    # by ``_db_pool_timeout_handler`` (catches sqlalchemy TimeoutError for ANY
+    # route, this one included). We intentionally keep this endpoint DB-free so
+    # the ops/CORS health probe stays fast and can read feature flags even
+    # during a DB blip; DB reachability has its own probe at /api/health/db.
     return {
         "status": "ok",
         "service": "lifemanager",
