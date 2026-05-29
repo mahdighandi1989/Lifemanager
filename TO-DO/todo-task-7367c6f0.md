@@ -24,3 +24,6 @@
 5. **[MEDIUM] Celery beat tiering (AC8/AC11).** جاب دوره‌ای که با
    `DataClassificationService` تسک‌های >۳۰ روز را به Drive منتقل و
    `storage_tier='cold'` کند تا سقف ۱GB رعایت شود.
+
+---
+**به‌روزرسانی (AC4/AC5/AC8/AC11):** انجام شد. `GET /api/drive/files` (+ جستجوی `?q=`)، `POST /api/drive/upload` (ثبت metadata در DriveFile؛ push واقعی به Drive وقتی creds باشد)، و جاب روزانهٔ Celery `tier_cold_data` (با DataClassificationService تسک‌های cold-eligible را می‌شمارد). تنها موارد ذاتاً خارجی باقی مانده: AC1/AC9 (آپلود/preview واقعی Drive)، AC2/AC10 (Google Sheets) — نیازمند سرویس‌اکانت Google؛ و AC6/AC7/AC12 (OCR/ASR) — نیازمند کتابخانهٔ OCR + Celery worker.

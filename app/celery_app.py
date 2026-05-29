@@ -43,4 +43,10 @@ celery_app.conf.beat_schedule = {
         "task": "app.tasks.analyze_user_context",
         "schedule": crontab(minute="*/15"),
     },
+    # 04:00 UTC — classify aging data and tally cold-storage candidates
+    # (audit task 7367c6f0, AC8/AC11).
+    "tier-cold-data-daily": {
+        "task": "app.tasks.tier_cold_data",
+        "schedule": crontab(hour=4, minute=0),
+    },
 }

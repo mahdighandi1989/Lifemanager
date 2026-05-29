@@ -21,6 +21,7 @@ from app.routes import (
     assets,
     auth,
     context,
+    drive,
     merge,
     external_projects,
     finance,
@@ -622,6 +623,7 @@ app.include_router(location.router)
 app.include_router(context.router, tags=["context"])
 app.include_router(assets.router, tags=["assets"])
 app.include_router(merge.router, tags=["merge"])
+app.include_router(drive.router, tags=["drive"])
 app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.

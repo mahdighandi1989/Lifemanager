@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-05-29T02:30:00+00:00",
+  "generated_at": "2026-05-29T02:50:00+00:00",
   "total": 4,
   "items": [
     {
@@ -24,8 +24,8 @@
       "title": "انتقال داده به Google Drive + طبقه‌بندی سرد",
       "todo_file": "TO-DO/todo-task-7367c6f0.md",
       "execution_priority": 3000,
-      "manual_actions": 5,
-      "summary": "[infra/creds] Google Drive/Sheets + Celery OCR/ASR + tiering (نیازمند Google creds/Celery/OCR). AC3 (DriveFile) + AC8/11 (DataClassificationService) انجام شد."
+      "manual_actions": 3,
+      "summary": "[external/creds] Google Drive/Sheets آپلود واقعی (AC1/2/9/10 — سرویس‌اکانت) و OCR/ASR (AC6/7/12 — کتابخانه+worker). AC3/AC4/AC5/AC8/AC11 (DriveFile/endpoints/search/tiering) انجام شد."
     },
     {
       "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",

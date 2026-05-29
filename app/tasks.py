@@ -243,3 +243,37 @@ def analyze_user_context() -> dict[str, Any]:
     count = len(result.get("suggestions", []))
     logger.info("ai_context analyze_user_context ran: %d suggestion(s)", count)
     return {"suggestions": count}
+
+
+@celery_app.task(name="app.tasks.tier_cold_data")
+def tier_cold_data() -> dict[str, Any]:
+    """Audit task 7367c6f0 AC8/AC11 — classify tasks and tally the
+    non-essential (cold-eligible) ones a credentialed Drive sync would migrate
+    out to keep the DB under its size cap. Scheduled daily; logs the tally."""
+    import asyncio
+
+    async def _run() -> dict[str, Any]:
+        from sqlalchemy import select
+
+        from app.database import SessionLocal
+        from app.models.task import Task
+        from app.services.data_classification_service import DataClassificationService
+
+        svc = DataClassificationService()
+        total = 0
+        cold = 0
+        async with SessionLocal() as db:
+            tasks = (await db.execute(select(Task))).scalars().all()
+            for task in tasks:
+                total += 1
+                if svc.classify_task_essentiality(task) != "essential":
+                    cold += 1
+        return {"total": total, "cold_eligible": cold}
+
+    try:
+        result = asyncio.run(_run())
+        logger.info("tier_cold_data: %s", result)
+        return result
+    except Exception as exc:
+        logger.exception("tier_cold_data failed: %r", exc)
+        return {"error": str(exc)}
