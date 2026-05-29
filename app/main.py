@@ -280,6 +280,11 @@ async def startup_event():
         ("recurrence", "JSON"),
         ("attachment", "VARCHAR(500)"),
         ("estimated_cost", "NUMERIC(18,2)"),
+        ("location_lat", "NUMERIC(10,6)"),
+        ("location_lng", "NUMERIC(10,6)"),
+        ("heart_rate_threshold", "INTEGER"),
+        ("activity_required", "VARCHAR(64)"),
+        ("mood_tag", "VARCHAR(64)"),
     ]
     for col_name, col_type in _task_planning_columns:
         try:

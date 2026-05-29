@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-05-29T01:10:00+00:00",
-  "total": 6,
+  "generated_at": "2026-05-29T01:30:00+00:00",
+  "total": 5,
   "items": [
     {
       "task_id": "task_78c0e8e0a9b5",
@@ -18,14 +18,6 @@
       "execution_priority": 3000,
       "manual_actions": 2,
       "summary": "[decision] admin-only vs user-scoped (AC8/10) + رمزنگاری کلید API (AC5). frontend (AISettings + nav) و backend انجام شد."
-    },
-    {
-      "task_id": "2165524b-5614-4c95-938c-0587d7748436",
-      "title": "موتور زمینه (Context Engine)",
-      "todo_file": "TO-DO/todo-task-2165524b.md",
-      "execution_priority": 3000,
-      "manual_actions": 2,
-      "summary": "[backend/infra] فیلدهای Task+migration (AC2) و Celery analyze_user_context (AC4). frontend (SmartAssistant + nav)، AC1/AC3/AC5 انجام شد."
     },
     {
       "task_id": "fbd9bd36-2c64-4014-921b-ded8e3dd5cb5",

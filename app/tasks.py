@@ -228,3 +228,18 @@ def run_self_improvement_profile_analytics() -> dict[str, Any]:
     except Exception as exc:
         logger.exception("run_self_improvement_profile_analytics failed: %r", exc)
         return {"error": str(exc)}
+
+
+@celery_app.task(name="app.tasks.analyze_user_context")
+def analyze_user_context() -> dict[str, Any]:
+    """Audit task 2165524b AC4 — run the context engine and log the outcome.
+
+    Scheduled every 15 minutes by celery beat. The orchestrator is rule-based
+    (no upstream call), so this is cheap; logging the suggestion count makes
+    the outcome rate observable in celery.log."""
+    from app.services.context_engine import ContextOrchestrator
+
+    result = ContextOrchestrator().analyze({})
+    count = len(result.get("suggestions", []))
+    logger.info("ai_context analyze_user_context ran: %d suggestion(s)", count)
+    return {"suggestions": count}

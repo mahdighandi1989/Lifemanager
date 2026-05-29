@@ -37,4 +37,10 @@ celery_app.conf.beat_schedule = {
         "task": "app.tasks.run_self_improvement_profile_analytics",
         "schedule": crontab(hour=3, minute=0),
     },
+    # Every 15 minutes — run the context engine so the assistant's task
+    # suggestions stay fresh (audit task 2165524b, AC4).
+    "analyze-user-context": {
+        "task": "app.tasks.analyze_user_context",
+        "schedule": crontab(minute="*/15"),
+    },
 }

@@ -55,6 +55,14 @@ class Task(Base):
     # user's total account balance covers it, the budget notifier flags the
     # task as affordable.
     estimated_cost = Column(Numeric(18, 2), nullable=True)
+    # Context-engine triggers (audit task 2165524b, AC2): a task can be gated
+    # on where you are, your heart rate, an activity, or a mood — the engine
+    # surfaces it when the ambient context matches.
+    location_lat = Column(Numeric(10, 6), nullable=True)
+    location_lng = Column(Numeric(10, 6), nullable=True)
+    heart_rate_threshold = Column(Integer, nullable=True)
+    activity_required = Column(String(64), nullable=True)
+    mood_tag = Column(String(64), nullable=True)
     # deadline is a full timestamp — distinct from due_date which is the
     # calendar date a task is scheduled for. Use deadline for the hard
     # cutoff (when it stops mattering); due_date for the planning bucket.
