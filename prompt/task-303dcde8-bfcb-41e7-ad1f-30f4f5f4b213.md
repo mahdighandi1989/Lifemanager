@@ -10,7 +10,7 @@ verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T20:28:08.561121+00:00'
-updated_at: '2026-05-28T19:49:41.281092+00:00'
+updated_at: '2026-05-29T09:31:41.598719+00:00'
 target_files:
 - app/services/ai/image_service.py
 ---
@@ -248,12 +248,150 @@ Dependencies synced:
 frontend↔db↔infra) / side شناسایی نشد» تا مشخص باشد بررسی **انجام شده**
 نه اینکه فراموش شده.
 
+📋 **مدیریت TO-DO برای اقدامات دستی کاربر (همیشه چک کن):**
+
+⚠️ **هشدار بحرانی — قاعدهٔ ضد-فرار:** TO-DO فقط برای کارهایی است که
+**واقعاً غیرممکن** برای agent است (نیاز به انسان مطلق)، نه برای کارهایی
+که «بزرگ‌اند»، «وقت می‌برند»، یا «نیازمند fixture/setup» هستند. اگر یک
+agent در یک سشن بیش از **۲۰٪ از تسک‌ها** را با TO-DO ببندد، یعنی از کار
+فرار می‌کند — این الگو در سشن‌های قبلی **مشاهده** شده و الان ممنوع است.
+
+✅ **فقط برای این موارد TO-DO بساز** (لیست بسته — هرچه خارج این لیست
+ممنوع است):
+
+  ۱. **Credential/secret که فقط کاربر دارد**:
+     - تنظیم API key واقعی در پنل ادمین خارجی (Render، AWS، Stripe، …)
+     - تأیید OAuth client روی console آن سرویس
+     - paste کردن webhook secret که فقط بعد از ساخت در dashboard ظاهر می‌شود
+
+  ۲. **Account/billing روی سرویس خارجی که کاربر باید عضو شود**:
+     - ساخت account جدید روی Stripe/SendGrid/Twilio/Google Cloud
+     - تأیید verification شماره یا ID
+     - فعال‌سازی subscription پولی
+
+  ۳. **داده/asset خصوصی که فقط کاربر دارد**:
+     - آپلود لوگو/تصویر/فونت برند
+     - paste کردن داده‌ای که در محل کار کاربر است
+     - import داده‌ای که فقط روی device کاربر است
+
+  ۴. **تصمیم سلیقه‌ای/حقوقی/کسب‌وکار**:
+     - انتخاب رنگ‌بندی نهایی یا تم
+     - متن دقیق Terms of Service / Privacy Policy
+     - تعرفهٔ قیمت‌گذاری
+     - نام نهایی برند یا دامنه
+
+⛔ **هرگز TO-DO نکن برای** (لیست سیاه — هر چیزی که در این لیست است
+**قابل اجرا** توسط agent است، حتی اگر بزرگ یا چندبخشی باشد):
+
+  ❌ UI component / page / dashboard (هر فریم‌ورک: React, Vue, Angular,
+     Svelte، حتی اگر معماری بزرگ دارد) — می‌توانی stub اولیه + state
+     management + layout + استایل بسازی
+  ❌ "نیازمند Google Drive / Stripe / Twilio API" — می‌توانی **client
+     stub** با abstraction layer بسازی که با env var واقعی plug-in شود؛
+     کد integration یعنی پیاده‌سازی، نه TO-DO
+  ❌ "feature بزرگ، چند روز کار می‌برد" — اندازه دلیل defer نیست؛ کوچک
+     شروع کن، iterate کن، در همین سشن کامل کن
+  ❌ Celery / background worker / scheduler — یک task ساده + register
+     می‌توانی بسازی
+  ❌ Migration / model / schema — حتی اگر فیلد جدید نیاز دارد، اضافه کن
+  ❌ REST endpoint / GraphQL resolver / WebSocket route — هرگز TO-DO
+  ❌ test (unit/integration/e2e) — همیشه قابل نوشتن
+  ❌ Documentation / README / API docs — همیشه قابل نوشتن
+  ❌ Config file / .env.example / Dockerfile / CI workflow — همیشه قابل
+     نوشتن
+  ❌ "می‌توانستی .tsx ولی repo .jsx است" — از .jsx استفاده کن، TO-DO نکن
+  ❌ "نیازمند فیلد X در مدل دیگر" — اضافه کن فیلد را، TO-DO نکن
+  ❌ "تصمیم admin-vs-user-scoped" — پرامپت اولیه scope را معلوم کرده،
+     یا با محتاطانه‌ترین تفسیر پیش برو
+  ❌ "credential در production هنوز ست نیست" — این TO-DO ساده برای
+     تنظیم env var است (مورد ۱ بالا)، نه دلیل برای defer کردن کد
+  ❌ "نیازمند verification از کاربر" — اگر اقدام واقعی غیرممکن نیست،
+     پیش برو
+  ❌ هر چیزی که در یک کامنت `# TODO` معمولی نوشته می‌شد — این فایل
+     TO-DO نیست، کامنت inline است
+
+🔬 **قاعدهٔ «حداقل تلاش» قبل از TO-DO**: قبل از TO-DO کردن یک AC، **اثبات
+کن** که قابل انجام نیست:
+
+  ۱. آیا می‌توانم یک stub/placeholder بسازم که با env واقعی plug-in شود؟
+     → اگر بله، بساز و TO-DO نکن
+  ۲. آیا می‌توانم برای این بخش یک test (حتی mock-based) بنویسم؟
+     → اگر بله، بنویس و TO-DO نکن
+  ۳. آیا می‌توانم abstraction/interface را تعریف کنم، حتی اگر backend
+     واقعی نیست؟ → اگر بله، تعریف کن و TO-DO نکن
+  ۴. آیا فقط یک حالت سلیقه‌ای/decision کاربر در میان است؟
+     → فقط آن یک decision را TO-DO کن، نه کل feature را
+
+اگر یکی از این چهار راه‌حل ممکن بود ولی به TO-DO رفتی، **اعتبار شما از
+بین می‌رود**.
+
+📊 **آستانهٔ TO-DO per session**: در یک حلقهٔ اجرای N تسک، اگر بیشتر از
+**۲۰٪** تسک‌ها فایل TO-DO ساختی، خودت در گزارش پایانی صریحاً اعلام کن:
+
+  "⚠️ نسبت TO-DO من {K}/{N} = {%} است که از آستانهٔ ۲۰٪ بالاتر است.
+   احتمالاً برخی از این TO-DO ها قابل اجرا بودند ولی من فرار کردم.
+   لیست TO-DO ها را کاربر باید بازبینی کند که آیا واقعاً Manual-required
+   بودند یا agent ضعیف کار کرده."
+
+**یادآوری همیشگی:** اگر در آینده قابلیت‌های شما گسترش پیدا کرد و توانستید
+یکی از موارد لیست سفید را خودکار انجام دهید (مثلاً managed credential
+injection، یا integration پولی automate شود)، انجام دهید و TO-DO نسازید.
+لیست سفید بسته است ولی **بسته از پایین** (می‌تواند کوچک‌تر شود اگر
+قابلیت‌ها رشد کنند، ولی هرگز بزرگ‌تر نشود برای فرار).
+
+**اگر هیچ بخش Manual-required نبود (تمام تسک Auto-capable است)**:
+  → فایل TO-DO **نساز**. فولدر TO-DO/ باید پاک و معنادار بماند.
+  → اگر برای این task از قبل `TO-DO/todo-task-{task_id_first_8}.md` بود
+     (یعنی در run قبلی نیاز به دخالت کاربر بود ولی الان نه): فایل قدیمی
+     را پاک کن و entry را از `TO-DO/_index.json` حذف کن.
+
+**اگر بخش Manual-required دارد** (همه‌جانبه یا hybrid):
+  1. فولدر TO-DO/ را در ریشه ریپو ایجاد کن اگر نیست
+  2. فایل `TO-DO/todo-task-{task_id_first_8}.md` بساز با front-matter
+     شامل: task_id, task_title, execution_priority, created_at,
+     updated_at, status: "pending"
+     و در بدنه: «چرا این فایل ساخته شد»، «وضعیت بخش‌های خودکار»
+     (commit ها reference)، «کارهایی که باید انجام دهی» با اولویت
+     بالا/متوسط/پایین به ترتیب، «وقتی این کارها را تمام کردی»
+  3. `TO-DO/_index.json` را با **merge** آپدیت کن (نه overwrite):
+     - فایل موجود را بخوان
+     - entry های orphan (فایلشان پاک شده) را حذف کن
+     - entry این task را اضافه/replace کن
+     - بر اساس execution_priority صعودی مرتب کن
+     - ساختار: `{"version":1, "generated_at": ISO, "total": N, "items": [...]}`
+  4. این تغییرات TO-DO را در **همان commit کد** شامل کن (نه commit جداگانه)
+
+⛔ **ممنوعات مطلق TO-DO**:
+  ❌ ساختن TO-DO برای کاری که می‌توانستی خودت انجام دهی (شلوغی فولدر)
+  ❌ overwrite کردن `TO-DO/_index.json` بدون merge (data loss)
+  ❌ نگه‌داشتن entry هایی که فایل‌شان پاک شده (broken reference)
+  ❌ فراموش کردن نوشتن «خروجی مورد انتظار» در هر آیتم TO-DO
+
+این بخش الزامی است. حتی اگر فکر می‌کنی "این تسک کاملاً auto است و نیازی
+به TO-DO نیست"، صریحاً در commit message یا report بنویس:
+"بررسی شد — این تسک هیچ بخش Manual-required ندارد، TO-DO ساخته نشد."
+
 📦 **اگر کار طولانی است:**
 - **خلاصه‌اش نکن.** همه را به‌طور کامل انجام بده.
 - اگر یک کامیت گنجایش ندارد، در **چندین کامیت متوالی** انجام بده — ولی
   هیچ بخشی را skip نکن.
 - ترتیب کامیت‌ها را منطقی نگه‌دار (foundation → core → integration → tests).
 - در آخر یک checklist از همه‌ی کامیت‌ها در PR description بنویس.
+
+🔁 **Commit + Push فوری per-task (بسیار مهم برای جریان کار صحیح):**
+
+پس از اتمام پیاده‌سازی این تسک، **بلافاصله** commit کن و **همان موقع**
+به default branch (main/master) push کن. سپس به تسک بعدی برو.
+
+✓ چرا این قانون حیاتی است:
+  - تسک‌های بعدی ممکن است به فایل‌ها/تغییراتی که این تسک ایجاد کرده
+    نیاز داشته باشند. اگر push نکنی، `git pull` بعدی آن‌ها را نمی‌بیند.
+  - جمع‌کردن تغییرات چند تسک منجر به conflict های بزرگ می‌شود.
+  - اگر در میانه fail کنی، task های push شده ضایع نمی‌شوند.
+
+⛔ ممنوع: "همه task ها را تمام می‌کنم بعد یک‌جا push می‌زنم"
+⛔ ممنوع: branch جدا برای task — مستقیم به default branch
+⛔ ممنوع: task بعدی بدون push کامل task قبلی
 
 ---
 
@@ -274,20 +412,18 @@ write بدون read یعنی یا (الف) reader حذف شده (regression)، �
 - علت: self.db write می‌شود ولی هرگز read نشده
 ```
 
-## 📋 چک‌لیست مراحل (3 مرحله)
+## 📋 چک‌لیست مراحل (1 مرحله)
 
 این تسک به مراحل کوچک‌تر تقسیم شده. **در هر verify خودکار، وضعیت هر مرحله به‌صورت `[ ]` (انجام نشده)، `[~]` (ناقص)، یا `[x]` (انجام شده) به‌روز می‌شود.**
 وقتی تمام مراحل `[x]` شدند، تسک به‌طور خودکار به «انجام شده» منتقل می‌شود.
 
-- [ ] **مرحله 1: تحلیل و حذف یا توجیه attribute self.db در image_service.py** — این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام نقاطی است که self.db نوشته (assign) می‌شود و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db است. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (اگر dead code است) یا یک
-- [ ] **مرحله 2: حذف self.db از image_service.py در صورت dead code بودن** — این مرحله شامل حذف تمام خطوطی است که self.db را در app/services/ai/image_service.py مقداردهی می‌کنند (write) اگر در مرحله قبل مشخص شد که هیچ readerی وجود ندارد و self.db dead code است. باید اطمینان حاصل شود که حذف self.db باعث شکستن هیچ functional requirement دیگری نمی‌شود. خارج از این مرحله: اضافه 
-- [ ] **مرحله 3: اضافه کردن reader برای self.db در صورت regression بودن** — این مرحله فقط در صورتی اجرا می‌شود که در مرحله 1 مشخص شود self.db باید خوانده شود ولی reader به اشتباه حذف شده است. شامل شناسایی جایی که self.db باید مصرف شود (مثلاً در یک متد خاص) و اضافه کردن کد خواندن از self.db. خارج از این مرحله: حذف self.db، تغییر logic اصلی سرویس، یا اضافه کردن feature جدید.
+- [ ] **مرحله 1: تحلیل و رفع مشکل write بدون read برای self.db در image_service.py** — این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام مکان‌هایی است که self.db مقداردهی یا نوشته می‌شود (مثلاً در __init__ یا متدهای دیگر)، و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db
 
 ---
 
-# 🔹 مرحله 1: تحلیل و حذف یا توجیه attribute self.db در image_service.py
+# 🔹 مرحله 1: تحلیل و رفع مشکل write بدون read برای self.db در image_service.py
 
-**Scope:** این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام نقاطی است که self.db نوشته (assign) می‌شود و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db است. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (اگر dead code است) یا یک reader باید اضافه شود (اگر regression است). این مرحله شامل تغییر کد نمی‌شود، فقط تحلیل و مستندسازی است. خارج از این مرحله: تغییرات واقعی کد، اضافه کردن reader جدید، یا حذف self.db.
+**Scope:** این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام مکان‌هایی است که self.db مقداردهی یا نوشته می‌شود (مثلاً در __init__ یا متدهای دیگر)، و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (چون unused است) یا اینکه reader گمشده باید اضافه شود (اگر regression است). خارج از این مرحله: تغییر در منطق business، اضافه کردن feature جدید، یا تغییر در دیتابیس. نکته حیاتی: ابتدا باید مشخص شود که self.db از نوع چیست (مثلاً SQLAlchemy session، یک کلاس دیتابیس کاستوم، یا چیز دیگر) تا بتوان reader مناسب را در صورت نیاز اضافه کرد.
 **Key terms:** app/services/ai/image_service.py, self.db, image_service
 
 **بخش مربوط از متن کاربر:**
@@ -296,182 +432,7 @@ attribute `self.db` در `app/services/ai/image_service.py` نوشته می‌ش
 ```
 
 ## 🎯 هدف (خلاصه ساختاریافته)
-تحلیل و مستندسازی dead code: self.db در image_service.py
-
-## 📍 موقعیت دقیق در پروژه
-_(file:line — symbol — snippet)_
-
-- `app/services/ai/image_service.py:20-28` — `class AIImageService` — این کامنت تأیید می‌کند که self.db قبلاً وجود داشته و به دلیل عدم استفاده حذف شده است. نیازی به تغییر کد نیست، فقط مستندسازی.
-  ```python
-  class AIImageService:
-      """Placeholder image-analysis service.
-  
-      Kept as a class for parity with AIService — when a real vision
-      provider is wired in, the constructor can take whatever dependency
-      (httpx client, db session, etc.) it needs at that time. The unused
-      ``db`` parameter was removed because no caller ever supplied it
-      and no method ever read it.
-      """
-  ```
-- `app/services/ai/image_service.py:30-55` — `async def analyze_image`
-  ```python
-  async def analyze_image(
-      self,
-      image_url: str,
-      *,
-      prompt: Optional[str] = None,
-      max_tokens: int = 256,
-  ) -> dict:
-      """Return a description of the image at ``image_url``.
-  
-      Until a real vision provider is wired in, this returns a
-      deterministic placeholder so the route layer / tests have a
-      stable shape to assert against:
-  
-          {"description":
-  ```
-
-## 🧭 هدف اصلی پروژه (از یادداشت کاربر)
-## ⚠️ یادداشت مهم برای مدل اجراکننده — قبل از شروع بخوان
-
-این پرامپت بر اساس یک **بررسی اولیهٔ خودکار** از repo ساخته شده — ممکن است
-حاوی اشتباه، تشخیص نادرست، یا حذف موارد مهم باشد. به‌عنوان منبع نهایی به
-آن استناد نکن.
-
-♻️ **احتمال پیاده‌سازی قبلی (مهم):**
-- ممکن است **بخشی یا تمامِ** این درخواست 
-[auto-re-registered from github_import at 2026-05-20T04:25:49.854717+00:00]
-
-## 🔍 Context و وضعیت فعلی
-تحلیل و حذف یا توجیه attribute self.db در app/services/ai/image_service.py. این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام نقاطی است که self.db نوشته (assign) می‌شود و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db است. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (اگر dead code است) یا یک reader باید اضافه شود (اگر regression است). این مرحله شامل تغییر کد نمی‌شود، فقط تحلیل و مستندسازی است. خارج از این مرحله: تغییرات واقعی کد، اضافه کردن reader جدید، یا حذف self.db.
-
-بر اساس بررسی کد واقعی در app/services/ai/image_service.py (خطوط 20-55)، کلاس AIImageService در حال حاضر فاقد متد __init__ است و هیچ attribute ای به نام self.db در بدنه کلاس یا متدهای آن (analyze_image) تعریف یا استفاده نشده است. با این حال، در کامنت خطوط 23-27 اشاره شده که 'when a real vision provider is wired in, the constructor can take whatever dependency (httpx client, db session, etc.) it needs at that time. The unused db parameter was removed because no caller ever supplied it and no method ever read it.' این نشان می‌دهد که self.db قبلاً وجود داشته و حذف شده است. جستجوی کامل در کل کدبیس (شامل فایل‌های deep-read شده مانند app/services/ai/__init__.py, app/services/ai/model_service.py, app/services/ai/nlp_service.py, app/services/ai/provider_service.py, app/routes/ai.py, app/services/ai_service.py و سایر فایل‌ها) هیچ ارجاعی به self.db یا AIImageService.db پیدا نکرد. بنابراین self.db در image_service.py یک dead code است که قبلاً پاکسازی شده و نیازی به اقدام ندارد.
-
-## ✅ معیار پذیرش (Acceptance Criteria) — رفتار-محور
-**مهم:** هر AC رفتار قابل مشاهده را تعریف می‌کند، نه نام فایل/کلاس.
-verify می‌تواند پیاده‌سازی متفاوت ولی هم‌ارز را قبول کند.
-
-- [ ] هیچ تستی fail نمی‌شود (`npm run test` / `pytest`)
-- [ ] linter بدون warning عبور می‌کند
-- [ ] type-check موفق است (`tsc --noEmit` / `mypy`)
-
-## 🪜 مراحل اجرایی پیشنهادی
-1. 1. تأیید کنید که فایل app/services/ai/image_service.py در خطوط 20-55 حاوی هیچ self.db ای نیست.
-2. کامنت موجود در خطوط 23-27 را به‌روزرسانی کنید تا به وضوح بگوید که self.db حذف شده و در صورت نیاز به DB در آینده، باید از طریق constructor تزریق شود.
-3. یک جستجوی grep در کل پروژه برای الگوی 'self\.db' در فایل‌های .py انجام دهید تا مطمئن شوید هیچ instance دیگری از این dead code باقی نمانده است.
-4. نتیجه تحلیل را در یک فایل مستندسازی (مانند docs/DEAD_CODE_ANALYSIS.md) ثبت کنید.
-
-## 📤 خروجی مورد انتظار
-تغییر کد در فایل‌های مرتبط، commit یا PR جدید با پیام واضح، و عبور تمام معیارهای پذیرش.
-
-## ⚠️ ریسک‌ها و موارد احتیاط
-پیش از merge، تست‌های موجود اجرا شوند تا رگرشن ایجاد نشود.
-
-## 🔗 وابستگی‌های تسکی
-_(مستقل)_
-
-## 🏷 دسته‌بندی
-- نوع: refactor
-- اولویت: low
-- تخمین زمان: small
-
----
-
-# 🔹 مرحله 2: حذف self.db از image_service.py در صورت dead code بودن
-
-**Scope:** این مرحله شامل حذف تمام خطوطی است که self.db را در app/services/ai/image_service.py مقداردهی می‌کنند (write) اگر در مرحله قبل مشخص شد که هیچ readerی وجود ندارد و self.db dead code است. باید اطمینان حاصل شود که حذف self.db باعث شکستن هیچ functional requirement دیگری نمی‌شود. خارج از این مرحله: اضافه کردن reader جدید، تغییر logic سرویس، یا حذف importهای مرتبط با self.db.
-**Key terms:** app/services/ai/image_service.py, self.db, image_service
-
-**بخش مربوط از متن کاربر:**
-```
-attribute `self.db` در `app/services/ai/image_service.py` نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند. علت: self.db write می‌شود ولی هرگز read نشده
-```
-
-## 🎯 هدف (خلاصه ساختاریافته)
-حذف self.db dead code از AIImageService در image_service.py
-
-## 📍 موقعیت دقیق در پروژه
-_(file:line — symbol — snippet)_
-
-- `app/services/ai/image_service.py:20-28` — `AIImageService` — کلاس AIImageService — docstring قبلاً اشاره دارد که پارامتر db حذف شده. اگر هنوز self.db در __init__ وجود دارد، باید حذف شود.
-  ```python
-  class AIImageService:
-      """Placeholder image-analysis service.
-  
-      Kept as a class for parity with AIService — when a real vision
-      provider is wired in, the constructor can take whatever dependency
-      (httpx client, db session, etc.) it needs at that time. The unused
-      ``db`` parameter was removed because no caller ever supplied it
-      and no method ever read it.
-      """
-  ```
-- `app/services/ai/image_service.py:30-55` — `AIImageService.analyze_image`
-  ```python
-  async def analyze_image(
-      self,
-      image_url: str,
-      *,
-      prompt: Optional[str] = None,
-      max_tokens: int = 256,
-  ) -> dict:
-      """Return a description of the image at ``image_url``."""
-      logger.info(
-          "image-analysis placeholder hit
-  ```
-
-## 🧭 هدف اصلی پروژه (از یادداشت کاربر)
-## ⚠️ یادداشت مهم برای مدل اجراکننده — قبل از شروع بخوان
-
-این پرامپت بر اساس یک **بررسی اولیهٔ خودکار** از repo ساخته شده — ممکن است
-حاوی اشتباه، تشخیص نادرست، یا حذف موارد مهم باشد. به‌عنوان منبع نهایی به
-آن استناد نکن.
-
-♻️ **احتمال پیاده‌سازی قبلی (مهم):**
-- ممکن است **بخشی یا تمامِ** این درخواست 
-[auto-re-registered from github_import at 2026-05-20T04:25:49.854717+00:00]
-
-## 🔍 Context و وضعیت فعلی
-کاربر درخواست حذف `self.db` از `app/services/ai/image_service.py` را دارد، زیرا این attribute در کلاس `AIImageService` نوشته می‌شود (write) اما هیچ readerای در کل کدبیس آن را مصرف نمی‌کند. بر اساس تحلیل کد واقعی در `app/services/ai/image_service.py` (خطوط 20-55)، کلاس `AIImageService` دارای متد `__init__` پیش‌فرض (از object) است و `self.db` در هیچ‌کجای کلاس مقداردهی یا استفاده نشده است. همچنین متد `analyze_image` (خطوط 30-55) و تابع ماژول-سطح `analyze_image` (خطوط 58-70) هیچ ارجاعی به `self.db` ندارند. بررسی importها در `app/services/ai/__init__.py` و `app/routes/ai.py` نشان می‌دهد که این سرویس از طریق `from app.services.ai.image_service import analyze_image` فراخوانی می‌شود و هیچ‌کدام از callerها به `self.db` وابسته نیستند. بنابراین `self.db` در این کلاس dead code محسوب می‌شود و حذف آن بی‌خطر است. توجه: کاربر تأکید کرده که خارج از این مرحله، اضافه کردن reader جدید، تغییر logic سرویس، یا حذف importهای مرتبط با `self.db` مجاز نیست.
-
-## ✅ معیار پذیرش (Acceptance Criteria) — رفتار-محور
-**مهم:** هر AC رفتار قابل مشاهده را تعریف می‌کند، نه نام فایل/کلاس.
-verify می‌تواند پیاده‌سازی متفاوت ولی هم‌ارز را قبول کند.
-
-- [ ] هیچ تستی fail نمی‌شود (`npm run test` / `pytest`)
-- [ ] linter بدون warning عبور می‌کند
-- [ ] type-check موفق است (`tsc --noEmit` / `mypy`)
-
-## 🪜 مراحل اجرایی پیشنهادی
-1. 1. در فایل `app/services/ai/image_service.py`، کلاس `AIImageService` را بررسی کن. در حال حاضر کلاس `__init__` صریحی ندارد و `self.db` در بدنه کلاس تعریف نشده است. اگر `self.db` در `__init__` یا جای دیگری از کلاس مقداردهی شده (مثلاً در commitهای قبلی یا در شاخه‌های دیگر)، آن خطوط را حذف کن. 2. اگر کلاس `AIImageService` دارای `__init__` با پارامتر `db` است، آن پارامتر و خط `self.db = db` را حذف کن. 3. اطمینان حاصل کن که متد `analyze_image` (خطوط 30-55) و تابع ماژول-سطح `analyze_image` (خطوط 58-70) هیچ ارجاعی به `self.db` ندارند. 4. importهای مرتبط با `self.db` (مثلاً `from app.database import SessionLocal` اگر فقط برای `self.db` استفاده می‌شده) را حذف نکن مگر اینکه dead import باشند. 5. تست‌های موجود در `tests/services/test_image_service.py` (اگر وجود دارد) را اجرا کن تا مطمئن شوی تغییری در رفتار سرویس ایجاد نشده است.
-
-## 📤 خروجی مورد انتظار
-تغییر کد در فایل‌های مرتبط، commit یا PR جدید با پیام واضح، و عبور تمام معیارهای پذیرش.
-
-## ⚠️ ریسک‌ها و موارد احتیاط
-پیش از merge، تست‌های موجود اجرا شوند تا رگرشن ایجاد نشود.
-
-## 🔗 وابستگی‌های تسکی
-_(مستقل)_
-
-## 🏷 دسته‌بندی
-- نوع: refactor
-- اولویت: low
-- تخمین زمان: small
-
----
-
-# 🔹 مرحله 3: اضافه کردن reader برای self.db در صورت regression بودن
-
-**Scope:** این مرحله فقط در صورتی اجرا می‌شود که در مرحله 1 مشخص شود self.db باید خوانده شود ولی reader به اشتباه حذف شده است. شامل شناسایی جایی که self.db باید مصرف شود (مثلاً در یک متد خاص) و اضافه کردن کد خواندن از self.db. خارج از این مرحله: حذف self.db، تغییر logic اصلی سرویس، یا اضافه کردن feature جدید.
-**Key terms:** app/services/ai/image_service.py, self.db, image_service
-
-**بخش مربوط از متن کاربر:**
-```
-attribute `self.db` در `app/services/ai/image_service.py` نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند. علت: self.db write می‌شود ولی هرگز read نشده
-```
-
-## 🎯 هدف (خلاصه ساختاریافته)
-اضافه کردن reader برای self.db در image_service در صورت regression
+حذف self.db بی‌استفاده از AIImageService در image_service.py
 
 ## 📍 موقعیت دقیق در پروژه
 _(file:line — symbol — snippet)_
@@ -484,6 +445,14 @@ _(file:line — symbol — snippet)_
       Kept as a class for parity with AIService — when a real vision
       provider is wired in, the constructor can take whatever dependency
       (httpx client, db session, etc.) it needs at that time. The unused
+      ``db`` parameter was removed because no caller ever supplied it
+      and no method ever read it.
+      """
+  
+      async def analyze_image(
+          self,
+          image_url: str,
+          *,
   ```
 
 ## 🧭 هدف اصلی پروژه (از یادداشت کاربر)
@@ -498,7 +467,7 @@ _(file:line — symbol — snippet)_
 [auto-re-registered from github_import at 2026-05-20T04:25:49.854717+00:00]
 
 ## 🔍 Context و وضعیت فعلی
-کاربر درخواست 'اضافه کردن reader برای self.db در صورت regression بودن' را داده است. این یک تسک cleanup با اولویت low است. متن کامل درخواست: 'این مرحله فقط در صورتی اجرا می‌شود که در مرحله 1 مشخص شود self.db باید خوانده شود ولی reader به اشتباه حذف شده است. شامل شناسایی جایی که self.db باید مصرف شود (مثلاً در یک متد خاص) و اضافه کردن کد خواندن از self.db. خارج از این مرحله: حذف self.db، تغییر logic اصلی سرویس، یا اضافه کردن feature جدید.' بخش مربوط از درخواست اصلی کاربر: 'attribute self.db در app/services/ai/image_service.py نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند. علت: self.db write می‌شود ولی هرگز read نشده'. کلیدواژه‌ها: app/services/ai/image_service.py, self.db, image_service. در کد فعلی فایل app/services/ai/image_service.py (خطوط 20-55)، کلاس AIImageService فاقد attribute self.db است. در واقع، کلاس AIImageService در خط 20 تعریف شده و هیچ constructor (__init__) ندارد. تنها متد آن analyze_image است که image_url, prompt, max_tokens را می‌گیرد و یک dict placeholder برمی‌گرداند. هیچ اثری از self.db در این فایل دیده نمی‌شود. این نشان می‌دهد که یا self.db در نسخه‌های قبلی وجود داشته و حذف شده، یا کاربر به اشتباه فکر می‌کند وجود دارد. بر اساس deep context، فایل app/services/ai/image_service.py در خطوط 20-55 هیچ self.db ندارد. بنابراین، این تسک برای بررسی regression است: اگر در مرحله 1 مشخص شود که self.db باید در یک متد خاص (مثلاً analyze_image) خوانده شود ولی به اشتباه حذف شده، باید reader اضافه شود. در غیر این صورت، نیازی به تغییر نیست. فایل‌های مرتبط: app/services/ai/__init__.py (که image_service را export می‌کند)، app/routes/ai.py (که analyze_image را call می‌کند)، و app/services/ai_service.py (که سرویس‌های AI را orchestrate می‌کند).
+تحلیل و رفع مشکل write بدون read برای self.db در image_service.py. کاربر درخواست داده است که attribute `self.db` در `app/services/ai/image_service.py` که نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند، بررسی و حذف شود. علت: self.db write می‌شود ولی هرگز read نشده است. این مرحله شامل تحلیل کامل فایل `app/services/ai/image_service.py` برای یافتن تمام مکان‌هایی است که self.db مقداردهی یا نوشته می‌شود (مثلاً در `__init__` یا متدهای دیگر)، و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (چون unused است) یا اینکه reader گمشده باید اضافه شود (اگر regression است). خارج از این مرحله: تغییر در منطق business، اضافه کردن feature جدید، یا تغییر در دیتابیس. نکته حیاتی: ابتدا باید مشخص شود که self.db از نوع چیست (مثلاً SQLAlchemy session، یک کلاس دیتابیس کاستوم، یا چیز دیگر) تا بتوان reader مناسب را در صورت نیاز اضافه کرد. در کد فعلی `app/services/ai/image_service.py` (خطوط 20-55)، کلاس `AIImageService` هیچ `__init__` ندارد و هیچ متدی از `self.db` استفاده نمی‌کند. تنها متد `analyze_image` (خطوط 30-55) یک placeholder است که یک dict ثابت برمی‌گرداند و هیچ دسترسی به دیتابیس ندارد. بررسی deep context نشان می‌دهد که فایل‌های `app/services/ai/ai_data_access_service.py` و `app/services/ai/recommendation_service.py` از `self.db` استفاده می‌کنند (از نوع SQLAlchemy AsyncSession)، اما `image_service.py` چنین چیزی ندارد. بنابراین self.db در image_service.py یک attribute مرده است که باید حذف شود.
 
 ## ✅ معیار پذیرش (Acceptance Criteria) — رفتار-محور
 **مهم:** هر AC رفتار قابل مشاهده را تعریف می‌کند، نه نام فایل/کلاس.
@@ -509,7 +478,7 @@ verify می‌تواند پیاده‌سازی متفاوت ولی هم‌ارز
 - [ ] type-check موفق است (`tsc --noEmit` / `mypy`)
 
 ## 🪜 مراحل اجرایی پیشنهادی
-1. 1. بررسی فایل app/services/ai/image_service.py برای وجود attribute self.db. در کد فعلی (خطوط 20-55)، کلاس AIImageService هیچ __init__ ندارد و self.db وجود ندارد. 2. اگر در مرحله 1 مشخص شود که self.db باید در متد analyze_image (خط 30) خوانده شود (مثلاً برای ذخیره/بازیابی نتایج تحلیل تصویر از دیتابیس)، باید: a) یک __init__ به کلاس AIImageService اضافه کرد که self.db = db را تنظیم کند. b) در متد analyze_image، از self.db برای خواندن داده استفاده کرد (مثلاً session = self.db() یا self.db.execute(...)). 3. اگر self.db نباید وجود داشته باشد (یعنی regression نیست)، هیچ تغییری نده و فقط در مستندات ذکر کن که self.db در image_service وجود ندارد. 4. فایل‌های مرتبط: app/services/ai/__init__.py (برای export سرویس جدید)، app/routes/ai.py (برای استفاده از analyze_image با db)، و app/services/ai_service.py (برای هماهنگی با سایر سرویس‌های AI). 5. تست‌های مربوطه: tests/test_image_service.py (اگر وجود دارد) یا tests/test_integration_services.py را برای پوشش analyze_image با db به‌روز کن.
+1. 1. فایل `app/services/ai/image_service.py` را باز کن و کلاس `AIImageService` را بررسی کن. 2. هیچ `__init__` یا متدی که `self.db` را تعریف یا استفاده کند وجود ندارد. 3. برای اطمینان، یک grep در کل پروژه روی `self.db` در فایل‌های مرتبط با image_service انجام بده: `grep -rn "self.db" app/services/ai/image_service.py` — نتیجه خالی است. 4. همچنین grep روی `AIImageService` در کل پروژه: `grep -rn "AIImageService" app/` — فقط در خود image_service.py و احتمالاً در `app/services/ai/__init__.py` (که deep-read نشده) یافت می‌شود. 5. از آنجایی که self.db هرگز تعریف یا استفاده نشده، نیازی به حذف خط خاصی نیست. اما برای جلوگیری از سردرگمی آینده، یک کامنت در docstring کلاس اضافه کن که `self.db` intentionally omitted است چون این سرویس placeholder است و نیازی به دیتابیس ندارد. 6. اگر در آینده یک vision provider واقعی اضافه شد، می‌توان `self.db` را با type hint `AsyncSession` اضافه کرد. 7. هیچ تغییری در منطق business یا دیتابیس لازم نیست.
 
 ## 📤 خروجی مورد انتظار
 تغییر کد در فایل‌های مرتبط، commit یا PR جدید با پیام واضح، و عبور تمام معیارهای پذیرش.
@@ -539,25 +508,9 @@ _(مستقل)_
 
 ## Task Steps
 
-### Step 1: تحلیل و حذف یا توجیه attribute self.db در image_service.py
+### Step 1: تحلیل و رفع مشکل write بدون read برای self.db در image_service.py
 **Status:** `pending` (0%)
-**Scope:** این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام نقاطی است که self.db نوشته (assign) می‌شود و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db است. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (اگر dead code است) یا یک reader باید اضافه شود (اگر regression است). این مرحله شامل تغییر کد نمی‌شود، فقط تحلیل و مستندسازی است. خارج از این مرحله: تغییرات واقعی کد، اضافه کردن reader جدید، یا حذف self.db.
-**Excerpt:**
-```
-attribute `self.db` در `app/services/ai/image_service.py` نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند. علت: self.db write می‌شود ولی هرگز read نشده
-```
-
-### Step 2: حذف self.db از image_service.py در صورت dead code بودن
-**Status:** `pending` (0%)
-**Scope:** این مرحله شامل حذف تمام خطوطی است که self.db را در app/services/ai/image_service.py مقداردهی می‌کنند (write) اگر در مرحله قبل مشخص شد که هیچ readerی وجود ندارد و self.db dead code است. باید اطمینان حاصل شود که حذف self.db باعث شکستن هیچ functional requirement دیگری نمی‌شود. خارج از این مرحله: اضافه کردن reader جدید، تغییر logic سرویس، یا حذف importهای مرتبط با self.db.
-**Excerpt:**
-```
-attribute `self.db` در `app/services/ai/image_service.py` نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند. علت: self.db write می‌شود ولی هرگز read نشده
-```
-
-### Step 3: اضافه کردن reader برای self.db در صورت regression بودن
-**Status:** `pending` (0%)
-**Scope:** این مرحله فقط در صورتی اجرا می‌شود که در مرحله 1 مشخص شود self.db باید خوانده شود ولی reader به اشتباه حذف شده است. شامل شناسایی جایی که self.db باید مصرف شود (مثلاً در یک متد خاص) و اضافه کردن کد خواندن از self.db. خارج از این مرحله: حذف self.db، تغییر logic اصلی سرویس، یا اضافه کردن feature جدید.
+**Scope:** این مرحله شامل تحلیل کامل فایل app/services/ai/image_service.py برای یافتن تمام مکان‌هایی است که self.db مقداردهی یا نوشته می‌شود (مثلاً در __init__ یا متدهای دیگر)، و سپس جستجوی کامل در کل کدبیس برای یافتن هرگونه خواندن (read) از self.db. اگر هیچ reader یافت نشد، باید تصمیم گرفته شود که آیا self.db باید حذف شود (چون unused است) یا اینکه reader گمشده باید اضافه شود (اگر regression است). خارج از این مرحله: تغییر در منطق business، اضافه کردن feature جدید، یا تغییر در دیتابیس. نکته حیاتی: ابتدا باید مشخص شود که self.db از نوع چیست (مثلاً SQLAlchemy session، یک کلاس دیتابیس کاستوم، یا چیز دیگر) تا بتوان reader مناسب را در صورت نیاز اضافه کرد.
 **Excerpt:**
 ```
 attribute `self.db` در `app/services/ai/image_service.py` نوشته می‌شود ولی هیچ reader در کدبیس آن را مصرف نمی‌کند. علت: self.db write می‌شود ولی هرگز read نشده
