@@ -23,6 +23,7 @@ from threading import Lock
 from typing import Optional
 
 from app.config import AI_PERFORMANCE_TARGETS
+from .content_analysis_service import analyze_content  # noqa: F401  re-export
 from .model_service import DEFAULT_MODEL
 from .provider_service import call_openai_chat, has_openai_key
 
@@ -207,50 +208,6 @@ async def generate_text(
         result_kind=kind,
     )
     return result
-
-
-# ── Lightweight content analysis (audit task 1a08ded2 AC 68) ─────────
-# Deterministic, no upstream call: the auto-ingestion pipeline
-# (event_publisher -> process_ai_ingestion_event -> ai_ingestion_service)
-# feeds new-entity text through here, so a key-less / offline deploy still
-# produces a usable summary + keywords without billing a provider.
-_STOPWORDS = {
-    "the", "a", "an", "and", "or", "but", "to", "of", "in", "on", "for",
-    "with", "is", "are", "this", "that", "it",
-    "را", "و", "در", "به", "از", "که", "این", "آن", "با", "برای", "تا",
-    "یک", "می", "هم", "رو", "است", "های",
-}
-
-
-def analyze_content(text: str, *, entity_type: str | None = None) -> dict:
-    """Analyse free-form entity text into a small structured result.
-
-    Returns ``{"summary": str, "keywords": list[str]}`` (AC 68). Pure and
-    deterministic so the ingestion pipeline and its tests never depend on a
-    live provider. ``summary`` is the first sentence (capped at 200 chars);
-    ``keywords`` are the most frequent non-trivial tokens (Persian + Latin),
-    stop-words removed. ``entity_type`` is accepted for future per-type
-    tuning but does not change the contract today.
-    """
-    import re as _re
-
-    text = (text or "").strip()
-    if not text:
-        return {"summary": "", "keywords": []}
-
-    # Summary: text up to the first sentence boundary, capped.
-    sentence = _re.split(r"(?<=[.!?؟])\s|\n", text, maxsplit=1)[0].strip()
-    summary = sentence[:200]
-
-    # Keywords: frequency of tokens (len>=3), Persian or Latin, minus stop-words.
-    freq: dict[str, int] = {}
-    for tok in _re.findall(r"[\w؀-ۿ]{3,}", text.lower()):
-        if tok in _STOPWORDS or tok.isdigit():
-            continue
-        freq[tok] = freq.get(tok, 0) + 1
-    keywords = [w for w, _ in sorted(freq.items(), key=lambda kv: (-kv[1], kv[0]))[:8]]
-
-    return {"summary": summary, "keywords": keywords}
 
 
 def _placeholder_response(prompt: str, model: str) -> dict:
