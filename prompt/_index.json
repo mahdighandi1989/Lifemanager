@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 17,
+  "total": 16,
   "tasks": [
-    {
-      "task_id": "task_882723eb07de",
-      "title": "بهینه‌سازی اتصال DB و اصلاح الگوهای طراحی",
-      "priority": "high",
-      "execution_priority": 2300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-task_882723eb07de.md",
-      "external_attempts": 0
-    },
     {
       "task_id": "task_92fa5ea15e2b",
       "title": "افزودن نوتیفیکیشن `verify_failed` و مدیریت رویدادها",
