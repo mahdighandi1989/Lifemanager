@@ -2,7 +2,7 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 4,
+  "total": 3,
   "tasks": [
     {
       "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
@@ -12,16 +12,6 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-3cc09436-d889-4cee-b22b-9af05c82a7b2.md",
-      "external_attempts": 0
-    },
-    {
-      "task_id": "7367c6f0-ba56-46c4-8436-0970a7075314",
-      "title": "مدیریت فایل و استخراج متن از Google Drive",
-      "priority": "medium",
-      "execution_priority": 3300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-7367c6f0-ba56-46c4-8436-0970a7075314.md",
       "external_attempts": 0
     },
     {
