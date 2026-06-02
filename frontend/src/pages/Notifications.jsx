@@ -54,6 +54,8 @@ function NotificationItem({ notification, onMarkRead }) {
 // choice survives reloads without a backend round-trip.
 const EVENT_TYPES = [
   { key: 'verify_failed', label: 'ورود ناموفق / تأیید ناموفق' },
+  { key: 'login_succeeded', label: 'ورود موفق' },
+  { key: 'task_done', label: 'انجام کار' },
   { key: 'system', label: 'سیستم' },
   { key: 'warning', label: 'هشدار' },
   { key: 'error', label: 'خطا' },

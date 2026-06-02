@@ -136,16 +136,21 @@ async def login(db: AsyncSession, credentials: UserLogin) -> TokenResponse:
         from app.services.notification_service import notify_event
 
         try:
-            await notify_event(
-                "verify_failed",
-                user_id=getattr(user, "id", 0) or 0,
-                db=db,
-                priority="high",
-                silent=False,
-            )
+            await notify_event("verify_failed", user_id=getattr(user, "id", 0) or 0, db=db, silent=False, priority="high")
         except Exception:  # never let notifications mask the 401
             pass
         raise ValueError("Invalid email or password")
+
+    # Successful login → explicit, registered, snake_case event_type
+    # (audit task 92fa5ea15e2b sub-task 4). silent so it lands in the bell/log
+    # as a security trail without an intrusive push; best-effort, never blocks
+    # the token issue.
+    from app.services.notification_service import notify_event
+
+    try:
+        await notify_event(event="login_succeeded", user_id=user.id, db=db, silent=True)
+    except Exception:  # a notification outage must never block login
+        pass
 
     token = create_access_token(data={"sub": str(user.id), "email": user.email})
     return TokenResponse(access_token=token, token_type="bearer")

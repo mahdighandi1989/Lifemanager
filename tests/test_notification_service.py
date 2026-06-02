@@ -202,6 +202,21 @@ def test_valid_notification_types_include_verify_failed():
     assert "verify_failed" in VALID_NOTIFICATION_TYPES
 
 
+@pytest.mark.asyncio
+async def test_notify_event_explicit_task_done_event_type(session_factory):
+    """A notification must carry an explicit snake_case event_type
+    (audit task 92fa5ea15e2b sub-task 3). The `task_done` event is
+    registered and resolves a meaningful Persian title/message."""
+    from app.services.notification_service import EVENT_REGISTRY
+
+    assert "task_done" in EVENT_REGISTRY  # registered event type
+    async with session_factory() as db:
+        record = await notify_event(event="task_done", user_id=7, db=db)
+    assert record is not None
+    assert record.title == "کار انجام شد"
+    assert "موفقیت" in (record.message or "")
+
+
 def test_verify_failed_persian_template_content():
     """The Persian message template for verify_failed is meaningful and
     not a placeholder. Verifier static-grep can also find this string

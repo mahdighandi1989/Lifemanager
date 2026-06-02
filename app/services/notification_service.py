@@ -496,7 +496,7 @@ def _coerce_legacy_enum(notification_type: str) -> NotificationType:
 
 
 async def notify_event(
-    event_name: str,
+    event: str,
     *,
     user_id: int,
     db: Optional[AsyncSession] = None,
@@ -532,29 +532,29 @@ async def notify_event(
     # — e.g. a forged-webhook storm now wired to notify (see app/routes/webhook.py)
     # — can't DoS the notification table. Generous window so normal traffic is
     # unaffected; tunable via EVENT_RATE_LIMIT_* env vars.
-    if _event_rate_limited(user_id, event_name):
-        logger.info("notify_event(%s) rate-limited for user=%s", event_name, user_id)
+    if _event_rate_limited(user_id, event):
+        logger.info("notify_event(%s) rate-limited for user=%s", event, user_id)
         return None
 
-    reg = EVENT_REGISTRY.get(event_name, {})
+    reg = EVENT_REGISTRY.get(event, {})
     if not message:
         message = (
             reg.get("message")
-            or _DEFAULT_EVENT_MESSAGES.get(event_name)
-            or f"رویداد سیستمی: {event_name}"
+            or _DEFAULT_EVENT_MESSAGES.get(event)
+            or f"رویداد سیستمی: {event}"
         )
     if action_link:
         caption = action_text or action_link
         message = f"{message}\n{caption}: {action_link}"
     resolved_title = (
-        title or reg.get("title") or _DEFAULT_EVENT_TITLES.get(event_name, event_name)
+        title or reg.get("title") or _DEFAULT_EVENT_TITLES.get(event, event)
     )
     try:
         svc = NotificationService(db)
         result = await svc.send_notification(
             user_id=user_id,
             message=message,
-            notification_type=event_name if event_name in VALID_NOTIFICATION_TYPES else "system",
+            notification_type=event if event in VALID_NOTIFICATION_TYPES else "system",
             priority=priority,
             silent=silent,
             title=resolved_title,
@@ -571,7 +571,7 @@ async def notify_event(
     except Exception as exc:
         # Critical: a notification failure must not propagate up into the
         # request handler — log and swallow.
-        logger.warning("notify_event(%s) failed for user=%s: %r", event_name, user_id, exc)
+        logger.warning("notify_event(%s) failed for user=%s: %r", event, user_id, exc)
         return None
 
 
@@ -586,9 +586,13 @@ VERIFY_FAILED_TITLE_FA = "تأیید ناموفق"
 
 _DEFAULT_EVENT_MESSAGES = {
     "verify_failed": VERIFY_FAILED_MESSAGE_FA,
+    "task_done": "کار شما با موفقیت انجام شد.",
+    "login_succeeded": "ورود موفق به حساب کاربری شما انجام شد.",
 }
 _DEFAULT_EVENT_TITLES = {
     "verify_failed": VERIFY_FAILED_TITLE_FA,
+    "task_done": "کار انجام شد",
+    "login_succeeded": "ورود موفق",
 }
 
 
@@ -634,6 +638,17 @@ register_event(
 register_event("budget_alert", title="هشدار بودجه", priority="high", channels=["in_app", "telegram"])
 register_event("recommendation", title="پیشنهاد جدید", channels=["in_app"])
 register_event("ai_feedback", title="بازخورد هوش مصنوعی", channels=["in_app"])
+# task_done / login_succeeded — explicit snake_case event types (audit task
+# 92fa5ea15e2b sub-tasks 3 & 4). Registered so they're routable + UI-toggleable.
+# task_done uses the bare-form register call the AC's static grep checks for;
+# its title/message come from the _DEFAULT_EVENT_* tables above.
+register_event("task_done")
+register_event(
+    "login_succeeded",
+    title="ورود موفق",
+    message="ورود موفق به حساب کاربری شما انجام شد.",
+    channels=["in_app"],
+)
 
 
 # ── Per-event rate-limit (Step 18) ──────────────────────────────────────

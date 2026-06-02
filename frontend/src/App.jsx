@@ -128,6 +128,16 @@ function App() {
                 }
               />
               <Route
+                path="/settings/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Notifications />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/ai-settings"
                 element={
                   <ProtectedRoute>
