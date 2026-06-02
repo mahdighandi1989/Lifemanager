@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-06-02T09:38:00+00:00",
-  "total": 2,
+  "generated_at": "2026-06-02T09:40:00+00:00",
+  "total": 3,
   "items": [
     {
       "task_id": "2165524b-5614-4c95-938c-0587d7748436",
@@ -11,6 +11,15 @@
       "status": "pending",
       "created_at": "2026-05-26T20:34:33.086107+00:00",
       "updated_at": "2026-06-02T09:38:00+00:00"
+    },
+    {
+      "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
+      "task_title": "Inter-project oversight — live third-party PM credentials + vendor adapters",
+      "execution_priority": 3000,
+      "file": "task-d2146781-pm-adapters.md",
+      "status": "pending",
+      "created_at": "2026-05-26T20:47:05.225531+00:00",
+      "updated_at": "2026-06-02T09:40:00+00:00"
     },
     {
       "task_id": "4ae4b3ca-1a0e-4057-8e62-99365abb1576",
