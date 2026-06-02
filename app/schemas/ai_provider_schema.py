@@ -52,3 +52,19 @@ class GlobalAnalysisPromptResponse(BaseModel):
 
 class GlobalAnalysisPromptUpdate(BaseModel):
     prompt_text: str = Field(..., max_length=10_000)
+
+
+class AnalysisPromptResponse(BaseModel):
+    """Admin-managed analysis prompt (AC 24-28). Mirrors the global-prompt
+    response shape but is served by the admin-gated /ai/analysis_prompt route."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: Optional[int] = None
+    prompt_text: str
+    edited_by_user_id: Optional[int] = None
+    last_edited_at: Optional[datetime] = None
+
+
+class AnalysisPromptUpdate(BaseModel):
+    prompt_text: str = Field(..., max_length=10_000)

@@ -266,10 +266,16 @@ from app.schemas.ai_provider_schema import (
     AIProviderCreate,
     AIProviderResponse,
     AIProviderUpdate,
+    AnalysisPromptResponse,
+    AnalysisPromptUpdate,
     GlobalAnalysisPromptResponse,
     GlobalAnalysisPromptUpdate,
 )
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_current_admin_user, get_optional_user_id
+from app.services.ai.analysis_prompt_service import (
+    get_analysis_prompt,
+    set_analysis_prompt,
+)
 
 
 def _provider_to_response(p: AIProvider) -> AIProviderResponse:
@@ -600,6 +606,36 @@ async def put_global_prompt(
     await db.commit()
     await db.refresh(prompt)
     return prompt
+
+
+# ── Admin-managed analysis prompt (audit task 1a08ded2 AC 24-28) ──────
+# Distinct from /global-prompt above: this surface is admin-gated for writes
+# (non-admin PUT -> 403) and backed by the AnalysisPrompt table + service.
+
+
+@router.get("/analysis_prompt", response_model=AnalysisPromptResponse)
+@handle_errors
+async def get_analysis_prompt_route(db: AsyncSession = Depends(get_db)):
+    """Return the active analysis prompt, or an empty default when none has
+    been saved yet (AC 25). Open read so any client/pipeline can fetch it."""
+    prompt = await get_analysis_prompt(db)
+    if prompt is None:
+        return AnalysisPromptResponse(prompt_text="")
+    return prompt
+
+
+@router.put("/analysis_prompt", response_model=AnalysisPromptResponse)
+@handle_errors
+async def put_analysis_prompt_route(
+    payload: AnalysisPromptUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_current_admin_user),  # AC 26: non-admin -> 403
+):
+    """Upsert the analysis prompt. Admin-only — a non-admin (or anonymous)
+    caller is rejected with 403 before reaching here (AC 26-27)."""
+    return await set_analysis_prompt(
+        db, prompt_text=payload.prompt_text, user_id=getattr(admin, "id", None)
+    )
 
 
 # ── User data context for AI (audit task 1a08ded2 AC 29-31) ────────

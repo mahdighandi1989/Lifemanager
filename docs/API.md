@@ -124,6 +124,7 @@ OpenAI-compatible vendor — DeepSeek/Grok/Perplexity/OpenRouter/local); falls
 back to env `OPENAI_API_KEY`, then the deterministic placeholder. Keys are
 stored encrypted (`AIProvider.api_key_encrypted`, migration 0026).
 | GET / PUT | `/api/ai/global-prompt` | Read / update the global analysis prompt. |
+| GET / PUT | `/api/ai/analysis_prompt` | Admin-managed analysis prompt (`analysis_prompts` table). GET is open and returns an empty default when unset; PUT is admin-only (403 for non-admin / anonymous). |
 | GET | `/api/ai/user_data_context` | Authenticated caller's own Task/Project/TodoItem/Notification context for AI. |
 | POST | `/api/ai/dynamic-analyze` | Free-form AI analysis; 403 when `FEATURE_AI_ENABLED` is off. |
 
