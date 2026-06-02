@@ -1,8 +1,17 @@
 {
   "version": 1,
-  "generated_at": "2026-06-02T00:00:00+00:00",
-  "total": 1,
+  "generated_at": "2026-06-02T09:38:00+00:00",
+  "total": 2,
   "items": [
+    {
+      "task_id": "2165524b-5614-4c95-938c-0587d7748436",
+      "task_title": "Context-aware recommendations — wearable pairing + continuous voice capture",
+      "execution_priority": 3000,
+      "file": "task-2165524b-wearable-voice.md",
+      "status": "pending",
+      "created_at": "2026-05-26T20:34:33.086107+00:00",
+      "updated_at": "2026-06-02T09:38:00+00:00"
+    },
     {
       "task_id": "4ae4b3ca-1a0e-4057-8e62-99365abb1576",
       "task_title": "Budget & Finance — live email/SMS finance sources",
