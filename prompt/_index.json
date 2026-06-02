@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 18,
+  "total": 17,
   "tasks": [
-    {
-      "task_id": "850097a9-25c6-4999-983f-5ce3c738d8db",
-      "title": "به‌روزرسانی وابستگی‌های Python در requirements.txt",
-      "priority": "high",
-      "execution_priority": 2300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-850097a9-25c6-4999-983f-5ce3c738d8db.md",
-      "external_attempts": 0
-    },
     {
       "task_id": "task_882723eb07de",
       "title": "بهینه‌سازی اتصال DB و اصلاح الگوهای طراحی",
