@@ -161,5 +161,5 @@ def test_drive_folder_layout(api_client):
     r = api_client.get("/api/drive/folders")
     assert r.status_code == 200
     body = r.json()
-    assert "Lifemanager Data" in body["root_folder"] or "LifeManager" in body["root_folder"]
+    assert body["root_folder"] == "LifeManagerData"
     assert "audio" in body["subfolders"]

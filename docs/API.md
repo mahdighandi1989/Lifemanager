@@ -315,7 +315,7 @@ offline and degrade to bookkeeping-only without creds.
 |---|---|---|
 | POST | `/api/drive/upload` | Record a `DriveFile` (metadata only). Audio/image files get `extracted_text` populated up front (AC6). |
 | GET | `/api/drive/files` | List Drive files; `?q=` filename substring search. |
-| GET | `/api/drive/folders` | The `Lifemanager Data` root + per-data-type subfolders (AC7). |
+| GET | `/api/drive/folders` | The `LifeManagerData` root + per-data-type subfolders (AC7). |
 | GET | `/api/files/{id}` | Resolve a file: Drive-tiered → its `drive_link` (AC5); touches `last_accessed_at`. 404 if missing. |
 | GET | `/api/files/{id}/raw` | Content representation (Step 7): Drive link for tiered files, extracted text for local (metadata-only system — AC8). |
 

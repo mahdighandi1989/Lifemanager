@@ -47,7 +47,7 @@ def test_google_drive_service_module_imports():
         get_or_create_subfolders,
     )
 
-    assert APP_ROOT_FOLDER_NAME == "Lifemanager Data"
+    assert APP_ROOT_FOLDER_NAME == "LifeManagerData"
     assert DEFAULT_SUBFOLDERS == ("audio", "images", "documents", "migrated_data")
     assert callable(get_or_create_app_root_folder)
     assert callable(get_or_create_subfolders)
@@ -86,7 +86,7 @@ async def test_drive_helpers_use_stub_client():
     root_id = await get_or_create_app_root_folder(
         refresh_token="rt", client=client
     )
-    assert root_id == "id-Lifemanager Data"
+    assert root_id == "id-LifeManagerData"
 
     subs = await get_or_create_subfolders(
         refresh_token="rt", root_folder_id=root_id, client=client

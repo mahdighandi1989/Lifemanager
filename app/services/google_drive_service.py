@@ -14,7 +14,7 @@ from typing import Iterable, Optional
 logger = logging.getLogger(__name__)
 
 
-APP_ROOT_FOLDER_NAME = "Lifemanager Data"
+APP_ROOT_FOLDER_NAME = "LifeManagerData"
 DEFAULT_SUBFOLDERS: tuple[str, ...] = (
     "audio",
     "images",
@@ -37,7 +37,7 @@ async def get_or_create_app_root_folder(
     refresh_token: Optional[str],
     client=None,
 ) -> str:
-    """Return the Drive folder id for ``Lifemanager Data``. Creates the
+    """Return the Drive folder id for ``LifeManagerData``. Creates the
     folder when it does not exist. ``client`` is the live Drive API
     client; the test suite injects a stub."""
     _require_credentials(refresh_token)
@@ -85,7 +85,7 @@ async def upload_file(
     media=None,
     client=None,
 ) -> dict:
-    """Upload a file under ``Lifemanager Data/<data_type>[/<record_id>]`` and
+    """Upload a file under ``LifeManagerData/<data_type>[/<record_id>]`` and
     return ``{drive_file_id, drive_link, folder_id}`` (audit task 7367c6f0 AC1,
     AC7). Creates the root + the data-type subfolder (+ a per-record subfolder
     when ``record_id`` is given). ``client`` is the live Drive client; tests
