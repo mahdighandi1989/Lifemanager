@@ -2,7 +2,7 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 8,
+  "total": 7,
   "tasks": [
     {
       "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
@@ -22,16 +22,6 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-3cc09436-d889-4cee-b22b-9af05c82a7b2.md",
-      "external_attempts": 0
-    },
-    {
-      "task_id": "3ea5622b-65c3-45dd-a133-e5703a4980f0",
-      "title": "همگام‌سازی migrationهای Alembic و startup",
-      "priority": "medium",
-      "execution_priority": 3300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-3ea5622b-65c3-45dd-a133-e5703a4980f0.md",
       "external_attempts": 0
     },
     {
