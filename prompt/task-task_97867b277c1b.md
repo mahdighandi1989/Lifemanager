@@ -3,14 +3,14 @@ task_id: task_97867b277c1b
 title: پیاده‌سازی معیارهای عملکردی و پاکسازی کد AI
 type: other
 priority: critical
-execution_priority: 1300
+execution_priority: 1350
 status: awaiting_review
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:19:08.370502+00:00'
-updated_at: '2026-05-29T20:35:45.965579+00:00'
+updated_at: '2026-06-02T08:16:21.347284+00:00'
 tags:
 - consolidated
 - post_verify_merge
