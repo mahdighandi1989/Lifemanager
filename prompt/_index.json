@@ -1,6 +1,5 @@
 {
   "version": 1,
-  "generated_at": "2026-06-01T21:09:05.987667+00:00",
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
   "total": 21,
@@ -13,9 +12,7 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-task_78c0e8e0a9b5.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T23:17:02.934574+00:00",
-      "updated_at": "2026-05-29T20:35:42.879841+00:00"
+      "external_attempts": 0
     },
     {
       "task_id": "task_97867b277c1b",
@@ -25,21 +22,7 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-task_97867b277c1b.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T23:19:08.370502+00:00",
-      "updated_at": "2026-05-29T20:35:45.965579+00:00"
-    },
-    {
-      "task_id": "b7894694-8868-4c88-8c3f-0baf4227bfcc",
-      "title": "افزودن تست‌های integration برای سرویس‌های اصلی",
-      "priority": "high",
-      "execution_priority": 2300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-b7894694-8868-4c88-8c3f-0baf4227bfcc.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-19T20:23:24.923615+00:00",
-      "updated_at": "2026-05-29T20:25:51.692789+00:00"
+      "external_attempts": 0
     },
     {
       "task_id": "850097a9-25c6-4999-983f-5ce3c738d8db",
@@ -49,9 +32,17 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-850097a9-25c6-4999-983f-5ce3c738d8db.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:26:06.083401+00:00",
-      "updated_at": "2026-05-29T20:33:47.976360+00:00"
+      "external_attempts": 0
+    },
+    {
+      "task_id": "b7894694-8868-4c88-8c3f-0baf4227bfcc",
+      "title": "افزودن تست‌های integration برای سرویس‌های اصلی",
+      "priority": "high",
+      "execution_priority": 2300,
+      "status": "awaiting_review",
+      "external_status": "pending",
+      "path": "prompt/task-b7894694-8868-4c88-8c3f-0baf4227bfcc.md",
+      "external_attempts": 0
     },
     {
       "task_id": "task_882723eb07de",
@@ -61,9 +52,7 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-task_882723eb07de.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T23:18:00.915795+00:00",
-      "updated_at": "2026-05-29T20:35:44.281727+00:00"
+      "external_attempts": 0
     },
     {
       "task_id": "task_92fa5ea15e2b",
@@ -73,81 +62,7 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-task_92fa5ea15e2b.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T23:20:22.917998+00:00",
-      "updated_at": "2026-05-29T20:35:48.384712+00:00"
-    },
-    {
-      "task_id": "1a08ded2-2801-4389-905c-94972c928461",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (12 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-1a08ded2-2801-4389-905c-94972c928461.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:15:14.628371+00:00",
-      "updated_at": "2026-06-01T21:09:00.977310+00:00"
-    },
-    {
-      "task_id": "4ae4b3ca-1a0e-4057-8e62-99365abb1576",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (16 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-4ae4b3ca-1a0e-4057-8e62-99365abb1576.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:23:14.627307+00:00",
-      "updated_at": "2026-05-29T20:33:16.569033+00:00"
-    },
-    {
-      "task_id": "2165524b-5614-4c95-938c-0587d7748436",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (15 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-2165524b-5614-4c95-938c-0587d7748436.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:34:33.086107+00:00",
-      "updated_at": "2026-05-29T20:35:21.998891+00:00"
-    },
-    {
-      "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (11 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-d2146781-09cc-47a1-aeda-a737d477b759.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:47:05.225531+00:00",
-      "updated_at": "2026-05-29T20:35:23.401809+00:00"
-    },
-    {
-      "task_id": "fbd9bd36-2c64-4014-921b-ded8e3dd5cb5",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (6 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-fbd9bd36-2c64-4014-921b-ded8e3dd5cb5.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:58:36.200085+00:00",
-      "updated_at": "2026-05-29T20:35:27.340205+00:00"
-    },
-    {
-      "task_id": "e606cca6-409a-4d32-80d7-e950ed124f16",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (8 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-e606cca6-409a-4d32-80d7-e950ed124f16.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T21:04:53.025117+00:00",
-      "updated_at": "2026-05-29T20:35:28.960314+00:00"
+      "external_attempts": 0
     },
     {
       "task_id": "14e65214-77a8-409b-80dc-9a328ec646da",
@@ -157,45 +72,67 @@
       "status": "pending",
       "external_status": "pending",
       "path": "prompt/task-14e65214-77a8-409b-80dc-9a328ec646da.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-29T12:20:14.940616+00:00",
-      "updated_at": "2026-05-29T20:40:04.013230+00:00"
+      "external_attempts": 0
     },
     {
-      "task_id": "3ea5622b-65c3-45dd-a133-e5703a4980f0",
-      "title": "همگام‌سازی migrationهای Alembic و startup",
+      "task_id": "1a08ded2-2801-4389-905c-94972c928461",
+      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (12 مرحله)",
       "priority": "medium",
-      "execution_priority": 3300,
-      "status": "awaiting_review",
+      "execution_priority": 3000,
+      "status": "pending",
       "external_status": "pending",
-      "path": "prompt/task-3ea5622b-65c3-45dd-a133-e5703a4980f0.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:27:03.826742+00:00",
-      "updated_at": "2026-05-29T20:34:29.665439+00:00"
+      "path": "prompt/task-1a08ded2-2801-4389-905c-94972c928461.md",
+      "external_attempts": 0
     },
     {
-      "task_id": "a997baa8-89fe-483d-b0ff-f0b0c36175c0",
-      "title": "تعریف متغیر GOOGLE_REDIRECT_URI در .env.example",
+      "task_id": "2165524b-5614-4c95-938c-0587d7748436",
+      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (15 مرحله)",
       "priority": "medium",
-      "execution_priority": 3300,
-      "status": "awaiting_review",
+      "execution_priority": 3000,
+      "status": "pending",
       "external_status": "pending",
-      "path": "prompt/task-a997baa8-89fe-483d-b0ff-f0b0c36175c0.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:27:04.768022+00:00",
-      "updated_at": "2026-05-29T20:34:41.739410+00:00"
+      "path": "prompt/task-2165524b-5614-4c95-938c-0587d7748436.md",
+      "external_attempts": 0
     },
     {
-      "task_id": "b7638cb2-238e-4f55-8544-2b9065f84023",
-      "title": "Align User and OAuthUser in Auth Pipeline",
+      "task_id": "4ae4b3ca-1a0e-4057-8e62-99365abb1576",
+      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (16 مرحله)",
       "priority": "medium",
-      "execution_priority": 3300,
-      "status": "awaiting_review",
+      "execution_priority": 3000,
+      "status": "pending",
       "external_status": "pending",
-      "path": "prompt/task-b7638cb2-238e-4f55-8544-2b9065f84023.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:27:42.490198+00:00",
-      "updated_at": "2026-05-29T20:35:09.555749+00:00"
+      "path": "prompt/task-4ae4b3ca-1a0e-4057-8e62-99365abb1576.md",
+      "external_attempts": 0
+    },
+    {
+      "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
+      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (11 مرحله)",
+      "priority": "medium",
+      "execution_priority": 3000,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-d2146781-09cc-47a1-aeda-a737d477b759.md",
+      "external_attempts": 0
+    },
+    {
+      "task_id": "e606cca6-409a-4d32-80d7-e950ed124f16",
+      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (8 مرحله)",
+      "priority": "medium",
+      "execution_priority": 3000,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-e606cca6-409a-4d32-80d7-e950ed124f16.md",
+      "external_attempts": 0
+    },
+    {
+      "task_id": "fbd9bd36-2c64-4014-921b-ded8e3dd5cb5",
+      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (6 مرحله)",
+      "priority": "medium",
+      "execution_priority": 3000,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-fbd9bd36-2c64-4014-921b-ded8e3dd5cb5.md",
+      "external_attempts": 0
     },
     {
       "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
@@ -205,21 +142,7 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-217909d2-9771-4584-ac19-f7e841afa09d.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T21:13:07.713317+00:00",
-      "updated_at": "2026-05-29T20:35:30.336824+00:00"
-    },
-    {
-      "task_id": "7367c6f0-ba56-46c4-8436-0970a7075314",
-      "title": "مدیریت فایل و استخراج متن از Google Drive",
-      "priority": "medium",
-      "execution_priority": 3300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-7367c6f0-ba56-46c4-8436-0970a7075314.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T21:18:45.683523+00:00",
-      "updated_at": "2026-05-29T20:35:33.100965+00:00"
+      "external_attempts": 0
     },
     {
       "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
@@ -229,21 +152,47 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-3cc09436-d889-4cee-b22b-9af05c82a7b2.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-27T21:23:41.404279+00:00",
-      "updated_at": "2026-05-29T20:35:56.957720+00:00"
+      "external_attempts": 0
     },
     {
-      "task_id": "3b90d409-4192-4804-a887-5f562559d2c4",
-      "title": "رسیدگی به فایل auth_google.py بدون مرجع",
-      "priority": "low",
-      "execution_priority": 4300,
+      "task_id": "3ea5622b-65c3-45dd-a133-e5703a4980f0",
+      "title": "همگام‌سازی migrationهای Alembic و startup",
+      "priority": "medium",
+      "execution_priority": 3300,
       "status": "awaiting_review",
       "external_status": "pending",
-      "path": "prompt/task-3b90d409-4192-4804-a887-5f562559d2c4.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:28:06.968482+00:00",
-      "updated_at": "2026-05-29T20:35:17.696106+00:00"
+      "path": "prompt/task-3ea5622b-65c3-45dd-a133-e5703a4980f0.md",
+      "external_attempts": 0
+    },
+    {
+      "task_id": "7367c6f0-ba56-46c4-8436-0970a7075314",
+      "title": "مدیریت فایل و استخراج متن از Google Drive",
+      "priority": "medium",
+      "execution_priority": 3300,
+      "status": "awaiting_review",
+      "external_status": "pending",
+      "path": "prompt/task-7367c6f0-ba56-46c4-8436-0970a7075314.md",
+      "external_attempts": 0
+    },
+    {
+      "task_id": "a997baa8-89fe-483d-b0ff-f0b0c36175c0",
+      "title": "تعریف متغیر GOOGLE_REDIRECT_URI در .env.example",
+      "priority": "medium",
+      "execution_priority": 3300,
+      "status": "awaiting_review",
+      "external_status": "pending",
+      "path": "prompt/task-a997baa8-89fe-483d-b0ff-f0b0c36175c0.md",
+      "external_attempts": 0
+    },
+    {
+      "task_id": "b7638cb2-238e-4f55-8544-2b9065f84023",
+      "title": "Align User and OAuthUser in Auth Pipeline",
+      "priority": "medium",
+      "execution_priority": 3300,
+      "status": "awaiting_review",
+      "external_status": "pending",
+      "path": "prompt/task-b7638cb2-238e-4f55-8544-2b9065f84023.md",
+      "external_attempts": 0
     },
     {
       "task_id": "303dcde8-bfcb-41e7-ad1f-30f4f5f4b213",
@@ -253,9 +202,17 @@
       "status": "awaiting_review",
       "external_status": "pending",
       "path": "prompt/task-303dcde8-bfcb-41e7-ad1f-30f4f5f4b213.md",
-      "external_attempts": 0,
-      "created_at": "2026-05-26T20:28:08.561121+00:00",
-      "updated_at": "2026-05-29T20:35:19.370679+00:00"
+      "external_attempts": 0
+    },
+    {
+      "task_id": "3b90d409-4192-4804-a887-5f562559d2c4",
+      "title": "رسیدگی به فایل auth_google.py بدون مرجع",
+      "priority": "low",
+      "execution_priority": 4300,
+      "status": "awaiting_review",
+      "external_status": "pending",
+      "path": "prompt/task-3b90d409-4192-4804-a887-5f562559d2c4.md",
+      "external_attempts": 0
     }
   ]
 }
