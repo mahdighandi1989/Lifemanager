@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 21,
+  "total": 20,
   "tasks": [
-    {
-      "task_id": "task_78c0e8e0a9b5",
-      "title": "پیاده‌سازی احراز هویت JWT و کنترل دسترسی کاربر",
-      "priority": "critical",
-      "execution_priority": 1300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-task_78c0e8e0a9b5.md",
-      "external_attempts": 0
-    },
     {
       "task_id": "task_97867b277c1b",
       "title": "پیاده‌سازی معیارهای عملکردی و پاکسازی کد AI",
