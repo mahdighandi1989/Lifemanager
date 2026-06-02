@@ -5,12 +5,12 @@ type: other
 priority: critical
 execution_priority: 1450
 status: awaiting_review
-external_status: claimed
-verification_status: partial
+external_status: done
+verification_status: applied_externally_pending_verify
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:19:08.370502+00:00'
-updated_at: '2026-06-02T09:18:44.321608+00:00'
+updated_at: '2026-06-02T09:24:57.760098+00:00'
 tags:
 - consolidated
 - post_verify_merge
