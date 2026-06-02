@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T21:12:55.743467+00:00'
-updated_at: '2026-06-02T21:12:56.841912+00:00'
+updated_at: '2026-06-02T21:50:39.783592+00:00'
 target_files:
 - app/routes/auth_google.py
 ---
@@ -537,6 +537,6 @@ _(مستقل)_
 
 ## Acceptance Criteria
 
-1. مشخص شد endpoint `GET /auth/google` در کدام دسته است (orphan/internal/deprecated)
-2. اقدام مناسب انجام شد: یا connection باز شد، یا تگ internal، یا حذف
-3. اگر حذف شد، تست‌های مربوطه هم حذف شدند و OpenAPI به‌روز شد
+1. مشخص شد endpoint `GET /auth/google` در کدام دسته است (orphan/internal/deprecated) _(verify: manual_only)_
+2. اقدام مناسب انجام شد: یا connection باز شد، یا تگ internal، یا حذف _(verify: static)_
+3. اگر حذف شد، تست‌های مربوطه هم حذف شدند و OpenAPI به‌روز شد _(verify: static)_
