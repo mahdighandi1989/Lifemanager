@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T21:11:01.679437+00:00'
-updated_at: '2026-06-02T21:11:01.679439+00:00'
+updated_at: '2026-06-02T21:46:46.712687+00:00'
 target_files:
 - app/models/todo_item.py
 ---
@@ -467,6 +467,6 @@ _(مستقل)_
 
 ## Acceptance Criteria
 
-1. ریشه anti-pattern تشخیص داده شد
-2. یا کد اصلاح شد، یا کامنت توجیهی اضافه شد
-3. تست edge case نوشته شد
+1. ریشه anti-pattern تشخیص داده شد _(verify: manual_only)_
+2. یا کد اصلاح شد، یا کامنت توجیهی اضافه شد _(verify: static)_
+3. تست edge case نوشته شد _(verify: backend_test)_
