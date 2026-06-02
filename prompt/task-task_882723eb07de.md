@@ -3,14 +3,14 @@ task_id: task_882723eb07de
 title: بهینه‌سازی اتصال DB و اصلاح الگوهای طراحی
 type: other
 priority: high
-execution_priority: 2300
+execution_priority: 2350
 status: awaiting_review
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:18:00.915795+00:00'
-updated_at: '2026-05-29T20:35:44.281727+00:00'
+updated_at: '2026-06-02T08:44:43.902652+00:00'
 tags:
 - consolidated
 - post_verify_merge
