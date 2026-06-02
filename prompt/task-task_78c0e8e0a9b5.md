@@ -3,14 +3,14 @@ task_id: task_78c0e8e0a9b5
 title: پیاده‌سازی احراز هویت JWT و کنترل دسترسی کاربر
 type: other
 priority: critical
-execution_priority: 1300
+execution_priority: 1350
 status: awaiting_review
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:17:02.934574+00:00'
-updated_at: '2026-05-29T20:35:42.879841+00:00'
+updated_at: '2026-06-02T07:54:11.403670+00:00'
 tags:
 - consolidated
 - post_verify_merge
