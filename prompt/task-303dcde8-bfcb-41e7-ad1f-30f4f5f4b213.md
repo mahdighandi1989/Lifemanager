@@ -5,12 +5,12 @@ type: cleanup
 priority: low
 execution_priority: 4350
 status: awaiting_review
-external_status: claimed
-verification_status: partial
+external_status: done
+verification_status: applied_externally_pending_verify
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T20:28:08.561121+00:00'
-updated_at: '2026-06-02T10:28:30.354107+00:00'
+updated_at: '2026-06-02T10:29:58.323443+00:00'
 target_files:
 - app/services/ai/image_service.py
 ---
