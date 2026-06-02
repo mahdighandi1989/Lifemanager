@@ -15,8 +15,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
+from app.models.task import Task
 from app.models.user_asset import UserAsset
 from app.services.asset_scan_service import scan_directory
+from app.services.asset_to_task_linker import AssetToTaskLinker
 
 router = APIRouter()
 
@@ -61,6 +63,33 @@ async def list_external_drives() -> dict:
     from app.services.asset_scan_service import detect_external_drives
 
     return {"drives": detect_external_drives()}
+
+
+@router.get("/api/assets/task-suggestions", tags=["assets"])
+@handle_errors
+async def asset_task_suggestions(
+    task_id: Optional[int] = None,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Suggest scanned assets that match the user's tasks (audit task 217909d2
+    AC4 — "وقتی کاربر وظیفه‌ای با موضوع «فیلم» ایجاد می‌کند، فایل‌های ویدئویی
+    مرتبط را پیشنهاد دهد"). Matches each task title against asset names via
+    AssetToTaskLinker. ``?task_id=`` narrows to a single task; otherwise every
+    task the user owns is considered."""
+    task_stmt = select(Task).where(Task.user_id == user_id)
+    if task_id is not None:
+        task_stmt = task_stmt.where(Task.id == task_id)
+    tasks = list((await db.execute(task_stmt)).scalars().all())
+
+    assets = list(
+        (
+            await db.execute(select(UserAsset).where(UserAsset.user_id == user_id))
+        ).scalars().all()
+    )
+
+    suggestions = AssetToTaskLinker().link(tasks, assets)
+    return {"suggestions": suggestions, "count": len(suggestions)}
 
 
 class SyncRequest(BaseModel):

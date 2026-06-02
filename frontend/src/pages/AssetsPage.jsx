@@ -18,6 +18,7 @@ function AssetsPage() {
   const [scanPath, setScanPath] = useState('');
   const [scanning, setScanning] = useState(false);
   const [scanMsg, setScanMsg] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
 
   const load = async () => {
     try {
@@ -28,6 +29,15 @@ function AssetsPage() {
       setError('خطا در دریافت دارایی‌ها: ' + (e.message || ''));
     } finally {
       setLoading(false);
+    }
+    // AC4: surface scanned assets that match the user's tasks ("you already
+    // have Inception.mp4 for your 'watch Inception' task"). Best-effort — a
+    // failure here must not break the asset list above.
+    try {
+      const sug = await api.get('/assets/task-suggestions');
+      setSuggestions(Array.isArray(sug.data?.suggestions) ? sug.data.suggestions : []);
+    } catch (e) {
+      setSuggestions([]);
     }
   };
 
@@ -91,6 +101,26 @@ function AssetsPage() {
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>
+        )}
+
+        {/* AC4: smart asset↔task suggestions */}
+        {suggestions.length > 0 && (
+          <div
+            data-testid="asset-task-suggestions"
+            className="mb-6 bg-amber-50 border border-amber-100 rounded-xl p-4"
+          >
+            <h2 className="text-sm font-semibold text-amber-700 mb-2">
+              پیشنهادهای مرتبط با وظایف شما
+            </h2>
+            <div className="space-y-1">
+              {suggestions.map((s, i) => (
+                <div key={i} className="text-sm text-amber-800">
+                  برای «{s.task_title}» این مورد را دارید:{' '}
+                  <span className="font-medium">{s.asset_name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {loading ? (

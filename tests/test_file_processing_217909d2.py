@@ -33,6 +33,41 @@ def test_scan_then_filter_movies(api_client, tmp_path):
     assert "notes.txt" not in names  # filtered out (it's a document)
 
 
+# ── AC4: smart asset↔task suggestions ───────────────────────────────
+
+
+def test_task_suggestions_surfaces_matching_asset(api_client, tmp_path):
+    movies = tmp_path / "Movies"
+    movies.mkdir()
+    (movies / "Inception.mp4").write_text("x")
+    api_client.post("/api/assets/scan", json={"path": str(movies)})
+
+    task = api_client.post(
+        "/api/tasks", json={"title": "Watch Inception tonight"}
+    )
+    assert task.status_code in (200, 201), task.text
+
+    r = api_client.get("/api/assets/task-suggestions")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["count"] >= 1
+    names = [s["asset_name"] for s in body["suggestions"]]
+    assert "Inception.mp4" in names
+
+
+def test_task_suggestions_empty_when_no_match(api_client, tmp_path):
+    movies = tmp_path / "Movies2"
+    movies.mkdir()
+    (movies / "Inception.mp4").write_text("x")
+    api_client.post("/api/assets/scan", json={"path": str(movies)})
+
+    api_client.post("/api/tasks", json={"title": "Buy groceries"})
+
+    r = api_client.get("/api/assets/task-suggestions")
+    assert r.status_code == 200
+    assert r.json()["count"] == 0
+
+
 # ── AC6: external-drive detection ───────────────────────────────────
 
 
