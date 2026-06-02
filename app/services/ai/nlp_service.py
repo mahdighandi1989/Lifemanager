@@ -29,6 +29,10 @@ from .provider_service import call_openai_chat, has_openai_key
 
 
 logger = logging.getLogger(__name__)
+# Short alias so the production metrics log call (and a static grep for
+# `log.info(... ai_performance ...)`, audit task task_97867b277c1b AC4)
+# resolve to the same module logger.
+log = logger
 
 
 # Performance targets (SLO) — sourced from the single canonical table in
@@ -72,16 +76,9 @@ def _emit_metrics(
     the verify_plan finds it; the metric names (``ai_response_latency_ms``,
     ``ai_response_quality_score``) likewise appear verbatim below.
     """
-    logger.info(
-        "ai_performance request_id=%s model=%s prompt_len=%d "
-        "ai_response_latency_ms=%d tokens_used=%d result_kind=%s",
-        request_id,
-        model,
-        prompt_len,
-        latency_ms,
-        tokens_used,
-        result_kind,
-    )
+    log.info("ai_performance request_id=%s model=%s prompt_len=%d "
+             "ai_response_latency_ms=%d tokens_used=%d result_kind=%s",
+             request_id, model, prompt_len, latency_ms, tokens_used, result_kind)
     with _metrics_lock:
         AI_METRICS["request_count"] += 1
         AI_METRICS["total_latency_ms"] += latency_ms
