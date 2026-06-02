@@ -3,14 +3,14 @@ task_id: 303dcde8-bfcb-41e7-ad1f-30f4f5f4b213
 title: حذف داده‌ی بی‌مصرف از self.db
 type: cleanup
 priority: low
-execution_priority: 4300
+execution_priority: 4350
 status: awaiting_review
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T20:28:08.561121+00:00'
-updated_at: '2026-05-29T20:35:19.370679+00:00'
+updated_at: '2026-06-02T10:28:30.354107+00:00'
 target_files:
 - app/services/ai/image_service.py
 ---
