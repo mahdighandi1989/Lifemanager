@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 16,
+  "total": 14,
   "tasks": [
-    {
-      "task_id": "task_92fa5ea15e2b",
-      "title": "افزودن نوتیفیکیشن `verify_failed` و مدیریت رویدادها",
-      "priority": "high",
-      "execution_priority": 2300,
-      "status": "awaiting_review",
-      "external_status": "pending",
-      "path": "prompt/task-task_92fa5ea15e2b.md",
-      "external_attempts": 0
-    },
     {
       "task_id": "14e65214-77a8-409b-80dc-9a328ec646da",
       "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (8 مرحله)",
@@ -22,16 +12,6 @@
       "status": "pending",
       "external_status": "pending",
       "path": "prompt/task-14e65214-77a8-409b-80dc-9a328ec646da.md",
-      "external_attempts": 0
-    },
-    {
-      "task_id": "1a08ded2-2801-4389-905c-94972c928461",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (12 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-1a08ded2-2801-4389-905c-94972c928461.md",
       "external_attempts": 0
     },
     {
