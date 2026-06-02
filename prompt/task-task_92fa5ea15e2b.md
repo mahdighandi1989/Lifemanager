@@ -3,14 +3,14 @@ task_id: task_92fa5ea15e2b
 title: افزودن نوتیفیکیشن `verify_failed` و مدیریت رویدادها
 type: other
 priority: high
-execution_priority: 2300
+execution_priority: 2350
 status: awaiting_review
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:20:22.917998+00:00'
-updated_at: '2026-05-29T20:35:48.384712+00:00'
+updated_at: '2026-06-02T08:48:55.847487+00:00'
 tags:
 - consolidated
 - post_verify_merge
