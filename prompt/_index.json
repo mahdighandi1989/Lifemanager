@@ -2,7 +2,7 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 12,
+  "total": 11,
   "tasks": [
     {
       "task_id": "14e65214-77a8-409b-80dc-9a328ec646da",
@@ -12,16 +12,6 @@
       "status": "pending",
       "external_status": "pending",
       "path": "prompt/task-14e65214-77a8-409b-80dc-9a328ec646da.md",
-      "external_attempts": 0
-    },
-    {
-      "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
-      "title": "[ایدهٔ متنی همراه نیست — دستورالعمل/درخواست کاربر **داخل** محتوای فایل‌های پیوست (11 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-d2146781-09cc-47a1-aeda-a737d477b759.md",
       "external_attempts": 0
     },
     {
