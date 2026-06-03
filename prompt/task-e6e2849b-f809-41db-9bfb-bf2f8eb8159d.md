@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T21:10:50.610509+00:00'
-updated_at: '2026-06-02T21:45:03.987755+00:00'
+updated_at: '2026-06-03T18:43:42.247684+00:00'
 ---
 
 # تضاد بین دو سیستم احراز هویت: auth_service سنتی و OAuth گوگل
