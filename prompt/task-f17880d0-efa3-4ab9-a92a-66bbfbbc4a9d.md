@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T20:53:55.250778+00:00'
-updated_at: '2026-06-02T21:42:39.873319+00:00'
+updated_at: '2026-06-03T18:43:13.510016+00:00'
 ---
 
 # [منطق] Incomplete Permission Coverage for Mutation Paths
