@@ -2,7 +2,7 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 3,
+  "total": 2,
   "tasks": [
     {
       "task_id": "14e65214-77a8-409b-80dc-9a328ec646da",
@@ -12,16 +12,6 @@
       "status": "pending",
       "external_status": "pending",
       "path": "prompt/task-14e65214-77a8-409b-80dc-9a328ec646da.md",
-      "external_attempts": 1
-    },
-    {
-      "task_id": "3cc09436-d889-4cee-b22b-9af05c82a7b2",
-      "title": "توسعه سیستم مدیریت پروفایل و تحلیل رفتاری",
-      "priority": "medium",
-      "execution_priority": 3050,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-3cc09436-d889-4cee-b22b-9af05c82a7b2.md",
       "external_attempts": 1
     },
     {
