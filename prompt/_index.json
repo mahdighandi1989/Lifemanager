@@ -2,17 +2,6 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 1,
-  "tasks": [
-    {
-      "task_id": "3b90d409-4192-4804-a887-5f562559d2c4",
-      "title": "رفع وضعیت orphan فایل‌های auth_google و crypt_service",
-      "priority": "low",
-      "execution_priority": 4050,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-3b90d409-4192-4804-a887-5f562559d2c4.md",
-      "external_attempts": 1
-    }
-  ]
+  "total": 0,
+  "tasks": []
 }
