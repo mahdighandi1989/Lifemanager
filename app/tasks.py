@@ -357,6 +357,71 @@ def process_finance_updates() -> dict[str, Any]:
     return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
 
 
+@celery_app.task(name="app.tasks.sync_indexed_file_sources")
+def sync_indexed_file_sources() -> dict[str, Any]:
+    """Audit task 217909d2 Step 2 / AC3 — periodic file-source reconcile.
+
+    The backend half of the "هر از چندگاهی که براش تنظیم می‌کنم این لیست‌های
+    داده‌هایی که دارم رو به روز بکنه ... اگه حذف شدن ازش پاک بکنه" mobile loop.
+    Scheduled by celery beat every ``FILE_SYNC_INTERVAL_MINUTES`` minutes
+    (configurable per-deploy). For each user that has indexed source entries,
+    it re-checks every ``source_path`` against the filesystem and prunes the
+    ones that vanished — keeping the index in sync without the client having to
+    re-post the full path list.
+
+    A mobile/desktop client that holds paths the server can't see (its own
+    filesystem) still drives add+prune via POST /api/assets/sync; this task
+    covers the server-visible sources (local dirs, mounted external drives) and
+    is the always-on safety net so deletions never linger in the index.
+
+    Best-effort: errors are logged, never retried — the next tick catches up.
+    """
+    import asyncio
+    import os
+
+    async def _run() -> dict[str, Any]:
+        from sqlalchemy import select
+
+        from app.database import SessionLocal
+        from app.models.indexed_data_source_entry import IndexedDataSourceEntry
+        from app.services.data_ingestion_service import DataIngestionService
+
+        users_scanned = 0
+        total_removed = 0
+        async with SessionLocal() as db:
+            user_ids = (
+                await db.execute(
+                    select(IndexedDataSourceEntry.user_id).distinct()
+                )
+            ).scalars().all()
+            svc = DataIngestionService(db)
+            for user_id in user_ids:
+                users_scanned += 1
+                rows = (
+                    await db.execute(
+                        select(IndexedDataSourceEntry.source_path).where(
+                            IndexedDataSourceEntry.user_id == user_id
+                        )
+                    )
+                ).scalars().all()
+                # Keep only the paths the server can still see on disk; anything
+                # gone is pruned by compare_and_remove_deleted.
+                present = [p for p in rows if p and os.path.exists(p)]
+                pruned = await svc.compare_and_remove_deleted(
+                    user_id=user_id, present_paths=present
+                )
+                total_removed += pruned.get("removed", 0)
+        return {"users": users_scanned, "removed": total_removed}
+
+    try:
+        result = asyncio.run(_run())
+        logger.info("sync_indexed_file_sources: %s", result)
+        return result
+    except Exception as exc:
+        logger.exception("sync_indexed_file_sources failed: %r", exc)
+        return {"error": str(exc)}
+
+
 @celery_app.task(name="app.tasks.sync_external_project")
 def sync_external_project(*, connection_id: int) -> dict[str, Any]:
     """Audit task d2146781 AC 6 — sync one external-project connection.

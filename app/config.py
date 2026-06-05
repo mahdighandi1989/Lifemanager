@@ -101,6 +101,14 @@ class Settings(BaseSettings):
     # app/services/migration_runner.py reads this via os.getenv too.
     RUN_ALEMBIC_MIGRATIONS_ON_STARTUP: bool = False
 
+    # --- File / asset indexing ----------------------------------------------
+    # How often (minutes) the periodic file-source sync runs — the backend
+    # side of the "هر از چندگاهی که براش تنظیم می‌کنم ... اگه حذف شدن ازش پاک
+    # بکنه" mobile/periodic loop (audit task 217909d2, Step 2 / AC3). The
+    # scheduled task re-checks every indexed source_path and prunes the ones
+    # that vanished on disk. Configurable per-deploy without a code change.
+    FILE_SYNC_INTERVAL_MINUTES: int = 30
+
     # --- Celery / Redis -----------------------------------------------------
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = Field(

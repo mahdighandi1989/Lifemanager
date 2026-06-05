@@ -141,3 +141,56 @@ async def test_sync_source_adds_and_prunes(db_session):
     summary = await svc.sync_source(user_id=2, scanned=second)
     assert summary["created"] == 1  # /x/3
     assert summary["removed"] == 1  # /x/2
+
+
+# ── Step 2 / AC3: periodic (mobile) sync reconcile via celery beat ───
+
+
+def test_periodic_sync_task_prunes_vanished_paths(tmp_path, monkeypatch):
+    """The scheduled task re-checks indexed paths against disk and prunes the
+    ones that vanished — the backend half of the mobile/periodic loop."""
+    import asyncio
+
+    from sqlalchemy import select
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    import app.database as database
+    from app import tasks
+    from app.database import Base
+    from app.models.indexed_data_source_entry import IndexedDataSourceEntry
+
+    # File-backed SQLite so the data survives the task's internal asyncio.run.
+    db_path = tmp_path / "periodic.db"
+    engine = create_async_engine(f"sqlite+aiosqlite:///{db_path}")
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+
+    keep = tmp_path / "keep.txt"
+    keep.write_text("x")
+    gone = tmp_path / "gone.txt"  # never created → should be pruned
+
+    async def _seed():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        async with factory() as db:
+            db.add(IndexedDataSourceEntry(user_id=1, source_path=str(keep)))
+            db.add(IndexedDataSourceEntry(user_id=1, source_path=str(gone)))
+            await db.commit()
+
+    asyncio.run(_seed())
+
+    # The task resolves SessionLocal from app.database at call time.
+    monkeypatch.setattr(database, "SessionLocal", factory)
+
+    result = tasks.sync_indexed_file_sources()
+    assert result["users"] == 1
+    assert result["removed"] == 1
+
+    async def _remaining():
+        async with factory() as db:
+            rows = (
+                await db.execute(select(IndexedDataSourceEntry.source_path))
+            ).scalars().all()
+        await engine.dispose()
+        return rows
+
+    assert asyncio.run(_remaining()) == [str(keep)]

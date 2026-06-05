@@ -8,6 +8,9 @@
 - External-drive detection (`detect_external_drives`; psutil now in requirements,
   mount-walk fallback) + `GET /api/assets/external-drives`.
 - Dynamic add/prune sync (`POST /api/assets/sync` → DataIngestionService.sync_source).
+- Periodic reconcile loop (Step 2): celery-beat task `app.tasks.sync_indexed_file_sources`
+  runs every `FILE_SYNC_INTERVAL_MINUTES` (default 30) and prunes indexed
+  paths that vanished on disk — the backend half of the mobile/periodic sync.
 - Free-text search (`GET /api/local-files?q=`), asset↔task correlation
   (`/ai/correlate_needs`), Drive metadata listing (`google_drive_service.list_files`).
 

@@ -1,3 +1,5 @@
+import os
+
 from celery import Celery
 from celery.schedules import crontab
 
@@ -63,5 +65,13 @@ celery_app.conf.beat_schedule = {
     "process-finance-updates": {
         "task": "app.tasks.process_finance_updates",
         "schedule": crontab(minute="*/30"),
+    },
+    # Periodic file-source reconcile — the backend half of the mobile/periodic
+    # "اگه حذف شدن ازش پاک بکنه" loop (audit task 217909d2, Step 2 / AC3). The
+    # interval is FILE_SYNC_INTERVAL_MINUTES (default 30), configurable per
+    # deploy without a code change.
+    "sync-indexed-file-sources": {
+        "task": "app.tasks.sync_indexed_file_sources",
+        "schedule": float(os.getenv("FILE_SYNC_INTERVAL_MINUTES", "30")) * 60.0,
     },
 }
