@@ -8,7 +8,12 @@ import api from '../lib/api';
 //    GET /api/ai/personalized_recommendations, derived from the user's
 //    interests + analyzed personality/mood. Rendered as their own section
 //    with data-testid='personalized-recommendation-item'.
-function RecommendationPanel() {
+//
+// ``enabledTypes`` (audit task 2165524b AC 10): optional map of
+// recommendation_type -> bool. When provided, context recs whose type is
+// disabled are hidden, so the page's priority toggles actually take effect.
+// Omitted (default) → every recommendation shows.
+function RecommendationPanel({ enabledTypes = null } = {}) {
   const [recs, setRecs] = useState([]);
   const [personalized, setPersonalized] = useState([]);
   const [error, setError] = useState(null);
@@ -29,6 +34,14 @@ function RecommendationPanel() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Apply the page's priority toggles. Keep the original index alongside each
+  // rec so accept/reject still dismisses the correct row from ``recs``.
+  const visibleRecs = recs
+    .map((rec, idx) => ({ rec, idx }))
+    .filter(({ rec }) =>
+      !enabledTypes || enabledTypes[rec.recommendation_type] !== false,
+    );
 
   const dismiss = (idx) => {
     // Persist accept/reject server-side when the rec has a real id (audit task
@@ -66,12 +79,12 @@ function RecommendationPanel() {
       )}
 
       <div className="space-y-2">
-        {recs.length === 0 ? (
+        {visibleRecs.length === 0 ? (
           <p data-testid="rec-empty" className="text-gray-400 text-sm">
             فعلاً پیشنهادی نیست.
           </p>
         ) : (
-          recs.map((rec, idx) => (
+          visibleRecs.map(({ rec, idx }) => (
             <div
               key={idx}
               data-testid={`rec-item-${idx}`}

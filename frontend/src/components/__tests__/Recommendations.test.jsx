@@ -83,4 +83,27 @@ describe('Recommendations page (task 2165524b AC 10)', () => {
     fireEvent.click(toggle);
     expect(toggle.checked).toBe(false);
   });
+
+  test('disabling a type hides its recommendations (AC 10 priorities take effect)', async () => {
+    get.mockImplementation((url) =>
+      url === '/recommendations'
+        ? Promise.resolve({
+            data: [
+              { recommendation_type: 'location', text: 'نزدیک فروشگاه' },
+              { recommendation_type: 'behavioral', text: 'یک کار باز را شروع کن' },
+            ],
+          })
+        : Promise.resolve({ data: [] }),
+    );
+    render(<Recommendations />);
+    await waitFor(() =>
+      expect(screen.getByText('نزدیک فروشگاه')).toBeInTheDocument(),
+    );
+    // Turn off location → that rec disappears, behavioral stays.
+    fireEvent.click(screen.getByTestId('rec-toggle-location'));
+    await waitFor(() =>
+      expect(screen.queryByText('نزدیک فروشگاه')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText('یک کار باز را شروع کن')).toBeInTheDocument();
+  });
 });

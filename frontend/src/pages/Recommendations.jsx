@@ -39,7 +39,7 @@ function Recommendations() {
         </section>
 
         <h2 className="font-semibold text-gray-900 mb-3">تاریخچه پیشنهادات</h2>
-        <RecommendationPanel />
+        <RecommendationPanel enabledTypes={enabled} />
       </div>
     </div>
   );
