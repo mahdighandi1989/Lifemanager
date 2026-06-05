@@ -123,6 +123,7 @@ def _serialize(t: Task) -> dict:
         "user_id": t.user_id,
         "project_id": t.project_id,
         "due_date": t.due_date.isoformat() if t.due_date else None,
+        "estimated_cost": float(t.estimated_cost) if t.estimated_cost is not None else None,
         "created_at": t.created_at.isoformat() if t.created_at else None,
         "updated_at": t.updated_at.isoformat() if t.updated_at else None,
     }
@@ -228,6 +229,7 @@ async def create_task(
         user_id=payload.user_id if payload.user_id is not None else caller_user_id,
         project_id=payload.project_id,
         due_date=payload.due_date,
+        estimated_cost=payload.estimated_cost,
     )
     db.add(task)
     await db.commit()
@@ -263,6 +265,8 @@ async def update_task(
         task.due_date = data["due_date"]
     if "project_id" in data:
         task.project_id = data["project_id"]
+    if "estimated_cost" in data:
+        task.estimated_cost = data["estimated_cost"]
 
     await db.commit()
     await db.refresh(task)

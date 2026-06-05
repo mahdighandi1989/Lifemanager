@@ -12,6 +12,7 @@ Field constraints:
     recurrence         optional dict (RFC-5545-ish: {"freq", "interval", ...})
 """
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
@@ -44,6 +45,9 @@ class TaskCreate(BaseModel):
     estimated_duration: Optional[int] = Field(default=None, ge=0)
     deadline: Optional[datetime] = None
     recurrence: Optional[dict[str, Any]] = None
+    # estimated_cost — money a planned purchase needs; the budget module reads
+    # it to flag affordability and surface AI suggestions (task 4ae4b3ca AC 12/13).
+    estimated_cost: Optional[Decimal] = Field(default=None, ge=0)
 
 
 class TaskUpdate(BaseModel):
@@ -60,6 +64,7 @@ class TaskUpdate(BaseModel):
     estimated_duration: Optional[int] = Field(default=None, ge=0)
     deadline: Optional[datetime] = None
     recurrence: Optional[dict[str, Any]] = None
+    estimated_cost: Optional[Decimal] = Field(default=None, ge=0)
 
 
 class TaskResponse(BaseModel):
@@ -74,6 +79,7 @@ class TaskResponse(BaseModel):
     estimated_duration: Optional[int] = None
     deadline: Optional[datetime] = None
     recurrence: Optional[dict[str, Any]] = None
+    estimated_cost: Optional[Decimal] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

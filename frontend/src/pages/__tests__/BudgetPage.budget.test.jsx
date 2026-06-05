@@ -11,8 +11,23 @@ import BudgetPage from '../BudgetPage';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  get.mockResolvedValue({
-    data: [{ id: 1, name: 'بانک', kind: 'bank', balance: 200, currency: 'USD' }],
+  // URL-aware: account list on mount, finance insights for the AI panel.
+  get.mockImplementation((url) => {
+    if (url === '/finance/insights') {
+      return Promise.resolve({
+        data: {
+          summary: { total_balance: 200 },
+          suggestions: [
+            { title: 'خرید لپ‌تاپ', estimated_cost: 50, affordable: true, recommendation: 'اکنون مقرون‌به‌صرفه است' },
+          ],
+          analysis: 'پیشنهاد بودجه‌ای',
+          model_used: 'placeholder',
+        },
+      });
+    }
+    return Promise.resolve({
+      data: [{ id: 1, name: 'بانک', kind: 'bank', balance: 200, currency: 'USD' }],
+    });
   });
 });
 
@@ -33,21 +48,25 @@ describe('BudgetPage purchase check + AI insight (task 4ae4b3ca AC 12/13)', () =
     await waitFor(() => expect(screen.getByTestId('purchase-result')).toBeInTheDocument());
   });
 
-  test('AI insight POSTs to /ai/analyze and shows text', async () => {
-    post.mockResolvedValueOnce({ data: { insights: 'پیشنهاد بودجه‌ای' } });
+  test('AI insight GETs /finance/insights and shows analysis + suggestions', async () => {
     render(<BudgetPage />);
     fireEvent.click(screen.getByTestId('ai-insight-btn'));
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/finance/insights'));
     await waitFor(() =>
-      expect(post).toHaveBeenCalledWith(
-        '/ai/analyze',
-        expect.objectContaining({ prompt: expect.any(String) }),
-      ),
+      expect(screen.getByTestId('ai-insight-text').textContent).toMatch(/پیشنهاد بودجه‌ای/),
     );
-    await waitFor(() => expect(screen.getByTestId('ai-insight-text')).toBeInTheDocument());
+    expect(screen.getByTestId('ai-insight-text').textContent).toMatch(/خرید لپ‌تاپ/);
   });
 
   test('AI insight degrades gracefully on 403', async () => {
-    post.mockRejectedValueOnce({ response: { status: 403 }, message: 'forbidden' });
+    get.mockImplementation((url) => {
+      if (url === '/finance/insights') {
+        return Promise.reject({ response: { status: 403 }, message: 'forbidden' });
+      }
+      return Promise.resolve({
+        data: [{ id: 1, name: 'بانک', kind: 'bank', balance: 200, currency: 'USD' }],
+      });
+    });
     render(<BudgetPage />);
     fireEvent.click(screen.getByTestId('ai-insight-btn'));
     await waitFor(() =>

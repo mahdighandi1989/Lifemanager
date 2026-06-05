@@ -456,3 +456,20 @@ async def list_affordable_tasks(
     from app.services.budget_notification_service import notify_affordable_tasks
 
     return {"affordable_task_ids": await notify_affordable_tasks(db, user_id)}
+
+
+@router.get("/api/finance/insights", tags=["finance"])
+@handle_errors
+async def finance_insights(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """AI analysis of the user's finances with budget-aware purchase
+    suggestions (AC 13 — "باید توسط مدل‌های هوش مصنوعی داخلی هم آنالیز بشه").
+
+    Returns ``{summary, suggestions, analysis, model_used}``; the analysis text
+    comes from ``ai_service.generate_text`` (deterministic placeholder when no
+    provider key is set, so this always responds 200)."""
+    from app.services.finance_ai_service import analyze_finances
+
+    return await analyze_finances(db, user_id)

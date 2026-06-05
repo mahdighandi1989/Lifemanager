@@ -122,10 +122,17 @@ function BudgetPage() {
   const fetchInsight = async () => {
     setInsightLoading(true);
     try {
-      const res = await api.post('/ai/analyze', {
-        prompt: 'بر اساس حساب‌ها و بودجهٔ من، پیشنهادهای خرید و مدیریت بودجه بده.',
+      // Dedicated finance analysis endpoint (task 4ae4b3ca AC 13): wires the
+      // user's accounts/budget/planned purchases into ai_service and returns
+      // free-text advice plus a per-purchase affordability verdict.
+      const res = await api.get('/finance/insights');
+      const data = res.data || {};
+      const lines = [];
+      if (data.analysis) lines.push(data.analysis);
+      (data.suggestions || []).forEach((s) => {
+        lines.push(`• ${s.title}: ${s.recommendation} (${s.estimated_cost})`);
       });
-      setInsight(res.data?.insights || 'پاسخی دریافت نشد.');
+      setInsight(lines.length ? lines.join('\n') : 'پاسخی دریافت نشد.');
     } catch (err) {
       // FEATURE_AI_ENABLED off -> 403; degrade gracefully.
       setInsight(
