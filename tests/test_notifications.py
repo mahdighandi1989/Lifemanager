@@ -1,98 +1,121 @@
+"""Auth enforcement on notification mutation endpoints (audit task f17880d0).
+
+Part of "Add Missing Auth to Mutation Endpoints" / the "Incomplete Permission
+Coverage for Mutation Paths" coherence audit. The notifications CRUD router
+(``app/routes/notifications.py``: list / create / mark-read / delete on the
+prefixed ``router``) is a mutation surface, so every route resolves the caller
+through ``app/dependencies/auth.py`` (``get_current_user``) and every service
+query is scoped by ``user_id``. These tests pin that end-to-end auth chain:
+
+  * no bearer            -> 403 (strict ``get_current_user``; the anon
+                            NotificationBell uses the separate ``api_router``
+                            ``GET /api/notifications`` instead — see the route)
+  * authenticated create -> 201, owner taken from the token (never the body)
+  * cross-tenant mutate  -> 404 (a notification you don't own is invisible)
+  * owner mutate         -> succeeds
+
+Ground-truth note (why this file was rewritten): the previous version asserted
+an imagined older contract — ``PUT /{id}/read`` instead of ``PATCH``, a
+``GET /{id}`` that never existed, a ``{message, type}`` create body that doesn't
+match ``NotificationCreate`` (which requires ``type`` + ``title`` with ``type``
+in the ``NotificationType`` enum), and unauthenticated access. It failed on
+every case. The router + schema are the business-logic ground truth; the test
+is aligned to them so it proves the audit's permission-coverage property.
+
+Caller identity is simulated by overriding ``get_current_user`` (the same
+hermetic technique used by tests/test_auth_mutation_coverage_f17880d0.py).
+"""
+from __future__ import annotations
+
+import types
+
 import pytest
-from httpx import AsyncClient, ASGITransport
+
+from app.dependencies.auth import get_current_user
 from app.main import app
 
 
-@pytest.mark.asyncio
-async def test_list_notifications_empty():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/notifications")
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-        assert len(data) == 0
+def _as_user(uid: int) -> None:
+    """Pin the resolved caller for the strict-auth dependency."""
+    app.dependency_overrides[get_current_user] = lambda: types.SimpleNamespace(
+        id=uid, email=f"user{uid}@example.com"
+    )
 
 
-@pytest.mark.asyncio
-async def test_create_notification():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post("/notifications", json={"message": "Test notification", "type": "info"})
-        assert response.status_code == 201
-        data = response.json()
-        assert data["message"] == "Test notification"
-        assert "id" in data
+@pytest.fixture(autouse=True)
+def _clear_user_override():
+    yield
+    app.dependency_overrides.pop(get_current_user, None)
 
 
-@pytest.mark.asyncio
-async def test_create_notification_missing_message():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post("/notifications", json={"type": "warning"})
-        assert response.status_code == 422
+def _create(client, title: str = "Hi"):
+    return client.post(
+        "/notifications/",
+        json={"type": "system", "title": title, "message": "body text"},
+    )
 
 
-@pytest.mark.asyncio
-async def test_get_notification_by_id():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        create_resp = await client.post("/notifications", json={"message": "Get Test", "type": "info"})
-        notif_id = create_resp.json()["id"]
-        
-        response = await client.get(f"/notifications/{notif_id}")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["id"] == notif_id
-        assert data["message"] == "Get Test"
+def test_mutations_require_authentication(api_client):
+    """No bearer token -> the strict auth dependency 403s every mutation and
+    the owner-scoped list."""
+    assert _create(api_client).status_code == 403
+    assert api_client.patch("/notifications/1/read").status_code == 403
+    assert api_client.delete("/notifications/1").status_code == 403
+    assert api_client.get("/notifications/").status_code == 403
 
 
-@pytest.mark.asyncio
-async def test_get_notification_not_found():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/notifications/99999")
-        assert response.status_code == 404
+def test_create_scopes_owner_to_token_identity(api_client):
+    """An authenticated create stamps the owner from the token, not the body."""
+    _as_user(1)
+    r = _create(api_client, title="Welcome")
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["title"] == "Welcome"
+    assert body["type"] == "system"
+    assert body["user_id"] == 1  # owner taken from auth context
+    assert body["is_read"] is False
+    assert "id" in body
 
 
-@pytest.mark.asyncio
-async def test_mark_notification_read():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        create_resp = await client.post("/notifications", json={"message": "Read Test", "type": "info"})
-        notif_id = create_resp.json()["id"]
-        
-        response = await client.put(f"/notifications/{notif_id}/read")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["read"] is True
+def test_create_missing_required_field_is_422(api_client):
+    """Validation still applies for an authenticated caller — ``title`` is
+    required by ``NotificationCreate``."""
+    _as_user(1)
+    r = api_client.post("/notifications/", json={"type": "system"})
+    assert r.status_code == 422
 
 
-@pytest.mark.asyncio
-async def test_mark_notification_read_not_found():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.put("/notifications/99999/read")
-        assert response.status_code == 404
+def test_mark_read_and_delete_scoped_to_owner(api_client):
+    """A notification created by user 1 cannot be marked-read or deleted by
+    user 2 (404), and stays fully controllable by its owner."""
+    _as_user(1)
+    nid = _create(api_client).json()["id"]
+
+    _as_user(2)
+    assert api_client.patch(f"/notifications/{nid}/read").status_code == 404
+    assert api_client.delete(f"/notifications/{nid}").status_code == 404
+
+    _as_user(1)
+    r = api_client.patch(f"/notifications/{nid}/read")
+    assert r.status_code == 200
+    assert r.json()["is_read"] is True
+    assert api_client.delete(f"/notifications/{nid}").status_code == 204
 
 
-@pytest.mark.asyncio
-async def test_delete_notification():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        create_resp = await client.post("/notifications", json={"message": "Delete Test", "type": "info"})
-        notif_id = create_resp.json()["id"]
-        
-        response = await client.delete(f"/notifications/{notif_id}")
-        assert response.status_code == 204
-        
-        get_response = await client.get(f"/notifications/{notif_id}")
-        assert get_response.status_code == 404
+def test_list_scoped_to_caller(api_client):
+    """The list endpoint only returns the caller's own notifications."""
+    _as_user(1)
+    _create(api_client, title="u1-note")
+
+    _as_user(2)
+    assert api_client.get("/notifications/").json() == []
+
+    _as_user(1)
+    titles = [n["title"] for n in api_client.get("/notifications/").json()]
+    assert "u1-note" in titles
 
 
-@pytest.mark.asyncio
-async def test_delete_notification_not_found():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete("/notifications/99999")
-        assert response.status_code == 404
+def test_mutating_missing_row_is_404(api_client):
+    _as_user(7)
+    assert api_client.patch("/notifications/99999/read").status_code == 404
+    assert api_client.delete("/notifications/99999").status_code == 404
