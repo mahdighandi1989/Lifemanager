@@ -2,8 +2,28 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 3,
+  "total": 5,
   "tasks": [
+    {
+      "task_id": "task_882723eb07de",
+      "title": "بهینه‌سازی اتصال DB و اصلاح الگوهای طراحی",
+      "priority": "high",
+      "execution_priority": 2050,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-task_882723eb07de.md",
+      "external_attempts": 1
+    },
+    {
+      "task_id": "task_92fa5ea15e2b",
+      "title": "افزودن نوتیفیکیشن `verify_failed` و مدیریت رویدادها",
+      "priority": "high",
+      "execution_priority": 2050,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-task_92fa5ea15e2b.md",
+      "external_attempts": 1
+    },
     {
       "task_id": "217909d2-9771-4584-ac19-f7e841afa09d",
       "title": "پیاده‌سازی پردازش فایل و تحلیل محتوا",
