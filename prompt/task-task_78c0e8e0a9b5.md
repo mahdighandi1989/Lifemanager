@@ -6,11 +6,11 @@ priority: critical
 execution_priority: 1450
 status: awaiting_review
 external_status: done
-verification_status: applied_externally_pending_verify
+verification_status: error
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:17:02.934574+00:00'
-updated_at: '2026-06-03T18:30:57.136770+00:00'
+updated_at: '2026-06-05T05:12:18.011119+00:00'
 tags:
 - consolidated
 - post_verify_merge
