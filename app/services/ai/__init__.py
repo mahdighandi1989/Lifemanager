@@ -19,6 +19,11 @@ from .model_service import (
     get_active_config,
 )
 from .nlp_service import generate_text
+from .performance_service import (
+    ai_feedback_logger,
+    ai_performance_tracker,
+    ai_response_processor,
+)
 from .provider_service import call_openai_chat, has_openai_key
 
 __all__ = [
@@ -26,6 +31,9 @@ __all__ = [
     "AIService",
     "DEFAULT_MODEL",
     "DEFAULT_PROVIDER",
+    "ai_feedback_logger",
+    "ai_performance_tracker",
+    "ai_response_processor",
     "analyze_image",
     "call_openai_chat",
     "generate_text",

@@ -28,7 +28,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import DEFAULT_ANON_USER_ID, get_optional_user_id
+from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.schemas.task_schema import TaskCreate, TaskUpdate

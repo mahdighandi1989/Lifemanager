@@ -22,14 +22,13 @@ where the column doesn't exist.
 """
 from typing import Union
 
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.services.auth_service import AuthService
 from app.models.user_oauth import OAuthUser
-from app.core.config import settings
 
 
 AuthContext = Union[User, OAuthUser]
