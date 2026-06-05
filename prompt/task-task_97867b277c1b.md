@@ -3,14 +3,14 @@ task_id: task_97867b277c1b
 title: پیاده‌سازی معیارهای عملکردی و پاکسازی کد AI
 type: other
 priority: critical
-execution_priority: 1450
-status: awaiting_review
-external_status: done
-verification_status: applied_externally_pending_verify
+execution_priority: 1200
+status: pending
+external_status: claimed
+verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:19:08.370502+00:00'
-updated_at: '2026-06-03T18:31:01.173609+00:00'
+updated_at: '2026-06-05T05:20:26.884004+00:00'
 tags:
 - consolidated
 - post_verify_merge
@@ -935,7 +935,7 @@ _(مستقل)_
 ```
 
 ### Step 3: تغییر کد برای محقق‌سازی outcome target (لاگ‌گیری تاخیر پاسخ AI)
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل پیاده‌سازی لاگ‌گیری تاخیر پاسخ AI است. باید زمان شروع و پایان هر درخواست AI ثبت شود و تاخیر به میلی‌ثانیه محاسبه گردد. این لاگ‌ها باید شامل timestamp و request_id باشند. فایل‌های هدف: backend/app/ai_service.py، backend/app/metrics.py، backend/app/logging.py. خارج از این مرحله: پیاده‌سازی بازخورد لایک/دیسلایک یا امتیازدهی صریح. نکته حیاتی: از تابع‌های record_ai_latency و metric_collector.record_ai_latency استفاده شود.
 — [merged] این مرحله شامل پیاده‌سازی لاگ‌گیری امتیاز کیفیت پاسخ AI است. باید یک مکانیزم برای ثبت امتیاز کیفیت (مثلاً از 0 تا 1) برای هر پاسخ AI ایجاد شود. این می‌تواند بر اساس بازخورد کاربر یا ارزیابی داخلی باشد. فایل‌های هدف: backend/app/ai_service.py، backend/app/metrics.py، backend/app/logging.py. خارج از این مرحله: پیاده‌سازی UI برای بازخورد کاربر. نکته حیاتی: از تابع metric_collector.record_ai_quality استفاده شود.
 **Excerpt:**
@@ -963,7 +963,7 @@ _(مستقل)_
 ```
 
 ### Step 6: اضافه کردن metric/log برای تشخیص outcome rate در production
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل اضافه کردن metric و logهای لازم است تا بتوان نرخ تحقق outcome (outcome rate) را در محیط production تشخیص داد. باید از metric_collector برای ثبت معیارها و از log.info برای ثبت رویدادهای مرتبط با عملکرد AI استفاده شود. فایل‌های هدف: backend/app/metrics.py، backend/app/logging.py. خارج از این مرحله: ایجاد endpoint API برای دریافت آمار. نکته حیاتی: از grep_patternهای مشخص شده استفاده شود.
 **Excerpt:**
 ```
@@ -971,7 +971,7 @@ _(مستقل)_
 ```
 
 ### Step 7: پیاده‌سازی مکانیزم بازخورد لایک/دیسلایک برای پاسخ‌های AI
-**Status:** `not_done` (0%)
+**Status:** `partial` (50%)
 **Scope:** این مرحله شامل پیاده‌سازی کامل مکانیزم بازخورد لایک/دیسلایک است. این شامل: 1) اضافه کردن دکمه‌های لایک/دیسلایک در UI چت، 2) ایجاد endpoint برای ثبت بازخورد، 3) ذخیره‌سازی بازخورد در دیتابیس. فایل‌های هدف: frontend (کامپوننت چت)، backend (endpoint جدید)، و دیتابیس (مدل جدید). خارج از این مرحله: پیاده‌سازی امتیازدهی صریح 1-5. نکته حیاتی: این یک feature کامل است و باید تمام لایه‌ها را پوشش دهد.
 **Excerpt:**
 ```
@@ -980,7 +980,7 @@ _(مستقل)_
 ```
 
 ### Step 8: پیاده‌سازی مکانیزم امتیازدهی صریح (1-5) برای پاسخ‌های AI
-**Status:** `not_done` (0%)
+**Status:** `partial` (50%)
 **Scope:** این مرحله شامل پیاده‌سازی مکانیزم امتیازدهی صریح با مقیاس 1 تا 5 است. این شامل: 1) اضافه کردن UI برای امتیازدهی عددی در چت، 2) ایجاد endpoint برای ثبت امتیاز، 3) ذخیره‌سازی امتیاز در دیتابیس. خارج از این مرحله: پیاده‌سازی لایک/دیسلایک (که در مرحله قبل انجام شده). نکته حیاتی: این مکانیزم باید جدا از لایک/دیسلایک باشد و امتیازدهی دقیق‌تری ارائه دهد.
 **Excerpt:**
 ```
@@ -1007,7 +1007,7 @@ _(مستقل)_
 ```
 
 ### Step 11: ایجاد endpoint API برای دریافت آمار معیارهای AI
-**Status:** `partial` (30%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل ایجاد یک endpoint GET است که آمار خلاصه معیارهای AI را بازمی‌گرداند. این آمار می‌تواند شامل میانگین تاخیر، میانگین امتیاز کیفیت، تعداد کل درخواست‌ها و ... باشد. خارج از این مرحله: پیاده‌سازی UI برای نمایش این آمار. نکته حیاتی: endpoint باید از دیتابیس خوانده شود و داده‌های real-time یا near-real-time ارائه دهد.
 **Excerpt:**
 ```
@@ -1029,7 +1029,7 @@ _(مستقل)_
 ```
 
 ### Step 13: حذف import generate_text از فایل app/routes/ai.py
-**Status:** `not_done` (0%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل حذف خط import مربوط به generate_text از فایل app/routes/ai.py است. خط مورد نظر: 'from app.services.ai_service import AIService, generate_text' که باید به 'from app.services.ai_service import AIService' تغییر یابد. خارج از این مرحله: تغییر endpoint /ai/generate. نکته حیاتی: فقط import حذف می‌شود، نه استفاده از AIService.
 **Excerpt:**
 ```
@@ -1037,7 +1037,7 @@ _(مستقل)_
 ```
 
 ### Step 14: اصلاح endpoint /ai/generate برای استفاده از AIService به جای generate_text
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل تغییر endpoint /ai/generate در فایل app/routes/ai.py است تا به جای تابع generate_text (که حذف شده) از سرویس AIService استفاده کند. باید فراخوانی ai_service.generate() جایگزین فراخوانی generate_text() شود. خارج از این مرحله: حذف endpoint. نکته حیاتی: endpoint باید همچنان کار کند و پاسخ 200 برگرداند.
 **Excerpt:**
 ```
@@ -1045,7 +1045,7 @@ _(مستقل)_
 ```
 
 ### Step 15: بررسی عدم وجود خطای import در زمان اجرا با تست backend
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل اجرای تست backend برای اطمینان از عدم وجود خطای import در زمان اجرا است. تست مورد نظر: tests/test_ai_service.py::test_ai_service_initializes_without_import_errors. خارج از این مرحله: اجرای سایر تست‌ها. نکته حیاتی: این تست باید با timeout 60 ثانیه اجرا شود.
 **Excerpt:**
 ```
@@ -1085,7 +1085,7 @@ _(مستقل)_
 ```
 
 ### Step 20: اجرای تست‌های backend برای اطمینان از عدم شکست
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل اجرای تمام تست‌های backend با دستور pytest -x است تا اطمینان حاصل شود که هیچ تستی پس از تغییرات شکست نمی‌خورد. خارج از این مرحله: اجرای linter. نکته حیاتی: اگر تستی شکست خورد، باید رفع شود.
 **Excerpt:**
 ```
@@ -1095,7 +1095,7 @@ _(مستقل)_
 ```
 
 ### Step 21: اجرای linter برای اطمینان از عدم وجود warning
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل اجرای linter (ruff) روی فایل‌های تغییر یافته برای اطمینان از عدم وجود warning است. دستور: ruff check app/routes/ai.py. خارج از این مرحله: اجرای type-check. نکته حیاتی: اگر warning وجود داشت، باید رفع شود.
 **Excerpt:**
 ```
@@ -1105,7 +1105,7 @@ _(مستقل)_
 ```
 
 ### Step 22: اجرای type-check برای اطمینان از صحت نوع‌ها
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل اجرای type-check (mypy) روی پروژه برای اطمینان از صحت نوع‌ها است. خارج از این مرحله: اجرای تست‌ها. نکته حیاتی: اگر type-check شکست خورد، باید رفع شود.
 **Excerpt:**
 ```
@@ -1126,7 +1126,7 @@ _(مستقل)_
 ```
 
 ### Step 24: ایجاد PR با checklist کامل از کامیت‌ها
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل ایجاد یک Pull Request (PR) با checklist کامل از تمام کامیت‌های انجام شده است. PR description باید شامل merged-from و توضیح دقیق تغییرات باشد. خارج از این مرحله: مرج کردن PR. نکته حیاتی: PR باید برای بازبینی آماده باشد.
 **Excerpt:**
 ```
