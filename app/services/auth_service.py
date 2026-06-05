@@ -99,10 +99,34 @@ async def register(db: AsyncSession, user_data: UserCreate) -> User:
         if existing_uname.scalar_one_or_none():
             raise ValueError("Username already taken")
 
+    # --- Role/privilege assignment (audit task a75e183c) ---------------
+    # SECURITY: the privilege a new local account receives is decided HERE,
+    # server-side — never read from the request body (UserCreate forbids the
+    # fields entirely; see app/schemas/auth.py). This mirrors the OAuth flow,
+    # where app/services/google_auth.py::get_or_create_user is the sole
+    # authority on an OAuthUser's role.
+    #
+    # Default = least privilege: is_superuser=False. We set it EXPLICITLY
+    # rather than leaning on the column's server default so the security
+    # decision is visible at the mutation site and survives a future model
+    # change to that default.
+    #
+    # The only path to an elevated local account is the operator-controlled
+    # ADMIN_EMAILS bootstrap list — the same single source of truth used by
+    # is_admin() (app/dependencies/auth.py) and the OAuth seeding logic.
+    # Aligning the stored is_superuser flag with that list keeps the two
+    # sides coherent: previously a bootstrap-admin email registering locally
+    # was stored is_superuser=False yet resolved as admin via is_admin()'s
+    # email check — an inconsistency this closes. Comparison is
+    # case-insensitive (admin_emails_list is pre-lowercased).
+    is_bootstrap_admin = (user_data.email or "").strip().lower() in settings.admin_emails_list
+
     db_user = User(
         email=user_data.email,
         username=user_data.username,
         hashed_password=hash_password(user_data.password),
+        is_active=True,
+        is_superuser=is_bootstrap_admin,
     )
     db.add(db_user)
     await db.commit()
