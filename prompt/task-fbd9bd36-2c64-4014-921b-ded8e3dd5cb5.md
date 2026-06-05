@@ -3,14 +3,14 @@ task_id: fbd9bd36-2c64-4014-921b-ded8e3dd5cb5
 title: پیاده‌سازی حذف تکراری و ادغام
 type: other
 priority: medium
-execution_priority: 3050
+execution_priority: 3100
 status: pending
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T20:58:36.200085+00:00'
-updated_at: '2026-06-05T04:59:12.430869+00:00'
+updated_at: '2026-06-05T05:39:30.210832+00:00'
 target_files:
 - backend/app/services/task_service.py
 - backend/app/models/task.py
