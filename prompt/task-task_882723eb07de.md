@@ -3,14 +3,14 @@ task_id: task_882723eb07de
 title: بهینه‌سازی اتصال DB و اصلاح الگوهای طراحی
 type: other
 priority: high
-execution_priority: 2350
-status: awaiting_review
-external_status: done
-verification_status: applied_externally_pending_verify
+execution_priority: 2100
+status: pending
+external_status: claimed
+verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:18:00.915795+00:00'
-updated_at: '2026-06-03T18:30:58.961061+00:00'
+updated_at: '2026-06-05T05:31:21.160629+00:00'
 tags:
 - consolidated
 - post_verify_merge
@@ -673,7 +673,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 ```
 
 ### Step 6: پیاده‌سازی async session management با asyncpg در app/database.py
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** افزودن async engine و async session maker به فایل app/database.py با استفاده از create_async_engine و async_sessionmaker. این شامل تعریف async_engine با ASYNC_DATABASE_URL و AsyncSessionLocal است. خارج از این مرحله: تغییر dependency injection در FastAPI یا تست concurrent. نکته حیاتی: async support باید با FastAPI dependency injection سازگار باشد.
 **Excerpt:**
 ```
@@ -717,7 +717,7 @@ AsyncSessionLocal = async_sessionmaker(async_engine)
 ```
 
 ### Step 11: بررسی وابستگی‌ها و نصب asyncpg در صورت نیاز
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** بررسی فایل requirements.txt یا pyproject.toml برای اطمینان از وجود asyncpg به عنوان وابستگی. اگر asyncpg نصب نیست، آن را به فایل وابستگی اضافه کنید. خارج از این مرحله: تغییر کد اصلی یا تست. نکته حیاتی: asyncpg برای async support با PostgreSQL ضروری است.
 **Excerpt:**
 ```
