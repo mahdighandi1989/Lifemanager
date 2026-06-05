@@ -1510,7 +1510,9 @@
     "file": "frontend/index.html",
     "start_line": 10,
     "end_line": 575,
-    "description": "Auto-injected DevTools inspector bridge. Inline <script> that instruments fetch / XHR / console / errors and posts events to the parent window when the SPA runs inside the inspector iframe. Not wired into application logic — purely dev-tooling. Safe to strip from production builds; left in source because removing it touches the Vite pipeline and the bridge is harmless at runtime.",
+    "description": "REMOVED. Historically frontend/index.html shipped an auto-injected DevTools inspector bridge: an inline <script> (formerly ~lines 10-575) that instrumented fetch / XHR / console / errors and posted events to a hard-coded external WebSocket (wss://ai-creator-backend-q677.onrender.com) plus the parent window when the SPA ran inside the inspector iframe. It was never wired into application logic — purely dev-tooling. As an unauthorized third-party tracker in production it was a security risk and has been stripped; frontend/index.html now contains only the standard Vite bootstrap. start_line/end_line above are retained as the historical range for audit reference.",
+    "removed": true,
+    "removed_in_task": "59e4e523",
     "harmless_at_runtime": true,
     "wired_into_app_logic": false
   },

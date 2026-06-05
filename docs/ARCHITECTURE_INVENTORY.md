@@ -92,16 +92,22 @@ declared in `frontend/src/App.jsx`.
 (See the dir listing for the full set; the SPA catch-all in
 `app/main.py` serves `index.html` for any non-API path.)
 
-## 4. Inspector Bridge Script (frontend/index.html)
+## 4. Inspector Bridge Script (frontend/index.html) — REMOVED
 
-`frontend/index.html` ships an inline script block between roughly
-lines 12-574. It is the **DevTools Inspector Bridge** — a debugging
-shim that posts events back to the parent window when the SPA is
-embedded in the inspector iframe. It is **NOT** wired into any
-application logic and runs purely for dev-tooling instrumentation.
-It can be safely removed in production builds; it is left in source
-because removing it requires touching the Vite build pipeline and
-the bridge is harmless at runtime.
+`frontend/index.html` **formerly** shipped an inline script block
+(roughly lines 10-575): the **DevTools Inspector Bridge** — a
+debugging shim that instrumented fetch / XHR / console / errors and
+posted events to a hard-coded external WebSocket
+(`wss://ai-creator-backend-q677.onrender.com`) and the parent window
+when the SPA was embedded in the inspector iframe. It was **NOT**
+wired into any application logic and ran purely as dev-tooling
+instrumentation.
+
+This script has been **removed** (security task `59e4e523`): an
+unauthorized third-party tracker that streamed user interactions to
+an external server has no place in production. `frontend/index.html`
+now contains only the standard Vite bootstrap (`<div id="root">` plus
+the `/src/main.jsx` module script).
 
 ## 5. No-summarisation declaration
 
