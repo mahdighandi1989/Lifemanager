@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 6,
+  "total": 5,
   "tasks": [
-    {
-      "task_id": "9a5a3b4d-163b-4775-adf0-341c670fb58f",
-      "title": "نقص در مکانیزم احراز هویت: get_optional_user_id در بسیاری از endpointها بدون اعتبارسنجی توکن استفاده می‌شود",
-      "priority": "critical",
-      "execution_priority": 1000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-9a5a3b4d-163b-4775-adf0-341c670fb58f.md",
-      "external_attempts": 0
-    },
     {
       "task_id": "a75e183c-f59d-423f-8b89-ad529f50b6ae",
       "title": "Enforce Default Role for Local User Registration",
