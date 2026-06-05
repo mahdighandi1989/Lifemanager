@@ -3,14 +3,14 @@ task_id: task_92fa5ea15e2b
 title: افزودن نوتیفیکیشن `verify_failed` و مدیریت رویدادها
 type: other
 priority: high
-execution_priority: 2350
-status: awaiting_review
-external_status: done
-verification_status: applied_externally_pending_verify
+execution_priority: 2100
+status: pending
+external_status: claimed
+verification_status: needs_clarification
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-05-26T23:20:22.917998+00:00'
-updated_at: '2026-06-03T18:31:03.039973+00:00'
+updated_at: '2026-06-05T05:35:18.323295+00:00'
 tags:
 - consolidated
 - post_verify_merge
@@ -1102,7 +1102,7 @@ _(مستقل)_
 ## Task Steps
 
 ### Step 1: بررسی وجود notify_event برای verify_failed در failure_handler.py
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن notify_event("verify_failed") در فایل‌های backend/app/handlers/failure_handler.py و backend/app/services/notification_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله بعدی (اضافه کردن) را رد کن.
 **Excerpt:**
 ```
@@ -1110,7 +1110,7 @@ _(مستقل)_
 ```
 
 ### Step 2: اضافه کردن notify_event برای verify_failed در failure_handler.py
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل اضافه کردن یک notify_event("verify_failed", ...) در نقطه وقوع event verify_failed در فایل backend/app/handlers/failure_handler.py است. خارج از این مرحله: نوشتن message template یا تنظیم silent/priority. نکته حیاتی: اگر call از قبل وجود دارد، این مرحله را رد کن.
 **Excerpt:**
 ```
@@ -1118,7 +1118,7 @@ _(مستقل)_
 ```
 
 ### Step 3: نوشتن message template فارسی و معنادار برای verify_failed
-**Status:** `partial` (50%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل نوشتن یک message template به زبان فارسی است که معنادار و قابل فهم باشد. خارج از این مرحله: اضافه کردن notify_event call یا تنظیم silent/priority. نکته حیاتی: message باید به گونه‌ای باشد که کاربر متوجه شود چه event ای رخ داده است.
 **Excerpt:**
 ```
@@ -1126,7 +1126,7 @@ _(مستقل)_
 ```
 
 ### Step 4: تنظیم silent=False و priority='high' برای notify_event verify_failed
-**Status:** `partial` (50%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل تنظیم پارامترهای silent=False و priority='high' در notify_event("verify_failed", ...) در فایل backend/app/handlers/failure_handler.py است. خارج از این مرحله: اضافه کردن notify_event call یا نوشتن message template. نکته حیاتی: این تنظیمات باید در همان call که اضافه شده است اعمال شوند.
 **Excerpt:**
 ```
@@ -1142,7 +1142,7 @@ _(مستقل)_
 ```
 
 ### Step 6: بررسی و رفع مشکل caption_incomplete در notification_service.py
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل بررسی و رفع مشکل 'caption_incomplete' در فایل backend/app/services/notification_service.py است. خارج از این مرحله: اضافه کردن event_type جدید یا تغییر در سایر فایل‌ها. نکته حیاتی: این مرحله نیاز به بازبینی دستی دارد و ممکن است شامل اصلاح caption یا اضافه کردن پارامترهای جدید باشد.
 **Excerpt:**
 ```
@@ -1150,7 +1150,7 @@ _(مستقل)_
 ```
 
 ### Step 7: بررسی وجود notify_event با event_type صریح در test_notification_service.py
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن notify_event(event='task_done') در فایل tests/test_notification_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله بعدی (اضافه کردن) را رد کن.
 **Excerpt:**
 ```
@@ -1158,7 +1158,7 @@ _(مستقل)_
 ```
 
 ### Step 8: اضافه کردن event_type صریح برای notify_event در test_notification_service.py
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل اضافه کردن event_type صریح (مانند 'task_done') به notify_event call در فایل tests/test_notification_service.py است. خارج از این مرحله: ثبت event در registry یا UI. نکته حیاتی: اگر event_type از قبل وجود دارد، این مرحله را رد کن.
 — [merged] این مرحله شامل اضافه کردن event_type صریح (مانند 'task_done') به notify_event call در فایل app/services/auth_service.py است. خارج از این مرحله: ثبت event در registry یا UI. نکته حیاتی: اگر event_type از قبل وجود دارد، این مرحله را رد کن.
 **Excerpt:**
@@ -1177,7 +1177,7 @@ _(مستقل)_
 ```
 
 ### Step 10: بررسی قابلیت toggle event_type task_done از UI notification settings
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل بررسی UI برای اطمینان از اینکه event_type 'task_done' در tab notification settings قابل toggle است. خارج از این مرحله: تغییر UI یا backend. نکته حیاتی: این مرحله نیاز به تعامل با UI دارد و باید از طریق مرورگر انجام شود.
 — [merged] این مرحله شامل بررسی UI برای اطمینان از اینکه event_type 'task_done' در tab notification settings قابل toggle است. خارج از این مرحله: تغییر UI یا backend. نکته حیاتی: این مرحله نیاز به تعامل با UI دارد و باید از طریق مرورگر انجام شود.
 — [merged] این مرحله شامل بررسی UI برای اطمینان از اینکه event_type 'task_done' در tab notification settings قابل toggle است. خارج از این مرحله: تغییر UI یا backend. نکته حیاتی: این مرحله نیاز به تعامل با UI دارد و باید از طریق مرورگر انجام شود.
@@ -1187,7 +1187,7 @@ _(مستقل)_
 ```
 
 ### Step 11: بررسی وجود notify_event با event_type صریح در auth_service.py
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن notify_event(event='[a-z_]+') در فایل app/services/auth_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله بعدی (اضافه کردن) را رد کن.
 **Excerpt:**
 ```
@@ -1195,7 +1195,7 @@ _(مستقل)_
 ```
 
 ### Step 12: ثبت event_type task_done در event registry (auth_service)
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل ثبت event_type 'task_done' در فایل‌های app/events/registry.py, backend/app/notifications/events.py, و backend/app/notifications/events.py است. خارج از این مرحله: اضافه کردن notify_event call یا UI. نکته حیاتی: اگر event از قبل ثبت شده است، این مرحله را رد کن.
 **Excerpt:**
 ```
@@ -1203,7 +1203,7 @@ _(مستقل)_
 ```
 
 ### Step 13: اجرای pytest برای اطمینان از عدم شکست تست‌ها
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل اجرای دستور pytest برای اطمینان از اینکه هیچ تستی fail نمی‌شود. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1211,7 +1211,7 @@ _(مستقل)_
 ```
 
 ### Step 14: اجرای linter برای اطمینان از عدم وجود warning
-**Status:** `not_done` (0%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل اجرای linter (مانند ruff) برای اطمینان از اینکه هیچ warning وجود ندارد. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1219,7 +1219,7 @@ _(مستقل)_
 ```
 
 ### Step 15: اجرای type-check برای اطمینان از موفقیت
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل اجرای type-check (مانند mypy) برای اطمینان از موفقیت آن. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1227,7 +1227,7 @@ _(مستقل)_
 ```
 
 ### Step 16: اجرای npm run build برای اطمینان از موفقیت build
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل اجرای دستور npm run build برای اطمینان از موفقیت build پروژه frontend است. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1235,7 +1235,7 @@ _(مستقل)_
 ```
 
 ### Step 17: اجرای npm run lint برای اطمینان از عدم وجود warning
-**Status:** `not_done` (0%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل اجرای دستور npm run lint برای اطمینان از اینکه هیچ warning وجود ندارد. خارج از این مرحله: تغییر کد. نکته حیاتی: این مرحله باید بعد از تمام تغییرات کد انجام شود.
 **Excerpt:**
 ```
@@ -1243,7 +1243,7 @@ _(مستقل)_
 ```
 
 ### Step 18: بررسی و اضافه کردن rate-limit برای event verify_failed
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل بررسی نیاز به rate-limit برای event verify_failed و اضافه کردن آن در صورت لزوم است. خارج از این مرحله: تغییرات دیگر در notification pipeline. نکته حیاتی: اگر event پر-تکرار است، rate-limit اضافه کن تا spam نشود.
 **Excerpt:**
 ```
@@ -1251,7 +1251,7 @@ _(مستقل)_
 ```
 
 ### Step 19: بررسی و رفع مشکل orphan records در صورت rename event_type
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل بررسی و رفع مشکل orphan records در صورت rename event_type در database است. خارج از این مرحله: تغییرات دیگر. نکته حیاتی: اگر event_type قبلاً به نام دیگری در DB ذخیره شده، rename باعث می‌شود old records orphan شوند.
 — [merged] این مرحله شامل بررسی و رفع مشکل orphan records در صورت rename event_type در database است. خارج از این مرحله: تغییرات دیگر. نکته حیاتی: اگر event_type قبلاً به نام دیگری در DB ذخیره شده، rename باعث می‌شود old records orphan شوند.
 **Excerpt:**
@@ -1260,7 +1260,7 @@ _(مستقل)_
 ```
 
 ### Step 20: بررسی و اطمینان از عدم وجود notify_event برای verify_failed در notification_service.py
-**Status:** `done` (100%)
+**Status:** `partial` (99%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن notify_event("verify_failed") در فایل backend/app/services/notification_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله اضافه کردن را رد کن.
 **Excerpt:**
 ```
@@ -1268,7 +1268,7 @@ _(مستقل)_
 ```
 
 ### Step 21: بررسی و اطمینان از عدم وجود notify_event با event_type صریح در test_notification_service.py (تکمیلی)
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن notify_event(event='task_done') در فایل tests/test_notification_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله اضافه کردن را رد کن.
 — [merged] این مرحله شامل جستجوی grep برای یافتن notify_event(event='[a-z_]+') در فایل app/services/auth_service.py است. هدف تعیین این است که آیا این call از قبل وجود دارد یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر call وجود دارد، مرحله اضافه کردن را رد کن.
 **Excerpt:**
@@ -1277,7 +1277,7 @@ _(مستقل)_
 ```
 
 ### Step 22: بررسی و اطمینان از ثبت event_type task_done در event registry (تکمیلی برای test_notification_service)
-**Status:** `done` (100%)
+**Status:** `not_done` (0%)
 **Scope:** این مرحله شامل جستجوی grep برای یافتن register_event('task_done') در فایل‌های backend/app/notifications/event_registry.py و backend/app/notifications/events.py است. هدف تعیین این است که آیا این event از قبل ثبت شده است یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر event ثبت شده است، مرحله ثبت را رد کن.
 — [merged] این مرحله شامل جستجوی grep برای یافتن '"task_done"' در فایل‌های app/events/registry.py, backend/app/notifications/events.py, و backend/app/notifications/events.py است. هدف تعیین این است که آیا این event از قبل ثبت شده است یا خیر. خارج از این مرحله: ایجاد یا تغییر کد. نکته حیاتی: اگر event ثبت شده است، مرحله ثبت را رد کن.
 **Excerpt:**
