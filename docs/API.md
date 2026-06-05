@@ -13,6 +13,45 @@ Conventions used across every endpoint:
 - **Strict CORS** — see `app/main.py::StrictCORSMiddleware`; the
   allowlist comes from `ALLOWED_ORIGINS` env var.
 
+## Authentication & identity scoping (security task 9a5a3b4d)
+
+Every user-scoped route resolves the caller's `user_id` through one of two
+dependencies in `app/dependencies/auth.py`. Which one a route uses encodes how
+sensitive its data is:
+
+| Dependency | No `Authorization` header | Valid bearer | Present-but-invalid / expired bearer |
+|---|---|---|---|
+| `get_required_user_id` (sensitive: **finance, assets, context**) | `REQUIRE_AUTH=false` → anon scope (user 0); `REQUIRE_AUTH=true` → **401** | that user's id | **401, always** |
+| `get_optional_user_id` (dashboard / self-improvement / lists / ai-config …) | anon scope (user 0) | that user's id | anon scope (user 0) |
+
+The key security property: on a **sensitive** route a forged or expired token is
+**always rejected with 401**, independent of `REQUIRE_AUTH` — a present-but-bad
+bearer is an attack signal and must never resolve to user 0's data. The probe
+from the task confirms it:
+
+```
+curl /api/finance/incomes -H 'Authorization: Bearer invalid_token'   # → 401
+```
+
+`get_optional_user_id` stays deliberately lenient (it still verifies the JWT
+signature, but falls back to the anon scope on any failure) because the
+login-bypass frontend reaches the dashboard with no header.
+
+**`REQUIRE_AUTH`** (`.env`, default `false`) is the switch that retires the
+anonymous fallback once real accounts exist. Before flipping it to `true`,
+re-home the legacy user-0 data onto a real account so it isn't orphaned:
+
+```
+# preview what would move (writes nothing)
+python -m scripts.reassign_anon_user_data --target <real_user_id> --dry-run
+# perform the reassignment (single transaction: all-or-nothing)
+python -m scripts.reassign_anon_user_data --target <real_user_id>
+```
+
+The mechanism (`app/services/user_data_migration.py`) discovers every table with
+a `user_id` column from SQLAlchemy metadata, so new user-scoped tables are
+migrated automatically. The only manual input is the target account id.
+
 ## Endpoint index
 
 ### Tasks (`/tasks`)

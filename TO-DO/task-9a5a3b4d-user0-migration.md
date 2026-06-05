@@ -3,7 +3,7 @@ task_id: 9a5a3b4d-163b-4775-adf0-341c670fb58f
 task_title: "نقص در مکانیزم احراز هویت: get_optional_user_id بدون اعتبارسنجی توکن"
 execution_priority: 1000
 created_at: "2026-06-02T21:07:39.947207+00:00"
-updated_at: "2026-06-05T18:00:00+00:00"
+updated_at: "2026-06-05T18:40:00+00:00"
 status: "pending"
 ---
 
@@ -32,6 +32,12 @@ is a business decision, so it is genuinely operator-only.
 - **Security tests** — `tests/test_auth_required_user_id_9a5a3b4d.py`
   (forged/expired token → 401, anon fallback by default, 401 when REQUIRE_AUTH
   is on, optional dep stays lenient).
+- **Migration mechanism (NEW — automated)** — `app/services/user_data_migration.py`
+  + the `scripts/reassign_anon_user_data.py` CLI. The reassignment itself is now
+  fully scripted (transactional, all-or-nothing, with a `--dry-run` preview); it
+  discovers every `user_id` table from SQLAlchemy metadata automatically.
+  Covered by `tests/test_user_data_migration_9a5a3b4d.py`. The **only** thing
+  left to a human is the ownership decision + running the command against prod.
 
 ## What you (the operator) must do
 
@@ -40,13 +46,18 @@ is a business decision, so it is genuinely operator-only.
 1. Decide the ownership mapping: which real `users` / `oauth_users` account
    should own the rows currently scoped to `user_id = 0`. There may be exactly
    one real operator account, in which case it is a single target id.
-2. Reassign the legacy rows. For every user-scoped table that can hold
-   `user_id = 0` (finance incomes/assets/accounts/transactions, user_assets,
-   user_contexts, contextual_recommendations, lists, todo_items, projects,
-   interests, person/people, ai_model_configs, …), run an
-   `UPDATE <table> SET user_id = :real_id WHERE user_id = 0;` inside one
-   transaction, against a **backed-up** database. Verify row counts before and
-   after.
+2. Reassign the legacy rows using the provided CLI (runs in a single
+   transaction — all-or-nothing — and auto-discovers every user-scoped table,
+   so you don't hand-write per-table SQL). Back up the DB first, then:
+
+   ```bash
+   # preview the per-table row counts that would move (writes nothing)
+   python -m scripts.reassign_anon_user_data --target <real_user_id> --dry-run
+   # perform the reassignment of user 0's data onto the real account
+   python -m scripts.reassign_anon_user_data --target <real_user_id>
+   ```
+
+   The command prints per-table affected-row counts and a total; verify them.
 3. Only then set the `REQUIRE_AUTH` env var to `true` on the deploy and
    restart, so anonymous access to the sensitive routes is refused.
 
