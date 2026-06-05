@@ -1,19 +1,19 @@
 ---
 task_id: f17880d0-efa3-4ab9-a92a-66bbfbbc4a9d
-title: '[منطق] Incomplete Permission Coverage for Mutation Paths'
+title: Add Missing Auth to Mutation Endpoints
 type: logic_audit
 priority: critical
-execution_priority: 1300
+execution_priority: 1350
 status: awaiting_review
-external_status: pending
+external_status: claimed
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T20:53:55.250778+00:00'
-updated_at: '2026-06-05T17:12:52.011051+00:00'
+updated_at: '2026-06-05T18:51:08.603732+00:00'
 ---
 
-# [منطق] Incomplete Permission Coverage for Mutation Paths
+# Add Missing Auth to Mutation Endpoints
 
 ## Raw Idea
 
