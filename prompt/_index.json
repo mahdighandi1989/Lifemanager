@@ -5,13 +5,13 @@
   "total": 2,
   "tasks": [
     {
-      "task_id": "2165524b-5614-4c95-938c-0587d7748436",
-      "title": "پیاده‌سازی سیستم پیشنهاددهی هوشمند مبتنی بر زمینه",
+      "task_id": "d2146781-09cc-47a1-aeda-a737d477b759",
+      "title": "توسعه قابلیت‌های نظارت بر پروژه‌های خارجی",
       "priority": "medium",
       "execution_priority": 3050,
       "status": "pending",
       "external_status": "pending",
-      "path": "prompt/task-2165524b-5614-4c95-938c-0587d7748436.md",
+      "path": "prompt/task-d2146781-09cc-47a1-aeda-a737d477b759.md",
       "external_attempts": 1
     },
     {
