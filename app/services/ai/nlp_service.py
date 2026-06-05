@@ -22,7 +22,10 @@ from collections import defaultdict
 from threading import Lock
 from typing import Optional
 
+from pydantic import ValidationError
+
 from app.config import AI_PERFORMANCE_TARGETS
+from app.schemas.ai_schema import validate_ai_generation
 from .content_analysis_service import analyze_content  # noqa: F401  re-export
 from .model_service import DEFAULT_MODEL
 from .provider_service import call_openai_chat, has_openai_key
@@ -185,7 +188,7 @@ async def generate_text(
         return result
 
     try:
-        result = await call_openai_chat(
+        raw = await call_openai_chat(
             prompt=prompt,
             model=model,
             max_tokens=max_tokens,
@@ -193,7 +196,23 @@ async def generate_text(
             api_key=api_key,
             base_url=base_url,
         )
+        # Post-generation validation (audit task 652ed219): parse the raw
+        # provider output through AIGenerateResponse at this single chokepoint
+        # so a malformed payload can't leak to any downstream consumer.
+        result = validate_ai_generation(raw, default_model=model)
         kind = "provider"
+    except ValidationError as exc:  # provider returned a structurally-bad body
+        # Flag for review rather than propagate garbage downstream.
+        log.warning("ai_response_validation_failed request_id=%s model=%s "
+                    "errors=%d detail=%s", request_id, model,
+                    exc.error_count(), exc.errors())
+        result = {
+            "generated_text": f"[ai-invalid] provider response failed schema "
+                              f"validation ({exc.error_count()} error(s))",
+            "model_used": model,
+            "tokens_used": 0,
+        }
+        kind = "invalid"
     except Exception as exc:  # network / provider failure
         result = {
             "generated_text": f"[ai-error] {type(exc).__name__}: {exc}",
@@ -207,8 +226,8 @@ async def generate_text(
         request_id=request_id,
         model=model,
         prompt_len=len(prompt),
+        tokens_used=result.get("tokens_used") or 0,
         latency_ms=latency_ms,
-        tokens_used=result.get("tokens_used", 0),
         result_kind=kind,
     )
     return result

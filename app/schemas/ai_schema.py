@@ -207,6 +207,52 @@ class AIGenerateResponse(BaseModel):
 AIGenerateRequest.model_rebuild()
 
 
+# ── Post-generation validation (audit task 652ed219) ────────────────────
+#
+# Coherence fix: `AIGenerateResponse` (above) is the canonical contract for
+# the AI text-generation pipeline, but until now it was only enforced at the
+# /ai/generate *route* boundary (`AIGenerateResponse(**result)`). Every other
+# consumer of `nlp_service.generate_text` — orchestrate_analysis, the planner,
+# finance advice, file summaries, task feedback — received the raw provider
+# dict with no structural guarantee. A provider returning a null `content`,
+# a non-string body, or a missing key would leak straight through to those
+# callers (and only blow up later, far from the source).
+#
+# `validate_ai_generation` is the single post-generation validation/parsing
+# entry point. The service layer runs every generation result through it so
+# the same schema that guards the wire response also guards the in-process
+# data flow. `AIAnalysisResultSchema` is exposed as the task-named alias for
+# the structured-output schema callers validate analysis results against.
+AIAnalysisResultSchema = AIAnalysisResult
+
+
+def validate_ai_generation(raw: Any, *, default_model: Optional[str] = None) -> dict:
+    """Validate & normalise a raw AI generation payload against
+    :class:`AIGenerateResponse`.
+
+    Returns a dict with the three contract keys guaranteed present and
+    well-typed: ``generated_text`` (str), ``model_used`` (str | None,
+    filled from ``default_model`` when the provider omitted it) and
+    ``tokens_used`` (int, never None — downstream metrics do arithmetic
+    on it). Extra keys an upstream provider may have tacked on are
+    stripped (Pydantic ignores undeclared fields), so a malformed or
+    over-broad provider response can't reach end users.
+
+    Raises :class:`pydantic.ValidationError` when the payload is
+    structurally invalid — e.g. not a mapping, ``generated_text`` missing
+    or null, or a field carrying the wrong type. Callers catch this to
+    flag the response for human review / fall back to a safe placeholder
+    rather than propagating garbage downstream.
+    """
+    validated = AIGenerateResponse.model_validate(raw)
+    data = validated.model_dump()
+    if data.get("model_used") is None and default_model is not None:
+        data["model_used"] = default_model
+    if data.get("tokens_used") is None:
+        data["tokens_used"] = 0
+    return data
+
+
 # ── Profiling: interests / sentiment / personality / career (task 14e65214) ──
 
 

@@ -60,7 +60,13 @@ class AIService:
     ) -> dict:
         """Delegates to nlp_service.generate_text (AC6, task 97867b277c1b).
         ``api_key``/``base_url`` route to a registered provider (task 1a08ded2);
-        omitted → env OpenAI path / placeholder."""
+        omitted → env OpenAI path / placeholder.
+
+        Output validation (audit task 652ed219): nlp_service.generate_text now
+        runs the provider response through ``validate_ai_generation`` before it
+        returns, so this method — and ``orchestrate_analysis`` below, which
+        reads ``out['generated_text']`` — always receive a schema-valid dict.
+        model_service stays a pure pass-through; no second validation needed."""
         from app.services.ai.nlp_service import DEFAULT_MODEL
         from app.services.ai.nlp_service import generate_text as _generate_text
 
