@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 7,
+  "total": 6,
   "tasks": [
-    {
-      "task_id": "32145cd6-a920-4c87-8467-21026dca420d",
-      "title": "[منطق] Missing Hallucination Detection and Mitigation",
-      "priority": "critical",
-      "execution_priority": 1000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-32145cd6-a920-4c87-8467-21026dca420d.md",
-      "external_attempts": 0
-    },
     {
       "task_id": "9a5a3b4d-163b-4775-adf0-341c670fb58f",
       "title": "نقص در مکانیزم احراز هویت: get_optional_user_id در بسیاری از endpointها بدون اعتبارسنجی توکن استفاده می‌شود",
