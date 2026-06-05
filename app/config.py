@@ -53,6 +53,20 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""
 
+    # --- Admin bootstrap ----------------------------------------------------
+    # Comma-separated list of email addresses that are treated as admins.
+    # Previously a single admin identity was hardcoded as a string literal in
+    # app/dependencies/auth.py, app/routes/auth_google.py, and
+    # app/services/google_auth.py — comparing the caller's email against that
+    # literal bypassed the role/permission columns entirely (the RBAC system),
+    # and baked a real person's identity into source where it couldn't be
+    # rotated per-deploy. Request-time authorization is now role-based first
+    # (UserRole.ADMIN / UserPermission.ADMIN); this env-configurable list only
+    # bootstraps the initial admin(s) so a fresh deploy has someone who can
+    # approve others. Empty by default — production sets it via the ADMIN_EMAILS
+    # env var. Matching is case-insensitive (see admin_emails_list).
+    ADMIN_EMAILS: str = ""
+
     # Google Maps key — used by the (future) /api/location/search
     # geocoding service. Empty by default so a deploy without Maps
     # credentials still boots; the route layer is responsible for
@@ -128,6 +142,18 @@ class Settings(BaseSettings):
         if not raw:
             return []
         return [o.strip() for o in raw.split(",") if o.strip()]
+
+    @property
+    def admin_emails_list(self) -> list[str]:
+        """Parsed, lower-cased list view of ADMIN_EMAILS — used by the admin
+        gate (app/dependencies/auth.py) and the OAuth bootstrap
+        (app/services/google_auth.py). Lower-cased so the comparison is
+        case-insensitive (email local-parts are practically case-insensitive
+        and the domain always is)."""
+        raw = (self.ADMIN_EMAILS or "").strip()
+        if not raw:
+            return []
+        return [e.strip().lower() for e in raw.split(",") if e.strip()]
 
 
 # Values that must never sign a production JWT. ``_DEV_SECRET_SENTINEL`` is

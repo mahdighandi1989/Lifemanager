@@ -28,7 +28,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.services.auth_service import AuthService
-from app.models.user_oauth import OAuthUser
+from app.models.user_oauth import OAuthUser, UserRole, UserPermission
+from app.core.config import settings
 
 
 AuthContext = Union[User, OAuthUser]
@@ -119,12 +120,43 @@ async def get_current_active_user(
         )
     return current_user
 
+def is_admin(current_user: AuthContext) -> bool:
+    """Role-based admin check across both user shapes.
+
+    This replaces the previous ``email == "<hardcoded literal>"`` test, which
+    bypassed RBAC entirely: a user explicitly granted ``UserRole.ADMIN`` /
+    ``UserPermission.ADMIN`` (e.g. via the approve flow) wasn't recognised,
+    while a real person's identity was baked into source. A caller is admin
+    when EITHER:
+
+      * their ``role`` column is ``UserRole.ADMIN`` — the canonical RBAC
+        signal carried on ``OAuthUser`` (the local ``User`` has no role
+        column, so ``getattr`` yields ``None`` and this is simply skipped),
+      * their ``permissions`` column is ``UserPermission.ADMIN``, or
+      * their email is in the operator-configured ``ADMIN_EMAILS`` bootstrap
+        list (case-insensitive) — how the first admin is seeded on a fresh
+        deploy before anyone has been granted the role in the DB.
+
+    Both enum members and their raw ``str`` values compare equal because
+    ``UserRole``/``UserPermission`` subclass ``str``; we still normalise via
+    ``getattr(x, "value", x)`` so a plain string column survives too.
+    """
+    role = getattr(current_user, "role", None)
+    if getattr(role, "value", role) == UserRole.ADMIN.value:
+        return True
+    perm = getattr(current_user, "permissions", None)
+    if getattr(perm, "value", perm) == UserPermission.ADMIN.value:
+        return True
+    email = (getattr(current_user, "email", None) or "").strip().lower()
+    return bool(email) and email in settings.admin_emails_list
+
+
 async def get_current_admin_user(
     current_user: AuthContext = Depends(get_current_user),
 ) -> AuthContext:
-    """Admin gate. Works for both User and OAuthUser shapes — ``email``
-    exists on both, so the comparison is safe across the union."""
-    if getattr(current_user, "email", None) != "mohamad.mahdi1988@gmail.com":
+    """Admin gate. Works for both User and OAuthUser shapes — authorization
+    is role-based (see :func:`is_admin`), not a hardcoded-email comparison."""
+    if not is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required",

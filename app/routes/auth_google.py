@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
 from app.database import get_db
 from app.services.google_auth import (
     verify_google_token,
@@ -11,9 +10,9 @@ from app.services.google_auth import (
     get_all_pending_users,
     approve_user
 )
-from app.dependencies.auth import get_current_user
-from app.models.user_oauth import OAuthUser, UserRole
-from app.schemas.user_oauth import TokenResponse, OAuthUserResponse, OAuthUserUpdate
+from app.dependencies.auth import get_current_user, is_admin
+from app.models.user_oauth import OAuthUser
+from app.schemas.user_oauth import OAuthUserResponse
 from app.core.config import settings
 
 router = APIRouter(prefix="", tags=["google-auth"])
@@ -175,7 +174,7 @@ async def list_pending_users(
     current_user: OAuthUser = Depends(get_current_user)
 ):
     """List all pending users (admin only)."""
-    if current_user.email != "mohamad.mahdi1988@gmail.com":
+    if not is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can access this endpoint."
@@ -190,7 +189,7 @@ async def approve_pending_user(
     current_user: OAuthUser = Depends(get_current_user)
 ):
     """Approve a pending user (admin only)."""
-    if current_user.email != "mohamad.mahdi1988@gmail.com":
+    if not is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can approve users."
@@ -210,7 +209,7 @@ async def admin_panel(
     db: AsyncSession = Depends(get_db)
 ):
     """Admin panel HTML page."""
-    if current_user.email != "mohamad.mahdi1988@gmail.com":
+    if not is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can access this page."
@@ -522,7 +521,7 @@ async def dashboard(current_user: OAuthUser = Depends(get_current_user)):
             </div>
             
             <div style="text-align: center;">
-                {'<a href="/admin/panel" class="btn btn-primary">👑 پنل مدیریت</a>' if current_user.email == "mohamad.mahdi1988@gmail.com" else ''}
+                {'<a href="/admin/panel" class="btn btn-primary">👑 پنل مدیریت</a>' if is_admin(current_user) else ''}
                 <a href="/auth/logout" class="btn btn-danger">🚪 خروج</a>
             </div>
         </div>

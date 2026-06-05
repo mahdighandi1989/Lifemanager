@@ -11,6 +11,11 @@ import os
 os.environ.setdefault("RATE_LIMIT_DISABLED", "true")
 # A stable signing key keeps token-shape assertions deterministic.
 os.environ.setdefault("JWT_SECRET_KEY", "test-key-not-for-prod")
+# Bootstrap admin identity for the admin-gated suites. The admin email used
+# to be a hardcoded literal in the source; it is now sourced from ADMIN_EMAILS
+# (see app/config.py). Seed it here so the existing admin-roundtrip tests
+# (settings global prompt, analysis prompt, auth deps) still grant admin.
+os.environ.setdefault("ADMIN_EMAILS", "mohamad.mahdi1988@gmail.com")
 
 
 # --- Shared fixtures (auto-discovered by pytest) ---------------------------

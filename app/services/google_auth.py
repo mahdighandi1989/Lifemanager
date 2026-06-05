@@ -1,12 +1,11 @@
 import httpx
-from jose import jwt, JWTError
+from jose import jwt
 from datetime import datetime, timedelta
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.config import settings
 from app.models.user_oauth import OAuthUser, UserRole, UserPermission
-from app.schemas.user_oauth import OAuthUserCreate, OAuthUserResponse
 
 async def verify_google_token(token: str) -> Optional[dict]:
     """Verify Google OAuth token and return user info."""
@@ -49,8 +48,12 @@ async def get_or_create_user(db: AsyncSession, email: str, name: Optional[str] =
     if user:
         return user
     
-    # Check if this is the admin email
-    if email == "mohamad.mahdi1988@gmail.com":
+    # Bootstrap admins: an email in the operator-configured ADMIN_EMAILS list
+    # is seeded with the ADMIN role/permissions and pre-approved. This replaces
+    # the previous hardcoded-email literal — the identity now lives in env, not
+    # source, and request-time authz is role-based (see app/dependencies/auth.py
+    # ::is_admin). Comparison is case-insensitive via admin_emails_list.
+    if (email or "").strip().lower() in settings.admin_emails_list:
         role = UserRole.ADMIN
         permissions = UserPermission.ADMIN
         status = "approved"
