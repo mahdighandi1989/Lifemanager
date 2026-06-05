@@ -23,7 +23,15 @@ class UserInterestCreate(UserInterestBase):
     pass
 
 
-class UserInterestSchema(UserInterestBase):
+class UserInterestSchema(BaseModel):
+    # Inherits the same fields as ``UserInterestBase`` but declared directly on
+    # ``BaseModel`` so the canonical response shape is self-contained.
+    interest_type: Optional[str] = Field(None, max_length=64)
+    value: str
+    source: Optional[str] = Field(None, max_length=64)
+    confidence_score: Optional[float] = Field(None, ge=0.0, le=1.0)
+    category: Optional[str] = Field(None, max_length=64)
+    is_verified: bool = False
     id: int
     user_id: Optional[int] = None
     created_at: Optional[datetime] = None
@@ -49,7 +57,14 @@ class UserTasteCreate(UserTasteBase):
     pass
 
 
-class UserTasteSchema(UserTasteBase):
+class UserTasteSchema(BaseModel):
+    # Same fields as ``UserTasteBase`` declared directly on ``BaseModel`` so the
+    # canonical response shape is self-contained.
+    category: Optional[str] = Field(None, max_length=64)
+    value: str
+    source: Optional[str] = Field(None, max_length=64)
+    confidence_score: Optional[float] = Field(None, ge=0.0, le=1.0)
+    is_verified: bool = False
     id: int
     user_id: Optional[int] = None
     created_at: Optional[datetime] = None

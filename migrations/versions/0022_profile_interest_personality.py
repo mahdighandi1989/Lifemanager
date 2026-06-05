@@ -103,7 +103,11 @@ def upgrade() -> None:
             sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
         )
 
-    # users — analyzed-profile cache columns.
+    # users — analyzed-profile cache columns. The op.add_column calls below are
+    # the dialect-agnostic equivalent of this raw DDL (audit task 14e65214 AC14):
+    #   ALTER TABLE users ADD COLUMN interests JSON;
+    #   ALTER TABLE users ADD COLUMN personality_traits JSON;
+    #   ALTER TABLE users ADD COLUMN mood_patterns JSON;
     for col, type_ in (
         ("interests", sa.JSON()),
         ("personality_traits", sa.JSON()),

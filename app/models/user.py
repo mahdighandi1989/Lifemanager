@@ -16,8 +16,10 @@ How they interact in the auth pipeline: both are issued the same JWT, so
 with ``getattr`` rather than assuming one concrete shape (a local ``User`` has
 no ``status``; an ``OAuthUser`` has no ``hashed_password``).
 """
+from typing import Any, Optional
+
 from sqlalchemy import JSON, Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.sql import func
 
 from app.database import Base
@@ -47,9 +49,9 @@ class User(Base):
     # these JSON columns hold the denormalised summary the recommendation +
     # career-path engines read without re-joining ("علائق من ... شخصیت منو
     # ... روحیات منو تحلیل کنن"). SQLite stores JSON as TEXT transparently.
-    interests = Column(JSON, nullable=True)
-    personality_traits = Column(JSON, nullable=True)
-    mood_patterns = Column(JSON, nullable=True)
+    interests: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    personality_traits: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    mood_patterns: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

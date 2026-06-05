@@ -89,6 +89,36 @@ async def get_user_tastes(db: AsyncSession, *, user_id: int) -> List["UserTaste"
     return list(result.scalars().all())
 
 
+class AIDataAccessService:
+    """Thin object-oriented facade over the module-level read helpers
+    (audit task 14e65214 AC5).
+
+    Existing callers use the free functions directly; this class gives the
+    AI pipeline a single injectable handle that carries the ``AsyncSession``
+    and exposes the same user-scoped, read-only retrieval surface — notably
+    ``get_user_interests`` / ``get_user_tastes`` for the interest & profile
+    system.
+    """
+
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def get_user_tasks(self, user_id: int) -> List[Task]:
+        return await get_user_tasks(self.db, user_id=user_id)
+
+    async def get_user_projects(self, user_id: int) -> List[Project]:
+        return await get_user_projects(self.db, user_id=user_id)
+
+    async def get_user_interests(self, user_id: int) -> List["UserInterest"]:
+        return await get_user_interests(self.db, user_id=user_id)
+
+    async def get_user_tastes(self, user_id: int) -> List["UserTaste"]:
+        return await get_user_tastes(self.db, user_id=user_id)
+
+    async def get_user_data_context(self, user_id: int) -> dict:
+        return await get_user_data_context(self.db, user_id=user_id)
+
+
 async def get_user_data_context(db: AsyncSession, *, user_id: int) -> dict:
     """Return a single dict carrying every per-user signal the AI
     pipeline cares about. The shape is intentionally flat so the

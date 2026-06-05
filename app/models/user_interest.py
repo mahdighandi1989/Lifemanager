@@ -13,6 +13,8 @@ Login-bypass single-tenant design: ``user_id`` mirrors UserContext /
 ContextualRecommendation — FK to ``users.id`` but nullable so anonymous
 traffic (user 0) can still own rows.
 """
+from typing import Optional
+
 from sqlalchemy import (
     Boolean,
     Column,
@@ -22,7 +24,7 @@ from sqlalchemy import (
     Integer,
     String,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
@@ -32,15 +34,17 @@ class UserInterest(Base):
     __tablename__ = "user_interests"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
+    user_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("users.id"), index=True, nullable=True
+    )
     # Step 1 fields — how the interest was supplied.
-    interest_type = Column(String(64), index=True, nullable=True)
-    value = Column(String, nullable=False)
-    source = Column(String(64), nullable=True)  # manual_input | task_analysis | ...
-    confidence_score = Column(Float, nullable=True)  # 0.0 – 1.0
+    interest_type: Mapped[Optional[str]] = mapped_column(String(64), index=True, nullable=True)
+    value: Mapped[str] = mapped_column(String, nullable=False)
+    source: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # manual_input | task_analysis | ...
+    confidence_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # 0.0 – 1.0
     # Step 2 fields — domain + verification.
-    category = Column(String(64), index=True, nullable=True)
-    is_verified = Column(Boolean, nullable=False, default=False)
+    category: Mapped[Optional[str]] = mapped_column(String(64), index=True, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
