@@ -5,12 +5,12 @@ type: logic_audit
 priority: critical
 execution_priority: 1350
 status: awaiting_review
-external_status: claimed
-verification_status: partial
+external_status: done
+verification_status: applied_externally_pending_verify
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T20:53:55.250778+00:00'
-updated_at: '2026-06-05T18:51:08.603732+00:00'
+updated_at: '2026-06-05T19:07:53.803340+00:00'
 ---
 
 # Add Missing Auth to Mutation Endpoints
