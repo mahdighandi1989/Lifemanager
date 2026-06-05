@@ -2,6 +2,17 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 0,
-  "tasks": []
+  "total": 1,
+  "tasks": [
+    {
+      "task_id": "f17880d0-efa3-4ab9-a92a-66bbfbbc4a9d",
+      "title": "Add Missing Auth to Mutation Endpoints",
+      "priority": "critical",
+      "execution_priority": 1100,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-f17880d0-efa3-4ab9-a92a-66bbfbbc4a9d.md",
+      "external_attempts": 2
+    }
+  ]
 }
