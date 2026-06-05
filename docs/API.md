@@ -327,16 +327,21 @@ offline and degrade to bookkeeping-only without creds.
 `GET /api/drive/files?q=` searches filename **and** extracted_text (Step 9).
 `POST /api/drive/upload` records the file to the `LifeManagerIndex` sheet via
 `sheets_service.record_index_entry` (best-effort, no-op without Sheets creds —
-Step 4). The daily `tier_cold_data` task now migrates cold DriveFiles via
-`cold_tiering_service.tier_cold_files` (AC4). Real OCR/ASR + live Google
-Drive/Sheets credentials are external (TO-DO/task-7367c6f0-ocr-google.md).
+Step 4). The daily `tier_cold_data` task migrates cold DriveFiles via
+`cold_tiering_service.tier_cold_files` (AC4) and records **each migrated file**
+to the `LifeManagerIndex` sheet through the task's `ledger` callback
+(`sheet_row_for` → `record_index_entry`), so the sheet ledger covers the
+migration path too, not just upload — best-effort, no-op without Sheets creds.
+Real OCR/ASR + live Google Drive/Sheets credentials are external
+(TO-DO/task-7367c6f0-ocr-google.md).
 
 Model: `DriveFile` gains `storage_location` (local\|drive) + `last_accessed_at`
 (migration 0023). Services: `google_drive_service` (`upload_file`→shareable
 link, `download_file`, `build_share_link`, folder helpers — AC1/AC7),
 `sheets_service` (`append_index_row` to `LifeManagerIndex` — AC2),
-`cold_tiering_service` (`is_cold`/`find_cold_files`/`tier_cold_files`, 30-day
-policy — AC4), `transcription_service` (`extract_text` for audio/image — AC6).
+`cold_tiering_service` (`is_cold`/`find_cold_files`/`tier_cold_files` with an
+optional `ledger` hook + `sheet_row_for`, 30-day policy — AC4),
+`transcription_service` (`extract_text` for audio/image — AC6).
 UI: `DriveFiles` page (`/drive-files`) badges Drive-stored files + links to the
 blob (AC8). The `tier_cold_data` Celery task runs the sweep daily.
 

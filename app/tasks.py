@@ -257,12 +257,20 @@ def tier_cold_data() -> dict[str, Any]:
 
         from app.database import SessionLocal
         from app.models.task import Task
-        from app.services.cold_tiering_service import tier_cold_files
+        from app.services.cold_tiering_service import sheet_row_for, tier_cold_files
         from app.services.data_classification_service import DataClassificationService
+        from app.services.sheets_service import record_index_entry
 
         svc = DataClassificationService()
         total = 0
         cold = 0
+
+        async def _ledger(row) -> None:
+            # Record every migrated file in the central LifeManagerIndex sheet
+            # ("توی شیت باید همه چیزا ثبت بشه"). Best-effort: a clean no-op when
+            # Sheets credentials/client aren't configured (audit task 7367c6f0).
+            await record_index_entry(sheet_row_for(row))
+
         async with SessionLocal() as db:
             tasks = (await db.execute(select(Task))).scalars().all()
             for task in tasks:
@@ -270,8 +278,9 @@ def tier_cold_data() -> dict[str, Any]:
                 if svc.classify_task_essentiality(task) != "essential":
                     cold += 1
             # Actually migrate cold DriveFiles (>30 days untouched) out to Drive
-            # — the AC4 tiering, not just a task tally (audit task 7367c6f0).
-            tiered = await tier_cold_files(db)
+            # — the AC4 tiering, not just a task tally (audit task 7367c6f0) —
+            # logging each migration to the central sheet ledger (AC2).
+            tiered = await tier_cold_files(db, ledger=_ledger)
         return {"total": total, "cold_eligible": cold, "files_migrated": tiered["migrated"]}
 
     try:

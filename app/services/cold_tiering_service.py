@@ -51,13 +51,19 @@ async def tier_cold_files(
     *,
     user_id: Optional[int] = None,
     mover: Optional[Callable[[DriveFile], Awaitable[dict]]] = None,
+    ledger: Optional[Callable[[DriveFile], Awaitable[None]]] = None,
     now: Optional[datetime] = None,
 ) -> dict:
     """Migrate every cold DriveFile out to Drive. For each cold row, optionally
     call ``mover(row)`` (real Drive upload) for {drive_file_id, drive_link},
-    then flip storage_location='drive' + stamp migrated_at. Returns
-    ``{migrated, file_ids}``."""
+    then flip storage_location='drive' + stamp migrated_at. After the migration
+    commits, optionally record each migrated row via ``ledger(row)`` — the seam
+    the central LifeManagerIndex sheet write hangs off, so "توی شیت باید همه
+    چیزا ثبت بشه" holds for the migration path too, not just upload (audit task
+    7367c6f0 AC2+AC4). The ledger write is best-effort: a sheet failure never
+    aborts an otherwise-successful migration. Returns ``{migrated, file_ids}``."""
     cold = await find_cold_files(db, user_id=user_id, now=now)
+    stamp = now or datetime.now(timezone.utc)
     migrated = 0
     for row in cold:
         if mover is not None:
@@ -67,8 +73,32 @@ async def tier_cold_files(
                 row.drive_link = info.get("drive_link", row.drive_link)
         row.storage_location = "drive"
         row.storage_tier = "cold"
-        row.migrated_at = now or datetime.now(timezone.utc)
+        row.migrated_at = stamp
         migrated += 1
     if migrated:
         await db.commit()
+    if ledger is not None:
+        for row in cold:
+            try:
+                await ledger(row)
+            except Exception:
+                # The ledger is an audit trail, not a gate — never undo a
+                # committed migration because the sheet append failed.
+                pass
     return {"migrated": migrated, "file_ids": [r.id for r in cold]}
+
+
+def sheet_row_for(row: DriveFile) -> dict:
+    """Project a migrated DriveFile onto the LifeManagerIndex record shape
+    consumed by ``sheets_service.record_index_entry`` (audit task 7367c6f0).
+    Centralises the field mapping so the cold-tiering ledger and the upload
+    ledger stay in sync on column names."""
+    return {
+        "RecordID": str(getattr(row, "id", "") or ""),
+        "DataType": getattr(row, "mime_type", None) or "file",
+        "OriginalLocation": "render",
+        "DriveFileID": getattr(row, "drive_file_id", None) or "",
+        "DriveLink": getattr(row, "drive_link", None) or "",
+        "ExtractedText": (getattr(row, "extracted_text", None) or "")[:200],
+        "LastAccessedAt": str(getattr(row, "migrated_at", "") or ""),
+    }

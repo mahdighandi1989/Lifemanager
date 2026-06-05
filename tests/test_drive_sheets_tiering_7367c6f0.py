@@ -81,3 +81,50 @@ async def test_tier_cold_files_migrates_drivefiles(db_session):
     await db_session.commit()
     result = await tier_cold_files(db_session, now=now)
     assert result["migrated"] >= 1
+
+
+@pytest.mark.asyncio
+async def test_tier_cold_files_records_each_migration_in_ledger(db_session):
+    """The migration path logs every moved file to the central sheet ledger
+    ("توی شیت باید همه چیزا ثبت بشه"), not just the upload path (AC2+AC4)."""
+    from app.models.drive_file import DriveFile
+    from app.services.cold_tiering_service import sheet_row_for, tier_cold_files
+
+    now = datetime.now(timezone.utc)
+    db_session.add(DriveFile(user_id=0, filename="cold1.pdf", mime_type="application/pdf",
+                             storage_location="local", extracted_text="lorem",
+                             last_accessed_at=now - timedelta(days=45)))
+    db_session.add(DriveFile(user_id=0, filename="warm.pdf", storage_location="local",
+                             last_accessed_at=now))  # not cold → must not be ledgered
+    await db_session.commit()
+
+    logged = []
+
+    async def ledger(row):
+        logged.append(sheet_row_for(row))
+
+    result = await tier_cold_files(db_session, ledger=ledger, now=now)
+    assert result["migrated"] == 1
+    # Exactly the migrated (cold) file was recorded, projected onto the index shape.
+    assert len(logged) == 1
+    assert logged[0]["DataType"] == "application/pdf"
+    assert logged[0]["OriginalLocation"] == "render"
+    assert logged[0]["RecordID"]  # non-empty record id
+
+
+@pytest.mark.asyncio
+async def test_tier_cold_files_ledger_failure_does_not_abort_migration(db_session):
+    """A failing sheet append must not roll back a committed migration."""
+    from app.models.drive_file import DriveFile
+    from app.services.cold_tiering_service import tier_cold_files
+
+    now = datetime.now(timezone.utc)
+    db_session.add(DriveFile(user_id=0, filename="old2.pdf", storage_location="local",
+                             last_accessed_at=now - timedelta(days=40)))
+    await db_session.commit()
+
+    async def boom(row):
+        raise RuntimeError("sheets down")
+
+    result = await tier_cold_files(db_session, ledger=boom, now=now)
+    assert result["migrated"] >= 1  # migration still succeeded despite ledger error
