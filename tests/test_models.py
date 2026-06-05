@@ -190,7 +190,7 @@ def test_task_model_required_fields(db_session):
     db_session.commit()
     db_session.refresh(user)
 
-    # Missing title
+    # Missing title still raises — title is nullable=False.
     with pytest.raises(Exception):
         task = Task(
             title=None,  # type: ignore
@@ -200,15 +200,15 @@ def test_task_model_required_fields(db_session):
         db_session.commit()
     db_session.rollback()
 
-    # Missing user_id
-    with pytest.raises(Exception):
-        task = Task(
-            title="Task without user",
-            user_id=None  # type: ignore
-        )
-        db_session.add(task)
-        db_session.commit()
-    db_session.rollback()
+    # user_id is intentionally nullable now (Task.user_id nullable=True —
+    # "anonymous task creation is allowed today"; routes populate it). So a
+    # task without a user must persist rather than raise.
+    task = Task(title="Task without user", user_id=None)  # type: ignore
+    db_session.add(task)
+    db_session.commit()
+    db_session.refresh(task)
+    assert task.id is not None
+    assert task.user_id is None
 
 
 def test_project_model_attributes(db_session):
@@ -239,7 +239,11 @@ def test_project_model_attributes(db_session):
 
 
 def test_project_model_relationship(db_session):
-    """Test Project-User relationship."""
+    """Test the Project→User link.
+
+    Project carries a `user_id` FK to users.id (no ORM back-reference is
+    declared on the model). Verify the FK value resolves to the owning user.
+    """
     user = User(
         email="reluser@example.com",
         username="reluser",
@@ -257,9 +261,10 @@ def test_project_model_relationship(db_session):
     db_session.commit()
     db_session.refresh(project)
 
-    # Test back-reference
-    assert project.user.id == user.id
-    assert project.user.email == "reluser@example.com"
+    # The FK links back to the owning user.
+    assert project.user_id == user.id
+    linked = db_session.get(User, project.user_id)
+    assert linked.email == "reluser@example.com"
 
 
 def test_notification_model_attributes(db_session):
@@ -276,7 +281,7 @@ def test_notification_model_attributes(db_session):
     notification = Notification(
         title="Test Notification",
         message="This is a test notification",
-        type=NotificationType.INFO,
+        type=NotificationType.SYSTEM,
         user_id=user.id
     )
     db_session.add(notification)
@@ -286,7 +291,7 @@ def test_notification_model_attributes(db_session):
     assert notification.id is not None
     assert notification.title == "Test Notification"
     assert notification.message == "This is a test notification"
-    assert notification.type == NotificationType.INFO
+    assert notification.type == NotificationType.SYSTEM
     assert notification.user_id == user.id
     assert notification.is_read is False
     assert notification.created_at is not None
@@ -319,6 +324,7 @@ def test_notification_model_enum_values(db_session):
 def test_ai_model_config_attributes(db_session):
     """Test AIModelConfig model creation."""
     config = AIModelConfig(
+        name="gpt-4-attrs",
         model_name="gpt-4",
         provider="openai",
         parameters={"temperature": 0.7, "max_tokens": 2000},
@@ -339,6 +345,7 @@ def test_ai_model_config_attributes(db_session):
 def test_ai_model_config_json_field(db_session):
     """Test AIModelConfig JSON parameters field."""
     config = AIModelConfig(
+        name="claude-3-json",
         model_name="claude-3",
         provider="anthropic",
         parameters={
@@ -362,6 +369,7 @@ def test_ai_model_config_json_field(db_session):
 def test_ai_model_config_defaults(db_session):
     """Test AIModelConfig default values."""
     config = AIModelConfig(
+        name="default-test-cfg",
         model_name="default-test",
         provider="test"
     )
@@ -371,3 +379,59 @@ def test_ai_model_config_defaults(db_session):
 
     assert config.is_active is True
     assert config.parameters == {}
+
+
+def test_user_context_user_id_matches_user_id():
+    """Coherence guard (audit task 42eab35f): UserContext.user_id is the
+    integer FK to users.id, and AuthContext (frontend) surfaces that same
+    integer `id`. This pins the cross-tier contract: a UserContext created
+    with `user.id` round-trips and stays linked to the right user.
+
+    Uses its own in-memory engine (not the shared module session) so the
+    coherence guarantee is verified independently of sibling tests.
+    """
+    from app.models.context import UserContext
+
+    engine = create_engine("sqlite:///:memory:", echo=False)
+    Base.metadata.create_all(bind=engine)
+    session = sessionmaker(bind=engine)()
+    try:
+        user = User(
+            email="ctxlink@example.com",
+            username="ctxlink",
+            hashed_password="hashed",
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+        # The frontend's `user.id` is exactly this integer primary key.
+        assert isinstance(user.id, int)
+
+        ctx = UserContext(user_id=user.id, activity_status="active")
+        session.add(ctx)
+        session.commit()
+        session.refresh(ctx)
+
+        # The FK stores the same integer the frontend sends back as user.id.
+        assert ctx.user_id == user.id
+        assert isinstance(ctx.user_id, int)
+    finally:
+        session.close()
+        Base.metadata.drop_all(bind=engine)
+
+
+def test_user_context_user_id_is_integer_fk_to_users(db_session):
+    """The `user_id` column must be an Integer FK pointing at `users.id`,
+    so the frontend contract (`user.id` is a number) is the correct one —
+    NOT a UUID/string. Verified against the SQLAlchemy column metadata.
+    """
+    from sqlalchemy import Integer
+
+    from app.models.context import UserContext
+
+    col = UserContext.__table__.c.user_id
+    assert isinstance(col.type, Integer)
+    fk = next(iter(col.foreign_keys))
+    assert fk.column.table.name == "users"
+    assert fk.column.name == "id"

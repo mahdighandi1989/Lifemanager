@@ -6,7 +6,7 @@ import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { AuthProvider, useAuth } from '../AuthContext';
+import { AuthProvider, normalizeUser, useAuth } from '../AuthContext';
 
 function Harness({ onReady }) {
   const ctx = useAuth();
@@ -125,6 +125,54 @@ describe('AuthContext', () => {
     expect(u).not.toMatch(/^https?:\/\//);
     expect(u).toBe('/auth/login');
     expect(loginCall.opts?.method).toBe('POST');
+  });
+
+  test('fetchMe() exposes a user with an explicit integer `id` matching users.id', async () => {
+    // Coherence guard (audit task 42eab35f): the backend UserContext model
+    // links rows via `user_id` FK -> users.id (an integer). AuthContext must
+    // therefore surface an authenticated user whose `id` is that same
+    // integer, so downstream per-user fetch/store can key on it reliably.
+    localStorage.setItem('token', 'valid-token');
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      // /users/ returns a list; first item is the current user (UserOut shape)
+      json: async () => [
+        { id: 7, email: 'a@b.com', username: 'alice', name: 'alice' },
+      ],
+    });
+    const get = renderWithProvider();
+    // allow the fetchMe effect to resolve
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const u = get().user;
+    expect(u).not.toBeNull();
+    expect(u).toHaveProperty('id', 7);
+    expect(typeof u.id).toBe('number');
+    expect(u.email).toBe('a@b.com');
+  });
+
+  describe('normalizeUser()', () => {
+    test('guarantees a canonical `id` from the backend UserOut shape', () => {
+      const u = normalizeUser({ id: 42, email: 'x@y.com', username: 'x' });
+      expect(u).toMatchObject({ id: 42, email: 'x@y.com', username: 'x' });
+      expect(typeof u.id).toBe('number');
+    });
+
+    test('accepts a legacy `user_id` and re-exposes it as `id`', () => {
+      const u = normalizeUser({ user_id: 99, email: 'z@y.com' });
+      expect(u.id).toBe(99);
+    });
+
+    test('returns null when no identifier is present', () => {
+      expect(normalizeUser({ email: 'noid@y.com' })).toBeNull();
+    });
+
+    test('returns null for non-object / nullish input', () => {
+      expect(normalizeUser(null)).toBeNull();
+      expect(normalizeUser(undefined)).toBeNull();
+      expect(normalizeUser('nope')).toBeNull();
+    });
   });
 
   test('register() also uses same-origin-relative URL', async () => {

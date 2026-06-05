@@ -79,6 +79,34 @@ legacy-unowned). The **role-change** path (`/admin/approve-user`) remains
 admin-gated via `is_admin`; **register / login** (bootstrap) and the
 HMAC-signed **`/webhook`** are intentional unauthenticated exceptions.
 
+### Frontend `user.id` ↔ backend `user_id` contract (audit task 42eab35f)
+
+The React `AuthContext` (`frontend/src/context/AuthContext.jsx`) exposes a
+`user` object whose **`id` is the single source of identity** the rest of the
+SPA keys on. That `id` is guaranteed by `normalizeUser()` and is exactly the
+integer primary key of the `users` table (`app/models/user.py::User.id`).
+
+This is the same integer that user-scoped backend rows reference through their
+`user_id` foreign key — e.g. `app/models/context.py::UserContext.user_id`
+(`ForeignKey("users.id")`, an **Integer**). Ground truth is the backend: the
+identifier is an integer, **not** a UUID/string. Downstream code linking a
+`UserContext` (or any `user_id`-scoped row) to the signed-in user can therefore
+trust `user.id` directly:
+
+```js
+const { user } = useAuth();
+// user.id (number) === backend users.id === UserContext.user_id
+fetch(`/api/context`, { headers: { Authorization: `Bearer ${token}` } });
+```
+
+`normalizeUser()` accepts either the canonical `id` (returned by
+`UserOut`/`UserPublic` from `/users/`) or a legacy `user_id` alias, re-exposes
+it as `id`, and yields `null` when no identifier is present — so a "user"
+without a backend-linkable id never reaches the UI. Tests pin both ends:
+`frontend/src/context/__tests__/AuthContext.test.jsx` (the `id` is surfaced)
+and `tests/test_models.py::test_user_context_user_id_*` (the FK is an integer
+pointing at `users.id`).
+
 ## Endpoint index
 
 ### Tasks (`/tasks`)

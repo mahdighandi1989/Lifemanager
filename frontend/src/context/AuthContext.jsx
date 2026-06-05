@@ -16,6 +16,57 @@ const AuthContext = createContext(null);
 // THEIR endpoints sit under the `/api/` prefix.
 const API_BASE = '';
 
+/**
+ * @typedef {Object} AuthUser
+ * The authenticated-user shape that AuthContext guarantees to downstream
+ * consumers. The `id` field is the canonical identifier and is ALWAYS
+ * present on a non-null `user` (see {@link normalizeUser}).
+ *
+ * Ground truth for this contract is the backend, NOT the frontend: `id`
+ * mirrors the integer primary key of the `users` table
+ * (`app/models/user.py::User.id`) and is exactly the value the
+ * `UserContext.user_id` foreign key points at
+ * (`app/models/context.py::UserContext`). It is therefore a **number**
+ * (integer), not a UUID/string. Downstream code can rely on `user.id`
+ * to fetch or store per-user data without guessing the field name.
+ *
+ * @property {number} id            backend `users.id` primary key (integer)
+ * @property {string} email
+ * @property {string} [username]
+ * @property {string} [name]        server-computed alias of `username`
+ * @property {boolean} [is_active]
+ * @property {boolean} [is_superuser]
+ */
+
+/**
+ * Normalize a raw backend user payload into the guaranteed {@link AuthUser}
+ * contract.
+ *
+ * The `/users/` endpoint returns `UserOut`/`UserPublic`, which already
+ * carries an integer `id`. This helper makes that guarantee explicit at
+ * the frontend boundary so AuthContext never surfaces a "user" that
+ * downstream UserContext-linked code can't actually key on:
+ *
+ *   - Accepts the canonical `id` or a legacy `user_id` field.
+ *   - Re-exposes it as a single canonical `id` field.
+ *   - Returns `null` when no usable identifier is present, so guards that
+ *     read `user.id` stay honest instead of dereferencing `undefined`.
+ *
+ * @param {any} raw raw JSON from `/users/` (object) or `null`
+ * @returns {AuthUser|null}
+ */
+export function normalizeUser(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  // Canonical `id` (UserOut) first; fall back to a legacy `user_id` alias.
+  const rawId = raw.id ?? raw.user_id;
+  if (rawId === undefined || rawId === null) {
+    // No identifier — this object cannot be linked to the backend's
+    // UserContext.user_id, so it is not a usable authenticated user.
+    return null;
+  }
+  return { ...raw, id: rawId };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('token'));
@@ -33,7 +84,9 @@ export function AuthProvider({ children }) {
         const data = await res.json();
         // /users/ returns list — get first item as current user
         // fallback: try /auth/me if available
-        setUser(Array.isArray(data) ? data[0] : data);
+        // normalizeUser guarantees an explicit `id` (matching the backend
+        // users.id / UserContext.user_id key) or yields null.
+        setUser(normalizeUser(Array.isArray(data) ? data[0] : data));
       } else {
         // token invalid
         localStorage.removeItem('token');
