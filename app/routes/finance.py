@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_required_user_id
 from app.middleware import handle_errors
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
 
@@ -90,7 +90,7 @@ class FinancialAccountResponse(BaseModel):
 async def create_income(
     payload: IncomeCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     income = Income(
         user_id=user_id,
@@ -109,7 +109,7 @@ async def create_income(
 @handle_errors
 async def list_incomes(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     result = await db.execute(select(Income).where(Income.user_id == user_id))
     return list(result.scalars().all())
@@ -123,7 +123,7 @@ async def list_incomes(
 async def create_asset(
     payload: AssetCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     asset = Asset(
         user_id=user_id,
@@ -143,7 +143,7 @@ async def create_asset(
 @handle_errors
 async def list_assets(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     result = await db.execute(select(Asset).where(Asset.user_id == user_id))
     return list(result.scalars().all())
@@ -161,7 +161,7 @@ async def list_assets(
 async def create_financial_account(
     payload: FinancialAccountCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     account = FinancialAccount(
         user_id=user_id,
@@ -185,7 +185,7 @@ async def create_financial_account(
 async def list_financial_accounts(
     kind: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     stmt = select(FinancialAccount).where(FinancialAccount.user_id == user_id)
     if kind:
@@ -204,7 +204,7 @@ async def list_financial_accounts(
 async def create_bank_account(
     payload: FinancialAccountCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     """AC 16 — thin alias that forces kind='bank' so the caller
     doesn't have to know about the discriminator column."""
@@ -226,7 +226,7 @@ async def create_bank_account(
 @handle_errors
 async def list_bank_accounts(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     result = await db.execute(
         select(FinancialAccount).where(
@@ -240,7 +240,7 @@ async def list_bank_accounts(
 @handle_errors
 async def list_broker_accounts(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     """AC 17 — same shape as the bank alias, filtered by kind='broker'."""
     result = await db.execute(
@@ -256,7 +256,7 @@ async def list_broker_accounts(
 async def create_broker_account(
     payload: FinancialAccountCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     account = FinancialAccount(
         user_id=user_id,
@@ -277,7 +277,7 @@ async def create_broker_account(
 async def create_exchange_account(
     payload: FinancialAccountCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     """AC 22 — exchange-account flavour. kind forced to 'exchange'."""
     account = FinancialAccount(
@@ -298,7 +298,7 @@ async def create_exchange_account(
 @handle_errors
 async def list_exchange_accounts(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     result = await db.execute(
         select(FinancialAccount).where(
@@ -337,7 +337,7 @@ class TransactionResponse(BaseModel):
 async def create_transaction(
     payload: TransactionCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     """Record a transaction and update the parent account's balance (AC 7).
 
@@ -378,7 +378,7 @@ async def create_transaction(
 async def list_transactions(
     account_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     """List the caller's transactions (optionally filtered by account).
 
@@ -406,7 +406,7 @@ class PurchaseEvalRequest(BaseModel):
 async def evaluate_budget_purchase(
     payload: PurchaseEvalRequest = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Weigh a prospective purchase against the user's budget: returns a
     priority and an ``affordable`` flag, and fires a budget_alert notification
@@ -429,7 +429,7 @@ class IngestMessageRequest(BaseModel):
 async def ingest_finance_message(
     payload: IngestMessageRequest = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Apply an inbound bank/exchange email or SMS to the user's balances
     (audit task 4ae4b3ca). An operator's IMAP poller / SMS gateway forwards the
@@ -448,7 +448,7 @@ async def ingest_finance_message(
 @handle_errors
 async def list_affordable_tasks(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Tasks the user can now afford given their budget — the reminder the memo
     asked for ("بهم اعلام بکنه"). Returns the affected task ids (a
@@ -462,7 +462,7 @@ async def list_affordable_tasks(
 @handle_errors
 async def finance_insights(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """AI analysis of the user's finances with budget-aware purchase
     suggestions (AC 13 — "باید توسط مدل‌های هوش مصنوعی داخلی هم آنالیز بشه").

@@ -40,6 +40,33 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # --- Strict-auth switch (security task 9a5a3b4d) -------------------------
+    # Master switch that governs whether *anonymous* (no-Authorization-header)
+    # traffic may reach the user-scoped routes.
+    #
+    # Background: the app historically shipped a single-tenant "login bypass"
+    # design — the frontend ran with isLoginBypassEnabled=true and sent no
+    # bearer token, so the backend resolved every anonymous request to a
+    # stable default scope (DEFAULT_ANON_USER_ID = user 0). That is convenient
+    # for a single operator but means anyone who can reach the API also reaches
+    # user 0's data. The hardening lives in app/dependencies/auth.py:
+    #
+    #   * A *forged / expired* bearer token is ALWAYS rejected with 401 on the
+    #     stricter dependency (get_required_user_id) regardless of this flag —
+    #     a present-but-invalid token is an attack signal, never silently
+    #     downgraded to the anon scope.
+    #   * A *missing* token is the only thing this flag governs. With
+    #     REQUIRE_AUTH=False (default) a missing token still falls back to the
+    #     anon scope so the current frontend keeps working and the existing
+    #     user-0 data stays reachable until it is migrated to real accounts
+    #     (AC3 of the task — a manual, operator-run data migration). Once that
+    #     migration is done, flip REQUIRE_AUTH=true (set the REQUIRE_AUTH env
+    #     var) and anonymous access to the sensitive routes is refused with 401.
+    #
+    # Default False keeps a fresh/dev deploy and the current single-tenant
+    # frontend working; production flips it on after the data migration.
+    REQUIRE_AUTH: bool = False
+
     # --- Google OAuth -------------------------------------------------------
     # Read by app/services/google_auth.py and app/routes/auth_google.py.
     # The auth_google router is mounted in app/main.py only when

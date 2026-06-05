@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_required_user_id
 from app.middleware import handle_errors
 from app.services.context_engine import ContextOrchestrator
 
@@ -35,7 +35,7 @@ class ContextAnalyzeRequest(BaseModel):
 @handle_errors
 async def analyze_context(
     payload: ContextAnalyzeRequest,
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
     body = {
         "location": payload.location.model_dump() if payload.location else None,
@@ -60,7 +60,7 @@ class LocationIn(BaseModel):
 async def save_context_location(
     payload: LocationIn = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Persist the caller's latest location into their UserContext (AC 3)."""
     from app.models.context import UserContext
@@ -87,7 +87,7 @@ class PhysiologicalIn(BaseModel):
 async def ingest_physiological(
     payload: PhysiologicalIn = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Ingest a wearable heart-rate / activity sample into UserContext and
     return fresh context-aware recommendations (audit task 2165524b Steps 6-7).
@@ -123,7 +123,7 @@ class VoiceIn(BaseModel):
 async def ingest_voice(
     payload: VoiceIn = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Infer mood from a voice transcript and store it on UserContext (audit
     task 2165524b Step 10). Continuous capture/ASR is external (see TO-DO)."""
@@ -146,7 +146,7 @@ async def ingest_voice(
 async def mark_recommendation_read(
     rec_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Persist accept/reject by marking a ContextualRecommendation read (AC5) —
     the RecommendationPanel buttons call this so dismissal isn't client-only."""
@@ -172,7 +172,7 @@ async def mark_recommendation_read(
 async def list_context_recommendations(
     type: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> list:
     """Diverse, profile-aware recommendations (audit task 14e65214, Step 4).
 
@@ -190,7 +190,7 @@ async def list_context_recommendations(
 @handle_errors
 async def list_recommendations(
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> list:
     """Return context-aware recommendations for the caller (AC 4).
 

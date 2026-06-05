@@ -13,7 +13,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_required_user_id
 from app.middleware import handle_errors
 from app.models.task import Task
 from app.models.user_asset import UserAsset
@@ -42,7 +42,7 @@ class ScanRequest(BaseModel):
 async def list_assets(
     asset_type: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> List[UserAsset]:
     """List the user's assets. ``?asset_type=movie`` filters to one kind so the
     caller can pull "all movies from /Movies" after a scan (audit task 217909d2
@@ -70,7 +70,7 @@ async def list_external_drives() -> dict:
 async def asset_task_suggestions(
     task_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Suggest scanned assets that match the user's tasks (audit task 217909d2
     AC4 — "وقتی کاربر وظیفه‌ای با موضوع «فیلم» ایجاد می‌کند، فایل‌های ویدئویی
@@ -101,7 +101,7 @@ class SyncRequest(BaseModel):
 async def sync_assets(
     payload: SyncRequest,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Periodic dynamic sync (audit task 217909d2 AC3, Steps 6-7): reconcile the
     user's data list against the current file set — add new paths, prune ones
@@ -119,7 +119,7 @@ async def sync_assets(
 async def scan_assets(
     payload: ScanRequest,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """AC2: walk ``payload.path`` and record any newly-found files as
     UserAsset rows (deduped by path). Returns scan counts + 'completed'."""
