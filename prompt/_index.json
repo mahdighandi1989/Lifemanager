@@ -2,7 +2,7 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 3,
+  "total": 2,
   "tasks": [
     {
       "task_id": "59e4e523-0e53-4116-a4bd-e067a27ec2bd",
@@ -12,16 +12,6 @@
       "status": "pending",
       "external_status": "pending",
       "path": "prompt/task-59e4e523-0e53-4116-a4bd-e067a27ec2bd.md",
-      "external_attempts": 0
-    },
-    {
-      "task_id": "67beb41c-9454-453f-91aa-876488f647ad",
-      "title": "Fix hardcoded admin email RBAC bypass",
-      "priority": "critical",
-      "execution_priority": 1000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-67beb41c-9454-453f-91aa-876488f647ad.md",
       "external_attempts": 0
     },
     {
