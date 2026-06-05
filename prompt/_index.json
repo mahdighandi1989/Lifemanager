@@ -5,16 +5,6 @@
   "total": 5,
   "tasks": [
     {
-      "task_id": "a75e183c-f59d-423f-8b89-ad529f50b6ae",
-      "title": "Enforce Default Role for Local User Registration",
-      "priority": "critical",
-      "execution_priority": 1000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-a75e183c-f59d-423f-8b89-ad529f50b6ae.md",
-      "external_attempts": 0
-    },
-    {
       "task_id": "59e4e523-0e53-4116-a4bd-e067a27ec2bd",
       "title": "حذف کد Inspector Bridge از production",
       "priority": "critical",
@@ -22,6 +12,16 @@
       "status": "pending",
       "external_status": "pending",
       "path": "prompt/task-59e4e523-0e53-4116-a4bd-e067a27ec2bd.md",
+      "external_attempts": 1
+    },
+    {
+      "task_id": "9a5a3b4d-163b-4775-adf0-341c670fb58f",
+      "title": "تقویت مکانیزم احراز هویت",
+      "priority": "critical",
+      "execution_priority": 1050,
+      "status": "pending",
+      "external_status": "pending",
+      "path": "prompt/task-9a5a3b4d-163b-4775-adf0-341c670fb58f.md",
       "external_attempts": 1
     },
     {
