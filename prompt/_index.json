@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 5,
+  "total": 4,
   "tasks": [
-    {
-      "task_id": "59e4e523-0e53-4116-a4bd-e067a27ec2bd",
-      "title": "حذف کد Inspector Bridge از production",
-      "priority": "critical",
-      "execution_priority": 1050,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-59e4e523-0e53-4116-a4bd-e067a27ec2bd.md",
-      "external_attempts": 1
-    },
     {
       "task_id": "9a5a3b4d-163b-4775-adf0-341c670fb58f",
       "title": "تقویت مکانیزم احراز هویت",
