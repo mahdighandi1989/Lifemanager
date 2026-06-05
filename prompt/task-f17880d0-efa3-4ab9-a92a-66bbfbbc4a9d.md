@@ -3,14 +3,14 @@ task_id: f17880d0-efa3-4ab9-a92a-66bbfbbc4a9d
 title: Add Missing Auth to Mutation Endpoints
 type: logic_audit
 priority: critical
-execution_priority: 1100
-status: pending
+execution_priority: 1400
+status: awaiting_review
 external_status: done
-verification_status: applied_externally_pending_verify
+verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T20:53:55.250778+00:00'
-updated_at: '2026-06-05T19:37:29.192757+00:00'
+updated_at: '2026-06-05T19:40:03.104105+00:00'
 ---
 
 # Add Missing Auth to Mutation Endpoints
@@ -491,7 +491,7 @@ Ensure that all FastAPI routes that perform data mutations (create, update, dele
 ```
 
 ### Step 2: Add auth dependency to user profile update endpoint
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل افزودن `Depends(get_current_active_user)` به endpoint مربوط به به‌روزرسانی پروفایل کاربر است. فرض بر این است که endpoint با مسیر `/users/me` یا `/users/{user_id}` و متد PUT/PATCH وجود دارد. باید اطمینان حاصل شود که کاربر فقط می‌تواند پروفایل خودش را به‌روز کند (مقایسه user_id از token با user_id در مسیر). خارج از این مرحله: تغییر roleها، ایجاد کاربر جدید، یا endpointهای غیرمرتبط.
 **Excerpt:**
 ```
@@ -507,7 +507,7 @@ Ensure that all FastAPI routes that perform data mutations (create, update, dele
 ```
 
 ### Step 4: Add auth dependency to resource creation endpoint
-**Status:** `partial` (50%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل افزودن `Depends(get_current_active_user)` به endpoint ایجاد منبع محافظت‌شده (مثلاً ایجاد پروژه، task، یا هر منبعی که نیاز به احراز هویت دارد) است. فرض بر این است که endpoint با مسیر `/resources/` و متد POST وجود دارد. باید اطمینان حاصل شود که کاربر احراز هویت‌شده creator منبع ثبت می‌شود. خارج از این مرحله: endpointهای role management یا user deletion.
 **Excerpt:**
 ```
@@ -523,7 +523,7 @@ Ensure that all FastAPI routes that perform data mutations (create, update, dele
 ```
 
 ### Step 6: Write unit tests for auth dependency on user profile update
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل نوشتن unit tests برای endpoint به‌روزرسانی پروفایل کاربر است که dependency امنیتی در مرحله 2 اضافه شد. تست‌ها باید شامل: درخواست بدون token (401)، درخواست با token کاربر دیگر (403)، درخواست معتبر (200) باشند. از mocking برای شبیه‌سازی JWT token و دیتابیس استفاده کنید. خارج از این مرحله: integration tests یا تست endpointهای دیگر.
 **Excerpt:**
 ```
@@ -539,7 +539,7 @@ Implement comprehensive unit and integration tests to verify permission enforcem
 ```
 
 ### Step 8: Write unit tests for auth dependency on resource creation endpoint
-**Status:** `partial` (70%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل نوشتن unit tests برای endpoint ایجاد منبع محافظت‌شده است که dependency امنیتی در مرحله 4 اضافه شد. تست‌ها باید شامل: درخواست بدون token (401)، درخواست معتبر (201 و بررسی creator_id) باشند. خارج از این مرحله: تست endpointهای delete یا update منابع.
 — [merged] این مرحله شامل نوشتن unit tests برای endpoint حذف منبع محافظت‌شده است که dependency امنیتی در مرحله 5 اضافه شد. تست‌ها باید شامل: درخواست بدون token (401)، درخواست با token کاربر غیرمالک (403)، درخواست با token مالک (204)، درخواست با token admin (204) باشند. خارج از این مرحله: تست endpointهای create یا update منابع.
 **Excerpt:**
@@ -548,7 +548,7 @@ Implement comprehensive unit and integration tests to verify permission enforcem
 ```
 
 ### Step 9: Write integration tests for auth enforcement across all mutation endpoints
-**Status:** `partial` (60%)
+**Status:** `partial` (80%)
 **Scope:** این مرحله شامل نوشتن integration tests است که تمام endpointهای mutation (update profile, change role, create resource, delete resource) را در یک سناریوی end-to-end تست می‌کند. تست‌ها باید با دیتابیس واقعی (یا in-memory) و JWT token واقعی اجرا شوند. هدف اطمینان از اینکه زنجیره کامل auth (token validation → user resolution → permission check) به‌درستی کار می‌کند. خارج از این مرحله: unit tests که قبلاً نوشته شده‌اند.
 **Excerpt:**
 ```
