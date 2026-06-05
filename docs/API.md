@@ -79,6 +79,22 @@ legacy-unowned). The **role-change** path (`/admin/approve-user`) remains
 admin-gated via `is_admin`; **register / login** (bootstrap) and the
 HMAC-signed **`/webhook`** are intentional unauthenticated exceptions.
 
+Two further mutation paths were aligned to the same "identity from the token,
+never the body" rule:
+
+* **`POST /api/users/profile`** — the profile update (`bio` / `display_name`).
+  It resolves the caller via `get_optional_user_id` and persists *only* onto
+  that user's own row, so there is no path/body field through which another
+  tenant could be targeted. It stays anonymous-safe: a request with no
+  credentials (login-bypass → user 0) still returns `200` with the sanitized
+  echo and skips persistence, preserving the XSS-sanitization contract (task
+  cba0111e). Only fields present in the body are written, so an empty body is a
+  no-op.
+* **`POST /api/planner/generate`** — the daily-plan builder. Identity now comes
+  from `get_optional_user_id`; the legacy `user_id` field in the request body is
+  **ignored** (kept only for backward compatibility), closing the leak where any
+  caller could read another tenant's plan by spoofing `user_id`.
+
 ### Frontend `user.id` ↔ backend `user_id` contract (audit task 42eab35f)
 
 The React `AuthContext` (`frontend/src/context/AuthContext.jsx`) exposes a

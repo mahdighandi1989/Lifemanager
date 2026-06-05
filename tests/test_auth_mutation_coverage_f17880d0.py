@@ -25,7 +25,12 @@ from __future__ import annotations
 import types
 
 import pytest
+import pytest_asyncio
+from fastapi.testclient import TestClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from app.database import Base, get_db
 from app.dependencies.auth import get_optional_user_id
 from app.main import app
 
@@ -176,3 +181,115 @@ async def test_role_change_endpoint_allows_admin(monkeypatch):
     assert result is approved
     # Sanity: the imported OAuthUser shape is what the gate reasons about.
     assert hasattr(OAuthUser, "role")
+
+
+# --- USER PROFILE UPDATE (POST /api/users/profile) --------------------------
+# Step 2 of the audit: this mutation resolved no caller identity, so it could
+# never enforce "a user may only update their own profile". It now resolves the
+# caller from the token (get_optional_user_id) — never the body — and persists
+# only onto that user's own row, while staying anonymous-safe (sanitize+echo).
+
+
+@pytest_asyncio.fixture
+async def seeded_db():
+    """Per-test in-memory engine with two real User rows (ids assigned by the
+    DB). Yields (factory, user_a_id, user_b_id)."""
+    from app.models.user import User
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as db:
+        a = User(email="a@example.com", username="a", hashed_password="x")
+        b = User(email="b@example.com", username="b", hashed_password="x")
+        db.add_all([a, b])
+        await db.commit()
+        await db.refresh(a)
+        await db.refresh(b)
+        ids = (a.id, b.id)
+
+    async def _get_db():
+        async with factory() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = _get_db
+    try:
+        yield factory, ids[0], ids[1]
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_profile_persists_only_to_authenticated_callers_own_row(seeded_db):
+    """An authenticated caller's sanitized profile lands on THEIR row — and
+    there is no body/path field through which another user could be targeted."""
+    from app.models.user import User
+
+    factory, uid_a, uid_b = seeded_db
+    _as_user(uid_a)
+    client = TestClient(app)
+
+    r = client.post(
+        "/api/users/profile",
+        json={"bio": "<script>x</script>hello", "display_name": "Alice"},
+    )
+    assert r.status_code == 200, r.text
+    assert "<script>" not in r.json()["bio"]
+
+    # Persisted onto user A (sanitized), and user B is completely untouched.
+    async with factory() as db:
+        a = (await db.execute(select(User).where(User.id == uid_a))).scalar_one()
+        b = (await db.execute(select(User).where(User.id == uid_b))).scalar_one()
+    assert a.display_name == "Alice"
+    assert a.bio is not None and "<script>" not in a.bio
+    assert b.bio is None and b.display_name is None
+
+
+@pytest.mark.asyncio
+async def test_profile_anonymous_caller_sanitizes_but_does_not_persist(seeded_db):
+    """Anonymous (login-bypass → user 0) still gets a 200 sanitize+echo and
+    writes to nobody's row — the verifier probe path stays intact."""
+    from app.models.user import User
+
+    factory, uid_a, uid_b = seeded_db
+    _as_user(0)
+    client = TestClient(app)
+
+    r = client.post("/api/users/profile", json={"bio": "anon", "display_name": "z"})
+    assert r.status_code == 200
+    assert r.json()["sanitized"] is True
+
+    async with factory() as db:
+        rows = (await db.execute(select(User))).scalars().all()
+    assert all(u.bio is None and u.display_name is None for u in rows)
+
+
+# --- PLANNER (POST /api/planner/generate) -----------------------------------
+# The handler trusted payload.user_id, so any caller could read another
+# tenant's tasks by passing their id. Identity now comes from the token.
+
+
+@pytest.mark.asyncio
+async def test_planner_scopes_to_token_identity_ignoring_body_user_id(seeded_db):
+    """A caller resolved as user A cannot read user B's plan by putting
+    user_id=B in the body — the body field is ignored."""
+    from app.models.task import Task
+
+    factory, uid_a, uid_b = seeded_db
+    async with factory() as db:
+        db.add_all([
+            Task(title="A-task", user_id=uid_a),
+            Task(title="B-task", user_id=uid_b),
+        ])
+        await db.commit()
+
+    _as_user(uid_a)
+    client = TestClient(app)
+    # Attempt to exfiltrate user B's plan by spoofing the body id.
+    r = client.post("/api/planner/generate", json={"user_id": uid_b})
+    assert r.status_code == 200, r.text
+    titles = {t["title"] for t in r.json().get("tasks", [])}
+    assert "A-task" in titles  # own task present
+    assert "B-task" not in titles  # other tenant's task NOT leaked

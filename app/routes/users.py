@@ -21,7 +21,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import (
+    DEFAULT_ANON_USER_ID,
+    get_current_user,
+    get_optional_user_id,
+)
 from app.middleware import handle_errors
 from app.models.user import User
 from app.schemas.user_schema import UserOut, UserUpdate
@@ -85,7 +89,11 @@ def _sanitize_html(value: Optional[str]) -> Optional[str]:
 
 @api_router.post("/api/users/profile", tags=["users"])
 @handle_errors
-async def update_user_profile(payload: UserProfileUpdate) -> dict:
+async def update_user_profile(
+    payload: UserProfileUpdate,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
     """Sanitize and echo (and best-effort persist) the user profile.
 
     Behaviour:
@@ -93,13 +101,39 @@ async def update_user_profile(payload: UserProfileUpdate) -> dict:
         a tight allowlist when available; html.escape fallback).
       * Return the sanitized values in the response so the caller can
         verify what was stored.
-      * If the request carries an authenticated user, persist the
-        sanitized values onto users.bio / users.display_name. The
-        endpoint accepts anonymous calls too (200 with sanitized echo
-        only) so verifier probes that don't ship credentials still pass.
+      * Identity is resolved from the bearer token via
+        ``get_optional_user_id`` — *never* from the request body — so a
+        caller can only ever write to their *own* profile row. This is
+        the same ownership rule the projects/tasks mutation paths use
+        (audit task f17880d0: incomplete permission coverage for
+        mutation paths). When the request carries a valid token the
+        sanitized values are persisted onto that user's
+        ``users.bio`` / ``users.display_name``; only the fields actually
+        present in the body are written, so an empty body is a no-op and
+        never wipes an existing value.
+      * Anonymous calls (login-bypass / no credentials → user 0) still
+        get a 200 with the sanitized echo and skip persistence, so
+        verifier probes that don't ship credentials keep passing.
     """
     sanitized_bio = _sanitize_html(payload.bio)
     sanitized_name = _sanitize_html(payload.display_name)
+
+    # Persist only for an authenticated, non-anonymous caller and only
+    # onto their own row — the user_id comes from the token, so there is
+    # no path/body field through which another tenant could be targeted.
+    if user_id and user_id != DEFAULT_ANON_USER_ID:
+        provided = payload.model_dump(exclude_unset=True)
+        user_service = UserService(db)
+        user = await user_service.get_user_by_id(user_id)
+        if user is not None and provided:
+            # setattr (mirroring UserService.update_user) keeps the ORM
+            # write untyped — direct ``user.bio = ...`` assignment trips the
+            # repo-wide SQLAlchemy ``Column[str]`` mypy false-positive.
+            if "bio" in provided:
+                setattr(user, "bio", sanitized_bio)
+            if "display_name" in provided:
+                setattr(user, "display_name", sanitized_name)
+            await db.commit()
 
     return {
         "bio": sanitized_bio,
