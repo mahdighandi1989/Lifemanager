@@ -2,18 +2,8 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 4,
+  "total": 3,
   "tasks": [
-    {
-      "task_id": "task_97867b277c1b",
-      "title": "پیاده‌سازی معیارهای عملکردی و پاکسازی کد AI",
-      "priority": "critical",
-      "execution_priority": 1200,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-task_97867b277c1b.md",
-      "external_attempts": 4
-    },
     {
       "task_id": "14e65214-77a8-409b-80dc-9a328ec646da",
       "title": "Implement User Interest & Profile System",
