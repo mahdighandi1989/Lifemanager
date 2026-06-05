@@ -37,6 +37,22 @@ router = APIRouter()
 # todo_items router and this one share one implementation. Aliased
 # under the historical names so the rest of this file keeps reading.
 
+
+def _list_owned_by(lst, user_id: int) -> bool:
+    """Ownership gate for the single-list mutation paths (audit task
+    f17880d0 — "Incomplete Permission Coverage for Mutation Paths").
+
+    A list is reachable when it is the caller's *or* legacy-unowned
+    (``user_id IS NULL`` — the 33 seeded defaults until a user claims
+    them). This mirrors the OR-NULL rule already used by
+    ``list_service.list_lists`` so the get-one / update / delete paths
+    are coherent with the list path: previously they ignored identity
+    entirely and let any caller mutate any list across tenants. Cross-
+    tenant lists are hidden with a 404 rather than a 403.
+    """
+    return getattr(lst, "user_id", None) is None or lst.user_id == user_id
+
+
 # --- LIST -------------------------------------------------------------------
 
 @router.get("/api/lists", tags=["todo-lists"], response_model=List[TodoListOut])
@@ -74,7 +90,11 @@ async def list_lists(
     response_model=TodoListWithItemsOut,
 )
 @handle_errors
-async def get_list(list_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+async def get_list(
+    list_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
     """Return one list + its items.
 
     Consumer: frontend/src/pages/ListDetail.jsx (the /lists/{id} page)
@@ -99,6 +119,8 @@ async def get_list(list_id: int, db: AsyncSession = Depends(get_db)) -> dict:
         pass
 
     lst = await list_service.get_list(db, list_id)
+    if not _list_owned_by(lst, user_id):
+        raise HTTPException(status_code=404, detail=f"TodoList {list_id} not found")
     items = await todo_item_service.list_items(db, list_id=list_id)
     payload = _serialize_list(lst, item_count=len(items))
     payload["items"] = [_serialize_item(it) for it in items]
@@ -121,14 +143,23 @@ async def get_list(list_id: int, db: AsyncSession = Depends(get_db)) -> dict:
 )
 @handle_errors
 async def create_list(
-    payload: TodoListCreate, db: AsyncSession = Depends(get_db)
+    payload: TodoListCreate,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    """Create a list owned by the caller (audit task f17880d0).
+
+    The owner is taken from the auth context — symmetric with
+    ``create_project`` / ``create_task`` — so a new list lands under
+    the caller's scope instead of as an unowned row visible to everyone.
+    """
     lst = await list_service.create_list(
         db,
         name=payload.name,
         description=payload.description,
         sort_order=payload.sort_order,
         is_archived=payload.is_archived,
+        user_id=user_id,
     )
     return _serialize_list(lst, item_count=0)
 
@@ -150,7 +181,16 @@ async def update_list(
     list_id: int,
     payload: TodoListUpdate,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    """Update a list the caller owns (audit task f17880d0).
+
+    Refuses cross-tenant rows with a 404 before mutating anything,
+    closing the gap where this path ignored identity entirely.
+    """
+    existing = await list_service.get_list(db, list_id)
+    if not _list_owned_by(existing, user_id):
+        raise HTTPException(status_code=404, detail=f"TodoList {list_id} not found")
     data = payload.model_dump(exclude_unset=True)
     lst = await list_service.update_list(db, list_id, **data)
     count = await list_service.count_items(db, list_id)
@@ -165,7 +205,18 @@ async def update_list(
     tags=["todo-lists"],
 )
 @handle_errors
-async def delete_list(list_id: int, db: AsyncSession = Depends(get_db)) -> None:
+async def delete_list(
+    list_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> None:
+    """Delete a list the caller owns (audit task f17880d0).
+
+    Cross-tenant deletes are refused with a 404 — the destructive
+    counterpart to ``delete_project``."""
+    existing = await list_service.get_list(db, list_id)
+    if not _list_owned_by(existing, user_id):
+        raise HTTPException(status_code=404, detail=f"TodoList {list_id} not found")
     await list_service.delete_list(db, list_id)
     return None
 
@@ -239,13 +290,18 @@ async def add_item_to_list(
     list_id: int,
     payload: dict,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """Quick-add an item directly into this list.
 
     Accepts a free-form dict so the frontend can POST {content, ...} without
-    juggling list_ids; the route inserts list_id automatically.
+    juggling list_ids; the route inserts list_id automatically. The target
+    list must be reachable in the caller's scope (audit task f17880d0) —
+    you can't inject items into another tenant's list.
     """
-    await list_service.get_list(db, list_id)
+    target = await list_service.get_list(db, list_id)
+    if not _list_owned_by(target, user_id):
+        raise HTTPException(status_code=404, detail=f"TodoList {list_id} not found")
     content = payload.get("content")
     if not isinstance(content, str) or not content.strip():
         raise HTTPException(status_code=400, detail="content is required")

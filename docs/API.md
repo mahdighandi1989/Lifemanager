@@ -52,17 +52,44 @@ The mechanism (`app/services/user_data_migration.py`) discovers every table with
 a `user_id` column from SQLAlchemy metadata, so new user-scoped tables are
 migrated automatically. The only manual input is the target account id.
 
+### Mutation-path ownership coverage (audit task f17880d0)
+
+Resolving `user_id` is only half the contract — a route also has to *act* on
+it. The audit "Incomplete Permission Coverage for Mutation Paths" found that
+several create paths resolved the caller but the matching **update / delete**
+paths ignored identity entirely, so any caller could mutate another tenant's
+rows. `projects.py` was the already-coherent ground truth and is the pattern
+every user-scoped mutation now follows:
+
+* **Resolve** the caller via `get_optional_user_id` on every create / read-one
+  / update / delete handler (not just the list/create paths).
+* **Authorize** by ownership before mutating: a row is reachable when it is the
+  caller's *or* legacy-unowned (`user_id IS NULL` — the seeded defaults and
+  pre-scoping rows). A cross-tenant row is hidden with a **404** (not a 403, so
+  we don't even confirm it exists to a non-owner).
+* Anonymous (`user 0`) keeps full CRUD under login-bypass, so the single-tenant
+  frontend is unaffected.
+
+Coverage now spans **tasks** (`Task.user_id`), **todo-lists**
+(`TodoList.user_id`), and **todo-items** — items carry no `user_id` of their
+own, so their create / update / delete / toggle / share / unshare / move paths
+inherit ownership from the parent list (an item reachable only through another
+tenant's lists 404s; orphan items with no list membership are treated as
+legacy-unowned). The **role-change** path (`/admin/approve-user`) remains
+admin-gated via `is_admin`; **register / login** (bootstrap) and the
+HMAC-signed **`/webhook`** are intentional unauthenticated exceptions.
+
 ## Endpoint index
 
 ### Tasks (`/tasks`)
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/tasks` / `/api/tasks/` | List every task |
-| POST | `/api/tasks` / `/api/tasks/` | Create a task |
-| GET | `/api/tasks/{task_id}` | Single task by id |
-| PUT | `/api/tasks/{task_id}` | Update a task |
-| DELETE | `/api/tasks/{task_id}` | Delete a task |
+| GET | `/api/tasks` / `/api/tasks/` | List the caller's tasks |
+| POST | `/api/tasks` / `/api/tasks/` | Create a task (owner = caller) |
+| GET | `/api/tasks/{task_id}` | Single task by id (404 if not owned) |
+| PUT | `/api/tasks/{task_id}` | Update a task you own (404 if not owned) |
+| DELETE | `/api/tasks/{task_id}` | Delete a task you own (404 if not owned) |
 | GET | `/api/tasks/search?q=` | Parameterised search |
 
 ### Projects (`/projects`)

@@ -113,6 +113,21 @@ def _normalise_status_output(value: str | None) -> str | None:
     return _STATUS_OUTPUT_ALIASES.get(value, value)
 
 
+def _task_visible_to(task: Task, user_id: int) -> bool:
+    """Ownership gate shared by the get/update/delete mutation paths.
+
+    Mirrors the canonical ``projects.py`` rule (audit task f17880d0 —
+    "Incomplete Permission Coverage for Mutation Paths"): a row is
+    visible to the caller when it is *theirs* or *legacy-unowned*
+    (``user_id IS NULL``). Cross-tenant rows are hidden (the caller
+    gets a 404, not a 403, so we don't even confirm the row exists to a
+    non-owner). Legacy unowned rows stay reachable so the login-bypass
+    single-tenant frontend keeps working until the data is migrated to
+    real accounts.
+    """
+    return bool(task.user_id is None or task.user_id == user_id)
+
+
 def _serialize(t: Task) -> dict:
     return {
         "id": t.id,
@@ -193,9 +208,18 @@ async def list_tasks(
 
 @router.get("/api/tasks/{task_id}", tags=["tasks"])
 @handle_errors
-async def get_task(task_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+async def get_task(
+    task_id: int,
+    db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Fetch one task, scoped to the caller (audit task f17880d0).
+
+    Symmetric with ``list_tasks`` / ``get_project``: a task owned by
+    another user 404s rather than leaking across tenants.
+    """
     task = await db.get(Task, task_id)
-    if task is None:
+    if task is None or not _task_visible_to(task, caller_user_id):
         raise HTTPException(status_code=404, detail="Task not found")
     return _serialize(task)
 
@@ -245,9 +269,17 @@ async def update_task(
     task_id: int,
     payload: TaskUpdate,
     db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    """Update a task the caller owns (audit task f17880d0).
+
+    Previously this mutation path ignored identity entirely — any
+    caller could rewrite any task. It now resolves the caller through
+    ``get_optional_user_id`` and refuses cross-tenant rows with a 404,
+    matching the create path and ``update_project``.
+    """
     task = await db.get(Task, task_id)
-    if task is None:
+    if task is None or not _task_visible_to(task, caller_user_id):
         raise HTTPException(status_code=404, detail="Task not found")
 
     data = payload.model_dump(exclude_unset=True)
@@ -281,9 +313,19 @@ async def update_task(
     tags=["tasks"],
 )
 @handle_errors
-async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)) -> None:
+async def delete_task(
+    task_id: int,
+    db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
+) -> None:
+    """Delete a task the caller owns (audit task f17880d0).
+
+    Cross-tenant deletes are refused with a 404 (the destructive
+    counterpart to ``delete_project``); legacy unowned rows remain
+    deletable under the login-bypass anon scope.
+    """
     task = await db.get(Task, task_id)
-    if task is None:
+    if task is None or not _task_visible_to(task, caller_user_id):
         raise HTTPException(status_code=404, detail="Task not found")
     await db.delete(task)
     await db.commit()

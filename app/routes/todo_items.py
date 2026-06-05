@@ -12,12 +12,14 @@ the routes themselves are thin shells over @handle_errors.
 import logging
 from typing import List
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
+from app.models.todo_list import TodoList
 from app.schemas.todo_item_schema import (
     TodoItemCreate,
     TodoItemMove,
@@ -32,6 +34,38 @@ from app.services import todo_item_service
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+async def _assert_item_in_scope(
+    db: AsyncSession, item_id: int, user_id: int
+) -> None:
+    """Authorize a mutation on an existing todo item (audit task f17880d0).
+
+    Todo items carry no ``user_id`` of their own — they inherit ownership
+    from the lists they belong to (the same model the read path uses, see
+    ``todo_item_service.list_items``'s list-owner join). A mutation is
+    allowed when the item is reachable in the caller's scope, i.e. it
+    belongs to at least one list that is the caller's *or* legacy-unowned
+    (``user_id IS NULL``), or it is an orphan item with no list membership
+    at all (treated as unowned/legacy). An item that lives exclusively in
+    another tenant's lists is hidden with a 404.
+
+    This closes the coherence gap the audit flagged: the create path and
+    the list read path resolved identity, but the item update / delete /
+    toggle / share / unshare / move paths ignored it entirely, letting any
+    caller mutate any item across tenants.
+    """
+    list_ids = await todo_item_service.get_item_list_ids(db, item_id)
+    if not list_ids:
+        # Orphan item (no list membership) — legacy/unowned, reachable.
+        return
+    stmt = select(TodoList.id).where(
+        TodoList.id.in_(list_ids),
+        (TodoList.user_id == user_id) | (TodoList.user_id.is_(None)),
+    )
+    reachable = (await db.execute(stmt)).first()
+    if reachable is None:
+        raise HTTPException(status_code=404, detail=f"TodoItem {item_id} not found")
 
 
 # --- LIST -------------------------------------------------------------------
@@ -86,8 +120,29 @@ async def get_todo_item(item_id: int, db: AsyncSession = Depends(get_db)) -> dic
 )
 @handle_errors
 async def create_todo_item(
-    payload: TodoItemCreate, db: AsyncSession = Depends(get_db)
+    payload: TodoItemCreate,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    # Audit task f17880d0: a new item may only be filed into lists the
+    # caller can reach (their own or legacy-unowned). Reject an attempt to
+    # plant an item in another tenant's list with a 404, mirroring the
+    # ownership rule the list mutation paths now enforce.
+    if payload.list_ids:
+        reachable = (
+            await db.execute(
+                select(TodoList.id).where(
+                    TodoList.id.in_(payload.list_ids),
+                    (TodoList.user_id == user_id) | (TodoList.user_id.is_(None)),
+                )
+            )
+        ).scalars().all()
+        unreachable = set(payload.list_ids) - set(reachable)
+        if unreachable:
+            raise HTTPException(
+                status_code=404,
+                detail=f"TodoList(s) not found: {sorted(unreachable)}",
+            )
     item = await todo_item_service.create_item(
         db,
         content=payload.content,
@@ -117,7 +172,9 @@ async def update_todo_item(
     item_id: int,
     payload: TodoItemUpdate,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    await _assert_item_in_scope(db, item_id, user_id)
     data = payload.model_dump(exclude_unset=True)
     item = await todo_item_service.update_item(db, item_id, **data)
     return _serialize(item)
@@ -131,7 +188,12 @@ async def update_todo_item(
     tags=["todo-items"],
 )
 @handle_errors
-async def delete_todo_item(item_id: int, db: AsyncSession = Depends(get_db)) -> None:
+async def delete_todo_item(
+    item_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> None:
+    await _assert_item_in_scope(db, item_id, user_id)
     await todo_item_service.delete_item(db, item_id)
     return None
 
@@ -144,7 +206,12 @@ async def delete_todo_item(item_id: int, db: AsyncSession = Depends(get_db)) -> 
     response_model=TodoItemOut,
 )
 @handle_errors
-async def toggle_complete(item_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+async def toggle_complete(
+    item_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_complete(db, item_id)
     return _serialize(item)
 
@@ -155,7 +222,12 @@ async def toggle_complete(item_id: int, db: AsyncSession = Depends(get_db)) -> d
     response_model=TodoItemOut,
 )
 @handle_errors
-async def toggle_star(item_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+async def toggle_star(
+    item_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_star(db, item_id)
     return _serialize(item)
 
@@ -172,7 +244,9 @@ async def share_item(
     item_id: int,
     payload: TodoItemShare,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.share_with_lists(db, item_id, payload.list_ids)
     return _serialize(item)
 
@@ -187,7 +261,9 @@ async def unshare_item(
     item_id: int,
     payload: TodoItemUnshare,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.unshare_from_lists(db, item_id, payload.list_ids)
     return _serialize(item)
 
@@ -202,7 +278,9 @@ async def move_item(
     item_id: int,
     payload: TodoItemMove,
     db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
 ) -> dict:
+    await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.move_item(
         db,
         item_id,
