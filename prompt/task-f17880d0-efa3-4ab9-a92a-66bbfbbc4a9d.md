@@ -3,14 +3,14 @@ task_id: f17880d0-efa3-4ab9-a92a-66bbfbbc4a9d
 title: Add Missing Auth to Mutation Endpoints
 type: logic_audit
 priority: critical
-execution_priority: 1350
-status: awaiting_review
-external_status: done
+execution_priority: 1050
+status: pending
+external_status: pending
 verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T20:53:55.250778+00:00'
-updated_at: '2026-06-05T19:25:44.438474+00:00'
+updated_at: '2026-06-05T19:25:54.348810+00:00'
 ---
 
 # Add Missing Auth to Mutation Endpoints
