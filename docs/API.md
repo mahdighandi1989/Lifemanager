@@ -139,6 +139,34 @@ editable analysis-prompt box. The whole `/ai` router is also dual-mounted under
 |---|---|---|
 | POST | `/api/ai/analyze` | Orchestrated analysis: global prompt + the caller's data context + the request prompt → `AIAnalysisResult`. 403 when `FEATURE_AI_ENABLED` is off. |
 | GET / PUT | `/api/settings/global-analysis-prompt` | Admin-only (403 for non-admin) global analysis prompt, stored in `global_settings`. |
+| GET | `/api/ai/hallucination-flags` | Human-review queue of low-confidence / self-contradictory AI answers (audit task 32145cd6). Returns `{flagged_count, items[]}`. |
+
+#### Hallucination detection + mitigation (audit task 32145cd6)
+
+Every answer the `ai_llm` pipeline produces (`nlp_service.generate_text` —
+the single chokepoint behind `/ai/generate`, `/ai/analyze`,
+`/ai/dynamic-analyze`) is scored by `app/services/ai/hallucination_service.py`
+along three axes and the result rides back in the response under a
+`hallucination` block (`confidence`, `grounding_ratio`, `contradictions`,
+`flagged`, `reasons`):
+
+- **fact-check / grounding** — fraction of the answer's content tokens that also
+  appear in the supplied data context (reuses `content_analysis_service`
+  tokenisation). Low overlap ⇒ likely fabricated.
+- **confidence scoring** — synthetic 0..1 score derived from hedging language,
+  detected contradictions, answer-length sanity, and grounding (OpenAI chat
+  completions returns no calibrated confidence, so it is derived locally).
+- **consistency checks** — detects internal contradictions (e.g. "the sky is
+  blue" / "the sky is not blue") between sentences.
+- **flagging for human review** — answers below
+  `AI_HALLUCINATION_CONFIDENCE_THRESHOLD` (or self-contradictory / ungrounded)
+  are queued for review (the endpoint above) instead of being shown as fact.
+- **prompt engineering** — `GROUNDING_SYSTEM_PROMPT` is prepended to the
+  orchestrated analysis prompt to steer the model away from guessing.
+
+The pass is deterministic and provider-free (no second LLM call), so a key-less
+/ offline deploy is still guarded and the unit tests stay hermetic. The guard
+never blocks a response — a 200 still ships, with the metadata attached.
 
 ### Finance (audit task 4ae4b3ca)
 

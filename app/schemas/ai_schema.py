@@ -190,6 +190,19 @@ class AIQueryResponse(BaseModel):
     tokens_used: Optional[int] = None
 
 
+class HallucinationAssessment(BaseModel):
+    """Hallucination-guard metadata attached to a generated answer (audit
+    task 32145cd6). ``flagged`` means the answer was queued for human review
+    because its confidence fell below the configured threshold or it
+    contradicted itself; the client can warn the user accordingly."""
+
+    confidence: float = 1.0
+    grounding_ratio: Optional[float] = None
+    contradictions: list[str] = Field(default_factory=list)
+    flagged: bool = False
+    reasons: list[str] = Field(default_factory=list)
+
+
 class AIGenerateResponse(BaseModel):
     """Shape returned by POST /ai/generate.
 
@@ -200,6 +213,9 @@ class AIGenerateResponse(BaseModel):
     generated_text: str
     model_used: Optional[str] = None
     tokens_used: Optional[int] = None
+    # Hallucination-guard block (audit task 32145cd6). Optional so older
+    # callers / detection-disabled deploys still validate.
+    hallucination: Optional[HallucinationAssessment] = None
 
 
 # Resolve the forward reference now that UserActivityContext is defined
@@ -245,7 +261,10 @@ def validate_ai_generation(raw: Any, *, default_model: Optional[str] = None) -> 
     rather than propagating garbage downstream.
     """
     validated = AIGenerateResponse.model_validate(raw)
-    data = validated.model_dump()
+    # The hallucination guard block is attached later by the pipeline
+    # (hallucination_service.annotate_result), never by the provider — exclude
+    # it here so this stays the pure 3-key contract validator (task 652ed219).
+    data = validated.model_dump(exclude={"hallucination"})
     if data.get("model_used") is None and default_model is not None:
         data["model_used"] = default_model
     if data.get("tokens_used") is None:

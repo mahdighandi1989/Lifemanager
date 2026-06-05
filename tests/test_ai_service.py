@@ -158,7 +158,11 @@ async def test_orchestrate_analysis_returns_full_shape(session_factory):
     async with session_factory() as db:
         svc = AIService(db)
         result = await svc.orchestrate_analysis(prompt="analyze my data", user_id=0)
-        assert set(result) == {"insights", "model_used", "context_items_count"}
+        # ``hallucination`` added by audit task 32145cd6 — the analysis answer is
+        # fact-checked against the user's data context.
+        assert set(result) == {
+            "insights", "model_used", "context_items_count", "hallucination",
+        }
         assert isinstance(result["context_items_count"], int)
         assert result["insights"]  # placeholder text is non-empty
 

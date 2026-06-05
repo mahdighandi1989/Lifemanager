@@ -246,6 +246,38 @@ AI_PERFORMANCE_TARGETS = {
 }
 
 
+# Hallucination detection / mitigation (audit task 32145cd6). The pipeline
+# scores every generated response for confidence + internal consistency +
+# grounding against the supplied context, and flags low-confidence outputs
+# for human review. The threshold is the single canonical knob ops tune via
+# env (AI_HALLUCINATION_CONFIDENCE_THRESHOLD) so the detector and any
+# dashboard/alert reading it never drift. ``enabled`` lets a deploy turn the
+# whole pass off without a code change; the literal default is on because an
+# ungrounded LLM answer reaching a user unflagged is the failure this guards.
+def _hallucination_threshold() -> float:
+    raw = os.getenv("AI_HALLUCINATION_CONFIDENCE_THRESHOLD")
+    if raw:
+        try:
+            val = float(raw)
+            if 0.0 <= val <= 1.0:
+                return val
+        except ValueError:
+            pass
+    return 0.5
+
+
+AI_HALLUCINATION_CONFIG = {
+    # A response whose computed confidence is < this is flagged for review.
+    "confidence_flag_threshold": _hallucination_threshold(),
+    # Master switch for the detection pass (still annotates when off=False).
+    "enabled": os.getenv("AI_HALLUCINATION_DETECTION_ENABLED", "true").lower()
+    in ("1", "true", "yes"),
+    # Cap on the in-process human-review queue so a key-less deploy that
+    # generates many low-confidence placeholders can't grow memory unbounded.
+    "review_queue_max": int(os.getenv("AI_HALLUCINATION_REVIEW_QUEUE_MAX", "200")),
+}
+
+
 # Module-level feature-flag mirrors. They evaluate at import time from the
 # same env vars Settings reads, so static greps for `os.getenv("FEATURE_X")`
 # find the canonical lookup in this file. Kept in sync with the Settings

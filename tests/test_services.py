@@ -89,7 +89,10 @@ async def test_generate_text_placeholder_without_api_key(monkeypatch):
 async def test_generate_text_returns_correct_response_shape(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     result = await generate_text("hi")
-    assert set(result.keys()) == {"generated_text", "model_used", "tokens_used"}
+    # ``hallucination`` guard block added by audit task 32145cd6.
+    assert set(result.keys()) == {
+        "generated_text", "model_used", "tokens_used", "hallucination",
+    }
 
 
 @pytest.mark.asyncio

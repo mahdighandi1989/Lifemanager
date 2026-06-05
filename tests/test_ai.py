@@ -63,4 +63,8 @@ def test_generate_response_matches_schema_strict_fields():
     r = client.post("/ai/generate", json={"prompt": "hi"})
     assert r.status_code == 200
     body = r.json()
-    assert set(body.keys()) <= {"generated_text", "model_used", "tokens_used"}
+    # ``hallucination`` is the guard block added by audit task 32145cd6; it is a
+    # declared AIGenerateResponse field, so it's allowed alongside the core three.
+    assert set(body.keys()) <= {
+        "generated_text", "model_used", "tokens_used", "hallucination",
+    }

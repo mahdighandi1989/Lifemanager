@@ -27,6 +27,7 @@ from pydantic import ValidationError
 from app.config import AI_PERFORMANCE_TARGETS
 from app.schemas.ai_schema import validate_ai_generation
 from .content_analysis_service import analyze_content  # noqa: F401  re-export
+from .hallucination_service import annotate_result  # noqa: F401  re-export
 from .model_service import DEFAULT_MODEL
 from .provider_service import call_openai_chat, has_openai_key
 
@@ -151,29 +152,25 @@ async def generate_text(
     model: str = DEFAULT_MODEL,
     api_key: Optional[str] = None,
     base_url: Optional[str] = None,
+    context: Optional[str] = None,
+    detect_hallucination: bool = True,
 ) -> dict:
-    """Generate text for ``prompt``.
+    """Generate text for ``prompt``, returning an ``AIGenerateResponse`` dict
+    ``{"generated_text", "model_used", "tokens_used"}``.
 
-    Returns a dict matching ``AIGenerateResponse``:
+    No provider key → deterministic placeholder (e2e tests need no upstream);
+    upstream errors → "[ai-error]" placeholder so the route still returns 200.
+    Every call writes an ``ai_performance`` log line for SLO tracking.
 
-        {"generated_text": str, "model_used": str, "tokens_used": int}
-
-    When no provider API key is configured, the prompt is echoed back
-    in a wrapper so end-to-end tests don't depend on a live upstream.
-    Errors from the upstream are caught and surfaced as a placeholder so
-    the route layer still returns a 200 — the caller can detect the
-    "[ai-error]" prefix if it wants to distinguish.
-
-    Every call writes an ``ai_performance`` log line carrying latency,
-    tokens, and result kind so an operator can SLO-track p95 latency
-    and the placeholder fall-back rate in production.
+    Hallucination guard (audit task 32145cd6): when ``detect_hallucination`` is
+    set, the result carries a ``hallucination`` block, low-confidence answers are
+    queued for review, and ``context`` is the data the answer is fact-checked on.
     """
     request_id = uuid.uuid4().hex
     start_ns = time.perf_counter_ns()
 
-    # A per-provider api_key (from a registered AIProvider) routes to that
-    # vendor; otherwise fall back to the env OPENAI_API_KEY. Only when NEITHER
-    # is present do we serve the deterministic placeholder (audit task 1a08ded2).
+    # A per-provider api_key routes to that vendor; else fall back to env
+    # OPENAI_API_KEY; only when NEITHER is present serve the placeholder (1a08ded2).
     if not (api_key or has_openai_key()):
         result = _placeholder_response(prompt, model)
         latency_ms = (time.perf_counter_ns() - start_ns) // 1_000_000
@@ -185,6 +182,8 @@ async def generate_text(
             tokens_used=result.get("tokens_used", 0),
             result_kind="placeholder",
         )
+        if detect_hallucination:
+            annotate_result(result, prompt=prompt, context=context)
         return result
 
     try:
@@ -196,9 +195,8 @@ async def generate_text(
             api_key=api_key,
             base_url=base_url,
         )
-        # Post-generation validation (audit task 652ed219): parse the raw
-        # provider output through AIGenerateResponse at this single chokepoint
-        # so a malformed payload can't leak to any downstream consumer.
+        # Post-generation validation (652ed219): parse the raw provider output
+        # through AIGenerateResponse so a malformed payload can't leak downstream.
         result = validate_ai_generation(raw, default_model=model)
         kind = "provider"
     except ValidationError as exc:  # provider returned a structurally-bad body
@@ -230,6 +228,8 @@ async def generate_text(
         latency_ms=latency_ms,
         result_kind=kind,
     )
+    if detect_hallucination:
+        annotate_result(result, prompt=prompt, context=context)
     return result
 
 

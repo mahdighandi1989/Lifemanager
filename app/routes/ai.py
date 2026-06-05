@@ -28,6 +28,7 @@ from app.services.ai.nlp_service import (
     metrics_snapshot,
     record_feedback,
 )
+from app.services.ai.hallucination_service import review_queue_snapshot
 # AC 5 (task 97867b277c1b): the module-level `generate_text` import
 # has been removed in favour of AIService.generate_text(). The
 # /ai/generate route below calls the instance method via the
@@ -255,6 +256,20 @@ async def get_ai_metrics(db: AsyncSession = Depends(get_db)) -> dict:
     except Exception:
         pass  # table not migrated yet — serve the in-memory snapshot
     return snap
+
+
+@router.get("/hallucination-flags")
+@handle_errors
+async def get_hallucination_flags() -> dict:
+    """Human-review queue of low-confidence / self-contradictory AI answers.
+
+    Audit task 32145cd6 — every answer the ``ai_llm`` pipeline produces is
+    scored for confidence + internal consistency + grounding; the ones that
+    fall below the configured threshold are queued here for a human to review
+    rather than being silently shown as fact. Returns
+    ``{"flagged_count": int, "items": [...]}``.
+    """
+    return review_queue_snapshot()
 
 
 # ── AI Providers + Global Analysis Prompt (audit task 1a08ded2) ─────

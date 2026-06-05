@@ -57,22 +57,20 @@ class AIService:
         model: Optional[str] = None,
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
+        context: Optional[str] = None,
     ) -> dict:
         """Delegates to nlp_service.generate_text (AC6, task 97867b277c1b).
         ``api_key``/``base_url`` route to a registered provider (task 1a08ded2);
-        omitted → env OpenAI path / placeholder.
-
-        Output validation (audit task 652ed219): nlp_service.generate_text now
-        runs the provider response through ``validate_ai_generation`` before it
-        returns, so this method — and ``orchestrate_analysis`` below, which
-        reads ``out['generated_text']`` — always receive a schema-valid dict.
-        model_service stays a pure pass-through; no second validation needed."""
+        omitted → env path. ``context`` grounds the hallucination guard (32145cd6).
+        nlp_service.generate_text validates the provider response (652ed219) and
+        annotates hallucination metadata, so this method stays a pass-through."""
         from app.services.ai.nlp_service import DEFAULT_MODEL
         from app.services.ai.nlp_service import generate_text as _generate_text
 
         return await _generate_text(
             prompt, max_tokens=max_tokens, temperature=temperature,
             model=model or DEFAULT_MODEL, api_key=api_key, base_url=base_url,
+            context=context,
         )
 
     async def orchestrate_analysis(
@@ -109,32 +107,38 @@ class AIService:
             len(v) for v in context.values() if isinstance(v, list)
         )
 
-        # 3. Merge into one prompt the model sees in full (no truncation).
+        # 3. Merge into one prompt; prepend the grounding instruction (32145cd6).
+        from app.services.ai.hallucination_service import GROUNDING_SYSTEM_PROMPT
+
+        context_json = json.dumps(context, ensure_ascii=False)
         merged = "\n\n".join(
             part
             for part in (
+                GROUNDING_SYSTEM_PROMPT,
                 global_prompt,
-                "DATA CONTEXT:\n" + json.dumps(context, ensure_ascii=False),
+                "DATA CONTEXT:\n" + context_json,
                 "REQUEST:\n" + prompt,
             )
             if part
         )
 
-        # 4. Resolve the user's registered provider (base_url + decrypted key +
-        # model) so analysis actually routes to their chosen vendor (task
-        # 1a08ded2); falls back to env OpenAI / placeholder when none.
+        # 4. Resolve the user's registered provider so analysis routes to their
+        # chosen vendor (task 1a08ded2); falls back to env OpenAI when none.
         from app.services.ai.provider_service import resolve_provider_routing
 
         model_name, api_key, base_url = await resolve_provider_routing(
             self.db, user_id=user_id, model=model
         )
+        # Fact-check the answer against the user's data context (task 32145cd6).
         out = await self.generate_text(
-            prompt=merged, model=model_name, api_key=api_key, base_url=base_url
+            prompt=merged, model=model_name, api_key=api_key, base_url=base_url,
+            context=context_json,
         )
         return {
             "insights": out.get("generated_text", ""),
             "model_used": model or out.get("model_used"),
             "context_items_count": context_items_count,
+            "hallucination": out.get("hallucination"),
         }
 
     async def get_task_context(self, user_id: int) -> dict:
