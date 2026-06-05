@@ -6,11 +6,11 @@ priority: critical
 execution_priority: 1350
 status: awaiting_review
 external_status: done
-verification_status: applied_externally_pending_verify
+verification_status: partial
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-02T20:53:55.250778+00:00'
-updated_at: '2026-06-05T19:07:53.803340+00:00'
+updated_at: '2026-06-05T19:25:44.438474+00:00'
 ---
 
 # Add Missing Auth to Mutation Endpoints
@@ -483,7 +483,7 @@ _(مستقل)_
 ## Task Steps
 
 ### Step 1: Audit all FastAPI mutation routes for missing auth dependencies
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل بررسی کامل تمام FastAPI route handlers در پروژه است که عملیات mutation (create, update, delete) روی user, role, یا هر منبع محافظت‌شده انجام می‌دهند. هدف شناسایی routeهایی است که از `Depends(get_current_active_user)` یا سایر dependencyهای امنیتی از `app/dependencies/auth.py` استفاده نمی‌کنند. این مرحله فقط audit و شناسایی است — هیچ تغییری در کد ایجاد نمی‌شود. مسیرهای registration/login که عمداً بدون auth هستند نباید به‌عنوان مشکل گزارش شوند. خروجی این مرحله یک لیست از routeهای آسیب‌پذیر است.
 **Excerpt:**
 ```
@@ -499,7 +499,7 @@ Ensure that all FastAPI routes that perform data mutations (create, update, dele
 ```
 
 ### Step 3: Add auth dependency to role change endpoint
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل افزودن `Depends(get_current_active_user)` و یک permission check (مثلاً `Depends(require_admin)`) به endpoint تغییر role کاربران است. فرض بر این است که endpoint با مسیر `/users/{user_id}/role` و متد PUT/PATCH وجود دارد. باید اطمینان حاصل شود که فقط کاربران با role admin می‌توانند role دیگران را تغییر دهند. خارج از این مرحله: endpointهای user profile update یا resource creation.
 **Excerpt:**
 ```
@@ -507,7 +507,7 @@ Ensure that all FastAPI routes that perform data mutations (create, update, dele
 ```
 
 ### Step 4: Add auth dependency to resource creation endpoint
-**Status:** `not_done` (0%)
+**Status:** `partial` (50%)
 **Scope:** این مرحله شامل افزودن `Depends(get_current_active_user)` به endpoint ایجاد منبع محافظت‌شده (مثلاً ایجاد پروژه، task، یا هر منبعی که نیاز به احراز هویت دارد) است. فرض بر این است که endpoint با مسیر `/resources/` و متد POST وجود دارد. باید اطمینان حاصل شود که کاربر احراز هویت‌شده creator منبع ثبت می‌شود. خارج از این مرحله: endpointهای role management یا user deletion.
 **Excerpt:**
 ```
@@ -515,7 +515,7 @@ Ensure that all FastAPI routes that perform data mutations (create, update, dele
 ```
 
 ### Step 5: Add auth dependency to resource deletion endpoint
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل افزودن `Depends(get_current_active_user)` و permission check (مالکیت یا role admin) به endpoint حذف منبع محافظت‌شده است. فرض بر این است که endpoint با مسیر `/resources/{resource_id}` و متد DELETE وجود دارد. باید اطمینان حاصل شود که فقط creator منبع یا admin می‌تواند آن را حذف کند. خارج از این مرحله: endpointهای create یا update منابع.
 **Excerpt:**
 ```
@@ -531,7 +531,7 @@ Implement comprehensive unit and integration tests to verify permission enforcem
 ```
 
 ### Step 7: Write unit tests for auth dependency on role change endpoint
-**Status:** `not_done` (0%)
+**Status:** `done` (100%)
 **Scope:** این مرحله شامل نوشتن unit tests برای endpoint تغییر role کاربر است که dependency امنیتی در مرحله 3 اضافه شد. تست‌ها باید شامل: درخواست بدون token (401)، درخواست با token کاربر عادی (403)، درخواست با token admin (200) باشند. خارج از این مرحله: تست endpointهای user profile یا resource deletion.
 **Excerpt:**
 ```
@@ -539,7 +539,7 @@ Implement comprehensive unit and integration tests to verify permission enforcem
 ```
 
 ### Step 8: Write unit tests for auth dependency on resource creation endpoint
-**Status:** `not_done` (0%)
+**Status:** `partial` (70%)
 **Scope:** این مرحله شامل نوشتن unit tests برای endpoint ایجاد منبع محافظت‌شده است که dependency امنیتی در مرحله 4 اضافه شد. تست‌ها باید شامل: درخواست بدون token (401)، درخواست معتبر (201 و بررسی creator_id) باشند. خارج از این مرحله: تست endpointهای delete یا update منابع.
 — [merged] این مرحله شامل نوشتن unit tests برای endpoint حذف منبع محافظت‌شده است که dependency امنیتی در مرحله 5 اضافه شد. تست‌ها باید شامل: درخواست بدون token (401)، درخواست با token کاربر غیرمالک (403)، درخواست با token مالک (204)، درخواست با token admin (204) باشند. خارج از این مرحله: تست endpointهای create یا update منابع.
 **Excerpt:**
@@ -548,7 +548,7 @@ Implement comprehensive unit and integration tests to verify permission enforcem
 ```
 
 ### Step 9: Write integration tests for auth enforcement across all mutation endpoints
-**Status:** `not_done` (0%)
+**Status:** `partial` (60%)
 **Scope:** این مرحله شامل نوشتن integration tests است که تمام endpointهای mutation (update profile, change role, create resource, delete resource) را در یک سناریوی end-to-end تست می‌کند. تست‌ها باید با دیتابیس واقعی (یا in-memory) و JWT token واقعی اجرا شوند. هدف اطمینان از اینکه زنجیره کامل auth (token validation → user resolution → permission check) به‌درستی کار می‌کند. خارج از این مرحله: unit tests که قبلاً نوشته شده‌اند.
 **Excerpt:**
 ```
