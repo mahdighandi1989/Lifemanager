@@ -53,7 +53,7 @@ The prefix lives on the router itself (`APIRouter(prefix="/ai")`).
 
 | Method | Path | Notes |
 |---|---|---|
-| POST | `/ai/generate` | Text generation; placeholder if no `OPENAI_API_KEY` |
+| POST | `/ai/generate` | Text generation; placeholder if no `OPENAI_API_KEY`. **Categorization (audit task 97867b277c1b / 69704426):** active utility endpoint — wired to `AIService.generate_text()` (connection opened, not orphan/deprecated); also the canonical surface reused by `/ai/dynamic-analyze`. The legacy module-level `generate_text` import was removed (audit task ef6adabf). |
 | GET | `/ai/configs` | List model configs |
 | POST | `/ai/configs` | Create model config |
 | PATCH | `/ai/configs/{config_id}` | Update model config |
