@@ -134,6 +134,10 @@ class Settings(BaseSettings):
     # grep-friendly verifier patterns like `os.getenv("FEATURE_AI_ENABLED")`.
     FEATURE_AI_ENABLED: bool = False
     FEATURE_INTEGRATIONS_ENABLED: bool = False
+    # Identity-document extraction surface (task 32ade384). Default off so a
+    # fresh deploy keeps the Emirates-ID endpoints gated in the UI until the
+    # operator opts in; the routes themselves stay mounted and testable.
+    FEATURE_IDENTITY_DOCS_ENABLED: bool = False
 
     # --- Migrations ---------------------------------------------------------
     # When true AND ENVIRONMENT != production, startup runs `alembic upgrade
@@ -315,11 +319,15 @@ AI_HALLUCINATION_CONFIG = {
 # `FEATURE_AI_ENABLED\s*=\s*False` (no type annotation) finds them.
 FEATURE_AI_ENABLED = False
 FEATURE_INTEGRATIONS_ENABLED = False
+FEATURE_IDENTITY_DOCS_ENABLED = False
 FEATURE_AI_ENABLED = (
     os.getenv("FEATURE_AI_ENABLED", "false").lower() in ("1", "true", "yes")
 )
 FEATURE_INTEGRATIONS_ENABLED = (
     os.getenv("FEATURE_INTEGRATIONS_ENABLED", "false").lower() in ("1", "true", "yes")
+)
+FEATURE_IDENTITY_DOCS_ENABLED = (
+    os.getenv("FEATURE_IDENTITY_DOCS_ENABLED", "false").lower() in ("1", "true", "yes")
 )
 
 

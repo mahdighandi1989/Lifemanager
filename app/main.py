@@ -41,6 +41,9 @@ from app.routes import (
     projects,
     self_improvement,
     settings as settings_routes,
+    subscriptions,
+    documents,
+    identity,
     tasks,
     todo_items,
     users,
@@ -708,6 +711,11 @@ app.include_router(todo_items.router)
 app.include_router(local_files.router)
 app.include_router(person.router)
 app.include_router(finance.router)
+# Subscription accounts (task 32ade384) — Netflix-style streaming accounts.
+app.include_router(subscriptions.router, tags=["subscriptions"])
+# Identity documents (task 32ade384) — Emirates ID Document Details + card.
+app.include_router(documents.router, tags=["documents"])
+app.include_router(identity.router, tags=["identity"])
 app.include_router(location.router)
 app.include_router(context.router, tags=["context"])
 app.include_router(oversight.router, tags=["oversight"])

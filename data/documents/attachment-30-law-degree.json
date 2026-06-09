@@ -1,0 +1,35 @@
+{
+  "source": "attachment #30",
+  "document_type": "Bachelor's Degree — certified official translation",
+  "issuing_institution": "Payame Noor University (PNU)",
+  "ministry": "Ministry of Science, Research & Technology",
+  "person": {
+    "full_name": "MOHAMMAD MEHDI GHANDI",
+    "father_name": "MAHMOUD",
+    "national_id": "1270021801",
+    "national_id_issued_in": "ESFAHAN",
+    "place_of_birth": "ESFAHAN",
+    "birth_year": 1989
+  },
+  "education": {
+    "degree": "Bachelor's Degree",
+    "major": "Law",
+    "university": "Payame Noor University (PNU)",
+    "graduation_date": "February 19, 2014"
+  },
+  "document_identifiers": {
+    "diploma_no": "4755",
+    "serial_no": "707361",
+    "issue_date": "May 15, 2016"
+  },
+  "signers": [
+    {
+      "name": "Dr. ALIASGHAR ROSTAMI ABOUSAEIDI",
+      "title": "Chancellor of the University"
+    },
+    {
+      "name": "Dr. ABOLFAZL FARAHANI",
+      "title": "Vice-Chancellor in Academic & Postgraduate Studies Affairs"
+    }
+  ]
+}

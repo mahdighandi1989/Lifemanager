@@ -14,6 +14,8 @@ from app.models.user_asset import UserAsset
 from app.models.person_task import person_tasks  # noqa: F401  (association table)
 from app.models.indexed_data_source_entry import IndexedDataSourceEntry
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
+from app.models.subscription_account import SubscriptionAccount
+from app.models.identity_document import IdentityDocument
 from app.models.context import UserContext
 from app.models.global_setting import GlobalSetting
 from app.models.recommendation import ContextualRecommendation
@@ -54,6 +56,8 @@ __all__ = [
     "BudgetPlan",
     "ContextualRecommendation",
     "FinancialAccount",
+    "SubscriptionAccount",
+    "IdentityDocument",
     "GlobalAnalysisPrompt",
     "GlobalSetting",
     "Income",
