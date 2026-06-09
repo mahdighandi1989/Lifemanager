@@ -2,17 +2,6 @@
   "version": 1,
   "project": "mahdighandi1989/Lifemanager",
   "watched_id": "44aa6743-bf59-4b44-85ae-54f8af548cc3",
-  "total": 1,
-  "tasks": [
-    {
-      "task_id": "32ade384-1df5-4990-8c37-3b11f7b35107",
-      "title": "کامل استخراج کن (13 مرحله)",
-      "priority": "medium",
-      "execution_priority": 3000,
-      "status": "pending",
-      "external_status": "pending",
-      "path": "prompt/task-32ade384-1df5-4990-8c37-3b11f7b35107.md",
-      "external_attempts": 0
-    }
-  ]
+  "total": 0,
+  "tasks": []
 }
