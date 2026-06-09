@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-09T21:32:01.883772+00:00'
-updated_at: '2026-06-09T21:32:01.883773+00:00'
+updated_at: '2026-06-09T22:35:57.696796+00:00'
 target_files:
 - app/services/inventory.py
 - app/tasks/order_processing.py
@@ -483,6 +483,6 @@ _(مستقل)_
 
 ## Acceptance Criteria
 
-1. تمام عملیات‌هایی که وضعیت مشترک را اصلاح می‌کنند، از مکانیزم‌های همگام‌سازی مناسب استفاده می‌کنند.
-2. تست‌های همزمانی (concurrency tests) برای سناریوهای حیاتی اضافه می‌شوند.
-3. یکپارچگی داده‌ها در شرایط بار بالا حفظ می‌شود.
+1. تمام عملیات‌هایی که وضعیت مشترک را اصلاح می‌کنند، از مکانیزم‌های همگام‌سازی مناسب استفاده می‌کنند. _(verify: static)_
+2. تست‌های همزمانی (concurrency tests) برای سناریوهای حیاتی اضافه می‌شوند. _(verify: static)_
+3. یکپارچگی داده‌ها در شرایط بار بالا حفظ می‌شود. _(verify: backend_test)_
