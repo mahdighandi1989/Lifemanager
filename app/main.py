@@ -44,6 +44,11 @@ from app.routes import (
     subscriptions,
     documents,
     identity,
+    bank_share_sheet,
+    uae_license,
+    vehicle,
+    rta,
+    neteller,
     tasks,
     todo_items,
     users,
@@ -716,6 +721,11 @@ app.include_router(subscriptions.router, tags=["subscriptions"])
 # Identity documents (task 32ade384) — Emirates ID Document Details + card.
 app.include_router(documents.router, tags=["documents"])
 app.include_router(identity.router, tags=["identity"])
+app.include_router(bank_share_sheet.router, tags=["bank"])
+app.include_router(uae_license.router, tags=["documents"])
+app.include_router(vehicle.router, tags=["vehicle"])
+app.include_router(rta.router, tags=["rta"])
+app.include_router(neteller.router, tags=["neteller"])
 app.include_router(location.router)
 app.include_router(context.router, tags=["context"])
 app.include_router(oversight.router, tags=["oversight"])

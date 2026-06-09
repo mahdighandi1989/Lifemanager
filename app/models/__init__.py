@@ -16,6 +16,10 @@ from app.models.indexed_data_source_entry import IndexedDataSourceEntry
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
 from app.models.subscription_account import SubscriptionAccount
 from app.models.identity_document import IdentityDocument
+from app.models.bank_account import BankShareSheetAccount
+from app.models.uae_license import UAEDrivingLicenseRecord
+from app.models.rta_account import RTAAccount
+from app.models.neteller_wallet import NetellerWalletSnapshot
 from app.models.context import UserContext
 from app.models.global_setting import GlobalSetting
 from app.models.recommendation import ContextualRecommendation
@@ -58,6 +62,10 @@ __all__ = [
     "FinancialAccount",
     "SubscriptionAccount",
     "IdentityDocument",
+    "BankShareSheetAccount",
+    "UAEDrivingLicenseRecord",
+    "RTAAccount",
+    "NetellerWalletSnapshot",
     "GlobalAnalysisPrompt",
     "GlobalSetting",
     "Income",
