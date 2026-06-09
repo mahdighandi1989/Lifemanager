@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-09T21:30:10.841961+00:00'
-updated_at: '2026-06-09T21:30:10.841963+00:00'
+updated_at: '2026-06-09T22:31:49.979392+00:00'
 ---
 
 # Core FastAPI application structure and entry point are missing
@@ -494,8 +494,8 @@ _(مستقل)_
 
 ## Acceptance Criteria
 
-1. A `main.py` file is created in the project root.
-2. The `main.py` file initializes a `FastAPI` instance.
-3. A simple GET endpoint `/` is defined and returns a JSON response.
-4. Basic SQLAlchemy async engine and sessionmaker are configured using `DATABASE_URL` from environment variables.
-5. The application can be started successfully using `uvicorn main:app --reload` and the root endpoint is accessible.
+1. A `main.py` file is created in the project root. _(verify: static)_
+2. The `main.py` file initializes a `FastAPI` instance. _(verify: static)_
+3. A simple GET endpoint `/` is defined and returns a JSON response. _(verify: api_response)_
+4. Basic SQLAlchemy async engine and sessionmaker are configured using `DATABASE_URL` from environment variables. _(verify: static)_
+5. The application can be started successfully using `uvicorn main:app --reload` and the root endpoint is accessible. _(verify: backend_test)_
