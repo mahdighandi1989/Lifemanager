@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-09T21:29:50.670317+00:00'
-updated_at: '2026-06-09T21:29:50.670320+00:00'
+updated_at: '2026-06-09T22:31:33.379839+00:00'
 ---
 
 # Missing application source code prevents cross-stack consistency analysis
@@ -443,6 +443,6 @@ _(مستقل)_
 
 ## Acceptance Criteria
 
-1. The full application source code (backend and frontend) is successfully provided to the analysis tool.
-2. The analysis tool can identify and parse backend API endpoint definitions (e.g., FastAPI routes and their parameters).
-3. The analysis tool can identify and parse frontend API calls (e.g., `fetch`, `axios`, or framework-specific client-side API service calls).
+1. The full application source code (backend and frontend) is successfully provided to the analysis tool. _(verify: static)_
+2. The analysis tool can identify and parse backend API endpoint definitions (e.g., FastAPI routes and their parameters). _(verify: backend_test)_
+3. The analysis tool can identify and parse frontend API calls (e.g., `fetch`, `axios`, or framework-specific client-side API service calls). _(verify: backend_test)_
