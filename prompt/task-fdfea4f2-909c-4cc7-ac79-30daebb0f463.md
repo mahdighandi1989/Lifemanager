@@ -10,7 +10,7 @@ verification_status: pending
 watched_id: 44aa6743-bf59-4b44-85ae-54f8af548cc3
 project: mahdighandi1989/Lifemanager
 created_at: '2026-06-09T21:30:58.811622+00:00'
-updated_at: '2026-06-09T21:30:58.811625+00:00'
+updated_at: '2026-06-09T22:31:56.558702+00:00'
 target_files:
 - requirements.txt
 ---
@@ -473,6 +473,6 @@ _(مستقل)_
 
 ## Acceptance Criteria
 
-1. یک فایل `requirements.txt` در ریشه مخزن وجود دارد.
-2. فایل تمام وابستگی‌های مستقیم پروژه را با نسخه‌های پین شده لیست می‌کند.
-3. پروژه را می‌توان با استفاده از `pip install -r requirements.txt` با موفقیت نصب و اجرا کرد.
+1. یک فایل `requirements.txt` در ریشه مخزن وجود دارد. _(verify: static)_
+2. فایل تمام وابستگی‌های مستقیم پروژه را با نسخه‌های پین شده لیست می‌کند. _(verify: static)_
+3. پروژه را می‌توان با استفاده از `pip install -r requirements.txt` با موفقیت نصب و اجرا کرد. _(verify: backend_test)_
