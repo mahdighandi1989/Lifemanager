@@ -71,24 +71,27 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  // ⚠️ Temporary: Set to true to bypass login for development/testing
-  const isLoginBypassEnabled = true;
+  // Login is enforced now that Google sign-in + role/permission management is
+  // wired up (app/routes/auth_google.py). Flip to true only for local dev if
+  // you need to bypass auth.
+  const isLoginBypassEnabled = false;
 
   const fetchMe = useCallback(async (t) => {
     if (!t) { setLoading(false); return; }
     try {
-      const res = await fetch(`${API_BASE}/users/`, {
+      // /auth/me returns a unified shape for BOTH the Google OAuth identity
+      // and a local password account: { id, email, name, role, permissions,
+      // status, is_admin, is_super_admin }. is_admin gates the user-management
+      // UI; status drives the pending-approval screen.
+      const res = await fetch(`${API_BASE}/auth/me`, {
         headers: { Authorization: `Bearer ${t}` },
       });
       if (res.ok) {
         const data = await res.json();
-        // /users/ returns list — get first item as current user
-        // fallback: try /auth/me if available
-        // normalizeUser guarantees an explicit `id` (matching the backend
-        // users.id / UserContext.user_id key) or yields null.
-        setUser(normalizeUser(Array.isArray(data) ? data[0] : data));
+        // normalizeUser guarantees an explicit `id` or yields null.
+        setUser(normalizeUser(data));
       } else {
-        // token invalid
+        // token invalid/expired → drop it
         localStorage.removeItem('token');
         setToken(null);
         setUser(null);
@@ -121,6 +124,28 @@ export function AuthProvider({ children }) {
     return t;
   };
 
+  const loginWithGoogle = async (credential) => {
+    // Exchange the Google Identity Services credential (ID token) for our
+    // session JWT via the backend, which verifies the token, upserts the
+    // OAuth user (ADMIN_EMAILS → admin, others → pending) and returns the
+    // user with its computed is_admin/status flags.
+    const res = await fetch(`${API_BASE}/auth/google/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'ورود با گوگل ناموفق بود');
+    }
+    const data = await res.json();
+    const t = data.access_token;
+    localStorage.setItem('token', t);
+    setToken(t);
+    if (data.user) setUser(normalizeUser(data.user));
+    return data.user;
+  };
+
   const register = async (email, password, username) => {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
@@ -141,7 +166,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated: !!token || isLoginBypassEnabled }}>
+    <AuthContext.Provider value={{ user, token, loading, login, loginWithGoogle, register, logout, isAuthenticated: !!token || isLoginBypassEnabled }}>
       {children}
     </AuthContext.Provider>
   );

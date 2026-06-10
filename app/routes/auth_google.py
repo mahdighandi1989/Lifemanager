@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
@@ -8,44 +10,208 @@ from app.services.google_auth import (
     get_or_create_user,
     create_jwt_token,
     get_all_pending_users,
-    approve_user
+    approve_user,
+    list_all_oauth_users,
+    admin_update_oauth_user,
+    delete_oauth_user,
+    is_super_admin_email,
 )
-from app.dependencies.auth import get_current_user, is_admin
+from app.dependencies.auth import get_current_user, get_current_admin_user, is_admin
 from app.models.user_oauth import OAuthUser
-from app.schemas.user_oauth import OAuthUserResponse
+from app.schemas.user_oauth import OAuthUserResponse, OAuthUserAdminUpdate
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="", tags=["google-auth"])
 
+# The three-tier access levels surfaced to the admin UI (label is Persian).
+# Kept here so the /auth/config endpoint and the management views share one
+# source of truth.
+ACCESS_LEVELS = [
+    {"key": "read-only", "label": "فقط خواندنی"},
+    {"key": "editor", "label": "ویرایشگر"},
+    {"key": "admin", "label": "ادمین (دسترسی کامل)"},
+]
+
+
+def _user_view(user: OAuthUser) -> dict:
+    """Serialise an OAuthUser for the API, with the computed ``is_admin`` flag
+    and ``is_super_admin`` so the frontend can disable controls on the
+    operator account."""
+    role = user.role.value if hasattr(user.role, "value") else user.role
+    perms = user.permissions.value if hasattr(user.permissions, "value") else user.permissions
+    return {
+        "id": user.id,
+        "email": user.email,
+        "name": user.name,
+        "role": role,
+        "permissions": perms,
+        "status": user.status,
+        "is_admin": is_admin(user),
+        "is_super_admin": is_super_admin_email(user.email),
+        "created_at": user.created_at.isoformat() if getattr(user, "created_at", None) else None,
+    }
+
+
+def _set_session_cookie(response: Response, jwt_token: str) -> None:
+    """Store the session JWT in an httponly cookie for the server-rendered
+    pages. ``samesite=lax`` is enough for the top-level-navigation OAuth
+    flow; ``secure`` follows the deployment (Render serves HTTPS)."""
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {jwt_token}",
+        httponly=True,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        samesite="lax",
+        secure=settings.ENVIRONMENT.lower() == "production",
+    )
+
 @router.get("/auth/google")
 async def google_login():
-    """Redirect to Google OAuth consent screen.
+    """Server-rendered "Sign in with Google" page.
 
-    Consumer: direct browser navigation. The Persian "تلاش مجدد"
-    (Try again) anchor in the /auth/pending HTML response points
-    here (see line ~153 of this file), and end-users hit the URL
-    directly when they click "Login with Google". Not invoked
-    from frontend JS — that's why the no-frontend-fetch audit
-    flags it as orphan. Keep.
+    Uses Google Identity Services (the in-browser credential flow) rather
+    than the classic redirect/consent-screen dance, so it works WITHOUT a
+    configured ``GOOGLE_REDIRECT_URI`` — the operator only has to add the
+    deployment origin to the OAuth client's "Authorized JavaScript origins".
+    The GIS button hands us an ID token (``credential``) which the page POSTs
+    to :func:`google_login_token`; that endpoint sets the session cookie and
+    the page then redirects (to /dashboard, or /auth/pending if unapproved).
+
+    The classic redirect flow at ``/auth/google/callback`` is kept for
+    backward compatibility but is no longer the primary entry point.
     """
     if not settings.GOOGLE_CLIENT_ID:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Google OAuth not configured. Set GOOGLE_CLIENT_ID in environment variables."
+            detail="Google OAuth not configured. Set GOOGLE_CLIENT_ID in environment variables.",
         )
-    
-    redirect_uri = settings.GOOGLE_REDIRECT_URI or "http://localhost:8000/auth/google/callback"
-    
-    google_auth_url = (
-        f"https://accounts.google.com/o/oauth2/v2/auth"
-        f"?client_id={settings.GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={redirect_uri}"
-        f"&response_type=code"
-        f"&scope=openid%20email%20profile"
-        f"&access_type=offline"
-    )
-    
-    return RedirectResponse(url=google_auth_url)
+
+    return HTMLResponse(f"""
+    <!DOCTYPE html>
+    <html lang="fa">
+    <head>
+        <title>ورود با گوگل - Lifemanager</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <style>
+            body {{
+                font-family: 'Vazir', 'Tahoma', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex; justify-content: center; align-items: center;
+                height: 100vh; margin: 0; direction: rtl;
+            }}
+            .card {{
+                background: white; border-radius: 20px; padding: 40px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+                max-width: 380px;
+            }}
+            h1 {{ color: #333; margin-bottom: 8px; font-size: 22px; }}
+            p {{ color: #888; margin-bottom: 28px; font-size: 14px; }}
+            #gbtn {{ display: flex; justify-content: center; }}
+            #err {{ color: #dc3545; margin-top: 18px; font-size: 14px; min-height: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div style="font-size:48px;margin-bottom:10px;">🔐</div>
+            <h1>ورود به Lifemanager</h1>
+            <p>برای ادامه با حساب گوگل خود وارد شوید</p>
+            <div id="gbtn"></div>
+            <div id="err"></div>
+        </div>
+        <script>
+            async function onCredential(resp) {{
+                document.getElementById('err').textContent = 'در حال ورود...';
+                try {{
+                    const r = await fetch('/auth/google/token', {{
+                        method: 'POST',
+                        headers: {{ 'Content-Type': 'application/json' }},
+                        body: JSON.stringify({{ credential: resp.credential }})
+                    }});
+                    const data = await r.json();
+                    if (!r.ok) {{
+                        document.getElementById('err').textContent = data.detail || 'ورود ناموفق بود';
+                        return;
+                    }}
+                    if (data.user && data.user.status === 'pending') {{
+                        window.location.href = '/auth/pending';
+                    }} else {{
+                        window.location.href = '/dashboard';
+                    }}
+                }} catch (e) {{
+                    document.getElementById('err').textContent = 'خطا در ارتباط با سرور';
+                }}
+            }}
+            window.onload = function() {{
+                google.accounts.id.initialize({{
+                    client_id: '{settings.GOOGLE_CLIENT_ID}',
+                    callback: onCredential
+                }});
+                google.accounts.id.renderButton(
+                    document.getElementById('gbtn'),
+                    {{ theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill' }}
+                );
+            }};
+        </script>
+    </body>
+    </html>
+    """)
+
+
+@router.get("/auth/config")
+async def auth_config():
+    """Public auth configuration for the SPA login page.
+
+    Exposes the Google client id (so the React app can render the GIS
+    button without a build-time env var) and the available access levels.
+    Safe to be public — the client id is not a secret.
+    """
+    return {
+        "google_client_id": settings.GOOGLE_CLIENT_ID or "",
+        "google_enabled": bool(settings.GOOGLE_CLIENT_ID),
+        "access_levels": ACCESS_LEVELS,
+        "admin_configured": bool(settings.admin_emails_list),
+    }
+
+
+@router.post("/auth/google/token")
+async def google_login_token(
+    response: Response,
+    credential: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+):
+    """Exchange a Google Identity Services ``credential`` (ID token) for a
+    Lifemanager session.
+
+    This is the single sign-in entry point shared by BOTH the React SPA and
+    the server-rendered /auth/google page. It verifies the Google token
+    (issuer + audience), upserts the OAuth user (ADMIN_EMAILS are bootstrapped
+    as approved admins, everyone else lands as ``pending``), issues our JWT,
+    sets it as an httponly cookie (for the server pages) AND returns it in the
+    body (for the SPA, which stores it in localStorage).
+    """
+    claims = await verify_google_token(credential)
+    if not claims:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="توکن گوگل نامعتبر است",
+        )
+
+    email = claims.get("email")
+    name = claims.get("name")
+    user = await get_or_create_user(db, email, name)
+    jwt_token = create_jwt_token(user)
+    _set_session_cookie(response, jwt_token)
+
+    logger.info("Google login: %s (role=%s, status=%s)", user.email, user.role, user.status)
+    return {
+        "access_token": jwt_token,
+        "token_type": "bearer",
+        "user": _user_view(user),
+    }
 
 @router.get("/auth/google/callback")
 async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
@@ -163,22 +329,86 @@ async def pending_page():
     </html>
     """
 
-@router.get("/auth/me", response_model=OAuthUserResponse)
-async def get_current_user_info(current_user: OAuthUser = Depends(get_current_user)):
-    """Get current authenticated user info."""
-    return current_user
+@router.get("/auth/me")
+async def get_current_user_info(current_user=Depends(get_current_user)):
+    """Current authenticated user — works for BOTH the Google OAuth identity
+    and a local password account.
+
+    Returns a unified dict (not a strict OAuth response model) so a local
+    ``User`` token doesn't 500 on the missing role/permissions/status columns.
+    The ``is_admin`` flag is computed server-side and is what the SPA uses to
+    decide whether to show the user-management UI.
+    """
+    role = getattr(current_user, "role", None)
+    perms = getattr(current_user, "permissions", None)
+    return {
+        "id": current_user.id,
+        "email": getattr(current_user, "email", None),
+        "name": getattr(current_user, "name", None) or getattr(current_user, "username", None),
+        "role": role.value if hasattr(role, "value") else role,
+        "permissions": perms.value if hasattr(perms, "value") else perms,
+        # Local users have no `status` column → report them as active.
+        "status": getattr(current_user, "status", None) or "active",
+        "is_admin": is_admin(current_user),
+        "is_super_admin": is_super_admin_email(getattr(current_user, "email", None)),
+    }
+
+# ── User management API (admin only) ────────────────────────────────────────
+# These are the JSON endpoints the React "User Management" page calls. Each is
+# gated by get_current_admin_user (role-based; see app/dependencies/auth.py).
+
+@router.get("/auth/users")
+async def list_users(
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(get_current_admin_user),
+):
+    """All OAuth users with their role / access level / status (admin only)."""
+    users = await list_all_oauth_users(db)
+    return {"users": [_user_view(u) for u in users], "access_levels": ACCESS_LEVELS}
+
+
+@router.patch("/auth/users/{user_id}")
+async def update_user(
+    user_id: int,
+    patch: OAuthUserAdminUpdate,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(get_current_admin_user),
+):
+    """Update a user's role (admin/user), access level (read-only/editor/admin)
+    and status (approved/pending/rejected). Super-admins are immutable."""
+    user = await admin_update_oauth_user(
+        db,
+        user_id,
+        role=patch.role,
+        permissions=patch.permissions,
+        status=patch.status,
+    )
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="کاربر یافت نشد")
+    return {"user": _user_view(user)}
+
+
+@router.delete("/auth/users/{user_id}")
+async def remove_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(get_current_admin_user),
+):
+    """Delete a user. Super-admins (ADMIN_EMAILS) cannot be deleted."""
+    ok = await delete_oauth_user(db, user_id)
+    if not ok:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="حذف ناموفق بود (کاربر یافت نشد یا super-admin است)",
+        )
+    return {"ok": True}
 
 @router.get("/admin/pending-users", response_model=list[OAuthUserResponse])
 async def list_pending_users(
     db: AsyncSession = Depends(get_db),
-    current_user: OAuthUser = Depends(get_current_user)
+    current_user: OAuthUser = Depends(get_current_admin_user)
 ):
     """List all pending users (admin only)."""
-    if not is_admin(current_user):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admin can access this endpoint."
-        )
     return await get_all_pending_users(db)
 
 @router.post("/admin/approve-user/{user_id}", response_model=OAuthUserResponse)
@@ -186,15 +416,9 @@ async def approve_pending_user(
     user_id: int,
     permissions: str = "read-only",
     db: AsyncSession = Depends(get_db),
-    current_user: OAuthUser = Depends(get_current_user)
+    current_user: OAuthUser = Depends(get_current_admin_user)
 ):
     """Approve a pending user (admin only)."""
-    if not is_admin(current_user):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admin can approve users."
-        )
-    
     user = await approve_user(db, user_id, permissions)
     if not user:
         raise HTTPException(

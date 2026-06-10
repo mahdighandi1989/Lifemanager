@@ -14,6 +14,8 @@ function Header() {
     { to: '/projects', label: 'Projects' },
     { to: '/lists', label: 'لیست‌ها' },
     { to: '/notifications', label: 'اعلان‌ها' },
+    // Only admins see the user-management link.
+    ...(user?.is_admin ? [{ to: '/admin/users', label: 'مدیریت کاربران' }] : []),
   ];
 
   const isActive = (path) => {

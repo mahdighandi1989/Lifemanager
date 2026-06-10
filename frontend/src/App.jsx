@@ -24,6 +24,7 @@ import MergeManagement from './pages/MergeManagement';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Login from './pages/Login';
+import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
 import Projects from './pages/Projects';
 import Register from './pages/Register';
@@ -61,8 +62,8 @@ function App() {
         <TaskProvider>
           <BrowserRouter>
             <Routes>
-              {/* Public routes — Login temporarily disabled */}
-              <Route path="/login" element={<LoginDisabled />} />
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/welcome" element={<Home />} />
 
@@ -283,6 +284,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <MergeManagement />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <AdminUsers />
                     </Layout>
                   </ProtectedRoute>
                 }
