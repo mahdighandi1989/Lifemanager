@@ -69,15 +69,22 @@ function GoogleLoginButton({ onError }) {
     return () => { cancelled = true; };
   }, [loginWithGoogle, navigate, onError]);
 
-  if (!enabled) return null;
-
+  // IMPORTANT: the button container (btnRef) is ALWAYS rendered — never gated
+  // behind `enabled`. The effect calls google.accounts.id.renderButton(btnRef
+  // .current, …) on mount, so the node MUST already be in the DOM at that
+  // point; if we returned null until `enabled`, btnRef.current would be null
+  // when renderButton runs and Google would paint nothing (the symptom: an
+  // empty space with only the "یا" divider showing). Only the divider is
+  // gated on `enabled`, so a deploy without Google configured shows nothing.
   return (
     <div className="mt-2">
-      <div className="flex items-center gap-3 my-4">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400">یا</span>
-        <div className="flex-1 h-px bg-gray-200" />
-      </div>
+      {enabled && (
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400">یا</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+      )}
       <div className="flex justify-center" ref={btnRef} />
     </div>
   );
