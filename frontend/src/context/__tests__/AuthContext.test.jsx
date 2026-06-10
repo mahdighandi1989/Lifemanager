@@ -135,10 +135,11 @@ describe('AuthContext', () => {
     localStorage.setItem('token', 'valid-token');
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      // /users/ returns a list; first item is the current user (UserOut shape)
-      json: async () => [
-        { id: 7, email: 'a@b.com', username: 'alice', name: 'alice' },
-      ],
+      // /auth/me returns the current user as a single object (unified shape
+      // for both OAuth and local accounts).
+      json: async () => (
+        { id: 7, email: 'a@b.com', username: 'alice', name: 'alice', is_admin: false, status: 'active' }
+      ),
     });
     const get = renderWithProvider();
     // allow the fetchMe effect to resolve

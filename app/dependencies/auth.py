@@ -20,14 +20,16 @@ The active/admin gates are still meaningful — a pending OAuthUser
 still gets 403 — but they no longer crash on a User-backed token
 where the column doesn't exist.
 """
-from typing import Union
+from typing import Optional, Union
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
-from app.services.auth_service import AuthService
+from app.services.auth_service import AuthService, validate_token
+from app.services.google_auth import get_oauth_user_by_id
 from app.models.user_oauth import OAuthUser, UserRole, UserPermission
 from app.core.config import settings
 
@@ -51,55 +53,101 @@ optional_security = HTTPBearer(auto_error=False)
 DEFAULT_ANON_USER_ID = 0
 
 
+def _extract_token(request: Request) -> Optional[str]:
+    """Pull the session token from the Authorization header OR the
+    ``access_token`` cookie.
+
+    The React SPA and JSON API clients send ``Authorization: Bearer <jwt>``.
+    The server-rendered Google sign-in pages (the /dashboard, /admin/panel
+    HTML flow) instead carry the token in an httponly ``access_token`` cookie
+    set by the OAuth callback — a plain browser navigation can't add an
+    Authorization header, so without cookie support those pages always 401'd.
+    Either form is accepted; the value may be bare or ``Bearer <jwt>``.
+    """
+    header = request.headers.get("Authorization", "") or ""
+    if header.lower().startswith("bearer "):
+        return header[7:].strip() or None
+    cookie = request.cookies.get("access_token")
+    if cookie:
+        return cookie[7:].strip() if cookie.lower().startswith("bearer ") else cookie.strip()
+    return None
+
+
+async def _resolve_token_to_user(token: str, db: AsyncSession) -> Optional[AuthContext]:
+    """Resolve a validated JWT to either an OAuthUser or a local User.
+
+    The token's ``typ`` claim disambiguates which table to hit:
+      * ``typ == "oauth"`` → ``oauth_users`` (Google sign-in identity), and
+      * anything else      → the local ``users`` table (password accounts).
+
+    Authorization is recomputed from this fresh row on every request, so an
+    admin's role/permission change is effective immediately.
+    """
+    payload = validate_token(token)
+    if payload is None:
+        return None
+    try:
+        user_id = int(payload["sub"])
+    except (KeyError, TypeError, ValueError):
+        return None
+
+    if payload.get("typ") == "oauth":
+        return await get_oauth_user_by_id(db, user_id)
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    return result.scalar_one_or_none()
+
+
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> AuthContext:
-    """Resolve the bearer token to a user row.
+    """Resolve the session token to a user row.
 
     The return type is ``AuthContext`` — either a ``User`` or an
     ``OAuthUser``. Downstream helpers must not assume one concrete
-    shape; they probe attributes with ``getattr``.
+    shape; they probe attributes with ``getattr``. The token is read
+    from the Authorization header or the ``access_token`` cookie (see
+    :func:`_extract_token`), and resolved against the correct table by
+    its ``typ`` claim (see :func:`_resolve_token_to_user`).
     """
-    token = credentials.credentials
-    auth_service = AuthService(db)
-    user = await auth_service.verify_token(token)
+    token = _extract_token(request)
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    user = await _resolve_token_to_user(token, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
     return user
 
 
 async def get_optional_user_id(
-    credentials: HTTPAuthorizationCredentials | None = Depends(optional_security),
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> int:
     """Return the caller's user_id, or ``DEFAULT_ANON_USER_ID`` if anon.
 
     This is the *lenient* identity dependency. It verifies the JWT
-    signature (via ``AuthService.verify_token`` →
-    ``auth_service.validate_token``, which checks signature, algorithm
-    and expiry) but never hard-fails: it is used by routes that must
-    keep serving the dashboard while the frontend's login-bypass mode
-    is enabled. Three cases handled:
+    signature/expiry but never hard-fails: it is used by routes that must
+    keep serving the dashboard for anonymous traffic. Three cases handled:
 
-      1. No Authorization header → DEFAULT_ANON_USER_ID. Matches the
-         current frontend's login-bypass mode so the routes don't 403
-         the user out of their own dashboard.
-      2. Header present, token resolves → that user's id.
-      3. Header present, token invalid → still falls back to the
-         default rather than 401. Logging the user out for a stale
-         token feels worse than serving the default scope; sensitive
-         routes use :func:`get_required_user_id` instead, which DOES
-         reject a present-but-invalid token.
+      1. No token (header or cookie) → DEFAULT_ANON_USER_ID.
+      2. Token resolves → that user's id (OAuth or local — see
+         :func:`_resolve_token_to_user`).
+      3. Token present but invalid → still falls back to the default
+         rather than 401. Sensitive routes use :func:`get_required_user_id`
+         instead, which DOES reject a present-but-invalid token.
 
-    Returns just the ``int`` because most callers only need the id —
-    no need to round-trip a full User row from the DB on every read.
+    Returns just the ``int`` because most callers only need the id.
     """
-    if credentials is None:
+    token = _extract_token(request)
+    if token is None:
         return DEFAULT_ANON_USER_ID
     try:
-        auth_service = AuthService(db)
-        user = await auth_service.verify_token(credentials.credentials)
+        user = await _resolve_token_to_user(token, db)
     except Exception:
         return DEFAULT_ANON_USER_ID
     if user is None:
@@ -108,7 +156,7 @@ async def get_optional_user_id(
 
 
 async def get_required_user_id(
-    credentials: HTTPAuthorizationCredentials | None = Depends(optional_security),
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> int:
     """Strict identity dependency for sensitive routes (finance, assets,
@@ -138,7 +186,8 @@ async def get_required_user_id(
     so route handlers can swap one dependency for the other without
     touching their bodies.
     """
-    if credentials is None:
+    token = _extract_token(request)
+    if token is None:
         if settings.REQUIRE_AUTH:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -146,10 +195,9 @@ async def get_required_user_id(
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return DEFAULT_ANON_USER_ID
-    # A header was supplied — it MUST carry one of our valid tokens.
-    auth_service = AuthService(db)
+    # A token was supplied — it MUST be one of our valid tokens.
     try:
-        user = await auth_service.verify_token(credentials.credentials)
+        user = await _resolve_token_to_user(token, db)
     except Exception:
         user = None
     if user is None:

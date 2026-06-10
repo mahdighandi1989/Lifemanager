@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 function Login() {
   const { login } = useAuth();
@@ -76,6 +77,8 @@ function Login() {
             {loading ? 'در حال ورود...' : 'ورود'}
           </button>
         </form>
+
+        <GoogleLoginButton onError={setError} />
 
         <p className="text-center text-sm text-gray-500 mt-6">
           حساب ندارید؟{' '}
