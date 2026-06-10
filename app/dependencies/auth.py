@@ -98,6 +98,38 @@ async def _resolve_token_to_user(token: str, db: AsyncSession) -> Optional[AuthC
     return result.scalar_one_or_none()
 
 
+async def _resolve_data_scope_user_id(token: str, db: AsyncSession) -> Optional[int]:
+    """Map a token to a per-user DATA scope id (the ``users.id`` space).
+
+    This is DELIBERATELY different from :func:`_resolve_token_to_user`, which
+    is for auth/admin gating. The per-user data tables (``user_contexts``,
+    finance, assets, …) carry a foreign key to the LOCAL ``users.id``. A Google
+    OAuth identity lives in a SEPARATE table (``oauth_users``) whose id is NOT
+    a valid ``users.id`` — using it as a data-scope id violates those FKs (the
+    cause of the /api/context/location 409s after Google sign-in went live).
+
+    So the mapping is:
+      * OAuth token  → ``DEFAULT_ANON_USER_ID``: the single-tenant shared scope,
+        identical to the pre-auth behaviour. This personal deployment has one
+        real operator, so their data lives in that one scope rather than under
+        an FK-incompatible oauth id. Returns an int, never None.
+      * Local token  → the verified ``users.id`` if the row exists, else None.
+      * Invalid token → None.
+    """
+    payload = validate_token(token)
+    if payload is None:
+        return None
+    if payload.get("typ") == "oauth":
+        return DEFAULT_ANON_USER_ID
+    try:
+        uid = int(payload["sub"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    result = await db.execute(select(User).where(User.id == uid))
+    user = result.scalar_one_or_none()
+    return user.id if user else None
+
+
 async def get_current_user(
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -147,12 +179,10 @@ async def get_optional_user_id(
     if token is None:
         return DEFAULT_ANON_USER_ID
     try:
-        user = await _resolve_token_to_user(token, db)
+        uid = await _resolve_data_scope_user_id(token, db)
     except Exception:
         return DEFAULT_ANON_USER_ID
-    if user is None:
-        return DEFAULT_ANON_USER_ID
-    return int(user.id)
+    return DEFAULT_ANON_USER_ID if uid is None else uid
 
 
 async def get_required_user_id(
@@ -195,18 +225,21 @@ async def get_required_user_id(
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return DEFAULT_ANON_USER_ID
-    # A token was supplied — it MUST be one of our valid tokens.
+    # A token was supplied — it MUST be one of our valid tokens. An OAuth token
+    # resolves to the shared single-tenant scope (see
+    # :func:`_resolve_data_scope_user_id`); a local token resolves to its
+    # users.id; an invalid token yields None → 401.
     try:
-        user = await _resolve_token_to_user(token, db)
+        uid = await _resolve_data_scope_user_id(token, db)
     except Exception:
-        user = None
-    if user is None:
+        uid = None
+    if uid is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return int(user.id)
+    return uid
 
 
 async def get_current_active_user(
