@@ -52,6 +52,7 @@ from app.routes import (
     rta,
     neteller,
     tasks,
+    telegram,
     todo_items,
     users,
     webhook,
@@ -766,6 +767,44 @@ app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
+# telegram.router decorators carry absolute /api/telegram/... paths (the
+# bidirectional bot: inbound webhook + set/delete/heal/status/test). Mounts with
+# no prefix, like webhook + notifications.api_router.
+app.include_router(telegram.router, tags=["telegram"])
+
+
+# ── Telegram webhook self-heal supervisor ────────────────────────────────────
+# A dedicated startup/shutdown pair (separate from startup_event so it's
+# isolated + reversible). The supervisor re-registers Telegram's webhook
+# whenever the recorded URL drifts from our public URL or the pending queue
+# backs up — the "buttons stop responding after a redeploy" failure. It is a
+# clean no-op when TELEGRAM_BOT_TOKEN / BACKEND_PUBLIC_URL are unset, so it's
+# always safe to start.
+@app.on_event("startup")
+async def _start_telegram_supervisor():
+    try:
+        from app.services.telegram_service import telegram_webhook_supervisor_loop
+
+        app.state.tg_webhook_stop = asyncio.Event()
+        app.state.tg_webhook_task = asyncio.create_task(
+            telegram_webhook_supervisor_loop(app.state.tg_webhook_stop)
+        )
+        logger.info("📡 Telegram webhook self-heal supervisor started")
+    except Exception as exc:
+        logger.warning("Telegram webhook supervisor failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_telegram_supervisor():
+    try:
+        stop = getattr(app.state, "tg_webhook_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "tg_webhook_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("Telegram webhook supervisor shutdown: %s", exc)
 
 # auth_google.router is INTENTIONALLY UNMOUNTED. The OAuth flow lives in
 # app/routes/auth_google.py and depends on the GOOGLE_CLIENT_ID /

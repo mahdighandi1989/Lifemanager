@@ -184,6 +184,24 @@ read-mark action lives at `PATCH /notifications/{notification_id}/read`.
 | GET | `/notifications/status` | Delivery counts (sent/failed/pending) |
 | GET | `/api/notifications/status` | Same shape; absolute-path mount |
 
+### Telegram bot (`/api/telegram`) — bidirectional
+
+Two-way bot: outbound critical-event notifications + inbound commands/buttons.
+Configured via env (`TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` / `BACKEND_PUBLIC_URL`);
+unset ⇒ clean no-op. The webhook ALWAYS returns 200 so Telegram never retry-storms,
+and a startup supervisor re-registers the webhook when it drifts after a redeploy.
+In-chat commands: `/start` `/help` `/menu` `/ping` `/diag` `/status` `/tasks` `/today`
+`/new_task <title?>` `/cancel`; inline callbacks `task:done:<id>`, `menu:tasks|status|new_task`.
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/telegram/webhook` | Telegram posts updates here (always 200) |
+| POST | `/api/telegram/set-webhook` | Register webhook (auto-builds URL when body omits it) |
+| POST | `/api/telegram/delete-webhook` | Unregister webhook |
+| POST | `/api/telegram/heal-webhook` | Run one self-heal cycle (idempotent) |
+| GET | `/api/telegram/status` | Config + webhook diagnostics (never returns the token) |
+| POST | `/api/telegram/test` | Send a test message to the configured chat |
+
 ### Users (`/users`)
 
 | Method | Path | Notes |

@@ -826,27 +826,36 @@ def send_telegram(*, body: str, chat_id: Optional[str] = None) -> bool:
     test (no token set) it logs and returns ``True`` so the call site is
     exercised without a real bot — exactly the seam the verify_failed
     fan-out needs. With a token it POSTs to the Bot API ``sendMessage``.
+
+    Single transport: this delegates to ``telegram_service.send_message_sync``
+    so the critical-event fan-out and the bidirectional bot share ONE Bot-API
+    call (config, no-op-without-token, error handling). Behaviour is unchanged.
+    A defensive fallback keeps the old inline implementation if the new module
+    can't be imported (e.g. partial deploy).
     """
-    import os
-
-    token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    target = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
-    if not token:
-        logger.info("send_telegram (no TELEGRAM_BOT_TOKEN): chat=%s body=%r", target, body[:80])
-        return True
-
     try:
-        import httpx
+        from app.services.telegram_service import send_message_sync
 
-        with httpx.Client(timeout=15.0) as client:
-            r = client.post(
-                f"https://api.telegram.org/bot{token}/sendMessage",
-                json={"chat_id": target, "text": body},
-            )
-            return 200 <= r.status_code < 300
-    except Exception as exc:
-        logger.warning("send_telegram failed: %r", exc)
-        return False
+        return send_message_sync(body=body, chat_id=chat_id)
+    except Exception as exc:  # pragma: no cover — import/transport fallback
+        logger.warning("send_telegram delegate failed, using inline fallback: %r", exc)
+        token = os.environ.get("TELEGRAM_BOT_TOKEN")
+        target = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+        if not token:
+            logger.info("send_telegram (no TELEGRAM_BOT_TOKEN): chat=%s body=%r", target, body[:80])
+            return True
+        try:
+            import httpx
+
+            with httpx.Client(timeout=15.0) as client:
+                r = client.post(
+                    f"https://api.telegram.org/bot{token}/sendMessage",
+                    json={"chat_id": target, "text": body},
+                )
+                return 200 <= r.status_code < 300
+        except Exception as exc2:
+            logger.warning("send_telegram failed: %r", exc2)
+            return False
 
 
 def schedule_notification(

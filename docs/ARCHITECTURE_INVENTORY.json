@@ -1339,20 +1339,48 @@
         "file": "frontend/src/pages/AISettings.jsx"
       },
       {
+        "name": "AdminUsers",
+        "file": "frontend/src/pages/AdminUsers.jsx"
+      },
+      {
         "name": "AssetsPage",
         "file": "frontend/src/pages/AssetsPage.jsx"
+      },
+      {
+        "name": "AssistantHub",
+        "file": "frontend/src/pages/AssistantHub.jsx"
       },
       {
         "name": "BudgetPage",
         "file": "frontend/src/pages/BudgetPage.jsx"
       },
       {
+        "name": "CareerPlanningPage",
+        "file": "frontend/src/pages/CareerPlanningPage.jsx"
+      },
+      {
         "name": "Dashboard",
         "file": "frontend/src/pages/Dashboard.jsx"
       },
       {
+        "name": "DataHub",
+        "file": "frontend/src/pages/DataHub.jsx"
+      },
+      {
+        "name": "DriveFiles",
+        "file": "frontend/src/pages/DriveFiles.jsx"
+      },
+      {
+        "name": "DriveSettings",
+        "file": "frontend/src/pages/DriveSettings.jsx"
+      },
+      {
         "name": "ExternalProjects",
         "file": "frontend/src/pages/ExternalProjects.jsx"
+      },
+      {
+        "name": "FinanceHub",
+        "file": "frontend/src/pages/FinanceHub.jsx"
       },
       {
         "name": "Home",
@@ -1361,6 +1389,10 @@
       {
         "name": "Home.test",
         "file": "frontend/src/pages/__tests__/Home.test.jsx"
+      },
+      {
+        "name": "Import",
+        "file": "frontend/src/pages/Import.jsx"
       },
       {
         "name": "ListDetail",
@@ -1391,12 +1423,32 @@
         "file": "frontend/src/pages/PeopleProfiles.jsx"
       },
       {
+        "name": "PersonProfilePage",
+        "file": "frontend/src/pages/PersonProfilePage.jsx"
+      },
+      {
+        "name": "PersonalityProfilePage",
+        "file": "frontend/src/pages/PersonalityProfilePage.jsx"
+      },
+      {
         "name": "Projects",
         "file": "frontend/src/pages/Projects.jsx"
       },
       {
+        "name": "ProjectsHub",
+        "file": "frontend/src/pages/ProjectsHub.jsx"
+      },
+      {
+        "name": "Recommendations",
+        "file": "frontend/src/pages/Recommendations.jsx"
+      },
+      {
         "name": "Register",
         "file": "frontend/src/pages/Register.jsx"
+      },
+      {
+        "name": "Settings",
+        "file": "frontend/src/pages/Settings.jsx"
       },
       {
         "name": "SmartAssistant",
@@ -1407,28 +1459,8 @@
         "file": "frontend/src/pages/Tasks.jsx"
       },
       {
-        "name": "Settings",
-        "file": "frontend/src/pages/Settings.jsx"
-      },
-      {
-        "name": "Recommendations",
-        "file": "frontend/src/pages/Recommendations.jsx"
-      },
-      {
-        "name": "PersonalityProfilePage",
-        "file": "frontend/src/pages/PersonalityProfilePage.jsx"
-      },
-      {
-        "name": "CareerPlanningPage",
-        "file": "frontend/src/pages/CareerPlanningPage.jsx"
-      },
-      {
-        "name": "DriveFiles",
-        "file": "frontend/src/pages/DriveFiles.jsx"
-      },
-      {
-        "name": "PersonProfilePage",
-        "file": "frontend/src/pages/PersonProfilePage.jsx"
+        "name": "TelegramSettings",
+        "file": "frontend/src/pages/TelegramSettings.jsx"
       }
     ],
     "components": [

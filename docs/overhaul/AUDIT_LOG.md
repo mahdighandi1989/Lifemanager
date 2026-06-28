@@ -302,3 +302,57 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   −1 from baseline)**; new `tests/test_drive_connection.py` 10/10; `npm run build` clean; frontend
   `DriveSettings.test.jsx` 2/2 + `drive_files.test.jsx` 2/2 green, full vitest 11 pre-existing failed
   (0 new); ruff clean on all new/changed files.
+
+## 2026-06-28 — Bidirectional Telegram bot (send + receive + self-heal), modelled on PROJECT-MANAGEMENT
+
+- **DECISION** Owner asked to port PROJECT-MANAGEMENT's *complete two-way* Telegram bot into
+  lifemanager and **sync it** with what already existed. The repo already had **one-way** outbound
+  only: `notification_service.send_telegram(*, body, chat_id=None)` (a fire-and-forget `sendMessage`
+  used by the `verify_failed`/`budget_alert` fan-out). The reference bot's `notification_service.py`
+  is 8.3k lines of oversight-specific machinery; we extracted only the **reusable bidirectional core**
+  and re-implemented it natively for lifemanager's domain (tasks/notifications), using `httpx`
+  (lifemanager convention) not `aiohttp`. Behaviour-preserving: the old send path is unchanged.
+- **CHANGE (core service)** New `app/services/telegram_service.py` — `TelegramBot` (async `httpx`
+  client): `send` (Markdown + no-parse-mode retry + 429 `retry_after` absorb), class-level per-chat
+  flood throttle (≥1.1s/chat + global pause), `send_with_reply_keyboard`, `answer_callback`,
+  `set_webhook`/`delete_webhook`/`get_webhook_info`. Inbound `handle_update` dispatches
+  `callback_query` then `message.text`, maps persistent-keyboard captions → commands
+  (`TEXT_ALIASES`), and **security-gates on `TELEGRAM_CHAT_ID`**. Commands: `/start` `/help`
+  (persistent keyboard), `/menu` (inline), `/ping`, `/diag` (chat id + webhook info), `/status`
+  (notification counts + open-task count), `/tasks` `/today` (open tasks with «✅ انجام شد» inline
+  buttons), `/new_task <title?>` (inline title creates immediately; bare starts an awaiting-title
+  flow), `/cancel`. Callbacks: `task:done:<id>`, `menu:tasks|status|new_task`. DB work uses its own
+  `SessionLocal` session scoped to `TELEGRAM_TASK_USER_ID` (default 0, anon bucket — mirrors
+  `FINANCE_INGEST_USER_ID`). **Self-heal**: `telegram_webhook_heal_once` + `telegram_webhook_supervisor_loop`
+  re-register the webhook when Telegram's recorded URL drifts from `{BACKEND_PUBLIC_URL}/api/telegram/webhook`
+  or the pending queue exceeds 100. The whole module fail-opens: unset token ⇒ logged no-op.
+- **CHANGE (sync — single transport)** `notification_service.send_telegram` now **delegates** to
+  `telegram_service.send_message_sync` (the one `sendMessage` seam) so the critical-event fan-out and
+  the bidirectional bot share identical config + no-op-without-token behaviour. Signature + dev no-op
+  contract preserved; a defensive inline fallback keeps it working if the new module can't import.
+- **CHANGE (routes)** New `app/routes/telegram.py` (absolute `/api/telegram/...`, no prefix, mirrors
+  `webhook`/`notifications.api_router`): `POST /webhook` (ALWAYS returns 200 so Telegram never
+  retry-storms), `POST /set-webhook` (auto-builds URL from `BACKEND_PUBLIC_URL` when body omits it),
+  `POST /delete-webhook`, `POST /heal-webhook`, `GET /status` (config + webhook diag, **never** the
+  token), `POST /test`. Registered in `app/main.py`; supervisor started/stopped via a dedicated
+  `@app.on_event("startup"|"shutdown")` pair (isolated + reversible).
+- **CHANGE (frontend)** New `frontend/src/pages/TelegramSettings.jsx` (RTL): status grid + «ثبت
+  webhook / ترمیم webhook / ارسال پیام تست / حذف webhook» + a one-time setup note. Added as a
+  «تلگرام» tab in `Settings.jsx`.
+- **Dependencies synced (4 directions):** upstream — `httpx` (already pinned), `Task`/`TaskStatus`,
+  `NotificationService.get_delivery_status`, `SessionLocal`. downstream — `send_telegram` delegation,
+  `TelegramSettings.jsx`, `Settings.jsx` tab, `main.py` router + supervisor. db — NONE (reads/writes
+  the existing `tasks`/`notifications` tables; no new table/column, no migration). env — documented
+  `BACKEND_PUBLIC_URL`, `TELEGRAM_TASK_USER_ID`, `TELEGRAM_APP_BASE_URL` in `.env.example` and
+  expanded the `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` note for the bidirectional flow.
+- **FIX (bonus, pre-existing)** `test_inventory_lists_all_frontend_pages` was red — 7 pages
+  (AdminUsers, AssistantHub, DataHub, DriveSettings, FinanceHub, Import, ProjectsHub) plus the new
+  TelegramSettings were missing from `docs/ARCHITECTURE_INVENTORY.json`. Reconciled all 8; the test
+  is now green (−1 from the 14-failure baseline).
+- **VERIFY** new `tests/test_telegram_bot.py` 24/24 green; existing `test_verify_failed_notification.py`
+  6/6 still green (delegation didn't break the fan-out); `inventory_json` 5/5; backend full suite
+  **986 passed / 13 pre-existing failed (0 new; −1 from baseline via the inventory fix)** — the 13 are
+  the known auth/env-gated failures (`test_auth_required_user_id_*`, `test_lint`, `*mutations_require_authentication`,
+  …) present on a clean tree before this change. `npm run build` clean; frontend `Settings.test.jsx` 3/3.
+- **TODO (owner — see chat summary)** set `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` + `BACKEND_PUBLIC_URL`
+  on Render, then open Settings → «تلگرام» → «ثبت webhook» (or just wait one self-heal cycle).

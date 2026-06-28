@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AISettings from './AISettings';
 import Notifications from './Notifications';
 import DriveSettings from './DriveSettings';
+import TelegramSettings from './TelegramSettings';
 
 // Settings is a tabbed shell consolidating the app's configuration:
 //   • هوش مصنوعی  → the AI catalog (AISettings) + the global analysis prompt
@@ -21,6 +22,7 @@ import DriveSettings from './DriveSettings';
 const TABS = [
   { id: 'ai', label: 'هوش مصنوعی' },
   { id: 'notifications', label: 'اعلان‌ها' },
+  { id: 'telegram', label: 'تلگرام' },
   { id: 'drive', label: 'گوگل درایو' },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
@@ -66,6 +68,7 @@ function Settings() {
         <div data-testid={`settings-panel-${tab}`}>
           {tab === 'ai' && <AISettings embedded />}
           {tab === 'notifications' && <Notifications embedded />}
+          {tab === 'telegram' && <TelegramSettings embedded />}
           {tab === 'drive' && <DriveSettings embedded />}
         </div>
       </div>
