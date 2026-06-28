@@ -400,3 +400,38 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   preserve the fan-out); backend full suite **1001 passed / 13 pre-existing failed (0 new)**; ruff
   clean on all new/changed files; `npm run build` clean; `Settings.test.jsx` 3/3.
 - **EXPERIENCE** recorded `experiences/notification-channel-event-preferences.md`.
+
+## 2026-06-28 — Tiered-storage task 7367c6f0 re-audit: complete AC5 (download Drive bytes)
+
+- **REVIEW** Owner resent the original tiered-storage spec (Drive/Sheets as the cold store, audit
+  task 7367c6f0). Verified every AC against the actual repo (paths in the auto-generated prompt
+  used a `backend/app/...` layout that does not match lifemanager's `app/...`; mapped by behaviour,
+  not filename):
+  - **AC1** ✓ `google_drive_service.upload_file` returns a shareable link (real client now wired).
+  - **AC2** ✓ `sheets_service.append_index_row`/`record_index_entry` → `LifeManagerIndex` (real
+    `GoogleSheetsClient` find-or-creates the sheet).
+  - **AC3** ✓ `DriveFile` (lifemanager's FileRecord) has storage_location/drive_file_id/drive_link/
+    extracted_text (+ storage_tier/last_accessed_at/migrated_at).
+  - **AC4** ✓ `cold_tiering_service` 30-day policy + Celery `tier-cold-data-daily`, real mover wired.
+  - **AC6** ✓ audio/image text extracted into `extracted_text` on upload.
+  - **AC7** ✓ `LifeManagerData` root + audio/images/documents/migrated_data subfolders (`ensure_app_folders`).
+  - **AC8** ✓ frontend badge + download link (`DriveFiles.jsx`); + upload control (added earlier today).
+  Did NOT rebuild any of the above — they were already implemented (prior 7367c6f0 work + today's
+  Drive connection integration).
+- **FINDING (the one real gap)** **AC5** ("باید بتونم فراخوانیش کنم و ببینمش") was only partially
+  met: `GET /api/files/{id}` and `/raw` returned the Drive *link*, never streamed the bytes through
+  the app, and the `google_drive_service.download_file` seam (+ `GoogleDriveClient.download`) was
+  unused by any route — a dangling downstream dependency.
+- **CHANGE (additive — completes AC5)** `app/routes/files.py`: new `GET /api/files/{id}/download`
+  that, for a Drive-tiered file, streams the REAL bytes from Google Drive via the `download_file`
+  seam when connected; degrades to a 302 to the share link when Drive is offline; and for a local
+  file returns its extracted-text body. The existing `/api/files/{id}` + `/raw` routes are untouched
+  (behaviour-preserving; their tests stay green).
+- **Dependencies synced (4 directions):** upstream — `download_file` seam, `build_drive_client`,
+  `drive_settings_service`, `DriveFile`. downstream — none broke (new route is additive; existing
+  files/raw routes + `drive_files.test.jsx` href contract untouched). cross-tier backend→frontend —
+  none required (the UI's existing `drive_link` download still works for the owner; the new streaming
+  route is available for clients that prefer app-proxied download). db — NONE (no schema change).
+  infra/env — none. side — AUDIT_LOG + experiences Update. **No Manual-required part → no TO-DO file.**
+- **VERIFY** backend full suite **964 passed / 14 pre-existing failed (0 new)**; Drive suite 26/26
+  (incl. 3 new download tests); `npm run build` clean; ruff clean on changed files.

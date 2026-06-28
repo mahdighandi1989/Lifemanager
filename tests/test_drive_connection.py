@@ -223,3 +223,59 @@ def test_drive_upload_file_stores_local_when_offline(api_client):
 
     listing = api_client.get("/api/drive/files").json()
     assert any(f["filename"] == "note.txt" for f in listing)
+
+
+# ── AC5: actually download bytes through the app ─────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_download_file_seam_returns_bytes_with_stub_client():
+    """google_drive_service.download_file hands back whatever the client yields
+    — the seam the /download route uses to stream real Drive bytes."""
+    from app.services import google_drive_service
+
+    class StubDownloadClient:
+        async def download(self, drive_file_id):
+            assert drive_file_id == "abc"
+            return b"the-bytes"
+
+    data = await google_drive_service.download_file(
+        refresh_token="tok", drive_file_id="abc", client=StubDownloadClient()
+    )
+    assert data == b"the-bytes"
+
+
+@pytest.mark.asyncio
+async def test_download_route_redirects_to_link_when_drive_offline(db_session):
+    """A Drive-tiered file, with Drive NOT connected, degrades to a 302 to the
+    share link so the capability still works."""
+    from starlette.responses import RedirectResponse
+
+    from app.models.drive_file import DriveFile
+    from app.routes.files import download_file
+
+    row = DriveFile(
+        user_id=0,
+        filename="r.pdf",
+        storage_location="drive",
+        drive_file_id="x",
+        drive_link="https://drive.google.com/file/d/x/view",
+    )
+    db_session.add(row)
+    await db_session.commit()
+    await db_session.refresh(row)
+
+    resp = await download_file(file_id=row.id, db=db_session, user_id=0)
+    assert isinstance(resp, RedirectResponse)
+    assert "drive.google.com" in resp.headers["location"]
+
+
+def test_download_route_local_returns_text(api_client):
+    """A local file (no raw bytes stored) downloads as its extracted-text body."""
+    up = api_client.post(
+        "/api/drive/upload-file", files={"file": ("memo.txt", b"hi", "text/plain")}
+    )
+    fid = up.json()["id"]
+    resp = api_client.get(f"/api/files/{fid}/download")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("text/plain")

@@ -170,3 +170,29 @@ Dropbox, Box, OneDrive…):
   `app/routes/auth_google.py`, `app/routes/drive.py`, `frontend/src/pages/DriveSettings.jsx`).
 - Related: [google-oauth-login], [pluggable-ai-provider-catalog-and-router]
   (same injected-client seam pattern).
+
+## Update 2026-06-28 — serving cloud bytes back through the app (download)
+
+When a "download my file" endpoint sits in front of cloud-stored blobs, return
+the bytes through the app with a **graceful 3-way fallback**, not a single path:
+
+1. **Connected → stream the real bytes.** Fetch via the injected client and wrap
+   in a streaming response with `Content-Disposition: attachment; filename=...`
+   and the stored mime type. This works even when the cloud share link isn't
+   public (least-privilege scopes like `drive.file` create non-public files).
+2. **Not connected but a share link exists → 302 redirect** to the link, so the
+   capability degrades instead of 500-ing.
+3. **No cloud copy (local/metadata-only) → return the local representation**
+   (e.g. the extracted text) as the body.
+
+Keep this as an **additive** route (`/files/{id}/download`) alongside any
+existing metadata/link endpoints — don't change the old ones, so their consumers
+and tests stay green (behaviour-preserving). This is also how you finally
+exercise a `download()` seam that was built but left unused by any route — a
+dangling downstream dependency is a real gap even when "the feature looks done".
+
+Process note: when re-auditing a "looks already built" task, map each acceptance
+criterion to **behaviour** in the real tree (auto-generated specs often cite a
+different directory layout, e.g. `backend/app/...` vs `app/...`). Most ACs were
+already met; the value was finding the **one** that wasn't (bytes never streamed)
+rather than rebuilding the rest.
