@@ -514,3 +514,31 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **VERIFY** backend full suite **1012 passed / 13 pre-existing failed (0 new)**; new
   tests/test_context_reco_completion.py 8/8 + existing context/celery/location suites green;
   `npm run build` clean; ruff clean on all changed files.
+
+## 2026-06-28 — FIX: Claude subscription (OAuth token) test → 401 Unauthorized
+
+- **FINDING** Owner tested the "Claude (اشتراک · OAuth token)" provider (Claude Opus 4.8) on the AI
+  settings page and got `HTTPStatusError: 401 Unauthorized for url 'https://api.anthropic.com/v1/messages'`.
+  Root cause: a Claude Pro/Max **OAuth** token is only accepted on `/v1/messages` when the request
+  carries `anthropic-beta: oauth-2025-04-20` (alongside `Authorization: Bearer …` and the Claude-Code
+  system spoof). The code set the Bearer header + the system spoof but **omitted the oauth beta
+  header**, so Anthropic rejected the subscription token with 401. The API-key path (`x-api-key`) was
+  unaffected.
+- **CHANGE** `app/services/ai/inference_gateway.py`: `_anthropic_text` now adds
+  `anthropic-beta: oauth-2025-04-20` when `auth_scheme == "oauth_bearer"`; `_anthropic_multimodal`
+  combines it with the existing pdfs beta (`oauth-2025-04-20,pdfs-2024-09-25`).
+  `app/services/ai/catalog_tester.py::_list_models` adds the same beta to the model-discovery GET
+  (`/v1/models`) so "دریافت مدل‌ها" works for the subscription provider too. API-key callers unchanged.
+- **Dependencies synced (4 directions):** upstream — `ResolvedModel.auth_scheme`, `CLAUDE_CODE_SYSTEM`,
+  the `claude_subscription` provider (auth_scheme=oauth_bearer, env_key=CLAUDE_CODE_OAUTH_TOKEN).
+  downstream — both Anthropic text/multimodal callers + the tester ping/discovery; new
+  `tests/test_anthropic_oauth_header.py` (oauth beta+bearer present, api-key path unchanged). db/env —
+  NONE. cross-tier — none (the frontend test button + AISettings consume the same `/ai/models/{id}/test`
+  contract, now returning OK instead of 401 when the token is valid). side — AUDIT_LOG + experiences.
+  **No Manual-required code part → no TO-DO** (the operator still supplies a valid, non-expired token).
+- **NOTE (operator)** Subscription OAuth access tokens are short-lived (~hours) and must be a real
+  Claude-Code OAuth token (starts `sk-ant-oat01-…`, via `claude setup-token`). If 401 persists after
+  this fix, the stored token is invalid/expired — regenerate and paste it again, or use a normal
+  `sk-ant-api03-…` API key on the plain "Anthropic" provider instead.
+- **VERIFY** new `tests/test_anthropic_oauth_header.py` 2/2; `tests/test_ai_catalog.py` 7/7; backend
+  full suite **1014 passed / 13 pre-existing failed (0 new)**; `npm run build` clean; ruff clean.

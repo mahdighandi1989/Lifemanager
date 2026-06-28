@@ -132,6 +132,8 @@ async def _list_models(provider: AICatalogProvider, key: str):
             headers = {"anthropic-version": "2023-06-01"}
             if provider.auth_scheme == "oauth_bearer":
                 headers["authorization"] = f"Bearer {key}"
+                # Subscription OAuth tokens require the oauth beta flag, else 401.
+                headers["anthropic-beta"] = "oauth-2025-04-20"
             else:
                 headers["x-api-key"] = key
             resp = await client.get(f"{root}/v1/models?limit=1000", headers=headers)

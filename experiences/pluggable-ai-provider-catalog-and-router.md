@@ -92,3 +92,29 @@ def effective_key(p):                       # DB secret first, env fallback
 ## 🔗 References
 - Source: Lifemanager task — porting ALLIN1's AI settings (docs/overhaul/AUDIT_LOG.md, 2026-06-28).
 - Related: legacy per-user provider system kept (Settings page); see CLAUDE.md rule 2.
+
+## Update 2026-06-28 — subscription OAuth tokens need a beta header, not just a Bearer
+
+When a provider authenticates with a **subscription OAuth token** (e.g. a
+Claude Pro/Max "Claude Code" token) instead of an API key, three things must ALL
+be present on the chat call or the provider returns **401 Unauthorized**:
+
+1. `Authorization: Bearer <oauth_token>` (NOT the api-key header), AND
+2. the provider's OAuth **beta header** — for Anthropic: `anthropic-beta: oauth-2025-04-20`
+   (combine with other betas comma-separated, e.g. `oauth-2025-04-20,pdfs-2024-09-25`), AND
+3. the client "spoof" system block the token is scoped to (Anthropic: a first
+   system block exactly `"You are Claude Code, Anthropic's official CLI for Claude."`).
+
+Pitfall: it's easy to wire (1) and (3) and forget (2) — the request then looks
+right but 401s. Apply the SAME header on every call site for that provider: the
+chat endpoint, the multimodal endpoint, AND the model-discovery (`GET /v1/models`)
+endpoint, or "test"/"sync models" will fail while one path works.
+
+Operator caveat to surface in the UI/docs: subscription OAuth **access** tokens
+are short-lived (hours) and need refreshing; a single pasted access token will
+start 401-ing once expired. Offer a plain API-key provider as the durable path.
+
+How to apply elsewhere: model `auth_scheme` per provider ("api_key" vs
+"oauth_bearer"); branch headers on it in ONE helper reused by every call site;
+add a test that asserts the oauth path sends Bearer + the beta header and that
+the api-key path still uses the key header with NO beta.
