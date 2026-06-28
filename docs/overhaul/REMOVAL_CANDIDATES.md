@@ -17,4 +17,17 @@ how to revive it.
 - **Revive:** set `GOOGLE_CLIENT_ID` (and the related OAuth env vars) — `main.py` mounts it
   automatically.
 
+## Legacy AI provider/model/context config (Settings) — quarantined 2026-06-28
+
+- **Looks redundant:** the new AI catalog (`/ai-settings`, `ai_catalog_*` tables) supersedes the
+  old per-user provider/model management that used to be the whole `/settings` page.
+- **Kept because:** the legacy per-user `AIProvider` / `AIModelConfig` rows still feed the
+  existing analysis pipeline (`app/services/ai/provider_service.resolve_provider_routing`), and
+  the "جعبه پرامپت تحلیل" (global analysis prompt) is a real feature not covered by the catalog.
+- **Where it lives now:** moved out of the default Settings view into the **«پیشرفته (قدیمی)»**
+  tab of the tabbed Settings page (`frontend/src/pages/Settings.jsx` → `LegacyAiSettings`). All
+  endpoints (`/api/ai/providers`, `/api/ai/configs`, `/api/ai/global-prompt`) are unchanged.
+- **Revive/retire:** once the analysis pipeline is migrated to resolve through the new catalog
+  (`ai_manager`), this tab can be retired with owner approval.
+
 <!-- Add new quarantined capabilities below this line. -->

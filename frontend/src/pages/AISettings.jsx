@@ -16,7 +16,7 @@ import AIFeedbackWidget from '../components/AIFeedbackWidget';
 // The legacy per-user provider/config management still lives in Settings.jsx
 // (capability preserved — CLAUDE.md rule 2). Plain fetch + Tailwind, RTL.
 
-function AISettings() {
+function AISettings({ embedded = false }) {
   const { token } = useAuth();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -163,12 +163,16 @@ function AISettings() {
   const enabledModels = (data?.models || []).filter((m) => m.enabled);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="ai-settings-page" dir="rtl">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">تنظیمات هوش مصنوعی</h1>
-        <p className="text-gray-500 mb-4">
-          ارائه‌دهنده را فعال کن، کلیدش را بگذار، اتصال را تست کن و برای هر قابلیت مدل انتخاب کن.
-        </p>
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="ai-settings-page" dir="rtl">
+      <div className={embedded ? '' : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'}>
+        {!embedded && (
+          <>
+            <h1 className="text-3xl font-bold text-gray-900 mb-1">تنظیمات هوش مصنوعی</h1>
+            <p className="text-gray-500 mb-4">
+              ارائه‌دهنده را فعال کن، کلیدش را بگذار، اتصال را تست کن و برای هر قابلیت مدل انتخاب کن.
+            </p>
+          </>
+        )}
 
         {/* Status */}
         {data?.status && (
