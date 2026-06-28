@@ -30,6 +30,7 @@ from app.routes import (
     external_projects,
     files,
     finance,
+    imports,
     integrations,
     interests,
     lists,
@@ -758,6 +759,9 @@ app.include_router(deduplication.router, tags=["deduplication"])
 app.include_router(ai_stream.router, tags=["ai"])
 app.include_router(drive.router, tags=["drive"])
 app.include_router(files.router, tags=["files"])
+# Import feature (spreadsheet bulk + AI document extraction — ALLIN1 port). The
+# router carries its own /api/imports prefix and mounts with no extra prefix.
+app.include_router(imports.router, tags=["imports"])
 app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.

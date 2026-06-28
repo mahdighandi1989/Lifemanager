@@ -70,3 +70,32 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   on the clean baseline (auth-enforcement env tests, ruff lint debt, google-oauth, inventory,
   env-parity; verified via a HEAD worktree). The 2 migration tests I initially broke (new tables
   w/o migration) are fixed. `cd frontend && npm run build` → clean. New files ruff-clean.
+
+## 2026-06-28 — Phase 2: Import feature (spreadsheet bulk + AI document) ported from ALLIN1
+
+- **DECISION** Build a unified **Import** page + `/api/imports` surface modeled on ALLIN1's
+  import (Excel/CSV bulk with dry-run + async AI document extraction). Adapted to Lifemanager's
+  user-scoped, dependency-free targets: **tasks / people / incomes / assets** (Transaction needs
+  an account FK → deferred). Existing JSON list-sync (`/api/lists/sync-from-file`) and finance
+  message-ingest are KEPT (CLAUDE.md rule 2); this is the new unified entry point, not a replacement.
+- **CHANGE** `app/services/import_service.py` — registry-driven engine: `parse_table` (CSV/XLSX
+  [lazy openpyxl]/JSON), `IMPORT_TARGETS` (columns + row→model builder + dedup key per target),
+  `import_rows` core (validate → idempotent dedup by natural key → dry-run or commit →
+  ImportResult), `bulk_import`, and the AI path (`_extract_rows_with_ai` via the AI catalog
+  gateway `complete`/`complete_multimodal`, `parse_model_json`, async `spawn_analyze_job`).
+- **CHANGE** `app/models/import_job.py` (`import_jobs` table) for the async AI path + history;
+  `app/routes/imports.py` (`/api/imports/{targets,{target}/template,{target},ai-models,analyze,
+  jobs,jobs/{id}}`). Registered in `main.py` + `models/__init__.py`; alembic `0032_import_jobs`.
+- **CHANGE** `requirements.txt` += `openpyxl==3.1.5` (lazy-imported; CSV/JSON still work without it).
+- **CHANGE** Frontend `frontend/src/pages/Import.jsx` (mode tabs spreadsheet/AI, target picker,
+  CSV template link, dry-run preview + commit, AI model picker + analyze-with-poll, import
+  history). Wired `/import` route in `App.jsx` + a Sidebar entry ("ایمپورت داده").
+- **CHANGE** New tests `tests/test_imports.py` (10): parse/dry-run/commit/idempotent/row-errors,
+  JSON people import, AI-extraction persistence (monkeypatched model), and endpoint coverage.
+- **NOTE / FOLLOW-UP** The async AI job processes in a background task using `SessionLocal`
+  (production-correct: one DB). In the in-memory test harness the request db ≠ SessionLocal, so
+  end-to-end completion isn't asserted via HTTP — the extraction+persist core is unit-tested
+  directly instead. `docs/ARCHITECTURE_INVENTORY.json` should be regenerated to list the new
+  Import page + endpoints (the inventory test was already failing pre-existing; not regressed).
+- **VERIFY** `python -m pytest tests/ -q` → **944 passed, 15 failed** (same 15 pre-existing; 0 new).
+  `cd frontend && npm run build` → clean. New backend files ruff-clean.

@@ -43,3 +43,8 @@ aiosqlite==0.20.0
 psutil==6.1.0
 google-api-python-client==2.155.0
 google-auth-oauthlib==1.2.1
+
+# Spreadsheet import (Import page / /api/imports). openpyxl reads .xlsx/.xlsm;
+# the import service lazy-imports it so CSV/JSON import still works on a stripped
+# image, and an XLSX upload there returns a clear "use CSV" error instead of 500.
+openpyxl==3.1.5
