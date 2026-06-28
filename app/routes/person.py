@@ -125,6 +125,48 @@ async def list_people_profiles(
     return await person_service.get_all_persons_for_user(db, user_id=user_id)
 
 
+@router.get("/api/people-profiles/summary", tags=["persons"])
+@handle_errors
+async def list_people_profiles_summary(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> List[dict]:
+    """Each tracked person WITH their behavioural-profile summary (ai_score +
+    relationship_type), so the افراد list shows the AI score/relationship at a
+    glance ("یه امتیازی بهش می‌ده") instead of just names. LEFT JOIN so people
+    without a profile yet still appear (score/relationship null). Additive — the
+    plain /api/people-profiles + /api/persons list contracts are unchanged."""
+    from sqlalchemy import select
+
+    from app.models.person import Person
+    from app.models.person_profile import PersonProfile
+
+    rows = (
+        await db.execute(
+            select(Person, PersonProfile)
+            .outerjoin(PersonProfile, PersonProfile.person_id == Person.id)
+            .where(Person.user_id == user_id)
+            .order_by(Person.created_at.desc())
+        )
+    ).all()
+    return [
+        {
+            "id": person.id,
+            "name": person.name,
+            "email": person.email,
+            "phone": person.phone,
+            "ai_score": profile.ai_score if profile is not None else None,
+            "relationship_type": profile.relationship_type if profile is not None else None,
+            "last_analyzed_at": (
+                profile.last_analyzed_at.isoformat()
+                if (profile is not None and profile.last_analyzed_at)
+                else None
+            ),
+        }
+        for person, profile in rows
+    ]
+
+
 @router.post(
     "/api/people-profiles",
     response_model=PersonResponse,

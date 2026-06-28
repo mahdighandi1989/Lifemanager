@@ -16,8 +16,8 @@ vi.mock('../../lib/api', () => ({
       if (url === '/external-projects') {
         return Promise.resolve({ data: [{ id: 1, name: 'Jira A', provider: 'jira', base_url: 'https://x' }] });
       }
-      if (url === '/persons') {
-        return Promise.resolve({ data: [{ id: 1, name: 'Ali', relationship_type: 'close' }] });
+      if (url === '/people-profiles/summary') {
+        return Promise.resolve({ data: [{ id: 1, name: 'Ali', ai_score: 70, relationship_type: 'close' }] });
       }
       return Promise.resolve({ data: [] });
     }),

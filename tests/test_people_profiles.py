@@ -27,6 +27,32 @@ def test_analyze_unknown_person_404(api_client):
     assert resp.status_code == 404
 
 
+def test_people_profiles_summary_includes_score_and_relationship(api_client):
+    """GET /api/people-profiles/summary joins each person with their profile so
+    the list can show ai_score + relationship_type at a glance. A person with no
+    profile yet appears with null score; recording a deed surfaces a real one."""
+    created = api_client.post("/api/people-profiles", json={"name": "Reza"})
+    pid = created.json()["id"]
+
+    summary = api_client.get("/api/people-profiles/summary")
+    assert summary.status_code == 200, summary.text
+    rows = summary.json()
+    assert isinstance(rows, list)
+    me = next(r for r in rows if r["id"] == pid)
+    # contract: the summary row carries the profile fields (null before any data)
+    assert set(me) >= {"id", "name", "ai_score", "relationship_type"}
+    assert me["ai_score"] is None and me["relationship_type"] is None
+
+    # record a good deed → the profile now has a score the list will show
+    deed = api_client.post(f"/api/people/{pid}/profile/deed", json={"kind": "good", "note": "lent money"})
+    assert deed.status_code == 200, deed.text
+
+    after = api_client.get("/api/people-profiles/summary").json()
+    me2 = next(r for r in after if r["id"] == pid)
+    assert me2["ai_score"] is not None
+    assert me2["relationship_type"] in {"close", "regular", "distant", "strained", "neutral"}
+
+
 def test_link_persons_to_task(api_client):
     """AC8 backend: POST /api/tasks/{id}/persons links people via person_tasks,
     idempotently."""

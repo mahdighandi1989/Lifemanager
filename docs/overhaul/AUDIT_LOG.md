@@ -227,3 +227,27 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   authorizes `/api` calls). The axios 401-redirect interceptor is unchanged (genuine-401 only).
 - **VERIFY** `cd frontend && npm run build` clean; AuthContext (12) + Sidebar (3) + hubs (5) green;
   backend `test_jwt_auth_pipeline.py` 14/14. Full vitest: 11 pre-existing failures, 0 new.
+
+## 2026-06-28 — People Profiles (task 3cc09436): surface score/relationship in the list
+
+- **REVIEW** Re-examined the People-Profiles feature (owner resent the old spec, "wasn't satisfied").
+  Found it already thoroughly implemented and meeting every AC: `PersonProfile` model (all fields),
+  service (deeds good/bad + important flag, note tone-analysis, score, relationship, reminders,
+  suggestions, analyze blend), endpoints (`/profile`, `/analyze`, `/note`, `/deed`, `/reminders`,
+  `/suggestions`), the rich `PersonProfilePage`, and the `PeopleProfiles` list with a per-person
+  profile link. Did NOT rebuild any of it.
+- **FINDING (the real gap)** The افراد LIST showed only names: it called `/api/persons` (no profile
+  data), so the AI **score + relationship were never visible at a glance** — contrary to the voice
+  intent ("یه امتیازی بهش می‌ده"). The `relationship_type` badge silently never rendered (undefined).
+- **CHANGE (additive — no contract disruption)** Added `GET /api/people-profiles/summary` (Person
+  ⟕ PersonProfile, user-scoped) returning each person + `ai_score`/`relationship_type`/`last_analyzed_at`.
+  The existing `/api/people-profiles` + `/api/persons` list contracts are unchanged. `PeopleProfiles.jsx`
+  now consumes `/summary` and shows the score (subtitle) + a Persian relationship badge
+  (نزدیک/معمولی/دور/پرتنش/خنثی) per person, keeping the profile link.
+- **Dependencies synced:** upstream — PersonProfile/Person models, score_from_deeds buckets,
+  get_optional_user_id; downstream — `PeopleProfiles.jsx`, `person_profile.test.jsx`, `NewPages.test.jsx`
+  (mock key `/persons`→`/people-profiles/summary`), `tests/test_people_profiles.py` (+summary test);
+  cross-tier backend→frontend — new GET consumed by the list page; backend→db — NONE (LEFT JOIN on
+  existing tables, no migration); infra/env — none. No Manual-required part → no TO-DO file.
+- **VERIFY** backend `tests/test_people_profiles.py` 6/6 + full suite **950 passed / 15 pre-existing
+  failed (0 new)**; `npm run build` clean; person_profile + NewPages **6/6**; ruff clean.

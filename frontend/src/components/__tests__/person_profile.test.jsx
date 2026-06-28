@@ -60,9 +60,10 @@ describe('PersonProfilePage (task 3cc09436 AC4/AC6)', () => {
   });
 });
 
-describe('PeopleProfiles profile link (task 3cc09436 AC5)', () => {
-  test('each person links to their profile page', async () => {
-    get.mockResolvedValue({ data: [{ id: 42, name: 'Ali', relationship_type: 'close' }] });
+describe('PeopleProfiles list (task 3cc09436 AC5 + at-a-glance score)', () => {
+  test('each person links to their profile and shows score + relationship', async () => {
+    // /people-profiles/summary returns persons joined with their profile.
+    get.mockResolvedValue({ data: [{ id: 42, name: 'Ali', ai_score: 70, relationship_type: 'close' }] });
     render(
       <MemoryRouter>
         <PeopleProfiles />
@@ -71,5 +72,8 @@ describe('PeopleProfiles profile link (task 3cc09436 AC5)', () => {
     await waitFor(() =>
       expect(screen.getByTestId('person-profile-link-42')).toHaveAttribute('href', '/people/42/profile'),
     );
+    // the AI score + relationship (Persian label) are surfaced in the list
+    expect(screen.getByTestId('person-score-42')).toHaveTextContent('70');
+    expect(screen.getByTestId('person-rel-42')).toHaveTextContent('نزدیک');
   });
 });

@@ -11,6 +11,17 @@ const REL_COLORS = {
   close: 'bg-green-100 text-green-700',
   regular: 'bg-blue-100 text-blue-700',
   distant: 'bg-gray-100 text-gray-600',
+  strained: 'bg-red-100 text-red-700',
+  neutral: 'bg-gray-100 text-gray-600',
+};
+// Persian labels for the relationship buckets the scorer produces
+// (app/services/ai/person_behavior.py).
+const REL_LABELS = {
+  close: 'نزدیک',
+  regular: 'معمولی',
+  distant: 'دور',
+  strained: 'پرتنش',
+  neutral: 'خنثی',
 };
 
 function PeopleProfiles() {
@@ -21,7 +32,10 @@ function PeopleProfiles() {
   useEffect(() => {
     let active = true;
     api
-      .get('/persons')
+      // /people-profiles/summary joins each person with their behavioural
+      // profile (ai_score + relationship_type) so the list shows them at a
+      // glance; falls back gracefully to names for people without a profile.
+      .get('/people-profiles/summary')
       .then((res) => active && setPeople(Array.isArray(res.data) ? res.data : []))
       .catch((e) => active && setError('خطا در دریافت افراد: ' + (e.message || '')))
       .finally(() => active && setLoading(false));
@@ -59,19 +73,22 @@ function PeopleProfiles() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{person.name}</h3>
-                    {person.relationship_type && (
-                      <p className="text-sm text-gray-500 mt-0.5">{person.relationship_type}</p>
+                    {person.ai_score != null && (
+                      <p data-testid={`person-score-${person.id}`} className="text-sm text-gray-500 mt-0.5">
+                        امتیاز: {person.ai_score}
+                      </p>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   {person.relationship_type && (
                     <span
+                      data-testid={`person-rel-${person.id}`}
                       className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                         REL_COLORS[person.relationship_type] || 'bg-gray-100 text-gray-600'
                       }`}
                     >
-                      {person.relationship_type}
+                      {REL_LABELS[person.relationship_type] || person.relationship_type}
                     </span>
                   )}
                   <Link
