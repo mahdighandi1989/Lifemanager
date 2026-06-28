@@ -99,3 +99,32 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   Import page + endpoints (the inventory test was already failing pre-existing; not regressed).
 - **VERIFY** `python -m pytest tests/ -q` → **944 passed, 15 failed** (same 15 pre-existing; 0 new).
   `cd frontend && npm run build` → clean. New backend files ruff-clean.
+
+## 2026-06-28 — Settings IA: consolidate AI + Notifications into a tabbed Settings page
+
+- **DECISION** Owner feedback (on the live site): the `/settings` page's older AI options feel
+  redundant now, and Notifications should live under Settings too. Consolidate Settings into a
+  **tabbed** shell rather than scattering AI config across pages.
+- **CHANGE** `frontend/src/pages/Settings.jsx` rewritten as a tabbed shell with three tabs:
+  **هوش مصنوعی** (renders the new `<AISettings/>` catalog), **اعلان‌ها** (renders
+  `<Notifications/>`), **پیشرفته (قدیمی)** (the previous Settings body — legacy provider/model/
+  context + the editable analysis prompt). Initial tab derived from the URL
+  (`/settings/ai-models`→ai, `/settings/notifications`→notifications, `?tab=`), read via
+  `window.location` so the component renders router-free in unit tests.
+- **CHANGE** `AISettings.jsx` and `Notifications.jsx` gained an `embedded` prop that drops the
+  full-page `min-h-screen` chrome + duplicate `<h1>` when hosted inside a Settings tab; both
+  still work standalone at `/ai-settings` and `/notifications` (capability preserved).
+- **CHANGE** `App.jsx`: `/settings/notifications` now renders `<Settings/>` (opens the
+  Notifications tab) instead of `<Notifications/>` directly; `/settings/ai-models` already → Settings.
+  Sidebar links left unchanged (standalone pages still reachable).
+- **DECISION (quarantine, not delete — rule 2)** The legacy AI provider/model/context config is
+  NOT removed: it still feeds the existing analysis pipeline (`provider_service` reads the
+  per-user `AIProvider`) and owns the global analysis prompt. It's moved out of the default view
+  into the "پیشرفته (قدیمی)" tab, with an in-UI note pointing to the new AI tab. Logged in
+  `REMOVAL_CANDIDATES.md`.
+- **CHANGE** `Settings.test.jsx` updated to the tabbed structure (switches to the Advanced tab
+  for the legacy assertions; adds tab-switching coverage).
+- **VERIFY** `cd frontend && npm run build` → clean. `npx vitest run` → **88 passed, 11 failed**;
+  the 11 are PRE-EXISTING (jsdom `window.location`/navigation limitations — confirmed identical
+  with this round's edits stashed: 87 passed/11 failed). Settings + AISettings suites: 12/12 green.
+  Verified visually in a real browser (all three tabs render embedded correctly). Backend untouched.

@@ -134,7 +134,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <Notifications />
+                      <Settings />
                     </Layout>
                   </ProtectedRoute>
                 }

@@ -127,7 +127,7 @@ function NotificationSettings() {
   );
 }
 
-function Notifications() {
+function Notifications({ embedded = false }) {
   const { token } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -169,11 +169,11 @@ function Notifications() {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="notifications-page">
+      <div className={embedded ? '' : 'max-w-2xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">اعلان‌ها</h1>
+            {!embedded && <h1 className="text-3xl font-bold text-gray-900">اعلان‌ها</h1>}
             <p className="text-gray-500 mt-1">
               {unreadCount > 0 ? `${unreadCount} اعلان خوانده‌نشده` : 'همه اعلان‌ها خوانده شده‌اند'}
             </p>
