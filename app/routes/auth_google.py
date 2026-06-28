@@ -260,9 +260,10 @@ async def google_drive_connect(
     """Start the Drive-connect consent flow (offline access → refresh_token).
 
     Redirects the browser to Google's consent screen with ``access_type=offline``
-    + ``prompt=consent`` (so Google always returns a refresh_token) and a
-    ``drive:`` state nonce stashed in an httponly cookie for CSRF protection.
-    The SPA opens this as a top-level navigation, passing its JWT as ``?token=``.
+    + ``prompt=select_account consent`` (so the user can PICK which Google
+    account to link, and Google always returns a refresh_token) and a ``drive:``
+    state nonce stashed in an httponly cookie for CSRF protection. The SPA opens
+    this as a top-level navigation, passing its JWT as ``?token=``.
     """
     await _require_drive_operator(token, request, db)
 
@@ -286,7 +287,10 @@ async def google_drive_connect(
         "response_type": "code",
         "scope": " ".join(DRIVE_SCOPES),
         "access_type": "offline",
-        "prompt": "consent",
+        # select_account → let the user choose WHICH Google account to connect
+        # (not silently the current browser session); consent → force a
+        # refresh_token even on a re-connect.
+        "prompt": "select_account consent",
         "include_granted_scopes": "true",
         "state": f"{DRIVE_STATE_PREFIX}{nonce}",
     }
