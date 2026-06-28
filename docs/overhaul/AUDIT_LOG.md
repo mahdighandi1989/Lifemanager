@@ -128,3 +128,10 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   the 11 are PRE-EXISTING (jsdom `window.location`/navigation limitations — confirmed identical
   with this round's edits stashed: 87 passed/11 failed). Settings + AISettings suites: 12/12 green.
   Verified visually in a real browser (all three tabs render embedded correctly). Backend untouched.
+- **CHANGE (follow-up)** Decluttered the sidebar: removed the standalone «تنظیمات هوش مصنوعی»
+  and «اعلان‌ها» links now that both are tabs under «تنظیمات». Standalone routes (`/ai-settings`,
+  `/notifications`) + the header notification bell remain (capability preserved). `Sidebar.test`
+  updated. `npm run build` clean; Sidebar suite 3/3.
+- **CHANGE (workflow)** Per the owner's explicit instruction, this work is merged **straight to
+  `main`** (the trading-system pattern) rather than left on the feature branch — the
+  managed-session caveat is overridden by explicit owner permission for this repo.

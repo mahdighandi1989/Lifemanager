@@ -21,12 +21,11 @@ const LINKS = [
     label: 'پروژه‌های خارجی',
     testid: 'sidebar-link-external-projects',
   },
-  {
-    to: '/ai-settings',
-    label: 'تنظیمات هوش مصنوعی',
-    testid: 'sidebar-link-ai-settings',
-  },
   { to: '/import', label: 'ایمپورت داده', testid: 'sidebar-link-import' },
+  // AI settings + notifications are now tabs under /settings (consolidated),
+  // so they no longer get their own sidebar links. The standalone pages
+  // (/ai-settings, /notifications) still exist and the header bell still links
+  // to notifications — capability preserved, nav decluttered.
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings' },
   { to: '/assistant', label: 'پیشنهادات هوشمند', testid: 'sidebar-link-assistant' },
   { to: '/recommendations', label: 'تاریخچه پیشنهادات', testid: 'sidebar-link-recommendations' },
@@ -35,11 +34,6 @@ const LINKS = [
   { to: '/drive-files', label: 'فایل‌های من', testid: 'sidebar-link-drive-files' },
   { to: '/assets', label: 'دارایی‌ها', testid: 'sidebar-link-assets' },
   { to: '/merge', label: 'ادغام تسک‌ها', testid: 'sidebar-link-merge' },
-  {
-    to: '/notifications',
-    label: 'اعلان‌ها',
-    testid: 'sidebar-link-notifications',
-  },
 ];
 
 function Sidebar() {
