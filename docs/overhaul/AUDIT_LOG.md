@@ -134,4 +134,24 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   updated. `npm run build` clean; Sidebar suite 3/3.
 - **CHANGE (workflow)** Per the owner's explicit instruction, this work is merged **straight to
   `main`** (the trading-system pattern) rather than left on the feature branch — the
-  managed-session caveat is overridden by explicit owner permission for this repo.
+  managed-session caveat is overridden by explicit owner permission for this repo. CLAUDE.md
+  updated so merge-to-`main` is the default going forward.
+
+## 2026-06-28 — Settings: retire the legacy "advanced" tab; relocate the analysis prompt
+
+- **FINDING** Grepped consumers of the legacy Settings "advanced" tab: the `AIModelConfig`
+  context knobs (`context_type`/`dynamic_response`/`token_limit`) have **no live readers** in
+  `app/`; the global **analysis prompt** (`/api/ai/global-prompt`) **is** used (`model_service`
+  composes it into analysis; `task_feedback` reads it).
+- **CHANGE** Removed the legacy provider/model/context **UI** and the «پیشرفته (قدیمی)» tab from
+  `Settings.jsx` (owner approval). Settings is now two tabs: «هوش مصنوعی» + «اعلان‌ها».
+- **CHANGE** Relocated the **analysis prompt** (textarea + save/cancel, `/api/ai/global-prompt`)
+  into `AISettings.jsx` (the «هوش مصنوعی» tab) — kept because it's actively used. Loaded via its
+  own effect so a post-mutation refresh never clobbers an in-progress edit.
+- **PRESERVED (rule 2)** The legacy endpoints `/api/ai/providers`, `/api/ai/configs` and the
+  `AIProvider`/`AIModelConfig` models + their rows are untouched — only the UI was dropped.
+  Updated `REMOVAL_CANDIDATES.md` with the retire path (migrate the analysis pipeline to the
+  catalog first).
+- **CHANGE** `Settings.test.jsx` trimmed to the two-tab shell + prompt-relocation check;
+  `AISettings.test.jsx` gained an analysis-prompt load/save test.
+- **VERIFY** `npm run build` clean; Settings + AISettings suites **7/7** green. Backend untouched.

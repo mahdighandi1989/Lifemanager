@@ -24,10 +24,16 @@ how to revive it.
 - **Kept because:** the legacy per-user `AIProvider` / `AIModelConfig` rows still feed the
   existing analysis pipeline (`app/services/ai/provider_service.resolve_provider_routing`), and
   the "جعبه پرامپت تحلیل" (global analysis prompt) is a real feature not covered by the catalog.
-- **Where it lives now:** moved out of the default Settings view into the **«پیشرفته (قدیمی)»**
-  tab of the tabbed Settings page (`frontend/src/pages/Settings.jsx` → `LegacyAiSettings`). All
-  endpoints (`/api/ai/providers`, `/api/ai/configs`, `/api/ai/global-prompt`) are unchanged.
-- **Revive/retire:** once the analysis pipeline is migrated to resolve through the new catalog
-  (`ai_manager`), this tab can be retired with owner approval.
+- **Where it lives now (Update 2026-06-28):** the «پیشرفته (قدیمی)» tab was **retired** (owner
+  approval). The legacy provider/model/context **UI** was removed (the context knobs
+  `context_type`/`dynamic_response`/`token_limit` had **no live consumers** — verified by grep).
+  The one piece that IS used — the global **analysis prompt** (`/api/ai/global-prompt`, read by
+  `model_service` + `task_feedback`) — was **relocated into the «هوش مصنوعی» tab** (AISettings).
+  The legacy **endpoints** `/api/ai/providers` and `/api/ai/configs` (+ the `AIProvider` /
+  `AIModelConfig` models + rows) are **unchanged** — only their UI was dropped; capability and
+  data are preserved.
+- **Revive/retire:** to fully retire the legacy `AIProvider`/`AIModelConfig` system, first migrate
+  the analysis pipeline (`provider_service.resolve_provider_routing`) to resolve through the new
+  catalog (`ai_manager`); then the endpoints can be removed with owner approval.
 
 <!-- Add new quarantined capabilities below this line. -->

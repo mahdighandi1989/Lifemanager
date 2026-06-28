@@ -26,6 +26,10 @@ function AISettings({ embedded = false }) {
   const [tests, setTests] = useState({});               // {modelId: {ok,message,...}}
   const [newModel, setNewModel] = useState({});         // {providerKey: {model_key, display_name}}
   const [busy, setBusy] = useState({});                 // {actionKey: bool}
+  // Global analysis prompt (relocated here from the old Settings "advanced" tab).
+  // It is actively used by the analysis pipeline (model_service / task_feedback).
+  const [prompt, setPrompt] = useState('');
+  const [savedPrompt, setSavedPrompt] = useState('');
 
   const authHeaders = useCallback(
     (extra = {}) => (token ? { Authorization: `Bearer ${token}`, ...extra } : { ...extra }),
@@ -51,6 +55,35 @@ function AISettings({ embedded = false }) {
   }, [authHeaders]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Load the global analysis prompt once (kept separate from load() so a
+  // post-mutation refresh never clobbers an in-progress edit).
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/ai/global-prompt', { headers: authHeaders() });
+        if (res.ok) {
+          const d = await res.json();
+          setPrompt(d.prompt_text || '');
+          setSavedPrompt(d.prompt_text || '');
+        }
+      } catch { /* leave empty on error */ }
+    })();
+  }, [authHeaders]);
+
+  const savePrompt = async () => {
+    try {
+      const res = await fetch('/api/ai/global-prompt', {
+        method: 'PUT', headers: jsonHeaders(), body: JSON.stringify({ prompt_text: prompt }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      setSavedPrompt(d.prompt_text ?? prompt);
+    } catch (e) {
+      setError('خطا در ذخیره پرامپت: ' + e.message);
+    }
+  };
+  const cancelPrompt = () => setPrompt(savedPrompt);
 
   const putProvider = async (key, body) => {
     setBusyFor(`prov-${key}`, true);
@@ -377,6 +410,30 @@ function AISettings({ embedded = false }) {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Global analysis prompt (relocated from the old Settings advanced tab) */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mt-6" data-testid="analysis-prompt-section">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">پرامپت تحلیل</h2>
+          <p className="text-xs text-gray-400 mb-3">
+            دستوری که مدل‌ها هنگام تحلیل داده‌های تو از آن پیروی می‌کنند (در سراسر قابلیت‌های تحلیل استفاده می‌شود).
+          </p>
+          <textarea
+            data-testid="analysis-prompt-textarea"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            rows={6}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            placeholder="پرامپتی که مدل‌ها بر اساس آن داده‌های صفحات شما را تحلیل می‌کنند..."
+          />
+          <div className="flex gap-2 mt-3">
+            <button data-testid="save-prompt-btn" onClick={savePrompt} className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-blue-700">
+              ذخیره
+            </button>
+            <button data-testid="cancel-prompt-btn" onClick={cancelPrompt} className="bg-gray-200 text-gray-700 rounded-lg px-4 py-2 text-sm hover:bg-gray-300">
+              لغو
+            </button>
           </div>
         </section>
       </div>

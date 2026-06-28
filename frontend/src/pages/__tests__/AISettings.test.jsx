@@ -53,6 +53,13 @@ beforeEach(() => {
     if (url === '/api/ai/overview') {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(OVERVIEW) });
     }
+    if (url === '/api/ai/global-prompt') {
+      const isGet = !opts || !opts.method;
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ prompt_text: isGet ? 'INITIAL PROMPT' : 'NEW PROMPT' }),
+      });
+    }
     return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
   });
 });
@@ -97,6 +104,21 @@ describe('AISettings page (ALLIN1 catalog form)', () => {
     await waitFor(() =>
       expect(global.fetch).toHaveBeenCalledWith(
         '/api/ai/routes/chat',
+        expect.objectContaining({ method: 'PUT' }),
+      ),
+    );
+  });
+
+  test('loads the relocated analysis prompt and Save PUTs it', async () => {
+    render(<AISettings />);
+    await waitFor(() =>
+      expect(screen.getByTestId('analysis-prompt-textarea').value).toBe('INITIAL PROMPT'),
+    );
+    fireEvent.change(screen.getByTestId('analysis-prompt-textarea'), { target: { value: 'NEW PROMPT' } });
+    fireEvent.click(screen.getByTestId('save-prompt-btn'));
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/ai/global-prompt',
         expect.objectContaining({ method: 'PUT' }),
       ),
     );
