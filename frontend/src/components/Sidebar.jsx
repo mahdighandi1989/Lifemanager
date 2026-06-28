@@ -26,6 +26,7 @@ const LINKS = [
     label: 'تنظیمات هوش مصنوعی',
     testid: 'sidebar-link-ai-settings',
   },
+  { to: '/import', label: 'ایمپورت داده', testid: 'sidebar-link-import' },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings' },
   { to: '/assistant', label: 'پیشنهادات هوشمند', testid: 'sidebar-link-assistant' },
   { to: '/recommendations', label: 'تاریخچه پیشنهادات', testid: 'sidebar-link-recommendations' },

@@ -18,6 +18,7 @@ from app.database import Base, engine
 from app.rate_limit import limiter
 from app.routes import (
     ai,
+    ai_catalog,
     ai_profile,
     ai_stream,
     assets,
@@ -29,6 +30,7 @@ from app.routes import (
     external_projects,
     files,
     finance,
+    imports,
     integrations,
     interests,
     lists,
@@ -229,6 +231,21 @@ async def startup_event():
         database_available = False
         logger.critical(f"❌ CRITICAL: Database connection failed: {e}")
         logger.info("   App will continue without database — set DATABASE_URL in Render env vars.")
+
+    # Seed the AI catalog (providers/models/task-routes) idempotently — the
+    # "complete AI settings" surface ported from ALLIN1. Safe to run every boot;
+    # creates missing providers (disabled, awaiting a key) + catalog models +
+    # auto routes without clobbering owner-set flags. Swallowed so a DB blip
+    # never crashes startup.
+    try:
+        from app.database import SessionLocal
+        from app.services.ai.catalog import seed_ai_catalog
+
+        async with SessionLocal() as session:
+            summary = await seed_ai_catalog(session)
+            logger.info("AI catalog seed: %s", summary)
+    except Exception as exc:
+        logger.debug("skip AI catalog seed: %s", exc)
 
     # Optional Alembic auto-migration (audit task 3ea5622b): gated by
     # RUN_ALEMBIC_MIGRATIONS_ON_STARTUP + non-production. No-op by default;
@@ -697,6 +714,12 @@ app.include_router(ai.router, tags=["ai"])
 # — the router's own prefix is /ai, mirroring the notifications/users dual
 # mount pattern above (audit task 1a08ded2).
 app.include_router(ai.router, prefix="/api", tags=["ai"])
+# AI catalog (providers/models/task-routes — the "complete AI settings" surface
+# ported from ALLIN1). Same /ai prefix on the router, dual-mounted like ai.router
+# so both /ai/... and the SPA's /api/ai/... resolve. Endpoints are additive and
+# do not collide (method+path) with the legacy provider/config router above.
+app.include_router(ai_catalog.router, tags=["ai-catalog"])
+app.include_router(ai_catalog.router, prefix="/api", tags=["ai-catalog"])
 # Profiling routes (interests/sentiment/personality/holistic/career — audit
 # task 14e65214). Same /ai prefix on the router, dual-mounted like ai.router so
 # both /ai/... and the SPA's /api/ai/... resolve.
@@ -736,6 +759,9 @@ app.include_router(deduplication.router, tags=["deduplication"])
 app.include_router(ai_stream.router, tags=["ai"])
 app.include_router(drive.router, tags=["drive"])
 app.include_router(files.router, tags=["files"])
+# Import feature (spreadsheet bulk + AI document extraction — ALLIN1 port). The
+# router carries its own /api/imports prefix and mounts with no extra prefix.
+app.include_router(imports.router, tags=["imports"])
 app.include_router(external_projects.router)
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.

@@ -6,6 +6,8 @@ before `Base.metadata.create_all()` runs at startup. Tools that do
 """
 from app.models.ai_model_config import AIModelConfig
 from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
+from app.models.ai_catalog import AICatalogModel, AICatalogProvider, AITaskRoute
+from app.models.import_job import ImportJob
 from app.models.analysis_prompt import AnalysisPrompt
 from app.models.external_project import ExternalProject, ExternalProjectConnection
 from app.models.oversight_task import OversightTask
@@ -52,6 +54,10 @@ from app.models.webhook_event import WebhookEvent
 __all__ = [
     "AIModelConfig",
     "AIProvider",
+    "AICatalogProvider",
+    "AICatalogModel",
+    "AITaskRoute",
+    "ImportJob",
     "AnalysisPrompt",
     "ExternalProject",
     "ExternalProjectConnection",

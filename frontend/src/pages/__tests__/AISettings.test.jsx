@@ -7,63 +7,97 @@ vi.mock('../../context/AuthContext', () => ({
 
 import AISettings from '../AISettings';
 
+// The page was upgraded to the ALLIN1-style "complete AI settings" form: one
+// /api/ai/overview call returns providers (catalog), models (with capabilities),
+// task routes, tasks, and capabilities. Provider cards expose enable + key +
+// sync; task routing pins a model per task.
+const OVERVIEW = {
+  providers: [
+    {
+      key: 'anthropic',
+      display_name: 'Anthropic (Claude · API key)',
+      enabled: true,
+      auth_scheme: 'api_key',
+      has_api_key: true,
+      api_key_masked: '••••3ebc',
+      base_url: 'https://api.anthropic.com',
+      env_key: 'ANTHROPIC_API_KEY',
+      recommended: true,
+      configured: true,
+      notes: null,
+    },
+  ],
+  models: [
+    {
+      id: 7,
+      model_key: 'claude-opus-4-8',
+      provider_key: 'anthropic',
+      display_name: 'Claude Opus 4.8',
+      enabled: true,
+      capabilities: ['reasoning', 'documents'],
+      is_custom: false,
+      source: 'catalog',
+    },
+  ],
+  routes: [{ task: 'chat', model_id: null, enabled: true }],
+  tasks: [{ id: 'chat', label: 'گفت‌وگو / دستیار', description: '...', preferred: 'reasoning' }],
+  capabilities: [
+    { id: 'reasoning', label: 'استدلال / Reasoning' },
+    { id: 'documents', label: 'اسناد / PDF' },
+  ],
+  status: { configured_providers: ['anthropic'], usable_model_count: 1, any_available: true },
+};
+
 beforeEach(() => {
-  global.fetch = vi.fn((url) => {
-    if (url === '/api/ai/providers') {
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([{ id: 1, name: 'OpenAI', is_enabled: true }]),
-      });
-    }
-    if (url === '/api/ai/configs') {
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([{ id: 1, name: 'gpt-4o', provider: 'OpenAI' }]),
-      });
+  global.fetch = vi.fn((url, opts) => {
+    if (url === '/api/ai/overview') {
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(OVERVIEW) });
     }
     return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
   });
 });
 
-describe('AISettings page (task 1a08ded2, AC4)', () => {
-  test('renders the providers + models management surface', async () => {
+describe('AISettings page (ALLIN1 catalog form)', () => {
+  test('renders provider cards, models, and task routing from /overview', async () => {
     render(<AISettings />);
     expect(screen.getByTestId('ai-settings-page')).toBeInTheDocument();
-    expect(screen.getByTestId('provider-form')).toBeInTheDocument();
-    expect(screen.getByTestId('model-form')).toBeInTheDocument();
 
-    // Loaded data is rendered into the right lists.
     await waitFor(() =>
-      expect(within(screen.getByTestId('providers-list')).getByText('OpenAI')).toBeInTheDocument(),
+      expect(screen.getByTestId('provider-card-anthropic')).toBeInTheDocument(),
     );
-    expect(within(screen.getByTestId('models-list')).getByText('gpt-4o')).toBeInTheDocument();
+    // model row + a capability chip
+    expect(screen.getByTestId('model-row-7')).toBeInTheDocument();
+    // task routing select for the chat task
+    expect(screen.getByTestId('route-select-chat')).toBeInTheDocument();
+    // status banner reflects availability
+    expect(screen.getByTestId('ai-status')).toBeInTheDocument();
   });
 
-  test('submitting the provider form POSTs to /api/ai/providers', async () => {
+  test('saving a key PUTs to /api/ai/providers/{key}', async () => {
     render(<AISettings />);
-    fireEvent.change(screen.getByTestId('provider-name-input'), {
-      target: { value: 'Anthropic' },
+    await waitFor(() => screen.getByTestId('provider-key-input-anthropic'));
+    fireEvent.change(screen.getByTestId('provider-key-input-anthropic'), {
+      target: { value: 'sk-ant-new' },
     });
-    fireEvent.click(screen.getByTestId('add-provider-btn'));
+    fireEvent.click(screen.getByTestId('provider-save-key-anthropic'));
 
     await waitFor(() =>
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/ai/providers',
-        expect.objectContaining({ method: 'POST' }),
+        '/api/ai/providers/anthropic',
+        expect.objectContaining({ method: 'PUT' }),
       ),
     );
   });
 
-  test('submitting the model form POSTs to /api/ai/configs', async () => {
+  test('changing a task route PUTs to /api/ai/routes/{task}', async () => {
     render(<AISettings />);
-    fireEvent.change(screen.getByTestId('model-name-input'), { target: { value: 'gpt-4o' } });
-    fireEvent.change(screen.getByTestId('model-provider-input'), { target: { value: 'OpenAI' } });
-    fireEvent.click(screen.getByTestId('add-model-btn'));
+    await waitFor(() => screen.getByTestId('route-select-chat'));
+    fireEvent.change(screen.getByTestId('route-select-chat'), { target: { value: '7' } });
 
     await waitFor(() =>
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/ai/configs',
-        expect.objectContaining({ method: 'POST' }),
+        '/api/ai/routes/chat',
+        expect.objectContaining({ method: 'PUT' }),
       ),
     );
   });

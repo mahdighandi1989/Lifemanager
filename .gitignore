@@ -163,3 +163,17 @@ frontend/dist/
 
 # Ensure requirements.txt is NOT ignored
 !requirements.txt
+
+# --- Ephemeral working artifacts (CLAUDE.md / docs workflow) ------------------
+# Scratch decision reports dropped at the repo root; promote keepers into
+# docs/decisions/ as YYYY-MM-DD-<slug>.md (which stay tracked).
+/decision_*.md
+# Owner drops review material into inbox/; contents are ephemeral, the
+# folder READMEs are force-tracked below so the structure persists.
+inbox/*
+!inbox/
+!inbox/**/README.md
+
+# Throwaway local venvs used for verification (not .venv which is already ignored)
+.venv_run/
+.venv_test/

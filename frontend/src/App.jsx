@@ -9,6 +9,7 @@ import { TaskProvider } from './context/TaskContext';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import AISettings from './pages/AISettings';
+import Import from './pages/Import';
 import Settings from './pages/Settings';
 import BudgetPage from './pages/BudgetPage';
 import ExternalProjects from './pages/ExternalProjects';
@@ -144,6 +145,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <AISettings />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/import"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Import />
                     </Layout>
                   </ProtectedRoute>
                 }
