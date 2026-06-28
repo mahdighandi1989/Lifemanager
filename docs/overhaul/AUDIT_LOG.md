@@ -356,3 +356,47 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   …) present on a clean tree before this change. `npm run build` clean; frontend `Settings.test.jsx` 3/3.
 - **TODO (owner — see chat summary)** set `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` + `BACKEND_PUBLIC_URL`
   on Render, then open Settings → «تلگرام» → «ثبت webhook» (or just wait one self-heal cycle).
+
+## 2026-06-28 — Unify notifications + Telegram into one hub; add real notification preferences
+
+- **DECISION** Owner: the «اعلان‌ها» and «تلگرام» settings tabs should be **one** (with room for
+  email later), and — like PROJECT-MANAGEMENT — there should be a way to set **per-event** "send
+  or not / sound or not" and per-channel routing, which this project lacked (the old toggles only
+  wrote `localStorage` and never reached the backend). Built both, behaviour-preserving.
+- **CHANGE (prefs service)** New `app/services/notification_prefs.py`: a JSON blob in the EXISTING
+  `global_settings` table (key `notification_prefs`) — **no new table / no migration**, survives
+  Render's ephemeral FS (a file would not). A process-wide cache (warmed at startup, refreshed on
+  save) backs DB-free predicates `event_enabled` / `event_sound` / `channel_enabled` /
+  `priority_allowed`. `EVENT_CATALOG` (verify_failed, budget_alert, budget_affordable, task_done,
+  recommendation, ai_feedback, login_succeeded — Persian labels + help) and `CHANNEL_CATALOG`
+  (in_app always-on, telegram, email) drive the UI. **Defaults reproduce the prior "always send,
+  always loud, telegram on" behaviour**, so an unconfigured install is unchanged.
+- **CHANGE (notify_event gating)** `app/services/notification_service.py`: `notify_event` now
+  consults prefs — disabled event ⇒ returns None (nothing sent); priority < `min_priority` ⇒ skip;
+  `silent` default changed `False`→`None` so an unset caller resolves silent from the sound pref
+  (explicit `silent=True/False` callers unchanged). Telegram fan-out additionally gated on
+  `channel_enabled("telegram")`; added an **email** fan-out gated on `channel_enabled("email")` +
+  `NOTIFICATION_EMAIL_TO` (via the existing `send_email`). `verify_failed`/`budget_alert` registered
+  with an `email` channel too. All best-effort: a prefs glitch degrades to "send anyway", never blocks.
+- **CHANGE (routes)** `app/routes/notifications.py` (api_router, absolute paths): `GET/PUT
+  /api/notifications/preferences` (load→cache / deep-merged partial save) and `POST
+  /api/notifications/test` (`channel: in_app|telegram|email`). `app/main.py` startup hook warms the
+  prefs cache from `global_settings`.
+- **CHANGE (frontend — the unification)** `Notifications.jsx` rewritten into a **unified hub**:
+  server-backed channel cards (in-app always-on; Telegram master toggle + the embedded
+  `TelegramSettings` webhook panel in a `<details>`; email toggle + SMTP note), a min-priority
+  selector, and a per-event table with **«ارسال» + «صدا»** switches — all persisting via
+  `PUT /api/notifications/preferences` (replaces the localStorage-only toggles). The standalone
+  «تلگرام» tab was **folded into** «اعلان‌ها» (`Settings.jsx`); `TelegramSettings.jsx` is kept and
+  reused as the Telegram channel section (capability preserved, rule 2). The
+  `data-testid="notification-settings"` anchor is retained so `Settings.test.jsx` stays green.
+- **Dependencies synced (4 directions):** upstream — `GlobalSetting`, `NotificationService`,
+  `send_telegram`/`send_email`/`get_telegram_bot`. downstream — `notify_event` gating, the
+  preferences/test routes, `Notifications.jsx`, `Settings.jsx` (tab removed), startup cache warm.
+  db — NONE (reuses `global_settings`; no new table/column/migration). env — documented
+  `NOTIFICATION_EMAIL_TO` in `.env.example`.
+- **VERIFY** new `tests/test_notification_prefs.py` 15/15 (defaults, roundtrip, predicates, the four
+  notify_event gates, routes); existing `test_verify_failed_notification.py` 6/6 still green (defaults
+  preserve the fan-out); backend full suite **1001 passed / 13 pre-existing failed (0 new)**; ruff
+  clean on all new/changed files; `npm run build` clean; `Settings.test.jsx` 3/3.
+- **EXPERIENCE** recorded `experiences/notification-channel-event-preferences.md`.

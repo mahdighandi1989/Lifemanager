@@ -503,7 +503,7 @@ async def notify_event(
     message: Optional[str] = None,
     title: Optional[str] = None,
     priority: str = "normal",
-    silent: bool = False,
+    silent: Optional[bool] = None,
     action_link: Optional[str] = None,
     action_text: Optional[str] = None,
 ) -> Optional[Notification]:
@@ -536,6 +536,30 @@ async def notify_event(
         logger.info("notify_event(%s) rate-limited for user=%s", event, user_id)
         return None
 
+    # Owner preferences (app/services/notification_prefs.py): gate whether this
+    # event sends at all, below-threshold priority, and resolve sound→silent.
+    # Defaults reproduce the prior "always send, always loud" behaviour, so an
+    # unconfigured install is unchanged. Imported lazily + best-effort so a
+    # prefs glitch can never block a critical notification.
+    try:
+        from app.services import notification_prefs as _prefs
+
+        if not _prefs.event_enabled(event):
+            logger.info("notify_event(%s) disabled by prefs for user=%s", event, user_id)
+            return None
+        if not _prefs.priority_allowed(priority):
+            return None
+        if silent is None:
+            silent = not _prefs.event_sound(event)
+        _telegram_channel_on = _prefs.channel_enabled("telegram")
+        _email_channel_on = _prefs.channel_enabled("email")
+    except Exception as exc:
+        logger.debug("notify_event prefs check skipped: %r", exc)
+        if silent is None:
+            silent = False
+        _telegram_channel_on = True
+        _email_channel_on = False
+
     reg = EVENT_REGISTRY.get(event, {})
     if not message:
         message = (
@@ -560,13 +584,25 @@ async def notify_event(
             title=resolved_title,
             channel="event",
         )
-        # Channel routing from the registry: high-signal events (e.g.
-        # verify_failed) also fan out to Telegram when registered + not silent.
-        if not silent and "telegram" in reg.get("channels", []):
+        # Channel routing from the registry, gated by the owner's per-channel
+        # prefs: high-signal events (e.g. verify_failed) fan out to Telegram when
+        # registered + not silent + the telegram channel is enabled.
+        if not silent and _telegram_channel_on and "telegram" in reg.get("channels", []):
             try:
                 send_telegram(body=f"{resolved_title}: {message}")
             except Exception as tg_exc:
                 logger.debug("telegram fan-out skipped: %r", tg_exc)
+        # Email channel (optional, future-ready): fan out when the event is
+        # registered for email, the channel is enabled, and a recipient is
+        # configured (NOTIFICATION_EMAIL_TO). No-op otherwise — so email stays a
+        # clean opt-in transport alongside Telegram.
+        if not silent and _email_channel_on and "email" in reg.get("channels", []):
+            recipient = os.environ.get("NOTIFICATION_EMAIL_TO", "")
+            if recipient:
+                try:
+                    send_email(to=recipient, subject=resolved_title, body=message)
+                except Exception as mail_exc:
+                    logger.debug("email fan-out skipped: %r", mail_exc)
         return result
     except Exception as exc:
         # Critical: a notification failure must not propagate up into the
@@ -633,9 +669,9 @@ register_event(
     message=VERIFY_FAILED_MESSAGE_FA,
     priority="high",
     silent=False,
-    channels=["in_app", "telegram"],
+    channels=["in_app", "telegram", "email"],
 )
-register_event("budget_alert", title="هشدار بودجه", priority="high", channels=["in_app", "telegram"])
+register_event("budget_alert", title="هشدار بودجه", priority="high", channels=["in_app", "telegram", "email"])
 register_event("recommendation", title="پیشنهاد جدید", channels=["in_app"])
 register_event("ai_feedback", title="بازخورد هوش مصنوعی", channels=["in_app"])
 # task_done / login_succeeded — explicit snake_case event types (audit task

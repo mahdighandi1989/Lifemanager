@@ -183,6 +183,17 @@ read-mark action lives at `PATCH /notifications/{notification_id}/read`.
 | DELETE | `/notifications/{notification_id}` | Delete one |
 | GET | `/notifications/status` | Delivery counts (sent/failed/pending) |
 | GET | `/api/notifications/status` | Same shape; absolute-path mount |
+| GET | `/api/notifications/preferences` | Per-event + per-channel prefs + catalogs (for the settings UI) |
+| PUT | `/api/notifications/preferences` | Partial-update prefs (events/sound/channels/min_priority) |
+| POST | `/api/notifications/test` | Send a test notification via `{channel: in_app\|telegram\|email}` |
+
+**Preference routing.** `notify_event` consults `notification_prefs` (a JSON blob
+in `global_settings`, key `notification_prefs`, warmed into a process cache at
+startup): an event sends only when its `events[event]` toggle is on and its
+priority ≥ `min_priority`; `sound[event]` decides silent-vs-loud; and each
+external channel (`telegram`, `email`) fans out only when `channels[ch].enabled`.
+Defaults reproduce the prior "always send, always loud" behaviour. The unified
+**اعلان‌ها** settings tab (in-app + Telegram + email in one place) edits these.
 
 ### Telegram bot (`/api/telegram`) — bidirectional
 

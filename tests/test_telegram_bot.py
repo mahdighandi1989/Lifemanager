@@ -105,7 +105,7 @@ async def test_help_attaches_persistent_keyboard(monkeypatch):
 @pytest.mark.asyncio
 async def test_persistent_keyboard_alias_maps_to_command(monkeypatch):
     bot = _make_bot(monkeypatch)
-    calls = _capture_send(bot)
+    _capture_send(bot)
     # tapping the "📊 وضعیت" button sends that literal text → must route to /status
     captured = {}
 

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import AISettings from './AISettings';
 import Notifications from './Notifications';
 import DriveSettings from './DriveSettings';
-import TelegramSettings from './TelegramSettings';
 
 // Settings is a tabbed shell consolidating the app's configuration:
 //   • هوش مصنوعی  → the AI catalog (AISettings) + the global analysis prompt
@@ -19,10 +18,12 @@ import TelegramSettings from './TelegramSettings';
 // Deep links: /settings (AI tab), /settings/ai-models (AI tab),
 // /settings/notifications (Notifications tab), or ?tab=ai|notifications.
 
+// Notifications is now a unified hub: in-app + Telegram + email channels and
+// per-event prefs all live under the «اعلان‌ها» tab (the standalone Telegram tab
+// was folded in — the TelegramSettings panel is embedded inside Notifications).
 const TABS = [
   { id: 'ai', label: 'هوش مصنوعی' },
   { id: 'notifications', label: 'اعلان‌ها' },
-  { id: 'telegram', label: 'تلگرام' },
   { id: 'drive', label: 'گوگل درایو' },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
@@ -68,7 +69,6 @@ function Settings() {
         <div data-testid={`settings-panel-${tab}`}>
           {tab === 'ai' && <AISettings embedded />}
           {tab === 'notifications' && <Notifications embedded />}
-          {tab === 'telegram' && <TelegramSettings embedded />}
           {tab === 'drive' && <DriveSettings embedded />}
         </div>
       </div>

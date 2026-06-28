@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from app.database import get_db
 from app.schemas.notification_schema import NotificationCreate, NotificationOut
 from app.services.notification_service import NotificationService
@@ -53,6 +54,100 @@ async def notifications_status(
 ):
     """/notifications/status — same shape as /api/notifications/status."""
     return await _notifications_status_impl(db, user_id)
+
+
+# ── Notification preferences (per-event + per-channel routing) ───────────────
+# The unified notification settings the owner controls: which events send, with
+# sound or not, which channels (in-app / telegram / email) are on, and a minimum
+# priority. Backed by app/services/notification_prefs.py (a JSON blob in the
+# existing global_settings table). These mirror the reference oversight project's
+# /notifications/prefs + /notifications/status surface, adapted to this app.
+
+class PrefsUpdate(BaseModel):
+    events: Optional[Dict[str, bool]] = None
+    sound: Optional[Dict[str, bool]] = None
+    channels: Optional[Dict[str, Dict[str, Any]]] = None
+    min_priority: Optional[str] = None
+
+
+class TestNotifyBody(BaseModel):
+    channel: Optional[str] = None  # 'telegram' | 'email' | 'in_app' | None (= in_app)
+    message: Optional[str] = None
+
+
+@api_router.get("/api/notifications/preferences", tags=["notifications"])
+async def get_notification_preferences(db: AsyncSession = Depends(get_db)):
+    """Current prefs + the event/channel catalogs the settings UI renders.
+
+    Loads from global_settings into the process cache (so notify_event's hot
+    path stays DB-free) and returns the merged-over-defaults view."""
+    from app.services import notification_prefs
+
+    await notification_prefs.load_prefs(db)
+    return {"ok": True, **notification_prefs.status_payload()}
+
+
+@api_router.put("/api/notifications/preferences", tags=["notifications"])
+async def update_notification_preferences(
+    payload: PrefsUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+):
+    """Partial-update the prefs (deep-merge events/sound/channels), persist, and
+    refresh the cache so the change takes effect immediately for new events."""
+    from app.services import notification_prefs
+
+    partial: Dict[str, Any] = {}
+    if payload.events is not None:
+        partial["events"] = payload.events
+    if payload.sound is not None:
+        partial["sound"] = payload.sound
+    if payload.channels is not None:
+        partial["channels"] = payload.channels
+    if payload.min_priority is not None:
+        if payload.min_priority not in notification_prefs.PRIORITY_RANK:
+            raise HTTPException(status_code=400, detail="min_priority نامعتبر")
+        partial["min_priority"] = payload.min_priority
+    updated = await notification_prefs.save_prefs(db, partial)
+    return {"ok": True, "prefs": updated}
+
+
+@api_router.post("/api/notifications/test", tags=["notifications"])
+async def test_notification(
+    payload: TestNotifyBody = Body(default=TestNotifyBody()),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """Send a test notification through one channel — proves the wiring end to
+    end from the settings page. Returns {ok, channel, result}."""
+    channel = (payload.channel or "in_app").strip().lower()
+    message = (payload.message or "✅ این یک پیام تست از Lifemanager است").strip()
+
+    if channel == "telegram":
+        from app.services.telegram_service import get_telegram_bot
+
+        bot = get_telegram_bot()
+        if not bot.is_configured():
+            return {"ok": False, "channel": channel, "error": "TELEGRAM_BOT_TOKEN/CHAT_ID تنظیم نشده"}
+        res = await bot.send(message, silent=True)
+        return {"ok": bool(res.get("ok")), "channel": channel, "result": res}
+
+    if channel == "email":
+        import os
+
+        from app.services.notification_service import send_email
+
+        recipient = os.environ.get("NOTIFICATION_EMAIL_TO", "")
+        if not recipient:
+            return {"ok": False, "channel": channel, "error": "NOTIFICATION_EMAIL_TO تنظیم نشده"}
+        ok = send_email(to=recipient, subject="Lifemanager — تست اعلان", body=message)
+        return {"ok": bool(ok), "channel": channel}
+
+    # default: in-app bell row
+    svc = NotificationService(db)
+    row = await svc.send_notification(
+        user_id=user_id, message=message, notification_type="info", title="پیام تست", channel="event"
+    )
+    return {"ok": True, "channel": "in_app", "id": getattr(row, "id", None)}
 
 
 @api_router.get(

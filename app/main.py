@@ -806,6 +806,24 @@ async def _stop_telegram_supervisor():
     except Exception as exc:
         logger.debug("Telegram webhook supervisor shutdown: %s", exc)
 
+
+# ── Notification preferences — warm the process cache at startup ─────────────
+# notify_event reads prefs from an in-process cache (no DB on its hot path), so
+# the owner's saved per-event/per-channel choices only take effect once the
+# cache is loaded from global_settings. Do it once at boot; a cold cache simply
+# falls back to behaviour-preserving defaults, so this is best-effort.
+@app.on_event("startup")
+async def _load_notification_prefs():
+    try:
+        from app.database import SessionLocal
+        from app.services import notification_prefs
+
+        async with SessionLocal() as session:
+            await notification_prefs.load_prefs(session)
+        logger.info("🔔 Notification preferences loaded into cache")
+    except Exception as exc:
+        logger.debug("notification prefs load skipped: %s", exc)
+
 # auth_google.router is INTENTIONALLY UNMOUNTED. The OAuth flow lives in
 # app/routes/auth_google.py and depends on the GOOGLE_CLIENT_ID /
 # GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI settings (see app/config.py).
