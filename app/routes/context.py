@@ -208,5 +208,10 @@ async def list_recommendations(
             "heart_rate": ctx_row.heart_rate,
             "activity_status": ctx_row.activity_status,
             "mood": ctx_row.mood,
+            # ISO string (JSON-safe for context_snapshot) so the engine can
+            # infer idle from a stale last_activity_time.
+            "last_activity_time": (
+                ctx_row.last_activity_time.isoformat() if ctx_row.last_activity_time else None
+            ),
         }
     return await generate_contextual_recommendations(db, user_id=user_id, context=context)

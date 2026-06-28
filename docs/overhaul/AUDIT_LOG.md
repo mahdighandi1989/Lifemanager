@@ -473,3 +473,44 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   NONE. env — NONE. side — AUDIT_LOG. **No Manual-required part → no TO-DO file.**
 - **VERIFY** no backend change → backend stays **1004 passed / 13 pre-existing failed (0 new)**;
   `npm run build` clean; new panel test 1/1 + existing SmartAssistant test 2/2 green.
+
+## 2026-06-28 — Context-aware recommendations (task 2165524b re-audit): close the real gaps
+
+- **REVIEW** Owner resent the "proactive, context-aware assistant" spec (location+Maps → "you're
+  near a shop where you can get the item you registered"; heart-rate/idle/mood → suggestions;
+  analyze on a configurable interval; surface in notifications). The whole engine already exists +
+  is tested (task 2165524b): UserContext/ContextualRecommendation models, recommendation_engine,
+  google_maps_service (key-gated geocode/nearby), /api/context/location, /api/recommendations,
+  LocationTracker.jsx (mounted in Layout, pings every 5 min), RecommendationPanel with accept/reject,
+  the `recommendation` notification event, and a celery beat job. Did NOT rebuild it (37 tests green).
+- **FINDING — four genuine gaps that matched the voice intent (completed, not rebuilt):**
+  (a) location branch never named the registered item ("موردی از لیست‌تان" generic);
+  (c) no idle auto-detection from a stale last_activity_time;
+  (d)+(i) the scheduled job ran ContextOrchestrator().analyze({}) (no per-user work) and the
+  registered `recommendation` notification event was never fired;
+  (h) the analysis interval was hard-coded at */15 with no env knob.
+- **CHANGE (engine)** `recommendation_engine.py`: the location branch loads the caller's OPEN tasks
+  and matches each nearby place to one (geo-proximity ~300m, else title↔name keyword overlap) →
+  "نزدیک «X» هستید — می‌توانید «<item>» را همین‌جا انجام دهید." + matched task_id (generic fallback
+  kept). Idle now inferred from a stale last_activity_time (CONTEXT_IDLE_MINUTES, default 60) as well
+  as the explicit flag. Empty context still returns [] (regression-pinned).
+- **CHANGE (route)** `routes/context.py` GET /api/recommendations passes last_activity_time (ISO,
+  JSON-safe) so on-demand calls also get idle inference.
+- **CHANGE (scheduled loop + notifications)** `tasks.py::analyze_user_context` keeps the DB-free
+  orchestrator self-check (suggestions>=1 contract preserved) AND iterates every UserContext, runs
+  the engine per user, and fires ONE silent in-app `recommendation` notification per user with the
+  freshest rec (best-effort; missing DB → clean no-op). Returns {suggestions, users_analyzed,
+  recommendations}.
+- **CHANGE (configurable interval)** `celery_app.py` reads CONTEXT_ANALYSIS_INTERVAL_MINUTES
+  (default 15) for the beat cadence; `config.py` adds CONTEXT_ANALYSIS_INTERVAL_MINUTES +
+  CONTEXT_IDLE_MINUTES; documented both in `.env.example`.
+- **Dependencies synced (4 directions):** upstream — Task(status/location_lat/lng/title), UserContext,
+  find_nearby_places, notify_event("recommendation"), SessionLocal. downstream — /api/recommendations
+  route + celery beat entry; existing engine/celery/location tests stay green (location text wasn't
+  pinned; suggestions>=1 preserved). cross-tier backend→frontend — none (existing RecommendationPanel/
+  NotificationBell/LocationTracker consume the richer text + real notifications through unchanged
+  contracts). db — NONE (ContextualRecommendation.task_id already existed; no migration). infra/env —
+  .env.example + config. side — AUDIT_LOG + experiences. No Manual-required part → no TO-DO file.
+- **VERIFY** backend full suite **1012 passed / 13 pre-existing failed (0 new)**; new
+  tests/test_context_reco_completion.py 8/8 + existing context/celery/location suites green;
+  `npm run build` clean; ruff clean on all changed files.

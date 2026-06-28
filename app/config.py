@@ -159,6 +159,16 @@ class Settings(BaseSettings):
     # that vanished on disk. Configurable per-deploy without a code change.
     FILE_SYNC_INTERVAL_MINUTES: int = 30
 
+    # --- Context engine / recommendations (audit task 2165524b) -------------
+    # How often (minutes) the scheduled per-user context analysis runs — the
+    # "حسب تنظیماتی که گذاشتم چند دقیقه/چند ساعت آنالیز می‌کنه" interval. Drives
+    # the analyze-user-context celery beat entry; tunable per deploy.
+    CONTEXT_ANALYSIS_INTERVAL_MINUTES: int = 15
+    # After this many minutes with no recorded activity, the engine infers the
+    # user is idle/bored and nudges an open task ("ببینه مدتی کار نکردم، حدس
+    # بزنه بیکارم").
+    CONTEXT_IDLE_MINUTES: int = 60
+
     # --- Celery / Redis -----------------------------------------------------
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = Field(

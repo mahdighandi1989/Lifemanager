@@ -230,19 +230,92 @@ def run_self_improvement_profile_analytics() -> dict[str, Any]:
         return {"error": str(exc)}
 
 
+async def _analyze_all_user_contexts() -> tuple[int, int]:
+    """For every user with a stored UserContext, fuse their latest snapshot
+    through the recommendation engine (location/physiological/behavioral) and
+    fire ONE in-app "recommendation" notification per user with a fresh rec —
+    the proactive "آنالیز می‌کنه و اعلام بکنه" loop. Best-effort per user.
+    Returns (users_analyzed, recommendations_generated)."""
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.context import UserContext
+    from app.services.notification_service import notify_event
+    from app.services.recommendation_engine import generate_contextual_recommendations
+
+    users_analyzed = 0
+    recs_generated = 0
+    async with SessionLocal() as db:
+        rows = (await db.execute(select(UserContext))).scalars().all()
+        for ctx in rows:
+            users_analyzed += 1
+            context = {
+                "current_location": ctx.current_location,
+                "heart_rate": ctx.heart_rate,
+                "activity_status": ctx.activity_status,
+                "mood": ctx.mood,
+                "last_activity_time": (
+                    ctx.last_activity_time.isoformat() if ctx.last_activity_time else None
+                ),
+            }
+            try:
+                recs = await generate_contextual_recommendations(
+                    db, user_id=ctx.user_id, context=context
+                )
+            except Exception as exc:
+                logger.debug("context analysis failed for user %s: %r", ctx.user_id, exc)
+                continue
+            if recs:
+                recs_generated += len(recs)
+                # Surface the freshest recommendation as a (silent) in-app
+                # notification so it reaches the bell, not just the recs list.
+                try:
+                    await notify_event(
+                        "recommendation",
+                        user_id=ctx.user_id,
+                        db=db,
+                        message=recs[0]["text"],
+                        priority="normal",
+                        silent=True,
+                    )
+                except Exception as exc:
+                    logger.debug("recommendation notify failed for user %s: %r", ctx.user_id, exc)
+    return users_analyzed, recs_generated
+
+
 @celery_app.task(name="app.tasks.analyze_user_context")
 def analyze_user_context() -> dict[str, Any]:
-    """Audit task 2165524b AC4 — run the context engine and log the outcome.
+    """Audit task 2165524b AC4 — the scheduled context-analysis loop.
 
-    Scheduled every 15 minutes by celery beat. The orchestrator is rule-based
-    (no upstream call), so this is cheap; logging the suggestion count makes
-    the outcome rate observable in celery.log."""
+    Runs on the CONTEXT_ANALYSIS_INTERVAL_MINUTES celery-beat cadence. Two parts:
+      1. A cheap rule-based orchestrator self-check (always ≥1 suggestion, DB-free
+         so the job is observable even during a DB blip).
+      2. The real work: per-user contextual recommendation generation + a
+         proactive in-app notification (best-effort; a missing DB degrades to a
+         clean no-op so the task never crashes the beat)."""
     from app.services.context_engine import ContextOrchestrator
 
     result = ContextOrchestrator().analyze({})
     count = len(result.get("suggestions", []))
-    logger.info("ai_context analyze_user_context ran: %d suggestion(s)", count)
-    return {"suggestions": count}
+
+    users_analyzed = 0
+    recs_generated = 0
+    try:
+        import asyncio
+
+        users_analyzed, recs_generated = asyncio.run(_analyze_all_user_contexts())
+    except Exception as exc:
+        logger.debug("per-user context analysis skipped: %r", exc)
+
+    logger.info(
+        "ai_context analyze_user_context ran: %d suggestion(s), %d user(s), %d rec(s)",
+        count, users_analyzed, recs_generated,
+    )
+    return {
+        "suggestions": count,
+        "users_analyzed": users_analyzed,
+        "recommendations": recs_generated,
+    }
 
 
 @celery_app.task(name="app.tasks.tier_cold_data")
