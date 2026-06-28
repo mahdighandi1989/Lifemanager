@@ -173,3 +173,7 @@ frontend/dist/
 inbox/*
 !inbox/
 !inbox/**/README.md
+
+# Throwaway local venvs used for verification (not .venv which is already ignored)
+.venv_run/
+.venv_test/
