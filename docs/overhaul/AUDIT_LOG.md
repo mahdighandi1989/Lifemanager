@@ -209,3 +209,21 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   "only update the index" instruction.
 - **VERIFY** `python -m pytest tests/ -q` → **949 passed, 15 failed** (same 15 pre-existing; 0 new).
   New backend files ruff-clean. locustfile not pytest-collected.
+
+## 2026-06-28 — Merge Projects + External Projects; fix frequent auto-logout
+
+- **CHANGE (IA)** Owner: `/projects` and `/external-projects` should be one for now. Added
+  `ProjectsHub` (tabs «پروژه‌های من» / «پروژه‌های خارجی») using the safe embed pattern — `Projects`
+  and `ExternalProjects` reused unchanged via a new `embedded` prop. `App.jsx` points both routes
+  at the hub; removed the standalone «پروژه‌های خارجی» sidebar link. hubs.test extended (ProjectsHub).
+- **FIX (auth — frequent logout, root cause #1)** `ACCESS_TOKEN_EXPIRE_MINUTES` defaulted to **30
+  minutes** → the token expired mid-session and the next request 401'd → logout. Raised the default
+  to **43200 (30 days)**, env-overridable (`app/config.py`). The expiry test reads the setting
+  dynamically, so it still passes.
+- **FIX (auth — frequent logout, root cause #2)** `AuthContext.fetchMe` cleared the token on **any**
+  non-200 `/auth/me` response — so a Render free-tier cold-start 5xx, a 404 (when the Google
+  `/auth/me` route isn't mounted), or a 429 logged the user out on the next mount. Now it drops the
+  token **only on a genuine 401**; transient/other responses keep the session (the token still
+  authorizes `/api` calls). The axios 401-redirect interceptor is unchanged (genuine-401 only).
+- **VERIFY** `cd frontend && npm run build` clean; AuthContext (12) + Sidebar (3) + hubs (5) green;
+  backend `test_jwt_auth_pipeline.py` 14/14. Full vitest: 11 pre-existing failures, 0 new.

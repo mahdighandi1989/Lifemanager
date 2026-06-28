@@ -90,11 +90,16 @@ export function AuthProvider({ children }) {
         const data = await res.json();
         // normalizeUser guarantees an explicit `id` or yields null.
         setUser(normalizeUser(data));
-      } else {
-        // token invalid/expired → drop it
+      } else if (res.status === 401) {
+        // ONLY a genuine 401 means the token is invalid/expired → drop it.
         localStorage.removeItem('token');
         setToken(null);
         setUser(null);
+      } else {
+        // Transient/other (404 if /auth/me isn't mounted, 5xx on a Render
+        // cold start, 429, …) must NOT log the user out — the token is still
+        // valid and authorizes the /api calls. Keep it; just skip user info.
+        // (This was the frequent-logout bug: any non-200 nuked the session.)
       }
     } catch {
       // network error — keep token but no user info

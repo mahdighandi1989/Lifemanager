@@ -18,11 +18,6 @@ const LINKS = [
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people' },
-  {
-    to: '/external-projects',
-    label: 'پروژه‌های خارجی',
-    testid: 'sidebar-link-external-projects',
-  },
   // Hubs:
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance' },
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant' },

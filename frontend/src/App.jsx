@@ -10,7 +10,6 @@ import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import AISettings from './pages/AISettings';
 import Settings from './pages/Settings';
-import ExternalProjects from './pages/ExternalProjects';
 import PeopleProfiles from './pages/PeopleProfiles';
 import PersonProfilePage from './pages/PersonProfilePage';
 // Grouped hubs (each reuses the original page components as embedded tabs —
@@ -23,7 +22,7 @@ import Lists from './pages/Lists';
 import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
-import Projects from './pages/Projects';
+import ProjectsHub from './pages/ProjectsHub';
 import Register from './pages/Register';
 import Tasks from './pages/Tasks';
 
@@ -90,7 +89,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <Projects />
+                      <ProjectsHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -220,7 +219,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <ExternalProjects />
+                      <ProjectsHub />
                     </Layout>
                   </ProtectedRoute>
                 }

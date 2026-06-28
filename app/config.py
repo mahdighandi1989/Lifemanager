@@ -38,7 +38,12 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("JWT_SECRET_KEY", "SECRET_KEY"),
     )
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # Access-token lifetime. The old 30-minute default logged users out very
+    # frequently (a single-tenant personal app with no refresh-token flow). A
+    # 30-day default keeps the session alive for normal use; override via the
+    # ACCESS_TOKEN_EXPIRE_MINUTES env var (lower it once a refresh-token /
+    # revocation flow lands — see TO-DO/task-78c0e8e0-jwt-revocation.md).
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 43200  # 30 days
 
     # --- Strict-auth switch (security task 9a5a3b4d) -------------------------
     # Master switch that governs whether *anonymous* (no-Authorization-header)

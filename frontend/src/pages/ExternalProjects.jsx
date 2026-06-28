@@ -4,7 +4,7 @@ import api from '../lib/api';
 // External projects page (audit task d2146781, AC6): lists the third-party
 // PM-tool projects the user mirrors. Reads GET /api/external-projects.
 
-function ExternalProjects() {
+function ExternalProjects({ embedded = false }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,10 +29,14 @@ function ExternalProjects() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="external-projects-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="external-projects-page">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">پروژه‌های خارجی</h1>
-        <p className="text-gray-500 mb-6">پروژه‌های متصل از ابزارهای مدیریت پروژهٔ شخص ثالث.</p>
+        {!embedded && (
+          <>
+            <h1 className="text-3xl font-bold text-gray-900 mb-1">پروژه‌های خارجی</h1>
+            <p className="text-gray-500 mb-6">پروژه‌های متصل از ابزارهای مدیریت پروژهٔ شخص ثالث.</p>
+          </>
+        )}
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">{error}</div>

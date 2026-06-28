@@ -61,7 +61,7 @@ function ProjectCard({ project }) {
   );
 }
 
-function Projects() {
+function Projects({ embedded = false }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -111,13 +111,15 @@ function Projects() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-6">
+          {embedded ? <div /> : (
           <div>
             <h1 className="text-3xl font-bold text-gray-900">پروژه‌ها</h1>
             <p className="text-gray-500 mt-1">سازماندهی و پیگیری پروژه‌های شما</p>
           </div>
+          )}
           <button
             onClick={() => setShowForm(v => !v)}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors flex items-center space-x-2"

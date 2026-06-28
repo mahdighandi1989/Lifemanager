@@ -12,10 +12,13 @@ vi.mock('../CareerPlanningPage', () => ({ default: () => <div data-testid="caree
 vi.mock('../Import', () => ({ default: () => <div data-testid="import-page" /> }));
 vi.mock('../DriveFiles', () => ({ default: () => <div data-testid="drive-files-page" /> }));
 vi.mock('../MergeManagement', () => ({ default: () => <div data-testid="merge-page" /> }));
+vi.mock('../Projects', () => ({ default: () => <div data-testid="projects-page" /> }));
+vi.mock('../ExternalProjects', () => ({ default: () => <div data-testid="external-projects-page" /> }));
 
 import FinanceHub from '../FinanceHub';
 import AssistantHub from '../AssistantHub';
 import DataHub from '../DataHub';
+import ProjectsHub from '../ProjectsHub';
 
 describe('Grouped hubs', () => {
   test('FinanceHub: budget default, switches to assets', () => {
@@ -45,5 +48,13 @@ describe('Grouped hubs', () => {
     expect(screen.getByTestId('drive-files-page')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('data-tab-merge'));
     expect(screen.getByTestId('merge-page')).toBeInTheDocument();
+  });
+
+  test('ProjectsHub: my-projects default, switches to external', () => {
+    render(<ProjectsHub />);
+    expect(screen.getByTestId('projects-hub')).toBeInTheDocument();
+    expect(screen.getByTestId('projects-page')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('projects-tab-external'));
+    expect(screen.getByTestId('external-projects-page')).toBeInTheDocument();
   });
 });
