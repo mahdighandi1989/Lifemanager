@@ -37,13 +37,15 @@ Treat every change as a production change.
   You should not need to be told to document — do it as part of finishing the work.
 - **Merge workflow (owner's explicit, standing instruction):** once rule 4 is green locally
   (`python -m pytest tests/ -q` + `cd frontend && npm run build`), **commit and merge straight
-  to `main`** — do **not** open a PR unless asked. `main` auto-deploys to Render, so the
-  local-green check is the safety gate: verify, then merge. Rules 2–3 still bind
-  (quarantine-not-delete; behaviour-preserving, reversible steps).
-  - *Managed/sandboxed sessions note:* when the environment pins development to a feature
-    branch (e.g. Claude Code on the web sets a `claude/...` branch and forbids pushing
-    elsewhere), commit and push to **that** branch instead of `main` — the merge-to-main
-    directive resumes for unconstrained local work. Never push to a branch you weren't told to.
+  to `main`** every time — you do **not** need to ask each task, and do **not** open a PR unless
+  asked. `main` auto-deploys to Render, so the local-green check is the safety gate: verify, then
+  merge. Rules 2–3 still bind (quarantine-not-delete; behaviour-preserving, reversible steps).
+  - *How to merge in a managed/web session:* the owner has confirmed direct `main` pushes are
+    allowed for this repo even from Claude Code on the web. Do the work on the assigned
+    `claude/...` branch, then `git checkout main`, fast-forward/merge the branch in, and
+    `git push origin main` (re-sync the branch afterwards). **Only** if a push to `main` is
+    actually rejected by the environment, fall back to pushing the feature branch and tell the
+    owner. Never push to a branch you weren't told to.
 - **Commits:** `type(scope): summary` — small, one concern, reversible; merge only when
   verified-green. Do not include model identifiers or session URLs in commit messages.
 
