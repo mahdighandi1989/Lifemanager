@@ -342,19 +342,65 @@ def process_finance_updates() -> dict[str, Any]:
     # app/services/finance_ingest_service.apply_bank_message (parse → update
     # FinancialAccount balance → record a Transaction → fire the affordable-task
     # reminder). The synchronous entry point is POST /api/finance/ingest-message
-    # (an operator's IMAP poller / SMS gateway forwards messages there). This
-    # scheduled task is the *pull* side and stays a clean no-op until live
-    # mailbox/SMS credentials exist (see TO-DO/task-4ae4b3ca-finance-sources.md),
-    # then it would iterate new messages through apply_bank_message.
+    # (an operator's SMS gateway pushes there). This scheduled task is the *pull*
+    # side: when FINANCE_IMAP_URL is configured it polls the mailbox via
+    # finance_imap_service and feeds each new message through apply_bank_message.
+    # It stays a clean no-op until those credentials exist (TO-DO/task-4ae4b3ca).
+    import asyncio
     import os
 
-    from app.services.finance_ingest_service import apply_bank_message  # noqa: F401
-
-    if not (os.getenv("FINANCE_IMAP_URL") or os.getenv("FINANCE_SMS_WEBHOOK")):
+    imap_url = os.getenv("FINANCE_IMAP_URL")
+    if not (imap_url or os.getenv("FINANCE_SMS_WEBHOOK")):
         logger.info("process_finance_updates: no email/SMS source configured — skip")
         return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
 
-    return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
+    # FINANCE_SMS_WEBHOOK is a *push* source (the gateway POSTs to
+    # /api/finance/ingest-message), so there's nothing to pull for SMS here.
+    if not imap_url:
+        return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
+
+    # Which account-owner the mailbox belongs to (single-tenant default = anon 0).
+    try:
+        ingest_user_id = int(os.getenv("FINANCE_INGEST_USER_ID", "0"))
+    except ValueError:
+        ingest_user_id = 0
+
+    try:
+        from app.services.finance_imap_service import fetch_unseen_email_bodies
+
+        bodies = fetch_unseen_email_bodies(imap_url)
+    except Exception as exc:
+        logger.exception("process_finance_updates: IMAP pull failed: %r", exc)
+        return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0, "error": str(exc)}
+
+    if not bodies:
+        return {"checked_emails": 0, "checked_sms": 0, "balances_updated": 0}
+
+    async def _apply() -> int:
+        from app.database import SessionLocal
+        from app.services.finance_ingest_service import apply_bank_message
+
+        updated = 0
+        async with SessionLocal() as db:
+            for body in bodies:
+                try:
+                    res = await apply_bank_message(
+                        db, user_id=ingest_user_id, channel="email", body=body
+                    )
+                    updated += int(res.get("balances_updated") or 0)
+                except Exception as exc:  # one bad message must not drop the batch
+                    logger.warning("process_finance_updates: apply failed: %r", exc)
+        return updated
+
+    try:
+        balances_updated = asyncio.run(_apply())
+    except Exception as exc:
+        logger.exception("process_finance_updates: apply batch failed: %r", exc)
+        return {"checked_emails": len(bodies), "checked_sms": 0, "balances_updated": 0, "error": str(exc)}
+
+    result = {"checked_emails": len(bodies), "checked_sms": 0, "balances_updated": balances_updated}
+    logger.info("process_finance_updates: %s", result)
+    return result
 
 
 @celery_app.task(name="app.tasks.sync_indexed_file_sources")

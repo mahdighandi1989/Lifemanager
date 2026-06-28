@@ -180,3 +180,32 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   Full vitest: 11 failed = the SAME pre-existing files (Dashboard/Footer/Header/Layout/Projects/
   Tasks/api — none touched here); 0 new. **Visually confirmed all 3 hubs in a real browser** (with
   a real login token) — embedded pages render full content, data/lists intact, no layout mess.
+
+## 2026-06-28 — TO-DO review: re-examine every residual, advance what's in-repo
+
+- **DECISION** Owner asked to go through every `TO-DO/` task one-by-one, verify the "done" ones
+  are still correct against the (much-changed) current code, advance anything now doable in-repo,
+  skip none, and after each **only update the index file** (no archive/delete). Reviewed all 8
+  residuals (the index tracked only 6 — added the 2 missing: 78c0e8e0, 882723eb).
+- **FINDING** All 8 are genuinely external/blocked (operator prod-data, third-party creds, device
+  hardware, or design-deferred). In-repo halves re-verified intact: 9a5a3b4d (migration CLI imports
+  + `--help` OK; get_required_user_id/REQUIRE_AUTH present), 217909d2 (scan/sync/external-drives +
+  celery reconcile), 7367c6f0 (drive upload/cold-tiering/sheets seam), 78c0e8e0 (per-user scoping +
+  secret refusal), 2165524b (physiological/voice endpoints), d2146781 (oversight + GenericHttpAdapter).
+- **CHANGE (4ae4b3ca — in-repo advance)** The `process_finance_updates` Celery task was a no-op even
+  with `FINANCE_IMAP_URL` set — the IMAP *pull* was never implemented. Built
+  `app/services/finance_imap_service.py` (stdlib `imaplib`: `parse_imap_url`, `fetch_unseen_email_bodies`
+  — connect, pull UNSEEN, mark Seen) and wired it into the task → each body flows through
+  `apply_bank_message`. Added the missing `FINANCE_IMAP_URL`/`FINANCE_SMS_WEBHOOK`/`FINANCE_INGEST_USER_ID`
+  to `.env.example` (the residual file had claimed they were there). Tests: `tests/test_finance_imap_4ae4b3ca.py` (5).
+- **CHANGE (882723eb — in-repo advance)** Added `tests/locustfile.py` (read-heavy `HttpUser`) +
+  `requirements-dev.txt` (locust, dev/CI-only — not collected by pytest, not in the runtime image).
+  Residual reduced to "run it against staging".
+- **DECISION (no dead code)** Left 78c0e8e0 (JWT denylist — would be dead under login-bypass) and
+  d2146781 (speculative vendor adapters — untestable without creds) as documented residuals.
+- **CHANGE** Rewrote `TO-DO/_index.json` → version 2, all 8 items, accurate per-task `status`
+  (blocked-operator | blocked-external | blocked-hardware | blocked-design) + an `agent_review`
+  note per item + `last_reviewed_at`. Individual task `.md` files left untouched per owner's
+  "only update the index" instruction.
+- **VERIFY** `python -m pytest tests/ -q` → **949 passed, 15 failed** (same 15 pre-existing; 0 new).
+  New backend files ruff-clean. locustfile not pytest-collected.

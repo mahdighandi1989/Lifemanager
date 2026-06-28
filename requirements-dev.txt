@@ -1,0 +1,8 @@
+# Dev / CI-only extras — NOT installed in the runtime image.
+# Keep the runtime deps in requirements.txt lean; these power tooling that runs
+# against a live/staging server or in CI, not the app itself.
+
+# Load testing (audit task 882723eb, Step 10): run `locust -f tests/locustfile.py
+# --host <staging>` to validate the tuned connection pool under sustained load.
+# The deterministic concurrency contract is covered by tests/test_database.py.
+locust>=2.31,<3
