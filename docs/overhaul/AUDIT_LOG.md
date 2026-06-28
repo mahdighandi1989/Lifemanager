@@ -542,3 +542,26 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   `sk-ant-api03-…` API key on the plain "Anthropic" provider instead.
 - **VERIFY** new `tests/test_anthropic_oauth_header.py` 2/2; `tests/test_ai_catalog.py` 7/7; backend
   full suite **1014 passed / 13 pre-existing failed (0 new)**; `npm run build` clean; ruff clean.
+
+## 2026-06-28 — FIX (real root cause): Claude OAuth 401 needs a Claude-CLI user-agent
+
+- **FINDING** The earlier oauth-beta-header fix was necessary but NOT sufficient — the owner still
+  got 401 on the subscription provider's test. Compared against ALLIN1 (where this exact 401 was
+  already solved): `backend/app/ai/inference.py` line 102 / `tester.py` line 94 set an extra header
+  on OAuth requests — **`user-agent: claude-cli/1.0 (external)`**. Anthropic rejects a Claude
+  subscription OAuth token with **401** when the request's User-Agent looks like a generic HTTP
+  client (httpx's default `python-httpx/…`); it must present as the Claude CLI. The owner correctly
+  insisted it wasn't the token.
+- **CHANGE** Added `user-agent: claude-cli/1.0 (external)` to every OAuth (`oauth_bearer`) Anthropic
+  call in lifemanager: `inference_gateway._anthropic_text`, `_anthropic_multimodal`, and
+  `catalog_tester._list_models` (model discovery). The api-key (`x-api-key`) path is unchanged (no
+  bearer, no beta, no spoofed user-agent). This brings lifemanager to parity with ALLIN1's working
+  OAuth implementation (Bearer + `anthropic-beta: oauth-2025-04-20` + Claude-CLI user-agent + the
+  `CLAUDE_CODE_SYSTEM` first system block — the constant is byte-identical across both repos).
+- **Dependencies synced (4 directions):** upstream — ALLIN1 reference impl, `CLAUDE_CODE_SYSTEM`,
+  `ResolvedModel.auth_scheme`. downstream — all three Anthropic OAuth call sites + `test_anthropic_oauth_header.py`
+  (now also asserts the user-agent on the oauth path and its absence on the api-key path). db/env —
+  NONE. cross-tier — none (same `/ai/models/{id}/test` contract; the «تست» button now succeeds with a
+  valid token). side — AUDIT_LOG + experiences Update. No Manual code part → no TO-DO.
+- **VERIFY** `tests/test_anthropic_oauth_header.py` 2/2; `tests/test_ai_catalog.py` 7/7; backend full
+  suite green (0 new failures); ruff clean.

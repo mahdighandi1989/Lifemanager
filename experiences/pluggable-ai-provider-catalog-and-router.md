@@ -118,3 +118,25 @@ How to apply elsewhere: model `auth_scheme` per provider ("api_key" vs
 "oauth_bearer"); branch headers on it in ONE helper reused by every call site;
 add a test that asserts the oauth path sends Bearer + the beta header and that
 the api-key path still uses the key header with NO beta.
+
+### Refinement: the User-Agent is the decisive header (not just the beta)
+
+The oauth beta header + Bearer + system spoof are necessary but STILL 401 if the
+request's `User-Agent` looks like a generic HTTP client. Anthropic gates
+subscription OAuth tokens on a Claude-CLI user-agent, so an httpx/requests default
+(`python-httpx/…`) is rejected with 401. Send **`user-agent: claude-cli/1.0 (external)`**
+on every OAuth call (chat, multimodal, model-discovery). Full working recipe for a
+Claude Pro/Max OAuth token on `/v1/messages`:
+
+```
+authorization: Bearer <sk-ant-oat01-…>
+anthropic-version: 2023-06-01
+anthropic-beta: oauth-2025-04-20            # + ,pdfs-2024-09-25 for documents
+user-agent: claude-cli/1.0 (external)       # ← the piece everyone forgets
+system[0] = "You are Claude Code, Anthropic's official CLI for Claude."
+```
+
+Debugging lesson: when a 401 persists after the "obvious" auth headers are right,
+**diff against a known-working implementation of the same provider** rather than
+assuming the credential is bad — here the only delta between the broken and working
+repos was this one user-agent line.

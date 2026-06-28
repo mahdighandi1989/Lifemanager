@@ -84,9 +84,12 @@ async def _anthropic_text(rm, prompt, system, max_tokens, temperature) -> str:
     if rm.auth_scheme == "oauth_bearer":
         headers["authorization"] = f"Bearer {rm.api_key}"
         # A Claude subscription OAuth token is ONLY accepted on /v1/messages with
-        # this beta header (+ the Claude-Code system spoof below). Without it
-        # Anthropic returns 401 Unauthorized.
+        # this beta header + a Claude-CLI user-agent (+ the Claude-Code system
+        # spoof below). Anthropic rejects the OAuth token with 401 if the
+        # user-agent looks like a generic HTTP client (httpx default), which is
+        # the exact 401 the owner hit — the fix that worked in ALLIN1.
         headers["anthropic-beta"] = "oauth-2025-04-20"
+        headers["user-agent"] = "claude-cli/1.0 (external)"
     else:
         headers["x-api-key"] = rm.api_key
     system_blocks = []
@@ -208,9 +211,10 @@ async def _anthropic_multimodal(rm, prompt, files, system, max_tokens) -> str:
                "anthropic-beta": "pdfs-2024-09-25"}
     if rm.auth_scheme == "oauth_bearer":
         headers["authorization"] = f"Bearer {rm.api_key}"
-        # OAuth subscription tokens need the oauth beta flag too (combined with
-        # the pdfs beta) or /v1/messages returns 401.
+        # OAuth subscription tokens need the oauth beta flag (combined with the
+        # pdfs beta) AND a Claude-CLI user-agent, or /v1/messages returns 401.
         headers["anthropic-beta"] = "oauth-2025-04-20,pdfs-2024-09-25"
+        headers["user-agent"] = "claude-cli/1.0 (external)"
     else:
         headers["x-api-key"] = rm.api_key
     content: List[Dict[str, Any]] = []

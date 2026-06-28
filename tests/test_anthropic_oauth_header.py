@@ -65,6 +65,8 @@ async def test_oauth_token_sends_beta_and_bearer(monkeypatch):
     h = _FakeClient.captured["headers"]
     assert h["authorization"] == "Bearer sk-ant-oat01-XXX"
     assert h["anthropic-beta"] == "oauth-2025-04-20"
+    # Anthropic 401s an OAuth token whose user-agent isn't the Claude CLI.
+    assert h["user-agent"] == "claude-cli/1.0 (external)"
     assert "x-api-key" not in h
     # the Claude-Code system spoof must be the first system block
     sys_blocks = _FakeClient.captured["json"]["system"]
@@ -80,3 +82,4 @@ async def test_api_key_path_unchanged(monkeypatch):
     assert h["x-api-key"] == "sk-ant-api03-XXX"
     assert "authorization" not in h
     assert "anthropic-beta" not in h
+    assert "user-agent" not in h
