@@ -13,7 +13,7 @@ const KIND_STYLES = {
   general: 'border-gray-200 bg-gray-50',
 };
 
-function SmartAssistant() {
+function SmartAssistant({ embedded = false }) {
   const [heartRate, setHeartRate] = useState('');
   const [noise, setNoise] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -39,7 +39,7 @@ function SmartAssistant() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="smart-assistant-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="smart-assistant-page">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">پیشنهادات هوشمند</h1>
         <p className="text-gray-500 mb-6">

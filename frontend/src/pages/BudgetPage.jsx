@@ -41,7 +41,7 @@ function AccountCard({ account }) {
   );
 }
 
-function BudgetPage() {
+function BudgetPage({ embedded = false }) {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -146,7 +146,7 @@ function BudgetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="budget-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="budget-page">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8" dir="rtl">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">برنامه و بودجه</h1>
         <p className="text-gray-500 mb-6">حساب‌های مالی شما و موجودی کل.</p>

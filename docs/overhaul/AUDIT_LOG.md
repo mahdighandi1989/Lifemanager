@@ -155,3 +155,28 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **CHANGE** `Settings.test.jsx` trimmed to the two-tab shell + prompt-relocation check;
   `AISettings.test.jsx` gained an analysis-prompt load/save test.
 - **VERIFY** `npm run build` clean; Settings + AISettings suites **7/7** green. Backend untouched.
+
+## 2026-06-28 — IA: group related pages into tabbed hubs (owner-approved plan)
+
+- **DECISION** Owner asked to tidy the ~16-item sidebar **without deleting any content**, being
+  careful with pages holding important data/lists. Chose the "three hubs" plan (confirmed via a
+  preview prompt): consolidate related pages into tabbed hubs using the **safe embed pattern** —
+  each page component is **reused unchanged** via a new `embedded` prop; only the outer full-page
+  chrome (`min-h-screen` wrapper + duplicate `<h1>`) is dropped when hosted in a tab. **No page
+  data/logic touched.**
+- **CHANGE** Added `embedded` prop (cosmetic root-wrapper only) to 9 pages: BudgetPage, AssetsPage,
+  SmartAssistant, Recommendations, PersonalityProfilePage, CareerPlanningPage, DriveFiles,
+  MergeManagement, Import (the 8 were patched by an asserted single-match script).
+- **CHANGE** New hub shells: `FinanceHub` (برنامه و بودجه + دارایی‌ها), `AssistantHub` (پیشنهادات
+  + تاریخچه + پروفایل شخصیت + ترسیم آینده), `DataHub` (ایمپورت + فایل‌های من + ادغام تسک‌ها). Each
+  picks its initial tab from the URL so the **existing routes still resolve** (e.g. `/assets`
+  opens FinanceHub's assets tab; `/merge` opens DataHub's merge tab) — nothing removed.
+- **CHANGE** `App.jsx` re-points those routes to the hubs (removed the now-unused direct imports);
+  `Sidebar.jsx` collapsed to: داشبورد · کارها · پروژه‌ها · لیست‌ها · افراد · پروژه‌های خارجی ·
+  مالی · دستیار هوشمند · داده · تنظیمات (16 → 10 items).
+- **CHANGE** New `hubs.test.jsx` (3) verifies each hub's tabs + default panel + switching (child
+  pages mocked to isolate tab logic).
+- **VERIFY** `npm run build` clean (126 modules). hubs + Sidebar + Settings suites **9/9** green.
+  Full vitest: 11 failed = the SAME pre-existing files (Dashboard/Footer/Header/Layout/Projects/
+  Tasks/api — none touched here); 0 new. **Visually confirmed all 3 hubs in a real browser** (with
+  a real login token) — embedded pages render full content, data/lists intact, no layout mess.

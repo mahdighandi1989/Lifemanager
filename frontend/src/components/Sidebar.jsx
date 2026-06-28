@@ -9,31 +9,25 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
+// Related pages are grouped into tabbed hubs (Finance / Assistant / Data /
+// Settings). The individual pages still exist and their original routes still
+// resolve (now opening the right hub tab) — nav is decluttered, nothing deleted.
 const LINKS = [
   { to: '/', label: 'Dashboard', testid: 'sidebar-link-dashboard' },
   { to: '/tasks', label: 'Tasks', testid: 'sidebar-link-tasks' },
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
-  { to: '/budget', label: 'برنامه و بودجه', testid: 'sidebar-link-budget' },
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people' },
   {
     to: '/external-projects',
     label: 'پروژه‌های خارجی',
     testid: 'sidebar-link-external-projects',
   },
-  { to: '/import', label: 'ایمپورت داده', testid: 'sidebar-link-import' },
-  // AI settings + notifications are now tabs under /settings (consolidated),
-  // so they no longer get their own sidebar links. The standalone pages
-  // (/ai-settings, /notifications) still exist and the header bell still links
-  // to notifications — capability preserved, nav decluttered.
+  // Hubs:
+  { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance' },
+  { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant' },
+  { to: '/import', label: 'داده', testid: 'sidebar-link-data' },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings' },
-  { to: '/assistant', label: 'پیشنهادات هوشمند', testid: 'sidebar-link-assistant' },
-  { to: '/recommendations', label: 'تاریخچه پیشنهادات', testid: 'sidebar-link-recommendations' },
-  { to: '/personality', label: 'پروفایل شخصیت', testid: 'sidebar-link-personality' },
-  { to: '/career-planning', label: 'ترسیم آینده', testid: 'sidebar-link-career-planning' },
-  { to: '/drive-files', label: 'فایل‌های من', testid: 'sidebar-link-drive-files' },
-  { to: '/assets', label: 'دارایی‌ها', testid: 'sidebar-link-assets' },
-  { to: '/merge', label: 'ادغام تسک‌ها', testid: 'sidebar-link-merge' },
 ];
 
 function Sidebar() {

@@ -12,7 +12,7 @@ const DIMENSIONS = [
   { key: 'neuroticism', label: 'حساسیت هیجانی' },
 ];
 
-function PersonalityProfilePage() {
+function PersonalityProfilePage({ embedded = false }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -39,7 +39,7 @@ function PersonalityProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="personality-profile-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="personality-profile-page">
       <div className="max-w-3xl mx-auto px-4" dir="rtl">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">پروفایل شخصیت</h1>
         {error && <p className="text-red-600 text-sm mb-3">{error}</p>}

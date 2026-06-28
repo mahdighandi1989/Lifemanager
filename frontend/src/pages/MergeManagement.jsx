@@ -6,7 +6,7 @@ import DeduplicationPanel from '../components/deduplication/DeduplicationPanel';
 // suggestions from POST /api/merge/suggestions and a "تأیید ادغام" button per
 // group that calls POST /api/merge/execute.
 
-function MergeManagement() {
+function MergeManagement({ embedded = false }) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,7 +40,7 @@ function MergeManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="merge-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="merge-page">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">ادغام تسک‌های مشابه</h1>
         <p className="text-gray-500 mb-6">

@@ -10,7 +10,7 @@ const TYPES = [
   { key: 'behavioral', label: 'مبتنی بر رفتار' },
 ];
 
-function Recommendations() {
+function Recommendations({ embedded = false }) {
   const [enabled, setEnabled] = useState({
     location: true,
     physiological: true,
@@ -19,7 +19,7 @@ function Recommendations() {
   const toggle = (k) => setEnabled((e) => ({ ...e, [k]: !e[k] }));
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="recommendations-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="recommendations-page">
       <div className="max-w-3xl mx-auto px-4" dir="rtl">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">پیشنهادات هوشمند</h1>
 

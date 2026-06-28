@@ -9,19 +9,15 @@ import { TaskProvider } from './context/TaskContext';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import AISettings from './pages/AISettings';
-import Import from './pages/Import';
 import Settings from './pages/Settings';
-import BudgetPage from './pages/BudgetPage';
 import ExternalProjects from './pages/ExternalProjects';
 import PeopleProfiles from './pages/PeopleProfiles';
-import SmartAssistant from './pages/SmartAssistant';
-import Recommendations from './pages/Recommendations';
-import PersonalityProfilePage from './pages/PersonalityProfilePage';
-import CareerPlanningPage from './pages/CareerPlanningPage';
-import DriveFiles from './pages/DriveFiles';
 import PersonProfilePage from './pages/PersonProfilePage';
-import AssetsPage from './pages/AssetsPage';
-import MergeManagement from './pages/MergeManagement';
+// Grouped hubs (each reuses the original page components as embedded tabs —
+// no page content/data logic changed):
+import FinanceHub from './pages/FinanceHub';     // برنامه و بودجه + دارایی‌ها
+import AssistantHub from './pages/AssistantHub'; // پیشنهادات + تاریخچه + شخصیت + ترسیم آینده
+import DataHub from './pages/DataHub';           // ایمپورت + فایل‌های من + ادغام تسک‌ها
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Login from './pages/Login';
@@ -154,7 +150,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <Import />
+                      <DataHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -184,7 +180,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <BudgetPage />
+                      <FinanceHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -194,7 +190,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <BudgetPage />
+                      <FinanceHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -234,7 +230,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <SmartAssistant />
+                      <AssistantHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -244,7 +240,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <Recommendations />
+                      <AssistantHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -254,7 +250,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <PersonalityProfilePage />
+                      <AssistantHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -264,7 +260,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <CareerPlanningPage />
+                      <AssistantHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -274,7 +270,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <DriveFiles />
+                      <DataHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -284,7 +280,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <AssetsPage />
+                      <FinanceHub />
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -294,7 +290,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <MergeManagement />
+                      <DataHub />
                     </Layout>
                   </ProtectedRoute>
                 }

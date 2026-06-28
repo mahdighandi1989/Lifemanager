@@ -4,7 +4,7 @@ import api from '../lib/api';
 // DriveFiles page (audit task 7367c6f0 AC8): lists the user's files and marks
 // the ones cold-tiered out to Google Drive with a badge + a download link to
 // the Drive blob. Reads GET /api/drive/files.
-function DriveFiles() {
+function DriveFiles({ embedded = false }) {
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
 
@@ -20,7 +20,7 @@ function DriveFiles() {
   }, [load]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="drive-files-page">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="drive-files-page">
       <div className="max-w-3xl mx-auto px-4" dir="rtl">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">فایل‌های من</h1>
         {error && <p className="text-red-600 text-sm mb-3">{error}</p>}

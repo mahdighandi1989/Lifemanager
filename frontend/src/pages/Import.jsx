@@ -32,7 +32,7 @@ function ResultBox({ result }) {
   );
 }
 
-function Import() {
+function Import({ embedded = false }) {
   const { token } = useAuth();
   const [mode, setMode] = useState('sheet'); // 'sheet' | 'ai'
   const [targets, setTargets] = useState([]);
@@ -124,7 +124,7 @@ function Import() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="import-page" dir="rtl">
+    <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="import-page" dir="rtl">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">ایمپورت داده</h1>
         <p className="text-gray-500 mb-4">از فایل صفحه‌گسترده یا با کمک هوش مصنوعی از سند، داده وارد کن.</p>
