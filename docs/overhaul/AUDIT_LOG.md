@@ -251,3 +251,54 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   existing tables, no migration); infra/env — none. No Manual-required part → no TO-DO file.
 - **VERIFY** backend `tests/test_people_profiles.py` 6/6 + full suite **950 passed / 15 pre-existing
   failed (0 new)**; `npm run build` clean; person_profile + NewPages **6/6**; ruff clean.
+
+## 2026-06-28 — Complete Google Drive integration (connect/sync from the UI)
+
+- **DECISION** Owner asked for a *complete* Google Drive connection for lifemanager —
+  folder creation, a DB-backed connection, real data upload/list, and frontend management —
+  modelled on ALLIN1's Drive pattern. The repo was already **injection-ready**:
+  `google_drive_service` / `sheets_service` accepted an injected `client` + `refresh_token` and
+  raised `NotImplementedError` without one; OAuth only did ID-token sign-in (no refresh-token
+  capture). So the work was to slot a real adapter into the existing seam, add the
+  connection store + OAuth offline flow, and build the UI — all behaviour-preserving.
+- **CHANGE (foundation — connection store)** `app/services/drive_settings_service.py`: a
+  key/value store over the EXISTING `GlobalSetting` table (lifemanager's equivalent of ALLIN1's
+  `system_settings`) — so **no new table / no migration**. Stores the `refresh_token` **encrypted
+  at rest** (`crypt_service.encrypt_data`), the connected account email, and a cached root-folder
+  id. `store_connection` / `resolve_refresh_token` (DB → env fallback `GOOGLE_DRIVE_REFRESH_TOKEN`
+  / `GOOGLE_SHEETS_REFRESH_TOKEN`) / `is_connected` / `disconnect` / `get_status`.
+- **CHANGE (core — real client adapter)** `app/services/google_api_client.py`: `GoogleDriveClient`
+  (folder find-or-create, upload, list, download) + `GoogleSheetsClient` (find-or-create the
+  `LifeManagerIndex` sheet + append) implementing the EXACT async interface the seams expect,
+  wrapping the sync google-api-python-client in `asyncio.to_thread`. `refresh_access_token`
+  (grant_type=refresh_token), `build_clients` (→ `(None, None)` when disconnected / libs missing),
+  `ensure_app_folders` (creates `LifeManagerData` + audio/images/documents/migrated_data, caches
+  root id), `make_drive_mover` (cold-tiering uploader). All google imports lazy → stripped image
+  still boots.
+- **CHANGE (OAuth connect/callback/disconnect)** `app/routes/auth_google.py`:
+  `GET /auth/google/drive/connect` redirects to consent with `access_type=offline` + `prompt=consent`
+  + `drive.file`/`spreadsheets` scope + a CSRF `state` nonce (httponly cookie); the **shared**
+  `/auth/google/callback` now branches on a `drive:`-prefixed state to capture + store the
+  refresh_token and eagerly create the folder tree. Sign-in path unchanged (state empty → legacy
+  flow). Connect is operator-gated (admin, or sole operator in single-tenant bypass).
+- **CHANGE (data connection + management routes)** `app/routes/drive.py` (always mounted):
+  `GET /api/drive/status`, `POST /api/drive/disconnect|test|sync` (operator-gated), and
+  `POST /api/drive/upload-file` (real multipart upload → pushes bytes to Drive when connected via
+  the `google_drive_service.upload_file` seam, else stores local). `app/tasks.py::tier_cold_data`
+  now builds the live client + mover + sheets ledger so the scheduled cold-tiering actually
+  migrates to Drive when connected.
+- **CHANGE (frontend)** New `frontend/src/pages/DriveSettings.jsx` (status grid + Connect /
+  Disconnect / Test / Sync, RTL); added as a «گوگل درایو» tab in `Settings.jsx`. `DriveFiles.jsx`
+  gained a real "بارگذاری فایل" upload control (multipart → `/api/drive/upload-file`).
+- **Dependencies synced (4 directions):** upstream — `GlobalSetting`, `crypt_service`,
+  `google_drive_service`/`sheets_service` seams, `exchange_code_for_token`/`verify_google_token`,
+  google-api libs (already pinned in requirements). downstream — `DriveSettings.jsx`, `Settings.jsx`
+  tab, `DriveFiles.jsx` upload, `tier_cold_data`. db — NONE (reused GlobalSetting; no new table/column,
+  no migration). env — documented `GOOGLE_DRIVE_REFRESH_TOKEN` in `.env.example` (+ Drive setup note).
+- **FIX (bonus, pre-existing)** `test_env_example_parity` was red because the `_GOOGLE_ISSUERS`
+  constant tripped the `GOOGLE_*` env-var scan; allow-listed it (it is a code constant, not config)
+  and named the new token-URI constant without a `GOOGLE_` prefix. Now green.
+- **VERIFY** backend full suite **961 passed / 14 pre-existing failed (0 new; env-parity now green,
+  −1 from baseline)**; new `tests/test_drive_connection.py` 10/10; `npm run build` clean; frontend
+  `DriveSettings.test.jsx` 2/2 + `drive_files.test.jsx` 2/2 green, full vitest 11 pre-existing failed
+  (0 new); ruff clean on all new/changed files.

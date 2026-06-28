@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import AISettings from './AISettings';
 import Notifications from './Notifications';
+import DriveSettings from './DriveSettings';
 
 // Settings is a tabbed shell consolidating the app's configuration:
 //   • هوش مصنوعی  → the AI catalog (AISettings) + the global analysis prompt
 //   • اعلان‌ها     → the Notifications page (preferences + inbox)
+//   • گوگل درایو   → the Google Drive connection (connect/disconnect/status/sync)
 //
 // The previous "advanced (legacy)" tab was retired (owner request): its AI
 // provider/model/context controls were redundant with the new catalog and had
@@ -19,6 +21,7 @@ import Notifications from './Notifications';
 const TABS = [
   { id: 'ai', label: 'هوش مصنوعی' },
   { id: 'notifications', label: 'اعلان‌ها' },
+  { id: 'drive', label: 'گوگل درایو' },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -63,6 +66,7 @@ function Settings() {
         <div data-testid={`settings-panel-${tab}`}>
           {tab === 'ai' && <AISettings embedded />}
           {tab === 'notifications' && <Notifications embedded />}
+          {tab === 'drive' && <DriveSettings embedded />}
         </div>
       </div>
     </div>

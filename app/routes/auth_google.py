@@ -1,6 +1,8 @@
 import logging
+import secrets
+from urllib.parse import urlencode
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
@@ -213,9 +215,154 @@ async def google_login_token(
         "user": _user_view(user),
     }
 
+# ── Google Drive connection (OAuth, offline access) ─────────────────────────
+# A SEPARATE consent flow from sign-in: it requests offline access + the
+# ``drive.file``/``spreadsheets`` scopes so we get a refresh_token, then stores
+# it (encrypted) via drive_settings_service. The state is prefixed ``drive:``
+# so the SHARED callback below can tell a Drive-connect round-trip apart from a
+# normal sign-in. Mirrors ALLIN1's /api/auth/google/drive/connect flow.
+DRIVE_STATE_PREFIX = "drive:"
+
+
+async def _require_drive_operator(token: str, request: Request, db: AsyncSession):
+    """Authorize the caller to manage the (single, app-wide) Drive connection.
+
+    Accepts the JWT from the ``?token=`` query param (a top-level browser
+    navigation from the SPA can't add an Authorization header) OR the normal
+    header/cookie. Allowed when the caller is an admin; in a pure single-tenant
+    deployment (no ADMIN_EMAILS configured and auth not enforced) the sole
+    operator is allowed through so the personal app works without Google
+    sign-in first."""
+    from app.dependencies.auth import (
+        _extract_token,
+        _resolve_token_to_user,
+        is_admin,
+    )
+
+    tok = token or _extract_token(request)
+    user = await _resolve_token_to_user(tok, db) if tok else None
+    if user is not None and is_admin(user):
+        return
+    if not settings.admin_emails_list and not settings.REQUIRE_AUTH:
+        return
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Drive connection management requires an admin account",
+    )
+
+
+@router.get("/auth/google/drive/connect")
+async def google_drive_connect(
+    request: Request,
+    token: str = "",
+    db: AsyncSession = Depends(get_db),
+):
+    """Start the Drive-connect consent flow (offline access → refresh_token).
+
+    Redirects the browser to Google's consent screen with ``access_type=offline``
+    + ``prompt=consent`` (so Google always returns a refresh_token) and a
+    ``drive:`` state nonce stashed in an httponly cookie for CSRF protection.
+    The SPA opens this as a top-level navigation, passing its JWT as ``?token=``.
+    """
+    await _require_drive_operator(token, request, db)
+
+    if not (settings.GOOGLE_CLIENT_ID and settings.GOOGLE_CLIENT_SECRET):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Google OAuth not configured (set GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET).",
+        )
+    if not settings.GOOGLE_REDIRECT_URI:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Set GOOGLE_REDIRECT_URI to your /auth/google/callback URL to connect Drive.",
+        )
+
+    from app.services.google_api_client import DRIVE_SCOPES
+
+    nonce = secrets.token_urlsafe(24)
+    params = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        "response_type": "code",
+        "scope": " ".join(DRIVE_SCOPES),
+        "access_type": "offline",
+        "prompt": "consent",
+        "include_granted_scopes": "true",
+        "state": f"{DRIVE_STATE_PREFIX}{nonce}",
+    }
+    consent_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)
+    resp = RedirectResponse(url=consent_url, status_code=302)
+    resp.set_cookie(
+        key="drive_oauth_state",
+        value=nonce,
+        httponly=True,
+        max_age=600,
+        samesite="lax",
+        secure=settings.ENVIRONMENT.lower() == "production",
+    )
+    return resp
+
+
+async def _handle_drive_callback(code: str, state: str, request: Request, db: AsyncSession):
+    """Drive-mode branch of the shared OAuth callback: verify the state nonce,
+    exchange the code for tokens (incl. the refresh_token), and persist the
+    connection. Always redirects back to the Drive settings tab with a status
+    flag rather than returning JSON (it's a browser navigation)."""
+    nonce = state[len(DRIVE_STATE_PREFIX):]
+    cookie_nonce = request.cookies.get("drive_oauth_state") if request else None
+    if not cookie_nonce or cookie_nonce != nonce:
+        return RedirectResponse(url="/settings?tab=drive&drive=error&reason=state", status_code=302)
+
+    token_data = await exchange_code_for_token(code)
+    if not token_data:
+        return RedirectResponse(url="/settings?tab=drive&drive=error&reason=exchange", status_code=302)
+
+    refresh_token = token_data.get("refresh_token")
+    if not refresh_token:
+        # Google only returns a refresh_token on the FIRST consent; prompt=consent
+        # is meant to force it. If it's still missing, the user must revoke the
+        # app's access at myaccount.google.com and reconnect.
+        return RedirectResponse(url="/settings?tab=drive&drive=error&reason=norefresh", status_code=302)
+
+    email = None
+    id_token = token_data.get("id_token")
+    if id_token:
+        claims = await verify_google_token(id_token)
+        email = (claims or {}).get("email")
+
+    from app.services import drive_settings_service as dss
+    from app.services.google_api_client import build_drive_client, ensure_app_folders
+
+    await dss.store_connection(db, refresh_token=refresh_token, account_email=email)
+    # Eagerly create the LifeManagerData folder tree so the first sync is instant
+    # and the status panel can show the root folder id immediately. Best-effort.
+    try:
+        drive_client = await build_drive_client(db)
+        if drive_client is not None:
+            await ensure_app_folders(db, drive_client)
+    except Exception as exc:
+        logger.warning("Drive folder bootstrap after connect failed: %r", exc)
+
+    resp = RedirectResponse(url="/settings?tab=drive&drive=connected", status_code=302)
+    resp.delete_cookie("drive_oauth_state")
+    logger.info("Google Drive connected (account=%s)", email or "unknown")
+    return resp
+
+
 @router.get("/auth/google/callback")
-async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
-    """Handle Google OAuth callback."""
+async def google_callback(
+    request: Request,
+    code: str,
+    state: str = "",
+    db: AsyncSession = Depends(get_db),
+):
+    """Handle Google OAuth callback (shared by sign-in AND Drive-connect).
+
+    A ``drive:``-prefixed ``state`` routes to the Drive-connect branch; anything
+    else is the legacy sign-in code flow below."""
+    if state and state.startswith(DRIVE_STATE_PREFIX):
+        return await _handle_drive_callback(code, state, request, db)
+
     # Exchange code for tokens
     token_data = await exchange_code_for_token(code)
     if not token_data:

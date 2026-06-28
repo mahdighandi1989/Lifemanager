@@ -265,13 +265,36 @@ def tier_cold_data() -> dict[str, Any]:
         total = 0
         cold = 0
 
-        async def _ledger(row) -> None:
-            # Record every migrated file in the central LifeManagerIndex sheet
-            # ("توی شیت باید همه چیزا ثبت بشه"). Best-effort: a clean no-op when
-            # Sheets credentials/client aren't configured (audit task 7367c6f0).
-            await record_index_entry(sheet_row_for(row))
-
         async with SessionLocal() as db:
+            # Build the live Drive/Sheets clients when the operator has connected
+            # Google Drive; otherwise they're None and the migration is pure
+            # bookkeeping (storage_location='drive', migrated_at) — the long-
+            # standing degrade-gracefully behaviour (audit task 7367c6f0).
+            from app.services import drive_settings_service as dss
+            from app.services.google_api_client import (
+                build_clients,
+                ensure_app_folders,
+                make_drive_mover,
+            )
+
+            drive_client, sheets_client = await build_clients(db)
+            refresh_token = await dss.resolve_refresh_token(db)
+            mover = None
+            if drive_client is not None:
+                try:
+                    _root, subfolders = await ensure_app_folders(db, drive_client)
+                    mover = make_drive_mover(drive_client, subfolders)
+                except Exception as exc:
+                    logger.warning("tier_cold_data: Drive folder bootstrap failed: %r", exc)
+
+            async def _ledger(row) -> None:
+                # Record every migrated file in the central LifeManagerIndex sheet
+                # ("توی شیت باید همه چیزا ثبت بشه"). Best-effort: a clean no-op when
+                # Sheets credentials/client aren't configured (audit task 7367c6f0).
+                await record_index_entry(
+                    sheet_row_for(row), refresh_token=refresh_token, client=sheets_client
+                )
+
             tasks = (await db.execute(select(Task))).scalars().all()
             for task in tasks:
                 total += 1
@@ -279,8 +302,9 @@ def tier_cold_data() -> dict[str, Any]:
                     cold += 1
             # Actually migrate cold DriveFiles (>30 days untouched) out to Drive
             # — the AC4 tiering, not just a task tally (audit task 7367c6f0) —
-            # logging each migration to the central sheet ledger (AC2).
-            tiered = await tier_cold_files(db, ledger=_ledger)
+            # using the real Drive client when connected, and logging each
+            # migration to the central sheet ledger (AC2).
+            tiered = await tier_cold_files(db, mover=mover, ledger=_ledger)
         return {"total": total, "cold_eligible": cold, "files_migrated": tiered["migrated"]}
 
     try:

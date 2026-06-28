@@ -7,6 +7,7 @@ import api from '../lib/api';
 function DriveFiles({ embedded = false }) {
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const load = useCallback(() => {
     api
@@ -19,10 +20,48 @@ function DriveFiles({ embedded = false }) {
     load();
   }, [load]);
 
+  // Upload an actual file: multipart POST to /api/drive/upload-file. The backend
+  // stores it locally and, when Drive is connected, pushes the bytes up and
+  // fills in the Drive id/link automatically.
+  const onUpload = useCallback(
+    (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      setError(null);
+      setUploading(true);
+      const form = new FormData();
+      form.append('file', file);
+      api
+        .post('/drive/upload-file', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then(() => load())
+        .catch((err) => setError('خطا در بارگذاری فایل: ' + (err?.response?.data?.detail || err.message || '')))
+        .finally(() => {
+          setUploading(false);
+          e.target.value = '';
+        });
+    },
+    [load],
+  );
+
   return (
     <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="drive-files-page">
       <div className="max-w-3xl mx-auto px-4" dir="rtl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">فایل‌های من</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">فایل‌های من</h1>
+          <label
+            data-testid="drive-upload-label"
+            className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium cursor-pointer hover:bg-blue-700"
+          >
+            {uploading ? 'در حال بارگذاری...' : 'بارگذاری فایل'}
+            <input
+              type="file"
+              data-testid="drive-upload-input"
+              onChange={onUpload}
+              disabled={uploading}
+              className="hidden"
+            />
+          </label>
+        </div>
         {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
 
         {files.length === 0 ? (

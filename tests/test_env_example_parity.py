@@ -52,6 +52,9 @@ def test_no_referenced_google_env_var_undocumented():
     missing = sorted(name for name in used if name not in documented)
     # Allow internal symbols that aren't env vars (e.g. constants
     # exported as Python identifiers but never read from env).
-    allowed_internal = {"GOOGLE_OAUTH"}
+    #   * GOOGLE_OAUTH    — a label prefix, never an env var.
+    #   * GOOGLE_ISSUERS  — the ``_GOOGLE_ISSUERS`` set of valid ID-token
+    #     issuers in google_auth.py (a code constant, not configuration).
+    allowed_internal = {"GOOGLE_OAUTH", "GOOGLE_ISSUERS"}
     missing = [m for m in missing if m not in allowed_internal]
     assert not missing, f"GOOGLE_* env vars referenced in code but missing from .env.example: {missing}"
