@@ -21,6 +21,15 @@ function SmartAssistant({ embedded = false }) {
   const [error, setError] = useState(null);
   const [ran, setRan] = useState(false);
 
+  // Task-aware AI feedback (audit task e606cca6): triggers POST /api/ai/analyze-tasks,
+  // which reads the user's actual tasks, runs the configured model within the
+  // analysis prompt set in تنظیمات → هوش مصنوعی, and ALSO files the feedback into
+  // the notification bell. Here we surface the trigger + the result inline.
+  const [tfLoading, setTfLoading] = useState(false);
+  const [tfError, setTfError] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const [tfContext, setTfContext] = useState(null);
+
   const analyze = async () => {
     setLoading(true);
     setError(null);
@@ -35,6 +44,20 @@ function SmartAssistant({ embedded = false }) {
       setError('خطا در تحلیل وضعیت: ' + (e.message || ''));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getTaskFeedback = async () => {
+    setTfLoading(true);
+    setTfError(null);
+    try {
+      const res = await api.post('/ai/analyze-tasks', { task_id: null });
+      setFeedback(res.data?.feedback || 'بازخوردی تولید نشد.');
+      setTfContext(res.data?.context || null);
+    } catch (e) {
+      setTfError('خطا در دریافت بازخورد: ' + (e?.response?.data?.detail || e.message || ''));
+    } finally {
+      setTfLoading(false);
     }
   };
 
@@ -101,6 +124,56 @@ function SmartAssistant({ embedded = false }) {
               <p className="text-xs text-gray-400 mt-1">{s.kind}</p>
             </div>
           ))}
+        </div>
+
+        {/* Task-aware AI feedback — uses the model + analysis prompt configured in
+            تنظیمات → هوش مصنوعی, sees the user's real tasks, and also saves the
+            result to the notification bell. */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mt-8" data-testid="task-feedback-card">
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <h2 className="font-semibold text-gray-900">بازخورد هوشمند روی تسک‌ها</h2>
+            <button
+              type="button"
+              data-testid="task-feedback-btn"
+              onClick={getTaskFeedback}
+              disabled={tfLoading}
+              className="bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {tfLoading ? 'در حال تحلیل…' : 'تحلیل تسک‌ها'}
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            مدل و پرامپتی که در «تنظیمات ← هوش مصنوعی» تعیین کرده‌اید، وضعیت واقعی تسک‌های شما را می‌بیند و بازخورد می‌دهد (در اعلان‌ها هم ثبت می‌شود).
+          </p>
+
+          {tfError && <p className="text-red-600 text-sm mb-2">{tfError}</p>}
+
+          {tfContext && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3" data-testid="task-feedback-context">
+              <div className="rounded-lg bg-gray-50 p-2 text-center">
+                <div className="text-lg font-bold text-gray-900">{tfContext.total ?? 0}</div>
+                <div className="text-xs text-gray-500">کل</div>
+              </div>
+              <div className="rounded-lg bg-green-50 p-2 text-center">
+                <div className="text-lg font-bold text-green-700">{tfContext.completed ?? 0}</div>
+                <div className="text-xs text-gray-500">انجام‌شده</div>
+              </div>
+              <div className="rounded-lg bg-blue-50 p-2 text-center">
+                <div className="text-lg font-bold text-blue-700">{tfContext.pending ?? 0}</div>
+                <div className="text-xs text-gray-500">در انتظار</div>
+              </div>
+              <div className="rounded-lg bg-red-50 p-2 text-center">
+                <div className="text-lg font-bold text-red-700">{tfContext.overdue ?? 0}</div>
+                <div className="text-xs text-gray-500">عقب‌افتاده</div>
+              </div>
+            </div>
+          )}
+
+          {feedback && (
+            <p data-testid="task-feedback-text" className="text-sm text-gray-700 whitespace-pre-wrap bg-indigo-50 border border-indigo-100 rounded-lg p-3">
+              {feedback}
+            </p>
+          )}
         </div>
       </div>
     </div>

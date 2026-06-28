@@ -435,3 +435,41 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   infra/env — none. side — AUDIT_LOG + experiences Update. **No Manual-required part → no TO-DO file.**
 - **VERIFY** backend full suite **964 passed / 14 pre-existing failed (0 new)**; Drive suite 26/26
   (incl. 3 new download tests); `npm run build` clean; ruff clean on changed files.
+
+## 2026-06-28 — Dynamic task-aware AI feedback (task e606cca6 re-audit): surface the existing engine in the UI
+
+- **REVIEW** Owner resent the "dynamic, non-hardcoded AI that knows my tasks, reacts to what I've
+  done/need to do, and sends intelligent feedback into notifications — within the prompt I write in
+  Settings, no token limit, cost no object" spec. Auto-generated prompt assumed a `backend/app/...`
+  + OpenAI + `.tsx` + WebSocket layout that does NOT match this repo; mapped every AC to behaviour.
+- **FINDING — the feature is already fully built (task e606cca6 + 1a08ded2) and green.** Verified by
+  running the suites, did NOT rebuild:
+  - AC1 (per-model `context_type`/`dynamic_response`/`token_limit`/`prompt_template`) → `AIModelConfig`
+    columns + `ai_schema` fields — `test_ai_model_config_has_context_fields`/`…_prompt_template_column`.
+  - AC2 (`get_task_context` → total/completed/pending/overdue) → `app/services/task_analysis.py`.
+  - AC4 (`POST /api/ai/analyze-tasks`) → `app/routes/ai.py` (context + analysis + feedback +
+    persists via `send_ai_feedback`).
+  - AC5 (`send_ai_feedback` → notification) → `notification_service.send_ai_feedback` → `notify_event("ai_feedback")`.
+  - AC6 (`analyze_user_tasks` groups + patterns) → `app/services/task_analysis.py`.
+  - AC7 (WebSocket `/ws/ai-stream`) → `app/routes/ai_stream.py`.
+  - "dynamic, within my prompt, NO token limit" → `app/services/ai/task_feedback.py` merges the
+    user's `GlobalAnalysisPrompt` + full task context + patterns and sends the WHOLE thing (the
+    `test_dynamic_analyze_sends_full_prompt_not_truncated` pins the no-1000-char-clip behaviour);
+    real LLM via `inference_gateway.complete` (Anthropic/OpenAI/Gemini), offline placeholder fallback.
+  - Settings UI (`AISettings.jsx`): provider keys, per-task model routing, and the editable analysis
+    prompt box. 43 backend + 6 frontend AI tests already green.
+- **FINDING — the one real gap (cross-tier, frontend):** NO page called `POST /api/ai/analyze-tasks`
+  (grep of `frontend/src`), so the task-aware feedback engine, though complete + persisting to the
+  bell, was **never triggerable from the app**. SmartAssistant only called `/v1/context/analyze`
+  (a different context engine); there was no scheduler either.
+- **CHANGE (additive — completes the surface)** `frontend/src/pages/SmartAssistant.jsx`: added a
+  «بازخورد هوشمند روی تسک‌ها» panel — a button that POSTs `/ai/analyze-tasks`, renders the returned
+  feedback + the context counts (کل/انجام‌شده/در انتظار/عقب‌افتاده), and notes the result is also
+  saved to the notification bell. The existing context-analyze panel is untouched.
+- **Dependencies synced (4 directions):** upstream — the existing `/api/ai/analyze-tasks` endpoint
+  (no change needed). downstream — new test `SmartAssistantTaskFeedback.test.jsx`; existing
+  `MorePages.test.jsx` SmartAssistant test still green (different testid, untouched path). cross-tier
+  frontend→backend — none required (consumes the already-shipped, already-tested endpoint). db —
+  NONE. env — NONE. side — AUDIT_LOG. **No Manual-required part → no TO-DO file.**
+- **VERIFY** no backend change → backend stays **1004 passed / 13 pre-existing failed (0 new)**;
+  `npm run build` clean; new panel test 1/1 + existing SmartAssistant test 2/2 green.
