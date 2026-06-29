@@ -675,3 +675,33 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **LIMITATION (documented)** Voice/video transcription needs an audio-capable model configured (e.g.
   a Gemini key with a vision model); with only an Anthropic/OpenAI vision model, images/PDFs analyse
   but audio degrades to a placeholder. Buffer is in-memory (single-replica), lost on restart mid-compose.
+
+## 2026-06-28 — Compose intelligence: list-aware routing + dedup/strengthen-existing
+
+- **DECISION** Owner asked whether compose actually (a) knows WHICH real list to file an item under,
+  and (b) detects an existing similar item and STRENGTHENS/updates it instead of duplicating. **Honest
+  prior state:** (a) the AI guessed a `list_name` blind (no sight of the user's real lists) → an
+  `ilike` fuzzy-match that usually missed → fell back to a bare task; (b) there was NO dedup — it
+  always created new. Built both properly.
+- **CHANGE (list-aware + dedup structuring)** `app/services/telegram_compose.py`: new `_gather_context`
+  feeds the structuring model the user's ACTUAL lists (sections) + recent open tasks + recent list
+  items (bounded: 80 lists / 40 tasks / 40 items). The `_STRUCTURE_PROMPT` now returns
+  `action: create|update`, `update_target_kind: task|todo_item`, `update_target_id`, plus the task
+  fields, and `list_name` must resolve to a REAL list (else null). A guard rejects any
+  `update_target_id` NOT in the offered candidate set (no hallucinated-row writes).
+- **CHANGE (apply: create OR strengthen)** `_create` → `_apply`: on `action=update` it loads the
+  chosen Task/TodoItem and **strengthens** it — `_merge_description` does an AI merge of the existing
+  description + the new input (deterministic labelled-append fallback when AI is down; never loses the
+  old text), raises priority only upward, fills an empty due_date. Otherwise it creates a Task, or a
+  `TodoItem` linked to the matched list. Confirmation message distinguishes "ساخته شد" vs "تقویت و
+  به‌روزرسانی شد".
+- **Dependencies synced (4 directions):** upstream — `Task`/`TaskStatus`/`TaskPriority`, `TodoItem`,
+  `TodoList(.is_archived)`, `complete`. downstream — `submit` confirmation copy. db — NONE (reads/updates
+  existing rows; no schema change). env — none.
+- **VERIFY** 3 new tests in `tests/test_telegram_compose.py` (route into an existing list; update +
+  strengthen an existing task via merge; hallucinated update-id guard → falls back to create) — file now
+  12/12; backend full suite **1029 passed / 13 pre-existing failed (0 new)**; ruff clean; `npm run build`
+  unaffected (no frontend change).
+- **LIMITATION** Dedup quality depends on a configured text model + the candidate window (recent 40
+  open tasks / 40 items); older items outside the window won't be matched. List routing needs the AI
+  to pick from the names shown — with no AI key it always creates a plain task (fail-open).

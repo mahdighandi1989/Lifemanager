@@ -194,3 +194,20 @@ photo / document / video / text messages becomes ONE AI-analysed task.
 - **Test the create step with a StaticPool in-memory SQLite** — the pipeline opens
   its OWN sessions (not the request session), so a per-request `:memory:` DB is
   invisible to it; StaticPool (single shared connection) fixes that.
+
+**List-aware routing + dedup (strengthen-existing):** for the structuring step to
+route into the RIGHT list and avoid duplicates, it must *see the domain*, not
+guess blind:
+- Feed the model the user's ACTUAL list names (the sections it may file into) +
+  recent open tasks + recent items (bounded — e.g. 80/40/40 — so the prompt stays
+  small). Make it return `action: create|update`, `update_target_kind`,
+  `update_target_id`, and a `list_name` that must resolve to one of the REAL names
+  shown (else null).
+- **Guard the update id**: only apply an update to an id you actually offered as a
+  candidate — otherwise a hallucinated id silently overwrites a random row. If the
+  id isn't in the candidate set, fall back to create.
+- **Strengthen, don't overwrite**: when updating, AI-merge the existing
+  description + the new input (deterministic labelled-append fallback when AI is
+  down — never lose the old text); raise priority only upward; fill empty fields
+  only. The dedup window is finite, so document that items older than the candidate
+  cap won't be matched.

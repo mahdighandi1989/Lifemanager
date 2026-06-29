@@ -210,9 +210,13 @@ a live status message edits in place. On «✅ ساخت کار از پیوست�
 each item, analyses it via `complete_multimodal` — which auto-resolves a vision/documents
 model (the "activate the vision model when needed" step; audio/video transcribe when the
 resolved model is audio-capable, e.g. Gemini) — concatenates the extractions IN ORDER,
-then a text model structures `{title, description, priority, target: task|list, list_name,
-due_date}` and creates a `Task` (or a `TodoItem` in a matching list). Fail-open: no AI key ⇒
-a task is still built from the text. Buffer scoped to `TELEGRAM_TASK_USER_ID` (default 0).
+then a text model structures `{action, update_target, title, description, priority, target,
+list_name, due_date}`. The structuring step is **list-aware + dedup-aware**: it's shown the
+user's real lists (sections) + recent open tasks/items, so it either creates a `Task` / a
+`TodoItem` in a matched list, OR **strengthens an existing task/item** (AI-merges the
+description, raises priority only upward) instead of duplicating — guarded so it can only
+update an id it was actually offered. Fail-open: no AI key ⇒ a plain task from the text.
+Buffer scoped to `TELEGRAM_TASK_USER_ID` (default 0).
 
 | Method | Path | Notes |
 |---|---|---|

@@ -222,7 +222,7 @@ class ComposeService:
             sections, models_used, report = await self._analyse_items(buf, bot)
             raw_idea = "\n\n".join(sections).strip()
             structured = await self._structure_task(raw_idea)
-            created = await self._create(structured, raw_idea)
+            created = await self._apply(structured, raw_idea)
         except Exception as exc:
             logger.exception("compose submit failed: %r", exc)
             self.clear(chat_id)
@@ -232,9 +232,10 @@ class ComposeService:
 
         self.clear(chat_id)
 
-        # Build the confirmation message.
-        kind_label = "لیست" if created["kind"] == "todo_item" else "کار"
-        msg_lines = [f"✅ {kind_label} ساخته شد: *{created['title']}* (#{created['id']})"]
+        # Build the confirmation message (create vs. strengthen-existing).
+        kind_label = "آیتم لیست" if created["kind"] == "todo_item" else "کار"
+        action_word = "تقویت و به‌روزرسانی شد" if created.get("updated") else "ساخته شد"
+        msg_lines = [f"✅ {kind_label} {action_word}: *{created['title']}* (#{created['id']})"]
         if created.get("list_name"):
             msg_lines.append(f"📋 در لیست: {created['list_name']}")
         if created.get("priority"):
@@ -307,29 +308,44 @@ class ComposeService:
         return sections, models_used, report
 
     async def _structure_task(self, raw_idea: str) -> Dict[str, Any]:
-        """Ask the text model for a structured task. Falls back to a plain task
-        built from the raw idea when AI is unavailable."""
+        """List-aware structuring + dedup decision.
+
+        The model is shown the user's ACTUAL lists (the sections it may route
+        into) and the recent open tasks / list items, then decides whether this
+        input is a NEW task or an UPDATE that should strengthen an existing one.
+        Falls back to a plain new task when AI is unavailable."""
         from app.database import SessionLocal
         from app.services.ai.inference_gateway import complete
 
-        # Title = first real content line (skip the "## پیوست N" section headers
-        # and "[تحلیل نشد]" placeholders the analysis step inserts).
+        # Title fallback = first real content line (skip "## پیوست N" headers and
+        # "[تحلیل نشد]" placeholders the analysis step inserts).
         first_line = next(
             (ln.strip() for ln in raw_idea.splitlines()
              if ln.strip() and not ln.strip().startswith(("##", "["))),
             "کار جدید",
         )
         fallback = {
+            "action": "create", "update_kind": None, "update_id": None,
             "title": first_line[:120].strip() or "کار جدید",
-            "description": raw_idea.strip()[:4000],
+            "description": raw_idea.strip()[:8000],
             "priority": "normal", "target": "task", "list_name": None, "due_date": None,
         }
         if not raw_idea.strip():
             return fallback
+
+        uid = _task_user_id()
+        async with SessionLocal() as session:
+            ctx = await self._gather_context(session, uid)
+
+        lists_txt = "\n".join(f"- {n}" for n in ctx["list_names"]) or "(هیچ لیستی نیست)"
+        tasks_txt = "\n".join(f"- [task #{t['id']}] {t['title']}" for t in ctx["tasks"]) or "(هیچ کار بازی نیست)"
+        items_txt = "\n".join(f"- [item #{i['id']}] {i['content']}" for i in ctx["items"]) or "(هیچ آیتمی نیست)"
+        prompt = _STRUCTURE_PROMPT.format(
+            lists=lists_txt, tasks=tasks_txt, items=items_txt, idea=raw_idea[:8000]
+        )
         try:
             async with SessionLocal() as session:
-                res = await complete(session, _STRUCTURE_PROMPT.format(idea=raw_idea[:8000]),
-                                     task="telegram_compose", max_tokens=1200)
+                res = await complete(session, prompt, task="telegram_compose", max_tokens=1400)
         except Exception as exc:
             logger.debug("compose structure AI skipped: %r", exc)
             return fallback
@@ -338,48 +354,115 @@ class ComposeService:
         obj = _parse_json_object(res.get("text", ""))
         if not obj:
             return fallback
+
+        action = "update" if str(obj.get("action")).lower() == "update" else "create"
+        update_kind = str(obj.get("update_target_kind") or "").lower().strip()
+        update_kind = update_kind if update_kind in ("task", "todo_item") else None
+        try:
+            update_id = int(obj.get("update_target_id"))
+        except (TypeError, ValueError):
+            update_id = None
+        # Guard: only update an id we actually offered (no hallucinated rows).
+        valid_ids = ctx["task_ids"] if update_kind == "task" else ctx["item_ids"]
+        if action == "update" and (update_id is None or update_id not in valid_ids):
+            action, update_kind, update_id = "create", None, None
+
+        # list_name must resolve to one of the REAL lists, else null.
+        list_name = None
+        raw_ln = str(obj.get("list_name")).strip() if obj.get("list_name") else ""
+        if raw_ln and raw_ln.lower() not in ("null", "none"):
+            for n in ctx["list_names"]:
+                if n.lower() == raw_ln.lower() or raw_ln.lower() in n.lower():
+                    list_name = n
+                    break
+
         return {
+            "action": action, "update_kind": update_kind, "update_id": update_id,
             "title": (str(obj.get("title") or fallback["title"]))[:255].strip() or fallback["title"],
             "description": str(obj.get("description") or raw_idea)[:8000],
             "priority": _norm_priority(obj.get("priority")),
             "target": "list" if str(obj.get("target")).lower() == "list" else "task",
-            "list_name": (str(obj.get("list_name")).strip() or None) if obj.get("list_name") else None,
+            "list_name": list_name,
             "due_date": _norm_date(obj.get("due_date")),
         }
 
-    async def _create(self, s: Dict[str, Any], raw_idea: str) -> Dict[str, Any]:
-        """Create a Task (default) or a TodoItem linked to a matching list."""
-        from app.database import SessionLocal
+    async def _gather_context(self, session, uid: int) -> Dict[str, Any]:
+        """The user's lists (sections) + recent open tasks + recent list items —
+        bounded so the structuring prompt stays small."""
+        from sqlalchemy import or_, select
 
-        uid = _task_user_id()
+        from app.models.task import Task, TaskStatus
+        from app.models.todo_item import TodoItem
+        from app.models.todo_list import TodoList
+
+        def _scope(col):
+            return or_(col == uid, col.is_(None)) if uid == 0 else (col == uid)
+
+        lists = (await session.execute(
+            select(TodoList.name)
+            .where(_scope(TodoList.user_id), TodoList.is_archived.is_(False))
+            .limit(80)
+        )).scalars().all()
+        tasks = (await session.execute(
+            select(Task.id, Task.title).where(
+                _scope(Task.user_id), Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS])
+            ).order_by(Task.id.desc()).limit(40)
+        )).all()
+        items = (await session.execute(
+            select(TodoItem.id, TodoItem.content).where(_scope(TodoItem.owner_id))
+            .order_by(TodoItem.id.desc()).limit(40)
+        )).all()
+        return {
+            "list_names": [n for n in lists if n],
+            "tasks": [{"id": t[0], "title": t[1]} for t in tasks],
+            "items": [{"id": i[0], "content": i[1]} for i in items],
+            "task_ids": {t[0] for t in tasks},
+            "item_ids": {i[0] for i in items},
+        }
+
+    async def _apply(self, s: Dict[str, Any], raw_idea: str) -> Dict[str, Any]:
+        """Route the structured result: UPDATE (strengthen) an existing task/item
+        when the model matched one, else CREATE a Task or a list TodoItem."""
+        if s["action"] == "update" and s["update_kind"] == "task" and s["update_id"]:
+            updated = await self._update_task(s)
+            if updated:
+                return updated
+        if s["action"] == "update" and s["update_kind"] == "todo_item" and s["update_id"]:
+            updated = await self._update_todo_item(s)
+            if updated:
+                return updated
+        # create path
         if s["target"] == "list" and s.get("list_name"):
-            created = await self._create_todo_item(s, uid)
+            created = await self._create_todo_item(s)
             if created:
                 return created
             # no matching list → fall back to a task (capability preserved)
+        return await self._create_task(s)
 
-        from app.models.task import Task, TaskPriority, TaskStatus
+    async def _create_task(self, s: Dict[str, Any]) -> Dict[str, Any]:
+        from app.database import SessionLocal
+        from app.models.task import Task, TaskStatus
 
-        pri_map = {"low": TaskPriority.LOW, "normal": TaskPriority.MEDIUM,
-                   "high": TaskPriority.HIGH, "critical": TaskPriority.CRITICAL}
         async with SessionLocal() as session:
             task = Task(
-                title=s["title"], description=s["description"],
-                status=TaskStatus.TODO, priority=pri_map.get(s["priority"], TaskPriority.MEDIUM),
-                user_id=uid, due_date=s.get("due_date"),
+                title=s["title"], description=s["description"], status=TaskStatus.TODO,
+                priority=_to_task_priority(s["priority"]), user_id=_task_user_id(),
+                due_date=s.get("due_date"),
             )
             session.add(task)
             await session.commit()
             await session.refresh(task)
-            return {"kind": "task", "id": task.id, "title": task.title, "priority": s["priority"]}
+            return {"kind": "task", "updated": False, "id": task.id,
+                    "title": task.title, "priority": s["priority"]}
 
-    async def _create_todo_item(self, s: Dict[str, Any], uid: int) -> Optional[Dict[str, Any]]:
+    async def _create_todo_item(self, s: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         from sqlalchemy import func, insert, or_, select
 
         from app.database import SessionLocal
         from app.models.todo_item import TodoItem
         from app.models.todo_list import TodoList, todo_list_items
 
+        uid = _task_user_id()
         name = s["list_name"]
         async with SessionLocal() as session:
             scope = or_(TodoList.user_id == uid, TodoList.user_id.is_(None)) if uid == 0 else (TodoList.user_id == uid)
@@ -400,8 +483,67 @@ class ComposeService:
                 todo_list_id=lst.id, todo_item_id=item.id, position=position
             ))
             await session.commit()
-            return {"kind": "todo_item", "id": item.id, "title": item.content,
-                    "list_name": lst.name, "priority": s["priority"]}
+            return {"kind": "todo_item", "updated": False, "id": item.id,
+                    "title": item.content, "list_name": lst.name, "priority": s["priority"]}
+
+    async def _update_task(self, s: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Strengthen an existing task: AI-merge the description, raise priority
+        only upward, fill an empty due_date. Never weakens what's there."""
+        from app.database import SessionLocal
+        from app.models.task import Task
+
+        async with SessionLocal() as session:
+            task = await session.get(Task, s["update_id"])
+            if task is None:
+                return None
+            task.description = (await self._merge_description(
+                task.title, task.description or "", s["description"]))[:8000]
+            new_pri = _to_task_priority(s["priority"])
+            if _pri_rank(new_pri) > _pri_rank(task.priority):
+                task.priority = new_pri
+            if s.get("due_date") and not task.due_date:
+                task.due_date = s["due_date"]
+            await session.commit()
+            await session.refresh(task)
+            return {"kind": "task", "updated": True, "id": task.id,
+                    "title": task.title, "priority": s["priority"]}
+
+    async def _update_todo_item(self, s: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        from app.database import SessionLocal
+        from app.models.todo_item import TodoItem
+
+        async with SessionLocal() as session:
+            item = await session.get(TodoItem, s["update_id"])
+            if item is None:
+                return None
+            item.description = (await self._merge_description(
+                item.content, item.description or "", s["description"]))[:8000]
+            await session.commit()
+            await session.refresh(item)
+            return {"kind": "todo_item", "updated": True, "id": item.id, "title": item.content}
+
+    async def _merge_description(self, title: str, old: str, new: str) -> str:
+        """Produce a strengthened description from the existing one + the new
+        input (AI when available, else a labelled append — never loses the old)."""
+        old, new = (old or "").strip(), (new or "").strip()
+        if not old:
+            return new
+        if not new:
+            return old
+        from app.database import SessionLocal
+        from app.services.ai.inference_gateway import complete
+
+        try:
+            async with SessionLocal() as session:
+                res = await complete(
+                    session, _MERGE_PROMPT.format(title=title, old=old[:4000], new=new[:4000]),
+                    task="telegram_compose", max_tokens=1200,
+                )
+            if res.get("ok") and (res.get("text") or "").strip():
+                return res["text"].strip()
+        except Exception as exc:
+            logger.debug("compose merge AI skipped: %r", exc)
+        return f"{old}\n\n— به‌روزرسانی:\n{new}"
 
 
 # ── prompts ──────────────────────────────────────────────────────────────────
@@ -418,14 +560,34 @@ _ANALYSIS_PROMPTS = {
 }
 
 _STRUCTURE_PROMPT = (
-    "از روی محتوای زیر (که از چند پیوست تلگرام به‌ترتیب استخراج شده) یک «کار» بساز.\n"
-    "ترتیب پیوست‌ها مهم است؛ اولین‌ها معمولاً مهم‌ترند.\n"
-    "فقط یک شیء JSON برگردان با این کلیدها (بدون توضیح، بدون code fence):\n"
-    '{{"title": "عنوان کوتاه و گویا فارسی", "description": "شرح کامل و خلاصهٔ آنچه باید انجام شود", '
-    '"priority": "low|normal|high|critical", "target": "task|list", '
-    '"list_name": "اگر این مورد بهتر است در یک لیست خاص برود نام آن، وگرنه null", '
+    "تو دستیار سازمان‌دهی کارها هستی. محتوای زیر از چند پیوست تلگرام به‌ترتیب استخراج شده "
+    "(ترتیب مهم است؛ اولین‌ها معمولاً مهم‌ترند).\n\n"
+    "لیست‌های موجود کاربر (می‌توانی آیتم را ذیل دقیقاً یکی از این‌ها قرار دهی):\n{lists}\n\n"
+    "کارهای باز فعلی کاربر (اگر این محتوا در واقع همان موضوع یکی از این‌هاست، به‌جای ساخت تکراری، "
+    "آن را به‌روزرسانی/تقویت کن):\n{tasks}\n\n"
+    "آیتم‌های فهرست‌های فعلی:\n{items}\n\n"
+    "فقط یک شیء JSON برگردان (بدون توضیح، بدون code fence) با این کلیدها:\n"
+    '{{"action": "create یا update", '
+    '"update_target_kind": "task یا todo_item یا null", '
+    '"update_target_id": "عدد id همان مورد بالا اگر update، وگرنه null", '
+    '"title": "عنوان کوتاه و گویا فارسی", '
+    '"description": "شرح کامل آنچه باید انجام شود", '
+    '"priority": "low|normal|high|critical", '
+    '"target": "task یا list", '
+    '"list_name": "دقیقاً یکی از نام لیست‌های بالا اگر مناسب است، وگرنه null", '
     '"due_date": "YYYY-MM-DD یا null"}}\n\n'
+    "قواعد:\n"
+    "- اگر محتوا با یکی از کارهای باز/آیتم‌های موجود هم‌موضوع است → action=update و id همان را بده.\n"
+    "- در غیر این‌صورت action=create.\n"
+    "- list_name باید عیناً از فهرست لیست‌های بالا باشد، وگرنه null.\n\n"
     "محتوا:\n{idea}"
+)
+
+_MERGE_PROMPT = (
+    "یک آیتم کار از قبل وجود دارد و حالا اطلاعات تازه‌ای رسیده. توضیحات را طوری بازنویسی کن که "
+    "آیتم را قوی‌تر، کامل‌تر و به‌روزتر کند — هیچ اطلاعات قبلی را از دست نده و موارد جدید را در آن ادغام کن. "
+    "فقط متن نهایی توضیحات را برگردان (بدون عنوان، بدون توضیح اضافه).\n\n"
+    "عنوان: {title}\n\nتوضیح فعلی:\n{old}\n\nاطلاعات تازه:\n{new}"
 )
 
 
@@ -455,6 +617,25 @@ def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
 def _norm_priority(value: Any) -> str:
     v = str(value or "").lower().strip()
     return v if v in ("low", "normal", "high", "critical") else "normal"
+
+
+_PRI_RANK = {"low": 0, "medium": 1, "normal": 1, "high": 2, "critical": 3}
+
+
+def _to_task_priority(value: str):
+    """Map our normalised priority string onto the Task model's enum."""
+    from app.models.task import TaskPriority
+
+    return {
+        "low": TaskPriority.LOW, "normal": TaskPriority.MEDIUM,
+        "high": TaskPriority.HIGH, "critical": TaskPriority.CRITICAL,
+    }.get(str(value or "").lower(), TaskPriority.MEDIUM)
+
+
+def _pri_rank(priority: Any) -> int:
+    """Rank a TaskPriority enum (or string) so updates can raise-only."""
+    val = getattr(priority, "value", priority)
+    return _PRI_RANK.get(str(val or "").lower(), 1)
 
 
 def _norm_date(value: Any):

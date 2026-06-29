@@ -194,3 +194,94 @@ def _async(value):
     async def _coro():
         return value
     return _coro()
+
+
+# ── list-aware routing + dedup/strengthen ────────────────────────────────────
+import json  # noqa: E402
+
+
+def _ai(monkeypatch, structure_obj, merge_text="توضیح ادغام‌شده و قوی‌تر"):
+    """Patch the AI gateway: multimodal extracts text, complete returns the
+    structuring JSON (or the merge text when given the merge prompt)."""
+    import app.services.ai.inference_gateway as gw
+
+    async def _mm(session, prompt, files, **k):
+        return {"ok": True, "text": "متن استخراج‌شده", "model": "TestVision"}
+
+    async def _complete(session, prompt, **k):
+        if "بازنویسی" in prompt:  # the merge prompt
+            return {"ok": True, "text": merge_text, "model": "TestText"}
+        return {"ok": True, "text": json.dumps(structure_obj, ensure_ascii=False), "model": "TestText"}
+
+    monkeypatch.setattr(gw, "complete_multimodal", _mm)
+    monkeypatch.setattr(gw, "complete", _complete)
+
+
+@pytest.mark.asyncio
+async def test_routes_into_existing_list(monkeypatch, compose_db):
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    from app.models.todo_list import TodoList
+
+    async with compose_db() as s:
+        s.add(TodoList(name="لیست خرید", user_id=0))
+        await s.commit()
+
+    bot = tg.TelegramBot()
+    monkeypatch.setattr(bot, "send", lambda *a, **k: _async({"ok": True}))
+    monkeypatch.setattr(bot, "download_file", lambda *a, **k: _async(b"x"))
+    _ai(monkeypatch, {"action": "create", "title": "شیر و نان",
+                      "description": "بخر", "target": "list", "list_name": "لیست خرید"})
+
+    svc = tc.get_compose_service()
+    svc.add_text("123", "شیر و نان بخر")
+    res = await svc.submit("123", bot=bot)
+    assert res["kind"] == "todo_item"          # routed to a list item, not a bare task
+    assert res["list_name"] == "لیست خرید"
+
+
+@pytest.mark.asyncio
+async def test_update_strengthens_existing_task(monkeypatch, compose_db):
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    from app.models.task import Task, TaskStatus
+
+    async with compose_db() as s:
+        t = Task(title="پروژهٔ آلفا", description="نسخهٔ قدیمی", status=TaskStatus.TODO, user_id=0)
+        s.add(t)
+        await s.commit()
+        await s.refresh(t)
+        task_id = t.id
+
+    bot = tg.TelegramBot()
+    monkeypatch.setattr(bot, "send", lambda *a, **k: _async({"ok": True}))
+    monkeypatch.setattr(bot, "download_file", lambda *a, **k: _async(b"x"))
+    _ai(monkeypatch, {"action": "update", "update_target_kind": "task",
+                      "update_target_id": task_id, "title": "پروژهٔ آلفا",
+                      "description": "جزئیات تازه", "target": "task"})
+
+    svc = tc.get_compose_service()
+    svc.add_text("123", "این هم اطلاعات تکمیلی پروژهٔ آلفا")
+    res = await svc.submit("123", bot=bot)
+    assert res["kind"] == "task" and res["updated"] is True
+    assert res["id"] == task_id                # updated the SAME task, no duplicate
+    async with compose_db() as s:
+        again = await s.get(Task, task_id)
+        assert "ادغام‌شده" in again.description  # description strengthened via merge
+
+
+@pytest.mark.asyncio
+async def test_hallucinated_update_id_falls_back_to_create(monkeypatch, compose_db):
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    bot = tg.TelegramBot()
+    monkeypatch.setattr(bot, "send", lambda *a, **k: _async({"ok": True}))
+    monkeypatch.setattr(bot, "download_file", lambda *a, **k: _async(b"x"))
+    # No tasks exist, but the model claims to update #999 → must guard + create.
+    _ai(monkeypatch, {"action": "update", "update_target_kind": "task",
+                      "update_target_id": 999, "title": "کار تازه",
+                      "description": "...", "target": "task"})
+    svc = tc.get_compose_service()
+    svc.add_text("123", "یک کار کاملاً جدید")
+    res = await svc.submit("123", bot=bot)
+    assert res["kind"] == "task" and res["updated"] is False  # created, not updated
