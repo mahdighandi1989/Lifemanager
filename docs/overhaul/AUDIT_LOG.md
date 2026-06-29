@@ -745,3 +745,30 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   20MB (Telegram). Keyword matching is substring `ILIKE` (no stemming) — good for Persian/English
   tokens ≥3 chars; very short/heavily-inflected matches may be missed. Manual picker shows the top
   5 tasks / 5 items / 8 lists by relevance.
+
+## 2026-06-28 — Fix: route /new_task + plain text through the intelligent compose flow; show destination + model
+
+- **FINDING (owner screenshot)** Tapping «🆕 کار جدید» then typing a sentence created a bare task with
+  NO auto/manual buttons, NO "where did it go", NO model — because `/new_task` (and the `menu:new_task`
+  callback) used the legacy `awaiting_title` → `_create_task` path, which bypasses the whole compose
+  pipeline. Plain non-command text hit a dead-end "متوجه نشدم" nudge. So all three of the owner's
+  complaints (no options / no destination / no model) traced to text never entering compose, plus the
+  compose confirmation only surfaced the *vision* model (media), never the *text* routing model.
+- **CHANGE (entry points → compose)** `telegram_service`: bare `/new_task`, the `menu:new_task`
+  callback, AND any plain non-command text now call a new `_start_compose_flow(chat_id, initial_text?)`
+  — it opens a compose session (optionally seeding the typed text as the first item) and shows the
+  auto/manual reply keyboard, so the user always sees BOTH «✅ ساخت خودکار» and «🎯 انتخاب مقصد»
+  before anything is created. Inline `/new_task <title>` still fast-creates (capability preserved); the
+  legacy `awaiting_title` handler is kept as a fallback.
+- **CHANGE (show model + destination)** `telegram_compose`: `_structure_task` now returns `_model`
+  (the text model that did the routing/dedup) and `submit` adds it to `models_used`, so the
+  confirmation reports the model even for text-only tasks. `_finish` now ALWAYS prints an explicit
+  «🗂 مقصد:» line (🆕 کار مستقل / 📋 لیست «…» / تقویتِ کار موجود #id) and, when no model ran, an
+  honest «ℹ️ بدون تحلیل هوش مصنوعی (کلید مدل تنظیم نشده)» note.
+- **Dependencies synced (4 directions):** upstream — `complete().model`, compose service. downstream —
+  `/new_task` + `menu:new_task` + plain-text path, `_finish` confirmation. db — NONE. env — none.
+- **VERIFY** updated 3 tests + added 1 (`test_text_only_auto_shows_destination_and_model`,
+  `test_new_task_bare_starts_compose`, `test_plain_text_starts_compose_with_that_text`,
+  `test_callback_menu_new_task_starts_compose`); added a compose-singleton reset fixture to
+  `test_telegram_bot.py`. telegram_bot 24/24 + compose 16/16; backend full suite **1033 passed / 13
+  pre-existing failed (0 new)**; ruff clean.

@@ -230,3 +230,14 @@ cloud storage (reuse the app's existing Drive client + folder-ensure) under a
 title-derived safe name, then write the share links into the row (a dedicated
 attachment field + the description). Fail-open when storage isn't connected — skip
 + note, never block task creation.
+
+**Route ALL task-entry through the smart pipeline, not just media.** It's easy to
+wire the rich pipeline to media only and leave a separate "type a title" path that
+bypasses it — users then see none of the routing/model/options for plain text and
+rightly ask "where did it go? which model?". Make the new-task command, its menu
+button, AND plain non-command text all open the SAME compose flow (seed the typed
+text as the first item) so the auto/manual buttons always appear. And surface what
+happened: record the *text* routing model (not just the media/vision one) and
+ALWAYS print an explicit destination line (independent task / list X / strengthened
+#id) + the model, or an honest "no AI key" note when it fell back. The user should
+never have to guess where their input landed or whether AI ran.

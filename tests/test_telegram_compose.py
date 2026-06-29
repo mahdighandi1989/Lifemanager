@@ -394,3 +394,23 @@ async def test_drive_upload_attaches_link_to_task(monkeypatch, compose_db):
         assert "drive.example" in (task.description or "")
         assert task.attachment and "drive.example" in task.attachment
     assert any("drive.example" in m for m in sent)
+
+
+@pytest.mark.asyncio
+async def test_text_only_auto_shows_destination_and_model(monkeypatch, compose_db):
+    """A plain-text auto submit must report WHERE it went + WHICH model ran."""
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    bot = tg.TelegramBot()
+    sent = []
+    monkeypatch.setattr(bot, "send", lambda msg, **k: sent.append(msg) or _async({"ok": True}))
+    _ai(monkeypatch, {"action": "create", "title": "وقت‌گذاری هفتگی",
+                      "description": "هر هفته روی پروژه", "target": "task"})
+
+    svc = tc.get_compose_service()
+    svc.add_text("123", "هر هفته روی پروژه گیت‌هاب وقت بگذارم")
+    res = await svc.submit("123", bot=bot)
+    assert res["handled"] == "compose_submitted"
+    joined = "\n".join(sent)
+    assert "🗂 مقصد" in joined          # says where it landed
+    assert "🤖 مدل: TestText" in joined  # says which model processed it

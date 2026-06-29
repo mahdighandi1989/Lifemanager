@@ -231,6 +231,8 @@ class ComposeService:
             sections, models_used, report = await self._analyse_items(buf, bot)
             raw_idea = "\n\n".join(sections).strip()
             structured = await self._structure_task(raw_idea)
+            if structured.get("_model"):  # the text model that did the routing
+                models_used.add(structured["_model"])
         except Exception as exc:
             logger.exception("compose analyse failed: %r", exc)
             self.clear(chat_id)
@@ -300,8 +302,14 @@ class ComposeService:
         kind_label = "آیتم لیست" if created["kind"] == "todo_item" else "کار"
         action_word = "تقویت و به‌روزرسانی شد" if created.get("updated") else "ساخته شد"
         msg_lines = [f"✅ {kind_label} {action_word}: *{created['title']}* (#{created['id']})"]
-        if created.get("list_name"):
-            msg_lines.append(f"📋 در لیست: {created['list_name']}")
+
+        # Always say WHERE it landed.
+        if created.get("updated") and created["kind"] == "task":
+            msg_lines.append(f"🗂 مقصد: تقویتِ کار موجود (#{created['id']})")
+        elif created.get("list_name"):
+            msg_lines.append(f"🗂 مقصد: 📋 لیست «{created['list_name']}»")
+        else:
+            msg_lines.append("🗂 مقصد: 🆕 کار مستقل (در هیچ لیستی)")
         if created.get("priority"):
             msg_lines.append(f"اولویت: {created['priority']}")
         if report:
@@ -314,8 +322,11 @@ class ComposeService:
         elif drive.get("skipped") == "drive_not_connected" and any(it.kind != "text" for it in items):
             msg_lines.append("")
             msg_lines.append("ℹ️ گوگل‌درایو وصل نیست؛ فایل‌ها بارگذاری نشدند (تنظیمات → گوگل درایو).")
+        # Always say WHICH model processed it (or that AI wasn't available).
         if models_used:
             msg_lines += ["", "🤖 مدل: " + "، ".join(sorted(models_used))]
+        else:
+            msg_lines += ["", "ℹ️ بدون تحلیل هوش مصنوعی (کلید مدل تنظیم نشده) — از متن خام ساخته شد."]
 
         markup = None
         if created["kind"] == "task":
@@ -419,7 +430,7 @@ class ComposeService:
             "کار جدید",
         )
         fallback = {
-            "action": "create", "update_kind": None, "update_id": None,
+            "action": "create", "update_kind": None, "update_id": None, "_model": None,
             "title": first_line[:120].strip() or "کار جدید",
             "description": raw_idea.strip()[:8000],
             "priority": "normal", "target": "task", "list_name": None, "due_date": None,
@@ -472,6 +483,7 @@ class ComposeService:
 
         return {
             "action": action, "update_kind": update_kind, "update_id": update_id,
+            "_model": res.get("model"),
             "title": (str(obj.get("title") or fallback["title"]))[:255].strip() or fallback["title"],
             "description": str(obj.get("description") or raw_idea)[:8000],
             "priority": _norm_priority(obj.get("priority")),

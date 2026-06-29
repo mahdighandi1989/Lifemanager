@@ -502,6 +502,33 @@ class TelegramBot:
         if mid:
             buf.status_message_id = mid
 
+    async def _start_compose_flow(self, chat_id: str, initial_text: Optional[str] = None) -> Dict[str, Any]:
+        """Open the intelligent compose flow (used by /new_task, the «کار جدید»
+        button, and any plain text). Shows the auto/manual keyboard so the user
+        sees BOTH options before anything is created."""
+        from app.services.telegram_compose import COMPOSE_REPLY_KEYBOARD, get_compose_service
+
+        _clear_state(chat_id)
+        compose = get_compose_service()
+        buf = compose.get(chat_id) or compose.start(chat_id)
+        if initial_text:
+            compose.add_text(chat_id, initial_text)
+        intro = (
+            "📝 دریافت شد. می‌توانی پیوست‌های بیشتری (متن/صوت 🎙/عکس 🖼/سند 📄) هم بفرستی.\n\n"
+            if initial_text else
+            "✍️ محتوای کار را بفرست — متن، صوت 🎙، عکس 🖼 یا سند 📄 (می‌توانی چندتا پشت‌سر هم بفرستی).\n\n"
+        )
+        intro += (
+            "بعد یکی را بزن:\n"
+            "• «✅ ساخت خودکار» — هوش مصنوعی تحلیل می‌کند، خودش مقصد را تشخیص می‌دهد و مدل را نشان می‌دهد\n"
+            "• «🎯 انتخاب مقصد» — خودت انتخاب می‌کنی کجا برود یا کدام موردِ موجود تقویت شود"
+        )
+        res = await self.send_with_reply_keyboard(intro, COMPOSE_REPLY_KEYBOARD, chat_id=chat_id)
+        mid = res.get("message_id")
+        if mid and initial_text:
+            buf.status_message_id = mid
+        return {"ok": True, "handled": "compose_started", "has_text": bool(initial_text)}
+
     async def _handle_command(self, chat_id: str, text: str) -> Dict[str, Any]:
         lower = text.lower()
 
@@ -539,24 +566,25 @@ class TelegramBot:
         if lower in ("/tasks", "/today", "/list"):
             return await self._cmd_tasks(chat_id)
 
-        # /new_task <title?>  — inline title creates immediately, bare starts a flow
+        # /new_task <title?>  — an inline one-liner creates immediately (quick path);
+        # bare /new_task opens the INTELLIGENT compose flow so even a plain text
+        # message gets analysed, routed (auto or manual), and reports the model.
         if lower == "/new_task" or lower.startswith("/new_task "):
             title = text[len("/new_task"):].strip()
             if title:
                 return await self._create_task(chat_id, title)
-            _set_state(chat_id, "awaiting_title")
-            await self.send("✏️ عنوان کار جدید را بفرست (یا /cancel برای لغو).", chat_id=chat_id, silent=True)
-            return {"ok": True, "handled": "new_task_prompt"}
+            return await self._start_compose_flow(chat_id)
 
-        # State-aware: a plain message while awaiting a title becomes the task.
+        # State-aware: a plain message while awaiting a title becomes the task
+        # (legacy quick path — kept as a fallback; new flows use compose).
         state = _chat_state.get(chat_id)
         if state and state.get("phase") == "awaiting_title":
             _clear_state(chat_id)
             return await self._create_task(chat_id, text)
 
-        # Unknown text → gentle nudge (kept silent to avoid notification spam).
-        await self.send("متوجه نشدم. /help را بزن تا فهرست دستورها بیاید.", chat_id=chat_id, silent=True)
-        return {"ok": True, "handled": "unknown"}
+        # Any other plain text → treat it as the start of an intelligent task
+        # compose (analyse + auto/manual routing), not a dead-end nudge.
+        return await self._start_compose_flow(chat_id, initial_text=text)
 
     async def _cmd_diag(self, chat_id: str) -> Dict[str, Any]:
         configured = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip()
@@ -667,9 +695,7 @@ class TelegramBot:
             return await self._cmd_status(chat_id)
         if data == "menu:new_task":
             await self.answer_callback(cq_id)
-            _set_state(chat_id, "awaiting_title")
-            await self.send("✏️ عنوان کار جدید را بفرست (یا /cancel).", chat_id=chat_id, silent=True)
-            return {"ok": True, "handled": "cb_new_task"}
+            return await self._start_compose_flow(chat_id)
         if data.startswith("task:done:"):
             task_id = data.split(":", 2)[2]
             return await self._complete_task(chat_id, cq_id, task_id)

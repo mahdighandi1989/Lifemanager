@@ -13,6 +13,17 @@ import pytest
 from app.services import telegram_service as tg
 
 
+@pytest.fixture(autouse=True)
+def _reset_compose_singleton():
+    # /new_task + plain text now open a compose session (global singleton); reset
+    # it around every test so compose state can't leak between tests.
+    import app.services.telegram_compose as tc
+
+    tc._service = None
+    yield
+    tc._service = None
+
+
 # ── helpers ──────────────────────────────────────────────────────────────────
 def _make_bot(monkeypatch, *, token="", chat=""):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", token)
@@ -145,36 +156,28 @@ async def test_new_task_inline_title_creates(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_new_task_flow_awaits_then_creates(monkeypatch):
+async def test_new_task_bare_starts_compose(monkeypatch):
+    import app.services.telegram_compose as tc
+
     bot = _make_bot(monkeypatch)
     calls = _capture_send(bot)
-    created = {}
-
-    async def _create(chat_id, title):
-        created["title"] = title
-        return {"ok": True, "handled": "task_created", "task_id": 2}
-
-    bot._create_task = _create  # type: ignore[assignment]
-
-    # bare /new_task → prompt + state
-    res1 = await bot.handle_update(_msg_update("/new_task"))
-    assert res1["handled"] == "new_task_prompt"
-    assert tg._chat_state["123"]["phase"] == "awaiting_title"
-    # next plain message becomes the task title, state cleared
-    res2 = await bot.handle_update(_msg_update("تماس با علی"))
-    assert res2["handled"] == "task_created"
-    assert created["title"] == "تماس با علی"
-    assert "123" not in tg._chat_state
-    assert calls  # prompt was sent
+    # bare /new_task → opens the intelligent compose flow (auto + manual options)
+    res = await bot.handle_update(_msg_update("/new_task"))
+    assert res["handled"] == "compose_started"
+    assert tc.get_compose_service().has_active("123") is True
+    assert any("ساخت خودکار" in c["message"] for c in calls)
 
 
 @pytest.mark.asyncio
-async def test_unknown_command_nudges(monkeypatch):
+async def test_plain_text_starts_compose_with_that_text(monkeypatch):
+    import app.services.telegram_compose as tc
+
     bot = _make_bot(monkeypatch)
-    calls = _capture_send(bot)
-    res = await bot.handle_update(_msg_update("بلابلا"))
-    assert res["handled"] == "unknown"
-    assert "/help" in calls[0]["message"]
+    _capture_send(bot)
+    res = await bot.handle_update(_msg_update("هر هفته روی پروژه وقت بگذارم"))
+    assert res["handled"] == "compose_started"
+    buf = tc.get_compose_service().get("123")
+    assert buf is not None and buf.items[0].text == "هر هفته روی پروژه وقت بگذارم"
 
 
 # ── callbacks ────────────────────────────────────────────────────────────────
@@ -196,7 +199,9 @@ async def test_callback_task_done_dispatches(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_callback_menu_new_task_sets_state(monkeypatch):
+async def test_callback_menu_new_task_starts_compose(monkeypatch):
+    import app.services.telegram_compose as tc
+
     bot = _make_bot(monkeypatch)
     _capture_send(bot)
 
@@ -207,8 +212,8 @@ async def test_callback_menu_new_task_sets_state(monkeypatch):
     update = {"callback_query": {"id": "cq2", "data": "menu:new_task",
                                  "message": {"chat": {"id": 123}}}}
     res = await bot.handle_update(update)
-    assert res["handled"] == "cb_new_task"
-    assert tg._chat_state["123"]["phase"] == "awaiting_title"
+    assert res["handled"] == "compose_started"
+    assert tc.get_compose_service().has_active("123") is True
 
 
 # ── webhook self-heal ────────────────────────────────────────────────────────

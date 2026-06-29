@@ -204,8 +204,9 @@ and a startup supervisor re-registers the webhook when it drifts after a redeplo
 In-chat commands: `/start` `/help` `/menu` `/ping` `/diag` `/status` `/tasks` `/today`
 `/new_task <title?>` `/cancel`; inline callbacks `task:done:<id>`, `menu:tasks|status|new_task`.
 
-**Compose (media → task).** Sending voice / photo / document / video (or several
-messages in a row) opens an ordered, TTL'd buffer (`app/services/telegram_compose.py`);
+**Compose (content → task).** `/new_task` (bare), the «🆕 کار جدید» button, and ANY plain
+text — as well as voice / photo / document / video (or several messages in a row) — open an
+ordered, TTL'd buffer (`app/services/telegram_compose.py`);
 a live status message edits in place. On «✅ ساخت کار از پیوست‌ها» the pipeline downloads
 each item, analyses it via `complete_multimodal` — which auto-resolves a vision/documents
 model (the "activate the vision model when needed" step; audio/video transcribe when the
