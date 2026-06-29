@@ -231,6 +231,17 @@ title-derived safe name, then write the share links into the row (a dedicated
 attachment field + the description). Fail-open when storage isn't connected — skip
 + note, never block task creation.
 
+**Route media by the capability it ACTUALLY needs, not a coarse "vision" bucket.**
+If you lump every non-text file into "vision", an audio clip resolves to a
+vision-capable model that can't read audio (e.g. Claude has vision but no audio
+input) and fails — making it look like "only provider X works / it's hard-coded".
+Derive the needed capability from the mime (audio/video → `audio`, PDF →
+`documents`, image → `vision`) and resolve ANY enabled model carrying it. Add an
+explicit `audio` capability to your catalog and tag the providers that truly accept
+audio. Then the choice is automatic and provider-agnostic, and your "couldn't
+analyse" message can name the exact missing capability ("no enabled model has the
+audio capability — enable one") instead of a vague "this file type".
+
 **Route ALL task-entry through the smart pipeline, not just media.** It's easy to
 wire the rich pipeline to media only and leave a separate "type a title" path that
 bypasses it — users then see none of the routing/model/options for plain text and

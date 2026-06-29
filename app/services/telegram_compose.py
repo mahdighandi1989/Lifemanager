@@ -406,7 +406,14 @@ class ComposeService:
             else:
                 err = res.get("error") or "no_capable_model"
                 it.error = err
-                note = "مدل سازگار با این نوع فایل تنظیم نشده" if err == "no_capable_model" else err
+                if err == "no_capable_model":
+                    if it.kind in ("voice", "audio", "video", "video_note", "animation"):
+                        note = ("هیچ مدلِ فعالی قابلیت «صوت» ندارد — یک مدل با قابلیت صوت فعال کن "
+                                "(مثلاً Gemini؛ مدل‌های Claude صوت را پشتیبانی نمی‌کنند)")
+                    else:
+                        note = "هیچ مدلِ فعالی قابلیت «تصویر/سند» ندارد — یک مدل بصری فعال کن"
+                else:
+                    note = err
                 report.append(f"{label} `{it.filename}` — ⚠️ {note}")
                 sections.append(f"## پیوست {it.order} ({it.kind}: {it.filename})\n[تحلیل نشد: {note}]")
 

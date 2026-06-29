@@ -190,7 +190,17 @@ async def complete_multimodal(
         if model_id is not None
         else await ai_manager.resolve(db, task)
     )
-    need = "documents" if any((f.get("mimetype") or "").endswith("pdf") for f in files) else "vision"
+    # Capability the files actually need — so resolution picks a model that can
+    # really read them (audio/video ⇒ audio, PDF ⇒ documents, else ⇒ vision).
+    # This is what keeps routing automatic: ANY enabled model carrying the needed
+    # capability is accepted; no provider is hard-coded.
+    _mimes = [(f.get("mimetype") or "").lower() for f in files]
+    if any(m.endswith("pdf") for m in _mimes):
+        need = "documents"
+    elif any(m.startswith(("audio/", "video/")) for m in _mimes):
+        need = "audio"
+    else:
+        need = "vision"
     if rm is None or not rm.is_usable or need not in rm.capabilities:
         capable = await ai_manager.capable_models(db, need)
         if not capable:

@@ -772,3 +772,36 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   `test_callback_menu_new_task_starts_compose`); added a compose-singleton reset fixture to
   `test_telegram_bot.py`. telegram_bot 24/24 + compose 16/16; backend full suite **1033 passed / 13
   pre-existing failed (0 new)**; ruff clean.
+
+## 2026-06-28 — Compose model routing is automatic by CAPABILITY (not hard-coded to Gemini); proper audio capability
+
+- **FINDING (owner)** "I already enabled my Claude token — it must be automatic, not hard-coded to
+  Gemini; any enabled model with vision/etc. should be accepted." Correct on both counts. **Reality
+  check:** text + image + PDF already auto-resolve to ANY enabled, capable model — Claude
+  (`vision`+`documents`) is picked automatically by `ai_manager.resolve` (highest-priority configured
+  model); nothing was Gemini-hard-coded. The screenshot's "no model" was the OLD `/new_task`→bare path
+  (fixed in the previous entry). The ONE real defect: **audio/video was routed as a `vision` task**, so
+  it resolved to Claude (which has vision but cannot read audio) and failed — making it *look* like
+  only Gemini works.
+- **CHANGE (audio capability)** `app/services/ai/catalog.py`: added an `audio` capability and tagged
+  the Gemini models with it (the providers that actually accept audio inline). The idempotent seed
+  refreshes catalog-model capabilities on every boot, so existing installs gain it automatically.
+- **CHANGE (capability-correct routing)** `inference_gateway.complete_multimodal`: `need` is now
+  derived from the file mime — audio/video ⇒ `audio`, PDF ⇒ `documents`, else ⇒ `vision`. So an audio
+  file resolves to ANY enabled model carrying the `audio` capability (Gemini today, anything added
+  later) and never silently mis-routes to a vision-only model. Images/PDF behaviour unchanged.
+- **CHANGE (precise message)** `telegram_compose._analyse_items`: the "not analysed" note is now
+  capability-specific — for audio/video it says "هیچ مدلِ فعالی قابلیت «صوت» ندارد — یک مدل با قابلیت
+  صوت فعال کن (مثلاً Gemini؛ مدل‌های Claude صوت را پشتیبانی نمی‌کنند)"; for image/doc it points at a
+  vision model. No more vague "this file type".
+- **Dependencies synced (4 directions):** upstream — `catalog` capability list + Gemini caps, seed
+  capability-refresh, `ai_manager.capable_models`. downstream — `complete_multimodal` need-routing,
+  compose analysis message. db — NONE (seed updates existing catalog rows in place; no schema change).
+  env — none (AI keys via the AI catalog / AISettings).
+- **VERIFY** new `tests/test_inference_multimodal_routing.py` 4/4 (audio→audio, video→audio,
+  image→vision, pdf→documents); `test_ai_catalog.py` 7/7 (uses subset assertions, unaffected by the
+  new capability); compose 16/16; backend full suite **1037 passed / 13 pre-existing failed (0 new)**;
+  ruff clean.
+- **CLARIFICATION for the owner** Text/image/PDF analysis works with your Claude automatically. Audio
+  transcription is a genuine model limitation — Claude has no audio input; enable any audio-capable
+  model (e.g. Gemini) and the bot will pick it for voice on its own. Nothing is Gemini-only by design.

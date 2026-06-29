@@ -23,6 +23,7 @@ CAPABILITIES: List[Dict[str, str]] = [
     {"id": "code", "label": "کد / Code"},
     {"id": "structured_output", "label": "خروجی ساختاریافته / Structured"},
     {"id": "documents", "label": "اسناد / PDF"},
+    {"id": "audio", "label": "صوت / Audio"},
     {"id": "web_search", "label": "جست‌وجوی وب / Web search"},
 ]
 CAPABILITY_IDS = {c["id"] for c in CAPABILITIES}
@@ -97,10 +98,10 @@ PROVIDER_CATALOG: Dict[str, Dict[str, Any]] = {
         "env_key": "GEMINI_API_KEY",
         "auth_scheme": "api_key",
         "recommended": False,
-        "notes": "کلید Google AI Studio. دید تصویر و زمینه‌ی بسیار بلند.",
+        "notes": "کلید Google AI Studio. دید تصویر، صوت/ویدئو، و زمینه‌ی بسیار بلند.",
         "models": [
-            {"model_key": "gemini-2.0-flash", "display_name": "Gemini 2.0 Flash", "capabilities": ["text", "vision", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
-            {"model_key": "gemini-1.5-pro", "display_name": "Gemini 1.5 Pro", "capabilities": ["text", "vision", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 2000000, "priority": 3},
+            {"model_key": "gemini-2.0-flash", "display_name": "Gemini 2.0 Flash", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
+            {"model_key": "gemini-1.5-pro", "display_name": "Gemini 1.5 Pro", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 2000000, "priority": 3},
         ],
     },
     "deepseek": {
