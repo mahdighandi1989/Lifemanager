@@ -248,6 +248,29 @@ async def startup_event():
     except Exception as exc:
         logger.debug("skip AI catalog seed: %s", exc)
 
+    # Anchor the anonymous data scope. Per-user tables (tasks, user_contexts,
+    # contextual_recommendations, finance, drive_files, …) carry a FK
+    # user_id → users.id. Anonymous / Google-OAuth traffic resolves to
+    # DEFAULT_ANON_USER_ID = 0 (app/dependencies/auth.py), so an anon write
+    # inserts user_id=0 — which violates that FK on Postgres unless a row id=0
+    # exists. That was the cause of the /api/context/location 409s (the
+    # LocationTracker ping). Seed a non-loginable anchor row idempotently;
+    # ON CONFLICT keeps it a no-op once present, and id=0 never collides with
+    # the serial sequence (which starts at 1). hashed_password='!' can never
+    # match a bcrypt hash, so nobody can log in AS the anon user.
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(
+                text(
+                    "INSERT INTO users (id, email, username, hashed_password) "
+                    "VALUES (0, 'anon@lifemanager.local', 'anon', '!') "
+                    "ON CONFLICT (id) DO NOTHING"
+                )
+            )
+        logger.info("anon system user (id=0) ensured — anon-scoped writes are FK-valid")
+    except Exception as exc:
+        logger.debug("skip anon user seed: %s", exc)
+
     # Optional Alembic auto-migration (audit task 3ea5622b): gated by
     # RUN_ALEMBIC_MIGRATIONS_ON_STARTUP + non-production. No-op by default;
     # errors are logged and swallowed so startup never crashes on it.

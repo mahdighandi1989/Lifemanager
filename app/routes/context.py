@@ -9,6 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -72,8 +73,16 @@ async def save_context_location(
         db.add(ctx)
     ctx.current_location = {"lat": payload.lat, "lng": payload.lng}
     ctx.last_activity_time = datetime.now(timezone.utc)
-    await db.commit()
-    await db.refresh(ctx)
+    try:
+        await db.commit()
+        await db.refresh(ctx)
+    except IntegrityError:
+        # The anon scope (user_id=0) FK-references users.id; if that anchor row
+        # is missing (or a concurrent ping raced us) the insert conflicts. Don't
+        # 409 the background LocationTracker — degrade to a soft ack. The startup
+        # anon-user seed normally makes this branch unreachable.
+        await db.rollback()
+        return {"status": "skipped", "current_location": {"lat": payload.lat, "lng": payload.lng}}
     return {"status": "ok", "current_location": ctx.current_location}
 
 

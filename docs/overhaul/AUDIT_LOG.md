@@ -603,3 +603,30 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   cross-tier — none. No Manual code part → no TO-DO.
 - **VERIFY** `tests/test_anthropic_oauth_header.py` 3/3 (oauth headers, temperature-retry, api-key
   path) + `tests/test_ai_catalog.py` 7/7; backend full suite green (0 new); ruff clean.
+
+## 2026-06-28 — FIX: /api/context/location 409 (anon scope had no FK anchor)
+
+- **FINDING** Owner's console showed `POST /api/context/location 409 (Conflict)` (the LocationTracker
+  ping that fires every 5 min). Root cause: per-user tables (user_contexts, tasks, contextual_recommendations,
+  finance, drive_files) carry `user_id → users.id` FK; anonymous / Google-OAuth traffic resolves to
+  `DEFAULT_ANON_USER_ID = 0`, so an anon write inserts `user_id=0`, which violates the FK on Postgres
+  when no `users` row id=0 exists. `@handle_errors` maps the resulting IntegrityError to 409. (Hidden
+  on SQLite, which doesn't enforce FKs by default — so tests were green.) This is the exact 409 the
+  auth module's docstring had warned about.
+- **CHANGE (root cause)** `app/main.py` startup: idempotently seed a non-loginable anchor row
+  `users(id=0, email='anon@lifemanager.local', username='anon', hashed_password='!')` via
+  `INSERT … ON CONFLICT (id) DO NOTHING`. Makes EVERY anon-scoped FK write valid (context, tasks,
+  finance, drive, recommendations), so anon context now persists and location-based recs can fire.
+  id=0 never collides with the serial sequence (starts at 1); '!' is not a valid bcrypt hash so the
+  row can't be logged into.
+- **CHANGE (belt-and-suspenders)** `app/routes/context.py::save_context_location` now catches
+  IntegrityError on commit → rollback → returns a soft `{"status":"skipped"}` 200 instead of letting
+  it become a 409. So the background ping never spams the console even in a deploy/seed race.
+- **Dependencies synced (4 directions):** upstream — `users` table schema, `DEFAULT_ANON_USER_ID`,
+  `@handle_errors` IntegrityError→409. downstream — `/api/context/location` (soft-ack path), the
+  LocationTracker (no behaviour change client-side); new `tests/test_context_location_resilience.py`.
+  db — NONE (no schema change; a DATA seed row, idempotent). cross-tier — none (the frontend ping
+  contract is unchanged; it just stops 409-ing). env — none. No Manual code part → no TO-DO.
+- **VERIFY** new `tests/test_context_location_resilience.py` 2/2 + context suites green; backend full
+  suite green (0 new); ruff clean. (The seed runs only against the live Postgres engine; tests use the
+  SQLite override so it's a no-op there.)
