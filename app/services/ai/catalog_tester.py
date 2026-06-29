@@ -63,12 +63,29 @@ async def test_model(db: AsyncSession, model_id: int) -> Dict[str, Any]:
         return {"ok": True, "latency_ms": latency, "message": f"OK · {latency} ms", "status_code": 200}
     except Exception as exc:
         latency = int((time.monotonic() - start) * 1000)
-        status = getattr(getattr(exc, "response", None), "status_code", None)
+        resp = getattr(exc, "response", None)
+        status = getattr(resp, "status_code", None)
+        # Surface the PROVIDER's actual error body (e.g. Anthropic's
+        # `authentication_error` message), not just "401 Unauthorized" — that's
+        # what tells the operator WHY (bad/expired token vs model vs credit vs
+        # account). Without this the real cause is invisible.
+        detail = ""
+        if resp is not None:
+            try:
+                body = resp.json()
+                err = body.get("error") if isinstance(body, dict) else None
+                if isinstance(err, dict):
+                    detail = f" — {err.get('type', '')}: {err.get('message', '')}".rstrip(": ")
+                elif getattr(resp, "text", ""):
+                    detail = f" — {resp.text[:400]}"
+            except Exception:
+                if getattr(resp, "text", ""):
+                    detail = f" — {resp.text[:400]}"
         return {
             "ok": False,
             "latency_ms": latency,
             "status_code": status,
-            "message": f"{type(exc).__name__}: {exc}",
+            "message": f"{type(exc).__name__}: {exc}{detail}",
         }
 
 

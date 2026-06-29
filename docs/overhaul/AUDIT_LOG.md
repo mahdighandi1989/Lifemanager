@@ -565,3 +565,19 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   valid token). side — AUDIT_LOG + experiences Update. No Manual code part → no TO-DO.
 - **VERIFY** `tests/test_anthropic_oauth_header.py` 2/2; `tests/test_ai_catalog.py` 7/7; backend full
   suite green (0 new failures); ruff clean.
+
+## 2026-06-28 — Surface the provider's real error body on the AI "test" (still-401 follow-up)
+
+- **FINDING** After matching ALLIN1's OAuth headers exactly (Bearer + anthropic-beta:oauth-2025-04-20
+  + claude-cli user-agent + Claude-Code system spoof), the owner still saw 401. lifemanager's
+  `catalog_tester.test_model` only reported `HTTPStatusError: 401 Unauthorized` — it **discarded
+  Anthropic's response body**, which carries the actual reason (`authentication_error` /
+  model / credit / account). ALLIN1 surfaces that body; lifemanager didn't, so the real cause was
+  invisible — making it impossible to tell a code bug from a bad/expired token.
+- **CHANGE** `app/services/ai/catalog_tester.py::test_model` now extracts the provider error body
+  (`error.type` + `error.message`, else the raw text, truncated) and appends it to the test message.
+  The «تست» button will now show e.g. `… 401 — authentication_error: <reason>` instead of a generic
+  status. Diagnostic-only; no behaviour change to the call itself.
+- **Dependencies synced:** upstream — httpx HTTPStatusError shape. downstream — the `/ai/models/{id}/test`
+  response message (richer string; same schema). db/env/cross-tier — none. No Manual code part → no TO-DO.
+- **VERIFY** `tests/test_ai_catalog.py` 7/7 + `tests/test_anthropic_oauth_header.py` 2/2; ruff clean.
