@@ -705,3 +705,43 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **LIMITATION** Dedup quality depends on a configured text model + the candidate window (recent 40
   open tasks / 40 items); older items outside the window won't be matched. List routing needs the AI
   to pick from the names shown — with no AI key it always creates a plain task (fail-open).
+
+## 2026-06-28 — Compose: full-coverage matching + manual target picker + Google Drive file archiving
+
+- **DECISION** Owner: (1) why only "recent 40" — it should identify items across the WHOLE app (it
+  has DB access); (2) besides auto, add a MANUAL mode to pick from a Telegram list which item to
+  add-to/strengthen; (3) every analysed file should also be uploaded to Google Drive (proper title,
+  reference, folder) and its link attached to the created/strengthened item. Built all three.
+- **CHANGE (full coverage)** `telegram_compose._gather_context(session, uid, raw_idea)`: the "recent
+  40" cap was only the prompt-size budget, never a DB limit. Now it keyword-searches **every** open
+  task / list item (`ILIKE` over `_keywords(raw_idea)`, up to 120 each) ∪ the 25 most-recent, ranks
+  by keyword-overlap, and keeps the top 40 for the AI — so a long-ago item is still found when
+  relevant. Lists raised to 200.
+- **CHANGE (manual picker)** A second compose button «🎯 انتخاب مقصد» (`COMPOSE_BTN_PICK`) →
+  `submit(mode="manual")`: analyses, then sends an inline keyboard of the most-relevant existing
+  tasks/items + lists + «🆕 کار جدید» (`cmp:t|i|l|new`), keeping the buffer alive. The tap →
+  `_handle_callback` `cmp:*` → `ComposeService.apply_choice`, which overrides the draft's target and
+  runs the shared `_finish`. «✅ ساخت خودکار» stays the auto path.
+- **CHANGE (Google Drive archiving)** `_attach_drive`: every downloaded file (`ComposeItem.data`, now
+  retained) is uploaded via the EXISTING Drive client (`build_clients` → `ensure_app_folders` →
+  `get_or_create_folder("telegram")` → `upload` → `share_link`) under `LifeManagerData/telegram/`
+  with a title-derived safe filename (`<task>__<order>__<orig>`); `_append_links_to_row` writes the
+  share links into the created/strengthened row's description and sets `Task.attachment` to the first
+  link. Fail-open: Drive not connected ⇒ skipped + a one-line note in the reply. Reuses the existing
+  Drive OAuth connection (Settings → گوگل درایو); no new credentials.
+- **CHANGE (refactor)** `submit` split into `submit(mode)` → `_send_target_picker` / `_finish`
+  (shared apply + Drive + confirm + clear); `apply_choice` for the manual tap; `_keywords` /
+  `_safe_name` helpers. Confirmation now lists the Drive links + create-vs-strengthen wording.
+- **Dependencies synced (4 directions):** upstream — `google_api_client.build_clients/ensure_app_folders/
+  GoogleDriveClient(upload/get_or_create_folder/share_link)`, `Task.attachment`, `Task`/`TodoItem`,
+  the bot's download bytes. downstream — `telegram_service` PICK button + `cmp:*` callbacks, `_finish`
+  confirmation. db — NONE (reuses tasks/todo_items + `global_settings` Drive connection; no schema
+  change). env — none new (Drive via existing `GOOGLE_*`).
+- **VERIFY** 3 new tests in `tests/test_telegram_compose.py` (full-coverage keyword find of an
+  out-of-recent-window task; manual pick → strengthen the chosen task; Drive upload attaches the
+  share link to the task description + `attachment`) → file 15/15; backend full suite **1032 passed /
+  13 pre-existing failed (0 new)**; ruff clean; `npm run build` unaffected.
+- **LIMITATION** Drive upload needs the Drive connection (Settings → گوگل درایو) + the bot's file ≤
+  20MB (Telegram). Keyword matching is substring `ILIKE` (no stemming) — good for Persian/English
+  tokens ≥3 chars; very short/heavily-inflected matches may be missed. Manual picker shows the top
+  5 tasks / 5 items / 8 lists by relevance.

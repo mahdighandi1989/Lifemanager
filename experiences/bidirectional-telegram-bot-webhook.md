@@ -209,5 +209,24 @@ guess blind:
 - **Strengthen, don't overwrite**: when updating, AI-merge the existing
   description + the new input (deterministic labelled-append fallback when AI is
   down — never lose the old text); raise priority only upward; fill empty fields
-  only. The dedup window is finite, so document that items older than the candidate
-  cap won't be matched.
+  only.
+
+**Full coverage without a giant prompt:** a "recent-N" candidate cap is a prompt-
+size budget, NOT a data limit — don't let it read as "the bot can't see old
+items." Instead push the matching into the DB: keyword-`ILIKE` over EVERY open
+row ∪ the most-recent, rank by keyword overlap, send only the top slice to the
+model. So a long-ago item is still found when relevant, and the prompt stays small.
+
+**Manual target picker (beside auto):** offer a second submit button that, instead
+of auto-applying the AI's pick, sends an inline keyboard of the most-relevant
+existing items + lists + "new"; keep the analysed draft on the buffer (`pending`)
+and let the button tap (`cmp:*` callback) choose the target, then run the SAME
+apply path. Split `submit` into `submit(mode)` → `_send_picker` / `_finish` so auto
+and manual share the create/Drive/confirm tail.
+
+**Archive the source files, link them back:** keep each downloaded file's bytes on
+the buffer item, and after the row is created/strengthened, upload every file to
+cloud storage (reuse the app's existing Drive client + folder-ensure) under a
+title-derived safe name, then write the share links into the row (a dedicated
+attachment field + the description). Fail-open when storage isn't connected — skip
++ note, never block task creation.

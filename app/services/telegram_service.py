@@ -446,6 +446,7 @@ class TelegramBot:
         a result dict when handled, or None to let the text/command path run."""
         from app.services.telegram_compose import (
             COMPOSE_BTN_CANCEL,
+            COMPOSE_BTN_PICK,
             COMPOSE_BTN_SUBMIT,
             get_compose_service,
         )
@@ -453,11 +454,15 @@ class TelegramBot:
         compose = get_compose_service()
         active = compose.has_active(chat_id)
 
-        # Submit / cancel buttons (only meaningful while composing).
+        # Submit / pick / cancel buttons (only meaningful while composing).
         if text == COMPOSE_BTN_SUBMIT:
             if not active:
                 return None
-            return await compose.submit(chat_id)
+            return await compose.submit(chat_id, mode="auto")
+        if text == COMPOSE_BTN_PICK:
+            if not active:
+                return None
+            return await compose.submit(chat_id, mode="manual")
         if text == COMPOSE_BTN_CANCEL:
             if not active:
                 return None
@@ -668,6 +673,25 @@ class TelegramBot:
         if data.startswith("task:done:"):
             task_id = data.split(":", 2)[2]
             return await self._complete_task(chat_id, cq_id, task_id)
+        # Compose manual target picker: cmp:new | cmp:t:<id> | cmp:i:<id> | cmp:l:<idx>
+        if data.startswith("cmp:"):
+            from app.services.telegram_compose import get_compose_service
+
+            await self.answer_callback(cq_id, "در حال اعمال…")
+            parts = data.split(":")
+            kind = parts[1] if len(parts) > 1 else ""
+            choice: Dict[str, Any]
+            if kind == "new":
+                choice = {"type": "new"}
+            elif kind == "t" and len(parts) > 2 and parts[2].isdigit():
+                choice = {"type": "task", "id": int(parts[2])}
+            elif kind == "i" and len(parts) > 2 and parts[2].isdigit():
+                choice = {"type": "item", "id": int(parts[2])}
+            elif kind == "l" and len(parts) > 2 and parts[2].isdigit():
+                choice = {"type": "list", "idx": int(parts[2])}
+            else:
+                return {"ok": True, "handled": "cmp_unknown", "data": data[:60]}
+            return await get_compose_service().apply_choice(chat_id, choice, self)
 
         await self.answer_callback(cq_id)
         return {"ok": True, "handled": "cb_unknown", "data": data[:60]}

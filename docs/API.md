@@ -211,12 +211,17 @@ each item, analyses it via `complete_multimodal` — which auto-resolves a visio
 model (the "activate the vision model when needed" step; audio/video transcribe when the
 resolved model is audio-capable, e.g. Gemini) — concatenates the extractions IN ORDER,
 then a text model structures `{action, update_target, title, description, priority, target,
-list_name, due_date}`. The structuring step is **list-aware + dedup-aware**: it's shown the
-user's real lists (sections) + recent open tasks/items, so it either creates a `Task` / a
-`TodoItem` in a matched list, OR **strengthens an existing task/item** (AI-merges the
-description, raises priority only upward) instead of duplicating — guarded so it can only
-update an id it was actually offered. Fail-open: no AI key ⇒ a plain task from the text.
-Buffer scoped to `TELEGRAM_TASK_USER_ID` (default 0).
+list_name, due_date}`. The structuring step is **list-aware + dedup-aware over the whole app**:
+candidates come from a keyword `ILIKE` search across EVERY open task / list item (∪ the most
+recent), ranked by overlap — not a recent-N cap — so it either creates a `Task` / a `TodoItem`
+in a matched list, OR **strengthens an existing task/item** (AI-merges the description, raises
+priority only upward) instead of duplicating, guarded so it can only update an id it was
+offered. Two buttons: «✅ ساخت خودکار» (AI decides) and «🎯 انتخاب مقصد» (manual — an inline
+keyboard of the most-relevant tasks/items/lists + "new"; the tap drives `cmp:*` callbacks).
+Every analysed file is also uploaded to **Google Drive** (`LifeManagerData/telegram/`, via the
+existing Drive connection) and its share link is attached to the created/strengthened row
+(`Task.attachment` + description). Fail-open: no AI key ⇒ a plain task; Drive not connected ⇒
+files skipped with a note. Buffer scoped to `TELEGRAM_TASK_USER_ID` (default 0).
 
 | Method | Path | Notes |
 |---|---|---|

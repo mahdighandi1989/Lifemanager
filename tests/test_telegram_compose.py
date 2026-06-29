@@ -285,3 +285,112 @@ async def test_hallucinated_update_id_falls_back_to_create(monkeypatch, compose_
     svc.add_text("123", "یک کار کاملاً جدید")
     res = await svc.submit("123", bot=bot)
     assert res["kind"] == "task" and res["updated"] is False  # created, not updated
+
+
+# ── full-coverage search (not a recent-N cap) ────────────────────────────────
+@pytest.mark.asyncio
+async def test_gather_context_finds_old_task_by_keyword(compose_db, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    from app.models.task import Task, TaskStatus
+
+    async with compose_db() as s:
+        # oldest task carries a distinctive keyword; then 30 newer unrelated tasks
+        s.add(Task(title="خرید دوچرخهٔ کوهستان", status=TaskStatus.TODO, user_id=0))
+        await s.flush()
+        for n in range(30):
+            s.add(Task(title=f"کار روزمرهٔ شمارهٔ {n}", status=TaskStatus.TODO, user_id=0))
+        await s.commit()
+
+    svc = tc.get_compose_service()
+    async with compose_db() as s:
+        ctx = await svc._gather_context(s, 0, "باید دوچرخه را تعمیر کنم")
+    titles = [t["title"] for t in ctx["tasks"]]
+    # found by keyword despite being far outside the recent window
+    assert any("دوچرخه" in t for t in titles)
+
+
+# ── manual target picker ─────────────────────────────────────────────────────
+@pytest.mark.asyncio
+async def test_manual_pick_then_apply_to_chosen_task(monkeypatch, compose_db):
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    from app.models.task import Task, TaskStatus
+
+    async with compose_db() as s:
+        t = Task(title="پروژهٔ بتا", description="قدیمی", status=TaskStatus.TODO, user_id=0)
+        s.add(t)
+        await s.commit()
+        await s.refresh(t)
+        task_id = t.id
+
+    bot = tg.TelegramBot()
+    sent = []
+    monkeypatch.setattr(bot, "send", lambda msg, **k: sent.append(msg) or _async({"ok": True}))
+    monkeypatch.setattr(bot, "download_file", lambda *a, **k: _async(b"x"))
+    # AI structuring (auto pick would be create) + merge text for the update
+    _ai(monkeypatch, {"action": "create", "title": "اطلاعات بتا",
+                      "description": "نکات تازه", "target": "task"})
+
+    svc = tc.get_compose_service()
+    svc.add_text("123", "اطلاعات تکمیلی برای پروژهٔ بتا")
+
+    # manual mode → a picker is shown, buffer stays active
+    res = await svc.submit("123", bot=bot, mode="manual")
+    assert res["handled"] == "compose_picker"
+    assert svc.has_active("123") is True
+    assert any("کجا برود" in m for m in sent)
+
+    # user taps "strengthen task #task_id"
+    res2 = await svc.apply_choice("123", {"type": "task", "id": task_id}, bot=bot)
+    assert res2["handled"] == "compose_submitted"
+    assert res2["kind"] == "task" and res2["updated"] is True and res2["id"] == task_id
+    assert svc.has_active("123") is False
+
+
+# ── Google Drive upload + link attach ────────────────────────────────────────
+class _FakeDrive:
+    async def get_or_create_folder(self, name, parent=None):
+        return "folder-id"
+
+    async def upload(self, *, file_name, parent, media):
+        return f"fid::{file_name}"
+
+    async def share_link(self, fid):
+        return f"https://drive.example/{fid}"
+
+
+@pytest.mark.asyncio
+async def test_drive_upload_attaches_link_to_task(monkeypatch, compose_db):
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "")
+    monkeypatch.setenv("TELEGRAM_TASK_USER_ID", "0")
+    bot = tg.TelegramBot()
+    sent = []
+    monkeypatch.setattr(bot, "send", lambda msg, **k: sent.append(msg) or _async({"ok": True}))
+    monkeypatch.setattr(bot, "download_file", lambda *a, **k: _async(b"filebytes"))
+    _ai(monkeypatch, {"action": "create", "title": "گزارش", "description": "از سند",
+                      "target": "task"})
+
+    import app.services.google_api_client as gac
+
+    async def _build(session):
+        return _FakeDrive(), None
+
+    async def _ensure(session, drive):
+        return "root-id", {}
+
+    monkeypatch.setattr(gac, "build_clients", _build)
+    monkeypatch.setattr(gac, "ensure_app_folders", _ensure)
+
+    svc = tc.get_compose_service()
+    svc.add_media("123", {"kind": "document", "file_id": "d1", "filename": "report.pdf",
+                          "mime": "application/pdf"})
+    res = await svc.submit("123", bot=bot)
+    assert res["handled"] == "compose_submitted"
+    assert res["drive_uploaded"] == 1
+    # the share link landed in the task description AND the confirmation
+    from app.models.task import Task
+    async with compose_db() as s:
+        task = await s.get(Task, res["id"])
+        assert "drive.example" in (task.description or "")
+        assert task.attachment and "drive.example" in task.attachment
+    assert any("drive.example" in m for m in sent)

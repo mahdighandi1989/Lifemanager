@@ -29,6 +29,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -39,9 +40,10 @@ COMPOSE_TTL_SECONDS = 1800  # 30 min — match the reference bot
 _MAX_ITEMS = 25
 
 # Reply-keyboard captions shown while composing.
-COMPOSE_BTN_SUBMIT = "✅ ساخت کار از پیوست‌ها"
+COMPOSE_BTN_SUBMIT = "✅ ساخت خودکار"          # auto: AI decides target
+COMPOSE_BTN_PICK = "🎯 انتخاب مقصد"            # manual: pick target from a list
 COMPOSE_BTN_CANCEL = "🗑 لغو"
-COMPOSE_REPLY_KEYBOARD = [[COMPOSE_BTN_SUBMIT], [COMPOSE_BTN_CANCEL]]
+COMPOSE_REPLY_KEYBOARD = [[COMPOSE_BTN_SUBMIT], [COMPOSE_BTN_PICK], [COMPOSE_BTN_CANCEL]]
 
 _KIND_ICON = {
     "voice": "🎙", "audio": "🎵", "photo": "🖼", "image": "🖼",
@@ -68,7 +70,9 @@ class ComposeItem:
     duration: Optional[int] = None
     size: Optional[int] = None
     # filled during the submit pipeline
+    data: Optional[bytes] = None        # downloaded bytes (kept for Drive upload)
     extracted: Optional[str] = None
+    drive_link: Optional[str] = None
     error: Optional[str] = None
 
 
@@ -80,6 +84,9 @@ class ComposeBuffer:
     created_at: float = field(default_factory=time.monotonic)
     last_at: float = field(default_factory=time.monotonic)
     submitting: bool = False
+    # manual-mode: the analysed-but-not-yet-applied draft (set by submit(mode="manual"),
+    # consumed by apply_choice when the user taps a target).
+    pending: Optional[Dict[str, Any]] = None
 
     def next_order(self) -> int:
         return len(self.items) + 1
@@ -192,15 +199,17 @@ class ComposeService:
                 dur = f" • {it.duration}s" if it.duration else ""
                 lines.append(f"{it.order}. {icon} `{it.filename or it.kind}`{dur}")
         lines.append("")
-        lines.append("وقتی تمام شد «✅ ساخت کار از پیوست‌ها» را بزن (یا 🗑 لغو).")
+        lines.append("وقتی تمام شد:")
+        lines.append("• «✅ ساخت خودکار» — هوش مصنوعی خودش مقصد را تشخیص می‌دهد")
+        lines.append("• «🎯 انتخاب مقصد» — خودت از فهرست انتخاب می‌کنی کجا برود/کدام تقویت شود")
         return "\n".join(lines)
 
     # ── submit pipeline ──────────────────────────────────────────────────────
-    async def submit(self, chat_id: str, bot: Any = None) -> Dict[str, Any]:
-        """Download + analyse every buffered item in order, build one structured
-        task, and create it. Returns a result dict; the caller has already been
-        told (via the reply) what happened. ``bot`` defaults to the singleton —
-        injected in tests."""
+    async def submit(self, chat_id: str, bot: Any = None, *, mode: str = "auto") -> Dict[str, Any]:
+        """Analyse the buffered items, then either apply automatically (mode=auto:
+        the AI decides the target) or present a manual target picker (mode=manual:
+        the user taps which existing task/item to strengthen, which list to file
+        under, or "new"). ``bot`` defaults to the singleton — injected in tests."""
         from app.services.telegram_service import (
             PERSISTENT_REPLY_KEYBOARD,
             get_telegram_bot,
@@ -222,9 +231,65 @@ class ComposeService:
             sections, models_used, report = await self._analyse_items(buf, bot)
             raw_idea = "\n\n".join(sections).strip()
             structured = await self._structure_task(raw_idea)
-            created = await self._apply(structured, raw_idea)
         except Exception as exc:
-            logger.exception("compose submit failed: %r", exc)
+            logger.exception("compose analyse failed: %r", exc)
+            self.clear(chat_id)
+            await bot.send(f"❌ تحلیل ناموفق بود:\n`{str(exc)[:200]}`", chat_id=chat_id, silent=True,
+                           reply_markup=PERSISTENT_REPLY_KEYBOARD)
+            return {"ok": True, "handled": "compose_error", "error": str(exc)[:200]}
+
+        if mode == "manual":
+            buf.submitting = False  # picker is async; allow the tap to drive it
+            buf.pending = {"structured": structured, "raw_idea": raw_idea,
+                           "models": list(models_used), "report": report}
+            await self._send_target_picker(chat_id, bot, buf, raw_idea)
+            return {"ok": True, "handled": "compose_picker"}
+
+        return await self._finish(chat_id, bot, structured, raw_idea, models_used, report, list(buf.items))
+
+    async def apply_choice(self, chat_id: str, choice: Dict[str, Any], bot: Any = None) -> Dict[str, Any]:
+        """Apply a manually-picked target (from the inline picker) to the pending
+        analysed draft. ``choice`` is {type: new|task|item|list, id?/idx?}."""
+        from app.services.telegram_service import get_telegram_bot
+
+        bot = bot or get_telegram_bot()
+        buf = self.get(chat_id)
+        if buf is None or not buf.pending:
+            await bot.send("⚠️ مهلت انتخاب تمام شد. دوباره پیوست‌ها را بفرست.", chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "compose_no_pending"}
+        pending = buf.pending
+        s = dict(pending["structured"])
+
+        ctype = choice.get("type")
+        if ctype == "new":
+            s.update({"action": "create", "update_kind": None, "update_id": None,
+                      "target": "task", "list_name": None})
+        elif ctype == "task":
+            s.update({"action": "update", "update_kind": "task", "update_id": choice.get("id")})
+        elif ctype == "item":
+            s.update({"action": "update", "update_kind": "todo_item", "update_id": choice.get("id")})
+        elif ctype == "list":
+            names = pending.get("lists") or []
+            idx = choice.get("idx", -1)
+            name = names[idx] if 0 <= idx < len(names) else None
+            s.update({"action": "create", "update_kind": None, "update_id": None,
+                      "target": "list" if name else "task", "list_name": name})
+        else:
+            return {"ok": True, "handled": "compose_choice_unknown"}
+
+        return await self._finish(chat_id, bot, s, pending["raw_idea"],
+                                  set(pending.get("models") or []), pending.get("report") or [], list(buf.items))
+
+    async def _finish(self, chat_id, bot, structured, raw_idea, models_used, report, items) -> Dict[str, Any]:
+        """Create/strengthen the row, upload the files to Drive + attach links,
+        send the confirmation, and clear the buffer."""
+        from app.services.telegram_service import PERSISTENT_REPLY_KEYBOARD
+
+        try:
+            created = await self._apply(structured, raw_idea)
+            drive = await self._attach_drive(created, items)
+        except Exception as exc:
+            logger.exception("compose finish failed: %r", exc)
             self.clear(chat_id)
             await bot.send(f"❌ ساخت کار ناموفق بود:\n`{str(exc)[:200]}`", chat_id=chat_id, silent=True,
                            reply_markup=PERSISTENT_REPLY_KEYBOARD)
@@ -232,7 +297,6 @@ class ComposeService:
 
         self.clear(chat_id)
 
-        # Build the confirmation message (create vs. strengthen-existing).
         kind_label = "آیتم لیست" if created["kind"] == "todo_item" else "کار"
         action_word = "تقویت و به‌روزرسانی شد" if created.get("updated") else "ساخته شد"
         msg_lines = [f"✅ {kind_label} {action_word}: *{created['title']}* (#{created['id']})"]
@@ -241,12 +305,17 @@ class ComposeService:
         if created.get("priority"):
             msg_lines.append(f"اولویت: {created['priority']}")
         if report:
+            msg_lines += ["", "تحلیل پیوست‌ها:", *report]
+        if drive.get("links"):
             msg_lines.append("")
-            msg_lines.append("تحلیل پیوست‌ها:")
-            msg_lines.extend(report)
+            msg_lines.append("📎 فایل‌ها در گوگل‌درایو:")
+            for link in drive["links"]:
+                msg_lines.append(f"• [{link['name']}]({link['link']})")
+        elif drive.get("skipped") == "drive_not_connected" and any(it.kind != "text" for it in items):
+            msg_lines.append("")
+            msg_lines.append("ℹ️ گوگل‌درایو وصل نیست؛ فایل‌ها بارگذاری نشدند (تنظیمات → گوگل درایو).")
         if models_used:
-            msg_lines.append("")
-            msg_lines.append("🤖 مدل: " + "، ".join(sorted(models_used)))
+            msg_lines += ["", "🤖 مدل: " + "، ".join(sorted(models_used))]
 
         markup = None
         if created["kind"] == "task":
@@ -257,7 +326,31 @@ class ComposeService:
         await bot.send("\n".join(msg_lines), chat_id=chat_id, silent=True, reply_markup=markup)
         await bot.send("🎛 منوی ثابت فعال است.", chat_id=chat_id, silent=True,
                        reply_markup=PERSISTENT_REPLY_KEYBOARD)
-        return {"ok": True, "handled": "compose_submitted", **created}
+        return {"ok": True, "handled": "compose_submitted", **created, "drive_uploaded": drive.get("uploaded", 0)}
+
+    async def _send_target_picker(self, chat_id, bot, buf, raw_idea) -> None:
+        """Show an inline keyboard of the most relevant existing tasks/items +
+        lists + "new", so the user chooses the target manually."""
+        from app.database import SessionLocal
+
+        uid = _task_user_id()
+        async with SessionLocal() as session:
+            ctx = await self._gather_context(session, uid, raw_idea)
+        buf.pending["lists"] = ctx["list_names"][:8]
+
+        rows: List[List[Dict[str, Any]]] = []
+        for t in ctx["tasks"][:5]:
+            rows.append([{"text": f"✏️ تقویت کار: {t['title'][:28]}", "callback_data": f"cmp:t:{t['id']}"}])
+        for i in ctx["items"][:5]:
+            rows.append([{"text": f"✏️ تقویت آیتم: {i['content'][:28]}", "callback_data": f"cmp:i:{i['id']}"}])
+        for idx, name in enumerate(buf.pending["lists"]):
+            rows.append([{"text": f"📋 افزودن به لیست: {name[:28]}", "callback_data": f"cmp:l:{idx}"}])
+        rows.append([{"text": "🆕 کار جدید مستقل", "callback_data": "cmp:new"}])
+
+        await bot.send(
+            "🎯 *این محتوا کجا برود؟*\nیکی را انتخاب کن — تقویت یک مورد موجود، افزودن به یک لیست، یا کار جدید.",
+            chat_id=chat_id, silent=True, reply_markup={"inline_keyboard": rows},
+        )
 
     async def _analyse_items(self, buf: ComposeBuffer, bot) -> tuple:
         """Download + analyse each item in order. Returns (sections, models, report)."""
@@ -280,6 +373,7 @@ class ComposeService:
                 report.append(f"{label} `{it.filename}` — ⚠️ دانلود نشد")
                 sections.append(f"## پیوست {it.order} ({it.kind}: {it.filename})\n[دانلود نشد]")
                 continue
+            it.data = data  # keep the bytes for the Google Drive upload step
 
             prompt = _ANALYSIS_PROMPTS.get(it.kind, _ANALYSIS_PROMPTS["default"])
             try:
@@ -335,7 +429,7 @@ class ComposeService:
 
         uid = _task_user_id()
         async with SessionLocal() as session:
-            ctx = await self._gather_context(session, uid)
+            ctx = await self._gather_context(session, uid, raw_idea)
 
         lists_txt = "\n".join(f"- {n}" for n in ctx["list_names"]) or "(هیچ لیستی نیست)"
         tasks_txt = "\n".join(f"- [task #{t['id']}] {t['title']}" for t in ctx["tasks"]) or "(هیچ کار بازی نیست)"
@@ -386,9 +480,15 @@ class ComposeService:
             "due_date": _norm_date(obj.get("due_date")),
         }
 
-    async def _gather_context(self, session, uid: int) -> Dict[str, Any]:
-        """The user's lists (sections) + recent open tasks + recent list items —
-        bounded so the structuring prompt stays small."""
+    async def _gather_context(self, session, uid: int, raw_idea: str = "") -> Dict[str, Any]:
+        """Candidate lists + tasks + items for routing/dedup.
+
+        Coverage is the WHOLE app, not a hard recent-N cap: we let the DB search
+        every open task / item whose title matches a keyword from the new content
+        (`ILIKE`), union that with the most recent rows (so there's always some
+        context), then rank by keyword overlap and keep the top slice for the AI
+        prompt. So an item created long ago is still found if it's relevant.
+        """
         from sqlalchemy import or_, select
 
         from app.models.task import Task, TaskStatus
@@ -398,27 +498,117 @@ class ComposeService:
         def _scope(col):
             return or_(col == uid, col.is_(None)) if uid == 0 else (col == uid)
 
+        kws = _keywords(raw_idea)
+
         lists = (await session.execute(
             select(TodoList.name)
             .where(_scope(TodoList.user_id), TodoList.is_archived.is_(False))
-            .limit(80)
+            .limit(200)
         )).scalars().all()
-        tasks = (await session.execute(
+
+        # Tasks: keyword matches across ALL open tasks ∪ most-recent (fallback).
+        task_rows: Dict[int, str] = {}
+        if kws:
+            matched = (await session.execute(
+                select(Task.id, Task.title).where(
+                    _scope(Task.user_id), Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
+                    or_(*[Task.title.ilike(f"%{k}%") for k in kws]),
+                ).limit(120)
+            )).all()
+            task_rows.update({r[0]: r[1] for r in matched})
+        recent_t = (await session.execute(
             select(Task.id, Task.title).where(
                 _scope(Task.user_id), Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS])
-            ).order_by(Task.id.desc()).limit(40)
+            ).order_by(Task.id.desc()).limit(25)
         )).all()
-        items = (await session.execute(
+        task_rows.update({r[0]: r[1] for r in recent_t})
+
+        item_rows: Dict[int, str] = {}
+        if kws:
+            matched = (await session.execute(
+                select(TodoItem.id, TodoItem.content).where(
+                    _scope(TodoItem.owner_id), or_(*[TodoItem.content.ilike(f"%{k}%") for k in kws]),
+                ).limit(120)
+            )).all()
+            item_rows.update({r[0]: r[1] for r in matched})
+        recent_i = (await session.execute(
             select(TodoItem.id, TodoItem.content).where(_scope(TodoItem.owner_id))
-            .order_by(TodoItem.id.desc()).limit(40)
+            .order_by(TodoItem.id.desc()).limit(25)
         )).all()
+        item_rows.update({r[0]: r[1] for r in recent_i})
+
+        def _rank(rows: Dict[int, str], limit: int):
+            scored = [
+                {"id": rid, "_t": txt or "", "score": sum(1 for k in kws if k.lower() in (txt or "").lower())}
+                for rid, txt in rows.items()
+            ]
+            scored.sort(key=lambda r: (r["score"], r["id"]), reverse=True)
+            return scored[:limit]
+
+        tasks = [{"id": r["id"], "title": r["_t"]} for r in _rank(task_rows, 40)]
+        items = [{"id": r["id"], "content": r["_t"]} for r in _rank(item_rows, 40)]
         return {
             "list_names": [n for n in lists if n],
-            "tasks": [{"id": t[0], "title": t[1]} for t in tasks],
-            "items": [{"id": i[0], "content": i[1]} for i in items],
-            "task_ids": {t[0] for t in tasks},
-            "item_ids": {i[0] for i in items},
+            "tasks": tasks,
+            "items": items,
+            "task_ids": {t["id"] for t in tasks},
+            "item_ids": {i["id"] for i in items},
         }
+
+    # ── Google Drive: upload the files + attach links to the created row ──────
+    async def _attach_drive(self, created: Dict[str, Any], items: List[ComposeItem]) -> Dict[str, Any]:
+        """Upload every downloaded file to Google Drive (under
+        LifeManagerData/telegram), then append the share links to the created/
+        updated row's description (+ Task.attachment). Fail-open: when Drive isn't
+        connected we skip silently and report it."""
+        file_items = [it for it in items if it.kind != "text" and it.data]
+        if not file_items:
+            return {"uploaded": 0, "links": []}
+        from app.database import SessionLocal
+        from app.services.google_api_client import build_clients, ensure_app_folders
+
+        links: List[Dict[str, str]] = []
+        try:
+            async with SessionLocal() as session:
+                drive, _sheets = await build_clients(session)
+                if drive is None:
+                    return {"uploaded": 0, "links": [], "skipped": "drive_not_connected"}
+                root_id, _subs = await ensure_app_folders(session, drive)
+                tg_folder = await drive.get_or_create_folder("telegram", parent=root_id)
+                safe = _safe_name(created.get("title") or "task")
+                for it in file_items:
+                    fname = f"{safe}__{it.order}__{_safe_name(it.filename or it.kind, keep_ext=True)}"
+                    try:
+                        fid = await drive.upload(file_name=fname, parent=tg_folder, media=it.data)
+                        link = await drive.share_link(fid)
+                        it.drive_link = link
+                        links.append({"name": fname, "link": link})
+                    except Exception as up_exc:
+                        logger.warning("compose drive upload of %s failed: %r", fname, up_exc)
+                if links:
+                    await self._append_links_to_row(session, created, links)
+                    await session.commit()
+            return {"uploaded": len(links), "links": links}
+        except Exception as exc:
+            logger.warning("compose drive attach failed: %r", exc)
+            return {"uploaded": 0, "links": [], "error": str(exc)[:120]}
+
+    async def _append_links_to_row(self, session, created: Dict[str, Any], links: List[Dict[str, str]]) -> None:
+        block = "\n\n📎 فایل‌ها (Google Drive):\n" + "\n".join(f"- {x['name']}: {x['link']}" for x in links)
+        if created["kind"] == "task":
+            from app.models.task import Task
+
+            row = await session.get(Task, created["id"])
+            if row is not None:
+                row.description = ((row.description or "") + block)[:8000]
+                if hasattr(row, "attachment"):
+                    row.attachment = (links[0]["link"])[:500]
+        else:
+            from app.models.todo_item import TodoItem
+
+            row = await session.get(TodoItem, created["id"])
+            if row is not None:
+                row.description = ((row.description or "") + block)[:8000]
 
     async def _apply(self, s: Dict[str, Any], raw_idea: str) -> Dict[str, Any]:
         """Route the structured result: UPDATE (strengthen) an existing task/item
@@ -612,6 +802,41 @@ def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
         return obj if isinstance(obj, dict) else None
     except Exception:
         return None
+
+
+# Common Persian/English stop-words to drop from keyword matching.
+_STOP = {
+    "این", "آن", "که", "را", "به", "از", "با", "در", "برای", "تا", "هم", "است",
+    "های", "یک", "روی", "کرد", "باید", "خیلی", "وقتی", "the", "and", "for", "with",
+    "this", "that", "you", "are", "have",
+}
+
+
+def _keywords(text: str, limit: int = 12) -> List[str]:
+    """Distinct content tokens (len ≥ 3, not stop-words/numbers) for ILIKE search."""
+    seen: set = set()
+    out: List[str] = []
+    for tok in re.findall(r"\w{3,}", text or "", flags=re.UNICODE):
+        low = tok.lower()
+        if low in _STOP or low.isdigit() or low in seen:
+            continue
+        seen.add(low)
+        out.append(tok)
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _safe_name(name: str, *, keep_ext: bool = False) -> str:
+    """A filesystem/Drive-safe name from a title (keeps an extension if asked)."""
+    name = (name or "").strip()
+    ext = ""
+    if keep_ext and "." in name:
+        name, _, ext = name.rpartition(".")
+        ext = "." + re.sub(r"[^\w]+", "", ext)[:8]
+    cleaned = re.sub(r"[\\/:*?\"<>|\n\r\t]+", " ", name).strip()
+    cleaned = re.sub(r"\s+", "_", cleaned)[:80] or "file"
+    return cleaned + ext
 
 
 def _norm_priority(value: Any) -> str:
