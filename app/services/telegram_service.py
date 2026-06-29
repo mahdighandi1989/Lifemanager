@@ -229,7 +229,12 @@ class TelegramBot:
             async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
                 r = await client.post(url, json=payload)
                 if r.status_code == 200:
-                    return {"ok": True, "silent": silent}
+                    mid = None
+                    try:
+                        mid = (r.json().get("result") or {}).get("message_id")
+                    except Exception:
+                        pass
+                    return {"ok": True, "silent": silent, "message_id": mid}
                 body = r.text
                 if r.status_code == 429:
                     self._absorb_429(body)
@@ -270,6 +275,73 @@ class TelegramBot:
                 await client.post(f"{_API_BASE}/bot{self.bot_token}/answerCallbackQuery", json=payload)
         except Exception:
             pass
+
+    async def edit_message_text(
+        self, chat_id: str, message_id: int, text: str, *,
+        reply_markup: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Edit a previously-sent message in place (used for the live compose
+        status). Silently ignores the 'message is not modified' no-op."""
+        if not self.bot_token:
+            return {"ok": False, "error": "no token"}
+        if len(text) > 4000:
+            text = text[:3990] + "\n…[truncated]"
+        payload: Dict[str, Any] = {
+            "chat_id": chat_id, "message_id": message_id, "text": text,
+            "parse_mode": "Markdown", "disable_web_page_preview": True,
+        }
+        if reply_markup:
+            payload["reply_markup"] = reply_markup
+        try:
+            async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
+                r = await client.post(f"{_API_BASE}/bot{self.bot_token}/editMessageText", json=payload)
+                if r.status_code == 200:
+                    return {"ok": True}
+                body = r.text
+                if "not modified" in body.lower():
+                    return {"ok": True, "unchanged": True}
+                if "can't parse" in body.lower():
+                    payload.pop("parse_mode", None)
+                    r2 = await client.post(f"{_API_BASE}/bot{self.bot_token}/editMessageText", json=payload)
+                    return {"ok": r2.status_code == 200}
+                return {"ok": False, "error": f"HTTP {r.status_code}: {body[:160]}"}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)[:160]}
+
+    # ── file download (getFile → bytes) ──────────────────────────────────────
+    async def get_file_path(self, file_id: str) -> Optional[str]:
+        """Resolve a Telegram file_id to its download path via getFile."""
+        if not self.bot_token:
+            return None
+        try:
+            async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
+                r = await client.get(f"{_API_BASE}/bot{self.bot_token}/getFile", params={"file_id": file_id})
+                if r.status_code != 200:
+                    return None
+                return ((r.json().get("result") or {}).get("file_path")) or None
+        except Exception as exc:
+            logger.debug("telegram get_file_path failed: %r", exc)
+            return None
+
+    async def download_file(self, file_id: str, *, max_bytes: int = 20 * 1024 * 1024) -> Optional[bytes]:
+        """Download a file by id (getFile → file API). Telegram's Bot API caps
+        downloads at 20MB; returns None on any failure or oversize."""
+        path = await self.get_file_path(file_id)
+        if not path:
+            return None
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                r = await client.get(f"{_API_BASE}/file/bot{self.bot_token}/{path}")
+                if r.status_code != 200:
+                    return None
+                data = r.content
+                if len(data) > max_bytes:
+                    logger.info("telegram download oversize (%d bytes) — skipped", len(data))
+                    return None
+                return data
+        except Exception as exc:
+            logger.debug("telegram download_file failed: %r", exc)
+            return None
 
     # ── webhook registration ─────────────────────────────────────────────────
     async def set_webhook(self, webhook_url: str) -> Dict[str, Any]:
@@ -329,20 +401,33 @@ class TelegramBot:
         text = (message.get("text") or "").strip()
         chat = message.get("chat") or {}
         chat_id = chat.get("id")
-        if not chat_id or not text:
+        if not chat_id:
             return {"ok": True, "ignored": True}
         chat_id_str = str(chat_id)
-
-        # Persistent-keyboard taps arrive as plain text — map back to commands.
-        if text in TEXT_ALIASES:
-            _clear_state(chat_id_str)
-            text = TEXT_ALIASES[text]
 
         # Security: only act on the configured chat (when one is configured).
         configured = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip()
         if configured and chat_id_str != configured:
             logger.info("telegram: ignoring chat %s (not configured)", chat_id_str)
             return {"ok": True, "ignored": True}
+
+        # Compose: media (voice/photo/document/video/…) — or text while a compose
+        # session is open — is buffered into one task. Runs BEFORE the text-command
+        # path so attachments aren't dropped (they carry no message.text).
+        try:
+            routed = await self._maybe_route_to_compose(chat_id_str, message, text)
+            if routed is not None:
+                return routed
+        except Exception as exc:
+            logger.exception("telegram compose routing crashed: %r", exc)
+
+        if not text:
+            return {"ok": True, "ignored": True}
+
+        # Persistent-keyboard taps arrive as plain text — map back to commands.
+        if text in TEXT_ALIASES:
+            _clear_state(chat_id_str)
+            text = TEXT_ALIASES[text]
 
         try:
             return await self._handle_command(chat_id_str, text)
@@ -354,12 +439,79 @@ class TelegramBot:
                 pass
             return {"ok": True, "handler_error": str(exc)[:200]}
 
+    async def _maybe_route_to_compose(
+        self, chat_id: str, message: Dict[str, Any], text: str
+    ) -> Optional[Dict[str, Any]]:
+        """Route media + compose-keyboard taps into the compose buffer. Returns
+        a result dict when handled, or None to let the text/command path run."""
+        from app.services.telegram_compose import (
+            COMPOSE_BTN_CANCEL,
+            COMPOSE_BTN_SUBMIT,
+            get_compose_service,
+        )
+
+        compose = get_compose_service()
+        active = compose.has_active(chat_id)
+
+        # Submit / cancel buttons (only meaningful while composing).
+        if text == COMPOSE_BTN_SUBMIT:
+            if not active:
+                return None
+            return await compose.submit(chat_id)
+        if text == COMPOSE_BTN_CANCEL:
+            if not active:
+                return None
+            compose.clear(chat_id)
+            await self.send("🗑 لغو شد.", chat_id=chat_id, silent=True, reply_markup=PERSISTENT_REPLY_KEYBOARD)
+            return {"ok": True, "handled": "compose_cancelled"}
+
+        media = compose.detect_media(message)
+
+        # A plain message while composing → add as a text item (commands +
+        # persistent-keyboard taps are left for the normal path).
+        if media is None:
+            if active and text and not text.startswith("/") and text not in TEXT_ALIASES:
+                buf = compose.add_text(chat_id, text)
+                await self._refresh_compose_status(chat_id, buf)
+                return {"ok": True, "handled": "compose_text_added"}
+            return None
+
+        # Media → start/append to the buffer + refresh the live status.
+        buf = compose.add_media(chat_id, media)
+        await self._refresh_compose_status(chat_id, buf, just_started=(len(buf.items) == 1))
+        return {"ok": True, "handled": "compose_media_added", "count": len(buf.items)}
+
+    async def _refresh_compose_status(self, chat_id: str, buf, just_started: bool = False) -> None:
+        """Send (first time) or edit-in-place the live compose status message,
+        keeping the submit/cancel reply keyboard attached."""
+        from app.services.telegram_compose import COMPOSE_REPLY_KEYBOARD, get_compose_service
+
+        text = get_compose_service().render_status(buf)
+        if buf.status_message_id and not just_started:
+            res = await self.edit_message_text(chat_id, buf.status_message_id, text)
+            if res.get("ok"):
+                return
+        # first item, or edit failed → send a fresh status + (re)attach keyboard
+        res = await self.send_with_reply_keyboard(text, COMPOSE_REPLY_KEYBOARD, chat_id=chat_id)
+        mid = res.get("message_id")
+        if mid:
+            buf.status_message_id = mid
+
     async def _handle_command(self, chat_id: str, text: str) -> Dict[str, Any]:
         lower = text.lower()
 
         if lower == "/cancel":
             had = _clear_state(chat_id)
-            await self.send("✅ لغو شد." if had else "هیچ مرحلهٔ فعالی نبود.", chat_id=chat_id, silent=True)
+            try:
+                from app.services.telegram_compose import get_compose_service
+
+                had = get_compose_service().clear(chat_id) or had
+            except Exception:
+                pass
+            await self.send(
+                "✅ لغو شد." if had else "هیچ مرحلهٔ فعالی نبود.",
+                chat_id=chat_id, silent=True, reply_markup=PERSISTENT_REPLY_KEYBOARD,
+            )
             return {"ok": True, "handled": "cancel"}
 
         if lower in ("/start", "/help"):
@@ -616,6 +768,9 @@ _HELP_TEXT = (
     "• /diag — 🩺 تشخیص chat\\_id و webhook\n"
     "• /cancel — لغو مرحلهٔ فعلی\n"
     "• /help — همین پیام\n\n"
+    "🎙 *ساخت کار از پیوست:* کافیست صوت، عکس، سند یا چند پیام پشت سر هم بفرستی؛ "
+    "ربات همه را به‌ترتیب تحلیل می‌کند (رونویسی صوت، خواندن عکس/سند با مدل بصری) "
+    "و با زدن «✅ ساخت کار از پیوست‌ها» یک کار از روی آن‌ها می‌سازد.\n\n"
     "💡 منوی ثابت پایین صفحه فعال شد."
 )
 
