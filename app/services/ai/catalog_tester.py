@@ -53,12 +53,14 @@ async def test_model(db: AsyncSession, model_id: int) -> Dict[str, Any]:
             _openai_text,
         )
 
+        # temperature=None: a connectivity ping doesn't need it, and the newer
+        # Anthropic models reject `temperature` with a 400 (deprecated).
         if _is_anthropic(rm):
-            await _anthropic_text(rm, "ping", None, 16, 0.0)
+            await _anthropic_text(rm, "ping", None, 16, None)
         elif _is_gemini(rm):
-            await _gemini_text(rm, "ping", None, 16, 0.0)
+            await _gemini_text(rm, "ping", None, 16, None)
         else:
-            await _openai_text(rm, "ping", None, 16, 0.0)
+            await _openai_text(rm, "ping", None, 16, None)
         latency = int((time.monotonic() - start) * 1000)
         return {"ok": True, "latency_ms": latency, "message": f"OK · {latency} ms", "status_code": 200}
     except Exception as exc:

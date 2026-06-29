@@ -15,6 +15,9 @@ from app.services.ai.manager import ResolvedModel
 
 
 class _FakeResp:
+    status_code = 200
+    text = ""
+
     def __init__(self, payload):
         self._payload = payload
 
@@ -71,6 +74,61 @@ async def test_oauth_token_sends_beta_and_bearer(monkeypatch):
     # the Claude-Code system spoof must be the first system block
     sys_blocks = _FakeClient.captured["json"]["system"]
     assert sys_blocks[0]["text"] == "You are Claude Code, Anthropic's official CLI for Claude."
+
+
+class _SeqResp:
+    def __init__(self, status_code, payload=None, text=""):
+        self.status_code = status_code
+        self._payload = payload or {}
+        self.text = text
+
+    def raise_for_status(self):
+        if not (200 <= self.status_code < 300):
+            import httpx
+
+            raise httpx.HTTPStatusError("err", request=None, response=self)
+
+    def json(self):
+        return self._payload
+
+
+class _SeqClient:
+    """Returns a queued sequence of responses and records every payload sent."""
+
+    responses: list = []
+    sent_payloads: list = []
+
+    def __init__(self, *a, **k):
+        pass
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *a):
+        return False
+
+    async def post(self, url, headers=None, json=None):
+        _SeqClient.sent_payloads.append(dict(json or {}))
+        return _SeqClient.responses.pop(0)
+
+
+@pytest.mark.asyncio
+async def test_temperature_deprecated_400_retries_without_temperature(monkeypatch):
+    """Newer Anthropic models reject `temperature` with a 400 — the gateway must
+    drop it and retry once, then succeed (the exact 400 the owner hit after auth
+    was fixed)."""
+    _SeqClient.responses = [
+        _SeqResp(400, text="invalid_request_error: 'temperature' is deprecated for this model"),
+        _SeqResp(200, payload={"content": [{"type": "text", "text": "ok"}]}),
+    ]
+    _SeqClient.sent_payloads = []
+    monkeypatch.setattr(httpx, "AsyncClient", _SeqClient)
+
+    out = await ig._anthropic_text(_rm("oauth_bearer"), "ping", None, 16, 0.5)
+    assert out == "ok"
+    # first attempt included temperature; the retry dropped it
+    assert "temperature" in _SeqClient.sent_payloads[0]
+    assert "temperature" not in _SeqClient.sent_payloads[1]
 
 
 @pytest.mark.asyncio

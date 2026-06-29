@@ -140,3 +140,17 @@ Debugging lesson: when a 401 persists after the "obvious" auth headers are right
 **diff against a known-working implementation of the same provider** rather than
 assuming the credential is bad — here the only delta between the broken and working
 repos was this one user-agent line.
+
+### Refinement: newer Anthropic models reject `temperature` (a 400 after auth is fixed)
+
+Once OAuth auth is correct, the next failure on Claude Opus 4.x is
+`400 invalid_request_error: 'temperature' is deprecated for this model`. Two
+defences: (1) a connectivity ping should send NO temperature; (2) wrap the
+`/v1/messages` POST with a self-healing retry — on a 400 whose body mentions
+`temperature`, drop it and POST once more. This keeps a configured temperature
+from breaking real inference on models that deprecate it, and keeps the call
+working across model generations without a per-model allow/deny list.
+
+Debugging lesson (again): the cause was only visible because the test surfaced
+the provider's response BODY. A bare "400 Bad Request" or "401" hides the one
+sentence that pinpoints the fix — always bubble up `error.type` + `error.message`.

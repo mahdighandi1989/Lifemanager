@@ -107,11 +107,26 @@ async def _anthropic_text(rm, prompt, system, max_tokens, temperature) -> str:
     if temperature is not None:
         payload["temperature"] = temperature
     async with httpx.AsyncClient(timeout=_timeout()) as client:
-        resp = await client.post(f"{root}/v1/messages", headers=headers, json=payload)
-        resp.raise_for_status()
-        data = resp.json()
+        data = await _anthropic_post(client, f"{root}/v1/messages", headers, payload)
     parts = data.get("content", [])
     return "".join(p.get("text", "") for p in parts if isinstance(p, dict))
+
+
+async def _anthropic_post(client, url, headers, payload):
+    """POST to Anthropic and return the parsed body, with one self-healing retry:
+    the newer models (e.g. Claude Opus 4.x) reject ``temperature`` with
+    ``400 invalid_request_error: 'temperature' is deprecated for this model`` —
+    drop it and retry once instead of failing the whole call."""
+    resp = await client.post(url, headers=headers, json=payload)
+    if (
+        resp.status_code == 400
+        and "temperature" in payload
+        and "temperature" in (resp.text or "").lower()
+    ):
+        payload.pop("temperature", None)
+        resp = await client.post(url, headers=headers, json=payload)
+    resp.raise_for_status()
+    return resp.json()
 
 
 async def _gemini_text(rm, prompt, system, max_tokens, temperature) -> str:
@@ -236,9 +251,7 @@ async def _anthropic_multimodal(rm, prompt, files, system, max_tokens) -> str:
     if sys_blocks:
         payload["system"] = sys_blocks
     async with httpx.AsyncClient(timeout=_timeout()) as client:
-        resp = await client.post(f"{root}/v1/messages", headers=headers, json=payload)
-        resp.raise_for_status()
-        data = resp.json()
+        data = await _anthropic_post(client, f"{root}/v1/messages", headers, payload)
     return "".join(p.get("text", "") for p in data.get("content", []) if isinstance(p, dict))
 
 

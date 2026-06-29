@@ -581,3 +581,25 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **Dependencies synced:** upstream — httpx HTTPStatusError shape. downstream — the `/ai/models/{id}/test`
   response message (richer string; same schema). db/env/cross-tier — none. No Manual code part → no TO-DO.
 - **VERIFY** `tests/test_ai_catalog.py` 7/7 + `tests/test_anthropic_oauth_header.py` 2/2; ruff clean.
+
+## 2026-06-28 — FIX: Claude Opus 4.x rejects `temperature` (the 401 was actually solved)
+
+- **FINDING** With the error body now surfaced, the «تست» error changed from `401 Unauthorized`
+  to **`400 invalid_request_error: 'temperature' is deprecated for this model'`**. That CONFIRMS the
+  OAuth auth fix worked (Bearer + oauth beta + claude-cli user-agent + system spoof got past 401) —
+  the remaining failure was the request sending `temperature`, which the newer Anthropic models
+  (Claude Opus 4.x) reject. The tester pinged with `temperature=0.0`, so the connectivity test
+  always 400'd on those models.
+- **CHANGE** `app/services/ai/inference_gateway.py`: new `_anthropic_post` helper wraps the
+  `/v1/messages` POST with one **self-healing retry** — on a `400` whose body mentions
+  `temperature`, it drops `temperature` from the payload and retries once (used by both
+  `_anthropic_text` and `_anthropic_multimodal`). `app/services/ai/catalog_tester.py`: the
+  connectivity pings now pass `temperature=None` (a ping needs no temperature). Net: the test
+  button succeeds, and real inference no longer breaks if a temperature is configured on a model
+  that deprecates it.
+- **Dependencies synced (4 directions):** upstream — httpx response shape, the Anthropic 400 error
+  body. downstream — `_anthropic_text`/`_anthropic_multimodal` (both route through `_anthropic_post`),
+  the three tester pings, `test_anthropic_oauth_header.py` (+ retry-drops-temperature test). db/env/
+  cross-tier — none. No Manual code part → no TO-DO.
+- **VERIFY** `tests/test_anthropic_oauth_header.py` 3/3 (oauth headers, temperature-retry, api-key
+  path) + `tests/test_ai_catalog.py` 7/7; backend full suite green (0 new); ruff clean.
