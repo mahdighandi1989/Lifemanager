@@ -630,3 +630,48 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **VERIFY** new `tests/test_context_location_resilience.py` 2/2 + context suites green; backend full
   suite green (0 new); ruff clean. (The seed runs only against the live Postgres engine; tests use the
   SQLite override so it's a no-op there.)
+
+## 2026-06-28 — Telegram compose: media burst (voice/photo/doc/video) → one AI-analysed task
+
+- **DECISION** Owner: make the bot handle attachments exactly like PROJECT-MANAGEMENT — send a
+  voice/photo/document (or several), have it **analyse all of them in order**, detect first-ness/
+  priority, **extract**, convert into a task (or route to a list), and **activate the vision model
+  when needed**. **Honest review of the prior state:** the bot was two-way for *text commands only* —
+  `handle_update` read `message.text` and **dropped all media** (no analysis, no transcription, no
+  vision, no routing). Built the full compose pipeline, adapted to this app + its AI layer.
+- **KEY ADAPTATION** This app's `complete_multimodal` already **auto-resolves a vision/documents
+  model by capability** (`need="vision"|"documents"`) — so "activate the vision model when needed"
+  is built-in; we did NOT need PROJECT-MANAGEMENT's manual `temp_activate_model` machinery. Audio/
+  video transcribe when the resolved model is audio-capable (Gemini passes any mime as inline_data);
+  otherwise the item degrades to a labelled placeholder (graceful, per this repo's philosophy).
+- **CHANGE (compose service)** New `app/services/telegram_compose.py`: `ComposeService` with
+  `detect_media` (voice/audio/photo[-largest]/document/video/video_note/animation), an in-memory
+  per-chat **ordered** buffer (`ComposeItem.order`, TTL 30min, max 25), `render_status` (live
+  "📦 N پیوست + M متن" list), and the `submit` pipeline → `_analyse_items` (download each via the
+  bot, run `complete_multimodal` per type with Persian transcribe/extract prompts, collect the
+  models used + a per-item ✅/⚠️ report) → `_structure_task` (text model → strict-JSON
+  {title,description,priority,target,list_name,due_date}; fallback builds a task from the raw text,
+  skipping section-header lines) → `_create` (a `Task`, or a `TodoItem` linked to a `TodoList`
+  matched by name). Scoped to `TELEGRAM_TASK_USER_ID`. Fail-open throughout.
+- **CHANGE (bot I/O)** `app/services/telegram_service.py`: added `download_file` (getFile →
+  /file/bot…, 20MB cap), `get_file_path`, `edit_message_text` (in-place status, swallows
+  "not modified"); `send` now returns `message_id`. `handle_update` restructured so media is
+  routed BEFORE the text path (attachments carry no `message.text`): new `_maybe_route_to_compose`
+  (+ `_refresh_compose_status`) buffers media / compose-keyboard taps / text-while-composing, while
+  **commands and persistent-keyboard taps are explicitly NOT swallowed**. `/cancel` now also clears
+  an active compose; `/help` documents the attachment flow.
+- **Dependencies synced (4 directions):** upstream — `complete`/`complete_multimodal`/`ai_manager`
+  (capability routing), `parse`-style JSON, `Task`/`TaskPriority`/`TodoList`/`TodoItem`/
+  `todo_list_items`, `SessionLocal`, the bot's new download/edit methods. downstream — `handle_update`
+  routing, `/help`, `/cancel`. db — NONE (reuses tasks + todo_items/todo_lists; no new table/migration).
+  env — none new (reuses `TELEGRAM_TASK_USER_ID`; AI keys via the existing catalog).
+- **VERIFY** new `tests/test_telegram_compose.py` 9/9 (detect_media, ordered buffer, render_status,
+  handle_update routing incl. "command not swallowed", full submit with mocked AI+download over a
+  StaticPool in-memory DB, and the AI-unavailable fallback); existing `test_telegram_bot.py` 24/24
+  still green; backend full suite **1010 passed / 13 pre-existing failed (0 new)**; ruff clean on all
+  new/changed files; `npm run build` unaffected (no frontend change this round).
+- **EXPERIENCE** merged an `## Update 2026-06-28` section into
+  `experiences/bidirectional-telegram-bot-webhook.md` (the multimodal compose pattern + its pitfalls).
+- **LIMITATION (documented)** Voice/video transcription needs an audio-capable model configured (e.g.
+  a Gemini key with a vision model); with only an Anthropic/OpenAI vision model, images/PDFs analyse
+  but audio degrades to a placeholder. Buffer is in-memory (single-replica), lost on restart mid-compose.

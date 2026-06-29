@@ -153,3 +153,44 @@ async def webhook(request: Request):
 - منبع اولیه: ported pattern from a sibling project's oversight bot; re-implemented
   generically for a tasks/notifications domain.
 - مرتبط: notification fan-out (`send_telegram` delegating to the shared seam).
+
+## Update 2026-06-28 — Multimodal "compose": media burst → one analysed task
+
+Extended the bot from text-only to a **compose** pipeline: a burst of voice /
+photo / document / video / text messages becomes ONE AI-analysed task.
+
+**Pattern (project-agnostic):**
+1. **Detect + buffer in order.** A `detect_media(message)` maps Telegram's
+   `voice/audio/photo[-largest]/document/video/video_note/animation` onto a
+   descriptor; everything is appended to a per-chat, TTL'd buffer with a 1-based
+   `order` (first-ness == priority). Plain text while a buffer is open is added
+   as a text item; **commands and keyboard taps are NOT swallowed** (check them
+   before routing to compose). A live status message is edited in place as items
+   arrive (needs the send call to return `message_id` + an `editMessageText`).
+2. **Download lazily at submit,** not on arrival — `getFile → file_path →
+   /file/bot<token>/<path>` (20MB Bot-API cap).
+3. **Analyse per type via ONE multimodal gateway.** Route images/PDF/audio/video
+   to a vision/documents model. If your gateway resolves the model **by
+   capability** (need="vision"/"documents"), that IS "activate the vision model
+   when needed" — no manual model-toggling machinery required (the reference
+   project temp-activates a model; capability-routing is strictly simpler).
+   Audio/video transcribe only when the resolved model is audio-capable (e.g.
+   Gemini passes any mime as inline_data); otherwise the item degrades to a
+   labelled placeholder. Concatenate the per-item extractions IN ORDER.
+4. **Structure with a text model** → strict JSON `{title, description, priority,
+   target: task|list, list_name, due_date}`, then create the row (route to a list
+   when one matches by name, else a plain task).
+
+**New pitfalls:**
+- **Inject the bot into `submit()`** (default to the singleton) or you can't
+  capture sends in tests — the pipeline otherwise grabs the global instance.
+- **Fallback title must skip section headers.** When AI is unavailable you build
+  the task from the raw concatenation — derive the title from the first line that
+  is NOT a `## attachment N` header / `[not analysed]` placeholder, or the title
+  becomes a header.
+- **Download at submit, not arrival** — users often send 5 files fast; downloading
+  eagerly wastes bandwidth on items they then cancel, and holds bytes in memory
+  for the whole TTL.
+- **Test the create step with a StaticPool in-memory SQLite** — the pipeline opens
+  its OWN sessions (not the request session), so a per-request `:memory:` DB is
+  invisible to it; StaticPool (single shared connection) fixes that.

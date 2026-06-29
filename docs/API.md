@@ -204,6 +204,16 @@ and a startup supervisor re-registers the webhook when it drifts after a redeplo
 In-chat commands: `/start` `/help` `/menu` `/ping` `/diag` `/status` `/tasks` `/today`
 `/new_task <title?>` `/cancel`; inline callbacks `task:done:<id>`, `menu:tasks|status|new_task`.
 
+**Compose (media → task).** Sending voice / photo / document / video (or several
+messages in a row) opens an ordered, TTL'd buffer (`app/services/telegram_compose.py`);
+a live status message edits in place. On «✅ ساخت کار از پیوست‌ها» the pipeline downloads
+each item, analyses it via `complete_multimodal` — which auto-resolves a vision/documents
+model (the "activate the vision model when needed" step; audio/video transcribe when the
+resolved model is audio-capable, e.g. Gemini) — concatenates the extractions IN ORDER,
+then a text model structures `{title, description, priority, target: task|list, list_name,
+due_date}` and creates a `Task` (or a `TodoItem` in a matching list). Fail-open: no AI key ⇒
+a task is still built from the text. Buffer scoped to `TELEGRAM_TASK_USER_ID` (default 0).
+
 | Method | Path | Notes |
 |---|---|---|
 | POST | `/api/telegram/webhook` | Telegram posts updates here (always 200) |
