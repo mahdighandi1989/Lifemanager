@@ -49,6 +49,7 @@ from app.models.user_interest import UserInterest
 from app.models.user_taste import UserTaste
 from app.models.personality import PersonalityAssessment, PersonalityTrait
 from app.models.user_oauth import OAuthUser
+from app.models.personal_writing import PersonalWriting
 from app.models.webhook_event import WebhookEvent
 
 __all__ = [
@@ -102,6 +103,7 @@ __all__ = [
     "PersonalityAssessment",
     "PersonalityTrait",
     "UserProfileAnalytics",
+    "PersonalWriting",
     "WebhookEvent",
     "todo_list_items",
 ]

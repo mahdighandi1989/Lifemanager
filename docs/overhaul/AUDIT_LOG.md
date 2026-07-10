@@ -841,3 +841,42 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **NOTE** The workbook binary itself is NOT committed (personal file; its full content now lives in
   the generated seed module). To re-import a future version: run the generator with the new path —
   the coverage gate + pinned-count tests catch any loss.
+
+## 2026-07-10 — «نوشته‌های من»: بخش جدید نوشته‌های بلند + ورود ۴ فایل Word (خداشناسی ×۳ + برنامه‌ریزی دنیا و آخرت)
+
+- **DECISION** Owner uploaded 4 Word files: three copies/revisions of his spiritual autobiography
+  («تاریخچه خداشناسی» — شرح حال + برداشت‌های شخصی) and one worldly/hereafter goals-with-philosophy
+  document. Requirements: (1) must NOT be scattered, (2) must live in its proper place, (3) the three
+  overlapping files merge with **exact-duplicate-only** dedup — anything not exactly duplicated is
+  preserved, (4) build the infrastructure if none exists. No existing surface fits whole multi-page
+  documents (lists scatter; documents/ is identity papers) → built a new section.
+- **FINDING (files)** Two of the three .doc files are **byte-identical** (md5 equal; both rev 59,
+  saved 04/04/2017, 6,825 words); the third is an older revision (rev 40, saved 07/03/2017, 3,903
+  words). So the real merge is v59 (base) + v40 (older). Extraction: `antiword -m UTF-8` (LibreOffice
+  writer missing in the container; **catdoc output was corrupt/incomplete** — mojibake + a whole dated
+  section missing — verified by normalized comparison and rejected). The .docx goals file parsed via
+  zip/XML (626 paragraphs incl. table contents; footnotes/endnotes empty; metadata 2020-09-07 →
+  2022-11-04).
+- **CHANGE (infrastructure — new section)** `app/models/personal_writing.py` (`personal_writings`:
+  title/category/body Text/source_note/written_at/sort_order, user-scoped nullable) + registration in
+  `models/__init__.py` + alembic `0033_personal_writings` (create_all covers Render free tier — new
+  table, no ALTERs). `app/routes/writings.py` — `/api/writings` CRUD (list omits `body` for weight;
+  detail returns it whole; anon bucket sees NULL-owner rows), mounted in `main.py`. Frontend
+  `frontend/src/pages/Writings.jsx` («نوشته‌های من»: فهرست دسته‌بندی‌شده + خوانندهٔ کامل، RTL،
+  whitespace-pre-wrap) + route `/writings` + Sidebar entry + `ARCHITECTURE_INVENTORY.json` page row.
+- **CHANGE (merge + seed)** `scripts/generate_writings_seed.py`: merged autobiography = **v59 verbatim
+  + ضمیمهٔ ۶ بلوک (۷.۵هزار حرف)** from v40 whose exact text is absent from v59 (incl. the dated
+  07/03/2017 addendum and «ادامه دارد…») under a clearly-marked appendix header — with a **machine
+  gate: every sentence of BOTH revisions must appear verbatim (whitespace-normalised) in the merged
+  body or generation fails**. Goals document stored **whole and untouched** (its فهرست‌های عشق به
+  خدا/اراده/ترس‌ها/مرد الهی sections overlap the existing خودسازی lists — kept intact here as the
+  integral source document; the SI lists remain the actionable copies; owner's rule permits keeping
+  since only *exact* duplicates may be dropped and these are embedded in continuous prose).
+  Generated `_personal_writings_seed_data.py` (2 writings; pinned bodies **53,521 + 63,310 chars**) +
+  `personal_writings_seed.py` (idempotent by title — user edits survive redeploys) + startup hook.
+- **VERIFY** new `tests/test_personal_writings.py` 4/4 (pinned counts/appendix-blocks/body sizes;
+  content integrity incl. appendix + «مردِ خدا»; seeder idempotency + no truncation in DB; full CRUD
+  roundtrip). Inventory 5/5 green. Backend full suite **1045 passed / 13 pre-existing failed (0 new)**;
+  ruff clean; `npm run build` clean.
+- **NOTE** Original Word binaries not committed (personal files); their full text now lives in the
+  generated seed module; provenance recorded in each writing's `source_note`.

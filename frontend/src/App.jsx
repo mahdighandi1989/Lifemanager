@@ -19,6 +19,7 @@ import AssistantHub from './pages/AssistantHub'; // پیشنهادات + تار�
 import DataHub from './pages/DataHub';           // ایمپورت + فایل‌های من + ادغام تسک‌ها
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
+import Writings from './pages/Writings';
 import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
@@ -90,6 +91,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ProjectsHub />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/writings"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Writings />
                     </Layout>
                   </ProtectedRoute>
                 }

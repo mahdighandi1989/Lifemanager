@@ -56,6 +56,7 @@ from app.routes import (
     todo_items,
     users,
     webhook,
+    writings,
 )
 
 # Configure logging
@@ -794,6 +795,9 @@ app.include_router(webhook.router, tags=["webhook"])
 # bidirectional bot: inbound webhook + set/delete/heal/status/test). Mounts with
 # no prefix, like webhook + notifications.api_router.
 app.include_router(telegram.router, tags=["telegram"])
+# writings.router decorators carry absolute /api/writings paths (نوشته‌های من —
+# long-form personal writings). Mounts with no prefix.
+app.include_router(writings.router, tags=["writings"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────
@@ -848,6 +852,21 @@ async def _seed_personal_development():
             logger.info("📚 personal-development archive seeded: %s", result)
     except Exception as exc:
         logger.warning("personal-development seed skipped: %s", exc)
+
+
+# ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────
+@app.on_event("startup")
+async def _seed_personal_writings():
+    try:
+        from app.database import SessionLocal
+        from app.services.personal_writings_seed import ensure_personal_writings_seeded
+
+        async with SessionLocal() as session:
+            result = await ensure_personal_writings_seeded(session)
+        if result.get("writings_added"):
+            logger.info("📝 personal writings seeded: %s", result)
+    except Exception as exc:
+        logger.warning("personal writings seed skipped: %s", exc)
 
 
 # ── Notification preferences — warm the process cache at startup ─────────────

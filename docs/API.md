@@ -233,6 +233,21 @@ files skipped with a note. Buffer scoped to `TELEGRAM_TASK_USER_ID` (default 0).
 | GET | `/api/telegram/status` | Config + webhook diagnostics (never returns the token) |
 | POST | `/api/telegram/test` | Send a test message to the configured chat |
 
+### Personal writings (`/api/writings`) — نوشته‌های من
+
+Long-form personal documents that stay whole (spiritual autobiography, the
+goals-with-philosophy document). List responses omit `body`; the detail
+endpoint returns it in full. Seeded at startup from the generated archive
+module (idempotent by title).
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/writings` | Summaries (`?category=` filter; no body) |
+| GET | `/api/writings/{id}` | One writing incl. full `body` |
+| POST | `/api/writings` | Create |
+| PUT | `/api/writings/{id}` | Partial update |
+| DELETE | `/api/writings/{id}` | Delete |
+
 ### Users (`/users`)
 
 | Method | Path | Notes |

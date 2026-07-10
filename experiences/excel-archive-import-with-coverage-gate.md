@@ -117,3 +117,32 @@ async def ensure_seeded(db):
 
 ## 🔗 References
 - مرتبط: [registry-driven-import-engine] (the app's general import surface)
+
+## Update 2026-07-10 — Word documents (.doc/.docx) + exact-duplicate-only merge
+
+Extending the pattern to legacy Word files (a memoir in 3 overlapping .doc
+revisions + a long goals document):
+
+- **Extractor quality is a correctness issue, not a convenience.** Compare
+  extractors on *normalized* content before trusting one: here `catdoc`
+  produced mojibake AND silently dropped a whole dated section that `antiword
+  -m UTF-8` preserved; LibreOffice headless failed outright (writer filters not
+  installed — `libreoffice-core` alone cannot convert). Always diff two
+  extractions (`re.sub(r"\s+", "", text)`) and keep the superset.
+- **Check for byte-identical files first** (md5 of extracted text): two of the
+  three "different" files were the same document — the real merge problem was
+  2 revisions, not 3 files.
+- **Exact-duplicate-only merge of revisions:** newest revision verbatim as the
+  base; sentence-split the older one, keep every sentence whose normalized form
+  is NOT a substring of the normalized base, and append those blocks under a
+  clearly-marked appendix («ضمیمه — بخش‌های نسخهٔ قدیمی‌تر…»). Then a machine
+  gate: every sentence of EVERY revision must appear verbatim in the merged
+  output, or generation fails. Reworded passages survive as both variants —
+  that is the requirement (only *exact* duplicates may be dropped).
+- **Long-form documents need a WHOLE-document home,** not list items. If the
+  app only has item-shaped storage, build a writings section (title/category/
+  body-Text/source_note/written_at): items scatter a memoir; a reader page
+  with `whitespace-pre-wrap` keeps it intact. Record merge provenance in a
+  `source_note` column so future-you knows what was merged and why.
+- **Seed idempotency by title** (skip-if-exists) — not delete-and-recreate — so
+  the user's later in-app edits survive every redeploy.
