@@ -805,3 +805,39 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **CLARIFICATION for the owner** Text/image/PDF analysis works with your Claude automatically. Audio
   transcription is a genuine model limitation — Claude has no audio input; enable any audio-capable
   model (e.g. Gemini) and the bot will pick it for voice on its own. Nothing is Gemini-only by design.
+
+## 2026-07-10 — Personal-development Excel archive imported (7 sheets → lists + finance)
+
+- **DECISION** Owner uploaded his legacy personal-development workbook (7 sheets, ~1,300 populated
+  rows) with a hard requirement: **nothing may be transferred incompletely or skipped**; every piece
+  of content goes to its appropriate section (creating sections where none exist). Approach: a
+  **generator with a machine-checked completeness gate** (`scripts/generate_pd_seed.py`) — it consumes
+  every non-empty cell through an explicit per-sheet rule and REFUSES to emit output if any cell is
+  left unconsumed — plus the repo's established idempotent startup-seed pattern (same as the 33
+  default lists / خودسازی seeds), so the content lands in production Postgres on the next deploy.
+- **MAPPING (sheet → destination)** «چرک نویس» → 11 lists (اولویت‌ها با علت، سه کار مورد علاقه،
+  کارهای زیر دو دقیقه، طرح تثبیت ×2، طرح‌های تاریخ‌دار ۲۳/۰۹–۱۷/۱۱/۲۰۲۴، بازچینش‌ها، متفرقه)؛
+  « مدیریت زمان» → 4 lists (دزدان انرژی/زمان ۱۷، گزارش هفتگی ۳۷، نکات رائفی‌پور ۱۷۰، درس‌گفتار
+  پناهیان جلسات ۱–۹ ۳۱۰ — حاشیه‌های ستون‌های کناری در description همان آیتم ادغام)؛ «مبارزه با هوای
+  نفس» → 1 list (توضیح + ۴ آیتم با نوع/جایگزین)؛ «اهداف» → 1 list (۵ هدف، علت در description)؛
+  «عادت‌ها جهت بهبود» → 2 lists (عادت‌های بد + مراحل بهبود + مقیاس دشواری؛ ۸۶ عادت روزانه با علامت
+  مثبت/منفی/خنثی و راهنمای تشخیص به‌عنوان توضیح لیست)؛ «ابزارها» → 2 lists (روش انتخاب ابزار ۶ گام؛
+  ۵ ابزار AI با URL و متن کامل بررسی — بدون truncate، بررسی ۳٫۶KB سالم)؛ **«حساب کتاب ماهانه» →
+  بخش مالی**: حساب `FinancialAccount` آرشیوی («هزینه‌های نقدی — آرشیو اکسل»، AED) + **۱۹۴
+  `Transaction`** هزینه برای ۴ ماه (سپتامبر–دسامبر ۲۰۲۴؛ تاریخ ردیف در صورت وجود، وگرنه تاریخ شروع
+  ماه) + مانده بانک‌ها/وام‌ها به‌صورت لیست آرشیو (عمداً حساب زنده نساختیم تا ترازهای کهنه با وضعیت
+  مالی فعلی قاطی نشود). ردیف‌های صرفاً شماره‌گذاری (ردیف ۵..۲۰ خالی) به‌عنوان ساختار مصرف شدند، نه محتوا.
+- **CHANGE** `scripts/generate_pd_seed.py` (committed, re-runnable; regeneration is byte-stable) →
+  generated `app/services/_personal_development_seed_data.py` (**22 lists / 820 items / 194
+  transactions**, pinned counts in-module); `app/services/personal_development_seed.py`
+  (`ensure_personal_development_seeded` — per-list skip-if-has-items, account-once, mirror of the
+  خودسازی seeder); startup hook in `app/main.py` (isolated `@app.on_event`, best-effort). No new
+  tables/columns → no migration; destinations already existed (lists UI + finance UI pick the
+  content up automatically).
+- **VERIFY** new `tests/test_personal_development_seed.py` 4/4 (pinned totals 22/820/194; unique
+  prefixed names; no empty contents; full seed writes exactly the pinned counts; second run is a
+  pure no-op; positions intact; 3.6KB review not truncated). Backend full suite **1041 passed / 13
+  pre-existing failed (0 new)**; ruff clean on all new files; `npm run build` clean (no frontend change).
+- **NOTE** The workbook binary itself is NOT committed (personal file; its full content now lives in
+  the generated seed module). To re-import a future version: run the generator with the new path —
+  the coverage gate + pinned-count tests catch any loss.

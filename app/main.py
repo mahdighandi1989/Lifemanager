@@ -830,6 +830,26 @@ async def _stop_telegram_supervisor():
         logger.debug("Telegram webhook supervisor shutdown: %s", exc)
 
 
+# ── Personal-development archive seed (owner's Excel workbook) ───────────────
+# Seeds the «توسعه فردی - …» lists + the finance archive account from the
+# generated module (see scripts/generate_pd_seed.py). Idempotent per list /
+# account — a fully-seeded DB makes this a fast no-op every boot.
+@app.on_event("startup")
+async def _seed_personal_development():
+    try:
+        from app.database import SessionLocal
+        from app.services.personal_development_seed import (
+            ensure_personal_development_seeded,
+        )
+
+        async with SessionLocal() as session:
+            result = await ensure_personal_development_seeded(session)
+        if any(result.values()):
+            logger.info("📚 personal-development archive seeded: %s", result)
+    except Exception as exc:
+        logger.warning("personal-development seed skipped: %s", exc)
+
+
 # ── Notification preferences — warm the process cache at startup ─────────────
 # notify_event reads prefs from an in-process cache (no DB on its hot path), so
 # the owner's saved per-event/per-channel choices only take effect once the
