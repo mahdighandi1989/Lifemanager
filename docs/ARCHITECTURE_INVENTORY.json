@@ -1351,6 +1351,10 @@
         "file": "frontend/src/pages/AssistantHub.jsx"
       },
       {
+        "name": "BrainDashboard",
+        "file": "frontend/src/pages/BrainDashboard.jsx"
+      },
+      {
         "name": "BudgetPage",
         "file": "frontend/src/pages/BudgetPage.jsx"
       },

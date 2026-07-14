@@ -481,10 +481,64 @@ class TelegramBot:
                 return {"ok": True, "handled": "compose_text_added"}
             return None
 
+        # Brain-data zips (Brilliant export) are ingested directly into the
+        # رشد ذهن dashboard instead of the compose buffer — this IS the
+        # Telegram upload channel the weekly reminder points at.
+        if media["kind"] == "document" and (media.get("filename") or "").lower().endswith(".zip"):
+            handled = await self._maybe_ingest_brain_zip(chat_id, media)
+            if handled is not None:
+                return handled
+
         # Media → start/append to the buffer + refresh the live status.
         buf = compose.add_media(chat_id, media)
         await self._refresh_compose_status(chat_id, buf, just_started=(len(buf.items) == 1))
         return {"ok": True, "handled": "compose_media_added", "count": len(buf.items)}
+
+    async def _maybe_ingest_brain_zip(self, chat_id: str, media: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Download a .zip document; if it's a Brilliant export, ingest it into
+        the brain dashboard and confirm. Returns None for non-Brilliant zips so
+        they continue into the compose flow."""
+        from app.services.brain_service import ingest_upload, is_brilliant_zip
+
+        data = await self.download_file(media.get("file_id"))
+        if not data or not is_brilliant_zip(data):
+            return None
+        await self.send("🧠 فایل دادهٔ هوش شناسایی شد — در حال تحلیل…", chat_id=chat_id, silent=True)
+        try:
+            from app.database import SessionLocal
+
+            async with SessionLocal() as session:
+                result = await ingest_upload(
+                    session, data, filename=media.get("filename") or "data.zip", via="telegram"
+                )
+        except ValueError as exc:
+            await self.send(f"⚠️ تحلیل نشد: {str(exc)[:150]}", chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "brain_zip_invalid"}
+        except Exception as exc:
+            logger.exception("brain zip ingest failed: %r", exc)
+            await self.send(f"❌ خطا در تحلیل فایل: `{str(exc)[:120]}`", chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "brain_zip_error"}
+
+        s = result["stats"]
+        owner = result.get("verified_owner")
+        owner_line = ("✅ مالکیت تأیید شد (ایمیل حساب با ایمیل شما یکی است)" if owner
+                      else "⚠️ ایمیل داخل فایل با ایمیل شناخته‌شدهٔ شما فرق دارد — با پرچم ثبت شد")
+        msg = [
+            "🧠 *تحلیل دادهٔ هوش انجام و داشبورد به‌روز شد*",
+            "",
+            f"{owner_line}",
+            f"• تعامل با مسئله: {s.get('problem_interactions')}",
+            f"• دقت پاسخ‌ها: {s.get('accuracy_pct')}٪" if s.get("accuracy_pct") is not None else "• دقت: —",
+            f"• درس‌های کامل‌شده: {s.get('lessons_completed')} از {s.get('lessons_started')}",
+            f"• بلندترین استریک: {s.get('longest_streak_days')} روز",
+            "",
+            "یادآور این هفته خاموش شد. جزئیات کامل: داشبورد «رشد ذهن و هوش».",
+        ]
+        if result.get("analysis_note"):
+            note = result["analysis_note"]
+            msg += ["", note[:1500] + ("…" if len(note) > 1500 else "")]
+        await self.send("\n".join(msg), chat_id=chat_id, silent=True)
+        return {"ok": True, "handled": "brain_zip_ingested", "upload_id": result["id"]}
 
     async def _refresh_compose_status(self, chat_id: str, buf, just_started: bool = False) -> None:
         """Send (first time) or edit-in-place the live compose status message,

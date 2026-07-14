@@ -252,3 +252,27 @@ happened: record the *text* routing model (not just the media/vision one) and
 ALWAYS print an explicit destination line (independent task / list X / strengthened
 #id) + the model, or an honest "no AI key" note when it fell back. The user should
 never have to guess where their input landed or whether AI ran.
+
+## Update 2026-07-14 — Content-type ingestion channels + stateful reminder cycles
+
+Two additions to the bot pattern, from building a weekly data-upload flow:
+
+- **Auto-detect special files by CONTENT, not by asking.** When a domain flow
+  (e.g. "analytics export") shares the bot with a general attachment flow,
+  probe the file's content (`is_<source>_file(bytes)` — for a zip: does it
+  contain the source's signature entry?) BEFORE routing to the general flow.
+  A recognised file goes straight to its ingest + a rich confirmation; anything
+  else falls through unchanged — zero new commands to learn.
+- **Reminder cycles that end on ACTION, not on acknowledgement:** persist a
+  tiny state machine in a settings row — `{enabled, weekday, hour, silent,
+  refollow_hours, last_reminder_at, awaiting_since}`. A pure decision function
+  (`None|remind|refollow`) makes the logic unit-testable without time mocking
+  frameworks: weekly slot fires `remind` (once per day guard), `awaiting_since`
+  + elapsed `refollow_hours` fires `refollow` forever until the awaited action
+  (an upload from ANY channel) clears `awaiting_since`. Drive it from the same
+  in-process supervisor-loop pattern as the webhook self-heal. Editable knobs
+  (day/hour/silent/interval) live in the dashboard, not hard-coded.
+- **Provenance answer to "is this data mine?":** exports usually embed the
+  account email — compare it to the app's known owner emails (env override ∪
+  users table ∪ previously verified uploads) and store a `verified_owner` flag;
+  keep-but-flag mismatches instead of rejecting (the user decides).

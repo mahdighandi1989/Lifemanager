@@ -880,3 +880,52 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   ruff clean; `npm run build` clean.
 - **NOTE** Original Word binaries not committed (personal files); their full text now lives in the
   generated seed module; provenance recorded in each writing's `source_note`.
+
+## 2026-07-14 — داشبورد «رشد ذهن و هوش»: تحلیل چندمنبعی با رفرنس + آپلود Brilliant از تلگرام/داشبورد + یادآور هفتگی
+
+- **DECISION** Owner asked for ONE consolidated surface analysing his intelligence/logic/brain growth
+  from (a) periodic Brilliant.org data-export zips and (b) his own behavioural data already in the
+  app — every number carrying an explicit data reference, with a provenance check that the data is
+  really HIS; upload via Telegram or the dashboard; and a weekly Telegram reminder (editable day/
+  hour, mutable to silent, disableable) that re-reminds every N hours (editable) until a file is
+  uploaded from EITHER channel. No such surface existed (closest: self-improvement check-ins,
+  UserProfileAnalytics) → built new, consolidated under «رشد ذهن و هوش».
+- **CHANGE (model)** `app/models/brain.py` — `BrainUpload` (`brain_uploads`: source/filename/via
+  dashboard|telegram/verified_owner/owner_email/stats_json/analysis_note/uploaded_at) + registration
+  + alembic `0034_brain_uploads` (create_all covers Render).
+- **CHANGE (service)** `app/services/brain_service.py`:
+  `parse_brilliant_zip` (JSON-Lines under data/production/ → interactions, practice accuracy from
+  per-problem states, viewed-solution rate, lessons/courses, streaks, monthly trend — verified
+  against the owner's real export: 795 interactions, 93.5% accuracy, 67/68 lessons);
+  **ownership check** = export's `auth_user.email` vs known owner emails (env `OWNER_EMAIL` ∪ users
+  table ∪ previously-verified uploads) → `verified_owner` flag, foreign files stored but flagged;
+  `ingest_upload` (store + end reminder cycle + best-effort AI narrative with a «مراجع:» section via
+  the AI catalog); `build_dashboard` — 4 sections (Brilliant trend/latest، tasks completion، خودسازی
+  check-ins + tick‌خورده‌ها، finance live entries with the Excel-archive account EXCLUDED), each with
+  a `provenance` block: tables, rows, calculation rule, and an `authored_by_you` rule saying exactly
+  why the signal counts as the owner's own behaviour; reminder config in `global_settings`
+  (`brain_reminder`: enabled/weekday/hour/silent/refollow_hours/awaiting_since/…);
+  `reminder_decision` (pure, unit-tested: weekly slot → remind; awaiting + refollow_hours elapsed →
+  re-remind; upload clears awaiting) + `reminder_tick` + `brain_reminder_loop` (10-min cadence,
+  startup/shutdown hooks like the webhook supervisor).
+- **CHANGE (routes/frontend)** `app/routes/brain.py` — GET /api/brain/dashboard، POST /upload
+  (multipart zip، ۵۰MB cap)، GET /uploads، GET/PUT /reminder (validated). New
+  `frontend/src/pages/BrainDashboard.jsx` («رشد ذهن و هوش»: آپلود، تنظیمات یادآور، کارت‌های بخش با
+  «📌 مرجع داده» بازشونده، روند ماهانه/بین‌آپلودی، متن تحلیل AI) + route `/brain` + Sidebar +
+  inventory row.
+- **CHANGE (telegram upload channel)** `telegram_service._maybe_ingest_brain_zip`: any .zip document
+  sent to the bot is probed with `is_brilliant_zip` — a Brilliant export is ingested directly
+  (ownership line + metrics + AI note replied; reminder cycle cleared); other zips fall through to
+  the compose flow unchanged.
+- **Dependencies synced:** upstream — GlobalSetting, telegram bot send/download, AI `complete`,
+  Task/TodoItem/SelfImprovementCheckIn/Transaction models, PD archive account name (exclusion).
+  downstream — main.py router + loop hooks, telegram media routing, App/Sidebar/inventory. db — new
+  table only (0034). env — optional `OWNER_EMAIL` (fallbacks exist).
+- **VERIFY** new `tests/test_brain_dashboard.py` **11/11** (synthetic-zip parser pinned numbers,
+  ownership verify/flag, ingest-clears-reminder, 3 reminder-decision suites incl. custom refollow,
+  upload+dashboard routes with provenance assertions, junk-zip 400, reminder validation); telegram
+  40/40 unchanged; backend full suite **1056 passed / 13 pre-existing failed (0 new)**; ruff clean;
+  `npm run build` clean. Parser sanity-checked against the real export locally (not committed —
+  personal data).
+- **LIMITATION** Reminder hour is UTC (stated in the UI). AI narrative requires a configured text
+  model (fail-open). The reminder loop is in-process/single-replica (like the webhook supervisor).

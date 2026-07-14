@@ -18,6 +18,7 @@ from app.database import Base, engine
 from app.rate_limit import limiter
 from app.routes import (
     ai,
+    brain,
     ai_catalog,
     ai_profile,
     ai_stream,
@@ -798,6 +799,8 @@ app.include_router(telegram.router, tags=["telegram"])
 # writings.router decorators carry absolute /api/writings paths (نوشته‌های من —
 # long-form personal writings). Mounts with no prefix.
 app.include_router(writings.router, tags=["writings"])
+# brain.router — رشد ذهن و هوش (dashboard/upload/reminder). Absolute paths.
+app.include_router(brain.router, tags=["brain"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────
@@ -852,6 +855,34 @@ async def _seed_personal_development():
             logger.info("📚 personal-development archive seeded: %s", result)
     except Exception as exc:
         logger.warning("personal-development seed skipped: %s", exc)
+
+
+# ── Brain reminder loop (رشد ذهن — weekly upload reminder via Telegram) ─────
+@app.on_event("startup")
+async def _start_brain_reminder():
+    try:
+        from app.services.brain_service import brain_reminder_loop
+
+        app.state.brain_reminder_stop = asyncio.Event()
+        app.state.brain_reminder_task = asyncio.create_task(
+            brain_reminder_loop(app.state.brain_reminder_stop)
+        )
+        logger.info("🧠 brain reminder loop started")
+    except Exception as exc:
+        logger.warning("brain reminder loop failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_brain_reminder():
+    try:
+        stop = getattr(app.state, "brain_reminder_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "brain_reminder_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("brain reminder shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

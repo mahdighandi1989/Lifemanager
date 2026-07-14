@@ -18,6 +18,7 @@ const LINKS = [
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
   { to: '/writings', label: 'نوشته‌های من', testid: 'sidebar-link-writings' },
+  { to: '/brain', label: 'رشد ذهن و هوش', testid: 'sidebar-link-brain' },
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people' },
   // Hubs:
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance' },

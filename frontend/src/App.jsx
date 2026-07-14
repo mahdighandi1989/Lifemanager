@@ -20,6 +20,7 @@ import DataHub from './pages/DataHub';           // ایمپورت + فایل‌
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Writings from './pages/Writings';
+import BrainDashboard from './pages/BrainDashboard';
 import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
@@ -91,6 +92,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ProjectsHub />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/brain"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <BrainDashboard />
                     </Layout>
                   </ProtectedRoute>
                 }

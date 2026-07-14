@@ -248,6 +248,24 @@ module (idempotent by title).
 | PUT | `/api/writings/{id}` | Partial update |
 | DELETE | `/api/writings/{id}` | Delete |
 
+### Brain growth (`/api/brain`) — رشد ذهن و هوش
+
+Consolidated cognitive-growth dashboard: Brilliant.org export zips (uploaded
+here or by sending the zip to the Telegram bot, which auto-detects it) + the
+owner's own behavioural signals (tasks / خودسازی / finance), every section with
+an explicit `provenance` block (tables, rows, rule, authored-by-you rule). The
+export's account email is checked against the owner's known emails
+(`verified_owner`). A weekly Telegram reminder (editable weekday/hour-UTC/
+silent/refollow_hours) re-reminds until an upload arrives from either channel.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/brain/dashboard` | Sections + provenance + reminder config |
+| POST | `/api/brain/upload` | Multipart zip (Brilliant export; 50MB cap) |
+| GET | `/api/brain/uploads` | Upload history (id/via/verified_owner) |
+| GET | `/api/brain/reminder` | Reminder config |
+| PUT | `/api/brain/reminder` | Edit enabled/weekday/hour/silent/refollow_hours |
+
 ### Users (`/users`)
 
 | Method | Path | Notes |
