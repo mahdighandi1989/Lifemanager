@@ -929,3 +929,34 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   personal data).
 - **LIMITATION** Reminder hour is UTC (stated in the UI). AI narrative requires a configured text
   model (fail-open). The reminder loop is in-process/single-replica (like the webhook supervisor).
+
+## 2026-07-14 — بازبینی داشبورد ذهن + ضدآینده‌سازی پارسر Brilliant (پوشش جنریک کل خروجی)
+
+- **REVIEW (owner asked "همه‌چیز درست پیاده شده؟")** Wiring re-verified: all 6 startup/shutdown hooks
+  intact and ordered, brain router mounted, migration chain 0032→0033→0034 correct, inventory/tests
+  green. Bugs found & fixed in the pass: (1) `reminder_decision._parse` could crash on a NAIVE
+  datetime string (older writes) — now coerced to UTC; (2) a >20MB zip sent to the bot silently fell
+  through to compose (which would also fail) — now replies with a clear "از داشبورد آپلود کن" hint;
+  (3) the AI-narrative prompt truncated raw stats at 4k chars, which after the inventory landed would
+  cut off the headline metrics — replaced with a compact curated payload (+ dataset_rows +
+  new_datasets) capped at 6k.
+- **FINDING (owner's future-proofing concern — correct)** The v1 parser read ONLY 6 hard-coded
+  datasets; the real export already contains **33 files** — 27 were invisible. As the owner uses more
+  Brilliant content (courses across math/logic/CS/data/science, daily challenges, leagues/XP,
+  badges…), the Django-dump export grows by NEW FILES/FIELDS which v1 would silently drop.
+  (brilliant.org itself 403-blocks unauthenticated fetches; catalog knowledge + the export's
+  app_model.json structure drive the design.)
+- **CHANGE (schema-tolerant parser v2)** `brain_service`: `_dataset_inventory` sweeps EVERY
+  `data/production/*.json` — rows, field-name union, timestamp range (any `*_ts/*_date/ts/*_at`
+  field), and a merged `activity_by_month` across ALL datasets. Stats now carry `datasets`,
+  `activity_by_month`, `coverage` {files_total, rows_total, specialized[6], generic_only[…]},
+  `schema_version: 2`, and `new_datasets` (diff vs the previous upload, set at ingest). Specialized
+  metrics unchanged (real-zip pin: accuracy 93.5%, 33 files / 1,102 rows fully covered).
+- **CHANGE (UI/provenance)** BrainDashboard: collapsible «🗂 همهٔ داده‌ست‌های فایل» table (rows +
+  time range per dataset, «جدید» badge) + a new-datasets callout; provenance rule now states the
+  two-layer coverage explicitly. AI narrative also receives dataset_rows/new_datasets so brand-new
+  content types get analysed even before specialized parsing exists.
+- **VERIFY** +2 tests (unknown-dataset inventory incl. fields/ts-range/generic_only/activity merge;
+  new-dataset detection between uploads) → brain suite **13/13**; real-zip sanity (33 files, curated
+  metrics unchanged); backend full suite **1058 passed / 13 pre-existing failed (0 new)**; ruff clean;
+  `npm run build` clean.

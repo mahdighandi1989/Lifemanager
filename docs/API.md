@@ -253,7 +253,11 @@ module (idempotent by title).
 Consolidated cognitive-growth dashboard: Brilliant.org export zips (uploaded
 here or by sending the zip to the Telegram bot, which auto-detects it) + the
 owner's own behavioural signals (tasks / خودسازی / finance), every section with
-an explicit `provenance` block (tables, rows, rule, authored-by-you rule). The
+an explicit `provenance` block (tables, rows, rule, authored-by-you rule).
+**Schema-tolerant ingest**: besides the specialized metrics, EVERY dataset in
+the export is generically inventoried (rows/fields/time-range + a merged
+monthly activity map + `new_datasets` diff vs the previous upload), so content
+types Brilliant adds later surface without a code change. The
 export's account email is checked against the owner's known emails
 (`verified_owner`). A weekly Telegram reminder (editable weekday/hour-UTC/
 silent/refollow_hours) re-reminds until an upload arrives from either channel.

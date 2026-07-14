@@ -211,6 +211,47 @@ function BrainDashboard() {
                         روند آپلودها: {brilliant.series.map((u) => `${(u.uploaded_at || '').slice(0, 10)} → ${u.accuracy_pct ?? '—'}٪`).join(' | ')}
                       </p>
                     )}
+                    {/* پوشش کامل داده‌ست‌ها — جنریک، ضدِ محتوای آیندهٔ Brilliant */}
+                    {brilliant.latest.datasets && (
+                      <details className="mt-3">
+                        <summary className="text-xs text-blue-600 cursor-pointer select-none">
+                          🗂 همهٔ داده‌ست‌های فایل ({brilliant.latest.coverage?.files_total ?? Object.keys(brilliant.latest.datasets).length} فایل،
+                          {' '}{brilliant.latest.coverage?.rows_total ?? '—'} ردیف — چیزی حذف نشده)
+                        </summary>
+                        <div className="mt-2 max-h-64 overflow-y-auto border border-gray-100 rounded-lg">
+                          <table className="w-full text-xs">
+                            <thead className="bg-gray-50 text-gray-500">
+                              <tr>
+                                <th className="text-right p-2">داده‌ست</th>
+                                <th className="text-center p-2">ردیف</th>
+                                <th className="text-center p-2">بازهٔ زمانی</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {Object.entries(brilliant.latest.datasets).map(([name, d]) => (
+                                <tr key={name} className="border-t border-gray-50">
+                                  <td className="p-2" dir="ltr">
+                                    {name}
+                                    {(brilliant.latest.new_datasets || []).includes(name) && (
+                                      <span className="mr-1 ml-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">جدید</span>
+                                    )}
+                                  </td>
+                                  <td className="p-2 text-center">{d.rows}</td>
+                                  <td className="p-2 text-center" dir="ltr">
+                                    {d.ts_min ? `${d.ts_min.slice(0, 10)} → ${(d.ts_max || '').slice(0, 10)}` : '—'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </details>
+                    )}
+                    {(brilliant.latest.new_datasets || []).length > 0 && (
+                      <p className="mt-2 text-xs text-amber-600">
+                        🆕 داده‌ست‌های تازه نسبت به آپلود قبلی: {brilliant.latest.new_datasets.join('، ')}
+                      </p>
+                    )}
                     {brilliant.latest_note && (
                       <div className="mt-3 bg-blue-50/50 border border-blue-100 rounded-lg p-3 text-sm text-gray-700 whitespace-pre-wrap leading-7">
                         {brilliant.latest_note}

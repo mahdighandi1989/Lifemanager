@@ -501,7 +501,20 @@ class TelegramBot:
         from app.services.brain_service import ingest_upload, is_brilliant_zip
 
         data = await self.download_file(media.get("file_id"))
-        if not data or not is_brilliant_zip(data):
+        if data is None:
+            # Bot API caps downloads at 20MB — a bigger export must go through
+            # the dashboard. Tell the user instead of silently attaching the
+            # zip to a compose task (which would hit the same cap).
+            size = media.get("size") or 0
+            if size > 20 * 1024 * 1024:
+                await self.send(
+                    "⚠️ این فایل از حد ۲۰ مگابایت تلگرام بزرگ‌تر است و از اینجا قابل دریافت نیست.\n"
+                    "لطفاً از داشبورد «رشد ذهن و هوش» آپلودش کن.",
+                    chat_id=chat_id, silent=True,
+                )
+                return {"ok": True, "handled": "brain_zip_too_big"}
+            return None
+        if not is_brilliant_zip(data):
             return None
         await self.send("🧠 فایل دادهٔ هوش شناسایی شد — در حال تحلیل…", chat_id=chat_id, silent=True)
         try:

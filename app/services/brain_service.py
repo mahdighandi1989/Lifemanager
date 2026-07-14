@@ -90,9 +90,71 @@ def is_brilliant_zip(data: bytes) -> bool:
         return False
 
 
+_TS_FIELD_HINTS = ("ts", "_ts", "date", "_date", "timestamp", "_at")
+
+
+def _looks_ts_field(name: str) -> bool:
+    low = name.lower()
+    return low == "ts" or any(low.endswith(h) for h in _TS_FIELD_HINTS)
+
+
+def _ts_month(value) -> Optional[str]:
+    """'2026-05-12T…' / '2026-05-12' → '2026-05' (else None)."""
+    if not isinstance(value, str) or len(value) < 7:
+        return None
+    head = value[:7]
+    if head[:4].isdigit() and head[4] == "-" and head[5:7].isdigit():
+        return head
+    return None
+
+
+def _dataset_inventory(z: zipfile.ZipFile) -> Dict[str, Any]:
+    """FUTURE-PROOF sweep: summarize EVERY data/production/*.json dataset —
+    row count, field-name union, timestamp range, and a merged monthly
+    activity map. Nothing is hard-coded here, so datasets Brilliant adds
+    later (new courses, daily challenges, leagues XP, badges, …) surface on
+    the dashboard automatically instead of being silently dropped."""
+    datasets: Dict[str, Any] = {}
+    activity: Dict[str, int] = defaultdict(int)
+    for info in z.infolist():
+        name = info.filename
+        if "data/production/" not in name or not name.endswith(".json"):
+            continue
+        key = name.rsplit("/", 1)[-1][:-5]  # strip .json
+        rows = _jsonl(z, key)
+        fields: set = set()
+        ts_min = ts_max = None
+        for r in rows:
+            if isinstance(r, dict):
+                fields.update(r.keys())
+                for f, v in r.items():
+                    if _looks_ts_field(f):
+                        month = _ts_month(v)
+                        if month:
+                            activity[month] += 1
+                        if isinstance(v, str) and len(v) >= 10 and v[:4].isdigit():
+                            ts_min = v if ts_min is None or v < ts_min else ts_min
+                            ts_max = v if ts_max is None or v > ts_max else ts_max
+        datasets[key] = {
+            "rows": len(rows),
+            "fields": sorted(fields),
+            "ts_min": ts_min[:19] if ts_min else None,
+            "ts_max": ts_max[:19] if ts_max else None,
+        }
+    return {"datasets": datasets, "activity_by_month": dict(sorted(activity.items()))}
+
+
 def parse_brilliant_zip(data: bytes) -> Dict[str, Any]:
     """Reduce the export to the dashboard's stats summary. Raises ValueError
-    on a non-Brilliant zip."""
+    on a non-Brilliant zip.
+
+    Two layers so future export growth is never dropped:
+      • specialized metrics for the known high-signal datasets (accuracy,
+        lessons, courses, streaks) — the curated cards;
+      • a GENERIC inventory of every dataset in the zip (rows/fields/time
+        range) + an all-datasets monthly activity map — anything new that
+        Brilliant ships shows up here without a code change.
+    """
     try:
         z = zipfile.ZipFile(io.BytesIO(data))
     except Exception as exc:
@@ -102,6 +164,8 @@ def parse_brilliant_zip(data: bytes) -> Dict[str, Any]:
     if not users:
         raise ValueError("این zip خروجی Brilliant نیست (auth_user یافت نشد)")
     user = users[0]
+
+    inventory = _dataset_inventory(z)
 
     interactions = _jsonl(z, "stats_userprobleminteraction")
     practices = _jsonl(z, "practice_practiceuserstate")
@@ -140,12 +204,25 @@ def parse_brilliant_zip(data: bytes) -> Dict[str, Any]:
     streak_days = [_days(s) for s in streaks]
     scores = [p.get("best_score") for p in practices if isinstance(p.get("best_score"), (int, float))]
 
+    known = {"auth_user", "stats_userprobleminteraction", "practice_practiceuserstate",
+             "courses_lessonuserstate", "courses_courseuserstate", "profile_streakrecord"}
+    ds = inventory["datasets"]
     return {
         "source": "brilliant",
+        "schema_version": 2,
         "account_email": (user.get("email") or "").strip().lower(),
         "account_name": f"{user.get('first_name', '')} {user.get('last_name', '')}".strip(),
         "date_joined": user.get("date_joined"),
         "last_login": user.get("last_login"),
+        # generic layer — full coverage of the export, whatever it contains
+        "datasets": ds,
+        "activity_by_month": inventory["activity_by_month"],
+        "coverage": {
+            "files_total": len(ds),
+            "rows_total": sum(d["rows"] for d in ds.values()),
+            "specialized": sorted(known & set(ds)),
+            "generic_only": sorted(set(ds) - known),
+        },
         "problem_interactions": len(interactions),
         "practice_sets": len(practices),
         "practice_problems_total": total,
@@ -197,6 +274,17 @@ async def ingest_upload(
     """Parse + verify + store one export; clears the reminder cycle."""
     stats = parse_brilliant_zip(data)
 
+    # New-dataset detection: datasets present now but absent from the previous
+    # upload get flagged so brand-new Brilliant content types are visible.
+    try:
+        prev = (await db.execute(
+            select(BrainUpload).order_by(BrainUpload.uploaded_at.desc()).limit(1)
+        )).scalars().first()
+        prev_names = set(json.loads(prev.stats_json).get("datasets", {})) if prev else set()
+        stats["new_datasets"] = sorted(set(stats.get("datasets", {})) - prev_names) if prev_names else []
+    except Exception:
+        stats["new_datasets"] = []
+
     known = await _known_owner_emails(db)
     email = stats.get("account_email") or ""
     if email and known:
@@ -243,11 +331,28 @@ async def ingest_upload(
 async def _ai_narrative(db: AsyncSession, stats: Dict[str, Any]) -> Optional[str]:
     from app.services.ai.inference_gateway import complete
 
+    # Compact, curated payload (never truncated mid-metric): the headline
+    # metrics + full-coverage summary + per-dataset row counts, so the model
+    # also sees NEW datasets that have no specialized parsing yet.
+    ds = stats.get("datasets", {})
+    compact = {
+        k: stats.get(k) for k in (
+            "accuracy_pct", "avg_best_score", "viewed_solution_pct",
+            "problem_interactions", "practice_problems_total", "practice_problems_correct",
+            "lessons_started", "lessons_completed", "longest_streak_days",
+            "total_streak_days", "streaks_count", "date_joined", "last_login",
+            "new_datasets",
+        )
+    }
+    compact["courses"] = stats.get("courses")
+    compact["activity_by_month"] = stats.get("activity_by_month")
+    compact["dataset_rows"] = {k: v.get("rows") for k, v in ds.items() if v.get("rows")}
     prompt = (
         "به‌عنوان تحلیل‌گر رشد شناختی، از روی این آمار خروجی Brilliant یک تحلیل کوتاه فارسی بنویس "
-        "(حداکثر ۱۲ خط): روند دقت، پشتکار (استریک‌ها)، حجم تمرین، و یک پیشنهاد مشخص. "
+        "(حداکثر ۱۲ خط): روند دقت، پشتکار (استریک‌ها)، حجم و الگوی فعالیت، و یک پیشنهاد مشخص. "
+        "اگر در dataset_rows یا new_datasets مجموعه‌دادهٔ تازه‌ای می‌بینی به آن هم اشاره کن. "
         "در پایان بخش «مراجع:» بنویس و دقیقاً بگو هر عدد از کدام فیلد آمده.\n\n"
-        f"آمار: {json.dumps(stats, ensure_ascii=False)[:4000]}"
+        f"آمار: {json.dumps(compact, ensure_ascii=False)[:6000]}"
     )
     res = await complete(db, prompt, task="task_analysis", max_tokens=900)
     if res.get("ok") and (res.get("text") or "").strip():
@@ -303,8 +408,10 @@ async def build_dashboard(db: AsyncSession) -> Dict[str, Any]:
         "provenance": {
             "tables": ["brain_uploads"],
             "rows": [f"#{u.id} ({u.filename}، {u.via})" for u in uploads],
-            "rule": "آمار مستقیماً از فایل‌های خروجی رسمی Brilliant شما (stats_userprobleminteraction، "
-                    "practice_practiceuserstate، courses_*، profile_streakrecord) استخراج شده است.",
+            "rule": "دو لایه: متریک‌های تخصصی از فایل‌های اصلی (stats_userprobleminteraction، "
+                    "practice_practiceuserstate، courses_*، profile_streakrecord) + جاروی جنریک همهٔ "
+                    "فایل‌های data/production (تعداد ردیف، فیلدها، بازهٔ زمانی) — پس دیتاست‌هایی که "
+                    "Brilliant بعداً اضافه کند هم بدون تغییر کد دیده و شمارش می‌شوند (فهرست coverage).",
             "authored_by_you": "ایمیل حساب داخل هر فایل با ایمیل(های) شناخته‌شدهٔ شما مقایسه می‌شود "
                                "(verified_owner)؛ فایل با ایمیل ناشناس علامت‌گذاری و جدا نمایش داده می‌شود.",
         },
@@ -435,9 +542,13 @@ def reminder_decision(cfg: Dict[str, Any], now: datetime) -> Optional[str]:
 
     def _parse(ts):
         try:
-            return datetime.fromisoformat(ts) if ts else None
+            dt = datetime.fromisoformat(ts) if ts else None
         except ValueError:
             return None
+        # coerce naive stamps (older writes) to UTC so subtraction never crashes
+        if dt is not None and dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
 
     last_reminder = _parse(cfg.get("last_reminder_at"))
     awaiting = _parse(cfg.get("awaiting_since"))

@@ -189,3 +189,43 @@ def test_reminder_routes(api_client):
 
     assert api_client.put("/api/brain/reminder", json={"weekday": 9}).status_code == 400
     assert api_client.put("/api/brain/reminder", json={"hour": 25}).status_code == 400
+
+
+# ── future-proofing: generic dataset inventory ───────────────────────────────
+def _zip_with_unknown_dataset(email="owner@example.com"):
+    """A synthetic export containing a dataset type we have NO specialized
+    parsing for — it must still be counted and surfaced."""
+    raw = _make_zip(email=email)
+    buf = io.BytesIO(raw)
+    with zipfile.ZipFile(buf, "a") as z:
+        z.writestr("data/production/dailychallenges_userattempt.json",
+                   "\n".join(json.dumps({"id": i, "score": 10 * i,
+                                         "attempted_ts": f"2026-07-0{i}T09:00:00+00:00"})
+                             for i in (1, 2, 3)))
+    return buf.getvalue()
+
+
+def test_inventory_covers_every_dataset_including_unknown():
+    s = bs.parse_brilliant_zip(_zip_with_unknown_dataset())
+    ds = s["datasets"]
+    # the unknown dataset is fully summarized (rows/fields/time range)
+    assert ds["dailychallenges_userattempt"]["rows"] == 3
+    assert "attempted_ts" in ds["dailychallenges_userattempt"]["fields"]
+    assert ds["dailychallenges_userattempt"]["ts_min"].startswith("2026-07-01")
+    # and marked as generic-only coverage (no specialized parser yet)
+    assert "dailychallenges_userattempt" in s["coverage"]["generic_only"]
+    # every file in the zip appears in the inventory — nothing invisible
+    assert s["coverage"]["files_total"] == len(ds) >= 7
+    assert s["coverage"]["rows_total"] >= 3
+    # its timestamps joined the merged activity map
+    assert s["activity_by_month"].get("2026-07") >= 3
+
+
+@pytest.mark.asyncio
+async def test_new_dataset_detection_between_uploads(db_session, monkeypatch):
+    monkeypatch.setenv("OWNER_EMAIL", "owner@example.com")
+    r1 = await bs.ingest_upload(db_session, _make_zip(), filename="w1.zip", via="dashboard")
+    assert r1["stats"]["new_datasets"] == []  # first upload → no baseline diff
+    r2 = await bs.ingest_upload(db_session, _zip_with_unknown_dataset(),
+                                filename="w2.zip", via="dashboard")
+    assert "dailychallenges_userattempt" in r2["stats"]["new_datasets"]
