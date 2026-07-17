@@ -30,6 +30,14 @@ from app.schemas.todo_item_schema import (
 )
 from app.routes._serializers import serialize_item as _serialize
 from app.services import todo_item_service
+from app.services.activity_log_service import record_activity
+
+
+async def _item_context(db: AsyncSession, item_id: int) -> tuple[str | None, int | None]:
+    """First owning list of an item, as (context_type, context_id) for the
+    activity log — items inherit their section from their list."""
+    list_ids = await todo_item_service.get_item_list_ids(db, item_id)
+    return ("list", list_ids[0]) if list_ids else (None, None)
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +168,13 @@ async def create_todo_item(
     from app.services.event_publisher import publish_data_change_event
 
     publish_data_change_event("todo_item", item.id, "created")
+    await record_activity(
+        action="create", entity_type="todo_item", entity_id=item.id,
+        entity_label=item.content,
+        context_type="list" if payload.list_ids else None,
+        context_id=payload.list_ids[0] if payload.list_ids else None,
+        detail="ایجاد آیتم", user_id=user_id, db=db,
+    )
     return _serialize(item)
 
 
@@ -177,6 +192,12 @@ async def update_todo_item(
     await _assert_item_in_scope(db, item_id, user_id)
     data = payload.model_dump(exclude_unset=True)
     item = await todo_item_service.update_item(db, item_id, **data)
+    ctx_type, ctx_id = await _item_context(db, item_id)
+    await record_activity(
+        action="update", entity_type="todo_item", entity_id=item.id,
+        entity_label=item.content, context_type=ctx_type, context_id=ctx_id,
+        detail="ویرایش آیتم", user_id=user_id, db=db,
+    )
     return _serialize(item)
 
 
@@ -194,7 +215,17 @@ async def delete_todo_item(
     user_id: int = Depends(get_optional_user_id),
 ) -> None:
     await _assert_item_in_scope(db, item_id, user_id)
+    ctx_type, ctx_id = await _item_context(db, item_id)
+    try:
+        label = (await todo_item_service.get_item(db, item_id)).content
+    except Exception:
+        label = None
     await todo_item_service.delete_item(db, item_id)
+    await record_activity(
+        action="delete", entity_type="todo_item", entity_id=item_id,
+        entity_label=label, context_type=ctx_type, context_id=ctx_id,
+        detail="حذف آیتم", user_id=user_id, db=db,
+    )
     return None
 
 
@@ -213,6 +244,14 @@ async def toggle_complete(
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_complete(db, item_id)
+    ctx_type, ctx_id = await _item_context(db, item_id)
+    await record_activity(
+        action="complete" if item.is_completed else "update",
+        entity_type="todo_item", entity_id=item.id, entity_label=item.content,
+        context_type=ctx_type, context_id=ctx_id,
+        detail="تکمیل آیتم" if item.is_completed else "برگشت آیتم به انجام‌نشده",
+        user_id=user_id, db=db,
+    )
     return _serialize(item)
 
 

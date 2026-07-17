@@ -15,6 +15,7 @@ from app.database import get_db
 from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.models.personal_writing import PersonalWriting
+from app.services.activity_log_service import record_activity
 
 router = APIRouter()
 
@@ -108,6 +109,10 @@ async def create_writing(
     db.add(w)
     await db.commit()
     await db.refresh(w)
+    await record_activity(
+        action="create", entity_type="writing", entity_id=w.id,
+        entity_label=w.title, detail="ایجاد نوشته", user_id=user_id, db=db,
+    )
     return {"ok": True, **_summary(w), "body": w.body}
 
 
@@ -137,6 +142,10 @@ async def update_writing(
         w.written_at = _parse_date(data["written_at"])
     await db.commit()
     await db.refresh(w)
+    await record_activity(
+        action="update", entity_type="writing", entity_id=w.id,
+        entity_label=w.title, detail="ویرایش نوشته", user_id=user_id, db=db,
+    )
     return {"ok": True, **_summary(w), "body": w.body}
 
 
@@ -152,5 +161,10 @@ async def delete_writing(
     )).scalars().first()
     if w is None:
         raise HTTPException(status_code=404, detail="Writing not found")
+    title = w.title
     await db.delete(w)
     await db.commit()
+    await record_activity(
+        action="delete", entity_type="writing", entity_id=writing_id,
+        entity_label=title, detail="حذف نوشته", user_id=user_id, db=db,
+    )

@@ -22,6 +22,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ActivityLogPanel from '../components/ActivityLogPanel';
 
 const API_BASE = '/api';
 
@@ -470,6 +471,9 @@ function ListDetail() {
             {items.filter((i) => i.is_completed).length} از {items.length} تکمیل شده
           </p>
         )}
+
+        {/* لاگ همین لیست — شامل رویدادهای آیتم‌هایش از طریق context. */}
+        <ActivityLogPanel entityType="list" entityId={id} title="لاگ این لیست" />
       </div>
     </div>
   );

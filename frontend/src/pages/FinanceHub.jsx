@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BudgetPage from './BudgetPage';
 import AssetsPage from './AssetsPage';
+import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // «مالی» hub — groups Budget + Assets as tabs (safe consolidation: the page
 // components are reused unchanged via their `embedded` prop; no data logic is
@@ -9,6 +10,7 @@ import AssetsPage from './AssetsPage';
 const TABS = [
   { id: 'budget', label: 'برنامه و بودجه', match: ['/budget', '/finance'] },
   { id: 'assets', label: 'دارایی‌ها', match: ['/assets'] },
+  { id: 'log', label: 'لاگ مالی', match: [] },
 ];
 
 function initialTab() {
@@ -45,6 +47,13 @@ function FinanceHub() {
         <div data-testid={`finance-panel-${tab}`}>
           {tab === 'budget' && <BudgetPage embedded />}
           {tab === 'assets' && <AssetsPage embedded />}
+          {tab === 'log' && (
+            <ActivityLogPanel
+              entityType="income,asset,account,transaction"
+              title="لاگ مالی"
+              pageSize={25}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // All task data lives under /api/tasks. The bare /tasks path is the SPA
 // route that renders this page.
@@ -282,6 +283,11 @@ function Tasks() {
             {tasks.filter(t => COMPLETED_STATUSES.has(t.status || (t.is_completed ? 'done' : 'todo'))).length} از {tasks.length} وظیفه تکمیل شده
           </p>
         )}
+
+        {/* لاگ بخش وظایف — فقط رویدادهای همین بخش. */}
+        <div dir="rtl">
+          <ActivityLogPanel entityType="task" title="لاگ وظایف" />
+        </div>
       </div>
     </div>
   );

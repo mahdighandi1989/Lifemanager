@@ -631,3 +631,30 @@ controlled deploy step). Off by default; migration errors are logged and
 swallowed so startup never crashes (`app/services/migration_runner.py`). The
 legacy idempotent `ALTER TABLE` block in `startup_event` remains as
 belt-and-suspenders for the create_all (no-alembic) path on Render's free tier.
+
+### Activity log — لاگ فعالیت‌ها (runtime audit trail)
+
+One append-only `activity_logs` row per notable user action across the whole
+app, written best-effort by `app/services/activity_log_service.record_activity`
+(never raises; always called AFTER the underlying commit, through the caller's
+session so tests/overrides see it). Two-level linking: `entity_type`/`entity_id`
+name the acted-on record, `context_type`/`context_id` name its owning
+profile/section (todo item → its list, deed/note → its person, transaction →
+its account), and `entity_label` snapshots the title at write time so rows
+survive rename/delete.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/activity-log` | Global trail, newest first. Filters: `action`, `entity_type` (comma-separated OK), `entity_id`, `search`, `date_from`/`date_to` (bare end date extends to end-of-day), `page`/`page_size` (≤500). Returns `{ok, items, total, page, page_size}`. |
+| GET | `/api/activity-log/entity/{entity_type}/{entity_id}` | One profile/section's trail — matches the pair as entity OR owning context, so a list's log includes its items and a person's log includes deeds/notes. Same filters minus `entity_type`/`entity_id`. |
+| GET | `/api/activity-log/export.csv` | UTF-8-BOM CSV (Excel-friendly), same filters + `context_type`/`context_id` (OR-pair rule), capped at 5000 rows. |
+| POST | `/api/activity-log` | Record an SPA-originated action (`{action, entity_type?, entity_id?, entity_label?, context_type?, context_id?, detail?}`) — for client-only events like CSV/PDF exports. |
+
+Scoping mirrors the writings router: anon (user 0) also sees legacy NULL-owner
+rows; a real JWT sees only its own rows. Write hooks live in the tasks,
+projects, lists, todo_items, person (deeds/notes/analyze), finance
+(incomes/assets/accounts/transactions), and writings routers. Frontend:
+`/activity-log` page (global, filterable, rows deep-link via
+`frontend/src/lib/activityLog.js::activityLink`) + the reusable
+`ActivityLogPanel` embedded on PersonProfilePage, ListDetail, Tasks,
+ProjectsHub, FinanceHub («لاگ مالی» tab), and Writings.

@@ -24,6 +24,7 @@ const LINKS = [
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance' },
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant' },
   { to: '/import', label: 'داده', testid: 'sidebar-link-data' },
+  { to: '/activity-log', label: 'لاگ فعالیت‌ها', testid: 'sidebar-link-activity-log' },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings' },
 ];
 

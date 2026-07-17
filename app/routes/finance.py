@@ -16,6 +16,7 @@ from app.database import get_db
 from app.dependencies.auth import get_required_user_id
 from app.middleware import handle_errors
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
+from app.services.activity_log_service import record_activity
 
 
 router = APIRouter()
@@ -102,6 +103,12 @@ async def create_income(
     db.add(income)
     await db.commit()
     await db.refresh(income)
+    await record_activity(
+        action="create", entity_type="income", entity_id=income.id,
+        entity_label=income.description,
+        detail=f"ثبت درآمد — {income.amount} {income.currency}",
+        user_id=user_id, db=db,
+    )
     return income
 
 
@@ -136,6 +143,12 @@ async def create_asset(
     db.add(asset)
     await db.commit()
     await db.refresh(asset)
+    await record_activity(
+        action="create", entity_type="asset", entity_id=asset.id,
+        entity_label=asset.name,
+        detail=f"ثبت دارایی — {asset.value} {asset.currency}",
+        user_id=user_id, db=db,
+    )
     return asset
 
 
@@ -174,6 +187,12 @@ async def create_financial_account(
     db.add(account)
     await db.commit()
     await db.refresh(account)
+    await record_activity(
+        action="create", entity_type="account", entity_id=account.id,
+        entity_label=account.name,
+        detail=f"ایجاد حساب مالی ({account.kind})",
+        user_id=user_id, db=db,
+    )
     return account
 
 
@@ -219,6 +238,12 @@ async def create_bank_account(
     db.add(account)
     await db.commit()
     await db.refresh(account)
+    await record_activity(
+        action="create", entity_type="account", entity_id=account.id,
+        entity_label=account.name,
+        detail=f"ایجاد حساب مالی ({account.kind})",
+        user_id=user_id, db=db,
+    )
     return account
 
 
@@ -269,6 +294,12 @@ async def create_broker_account(
     db.add(account)
     await db.commit()
     await db.refresh(account)
+    await record_activity(
+        action="create", entity_type="account", entity_id=account.id,
+        entity_label=account.name,
+        detail=f"ایجاد حساب مالی ({account.kind})",
+        user_id=user_id, db=db,
+    )
     return account
 
 
@@ -291,6 +322,12 @@ async def create_exchange_account(
     db.add(account)
     await db.commit()
     await db.refresh(account)
+    await record_activity(
+        action="create", entity_type="account", entity_id=account.id,
+        entity_label=account.name,
+        detail=f"ایجاد حساب مالی ({account.kind})",
+        user_id=user_id, db=db,
+    )
     return account
 
 
@@ -367,6 +404,14 @@ async def create_transaction(
     account.balance = (account.balance or Decimal(0)) + delta
     await db.commit()
     await db.refresh(txn)
+    await record_activity(
+        action="create", entity_type="transaction", entity_id=txn.id,
+        entity_label=txn.description or f"{txn.transaction_type} {txn.amount}",
+        context_type="account", context_id=account.id,
+        detail=f"ثبت تراکنش {('واریز' if txn.transaction_type == 'income' else 'برداشت')} "
+               f"{txn.amount} در حساب «{account.name}»",
+        user_id=user_id, db=db,
+    )
     return txn
 
 

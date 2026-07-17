@@ -27,6 +27,7 @@ from app.schemas.todo_list_schema import (
 from app.routes._serializers import serialize_item as _serialize_item
 from app.routes._serializers import serialize_list as _serialize_list
 from app.services import list_service, todo_item_service
+from app.services.activity_log_service import record_activity
 
 logger = logging.getLogger(__name__)
 
@@ -161,6 +162,10 @@ async def create_list(
         is_archived=payload.is_archived,
         user_id=user_id,
     )
+    await record_activity(
+        action="create", entity_type="list", entity_id=lst.id,
+        entity_label=lst.name, detail="ایجاد لیست", user_id=user_id, db=db,
+    )
     return _serialize_list(lst, item_count=0)
 
 
@@ -194,6 +199,10 @@ async def update_list(
     data = payload.model_dump(exclude_unset=True)
     lst = await list_service.update_list(db, list_id, **data)
     count = await list_service.count_items(db, list_id)
+    await record_activity(
+        action="update", entity_type="list", entity_id=lst.id,
+        entity_label=lst.name, detail="ویرایش لیست", user_id=user_id, db=db,
+    )
     return _serialize_list(lst, item_count=count)
 
 
@@ -217,7 +226,12 @@ async def delete_list(
     existing = await list_service.get_list(db, list_id)
     if not _list_owned_by(existing, user_id):
         raise HTTPException(status_code=404, detail=f"TodoList {list_id} not found")
+    name = existing.name
     await list_service.delete_list(db, list_id)
+    await record_activity(
+        action="delete", entity_type="list", entity_id=list_id,
+        entity_label=name, detail="حذف لیست", user_id=user_id, db=db,
+    )
     return None
 
 
@@ -272,11 +286,18 @@ async def sync_lists_from_file(
             detail="top-level JSON must be an object",
         )
     try:
-        return await list_service.sync_todo_lists_from_source(
+        result = await list_service.sync_todo_lists_from_source(
             db, user_id=user_id, payload=payload
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    await record_activity(
+        action="import", entity_type="list",
+        entity_label=str(payload.get("name") or "")[:255] or None,
+        detail=f"همگام‌سازی لیست از فایل «{upload.filename or ''}»",
+        user_id=user_id, db=db,
+    )
+    return result
 
 
 @router.post(
@@ -312,5 +333,10 @@ async def add_item_to_list(
         is_completed=bool(payload.get("is_completed", False)),
         is_starred=bool(payload.get("is_starred", False)),
         list_ids=[list_id],
+    )
+    await record_activity(
+        action="create", entity_type="todo_item", entity_id=item.id,
+        entity_label=item.content, context_type="list", context_id=list_id,
+        detail=f"افزودن آیتم به لیست «{target.name}»", user_id=user_id, db=db,
     )
     return _serialize_item(item)

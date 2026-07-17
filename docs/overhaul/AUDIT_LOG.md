@@ -960,3 +960,64 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   new-dataset detection between uploads) → brain suite **13/13**; real-zip sanity (33 files, curated
   metrics unchanged); backend full suite **1058 passed / 13 pre-existing failed (0 new)**; ruff clean;
   `npm run build` clean.
+
+## 2026-07-17 — لاگ فعالیت‌های سراسری (الگوبرداری از سیستم audit-log پروژه‌ی عملیات بانکی)
+
+- **DECISION (pattern port, not code copy)** Owner asked to mirror the sibling banking-ops app's
+  audit-log design: one global «لاگ فعالیت‌ها» page where every row deep-links to its profile/section,
+  plus a per-profile/per-section panel showing only that record's trail. That app links everything
+  through a single `account_no` (one customer profile owns all children); Lifemanager has MANY
+  section types, so the port generalises `account_no` into a `context_type`/`context_id` pair
+  (todo item → its list, deed/note → its person, transaction → its account) and adds
+  `entity_label` (title snapshot at write time — the analogue of its server-side customer-name
+  enrichment, without the reverse lookup) so rows stay meaningful after rename/delete.
+- **FINDING** Lifemanager had no generic runtime audit trail — only narrow domain histories
+  (BehaviorLog/PersonProfile.behavior_log, Interaction, ImportJob, WebhookEvent, notification
+  delivery states) and one write-path seam (`event_publisher.publish_data_change_event`, wired into
+  todo-item create only, broker-dependent/lossy). Chose inline same-session best-effort writes
+  instead (mirrors the reference app's `record_audit(db=db)`).
+- **CHANGE (model/migration)** New `ActivityLog` (`activity_logs`): user_id, action, entity_type,
+  entity_id, entity_label, context_type, context_id, detail, ip_address, created_at (all lookup
+  columns indexed). Registered in `app/models/__init__.py` (create_all covers Render free tier) +
+  alembic `0035_activity_logs` (inspector-guarded, linear after 0034).
+- **CHANGE (service)** `activity_log_service.record_activity(...)` — keyword-only, **never raises**,
+  called after the underlying commit; writes through the caller's session (so dependency-override
+  tests see it) or a private SessionLocal when none given; captures client IP from
+  X-Forwarded-For.
+- **CHANGE (routes)** New `app/routes/activity_log.py`: `GET /api/activity-log` (global; action /
+  entity_type incl. comma-list / entity_id / search / date range / pagination ≤500),
+  `GET /api/activity-log/entity/{type}/{id}` (entity OR owning-context match → a list's trail
+  includes its items, a person's includes deeds/notes), `GET /api/activity-log/export.csv`
+  (UTF-8-BOM, ≤5000 rows), `POST /api/activity-log` (SPA-originated actions). Scoping mirrors
+  writings `_scope` (anon 0 + legacy NULL). Router mounted in main.py.
+- **CHANGE (write hooks)** record_activity added after successful commits in: tasks
+  (create/update/complete/delete), projects (C/U/D), lists (C/U/D + item quick-add + file sync),
+  todo_items (C/U/D, toggle-complete with complete/update action split), person (C/U/D,
+  deed, profile note, analyze), finance (income/asset/account creates incl. per-kind aliases,
+  transaction with account context), writings (C/U/D). Persian details; labels from the row's title.
+- **CHANGE (frontend)** `lib/activityLog.js` (ENTITY_FA/VERB_FA/ACTION_COLORS/activityWhat/
+  activityLink/fa-IR Jalali formatWhen — one helper module so global page and panels stay
+  consistent, same as the reference app's shared `lib/audit.ts`); `ActivityLogPanel.jsx`
+  (collapsible per-section panel, search + CSV export + pagination, rows deep-link); global
+  `ActivityLogPage.jsx` @ /activity-log (action/entity selects, search, date range, pagination 50,
+  CSV) + route in App.jsx + Sidebar «لاگ فعالیت‌ها». Panels embedded: PersonProfilePage («لاگ این
+  فرد»), ListDetail («لاگ این لیست»), Tasks, ProjectsHub, FinanceHub (new «لاگ مالی» tab —
+  entity_type=income,asset,account,transaction), Writings. All panels are self-RTL (dir="rtl" on
+  the section root).
+- **CHANGE (docs)** docs/API.md activity-log section; ARCHITECTURE_INVENTORY.json — new page,
+  model, service, and route entries (the inventory test caught the missing page: it enforces
+  docs-live).
+- **NOTE (deliberate scope)** Read endpoints use `get_optional_user_id` like the rest of the
+  dashboard surface (the reference app gates its global log admin-only; Lifemanager is
+  single-tenant login-bypass — per-user scoping applies the moment real JWTs arrive). Deletes of
+  log rows are not exposed (append-only by design). `frontend/dist/index.html` build artifact left
+  untouched (Render rebuilds).
+- **Dependencies synced:** new table only (no ALTERs); no env vars; no Celery/broker dependency;
+  event_publisher seam untouched.
+- **VERIFY** +11 tests (`tests/test_activity_log.py`: hooks per domain, context linking for
+  list-items / person-deeds / account-transactions, filters incl. comma entity_type + dates +
+  search, pagination + newest-first, CSV BOM export, per-entity isolation, cross-user scoping via
+  planted foreign row) → **11/11**; backend full suite **1069 passed / 13 pre-existing failed
+  (0 new — verified by diffing FAILED lists against the pre-change baseline)**; ruff clean on all
+  new files (2 findings in finance.py are pre-existing unused imports, untouched); `npm run build`
+  clean.

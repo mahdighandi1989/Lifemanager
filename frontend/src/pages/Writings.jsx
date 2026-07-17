@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
+import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // نوشته‌های من — long-form personal writings (spiritual autobiography, the
 // worldly/hereafter goals document, future essays). Documents stay WHOLE here
@@ -117,6 +118,9 @@ function Writings() {
             </div>
           </div>
         </div>
+
+        {/* لاگ بخش نوشته‌ها */}
+        <ActivityLogPanel entityType="writing" title="لاگ نوشته‌ها" />
       </div>
     </div>
   );

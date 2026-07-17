@@ -32,6 +32,7 @@ from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.schemas.task_schema import TaskCreate, TaskUpdate
+from app.services.activity_log_service import record_activity
 
 logger = logging.getLogger(__name__)
 
@@ -258,6 +259,10 @@ async def create_task(
     db.add(task)
     await db.commit()
     await db.refresh(task)
+    await record_activity(
+        action="create", entity_type="task", entity_id=task.id,
+        entity_label=task.title, detail="ایجاد تسک", user_id=caller_user_id, db=db,
+    )
     return _serialize(task)
 
 
@@ -302,6 +307,13 @@ async def update_task(
 
     await db.commit()
     await db.refresh(task)
+    completed = data.get("status") in ("done", "completed")
+    await record_activity(
+        action="complete" if completed else "update",
+        entity_type="task", entity_id=task.id, entity_label=task.title,
+        detail="تکمیل تسک" if completed else "ویرایش تسک",
+        user_id=caller_user_id, db=db,
+    )
     return _serialize(task)
 
 
@@ -327,8 +339,13 @@ async def delete_task(
     task = await db.get(Task, task_id)
     if task is None or not _task_visible_to(task, caller_user_id):
         raise HTTPException(status_code=404, detail="Task not found")
+    title = task.title
     await db.delete(task)
     await db.commit()
+    await record_activity(
+        action="delete", entity_type="task", entity_id=task_id,
+        entity_label=title, detail="حذف تسک", user_id=caller_user_id, db=db,
+    )
     return None
 
 

@@ -21,6 +21,7 @@ import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import Writings from './pages/Writings';
 import BrainDashboard from './pages/BrainDashboard';
+import ActivityLogPage from './pages/ActivityLogPage';
 import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
@@ -132,6 +133,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ListDetail />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/activity-log"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <ActivityLogPage />
                     </Layout>
                   </ProtectedRoute>
                 }

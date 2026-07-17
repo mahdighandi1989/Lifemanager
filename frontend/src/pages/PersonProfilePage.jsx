@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../lib/api';
+import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // PersonProfilePage (audit task 3cc09436 AC4/AC6): a person's behavioural
 // profile — AI relationship score, relationship type, behaviour history — plus
@@ -187,6 +188,9 @@ function PersonProfilePage() {
             );
           })()}
         </section>
+
+        {/* لاگ فعالیت‌های همین فرد — رویدادهای پروفایل + رفتارها/یادداشت‌ها. */}
+        <ActivityLogPanel entityType="person" entityId={id} title="لاگ این فرد" />
       </div>
     </div>
   );

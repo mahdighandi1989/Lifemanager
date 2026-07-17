@@ -17,6 +17,7 @@ from app.config import settings
 from app.database import Base, engine
 from app.rate_limit import limiter
 from app.routes import (
+    activity_log,
     ai,
     brain,
     ai_catalog,
@@ -799,6 +800,10 @@ app.include_router(telegram.router, tags=["telegram"])
 # writings.router decorators carry absolute /api/writings paths (نوشته‌های من —
 # long-form personal writings). Mounts with no prefix.
 app.include_router(writings.router, tags=["writings"])
+
+# لاگ فعالیت‌ها — the runtime activity/audit trail (global page + per-section
+# panels read it; domain routers write it via record_activity).
+app.include_router(activity_log.router, tags=["activity-log"])
 # brain.router — رشد ذهن و هوش (dashboard/upload/reminder). Absolute paths.
 app.include_router(brain.router, tags=["brain"])
 

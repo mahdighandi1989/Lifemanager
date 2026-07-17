@@ -5,6 +5,12 @@
   "backend": {
     "models": [
       {
+        "file": "app/models/activity_log.py",
+        "classes": [
+          "ActivityLog"
+        ]
+      },
+      {
         "file": "app/models/ai_assessment.py",
         "classes": [
           "AIAssessment"
@@ -222,6 +228,27 @@
       {
         "file": "app/routes/_serializers.py",
         "endpoints": []
+      },
+      {
+        "file": "app/routes/activity_log.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/activity-log"
+          },
+          {
+            "method": "GET",
+            "path": "/api/activity-log/entity/{entity_type}/{entity_id}"
+          },
+          {
+            "method": "GET",
+            "path": "/api/activity-log/export.csv"
+          },
+          {
+            "method": "POST",
+            "path": "/api/activity-log"
+          }
+        ]
       },
       {
         "file": "app/routes/ai.py",
@@ -1089,6 +1116,13 @@
         "functions": []
       },
       {
+        "file": "app/services/activity_log_service.py",
+        "classes": [],
+        "functions": [
+          "record_activity"
+        ]
+      },
+      {
         "file": "app/services/ai/ai_data_access_service.py",
         "classes": [],
         "functions": [
@@ -1337,6 +1371,10 @@
       {
         "name": "AISettings",
         "file": "frontend/src/pages/AISettings.jsx"
+      },
+      {
+        "name": "ActivityLogPage",
+        "file": "frontend/src/pages/ActivityLogPage.jsx"
       },
       {
         "name": "AdminUsers",

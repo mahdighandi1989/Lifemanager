@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Projects from './Projects';
 import ExternalProjects from './ExternalProjects';
+import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // «پروژه‌ها» hub — unifies internal projects and third-party (external) PM
 // projects into one tabbed page (owner request: "یکی باشه فعلا بهتره"). Both
@@ -46,6 +47,9 @@ function ProjectsHub() {
           {tab === 'mine' && <Projects embedded />}
           {tab === 'external' && <ExternalProjects embedded />}
         </div>
+
+        {/* لاگ بخش پروژه‌ها */}
+        {tab === 'mine' && <ActivityLogPanel entityType="project" title="لاگ پروژه‌ها" />}
       </div>
     </div>
   );

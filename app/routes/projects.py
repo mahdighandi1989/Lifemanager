@@ -21,6 +21,7 @@ from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
 from app.models.project import Project
 from app.schemas.project_schema import ProjectCreate, ProjectUpdate
+from app.services.activity_log_service import record_activity
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +122,10 @@ async def create_project(
     db.add(project)
     await db.commit()
     await db.refresh(project)
+    await record_activity(
+        action="create", entity_type="project", entity_id=project.id,
+        entity_label=project.name, detail="ایجاد پروژه", user_id=user_id, db=db,
+    )
     return _serialize(project)
 
 
@@ -146,6 +151,10 @@ async def update_project(
         project.status = data["status"]
     await db.commit()
     await db.refresh(project)
+    await record_activity(
+        action="update", entity_type="project", entity_id=project.id,
+        entity_label=project.name, detail="ویرایش پروژه", user_id=user_id, db=db,
+    )
     return _serialize(project)
 
 
@@ -165,6 +174,11 @@ async def delete_project(
     project = await db.get(Project, project_id)
     if project is None or (project.user_id is not None and project.user_id != user_id):
         raise HTTPException(status_code=404, detail="Project not found")
+    name = project.name
     await db.delete(project)
     await db.commit()
+    await record_activity(
+        action="delete", entity_type="project", entity_id=project_id,
+        entity_label=name, detail="حذف پروژه", user_id=user_id, db=db,
+    )
     return None

@@ -19,6 +19,7 @@ from app.schemas.person_schema import (
     PersonUpdate,
 )
 from app.services import person_service
+from app.services.activity_log_service import record_activity
 
 
 router = APIRouter()
@@ -38,6 +39,11 @@ async def create_person(
 ) -> PersonResponse:
     person = await person_service.create_person(
         db, user_id=user_id, payload=payload
+    )
+    await record_activity(
+        action="create", entity_type="person", entity_id=getattr(person, "id", None),
+        entity_label=getattr(person, "name", None), detail="ایجاد پروفایل فرد",
+        user_id=user_id, db=db,
     )
     return person
 
@@ -89,6 +95,11 @@ async def update_person(
     )
     if person is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    await record_activity(
+        action="update", entity_type="person", entity_id=person_id,
+        entity_label=getattr(person, "name", None), detail="ویرایش پروفایل فرد",
+        user_id=user_id, db=db,
+    )
     return person
 
 
@@ -103,11 +114,17 @@ async def delete_person(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ):
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    name = getattr(person, "name", None) if person is not None else None
     success = await person_service.delete_person(
         db, person_id=person_id, user_id=user_id
     )
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    await record_activity(
+        action="delete", entity_type="person", entity_id=person_id,
+        entity_label=name, detail="حذف پروفایل فرد", user_id=user_id, db=db,
+    )
 
 
 # ── /api/people-profiles aliases (audit task 3cc09436 AC4/AC5/AC6) ──────
@@ -179,7 +196,13 @@ async def create_people_profile(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> PersonResponse:
-    return await person_service.create_person(db, user_id=user_id, payload=payload)
+    person = await person_service.create_person(db, user_id=user_id, payload=payload)
+    await record_activity(
+        action="create", entity_type="person", entity_id=getattr(person, "id", None),
+        entity_label=getattr(person, "name", None), detail="ایجاد پروفایل فرد",
+        user_id=user_id, db=db,
+    )
+    return person
 
 
 @router.post("/api/people-profiles/{person_id}/analyze", tags=["persons"])
@@ -248,6 +271,11 @@ async def analyze_person_profile(
     profile = await person_profile_service.analyze_person(
         db, person_id=person_id, person_name=getattr(person, "name", "")
     )
+    await record_activity(
+        action="analyze", entity_type="person", entity_id=person_id,
+        entity_label=getattr(person, "name", None),
+        detail="تحلیل هوش مصنوعی رابطه", user_id=user_id, db=db,
+    )
     return person_profile_service.serialize(profile)
 
 
@@ -267,6 +295,12 @@ async def add_person_profile_note(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
     profile = await person_profile_service.set_note(
         db, person_id=person_id, note=payload.user_notes
+    )
+    await record_activity(
+        action="update", entity_type="person_note", entity_id=person_id,
+        entity_label=getattr(person, "name", None),
+        context_type="person", context_id=person_id,
+        detail="ثبت/به‌روزرسانی یادداشت درباره فرد", user_id=user_id, db=db,
     )
     return person_profile_service.serialize(profile)
 
@@ -294,6 +328,14 @@ async def record_person_deed(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
     profile = await person_profile_service.record_deed(
         db, person_id=person_id, kind=payload.kind, note=payload.note, important=payload.important
+    )
+    await record_activity(
+        action="create", entity_type="deed", entity_id=person_id,
+        entity_label=getattr(person, "name", None),
+        context_type="person", context_id=person_id,
+        detail=("ثبت کار خوب" if payload.kind == "good" else "ثبت کار بد")
+        + (f" — {payload.note}" if payload.note else ""),
+        user_id=user_id, db=db,
     )
     return person_profile_service.serialize(profile)
 
