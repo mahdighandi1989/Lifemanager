@@ -9,6 +9,7 @@ from app.models.ai_model_config import AIModelConfig
 from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
 from app.models.ai_catalog import AICatalogModel, AICatalogProvider, AITaskRoute
 from app.models.import_job import ImportJob
+from app.models.inbox_item import InboxItem
 from app.models.analysis_prompt import AnalysisPrompt
 from app.models.external_project import ExternalProject, ExternalProjectConnection
 from app.models.oversight_task import OversightTask
@@ -62,6 +63,7 @@ __all__ = [
     "AICatalogModel",
     "AITaskRoute",
     "ImportJob",
+    "InboxItem",
     "AnalysisPrompt",
     "ExternalProject",
     "ExternalProjectConnection",

@@ -54,7 +54,7 @@ _HTTP_TIMEOUT = 15.0
 PERSISTENT_REPLY_KEYBOARD: Dict[str, Any] = {
     "keyboard": [
         [{"text": "📋 کارها"}, {"text": "🆕 کار جدید"}],
-        [{"text": "📊 وضعیت"}, {"text": "📋 منو"}],
+        [{"text": "📥 صندوق ورودی"}, {"text": "📊 وضعیت"}, {"text": "📋 منو"}],
     ],
     "resize_keyboard": True,
     "is_persistent": True,
@@ -64,6 +64,7 @@ PERSISTENT_REPLY_KEYBOARD: Dict[str, Any] = {
 TEXT_ALIASES: Dict[str, str] = {
     "📋 کارها": "/tasks",
     "🆕 کار جدید": "/new_task",
+    "📥 صندوق ورودی": "/inbox",
     "📊 وضعیت": "/status",
     "📋 منو": "/menu",
 }
@@ -633,6 +634,14 @@ class TelegramBot:
         if lower in ("/tasks", "/today", "/list"):
             return await self._cmd_tasks(chat_id)
 
+        # /inbox <text?> — universal capture (صندوق ورودی): drop anything, the
+        # triage layer suggests where it belongs, filing happens on the Dashboard.
+        # Bare /inbox reports the pending count. Plain text still goes to the
+        # compose flow below (unchanged behaviour) — this is the explicit path.
+        if lower == "/inbox" or lower.startswith("/inbox "):
+            body = text[len("/inbox"):].strip()
+            return await self._cmd_inbox(chat_id, body)
+
         # /new_task <title?>  — an inline one-liner creates immediately (quick path);
         # bare /new_task opens the INTELLIGENT compose flow so even a plain text
         # message gets analysed, routed (auto or manual), and reports the model.
@@ -716,6 +725,66 @@ class TelegramBot:
             chat_id=chat_id, silent=True,
         )
         return {"ok": True, "handled": "status"}
+
+    async def _cmd_inbox(self, chat_id: str, body: str) -> Dict[str, Any]:
+        """صندوق ورودی: `/inbox <متن>` captures + triages; bare `/inbox`
+        reports the pending count. Fail-open like every bot path — a DB/AI
+        problem is reported, never raised."""
+        from app.database import SessionLocal
+        from app.models.inbox_item import InboxItem
+        from app.services import inbox_service
+
+        base = _app_base_url()
+        uid = _task_user_id()
+        if not body:
+            try:
+                async with SessionLocal() as session:
+                    count = await inbox_service.pending_count(session, uid)
+            except Exception as exc:
+                logger.warning("telegram /inbox count failed: %r", exc)
+                count = None
+            msg = (
+                "📥 *صندوق ورودی*\n\n"
+                + (f"موارد در انتظار بررسی: *{count}*\n\n" if count is not None else "")
+                + "هر چیزی را این‌طور بفرست:\n`/inbox متن دلخواه`\n"
+                  "خودش تشخیص می‌دهد کجا تعلق دارد؛ تأیید نهایی در میز فرمان است."
+                + (f"\n\n🏠 {base}/" if base else "")
+            )
+            await self.send(msg, chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "inbox_help"}
+        try:
+            import html as _html
+
+            async with SessionLocal() as session:
+                item = InboxItem(
+                    user_id=uid,
+                    content=_html.escape(body, quote=True),
+                    source="telegram",
+                    status="pending",
+                )
+                session.add(item)
+                await session.commit()
+                await session.refresh(item)
+                try:
+                    item = await inbox_service.apply_classification(session, item, user_id=uid)
+                except Exception as cls_exc:  # capture survives triage failure
+                    logger.warning("telegram /inbox triage failed: %r", cls_exc)
+        except Exception as exc:
+            logger.exception("telegram /inbox capture failed: %r", exc)
+            await self.send(f"⚠️ ثبت نشد: `{str(exc)[:150]}`", chat_id=chat_id, silent=True)
+            return {"ok": False, "handled": "inbox_error"}
+        type_fa = {
+            "task": "تسک", "todo": "آیتم لیست", "note": "یادداشت",
+            "person": "شخص", None: "نامشخص",
+        }.get(item.suggested_type, item.suggested_type or "نامشخص")
+        reason = (item.suggestion or {}).get("reason") or ""
+        await self.send(
+            "📥 در صندوق ورودی ثبت شد.\n\n"
+            f"پیشنهاد: *{type_fa}*" + (f"\n_{reason}_" if reason else "")
+            + "\n\nتأیید/جابه‌جایی از میز فرمان:" + (f"\n{base}/" if base else " صفحهٔ اصلی برنامه"),
+            chat_id=chat_id, silent=True,
+        )
+        return {"ok": True, "handled": "inbox_captured", "item_id": item.id}
 
     async def _cmd_tasks(self, chat_id: str) -> Dict[str, Any]:
         try:
@@ -879,6 +948,7 @@ _HELP_TEXT = (
     "دستورها:\n"
     "• /tasks — 📋 کارهای باز (با دکمهٔ «انجام شد»)\n"
     "• /new\\_task — 🆕 ساخت کار (می‌توانی عنوان را همان خط بنویسی: `/new_task خرید نان`)\n"
+    "• /inbox — 📥 صندوق ورودی: هر چیزی را بفرست (`/inbox متن`)، خودش تشخیص می‌دهد کجا برود\n"
     "• /status — 📊 وضعیت اعلان‌ها و تعداد کارها\n"
     "• /menu — منوی دسترسی سریع\n"
     "• /ping — 🏓 تست زندهٔ webhook\n"

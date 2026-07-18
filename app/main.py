@@ -20,6 +20,8 @@ from app.routes import (
     activity_log,
     ai,
     brain,
+    command_center,
+    inbox,
     ai_catalog,
     ai_profile,
     ai_stream,
@@ -806,6 +808,10 @@ app.include_router(writings.router, tags=["writings"])
 app.include_router(activity_log.router, tags=["activity-log"])
 # brain.router — رشد ذهن و هوش (dashboard/upload/reminder). Absolute paths.
 app.include_router(brain.router, tags=["brain"])
+# صندوق ورودی همه‌چیز — universal capture inbox (+ AI triage). Absolute paths.
+app.include_router(inbox.router, tags=["inbox"])
+# میز فرمان «امروز من» — the Dashboard's one-call Today aggregate.
+app.include_router(command_center.router, tags=["command-center"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────

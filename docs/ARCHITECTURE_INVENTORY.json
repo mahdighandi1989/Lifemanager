@@ -78,6 +78,12 @@
         ]
       },
       {
+        "file": "app/models/inbox_item.py",
+        "classes": [
+          "InboxItem"
+        ]
+      },
+      {
         "file": "app/models/indexed_data_source_entry.py",
         "classes": [
           "IndexedDataSourceEntry"
@@ -477,6 +483,15 @@
         ]
       },
       {
+        "file": "app/routes/command_center.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/command-center/today"
+          }
+        ]
+      },
+      {
         "file": "app/routes/context.py",
         "endpoints": [
           {
@@ -635,6 +650,31 @@
           {
             "method": "GET",
             "path": "/api/finance/affordable-tasks"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/inbox.py",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/api/inbox"
+          },
+          {
+            "method": "GET",
+            "path": "/api/inbox"
+          },
+          {
+            "method": "POST",
+            "path": "/api/inbox/{item_id}/file"
+          },
+          {
+            "method": "POST",
+            "path": "/api/inbox/{item_id}/dismiss"
+          },
+          {
+            "method": "POST",
+            "path": "/api/inbox/{item_id}/reclassify"
           }
         ]
       },
@@ -1196,6 +1236,13 @@
         ]
       },
       {
+        "file": "app/services/command_center_service.py",
+        "classes": [],
+        "functions": [
+          "build_today"
+        ]
+      },
+      {
         "file": "app/services/crypt_service.py",
         "classes": [],
         "functions": [
@@ -1235,6 +1282,17 @@
           "create_jwt_token",
           "get_all_pending_users",
           "approve_user"
+        ]
+      },
+      {
+        "file": "app/services/inbox_service.py",
+        "classes": [],
+        "functions": [
+          "classify_content",
+          "apply_classification",
+          "file_item",
+          "pending_count",
+          "scope_filter"
         ]
       },
       {

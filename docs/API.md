@@ -658,3 +658,40 @@ projects, lists, todo_items, person (deeds/notes/analyze), finance
 `frontend/src/lib/activityLog.js::activityLink`) + the reusable
 `ActivityLogPanel` embedded on PersonProfilePage, ListDetail, Tasks,
 ProjectsHub, FinanceHub («لاگ مالی» tab), and Writings.
+
+### Universal capture inbox — صندوق ورودی همه‌چیز
+
+One `inbox_items` row per raw thing the owner throws at the system (web
+quick-box on the Dashboard, or Telegram `/inbox متن`), captured BEFORE deciding
+where it belongs. Triage (`app/services/inbox_service.classify_content`) asks
+the routed text model (AI task `inbox_triage` via `inference_gateway.complete`,
+the same seam the Telegram compose flow uses) for a destination suggestion —
+`task | todo | note | person` plus title/priority/due_date/list_name/reason —
+and degrades to a deterministic keyword heuristic on a keyless deploy
+(`ai_model: null` marks the heuristic; fail-open: a triage crash never loses
+the capture). Rows are never deleted: `pending → filed | dismissed`.
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/inbox` | Capture `{content (1..8000), source?}` → 201 `{ok, item}` with the triage suggestion attached (best-effort). Content is HTML-escaped at the boundary. |
+| GET | `/api/inbox` | Newest first; filters: `status` (`pending`/`filed`/`dismissed`), `page`/`page_size` (≤200). Returns `{ok, items, total, pending_count, page, page_size}`. |
+| POST | `/api/inbox/{id}/file` | Turn the row into a real entity. Body (all optional): `{target_type, title, list_name, category, person_name, due_date, priority}` — bare POST files into the AI-suggested target. Targets: `task` → Task; `todo` → TodoItem into the matching list, else the auto-created «صندوق ورودی» list; `note` → PersonalWriting (category default «صندوق ورودی»); `person` → Person. Returns `{ok, item, created:{kind,id,title,link,…}}`; 409 when already filed, 422 on an unknown target. |
+| POST | `/api/inbox/{id}/dismiss` | Mark reviewed-and-dropped (kept, not deleted). 409 when already filed. |
+| POST | `/api/inbox/{id}/reclassify` | Re-run triage on a pending row. |
+
+Scoping mirrors the tasks/writings/activity-log routers (anon 0 also reads
+legacy NULL rows). Every capture/file/dismiss writes an activity-log row
+(`entity_type=inbox_item`; filing also links `context_type/context_id` to the
+created entity). Telegram: `/inbox` (and the «📥 صندوق ورودی» keyboard button)
+captures from chat; plain text still opens the compose flow unchanged.
+
+### Command center — میز فرمان «امروز من»
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/command-center/today` | One read-only aggregate for the Dashboard's Today view: `tasks` (overdue / due_today / upcoming ≤7 days over open tasks with a due_date or deadline, each bucket + counts + `open_count`), `todo` (`due` ≤7d incomplete, `starred` open), `notifications` (`unread_count` + latest 5), `inbox` (`pending_count` + latest 10 with suggestions), and `stats` (`tasks_total`/`tasks_done`/`projects_total` — the legacy stat-card numbers). Each bucket scoped like its home router. |
+
+Frontend: the Dashboard (`/`) is now the «میز فرمان — امروز من» — quick-capture
+box (POST `/api/inbox`), pending-inbox triage rows (تأیید / ارسال به… / رد),
+attention buckets, unread notifications, due/starred list items, with the
+legacy stat cards + quick actions preserved below.

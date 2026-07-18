@@ -1021,3 +1021,59 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   (0 new — verified by diffing FAILED lists against the pre-change baseline)**; ruff clean on all
   new files (2 findings in finance.py are pre-existing unused imports, untouched); `npm run build`
   clean.
+
+## 2026-07-18 — میز فرمان «امروز من» + صندوق ورودی همه‌چیز (فاز ۱+۲ نقشه راه استفاده‌پذیری)
+
+- **DECISION (owner)** Owner's core complaint: «همه‌چیز هست ولی جریان استفادهٔ روزانه ندارد —
+  نمی‌دانم چطور برای مدیریت زندگی‌ام استفاده‌اش کنم.» Agreed 4-phase roadmap (۱ میز فرمان،
+  ۲ صندوق ورودی با تریاژ AI، ۳ موتور توجه/یادآوری، ۴ مرور هفتگی AI); owner picked phases 1+2
+  first. Design reuses the Telegram compose flow's proven seams (inference_gateway.complete,
+  fail-open structure→apply) rather than building a parallel AI path.
+- **CHANGE (model/migration)** New `InboxItem` (`inbox_items`): user_id, content (escaped at
+  boundary), source (web/telegram), status (pending→filed|dismissed — no physical delete),
+  suggested_type, suggestion (JSON: title/description/priority/due_date/list_name/category/
+  person_name/reason), ai_model (provenance; null = heuristic), filed_entity_type/id (no FK —
+  survives entity deletion, like activity_logs). Registered in models/__init__ + alembic
+  `0036_inbox_items` (inspector-guarded, linear after 0035).
+- **CHANGE (service)** `inbox_service`: `classify_content` — AI task `inbox_triage` via
+  `inference_gateway.complete` with the user's REAL list names injected (destination
+  allowlist-validated, dates/priority normalised), degrading to a deterministic keyword
+  heuristic on keyless deploys; never raises. `file_item` — files through the CALLER'S session
+  (entity flush + status flip = one commit): task / todo (matching list, else auto-created
+  «صندوق ورودی» list — an explicit todo choice can never dead-end) / note (PersonalWriting,
+  category default «صندوق ورودی») / person. `command_center_service.build_today` — one
+  aggregate: task buckets (overdue/today/upcoming≤7d over due_date∧deadline, merged-away rows
+  excluded), todo due+starred, unread notifications, pending inbox, legacy stat counters.
+- **CHANGE (routes)** New `app/routes/inbox.py` (POST /api/inbox — capture commits FIRST, then
+  best-effort triage, so a triage crash can never lose input; GET list w/ status filter +
+  pending_count; file — bare POST files the suggestion, body overrides target/fields, 409 on
+  re-file, 422 unknown target; dismiss — 409 when already filed; reclassify) and
+  `app/routes/command_center.py` (GET /api/command-center/today). Both mounted in main.py;
+  scoping mirrors tasks/writings (anon 0 + legacy NULL). Activity-log hooks on
+  capture/file/dismiss (file links context to the created entity).
+- **CHANGE (telegram — additive)** `/inbox <متن>` command + «📥 صندوق ورودی» persistent-keyboard
+  button + help line: captures to the inbox and replies with the suggested destination; bare
+  `/inbox` shows the pending count. Plain-text→compose behaviour UNCHANGED (compose remains the
+  telegram-native create path; /inbox is the explicit capture-for-later path).
+- **CHANGE (frontend)** Dashboard (`/`) reworked into «میز فرمان — امروز من» (dir="rtl" root,
+  fa-IR date): quick-capture box (ctrl+enter submits; shows the returned suggestion),
+  «⏰ نیازمند توجه» buckets (red/blue/plain), «📥 صندوق ورودی» rows with one-tap تأیید /
+  «ارسال به…» select / رد, unread notifications, due+starred list items. Legacy stat cards +
+  quick actions + offline banner PRESERVED below (quick-action rows: space-x-3 → gap-3, the
+  RTL-safe equivalent). Escaped server text folded back via `unescapeHtml` before render.
+- **NOTE (deliberate scope)** Triage targets v1 = task/todo/note/person (finance needs an
+  account context — deferred to phase 3+); no dedicated /inbox page (the Dashboard section IS
+  the review surface for now); reminder/attention engine and weekly AI review are phases 3–4.
+  `frontend/dist` build artifact reverted (Render rebuilds).
+- **VERIFY** +17 tests (`test_inbox.py` 11: heuristic capture incl. person cues, empty-422,
+  activity hooks, file→task/note/person/todo incl. fallback-list creation + named-list match,
+  unknown-target 422, re-file/dismiss-after-file 409s, status filter + pending_count,
+  cross-user hiding + 404s; `test_command_center.py` 6: zeroed structure, task buckets incl.
+  done/no-date/30d exclusions, todo due/starred, inbox+notification buckets, cross-user
+  exclusion) → **17/17**; backend full suite **1085 passed / 13 failed (0 new — failure list
+  diffed: same 13 pre-existing auth/lint items)**; ruff clean on all new files; frontend
+  `npm run build` clean; vitest **16 failed / 85 passed — identical to the pre-change baseline**
+  (verified by stashing Dashboard.jsx and re-running).
+- **EXPERIENCE** New `experiences/universal-capture-inbox-with-ai-triage.md` (capture≠classify≠
+  file transactions, two-layer triage with allowlist sandboxing, always-succeeding filing
+  fallback, enum-NAME-in-raw-SQL pitfall, escape/unescape round-trip).
