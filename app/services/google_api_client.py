@@ -46,15 +46,19 @@ DRIVE_SCOPES = (
 )
 
 
-async def refresh_access_token(refresh_token: str) -> Optional[str]:
-    """Exchange a long-lived refresh_token for a short-lived access_token.
-
-    Returns None (never raises) on any failure so callers degrade to offline.
-    """
+async def refresh_access_token_details(
+    refresh_token: str,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Exchange a refresh_token for an access_token, returning
+    ``(access_token, error_detail)`` — the detail is what /api/drive/test
+    surfaces so «بررسی اتصال» can say WHY (a Google ``invalid_grant`` means
+    the stored token was revoked/expired and only a reconnect fixes it,
+    which is invisible when every failure collapses to one message).
+    Never raises."""
     if not refresh_token:
-        return None
+        return None, "no_refresh_token"
     if not (settings.GOOGLE_CLIENT_ID and settings.GOOGLE_CLIENT_SECRET):
-        return None
+        return None, "oauth_not_configured"
     try:
         async with httpx.AsyncClient(timeout=settings.EXTERNAL_API_TIMEOUT) as client:
             resp = await client.post(
@@ -72,11 +76,17 @@ async def refresh_access_token(refresh_token: str) -> Optional[str]:
                 resp.status_code,
                 resp.text[:200],
             )
-            return None
-        return resp.json().get("access_token")
+            return None, f"refresh_rejected status={resp.status_code}: {resp.text[:200]}"
+        return resp.json().get("access_token"), None
     except Exception as exc:
         logger.warning("Drive token refresh error: %r", exc)
-        return None
+        return None, f"refresh_error: {type(exc).__name__}: {exc}"
+
+
+async def refresh_access_token(refresh_token: str) -> Optional[str]:
+    """Back-compat shim: the token-or-None shape every existing caller uses."""
+    token, _ = await refresh_access_token_details(refresh_token)
+    return token
 
 
 def _build_services(access_token: str):

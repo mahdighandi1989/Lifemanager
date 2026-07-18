@@ -78,6 +78,10 @@ function DriveSettings({ embedded = false }) {
       const data = res.data || {};
       if (data.ok === false || data.success === false) {
         setMsg({ kind: 'error', text: data.detail || 'عملیات ناموفق بود' });
+      } else if (kind !== 'disconnect' && data.connected === false) {
+        // ok:true + connected:false = a clean no-op (e.g. sync with a dead
+        // token) — showing plain success here hid real breakage.
+        setMsg({ kind: 'error', text: data.detail || 'درایو متصل نیست — عملیاتی انجام نشد' });
       } else {
         setMsg({ kind: 'success', text: okText });
       }

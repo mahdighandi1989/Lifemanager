@@ -279,3 +279,43 @@ def test_download_route_local_returns_text(api_client):
     resp = api_client.get(f"/api/files/{fid}/download")
     assert resp.status_code == 200
     assert resp.headers["content-type"].startswith("text/plain")
+
+
+@pytest.mark.asyncio
+async def test_refresh_access_token_details_surfaces_google_rejection(monkeypatch):
+    """The diagnostic seam behind «بررسی اتصال»: a Google 400 (invalid_grant —
+    revoked/expired token) must come back as a REASONED failure, and the
+    back-compat refresh_access_token shim must still return plain None."""
+    from app.services import google_api_client as gac
+
+    monkeypatch.setattr(gac.settings, "GOOGLE_CLIENT_ID", "cid", raising=False)
+    monkeypatch.setattr(gac.settings, "GOOGLE_CLIENT_SECRET", "sec", raising=False)
+
+    class _Resp:
+        status_code = 400
+        text = '{"error": "invalid_grant", "error_description": "Token has been expired or revoked."}'
+
+    class _Client:
+        def __init__(self, *a, **k):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *a):
+            return False
+
+        async def post(self, *a, **k):
+            return _Resp()
+
+    monkeypatch.setattr(gac.httpx, "AsyncClient", _Client)
+
+    token, error = await gac.refresh_access_token_details("dead-token")
+    assert token is None
+    assert error is not None and "invalid_grant" in error and "refresh_rejected" in error
+    assert await gac.refresh_access_token("dead-token") is None
+
+    # And the two local (no-network) reasons stay distinct.
+    assert await gac.refresh_access_token_details("") == (None, "no_refresh_token")
+    monkeypatch.setattr(gac.settings, "GOOGLE_CLIENT_ID", "", raising=False)
+    assert (await gac.refresh_access_token_details("t"))[1] == "oauth_not_configured"

@@ -1181,3 +1181,35 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **VERIFY** Suites now: inbox 14/14, attention 10/10, weekly 6/6, telegram 25/25; ruff clean;
   `npm run build` clean; vitest 16/85 failed/passed — identical to baseline; backend full suite
   green vs the same 13 pre-existing failures (recorded at commit time).
+
+## 2026-07-18 — تشخیص دقیق «بررسی اتصال» درایو (owner: «قبلاً کار می‌کرد»)
+
+- **FINDING (production report)** Settings → گوگل درایو: status «متصل»، «همگام‌سازی اکنون» سبز،
+  ولی «بررسی اتصال» خطای واحد «Drive is not connected (no refresh token) or google libraries
+  are unavailable». Root cause of the CONTRADICTION (code-level): status/«متصل» only means a
+  refresh_token exists in the DB; /api/drive/test collapsed THREE distinct failures (no token /
+  Google rejected the token / libs missing) into that one message; and /api/drive/sync returned
+  ok:true + connected:false which the panel rendered as plain success while uploading nothing.
+  Most likely live cause given token-on-file + sync no-op: Google rejecting the stored
+  refresh_token (invalid_grant — revoked/expired; OAuth consent screens in Testing mode expire
+  refresh tokens after ~7 days), which matches «قبلاً کار می‌کرد». The COOP console warnings are
+  unrelated to the Drive flow (connect is a top-level navigation, not a popup).
+- **CHANGE (google_api_client)** `refresh_access_token_details(token) → (access_token,
+  error_detail)` — surfaces Google's actual rejection (status + body snippet);
+  `refresh_access_token` kept as a back-compat shim (same token-or-None shape for all existing
+  callers — behaviour-preserving).
+- **CHANGE (routes/drive.py)** /api/drive/test now diagnoses step-by-step with Persian
+  remediation per reason: `oauth_not_configured` (env vars), `no_refresh_token` (connect
+  button), `refresh_rejected` (+`google_error`; «قطع اتصال و اتصال دوباره»), `client_build_failed`
+  (libs). /api/drive/sync keeps its ok:true no-op contract but now carries a detail explaining
+  nothing synced and pointing at «بررسی اتصال».
+- **CHANGE (DriveSettings.jsx)** ok:true+connected:false responses (test/sync) render as a
+  warning with the server detail instead of unconditional success; disconnect (which
+  legitimately returns connected:false) keeps its success message.
+- **VERIFY** +1 test (`test_refresh_access_token_details_surfaces_google_rejection` — fake
+  httpx 400 invalid_grant → reasoned failure + shim None + the two local reasons distinct);
+  drive suites 34/34; ruff clean; backend full suite **1106 passed / 13 failed — FAILED list
+  identical to baseline**; `npm run build` clean; dist reverted.
+- **OWNER ACTION** در پنل درایو: «قطع اتصال» → «اتصال به گوگل درایو» (توکن تازه). اگر باز تکرار
+  شد و OAuth consent در حالت Testing است، در Google Cloud Console آن را Publish کن تا
+  refresh token هفت‌روزه منقضی نشود.

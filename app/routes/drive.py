@@ -180,15 +180,49 @@ async def drive_test_connection(request: Request, db: AsyncSession = Depends(get
     """Verify the live connection by building a client and ensuring the app
     folder tree exists. Returns the root folder id on success (operator only)."""
     await _require_drive_operator(request, db)
-    from app.services.google_api_client import build_drive_client, ensure_app_folders
+    from app.config import settings as app_settings
+    from app.services import drive_settings_service as dss
+    from app.services.google_api_client import (
+        build_drive_client,
+        ensure_app_folders,
+        refresh_access_token_details,
+    )
+
+    # Diagnose step-by-step so «بررسی اتصال» tells the owner exactly what to
+    # fix — the previous single collapsed message hid the most common cause
+    # (Google revoking the stored refresh_token → only a reconnect helps),
+    # while the status panel kept saying «متصل» because a token WAS on file.
+    if not (app_settings.GOOGLE_CLIENT_ID and app_settings.GOOGLE_CLIENT_SECRET):
+        return {
+            "ok": False, "success": False, "connected": False,
+            "reason": "oauth_not_configured",
+            "detail": "متغیرهای محیطی GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET روی سرور تنظیم نیستند.",
+        }
+    refresh_token = await dss.resolve_refresh_token(db)
+    if not refresh_token:
+        return {
+            "ok": False, "success": False, "connected": False,
+            "reason": "no_refresh_token",
+            "detail": "توکنی ذخیره نشده است — دکمهٔ «اتصال به گوگل درایو» را بزن.",
+        }
+    access_token, token_error = await refresh_access_token_details(refresh_token)
+    if not access_token:
+        return {
+            "ok": False, "success": False, "connected": False,
+            "reason": "refresh_rejected",
+            "google_error": token_error,
+            "detail": (
+                "گوگل توکن ذخیره‌شده را نپذیرفت (معمولاً یعنی توکن باطل/منقضی شده). "
+                "«قطع اتصال» و سپس اتصال دوباره مشکل را حل می‌کند."
+            ),
+        }
 
     drive_client = await build_drive_client(db)
     if drive_client is None:
         return {
-            "ok": False,
-            "success": False,
-            "connected": False,
-            "detail": "Drive is not connected (no refresh token) or google libraries are unavailable.",
+            "ok": False, "success": False, "connected": False,
+            "reason": "client_build_failed",
+            "detail": "کتابخانه‌های گوگل روی سرور در دسترس نیستند (ساخت کلاینت ناموفق بود).",
         }
     root_id, subfolders = await ensure_app_folders(db, drive_client)
     return {
@@ -220,7 +254,13 @@ async def drive_sync_now(
 
     drive_client = await build_drive_client(db)
     if drive_client is None:
-        return {"ok": True, "success": True, "uploaded": 0, "connected": False}
+        # ok stays true (a clean no-op, the documented contract) but the
+        # payload must SAY nothing happened — the panel previously rendered
+        # this as «همگام‌سازی انجام شد» while zero files moved.
+        return {
+            "ok": True, "success": True, "uploaded": 0, "connected": False,
+            "detail": "درایو متصل نیست — چیزی همگام‌سازی نشد. «بررسی اتصال» را بزن تا علت دقیق را ببینی.",
+        }
 
     # Make sure the folder tree exists (and the root id is cached).
     await ensure_app_folders(db, drive_client)
