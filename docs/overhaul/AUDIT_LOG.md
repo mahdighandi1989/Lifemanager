@@ -1264,3 +1264,31 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   (Account Settings → API Keys). اختیاری: `DEV_*` برای فاصله‌ها (\.env.example).
   برای کارنامهٔ AI-دار، یک مدل متنی در «تنظیمات AI» فعال باشد؛ بدون آن fallback قطعی
   می‌نویسد.
+
+## 2026-07-18 — دور دوم مرکز توسعه: خطاهای ماندگار + لاگ ترجمه‌شده ذیل پروژه + تنظیمات یکپارچه
+
+- **DECISION (پاسخ به بازخورد مالک)** «مرکز توسعه و تنظیمات یکی باشن»: نیمه‌پذیرفته شد —
+  بخش تنظیماتی (توکن‌ها + موتور) به یک کامپوننت مشترک `DevSyncSettings.jsx` تبدیل و
+  در DO جا mount شد: تب جدید «مرکز توسعه» در /settings و تب تنظیمات خود /dev-center
+  (dual-mount؛ هیچ‌چیز حذف نشد). نماهای عملیاتی (لاگ زنده/خطاها/آمار/کارنامه) داشبوردند
+  نه تنظیمات و در /dev-center ماندند.
+- **CHANGE (schema)** جدول `dev_error_issues` (migration 0039): یک ردیف ماندگار per
+  امضای خطا (fingerprint = md5 سرویس + پیامِ عددزدوده) — occurrences، first/last_seen،
+  status (open|resolved|muted)، resolved_by (auto|manual)، reopened_count. لاگ خام با
+  retention پاک می‌شود، خطاها هرگز («خطاها حذف نشن»).
+- **CHANGE (services)** `error_issue_service.py`: upsert از خطاهای هر poll (داخل
+  sync_logs، fail-open)؛ auto-resolve وقتی خطا ≥ `error_resolve_hours` ساکت باشد **و**
+  سرویس بعد از آن لاگ داده باشد (سرویس خاموش ⇒ رفع‌شده حساب نمی‌شود؛ ثبت تجمیعی در
+  activity log)؛ بازگشت خطا ⇒ بازگشایی خودکار + شمارنده. مترجم فارسی
+  `interpret_log_fa` (HTTP/دیپلوی/بوت/خاموشی/مایگریشن/Traceback) +
+  `build_project_feed` (رویدادهای قابل‌توجه، تکراری‌های پشت‌سرهم ×N فشرده).
+- **CHANGE (routes/UI)** `GET/PATCH /api/dev/errors`، `GET /api/dev/projects/{id}/feed`;
+  شمارندهٔ `open_errors` روی کارت‌ها/overview/نیازمند رسیدگی؛ تب «خطاها» در DevCenter
+  (باز/رفع‌شده/بی‌صدا + دکمه‌های دستی)؛ پنل بازشدنی «لاگ و کارنامهٔ این پروژه» روی هر
+  کارت (خطاهای باز + رویدادهای ترجمه‌شده + کارنامه‌های اخیر)؛ توضیح یک‌خطی زیر هر تب
+  هاب پروژه‌ها («این تب چیست») — پاسخ به «معلوم نیست اونا چین».
+- **VERIFY** tests dev-sync ۳۹/۳۹ (چرخهٔ خطا: upsert/تجمیع امضا/auto-resolve/عدم-resolve
+  سرویس خاموش/بازگشایی؛ الگوهای مترجم؛ فشرده‌سازی feed؛ فلوی کامل route)؛ ruff پاک؛
+  alembic تا 0039 سبز؛ کل suite ۱۱۴۵ پاس / ۱۳ خطا — لیست خطاها عیناً بیس‌لاین؛
+  `npm run build` سبز. (ورک‌فلوی بازبینی چندایجنتهٔ دور دوم توسط مالک لغو شد —
+  به‌جایش مرور دستی + تست‌های چرخهٔ کامل.)

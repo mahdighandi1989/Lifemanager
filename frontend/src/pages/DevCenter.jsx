@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../lib/api';
 import DevProjectsOverview from '../components/DevProjectsOverview';
+import DevSyncSettings from '../components/DevSyncSettings';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // «مرکز توسعه» — live Render logs + stats + کارنامهٔ روزانه + token settings.
@@ -10,6 +11,7 @@ import ActivityLogPanel from '../components/ActivityLogPanel';
 const TABS = [
   { id: 'overview', label: 'نمای کلی' },
   { id: 'live', label: 'لاگ زنده' },
+  { id: 'errors', label: 'خطاها' },
   { id: 'stats', label: 'آمار' },
   { id: 'summaries', label: 'کارنامهٔ روزانه' },
   { id: 'settings', label: 'تنظیمات' },
@@ -516,222 +518,163 @@ function SummariesTab() {
   );
 }
 
-// ── تنظیمات ──────────────────────────────────────────────────────────────────
-function SettingsTab() {
-  const [integrations, setIntegrations] = useState(null);
-  const [settings, setSettings] = useState(null);
-  const [tokenInputs, setTokenInputs] = useState({ github: '', render: '' });
+// ── خطاها (ماندگار — با وضعیت رفع‌شده) ───────────────────────────────────────
+function relTimeFa(iso) {
+  if (!iso) return '—';
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '—';
+  const mins = Math.max(0, Math.round((Date.now() - then) / 60000));
+  if (mins < 60) return `${mins} دقیقه پیش`;
+  const hours = Math.round(mins / 60);
+  if (hours < 48) return `${hours} ساعت پیش`;
+  return `${Math.round(hours / 24)} روز پیش`;
+}
+
+function ErrorCard({ issue, onSetStatus }) {
+  const border =
+    issue.status === 'open' ? 'border-red-200' : issue.status === 'resolved' ? 'border-emerald-200' : 'border-gray-200';
+  return (
+    <div className={`bg-white rounded-xl border ${border} p-3`}>
+      <div className="flex items-start justify-between gap-2 flex-wrap">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            {issue.status === 'resolved' && (
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                ✓ رفع شد {issue.resolved_by === 'auto' ? '(خودکار)' : '(دستی)'}
+              </span>
+            )}
+            {issue.status === 'muted' && (
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">🔇 بی‌صدا</span>
+            )}
+            <span dir="ltr" className="text-[11px] text-sky-700">{issue.service_name || issue.service_id}</span>
+            <span className="text-[11px] text-gray-400">{issue.occurrences} بار</span>
+            {issue.reopened_count > 0 && (
+              <span className="text-[11px] text-amber-600">{issue.reopened_count} بار برگشته</span>
+            )}
+          </div>
+          <p dir="ltr" className="text-xs font-mono text-gray-800 break-all text-left" title={issue.sample_message || ''}>
+            {issue.title}
+          </p>
+          <div className="text-[11px] text-gray-400 mt-1">
+            اولین بار: {relTimeFa(issue.first_seen_at)} — آخرین بار: {relTimeFa(issue.last_seen_at)}
+            {issue.resolved_at && <> — رفع: {relTimeFa(issue.resolved_at)}</>}
+          </div>
+        </div>
+        <div className="flex gap-1.5 shrink-0">
+          {issue.status !== 'resolved' && (
+            <button
+              onClick={() => onSetStatus(issue, 'resolved')}
+              className="px-2 py-1 text-[11px] rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              رفع شد
+            </button>
+          )}
+          {issue.status === 'open' && (
+            <button
+              onClick={() => onSetStatus(issue, 'muted')}
+              className="px-2 py-1 text-[11px] rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50"
+            >
+              بی‌صدا
+            </button>
+          )}
+          {issue.status !== 'open' && (
+            <button
+              onClick={() => onSetStatus(issue, 'open')}
+              className="px-2 py-1 text-[11px] rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50"
+            >
+              بازگشایی
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorsTab() {
+  const [errors, setErrors] = useState([]);
+  const [counts, setCounts] = useState({});
+  const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState(null);
-  const [testResult, setTestResult] = useState({});
+  const [showResolved, setShowResolved] = useState(false);
 
   const load = useCallback(() => {
-    api.get('/dev/integrations').then((res) => setIntegrations(res.data)).catch(() => {});
-    api.get('/dev/settings').then((res) => setSettings(res.data?.settings || null)).catch(() => {});
+    setLoading(true);
+    api
+      .get('/dev/errors', { params: { limit: 500 } })
+      .then((res) => {
+        setErrors(res.data?.errors || []);
+        setCounts(res.data?.counts || {});
+      })
+      .catch(() => setNotice('خطا در دریافت فهرست خطاها'))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const saveToken = async (provider, clear = false) => {
+  const setStatus = async (issue, status) => {
     try {
-      await api.put(`/dev/integrations/${provider}`, {
-        api_key: clear ? '' : tokenInputs[provider],
-      });
-      setTokenInputs((t) => ({ ...t, [provider]: '' }));
-      setNotice(clear ? 'کلید پاک شد.' : 'کلید ذخیره شد (رمزنگاری‌شده).');
+      await api.patch(`/dev/errors/${issue.id}`, { status });
       load();
     } catch (e) {
-      setNotice('ذخیرهٔ کلید ناموفق: ' + (e.response?.data?.detail || e.message || ''));
+      setNotice('تغییر وضعیت ناموفق: ' + (e.response?.data?.detail || e.message || ''));
     }
   };
 
-  const testConnection = async (provider) => {
-    setTestResult((r) => ({ ...r, [provider]: { pending: true } }));
-    try {
-      const res = await api.post(`/dev/integrations/${provider}/test`);
-      setTestResult((r) => ({ ...r, [provider]: res.data }));
-    } catch (e) {
-      setTestResult((r) => ({ ...r, [provider]: { ok: false, error: e.message } }));
-    }
-  };
-
-  const saveSettings = async () => {
-    if (!settings) return;
-    const payload = {};
-    for (const [key, value] of Object.entries(settings)) {
-      if (typeof value === 'boolean') payload[key] = value;
-      else if (typeof value === 'number' && Number.isFinite(value)) payload[key] = value;
-      // stamps / strings are never sent back (settings-echo lesson)
-    }
-    try {
-      const res = await api.put('/dev/settings', payload);
-      setSettings(res.data?.settings || settings);
-      setNotice('تنظیمات ذخیره شد.');
-    } catch (e) {
-      setNotice('ذخیرهٔ تنظیمات ناموفق: ' + (e.response?.data?.detail || e.message || ''));
-    }
-  };
-
-  const setNum = (key, raw) => {
-    const value = raw === '' ? '' : Number(raw);
-    setSettings((s) => ({ ...s, [key]: value === '' ? '' : value }));
-  };
-
-  const PROVIDER_META = {
-    github: {
-      title: 'گیت‌هاب',
-      envHint: 'GITHUB_TOKEN (یا GH_TOKEN)',
-      desc: 'برای همگام‌سازی مخزن‌ها. یک Personal Access Token با دسترسی خواندن repo کافی است.',
-    },
-    render: {
-      title: 'رندر',
-      envHint: 'RENDER_API_KEY',
-      desc: 'برای فهرست سرویس‌ها و دریافت لاگ‌ها. از Render → Account Settings → API Keys بساز.',
-    },
-  };
-
-  const numField = (key, label, hint) => (
-    <label className="block text-sm">
-      <span className="text-gray-600">{label}</span>
-      <input
-        type="number"
-        value={settings?.[key] ?? ''}
-        onChange={(e) => setNum(key, e.target.value)}
-        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
-      />
-      {hint && <span className="text-[11px] text-gray-400">{hint}</span>}
-    </label>
-  );
+  const open = errors.filter((e) => e.status === 'open');
+  const resolved = errors.filter((e) => e.status === 'resolved');
+  const muted = errors.filter((e) => e.status === 'muted');
 
   return (
-    <div data-testid="dev-settings-tab">
+    <div data-testid="dev-errors-tab">
+      <p className="text-sm text-gray-500 mb-3">
+        هر خطای متمایز از لاگ‌ها این‌جا برای همیشه ثبت می‌شود؛ اگر دیگر تکرار نشود (در حالی که
+        سرویس فعال است) خودش «رفع‌شده» علامت می‌خورد تا سراغ خطای حل‌شده نروی؛ اگر برگردد،
+        دوباره باز می‌شود.
+      </p>
       {notice && (
-        <div className="mb-3 bg-blue-50 border border-blue-100 rounded-lg p-2.5 text-sm text-blue-700 flex justify-between">
+        <div className="mb-3 bg-red-50 border border-red-100 rounded-lg p-2.5 text-sm text-red-600 flex justify-between">
           <span>{notice}</span>
-          <button onClick={() => setNotice(null)} className="text-blue-400">✕</button>
+          <button onClick={() => setNotice(null)} className="text-red-400">✕</button>
         </div>
       )}
-
-      <div className="grid md:grid-cols-2 gap-4 mb-6">
-        {['github', 'render'].map((provider) => {
-          const st = integrations?.[provider] || {};
-          const meta = PROVIDER_META[provider];
-          const test = testResult[provider];
-          return (
-            <div key={provider} className="bg-white rounded-xl border border-gray-100 p-4">
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="font-semibold text-gray-800">
-                  کلید {meta.title}
-                </h3>
-                <span
-                  className={`text-[11px] px-2 py-0.5 rounded-full ${
-                    st.source
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}
-                >
-                  {st.source === 'db' ? 'ذخیره در برنامه' : st.source === 'env' ? 'از متغیر محیطی' : 'تنظیم نشده'}
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 mb-2">{meta.desc}</p>
-              <div className="text-[11px] text-gray-400 mb-2" dir="rtl">
-                راه ساده‌تر: در Render متغیر محیطی <code dir="ltr" className="bg-gray-100 px-1 rounded">{meta.envHint}</code> را بگذار — بدون نیاز به این فرم.
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  dir="ltr"
-                  value={tokenInputs[provider]}
-                  onChange={(e) => setTokenInputs((t) => ({ ...t, [provider]: e.target.value }))}
-                  placeholder={st.has_api_key ? '•••••••• (کلید ذخیره شده)' : 'توکن را اینجا بچسبان'}
-                  className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
-                />
-                <button
-                  onClick={() => saveToken(provider)}
-                  disabled={!tokenInputs[provider]}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white disabled:opacity-40"
-                >
-                  ذخیره
-                </button>
-              </div>
-              <div className="flex gap-2 mt-2 items-center flex-wrap">
-                <button
-                  onClick={() => testConnection(provider)}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-                >
-                  بررسی اتصال
-                </button>
-                {st.has_api_key && (
-                  <button
-                    onClick={() => saveToken(provider, true)}
-                    className="px-2.5 py-1 text-xs rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
-                  >
-                    پاک کردن کلید
-                  </button>
-                )}
-                {test && !test.pending && (
-                  <span className={`text-xs ${test.ok ? 'text-emerald-600' : 'text-red-600'}`} dir="rtl">
-                    {test.ok
-                      ? `✓ متصل${test.login || test.owner ? ' — ' : ''}${test.login || test.owner || ''}`
-                      : `✗ ${test.detail || test.error || 'ناموفق'}`}
-                  </span>
-                )}
-                {test?.pending && <span className="text-xs text-gray-400">در حال بررسی…</span>}
-              </div>
-              {st.last_sync_at && (
-                <div className="text-[11px] text-gray-400 mt-2">
-                  آخرین همگام‌سازی: <span dir="ltr">{st.last_sync_at.slice(0, 19).replace('T', ' ')}</span>
-                  {st.last_sync_ok === false && (
-                    <span className="text-red-500"> — ناموفق: <span dir="ltr">{st.last_sync_error}</span></span>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div className="flex gap-3 mb-4">
+        <span className="text-sm text-red-600 font-medium">{counts.open || 0} باز</span>
+        <span className="text-sm text-emerald-600">{counts.resolved || 0} رفع‌شده</span>
+        <span className="text-sm text-gray-400">{counts.muted || 0} بی‌صدا</span>
       </div>
 
-      {settings && (
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-800">موتور همگام‌سازی</h3>
-            <label className="text-sm flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={!!settings.enabled}
-                onChange={(e) => setSettings((s) => ({ ...s, enabled: e.target.checked }))}
-              />
-              فعال
-            </label>
+      {loading ? (
+        <div className="p-8 text-center text-gray-400">در حال بارگذاری…</div>
+      ) : (
+        <>
+          <h3 className="font-semibold text-gray-800 text-sm mb-2">خطاهای باز</h3>
+          <div className="space-y-2 mb-6" data-testid="dev-errors-open">
+            {open.length === 0 ? (
+              <div className="p-6 text-center text-emerald-600 bg-emerald-50 rounded-xl border border-emerald-100">
+                ✓ هیچ خطای باز و حل‌نشده‌ای نیست
+              </div>
+            ) : (
+              open.map((issue) => <ErrorCard key={issue.id} issue={issue} onSetStatus={setStatus} />)
+            )}
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {numField('repo_sync_interval_minutes', 'فاصلهٔ همگام‌سازی مخزن‌ها (دقیقه)')}
-            {numField('service_sync_interval_minutes', 'فاصلهٔ همگام‌سازی سرویس‌ها (دقیقه)')}
-            {numField('log_poll_seconds', 'فاصلهٔ دریافت لاگ در پس‌زمینه (ثانیه)')}
-            {numField('retention_hours', 'نگهداری لاگ خام (ساعت)', 'قدیمی‌ترها حذف می‌شوند؛ کارنامهٔ روزانه می‌ماند')}
-            {numField('summary_hour', 'ساعت تولید کارنامهٔ شبانه (محلی)')}
-            {numField('error_attention_threshold', 'آستانهٔ خطا برای «نیازمند رسیدگی»')}
-            {numField('stale_repo_days', 'آستانهٔ رکود مخزن (روز)')}
-            {numField('tz_offset_minutes', 'اختلاف منطقهٔ زمانی (دقیقه)', 'مثلاً ۲۴۰ برای امارات')}
-          </div>
-          <label className="text-sm flex items-center gap-2 mt-3">
-            <input
-              type="checkbox"
-              checked={!!settings.summary_enabled}
-              onChange={(e) => setSettings((s) => ({ ...s, summary_enabled: e.target.checked }))}
-            />
-            تولید خودکار کارنامهٔ شبانه
-          </label>
-          <div className="mt-4">
-            <button
-              onClick={saveSettings}
-              className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-            >
-              ذخیرهٔ تنظیمات
-            </button>
-          </div>
-        </div>
+
+          <button
+            onClick={() => setShowResolved((v) => !v)}
+            className="text-sm text-gray-500 hover:text-gray-700 mb-2"
+          >
+            {showResolved ? '▾' : '◂'} رفع‌شده‌ها و بی‌صداها ({resolved.length + muted.length})
+          </button>
+          {showResolved && (
+            <div className="space-y-2" data-testid="dev-errors-resolved">
+              {[...resolved, ...muted].map((issue) => (
+                <ErrorCard key={issue.id} issue={issue} onSetStatus={setStatus} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -768,9 +711,10 @@ function DevCenter() {
 
         {tab === 'overview' && <DevProjectsOverview embedded />}
         {tab === 'live' && <LiveLogsTab />}
+        {tab === 'errors' && <ErrorsTab />}
         {tab === 'stats' && <StatsTab />}
         {tab === 'summaries' && <SummariesTab />}
-        {tab === 'settings' && <SettingsTab />}
+        {tab === 'settings' && <DevSyncSettings />}
 
         {tab === 'overview' && (
           <ActivityLogPanel entityType="dev_project,dev_service,dev_integration" title="لاگ مرکز توسعه" />

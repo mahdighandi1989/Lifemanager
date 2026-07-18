@@ -15,6 +15,17 @@ const TABS = [
   { id: 'dev', label: 'پروژه‌های توسعه', match: [] },
 ];
 
+// «این تب‌ها چی‌ان؟» — one honest sentence per tab (owner asked). Shown under
+// the tab bar so each view explains itself.
+const TAB_HINTS = {
+  mine:
+    'پروژه‌های زندگی خودت — دسته‌هایی که خودت می‌سازی (مثل «خانه»، «مهاجرت»، «پروژه‌های نرم‌افزاری») تا وظایف بهشان وصل شوند و کارنامهٔ پروژه‌های توسعه هم ذیلشان ثبت شود.',
+  external:
+    'اتصال به ابزارهای مدیریت پروژهٔ بیرونی (Jira، Linear، Asana و…) برای پایش «مغفول‌مانده‌ها». اگر از چنین ابزاری استفاده نمی‌کنی، این تب خالی می‌ماند و نیازی بهش نداری.',
+  dev:
+    'مخزن‌های گیت‌هاب و سرویس‌های رندر تو — همگام‌سازی خودکار، خطاهای باز، و کارنامهٔ روزانهٔ فارسی. جزئیات کامل در «مرکز توسعه».',
+};
+
 function initialTab() {
   try {
     const { pathname, search } = window.location;
@@ -45,6 +56,11 @@ function ProjectsHub() {
             </button>
           ))}
         </div>
+        {TAB_HINTS[tab] && (
+          <p className="text-xs text-gray-500 -mt-3 mb-4 leading-relaxed" data-testid="projects-tab-hint">
+            {TAB_HINTS[tab]}
+          </p>
+        )}
         <div data-testid={`projects-panel-${tab}`}>
           {tab === 'mine' && <Projects embedded />}
           {tab === 'external' && <ExternalProjects embedded />}

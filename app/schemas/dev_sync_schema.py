@@ -51,6 +51,12 @@ class DevTaskCreate(BaseModel):
     due_date: Optional[date] = None
 
 
+class DevErrorPatch(BaseModel):
+    """PATCH /api/dev/errors/{id} — manual status override."""
+
+    status: str = Field(pattern="^(open|resolved|muted)$")
+
+
 class DevLogsFetchRequest(BaseModel):
     service_ids: Optional[List[str]] = None
     limit: Optional[int] = Field(default=None, ge=1, le=500)
@@ -73,4 +79,5 @@ class DevSettingsUpdate(BaseModel):
     summary_enabled: Optional[bool] = None
     summary_hour: Optional[int] = Field(default=None, ge=0, le=23)
     error_attention_threshold: Optional[int] = Field(default=None, ge=1, le=1000)
+    error_resolve_hours: Optional[int] = Field(default=None, ge=1, le=720)
     stale_repo_days: Optional[int] = Field(default=None, ge=1, le=365)

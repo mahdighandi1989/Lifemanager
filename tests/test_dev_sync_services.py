@@ -451,3 +451,122 @@ async def test_sanitize_error_redacts_token():
     exc = RuntimeError("Illegal header value b'Bearer rnd-SECRET\\ntail'")
     msg = token_service.sanitize_error(exc, "rnd-SECRET\ntail", None)
     assert "SECRET" not in msg and "***" in msg and "\n" not in msg
+
+
+# ── error issues (persistent — «خطاها حذف نشن») ──────────────────────────────
+from app.models.dev_sync import DevErrorIssue  # noqa: E402
+from app.services.dev_sync import error_issue_service  # noqa: E402
+
+
+def _err_row(i, message="ValueError: boom 42", at=None, service_id="srv-abc123"):
+    return {
+        "id": f"e{i}",
+        "service_id": service_id,
+        "service_name": "lifemanager",
+        "timestamp": at or (NOW - timedelta(minutes=i)),
+        "level": "error",
+        "message": message,
+    }
+
+
+async def test_error_issue_upsert_and_recurrence(db_session):
+    svc = DevService(id="srv-abc123", name="lifemanager", status="active")
+    db_session.add(svc)
+    await db_session.commit()
+    services = {"srv-abc123": svc}
+
+    touched = await error_issue_service.upsert_from_logs(
+        db_session, [_err_row(1), _err_row(2, message="ValueError: boom 43")], services
+    )
+    assert touched == 1  # numbers normalized away → one signature
+    issue = (await db_session.execute(select(DevErrorIssue))).scalars().one()
+    assert issue.status == "open" and issue.occurrences == 2
+
+    # same signature again → occurrences grow, still one row
+    await error_issue_service.upsert_from_logs(db_session, [_err_row(3)], services)
+    issue = (await db_session.execute(select(DevErrorIssue))).scalars().one()
+    assert issue.occurrences == 3 and issue.reopened_count == 0
+
+
+async def test_error_issue_auto_resolve_and_reopen(db_session):
+    old = NOW - timedelta(hours=48)
+    svc = DevService(
+        id="srv-abc123", name="lifemanager", status="active", last_log_at=NOW - timedelta(minutes=5)
+    )
+    db_session.add(svc)
+    await db_session.commit()
+    services = {"srv-abc123": svc}
+
+    await error_issue_service.upsert_from_logs(db_session, [_err_row(1, at=old)], services)
+
+    resolved = await error_issue_service.auto_resolve(db_session, resolve_hours=24, now=NOW)
+    assert len(resolved) == 1
+    issue = (await db_session.execute(select(DevErrorIssue))).scalars().one()
+    assert issue.status == "resolved" and issue.resolved_by == "auto"
+
+    # the error comes back → re-opened, counted
+    await error_issue_service.upsert_from_logs(db_session, [_err_row(9, at=NOW)], services)
+    issue = (await db_session.execute(select(DevErrorIssue))).scalars().one()
+    assert issue.status == "open" and issue.reopened_count == 1 and issue.resolved_at is None
+
+
+async def test_error_issue_not_resolved_when_service_silent(db_session):
+    """A service that stopped logging entirely proves nothing — the error
+    must stay open (maybe the whole service is down)."""
+    old = NOW - timedelta(hours=48)
+    svc = DevService(id="srv-abc123", name="lifemanager", status="active", last_log_at=old)
+    db_session.add(svc)
+    await db_session.commit()
+
+    await error_issue_service.upsert_from_logs(
+        db_session, [_err_row(1, at=old)], {"srv-abc123": svc}
+    )
+    resolved = await error_issue_service.auto_resolve(db_session, resolve_hours=24, now=NOW)
+    assert resolved == []
+    issue = (await db_session.execute(select(DevErrorIssue))).scalars().one()
+    assert issue.status == "open"
+
+
+async def test_interpret_log_fa_patterns():
+    fa = error_issue_service.interpret_log_fa
+    assert fa('"GET /api/tasks HTTP/1.1" 500')["kind"] == "http_error"
+    assert "خطای سرور" in fa('"GET /api/tasks HTTP/1.1" 500')["text"]
+    assert fa('"POST /api/login HTTP/1.1" 401')["kind"] == "http_client_error"
+    assert fa('"GET /api/health HTTP/1.1" 200') is None  # routine noise
+    assert fa("==> Deploy live for srv-x")["kind"] == "deploy"
+    assert fa("Application startup complete.")["kind"] == "startup"
+    assert fa("Running alembic upgrade")["kind"] == "migration"
+    assert fa("Traceback (most recent call last):", "error")["kind"] == "error"
+    assert fa("something odd", "warn")["kind"] == "warn"
+    assert fa("plain info line") is None
+
+
+async def test_build_project_feed_collapses_runs(db_session):
+    db_session.add(DevService(id="srv-abc123", name="lifemanager", status="active"))
+    for i in range(3):  # three identical 500s in a row → one feed row ×3
+        db_session.add(
+            DevLog(
+                id=f"f{i}",
+                service_id="srv-abc123",
+                service_name="lifemanager",
+                timestamp=NOW - timedelta(minutes=10 - i),
+                level="error",
+                message='"GET /api/x HTTP/1.1" 500',
+            )
+        )
+    db_session.add(
+        DevLog(
+            id="f9",
+            service_id="srv-abc123",
+            service_name="lifemanager",
+            timestamp=NOW - timedelta(minutes=1),
+            level="info",
+            message="Application startup complete.",
+        )
+    )
+    await db_session.commit()
+
+    feed = await error_issue_service.build_project_feed(db_session, ["srv-abc123"])
+    assert len(feed) == 2
+    assert feed[0]["kind"] == "startup"  # newest first
+    assert feed[1]["count"] == 3 and "خطای سرور" in feed[1]["text_fa"]

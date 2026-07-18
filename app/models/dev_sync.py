@@ -129,6 +129,40 @@ class DevLog(Base):
     )
 
 
+class DevErrorIssue(Base):
+    """One PERSISTENT error signature per service («خطاها حذف نشن»).
+
+    Raw dev_logs age out with retention, but every distinct error message
+    (numbers/ids normalized away → ``fingerprint``) gets exactly one row here
+    that lives forever: occurrences/first/last are updated while it keeps
+    happening, the engine auto-resolves it once it has stopped for
+    ``error_resolve_hours`` WHILE the service kept logging (a dead service
+    proves nothing), and a recurrence re-opens it. The owner can also resolve
+    or mute manually. Status: open | resolved | muted.
+    """
+
+    __tablename__ = "dev_error_issues"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
+    service_id = Column(String(64), nullable=False, index=True)
+    service_name = Column(String(255), nullable=True)
+    dev_project_id = Column(Integer, ForeignKey("dev_projects.id"), index=True, nullable=True)
+    fingerprint = Column(String(64), nullable=False, unique=True, index=True)
+    title = Column(String(300), nullable=False)  # normalized message
+    sample_message = Column(Text, nullable=True)  # latest raw example
+    level = Column(String(16), nullable=False, default="error")
+    occurrences = Column(Integer, nullable=False, default=1)
+    first_seen_at = Column(DateTime(timezone=True), nullable=False)
+    last_seen_at = Column(DateTime(timezone=True), nullable=False, index=True)
+    status = Column(String(16), nullable=False, default="open", index=True)
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+    resolved_by = Column(String(16), nullable=True)  # auto | manual
+    reopened_count = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
 class DevLogSummary(Base):
     __tablename__ = "dev_log_summaries"
 

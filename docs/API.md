@@ -450,6 +450,8 @@ connection.
 | POST | `/api/dev/logs/fetch` | Pull newest lines from Render now (live-tab poll). |
 | GET | `/api/dev/logs/stats` | Counts by level/service/hour for the charts. |
 | GET | `/api/dev/summaries` · POST `/api/dev/summaries/generate` | Persian daily digests (AI task `dev_log_summary`, deterministic fallback ⇒ `ai_model` NULL); mirrored into the activity log. |
+| GET | `/api/dev/errors` · PATCH `/api/dev/errors/{id}` | PERSISTENT error issues (one row per normalized signature — raw logs age out, issues never do). Auto-resolved when silent ≥`error_resolve_hours` while the service still logs; recurrence re-opens (+`reopened_count`). Manual status: open/resolved/muted. |
+| GET | `/api/dev/projects/{id}/feed` | Per-project panel: recent notable events translated to Persian (`interpret_log_fa`, identical runs collapsed with ×count), open issues, latest digests. |
 | GET/PUT | `/api/dev/settings` | Engine config blob (`dev_sync_engine` GlobalSetting); stamps are read-only. |
 
 Background: `dev_sync_loop` (app/services/dev_sync/engine.py) started from

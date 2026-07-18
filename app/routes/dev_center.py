@@ -19,10 +19,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies.auth import get_optional_user_id
 from app.middleware import handle_errors
-from app.models.dev_sync import DevLog, DevLogSummary, DevProject, DevService
+from app.models.dev_sync import DevErrorIssue, DevLog, DevLogSummary, DevProject, DevService
 from app.models.project import Project
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.schemas.dev_sync_schema import (
+    DevErrorPatch,
     DevLogsFetchRequest,
     DevProjectPatch,
     DevServicePatch,
@@ -34,6 +35,7 @@ from app.schemas.dev_sync_schema import (
 from app.services.activity_log_service import record_activity
 from app.services.dev_sync import (
     engine as dev_engine,
+    error_issue_service,
     github_sync_service,
     log_summary_service,
     render_sync_service,
@@ -242,9 +244,17 @@ async def _project_stats(db: AsyncSession, user_id: int) -> dict:
         .scalars()
         .all()
     )
+    open_rows = (
+        await db.execute(
+            select(DevErrorIssue.service_id, func.count(DevErrorIssue.id))
+            .where(DevErrorIssue.status == "open")
+            .group_by(DevErrorIssue.service_id)
+        )
+    ).all()
     return {
         "per_service": per_service,
         "today_summaries": {s.service_id: s for s in summaries},
+        "open_errors_by_service": dict(open_rows),
         "cfg": cfg,
     }
 
@@ -285,6 +295,9 @@ async def list_dev_projects(
         item["logs_24h"] = sum(
             stats["per_service"].get(s.id, {}).get("total", 0) for s in item_services
         )
+        item["open_errors"] = sum(
+            stats["open_errors_by_service"].get(s.id, 0) for s in item_services
+        )
         today = [
             log_summary_service.serialize_summary(stats["today_summaries"][s.id])
             for s in item_services
@@ -313,6 +326,8 @@ async def dev_overview(
     needs_attention = []
     for p in projects:
         reasons = []
+        if p.get("open_errors", 0) > 0:
+            reasons.append(f"{p['open_errors']} خطای باز حل‌نشده")
         if p["errors_24h"] >= threshold:
             reasons.append(f"{p['errors_24h']} خطا در ۲۴ ساعت گذشته")
         for svc in p["services"]:
@@ -347,6 +362,7 @@ async def dev_overview(
             "services": active_services,
             "errors_24h": total_errors,
             "logs_24h": total_logs,
+            "open_errors": sum(p.get("open_errors", 0) for p in projects),
         },
     }
 
@@ -514,11 +530,13 @@ async def fetch_dev_logs_now(
     user_id: int = Depends(get_optional_user_id),
 ):
     """Pull the newest lines from Render right now (the live tab's poll)."""
+    cfg = await dev_engine.load_settings(db)
     return await render_sync_service.sync_logs(
         db,
         _owner(user_id),
         service_ids=payload.service_ids,
         limit=payload.limit or 100,
+        resolve_hours=int(cfg.get("error_resolve_hours", 24)),
     )
 
 
@@ -531,6 +549,143 @@ async def dev_log_stats(
 ):
     stats = await render_sync_service.log_stats(db, since_hours=since_hours)
     return {"ok": True, **stats}
+
+
+# ── error issues (persistent — «خطاها حذف نشن») ─────────────────────────────
+@router.get("/api/dev/errors", tags=["dev-center"])
+@handle_errors
+async def list_dev_errors(
+    status_filter: Optional[str] = Query(default=None, alias="status"),
+    service_id: Optional[str] = Query(default=None),
+    dev_project_id: Optional[int] = Query(default=None),
+    limit: int = Query(default=200, ge=1, le=1000),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    query = select(DevErrorIssue)
+    if status_filter:
+        wanted = [s.strip() for s in status_filter.split(",") if s.strip()]
+        query = query.where(DevErrorIssue.status.in_(wanted))
+    if service_id:
+        query = query.where(DevErrorIssue.service_id == service_id)
+    if dev_project_id is not None:
+        query = query.where(DevErrorIssue.dev_project_id == dev_project_id)
+    rows = (
+        (await db.execute(query.order_by(DevErrorIssue.last_seen_at.desc()).limit(limit)))
+        .scalars()
+        .all()
+    )
+    counts_rows = (
+        await db.execute(
+            select(DevErrorIssue.status, func.count(DevErrorIssue.id)).group_by(
+                DevErrorIssue.status
+            )
+        )
+    ).all()
+    return {
+        "ok": True,
+        "errors": [error_issue_service.serialize_issue(r) for r in rows],
+        "counts": {status: count for status, count in counts_rows},
+    }
+
+
+@router.patch("/api/dev/errors/{issue_id}", tags=["dev-center"])
+@handle_errors
+async def patch_dev_error(
+    issue_id: int,
+    payload: DevErrorPatch = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """Manual override: رفع شد / بازگشایی / بی‌صدا."""
+    issue = await db.get(DevErrorIssue, issue_id)
+    if issue is None or (issue.user_id is not None and issue.user_id != user_id):
+        raise HTTPException(status_code=404, detail="error issue not found")
+    new_status = payload.status
+    issue.status = new_status
+    if new_status == "resolved":
+        issue.resolved_at = datetime.now(timezone.utc)
+        issue.resolved_by = "manual"
+    elif new_status == "open":
+        issue.resolved_at = None
+        issue.resolved_by = None
+    await db.commit()
+    await db.refresh(issue)
+    status_fa = {"resolved": "رفع‌شده", "open": "باز", "muted": "بی‌صدا"}[new_status]
+    await record_activity(
+        action="dev_error_status",
+        entity_type="dev_service",
+        entity_id=issue.service_id,
+        entity_label=issue.service_name or issue.service_id,
+        detail=f"وضعیت خطا دستی «{status_fa}» شد: {issue.title[:150]}",
+        user_id=user_id,
+        db=db,
+    )
+    return {"ok": True, "error": error_issue_service.serialize_issue(issue)}
+
+
+@router.get("/api/dev/projects/{dev_project_id}/feed", tags=["dev-center"])
+@handle_errors
+async def dev_project_feed(
+    dev_project_id: int,
+    limit: int = Query(default=40, ge=5, le=100),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """«ذیل هر پروژه»: رویدادهای اخیرِ ترجمه‌شده + خطاهای باز + کارنامه‌های
+    اخیر — one call for the expandable per-project panel."""
+    project = await db.get(DevProject, dev_project_id)
+    if project is None or (project.user_id is not None and project.user_id != user_id):
+        raise HTTPException(status_code=404, detail="dev project not found")
+    services = (
+        (
+            await db.execute(
+                select(DevService).where(DevService.dev_project_id == dev_project_id)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    service_ids = [s.id for s in services]
+    feed = await error_issue_service.build_project_feed(db, service_ids, limit=limit)
+    issues = []
+    if service_ids:
+        issues = (
+            (
+                await db.execute(
+                    select(DevErrorIssue)
+                    .where(
+                        DevErrorIssue.service_id.in_(service_ids),
+                        DevErrorIssue.status == "open",
+                    )
+                    .order_by(DevErrorIssue.last_seen_at.desc())
+                    .limit(20)
+                )
+            )
+            .scalars()
+            .all()
+        )
+    summaries = []
+    if service_ids:
+        summaries = (
+            (
+                await db.execute(
+                    select(DevLogSummary)
+                    .where(DevLogSummary.service_id.in_(service_ids))
+                    .order_by(DevLogSummary.summary_date.desc(), DevLogSummary.id.desc())
+                    .limit(5)
+                )
+            )
+            .scalars()
+            .all()
+        )
+    return {
+        "ok": True,
+        "project": _ser_project(project),
+        "feed": feed,
+        "open_errors": [error_issue_service.serialize_issue(i) for i in issues],
+        "summaries": [log_summary_service.serialize_summary(s) for s in summaries],
+    }
 
 
 # ── summaries ────────────────────────────────────────────────────────────────

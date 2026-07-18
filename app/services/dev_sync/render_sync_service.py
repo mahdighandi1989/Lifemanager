@@ -250,6 +250,7 @@ async def sync_logs(
     service_ids: Optional[List[str]] = None,
     limit: int = 100,
     fetcher: Optional[Callable] = None,
+    resolve_hours: int = 24,
 ) -> Dict[str, Any]:
     """Fetch the newest lines for every auto-fetch service (or the given
     subset), dedup by row id, insert the new ones. Fail-open per service."""
@@ -332,11 +333,45 @@ async def sync_logs(
                 await db.rollback()
             logger.debug("dev log bulk insert degraded to row-by-row: %r", exc)
 
+        # Durable error tracking («خطاها حذف نشن»): fold this poll's new
+        # error lines into dev_error_issues. Fail-open inside the service.
+        from app.services.dev_sync import error_issue_service
+
+        issues_touched = await error_issue_service.upsert_from_logs(
+            db, fresh, {svc.id: svc for svc in services}, user_id=user_id
+        )
+    else:
+        issues_touched = 0
+
+    # Auto-resolve errors that stopped happening while the service kept
+    # logging — the owner must never chase an already-fixed bug.
+    from app.services.dev_sync import error_issue_service as _eis
+
+    auto_resolved = await _eis.auto_resolve(db, resolve_hours=resolve_hours)
+    if auto_resolved:
+        try:
+            from app.services.activity_log_service import record_activity
+
+            names = "، ".join(i.title[:60] for i in auto_resolved[:3])
+            await record_activity(
+                action="dev_errors_auto_resolved",
+                entity_type="dev_service",
+                entity_id=auto_resolved[0].service_id,
+                entity_label=auto_resolved[0].service_name or auto_resolved[0].service_id,
+                detail=f"{len(auto_resolved)} خطا به‌عنوان رفع‌شده علامت خورد: {names}",
+                user_id=user_id,
+                db=db,
+            )
+        except Exception as exc:
+            logger.debug("auto-resolve activity mirror skipped: %r", exc)
+
     return {
         "ok": True,
         "fetched": fetched,
         "new": new_count,
         "services": len(services),
+        "issues_touched": issues_touched,
+        "auto_resolved": len(auto_resolved),
         "errors": errors or None,
     }
 

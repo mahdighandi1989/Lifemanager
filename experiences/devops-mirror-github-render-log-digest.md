@@ -113,3 +113,17 @@ async def tick(db, now):
    توابع تصمیم خالص + tick کوتاه) و stampها را قبل از کار جلو ببر.
 5. digest → LLM → fallback deterministic؛ خروجی را در activity log میزبان هم
    ثبت کن تا در نماهای موجود ظاهر شود؛ لاگ خام را کوتاه‌عمر نگه دار.
+
+## Update 2026-07-18 — خطاهای ماندگار + مترجم لاگ
+
+- **Issue-per-signature به‌جای «خطا در لاگ»:** جدول جدا `error_issues(fingerprint
+  unique, occurrences, first/last_seen, status, resolved_by, reopened_count)` که
+  fingerprint = hash(سرویس + پیامِ digit/hex-زدوده). لاگ خام short-retention می‌ماند،
+  ایشوها هرگز پاک نمی‌شوند. upsert داخل همان poll لاگ (fail-open، commit خودش).
+- **Auto-resolve فقط با مدرک:** خطای ساکت ≥N ساعت فقط وقتی resolved می‌شود که
+  `service.last_log_at > issue.last_seen_at` — سرویسِ ساکت/مرده اثبات رفع نیست.
+  بازگشت امضا ⇒ reopen + شمارنده (اعتماد کاربر به «رفع شد ✓» حفظ می‌شود).
+- **مترجم rule-based قبل از LLM:** برای «لاگ قابل‌فهم» per-line از regexهای الگوهای
+  رایج (HTTP status، deploy/build، startup/shutdown، migration، traceback) خروجی
+  زبان-کاربر بساز و خطوط روتین (2xx info) را حذف کن؛ رانِ تکراری‌های پشت‌سرهم را به
+  یک ردیف ×N فشرده کن. LLM را فقط برای کارنامهٔ روزانه نگه دار — ارزان و آنی.

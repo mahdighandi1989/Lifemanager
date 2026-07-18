@@ -238,3 +238,47 @@ async def test_put_token_with_whitespace_rejected(api_client):
         "/api/dev/integrations/github", json={"api_key": "tok\nwith-newline"}
     )
     assert res.status_code == 422
+
+
+async def test_error_issues_flow(api_client, fake_net):
+    """Full flow: error log line → persistent issue → visible on the project
+    card → manual resolve → feed shows the translated event."""
+    api_client.put("/api/dev/integrations/github", json={"api_key": "gt"})
+    api_client.put("/api/dev/integrations/render", json={"api_key": "rt"})
+    api_client.post("/api/dev/sync/github")
+    api_client.post("/api/dev/sync/render")
+    fetched = api_client.post("/api/dev/logs/fetch", json={}).json()
+    assert fetched["issues_touched"] == 1  # the ERROR line became an issue
+
+    errors = api_client.get("/api/dev/errors").json()
+    assert errors["ok"] is True and errors["counts"].get("open") == 1
+    issue = errors["errors"][0]
+    assert issue["status"] == "open" and "kaboom" in issue["title"]
+
+    # the project card counts it
+    projects = api_client.get("/api/dev/projects").json()["projects"]
+    assert projects[0]["open_errors"] == 1
+
+    # per-project feed: open error + translated event list
+    dev_id = projects[0]["id"]
+    feed = api_client.get(f"/api/dev/projects/{dev_id}/feed").json()
+    assert feed["ok"] is True
+    assert len(feed["open_errors"]) == 1
+    assert any("خطا" in ev["text_fa"] for ev in feed["feed"])
+
+    # manual resolve → counted as resolved, project card back to green
+    patched = api_client.patch(f"/api/dev/errors/{issue['id']}", json={"status": "resolved"}).json()
+    assert patched["error"]["status"] == "resolved" and patched["error"]["resolved_by"] == "manual"
+    projects2 = api_client.get("/api/dev/projects").json()["projects"]
+    assert projects2[0]["open_errors"] == 0
+
+    # re-fetch same logs: same lines are deduped → no reopen from old rows
+    api_client.post("/api/dev/logs/fetch", json={})
+    errors2 = api_client.get("/api/dev/errors").json()
+    assert errors2["counts"].get("resolved") == 1 and not errors2["counts"].get("open")
+
+    # invalid status rejected
+    bad = api_client.patch(f"/api/dev/errors/{issue['id']}", json={"status": "gone"})
+    assert bad.status_code == 422
+    missing = api_client.patch("/api/dev/errors/99999", json={"status": "open"})
+    assert missing.status_code == 404

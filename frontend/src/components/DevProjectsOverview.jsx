@@ -41,6 +41,28 @@ function DevProjectsOverview({ embedded = false }) {
   const [notice, setNotice] = useState(null);
   const [syncing, setSyncing] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [expanded, setExpanded] = useState({}); // dev_project_id → bool
+  const [feeds, setFeeds] = useState({}); // dev_project_id → {feed, open_errors, summaries}
+
+  const toggleDetails = (id) => {
+    setExpanded((e) => ({ ...e, [id]: !e[id] }));
+    if (!feeds[id]) {
+      api
+        .get(`/dev/projects/${id}/feed`)
+        .then((res) => setFeeds((f) => ({ ...f, [id]: res.data })))
+        .catch(() => setFeeds((f) => ({ ...f, [id]: { error: true } })));
+    }
+  };
+
+  const resolveError = async (projectId, issueId) => {
+    try {
+      await api.patch(`/dev/errors/${issueId}`, { status: 'resolved' });
+      const res = await api.get(`/dev/projects/${projectId}/feed`);
+      setFeeds((f) => ({ ...f, [projectId]: res.data }));
+    } catch (e) {
+      setNotice('تغییر وضعیت خطا ناموفق: ' + (e.message || ''));
+    }
+  };
 
   const load = useCallback(() => {
     setLoading(true);
@@ -230,7 +252,16 @@ function DevProjectsOverview({ embedded = false }) {
                   )}
                   <div className="text-xs text-gray-500 mt-1.5 flex gap-3 flex-wrap">
                     <span>آخرین push: {relTimeFa(p.pushed_at)}</span>
-                    <span className={p.errors_24h > 0 ? 'text-red-600 font-medium' : ''}>
+                    <span
+                      className={
+                        p.open_errors > 0
+                          ? 'text-red-600 font-medium'
+                          : 'text-emerald-600'
+                      }
+                    >
+                      {p.open_errors > 0 ? `${p.open_errors} خطای باز` : '✓ بدون خطای باز'}
+                    </span>
+                    <span className={p.errors_24h > 0 ? 'text-red-500' : ''}>
                       خطای ۲۴س: {p.errors_24h}
                     </span>
                     <span>لاگ ۲۴س: {p.logs_24h}</span>
@@ -253,6 +284,15 @@ function DevProjectsOverview({ embedded = false }) {
                     <p className="text-sm text-gray-700 mt-2 bg-emerald-50 border border-emerald-100 rounded-lg p-2">
                       📝 {p.today_summary}
                     </p>
+                  )}
+                  {p.services.length > 0 && (
+                    <button
+                      onClick={() => toggleDetails(p.id)}
+                      className="mt-2 text-xs text-blue-600 hover:text-blue-800"
+                      data-testid={`dev-project-details-${p.id}`}
+                    >
+                      {expanded[p.id] ? '▾ بستن جزئیات' : '◂ لاگ و کارنامهٔ این پروژه'}
+                    </button>
                   )}
                 </div>
                 <div className="flex flex-col gap-2 items-end shrink-0">
@@ -277,6 +317,91 @@ function DevProjectsOverview({ embedded = false }) {
                   </button>
                 </div>
               </div>
+
+              {/* ذیل پروژه: خطاهای باز + رویدادهای ترجمه‌شده + کارنامه‌ها */}
+              {expanded[p.id] && (
+                <div className="mt-3 border-t border-gray-100 pt-3" data-testid={`dev-project-panel-${p.id}`}>
+                  {!feeds[p.id] ? (
+                    <div className="text-xs text-gray-400 text-center py-3">در حال بارگذاری…</div>
+                  ) : feeds[p.id].error ? (
+                    <div className="text-xs text-red-500 text-center py-3">خطا در دریافت جزئیات</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {(feeds[p.id].open_errors || []).length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-semibold text-red-600 mb-1.5">خطاهای باز (حل‌نشده)</h4>
+                          <div className="space-y-1.5">
+                            {feeds[p.id].open_errors.map((issue) => (
+                              <div
+                                key={issue.id}
+                                className="flex items-start justify-between gap-2 bg-red-50 border border-red-100 rounded-lg p-2"
+                              >
+                                <div className="min-w-0">
+                                  <p dir="ltr" className="text-[11px] font-mono text-red-800 break-all text-left" title={issue.sample_message || ''}>
+                                    {issue.title}
+                                  </p>
+                                  <span className="text-[10px] text-red-400">
+                                    {issue.occurrences} بار — آخرین: {relTimeFa(issue.last_seen_at)}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => resolveError(p.id, issue.id)}
+                                  className="shrink-0 px-2 py-0.5 text-[10px] rounded bg-emerald-600 text-white hover:bg-emerald-700"
+                                >
+                                  رفع شد
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <h4 className="text-xs font-semibold text-gray-600 mb-1.5">رویدادهای اخیر (به زبان آدمیزاد)</h4>
+                        {(feeds[p.id].feed || []).length === 0 ? (
+                          <p className="text-xs text-gray-400">رویداد قابل‌توجهی در لاگ‌های اخیر نیست — روز آرامی است.</p>
+                        ) : (
+                          <ul className="space-y-1">
+                            {feeds[p.id].feed.slice(0, 12).map((ev, i) => (
+                              <li key={i} className="text-xs flex items-start gap-1.5" title={ev.raw}>
+                                <span className="text-gray-400 shrink-0" dir="ltr">
+                                  {(ev.timestamp || '').slice(11, 16)}
+                                </span>
+                                <span
+                                  className={
+                                    ev.kind?.includes('error') || ev.kind === 'build_failed'
+                                      ? 'text-red-600'
+                                      : ev.kind === 'deploy' || ev.kind === 'startup'
+                                        ? 'text-emerald-700'
+                                        : 'text-gray-600'
+                                  }
+                                >
+                                  {ev.text_fa}
+                                  {ev.count > 1 && <span className="text-gray-400"> (×{ev.count})</span>}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+
+                      {(feeds[p.id].summaries || []).length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-semibold text-gray-600 mb-1.5">کارنامه‌های اخیر</h4>
+                          <div className="space-y-1.5">
+                            {feeds[p.id].summaries.slice(0, 3).map((s) => (
+                              <div key={s.id} className="bg-gray-50 border border-gray-100 rounded-lg p-2">
+                                <span className="text-[10px] text-gray-400" dir="ltr">📅 {s.summary_date}</span>
+                                <p className="text-xs text-gray-700 whitespace-pre-wrap mt-0.5">{s.summary}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))
         )}

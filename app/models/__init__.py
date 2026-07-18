@@ -57,6 +57,7 @@ from app.models.personal_writing import PersonalWriting
 from app.models.webhook_event import WebhookEvent
 from app.models.weekly_review import WeeklyReview
 from app.models.dev_sync import (
+    DevErrorIssue,
     DevIntegration,
     DevLog,
     DevLogSummary,
@@ -122,6 +123,7 @@ __all__ = [
     "PersonalWriting",
     "WebhookEvent",
     "WeeklyReview",
+    "DevErrorIssue",
     "DevIntegration",
     "DevProject",
     "DevService",

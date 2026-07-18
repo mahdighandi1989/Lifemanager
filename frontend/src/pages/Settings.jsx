@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AISettings from './AISettings';
 import Notifications from './Notifications';
 import DriveSettings from './DriveSettings';
+import DevSyncSettings from '../components/DevSyncSettings';
 
 // Settings is a tabbed shell consolidating the app's configuration:
 //   • هوش مصنوعی  → the AI catalog (AISettings) + the global analysis prompt
@@ -21,10 +22,14 @@ import DriveSettings from './DriveSettings';
 // Notifications is now a unified hub: in-app + Telegram + email channels and
 // per-event prefs all live under the «اعلان‌ها» tab (the standalone Telegram tab
 // was folded in — the TelegramSettings panel is embedded inside Notifications).
+// «مرکز توسعه» here is the SAME DevSyncSettings component DevCenter's own
+// تنظیمات tab renders (owner request: settings live in one place). The ops
+// views (live logs / errors / stats / کارنامه) stay on /dev-center.
 const TABS = [
   { id: 'ai', label: 'هوش مصنوعی' },
   { id: 'notifications', label: 'اعلان‌ها' },
   { id: 'drive', label: 'گوگل درایو' },
+  { id: 'dev', label: 'مرکز توسعه' },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -70,6 +75,7 @@ function Settings() {
           {tab === 'ai' && <AISettings embedded />}
           {tab === 'notifications' && <Notifications embedded />}
           {tab === 'drive' && <DriveSettings embedded />}
+          {tab === 'dev' && <DevSyncSettings showCenterLink />}
         </div>
       </div>
     </div>

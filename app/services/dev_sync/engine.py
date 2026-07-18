@@ -41,6 +41,7 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     "summary_enabled": True,
     "summary_hour": 22,                # local hour the daily digest is written
     "error_attention_threshold": 20,   # errors/24h that flag a project as needs-attention
+    "error_resolve_hours": 24,         # error silent this long (while service logs) ⇒ resolved
     "stale_repo_days": 14,
     # stamps (never editable from the UI):
     "last_repo_sync_at": None,
@@ -60,6 +61,7 @@ _ENV_KEYS = {
     "retention_hours": ("DEV_LOG_RETENTION_HOURS", "int"),
     "summary_enabled": ("DEV_SUMMARY_ENABLED", "bool"),
     "summary_hour": ("DEV_SUMMARY_HOUR", "int"),
+    "error_resolve_hours": ("DEV_ERROR_RESOLVE_HOURS", "int"),
 }
 
 # Fields the PUT /api/dev/settings endpoint may change. Stamps are excluded on
@@ -77,6 +79,7 @@ EDITABLE_FIELDS = (
     "summary_enabled",
     "summary_hour",
     "error_attention_threshold",
+    "error_resolve_hours",
     "stale_repo_days",
 )
 
@@ -252,7 +255,11 @@ async def dev_sync_tick(db: AsyncSession, now: Optional[datetime] = None) -> Dic
             db,
             result,
             "logs",
-            render_sync_service.sync_logs(db, limit=int(cfg.get("log_fetch_limit", 100))),
+            render_sync_service.sync_logs(
+                db,
+                limit=int(cfg.get("log_fetch_limit", 100)),
+                resolve_hours=int(cfg.get("error_resolve_hours", 24)),
+            ),
         )
 
     if due(cfg.get("last_cleanup_at"), int(cfg.get("cleanup_interval_minutes", 360)) * 60, now):
