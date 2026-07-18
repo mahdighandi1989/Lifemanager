@@ -56,6 +56,12 @@ EVENT_CATALOG: List[Dict[str, Any]] = [
      "channels": ["in_app"], "default_enabled": True, "default_sound": False},
     {"key": "login_succeeded", "label": "ورود موفق", "help": "اطلاع از ورود موفق به حساب",
      "channels": ["in_app"], "default_enabled": True, "default_sound": False},
+    {"key": "attention_alert", "label": "موتور توجه (موعد/انقضا)", "help": "هشدار ددلاین‌ها، انقضای مدارک و اشتراک‌ها، و صندوق ورودی مانده",
+     "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": True},
+    {"key": "morning_brief", "label": "پیام صبحگاهی", "help": "برنامهٔ امروز، هر روز صبح",
+     "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": False},
+    {"key": "weekly_review", "label": "مرور هفتگی", "help": "گزارش و پیشنهادهای هفتگی هوش مصنوعی",
+     "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": False},
 ]
 
 # The channels surface — in_app is the always-on bell history; telegram + email

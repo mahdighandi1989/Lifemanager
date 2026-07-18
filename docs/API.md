@@ -695,3 +695,53 @@ Frontend: the Dashboard (`/`) is now the «میز فرمان — امروز من
 box (POST `/api/inbox`), pending-inbox triage rows (تأیید / ارسال به… / رد),
 attention buckets, unread notifications, due/starred list items, with the
 legacy stat cards + quick actions preserved below.
+
+### Attention engine — موتور توجه و یادآوری
+
+An in-process background loop (10-min cadence, started/stopped like the brain
+reminder in `app/main.py`) drives `attention_service.attention_tick`: a rule
+scan every `scan_interval_minutes` (default 30), the morning brief once per
+local day, and the weekly-review tick. Rules (v1, real columns only):
+`task_overdue`/`task_due_today` (due_date∧deadline over open tasks),
+`todo_overdue`, `license_expiry` (UAE licence Date), `document_expiry`
+(identity-document string dates, parsed best-effort), `subscription_renewal`
+(string next_payment_date), `inbox_stale` (pending captures older than the
+threshold). Alerts are aggregated per rule into ONE `attention_alert`
+notification (in-app + Telegram via the event registry) and deduped through
+`attention_marks` with per-rule cooldowns (daily for overdue, weekly for
+expiries). The morning brief composes the command-center Today payload into a
+Persian Telegram message (+ optional one-line AI garnish, fail-open) and an
+in-app `morning_brief` record; hours are LOCAL via `tz_offset_minutes`
+(default +240 = UAE).
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/attention/scan` | Dry-run rule scan — `{ok, findings[{rule, entity_type, entity_id, label, detail, date, priority}], count, rule_titles}`. Nothing is sent. |
+| POST | `/api/attention/run` | Scan + send fresh (not-cooling-down) alerts → `{ok, sent_rules, fresh_count, findings_count}`. |
+| POST | `/api/attention/morning-brief` | Force-send today's brief now → `{ok, sent, telegram, text}`. |
+| GET / PUT | `/api/attention/settings` | The engine blob (GlobalSetting `attention_engine`): enabled, brief_enabled, brief_hour, tz_offset_minutes, expiry_days, subscription_days, inbox_stale_hours, scan_interval_minutes (+ last_* stamps). PUT is partial; unknown keys ignored. |
+
+### Weekly review — مرور هفتگی
+
+`weekly_review_service` builds a trailing-7-day report (activity-log counts
+per entity/action, tasks created/completed/open + overdue titles, صندوق ورودی
+funnel, writings, notifications volume), stores it in `weekly_reviews` (stats
+JSON + narrative + `ai_model` provenance — NULL means the deterministic
+fallback summary ran because no text model is configured), and delivers it
+(Telegram + in-app `weekly_review` event). Auto-runs on the local
+weekday+hour in its settings (default جمعه 17:00, UTC+4) via the attention
+loop; `review_decision` is the pure weekly gate.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/weekly-review` | Stored reviews, newest first (`limit` ≤100). |
+| GET | `/api/weekly-review/latest` | `{ok, review}` — `review: null` when none exist (no 404). |
+| POST | `/api/weekly-review/run` | Generate + deliver now → `{ok, review}`. |
+| GET / PUT | `/api/weekly-review/settings` | GlobalSetting `weekly_review`: enabled, weekday (Python convention, 4=جمعه), hour, tz_offset_minutes. |
+
+New notification events registered: `attention_alert` (in_app+telegram, high),
+`morning_brief` / `weekly_review` (in_app-only — their services send their own
+formatted Telegram text, so event fan-out would double it); all three appear
+in the notification-preferences catalog. Frontend: «مراقبت و مرور» page at
+`/attention` (live dry-scan, run-now, brief-now, both settings cards, stored
+reviews) + a Dashboard quick-action card.

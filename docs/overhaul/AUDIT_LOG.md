@@ -1077,3 +1077,62 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **EXPERIENCE** New `experiences/universal-capture-inbox-with-ai-triage.md` (capture≠classify≠
   file transactions, two-layer triage with allowlist sandboxing, always-succeeding filing
   fallback, enum-NAME-in-raw-SQL pitfall, escape/unescape round-trip).
+
+## 2026-07-18 — موتور توجه + پیام صبحگاهی + مرور هفتگی AI (فاز ۳+۴ نقشه راه — «مدیریتم کن»)
+
+- **DECISION (owner: «انجام بده»)** Continue the roadmap: phase 3 (attention/reminder engine +
+  morning brief) and phase 4 (weekly AI review). Both ride ONE new in-process loop that mirrors
+  the proven brain-reminder lifecycle (GlobalSetting JSON config, PURE decision fns, *_tick per
+  cycle, loop with stop_event started/stopped in main.py) — no Celery/broker dependency.
+- **CHANGE (models/migration)** `AttentionMark` (`attention_marks`: user_id, dedup_key
+  `{rule}:{entity_id}`, rule, last_sent_at — the engine's cooldown memory, no FKs so marks
+  survive entity deletion) + `WeeklyReview` (`weekly_reviews`: week_start/end, stats JSON,
+  narrative, ai_model provenance). Both registered in models/__init__ + alembic
+  `0037_attention_weekly_review` (inspector-guarded, linear after 0036).
+- **CHANGE (attention_service)** v1 rules over REAL columns only: task_overdue/task_due_today
+  (due_date∧deadline, merged-away excluded — same buckets as the command center), todo_overdue,
+  license_expiry (uae_driving_licenses.expiry_date Date), document_expiry
+  (identity_documents.expiry_date string "14 Aug 2027" → parse_string_date best-effort,
+  unparseable skipped), subscription_renewal (next_payment_date "June 25, 2026"), inbox_stale
+  (pending captures older than threshold, one aggregate finding). Each rule fail-opens alone.
+  Alerts: ONE aggregated `attention_alert` notification per rule (bell + Telegram via the event
+  registry), deduped via attention_marks with per-rule cooldowns (24h tasks/inbox, 72h
+  subscriptions, 168h expiries) — a NEW entity alerts immediately even while others cool down.
+  Morning brief: pure `brief_decision` (local hour via tz_offset_minutes default +240, once per
+  local date), text composed from command_center build_today + optional one-line AI garnish
+  (fail-open), delivered as pretty Telegram markdown + an in-app `morning_brief` record.
+  `attention_tick` = scan-on-interval + brief + weekly_tick; `attention_loop` 10-min cadence,
+  30s initial grace; startup/shutdown pair in main.py after the brain reminder's.
+- **CHANGE (weekly_review_service)** Trailing-7-day stats (activity-log grouped counts, tasks
+  created/completed/open_now + overdue titles, صندوق ورودی funnel captured/filed/dismissed/
+  pending_now, writings, notifications volume — every block fail-opens alone), narrative via
+  inference gateway task `weekly_review` (achievements / slipped / 3 concrete suggestions),
+  deterministic Persian fallback with ai_model=NULL when keyless. Stored row + Telegram +
+  in-app `weekly_review` event. Pure `review_decision` (local weekday+hour, ≥6 days since last
+  auto run; default جمعه 17:00 UTC+4).
+- **CHANGE (routes)** `app/routes/attention.py` (GET scan dry-run, POST run, POST
+  morning-brief force, GET/PUT settings) + `app/routes/weekly_review.py` (GET list, GET latest
+  — ok+null not 404, POST run, GET/PUT settings). Mounted in main.py; scoping as elsewhere.
+- **CHANGE (notifications)** register_event: `attention_alert` (in_app+telegram, high),
+  `morning_brief`, `weekly_review` (in_app-only — their services send their own formatted
+  Telegram text; event fan-out would double every message). All three added to the
+  notification-prefs EVENT_CATALOG so the settings UI can toggle them.
+- **CHANGE (frontend)** New page `AttentionCenter.jsx` @ /attention («مراقبت و مرور», self-RTL):
+  live dry-scan grouped by rule with run-now + brief-now buttons, attention settings card
+  (enable/brief hour/tz/thresholds), weekly-review settings card (weekday select/hour/run-now),
+  and the stored reviews list (expandable narrative, model provenance shown). Route in App.jsx,
+  Sidebar «مراقبت و مرور», Dashboard quick-action card. Inventory JSON updated (pages enforced
+  by test).
+- **NOTE (deliberate scope)** Person-follow-up rule deferred (no reliable last-contact column
+  in v1 use); email channel untouched; loop is in-process/single-replica like the webhook
+  supervisor and brain reminder; brief/weekly hours are LOCAL via tz_offset_minutes (default
+  UAE +4) — stated in the UI. `frontend/dist` reverted (Render rebuilds).
+- **VERIFY** +13 tests (`test_attention.py` 8: string-date formats, task buckets, license/doc/
+  subscription/stale-inbox rules incl. unparseable-skip + horizon exclusion, todo_overdue,
+  send-once-then-cooldown + new-entity-fresh + unread-notification landing, pure brief
+  decision matrix, brief endpoint stamps date, settings roundtrip ignoring unknown keys;
+  `test_weekly_review.py` 5: stats+fallback narrative provenance, list/latest, pure weekly
+  gate matrix, settings, cross-user hiding) → **13/13**; ruff clean on all new files; frontend
+  `npm run build` clean; vitest **16 failed / 85 passed — identical to baseline**; backend full
+  suite **1099 passed / 13 failed (0 new — FAILED list diffed byte-identical against the
+  pre-change baseline)**.

@@ -22,6 +22,7 @@ import Lists from './pages/Lists';
 import Writings from './pages/Writings';
 import BrainDashboard from './pages/BrainDashboard';
 import ActivityLogPage from './pages/ActivityLogPage';
+import AttentionCenter from './pages/AttentionCenter';
 import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
@@ -143,6 +144,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ActivityLogPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/attention"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <AttentionCenter />
                     </Layout>
                   </ProtectedRoute>
                 }

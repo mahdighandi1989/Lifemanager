@@ -685,6 +685,19 @@ register_event(
     message="ورود موفق به حساب کاربری شما انجام شد.",
     channels=["in_app"],
 )
+# موتور توجه (phase 3) + مرور هفتگی (phase 4). attention_alert fans out to
+# Telegram (deadline/expiry nags must reach the phone); morning_brief and
+# weekly_review are in_app-only here because their services send their own
+# richly-formatted Telegram text directly — routing them through the event
+# fan-out too would double every message.
+register_event(
+    "attention_alert",
+    title="هشدار موتور توجه",
+    priority="high",
+    channels=["in_app", "telegram"],
+)
+register_event("morning_brief", title="☀️ برنامهٔ امروز", channels=["in_app"])
+register_event("weekly_review", title="📒 مرور هفتگی", channels=["in_app"])
 
 
 # ── Per-event rate-limit (Step 18) ──────────────────────────────────────

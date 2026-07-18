@@ -36,6 +36,12 @@
         ]
       },
       {
+        "file": "app/models/attention_mark.py",
+        "classes": [
+          "AttentionMark"
+        ]
+      },
+      {
         "file": "app/models/behavior_log.py",
         "classes": [
           "BehaviorType",
@@ -227,6 +233,12 @@
         "file": "app/models/webhook_event.py",
         "classes": [
           "WebhookEvent"
+        ]
+      },
+      {
+        "file": "app/models/weekly_review.py",
+        "classes": [
+          "WeeklyReview"
         ]
       }
     ],
@@ -421,6 +433,31 @@
           {
             "method": "WEBSOCKET",
             "path": "/api/assets/scan-status"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/attention.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/attention/scan"
+          },
+          {
+            "method": "POST",
+            "path": "/api/attention/run"
+          },
+          {
+            "method": "POST",
+            "path": "/api/attention/morning-brief"
+          },
+          {
+            "method": "GET",
+            "path": "/api/attention/settings"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/attention/settings"
           }
         ]
       },
@@ -1142,6 +1179,31 @@
             "path": "/webhook"
           }
         ]
+      },
+      {
+        "file": "app/routes/weekly_review.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/weekly-review"
+          },
+          {
+            "method": "GET",
+            "path": "/api/weekly-review/latest"
+          },
+          {
+            "method": "POST",
+            "path": "/api/weekly-review/run"
+          },
+          {
+            "method": "GET",
+            "path": "/api/weekly-review/settings"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/weekly-review/settings"
+          }
+        ]
       }
     ],
     "services": [
@@ -1217,6 +1279,21 @@
         "file": "app/services/ai_service.py",
         "classes": [],
         "functions": []
+      },
+      {
+        "file": "app/services/attention_service.py",
+        "classes": [],
+        "functions": [
+          "scan_findings",
+          "send_alerts",
+          "brief_decision",
+          "send_morning_brief",
+          "attention_tick",
+          "attention_loop",
+          "get_settings",
+          "update_settings",
+          "parse_string_date"
+        ]
       },
       {
         "file": "app/services/auth_service.py",
@@ -1421,6 +1498,21 @@
           "update_item",
           "toggle_complete"
         ]
+      },
+      {
+        "file": "app/services/weekly_review_service.py",
+        "classes": [],
+        "functions": [
+          "gather_stats",
+          "generate_review",
+          "review_decision",
+          "weekly_tick",
+          "list_reviews",
+          "get_settings",
+          "update_settings",
+          "fallback_narrative",
+          "serialize"
+        ]
       }
     ]
   },
@@ -1445,6 +1537,10 @@
       {
         "name": "AssistantHub",
         "file": "frontend/src/pages/AssistantHub.jsx"
+      },
+      {
+        "name": "AttentionCenter",
+        "file": "frontend/src/pages/AttentionCenter.jsx"
       },
       {
         "name": "BrainDashboard",

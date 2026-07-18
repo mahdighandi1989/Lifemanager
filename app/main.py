@@ -19,9 +19,11 @@ from app.rate_limit import limiter
 from app.routes import (
     activity_log,
     ai,
+    attention,
     brain,
     command_center,
     inbox,
+    weekly_review,
     ai_catalog,
     ai_profile,
     ai_stream,
@@ -812,6 +814,10 @@ app.include_router(brain.router, tags=["brain"])
 app.include_router(inbox.router, tags=["inbox"])
 # میز فرمان «امروز من» — the Dashboard's one-call Today aggregate.
 app.include_router(command_center.router, tags=["command-center"])
+# موتور توجه — rule scan / morning brief / settings (phase 3).
+app.include_router(attention.router, tags=["attention"])
+# مرور هفتگی — stored weekly AI reviews + schedule (phase 4).
+app.include_router(weekly_review.router, tags=["weekly-review"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────
@@ -894,6 +900,36 @@ async def _stop_brain_reminder():
             await asyncio.wait_for(task, timeout=5)
     except Exception as exc:
         logger.debug("brain reminder shutdown: %s", exc)
+
+
+# ── Attention engine loop (موتور توجه — rule scan + morning brief + weekly
+# review). Same lifecycle shape as the brain reminder: its own stop event,
+# fail-open start, bounded shutdown wait. ────────────────────────────────────
+@app.on_event("startup")
+async def _start_attention_engine():
+    try:
+        from app.services.attention_service import attention_loop
+
+        app.state.attention_stop = asyncio.Event()
+        app.state.attention_task = asyncio.create_task(
+            attention_loop(app.state.attention_stop)
+        )
+        logger.info("🚨 attention engine loop started")
+    except Exception as exc:
+        logger.warning("attention engine loop failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_attention_engine():
+    try:
+        stop = getattr(app.state, "attention_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "attention_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("attention engine shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

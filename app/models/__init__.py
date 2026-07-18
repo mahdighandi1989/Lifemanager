@@ -5,6 +5,7 @@ before `Base.metadata.create_all()` runs at startup. Tools that do
 `from app.models import X` also get a single import surface.
 """
 from app.models.activity_log import ActivityLog
+from app.models.attention_mark import AttentionMark
 from app.models.ai_model_config import AIModelConfig
 from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
 from app.models.ai_catalog import AICatalogModel, AICatalogProvider, AITaskRoute
@@ -54,9 +55,11 @@ from app.models.user_oauth import OAuthUser
 from app.models.brain import BrainUpload
 from app.models.personal_writing import PersonalWriting
 from app.models.webhook_event import WebhookEvent
+from app.models.weekly_review import WeeklyReview
 
 __all__ = [
     "ActivityLog",
+    "AttentionMark",
     "AIModelConfig",
     "AIProvider",
     "AICatalogProvider",
@@ -111,5 +114,6 @@ __all__ = [
     "BrainUpload",
     "PersonalWriting",
     "WebhookEvent",
+    "WeeklyReview",
     "todo_list_items",
 ]
