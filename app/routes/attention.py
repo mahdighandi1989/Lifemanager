@@ -70,11 +70,19 @@ async def get_attention_settings(db: AsyncSession = Depends(get_db)) -> dict:
     return {"ok": True, "success": True, "settings": cfg}
 
 
+# The engine's own bookkeeping stamps. A settings form naturally echoes the
+# whole GET payload back on save; if these keys passed through, a stale
+# last_brief_date would re-arm today's already-sent brief. Only the loop may
+# write them.
+_INTERNAL_STAMPS = ("last_brief_date", "last_scan_at")
+
+
 @router.put("/api/attention/settings", tags=["attention"])
 @handle_errors
 async def put_attention_settings(
     partial: Dict[str, Any] = Body(...),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    cfg = await attention_service.update_settings(db, partial or {})
+    cleaned = {k: v for k, v in (partial or {}).items() if k not in _INTERNAL_STAMPS}
+    cfg = await attention_service.update_settings(db, cleaned)
     return {"ok": True, "success": True, "settings": cfg}

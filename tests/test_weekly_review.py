@@ -97,3 +97,15 @@ def test_cross_user_reviews_hidden(api_client):
     _run_sql("UPDATE weekly_reviews SET user_id = 42")
     assert api_client.get("/api/weekly-review").json()["reviews"] == []
     assert api_client.get("/api/weekly-review/latest").json()["review"] is None
+
+
+def test_settings_put_ignores_last_run_at_and_bad_types(api_client):
+    r = api_client.put(
+        "/api/weekly-review/settings",
+        json={"hour": "", "weekday": 5, "last_run_at": "2000-01-01T00:00:00+00:00"},
+    )
+    assert r.status_code == 200
+    saved = r.json()["settings"]
+    assert saved["hour"] == DEFAULT_SETTINGS["hour"]  # '' rejected
+    assert saved["weekday"] == 5
+    assert saved["last_run_at"] is None  # scheduler-owned stamp not writable here

@@ -133,13 +133,32 @@ async def get_settings(db: AsyncSession) -> Dict[str, Any]:
     return cfg
 
 
+def _coerce_setting(default: Any, value: Any) -> tuple[bool, Any]:
+    """Type-check a settings value against its default: bools stay bools,
+    ints parse-or-reject (an empty string from a cleared number input must
+    NOT be persisted — int('') would then crash every scheduler tick),
+    None-defaults (stamps) accept str/None."""
+    if isinstance(default, bool):
+        return (isinstance(value, bool), value)
+    if isinstance(default, int):
+        try:
+            return (True, int(value))
+        except (TypeError, ValueError):
+            return (False, None)
+    if value is None or isinstance(value, str):
+        return (True, value)
+    return (False, None)
+
+
 async def update_settings(db: AsyncSession, partial: Dict[str, Any]) -> Dict[str, Any]:
     from app.models.global_setting import GlobalSetting
 
     cfg = await get_settings(db)
     for k, v in (partial or {}).items():
         if k in DEFAULT_SETTINGS:
-            cfg[k] = v
+            ok, coerced = _coerce_setting(DEFAULT_SETTINGS[k], v)
+            if ok:
+                cfg[k] = coerced
     row = (
         await db.execute(select(GlobalSetting).where(GlobalSetting.key == SETTINGS_KEY))
     ).scalars().first()
@@ -401,12 +420,35 @@ async def _mark_sent(
 
 
 # ── alert sending ────────────────────────────────────────────────────────────
+# Serialises the check-then-act window between the 10-min loop tick and the
+# UI's «ارسال هشدارها» button: both run in THIS process (single-replica, like
+# the compose buffer), so an asyncio lock is enough to stop a race from
+# double-sending every fresh finding.
+_send_lock: Optional[Any] = None
+
+
+def _get_send_lock():
+    import asyncio
+
+    global _send_lock
+    if _send_lock is None:
+        _send_lock = asyncio.Lock()
+    return _send_lock
+
+
 async def send_alerts(
     db: AsyncSession, *, user_id: int = 0, now: Optional[datetime] = None
 ) -> Dict[str, Any]:
     """Scan, drop findings still inside their cooldown, then send ONE
     aggregated notification per rule (bell + Telegram via notify_event's
     registered channels) and remember what was sent."""
+    async with _get_send_lock():
+        return await _send_alerts_locked(db, user_id=user_id, now=now)
+
+
+async def _send_alerts_locked(
+    db: AsyncSession, *, user_id: int = 0, now: Optional[datetime] = None
+) -> Dict[str, Any]:
     now = now or datetime.now(timezone.utc)
     cfg = await get_settings(db)
     findings = await scan_findings(db, user_id=user_id, now=now, settings=cfg)
@@ -512,6 +554,20 @@ async def send_morning_brief(
     cfg = await get_settings(db)
     if not force and not brief_decision(cfg, now):
         return {"sent": False, "reason": "not_due"}
+    # The prefs catalog lists morning_brief with a Telegram channel, so the
+    # direct pretty-text send below must honour the SAME toggles the event
+    # fan-out honours (the UI switch must actually switch something).
+    # force=True (the explicit UI button) bypasses the event toggle but
+    # still respects the channel toggle. Fail-open like notify_event.
+    try:
+        from app.services import notification_prefs as _prefs
+
+        event_on = _prefs.event_enabled("morning_brief")
+        telegram_on = _prefs.channel_enabled("telegram")
+    except Exception:
+        event_on, telegram_on = True, True
+    if not force and not event_on:
+        return {"sent": False, "reason": "disabled_by_prefs"}
     local = local_now(cfg, now)
 
     from app.services.command_center_service import build_today
@@ -527,7 +583,7 @@ async def send_morning_brief(
         from app.services.telegram_service import get_telegram_bot
 
         bot = get_telegram_bot()
-        if bot.is_configured():
+        if telegram_on and bot.is_configured():
             await bot.send(text, silent=True)
             telegram_sent = True
     except Exception as exc:

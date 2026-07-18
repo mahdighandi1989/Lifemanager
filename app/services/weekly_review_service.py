@@ -67,11 +67,14 @@ async def get_settings(db: AsyncSession) -> Dict[str, Any]:
 
 async def update_settings(db: AsyncSession, partial: Dict[str, Any]) -> Dict[str, Any]:
     from app.models.global_setting import GlobalSetting
+    from app.services.attention_service import _coerce_setting
 
     cfg = await get_settings(db)
     for k, v in (partial or {}).items():
         if k in DEFAULT_SETTINGS:
-            cfg[k] = v
+            ok, coerced = _coerce_setting(DEFAULT_SETTINGS[k], v)
+            if ok:
+                cfg[k] = coerced
     row = (
         await db.execute(select(GlobalSetting).where(GlobalSetting.key == SETTINGS_KEY))
     ).scalars().first()
@@ -315,10 +318,21 @@ def serialize(row: WeeklyReview) -> Dict[str, Any]:
 
 
 async def generate_review(
-    db: AsyncSession, *, user_id: int = 0, now: Optional[datetime] = None, deliver: bool = True
+    db: AsyncSession,
+    *,
+    user_id: int = 0,
+    now: Optional[datetime] = None,
+    deliver: bool = True,
+    manual: bool = True,
 ) -> WeeklyReview:
     """Build + store this week's review (window = the trailing 7 days) and
-    deliver it. Never raises out of the delivery step."""
+    deliver it. Never raises out of the delivery step.
+
+    Delivery honours the notification-preference toggles the catalog
+    advertises for ``weekly_review`` (the scheduled path skips Telegram when
+    the event is switched off; a ``manual`` run-now still sends unless the
+    telegram CHANNEL itself is off) — mirroring the morning brief.
+    """
     now = now or datetime.now(timezone.utc)
     start = now - timedelta(days=7)
     stats = await gather_stats(db, user_id, start, now)
@@ -340,10 +354,17 @@ async def generate_review(
 
     if deliver:
         try:
+            from app.services import notification_prefs as _prefs
+
+            event_on = _prefs.event_enabled("weekly_review")
+            telegram_on = _prefs.channel_enabled("telegram")
+        except Exception:
+            event_on, telegram_on = True, True
+        try:
             from app.services.telegram_service import get_telegram_bot
 
             bot = get_telegram_bot()
-            if bot.is_configured():
+            if telegram_on and (manual or event_on) and bot.is_configured():
                 await bot.send(f"📒 *مرور هفتگی*\n\n{narrative}", silent=True)
         except Exception as exc:
             logger.warning("weekly review telegram send failed: %r", exc)
@@ -376,7 +397,7 @@ async def weekly_tick(db: AsyncSession, now: Optional[datetime] = None) -> Optio
         uid = int(os.environ.get("TELEGRAM_TASK_USER_ID", "0") or "0")
     except (TypeError, ValueError):
         uid = 0
-    row = await generate_review(db, user_id=uid, now=now)
+    row = await generate_review(db, user_id=uid, now=now, manual=False)
     await update_settings(db, {"last_run_at": now.isoformat()})
     return row
 

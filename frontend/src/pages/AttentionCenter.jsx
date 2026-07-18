@@ -81,6 +81,32 @@ function Toggle({ label, checked, onChange }) {
   );
 }
 
+// Save must send ONLY the user-editable fields: echoing the whole GET payload
+// would also write back the engine's bookkeeping stamps (last_brief_date, …)
+// and could re-arm an already-sent brief; blanked number inputs ('' from a
+// cleared field) are dropped rather than persisted.
+const validNum = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : undefined);
+
+function attentionSavePayload(s) {
+  return {
+    enabled: !!s.enabled,
+    brief_enabled: !!s.brief_enabled,
+    brief_hour: validNum(s.brief_hour),
+    tz_offset_minutes: validNum(s.tz_offset_minutes),
+    expiry_days: validNum(s.expiry_days),
+    subscription_days: validNum(s.subscription_days),
+    inbox_stale_hours: validNum(s.inbox_stale_hours),
+  };
+}
+
+function weeklySavePayload(s) {
+  return {
+    enabled: !!s.enabled,
+    weekday: validNum(s.weekday),
+    hour: validNum(s.hour),
+  };
+}
+
 function AttentionCenter() {
   const [scan, setScan] = useState(null);
   const [ruleTitles, setRuleTitles] = useState({});
@@ -208,7 +234,7 @@ function AttentionCenter() {
               <button
                 type="button"
                 disabled={busy === 'saveAttention'}
-                onClick={() => act('saveAttention', () => api.put('/attention/settings', settings), 'ذخیره شد')}
+                onClick={() => act('saveAttention', () => api.put('/attention/settings', attentionSavePayload(settings)), 'ذخیره شد')}
                 className="rounded-md bg-gray-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-900 disabled:opacity-50"
               >
                 ذخیره
@@ -246,7 +272,7 @@ function AttentionCenter() {
                 <button
                   type="button"
                   disabled={busy === 'saveWeekly'}
-                  onClick={() => act('saveWeekly', () => api.put('/weekly-review/settings', weeklySettings), 'ذخیره شد')}
+                  onClick={() => act('saveWeekly', () => api.put('/weekly-review/settings', weeklySavePayload(weeklySettings)), 'ذخیره شد')}
                   className="rounded-md bg-gray-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-900 disabled:opacity-50"
                 >
                   ذخیره

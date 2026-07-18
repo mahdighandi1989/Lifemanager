@@ -307,3 +307,25 @@ def test_test_route_unconfigured(api_client, monkeypatch):
     r = api_client.post("/api/telegram/test", json={"message": "x"})
     assert r.status_code == 200
     assert r.json()["ok"] is False
+
+
+# ── /inbox routing (صندوق ورودی) ─────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_inbox_command_routes_all_forms(monkeypatch):
+    """`/inbox متن`, bare `/inbox`, AND `/inbox\\nمتن` (text pasted on the
+    next line) must all reach _cmd_inbox — the newline form must NOT fall
+    through to the compose flow."""
+    bot = _make_bot(monkeypatch)
+    seen: list[str] = []
+
+    async def _fake_cmd_inbox(chat_id, body):
+        seen.append(body)
+        return {"ok": True, "handled": "inbox_captured"}
+
+    bot._cmd_inbox = _fake_cmd_inbox  # type: ignore[assignment]
+    assert (await bot.handle_update(_msg_update("/inbox خرید نان")))["handled"] == "inbox_captured"
+    assert (await bot.handle_update(_msg_update("/inbox\nیادداشت چندخطی\nخط دوم")))["handled"] == "inbox_captured"
+    assert (await bot.handle_update(_msg_update("/inbox")))["handled"] == "inbox_captured"
+    assert seen == ["خرید نان", "یادداشت چندخطی\nخط دوم", ""]

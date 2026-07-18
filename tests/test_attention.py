@@ -196,3 +196,58 @@ def test_settings_roundtrip_ignores_unknown_keys(api_client):
     # persisted
     again = api_client.get("/api/attention/settings").json()["settings"]
     assert again["brief_hour"] == 6
+
+
+def test_settings_put_rejects_bad_types_and_internal_stamps(api_client):
+    # A cleared number input ('') must not persist — int('') would kill the loop.
+    r = api_client.put("/api/attention/settings", json={"brief_hour": "", "expiry_days": "45"})
+    assert r.status_code == 200
+    saved = r.json()["settings"]
+    assert saved["brief_hour"] == DEFAULT_SETTINGS["brief_hour"]  # rejected
+    assert saved["expiry_days"] == 45  # numeric string coerced
+    # The engine's own stamps are not writable from the settings surface —
+    # echoing a stale last_brief_date back would re-arm today's sent brief.
+    api_client.post("/api/attention/morning-brief")
+    stamped = api_client.get("/api/attention/settings").json()["settings"]["last_brief_date"]
+    assert stamped is not None
+    r = api_client.put(
+        "/api/attention/settings", json={"last_brief_date": "2000-01-01", "last_scan_at": "x"}
+    )
+    assert r.json()["settings"]["last_brief_date"] == stamped
+
+
+def test_morning_brief_scheduled_path_respects_event_prefs(api_client):
+    """Turning «پیام صبحگاهی» off in notification prefs must silence the
+    SCHEDULED path (the catalog advertises the toggle); the explicit
+    force button still works."""
+    from app.services import notification_prefs as prefs
+
+    original = prefs.get_prefs()
+    try:
+        merged = {**original, "events": {**original.get("events", {}), "morning_brief": False}}
+        prefs.set_cache(merged)
+
+        import asyncio as _asyncio
+
+        from app.database import get_db
+        from app.main import app as _app
+        from app.services.attention_service import send_morning_brief, update_settings
+
+        override = _app.dependency_overrides[get_db]
+
+        async def _go():
+            agen = override()
+            session = await agen.__anext__()
+            try:
+                # Make the schedule "due" so only the prefs gate can stop it.
+                await update_settings(session, {"brief_hour": 0, "last_brief_date": None})
+                return await send_morning_brief(session)
+            finally:
+                await agen.aclose()
+
+        result = _asyncio.run(_go())
+        assert result == {"sent": False, "reason": "disabled_by_prefs"}
+    finally:
+        prefs.set_cache(original)
+    # Explicit force path (the UI button) still sends.
+    assert api_client.post("/api/attention/morning-brief").json()["sent"] is True

@@ -89,14 +89,19 @@ function InboxRow({ item, onFile, onDismiss, busy }) {
       </div>
       {reason && <p className="text-xs text-gray-500">{unescapeHtml(reason)}</p>}
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => onFile(item, null)}
-          className="rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
-        >
-          ✔ تأیید ({TYPE_FA[suggested] || suggested})
-        </button>
+        {/* No one-tap confirm when the classifier produced nothing — a
+            «تأیید (نامشخص)» button would silently file as a task; the user
+            must pick a real destination instead. */}
+        {TYPE_FA[suggested] && suggested !== 'unknown' && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onFile(item, null)}
+            className="rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            ✔ تأیید ({TYPE_FA[suggested]})
+          </button>
+        )}
         <select
           value={target}
           onChange={(e) => setTarget(e.target.value)}
@@ -154,6 +159,8 @@ function Dashboard() {
   // «امروز من» aggregate + quick-capture state.
   const [today, setToday] = useState(null);
   const [todayLoading, setTodayLoading] = useState(true);
+  const [todayError, setTodayError] = useState(false);
+  const [actionError, setActionError] = useState(false);
   const [captureText, setCaptureText] = useState('');
   const [captureBusy, setCaptureBusy] = useState(false);
   const [captureFeedback, setCaptureFeedback] = useState(null);
@@ -163,8 +170,11 @@ function Dashboard() {
     try {
       const res = await api.get('/command-center/today');
       setToday(res.data);
+      setTodayError(false);
     } catch {
-      setToday(null);
+      // Keep whatever data we already had; a failed refresh must NOT make
+      // the page claim «هیچ موعدی نیست» — that reads as all-clear.
+      setTodayError(true);
     } finally {
       setTodayLoading(false);
     }
@@ -229,24 +239,28 @@ function Dashboard() {
 
   const handleFile = async (item, target) => {
     setInboxBusyId(item.id);
+    setActionError(false);
     try {
       await api.post(`/inbox/${item.id}/file`, target ? { target_type: target } : {});
-      fetchToday();
     } catch {
-      // keep the row; the next refresh shows its real state
+      // e.g. 409: filed from another tab/Telegram — surface it; the refresh
+      // below reconciles the stale row either way.
+      setActionError(true);
     } finally {
+      fetchToday();
       setInboxBusyId(null);
     }
   };
 
   const handleDismiss = async (item) => {
     setInboxBusyId(item.id);
+    setActionError(false);
     try {
       await api.post(`/inbox/${item.id}/dismiss`);
-      fetchToday();
     } catch {
-      // keep the row
+      setActionError(true);
     } finally {
+      fetchToday();
       setInboxBusyId(null);
     }
   };
@@ -259,6 +273,9 @@ function Dashboard() {
   const inbox = today?.inbox;
   const notifications = today?.notifications;
   const todo = today?.todo;
+  // Calm zero-states are only truthful when we actually HAVE fresh data —
+  // a failed fetch with no data must not render as «همه‌چیز آرام است».
+  const showEmptyStates = !todayLoading && !(todayError && !today);
   const hasAttention =
     (tasksBuckets?.overdue_count || 0) +
       (tasksBuckets?.due_today_count || 0) +
@@ -319,6 +336,29 @@ function Dashboard() {
           )}
         </div>
 
+        {/* Today fetch failed → say so; silence would read as all-clear. */}
+        {todayError && (
+          <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm text-red-700">
+              دریافت اطلاعات «امروز من» ناموفق بود — ممکن است موارد نیازمند توجه نمایش داده نشوند.
+            </p>
+            <button
+              type="button"
+              onClick={() => { setTodayLoading(true); fetchToday(); }}
+              className="shrink-0 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
+            >
+              تلاش دوباره
+            </button>
+          </div>
+        )}
+        {actionError && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-3">
+            <p className="text-sm text-amber-700">
+              عملیات روی آن مورد انجام نشد (شاید قبلاً از جای دیگری تعیین‌تکلیف شده) — فهرست به‌روز شد.
+            </p>
+          </div>
+        )}
+
         {/* Today grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Attention: overdue / today / upcoming tasks */}
@@ -333,7 +373,7 @@ function Dashboard() {
             }
           >
             {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
-            {!todayLoading && !hasAttention && (
+            {showEmptyStates && !hasAttention && (
               <p className="text-sm text-gray-400">هیچ موعد نزدیکی نیست — آسوده باش 🌿</p>
             )}
             {tasksBuckets?.overdue?.map((t) => <TaskRow key={`o${t.id}`} task={t} tone="overdue" />)}
@@ -348,7 +388,7 @@ function Dashboard() {
             badgeCls="bg-blue-100 text-blue-700"
           >
             {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
-            {!todayLoading && !(inbox?.latest?.length) && (
+            {showEmptyStates && !(inbox?.latest?.length) && (
               <p className="text-sm text-gray-400">خالی است — هرچه از وب یا تلگرام (/inbox) بفرستی این‌جا می‌آید.</p>
             )}
             {inbox?.latest?.map((item) => (
@@ -374,7 +414,7 @@ function Dashboard() {
                 </Link>
               }
             >
-              {!todayLoading && !(notifications?.latest?.length) && (
+              {showEmptyStates && !(notifications?.latest?.length) && (
                 <p className="text-sm text-gray-400">اعلان خوانده‌نشده‌ای نیست.</p>
               )}
               {notifications?.latest?.map((n) => (
@@ -397,7 +437,7 @@ function Dashboard() {
                 </Link>
               }
             >
-              {!todayLoading && !(todo?.due?.length || todo?.starred?.length) && (
+              {showEmptyStates && !(todo?.due?.length || todo?.starred?.length) && (
                 <p className="text-sm text-gray-400">آیتم موعددار یا ستاره‌داری نیست.</p>
               )}
               {todo?.due?.map((i) => (

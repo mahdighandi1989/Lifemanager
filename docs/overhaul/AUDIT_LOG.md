@@ -1136,3 +1136,48 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   `npm run build` clean; vitest **16 failed / 85 passed — identical to baseline**; backend full
   suite **1099 passed / 13 failed (0 new — FAILED list diffed byte-identical against the
   pre-change baseline)**.
+
+## 2026-07-18 — بازبینی خصمانه‌ی چهار فاز (owner: «بررسی مجدد کن») + رفع ۱۱ یافتهٔ تأییدشده
+
+- **REVIEW (multi-agent adversarial)** Owner asked for a re-verification of all 4 phases and
+  whether anything was deleted. Deterministic pass first: across both commits the ONLY deleted
+  lines were Dashboard CSS-class swaps (space-x→gap, RTL-safe), the page title, and one telegram
+  keyboard row replaced by a superset row — **no capability, endpoint, page, button, or data
+  removed; migrations are create-only (drops exist solely in downgrade())**. Then a 32-agent
+  review workflow (4 dimensions × finder + 2 adversarial verifiers per finding) confirmed 11
+  findings (3 refuted as theoretical). All 11 fixed:
+- **FIX (major — double escape)** Filing an inbox capture re-escaped already-escaped content
+  (`Q&A` → `Q&amp;amp;A`, breaking titles/URLs in all four targets). `inbox_service._esc` now
+  normalises via unescape-then-escape — idempotent across escaped content, raw route overrides,
+  and AI-suggested text; exactly ONE escape level like the tasks router. +test
+  (`test_filing_keeps_single_escape_level`).
+- **FIX (major — settings echo re-arms schedulers)** PUT /api/attention/settings and
+  /api/weekly-review/settings now strip the engine-owned stamps (last_brief_date, last_scan_at,
+  last_run_at) — a settings form echoing the GET payload could rewind them and double-send the
+  brief/review. AttentionCenter now also sends ONLY the editable fields. +tests.
+- **FIX (major — '' persisted into int settings)** `_coerce_setting` type-checks every settings
+  write (bool stays bool, int parses-or-rejects — a cleared number input no longer persists ''
+  which made int('') kill every scheduler tick silently); shared by both services. Frontend
+  drops non-finite numbers from the save payload. +tests.
+- **FIX (major — prefs bypass)** The catalog advertises Telegram for morning_brief/weekly_review
+  but their direct Telegram sends ignored the toggles. Scheduled paths now honour
+  event_enabled + channel_enabled (fail-open); the explicit UI run-now buttons bypass the event
+  toggle but still respect the channel toggle. +test (scheduled brief blocked by prefs, force
+  still sends).
+- **FIX (minor)** send_alerts race (loop tick vs run-now double-send): serialized behind an
+  in-process asyncio lock (single-replica, same rationale as the compose buffer). Todo filing
+  list match: exact case-insensitive first («کار» never lands in «کارهای شخصی»), LIKE wildcards
+  escaped, archived lists excluded (incl. the «صندوق ورودی» fallback lookup). Telegram
+  `/inbox\nمتن` (text on the next line) no longer falls through to compose. +tests.
+- **FIX (minor — frontend truthfulness)** Dashboard: a failed /command-center/today fetch now
+  shows an error banner + retry and suppresses the calming zero-states (stale data is kept);
+  file/dismiss failures surface a notice and ALWAYS refresh (stale 409 rows reconcile); the
+  one-tap confirm button is hidden when the suggestion is null/unknown (no more silent
+  file-as-task behind a «تأیید (نامشخص)» label).
+- **NOTE** 3 findings refuted by the verifier panel (deadline tz bucketing, settings-blob stamp
+  race, AttentionCenter all-or-nothing refresh) — recorded here as reviewed-and-declined, not
+  bugs in practice. Root cause of dist/index.html slipping into the previous commit found
+  (checkout ran from frontend/ cwd) — reverted; dist stays untouched.
+- **VERIFY** Suites now: inbox 14/14, attention 10/10, weekly 6/6, telegram 25/25; ruff clean;
+  `npm run build` clean; vitest 16/85 failed/passed — identical to baseline; backend full suite
+  green vs the same 13 pre-existing failures (recorded at commit time).

@@ -226,8 +226,14 @@ async def apply_classification(db: AsyncSession, item: InboxItem, *, user_id: in
 
 
 def _esc(value: Optional[str]) -> Optional[str]:
-    """Same stored-XSS defence the route layer applies to direct creates."""
-    return None if value is None else html.escape(value, quote=True)
+    """Normalise to EXACTLY ONE escape level (the app convention set by the
+    tasks router's _sanitize). Filing inputs arrive mixed: content-derived
+    defaults are already escaped at capture, route-body overrides are raw,
+    and AI-suggested text may be either — a plain second html.escape would
+    double-escape the first kind (``Q&A`` → ``Q&amp;amp;A``, breaking titles
+    and URLs). unescape-then-escape is idempotent across all three sources.
+    """
+    return None if value is None else html.escape(html.unescape(value), quote=True)
 
 
 def _to_task_priority(value: str):
@@ -263,19 +269,44 @@ async def _file_as_todo(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Di
     lst = None
     name = s.get("list_name")
     if name:
+        # Exact (case-insensitive) match wins — «کار» must not land in
+        # «کارهای شخصی». Fall back to substring with LIKE wildcards escaped
+        # (a list named «تخفیف 50%» must not widen the pattern). Archived
+        # lists are never a filing destination.
         lst = (
             await db.execute(
                 select(TodoList)
-                .where(scope_filter(TodoList.user_id, user_id), TodoList.name.ilike(f"%{name}%"))
+                .where(
+                    scope_filter(TodoList.user_id, user_id),
+                    TodoList.is_archived.is_(False),
+                    func.lower(TodoList.name) == name.lower(),
+                )
                 .limit(1)
             )
         ).scalars().first()
+        if lst is None:
+            pattern = (
+                name.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            )
+            lst = (
+                await db.execute(
+                    select(TodoList)
+                    .where(
+                        scope_filter(TodoList.user_id, user_id),
+                        TodoList.is_archived.is_(False),
+                        TodoList.name.ilike(f"%{pattern}%", escape="\\"),
+                    )
+                    .order_by(func.length(TodoList.name))
+                    .limit(1)
+                )
+            ).scalars().first()
     if lst is None:
         lst = (
             await db.execute(
                 select(TodoList)
                 .where(
                     scope_filter(TodoList.user_id, user_id),
+                    TodoList.is_archived.is_(False),
                     TodoList.name == INBOX_DEFAULT_LIST_NAME,
                 )
                 .limit(1)

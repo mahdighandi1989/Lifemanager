@@ -69,5 +69,9 @@ async def put_weekly_review_settings(
     partial: Dict[str, Any] = Body(...),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    cfg = await svc.update_settings(db, partial or {})
+    # last_run_at is the scheduler's own stamp — a settings form echoing the
+    # GET payload back must not rewind it (it would re-arm this week's
+    # already-sent review). Only weekly_tick writes it.
+    cleaned = {k: v for k, v in (partial or {}).items() if k != "last_run_at"}
+    cfg = await svc.update_settings(db, cleaned)
     return {"ok": True, "success": True, "settings": cfg}

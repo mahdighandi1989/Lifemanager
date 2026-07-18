@@ -189,3 +189,31 @@ def test_cross_user_rows_hidden_and_404_on_mutation(api_client):
     assert api_client.post(f"/api/inbox/{foreign['id']}/dismiss").status_code == 404
     assert api_client.post(f"/api/inbox/{foreign['id']}/file").status_code == 404
     assert api_client.post(f"/api/inbox/{mine['id']}/dismiss").status_code == 200
+
+
+# --- escaping normalization (review fix: no double-escape on filing) --------
+
+
+def test_filing_keeps_single_escape_level(api_client):
+    item = _capture(api_client, "خرید بلیت Q&A <مهم> از https://x.com/?a=1&b=2")
+    # Capture stores exactly one escape level.
+    assert "Q&amp;A" in item["content"] and "&amp;amp;" not in item["content"]
+    r = api_client.post(f"/api/inbox/{item['id']}/file", json={"target_type": "task"})
+    assert r.status_code == 200, r.text
+    task = next(t for t in api_client.get("/api/tasks").json() if "Q&amp;" in t["title"])
+    # Filed entity matches the direct-create convention: ONE escape, not two.
+    assert "&amp;amp;" not in task["title"]
+    assert "&amp;amp;" not in (task["description"] or "")
+    assert "a=1&amp;b=2" in (task["description"] or "")
+
+
+def test_todo_filing_prefers_exact_list_match(api_client):
+    # Substring-first ordering trap: the longer name exists BEFORE the exact one.
+    assert api_client.post("/api/lists/", json={"name": "کارهای شخصی"}).status_code == 201
+    assert api_client.post("/api/lists/", json={"name": "کار"}).status_code == 201
+    item = _capture(api_client, "پیگیری بیمه")
+    r = api_client.post(
+        f"/api/inbox/{item['id']}/file", json={"target_type": "todo", "list_name": "کار"}
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["created"]["list_name"] == "کار"

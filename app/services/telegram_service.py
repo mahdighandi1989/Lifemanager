@@ -638,7 +638,10 @@ class TelegramBot:
         # triage layer suggests where it belongs, filing happens on the Dashboard.
         # Bare /inbox reports the pending count. Plain text still goes to the
         # compose flow below (unchanged behaviour) — this is the explicit path.
-        if lower == "/inbox" or lower.startswith("/inbox "):
+        # Accept "/inbox متن", bare "/inbox", AND "/inbox\nمتن" — pasting the
+        # text on the next line is the natural way to drop a multi-line note,
+        # and it must not fall through to the compose flow.
+        if lower == "/inbox" or lower.startswith(("/inbox ", "/inbox\n")):
             body = text[len("/inbox"):].strip()
             return await self._cmd_inbox(chat_id, body)
 
