@@ -1519,16 +1519,16 @@
   "frontend": {
     "pages": [
       {
-        "name": "AISettings",
-        "file": "frontend/src/pages/AISettings.jsx"
-      },
-      {
         "name": "ActivityLogPage",
         "file": "frontend/src/pages/ActivityLogPage.jsx"
       },
       {
         "name": "AdminUsers",
         "file": "frontend/src/pages/AdminUsers.jsx"
+      },
+      {
+        "name": "AISettings",
+        "file": "frontend/src/pages/AISettings.jsx"
       },
       {
         "name": "AssetsPage",
@@ -1561,6 +1561,10 @@
       {
         "name": "DataHub",
         "file": "frontend/src/pages/DataHub.jsx"
+      },
+      {
+        "name": "DevCenter",
+        "file": "frontend/src/pages/DevCenter.jsx"
       },
       {
         "name": "DriveFiles",
@@ -1619,12 +1623,12 @@
         "file": "frontend/src/pages/PeopleProfiles.jsx"
       },
       {
-        "name": "PersonProfilePage",
-        "file": "frontend/src/pages/PersonProfilePage.jsx"
-      },
-      {
         "name": "PersonalityProfilePage",
         "file": "frontend/src/pages/PersonalityProfilePage.jsx"
+      },
+      {
+        "name": "PersonProfilePage",
+        "file": "frontend/src/pages/PersonProfilePage.jsx"
       },
       {
         "name": "Projects",

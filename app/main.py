@@ -31,6 +31,7 @@ from app.routes import (
     auth,
     context,
     deduplication,
+    dev_center,
     drive,
     merge,
     external_projects,
@@ -794,6 +795,8 @@ app.include_router(files.router, tags=["files"])
 # router carries its own /api/imports prefix and mounts with no extra prefix.
 app.include_router(imports.router, tags=["imports"])
 app.include_router(external_projects.router)
+# مرکز توسعه — GitHub/Render dev-sync (absolute /api/dev/* paths, no prefix).
+app.include_router(dev_center.router, tags=["dev-center"])
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
@@ -930,6 +933,35 @@ async def _stop_attention_engine():
             await asyncio.wait_for(task, timeout=5)
     except Exception as exc:
         logger.debug("attention engine shutdown: %s", exc)
+
+
+# ── Dev-sync engine loop (مرکز توسعه — GitHub repos + Render services/logs +
+# کارنامهٔ روزانه). Same lifecycle shape as the attention engine. ────────────
+@app.on_event("startup")
+async def _start_dev_sync_engine():
+    try:
+        from app.services.dev_sync.engine import dev_sync_loop
+
+        app.state.dev_sync_stop = asyncio.Event()
+        app.state.dev_sync_task = asyncio.create_task(
+            dev_sync_loop(app.state.dev_sync_stop)
+        )
+        logger.info("🛠️ dev-sync engine loop started")
+    except Exception as exc:
+        logger.warning("dev-sync engine loop failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_dev_sync_engine():
+    try:
+        stop = getattr(app.state, "dev_sync_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "dev_sync_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("dev-sync engine shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

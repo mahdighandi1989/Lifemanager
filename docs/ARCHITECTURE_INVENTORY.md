@@ -88,6 +88,9 @@ declared in `frontend/src/App.jsx`.
 * `Profile.jsx` — user profile editor.
 * `SelfImprovement.jsx` — self-improvement check-in UI.
 * `Settings.jsx` — global settings.
+* `DevCenter.jsx` — «مرکز توسعه»: GitHub repos + Render services, live log
+  viewer, log stats, Persian daily summaries, token settings (`/dev-center`;
+  overview also embedded as the «پروژه‌های توسعه» tab in `ProjectsHub.jsx`).
 
 (See the dir listing for the full set; the SPA catch-all in
 `app/main.py` serves `index.html` for any non-API path.)

@@ -1213,3 +1213,54 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **OWNER ACTION** در پنل درایو: «قطع اتصال» → «اتصال به گوگل درایو» (توکن تازه). اگر باز تکرار
   شد و OAuth consent در حالت Testing است، در Google Cloud Console آن را Publish کن تا
   refresh token هفت‌روزه منقضی نشود.
+
+## 2026-07-18 — «مرکز توسعه»: آینهٔ GitHub/Render + کارنامهٔ روزانهٔ فارسی (owner request)
+
+- **DECISION** زیرساخت سینک اپ خواهر (project-management) داخل Lifemanager پیاده شد، اما
+  به‌سبک این repo و ضد-موازی‌کاری: فقط mirror + وظیفهٔ زندگی (رسیدگی)، بدون ایشوسازی
+  مهندسی/آرشیو gzip/deploy-ops. جزئیات مقایسه در
+  `docs/decisions/2026-07-18-dev-center-github-render-mirror.md`.
+- **CHANGE (schema)** پنج جدول جدید: `dev_integrations` (توکن Fernet-encrypted، قرارداد
+  has_api_key)، `dev_projects` (مخزن‌ها؛ `linked_project_id` پل به پروژه‌های زندگی)،
+  `dev_services` (PK = srv-id رندر، auto-link به مخزن)، `dev_logs` (PK = hash محتوا ⇒
+  dedup بین pollها؛ retention کوتاه)، `dev_log_summaries` (کارنامهٔ per service × روزِ
+  محلی؛ `ai_model NULL` ⇒ متن fallback). ثبت در `models/__init__` + alembic
+  `0038_dev_sync` (با هر ۷ FK؛ زنجیره تا head روی DB خالی سبز).
+- **CHANGE (services)** `app/services/dev_sync/`: token_service (DB-اول-env-بعد؛
+  `GITHUB_TOKEN`/`GH_TOKEN`/`RENDER_API_KEY`؛ sanitize_error ضد نشت توکن در پیام خطای
+  h11)، github_sync (صفحه‌بندی /user/repos، upsert سراسری، بدون حذف)، render_sync
+  (owners→services→logs؛ سرویس ناپدید ⇒ status=gone؛ level detection؛ timestamp
+  نانوثانیه‌ای)، log_summary (digest deterministic → LLM task `dev_log_summary` →
+  fallback فارسی؛ ثبت در activity log با context پروژهٔ زندگی)، engine (حلقهٔ الگوی
+  attention: blob تنظیمات با اولویت DEFAULTS<env<blob، تصمیم‌های خالص، tick 30s با
+  cadence per-concern: مخزن 60د/سرویس 30د/لاگ 120ث/پاکسازی 6س/کارنامه شبانه).
+- **CHANGE (routes/UI)** `/api/dev/*` (توکن‌ها/تست اتصال/sync-now/projects/overview/
+  services/logs+filters/stats/summaries/settings؛ ثبت در main.py)؛ صفحهٔ
+  `DevCenter.jsx` (نمای کلی | لاگ زنده با چیپ سرویس/سطح + poll 10ث | آمار | کارنامهٔ
+  روزانه | تنظیمات)؛ تب «پروژه‌های توسعه» در ProjectsHub + لینک سایدبار «مرکز توسعه»؛
+  `.env.example` + `docs/API.md` + `ARCHITECTURE_INVENTORY.(md|json)` به‌روز شد.
+- **FINDING (review workflow — 26 یافتهٔ تأییدشده، همه اعمال شد)** بازبینی خصمانهٔ
+  چندبعدی (۵ بعد × verify مستقل) این نقص‌ها را قبل از merge گرفت و اصلاح شد:
+  (۱) نبود rollback در tick ⇒ یک خطای DB سشن مشترک را مسموم و hot-loop سیزحمتی 30ثانیه‌ای
+  می‌ساخت — الان per-concern rollback + commitهای محافظت‌شده در سرویس‌ها؛
+  (۲) اسکوپ مخلوط UI(user_id)/موتور(NULL) ⇒ دو مجموعه‌ردیف و IntegrityError روی PK
+  سراسری srv-id — الان دادهٔ dev-sync نصب‌سطح است (`_owner()→None` مستندشده) و lookupهای
+  upsert سراسری‌اند؛ (۳) نشت توکن بدشکل در repr خطای h11 ⇒ sanitize_error (با واریانت
+  unicode-escape) + رد توکن دارای whitespace در schema (422)؛ (۴) ذخیرهٔ blob ادغام‌شده
+  ⇒ منجمدشدن envها — الان blob خام جدا و tick فقط stampها را با read-modify-write تازه
+  می‌نویسد؛ (۵) FKهای جاافتادهٔ migration؛ (۶) چک مالکیت در PATCHها و create-task
+  (الگوی projects.py)؛ (۷) بازگرداندن last_log_at در مسیر retry بعد از race؛
+  (۸) فرانت: انتخاب خالی سرویس‌ها ≠ همه، autoscroll فقط نزدیک انتها، debounce جستجو،
+  bidi تولتیپ‌ها، bar ساعتی stacked بدون دوباره‌شماری خطا، پاک‌شدن بنر خطا، حذف
+  self-link. یک یافته (drift عمدی server_default مدل/migration) توسط verifier رد شد —
+  الگوی رایج همین repo است؛ reviewed-and-declined.
+- **VERIFY** tests dev-sync ۳۴/۳۴ (توکن/ماسک/whitespace، سینک‌ها با fetcher تقلبی،
+  dedup، cross-scope upsert، tick مسموم‌نشدنی + استمپ‌ها، env-not-baked، فیلترها،
+  fallback کارنامه + آینهٔ activity)؛ ruff پاک؛ alembic تا 0038 سبز؛ کل suite برابر
+  بیس‌لاین (همان ۱۳ خطای از-قبل + صفر جدید؛ DevCenter به inventory JSON اضافه شد)؛
+  `npm run build` سبز.
+- **OWNER ACTION (استقرار)** در Render → سرویس Lifemanager → Environment دو متغیر
+  اضافه کن: `GITHUB_TOKEN` (PAT با دسترسی خواندن مخزن‌ها) و `RENDER_API_KEY`
+  (Account Settings → API Keys). اختیاری: `DEV_*` برای فاصله‌ها (\.env.example).
+  برای کارنامهٔ AI-دار، یک مدل متنی در «تنظیمات AI» فعال باشد؛ بدون آن fallback قطعی
+  می‌نویسد.

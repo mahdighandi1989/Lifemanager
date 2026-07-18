@@ -16,6 +16,7 @@ const LINKS = [
   { to: '/', label: 'Dashboard', testid: 'sidebar-link-dashboard' },
   { to: '/tasks', label: 'Tasks', testid: 'sidebar-link-tasks' },
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
+  { to: '/dev-center', label: 'مرکز توسعه', testid: 'sidebar-link-dev-center' },
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists' },
   { to: '/writings', label: 'نوشته‌های من', testid: 'sidebar-link-writings' },
   { to: '/brain', label: 'رشد ذهن و هوش', testid: 'sidebar-link-brain' },

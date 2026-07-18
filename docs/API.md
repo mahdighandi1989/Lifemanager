@@ -432,6 +432,33 @@ Live third-party PM credentials are the only external piece (TO-DO/).
 and `fetch_project_data`; the `sync_external_project` Celery task syncs a
 connection.
 
+### Dev-center — GitHub/Render sync (مرکز توسعه)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/dev/integrations` | Token status per provider (`github`, `render`) — `has_api_key`/`source` only, never key material. |
+| PUT | `/api/dev/integrations/{provider}` | Set (encrypt-at-rest) or clear (`api_key: ""`) a token; DB wins over the `GITHUB_TOKEN`/`GH_TOKEN`/`RENDER_API_KEY` env fallback. |
+| POST | `/api/dev/integrations/{provider}/test` | Live probe (GitHub `/user`, Render `/owners`). |
+| POST | `/api/dev/sync/github` | Sync repos → `dev_projects` (upsert; vanished repos are kept). |
+| POST | `/api/dev/sync/render` | Sync services → `dev_services` (+ auto-link to repos; vanished services marked `gone`). |
+| GET | `/api/dev/projects` | Repos + linked services + 24h log/error counters + today's summary. |
+| PATCH | `/api/dev/projects/{id}` | Link/unlink a life project (`linked_project_id` / `unlink`), toggle `is_active`. |
+| POST | `/api/dev/projects/{id}/create-task` | Create a LIFE follow-up task (رسیدگی) — linked to the bridged life project; NOT an engineering ticket (the PM app owns those). |
+| GET | `/api/dev/overview` | Totals + needs-attention flags (error threshold / suspended service / stale repo). |
+| GET | `/api/dev/services` · PATCH `/api/dev/services/{id}` | Render services list; toggle `auto_fetch_logs`. |
+| GET | `/api/dev/logs` | Filters: `service_ids`, `levels`, `since_minutes`, `q`, `limit≤500`. |
+| POST | `/api/dev/logs/fetch` | Pull newest lines from Render now (live-tab poll). |
+| GET | `/api/dev/logs/stats` | Counts by level/service/hour for the charts. |
+| GET | `/api/dev/summaries` · POST `/api/dev/summaries/generate` | Persian daily digests (AI task `dev_log_summary`, deterministic fallback ⇒ `ai_model` NULL); mirrored into the activity log. |
+| GET/PUT | `/api/dev/settings` | Engine config blob (`dev_sync_engine` GlobalSetting); stamps are read-only. |
+
+Background: `dev_sync_loop` (app/services/dev_sync/engine.py) started from
+`main.py` — repo sync 60m, service sync 30m, log poll 120s, retention cleanup
+(72h default; summaries are the long-term record), nightly summary at local
+`summary_hour`. Tables: `dev_integrations`, `dev_projects`, `dev_services`,
+`dev_logs`, `dev_log_summaries` (migration 0038). UI: `DevCenter.jsx` +
+«پروژه‌های توسعه» tab in `ProjectsHub.jsx`.
+
 ### Deduplication / consolidation (audit task fbd9bd36)
 
 Reduce chaos by consolidating similar entities **without summarizing or

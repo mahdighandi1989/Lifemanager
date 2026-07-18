@@ -56,6 +56,13 @@ from app.models.brain import BrainUpload
 from app.models.personal_writing import PersonalWriting
 from app.models.webhook_event import WebhookEvent
 from app.models.weekly_review import WeeklyReview
+from app.models.dev_sync import (
+    DevIntegration,
+    DevLog,
+    DevLogSummary,
+    DevProject,
+    DevService,
+)
 
 __all__ = [
     "ActivityLog",
@@ -115,5 +122,10 @@ __all__ = [
     "PersonalWriting",
     "WebhookEvent",
     "WeeklyReview",
+    "DevIntegration",
+    "DevProject",
+    "DevService",
+    "DevLog",
+    "DevLogSummary",
     "todo_list_items",
 ]

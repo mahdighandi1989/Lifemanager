@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Projects from './Projects';
 import ExternalProjects from './ExternalProjects';
+import DevProjectsOverview from '../components/DevProjectsOverview';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // «پروژه‌ها» hub — unifies internal projects and third-party (external) PM
@@ -11,6 +12,7 @@ import ActivityLogPanel from '../components/ActivityLogPanel';
 const TABS = [
   { id: 'mine', label: 'پروژه‌های من', match: ['/projects'] },
   { id: 'external', label: 'پروژه‌های خارجی', match: ['/external-projects'] },
+  { id: 'dev', label: 'پروژه‌های توسعه', match: [] },
 ];
 
 function initialTab() {
@@ -46,10 +48,14 @@ function ProjectsHub() {
         <div data-testid={`projects-panel-${tab}`}>
           {tab === 'mine' && <Projects embedded />}
           {tab === 'external' && <ExternalProjects embedded />}
+          {tab === 'dev' && <DevProjectsOverview embedded={false} />}
         </div>
 
         {/* لاگ بخش پروژه‌ها */}
         {tab === 'mine' && <ActivityLogPanel entityType="project" title="لاگ پروژه‌ها" />}
+        {tab === 'dev' && (
+          <ActivityLogPanel entityType="dev_project,dev_service" title="لاگ پروژه‌های توسعه" />
+        )}
       </div>
     </div>
   );
