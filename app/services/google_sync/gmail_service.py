@@ -167,8 +167,10 @@ async def send_email_gmail(
     body: str,
     fetcher: Optional[Callable] = None,
     access_token: Optional[str] = None,
+    html: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Send a plain-text email AS the connected account (gmail.send scope).
+    """Send an email AS the connected account (gmail.send scope). ``html``
+    adds a rich alternative part (the plain body stays the fallback).
     Never raises."""
     token = access_token or await get_access_token(db)
     if not token:
@@ -180,6 +182,8 @@ async def send_email_gmail(
         msg["To"] = to
         msg["Subject"] = subject
         msg.set_content(body)
+        if html:
+            msg.add_alternative(html, subtype="html")
         raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
         fetch = fetcher or _default_fetcher
         result = await fetch(

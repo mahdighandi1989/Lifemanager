@@ -200,8 +200,8 @@ async def test_compose_digest_sections(db_session):
 async def test_send_digest_uses_gmail_and_logs(db_session, monkeypatch):
     sent = {}
 
-    async def fake_send(db, to, subject, body, fetcher=None, access_token=None):
-        sent.update({"to": to, "subject": subject})
+    async def fake_send(db, to, subject, body, fetcher=None, access_token=None, html=None):
+        sent.update({"to": to, "subject": subject, "html": html})
         return {"ok": True, "id": "x"}
 
     async def fake_email(db):
@@ -216,6 +216,8 @@ async def test_send_digest_uses_gmail_and_logs(db_session, monkeypatch):
     result = await digest_service.send_digest(db_session, now=NOW, tz_offset_minutes=0)
     assert result["email"] == {"via": "gmail", "ok": True}
     assert sent["to"] == "me@example.com"
+    # the email carries the rich HTML report with the action list
+    assert sent["html"] and "تکلیف امروز" in sent["html"] and 'dir="rtl"' in sent["html"]
     acts = (await db_session.execute(select(ActivityLog))).scalars().all()
     assert any(a.action == "personal_digest" for a in acts)
 
@@ -356,3 +358,56 @@ async def test_probe_reports_api_disabled(db_session, monkeypatch):
     result = await gmail_service.probe(db_session, fetcher=fetch_403)
     assert result["ok"] is False and result["reason"] == "api_disabled"
     assert "Enable" in result["detail"] or "فعال" in result["detail"]
+
+
+# ── rich digest (owner: «ایمیل ساده است، آمار و تکلیف ندارد») ────────────────
+async def test_collect_digest_data_covers_app_sections(db_session):
+    from app.models.task import Task, TaskStatus
+
+    now = NOW
+    db_session.add(PersonalEvent(id="ev", summary="جلسه", start_at=now + timedelta(hours=1), status="confirmed"))
+    db_session.add(PersonalEmail(id="am", subject="پاسخ بده", needs_action=True, received_at=now, ai_category="action"))
+    db_session.add(Task(title="کار باز", status=TaskStatus.TODO))
+    await db_session.commit()
+
+    data = await digest_service.collect_digest_data(db_session, now=now, tz_offset_minutes=0)
+    assert data["date_local"] == "2026-07-19"
+    assert len(data["events_today"]) == 1
+    assert len(data["action_emails"]) == 1
+    assert data["tasks"]["open"] == 1
+    assert isinstance(data["attention"], dict)
+    assert len(data["activity_7d"]) == 7
+
+
+async def test_build_todo_list_prioritizes(db_session):
+    data = {
+        "attention": {"task_overdue": {"count": 2, "title": "⏰", "labels": ["الف", "ب"]}},
+        "action_emails": [{"subject": "X", "summary": None, "suggested_task": None}],
+        "dev": {"open_errors": 3},
+        "inbox_pending": 1,
+        "events_today": [],
+    }
+    todos = digest_service.build_todo_list_fa(data)
+    texts = " | ".join(t["text"] for t in todos)
+    assert "2 تسک عقب‌افتاده" in texts and "1 ایمیل" in texts and "3 خطای باز" in texts
+    # empty state
+    empty = digest_service.build_todo_list_fa({"attention": {}, "dev": {}})
+    assert "مرتب" in empty[0]["text"]
+
+
+async def test_render_digest_html_structure(db_session):
+    from app.models.dev_sync import DevErrorIssue
+
+    db_session.add(
+        DevErrorIssue(
+            service_id="srv-1", service_name="x", fingerprint="f1", title="Boom",
+            first_seen_at=NOW, last_seen_at=NOW, status="open",
+        )
+    )
+    await db_session.commit()
+    data = await digest_service.collect_digest_data(db_session, now=NOW, tz_offset_minutes=0)
+    html = digest_service.render_digest_html(data, advice="اول تسک‌ها.", base_url="https://app.example.com")
+    for needle in ("گزارش روز", "تکلیف امروز", "تقویم", "ایمیل‌ها", "موتور توجه", "پروژه‌های توسعه", 'dir="rtl"'):
+        assert needle in html
+    assert "https://app.example.com" in html  # action link on the dev-errors todo
+    assert "<script" not in html  # email-safe
