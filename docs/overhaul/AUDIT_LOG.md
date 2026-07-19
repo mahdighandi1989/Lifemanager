@@ -1323,3 +1323,20 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   گوگل» تا صفحهٔ رضایت گوگل دسترسی جیمیل/تقویم را بگیرد؛ بعد «بررسی دسترسی جیمیل» و
   «همگام‌سازی اکنون». (اگر OAuth consent در حالت Testing است، scopeهای جدید را در
   Google Cloud Console به فهرست scopes اضافه کن.)
+
+## 2026-07-19 — تشخیص دقیق خطای اتصال گوگل (گزارش مالک: reconsent دوبار، باز 403)
+
+- **FINDING** «بررسی دسترسی جیمیل» بعد از دو بار reconnect همچنان خطا — probe هر 403 را
+  «نبود scope» ترجمه می‌کرد، در حالی که محتمل‌ترین علتِ 403 بعد از رضایتِ موفق،
+  **فعال‌نبودن خود Gmail/Calendar API در پروژهٔ Google Cloud** است (بدنهٔ پاسخ گوگل
+  reason=SERVICE_DISABLED/accessNotConfigured دارد) — دو درمان کاملاً متفاوت.
+- **CHANGE** `diagnose_google_error(exc)` در gmail_service: بدنهٔ پاسخ را می‌خواند و بین
+  `api_disabled` (فعال‌سازی API در کنسول)، `missing_scope` (reconnect + تیک چک‌باکس‌ها)،
+  `token_rejected` (invalid_grant) و خطای عمومی تمایز می‌گذارد؛ probe جدا برای تقویم؛
+  `/api/google/test` هر دو سرویس را جدا گزارش می‌دهد؛ خطای sync هم از همین تشخیص‌گر
+  پیام می‌گیرد و پنل، نتیجهٔ جیمیل/تقویم را جدا نشان می‌دهد. +۲ تست (ماتریس تشخیص +
+  probe با 403 SERVICE_DISABLED).
+- **VERIFY** google-sync ۱۳/۱۳؛ full suite ۱۱۵۸ پاس / ۱۳ خطای بیس‌لاین؛ build سبز.
+- **OWNER ACTION** در console.cloud.google.com (همان پروژهٔ CLIENT_ID) → APIs & Services →
+  Library → «Gmail API» → Enable و «Google Calendar API» → Enable؛ چند دقیقه صبر و دوباره
+  «بررسی دسترسی جیمیل». پیام جدید اگر مشکل دیگری باشد دقیقاً می‌گوید چه کنی.

@@ -94,9 +94,11 @@ async def sync_calendar(
     try:
         events = await fetch_upcoming(token, days=days, fetcher=fetcher, now=now)
     except Exception as exc:
-        msg = f"{type(exc).__name__}: {str(exc)[:200]}"
-        logger.warning("calendar fetch failed: %s", msg)
-        return {"ok": False, "error": msg, "fetched": 0, "new": 0}
+        from app.services.google_sync.gmail_service import diagnose_google_error
+
+        diagnosis = diagnose_google_error(exc)
+        logger.warning("calendar fetch failed: %s", diagnosis)
+        return {"ok": False, "error": diagnosis["detail"], "reason": diagnosis["reason"], "fetched": 0, "new": 0}
 
     new_count = 0
     sync_ts = datetime.now(timezone.utc)

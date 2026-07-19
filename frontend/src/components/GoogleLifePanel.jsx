@@ -58,10 +58,32 @@ function GoogleLifePanel() {
     try {
       const res = await api.post(path);
       const data = res.data || {};
-      if (data.ok === false) {
+      if (kind === 'test') {
+        // the probe reports gmail + calendar separately with reasoned failures
+        const parts = [];
+        const g = data.gmail || data;
+        const c = data.calendar;
+        parts.push(g.ok ? '✓ جیمیل متصل است' : `✗ جیمیل: ${g.detail || g.error || 'ناموفق'}`);
+        if (c) parts.push(c.ok ? '✓ تقویم متصل است' : `✗ تقویم: ${c.detail || c.error || 'ناموفق'}`);
+        setMsg({ kind: g.ok && (!c || c.ok) ? 'success' : 'error', text: parts.join(' — ') });
+      } else if (kind === 'sync') {
+        const g = data.gmail || {};
+        const c = data.calendar || {};
+        if (g.ok === false || c.ok === false) {
+          const parts = [];
+          if (g.ok === false) parts.push(`جیمیل: ${g.error || 'ناموفق'}`);
+          if (c.ok === false) parts.push(`تقویم: ${c.error || 'ناموفق'}`);
+          setMsg({ kind: 'error', text: parts.join(' — ') });
+        } else {
+          setMsg({
+            kind: 'success',
+            text: `${okText} — ${g.new ?? 0} ایمیل جدید، ${c.new ?? 0} رویداد جدید`,
+          });
+        }
+      } else if (data.ok === false) {
         setMsg({ kind: 'error', text: data.detail || data.error || 'ناموفق بود' });
       } else {
-        setMsg({ kind: 'success', text: okText + (data.email ? '' : '') });
+        setMsg({ kind: 'success', text: okText });
       }
       load();
     } catch (e) {

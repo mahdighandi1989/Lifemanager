@@ -309,3 +309,50 @@ async def test_google_routes_flow(api_client, fake_google):
 
     missing = api_client.post("/api/google/emails/nope/create-task", json={})
     assert missing.status_code == 404
+
+
+# ── error diagnosis (403 ≠ 403) ──────────────────────────────────────────────
+class _FakeResp:
+    def __init__(self, text):
+        self.text = text
+
+
+class _FakeHTTPError(Exception):
+    def __init__(self, msg, body):
+        super().__init__(msg)
+        self.response = _FakeResp(body)
+
+
+async def test_diagnose_google_error_reasons():
+    diag = gmail_service.diagnose_google_error
+    api_off = _FakeHTTPError(
+        "Client error '403 Forbidden'",
+        '{"error":{"status":"PERMISSION_DENIED","details":[{"reason":"SERVICE_DISABLED"}],'
+        '"message":"Gmail API has not been used in project 123 or it is disabled"}}',
+    )
+    assert diag(api_off)["reason"] == "api_disabled"
+    scope = _FakeHTTPError(
+        "Client error '403 Forbidden'",
+        '{"error":{"message":"Request had insufficient authentication scopes.",'
+        '"status":"PERMISSION_DENIED","details":[{"reason":"ACCESS_TOKEN_SCOPE_INSUFFICIENT"}]}}',
+    )
+    assert diag(scope)["reason"] == "missing_scope"
+    rejected = _FakeHTTPError("Client error '401 Unauthorized'", '{"error":"invalid_grant"}')
+    assert diag(rejected)["reason"] == "token_rejected"
+    other = RuntimeError("boom")
+    assert diag(other)["reason"] == "error"
+
+
+async def test_probe_reports_api_disabled(db_session, monkeypatch):
+    async def fake_token(db):
+        return "at-1"
+
+    async def fetch_403(method, url, headers, json_body=None):
+        raise _FakeHTTPError(
+            "Client error '403 Forbidden' for url", "Gmail API has not been used in project"
+        )
+
+    monkeypatch.setattr(gmail_service, "get_access_token", fake_token)
+    result = await gmail_service.probe(db_session, fetcher=fetch_403)
+    assert result["ok"] is False and result["reason"] == "api_disabled"
+    assert "Enable" in result["detail"] or "فعال" in result["detail"]

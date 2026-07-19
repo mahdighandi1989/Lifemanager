@@ -115,8 +115,12 @@ async def google_test(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ):
-    """Live probe: does the stored token cover Gmail? (403 ⇒ reconnect)."""
-    return await gmail_service.probe(db)
+    """Live probe for BOTH services, with reasoned failures (api_disabled vs
+    missing_scope vs token_rejected — different remedies). Top-level fields
+    stay the gmail result for back-compat."""
+    gmail = await gmail_service.probe(db)
+    calendar = await gmail_service.probe_calendar(db)
+    return {**gmail, "gmail": gmail, "calendar": calendar}
 
 
 @router.post("/api/google/sync", tags=["google-sync"])

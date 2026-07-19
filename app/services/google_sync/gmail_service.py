@@ -130,9 +130,9 @@ async def sync_gmail(
     try:
         messages = await fetch_recent(token, max_results=max_results, fetcher=fetcher)
     except Exception as exc:
-        msg = f"{type(exc).__name__}: {str(exc)[:200]}"
-        logger.warning("gmail fetch failed: %s", msg)
-        return {"ok": False, "error": msg, "fetched": 0, "new": 0}
+        diagnosis = diagnose_google_error(exc)
+        logger.warning("gmail fetch failed: %s", diagnosis)
+        return {"ok": False, "error": diagnosis["detail"], "reason": diagnosis["reason"], "fetched": 0, "new": 0}
 
     new_count = 0
     try:
@@ -195,9 +195,55 @@ async def send_email_gmail(
         return {"ok": False, "error": msg_text}
 
 
+def diagnose_google_error(exc: Exception) -> Dict[str, str]:
+    """Turn a Google API failure into the REAL reason + Persian remediation.
+    A bare 403 is ambiguous: «API فعال نیست» و «scope داده نشده» درمان‌های
+    کاملاً متفاوتی دارند — read the response body and say which."""
+    body = ""
+    response = getattr(exc, "response", None)
+    if response is not None:
+        try:
+            body = response.text[:600]
+        except Exception:
+            body = ""
+    combined = f"{exc} {body}"
+    if (
+        "accessNotConfigured" in combined
+        or "SERVICE_DISABLED" in combined
+        or "has not been used in project" in combined
+        or "it is disabled" in combined
+    ):
+        return {
+            "reason": "api_disabled",
+            "detail": (
+                "خودِ سرویس API در پروژهٔ Google Cloud فعال نیست (اجازهٔ تو مشکلی ندارد). "
+                "در console.cloud.google.com → APIs & Services → Library، "
+                "«Gmail API» و «Google Calendar API» را Enable کن و چند دقیقه بعد دوباره امتحان کن."
+            ),
+        }
+    if (
+        "ACCESS_TOKEN_SCOPE_INSUFFICIENT" in combined
+        or "insufficientPermissions" in combined
+        or "insufficient authentication scopes" in combined.lower()
+        or "403" in str(exc)
+    ):
+        return {
+            "reason": "missing_scope",
+            "detail": (
+                "توکن فعلی دسترسی این سرویس را ندارد — «قطع اتصال» و دوباره «اتصال به گوگل» بزن و "
+                "در صفحهٔ گوگل حتماً تیک جیمیل/تقویم را (اگر چک‌باکس جدا دارد) بزن."
+            ),
+        }
+    if "401" in str(exc) or "invalid_grant" in combined:
+        return {
+            "reason": "token_rejected",
+            "detail": "گوگل توکن ذخیره‌شده را رد کرد — قطع اتصال و اتصال دوباره لازم است.",
+        }
+    return {"reason": "error", "detail": f"{type(exc).__name__}: {str(exc)[:120]} {body[:200]}".strip()}
+
+
 async def probe(db: AsyncSession, fetcher: Optional[Callable] = None) -> Dict[str, Any]:
-    """«بررسی اتصال جیمیل» — GET users/me/profile. Distinguishes
-    not-connected from missing-scope (403 ⇒ reconnect needed)."""
+    """«بررسی اتصال جیمیل» — GET users/me/profile with a REASONED failure."""
     token = await get_access_token(db)
     if not token:
         return {
@@ -210,11 +256,23 @@ async def probe(db: AsyncSession, fetcher: Optional[Callable] = None) -> Dict[st
         data = await fetch("GET", f"{GMAIL_API}/users/me/profile", _headers(token))
         return {"ok": True, "email": (data or {}).get("emailAddress")}
     except Exception as exc:
-        text = str(exc)
-        if "403" in text or "insufficient" in text.lower():
-            return {
-                "ok": False,
-                "reason": "missing_scope",
-                "detail": "دسترسی جیمیل در اتصال فعلی نیست — یک بار «قطع اتصال» و دوباره «اتصال به گوگل» را بزن تا اجازهٔ جدید گرفته شود.",
-            }
-        return {"ok": False, "reason": "error", "detail": f"{type(exc).__name__}: {text[:150]}"}
+        diagnosis = diagnose_google_error(exc)
+        return {"ok": False, **diagnosis}
+
+
+async def probe_calendar(db: AsyncSession, fetcher: Optional[Callable] = None) -> Dict[str, Any]:
+    """«بررسی تقویم» — one-item events list with the same reasoned failure."""
+    token = await get_access_token(db)
+    if not token:
+        return {"ok": False, "reason": "not_connected", "detail": "گوگل متصل نیست."}
+    fetch = fetcher or _default_fetcher
+    try:
+        await fetch(
+            "GET",
+            "https://www.googleapis.com/calendar/v3/calendars/primary/events?maxResults=1",
+            _headers(token),
+        )
+        return {"ok": True}
+    except Exception as exc:
+        diagnosis = diagnose_google_error(exc)
+        return {"ok": False, **diagnosis}
