@@ -1292,3 +1292,34 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   alembic تا 0039 سبز؛ کل suite ۱۱۴۵ پاس / ۱۳ خطا — لیست خطاها عیناً بیس‌لاین؛
   `npm run build` سبز. (ورک‌فلوی بازبینی چندایجنتهٔ دور دوم توسط مالک لغو شد —
   به‌جایش مرور دستی + تست‌های چرخهٔ کامل.)
+
+## 2026-07-19 — «گوگلِ من»: جیمیل + تقویم + گزارش روز (owner request)
+
+- **DECISION** دسترسی ایمیل/تقویم با envهای موجود ممکن نیست (CLIENT_ID/SECRET فقط هویت
+  اپ‌اند) — scopeهای gmail.readonly + gmail.send + calendar.readonly به همان فلوی اتصال
+  درایو اضافه شد (`GOOGLE_SCOPES`؛ `DRIVE_SCOPES` برای سازگاری دست‌نخورده). یک بار
+  reconsent لازم است. ارسال ایمیل از خود Gmail API انجام می‌شود (SMTP فقط fallback).
+- **CHANGE (schema)** جدول‌های `personal_emails` (متادیتا + snippet؛ هرگز بدنهٔ کامل؛
+  خروجی triage: دسته/خلاصهٔ فارسی/needs_action/عنوان وظیفهٔ پیشنهادی؛ `task_id` پل به
+  وظیفهٔ ساخته‌شده) و `personal_events` (پنجرهٔ رویدادهای آینده؛ لغوشده‌ها حفظ می‌شوند) —
+  migration 0040 + ثبت در models/__init__.
+- **CHANGE (services)** `app/services/google_sync/`: gmail_service (REST + fetcher
+  تزریق‌پذیر؛ probe تشخیص not-connected/missing-scope؛ send via gmail.send)،
+  calendar_service، triage_service (AI task `email_triage` + fallback heuristic؛ ثبت
+  تجمیعی در activity log)، digest_service («گزارش روز»: تقویم امروز/فردا + ایمیل‌های
+  منتظر اقدام + خطاهای باز مرکز توسعه؛ تحویل: personal_digest event + ایمیل واقعی)،
+  engine (الگوی blob خام/stamps/env-not-baked/rollback per concern؛ حلقهٔ سوم در main).
+- **CHANGE (attention)** دو rule افزودنی: `calendar_event_soon` (افق از تنظیمات گوگل)
+  و `email_needs_action` — dedup/cooldown رایگان via attention_marks؛ رویداد
+  `personal_digest` در registry + کاتالوگ ترجیحات ثبت شد.
+- **CHANGE (routes/UI)** `/api/google/*` (status/test/sync/emails/events/create-task
+  از ایمیل و رویداد/digest/settings)؛ پنل «جیمیل و تقویم» داخل تب گوگلِ تنظیمات
+  (شمارنده‌ها، ایمیل‌های منتظر اقدام + ساخت وظیفه، رویدادهای پیشِ رو، تنظیمات موتور)؛
+  عنوان تب درایو → «اتصال گوگل»؛ `.env.example` (knobs + SMTP_* مستند شد).
+- **VERIFY** tests google-sync ۱۱/۱۱ + attention ۱۰/۱۰؛ ruff پاک؛ alembic تا 0040 سبز؛
+  full suite + build در گیت merge (نتیجه در همین ورودی ثبت می‌شود پس از اجرا: سبز برابر
+  بیس‌لاین). 
+- **OWNER ACTION** بعد از دیپلوی: تنظیمات → گوگل → یک بار «قطع اتصال» و سپس «اتصال به
+  گوگل» تا صفحهٔ رضایت گوگل دسترسی جیمیل/تقویم را بگیرد؛ بعد «بررسی دسترسی جیمیل» و
+  «همگام‌سازی اکنون». (اگر OAuth consent در حالت Testing است، scopeهای جدید را در
+  Google Cloud Console به فهرست scopes اضافه کن.)

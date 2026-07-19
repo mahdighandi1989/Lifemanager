@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
+import GoogleLifePanel from '../components/GoogleLifePanel';
 
 // Google Drive connection management panel (Settings → «گوگل درایو» tab).
 // Mirrors ALLIN1's Drive settings panel: a status grid + Connect / Disconnect /
@@ -100,9 +101,10 @@ function DriveSettings({ embedded = false }) {
   return (
     <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="drive-settings-page">
       <div className="max-w-2xl mx-auto px-4" dir="rtl">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">اتصال گوگل درایو</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-1">اتصال گوگل</h2>
         <p className="text-gray-500 text-sm mb-5">
-          فایل‌ها و داده‌های قدیمی شما به‌صورت خودکار در یک پوشه‌ی اختصاصی روی گوگل درایو شما ذخیره می‌شوند.
+          یک اتصال برای همه‌چیز: درایو (پشتیبان‌گیری فایل‌ها)، جیمیل و تقویم (پایش، تحلیل و
+          یادآوری). با دکمهٔ «اتصال» همهٔ دسترسی‌ها یک‌جا گرفته می‌شود.
         </p>
 
         {msg && (
@@ -195,6 +197,9 @@ function DriveSettings({ embedded = false }) {
                 </>
               )}
             </div>
+
+            {/* جیمیل و تقویم — same connection, its own panel */}
+            <GoogleLifePanel />
           </>
         )}
       </div>

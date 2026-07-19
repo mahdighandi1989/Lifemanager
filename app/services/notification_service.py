@@ -698,6 +698,14 @@ register_event(
 )
 register_event("morning_brief", title="☀️ برنامهٔ امروز", channels=["in_app"])
 register_event("weekly_review", title="📒 مرور هفتگی", channels=["in_app"])
+# گزارش روز شخصی (google_sync) — تقویم + ایمیل‌های منتظر اقدام + وضعیت
+# پروژه‌های توسعه. The digest service also emails the full text itself via
+# the Gmail API, so the email channel here stays a prefs-driven extra.
+register_event(
+    "personal_digest",
+    title="📒 گزارش روز",
+    channels=["in_app", "telegram"],
+)
 
 
 # ── Per-event rate-limit (Step 18) ──────────────────────────────────────

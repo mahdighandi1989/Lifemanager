@@ -196,3 +196,19 @@ criterion to **behaviour** in the real tree (auto-generated specs often cite a
 different directory layout, e.g. `backend/app/...` vs `app/...`). Most ACs were
 already met; the value was finding the **one** that wasn't (bytes never streamed)
 rather than rebuilding the rest.
+
+## Update 2026-07-19 — گسترش همان اتصال به Gmail/Calendar
+
+- **یک consent، یک refresh token برای همهٔ سرویس‌های گوگل:** scopeهای جدید را به
+  tuple مرکزی اضافه کن (`GOOGLE_SCOPES = DRIVE_SCOPES + (...)`) و tuple قدیمی را برای
+  سازگاری نگه دار. چون فلو `prompt=consent&include_granted_scopes=true` دارد، یک بار
+  reconnect همهٔ دسترسی‌ها را در یک refresh_token جدید جمع می‌کند — مدل ذخیره تغییری
+  نمی‌خواهد.
+- **کلاینت‌های سبک REST به‌جای discovery:** برای gmail/calendar فقط httpx +
+  `Authorization: Bearer <access>` کافی است (fetcher تزریق‌پذیر ⇒ تست بدون شبکه).
+  probe جدا که 403 را «missing_scope: دوباره وصل شو» ترجمه کند — با «متصل نیست» یکی
+  نکن، دو درمان متفاوت دارند.
+- **ارسال ایمیل بدون SMTP:** با scope `gmail.send`، پیام MIME را base64url کن و به
+  `users/me/messages/send` بفرست — ایمیلِ «از طرف خودم به خودم» برای گزارش روزانه؛
+  SMTP فقط fallback.
+- متادیتا+snippet را ذخیره کن نه بدنهٔ کامل (`format=metadata`) — حریم خصوصی و حجم.

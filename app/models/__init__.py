@@ -56,6 +56,7 @@ from app.models.brain import BrainUpload
 from app.models.personal_writing import PersonalWriting
 from app.models.webhook_event import WebhookEvent
 from app.models.weekly_review import WeeklyReview
+from app.models.personal_sync import PersonalEmail, PersonalEvent
 from app.models.dev_sync import (
     DevErrorIssue,
     DevIntegration,
@@ -123,6 +124,8 @@ __all__ = [
     "PersonalWriting",
     "WebhookEvent",
     "WeeklyReview",
+    "PersonalEmail",
+    "PersonalEvent",
     "DevErrorIssue",
     "DevIntegration",
     "DevProject",

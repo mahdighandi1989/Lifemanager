@@ -55,6 +55,8 @@ def test_no_referenced_google_env_var_undocumented():
     #   * GOOGLE_OAUTH    — a label prefix, never an env var.
     #   * GOOGLE_ISSUERS  — the ``_GOOGLE_ISSUERS`` set of valid ID-token
     #     issuers in google_auth.py (a code constant, not configuration).
-    allowed_internal = {"GOOGLE_OAUTH", "GOOGLE_ISSUERS"}
+    #   * GOOGLE_SCOPES   — the combined Drive+Gmail+Calendar consent scope
+    #     tuple in google_api_client.py (a code constant, not configuration).
+    allowed_internal = {"GOOGLE_OAUTH", "GOOGLE_ISSUERS", "GOOGLE_SCOPES"}
     missing = [m for m in missing if m not in allowed_internal]
     assert not missing, f"GOOGLE_* env vars referenced in code but missing from .env.example: {missing}"

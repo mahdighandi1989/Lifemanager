@@ -461,6 +461,28 @@ Background: `dev_sync_loop` (app/services/dev_sync/engine.py) started from
 `dev_logs`, `dev_log_summaries` (migration 0038). UI: `DevCenter.jsx` +
 «پروژه‌های توسعه» tab in `ProjectsHub.jsx`.
 
+### گوگلِ من — personal Gmail/Calendar sync
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/google/status` | DB-only: connected flag, account, counts (emails / action_emails / events_7d), poll stamps, settings. |
+| POST | `/api/google/test` | Live Gmail probe — distinguishes not-connected vs missing-scope (reconnect needed). |
+| POST | `/api/google/sync` | Gmail fetch (+AI/heuristic triage: category, Persian summary, needs_action, suggested task) + Calendar window sync. Mirrors into the activity log. |
+| GET | `/api/google/emails` | `needs_action`/`days`/`limit` filters; needs_action=true excludes already-filed (task_id). |
+| GET | `/api/google/events` | Upcoming window; cancelled events kept with status. |
+| POST | `/api/google/emails/{id}/create-task` · `/api/google/events/{id}/create-task` | File as a life task; links back via `task_id`. |
+| POST | `/api/google/digest/run` | «گزارش روز» now — in-app + Telegram (`personal_digest` event) + a real email via Gmail API (SMTP fallback). |
+| GET/PUT | `/api/google/settings` | Engine blob `google_sync_engine` (stamps read-only). |
+
+OAuth: the Drive connect flow now requests `GOOGLE_SCOPES` (Drive +
+gmail.readonly + gmail.send + calendar.readonly) — one consent, one refresh
+token (`google_drive_refresh_token`). Background loop `google_sync_loop`
+(gmail 30m / calendar 60m / digest at local `digest_hour`). Reminders ride
+the attention engine (rules `calendar_event_soon`, `email_needs_action` —
+cooldown dedup via attention_marks). Tables: `personal_emails`,
+`personal_events` (migration 0040). UI: `GoogleLifePanel` inside the
+Settings → گوگل tab.
+
 ### Deduplication / consolidation (audit task fbd9bd36)
 
 Reduce chaos by consolidating similar entities **without summarizing or

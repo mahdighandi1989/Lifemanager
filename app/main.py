@@ -33,6 +33,7 @@ from app.routes import (
     deduplication,
     dev_center,
     drive,
+    google_sync,
     merge,
     external_projects,
     files,
@@ -797,6 +798,8 @@ app.include_router(imports.router, tags=["imports"])
 app.include_router(external_projects.router)
 # مرکز توسعه — GitHub/Render dev-sync (absolute /api/dev/* paths, no prefix).
 app.include_router(dev_center.router, tags=["dev-center"])
+# گوگلِ من — Gmail/Calendar mirror (absolute /api/google/* paths, no prefix).
+app.include_router(google_sync.router, tags=["google-sync"])
 # webhook.router decorators carry the absolute path (/webhook, /webhook/health)
 # so it mounts with no prefix to avoid double-prefixing.
 app.include_router(webhook.router, tags=["webhook"])
@@ -962,6 +965,35 @@ async def _stop_dev_sync_engine():
             await asyncio.wait_for(task, timeout=5)
     except Exception as exc:
         logger.debug("dev-sync engine shutdown: %s", exc)
+
+
+# ── Google personal-sync loop (جیمیل + تقویم + گزارش روز). Same lifecycle
+# shape as the attention/dev-sync engines. ───────────────────────────────────
+@app.on_event("startup")
+async def _start_google_sync_engine():
+    try:
+        from app.services.google_sync.engine import google_sync_loop
+
+        app.state.google_sync_stop = asyncio.Event()
+        app.state.google_sync_task = asyncio.create_task(
+            google_sync_loop(app.state.google_sync_stop)
+        )
+        logger.info("📬 google personal-sync loop started")
+    except Exception as exc:
+        logger.warning("google personal-sync loop failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_google_sync_engine():
+    try:
+        stop = getattr(app.state, "google_sync_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "google_sync_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("google personal-sync shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

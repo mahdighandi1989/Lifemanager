@@ -45,6 +45,18 @@ DRIVE_SCOPES = (
     "profile",
 )
 
+# Full connect scope set: Drive + Gmail (read + send own mail) + Calendar
+# (read). The connect flow requests GOOGLE_SCOPES; DRIVE_SCOPES is kept
+# unchanged for existing callers (behaviour-preserving). An already-connected
+# account picks the new scopes up on the next «اتصال» click (the flow sends
+# prompt=consent + include_granted_scopes, so reconsent re-issues a
+# refresh_token covering everything).
+GOOGLE_SCOPES = DRIVE_SCOPES + (
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/calendar.readonly",
+)
+
 
 async def refresh_access_token_details(
     refresh_token: str,

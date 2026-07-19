@@ -69,6 +69,8 @@ RULE_COOLDOWN_HOURS: Dict[str, int] = {
     "document_expiry": 168,
     "subscription_renewal": 72,
     "inbox_stale": 24,
+    "calendar_event_soon": 12,
+    "email_needs_action": 24,
 }
 
 RULE_TITLES_FA: Dict[str, str] = {
@@ -79,6 +81,8 @@ RULE_TITLES_FA: Dict[str, str] = {
     "document_expiry": "📄 انقضای مدرک هویتی",
     "subscription_renewal": "💳 موعد پرداخت اشتراک",
     "inbox_stale": "📥 صندوق ورودی منتظر توست",
+    "calendar_event_soon": "🗓 رویداد نزدیک تقویم",
+    "email_needs_action": "📧 ایمیل منتظر اقدام",
 }
 
 RULE_PRIORITIES: Dict[str, str] = {
@@ -89,6 +93,8 @@ RULE_PRIORITIES: Dict[str, str] = {
     "document_expiry": "high",
     "subscription_renewal": "normal",
     "inbox_stale": "normal",
+    "calendar_event_soon": "high",
+    "email_needs_action": "normal",
 }
 
 _STRING_DATE_FORMATS = ("%d %b %Y", "%B %d, %Y", "%d %B %Y", "%b %d, %Y", "%Y-%m-%d")
@@ -355,6 +361,66 @@ async def scan_findings(
             ))
     except Exception as exc:
         logger.warning("attention inbox rule skipped: %r", exc)
+
+    # تقویم گوگل — رویدادهای نزدیک (personal_events از google_sync؛ افق از بلاب
+    # google_sync_engine خوانده می‌شود تا یک‌جا تنظیم شود). Fail-open مثل بقیه.
+    try:
+        from app.models.personal_sync import PersonalEvent
+        from app.services.google_sync.engine import load_settings as _g_cfg
+
+        gcfg = await _g_cfg(db)
+        horizon = now + timedelta(hours=int(gcfg.get("event_remind_hours", 24) or 24))
+        rows = (
+            await db.execute(
+                select(PersonalEvent).where(
+                    PersonalEvent.start_at.isnot(None),
+                    PersonalEvent.start_at >= now,
+                    PersonalEvent.start_at <= horizon,
+                    PersonalEvent.status != "cancelled",
+                ).order_by(PersonalEvent.start_at).limit(10)
+            )
+        ).scalars().all()
+        tz_off = int(gcfg.get("tz_offset_minutes", 240) or 0)
+        for ev in rows:
+            start = ev.start_at
+            if start is not None and start.tzinfo is None:
+                start = start.replace(tzinfo=timezone.utc)
+            local = (start + timedelta(minutes=tz_off)) if start else None
+            when_txt = "تمام‌روز" if ev.all_day else (local.strftime("%H:%M") if local else "—")
+            findings.append(_finding(
+                "calendar_event_soon", "personal_event", ev.id,
+                ev.summary or "(بدون عنوان)",
+                f"شروع: {when_txt}" + (f" — {ev.location}" if ev.location else ""),
+                local.date() if local else None,
+            ))
+    except Exception as exc:
+        logger.warning("attention calendar rule skipped: %r", exc)
+
+    # جیمیل — ایمیل‌های نیازمند اقدام که هنوز وظیفه نشده‌اند
+    try:
+        from app.models.personal_sync import PersonalEmail
+        from app.services.google_sync.engine import load_settings as _g_cfg2
+
+        gcfg2 = await _g_cfg2(db)
+        recent = now - timedelta(days=int(gcfg2.get("email_action_days", 7) or 7))
+        rows = (
+            await db.execute(
+                select(PersonalEmail).where(
+                    PersonalEmail.needs_action.is_(True),
+                    PersonalEmail.task_id.is_(None),
+                    PersonalEmail.received_at >= recent,
+                ).order_by(PersonalEmail.received_at.desc()).limit(10)
+            )
+        ).scalars().all()
+        for em in rows:
+            findings.append(_finding(
+                "email_needs_action", "personal_email", em.id,
+                (em.subject or "بدون موضوع")[:120],
+                em.ai_summary or "به نظر نیازمند پاسخ/اقدام است",
+                None,
+            ))
+    except Exception as exc:
+        logger.warning("attention email rule skipped: %r", exc)
 
     return findings
 

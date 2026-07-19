@@ -278,14 +278,15 @@ async def google_drive_connect(
             detail="Set GOOGLE_REDIRECT_URI to your /auth/google/callback URL to connect Drive.",
         )
 
-    from app.services.google_api_client import DRIVE_SCOPES
+    from app.services.google_api_client import GOOGLE_SCOPES
 
     nonce = secrets.token_urlsafe(24)
     params = {
         "client_id": settings.GOOGLE_CLIENT_ID,
         "redirect_uri": settings.GOOGLE_REDIRECT_URI,
         "response_type": "code",
-        "scope": " ".join(DRIVE_SCOPES),
+        # Drive + Gmail(read/send) + Calendar(read) — one consent, one token.
+        "scope": " ".join(GOOGLE_SCOPES),
         "access_type": "offline",
         # select_account → let the user choose WHICH Google account to connect
         # (not silently the current browser session); consent → force a
