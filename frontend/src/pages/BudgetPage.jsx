@@ -43,6 +43,9 @@ function AccountCard({ account }) {
 
 function BudgetPage({ embedded = false }) {
   const [accounts, setAccounts] = useState([]);
+  // Per-currency totals from the server (audit #20). null → endpoint not
+  // available / shape mismatch → fall back to grouping client-side.
+  const [currencyBalances, setCurrencyBalances] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -66,6 +69,14 @@ function BudgetPage({ embedded = false }) {
       .then((res) => setAccounts(Array.isArray(res.data) ? res.data : []))
       .catch((e) => setError('خطا در دریافت حساب‌ها: ' + (e.message || '')))
       .finally(() => setLoading(false));
+    // Per-currency truth (audit #20): the server never sums across currencies.
+    api
+      .get('/finance/balances-by-currency')
+      .then((res) => {
+        const b = res.data?.balances;
+        setCurrencyBalances(Array.isArray(b) ? b : null);
+      })
+      .catch(() => setCurrencyBalances(null));
   }, []);
 
   useEffect(() => {
@@ -104,7 +115,20 @@ function BudgetPage({ embedded = false }) {
     }
   };
 
-  const total = accounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
+  // NEVER a cross-currency sum (audit #20): a IRR account + a USD account has
+  // no meaningful single total. Prefer the server's grouping; otherwise group
+  // the loaded accounts by currency client-side.
+  const balanceRows =
+    currencyBalances ??
+    Object.values(
+      accounts.reduce((acc, a) => {
+        const cur = (a.currency || '?').toUpperCase();
+        acc[cur] = acc[cur] || { currency: cur, total: 0, accounts: 0 };
+        acc[cur].total += Number(a.balance) || 0;
+        acc[cur].accounts += 1;
+        return acc;
+      }, {}),
+    ).sort((x, y) => y.total - x.total);
 
   const checkPurchase = async (e) => {
     e.preventDefault();
@@ -149,14 +173,34 @@ function BudgetPage({ embedded = false }) {
     <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="budget-page">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8" dir="rtl">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">برنامه و بودجه</h1>
-        <p className="text-gray-500 mb-6">حساب‌های مالی شما و موجودی کل.</p>
+        <p className="text-gray-500 mb-6">حساب‌های مالی شما و موجودی به تفکیک ارز.</p>
 
-        {/* Dashboard summary */}
+        {/* Dashboard summary — one row per currency, never a cross-currency sum */}
         <div className="bg-gradient-to-l from-blue-600 to-blue-500 rounded-xl p-6 mb-6 text-white">
-          <p className="text-blue-100 text-sm">موجودی کل ({accounts.length} حساب)</p>
-          <p className="text-3xl font-bold mt-1" data-testid="budget-total">
-            {total.toLocaleString('fa-IR')}
-          </p>
+          <p className="text-blue-100 text-sm">موجودی به تفکیک ارز ({accounts.length} حساب)</p>
+          <div className="mt-2 space-y-1.5" data-testid="budget-total">
+            {balanceRows.length === 0 ? (
+              <p className="text-3xl font-bold">۰</p>
+            ) : (
+              balanceRows.map((b) => (
+                <div
+                  key={b.currency}
+                  data-testid={`budget-currency-${b.currency}`}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <span className="text-blue-100 text-sm">
+                    {b.currency}{' '}
+                    <span className="text-blue-200 text-xs">
+                      ({(b.accounts ?? 0).toLocaleString('fa-IR')} حساب)
+                    </span>
+                  </span>
+                  <span className="text-2xl font-bold" dir="ltr">
+                    {Number(b.total || 0).toLocaleString('fa-IR')}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Manual entry — record accounts + incomes (raw memo: "اینجا ثبت بکنم") */}

@@ -13,7 +13,21 @@ const KIND_STYLES = {
   general: 'border-gray-200 bg-gray-50',
 };
 
+// Quick-start prompts for the cross-domain chat (audit #4) — clicking one
+// fills the box and sends immediately.
+const CHAT_SUGGESTIONS = [
+  'وضعیت مالی‌ام چطوره؟',
+  'این هفته چی عقب افتاده؟',
+  'امروز چی کار کنم؟',
+];
+
 function SmartAssistant({ embedded = false }) {
+  // Conversational assistant (audit #4): POST /api/ai/chat with the running
+  // history. Session-state only — nothing is persisted client-side.
+  const [chatMsgs, setChatMsgs] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatBusy, setChatBusy] = useState(false);
+
   const [heartRate, setHeartRate] = useState('');
   const [noise, setNoise] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -29,6 +43,41 @@ function SmartAssistant({ embedded = false }) {
   const [tfError, setTfError] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [tfContext, setTfContext] = useState(null);
+
+  const sendChat = async (text) => {
+    const message = String(text || '').trim();
+    if (!message || chatBusy) return;
+    // Prior turns only — the new message travels in `message`, not `history`.
+    const history = chatMsgs.slice(-8).map((m) => ({ role: m.role, content: m.content }));
+    setChatMsgs((prev) => [...prev, { role: 'user', content: message }]);
+    setChatInput('');
+    setChatBusy(true);
+    try {
+      const res = await api.post('/ai/chat', { message, history });
+      const data = res.data || {};
+      setChatMsgs((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: data.text || 'پاسخی دریافت نشد.',
+          model: data.model || null,
+          // ok:false still carries a human-readable text — show it, tinted as a warning.
+          warn: data.ok === false,
+        },
+      ]);
+    } catch (e) {
+      setChatMsgs((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'خطا در گفتگو: ' + (e?.response?.data?.detail || e.message || ''),
+          warn: true,
+        },
+      ]);
+    } finally {
+      setChatBusy(false);
+    }
+  };
 
   const analyze = async () => {
     setLoading(true);
@@ -68,6 +117,84 @@ function SmartAssistant({ embedded = false }) {
         <p className="text-gray-500 mb-6">
           بر اساس وضعیت فعلی شما، موتور زمینه پیشنهادهای کار را تولید می‌کند.
         </p>
+
+        {/* Cross-domain chat (audit #4) — asks POST /api/ai/chat over the
+            user's own data; explicit dir="rtl" because replies mix Persian
+            with Latin numbers/model names (bidi rule). */}
+        <div
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6"
+          dir="rtl"
+          data-testid="assistant-chat"
+        >
+          <h2 className="font-semibold text-gray-900 mb-1">گفتگو با دستیار</h2>
+          <p className="text-xs text-gray-400 mb-3">
+            دربارهٔ تسک‌ها، مالی، افراد و برنامهٔ روزت بپرس — پاسخ از داده‌های خودت ساخته می‌شود.
+          </p>
+
+          {chatMsgs.length > 0 && (
+            <div className="space-y-2 mb-3 max-h-80 overflow-y-auto" data-testid="chat-messages">
+              {chatMsgs.map((m, i) => (
+                <div
+                  key={i}
+                  data-testid={`chat-msg-${m.role}-${i}`}
+                  className={`rounded-lg border p-3 text-sm ${
+                    m.role === 'user'
+                      ? 'bg-blue-50 border-blue-100 text-gray-800 mr-8'
+                      : m.warn
+                        ? 'bg-amber-50 border-amber-200 text-amber-800 ml-8'
+                        : 'bg-gray-50 border-gray-100 text-gray-800 ml-8'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">{m.content}</p>
+                  {m.role === 'assistant' && m.model && (
+                    <p className="text-[10px] text-gray-400 mt-1" dir="ltr" data-testid={`chat-model-${i}`}>
+                      {m.model}
+                    </p>
+                  )}
+                </div>
+              ))}
+              {chatBusy && <p className="text-xs text-gray-400">در حال فکر کردن…</p>}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 mb-3" data-testid="chat-suggestions">
+            {CHAT_SUGGESTIONS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => sendChat(s)}
+                disabled={chatBusy}
+                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full px-3 py-1 disabled:opacity-50"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendChat(chatInput);
+            }}
+            className="flex gap-2"
+          >
+            <input
+              data-testid="chat-input"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder="سؤالت را بنویس…"
+              className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              data-testid="chat-send-btn"
+              disabled={chatBusy}
+              className="bg-blue-600 text-white rounded-lg px-5 py-2 text-sm hover:bg-blue-700 disabled:opacity-50"
+            >
+              بپرس
+            </button>
+          </form>
+        </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
           <div className="flex flex-wrap gap-3 items-end">

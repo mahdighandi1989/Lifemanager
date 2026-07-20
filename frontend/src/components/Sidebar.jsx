@@ -12,7 +12,8 @@ import { Link, useLocation } from 'react-router-dom';
 // Related pages are grouped into tabbed hubs (Finance / Assistant / Data /
 // Settings). The individual pages still exist and their original routes still
 // resolve (now opening the right hub tab) — nav is decluttered, nothing deleted.
-const LINKS = [
+// Exported so Header's mobile menu renders the exact same link set.
+export const LINKS = [
   { to: '/', label: 'Dashboard', testid: 'sidebar-link-dashboard' },
   { to: '/tasks', label: 'Tasks', testid: 'sidebar-link-tasks' },
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
@@ -23,10 +24,12 @@ const LINKS = [
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people' },
   // Hubs:
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance' },
+  { to: '/life-file', label: 'پروندهٔ زندگی', testid: 'sidebar-link-life-file' },
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant' },
   { to: '/import', label: 'داده', testid: 'sidebar-link-data' },
   { to: '/attention', label: 'مراقبت و مرور', testid: 'sidebar-link-attention' },
   { to: '/activity-log', label: 'لاگ فعالیت‌ها', testid: 'sidebar-link-activity-log' },
+  { to: '/system-map', label: 'نقشهٔ سیستم', testid: 'sidebar-link-system-map' },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings' },
 ];
 

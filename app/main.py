@@ -23,7 +23,10 @@ from app.routes import (
     brain,
     command_center,
     inbox,
+    assistant_chat,
     backup,
+    global_search,
+    system_map,
     trash,
     weekly_review,
     ai_catalog,
@@ -842,6 +845,10 @@ app.include_router(attention.router, tags=["attention"])
 app.include_router(weekly_review.router, tags=["weekly-review"])
 # پشتیبان‌گیری خودکار — nightly full-DB export to Drive + manual run/export.
 app.include_router(backup.router, tags=["backup"])
+# دستیار سراسری + جستجوی سراسری + نقشهٔ سیستم (phase 4).
+app.include_router(assistant_chat.router, tags=["ai"])
+app.include_router(global_search.router, tags=["search"])
+app.include_router(system_map.router, tags=["system-map"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────

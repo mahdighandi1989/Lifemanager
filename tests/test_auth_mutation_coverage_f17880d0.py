@@ -277,11 +277,15 @@ async def test_planner_scopes_to_token_identity_ignoring_body_user_id(seeded_db)
     user_id=B in the body — the body field is ignored."""
     from app.models.task import Task
 
+    from datetime import date as _date
+
     factory, uid_a, uid_b = seeded_db
     async with factory() as db:
+        # Dated so the daily plan includes them — undated tasks are
+        # excluded from the plan since 2026-07-20 (audit #3).
         db.add_all([
-            Task(title="A-task", user_id=uid_a),
-            Task(title="B-task", user_id=uid_b),
+            Task(title="A-task", user_id=uid_a, due_date=_date.today()),
+            Task(title="B-task", user_id=uid_b, due_date=_date.today()),
         ])
         await db.commit()
 

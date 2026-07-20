@@ -20,6 +20,11 @@ const RULE_COLORS = {
   inbox_stale: 'bg-emerald-100 text-emerald-700',
 };
 
+// Rules where «ساخت تسک» makes no sense: an inbox nudge isn't actionable as a
+// task, and overdue/due-today findings ARE tasks already — a copy would only
+// duplicate them.
+const NO_TASK_RULES = new Set(['inbox_stale', 'task_overdue', 'task_due_today']);
+
 const WEEKDAYS_FA = [
   { value: 0, label: 'دوشنبه' },
   { value: 1, label: 'سه‌شنبه' },
@@ -155,6 +160,25 @@ function AttentionCenter() {
     }
   };
 
+  // «دیدن → اقدام» (audit #10): turn a finding into a real task. Labels come
+  // HTML-escaped from the scan payload, so unescape before they become a title.
+  const createTaskFrom = async (f, key) => {
+    setBusy(key);
+    try {
+      const res = await api.post('/attention/create-task', {
+        rule: f.rule,
+        label: unescapeHtml(f.label),
+        detail: unescapeHtml(f.detail),
+        date: f.date || null,
+      });
+      say(true, `تسک ساخته شد: ${res.data?.title || ''}`);
+    } catch {
+      say(false, 'ساخت تسک ناموفق بود');
+    } finally {
+      setBusy('');
+    }
+  };
+
   const groupedFindings = {};
   (scan?.findings || []).forEach((f) => {
     (groupedFindings[f.rule] = groupedFindings[f.rule] || []).push(f);
@@ -214,7 +238,20 @@ function AttentionCenter() {
                   {items.map((f, i) => (
                     <li key={`${rule}${i}`} className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm">
                       <span className="truncate text-gray-800">{unescapeHtml(f.label)}</span>
-                      <span className="shrink-0 text-xs text-gray-500">{f.detail}</span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <span className="text-xs text-gray-500">{f.detail}</span>
+                        {!NO_TASK_RULES.has(rule) && (
+                          <button
+                            type="button"
+                            data-testid={`attention-create-task-${rule}-${i}`}
+                            disabled={busy === `mk-${rule}-${i}`}
+                            onClick={() => createTaskFrom(f, `mk-${rule}-${i}`)}
+                            className="rounded-md bg-emerald-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                          >
+                            {busy === `mk-${rule}-${i}` ? '…' : '➕ ساخت تسک'}
+                          </button>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>

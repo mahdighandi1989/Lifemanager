@@ -3,6 +3,20 @@ import { useParams } from 'react-router-dom';
 import api from '../lib/api';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 
+// Persian badges for the linked tasks' status values (app/models/task.py).
+const TASK_STATUS_LABELS = {
+  todo: 'در انتظار',
+  in_progress: 'در حال انجام',
+  done: 'انجام شد',
+  cancelled: 'لغو شد',
+};
+const TASK_STATUS_COLORS = {
+  todo: 'bg-blue-100 text-blue-700',
+  in_progress: 'bg-amber-100 text-amber-700',
+  done: 'bg-green-100 text-green-700',
+  cancelled: 'bg-gray-100 text-gray-500',
+};
+
 // PersonProfilePage (audit task 3cc09436 AC4/AC6): a person's behavioural
 // profile — AI relationship score, relationship type, behaviour history — plus
 // a form to record a free-text note and a button to (re)run AI analysis.
@@ -18,6 +32,10 @@ function PersonProfilePage() {
   const [deedNote, setDeedNote] = useState('');
   const [deedImportant, setDeedImportant] = useState(false);
   const [logFilter, setLogFilter] = useState('all'); // all | good | bad
+  // CRM dates (audit #11) + linked tasks (audit #24 — the link was write-only).
+  const [dates, setDates] = useState({ birthday: '', next_follow_up: '' });
+  const [datesMsg, setDatesMsg] = useState(null);
+  const [tasks, setTasks] = useState(null); // null → loading
 
   const load = useCallback(() => {
     api
@@ -29,6 +47,20 @@ function PersonProfilePage() {
       .catch((e) => setError('خطا در دریافت پروفایل: ' + (e.message || '')));
     api.get(`/people/${id}/profile/reminders`).then((r) => setReminders(r.data?.reminders || [])).catch(() => {});
     api.get(`/people/${id}/profile/suggestions`).then((r) => setSuggestions(r.data?.suggestions || [])).catch(() => {});
+    // The person row itself carries birthday/next_follow_up (audit #11).
+    api
+      .get(`/persons/${id}`)
+      .then((r) => {
+        setDates({
+          birthday: String(r.data?.birthday || '').slice(0, 10),
+          next_follow_up: String(r.data?.next_follow_up || '').slice(0, 10),
+        });
+      })
+      .catch(() => {});
+    api
+      .get(`/persons/${id}/tasks`)
+      .then((r) => setTasks(Array.isArray(r.data?.tasks) ? r.data.tasks : []))
+      .catch(() => setTasks([]));
   }, [id]);
 
   useEffect(() => {
@@ -55,6 +87,23 @@ function PersonProfilePage() {
       .post(`/people/${id}/profile/analyze`)
       .then((res) => setProfile(res.data))
       .catch((e) => setError('خطا در تحلیل: ' + (e.message || '')))
+      .finally(() => setBusy(false));
+  };
+
+  const saveDates = (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setDatesMsg(null);
+    api
+      .put(`/persons/${id}`, {
+        birthday: dates.birthday || null,
+        next_follow_up: dates.next_follow_up || null,
+      })
+      .then(() => {
+        setDatesMsg('ذخیره شد');
+        setTimeout(() => setDatesMsg(null), 4000);
+      })
+      .catch((err) => setError('خطا در ذخیرهٔ تاریخ‌ها: ' + (err.message || '')))
       .finally(() => setBusy(false));
   };
 
@@ -95,6 +144,80 @@ function PersonProfilePage() {
           >
             {busy ? 'در حال پردازش…' : 'تحلیل هوش مصنوعی'}
           </button>
+        </section>
+
+        {/* CRM dates (audit #11): birthday + next follow-up, editable in place */}
+        <form onSubmit={saveDates} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4" data-testid="person-dates">
+          <h2 className="font-semibold text-gray-900 mb-2">تولد / موعد پیگیری</h2>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="text-sm text-gray-600">
+              تولد
+              <input
+                type="date"
+                data-testid="person-birthday-input"
+                value={dates.birthday}
+                onChange={(e) => setDates({ ...dates, birthday: e.target.value })}
+                className="mt-1 block border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                dir="ltr"
+              />
+            </label>
+            <label className="text-sm text-gray-600">
+              موعد پیگیری
+              <input
+                type="date"
+                data-testid="person-followup-input"
+                value={dates.next_follow_up}
+                onChange={(e) => setDates({ ...dates, next_follow_up: e.target.value })}
+                className="mt-1 block border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                dir="ltr"
+              />
+            </label>
+            <button
+              type="submit"
+              data-testid="save-dates-btn"
+              disabled={busy}
+              className="bg-blue-600 text-white text-sm rounded-lg px-4 py-2 hover:bg-blue-700 disabled:opacity-60"
+            >
+              ذخیره
+            </button>
+            {datesMsg && (
+              <span data-testid="dates-saved-msg" className="text-xs text-green-600">{datesMsg}</span>
+            )}
+          </div>
+        </form>
+
+        {/* Linked tasks (audit #24): the read side of person_tasks */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4" data-testid="person-tasks">
+          <h2 className="font-semibold text-gray-900 mb-2">تسک‌های مرتبط</h2>
+          {tasks === null ? (
+            <p className="text-gray-400 text-sm">در حال بارگذاری…</p>
+          ) : tasks.length === 0 ? (
+            <p className="text-gray-400 text-sm" data-testid="person-tasks-empty">تسکی وصل نشده</p>
+          ) : (
+            <ul className="space-y-1.5 text-sm" data-testid="person-tasks-list">
+              {tasks.map((t) => (
+                <li key={t.id} className="flex items-center justify-between gap-2">
+                  <span className="truncate text-gray-800">{t.title}</span>
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    {t.status && (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          TASK_STATUS_COLORS[t.status] || 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {TASK_STATUS_LABELS[t.status] || t.status}
+                      </span>
+                    )}
+                    {t.due_date && (
+                      <span className="text-[11px] text-gray-400" dir="ltr">
+                        {String(t.due_date).slice(0, 10)}
+                      </span>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <form onSubmit={saveNote} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">

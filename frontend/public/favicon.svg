@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Matches the header logo: blue rounded square + check-circle. index.html
+       already referenced /favicon.svg; this file makes that reference (and the
+       PWA manifest icon) actually resolve. -->
+  <rect width="32" height="32" rx="7" fill="#2563eb"/>
+  <path d="M11 16.5l3.2 3.2L21.5 12.4" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -634,6 +634,12 @@ class TelegramBot:
         if lower in ("/tasks", "/today", "/list"):
             return await self._cmd_tasks(chat_id)
 
+        # /ask <question> — the cross-domain assistant (phase 4, audit #4):
+        # «وضعیت مالی‌ام چطوره؟» answered from the app's live data.
+        if lower == "/ask" or lower.startswith(("/ask ", "/ask\n")):
+            question = text[len("/ask"):].strip()
+            return await self._cmd_ask(chat_id, question)
+
         # /inbox <text?> — universal capture (صندوق ورودی): drop anything, the
         # triage layer suggests where it belongs, filing happens on the Dashboard.
         # Bare /inbox reports the pending count. Plain text still goes to the
@@ -788,6 +794,26 @@ class TelegramBot:
             chat_id=chat_id, silent=True,
         )
         return {"ok": True, "handled": "inbox_captured", "item_id": item.id}
+
+    async def _cmd_ask(self, chat_id: str, question: str) -> Dict[str, Any]:
+        if not question:
+            await self.send(
+                "❓ سؤالت را بعد از /ask بنویس — مثلاً:\n/ask وضعیت مالی‌ام چطوره؟",
+                chat_id=chat_id, silent=True,
+            )
+            return {"ok": True, "handled": "ask_usage"}
+        try:
+            from app.database import SessionLocal
+            from app.services.assistant_chat_service import answer_question
+
+            async with SessionLocal() as session:
+                result = await answer_question(session, user_id=0, question=question)
+            await self.send(result["text"][:3800], chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "ask", "model": result.get("model")}
+        except Exception as exc:
+            logger.debug("telegram /ask failed: %r", exc)
+            await self.send("⚠️ الان نتوانستم پاسخ بدهم.", chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "ask_error"}
 
     async def _cmd_tasks(self, chat_id: str) -> Dict[str, Any]:
         try:
@@ -950,6 +976,7 @@ _HELP_TEXT = (
     "👋 *ربات Lifemanager*\n\n"
     "دستورها:\n"
     "• /tasks — 📋 کارهای باز (با دکمهٔ «انجام شد»)\n"
+    "• /ask — 🧠 هر سؤالی از داده‌هایت (`/ask وضعیت مالی‌ام چطوره؟`)\n"
     "• /new\\_task — 🆕 ساخت کار (می‌توانی عنوان را همان خط بنویسی: `/new_task خرید نان`)\n"
     "• /inbox — 📥 صندوق ورودی: هر چیزی را بفرست (`/inbox متن`)، خودش تشخیص می‌دهد کجا برود\n"
     "• /status — 📊 وضعیت اعلان‌ها و تعداد کارها\n"

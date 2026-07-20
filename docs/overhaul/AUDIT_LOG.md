@@ -1446,3 +1446,67 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   همان baseline پیش از تغییر است (۹ فایل قدیمی: Dashboard/Tasks/Projects تست‌های
   کامپوننت‌ناموجود، Footer/Header/Layout، api.test، Notifications.settings، hubs).
   `npm run build` سبز.
+
+## 2026-07-20 — اجرای نقشهٔ راه، فازهای ۰ تا ۴ (دستور مالک: «تا آخر برو، همه‌چیز را تمام کن»)
+
+- **CHANGE (فاز ۰ — ایمنی)** soft-delete + سطل زباله (/api/trash) برای TodoItem/PersonalWriting؛
+  بکاپ کامل شبانهٔ DB به Drive با fallback محلی + /api/backup/{status,run,export} + حلقه؛
+  payload_before در activity log؛ گیت نوشتن enforce_write_auth (dual-path پشت REQUIRE_AUTH)؛
+  REGISTER_INVITE_CODE؛ sanitizer ایدمپوتنت؛ keep-alive GitHub Action؛ «اقدامات مالک» با چک
+  زنده + تب «ایمنی داده» در تنظیمات؛ migration 0041.
+- **CHANGE (فاز ۱ — یک ستون زمان‌بندی/یک مغز)** jobs_engine (۷ کار celery مرده → حلقهٔ
+  in-process با stamp)؛ ingestion رویدادی in-process با persist؛ درز کاتالوگ در generate_text
+  (مسیر قدیمی OpenAI فقط fallback)؛ ۷ task واقعی در کاتالوگ AISettings؛ جدول ai_usage_logs +
+  /api/settings/ai-usage؛ migration 0042؛ celery قرنطینه (REMOVAL_CANDIDATES).
+- **CHANGE (فاز ۲ — یک گزارش/یک میز فرمان)** build_today + باکت‌های مالی(به‌تفکیک ارز)/تقویم/
+  افراد/رشد؛ بریف صبح همهٔ باکت‌ها + todo را چاپ می‌کند؛ گزارش شبانه بخش مالی/افراد گرفت؛ فرم
+  کامل تسک + ذخیرهٔ deadline/duration/recurrence؛ موعد آیتم لیست (هر دو مسیر + UI)؛ ۴ کارت
+  جدید داشبورد + GoogleLifePanel روی داشبورد؛ مرور هفتگی todoها را می‌شمارد.
+- **CHANGE (فاز ۳ — بستن جزیره‌ها)** ایمیل بانکی از google_sync → apply_bank_message با تطبیق
+  امن حساب (رد نوشتن مبهم)؛ Person.birthday/next_follow_up + قواعد توجه تولد/پیگیری/جریمهٔ
+  RTA؛ خواندن دوطرفهٔ person_tasks؛ planner: حذف بدون‌موعدها + estimated_duration + دورزدن
+  تقویم + پیوست به بریف صبح؛ پایان جمع چندارزی + /api/finance/balances-by-currency؛
+  Transaction.category + گزارش ماهانهٔ /api/finance/reports/monthly؛ POST
+  /api/attention/create-task (دیدن→اقدام)؛ migrations 0043/0044.
+- **CHANGE (فاز ۴ — دستیار سراسری)** assistant_chat_service (پاسخ از دادهٔ زندهٔ همهٔ
+  حوزه‌ها) + POST /api/ai/chat + فرمان /ask تلگرام؛ جستجوی سراسری /api/search (۸ حوزه،
+  fail-open، لینک ناوبری)؛ /api/system-map (نقشهٔ قابلیت‌ها + سرشماری زنده) + صفحهٔ
+  «نقشهٔ سیستم»؛ صفحهٔ «پروندهٔ زندگی» (۷+ روتر بی‌UI دیدنی شدند)؛ جعبهٔ جستجو + منوی
+  همبرگری موبایل + manifest PWA؛ چت در SmartAssistant؛ تفکیک ارزی BudgetPage؛ تب‌های گزارش
+  ماهانه/حساب‌های دیگر در FinanceHub؛ فرم افزودن فرد + تولد/پیگیری + تسک‌های فرد؛ دکمهٔ
+  «ساخت تسک» روی یافته‌های AttentionCenter.
+- **VERIFY** هر فاز: تست‌های اختصاصی سبز (۱۷+۵+…+۴ تست جدید)؛ suite کامل + build در گیت
+  merge؛ ۲ رگرسیون تست حین کار شناسایی و همان لحظه رفع شد (الگوی گیت جداگانهٔ نوشتن).
+  جزئیات کامل هر تغییر در پیام‌های کامیت همین بازه.
+
+## 2026-07-20 — فاز ۴ فرانت‌اند: پنج سطح UI روی endpointهای تازه (ممیزی #4/#7/#10/#11/#19/#20/#24)
+
+- **CHANGE** `SmartAssistant.jsx`: بخش چت واقعی بالای صفحه — لیست پیام (کاربر آبی/راست،
+  دستیار خنثی، ok:false با رنگ هشدار + متن برگشتی)، ارسال ۸ نوبت آخر به‌عنوان history به
+  `POST /api/ai/chat`، نام مدل زیر پاسخ، سه چیپ پیشنهادی که پر می‌کنند و می‌فرستند؛ فقط
+  state جلسه، چیزی ذخیره نمی‌شود.
+- **CHANGE** `BudgetPage.jsx`: «موجودی کل» تک‌عددی حذفِ نمایشی شد — کارت خلاصه حالا ردیفِ
+  هر ارز را از `/api/finance/balances-by-currency` می‌خواند (fallback: گروه‌بندی سمت
+  کلاینت بر اساس currency)؛ هرگز جمع بین‌ارزی رندر نمی‌شود. testid `budget-total` روی
+  ظرف ردیف‌ها ماند تا تست‌های موجود سبز بمانند.
+- **CHANGE** `FinanceHub.jsx`: دو تب جدید با همان الگوی تب‌های موجود — «گزارش ماهانه»
+  (جدول هر ماه: ارز/درآمد/هزینه/خالص fa-IR با dir="ltr" + باز شدن by_category + لیست
+  فشردهٔ ۲۰ تراکنش آخر با badge دسته) و «حساب‌های دیگر» (کارت‌های فقط‌خواندنی اشتراک‌ها/
+  نتلر/RTA-سالیک/شیت‌های بانکی؛ همهٔ کارت‌ها fail-open با «چیزی ثبت نشده»).
+- **CHANGE** `PeopleProfiles.jsx`: فرم «افزودن فرد» (نام الزامی؛ ایمیل/تلفن/تولد/موعد
+  پیگیری اختیاری) → `POST /api/persons` + رفرش لیست؛ badge 🎂 برای فرد دارای تولد
+  (تاریخ‌ها از `/api/persons` merge می‌شوند چون خروجی summary آن‌ها را ندارد — fail-open).
+- **CHANGE** `PersonProfilePage.jsx`: بخش «تسک‌های مرتبط» از `GET /api/persons/{id}/tasks`
+  (badge وضعیت + موعد؛ خالی: «تسکی وصل نشده») + ردیف ویرایش‌پذیر «تولد / موعد پیگیری»
+  (دو input تاریخ + ذخیره با `PUT /api/persons/{id}`).
+- **CHANGE** `AttentionCenter.jsx`: دکمهٔ «➕ ساخت تسک» کنار هر یافتهٔ اسکن →
+  `POST /api/attention/create-task` با {rule,label,detail,date} (label/detail قبل از ارسال
+  unescape می‌شوند) + پیام موفقیت با عنوان تسک؛ برای `inbox_stale` و
+  `task_overdue`/`task_due_today` (که خودشان تسک‌اند) دکمه رندر نمی‌شود.
+- **CHANGE (تست)** سه فایل vitest جدید: `SmartAssistant.chat.test.jsx` (۴ تست: post پیام +
+  رندر پاسخ/مدل، history نوبت دوم، ok:false هشدار، چیپ)، `PeopleProfiles.addPerson.test.jsx`
+  (۳ تست: post تولد/پیگیری + رفرش، بدون نام post نمی‌شود، badge 🎂)،
+  `AttentionCenter.createTask.test.jsx` (۲ تست: payload دقیق + نبود دکمه برای inbox_stale).
+- **VERIFY** `npm run build` سبز؛ suite کامل vitest: ۱۶ شکست — دقیقاً همان ۱۶ شکست
+  baseline قبل از تغییر (Header/Footer/Layout/Dashboard/Projects/Tasks/api/Notifications/
+  ProjectsHub — ربطی به این فایل‌ها ندارند)؛ ۹ تست جدید همگی سبز.

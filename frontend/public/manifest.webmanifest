@@ -1,0 +1,19 @@
+{
+  "name": "مدیریت زندگی",
+  "short_name": "زندگی",
+  "description": "Lifemanager — مدیریت هوشمند زندگی، وظایف و پروژه‌ها",
+  "dir": "rtl",
+  "lang": "fa",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#f9fafb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

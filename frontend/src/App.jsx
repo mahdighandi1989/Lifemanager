@@ -17,8 +17,10 @@ import PersonProfilePage from './pages/PersonProfilePage';
 import FinanceHub from './pages/FinanceHub';     // برنامه و بودجه + دارایی‌ها
 import AssistantHub from './pages/AssistantHub'; // پیشنهادات + تاریخچه + شخصیت + ترسیم آینده
 import DataHub from './pages/DataHub';           // ایمپورت + فایل‌های من + ادغام تسک‌ها
+import LifeFilePage from './pages/LifeFilePage';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
+import SystemMapPage from './pages/SystemMapPage';
 import Writings from './pages/Writings';
 import BrainDashboard from './pages/BrainDashboard';
 import ActivityLogPage from './pages/ActivityLogPage';
@@ -245,6 +247,26 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <FinanceHub />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/life-file"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <LifeFilePage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-map"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SystemMapPage />
                     </Layout>
                   </ProtectedRoute>
                 }

@@ -1519,16 +1519,16 @@
   "frontend": {
     "pages": [
       {
+        "name": "AISettings",
+        "file": "frontend/src/pages/AISettings.jsx"
+      },
+      {
         "name": "ActivityLogPage",
         "file": "frontend/src/pages/ActivityLogPage.jsx"
       },
       {
         "name": "AdminUsers",
         "file": "frontend/src/pages/AdminUsers.jsx"
-      },
-      {
-        "name": "AISettings",
-        "file": "frontend/src/pages/AISettings.jsx"
       },
       {
         "name": "AssetsPage",
@@ -1595,6 +1595,10 @@
         "file": "frontend/src/pages/Import.jsx"
       },
       {
+        "name": "LifeFilePage",
+        "file": "frontend/src/pages/LifeFilePage.jsx"
+      },
+      {
         "name": "ListDetail",
         "file": "frontend/src/pages/ListDetail.jsx"
       },
@@ -1623,12 +1627,12 @@
         "file": "frontend/src/pages/PeopleProfiles.jsx"
       },
       {
-        "name": "PersonalityProfilePage",
-        "file": "frontend/src/pages/PersonalityProfilePage.jsx"
-      },
-      {
         "name": "PersonProfilePage",
         "file": "frontend/src/pages/PersonProfilePage.jsx"
+      },
+      {
+        "name": "PersonalityProfilePage",
+        "file": "frontend/src/pages/PersonalityProfilePage.jsx"
       },
       {
         "name": "Projects",
@@ -1653,6 +1657,10 @@
       {
         "name": "SmartAssistant",
         "file": "frontend/src/pages/SmartAssistant.jsx"
+      },
+      {
+        "name": "SystemMapPage",
+        "file": "frontend/src/pages/SystemMapPage.jsx"
       },
       {
         "name": "Tasks",
