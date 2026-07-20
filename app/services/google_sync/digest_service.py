@@ -343,6 +343,22 @@ async def collect_digest_data(
     except Exception as exc:
         logger.debug("digest data: activity skipped: %r", exc)
 
+    # مالی + افراد (phase 2, audit #5): the nightly report finally covers
+    # money and relationships — reusing the command-center bucket
+    # builders so داشبورد/بریف/گزارش همه از یک منبع بخوانند.
+    try:
+        from app.services.command_center_service import (
+            _finance_bucket,
+            _people_bucket,
+        )
+
+        data["finance"] = await _finance_bucket(db, 0)
+        data["people"] = await _people_bucket(db)
+    except Exception as exc:
+        logger.debug("digest data: finance/people skipped: %r", exc)
+        data["finance"] = {"balances_by_currency": [], "subscriptions": []}
+        data["people"] = {"reminders": [], "reminders_count": 0}
+
     return data
 
 
@@ -562,6 +578,42 @@ def render_digest_html(
             + '<div style="font-size:11px;color:#9ca3af;margin-top:4px">تعداد فعالیت‌های ثبت‌شده در برنامه، ۷ روز اخیر</div>'
         )
 
+    # مالی + افراد (phase 2, audit #5) — money and relationships in the
+    # same nightly report. Balances stay strictly per-currency (audit #20).
+    fin = data.get("finance") or {}
+    fin_inner = ""
+    for b in (fin.get("balances_by_currency") or [])[:5]:
+        total_fmt = f"{float(b.get('total') or 0):,.0f}"
+        fin_inner += (
+            f'<div style="font-size:13px;padding:2px 0;color:#111827">'
+            f'<b dir="ltr">{_esc(total_fmt)} {_esc(b.get("currency"))}</b>'
+            f'<span style="color:#6b7280;font-size:12px"> ({_esc(b.get("accounts", 0))} حساب)</span></div>'
+        )
+    for s in (fin.get("subscriptions") or [])[:4]:
+        if s.get("next_payment_date"):
+            fin_inner += (
+                f'<div style="font-size:12px;color:#92400e;padding:2px 0">🔁 '
+                f'{_esc(s.get("provider") or "")} — پرداخت بعدی: '
+                f'<span dir="ltr">{_esc(s["next_payment_date"])}</span></div>'
+            )
+    if not fin_inner:
+        fin_inner = '<div style="font-size:13px;color:#9ca3af">حسابی ثبت نشده است.</div>'
+    ppl = data.get("people") or {}
+    ppl_inner = ""
+    for r in (ppl.get("reminders") or [])[:4]:
+        ppl_inner += (
+            f'<div style="font-size:13px;padding:2px 0;color:#111827">'
+            f'<b>{_esc(r.get("person_name") or "")}</b>: {_esc(r.get("note") or "")}</div>'
+        )
+    if ppl.get("reminders_count", 0) > 4:
+        ppl_inner += (
+            f'<div style="font-size:11px;color:#9ca3af">و '
+            f'{_esc(ppl["reminders_count"] - 4)} یادآور دیگر…</div>'
+        )
+    people_section = (
+        section("🧑‍🤝‍🧑 یادآور افراد", ppl_inner, "#7c3aed") if ppl_inner else ""
+    )
+
     advice_html = ""
     if advice:
         advice_html = section(
@@ -585,6 +637,8 @@ def render_digest_html(
         + section("📧 ایمیل‌ها", emails_inner)
         + section("⏰ هشدارهای موتور توجه", attention_inner, "#b45309")
         + section("🛠 پروژه‌های توسعه", dev_inner)
+        + section("💰 مالی", fin_inner, "#0f766e")
+        + people_section
         + (section("📊 روند فعالیت هفته", bars) if bars else "")
         + '<div style="font-size:11px;color:#9ca3af;text-align:center;margin-top:8px">'
         "این گزارش هر شب به‌صورت خودکار از Lifemanager ارسال می‌شود.</div></div>"

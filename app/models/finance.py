@@ -78,6 +78,9 @@ class Transaction(Base):
     amount = Column(Numeric(18, 2), nullable=False, default=0)
     transaction_type = Column(String(16), nullable=False, default="expense")
     description = Column(String(255), nullable=True)
+    # Phase 3 (audit #19): free-form spending category (خوراک/حمل‌ونقل/…)
+    # so the monthly report can group spending. Optional.
+    category = Column(String(64), nullable=True, index=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
 

@@ -1416,3 +1416,33 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   backup روزانه به Drive؛ بستن نوشتن ناشناس با dual-path (همراه فلوی login)؛ soft-delete
   و سطل زباله برای آیتم/نوشته؛ payload_before در activity log؛ realign فقط
   insert-if-missing؛ حذف html.escape از لایهٔ ذخیره؛ آرشیو فایل‌های منبع اصلی در Drive.
+
+## 2026-07-20 — فاز ۲ فرانت‌اند: فرم کامل تسک + موعد آیتم لیست + کارت‌های دامنهٔ داشبورد (ممیزی #۱۲/#۱۳/#۵)
+
+- **CHANGE (Tasks.jsx — ممیزی #۱۲)** فرم ایجاد تسک کامل شد: فیلدهای اختیاری موعد
+  (due_date)، اولویت (کم/متوسط/زیاد → 1/2/4 مطابق `_priority_to_int` بک‌اند؛ HIGH=4 نه 3)،
+  پروژه (از GET /api/projects) و هزینهٔ تقریبی، پشت تاگل «جزئیات بیشتر» تا quick-add
+  تک‌ضربه‌ای دست‌نخورده بماند؛ payload فقط فیلدهای پرشده را می‌فرستد. روی ردیف تسک نشان
+  موعد (قرمز اگر گذشته) و نشان اولویت (فقط غیر از پیش‌فرض ۲/متوسط — چون بک‌اند priority
+  تهی را ۲ سریال می‌کند و نشان «متوسط» روی همهٔ ردیف‌های قدیمی نویز می‌شد) اضافه شد.
+- **CHANGE (ListDetail.jsx — ممیزی #۱۳)** فرم افزودن آیتم ورودی تاریخ اختیاری گرفت
+  (due_date در POST /api/lists/{id}/items)؛ نشان موعد فارسی (fa-IR، قرمز اگر گذشته و
+  تیک‌نخورده) روی ردیف؛ ویرایش/حذف موعد آیتم موجود در پنل باز‌شده با
+  PATCH /api/todo-items/{id} و `{due_date: null}` برای پاک‌کردن (بک‌اند exclude_unset است
+  پس کلید باید صریح بیاید).
+- **CHANGE (Dashboard.jsx — ممیزی #۵)** چهار کارت دامنهٔ جدید از باکت‌های فاز-۲ی
+  /api/command-center/today: «تقویم امروز» (ساعت HH:MM محلی، تمام‌روز، خالی=«رویدادی
+  نیست»)، «مالی» (یک ردیف به‌ازای هر ارز — هرگز جمع بین‌ارزی نمی‌شود، ممیزی #۲۰؛ +
+  اشتراک‌ها با next_payment_date)، «افراد» (reminders_count + تا ۳ یادآوری)، «رشد امروز»
+  (X از Y + نوار پیشرفت). بخش تاشوی «ایمیل و تقویم گوگل» با GoogleLifePanel (همان
+  کامپوننت DriveSettings — از آن‌جا حذف نشد) به انتهای داشبورد اضافه شد؛ پیش‌فرض بسته و
+  unmount است پس فراخوان‌های /google/* فقط با باز کردن شلیک می‌شوند و پنل خودش همهٔ
+  خطاها را می‌بلعد (fail-open، داشبورد سفید نمی‌شود).
+- **VERIFY** ۲ فایل تست جدید (۴ تست): `Tasks.createForm.test.jsx` (payload شامل
+  due_date/priority/project_id/estimated_cost وقتی پر شوند؛ quick-add فقط-عنوان همان
+  payload حداقلی قبلی)، `Dashboard.todayCards.test.jsx` (رندر ۴ کارت از payload ماک؛
+  تاگل گوگل: پیش‌فرض unmount، بدون فراخوان /google/status، پس از کلیک mount و fail-open
+  با ماک‌های reject‌شده). suite کامل: ۹۴ پاس / ۱۶ شکست — مجموعهٔ شکست‌ها بایت‌به‌بایت
+  همان baseline پیش از تغییر است (۹ فایل قدیمی: Dashboard/Tasks/Projects تست‌های
+  کامپوننت‌ناموجود، Footer/Header/Layout، api.test، Notifications.settings، hubs).
+  `npm run build` سبز.

@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id, get_required_user_id
+from app.dependencies.auth import enforce_write_auth, get_optional_user_id
 from app.middleware import handle_errors
 from app.models.todo_list import TodoList
 from app.schemas.todo_item_schema import (
@@ -130,7 +130,8 @@ async def get_todo_item(item_id: int, db: AsyncSession = Depends(get_db)) -> dic
 async def create_todo_item(
     payload: TodoItemCreate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     # Audit task f17880d0: a new item may only be filed into lists the
     # caller can reach (their own or legacy-unowned). Reject an attempt to
@@ -193,7 +194,8 @@ async def update_todo_item(
     item_id: int,
     payload: TodoItemUpdate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     before = await todo_item_service.get_item(db, item_id)
@@ -226,7 +228,8 @@ async def update_todo_item(
 async def delete_todo_item(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> None:
     """Soft delete — the item moves to the trash (سطل زباله) and can be
     restored from /api/trash. Hard removal only via the purge endpoint."""
@@ -260,7 +263,8 @@ async def delete_todo_item(
 async def toggle_complete(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_complete(db, item_id)
@@ -284,7 +288,8 @@ async def toggle_complete(
 async def toggle_star(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_star(db, item_id)
@@ -303,7 +308,8 @@ async def share_item(
     item_id: int,
     payload: TodoItemShare,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.share_with_lists(db, item_id, payload.list_ids)
@@ -320,7 +326,8 @@ async def unshare_item(
     item_id: int,
     payload: TodoItemUnshare,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.unshare_from_lists(db, item_id, payload.list_ids)
@@ -337,7 +344,8 @@ async def move_item(
     item_id: int,
     payload: TodoItemMove,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.move_item(

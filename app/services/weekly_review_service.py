@@ -179,6 +179,30 @@ async def gather_stats(
     except Exception as exc:
         logger.warning("weekly stats: tasks block skipped: %r", exc)
 
+    # آیتم‌های لیست — completed this week (audit #13: todos were invisible
+    # to the weekly narrative even though they carry completed_at).
+    try:
+        from app.models.todo_item import TodoItem
+
+        stats["todo_items"] = {
+            "completed": int(
+                (
+                    await db.execute(
+                        select(func.count()).select_from(TodoItem).where(
+                            _scope(TodoItem.owner_id, user_id),
+                            TodoItem.deleted_at.is_(None),
+                            TodoItem.completed_at.isnot(None),
+                            TodoItem.completed_at >= start,
+                            TodoItem.completed_at < end,
+                        )
+                    )
+                ).scalar()
+                or 0
+            ),
+        }
+    except Exception as exc:
+        logger.warning("weekly stats: todo block skipped: %r", exc)
+
     # صندوق ورودی funnel
     try:
         from app.models.inbox_item import InboxItem
@@ -270,6 +294,9 @@ def fallback_narrative(stats: Dict[str, Any]) -> str:
     ]
     if stats.get("writings_created"):
         lines.append(f"• نوشته‌های جدید: {stats['writings_created']}")
+    todo_done = (stats.get("todo_items") or {}).get("completed", 0)
+    if todo_done:
+        lines.append(f"• آیتم‌های لیست تکمیل‌شده: {todo_done}")
     overdue = tasks.get("overdue_titles") or []
     if overdue:
         lines.append("• عقب‌افتاده‌های فعلی: " + "، ".join(overdue[:5]))

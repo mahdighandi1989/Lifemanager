@@ -141,10 +141,16 @@ def _priority_key(task: Task) -> tuple:
     return (weight, due, created)
 
 
-def _is_due_on(task: Task, target_date) -> bool:
-    """True if the task has no due date, or its due date is on/before target_date."""
+def _is_due_on(task: Task, target_date, *, include_undated: bool = False) -> bool:
+    """True if the task's due date is on/before ``target_date``.
+
+    2026-07-20 (audit #3): tasks with NO due date used to be included
+    unconditionally, flooding every day's plan with the whole backlog.
+    They are now excluded by default; ``include_undated=True`` restores
+    the old behaviour for callers that want the backlog view.
+    """
     if not task.due_date:
-        return True
+        return include_undated
     due = task.due_date
     if hasattr(due, "date"):
         due = due.date() if not isinstance(due, type(target_date)) else due
@@ -155,6 +161,8 @@ async def generate_daily_plan(
     db: AsyncSession,
     user_id: int,
     target_date=None,
+    *,
+    include_undated: bool = False,
 ) -> dict:
     """Return a prioritised list of tasks for ``target_date`` plus a summary.
 
@@ -176,17 +184,59 @@ async def generate_daily_plan(
         .order_by(Task.created_at.desc())
     )
     result = await db.execute(stmt)
-    candidates = [t for t in result.scalars().all() if _is_due_on(t, target_date)]
+    candidates = [
+        t for t in result.scalars().all()
+        if _is_due_on(t, target_date, include_undated=include_undated)
+    ]
 
     prioritised = sorted(candidates, key=_priority_key)
 
-    # Build a lightweight schedule: 30 min slots starting at 09:00 local time.
-    slot_minutes = 30
-    start = datetime.combine(target_date, time(hour=9))
+    # Calendar awareness (2026-07-20, audit #15): the plan schedules
+    # AROUND the day's Google Calendar mirror events instead of on top
+    # of them. Fail-open — no calendar rows ⇒ a free day.
+    busy: list[tuple[datetime, datetime]] = []
+    try:
+        from app.models.personal_sync import PersonalEvent
+
+        day_start = datetime.combine(target_date, time(hour=0))
+        day_end = day_start + timedelta(days=1)
+        ev_rows = (
+            await db.execute(
+                select(PersonalEvent).where(
+                    PersonalEvent.start_at.isnot(None),
+                    PersonalEvent.all_day.is_(False),
+                    PersonalEvent.start_at >= day_start - timedelta(hours=14),
+                    PersonalEvent.start_at < day_end + timedelta(hours=14),
+                )
+            )
+        ).scalars().all()
+        for ev in ev_rows:
+            ev_start = ev.start_at.replace(tzinfo=None) if ev.start_at.tzinfo else ev.start_at
+            ev_end = ev.end_at.replace(tzinfo=None) if (ev.end_at and ev.end_at.tzinfo) else (ev.end_at or ev_start + timedelta(hours=1))
+            if ev.status != "cancelled" and ev_end > day_start and ev_start < day_end:
+                busy.append((ev_start, ev_end))
+    except Exception:
+        busy = []
+
+    def _conflicts(s: datetime, e: datetime) -> bool:
+        return any(s < b_end and e > b_start for b_start, b_end in busy)
+
+    # Schedule respecting each task's estimated_duration (audit #3: the
+    # stored minutes were never read — fixed; 30-min default remains).
+    cursor = datetime.combine(target_date, time(hour=9))
+    day_cap = datetime.combine(target_date, time(hour=21))
     schedule = []
-    for index, task in enumerate(prioritised):
-        slot_start = start + timedelta(minutes=index * slot_minutes)
-        slot_end = slot_start + timedelta(minutes=slot_minutes)
+    for task in prioritised:
+        minutes = int(task.estimated_duration or 30)
+        minutes = max(10, min(minutes, 8 * 60))
+        # advance past busy calendar blocks
+        while _conflicts(cursor, cursor + timedelta(minutes=minutes)) and cursor < day_cap:
+            cursor += timedelta(minutes=15)
+        slot_start = cursor
+        slot_end = slot_start + timedelta(minutes=minutes)
+        if slot_end > day_cap:
+            break  # the day is full — remaining tasks stay in `tasks` unscheduled
+        cursor = slot_end
         schedule.append(
             {
                 "task_id": task.id,

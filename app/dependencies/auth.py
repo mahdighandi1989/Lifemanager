@@ -303,3 +303,38 @@ async def get_current_admin_user(
             detail="Admin access required",
         )
     return current_user
+
+async def enforce_write_auth(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Write-path gate (data-safety phase 0, refined 2026-07-20).
+
+    Composed NEXT TO ``get_optional_user_id`` on mutation endpoints so
+    identity resolution stays overridable in tests (the f17880d0 suite
+    pins authorization semantics through that override) while strictness
+    is enforced separately:
+
+      * token present but invalid → 401 always (attack signal).
+      * no token + ``REQUIRE_AUTH=true`` → 401 (anon writes refused).
+      * no token + ``REQUIRE_AUTH=false`` (default) → allowed, unchanged.
+    """
+    token = _extract_token(request)
+    if token is None:
+        if settings.REQUIRE_AUTH:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication required",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return
+    try:
+        uid = await _resolve_data_scope_user_id(token, db)
+    except Exception:
+        uid = None
+    if uid is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

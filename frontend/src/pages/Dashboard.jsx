@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
+import GoogleLifePanel from '../components/GoogleLifePanel';
 
 // Use /api so the fetches reach the JSON endpoints, not the SPA route.
 const API_BASE = '/api';
@@ -134,6 +135,16 @@ function InboxRow({ item, onFile, onDismiss, busy }) {
   );
 }
 
+// "2026-07-20T09:30:00+00:00" → "09:30" (local clock) for the calendar
+// card; all-day events render as «تمام‌روز».
+function eventTimeHHMM(ev) {
+  if (ev.all_day) return 'تمام‌روز';
+  if (!ev.start_at) return '—';
+  const d = new Date(ev.start_at);
+  if (Number.isNaN(d.getTime())) return String(ev.start_at).slice(11, 16);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
 function SectionCard({ title, badge, badgeCls, children, footer }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
@@ -165,6 +176,9 @@ function Dashboard() {
   const [captureBusy, setCaptureBusy] = useState(false);
   const [captureFeedback, setCaptureFeedback] = useState(null);
   const [inboxBusyId, setInboxBusyId] = useState(null);
+  // Google mirror panel — collapsed (and unmounted) by default so its
+  // /google/* calls only fire when the user opens the section.
+  const [showGooglePanel, setShowGooglePanel] = useState(false);
 
   const fetchToday = useCallback(async () => {
     try {
@@ -273,6 +287,14 @@ function Dashboard() {
   const inbox = today?.inbox;
   const notifications = today?.notifications;
   const todo = today?.todo;
+  // Phase-2 domain buckets (audit #5): مالی، تقویم، افراد، رشد.
+  const calendarBucket = today?.calendar;
+  const finance = today?.finance;
+  const people = today?.people;
+  const growth = today?.growth;
+  const growthPct = growth?.today_total
+    ? Math.round((100 * (growth.today_done || 0)) / growth.today_total)
+    : 0;
   // Calm zero-states are only truthful when we actually HAVE fresh data —
   // a failed fetch with no data must not render as «همه‌چیز آرام است».
   const showEmptyStates = !todayLoading && !(todayError && !today);
@@ -455,6 +477,134 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* Phase-2 domain cards (audit #5): تقویم / مالی / افراد / رشد —
+            the domains that previously had no presence on «امروز من». */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <SectionCard
+            title="🗓 تقویم امروز"
+            badge={todayLoading ? '…' : calendarBucket?.events?.length || 0}
+            badgeCls="bg-indigo-100 text-indigo-700"
+          >
+            {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
+            {showEmptyStates && !(calendarBucket?.events?.length) && (
+              <p className="text-sm text-gray-400">رویدادی نیست</p>
+            )}
+            {calendarBucket?.events?.slice(0, 5).map((ev) => (
+              <div
+                key={ev.id}
+                className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2"
+              >
+                <span className="truncate text-sm text-gray-800" dir="auto">
+                  {ev.summary}
+                </span>
+                <span className="shrink-0 text-xs text-gray-500" dir="ltr">
+                  {eventTimeHHMM(ev)}
+                </span>
+              </div>
+            ))}
+          </SectionCard>
+
+          <SectionCard
+            title="💰 مالی"
+            badge={todayLoading ? '…' : finance?.balances_by_currency?.length || 0}
+            badgeCls="bg-emerald-100 text-emerald-700"
+            footer={
+              <Link to="/finance" className="mt-3 block text-xs font-medium text-blue-600 hover:text-blue-700">
+                بخش مالی ←
+              </Link>
+            }
+          >
+            {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
+            {showEmptyStates && !(finance?.balances_by_currency?.length || finance?.subscriptions?.length) && (
+              <p className="text-sm text-gray-400">حسابی ثبت نشده است.</p>
+            )}
+            {/* One row per currency — totals are NEVER summed across
+                currencies (audit #20). */}
+            {finance?.balances_by_currency?.map((b) => (
+              <div
+                key={b.currency}
+                className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2"
+                data-testid={`finance-currency-${b.currency}`}
+              >
+                <span className="text-sm font-medium text-gray-800">
+                  {Number(b.total || 0).toLocaleString('fa-IR')}{' '}
+                  <span className="text-xs text-gray-500" dir="ltr">{b.currency}</span>
+                </span>
+                <span className="shrink-0 text-xs text-gray-400">
+                  {b.accounts} حساب
+                </span>
+              </div>
+            ))}
+            {finance?.subscriptions?.slice(0, 3).map((s) => (
+              <div
+                key={s.id}
+                className="flex items-center justify-between gap-2 rounded-lg border border-amber-100 bg-amber-50/50 px-3 py-2"
+              >
+                <span className="truncate text-xs text-gray-700" dir="auto">
+                  {s.provider}
+                  {s.plan ? ` — ${s.plan}` : ''}
+                </span>
+                {s.next_payment_date && (
+                  <span className="shrink-0 text-xs text-gray-500" dir="ltr">
+                    {s.next_payment_date}
+                  </span>
+                )}
+              </div>
+            ))}
+          </SectionCard>
+
+          <SectionCard
+            title="👥 افراد"
+            badge={todayLoading ? '…' : people?.reminders_count || 0}
+            badgeCls="bg-purple-100 text-purple-700"
+            footer={
+              <Link to="/people-profiles" className="mt-3 block text-xs font-medium text-blue-600 hover:text-blue-700">
+                همهٔ افراد ←
+              </Link>
+            }
+          >
+            {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
+            {showEmptyStates && !(people?.reminders?.length) && (
+              <p className="text-sm text-gray-400">یادآوری‌ای برای افراد نیست.</p>
+            )}
+            {people?.reminders?.slice(0, 3).map((r, i) => (
+              <div
+                key={`${r.person_id}-${i}`}
+                className="rounded-lg border border-gray-200 bg-white px-3 py-2"
+              >
+                <p className="text-sm text-gray-800 truncate">
+                  <span className="font-medium">{unescapeHtml(r.person_name)}</span>
+                  {r.note ? `: ${unescapeHtml(r.note)}` : ''}
+                </p>
+              </div>
+            ))}
+          </SectionCard>
+
+          <SectionCard
+            title="🌱 رشد امروز"
+            badge={todayLoading ? '…' : `${growth?.today_done || 0} از ${growth?.today_total || 0}`}
+            badgeCls="bg-green-100 text-green-700"
+          >
+            {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
+            {showEmptyStates && !growth?.today_total && (
+              <p className="text-sm text-gray-400">امروز چک‌اینی ثبت نشده است.</p>
+            )}
+            {growth?.today_total > 0 && (
+              <div data-testid="growth-progress">
+                <p className="text-sm text-gray-700 mb-2">
+                  {`${growth.today_done || 0} از ${growth.today_total} انجام شد`}
+                </p>
+                <div className="h-2 w-full rounded-full bg-gray-100">
+                  <div
+                    className="h-2 rounded-full bg-green-500 transition-all"
+                    style={{ width: `${Math.min(100, growthPct)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </SectionCard>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           <StatCard
@@ -557,6 +707,28 @@ function Dashboard() {
               </div>
             </Link>
           </div>
+        </div>
+
+        {/* «ایمیل و تقویم گوگل» — the same GoogleLifePanel that lives in
+            DriveSettings, mirrored here behind a collapsed toggle. It stays
+            unmounted until opened, so its /google/* calls only fire on
+            demand, and the panel itself swallows every API failure
+            (.catch(() => {})) — a broken Google mirror can never blank the
+            dashboard. */}
+        <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6" data-testid="dashboard-google-section">
+          <button
+            type="button"
+            onClick={() => setShowGooglePanel((v) => !v)}
+            className="flex w-full items-center justify-between gap-2"
+            aria-expanded={showGooglePanel}
+            data-testid="dashboard-google-toggle"
+          >
+            <h2 className="text-lg font-semibold text-gray-900">📧 ایمیل و تقویم گوگل</h2>
+            <span className="text-sm font-medium text-blue-600">
+              {showGooglePanel ? 'بستن ▲' : 'نمایش ▼'}
+            </span>
+          </button>
+          {showGooglePanel && <GoogleLifePanel />}
         </div>
       </div>
     </div>

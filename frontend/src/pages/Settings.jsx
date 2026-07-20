@@ -3,6 +3,7 @@ import AISettings from './AISettings';
 import Notifications from './Notifications';
 import DriveSettings from './DriveSettings';
 import DevSyncSettings from '../components/DevSyncSettings';
+import DataSafetyPanel from '../components/DataSafetyPanel';
 
 // Settings is a tabbed shell consolidating the app's configuration:
 //   • هوش مصنوعی  → the AI catalog (AISettings) + the global analysis prompt
@@ -30,6 +31,8 @@ const TABS = [
   { id: 'notifications', label: 'اعلان‌ها' },
   { id: 'drive', label: 'گوگل درایو' },
   { id: 'dev', label: 'مرکز توسعه' },
+  // ایمنی داده: اقدامات مالک + بکاپ + سطل زباله (data-safety phase 0)
+  { id: 'safety', label: 'ایمنی داده' },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -76,6 +79,7 @@ function Settings() {
           {tab === 'notifications' && <Notifications embedded />}
           {tab === 'drive' && <DriveSettings embedded />}
           {tab === 'dev' && <DevSyncSettings showCenterLink />}
+          {tab === 'safety' && <DataSafetyPanel />}
         </div>
       </div>
     </div>

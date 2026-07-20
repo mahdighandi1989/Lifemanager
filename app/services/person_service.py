@@ -24,6 +24,8 @@ async def create_person(
         email=str(payload.email) if payload.email else None,
         phone=_sanitize(payload.phone),
         notes=_sanitize(payload.notes),
+        birthday=payload.birthday,
+        next_follow_up=payload.next_follow_up,
     )
     db.add(person)
     await db.commit()
@@ -69,6 +71,10 @@ async def update_person(
         person.phone = _sanitize(payload.phone)
     if payload.notes is not None:
         person.notes = _sanitize(payload.notes)
+    if payload.birthday is not None:
+        person.birthday = payload.birthday
+    if payload.next_follow_up is not None:
+        person.next_follow_up = payload.next_follow_up
     await db.commit()
     await db.refresh(person)
     return person

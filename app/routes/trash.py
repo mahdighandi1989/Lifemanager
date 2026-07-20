@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id, get_required_user_id
+from app.dependencies.auth import enforce_write_auth, get_optional_user_id
 from app.middleware import handle_errors
 from app.models.personal_writing import PersonalWriting
 from app.services import todo_item_service
@@ -71,7 +71,8 @@ async def list_trash(
 async def restore_todo_item(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     item = await todo_item_service.restore_item(db, item_id)
     await record_activity(
@@ -89,7 +90,8 @@ async def restore_todo_item(
 async def purge_todo_item(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> None:
     # Purge only accepts rows that are already in the trash — a live
     # item must go through the normal (soft) DELETE first.
@@ -114,7 +116,8 @@ async def purge_todo_item(
 async def restore_writing(
     writing_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     w = (
         await db.execute(
@@ -143,7 +146,8 @@ async def restore_writing(
 async def purge_writing(
     writing_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> None:
     w = (
         await db.execute(

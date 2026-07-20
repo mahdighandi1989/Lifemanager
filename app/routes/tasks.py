@@ -140,6 +140,9 @@ def _serialize(t: Task) -> dict:
         "project_id": t.project_id,
         "due_date": t.due_date.isoformat() if t.due_date else None,
         "estimated_cost": float(t.estimated_cost) if t.estimated_cost is not None else None,
+        "deadline": t.deadline.isoformat() if t.deadline else None,
+        "estimated_duration": t.estimated_duration,
+        "recurrence": t.recurrence,
         "created_at": t.created_at.isoformat() if t.created_at else None,
         "updated_at": t.updated_at.isoformat() if t.updated_at else None,
     }
@@ -255,6 +258,11 @@ async def create_task(
         project_id=payload.project_id,
         due_date=payload.due_date,
         estimated_cost=payload.estimated_cost,
+        # Accepted by the schema but silently dropped before 2026-07-20
+        # (audit #12 deep layer) — planner/recurrence depend on them.
+        deadline=payload.deadline,
+        estimated_duration=payload.estimated_duration,
+        recurrence=payload.recurrence,
     )
     db.add(task)
     await db.commit()
@@ -304,6 +312,12 @@ async def update_task(
         task.project_id = data["project_id"]
     if "estimated_cost" in data:
         task.estimated_cost = data["estimated_cost"]
+    if "deadline" in data:
+        task.deadline = data["deadline"]
+    if "estimated_duration" in data:
+        task.estimated_duration = data["estimated_duration"]
+    if "recurrence" in data:
+        task.recurrence = data["recurrence"]
 
     await db.commit()
     await db.refresh(task)
@@ -392,3 +406,33 @@ async def link_persons_to_task(
             linked.append(pid)
     await db.commit()
     return {"task_id": task_id, "linked_person_ids": linked}
+
+
+@router.get("/api/tasks/{task_id}/persons", tags=["tasks"])
+@handle_errors
+async def task_persons_list(
+    task_id: int,
+    db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """افراد مرتبط با این تسک — the READ side of person_tasks (audit #24)."""
+    from sqlalchemy import select as _select
+
+    from app.models.person import Person
+    from app.models.person_task import person_tasks
+
+    task = await db.get(Task, task_id)
+    if task is None or not _task_visible_to(task, caller_user_id):
+        raise HTTPException(status_code=404, detail="Task not found")
+    rows = (
+        await db.execute(
+            _select(Person)
+            .join(person_tasks, person_tasks.c.person_id == Person.id)
+            .where(person_tasks.c.task_id == task_id)
+        )
+    ).scalars().all()
+    return {
+        "ok": True,
+        "task_id": task_id,
+        "persons": [{"id": p.id, "name": p.name} for p in rows],
+    }

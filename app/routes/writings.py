@@ -12,7 +12,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id, get_required_user_id
+from app.dependencies.auth import enforce_write_auth, get_optional_user_id
 from app.middleware import handle_errors
 from app.models.personal_writing import PersonalWriting
 from app.services.activity_log_service import record_activity
@@ -102,7 +102,8 @@ async def get_writing(
 async def create_writing(
     payload: WritingCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     w = PersonalWriting(
         title=payload.title.strip()[:500], body=payload.body,
@@ -127,7 +128,8 @@ async def update_writing(
     writing_id: int,
     payload: WritingUpdate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     w = (await db.execute(
         select(PersonalWriting).where(PersonalWriting.id == writing_id, _scope(user_id))
@@ -168,7 +170,8 @@ async def update_writing(
 async def delete_writing(
     writing_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ):
     """Soft delete — the writing moves to the trash (سطل زباله) and can
     be restored from /api/trash; hard removal only via trash purge."""

@@ -49,7 +49,7 @@ async def test_generate_daily_plan_includes_user_tasks(session_factory):
     await _add_task(session_factory, title="a", user_id=1)
     await _add_task(session_factory, title="b", user_id=1)
     async with session_factory() as db:
-        plan = await generate_daily_plan(db, user_id=1)
+        plan = await generate_daily_plan(db, user_id=1, include_undated=True)
     assert plan["total"] == 2
     assert {t["title"] for t in plan["tasks"]} == {"a", "b"}
     assert len(plan["daily_plan"]) == 2
@@ -62,7 +62,7 @@ async def test_generate_daily_plan_sorts_by_priority(session_factory):
     await _add_task(session_factory, title="critical-task", user_id=1, priority=TaskPriority.CRITICAL)
     await _add_task(session_factory, title="low-task", user_id=1, priority=TaskPriority.LOW)
     async with session_factory() as db:
-        plan = await generate_daily_plan(db, user_id=1)
+        plan = await generate_daily_plan(db, user_id=1, include_undated=True)
     titles = [t["title"] for t in plan["tasks"]]
     assert titles.index("critical-task") < titles.index("medium-task") < titles.index("low-task")
 
@@ -72,7 +72,7 @@ async def test_generate_daily_plan_excludes_done_tasks(session_factory):
     await _add_task(session_factory, title="open", user_id=1, status=TaskStatus.TODO)
     await _add_task(session_factory, title="done", user_id=1, status=TaskStatus.DONE)
     async with session_factory() as db:
-        plan = await generate_daily_plan(db, user_id=1)
+        plan = await generate_daily_plan(db, user_id=1, include_undated=True)
     titles = [t["title"] for t in plan["tasks"]]
     assert "open" in titles
     assert "done" not in titles
@@ -82,7 +82,9 @@ async def test_generate_daily_plan_excludes_done_tasks(session_factory):
 async def test_generate_daily_plan_schedule_carries_starts_at(session_factory):
     await _add_task(session_factory, title="x", user_id=1)
     async with session_factory() as db:
-        plan = await generate_daily_plan(db, user_id=1, target_date="2025-03-15")
+        plan = await generate_daily_plan(
+            db, user_id=1, target_date="2025-03-15", include_undated=True
+        )
     slot = plan["daily_plan"][0]
     assert slot["task_id"] is not None
     assert slot["starts_at"].startswith("2025-03-15T09:00")
@@ -143,3 +145,16 @@ async def test_suggest_task_priorities_handles_empty_list():
     result = await suggest_task_priorities([])
     assert result["generated_text"] == ""
     assert result["tokens_used"] == 0
+
+
+@pytest.mark.asyncio
+async def test_generate_daily_plan_excludes_undated_by_default(session_factory):
+    """2026-07-20 audit #3: undated backlog tasks must NOT flood every
+    day's plan — they only appear with include_undated=True."""
+    await _add_task(session_factory, title="undated", user_id=1)
+    async with session_factory() as db:
+        plan = await generate_daily_plan(db, user_id=1)
+    assert plan["total"] == 0 and plan["daily_plan"] == []
+    async with session_factory() as db:
+        backlog = await generate_daily_plan(db, user_id=1, include_undated=True)
+    assert backlog["total"] == 1

@@ -13,6 +13,7 @@ external piece (see TO-DO/) — the parse→apply path itself is fully in-repo.
 """
 from __future__ import annotations
 
+import re
 from decimal import Decimal
 from typing import Optional
 
@@ -23,12 +24,44 @@ from app.models.finance import FinancialAccount, Transaction
 
 
 async def _pick_account(
-    db: AsyncSession, *, user_id: int, account_id: Optional[int]
+    db: AsyncSession,
+    *,
+    user_id: int,
+    account_id: Optional[int],
+    sender_hint: Optional[str] = None,
 ) -> Optional[FinancialAccount]:
+    """Resolve WHICH account a bank message belongs to.
+
+    2026-07-20 audit #6: the old ``.first()`` grabbed an arbitrary account
+    and overwrote its balance. Now: explicit account_id wins; else try to
+    match the sender/bank hint against account name/institution; else fall
+    back to ``.first()`` ONLY when the user has exactly one account —
+    with several accounts and no confident match we refuse (None) rather
+    than corrupt the wrong balance.
+    """
     stmt = select(FinancialAccount).where(FinancialAccount.user_id == user_id)
     if account_id is not None:
         stmt = stmt.where(FinancialAccount.id == account_id)
-    return (await db.execute(stmt)).scalars().first()
+        return (await db.execute(stmt)).scalars().first()
+    accounts = (await db.execute(stmt)).scalars().all()
+    if not accounts:
+        return None
+    if sender_hint:
+        hint = sender_hint.lower()
+        for acc in accounts:
+            for field in (acc.institution, acc.name):
+                if field and len(field) >= 3 and field.lower() in hint:
+                    return acc
+        # try token overlap the other way (hint token appears in the field)
+        tokens = [t for t in re.split(r"[^a-z0-9؀-ۿ]+", hint) if len(t) >= 3]
+        for acc in accounts:
+            joined = f"{acc.institution or ''} {acc.name or ''}".lower()
+            for t in tokens:
+                if t in joined:
+                    return acc
+    if len(accounts) == 1:
+        return accounts[0]
+    return None
 
 
 async def apply_bank_message(
@@ -38,6 +71,7 @@ async def apply_bank_message(
     channel: str,
     body: str,
     account_id: Optional[int] = None,
+    sender: Optional[str] = None,
 ) -> dict:
     """Parse ``body`` (channel ``email``|``sms``), update the matching account's
     balance, record the delta as a Transaction, and trigger the affordable-tasks
@@ -55,9 +89,12 @@ async def apply_bank_message(
     if new_balance is None:
         return {"matched": False, "balances_updated": 0}
 
-    account = await _pick_account(db, user_id=user_id, account_id=account_id)
+    account = await _pick_account(
+        db, user_id=user_id, account_id=account_id,
+        sender_hint=f"{sender or ''} {body[:300]}",
+    )
     if account is None:
-        return {"matched": True, "balances_updated": 0, "reason": "no account"}
+        return {"matched": True, "balances_updated": 0, "reason": "no confident account match"}
 
     old = Decimal(str(account.balance or 0))
     new = Decimal(str(new_balance))

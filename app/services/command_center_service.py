@@ -200,8 +200,20 @@ async def build_today(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
         or 0
     )
 
+    # ── Phase 2 buckets (2026-07-20, audit #5): مالی، تقویم، افراد، رشد —
+    # the domains that had NO card in «امروز من». Each is fail-open so a
+    # broken domain never blanks the dashboard or the morning brief.
+    finance_bucket = await _finance_bucket(db, user_id)
+    calendar_bucket = await _calendar_bucket(db)
+    people_bucket = await _people_bucket(db)
+    growth_bucket = await _growth_bucket(db, user_id, today)
+
     return {
         "today": today.isoformat(),
+        "finance": finance_bucket,
+        "calendar": calendar_bucket,
+        "people": people_bucket,
+        "growth": growth_bucket,
         "tasks": {
             "overdue": [_task_row(t) for t in overdue[:_LIST_LIMIT]],
             "due_today": [_task_row(t) for t in due_today[:_LIST_LIMIT]],
@@ -247,3 +259,165 @@ async def build_today(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
             "projects_total": projects_total,
         },
     }
+
+
+# --- Phase 2 bucket builders (fail-open, each isolated) ---------------------
+
+
+async def _finance_bucket(db: AsyncSession, user_id: int) -> Dict[str, Any]:
+    """Balances grouped per currency (NEVER summed across currencies —
+    audit #20) + subscriptions with a known next payment."""
+    try:
+        from app.models.finance import FinancialAccount
+        from app.models.subscription_account import SubscriptionAccount
+
+        rows = (
+            await db.execute(
+                select(
+                    FinancialAccount.currency,
+                    func.count(FinancialAccount.id),
+                    func.sum(FinancialAccount.balance),
+                )
+                .where(_scope(FinancialAccount.user_id, user_id))
+                .group_by(FinancialAccount.currency)
+            )
+        ).all()
+        subs = (
+            await db.execute(
+                select(SubscriptionAccount)
+                .where(_scope(SubscriptionAccount.user_id, user_id))
+                .limit(10)
+            )
+        ).scalars().all()
+        return {
+            "balances_by_currency": [
+                {
+                    "currency": r[0] or "?",
+                    "accounts": int(r[1] or 0),
+                    "total": float(r[2] or 0),
+                }
+                for r in rows
+            ],
+            "subscriptions": [
+                {
+                    "id": s.id,
+                    "provider": s.provider,
+                    "plan": s.plan,
+                    "next_payment_date": s.next_payment_date,
+                }
+                for s in subs
+            ],
+        }
+    except Exception:
+        return {"balances_by_currency": [], "subscriptions": []}
+
+
+async def _calendar_bucket(db: AsyncSession) -> Dict[str, Any]:
+    """Today's + tomorrow's Google Calendar mirror rows (read-only)."""
+    try:
+        from app.models.personal_sync import PersonalEvent
+
+        now = datetime.now(timezone.utc)
+        window_end = now + timedelta(hours=36)
+        events = (
+            await db.execute(
+                select(PersonalEvent)
+                .where(
+                    PersonalEvent.start_at.is_not(None),
+                    PersonalEvent.start_at >= now - timedelta(hours=6),
+                    PersonalEvent.start_at <= window_end,
+                    or_(
+                        PersonalEvent.status.is_(None),
+                        PersonalEvent.status != "cancelled",
+                    ),
+                )
+                .order_by(PersonalEvent.start_at.asc())
+                .limit(10)
+            )
+        ).scalars().all()
+        return {
+            "events": [
+                {
+                    "id": e.id,
+                    "summary": e.summary,
+                    "start_at": e.start_at.isoformat() if e.start_at else None,
+                    "all_day": bool(e.all_day),
+                    "location": e.location,
+                }
+                for e in events
+            ],
+        }
+    except Exception:
+        return {"events": []}
+
+
+async def _people_bucket(db: AsyncSession) -> Dict[str, Any]:
+    """Flagged «فراموش نکنم» deeds across all people — the CRM's reminders
+    finally surfacing outside each person's own page (audit #11)."""
+    try:
+        from app.models.person import Person
+        from app.models.person_profile import PersonProfile
+
+        rows = (
+            await db.execute(
+                select(PersonProfile, Person.name)
+                .join(Person, Person.id == PersonProfile.person_id)
+                .limit(200)
+            )
+        ).all()
+        reminders: List[Dict[str, Any]] = []
+        for profile, person_name in rows:
+            for entry in (profile.behavior_log or []):
+                if isinstance(entry, dict) and entry.get("important"):
+                    reminders.append({
+                        "person_id": profile.person_id,
+                        "person_name": person_name,
+                        "note": (entry.get("text") or entry.get("note") or "")[:200],
+                    })
+        return {"reminders": reminders[:10], "reminders_count": len(reminders)}
+    except Exception:
+        return {"reminders": [], "reminders_count": 0}
+
+
+async def _growth_bucket(db: AsyncSession, user_id: int, today: date) -> Dict[str, Any]:
+    """Self-improvement today: X از Y (check-ins) — the growth domain's
+    first appearance on the dashboard/brief."""
+    try:
+        from app.models.self_improvement import (
+            CHECKIN_STATUS_AUTO_DONE,
+            CHECKIN_STATUS_DONE,
+            SelfImprovementCheckIn,
+        )
+
+        total = int(
+            (
+                await db.execute(
+                    select(func.count())
+                    .select_from(SelfImprovementCheckIn)
+                    .where(
+                        SelfImprovementCheckIn.checkin_date == today,
+                        _scope(SelfImprovementCheckIn.user_id, user_id),
+                    )
+                )
+            ).scalar()
+            or 0
+        )
+        done = int(
+            (
+                await db.execute(
+                    select(func.count())
+                    .select_from(SelfImprovementCheckIn)
+                    .where(
+                        SelfImprovementCheckIn.checkin_date == today,
+                        _scope(SelfImprovementCheckIn.user_id, user_id),
+                        SelfImprovementCheckIn.status.in_(
+                            [CHECKIN_STATUS_DONE, CHECKIN_STATUS_AUTO_DONE]
+                        ),
+                    )
+                )
+            ).scalar()
+            or 0
+        )
+        return {"today_total": total, "today_done": done}
+    except Exception:
+        return {"today_total": 0, "today_done": 0}

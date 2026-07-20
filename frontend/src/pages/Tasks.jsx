@@ -36,11 +36,37 @@ const STATUS_COLORS = {
 // caption stay in sync.
 const COMPLETED_STATUSES = new Set(['done', 'completed']);
 
+// Priority ints as the backend speaks them (app/routes/tasks.py):
+// _priority_to_int maps LOW→1, MEDIUM→2, HIGH→4, CRITICAL→5, and an
+// unset priority serialises as 2 (MEDIUM). On the way in, 0..1→LOW,
+// 2..3→MEDIUM, 4→HIGH, 5→CRITICAL — so the form sends 1/2/4 for
+// کم/متوسط/زیاد to survive the round-trip unchanged.
+const PRIORITY_LABELS = { 1: 'کم', 2: 'متوسط', 3: 'متوسط', 4: 'زیاد', 5: 'بحرانی' };
+const PRIORITY_COLORS = {
+  1: 'bg-gray-100 text-gray-600',
+  4: 'bg-orange-100 text-orange-700',
+  5: 'bg-red-100 text-red-700',
+};
+
+// Local (not UTC) today as YYYY-MM-DD, for the «موعد گذشته» tint.
+const localTodayISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 function TaskRow({ task, onToggle }) {
   // Default to the backend's canonical "todo" sentinel when no
   // status is set (e.g. a task created before the column existed).
   const status = task.status || (task.is_completed ? 'done' : 'todo');
   const isDone = COMPLETED_STATUSES.has(status);
+  const overdue = task.due_date && !isDone && task.due_date < localTodayISO();
+  // Backend serialises an unset priority as 2 (MEDIUM), so a
+  // «متوسط» badge on every legacy row would be pure noise — only
+  // non-default priorities get a badge.
+  const priorityBadge =
+    task.priority != null && task.priority !== 2 && task.priority !== 3
+      ? task.priority
+      : null;
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
       <div className="flex items-center space-x-3">
@@ -69,9 +95,30 @@ function TaskRow({ task, onToggle }) {
           )}
         </div>
       </div>
-      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_COLORS[status] || 'bg-gray-100 text-gray-600'}`}>
-        {STATUS_LABELS[status] || status}
-      </span>
+      <div className="flex items-center gap-2">
+        {task.due_date && (
+          <span
+            className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              overdue ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
+            }`}
+            dir="ltr"
+            data-testid={`task-due-badge-${task.id}`}
+          >
+            📅 {task.due_date}
+          </span>
+        )}
+        {priorityBadge && (
+          <span
+            className={`text-xs font-medium px-2 py-0.5 rounded-full ${PRIORITY_COLORS[priorityBadge] || 'bg-gray-100 text-gray-600'}`}
+            data-testid={`task-priority-badge-${task.id}`}
+          >
+            {PRIORITY_LABELS[priorityBadge] || priorityBadge}
+          </span>
+        )}
+        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_COLORS[status] || 'bg-gray-100 text-gray-600'}`}>
+          {STATUS_LABELS[status] || status}
+        </span>
+      </div>
     </div>
   );
 }
@@ -86,6 +133,14 @@ function Tasks() {
   // Person picker (audit task 3cc09436, AC8): pick people to link to the task.
   const [persons, setPersons] = useState([]);
   const [selectedPersonIds, setSelectedPersonIds] = useState([]);
+  // Optional create-form fields (audit #12) — hidden behind «جزئیات
+  // بیشتر» so the one-keystroke quick-add stays untouched.
+  const [showDetails, setShowDetails] = useState(false);
+  const [newDueDate, setNewDueDate] = useState('');
+  const [newPriority, setNewPriority] = useState('');
+  const [newProjectId, setNewProjectId] = useState('');
+  const [newCost, setNewCost] = useState('');
+  const [projects, setProjects] = useState([]);
 
   const fetchPersons = async () => {
     try {
@@ -96,6 +151,18 @@ function Tasks() {
       }
     } catch {
       // non-fatal — the task form still works without the picker
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/projects`);
+      if (res.ok) {
+        const data = await res.json();
+        setProjects(Array.isArray(data) ? data : []);
+      }
+    } catch {
+      // non-fatal — the task form still works without the project picker
     }
   };
 
@@ -113,22 +180,36 @@ function Tasks() {
     }
   };
 
-  useEffect(() => { fetchTasks(); fetchPersons(); }, []);
+  useEffect(() => { fetchTasks(); fetchPersons(); fetchProjects(); }, []);
 
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
     setAdding(true);
     try {
+      // Optional fields ride along only when the user actually set
+      // them — a bare title still posts the same minimal payload as
+      // before (quick-add unchanged).
+      const payload = { title: newTitle.trim(), status: 'todo' };
+      if (newDueDate) payload.due_date = newDueDate;
+      if (newPriority) payload.priority = Number(newPriority);
+      if (newProjectId) payload.project_id = Number(newProjectId);
+      if (newCost !== '' && Number.isFinite(Number(newCost))) {
+        payload.estimated_cost = Number(newCost);
+      }
       const res = await fetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle.trim(), status: 'todo' }),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         const task = await res.json();
         setTasks(prev => [task, ...prev]);
         setNewTitle('');
+        setNewDueDate('');
+        setNewPriority('');
+        setNewProjectId('');
+        setNewCost('');
         // Link any picked people to the new task (AC8).
         if (selectedPersonIds.length && task?.id) {
           try {
@@ -201,6 +282,79 @@ function Tasks() {
             >
               {adding ? 'در حال افزودن...' : 'افزودن'}
             </button>
+          </div>
+          {/* Optional fields (audit #12) — collapsed by default so the
+              one-keystroke quick-add flow stays intact. dir="rtl" on the
+              block keeps the Persian labels bidi-safe (document root is
+              dir="ltr"). */}
+          <div dir="rtl">
+            <button
+              type="button"
+              onClick={() => setShowDetails((v) => !v)}
+              className="text-xs text-blue-600 hover:underline"
+              data-testid="task-details-toggle"
+              aria-expanded={showDetails}
+            >
+              {showDetails ? 'جزئیات کمتر ▲' : 'جزئیات بیشتر ▼'}
+            </button>
+            {showDetails && (
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="task-details-fields">
+                <label className="block text-xs text-gray-500">
+                  موعد
+                  <input
+                    type="date"
+                    value={newDueDate}
+                    onChange={(e) => setNewDueDate(e.target.value)}
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    dir="ltr"
+                    data-testid="task-due-input"
+                  />
+                </label>
+                <label className="block text-xs text-gray-500">
+                  اولویت
+                  <select
+                    value={newPriority}
+                    onChange={(e) => setNewPriority(e.target.value)}
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    data-testid="task-priority-select"
+                  >
+                    {/* Ints per app/routes/tasks.py: LOW=1, MEDIUM=2, HIGH=4. */}
+                    <option value="">بدون</option>
+                    <option value="1">کم</option>
+                    <option value="2">متوسط</option>
+                    <option value="4">زیاد</option>
+                  </select>
+                </label>
+                <label className="block text-xs text-gray-500">
+                  پروژه
+                  <select
+                    value={newProjectId}
+                    onChange={(e) => setNewProjectId(e.target.value)}
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    data-testid="task-project-select"
+                  >
+                    <option value="">بدون پروژه</option>
+                    {projects.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-xs text-gray-500">
+                  هزینهٔ تقریبی
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={newCost}
+                    onChange={(e) => setNewCost(e.target.value)}
+                    placeholder="مثلاً ۵۰۰۰۰"
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    dir="ltr"
+                    data-testid="task-cost-input"
+                  />
+                </label>
+              </div>
+            )}
           </div>
           {persons.length > 0 && (
             <div data-testid="task-person-picker">

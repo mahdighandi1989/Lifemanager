@@ -10,7 +10,7 @@ Thin shells over ``app/services/attention_service``:
 """
 from typing import Any, Dict
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -86,3 +86,56 @@ async def put_attention_settings(
     cleaned = {k: v for k, v in (partial or {}).items() if k not in _INTERNAL_STAMPS}
     cfg = await attention_service.update_settings(db, cleaned)
     return {"ok": True, "success": True, "settings": cfg}
+
+
+@router.post("/api/attention/create-task", tags=["attention"])
+@handle_errors
+async def create_task_from_finding(
+    payload: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """ساخت تسک از یک یافتهٔ موتور توجه — بستن حلقهٔ «دیدن → اقدام»
+    (phase 3, audit #10: هشدار انقضا هرگز تسک تمدید نمی‌ساخت)."""
+    from datetime import date as _date
+
+    from app.models.task import Task, TaskPriority, TaskStatus
+    from app.services.activity_log_service import record_activity
+
+    label = str(payload.get("label") or "").strip()
+    rule = str(payload.get("rule") or "").strip()
+    if not label:
+        raise HTTPException(status_code=400, detail="label is required")
+    title_by_rule = {
+        "license_expiry": f"تمدید گواهینامه — {label}",
+        "document_expiry": f"تمدید مدرک — {label}",
+        "subscription_renewal": f"رسیدگی به اشتراک {label}",
+        "rta_fines": f"پرداخت جریمهٔ RTA — {label}",
+        "person_birthday": f"تبریک تولد {label}",
+        "person_follow_up": f"پیگیری {label}",
+    }
+    title = title_by_rule.get(rule, f"رسیدگی: {label}")
+    due = None
+    raw_date = payload.get("date")
+    if isinstance(raw_date, str) and raw_date.strip():
+        try:
+            due = _date.fromisoformat(raw_date.strip()[:10])
+        except ValueError:
+            due = None
+    task = Task(
+        title=title[:200],
+        description=str(payload.get("detail") or "")[:1000] or None,
+        status=TaskStatus.TODO,
+        priority=TaskPriority.HIGH,
+        user_id=user_id if user_id != 0 else None,
+        due_date=due,
+    )
+    db.add(task)
+    await db.commit()
+    await db.refresh(task)
+    await record_activity(
+        action="create", entity_type="task", entity_id=task.id,
+        entity_label=task.title, detail=f"ساخت تسک از هشدار توجه ({rule})",
+        user_id=user_id, db=db,
+    )
+    return {"ok": True, "task_id": task.id, "title": task.title}

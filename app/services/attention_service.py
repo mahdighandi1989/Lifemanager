@@ -71,6 +71,9 @@ RULE_COOLDOWN_HOURS: Dict[str, int] = {
     "inbox_stale": 24,
     "calendar_event_soon": 12,
     "email_needs_action": 24,
+    "person_birthday": 24,
+    "person_follow_up": 48,
+    "rta_fines": 72,
 }
 
 RULE_TITLES_FA: Dict[str, str] = {
@@ -83,6 +86,9 @@ RULE_TITLES_FA: Dict[str, str] = {
     "inbox_stale": "📥 صندوق ورودی منتظر توست",
     "calendar_event_soon": "🗓 رویداد نزدیک تقویم",
     "email_needs_action": "📧 ایمیل منتظر اقدام",
+    "person_birthday": "🎂 تولد نزدیک",
+    "person_follow_up": "🧑‍🤝‍🧑 موعد پیگیری فرد",
+    "rta_fines": "🚗 جریمه/امتیاز منفی RTA",
 }
 
 RULE_PRIORITIES: Dict[str, str] = {
@@ -95,6 +101,9 @@ RULE_PRIORITIES: Dict[str, str] = {
     "inbox_stale": "normal",
     "calendar_event_soon": "high",
     "email_needs_action": "normal",
+    "person_birthday": "high",
+    "person_follow_up": "normal",
+    "rta_fines": "high",
 }
 
 _STRING_DATE_FORMATS = ("%d %b %Y", "%B %d, %Y", "%d %B %Y", "%b %d, %Y", "%Y-%m-%d")
@@ -336,6 +345,78 @@ async def scan_findings(
             ))
     except Exception as exc:
         logger.warning("attention subscription rule skipped: %r", exc)
+
+    # people — birthdays + due follow-ups (phase 3, audit #11: the CRM
+    # finally speaks up outside its own page)
+    try:
+        from sqlalchemy import or_
+
+        from app.models.person import Person
+
+        birthday_horizon_days = int(cfg.get("birthday_days", 7))
+        rows = (
+            await db.execute(
+                select(Person).where(
+                    _scope(Person.user_id, user_id),
+                    or_(
+                        Person.birthday.isnot(None),
+                        Person.next_follow_up.isnot(None),
+                    ),
+                )
+            )
+        ).scalars().all()
+        for p in rows:
+            if p.birthday:
+                try:
+                    next_bd = p.birthday.replace(year=today.year)
+                    if next_bd < today:
+                        next_bd = p.birthday.replace(year=today.year + 1)
+                except ValueError:  # Feb 29 on a non-leap year
+                    next_bd = date(today.year + (1 if (today.month, today.day) > (3, 1) else 0), 3, 1)
+                days = (next_bd - today).days
+                if 0 <= days <= birthday_horizon_days:
+                    detail = "امروز تولدشه! 🎂" if days == 0 else f"{days} روز تا تولد"
+                    findings.append(_finding(
+                        "person_birthday", "person", p.id, p.name, detail, next_bd,
+                    ))
+            if p.next_follow_up and p.next_follow_up <= today:
+                overdue_days = (today - p.next_follow_up).days
+                detail = (
+                    "موعد پیگیری امروز است" if overdue_days == 0
+                    else f"{overdue_days} روز از موعد پیگیری گذشته"
+                )
+                findings.append(_finding(
+                    "person_follow_up", "person", p.id, p.name, detail, p.next_follow_up,
+                ))
+    except Exception as exc:
+        logger.warning("attention people rule skipped: %r", exc)
+
+    # RTA — payable fines / black points (phase 3, audit #10: «جریمه
+    # رانندگی هرگز خودش را نشان نمی‌دهد»)
+    try:
+        from app.models.rta_account import RTAAccount
+
+        rows = (
+            await db.execute(
+                select(RTAAccount).where(_scope(RTAAccount.user_id, user_id))
+            )
+        ).scalars().all()
+        for r in rows:
+            fines = float(getattr(r, "fines_payable", 0) or 0)
+            points = int(getattr(r, "black_points", 0) or 0)
+            if fines > 0 or points > 0:
+                bits = []
+                if fines > 0:
+                    bits.append(f"{fines:,.0f} درهم جریمهٔ پرداخت‌نشده")
+                if points > 0:
+                    bits.append(f"{points} امتیاز منفی")
+                findings.append(_finding(
+                    "rta_fines", "rta_account", r.id,
+                    getattr(r, "name", None) or "حساب RTA",
+                    " و ".join(bits), None,
+                ))
+    except Exception as exc:
+        logger.warning("attention rta rule skipped: %r", exc)
 
     # inbox — pending captures growing stale (one aggregate finding)
     try:
@@ -583,6 +664,39 @@ def _brief_text(today_payload: Dict[str, Any], local: datetime) -> str:
         lines.append(f"🔜 هفت روز آینده: {tasks.get('upcoming_count', len(upcoming))} مورد")
     if not (overdue or due_today):
         lines.append("🌿 امروز موعد فوری نداری.")
+    # Phase 2 (2026-07-20, audit #13/#16): the brief now prints the todo
+    # bucket build_today always computed, plus the new calendar/finance/
+    # people/growth buckets — one aggregate, one report.
+    todo = today_payload.get("todo", {}) or {}
+    todo_due = todo.get("due") or []
+    if todo_due:
+        lines.append(f"📋 آیتم‌های لیست ({len(todo_due)}):")
+        lines += [f"  • {i['content'][:60]}" for i in todo_due[:5]]
+    calendar = today_payload.get("calendar", {}) or {}
+    events = calendar.get("events") or []
+    if events:
+        lines.append(f"🗓 تقویم امروز/فردا ({len(events)}):")
+        for e in events[:5]:
+            when = (e.get("start_at") or "")[11:16]
+            title = (e.get("summary") or "بدون عنوان")[:50]
+            lines.append(f"  • {when} {title}".rstrip())
+    people = today_payload.get("people", {}) or {}
+    if people.get("reminders_count"):
+        lines.append(f"🧑‍🤝‍🧑 یادآور افراد: {people['reminders_count']} مورد «فراموش نکنم»")
+        lines += [
+            f"  • {r['person_name']}: {r['note'][:50]}"
+            for r in (people.get("reminders") or [])[:3]
+        ]
+    growth = today_payload.get("growth", {}) or {}
+    if growth.get("today_total"):
+        lines.append(
+            f"🌱 خودسازی امروز: {growth.get('today_done', 0)} از {growth['today_total']}"
+        )
+    finance = today_payload.get("finance", {}) or {}
+    balances = finance.get("balances_by_currency") or []
+    if balances:
+        parts = [f"{b['total']:,.0f} {b['currency']}" for b in balances[:4]]
+        lines.append("💰 موجودی‌ها: " + " | ".join(parts))
     pending = inbox.get("pending_count", 0)
     if pending:
         lines.append(f"📥 صندوق ورودی: {pending} مورد منتظر تصمیم")
@@ -641,6 +755,21 @@ async def send_morning_brief(
 
     today_payload = await build_today(db, user_id)
     text = _brief_text(today_payload, local)
+    # «برنامهٔ پیشنهادی امروز» (phase 3, audit #3): the planner finally
+    # gets a consumer — its calendar-aware schedule rides the brief.
+    try:
+        from app.services.planner_service import generate_daily_plan
+
+        plan = await generate_daily_plan(db, user_id, target_date=local.date())
+        slots = (plan or {}).get("daily_plan") or []
+        if slots:
+            text += "\n\n🧭 برنامهٔ پیشنهادی امروز:"
+            for s in slots[:6]:
+                text += f"\n  • {s['starts_at'][11:16]} {s['title'][:50]}"
+            if len(slots) > 6:
+                text += f"\n  … و {len(slots) - 6} مورد دیگر"
+    except Exception as exc:
+        logger.debug("brief plan section skipped: %r", exc)
     ai_line = await _brief_ai_line(db, text)
     if ai_line:
         text = f"{text}\n\n💬 {ai_line}"

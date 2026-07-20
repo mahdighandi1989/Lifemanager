@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id, get_required_user_id
+from app.dependencies.auth import enforce_write_auth, get_optional_user_id
 from app.middleware import handle_errors
 from app.schemas.todo_item_schema import TodoItemOut
 from app.schemas.todo_list_schema import (
@@ -146,7 +146,8 @@ async def get_list(
 async def create_list(
     payload: TodoListCreate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     """Create a list owned by the caller (audit task f17880d0).
 
@@ -186,7 +187,8 @@ async def update_list(
     list_id: int,
     payload: TodoListUpdate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     """Update a list the caller owns (audit task f17880d0).
 
@@ -217,7 +219,8 @@ async def update_list(
 async def delete_list(
     list_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> None:
     """Delete a list the caller owns (audit task f17880d0).
 
@@ -260,7 +263,8 @@ async def list_items_in_list(
 async def sync_lists_from_file(
     upload: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     """Sync one TodoList + its items from an uploaded JSON file.
 
@@ -311,7 +315,8 @@ async def add_item_to_list(
     list_id: int,
     payload: dict,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_required_user_id),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
 ) -> dict:
     """Quick-add an item directly into this list.
 

@@ -36,6 +36,39 @@ _RE_ACTIONISH = re.compile(
     re.I,
 )
 
+# Bank-sender detection (phase 3, audit #6): the live Gmail sync had ZERO
+# finance references while the IMAP poller waited for credentials that
+# never came. Emails matching this pattern are ALSO routed through
+# finance_ingest_service.apply_bank_message (best-effort, snippet-only).
+_RE_BANK_SENDER = re.compile(
+    r"(bankfab|fab\.ae|emiratesnbd|adcb|mashreq|rakbank|cbd\.ae|dib\.ae|"
+    r"adib\.ae|hsbc|citibank|standardchartered|noor ?bank|neteller|"
+    r"بانک|balance|available balance|موجودی)",
+    re.I,
+)
+
+
+async def _route_bank_email(db: AsyncSession, email: PersonalEmail) -> bool:
+    """Feed a bank-looking email through the finance apply path. Returns
+    True when a balance was actually applied. Never raises."""
+    try:
+        blob = f"{email.from_addr or ''} {email.subject or ''}"
+        if not _RE_BANK_SENDER.search(blob):
+            return False
+        from app.services.finance_ingest_service import apply_bank_message
+
+        res = await apply_bank_message(
+            db,
+            user_id=0,
+            channel="email",
+            body=f"{email.subject or ''}\n{email.snippet or ''}",
+            sender=email.from_addr,
+        )
+        return bool(res.get("balances_updated"))
+    except Exception as exc:
+        logger.debug("bank email routing skipped (%s): %r", email.id, exc)
+        return False
+
 
 def heuristic_triage(email: PersonalEmail) -> Dict[str, Any]:
     text = f"{email.subject or ''} {email.snippet or ''}"
@@ -137,6 +170,7 @@ async def analyze_new_emails(
 
     now = datetime.now(timezone.utc)
     action_titles: List[str] = []
+    finance_routed = 0
     for email in rows:
         result, model = await _ai_triage(db, email)
         if result is None:
@@ -149,6 +183,8 @@ async def analyze_new_emails(
         email.analyzed_at = now
         if email.needs_action:
             action_titles.append((email.subject or email.ai_summary or "بدون موضوع")[:80])
+        if await _route_bank_email(db, email):
+            finance_routed += 1
     try:
         await db.commit()
     except Exception:
@@ -171,4 +207,4 @@ async def analyze_new_emails(
         )
     except Exception as exc:
         logger.debug("email triage activity mirror skipped: %r", exc)
-    return {"ok": True, "analyzed": len(rows), "needs_action": len(action_titles)}
+    return {"ok": True, "analyzed": len(rows), "needs_action": len(action_titles), "finance_routed": finance_routed}

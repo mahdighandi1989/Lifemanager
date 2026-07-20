@@ -27,12 +27,12 @@ def _to_decimal(value) -> Decimal:
 
 async def notify_affordable_tasks(db: AsyncSession, user_id: int) -> List[int]:
     """Notify the user about each estimated-cost task their balance covers."""
-    balances = (
-        await db.execute(
-            select(FinancialAccount.balance).where(FinancialAccount.user_id == user_id)
-        )
-    ).scalars().all()
-    total_balance = sum((_to_decimal(b) for b in balances), Decimal(0))
+    # 2026-07-20 audit #20: this helper was both plan-blind and summed
+    # currencies raw. It now shares budget_service's single source of
+    # truth (plan first, else the largest single-currency total).
+    from app.services.budget_service import _available_budget
+
+    total_balance, _plan_id, _currency = await _available_budget(db, user_id)
 
     tasks = (
         await db.execute(

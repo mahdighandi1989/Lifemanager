@@ -370,3 +370,43 @@ async def person_suggestions(
     if person is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
     return {"suggestions": await person_profile_service.get_suggestions(db, person_id=person_id)}
+
+
+@router.get("/api/persons/{person_id}/tasks", tags=["persons"])
+@handle_errors
+async def person_tasks_list(
+    person_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """تسک‌های مرتبط با این فرد — the READ side of person_tasks that never
+    existed (2026-07-20 audit #24: the link was write-only)."""
+    from sqlalchemy import select
+
+    from app.models.person_task import person_tasks
+    from app.models.task import Task
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    rows = (
+        await db.execute(
+            select(Task)
+            .join(person_tasks, person_tasks.c.task_id == Task.id)
+            .where(person_tasks.c.person_id == person_id)
+            .order_by(Task.id.desc())
+        )
+    ).scalars().all()
+    return {
+        "ok": True,
+        "person_id": person_id,
+        "tasks": [
+            {
+                "id": t.id,
+                "title": t.title,
+                "status": t.status.value if t.status else None,
+                "due_date": t.due_date.isoformat() if t.due_date else None,
+            }
+            for t in rows
+        ],
+    }

@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_required_user_id
+from app.dependencies.auth import get_optional_user_id, get_required_user_id
 from app.middleware import handle_errors
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
 from app.services.activity_log_service import record_activity
@@ -353,6 +353,7 @@ class TransactionCreate(BaseModel):
     amount: Decimal = Field(..., ge=0)
     transaction_type: str = Field(default="expense", pattern="^(income|expense)$")
     description: Optional[str] = Field(default=None, max_length=255)
+    category: Optional[str] = Field(default=None, max_length=64)
 
 
 class TransactionResponse(BaseModel):
@@ -363,6 +364,7 @@ class TransactionResponse(BaseModel):
     amount: Decimal
     transaction_type: str
     description: Optional[str]
+    category: Optional[str] = None
 
 
 @router.post(
@@ -397,6 +399,7 @@ async def create_transaction(
         amount=payload.amount,
         transaction_type=payload.transaction_type,
         description=payload.description,
+        category=getattr(payload, "category", None),
     )
     db.add(txn)
     # Update the running balance: income adds, expense subtracts.
@@ -518,3 +521,88 @@ async def finance_insights(
     from app.services.finance_ai_service import analyze_finances
 
     return await analyze_finances(db, user_id)
+
+
+# ── گزارش‌های مالی (phase 3, audit #19: the ledger was write-only) ─────
+
+
+@router.get("/api/finance/balances-by-currency", tags=["finance"])
+@handle_errors
+async def finance_balances_by_currency(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """موجودی‌ها به تفکیک ارز — هیچ‌وقت ارزها با هم جمع نمی‌شوند (audit #20)."""
+    from app.services.budget_service import balances_by_currency
+
+    return {"ok": True, "balances": await balances_by_currency(db, user_id)}
+
+
+@router.get("/api/finance/reports/monthly", tags=["finance"])
+@handle_errors
+async def finance_monthly_report(
+    months: int = 6,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """گزارش ماهانهٔ درآمد/هزینه به تفکیک ارز + دسته — «گزارش واضح» مالی.
+
+    Aggregation happens in Python (not SQL date functions) so the exact
+    same code path runs on SQLite tests and Postgres production.
+    """
+    from collections import defaultdict
+    from datetime import datetime, timedelta, timezone
+
+    months = max(1, min(int(months), 24))
+    since = datetime.now(timezone.utc) - timedelta(days=31 * months)
+    owned = select(FinancialAccount).where(
+        (FinancialAccount.user_id == user_id) | (FinancialAccount.user_id.is_(None))
+        if user_id == 0 else (FinancialAccount.user_id == user_id)
+    )
+    accounts = {a.id: a for a in (await db.execute(owned)).scalars().all()}
+    if not accounts:
+        return {"ok": True, "months": []}
+    rows = (
+        await db.execute(
+            select(Transaction)
+            .where(
+                Transaction.account_id.in_(list(accounts.keys())),
+                Transaction.timestamp >= since,
+            )
+            .order_by(Transaction.timestamp.asc())
+        )
+    ).scalars().all()
+    monthly: dict = defaultdict(lambda: defaultdict(lambda: {
+        "income": 0.0, "expense": 0.0, "by_category": defaultdict(float),
+    }))
+    for t in rows:
+        ts = t.timestamp
+        if ts is None:
+            continue
+        month_key = f"{ts.year:04d}-{ts.month:02d}"
+        currency = (accounts[t.account_id].currency or "?").upper()
+        cell = monthly[month_key][currency]
+        amount = float(t.amount or 0)
+        if t.transaction_type == "income":
+            cell["income"] += amount
+        else:
+            cell["expense"] += amount
+            cell["by_category"][t.category or "بدون دسته"] += amount
+    out = []
+    for month_key in sorted(monthly.keys()):
+        currencies = []
+        for currency, cell in sorted(monthly[month_key].items()):
+            currencies.append({
+                "currency": currency,
+                "income": round(cell["income"], 2),
+                "expense": round(cell["expense"], 2),
+                "net": round(cell["income"] - cell["expense"], 2),
+                "by_category": [
+                    {"category": c, "amount": round(v, 2)}
+                    for c, v in sorted(
+                        cell["by_category"].items(), key=lambda kv: -kv[1]
+                    )
+                ],
+            })
+        out.append({"month": month_key, "currencies": currencies})
+    return {"ok": True, "months": out}

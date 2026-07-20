@@ -166,6 +166,25 @@ function ListHeader({ list, onUpdated }) {
 const toPersianDigits = (n) =>
   String(n).replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
 
+// Local (not UTC) today as YYYY-MM-DD — ISO strings compare lexically,
+// so `due < localTodayISO()` is the overdue test.
+const localTodayISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+// "2026-07-21" → «۱۴۰۵/۴/۳۰» for the due badge. Falls back to the raw
+// ISO string if Date/Intl balks.
+const faDueDate = (iso) => {
+  try {
+    const d = new Date(`${iso}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('fa-IR');
+  } catch {
+    return iso;
+  }
+};
+
 function NoteRow({ item }) {
   // Paragraph-style prose between checklist rows. No checkbox, no
   // star, no actions — purely informational.
@@ -218,6 +237,26 @@ function ItemRow({ item, index, listId, allLists, onChanged, onDeleted }) {
 
   const toggleComplete = () => post(`/todo-items/${item.id}/toggle-complete`);
   const toggleStar = () => post(`/todo-items/${item.id}/toggle-star`);
+
+  // Set or clear the due date (audit #13). Empty value → explicit
+  // null so the backend clears the column (PATCH excludes unset
+  // fields, so the key must be present to clear).
+  const setDueDate = async (value) => {
+    setBusy(true);
+    try {
+      const res = await fetch(`${API_BASE}/todo-items/${item.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ due_date: value || null }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        onChanged(updated);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const share = async () => {
     const targetId = window.prompt('شناسهٔ لیست مقصد برای اشتراک:');
@@ -289,6 +328,18 @@ function ItemRow({ item, index, listId, allLists, onChanged, onDeleted }) {
               </span>
             )}
             {item.content}
+            {item.due_date && (
+              <span
+                className={`ms-2 inline-block align-middle text-xs font-medium px-2 py-0.5 rounded-full ${
+                  !item.is_completed && item.due_date < localTodayISO()
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-600'
+                }`}
+                data-testid={`item-due-badge-${item.id}`}
+              >
+                📅 {faDueDate(item.due_date)}
+              </span>
+            )}
           </p>
           {item.list_ids && item.list_ids.length > 1 && (
             <p className="text-xs text-blue-500 mt-0.5">
@@ -311,6 +362,35 @@ function ItemRow({ item, index, listId, allLists, onChanged, onDeleted }) {
           ) : (
             <p className="text-gray-300 italic">بدون توضیح</p>
           )}
+          {/* Due-date editor (audit #13) — set or clear the موعد of an
+              existing item. dir="rtl" keeps the mixed label/date-widget
+              row bidi-safe (document root is dir="ltr"). */}
+          <div className="mt-3 flex items-center gap-2" dir="rtl">
+            <label className="text-xs text-gray-500" htmlFor={`item-due-${item.id}`}>
+              موعد:
+            </label>
+            <input
+              id={`item-due-${item.id}`}
+              type="date"
+              value={item.due_date || ''}
+              onChange={(e) => setDueDate(e.target.value)}
+              disabled={busy}
+              className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50"
+              dir="ltr"
+              data-testid={`item-due-input-${item.id}`}
+            />
+            {item.due_date && (
+              <button
+                type="button"
+                onClick={() => setDueDate('')}
+                disabled={busy}
+                className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50"
+                data-testid={`item-due-clear-${item.id}`}
+              >
+                حذف موعد
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -319,6 +399,7 @@ function ItemRow({ item, index, listId, allLists, onChanged, onDeleted }) {
 
 function NewItemForm({ listId, onCreated }) {
   const [content, setContent] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [busy, setBusy] = useState(false);
 
   const submit = async (e) => {
@@ -326,14 +407,19 @@ function NewItemForm({ listId, onCreated }) {
     if (!content.trim()) return;
     setBusy(true);
     try {
+      // due_date rides along only when set — content alone posts the
+      // same minimal payload as before (audit #13).
+      const body = { content: content.trim() };
+      if (dueDate) body.due_date = dueDate;
       const res = await fetch(`${API_BASE}/lists/${listId}/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: content.trim() }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const item = await res.json();
         setContent('');
+        setDueDate('');
         onCreated(item);
       }
     } finally {
@@ -349,6 +435,16 @@ function NewItemForm({ listId, onCreated }) {
         onChange={(e) => setContent(e.target.value)}
         placeholder="آیتم جدید…"
         className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+      />
+      <input
+        type="date"
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
+        title="موعد (اختیاری)"
+        aria-label="موعد (اختیاری)"
+        className="border border-gray-200 rounded-lg px-2 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        dir="ltr"
+        data-testid="new-item-due-input"
       />
       <button
         type="submit"
