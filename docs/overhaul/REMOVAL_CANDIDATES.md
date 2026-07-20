@@ -50,3 +50,13 @@ how to revive it.
   (`app/services/self_improvement_service.py`): قبلاً در هر بوت/GET هر ردیفی با این
   پیشوندها حذف سخت می‌شد (یادداشت‌های آیندهٔ مالک هم). حالا فقط وقتی ردیف‌های exact-match
   قدیمی (وضعیت پیش-مهاجرت) حاضر باشند اجرا می‌شود. بازگردانی: برداشتن شرط `if exact_stale`.
+
+## 2026-07-20 — Celery/beat به‌عنوان مسیر زمان‌بندی (قرنطینه — جایگزین: jobs_engine)
+
+- `app/celery_app.py` + `app/tasks.py` + مصرف صف `process_ai_ingestion_event`: در تولید
+  هرگز اجرا نمی‌شدند (broker هاردکد localhost؛ render.yaml بدون worker/beat/redis —
+  یافتهٔ #1 ممیزی). از این تاریخ مسیر canonical زمان‌بندی
+  `app/services/jobs_engine.py` (حلقهٔ in-process با stamp در GlobalSetting) است و
+  ingestion رویدادی از `event_publisher` به‌صورت in-process اجرا می‌شود. کد celery حذف
+  نشده — دست‌نخورده مانده تا اگر روزی worker واقعی مستقر شد قابل احیا باشد.
+  بازگردانی: استقرار redis+worker+beat و برداشتن حلقهٔ jobs_engine از main.py.

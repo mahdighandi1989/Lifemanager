@@ -165,3 +165,58 @@ async def owner_actions(db: AsyncSession = Depends(get_db)) -> dict:
         "actions": actions,
         "pending_count": len(pending),
     }
+
+
+@router.get("/api/settings/jobs-status", tags=["settings"])
+@handle_errors
+async def jobs_status(db: AsyncSession = Depends(get_db)) -> dict:
+    """وضعیت موتور واحد زمان‌بندی (jobs engine) — کدام کار کی اجرا شده."""
+    from app.services.jobs_engine import get_jobs_status
+
+    return await get_jobs_status(db)
+
+
+@router.get("/api/settings/ai-usage", tags=["settings"])
+@handle_errors
+async def ai_usage_summary(db: AsyncSession = Depends(get_db)) -> dict:
+    """خلاصهٔ مصرف AI هفت روز اخیر به تفکیک task — حسابداری مصرف روی
+    اشتراک شخصی مالک (phase 1)."""
+    from datetime import datetime, timedelta, timezone
+
+    from sqlalchemy import case as _case
+    from sqlalchemy import func as _func
+
+    from app.models.ai_usage import AIUsageLog
+
+    since = datetime.now(timezone.utc) - timedelta(days=7)
+    rows = (
+        await db.execute(
+            select(
+                AIUsageLog.task,
+                _func.count(AIUsageLog.id),
+                _func.sum(AIUsageLog.prompt_chars),
+                _func.sum(AIUsageLog.output_chars),
+                _func.sum(_case((AIUsageLog.ok.is_(False), 1), else_=0)),
+            )
+            .where(AIUsageLog.created_at >= since)
+            .group_by(AIUsageLog.task)
+            .order_by(_func.count(AIUsageLog.id).desc())
+        )
+    ).all()
+    total_calls = sum(int(r[1] or 0) for r in rows)
+    return {
+        "ok": True,
+        "since": since.isoformat(),
+        "total_calls_7d": total_calls,
+        "by_task": [
+            {
+                "task": r[0],
+                "calls": int(r[1] or 0),
+                "prompt_chars": int(r[2] or 0),
+                "output_chars": int(r[3] or 0),
+                "est_tokens": (int(r[2] or 0) + int(r[3] or 0)) // 4,
+                "failures": int(r[4] or 0),
+            }
+            for r in rows
+        ],
+    }

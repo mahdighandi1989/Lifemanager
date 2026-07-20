@@ -18,8 +18,6 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-from collections import defaultdict
-from threading import Lock
 from typing import Optional
 
 from pydantic import ValidationError
@@ -30,6 +28,15 @@ from .content_analysis_service import analyze_content  # noqa: F401  re-export
 from .hallucination_service import annotate_result  # noqa: F401  re-export
 from .model_service import DEFAULT_MODEL
 from .provider_service import call_openai_chat, has_openai_key
+from .gateway_seam import try_catalog_gateway as _try_catalog_gateway
+from .metrics import (  # noqa: F401  re-export (compat with existing imports)
+    AI_METRICS,
+    _emit_metrics,
+    metric_collector_record_ai_latency,
+    metric_collector_record_ai_quality,
+    metrics_snapshot,
+    record_feedback,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -46,102 +53,6 @@ log = logger
 # literals (500 p95-ms, 4.0 quality) live in config.py.
 AI_RESPONSE_LATENCY_TARGET_MS = AI_PERFORMANCE_TARGETS["latency_p95_ms_max"]  # p95 SLO
 AI_RESPONSE_QUALITY_TARGET = AI_PERFORMANCE_TARGETS["quality_score_min"]  # avg user score (1-5)
-
-
-# In-process rolling counters. The summary endpoint reads these, the
-# feedback endpoint mutates them. A real production deployment would
-# back this with Redis or Prometheus; the in-process version is
-# enough to satisfy the static greps and serve a single-replica deploy.
-_metrics_lock = Lock()
-AI_METRICS: dict = {
-    "request_count": 0,
-    "total_latency_ms": 0,
-    "total_tokens": 0,
-    "result_kinds": defaultdict(int),  # provider / placeholder / error
-    "feedback_likes": 0,
-    "feedback_dislikes": 0,
-    "score_sum": 0,
-    "score_count": 0,
-}
-
-
-def _emit_metrics(
-    *,
-    request_id: str,
-    model: str,
-    prompt_len: int,
-    latency_ms: int,
-    tokens_used: int,
-    result_kind: str,
-) -> None:
-    """Append a structured ``ai_performance`` log line and bump counters.
-
-    The log key is the literal ``ai_performance`` so a static grep from
-    the verify_plan finds it; the metric names (``ai_response_latency_ms``,
-    ``ai_response_quality_score``) likewise appear verbatim below.
-    """
-    log.info("ai_performance request_id=%s model=%s prompt_len=%d "
-             "ai_response_latency_ms=%d tokens_used=%d result_kind=%s",
-             request_id, model, prompt_len, latency_ms, tokens_used, result_kind)
-    with _metrics_lock:
-        AI_METRICS["request_count"] += 1
-        AI_METRICS["total_latency_ms"] += latency_ms
-        AI_METRICS["total_tokens"] += tokens_used
-        AI_METRICS["result_kinds"][result_kind] += 1
-
-
-def record_feedback(*, liked: Optional[bool] = None, score: Optional[int] = None) -> None:
-    """Bump the user-feedback counters used by /api/ai/metrics.
-
-    ``liked`` is the binary like/dislike signal (None means "not given").
-    ``score`` is the explicit 1-5 rating (None means "not given"). The
-    helper rejects out-of-range scores at the boundary so the rolling
-    average (ai_response_quality_score) stays clean.
-    """
-    with _metrics_lock:
-        if liked is True:
-            AI_METRICS["feedback_likes"] += 1
-        elif liked is False:
-            AI_METRICS["feedback_dislikes"] += 1
-        if score is not None:
-            if not 1 <= int(score) <= 5:
-                raise ValueError("score must be between 1 and 5")
-            AI_METRICS["score_sum"] += int(score)
-            AI_METRICS["score_count"] += 1
-
-
-def metric_collector_record_ai_latency(latency_ms: int) -> None:
-    """Compatibility hook for verify_plan greps (``metric_collector.record_ai_latency``)."""
-    with _metrics_lock:
-        AI_METRICS["total_latency_ms"] += int(latency_ms)
-
-
-def metric_collector_record_ai_quality(score: int) -> None:
-    """Compatibility hook for verify_plan greps (``metric_collector.record_ai_quality``)."""
-    record_feedback(score=score)
-
-
-def metrics_snapshot() -> dict:
-    """Return a JSON-serialisable view of the current counters."""
-    with _metrics_lock:
-        kinds = dict(AI_METRICS["result_kinds"])
-        n = AI_METRICS["request_count"]
-        avg_latency = (
-            AI_METRICS["total_latency_ms"] / n if n else 0.0
-        )
-        score_n = AI_METRICS["score_count"]
-        avg_score = (AI_METRICS["score_sum"] / score_n) if score_n else 0.0
-        return {
-            "request_count": n,
-            "avg_latency_ms": avg_latency,
-            "ai_response_latency_target_ms": AI_RESPONSE_LATENCY_TARGET_MS,
-            "ai_response_quality_target": AI_RESPONSE_QUALITY_TARGET,
-            "total_tokens": AI_METRICS["total_tokens"],
-            "result_kinds": kinds,
-            "feedback_likes": AI_METRICS["feedback_likes"],
-            "feedback_dislikes": AI_METRICS["feedback_dislikes"],
-            "ai_response_quality_score": avg_score,
-        }
 
 
 async def generate_text(
@@ -168,6 +79,24 @@ async def generate_text(
     """
     request_id = uuid.uuid4().hex
     start_ns = time.perf_counter_ns()
+
+    # ── Phase 1 seam (2026-07-20, audit #2): route through the catalog
+    # gateway FIRST so every legacy caller (finance analysis, assistant
+    # task feedback, self-improvement narrative, file summaries, planner)
+    # uses the model the owner configured in AISettings. Fail-open: any
+    # gateway miss (no model, provider error) falls back to the legacy
+    # OpenAI-compatible path below, byte-for-byte unchanged.
+    gateway = await _try_catalog_gateway(
+        prompt,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        request_id=request_id,
+        start_ns=start_ns,
+    )
+    if gateway is not None:
+        if detect_hallucination:
+            annotate_result(gateway, prompt=prompt, context=context)
+        return gateway
 
     # A per-provider api_key routes to that vendor; else fall back to env
     # OPENAI_API_KEY; only when NEITHER is present serve the placeholder (1a08ded2).

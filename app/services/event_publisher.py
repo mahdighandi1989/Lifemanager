@@ -11,10 +11,49 @@ Celery/Redis is down.
 """
 from __future__ import annotations
 
+import asyncio
+import json
 import logging
 import threading
 
 logger = logging.getLogger(__name__)
+
+
+async def _ingest_in_process(entity_type: str, entity_id: int, action: str) -> None:
+    """Run the AI ingestion for one changed entity on the app's own loop
+    and persist the outcome to the activity log (the Celery path computed
+    the analysis and threw it away — audit quick-win)."""
+    try:
+        from app.database import SessionLocal
+        from app.services.ai_ingestion_service import ingest_entity
+
+        async with SessionLocal() as db:
+            result = await ingest_entity(
+                db, entity_type=entity_type, entity_id=entity_id, action=action
+            )
+            if result.get("ingested"):
+                from app.services.activity_log_service import record_activity
+
+                analysis = result.get("analysis") or {}
+                await record_activity(
+                    action="ai_ingest",
+                    entity_type=entity_type,
+                    entity_id=entity_id,
+                    detail=json.dumps(
+                        {
+                            "keywords": (analysis.get("keywords") or [])[:10],
+                            "summary": (analysis.get("summary") or "")[:500],
+                            "sentiment": analysis.get("sentiment"),
+                        },
+                        ensure_ascii=False,
+                    ),
+                    db=db,
+                )
+    except Exception as exc:  # never break or outlive the caller's request
+        logger.debug(
+            "in-process ingest failed (%s %s %s): %r",
+            entity_type, entity_id, action, exc,
+        )
 
 # How long the request will wait for the broker publish before giving up and
 # moving on. A reachable broker returns in milliseconds; an unreachable one
@@ -42,6 +81,21 @@ def publish_data_change_event(entity_type: str, entity_id: int, action: str) -> 
     ``_PUBLISH_WAIT_SECONDS``. The thread is abandoned (daemon) if it exceeds
     that — best-effort delivery, never a hot-path stall.
     """
+    # Phase 1 (2026-07-20): the Celery consumer never ran in production
+    # (no worker/redis deployed — audit #1), so the queue path silently
+    # dropped every event. When a running event loop exists (the normal
+    # FastAPI case), ingest in-process instead; the Celery enqueue stays
+    # as the fallback for non-async callers so no capability is deleted.
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    if loop is not None:
+        loop.create_task(
+            _ingest_in_process(entity_type, entity_id, action)
+        )
+        return True
+
     outcome = {"ok": False}
 
     def _enqueue() -> None:

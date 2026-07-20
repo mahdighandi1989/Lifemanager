@@ -19,7 +19,9 @@ async def test_seed_ai_catalog_is_idempotent(db_session):
     first = await seed_ai_catalog(db_session)
     assert first["providers_added"] > 0
     assert first["models_added"] > 0
-    assert first["routes_added"] == 12  # one per TASK_TYPES entry
+    from app.services.ai.catalog import TASK_TYPES
+
+    assert first["routes_added"] == len(TASK_TYPES)  # one per TASK_TYPES entry
 
     second = await seed_ai_catalog(db_session)
     assert second == {"providers_added": 0, "models_added": 0, "routes_added": 0}

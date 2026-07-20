@@ -387,6 +387,11 @@ async def startup_event():
         ("todo_items", "deleted_at", "TIMESTAMP WITH TIME ZONE"),
         ("personal_writings", "deleted_at", "TIMESTAMP WITH TIME ZONE"),
         ("activity_logs", "payload_before", "TEXT"),
+        # CRM date columns for the attention rules (phase 3, 2026-07-20).
+        ("persons", "birthday", "DATE"),
+        ("persons", "next_follow_up", "DATE"),
+        # Spending category for the monthly finance report (phase 3).
+        ("transactions", "category", "VARCHAR(64)"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:
@@ -1037,6 +1042,35 @@ async def _stop_backup_loop():
             await asyncio.wait_for(task, timeout=5)
     except Exception as exc:
         logger.debug("backup loop shutdown: %s", exc)
+
+
+# ── Jobs engine (موتور واحد زمان‌بندی — phase 1): the in-process port of
+# the Celery beat jobs that never ran in production. ────────────────────
+@app.on_event("startup")
+async def _start_jobs_engine():
+    try:
+        from app.services.jobs_engine import jobs_loop
+
+        app.state.jobs_stop = asyncio.Event()
+        app.state.jobs_task = asyncio.create_task(
+            jobs_loop(app.state.jobs_stop)
+        )
+        logger.info("⚙️ jobs engine started")
+    except Exception as exc:
+        logger.warning("jobs engine failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_jobs_engine():
+    try:
+        stop = getattr(app.state, "jobs_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "jobs_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("jobs engine shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

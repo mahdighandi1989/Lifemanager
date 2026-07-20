@@ -64,6 +64,9 @@ async def complete(
     if rm is None or not rm.is_usable:
         return {"ok": False, "error": "no_model", "text": "", "model": None}
 
+    import time as _time
+
+    _start = _time.perf_counter()
     try:
         if _is_anthropic(rm):
             text = await _anthropic_text(rm, prompt, system, max_tokens, temperature)
@@ -71,9 +74,46 @@ async def complete(
             text = await _gemini_text(rm, prompt, system, max_tokens, temperature)
         else:
             text = await _openai_text(rm, prompt, system, max_tokens, temperature)
+        await _record_usage(
+            db, task=task, rm=rm, ok=True, error=None,
+            prompt_chars=len(prompt), output_chars=len(text or ""),
+            latency_ms=int((_time.perf_counter() - _start) * 1000),
+        )
         return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
     except Exception as exc:  # transport / provider error → uniform failure
+        await _record_usage(
+            db, task=task, rm=rm, ok=False,
+            error=f"{type(exc).__name__}: {exc}",
+            prompt_chars=len(prompt), output_chars=0,
+            latency_ms=int((_time.perf_counter() - _start) * 1000),
+        )
         return {"ok": False, "error": f"{type(exc).__name__}: {exc}", "text": "", "model": rm.display_name}
+
+
+async def _record_usage(
+    db: AsyncSession, *, task, rm, ok, error, prompt_chars, output_chars, latency_ms
+) -> None:
+    """Ledger every gateway call (حسابداری مصرف AI). Fail-open: a logging
+    hiccup must never break or roll back the inference itself."""
+    try:
+        from app.models.ai_usage import AIUsageLog
+
+        db.add(AIUsageLog(
+            task=str(task or "general")[:64],
+            model=(getattr(rm, "display_name", None) or "")[:160] or None,
+            provider=(getattr(rm, "provider_key", None) or "")[:64] or None,
+            ok=bool(ok),
+            error=(error or None) and str(error)[:300],
+            prompt_chars=int(prompt_chars or 0),
+            output_chars=int(output_chars or 0),
+            latency_ms=latency_ms,
+        ))
+        await db.commit()
+    except Exception:
+        try:
+            await db.rollback()
+        except Exception:
+            pass
 
 
 async def _anthropic_text(rm, prompt, system, max_tokens, temperature) -> str:
