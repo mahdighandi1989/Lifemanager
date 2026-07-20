@@ -74,6 +74,16 @@ async def register(
     payload: UserCreate,
     db: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
+    # Invite gate (data-safety phase 0): when REGISTER_INVITE_CODE is
+    # configured, an open /register on the public URL stops minting
+    # accounts for strangers. Unset ⇒ behaviour unchanged.
+    if settings.REGISTER_INVITE_CODE:
+        supplied = getattr(payload, "invite_code", None)
+        if supplied != settings.REGISTER_INVITE_CODE:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="کد دعوت نامعتبر است",
+            )
     try:
         user = await auth_service.register(db, payload)
     except ValueError as exc:

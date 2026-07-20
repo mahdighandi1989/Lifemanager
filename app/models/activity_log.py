@@ -47,6 +47,10 @@ class ActivityLog(Base):
     context_type = Column(String(50), nullable=True, index=True)
     context_id = Column(String(64), nullable=True, index=True)
     detail = Column(Text, nullable=True)
+    # Snapshot of the entity's content BEFORE an update/delete (JSON
+    # text). The only in-app undo source until full DB backups land —
+    # filled for content-bearing entities (todo items, writings, lists).
+    payload_before = Column(Text, nullable=True)
     ip_address = Column(String(64), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
 

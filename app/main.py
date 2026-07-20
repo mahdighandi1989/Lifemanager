@@ -23,6 +23,8 @@ from app.routes import (
     brain,
     command_center,
     inbox,
+    backup,
+    trash,
     weekly_review,
     ai_catalog,
     ai_profile,
@@ -381,6 +383,10 @@ async def startup_event():
         ("ai_providers", "default_model", "VARCHAR(120)"),
         # Oversight per-connection time budget (audit task d2146781).
         ("external_project_connections", "time_budget_minutes", "INTEGER"),
+        # Soft-delete + undo snapshot (data-safety phase 0, 2026-07-20).
+        ("todo_items", "deleted_at", "TIMESTAMP WITH TIME ZONE"),
+        ("personal_writings", "deleted_at", "TIMESTAMP WITH TIME ZONE"),
+        ("activity_logs", "payload_before", "TEXT"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:
@@ -822,10 +828,15 @@ app.include_router(brain.router, tags=["brain"])
 app.include_router(inbox.router, tags=["inbox"])
 # میز فرمان «امروز من» — the Dashboard's one-call Today aggregate.
 app.include_router(command_center.router, tags=["command-center"])
+# سطل زباله — recoverable deletes for todo items + writings (data-safety
+# phase 0). Absolute /api/trash paths.
+app.include_router(trash.router, tags=["trash"])
 # موتور توجه — rule scan / morning brief / settings (phase 3).
 app.include_router(attention.router, tags=["attention"])
 # مرور هفتگی — stored weekly AI reviews + schedule (phase 4).
 app.include_router(weekly_review.router, tags=["weekly-review"])
+# پشتیبان‌گیری خودکار — nightly full-DB export to Drive + manual run/export.
+app.include_router(backup.router, tags=["backup"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────
@@ -996,6 +1007,36 @@ async def _stop_google_sync_engine():
             await asyncio.wait_for(task, timeout=5)
     except Exception as exc:
         logger.debug("google personal-sync shutdown: %s", exc)
+
+
+# ── Backup loop (پشتیبان‌گیری شبانه — full-DB export to Drive, local
+# fallback). Same lifecycle shape as the attention/dev-sync/google-sync
+# engines. ──────────────────────────────────────────────────────────────
+@app.on_event("startup")
+async def _start_backup_loop():
+    try:
+        from app.services.backup_service import backup_loop
+
+        app.state.backup_stop = asyncio.Event()
+        app.state.backup_task = asyncio.create_task(
+            backup_loop(app.state.backup_stop)
+        )
+        logger.info("💾 backup loop started")
+    except Exception as exc:
+        logger.warning("backup loop failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_backup_loop():
+    try:
+        stop = getattr(app.state, "backup_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "backup_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("backup loop shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

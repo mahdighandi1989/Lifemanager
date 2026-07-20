@@ -108,6 +108,9 @@ def _serialize(row: ActivityLog) -> dict:
         "context_type": row.context_type,
         "context_id": row.context_id,
         "detail": row.detail,
+        # Undo snapshot (data-safety phase 0) — previous content of the
+        # entity for update/delete rows; None elsewhere.
+        "payload_before": row.payload_before,
         "ip_address": row.ip_address,
         "created_at": row.created_at.isoformat() if row.created_at else None,
     }

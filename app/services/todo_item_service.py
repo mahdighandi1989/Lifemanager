@@ -22,7 +22,12 @@ from app.models.todo_list import TodoList, todo_list_items
 
 
 def _sanitize(value: Optional[str]) -> Optional[str]:
-    return None if value is None else html.escape(value, quote=True)
+    # Unescape-then-escape makes the transform idempotent: text that was
+    # already escaped at rest (or round-tripped through the edit form)
+    # no longer accumulates &amp;amp;… layers with every save — the
+    # creeping-corruption failure mode the 2026-07-20 data-safety audit
+    # flagged. The at-rest format (escaped once) is unchanged.
+    return None if value is None else html.escape(html.unescape(value), quote=True)
 
 
 def _now() -> datetime:
@@ -73,13 +78,20 @@ async def list_items(
         stmt = stmt.where(
             or_(TodoItem.id.in_(owned_items), TodoItem.id.notin_(linked_items))
         )
+    stmt = stmt.where(TodoItem.deleted_at.is_(None))
     result = await db.execute(stmt)
     return result.scalars().unique().all()
 
 
-async def get_item(db: AsyncSession, item_id: int) -> TodoItem:
+async def get_item(
+    db: AsyncSession, item_id: int, *, include_deleted: bool = False
+) -> TodoItem:
     obj = await db.get(TodoItem, item_id)
     if obj is None:
+        raise NoResultFound(f"TodoItem {item_id} not found")
+    if obj.deleted_at is not None and not include_deleted:
+        # Trashed rows are invisible to the normal CRUD surface; only
+        # the /api/trash endpoints (include_deleted=True) may see them.
         raise NoResultFound(f"TodoItem {item_id} not found")
     return obj
 
@@ -280,9 +292,83 @@ async def move_item(
     return obj
 
 
-async def delete_item(db: AsyncSession, item_id: int) -> None:
+async def soft_delete_item(db: AsyncSession, item_id: int) -> TodoItem:
+    """Move an item (and its subitems) to the trash instead of deleting.
+
+    Data-safety phase 0 (2026-07-20): DELETE on years-old owner content
+    must be recoverable. List memberships are kept so restore puts the
+    item back exactly where it was; read paths filter deleted_at.
+    """
     obj = await get_item(db, item_id)
+    stamp = _now()
+    obj.deleted_at = stamp
+    children = (
+        await db.execute(
+            select(TodoItem).where(
+                TodoItem.parent_id == item_id,
+                TodoItem.deleted_at.is_(None),
+            )
+        )
+    ).scalars().all()
+    for child in children:
+        child.deleted_at = stamp
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+
+async def restore_item(db: AsyncSession, item_id: int) -> TodoItem:
+    """Bring a trashed item (and subitems trashed with it) back."""
+    obj = await get_item(db, item_id, include_deleted=True)
+    stamp = obj.deleted_at
+    obj.deleted_at = None
+    if stamp is not None:
+        children = (
+            await db.execute(
+                select(TodoItem).where(
+                    TodoItem.parent_id == item_id,
+                    TodoItem.deleted_at == stamp,
+                )
+            )
+        ).scalars().all()
+        for child in children:
+            child.deleted_at = None
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+
+async def list_trashed_items(db: AsyncSession) -> Sequence[TodoItem]:
+    stmt = (
+        select(TodoItem)
+        .where(TodoItem.deleted_at.is_not(None))
+        .order_by(TodoItem.deleted_at.desc(), TodoItem.id)
+    )
+    return (await db.execute(stmt)).scalars().all()
+
+
+async def delete_item(db: AsyncSession, item_id: int) -> None:
+    """Hard delete (purge). Only the trash-purge endpoint calls this —
+    the normal DELETE route soft-deletes via :func:`soft_delete_item`."""
+    obj = await get_item(db, item_id, include_deleted=True)
+    # Delete children explicitly (dialect-safe: SQLite test runs don't
+    # always enforce the DB-level ON DELETE CASCADE on parent_id).
+    child_ids = (
+        await db.execute(
+            select(TodoItem.id).where(TodoItem.parent_id == item_id)
+        )
+    ).scalars().all()
+    if child_ids:
+        await db.execute(
+            delete(todo_list_items).where(
+                todo_list_items.c.todo_item_id.in_(child_ids)
+            )
+        )
+        await db.execute(delete(TodoItem).where(TodoItem.id.in_(child_ids)))
     # Cascade on the association table is ON DELETE CASCADE so the
-    # M2M rows go away automatically.
+    # M2M rows go away automatically (explicit here for SQLite parity).
+    await db.execute(
+        delete(todo_list_items).where(todo_list_items.c.todo_item_id == item_id)
+    )
     await db.delete(obj)
     await db.commit()

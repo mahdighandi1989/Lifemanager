@@ -1,0 +1,41 @@
+# Keep-alive ping — فاز ۰ ایمنی (2026-07-20).
+#
+# Render free tier spins the web service down after ~15 min idle, which
+# also freezes every in-process automation loop (attention engine, بریف
+# صبح، google-sync، dev-sync). This scheduled ping keeps the service warm
+# so the proactive column actually fires on time.
+#
+# OWNER ACTION (one-time): in GitHub → Settings → Secrets and variables →
+# Actions → Variables, add KEEPALIVE_URL = https://<your-app>.onrender.com/api/health
+# Until the variable exists the job exits 0 without pinging (no failures).
+name: keepalive
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping health endpoint
+        env:
+          KEEPALIVE_URL: ${{ vars.KEEPALIVE_URL }}
+        run: |
+          if [ -z "$KEEPALIVE_URL" ]; then
+            echo "KEEPALIVE_URL repo variable not set — skipping (see file header)."
+            exit 0
+          fi
+          # Fail soft: a cold-start can take >30s; retry a few times and
+          # never mark the workflow red just because the app was asleep.
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$KEEPALIVE_URL" || echo 000)
+            echo "attempt $i → HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 20
+          done
+          echo "service did not answer 200 after 3 attempts (probably waking up) — not failing the job."
+          exit 0

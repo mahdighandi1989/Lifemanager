@@ -245,6 +245,7 @@ async def scan_findings(
             await db.execute(
                 select(TodoItem).where(
                     _scope(TodoItem.owner_id, user_id),
+                    TodoItem.deleted_at.is_(None),
                     TodoItem.is_completed.is_(False),
                     TodoItem.due_date.isnot(None),
                     TodoItem.due_date < today,

@@ -18,6 +18,8 @@ fields. A body carrying e.g. ``{"role": "admin"}`` or
 ``{"is_superuser": true}`` now fails validation with 422 instead of being
 silently dropped.
 """
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -34,6 +36,9 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
     username: str = Field(..., min_length=1, max_length=64)
+    # Optional invite code — enforced by /register only when the
+    # operator sets REGISTER_INVITE_CODE (data-safety phase 0).
+    invite_code: Optional[str] = None
 
 
 class UserLogin(BaseModel):

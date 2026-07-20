@@ -54,3 +54,114 @@ async def put_global_analysis_prompt(
         row.value = payload.value
     await db.commit()
     return {"key": _GLOBAL_ANALYSIS_PROMPT_KEY, "value": payload.value}
+
+
+# --- اقدامات مالک (owner-actions queue, data-safety phase 0) ---------------
+#
+# The 2026-07-20 audit found merged capabilities silently OFF because their
+# one-time owner action (env var / Google-console click) lived only in
+# docs/overhaul/AUDIT_LOG.md. This endpoint surfaces that queue inside the
+# product with live checks where the app can actually verify the state.
+
+@router.get("/api/settings/owner-actions", tags=["settings"])
+@handle_errors
+async def owner_actions(db: AsyncSession = Depends(get_db)) -> dict:
+    import os
+
+    from app.config import settings as _settings
+
+    actions: list[dict] = []
+
+    def add(key: str, title: str, done, how: str, detail: str = "") -> None:
+        actions.append({
+            "key": key, "title": title, "done": done,
+            "how": how, "detail": detail,
+        })
+
+    # 1) Telegram bot token (env).
+    add(
+        "telegram_token",
+        "توکن بات تلگرام",
+        bool((os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()),
+        "در Render → Environment مقدار TELEGRAM_BOT_TOKEN را ست کن (از BotFather).",
+        "بدون آن: کپچر تلگرام، بریف صبح و هشدارهای تلگرامی خاموش‌اند.",
+    )
+    # 2) Google connection (refresh token stored + encrypted).
+    google_connected = False
+    try:
+        from app.services.drive_settings_service import resolve_refresh_token
+
+        google_connected = bool(await resolve_refresh_token(db))
+    except Exception:
+        google_connected = False
+    add(
+        "google_connection",
+        "اتصال گوگل (درایو/جیمیل/تقویم)",
+        google_connected,
+        "تنظیمات → گوگل → «اتصال به گوگل» و تیک همهٔ دسترسی‌ها.",
+        "بدون آن: همگام‌سازی ایمیل/تقویم، گزارش روز و بکاپ روی Drive خاموش‌اند.",
+    )
+    # 3) OAuth consent published (cannot be checked from here — instruction).
+    add(
+        "oauth_consent_published",
+        "انتشار OAuth consent (پایان انقضای هفتگی توکن گوگل)",
+        None,
+        "console.cloud.google.com → APIs & Services → OAuth consent screen → "
+        "Publish app (از حالت Testing خارج شود).",
+        "در حالت Testing، refresh token هر ~۷ روز می‌میرد و اتصال گوگل هفتگی می‌شکند.",
+    )
+    # 4) REQUIRE_AUTH flipped on.
+    add(
+        "require_auth",
+        "فعال‌سازی REQUIRE_AUTH (بستن دسترسی ناشناس)",
+        bool(_settings.REQUIRE_AUTH),
+        "بعد از ساخت حساب و ورود موفق در مرورگر/گوشی، در Render → Environment مقدار "
+        "REQUIRE_AUTH=true را ست کن.",
+        "تا خاموش است، درخواست بدون توکن به دادهٔ user-0 می‌رسد.",
+    )
+    # 5) Register invite gate.
+    add(
+        "register_invite",
+        "کد دعوت ثبت‌نام (بستن register باز)",
+        bool(_settings.REGISTER_INVITE_CODE),
+        "در Render → Environment مقدار REGISTER_INVITE_CODE را ست کن.",
+        "بدون آن هر غریبه‌ای می‌تواند حساب بسازد.",
+    )
+    # 6) Nightly backup healthy (live check via backup service if present).
+    backup_done = None
+    backup_detail = "وضعیت بکاپ در دسترس نیست."
+    try:
+        from app.services.backup_service import get_status as _backup_status
+
+        st = await _backup_status(db)
+        backup_done = bool(st.get("last_ok_at")) and not st.get("is_stale", True)
+        backup_detail = (
+            f"آخرین بکاپ موفق: {st.get('last_ok_at') or '—'}"
+            + (" (قدیمی!)" if st.get("is_stale") else "")
+        )
+    except Exception:
+        pass
+    add(
+        "backup_fresh",
+        "بکاپ شبانهٔ دادهٔ زندگی",
+        backup_done,
+        "اتصال گوگل را برقرار کن؛ بکاپ شبانه خودکار اجرا می‌شود "
+        "(دکمهٔ «بکاپ فوری» هم در همین تنظیمات هست).",
+        backup_detail,
+    )
+    # 7) Keep-alive ping (cannot verify from inside — instruction).
+    add(
+        "keepalive",
+        "پینگ بیدارباش free-tier (GitHub Actions)",
+        None,
+        "GitHub → repo Settings → Secrets and variables → Actions → Variables → "
+        "KEEPALIVE_URL = https://<app>.onrender.com/api/health",
+        "بدون آن سرویس در بی‌کاری می‌خوابد و بریف ۷ صبح تا اولین بازدید تو عقب می‌افتد.",
+    )
+
+    pending = [a for a in actions if a["done"] is False]
+    return {
+        "ok": True,
+        "actions": actions,
+        "pending_count": len(pending),
+    }

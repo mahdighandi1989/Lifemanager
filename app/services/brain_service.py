@@ -449,7 +449,8 @@ async def build_dashboard(db: AsyncSession) -> Dict[str, Any]:
     from app.models.todo_item import TodoItem
 
     i_done = (await db.execute(select(func.count(TodoItem.id)).where(
-        _scope(TodoItem.owner_id, uid), TodoItem.is_completed.is_(True)))).scalar() or 0
+        _scope(TodoItem.owner_id, uid), TodoItem.deleted_at.is_(None),
+        TodoItem.is_completed.is_(True)))).scalar() or 0
     sections.append({
         "key": "self_improvement",
         "title": "خودسازی و لیست‌ها (پیگیری عادت‌ها)",

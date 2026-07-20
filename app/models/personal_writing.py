@@ -25,5 +25,8 @@ class PersonalWriting(Base):
     source_note = Column(String(500), nullable=True)
     written_at = Column(Date, nullable=True)
     sort_order = Column(Integer, nullable=False, default=0, server_default="0")
+    # Soft-delete (سطل زباله): a writing body can be years of personal
+    # history — DELETE stamps this instead of dropping the row.
+    deleted_at = Column(DateTime(timezone=True), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())

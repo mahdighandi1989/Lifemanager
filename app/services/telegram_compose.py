@@ -546,12 +546,14 @@ class ComposeService:
         if kws:
             matched = (await session.execute(
                 select(TodoItem.id, TodoItem.content).where(
-                    _scope(TodoItem.owner_id), or_(*[TodoItem.content.ilike(f"%{k}%") for k in kws]),
+                    _scope(TodoItem.owner_id), TodoItem.deleted_at.is_(None),
+                    or_(*[TodoItem.content.ilike(f"%{k}%") for k in kws]),
                 ).limit(120)
             )).all()
             item_rows.update({r[0]: r[1] for r in matched})
         recent_i = (await session.execute(
-            select(TodoItem.id, TodoItem.content).where(_scope(TodoItem.owner_id))
+            select(TodoItem.id, TodoItem.content)
+            .where(_scope(TodoItem.owner_id), TodoItem.deleted_at.is_(None))
             .order_by(TodoItem.id.desc()).limit(25)
         )).all()
         item_rows.update({r[0]: r[1] for r in recent_i})

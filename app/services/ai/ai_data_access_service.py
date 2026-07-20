@@ -38,7 +38,7 @@ async def get_user_todo_items(db: AsyncSession, *, user_id: int) -> List[TodoIte
         select(TodoItem)
         .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
         .join(TodoList, TodoList.id == todo_list_items.c.todo_list_id)
-        .where(TodoList.user_id == user_id)
+        .where(TodoList.user_id == user_id, TodoItem.deleted_at.is_(None))
     )
     return list(result.scalars().all())
 

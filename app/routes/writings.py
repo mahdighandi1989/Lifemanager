@@ -12,7 +12,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_optional_user_id, get_required_user_id
 from app.middleware import handle_errors
 from app.models.personal_writing import PersonalWriting
 from app.services.activity_log_service import record_activity
@@ -36,9 +36,14 @@ class WritingUpdate(BaseModel):
     written_at: Optional[str] = None
 
 
-def _scope(uid: int):
-    return or_(PersonalWriting.user_id == uid, PersonalWriting.user_id.is_(None)) \
+def _scope(uid: int, *, include_deleted: bool = False):
+    owner = or_(PersonalWriting.user_id == uid, PersonalWriting.user_id.is_(None)) \
         if uid == 0 else (PersonalWriting.user_id == uid)
+    if include_deleted:
+        return owner
+    # Trashed writings are invisible to the normal CRUD surface — only
+    # /api/trash (data-safety phase 0) lists/restores them.
+    return owner & PersonalWriting.deleted_at.is_(None)
 
 
 def _summary(w: PersonalWriting) -> dict:
@@ -97,7 +102,7 @@ async def get_writing(
 async def create_writing(
     payload: WritingCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     w = PersonalWriting(
         title=payload.title.strip()[:500], body=payload.body,
@@ -122,13 +127,21 @@ async def update_writing(
     writing_id: int,
     payload: WritingUpdate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     w = (await db.execute(
         select(PersonalWriting).where(PersonalWriting.id == writing_id, _scope(user_id))
     )).scalars().first()
     if w is None:
         raise HTTPException(status_code=404, detail="Writing not found")
+    # Snapshot BEFORE overwriting — a writing body can be years of
+    # personal history and PUT was the only place it got replaced with
+    # no history at all (2026-07-20 data-safety audit).
+    snapshot = {
+        "title": w.title, "category": w.category, "body": w.body,
+        "source_note": w.source_note,
+        "written_at": w.written_at.isoformat() if w.written_at else None,
+    }
     data = payload.model_dump(exclude_unset=True)
     if "title" in data and data["title"]:
         w.title = data["title"].strip()[:500]
@@ -144,7 +157,8 @@ async def update_writing(
     await db.refresh(w)
     await record_activity(
         action="update", entity_type="writing", entity_id=w.id,
-        entity_label=w.title, detail="ویرایش نوشته", user_id=user_id, db=db,
+        entity_label=w.title, detail="ویرایش نوشته",
+        payload_before=snapshot, user_id=user_id, db=db,
     )
     return {"ok": True, **_summary(w), "body": w.body}
 
@@ -154,17 +168,26 @@ async def update_writing(
 async def delete_writing(
     writing_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ):
+    """Soft delete — the writing moves to the trash (سطل زباله) and can
+    be restored from /api/trash; hard removal only via trash purge."""
     w = (await db.execute(
         select(PersonalWriting).where(PersonalWriting.id == writing_id, _scope(user_id))
     )).scalars().first()
     if w is None:
         raise HTTPException(status_code=404, detail="Writing not found")
-    title = w.title
-    await db.delete(w)
+    snapshot = {
+        "title": w.title, "category": w.category, "body": w.body,
+        "source_note": w.source_note,
+        "written_at": w.written_at.isoformat() if w.written_at else None,
+    }
+    from datetime import datetime, timezone
+
+    w.deleted_at = datetime.now(timezone.utc)
     await db.commit()
     await record_activity(
         action="delete", entity_type="writing", entity_id=writing_id,
-        entity_label=title, detail="حذف نوشته", user_id=user_id, db=db,
+        entity_label=w.title, detail="انتقال نوشته به سطل زباله",
+        payload_before=snapshot, user_id=user_id, db=db,
     )

@@ -109,6 +109,7 @@ async def build_today(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
             select(TodoItem)
             .where(
                 _scope(TodoItem.owner_id, user_id),
+                TodoItem.deleted_at.is_(None),
                 TodoItem.is_completed.is_(False),
                 TodoItem.due_date.isnot(None),
                 TodoItem.due_date <= horizon,
@@ -122,6 +123,7 @@ async def build_today(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
             select(TodoItem)
             .where(
                 _scope(TodoItem.owner_id, user_id),
+                TodoItem.deleted_at.is_(None),
                 TodoItem.is_completed.is_(False),
                 TodoItem.is_starred.is_(True),
             )

@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_optional_user_id, get_required_user_id
 from app.middleware import handle_errors
 from app.schemas.todo_item_schema import TodoItemOut
 from app.schemas.todo_list_schema import (
@@ -146,7 +146,7 @@ async def get_list(
 async def create_list(
     payload: TodoListCreate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Create a list owned by the caller (audit task f17880d0).
 
@@ -186,7 +186,7 @@ async def update_list(
     list_id: int,
     payload: TodoListUpdate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Update a list the caller owns (audit task f17880d0).
 
@@ -217,7 +217,7 @@ async def update_list(
 async def delete_list(
     list_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> None:
     """Delete a list the caller owns (audit task f17880d0).
 
@@ -260,7 +260,7 @@ async def list_items_in_list(
 async def sync_lists_from_file(
     upload: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Sync one TodoList + its items from an uploaded JSON file.
 
@@ -311,7 +311,7 @@ async def add_item_to_list(
     list_id: int,
     payload: dict,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """Quick-add an item directly into this list.
 
@@ -326,12 +326,26 @@ async def add_item_to_list(
     content = payload.get("content")
     if not isinstance(content, str) or not content.strip():
         raise HTTPException(status_code=400, detail="content is required")
+    # due_date was accepted by the schema-level endpoint but dropped on
+    # this quick-add path (2026-07-20 audit #13) — parse it so list items
+    # can join the attention engine and the daily brief.
+    from datetime import date as _date
+
+    raw_due = payload.get("due_date")
+    due_date = None
+    if isinstance(raw_due, str) and raw_due.strip():
+        try:
+            due_date = _date.fromisoformat(raw_due.strip()[:10])
+        except ValueError:
+            raise HTTPException(status_code=400, detail="invalid due_date")
     item = await todo_item_service.create_item(
         db,
         content=content,
         description=payload.get("description"),
         is_completed=bool(payload.get("is_completed", False)),
         is_starred=bool(payload.get("is_starred", False)),
+        due_date=due_date,
+        owner_id=user_id if user_id != 0 else None,
         list_ids=[list_id],
     )
     await record_activity(

@@ -7,6 +7,7 @@ startup raises so we fail loudly instead of running with a guessable key.
 """
 import os
 import secrets
+from typing import Optional
 
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings
@@ -71,6 +72,11 @@ class Settings(BaseSettings):
     # Default False keeps a fresh/dev deploy and the current single-tenant
     # frontend working; production flips it on after the data migration.
     REQUIRE_AUTH: bool = False
+    # When set, POST /register requires this exact invite code — closes
+    # open registration on the public URL without touching login or the
+    # existing accounts (data-safety phase 0). Empty/None = unchanged
+    # open-registration behaviour.
+    REGISTER_INVITE_CODE: Optional[str] = None
 
     # --- Google OAuth -------------------------------------------------------
     # Read by app/services/google_auth.py and app/routes/auth_google.py.

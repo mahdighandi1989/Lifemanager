@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_optional_user_id, get_required_user_id
 from app.middleware import handle_errors
 from app.models.todo_list import TodoList
 from app.schemas.todo_item_schema import (
@@ -130,7 +130,7 @@ async def get_todo_item(item_id: int, db: AsyncSession = Depends(get_db)) -> dic
 async def create_todo_item(
     payload: TodoItemCreate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     # Audit task f17880d0: a new item may only be filed into lists the
     # caller can reach (their own or legacy-unowned). Reject an attempt to
@@ -157,6 +157,12 @@ async def create_todo_item(
         description=payload.description,
         is_completed=payload.is_completed,
         is_starred=payload.is_starred,
+        # due_date/parent_id were accepted by the schema but silently
+        # dropped here (2026-07-20 audit #13) — list items never reached
+        # the attention engine or the daily brief. Pass them through.
+        parent_id=payload.parent_id,
+        due_date=payload.due_date,
+        owner_id=user_id if user_id != 0 else None,
         list_ids=payload.list_ids,
         type=payload.type,
     )
@@ -187,16 +193,24 @@ async def update_todo_item(
     item_id: int,
     payload: TodoItemUpdate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
+    before = await todo_item_service.get_item(db, item_id)
+    snapshot = {
+        "content": before.content,
+        "description": before.description,
+        "due_date": before.due_date.isoformat() if before.due_date else None,
+        "is_completed": before.is_completed,
+    }
     data = payload.model_dump(exclude_unset=True)
     item = await todo_item_service.update_item(db, item_id, **data)
     ctx_type, ctx_id = await _item_context(db, item_id)
     await record_activity(
         action="update", entity_type="todo_item", entity_id=item.id,
         entity_label=item.content, context_type=ctx_type, context_id=ctx_id,
-        detail="ویرایش آیتم", user_id=user_id, db=db,
+        detail="ویرایش آیتم", payload_before=snapshot,
+        user_id=user_id, db=db,
     )
     return _serialize(item)
 
@@ -212,19 +226,25 @@ async def update_todo_item(
 async def delete_todo_item(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> None:
+    """Soft delete — the item moves to the trash (سطل زباله) and can be
+    restored from /api/trash. Hard removal only via the purge endpoint."""
     await _assert_item_in_scope(db, item_id, user_id)
     ctx_type, ctx_id = await _item_context(db, item_id)
-    try:
-        label = (await todo_item_service.get_item(db, item_id)).content
-    except Exception:
-        label = None
-    await todo_item_service.delete_item(db, item_id)
+    before = await todo_item_service.get_item(db, item_id)
+    snapshot = {
+        "content": before.content,
+        "description": before.description,
+        "due_date": before.due_date.isoformat() if before.due_date else None,
+        "is_completed": before.is_completed,
+    }
+    item = await todo_item_service.soft_delete_item(db, item_id)
     await record_activity(
         action="delete", entity_type="todo_item", entity_id=item_id,
-        entity_label=label, context_type=ctx_type, context_id=ctx_id,
-        detail="حذف آیتم", user_id=user_id, db=db,
+        entity_label=item.content, context_type=ctx_type, context_id=ctx_id,
+        detail="انتقال آیتم به سطل زباله", payload_before=snapshot,
+        user_id=user_id, db=db,
     )
     return None
 
@@ -240,7 +260,7 @@ async def delete_todo_item(
 async def toggle_complete(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_complete(db, item_id)
@@ -264,7 +284,7 @@ async def toggle_complete(
 async def toggle_star(
     item_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.toggle_star(db, item_id)
@@ -283,7 +303,7 @@ async def share_item(
     item_id: int,
     payload: TodoItemShare,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.share_with_lists(db, item_id, payload.list_ids)
@@ -300,7 +320,7 @@ async def unshare_item(
     item_id: int,
     payload: TodoItemUnshare,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.unshare_from_lists(db, item_id, payload.list_ids)
@@ -317,7 +337,7 @@ async def move_item(
     item_id: int,
     payload: TodoItemMove,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
     await _assert_item_in_scope(db, item_id, user_id)
     item = await todo_item_service.move_item(

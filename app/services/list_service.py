@@ -315,7 +315,12 @@ async def sync_todo_lists_from_source(
     existing_result = await db.execute(
         select(TodoItem)
         .join(todo_list_items, todo_list_items.c.todo_item_id == TodoItem.id)
-        .where(todo_list_items.c.todo_list_id == lst.id)
+        .where(
+            todo_list_items.c.todo_list_id == lst.id,
+            # Trashed rows must not swallow re-imported content — a
+            # fresh live row is created instead (data-safety phase 0).
+            TodoItem.deleted_at.is_(None),
+        )
     )
     existing_items = {it.content: it for it in existing_result.scalars().all()}
 

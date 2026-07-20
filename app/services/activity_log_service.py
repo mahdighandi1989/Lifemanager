@@ -18,6 +18,7 @@ IP — this module stays importable from services and tasks.
 """
 from __future__ import annotations
 
+import json
 import logging
 from typing import Optional
 
@@ -47,6 +48,7 @@ async def record_activity(
     context_type: Optional[str] = None,
     context_id=None,
     detail: Optional[str] = None,
+    payload_before=None,
     user_id: Optional[int] = None,
     request: Optional[Request] = None,
     db=None,
@@ -69,6 +71,11 @@ async def record_activity(
             context_type=context_type,
             context_id=str(context_id) if context_id is not None else None,
             detail=detail,
+            payload_before=(
+                payload_before
+                if isinstance(payload_before, (str, type(None)))
+                else json.dumps(payload_before, ensure_ascii=False, default=str)
+            ),
             ip_address=_client_ip(request),
         )
         if db is not None:

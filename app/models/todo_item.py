@@ -63,6 +63,11 @@ class TodoItem(Base):
     # completed_at is recorded the moment is_completed flips True so
     # ops can plot "completions per day" without trawling created_at.
     completed_at = Column(DateTime(timezone=True), nullable=True)
+    # Soft-delete (سطل زباله): DELETE routes stamp this instead of
+    # removing the row, so years-old owner content survives a wrong
+    # click. Read paths filter deleted_at IS NULL; /api/trash lists,
+    # restores, or purges stamped rows.
+    deleted_at = Column(DateTime(timezone=True), nullable=True, index=True)
     # ``type`` classifies the item beyond is_starred/is_completed —
     # audit task 2165524b AC 1 asked for {task, shopping, errand, ...}.
     # Default 'task' keeps every existing row's classification stable.

@@ -177,3 +177,7 @@ inbox/*
 # Throwaway local venvs used for verification (not .venv which is already ignored)
 .venv_run/
 .venv_test/
+
+# Local backup archives — the automatic-backup service's fallback when Google
+# Drive is offline (app/services/backup_service.py). Never commit life data.
+data/backups/
