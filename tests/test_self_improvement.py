@@ -825,3 +825,124 @@ def test_overview_with_garbage_token_falls_back_to_anon(api_client):
         headers={"Authorization": "Bearer not.a.real.jwt"},
     )
     assert r.status_code == 200, r.text
+
+
+# --- Owner-data guards (2026-07-20) ----------------------------------------
+
+
+def _divine_rows(seed_items, *, misorder=False, completed_idx=None,
+                 edited_idx=None, drop_last=False):
+    """Build (id, content, description, position, is_completed) tuples
+    mirroring the production divine_man list state."""
+    from app.services.self_improvement_service import _parse_seed_item
+
+    rows = []
+    for i, raw in enumerate(seed_items):
+        content, kind = _parse_seed_item(raw)
+        rows.append([i + 1, content, kind, i, False])
+    if misorder:
+        # Note + header (canonical positions 35/36) tacked on at the
+        # end — the exact bug state the hard reset was built for.
+        prose = [r for r in rows if r[2] is not None]
+        rows = [r for r in rows if r[2] is None] + prose
+        for pos, r in enumerate(rows):
+            r[3] = pos
+    if completed_idx is not None:
+        rows[completed_idx][4] = True
+    if edited_idx is not None:
+        rows[edited_idx][1] = "متن ویرایش‌شدهٔ خود مالک"
+    if drop_last:
+        rows = rows[:-1]
+    return [tuple(r) for r in rows]
+
+
+def test_divine_man_hard_reset_verdict_guards_owner_data():
+    """The startup wipe may only fire for the pure-seed misorder bug —
+    any owner add/edit/tick (سال‌ها محتوای جمع‌شده) must disable it."""
+    from app.services.self_improvement_service import (
+        divine_man_hard_reset_verdict,
+    )
+
+    divine_name = "شخصیت یک مرد الهی – مردِ خدا ..."
+    seed = SELF_IMPROVEMENT_LISTS[divine_name]
+
+    # Canonical order → nothing to do.
+    ok, reason = divine_man_hard_reset_verdict(_divine_rows(seed), seed)
+    assert (ok, reason) == (False, "order-ok")
+
+    # Full count, pure seed, misordered → the one state that resets.
+    ok, reason = divine_man_hard_reset_verdict(
+        _divine_rows(seed, misorder=True), seed
+    )
+    assert (ok, reason) == (True, "misordered-pure-seed")
+
+    # Owner deleted a row → count mismatch → never reset.
+    ok, reason = divine_man_hard_reset_verdict(
+        _divine_rows(seed, misorder=True, drop_last=True), seed
+    )
+    assert (ok, reason) == (False, "count-mismatch")
+
+    # Owner ticked an item → reset would erase the tick → skip.
+    ok, _ = divine_man_hard_reset_verdict(
+        _divine_rows(seed, misorder=True, completed_idx=0), seed
+    )
+    assert ok is False
+
+    # Owner edited an item's text → reset would revert it → skip.
+    ok, _ = divine_man_hard_reset_verdict(
+        _divine_rows(seed, misorder=True, edited_idx=0), seed
+    )
+    assert ok is False
+
+
+@pytest.mark.asyncio
+async def test_muhasebe_prefix_rows_survive_when_migration_done(si_client):
+    """Once the old exact-match rows are gone (migration finished), a
+    «نکته: …» / «مراقبه: …» row is the OWNER'S own note and must never
+    be deleted by the seeder — prefix cleanup only applies to the
+    pre-migration state that still carries exact-match stale rows."""
+    from sqlalchemy import insert, select
+
+    from app.services.self_improvement_service import ensure_lists_seeded
+
+    client, factory = si_client
+    owner_note = "نکته: یادداشت شخصی مالک — نباید هرگز حذف شود"
+    owner_moraghebe = "مراقبه: تمرین جدید خودم"
+
+    async with factory() as db:
+        ml = (await db.execute(
+            select(TodoList).where(TodoList.name == MUHASEBE_LIST_NAME)
+        )).scalar_one()
+        taken = (await db.execute(
+            select(todo_list_items.c.position).where(
+                todo_list_items.c.todo_list_id == ml.id
+            )
+        )).all()
+        start = (max((p for (p,) in taken), default=-1)) + 1
+        for offset, content in enumerate([owner_note, owner_moraghebe]):
+            it = TodoItem(content=content)
+            db.add(it)
+            await db.commit()
+            await db.refresh(it)
+            await db.execute(insert(todo_list_items).values(
+                todo_list_id=ml.id, todo_item_id=it.id,
+                position=start + offset,
+            ))
+        await db.commit()
+
+    async with factory() as db:
+        await ensure_lists_seeded(db)
+
+    async with factory() as db:
+        ml = (await db.execute(
+            select(TodoList).where(TodoList.name == MUHASEBE_LIST_NAME)
+        )).scalar_one()
+        rows = (await db.execute(
+            select(TodoItem.content)
+            .join(todo_list_items,
+                  todo_list_items.c.todo_item_id == TodoItem.id)
+            .where(todo_list_items.c.todo_list_id == ml.id)
+        )).all()
+    contents = {r[0] for r in rows}
+    assert owner_note in contents
+    assert owner_moraghebe in contents

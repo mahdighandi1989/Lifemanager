@@ -580,12 +580,12 @@ async def startup_event():
     # still rendering at the END of the شخصیت مرد الهی list across
     # multiple deploys, even though _realign_positions tests pass
     # locally. Whatever's happening on production isn't caught by my
-    # SQLite tests, so we bypass the smart-reordering path entirely:
-    # if positions 35 + 36 of the divine_man list aren't the note +
-    # header, wipe the list and re-seed in canonical order. No
-    # user data is at risk — the list carries no check-ins yet
-    # (the screenshot shows "از 41 تکمیل شده 0") and items can be
-    # re-added by the user if they'd manually appended any.
+    # SQLite tests, so we bypass the smart-reordering path entirely
+    # for that one bug state. Guarded since 2026-07-20 by
+    # divine_man_hard_reset_verdict: the wipe only runs when it is
+    # provably lossless (full canonical count, every row pure seed
+    # content, nothing ticked) — any owner add/edit/tick disables it,
+    # because preserving owner data outranks display order.
     try:
         from app.database import SessionLocal
         from app.models.todo_item import TodoItem
@@ -594,9 +594,8 @@ async def startup_event():
             SELF_IMPROVEMENT_LISTS,
         )
         from app.services.self_improvement_service import (
-            SI_DESCRIPTION_HEADER,
-            SI_DESCRIPTION_NOTE,
             _parse_seed_item,
+            divine_man_hard_reset_verdict,
         )
         from sqlalchemy import delete as _delete
         from sqlalchemy import insert as _insert
@@ -616,18 +615,21 @@ async def startup_event():
                             TodoItem.content,
                             TodoItem.description,
                             todo_list_items.c.position,
+                            TodoItem.is_completed,
                         )
                         .join(todo_list_items,
                               todo_list_items.c.todo_item_id == TodoItem.id)
                         .where(todo_list_items.c.todo_list_id == lst.id)
                         .order_by(todo_list_items.c.position)
                     )).all()
-                    needs_reset = (
-                        len(rows) != len(seed)
-                        or (len(rows) >= 37 and (
-                            rows[35][2] != SI_DESCRIPTION_NOTE
-                            or rows[36][2] != SI_DESCRIPTION_HEADER
-                        ))
+                    # Owner-data guard (2026-07-20): the reset wipes the
+                    # whole list, so it only fires for the exact
+                    # production bug it was built for — full canonical
+                    # count, pure seed content, nothing ticked, but
+                    # note/header misplaced. Any owner add/edit/tick or
+                    # count drift → skip and leave the data alone.
+                    needs_reset, reset_reason = divine_man_hard_reset_verdict(
+                        rows, seed
                     )
                     if needs_reset:
                         logger.info(
@@ -671,9 +673,9 @@ async def startup_event():
                         )
                     else:
                         logger.info(
-                            "divine_man order check ✓ (rows=%d, "
-                            "pos35=NOTE, pos36=HEADER)",
-                            len(rows),
+                            "divine_man hard-reset not needed (rows=%d, "
+                            "reason=%s)",
+                            len(rows), reset_reason,
                         )
     except Exception as exc:
         logger.warning(

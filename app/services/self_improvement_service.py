@@ -120,6 +120,37 @@ def _parse_seed_item(raw: str) -> tuple[str, Optional[str]]:
     return raw, None
 
 
+def divine_man_hard_reset_verdict(
+    rows: list[tuple], seed_items: list[str]
+) -> tuple[bool, str]:
+    """Decide whether the startup hard-reset of the divine_man list is
+    both NEEDED (canonical misorder bug: full count but note/header not
+    at positions 35/36) and LOSSLESS (every row is pure seed content and
+    nothing is ticked). Rows: (id, content, description, position,
+    is_completed).
+
+    The reset wipes and re-inserts the whole list, so it must NEVER run
+    when the owner has added, edited, or completed anything — owner data
+    outranks display order. Returns (should_reset, reason).
+    """
+    if len(rows) != len(seed_items):
+        # Count drift means the owner added/removed rows (or the
+        # service-level catch-up will top up missing seed rows). A wipe
+        # here would destroy or resurrect owner edits — never reset.
+        return False, "count-mismatch"
+    if len(rows) < 37 or (
+        rows[35][2] == SI_DESCRIPTION_NOTE
+        and rows[36][2] == SI_DESCRIPTION_HEADER
+    ):
+        return False, "order-ok"
+    seed_contents = {c for c, _k in (_parse_seed_item(r) for r in seed_items)}
+    non_seed = sum(1 for r in rows if r[1] not in seed_contents)
+    completed = sum(1 for r in rows if len(r) > 4 and r[4])
+    if non_seed or completed:
+        return False, f"owner-data:{non_seed}-non-seed,{completed}-completed"
+    return True, "misordered-pure-seed"
+
+
 # Names the lists carried in earlier deploys. The startup rename
 # step (see app.main.startup_event) UPDATEs todo_lists.name from
 # the old form to the new form so the seeder lookup matches and the
@@ -393,11 +424,20 @@ async def ensure_lists_seeded(db: AsyncSession) -> int:
         # that were promoted to their own lists. Idempotent and
         # surgical so anything the user added themselves stays.
         if list_name == MUHASEBE_LIST_NAME and n_items > 0:
-            stale = [
+            exact_stale = [
                 (iid, _p) for (iid, c, _p) in existing_items
                 if c in _OLD_MUHASEBE_DAILY_LOG_ITEMS
-                or any(c.startswith(p) for p in _OLD_MUHASEBE_PREFIX_CLEANUP)
             ]
+            # Prefix rows («مراقبه: …» / «نکته: …») are only stale in
+            # the pre-migration state, which always also carries
+            # exact-match rows. Once those are gone the migration is
+            # done and prefix-titled rows are the owner's own notes —
+            # they must never be touched again.
+            prefix_stale = [
+                (iid, _p) for (iid, c, _p) in existing_items
+                if any(c.startswith(p) for p in _OLD_MUHASEBE_PREFIX_CLEANUP)
+            ] if exact_stale else []
+            stale = exact_stale + prefix_stale
             if stale:
                 stale_ids = [iid for iid, _p in stale]
                 await db.execute(
