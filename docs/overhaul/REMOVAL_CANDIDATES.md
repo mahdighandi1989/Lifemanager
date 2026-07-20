@@ -37,3 +37,16 @@ how to revive it.
   catalog (`ai_manager`); then the endpoints can be removed with owner approval.
 
 <!-- Add new quarantined capabilities below this line. -->
+
+## 2026-07-20 — رفتارهای قرنطینه‌شدهٔ seed خودسازی (کد حفظ شد، شرط مخرب غیرفعال)
+
+- **شرط count-mismatch در HARD RESET لیست «مرد الهی»** (`app/main.py` بلوک divine_man):
+  قبلاً `len(rows) != len(seed)` به‌تنهایی کل لیست را حذف/بازسازی می‌کرد — یعنی افزودن یا
+  حذف یک آیتم توسط مالک، در بوت بعدی همهٔ داده‌اش را می‌پراند. از این تاریخ reset فقط با
+  حکم `divine_man_hard_reset_verdict` (تعداد برابر seed + محتوای صددرصد seed + صفر تیک)
+  اجرا می‌شود. حالت‌های قبلی حذف نشده‌اند — فقط پشت گارد بدون‌خسارت رفته‌اند و در log با
+  reason ثبت می‌شوند. بازگردانی: حذف گارد (یک if) — ولی فقط با تأیید صریح مالک.
+- **حذف پیشوندی نامشروط «مراقبه:/نکته:» در لیست محاسبه**
+  (`app/services/self_improvement_service.py`): قبلاً در هر بوت/GET هر ردیفی با این
+  پیشوندها حذف سخت می‌شد (یادداشت‌های آیندهٔ مالک هم). حالا فقط وقتی ردیف‌های exact-match
+  قدیمی (وضعیت پیش-مهاجرت) حاضر باشند اجرا می‌شود. بازگردانی: برداشتن شرط `if exact_stale`.

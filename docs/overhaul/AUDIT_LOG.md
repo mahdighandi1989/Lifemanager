@@ -1389,3 +1389,30 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **CHANGE (docs)** گزارش تصمیم `docs/decisions/2026-07-20-life-os-holistic-audit.md` +
   تجربهٔ جدید `experiences/holistic-island-audit-with-adversarial-verification.md` ثبت شد.
   هیچ کد رفتاری تغییر نکرد (ممیزی فقط‌خواندنی).
+
+## 2026-07-20 — موجودی محتوا + ایمنی داده (درخواست مالک: «لیست‌های سال‌هایم چه می‌شوند؟»)
+
+- **FINDING (موجودی)** ورک‌فلوی ۶-ایجنته کل محتوای ارزشمند را فهرست کرد: ۳۳ لیست تودو
+  (۲۹۶+۱۱۶ آیتم)، ۲۲ لیست توسعهٔ فردی (۸۲۰ آیتم) + ۱۹۴ تراکنش آرشیوی، ۸ لیست خودسازی
+  (۱۴۵ آیتم)، ۲ نوشتهٔ بلند (~۱۱۷هزار کاراکتر با گیت verbatim)، سند حقوق؛ `prompt/`
+  (۱۳MB) خروجی ماشینی بات قدیمی است (~۱۶ فایلش پیوست خام شخصی دارد). دفتر موجودی دائمی:
+  `docs/CONTENT_INVENTORY.md`. محتوای DB-only (بدون backup قابل بازیابی نیست): کل CRM،
+  چک‌این‌ها، مالی جاری، inbox، تغییرات پس از seed.
+- **FINDING (🔴 دو بمب دادهٔ فعال — راستی‌آزمایی مستقل)** (۱) HARD RESET لیست «مرد الهی»
+  در `main.py` با شرط «تعداد ≠ ۴۱» در هر بوت کل لیست را حذف/بازسازی می‌کرد — هر
+  افزودن/حذف مالک = پریدن همهٔ ویرایش‌ها و تیک‌ها در بوت بعد. (۲) پاک‌سازی پیشوندی
+  «مراقبه:/نکته:» در لیست محاسبه، یادداشت‌های آیندهٔ مالک با این شروع‌ها را در هر
+  بوت/GET حذف می‌کرد. همچنین تأیید شد: seedهای اصلی fill-empty و امن‌اند؛ نوشتن ناشناس
+  روی lists/todo-items/writings حتی با REQUIRE_AUTH=true باز می‌ماند (get_optional).
+- **CHANGE (مهار دو بمب)** `self_improvement_service.py`: تابع جدید
+  `divine_man_hard_reset_verdict` (reset فقط در حالت اثباتاً بدون‌خسارت: count==seed،
+  محتوا صددرصد seed، صفر تیک) + حذف پیشوندی فقط با حضور ردیف‌های exact-match پیش-مهاجرت؛
+  `main.py`: استفاده از verdict + ستون is_completed در کوئری + به‌روزکردن کامنت.
+  رفتارهای قبلی در REMOVAL_CANDIDATES قرنطینه/مستند شدند (rule 2).
+- **VERIFY** ۲ تست جدید (۵ سناریوی گارد verdict؛ بقای یادداشت‌های پیشونددار مالک پس از
+  مهاجرت)؛ test_self_improvement ۲۲/۲۲ سبز؛ تست‌های قدیمی پاک‌سازی مهاجرتی بدون تغییر
+  پاس. full suite + build: نتیجه در گیت merge همین ورودی.
+- **PROPOSAL (نیازمند تصمیم مالک — گزارش تصمیم `2026-07-20-content-safety-and-inventory.md`)**
+  backup روزانه به Drive؛ بستن نوشتن ناشناس با dual-path (همراه فلوی login)؛ soft-delete
+  و سطل زباله برای آیتم/نوشته؛ payload_before در activity log؛ realign فقط
+  insert-if-missing؛ حذف html.escape از لایهٔ ذخیره؛ آرشیو فایل‌های منبع اصلی در Drive.
