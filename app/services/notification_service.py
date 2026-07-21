@@ -706,6 +706,21 @@ register_event(
     title="📒 گزارش روز",
     channels=["in_app", "telegram"],
 )
+# اتصال گوگل (Gmail/تقویم/Drive). قطعی باید بدون رفتن به هیچ صفحه‌ای به مالک
+# برسد — پس به تلگرام fan-out می‌شود. edge-triggered + cooldownِ بادوام در بلابِ
+# google_sync_engine (نه rate-limitِ in-process که با ری‌استارتِ Render ریست می‌شود).
+register_event(
+    "google_disconnected",
+    title="⚠️ اتصال گوگل قطع شد",
+    priority="high",
+    silent=False,
+    channels=["in_app", "telegram"],
+)
+register_event(
+    "google_reconnected",
+    title="✅ اتصال گوگل برقرار شد",
+    channels=["in_app", "telegram"],
+)
 
 
 # ── Per-event rate-limit (Step 18) ──────────────────────────────────────

@@ -180,6 +180,38 @@ def digest_decision(cfg: Dict[str, Any], now_utc: datetime) -> bool:
     return cfg.get("last_digest_date") != local.date().isoformat()
 
 
+def connection_decision(
+    prev_state: Optional[str],
+    probe_state: str,
+    last_notified_iso: Optional[str],
+    now_utc: datetime,
+    cooldown_seconds: int = 86400,
+) -> Dict[str, Any]:
+    """PURE edge-trigger for the «اتصال گوگل قطع شد» alert (testable matrix).
+
+    ``probe_state`` ∈ {connected, not_connected, token_revoked}:
+      * ``not_connected`` — no refresh token at all (never linked, or the owner
+        disconnected on purpose). Never alert — that's not a *drop*.
+      * ``connected`` — token still works. No alert; flag reconnection when the
+        previous state was disconnected (so an all-clear can fire).
+      * ``token_revoked`` — a token IS stored but Google rejected it
+        (invalid_grant/expired). Alert on the connected→disconnected edge, then
+        stay quiet until ``cooldown_seconds`` passes (durable cooldown, so a
+        persistently-revoked token doesn't nag every poll — and it survives a
+        Render restart because the timestamp lives in the settings blob).
+    """
+    if probe_state != "token_revoked":
+        return {
+            "alert": False,
+            "new_state": probe_state,
+            "reconnected": probe_state == "connected" and prev_state == "disconnected",
+        }
+    if prev_state != "disconnected":
+        return {"alert": True, "new_state": "disconnected", "reconnected": False}
+    stale = (not last_notified_iso) or due(last_notified_iso, cooldown_seconds, now_utc)
+    return {"alert": stale, "new_state": "disconnected", "reconnected": False}
+
+
 # ── tick + loop ──────────────────────────────────────────────────────────────
 async def _run_concern(db, result: Dict[str, Any], key: str, coro) -> None:
     try:
@@ -191,6 +223,71 @@ async def _run_concern(db, result: Dict[str, Any], key: str, coro) -> None:
         except Exception:
             pass
     result["ran"].append(key)
+
+
+async def _check_connection(
+    db: AsyncSession, cfg: Dict[str, Any], now: datetime, now_iso: str
+) -> Dict[str, Any]:
+    """Probe the Google connection three-ways and, on the connected→disconnected
+    edge, fire a Telegram-fanned «اتصال گوگل قطع شد» alert so the owner learns of
+    a revoked token WITHOUT visiting any page. Writes durable state into the
+    settings blob. Never raises (runs as a sync concern)."""
+    import os
+
+    from app.services.drive_settings_service import resolve_refresh_token
+    from app.services.google_api_client import refresh_access_token_details
+
+    rt = await resolve_refresh_token(db)
+    if not rt:
+        probe_state, reason = "not_connected", None
+    else:
+        token, reason = await refresh_access_token_details(rt)
+        probe_state = "connected" if token else "token_revoked"
+
+    prev = cfg.get("google_conn_state")
+    dec = connection_decision(
+        prev, probe_state, cfg.get("google_disconnect_notified_at"), now
+    )
+    stamps: Dict[str, Any] = {"google_conn_state": dec["new_state"]}
+    if probe_state == "connected":
+        stamps["last_gmail_success_at"] = now_iso
+
+    uid = int(os.environ.get("TELEGRAM_TASK_USER_ID", "0") or 0)
+    if dec.get("alert"):
+        stamps["google_disconnect_notified_at"] = now_iso
+        try:
+            from app.services.notification_service import notify_event
+
+            await notify_event(
+                "google_disconnected",
+                user_id=uid,
+                db=db,
+                title="⚠️ اتصال گوگل قطع شد",
+                message=(
+                    "گوگل توکنِ ذخیره‌شده را رد کرد؛ Gmail/تقویم/Drive تا اتصالِ دوباره "
+                    "کار نمی‌کنند. در تنظیمات «اتصال به گوگل» را دوباره بزن."
+                    + (f" (جزئیات: {reason[:120]})" if reason else "")
+                ),
+                priority="high",
+            )
+        except Exception as exc:  # notification must never break the loop
+            logger.debug("google_disconnected notify failed: %r", exc)
+    elif dec.get("reconnected"):
+        try:
+            from app.services.notification_service import notify_event
+
+            await notify_event(
+                "google_reconnected",
+                user_id=uid,
+                db=db,
+                title="✅ اتصال گوگل برقرار شد",
+                message="Gmail/تقویم/Drive دوباره وصل شد.",
+            )
+        except Exception as exc:
+            logger.debug("google_reconnected notify failed: %r", exc)
+
+    await _write_stamps(db, stamps)
+    return {"ok": True, "state": dec["new_state"], "probe": probe_state}
 
 
 async def google_sync_tick(db: AsyncSession, now: Optional[datetime] = None) -> Dict[str, Any]:
@@ -223,6 +320,11 @@ async def google_sync_tick(db: AsyncSession, now: Optional[datetime] = None) -> 
             return {"sync": sync, "triage": triage, "ok": sync.get("ok", False)}
 
         await _run_concern(db, result, "gmail", _gmail())
+
+        # Connection health rides the Gmail cadence: on the connected→disconnected
+        # edge it alerts (Telegram) so a revoked token surfaces without the owner
+        # visiting any page. Its own durable state/stamps, so it's isolated.
+        await _run_concern(db, result, "connection", _check_connection(db, cfg, now, now_iso))
 
     if due(cfg.get("last_calendar_poll_at"), int(cfg["calendar_poll_minutes"]) * 60, now):
         stamps["last_calendar_poll_at"] = now_iso

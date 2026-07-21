@@ -231,6 +231,28 @@ async def test_digest_decision_matrix():
     assert g_engine.digest_decision(done, NOW.replace(hour=22)) is False
 
 
+async def test_connection_decision_matrix():
+    cd = g_engine.connection_decision
+    # No token → never alert (not a drop; owner never linked / disconnected).
+    assert cd(None, "not_connected", None, NOW)["alert"] is False
+    # Working token, was fine → no alert, not a reconnection.
+    assert cd("connected", "connected", None, NOW)["alert"] is False
+    # Working token AFTER a disconnect → all-clear (reconnected).
+    back = cd("disconnected", "connected", None, NOW)
+    assert back["alert"] is False and back["reconnected"] is True
+    # Revoked token on the connected→disconnected edge → ALERT once.
+    edge = cd("connected", "token_revoked", None, NOW)
+    assert edge["alert"] is True and edge["new_state"] == "disconnected"
+    # Revoked with no prior state (first ever probe finds it dead) → alert.
+    assert cd(None, "token_revoked", None, NOW)["alert"] is True
+    # Still revoked, alerted 1h ago → stay quiet (durable cooldown).
+    recent = (NOW - timedelta(hours=1)).isoformat()
+    assert cd("disconnected", "token_revoked", recent, NOW)["alert"] is False
+    # Still revoked, but last alert was >24h ago → re-alert.
+    stale = (NOW - timedelta(hours=30)).isoformat()
+    assert cd("disconnected", "token_revoked", stale, NOW)["alert"] is True
+
+
 async def test_google_tick_stamps_and_env_not_baked(db_session, monkeypatch):
     monkeypatch.setenv("GMAIL_POLL_MINUTES", "45")
 
