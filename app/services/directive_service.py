@@ -107,15 +107,20 @@ _DOMAIN_DEFAULT_TIME = {
 }
 
 
+def _valid_hhmm(text: str) -> bool:
+    """A real clock time — 0–23 hours, 0–59 minutes (rejects "99:99")."""
+    m = re.match(r"^(\d{1,2}):(\d{2})$", (text or "").strip())
+    return bool(m) and 0 <= int(m.group(1)) <= 23 and 0 <= int(m.group(2)) <= 59
+
+
 def _window_of(preferred_time: Optional[str]) -> Optional[str]:
     """Resolve a preferred_time (a window key OR "HH:MM") to a window key."""
     if not preferred_time:
         return None
     if preferred_time in _TIME_WINDOWS:
         return preferred_time
-    m = re.match(r"^(\d{1,2}):(\d{2})$", preferred_time.strip())
-    if m:
-        h = int(m.group(1))
+    if _valid_hhmm(preferred_time):
+        h = int(preferred_time.strip().split(":")[0])
         for win, (lo, hi) in _TIME_WINDOWS.items():
             if lo <= h <= hi:
                 return win
@@ -738,9 +743,11 @@ async def set_schedule(
         return None
     if preferred_time is not None:
         pt = preferred_time.strip()
-        d.preferred_time = pt if (pt in _TIME_WINDOWS or re.match(r"^\d{1,2}:\d{2}$", pt) or pt == "") else d.preferred_time
         if pt == "":
             d.preferred_time = None
+        elif pt in _TIME_WINDOWS or _valid_hhmm(pt):
+            d.preferred_time = pt
+        # else: ignore a nonsensical value ("99:99") — keep the existing one.
     if preferred_context is not None:
         d.preferred_context = preferred_context.strip()[:200] or None
     await db.commit()
@@ -815,10 +822,20 @@ async def run_daily_intake(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]
 
 
 # ── daily command selection ───────────────────────────────────────────────────
-def _is_due(d: Directive, today: date) -> bool:
+def _local_date(dt: Optional[datetime], off: int) -> Optional[date]:
+    """The LOCAL calendar date of a stored (UTC) timestamp — so «gap since last
+    done» is measured in local days, not UTC days (fixes the near-midnight
+    off-by-one, review finding #6)."""
+    if dt is None:
+        return None
+    naive = dt if dt.tzinfo is None else dt.astimezone(timezone.utc).replace(tzinfo=None)
+    return (naive + timedelta(minutes=off)).date()
+
+
+def _is_due(d: Directive, today: date, off: int = 240) -> bool:
     if d.cadence == CADENCE_DAILY:
         return True
-    last = d.last_done_at.date() if d.last_done_at else None
+    last = _local_date(d.last_done_at, off)
     if last is None:
         return True
     gap = (today - last).days
@@ -831,12 +848,12 @@ def _is_due(d: Directive, today: date) -> bool:
     return True
 
 
-def _score(d: Directive, today: date) -> tuple:
+def _score(d: Directive, today: date, off: int = 240) -> tuple:
     """Weak-first, due-first, neglected-first, heavier-first — strict coaching
     surfaces what most needs work. Deterministic (id tie-break) so the web
     preview and the persisted set agree."""
-    due = 1 if _is_due(d, today) else 0
-    last_surf = d.last_surfaced_at.date() if d.last_surfaced_at else None
+    due = 1 if _is_due(d, today, off) else 0
+    last_surf = _local_date(d.last_surfaced_at, off)
     neglect = (today - last_surf).days if last_surf else 30
     neglect = max(0, min(neglect, 30))
     weakness = 100 - int(d.strength or 0)
@@ -862,7 +879,11 @@ async def build_directive_context(
     try:
         from app.models.personal_sync import PersonalEvent
 
-        now_utc = datetime.now(timezone.utc)
+        # Base the calendar window on the passed ``now`` (not wall-clock) so a
+        # replayed/mocked time counts events against the right day (finding #7).
+        now_utc = now or datetime.now(timezone.utc)
+        if now_utc.tzinfo is None:
+            now_utc = now_utc.replace(tzinfo=timezone.utc)
         rows = (
             await db.execute(
                 select(PersonalEvent.start_at).where(
@@ -951,6 +972,7 @@ async def select_today_commands(
     top-N active directives and (when ``persist``) writes the check-in rows +
     stamps ``last_surfaced_at`` (idempotent via the per-day unique key)."""
     cfg = await get_config(db)
+    off = int(cfg.get("tz_offset_minutes", 240))
     day = _local_now(cfg, now).date()
 
     context = await build_directive_context(db, user_id, now)
@@ -959,9 +981,17 @@ async def select_today_commands(
     if existing:
         by_id = {c.directive_id: c for c in existing}
         ds = (
-            await db.execute(select(Directive).where(Directive.id.in_(list(by_id.keys()))))
+            await db.execute(
+                select(Directive).where(
+                    Directive.id.in_(list(by_id.keys())),
+                    # Only still-ACTIVE surfaced commands stay on today's list —
+                    # a directive archived/graduated after this morning's
+                    # surfacing must drop off (review 2026-07-21, finding #3).
+                    Directive.status == DIRECTIVE_ACTIVE,
+                )
+            )
         ).scalars().all()
-        ds.sort(key=lambda d: _score(d, day), reverse=True)
+        ds.sort(key=lambda d: _score(d, day, off), reverse=True)
         cmds = [{**directive_dict(d), "done": by_id[d.id].done} for d in ds]
         return {
             "date": day.isoformat(),
@@ -977,10 +1007,12 @@ async def select_today_commands(
             )
         )
     ).scalars().all()
-    active.sort(key=lambda d: _score(d, day), reverse=True)
+    active.sort(key=lambda d: _score(d, day, off), reverse=True)
     picked = active[: _effective_daily_count(cfg, context)]
 
     if persist and picked:
+        from sqlalchemy.exc import IntegrityError
+
         now_utc = datetime.now(timezone.utc)
         for d in picked:
             db.add(DirectiveCheckin(
@@ -988,7 +1020,15 @@ async def select_today_commands(
                 checkin_date=day, surfaced=True, done=None,
             ))
             d.last_surfaced_at = now_utc
-        await db.commit()
+        try:
+            await db.commit()
+        except IntegrityError:
+            # A concurrent surfacing (the loop tick racing GET /today in the
+            # same minute) already inserted today's rows — the per-day unique
+            # key rejected ours. Roll back and return the persisted set so the
+            # caller neither 409s nor re-pushes (review 2026-07-21, finding #5).
+            await db.rollback()
+            return await select_today_commands(db, user_id, now=now, persist=False)
 
     return {
         "date": day.isoformat(),
@@ -1044,6 +1084,11 @@ async def mark(
     ).scalar_one_or_none()
     if d is None:
         return None
+    # Only ACTIVE directives take a follow-up answer — a proposed (never
+    # approved) or archived/graduated directive must NOT gain strength or be
+    # surfaced as a command (review 2026-07-21, findings #3/#4).
+    if d.status != DIRECTIVE_ACTIVE:
+        return {"directive": directive_dict(d), "graduated": False, "skipped": "not_active"}
 
     c = await _upsert_checkin(db, directive_id, user_id, day)
     was_done = c.done
@@ -1054,25 +1099,30 @@ async def mark(
     gain = int(cfg.get("gain", 7))
     penalty = int(cfg.get("penalty", 12))
 
-    # Undo the previous same-day answer's effect before applying the new one,
-    # so toggling done↔missed twice in a day can't double-count.
-    if was_done is True and done is False:
+    # REVERSE the previous same-day answer's FULL effect (counter + strength +
+    # streak) before applying the new one, so re-answering the same day neither
+    # double-counts nor drifts strength (review 2026-07-21, finding #1). This
+    # also makes re-sending the SAME answer idempotent. (The pre-miss streak
+    # value is unrecoverable once zeroed — a miss→done the same day restarts the
+    # streak at 1; strength is restored exactly.)
+    if was_done is True:
         d.times_done = max(0, int(d.times_done or 0) - 1)
-    elif was_done is False and done is True:
+        d.strength = max(0, int(d.strength or 0) - gain)
+        d.streak = max(0, int(d.streak or 0) - 1)
+    elif was_done is False:
         d.times_missed = max(0, int(d.times_missed or 0) - 1)
+        d.strength = min(100, int(d.strength or 0) + penalty)
 
     if done:
-        if was_done is not True:
-            d.times_done = int(d.times_done or 0) + 1
-            d.streak = int(d.streak or 0) + 1
-            d.best_streak = max(int(d.best_streak or 0), d.streak)
-            d.strength = min(100, int(d.strength or 0) + gain)
-            d.last_done_at = now_utc
+        d.times_done = int(d.times_done or 0) + 1
+        d.streak = int(d.streak or 0) + 1
+        d.best_streak = max(int(d.best_streak or 0), d.streak)
+        d.strength = min(100, int(d.strength or 0) + gain)
+        d.last_done_at = now_utc
     else:
-        if was_done is not False:
-            d.times_missed = int(d.times_missed or 0) + 1
-            d.streak = 0
-            d.strength = max(0, int(d.strength or 0) - penalty)
+        d.times_missed = int(d.times_missed or 0) + 1
+        d.streak = 0
+        d.strength = max(0, int(d.strength or 0) - penalty)
 
     graduated = False
     if (
@@ -1109,7 +1159,9 @@ async def run_evening_followup(
     missed = 0
     for c in pending:
         res = await mark(db, c.directive_id, False, user_id=user_id, now=now)
-        if res is not None:
+        # mark() no-ops (returns skipped) for a directive that is no longer
+        # ACTIVE — don't count those as misses (review findings #3/#4).
+        if res is not None and not res.get("skipped"):
             missed += 1
     return {"ok": True, "date": day.isoformat(), "missed": missed}
 
@@ -1131,7 +1183,16 @@ async def growth_report(db: AsyncSession, user_id: int = 0, now: Optional[dateti
     today_checkins = await _todays_checkins(db, user_id, day)
     today_done = sum(1 for c in today_checkins if c.done is True)
 
-    graduated.sort(key=lambda d: (d.graduated_at or datetime.min.replace(tzinfo=timezone.utc)), reverse=True)
+    def _grad_key(d):
+        # Normalise to an aware UTC datetime so a stray naive graduated_at
+        # (ever written from a naive `now`) can't raise TypeError on compare
+        # (review 2026-07-21, finding #10).
+        g = d.graduated_at
+        if g is None:
+            return datetime.min.replace(tzinfo=timezone.utc)
+        return g if g.tzinfo is not None else g.replace(tzinfo=timezone.utc)
+
+    graduated.sort(key=_grad_key, reverse=True)
     forming.sort(key=lambda d: int(d.strength or 0), reverse=True)
 
     # per-domain active counts (so the owner sees the balance of their life)
@@ -1180,8 +1241,15 @@ async def directive_tick(db: AsyncSession, now: Optional[datetime] = None, *, us
     stored = await _load_blob(db, CONFIG_KEY)
     did: List[str] = []
 
+    # Whether today's commands were surfaced on an EARLIER tick (before this
+    # invocation). If the app was asleep all day and only wakes in the evening,
+    # this is False — and we must NOT surface then immediately sweep the same
+    # commands as missed in one tick (review 2026-07-21, finding #2). The owner
+    # gets the rest of the evening; the sweep waits for a later tick.
+    surfaced_before = stored.get("last_command_date") == day_iso
+
     # Morning: pull in new content / drop removed content, then surface + push.
-    if local.hour >= int(cfg.get("brief_hour", 7)) and stored.get("last_command_date") != day_iso:
+    if local.hour >= int(cfg.get("brief_hour", 7)) and not surfaced_before:
         intake = await run_daily_intake(db, user_id)
         res = await select_today_commands(db, user_id, now=now, persist=True)
         cmds = res.get("commands") or []
@@ -1193,8 +1261,13 @@ async def directive_tick(db: AsyncSession, now: Optional[datetime] = None, *, us
         await _save_blob(db, CONFIG_KEY, stored)
         did.append(f"commands:{len(cmds)} intake+{intake['proposed_added']}/-{intake['archived']}")
 
-    # Evening: sweep misses + remind.
-    if local.hour >= int(cfg.get("followup_hour", 21)) and stored.get("last_followup_date") != day_iso:
+    # Evening: sweep misses + remind — ONLY if the commands were already
+    # surfaced on a prior tick (so the owner had a window to answer).
+    if (
+        local.hour >= int(cfg.get("followup_hour", 21))
+        and surfaced_before
+        and stored.get("last_followup_date") != day_iso
+    ):
         summary = await run_evening_followup(db, user_id, now=now)
         # re-load (mark() mutated the blob's sibling rows, not the blob itself)
         stored = await _load_blob(db, CONFIG_KEY)

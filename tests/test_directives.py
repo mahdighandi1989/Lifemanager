@@ -305,6 +305,58 @@ def test_context_route(api_client):
     assert "load" in ctx and "open_tasks" in ctx
 
 
+# ── review 2026-07-21 regression fixes ────────────────────────────────────────
+@pytest.mark.asyncio
+async def test_same_day_toggle_reverses_strength_and_streak(db_session):
+    """Finding #1: re-answering the same day fully REVERSES the prior answer's
+    strength+streak (not just the counter) and is idempotent."""
+    d = await svc.add_manual(db_session, 0, title="ذکر")
+    await svc.mark(db_session, d.id, True, 0, now=_now(day=1))
+    await svc.mark(db_session, d.id, True, 0, now=_now(day=2))
+    r = await svc.mark(db_session, d.id, True, 0, now=_now(day=3))
+    assert r["directive"]["strength"] == 21 and r["directive"]["streak"] == 3
+
+    # toggle day-3 done → miss: reverse the done (21-7=14, streak 3-1=2), then
+    # apply miss (streak 0, 14-12=2). NOT the buggy 21-12=9.
+    r2 = await svc.mark(db_session, d.id, False, 0, now=_now(day=3))
+    assert r2["directive"]["strength"] == 2 and r2["directive"]["streak"] == 0
+    assert r2["directive"]["times_done"] == 2 and r2["directive"]["times_missed"] == 1
+
+    # re-sending the SAME (miss) answer is idempotent — no drift.
+    r3 = await svc.mark(db_session, d.id, False, 0, now=_now(day=3))
+    assert r3["directive"]["strength"] == 2 and r3["directive"]["times_missed"] == 1
+
+
+@pytest.mark.asyncio
+async def test_evening_tick_does_not_sweep_freshly_surfaced(db_session):
+    """Finding #2: a first tick that lands in the evening surfaces the day's
+    commands but must NOT immediately sweep them as missed in the same tick."""
+    d = await svc.add_manual(db_session, 0, title="ورزش")
+    await svc.mark(db_session, d.id, True, 0, now=_now(day=4))  # strength 7
+
+    # day 5: app was asleep all day, first tick at local 21:00 (UTC 17 + 4h)
+    await svc.directive_tick(db_session, now=_now(day=5, hour=17))
+    after = (await svc.list_directives(db_session, 0, status="active"))[0]
+    assert after["strength"] == 7  # NOT swept (a miss would be max(0, 7-12)=0)
+    cmds = (await svc.select_today_commands(db_session, 0, now=_now(day=5, hour=17)))["commands"]
+    assert cmds and cmds[0]["done"] is None  # surfaced, unanswered
+
+
+@pytest.mark.asyncio
+async def test_mark_and_today_ignore_non_active(db_session):
+    """Findings #3/#4: mark() is a no-op on a non-active directive, and a
+    directive archived after surfacing drops off today's command list."""
+    p = await svc.auto_intake_from_text(db_session, 0, "زبان")  # proposed
+    r = await svc.mark(db_session, p.id, True, 0, now=_now())
+    assert r.get("skipped") == "not_active" and r["directive"]["strength"] == 0
+
+    a = await svc.add_manual(db_session, 0, title="نماز اول وقت")
+    await svc.select_today_commands(db_session, 0, now=_now(day=6), persist=True)  # surfaces a
+    await svc.set_status(db_session, a.id, "archived", 0)  # archived after surfacing
+    cmds = (await svc.select_today_commands(db_session, 0, now=_now(day=6)))["commands"]
+    assert all(c["id"] != a.id for c in cmds)  # archived one dropped off
+
+
 @pytest.mark.asyncio
 async def test_config_strict_preset_and_update(db_session):
     cfg = await svc.get_config(db_session)
