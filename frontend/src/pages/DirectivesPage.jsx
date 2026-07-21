@@ -60,6 +60,7 @@ export default function DirectivesPage() {
   const [proposed, setProposed] = useState([]);
   const [active, setActive] = useState([]);
   const [graduated, setGraduated] = useState([]);
+  const [archived, setArchived] = useState([]);
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -69,12 +70,13 @@ export default function DirectivesPage() {
   const reload = useCallback(async () => {
     setLoading(true);
     const safe = (p) => p.then((r) => r.data).catch(() => null);
-    const [t, rep, prop, act, grad, cfg] = await Promise.all([
+    const [t, rep, prop, act, grad, arch, cfg] = await Promise.all([
       safe(api.get('/directives/today')),
       safe(api.get('/directives/report')),
       safe(api.get('/directives?status=proposed')),
       safe(api.get('/directives?status=active')),
       safe(api.get('/directives?status=graduated')),
+      safe(api.get('/directives?status=archived')),
       safe(api.get('/directives/config')),
     ]);
     setToday((t && t.commands) || []);
@@ -82,6 +84,7 @@ export default function DirectivesPage() {
     setProposed((prop && prop.directives) || []);
     setActive((act && act.directives) || []);
     setGraduated((grad && grad.directives) || []);
+    setArchived((arch && arch.directives) || []);
     setConfig((cfg && cfg.config) || null);
     setLoading(false);
   }, []);
@@ -108,8 +111,12 @@ export default function DirectivesPage() {
   const markMiss = (id) => act(() => api.post(`/directives/${id}/miss`), 'ثبت شد که جا ماندی.');
   const approve = (id) => act(() => api.post(`/directives/${id}/approve`));
   const reject = (id) => act(() => api.post(`/directives/${id}/reject`));
+  const archiveDirective = (id) =>
+    act(() => api.post(`/directives/${id}/reject`), 'کنار گذاشته شد (برگشت‌پذیر).');
+  const restoreDirective = (id) =>
+    act(() => api.post(`/directives/${id}/approve`), 'به روال برگشت.');
   const extract = () =>
-    act(() => api.post('/directives/extract'), 'از محتوایت فرمان‌های تازه پیشنهاد شد.');
+    act(() => api.post('/directives/extract'), 'همگام شد: محتوای تازه پیشنهاد و محتوای حذف‌شده آرشیو شد.');
   const addManual = () => {
     const title = newTitle.trim();
     if (!title) return;
@@ -166,6 +173,12 @@ export default function DirectivesPage() {
           </div>
           {msg && <span className="text-sm text-emerald-600">{msg}</span>}
         </div>
+
+        <p className="text-xs text-gray-400 mb-5 -mt-3">
+          افزودن به روال: آیتمِ لیست را ⭐ کن یا نوشتهٔ نو بساز (هر صبح خودکار پیشنهاد می‌شود) —
+          یا همین حالا «استخراج» را بزن. حذف از روال: «کنار بگذار»، یا آیتمِ منبع را به سطل زباله ببر
+          (خودش آرشیو می‌شود)، یا بگذار با ۲۱ روز پایداری «نهادینه» شود.
+        </p>
 
         {loading ? (
           <p className="text-gray-400 text-sm">در حال بارگذاری…</p>
@@ -286,6 +299,14 @@ export default function DirectivesPage() {
                         <div className="flex items-center gap-2 text-xs text-gray-400 shrink-0">
                           {d.streak > 0 && <span className="text-orange-600">🔥 {d.streak}</span>}
                           <span>قوّت {d.strength}٪</span>
+                          <button
+                            onClick={() => archiveDirective(d.id)}
+                            disabled={busy}
+                            title="کنار بگذار (برگشت‌پذیر)"
+                            className="text-gray-300 hover:text-red-500 disabled:opacity-50"
+                          >
+                            کنار بگذار
+                          </button>
                         </div>
                       </div>
                       <StrengthBar value={d.strength} />
@@ -309,6 +330,32 @@ export default function DirectivesPage() {
                     >
                       ✓ {d.title}
                     </span>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* archived — set aside, recoverable */}
+            {archived.length > 0 && (
+              <section>
+                <h2 className="text-sm font-semibold text-gray-900 mb-2">
+                  🗄 کنار گذاشته‌شده‌ها (برگشت‌پذیر)
+                </h2>
+                <div className="space-y-2" data-testid="directives-archived">
+                  {archived.map((d) => (
+                    <div
+                      key={d.id}
+                      className="flex items-center justify-between gap-3 bg-gray-50 rounded-xl border border-gray-100 p-3"
+                    >
+                      <span className="text-sm text-gray-500 truncate">{d.title}</span>
+                      <button
+                        onClick={() => restoreDirective(d.id)}
+                        disabled={busy}
+                        className="rounded-lg bg-gray-100 text-gray-600 text-xs px-3 py-1.5 disabled:opacity-50 shrink-0"
+                      >
+                        برگردان به روال
+                      </button>
+                    </div>
                   ))}
                 </div>
               </section>

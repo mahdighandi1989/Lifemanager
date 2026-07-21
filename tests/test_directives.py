@@ -129,6 +129,47 @@ async def test_growth_report_counts(db_session):
 
 
 @pytest.mark.asyncio
+async def test_reconcile_archives_directive_when_source_trashed(db_session):
+    from app.models.todo_item import TodoItem
+
+    it = TodoItem(content="هر روز قرآن", is_starred=True)
+    db_session.add(it)
+    await db_session.commit()
+    await db_session.refresh(it)
+
+    assert (await svc.extract_directives(db_session, 0, use_ai=False))["proposed_added"] == 1
+    d_id = (await svc.list_directives(db_session, 0, status="proposed"))[0]["id"]
+    await svc.set_status(db_session, d_id, "active", 0)
+
+    # trash the source todo item → reconcile archives its directive
+    it.deleted_at = datetime.now(timezone.utc)
+    await db_session.commit()
+    assert await svc.reconcile_sources(db_session, 0) == 1
+    assert len(await svc.list_directives(db_session, 0, status="archived")) == 1
+    assert len(await svc.list_directives(db_session, 0, status="active")) == 0
+
+
+@pytest.mark.asyncio
+async def test_run_daily_intake_adds_new_and_removes_gone(db_session):
+    from app.models.todo_item import TodoItem
+
+    a = TodoItem(content="ورزش روزانه", is_starred=True)
+    db_session.add(a)
+    await db_session.commit()
+
+    r1 = await svc.run_daily_intake(db_session, 0)  # new starred item → proposed
+    assert r1["proposed_added"] == 1 and r1["archived"] == 0
+
+    d_id = (await svc.list_directives(db_session, 0, status="proposed"))[0]["id"]
+    await svc.set_status(db_session, d_id, "active", 0)
+    await db_session.delete(a)  # source removed entirely
+    await db_session.commit()
+
+    r2 = await svc.run_daily_intake(db_session, 0)  # gone source → archived
+    assert r2["archived"] == 1
+
+
+@pytest.mark.asyncio
 async def test_config_strict_preset_and_update(db_session):
     cfg = await svc.get_config(db_session)
     assert cfg["mode"] == "strict" and cfg["daily_count"] == 5 and cfg["grad_streak"] == 21
@@ -156,9 +197,21 @@ def test_directives_endpoints_flow(api_client):
 def test_extract_endpoint_and_config(api_client):
     r = api_client.post("/api/directives/extract")
     assert r.status_code == 200, r.text
-    assert r.json()["success"] in (True, False)  # no candidates → ok:True, 0 added
+    body = r.json()  # now runs the full sync (add + remove)
+    assert body["ok"] is True and "proposed_added" in body and "archived" in body
     cfg = api_client.get("/api/directives/config").json()["config"]
     assert cfg["mode"] == "strict" and cfg["channel"] == "both"
+
+
+def test_archive_and_restore_via_routes(api_client):
+    api_client.post("/api/directives", json={"title": "مراقبه"})
+    did = api_client.get("/api/directives?status=active").json()["directives"][0]["id"]
+    # «کنار بگذار» → archived, drops out of the active routine
+    assert api_client.post(f"/api/directives/{did}/reject").json()["directive"]["status"] == "archived"
+    assert api_client.get("/api/directives?status=active").json()["count"] == 0
+    # «برگردان» → back to active
+    assert api_client.post(f"/api/directives/{did}/approve").json()["directive"]["status"] == "active"
+    assert api_client.get("/api/directives?status=active").json()["count"] == 1
 
 
 def test_command_desk_exposes_today_commands(api_client):

@@ -108,8 +108,10 @@ async def extract(
     user_id: int = Depends(get_optional_user_id),
     _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
-    res = await svc.extract_directives(db, user_id)
-    return {"success": res.get("ok", False), **res}
+    # Same full sync the daily loop runs: propose from new starred items /
+    # writings AND archive directives whose source content was removed.
+    res = await svc.run_daily_intake(db, user_id)
+    return {"ok": True, "success": True, **res}
 
 
 @router.post("/api/directives", tags=["directives"])

@@ -456,6 +456,72 @@ async def set_status(db: AsyncSession, directive_id: int, status: str, user_id: 
     return d
 
 
+async def _count_status(db: AsyncSession, user_id: int, status: str) -> int:
+    from sqlalchemy import func
+
+    return int(
+        (
+            await db.execute(
+                select(func.count()).select_from(Directive).where(
+                    _scope(Directive.user_id, user_id), Directive.status == status
+                )
+            )
+        ).scalar()
+        or 0
+    )
+
+
+# ── auto add/remove: keep the routine in sync with the owner's content ────────
+async def reconcile_sources(db: AsyncSession, user_id: int = 0) -> int:
+    """Remove-from-routine, automatically: archive any proposed/active
+    directive whose source todo item is now gone or trashed (soft-deleted).
+    Recoverable (archived, never hard-deleted — quarantine-not-delete).
+    Graduated directives are left untouched (already internalized)."""
+    from app.models.todo_item import TodoItem
+
+    rows = (
+        await db.execute(
+            select(Directive).where(
+                _scope(Directive.user_id, user_id),
+                Directive.status.in_([DIRECTIVE_PROPOSED, DIRECTIVE_ACTIVE]),
+                Directive.source_type == "todo_item",
+            )
+        )
+    ).scalars().all()
+    archived = 0
+    for d in rows:
+        try:
+            ref = int(d.source_ref)
+        except (TypeError, ValueError):
+            continue
+        item = (
+            await db.execute(select(TodoItem).where(TodoItem.id == ref))
+        ).scalar_one_or_none()
+        if item is None or item.deleted_at is not None:
+            d.status = DIRECTIVE_ARCHIVED
+            archived += 1
+    if archived:
+        await db.commit()
+    return archived
+
+
+async def run_daily_intake(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
+    """The «هرچیزی بعداً اضافه بشه خودش جا بده» loop step: propose directives
+    from newly-starred items / new writings (extract is dedup-idempotent), and
+    archive directives whose source content was removed. Fail-open."""
+    try:
+        ex = await extract_directives(db, user_id)
+    except Exception as exc:
+        logger.debug("daily intake extract skipped: %r", exc)
+        ex = {"proposed_added": 0}
+    try:
+        archived = await reconcile_sources(db, user_id)
+    except Exception as exc:
+        logger.debug("daily intake reconcile skipped: %r", exc)
+        archived = 0
+    return {"proposed_added": int(ex.get("proposed_added", 0)), "archived": archived}
+
+
 # ── daily command selection ───────────────────────────────────────────────────
 def _is_due(d: Directive, today: date) -> bool:
     if d.cadence == CADENCE_DAILY:
@@ -721,15 +787,18 @@ async def directive_tick(db: AsyncSession, now: Optional[datetime] = None, *, us
     stored = await _load_blob(db, CONFIG_KEY)
     did: List[str] = []
 
-    # Morning: surface + push commands.
+    # Morning: pull in new content / drop removed content, then surface + push.
     if local.hour >= int(cfg.get("brief_hour", 7)) and stored.get("last_command_date") != day_iso:
+        intake = await run_daily_intake(db, user_id)
         res = await select_today_commands(db, user_id, now=now, persist=True)
         cmds = res.get("commands") or []
+        pending = await _count_status(db, user_id, DIRECTIVE_PROPOSED)
         if cmds and cfg.get("channel") in ("both", "telegram"):
-            await _push_commands(cmds, local)
+            await _push_commands(cmds, local, pending_proposals=pending)
+        stored = await _load_blob(db, CONFIG_KEY)  # intake committed sibling rows
         stored["last_command_date"] = day_iso
         await _save_blob(db, CONFIG_KEY, stored)
-        did.append(f"commands:{len(cmds)}")
+        did.append(f"commands:{len(cmds)} intake+{intake['proposed_added']}/-{intake['archived']}")
 
     # Evening: sweep misses + remind.
     if local.hour >= int(cfg.get("followup_hour", 21)) and stored.get("last_followup_date") != day_iso:
@@ -745,7 +814,9 @@ async def directive_tick(db: AsyncSession, now: Optional[datetime] = None, *, us
     return {"did": did or "not_due", "date": day_iso}
 
 
-async def _push_commands(commands: List[Dict[str, Any]], local: datetime) -> None:
+async def _push_commands(
+    commands: List[Dict[str, Any]], local: datetime, *, pending_proposals: int = 0
+) -> None:
     try:
         from app.services.telegram_service import get_telegram_bot
 
@@ -757,6 +828,8 @@ async def _push_commands(commands: List[Dict[str, Any]], local: datetime) -> Non
             streak = f" 🔥{c['streak']}" if c.get("streak") else ""
             lines.append(f"• {c['title']}{streak}")
         lines.append("")
+        if pending_proposals:
+            lines.append(f"📥 {pending_proposals} پیشنهادِ تازه از محتوایت منتظر تأیید است.")
         lines.append("شب می‌پرسم کدام‌ها را انجام دادی. جا نمان.")
         await bot.send("\n".join(lines), silent=True)
     except Exception as exc:

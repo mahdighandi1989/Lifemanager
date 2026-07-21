@@ -1621,3 +1621,21 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   auto-intake dedupe، select persist+cap، done→graduation در ۲۱ روز، miss penalty، سویپ شبانه،
   گزارش، config preset، جریانِ روتر، باکتِ میز فرمان، گیتِ auth). ۴۵ تست همسایه (command-center/
   phase3/backup/rate-limit/inventory) بدون رگرسیون؛ ruff پاک؛ `npm run build` سبز.
+
+## 2026-07-21 — چرخهٔ خودکارِ افزودن/حذفِ فرمان‌ها (هرچیز تازه خودش جا بیفتد)
+
+- **FINDING (owner)** «بعداً چیزی به لیست‌ها اضافه کنم، چطور به روال روزانه اضافه/حذف می‌شود؟» —
+  نسخهٔ اول auto_intake را داشت ولی به هیچ نقطهٔ ورودِ محتوا وصل نبود؛ فقط دکمهٔ «استخراج» دستی.
+- **CHANGE (auto-add)** جذبِ روزانه در حلقه: `run_daily_intake` (extractِ idempotent روی آیتم‌های
+  ستاره‌دار + عنوانِ نوشته‌ها → پیشنهاد) در پنجرهٔ صبحِ `directive_tick` اجرا می‌شود؛ پس ستاره‌زدنِ
+  آیتم یا افزودنِ نوشته تا صبحِ بعد خودش «پیشنهاد» می‌شود (بدون دست‌زدن به مسیرهای داغِ ساخت).
+  پوشِ صبح تعداد پیشنهادهای منتظرِ تأیید را هم می‌گوید. دکمهٔ «استخراج» حالا همین همگام‌سازیِ کامل
+  را می‌زند (add + remove).
+- **CHANGE (auto-remove)** `reconcile_sources`: هر فرمانِ proposed/active که آیتمِ منبعش
+  (source_type=todo_item) پاک یا trash شده باشد، **آرشیو** می‌شود (برگشت‌پذیر — quarantine).
+  graduatedها دست‌نخورده می‌مانند.
+- **CHANGE (UI)** صفحهٔ «مسیر نهادینه‌سازی»: دکمهٔ «کنار بگذار» روی فرمان‌های فعال + بخشِ
+  «کنار گذاشته‌شده‌ها» با «برگردان به روال» + راهنمای «ستاره بزن/نوشته بساز = افزودن؛ کنار
+  بگذار/سطل زباله = حذف؛ ۲۱ روز پایداری = نهادینه».
+- **VERIFY** ۱۶ تستِ `test_directives` (۳ تازه: reconcile با trashِ منبع، run_daily_intake
+  افزودن+حذف، archive/restore روتر). ruff پاک؛ npm build سبز؛ گیت کامل بدون رگرسیون جدید.
