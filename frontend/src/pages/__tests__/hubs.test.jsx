@@ -14,6 +14,8 @@ vi.mock('../DriveFiles', () => ({ default: () => <div data-testid="drive-files-p
 vi.mock('../MergeManagement', () => ({ default: () => <div data-testid="merge-page" /> }));
 vi.mock('../Projects', () => ({ default: () => <div data-testid="projects-page" /> }));
 vi.mock('../ExternalProjects', () => ({ default: () => <div data-testid="external-projects-page" /> }));
+vi.mock('../../components/DevProjectsOverview', () => ({ default: () => <div data-testid="dev-projects-overview" /> }));
+vi.mock('../../components/ActivityLogPanel', () => ({ default: () => <div data-testid="activity-log-panel" /> }));
 
 import FinanceHub from '../FinanceHub';
 import AssistantHub from '../AssistantHub';
@@ -50,11 +52,15 @@ describe('Grouped hubs', () => {
     expect(screen.getByTestId('merge-page')).toBeInTheDocument();
   });
 
-  test('ProjectsHub: my-projects default, switches to external', () => {
+  test('ProjectsHub: my-projects default, switches to dev; external tab is quarantined', () => {
     render(<ProjectsHub />);
     expect(screen.getByTestId('projects-hub')).toBeInTheDocument();
     expect(screen.getByTestId('projects-page')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('projects-tab-external'));
-    expect(screen.getByTestId('external-projects-page')).toBeInTheDocument();
+    // «پروژه‌های خارجی» tab was quarantined in the 2026-07-21 nav audit — it is
+    // no longer offered (the page + route survive, just unlinked).
+    expect(screen.queryByTestId('projects-tab-external')).toBeNull();
+    // The dev-projects tab is still reachable.
+    fireEvent.click(screen.getByTestId('projects-tab-dev'));
+    expect(screen.getByTestId('dev-projects-overview')).toBeInTheDocument();
   });
 });

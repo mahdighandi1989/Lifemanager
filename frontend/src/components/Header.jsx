@@ -140,15 +140,14 @@ function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navLinks = [
-    { to: '/', label: 'Dashboard' },
-    { to: '/tasks', label: 'Tasks' },
-    { to: '/projects', label: 'Projects' },
-    { to: '/lists', label: 'لیست‌ها' },
-    { to: '/notifications', label: 'اعلان‌ها' },
-    // Only admins see the user-management link.
-    ...(user?.is_admin ? [{ to: '/admin/users', label: 'مدیریت کاربران' }] : []),
-  ];
+  // 2026-07-21 nav-consolidation (owner audit «کمتر ولی زنده»): the desktop
+  // header used to carry its own row of nav links — with raw English labels
+  // (Dashboard/Tasks/Projects) that both violate the all-Persian/RTL rule and
+  // duplicate the Persian Sidebar. On desktop the Sidebar (hidden md:flex) IS
+  // the primary nav, so the header row was pure duplication. Header is now
+  // reduced to logo + global search + notification bell + identity/logout;
+  // the full link set still lives in the mobile slide-over below (which reads
+  // the same Sidebar LINKS), so nothing is unreachable on small screens.
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
@@ -194,25 +193,6 @@ function Header() {
               <span className="text-xl font-bold text-gray-900 hidden sm:block">Lifemanager</span>
             </Link>
           </div>
-
-          {isAuthenticated && (
-            <nav className="hidden md:flex items-center space-x-1" aria-label="Primary">
-              {navLinks.map(({ to, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  data-testid={`header-link-${to === '/' ? 'home' : to.slice(1)}`}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive(to)
-                      ? 'bg-blue-50 text-blue-600 font-semibold'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          )}
 
           <div className="flex items-center space-x-3">
             {isAuthenticated && <GlobalSearch />}
@@ -267,9 +247,10 @@ function Header() {
           {[
             ...SIDEBAR_LINKS,
             { to: '/notifications', label: 'اعلان‌ها', testid: 'link-notifications' },
-            ...(user?.is_admin
-              ? [{ to: '/admin/users', label: 'مدیریت کاربران', testid: 'link-admin-users' }]
-              : []),
+            // «مدیریت کاربران» (/admin/users) quarantined from nav on 2026-07-21:
+            // this is a single-tenant personal app, so user administration has
+            // no meaning here. The route + page still resolve (rule 2); it is
+            // simply no longer surfaced. See docs/overhaul/REMOVAL_CANDIDATES.md.
           ].map(({ to, label, testid }) => (
             <Link
               key={to}

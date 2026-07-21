@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import Projects from './Projects';
-import ExternalProjects from './ExternalProjects';
 import DevProjectsOverview from '../components/DevProjectsOverview';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 
-// «پروژه‌ها» hub — unifies internal projects and third-party (external) PM
-// projects into one tabbed page (owner request: "یکی باشه فعلا بهتره"). Both
-// page components are reused unchanged via their `embedded` prop; the existing
-// /projects and /external-projects routes still resolve here.
+// «پروژه‌ها» hub — internal life projects + a dev-projects overview.
+//
+// 2026-07-21 audit («کمتر ولی زنده»): the «پروژه‌های خارجی» tab
+// (ExternalProjects — connectors to Jira/Linear/Asana) was a dead surface for
+// a single-tenant personal owner who uses none of those tools, so it is
+// quarantined from the tab bar. The ExternalProjects page + its /api/external
+// backend and the /external-projects route are UNCHANGED (rule 2 —
+// quarantine-not-delete; /external-projects still resolves here and lands on
+// the default tab). See docs/overhaul/REMOVAL_CANDIDATES.md.
 
 const TABS = [
   { id: 'mine', label: 'پروژه‌های من', match: ['/projects'] },
-  { id: 'external', label: 'پروژه‌های خارجی', match: ['/external-projects'] },
   { id: 'dev', label: 'پروژه‌های توسعه', match: [] },
 ];
 
@@ -20,18 +23,15 @@ const TABS = [
 const TAB_HINTS = {
   mine:
     'پروژه‌های زندگی خودت — دسته‌هایی که خودت می‌سازی (مثل «خانه»، «مهاجرت»، «پروژه‌های نرم‌افزاری») تا وظایف بهشان وصل شوند و کارنامهٔ پروژه‌های توسعه هم ذیلشان ثبت شود.',
-  external:
-    'اتصال به ابزارهای مدیریت پروژهٔ بیرونی (Jira، Linear، Asana و…) برای پایش «مغفول‌مانده‌ها». اگر از چنین ابزاری استفاده نمی‌کنی، این تب خالی می‌ماند و نیازی بهش نداری.',
   dev:
     'مخزن‌های گیت‌هاب و سرویس‌های رندر تو — همگام‌سازی خودکار، خطاهای باز، و کارنامهٔ روزانهٔ فارسی. جزئیات کامل در «مرکز توسعه».',
 };
 
 function initialTab() {
   try {
-    const { pathname, search } = window.location;
+    const { search } = window.location;
     const q = new URLSearchParams(search).get('tab');
     if (q && TABS.some((t) => t.id === q)) return q;
-    if (pathname.startsWith('/external-projects')) return 'external';
   } catch { /* no window */ }
   return 'mine';
 }
@@ -63,7 +63,6 @@ function ProjectsHub() {
         )}
         <div data-testid={`projects-panel-${tab}`}>
           {tab === 'mine' && <Projects embedded />}
-          {tab === 'external' && <ExternalProjects embedded />}
           {tab === 'dev' && <DevProjectsOverview embedded={false} />}
         </div>
 
