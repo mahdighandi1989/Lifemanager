@@ -13,6 +13,9 @@ const TYPE_FA = {
   note: 'یادداشت',
   person: 'شخص',
   subscription: 'اشتراک',
+  finance_account: 'حساب مالی',
+  document: 'سند',
+  password_request: 'رمز لازم',
   unknown: 'نامشخص',
 };
 
@@ -22,6 +25,9 @@ const TYPE_COLOR = {
   note: 'bg-amber-100 text-amber-700',
   person: 'bg-purple-100 text-purple-700',
   subscription: 'bg-rose-100 text-rose-700',
+  finance_account: 'bg-teal-100 text-teal-700',
+  document: 'bg-indigo-100 text-indigo-700',
+  password_request: 'bg-orange-100 text-orange-700',
   unknown: 'bg-gray-100 text-gray-600',
 };
 
@@ -65,10 +71,12 @@ function TaskRow({ task, tone }) {
 }
 
 // «صندوق ورودی» pending row: suggestion chip + one-tap file / retarget / dismiss.
-function InboxRow({ item, onFile, onDismiss, busy }) {
+function InboxRow({ item, onFile, onDismiss, onPassword, busy }) {
   const [target, setTarget] = useState('');
+  const [pw, setPw] = useState('');
   const suggested = item.suggested_type || 'unknown';
   const reason = item.suggestion?.reason;
+  const isPasswordReq = suggested === 'password_request';
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 space-y-2" data-testid="inbox-row">
       <div className="flex items-start justify-between gap-2">
@@ -80,6 +88,35 @@ function InboxRow({ item, onFile, onDismiss, busy }) {
         </span>
       </div>
       {reason && <p className="text-xs text-gray-500">{unescapeHtml(reason)}</p>}
+      {isPasswordReq ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="password"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            placeholder="رمزِ فایل"
+            data-testid="inbox-password-input"
+            className="flex-1 min-w-[8rem] rounded-md border border-gray-300 px-2 py-1 text-xs"
+          />
+          <button
+            type="button"
+            disabled={busy || !pw.trim()}
+            onClick={() => { onPassword(item, pw.trim()); setPw(''); }}
+            data-testid="inbox-password-submit"
+            className="rounded-md bg-orange-600 px-3 py-1 text-xs font-medium text-white hover:bg-orange-700 disabled:opacity-50"
+          >
+            🔓 باز کن و ذخیرهٔ رمز
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onDismiss(item)}
+            className="rounded-md border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+          >
+            ✖ رد
+          </button>
+        </div>
+      ) : (
       <div className="flex flex-wrap items-center gap-2">
         {/* No one-tap confirm when the classifier produced nothing — a
             «تأیید (نامشخص)» button would silently file as a task; the user
@@ -104,6 +141,8 @@ function InboxRow({ item, onFile, onDismiss, busy }) {
           <option value="todo">آیتم لیست</option>
           <option value="note">یادداشت</option>
           <option value="person">شخص</option>
+          <option value="finance_account">حساب مالی</option>
+          <option value="document">سند</option>
         </select>
         <button
           type="button"
@@ -122,6 +161,7 @@ function InboxRow({ item, onFile, onDismiss, busy }) {
           ✖ رد
         </button>
       </div>
+      )}
     </div>
   );
 }
@@ -229,8 +269,11 @@ function Dashboard() {
     try {
       const r = await api.post('/inbox/backfill');
       const d = r.data || {};
+      const locked = d.locked_files ? `، ${d.locked_files} فایلِ رمزدار` : '';
       setBackfillMsg(
-        `از ${d.scanned || 0} ایمیل: ${d.subscription_candidates || 0} اشتراک، ${d.person_candidates || 0} فرد پیشنهاد شد.`,
+        `از ${d.scanned || 0} ایمیل و ${d.drive_scanned || 0} فایلِ درایو: ` +
+          `${d.subscription_candidates || 0} اشتراک، ${d.person_candidates || 0} فرد، ` +
+          `${d.attachment_candidates || 0} پیوست، ${d.drive_candidates || 0} فایلِ درایو پیشنهاد شد${locked}.`,
       );
       await fetchToday();
     } catch {
@@ -317,6 +360,24 @@ function Dashboard() {
     setActionError(false);
     try {
       await api.post(`/inbox/${item.id}/dismiss`);
+    } catch {
+      setActionError(true);
+    } finally {
+      fetchToday();
+      setInboxBusyId(null);
+    }
+  };
+
+  const handlePassword = async (item, password) => {
+    setInboxBusyId(item.id);
+    setActionError(false);
+    try {
+      const sug = item.suggestion || {};
+      await api.post('/inbox/password', {
+        source_ref: sug.source_ref,
+        source_key: sug.source_key,
+        password,
+      });
     } catch {
       setActionError(true);
     } finally {
@@ -532,7 +593,7 @@ function Dashboard() {
               autoIngest !== null && (
                 <div className="mt-3 space-y-2">
                   <label className="flex items-center justify-between gap-2 text-xs text-gray-500 cursor-pointer">
-                    <span>اسکنِ خودکارِ ایمیل (اشتراک‌ها و افراد)</span>
+                    <span>اسکنِ خودکار (ایمیل، پیوست‌ها، درایو)</span>
                     <button
                       type="button"
                       role="switch"
@@ -557,7 +618,7 @@ function Dashboard() {
                     data-testid="inbox-backfill-btn"
                     className="w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
                   >
-                    {backfilling ? 'در حال اسکن…' : 'اسکنِ ایمیل‌های موجود (اشتراک/افراد)'}
+                    {backfilling ? 'در حال اسکن…' : 'اسکنِ همه‌چیزِ موجود (ایمیل + پیوست + درایو)'}
                   </button>
                   {backfillMsg && <p className="text-xs text-gray-500">{backfillMsg}</p>}
                 </div>
@@ -574,6 +635,7 @@ function Dashboard() {
                 item={item}
                 busy={inboxBusyId === item.id}
                 onFile={handleFile}
+                onPassword={handlePassword}
                 onDismiss={handleDismiss}
               />
             ))}

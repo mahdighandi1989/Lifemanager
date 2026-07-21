@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 # «subscription» is filed by the auto-ingest pipeline (a recognised
 # subscription-provider email) rather than the text classifier, but it flows
 # through the same review-then-file queue.
-INBOX_TARGETS = ("task", "todo", "note", "person", "subscription")
+INBOX_TARGETS = ("task", "todo", "note", "person", "subscription", "finance_account", "document")
 
 # Fallback list for explicit todo filings that match no existing list —
 # auto-created so a "به لیست بفرست" choice can never dead-end.
@@ -393,6 +393,79 @@ async def _file_as_subscription(db: AsyncSession, s: Dict[str, Any], user_id: in
     return {"kind": "subscription", "id": sub.id, "title": sub.provider, "link": "/life-file"}
 
 
+def _to_decimal(value: Any):
+    """Best-effort money parse: «AED 44.99» / «۱٬۲۳۴٫۵» / 1234 → Decimal or None."""
+    from decimal import Decimal, InvalidOperation
+
+    if value is None:
+        return None
+    s = str(value)
+    s = s.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٬٫", "0123456789,."))
+    m = re.search(r"-?[0-9][0-9,]*\.?[0-9]*", s)
+    if not m:
+        return None
+    try:
+        return Decimal(m.group(0).replace(",", ""))
+    except (InvalidOperation, ValueError):
+        return None
+
+
+async def _file_as_finance_account(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
+    """Create OR update a bank/broker/exchange account from an extracted file —
+    «هر بار به‌روزرسانی کن و اگر نبود بساز». Matches an existing account by
+    name/institution (case-insensitive) and refreshes its balance; else creates."""
+    from sqlalchemy import func as _f
+
+    from app.models.finance import FinancialAccount
+
+    provider = (s.get("provider") or s.get("title") or "حساب")[:255]
+    kind = str(s.get("account_kind") or s.get("kind") or "bank")[:32]
+    if kind not in ("bank", "broker", "exchange"):
+        kind = "bank"
+    currency = str(s.get("currency") or "USD")[:8]
+    balance = _to_decimal(s.get("balance"))
+
+    existing = (
+        await db.execute(
+            select(FinancialAccount).where(
+                scope_filter(FinancialAccount.user_id, user_id),
+                _f.lower(FinancialAccount.name) == provider.lower(),
+            )
+        )
+    ).scalars().first()
+    if existing is not None:
+        if balance is not None:
+            existing.balance = balance
+        if s.get("currency"):
+            existing.currency = currency
+        acct = existing
+    else:
+        acct = FinancialAccount(
+            user_id=user_id, name=_esc(provider), kind=kind,
+            institution=_esc(s.get("provider")), currency=currency,
+            balance=balance if balance is not None else 0,
+        )
+        db.add(acct)
+    await db.flush()
+    return {"kind": "finance_account", "id": acct.id, "title": acct.name, "link": "/budget"}
+
+
+async def _file_as_document(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
+    """File an extracted identity/official document into IdentityDocument (its
+    expiry then drives the attention reminder)."""
+    from app.models.identity_document import IdentityDocument
+
+    doc = IdentityDocument(
+        user_id=user_id,
+        full_name=(_esc(s.get("name") or s.get("full_name") or s.get("title")) or None),
+        emirates_id_number=(str(s["account_no"])[:32] if s.get("account_no") else None),
+        expiry_date=(str(s["expiry"])[:32] if s.get("expiry") else None),
+    )
+    db.add(doc)
+    await db.flush()
+    return {"kind": "document", "id": doc.id, "title": doc.full_name or "سند", "link": "/life-file"}
+
+
 async def _file_as_person(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
     from app.models.person import Person
 
@@ -466,6 +539,8 @@ async def file_item(
         "note": _file_as_note,
         "person": _file_as_person,
         "subscription": _file_as_subscription,
+        "finance_account": _file_as_finance_account,
+        "document": _file_as_document,
     }[kind]
     created = await filer(db, base, user_id)
 

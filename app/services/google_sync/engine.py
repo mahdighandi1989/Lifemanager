@@ -33,6 +33,8 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     "gmail_fetch_limit": 25,
     "calendar_poll_minutes": 60,
     "calendar_window_days": 14,
+    "drive_poll_minutes": 360,     # Drive changes slower than mail — scan every 6h
+    "drive_scan_limit": 30,
     "triage_batch": 10,
     "digest_enabled": True,
     "digest_hour": 21,            # local hour the daily digest goes out
@@ -42,6 +44,7 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     # stamps (never editable from the UI):
     "last_gmail_poll_at": None,
     "last_calendar_poll_at": None,
+    "last_drive_poll_at": None,
     "last_digest_date": None,
 }
 
@@ -65,6 +68,8 @@ EDITABLE_FIELDS = (
     "gmail_fetch_limit",
     "calendar_poll_minutes",
     "calendar_window_days",
+    "drive_poll_minutes",
+    "drive_scan_limit",
     "triage_batch",
     "digest_enabled",
     "digest_hour",
@@ -334,6 +339,23 @@ async def google_sync_tick(db: AsyncSession, now: Optional[datetime] = None) -> 
             "calendar",
             calendar_service.sync_calendar(db, days=int(cfg.get("calendar_window_days", 14))),
         )
+
+    # Drive feeding source: on its own (slow) cadence, list the Drive and turn
+    # each new readable file into a review candidate — «از گوگل درایو همه‌چیز را
+    # ببیند». Opt-in + a clean no-op when Drive isn't connected.
+    if due(cfg.get("last_drive_poll_at"), int(cfg.get("drive_poll_minutes", 360)) * 60, now):
+        stamps["last_drive_poll_at"] = now_iso
+
+        async def _drive():
+            from app.services.ingest import drive_ingest
+
+            if not await drive_ingest.is_enabled(db):
+                return {"ok": True, "skipped": "disabled"}
+            return await drive_ingest.scan_drive(
+                db, user_id=0, limit=int(cfg.get("drive_scan_limit", 30))
+            )
+
+        await _run_concern(db, result, "drive", _drive())
 
     if digest_decision(cfg, now):
         local = now + timedelta(minutes=int(cfg.get("tz_offset_minutes", 240) or 0))

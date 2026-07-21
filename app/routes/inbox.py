@@ -16,7 +16,7 @@ Scoping matches the tasks/writings/activity-log routers: the anon bucket
 import html
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -237,13 +237,13 @@ async def get_auto_ingest(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> dict:
-    """Master switch for Gmail auto-ingest — subscriptions (review candidates)
-    AND people (interactions for known contacts + person candidates). Reported
-    as one flag: on only when BOTH are on."""
+    """Master switch for auto-ingest — subscriptions + people (from Gmail) AND
+    Drive files. Reported as one flag: on only when ALL are on."""
     from app.services.google_sync.person_ingest import is_enabled as people_on
     from app.services.google_sync.subscription_ingest import is_enabled as subs_on
+    from app.services.ingest.drive_ingest import is_enabled as drive_on
 
-    enabled = await subs_on(db) and await people_on(db)
+    enabled = await subs_on(db) and await people_on(db) and await drive_on(db)
     return {"ok": True, "success": True, "enabled": enabled}
 
 
@@ -256,9 +256,11 @@ async def put_auto_ingest(
 ) -> dict:
     from app.services.google_sync.person_ingest import set_enabled as set_people
     from app.services.google_sync.subscription_ingest import set_enabled as set_subs
+    from app.services.ingest.drive_ingest import set_enabled as set_drive
 
     await set_subs(db, patch.enabled)
     await set_people(db, patch.enabled)
+    await set_drive(db, patch.enabled)
     return {"ok": True, "success": True, "enabled": patch.enabled}
 
 
@@ -269,10 +271,54 @@ async def backfill_ingest(
     user_id: int = Depends(get_optional_user_id),
     _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
-    """One-time catch-up: run subscription + people detection over the emails
-    ALREADY synced (the backlog that arrived before these detectors existed).
-    Idempotent — safe to run repeatedly."""
+    """One-time catch-up: run subscription + people + ATTACHMENT detection over
+    the emails ALREADY synced AND scan Google Drive — the whole backlog that
+    arrived before these detectors existed. Idempotent — safe to run repeatedly."""
     from app.services.google_sync.person_ingest import backfill_all
+    from app.services.ingest import drive_ingest
+    from app.services.ingest.email_ingest import backfill_attachments
 
     res = await backfill_all(db, user_id=user_id)
+    att = await backfill_attachments(db, user_id=user_id)
+    res["attachment_candidates"] = att.get("proposed", 0)
+    res["locked_files"] = att.get("needs_password", 0)
+    drive = await drive_ingest.scan_drive(db, user_id=user_id, limit=100)
+    res["drive_candidates"] = drive.get("proposed", 0)
+    res["drive_scanned"] = drive.get("scanned", 0)
     return {"ok": True, "success": True, **res}
+
+
+class PasswordSubmit(BaseModel):
+    source_ref: str = Field(..., max_length=300)
+    source_key: str = Field(..., max_length=200)
+    password: str = Field(..., min_length=1, max_length=256)
+
+
+@router.post("/api/inbox/password", tags=["inbox"])
+@handle_errors
+async def submit_password(
+    payload: PasswordSubmit = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """Store the password for a locked-file source (encrypted) and immediately
+    re-open the file. Future files from the same source open automatically."""
+    from app.services.ingest import credentials
+    from app.services.ingest.email_ingest import retry_source_ref
+
+    await credentials.store_password(db, source_key=payload.source_key, password=payload.password)
+    res = await retry_source_ref(db, source_ref=payload.source_ref, user_id=user_id)
+    # mark the matching password_request item as handled
+    reqs = (
+        await db.execute(
+            select(InboxItem).where(
+                InboxItem.status == "pending", InboxItem.suggested_type == "password_request"
+            )
+        )
+    ).scalars().all()
+    for r in reqs:
+        if (r.suggestion or {}).get("source_ref") == payload.source_ref:
+            r.status = "filed"
+    await db.commit()
+    return {"ok": True, "success": True, "result": res}

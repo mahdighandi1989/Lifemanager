@@ -1895,3 +1895,50 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   تست‌های sidebar/merge/hubs سبز.
 - **NOTE (مدارک/دیگر منابع)** فهرستِ کاملِ auto-feed در recon نشان داد مدارک از ایمیل قابلِ
   تغذیهٔ مطمئن نیستند (منبع = عکسِ کارت)؛ تقویم+بانک از قبل automatic؛ اشتراک+افراد ساخته شد.
+
+## 2026-07-22 — «همه‌چیز، نه فقط صورتحساب»: تغذیهٔ فراگیرِ فایل‌ها (پیوست + درایو)
+
+- **CHANGE (خطِ لولهٔ تغذیهٔ فراگیر — `app/services/ingest/`)** مالک: «صورتحسابِ بانکی و بروکر
+  فقط مثال بود، منظورم همه‌چیز است». یک استخراج‌گرِ واحدِ منبع‌ناوابسته ساخته شد:
+  `universal_ingest.extract_from_file(bytes, mimetype, source_ref, password?)` که فایل را با
+  مدلِ **دیداری** (`complete_multimodal`, task=`document_extraction`) می‌خواند و یک
+  **کاندیدِ بازبینی** (`InboxItem`) می‌سازد — هیچ‌چیز کورکورانه نوشته نمی‌شود؛ تأییدِ مالک است
+  که مقصد را می‌سازد/به‌روزرسانی می‌کند. فیدرها فقط bytes + یک `source_ref`ِ پایدار می‌دهند:
+  `email_ingest` (پیوستِ ایمیل، `attachments.fetch_email_attachments` روی Gmail، on-demand و
+  بدونِ ذخیرهٔ بایت‌ها)، و `drive_ingest` (اسکنِ Google Drive).
+- **CHANGE (فیلرهای create-or-update)** `inbox_service`: `_file_as_finance_account` (تطبیقِ
+  case-insensitive نام → به‌روزرسانیِ موجودی، وگرنه ساختِ حساب — «هر بار به‌روزرسانی، اگر نبود
+  بساز»)، `_file_as_document` (→ `IdentityDocument`)، و اصلاحِ `_file_as_person` (ذخیرهٔ `email`
+  + backfillِ تعاملات). `INBOX_TARGETS` گسترش یافت به finance_account/document؛ `_to_decimal`
+  اعدادِ فارسی/جداکنندهٔ هزارگان را می‌فهمد (`AED ۱٬۲۵۰٫۵` → Decimal).
+- **CHANGE (خزانهٔ رمز + جریانِ ask-once)** `credentials` (رمز را با `crypt_service` رمزنگاری و
+  در `GlobalSetting` با کلیدِ دامنهٔ فرستنده ذخیره می‌کند) + `attachments.prepare_bytes`
+  (PDFِ رمزدار را با pypdf باز و به بایتِ خام دوباره‌سریال می‌کند؛ نبودِ رمز → `needs_password`).
+  فایلِ قفل → کاندیدِ `password_request` + پوشِ تلگرام؛ endpointِ `POST /api/inbox/password`
+  رمز را ذخیره، فایل را باز، و آیتم را filed می‌کند. فایل‌های بعدیِ همان منبع خودکار باز می‌شوند.
+- **CHANGE (Drive منبعِ تغذیه + گستردنِ scope)** `drive_ingest.scan_drive` از
+  `google_api_client.build_drive_client` استفاده می‌کند (سیمِ حاضرِ list_files/download) و
+  فایل‌های خواندنی (PDF/عکس) را از خطِ لولهٔ همان extractor می‌گذراند؛ فرمت‌های native گوگل
+  (docs/sheets) که `get_media` ندارند رد می‌شوند. برای «همه‌چیز را در درایو ببیند»
+  `drive.readonly` **به‌صورت افزایشی** به `GOOGLE_SCOPES` اضافه شد — توکنِ فعلی دست‌نخورده کار
+  می‌کند؛ scopeِ جدید با اتصالِ دوبارهٔ بعدی فعال می‌شود (رفتار حفظ شد).
+- **CHANGE (اتوماسیونِ همیشگی + backfill)** خطِ لولهٔ پیوست به `triage_service.analyze_new_emails`
+  و اسکنِ Drive به `engine.google_sync_tick` (کادنسِ مستقل، پیش‌فرض ۶ساعت، stampِ
+  `last_drive_poll_at`) وصل شد — بدونِ نیاز به تیک‌زدنِ دستی. `POST /api/inbox/backfill` حالا
+  علاوه بر اشتراک/افراد، پیوست‌ها و Drive را هم روی داده‌های موجود اجرا می‌کند (idempotent).
+  تاگلِ `auto-ingest` حالا هر سه (اشتراک+افراد+درایو) را با هم روشن/خاموش می‌کند.
+- **CHANGE (فرانت — داشبورد)** `InboxRow` شاخهٔ `password_request` (فیلدِ رمز +
+  «🔓 باز کن و ذخیرهٔ رمز»)؛ گزینه‌های «حساب مالی/سند» به منوی ارسال؛ برچسبِ backfill به
+  «اسکنِ همه‌چیزِ موجود (ایمیل + پیوست + درایو)» و پیامِ نتیجه با شمارشِ درایو/پیوست/قفل.
+- **FIX (importِ گمشده)** `submit_password` از `Body(...)` استفاده می‌کرد ولی `Body` importنشده
+  بود — با `import app.main` پیش از merge گرفته شد و رفع شد.
+- **DECISION (dedup روی همهٔ statusها)** `_has_pending`→`_already_ingested`: دیگر فقط pending را
+  چک نمی‌کند بلکه filed/dismissed را هم بر اساسِ `source_ref` می‌بیند تا re-scan/backfill هرگز
+  فایلی را که مالک قبلاً رسیدگی کرده دوباره پیشنهاد ندهد. `drive_ingest` علاوه بر آن یک stampِ
+  «seen ids» دارد تا فایلِ بدونِ‌تغییر دوباره **دانلود** نشود.
+- **VERIFY** گیتِ کامل: **۱۲۷۸ پاس / ۱۲ شکستِ baseline** (همان ۱۲ تستِ auth-config که در
+  HEADِ `71aee9d` هم بدونِ این تغییرات می‌افتند — با git stash تأیید شد؛ regression نیست).
+  `tests/test_universal_ingest.py` (۸ تستِ نو: extract→کاندید، dedup، unreadable-surface،
+  filer create-then-update، prepare_bytes passthrough، خزانهٔ رمز، Drive scan+dedup،
+  Drive-offline no-op) سبز. `cd frontend && npm run build` سبز. تجربه:
+  `experiences/multimodal-file-ingest-to-review-queue.md`.

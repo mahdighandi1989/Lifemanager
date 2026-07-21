@@ -45,13 +45,17 @@ DRIVE_SCOPES = (
     "profile",
 )
 
-# Full connect scope set: Drive + Gmail (read + send own mail) + Calendar
-# (read). The connect flow requests GOOGLE_SCOPES; DRIVE_SCOPES is kept
-# unchanged for existing callers (behaviour-preserving). An already-connected
-# account picks the new scopes up on the next «اتصال» click (the flow sends
-# prompt=consent + include_granted_scopes, so reconsent re-issues a
-# refresh_token covering everything).
+# Full connect scope set: Drive (app files + READ the whole Drive) + Gmail
+# (read + send own mail) + Calendar (read). The connect flow requests
+# GOOGLE_SCOPES; DRIVE_SCOPES is kept unchanged for existing callers
+# (behaviour-preserving). An already-connected account picks the new scopes up
+# on the next «اتصال» click (the flow sends prompt=consent +
+# include_granted_scopes, so reconsent re-issues a refresh_token covering
+# everything). ``drive.readonly`` is what lets the ingest pipeline read the
+# owner's whole Drive as a feeding source — «از گوگل درایو همه‌چیز را ببیند»;
+# without a reconnect the app still only sees the files IT created (drive.file).
 GOOGLE_SCOPES = DRIVE_SCOPES + (
+    "https://www.googleapis.com/auth/drive.readonly",
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.send",
     "https://www.googleapis.com/auth/calendar.readonly",

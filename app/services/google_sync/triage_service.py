@@ -225,6 +225,18 @@ async def analyze_new_emails(
         except Exception as exc:
             logger.debug("people rescore skipped: %r", exc)
 
+    # Universal attachment ingest: read this batch's attachments (statements,
+    # documents, scans…) → review candidates. Best-effort + fail-open; a no-op
+    # when Google isn't connected (get_access_token → None).
+    try:
+        from app.services.ingest.email_ingest import ingest_email_attachments
+
+        for email in rows:
+            await ingest_email_attachments(db, email, user_id=0)
+        await db.commit()
+    except Exception as exc:
+        logger.debug("attachment ingest batch skipped: %r", exc)
+
     try:
         from app.services.activity_log_service import record_activity
 
