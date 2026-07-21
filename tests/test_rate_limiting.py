@@ -116,3 +116,41 @@ def test_rate_limit_is_environment_configurable():
     fields = settings.__class__.model_fields
     assert "RATE_LIMIT_LOGIN" in fields
     assert "RATE_LIMIT_REGISTER" in fields
+
+
+# ── dict-returning @limiter.limit endpoints need a `response: Response` ────────
+# Regression for the 2026-07-21 production 500: an endpoint that is
+# @limiter.limit-guarded AND returns a plain dict must declare a
+# `response: Response` parameter, or slowapi's post-call header injection
+# raises "parameter `response` must be an instance of starlette.responses.
+# Response". Rate-limiting is DISABLED for the rest of the suite, so these are
+# the only tests that exercise the header-injection path — the bug was
+# invisible everywhere else.
+def test_backup_run_under_active_limiter_returns_200_not_500(
+    rate_limited_client, tmp_path, monkeypatch
+):
+    from app.services import backup_service
+
+    monkeypatch.setattr(backup_service, "BACKUPS_DIR", tmp_path / "backups")
+
+    async def _no_client(db):
+        return None
+
+    monkeypatch.setattr("app.services.google_api_client.build_drive_client", _no_client)
+    monkeypatch.delenv("GOOGLE_DRIVE_REFRESH_TOKEN", raising=False)
+    monkeypatch.delenv("GOOGLE_SHEETS_REFRESH_TOKEN", raising=False)
+
+    r = rate_limited_client.post("/api/backup/run")
+    assert r.status_code == 200, r.text  # NOT 500 from slowapi header injection
+    assert r.json()["ok"] is True
+    keys = {k.lower() for k in r.headers.keys()}
+    assert "x-ratelimit-limit" in keys or "x-ratelimit-remaining" in keys
+
+
+def test_assistant_chat_under_active_limiter_returns_200_not_500(rate_limited_client):
+    # answer_question never raises and returns a dict even with no AI model,
+    # so a 200 here proves the slowapi header injection succeeded.
+    r = rate_limited_client.post("/api/ai/chat", json={"message": "سلام"})
+    assert r.status_code == 200, r.text  # NOT 500 from slowapi header injection
+    keys = {k.lower() for k in r.headers.keys()}
+    assert "x-ratelimit-limit" in keys or "x-ratelimit-remaining" in keys

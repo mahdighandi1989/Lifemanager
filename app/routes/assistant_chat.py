@@ -6,7 +6,7 @@ Telegram's /ask shares the same service.
 """
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, Request
+from fastapi import APIRouter, Body, Depends, Request, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,6 +34,7 @@ class ChatRequest(BaseModel):
 @handle_errors
 async def assistant_chat(
     request: Request,
+    response: Response,  # slowapi injects X-RateLimit-* headers into this
     payload: ChatRequest = Body(...),
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),

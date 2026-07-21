@@ -1570,3 +1570,26 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   ثبت `capped_tables`، و «زیرِ سقف ⇒ بدون capped_tables»). گیت کامل: `pytest tests/` بدون
   رگرسیون جدید (۱۳ شکستِ auth/google/notifications/dev-sync از قبل موجود و بی‌ربط — روی
   checkout تمیزِ همین کامیت هم همان‌ها می‌افتند)؛ `npm run build` سبز.
+
+## 2026-07-21 — رفع 500 تولیدیِ «بکاپ فوری» (slowapi بدون پارامتر Response)
+
+- **FINDING (🔴 تولید)** بعد از رفع OOM، `POST /api/backup/run` در تولید ۵۰۰ می‌داد با
+  ردِ لاگِ `slowapi/extension.py _inject_headers → Exception: parameter response must be an
+  instance of starlette.responses.Response`. علت: endpoint یک `dict` برمی‌گرداند و
+  `@limiter.limit("6/hour")` دارد؛ slowapi بعد از اجرا باید هدرهای `X-RateLimit-*` را تزریق کند
+  ولی endpoint پارامتر `response: Response` نداشت. چون در تست‌ها rate-limit **غیرفعال** است
+  (`RATE_LIMIT_DISABLED=true` در conftest)، مسیر تزریقِ هدر هرگز اجرا نمی‌شد و باگ فقط در
+  تولید ظاهر می‌شد. رفعِ OOM این باگِ نهفته را «آشکار» کرد (قبلاً run_backup پیش از
+  return کشته می‌شد، حالا سالم return می‌کند و به تزریقِ هدر می‌رسد).
+- **FINDING (🟠 نهفته)** `POST /api/ai/chat` هم دقیقاً همین شکل را داشت (dict + `@limiter.limit`
+  بدون `response`)، پس در تولید با فعال‌بودن rate-limit ۵۰۰ می‌داد.
+- **CHANGE (correctness)** به هر دو endpoint پارامتر `response: Response` اضافه شد (همان الگوی
+  ثبت‌شدهٔ `app/routes/auth.py` register/login). FastAPI یک Response تزریق می‌کند و slowapi
+  هدرها را در آن می‌گذارد؛ dict خروجی دست‌نخورده می‌ماند.
+- **VERIFY** دو تستِ رگرسیون در `tests/test_rate_limiting.py` با limiterِ **فعال**:
+  `/api/backup/run` و `/api/ai/chat` باید ۲۰۰ بدهند نه ۵۰۰ + هدرِ `x-ratelimit-*` داشته باشند.
+  اثبات‌شده که بدون رفع، هر دو ۵۰۰ می‌دهند (revert موقت). ۸ تست rate-limit + ۱۳ تست backup +
+  فاز۴ سبز؛ ruff پاک.
+- **NOTE** خطای stale `ai_model_configs.prompt_template does not exist` در پنل فقط `last_error`
+  ذخیره‌شده از تلاش‌های قبلی است؛ کدِ جدید با `SELECT *` نسبت به drift ایمن است و اولین بکاپِ
+  موفق، `last_error` را None می‌کند و پیام پاک می‌شود.

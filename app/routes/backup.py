@@ -19,7 +19,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.background import BackgroundTask
@@ -49,11 +49,18 @@ async def backup_status(
 @handle_errors
 async def backup_run(
     request: Request,
+    response: Response,  # slowapi injects X-RateLimit-* headers into this
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
     _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     # run_backup never raises — its dict already carries ok/success/detail_fa.
+    # ``response`` is REQUIRED even though we return a dict: with the
+    # @limiter.limit rate-limiter active (production), slowapi injects the
+    # X-RateLimit-* headers into it AFTER the endpoint returns — without a
+    # Response parameter slowapi raises 500 ("parameter `response` must be an
+    # instance of starlette.responses.Response"). Rate-limiting is disabled in
+    # tests so the bug only ever surfaced in prod (2026-07-21).
     return await svc.run_backup(db)
 
 
