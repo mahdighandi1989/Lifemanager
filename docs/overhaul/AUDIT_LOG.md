@@ -1774,3 +1774,28 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   ماندنِ legacyِ NULL، idempotentیِ create). test_projects/test_tasks/test_telegram_compose سبز؛
   npm build سبز؛ vitest بدونِ رگرسیونِ جدید (شکستِ از-قبل‌موجودِ `components/__tests__/Projects.test.jsx`
   — importِ کهنه به مسیرِ جابه‌جاشده — نامرتبط با این تغییر).
+
+## 2026-07-21 — نقشهٔ صادقانهٔ اپ (owner: «خب که چی؟ صفحه‌ها خالی‌اند») + برنامهٔ «کمتر ولی زنده»
+
+- **FINDING (owner)** مالک صفحهٔ «پروندهٔ زندگی» (۶ کارتِ «چیزی ثبت نشده») را نمونه گرفت و گفت کلِ
+  اپ پر از صفحه‌های خالی/منفعل/بی‌هدف است و من نقطهٔ اصلی را نمی‌فهمم. او یک نقشهٔ صادقانه خواست تا
+  با هم تصمیم بگیریم چه بماند/ادغام/قرنطینه شود، بعد ساخت.
+- **DECISION** به‌جای رفعِ باگ، یک ممیزیِ چنداجنتی (15 اجنت، ~1.15M توکن، wf_16d6572d-ee4) روی
+  ~۵۳ سطحِ کاربرـرو زدم؛ هر صفحه از دیدِ «مالک وقتی بازش می‌کند چه می‌بیند» قضاوت شد + یک منتقدِ
+  کامل‌بودن سوگیریِ اجنت‌ها را گرفت (قضاوت بر پایهٔ «الان داده دارد؟» به‌جای «قابلیت سیم‌کشی شده؟»؛
+  اصلاح شد: افراد/ایمپورت واقعاً alive-اند).
+- **FINDING (نتیجه)** اپ «خالی» نیست، بدتشخیصی شده. سه دسته: (۱) ~۲۵ سطحِ **زنده** (ستون‌فقراتِ
+  فعال: directives + attention + dashboard + writings + lists + brain + finance…). (۲) ~۱۴ سطحِ
+  **«قابلیت هست، ورودی نیست»**: بک‌اند+extractor کامل ولی هیچ feederِ خودکاری صدایشان نمی‌زند
+  (LifeFile/subscriptions/documents/uae-license/people-profile/drive-files/import/assets). (۳) ۸
+  موردِ **تکراری/شلوغیِ ناوبری** (Header انگلیسی ⇄ Sidebar فارسی؛ /import⇄/merge؛ مسیرهای تکراریِ
+  settings؛ ۴ کارتِ snapshot دو بار). (۴) ۴ موردِ **مرده/بی‌ربطِ تک‌کاربره** → قرنطینه
+  (external-projects, admin/users, neteller, login-disabled).
+- **PROPOSAL (برنامهٔ «کمتر ولی زنده»، به‌ترتیبِ اهرم)** ۱) خطِ لولهٔ واحدِ auto-ingest
+  (Gmail/Drive/Telegram → extractorهای موجود → «صفِ بازبینی»)؛ ۲) روشن‌کردنِ دوبارهٔ موتورِ خفتهٔ
+  self-improvement (check-in/streak روی /api/self-improvement، UIاش حذف شده) در ListDetail؛ ۳)
+  «فرمان‌های امروز» را بالای میز فرمان + auto-approveِ صبحگاهی (هرگز خالی)؛ ۴) جمع‌کردنِ سرریزِ
+  ناوبری (یک سایدبارِ فارسی، redirectِ aliasها)؛ ۵) قرنطینهٔ سطوحِ مرده در REMOVAL_CANDIDATES.md.
+  جانِ کلام: کار «ساختن» نیست، «وصل‌کردن» است — بیشترِ کد از قبل هست.
+- **ARTIFACT** نقشهٔ بصریِ صادقانه: https://claude.ai/code/artifact/ae11ea45-a7c9-47a9-baa4-e199b786a3de
+- **NEXT** منتظرِ انتخابِ مالک برای نقطهٔ شروع (بدونِ تغییرِ کدِ رفتاری تا تصمیم).
