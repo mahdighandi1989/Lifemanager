@@ -15,7 +15,7 @@
  * order + labels + a ``group`` tag changed. ``LINKS`` stays a flat export so
  * Header's mobile menu keeps working (it ignores ``group``).
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 // group keys → Persian section headers (rendered only in the desktop Sidebar).
@@ -57,10 +57,49 @@ export const LINKS = [
   { to: '/activity-log', label: 'لاگ فعالیت‌ها', testid: 'sidebar-link-activity-log', group: 'system' },
 ];
 
+// 2026-07-22 «اختاپوس» fix (owner: too many always-visible pages → overwhelm).
+// Keep the DAILY + LIFE groups visible; collapse TOOLS + SYSTEM behind one
+// «بیشتر» drawer so the resting sidebar is short and the owner isn't forced to
+// scan 18 doors. Nothing is removed — the drawer holds them one click away and
+// every route/testid is unchanged. The mobile menu (Header) still lists all.
+const PRIMARY_GROUPS = ['daily', 'life'];
+const SECONDARY_GROUPS = ['tools', 'system'];
+
 function Sidebar() {
   const location = useLocation();
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+
+  // Auto-open the drawer when the current page lives inside it, so the user is
+  // never on a page whose nav entry is hidden.
+  const secondaryLinks = LINKS.filter((l) => SECONDARY_GROUPS.includes(l.group));
+  const [showMore, setShowMore] = useState(() => secondaryLinks.some((l) => isActive(l.to)));
+
+  const renderGroup = (key, title) => {
+    const items = LINKS.filter((l) => l.group === key);
+    if (items.length === 0) return null;
+    return (
+      <div key={key} className="mb-1">
+        <div className="px-3 pt-3 pb-1 text-[11px] font-semibold text-gray-400 select-none">
+          {title}
+        </div>
+        {items.map(({ to, label, testid }) => (
+          <Link
+            key={to}
+            to={to}
+            data-testid={testid}
+            className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              isActive(to)
+                ? 'bg-blue-50 text-blue-600 font-semibold'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <aside
@@ -68,31 +107,26 @@ function Sidebar() {
       className="hidden md:flex md:flex-col md:w-56 md:shrink-0 bg-white border-l border-gray-200"
     >
       <nav className="flex flex-col p-3 space-y-1" aria-label="Sidebar">
-        {NAV_GROUPS.map(([key, title]) => {
-          const items = LINKS.filter((l) => l.group === key);
-          if (items.length === 0) return null;
-          return (
-            <div key={key} className="mb-1">
-              <div className="px-3 pt-3 pb-1 text-[11px] font-semibold text-gray-400 select-none">
-                {title}
-              </div>
-              {items.map(({ to, label, testid }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  data-testid={testid}
-                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive(to)
-                      ? 'bg-blue-50 text-blue-600 font-semibold'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
-                  }`}
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          );
-        })}
+        {NAV_GROUPS.filter(([key]) => PRIMARY_GROUPS.includes(key)).map(([key, title]) =>
+          renderGroup(key, title),
+        )}
+
+        {/* «بیشتر» — one door for tools + system + settings */}
+        <button
+          type="button"
+          data-testid="sidebar-more-toggle"
+          onClick={() => setShowMore((v) => !v)}
+          aria-expanded={showMore}
+          className="mt-2 flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+        >
+          <span>{showMore ? 'کمتر' : 'بیشتر (ابزارها و تنظیمات)'}</span>
+          <span className="text-xs">{showMore ? '▲' : '▼'}</span>
+        </button>
+
+        {showMore &&
+          NAV_GROUPS.filter(([key]) => SECONDARY_GROUPS.includes(key)).map(([key, title]) =>
+            renderGroup(key, title),
+          )}
       </nav>
     </aside>
   );
