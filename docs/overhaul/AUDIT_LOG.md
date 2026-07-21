@@ -1593,3 +1593,31 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **NOTE** خطای stale `ai_model_configs.prompt_template does not exist` در پنل فقط `last_error`
   ذخیره‌شده از تلاش‌های قبلی است؛ کدِ جدید با `SELECT *` نسبت به drift ایمن است و اولین بکاپِ
   موفق، `last_error` را None می‌کند و پیام پاک می‌شود.
+
+## 2026-07-21 — موتور نهادینه‌سازی (فرمان روزانه از محتوا → پیگیری → حل‌شدن)
+
+- **DECISION (owner vision)** مالک روشن کرد که هدفش «گم‌نشدن» نیست؛ می‌خواهد لیست‌ها/نوشته‌ها/
+  آرزوهای مکتوبش به موتوری تبدیل شوند که هر روز به او **فرمان** بدهد، **پیگیری** کند، و کم‌کم در او
+  **حل و نهادینه** شود «بدون اینکه دونه‌دونه بخواندشان»، و هرچیز تازه خودش جا بیفتد. دو انتخاب مالک:
+  لحن **مربیِ جدی** + کانال **هم وب هم تلگرام**.
+- **CHANGE (model)** دو جدول تازه: `directives` (فرمانِ زنده: title/domain/cadence/kind/status
+  [proposed→active→graduated/archived]، strength ۰..۱۰۰، streak، times_done/missed، weight،
+  next_step، source_type/ref) و `directive_checkins` (لاگ روزانه: surfaced/done، یکتا per
+  (directive,date)). ثبت در `models/__init__` + migration `0046_directives` (Inspector-guarded،
+  create_all هم روی free tier می‌سازد).
+- **CHANGE (engine)** `directive_service`: استخراج از محتوا (AI بازنویسی به فرمانِ امری +
+  برچسب دامنه/cadence؛ با نبودِ مدل، هیوریستیک قطعی — پس بی‌AI هم کار می‌کند و تست همان مسیر را
+  می‌زند)؛ انتخاب روزانهٔ N فرمان (weak-first + due + neglected + weight، قطعی)، persist یک‌بار
+  در روز؛ done→strength/streak، miss→ریست streak + افت strength (مربی جدی = نوسانِ بزرگ‌تر)؛
+  فارغ‌التحصیلی (strength≥۹۰ و streak≥۲۱ → graduated «در تو حل شد»)؛ سویپِ شبانه (فرمانِ
+  بی‌پاسخ = جاماندن)؛ گزارش رشد؛ auto_intake برای هرچیز تازه؛ config در یک blob (mode/channel/
+  ساعت‌ها) با presetهای strict/balanced/gentle.
+- **CHANGE (surface)** روتر `/api/directives/*` (today/report/config/extract/add/approve/reject/
+  done/miss؛ mutationها با گیت `enforce_auth_when_required`)؛ حلقهٔ `directive_loop` در
+  `main.py` startup (پنجرهٔ صبح: surface + پوش تلگرام؛ پنجرهٔ شب: سویپ + پیگیری)؛ باکتِ
+  «فرمان‌های امروز» (read-only، fail-open) به `build_today` اضافه شد تا در میز فرمانِ وب هم دیده
+  شود؛ صفحهٔ وب «مسیر نهادینه‌سازی» + لینک سایدبار + مسیر + ثبت در ARCHITECTURE_INVENTORY.json.
+- **VERIFY** `tests/test_directives.py` (۱۳ تست: استخراجِ هیوریستیک+idempotent، approve/reject،
+  auto-intake dedupe، select persist+cap، done→graduation در ۲۱ روز، miss penalty، سویپ شبانه،
+  گزارش، config preset، جریانِ روتر، باکتِ میز فرمان، گیتِ auth). ۴۵ تست همسایه (command-center/
+  phase3/backup/rate-limit/inventory) بدون رگرسیون؛ ruff پاک؛ `npm run build` سبز.

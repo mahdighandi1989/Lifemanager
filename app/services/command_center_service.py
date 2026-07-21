@@ -207,6 +207,7 @@ async def build_today(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
     calendar_bucket = await _calendar_bucket(db)
     people_bucket = await _people_bucket(db)
     growth_bucket = await _growth_bucket(db, user_id, today)
+    commands_bucket = await _commands_bucket(db, user_id)
 
     return {
         "today": today.isoformat(),
@@ -214,6 +215,7 @@ async def build_today(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
         "calendar": calendar_bucket,
         "people": people_bucket,
         "growth": growth_bucket,
+        "commands": commands_bucket,
         "tasks": {
             "overdue": [_task_row(t) for t in overdue[:_LIST_LIMIT]],
             "due_today": [_task_row(t) for t in due_today[:_LIST_LIMIT]],
@@ -421,3 +423,21 @@ async def _growth_bucket(db: AsyncSession, user_id: int, today: date) -> Dict[st
         return {"today_total": total, "today_done": done}
     except Exception:
         return {"today_total": 0, "today_done": 0}
+
+
+async def _commands_bucket(db, user_id: int) -> Dict[str, Any]:
+    """«فرمان‌های امروز» — today's internalization commands (read-only preview;
+    the directive engine loop / the /today endpoint own the persisted
+    surfacing). Fail-open so a broken engine never blanks the dashboard."""
+    try:
+        from app.services import directive_service as _ds
+
+        res = await _ds.select_today_commands(db, user_id, persist=False)
+        cmds = res.get("commands") or []
+        return {
+            "items": cmds,
+            "count": len(cmds),
+            "done": sum(1 for c in cmds if c.get("done") is True),
+        }
+    except Exception:
+        return {"items": [], "count": 0, "done": 0}

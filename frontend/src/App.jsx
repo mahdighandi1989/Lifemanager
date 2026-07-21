@@ -18,6 +18,7 @@ import FinanceHub from './pages/FinanceHub';     // برنامه و بودجه +
 import AssistantHub from './pages/AssistantHub'; // پیشنهادات + تاریخچه + شخصیت + ترسیم آینده
 import DataHub from './pages/DataHub';           // ایمپورت + فایل‌های من + ادغام تسک‌ها
 import LifeFilePage from './pages/LifeFilePage';
+import DirectivesPage from './pages/DirectivesPage';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import SystemMapPage from './pages/SystemMapPage';
@@ -257,6 +258,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <LifeFilePage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/directives"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <DirectivesPage />
                     </Layout>
                   </ProtectedRoute>
                 }

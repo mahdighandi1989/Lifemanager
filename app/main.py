@@ -25,6 +25,7 @@ from app.routes import (
     inbox,
     assistant_chat,
     backup,
+    directives,
     global_search,
     system_map,
     trash,
@@ -852,6 +853,9 @@ app.include_router(attention.router, tags=["attention"])
 app.include_router(weekly_review.router, tags=["weekly-review"])
 # پشتیبان‌گیری خودکار — nightly full-DB export to Drive + manual run/export.
 app.include_router(backup.router, tags=["backup"])
+# موتور نهادینه‌سازی — living directives extracted from the owner's content,
+# surfaced/followed-up daily, tracked to internalization (2026-07-21 vision).
+app.include_router(directives.router, tags=["directives"])
 # دستیار سراسری + جستجوی سراسری + نقشهٔ سیستم (phase 4).
 app.include_router(assistant_chat.router, tags=["ai"])
 app.include_router(global_search.router, tags=["search"])
@@ -1085,6 +1089,35 @@ async def _stop_jobs_engine():
             await asyncio.wait_for(task, timeout=5)
     except Exception as exc:
         logger.debug("jobs engine shutdown: %s", exc)
+
+
+# ── Directive engine (موتور نهادینه‌سازی — daily command push + evening
+# follow-up sweep). Same lifecycle shape as the backup/attention loops. ──────
+@app.on_event("startup")
+async def _start_directive_loop():
+    try:
+        from app.services.directive_service import directive_loop
+
+        app.state.directive_stop = asyncio.Event()
+        app.state.directive_task = asyncio.create_task(
+            directive_loop(app.state.directive_stop)
+        )
+        logger.info("🎯 directive engine started")
+    except Exception as exc:
+        logger.warning("directive engine failed to start: %s", exc)
+
+
+@app.on_event("shutdown")
+async def _stop_directive_loop():
+    try:
+        stop = getattr(app.state, "directive_stop", None)
+        if stop is not None:
+            stop.set()
+        task = getattr(app.state, "directive_task", None)
+        if task is not None:
+            await asyncio.wait_for(task, timeout=5)
+    except Exception as exc:
+        logger.debug("directive engine shutdown: %s", exc)
 
 
 # ── Personal writings seed (نوشته‌های من — Word documents archive) ───────────

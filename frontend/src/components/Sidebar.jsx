@@ -15,6 +15,7 @@ import { Link, useLocation } from 'react-router-dom';
 // Exported so Header's mobile menu renders the exact same link set.
 export const LINKS = [
   { to: '/', label: 'Dashboard', testid: 'sidebar-link-dashboard' },
+  { to: '/directives', label: 'مسیر نهادینه‌سازی', testid: 'sidebar-link-directives' },
   { to: '/tasks', label: 'Tasks', testid: 'sidebar-link-tasks' },
   { to: '/projects', label: 'Projects', testid: 'sidebar-link-projects' },
   { to: '/dev-center', label: 'مرکز توسعه', testid: 'sidebar-link-dev-center' },

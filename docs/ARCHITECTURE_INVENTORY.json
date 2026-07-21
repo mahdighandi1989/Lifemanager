@@ -1595,6 +1595,10 @@
         "file": "frontend/src/pages/Import.jsx"
       },
       {
+        "name": "DirectivesPage",
+        "file": "frontend/src/pages/DirectivesPage.jsx"
+      },
+      {
         "name": "LifeFilePage",
         "file": "frontend/src/pages/LifeFilePage.jsx"
       },
