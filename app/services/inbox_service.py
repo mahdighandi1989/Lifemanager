@@ -33,7 +33,10 @@ from app.models.inbox_item import InboxItem
 logger = logging.getLogger(__name__)
 
 # Destinations the triage layer may suggest / the filing layer accepts.
-INBOX_TARGETS = ("task", "todo", "note", "person")
+# «subscription» is filed by the auto-ingest pipeline (a recognised
+# subscription-provider email) rather than the text classifier, but it flows
+# through the same review-then-file queue.
+INBOX_TARGETS = ("task", "todo", "note", "person", "subscription")
 
 # Fallback list for explicit todo filings that match no existing list —
 # auto-created so a "به لیست بفرست" choice can never dead-end.
@@ -369,6 +372,27 @@ async def _file_as_note(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Di
     return {"kind": "writing", "id": writing.id, "title": writing.title, "link": "/writings"}
 
 
+async def _file_as_subscription(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
+    """Turn an auto-ingest subscription candidate into a real
+    ``SubscriptionAccount`` — which the «اشتراک‌ها» card shows and
+    ``attention_service.subscription_renewal`` turns into a renewal reminder.
+    Only the shown next-payment date + provider/email ride along; there is no
+    price column on the model, so the amount stays informational in the inbox
+    row (the owner can edit the account afterwards)."""
+    from app.models.subscription_account import SubscriptionAccount
+
+    provider = (s.get("provider") or s.get("title") or "subscription")
+    sub = SubscriptionAccount(
+        user_id=user_id,
+        provider=str(provider)[:64],
+        account_email=(str(s["account_email"])[:255] if s.get("account_email") else None),
+        next_payment_date=(str(s["next_payment_date"])[:64] if s.get("next_payment_date") else None),
+    )
+    db.add(sub)
+    await db.flush()
+    return {"kind": "subscription", "id": sub.id, "title": sub.provider, "link": "/life-file"}
+
+
 async def _file_as_person(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
     from app.models.person import Person
 
@@ -427,6 +451,7 @@ async def file_item(
         "todo": _file_as_todo,
         "note": _file_as_note,
         "person": _file_as_person,
+        "subscription": _file_as_subscription,
     }[kind]
     created = await filer(db, base, user_id)
 

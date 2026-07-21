@@ -35,6 +35,7 @@ _TARGET_FA = {
     "todo_item": "آیتم لیست",
     "writing": "یادداشت",
     "person": "شخص",
+    "subscription": "اشتراک",
 }
 
 
@@ -222,3 +223,34 @@ async def reclassify_inbox_item(
         raise HTTPException(status_code=409, detail="Item already filed")
     item = await inbox_service.apply_classification(db, item, user_id=user_id)
     return {"ok": True, "success": True, "item": _serialize(item)}
+
+
+# --- auto-ingest toggle (opt-in Gmail → subscription candidates) ------------
+
+class AutoIngestPatch(BaseModel):
+    enabled: bool
+
+
+@router.get("/api/inbox/auto-ingest", tags=["inbox"])
+@handle_errors
+async def get_auto_ingest(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Whether recognised subscription emails auto-create review candidates."""
+    from app.services.google_sync.subscription_ingest import is_enabled
+
+    return {"ok": True, "success": True, "enabled": await is_enabled(db)}
+
+
+@router.put("/api/inbox/auto-ingest", tags=["inbox"])
+@handle_errors
+async def put_auto_ingest(
+    patch: AutoIngestPatch,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    from app.services.google_sync.subscription_ingest import set_enabled
+
+    enabled = await set_enabled(db, patch.enabled)
+    return {"ok": True, "success": True, "enabled": enabled}

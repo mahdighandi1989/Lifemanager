@@ -175,6 +175,7 @@ async def analyze_new_emails(
     now = datetime.now(timezone.utc)
     action_titles: List[str] = []
     finance_routed = 0
+    subscription_candidates = 0
     for email in rows:
         result, model = await _ai_triage(db, email)
         if result is None:
@@ -189,6 +190,12 @@ async def analyze_new_emails(
             action_titles.append((email.subject or email.ai_summary or "بدون موضوع")[:80])
         if await _route_bank_email(db, email):
             finance_routed += 1
+        # Auto-ingest (opt-in): recognised subscription-provider mails become
+        # review-queue candidates the owner files into اشتراک‌ها with one tap.
+        from app.services.google_sync.subscription_ingest import route_subscription_email
+
+        if await route_subscription_email(db, email, user_id=0):
+            subscription_candidates += 1
     try:
         await db.commit()
     except Exception:
@@ -211,4 +218,10 @@ async def analyze_new_emails(
         )
     except Exception as exc:
         logger.debug("email triage activity mirror skipped: %r", exc)
-    return {"ok": True, "analyzed": len(rows), "needs_action": len(action_titles), "finance_routed": finance_routed}
+    return {
+        "ok": True,
+        "analyzed": len(rows),
+        "needs_action": len(action_titles),
+        "finance_routed": finance_routed,
+        "subscription_candidates": subscription_candidates,
+    }

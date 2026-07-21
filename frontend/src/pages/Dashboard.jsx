@@ -12,6 +12,7 @@ const TYPE_FA = {
   todo: 'آیتم لیست',
   note: 'یادداشت',
   person: 'شخص',
+  subscription: 'اشتراک',
   unknown: 'نامشخص',
 };
 
@@ -20,6 +21,7 @@ const TYPE_COLOR = {
   todo: 'bg-emerald-100 text-emerald-700',
   note: 'bg-amber-100 text-amber-700',
   person: 'bg-purple-100 text-purple-700',
+  subscription: 'bg-rose-100 text-rose-700',
   unknown: 'bg-gray-100 text-gray-600',
 };
 
@@ -200,6 +202,23 @@ function Dashboard() {
       setCmdBusyId(null);
     }
   }, [fetchToday]);
+
+  // Opt-in auto-ingest toggle (Gmail → subscription review candidates).
+  const [autoIngest, setAutoIngest] = useState(null);
+  useEffect(() => {
+    api.get('/inbox/auto-ingest')
+      .then((r) => setAutoIngest(!!r.data?.enabled))
+      .catch(() => setAutoIngest(null));
+  }, []);
+  const toggleAutoIngest = async () => {
+    const next = !autoIngest;
+    setAutoIngest(next);
+    try {
+      await api.put('/inbox/auto-ingest', { enabled: next });
+    } catch {
+      setAutoIngest(!next); // revert on failure
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -489,6 +508,29 @@ function Dashboard() {
             title="📥 صندوق ورودی — منتظر تصمیم"
             badge={todayLoading ? '…' : inbox?.pending_count || 0}
             badgeCls="bg-blue-100 text-blue-700"
+            footer={
+              autoIngest !== null && (
+                <label className="mt-3 flex items-center justify-between gap-2 text-xs text-gray-500 cursor-pointer">
+                  <span>اسکنِ خودکارِ ایمیل برای اشتراک‌ها</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={autoIngest}
+                    onClick={toggleAutoIngest}
+                    data-testid="auto-ingest-toggle"
+                    className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                      autoIngest ? 'bg-emerald-500' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        autoIngest ? '-translate-x-4' : '-translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                </label>
+              )
+            }
           >
             {todayLoading && <p className="text-sm text-gray-400">در حال بارگذاری…</p>}
             {showEmptyStates && !(inbox?.latest?.length) && (
