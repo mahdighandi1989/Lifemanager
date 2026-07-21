@@ -1845,3 +1845,32 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **VERIFY** ۵ تستِ pipeline؛ گیتِ کامل ۱۲۵۶ پاس / ۱۲ baseline؛ build سبز. (commit a5060f1)
 - **STATUS** هر ۵ حرکتِ «کمتر ولی زنده» تمام شد. سِیمِ ingest برای اسناد (uae-license/identity)
   آماده است (همان الگو) — برای دورِ بعد.
+
+## 2026-07-21 — تغذیهٔ خودکارِ دائمی + هشدارِ قطعِ اتصال + زنده‌شدنِ CRM افراد
+
+درخواستِ مالک: (۱) auto-ingest را برای مدارک و «هرچیزِ دیگر» گسترش بده — خودکار و دائمی، بدونِ
+تیک‌زدنِ هربار؛ (۲) اگر اتصالِ گوگل قطع شد بدونِ رفتن به جایی بفهمم؛ (۳) صفحهٔ افراد طبقِ فلسفهٔ
+اصلی‌اش (تحلیل از روی داده در طولِ زمان).
+
+- **RECON (۳ اجنت، wf_37ae51e7)** نتایجِ کلیدی: (الف) CRM افراد **کاملاً ساخته** است (مدل
+  PersonProfile با همهٔ فیلدها، endpointها، PersonProfilePage، فرمِ نظر/کارِ خوب-بد، اسکورر با
+  time-decay) — نباید بازساخته شود؛ **تنها شکاف:** جدولِ Interaction هیچ‌جا نوشته نمی‌شد و
+  person_tasks به امتیاز وصل نبود، پس امتیاز همیشه ۰ بود. (ب) auto-feed: تقویم + موجودیِ بانک از
+  قبل automatic؛ اشتراک‌ها review-queue (ساخته شد)؛ **تنها هدفِ ارزشمندِ ساخته‌نشده = Person +
+  Interaction از Gmail**؛ مدارک (Emirates ID/گواهینامه) و RTA **منبعِ ماشینیِ ایمیل ندارند**
+  (داده در عکسِ کارت است؛ OCRِ خودکارِ سندِ رسمی پرخطر) → skip، مسیرِ دستی + یادآورِ انقضا بماند.
+  (پ) قطعِ اتصال کاملاً silent بود؛ توکنِ باطل‌شده با نبودِ توکن یکی می‌شد.
+- **CHANGE (C1 — هشدارِ قطعِ اتصال، commit c79b446)** connection_decision (تصمیمِ خالصِ
+  edge-triggered + cooldownِ بادوامِ ۲۴h در بلابِ google_sync_engine) + _check_connection در حلقه
+  (با refresh_access_token_details سه‌حالت را تفکیک) → رویدادِ google_disconnected به تلگرام +
+  اعلانِ درون‌برنامه‌ای، و google_reconnected روی بازیابی. مالک بی‌آنکه جایی برود می‌فهمد.
+- **CHANGE (C2 — CRM افراد، commit این فاز)** producerِ گمشدهٔ Interaction ساخته شد:
+  person_ingest (Gmail→Interaction برای فردِ شناخته‌شده به‌صورت automatic + کاندیدِ person برای
+  فرستندهٔ انسانیِ تکراری) + record_interaction/record_task_link_interactions در
+  person_profile_service + پلِ tasks link-persons. امتیازِ رابطه حالا از فعالیتِ واقعی (ایمیل +
+  تسکِ مشترک) در طولِ زمان زنده می‌شود — دقیقاً فلسفهٔ مالک، بدونِ بازساختنِ چیزی.
+- **DECISION (مدارک)** برخلافِ اشتراک‌ها، مدارک از ایمیل قابلِ‌تغذیهٔ مطمئن نیستند (منبع = عکسِ
+  کارت). به‌جای ساختِ OCRِ پرخطرِ سندِ رسمی، مسیرِ دستیِ موجود + یادآورِ انقضا (attention_service:
+  license_expiry/document_expiry) نگه داشته شد. صادقانه به مالک اعلام می‌شود.
+- **VERIFY** C1: test_connection_decision_matrix. C2: ۶ تستِ person_ingest + گاردِ
+  try/except-freeِ روتِ tasks. هر دو گیتِ کامل بدونِ شکستِ non-baseline؛ build سبز.
