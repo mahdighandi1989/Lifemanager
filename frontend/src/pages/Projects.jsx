@@ -10,7 +10,7 @@
  * Side effects: Makes HTTP requests to the backend API on mount and on project creation.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // All project data lives under /api/projects. The bare /projects path is
 // the SPA route that renders this page.
@@ -69,6 +69,12 @@ function Projects({ embedded = false }) {
   const [newName, setNewName] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [adding, setAdding] = useState(false);
+  // Synchronous in-flight guard: `adding` (React state) updates a render tick
+  // late, so a fast double-click can fire two POSTs before the button
+  // disables. A ref flips immediately and blocks the second submit — the root
+  // cause of the duplicate rows the owner saw. The server-side idempotent
+  // create is the backstop; this stops the request from ever leaving.
+  const submitting = useRef(false);
 
   const fetchProjects = async () => {
     try {
@@ -89,6 +95,8 @@ function Projects({ embedded = false }) {
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!newName.trim()) return;
+    if (submitting.current) return;   // block a second submit already in flight
+    submitting.current = true;
     setAdding(true);
     try {
       const res = await fetch(`${API_BASE}/projects`, {
@@ -98,7 +106,12 @@ function Projects({ embedded = false }) {
       });
       if (res.ok) {
         const project = await res.json();
-        setProjects(prev => [project, ...prev]);
+        // Server create is idempotent by (owner, name): re-adding the same
+        // name returns the existing row. De-dupe locally so it isn't listed
+        // twice if it's already on screen.
+        setProjects(prev =>
+          prev.some(p => p.id === project.id) ? prev : [project, ...prev]
+        );
         setNewName('');
         setNewDesc('');
         setShowForm(false);
@@ -107,6 +120,7 @@ function Projects({ embedded = false }) {
       setError('خطا در افزودن پروژه');
     } finally {
       setAdding(false);
+      submitting.current = false;
     }
   };
 

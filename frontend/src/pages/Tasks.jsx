@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 
 // All task data lives under /api/tasks. The bare /tasks path is the SPA
@@ -129,6 +129,10 @@ function Tasks() {
   const [error, setError] = useState(null);
   const [newTitle, setNewTitle] = useState('');
   const [adding, setAdding] = useState(false);
+  // Synchronous in-flight guard: `adding` (React state) lags a render tick, so
+  // a fast double-click can fire two POSTs and create duplicate tasks before
+  // the button disables. A ref blocks the second submit immediately.
+  const submitting = useRef(false);
   const [filter, setFilter] = useState('all');
   // Person picker (audit task 3cc09436, AC8): pick people to link to the task.
   const [persons, setPersons] = useState([]);
@@ -185,6 +189,8 @@ function Tasks() {
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
+    if (submitting.current) return;   // block a second submit already in flight
+    submitting.current = true;
     setAdding(true);
     try {
       // Optional fields ride along only when the user actually set
@@ -228,6 +234,7 @@ function Tasks() {
       setError('خطا در افزودن وظیفه');
     } finally {
       setAdding(false);
+      submitting.current = false;
     }
   };
 

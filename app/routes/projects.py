@@ -72,8 +72,18 @@ async def list_projects(
 
     Previously returned EVERY user's projects. Now scoped to the caller via
     ``get_optional_user_id`` (anon → user 0 under login-bypass), including
-    legacy unowned rows so nothing pre-scoping disappears."""
-    result = await db.execute(select(Project).where(_owned_or_unowned(user_id)))
+    legacy unowned rows so nothing pre-scoping disappears.
+
+    Merged-away rows are hidden: the DeduplicationService soft-deletes a merged
+    source by setting ``is_active=False`` (never a hard delete — reversible),
+    so listing filters them out. ``is_active IS NOT False`` keeps legacy rows
+    whose column is NULL visible — only an *explicit* False (a merge) hides a
+    row, so nothing pre-dedup disappears (CLAUDE.md rule 2)."""
+    result = await db.execute(
+        select(Project).where(
+            _owned_or_unowned(user_id), Project.is_active.isnot(False)
+        )
+    )
     return [_serialize(p) for p in result.scalars().all()]
 
 
@@ -111,11 +121,30 @@ async def create_project(
 
     The owner is taken from the auth context (not trusted from the body) so a
     client can't plant a row under someone else's id; anon resolves to user 0.
+
+    Idempotent by (owner, name): if an active project with the same sanitized
+    name already exists for this owner, return it instead of inserting a second
+    row. This is the root-cause fix for the duplicate "test project" rows the
+    owner hit — a double-submit (or a re-run of the same create) now converges
+    on the one project rather than piling up near-identical rows. It is not a
+    delete: an existing row is reused, never removed (CLAUDE.md rule 2).
     """
+    owner = payload.user_id if payload.user_id is not None else user_id
+    clean_name = _sanitize(payload.name)
+    existing = await db.execute(
+        select(Project).where(
+            Project.user_id == owner,
+            Project.name == clean_name,
+            Project.is_active.isnot(False),
+        )
+    )
+    dup = existing.scalars().first()
+    if dup is not None:
+        return _serialize(dup)
     project = Project(
-        name=_sanitize(payload.name),
+        name=clean_name,
         description=_sanitize(payload.description),
-        user_id=payload.user_id if payload.user_id is not None else user_id,
+        user_id=owner,
     )
     if hasattr(project, "status"):
         project.status = payload.status

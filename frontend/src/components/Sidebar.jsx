@@ -45,6 +45,10 @@ export const LINKS = [
   // ابزار — helpers.
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant', group: 'tools' },
   { to: '/import', label: 'داده', testid: 'sidebar-link-data', group: 'tools' },
+  // The dedup/merge tool already lived at /merge (a tab inside «داده») but was
+  // undiscoverable — the owner asked why duplicate projects/tasks pile up. A
+  // top-level link surfaces the reversible "find similar → merge" flow.
+  { to: '/merge', label: 'پاک‌سازی و ادغام', testid: 'sidebar-link-merge', group: 'tools' },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings', group: 'tools' },
 
   // سیستم و فنی — developer/meta tools (kept, quarantined to the bottom).

@@ -525,19 +525,26 @@ class ComposeService:
             .limit(200)
         )).scalars().all()
 
-        # Tasks: keyword matches across ALL open tasks ∪ most-recent (fallback).
+        # Tasks: keyword matches across tasks in ANY status ∪ most-recent open
+        # (fallback). Dedup detection deliberately spans DONE/CANCELLED too — a
+        # re-dictated idea should match its already-finished original ("you
+        # already did this") instead of spawning a duplicate. Merged-away rows
+        # (merged_into_id set) are excluded so a soft-merged duplicate can't
+        # re-surface as a match. The recent fallback stays open-only so it
+        # doesn't flood the context with finished work.
         task_rows: Dict[int, str] = {}
         if kws:
             matched = (await session.execute(
                 select(Task.id, Task.title).where(
-                    _scope(Task.user_id), Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
+                    _scope(Task.user_id), Task.merged_into_id.is_(None),
                     or_(*[Task.title.ilike(f"%{k}%") for k in kws]),
                 ).limit(120)
             )).all()
             task_rows.update({r[0]: r[1] for r in matched})
         recent_t = (await session.execute(
             select(Task.id, Task.title).where(
-                _scope(Task.user_id), Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS])
+                _scope(Task.user_id), Task.merged_into_id.is_(None),
+                Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
             ).order_by(Task.id.desc()).limit(25)
         )).all()
         task_rows.update({r[0]: r[1] for r in recent_t})

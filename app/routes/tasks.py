@@ -202,8 +202,16 @@ async def list_tasks(
     working: those rows live under user_id=0 and the filter still
     matches. With a real JWT, the dep validates signature + expiry
     and the query is correctly scoped.
+
+    Merged-away rows are hidden: the DeduplicationService soft-deletes a
+    merged source by pointing ``merged_into_id`` at the survivor (never a hard
+    delete — reversible), so a task with ``merged_into_id`` set is treated as
+    merged-away and excluded from the list. Unmerged rows have it NULL, so
+    nothing pre-dedup disappears (CLAUDE.md rule 2).
     """
-    stmt = select(Task).where(Task.user_id == user_id)
+    stmt = select(Task).where(
+        Task.user_id == user_id, Task.merged_into_id.is_(None)
+    )
     result = await db.execute(stmt)
     return [_serialize(t) for t in result.scalars().all()]
 
