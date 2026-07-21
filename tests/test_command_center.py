@@ -46,6 +46,14 @@ def test_empty_db_returns_complete_zeroed_structure(api_client):
     assert data["stats"] == {"tasks_total": 0, "tasks_done": 0, "projects_total": 0}
 
 
+def test_commands_bucket_shape_includes_proposed(api_client):
+    """The «فرمان‌های امروز» bucket the Dashboard renders carries the
+    directive counts, including ``proposed`` — the count the desk uses to
+    nudge «N فرمانِ پیشنهادی منتظرِ تأیید» when nothing is active yet."""
+    data = _today(api_client)
+    assert data["commands"] == {"items": [], "count": 0, "done": 0, "proposed": 0}
+
+
 def test_task_buckets_by_due_date(api_client):
     today = date.today()
     mk = lambda title, d: api_client.post(  # noqa: E731

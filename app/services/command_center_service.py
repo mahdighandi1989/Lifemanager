@@ -434,10 +434,15 @@ async def _commands_bucket(db, user_id: int) -> Dict[str, Any]:
 
         res = await _ds.select_today_commands(db, user_id, persist=False)
         cmds = res.get("commands") or []
+        # proposed count: lets the dashboard nudge «N فرمانِ پیشنهادی منتظرِ
+        # تأیید» when there are no ACTIVE commands yet — so a brand-new owner's
+        # first open is an actionable invitation, not a dead empty card.
+        proposed = len(await _ds.list_directives(db, user_id, status="proposed"))
         return {
             "items": cmds,
             "count": len(cmds),
             "done": sum(1 for c in cmds if c.get("done") is True),
+            "proposed": proposed,
         }
     except Exception:
-        return {"items": [], "count": 0, "done": 0}
+        return {"items": [], "count": 0, "done": 0, "proposed": 0}

@@ -169,6 +169,8 @@ function Dashboard() {
   // /google/* calls only fire when the user opens the section.
   const [showGooglePanel, setShowGooglePanel] = useState(false);
 
+  const [cmdBusyId, setCmdBusyId] = useState(null);
+
   const fetchToday = useCallback(async () => {
     try {
       const res = await api.get('/command-center/today');
@@ -182,6 +184,22 @@ function Dashboard() {
       setTodayLoading(false);
     }
   }, []);
+
+  // «فرمان‌های امروز» — mark a directive done/missed straight from the command
+  // desk, then refresh so strength/streak update in place. The full engine
+  // (steps, schedule, growth report) lives at /directives; this is the daily
+  // touch-point surfaced on the first screen.
+  const markCommand = useCallback(async (id, done) => {
+    setCmdBusyId(id);
+    try {
+      await api.post(`/directives/${id}/${done ? 'done' : 'miss'}`);
+      await fetchToday();
+    } catch {
+      setActionError(true);
+    } finally {
+      setCmdBusyId(null);
+    }
+  }, [fetchToday]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -346,6 +364,80 @@ function Dashboard() {
             </p>
           )}
         </div>
+
+        {/* فرمان‌های امروز — the internalization engine, surfaced on the first
+            screen (audit «کمتر ولی زنده», move 3). The commands bucket is
+            already computed in build_today; here we render it with انجام
+            دادم/جا ماندم, and when nothing is active yet we nudge toward the
+            waiting proposals so the first open is never a dead empty card. */}
+        {today?.commands && (() => {
+          const cb = today.commands;
+          const items = cb.items || [];
+          const proposed = cb.proposed || 0;
+          return (
+            <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-100 p-5" data-testid="dashboard-commands">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-semibold text-gray-900">🎯 فرمان‌های امروز</h2>
+                <Link to="/directives" className="text-xs text-blue-600 hover:underline shrink-0">مسیرِ نهادینه‌سازی ›</Link>
+              </div>
+              {items.length > 0 ? (
+                <div className="space-y-2" data-testid="dashboard-commands-list">
+                  {items.map((c) => (
+                    <div key={c.id} className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 p-3">
+                      <div className="min-w-0">
+                        <div className="text-sm text-gray-800 truncate">{c.title}</div>
+                        {c.current_step && (
+                          <div className="text-xs text-indigo-600 mt-0.5 truncate">👉 {c.current_step}</div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {c.streak > 0 && <span className="text-xs text-orange-600">🔥 {c.streak}</span>}
+                        {c.done === true ? (
+                          <span className="text-emerald-600 text-sm font-medium">✓ انجام شد</span>
+                        ) : c.done === false ? (
+                          <span className="text-red-500 text-sm">جا ماندی</span>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => markCommand(c.id, true)}
+                              disabled={cmdBusyId === c.id}
+                              className="rounded-lg bg-emerald-600 text-white text-xs px-3 py-1.5 hover:bg-emerald-700 disabled:opacity-50"
+                            >
+                              انجام دادم
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => markCommand(c.id, false)}
+                              disabled={cmdBusyId === c.id}
+                              className="rounded-lg bg-gray-100 text-gray-600 text-xs px-3 py-1.5 hover:bg-gray-200 disabled:opacity-50"
+                            >
+                              جا ماندم
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : proposed > 0 ? (
+                <div className="flex items-center justify-between gap-3 rounded-lg bg-indigo-50 border border-indigo-100 p-3" data-testid="dashboard-commands-proposed">
+                  <p className="text-sm text-indigo-800">
+                    {proposed} فرمانِ پیشنهادی از نوشته‌ها و لیست‌هایت آماده است — بررسی و تأیید کن تا وارد روال روزانه شوند.
+                  </p>
+                  <Link to="/directives" className="shrink-0 rounded-lg bg-indigo-600 text-white text-xs px-3 py-1.5 hover:bg-indigo-700">
+                    بررسی و تأیید ›
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">
+                  هنوز فرمانی نداری — از نوشته‌ها و لیست‌هایت فرمانِ روزانه بساز.{' '}
+                  <Link to="/directives" className="text-blue-600 hover:underline">شروع کن ›</Link>
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Today fetch failed → say so; silence would read as all-clear. */}
         {todayError && (
