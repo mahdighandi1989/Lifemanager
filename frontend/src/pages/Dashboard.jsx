@@ -511,7 +511,7 @@ function Dashboard() {
             footer={
               autoIngest !== null && (
                 <label className="mt-3 flex items-center justify-between gap-2 text-xs text-gray-500 cursor-pointer">
-                  <span>اسکنِ خودکارِ ایمیل برای اشتراک‌ها</span>
+                  <span>اسکنِ خودکارِ ایمیل (اشتراک‌ها و افراد)</span>
                   <button
                     type="button"
                     role="switch"

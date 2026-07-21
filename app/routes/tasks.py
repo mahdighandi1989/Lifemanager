@@ -413,6 +413,16 @@ async def link_persons_to_task(
             )
             linked.append(pid)
     await db.commit()
+
+    # Bridge task involvement → the relationship score (owner's vision: «از روی
+    # داده‌هایی که ... اون شخص دخیل بوده»). The service records a shared-work
+    # interaction per newly linked person and refreshes their score; it isolates
+    # its own errors so scoring never fails the link (route stays try/except-free).
+    from app.services import person_profile_service as pps
+
+    await pps.record_task_link_interactions(
+        db, task_id=task_id, task_title=task.title, person_ids=linked
+    )
     return {"task_id": task_id, "linked_person_ids": linked}
 
 

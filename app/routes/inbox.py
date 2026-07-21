@@ -237,10 +237,14 @@ async def get_auto_ingest(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> dict:
-    """Whether recognised subscription emails auto-create review candidates."""
-    from app.services.google_sync.subscription_ingest import is_enabled
+    """Master switch for Gmail auto-ingest — subscriptions (review candidates)
+    AND people (interactions for known contacts + person candidates). Reported
+    as one flag: on only when BOTH are on."""
+    from app.services.google_sync.person_ingest import is_enabled as people_on
+    from app.services.google_sync.subscription_ingest import is_enabled as subs_on
 
-    return {"ok": True, "success": True, "enabled": await is_enabled(db)}
+    enabled = await subs_on(db) and await people_on(db)
+    return {"ok": True, "success": True, "enabled": enabled}
 
 
 @router.put("/api/inbox/auto-ingest", tags=["inbox"])
@@ -250,7 +254,9 @@ async def put_auto_ingest(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
 ) -> dict:
-    from app.services.google_sync.subscription_ingest import set_enabled
+    from app.services.google_sync.person_ingest import set_enabled as set_people
+    from app.services.google_sync.subscription_ingest import set_enabled as set_subs
 
-    enabled = await set_enabled(db, patch.enabled)
-    return {"ok": True, "success": True, "enabled": enabled}
+    await set_subs(db, patch.enabled)
+    await set_people(db, patch.enabled)
+    return {"ok": True, "success": True, "enabled": patch.enabled}

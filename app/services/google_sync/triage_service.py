@@ -176,6 +176,8 @@ async def analyze_new_emails(
     action_titles: List[str] = []
     finance_routed = 0
     subscription_candidates = 0
+    person_candidates = 0
+    scored_people: set = set()
     for email in rows:
         result, model = await _ai_triage(db, email)
         if result is None:
@@ -196,11 +198,32 @@ async def analyze_new_emails(
 
         if await route_subscription_email(db, email, user_id=0):
             subscription_candidates += 1
+
+        # People CRM auto-feed: a mail from a KNOWN person records an interaction
+        # (auto — feeds the relationship score); an unknown repeated human sender
+        # becomes a review candidate. See google_sync/person_ingest.py.
+        from app.services.google_sync import person_ingest
+
+        pid = await person_ingest.record_email_interaction(db, email, user_id=0)
+        if pid is not None:
+            scored_people.add(pid)
+        elif await person_ingest.route_person_email(db, email, user_id=0):
+            person_candidates += 1
     try:
         await db.commit()
     except Exception:
         await db.rollback()
         return {"ok": False, "analyzed": 0, "needs_action": 0}
+
+    # Refresh each affected person's relationship score once (interactions were
+    # added with reanalyze=False to avoid a re-score per email in the batch).
+    if scored_people:
+        try:
+            from app.services.google_sync import person_ingest
+
+            await person_ingest.rescore_people(db, scored_people)
+        except Exception as exc:
+            logger.debug("people rescore skipped: %r", exc)
 
     try:
         from app.services.activity_log_service import record_activity
@@ -224,4 +247,6 @@ async def analyze_new_emails(
         "needs_action": len(action_titles),
         "finance_routed": finance_routed,
         "subscription_candidates": subscription_candidates,
+        "person_candidates": person_candidates,
+        "interactions_recorded": len(scored_people),
     }

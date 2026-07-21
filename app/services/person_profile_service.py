@@ -7,14 +7,17 @@ appends an analysis snapshot to the behaviour log.
 """
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.interaction import Interaction
 from app.models.person_profile import PersonProfile
+
+logger = logging.getLogger(__name__)
 
 
 async def get_or_create_profile(db: AsyncSession, *, person_id: int) -> PersonProfile:
@@ -152,6 +155,80 @@ async def analyze_person(db: AsyncSession, *, person_id: int, person_name: str =
     await db.commit()
     await db.refresh(profile)
     return profile
+
+
+async def record_interaction(
+    db: AsyncSession,
+    *,
+    person_id: int,
+    type: str = "other",
+    summary: Optional[str] = None,
+    notes: Optional[str] = None,
+    date: Optional[datetime] = None,
+    reanalyze: bool = True,
+    dedup_note: Optional[str] = None,
+) -> Optional[Interaction]:
+    """Create an Interaction row for a person and (by default) refresh the
+    deterministic relationship score from the now-real history — the bridge
+    that finally turns real activity (emails, shared tasks) into scoring input
+    (audit «کمتر ولی زنده»: the Interaction table used to have no producer).
+
+    ``dedup_note`` — when given, a prior interaction whose ``notes`` equals it
+    (e.g. ``gmail:<id>``) short-circuits, so re-syncing the same email doesn't
+    stack duplicate interactions. Returns the row, or None when deduped.
+    """
+    from app.models.interaction import InteractionType
+
+    if dedup_note:
+        seen = (
+            await db.execute(
+                select(Interaction.id).where(
+                    Interaction.person_id == person_id, Interaction.notes == dedup_note
+                )
+            )
+        ).first()
+        if seen:
+            return None
+    try:
+        itype = type if isinstance(type, InteractionType) else InteractionType(str(type))
+    except ValueError:
+        itype = InteractionType.OTHER
+    inter = Interaction(
+        person_id=person_id,
+        type=itype,
+        date=date or datetime.now(timezone.utc),
+        summary=(summary or "")[:512] or None,
+        notes=dedup_note or notes,
+    )
+    db.add(inter)
+    await db.flush()
+    if reanalyze:
+        await analyze_person(db, person_id=person_id)
+    return inter
+
+
+async def record_task_link_interactions(
+    db: AsyncSession, *, task_id: int, task_title: Optional[str], person_ids: List[int]
+) -> int:
+    """Record a shared-work interaction per newly linked person and refresh
+    their score. Isolates its own per-person errors so a scoring hiccup never
+    fails the task-link request (keeps the route try/except-free). Returns how
+    many interactions were recorded."""
+    recorded = 0
+    for pid in person_ids or []:
+        try:
+            created = await record_interaction(
+                db,
+                person_id=pid,
+                type="other",
+                summary=f"کارِ مشترک: {(task_title or '')[:120]}",
+                dedup_note=f"task:{task_id}:person:{pid}",
+            )
+            if created is not None:
+                recorded += 1
+        except Exception as exc:
+            logger.debug("task-link interaction skipped (person %s): %r", pid, exc)
+    return recorded
 
 
 def serialize(profile: PersonProfile) -> dict:
