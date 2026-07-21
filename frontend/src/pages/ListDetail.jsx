@@ -457,6 +457,97 @@ function NewItemForm({ listId, onCreated }) {
   );
 }
 
+// 2026-07-21 (audit «کمتر ولی زنده», move 2): the خودسازی daily-tracking
+// engine — check-in / streak / AI auto-tick — lives fully on
+// /api/self-improvement but had lost its web UI when /self-improvement was
+// removed. This panel re-lights it IN PLACE: for a self-improvement list it
+// shows today's check-ins as a compact «پیگیریِ روزانه» strip, distinct from
+// the permanent todo «تکمیل» toggle in the list below. Detection is
+// data-driven and fail-open — the overview endpoint only returns a section
+// for the lists it manages, so a regular todo list renders nothing here.
+export function SelfImprovementPanel({ listId }) {
+  const [section, setSection] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [busyId, setBusyId] = useState(null);
+
+  const load = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/self-improvement/overview`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const sec = (data.sections || []).find((s) => s.list_id === listId);
+      setSection(sec || null);
+    } catch {
+      /* fail-open: offline / not a SI list → the panel simply doesn't show */
+    } finally {
+      setLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listId]);
+
+  const toggle = async (item) => {
+    const done = item.status === 'done' || item.status === 'auto_done';
+    setBusyId(item.item_id);
+    try {
+      await fetch(`${API_BASE}/self-improvement/daily-update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id: item.item_id, status: done ? 'pending' : 'done' }),
+      });
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  if (!loaded || !section) return null;
+  const checklist = (section.items || []).filter((i) => i.kind === 'checklist');
+  if (checklist.length === 0) return null;
+
+  return (
+    <div className="bg-emerald-50 rounded-xl border border-emerald-100 p-5 mb-4" dir="rtl" data-testid="si-daily-panel">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-semibold text-emerald-900">🌱 پیگیریِ روزانه</h2>
+        <span className="text-xs text-emerald-700 font-medium">
+          امروز {section.completed_today} از {section.total}
+        </span>
+      </div>
+      <div className="space-y-1.5">
+        {checklist.map((item) => {
+          const done = item.status === 'done' || item.status === 'auto_done';
+          return (
+            <button
+              key={item.item_id}
+              type="button"
+              onClick={() => toggle(item)}
+              disabled={busyId === item.item_id}
+              data-testid={`si-checkin-${item.item_id}`}
+              className={`w-full flex items-center gap-2 text-right rounded-lg px-3 py-2 text-sm transition-colors disabled:opacity-50 ${
+                done
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-emerald-100 border border-emerald-100'
+              }`}
+            >
+              <span className="shrink-0">{done ? '✓' : '○'}</span>
+              <span className="flex-1 truncate">{item.content}</span>
+              {item.is_auto && (
+                <span className="shrink-0 text-xs" title="به‌طور خودکار توسط دستیار ثبت شد">🤖</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[11px] text-emerald-700 mt-2 opacity-80">
+        این چک‌این هر روز صفر می‌شود و روند را می‌سازد؛ «تکمیل»ِ پایین، وضعیتِ دائمیِ آیتم است.
+      </p>
+    </div>
+  );
+}
+
 function ListDetail() {
   const { listId } = useParams();
   const id = parseInt(listId, 10);
@@ -513,6 +604,10 @@ function ListDetail() {
             onUpdated={(updated) => setList((prev) => ({ ...prev, ...updated }))}
           />
         )}
+
+        {/* خودسازی: daily check-in strip (re-lit engine). Renders only for
+            self-improvement lists; a plain list shows nothing here. */}
+        <SelfImprovementPanel listId={id} />
 
         <NewItemForm listId={id} onCreated={onCreated} />
 
