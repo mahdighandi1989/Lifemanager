@@ -82,6 +82,8 @@ _CONFIG_DEFAULTS: Dict[str, Any] = {
     "brief_hour": 7,            # local hour the morning commands go out
     "followup_hour": 21,        # local hour the evening follow-up goes out
     "enabled": True,
+    "extraction_scope": "all",  # "all" = every list item + writing bodies; "starred" = only ⭐
+    "extraction_limit": 80,     # max candidates considered per extraction pass
 }
 
 # ── domain keyword heuristic (used to tag a candidate when AI is off) ─────────
@@ -170,6 +172,9 @@ async def get_config(db: AsyncSession) -> Dict[str, Any]:
 async def update_config(db: AsyncSession, partial: Dict[str, Any]) -> Dict[str, Any]:
     stored = await _load_blob(db, CONFIG_KEY)
     allowed = set(_CONFIG_DEFAULTS) | {"daily_count", "gain", "penalty", "grad_strength", "grad_streak"}
+    # normalize the enum-ish scope
+    if partial.get("extraction_scope") not in (None, "all", "starred"):
+        partial = {**partial, "extraction_scope": "all"}
     for k, v in (partial or {}).items():
         if k in allowed:
             stored[k] = v
@@ -216,50 +221,106 @@ async def _existing_norm_titles(db: AsyncSession, user_id: int) -> set:
     return {_norm(t) for t in rows}
 
 
-async def _gather_candidates(db: AsyncSession, user_id: int, limit: int) -> List[Dict[str, Any]]:
-    """Candidate texts from the owner's content — starred/active todo items
-    first (the aspirational/reference lists), then long personal writings as
-    goals. Never invents; every candidate carries its source for traceability."""
+def _chunk_writing_body(body: str, *, max_chunks: int = 12) -> List[str]:
+    """Split a long writing into aspiration-sized chunks (a paragraph or a
+    sentence) so the AI can mine goals FROM WITHIN the text — not just its
+    title. Trivial fragments are dropped; the whole thing is capped so a
+    50k-char writing can't flood the candidate list."""
+    if not body:
+        return []
+    # paragraphs first; fall back to sentence-ish splits for wall-of-text
+    parts = re.split(r"\n{2,}", body)
+    chunks: List[str] = []
+    for p in parts:
+        p = re.sub(r"\s+", " ", p).strip()
+        if not p:
+            continue
+        if len(p) <= 220:
+            chunks.append(p)
+        else:
+            for s in re.split(r"(?<=[.!؟\n])\s+", p):
+                s = s.strip()
+                if 12 <= len(s) <= 220:
+                    chunks.append(s)
+        if len(chunks) >= max_chunks:
+            break
+    return chunks[:max_chunks]
+
+
+async def _gather_candidates(
+    db: AsyncSession, user_id: int, limit: int, *, scope: str = "all"
+) -> List[Dict[str, Any]]:
+    """Candidate texts from the owner's content, each carrying its source (for
+    traceability) and a ``starred`` high-signal flag.
+
+    ``scope="starred"`` — only ⭐ items + writing titles (the conservative set,
+    used as the safe heuristic fallback when no AI model is configured).
+    ``scope="all"`` (default) — ALSO every other active list item AND chunks
+    of the writing BODIES, so the extractor can see EVERYTHING, not just the
+    12 starred ones (owner 2026-07-21: «فقط همین ۱۲ تا؟»). The broad set is
+    meant to be filtered/merged by the AI; the heuristic path keeps only the
+    starred subset to avoid proposing every shopping-list item."""
     from app.models.personal_writing import PersonalWriting
     from app.models.todo_item import TodoItem
 
     out: List[Dict[str, Any]] = []
-    # Starred, not-completed, not-deleted todo items = the owner's own emphasis.
-    items = (
+    seen: set = set()
+
+    def _add(text: str, *, source_type: str, source_ref: str, starred: bool, kind: Optional[str] = None):
+        t = (text or "").strip()
+        key = _norm(t)
+        if not t or key in seen or len(out) >= limit:
+            return
+        seen.add(key)
+        row = {"text": t[:400], "source_type": source_type, "source_ref": source_ref, "starred": starred}
+        if kind:
+            row["kind"] = kind
+        out.append(row)
+
+    # 1) Starred active items — the owner's own emphasis (highest signal).
+    starred = (
         await db.execute(
-            select(TodoItem)
-            .where(
+            select(TodoItem).where(
                 _scope(TodoItem.owner_id, user_id),
                 TodoItem.deleted_at.is_(None),
                 TodoItem.is_completed.is_(False),
                 TodoItem.is_starred.is_(True),
-            )
-            .order_by(TodoItem.updated_at.desc().nullslast())
-            .limit(limit)
+            ).order_by(TodoItem.updated_at.desc().nullslast()).limit(limit)
         )
     ).scalars().all()
-    for it in items:
-        text = (it.content or "").strip()
-        if text:
-            out.append({"text": text, "source_type": "todo_item", "source_ref": str(it.id)})
-    # Personal writings → each becomes a goal-shaped directive (its title is
-    # the aspiration; the body is the "why").
-    if len(out) < limit:
-        writings = (
+    for it in starred:
+        _add(it.content, source_type="todo_item", source_ref=str(it.id), starred=True)
+
+    # 2) Writing TITLES — always high-signal (an aspiration each).
+    writings = (
+        await db.execute(
+            select(PersonalWriting)
+            .where(_scope(PersonalWriting.user_id, user_id), PersonalWriting.deleted_at.is_(None))
+            .order_by(PersonalWriting.sort_order.asc())
+        )
+    ).scalars().all()
+    for w in writings:
+        _add(w.title, source_type="personal_writing", source_ref=str(w.id), starred=True, kind=KIND_GOAL)
+
+    if scope == "all":
+        # 3) Every OTHER active list item (non-starred) — broad coverage.
+        others = (
             await db.execute(
-                select(PersonalWriting)
-                .where(_scope(PersonalWriting.user_id, user_id), PersonalWriting.deleted_at.is_(None))
-                .order_by(PersonalWriting.sort_order.asc())
-                .limit(limit - len(out))
+                select(TodoItem).where(
+                    _scope(TodoItem.owner_id, user_id),
+                    TodoItem.deleted_at.is_(None),
+                    TodoItem.is_completed.is_(False),
+                    TodoItem.is_starred.is_(False),
+                ).order_by(TodoItem.updated_at.desc().nullslast()).limit(limit)
             )
         ).scalars().all()
+        for it in others:
+            _add(it.content, source_type="todo_item", source_ref=str(it.id), starred=False)
+        # 4) Chunks of the writing BODIES — mine goals from within the text.
         for w in writings:
-            title = (w.title or "").strip()
-            if title:
-                out.append({
-                    "text": title, "source_type": "personal_writing", "source_ref": str(w.id),
-                    "kind": KIND_GOAL,
-                })
+            for chunk in _chunk_writing_body(w.body or ""):
+                _add(chunk, source_type="personal_writing", source_ref=str(w.id), starred=False, kind=KIND_GOAL)
+
     return out
 
 
@@ -274,15 +335,17 @@ async def _ai_refine(db: AsyncSession, candidates: List[Dict[str, Any]]) -> Opti
 
         listing = "\n".join(f"{i+1}. {c['text'][:160]}" for i, c in enumerate(candidates))
         prompt = (
-            "این‌ها بریده‌هایی از لیست‌ها و نوشته‌های یک کاربر است. هرکدام را به یک "
-            "«فرمانِ» کوتاهِ قابلِ‌انجام و تکرارشونده تبدیل کن (فعلِ امری فارسی، حداکثر ۱۲ کلمه) "
-            "و برچسب بزن. فقط JSON آرایه برگردان؛ هر عضو: "
+            "این‌ها بریده‌هایی از لیست‌ها و نوشته‌های یک کاربر است. آن‌هایی را که یک "
+            "«عادت/تمرین/هدفِ» قابلِ‌نهادینه‌شدن‌اند به «فرمانِ» کوتاهِ امری فارسی (حداکثر "
+            "۱۲ کلمه) تبدیل کن و برچسب بزن. کارهای یک‌بارهٔ پیشِ‌پاافتاده (خریدِ روزمره، "
+            "تماسِ تکی، قرارِ گذرا) را **رد کن** و در خروجی نیاور؛ موارد تکراری/هم‌معنا را "
+            "**ادغام** کن. فقط JSON آرایه برگردان؛ هر عضو: "
             '{"i": شمارهٔ ورودی, "title": "فرمان", "domain": یکی از '
             "[معنوی,خودسازی,دانش,سلامت,مالی,روابط,آرزو,کار], "
             '"cadence": یکی از [daily,few_per_week,weekly,once], "kind": یکی از [practice,goal]}.\n\n'
             + listing
         )
-        res = await complete(db, prompt, task="planning", max_tokens=1200)
+        res = await complete(db, prompt, task="planning", max_tokens=2000)
         if not (res.get("ok") and res.get("text")):
             return None
         text = res["text"]
@@ -336,20 +399,32 @@ _VALID_KIND = {KIND_PRACTICE, KIND_GOAL}
 
 
 async def extract_directives(
-    db: AsyncSession, user_id: int = 0, *, limit: int = 40, use_ai: bool = True
+    db: AsyncSession, user_id: int = 0, *, limit: Optional[int] = None,
+    use_ai: bool = True, scope: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Propose directives from the owner's content. Idempotent: a candidate
     whose (normalized) command already exists is skipped, so re-running only
-    adds what's new. NEVER raises — returns a summary dict."""
+    adds what's new. NEVER raises — returns a summary dict.
+
+    ``scope`` / ``limit`` default from the engine config (extraction_scope /
+    extraction_limit). With ``scope="all"`` the WHOLE of the owner's content is
+    considered (every list item + writing bodies); the AI filters/merges it.
+    When no AI is available the heuristic keeps only the STARRED subset so a
+    broad scope can't dump every trivial list item as a proposal."""
     try:
-        candidates = await _gather_candidates(db, user_id, limit)
+        cfg = await get_config(db)
+        scope = scope or cfg.get("extraction_scope", "all")
+        limit = int(limit or cfg.get("extraction_limit", 80))
+        candidates = await _gather_candidates(db, user_id, limit, scope=scope)
         if not candidates:
             return {"ok": True, "proposed_added": 0, "skipped": 0, "reason": "no_candidates"}
 
         refined = (await _ai_refine(db, candidates)) if use_ai else None
         used_ai = refined is not None
         if not refined:
-            refined = _heuristic_refine(candidates)
+            # Safe fallback: without AI, only the high-signal (starred) subset
+            # becomes proposals — never the whole backlog.
+            refined = _heuristic_refine([c for c in candidates if c.get("starred")])
 
         seen = await _existing_norm_titles(db, user_id)
         added = 0

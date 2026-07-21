@@ -657,6 +657,15 @@ class TelegramBot:
             question = text[len("/ask"):].strip()
             return await self._cmd_ask(chat_id, question)
 
+        # /goal <text> — drop a goal/habit straight into «مسیر نهادینه‌سازی»
+        # from the phone. Also accept a leading «هدف:» / «فرمان:» so a natural
+        # note works without remembering the slash command. It lands as a
+        # PROPOSAL (owner approves on the web) — «هرچیزی بعداً اضافه بشه».
+        if lower == "/goal" or lower.startswith(("/goal ", "/goal\n")):
+            return await self._cmd_goal(chat_id, text[len("/goal"):].strip())
+        if text.startswith(("هدف:", "فرمان:")):
+            return await self._cmd_goal(chat_id, text.split(":", 1)[1].strip())
+
         # /inbox <text?> — universal capture (صندوق ورودی): drop anything, the
         # triage layer suggests where it belongs, filing happens on the Dashboard.
         # Bare /inbox reports the pending count. Plain text still goes to the
@@ -832,6 +841,36 @@ class TelegramBot:
             await self.send("⚠️ الان نتوانستم پاسخ بدهم.", chat_id=chat_id, silent=True)
             return {"ok": True, "handled": "ask_error"}
 
+    async def _cmd_goal(self, chat_id: str, body: str) -> Dict[str, Any]:
+        body = (body or "").strip()
+        if not body:
+            await self.send(
+                "🎯 بعد از /goal هدف یا عادتت را بنویس — مثلاً:\n/goal هر روز ۱۰ دقیقه مطالعه\n"
+                "یا فقط بنویس «هدف: …»",
+                chat_id=chat_id, silent=True,
+            )
+            return {"ok": True, "handled": "goal_usage"}
+        try:
+            from app.database import SessionLocal
+            from app.services import directive_service as ds
+
+            async with SessionLocal() as session:
+                d = await ds.auto_intake_from_text(
+                    session, _task_user_id(), body, source_type="telegram"
+                )
+            if d is None:
+                await self.send("این از قبل در «مسیر نهادینه‌سازی» هست.", chat_id=chat_id, silent=True)
+                return {"ok": True, "handled": "goal_dup"}
+            await self.send(
+                f"✅ به «مسیر نهادینه‌سازی» اضافه شد (پیشنهاد — در وب تأییدش کن):\n• {d.title}",
+                chat_id=chat_id, silent=True,
+            )
+            return {"ok": True, "handled": "goal_added", "directive_id": d.id}
+        except Exception as exc:
+            logger.debug("telegram /goal failed: %r", exc)
+            await self.send("⚠️ الان نشد ثبتش کنم؛ بعداً دوباره تلاش کن.", chat_id=chat_id, silent=True)
+            return {"ok": True, "handled": "goal_error"}
+
     async def _cmd_tasks(self, chat_id: str) -> Dict[str, Any]:
         try:
             from app.database import SessionLocal
@@ -994,6 +1033,7 @@ _HELP_TEXT = (
     "دستورها:\n"
     "• /tasks — 📋 کارهای باز (با دکمهٔ «انجام شد»)\n"
     "• /ask — 🧠 هر سؤالی از داده‌هایت (`/ask وضعیت مالی‌ام چطوره؟`)\n"
+    "• /goal — 🎯 افزودن هدف/عادت به «مسیر نهادینه‌سازی» (`/goal هر روز ۱۰ دقیقه مطالعه`)\n"
     "• /new\\_task — 🆕 ساخت کار (می‌توانی عنوان را همان خط بنویسی: `/new_task خرید نان`)\n"
     "• /inbox — 📥 صندوق ورودی: هر چیزی را بفرست (`/inbox متن`)، خودش تشخیص می‌دهد کجا برود\n"
     "• /status — 📊 وضعیت اعلان‌ها و تعداد کارها\n"

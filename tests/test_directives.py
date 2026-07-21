@@ -129,6 +129,39 @@ async def test_growth_report_counts(db_session):
 
 
 @pytest.mark.asyncio
+async def test_extraction_scope_all_covers_content_but_heuristic_stays_safe(db_session):
+    """scope=all sees EVERYTHING (non-starred items + writing BODIES), fixing
+    «فقط همین ۱۲ تا؟». But with no AI the heuristic proposes ONLY the
+    high-signal starred subset, so a broad scope can't dump every trivial
+    list item as a proposal."""
+    from app.models.personal_writing import PersonalWriting
+    from app.models.todo_item import TodoItem
+
+    db_session.add(TodoItem(content="هر روز قرآن", is_starred=True))
+    db_session.add(TodoItem(content="شیر بخر", is_starred=False))
+    db_session.add(
+        PersonalWriting(title="دنیا و آخرت", body="باید هر روز محاسبه کنم.\n\nآرزو دارم قوی شوم.")
+    )
+    await db_session.commit()
+
+    cands = await svc._gather_candidates(db_session, 0, 80, scope="all")
+    texts = [c["text"] for c in cands]
+    assert "شیر بخر" in texts  # a non-starred list item is now seen
+    assert any("محاسبه" in t for t in texts)  # a writing BODY chunk is mined
+
+    await svc.extract_directives(db_session, 0, use_ai=False, scope="all")
+    props = {p["title"] for p in await svc.list_directives(db_session, 0, status="proposed")}
+    assert "هر روز قرآن" in props  # starred kept
+    assert "شیر بخر" not in props  # trivial non-starred NOT dumped (safe heuristic)
+
+
+@pytest.mark.asyncio
+async def test_config_defaults_extraction_scope_all(db_session):
+    cfg = await svc.get_config(db_session)
+    assert cfg["extraction_scope"] == "all" and int(cfg["extraction_limit"]) >= 40
+
+
+@pytest.mark.asyncio
 async def test_reconcile_archives_directive_when_source_trashed(db_session):
     from app.models.todo_item import TodoItem
 
