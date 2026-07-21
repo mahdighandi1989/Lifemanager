@@ -843,6 +843,94 @@ def _score(d: Directive, today: date) -> tuple:
     return (due, neglect, int(d.weight or 3), weakness, -(d.id or 0))
 
 
+async def build_directive_context(
+    db: AsyncSession, user_id: int = 0, now: Optional[datetime] = None
+) -> Dict[str, Any]:
+    """Layer 4 — read the owner's actual day (calendar load, open/overdue tasks,
+    recent follow-through) so the engine can tailor HOW MUCH it asks. Pure
+    reads, fail-open (a broken source never blocks the daily commands)."""
+    from sqlalchemy import func as _func
+
+    cfg = await get_config(db)
+    local = _local_now(cfg, now)
+    today = local.date()
+    off = int(cfg.get("tz_offset_minutes", 240))
+
+    calendar_events = 0
+    open_tasks = 0
+    overdue_tasks = 0
+    try:
+        from app.models.personal_sync import PersonalEvent
+
+        now_utc = datetime.now(timezone.utc)
+        rows = (
+            await db.execute(
+                select(PersonalEvent.start_at).where(
+                    PersonalEvent.start_at.isnot(None),
+                    PersonalEvent.start_at >= now_utc - timedelta(hours=18),
+                    PersonalEvent.start_at <= now_utc + timedelta(hours=30),
+                )
+            )
+        ).scalars().all()
+        for sa in rows:
+            try:
+                dt = sa if sa.tzinfo is None else sa.astimezone(timezone.utc).replace(tzinfo=None)
+                if (dt + timedelta(minutes=off)).date() == today:
+                    calendar_events += 1
+            except Exception:
+                continue
+    except Exception as exc:
+        logger.debug("directive context calendar skipped: %r", exc)
+
+    try:
+        from app.models.task import Task, TaskStatus
+
+        open_q = select(_func.count()).select_from(Task).where(
+            _scope(Task.user_id, user_id),
+            Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
+            Task.merged_into_id.is_(None),
+        )
+        open_tasks = int((await db.execute(open_q)).scalar() or 0)
+        overdue_q = select(_func.count()).select_from(Task).where(
+            _scope(Task.user_id, user_id),
+            Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
+            Task.merged_into_id.is_(None),
+            Task.due_date.isnot(None),
+            Task.due_date < today,
+        )
+        overdue_tasks = int((await db.execute(overdue_q)).scalar() or 0)
+    except Exception as exc:
+        logger.debug("directive context tasks skipped: %r", exc)
+
+    if calendar_events >= 4 or overdue_tasks >= 5:
+        load = "heavy"
+    elif calendar_events == 0 and open_tasks <= 2:
+        load = "light"
+    else:
+        load = "normal"
+
+    return {
+        "date": today.isoformat(),
+        "calendar_events": calendar_events,
+        "open_tasks": open_tasks,
+        "overdue_tasks": overdue_tasks,
+        "load": load,
+    }
+
+
+def _load_label_fa(load: str) -> str:
+    return {"heavy": "شلوغ", "light": "سبک", "normal": "معمولی"}.get(load, "معمولی")
+
+
+def _effective_daily_count(cfg: Dict[str, Any], context: Dict[str, Any]) -> int:
+    """Fewer commands on a heavy day, the configured count otherwise — so the
+    engine respects «امروز واقعاً چه‌قدر سرم شلوغ است»."""
+    base = int(cfg.get("daily_count", 5))
+    if context.get("load") == "heavy":
+        return max(2, base - 2)
+    return base
+
+
 async def _todays_checkins(db: AsyncSession, user_id: int, day: date) -> List[DirectiveCheckin]:
     return (
         await db.execute(
@@ -865,6 +953,8 @@ async def select_today_commands(
     cfg = await get_config(db)
     day = _local_now(cfg, now).date()
 
+    context = await build_directive_context(db, user_id, now)
+
     existing = await _todays_checkins(db, user_id, day)
     if existing:
         by_id = {c.directive_id: c for c in existing}
@@ -877,6 +967,7 @@ async def select_today_commands(
             "date": day.isoformat(),
             "commands": _order_by_time(cmds),
             "persisted": True,
+            "context": context,
         }
 
     active = (
@@ -887,7 +978,7 @@ async def select_today_commands(
         )
     ).scalars().all()
     active.sort(key=lambda d: _score(d, day), reverse=True)
-    picked = active[: int(cfg.get("daily_count", 5))]
+    picked = active[: _effective_daily_count(cfg, context)]
 
     if persist and picked:
         now_utc = datetime.now(timezone.utc)
@@ -903,6 +994,7 @@ async def select_today_commands(
         "date": day.isoformat(),
         "commands": _order_by_time([{**directive_dict(d), "done": None} for d in picked]),
         "persisted": persist and bool(picked),
+        "context": context,
     }
 
 
@@ -1095,7 +1187,7 @@ async def directive_tick(db: AsyncSession, now: Optional[datetime] = None, *, us
         cmds = res.get("commands") or []
         pending = await _count_status(db, user_id, DIRECTIVE_PROPOSED)
         if cmds and cfg.get("channel") in ("both", "telegram"):
-            await _push_commands(cmds, local, pending_proposals=pending)
+            await _push_commands(cmds, local, pending_proposals=pending, context=res.get("context"))
         stored = await _load_blob(db, CONFIG_KEY)  # intake committed sibling rows
         stored["last_command_date"] = day_iso
         await _save_blob(db, CONFIG_KEY, stored)
@@ -1181,7 +1273,8 @@ async def _push_reminders(due: List[Directive], local: datetime) -> None:
 
 
 async def _push_commands(
-    commands: List[Dict[str, Any]], local: datetime, *, pending_proposals: int = 0
+    commands: List[Dict[str, Any]], local: datetime, *, pending_proposals: int = 0,
+    context: Optional[Dict[str, Any]] = None,
 ) -> None:
     try:
         from app.services.telegram_service import get_telegram_bot
@@ -1189,7 +1282,12 @@ async def _push_commands(
         bot = get_telegram_bot()
         if not bot.is_configured():
             return
-        lines = [f"🎯 *فرمان‌های امروز* ({local.date().isoformat()}) — مربیِ جدی:", ""]
+        head = f"🎯 *فرمان‌های امروز* ({local.date().isoformat()}) — مربیِ جدی:"
+        if context and context.get("load") == "heavy":
+            head += "\n(امروز سرت شلوغه — سبک‌تر گرفتم)"
+        elif context and context.get("load") == "light":
+            head += "\n(امروز روزِ سبکیه — خوب پیش برو)"
+        lines = [head, ""]
         for c in commands:
             streak = f" 🔥{c['streak']}" if c.get("streak") else ""
             lines.append(f"• {c['title']}{streak}")

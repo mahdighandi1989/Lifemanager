@@ -71,6 +71,7 @@ export default function DirectivesPage() {
   const [graduated, setGraduated] = useState([]);
   const [archived, setArchived] = useState([]);
   const [config, setConfig] = useState(null);
+  const [todayCtx, setTodayCtx] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
@@ -89,6 +90,7 @@ export default function DirectivesPage() {
       safe(api.get('/directives/config')),
     ]);
     setToday((t && t.commands) || []);
+    setTodayCtx((t && t.context) || null);
     setReport((rep && rep.report) || null);
     setProposed((prop && prop.directives) || []);
     setActive((act && act.directives) || []);
@@ -209,6 +211,26 @@ export default function DirectivesPage() {
               <StatCard label="شروع‌نشده" value={counts.not_started ?? 0} tone="bg-amber-50 border-amber-100" />
               <StatCard label="امروز" value={`${todayStat.done}/${todayStat.total}`} />
             </div>
+
+            {/* context banner — the engine tailors to your actual day */}
+            {todayCtx && (
+              <div
+                data-testid="directives-context"
+                className={`rounded-xl border p-3 text-sm ${
+                  todayCtx.load === 'heavy'
+                    ? 'bg-red-50 border-red-100 text-red-700'
+                    : todayCtx.load === 'light'
+                      ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                      : 'bg-gray-50 border-gray-100 text-gray-600'
+                }`}
+              >
+                امروز روزِ{' '}
+                {todayCtx.load === 'heavy' ? 'شلوغی' : todayCtx.load === 'light' ? 'سبکی' : 'معمولی'}{' '}
+                است ({todayCtx.calendar_events} رویدادِ تقویم، {todayCtx.open_tasks} کارِ باز
+                {todayCtx.overdue_tasks > 0 ? `، ${todayCtx.overdue_tasks} عقب‌افتاده` : ''}).
+                {todayCtx.load === 'heavy' && ' فرمان‌ها را سبک‌تر گرفتم.'}
+              </div>
+            )}
 
             {/* today's commands */}
             <section>

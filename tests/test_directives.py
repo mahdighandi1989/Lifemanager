@@ -274,6 +274,38 @@ def test_schedule_routes(api_client):
 
 
 @pytest.mark.asyncio
+async def test_context_load_scales_daily_count(db_session):
+    """Layer 4: on a heavy day (many overdue tasks) the engine surfaces FEWER
+    commands, and the /today payload carries the load context."""
+    from app.models.task import Task, TaskStatus
+
+    for i in range(8):
+        await svc.add_manual(db_session, 0, title=f"عادت {i}")
+    ctx0 = await svc.build_directive_context(db_session, 0)
+    assert ctx0["load"] in ("light", "normal")  # no tasks yet
+
+    # 6 overdue tasks → heavy day
+    from datetime import date as _date
+    for i in range(6):
+        db_session.add(Task(title=f"t{i}", status=TaskStatus.TODO, due_date=_date(2020, 1, 1)))
+    await db_session.commit()
+    ctx = await svc.build_directive_context(db_session, 0)
+    assert ctx["load"] == "heavy" and ctx["overdue_tasks"] >= 5
+
+    now = datetime(2026, 7, 22, 8, 0, tzinfo=timezone.utc)
+    sel = await svc.select_today_commands(db_session, 0, now=now, persist=True)
+    assert sel["context"]["load"] == "heavy"
+    assert len(sel["commands"]) == 3  # strict base 5, heavy → 5-2 = 3
+
+
+def test_context_route(api_client):
+    r = api_client.get("/api/directives/context")
+    assert r.status_code == 200, r.text
+    ctx = r.json()["context"]
+    assert "load" in ctx and "open_tasks" in ctx
+
+
+@pytest.mark.asyncio
 async def test_config_strict_preset_and_update(db_session):
     cfg = await svc.get_config(db_session)
     assert cfg["mode"] == "strict" and cfg["daily_count"] == 5 and cfg["grad_streak"] == 21

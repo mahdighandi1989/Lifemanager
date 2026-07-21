@@ -1682,3 +1682,16 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   روی فرمان‌ها + انتخابگرِ «کِی؟» + دکمهٔ «زمان‌بندی خودکار» + نمایشِ زمینه.
 - **VERIFY** تست‌های تازه (assign+order+reminder dedup، set/clear، روتر). ۲۳ تستِ directives
   سبز؛ ruff پاک؛ npm build سبز.
+
+## 2026-07-21 — لایه ۴ موتور نهادینه‌سازی: آگاهی از زندگیِ روزمره
+
+- **FINDING (owner)** «در نظر میگیره من هر روز واقعاً چی کار می‌کنم که پیشنهاد می‌ده؟»
+- **CHANGE (engine)** `build_directive_context` (تقویمِ امروز، کارهای باز/عقب‌افتاده — pure
+  reads، fail-open، بدونِ وابستگی به build_today تا حلقه نشود). `_effective_daily_count`:
+  روزِ شلوغ (≥۴ رویداد یا ≥۵ عقب‌افتاده) → فرمانِ کمتر (base-2)، وگرنه base. select_today_commands
+  از این استفاده می‌کند و `context` را در پاسخ می‌آورد؛ پوشِ صبح می‌گوید «امروز سرت شلوغه —
+  سبک‌تر گرفتم».
+- **CHANGE (routes/UI)** `GET /context`؛ در صفحه بنرِ «امروز روزِ شلوغی/سبکی/معمولی است (N
+  رویداد، M کار باز…)».
+- **VERIFY** تست‌های تازه (heavy → daily_count کمتر؛ روتر). ۲۵ تستِ directives سبز؛ ruff پاک؛
+  npm build سبز. **هر چهار لایهٔ عمق (پوشش/قدم‌ها/زمان‌بندی/آگاهی) کامل شد.**

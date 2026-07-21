@@ -69,6 +69,16 @@ async def today_commands(
     return {"ok": True, "success": True, **res}
 
 
+@router.get("/api/directives/context", tags=["directives"])
+@handle_errors
+async def directive_context(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    ctx = await svc.build_directive_context(db, user_id)
+    return {"ok": True, "success": True, "context": ctx}
+
+
 @router.get("/api/directives/report", tags=["directives"])
 @handle_errors
 async def report(
