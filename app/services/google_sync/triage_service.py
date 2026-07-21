@@ -40,10 +40,13 @@ _RE_ACTIONISH = re.compile(
 # finance references while the IMAP poller waited for credentials that
 # never came. Emails matching this pattern are ALSO routed through
 # finance_ingest_service.apply_bank_message (best-effort, snippet-only).
+# Only concrete bank SENDER domains — never generic words like "balance"
+# or "بانک" that appear in newsletters (2026-07-20 review: "work-life
+# balance" was parsed as a balance and overwrote the account).
 _RE_BANK_SENDER = re.compile(
-    r"(bankfab|fab\.ae|emiratesnbd|adcb|mashreq|rakbank|cbd\.ae|dib\.ae|"
-    r"adib\.ae|hsbc|citibank|standardchartered|noor ?bank|neteller|"
-    r"بانک|balance|available balance|موجودی)",
+    r"(bankfab|fab\.ae|emiratesnbd\.|adcb\.|mashreq|rakbank|cbd\.ae|"
+    r"dib\.ae|adib\.ae|@hsbc|citibank\.|standardchartered|noorbank|"
+    r"neteller\.)",
     re.I,
 )
 
@@ -52,8 +55,9 @@ async def _route_bank_email(db: AsyncSession, email: PersonalEmail) -> bool:
     """Feed a bank-looking email through the finance apply path. Returns
     True when a balance was actually applied. Never raises."""
     try:
-        blob = f"{email.from_addr or ''} {email.subject or ''}"
-        if not _RE_BANK_SENDER.search(blob):
+        # Match the SENDER address only — a subject mentioning "balance"
+        # is not a bank statement.
+        if not _RE_BANK_SENDER.search(email.from_addr or ""):
             return False
         from app.services.finance_ingest_service import apply_bank_message
 

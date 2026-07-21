@@ -93,27 +93,30 @@ async def complete(
 async def _record_usage(
     db: AsyncSession, *, task, rm, ok, error, prompt_chars, output_chars, latency_ms
 ) -> None:
-    """Ledger every gateway call (حسابداری مصرف AI). Fail-open: a logging
-    hiccup must never break or roll back the inference itself."""
+    """Ledger every gateway call (حسابداری مصرف AI) in its OWN short-lived
+    session. 2026-07-20 review: committing on the CALLER's session mid-call
+    corrupted batch callers (triage_service commits AFTER its loop; a usage
+    commit here flushed half-updated rows and a usage rollback wiped their
+    staged changes). An independent session keeps transaction ownership
+    with the caller. Fail-open: never break the inference."""
     try:
+        from app.database import SessionLocal
         from app.models.ai_usage import AIUsageLog
 
-        db.add(AIUsageLog(
-            task=str(task or "general")[:64],
-            model=(getattr(rm, "display_name", None) or "")[:160] or None,
-            provider=(getattr(rm, "provider_key", None) or "")[:64] or None,
-            ok=bool(ok),
-            error=(error or None) and str(error)[:300],
-            prompt_chars=int(prompt_chars or 0),
-            output_chars=int(output_chars or 0),
-            latency_ms=latency_ms,
-        ))
-        await db.commit()
+        async with SessionLocal() as s:
+            s.add(AIUsageLog(
+                task=str(task or "general")[:64],
+                model=(getattr(rm, "display_name", None) or "")[:160] or None,
+                provider=(getattr(rm, "provider_key", None) or "")[:64] or None,
+                ok=bool(ok),
+                error=(error or None) and str(error)[:300],
+                prompt_chars=int(prompt_chars or 0),
+                output_chars=int(output_chars or 0),
+                latency_ms=latency_ms,
+            ))
+            await s.commit()
     except Exception:
-        try:
-            await db.rollback()
-        except Exception:
-            pass
+        pass
 
 
 async def _anthropic_text(rm, prompt, system, max_tokens, temperature) -> str:

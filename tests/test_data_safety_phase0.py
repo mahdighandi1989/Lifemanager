@@ -213,3 +213,52 @@ async def test_owner_actions_endpoint(api_client):
     } <= keys
     # Every action carries a Persian how-to.
     assert all(a["how"] for a in body["actions"])
+
+
+# --- 2026-07-20 review regressions -----------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_restored_child_survives_parent_purge(api_client):
+    """A child restored on its own must NOT be hard-deleted when its
+    (still-trashed) parent is later purged (CASCADE trap)."""
+    parent = api_client.post("/api/todo-items", json={"content": "والد"}).json()
+    child = api_client.post(
+        "/api/todo-items", json={"content": "فرزند", "parent_id": parent["id"]}
+    ).json()
+    # Trash both (parent delete cascades the child into trash)…
+    api_client.delete(f"/api/todo-items/{parent['id']}")
+    # …restore ONLY the child…
+    api_client.post(f"/api/trash/todo-items/{child['id']}/restore")
+    # …then purge the parent.
+    assert api_client.delete(f"/api/trash/todo-items/{parent['id']}").status_code == 204
+    # The child is still alive and now an orphan (parent gone).
+    live_ids = {it["id"] for it in api_client.get("/api/todo-items").json()}
+    assert child["id"] in live_ids
+    assert parent["id"] not in live_ids
+
+
+@pytest.mark.asyncio
+async def test_sanitizer_preserves_literal_entities(api_client):
+    """The idempotent sanitizer must NOT decode entities the owner typed
+    literally (e.g. a URL with &copy=) — only undo our own escaping."""
+    content = "لینک: https://x.test/?a=1&copy=2 و &nbsp; فاصله"
+    r = api_client.post("/api/todo-items", json={"content": content})
+    item_id = r.json()["id"]
+    stored = r.json()["content"]
+    # &copy= and &nbsp; must survive (escaped, not decoded to © / nbsp char).
+    assert "copy=2" in stored
+    assert "&nbsp;" in stored or "nbsp" in stored
+    # Round-trip is idempotent (no &amp;amp; creep).
+    r2 = api_client.put(f"/api/todo-items/{item_id}", json={"content": stored})
+    assert r2.json()["content"] == stored
+
+
+@pytest.mark.asyncio
+async def test_todo_due_date_can_be_cleared(api_client):
+    r = api_client.post("/api/todo-items", json={"content": "x", "due_date": "2026-09-01"})
+    item_id = r.json()["id"]
+    assert r.json()["due_date"] == "2026-09-01"
+    cleared = api_client.patch(f"/api/todo-items/{item_id}", json={"due_date": None})
+    assert cleared.status_code == 200
+    assert cleared.json()["due_date"] is None

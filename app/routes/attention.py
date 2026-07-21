@@ -14,7 +14,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
 from app.middleware import handle_errors
 from app.services import attention_service
 
@@ -94,6 +94,7 @@ async def create_task_from_finding(
     payload: dict = Body(...),
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     """ساخت تسک از یک یافتهٔ موتور توجه — بستن حلقهٔ «دیدن → اقدام»
     (phase 3, audit #10: هشدار انقضا هرگز تسک تمدید نمی‌ساخت)."""

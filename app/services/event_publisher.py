@@ -18,6 +18,10 @@ import threading
 
 logger = logging.getLogger(__name__)
 
+# Strong references to in-flight ingest tasks so the event loop can't GC
+# them mid-run (2026-07-20 review; asyncio docs require holding the ref).
+_bg_tasks: set = set()
+
 
 async def _ingest_in_process(entity_type: str, entity_id: int, action: str) -> None:
     """Run the AI ingestion for one changed entity on the app's own loop
@@ -91,9 +95,11 @@ def publish_data_change_event(entity_type: str, entity_id: int, action: str) -> 
     except RuntimeError:
         loop = None
     if loop is not None:
-        loop.create_task(
+        task = loop.create_task(
             _ingest_in_process(entity_type, entity_id, action)
         )
+        _bg_tasks.add(task)
+        task.add_done_callback(_bg_tasks.discard)
         return True
 
     outcome = {"ok": False}

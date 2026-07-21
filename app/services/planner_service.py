@@ -11,7 +11,7 @@ Security notes:
 - search_tasks() uses .ilike() with a bound LIKE pattern so the same
   guarantee extends to fuzzy text search.
 """
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone
 from typing import List, Optional
 
 from sqlalchemy import delete, select
@@ -198,6 +198,23 @@ async def generate_daily_plan(
     try:
         from app.models.personal_sync import PersonalEvent
 
+        # 2026-07-20 review: the 09:00-21:00 slots are LOCAL, so calendar
+        # events (stored UTC) must be shifted to local before comparison —
+        # otherwise the plan collides with real meetings by tz_offset hours.
+        tz_off = 240
+        try:
+            from app.services.google_sync.engine import load_settings
+
+            cfg = await load_settings(db)
+            tz_off = int(cfg.get("tz_offset_minutes", 240))
+        except Exception:
+            tz_off = 240
+
+        def _to_local_naive(dt):
+            if dt.tzinfo is not None:
+                dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+            return dt + timedelta(minutes=tz_off)
+
         day_start = datetime.combine(target_date, time(hour=0))
         day_end = day_start + timedelta(days=1)
         ev_rows = (
@@ -211,8 +228,8 @@ async def generate_daily_plan(
             )
         ).scalars().all()
         for ev in ev_rows:
-            ev_start = ev.start_at.replace(tzinfo=None) if ev.start_at.tzinfo else ev.start_at
-            ev_end = ev.end_at.replace(tzinfo=None) if (ev.end_at and ev.end_at.tzinfo) else (ev.end_at or ev_start + timedelta(hours=1))
+            ev_start = _to_local_naive(ev.start_at)
+            ev_end = _to_local_naive(ev.end_at) if ev.end_at else ev_start + timedelta(hours=1)
             if ev.status != "cancelled" and ev_end > day_start and ev_start < day_end:
                 busy.append((ev_start, ev_end))
     except Exception:

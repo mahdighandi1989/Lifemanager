@@ -24,7 +24,9 @@ class TaskCreate(BaseModel):
     # description max_length=1000 per the validation AC
     description: Optional[str] = Field(default=None, max_length=1000)
     # priority 0..5 (AC grep: priority.*Field.*ge=0.*le=5)
-    priority: int = Field(default=0, ge=0, le=5)
+    # Default MEDIUM (2), not LOW — a quick-add with no priority must not
+    # render a «کم» badge (2026-07-20 review). Explicit 0/1 still → LOW.
+    priority: int = Field(default=2, ge=0, le=5)
     # due_date as a date (AC grep accepts `due_date: date` or `due_date: datetime`)
     due_date: Optional[date] = None
     # `status` accepts BOTH the canonical TaskStatus enum values

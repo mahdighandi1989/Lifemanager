@@ -14,7 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
 from app.middleware import handle_errors
 
 logger = logging.getLogger(__name__)
@@ -37,6 +37,7 @@ async def _count(db: AsyncSession, model, *filters) -> int:
 async def system_map(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     counts: dict = {}
     try:

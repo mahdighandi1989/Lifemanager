@@ -71,9 +71,14 @@ async def update_person(
         person.phone = _sanitize(payload.phone)
     if payload.notes is not None:
         person.notes = _sanitize(payload.notes)
-    if payload.birthday is not None:
+    # 2026-07-20 review: use fields_set so an EXPLICIT null clears the
+    # date (the owner removing a birthday/follow-up), while an absent
+    # field stays untouched — "is not None" made clearing impossible and
+    # left person_follow_up nagging forever.
+    fields_set = payload.model_fields_set
+    if "birthday" in fields_set:
         person.birthday = payload.birthday
-    if payload.next_follow_up is not None:
+    if "next_follow_up" in fields_set:
         person.next_follow_up = payload.next_follow_up
     await db.commit()
     await db.refresh(person)

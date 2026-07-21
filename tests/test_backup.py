@@ -121,12 +121,16 @@ async def test_run_backup_degrades_to_local_file_and_updates_status(db_session):
     assert data["tables"]["todo_items"][0]["due_date"] == "2026-07-02"
 
     status = await backup_service.get_status(db_session)
-    assert status["last_ok_at"] is not None
+    # Local-only (Drive offline) is degraded: last_local_at is stamped but
+    # last_ok_at / has_durable_backup are NOT (2026-07-20 review).
+    assert status["last_ok_at"] is None
+    assert status["last_local_at"] is not None
+    assert status["has_durable_backup"] is False
+    assert status["is_stale"] is True
     assert status["last_attempt_at"] is not None
     assert status["last_file_name"] == result["file_name"]
     assert status["last_size_bytes"] == result["size_bytes"]
     assert status["last_counts_total"] == sum(result["counts"].values())
-    assert status["is_stale"] is False
     assert status["drive_configured"] is False
 
 
@@ -184,7 +188,11 @@ def test_backup_run_endpoint_then_status_reflects_it(api_client):
 
     status = api_client.get("/api/backup/status").json()["status"]
     assert status["last_file_name"] == body["file_name"]
-    assert status["is_stale"] is False
+    # A LOCAL-only (degraded) backup is not durable — it must NOT clear
+    # is_stale or claim a durable backup (2026-07-20 review).
+    assert status["is_stale"] is True
+    assert status["has_durable_backup"] is False
+    assert status["last_local_at"]
 
 
 def test_backup_export_endpoint_returns_raw_json(api_client):
@@ -199,7 +207,33 @@ def test_backup_export_endpoint_returns_raw_json(api_client):
     assert "lifemanager-backup-" in r.headers.get("content-disposition", "")
 
     data = r.json()
+    assert data.get("secrets_redacted") is True  # manual download masks creds
     assert data["counts"]["todo_items"] == 1
     row = data["tables"]["todo_items"][0]
     assert row["content"] == "row-for-export"
     assert row["due_date"] == "2026-07-03"
+
+
+def test_backup_endpoints_require_auth_when_configured(api_client, monkeypatch):
+    """Flipping REQUIRE_AUTH=true (the owner-actions remediation) must
+    actually close the full-DB export/run to anonymous callers — the
+    critical hole the 2026-07-20 review found."""
+    from app.config import settings as _settings
+
+    monkeypatch.setattr(_settings, "REQUIRE_AUTH", True)
+    assert api_client.get("/api/backup/export").status_code == 401
+    assert api_client.post("/api/backup/run").status_code == 401
+    assert api_client.get("/api/backup/status").status_code == 401
+
+
+def test_backup_export_redacts_credentials(api_client):
+    """The manual HTTP download masks password hashes / encrypted keys."""
+    _run_sql(
+        "INSERT INTO users (email, username, hashed_password, is_active) "
+        "VALUES ('x@y.z', 'x', 'bcrypt$secret$hash', 1)"
+    )
+    data = api_client.get("/api/backup/export").json()
+    users = data["tables"].get("users", [])
+    assert users and all(
+        u.get("hashed_password") == "***redacted***" for u in users
+    )

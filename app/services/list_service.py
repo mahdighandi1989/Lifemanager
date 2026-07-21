@@ -49,8 +49,19 @@ async def get_list(db: AsyncSession, list_id: int) -> TodoList:
 
 
 async def count_items(db: AsyncSession, list_id: int) -> int:
-    stmt = select(func.count()).select_from(todo_list_items).where(
-        todo_list_items.c.todo_list_id == list_id
+    from app.models.todo_item import TodoItem
+
+    # Count only LIVE items — soft-delete keeps the membership row, so a
+    # raw association-table count would over-report after any soft delete
+    # (2026-07-20 review). Join to TodoItem and filter deleted_at.
+    stmt = (
+        select(func.count())
+        .select_from(todo_list_items)
+        .join(TodoItem, TodoItem.id == todo_list_items.c.todo_item_id)
+        .where(
+            todo_list_items.c.todo_list_id == list_id,
+            TodoItem.deleted_at.is_(None),
+        )
     )
     result = await db.execute(stmt)
     return int(result.scalar_one() or 0)

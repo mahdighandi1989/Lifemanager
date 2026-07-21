@@ -58,6 +58,7 @@ _STATUS_DEFAULTS: Dict[str, Any] = {
     "last_size_bytes": None,
     "last_drive_file_id": None,
     "last_counts_total": None,
+    "last_local_at": None,
 }
 
 
@@ -81,10 +82,24 @@ def _json_safe(value: Any) -> Any:
     return str(value)  # UUID, Enum, anything exotic — never let dumps blow up
 
 
-async def export_all_tables(db: AsyncSession) -> Dict[str, Any]:
+# Columns that are credentials, not content. Kept in the automated Drive
+# backup (goes to the owner's private Drive), but REDACTED from the manual
+# HTTP /export download so a pre-lockdown anonymous fetch can't walk away
+# with password hashes / encrypted keys (2026-07-20 review, critical).
+_SENSITIVE_COLUMNS = {
+    "hashed_password", "password", "api_key_encrypted", "api_key",
+    "refresh_token", "access_token", "token", "client_secret",
+    "encrypted_value", "secret",
+}
+
+
+async def export_all_tables(
+    db: AsyncSession, *, redact_secrets: bool = False
+) -> Dict[str, Any]:
     """SELECT * every table registered on ``Base.metadata`` and return
     ``{"exported_at", "tables": {name: [rows...]}, "counts": {name: n}}``
-    with every value JSON-safe."""
+    with every value JSON-safe. With ``redact_secrets`` the credential
+    columns are masked (used by the manual HTTP download)."""
     import app.models  # noqa: F401 — registers every model on Base.metadata
 
     from app.database import Base
@@ -93,14 +108,21 @@ async def export_all_tables(db: AsyncSession) -> Dict[str, Any]:
     counts: Dict[str, int] = {}
     for table in Base.metadata.sorted_tables:
         rows = (await db.execute(select(table))).mappings().all()
-        tables[table.name] = [
-            {str(k): _json_safe(v) for k, v in dict(row).items()} for row in rows
-        ]
-        counts[table.name] = len(tables[table.name])
+        out = []
+        for row in rows:
+            d = {str(k): _json_safe(v) for k, v in dict(row).items()}
+            if redact_secrets:
+                for col in list(d.keys()):
+                    if col.lower() in _SENSITIVE_COLUMNS and d[col] is not None:
+                        d[col] = "***redacted***"
+            out.append(d)
+        tables[table.name] = out
+        counts[table.name] = len(out)
     return {
         "exported_at": datetime.now(timezone.utc).isoformat(),
         "tables": tables,
         "counts": counts,
+        "secrets_redacted": redact_secrets,
     }
 
 
@@ -168,6 +190,9 @@ async def get_status(db: AsyncSession) -> Dict[str, Any]:
     except Exception as exc:
         logger.debug("backup drive_configured probe failed: %r", exc)
         status["drive_configured"] = False
+
+    # A durable (off-box) backup exists only when the last run reached Drive.
+    status["has_durable_backup"] = bool(status.get("last_drive_file_id"))
     return status
 
 
@@ -255,9 +280,12 @@ async def run_backup(db: AsyncSession, now: Optional[datetime] = None) -> Dict[s
             if drive_error:
                 result["drive_error"] = drive_error
 
+        # 2026-07-20 review: last_ok_at (which drives is_stale + the green
+        # owner-action tick) means "a DURABLE off-box backup exists" — only
+        # a Drive upload qualifies. A local file on Render's ephemeral disk
+        # gets its own stamp so the panel can show "local only, not durable".
         status_patch.update(
             {
-                "last_ok_at": now.isoformat(),
                 "last_error": drive_error if result["degraded"] else None,
                 "last_file_name": file_name,
                 "last_size_bytes": len(gz),
@@ -265,6 +293,10 @@ async def run_backup(db: AsyncSession, now: Optional[datetime] = None) -> Dict[s
                 "last_counts_total": sum(export["counts"].values()),
             }
         )
+        if result["drive_file_id"]:
+            status_patch["last_ok_at"] = now.isoformat()
+        else:
+            status_patch["last_local_at"] = now.isoformat()
     except Exception as exc:
         try:
             await db.rollback()

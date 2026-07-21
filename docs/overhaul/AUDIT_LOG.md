@@ -1510,3 +1510,32 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **VERIFY** `npm run build` سبز؛ suite کامل vitest: ۱۶ شکست — دقیقاً همان ۱۶ شکست
   baseline قبل از تغییر (Header/Footer/Layout/Dashboard/Projects/Tasks/api/Notifications/
   ProjectsHub — ربطی به این فایل‌ها ندارند)؛ ۹ تست جدید همگی سبز.
+
+## 2026-07-20 — بازبینی خصمانهٔ نهایی فازهای ۰–۴ (۴۵ ایجنت؛ ۳۸ یافتهٔ تأییدشده، صفر رد)
+
+- **FINDING (🔴 بحرانی — ۵ لنز مستقل)** `GET /api/backup/export` و `POST /api/backup/run` فقط
+  get_optional_user_id داشتند که هرگز 401 نمی‌دهد ⇒ حتی با `REQUIRE_AUTH=true` (همان درمانی
+  که «اقدامات مالک» تبلیغ می‌کند) هر ناشناسی روی URL عمومی کل دیتابیس (هش پسورد، کلیدهای
+  رمزشده، مالی، نوشته‌ها) را دانلود می‌کرد.
+- **CHANGE (auth)** گیت `enforce_auth_when_required` (تعمیم `enforce_write_auth`): توکن نامعتبر
+  همیشه 401؛ بی‌توکن + REQUIRE_AUTH ⇒ 401؛ بی‌توکن + پیش‌فرض ⇒ مجاز. روی backup(×۳)،
+  گزارش‌های مالی(×۲)، /api/ai/chat، جستجوی سراسری، system-map، سطل زباله، و endpoint های
+  وضعیتِ settings سوار شد. export دستی ستون‌های اعتباری را redact می‌کند (بکاپ Drive کامل
+  می‌ماند)؛ rate-limit روی run و chat.
+- **CHANGE (نشت مالکیت)** جستجوی سراسری بلوک‌های نوشته/آیتم/ایمیل را user-scope کرد (ایمیل فقط
+  scope تک‌کاربره). قواعد آینده multi-user را می‌بندد.
+- **CHANGE (data-safety)** purge والد از سطل زباله دیگر فرزندِ زندهٔ بازیابی‌شده را نمی‌کشد
+  (orphan + فقط فرزند trashed حذف)؛ sanitizer فقط escapeهای خودمان را برمی‌گرداند نه
+  entityهای literal مالک (`&copy=`/`&nbsp;`)؛ regex ایمیل بانکی فقط دامنهٔ فرستنده (نه واژهٔ
+  «balance/بانک»)؛ `_pick_account` توکن‌های عمومی را stop-word و فقط match یکتا می‌پذیرد؛
+  backup محلی‌ونه‌Drive دیگر تیک «بکاپ سالم» را سبز نمی‌کند (`has_durable_backup`/`last_local_at`).
+- **CHANGE (correctness)** planner و بریف صبح ساعت رویدادهای تقویم را با tz_offset محلی
+  می‌کنند؛ گزارش ماهانه since را به اول ماه snap می‌کند (باکت قدیمی ناقص نباشد)؛
+  `_record_usage` روی session مستقل commit می‌کند (نه session کالر — رفع خرابی batch تریاژ)؛
+  `update_person` با model_fields_set تاریخ را با null صریح پاک می‌کند؛ `count_items` فقط
+  آیتم زنده می‌شمارد؛ `due_date` آیتم با sentinel قابل پاک‌شدن شد؛ پیش‌فرض priority تسک
+  MEDIUM شد (نه LOW)؛ ingest رویدادی strong-ref نگه می‌دارد؛ تلگرام update_id تکراری را
+  drop می‌کند؛ TransactionResponse فیلد timestamp گرفت.
+- **VERIFY** یافته‌ها تک‌تک روی کد راستی‌آزمایی خصمانه شدند (۳۸ CONFIRMED، صفر REFUTED)؛
+  ۱۰+ تست رگرسیون جدید (auth بکاپ ۴۰۱، redact، child-survives-purge، sanitizer literal،
+  date-clear، ambiguous-bank، quick-add priority)؛ گیت کامل + build در همین بازه.

@@ -52,13 +52,23 @@ async def _pick_account(
             for field in (acc.institution, acc.name):
                 if field and len(field) >= 3 and field.lower() in hint:
                     return acc
-        # try token overlap the other way (hint token appears in the field)
-        tokens = [t for t in re.split(r"[^a-z0-9؀-ۿ]+", hint) if len(t) >= 3]
-        for acc in accounts:
-            joined = f"{acc.institution or ''} {acc.name or ''}".lower()
-            for t in tokens:
-                if t in joined:
-                    return acc
+        # Token overlap — but only DISTINCTIVE tokens. Generic banking
+        # words match every account and would pick the wrong one
+        # (2026-07-20 review), so they're stop-worded, and a match only
+        # counts if EXACTLY ONE account contains the token.
+        _STOP = {"bank", "بانک", "account", "حساب", "card", "کارت",
+                 "balance", "موجودی", "aed", "usd", "irr", "the", "your"}
+        tokens = [
+            t for t in re.split(r"[^a-z0-9؀-ۿ]+", hint)
+            if len(t) >= 3 and t not in _STOP
+        ]
+        for t in tokens:
+            matched = [
+                acc for acc in accounts
+                if t in f"{acc.institution or ''} {acc.name or ''}".lower()
+            ]
+            if len(matched) == 1:
+                return matched[0]
     if len(accounts) == 1:
         return accounts[0]
     return None

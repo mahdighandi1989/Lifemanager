@@ -143,3 +143,42 @@ async def test_create_task_from_finding(api_client):
     task = api_client.get(f"/api/tasks/{tid}").json()
     assert task["title"].startswith("تمدید گواهینامه")
     assert task["due_date"] == (date.today() + timedelta(days=12)).isoformat()
+
+
+@pytest.mark.asyncio
+async def test_person_dates_can_be_cleared(api_client):
+    r = api_client.post(
+        "/api/persons",
+        json={"name": "سارا", "birthday": "1990-05-01", "next_follow_up": "2026-08-01"},
+    )
+    pid = r.json()["id"]
+    assert r.json()["birthday"] == "1990-05-01"
+    upd = api_client.put(f"/api/persons/{pid}", json={"birthday": None, "next_follow_up": None})
+    assert upd.status_code == 200
+    got = api_client.get(f"/api/persons/{pid}").json()
+    assert got["birthday"] is None and got["next_follow_up"] is None
+
+
+@pytest.mark.asyncio
+async def test_quick_add_task_has_no_low_priority_badge(api_client):
+    """A quick-add with no priority must default to MEDIUM (2), not LOW (1)
+    — otherwise every legacy row shows a «کم» badge (2026-07-20 review)."""
+    r = api_client.post("/api/tasks/", json={"title": "بدون اولویت"})
+    assert r.status_code == 201
+    assert r.json()["priority"] == 2
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_bank_token_does_not_pick_wrong_account(db_session):
+    from app.models.finance import FinancialAccount
+    from app.services.finance_ingest_service import apply_bank_message
+
+    db_session.add(FinancialAccount(user_id=0, name="بانک ملت", currency="IRR", balance=10))
+    db_session.add(FinancialAccount(user_id=0, name="بانک صادرات", currency="IRR", balance=20))
+    await db_session.commit()
+    # Generic word "بانک" matches both → must refuse, not silently pick one.
+    res = await apply_bank_message(
+        db_session, user_id=0, channel="email",
+        body="موجودی حساب بانک شما: 999", sender="x@unknown.com",
+    )
+    assert res["balances_updated"] == 0

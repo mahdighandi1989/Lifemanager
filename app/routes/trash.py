@@ -13,7 +13,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import enforce_write_auth, get_optional_user_id
+from app.dependencies.auth import (
+    enforce_auth_when_required,
+    enforce_write_auth,
+    get_optional_user_id,
+)
 from app.middleware import handle_errors
 from app.models.personal_writing import PersonalWriting
 from app.services import todo_item_service
@@ -31,6 +35,7 @@ def _iso(dt) -> str | None:
 async def list_trash(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     items = await todo_item_service.list_trashed_items(db)
     writings = (

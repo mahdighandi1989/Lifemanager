@@ -10,7 +10,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import AuthContext, get_current_admin_user
+from app.dependencies.auth import (
+    AuthContext,
+    enforce_auth_when_required,
+    get_current_admin_user,
+)
 from app.middleware import handle_errors
 from app.models.global_setting import GlobalSetting
 
@@ -65,7 +69,10 @@ async def put_global_analysis_prompt(
 
 @router.get("/api/settings/owner-actions", tags=["settings"])
 @handle_errors
-async def owner_actions(db: AsyncSession = Depends(get_db)) -> dict:
+async def owner_actions(
+    db: AsyncSession = Depends(get_db),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
     import os
 
     from app.config import settings as _settings
@@ -134,7 +141,9 @@ async def owner_actions(db: AsyncSession = Depends(get_db)) -> dict:
         from app.services.backup_service import get_status as _backup_status
 
         st = await _backup_status(db)
-        backup_done = bool(st.get("last_ok_at")) and not st.get("is_stale", True)
+        # Durable (Drive) backup within window — a local-only file on
+        # Render's ephemeral disk is NOT a real backup (2026-07-20 review).
+        backup_done = st.get("has_durable_backup") and not st.get("is_stale", True)
         backup_detail = (
             f"آخرین بکاپ موفق: {st.get('last_ok_at') or '—'}"
             + (" (قدیمی!)" if st.get("is_stale") else "")
@@ -169,7 +178,10 @@ async def owner_actions(db: AsyncSession = Depends(get_db)) -> dict:
 
 @router.get("/api/settings/jobs-status", tags=["settings"])
 @handle_errors
-async def jobs_status(db: AsyncSession = Depends(get_db)) -> dict:
+async def jobs_status(
+    db: AsyncSession = Depends(get_db),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
     """وضعیت موتور واحد زمان‌بندی (jobs engine) — کدام کار کی اجرا شده."""
     from app.services.jobs_engine import get_jobs_status
 
@@ -178,7 +190,10 @@ async def jobs_status(db: AsyncSession = Depends(get_db)) -> dict:
 
 @router.get("/api/settings/ai-usage", tags=["settings"])
 @handle_errors
-async def ai_usage_summary(db: AsyncSession = Depends(get_db)) -> dict:
+async def ai_usage_summary(
+    db: AsyncSession = Depends(get_db),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
     """خلاصهٔ مصرف AI هفت روز اخیر به تفکیک task — حسابداری مصرف روی
     اشتراک شخصی مالک (phase 1)."""
     from datetime import datetime, timedelta, timezone

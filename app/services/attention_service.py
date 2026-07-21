@@ -676,8 +676,21 @@ def _brief_text(today_payload: Dict[str, Any], local: datetime) -> str:
     events = calendar.get("events") or []
     if events:
         lines.append(f"🗓 تقویم امروز/فردا ({len(events)}):")
+        tz_off = int((today_payload.get("_tz_offset_minutes") or 240))
         for e in events[:5]:
-            when = (e.get("start_at") or "")[11:16]
+            when = ""
+            raw = e.get("start_at")
+            if e.get("all_day"):
+                when = "تمام‌روز"
+            elif raw:
+                try:
+                    dt = datetime.fromisoformat(raw)
+                    if dt.tzinfo is not None:
+                        dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+                    dt = dt + timedelta(minutes=tz_off)
+                    when = dt.strftime("%H:%M")
+                except Exception:
+                    when = raw[11:16]
             title = (e.get("summary") or "بدون عنوان")[:50]
             lines.append(f"  • {when} {title}".rstrip())
     people = today_payload.get("people", {}) or {}
@@ -754,6 +767,7 @@ async def send_morning_brief(
     from app.services.command_center_service import build_today
 
     today_payload = await build_today(db, user_id)
+    today_payload["_tz_offset_minutes"] = int(cfg.get("tz_offset_minutes", 240))
     text = _brief_text(today_payload, local)
     # «برنامهٔ پیشنهادی امروز» (phase 3, audit #3): the planner finally
     # gets a consumer — its calendar-aware schedule rides the brief.

@@ -6,13 +6,14 @@ Telegram's /ask shares the same service.
 """
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
 from app.middleware import handle_errors
+from app.rate_limit import limiter
 from app.services.assistant_chat_service import answer_question
 
 router = APIRouter()
@@ -29,11 +30,14 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/api/ai/chat", tags=["ai"])
+@limiter.limit("30/hour")
 @handle_errors
 async def assistant_chat(
+    request: Request,
     payload: ChatRequest = Body(...),
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     result = await answer_question(
         db,

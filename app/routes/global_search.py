@@ -16,7 +16,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
 from app.middleware import handle_errors
 
 logger = logging.getLogger(__name__)
@@ -36,6 +36,7 @@ async def global_search(
     q: str = Query(default="", max_length=200),
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     q = (q or "").strip()
     if len(q) < 2:
@@ -68,6 +69,14 @@ async def global_search(
         from app.models.todo_item import TodoItem
         from app.models.todo_list import todo_list_items
 
+        from app.models.todo_list import TodoList
+
+        owned_items = (
+            select(todo_list_items.c.todo_item_id)
+            .join(TodoList, TodoList.id == todo_list_items.c.todo_list_id)
+            .where(_scope(TodoList.user_id, user_id))
+        )
+        linked_items = select(todo_list_items.c.todo_item_id)
         rows = (await db.execute(
             select(TodoItem, todo_list_items.c.todo_list_id)
             .join(
@@ -77,6 +86,10 @@ async def global_search(
             )
             .where(
                 TodoItem.deleted_at.is_(None),
+                or_(
+                    TodoItem.id.in_(owned_items),
+                    TodoItem.id.notin_(linked_items),
+                ),
                 or_(
                     TodoItem.content.ilike(pattern),
                     TodoItem.description.ilike(pattern),
@@ -113,8 +126,13 @@ async def global_search(
     try:  # writings (live only)
         from app.models.personal_writing import PersonalWriting
 
+        w_scope = (
+            or_(PersonalWriting.user_id == user_id, PersonalWriting.user_id.is_(None))
+            if user_id == 0 else (PersonalWriting.user_id == user_id)
+        )
         rows = (await db.execute(
             select(PersonalWriting).where(
+                w_scope,
                 PersonalWriting.deleted_at.is_(None),
                 or_(
                     PersonalWriting.title.ilike(pattern),
@@ -184,10 +202,10 @@ async def global_search(
     except Exception as exc:
         logger.debug("search transactions skipped: %r", exc)
 
-    try:  # synced emails (metadata only)
+    try:  # synced emails (metadata only) — single-tenant scope only
         from app.models.personal_sync import PersonalEmail
 
-        rows = (await db.execute(
+        rows = [] if user_id != 0 else (await db.execute(
             select(PersonalEmail).where(
                 or_(
                     PersonalEmail.subject.ilike(pattern),

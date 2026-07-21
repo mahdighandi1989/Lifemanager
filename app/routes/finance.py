@@ -4,18 +4,23 @@
 Thin shells over the ORM models — no service layer because the
 operations are flat (per-user list/create with no cross-row logic).
 """
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id, get_required_user_id
+from app.dependencies.auth import (
+    enforce_auth_when_required,
+    get_optional_user_id,
+    get_required_user_id,
+)
 from app.middleware import handle_errors
-from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
+from app.models.finance import Asset, FinancialAccount, Income, Transaction
 from app.services.activity_log_service import record_activity
 
 
@@ -365,6 +370,7 @@ class TransactionResponse(BaseModel):
     transaction_type: str
     description: Optional[str]
     category: Optional[str] = None
+    timestamp: Optional[datetime] = None
 
 
 @router.post(
@@ -531,6 +537,7 @@ async def finance_insights(
 async def finance_balances_by_currency(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ):
     """موجودی‌ها به تفکیک ارز — هیچ‌وقت ارزها با هم جمع نمی‌شوند (audit #20)."""
     from app.services.budget_service import balances_by_currency
@@ -544,6 +551,7 @@ async def finance_monthly_report(
     months: int = 6,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
 ):
     """گزارش ماهانهٔ درآمد/هزینه به تفکیک ارز + دسته — «گزارش واضح» مالی.
 
@@ -551,10 +559,15 @@ async def finance_monthly_report(
     same code path runs on SQLite tests and Postgres production.
     """
     from collections import defaultdict
-    from datetime import datetime, timedelta, timezone
+    from datetime import timezone
 
     months = max(1, min(int(months), 24))
-    since = datetime.now(timezone.utc) - timedelta(days=31 * months)
+    # Snap to the first day of the (months-1)-ago month so the oldest
+    # bucket is a WHOLE month, not a mid-month slice (2026-07-20 review).
+    now_utc = datetime.now(timezone.utc)
+    y, m = now_utc.year, now_utc.month
+    total = (y * 12 + (m - 1)) - (months - 1)
+    since = datetime(total // 12, total % 12 + 1, 1, tzinfo=timezone.utc)
     owned = select(FinancialAccount).where(
         (FinancialAccount.user_id == user_id) | (FinancialAccount.user_id.is_(None))
         if user_id == 0 else (FinancialAccount.user_id == user_id)

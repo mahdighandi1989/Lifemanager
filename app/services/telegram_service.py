@@ -33,6 +33,7 @@ import asyncio
 import logging
 import os
 import time
+from collections import deque as _deque
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -106,6 +107,10 @@ def _app_base_url() -> str:
 # ── In-memory per-chat conversation state (for the /new_task flow) ───────────
 # Light, single-replica state. The only flow today is "waiting for a task title"
 # after a bare /new_task. Each entry carries a created_at so stale entries expire.
+
+# Recently-seen update_ids (idempotency for redelivered webhooks, 2026-07-20).
+_SEEN_UPDATE_IDS: "_deque[int]" = _deque(maxlen=512)
+
 _chat_state: Dict[str, Dict[str, Any]] = {}
 _CHAT_STATE_TTL_SEC = 600  # 10 minutes
 
@@ -385,6 +390,18 @@ class TelegramBot:
     # ── inbound: dispatch ────────────────────────────────────────────────────
     async def handle_update(self, update: Dict[str, Any]) -> Dict[str, Any]:
         """Process one webhook update. Always returns a dict; never raises."""
+        # Idempotency (2026-07-20 review): Telegram redelivers an update when
+        # the webhook is slow (a /ask that waits on the LLM easily exceeds
+        # the timeout), which would run the command — and bill the model —
+        # twice. Drop update_ids we've already seen.
+        try:
+            update_id = update.get("update_id")
+            if update_id is not None:
+                if update_id in _SEEN_UPDATE_IDS:
+                    return {"ok": True, "handled": "duplicate"}
+                _SEEN_UPDATE_IDS.append(update_id)
+        except Exception:
+            pass
         try:
             _cleanup_expired_state()
         except Exception as exc:

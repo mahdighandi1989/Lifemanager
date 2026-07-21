@@ -21,13 +21,29 @@ from app.models.todo_item import TodoItem
 from app.models.todo_list import TodoList, todo_list_items
 
 
+# Only the five entities html.escape(quote=True) itself produces. We undo
+# just these before re-escaping so the transform is idempotent (no
+# &amp;amp; creep) WITHOUT decoding entities the owner typed literally
+# (e.g. "&copy;", "&nbsp;", "&times") — 2026-07-20 review.
+_OWN_ESCAPES = (
+    ("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"),
+    ("&quot;", '"'), ("&#x27;", "'"),
+)
+
+
+def _unescape_own(value: str) -> str:
+    # &amp; must be restored LAST so "&amp;lt;" → "&lt;" → "<" round-trips
+    # cleanly; do the non-amp ones first, then amp.
+    for entity, char in _OWN_ESCAPES[1:]:
+        value = value.replace(entity, char)
+    return value.replace("&amp;", "&")
+
+
 def _sanitize(value: Optional[str]) -> Optional[str]:
-    # Unescape-then-escape makes the transform idempotent: text that was
-    # already escaped at rest (or round-tripped through the edit form)
-    # no longer accumulates &amp;amp;… layers with every save — the
-    # creeping-corruption failure mode the 2026-07-20 data-safety audit
-    # flagged. The at-rest format (escaped once) is unchanged.
-    return None if value is None else html.escape(html.unescape(value), quote=True)
+    return None if value is None else html.escape(_unescape_own(value), quote=True)
+
+
+_UNSET = object()  # sentinel: distinguish "clear to null" from "not provided"
 
 
 def _now() -> datetime:
@@ -197,7 +213,7 @@ async def update_item(
     is_completed: Optional[bool] = None,
     is_starred: Optional[bool] = None,
     parent_id: Optional[int] = None,
-    due_date=None,
+    due_date=_UNSET,
 ) -> TodoItem:
     obj = await get_item(db, item_id)
     if content is not None:
@@ -211,7 +227,9 @@ async def update_item(
         obj.is_starred = is_starred
     if parent_id is not None:
         obj.parent_id = parent_id if parent_id != 0 else None
-    if due_date is not None:
+    # Sentinel lets an explicit null CLEAR the due date (the «حذف موعد»
+    # button); an omitted key leaves it untouched (2026-07-20 review).
+    if due_date is not _UNSET:
         obj.due_date = due_date
     await db.commit()
     await db.refresh(obj)
@@ -349,24 +367,41 @@ async def list_trashed_items(db: AsyncSession) -> Sequence[TodoItem]:
 
 async def delete_item(db: AsyncSession, item_id: int) -> None:
     """Hard delete (purge). Only the trash-purge endpoint calls this —
-    the normal DELETE route soft-deletes via :func:`soft_delete_item`."""
+    the normal DELETE route soft-deletes via :func:`soft_delete_item`.
+
+    2026-07-20 review: purge only removes children that are ALSO trashed.
+    A child the owner separately RESTORED (deleted_at IS NULL) must
+    survive — so it is orphaned (parent_id=NULL) first, otherwise the
+    Postgres ondelete=CASCADE on parent_id would silently kill it."""
     obj = await get_item(db, item_id, include_deleted=True)
-    # Delete children explicitly (dialect-safe: SQLite test runs don't
-    # always enforce the DB-level ON DELETE CASCADE on parent_id).
-    child_ids = (
+    # Live children: detach so the parent's CASCADE can't take them.
+    live_children = (
         await db.execute(
-            select(TodoItem.id).where(TodoItem.parent_id == item_id)
-        )
-    ).scalars().all()
-    if child_ids:
-        await db.execute(
-            delete(todo_list_items).where(
-                todo_list_items.c.todo_item_id.in_(child_ids)
+            select(TodoItem).where(
+                TodoItem.parent_id == item_id,
+                TodoItem.deleted_at.is_(None),
             )
         )
-        await db.execute(delete(TodoItem).where(TodoItem.id.in_(child_ids)))
-    # Cascade on the association table is ON DELETE CASCADE so the
-    # M2M rows go away automatically (explicit here for SQLite parity).
+    ).scalars().all()
+    for child in live_children:
+        child.parent_id = None
+    # Trashed children go with the parent (dialect-safe explicit delete —
+    # SQLite test runs don't always enforce the DB-level CASCADE).
+    dead_child_ids = (
+        await db.execute(
+            select(TodoItem.id).where(
+                TodoItem.parent_id == item_id,
+                TodoItem.deleted_at.is_not(None),
+            )
+        )
+    ).scalars().all()
+    if dead_child_ids:
+        await db.execute(
+            delete(todo_list_items).where(
+                todo_list_items.c.todo_item_id.in_(dead_child_ids)
+            )
+        )
+        await db.execute(delete(TodoItem).where(TodoItem.id.in_(dead_child_ids)))
     await db.execute(
         delete(todo_list_items).where(todo_list_items.c.todo_item_id == item_id)
     )
