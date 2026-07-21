@@ -100,6 +100,29 @@ describe('Header global search (phase 4, critic #5/#7)', () => {
     expect(screen.queryByTestId('global-search-results')).toBeNull();
   });
 
+  test('unescapes HTML entities in result title/snippet before rendering', async () => {
+    get.mockImplementation((url) => {
+      if (url === '/search') {
+        return Promise.resolve({
+          data: {
+            ok: true,
+            results: [
+              { kind: 'task', kind_fa: 'تسک', id: 7, title: 'a &lt;b&gt; &amp; c', snippet: 'x &amp; y', url: '/tasks/7' },
+            ],
+          },
+        });
+      }
+      return Promise.resolve({ data: [] });
+    });
+    renderHeader();
+    fireEvent.change(screen.getByTestId('global-search-input'), { target: { value: 'ab' } });
+    await waitFor(() =>
+      expect(screen.getByTestId('search-result-task-7')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('a <b> & c')).toBeInTheDocument();
+    expect(screen.getByText('x & y')).toBeInTheDocument();
+  });
+
   test('Escape closes the dropdown', async () => {
     renderHeader();
     const input = screen.getByTestId('global-search-input');

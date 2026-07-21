@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
+import { unescapeHtml } from '../lib/text';
 import NotificationBell from './NotificationBell';
 import { LINKS as SIDEBAR_LINKS } from './Sidebar';
 
@@ -90,7 +91,7 @@ function GlobalSearch() {
       {open && results !== null && (
         <div
           data-testid="global-search-results"
-          className="absolute top-full mt-1 right-0 w-72 sm:w-80 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50 text-right"
+          className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 max-w-[calc(100vw-1.5rem)] max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50 text-right"
         >
           {results.length === 0 ? (
             <p className="text-gray-400 text-sm p-3">چیزی پیدا نشد</p>
@@ -114,11 +115,11 @@ function GlobalSearch() {
                     </span>
                     <span className="min-w-0">
                       <span className="block text-sm text-gray-800 truncate">
-                        {r.title}
+                        {unescapeHtml(r.title)}
                       </span>
                       {r.snippet && (
                         <span className="block text-xs text-gray-400 truncate">
-                          {r.snippet}
+                          {unescapeHtml(r.snippet)}
                         </span>
                       )}
                     </span>

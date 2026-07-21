@@ -2,21 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
 import GoogleLifePanel from '../components/GoogleLifePanel';
+import { unescapeHtml } from '../lib/text';
 
 // Use /api so the fetches reach the JSON endpoints, not the SPA route.
 const API_BASE = '/api';
-
-// Server stores text HTML-escaped (stored-XSS defence); React re-escapes on
-// render, so display needs the entities folded back to characters.
-function unescapeHtml(value) {
-  if (!value) return value;
-  return String(value)
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#x27;', "'")
-    .replaceAll('&amp;', '&');
-}
 
 const TYPE_FA = {
   task: 'تسک',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
+import { unescapeHtml } from '../lib/text';
 
 // «ایمنی داده» panel (Settings → ایمنی داده tab, data-safety phase 0).
 // Three cards, each with its own load/error state, all through the shared
@@ -304,7 +305,7 @@ function TrashCard() {
   const purgeItem = (it) => {
     if (
       !window.confirm(
-        `«${it.content}» برای همیشه حذف می‌شود و به هیچ روشی قابل بازگشت نیست. مطمئنی؟`,
+        `«${unescapeHtml(it.content)}» برای همیشه حذف می‌شود و به هیچ روشی قابل بازگشت نیست. مطمئنی؟`,
       )
     )
       return;
@@ -317,7 +318,7 @@ function TrashCard() {
   const purgeWriting = (w) => {
     if (
       !window.confirm(
-        `نوشتهٔ «${w.title}» برای همیشه حذف می‌شود و به هیچ روشی قابل بازگشت نیست. مطمئنی؟`,
+        `نوشتهٔ «${unescapeHtml(w.title)}» برای همیشه حذف می‌شود و به هیچ روشی قابل بازگشت نیست. مطمئنی؟`,
       )
     )
       return;
@@ -393,7 +394,7 @@ function TrashCard() {
               className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-0"
             >
               <div className="min-w-0">
-                <div className="text-sm text-gray-800 truncate">{it.content}</div>
+                <div className="text-sm text-gray-800 truncate">{unescapeHtml(it.content)}</div>
                 <div className="text-xs text-gray-400">حذف‌شده در {faDateTime(it.deleted_at)}</div>
               </div>
               {rowButtons(
@@ -418,7 +419,7 @@ function TrashCard() {
             >
               <div className="min-w-0">
                 <div className="text-sm text-gray-800 truncate">
-                  {w.title}
+                  {unescapeHtml(w.title)}
                   {w.category ? <span className="text-gray-400"> — {w.category}</span> : null}
                 </div>
                 <div className="text-xs text-gray-400">حذف‌شده در {faDateTime(w.deleted_at)}</div>
