@@ -35,6 +35,7 @@ from app.routes import (
     ai_stream,
     assets,
     auth,
+    cleanup,
     context,
     deduplication,
     dev_center,
@@ -835,6 +836,7 @@ app.include_router(settings_routes.router, tags=["settings"])
 app.include_router(assets.router, tags=["assets"])
 app.include_router(merge.router, tags=["merge"])
 app.include_router(deduplication.router, tags=["deduplication"])
+app.include_router(cleanup.router, tags=["cleanup"])
 app.include_router(ai_stream.router, tags=["ai"])
 app.include_router(drive.router, tags=["drive"])
 app.include_router(files.router, tags=["files"])
