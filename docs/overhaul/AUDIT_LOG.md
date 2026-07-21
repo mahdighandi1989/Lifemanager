@@ -1828,3 +1828,20 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   با بازاستفاده از inbox + extractorهای موجود ساختنی است. اما ارزشش کاملاً به «وصل‌بودنِ حسابِ
   گوگلِ مالک» بند است (قابلِ‌مشاهده از اینجا نیست) و شاملِ اسکنِ Gmail است (تصمیمِ حریمِ خصوصی) →
   منتظرِ تأییدِ مالک.
+
+## 2026-07-21 — حرکت ۱ «کمتر ولی زنده»: تغذیهٔ خودکارِ اشتراک‌ها از Gmail (تأییدِ مالک)
+
+- **DECISION (مالک)** مالک «کاملش را بساز — گوگلم وصل است» را انتخاب کرد (opt-in، اسکنِ Gmail
+  مجاز). پس بزرگ‌ترین تکهٔ نقشه ساخته شد.
+- **CHANGE** خطِ لولهٔ auto-ingest برای اشتراک‌ها، با بازاستفادهٔ کاملِ زیرساخت (هیچ مدل/مهاجرتِ
+  جدید): (۱) `subscription_ingest.route_subscription_email` در حلقهٔ تحلیلِ ایمیلِ Gmail
+  (`triage_service.analyze_new_emails`) هوک شد؛ ایمیل‌های ارائه‌دهنده‌های شناخته‌شدهٔ اشتراک با
+  زبانِ صورتحساب → کاندیدِ `InboxItem` (suggested_type=subscription). دقیق/idempotent/opt-in/
+  fail-open. (۲) `inbox_service`: هدفِ `subscription` + `_file_as_subscription` → `SubscriptionAccount`.
+  (۳) toggleِ `/api/inbox/auto-ingest` + سوییچِ UI روی کارتِ صندوقِ ورودی + برچسبِ «اشتراک» برای
+  تأییدِ یک‌ضربه‌ای.
+- **RATIONALE** «صفِ بازبینی»، extractorها، و downstream (attention.subscription_renewal + کارتِ
+  اشتراک‌ها) همه از قبل بودند؛ کارِ لازم «وصل‌کردن» بود نه «ساختن». همان جانِ کلامِ نقشه.
+- **VERIFY** ۵ تستِ pipeline؛ گیتِ کامل ۱۲۵۶ پاس / ۱۲ baseline؛ build سبز. (commit a5060f1)
+- **STATUS** هر ۵ حرکتِ «کمتر ولی زنده» تمام شد. سِیمِ ingest برای اسناد (uae-license/identity)
+  آماده است (همان الگو) — برای دورِ بعد.
