@@ -305,6 +305,31 @@ def test_context_route(api_client):
     assert "load" in ctx and "open_tasks" in ctx
 
 
+def test_token_set_stems_and_dedups():
+    # possessive/verb suffixes collapse: «بیانت» ≈ «بیان»
+    assert svc._token_set("فن بیانت را تمرین کن") == svc._token_set("فن بیان را تمرین کن")
+    # near-dupes score high, distinct ones score 0 (no false merge)
+    assert svc._jaccard(
+        svc._token_set("حین نوشتن از کتاب رونویسی کن"),
+        svc._token_set("هنگام نوشتن از کتاب رونویسی کن"),
+    ) >= 0.6
+    assert svc._jaccard(
+        svc._token_set("محاسبهٔ نفس روزانه را انجام بده"),
+        svc._token_set("در فارکس معامله و تمرین کن"),
+    ) == 0.0
+
+
+@pytest.mark.asyncio
+async def test_fuzzy_dedup_blocks_near_duplicates(db_session):
+    """Re-running extraction / intake must not pile up rewordings of what's
+    already in play (owner 2026-07-21 «قاطی شدن»)."""
+    assert await svc.auto_intake_from_text(db_session, 0, "فن بیان را تمرین کن") is not None
+    # a slightly-reworded near-duplicate is blocked...
+    assert await svc.auto_intake_from_text(db_session, 0, "فن بیانت را تمرین کن") is None
+    # ...but a genuinely distinct directive still gets in.
+    assert await svc.auto_intake_from_text(db_session, 0, "حفظ قرآن را ادامه بده") is not None
+
+
 @pytest.mark.asyncio
 async def test_bulk_approve_and_reject(db_session):
     for t in ["a", "b", "c"]:

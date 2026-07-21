@@ -159,6 +159,53 @@ def _norm(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "").strip()).lower()[:200]
 
 
+# Persian normalization + fuzzy dedup, so re-running extraction doesn't pile up
+# near-duplicates («فن بیانت را تمرین کن» vs «فن بیان را تمرین کن») — owner
+# 2026-07-21 «قاطی شدن».
+_FA_STOPWORDS = {
+    "را", "و", "که", "از", "به", "در", "با", "برای", "یک", "این", "آن", "هر",
+    "تا", "بر", "می", "رو", "هم", "یا", "های", "ها", "است", "هست", "کن", "را‌",
+    "بده", "کنم", "شان", "ات", "ام", "شود", "شو",
+}
+
+
+def _fa_norm(text: str) -> str:
+    t = (text or "")
+    t = t.replace("‌", " ")  # ZWNJ → space
+    t = t.replace("ي", "ی").replace("ك", "ک").replace("ۀ", "ه").replace("ة", "ه")
+    t = re.sub(r"[ً-ْ]", "", t)  # Arabic diacritics
+    t = re.sub(r"[^\w\s؀-ۿ]", " ", t)  # drop punctuation
+    return re.sub(r"\s+", " ", t).strip().lower()
+
+
+# Light stemming: strip common possessive/verb suffixes so «بیانت»≈«بیان»,
+# «فلسفه‌شان»≈«فلسفه», «آخرتت»≈«آخرت» collapse to the same token.
+_FA_SUFFIXES = ("شان", "تان", "مان", "های", "ها", "ات", "اش", "ام", "ت", "ش", "م", "ی")
+
+
+def _stem(tok: str) -> str:
+    for suf in _FA_SUFFIXES:  # longest first
+        if tok.endswith(suf) and len(tok) - len(suf) >= 3:
+            return tok[: -len(suf)]
+    return tok
+
+
+def _token_set(text: str) -> frozenset:
+    return frozenset(
+        _stem(w) for w in _fa_norm(text).split() if w and w not in _FA_STOPWORDS
+    )
+
+
+def _jaccard(a: frozenset, b: frozenset) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _near_dup(tokens: frozenset, others: List[frozenset], threshold: float = 0.6) -> bool:
+    return any(_jaccard(tokens, o) >= threshold for o in others)
+
+
 def _guess_domain(text: str) -> str:
     low = (text or "").lower()
     for domain, words in _DOMAIN_KEYWORDS:
@@ -294,6 +341,24 @@ async def _existing_norm_titles(db: AsyncSession, user_id: int) -> set:
     return {_norm(t) for t in rows}
 
 
+async def _dedup_state(db: AsyncSession, user_id: int):
+    """Return (exact_all, inplay_tokensets, inplay_titles):
+      * exact_all       — normalized titles of ALL directives (block exact
+        re-proposals, incl. rejected — respect the owner's «رد»).
+      * inplay_tokensets — token sets of PROPOSED+ACTIVE titles, for FUZZY
+        near-dup blocking so re-running extraction can't pile up rewordings.
+      * inplay_titles    — those titles as text, handed to the AI so it avoids
+        producing anything semantically equivalent in the first place."""
+    rows = (
+        await db.execute(
+            select(Directive.title, Directive.status).where(_scope(Directive.user_id, user_id))
+        )
+    ).all()
+    exact_all = {_norm(t) for t, _ in rows}
+    inplay = [t for t, s in rows if s in (DIRECTIVE_PROPOSED, DIRECTIVE_ACTIVE)]
+    return exact_all, [_token_set(t) for t in inplay], inplay[:40]
+
+
 def _chunk_writing_body(body: str, *, max_chunks: int = 12) -> List[str]:
     """Split a long writing into aspiration-sized chunks (a paragraph or a
     sentence) so the AI can mine goals FROM WITHIN the text — not just its
@@ -397,7 +462,10 @@ async def _gather_candidates(
     return out
 
 
-async def _ai_refine(db: AsyncSession, candidates: List[Dict[str, Any]]) -> Optional[List[Dict[str, Any]]]:
+async def _ai_refine(
+    db: AsyncSession, candidates: List[Dict[str, Any]],
+    existing_titles: Optional[List[str]] = None,
+) -> Optional[List[Dict[str, Any]]]:
     """Ask the routed model to rewrite candidates into imperative daily
     commands + tag them. Returns None on any failure (caller falls back to the
     heuristic)."""
@@ -407,12 +475,21 @@ async def _ai_refine(db: AsyncSession, candidates: List[Dict[str, Any]]) -> Opti
         from app.services.ai.inference_gateway import complete
 
         listing = "\n".join(f"{i+1}. {c['text'][:160]}" for i, c in enumerate(candidates))
+        existing_block = ""
+        if existing_titles:
+            existing_block = (
+                "\n\nاین فرمان‌ها از قبل ثبت شده‌اند — چیزی که **هم‌معنا/نزدیک** به این‌هاست "
+                "را در خروجی **نیاور** (حتی با عبارتِ متفاوت):\n"
+                + "\n".join(f"- {t}" for t in existing_titles[:40])
+            )
         prompt = (
             "این‌ها بریده‌هایی از لیست‌ها و نوشته‌های یک کاربر است. آن‌هایی را که یک "
             "«عادت/تمرین/هدفِ» قابلِ‌نهادینه‌شدن‌اند به «فرمانِ» کوتاهِ امری فارسی (حداکثر "
             "۱۲ کلمه) تبدیل کن و برچسب بزن. کارهای یک‌بارهٔ پیشِ‌پاافتاده (خریدِ روزمره، "
             "تماسِ تکی، قرارِ گذرا) را **رد کن** و در خروجی نیاور؛ موارد تکراری/هم‌معنا را "
-            "**ادغام** کن. فقط JSON آرایه برگردان؛ هر عضو: "
+            "**ادغام** کن (هر مفهوم فقط یک فرمان)."
+            + existing_block
+            + "\n\nفقط JSON آرایه برگردان؛ هر عضو: "
             '{"i": شمارهٔ ورودی, "title": "فرمان", "domain": یکی از '
             "[معنوی,خودسازی,دانش,سلامت,مالی,روابط,آرزو,کار], "
             '"cadence": یکی از [daily,few_per_week,weekly,once], "kind": یکی از [practice,goal]}.\n\n'
@@ -492,22 +569,26 @@ async def extract_directives(
         if not candidates:
             return {"ok": True, "proposed_added": 0, "skipped": 0, "reason": "no_candidates"}
 
-        refined = (await _ai_refine(db, candidates)) if use_ai else None
+        exact_seen, fuzzy_sets, inplay_titles = await _dedup_state(db, user_id)
+        refined = (await _ai_refine(db, candidates, inplay_titles)) if use_ai else None
         used_ai = refined is not None
         if not refined:
             # Safe fallback: without AI, only the high-signal (starred) subset
             # becomes proposals — never the whole backlog.
             refined = _heuristic_refine([c for c in candidates if c.get("starred")])
 
-        seen = await _existing_norm_titles(db, user_id)
         added = 0
         skipped = 0
         for r in refined:
             key = _norm(r["title"])
-            if not key or key in seen:
+            toks = _token_set(r["title"])
+            # Skip exact re-proposals (any status) AND near-duplicates of what's
+            # already in play or added this pass — no more «قاطی شدن».
+            if not key or key in exact_seen or _near_dup(toks, fuzzy_sets):
                 skipped += 1
                 continue
-            seen.add(key)
+            exact_seen.add(key)
+            fuzzy_sets.append(toks)
             cadence = r["cadence"] if r["cadence"] in _VALID_CADENCE else CADENCE_DAILY
             kind = r["kind"] if r["kind"] in _VALID_KIND else KIND_PRACTICE
             db.add(Directive(
@@ -543,8 +624,8 @@ async def auto_intake_from_text(
     title = (text or "").strip()[:200]
     if not title:
         return None
-    seen = await _existing_norm_titles(db, user_id)
-    if _norm(title) in seen:
+    exact_seen, fuzzy_sets, _ = await _dedup_state(db, user_id)
+    if _norm(title) in exact_seen or _near_dup(_token_set(title), fuzzy_sets):
         return None
     d = Directive(
         user_id=_uid_for_write(user_id),
