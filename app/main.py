@@ -395,6 +395,13 @@ async def startup_event():
         ("persons", "next_follow_up", "DATE"),
         # Spending category for the monthly finance report (phase 3).
         ("transactions", "category", "VARCHAR(64)"),
+        # AI model config columns (audit e606cca6) that never got a startup
+        # ALTER — production Postgres lacked them, which broke the full-DB
+        # backup's SELECT (2026-07-21). Idempotent add for the legacy path.
+        ("ai_model_configs", "prompt_template", "TEXT"),
+        ("ai_model_configs", "context_type", "VARCHAR(32) DEFAULT 'tasks'"),
+        ("ai_model_configs", "dynamic_response", "BOOLEAN DEFAULT TRUE"),
+        ("ai_model_configs", "token_limit", "INTEGER"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:

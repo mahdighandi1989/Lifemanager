@@ -237,3 +237,34 @@ def test_backup_export_redacts_credentials(api_client):
     assert users and all(
         u.get("hashed_password") == "***redacted***" for u in users
     )
+
+
+def test_export_survives_a_broken_table(api_client, monkeypatch):
+    """A single drifted/broken table (a model column the live DB lacks)
+    must NOT kill the whole backup — the 2026-07-21 production incident
+    (ai_model_configs.prompt_template UndefinedColumn)."""
+    import app.services.backup_service as svc
+
+    real_json_safe = svc._json_safe
+    calls = {"n": 0}
+
+    def _boom_once(value):
+        # Trip an error while serializing exactly one row so one table's
+        # loop raises, exercising the per-table fail-open path.
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise RuntimeError("simulated column drift")
+        return real_json_safe(value)
+
+    # Insert a row so there's at least one row to serialize.
+    _run_sql(
+        "INSERT INTO todo_items (content, is_completed, is_starred, type) "
+        "VALUES ('x', 0, 0, 'task')"
+    )
+    monkeypatch.setattr(svc, "_json_safe", _boom_once)
+    r = api_client.get("/api/backup/export")
+    assert r.status_code == 200, r.text
+    data = r.json()
+    # The backup completed and recorded which table(s) failed.
+    assert "table_errors" in data
+    assert isinstance(data["counts"], dict) and data["counts"]

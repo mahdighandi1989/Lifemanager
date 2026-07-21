@@ -96,34 +96,60 @@ _SENSITIVE_COLUMNS = {
 async def export_all_tables(
     db: AsyncSession, *, redact_secrets: bool = False
 ) -> Dict[str, Any]:
-    """SELECT * every table registered on ``Base.metadata`` and return
+    """Dump every table registered on ``Base.metadata`` and return
     ``{"exported_at", "tables": {name: [rows...]}, "counts": {name: n}}``
     with every value JSON-safe. With ``redact_secrets`` the credential
-    columns are masked (used by the manual HTTP download)."""
+    columns are masked (used by the manual HTTP download).
+
+    2026-07-21: uses a raw ``SELECT *`` per table (not ``select(table)``)
+    so the export reflects the DB's ACTUAL columns — immune to ORM/DB
+    schema drift (a model column the production table lacks used to make
+    ``select(table)`` raise UndefinedColumn and kill the WHOLE backup).
+    Each table is fail-open: a broken table records an ``errors`` note and
+    the rest of the backup still completes."""
+    from sqlalchemy import text
+
     import app.models  # noqa: F401 — registers every model on Base.metadata
 
     from app.database import Base
 
     tables: Dict[str, list] = {}
     counts: Dict[str, int] = {}
+    errors: Dict[str, str] = {}
     for table in Base.metadata.sorted_tables:
-        rows = (await db.execute(select(table))).mappings().all()
-        out = []
-        for row in rows:
-            d = {str(k): _json_safe(v) for k, v in dict(row).items()}
-            if redact_secrets:
-                for col in list(d.keys()):
-                    if col.lower() in _SENSITIVE_COLUMNS and d[col] is not None:
-                        d[col] = "***redacted***"
-            out.append(d)
-        tables[table.name] = out
-        counts[table.name] = len(out)
-    return {
+        name = table.name
+        try:
+            # Quote the identifier defensively; SELECT * returns whatever
+            # columns the live table has, drift or not.
+            bind = db.get_bind()
+            preparer = bind.dialect.identifier_preparer if bind is not None else None
+            quoted = preparer.quote(name) if preparer is not None else f'"{name}"'
+            rows = (await db.execute(text(f"SELECT * FROM {quoted}"))).mappings().all()
+            out = []
+            for row in rows:
+                d = {str(k): _json_safe(v) for k, v in dict(row).items()}
+                if redact_secrets:
+                    for col in list(d.keys()):
+                        if col.lower() in _SENSITIVE_COLUMNS and d[col] is not None:
+                            d[col] = "***redacted***"
+                out.append(d)
+            tables[name] = out
+            counts[name] = len(out)
+        except Exception as exc:
+            # One drifted/locked table must never lose the whole backup.
+            errors[name] = repr(exc)[:300]
+            tables[name] = []
+            counts[name] = 0
+            logger.warning("backup: table %s skipped: %r", name, exc)
+    result = {
         "exported_at": datetime.now(timezone.utc).isoformat(),
         "tables": tables,
         "counts": counts,
         "secrets_redacted": redact_secrets,
     }
+    if errors:
+        result["table_errors"] = errors
+    return result
 
 
 # ── Status blob (same shape as the sibling engines' GlobalSetting blobs) ─────
