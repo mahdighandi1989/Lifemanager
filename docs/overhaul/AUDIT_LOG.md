@@ -1874,3 +1874,24 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   license_expiry/document_expiry) نگه داشته شد. صادقانه به مالک اعلام می‌شود.
 - **VERIFY** C1: test_connection_decision_matrix. C2: ۶ تستِ person_ingest + گاردِ
   try/except-freeِ روتِ tasks. هر دو گیتِ کامل بدونِ شکستِ non-baseline؛ build سبز.
+
+## 2026-07-22 — «چرا تغییری نمی‌بینم / اختاپوس / آشغالِ تستی» — سه رفع
+
+- **FINDING/FIX (استقرار دیده نمی‌شد)** مالک تغییرات را در فرانت نمی‌دید با اینکه build درست بود.
+  علت: `index.html` بدونِ Cache-Control سرو می‌شد ⇒ مرورگر/لبه پوستهٔ کهنه (و bundleِ JS کهنه)
+  را نگه می‌داشت. رفع: سرو با `no-store` + endpointِ `/api/version` (RENDER_GIT_COMMIT) برای
+  تأییدِ نسخهٔ live از مرورگر. (commit a225143/25ba4fa) — service worker وجود نداشت؛ render.yaml
+  از قبل `npm run build` را در هر deploy اجرا می‌کرد.
+- **CHANGE (اختاپوس — جمع‌کردنِ ناوبری)** مالک: «سخت‌تر/وحشتناک‌تر/گیج‌کننده‌تر شده؛ هی مجبورم
+  بچرخم». انتخابِ مالک: سطحِ «متوسط». سایدبار در حالتِ استراحت فقط «روزانه» + «زندگی» را نشان
+  می‌دهد؛ «ابزار» + «فنی» پشتِ یک درِ «بیشتر» (که روی صفحه‌های همان گروه خودکار باز می‌شود).
+  هیچ‌چیز حذف نشد. (commit d78bcd4)
+- **CHANGE (آشغالِ تستی)** مالک: «چرا هنوز آشغالِ تستی می‌بینم». `cleanup_service` +
+  `/api/cleanup/test-junk` + پنلِ «آشغالِ تستی» در «پاک‌سازی و ادغام»: اسکنِ
+  کار/پروژه/لیست/آیتم‌لیست/اشتراک برای نام‌های test/تست/sample و حذفِ **برگشت‌پذیر** با
+  soft-markerِ هر جدول (Task→CANCELLED، Project→is_active، List→is_archived، Item→deleted_at؛
+  اشتراک حذفِ کامل با تیکِ صریح). (commit ef78143)
+- **VERIFY** هر سه: گیتِ کامل بدونِ شکستِ non-baseline (۱۲۶۸ پاس/۱۲ baseline)؛ build سبز؛
+  تست‌های sidebar/merge/hubs سبز.
+- **NOTE (مدارک/دیگر منابع)** فهرستِ کاملِ auto-feed در recon نشان داد مدارک از ایمیل قابلِ
+  تغذیهٔ مطمئن نیستند (منبع = عکسِ کارت)؛ تقویم+بانک از قبل automatic؛ اشتراک+افراد ساخته شد.
