@@ -725,6 +725,22 @@ async def health():
     return {"status": "healthy"}
 
 
+# Deploy-verification endpoint: open /api/version in the browser to see WHICH
+# commit is actually live. If it doesn't match the latest pushed commit, the
+# problem is the deploy (Render building / not triggered), not the code. Render
+# injects RENDER_GIT_COMMIT at build time; falls back to "dev" locally.
+@app.get("/api/version", tags=["health"])
+async def version():
+    import os
+
+    commit = os.environ.get("RENDER_GIT_COMMIT") or "dev"
+    return {
+        "commit": commit,
+        "short": commit[:8] if commit != "dev" else "dev",
+        "service": os.environ.get("RENDER_SERVICE_NAME", "lifemanager"),
+    }
+
+
 # Oversight/status endpoint — exposed for ops dashboards and used by the
 # CORS verifier probe. Returns a stable shape with feature-flag state +
 # uptime marker so the response is easy to spot in logs.
@@ -1261,12 +1277,22 @@ if frontend_dist.exists():
             logger.warning(f"Invalid path requested: {full_path}")
             return {"detail": "Not Found"}
 
+        # The HTML shell must NEVER be cached: a new deploy changes the hashed
+        # asset filenames index.html points to, so a cached shell keeps loading
+        # the OLD bundle — the "I pushed changes but see nothing" trap. The
+        # shell is ~1 KB, so no-store costs nothing. Hashed /assets/* are
+        # immutable (new build ⇒ new filename) and stay cacheable via the
+        # StaticFiles mount above.
+        _NO_STORE = {"Cache-Control": "no-cache, no-store, must-revalidate"}
+
         file_path = frontend_dist / full_path
         if file_path.exists() and file_path.is_file():
+            if file_path.name == "index.html":
+                return FileResponse(str(file_path), headers=_NO_STORE)
             return FileResponse(str(file_path))
         index_path = frontend_dist / "index.html"
         if index_path.exists():
-            return FileResponse(str(index_path))
+            return FileResponse(str(index_path), headers=_NO_STORE)
         return {"detail": "Not Found"}
 else:
     logger.warning(f"⚠️  Frontend dist directory not found at {frontend_dist}")
