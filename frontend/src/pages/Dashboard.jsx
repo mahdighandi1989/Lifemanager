@@ -220,6 +220,26 @@ function Dashboard() {
     }
   };
 
+  // One-time catch-up over emails that synced before the detectors existed.
+  const [backfilling, setBackfilling] = useState(false);
+  const [backfillMsg, setBackfillMsg] = useState(null);
+  const runBackfill = async () => {
+    setBackfilling(true);
+    setBackfillMsg(null);
+    try {
+      const r = await api.post('/inbox/backfill');
+      const d = r.data || {};
+      setBackfillMsg(
+        `از ${d.scanned || 0} ایمیل: ${d.subscription_candidates || 0} اشتراک، ${d.person_candidates || 0} فرد پیشنهاد شد.`,
+      );
+      await fetchToday();
+    } catch {
+      setBackfillMsg('خطا در اسکن.');
+    } finally {
+      setBackfilling(false);
+    }
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -510,25 +530,37 @@ function Dashboard() {
             badgeCls="bg-blue-100 text-blue-700"
             footer={
               autoIngest !== null && (
-                <label className="mt-3 flex items-center justify-between gap-2 text-xs text-gray-500 cursor-pointer">
-                  <span>اسکنِ خودکارِ ایمیل (اشتراک‌ها و افراد)</span>
+                <div className="mt-3 space-y-2">
+                  <label className="flex items-center justify-between gap-2 text-xs text-gray-500 cursor-pointer">
+                    <span>اسکنِ خودکارِ ایمیل (اشتراک‌ها و افراد)</span>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={autoIngest}
+                      onClick={toggleAutoIngest}
+                      data-testid="auto-ingest-toggle"
+                      className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                        autoIngest ? 'bg-emerald-500' : 'bg-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          autoIngest ? '-translate-x-4' : '-translate-x-0.5'
+                        }`}
+                      />
+                    </button>
+                  </label>
                   <button
                     type="button"
-                    role="switch"
-                    aria-checked={autoIngest}
-                    onClick={toggleAutoIngest}
-                    data-testid="auto-ingest-toggle"
-                    className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
-                      autoIngest ? 'bg-emerald-500' : 'bg-gray-300'
-                    }`}
+                    onClick={runBackfill}
+                    disabled={backfilling}
+                    data-testid="inbox-backfill-btn"
+                    className="w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
                   >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        autoIngest ? '-translate-x-4' : '-translate-x-0.5'
-                      }`}
-                    />
+                    {backfilling ? 'در حال اسکن…' : 'اسکنِ ایمیل‌های موجود (اشتراک/افراد)'}
                   </button>
-                </label>
+                  {backfillMsg && <p className="text-xs text-gray-500">{backfillMsg}</p>}
+                </div>
               )
             }
           >

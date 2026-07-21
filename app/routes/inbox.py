@@ -22,7 +22,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
 from app.middleware import handle_errors
 from app.models.inbox_item import InboxItem
 from app.services import inbox_service
@@ -260,3 +260,19 @@ async def put_auto_ingest(
     await set_subs(db, patch.enabled)
     await set_people(db, patch.enabled)
     return {"ok": True, "success": True, "enabled": patch.enabled}
+
+
+@router.post("/api/inbox/backfill", tags=["inbox"])
+@handle_errors
+async def backfill_ingest(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """One-time catch-up: run subscription + people detection over the emails
+    ALREADY synced (the backlog that arrived before these detectors existed).
+    Idempotent — safe to run repeatedly."""
+    from app.services.google_sync.person_ingest import backfill_all
+
+    res = await backfill_all(db, user_id=user_id)
+    return {"ok": True, "success": True, **res}

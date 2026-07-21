@@ -204,6 +204,78 @@ async def route_person_email(db: AsyncSession, email, *, user_id: int = 0) -> bo
         return False
 
 
+async def backfill_person_interactions(
+    db: AsyncSession, *, person_id: int, email: str, user_id: int = 0
+) -> int:
+    """When a person is added, seed their relationship from the emails ALREADY
+    synced from them (so the score isn't a lifeless zero). Returns how many
+    interactions were created, then re-scores once."""
+    from app.models.personal_sync import PersonalEmail
+    from app.services import person_profile_service as pps
+
+    addr = (email or "").strip().lower()
+    if not addr:
+        return 0
+    rows = (
+        await db.execute(
+            select(PersonalEmail).where(func.lower(PersonalEmail.from_addr).like(f"%{addr}%"))
+        )
+    ).scalars().all()
+    made = 0
+    for em in rows:
+        created = await pps.record_interaction(
+            db,
+            person_id=person_id,
+            type="email",
+            summary=(em.subject or "ایمیل")[:512],
+            date=getattr(em, "received_at", None),
+            reanalyze=False,
+            dedup_note=f"gmail:{em.id}",
+        )
+        if created is not None:
+            made += 1
+    if made:
+        try:
+            await pps.analyze_person(db, person_id=person_id)
+        except Exception:
+            pass
+    return made
+
+
+async def backfill_all(db: AsyncSession, *, user_id: int = 0, limit: int = 1000) -> dict:
+    """Run subscription + people ingest over ALREADY-synced emails — the
+    one-time catch-up for the backlog that was analysed before these detectors
+    existed (so a mailbox that synced 165 emails yesterday still produces
+    candidates today). Idempotent: dedup guards prevent double-adds."""
+    from app.models.personal_sync import PersonalEmail
+    from app.services.google_sync import subscription_ingest
+
+    rows = (
+        await db.execute(
+            select(PersonalEmail).order_by(PersonalEmail.received_at.desc().nullslast()).limit(limit)
+        )
+    ).scalars().all()
+    subs = 0
+    people = 0
+    scored: Set[int] = set()
+    for em in rows:
+        if await subscription_ingest.route_subscription_email(db, em, user_id=user_id):
+            subs += 1
+        pid = await record_email_interaction(db, em, user_id=user_id)
+        if pid is not None:
+            scored.add(pid)
+        elif await route_person_email(db, em, user_id=user_id):
+            people += 1
+    await db.commit()
+    await rescore_people(db, scored)
+    return {
+        "scanned": len(rows),
+        "subscription_candidates": subs,
+        "person_candidates": people,
+        "interactions_recorded": len(scored),
+    }
+
+
 async def rescore_people(db: AsyncSession, person_ids: Set[int]) -> None:
     """Refresh the deterministic relationship score once per affected person
     after a triage batch (interactions were added with reanalyze=False)."""

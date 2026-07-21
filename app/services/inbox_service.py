@@ -397,13 +397,27 @@ async def _file_as_person(db: AsyncSession, s: Dict[str, Any], user_id: int) -> 
     from app.models.person import Person
 
     name = s.get("person_name") or s["title"]
+    email = (s.get("email") or "").strip().lower() or None
     person = Person(
         user_id=user_id,
         name=_esc(name)[:255],
+        email=(email[:255] if email else None),
         notes=_esc(s.get("description")),
     )
     db.add(person)
     await db.flush()
+    # If we know their email (a Gmail-sourced candidate), backfill the
+    # relationship from the emails already synced from them so the profile
+    # shows a real score the moment it's approved — not a lifeless zero.
+    if email:
+        try:
+            from app.services.google_sync import person_ingest
+
+            await person_ingest.backfill_person_interactions(
+                db, person_id=person.id, email=email, user_id=user_id
+            )
+        except Exception:
+            pass  # score enrichment is best-effort; the person is what matters
     return {
         "kind": "person",
         "id": person.id,
