@@ -1,13 +1,13 @@
 ---
 title: "Full-DB JSON export with degraded cloud backup (never raise, never single-copy)"
-tags: ["backup", "sqlalchemy", "google-drive", "resilience", "background-loop"]
+tags: ["backup", "sqlalchemy", "google-drive", "resilience", "background-loop", "memory-safety", "streaming"]
 topic_canonical: "full-db-json-export-with-degraded-cloud-backup"
 source:
   type: "claude-code-task"
   origin: "claude-code"
   imported_at: "2026-07-20T00:00:00Z"
 created_at: "2026-07-20T00:00:00Z"
-updated_at: "2026-07-20T00:00:00Z"
+updated_at: "2026-07-21T00:00:00Z"
 merged_from: []
 ---
 
@@ -113,6 +113,77 @@ async def run_backup(db, now=None):
 6. در تست‌ها: دایرکتوری محلی را monkeypatch کن به tmp، سازندهٔ client ابری را
    monkeypatch کن که None برگرداند، و یک ردیف با date واقعی درج کن تا
    سریال‌سازی end-to-end اثبات شود.
+
+## Update 2026-07-21 — Streaming the export so it can't OOM the box
+
+### 🎯 چالش تازه
+نسخهٔ اول کل export را در RAM می‌ساخت: `dict` کاملِ همهٔ ردیف‌ها → `json.dumps`
+(رشتهٔ کامل) → `gzip.compress` (کپی سوم). روی هاست ۵۱۲MB، با چند ماه لاگِ
+append-only (activity/usage/webhook)، فشردنِ همین سه کپی + سربارِ per-row
+`dict` پایتون از سقف رد شد و لحظه‌ای که کاربر «بکاپ فوری» را زد instance با
+«Ran out of memory» کشته شد و کل اپ گیر کرد (رفرش هم جواب نمی‌داد). درسِ کلیدی:
+**روی هاست محدود، «همه را در حافظه بساز بعد بنویس» یک بمب ساعتی است که با رشد
+دیتابیس منفجر می‌شود — نه با یک تغییر کد.**
+
+### 💡 راه‌حل
+1. **سریال‌سازیِ استریمی به‌جای dict کامل:** یک async generator که سند JSON را
+   تکه‌تکه (`bytes`) بیرون می‌دهد و هر جدول را **ردیف‌به‌ردیف** با `db.stream()`
+   (نه `execute().all()`) می‌خواند. اوج حافظه = یک ردیف + بافر gzip، مستقل از
+   حجم دیتابیس. `counts`/`table_errors`/`capped_tables` را **بعد از** بلوک
+   `tables` منتشر کن (ترتیب کلید JSON بی‌اهمیت است) چون تا پایان استریم معلوم
+   نیستند؛ برای دسترسی کالر بدون re-parse، همان dictها را به یک `sink` بده.
+2. **gzip مستقیم روی دیسک:** استریم را با `gzip.open(tmp, "wb")` توی یک فایل
+   موقت در **همان** دایرکتوری مقصد بنویس، بعد با `Path.replace` (rename اتمیک،
+   نه copy) نهایی کن. آپلود ابری فقط همین فایلِ **کوچکِ فشرده** را یک‌بار به RAM
+   می‌خواند.
+3. **سقفِ شفاف روی جدول‌های لاگِ بی‌کران:** جدول‌های append-only تله‌متری
+   (activity_logs/ai_usage_logs/behavior_logs/webhook_events/…) را به «N ردیف
+   آخر» (`ORDER BY id DESC LIMIT N`) محدود کن و این را زیر کلید `capped_tables`
+   **ثبت** کن. جدول‌های **محتوا** (tasks/writings/persons/transactions/…) هرگز
+   سقف نمی‌خورند — «نه کم بشه». سقف = محافظ اندازهٔ فایل، نه جایگزین استریم.
+4. **استریمِ HTTP بدونِ خطر lifecycle:** برای دانلود دستی، export را توی یک فایل
+   موقت بریز (session درخواست همان‌جا و همان لحظه drain می‌شود)، بعد
+   `FileResponse` فایل را از **دیسک** استریم کند و یک `BackgroundTask` پاکش کند.
+   هرگز به «session وابسته به Depends داخل generatorِ StreamingResponse» تکیه
+   نکن — teardown آن نسبت به استریم مبهم است.
+
+```python
+async def iter_export_bytes(db, *, redact_secrets=False, sink=None):
+    yield b'{"exported_at": ' + dumps(utcnow()).encode() + b', "tables": {'
+    first = True
+    for table in Base.metadata.sorted_tables:
+        if not first: yield b", "
+        first = False
+        yield dumps(table.name).encode() + b": ["
+        n = 0
+        try:
+            sql = f"SELECT * FROM {q(table.name)}"
+            if (cap := CAPS.get(table.name)) and "id" in table.columns:
+                sql += f" ORDER BY {q('id')} DESC LIMIT {cap}"
+            async for row in (await db.stream(text(sql))).mappings():
+                if n: yield b", "
+                yield dumps({k: json_safe(v) for k, v in row.items()}).encode()
+                n += 1
+        except Exception as exc:
+            errors[table.name] = repr(exc)[:300]
+            await db.rollback()          # PG: unpoison the aborted txn
+        counts[table.name] = n
+        yield b"]"
+    yield b'}, "counts": ' + dumps(counts).encode() + b"}"   # counts AFTER tables
+```
+
+### ⚠️ نکات حیاتی تازه
+- **`db.stream()` نه `execute().all()`** — دومی همان بمبِ حافظه است با یک نام
+  دیگر. `AsyncResult.mappings()` روی aiosqlite و asyncpg هر دو کار می‌کند.
+- **بعد از خطای هر جدول `rollback` کن** وگرنه روی Postgres تراکنشِ abortشده به
+  همهٔ جدول‌های بعدی سرایت می‌کند و backup تقریباً خالی می‌شود.
+- **rename اتمیک در همان فایل‌سیستم:** فایل موقت را در همان دایرکتوری مقصد بساز
+  تا `replace` واقعاً اتمیک باشد؛ و prefixاش را طوری بگذار که با glob پرونرِ
+  retention (`lifemanager-backup-*`) match نشود تا نیمه‌کاره پاک نشود.
+- **سقف = کاهشِ داده؛ پس شفاف ثبتش کن.** فقط جدول‌های عملیاتی/تله‌متری را سقف
+  بزن، نه محتوای کاربر، و لیست سقف‌خورده‌ها را در خروجی بیاور.
+- **`Date.now()`/gzip mtime بی‌اهمیت‌اند** برای decompress؛ ولی خروجی gz را
+  بین اجراها بایت‌به‌بایت مقایسه نکن.
 
 ## 🔗 References
 

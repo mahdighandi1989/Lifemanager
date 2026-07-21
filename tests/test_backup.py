@@ -268,3 +268,60 @@ def test_export_survives_a_broken_table(api_client, monkeypatch):
     # The backup completed and recorded which table(s) failed.
     assert "table_errors" in data
     assert isinstance(data["counts"], dict) and data["counts"]
+
+
+# ── memory-safety: streaming + log capping (2026-07-21 OOM fix) ───────────────
+@pytest.mark.asyncio
+async def test_iter_export_bytes_streams_and_reparses(db_session):
+    """The streaming serializer yields the export in many small chunks that
+    concatenate to exactly what export_all_tables returns (ONE code path).
+    Streaming row-by-row is what keeps the whole DB out of RAM (the OOM fix)."""
+    from app.models.todo_item import TodoItem
+
+    db_session.add(TodoItem(content="استریم", due_date=date(2026, 7, 9)))
+    await db_session.commit()
+
+    chunks = [c async for c in backup_service.iter_export_bytes(db_session)]
+    assert len(chunks) > 5  # genuinely streamed, not one blob
+    assert all(isinstance(c, (bytes, bytearray)) for c in chunks)
+    parsed = json.loads(b"".join(chunks).decode("utf-8"))
+    assert parsed["counts"]["todo_items"] == 1
+    assert parsed["tables"]["todo_items"][0]["content"] == "استریم"
+    assert parsed["secrets_redacted"] is False
+
+
+@pytest.mark.asyncio
+async def test_capped_log_tables_keep_only_most_recent_rows(db_session, monkeypatch):
+    """Append-only log tables are capped to their most-recent rows so months
+    of telemetry can't OOM the box (2026-07-21). The truncation is recorded
+    under ``capped_tables`` — transparent, never a silent reduction — and
+    CONTENT tables (absent from the cap map) are always exported in full."""
+    from app.models.todo_item import TodoItem
+
+    # Exercise the mechanism without inserting 25000 real log rows: pretend
+    # todo_items is a capped log table with cap=2.
+    monkeypatch.setattr(backup_service, "_CAPPED_LOG_TABLES", {"todo_items": 2})
+    for i in range(5):
+        db_session.add(TodoItem(content=f"row-{i}"))
+    await db_session.commit()
+
+    export = await backup_service.export_all_tables(db_session)
+    assert export["counts"]["todo_items"] == 2  # only the 2 most-recent kept
+    assert export.get("capped_tables", {}).get("todo_items") == 2
+    # newest-first (id DESC): the last two inserted survive
+    contents = {r["content"] for r in export["tables"]["todo_items"]}
+    assert contents == {"row-4", "row-3"}
+
+
+@pytest.mark.asyncio
+async def test_export_uncapped_when_below_limit_records_no_capped_tables(db_session):
+    """A table under its cap is NOT flagged as capped (no false 'reduced'
+    signal) — the default config leaves the tiny test DB fully intact."""
+    from app.models.todo_item import TodoItem
+
+    db_session.add(TodoItem(content="کامل"))
+    await db_session.commit()
+
+    export = await backup_service.export_all_tables(db_session)
+    assert "capped_tables" not in export  # nothing hit its cap
+    assert export["counts"]["todo_items"] == 1

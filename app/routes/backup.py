@@ -14,13 +14,15 @@ columns (password hashes / encrypted keys) so a pre-lockdown anonymous fetch
 can't harvest them; the automated Drive backup (private to the owner) keeps
 everything for a real restore.
 """
-import io
-import json
+import os
+import tempfile
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.background import BackgroundTask
 
 from app.database import get_db
 from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
@@ -65,12 +67,37 @@ async def backup_export(
     """Stream a freshly-built, uncompressed JSON export as a download —
     the manual «نسخهٔ پشتیبان را همین حالا بگیر و نگه دار» escape hatch.
     Credential columns are redacted here (the automated Drive backup keeps
-    them for a true restore)."""
-    export = await svc.export_all_tables(db, redact_secrets=True)
-    payload = json.dumps(export, ensure_ascii=False).encode("utf-8")
+    them for a true restore).
+
+    Memory-safe (2026-07-21): the export streams row-by-row onto a temp file
+    on disk, then ``FileResponse`` streams that file from disk and a
+    background task deletes it — the whole DB is never held in RAM, and the
+    request session is fully drained BEFORE the response starts streaming (so
+    no dependency-lifecycle hazard)."""
+    fd, tmp_name = tempfile.mkstemp(prefix="lm-export-", suffix=".json")
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    try:
+        with open(tmp_path, "wb") as fh:
+            async for chunk in svc.iter_export_bytes(db, redact_secrets=True):
+                fh.write(chunk)
+    except Exception:
+        try:
+            tmp_path.unlink()
+        except Exception:
+            pass
+        raise
     file_name = f"lifemanager-backup-{datetime.now(timezone.utc):%Y%m%d-%H%M%S}.json"
-    return StreamingResponse(
-        io.BytesIO(payload),
+
+    def _cleanup() -> None:
+        try:
+            tmp_path.unlink()
+        except Exception:
+            pass
+
+    return FileResponse(
+        tmp_path,
         media_type="application/json",
-        headers={"Content-Disposition": f'attachment; filename="{file_name}"'},
+        filename=file_name,
+        background=BackgroundTask(_cleanup),
     )

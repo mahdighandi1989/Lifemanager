@@ -1539,3 +1539,34 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
 - **VERIFY** یافته‌ها تک‌تک روی کد راستی‌آزمایی خصمانه شدند (۳۸ CONFIRMED، صفر REFUTED)؛
   ۱۰+ تست رگرسیون جدید (auth بکاپ ۴۰۱، redact، child-survives-purge، sanitizer literal،
   date-clear، ambiguous-bank، quick-add priority)؛ گیت کامل + build در همین بازه.
+
+## 2026-07-21 — رفع OOM بکاپ روی هاست ۵۱۲MB (استریم به‌جای ساخت کامل در حافظه)
+
+- **FINDING (🔴 تولید)** کلیک «بکاپ فوری» روی Render رایگان instance را با «Ran out of
+  memory (used over 512MB)» می‌کشت و کل اپ گیر می‌کرد (حتی رفرش هم جواب نمی‌داد).
+  ریشه: `run_backup` سه کپیِ کامل از دیتابیس را هم‌زمان در RAM نگه می‌داشت —
+  `export = dict همهٔ ردیف‌ها` → `json.dumps` (رشتهٔ کامل) → `gzip.compress` (کپی سوم) —
+  به‌علاوهٔ سربارِ per-row `dict` پایتون. با چند ماه لاگِ append-only از سقف رد می‌شد؛ این
+  یک بمب ساعتی وابسته به رشد دیتابیس بود، نه یک باگ لحظه‌ای.
+- **CHANGE (memory)** `backup_service` بازنویسی شد به سریال‌سازی استریمی: `iter_export_bytes`
+  یک async generator است که سند JSON را تکه‌تکه بیرون می‌دهد و هر جدول را ردیف‌به‌ردیف با
+  `db.stream().mappings()` می‌خواند (اوج حافظه = یک ردیف + بافر gzip، مستقل از حجم DB).
+  `run_backup` استریم را مستقیم با `gzip.open` روی یک فایل موقت در همان دایرکتوری می‌نویسد و با
+  `Path.replace` (rename اتمیک) نهایی می‌کند؛ آپلود Drive فقط همان فایلِ کوچکِ فشرده را یک‌بار
+  می‌خواند. `export_all_tables` حالا فقط wrapperی است که همان generator را drain می‌کند (یک
+  مسیر سریال‌سازی).
+- **CHANGE (bounded logs)** جدول‌های لاگِ append-only بی‌کران
+  (`activity_logs`/`ai_usage_logs`/`behavior_logs`/`dev_logs`/`webhook_events`/`notifications`)
+  به «N ردیف آخر» (`ORDER BY id DESC LIMIT`) سقف خوردند و زیر کلید `capped_tables` **شفاف**
+  ثبت می‌شوند؛ جدول‌های محتوا (tasks/writings/persons/transactions/assets/documents/…) هرگز
+  سقف نمی‌خورند («نه کم بشه»).
+- **CHANGE (http export)** `GET /api/backup/export` به‌جای ساختِ payload کامل در حافظه، export
+  را روی یک فایل موقت می‌ریزد (session درخواست همان‌جا drain می‌شود) و با `FileResponse` از
+  دیسک استریم می‌کند + `BackgroundTask` فایل موقت را پاک می‌کند — بدون خطرِ lifecycleِ
+  session داخل StreamingResponse.
+- **CHANGE (resilience)** بعد از خطای هر جدول `db.rollback()` تا تراکنشِ abortشدهٔ Postgres به
+  جدول‌های بعدی سرایت نکند؛ فایل موقت در `finally` هرگز نیمه‌کاره باقی نمی‌ماند.
+- **VERIFY** `tests/test_backup.py` سبز (۱۳ تست، شامل ۳ تست تازه: استریمِ چندتکه، سقفِ لاگ +
+  ثبت `capped_tables`، و «زیرِ سقف ⇒ بدون capped_tables»). گیت کامل: `pytest tests/` بدون
+  رگرسیون جدید (۱۳ شکستِ auth/google/notifications/dev-sync از قبل موجود و بی‌ربط — روی
+  checkout تمیزِ همین کامیت هم همان‌ها می‌افتند)؛ `npm run build` سبز.
