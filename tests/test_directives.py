@@ -203,6 +203,37 @@ async def test_run_daily_intake_adds_new_and_removes_gone(db_session):
 
 
 @pytest.mark.asyncio
+async def test_steps_generate_fallback_and_current_step(db_session):
+    """Layer 2: a directive breaks into ordered steps; the FIRST undone step is
+    the «قدمِ الان». With no AI the next_step becomes a single step so the
+    feature still does something."""
+    d = await svc.add_manual(db_session, 0, title="در فارکس معامله کن", next_step="یک دموِ رایگان باز کن")
+    res = await svc.generate_steps(db_session, d.id, 0, use_ai=False)
+    assert [s["text"] for s in res["steps"]] == ["یک دموِ رایگان باز کن"]
+    assert res["current_step"] == "یک دموِ رایگان باز کن"
+
+    # richer steps → current advances as they're checked off
+    d.steps = [{"text": "دمو باز کن", "done": False}, {"text": "استراتژی بنویس", "done": False}]
+    await db_session.commit()
+    r1 = await svc.set_step_done(db_session, d.id, 0, True, 0)
+    assert r1["current_step"] == "استراتژی بنویس"
+    assert r1["steps_done"] == 1 and r1["steps_total"] == 2
+    # today's command carries the current step (not just the title)
+    cmd = (await svc.select_today_commands(db_session, 0))["commands"]
+    assert cmd and cmd[0]["current_step"] == "استراتژی بنویس"
+
+
+def test_steps_routes(api_client):
+    api_client.post("/api/directives", json={"title": "زبان یاد بگیر"})
+    did = api_client.get("/api/directives?status=active").json()["directives"][0]["id"]
+    gen = api_client.post(f"/api/directives/{did}/steps/generate")
+    assert gen.status_code == 200, gen.text
+    # no AI configured in tests → empty steps (no next_step); toggle out of range is a no-op
+    tog = api_client.post(f"/api/directives/{did}/steps/toggle", json={"index": 0, "done": True})
+    assert tog.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_config_strict_preset_and_update(db_session):
     cfg = await svc.get_config(db_session)
     assert cfg["mode"] == "strict" and cfg["daily_count"] == 5 and cfg["grad_streak"] == 21

@@ -1653,3 +1653,17 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   `auto_intake` (پیشنهاد، تأیید در وب). به help اضافه شد.
 - **VERIFY** تست‌های تازه (scope=all متنِ نوشته و آیتمِ بی‌ستاره را می‌بیند ولی هیوریستیک امن
   می‌ماند؛ config پیش‌فرض all). ۵۹ تستِ directives+telegram سبز؛ ruff پاک.
+
+## 2026-07-21 — لایه ۲ موتور نهادینه‌سازی: راهنماییِ مرحله‌به‌مرحله
+
+- **FINDING (owner)** «فقط می‌گوید فلان کن، همین؟ بدون شکستن به قدم‌ها و پیش‌نیازها؟»
+- **CHANGE (model)** ستونِ `steps` (JSON) روی directives (لیستِ `{text, done}`). مدل +
+  startup ALTER در main.py + migration `0047_directive_steps` (Inspector-guarded).
+- **CHANGE (engine)** `generate_steps` (AI: شکستن به ۳-۷ قدمِ عملیِ به‌ترتیب + پیش‌نیاز؛ بدون
+  AI: next_step به‌عنوان تک‌قدم)؛ `set_step_done` (تیک/جلو بردن)؛ `current_step` = اولین
+  قدمِ ناتمام. `directive_dict` حالا steps/current_step/steps_done/total دارد و فرمانِ روزانه
+  «قدمِ الان» را نشان می‌دهد نه فقط عنوان.
+- **CHANGE (routes/UI)** `/steps/generate` و `/steps/toggle` (گیت‌دار)؛ در صفحه: «👉 قدمِ الان»
+  روی فرمان‌های امروز + چک‌لیستِ قدم‌ها روی کارت‌های فعال + دکمهٔ «🪜 شکستن به قدم‌های عملی».
+- **VERIFY** تست‌های تازه (fallback + current advance + روتر). ۲۰ تستِ directives سبز؛ ruff
+  پاک؛ npm build سبز.

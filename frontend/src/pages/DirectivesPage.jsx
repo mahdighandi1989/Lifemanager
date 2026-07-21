@@ -115,6 +115,10 @@ export default function DirectivesPage() {
     act(() => api.post(`/directives/${id}/reject`), 'کنار گذاشته شد (برگشت‌پذیر).');
   const restoreDirective = (id) =>
     act(() => api.post(`/directives/${id}/approve`), 'به روال برگشت.');
+  const genSteps = (id) =>
+    act(() => api.post(`/directives/${id}/steps/generate`), 'به قدم‌های عملی شکسته شد.');
+  const toggleStep = (id, index, done) =>
+    act(() => api.post(`/directives/${id}/steps/toggle`, { index, done }));
   const extract = () =>
     act(() => api.post('/directives/extract'), 'همگام شد: محتوای تازه پیشنهاد و محتوای حذف‌شده آرشیو شد.');
   const addManual = () => {
@@ -215,6 +219,11 @@ export default function DirectivesPage() {
                           )}
                         </div>
                         <div className="text-sm text-gray-800 mt-1 truncate">{c.title}</div>
+                        {c.current_step && (
+                          <div className="text-xs text-indigo-600 mt-0.5 truncate">
+                            👉 قدمِ الان: {c.current_step}
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {c.done === true ? (
@@ -311,6 +320,34 @@ export default function DirectivesPage() {
                         </div>
                       </div>
                       <StrengthBar value={d.strength} />
+                      {d.steps && d.steps.length > 0 ? (
+                        <div className="mt-2 space-y-1">
+                          {d.steps.map((s, i) => (
+                            <label
+                              key={i}
+                              className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!s.done}
+                                disabled={busy}
+                                onChange={() => toggleStep(d.id, i, !s.done)}
+                              />
+                              <span className={s.done ? 'line-through text-gray-400' : ''}>
+                                {s.text}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => genSteps(d.id)}
+                          disabled={busy}
+                          className="mt-2 text-xs text-indigo-500 hover:text-indigo-700 disabled:opacity-50"
+                        >
+                          🪜 شکستن به قدم‌های عملی
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

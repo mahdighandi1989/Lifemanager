@@ -159,6 +159,40 @@ async def reject(
     return {"ok": True, "success": True, "directive": svc.directive_dict(d)}
 
 
+@router.post("/api/directives/{directive_id}/steps/generate", tags=["directives"])
+@handle_errors
+async def generate_steps(
+    directive_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    res = await svc.generate_steps(db, directive_id, user_id)
+    if res is None:
+        return {"ok": False, "success": False, "error": "not_found"}
+    return {"ok": True, "success": True, "directive": res}
+
+
+class StepToggle(BaseModel):
+    index: int = Field(..., ge=0, le=50)
+    done: bool = True
+
+
+@router.post("/api/directives/{directive_id}/steps/toggle", tags=["directives"])
+@handle_errors
+async def toggle_step(
+    directive_id: int,
+    body: StepToggle = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    res = await svc.set_step_done(db, directive_id, body.index, body.done, user_id)
+    if res is None:
+        return {"ok": False, "success": False, "error": "not_found"}
+    return {"ok": True, "success": True, "directive": res}
+
+
 @router.post("/api/directives/{directive_id}/done", tags=["directives"])
 @handle_errors
 async def mark_done(

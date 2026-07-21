@@ -190,7 +190,27 @@ def _local_now(cfg: Dict[str, Any], now: Optional[datetime] = None) -> datetime:
 
 
 # ── serialization ─────────────────────────────────────────────────────────────
+def _clean_steps(steps: Any) -> List[Dict[str, Any]]:
+    """Coerce stored steps into ``[{"text": str, "done": bool}, …]``."""
+    if not isinstance(steps, list):
+        return []
+    out = []
+    for s in steps:
+        if isinstance(s, dict) and s.get("text"):
+            out.append({"text": str(s["text"])[:300], "done": bool(s.get("done"))})
+    return out
+
+
+def _current_step(steps: Any) -> Optional[str]:
+    """The first not-yet-done step — the concrete «الان دقیقاً این قدم»."""
+    for s in _clean_steps(steps):
+        if not s["done"]:
+            return s["text"]
+    return None
+
+
 def directive_dict(d: Directive) -> Dict[str, Any]:
+    steps = _clean_steps(getattr(d, "steps", None))
     return {
         "id": d.id,
         "title": d.title,
@@ -206,6 +226,10 @@ def directive_dict(d: Directive) -> Dict[str, Any]:
         "times_missed": int(d.times_missed or 0),
         "weight": int(d.weight or 3),
         "next_step": d.next_step,
+        "steps": steps,
+        "current_step": _current_step(steps),
+        "steps_total": len(steps),
+        "steps_done": sum(1 for s in steps if s["done"]),
         "source_type": d.source_type,
         "source_ref": d.source_ref,
         "last_done_at": d.last_done_at.isoformat() if d.last_done_at else None,
@@ -529,6 +553,78 @@ async def set_status(db: AsyncSession, directive_id: int, status: str, user_id: 
     await db.commit()
     await db.refresh(d)
     return d
+
+
+async def _ai_steps(db: AsyncSession, directive: Directive) -> Optional[List[str]]:
+    """Ask the routed model to break a directive into 3–7 concrete, ordered
+    sub-steps / prerequisites. Returns None on any failure."""
+    import json
+
+    try:
+        from app.services.ai.inference_gateway import complete
+
+        prompt = (
+            f"هدف/عادت کاربر: «{directive.title}»"
+            + (f" (حوزه: {directive.domain})" if directive.domain else "")
+            + ".\nاین را به ۳ تا ۷ قدمِ عملیِ کوتاه و به‌ترتیب بشکن (اول پیش‌نیازها، بعد "
+            "اجرا). هر قدم یک جملهٔ امریِ کوتاهِ فارسی. فقط JSON آرایه‌ای از رشته‌ها برگردان، "
+            'مثل ["قدم اول","قدم دوم"].'
+        )
+        res = await complete(db, prompt, task="planning", max_tokens=600)
+        if not (res.get("ok") and res.get("text")):
+            return None
+        text = res["text"]
+        start, end = text.find("["), text.rfind("]")
+        if start < 0 or end <= start:
+            return None
+        parsed = json.loads(text[start:end + 1])
+        steps = [str(s).strip()[:300] for s in parsed if str(s).strip()]
+        return steps[:7] or None
+    except Exception as exc:
+        logger.debug("directive AI steps skipped: %r", exc)
+        return None
+
+
+async def generate_steps(
+    db: AsyncSession, directive_id: int, user_id: int = 0, *, use_ai: bool = True
+) -> Optional[Dict[str, Any]]:
+    """Break a directive into ordered sub-steps (layer 2). AI-driven; with no
+    model the ``next_step`` (if any) becomes a single step so the feature still
+    does something. Returns the updated directive dict or None."""
+    d = (
+        await db.execute(
+            select(Directive).where(Directive.id == directive_id, _scope(Directive.user_id, user_id))
+        )
+    ).scalar_one_or_none()
+    if d is None:
+        return None
+    step_texts = (await _ai_steps(db, d)) if use_ai else None
+    if not step_texts:
+        step_texts = [d.next_step.strip()] if (d.next_step or "").strip() else []
+    d.steps = [{"text": t, "done": False} for t in step_texts]
+    await db.commit()
+    await db.refresh(d)
+    return directive_dict(d)
+
+
+async def set_step_done(
+    db: AsyncSession, directive_id: int, index: int, done: bool, user_id: int = 0
+) -> Optional[Dict[str, Any]]:
+    """Toggle one sub-step's done state and advance the «current step»."""
+    d = (
+        await db.execute(
+            select(Directive).where(Directive.id == directive_id, _scope(Directive.user_id, user_id))
+        )
+    ).scalar_one_or_none()
+    if d is None:
+        return None
+    steps = _clean_steps(getattr(d, "steps", None))
+    if 0 <= index < len(steps):
+        steps[index]["done"] = bool(done)
+        d.steps = steps
+        await db.commit()
+        await db.refresh(d)
+    return directive_dict(d)
 
 
 async def _count_status(db: AsyncSession, user_id: int, status: str) -> int:

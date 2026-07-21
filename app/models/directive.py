@@ -28,6 +28,7 @@ never needs a cross-dialect migration.
 from __future__ import annotations
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     Date,
@@ -95,6 +96,11 @@ class Directive(Base):
 
     # For KIND_GOAL: the concrete next action to take.
     next_step = Column(Text, nullable=True)
+    # Step-by-step guidance (layer 2, 2026-07-21): an ordered list of concrete
+    # sub-steps / prerequisites, each ``{"text": str, "done": bool}``. The daily
+    # command surfaces the FIRST undone step ("current step") so the owner is
+    # told the exact next move, not just «فلان کن». NULL = not broken down yet.
+    steps = Column(JSON, nullable=True)
 
     # Provenance so the owner can see WHERE a command came from (traceable,
     # never invented from nothing). e.g. source_type="todo_item", source_ref="42".

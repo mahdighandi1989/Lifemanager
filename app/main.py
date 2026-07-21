@@ -403,6 +403,9 @@ async def startup_event():
         ("ai_model_configs", "context_type", "VARCHAR(32) DEFAULT 'tasks'"),
         ("ai_model_configs", "dynamic_response", "BOOLEAN DEFAULT TRUE"),
         ("ai_model_configs", "token_limit", "INTEGER"),
+        # موتور نهادینه‌سازی — step-by-step guidance (layer 2) on the
+        # already-created (0046) directives table.
+        ("directives", "steps", "JSON"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:
