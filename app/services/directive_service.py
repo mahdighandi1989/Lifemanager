@@ -97,6 +97,47 @@ _DOMAIN_KEYWORDS = [
     ("خودسازی", ("محاسبه", "اراده", "تمرکز", "عادت", "خودسازی", "مراقبه", "تذکر", "اخلاق", "صبر", "نظم", "تفکر")),
 ]
 
+# ── scheduling (layer 3): time-of-day windows ────────────────────────────────
+_TIME_WINDOWS = {"morning": (6, 11), "afternoon": (12, 16), "evening": (17, 20), "night": (21, 23)}
+_WINDOW_ORDER = {"morning": 0, "afternoon": 1, "evening": 2, "night": 3}
+_TIME_LABEL_FA = {"morning": "صبح", "afternoon": "ظهر/بعدازظهر", "evening": "عصر", "night": "شب"}
+_DOMAIN_DEFAULT_TIME = {
+    "معنوی": "morning", "سلامت": "evening", "دانش": "afternoon", "خودسازی": "night",
+    "مالی": "afternoon", "روابط": "evening", "آرزو": "afternoon", "کار": "afternoon",
+}
+
+
+def _window_of(preferred_time: Optional[str]) -> Optional[str]:
+    """Resolve a preferred_time (a window key OR "HH:MM") to a window key."""
+    if not preferred_time:
+        return None
+    if preferred_time in _TIME_WINDOWS:
+        return preferred_time
+    m = re.match(r"^(\d{1,2}):(\d{2})$", preferred_time.strip())
+    if m:
+        h = int(m.group(1))
+        for win, (lo, hi) in _TIME_WINDOWS.items():
+            if lo <= h <= hi:
+                return win
+    return None
+
+
+def _time_label_fa(preferred_time: Optional[str]) -> Optional[str]:
+    if not preferred_time:
+        return None
+    win = _window_of(preferred_time)
+    if preferred_time not in _TIME_WINDOWS and re.match(r"^\d{1,2}:\d{2}$", preferred_time or ""):
+        return preferred_time  # a specific clock time — show it as-is
+    return _TIME_LABEL_FA.get(win)
+
+
+def _hour_in_window(hour: int, preferred_time: Optional[str]) -> bool:
+    win = _window_of(preferred_time)
+    if win is None:
+        return False
+    lo, hi = _TIME_WINDOWS[win]
+    return lo <= hour <= hi
+
 
 # ── scope helpers (same anon/legacy convention as the rest of the app) ────────
 def _scope(col, uid: int):
@@ -230,6 +271,9 @@ def directive_dict(d: Directive) -> Dict[str, Any]:
         "current_step": _current_step(steps),
         "steps_total": len(steps),
         "steps_done": sum(1 for s in steps if s["done"]),
+        "preferred_time": getattr(d, "preferred_time", None),
+        "preferred_context": getattr(d, "preferred_context", None),
+        "time_label": _time_label_fa(getattr(d, "preferred_time", None)),
         "source_type": d.source_type,
         "source_ref": d.source_ref,
         "last_done_at": d.last_done_at.isoformat() if d.last_done_at else None,
@@ -627,6 +671,83 @@ async def set_step_done(
     return directive_dict(d)
 
 
+async def _ai_schedule(db: AsyncSession, directive: Directive) -> Optional[Dict[str, str]]:
+    import json
+
+    try:
+        from app.services.ai.inference_gateway import complete
+
+        prompt = (
+            f"برای این عادت/هدف بهترین زمانِ روز و یک نشانهٔ زمینه‌ایِ کوتاه پیشنهاد بده: "
+            f"«{directive.title}» (حوزه: {directive.domain}). "
+            'فقط JSON: {"time": یکی از [morning,afternoon,evening,night], '
+            '"context": "نشانهٔ کوتاه مثل بعد از نماز صبح"}.'
+        )
+        res = await complete(db, prompt, task="planning", max_tokens=200)
+        if not (res.get("ok") and res.get("text")):
+            return None
+        text = res["text"]
+        s, e = text.find("{"), text.rfind("}")
+        if s < 0 or e <= s:
+            return None
+        obj = json.loads(text[s:e + 1])
+        t = str(obj.get("time") or "").strip()
+        return {
+            "time": t if t in _TIME_WINDOWS else "",
+            "context": str(obj.get("context") or "").strip()[:200],
+        }
+    except Exception as exc:
+        logger.debug("directive AI schedule skipped: %r", exc)
+        return None
+
+
+async def assign_schedule(
+    db: AsyncSession, directive_id: int, user_id: int = 0, *, use_ai: bool = True
+) -> Optional[Dict[str, Any]]:
+    """Suggest WHEN/WHERE for a directive (layer 3). AI-driven; heuristic
+    fallback picks a time window by domain."""
+    d = (
+        await db.execute(
+            select(Directive).where(Directive.id == directive_id, _scope(Directive.user_id, user_id))
+        )
+    ).scalar_one_or_none()
+    if d is None:
+        return None
+    sched = (await _ai_schedule(db, d)) if use_ai else None
+    if not sched or not sched.get("time"):
+        sched = {"time": _DOMAIN_DEFAULT_TIME.get(d.domain, "afternoon"),
+                 "context": (sched or {}).get("context", "")}
+    d.preferred_time = sched["time"]
+    if sched.get("context"):
+        d.preferred_context = sched["context"]
+    await db.commit()
+    await db.refresh(d)
+    return directive_dict(d)
+
+
+async def set_schedule(
+    db: AsyncSession, directive_id: int, *, preferred_time: Optional[str] = None,
+    preferred_context: Optional[str] = None, user_id: int = 0,
+) -> Optional[Dict[str, Any]]:
+    d = (
+        await db.execute(
+            select(Directive).where(Directive.id == directive_id, _scope(Directive.user_id, user_id))
+        )
+    ).scalar_one_or_none()
+    if d is None:
+        return None
+    if preferred_time is not None:
+        pt = preferred_time.strip()
+        d.preferred_time = pt if (pt in _TIME_WINDOWS or re.match(r"^\d{1,2}:\d{2}$", pt) or pt == "") else d.preferred_time
+        if pt == "":
+            d.preferred_time = None
+    if preferred_context is not None:
+        d.preferred_context = preferred_context.strip()[:200] or None
+    await db.commit()
+    await db.refresh(d)
+    return directive_dict(d)
+
+
 async def _count_status(db: AsyncSession, user_id: int, status: str) -> int:
     from sqlalchemy import func
 
@@ -751,11 +872,10 @@ async def select_today_commands(
             await db.execute(select(Directive).where(Directive.id.in_(list(by_id.keys()))))
         ).scalars().all()
         ds.sort(key=lambda d: _score(d, day), reverse=True)
+        cmds = [{**directive_dict(d), "done": by_id[d.id].done} for d in ds]
         return {
             "date": day.isoformat(),
-            "commands": [
-                {**directive_dict(d), "done": by_id[d.id].done} for d in ds
-            ],
+            "commands": _order_by_time(cmds),
             "persisted": True,
         }
 
@@ -781,9 +901,19 @@ async def select_today_commands(
 
     return {
         "date": day.isoformat(),
-        "commands": [{**directive_dict(d), "done": None} for d in picked],
+        "commands": _order_by_time([{**directive_dict(d), "done": None} for d in picked]),
         "persisted": persist and bool(picked),
     }
+
+
+def _order_by_time(commands: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Order the day's commands by time-of-day window (morning→night; unscheduled
+    last) so the list reads like a plan for the day. Stable — keeps the
+    importance order within the same window."""
+    return sorted(
+        commands,
+        key=lambda c: _WINDOW_ORDER.get(_window_of(c.get("preferred_time")), 9),
+    )
 
 
 # ── follow-up: mark done / missed + strength/streak/graduation ────────────────
@@ -982,7 +1112,72 @@ async def directive_tick(db: AsyncSession, now: Optional[datetime] = None, *, us
         await _save_blob(db, CONFIG_KEY, stored)
         did.append(f"followup_missed:{summary.get('missed', 0)}")
 
+    # Any cycle: fire per-directive «الان وقتشه» reminders whose time-window is
+    # now (deduped once/day). This is the «یادآوری در همان لحظه» of layer 3.
+    rem = await run_time_reminders(db, user_id, now=now)
+    if rem.get("reminded"):
+        did.append(f"reminded:{rem['reminded']}")
+
     return {"did": did or "not_due", "date": day_iso}
+
+
+async def run_time_reminders(
+    db: AsyncSession, user_id: int = 0, now: Optional[datetime] = None
+) -> Dict[str, Any]:
+    """Push a one-per-day reminder for each surfaced-but-undone command whose
+    preferred time-window matches the current local hour (layer 3). Deduped via
+    a ``reminded`` stamp in the config blob so it fires at most once per
+    directive per day. Fail-open; respects the channel setting."""
+    cfg = await get_config(db)
+    if cfg.get("channel") not in ("both", "telegram"):
+        return {"reminded": 0}
+    local = _local_now(cfg, now)
+    day = local.date()
+    day_iso = day.isoformat()
+
+    checkins = await _todays_checkins(db, user_id, day)
+    undone_ids = [c.directive_id for c in checkins if c.done is None]
+    if not undone_ids:
+        return {"reminded": 0}
+    ds = (
+        await db.execute(select(Directive).where(Directive.id.in_(undone_ids)))
+    ).scalars().all()
+
+    stored = await _load_blob(db, CONFIG_KEY)
+    rem = stored.get("reminded") or {}
+    if rem.get("date") != day_iso:
+        rem = {"date": day_iso, "ids": []}
+    already = set(rem.get("ids") or [])
+    due = [
+        d for d in ds
+        if d.id not in already and _hour_in_window(local.hour, d.preferred_time)
+    ]
+    if not due:
+        return {"reminded": 0}
+    await _push_reminders(due, local)
+    rem["ids"] = list(already | {d.id for d in due})
+    stored["reminded"] = rem
+    await _save_blob(db, CONFIG_KEY, stored)
+    return {"reminded": len(due)}
+
+
+async def _push_reminders(due: List[Directive], local: datetime) -> None:
+    try:
+        from app.services.telegram_service import get_telegram_bot
+
+        bot = get_telegram_bot()
+        if not bot.is_configured():
+            return
+        lines = ["⏰ *الان وقتشه*:", ""]
+        for d in due:
+            cur = _current_step(getattr(d, "steps", None))
+            ctx = f" — {d.preferred_context}" if getattr(d, "preferred_context", None) else ""
+            lines.append(f"• {d.title}{ctx}")
+            if cur:
+                lines.append(f"   👉 {cur}")
+        await bot.send("\n".join(lines), silent=True)
+    except Exception as exc:
+        logger.debug("directive reminder push skipped: %r", exc)
 
 
 async def _push_commands(

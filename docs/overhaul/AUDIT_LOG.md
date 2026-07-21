@@ -1667,3 +1667,18 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   روی فرمان‌های امروز + چک‌لیستِ قدم‌ها روی کارت‌های فعال + دکمهٔ «🪜 شکستن به قدم‌های عملی».
 - **VERIFY** تست‌های تازه (fallback + current advance + روتر). ۲۰ تستِ directives سبز؛ ruff
   پاک؛ npm build سبز.
+
+## 2026-07-21 — لایه ۳ موتور نهادینه‌سازی: زمان‌بندی (کِی/کجا + یادآوری در همان لحظه)
+
+- **FINDING (owner)** «میگه باید کِی انجام بدم و همان لحظه یادآوری و پیگیری کنه؟»
+- **CHANGE (model)** ستون‌های `preferred_time` (window: morning/afternoon/evening/night یا HH:MM)
+  و `preferred_context` روی directives (مدل + startup ALTER + migration `0048`).
+- **CHANGE (engine)** `assign_schedule` (AI زمان+زمینه؛ هیوریستیک حسبِ حوزه: معنوی→صبح،
+  سلامت→عصر، …)؛ `set_schedule` دستی/پاک‌کردن؛ `directive_dict` حالا time_label دارد؛
+  `_order_by_time` فرمان‌های روز را صبح→شب می‌چیند؛ `run_time_reminders` هر چرخه، برای
+  فرمانِ surface‌شده‌ی ناتمام که پنجرهٔ زمانی‌اش الان است، یک یادآوریِ «⏰ الان وقتشه» (با قدمِ
+  فعلی + زمینه) می‌فرستد و یک‌بار-در-روز per-directive dedup می‌کند (بلاب). به directive_tick وصل شد.
+- **CHANGE (routes/UI)** `/schedule/auto` و `/schedule` (گیت‌دار)؛ در صفحه: چیپِ «⏰ صبح/عصر/…»
+  روی فرمان‌ها + انتخابگرِ «کِی؟» + دکمهٔ «زمان‌بندی خودکار» + نمایشِ زمینه.
+- **VERIFY** تست‌های تازه (assign+order+reminder dedup، set/clear، روتر). ۲۳ تستِ directives
+  سبز؛ ruff پاک؛ npm build سبز.

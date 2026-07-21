@@ -234,6 +234,46 @@ def test_steps_routes(api_client):
 
 
 @pytest.mark.asyncio
+async def test_schedule_assign_order_and_reminders(db_session):
+    """Layer 3: a directive gets a WHEN (time window), the day's commands are
+    ordered morning→night, and an in-window undone command fires a one-per-day
+    reminder."""
+    a = await svc.add_manual(db_session, 0, title="قرآن بخوان", domain="معنوی")   # → morning
+    b = await svc.add_manual(db_session, 0, title="ورزش کن", domain="سلامت")      # → evening
+    ra = await svc.assign_schedule(db_session, a.id, 0, use_ai=False)
+    rb = await svc.assign_schedule(db_session, b.id, 0, use_ai=False)
+    assert ra["preferred_time"] == "morning" and ra["time_label"] == "صبح"
+    assert rb["preferred_time"] == "evening" and rb["time_label"] == "عصر"
+
+    now = datetime(2026, 7, 22, 4, 0, tzinfo=timezone.utc)  # local 08:00 (morning)
+    sel = await svc.select_today_commands(db_session, 0, now=now, persist=True)
+    assert [c["title"] for c in sel["commands"]] == ["قرآن بخوان", "ورزش کن"]  # morning first
+
+    r1 = await svc.run_time_reminders(db_session, 0, now=now)
+    assert r1["reminded"] == 1  # only the morning one is in-window
+    r2 = await svc.run_time_reminders(db_session, 0, now=now)
+    assert r2["reminded"] == 0  # deduped for the rest of the day
+
+
+@pytest.mark.asyncio
+async def test_set_schedule_manual_and_clear(db_session):
+    d = await svc.add_manual(db_session, 0, title="مطالعه")
+    r = await svc.set_schedule(db_session, d.id, preferred_time="night", preferred_context="قبل خواب", user_id=0)
+    assert r["preferred_time"] == "night" and r["preferred_context"] == "قبل خواب"
+    r2 = await svc.set_schedule(db_session, d.id, preferred_time="", user_id=0)
+    assert r2["preferred_time"] is None  # cleared
+
+
+def test_schedule_routes(api_client):
+    api_client.post("/api/directives", json={"title": "دعا بخوان"})
+    did = api_client.get("/api/directives?status=active").json()["directives"][0]["id"]
+    auto = api_client.post(f"/api/directives/{did}/schedule/auto")
+    assert auto.status_code == 200 and auto.json()["directive"]["preferred_time"]
+    man = api_client.put(f"/api/directives/{did}/schedule", json={"preferred_time": "morning"})
+    assert man.json()["directive"]["preferred_time"] == "morning"
+
+
+@pytest.mark.asyncio
 async def test_config_strict_preset_and_update(db_session):
     cfg = await svc.get_config(db_session)
     assert cfg["mode"] == "strict" and cfg["daily_count"] == 5 and cfg["grad_streak"] == 21

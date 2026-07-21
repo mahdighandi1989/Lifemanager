@@ -101,6 +101,13 @@ class Directive(Base):
     # command surfaces the FIRST undone step ("current step") so the owner is
     # told the exact next move, not just «فلان کن». NULL = not broken down yet.
     steps = Column(JSON, nullable=True)
+    # Scheduling (layer 3, 2026-07-21): WHEN/WHERE the owner should do this.
+    # ``preferred_time`` is a window key ("morning"/"afternoon"/"evening"/
+    # "night") or "HH:MM"; the daily commands are ordered by it and a
+    # once-a-day reminder fires when its window arrives. ``preferred_context``
+    # is a free-text cue ("بعد از نماز صبح", "در دستشویی").
+    preferred_time = Column(String(16), nullable=True)
+    preferred_context = Column(Text, nullable=True)
 
     # Provenance so the owner can see WHERE a command came from (traceable,
     # never invented from nothing). e.g. source_type="todo_item", source_ref="42".

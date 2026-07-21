@@ -35,6 +35,15 @@ function DomainChip({ domain }) {
   );
 }
 
+function TimeChip({ label }) {
+  if (!label) return null;
+  return (
+    <span className="inline-block rounded-full bg-blue-50 text-blue-700 text-xs px-2 py-0.5">
+      ⏰ {label}
+    </span>
+  );
+}
+
 function StrengthBar({ value }) {
   const v = Math.max(0, Math.min(100, Number(value) || 0));
   const color = v >= 90 ? 'bg-emerald-500' : v >= 40 ? 'bg-indigo-500' : 'bg-amber-400';
@@ -119,6 +128,10 @@ export default function DirectivesPage() {
     act(() => api.post(`/directives/${id}/steps/generate`), 'به قدم‌های عملی شکسته شد.');
   const toggleStep = (id, index, done) =>
     act(() => api.post(`/directives/${id}/steps/toggle`, { index, done }));
+  const autoSchedule = (id) =>
+    act(() => api.post(`/directives/${id}/schedule/auto`), 'زمان‌بندی شد.');
+  const setTime = (id, t) =>
+    act(() => api.put(`/directives/${id}/schedule`, { preferred_time: t }));
   const extract = () =>
     act(() => api.post('/directives/extract'), 'همگام شد: محتوای تازه پیشنهاد و محتوای حذف‌شده آرشیو شد.');
   const addManual = () => {
@@ -212,8 +225,9 @@ export default function DirectivesPage() {
                       className="flex items-center justify-between gap-3 bg-white rounded-xl border border-gray-100 p-3"
                     >
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <DomainChip domain={c.domain} />
+                          <TimeChip label={c.time_label} />
                           {c.streak > 0 && (
                             <span className="text-xs text-orange-600">🔥 {c.streak}</span>
                           )}
@@ -302,8 +316,9 @@ export default function DirectivesPage() {
                   {active.map((d) => (
                     <div key={d.id} className="bg-white rounded-xl border border-gray-100 p-3">
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0 flex-wrap">
                           <DomainChip domain={d.domain} />
+                          <TimeChip label={d.time_label} />
                           <span className="text-sm text-gray-800 truncate">{d.title}</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-gray-400 shrink-0">
@@ -318,6 +333,30 @@ export default function DirectivesPage() {
                             کنار بگذار
                           </button>
                         </div>
+                      </div>
+                      {d.preferred_context && (
+                        <div className="text-xs text-blue-600 mb-1">🕒 {d.preferred_context}</div>
+                      )}
+                      <div className="flex items-center gap-2 mb-2 text-xs">
+                        <select
+                          value={d.preferred_time && ['morning','afternoon','evening','night'].includes(d.preferred_time) ? d.preferred_time : ''}
+                          disabled={busy}
+                          onChange={(e) => setTime(d.id, e.target.value)}
+                          className="rounded border border-gray-200 text-xs px-1 py-0.5 text-gray-600"
+                        >
+                          <option value="">کِی؟</option>
+                          <option value="morning">صبح</option>
+                          <option value="afternoon">ظهر/بعدازظهر</option>
+                          <option value="evening">عصر</option>
+                          <option value="night">شب</option>
+                        </select>
+                        <button
+                          onClick={() => autoSchedule(d.id)}
+                          disabled={busy}
+                          className="text-blue-500 hover:text-blue-700 disabled:opacity-50"
+                        >
+                          ⏰ زمان‌بندی خودکار
+                        </button>
                       </div>
                       <StrengthBar value={d.strength} />
                       {d.steps && d.steps.length > 0 ? (

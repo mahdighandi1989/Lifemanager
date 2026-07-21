@@ -193,6 +193,44 @@ async def toggle_step(
     return {"ok": True, "success": True, "directive": res}
 
 
+@router.post("/api/directives/{directive_id}/schedule/auto", tags=["directives"])
+@handle_errors
+async def auto_schedule(
+    directive_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    res = await svc.assign_schedule(db, directive_id, user_id)
+    if res is None:
+        return {"ok": False, "success": False, "error": "not_found"}
+    return {"ok": True, "success": True, "directive": res}
+
+
+class ScheduleBody(BaseModel):
+    preferred_time: Optional[str] = Field(None, max_length=16)
+    preferred_context: Optional[str] = Field(None, max_length=200)
+
+
+@router.put("/api/directives/{directive_id}/schedule", tags=["directives"])
+@handle_errors
+async def set_schedule(
+    directive_id: int,
+    body: ScheduleBody = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    res = await svc.set_schedule(
+        db, directive_id,
+        preferred_time=body.preferred_time, preferred_context=body.preferred_context,
+        user_id=user_id,
+    )
+    if res is None:
+        return {"ok": False, "success": False, "error": "not_found"}
+    return {"ok": True, "success": True, "directive": res}
+
+
 @router.post("/api/directives/{directive_id}/done", tags=["directives"])
 @handle_errors
 async def mark_done(
