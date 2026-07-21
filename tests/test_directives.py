@@ -305,6 +305,55 @@ def test_context_route(api_client):
     assert "load" in ctx and "open_tasks" in ctx
 
 
+@pytest.mark.asyncio
+async def test_bulk_approve_and_reject(db_session):
+    for t in ["a", "b", "c"]:
+        await svc.auto_intake_from_text(db_session, 0, t)  # proposed
+    n = await svc.bulk_set_status(db_session, 0, from_status="proposed", to_status="active")
+    assert n == 3
+    assert len(await svc.list_directives(db_session, 0, status="active")) == 3
+    assert len(await svc.list_directives(db_session, 0, status="proposed")) == 0
+
+
+def test_bulk_routes(api_client):
+    # reject-all / approve-all on an empty proposed set are safe no-ops (0 moved)
+    r = api_client.post("/api/directives/reject-all")
+    assert r.status_code == 200 and r.json()["ok"] is True and r.json()["moved"] == 0
+    a = api_client.post("/api/directives/approve-all")
+    assert a.status_code == 200 and a.json()["moved"] == 0
+
+
+@pytest.mark.asyncio
+async def test_steps_stay_faithful_to_owner_subitems(db_session):
+    """The owner's OWN breakdown wins: a todo item's child items become the
+    directive's steps verbatim (no AI) rather than invented ones."""
+    from app.models.todo_item import TodoItem
+
+    parent = TodoItem(content="کسب درآمد", is_starred=True)
+    db_session.add(parent)
+    await db_session.commit()
+    await db_session.refresh(parent)
+    for s in ["واردات را یاد بگیر", "بازار هدف را پیدا کن", "نمونه سفارش بده"]:
+        db_session.add(TodoItem(content=s, parent_id=parent.id))
+    await db_session.commit()
+
+    d = await svc.add_manual(db_session, 0, title="کسب درآمد")
+    d.source_type = "todo_item"
+    d.source_ref = str(parent.id)
+    await db_session.commit()
+
+    src = await svc._source_context(db_session, d)
+    assert src["existing"] == ["واردات را یاد بگیر", "بازار هدف را پیدا کن", "نمونه سفارش بده"]
+    res = await svc.generate_steps(db_session, d.id, 0, use_ai=False)
+    assert [s["text"] for s in res["steps"]] == src["existing"]  # verbatim, faithful
+
+
+def test_extract_written_steps_parses_owner_lists():
+    body = "مقدمه.\n۱. اول این\n2) بعد آن\n- و این\n* و آن\nمتن عادی که قدم نیست."
+    steps = svc._extract_written_steps(body)
+    assert steps == ["اول این", "بعد آن", "و این", "و آن"]
+
+
 # ── review 2026-07-21 regression fixes ────────────────────────────────────────
 @pytest.mark.asyncio
 async def test_same_day_toggle_reverses_strength_and_streak(db_session):

@@ -122,6 +122,10 @@ export default function DirectivesPage() {
   const markMiss = (id) => act(() => api.post(`/directives/${id}/miss`), 'ثبت شد که جا ماندی.');
   const approve = (id) => act(() => api.post(`/directives/${id}/approve`));
   const reject = (id) => act(() => api.post(`/directives/${id}/reject`));
+  const approveAll = () =>
+    act(() => api.post('/directives/approve-all'), 'همهٔ پیشنهادها تأیید شد.');
+  const rejectAll = () =>
+    act(() => api.post('/directives/reject-all'), 'همهٔ پیشنهادها کنار گذاشته شد.');
   const archiveDirective = (id) =>
     act(() => api.post(`/directives/${id}/reject`), 'کنار گذاشته شد (برگشت‌پذیر).');
   const restoreDirective = (id) =>
@@ -291,9 +295,29 @@ export default function DirectivesPage() {
             {/* proposals */}
             {proposed.length > 0 && (
               <section>
-                <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  ✍️ پیشنهادها (منتظر تأیید تو)
-                </h2>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    ✍️ پیشنهادها (منتظر تأیید تو) — {proposed.length}
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={approveAll}
+                      disabled={busy}
+                      data-testid="directives-approve-all"
+                      className="rounded-lg bg-indigo-600 text-white text-xs px-3 py-1.5 disabled:opacity-50"
+                    >
+                      تأیید همه
+                    </button>
+                    <button
+                      onClick={rejectAll}
+                      disabled={busy}
+                      data-testid="directives-reject-all"
+                      className="rounded-lg bg-gray-100 text-gray-500 text-xs px-3 py-1.5 disabled:opacity-50"
+                    >
+                      رد همه
+                    </button>
+                  </div>
+                </div>
                 <div className="space-y-2" data-testid="directives-proposed">
                   {proposed.map((d) => (
                     <div

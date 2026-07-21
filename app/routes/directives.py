@@ -141,6 +141,28 @@ async def add(
     return {"ok": True, "success": True, "directive": svc.directive_dict(d)}
 
 
+@router.post("/api/directives/approve-all", tags=["directives"])
+@handle_errors
+async def approve_all(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    n = await svc.bulk_set_status(db, user_id, from_status="proposed", to_status="active")
+    return {"ok": True, "success": True, "moved": n}
+
+
+@router.post("/api/directives/reject-all", tags=["directives"])
+@handle_errors
+async def reject_all(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    n = await svc.bulk_set_status(db, user_id, from_status="proposed", to_status="archived")
+    return {"ok": True, "success": True, "moved": n}
+
+
 @router.post("/api/directives/{directive_id}/approve", tags=["directives"])
 @handle_errors
 async def approve(

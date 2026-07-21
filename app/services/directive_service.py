@@ -604,22 +604,89 @@ async def set_status(db: AsyncSession, directive_id: int, status: str, user_id: 
     return d
 
 
-async def _ai_steps(db: AsyncSession, directive: Directive) -> Optional[List[str]]:
-    """Ask the routed model to break a directive into 3–7 concrete, ordered
-    sub-steps / prerequisites. Returns None on any failure."""
+def _extract_written_steps(body: str) -> List[str]:
+    """Pull the steps the OWNER already wrote in a text — numbered (۱. / 1) /
+    1-) or bulleted (- • *) lines. If they structured it themselves, we honour
+    that rather than inventing (owner 2026-07-21: «به محتوا پایبند بمان»)."""
+    out: List[str] = []
+    for raw in (body or "").splitlines():
+        line = raw.strip()
+        m = re.match(r"^\s*(?:[-•*]|[0-9۰-۹]{1,2}[.\)\-])\s+(.*)$", line)
+        if m and m.group(1).strip():
+            out.append(m.group(1).strip()[:300])
+        if len(out) >= 12:
+            break
+    return out
+
+
+async def _source_context(db: AsyncSession, directive: Directive) -> Dict[str, Any]:
+    """Fetch the ORIGINAL content a directive came from + any steps the owner
+    ALREADY defined there (a todo item's sub-items, or numbered/bulleted lines
+    in a writing) so step-generation stays FAITHFUL to the owner's own
+    breakdown instead of inventing from scratch. Fail-open."""
+    text = ""
+    existing: List[str] = []
+    try:
+        if directive.source_type == "todo_item" and (directive.source_ref or "").isdigit():
+            from app.models.todo_item import TodoItem
+
+            iid = int(directive.source_ref)
+            it = (await db.execute(select(TodoItem).where(TodoItem.id == iid))).scalar_one_or_none()
+            if it is not None:
+                text = "\n".join(x for x in [it.content, getattr(it, "description", None)] if x)
+                # The owner's OWN sub-steps = the item's child items.
+                kids = (
+                    await db.execute(
+                        select(TodoItem).where(
+                            TodoItem.parent_id == iid, TodoItem.deleted_at.is_(None)
+                        ).order_by(TodoItem.id.asc())
+                    )
+                ).scalars().all()
+                existing = [k.content.strip() for k in kids if (k.content or "").strip()][:12]
+        elif directive.source_type == "personal_writing" and (directive.source_ref or "").isdigit():
+            from app.models.personal_writing import PersonalWriting
+
+            wid = int(directive.source_ref)
+            w = (await db.execute(select(PersonalWriting).where(PersonalWriting.id == wid))).scalar_one_or_none()
+            if w is not None:
+                text = (w.body or "")[:2000]
+                existing = _extract_written_steps(w.body or "")
+    except Exception as exc:
+        logger.debug("directive source context skipped: %r", exc)
+    return {"text": text[:2000], "existing": existing}
+
+
+async def _ai_steps(
+    db: AsyncSession, directive: Directive, source: Optional[Dict[str, Any]] = None
+) -> Optional[List[str]]:
+    """Ask the routed model to break a directive into 3–7 ordered sub-steps.
+    When the owner's SOURCE content already carries steps/sub-tasks, the model
+    is told to KEEP and expand those faithfully rather than invent. Returns
+    None on any failure."""
     import json
 
+    source = source or {}
     try:
         from app.services.ai.inference_gateway import complete
 
-        prompt = (
-            f"هدف/عادت کاربر: «{directive.title}»"
-            + (f" (حوزه: {directive.domain})" if directive.domain else "")
-            + ".\nاین را به ۳ تا ۷ قدمِ عملیِ کوتاه و به‌ترتیب بشکن (اول پیش‌نیازها، بعد "
-            "اجرا). هر قدم یک جملهٔ امریِ کوتاهِ فارسی. فقط JSON آرایه‌ای از رشته‌ها برگردان، "
+        prompt = f"هدف/عادت کاربر: «{directive.title}»"
+        if directive.domain:
+            prompt += f" (حوزه: {directive.domain})"
+        prompt += "."
+        if source.get("existing"):
+            prompt += (
+                "\n\nقدم‌ها/زیرکارهایی که **خودِ کاربر** تعریف کرده (به این‌ها پایبند بمان،"
+                " عیناً حفظ و فقط در صورت لزوم مرتب/بسط بده، چیزِ نامرتبط اضافه نکن):\n"
+                + "\n".join(f"- {s}" for s in source["existing"][:12])
+            )
+        elif source.get("text"):
+            prompt += "\n\nمتنِ منبعِ کاربر (اگر داخلش مرحله‌ای هست، همان را پایه بگیر):\n" + source["text"][:1500]
+        prompt += (
+            "\n\nاین را به ۳ تا ۷ قدمِ عملیِ کوتاه و به‌ترتیب بشکن (اول پیش‌نیازها، بعد اجرا). "
+            "هر قدم یک جملهٔ امریِ کوتاهِ فارسی. فقط JSON آرایه‌ای از رشته‌ها برگردان، "
             'مثل ["قدم اول","قدم دوم"].'
         )
-        res = await complete(db, prompt, task="planning", max_tokens=600)
+        res = await complete(db, prompt, task="planning", max_tokens=700)
         if not (res.get("ok") and res.get("text")):
             return None
         text = res["text"]
@@ -637,9 +704,12 @@ async def _ai_steps(db: AsyncSession, directive: Directive) -> Optional[List[str
 async def generate_steps(
     db: AsyncSession, directive_id: int, user_id: int = 0, *, use_ai: bool = True
 ) -> Optional[Dict[str, Any]]:
-    """Break a directive into ordered sub-steps (layer 2). AI-driven; with no
-    model the ``next_step`` (if any) becomes a single step so the feature still
-    does something. Returns the updated directive dict or None."""
+    """Break a directive into ordered sub-steps (layer 2), FAITHFUL to the
+    owner's own content. Order of preference:
+      1. AI, fed the source content + any owner-defined steps (honour & expand).
+      2. The owner's own sub-items / written steps used verbatim (no AI).
+      3. The directive's ``next_step`` as a single step.
+    Returns the updated directive dict or None."""
     d = (
         await db.execute(
             select(Directive).where(Directive.id == directive_id, _scope(Directive.user_id, user_id))
@@ -647,7 +717,11 @@ async def generate_steps(
     ).scalar_one_or_none()
     if d is None:
         return None
-    step_texts = (await _ai_steps(db, d)) if use_ai else None
+    source = await _source_context(db, d)
+    step_texts = (await _ai_steps(db, d, source)) if use_ai else None
+    if not step_texts:
+        # No model → use the owner's OWN breakdown verbatim if they defined one.
+        step_texts = list(source.get("existing") or [])
     if not step_texts:
         step_texts = [d.next_step.strip()] if (d.next_step or "").strip() else []
     d.steps = [{"text": t, "done": False} for t in step_texts]
@@ -753,6 +827,32 @@ async def set_schedule(
     await db.commit()
     await db.refresh(d)
     return directive_dict(d)
+
+
+async def bulk_set_status(
+    db: AsyncSession, user_id: int, *, from_status: str, to_status: str
+) -> int:
+    """Move EVERY directive in ``from_status`` to ``to_status`` in one shot
+    («تأیید همه» / «رد همه»). Returns how many moved. Only proposed→active /
+    proposed→archived transitions are meant to use this; other pairs are
+    allowed but harmless."""
+    valid = {DIRECTIVE_PROPOSED, DIRECTIVE_ACTIVE, DIRECTIVE_GRADUATED, DIRECTIVE_ARCHIVED}
+    if from_status not in valid or to_status not in valid:
+        return 0
+    rows = (
+        await db.execute(
+            select(Directive).where(
+                _scope(Directive.user_id, user_id), Directive.status == from_status
+            )
+        )
+    ).scalars().all()
+    for d in rows:
+        d.status = to_status
+        if to_status == DIRECTIVE_GRADUATED and d.graduated_at is None:
+            d.graduated_at = datetime.now(timezone.utc)
+    if rows:
+        await db.commit()
+    return len(rows)
 
 
 async def _count_status(db: AsyncSession, user_id: int, status: str) -> int:
