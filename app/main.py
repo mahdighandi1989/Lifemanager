@@ -730,6 +730,7 @@ async def health():
 # problem is the deploy (Render building / not triggered), not the code. Render
 # injects RENDER_GIT_COMMIT at build time; falls back to "dev" locally.
 @app.get("/api/version", tags=["health"])
+@app.get("/api/version/", tags=["health"])
 async def version():
     import os
 
