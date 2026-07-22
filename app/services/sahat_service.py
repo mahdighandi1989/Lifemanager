@@ -409,10 +409,15 @@ async def get_threads(db: AsyncSession, uid: int = 0) -> List[Dict[str, Any]]:
             )
         ).scalars().all()
         out = []
+        seen_keys: set = set()
         for r in rows:
             tokens = tuple(r.tokens or ())
-            if not tokens:
+            # Dedup by key: NULL user_id rows escape UNIQUE(user_id, key) on
+            # Postgres (NULLs are distinct), so a concurrent first-seed could
+            # double-insert — render each thread once regardless.
+            if not tokens or r.key in seen_keys:
                 continue
+            seen_keys.add(r.key)
             out.append({
                 "id": r.id, "key": r.key, "sahat": r.sahat if r.sahat in SAHATS else "khod_ravan",
                 "title": r.title, "tokens": tokens, "link": r.link or "/lists",
