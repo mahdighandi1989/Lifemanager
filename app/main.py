@@ -424,6 +424,8 @@ async def startup_event():
         ("personal_writings", "sahat", "VARCHAR(16)"),
         ("directives", "sahat", "VARCHAR(16)"),
         ("projects", "sahat", "VARCHAR(16)"),
+        # مرحله‌بندی (2026-07-22): ordered trackable steps on any task.
+        ("tasks", "steps", "JSON"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:

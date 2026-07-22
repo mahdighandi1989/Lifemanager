@@ -19,11 +19,13 @@ Design commitments (v2 — «خداشهر», replacing the v1 island):
     to the deterministic classifier. The owner's correction is final and
     visible on every page (chips), so the lens is woven through the app
     instead of living on one page.
-  * **The machine never issues a fiqhi verdict.** It only flags PROBABILITY
-    with a decidable TEST per weight (see the ladder below). «احتمالِ
-    حق‌الناس», never «حق‌الناس» — certainty belongs to the owner.
-  * **Deeds only, never intentions.** نیت is between the owner and God; the
-    machine scores observable follow-through, nothing more.
+  * **A calm organizer, never a judge (owner's third correction).** The
+    machine attaches NO moral label to anything — nothing is حق‌الناس/حق‌الله
+    by machine decree. Most of life is مباح; whether an act is ever a duty is
+    context only the owner sees. Attention items are labelled by their plain
+    NATURE (overdue / someone-waiting / stale / piled-up), never by a verdict.
+  * **Deeds only, never intentions, never sermons.** The map organizes and
+    tracks follow-through; it does not tell the owner «now do X».
   * **A writing is presence, not achievement.** Content mass (writings,
     projects, assets) is shown but NEVER scored as «done» — v1's
     every-writing-counts-as-done inflated the numbers dishonestly.
@@ -114,58 +116,42 @@ DISTRICTS: Dict[str, Dict[str, Any]] = {
     "mohit": {"title": "رابطه با محیط و اموال", "keys": ["mohit"]},
 }
 
-# ── Severity ladder (اصالتِ امتیاز — از فقه، نه قراردادی) ────────────────────
-# The owner's corrections (2026-07-22, twice): weights are anchored in the
-# مفسده/مصلحت ladder, each with a decidable TEST — and the machine only ever
-# reports a PROBABILITY, never a verdict:
-#
-#   W_HAQ_NAS (5) — «احتمالِ حق‌الناس/عهد». TEST: «آیا حقِ شخصِ دیگری بر گردنِ
-#     من درگیر است؟» بدهی، امانت، وعده/قرارِ داده‌شده، پاسخی که یک انسانِ
-#     واقعی منتظرش است. The machine flags this ONLY when a real person is
-#     linked AND the text carries a promise/debt marker (or a real human
-#     awaits a reply). Everything else is NOT حق‌الناس — a machine
-#     notification never passes this test by itself, and neither does an
-#     ordinary overdue project task.
-#   W_AHD (4) — عهد و قرار (تعهدِ داده‌شده به دیگران بدونِ نشانهٔ صریحِ دین/وعده).
-#   W_ZARAR_KHOD (4) — اضرار به نفس (جسمی یا مالی؛ لاضرر). TEST: «آیا جسم یا
-#     مالِ خودم در معرضِ ضررِ جدی است؟» سلامتِ رهاشده، سندِ منقضی، جریمهٔ
-#     پرداختنی، هشدارِ مالیِ حسابِ خودم.
-#   W_GROWTH (3) — رشد و تهذیب. TEST: «آیا مسیرِ رشدی که خودم تعهد کرده‌ام
-#     راکد مانده؟» — including صله/پیگیریِ رابطه (a lapsed follow-up is a
-#     stalled مستحب, NOT an automatic حق‌الناس).
-#   W_CLUTTER (1) — لغو و اتلاف. TEST: «نه حقِ کسی، نه ضررِ جدی — فقط ظرفِ
-#     عمر را پر کرده.»
-W_HAQ_NAS = 5
-W_AHD = 4
-W_ZARAR_KHOD = 4
-W_GROWTH = 3
-W_CLUTTER = 1
-# Back-compat alias (older callers/tests may import the previous name).
-W_SELF_HARM = W_ZARAR_KHOD
+# ── Urgency ladder (calm — «چقدر منتظرِ توئه», NOT a moral verdict) ──────────
+# The owner's THIRD correction (2026-07-22): DROP the fiqhi weighting entirely.
+# The map is a calm ORGANIZER, not a judge. Nothing is ever branded
+# حق‌الناس/حق‌الله by the machine — most of life is مباح, and context (which
+# only the owner sees) is the only thing that could ever make a plain act a
+# duty. Attention items are labelled by their NATURE (overdue / someone-waiting
+# / stale / piled-up); the numeric level only ORDERS «what needs you first» and
+# is never shown as a verdict.
+U_OVERDUE = 4    # عقب‌افتاده یا منقضی
+U_WAITING = 3    # یک نفر منتظرِ توست
+U_SOON = 2       # نزدیکِ موعد
+U_STALE = 2      # مدتی راکد مانده
+U_PILE = 1       # تلنبار شده
 
-# Attention-item kinds → the honest badge the UI shows. Weight alone is not a
-# verdict; the kind says WHAT the flag means.
+# Back-compat aliases so any external import keeps resolving. Values are now
+# plain urgency — they carry NO fiqhi meaning anymore.
+W_HAQ_NAS = U_WAITING
+W_AHD = U_WAITING
+W_ZARAR_KHOD = U_OVERDUE
+W_GROWTH = U_STALE
+W_CLUTTER = U_PILE
+W_SELF_HARM = U_OVERDUE
+
+# Attention-item kinds → the plain, non-judging label the UI shows.
 ATTENTION_KINDS_FA = {
-    "haq_probable": "احتمالِ حق‌الناس",
-    "ahd": "عهد و قرار",
-    "zarar": "ضرر به خود/مال",
-    "selleh": "صله و پیگیریِ رابطه",
-    "growth": "رشد",
-    "clutter": "اتلاف",
+    "overdue": "عقب‌افتاده",
+    "waiting": "یک نفر منتظرته",
+    "soon": "نزدیکِ موعد",
+    "stale": "مدتی راکد",
+    "pile": "تلنبار شده",
 }
 
-# Promise/debt markers: only these turn a person-linked overdue task into an
-# «احتمالِ حق‌الناس». Deliberately narrow — false «حق‌الناس» is worse than a
-# missed flag (the owner's own محاسبه catches the rest).
-_RE_PROMISE = re.compile(
-    r"(قول|وعده|قرار گذاشت|قرض|بدهی|بدهکار|پس بده|امانت|تحویل|جواب|پاسخ|تعهد|اجرت|حقوق|طلب)",
-    re.I,
-)
-
-# Automated financial alerts about the owner's OWN accounts (margin calls,
-# balance warnings…) — risk to own wealth ⇒ اضرار به مالِ خود، ذیلِ محیط/اموال.
-# Checked BEFORE the human test: a margin-call mail from a named broker
-# address is still a machine alert, not a person awaiting a reply.
+# Automated financial notifications about the owner's OWN account — used ONLY
+# to route them to «محیط/اموال» and dedup duplicates. No moral label attached;
+# checked before the human test so a broker's automated mail isn't mistaken for
+# a person awaiting a reply.
 _RE_FIN_ALERT = re.compile(
     r"(margin|liquidat|balance|payment due|overdue|insufficient|statement|"
     r"invoice|alert|بدهی|سررسید|موجودی|اخطار|هشدار)",
@@ -489,10 +475,10 @@ async def build_sahat_map(
         for th in threads_reg
     }
 
-    def att(sahat: str, label: str, weight: int, link: str, kind: str = "growth") -> None:
+    def att(sahat: str, label: str, weight: int, link: str, kind: str = "overdue") -> None:
         cells[sahat]["attention"].append({
             "label": label[:120], "weight": weight, "link": link, "kind": kind,
-            "kind_fa": ATTENTION_KINDS_FA.get(kind, "رشد"),
+            "kind_fa": ATTENTION_KINDS_FA.get(kind, "پیگیری"),
         })
 
     def thr_sample(key: str, title: str) -> None:
@@ -501,10 +487,9 @@ async def build_sahat_map(
             row["samples"].append(title[:80])
 
     # ── Tasks ───────────────────────────────────────────────────────────────
-    # حق‌الناس honesty (owner's correction): a person-linked overdue task is
-    # only «احتمالِ حق‌الناس» when its text carries a promise/debt marker;
-    # otherwise it is عهد (4). A plain overdue project task is عهد با خود (3)
-    # — never automatic حق‌الناس.
+    # An overdue task is surfaced plainly. If a person is linked, the label
+    # simply notes «یک نفر منتظرشه» (higher in the list) — no moral class, no
+    # verdict. That's the whole rule now.
     try:
         from app.models.person_task import person_tasks
         from app.models.task import Task, TaskStatus
@@ -532,22 +517,20 @@ async def build_sahat_map(
             if t.status == TaskStatus.DONE:
                 cell["done"] += 1
             elif overdue:
-                if person_linked and _RE_PROMISE.search(t.title or ""):
-                    att(sahat, f"کارِ عقب‌افتاده با پای یک شخص: {t.title}", W_HAQ_NAS, "/tasks",
-                        kind="haq_probable")
-                elif person_linked:
-                    att(sahat, f"کارِ عقب‌افتادهٔ مرتبط با یک شخص: {t.title}", W_AHD, "/tasks",
-                        kind="ahd")
-                elif sahat == "khod_jesm":
-                    att(sahat, f"کارِ عقب‌افتادهٔ سلامت: {t.title}", W_ZARAR_KHOD, "/tasks",
-                        kind="zarar")
+                if person_linked:
+                    att(sahat, f"کارِ عقب‌افتاده — یک نفر منتظرشه: {t.title}", U_WAITING, "/tasks",
+                        kind="waiting")
                 else:
-                    att(sahat, f"کارِ عقب‌افتاده: {t.title}", W_GROWTH, "/tasks", kind="growth")
+                    att(sahat, f"کارِ عقب‌افتاده: {t.title}", U_OVERDUE, "/tasks", kind="overdue")
             if detail and t.status != TaskStatus.DONE and len(cell["detail"]["tasks"]) < 60:
+                steps = t.steps if isinstance(t.steps, list) else []
+                s_total = sum(1 for s in steps if isinstance(s, dict) and s.get("text"))
+                s_done = sum(1 for s in steps if isinstance(s, dict) and s.get("done"))
                 cell["detail"]["tasks"].append({
                     "id": t.id, "title": t.title, "status": str(t.status.value if hasattr(t.status, "value") else t.status),
                     "due_date": t.due_date.isoformat() if t.due_date else None,
                     "overdue": overdue,
+                    "steps_total": s_total, "steps_done": s_done,
                 })
     except Exception as exc:
         logger.debug("sahat tasks skipped: %r", exc)
@@ -594,7 +577,8 @@ async def build_sahat_map(
                 thr_sample(th["key"], lst.name)
             for i in rows:
                 if not i.is_completed and i.due_date and i.due_date < today:
-                    att(sahat, f"آیتمِ موعدگذشته: {(i.content or '')[:60]}", W_GROWTH, "/lists")
+                    att(sahat, f"آیتمِ موعدگذشته: {(i.content or '')[:60]}", U_OVERDUE, "/lists",
+                        kind="overdue")
             if detail and len(cell["detail"]["lists"]) < 60:
                 cell["detail"]["lists"].append({
                     "id": lst.id, "name": lst.name, "done": done, "total": len(rows),
@@ -661,7 +645,7 @@ async def build_sahat_map(
             missed = int(getattr(d, "times_missed", 0) or 0)
             done_n = int(getattr(d, "times_done", 0) or 0)
             if status == "active" and missed > max(done_n, 2):
-                att(sahat, f"فرمانِ رهاشده: {(d.title or '')[:60]}", W_GROWTH, "/directives")
+                att(sahat, f"مسیرِ راکد: {(d.title or '')[:60]}", U_STALE, "/directives", kind="stale")
             if detail and status in ("active", "proposed") and len(cell["detail"]["directives"]) < 60:
                 cell["detail"]["directives"].append({
                     "id": d.id, "title": d.title, "status": status,
@@ -686,7 +670,7 @@ async def build_sahat_map(
     except Exception as exc:
         logger.debug("sahat projects skipped: %r", exc)
 
-    # ── People (دیگران): صله و پیگیری — NOT automatic حق‌الناس ──────────────
+    # ── People (دیگران): a follow-up you meant to make — plainly, no verdict ─
     people_overdue: List[Dict[str, Any]] = []
     try:
         from app.models.person import Person
@@ -702,18 +686,18 @@ async def build_sahat_map(
         for p in people:
             nf = getattr(p, "next_follow_up", None)
             if nf and nf < today:
-                att("digaran", f"پیگیریِ رابطه: {p.name}", W_GROWTH, "/people-profiles",
-                    kind="selleh")
+                att("digaran", f"می‌خواستی پیگیری کنی: {p.name}", U_WAITING, "/people-profiles",
+                    kind="waiting")
                 people_overdue.append({"id": p.id, "name": p.name, "next_follow_up": nf.isoformat()})
     except Exception as exc:
         logger.debug("sahat people skipped: %r", exc)
 
-    # ── Emails needing action — the حق‌الناس TEST applied correctly ──────────
-    # Order matters (owner's broker-email correction): an automated financial
-    # alert is checked FIRST — a margin call from a named broker address is
-    # still a machine alert about MY OWN wealth (اضرار به مال), never a person
-    # awaiting a reply. Only then does the human test apply, and even a human
-    # reply is flagged as «احتمالِ حق‌الناس» — the machine holds no verdict.
+    # ── Emails needing action — plainly routed, no moral labels ─────────────
+    # Order matters (the broker-email fix): an automated financial notification
+    # is checked FIRST — a margin call from a named broker address is a machine
+    # alert about the owner's OWN account, not a person awaiting a reply. Then
+    # a real human awaiting a reply is surfaced as «یک نفر منتظرته»; the rest is
+    # a machine pile. Deduped by subject so five copies collapse to one.
     try:
         from app.models.personal_sync import PersonalEmail
         from app.services.google_sync.person_ingest import _is_human
@@ -734,19 +718,16 @@ async def build_sahat_map(
             if _RE_FIN_ALERT.search(f"{e.subject or ''} {e.snippet or ''}"):
                 cells["mohit"]["total"] += 1
                 if not dup:
-                    att("mohit", f"هشدارِ مالیِ حسابِ خودم: {subj}", W_ZARAR_KHOD, "/",
-                        kind="zarar")
+                    att("mohit", f"هشدارِ مالیِ حسابت: {subj}", U_OVERDUE, "/", kind="overdue")
             elif _is_human(e):
                 cells["digaran"]["total"] += 1
                 if not dup:
-                    att("digaran", f"پاسخِ معطلِ یک انسان: {subj}", W_HAQ_NAS, "/",
-                        kind="haq_probable")
+                    att("digaran", f"پاسخِ معطلِ یک نفر: {subj}", U_WAITING, "/", kind="waiting")
             else:
                 auto_other += 1
         if auto_other:
             cells["mohit"]["total"] += auto_other
-            att("mohit", f"{auto_other} اعلانِ ماشینیِ دیگر (بدونِ حقِ کسی)", W_CLUTTER, "/",
-                kind="clutter")
+            att("mohit", f"{auto_other} اعلانِ ماشینیِ دیگر", U_PILE, "/", kind="pile")
     except Exception as exc:
         logger.debug("sahat emails skipped: %r", exc)
 
@@ -780,8 +761,8 @@ async def build_sahat_map(
             except ValueError:
                 pass
             if expired:
-                att("mohit", f"سندِ منقضی: {doc.full_name or 'سند'}", W_ZARAR_KHOD, "/life-file",
-                    kind="zarar")
+                att("mohit", f"سندِ منقضی: {doc.full_name or 'سند'}", U_OVERDUE, "/life-file",
+                    kind="overdue")
             else:
                 cells["mohit"]["done"] += 1
             if detail and len(docs_detail) < 10:
@@ -815,8 +796,8 @@ async def build_sahat_map(
         ).scalars().first()
         payable = float(getattr(rta, "fines_payable", 0) or 0) if rta is not None else 0
         if payable > 0:
-            att("mohit", f"جریمهٔ پرداختنیِ RTA ({payable:g})", W_ZARAR_KHOD, "/life-file",
-                kind="zarar")
+            att("mohit", f"جریمهٔ پرداختنیِ RTA ({payable:g})", U_OVERDUE, "/life-file",
+                kind="overdue")
     except Exception as exc:
         logger.debug("sahat rta skipped: %r", exc)
 
@@ -852,8 +833,8 @@ async def build_sahat_map(
         if inbox_pending:
             cells["mohit"]["total"] += int(inbox_pending)
             if inbox_pending > 10:
-                att("mohit", f"{inbox_pending} موردِ تلنبارشده در صندوقِ ورودی", W_CLUTTER, "/",
-                    kind="clutter")
+                att("mohit", f"{inbox_pending} موردِ تلنبارشده در صندوقِ ورودی", U_PILE, "/",
+                    kind="pile")
     except Exception as exc:
         logger.debug("sahat inbox skipped: %r", exc)
 
@@ -872,7 +853,8 @@ async def build_sahat_map(
                 created = created.replace(tzinfo=timezone.utc)
             age_days = (datetime.now(timezone.utc) - created).days
             if age_days > 14:
-                att("khod_aql", f"تمرینِ هوش {age_days} روز است به‌روز نشده", W_GROWTH, "/brain")
+                att("khod_aql", f"تمرینِ هوش {age_days} روز است به‌روز نشده", U_STALE, "/brain",
+                    kind="stale")
     except Exception as exc:
         logger.debug("sahat brain skipped: %r", exc)
 

@@ -1,5 +1,6 @@
-"""نقشهٔ ساحت‌ها — every entity buckets under a human dimension; weights are
-principled (حق‌الناس > اضرار به نفس > رشد > لغو); the backbone lists pin."""
+"""خداشهر — every entity buckets under a human dimension (placement), gets
+staged and tracked; the map is a CALM organizer, never a judge (no moral
+labels). Staging (مرحله‌بندی) is the «نخِ تسبیح» done right."""
 import datetime as dt
 
 import pytest
@@ -57,9 +58,11 @@ async def test_map_buckets_everything_and_weights(db_session):
     by_key = {s["key"]: s for s in data["sahats"]}
     assert set(by_key) == set(ss.SAHATS)
 
-    # حق‌الناس: the overdue person-linked task shows in دیگران at weight 5
+    # the overdue person-linked task shows in دیگران, plainly (someone waiting)
     dig = by_key["digaran"]
-    assert any(a["weight"] == ss.W_HAQ_NAS and "تحویل پروژه" in a["label"] for a in dig["attention"])
+    assert any(a["kind"] == "waiting" and "تحویل پروژه" in a["label"] for a in dig["attention"])
+    # no moral verdict is ever attached
+    assert not any(a["kind"] in ("haq_probable", "zarar", "selleh") for a in dig["attention"])
 
     # backbone pinned under خدا with progress 1/2
     khoda = by_key["khoda"]
@@ -74,17 +77,15 @@ async def test_map_buckets_everything_and_weights(db_session):
 
 
 @pytest.mark.asyncio
-async def test_haq_nas_test_applied_to_emails(db_session):
-    """The حق‌الناس TEST (owner's correction): only a real HUMAN awaiting a
-    reply engages another person's right. A broker margin-call alert is
-    اضرار به مالِ خود (محیط), never حق‌الناس — and duplicates collapse."""
+async def test_emails_routed_plainly_no_verdict(db_session):
+    """Emails are surfaced by NATURE, no moral label: a human awaiting a reply
+    → «یک نفر منتظرته» (دیگران); a broker margin-call alert → account notice
+    (محیط), deduped; nothing is ever branded حق‌الناس."""
     from app.models.personal_sync import PersonalEmail
 
     db_session.add_all([
-        # a human waiting for a reply → دیگران / حق‌الناس
         PersonalEmail(id="h1", from_addr="Ali Rezaei <ali.rezaei@gmail.com>",
                       subject="جواب پروژه رو میدی؟", needs_action=True),
-        # five copies of the same automated margin alert → محیط / ضرر به مالِ خود، یک‌بار
         *[
             PersonalEmail(id=f"m{i}", from_addr="noreply@xm.com",
                           subject="Margin Call Notification Alert 8023605", needs_action=True)
@@ -95,17 +96,17 @@ async def test_haq_nas_test_applied_to_emails(db_session):
 
     data = await ss.build_sahat_map(db_session, 0)
     by_key = {s["key"]: s for s in data["sahats"]}
-
     dig_att = by_key["digaran"]["attention"]
     mohit_att = by_key["mohit"]["attention"]
-    # human → حق‌الناس in دیگران
-    assert any(a["weight"] == ss.W_HAQ_NAS and "جواب پروژه" in a["label"] for a in dig_att)
-    # margin alerts NEVER appear as حق‌الناس anywhere
-    assert not any("Margin" in a["label"] and a["weight"] == ss.W_HAQ_NAS
-                   for a in dig_att + mohit_att)
-    # they appear ONCE in محیط as ضرر به مالِ خود (deduped by subject)
+
+    # human awaiting a reply → دیگران, kind "waiting"
+    assert any(a["kind"] == "waiting" and "جواب پروژه" in a["label"] for a in dig_att)
+    # margin alerts stay OUT of دیگران and carry no moral kind
+    assert not any("Margin" in a["label"] for a in dig_att)
+    assert not any(a["kind"] in ("haq_probable", "zarar") for a in dig_att + mohit_att)
+    # deduped to ONE row in محیط
     margin_rows = [a for a in mohit_att if "Margin" in a["label"]]
-    assert len(margin_rows) == 1 and margin_rows[0]["weight"] == ss.W_ZARAR_KHOD
+    assert len(margin_rows) == 1
 
 
 @pytest.mark.asyncio
@@ -154,11 +155,11 @@ def test_map_endpoint(api_client):
 
 
 @pytest.mark.asyncio
-async def test_no_automatic_haq_nas(db_session):
-    """Owner's correction («احمقانه کار نباید انجام بشه»): an ordinary overdue
-    project task and a lapsed CRM follow-up are NOT حق‌الناس. The machine only
-    flags «احتمالِ حق‌الناس» when a real person is linked AND the text carries
-    a promise/debt marker."""
+async def test_no_moral_labels_anywhere(db_session):
+    """Owner's third correction («اصلا اینا رو ول کن»): NOTHING is ever branded
+    حق‌الناس/رشد/اتلاف. An overdue project task and a lapsed follow-up are
+    surfaced plainly — overdue is «عقب‌افتاده», a follow-up is «منتظرته» — with
+    no fiqhi kind on any attention item in any sahat."""
     from app.models.person import Person
     from app.models.project import Project
 
@@ -172,21 +173,20 @@ async def test_no_automatic_haq_nas(db_session):
     await db_session.commit()
 
     data = await ss.build_sahat_map(db_session, 0)
+    moral = {"haq_probable", "ahd", "zarar", "selleh", "growth", "clutter"}
+    calm = {"overdue", "waiting", "soon", "stale", "pile"}
+    for s in data["sahats"]:
+        for a in s["attention"]:
+            assert a["kind"] in calm and a["kind"] not in moral
     dig = next(s for s in data["sahats"] if s["key"] == "digaran")
-    # overdue project task → رشد (۳)، نه حق‌الناس
-    row = next(a for a in dig["attention"] if "نوشتن ماژول" in a["label"])
-    assert row["weight"] == ss.W_GROWTH and row["kind"] == "growth"
-    # lapsed follow-up → صله و پیگیریِ رابطه (۳)، نه حق‌الناس
-    row2 = next(a for a in dig["attention"] if "حسین" in a["label"])
-    assert row2["weight"] == ss.W_GROWTH and row2["kind"] == "selleh"
-    assert not any(a["kind"] == "haq_probable" for a in dig["attention"])
+    assert next(a for a in dig["attention"] if "نوشتن ماژول" in a["label"])["kind"] == "overdue"
+    assert next(a for a in dig["attention"] if "حسین" in a["label"])["kind"] == "waiting"
 
 
 @pytest.mark.asyncio
 async def test_fin_alert_beats_human_looking_sender(db_session):
-    """The broker-email mistake, root-caused: a margin call sent from a NAMED
-    address («John Smith <john@brokerx.com>») is still a machine alert about
-    my OWN wealth — the financial-alert test runs BEFORE the human test."""
+    """The broker-email fix stays: a margin call from a NAMED address is routed
+    to «محیط» (own account), not mistaken for a person awaiting a reply."""
     from app.models.personal_sync import PersonalEmail
 
     db_session.add(PersonalEmail(
@@ -198,8 +198,8 @@ async def test_fin_alert_beats_human_looking_sender(db_session):
     data = await ss.build_sahat_map(db_session, 0)
     mohit = next(s for s in data["sahats"] if s["key"] == "mohit")
     dig = next(s for s in data["sahats"] if s["key"] == "digaran")
-    assert any(a["kind"] == "zarar" and "هشدارِ مالی" in a["label"] for a in mohit["attention"])
-    assert not any(a["kind"] == "haq_probable" for a in dig["attention"])
+    assert any("هشدارِ مالی" in a["label"] for a in mohit["attention"])
+    assert not any("Margin" in a["label"] or "هشدار" in a["label"] for a in dig["attention"])
 
 
 @pytest.mark.asyncio
@@ -305,3 +305,64 @@ def test_threads_endpoints(api_client):
     assert r3.status_code == 200
     row = next(t for t in api_client.get("/api/sahat/threads").json()["threads"] if t["id"] == tid)
     assert row["is_active"] is False
+
+
+# ── مرحله‌بندی (staging) + auto-placement — the «heart» iteration ────────────
+
+
+def test_steps_util_split_and_progress():
+    from app.services import steps_util as su
+
+    steps = su.split_into_steps("ارسال جنس به ایران", "خرید بسته\nبسته‌بندی\nتحویل به پست")
+    assert [s["text"] for s in steps] == ["خرید بسته", "بسته‌بندی", "تحویل به پست"]
+    prog = su.steps_progress([{"text": "a", "done": True}, {"text": "b", "done": False}])
+    assert prog["steps_total"] == 2 and prog["steps_done"] == 1 and prog["current_step"] == "b"
+    # single-line blob falls back to sentence-ish splitting; never raises
+    assert su.split_into_steps("فقط یک کار", None)
+    assert su.split_into_steps(None, None) == []
+
+
+def test_task_steps_endpoints(api_client):
+    tid = api_client.post("/api/tasks", json={"title": "راه‌اندازی سایت"}).json()["id"]
+    # generate breaks it into stages (heuristic, keyless)
+    r = api_client.post(
+        f"/api/tasks/{tid}/steps",
+        json={"steps": ["ثبت دامنه", "طراحی", "انتشار"]},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["steps_total"] == 3 and body["steps_done"] == 0
+    assert body["current_step"] == "ثبت دامنه"
+    # tick the first step → progress advances, next step moves on
+    r2 = api_client.post(f"/api/tasks/{tid}/steps/toggle", json={"index": 0, "done": True})
+    b2 = r2.json()
+    assert b2["steps_done"] == 1 and b2["current_step"] == "طراحی"
+    # the list endpoint carries the staging fields too
+    row = next(t for t in api_client.get("/api/tasks").json() if t["id"] == tid)
+    assert row["steps_total"] == 3 and row["steps_done"] == 1
+
+
+def test_task_steps_generate_is_fill_empty(api_client):
+    tid = api_client.post(
+        "/api/tasks",
+        json={"title": "کار", "description": "قدم اول\nقدم دوم"},
+    ).json()["id"]
+    first = api_client.post(f"/api/tasks/{tid}/steps/generate").json()
+    assert first["steps_total"] == 2
+    # a second generate must NOT overwrite an already-staged task
+    api_client.post(f"/api/tasks/{tid}/steps/toggle", json={"index": 0, "done": True})
+    again = api_client.post(f"/api/tasks/{tid}/steps/generate").json()
+    assert again["steps_done"] == 1  # untouched
+
+
+@pytest.mark.asyncio
+async def test_capture_auto_places_task_under_sahat(db_session):
+    """Every captured input lands in its district «مثل آب خوردن» — the filer
+    stamps a sahat from the content (owner-correctable later)."""
+    from app.services import inbox_service as ib
+
+    res = await ib._file_as_task(db_session, {"title": "خواندن کتاب فلسفه"}, 0)
+    from app.models.task import Task
+
+    t = await db_session.get(Task, res["id"])
+    assert t.sahat == "khod_aql"  # placed automatically, no manual tagging

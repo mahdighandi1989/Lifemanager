@@ -62,7 +62,7 @@ function Attention({ s }) {
   if (!(s.attention || []).length) return null;
   return (
     <div className="space-y-1">
-      <p className="text-[11px] font-medium text-gray-500">نیازمندِ توجه:</p>
+      <p className="text-[11px] font-medium text-gray-500">منتظرِ پیگیری:</p>
       {s.attention.map((a, i) => (
         <Link
           key={i}
@@ -73,7 +73,7 @@ function Attention({ s }) {
           <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
             ATTENTION_KIND_CLS[a.kind] || 'bg-amber-100 text-amber-700'
           }`}>
-            {a.kind_fa || 'رشد'}
+            {a.kind_fa || 'پیگیری'}
           </span>
         </Link>
       ))}
@@ -87,7 +87,7 @@ function Progress({ s, color }) {
   return (
     <div>
       <div className="flex items-center justify-between text-[11px] text-gray-500">
-        <span>پیگیریِ عمل</span>
+        <span>پیشرفت</span>
         <span dir="ltr">{s.done}/{s.total}</span>
       </div>
       <div className="mt-1 h-2 w-full rounded-full bg-gray-100">
@@ -210,9 +210,9 @@ function SahatMap() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">🏙 خداشهر — نقشهٔ زندگی</h1>
           <p className="mt-1 text-sm text-gray-500">
-            همه‌چیز — از عبادت تا مباح‌ترین کارِ روزمره — ذیلِ ساحت‌های انسان: قبلهٔ شهر
-            رابطه با خداست و بدنهٔ شهر، خود و دیگران و محیط. ماشین فقط عمل و پیگیری را
-            می‌سنجد؛ <b>نیت هرگز امتیاز نمی‌گیرد</b> و هیچ برچسبِ فقهی‌ای حکمِ قطعی نیست.
+            هر چیزی که وارد زندگیت می‌شود — کار، نوشته، مالی، افراد، اسناد — این‌جا سرِ
+            جای خودش می‌نشیند و می‌بینی هرکدام چقدر جلو رفته. نه امتیازِ اخلاقی، نه
+            برچسب؛ فقط یک نقشهٔ آرام که همه‌چیز را جمع‌وجور نگه می‌دارد.
           </p>
         </div>
         <button
@@ -251,8 +251,8 @@ function SahatMap() {
             </div>
             {weakest && (
               <p className="mt-3 text-center text-xs text-gray-500">
-                ضعیف‌ترین ساحتِ این لحظه:{' '}
-                <b>{sahats.find((s) => s.key === weakest)?.title}</b> — محاسبهٔ هفتگی را از همین‌جا شروع کن.
+                کم‌ترین پیشرفت این لحظه:{' '}
+                <b>{sahats.find((s) => s.key === weakest)?.title}</b> — شاید بد نباشه از همین‌جا شروع کنی.
               </p>
             )}
           </div>

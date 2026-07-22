@@ -122,7 +122,7 @@ function CellBlock({ s, onThreadsChanged }) {
       {pct != null && (
         <div>
           <div className="flex items-center justify-between text-[11px] text-gray-500">
-            <span>پیگیریِ عمل</span>
+            <span>پیشرفت</span>
             <span dir="ltr">{s.done}/{s.total}</span>
           </div>
           <div className="mt-1 h-2 w-full rounded-full bg-gray-100">
@@ -132,7 +132,7 @@ function CellBlock({ s, onThreadsChanged }) {
       )}
 
       {(s.attention || []).length > 0 && (
-        <Section title="نیازمندِ توجه:">
+        <Section title="منتظرِ پیگیری:">
           {s.attention.map((a, i) => (
             <Link
               key={i}
@@ -141,7 +141,7 @@ function CellBlock({ s, onThreadsChanged }) {
             >
               <span className="truncate">{a.label}</span>
               <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${ATTENTION_KIND_CLS[a.kind] || 'bg-amber-100 text-amber-700'}`}>
-                {a.kind_fa || 'رشد'}
+                {a.kind_fa || 'پیگیری'}
               </span>
             </Link>
           ))}
@@ -192,7 +192,14 @@ function CellBlock({ s, onThreadsChanged }) {
             {d.tasks.slice(0, 15).map((t) => (
               <Link key={t.id} to="/tasks" className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-xs text-gray-700 hover:bg-gray-50">
                 <span className="truncate">{t.title}</span>
-                {t.overdue && <span className="shrink-0 rounded-full bg-red-50 px-1.5 text-[10px] text-red-600">عقب‌افتاده</span>}
+                <span className="flex shrink-0 items-center gap-1.5">
+                  {t.steps_total > 0 && (
+                    <span className="rounded-full bg-blue-50 px-1.5 text-[10px] text-blue-600" dir="ltr">
+                      {t.steps_done}/{t.steps_total} مرحله
+                    </span>
+                  )}
+                  {t.overdue && <span className="rounded-full bg-red-50 px-1.5 text-[10px] text-red-600">عقب‌افتاده</span>}
+                </span>
               </Link>
             ))}
             {d.tasks.length > 15 && (

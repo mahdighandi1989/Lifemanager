@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 import SahatChip from '../components/SahatChip';
+import api from '../lib/api';
 
 // All task data lives under /api/tasks. The bare /tasks path is the SPA
 // route that renders this page.
@@ -55,7 +56,106 @@ const localTodayISO = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-function TaskRow({ task, onToggle }) {
+// مرحله‌بندی — calm staging for a task. Break it into ordered steps, tick them
+// off, see the next one. No «الان وقتشه» nagging; the next step is just shown.
+function TaskSteps({ task, onChanged }) {
+  const steps = task.steps || [];
+  const total = task.steps_total ?? steps.length;
+  const done = task.steps_done ?? steps.filter((s) => s.done).length;
+  const [open, setOpen] = useState(total > 0);
+  const [newStep, setNewStep] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const apply = (res) => { if (res?.data && onChanged) onChanged(res.data); };
+
+  const generate = async () => {
+    setBusy(true);
+    try { apply(await api.post(`/tasks/${task.id}/steps/generate`)); }
+    catch { /* best-effort */ } finally { setBusy(false); setOpen(true); }
+  };
+  const toggle = async (index, isDone) => {
+    try { apply(await api.post(`/tasks/${task.id}/steps/toggle`, { index, done: !isDone })); }
+    catch { /* best-effort */ }
+  };
+  const addStep = async (e) => {
+    e.preventDefault();
+    if (!newStep.trim()) return;
+    setBusy(true);
+    const next = [...steps.map((s) => ({ text: s.text, done: s.done })), { text: newStep.trim(), done: false }];
+    try { apply(await api.post(`/tasks/${task.id}/steps`, { steps: next })); setNewStep(''); }
+    catch { /* best-effort */ } finally { setBusy(false); }
+  };
+
+  if (total === 0 && !open) {
+    return (
+      <div className="mt-2 flex items-center gap-2 pr-8">
+        <button
+          type="button"
+          onClick={generate}
+          disabled={busy}
+          data-testid={`task-stage-${task.id}`}
+          className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[11px] text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+        >
+          🪜 مرحله‌بندی کن
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-[11px] text-gray-400 hover:text-gray-600"
+        >
+          یا دستی اضافه کن
+        </button>
+      </div>
+    );
+  }
+
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return (
+    <div className="mt-2 pr-8 space-y-1.5" data-testid={`task-steps-${task.id}`}>
+      {total > 0 && (
+        <div>
+          <div className="flex items-center justify-between text-[11px] text-gray-500">
+            <span>مرحله‌ها</span>
+            <span dir="ltr">{done}/{total}</span>
+          </div>
+          <div className="mt-1 h-1.5 w-full rounded-full bg-gray-100">
+            <div className="h-1.5 rounded-full bg-blue-500" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      )}
+      {steps.map((s, i) => (
+        <label key={i} className="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={!!s.done}
+            onChange={() => toggle(i, s.done)}
+            className="mt-0.5"
+            data-testid={`task-step-toggle-${task.id}-${i}`}
+          />
+          <span className={s.done ? 'line-through text-gray-400' : ''}>{s.text}</span>
+        </label>
+      ))}
+      <form onSubmit={addStep} className="flex items-center gap-2">
+        <input
+          value={newStep}
+          onChange={(e) => setNewStep(e.target.value)}
+          placeholder="یک مرحلهٔ دیگر…"
+          className="flex-1 rounded-md border border-gray-200 px-2 py-1 text-xs"
+        />
+        <button type="submit" disabled={busy} className="rounded-md bg-gray-100 px-2 py-1 text-[11px] text-gray-600 disabled:opacity-50">
+          افزودن
+        </button>
+        {total === 0 && (
+          <button type="button" onClick={generate} disabled={busy} className="rounded-md px-2 py-1 text-[11px] text-blue-600 disabled:opacity-50">
+            🪜 خودکار
+          </button>
+        )}
+      </form>
+    </div>
+  );
+}
+
+function TaskRow({ task, onToggle, onChanged }) {
   // Default to the backend's canonical "todo" sentinel when no
   // status is set (e.g. a task created before the column existed).
   const status = task.status || (task.is_completed ? 'done' : 'todo');
@@ -69,7 +169,8 @@ function TaskRow({ task, onToggle }) {
       ? task.priority
       : null;
   return (
-    <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+    <div className="p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+      <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">
         <button
           onClick={() => onToggle(task.id, status)}
@@ -126,6 +227,8 @@ function TaskRow({ task, onToggle }) {
           {STATUS_LABELS[status] || status}
         </span>
       </div>
+      </div>
+      {!isDone && <TaskSteps task={task} onChanged={onChanged} />}
     </div>
   );
 }
@@ -441,7 +544,14 @@ function Tasks() {
             </div>
           ) : (
             filtered.map(task => (
-              <TaskRow key={task.id} task={task} onToggle={handleToggle} />
+              <TaskRow
+                key={task.id}
+                task={task}
+                onToggle={handleToggle}
+                onChanged={(updated) =>
+                  setTasks((prev) => prev.map((t) => (t.id === updated.id ? { ...t, ...updated } : t)))
+                }
+              />
             ))
           )}
         </div>

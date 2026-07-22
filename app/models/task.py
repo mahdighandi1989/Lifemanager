@@ -83,6 +83,11 @@ class Task(Base):
     # "interval": 1, "byweekday": ["MO", "WE"]}) so the planner can
     # expand recurring tasks without a separate recurrence table.
     recurrence = Column(JSON, nullable=True)
+    # مرحله‌بندی (2026-07-22): an ordered list of concrete steps, each
+    # ``{"text": str, "done": bool}`` — the «نخِ تسبیح» done right: any input
+    # can be broken into trackable stages and its progress followed, calmly,
+    # without turning it into a preachy daily command. NULL = not staged yet.
+    steps = Column(JSON, nullable=True)
     # attachment is a storage key resolved by app/services/__init__.py's
     # get_storage_backend() — opaque to the database. Production deploys
     # set STORAGE_BACKEND=s3 to route reads/writes through S3Storage.

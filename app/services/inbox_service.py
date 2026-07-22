@@ -249,6 +249,18 @@ def _to_task_priority(value: str):
     }.get(value, TaskPriority.MEDIUM)
 
 
+def _auto_sahat(text: str) -> Optional[str]:
+    """خداشهر: place a captured input under a sahat automatically at filing
+    time, so it lands in its district «مثل آب خوردن». Owner-correctable later
+    via the chip. Best-effort — never blocks a capture."""
+    try:
+        from app.services.sahat_service import classify_text
+
+        return classify_text(text)
+    except Exception:
+        return None
+
+
 async def _file_as_task(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
     from app.models.task import Task, TaskStatus
 
@@ -259,6 +271,7 @@ async def _file_as_task(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Di
         priority=_to_task_priority(s.get("priority", "normal")),
         user_id=user_id,
         due_date=_norm_date(s.get("due_date")),
+        sahat=_auto_sahat(f"{s.get('title', '')} {s.get('description', '')}"),
     )
     db.add(task)
     await db.flush()

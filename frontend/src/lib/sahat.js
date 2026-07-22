@@ -47,15 +47,14 @@ export const DISTRICTS = [
   { key: 'mohit', fa: 'محیط و اموال', icon: '🌍' },
 ];
 
-// Honest severity badges — the machine flags PROBABILITY, never a verdict.
-// kind comes from the backend attention item; kind_fa is its label.
+// Plain, non-judging badges — labelled by NATURE, not by a moral verdict.
+// kind comes from the backend attention item; kind_fa is its calm label.
 export const ATTENTION_KIND_CLS = {
-  haq_probable: 'bg-red-100 text-red-700',
-  ahd: 'bg-orange-100 text-orange-700',
-  zarar: 'bg-orange-100 text-orange-700',
-  selleh: 'bg-pink-100 text-pink-700',
-  growth: 'bg-amber-100 text-amber-700',
-  clutter: 'bg-gray-100 text-gray-600',
+  overdue: 'bg-red-100 text-red-700',
+  waiting: 'bg-amber-100 text-amber-700',
+  soon: 'bg-amber-100 text-amber-700',
+  stale: 'bg-gray-100 text-gray-600',
+  pile: 'bg-gray-100 text-gray-500',
 };
 
 export function scoreColor(s) {

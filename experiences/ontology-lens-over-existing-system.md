@@ -195,3 +195,42 @@ corrections generalize far beyond this repo:
    thread («نخِ تسبیح») registry moved to a table (code list = seed + keyless
    fallback, soft deactivate) with tiny CRUD + an add-form on the district
    page — «I added something new» must never require a deploy.
+
+## Update 2026-07-22 — the owner rejected v2 too («stop building a mosque»): drop the worldview's *verdicts*, keep its *skeleton*
+
+Even after making the ontology persistent + correctable, the owner was more
+angry, not less: «باز اومدی مسجد درست کردی، هی حق‌الناس... چرا طبیعی رفتار
+نمی‌کنی؟». The mistake was subtle and worth naming precisely, because it recurs
+whenever a system encodes someone's values:
+
+1. **Encode the worldview's STRUCTURE, never its JUDGMENTS.** The owner wanted
+   everything to *sit under* their dimensions (a skeleton), NOT to be morally
+   *scored* by them. A severity ladder derived from the value system
+   (obligation > harm > growth > waste) — even a careful, tested one — is the
+   machine issuing verdicts the worldview reserves for the person. Rip the
+   moral vocabulary out entirely; label attention items by their plain NATURE
+   (overdue / someone-waiting / stale / piled-up). Keep an internal numeric
+   *urgency* only to order «what needs you first», never shown as a class.
+2. **Most of life is neutral; don't force a moral valence.** The owner's own
+   words: most acts are مباح (neither duty-to-others nor duty-to-God); context
+   *the machine cannot see* is the only thing that could ever raise one to a
+   duty. Any classifier that assigns moral weight by default is wrong by
+   construction — it will brand a broker's unanswered email a sin. Default to
+   neutral; let the human supply the valence when it exists.
+3. **The value the person actually wants is rarely the scoring — it's the
+   effortless ORGANIZING + STAGING + TRACKING they can't do by hand.** «همه
+   ورودی‌هام راحت مثل آب خوردن سرِ جاش بشینه، مرحله‌بندی بشه، پیگیری بشه — نه یه
+   عنوانِ درشت که بگه الان وقتشه.» They can already tell themselves what to do;
+   what they can't do is keep every scattered input placed, broken into
+   trackable stages, and followed up. Build THAT. A big «now do X» headline is
+   worse than nothing — it's the system pretending to add value while adding
+   noise.
+4. **«نخِ تسبیح» meant DECOMPOSITION, not tagging.** The through-line the owner
+   asked for is: take an input and break it into an ordered, tickable spine of
+   stages you can follow — reuse the app's existing step/checklist mechanism,
+   expose it on *any* actionable entity, and show the next step as calm INFO,
+   not a nag. Keyword-tagging was the shallow misread; staging is the real ask.
+5. **When you've been wrong twice, prove understanding BEFORE building a third
+   time.** A single well-framed reflect-and-confirm (say back their vision in
+   their own words; pick the starting point) is worth more than another
+   confident wrong build. Being understood was itself the relief they needed.

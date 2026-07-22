@@ -154,9 +154,17 @@ def _serialize(t: Task) -> dict:
         "deadline": t.deadline.isoformat() if t.deadline else None,
         "estimated_duration": t.estimated_duration,
         "recurrence": t.recurrence,
+        # مرحله‌بندی — the calm staging progress (نخِ تسبیح done right).
+        **_steps_fields(t),
         "created_at": t.created_at.isoformat() if t.created_at else None,
         "updated_at": t.updated_at.isoformat() if t.updated_at else None,
     }
+
+
+def _steps_fields(t: Task) -> dict:
+    from app.services.steps_util import steps_progress
+
+    return steps_progress(getattr(t, "steps", None))
 
 
 # --- SEARCH (parameterised — SQL injection is structurally impossible) ----
@@ -387,6 +395,16 @@ async def delete_task(
 from pydantic import BaseModel  # noqa: E402
 
 
+class _StepsBody(BaseModel):
+    # Accept either plain strings or {text, done} objects.
+    steps: List = []
+
+
+class _StepToggle(BaseModel):
+    index: int
+    done: bool = True
+
+
 class _PersonLinkRequest(BaseModel):
     person_ids: List[int] = []
 
@@ -465,3 +483,69 @@ async def task_persons_list(
         "task_id": task_id,
         "persons": [{"id": p.id, "name": p.name} for p in rows],
     }
+
+
+# --- مرحله‌بندی (staging) — the «نخِ تسبیح» done right, on any task ------------
+# Break an input into ordered, trackable stages and follow them, calmly. No
+# daily-command nagging, no «الان وقتشه» — just the next concrete step as info.
+
+
+@router.post("/api/tasks/{task_id}/steps", tags=["tasks"])
+@handle_errors
+async def set_task_steps(
+    task_id: int,
+    payload: _StepsBody,
+    db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Set (or replace) a task's steps. Accepts plain strings or {text, done}."""
+    from app.services.steps_util import clean_steps
+
+    task = await db.get(Task, task_id)
+    if task is None or not _task_visible_to(task, caller_user_id):
+        raise HTTPException(status_code=404, detail="Task not found")
+    task.steps = clean_steps(payload.steps)
+    await db.commit()
+    await db.refresh(task)
+    return {"ok": True, "success": True, **_serialize(task)}
+
+
+@router.post("/api/tasks/{task_id}/steps/generate", tags=["tasks"])
+@handle_errors
+async def generate_task_steps(
+    task_id: int,
+    db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Heuristically break the task into ordered stages (deterministic, keyless).
+    Never overwrites existing steps — only fills when empty."""
+    from app.services.steps_util import clean_steps, split_into_steps
+
+    task = await db.get(Task, task_id)
+    if task is None or not _task_visible_to(task, caller_user_id):
+        raise HTTPException(status_code=404, detail="Task not found")
+    if not clean_steps(getattr(task, "steps", None)):
+        task.steps = split_into_steps(task.title, task.description)
+        await db.commit()
+        await db.refresh(task)
+    return {"ok": True, "success": True, **_serialize(task)}
+
+
+@router.post("/api/tasks/{task_id}/steps/toggle", tags=["tasks"])
+@handle_errors
+async def toggle_task_step(
+    task_id: int,
+    payload: _StepToggle,
+    db: AsyncSession = Depends(get_db),
+    caller_user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Tick / untick one step by index."""
+    from app.services.steps_util import toggle_step
+
+    task = await db.get(Task, task_id)
+    if task is None or not _task_visible_to(task, caller_user_id):
+        raise HTTPException(status_code=404, detail="Task not found")
+    task.steps = toggle_step(getattr(task, "steps", None), payload.index, payload.done)
+    await db.commit()
+    await db.refresh(task)
+    return {"ok": True, "success": True, **_serialize(task)}
