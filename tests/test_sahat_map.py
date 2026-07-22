@@ -148,3 +148,160 @@ def test_map_endpoint(api_client):
     assert r.status_code == 200
     body = r.json()
     assert body["ok"] is True and len(body["sahats"]) == 6
+
+
+# ── خداشهر v2 — honest weights, stored-wins, districts, editable threads ─────
+
+
+@pytest.mark.asyncio
+async def test_no_automatic_haq_nas(db_session):
+    """Owner's correction («احمقانه کار نباید انجام بشه»): an ordinary overdue
+    project task and a lapsed CRM follow-up are NOT حق‌الناس. The machine only
+    flags «احتمالِ حق‌الناس» when a real person is linked AND the text carries
+    a promise/debt marker."""
+    from app.models.person import Person
+    from app.models.project import Project
+
+    yesterday = dt.date.today() - dt.timedelta(days=1)
+    proj = Project(user_id=0, name="پروژه نرم افزاری")
+    db_session.add(proj)
+    await db_session.flush()
+    db_session.add(Task(user_id=0, title="نوشتن ماژول جدید", status=TaskStatus.TODO,
+                        due_date=yesterday, project_id=proj.id))
+    db_session.add(Person(user_id=0, name="حسین", next_follow_up=yesterday))
+    await db_session.commit()
+
+    data = await ss.build_sahat_map(db_session, 0)
+    dig = next(s for s in data["sahats"] if s["key"] == "digaran")
+    # overdue project task → رشد (۳)، نه حق‌الناس
+    row = next(a for a in dig["attention"] if "نوشتن ماژول" in a["label"])
+    assert row["weight"] == ss.W_GROWTH and row["kind"] == "growth"
+    # lapsed follow-up → صله و پیگیریِ رابطه (۳)، نه حق‌الناس
+    row2 = next(a for a in dig["attention"] if "حسین" in a["label"])
+    assert row2["weight"] == ss.W_GROWTH and row2["kind"] == "selleh"
+    assert not any(a["kind"] == "haq_probable" for a in dig["attention"])
+
+
+@pytest.mark.asyncio
+async def test_fin_alert_beats_human_looking_sender(db_session):
+    """The broker-email mistake, root-caused: a margin call sent from a NAMED
+    address («John Smith <john@brokerx.com>») is still a machine alert about
+    my OWN wealth — the financial-alert test runs BEFORE the human test."""
+    from app.models.personal_sync import PersonalEmail
+
+    db_session.add(PersonalEmail(
+        id="b1", from_addr="John Smith <john.smith@brokerx.com>",
+        subject="Margin call: insufficient balance", needs_action=True,
+    ))
+    await db_session.commit()
+
+    data = await ss.build_sahat_map(db_session, 0)
+    mohit = next(s for s in data["sahats"] if s["key"] == "mohit")
+    dig = next(s for s in data["sahats"] if s["key"] == "digaran")
+    assert any(a["kind"] == "zarar" and "هشدارِ مالی" in a["label"] for a in mohit["attention"])
+    assert not any(a["kind"] == "haq_probable" for a in dig["attention"])
+
+
+@pytest.mark.asyncio
+async def test_stored_sahat_wins_over_classifier(db_session):
+    """The owner's correction is final: a stored sahat beats every keyword."""
+    t = Task(user_id=0, title="خواندن کتاب", status=TaskStatus.TODO, sahat="khoda")
+    lst = TodoList(user_id=0, name="لیست خرید", sahat="khod_aql")
+    db_session.add_all([t, lst])
+    await db_session.commit()
+
+    assert ss.effective_task_sahat(t) == "khoda"       # keyword would say عقل
+    assert ss.effective_list_sahat(lst) == "khod_aql"  # keyword would say محیط
+    data = await ss.build_sahat_map(db_session, 0)
+    khoda = next(s for s in data["sahats"] if s["key"] == "khoda")
+    assert khoda["total"] >= 1  # the reassigned task counts under خدا
+
+
+@pytest.mark.asyncio
+async def test_writing_is_presence_not_achievement(db_session):
+    """v1 scored every writing as done/total (a fake 100%). v2 counts content
+    MASS — a writing never inflates the follow-through score."""
+    db_session.add(PersonalWriting(user_id=0, title="جستاری دربارهٔ کتاب", body="..."))
+    await db_session.commit()
+
+    data = await ss.build_sahat_map(db_session, 0)
+    aql = next(s for s in data["sahats"] if s["key"] == "khod_aql")
+    assert aql["writings"] == 1
+    assert aql["total"] == 0 and aql["done"] == 0
+
+
+@pytest.mark.asyncio
+async def test_assign_and_db_thread_accretion(db_session):
+    """assign_sahat persists the correction; a NEW DB-registry thread accretes
+    matching content with no code change."""
+    t = Task(user_id=0, title="کاری بدون نشانه", status=TaskStatus.TODO)
+    db_session.add(t)
+    await db_session.commit()
+
+    assert await ss.assign_sahat(db_session, 0, "task", t.id, "mohit") is True
+    await db_session.refresh(t)
+    assert t.sahat == "mohit" and ss.effective_task_sahat(t) == "mohit"
+    with pytest.raises(ValueError):
+        await ss.assign_sahat(db_session, 0, "task", t.id, "ناشناخته")
+    assert await ss.assign_sahat(db_session, 0, "task", 999999, "khoda") is False
+
+    from app.models.sahat_thread import SahatThread
+
+    db_session.add(SahatThread(user_id=None, key="tarikh_anbia", title="تاریخ انبیا",
+                               sahat="khoda", tokens=["انبیا"], link="/lists", sort_order=99))
+    db_session.add(TodoList(user_id=0, name="تاریخ انبیا"))
+    await db_session.commit()
+
+    data = await ss.build_sahat_map(db_session, 0)
+    khoda = next(s for s in data["sahats"] if s["key"] == "khoda")
+    th = next(x for x in khoda["threads"] if x["key"] == "tarikh_anbia")
+    assert th["lists"] == 1
+
+
+@pytest.mark.asyncio
+async def test_district_builder(db_session):
+    """'khod' aggregates the three facets; unknown keys return None."""
+    db_session.add(Task(user_id=0, title="ورزش صبح", status=TaskStatus.TODO))
+    await db_session.commit()
+
+    d = await ss.build_sahat_district(db_session, 0, "khod")
+    assert d is not None
+    assert {s["key"] for s in d["sahats"]} == {"khod_ravan", "khod_aql", "khod_jesm"}
+    jesm = next(s for s in d["sahats"] if s["key"] == "khod_jesm")
+    assert any(t["title"] == "ورزش صبح" for t in jesm["detail"]["tasks"])
+    assert await ss.build_sahat_district(db_session, 0, "nope") is None
+
+
+def test_district_and_assign_endpoints(api_client):
+    r = api_client.get("/api/sahat/district/khod")
+    assert r.status_code == 200
+    assert {s["key"] for s in r.json()["sahats"]} == {"khod_ravan", "khod_aql", "khod_jesm"}
+    assert api_client.get("/api/sahat/district/nope").status_code == 404
+
+    tid = api_client.post("/api/tasks", json={"title": "تست ساحت"}).json()["id"]
+    r2 = api_client.post("/api/sahat/assign",
+                         json={"entity_type": "task", "entity_id": tid, "sahat": "khoda"})
+    assert r2.status_code == 200 and r2.json()["ok"] is True
+    row = next(t for t in api_client.get("/api/tasks").json() if t["id"] == tid)
+    assert row["sahat"] == "khoda" and row["sahat_source"] == "owner"
+    # unknown sahat → 422; unknown entity → 404
+    assert api_client.post("/api/sahat/assign",
+                           json={"entity_type": "task", "entity_id": tid, "sahat": "x"}).status_code == 422
+    assert api_client.post("/api/sahat/assign",
+                           json={"entity_type": "task", "entity_id": 999999, "sahat": "khoda"}).status_code == 404
+
+
+def test_threads_endpoints(api_client):
+    r = api_client.get("/api/sahat/threads")
+    assert r.status_code == 200
+    keys = {t["key"] for t in r.json()["threads"]}
+    assert {"mohasebe", "khodashenasi"} <= keys  # seeded from the code registry
+    r2 = api_client.post("/api/sahat/threads",
+                         json={"title": "خوشنویسی", "sahat": "khod_aql", "tokens": ["خوشنویسی"]})
+    assert r2.status_code == 200 and r2.json()["ok"] is True
+    tid = r2.json()["id"]
+    # soft deactivate — quarantine, not delete
+    r3 = api_client.patch(f"/api/sahat/threads/{tid}", json={"is_active": False})
+    assert r3.status_code == 200
+    row = next(t for t in api_client.get("/api/sahat/threads").json()["threads"] if t["id"] == tid)
+    assert row["is_active"] is False

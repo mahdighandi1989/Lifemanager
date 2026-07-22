@@ -145,3 +145,53 @@ weighted as "obligation to others" (حق‌الناس). The fixes are reusable r
    behind the "more" drawer (routes/testids intact, drawer auto-opens on their
    routes) — the map became the single door. Update the nav test to LOCK the
    new design, don't fight it.
+
+## Update 2026-07-22 — the owner rejected v1 («a dirty mosque»): a read-only lens is a dead lens
+
+The owner's verdict on the deployed v1 was total: the ontology page read as a
+*caricature* of the worldview («مسجد مجازی» — a virtual mosque), classification
+felt childish, and the whole thing was an ISLAND that increased disorder. The
+corrections generalize far beyond this repo:
+
+1. **A read-only, read-time-guessed ontology stays an island.** If no other
+   page shows the classification and the owner cannot correct it, the lens is
+   one dead screen. The fix has three legs, all required: (a) a nullable
+   ``<dimension>`` column on every primary content table — **stored value
+   always wins** over the classifier (fill-empty, behavior preserving);
+   (b) an *effective-dimension* field in every list serializer so every page
+   can SHOW the lens; (c) a correction chip on every row (one assign endpoint,
+   `{entity_type, entity_id, dimension}`) — the owner's correction is final
+   and immediately global. Auto-guess + owner-override is the whole design.
+2. **The machine must never issue the worldview's verdicts — only flag
+   probability.** v1 auto-labeled every overdue person/project task and every
+   lapsed CRM follow-up as the heaviest moral class (حق‌الناس). The expert saw
+   it instantly as nonsense («فکر می‌کنه من احمقم»). Rule: reserve the heaviest
+   class for narrow, marker-gated matches (person linked AND promise/debt
+   token), label it *probable* («احتمالِ …»), give every attention item a
+   ``kind`` + honest badge, and downgrade everything else (project overdue →
+   growth; follow-up → relationship upkeep). A false heavy flag costs more
+   trust than ten missed ones.
+3. **Check machine-alert patterns BEFORE the is-human heuristic.** The broker
+   margin-call regression re-appeared because a named sender
+   («John Smith <john@brokerx.com>») passed `_is_human` and the financial-alert
+   regex never ran. Order of tests IS the classifier.
+4. **Content is presence, not achievement.** v1 counted every writing as
+   done/total=1/1 («a written piece IS the artifact») → fake 100% scores.
+   Score follow-through (tasks/items/directives) only; report content as mass
+   («N writings, N projects, N files»), unscored.
+5. **A city, not a shrine: the worldview must dignify the mundane.** The owner
+   wanted a خداشهر (God-city / مدینه فاضله): the sacred relation is the qibla
+   the whole city faces — a full-width orientation band — while the BULK of
+   the map is ordinary life (trade, hobbies, errands, مباحات) standing in its
+   own districts. Extend the keyword tables with the owner's REAL data names
+   (their actual list titles), not pious vocabulary, or everything defaults
+   into the spiritual bucket and reads as caricature.
+6. **A hub without drill-down is a dead end; give every dimension a district
+   page.** One map card → `/dimension/:key` page aggregating that dimension's
+   item-level content across every entity type (with an aggregated 'self' key
+   when facets exist) — the chain map → district → thread → page/item is what
+   makes the ontology *navigation* instead of decoration.
+7. **Registries the owner must extend go in the DB, seeded from code.** The
+   thread («نخِ تسبیح») registry moved to a table (code list = seed + keyless
+   fallback, soft deactivate) with tiny CRUD + an add-form on the district
+   page — «I added something new» must never require a deploy.

@@ -1567,6 +1567,10 @@
         "file": "frontend/src/pages/DevCenter.jsx"
       },
       {
+        "name": "DirectivesPage",
+        "file": "frontend/src/pages/DirectivesPage.jsx"
+      },
+      {
         "name": "DriveFiles",
         "file": "frontend/src/pages/DriveFiles.jsx"
       },
@@ -1593,10 +1597,6 @@
       {
         "name": "Import",
         "file": "frontend/src/pages/Import.jsx"
-      },
-      {
-        "name": "DirectivesPage",
-        "file": "frontend/src/pages/DirectivesPage.jsx"
       },
       {
         "name": "LifeFilePage",
@@ -1655,6 +1655,18 @@
         "file": "frontend/src/pages/Register.jsx"
       },
       {
+        "name": "SahatDetail",
+        "file": "frontend/src/pages/SahatDetail.jsx"
+      },
+      {
+        "name": "SahatMap",
+        "file": "frontend/src/pages/SahatMap.jsx"
+      },
+      {
+        "name": "SelfPortrait",
+        "file": "frontend/src/pages/SelfPortrait.jsx"
+      },
+      {
         "name": "Settings",
         "file": "frontend/src/pages/Settings.jsx"
       },
@@ -1677,14 +1689,6 @@
       {
         "name": "Writings",
         "file": "frontend/src/pages/Writings.jsx"
-      },
-      {
-        "name": "SelfPortrait",
-        "file": "frontend/src/pages/SelfPortrait.jsx"
-      },
-      {
-        "name": "SahatMap",
-        "file": "frontend/src/pages/SahatMap.jsx"
       }
     ],
     "components": [
