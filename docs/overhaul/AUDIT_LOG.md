@@ -2010,3 +2010,31 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
   اعتبارِ template، extractِ recipe، ساختِ درخواستِ اجزا، derive+openِ خودکار). گیت سبز؛
   build سبز. امنیت: مقادیر رمزنگاری‌شده، هرگز به کلاینت برنمی‌گردند؛ derivۀ pure؛ fallbackِ
   امن روی رمزِ اشتباه.
+
+## 2026-07-22 — «خریدهایم را تحلیل کن» (فاز C): پلِ رسید→دفتر + تحلیلِ دوره‌ای + نمودار
+
+مالک: «از خریدها + درآمد + صورتحساب‌ها، درآمد/هزینه/سود/زیان را دوره‌ای بسنج و نمودار +
+اطلاعیهٔ واضح بده». نقشه‌برداری نشان داد دفترِ Transaction و تجمیعِ ماهانه از قبل بودند؛
+شکافِ اصلی = **رسیدهای استخراج‌شده هرگز تراکنش نمی‌شدند** (بن‌بست در note/document).
+
+- **CHANGE (ستون‌های رسید روی Transaction)** `occurred_on` (تاریخِ خودِ رسید)، `currency`
+  (ارزِ رسید، مستقل از حساب)، `source`/`source_ref` (ردیابی + dedup). idempotent startup
+  ALTER در main.py + migration 0050. `create_all` جدولِ موجود را alter نمی‌کند، پس ALTER لازم بود.
+- **CHANGE (پلِ رسید→دفتر)** `inbox_service._file_as_transaction`: رسید/فاکتور را به‌عنوان
+  هزینه در حسابِ نقدیِ «نقدی/رسیدها (ارز)» (اگر نبود ساخته می‌شود) ثبت می‌کند؛ idempotent روی
+  source_ref (تأییدِ دوباره دوباره‌ثبت نمی‌کند). `receipt/invoice/expense/purchase` به
+  `_KIND_MAP`→transaction و «receipt» به promptِ استخراج و `transaction` به INBOX_TARGETS +
+  filerها اضافه شد. حالا رسیدِ کارفور با تأیید، دفتر را بدهکار می‌کند و در تحلیل شمرده می‌شود.
+- **CHANGE (سرویسِ گزارشِ مشترک)** `finance_report_service.build_report` (تجمیعِ درآمد/هزینه/
+  خالص per-month per-currency، ترجیحِ occurred_on/currency، هرگز جمعِ بین‌ارزی — audit #20) —
+  حالا هم routeِ `/api/finance/reports/monthly` و هم jobِ دوره‌ای همین مسیر را می‌روند (رفتار
+  حفظ شد). `summarize_current_month` برای اطلاعیه.
+- **CHANGE (تحلیلِ دوره‌ای + اطلاعیه)** `jobs_engine._job_finance_analysis` (پیش‌فرض ۲۴h،
+  env `FINANCE_ANALYSIS_INTERVAL_MINUTES`): گزارشِ ماهِ جاری را می‌سازد و فقط وقتی امضای
+  totalها تغییر کند یک اطلاعیهٔ واضح («درآمد X، هزینه Y، سود/زیان Z» per currency) به in-app +
+  تلگرام می‌فرستد (dedup روی امضا در GlobalSetting — هر روز همان عدد را دوباره نمی‌گوید).
+- **CHANGE (نمودار — بدونِ کتابخانه)** `FinanceHub.MonthlyChart`: نمودارِ میله‌ایِ درآمد/هزینه +
+  خالصِ per-currency با divهای دستی (CSP-safe، بدونِ chart lib که نبود). بالای جدولِ موجود.
+- **VERIFY** `tests/test_finance_analysis.py` (۴: رسید→تراکنش، dedupِ source_ref، تجمیعِ
+  occurred_on/currency، dedupِ jobِ اطلاعیه). testهای موجودِ مالی (۴۰) سبز؛ build سبز.
+  تفکیکِ ارز حفظ شد؛ routeِ گزارش رفتار حفظ کرد (سرویسِ مشترک).

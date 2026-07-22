@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 # «subscription» is filed by the auto-ingest pipeline (a recognised
 # subscription-provider email) rather than the text classifier, but it flows
 # through the same review-then-file queue.
-INBOX_TARGETS = ("task", "todo", "note", "person", "subscription", "finance_account", "document")
+INBOX_TARGETS = ("task", "todo", "note", "person", "subscription", "finance_account", "document", "transaction")
 
 # Fallback list for explicit todo filings that match no existing list —
 # auto-created so a "به لیست بفرست" choice can never dead-end.
@@ -450,6 +450,75 @@ async def _file_as_finance_account(db: AsyncSession, s: Dict[str, Any], user_id:
     return {"kind": "finance_account", "id": acct.id, "title": acct.name, "link": "/budget"}
 
 
+def _parse_date(value: Any):
+    """Best-effort date parse for a receipt's own date → date or None."""
+    if not value:
+        return None
+    from datetime import datetime as _dt
+
+    s = str(value).strip()[:10]
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%d-%m-%Y"):
+        try:
+            return _dt.strptime(s, fmt).date()
+        except Exception:
+            continue
+    return None
+
+
+async def _file_as_transaction(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
+    """File an extracted receipt/invoice as an EXPENSE Transaction so purchases
+    actually feed the income/expense/profit-loss analysis — «خریدهایم را تحلیل
+    کن». Books it against a per-currency «نقدی/رسیدها» cash account (created if
+    missing). Idempotent on source_ref (a re-approval never double-posts)."""
+    from sqlalchemy import func as _f
+
+    from app.models.finance import FinancialAccount, Transaction
+
+    amount = _to_decimal(s.get("amount") or s.get("total") or s.get("balance"))
+    currency = str(s.get("currency") or "AED")[:8]
+    source_ref = s.get("source_ref")
+    if source_ref:
+        existing = (
+            await db.execute(select(Transaction).where(Transaction.source_ref == source_ref))
+        ).scalars().first()
+        if existing is not None:
+            return {"kind": "transaction", "id": existing.id, "title": existing.description or "تراکنش", "link": "/finance"}
+
+    acct_name = f"نقدی/رسیدها ({currency})"
+    acct = (
+        await db.execute(
+            select(FinancialAccount).where(
+                scope_filter(FinancialAccount.user_id, user_id),
+                _f.lower(FinancialAccount.name) == acct_name.lower(),
+            )
+        )
+    ).scalars().first()
+    if acct is None:
+        acct = FinancialAccount(
+            user_id=user_id, name=_esc(acct_name), kind="bank",
+            institution="رسیدها", currency=currency, balance=0,
+        )
+        db.add(acct)
+        await db.flush()
+
+    merchant = (s.get("provider") or s.get("merchant") or s.get("title") or "خرید")[:255]
+    category = _esc(s.get("category") or merchant)[:64] or None
+    txn = Transaction(
+        account_id=acct.id,
+        amount=amount if amount is not None else 0,
+        transaction_type=str(s.get("transaction_type") or "expense")[:16],
+        description=_esc(merchant),
+        category=category,
+        occurred_on=_parse_date(s.get("date")),
+        currency=currency,
+        source="receipt",
+        source_ref=(str(source_ref)[:255] if source_ref else None),
+    )
+    db.add(txn)
+    await db.flush()
+    return {"kind": "transaction", "id": txn.id, "title": merchant, "link": "/finance"}
+
+
 async def _file_as_document(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
     """File an extracted identity/official document into IdentityDocument (its
     expiry then drives the attention reminder)."""
@@ -541,6 +610,7 @@ async def file_item(
         "subscription": _file_as_subscription,
         "finance_account": _file_as_finance_account,
         "document": _file_as_document,
+        "transaction": _file_as_transaction,
     }[kind]
     created = await filer(db, base, user_id)
 

@@ -33,6 +33,10 @@ _KIND_MAP = {
     "broker": "finance_account",
     "exchange": "finance_account",
     "subscription": "subscription",
+    "receipt": "transaction",
+    "invoice": "transaction",
+    "expense": "transaction",
+    "purchase": "transaction",
     "document": "document",
     "id": "document",
     "identity": "document",
@@ -47,7 +51,7 @@ _EXTRACT_PROMPT = """این یک فایل از زندگیِ کاربر است (�
 محتوا را بخوان و فقط یک شیء JSON برگردان، بدون هیچ توضیحِ اضافه:
 
 {
-  "kind": "finance_account | subscription | document | contact | task | note | other",
+  "kind": "finance_account | subscription | receipt | document | contact | task | note | other",
   "title": "یک عنوانِ کوتاهِ فارسی برای این مورد",
   "summary": "یک جملهٔ فارسی که بگوید این چیست",
   "fields": {

@@ -397,6 +397,12 @@ async def startup_event():
         ("persons", "next_follow_up", "DATE"),
         # Spending category for the monthly finance report (phase 3).
         ("transactions", "category", "VARCHAR(64)"),
+        # Ingested-receipt fields (2026-07-22): a receipt carries its own date
+        # + currency + a source_ref back to the document (dedup on re-approval).
+        ("transactions", "occurred_on", "DATE"),
+        ("transactions", "currency", "VARCHAR(8)"),
+        ("transactions", "source", "VARCHAR(32)"),
+        ("transactions", "source_ref", "VARCHAR(255)"),
         # AI model config columns (audit e606cca6) that never got a startup
         # ALTER — production Postgres lacked them, which broke the full-DB
         # backup's SELECT (2026-07-21). Idempotent add for the legacy path.

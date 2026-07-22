@@ -81,6 +81,13 @@ class Transaction(Base):
     # Phase 3 (audit #19): free-form spending category (خوراک/حمل‌ونقل/…)
     # so the monthly report can group spending. Optional.
     category = Column(String(64), nullable=True, index=True)
+    # Ingested-receipt fields (2026-07-22): a Carrefour receipt carries its OWN
+    # date + currency, independent of the parent account, and a source_ref back
+    # to the ingested document (idempotency — a re-approval must not double-post).
+    occurred_on = Column(Date, nullable=True, index=True)  # the receipt's own date
+    currency = Column(String(8), nullable=True)            # receipt currency (falls back to account)
+    source = Column(String(32), nullable=True)             # manual | email | receipt | drive
+    source_ref = Column(String(255), nullable=True, index=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
 

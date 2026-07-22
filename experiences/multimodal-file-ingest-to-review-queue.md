@@ -183,3 +183,30 @@ async def store_password(db, *, source_key, password):
   feeds), `google-drive-oauth-offline-integration` (the injection-ready Drive
   client seam this consumes), `soft-delete-tombstone-must-filter-every-read-path`
   (why dedup must consider non-pending rows).
+
+## Update 2026-07-22 — bridge extracted data into the domain's AGGREGATION table, not a dead-end
+
+A receipt-analysis feature exposed a gap the review-queue pattern can hide:
+extraction captured the amount+date of every receipt, but approving one only
+created an inbox note/document — it never became a row in the finance ledger, so
+"analyze my spending" had nothing to aggregate. The lesson:
+
+- **The filer must write the table the ANALYTICS read, not just any table.** If
+  the value of ingestion is aggregation (spend trends, calories, hours), the
+  approve-filer has to insert into the *aggregation* model (a `Transaction`),
+  not a generic capture row. Map the AI `kind` (`receipt`/`invoice`) to that
+  destination and add it to your INBOX_TARGETS + filer dispatch.
+- **Extracted rows carry their OWN date + unit.** A receipt has its own
+  `occurred_on` and `currency`, independent of any parent account — add those
+  columns (idempotent startup ALTER + migration; `create_all` won't alter an
+  existing table) or backdated/foreign-currency items mis-bucket.
+- **Idempotency key = source_ref on the aggregation row too.** Dedup the ledger
+  insert on the document's source_ref so a re-approval or re-scan never
+  double-posts.
+- **One report path, two callers.** Extract the aggregation into a service
+  (`build_report`) shared by the HTTP route and the periodic job, so the number
+  the user sees on screen and the number the notification sends can never drift.
+- **Periodic notifications dedup on a CHANGE signature.** A daily analysis job
+  must store a signature of the last-notified totals and stay silent until they
+  change — otherwise it re-sends the same figures every run (the noise trap
+  again).

@@ -555,67 +555,11 @@ async def finance_monthly_report(
 ):
     """گزارش ماهانهٔ درآمد/هزینه به تفکیک ارز + دسته — «گزارش واضح» مالی.
 
-    Aggregation happens in Python (not SQL date functions) so the exact
-    same code path runs on SQLite tests and Postgres production.
+    Aggregation lives in finance_report_service.build_report (the SAME code path
+    the periodic analysis job uses), in Python (not SQL date functions) so the
+    exact same path runs on SQLite tests and Postgres production.
     """
-    from collections import defaultdict
-    from datetime import timezone
+    from app.services.finance_report_service import build_report
 
-    months = max(1, min(int(months), 24))
-    # Snap to the first day of the (months-1)-ago month so the oldest
-    # bucket is a WHOLE month, not a mid-month slice (2026-07-20 review).
-    now_utc = datetime.now(timezone.utc)
-    y, m = now_utc.year, now_utc.month
-    total = (y * 12 + (m - 1)) - (months - 1)
-    since = datetime(total // 12, total % 12 + 1, 1, tzinfo=timezone.utc)
-    owned = select(FinancialAccount).where(
-        (FinancialAccount.user_id == user_id) | (FinancialAccount.user_id.is_(None))
-        if user_id == 0 else (FinancialAccount.user_id == user_id)
-    )
-    accounts = {a.id: a for a in (await db.execute(owned)).scalars().all()}
-    if not accounts:
-        return {"ok": True, "months": []}
-    rows = (
-        await db.execute(
-            select(Transaction)
-            .where(
-                Transaction.account_id.in_(list(accounts.keys())),
-                Transaction.timestamp >= since,
-            )
-            .order_by(Transaction.timestamp.asc())
-        )
-    ).scalars().all()
-    monthly: dict = defaultdict(lambda: defaultdict(lambda: {
-        "income": 0.0, "expense": 0.0, "by_category": defaultdict(float),
-    }))
-    for t in rows:
-        ts = t.timestamp
-        if ts is None:
-            continue
-        month_key = f"{ts.year:04d}-{ts.month:02d}"
-        currency = (accounts[t.account_id].currency or "?").upper()
-        cell = monthly[month_key][currency]
-        amount = float(t.amount or 0)
-        if t.transaction_type == "income":
-            cell["income"] += amount
-        else:
-            cell["expense"] += amount
-            cell["by_category"][t.category or "بدون دسته"] += amount
-    out = []
-    for month_key in sorted(monthly.keys()):
-        currencies = []
-        for currency, cell in sorted(monthly[month_key].items()):
-            currencies.append({
-                "currency": currency,
-                "income": round(cell["income"], 2),
-                "expense": round(cell["expense"], 2),
-                "net": round(cell["income"] - cell["expense"], 2),
-                "by_category": [
-                    {"category": c, "amount": round(v, 2)}
-                    for c, v in sorted(
-                        cell["by_category"].items(), key=lambda kv: -kv[1]
-                    )
-                ],
-            })
-        out.append({"month": month_key, "currencies": currencies})
+    out = await build_report(db, user_id=user_id, months=months)
     return {"ok": True, "months": out}

@@ -215,6 +215,47 @@ async def _job_finance_email_poll(db: AsyncSession) -> dict[str, Any]:
     return {"checked_emails": len(bodies), "balances_updated": updated}
 
 
+async def _job_finance_analysis(db: AsyncSession) -> dict[str, Any]:
+    """Periodic income/expense/profit-loss review → ONE clear notification,
+    fired only when the current month's per-currency totals actually change
+    (dedup on a stored signature, so a daily run doesn't re-nag the same
+    numbers). Owner: «چند وقت یک‌بار همه‌چیز را بررسی کن و اطلاعیهٔ واضح بده»."""
+    from app.models.global_setting import GlobalSetting
+    from app.services.finance_report_service import build_report, summarize_current_month
+
+    report = await build_report(db, user_id=0, months=2)
+    summary = summarize_current_month(report)
+    if not summary.get("lines"):
+        return {"notified": False, "reason": "no data"}
+
+    sig_key = "finance_analysis:last"
+    row = (
+        await db.execute(select(GlobalSetting).where(GlobalSetting.key == sig_key))
+    ).scalars().first()
+    sig = f"{summary['month']}::{summary['signature']}"
+    if row is not None and row.value == sig:
+        return {"notified": False, "reason": "unchanged"}
+
+    message = f"📊 گزارشِ مالیِ {summary['month']}:\n" + "\n".join(summary["lines"])
+    try:
+        from app.services.notification_service import notify_event
+
+        uid = int(os.getenv("TELEGRAM_TASK_USER_ID", "0") or 0)
+        await notify_event(
+            "attention_alert", user_id=uid, db=db,
+            title="📊 گزارشِ مالی", message=message, priority="normal",
+        )
+    except Exception as exc:
+        logger.debug("finance analysis notify failed: %r", exc)
+
+    if row is None:
+        db.add(GlobalSetting(key=sig_key, value=sig))
+    else:
+        row.value = sig
+    await db.commit()
+    return {"notified": True, "month": summary["month"]}
+
+
 async def _job_file_reconcile(db: AsyncSession) -> dict[str, Any]:
     """Prune indexed file-source entries whose paths vanished (217909d2)."""
     from app.models.indexed_data_source_entry import IndexedDataSourceEntry
@@ -264,6 +305,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_email_poll", "پول‌خوانی ایمیل بانکی (IMAP)",
      lambda: _env_minutes("FINANCE_POLL_INTERVAL_MINUTES", 30.0),
      _job_finance_email_poll),
+    ("finance_periodic_analysis", "تحلیل دوره‌ای مالی + اطلاعیه",
+     lambda: _env_minutes("FINANCE_ANALYSIS_INTERVAL_MINUTES", 24 * 60.0),
+     _job_finance_analysis),
     ("file_reconcile", "هرس ایندکس فایل‌های حذف‌شده",
      lambda: _env_minutes("FILE_SYNC_INTERVAL_MINUTES", 30.0),
      _job_file_reconcile),

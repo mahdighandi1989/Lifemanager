@@ -20,6 +20,63 @@ const TABS = [
 
 const faNum = (n) => Number(n || 0).toLocaleString('fa-IR');
 
+// Hand-rolled, dependency-free income/expense/net chart (CSP-safe — no chart
+// library). One compact panel per currency (never mixes currencies): monthly
+// income (green) vs expense (red) bars + the net (profit/loss) under each.
+function MonthlyChart({ months }) {
+  if (!months || months.length === 0) return null;
+  const byCur = {};
+  months.forEach((m) => {
+    (m.currencies || []).forEach((c) => {
+      if (!byCur[c.currency]) byCur[c.currency] = [];
+      byCur[c.currency].push({
+        month: m.month, income: c.income || 0, expense: c.expense || 0, net: c.net || 0,
+      });
+    });
+  });
+  const currencies = Object.keys(byCur);
+  if (currencies.length === 0) return null;
+  return (
+    <div className="space-y-4" dir="rtl" data-testid="finance-charts">
+      {currencies.map((cur) => {
+        const series = byCur[cur];
+        const max = Math.max(1, ...series.flatMap((s) => [s.income, s.expense]));
+        return (
+          <div
+            key={cur}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"
+            data-testid={`finance-chart-${cur}`}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">
+                نمودارِ درآمد/هزینه — <span dir="ltr">{cur}</span>
+              </h3>
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-green-500" />درآمد</span>
+                <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded bg-red-500" />هزینه</span>
+              </div>
+            </div>
+            <div className="flex h-36 items-end justify-around gap-2">
+              {series.map((s) => (
+                <div key={s.month} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                  <div className="flex h-28 w-full items-end justify-center gap-1">
+                    <div className="w-3 rounded-t bg-green-500" style={{ height: `${(s.income / max) * 100}%` }} title={`درآمد ${faNum(s.income)}`} />
+                    <div className="w-3 rounded-t bg-red-500" style={{ height: `${(s.expense / max) * 100}%` }} title={`هزینه ${faNum(s.expense)}`} />
+                  </div>
+                  <span className="text-[10px] text-gray-500" dir="ltr">{s.month.slice(2)}</span>
+                  <span className={`text-[10px] font-medium ${s.net < 0 ? 'text-red-600' : 'text-green-700'}`} dir="ltr">
+                    {faNum(s.net)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── «گزارش ماهانه» — GET /api/finance/reports/monthly (audit #19) ──────────
 function MonthlyReportsPanel() {
   const [months, setMonths] = useState(null); // null → loading
@@ -54,6 +111,7 @@ function MonthlyReportsPanel() {
           هنوز گزارشی نیست — تراکنشی ثبت نشده.
         </p>
       )}
+      {months !== null && months.length > 0 && <MonthlyChart months={months} />}
       {(months || [])
         .slice()
         .reverse()
