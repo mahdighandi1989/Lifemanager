@@ -22,6 +22,7 @@ import { Link, useLocation } from 'react-router-dom';
 export const NAV_GROUPS = [
   ['daily', 'روزانه'],
   ['life', 'زندگی'],
+  ['life_pages', 'صفحه‌های زندگی'],
   ['tools', 'ابزار'],
   ['system', 'سیستم و فنی'],
 ];
@@ -34,17 +35,21 @@ export const LINKS = [
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists', group: 'daily' },
   { to: '/attention', label: 'مراقبت و مرور', testid: 'sidebar-link-attention', group: 'daily' },
 
-  // زندگی — your data / content. The sahat map leads: it is the hub that
-  // organises every life page under the human dimensions (رابطه با خدا/خود/
-  // دیگران/محیط), so navigation flows map → sahat → page.
+  // زندگی — menu redesign per the sahat framework (owner, 2026-07-22): the map
+  // IS the menu of life. Its six cards link into every life page under the
+  // human dimensions (خدا/خود/دیگران/محیط), so the resting sidebar shows ONE
+  // door for life instead of seven scattered ones.
   { to: '/sahat', label: '🧭 نقشهٔ ساحت‌ها', testid: 'sidebar-link-sahat', group: 'life' },
-  { to: '/life-file', label: 'پروندهٔ زندگی', testid: 'sidebar-link-life-file', group: 'life' },
-  { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance', group: 'life' },
-  { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people', group: 'life' },
-  { to: '/writings', label: 'نوشته‌های من', testid: 'sidebar-link-writings', group: 'life' },
-  { to: '/self-portrait', label: 'خودنگاره (علاقه/اراده)', testid: 'sidebar-link-self-portrait', group: 'life' },
-  { to: '/brain', label: 'رشد ذهن و هوش', testid: 'sidebar-link-brain', group: 'life' },
-  { to: '/projects', label: 'پروژه‌ها', testid: 'sidebar-link-projects', group: 'life' },
+
+  // صفحه‌های زندگی — kept one click away behind «بیشتر» (quarantine-not-delete:
+  // every route/testid is unchanged; the map cards also link to each of them).
+  { to: '/life-file', label: 'پروندهٔ زندگی', testid: 'sidebar-link-life-file', group: 'life_pages' },
+  { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance', group: 'life_pages' },
+  { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people', group: 'life_pages' },
+  { to: '/writings', label: 'نوشته‌های من', testid: 'sidebar-link-writings', group: 'life_pages' },
+  { to: '/self-portrait', label: 'خودنگاره (علاقه/اراده)', testid: 'sidebar-link-self-portrait', group: 'life_pages' },
+  { to: '/brain', label: 'رشد ذهن و هوش', testid: 'sidebar-link-brain', group: 'life_pages' },
+  { to: '/projects', label: 'پروژه‌ها', testid: 'sidebar-link-projects', group: 'life_pages' },
 
   // ابزار — helpers.
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant', group: 'tools' },
@@ -67,7 +72,7 @@ export const LINKS = [
 // scan 18 doors. Nothing is removed — the drawer holds them one click away and
 // every route/testid is unchanged. The mobile menu (Header) still lists all.
 const PRIMARY_GROUPS = ['daily', 'life'];
-const SECONDARY_GROUPS = ['tools', 'system'];
+const SECONDARY_GROUPS = ['life_pages', 'tools', 'system'];
 
 function Sidebar() {
   const location = useLocation();
@@ -123,7 +128,7 @@ function Sidebar() {
           aria-expanded={showMore}
           className="mt-2 flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition-colors"
         >
-          <span>{showMore ? 'کمتر' : 'بیشتر (ابزارها و تنظیمات)'}</span>
+          <span>{showMore ? 'کمتر' : 'بیشتر (صفحه‌ها و ابزارها)'}</span>
           <span className="text-xs">{showMore ? '▲' : '▼'}</span>
         </button>
 

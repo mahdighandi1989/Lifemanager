@@ -74,6 +74,66 @@ async def test_map_buckets_everything_and_weights(db_session):
 
 
 @pytest.mark.asyncio
+async def test_haq_nas_test_applied_to_emails(db_session):
+    """The حق‌الناس TEST (owner's correction): only a real HUMAN awaiting a
+    reply engages another person's right. A broker margin-call alert is
+    اضرار به مالِ خود (محیط), never حق‌الناس — and duplicates collapse."""
+    from app.models.personal_sync import PersonalEmail
+
+    db_session.add_all([
+        # a human waiting for a reply → دیگران / حق‌الناس
+        PersonalEmail(id="h1", from_addr="Ali Rezaei <ali.rezaei@gmail.com>",
+                      subject="جواب پروژه رو میدی؟", needs_action=True),
+        # five copies of the same automated margin alert → محیط / ضرر به مالِ خود، یک‌بار
+        *[
+            PersonalEmail(id=f"m{i}", from_addr="noreply@xm.com",
+                          subject="Margin Call Notification Alert 8023605", needs_action=True)
+            for i in range(5)
+        ],
+    ])
+    await db_session.commit()
+
+    data = await ss.build_sahat_map(db_session, 0)
+    by_key = {s["key"]: s for s in data["sahats"]}
+
+    dig_att = by_key["digaran"]["attention"]
+    mohit_att = by_key["mohit"]["attention"]
+    # human → حق‌الناس in دیگران
+    assert any(a["weight"] == ss.W_HAQ_NAS and "جواب پروژه" in a["label"] for a in dig_att)
+    # margin alerts NEVER appear as حق‌الناس anywhere
+    assert not any("Margin" in a["label"] and a["weight"] == ss.W_HAQ_NAS
+                   for a in dig_att + mohit_att)
+    # they appear ONCE in محیط as ضرر به مالِ خود (deduped by subject)
+    margin_rows = [a for a in mohit_att if "Margin" in a["label"]]
+    assert len(margin_rows) == 1 and margin_rows[0]["weight"] == ss.W_ZARAR_KHOD
+
+
+@pytest.mark.asyncio
+async def test_threads_accrete_scattered_content(db_session):
+    """زیرساختِ بارش: a NEW scattered writing naming a thread self-attaches —
+    no re-filing, no manual tagging."""
+    from app.models.todo_list import todo_list_items
+
+    lst = TodoList(user_id=0, name="خودسازی - محاسبه میان و پایان هفته")
+    it = TodoItem(owner_id=0, content="محاسبهٔ شب", is_completed=True)
+    db_session.add_all([lst, it])
+    await db_session.flush()
+    await db_session.execute(todo_list_items.insert().values(todo_list_id=lst.id, todo_item_id=it.id))
+    # a scattered NEW writing mentioning the thread token
+    db_session.add(PersonalWriting(user_id=0, title="یادداشتِ تازه دربارهٔ محاسبه نفس", body="..."))
+    await db_session.commit()
+
+    data = await ss.build_sahat_map(db_session, 0)
+    ravan = next(s for s in data["sahats"] if s["key"] == "khod_ravan")
+    th = next(t for t in ravan["threads"] if t["key"] == "mohasebe")
+    assert th["lists"] == 1 and th["done"] == 1 and th["total"] == 1
+    assert th["writings"] == 1  # the scattered writing self-attached
+    # every declared thread renders, even when empty (honest gaps)
+    khoda = next(s for s in data["sahats"] if s["key"] == "khoda")
+    assert {t["key"] for t in khoda["threads"]} >= {"khodashenasi", "barnameh_elahi"}
+
+
+@pytest.mark.asyncio
 async def test_snapshot_history_accumulates(db_session):
     db_session.add(Task(user_id=0, title="ورزش", status=TaskStatus.DONE))
     await db_session.commit()

@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -81,11 +82,40 @@ SAHATS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# Severity ladder (اصالتِ امتیاز — از فقه، نه قراردادی):
-W_HAQ_NAS = 5      # حق‌الناس / عهد — تعهد به دیگران، ددلاین، بدهی، ایمیلِ بی‌پاسخ
-W_SELF_HARM = 4    # اضرار به نفس — سلامتِ رهاشده، سندِ منقضی
-W_GROWTH = 3       # رشد و تهذیب — ستون‌فقرات‌های خودسازی/علم که راکد مانده
-W_CLUTTER = 1      # لغو و اتلاف — انباشتگیِ دیجیتال، صندوقِ تلنبارشده
+# ── Severity ladder (اصالتِ امتیاز — از فقه، نه قراردادی) ────────────────────
+# The owner's correction (2026-07-22): a broker's margin-call alert is NOT
+# حق‌الناس — no other person's right is involved; it is a risk to the owner's
+# OWN wealth. Per the اصیل Shia-fiqh concepts (the line of Imam Khomeini and
+# Imam Khamenei), each weight has a precise TEST, not a surface category:
+#
+#   W_HAQ_NAS (5) — حق‌الناس/عهد. TEST: «آیا حقِ شخصِ دیگری بر گردنِ من درگیر
+#     است؟» بدهی، امانت، اجرت، وعده/قرارِ داده‌شده، پاسخی که یک انسانِ واقعی
+#     منتظرش است، پیگیریِ قول‌داده‌شده. حق‌الناس بدونِ رضایتِ صاحبِ حق ساقط
+#     نمی‌شود — لذا سنگین‌ترین وزن.
+#   W_ZARAR_KHOD (4) — اضرار به نفس (جسمی یا مالی؛ قاعدهٔ لاضرر + حرمتِ
+#     تضییعِ مال). TEST: «آیا جسم یا مالِ خودم در معرضِ ضررِ جدی است؟»
+#     سلامتِ رهاشده، سندِ منقضی، هشدارِ مالیِ حساب/بروکرِ خودم (مارجین و…).
+#   W_GROWTH (3) — رشد و تهذیب (واجب/مستحبِ سلوکی). TEST: «آیا مسیرِ رشدی که
+#     خودم تعهد کرده‌ام راکد مانده؟» نخِ تسبیحِ خودسازی/علمِ متوقف.
+#   W_CLUTTER (1) — لغو و اتلاف. TEST: «نه حقِ کسی، نه ضررِ جدی — فقط ظرفِ
+#     عمر را پر کرده.» انباشتگیِ دیجیتال، صندوقِ تلنبار.
+#
+# A machine-generated notification NEVER passes the حق‌الناس test by itself;
+# only a real human awaiting something from the owner does.
+W_HAQ_NAS = 5
+W_ZARAR_KHOD = 4
+W_GROWTH = 3
+W_CLUTTER = 1
+# Back-compat alias (older callers/tests may import the previous name).
+W_SELF_HARM = W_ZARAR_KHOD
+
+# Automated financial alerts about the owner's OWN accounts (margin calls,
+# balance warnings…) — risk to own wealth ⇒ اضرار به مالِ خود، ذیلِ محیط/اموال.
+_RE_FIN_ALERT = re.compile(
+    r"(margin|liquidat|balance|payment due|overdue|insufficient|statement|"
+    r"invoice|بدهی|سررسید|موجودی|اخطار|هشدار)",
+    re.I,
+)
 
 # ── backbone (نخِ تسبیح) — the owner's named lists/writings pinned to sahats ─
 # Matched by substring on the list/writing name (case/spacing tolerant).
@@ -156,6 +186,46 @@ def _is_backbone_writing(title: Optional[str], category: Optional[str]) -> bool:
     return any(tok in blob for tok in _BACKBONE_WRITING_TOKENS)
 
 
+# ── نخ‌های تسبیح (threads) — the accretion infrastructure ───────────────────
+# Each thread is a NAMED STREAM under one sahat. Scattered content — a new
+# writing, a list, a directive, a voice-note typed up later — self-attaches to
+# its thread by token match at read time, so the owner's «مطالب پراکنده» always
+# find their place and stay trackable WITHOUT re-filing anything. Adding a new
+# thread = one line here; everything matching starts flowing immediately.
+THREADS: List[Dict[str, Any]] = [
+    {"key": "khodashenasi", "sahat": "khoda", "title": "خداشناسی و شرح حال",
+     "tokens": ("خداشناسی", "شرح حال"), "link": "/writings"},
+    {"key": "barnameh_elahi", "sahat": "khoda", "title": "برنامه‌ریزیِ الهی (دنیا و آخرت)",
+     "tokens": ("برنامه‌ریزی الهی", "برنامه ریزی الهی", "دنیا و آخرت"), "link": "/writings"},
+    {"key": "eshgh_khoda", "sahat": "khoda", "title": "کارهایی که عاشقِ خدا می‌کند",
+     "tokens": ("عاشق خدا",), "link": "/lists"},
+    {"key": "moraqebe", "sahat": "khoda", "title": "مراقبه قبل از هر کار",
+     "tokens": ("مراقبه",), "link": "/lists"},
+    {"key": "mard_elahi", "sahat": "khoda", "title": "شخصیتِ مردِ الهی",
+     "tokens": ("مرد الهی", "مردِ خدا", "مرد خدا"), "link": "/lists"},
+    {"key": "mohasebe", "sahat": "khod_ravan", "title": "محاسبهٔ میان و پایانِ هفته",
+     "tokens": ("محاسبه",), "link": "/lists"},
+    {"key": "erade", "sahat": "khod_ravan", "title": "تقویت/تضعیفِ اراده",
+     "tokens": ("اراده",), "link": "/lists"},
+    {"key": "shojaat", "sahat": "khod_ravan", "title": "ترس‌ها و شجاعت",
+     "tokens": ("ترس", "شجاع"), "link": "/lists"},
+    {"key": "tazakor", "sahat": "khod_ravan", "title": "تذکر و یادآوری",
+     "tokens": ("تذکر", "یادآوری"), "link": "/lists"},
+]
+
+
+def thread_for(text: Optional[str]) -> Optional[Dict[str, Any]]:
+    """First thread whose token appears in the text, else None. This is the
+    accretion hook: ANY new content naming a thread self-attaches to it."""
+    t = text or ""
+    if not t.strip():
+        return None
+    for th in THREADS:
+        if any(tok in t for tok in th["tokens"]):
+            return th
+    return None
+
+
 def _empty_cell() -> Dict[str, Any]:
     return {"total": 0, "done": 0, "attention": [], "backbone": []}
 
@@ -164,6 +234,11 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     """Aggregate EVERYTHING into the six sahat buckets, live. Read-only."""
     cells: Dict[str, Dict[str, Any]] = {k: _empty_cell() for k in SAHATS}
     today = date.today()
+    # thread accumulators — scattered content self-attaches here by token match
+    thr: Dict[str, Dict[str, Any]] = {
+        th["key"]: {"done": 0, "total": 0, "writings": 0, "directives": 0, "lists": 0}
+        for th in THREADS
+    }
 
     def att(sahat: str, label: str, weight: int, link: str) -> None:
         cells[sahat]["attention"].append({"label": label[:120], "weight": weight, "link": link})
@@ -192,7 +267,7 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 cell["done"] += 1
             elif t.due_date and t.due_date < today:
                 w = W_HAQ_NAS if sahat == "digaran" else (
-                    W_SELF_HARM if sahat == "khod_jesm" else W_GROWTH
+                    W_ZARAR_KHOD if sahat == "khod_jesm" else W_GROWTH
                 )
                 att(sahat, f"کارِ عقب‌افتاده: {t.title}", w, "/tasks")
     except Exception as exc:
@@ -233,6 +308,11 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 cell["backbone"].append({
                     "label": lst.name, "done": done, "total": len(rows), "link": "/lists",
                 })
+            th = thread_for(lst.name)
+            if th is not None:
+                thr[th["key"]]["lists"] += 1
+                thr[th["key"]]["done"] += done
+                thr[th["key"]]["total"] += len(rows)
             for i in rows:
                 if not i.is_completed and i.due_date and i.due_date < today:
                     att(sahat, f"آیتمِ موعدگذشته: {(i.content or '')[:60]}", W_GROWTH, "/lists")
@@ -251,6 +331,10 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             )
         ).scalars().all()
         for w in writings:
+            blob = f"{w.title or ''} {w.category or ''}"
+            th = thread_for(blob)
+            if th is not None:
+                thr[th["key"]]["writings"] += 1
             if _is_backbone_writing(w.title, w.category):
                 cells["khoda"]["total"] += 1
                 cells["khoda"]["done"] += 1  # a written piece IS the artifact
@@ -258,7 +342,7 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                     "label": w.title or "نوشته", "done": 1, "total": 1, "link": "/writings",
                 })
             else:
-                sahat = classify_text(f"{w.title or ''} {w.category or ''}", default="khod_aql")
+                sahat = (th["sahat"] if th is not None else None) or classify_text(blob, default="khod_aql")
                 cells[sahat]["total"] += 1
                 cells[sahat]["done"] += 1
     except Exception as exc:
@@ -275,6 +359,9 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             status = str(getattr(d, "status", "")).lower()
             if status == "archived":
                 continue
+            th = thread_for(d.title)
+            if th is not None:
+                thr[th["key"]]["directives"] += 1
             sahat = _DOMAIN_TO_SAHAT.get(getattr(d, "domain", "") or "", None) or classify_text(d.title)
             cell = cells[sahat]
             cell["total"] += 1
@@ -306,9 +393,15 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     except Exception as exc:
         logger.debug("sahat people skipped: %r", exc)
 
-    # ── Emails needing action (حق‌الناس — پاسخِ معطل) ────────────────────────
+    # ── Emails needing action — the حق‌الناس TEST applied correctly ──────────
+    # Only a REAL HUMAN awaiting a reply engages another person's right. A
+    # machine-generated alert never does: a financial alert about the owner's
+    # own account (margin call, balance warning) is اضرار به مالِ خود (محیط/
+    # اموال)، and the rest is mere clutter. Deduped by subject so five copies
+    # of the same alert surface once.
     try:
         from app.models.personal_sync import PersonalEmail
+        from app.services.google_sync.person_ingest import _is_human
 
         pend = (
             await db.execute(
@@ -317,9 +410,25 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 )
             )
         ).scalars().all()
-        cells["digaran"]["total"] += len(pend)
-        for e in pend[:5]:
-            att("digaran", f"ایمیلِ منتظرِ اقدام: {(e.subject or '')[:60]}", W_HAQ_NAS, "/")
+        seen_subjects: set = set()
+        auto_other = 0
+        for e in pend:
+            subj = (e.subject or "بدون موضوع")[:60]
+            dup = subj in seen_subjects
+            seen_subjects.add(subj)
+            if _is_human(e):
+                cells["digaran"]["total"] += 1
+                if not dup:
+                    att("digaran", f"پاسخِ معطلِ یک انسان: {subj}", W_HAQ_NAS, "/")
+            elif _RE_FIN_ALERT.search(f"{e.subject or ''} {e.snippet or ''}"):
+                cells["mohit"]["total"] += 1
+                if not dup:
+                    att("mohit", f"هشدارِ مالیِ حسابِ خودم: {subj}", W_ZARAR_KHOD, "/")
+            else:
+                auto_other += 1
+        if auto_other:
+            cells["mohit"]["total"] += auto_other
+            att("mohit", f"{auto_other} اعلانِ ماشینیِ دیگر (بدونِ حقِ کسی)", W_CLUTTER, "/")
     except Exception as exc:
         logger.debug("sahat emails skipped: %r", exc)
 
@@ -348,7 +457,7 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             exp = (doc.expiry_date or "")[:10]
             try:
                 if exp and date.fromisoformat(exp) < today:
-                    att("mohit", f"سندِ منقضی: {doc.full_name or 'سند'}", W_SELF_HARM, "/life-file")
+                    att("mohit", f"سندِ منقضی: {doc.full_name or 'سند'}", W_ZARAR_KHOD, "/life-file")
                     continue
             except ValueError:
                 pass
@@ -412,6 +521,18 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 base = (base + diligence_score) / 2
             score = int(max(0, min(100, round(base - penalty))))
         cell["attention"].sort(key=lambda a: -a["weight"])
+        # نخ‌های این ساحت — every thread renders (even empty: an empty thread is
+        # an honest «هنوز محتوایی این‌جا نریخته», not a hidden hole).
+        threads = [
+            {
+                "key": th["key"], "title": th["title"], "link": th["link"],
+                "done": thr[th["key"]]["done"], "total": thr[th["key"]]["total"],
+                "writings": thr[th["key"]]["writings"],
+                "directives": thr[th["key"]]["directives"],
+                "lists": thr[th["key"]]["lists"],
+            }
+            for th in THREADS if th["sahat"] == key
+        ]
         out.append({
             "key": key,
             "title": meta["title"],
@@ -422,6 +543,7 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             "total": total,
             "done": done,
             "backbone": cell["backbone"][:6],
+            "threads": threads,
             "attention": cell["attention"][:5],
             "finance_lines": cell.get("finance_lines"),
         })

@@ -115,3 +115,33 @@ async def build_map(db, uid):
 - مرتبط: `self-model-from-composed-analyzers` (the compose-don't-rebuild
   precedent + snapshot-for-history pattern), `holistic-island-audit-with-
   adversarial-verification` (mapping everything that exists before layering).
+
+## Update 2026-07-22 — the owner audited the ontology: three corrections that generalize
+
+The first deployed map drew an immediate domain-expert correction that exposed a
+classification bug invisible to any test: a broker's margin-call email had been
+weighted as "obligation to others" (حق‌الناس). The fixes are reusable rules:
+
+1. **Weights need a TEST, not a category.** "Email needing action → obligation
+   class" was surface-matching. Every severity class must be defined by a
+   decidable question ("is another person's right involved?"), documented next
+   to the constant, and the classifier must apply the question — here: sender
+   is a real human awaiting a reply → obligation; automated alert about one's
+   own account → self-harm(financial) class; other machine mail → waste. Reuse
+   the codebase's existing human-vs-automated sender heuristic instead of
+   inventing one.
+2. **Dedup attention items by content key.** Five copies of the same alert
+   rendered five weighted rows — dedup by subject/label before display, count
+   the collapse.
+3. **Threads registry = the accretion contract.** The owner's real ask behind
+   "nothing may be lost" is *accretion*: new scattered content must self-attach
+   to a named stream and become trackable with zero manual filing. A tiny
+   registry (`THREADS`: key, dimension, title, match-tokens, link) checked at
+   read time gives that: any new writing/list/goal naming a thread joins it
+   instantly, and EMPTY threads still render — an honest gap beats a hidden
+   hole. Adding a stream is one registry line.
+4. **When the hub page proves itself, demote its children in the menu.** After
+   the owner approved the map-as-hub, the seven scattered life links moved
+   behind the "more" drawer (routes/testids intact, drawer auto-opens on their
+   routes) — the map became the single door. Update the nav test to LOCK the
+   new design, don't fight it.

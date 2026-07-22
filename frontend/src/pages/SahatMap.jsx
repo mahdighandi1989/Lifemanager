@@ -23,9 +23,12 @@ const LINK_FA = {
   '/life-file': 'پروندهٔ زندگی', '/assets': 'دارایی‌ها', '/merge': 'پاک‌سازی',
 };
 
+// Severity badges mirror the fiqhi tests exactly (owner's correction): 5 =
+// another PERSON's right; 4 = risk to one's OWN body/wealth (لاضرر); 3 =
+// stalled growth; 1 = mere waste. A machine alert is never حق‌الناس.
 const WEIGHT_BADGE = (w) => {
   if (w >= 5) return { label: 'حق‌الناس', cls: 'bg-red-100 text-red-700' };
-  if (w >= 4) return { label: 'سلامت/سند', cls: 'bg-orange-100 text-orange-700' };
+  if (w >= 4) return { label: 'ضرر به خود/مال', cls: 'bg-orange-100 text-orange-700' };
   if (w >= 3) return { label: 'رشد', cls: 'bg-amber-100 text-amber-700' };
   return { label: 'اتلاف', cls: 'bg-gray-100 text-gray-600' };
 };
@@ -152,7 +155,31 @@ function SahatMap() {
                     </div>
                   )}
 
-                  {(s.backbone || []).length > 0 && (
+                  {(s.threads || []).length > 0 ? (
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-medium text-gray-500">نخ‌های تسبیح:</p>
+                      {s.threads.map((t) => {
+                        const empty = !t.total && !t.writings && !t.directives;
+                        return (
+                          <Link
+                            key={t.key}
+                            to={t.link || '/lists'}
+                            className={`flex items-center justify-between gap-2 rounded-md px-2 py-1 text-xs hover:bg-gray-100 ${
+                              empty ? 'bg-gray-50/50 text-gray-400' : 'bg-gray-50 text-gray-700'
+                            }`}
+                          >
+                            <span className="truncate">{t.title}</span>
+                            <span className="flex shrink-0 items-center gap-1.5 text-[10px] text-gray-400">
+                              {t.total > 0 && <span dir="ltr">{t.done}/{t.total}</span>}
+                              {t.writings > 0 && <span>📝{t.writings}</span>}
+                              {t.directives > 0 && <span>🧭{t.directives}</span>}
+                              {empty && <span>خالی</span>}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ) : (s.backbone || []).length > 0 && (
                     <div className="space-y-1">
                       <p className="text-[11px] font-medium text-gray-500">نخِ تسبیح:</p>
                       {s.backbone.map((b, i) => (
