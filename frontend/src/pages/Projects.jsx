@@ -31,10 +31,10 @@ const STATUS_LABELS = {
   archived: 'آرشیو',
 };
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, onDelete }) {
   const status = project.status || 'active';
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative group">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -61,11 +61,22 @@ function ProjectCard({ project }) {
           </span>
         </span>
       </div>
-      {project.created_at && (
-        <p className="text-xs text-gray-400 mt-2">
-          ایجاد: {new Date(project.created_at).toLocaleDateString('fa-IR')}
-        </p>
-      )}
+      <div className="mt-2 flex items-center justify-between">
+        {project.created_at ? (
+          <p className="text-xs text-gray-400">
+            ایجاد: {new Date(project.created_at).toLocaleDateString('fa-IR')}
+          </p>
+        ) : <span />}
+        <button
+          type="button"
+          onClick={() => onDelete && onDelete(project)}
+          data-testid={`project-delete-${project.id}`}
+          className="text-xs text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label="حذف پروژه"
+        >
+          حذف
+        </button>
+      </div>
     </div>
   );
 }
@@ -100,6 +111,21 @@ function Projects({ embedded = false }) {
   };
 
   useEffect(() => { fetchProjects(); }, []);
+
+  const handleDelete = async (project) => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(`حذف پروژهٔ «${project.name || project.title}»؟`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/projects/${project.id}`, { method: 'DELETE' });
+      if (res.ok || res.status === 204) {
+        setProjects(prev => prev.filter(p => p.id !== project.id));
+      } else {
+        setError('حذف پروژه ناموفق بود');
+      }
+    } catch {
+      setError('حذف پروژه ناموفق بود');
+    }
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -217,7 +243,7 @@ function Projects({ embedded = false }) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {projects.map(project => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard key={project.id} project={project} onDelete={handleDelete} />
             ))}
           </div>
         )}
