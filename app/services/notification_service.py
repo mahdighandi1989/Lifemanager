@@ -152,6 +152,22 @@ class NotificationService:
             notification_id, user_id, is_read=True
         )
 
+    async def mark_all_read(self, user_id: int) -> int:
+        """Clear the unread badge in one statement — the «خواندنِ همه» action
+        for the owner's 106-notification backlog. Marks read (never deletes;
+        the rows stay visible). Returns how many were flipped."""
+        if self.db is None:
+            return 0
+        stmt = (
+            update(Notification)
+            .where(Notification.user_id == user_id)
+            .where(Notification.is_read.is_(False))
+            .values(is_read=True)
+        )
+        result = await self.db.execute(stmt)
+        await self.db.commit()
+        return int(result.rowcount or 0)
+
     # ── Protected hooks (patched by unit tests) ──────────────────────
 
     async def _save_notification(

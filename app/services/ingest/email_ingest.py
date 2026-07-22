@@ -1,14 +1,19 @@
 """Orchestrate attachment ingest for an email, and the master backfill.
 
 Per email: fetch its attachments, decrypt with any stored password for the
-sender, extract → propose a review candidate. A locked file with no known
-password raises a «فایلِ رمزدار» request (Telegram + inbox) instead of being
-dropped. Idempotent + fail-open.
+sender, extract → propose a review candidate. A locked file that is WORTH
+unlocking (a real statement/invoice) with no known password raises a «فایلِ
+رمزدار» request; broker legal BOILERPLATE (Terms/Policy/Disclosure/Refer-a-
+Friend…) is skipped entirely — never a request, never a notification. And the
+Telegram/notification is a SINGLE batched digest per cooldown window (owner:
+«اپ شده ماشینِ نویز») — not one push per file. Idempotent + fail-open.
 """
 from __future__ import annotations
 
 import logging
 import os
+import re
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 from sqlalchemy import select
@@ -20,21 +25,54 @@ from app.services.ingest.universal_ingest import extract_from_file
 
 logger = logging.getLogger(__name__)
 
+# ── locked-file value filter ────────────────────────────────────────────────
+# A genuine statement/invoice is worth unlocking; broker legal boilerplate
+# (Terms, Policy, Disclosure, Refer-a-Friend…) is pure noise — never ask a
+# password for it. Allow-list precedence: a financial keyword overrides, so a
+# real "Statement of Terms.pdf" still flows.
+_FINANCIAL_RE = re.compile(
+    r"(statement|invoice|receipt|contract.?note|confirmation|payslip|tax|"
+    r"صورت.?حساب|فاکتور|رسید|بیلان|گزارش.?حساب|پرداخت|فیش)",
+    re.I,
+)
+_BOILERPLATE_RE = re.compile(
+    r"(terms|conditions|policy|policies|disclosure|disclaimer|agreement|"
+    r"refer.?a.?friend|conflicts?.?of.?interest|privacy|kyc|cookie|"
+    r"execution.?policy|risk.?disclosure|legal|gdpr|regulation|handbook|"
+    r"guideline|قوانین|سیاست|افشا|حریم.?خصوصی)",
+    re.I,
+)
 
-async def _propose_password_request(db, *, sender: str, filename: str, source_ref: str, user_id: int) -> None:
-    """Surface a «رمز لازم است» item + push it to Telegram, once per source_ref."""
+_DIGEST_STAMP_KEY = "ingest_locked_digest:last_at"
+_DIGEST_COOLDOWN_S = int(os.environ.get("LOCKED_DIGEST_COOLDOWN_S", str(6 * 3600)) or 0)
+
+
+def _is_worthless_locked(filename: str | None) -> bool:
+    """True when a locked file isn't worth asking a password for (broker
+    boilerplate). A financial keyword in the name overrides (allow-list wins)."""
+    name = filename or ""
+    if _FINANCIAL_RE.search(name):
+        return False
+    return bool(_BOILERPLATE_RE.search(name))
+
+
+async def _propose_password_request(
+    db, *, sender: str, filename: str, source_ref: str, user_id: int
+) -> bool:
+    """Create a «رمز لازم است» InboxItem once per source_ref — matched across
+    ANY status (pending|filed|dismissed), so a dismissed/handled file never
+    re-appears on a re-scan. Returns True only when a NEW row was created.
+    Does NOT notify — the caller sends ONE batched digest for the whole run."""
     from app.models.inbox_item import InboxItem
 
     src_key = credentials.source_key_for(sender)
     existing = (
         await db.execute(
-            select(InboxItem).where(
-                InboxItem.status == "pending", InboxItem.suggested_type == "password_request"
-            )
+            select(InboxItem).where(InboxItem.suggested_type == "password_request")
         )
     ).scalars().all()
     if any((r.suggestion or {}).get("source_ref") == source_ref for r in existing):
-        return
+        return False
     db.add(
         InboxItem(
             user_id=user_id,
@@ -46,39 +84,96 @@ async def _propose_password_request(db, *, sender: str, filename: str, source_re
             ai_model=None,
         )
     )
-    try:
-        from app.services.notification_service import notify_event
+    return True
 
-        uid = int(os.environ.get("TELEGRAM_TASK_USER_ID", "0") or 0)
-        await notify_event(
-            "attention_alert",
-            user_id=uid,
-            db=db,
-            title="🔒 فایلِ رمزدار",
-            message=f"فایلِ «{filename}» رمز دارد. در داشبورد → صندوق ورودی رمزش را وارد کن تا باز شود.",
-            priority="high",
+
+async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[str, Any]:
+    """Send ONE «فایل‌های رمزدار» digest (in-app + Telegram) covering ALL pending
+    locked files, at most once per cooldown window. The files still land in the
+    inbox; only the push is coalesced. Never raises. The caller commits."""
+    from app.models.global_setting import GlobalSetting
+    from app.models.inbox_item import InboxItem
+
+    try:
+        pend = (
+            await db.execute(
+                select(InboxItem).where(
+                    InboxItem.status == "pending",
+                    InboxItem.suggested_type == "password_request",
+                )
+            )
+        ).scalars().all()
+        n = len(pend)
+        if n == 0:
+            return {"sent": False, "pending": 0}
+
+        # Durable cooldown — an in-process timer would reset on every Render
+        # free-tier restart (see experiences/periodic-attention-engine…).
+        row = (
+            await db.execute(select(GlobalSetting).where(GlobalSetting.key == _DIGEST_STAMP_KEY))
+        ).scalar_one_or_none()
+        now = datetime.now(timezone.utc)
+        if row and row.value:
+            try:
+                last = datetime.fromisoformat(row.value)
+                if last.tzinfo is None:
+                    last = last.replace(tzinfo=timezone.utc)
+                if (now - last).total_seconds() < _DIGEST_COOLDOWN_S:
+                    return {"sent": False, "pending": n, "reason": "cooldown"}
+            except Exception:
+                pass
+
+        names = [(p.suggestion or {}).get("filename") or "?" for p in pend[:8]]
+        more = f"\nو {n - 8} مورد دیگر" if n > 8 else ""
+        message = (
+            f"{n} فایلِ رمزدار منتظرِ رمز است:\n"
+            + "\n".join(f"• {nm}" for nm in names)
+            + more
+            + "\nدر داشبورد → صندوق ورودی رمزشان را وارد کن."
         )
+        try:
+            from app.services.notification_service import notify_event
+
+            uid = int(os.environ.get("TELEGRAM_TASK_USER_ID", "0") or 0) or user_id
+            await notify_event(
+                "attention_alert",
+                user_id=uid,
+                db=db,
+                title="🔒 فایل‌های رمزدار",
+                message=message,
+                priority="high",
+            )
+        except Exception as exc:
+            logger.debug("locked digest notify failed: %r", exc)
+
+        if row is None:
+            db.add(GlobalSetting(key=_DIGEST_STAMP_KEY, value=now.isoformat()))
+        else:
+            row.value = now.isoformat()
+        return {"sent": True, "pending": n}
     except Exception as exc:
-        logger.debug("password request notify failed: %r", exc)
+        logger.debug("locked digest skipped: %r", exc)
+        return {"sent": False, "pending": 0}
 
 
 async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0) -> Dict[str, int]:
-    """Fetch + extract this email's attachments. Never raises."""
+    """Fetch + extract this email's attachments. Never raises. Only CREATES
+    InboxItems — the batched digest is sent by the caller (batch-level)."""
+    empty = {"proposed": 0, "needs_password": 0, "skipped_boilerplate": 0, "new_locked": 0}
     mid = getattr(email, "id", None)
     if not mid:
-        return {"proposed": 0, "needs_password": 0}
+        return dict(empty)
     try:
         atts = await fetch_email_attachments(db, mid)
     except Exception as exc:
         logger.debug("attachment fetch failed (%s): %r", mid, exc)
-        return {"proposed": 0, "needs_password": 0}
+        return dict(empty)
 
     sender = getattr(email, "from_addr", "") or ""
     src_key = credentials.source_key_for(sender)
     pw = await credentials.get_password(db, source_key=src_key)
 
-    proposed = 0
-    needs = 0
+    proposed = needs = skipped = new_locked = 0
     for att in atts:
         source_ref = f"gmail:{mid}:{att['filename']}"
         res = await extract_from_file(
@@ -94,11 +189,20 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
         if st in ("proposed", "unreadable"):
             proposed += 1
         elif st == "needs_password":
+            if _is_worthless_locked(att["filename"]):
+                skipped += 1
+                continue
             needs += 1
-            await _propose_password_request(
+            if await _propose_password_request(
                 db, sender=sender, filename=att["filename"], source_ref=source_ref, user_id=user_id
-            )
-    return {"proposed": proposed, "needs_password": needs}
+            ):
+                new_locked += 1
+    return {
+        "proposed": proposed,
+        "needs_password": needs,
+        "skipped_boilerplate": skipped,
+        "new_locked": new_locked,
+    }
 
 
 async def retry_source_ref(db: AsyncSession, *, source_ref: str, user_id: int = 0) -> Dict[str, Any]:
@@ -126,7 +230,8 @@ async def retry_source_ref(db: AsyncSession, *, source_ref: str, user_id: int = 
 
 async def backfill_attachments(db: AsyncSession, *, user_id: int = 0, limit: int = 400) -> Dict[str, Any]:
     """Run attachment ingest over already-synced emails (catch-up for the
-    backlog). Bounded by ``limit`` since each email may hit the network."""
+    backlog). Bounded by ``limit`` since each email may hit the network. Sends
+    ONE locked-file digest at the end, not one per file."""
     from app.models.personal_sync import PersonalEmail
 
     rows = (
@@ -134,13 +239,19 @@ async def backfill_attachments(db: AsyncSession, *, user_id: int = 0, limit: int
             select(PersonalEmail).order_by(PersonalEmail.received_at.desc().nullslast()).limit(limit)
         )
     ).scalars().all()
-    proposed = 0
-    needs = 0
-    scanned = 0
+    proposed = needs = scanned = skipped = 0
     for em in rows:
         scanned += 1
         r = await ingest_email_attachments(db, em, user_id=user_id)
         proposed += r["proposed"]
         needs += r["needs_password"]
+        skipped += r.get("skipped_boilerplate", 0)
     await db.commit()
-    return {"scanned": scanned, "proposed": proposed, "needs_password": needs}
+    await notify_locked_digest(db, user_id=user_id)
+    await db.commit()
+    return {
+        "scanned": scanned,
+        "proposed": proposed,
+        "needs_password": needs,
+        "skipped_boilerplate": skipped,
+    }

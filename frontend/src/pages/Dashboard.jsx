@@ -283,6 +283,21 @@ function Dashboard() {
     }
   };
 
+  // «خواندنِ همه» — clear the whole unread backlog (the owner's 106-pile) in one
+  // tap, then refresh so the badge drops to zero.
+  const [markingRead, setMarkingRead] = useState(false);
+  const markAllRead = async () => {
+    setMarkingRead(true);
+    try {
+      await api.post('/notifications/mark-all-read');
+      await fetchToday();
+    } catch {
+      /* best-effort */
+    } finally {
+      setMarkingRead(false);
+    }
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -648,9 +663,22 @@ function Dashboard() {
               badge={todayLoading ? '…' : notifications?.unread_count || 0}
               badgeCls="bg-amber-100 text-amber-700"
               footer={
-                <Link to="/notifications" className="mt-3 block text-xs font-medium text-blue-600 hover:text-blue-700">
-                  همهٔ اعلان‌ها ←
-                </Link>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <Link to="/notifications" className="text-xs font-medium text-blue-600 hover:text-blue-700">
+                    همهٔ اعلان‌ها ←
+                  </Link>
+                  {(notifications?.unread_count || 0) > 0 && (
+                    <button
+                      type="button"
+                      onClick={markAllRead}
+                      disabled={markingRead}
+                      data-testid="mark-all-read-btn"
+                      className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                    >
+                      {markingRead ? '…' : 'خواندنِ همه'}
+                    </button>
+                  )}
+                </div>
               }
             >
               {showEmptyStates && !(notifications?.latest?.length) && (

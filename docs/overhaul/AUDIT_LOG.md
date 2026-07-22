@@ -1942,3 +1942,40 @@ Group bullets under a `## YYYY-MM-DD — <phase/context>` heading.
   filer create-then-update، prepare_bytes passthrough، خزانهٔ رمز، Drive scan+dedup،
   Drive-offline no-op) سبز. `cd frontend && npm run build` سبز. تجربه:
   `experiences/multimodal-file-ingest-to-review-queue.md`.
+
+## 2026-07-22 — «اپ شده ماشینِ نویز» (فاز A): بندِ نویز + پاک‌سازیِ آشغال
+
+مالک با اسکرین‌شات نشان داد: ۱۰۶ اعلانِ خوانده‌نشده، ده‌ها جعبهٔ «رمز بده» برای
+PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هنوز در «نیازمند توجه». نقشه‌برداریِ
+موازیِ ۵-عامله (workflow) علتِ هر مورد را دقیق کرد.
+
+- **FINDING (سیلِ فایل رمزدار)** `email_ingest._propose_password_request` برای هر
+  فایلِ قفل یک InboxItem + یک `notify_event(attention_alert)` (کانالِ in_app+telegram)
+  می‌ساخت — بدونِ فیلترِ ارزش، بدونِ batch، بدونِ سقف. dedup فقط `status=='pending'` را
+  می‌دید، پس backfill هر بار تکراری می‌ساخت. → منشأِ ۱۰۶ اعلان + ده‌ها بویلرپلیت.
+- **CHANGE (فیلترِ ارزش)** `_is_worthless_locked(filename)`: بویلرپلیتِ کارگزار
+  (terms/policy/disclosure/refer-a-friend/conflicts/privacy…) رد می‌شود — نه درخواست،
+  نه اعلان؛ با تقدمِ allow-list تا «Statement of Terms» یا «صورتحساب» عبور کند.
+- **CHANGE (batch digest + cooldownِ بادوام)** notify از حلقهٔ per-file خارج شد؛
+  `notify_locked_digest` یک پیامِ خلاصه («N فایلِ رمزدار منتظرِ رمز») در هر پنجرهٔ
+  cooldown (پیش‌فرض ۶h، stamp در GlobalSetting تا restartِ Render صفرش نکند) می‌فرستد.
+  triage و backfill بعد از batch یک‌بار صدایش می‌زنند.
+- **CHANGE (dedup روی همهٔ statusها)** `_propose_password_request` دیگر `pending` را
+  شرط نمی‌کند؛ هر status با همان source_ref = تکرار نساز.
+- **CHANGE (پاک‌سازیِ پس‌گرد + خودکار)** `cleanup_service`:
+  `auto_purge_exact_test_junk` (soft-deleteِ برگشت‌پذیرِ ردیف‌هایی که کلِ عنوانشان دقیقاً
+  «test/تست/sample…» است — بی‌ابهام) + `dismiss/scan_locked_boilerplate` (بویلرپلیتِ
+  قفل → dismissed). یک startup one-shot در main.py هر دو را در بوت اجرا می‌کند، پس آشغال
+  بدونِ جستنِ دکمه ناپدید می‌شود (idempotent). scan/remove_test_junk حالا InboxItem را هم
+  پوشش می‌دهد.
+- **CHANGE (خواندنِ همه)** `NotificationService.mark_all_read` + `POST
+  /api/notifications/mark-all-read` + دکمهٔ «خواندنِ همه» در کارتِ اعلانِ داشبورد —
+  پاک‌کردنِ بَجِ ۱۰۶ با یک ضربه (فقط خوانده‌علامت، حذف نمی‌کند). endpointهای
+  `/api/cleanup/auto-purge` و `/api/cleanup/locked-boilerplate[/dismiss]` هم اضافه شد.
+- **VERIFY** `tests/test_noise_cleanup.py` (۶ مورد: فیلترِ ارزش، dismiss/scanِ بویلرپلیت،
+  dedupِ همه‌status، auto-purgeِ exact-only، digestِ batch+cooldown، mark_all_read) سبز؛
+  گیتِ بک‌اند بدونِ شکستِ non-baseline؛ build سبز. رفتار حفظ شد: قابلیتِ password_request
+  و همهٔ endpointها می‌مانند؛ فقط بویلرپلیت رد و push یک digest می‌شود (rules 2-3).
+- **NOTE (تشخیصِ اصلاح‌شده)** «آشغالِ تستی» در «نیازمند توجه» = ردیفِ Task است و
+  scan_test_junk از قبل Taskها را پوشش می‌داد؛ علتِ ماندن = ابزار دستی/دفن‌شده بود و مالک
+  اجرایش نکرده بود. رفع: startup one-shot خودش پاک می‌کند.

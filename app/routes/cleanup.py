@@ -49,3 +49,39 @@ async def remove(
         db, user_id, [i.model_dump() for i in payload.items]
     )
     return {"ok": True, "success": True, "removed": removed, "total": sum(removed.values())}
+
+
+@router.post("/api/cleanup/auto-purge", tags=["cleanup"])
+@handle_errors
+async def auto_purge(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """One tap: reversibly remove every row whose ENTIRE title is a test word
+    (exact match — safe). Same as the startup one-shot, on demand."""
+    removed = await cleanup_service.auto_purge_exact_test_junk(db, user_id)
+    return {"ok": True, "success": True, "removed": removed, "total": sum(removed.values())}
+
+
+@router.get("/api/cleanup/locked-boilerplate", tags=["cleanup"])
+@handle_errors
+async def scan_locked(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    items = await cleanup_service.scan_locked_boilerplate(db, user_id)
+    return {"ok": True, "success": True, "items": items, "count": len(items)}
+
+
+@router.post("/api/cleanup/locked-boilerplate/dismiss", tags=["cleanup"])
+@handle_errors
+async def dismiss_locked(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """Dismiss every pending boilerplate «فایل رمزدار» request (soft/restorable)
+    — clears the dozens of Terms/Policy/Disclosure password boxes at once."""
+    res = await cleanup_service.dismiss_locked_boilerplate(db, user_id)
+    return {"ok": True, "success": True, **res}

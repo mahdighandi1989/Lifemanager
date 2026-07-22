@@ -940,6 +940,30 @@ async def _seed_personal_development():
         logger.warning("personal-development seed skipped: %s", exc)
 
 
+# ── Auto-cleanup one-shot (owner: «چرا هنوز آشغالِ تستی می‌بینم») ────────────
+# Reversibly clears the two kinds of noise the owner kept seeing, so they
+# disappear WITHOUT hunting for a cleanup button: (1) rows whose entire title
+# is a test word (exact match → soft-delete), and (2) the dozens of worthless
+# broker-boilerplate «فایل رمزدار» requests (→ dismissed). Idempotent: once
+# cleared, re-runs are no-ops. Everything is restorable (soft markers).
+@app.on_event("startup")
+async def _auto_cleanup_junk():
+    try:
+        from app.database import SessionLocal
+        from app.services.cleanup_service import (
+            auto_purge_exact_test_junk,
+            dismiss_locked_boilerplate,
+        )
+
+        async with SessionLocal() as session:
+            purged = await auto_purge_exact_test_junk(session, user_id=0)
+            locked = await dismiss_locked_boilerplate(session, user_id=0)
+        if any(purged.values()) or locked.get("dismissed"):
+            logger.info("🧹 auto-cleanup: test-junk=%s, locked-boilerplate=%s", purged, locked)
+    except Exception as exc:
+        logger.warning("auto-cleanup skipped: %s", exc)
+
+
 # ── Brain reminder loop (رشد ذهن — weekly upload reminder via Telegram) ─────
 @app.on_event("startup")
 async def _start_brain_reminder():

@@ -51,7 +51,7 @@ async def test_remove_is_reversible_soft_delete(db_session):
         [{"kind": "task", "id": t.id}, {"kind": "project", "id": p.id},
          {"kind": "list", "id": lst.id}, {"kind": "todo", "id": it.id}],
     )
-    assert removed == {"task": 1, "project": 1, "list": 1, "todo": 1, "subscription": 0}
+    assert removed == {"task": 1, "project": 1, "list": 1, "todo": 1, "subscription": 0, "inbox": 0}
 
     # each was soft-marked, not destroyed — the rows still exist and can be undone
     await db_session.refresh(t); await db_session.refresh(p)

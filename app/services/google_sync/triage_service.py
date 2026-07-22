@@ -227,12 +227,19 @@ async def analyze_new_emails(
 
     # Universal attachment ingest: read this batch's attachments (statements,
     # documents, scans…) → review candidates. Best-effort + fail-open; a no-op
-    # when Google isn't connected (get_access_token → None).
+    # when Google isn't connected (get_access_token → None). Worthless broker
+    # boilerplate is skipped; the locked-file push is ONE batched digest per
+    # cooldown window (not one per file — the owner's «ماشینِ نویز» complaint).
     try:
-        from app.services.ingest.email_ingest import ingest_email_attachments
+        from app.services.ingest.email_ingest import (
+            ingest_email_attachments,
+            notify_locked_digest,
+        )
 
         for email in rows:
             await ingest_email_attachments(db, email, user_id=0)
+        await db.commit()
+        await notify_locked_digest(db, user_id=0)
         await db.commit()
     except Exception as exc:
         logger.debug("attachment ingest batch skipped: %r", exc)

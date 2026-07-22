@@ -165,6 +165,19 @@ async def list_notifications_api(
     return await svc.get_user_notifications(user_id)
 
 
+@api_router.post("/api/notifications/mark-all-read", tags=["notifications"])
+async def mark_all_read_api(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+):
+    """«خواندنِ همه» — clear the whole unread backlog in one tap (owner's
+    106-notification pile). Marks read, never deletes. Same anon→0 scope as
+    GET /api/notifications, so it targets exactly the bell's rows."""
+    svc = NotificationService(db)
+    n = await svc.mark_all_read(user_id)
+    return {"ok": True, "success": True, "marked": n}
+
+
 # Naming convention: every notification endpoint path is lower-snake_case.
 # `mark_as_read` lives at /{notification_id}/read (a noun-only RESTful
 # path) — NOT the legacy camelCase /markAsRead. Decorator calls are

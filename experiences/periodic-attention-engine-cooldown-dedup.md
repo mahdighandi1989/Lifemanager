@@ -118,3 +118,34 @@ async def loop(stop_event):
 - الگوی خواهر: [universal-capture-inbox-with-ai-triage] (صندوق ورودی که این موتور به آن nag می‌زند)
 - الگوی خواهر: [notification-channel-event-preferences] (مسیر ارسال + ترجیحات)
 - الگوی خواهر: [bidirectional-telegram-bot-webhook] (send seam و fail-open بدون توکن)
+
+## Update 2026-07-22 — value-filter + batch-digest for machine-generated alerts
+
+A locked-file detector proved that cooldown/dedup alone isn't enough — an
+auto-ingest pipeline flooded the owner with 106 unread notifications and dozens
+of "enter password" cards, one per file, most for worthless boilerplate. The
+noise came from four missing guards. The reusable rule for ANY system that
+turns detected items into user-facing alerts:
+
+1. **Value-filter BEFORE you alert.** Not every detected item deserves a prompt.
+   Classify by cheap metadata (filename/sender) into worth-acting vs boilerplate
+   with an ALLOW-list that overrides the DENY-list (`_FINANCIAL_RE` wins over
+   `_BOILERPLATE_RE`), so a genuine "Statement of Terms" still flows while
+   "Terms and Conditions" is dropped silently — no row, no push.
+2. **Batch the push, not the record.** Keep creating the per-item record (the
+   inbox row stays), but hoist the NOTIFICATION out of the per-item loop to the
+   batch caller: one digest ("N files waiting: •a •b …") per run, not N pushes.
+3. **Durable cooldown, never in-process.** The digest fires at most once per
+   window using a timestamp in a settings/GlobalSetting row — an in-process
+   timer resets on every free-tier restart and the flood resumes.
+4. **Dedup across ALL statuses + retroactive purge.** Dedup the "already
+   proposed" check on the source key across pending|filed|dismissed (pending-only
+   lets dismissed items resurface every re-scan). Ship a reversible retroactive
+   cleanup (soft-delete/dismiss) AND run it as an idempotent startup one-shot, so
+   the EXISTING backlog clears without the owner hunting for a button — plus a
+   bulk `mark_all_read` for the notification pile (mark read, never delete).
+
+Pitfall: an auto-purge that runs on startup must match EXACTLY (whole value ==
+a test token), never substring, or it silently deletes legitimate rows on every
+deploy. Substring/ambiguous matches belong in the manual, explicitly-confirmed
+tool only.
