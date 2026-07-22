@@ -46,9 +46,21 @@ def _scope(uid: int, *, include_deleted: bool = False):
     return owner & PersonalWriting.deleted_at.is_(None)
 
 
+def _effective_sahat(w: PersonalWriting):
+    try:
+        from app.services.sahat_service import effective_writing_sahat
+
+        return effective_writing_sahat(w)
+    except Exception:
+        return getattr(w, "sahat", None)
+
+
 def _summary(w: PersonalWriting) -> dict:
     return {
         "id": w.id, "title": w.title, "category": w.category,
+        # خداشهر: effective sahat (stored value wins, else classifier).
+        "sahat": _effective_sahat(w),
+        "sahat_source": "owner" if getattr(w, "sahat", None) else "auto",
         "source_note": w.source_note,
         "written_at": w.written_at.isoformat() if w.written_at else None,
         "sort_order": w.sort_order, "body_chars": len(w.body or ""),

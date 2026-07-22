@@ -43,6 +43,14 @@ def _owned_or_unowned(user_id: int):
     return or_(Project.user_id == user_id, Project.user_id.is_(None))
 
 
+# خداشهر: pure + total (never raises) — this file's no-try/except guard test
+# stays satisfied; effective_project_sahat itself is defensive getattr-only.
+def _effective_sahat(p: Project):
+    from app.services.sahat_service import effective_project_sahat
+
+    return effective_project_sahat(p)
+
+
 def _serialize(p: Project) -> dict:
     return {
         "id": p.id,
@@ -50,6 +58,9 @@ def _serialize(p: Project) -> dict:
         "description": p.description,
         "user_id": p.user_id,
         "status": getattr(p, "status", "active") or "active",
+        # خداشهر: effective sahat (stored value wins, else classifier).
+        "sahat": _effective_sahat(p),
+        "sahat_source": "owner" if getattr(p, "sahat", None) else "auto",
         "is_active": bool(p.is_active),
         "created_at": p.created_at.isoformat() if p.created_at else None,
         "updated_at": p.updated_at.isoformat() if p.updated_at else None,

@@ -129,6 +129,14 @@ def _task_visible_to(task: Task, user_id: int) -> bool:
     return bool(task.user_id is None or task.user_id == user_id)
 
 
+# خداشهر: pure + total (never raises) — this file's no-try/except guard test
+# stays satisfied; effective_task_sahat itself is defensive getattr-only.
+def _effective_sahat(t: Task):
+    from app.services.sahat_service import effective_task_sahat
+
+    return effective_task_sahat(t)
+
+
 def _serialize(t: Task) -> dict:
     return {
         "id": t.id,
@@ -139,6 +147,9 @@ def _serialize(t: Task) -> dict:
         "user_id": t.user_id,
         "project_id": t.project_id,
         "due_date": t.due_date.isoformat() if t.due_date else None,
+        # خداشهر: effective sahat (stored value wins, else classifier).
+        "sahat": _effective_sahat(t),
+        "sahat_source": "owner" if getattr(t, "sahat", None) else "auto",
         "estimated_cost": float(t.estimated_cost) if t.estimated_cost is not None else None,
         "deadline": t.deadline.isoformat() if t.deadline else None,
         "estimated_duration": t.estimated_duration,

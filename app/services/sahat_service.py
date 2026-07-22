@@ -1,30 +1,39 @@
-"""نقشهٔ ساحت‌ها — the human-dimensions layer over the WHOLE system.
+"""خداشهر — the God-city: the human-dimensions layer over the WHOLE system.
 
-Owner's foundational reframing (2026-07-22): the app manages the life of a
-HUMAN whose worldview is Shia fiqh, so everything — tasks, writings, emails,
-finance, people, files, wishes, even idle downloads — must find its place under
-the human ساحت‌ها. The primary axis is the fiqhi four-relations (the axis of
-تکلیف and severity): رابطه با خدا / با خود / با دیگران / با محیط — with the
-modern five-sahat model slotted in as facets of «خود» (جسم/عقل/روان), exactly
-the synthesis the owner's consultation reached.
+Owner's foundational reframing (2026-07-22, corrected twice): the app manages
+the life of a HUMAN whose worldview is Shia fiqh, so everything — tasks,
+writings, emails, finance, people, files, wishes, hobbies, even idle
+downloads — must find its place under the human ساحت‌ها. **This is a CITY,
+not a mosque**: the God-relation is the قبله the whole city faces, not a
+worship corner; the bulk of the city is مباحات — ordinary work, trade,
+hobbies, errands — each standing in its own district with dignity.
 
-Design commitments:
-  * **A LENS, not a rebuild.** Nothing already built is discarded; this module
-    only READS the existing tables and buckets every row under a sahat via
-    deterministic rules (keyword/domain/relation), so anything new added
-    anywhere classifies itself automatically. No source table is mutated.
-  * **Principled weights (اصالت), from فقه:** severity is anchored in the
-    مفسده/مصلحت ladder the owner specified — حق‌الناس/عهد (5) > اضرار به نفس
-    (4) > رشد/تهذیب (3) > لغو و اتلاف (1-2) — never arbitrary points.
+The primary axis is the fiqhi four-relations (the axis of تکلیف and
+severity): رابطه با خدا / با خود / با دیگران / با محیط — with the modern
+five-sahat model slotted in as facets of «خود» (جسم/عقل/روان), exactly the
+synthesis the owner's consultation reached.
+
+Design commitments (v2 — «خداشهر», replacing the v1 island):
+  * **Persistent + owner-correctable.** The five primary content tables carry
+    a nullable ``sahat`` column. A stored value ALWAYS wins; NULL falls back
+    to the deterministic classifier. The owner's correction is final and
+    visible on every page (chips), so the lens is woven through the app
+    instead of living on one page.
+  * **The machine never issues a fiqhi verdict.** It only flags PROBABILITY
+    with a decidable TEST per weight (see the ladder below). «احتمالِ
+    حق‌الناس», never «حق‌الناس» — certainty belongs to the owner.
   * **Deeds only, never intentions.** نیت is between the owner and God; the
-    machine scores observable follow-through (عمل و پیگیری), nothing more.
-  * **The map serves محاسبه.** The owner's own «خودسازی - محاسبه میان و پایان
-    هفته» practice is the consumption point: the map pre-computes the weekly
-    self-accounting sheet instead of replacing it.
+    machine scores observable follow-through, nothing more.
+  * **A writing is presence, not achievement.** Content mass (writings,
+    projects, assets) is shown but NEVER scored as «done» — v1's
+    every-writing-counts-as-done inflated the numbers dishonestly.
+  * **Threads (نخِ تسبیح) are data.** The registry lives in ``sahat_threads``
+    (seeded from the code list below, which stays as fallback), so the owner
+    adds a new stream without a deploy; scattered content self-attaches by
+    token match at read time.
 
 Deterministic + SQL-only (works on a keyless deploy); snapshots persist to
-``AIAssessment(assessment_type='sahat_map')`` for the over-time trend (same
-pattern as self_model_service).
+``AIAssessment(assessment_type='sahat_map')`` for the over-time trend.
 """
 from __future__ import annotations
 
@@ -43,82 +52,127 @@ SAHAT_MAP_TYPE = "sahat_map"
 
 # ── the taxonomy ────────────────────────────────────────────────────────────
 # Four fiqhi relations; «خود» carries the three modern facets (جسم/عقل/روان).
+# ``group`` drives the city layout: qibla (the orientation band), khod (the
+# three facets of self), rel (the outward relations). ``fa_short`` feeds the
+# small chips on the tool pages.
 SAHATS: Dict[str, Dict[str, Any]] = {
     "khoda": {
         "title": "رابطه با خدا",
-        "icon": "🕌",
-        "desc": "عبادت، نیت، خداشناسی، برنامه‌ریزیِ الهی",
-        "links": ["/writings", "/directives", "/lists"],
+        "fa_short": "خدا",
+        "icon": "🕋",
+        "group": "qibla",
+        "desc": "قبلهٔ شهر — خداشناسی، نیت، عبادت و برنامه‌ریزیِ الهی؛ همهٔ ساحت‌ها رو به این‌جا دارند",
+        "links": ["/writings", "/lists", "/directives"],
     },
     "khod_ravan": {
         "title": "خود — روان و اراده",
+        "fa_short": "روان",
         "icon": "💠",
-        "desc": "خودسازی، اخلاق، اراده و اهتمام، ترس و شجاعت",
+        "group": "khod",
+        "desc": "خودسازی، اخلاق، اراده و اهتمام، ترس و شجاعت، تفریحِ سالم",
         "links": ["/self-portrait", "/directives", "/lists"],
     },
     "khod_aql": {
         "title": "خود — عقل و ذهن",
+        "fa_short": "عقل",
         "icon": "📚",
-        "desc": "یادگیری، مطالعه، نوشته‌ها، رشدِ ذهن",
+        "group": "khod",
+        "desc": "یادگیری، مطالعه، نوشتن، مهارت‌ها، رشدِ ذهن",
         "links": ["/writings", "/brain", "/lists"],
     },
     "khod_jesm": {
         "title": "خود — جسم و سلامت",
+        "fa_short": "جسم",
         "icon": "💪",
-        "desc": "ورزش، تغذیه، خواب، سلامت",
+        "group": "khod",
+        "desc": "ورزش، تغذیه، خواب، سلامت و درمان",
         "links": ["/lists", "/tasks"],
     },
     "digaran": {
         "title": "رابطه با دیگران",
+        "fa_short": "دیگران",
         "icon": "🤝",
-        "desc": "خانواده و افراد، کار و پروژه، مالی و حق‌الناس، ایمیل‌ها",
+        "group": "rel",
+        "desc": "خانواده و افراد، کار و کسب، معامله و مالی، پروژه‌ها",
         "links": ["/people-profiles", "/budget", "/projects", "/tasks"],
     },
     "mohit": {
-        "title": "رابطه با محیط و ابزار",
+        "title": "رابطه با محیط و اموال",
+        "fa_short": "محیط",
         "icon": "🌍",
-        "desc": "اسناد و دارایی‌ها، اشتراک‌ها، نظمِ دیجیتال، انباشتگی",
+        "group": "rel",
+        "desc": "اسناد و دارایی‌ها، اشتراک‌ها، ابزار، نظمِ دیجیتال",
         "links": ["/life-file", "/assets", "/merge"],
     },
 }
 
+# Combined districts for navigation: «خود» aggregates its three facets.
+DISTRICTS: Dict[str, Dict[str, Any]] = {
+    "khoda": {"title": "رابطه با خدا", "keys": ["khoda"]},
+    "khod": {"title": "خود — جان و تن و ذهن", "keys": ["khod_ravan", "khod_aql", "khod_jesm"]},
+    "digaran": {"title": "رابطه با دیگران", "keys": ["digaran"]},
+    "mohit": {"title": "رابطه با محیط و اموال", "keys": ["mohit"]},
+}
+
 # ── Severity ladder (اصالتِ امتیاز — از فقه، نه قراردادی) ────────────────────
-# The owner's correction (2026-07-22): a broker's margin-call alert is NOT
-# حق‌الناس — no other person's right is involved; it is a risk to the owner's
-# OWN wealth. Per the اصیل Shia-fiqh concepts (the line of Imam Khomeini and
-# Imam Khamenei), each weight has a precise TEST, not a surface category:
+# The owner's corrections (2026-07-22, twice): weights are anchored in the
+# مفسده/مصلحت ladder, each with a decidable TEST — and the machine only ever
+# reports a PROBABILITY, never a verdict:
 #
-#   W_HAQ_NAS (5) — حق‌الناس/عهد. TEST: «آیا حقِ شخصِ دیگری بر گردنِ من درگیر
-#     است؟» بدهی، امانت، اجرت، وعده/قرارِ داده‌شده، پاسخی که یک انسانِ واقعی
-#     منتظرش است، پیگیریِ قول‌داده‌شده. حق‌الناس بدونِ رضایتِ صاحبِ حق ساقط
-#     نمی‌شود — لذا سنگین‌ترین وزن.
-#   W_ZARAR_KHOD (4) — اضرار به نفس (جسمی یا مالی؛ قاعدهٔ لاضرر + حرمتِ
-#     تضییعِ مال). TEST: «آیا جسم یا مالِ خودم در معرضِ ضررِ جدی است؟»
-#     سلامتِ رهاشده، سندِ منقضی، هشدارِ مالیِ حساب/بروکرِ خودم (مارجین و…).
-#   W_GROWTH (3) — رشد و تهذیب (واجب/مستحبِ سلوکی). TEST: «آیا مسیرِ رشدی که
-#     خودم تعهد کرده‌ام راکد مانده؟» نخِ تسبیحِ خودسازی/علمِ متوقف.
+#   W_HAQ_NAS (5) — «احتمالِ حق‌الناس/عهد». TEST: «آیا حقِ شخصِ دیگری بر گردنِ
+#     من درگیر است؟» بدهی، امانت، وعده/قرارِ داده‌شده، پاسخی که یک انسانِ
+#     واقعی منتظرش است. The machine flags this ONLY when a real person is
+#     linked AND the text carries a promise/debt marker (or a real human
+#     awaits a reply). Everything else is NOT حق‌الناس — a machine
+#     notification never passes this test by itself, and neither does an
+#     ordinary overdue project task.
+#   W_AHD (4) — عهد و قرار (تعهدِ داده‌شده به دیگران بدونِ نشانهٔ صریحِ دین/وعده).
+#   W_ZARAR_KHOD (4) — اضرار به نفس (جسمی یا مالی؛ لاضرر). TEST: «آیا جسم یا
+#     مالِ خودم در معرضِ ضررِ جدی است؟» سلامتِ رهاشده، سندِ منقضی، جریمهٔ
+#     پرداختنی، هشدارِ مالیِ حسابِ خودم.
+#   W_GROWTH (3) — رشد و تهذیب. TEST: «آیا مسیرِ رشدی که خودم تعهد کرده‌ام
+#     راکد مانده؟» — including صله/پیگیریِ رابطه (a lapsed follow-up is a
+#     stalled مستحب, NOT an automatic حق‌الناس).
 #   W_CLUTTER (1) — لغو و اتلاف. TEST: «نه حقِ کسی، نه ضررِ جدی — فقط ظرفِ
-#     عمر را پر کرده.» انباشتگیِ دیجیتال، صندوقِ تلنبار.
-#
-# A machine-generated notification NEVER passes the حق‌الناس test by itself;
-# only a real human awaiting something from the owner does.
+#     عمر را پر کرده.»
 W_HAQ_NAS = 5
+W_AHD = 4
 W_ZARAR_KHOD = 4
 W_GROWTH = 3
 W_CLUTTER = 1
 # Back-compat alias (older callers/tests may import the previous name).
 W_SELF_HARM = W_ZARAR_KHOD
 
-# Automated financial alerts about the owner's OWN accounts (margin calls,
-# balance warnings…) — risk to own wealth ⇒ اضرار به مالِ خود، ذیلِ محیط/اموال.
-_RE_FIN_ALERT = re.compile(
-    r"(margin|liquidat|balance|payment due|overdue|insufficient|statement|"
-    r"invoice|بدهی|سررسید|موجودی|اخطار|هشدار)",
+# Attention-item kinds → the honest badge the UI shows. Weight alone is not a
+# verdict; the kind says WHAT the flag means.
+ATTENTION_KINDS_FA = {
+    "haq_probable": "احتمالِ حق‌الناس",
+    "ahd": "عهد و قرار",
+    "zarar": "ضرر به خود/مال",
+    "selleh": "صله و پیگیریِ رابطه",
+    "growth": "رشد",
+    "clutter": "اتلاف",
+}
+
+# Promise/debt markers: only these turn a person-linked overdue task into an
+# «احتمالِ حق‌الناس». Deliberately narrow — false «حق‌الناس» is worse than a
+# missed flag (the owner's own محاسبه catches the rest).
+_RE_PROMISE = re.compile(
+    r"(قول|وعده|قرار گذاشت|قرض|بدهی|بدهکار|پس بده|امانت|تحویل|جواب|پاسخ|تعهد|اجرت|حقوق|طلب)",
     re.I,
 )
 
-# ── backbone (نخِ تسبیح) — the owner's named lists/writings pinned to sahats ─
-# Matched by substring on the list/writing name (case/spacing tolerant).
+# Automated financial alerts about the owner's OWN accounts (margin calls,
+# balance warnings…) — risk to own wealth ⇒ اضرار به مالِ خود، ذیلِ محیط/اموال.
+# Checked BEFORE the human test: a margin-call mail from a named broker
+# address is still a machine alert, not a person awaiting a reply.
+_RE_FIN_ALERT = re.compile(
+    r"(margin|liquidat|balance|payment due|overdue|insufficient|statement|"
+    r"invoice|alert|بدهی|سررسید|موجودی|اخطار|هشدار)",
+    re.I,
+)
+
+# ── backbone (ستون‌فقرات) — the owner's named lists/writings pinned to sahats ─
 _BACKBONE_LISTS = [
     ("عاشق خدا", "khoda"),
     ("مراقبه", "khoda"),
@@ -133,12 +187,36 @@ _BACKBONE_LISTS = [
 _BACKBONE_WRITING_TOKENS = ("خداشناسی", "برنامه‌ریزی الهی", "برنامه ریزی الهی", "شرح حال")
 
 # Keyword → sahat for free-text titles (first hit wins; checked in order).
+# v2: extended with the owner's REAL list names (تجارت، برنامه نویسی، مداحی،
+# خریدهای لازم…) so the actual data lands sensibly — the city is mostly
+# مباحات and they deserve correct districts, not a pious default.
 _KEYWORDS = [
-    ("khoda", ("نماز", "قرآن", "دعا", "روزه", "خدا", "الهی", "زیارت", "مسجد", "معنو")),
-    ("khod_jesm", ("ورزش", "دویدن", "باشگاه", "تمرین", "رژیم", "خواب", "سلامت", "پزشک", "دندان", "چکاپ")),
-    ("khod_aql", ("کتاب", "مطالعه", "خواندن", "یادگیری", "درس", "زبان", "دوره", "study", "read", "learn")),
-    ("digaran", ("تماس", "جلسه", "خانواده", "مادر", "پدر", "همسر", "دوست", "مهمان", "هدیه", "صله")),
-    ("mohit", ("نظافت", "تعمیر", "ماشین", "خانه", "اتاق", "مرتب", "بایگانی")),
+    ("khoda", (
+        "نماز", "قرآن", "دعا", "روزه", "خدا", "الهی", "زیارت", "مسجد", "معنو",
+        "معارف", "مداحی", "انبیا", "توسل", "اذان", "صدقه", "خمس", "زکات",
+    )),
+    ("khod_jesm", (
+        "ورزش", "دویدن", "باشگاه", "تمرین", "رژیم", "خواب", "سلامت", "پزشک",
+        "دندان", "چکاپ", "دارو", "درمان",
+    )),
+    ("khod_aql", (
+        "کتاب", "مطالعه", "خواندن", "یادگیری", "درس", "زبان", "دوره", "study",
+        "read", "learn", "برنامه نویسی", "برنامه‌نویسی", "ریاضی", "فیزیک",
+        "حقوق", "خوشنویسی", "نویسندگی", "شعر", "تاریخ", "تحلیل", "تفکر",
+        "ایده", "هوش", "مهارت",
+    )),
+    ("digaran", (
+        "تماس", "جلسه", "خانواده", "مادر", "پدر", "همسر", "دوست", "مهمان",
+        "هدیه", "صله", "تجارت", "درآمد", "کسب", "نفوذ", "فامیل", "مشتری",
+        "قرض", "بدهی", "همکار",
+    )),
+    ("mohit", (
+        "نظافت", "تعمیر", "ماشین", "خانه", "اتاق", "مرتب", "بایگانی", "خرید",
+        "مدارک", "اشتراک", "پرونده",
+    )),
+    ("khod_ravan", (
+        "تفریح", "سرگرمی", "عادت", "خودهیپنوتیزم", "صبر", "بیکار",
+    )),
 ]
 
 _DOMAIN_TO_SAHAT = {
@@ -173,6 +251,11 @@ def classify_text(text: Optional[str], default: str = "khod_ravan") -> str:
     return default
 
 
+def _stored(value: Optional[str]) -> Optional[str]:
+    """A stored sahat value, if valid — the owner's correction always wins."""
+    return value if value in SAHATS else None
+
+
 def backbone_sahat_for_list(name: Optional[str]) -> Optional[str]:
     n = (name or "")
     for token, sahat in _BACKBONE_LISTS:
@@ -186,12 +269,58 @@ def _is_backbone_writing(title: Optional[str], category: Optional[str]) -> bool:
     return any(tok in blob for tok in _BACKBONE_WRITING_TOKENS)
 
 
+# ── effective-sahat helpers (stored value wins; pure + cheap) ───────────────
+# Used by the tool-page serializers (lists/tasks/writings/directives/projects)
+# so every page can SHOW the lens and offer the correction chip.
+
+def effective_task_sahat(t) -> str:
+    return (
+        _stored(getattr(t, "sahat", None))
+        or ("digaran" if getattr(t, "project_id", None) else None)
+        or classify_text(getattr(t, "title", None))
+    )
+
+
+def effective_list_sahat(lst) -> str:
+    return (
+        _stored(getattr(lst, "sahat", None))
+        or backbone_sahat_for_list(getattr(lst, "name", None))
+        or classify_text(getattr(lst, "name", None), default="khod_ravan")
+    )
+
+
+def effective_writing_sahat(w) -> str:
+    stored = _stored(getattr(w, "sahat", None))
+    if stored:
+        return stored
+    blob = f"{getattr(w, 'title', '') or ''} {getattr(w, 'category', '') or ''}"
+    if _is_backbone_writing(getattr(w, "title", None), getattr(w, "category", None)):
+        return "khoda"
+    th = thread_for(blob)
+    if th is not None:
+        return th["sahat"]
+    return classify_text(blob, default="khod_aql")
+
+
+def effective_directive_sahat(d) -> str:
+    return (
+        _stored(getattr(d, "sahat", None))
+        or _DOMAIN_TO_SAHAT.get(getattr(d, "domain", "") or "", None)
+        or classify_text(getattr(d, "title", None))
+    )
+
+
+def effective_project_sahat(p) -> str:
+    return _stored(getattr(p, "sahat", None)) or classify_text(
+        getattr(p, "name", None), default="digaran"
+    )
+
+
 # ── نخ‌های تسبیح (threads) — the accretion infrastructure ───────────────────
-# Each thread is a NAMED STREAM under one sahat. Scattered content — a new
-# writing, a list, a directive, a voice-note typed up later — self-attaches to
-# its thread by token match at read time, so the owner's «مطالب پراکنده» always
-# find their place and stay trackable WITHOUT re-filing anything. Adding a new
-# thread = one line here; everything matching starts flowing immediately.
+# v2: the registry is DATA (``sahat_threads`` table, editable from the UI);
+# this code list is the SEED and the fallback for keyless/empty deploys.
+# Matching semantics are unchanged: any new content naming a thread
+# self-attaches to it at read time.
 THREADS: List[Dict[str, Any]] = [
     {"key": "khodashenasi", "sahat": "khoda", "title": "خداشناسی و شرح حال",
      "tokens": ("خداشناسی", "شرح حال"), "link": "/writings"},
@@ -215,35 +344,162 @@ THREADS: List[Dict[str, Any]] = [
 
 
 def thread_for(text: Optional[str]) -> Optional[Dict[str, Any]]:
-    """First thread whose token appears in the text, else None. This is the
-    accretion hook: ANY new content naming a thread self-attaches to it."""
+    """First CODE-registry thread whose token appears in the text, else None.
+    (Kept for back-compat and for the pure helpers above; the map itself uses
+    the DB registry via :func:`get_threads`.)"""
+    return _thread_for_in(THREADS, text)
+
+
+def _thread_for_in(registry: List[Dict[str, Any]], text: Optional[str]) -> Optional[Dict[str, Any]]:
     t = text or ""
     if not t.strip():
         return None
-    for th in THREADS:
+    for th in registry:
         if any(tok in t for tok in th["tokens"]):
             return th
     return None
 
 
+async def ensure_threads_seeded(db: AsyncSession, uid: int = 0) -> None:
+    """Fill-empty seeding: every code-registry thread missing from the DB is
+    inserted (merge, don't replace — owner rows are never touched)."""
+    try:
+        from app.models.sahat_thread import SahatThread
+
+        rows = (
+            await db.execute(select(SahatThread).where(_scope(SahatThread.user_id, uid)))
+        ).scalars().all()
+        have = {r.key for r in rows}
+        added = False
+        for i, th in enumerate(THREADS):
+            if th["key"] in have:
+                continue
+            db.add(SahatThread(
+                user_id=None if uid == 0 else uid,
+                key=th["key"],
+                title=th["title"],
+                sahat=th["sahat"],
+                tokens=list(th["tokens"]),
+                link=th.get("link"),
+                sort_order=i,
+            ))
+            added = True
+        if added:
+            await db.commit()
+    except Exception as exc:
+        logger.debug("sahat thread seeding skipped: %r", exc)
+        try:
+            await db.rollback()
+        except Exception:
+            pass
+
+
+async def get_threads(db: AsyncSession, uid: int = 0) -> List[Dict[str, Any]]:
+    """Active threads from the DB (seeded on first read); falls back to the
+    code registry so a keyless/broken deploy keeps its map."""
+    try:
+        from app.models.sahat_thread import SahatThread
+
+        await ensure_threads_seeded(db, uid)
+        rows = (
+            await db.execute(
+                select(SahatThread)
+                .where(_scope(SahatThread.user_id, uid), SahatThread.is_active.is_(True))
+                .order_by(SahatThread.sort_order, SahatThread.id)
+            )
+        ).scalars().all()
+        out = []
+        for r in rows:
+            tokens = tuple(r.tokens or ())
+            if not tokens:
+                continue
+            out.append({
+                "id": r.id, "key": r.key, "sahat": r.sahat if r.sahat in SAHATS else "khod_ravan",
+                "title": r.title, "tokens": tokens, "link": r.link or "/lists",
+            })
+        return out or list(THREADS)
+    except Exception as exc:
+        logger.debug("sahat threads fallback to code registry: %r", exc)
+        return list(THREADS)
+
+
+# ── owner correction (the assign endpoint's engine) ─────────────────────────
+_ASSIGNABLE = {
+    "task": ("app.models.task", "Task", "user_id"),
+    "list": ("app.models.todo_list", "TodoList", "user_id"),
+    "writing": ("app.models.personal_writing", "PersonalWriting", "user_id"),
+    "directive": ("app.models.directive", "Directive", "user_id"),
+    "project": ("app.models.project", "Project", "user_id"),
+}
+
+
+async def assign_sahat(
+    db: AsyncSession, uid: int, entity_type: str, entity_id: int, sahat: str
+) -> bool:
+    """Persist the owner's sahat correction. Returns False when the entity is
+    missing or out of scope (route answers 404 — cross-tenant rows stay
+    hidden). ``sahat`` must be a known key."""
+    if sahat not in SAHATS or entity_type not in _ASSIGNABLE:
+        raise ValueError("unknown sahat or entity type")
+    import importlib
+
+    mod_name, cls_name, owner_col = _ASSIGNABLE[entity_type]
+    model = getattr(importlib.import_module(mod_name), cls_name)
+    row = (
+        await db.execute(
+            select(model).where(model.id == entity_id, _scope(getattr(model, owner_col), uid))
+        )
+    ).scalars().first()
+    if row is None:
+        return False
+    row.sahat = sahat
+    await db.commit()
+    return True
+
+
 def _empty_cell() -> Dict[str, Any]:
-    return {"total": 0, "done": 0, "attention": [], "backbone": []}
-
-
-async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
-    """Aggregate EVERYTHING into the six sahat buckets, live. Read-only."""
-    cells: Dict[str, Dict[str, Any]] = {k: _empty_cell() for k in SAHATS}
-    today = date.today()
-    # thread accumulators — scattered content self-attaches here by token match
-    thr: Dict[str, Dict[str, Any]] = {
-        th["key"]: {"done": 0, "total": 0, "writings": 0, "directives": 0, "lists": 0}
-        for th in THREADS
+    return {
+        "total": 0, "done": 0, "attention": [], "backbone": [],
+        # content mass — shown, never scored:
+        "writings": 0, "projects": 0, "assets": 0,
+        # item-level detail (filled only when detail=True):
+        "detail": {"tasks": [], "lists": [], "writings": [], "directives": [], "projects": []},
     }
 
-    def att(sahat: str, label: str, weight: int, link: str) -> None:
-        cells[sahat]["attention"].append({"label": label[:120], "weight": weight, "link": link})
 
-    # ── Tasks (with people/project ⇒ دیگران/حق‌الناس) ────────────────────────
+async def build_sahat_map(
+    db: AsyncSession, uid: int = 0, detail: bool = False
+) -> Dict[str, Any]:
+    """Aggregate EVERYTHING into the six sahat buckets, live. Read-only.
+
+    ``detail=True`` additionally fills per-cell item lists (the district pages
+    drill down through them) — same single pass, no second query storm.
+    """
+    cells: Dict[str, Dict[str, Any]] = {k: _empty_cell() for k in SAHATS}
+    today = date.today()
+    threads_reg = await get_threads(db, uid)
+    thr: Dict[str, Dict[str, Any]] = {
+        th["key"]: {"done": 0, "total": 0, "writings": 0, "directives": 0, "lists": 0,
+                    "samples": []}
+        for th in threads_reg
+    }
+
+    def att(sahat: str, label: str, weight: int, link: str, kind: str = "growth") -> None:
+        cells[sahat]["attention"].append({
+            "label": label[:120], "weight": weight, "link": link, "kind": kind,
+            "kind_fa": ATTENTION_KINDS_FA.get(kind, "رشد"),
+        })
+
+    def thr_sample(key: str, title: str) -> None:
+        row = thr.get(key)
+        if row is not None and len(row["samples"]) < 5 and title:
+            row["samples"].append(title[:80])
+
+    # ── Tasks ───────────────────────────────────────────────────────────────
+    # حق‌الناس honesty (owner's correction): a person-linked overdue task is
+    # only «احتمالِ حق‌الناس» when its text carries a promise/debt marker;
+    # otherwise it is عهد (4). A plain overdue project task is عهد با خود (3)
+    # — never automatic حق‌الناس.
     try:
         from app.models.person_task import person_tasks
         from app.models.task import Task, TaskStatus
@@ -260,20 +516,38 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
         for t in tasks:
             if t.status == TaskStatus.CANCELLED:
                 continue
-            sahat = "digaran" if (t.id in linked_ids or t.project_id) else classify_text(t.title)
+            person_linked = t.id in linked_ids
+            sahat = (
+                _stored(getattr(t, "sahat", None))
+                or ("digaran" if (person_linked or t.project_id) else classify_text(t.title))
+            )
             cell = cells[sahat]
             cell["total"] += 1
+            overdue = bool(t.due_date and t.due_date < today and t.status != TaskStatus.DONE)
             if t.status == TaskStatus.DONE:
                 cell["done"] += 1
-            elif t.due_date and t.due_date < today:
-                w = W_HAQ_NAS if sahat == "digaran" else (
-                    W_ZARAR_KHOD if sahat == "khod_jesm" else W_GROWTH
-                )
-                att(sahat, f"کارِ عقب‌افتاده: {t.title}", w, "/tasks")
+            elif overdue:
+                if person_linked and _RE_PROMISE.search(t.title or ""):
+                    att(sahat, f"کارِ عقب‌افتاده با پای یک شخص: {t.title}", W_HAQ_NAS, "/tasks",
+                        kind="haq_probable")
+                elif person_linked:
+                    att(sahat, f"کارِ عقب‌افتادهٔ مرتبط با یک شخص: {t.title}", W_AHD, "/tasks",
+                        kind="ahd")
+                elif sahat == "khod_jesm":
+                    att(sahat, f"کارِ عقب‌افتادهٔ سلامت: {t.title}", W_ZARAR_KHOD, "/tasks",
+                        kind="zarar")
+                else:
+                    att(sahat, f"کارِ عقب‌افتاده: {t.title}", W_GROWTH, "/tasks", kind="growth")
+            if detail and t.status != TaskStatus.DONE and len(cell["detail"]["tasks"]) < 60:
+                cell["detail"]["tasks"].append({
+                    "id": t.id, "title": t.title, "status": str(t.status.value if hasattr(t.status, "value") else t.status),
+                    "due_date": t.due_date.isoformat() if t.due_date else None,
+                    "overdue": overdue,
+                })
     except Exception as exc:
         logger.debug("sahat tasks skipped: %r", exc)
 
-    # ── Todo lists + items (the نخِ تسبیح lives here) ────────────────────────
+    # ── Todo lists + items ──────────────────────────────────────────────────
     try:
         from app.models.todo_item import TodoItem
         from app.models.todo_list import TodoList, todo_list_items
@@ -289,7 +563,6 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             )
         ).scalars().all()
         item_by_id = {i.id: i for i in items}
-        # items ↔ lists is M2M through todo_list_items
         by_list: Dict[int, List] = {}
         for list_id, item_id in (
             await db.execute(select(todo_list_items.c.todo_list_id, todo_list_items.c.todo_item_id))
@@ -298,7 +571,7 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             if it is not None:
                 by_list.setdefault(list_id, []).append(it)
         for lst in lists:
-            sahat = backbone_sahat_for_list(lst.name) or classify_text(lst.name, default="khod_ravan")
+            sahat = effective_list_sahat(lst)
             rows = by_list.get(lst.id, [])
             done = sum(1 for i in rows if i.is_completed)
             cell = cells[sahat]
@@ -308,18 +581,25 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 cell["backbone"].append({
                     "label": lst.name, "done": done, "total": len(rows), "link": "/lists",
                 })
-            th = thread_for(lst.name)
+            th = _thread_for_in(threads_reg, lst.name)
             if th is not None:
                 thr[th["key"]]["lists"] += 1
                 thr[th["key"]]["done"] += done
                 thr[th["key"]]["total"] += len(rows)
+                thr_sample(th["key"], lst.name)
             for i in rows:
                 if not i.is_completed and i.due_date and i.due_date < today:
                     att(sahat, f"آیتمِ موعدگذشته: {(i.content or '')[:60]}", W_GROWTH, "/lists")
+            if detail and len(cell["detail"]["lists"]) < 60:
+                cell["detail"]["lists"].append({
+                    "id": lst.id, "name": lst.name, "done": done, "total": len(rows),
+                })
     except Exception as exc:
         logger.debug("sahat lists skipped: %r", exc)
 
-    # ── Writings (backbone: خداشناسی / برنامه‌ریزی الهی) ─────────────────────
+    # ── Writings — presence, not achievement ────────────────────────────────
+    # v1 counted every writing as done/total (a fake 100%). v2 counts content
+    # MASS per sahat and lets the backbone show as documents, unscored.
     try:
         from app.models.personal_writing import PersonalWriting
 
@@ -332,23 +612,28 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
         ).scalars().all()
         for w in writings:
             blob = f"{w.title or ''} {w.category or ''}"
-            th = thread_for(blob)
+            th = _thread_for_in(threads_reg, blob)
             if th is not None:
                 thr[th["key"]]["writings"] += 1
+                thr_sample(th["key"], w.title or "نوشته")
+            sahat = _stored(getattr(w, "sahat", None)) or (
+                "khoda" if _is_backbone_writing(w.title, w.category)
+                else (th["sahat"] if th is not None else classify_text(blob, default="khod_aql"))
+            )
+            cell = cells[sahat]
+            cell["writings"] += 1
             if _is_backbone_writing(w.title, w.category):
-                cells["khoda"]["total"] += 1
-                cells["khoda"]["done"] += 1  # a written piece IS the artifact
-                cells["khoda"]["backbone"].append({
-                    "label": w.title or "نوشته", "done": 1, "total": 1, "link": "/writings",
+                cell["backbone"].append({
+                    "label": w.title or "نوشته", "doc": True, "link": "/writings",
                 })
-            else:
-                sahat = (th["sahat"] if th is not None else None) or classify_text(blob, default="khod_aql")
-                cells[sahat]["total"] += 1
-                cells[sahat]["done"] += 1
+            if detail and len(cell["detail"]["writings"]) < 60:
+                cell["detail"]["writings"].append({
+                    "id": w.id, "title": w.title, "category": w.category,
+                })
     except Exception as exc:
         logger.debug("sahat writings skipped: %r", exc)
 
-    # ── Directives (فرمان‌ها) by domain ──────────────────────────────────────
+    # ── Directives (فرمان‌ها) ───────────────────────────────────────────────
     try:
         from app.models.directive import Directive
 
@@ -359,10 +644,11 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             status = str(getattr(d, "status", "")).lower()
             if status == "archived":
                 continue
-            th = thread_for(d.title)
+            th = _thread_for_in(threads_reg, d.title)
             if th is not None:
                 thr[th["key"]]["directives"] += 1
-            sahat = _DOMAIN_TO_SAHAT.get(getattr(d, "domain", "") or "", None) or classify_text(d.title)
+                thr_sample(th["key"], d.title or "فرمان")
+            sahat = effective_directive_sahat(d)
             cell = cells[sahat]
             cell["total"] += 1
             if status == "graduated":
@@ -371,10 +657,32 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             done_n = int(getattr(d, "times_done", 0) or 0)
             if status == "active" and missed > max(done_n, 2):
                 att(sahat, f"فرمانِ رهاشده: {(d.title or '')[:60]}", W_GROWTH, "/directives")
+            if detail and status in ("active", "proposed") and len(cell["detail"]["directives"]) < 60:
+                cell["detail"]["directives"].append({
+                    "id": d.id, "title": d.title, "status": status,
+                    "strength": int(getattr(d, "strength", 0) or 0),
+                    "streak": int(getattr(d, "streak", 0) or 0),
+                })
     except Exception as exc:
         logger.debug("sahat directives skipped: %r", exc)
 
-    # ── People (دیگران): overdue follow-ups / birthdays ─────────────────────
+    # ── Projects — presence (mass), classified + correctable ────────────────
+    try:
+        from app.models.project import Project
+
+        projects = (
+            await db.execute(select(Project).where(_scope(Project.user_id, uid)))
+        ).scalars().all()
+        for p in projects:
+            sahat = effective_project_sahat(p)
+            cells[sahat]["projects"] += 1
+            if detail and len(cells[sahat]["detail"]["projects"]) < 30:
+                cells[sahat]["detail"]["projects"].append({"id": p.id, "name": p.name})
+    except Exception as exc:
+        logger.debug("sahat projects skipped: %r", exc)
+
+    # ── People (دیگران): صله و پیگیری — NOT automatic حق‌الناس ──────────────
+    people_overdue: List[Dict[str, Any]] = []
     try:
         from app.models.person import Person
 
@@ -389,16 +697,18 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
         for p in people:
             nf = getattr(p, "next_follow_up", None)
             if nf and nf < today:
-                att("digaran", f"پیگیریِ عقب‌افتاده: {p.name}", W_HAQ_NAS, "/people-profiles")
+                att("digaran", f"پیگیریِ رابطه: {p.name}", W_GROWTH, "/people-profiles",
+                    kind="selleh")
+                people_overdue.append({"id": p.id, "name": p.name, "next_follow_up": nf.isoformat()})
     except Exception as exc:
         logger.debug("sahat people skipped: %r", exc)
 
     # ── Emails needing action — the حق‌الناس TEST applied correctly ──────────
-    # Only a REAL HUMAN awaiting a reply engages another person's right. A
-    # machine-generated alert never does: a financial alert about the owner's
-    # own account (margin call, balance warning) is اضرار به مالِ خود (محیط/
-    # اموال)، and the rest is mere clutter. Deduped by subject so five copies
-    # of the same alert surface once.
+    # Order matters (owner's broker-email correction): an automated financial
+    # alert is checked FIRST — a margin call from a named broker address is
+    # still a machine alert about MY OWN wealth (اضرار به مال), never a person
+    # awaiting a reply. Only then does the human test apply, and even a human
+    # reply is flagged as «احتمالِ حق‌الناس» — the machine holds no verdict.
     try:
         from app.models.personal_sync import PersonalEmail
         from app.services.google_sync.person_ingest import _is_human
@@ -416,36 +726,40 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             subj = (e.subject or "بدون موضوع")[:60]
             dup = subj in seen_subjects
             seen_subjects.add(subj)
-            if _is_human(e):
-                cells["digaran"]["total"] += 1
-                if not dup:
-                    att("digaran", f"پاسخِ معطلِ یک انسان: {subj}", W_HAQ_NAS, "/")
-            elif _RE_FIN_ALERT.search(f"{e.subject or ''} {e.snippet or ''}"):
+            if _RE_FIN_ALERT.search(f"{e.subject or ''} {e.snippet or ''}"):
                 cells["mohit"]["total"] += 1
                 if not dup:
-                    att("mohit", f"هشدارِ مالیِ حسابِ خودم: {subj}", W_ZARAR_KHOD, "/")
+                    att("mohit", f"هشدارِ مالیِ حسابِ خودم: {subj}", W_ZARAR_KHOD, "/",
+                        kind="zarar")
+            elif _is_human(e):
+                cells["digaran"]["total"] += 1
+                if not dup:
+                    att("digaran", f"پاسخِ معطلِ یک انسان: {subj}", W_HAQ_NAS, "/",
+                        kind="haq_probable")
             else:
                 auto_other += 1
         if auto_other:
             cells["mohit"]["total"] += auto_other
-            att("mohit", f"{auto_other} اعلانِ ماشینیِ دیگر (بدونِ حقِ کسی)", W_CLUTTER, "/")
+            att("mohit", f"{auto_other} اعلانِ ماشینیِ دیگر (بدونِ حقِ کسی)", W_CLUTTER, "/",
+                kind="clutter")
     except Exception as exc:
         logger.debug("sahat emails skipped: %r", exc)
 
-    # ── Finance (دیگران — رزقِ حلال و حق‌الناسِ مالی) ────────────────────────
+    # ── Finance (دیگران — رزقِ حلال) ────────────────────────────────────────
+    finance_lines: List[str] = []
     try:
         from app.services.finance_report_service import build_report, summarize_current_month
 
         report = await build_report(db, user_id=uid, months=1)
         summary = summarize_current_month(report)
         if summary.get("lines"):
-            cells["digaran"]["total"] += 1
-            cells["digaran"]["done"] += 1
-            cells["digaran"]["finance_lines"] = summary["lines"][:3]
+            finance_lines = summary["lines"][:3]
+            cells["digaran"]["finance_lines"] = finance_lines
     except Exception as exc:
         logger.debug("sahat finance skipped: %r", exc)
 
-    # ── Documents / subscriptions (محیط و ابزار) ─────────────────────────────
+    # ── Documents / subscriptions / RTA (محیط و اموال) ──────────────────────
+    docs_detail: List[Dict[str, Any]] = []
     try:
         from app.models.identity_document import IdentityDocument
 
@@ -455,45 +769,107 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
         cells["mohit"]["total"] += len(docs)
         for doc in docs:
             exp = (doc.expiry_date or "")[:10]
+            expired = False
             try:
-                if exp and date.fromisoformat(exp) < today:
-                    att("mohit", f"سندِ منقضی: {doc.full_name or 'سند'}", W_ZARAR_KHOD, "/life-file")
-                    continue
+                expired = bool(exp) and date.fromisoformat(exp) < today
             except ValueError:
                 pass
-            cells["mohit"]["done"] += 1
+            if expired:
+                att("mohit", f"سندِ منقضی: {doc.full_name or 'سند'}", W_ZARAR_KHOD, "/life-file",
+                    kind="zarar")
+            else:
+                cells["mohit"]["done"] += 1
+            if detail and len(docs_detail) < 10:
+                docs_detail.append({
+                    "name": doc.full_name or "سند", "expiry": doc.expiry_date, "expired": expired,
+                })
     except Exception as exc:
         logger.debug("sahat documents skipped: %r", exc)
 
+    subs_count = 0
     try:
         from app.models.subscription_account import SubscriptionAccount
 
         subs = (
             await db.execute(select(SubscriptionAccount).where(_scope(SubscriptionAccount.user_id, uid)))
         ).scalars().all()
-        cells["mohit"]["total"] += len(subs)
-        cells["mohit"]["done"] += len(subs)
+        subs_count = len(subs)
+        cells["mohit"]["total"] += subs_count
+        cells["mohit"]["done"] += subs_count
     except Exception as exc:
         logger.debug("sahat subscriptions skipped: %r", exc)
 
-    # ── Digital clutter (لغو/اتلاف — انباشتگیِ صندوق) ───────────────────────
     try:
-        from app.models.inbox_item import InboxItem
+        from app.models.rta_account import RTAAccount
+
+        rta = (
+            await db.execute(
+                select(RTAAccount).where(_scope(RTAAccount.user_id, uid))
+                .order_by(RTAAccount.id.desc()).limit(1)
+            )
+        ).scalars().first()
+        payable = float(getattr(rta, "fines_payable", 0) or 0) if rta is not None else 0
+        if payable > 0:
+            att("mohit", f"جریمهٔ پرداختنیِ RTA ({payable:g})", W_ZARAR_KHOD, "/life-file",
+                kind="zarar")
+    except Exception as exc:
+        logger.debug("sahat rta skipped: %r", exc)
+
+    # ── Digital assets (فیلم/کتاب/فایل) — the انباشتگی the owner named ──────
+    try:
         from sqlalchemy import func as _f
 
-        n_pending = (
+        from app.models.user_asset import UserAsset
+
+        n_assets = (
+            await db.execute(
+                select(_f.count()).select_from(UserAsset).where(_scope(UserAsset.user_id, uid))
+            )
+        ).scalar() or 0
+        cells["mohit"]["assets"] += int(n_assets)
+    except Exception as exc:
+        logger.debug("sahat assets skipped: %r", exc)
+
+    # ── Digital clutter (لغو/اتلاف — انباشتگیِ صندوق) ───────────────────────
+    inbox_pending = 0
+    try:
+        from sqlalchemy import func as _f
+
+        from app.models.inbox_item import InboxItem
+
+        inbox_pending = (
             await db.execute(
                 select(_f.count()).select_from(InboxItem).where(
                     _scope(InboxItem.user_id, uid), InboxItem.status == "pending"
                 )
             )
         ).scalar() or 0
-        if n_pending:
-            cells["mohit"]["total"] += int(n_pending)
-            if n_pending > 10:
-                att("mohit", f"{n_pending} موردِ تلنبارشده در صندوقِ ورودی", W_CLUTTER, "/")
+        if inbox_pending:
+            cells["mohit"]["total"] += int(inbox_pending)
+            if inbox_pending > 10:
+                att("mohit", f"{inbox_pending} موردِ تلنبارشده در صندوقِ ورودی", W_CLUTTER, "/",
+                    kind="clutter")
     except Exception as exc:
         logger.debug("sahat inbox skipped: %r", exc)
+
+    # ── رشدِ ذهن: recency of the brain practice (عقل) ───────────────────────
+    try:
+        from app.models.brain import BrainUpload
+
+        last_up = (
+            await db.execute(
+                select(BrainUpload).order_by(BrainUpload.id.desc()).limit(1)
+            )
+        ).scalars().first()
+        if last_up is not None and last_up.created_at is not None:
+            created = last_up.created_at
+            if created.tzinfo is None:  # SQLite returns naive datetimes
+                created = created.replace(tzinfo=timezone.utc)
+            age_days = (datetime.now(timezone.utc) - created).days
+            if age_days > 14:
+                att("khod_aql", f"تمرینِ هوش {age_days} روز است به‌روز نشده", W_GROWTH, "/brain")
+    except Exception as exc:
+        logger.debug("sahat brain skipped: %r", exc)
 
     # ── روان: fold in the willpower index (خودنگاره) ─────────────────────────
     diligence_score = None
@@ -506,7 +882,7 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     except Exception as exc:
         logger.debug("sahat diligence skipped: %r", exc)
 
-    # ── score each sahat ─────────────────────────────────────────────────────
+    # ── score each sahat — follow-through only; mass is displayed, not scored ─
     out: List[Dict[str, Any]] = []
     for key, meta in SAHATS.items():
         cell = cells[key]
@@ -521,32 +897,47 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 base = (base + diligence_score) / 2
             score = int(max(0, min(100, round(base - penalty))))
         cell["attention"].sort(key=lambda a: -a["weight"])
-        # نخ‌های این ساحت — every thread renders (even empty: an empty thread is
-        # an honest «هنوز محتوایی این‌جا نریخته», not a hidden hole).
         threads = [
             {
                 "key": th["key"], "title": th["title"], "link": th["link"],
+                "id": th.get("id"),
                 "done": thr[th["key"]]["done"], "total": thr[th["key"]]["total"],
                 "writings": thr[th["key"]]["writings"],
                 "directives": thr[th["key"]]["directives"],
                 "lists": thr[th["key"]]["lists"],
+                "samples": thr[th["key"]]["samples"],
             }
-            for th in THREADS if th["sahat"] == key
+            for th in threads_reg if th["sahat"] == key
         ]
-        out.append({
+        entry = {
             "key": key,
             "title": meta["title"],
+            "fa_short": meta["fa_short"],
             "icon": meta["icon"],
+            "group": meta["group"],
             "desc": meta["desc"],
             "links": meta["links"],
             "score": score,
             "total": total,
             "done": done,
+            "writings": cell["writings"],
+            "projects": cell["projects"],
+            "assets": cell["assets"],
             "backbone": cell["backbone"][:6],
             "threads": threads,
             "attention": cell["attention"][:5],
             "finance_lines": cell.get("finance_lines"),
-        })
+        }
+        if detail:
+            entry["detail"] = cell["detail"]
+            if key == "digaran":
+                entry["detail"]["people_overdue"] = people_overdue[:20]
+                entry["detail"]["finance_lines"] = finance_lines
+            if key == "mohit":
+                entry["detail"]["documents"] = docs_detail
+                entry["detail"]["subscriptions_count"] = subs_count
+                entry["detail"]["inbox_pending"] = int(inbox_pending)
+        out.append(entry)
 
     scored = [s for s in out if s["score"] is not None]
     weakest = min(scored, key=lambda s: s["score"])["key"] if scored else None
@@ -556,6 +947,29 @@ async def build_sahat_map(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
         "weakest": weakest,
         "strongest": strongest,
         "generated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+async def build_sahat_district(db: AsyncSession, uid: int, district: str) -> Optional[Dict[str, Any]]:
+    """One district («محله»), item-level: a SAHATS key or a DISTRICTS key
+    ('khod' aggregates the three facets of self). Returns None for unknown
+    keys (route answers 404)."""
+    if district in DISTRICTS:
+        keys = DISTRICTS[district]["keys"]
+        title = DISTRICTS[district]["title"]
+    elif district in SAHATS:
+        keys = [district]
+        title = SAHATS[district]["title"]
+    else:
+        return None
+    data = await build_sahat_map(db, uid, detail=True)
+    cells = [s for s in data["sahats"] if s["key"] in keys]
+    return {
+        "district": district,
+        "title": title,
+        "keys": keys,
+        "sahats": cells,
+        "generated_at": data["generated_at"],
     }
 
 

@@ -28,6 +28,17 @@ from __future__ import annotations
 from typing import Iterable, Optional
 
 
+def _effective_list_sahat(obj) -> Optional[str]:
+    """Effective sahat for a TodoList — defensive so a serialisation never
+    fails because of the lens layer."""
+    try:
+        from app.services.sahat_service import effective_list_sahat
+
+        return effective_list_sahat(obj)
+    except Exception:
+        return getattr(obj, "sahat", None)
+
+
 def serialize_list(obj, item_count: int = 0) -> dict:
     """Shape a TodoList ORM row for the wire."""
     return {
@@ -37,6 +48,10 @@ def serialize_list(obj, item_count: int = 0) -> dict:
         "user_id": obj.user_id,
         "sort_order": obj.sort_order,
         "is_archived": bool(obj.is_archived),
+        # خداشهر: effective sahat (stored wins, else classifier) so the Lists
+        # page can show + correct the lens. sahat_source says which it was.
+        "sahat": _effective_list_sahat(obj),
+        "sahat_source": "owner" if getattr(obj, "sahat", None) else "auto",
         "item_count": item_count,
         "created_at": obj.created_at.isoformat() if obj.created_at else None,
         "updated_at": obj.updated_at.isoformat() if obj.updated_at else None,

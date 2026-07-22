@@ -302,6 +302,15 @@ def _current_step(steps: Any) -> Optional[str]:
     return None
 
 
+def _effective_sahat(d: Directive):
+    try:
+        from app.services.sahat_service import effective_directive_sahat
+
+        return effective_directive_sahat(d)
+    except Exception:
+        return getattr(d, "sahat", None)
+
+
 def directive_dict(d: Directive) -> Dict[str, Any]:
     steps = _clean_steps(getattr(d, "steps", None))
     return {
@@ -309,6 +318,9 @@ def directive_dict(d: Directive) -> Dict[str, Any]:
         "title": d.title,
         "detail": d.detail,
         "domain": d.domain,
+        # خداشهر: effective sahat (stored value wins, else domain/classifier).
+        "sahat": _effective_sahat(d),
+        "sahat_source": "owner" if getattr(d, "sahat", None) else "auto",
         "cadence": d.cadence,
         "kind": d.kind,
         "status": d.status,
