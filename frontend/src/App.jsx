@@ -20,6 +20,7 @@ import DataHub from './pages/DataHub';           // ایمپورت + فایل‌
 import LifeFilePage from './pages/LifeFilePage';
 import DirectivesPage from './pages/DirectivesPage';
 import SelfPortrait from './pages/SelfPortrait';
+import SahatMap from './pages/SahatMap';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import SystemMapPage from './pages/SystemMapPage';
@@ -279,6 +280,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <SelfPortrait />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sahat"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SahatMap />
                     </Layout>
                   </ProtectedRoute>
                 }

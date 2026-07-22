@@ -1681,6 +1681,10 @@
       {
         "name": "SelfPortrait",
         "file": "frontend/src/pages/SelfPortrait.jsx"
+      },
+      {
+        "name": "SahatMap",
+        "file": "frontend/src/pages/SahatMap.jsx"
       }
     ],
     "components": [

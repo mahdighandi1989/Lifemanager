@@ -256,6 +256,16 @@ async def _job_finance_analysis(db: AsyncSession) -> dict[str, Any]:
     return {"notified": True, "month": summary["month"]}
 
 
+async def _job_sahat_snapshot(db: AsyncSession) -> dict[str, Any]:
+    """Persist one نقشهٔ ساحت‌ها snapshot per day so the over-time trend fills
+    without the owner clicking anything."""
+    from app.services.sahat_service import snapshot_sahat_map
+
+    data = await snapshot_sahat_map(db, uid=0)
+    scores = {s["key"]: s["score"] for s in data.get("sahats", [])}
+    return {"scores": scores}
+
+
 async def _job_file_reconcile(db: AsyncSession) -> dict[str, Any]:
     """Prune indexed file-source entries whose paths vanished (217909d2)."""
     from app.models.indexed_data_source_entry import IndexedDataSourceEntry
@@ -308,6 +318,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_periodic_analysis", "تحلیل دوره‌ای مالی + اطلاعیه",
      lambda: _env_minutes("FINANCE_ANALYSIS_INTERVAL_MINUTES", 24 * 60.0),
      _job_finance_analysis),
+    ("sahat_daily_snapshot", "ثبتِ روزانهٔ نقشهٔ ساحت‌ها",
+     lambda: _env_minutes("SAHAT_SNAPSHOT_INTERVAL_MINUTES", 24 * 60.0),
+     _job_sahat_snapshot),
     ("file_reconcile", "هرس ایندکس فایل‌های حذف‌شده",
      lambda: _env_minutes("FILE_SYNC_INTERVAL_MINUTES", 30.0),
      _job_file_reconcile),

@@ -34,7 +34,10 @@ export const LINKS = [
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists', group: 'daily' },
   { to: '/attention', label: 'مراقبت و مرور', testid: 'sidebar-link-attention', group: 'daily' },
 
-  // زندگی — your data / content.
+  // زندگی — your data / content. The sahat map leads: it is the hub that
+  // organises every life page under the human dimensions (رابطه با خدا/خود/
+  // دیگران/محیط), so navigation flows map → sahat → page.
+  { to: '/sahat', label: '🧭 نقشهٔ ساحت‌ها', testid: 'sidebar-link-sahat', group: 'life' },
   { to: '/life-file', label: 'پروندهٔ زندگی', testid: 'sidebar-link-life-file', group: 'life' },
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance', group: 'life' },
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people', group: 'life' },
