@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import api from '../lib/api';
+import SahatChip from '../components/SahatChip';
 
 /**
  * مسیر نهادینه‌سازی — the internalization engine surface (owner vision
@@ -364,6 +365,12 @@ export default function DirectivesPage() {
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2 min-w-0 flex-wrap">
                           <DomainChip domain={d.domain} />
+                          <SahatChip
+                            entityType="directive"
+                            entityId={d.id}
+                            sahat={d.sahat}
+                            source={d.sahat_source}
+                          />
                           <TimeChip label={d.time_label} />
                           <span className="text-sm text-gray-800 truncate">{d.title}</span>
                         </div>

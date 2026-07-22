@@ -6,22 +6,23 @@
  * AC for this task asserts data-testid='sidebar' is visible on every
  * page, hence the testid plus the unconditional render in Layout.
  *
- * 2026-07-21 nav audit (owner request): the flat list was disordered, mixed
- * English labels into an otherwise all-Persian RTL app, and buried
- * developer/meta pages (مرکز توسعه، نقشهٔ سیستم، لاگ فعالیت‌ها) among the
- * life pages. Reorganised into four intent groups, all-Persian labels, with
- * the system/dev tools quarantined at the BOTTOM. Nothing was removed — every
- * route still resolves and every ``sidebar-link-*`` testid is unchanged; only
- * order + labels + a ``group`` tag changed. ``LINKS`` stays a flat export so
- * Header's mobile menu keeps working (it ignores ``group``).
+ * 2026-07-22 «خداشهر» redesign (owner's correction of the v1 sahat menu —
+ * «مسجد نخواستم، خداشهر می‌خواهم»): the life group IS the city. The map
+ * («نقشهٔ خداشهر») plus its four districts (خدا / خود / دیگران / محیط) are
+ * the resting navigation of life; each district page aggregates the live
+ * content of that sahat and links into every tool page. The tool pages
+ * themselves stay one click away behind «بیشتر» (quarantine-not-delete:
+ * every route + ``sidebar-link-*`` testid is unchanged) AND are linked
+ * prominently from inside the districts — nav by meaning first, by tool
+ * second.
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 // group keys → Persian section headers (rendered only in the desktop Sidebar).
 export const NAV_GROUPS = [
   ['daily', 'روزانه'],
-  ['life', 'زندگی'],
+  ['life', 'خداشهر'],
   ['life_pages', 'صفحه‌های زندگی'],
   ['tools', 'ابزار'],
   ['system', 'سیستم و فنی'],
@@ -35,14 +36,16 @@ export const LINKS = [
   { to: '/lists', label: 'لیست‌ها', testid: 'sidebar-link-lists', group: 'daily' },
   { to: '/attention', label: 'مراقبت و مرور', testid: 'sidebar-link-attention', group: 'daily' },
 
-  // زندگی — menu redesign per the sahat framework (owner, 2026-07-22): the map
-  // IS the menu of life. Its six cards link into every life page under the
-  // human dimensions (خدا/خود/دیگران/محیط), so the resting sidebar shows ONE
-  // door for life instead of seven scattered ones.
-  { to: '/sahat', label: '🧭 نقشهٔ ساحت‌ها', testid: 'sidebar-link-sahat', group: 'life' },
+  // خداشهر — the map + the four districts. `/sahat` keeps its testid.
+  { to: '/sahat', label: '🏙 نقشهٔ خداشهر', testid: 'sidebar-link-sahat', group: 'life' },
+  { to: '/sahat/khoda', label: '🕋 رابطه با خدا', testid: 'sidebar-link-sahat-khoda', group: 'life' },
+  { to: '/sahat/khod', label: '💠 خود — جان و تن و ذهن', testid: 'sidebar-link-sahat-khod', group: 'life' },
+  { to: '/sahat/digaran', label: '🤝 رابطه با دیگران', testid: 'sidebar-link-sahat-digaran', group: 'life' },
+  { to: '/sahat/mohit', label: '🌍 محیط و اموال', testid: 'sidebar-link-sahat-mohit', group: 'life' },
 
-  // صفحه‌های زندگی — kept one click away behind «بیشتر» (quarantine-not-delete:
-  // every route/testid is unchanged; the map cards also link to each of them).
+  // صفحه‌های زندگی — the tool pages, one click away behind «بیشتر»
+  // (quarantine-not-delete: every route/testid unchanged; the district pages
+  // link into each of them with live data).
   { to: '/life-file', label: 'پروندهٔ زندگی', testid: 'sidebar-link-life-file', group: 'life_pages' },
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance', group: 'life_pages' },
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people', group: 'life_pages' },
@@ -66,11 +69,9 @@ export const LINKS = [
   { to: '/activity-log', label: 'لاگ فعالیت‌ها', testid: 'sidebar-link-activity-log', group: 'system' },
 ];
 
-// 2026-07-22 «اختاپوس» fix (owner: too many always-visible pages → overwhelm).
-// Keep the DAILY + LIFE groups visible; collapse TOOLS + SYSTEM behind one
-// «بیشتر» drawer so the resting sidebar is short and the owner isn't forced to
-// scan 18 doors. Nothing is removed — the drawer holds them one click away and
-// every route/testid is unchanged. The mobile menu (Header) still lists all.
+// Resting sidebar = روزانه + خداشهر; everything else behind one «بیشتر»
+// drawer. Nothing is removed — the drawer holds them one click away and every
+// route/testid is unchanged. The mobile menu (Header) still lists all.
 const PRIMARY_GROUPS = ['daily', 'life'];
 const SECONDARY_GROUPS = ['life_pages', 'tools', 'system'];
 
@@ -79,10 +80,22 @@ function Sidebar() {
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
-  // Auto-open the drawer when the current page lives inside it, so the user is
-  // never on a page whose nav entry is hidden.
+  // The map link should not light up on district pages (they have their own
+  // entries) — exact match for '/sahat', startsWith for the rest.
+  const isActiveNav = (path) =>
+    path === '/sahat' ? location.pathname === '/sahat' : isActive(path);
+
   const secondaryLinks = LINKS.filter((l) => SECONDARY_GROUPS.includes(l.group));
-  const [showMore, setShowMore] = useState(() => secondaryLinks.some((l) => isActive(l.to)));
+  const onSecondary = secondaryLinks.some((l) => isActive(l.to));
+  const [showMore, setShowMore] = useState(() => onSecondary);
+
+  // v1 bug fix: the auto-open only ran on mount, so an SPA navigation into a
+  // drawer page (e.g. Dashboard → /merge) left the user on a page whose nav
+  // entry was hidden. Open the drawer whenever the route lands inside it
+  // (never auto-close — closing is the user's call).
+  useEffect(() => {
+    if (onSecondary) setShowMore(true);
+  }, [onSecondary]);
 
   const renderGroup = (key, title) => {
     const items = LINKS.filter((l) => l.group === key);
@@ -98,7 +111,7 @@ function Sidebar() {
             to={to}
             data-testid={testid}
             className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              isActive(to)
+              isActiveNav(to)
                 ? 'bg-blue-50 text-blue-600 font-semibold'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
             }`}
@@ -120,7 +133,7 @@ function Sidebar() {
           renderGroup(key, title),
         )}
 
-        {/* «بیشتر» — one door for tools + system + settings */}
+        {/* «بیشتر» — one door for the tool pages + settings + system */}
         <button
           type="button"
           data-testid="sidebar-more-toggle"

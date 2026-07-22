@@ -21,6 +21,7 @@ import LifeFilePage from './pages/LifeFilePage';
 import DirectivesPage from './pages/DirectivesPage';
 import SelfPortrait from './pages/SelfPortrait';
 import SahatMap from './pages/SahatMap';
+import SahatDetail from './pages/SahatDetail';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import SystemMapPage from './pages/SystemMapPage';
@@ -290,6 +291,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <SahatMap />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sahat/:key"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SahatDetail />
                     </Layout>
                   </ProtectedRoute>
                 }

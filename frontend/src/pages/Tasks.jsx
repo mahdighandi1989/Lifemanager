@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ActivityLogPanel from '../components/ActivityLogPanel';
+import SahatChip from '../components/SahatChip';
 
 // All task data lives under /api/tasks. The bare /tasks path is the SPA
 // route that renders this page.
@@ -96,6 +97,12 @@ function TaskRow({ task, onToggle }) {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <SahatChip
+          entityType="task"
+          entityId={task.id}
+          sahat={task.sahat}
+          source={task.sahat_source}
+        />
         {task.due_date && (
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${

@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import SahatChip from '../components/SahatChip';
 
 // All project data lives under /api/projects. The bare /projects path is
 // the SPA route that renders this page.
@@ -48,8 +49,16 @@ function ProjectCard({ project }) {
             )}
           </div>
         </div>
-        <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0 ml-2 ${STATUS_COLORS[status] || 'bg-gray-100 text-gray-600'}`}>
-          {STATUS_LABELS[status] || status}
+        <span className="flex flex-shrink-0 items-center gap-1.5 ml-2">
+          <SahatChip
+            entityType="project"
+            entityId={project.id}
+            sahat={project.sahat}
+            source={project.sahat_source}
+          />
+          <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_COLORS[status] || 'bg-gray-100 text-gray-600'}`}>
+            {STATUS_LABELS[status] || status}
+          </span>
         </span>
       </div>
       {project.created_at && (

@@ -12,6 +12,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import SahatChip from '../components/SahatChip';
 
 const API_BASE = '/api';
 
@@ -77,6 +78,12 @@ function ListRow({ list, onDelete }) {
         </span>
         <span className="font-medium text-gray-900 truncate">{list.name}</span>
       </Link>
+      <SahatChip
+        entityType="list"
+        entityId={list.id}
+        sahat={list.sahat}
+        source={list.sahat_source}
+      />
       <button
         onClick={() => onDelete(list.id)}
         className="text-gray-400 hover:text-red-600 text-sm"
