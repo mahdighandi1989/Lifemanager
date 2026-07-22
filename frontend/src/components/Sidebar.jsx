@@ -39,6 +39,7 @@ export const LINKS = [
   { to: '/budget', label: 'مالی', testid: 'sidebar-link-finance', group: 'life' },
   { to: '/people-profiles', label: 'افراد', testid: 'sidebar-link-people', group: 'life' },
   { to: '/writings', label: 'نوشته‌های من', testid: 'sidebar-link-writings', group: 'life' },
+  { to: '/self-portrait', label: 'خودنگاره (علاقه/اراده)', testid: 'sidebar-link-self-portrait', group: 'life' },
   { to: '/brain', label: 'رشد ذهن و هوش', testid: 'sidebar-link-brain', group: 'life' },
   { to: '/projects', label: 'پروژه‌ها', testid: 'sidebar-link-projects', group: 'life' },
 

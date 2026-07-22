@@ -19,6 +19,7 @@ import AssistantHub from './pages/AssistantHub'; // پیشنهادات + تار�
 import DataHub from './pages/DataHub';           // ایمپورت + فایل‌های من + ادغام تسک‌ها
 import LifeFilePage from './pages/LifeFilePage';
 import DirectivesPage from './pages/DirectivesPage';
+import SelfPortrait from './pages/SelfPortrait';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import SystemMapPage from './pages/SystemMapPage';
@@ -268,6 +269,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <DirectivesPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/self-portrait"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <SelfPortrait />
                     </Layout>
                   </ProtectedRoute>
                 }

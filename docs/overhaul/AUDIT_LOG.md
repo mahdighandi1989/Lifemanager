@@ -2038,3 +2038,26 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **VERIFY** `tests/test_finance_analysis.py` (۴: رسید→تراکنش، dedupِ source_ref، تجمیعِ
   occurred_on/currency، dedupِ jobِ اطلاعیه). testهای موجودِ مالی (۴۰) سبز؛ build سبز.
   تفکیکِ ارز حفظ شد؛ routeِ گزارش رفتار حفظ کرد (سرویسِ مشترک).
+
+## 2026-07-22 — «علاقه‌ها و اراده» (فاز D): خودنگارهٔ مالک از داده‌های خودش
+
+مالک: «از نوشته‌ها و آرزوها و وظایفی که نوشتم و پیگیری کردم/نکردم، علایقم و میزانِ اراده و
+اهتمامم را تشخیص بده». نقشه‌برداری نشان داد سیگنال‌ها و سه تحلیلِ نقطه‌ایِ جدا از قبل بودند؛
+شکاف = ترکیبِ آن‌ها در یک خودنگارهٔ طولی + استنتاجِ علاقه از نوشته‌ها.
+
+- **CHANGE (سرویسِ خودنگاره)** `self_model_service` (کاملاً deterministic + SQL-only، بی‌نیاز
+  از کلید): `compute_interests` (استنتاجِ علاقه از corpusِ کاملِ مالک — نوشته‌ها + کارها +
+  آیتم‌ها + دامنهٔ فرمان‌ها، با reuseِ `profile_analysis.keyword_frequencies/categorize`؛
+  خروجی: دسته‌های علاقه + پربسامدترین واژه‌ها). `compute_diligence` (شاخصِ ۰-۱۰۰ + روند از
+  پیگیریِ فرمان done/missed + زنجیره + نهادینه‌شده، اتمامِ کار/لیست، و جریمهٔ عقب‌افتادگی).
+- **CHANGE (ماندگاری طولی)** `build_self_model` هر بار یک snapshot در
+  `AIAssessment(assessment_type='self_model')` می‌نویسد (score=شاخصِ اراده، analysis_text=JSON)
+  → سریِ زمانی مجانی. `get_latest_self_model` آخرین + تاریخچهٔ score. بدونِ جدولِ نو و بدونِ
+  تغییرِ assessment_typeهای موجود (رفتار حفظ شد).
+- **CHANGE (route + فرانت)** `GET /ai/self_model` + `POST /ai/self_model/refresh` (در
+  ai_profile، dual-mount /ai + /api/ai). صفحهٔ `SelfPortrait` («خودنگاره — علاقه/اراده»):
+  عددِ بزرگِ شاخص + روند + نرخ‌های اجزا + تاریخچهٔ میله‌ای + چیپ‌های علاقه؛ dir=rtl؛ در سایدبار
+  گروهِ «زندگی» + مسیرِ /self-portrait.
+- **VERIFY** `tests/test_self_model.py` (۳: علاقه از نوشته، شاخصِ اراده از پیگیری، ماندگاری+
+  تاریخچه). testِ Sidebar (۴) سبز؛ build سبز؛ گیت بدونِ شکستِ non-baseline. تجربه:
+  self-model-from-composed-analyzers.md.

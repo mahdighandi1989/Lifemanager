@@ -188,3 +188,31 @@ async def get_career_paths(
     uid = request_data.user_id if request_data.user_id is not None else user_id
     result = await CareerPathService(db).generate_career_paths(uid, request_data)
     return CareerPathResponse(**result)
+
+
+# ── Self-model: interests + willpower/diligence (اراده و اهتمام) ─────
+@router.get("/self_model")
+@handle_errors
+async def get_self_model(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """The owner's self-portrait — interests + a willpower/diligence index with
+    trend + history, inferred from writings/wishes/tasks over time."""
+    from app.services.self_model_service import get_latest_self_model
+
+    data = await get_latest_self_model(db, user_id)
+    return {"ok": True, "success": True, **data}
+
+
+@router.post("/self_model/refresh")
+@handle_errors
+async def refresh_self_model(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """Recompute + persist a fresh snapshot (adds a point to the over-time series)."""
+    from app.services.self_model_service import build_self_model
+
+    data = await build_self_model(db, user_id)
+    return {"ok": True, "success": True, **data}

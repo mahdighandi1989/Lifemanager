@@ -1677,6 +1677,10 @@
       {
         "name": "Writings",
         "file": "frontend/src/pages/Writings.jsx"
+      },
+      {
+        "name": "SelfPortrait",
+        "file": "frontend/src/pages/SelfPortrait.jsx"
       }
     ],
     "components": [
