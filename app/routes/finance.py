@@ -86,6 +86,15 @@ class FinancialAccountResponse(BaseModel):
     institution: Optional[str]
     currency: str
     balance: Decimal
+    # مالیِ خودتغذیه (2026-07-22): where this card came from + its detected
+    # identity, so the UI can badge «از ایمیل — بررسی کن» and show the ref/IBAN.
+    # All optional + additive — manual accounts simply carry None.
+    source: Optional[str] = None
+    inferred: Optional[bool] = None
+    account_ref: Optional[str] = None
+    iban: Optional[str] = None
+    last_email_at: Optional[str] = None
+    updated_at: Optional[datetime] = None
 
 
 # ── Income ──────────────────────────────────────────────────────────
@@ -217,7 +226,19 @@ async def list_financial_accounts(
             raise HTTPException(status_code=400, detail="invalid kind filter")
         stmt = stmt.where(FinancialAccount.kind == kind)
     result = await db.execute(stmt)
-    return list(result.scalars().all())
+    from app.services.finance_email_scan_service import account_public_extra
+
+    out: List[FinancialAccountResponse] = []
+    for a in result.scalars().all():
+        pub = account_public_extra(a)
+        out.append(FinancialAccountResponse(
+            id=a.id, user_id=a.user_id, name=a.name, kind=a.kind,
+            institution=a.institution, currency=a.currency, balance=a.balance,
+            source=pub["source"], inferred=pub["inferred"],
+            account_ref=pub["account_ref"], iban=pub["iban"],
+            last_email_at=pub["last_email_at"], updated_at=a.updated_at,
+        ))
+    return out
 
 
 # ── Per-kind endpoint aliases (audit task 4ae4b3ca ACs 16, 17, 22) ──
@@ -496,6 +517,24 @@ async def ingest_finance_message(
         db, user_id=user_id, channel=payload.channel, body=payload.body,
         account_id=payload.account_id,
     )
+
+
+@router.post("/api/finance/scan-emails", tags=["finance"])
+@handle_errors
+async def scan_finance_emails_endpoint(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """مالیِ خودتغذیه — read the synced Gmail and create/update a card per
+    detected financial account (balance, ref, IBAN), recording per-email
+    deltas. Owner-triggered from the «مالی» page and run periodically by the
+    jobs engine. Idempotent + conservative; created cards are marked «از ایمیل»
+    so the owner can confirm/correct them."""
+    from app.services.finance_email_scan_service import scan_finance_emails
+
+    summary = await scan_finance_emails(db, user_id)
+    return {"ok": True, "success": True, **summary}
 
 
 @router.get("/api/finance/affordable-tasks", tags=["finance"])
