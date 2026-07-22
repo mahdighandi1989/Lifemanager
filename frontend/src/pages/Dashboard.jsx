@@ -81,18 +81,38 @@ function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
   const reason = item.suggestion?.reason;
   const isPasswordReq = suggested === 'password_request';
   const isComponentsReq = suggested === 'password_components';
+  const isLocked = isPasswordReq || isComponentsReq;
   const missing = item.suggestion?.missing || [];
+  const srcKey = item.suggestion?.source_key;
+  const fname = item.suggestion?.filename;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3 space-y-2" data-testid="inbox-row">
+    <div className="rounded-lg border border-gray-200 bg-white p-3 space-y-2" data-testid="inbox-row" dir="rtl">
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
-          {unescapeHtml(item.content)}
-        </p>
+        {isLocked ? (
+          // A locked-file row: keep the long Latin filename on its OWN LTR line
+          // so it never scrambles the Persian phrase around it (bidi rule).
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-gray-800">
+              🔒 فایلِ رمزدار{srcKey ? ' — از ' : ''}
+              {srcKey && <span dir="ltr">{srcKey}</span>}
+            </p>
+            {fname && (
+              <p className="mt-0.5 text-xs text-gray-500 break-all" dir="ltr">{fname}</p>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
+            {unescapeHtml(item.content)}
+          </p>
+        )}
         <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLOR[suggested] || TYPE_COLOR.unknown}`}>
           {TYPE_FA[suggested] || suggested}
         </span>
       </div>
-      {reason && <p className="text-xs text-gray-500">{unescapeHtml(reason)}</p>}
+      {isComponentsReq && (
+        <p className="text-xs text-gray-500">برای ساختِ رمز، این‌ها را وارد کن:</p>
+      )}
+      {reason && !isLocked && <p className="text-xs text-gray-500">{unescapeHtml(reason)}</p>}
       {isPasswordReq ? (
         <div className="flex flex-wrap items-center gap-2">
           <input

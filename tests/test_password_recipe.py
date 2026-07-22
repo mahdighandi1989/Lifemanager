@@ -89,6 +89,62 @@ async def test_resolve_missing_components_creates_smart_request(db_session, monk
     assert {c["key"] for c in item.suggestion["missing"]} == {"card_last3", "dob"}
 
 
+def _pw_req(source_ref, source_key, filename, suggested_type="password_request"):
+    return InboxItem(
+        user_id=0, content=f"locked {filename}", source="attachment", status="pending",
+        suggested_type=suggested_type,
+        suggestion={"source_ref": source_ref, "source_key": source_key, "filename": filename},
+    )
+
+
+@pytest.mark.asyncio
+async def test_retry_domain_opens_all_files_of_a_bank(db_session, monkeypatch):
+    # two locked files from bsi.co.ae share one password → one submit opens both.
+    db_session.add_all([
+        _pw_req("gmail:m1:a.pdf", "bsi.co.ae", "a.pdf"),
+        _pw_req("gmail:m2:b.pdf", "bsi.co.ae", "b.pdf"),
+        _pw_req("gmail:m3:c.pdf", "other.com", "c.pdf"),  # different bank — untouched
+    ])
+    await db_session.commit()
+
+    async def _fake_retry(db, *, source_ref, user_id=0):
+        return {"status": "proposed"}
+    monkeypatch.setattr(email_ingest, "retry_source_ref", _fake_retry)
+
+    res = await email_ingest.retry_domain(db_session, source_key="bsi.co.ae", user_id=0)
+    assert res["tried"] == 2 and res["opened"] == 2
+    from sqlalchemy import select as _s
+    remaining = (
+        await db_session.execute(_s(InboxItem).where(InboxItem.status == "pending"))
+    ).scalars().all()
+    assert [r.suggestion["source_key"] for r in remaining] == ["other.com"]
+
+
+@pytest.mark.asyncio
+async def test_upgrade_pending_locked_to_smart_flow(db_session, monkeypatch):
+    import app.services.ai.inference_gateway as ig
+    import app.services.google_sync.gmail_service as gm
+    db_session.add(_pw_req("gmail:m9:stmt.pdf", "bsi.co.ae", "stmt.pdf"))
+    await db_session.commit()
+
+    monkeypatch.setattr(ig, "complete", _mock_complete(
+        '{"has_recipe":true,"template":"{card_last3}{dob}",'
+        '"components":[{"key":"card_last3","label":"۳ رقمِ آخرِ کارت","kind":"digits"},'
+        '{"key":"dob","label":"تولد","kind":"date"}]}'
+    ))
+
+    async def _body(db, mid, **kw):
+        return "رمز = سه رقم آخر کارت + تاریخ تولد"
+    monkeypatch.setattr(gm, "fetch_message_body", _body)
+
+    res = await email_ingest.upgrade_pending_locked(db_session, user_id=0)
+    assert res["upgraded"] == 1
+    from sqlalchemy import select as _s
+    item = (await db_session.execute(_s(InboxItem))).scalars().first()
+    assert item.suggested_type == "password_components"
+    assert {c["key"] for c in item.suggestion["missing"]} == {"card_last3", "dob"}
+
+
 @pytest.mark.asyncio
 async def test_resolve_derives_and_opens_when_facts_present(db_session, monkeypatch):
     # recipe already stored + all facts present → derive silently, no prompt.

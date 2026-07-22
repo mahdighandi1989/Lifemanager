@@ -325,6 +325,92 @@ async def retry_source_ref(db: AsyncSession, *, source_ref: str, user_id: int = 
     return {"status": "not_found"}
 
 
+async def retry_domain(db: AsyncSession, *, source_key: str, user_id: int = 0) -> Dict[str, Any]:
+    """Once a password/credentials exist for a sender DOMAIN, re-open EVERY
+    pending locked file from that domain — one password unlocks the whole bank
+    (owner: «برای هر فایل جدا رمز نخواه»). Marks each opened item filed."""
+    from app.models.inbox_item import InboxItem
+
+    rows = (
+        await db.execute(
+            select(InboxItem).where(
+                InboxItem.status == "pending",
+                InboxItem.suggested_type.in_(["password_request", "password_components"]),
+            )
+        )
+    ).scalars().all()
+    opened = 0
+    tried = 0
+    for r in rows:
+        sug = r.suggestion or {}
+        if sug.get("source_key") != source_key:
+            continue
+        ref = sug.get("source_ref")
+        if not ref:
+            continue
+        tried += 1
+        try:
+            res = await retry_source_ref(db, source_ref=ref, user_id=user_id)
+        except Exception as exc:
+            logger.debug("retry_domain re-open failed (%s): %r", ref, exc)
+            continue
+        if res.get("status") == "proposed":
+            r.status = "filed"
+            opened += 1
+    await db.commit()
+    return {"tried": tried, "opened": opened}
+
+
+async def upgrade_pending_locked(db: AsyncSession, *, user_id: int = 0, limit: int = 60) -> Dict[str, Any]:
+    """Upgrade OLD blind «رمز بده» requests to the smart flow: read each item's
+    email body, and if it explains how the password is formed, convert the item
+    to a «password_components» request (ask card+DOB instead of a raw password).
+    Idempotent; bounded; never raises."""
+    from app.models.inbox_item import InboxItem
+    from app.services.google_sync.gmail_service import fetch_message_body
+    from app.services.ingest import identity_facts, password_recipe
+
+    rows = (
+        await db.execute(
+            select(InboxItem)
+            .where(InboxItem.status == "pending", InboxItem.suggested_type == "password_request")
+            .limit(limit)
+        )
+    ).scalars().all()
+    upgraded = 0
+    for r in rows:
+        sug = r.suggestion or {}
+        domain = sug.get("source_key")
+        ref = sug.get("source_ref") or ""
+        try:
+            _, mid, _ = ref.split(":", 2)
+        except ValueError:
+            continue
+        try:
+            recipe = await password_recipe.get_stored_recipe(db, domain=domain)
+            if recipe is None:
+                body = await fetch_message_body(db, mid)
+                recipe = await password_recipe.extract_recipe(db, body, domain)
+                if recipe is not None:
+                    await password_recipe.store_recipe(db, domain=domain, recipe=recipe)
+            if not (recipe and recipe.get("has_recipe") and recipe.get("template")):
+                continue
+            comps = recipe.get("components") or []
+            values = await identity_facts.get_many(db, keys=[c["key"] for c in comps], user_id=user_id)
+            missing = [c for c in comps if not values.get(c["key"])]
+            r.suggested_type = "password_components"
+            r.suggestion = {
+                **sug, "template": recipe.get("template"),
+                "notes": recipe.get("notes"), "missing": missing,
+            }
+            upgraded += 1
+        except Exception as exc:
+            logger.debug("locked upgrade skipped (%s): %r", ref, exc)
+            continue
+    await db.commit()
+    return {"upgraded": upgraded}
+
+
 async def backfill_attachments(db: AsyncSession, *, user_id: int = 0, limit: int = 400) -> Dict[str, Any]:
     """Run attachment ingest over already-synced emails (catch-up for the
     backlog). Bounded by ``limit`` since each email may hit the network. Sends

@@ -276,12 +276,15 @@ async def backfill_ingest(
     arrived before these detectors existed. Idempotent — safe to run repeatedly."""
     from app.services.google_sync.person_ingest import backfill_all
     from app.services.ingest import drive_ingest
-    from app.services.ingest.email_ingest import backfill_attachments
+    from app.services.ingest.email_ingest import backfill_attachments, upgrade_pending_locked
 
     res = await backfill_all(db, user_id=user_id)
     att = await backfill_attachments(db, user_id=user_id)
     res["attachment_candidates"] = att.get("proposed", 0)
     res["locked_files"] = att.get("needs_password", 0)
+    # Upgrade any OLD blind «رمز بده» requests to the smart card+DOB flow.
+    upg = await upgrade_pending_locked(db, user_id=user_id)
+    res["locked_upgraded"] = upg.get("upgraded", 0)
     drive = await drive_ingest.scan_drive(db, user_id=user_id, limit=100)
     res["drive_candidates"] = drive.get("proposed", 0)
     res["drive_scanned"] = drive.get("scanned", 0)
@@ -303,17 +306,19 @@ async def submit_password(
     _gate: None = Depends(enforce_auth_when_required),
 ) -> dict:
     """Store the password for a locked-file source (encrypted) and immediately
-    re-open the file. Future files from the same source open automatically."""
+    re-open EVERY pending file from that same source — one password unlocks the
+    whole bank. Future files from the source open automatically."""
     from app.services.ingest import credentials
-    from app.services.ingest.email_ingest import retry_source_ref
+    from app.services.ingest.email_ingest import retry_domain, retry_source_ref
 
     await credentials.store_password(db, source_key=payload.source_key, password=payload.password)
     res = await retry_source_ref(db, source_ref=payload.source_ref, user_id=user_id)
-    # mark the matching password_request item as handled
+    # mark the submitted item filed…
     reqs = (
         await db.execute(
             select(InboxItem).where(
-                InboxItem.status == "pending", InboxItem.suggested_type == "password_request"
+                InboxItem.status == "pending",
+                InboxItem.suggested_type.in_(["password_request", "password_components"]),
             )
         )
     ).scalars().all()
@@ -321,7 +326,9 @@ async def submit_password(
         if (r.suggestion or {}).get("source_ref") == payload.source_ref:
             r.status = "filed"
     await db.commit()
-    return {"ok": True, "success": True, "result": res}
+    # …then open ALL the OTHER pending files from the same bank with one password.
+    batch = await retry_domain(db, source_key=payload.source_key, user_id=user_id)
+    return {"ok": True, "success": True, "result": res, "batch_opened": batch.get("opened", 0)}
 
 
 class ComponentsSubmit(BaseModel):
@@ -342,7 +349,7 @@ async def submit_password_components(
     reusable), derive the file password from the email's recipe, open the file,
     and remember it forever — future files from that sender open automatically."""
     from app.services.ingest import credentials, identity_facts, password_recipe
-    from app.services.ingest.email_ingest import retry_source_ref
+    from app.services.ingest.email_ingest import retry_domain, retry_source_ref
 
     for key, value in (payload.values or {}).items():
         if value:
@@ -350,6 +357,7 @@ async def submit_password_components(
 
     recipe = await password_recipe.get_stored_recipe(db, domain=payload.source_key)
     result: Dict[str, Any] = {"derived": False}
+    batch_opened = 0
     if recipe and recipe.get("template"):
         keys = [c["key"] for c in (recipe.get("components") or [])]
         values = await identity_facts.get_many(db, keys=keys, user_id=user_id)
@@ -371,4 +379,8 @@ async def submit_password_components(
         if (r.suggestion or {}).get("source_ref") == payload.source_ref:
             r.status = "filed"
     await db.commit()
-    return {"ok": True, "success": True, "result": result}
+    # one recipe unlocks the whole bank — open its other pending files too.
+    if result.get("derived"):
+        batch = await retry_domain(db, source_key=payload.source_key, user_id=user_id)
+        batch_opened = batch.get("opened", 0)
+    return {"ok": True, "success": True, "result": result, "batch_opened": batch_opened}
