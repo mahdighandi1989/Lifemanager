@@ -19,5 +19,9 @@ class Project(Base):
     # break deploys whose existing 'projects' table predates this field
     # (Base.metadata.create_all does NOT add columns to existing tables).
     is_active = Column(Boolean, default=True)
+    # خداشهر (2026-07-22): persistent sahat assignment. Unlike 'status' above,
+    # this IS a column — the startup ALTER in app/main.py + migration 0051 add
+    # it to pre-existing tables, so create_all's no-alter limitation is covered.
+    sahat = Column(String(16), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

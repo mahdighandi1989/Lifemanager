@@ -57,6 +57,7 @@ from app.models.user_oauth import OAuthUser
 from app.models.brain import BrainUpload
 from app.models.personal_writing import PersonalWriting
 from app.models.directive import Directive, DirectiveCheckin
+from app.models.sahat_thread import SahatThread
 from app.models.webhook_event import WebhookEvent
 from app.models.weekly_review import WeeklyReview
 from app.models.personal_sync import PersonalEmail, PersonalEvent

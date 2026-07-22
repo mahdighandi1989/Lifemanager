@@ -416,6 +416,14 @@ async def startup_event():
         ("directives", "steps", "JSON"),
         ("directives", "preferred_time", "VARCHAR(16)"),
         ("directives", "preferred_context", "TEXT"),
+        # خداشهر (2026-07-22): persistent, owner-correctable sahat on the five
+        # primary content tables — a stored value always wins over the
+        # classifier (mirrors migration 0051).
+        ("tasks", "sahat", "VARCHAR(16)"),
+        ("todo_lists", "sahat", "VARCHAR(16)"),
+        ("personal_writings", "sahat", "VARCHAR(16)"),
+        ("directives", "sahat", "VARCHAR(16)"),
+        ("projects", "sahat", "VARCHAR(16)"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:

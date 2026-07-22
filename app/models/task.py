@@ -45,6 +45,11 @@ class Task(Base):
     # app/schemas/task_schema.py. Legacy deploys that already have a
     # TIMESTAMP column are migrated to DATE at startup (see app/main.py).
     due_date = Column(Date, nullable=True)
+    # خداشهر (2026-07-22): the owner's persistent sahat assignment (khoda /
+    # khod_ravan / khod_aql / khod_jesm / digaran / mohit). NULL = untouched;
+    # the deterministic classifier supplies a default at read time, but a
+    # stored value ALWAYS wins — the owner's correction is final.
+    sahat = Column(String(16), nullable=True)
 
     # Planning fields (added for the database-evolution composite).
     # estimated_duration is stored as integer minutes so the column type

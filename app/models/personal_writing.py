@@ -21,6 +21,9 @@ class PersonalWriting(Base):
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
     title = Column(String(500), nullable=False)
     category = Column(String(120), nullable=True, index=True)
+    # خداشهر (2026-07-22): persistent sahat assignment; NULL = classifier
+    # default at read time, stored value always wins (owner correction final).
+    sahat = Column(String(16), nullable=True)
     body = Column(Text, nullable=False)
     source_note = Column(String(500), nullable=True)
     written_at = Column(Date, nullable=True)

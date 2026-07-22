@@ -57,6 +57,9 @@ class TodoList(Base):
     # is_archived hides the list from the default sidebar without
     # destroying its data — soft-delete semantics for power users.
     is_archived = Column(Boolean, nullable=False, server_default="0", default=False)
+    # خداشهر (2026-07-22): persistent sahat assignment; NULL = classifier
+    # default at read time, stored value always wins (owner correction final).
+    sahat = Column(String(16), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

@@ -80,6 +80,9 @@ class Directive(Base):
     title = Column(Text, nullable=False)          # the command itself (Persian)
     detail = Column(Text, nullable=True)          # optional elaboration / the "why"
     domain = Column(String(32), nullable=False, server_default="خودسازی", default="خودسازی")
+    # خداشهر (2026-07-22): persistent sahat assignment; NULL = derived from
+    # ``domain`` (or the classifier) at read time; a stored value always wins.
+    sahat = Column(String(16), nullable=True)
     cadence = Column(String(24), nullable=False, server_default=CADENCE_DAILY, default=CADENCE_DAILY)
     kind = Column(String(16), nullable=False, server_default=KIND_PRACTICE, default=KIND_PRACTICE)
     status = Column(String(16), nullable=False, server_default=DIRECTIVE_PROPOSED, default=DIRECTIVE_PROPOSED, index=True)
