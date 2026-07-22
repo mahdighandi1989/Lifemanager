@@ -22,6 +22,7 @@ from app.models.indexed_data_source_entry import IndexedDataSourceEntry
 from app.models.finance import Asset, BudgetPlan, FinancialAccount, Income, Transaction
 from app.models.subscription_account import SubscriptionAccount
 from app.models.identity_document import IdentityDocument
+from app.models.identity_fact import IdentityFact
 from app.models.bank_account import BankShareSheetAccount
 from app.models.uae_license import UAEDrivingLicenseRecord
 from app.models.rta_account import RTAAccount
@@ -89,6 +90,7 @@ __all__ = [
     "FinancialAccount",
     "SubscriptionAccount",
     "IdentityDocument",
+    "IdentityFact",
     "BankShareSheetAccount",
     "UAEDrivingLicenseRecord",
     "RTAAccount",

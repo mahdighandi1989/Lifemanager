@@ -1979,3 +1979,34 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **NOTE (تشخیصِ اصلاح‌شده)** «آشغالِ تستی» در «نیازمند توجه» = ردیفِ Task است و
   scan_test_junk از قبل Taskها را پوشش می‌داد؛ علتِ ماندن = ابزار دستی/دفن‌شده بود و مالک
   اجرایش نکرده بود. رفع: startup one-shot خودش پاک می‌کند.
+
+## 2026-07-22 — «رمزِ هوشمند» (فاز B): استخراجِ دستورِ رمز + اجزای هویتیِ برگشت‌پذیر
+
+مالک: «وقتی فایلِ رمزدار می‌آید معمولاً تو متنِ ایمیل می‌نویسد رمز از چه ساخته می‌شود —
+سه رقمِ آخرِ کارت + رقمِ تولد و … . همان‌ها را ازم بپرس، نگه دار، و همیشه فایل‌ها را باز کن.»
+
+- **CHANGE (متنِ کاملِ ایمیل on-demand)** `gmail_service.fetch_message_body` — با
+  `format=full`، walkِ partها، ترجیحِ text/plain (fallback به html با حذفِ تگ)، decodeِ
+  base64url؛ بدنه فقط لحظه‌ای گرفته می‌شود و ذخیره نمی‌شود (اصلِ metadata-only حفظ شد).
+- **CHANGE (خزانهٔ اجزای هویتی)** مدلِ نوِ `IdentityFact` (identity_facts) — کلید-محور،
+  مقدار Fernet-رمزنگاری‌شده، ثبت در `__init__` + migration 0049 + create_all. سرویسِ
+  `identity_facts` (set/get/get_many/list با ماسک: فقط label + has_value، هرگز plaintext).
+  واژگانِ متعارف (card_last3/dob/national_id/…).
+- **CHANGE (استخراجِ دستورِ رمز + ساختِ امن)** `password_recipe`: با AI از بدنهٔ ایمیل یک
+  recipeِ ساختارمند {has_recipe, components, template} می‌سازد؛ `_canonicalise` template را
+  اعتبارسنجی می‌کند (هر توکن باید componentِ اعلام‌شده باشد). `derive_password` فقط
+  جایگذاریِ توکنِ امن است (نه str.format/eval) — چون بدنهٔ ایمیل untrusted است؛ recipeِ
+  بدخواه فقط می‌تواند factهای خودِ مالک را به‌هم بچسباند. recipe per-domain در GlobalSetting.
+- **CHANGE (حلقهٔ derive→ذخیرهٔ ابدی)** `email_ingest._resolve_locked_file`: روی فایلِ
+  قفلِ ارزشمند → recipe (ذخیره‌شده وگرنه از بدنه) → اگر همهٔ اجزا موجود بود، رمز را می‌سازد،
+  فایل را باز می‌کند و رمز را per-domain ذخیره (بی‌پرسش). اگر جزئی کم بود → InboxItemِ
+  `password_components` که فقط همان اجزای کم را می‌پرسد. بی‌recipe → همان `password_request`
+  قبلی (رفتار حفظ شد). رمزِ مشتق‌شدهٔ اشتباه → open شکست می‌خورد → fallback به پرسش (بدونِ
+  حلقهٔ بی‌پایان). dedup و digest حالا هر دو نوع را می‌شناسند.
+- **CHANGE (endpoint + فرانت)** `POST /api/inbox/password-components` (ذخیرهٔ اجزا +
+  ساخت رمز + بازکردن + filed). در Dashboard شاخهٔ `password_components` که برای هر جزءِ کم
+  یک فیلدِ برچسب‌دار (dir=rtl) نشان می‌دهد و «🔐 ذخیره کن و رمز را بساز» می‌فرستد.
+- **VERIFY** `tests/test_password_recipe.py` (۶: roundtripِ fact + ماسک، derivۀ امن،
+  اعتبارِ template، extractِ recipe، ساختِ درخواستِ اجزا، derive+openِ خودکار). گیت سبز؛
+  build سبز. امنیت: مقادیر رمزنگاری‌شده، هرگز به کلاینت برنمی‌گردند؛ derivۀ pure؛ fallbackِ
+  امن روی رمزِ اشتباه.

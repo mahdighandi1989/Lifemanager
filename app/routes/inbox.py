@@ -322,3 +322,53 @@ async def submit_password(
             r.status = "filed"
     await db.commit()
     return {"ok": True, "success": True, "result": res}
+
+
+class ComponentsSubmit(BaseModel):
+    source_ref: str = Field(..., max_length=300)
+    source_key: str = Field(..., max_length=200)
+    values: Dict[str, str] = Field(default_factory=dict)
+
+
+@router.post("/api/inbox/password-components", tags=["inbox"])
+@handle_errors
+async def submit_password_components(
+    payload: ComponentsSubmit = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """«رمزِ هوشمند»: store the identity components the owner supplied (encrypted,
+    reusable), derive the file password from the email's recipe, open the file,
+    and remember it forever — future files from that sender open automatically."""
+    from app.services.ingest import credentials, identity_facts, password_recipe
+    from app.services.ingest.email_ingest import retry_source_ref
+
+    for key, value in (payload.values or {}).items():
+        if value:
+            await identity_facts.set_fact(db, fact_key=key, value=value, user_id=user_id)
+
+    recipe = await password_recipe.get_stored_recipe(db, domain=payload.source_key)
+    result: Dict[str, Any] = {"derived": False}
+    if recipe and recipe.get("template"):
+        keys = [c["key"] for c in (recipe.get("components") or [])]
+        values = await identity_facts.get_many(db, keys=keys, user_id=user_id)
+        if keys and all(values.get(k) for k in keys):
+            pw = password_recipe.derive_password(recipe["template"], values)
+            await credentials.store_password(db, source_key=payload.source_key, password=pw)
+            result = await retry_source_ref(db, source_ref=payload.source_ref, user_id=user_id)
+            result["derived"] = True
+
+    reqs = (
+        await db.execute(
+            select(InboxItem).where(
+                InboxItem.status == "pending",
+                InboxItem.suggested_type.in_(["password_components", "password_request"]),
+            )
+        )
+    ).scalars().all()
+    for r in reqs:
+        if (r.suggestion or {}).get("source_ref") == payload.source_ref:
+            r.status = "filed"
+    await db.commit()
+    return {"ok": True, "success": True, "result": result}

@@ -16,6 +16,7 @@ const TYPE_FA = {
   finance_account: 'حساب مالی',
   document: 'سند',
   password_request: 'رمز لازم',
+  password_components: 'اطلاعاتِ رمز',
   unknown: 'نامشخص',
 };
 
@@ -28,6 +29,7 @@ const TYPE_COLOR = {
   finance_account: 'bg-teal-100 text-teal-700',
   document: 'bg-indigo-100 text-indigo-700',
   password_request: 'bg-orange-100 text-orange-700',
+  password_components: 'bg-orange-100 text-orange-700',
   unknown: 'bg-gray-100 text-gray-600',
 };
 
@@ -71,12 +73,15 @@ function TaskRow({ task, tone }) {
 }
 
 // «صندوق ورودی» pending row: suggestion chip + one-tap file / retarget / dismiss.
-function InboxRow({ item, onFile, onDismiss, onPassword, busy }) {
+function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
   const [target, setTarget] = useState('');
   const [pw, setPw] = useState('');
+  const [comp, setComp] = useState({});
   const suggested = item.suggested_type || 'unknown';
   const reason = item.suggestion?.reason;
   const isPasswordReq = suggested === 'password_request';
+  const isComponentsReq = suggested === 'password_components';
+  const missing = item.suggestion?.missing || [];
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 space-y-2" data-testid="inbox-row">
       <div className="flex items-start justify-between gap-2">
@@ -115,6 +120,40 @@ function InboxRow({ item, onFile, onDismiss, onPassword, busy }) {
           >
             ✖ رد
           </button>
+        </div>
+      ) : isComponentsReq ? (
+        <div className="space-y-2" dir="rtl">
+          {missing.map((c) => (
+            <input
+              key={c.key}
+              type={c.kind === 'digits' ? 'text' : 'text'}
+              inputMode={c.kind === 'digits' ? 'numeric' : 'text'}
+              value={comp[c.key] || ''}
+              onChange={(e) => setComp((s) => ({ ...s, [c.key]: e.target.value }))}
+              placeholder={c.label || c.key}
+              data-testid={`inbox-component-${c.key}`}
+              className="w-full rounded-md border border-gray-300 px-2 py-1 text-xs"
+            />
+          ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              disabled={busy || !missing.every((c) => (comp[c.key] || '').trim())}
+              onClick={() => { onComponents(item, comp); setComp({}); }}
+              data-testid="inbox-components-submit"
+              className="rounded-md bg-orange-600 px-3 py-1 text-xs font-medium text-white hover:bg-orange-700 disabled:opacity-50"
+            >
+              🔐 ذخیره کن و رمز را بساز
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onDismiss(item)}
+              className="rounded-md border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+            >
+              ✖ رد
+            </button>
+          </div>
         </div>
       ) : (
       <div className="flex flex-wrap items-center gap-2">
@@ -401,6 +440,26 @@ function Dashboard() {
     }
   };
 
+  // «رمزِ هوشمند»: send the identity components the email asked for; the backend
+  // stores them (encrypted, reusable), derives the password, and opens the file.
+  const handleComponents = async (item, values) => {
+    setInboxBusyId(item.id);
+    setActionError(false);
+    try {
+      const sug = item.suggestion || {};
+      await api.post('/inbox/password-components', {
+        source_ref: sug.source_ref,
+        source_key: sug.source_key,
+        values,
+      });
+    } catch {
+      setActionError(true);
+    } finally {
+      fetchToday();
+      setInboxBusyId(null);
+    }
+  };
+
   const faDate = new Date().toLocaleDateString('fa-IR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -651,6 +710,7 @@ function Dashboard() {
                 busy={inboxBusyId === item.id}
                 onFile={handleFile}
                 onPassword={handlePassword}
+                onComponents={handleComponents}
                 onDismiss={handleDismiss}
               />
             ))}

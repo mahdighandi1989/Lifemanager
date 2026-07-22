@@ -68,7 +68,9 @@ async def _propose_password_request(
     src_key = credentials.source_key_for(sender)
     existing = (
         await db.execute(
-            select(InboxItem).where(InboxItem.suggested_type == "password_request")
+            select(InboxItem).where(
+                InboxItem.suggested_type.in_(["password_request", "password_components"])
+            )
         )
     ).scalars().all()
     if any((r.suggestion or {}).get("source_ref") == source_ref for r in existing):
@@ -87,6 +89,98 @@ async def _propose_password_request(
     return True
 
 
+async def _propose_components_request(
+    db, *, sender: str, filename: str, source_ref: str, domain: str,
+    recipe: Dict[str, Any], missing: list, user_id: int,
+) -> bool:
+    """Smart request: instead of a blind «رمز بده» box, ask ONLY for the missing
+    identity components the email says form the password (once per source_ref)."""
+    from app.models.inbox_item import InboxItem
+
+    existing = (
+        await db.execute(
+            select(InboxItem).where(
+                InboxItem.suggested_type.in_(["password_request", "password_components"])
+            )
+        )
+    ).scalars().all()
+    if any((r.suggestion or {}).get("source_ref") == source_ref for r in existing):
+        return False
+    labels = "، ".join(c.get("label") or c.get("key") for c in missing[:4])
+    db.add(
+        InboxItem(
+            user_id=user_id,
+            content=f"🔐 برای بازکردنِ «{filename}» از {domain} این‌ها لازم است: {labels}",
+            source="attachment",
+            status="pending",
+            suggested_type="password_components",
+            suggestion={
+                "source_ref": source_ref,
+                "filename": filename,
+                "source_key": domain,
+                "template": recipe.get("template"),
+                "notes": recipe.get("notes"),
+                "missing": missing,
+            },
+            ai_model=None,
+        )
+    )
+    return True
+
+
+async def _resolve_locked_file(
+    db, *, mid: str, att: Dict[str, Any], source_ref: str, sender: str, user_id: int
+) -> str:
+    """Try to open a locked VALUABLE file smartly: recipe (stored, else read
+    from the email BODY) → derive from stored identity facts → open silently.
+    Missing facts → a «password_components» request (ask only what's needed).
+    No recipe → today's plain «password_request». Returns
+    opened|components|request|dup|error. Never raises."""
+    from app.services.ingest import identity_facts, password_recipe
+
+    domain = credentials.source_key_for(sender)
+    try:
+        recipe = await password_recipe.get_stored_recipe(db, domain=domain)
+        if recipe is None:
+            from app.services.google_sync.gmail_service import fetch_message_body
+
+            body = await fetch_message_body(db, mid)
+            recipe = await password_recipe.extract_recipe(db, body, sender)
+            if recipe is not None:
+                await password_recipe.store_recipe(db, domain=domain, recipe=recipe)
+
+        if recipe and recipe.get("has_recipe") and recipe.get("template"):
+            comps = recipe.get("components") or []
+            values = await identity_facts.get_many(db, keys=[c["key"] for c in comps], user_id=user_id)
+            missing = [c for c in comps if not values.get(c["key"])]
+            if not missing:
+                pw = password_recipe.derive_password(recipe["template"], values)
+                res = await extract_from_file(
+                    db, filename=att["filename"], mimetype=att.get("mimetype"),
+                    data=att["data"], source_ref=source_ref, user_id=user_id, password=pw,
+                )
+                if res.get("status") == "proposed":
+                    await credentials.store_password(db, source_key=domain, password=pw)
+                    return "opened"
+                # derived password wrong (recipe/format misread) → fall through to ask
+            elif await _propose_components_request(
+                db, sender=sender, filename=att["filename"], source_ref=source_ref,
+                domain=domain, recipe=recipe, missing=missing, user_id=user_id,
+            ):
+                return "components"
+            else:
+                return "dup"
+
+        if await _propose_password_request(
+            db, sender=sender, filename=att["filename"], source_ref=source_ref, user_id=user_id
+        ):
+            return "request"
+        return "dup"
+    except Exception as exc:
+        logger.debug("locked resolve failed (%s): %r", source_ref, exc)
+        return "error"
+
+
 async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[str, Any]:
     """Send ONE «فایل‌های رمزدار» digest (in-app + Telegram) covering ALL pending
     locked files, at most once per cooldown window. The files still land in the
@@ -99,7 +193,7 @@ async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[st
             await db.execute(
                 select(InboxItem).where(
                     InboxItem.status == "pending",
-                    InboxItem.suggested_type == "password_request",
+                    InboxItem.suggested_type.in_(["password_request", "password_components"]),
                 )
             )
         ).scalars().all()
@@ -192,10 +286,13 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
             if _is_worthless_locked(att["filename"]):
                 skipped += 1
                 continue
-            needs += 1
-            if await _propose_password_request(
-                db, sender=sender, filename=att["filename"], source_ref=source_ref, user_id=user_id
-            ):
+            outcome = await _resolve_locked_file(
+                db, mid=mid, att=att, source_ref=source_ref, sender=sender, user_id=user_id
+            )
+            if outcome == "opened":
+                proposed += 1  # derived the password + extracted, no prompt needed
+            elif outcome in ("request", "components"):
+                needs += 1
                 new_locked += 1
     return {
         "proposed": proposed,

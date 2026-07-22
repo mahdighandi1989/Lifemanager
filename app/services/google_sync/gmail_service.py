@@ -85,6 +85,67 @@ def normalize_message(raw: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     }
 
 
+def _decode_b64url(data: str) -> str:
+    try:
+        return base64.urlsafe_b64decode(data + "===").decode("utf-8", "ignore")
+    except Exception:
+        return ""
+
+
+def _collect_body(payload: dict) -> str:
+    """Walk a Gmail payload tree; prefer text/plain, fall back to text/html
+    (tags stripped). Returns the concatenated body text (possibly '')."""
+    import re as _re
+
+    plain: List[str] = []
+    html: List[str] = []
+
+    def walk(part):
+        if not part:
+            return
+        mime = (part.get("mimeType") or "").lower()
+        data = (part.get("body") or {}).get("data")
+        if data:
+            if mime == "text/plain":
+                plain.append(_decode_b64url(data))
+            elif mime == "text/html":
+                html.append(_decode_b64url(data))
+        for sub in part.get("parts") or []:
+            walk(sub)
+
+    walk(payload)
+    text = "\n".join(plain).strip()
+    if not text and html:
+        text = _re.sub(r"<[^>]+>", " ", "\n".join(html))
+        text = _re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+async def fetch_message_body(
+    db: AsyncSession, message_id: str, *, max_chars: int = 40000
+) -> Optional[str]:
+    """Fetch the FULL plaintext body of a message ON DEMAND (never stored — the
+    metadata-only-at-rest invariant stands). Used to read a bank's password
+    instructions. None when not connected / on any error (fail-open)."""
+    token = await get_access_token(db)
+    if not token:
+        return None
+    try:
+        raw = await _default_fetcher(
+            "GET", f"{GMAIL_API}/users/me/messages/{message_id}?format=full", _headers(token)
+        )
+    except Exception as exc:
+        logger.debug("full body fetch failed (%s): %r", message_id, exc)
+        return None
+    payload = (raw or {}).get("payload") or {}
+    body = _collect_body(payload)
+    if not body:  # single-part messages carry the body at payload.body.data
+        data = (payload.get("body") or {}).get("data")
+        if data:
+            body = _decode_b64url(data)
+    return (body or "")[:max_chars] or None
+
+
 async def fetch_recent(
     access_token: str,
     max_results: int = 25,
