@@ -317,10 +317,16 @@ async def submit_password(
     res = await try_open(db, source_ref=payload.source_ref, password=payload.password, user_id=user_id)
     if not res.get("unlocked"):
         await db.commit()
-        return {
-            "ok": False, "success": False, "unlocked": False,
-            "message": "رمز درست نبود — دوباره امتحان کن.", "result": res,
-        }
+        # Distinguish a genuinely-wrong password (prepare_bytes rejected it)
+        # from a file we simply couldn't fetch right now (Gmail token refresh /
+        # 429 → attachments come back empty). Telling the owner «رمز غلط» and
+        # discarding a CORRECT password on a transient hiccup was a real bug.
+        if res.get("status") == "needs_password":
+            return {"ok": False, "success": False, "unlocked": False,
+                    "message": "رمز درست نبود — دوباره امتحان کن.", "result": res}
+        return {"ok": False, "success": False, "unlocked": False, "retry": True,
+                "message": "الان نتوانستم فایل را باز کنم (اتصالِ گوگل) — چند لحظه بعد دوباره امتحان کن.",
+                "result": res}
     # correct password → store it, resolve the request, open the whole bank.
     await credentials.store_password(db, source_key=payload.source_key, password=payload.password)
     await db.commit()
@@ -372,6 +378,11 @@ async def submit_password_components(
         batch = await retry_domain(db, source_key=payload.source_key, user_id=user_id)
         batch_opened = batch.get("opened", 0)
         return {"ok": True, "success": True, "result": result, "batch_opened": batch_opened}
+    # couldn't-fetch (transient Gmail) vs genuinely-wrong components — don't
+    # cry «اجزا غلط» when we simply couldn't reach the file.
+    if result.get("status") not in (None, "needs_password"):
+        return {"ok": False, "success": False, "retry": True, "result": result, "batch_opened": 0,
+                "message": "الان نتوانستم فایل را باز کنم — چند لحظه بعد دوباره امتحان کن."}
     return {
         "ok": False, "success": False, "result": result, "batch_opened": 0,
         "message": "با این اجزا رمز باز نشد — اجزا را بررسی کن یا رمز را مستقیم وارد کن.",

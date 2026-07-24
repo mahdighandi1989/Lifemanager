@@ -49,7 +49,7 @@ class EmailParserService:
     # «balance is 1000 USD» / «Balance: USD 1,234.56» / «AED 500» (currency word
     # BEFORE the amount — the common bank-statement shape the old regex missed).
     _BALANCE_RE = re.compile(
-        r"(?:موجودی|balance|بالانس|available|مبلغ)\s*(?:is|:|：|of)?\s*"
+        r"(?:موجودی|balance|بالانس|available\s*balance|موجودیِ?\s*قابل\s*برداشت)\s*(?:is|:|：|of)?\s*"
         r"(?P<cur0>usd|eur|aed|gbp|irr|aud|cad|dhs|ریال|تومان|درهم|[$€£])?\s*"
         r"(?P<amount>\d[\d,]*(?:\.\d+)?)\s*"
         r"(?P<cur2>ریال|تومان|rial|toman|usd|eur|aed|gbp|dollar|درهم|dhs|[$€£])?",

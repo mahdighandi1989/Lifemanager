@@ -119,17 +119,30 @@ def _scope(col, uid: int):
 
 
 async def _match_account(
-    db: AsyncSession, uid: int, institution: Optional[str], ref: Optional[str]
+    db: AsyncSession, uid: int, institution: Optional[str], ref: Optional[str],
+    source_ref: Optional[str] = None,
 ) -> Optional[FinancialAccount]:
-    """Find the account this email belongs to — by stored account-ref first
-    (exact, the strongest key), then by institution name/label."""
+    """Find the account this signal belongs to. Priority: (1) same source file
+    (source_ref already seen on the card) — this reconciles the attachment
+    auto-feed and the later manual «تأیید» onto ONE card even when they derive
+    the institution name differently; (2) exact account-ref; (3) institution
+    name — BUT only when there's no ref, so two distinct accounts at the same
+    bank (different refs) don't collapse into one card."""
     accounts = (
         await db.execute(select(FinancialAccount).where(_scope(FinancialAccount.user_id, uid)))
     ).scalars().all()
+    if source_ref:
+        for a in accounts:
+            ex = _extra(a)
+            if source_ref in set(ex.get("source_refs") or []) or source_ref in set(ex.get("applied_refs") or []):
+                return a
     if ref:
         for a in accounts:
             if _extra(a).get("account_ref") == ref:
                 return a
+        # a real ref that matches no stored ref ⇒ a DISTINCT account; do not
+        # fall through to the loose institution-substring match.
+        return None
     if institution:
         inst = institution.lower()
         for a in accounts:
@@ -174,12 +187,18 @@ async def apply_account_signal(
     if bal is None and not account_ref and not iban:
         return {"created": 0, "updated": 0, "account_id": None}
 
-    acc = await _match_account(db, uid, institution, account_ref)
+    acc = await _match_account(db, uid, institution, account_ref, source_ref=source_ref)
     created = updated = 0
     if acc is None:
+        # Don't CREATE a phantom card from a bare masked ref alone (a receipt
+        # says «paid with card ending 4321» — that's a purchase, not an account).
+        # A new card needs a real balance or an IBAN.
+        if bal is None and not iban:
+            return {"created": 0, "updated": 0, "account_id": None}
         extra = {
             "source": source, "inferred": True, "account_ref": account_ref,
             "last_email_at": occurred_iso,
+            "source_refs": [source_ref] if source_ref else [],
         }
         if iban:
             extra["iban"] = iban
@@ -199,6 +218,13 @@ async def apply_account_signal(
             _record_txn(db, acc, Decimal(0), bal, source_ref, occurred_iso, currency, source)
     else:
         extra = _extra(acc)
+        # Always remember this file/source touched this card — the reconciliation
+        # key so a later manual «تأیید» of the same file lands on THIS card.
+        if source_ref:
+            srefs = set(extra.get("source_refs") or [])
+            srefs.add(source_ref)
+            extra["source_refs"] = list(srefs)[-200:]
+            acc.extra = json.dumps(extra, ensure_ascii=False)
         last_at = extra.get("last_email_at")
         is_newer = occurred_iso is None or last_at is None or occurred_iso >= last_at
         if bal is not None and is_newer:
@@ -285,7 +311,11 @@ def _record_txn(
 
     extra = _extra(acc)
     # dedup: track applied refs on the account (backstop to the DB source_ref).
-    applied = set(extra.get("applied_refs") or []) | set(extra.get("applied_emails") or [])
+    # Legacy rows stored bare email ids in ``applied_emails`` — reconstruct the
+    # new ``email:<id>`` ref form so a migrated card doesn't re-post its history.
+    applied = set(extra.get("applied_refs") or []) | {
+        f"email:{i}" for i in (extra.get("applied_emails") or [])
+    }
     if ref in applied:
         return False
     delta = new - old

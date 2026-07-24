@@ -83,6 +83,18 @@ def _is_worthless_locked(filename: str | None) -> bool:
     return bool(_BOILERPLATE_RE.search(name))
 
 
+def _email_iso(em) -> "str | None":
+    """ISO date of a PersonalEmail, or None — the statement date used to arm the
+    finance staleness guard so an older statement can't overwrite a newer one."""
+    recv = getattr(em, "received_at", None)
+    if recv is None:
+        return None
+    try:
+        return recv.isoformat()
+    except Exception:
+        return None
+
+
 async def _propose_password_request(
     db, *, sender: str, filename: str, source_ref: str, user_id: int
 ) -> bool:
@@ -297,6 +309,13 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
         return dict(empty)
 
     sender = getattr(email, "from_addr", "") or ""
+    occurred_iso = None
+    _recv = getattr(email, "received_at", None)
+    if _recv is not None:
+        try:
+            occurred_iso = _recv.isoformat()
+        except Exception:
+            occurred_iso = None
     src_key = credentials.source_key_for(sender)
     pw = await credentials.get_password(db, source_key=src_key)
 
@@ -312,6 +331,7 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
             user_id=user_id,
             password=pw,
             sender=sender,
+            occurred_iso=occurred_iso,
         )
         st = res.get("status")
         if st in ("proposed", "unreadable"):
@@ -350,12 +370,14 @@ async def retry_source_ref(db: AsyncSession, *, source_ref: str, user_id: int = 
     atts = await fetch_email_attachments(db, mid)
     em = await db.get(PersonalEmail, mid)
     sender = getattr(em, "from_addr", "") if em else ""
+    occurred_iso = _email_iso(em)
     pw = await credentials.get_password(db, source_key=credentials.source_key_for(sender))
     for att in atts:
         if att["filename"] == filename:
             res = await extract_from_file(
                 db, filename=filename, mimetype=att.get("mimetype"), data=att["data"],
                 source_ref=source_ref, user_id=user_id, password=pw, sender=sender,
+                occurred_iso=occurred_iso,
             )
             if res.get("status") in _UNLOCKED:
                 await mark_source_resolved(db, source_ref)
@@ -380,6 +402,7 @@ async def try_open(db: AsyncSession, *, source_ref: str, password: str, user_id:
     atts = await fetch_email_attachments(db, mid)
     em = await db.get(PersonalEmail, mid)
     sender = getattr(em, "from_addr", "") if em else ""
+    occurred_iso = _email_iso(em)
     for att in atts:
         if att["filename"] != filename:
             continue
@@ -389,6 +412,7 @@ async def try_open(db: AsyncSession, *, source_ref: str, password: str, user_id:
         res = await extract_from_file(
             db, filename=filename, mimetype=att.get("mimetype"), data=att["data"],
             source_ref=source_ref, user_id=user_id, password=password, sender=sender,
+            occurred_iso=occurred_iso,
         )
         await mark_source_resolved(db, source_ref)
         return {"unlocked": True, **res}
@@ -492,9 +516,12 @@ async def backfill_attachments(db: AsyncSession, *, user_id: int = 0, limit: int
     ONE locked-file digest at the end, not one per file."""
     from app.models.personal_sync import PersonalEmail
 
+    # Oldest-first (mirror scan_finance_emails) so that when several monthly
+    # statements from one account are backfilled, the NEWEST is applied LAST and
+    # wins the balance — newest-first would let an older statement overwrite it.
     rows = (
         await db.execute(
-            select(PersonalEmail).order_by(PersonalEmail.received_at.desc().nullslast()).limit(limit)
+            select(PersonalEmail).order_by(PersonalEmail.received_at.asc().nullsfirst()).limit(limit)
         )
     ).scalars().all()
     proposed = needs = scanned = skipped = 0

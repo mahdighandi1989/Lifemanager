@@ -168,6 +168,7 @@ async def _classify_text(db: AsyncSession, text: str, filename: str) -> Optional
 async def _feed_finance(
     db: AsyncSession, *, fields: Dict[str, Any], sender: Optional[str],
     filename: str, source_ref: str, user_id: int, det: Optional[Dict[str, Any]],
+    occurred_iso: Optional[str] = None,
 ) -> None:
     """A statement/finance file also flows straight into «مالی» — create/update
     the account card, deduped, without waiting for a manual «file» click. Uses
@@ -188,10 +189,13 @@ async def _feed_finance(
         kind = str(fields.get("account_kind") or fields.get("kind") or "bank")
         if institution is None and not ref and not iban:
             return
+        # occurred_iso = the source email's date, so the «only a newer signal
+        # moves the balance» guard actually arms (parse_finance_fields carries
+        # no date; without this an OLDER statement could overwrite a newer one).
         await fs.apply_account_signal(
             db, user_id, institution=institution, account_ref=ref, iban=iban,
             balance=balance, currency=currency, kind=kind, source="attachment",
-            source_ref=source_ref, occurred_iso=(det or {}).get("date"),
+            source_ref=source_ref, occurred_iso=(occurred_iso or (det or {}).get("date") or fields.get("date")),
             provider_name=provider,
         )
     except Exception as exc:
@@ -208,6 +212,7 @@ async def extract_from_file(
     user_id: int = 0,
     password: Optional[str] = None,
     sender: Optional[str] = None,
+    occurred_iso: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Read one file → propose a review candidate (and auto-feed «مالی» for a
     statement). Returns ``{status: proposed|needs_password|duplicate|unreadable}``.
@@ -284,6 +289,7 @@ async def extract_from_file(
             await _feed_finance(
                 db, fields=merged, sender=sender, filename=filename,
                 source_ref=source_ref, user_id=user_id, det=det_finance,
+                occurred_iso=occurred_iso,
             )
         return {"status": "proposed", "kind": suggested}
     except Exception as exc:

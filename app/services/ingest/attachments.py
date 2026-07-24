@@ -100,12 +100,27 @@ def prepare_bytes(
         from pypdf import PdfReader, PdfWriter
 
         reader = PdfReader(io.BytesIO(data))
+    except Exception as exc:
+        # Not a parseable PDF at all (or a pypdf edge) — hand the raw bytes to
+        # the model rather than blocking; it degrades gracefully on its own.
+        logger.debug("pdf open skipped: %r", exc)
+        return data, False
+    try:
         if not reader.is_encrypted:
             return data, False
         if not password:
             return None, True
         if reader.decrypt(password) == 0:  # 0 ⇒ wrong password
             return None, True
+    except Exception as exc:
+        # Couldn't even determine encryption / decrypt threw → treat as still
+        # locked, so a wrong password is never silently accepted and stored.
+        logger.debug("pdf decrypt failed (still locked): %r", exc)
+        return None, True
+    # decrypt SUCCEEDED — now re-serialise to plain bytes; if that step throws,
+    # the file is genuinely unlocked, so hand the original decrypted bytes on
+    # (never report it as still-locked, which would re-ask a correct password).
+    try:
         writer = PdfWriter()
         for page in reader.pages:
             writer.add_page(page)
@@ -113,7 +128,5 @@ def prepare_bytes(
         writer.write(buf)
         return buf.getvalue(), False
     except Exception as exc:
-        # Not a parseable PDF (or a pypdf edge) — hand the raw bytes to the model
-        # rather than blocking; the model degrades gracefully on its own.
-        logger.debug("pdf prepare skipped: %r", exc)
+        logger.debug("pdf re-serialise skipped (already unlocked): %r", exc)
         return data, False

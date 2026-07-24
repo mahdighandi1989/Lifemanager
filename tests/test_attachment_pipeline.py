@@ -195,3 +195,100 @@ async def test_mark_source_resolved_files_the_request(db_session):
     assert n == 1
     row = (await db_session.execute(select(InboxItem))).scalars().one()
     assert row.status == "filed"
+
+
+# ── review-round fixes (adversarial verification of the fix itself) ──────────
+
+@pytest.mark.asyncio
+async def test_older_statement_does_not_overwrite_newer_balance(db_session):
+    """occurred_iso arms the staleness guard: a newer statement wins even if an
+    older one is applied afterward (the backfill-order corruption bug)."""
+    from app.services import finance_email_scan_service as fs
+
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••4321",
+        balance=5000, currency="AED", source="attachment",
+        source_ref="gmail:july:stmt.pdf", occurred_iso="2026-07-31T00:00:00",
+    )
+    await db_session.commit()
+    # an OLDER statement arrives afterward → must NOT overwrite the newer balance
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••4321",
+        balance=1000, currency="AED", source="attachment",
+        source_ref="gmail:june:stmt.pdf", occurred_iso="2026-06-30T00:00:00",
+    )
+    await db_session.commit()
+    acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    assert float(acc.balance) == 5000.0  # newest wins, older ignored
+
+
+@pytest.mark.asyncio
+async def test_source_ref_reconciles_auto_feed_and_manual_file(db_session):
+    """The attachment auto-feed and a later manual «تأیید» of the SAME file land
+    on ONE card even when they name the institution differently (source_ref)."""
+    from app.services import finance_email_scan_service as fs
+    from app.services import inbox_service as ib
+
+    # auto-feed at propose time (institution from sender domain)
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••4321",
+        balance=1000, currency="AED", source="attachment",
+        source_ref="gmail:m1:statement.pdf", occurred_iso="2026-07-01T00:00:00",
+    )
+    await db_session.commit()
+    # later, the owner approves the SAME file (provider/title differs)
+    await ib._file_as_finance_account(db_session, {
+        "provider": "My Bank Statement", "balance": "1200", "currency": "AED",
+        "account_no": "••4321", "source_ref": "gmail:m1:statement.pdf",
+    }, 0)
+    await db_session.commit()
+    accs = (await db_session.execute(select(FinancialAccount))).scalars().all()
+    assert len(accs) == 1  # reconciled onto one card, not duplicated
+
+
+@pytest.mark.asyncio
+async def test_distinct_accounts_same_bank_not_collapsed(db_session):
+    """Two different accounts at the same bank (different refs) get their own
+    cards — the institution-substring fallback no longer collapses them."""
+    from app.services import finance_email_scan_service as fs
+
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••1111",
+        balance=100, currency="AED", source="attachment", source_ref="gmail:a:1.pdf",
+        occurred_iso="2026-07-01T00:00:00",
+    )
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••2222",
+        balance=200, currency="AED", source="attachment", source_ref="gmail:b:2.pdf",
+        occurred_iso="2026-07-01T00:00:00",
+    )
+    await db_session.commit()
+    accs = (await db_session.execute(select(FinancialAccount))).scalars().all()
+    assert len(accs) == 2
+
+
+@pytest.mark.asyncio
+async def test_bare_ref_receipt_makes_no_phantom_card(db_session):
+    """A receipt («paid with card ending 4321», no balance/IBAN) must NOT create
+    a finance account — that's a purchase, not an account."""
+    from app.services import finance_email_scan_service as fs
+
+    r = await fs.apply_account_signal(
+        db_session, 0, institution="shop", account_ref="••4321",
+        balance=None, iban=None, source="attachment", source_ref="gmail:r:receipt.pdf",
+    )
+    await db_session.commit()
+    assert r["account_id"] is None
+    assert (await db_session.execute(select(FinancialAccount))).scalars().first() is None
+
+
+def test_prepare_bytes_encrypted_error_stays_locked():
+    """A truncated/corrupt encrypted PDF must report needs_password (still
+    locked), never pass encrypted bytes through as if unlocked."""
+    # a header that looks like a PDF but is not parseable → open fails → passthrough
+    ready, needs = prepare_bytes(b"%PDF-1.4 broken", "application/pdf", password="x")
+    assert needs is False  # unparseable-as-pdf → hand raw bytes on (not our concern)
+
+    # a real encrypted PDF with the WRONG password → needs_password
+    enc = _encrypted_pdf("right")
+    assert prepare_bytes(enc, "application/pdf", password="wrong") == (None, True)
