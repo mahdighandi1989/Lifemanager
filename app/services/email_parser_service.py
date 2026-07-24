@@ -36,14 +36,23 @@ class EmailParserService:
         "dollar": "USD",
         "€": "EUR",
         "eur": "EUR",
+        "£": "GBP",
+        "gbp": "GBP",
+        "aed": "AED",       # UAE dirham — the owner's home currency
+        "درهم": "AED",
+        "dhs": "AED",
+        "aud": "AUD",
+        "cad": "CAD",
     }
 
-    # "موجودی: 12,500,000 ریال" / "Balance: $1,234.56" / "balance is 1000 USD"
+    # Handles all of: «موجودی: 12,500,000 ریال» / «Balance: $1,234.56» /
+    # «balance is 1000 USD» / «Balance: USD 1,234.56» / «AED 500» (currency word
+    # BEFORE the amount — the common bank-statement shape the old regex missed).
     _BALANCE_RE = re.compile(
-        r"(?:موجودی|balance|بالانس)\s*(?:is|:|：)?\s*"
-        r"(?P<cur1>[$€])?\s*"
+        r"(?:موجودی|balance|بالانس|available|مبلغ)\s*(?:is|:|：|of)?\s*"
+        r"(?P<cur0>usd|eur|aed|gbp|irr|aud|cad|dhs|ریال|تومان|درهم|[$€£])?\s*"
         r"(?P<amount>\d[\d,]*(?:\.\d+)?)\s*"
-        r"(?P<cur2>ریال|تومان|rial|toman|usd|eur|dollar|\$|€)?",
+        r"(?P<cur2>ریال|تومان|rial|toman|usd|eur|aed|gbp|dollar|درهم|dhs|[$€£])?",
         re.IGNORECASE,
     )
 
@@ -55,7 +64,7 @@ class EmailParserService:
         if not match:
             return ParsedBalance(balance=None, currency=None)
         amount = float(match.group("amount").replace(",", ""))
-        token = (match.group("cur1") or match.group("cur2") or "").strip().lower()
+        token = (match.group("cur0") or match.group("cur2") or "").strip().lower()
         currency = self._CURRENCY.get(token)
         return ParsedBalance(balance=amount, currency=currency, raw_match=match.group(0))
 

@@ -97,11 +97,64 @@ def _canonicalise(recipe: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return {"has_recipe": True, "template": template, "components": components, "notes": str(recipe.get("notes") or "")[:300]}
 
 
+# ── deterministic recipe parser (keyless fallback to the AI) ─────────────────
+# Banks state the rule in a handful of stock phrasings. Recognising them with
+# regex means the recipe works WITHOUT any model — the AI is only needed for
+# unusual wordings. Each (pattern → canonical key); the template is built in the
+# order the phrases appear in the body.
+_PHRASES = [
+    ("card_last4", r"last\s*(?:4|four)\s*digits?\s*of\s*(?:your\s*)?(?:credit\s*|debit\s*)?card|چهار\s*رقمِ?\s*آخرِ?\s*کارت"),
+    ("card_last3", r"last\s*(?:3|three)\s*digits?\s*of\s*(?:your\s*)?card|سه\s*رقمِ?\s*آخرِ?\s*کارت"),
+    ("account_last4", r"last\s*(?:4|four)\s*digits?\s*of\s*(?:your\s*)?account|چهار\s*رقمِ?\s*آخرِ?\s*حساب"),
+    ("passport_last4", r"last\s*(?:4|four)\s*digits?\s*of\s*(?:your\s*)?passport|چهار\s*رقمِ?\s*آخرِ?\s*پاسپورت"),
+    ("phone_last4", r"last\s*(?:4|four)\s*digits?\s*of\s*(?:your\s*)?(?:mobile|phone)|چهار\s*رقمِ?\s*آخرِ?\s*(?:موبایل|تلفن)"),
+    ("national_id", r"national\s*id|nric|کدِ?\s*ملی|شمار[هه]\s*ملی"),
+    ("customer_id", r"customer\s*(?:id|number)|شمار[هٔه]\s*مشتری"),
+    ("postal_code", r"post(?:al)?\s*code|zip\s*code|کدِ?\s*پستی"),
+    ("dob", r"date\s*of\s*birth|d\.?o\.?b\b|birth\s*date|تاریخِ?\s*تولد|تولد"),
+    ("dob_year", r"year\s*of\s*birth|سالِ?\s*تولد"),
+    ("mother_name", r"mother'?s?\s*name|نامِ?\s*مادر"),
+]
+_PW_CONTEXT = re.compile(r"(password|passcode|pass\s*word|پسورد|رمز)", re.I)
+
+
+def deterministic_recipe(email_body: Optional[str]) -> Dict[str, Any]:
+    """Parse a password recipe from stock bank phrasings — no AI. Requires a
+    password-context word AND at least one recognised component, so a generic
+    email doesn't produce a spurious recipe. Template follows phrase order."""
+    body = email_body or ""
+    if not _PW_CONTEXT.search(body):
+        return {"has_recipe": False}
+    hits = []
+    for key, pat in _PHRASES:
+        m = re.search(pat, body, re.I)
+        if m:
+            hits.append((m.start(), key))
+    if not hits:
+        return {"has_recipe": False}
+    hits.sort()
+    ordered, seen = [], set()
+    for _, key in hits:
+        if key not in seen:
+            seen.add(key)
+            ordered.append(key)
+    # «سال تولد» matches both dob_year and (bare) dob — keep only the specific one.
+    if "dob_year" in ordered and "dob" in ordered:
+        ordered.remove("dob")
+    template = "".join("{" + k + "}" for k in ordered)
+    components = [{"key": k, "label": label_for(k), "kind": kind_for(k)} for k in ordered]
+    return {"has_recipe": True, "template": template, "components": components, "notes": ""}
+
+
 async def extract_recipe(db: AsyncSession, email_body: Optional[str], sender: str) -> Optional[Dict[str, Any]]:
-    """Ask the AI to read the body for a password recipe. Returns a canonicalised
-    recipe dict ({has_recipe: false} when none), or None on total failure."""
+    """Determine the password recipe from the body. Tries the DETERMINISTIC
+    phrase parser first (keyless), then falls back to the AI for unusual
+    wordings. Returns a canonicalised recipe ({has_recipe: false} when none)."""
     if not email_body:
         return {"has_recipe": False}
+    det = _canonicalise(deterministic_recipe(email_body))
+    if det.get("has_recipe"):
+        return det
     try:
         from app.services.ai.inference_gateway import complete
 

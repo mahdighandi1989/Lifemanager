@@ -88,14 +88,17 @@ async def _already_ingested(db: AsyncSession, source_ref: str) -> bool:
     """True when this exact file (by source_ref) was ALREADY turned into a
     candidate — in ANY status. Checking filed/dismissed too (not just pending)
     keeps Drive re-scans and the backfill idempotent: a file the owner already
-    filed or intentionally dismissed is never re-proposed."""
+    filed or intentionally dismissed is never re-proposed. Dedup by source_ref
+    across ALL content types (incl. transaction — omitting it re-proposed every
+    receipt on each re-scan)."""
     from app.models.inbox_item import InboxItem
 
     rows = (
         await db.execute(
             select(InboxItem).where(
                 InboxItem.suggested_type.in_(
-                    ["finance_account", "document", "subscription", "person", "task", "note"]
+                    ["finance_account", "transaction", "document", "subscription",
+                     "person", "task", "note"]
                 ),
             )
         )
@@ -141,6 +144,60 @@ async def _propose(
     )
 
 
+async def _classify_text(db: AsyncSession, text: str, filename: str) -> Optional[Dict[str, Any]]:
+    """Rich classification of already-extracted TEXT via a text LLM (cheaper +
+    more reliable than vision on a statement). Returns a parsed dict or None —
+    the deterministic path is the floor, so None just means 'no richer info'."""
+    try:
+        from app.services.ai.inference_gateway import complete
+
+        res = await complete(
+            db, _EXTRACT_PROMPT + "\n\nمتنِ فایل:\n" + text[:8000],
+            task="document_extraction", max_tokens=500,
+        )
+        if res.get("ok"):
+            parsed = _parse_json(res.get("text"))
+            if parsed:
+                parsed["_model"] = res.get("model")
+                return parsed
+    except Exception as exc:
+        logger.debug("text classify skipped: %r", exc)
+    return None
+
+
+async def _feed_finance(
+    db: AsyncSession, *, fields: Dict[str, Any], sender: Optional[str],
+    filename: str, source_ref: str, user_id: int, det: Optional[Dict[str, Any]],
+) -> None:
+    """A statement/finance file also flows straight into «مالی» — create/update
+    the account card, deduped, without waiting for a manual «file» click. Uses
+    the SAME identity engine as the email scan so the two never double-up."""
+    try:
+        from app.services import finance_email_scan_service as fs
+
+        provider = fields.get("provider") or fields.get("institution")
+        institution = fs._institution(sender, provider or filename) or (
+            re.sub(r"[^A-Za-z0-9آ-ی]+", "", str(provider))[:60] if provider else None
+        )
+        ref = fields.get("account_no") or (det or {}).get("account_no")
+        iban = fields.get("iban") or (det or {}).get("iban")
+        balance = fields.get("balance")
+        if balance is None and det:
+            balance = det.get("balance")
+        currency = fields.get("currency") or (det or {}).get("currency")
+        kind = str(fields.get("account_kind") or fields.get("kind") or "bank")
+        if institution is None and not ref and not iban:
+            return
+        await fs.apply_account_signal(
+            db, user_id, institution=institution, account_ref=ref, iban=iban,
+            balance=balance, currency=currency, kind=kind, source="attachment",
+            source_ref=source_ref, occurred_iso=(det or {}).get("date"),
+            provider_name=provider,
+        )
+    except Exception as exc:
+        logger.debug("attachment→finance feed skipped (%s): %r", source_ref, exc)
+
+
 async def extract_from_file(
     db: AsyncSession,
     *,
@@ -150,9 +207,13 @@ async def extract_from_file(
     source_ref: str,
     user_id: int = 0,
     password: Optional[str] = None,
+    sender: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Read one file → propose a review candidate. Returns a status dict:
-    ``{status: proposed|needs_password|duplicate|unreadable, ...}``. Never raises.
+    """Read one file → propose a review candidate (and auto-feed «مالی» for a
+    statement). Returns ``{status: proposed|needs_password|duplicate|unreadable}``.
+    Deterministic-first: text-bearing files (PDF/XLSX/CSV/DOCX/TXT) are read with
+    NO model, so an attachment is never a dead note just because a vision model
+    isn't configured. Images still go to the vision model. Never raises.
     """
     try:
         if await _already_ingested(db, source_ref):
@@ -162,37 +223,68 @@ async def extract_from_file(
         if needs_pw:
             return {"status": "needs_password", "filename": filename, "source_ref": source_ref}
 
-        from app.services.ai.inference_gateway import complete_multimodal
+        from app.services.ingest import text_extract
 
-        res = await complete_multimodal(
-            db,
-            _EXTRACT_PROMPT,
-            [{"filename": filename, "mimetype": mimetype or "application/octet-stream", "data": ready}],
-            task="document_extraction",
-        )
-        parsed = _parse_json(res.get("text")) if res.get("ok") else None
-        if not parsed:
-            # graceful fallback: surface the file so it is never silently lost
-            await _propose(
-                db, suggested_type="note", title=filename,
-                summary="این فایل خودکار خوانده نشد — دستی بررسی کن.",
-                fields={}, source_ref=source_ref, filename=filename,
-                user_id=user_id, ai_model=None,
+        text = text_extract.extract_text(ready, mimetype, filename)
+        det_finance = text_extract.parse_finance_fields(text) if text else None
+
+        parsed: Optional[Dict[str, Any]] = None
+        ai_model: Optional[str] = None
+        if text:
+            # deterministic text present → prefer a TEXT model for a rich read;
+            # fall back to a deterministic classification so it works keyless.
+            rich = await _classify_text(db, text, filename)
+            if rich:
+                parsed = rich
+                ai_model = rich.get("_model")
+            elif det_finance:
+                parsed = {
+                    "kind": det_finance["kind"], "title": filename,
+                    "summary": "صورتحساب/سندِ مالی — خودکار خوانده شد.",
+                    "fields": {k: v for k, v in det_finance.items() if v not in (None, "")},
+                }
+            else:
+                parsed = {
+                    "kind": "document", "title": filename,
+                    "summary": "سند — متنش خوانده شد؛ برای جزئیات بازش کن.",
+                    "fields": {},
+                }
+        else:
+            # no deterministic text (image/scan) → the vision model path.
+            from app.services.ai.inference_gateway import complete_multimodal
+
+            res = await complete_multimodal(
+                db, _EXTRACT_PROMPT,
+                [{"filename": filename, "mimetype": mimetype or "application/octet-stream", "data": ready}],
+                task="document_extraction",
             )
-            return {"status": "unreadable", "reason": res.get("error") if not res.get("ok") else "unparsed"}
+            parsed = _parse_json(res.get("text")) if res.get("ok") else None
+            ai_model = res.get("model") if res.get("ok") else None
+            if not parsed:
+                await _propose(
+                    db, suggested_type="note", title=filename,
+                    summary="این فایل خودکار خوانده نشد — دستی بررسی کن.",
+                    fields={}, source_ref=source_ref, filename=filename,
+                    user_id=user_id, ai_model=None,
+                )
+                return {"status": "unreadable", "reason": res.get("error") if not res.get("ok") else "unparsed"}
 
         suggested = _KIND_MAP.get(str(parsed.get("kind") or "other").lower(), "note")
+        fields = parsed.get("fields") or {}
         await _propose(
-            db,
-            suggested_type=suggested,
+            db, suggested_type=suggested,
             title=str(parsed.get("title") or filename)[:200],
             summary=str(parsed.get("summary") or "")[:500],
-            fields=parsed.get("fields") or {},
-            source_ref=source_ref,
-            filename=filename,
-            user_id=user_id,
-            ai_model=res.get("model"),
+            fields=fields, source_ref=source_ref, filename=filename,
+            user_id=user_id, ai_model=ai_model,
         )
+        # a statement also self-feeds «مالی» (no manual click needed).
+        if suggested == "finance_account" or det_finance:
+            merged = {**(det_finance or {}), **fields}
+            await _feed_finance(
+                db, fields=merged, sender=sender, filename=filename,
+                source_ref=source_ref, user_id=user_id, det=det_finance,
+            )
         return {"status": "proposed", "kind": suggested}
     except Exception as exc:
         logger.debug("universal extract skipped (%s): %r", source_ref, exc)

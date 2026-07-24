@@ -148,6 +148,81 @@ def _to_decimal(value: Any) -> Optional[Decimal]:
         return None
 
 
+async def apply_account_signal(
+    db: AsyncSession,
+    uid: int,
+    *,
+    institution: Optional[str],
+    account_ref: Optional[str] = None,
+    iban: Optional[str] = None,
+    balance: Any = None,
+    currency: Optional[str] = None,
+    kind: str = "bank",
+    source: str = "email",
+    source_ref: Optional[str] = None,
+    occurred_iso: Optional[str] = None,
+    provider_name: Optional[str] = None,
+) -> Dict[str, Any]:
+    """The ONE place a detected account becomes/updates a card — shared by the
+    email-text scan AND the attachment extractor, so both reconcile onto the
+    SAME identity (account_ref → institution). Creates a card when none matches,
+    else updates the balance if this signal is newer, recording a deduped delta
+    transaction. Returns {created, updated, account_id}. Caller commits."""
+    bal = _to_decimal(balance)
+    if institution is None and not account_ref and not provider_name:
+        return {"created": 0, "updated": 0, "account_id": None}
+    if bal is None and not account_ref and not iban:
+        return {"created": 0, "updated": 0, "account_id": None}
+
+    acc = await _match_account(db, uid, institution, account_ref)
+    created = updated = 0
+    if acc is None:
+        extra = {
+            "source": source, "inferred": True, "account_ref": account_ref,
+            "last_email_at": occurred_iso,
+        }
+        if iban:
+            extra["iban"] = iban
+        base = (provider_name or institution or (iban or account_ref) or "حساب")
+        name = base if not account_ref else f"{base} {account_ref}"
+        acc = FinancialAccount(
+            user_id=None if uid == 0 else uid,
+            name=name[:255], kind=(kind if kind in ("bank", "broker", "exchange") else "bank"),
+            institution=institution or provider_name, currency=(currency or "USD"),
+            balance=(bal if bal is not None else Decimal(0)),
+            extra=json.dumps(extra, ensure_ascii=False),
+        )
+        db.add(acc)
+        await db.flush()
+        created = 1
+        if bal is not None and source_ref:
+            _record_txn(db, acc, Decimal(0), bal, source_ref, occurred_iso, currency, source)
+    else:
+        extra = _extra(acc)
+        last_at = extra.get("last_email_at")
+        is_newer = occurred_iso is None or last_at is None or occurred_iso >= last_at
+        if bal is not None and is_newer:
+            old = _to_decimal(acc.balance) or Decimal(0)
+            # With a source_ref, record a deduped delta txn — and if this ref was
+            # already applied, skip BOTH (idempotent re-scan). Without one (a
+            # manual re-file), just update the balance, no txn.
+            apply = _record_txn(db, acc, old, bal, source_ref, occurred_iso, currency, source) \
+                if source_ref else True
+            if apply:
+                acc.balance = bal
+                if currency:
+                    acc.currency = currency
+                extra = _extra(acc)  # re-read: _record_txn may have written applied_refs
+                extra.update({"source": extra.get("source", source), "last_email_at": occurred_iso})
+                if account_ref and not extra.get("account_ref"):
+                    extra["account_ref"] = account_ref
+                if iban and not extra.get("iban"):
+                    extra["iban"] = iban
+                acc.extra = json.dumps(extra, ensure_ascii=False)
+                updated = 1
+    return {"created": created, "updated": updated, "account_id": acc.id}
+
+
 async def scan_finance_emails(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     """Read the synced Gmail, create/update a card per detected account, and
     record per-email balance deltas. Returns a summary. Never raises on a bad
@@ -174,60 +249,23 @@ async def scan_finance_emails(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             financial += 1
 
             parsed = parse_balance(text)
-            balance = _to_decimal(getattr(parsed, "balance", None))
-            currency = getattr(parsed, "currency", None)
             institution = _institution(e.from_addr, e.subject)
             ref = _account_ref(text)
-
-            # A card needs a name (institution) AND a real signal (balance or ref).
-            if institution is None or (balance is None and ref is None):
+            iban_m = _IBAN.search(text)
+            if institution is None or (getattr(parsed, "balance", None) is None and ref is None):
                 continue
-
-            acc = await _match_account(db, uid, institution, ref)
-            recv_iso = e.received_at.isoformat() if e.received_at else None
-
-            if acc is None:
-                extra = {
-                    "source": "email", "inferred": True,
-                    "account_ref": ref, "last_email_id": e.id, "last_email_at": recv_iso,
-                }
-                iban = _IBAN.search(text)
-                if iban:
-                    extra["iban"] = iban.group(1).upper()
-                name = institution if not ref else f"{institution} {ref}"
-                acc = FinancialAccount(
-                    user_id=None if uid == 0 else uid,
-                    name=name[:255], kind=_kind(text),
-                    institution=institution, currency=(currency or "USD"),
-                    balance=(balance if balance is not None else Decimal(0)),
-                    extra=json.dumps(extra, ensure_ascii=False),
-                )
-                db.add(acc)
-                await db.flush()
-                created += 1
-                if balance is not None:
-                    _record_txn(db, acc, Decimal(0), balance, e.id, recv_iso, currency)
-            else:
-                extra = _extra(acc)
-                last_at = extra.get("last_email_at")
-                # only a NEWER email may move the balance (avoid an old mail
-                # clobbering a fresher one on re-scan)
-                is_newer = recv_iso is None or last_at is None or recv_iso >= last_at
-                if balance is not None and is_newer:
-                    old = _to_decimal(acc.balance) or Decimal(0)
-                    if _record_txn(db, acc, old, balance, e.id, recv_iso, currency):
-                        acc.balance = balance
-                        if currency:
-                            acc.currency = currency
-                        # re-read: _record_txn just wrote applied_emails into
-                        # acc.extra — reload so we don't clobber it below.
-                        extra = _extra(acc)
-                        extra.update({"source": extra.get("source", "email"),
-                                      "last_email_id": e.id, "last_email_at": recv_iso})
-                        if ref and not extra.get("account_ref"):
-                            extra["account_ref"] = ref
-                        acc.extra = json.dumps(extra, ensure_ascii=False)
-                        updated += 1
+            res = await apply_account_signal(
+                db, uid,
+                institution=institution, account_ref=ref,
+                iban=(iban_m.group(1).upper() if iban_m else None),
+                balance=getattr(parsed, "balance", None),
+                currency=getattr(parsed, "currency", None),
+                kind=_kind(text), source="email",
+                source_ref=f"email:{e.id}",
+                occurred_iso=(e.received_at.isoformat() if e.received_at else None),
+            )
+            created += res["created"]
+            updated += res["updated"]
         except Exception as exc:  # one bad email never aborts the scan
             logger.debug("finance email scan skipped a row: %r", exc)
             continue
@@ -238,29 +276,27 @@ async def scan_finance_emails(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
 
 def _record_txn(
     db: AsyncSession, acc: FinancialAccount, old: Decimal, new: Decimal,
-    email_id: str, occurred_iso: Optional[str], currency: Optional[str],
+    ref: str, occurred_iso: Optional[str], currency: Optional[str], source: str = "email",
 ) -> bool:
-    """Record the balance delta as a Transaction, idempotent on the email id.
-    Returns False when this email was already applied (so the caller skips the
-    balance write too)."""
+    """Record the balance delta as a Transaction, idempotent on the signal ref
+    (email:<id> or gmail:<mid>:<file>). Returns False when this ref was already
+    applied (so the caller skips the balance write too)."""
     from datetime import date as _date
 
-    source_ref = f"email:{email_id}"
-    # dedup: a synchronous existence check via the identity map is unreliable
-    # mid-flush, so we tag the account's extra with applied ids as a backstop.
     extra = _extra(acc)
-    applied = set(extra.get("applied_emails") or [])
-    if email_id in applied:
+    # dedup: track applied refs on the account (backstop to the DB source_ref).
+    applied = set(extra.get("applied_refs") or []) | set(extra.get("applied_emails") or [])
+    if ref in applied:
         return False
     delta = new - old
     txn = Transaction(
         account_id=acc.id,
         amount=abs(delta),
         transaction_type=("income" if delta >= 0 else "expense"),
-        description="به‌روزرسانیِ خودکار از ایمیل",
+        description=("به‌روزرسانیِ خودکار از فایل" if source == "attachment" else "به‌روزرسانیِ خودکار از ایمیل"),
         currency=(currency or acc.currency),
-        source="email",
-        source_ref=source_ref,
+        source=source,
+        source_ref=ref,
     )
     try:
         d = _date.fromisoformat(occurred_iso[:10]) if occurred_iso else None
@@ -269,9 +305,9 @@ def _record_txn(
     except Exception:
         pass
     db.add(txn)
-    applied.add(email_id)
-    # keep the applied set bounded
-    extra["applied_emails"] = list(applied)[-200:]
+    applied.add(ref)
+    extra["applied_refs"] = list(applied)[-200:]
+    extra.pop("applied_emails", None)  # migrated to applied_refs
     acc.extra = json.dumps(extra, ensure_ascii=False)
     return True
 

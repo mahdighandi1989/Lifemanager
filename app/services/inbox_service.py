@@ -424,43 +424,40 @@ def _to_decimal(value: Any):
 
 
 async def _file_as_finance_account(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
-    """Create OR update a bank/broker/exchange account from an extracted file —
-    «هر بار به‌روزرسانی کن و اگر نبود بساز». Matches an existing account by
-    name/institution (case-insensitive) and refreshes its balance; else creates."""
-    from sqlalchemy import func as _f
-
-    from app.models.finance import FinancialAccount
+    """Create OR update a bank/broker/exchange account from an approved file,
+    via the SHARED identity engine (finance_email_scan_service.apply_account_signal)
+    so the manual-file path, the email scan, and the attachment auto-feed all
+    reconcile onto ONE account per (account_no → institution) — no more
+    duplicate cards from name-only + HTML-escape-mismatched matching."""
+    from app.services import finance_email_scan_service as fs
 
     provider = (s.get("provider") or s.get("title") or "حساب")[:255]
     kind = str(s.get("account_kind") or s.get("kind") or "bank")[:32]
-    if kind not in ("bank", "broker", "exchange"):
-        kind = "bank"
-    currency = str(s.get("currency") or "USD")[:8]
-    balance = _to_decimal(s.get("balance"))
+    ref = s.get("account_no") or s.get("account_ref")
+    iban = s.get("iban")
+    institution = fs._institution(None, provider) or provider or None
+    res = await fs.apply_account_signal(
+        db, user_id, institution=institution, account_ref=ref, iban=iban,
+        balance=s.get("balance"), currency=s.get("currency"), kind=kind,
+        source="attachment", source_ref=s.get("source_ref"),
+        occurred_iso=s.get("date"), provider_name=provider,
+    )
+    acct_id = res.get("account_id")
+    if acct_id is None:
+        # no financial signal at all → keep the old create so «تأیید» still yields
+        # a card the owner can fill in by hand.
+        from app.models.finance import FinancialAccount
 
-    existing = (
-        await db.execute(
-            select(FinancialAccount).where(
-                scope_filter(FinancialAccount.user_id, user_id),
-                _f.lower(FinancialAccount.name) == provider.lower(),
-            )
-        )
-    ).scalars().first()
-    if existing is not None:
-        if balance is not None:
-            existing.balance = balance
-        if s.get("currency"):
-            existing.currency = currency
-        acct = existing
-    else:
         acct = FinancialAccount(
-            user_id=user_id, name=_esc(provider), kind=kind,
-            institution=_esc(s.get("provider")), currency=currency,
-            balance=balance if balance is not None else 0,
+            user_id=user_id, name=_esc(provider),
+            kind=(kind if kind in ("bank", "broker", "exchange") else "bank"),
+            institution=_esc(s.get("provider")), currency=str(s.get("currency") or "USD")[:8],
+            balance=_to_decimal(s.get("balance")) or 0,
         )
         db.add(acct)
-    await db.flush()
-    return {"kind": "finance_account", "id": acct.id, "title": acct.name, "link": "/budget"}
+        await db.flush()
+        acct_id = acct.id
+    return {"kind": "finance_account", "id": acct_id, "title": provider, "link": "/budget"}
 
 
 def _parse_date(value: Any):

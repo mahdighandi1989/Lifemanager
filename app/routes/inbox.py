@@ -309,26 +309,24 @@ async def submit_password(
     re-open EVERY pending file from that same source — one password unlocks the
     whole bank. Future files from the source open automatically."""
     from app.services.ingest import credentials
-    from app.services.ingest.email_ingest import retry_domain, retry_source_ref
+    from app.services.ingest.email_ingest import retry_domain, try_open
 
+    # VERIFY the password actually opens the file BEFORE storing it — a wrong/
+    # typo password used to be saved domain-wide (poisoning every sibling) and
+    # the request force-filed so the file went silent and was never re-asked.
+    res = await try_open(db, source_ref=payload.source_ref, password=payload.password, user_id=user_id)
+    if not res.get("unlocked"):
+        await db.commit()
+        return {
+            "ok": False, "success": False, "unlocked": False,
+            "message": "رمز درست نبود — دوباره امتحان کن.", "result": res,
+        }
+    # correct password → store it, resolve the request, open the whole bank.
     await credentials.store_password(db, source_key=payload.source_key, password=payload.password)
-    res = await retry_source_ref(db, source_ref=payload.source_ref, user_id=user_id)
-    # mark the submitted item filed…
-    reqs = (
-        await db.execute(
-            select(InboxItem).where(
-                InboxItem.status == "pending",
-                InboxItem.suggested_type.in_(["password_request", "password_components"]),
-            )
-        )
-    ).scalars().all()
-    for r in reqs:
-        if (r.suggestion or {}).get("source_ref") == payload.source_ref:
-            r.status = "filed"
     await db.commit()
-    # …then open ALL the OTHER pending files from the same bank with one password.
     batch = await retry_domain(db, source_key=payload.source_key, user_id=user_id)
-    return {"ok": True, "success": True, "result": res, "batch_opened": batch.get("opened", 0)}
+    return {"ok": True, "success": True, "unlocked": True, "result": res,
+            "batch_opened": batch.get("opened", 0)}
 
 
 class ComponentsSubmit(BaseModel):
@@ -349,38 +347,32 @@ async def submit_password_components(
     reusable), derive the file password from the email's recipe, open the file,
     and remember it forever — future files from that sender open automatically."""
     from app.services.ingest import credentials, identity_facts, password_recipe
-    from app.services.ingest.email_ingest import retry_domain, retry_source_ref
+    from app.services.ingest.email_ingest import retry_domain, try_open
 
     for key, value in (payload.values or {}).items():
         if value:
             await identity_facts.set_fact(db, fact_key=key, value=value, user_id=user_id)
 
     recipe = await password_recipe.get_stored_recipe(db, domain=payload.source_key)
-    result: Dict[str, Any] = {"derived": False}
+    result: Dict[str, Any] = {"derived": False, "unlocked": False}
     batch_opened = 0
     if recipe and recipe.get("template"):
         keys = [c["key"] for c in (recipe.get("components") or [])]
         values = await identity_facts.get_many(db, keys=keys, user_id=user_id)
         if keys and all(values.get(k) for k in keys):
             pw = password_recipe.derive_password(recipe["template"], values)
-            await credentials.store_password(db, source_key=payload.source_key, password=pw)
-            result = await retry_source_ref(db, source_ref=payload.source_ref, user_id=user_id)
-            result["derived"] = True
-
-    reqs = (
-        await db.execute(
-            select(InboxItem).where(
-                InboxItem.status == "pending",
-                InboxItem.suggested_type.in_(["password_components", "password_request"]),
-            )
-        )
-    ).scalars().all()
-    for r in reqs:
-        if (r.suggestion or {}).get("source_ref") == payload.source_ref:
-            r.status = "filed"
+            # VERIFY the derived password before storing it (a misread recipe or
+            # a wrong fact shouldn't poison the domain nor force-file the request).
+            opened = await try_open(db, source_ref=payload.source_ref, password=pw, user_id=user_id)
+            result = {"derived": True, "unlocked": bool(opened.get("unlocked")), **opened}
+            if opened.get("unlocked"):
+                await credentials.store_password(db, source_key=payload.source_key, password=pw)
     await db.commit()
-    # one recipe unlocks the whole bank — open its other pending files too.
-    if result.get("derived"):
+    if result.get("unlocked"):
         batch = await retry_domain(db, source_key=payload.source_key, user_id=user_id)
         batch_opened = batch.get("opened", 0)
-    return {"ok": True, "success": True, "result": result, "batch_opened": batch_opened}
+        return {"ok": True, "success": True, "result": result, "batch_opened": batch_opened}
+    return {
+        "ok": False, "success": False, "result": result, "batch_opened": 0,
+        "message": "با این اجزا رمز باز نشد — اجزا را بررسی کن یا رمز را مستقیم وارد کن.",
+    }

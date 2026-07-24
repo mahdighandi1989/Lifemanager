@@ -25,6 +25,33 @@ from app.services.ingest.universal_ingest import extract_from_file
 
 logger = logging.getLogger(__name__)
 
+# A file is "past the password" the moment it decrypts — extraction success is
+# a SEPARATE concern. Treating «unlocked but AI-unreadable» as still-locked was
+# the bug that re-asked the owner for files they had already unlocked.
+_UNLOCKED = {"proposed", "unreadable", "duplicate"}
+
+
+async def mark_source_resolved(db, source_ref: str) -> int:
+    """Flip every pending password request for this file to «filed» — once a
+    file is unlocked, its request must disappear so the digest never re-asks."""
+    from app.models.inbox_item import InboxItem
+
+    rows = (
+        await db.execute(
+            select(InboxItem).where(
+                InboxItem.status == "pending",
+                InboxItem.suggested_type.in_(["password_request", "password_components"]),
+            )
+        )
+    ).scalars().all()
+    n = 0
+    for r in rows:
+        if (r.suggestion or {}).get("source_ref") == source_ref:
+            r.status = "filed"
+            n += 1
+    return n
+
+
 # ── locked-file value filter ────────────────────────────────────────────────
 # A genuine statement/invoice is worth unlocking; broker legal boilerplate
 # (Terms, Policy, Disclosure, Refer-a-Friend…) is pure noise — never ask a
@@ -141,12 +168,16 @@ async def _resolve_locked_file(
     domain = credentials.source_key_for(sender)
     try:
         recipe = await password_recipe.get_stored_recipe(db, domain=domain)
-        if recipe is None:
+        if not (recipe and recipe.get("has_recipe")):
             from app.services.google_sync.gmail_service import fetch_message_body
 
             body = await fetch_message_body(db, mid)
-            recipe = await password_recipe.extract_recipe(db, body, sender)
-            if recipe is not None:
+            fresh = await password_recipe.extract_recipe(db, body, sender)
+            # Only cache a POSITIVE recipe — caching «has_recipe:false» used to
+            # poison the domain permanently so the real statement email was
+            # never re-inspected (complaint B). A negative just retries next time.
+            if fresh and fresh.get("has_recipe"):
+                recipe = fresh
                 await password_recipe.store_recipe(db, domain=domain, recipe=recipe)
 
         if recipe and recipe.get("has_recipe") and recipe.get("template"):
@@ -157,10 +188,12 @@ async def _resolve_locked_file(
                 pw = password_recipe.derive_password(recipe["template"], values)
                 res = await extract_from_file(
                     db, filename=att["filename"], mimetype=att.get("mimetype"),
-                    data=att["data"], source_ref=source_ref, user_id=user_id, password=pw,
+                    data=att["data"], source_ref=source_ref, user_id=user_id,
+                    password=pw, sender=sender,
                 )
-                if res.get("status") == "proposed":
+                if res.get("status") in _UNLOCKED:
                     await credentials.store_password(db, source_key=domain, password=pw)
+                    await mark_source_resolved(db, source_ref)
                     return "opened"
                 # derived password wrong (recipe/format misread) → fall through to ask
             elif await _propose_components_request(
@@ -278,10 +311,14 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
             source_ref=source_ref,
             user_id=user_id,
             password=pw,
+            sender=sender,
         )
         st = res.get("status")
         if st in ("proposed", "unreadable"):
             proposed += 1
+            # a stored domain password just opened this file → clear any stale
+            # request so the digest never re-asks (complaint A).
+            await mark_source_resolved(db, source_ref)
         elif st == "needs_password":
             if _is_worthless_locked(att["filename"]):
                 skipped += 1
@@ -318,11 +355,44 @@ async def retry_source_ref(db: AsyncSession, *, source_ref: str, user_id: int = 
         if att["filename"] == filename:
             res = await extract_from_file(
                 db, filename=filename, mimetype=att.get("mimetype"), data=att["data"],
-                source_ref=source_ref, user_id=user_id, password=pw,
+                source_ref=source_ref, user_id=user_id, password=pw, sender=sender,
             )
+            if res.get("status") in _UNLOCKED:
+                await mark_source_resolved(db, source_ref)
             await db.commit()
             return res
     return {"status": "not_found"}
+
+
+async def try_open(db: AsyncSession, *, source_ref: str, password: str, user_id: int = 0) -> Dict[str, Any]:
+    """Verify a CANDIDATE password actually decrypts THIS file (via prepare_bytes,
+    the authoritative test) BEFORE anything is stored — so a wrong/typo password
+    can no longer poison the whole domain's credential slot nor force-file the
+    request. On success runs the full extract (which also feeds «مالی») and
+    resolves the request. Returns ``{unlocked: bool, ...extract result}``."""
+    from app.models.personal_sync import PersonalEmail
+    from app.services.ingest.attachments import prepare_bytes
+
+    try:
+        _, mid, filename = source_ref.split(":", 2)
+    except ValueError:
+        return {"unlocked": False, "status": "bad_ref"}
+    atts = await fetch_email_attachments(db, mid)
+    em = await db.get(PersonalEmail, mid)
+    sender = getattr(em, "from_addr", "") if em else ""
+    for att in atts:
+        if att["filename"] != filename:
+            continue
+        _ready, needs_pw = prepare_bytes(att["data"], att.get("mimetype"), password=password)
+        if needs_pw:
+            return {"unlocked": False, "status": "needs_password"}
+        res = await extract_from_file(
+            db, filename=filename, mimetype=att.get("mimetype"), data=att["data"],
+            source_ref=source_ref, user_id=user_id, password=password, sender=sender,
+        )
+        await mark_source_resolved(db, source_ref)
+        return {"unlocked": True, **res}
+    return {"unlocked": False, "status": "not_found"}
 
 
 async def retry_domain(db: AsyncSession, *, source_key: str, user_id: int = 0) -> Dict[str, Any]:
@@ -354,9 +424,13 @@ async def retry_domain(db: AsyncSession, *, source_key: str, user_id: int = 0) -
         except Exception as exc:
             logger.debug("retry_domain re-open failed (%s): %r", ref, exc)
             continue
-        if res.get("status") == "proposed":
+        # File the request when the file UNLOCKED — not only when the AI could
+        # also read it. Decrypt-ok-but-unreadable used to stay pending and get
+        # re-asked forever (complaint A).
+        if res.get("status") in _UNLOCKED:
             r.status = "filed"
-            opened += 1
+            if res.get("status") != "duplicate":
+                opened += 1
     await db.commit()
     return {"tried": tried, "opened": opened}
 
@@ -388,10 +462,11 @@ async def upgrade_pending_locked(db: AsyncSession, *, user_id: int = 0, limit: i
             continue
         try:
             recipe = await password_recipe.get_stored_recipe(db, domain=domain)
-            if recipe is None:
+            if not (recipe and recipe.get("has_recipe")):
                 body = await fetch_message_body(db, mid)
-                recipe = await password_recipe.extract_recipe(db, body, domain)
-                if recipe is not None:
+                fresh = await password_recipe.extract_recipe(db, body, domain)
+                if fresh and fresh.get("has_recipe"):  # cache only positives
+                    recipe = fresh
                     await password_recipe.store_recipe(db, domain=domain, recipe=recipe)
             if not (recipe and recipe.get("has_recipe") and recipe.get("template")):
                 continue
