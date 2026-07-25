@@ -72,7 +72,7 @@ function MovementLine({ m }) {
   );
 }
 
-function AccountRow({ account }) {
+function AccountRow({ account, onDelete }) {
   const movements = account.movements || [];
   // ریزِ گردش (2026-07-25): the card previews the last few movements; the full
   // ledger is one click away and loads on demand — «از این حساب چه چیزی در
@@ -105,6 +105,17 @@ function AccountRow({ account }) {
         <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 space-y-0.5" dir="rtl">
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] font-medium text-gray-500">آخرین تغییرها:</p>
+            {onDelete && (
+              <button
+                type="button"
+                data-testid={`account-delete-${account.id}`}
+                onClick={() => onDelete(account)}
+                className="text-[11px] text-gray-400 hover:text-red-600"
+                title="این حساب من نیست — کارت و تغییرهایش را پاک کن"
+              >
+                ✖ این حساب من نیست
+              </button>
+            )}
             {total > movements.length && (
               <button
                 type="button"
@@ -240,6 +251,20 @@ function BudgetPage({ embedded = false }) {
       setScanMsg('آوردنِ تاریخچه ناموفق بود.');
     } finally {
       setSweeping(false);
+    }
+  };
+
+  // «این حساب من نیست» — a wrong machine-made card must be removable; cleanup
+  // only ever caught the empty ones (2026-07-25).
+  const deleteAccount = async (account) => {
+    if (!window.confirm(`کارتِ «${account.name}» و همهٔ تغییرهای ثبت‌شده‌اش پاک شود؟`)) return;
+    try {
+      const res = await api.delete(`/finance/accounts/${account.id}`);
+      const d = res.data || {};
+      setScanMsg(`کارتِ «${d.name || account.name}» پاک شد (${d.transactions_removed ?? 0} تراکنش).`);
+      loadAccounts();
+    } catch {
+      setScanMsg('حذفِ کارت ناموفق بود.');
     }
   };
 
@@ -539,7 +564,7 @@ function BudgetPage({ embedded = false }) {
               هنوز حسابی ثبت نشده است.
             </div>
           ) : (
-            liveAccounts.map((a) => <AccountRow key={a.id} account={a} />)
+            liveAccounts.map((a) => <AccountRow key={a.id} account={a} onDelete={deleteAccount} />)
           )}
         </div>
 

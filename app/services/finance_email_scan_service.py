@@ -45,6 +45,31 @@ _FIN_HINT = re.compile(
     re.I,
 )
 _BROKER_HINT = re.compile(r"(broker|بروکر|forex|فارکس|margin|mt4|mt5|trading|xm|exness|fbs)", re.I)
+
+# ── «مالی است» ≠ «حسابِ من است» (2026-07-25) ────────────────────────────────
+# After the history sweep widened the input from 2 days to 24 months, the loose
+# «smells financial» gate started opening cards for documents that are about
+# money but are NOT the owner's account: a credit-bureau report («سامانه
+# اعتبارسنجی» — its big number is a facility/。debt figure, not a balance), a
+# loan schedule, a tax notice, an insurance policy, and — for a broker — a DEMO
+# account. Each of these is refused outright: no card created, no balance moved.
+_NOT_AN_ACCOUNT = re.compile(
+    r"(?i)("
+    r"credit\s*(report|score|bureau|inquiry)|اعتبارسنج|رتبهٔ?\s*اعتبار|گزارش\s*اعتبار|"
+    r"استعلام|چک\s*برگشت|سفته|ضمانت\s*نامه|"
+    r"loan\s*(schedule|statement|agreement)|تسهیلات|اقساط|وام|قسط\s*بندی|"
+    r"tax\s*(invoice|notice|return)|مالیات|اظهارنامه|"
+    r"insurance\s*(policy|premium)|بیمه\s*نامه|"
+    r"demo\s*account|practice\s*account|حساب\s*(آزمایشی|دمو|تمرین)|"
+    r"newsletter|unsubscribe|promotion"
+    r")"
+)
+
+
+def is_not_an_account(text: Optional[str]) -> bool:
+    """True when this document is about money but is not an account of the
+    owner's — so it must never become (or update) a card."""
+    return bool(text) and bool(_NOT_AN_ACCOUNT.search(text))
 _EXCHANGE_HINT = re.compile(r"(exchange|صراف|crypto|صرافی|binance|coinbase|kraken)", re.I)
 
 _IBAN = re.compile(r"\b([A-Z]{2}\d{2}[A-Z0-9]{11,30})\b")
@@ -209,7 +234,11 @@ async def apply_account_signal(
         # newspaper carries the SENDER's IBAN for payment, which is their
         # account, not the owner's. A bare masked ref («paid with card ending
         # 4321») is a purchase, not an account either.
-        if bal is None or bal == 0 or not institution:
+        # A card needs a real, POSITIVE balance. A negative number pulled out of
+        # a broker statement is a floating P/L or a closed-position figure, not
+        # «موجودیِ حساب» — the owner's XM card opened at −998.64 USD that way
+        # (2026-07-25). If an account really is negative, he types it himself.
+        if bal is None or bal <= 0 or not institution:
             return {"created": 0, "updated": 0, "account_id": None}
         extra = {
             "source": source, "inferred": True, "account_ref": account_ref,
@@ -243,6 +272,10 @@ async def apply_account_signal(
             acc.extra = json.dumps(extra, ensure_ascii=False)
         last_at = extra.get("last_email_at")
         is_newer = occurred_iso is None or last_at is None or occurred_iso >= last_at
+        # Same rule on UPDATE: a machine-parsed negative is a P/L, not a balance.
+        # Never let one overwrite a real balance the owner can see.
+        if bal is not None and bal < 0:
+            bal = None
         if bal is not None and is_newer:
             old = _to_decimal(acc.balance) or Decimal(0)
             # With a source_ref, record a deduped delta txn — and if this ref was
@@ -287,6 +320,9 @@ async def scan_finance_emails(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
             if not text:
                 continue
             if not _FIN_HINT.search(text) and (e.ai_category or "") != "receipt":
+                continue
+            # Financial, but not an account of his (credit report, loan, demo…).
+            if is_not_an_account(text):
                 continue
             financial += 1
 

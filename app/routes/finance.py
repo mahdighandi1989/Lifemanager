@@ -266,6 +266,54 @@ async def list_financial_accounts(
     return out
 
 
+@router.delete("/api/finance/accounts/{account_id}")
+@handle_errors
+async def delete_financial_account(
+    account_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """حذفِ یک کارتِ حساب — the escape hatch this page never had (2026-07-25).
+
+    A machine-created card that is simply WRONG (a credit report read as an
+    account, a demo broker account) could be neither corrected nor removed:
+    `cleanup-auto-cards` only removes rows with no balance AND no movement, and
+    a wrong card usually has both. The owner must always be able to say «این
+    حساب من نیست». The account's recorded movements go with it — they describe
+    an account that does not exist.
+    """
+    from sqlalchemy import delete as _delete
+
+    from app.services.inbox_service import scope_filter
+
+    acc = (
+        await db.execute(
+            select(FinancialAccount).where(
+                FinancialAccount.id == account_id,
+                scope_filter(FinancialAccount.user_id, user_id),
+            )
+        )
+    ).scalars().first()
+    if acc is None:
+        raise HTTPException(status_code=404, detail="Account not found")
+    name = acc.name
+    removed_txns = (
+        await db.execute(select(Transaction).where(Transaction.account_id == account_id))
+    ).scalars().all()
+    await db.execute(_delete(Transaction).where(Transaction.account_id == account_id))
+    await db.delete(acc)
+    await db.commit()
+    await record_activity(
+        action="delete", entity_type="account", entity_id=account_id,
+        entity_label=name, detail=f"حذف حساب مالی ({len(removed_txns)} تراکنش)",
+        user_id=user_id, db=db,
+    )
+    return {
+        "ok": True, "success": True, "deleted": True,
+        "name": name, "transactions_removed": len(removed_txns),
+    }
+
+
 @router.get("/api/finance/accounts/{account_id}/transactions")
 @handle_errors
 async def account_transactions(

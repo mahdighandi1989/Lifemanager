@@ -168,3 +168,95 @@ async def test_movements_are_reported_per_account(db_session):
     moves = await fs.account_movements(db_session, acc.id)
     assert moves and moves[0]["amount"] == 15636.22
     assert moves[0]["date"] == "2026-07-20" and moves[0]["currency"] == "AED"
+
+
+# ── «مالی است» ≠ «حسابِ من است» (2026-07-25, after the 24-month sweep) ───────
+
+def test_credit_report_and_loan_and_demo_are_not_accounts():
+    """Owner's two wrong cards: «بانک مرکزی / سامانه اعتبارسنجی» (a credit
+    bureau report — its big number is a facility figure, not a balance) and an
+    XM broker card. A demo account is not an account either."""
+    assert fs.is_not_an_account("سامانه اعتبارسنجی — گزارش اعتباری شما")
+    assert fs.is_not_an_account("استعلام چک برگشتی")
+    assert fs.is_not_an_account("صورتحساب تسهیلات و اقساط وام")
+    assert fs.is_not_an_account("Your Credit Report is ready")
+    assert fs.is_not_an_account("XM Demo Account — statement")
+    assert fs.is_not_an_account("حساب آزمایشی متاتریدر")
+    assert fs.is_not_an_account("بیمه نامه شخص ثالث")
+    # …but a real statement still passes through
+    assert not fs.is_not_an_account("Account statement — balance AED 15,636.22")
+    assert not fs.is_not_an_account("صورتحساب حساب جاری — موجودی ۱۲٬۵۰۰٬۰۰۰ ریال")
+
+
+@pytest.mark.asyncio
+async def test_credit_bureau_email_never_opens_a_card(db_session):
+    db_session.add(_email(
+        "cb1", "noreply@cbi.ir", "سامانه اعتبارسنجی — گزارش اعتباری",
+        "مبلغ تسهیلات: موجودی 2,343,892,880 ریال", dt.datetime(2026, 6, 18),
+    ))
+    await db_session.commit()
+    summary = await fs.scan_finance_emails(db_session, 0)
+    assert summary["created"] == 0
+    assert (await db_session.execute(select(FinancialAccount))).scalars().first() is None
+
+
+@pytest.mark.asyncio
+async def test_negative_balance_never_opens_or_moves_a_card(db_session):
+    """A broker statement's floating P/L is not «موجودی». The owner's XM card
+    opened at −998.64 USD that way."""
+    r = await fs.apply_account_signal(
+        db_session, 0, institution="xmglobal", account_ref="••4321",
+        balance=-998.64, currency="USD", source="attachment", source_ref="file:xm1",
+    )
+    await db_session.commit()
+    assert r["account_id"] is None
+    assert (await db_session.execute(select(FinancialAccount))).scalars().first() is None
+
+    # an existing, real card is never overwritten by a negative either
+    await fs.apply_account_signal(
+        db_session, 0, institution="xmglobal", account_ref="••4321",
+        balance=1500, currency="USD", source="email", source_ref="email:x1",
+        occurred_iso="2026-04-01T00:00:00",
+    )
+    await db_session.commit()
+    await fs.apply_account_signal(
+        db_session, 0, institution="xmglobal", account_ref="••4321",
+        balance=-998.64, currency="USD", source="attachment", source_ref="file:xm2",
+        occurred_iso="2026-04-20T00:00:00",
+    )
+    await db_session.commit()
+    acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    assert float(acc.balance) == 1500.0
+
+
+@pytest.mark.asyncio
+async def test_attachment_feed_refuses_a_credit_report(db_session):
+    """The same guard on the FILE path — that is where both wrong cards came
+    from («به‌روزرسانیِ خودکار از فایل»)."""
+    from app.services.ingest.universal_ingest import extract_from_file
+
+    pdf_text = (
+        "بانک مرکزی — سامانه اعتبارسنجی\n"
+        "گزارش اعتباری\n"
+        "موجودی: 2,343,892,880 ریال\n"
+    ).encode("utf-8")
+    res = await extract_from_file(
+        db_session, filename="credit-report.csv", mimetype="text/csv", data=pdf_text,
+        source_ref="gmail:cb:report.csv", user_id=0, sender="noreply@cbi.ir",
+    )
+    await db_session.commit()
+    assert res["status"] == "proposed"          # still filed for review…
+    # …but no account card was opened
+    assert (await db_session.execute(select(FinancialAccount))).scalars().first() is None
+
+
+def test_owner_can_delete_a_wrong_card(api_client):
+    """«این حساب من نیست» — cleanup only ever removed EMPTY cards; a wrong card
+    usually has a balance and a movement, so it was unremovable."""
+    created = api_client.post("/api/finance/accounts",
+                              json={"name": "کارتِ اشتباه", "kind": "bank",
+                                    "balance": 100, "currency": "USD"}).json()
+    r = api_client.delete(f"/api/finance/accounts/{created['id']}")
+    assert r.status_code == 200 and r.json()["deleted"] is True
+    assert all(a["id"] != created["id"] for a in api_client.get("/api/finance/accounts").json())
+    assert api_client.delete("/api/finance/accounts/999999").status_code == 404

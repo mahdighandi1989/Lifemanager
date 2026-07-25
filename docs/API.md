@@ -371,6 +371,7 @@ never blocks a response — a 200 still ships, with the metadata attached.
 |---|---|---|
 | GET / POST | `/api/finance/accounts` | List / create financial accounts (bank/broker/exchange). |
 | GET | `/api/finance/accounts/{id}/transactions` | ریزِ گردشِ حساب — every recorded movement, newest first (statement lines + balance deltas). The account list carries `txn_count` so the UI offers it only when there is something to show. |
+| DELETE | `/api/finance/accounts/{id}` | «این حساب من نیست» — remove a card the machine got wrong, with its recorded movements (cleanup-auto-cards only ever removed EMPTY cards). |
 | GET / POST | `/api/finance/incomes`, `/api/finance/assets` | Incomes / assets CRUD. |
 | POST | `/api/finance/transactions` | Record a transaction (income/expense) and update the account balance. |
 | GET | `/api/finance/transactions` | List the caller's transactions (`?account_id=` filter). |

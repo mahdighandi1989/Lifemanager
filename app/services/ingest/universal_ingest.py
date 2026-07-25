@@ -181,16 +181,33 @@ async def _feed_finance(
     try:
         from app.services import finance_email_scan_service as fs
 
+        # «مالی است» ≠ «حسابِ من است»: a credit-bureau report, a loan schedule,
+        # a tax notice or a broker DEMO account is refused outright. Checked on
+        # the file's own text (2026-07-25 — «سامانه اعتبارسنجی» had become a
+        # ۲٫۳ میلیارد ریالی card).
+        haystack = " ".join(
+            str(v) for v in (text, filename, fields.get("provider"), fields.get("title"))
+            if v
+        )
+        if fs.is_not_an_account(haystack):
+            logger.info("attachment→finance refused (not an account): %s", filename)
+            return 0
+
         provider = fields.get("provider") or fields.get("institution")
         institution = fs._institution(sender, provider or filename) or (
             re.sub(r"[^A-Za-z0-9آ-ی]+", "", str(provider))[:60] if provider else None
         )
         ref = fields.get("account_no") or (det or {}).get("account_no")
         iban = fields.get("iban") or (det or {}).get("iban")
-        balance = fields.get("balance")
-        if balance is None and det:
-            balance = det.get("balance")
-        currency = fields.get("currency") or (det or {}).get("currency")
+        # DETERMINISTIC WINS for the money. The caller merges `{**det, **ai}`,
+        # which let the model's number override a regex that had actually found
+        # «موجودی» in the text — that is how a broker statement's floating P/L
+        # (−998.64) became the card's balance. The model may FILL a gap; it may
+        # not overrule what was literally read off the page.
+        balance = (det or {}).get("balance")
+        if balance is None:
+            balance = fields.get("balance")
+        currency = (det or {}).get("currency") or fields.get("currency")
         kind = str(fields.get("account_kind") or fields.get("kind") or "bank")
         if institution is None and not ref and not iban:
             return 0
