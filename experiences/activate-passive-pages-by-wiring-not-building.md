@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-07-21T00:00:00Z"
 created_at: "2026-07-21T00:00:00Z"
-updated_at: "2026-07-21T00:00:00Z"
+updated_at: "2026-07-25T00:00:00Z"
 merged_from: []
 ---
 
@@ -124,3 +124,58 @@ FILE_HANDLERS["subscription"] = _file_as_subscription   # -> creates the typed r
 - مرتبط: `soft-delete-tombstone-must-filter-every-read-path`,
   `universal-capture-inbox-with-ai-triage`,
   `holistic-island-audit-with-adversarial-verification`
+
+
+## Update 2026-07-25 — the second failure mode: one truth rendered twice
+
+The first pass of this lesson covered *empty* pages. A page-by-page survey of
+the same app surfaced the mirror-image problem: pages that are **full, but of
+someone else's content**. Four kinds showed up, and each has a different fix:
+
+1. **Two renders of one truth** — page A and tab B fetch the *same endpoints*
+   and draw the same cards. Nobody notices because both "work". Fix: pick the
+   home that owns the concept, delete the *duplicate render only*, and leave a
+   one-line pointer where it used to be. The endpoints never move.
+2. **A tab that can never fill** — its data source doesn't exist in the
+   deployed environment (a server-side folder on an ephemeral host, a device
+   integration nobody connected). An always-empty tab reads as a broken app.
+   Quarantine it from the bar, keep the route.
+3. **A page with no write path** — read-only cards over data the system
+   deliberately does NOT auto-ingest (documents too risky to OCR). It is
+   *structurally* condemned to stay empty. The fix is a manual entry form, not
+   more automation.
+4. **A container that contains nothing** — a "projects" list with no detail
+   page and no way to attach work. Give it a detail route and the read endpoint
+   for its children; that's what makes it a container rather than a label.
+
+**Quarantine pattern that keeps every capability** (rule: never delete):
+
+```jsx
+const TABS = [/* what the bar shows */];
+const QUARANTINED_TABS = [/* hidden, but still routable */];
+const ALL_TABS = [...TABS, ...QUARANTINED_TABS];
+// route/?tab= still resolves against ALL_TABS…
+const visible = TABS.some((t) => t.id === tab)
+  ? TABS
+  : [...TABS, ...QUARANTINED_TABS.filter((t) => t.id === tab)];  // …and shows while active
+```
+
+**Alias routes silently break the menu.** Apps accumulate paths that render an
+existing hub (`/finance` → budget, `/people/:id/profile` → people, …). A
+`pathname.startsWith(link.to)` active check misses them, so the user stands on
+a page while the nav points nowhere and a collapsed drawer stays shut. Keep an
+explicit alias map next to the link list and test it:
+
+```js
+export const NAV_ALIASES = { '/budget': ['/finance', '/assets'], '/people-profiles': ['/people/'] };
+const isActive = (p) => path.startsWith(p) || (NAV_ALIASES[p] || []).some((a) => path.startsWith(a));
+```
+
+**Settings in two places is worse than settings in the wrong place.** When one
+screen owns settings that logically belong in the settings page, don't copy the
+markup — extract ONE component and mount it in both. Two copies diverge; one
+component in two mounts cannot.
+
+**What the tidy-up must not do:** every step above is reversible, and each got a
+line in the removal ledger naming the exact revert. A consolidation you can't
+undo is a deletion wearing a nicer word.
