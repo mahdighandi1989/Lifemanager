@@ -147,6 +147,23 @@ def _heuristic_classify(content: str) -> Dict[str, Any]:
     }
 
 
+LOCKED_TYPES = ("password_request", "password_components")
+
+
+def locked_first_order():
+    """ORDER BY expression putting «رمز لازم» rows first.
+
+    A locked-file row is one-step actionable (type the password); an unread note
+    is not. With seventy notes pending, six password requests were invisible —
+    the owner reported «جایی برای رمز زدن نیست» while the digest kept naming the
+    files. Sorting them to the top is the fix."""
+    from sqlalchemy import case
+
+    from app.models.inbox_item import InboxItem
+
+    return case((InboxItem.suggested_type.in_(list(LOCKED_TYPES)), 0), else_=1)
+
+
 def scope_filter(col, uid: int):
     """Anon scope (0) also covers legacy NULL-owner rows — same rule as
     the tasks/writings/activity-log routers."""

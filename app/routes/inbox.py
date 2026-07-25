@@ -128,9 +128,10 @@ async def list_inbox_items(
     total = (
         await db.execute(select(func.count()).select_from(stmt.subquery()))
     ).scalar() or 0
+    # Locked files FIRST (see inbox_service.locked_first_order).
     rows = (
         await db.execute(
-            stmt.order_by(InboxItem.id.desc())
+            stmt.order_by(inbox_service.locked_first_order(), InboxItem.id.desc())
             .offset((page - 1) * page_size)
             .limit(page_size)
         )
@@ -288,6 +289,23 @@ async def backfill_ingest(
     drive = await drive_ingest.scan_drive(db, user_id=user_id, limit=100)
     res["drive_candidates"] = drive.get("proposed", 0)
     res["drive_scanned"] = drive.get("scanned", 0)
+    return {"ok": True, "success": True, **res}
+
+
+@router.post("/api/inbox/retry-unreadable", tags=["inbox"])
+@handle_errors
+async def retry_unreadable_notes(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """Re-read every «این فایل خودکار خوانده نشد» note with the NEW deterministic
+    extractor (PDF/XLSX/CSV/DOCX text — no AI needed). Those notes were dead ends
+    created when extraction was AI-only; the source_ref dedup then blocked them
+    forever. Idempotent and bounded."""
+    from app.services.ingest.email_ingest import retry_unreadable
+
+    res = await retry_unreadable(db, user_id=user_id)
     return {"ok": True, "success": True, **res}
 
 

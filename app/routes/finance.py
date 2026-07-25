@@ -220,7 +220,12 @@ async def list_financial_accounts(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_required_user_id),
 ):
-    stmt = select(FinancialAccount).where(FinancialAccount.user_id == user_id)
+    # Legacy/auto-created rows carry user_id NULL (the scan job runs in the anon
+    # scope). The dashboard already used the NULL-inclusive scope, so the owner
+    # saw «۳ حساب» there while THIS page said «۰ حساب» — the same rule now.
+    from app.services.inbox_service import scope_filter
+
+    stmt = select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
     if kind:
         if kind not in ("bank", "broker", "exchange"):
             raise HTTPException(status_code=400, detail="invalid kind filter")

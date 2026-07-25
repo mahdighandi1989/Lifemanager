@@ -459,6 +459,55 @@ async def retry_domain(db: AsyncSession, *, source_key: str, user_id: int = 0) -
     return {"tried": tried, "opened": opened}
 
 
+_UNREAD_MARK = "خودکار خوانده نشد"
+
+
+async def retry_unreadable(db: AsyncSession, *, user_id: int = 0, limit: int = 200) -> Dict[str, Any]:
+    """Re-read the dead «این فایل خودکار خوانده نشد» notes.
+
+    Those rows were created when extraction was 100% AI-dependent: with no
+    vision model the file became an empty note, and the ``source_ref`` dedup
+    then blocked it FOREVER. Now that deterministic extraction exists (PDF /
+    XLSX / CSV / DOCX text), this walks those notes, retires each one (status
+    dismissed + the ref renamed so the dedup guard stops matching) and re-runs
+    the extractor on the original attachment. Bounded + idempotent; never raises.
+    """
+    from app.models.inbox_item import InboxItem
+
+    rows = (
+        await db.execute(
+            select(InboxItem)
+            .where(InboxItem.suggested_type == "note", InboxItem.status == "pending")
+            .order_by(InboxItem.id.desc())
+            .limit(limit)
+        )
+    ).scalars().all()
+
+    retried = reread = skipped = 0
+    for r in rows:
+        sug = r.suggestion or {}
+        ref = sug.get("source_ref") or ""
+        blob = f"{r.content or ''} {sug.get('summary') or ''}"
+        if _UNREAD_MARK not in blob or not ref.startswith("gmail:"):
+            continue
+        retried += 1
+        # retire the dead note so the dedup guard no longer blocks a fresh read
+        r.status = "dismissed"
+        r.suggestion = {**sug, "source_ref": None, "superseded_ref": ref}
+        try:
+            res = await retry_source_ref(db, source_ref=ref, user_id=user_id)
+        except Exception as exc:
+            logger.debug("retry_unreadable failed (%s): %r", ref, exc)
+            skipped += 1
+            continue
+        if res.get("status") == "proposed":
+            reread += 1
+        elif res.get("status") not in ("duplicate",):
+            skipped += 1
+    await db.commit()
+    return {"retried": retried, "reread": reread, "skipped": skipped}
+
+
 async def upgrade_pending_locked(db: AsyncSession, *, user_id: int = 0, limit: int = 60) -> Dict[str, Any]:
     """Upgrade OLD blind «رمز بده» requests to the smart flow: read each item's
     email body, and if it explains how the password is formed, convert the item

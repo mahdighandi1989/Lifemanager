@@ -101,9 +101,14 @@ function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
             )}
           </div>
         ) : (
-          <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
-            {unescapeHtml(item.content)}
-          </p>
+          <div className="min-w-0 flex-1">
+            {fname && (
+              <p className="text-xs text-gray-500 break-all" dir="ltr">{fname}</p>
+            )}
+            <p className="text-sm text-gray-800 whitespace-pre-wrap break-words overflow-wrap-anywhere">
+              {unescapeHtml(item.content)}
+            </p>
+          </div>
         )}
         <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLOR[suggested] || TYPE_COLOR.unknown}`}>
           {TYPE_FA[suggested] || suggested}
@@ -112,7 +117,9 @@ function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
       {isComponentsReq && (
         <p className="text-xs text-gray-500">برای ساختِ رمز، این‌ها را وارد کن:</p>
       )}
-      {reason && !isLocked && <p className="text-xs text-gray-500">{unescapeHtml(reason)}</p>}
+      {reason && !isLocked && (
+        <p className="text-xs text-gray-500 break-words">{unescapeHtml(reason)}</p>
+      )}
       {isPasswordReq ? (
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -322,6 +329,25 @@ function Dashboard() {
   // One-time catch-up over emails that synced before the detectors existed.
   const [backfilling, setBackfilling] = useState(false);
   const [backfillMsg, setBackfillMsg] = useState(null);
+  // Re-read the dead «خوانده نشد» notes with the deterministic extractor.
+  const [retrying, setRetrying] = useState(false);
+  const runRetryUnreadable = async () => {
+    setRetrying(true);
+    setBackfillMsg(null);
+    try {
+      const r = await api.post('/inbox/retry-unreadable');
+      const d = r.data || {};
+      setBackfillMsg(
+        `${d.retried || 0} فایلِ خوانده‌نشده دوباره بررسی شد؛ ${d.reread || 0} تا این‌بار خوانده شد.`,
+      );
+      await fetchToday();
+    } catch {
+      setBackfillMsg('خواندنِ دوباره ناموفق بود.');
+    } finally {
+      setRetrying(false);
+    }
+  };
+
   const runBackfill = async () => {
     setBackfilling(true);
     setBackfillMsg(null);
@@ -714,7 +740,16 @@ function Dashboard() {
                   >
                     {backfilling ? 'در حال اسکن…' : 'اسکنِ همه‌چیزِ موجود (ایمیل + پیوست + درایو)'}
                   </button>
-                  {backfillMsg && <p className="text-xs text-gray-500">{backfillMsg}</p>}
+                  <button
+                    type="button"
+                    onClick={runRetryUnreadable}
+                    disabled={retrying}
+                    data-testid="inbox-retry-unreadable-btn"
+                    className="w-full rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                  >
+                    {retrying ? 'در حال خواندنِ دوباره…' : 'دوباره بخوان (فایل‌هایی که «خوانده نشد» شدند)'}
+                  </button>
+                  {backfillMsg && <p className="text-xs text-gray-500 break-words">{backfillMsg}</p>}
                 </div>
               )
             }

@@ -52,9 +52,13 @@ async def _available_budget(
 async def balances_by_currency(db: AsyncSession, user_id: int) -> list[dict]:
     """Grouped account totals — the only honest «موجودی کل» for a
     multi-currency owner (audit #20). No cross-currency summing, ever."""
+    # NULL-inclusive in the anon scope — auto-created cards (scan job) carry
+    # user_id NULL and must be counted here exactly as the dashboard counts them.
+    from app.services.inbox_service import scope_filter
+
     rows = (
         await db.execute(
-            select(FinancialAccount).where(FinancialAccount.user_id == user_id)
+            select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
         )
     ).scalars().all()
     grouped: dict[str, dict] = {}

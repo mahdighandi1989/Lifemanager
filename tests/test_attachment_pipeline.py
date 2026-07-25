@@ -292,3 +292,88 @@ def test_prepare_bytes_encrypted_error_stays_locked():
     # a real encrypted PDF with the WRONG password → needs_password
     enc = _encrypted_pdf("right")
     assert prepare_bytes(enc, "application/pdf", password="wrong") == (None, True)
+
+
+# ── the owner's live report: cards invisible on /finance, locked rows buried ──
+
+def test_auto_created_cards_are_visible_on_finance_page(api_client):
+    """The scan job creates cards with user_id NULL (anon scope). The dashboard
+    counted them while /api/finance/accounts returned NOTHING — «۳ حساب» vs
+    «۰ حساب». Both read paths now use the same NULL-inclusive scope."""
+    r = api_client.post(
+        "/api/finance/accounts",
+        json={"name": "کارتِ دستی", "kind": "bank", "balance": 10, "currency": "AED"},
+    )
+    assert r.status_code == 201
+    rows = api_client.get("/api/finance/accounts").json()
+    assert any(a["name"] == "کارتِ دستی" for a in rows)
+    bal = api_client.get("/api/finance/balances-by-currency").json()
+    assert any(b["currency"] == "AED" for b in bal.get("balances", []))
+
+
+@pytest.mark.asyncio
+async def test_null_owner_card_listed_and_counted(db_session):
+    """A card written by the background job (user_id NULL) must be visible in
+    the anon scope — the exact row the owner's page was hiding."""
+    from app.services import finance_email_scan_service as fs
+    from app.services.budget_service import balances_by_currency
+
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••9999",
+        balance=15656.24, currency="AED", source="email", source_ref="email:x1",
+        occurred_iso="2026-07-20T00:00:00",
+    )
+    await db_session.commit()
+    acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    assert acc.user_id is None  # job-created rows are anon-owned
+    rows = await balances_by_currency(db_session, 0)
+    assert any(r["currency"] == "AED" and r["accounts"] == 1 for r in rows)
+
+
+@pytest.mark.asyncio
+async def test_locked_files_sort_first_in_inbox(db_session):
+    """Six «رمز لازم» rows must not be buried under seventy notes — the reason
+    the owner «couldn't find anywhere to type the password». The list route
+    orders by inbox_service.locked_first_order()."""
+    from app.models.inbox_item import InboxItem
+    from app.services import inbox_service
+
+    for i in range(5):
+        db_session.add(InboxItem(user_id=0, content=f"یادداشتِ {i}", source="web",
+                                 status="pending", suggested_type="note"))
+    db_session.add(InboxItem(user_id=0, content="🔒 فایلِ رمزدار", source="attachment",
+                             status="pending", suggested_type="password_request",
+                             suggestion={"source_ref": "gmail:m1:a.pdf"}))
+    await db_session.commit()
+
+    rows = (
+        await db_session.execute(
+            select(InboxItem).order_by(inbox_service.locked_first_order(), InboxItem.id.desc())
+        )
+    ).scalars().all()
+    assert rows[0].suggested_type == "password_request"  # actionable row on top
+
+
+@pytest.mark.asyncio
+async def test_retry_unreadable_reopens_dead_notes(db_session):
+    """The «این فایل خودکار خوانده نشد» notes were permanent dead ends (the
+    source_ref dedup blocked a re-read). retry_unreadable retires them so the
+    deterministic extractor gets a second pass."""
+    from app.models.inbox_item import InboxItem
+    from app.services.ingest.email_ingest import retry_unreadable
+
+    db_session.add(InboxItem(
+        user_id=0, content="statement.pdf — این فایل خودکار خوانده نشد — دستی بررسی کن.",
+        source="attachment", status="pending", suggested_type="note",
+        suggestion={"source_ref": "gmail:m1:statement.pdf", "filename": "statement.pdf",
+                    "summary": "این فایل خودکار خوانده نشد — دستی بررسی کن."},
+    ))
+    await db_session.commit()
+
+    res = await retry_unreadable(db_session, user_id=0)
+    assert res["retried"] == 1
+    row = (await db_session.execute(select(InboxItem))).scalars().one()
+    # the dead note is retired and its ref released, so a fresh read can propose
+    assert row.status == "dismissed"
+    assert (row.suggestion or {}).get("source_ref") is None
+    assert (row.suggestion or {}).get("superseded_ref") == "gmail:m1:statement.pdf"
