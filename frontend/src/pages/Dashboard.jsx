@@ -33,23 +33,9 @@ const TYPE_COLOR = {
   unknown: 'bg-gray-100 text-gray-600',
 };
 
-function StatCard({ title, value, icon, color, linkTo }) {
-  return (
-    <Link to={linkTo} className="block">
-      <div className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow cursor-pointer`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">{title}</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
-          </div>
-          <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center`}>
-            {icon}
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
+// (StatCard — the three big counter tiles — was folded into the compact
+// summary strip at the bottom of the page on 2026-07-25. Every number and
+// every link it carried is still there, in one row instead of three cards.)
 
 // One task row inside the «عقب‌افتاده / امروز / پیش‌رو» buckets.
 function TaskRow({ task, tone }) {
@@ -276,6 +262,8 @@ function Dashboard() {
   // Google mirror panel — collapsed (and unmounted) by default so its
   // /google/* calls only fire when the user opens the section.
   const [showGooglePanel, setShowGooglePanel] = useState(false);
+  // «بخش‌های آرام» — the domain cards with nothing in them today (see below).
+  const [showQuietDomains, setShowQuietDomains] = useState(false);
 
   const [cmdBusyId, setCmdBusyId] = useState(null);
 
@@ -530,6 +518,27 @@ function Dashboard() {
       (tasksBuckets?.due_today_count || 0) +
       (tasksBuckets?.upcoming_count || 0) >
     0;
+
+  // لاغرکردنِ میز فرمان (2026-07-25): a domain card with nothing in it is not
+  // information — four «چیزی نیست» boxes push the things that DO need the owner
+  // below the fold. Quiet domains collapse into one line and open on demand.
+  // Nothing is removed: every card is one click away, and while data is still
+  // loading (or a fetch failed) they all render as before.
+  const quietDomains = [
+    { key: 'calendar', label: 'تقویم', has: !!calendarBucket?.events?.length },
+    {
+      key: 'finance',
+      label: 'مالی',
+      has: !!(finance?.balances_by_currency?.length || finance?.subscriptions?.length),
+    },
+    { key: 'people', label: 'افراد', has: !!people?.reminders?.length },
+    { key: 'growth', label: 'رشد', has: (growth?.today_total || 0) > 0 },
+  ];
+  const quiet = quietDomains.filter((d) => !d.has);
+  // Only collapse once we KNOW a domain is quiet — never while loading/failed.
+  const canCollapse = showEmptyStates && quiet.length > 0;
+  const showDomain = (key) =>
+    !canCollapse || showQuietDomains || quietDomains.find((d) => d.key === key)?.has;
 
   return (
     <div dir="rtl" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8">
@@ -838,8 +847,28 @@ function Dashboard() {
         </div>
 
         {/* Phase-2 domain cards (audit #5): تقویم / مالی / افراد / رشد —
-            the domains that previously had no presence on «امروز من». */}
+            the domains that previously had no presence on «امروز من».
+            2026-07-25: quiet ones collapse into the one line below. */}
+        {canCollapse && (
+          <div
+            className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white px-4 py-2.5"
+            data-testid="dashboard-quiet-domains"
+          >
+            <p className="text-sm text-gray-500">
+              آرام امروز: {quiet.map((d) => d.label).join(' · ')}
+            </p>
+            <button
+              type="button"
+              data-testid="dashboard-quiet-toggle"
+              onClick={() => setShowQuietDomains((v) => !v)}
+              className="shrink-0 text-xs font-medium text-blue-600 hover:text-blue-700"
+            >
+              {showQuietDomains ? 'جمع کن ▲' : 'نمایش ▼'}
+            </button>
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {showDomain('calendar') && (
           <SectionCard
             title="🗓 تقویم امروز"
             badge={todayLoading ? '…' : calendarBucket?.events?.length || 0}
@@ -863,7 +892,9 @@ function Dashboard() {
               </div>
             ))}
           </SectionCard>
+          )}
 
+          {showDomain('finance') && (
           <SectionCard
             title="💰 مالی"
             badge={todayLoading ? '…' : finance?.balances_by_currency?.length || 0}
@@ -912,7 +943,9 @@ function Dashboard() {
               </div>
             ))}
           </SectionCard>
+          )}
 
+          {showDomain('people') && (
           <SectionCard
             title="👥 افراد"
             badge={todayLoading ? '…' : people?.reminders_count || 0}
@@ -939,7 +972,9 @@ function Dashboard() {
               </div>
             ))}
           </SectionCard>
+          )}
 
+          {showDomain('growth') && (
           <SectionCard
             title="🌱 رشد امروز"
             badge={todayLoading ? '…' : `${growth?.today_done || 0} از ${growth?.today_total || 0}`}
@@ -963,108 +998,45 @@ function Dashboard() {
               </div>
             )}
           </SectionCard>
+          )}
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <StatCard
-            title="کل وظایف"
-            value={loading ? '...' : stats.tasks}
-            linkTo="/tasks"
-            color="bg-blue-100"
-            icon={
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            }
-          />
-          <StatCard
-            title="پروژه‌های فعال"
-            value={loading ? '...' : stats.projects}
-            linkTo="/projects"
-            color="bg-purple-100"
-            icon={
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
-            }
-          />
-          <StatCard
-            title="وظایف تکمیل‌شده"
-            value={loading ? '...' : stats.completed}
-            linkTo="/tasks"
-            color="bg-green-100"
-            icon={
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-          />
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">دسترسی سریع</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link
-              to="/tasks"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
-            >
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">مدیریت وظایف</p>
-                <p className="text-sm text-gray-500">ایجاد و پیگیری وظایف روزانه</p>
-              </div>
+        {/* شمارنده‌ها + دسترسی سریع — 2026-07-25: سه کارتِ بزرگ و چهار کارتِ
+            لینک، نصفِ ارتفاعِ صفحه را می‌گرفتند بدون آنکه چیزی به «امروزِ من»
+            اضافه کنند (سایدبار همان لینک‌ها را دارد). هیچ عدد و هیچ لینکی حذف
+            نشد — همه در یک نوارِ فشرده جمع شدند. */}
+        <div
+          className="mb-8 rounded-xl border border-gray-100 bg-white px-4 py-3"
+          data-testid="dashboard-summary-strip"
+        >
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+            <Link to="/tasks" className="text-gray-600 hover:text-blue-600">
+              کل وظایف: <span className="font-semibold text-gray-900">{loading ? '…' : stats.tasks}</span>
             </Link>
-            <Link
-              to="/projects"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-colors"
-            >
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">مدیریت پروژه‌ها</p>
-                <p className="text-sm text-gray-500">سازماندهی و پیشرفت پروژه‌ها</p>
-              </div>
+            <Link to="/tasks" className="text-gray-600 hover:text-blue-600">
+              تکمیل‌شده: <span className="font-semibold text-gray-900">{loading ? '…' : stats.completed}</span>
             </Link>
+            <Link to="/projects" className="text-gray-600 hover:text-blue-600">
+              پروژه‌های فعال: <span className="font-semibold text-gray-900">{loading ? '…' : stats.projects}</span>
+            </Link>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-2 text-xs">
+            <Link to="/tasks" className="text-blue-600 hover:underline">وظایف</Link>
+            <Link to="/projects" className="text-blue-600 hover:underline">پروژه‌ها</Link>
+            <Link to="/sahat" className="text-blue-600 hover:underline">نقشهٔ خداشهر</Link>
             <Link
               to="/attention"
               data-testid="dashboard-attention-link"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
+              className="text-blue-600 hover:underline"
             >
-              <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">مراقبت و مرور</p>
-                <p className="text-sm text-gray-500">موتور توجه، پیام صبحگاهی و مرور هفتگی</p>
-              </div>
+              مراقبت و مرور
             </Link>
-            {/* Dedup / consolidation entry (audit task fbd9bd36 AC4 — reachable
-                from the Dashboard, not only the sidebar). */}
             <Link
               to="/merge"
               data-testid="dashboard-merge-link"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-amber-300 hover:bg-amber-50 transition-colors"
+              className="text-blue-600 hover:underline"
             >
-              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">ادغام موارد مشابه</p>
-                <p className="text-sm text-gray-500">شناسایی و تلفیق تسک/پروژه/لیست‌های مشابه</p>
-              </div>
+              ادغام موارد مشابه
             </Link>
           </div>
         </div>
