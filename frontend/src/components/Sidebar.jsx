@@ -53,21 +53,36 @@ export const LINKS = [
   { to: '/self-portrait', label: 'خودنگاره (علاقه/اراده)', testid: 'sidebar-link-self-portrait', group: 'life_pages' },
   { to: '/brain', label: 'رشد ذهن و هوش', testid: 'sidebar-link-brain', group: 'life_pages' },
   { to: '/projects', label: 'پروژه‌ها', testid: 'sidebar-link-projects', group: 'life_pages' },
+  // 2026-07-25: «مرکز توسعه» is not a debug tool — it is the owner's WORK
+  // (repos, services, the daily Persian report). It sits with the life pages
+  // now instead of at the bottom next to the system tools. Route + testid
+  // unchanged.
+  { to: '/dev-center', label: 'کار و توسعه', testid: 'sidebar-link-dev-center', group: 'life_pages' },
 
   // ابزار — helpers.
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant', group: 'tools' },
-  { to: '/import', label: 'داده', testid: 'sidebar-link-data', group: 'tools' },
-  // The dedup/merge tool already lived at /merge (a tab inside «داده») but was
-  // undiscoverable — the owner asked why duplicate projects/tasks pile up. A
-  // top-level link surfaces the reversible "find similar → merge" flow.
-  { to: '/merge', label: 'پاک‌سازی و ادغام', testid: 'sidebar-link-merge', group: 'tools' },
+  // «داده» already contains the dedup/merge tool as its own tab; the separate
+  // top-level «پاک‌سازی و ادغام» entry pointed at the same surface, so the menu
+  // now has one door (the /merge route is unchanged and still resolves).
+  { to: '/import', label: 'داده (ایمپورت و ادغام)', testid: 'sidebar-link-data', group: 'tools' },
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings', group: 'tools' },
 
   // سیستم و فنی — developer/meta tools (kept, quarantined to the bottom).
-  { to: '/dev-center', label: 'مرکز توسعه', testid: 'sidebar-link-dev-center', group: 'system' },
   { to: '/system-map', label: 'نقشهٔ سیستم', testid: 'sidebar-link-system-map', group: 'system' },
   { to: '/activity-log', label: 'لاگ فعالیت‌ها', testid: 'sidebar-link-activity-log', group: 'system' },
 ];
+
+// Alias routes that render an existing hub: visiting them must light up (and
+// open the drawer for) the entry that owns them. Without this the owner lands
+// on e.g. /people/3/profile or /notifications and the menu looks unrelated.
+export const NAV_ALIASES = {
+  '/budget': ['/finance', '/assets'],
+  '/people-profiles': ['/people/'],
+  '/import': ['/drive-files', '/merge'],
+  '/assistant': ['/recommendations', '/personality', '/career-planning'],
+  '/settings': ['/notifications', '/ai-settings'],
+  '/lists': ['/lists/'],
+};
 
 // Resting sidebar = روزانه + خداشهر; everything else behind one «بیشتر»
 // drawer. Nothing is removed — the drawer holds them one click away and every
@@ -77,8 +92,11 @@ const SECONDARY_GROUPS = ['life_pages', 'tools', 'system'];
 
 function Sidebar() {
   const location = useLocation();
-  const isActive = (path) =>
-    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+  const isActive = (path) => {
+    if (path === '/') return location.pathname === '/';
+    if (location.pathname.startsWith(path)) return true;
+    return (NAV_ALIASES[path] || []).some((alias) => location.pathname.startsWith(alias));
+  };
 
   // The map link should not light up on district pages (they have their own
   // entries) — exact match for '/sahat', startsWith for the rest.

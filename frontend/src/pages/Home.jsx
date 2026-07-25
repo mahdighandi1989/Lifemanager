@@ -1,11 +1,15 @@
 /**
- * Home — public landing page at /.
+ * Home — the public landing page, mounted at /welcome only.
  *
- * Renders for unauthenticated users (App.jsx routes the authenticated
- * user past this to the Dashboard). Carries the AC selectors
- * data-testid='login-link' and data-testid='register-link' on its
- * primary calls-to-action so a browser/UI probe at / can find them
- * without going through the Header.
+ * 2026-07-25 survey: nothing inside the app links here — `/` goes straight to
+ * the Dashboard behind ProtectedRoute, and a logged-out visitor is sent to
+ * /login. The route stays mounted (rule 2: quarantine, never delete) as the
+ * one public door, and the copy was corrected: it described a task/reminder
+ * app, which this stopped being long ago. See REMOVAL_CANDIDATES.md.
+ *
+ * Carries the AC selectors data-testid='login-link' / 'register-link' on its
+ * primary calls-to-action so a browser/UI probe can find them without going
+ * through the Header.
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -34,8 +38,8 @@ function Home() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Lifemanager</h1>
-          <p className="text-gray-500 mb-8">
-            مدیریت تسک‌ها، پروژه‌ها و یادآوری‌ها — یک‌جا.
+          <p className="text-gray-500 mb-8" dir="rtl">
+            مدیریت زندگی — کارها و پروژه‌ها، مالی و مدارک، افراد، و نقشهٔ ساحت‌های زندگی، یک‌جا.
           </p>
           <div className="flex justify-center gap-3">
             <Link

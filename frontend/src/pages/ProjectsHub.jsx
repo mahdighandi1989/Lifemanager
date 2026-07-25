@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Projects from './Projects';
 import DevProjectsOverview from '../components/DevProjectsOverview';
 import ActivityLogPanel from '../components/ActivityLogPanel';
@@ -13,9 +14,12 @@ import ActivityLogPanel from '../components/ActivityLogPanel';
 // quarantine-not-delete; /external-projects still resolves here and lands on
 // the default tab). See docs/overhaul/REMOVAL_CANDIDATES.md.
 
+// 2026-07-25 tidy-up: «پروژه‌های توسعه» was the same DevProjectsOverview that
+// «مرکز توسعه» already renders — one content, two doors. The tab is retired
+// from the bar and replaced by a link to /dev-center (component + route
+// untouched; the tab still opens via ?tab=dev — see REMOVAL_CANDIDATES.md).
 const TABS = [
   { id: 'mine', label: 'پروژه‌های من', match: ['/projects'] },
-  { id: 'dev', label: 'پروژه‌های توسعه', match: [] },
 ];
 
 // «این تب‌ها چی‌ان؟» — one honest sentence per tab (owner asked). Shown under
@@ -31,7 +35,9 @@ function initialTab() {
   try {
     const { search } = window.location;
     const q = new URLSearchParams(search).get('tab');
-    if (q && TABS.some((t) => t.id === q)) return q;
+    // 'dev' is no longer in the bar but ?tab=dev still opens it (old links keep
+    // working — quarantine, not deletion).
+    if (q && (TABS.some((t) => t.id === q) || q === 'dev')) return q;
   } catch { /* no window */ }
   return 'mine';
 }
@@ -59,6 +65,15 @@ function ProjectsHub() {
         {TAB_HINTS[tab] && (
           <p className="text-xs text-gray-500 -mt-3 mb-4 leading-relaxed" data-testid="projects-tab-hint">
             {TAB_HINTS[tab]}
+          </p>
+        )}
+        {tab === 'mine' && (
+          <p className="text-xs text-gray-500 mb-4">
+            پروژه‌های نرم‌افزاری و مخزن‌هایت در{' '}
+            <Link to="/dev-center" data-testid="projects-to-dev-center" className="text-blue-600 hover:underline">
+              مرکز توسعه
+            </Link>{' '}
+            هستند.
           </p>
         )}
         <div data-testid={`projects-panel-${tab}`}>

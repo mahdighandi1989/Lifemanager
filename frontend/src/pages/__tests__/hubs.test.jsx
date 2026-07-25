@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi } from 'vitest';
 
 // Mock the child pages so the hub tests isolate the tab logic (the real pages
@@ -22,28 +23,41 @@ import AssistantHub from '../AssistantHub';
 import DataHub from '../DataHub';
 import ProjectsHub from '../ProjectsHub';
 
+// Router-aware render: the hubs now link to sibling pages.
+const renderHub = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
+
 describe('Grouped hubs', () => {
-  test('FinanceHub: budget default, switches to assets', () => {
-    render(<FinanceHub />);
+  // 2026-07-25: «دارایی‌ها» (media, not money — and its scan reads a folder the
+  // deployment doesn't have) is quarantined from the bar; the panel is intact.
+  test('FinanceHub: budget default, media assets tab is off the bar', () => {
+    renderHub(<FinanceHub />);
     expect(screen.getByTestId('finance-hub')).toBeInTheDocument();
     expect(screen.getByTestId('budget-page')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('finance-tab-assets'));
-    expect(screen.getByTestId('assets-page')).toBeInTheDocument();
+    expect(screen.queryByTestId('finance-tab-assets')).toBeNull();
+    ['budget', 'reports', 'others', 'log'].forEach((id) =>
+      expect(screen.getByTestId(`finance-tab-${id}`)).toBeInTheDocument(),
+    );
   });
 
-  test('AssistantHub: 4 tabs, assistant default, switches to career', () => {
-    render(<AssistantHub />);
+  // 2026-07-25: the three extra tabs are quarantined from the bar, but their
+  // own routes still open their panels (quarantine, not deletion).
+  test('AssistantHub: one tab at rest; /career-planning still opens its panel', () => {
+    renderHub(<AssistantHub />);
     expect(screen.getByTestId('assistant-hub')).toBeInTheDocument();
     expect(screen.getByTestId('smart-assistant-page')).toBeInTheDocument();
-    ['assistant', 'recommendations', 'personality', 'career'].forEach((id) =>
-      expect(screen.getByTestId(`assistant-tab-${id}`)).toBeInTheDocument(),
+    expect(screen.getByTestId('assistant-tab-assistant')).toBeInTheDocument();
+    ['recommendations', 'personality', 'career'].forEach((id) =>
+      expect(screen.queryByTestId(`assistant-tab-${id}`)).toBeNull(),
     );
-    fireEvent.click(screen.getByTestId('assistant-tab-career'));
+
+    window.history.pushState({}, '', '/career-planning');
+    renderHub(<AssistantHub />);
     expect(screen.getByTestId('career-planning-page')).toBeInTheDocument();
+    window.history.pushState({}, '', '/');
   });
 
   test('DataHub: import default, switches to files and merge', () => {
-    render(<DataHub />);
+    renderHub(<DataHub />);
     expect(screen.getByTestId('data-hub')).toBeInTheDocument();
     expect(screen.getByTestId('import-page')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('data-tab-files'));
@@ -52,15 +66,22 @@ describe('Grouped hubs', () => {
     expect(screen.getByTestId('merge-page')).toBeInTheDocument();
   });
 
-  test('ProjectsHub: my-projects default, switches to dev; external tab is quarantined', () => {
-    render(<ProjectsHub />);
+  test('ProjectsHub: my-projects only; dev content points at «مرکز توسعه»', () => {
+    renderHub(<ProjectsHub />);
     expect(screen.getByTestId('projects-hub')).toBeInTheDocument();
     expect(screen.getByTestId('projects-page')).toBeInTheDocument();
     // «پروژه‌های خارجی» tab was quarantined in the 2026-07-21 nav audit — it is
     // no longer offered (the page + route survive, just unlinked).
     expect(screen.queryByTestId('projects-tab-external')).toBeNull();
-    // The dev-projects tab is still reachable.
-    fireEvent.click(screen.getByTestId('projects-tab-dev'));
+    // 2026-07-25: the dev tab rendered the SAME overview as /dev-center — one
+    // content behind two doors. The bar now links there instead.
+    expect(screen.queryByTestId('projects-tab-dev')).toBeNull();
+    expect(screen.getByTestId('projects-to-dev-center')).toHaveAttribute('href', '/dev-center');
+
+    // …but an old ?tab=dev link still opens the panel (quarantine, not delete).
+    window.history.pushState({}, '', '/projects?tab=dev');
+    renderHub(<ProjectsHub />);
     expect(screen.getByTestId('dev-projects-overview')).toBeInTheDocument();
+    window.history.pushState({}, '', '/');
   });
 });

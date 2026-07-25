@@ -58,4 +58,27 @@ describe('Sidebar', () => {
     const dashboard = screen.getByTestId('sidebar-link-dashboard');
     expect(dashboard.className).not.toMatch(/font-semibold/);
   });
+
+  // 2026-07-25: seven alias routes render an existing hub. Landing on one used
+  // to leave the drawer shut and no entry lit — the page looked unrelated to
+  // the menu.
+  test.each([
+    ['/people/7/profile', 'sidebar-link-people'],
+    ['/notifications', 'sidebar-link-settings'],
+    ['/merge', 'sidebar-link-data'],
+    ['/finance', 'sidebar-link-finance'],
+    ['/personality', 'sidebar-link-assistant'],
+  ])('alias %s lights up (and opens the drawer for) %s', (path, testid) => {
+    renderAt(path);
+    const entry = screen.getByTestId(testid); // present ⇒ drawer auto-opened
+    expect(entry.className).toMatch(/text-blue-600/);
+  });
+
+  // «پاک‌سازی و ادغام» was a second door to the tab inside «داده».
+  test('the merge tool has one menu door, not two', () => {
+    renderAt('/');
+    fireEvent.click(screen.getByTestId('sidebar-more-toggle'));
+    expect(screen.queryByTestId('sidebar-link-merge')).toBeNull();
+    expect(screen.getByTestId('sidebar-link-data')).toHaveAttribute('href', '/import');
+  });
 });

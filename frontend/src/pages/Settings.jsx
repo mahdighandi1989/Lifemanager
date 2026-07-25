@@ -4,6 +4,7 @@ import Notifications from './Notifications';
 import DriveSettings from './DriveSettings';
 import DevSyncSettings from '../components/DevSyncSettings';
 import DataSafetyPanel from '../components/DataSafetyPanel';
+import AttentionSettingsPanel from '../components/AttentionSettingsPanel';
 
 // Settings is a tabbed shell consolidating the app's configuration:
 //   • هوش مصنوعی  → the AI catalog (AISettings) + the global analysis prompt
@@ -31,6 +32,10 @@ const TABS = [
   { id: 'notifications', label: 'اعلان‌ها' },
   { id: 'drive', label: 'گوگل درایو' },
   { id: 'dev', label: 'مرکز توسعه' },
+  // مراقبت و مرور (2026-07-25): the attention-engine + weekly-review settings
+  // were the only settings living outside this page. Same component the
+  // control room at /attention mounts — one implementation, two places.
+  { id: 'attention', label: 'مراقبت و مرور' },
   // ایمنی داده: اقدامات مالک + بکاپ + سطل زباله (data-safety phase 0)
   { id: 'safety', label: 'ایمنی داده' },
 ];
@@ -79,6 +84,7 @@ function Settings() {
           {tab === 'notifications' && <Notifications embedded />}
           {tab === 'drive' && <DriveSettings embedded />}
           {tab === 'dev' && <DevSyncSettings showCenterLink />}
+          {tab === 'attention' && <AttentionSettingsPanel />}
           {tab === 'safety' && <DataSafetyPanel />}
         </div>
       </div>

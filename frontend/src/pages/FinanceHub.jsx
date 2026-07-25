@@ -10,13 +10,23 @@ import api from '../lib/api';
 // Phase 3 additions: «گزارش ماهانه» (audit #19 — the ledger was write-only)
 // and «حساب‌های دیگر» (audit #7 — imported snapshots had no read surface).
 
+// 2026-07-25 tidy-up: «دارایی‌ها» (film/book/scanned media) is not money, and
+// its scanner only reads a server-side folder that does not exist on the
+// deployment — so the tab could never fill. Quarantined from the bar; the
+// AssetsPage, the /assets route and ?tab=assets all still work (see
+// docs/overhaul/REMOVAL_CANDIDATES.md). It comes back the day the scan is
+// wired to Drive.
 const TABS = [
   { id: 'budget', label: 'برنامه و بودجه', match: ['/budget', '/finance'] },
-  { id: 'assets', label: 'دارایی‌ها', match: ['/assets'] },
   { id: 'reports', label: 'گزارش ماهانه', match: [] },
   { id: 'others', label: 'حساب‌های دیگر', match: [] },
   { id: 'log', label: 'لاگ مالی', match: [] },
 ];
+
+const QUARANTINED_TABS = [
+  { id: 'assets', label: 'دارایی‌ها (رسانه‌ای)', match: ['/assets'] },
+];
+const ALL_TABS = [...TABS, ...QUARANTINED_TABS];
 
 const faNum = (n) => Number(n || 0).toLocaleString('fa-IR');
 
@@ -368,8 +378,8 @@ function initialTab() {
   try {
     const { pathname, search } = window.location;
     const q = new URLSearchParams(search).get('tab');
-    if (q && TABS.some((t) => t.id === q)) return q;
-    const hit = TABS.find((t) => t.match.some((p) => pathname.startsWith(p)));
+    if (q && ALL_TABS.some((t) => t.id === q)) return q;
+    const hit = ALL_TABS.find((t) => t.match.some((p) => pathname.startsWith(p)));
     if (hit) return hit.id;
   } catch { /* no window */ }
   return 'budget';
@@ -377,12 +387,17 @@ function initialTab() {
 
 function FinanceHub() {
   const [tab, setTab] = useState(initialTab());
+  // /assets (or ?tab=assets) still lands on its panel — and then its tab shows
+  // in the bar so the user can see where they are.
+  const visibleTabs = TABS.some((t) => t.id === tab)
+    ? TABS
+    : [...TABS, ...QUARANTINED_TABS.filter((t) => t.id === tab)];
   return (
     <div className="min-h-screen bg-gray-50 py-8" data-testid="finance-hub">
       <div className="max-w-4xl mx-auto px-4" dir="rtl">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">مالی</h1>
         <div className="flex gap-1 mb-6 border-b border-gray-200" data-testid="finance-tabs">
-          {TABS.map((t) => (
+          {visibleTabs.map((t) => (
             <button
               key={t.id}
               data-testid={`finance-tab-${t.id}`}
