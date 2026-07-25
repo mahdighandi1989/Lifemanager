@@ -16,6 +16,16 @@ const TASK_STATUS_COLORS = {
   done: 'bg-green-100 text-green-700',
   cancelled: 'bg-gray-100 text-gray-500',
 };
+// Persian labels for the relationship buckets the backend accepts
+// (person_profile_service.REL_FA — kept in sync, the page used to show the raw
+// English key).
+const REL_LABELS = {
+  close: 'نزدیک',
+  regular: 'معمولی',
+  distant: 'دور',
+  strained: 'پرتنش',
+  neutral: 'خنثی',
+};
 
 // PersonProfilePage (audit task 3cc09436 AC4/AC6): a person's behavioural
 // profile — AI relationship score, relationship type, behaviour history — plus
@@ -81,6 +91,16 @@ function PersonProfilePage() {
       .finally(() => setBusy(false));
   };
 
+  // «نوع رابطه تعیین بشه» — stored-wins: an empty value hands it back to the scorer.
+  const setRelationship = (value) => {
+    setBusy(true);
+    api
+      .put(`/people/${id}/profile/relationship`, { relationship: value })
+      .then((res) => setProfile(res.data))
+      .catch((e) => setError('خطا در تعیین نوع رابطه: ' + (e.message || '')))
+      .finally(() => setBusy(false));
+  };
+
   const analyze = () => {
     setBusy(true);
     api
@@ -117,15 +137,48 @@ function PersonProfilePage() {
       .finally(() => setBusy(false));
   };
 
+  const ledger = profile?.ledger || null;
+
   return (
     <div className="min-h-screen bg-gray-50 py-8" data-testid="person-profile-page">
       <div className="max-w-2xl mx-auto px-4" dir="rtl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">پروفایل فرد</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4" data-testid="person-profile-title">
+          {profile?.person_name ? `پروندهٔ ${profile.person_name}` : 'پروفایل فرد'}
+        </h1>
         {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+
+        {/* کارنامهٔ ماندگار — the all-time record. Time never erases it, so a
+            recent kindness can't talk over a long history (and the reverse). */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4" data-testid="person-ledger">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-gray-900">کارنامهٔ ماندگار</h2>
+            <span className="text-[11px] text-gray-400">هیچ‌وقت پاک نمی‌شود</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg bg-green-50 py-2">
+              <p className="text-lg font-bold text-green-700" data-testid="ledger-good">{ledger ? ledger.good : '—'}</p>
+              <p className="text-[11px] text-green-700">کار خوب</p>
+            </div>
+            <div className="rounded-lg bg-red-50 py-2">
+              <p className="text-lg font-bold text-red-700" data-testid="ledger-bad">{ledger ? ledger.bad : '—'}</p>
+              <p className="text-[11px] text-red-700">کار بد</p>
+            </div>
+            <div className="rounded-lg bg-amber-50 py-2">
+              <p className="text-lg font-bold text-amber-700" data-testid="ledger-flagged">{ledger ? ledger.flagged.length : '—'}</p>
+              <p className="text-[11px] text-amber-700">یادم بماند</p>
+            </div>
+          </div>
+          {ledger?.first_at && (
+            <p className="mt-2 text-[11px] text-gray-400" dir="rtl">
+              از <span dir="ltr">{String(ledger.first_at).slice(0, 10)}</span> تا{' '}
+              <span dir="ltr">{String(ledger.last_at || '').slice(0, 10)}</span> — {ledger.total} مورد ثبت‌شده
+            </p>
+          )}
+        </section>
 
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">امتیاز هوش مصنوعی</span>
+            <span className="text-gray-500">حالِ اخیرِ رابطه (وزن‌دار به تازگی)</span>
             <span data-testid="profile-ai-score" className="font-semibold">
               {profile ? profile.ai_score : '—'}
             </span>
@@ -133,8 +186,27 @@ function PersonProfilePage() {
           <div className="flex justify-between text-sm mt-2">
             <span className="text-gray-500">نوع رابطه</span>
             <span data-testid="profile-relationship" className="font-semibold">
-              {profile ? profile.relationship_type : '—'}
+              {profile ? (profile.relationship_fa || profile.relationship_type) : '—'}
+              {profile?.relationship_override && (
+                <span className="mr-1 text-[11px] font-normal text-gray-400">(نظر خودت)</span>
+              )}
             </span>
+          </div>
+          {/* «نوع رابطه تعیین بشه» — the owner's verdict beats the scorer. */}
+          <div className="mt-3 flex items-center gap-2" data-testid="relationship-picker">
+            <label className="text-sm text-gray-500">تعیینِ رابطه توسط خودت</label>
+            <select
+              data-testid="relationship-select"
+              value={profile?.relationship_override || ''}
+              onChange={(e) => setRelationship(e.target.value)}
+              disabled={busy}
+              className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+            >
+              <option value="">بگذار سیستم حساب کند</option>
+              {Object.entries(REL_LABELS).map(([k, fa]) => (
+                <option key={k} value={k}>{fa}</option>
+              ))}
+            </select>
           </div>
           <button
             data-testid="analyze-person-btn"
@@ -261,12 +333,18 @@ function PersonProfilePage() {
           </div>
         </section>
 
-        {/* Reminders (Step 8) */}
+        {/* «فراموش نکنم» (Step 8) — good and bad both kept, newest first, with
+            the date, so nothing quietly drops out of memory. */}
         {reminders.length > 0 && (
           <section data-testid="reminders" className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-4">
-            <h2 className="font-semibold text-amber-800 mb-2">یادآوری‌ها</h2>
+            <h2 className="font-semibold text-amber-800 mb-2">یادم بماند</h2>
             <ul className="space-y-1 text-sm text-amber-700">
-              {reminders.map((r, i) => (<li key={i}>• {r.note || r.kind}</li>))}
+              {reminders.map((r, i) => (
+                <li key={i} className="flex justify-between gap-2">
+                  <span>{r.valence > 0 ? '🟢' : r.valence < 0 ? '🔴' : '•'} {r.note || r.kind}</span>
+                  {r.at && <span className="text-[11px] text-amber-500 shrink-0" dir="ltr">{String(r.at).slice(0, 10)}</span>}
+                </li>
+              ))}
             </ul>
           </section>
         )}
@@ -312,8 +390,9 @@ function PersonProfilePage() {
           })()}
         </section>
 
-        {/* لاگ فعالیت‌های همین فرد — رویدادهای پروفایل + رفتارها/یادداشت‌ها. */}
-        <ActivityLogPanel entityType="person" entityId={id} title="لاگ این فرد" />
+        {/* رویدادهای سیستمی (چه کسی کِی چه چیزی را ثبت/ویرایش کرد) — مکمّلِ
+            «تاریخچه رفتار» بالا، نه تکرارِ آن. */}
+        <ActivityLogPanel entityType="person" entityId={id} title="رویدادهای سیستمیِ این فرد" />
       </div>
     </div>
   );

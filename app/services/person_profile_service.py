@@ -19,6 +19,63 @@ from app.models.person_profile import PersonProfile
 
 logger = logging.getLogger(__name__)
 
+# Persian labels for the relationship buckets. The backend owns them now so the
+# map, the list and the profile page can never drift apart (they did: the
+# profile page rendered the raw English key).
+REL_FA = {
+    "close": "نزدیک",
+    "regular": "معمولی",
+    "distant": "دور",
+    "strained": "پرتنش",
+    "neutral": "خنثی",
+}
+# What the owner may set by hand («نوع رابطه تعیین بشه»).
+REL_CHOICES = tuple(REL_FA.keys())
+
+
+def build_ledger(profile: PersonProfile) -> dict:
+    """دفترِ ماندگار — the all-time, undecayed record of this person.
+
+    Kept next to ``ai_score`` (which decays on purpose) so a recent kindness
+    can never quietly erase a long history, and a long-ago kindness is never
+    lost either: «همه چیز ثبت بشه که فراموشی اتفاق نیفته».
+    """
+    from app.services.ai.person_behavior import ledger_from_deeds
+
+    deeds = [e for e in (profile.behavior_log or []) if e.get("valence") is not None]
+    return ledger_from_deeds(deeds)
+
+
+def effective_relationship(profile: PersonProfile) -> str:
+    """The relationship in force: the owner's own verdict when he gave one,
+    otherwise the computed bucket (stored-wins, as with sahat)."""
+    return (getattr(profile, "relationship_override", None) or profile.relationship_type
+            or "neutral")
+
+
+async def set_relationship(
+    db: AsyncSession, *, person_id: int, relationship: Optional[str]
+) -> PersonProfile:
+    """Record the owner's own verdict on the relationship, or clear it (None)
+    to hand the call back to the scorer. Never touches the deed log."""
+    profile = await get_or_create_profile(db, person_id=person_id)
+    value = (relationship or "").strip() or None
+    if value is not None and value not in REL_CHOICES:
+        raise ValueError(f"unknown relationship: {value}")
+    profile.relationship_override = value
+    log = list(profile.behavior_log or [])
+    log.append({
+        "type": "relationship_set",
+        "note": (f"نوع رابطه را «{REL_FA.get(value, value)}» گذاشتی"
+                 if value else "تعیینِ نوع رابطه را به سیستم واگذار کردی"),
+        "relationship": value,
+        "at": datetime.now(timezone.utc).isoformat(),
+    })
+    profile.behavior_log = log[-100:]
+    await db.commit()
+    await db.refresh(profile)
+    return profile
+
 
 async def get_or_create_profile(db: AsyncSession, *, person_id: int) -> PersonProfile:
     row = (
@@ -92,31 +149,41 @@ async def record_deed(
 
 
 async def get_reminders(db: AsyncSession, *, person_id: int) -> list[dict]:
-    """Important deeds the user flagged to not forget (Step 8)."""
+    """«فراموش نکنم» — the entries the owner flagged, newest first, never
+    decayed and never pruned by the score (Step 8)."""
     profile = await get_or_create_profile(db, person_id=person_id)
-    return [e for e in (profile.behavior_log or []) if e.get("important")]
+    flagged = [e for e in (profile.behavior_log or []) if e.get("important")]
+    return sorted(flagged, key=lambda e: str(e.get("at") or ""), reverse=True)
 
 
 async def get_suggestions(db: AsyncSession, *, person_id: int) -> list[str]:
-    """Actionable suggestions from the relationship type + recent good/bad
-    balance (Step 9 — "تشکر کن / مراقب باش / جبران کن")."""
-    from app.services.ai.person_behavior import score_from_deeds
+    """Reading the record back, not judging it (Step 9).
 
+    Reads the ALL-TIME ledger — not the decayed score — so «یک کار خوبِ تازه»
+    never talks over a long record, in either direction.
+    """
     profile = await get_or_create_profile(db, person_id=person_id)
-    deeds = [e for e in (profile.behavior_log or []) if e.get("valence") is not None]
-    scored = score_from_deeds(deeds) if deeds else {"good_deeds": 0, "bad_deeds": 0}
-    rel = profile.relationship_type
+    ledger = build_ledger(profile)
+    rel = effective_relationship(profile)
     out: list[str] = []
-    if scored["good_deeds"] > scored["bad_deeds"]:
-        out.append("این فرد به شما خوبی کرده — یک قدردانی یا جبران را در نظر بگیرید.")
-    if scored["bad_deeds"] > scored["good_deeds"]:
-        out.append("رفتارهای منفی ثبت شده — در تعامل بعدی محتاط باشید.")
+    if ledger["good"] > ledger["bad"]:
+        out.append(
+            f"در مجموع {ledger['good']} کار خوب از او ثبت شده — جای قدردانی یا جبران هست."
+        )
+    if ledger["bad"] > ledger["good"]:
+        out.append(
+            f"در مجموع {ledger['bad']} مورد منفی ثبت شده — در تعامل بعدی حواست باشد."
+        )
+    if ledger["good"] and ledger["bad"] and ledger["good"] == ledger["bad"]:
+        out.append("کارنامه‌اش سربه‌سر است — نه فراموشش کن، نه یک‌طرفه قضاوت.")
+    if ledger["flagged"]:
+        out.append(f"{len(ledger['flagged'])} مورد را «یادم بماند» علامت زده‌ای؛ دوره‌شان کن.")
     if rel == "close":
-        out.append("رابطه نزدیک است؛ برای حفظ آن وقت بگذارید.")
+        out.append("رابطه را نزدیک ثبت کرده‌ای؛ برای حفظش وقت بگذار.")
     elif rel in ("distant", "strained"):
-        out.append("رابطه کم‌رنگ/پرتنش است؛ اگر مهم است، یک گام ترمیمی بردارید.")
+        out.append("رابطه کم‌رنگ/پرتنش است؛ اگر برایت مهم است، یک گام ترمیمی بردار.")
     if not out:
-        out.append("داده کافی نیست؛ با ثبت کارهای خوب/بد، پیشنهادها دقیق‌تر می‌شوند.")
+        out.append("داده کافی نیست؛ با ثبت کارهای خوب/بد، این صفحه دقیق‌تر می‌شود.")
     return out
 
 
@@ -231,13 +298,27 @@ async def record_task_link_interactions(
     return recorded
 
 
-def serialize(profile: PersonProfile) -> dict:
+def serialize(profile: PersonProfile, person: Optional[object] = None) -> dict:
+    """The profile as the page reads it.
+
+    Additive over the original contract (``ai_score`` / ``user_notes`` /
+    ``behavior_log`` / ``relationship_type`` stay exactly as they were): adds
+    the permanent ledger, the owner's override, the Persian label, and — when
+    the caller has the row — the person's name, so the header stops saying a
+    bare «پروفایل فرد».
+    """
+    rel = effective_relationship(profile)
     return {
         "id": profile.id,
         "person_id": profile.person_id,
+        "person_name": getattr(person, "name", None) if person is not None else None,
         "ai_score": profile.ai_score,
         "user_notes": profile.user_notes,
         "behavior_log": profile.behavior_log or [],
         "relationship_type": profile.relationship_type,
+        "relationship_override": getattr(profile, "relationship_override", None),
+        "relationship": rel,
+        "relationship_fa": REL_FA.get(rel, rel),
+        "ledger": build_ledger(profile),
         "last_analyzed_at": profile.last_analyzed_at.isoformat() if profile.last_analyzed_at else None,
     }

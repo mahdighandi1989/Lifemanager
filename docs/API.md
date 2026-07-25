@@ -631,16 +631,25 @@ history, and keep free-text notes + a behaviour log per person.
 | POST | `/api/people/{id}/profile/analyze` | Blend interaction-history + deed/note scores; persists `ai_score` + `relationship_type` + a `behavior_log` snapshot. |
 | POST | `/api/people/{id}/profile/note` | Save a note AND analyze its tone (Step 10) — the sentiment becomes a valenced log entry that feeds the score. |
 | POST | `/api/people/{id}/profile/deed` | Record a good/bad deed (`{kind, note, important}`) and recompute (Step 4-5 — "کارهای بد و خوبش ثبت بشه"). |
-| GET | `/api/people/{id}/profile/reminders` | Important deeds flagged to not forget (Step 8). |
-| GET | `/api/people/{id}/profile/suggestions` | Actionable suggestions from relationship + deed balance (Step 9). |
+| PUT | `/api/people/{id}/profile/relationship` | The owner's own verdict (`{relationship}`: close/regular/distant/strained/neutral; `""` clears it). Stored-wins over the computed value. |
+| GET | `/api/people/{id}/profile/reminders` | Flagged «یادم بماند» entries, newest first, never decayed or pruned (Step 8). |
+| GET | `/api/people/{id}/profile/suggestions` | Read-back of the **all-time ledger** (Step 9) — not the decayed mood. |
+| GET | `/api/people-profiles/summary` | One row per person: `ai_score`, `relationship`/`relationship_fa`/`relationship_override`, `ledger`, `birthday`, `next_follow_up` — the افراد list reads this alone. |
 
 Model: `PersonProfile` (one per `Person` — `ai_score`, `user_notes`,
 `behavior_log` JSON of deeds/notes/analyses, `relationship_type`,
-`last_analyzed_at`; migration 0024). Scoring: `person_behavior.score_from_deeds`
-weighs good/bad deeds with **time decay** (recent deeds dominate — "با یه کار
-خوبش هزار تا کار بد رو فراموش نکنم"); note tone feeds it. UI: `PersonProfilePage`
-(`/people/:id/profile`) — score, note + deed forms, reminders, suggestions, and a
-good/bad-filterable behaviour timeline; `PeopleProfiles` links each person.
+`relationship_override`, `last_analyzed_at`; migrations 0024 + 0053).
+
+**Two numbers, on purpose** (2026-07-25): `person_behavior.score_from_deeds`
+decays (half-life 30d) and is labelled «حالِ اخیرِ رابطه» — it forgets by design;
+`person_behavior.ledger_from_deeds` is the permanent, undecayed record
+(good/bad/balance, flagged entries, first/last stamp) that answers «همه چیز ثبت
+بشه که فراموشی اتفاق نیفته». Every derived text (suggestions, map rows) reads the
+ledger. `relationship_override` beats the computed `relationship_type` without
+destroying it. UI: `PersonProfilePage` (`/people/:id/profile`) — permanent ledger
+card, recent-mood score, relationship picker, note + deed forms, reminders,
+suggestions, good/bad-filterable timeline; `PeopleProfiles` lists everyone with
+their ledger; the خداشهر district `دیگران` carries the same rows.
 
 ### Notification events (audit task 92fa5ea15e2b)
 

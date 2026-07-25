@@ -32,6 +32,10 @@ class PersonProfile(Base):
     user_notes = Column(Text, nullable=True)
     behavior_log = Column(JSON, nullable=True)  # [{type, note, at}, ...]
     relationship_type = Column(String(32), nullable=False, server_default="neutral", default="neutral")
+    # «نوع رابطه خودم تعیین بشه» (2026-07-25): the owner's own verdict. When set
+    # it always beats the computed relationship_type — same stored-wins rule as
+    # the sahat column. NULL = «بگذار خودش حساب کند».
+    relationship_override = Column(String(32), nullable=True)
     last_analyzed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

@@ -671,13 +671,24 @@ async def build_sahat_map(
         logger.debug("sahat projects skipped: %r", exc)
 
     # ── People (دیگران): a follow-up you meant to make — plainly, no verdict ─
+    # افراد lives HERE in the city (2026-07-25): the محلهٔ «رابطه با دیگران»
+    # carries the people themselves and their permanent ledger, not only the
+    # follow-ups that slipped. The map reads the record back; it never judges.
     people_overdue: List[Dict[str, Any]] = []
+    people_detail: List[Dict[str, Any]] = []
+    people_flagged = 0
     try:
         from app.models.person import Person
+        from app.models.person_profile import PersonProfile
+        from app.services import person_profile_service as pps
 
         people = (
             await db.execute(select(Person).where(_scope(Person.user_id, uid)))
         ).scalars().all()
+        profiles = {
+            pr.person_id: pr
+            for pr in (await db.execute(select(PersonProfile))).scalars().all()
+        }
         cells["digaran"]["total"] += len(people)
         cells["digaran"]["done"] += sum(
             1 for p in people
@@ -689,6 +700,27 @@ async def build_sahat_map(
                 att("digaran", f"می‌خواستی پیگیری کنی: {p.name}", U_WAITING, "/people-profiles",
                     kind="waiting")
                 people_overdue.append({"id": p.id, "name": p.name, "next_follow_up": nf.isoformat()})
+            prof = profiles.get(p.id)
+            ledger = pps.build_ledger(prof) if prof is not None else None
+            rel = pps.effective_relationship(prof) if prof is not None else None
+            if ledger:
+                people_flagged += len(ledger["flagged"])
+            if detail and len(people_detail) < 30:
+                people_detail.append({
+                    "id": p.id, "name": p.name,
+                    "relationship": rel,
+                    "relationship_fa": pps.REL_FA.get(rel, rel) if rel else None,
+                    "good": ledger["good"] if ledger else 0,
+                    "bad": ledger["bad"] if ledger else 0,
+                    "flagged": len(ledger["flagged"]) if ledger else 0,
+                    "next_follow_up": nf.isoformat() if nf else None,
+                })
+        # «فراموش نکنم» — the flagged entries are a standing reminder, low and
+        # calm: a count, not a nag per person.
+        if people_flagged:
+            att("digaran", f"{people_flagged} موردِ «یادم بماند» دربارهٔ افراد",
+                U_PILE, "/people-profiles", kind="pile")
+        people_detail.sort(key=lambda r: (-r["flagged"], -(r["good"] + r["bad"])))
     except Exception as exc:
         logger.debug("sahat people skipped: %r", exc)
 
@@ -919,6 +951,8 @@ async def build_sahat_map(
             entry["detail"] = cell["detail"]
             if key == "digaran":
                 entry["detail"]["people_overdue"] = people_overdue[:20]
+                entry["detail"]["people"] = people_detail
+                entry["detail"]["people_flagged"] = people_flagged
                 entry["detail"]["finance_lines"] = finance_lines
             if key == "mohit":
                 entry["detail"]["documents"] = docs_detail

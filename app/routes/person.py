@@ -158,6 +158,8 @@ async def list_people_profiles_summary(
     from app.models.person import Person
     from app.models.person_profile import PersonProfile
 
+    from app.services import person_profile_service as pps
+
     rows = (
         await db.execute(
             select(Person, PersonProfile)
@@ -166,22 +168,38 @@ async def list_people_profiles_summary(
             .order_by(Person.created_at.desc())
         )
     ).all()
-    return [
-        {
+    out: List[dict] = []
+    for person, profile in rows:
+        rel = pps.effective_relationship(profile) if profile is not None else None
+        ledger = pps.build_ledger(profile) if profile is not None else None
+        out.append({
             "id": person.id,
             "name": person.name,
             "email": person.email,
             "phone": person.phone,
             "ai_score": profile.ai_score if profile is not None else None,
             "relationship_type": profile.relationship_type if profile is not None else None,
+            # افراد (2026-07-25): the effective relationship (owner's verdict
+            # wins), its Persian label, the permanent ledger, and the CRM dates
+            # — so the list page needs ONE request, not two.
+            "relationship": rel,
+            "relationship_fa": pps.REL_FA.get(rel, rel) if rel else None,
+            "relationship_override": (
+                getattr(profile, "relationship_override", None) if profile is not None else None
+            ),
+            "ledger": ledger,
+            "birthday": person.birthday.isoformat() if getattr(person, "birthday", None) else None,
+            "next_follow_up": (
+                person.next_follow_up.isoformat()
+                if getattr(person, "next_follow_up", None) else None
+            ),
             "last_analyzed_at": (
                 profile.last_analyzed_at.isoformat()
                 if (profile is not None and profile.last_analyzed_at)
                 else None
             ),
-        }
-        for person, profile in rows
-    ]
+        })
+    return out
 
 
 @router.post(
@@ -251,7 +269,7 @@ async def get_person_profile(
     if person is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
     profile = await person_profile_service.get_or_create_profile(db, person_id=person_id)
-    return person_profile_service.serialize(profile)
+    return person_profile_service.serialize(profile, person)
 
 
 @router.post("/api/people/{person_id}/profile/analyze", tags=["persons"])
@@ -276,7 +294,7 @@ async def analyze_person_profile(
         entity_label=getattr(person, "name", None),
         detail="تحلیل هوش مصنوعی رابطه", user_id=user_id, db=db,
     )
-    return person_profile_service.serialize(profile)
+    return person_profile_service.serialize(profile, person)
 
 
 @router.post("/api/people/{person_id}/profile/note", tags=["persons"])
@@ -302,7 +320,7 @@ async def add_person_profile_note(
         context_type="person", context_id=person_id,
         detail="ثبت/به‌روزرسانی یادداشت درباره فرد", user_id=user_id, db=db,
     )
-    return person_profile_service.serialize(profile)
+    return person_profile_service.serialize(profile, person)
 
 
 class _DeedPayload(BaseModel):
@@ -337,7 +355,43 @@ async def record_person_deed(
         + (f" — {payload.note}" if payload.note else ""),
         user_id=user_id, db=db,
     )
-    return person_profile_service.serialize(profile)
+    return person_profile_service.serialize(profile, person)
+
+
+class _RelationshipPayload(BaseModel):
+    # None / "" → clear the override and hand the call back to the scorer.
+    relationship: str = Field(default="", max_length=32)
+
+
+@router.put("/api/people/{person_id}/profile/relationship", tags=["persons"])
+@handle_errors
+async def set_person_relationship(
+    person_id: int,
+    payload: _RelationshipPayload = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """«نوع رابطه تعیین بشه» — the owner's own verdict, which beats the
+    computed one (stored-wins). An empty value clears it."""
+    from app.services import person_profile_service
+
+    person = await person_service.get_person(db, person_id=person_id, user_id=user_id)
+    if person is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
+    try:
+        profile = await person_profile_service.set_relationship(
+            db, person_id=person_id, relationship=payload.relationship
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    await record_activity(
+        action="update", entity_type="person_relationship", entity_id=person_id,
+        entity_label=getattr(person, "name", None),
+        context_type="person", context_id=person_id,
+        detail="تعیین نوع رابطه" + (f" — {payload.relationship}" if payload.relationship else " (واگذاری به سیستم)"),
+        user_id=user_id, db=db,
+    )
+    return person_profile_service.serialize(profile, person)
 
 
 @router.get("/api/people/{person_id}/profile/reminders", tags=["persons"])

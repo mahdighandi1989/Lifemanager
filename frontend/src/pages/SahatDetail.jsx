@@ -241,6 +241,25 @@ function CellBlock({ s, onThreadsChanged }) {
           </Section>
         )}
 
+        {/* افراد — the ledger itself lives in this district, not only the
+            follow-ups that slipped (2026-07-25). 👍/👎 are the all-time counts;
+            ⭐ is «یادم بماند». */}
+        {(d.people || []).length > 0 && (
+          <Section title={`افراد (${d.people.length}):`}>
+            {d.people.map((p) => (
+              <Link key={p.id} to={`/people/${p.id}/profile`} className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-xs text-gray-700 hover:bg-gray-50">
+                <span className="truncate">
+                  {p.name}
+                  {p.relationship_fa && <span className="mr-1 text-[10px] text-gray-400">({p.relationship_fa})</span>}
+                </span>
+                <span className="shrink-0 text-[10px] text-gray-400" dir="ltr">
+                  {p.flagged > 0 ? `⭐${p.flagged} ` : ''}👍{p.good} 👎{p.bad}
+                </span>
+              </Link>
+            ))}
+          </Section>
+        )}
+
         {(d.people_overdue || []).length > 0 && (
           <Section title="پیگیریِ رابطه (عقب‌افتاده):">
             {d.people_overdue.map((p) => (

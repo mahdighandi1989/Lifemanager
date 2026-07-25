@@ -426,6 +426,9 @@ async def startup_event():
         ("projects", "sahat", "VARCHAR(16)"),
         # مرحله‌بندی (2026-07-22): ordered trackable steps on any task.
         ("tasks", "steps", "JSON"),
+        # افراد (2026-07-25): the owner's own verdict on a relationship, which
+        # always beats the computed one (mirrors migration 0053).
+        ("person_profiles", "relationship_override", "VARCHAR(32)"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:

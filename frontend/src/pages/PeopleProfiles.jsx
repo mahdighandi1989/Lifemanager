@@ -33,30 +33,17 @@ function PeopleProfiles() {
   // «افزودن فرد» (audit #11): name required; email/phone/birthday/follow-up optional.
   const [form, setForm] = useState(EMPTY_PERSON_FORM);
   const [saving, setSaving] = useState(false);
-  // birthday/next_follow_up live on the /persons rows; the summary endpoint
-  // predates them, so merge them in fail-open for the 🎂 badge.
-  const [extras, setExtras] = useState({});
 
   const load = useCallback(() => {
     setLoading(true);
     api
       // /people-profiles/summary joins each person with their behavioural
-      // profile (ai_score + relationship_type) so the list shows them at a
-      // glance; falls back gracefully to names for people without a profile.
+      // profile — score, effective relationship, the permanent ledger AND the
+      // CRM dates (2026-07-25), so this page needs ONE request, not two.
       .get('/people-profiles/summary')
       .then((res) => setPeople(Array.isArray(res.data) ? res.data : []))
       .catch((e) => setError('خطا در دریافت افراد: ' + (e.message || '')))
       .finally(() => setLoading(false));
-    api
-      .get('/persons')
-      .then((res) => {
-        const map = {};
-        (Array.isArray(res.data) ? res.data : []).forEach((p) => {
-          map[p.id] = p;
-        });
-        setExtras(map);
-      })
-      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -86,10 +73,14 @@ function PeopleProfiles() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" data-testid="people-profiles-page">
+    // dir="rtl" on the whole page (bidi rule): the rows mix Persian names with
+    // Latin counters/dates, which the browser reorders without it.
+    <div className="min-h-screen bg-gray-50 py-8" data-testid="people-profiles-page" dir="rtl">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">افراد</h1>
-        <p className="text-gray-500 mb-6">پروفایل افرادی که با آن‌ها در ارتباط هستید.</p>
+        <p className="text-gray-500 mb-6">
+          پروندهٔ کسانی که با آن‌ها در ارتباطی — کارهای خوب و بدشان همین‌جا می‌ماند تا فراموش نشود.
+        </p>
 
         {/* «افزودن فرد» — dir="rtl" چون برچسب‌های فارسی با ورودی‌های لاتین/تاریخ مخلوط‌اند (bidi rule) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6" dir="rtl" data-testid="add-person">
@@ -176,16 +167,23 @@ function PeopleProfiles() {
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       {person.name}
-                      {(person.birthday || extras[person.id]?.birthday) && (
+                      {person.birthday && (
                         <span
                           data-testid={`person-birthday-badge-${person.id}`}
-                          title={`تولد: ${person.birthday || extras[person.id]?.birthday}`}
+                          title={`تولد: ${person.birthday}`}
                           className="mr-1 text-sm"
                         >
                           🎂
                         </span>
                       )}
                     </h3>
+                    {/* کارنامهٔ ماندگار at a glance — the counts time never erases. */}
+                    {person.ledger && person.ledger.total > 0 && (
+                      <p data-testid={`person-ledger-${person.id}`} className="text-xs text-gray-500 mt-0.5" dir="ltr">
+                        👍{person.ledger.good} 👎{person.ledger.bad}
+                        {person.ledger.flagged?.length > 0 ? ` ⭐${person.ledger.flagged.length}` : ''}
+                      </p>
+                    )}
                     {person.ai_score != null && (
                       <p data-testid={`person-score-${person.id}`} className="text-sm text-gray-500 mt-0.5">
                         امتیاز: {person.ai_score}
@@ -194,14 +192,18 @@ function PeopleProfiles() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  {person.relationship_type && (
+                  {(person.relationship || person.relationship_type) && (
                     <span
                       data-testid={`person-rel-${person.id}`}
+                      title={person.relationship_override ? 'نظر خودت' : 'محاسبهٔ سیستم'}
                       className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                        REL_COLORS[person.relationship_type] || 'bg-gray-100 text-gray-600'
+                        REL_COLORS[person.relationship || person.relationship_type] || 'bg-gray-100 text-gray-600'
                       }`}
                     >
-                      {REL_LABELS[person.relationship_type] || person.relationship_type}
+                      {person.relationship_fa
+                        || REL_LABELS[person.relationship || person.relationship_type]
+                        || person.relationship_type}
+                      {person.relationship_override ? ' ✍️' : ''}
                     </span>
                   )}
                   <Link

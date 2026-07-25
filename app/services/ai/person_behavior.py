@@ -14,9 +14,14 @@ _TYPE_WEIGHTS = {"meeting": 3, "call": 2, "email": 1, "message": 1, "other": 1}
 
 
 def _decay(age_days: float, half_life: float = 30.0) -> float:
-    """Recency weight — a deed's influence halves every ``half_life`` days, so
-    "با یه کار خوبش هزار تا کار بد رو فراموش نکنم": old good deeds fade, the
-    pattern over time wins (audit task 3cc09436 Step 5)."""
+    """Recency weight — a deed's influence halves every ``half_life`` days.
+
+    This produces the *current mood* of a relationship: how it feels lately.
+    It deliberately forgets, so it must NEVER be the only record — a decayed
+    score is exactly how «با یه کار خوبش هزار تا کار بدش را فراموش کنم»
+    happens. The permanent, undecayed record is ``ledger_from_deeds`` below;
+    the two are shown side by side (2026-07-25 افراد rebuild).
+    """
     return 0.5 ** (max(0.0, age_days) / half_life)
 
 
@@ -62,6 +67,61 @@ def score_from_deeds(deeds: Iterable[dict], *, now: Optional[datetime] = None) -
     else:
         rel = "distant"
     return {"ai_score": score, "relationship_type": rel, "good_deeds": good, "bad_deeds": bad}
+
+
+def ledger_from_deeds(deeds: Iterable[dict], *, now: Optional[datetime] = None) -> dict:
+    """دفترِ ماندگار — the all-time record that time never erases.
+
+    The owner's rule (2026-07-25): «همه چیز ثبت بشه که فراموشی اتفاق نیفته و
+    با یه کار خوبش هزار تا کار بدی که کرده رو فراموش نکنم.» ``score_from_deeds``
+    decays on purpose (that is the *mood*); this counts every deed at full
+    weight, forever, and keeps the flagged ones («کجا بهم خوبی کرد که فراموش
+    نکنم») at the top. Nothing here is a verdict — it is a faithful record the
+    owner reads himself.
+
+    Returns counts, the plain balance (good − bad), the flagged entries, and
+    the span of the record.
+    """
+    now = now or datetime.now(timezone.utc)
+    good = bad = neutral = 0
+    flagged: list[dict] = []
+    stamps: list[str] = []
+    for d in deeds or []:
+        v = d.get("valence")
+        if v is None:
+            continue
+        if v > 0:
+            good += 1
+        elif v < 0:
+            bad += 1
+        else:
+            neutral += 1
+        at = d.get("at")
+        if at:
+            stamps.append(str(at))
+        if d.get("important"):
+            flagged.append(
+                {
+                    "note": (d.get("note") or d.get("kind") or d.get("type") or ""),
+                    "valence": v,
+                    "at": at,
+                    "age_days": round(_age_days(at, now)) if at else None,
+                }
+            )
+    stamps.sort()
+    flagged.sort(key=lambda e: str(e.get("at") or ""), reverse=True)
+    return {
+        "good": good,
+        "bad": bad,
+        "neutral": neutral,
+        "total": good + bad + neutral,
+        "balance": good - bad,
+        "flagged": flagged,
+        "flagged_good": sum(1 for e in flagged if (e.get("valence") or 0) > 0),
+        "flagged_bad": sum(1 for e in flagged if (e.get("valence") or 0) < 0),
+        "first_at": stamps[0] if stamps else None,
+        "last_at": stamps[-1] if stamps else None,
+    }
 
 
 def _kind(it: Any) -> str:

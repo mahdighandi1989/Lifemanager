@@ -59,13 +59,18 @@ describe('PeopleProfiles add-person form (audit #11)', () => {
     await waitFor(() => expect(post).not.toHaveBeenCalled());
   });
 
-  test('shows the 🎂 badge for a person with a birthday', async () => {
+  // 2026-07-25: the summary row now carries birthday + the permanent ledger,
+  // so the page reads ONE endpoint (it used to fetch /persons too and merge).
+  test('shows the 🎂 badge and the ledger from the summary row alone', async () => {
     get.mockImplementation((url) => {
       if (url === '/people-profiles/summary') {
-        return Promise.resolve({ data: [{ id: 42, name: 'Ali', ai_score: 70, relationship_type: 'close' }] });
-      }
-      if (url === '/persons') {
-        return Promise.resolve({ data: [{ id: 42, name: 'Ali', birthday: '1990-05-01' }] });
+        return Promise.resolve({
+          data: [{
+            id: 42, name: 'Ali', ai_score: 70, relationship_type: 'close',
+            relationship: 'close', relationship_fa: 'نزدیک', birthday: '1990-05-01',
+            ledger: { good: 2, bad: 1, total: 3, balance: 1, flagged: [] },
+          }],
+        });
       }
       return Promise.resolve({ data: [] });
     });
@@ -75,5 +80,9 @@ describe('PeopleProfiles add-person form (audit #11)', () => {
       </MemoryRouter>,
     );
     await waitFor(() => expect(screen.getByTestId('person-birthday-badge-42')).toBeInTheDocument());
+    expect(screen.getByTestId('person-ledger-42')).toHaveTextContent('👍2');
+    expect(screen.getByTestId('person-ledger-42')).toHaveTextContent('👎1');
+    expect(screen.getByTestId('person-rel-42')).toHaveTextContent('نزدیک');
+    expect(get.mock.calls.filter(([u]) => u === '/persons').length).toBe(0);
   });
 });
