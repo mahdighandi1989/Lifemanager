@@ -155,6 +155,9 @@ function BudgetPage({ embedded = false }) {
 
   // مالیِ خودتغذیه — pull accounts/balances out of the synced Gmail.
   const [scanning, setScanning] = useState(false);
+  // «برو از اول بیاور» — the history sweep + the archive grouping (2026-07-25).
+  const [sweeping, setSweeping] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const [scanMsg, setScanMsg] = useState(null);
   const [cleaning, setCleaning] = useState(false);
 
@@ -210,6 +213,33 @@ function BudgetPage({ embedded = false }) {
       setScanMsg('اسکنِ ایمیل‌ها ناموفق بود — شاید گوگل هنوز وصل نیست.');
     } finally {
       setScanning(false);
+    }
+  };
+
+  // «برو همهٔ صورت‌حساب‌ها را از اول بیاور»: the mailbox mirror only ever held
+  // the last 2 days, so the extractors had almost nothing to read. This pulls
+  // the history first, then extracts.
+  const deepSweep = async () => {
+    setSweeping(true);
+    setScanMsg(null);
+    try {
+      const res = await api.post('/inbox/deep-sweep', { months: 24, max_messages: 800 });
+      const d = res.data || {};
+      if (d.ok === false) {
+        setScanMsg('آوردنِ تاریخچه ناموفق بود — احتمالاً گوگل وصل نیست.');
+      } else {
+        setScanMsg(
+          `${d.mirrored_new ?? 0} ایمیلِ تازه از ${d.months ?? 24} ماهِ گذشته آورده شد؛ ` +
+          `${d.attachment_candidates ?? 0} پیوست خوانده شد، ` +
+          `${d.locked_files ?? 0} فایلِ رمزدار منتظرِ رمز است، و ` +
+          `${d.accounts_created ?? 0} حسابِ تازه ساخته شد.`,
+        );
+      }
+      loadAccounts();
+    } catch {
+      setScanMsg('آوردنِ تاریخچه ناموفق بود.');
+    } finally {
+      setSweeping(false);
     }
   };
 
@@ -301,6 +331,11 @@ function BudgetPage({ embedded = false }) {
     }
   };
 
+  // Live accounts first; the imported archive (pre-system Excel history) is
+  // filed separately below so a 0.00 card from 2024 never leads the page.
+  const liveAccounts = accounts.filter((a) => !a.archived);
+  const archivedAccounts = accounts.filter((a) => a.archived);
+
   return (
     <div className={embedded ? '' : 'min-h-screen bg-gray-50 py-8'} data-testid="budget-page">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8" dir="rtl">
@@ -319,6 +354,16 @@ function BudgetPage({ embedded = false }) {
               title="ایمیل‌های همگام‌شدهٔ گوگل را می‌خواند و برای هر حسابی که پیدا کند کارت می‌سازد و موجودی را به‌روز می‌کند"
             >
               {scanning ? 'در حال خواندن ایمیل‌ها…' : '🔄 به‌روزرسانی از ایمیل‌ها'}
+            </button>
+            <button
+              type="button"
+              onClick={deepSweep}
+              disabled={sweeping}
+              data-testid="finance-deep-sweep"
+              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              title="تا ۲۴ ماه عقب می‌رود، صورت‌حساب‌ها و پیوست‌های قدیمی را از ایمیل می‌آورد و بعد استخراج می‌کند — دکمهٔ بالایی فقط چیزی را می‌خواند که قبلاً آمده باشد"
+            >
+              {sweeping ? 'در حال آوردنِ تاریخچه…' : '📜 آوردنِ تاریخچهٔ ۲۴ ماه'}
             </button>
             <button
               type="button"
@@ -494,9 +539,35 @@ function BudgetPage({ embedded = false }) {
               هنوز حسابی ثبت نشده است.
             </div>
           ) : (
-            accounts.map((a) => <AccountRow key={a.id} account={a} />)
+            liveAccounts.map((a) => <AccountRow key={a.id} account={a} />)
           )}
         </div>
+
+        {/* آرشیو — imported history (the Excel sheet from before this system
+            existed). Kept in full, but it is not a live account and must not
+            sit above the real ones. */}
+        {archivedAccounts.length > 0 && (
+          <div className="mt-6" data-testid="archived-accounts">
+            <button
+              type="button"
+              data-testid="archived-toggle"
+              onClick={() => setShowArchived((v) => !v)}
+              className="flex w-full items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white px-4 py-2.5 text-sm"
+            >
+              <span className="text-gray-500">
+                آرشیوِ واردشده ({archivedAccounts.length.toLocaleString('fa-IR')}) — دادهٔ قدیمی، پیش از این سیستم
+              </span>
+              <span className="text-xs font-medium text-blue-600">
+                {showArchived ? 'بستن ▲' : 'نمایش ▼'}
+              </span>
+            </button>
+            {showArchived && (
+              <div className="mt-3 space-y-3">
+                {archivedAccounts.map((a) => <AccountRow key={a.id} account={a} />)}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

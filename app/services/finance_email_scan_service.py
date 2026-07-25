@@ -367,6 +367,9 @@ def account_public_extra(acc: FinancialAccount) -> Dict[str, Any]:
         "account_ref": e.get("account_ref"),
         "iban": e.get("iban"),
         "last_email_at": e.get("last_email_at"),
+        # An archived card is history, not a live account (the imported Excel
+        # sheet from before the system existed). Kept in full, filed apart.
+        "archived": bool(e.get("archived")),
     }
 
 

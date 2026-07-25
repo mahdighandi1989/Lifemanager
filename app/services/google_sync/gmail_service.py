@@ -178,6 +178,138 @@ async def fetch_recent(
     return out
 
 
+async def fetch_history(
+    access_token: str,
+    *,
+    query: str,
+    max_messages: int = 800,
+    fetcher: Optional[Callable] = None,
+) -> List[Dict[str, Any]]:
+    """Page through the WHOLE result set of a Gmail query, not just page one.
+
+    The bug this exists to fix (owner, 2026-07-25: «چرا نرفته بقیه صورت‌حساب‌ها
+    رو استخراج کنه»): ``fetch_recent`` asks for ``newer_than:2d`` with
+    ``maxResults=25`` and reads a single page. So ``personal_emails`` only ever
+    held the last two days — every statement older than that was never mirrored,
+    and therefore could never be extracted no matter how often the backfill ran.
+    The backfill was scanning a well that was refilled two days deep.
+
+    Bounded by ``max_messages`` and by Gmail's own paging; never raises past the
+    caller (``sync_gmail_history`` wraps).
+    """
+    from urllib.parse import quote
+
+    fetch = fetcher or _default_fetcher
+    out: List[Dict[str, Any]] = []
+    page_token: Optional[str] = None
+    seen: set = set()
+    while len(out) < max_messages:
+        url = (
+            f"{GMAIL_API}/users/me/messages?maxResults=100&q={quote(query)}"
+            + (f"&pageToken={quote(page_token)}" if page_token else "")
+        )
+        listing = await fetch("GET", url, _headers(access_token)) or {}
+        ids = [m.get("id") for m in (listing.get("messages") or []) if m.get("id")]
+        for mid in ids:
+            if mid in seen or len(out) >= max_messages:
+                continue
+            seen.add(mid)
+            raw = await fetch(
+                "GET",
+                f"{GMAIL_API}/users/me/messages/{mid}?format=metadata"
+                "&metadataHeaders=From&metadataHeaders=Subject",
+                _headers(access_token),
+            )
+            normalized = normalize_message(raw)
+            if normalized:
+                out.append(normalized)
+        page_token = listing.get("nextPageToken")
+        if not page_token or not ids:
+            break
+    return out
+
+
+# The history sweep's queries. Statements arrive as attachments; the rest of the
+# money trail (balance alerts, transfer confirmations) arrives as plain mail.
+HISTORY_QUERIES = (
+    "has:attachment newer_than:{months}m",
+    "(statement OR balance OR transaction OR invoice OR receipt OR "
+    "صورتحساب OR موجودی OR تراکنش OR واریز OR برداشت) newer_than:{months}m",
+)
+
+
+async def sync_gmail_history(
+    db: AsyncSession,
+    *,
+    months: int = 24,
+    max_messages: int = 800,
+    fetcher: Optional[Callable] = None,
+    access_token: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Mirror the mailbox HISTORY (not just the last two days) into
+    ``personal_emails`` so the attachment/finance extractors have something to
+    work with. Idempotent: an already-mirrored message is left alone. Never
+    raises."""
+    token = access_token or await get_access_token(db)
+    if not token:
+        return {"ok": False, "error": "not_connected", "fetched": 0, "new": 0}
+
+    months = max(1, min(int(months or 24), 120))
+    max_messages = max(1, min(int(max_messages or 800), 5000))
+    messages: List[Dict[str, Any]] = []
+    seen: set = set()
+    try:
+        for template in HISTORY_QUERIES:
+            if len(messages) >= max_messages:
+                break
+            batch = await fetch_history(
+                token,
+                query=template.format(months=months),
+                max_messages=max_messages - len(messages),
+                fetcher=fetcher,
+            )
+            for m in batch:
+                if m["id"] not in seen:
+                    seen.add(m["id"])
+                    messages.append(m)
+    except Exception as exc:
+        diagnosis = diagnose_google_error(exc)
+        logger.warning("gmail history sweep failed: %s", diagnosis)
+        return {
+            "ok": False, "error": diagnosis["detail"], "reason": diagnosis["reason"],
+            "fetched": len(messages), "new": 0,
+        }
+
+    new_count = 0
+    try:
+        ids = [m["id"] for m in messages]
+        existing = set()
+        for i in range(0, len(ids), 400):  # keep the IN() clause sane
+            chunk = ids[i:i + 400]
+            existing |= set(
+                (
+                    await db.execute(
+                        select(PersonalEmail.id).where(PersonalEmail.id.in_(chunk))
+                    )
+                ).scalars().all()
+            )
+        for m in messages:
+            if m["id"] not in existing:
+                db.add(PersonalEmail(**m))
+                existing.add(m["id"])
+                new_count += 1
+        await db.commit()
+    except Exception as exc:
+        logger.warning("gmail history persist failed: %r", exc)
+        await db.rollback()
+        return {"ok": False, "error": "persist_failed", "fetched": len(messages), "new": 0}
+
+    return {
+        "ok": True, "fetched": len(messages), "new": new_count,
+        "months": months, "max_messages": max_messages,
+    }
+
+
 async def sync_gmail(
     db: AsyncSession,
     max_results: int = 25,

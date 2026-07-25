@@ -292,6 +292,63 @@ async def backfill_ingest(
     return {"ok": True, "success": True, **res}
 
 
+class _DeepSweepPayload(BaseModel):
+    months: int = Field(default=24, ge=1, le=120)
+    max_messages: int = Field(default=800, ge=1, le=5000)
+
+
+@router.post("/api/inbox/deep-sweep", tags=["inbox"])
+@handle_errors
+async def deep_sweep(
+    payload: _DeepSweepPayload = Body(default=_DeepSweepPayload()),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """«برو همهٔ صورت‌حساب‌ها را از اول بیاور» — the history sweep.
+
+    The reason the finance page only ever knew a handful of movements: the
+    Gmail mirror fetched `newer_than:2d` (one page, 25 messages), so a
+    statement older than two days was never in the database at all, and the
+    backfill — which only reads ALREADY-mirrored mail — had nothing to find.
+
+    This endpoint fixes the order of operations: mirror the mailbox history
+    FIRST (paged, months back), then run the attachment extraction and the
+    finance scan over it. Idempotent at every stage; safe to re-run.
+    """
+    from app.services import finance_email_scan_service as fs
+    from app.services.google_sync import gmail_service
+    from app.services.ingest.email_ingest import backfill_attachments
+
+    mirror = await gmail_service.sync_gmail_history(
+        db, months=payload.months, max_messages=payload.max_messages
+    )
+    out: Dict[str, Any] = {
+        "mirrored_new": mirror.get("new", 0),
+        "mirrored_seen": mirror.get("fetched", 0),
+        "months": payload.months,
+    }
+    if not mirror.get("ok"):
+        # Not connected / API error: say so plainly instead of reporting «۰ تازه»
+        # as if the mailbox were empty.
+        out["ok"] = False
+        out["success"] = False
+        out["error"] = mirror.get("error")
+        out["reason"] = mirror.get("reason")
+        return out
+
+    att = await backfill_attachments(db, user_id=user_id, limit=max(400, payload.max_messages))
+    out["attachments_scanned"] = att.get("scanned", 0)
+    out["attachment_candidates"] = att.get("proposed", 0)
+    out["locked_files"] = att.get("needs_password", 0)
+
+    scan = await fs.scan_finance_emails(db, user_id)
+    out["accounts_created"] = scan.get("created", 0)
+    out["accounts_updated"] = scan.get("updated", 0)
+    out["emails_scanned"] = scan.get("scanned", 0)
+    return {"ok": True, "success": True, **out}
+
+
 @router.post("/api/inbox/retry-unreadable", tags=["inbox"])
 @handle_errors
 async def retry_unreadable_notes(

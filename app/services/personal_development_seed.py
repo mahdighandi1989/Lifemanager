@@ -15,6 +15,7 @@ every boot (Render free tier) — repeats are no-ops.
 """
 from __future__ import annotations
 
+import json
 import logging
 from datetime import date, datetime, timezone
 
@@ -70,16 +71,36 @@ async def _seed_lists(db: AsyncSession) -> dict:
     return {"lists_added": lists_added, "items_added": items_added}
 
 
+def _archive_extra() -> str:
+    """This card is HISTORY, not a live account (owner, 2026-07-25: «اون فایل
+    اکسل برای زمانی بود که من این سیستم رو نداشتم»). The rows stay — they are
+    his real 2024 spending — but the card is flagged so «مالی» files it under
+    «آرشیو» instead of showing a 0.00 account above the live ones."""
+    return json.dumps(
+        {"archived": True, "source": "excel_archive", "inferred": False},
+        ensure_ascii=False,
+    )
+
+
 async def _seed_finance(db: AsyncSession) -> dict:
     existing = (await db.execute(
         select(FinancialAccount).where(FinancialAccount.name == PD_ACCOUNT_NAME)
     )).scalars().first()
     if existing is not None:
+        # Idempotent back-fill for a card seeded before the flag existed.
+        try:
+            extra = json.loads(existing.extra) if existing.extra else {}
+        except Exception:
+            extra = {}
+        if not extra.get("archived"):
+            extra.update({"archived": True, "source": "excel_archive"})
+            existing.extra = json.dumps(extra, ensure_ascii=False)
+            return {"account_added": 0, "transactions_added": 0, "archived_marked": 1}
         return {"account_added": 0, "transactions_added": 0}
 
     account = FinancialAccount(
         name=PD_ACCOUNT_NAME, kind="bank", institution="آرشیو اکسل توسعه فردی",
-        currency=PD_ACCOUNT_CURRENCY, balance=0,
+        currency=PD_ACCOUNT_CURRENCY, balance=0, extra=_archive_extra(),
     )
     db.add(account)
     await db.flush()

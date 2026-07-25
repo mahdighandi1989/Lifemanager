@@ -100,6 +100,9 @@ class FinancialAccountResponse(BaseModel):
     # ریزِ گردش (2026-07-25): how many per-transaction statement lines this card
     # has, so the UI can offer «ریزِ گردش» only when there is something to show.
     txn_count: int = 0
+    # آرشیو (2026-07-25): imported history (the pre-system Excel sheet), shown
+    # in its own collapsed group rather than among the live accounts.
+    archived: bool = False
 
 
 # ── Income ──────────────────────────────────────────────────────────
@@ -258,6 +261,7 @@ async def list_financial_accounts(
             last_email_at=pub["last_email_at"], updated_at=a.updated_at,
             movements=await account_movements(db, a.id),
             txn_count=int(count),
+            archived=pub.get("archived", False),
         ))
     return out
 
