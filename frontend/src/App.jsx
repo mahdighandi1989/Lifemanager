@@ -33,6 +33,7 @@ import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
 import Notifications from './pages/Notifications';
 import ProjectsHub from './pages/ProjectsHub';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 import DevCenter from './pages/DevCenter';
 import Register from './pages/Register';
 import Tasks from './pages/Tasks';
@@ -101,6 +102,17 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ProjectsHub />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              {/* صفحهٔ یک پروژه (2026-07-25): «پروژه‌های من» جایی برای رفتن نداشت */}
+              <Route
+                path="/projects/:id"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <ProjectDetailPage />
                     </Layout>
                   </ProtectedRoute>
                 }

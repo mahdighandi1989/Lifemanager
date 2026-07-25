@@ -118,6 +118,46 @@ async def get_project(
     return _serialize(project)
 
 
+@router.get("/api/projects/{project_id}/tasks", tags=["projects"])
+@handle_errors
+async def project_tasks_list(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """کارهای این پروژه — the read side a project page needs to be a real
+    container for work (2026-07-25 survey: «پروژه‌های من» showed only a name
+    and a description). Mirrors /api/persons/{id}/tasks; merged-away rows are
+    hidden the same way the task list hides them.
+    """
+    from app.models.task import Task
+
+    project = await db.get(Project, project_id)
+    if project is None or (project.user_id is not None and project.user_id != user_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    rows = (
+        await db.execute(
+            select(Task)
+            .where(Task.project_id == project_id, Task.merged_into_id.is_(None))
+            .order_by(Task.id.desc())
+        )
+    ).scalars().all()
+    return {
+        "ok": True,
+        "success": True,
+        "project_id": project_id,
+        "tasks": [
+            {
+                "id": t.id,
+                "title": t.title,
+                "status": t.status.value if t.status else None,
+                "due_date": t.due_date.isoformat() if t.due_date else None,
+            }
+            for t in rows
+        ],
+    }
+
+
 # --- CREATE -----------------------------------------------------------------
 
 @router.post("/api/projects", status_code=status.HTTP_201_CREATED, tags=["projects"])

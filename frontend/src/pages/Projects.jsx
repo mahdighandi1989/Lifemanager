@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import SahatChip from '../components/SahatChip';
 
 // All project data lives under /api/projects. The bare /projects path is
@@ -43,7 +44,14 @@ function ProjectCard({ project, onDelete }) {
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{project.name || project.title}</h3>
+            {/* هر پروژه حالا صفحهٔ خودش را دارد (۲۰۲۶-۰۷-۲۵): ظرفِ کارها، نه فقط یک نام */}
+            <Link
+              to={`/projects/${project.id}`}
+              data-testid={`project-open-${project.id}`}
+              className="font-semibold text-gray-900 hover:text-blue-600"
+            >
+              {project.name || project.title}
+            </Link>
             {project.description && (
               <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{project.description}</p>
             )}

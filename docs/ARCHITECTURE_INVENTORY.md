@@ -28,6 +28,7 @@ notifications / users surfaces).
 | GET | `/api/tasks/search` | `app/routes/tasks.py` |
 | GET / POST | `/api/projects` | `app/routes/projects.py` |
 | GET / PUT / PATCH / DELETE | `/api/projects/{project_id}` | `app/routes/projects.py` |
+| GET | `/api/projects/{project_id}/tasks` | `app/routes/projects.py` |
 | POST | `/api/planner/generate` | `app/routes/planner.py` |
 | POST | `/auth/register` | `app/routes/auth.py` |
 | POST | `/auth/login` | `app/routes/auth.py` |
@@ -90,7 +91,8 @@ declared in `frontend/src/App.jsx`.
 * `Settings.jsx` — global settings.
 * `DevCenter.jsx` — «مرکز توسعه»: GitHub repos + Render services, live log
   viewer, log stats, Persian daily summaries, token settings (`/dev-center`;
-  overview also embedded as the «پروژه‌های توسعه» tab in `ProjectsHub.jsx`).
+  overview; the duplicate «پروژه‌های توسعه» tab in `ProjectsHub.jsx` was
+  retired 2026-07-25 — the hub links here instead).
 
 (See the dir listing for the full set; the SPA catch-all in
 `app/main.py` serves `index.html` for any non-API path.)

@@ -1639,6 +1639,10 @@
         "file": "frontend/src/pages/PersonalityProfilePage.jsx"
       },
       {
+        "name": "ProjectDetailPage",
+        "file": "frontend/src/pages/ProjectDetailPage.jsx"
+      },
+      {
         "name": "Projects",
         "file": "frontend/src/pages/Projects.jsx"
       },

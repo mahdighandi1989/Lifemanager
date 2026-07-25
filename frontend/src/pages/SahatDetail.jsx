@@ -234,7 +234,7 @@ function CellBlock({ s, onThreadsChanged }) {
         {(d.projects || []).length > 0 && (
           <Section title={`پروژه‌ها (${d.projects.length}):`}>
             {d.projects.map((p) => (
-              <Link key={p.id} to="/projects" className="block truncate rounded-md px-2 py-1 text-xs text-gray-700 hover:bg-gray-50">
+              <Link key={p.id} to={`/projects/${p.id}`} className="block truncate rounded-md px-2 py-1 text-xs text-gray-700 hover:bg-gray-50">
                 📁 {p.name}
               </Link>
             ))}

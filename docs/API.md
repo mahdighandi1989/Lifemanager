@@ -145,6 +145,7 @@ pointing at `users.id`).
 | GET | `/api/projects/{project_id}` | One |
 | PUT | `/api/projects/{project_id}` | Update |
 | DELETE | `/api/projects/{project_id}` | Delete |
+| GET | `/api/projects/{project_id}/tasks` | کارهای این پروژه — the read side the project page needs (merged-away rows hidden). UI: `ProjectDetailPage` (`/projects/:id`). |
 
 ### Auth (`/auth`)
 
