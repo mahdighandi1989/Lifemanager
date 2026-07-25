@@ -370,6 +370,61 @@ def account_public_extra(acc: FinancialAccount) -> Dict[str, Any]:
     }
 
 
+async def record_statement_lines(
+    db: AsyncSession,
+    account: FinancialAccount,
+    rows: List[Dict[str, Any]],
+    *,
+    source: str = "attachment",
+) -> Dict[str, Any]:
+    """ریزِ گردش — persist parsed statement movements as real Transactions.
+
+    Deduped on the CONTENT hash (``statement_lines.line_ref``), not on the file:
+    the same movement arriving again in an overlapping statement, or in a
+    re-upload of the same PDF, is recognised and skipped. Returns
+    {added, skipped}. The caller commits.
+    """
+    from datetime import date as _date
+
+    from app.services.ingest.statement_lines import line_ref
+
+    if not rows or account is None or account.id is None:
+        return {"added": 0, "skipped": 0}
+
+    refs = [line_ref(account.id, r) for r in rows]
+    existing = set(
+        (
+            await db.execute(
+                select(Transaction.source_ref).where(Transaction.source_ref.in_(refs))
+            )
+        ).scalars().all()
+    )
+    added = skipped = 0
+    for row, ref in zip(rows, refs):
+        if ref in existing:
+            skipped += 1
+            continue
+        existing.add(ref)  # a statement may repeat an identical line twice
+        txn = Transaction(
+            account_id=account.id,
+            amount=_to_decimal(row.get("amount")) or Decimal(0),
+            transaction_type=("expense" if row.get("direction") == "out" else "income"),
+            description=(row.get("description") or "تراکنش")[:255],
+            currency=(row.get("currency") or account.currency),
+            source=source,
+            source_ref=ref,
+        )
+        try:
+            d = row.get("date")
+            if d:
+                txn.occurred_on = _date.fromisoformat(str(d)[:10])
+        except Exception:
+            pass
+        db.add(txn)
+        added += 1
+    return {"added": added, "skipped": skipped}
+
+
 async def account_movements(
     db: AsyncSession, account_id: int, limit: int = 5
 ) -> List[Dict[str, Any]]:

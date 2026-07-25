@@ -58,24 +58,74 @@ function AccountCard({ account }) {
   );
 }
 
+// One movement line — shared by the card preview and the full ledger.
+function MovementLine({ m }) {
+  return (
+    <p className="flex items-center justify-between gap-2 text-[11px] text-gray-600">
+      <span className="truncate">
+        {m.date ? m.date : '—'} · {m.description || (m.source === 'attachment' ? 'از فایل' : 'از ایمیل')}
+      </span>
+      <span className={m.type === 'expense' ? 'text-red-600' : 'text-green-700'} dir="ltr">
+        {m.type === 'expense' ? '−' : '+'}{Number(m.amount || 0).toLocaleString('fa-IR')} {m.currency || ''}
+      </span>
+    </p>
+  );
+}
+
 function AccountRow({ account }) {
   const movements = account.movements || [];
+  // ریزِ گردش (2026-07-25): the card previews the last few movements; the full
+  // ledger is one click away and loads on demand — «از این حساب چه چیزی در
+  // فلان تاریخ کم شده» finally has a complete answer.
+  const [ledger, setLedger] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [loadingLedger, setLoadingLedger] = useState(false);
+  const total = account.txn_count || 0;
+
+  const toggle = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    setOpen(true);
+    if (ledger === null && !loadingLedger) {
+      setLoadingLedger(true);
+      api
+        .get(`/finance/accounts/${account.id}/transactions`)
+        .then((res) => setLedger(Array.isArray(res.data?.transactions) ? res.data.transactions : []))
+        .catch(() => setLedger([]))
+        .finally(() => setLoadingLedger(false));
+    }
+  };
+
   return (
     <div className="space-y-1">
       <AccountCard account={account} />
       {movements.length > 0 && (
         <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 space-y-0.5" dir="rtl">
-          <p className="text-[11px] font-medium text-gray-500">آخرین تغییرها:</p>
-          {movements.map((m, i) => (
-            <p key={i} className="flex items-center justify-between gap-2 text-[11px] text-gray-600">
-              <span className="truncate">
-                {m.date ? m.date : '—'} · {m.description || (m.source === 'attachment' ? 'از فایل' : 'از ایمیل')}
-              </span>
-              <span className={m.type === 'expense' ? 'text-red-600' : 'text-green-700'} dir="ltr">
-                {m.type === 'expense' ? '−' : '+'}{Number(m.amount || 0).toLocaleString('fa-IR')} {m.currency || ''}
-              </span>
-            </p>
-          ))}
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] font-medium text-gray-500">آخرین تغییرها:</p>
+            {total > movements.length && (
+              <button
+                type="button"
+                data-testid={`account-ledger-toggle-${account.id}`}
+                onClick={toggle}
+                className="text-[11px] text-blue-600 hover:underline"
+              >
+                {open ? 'بستن' : `ریزِ گردش (${total.toLocaleString('fa-IR')})`}
+              </button>
+            )}
+          </div>
+          {!open && movements.map((m, i) => <MovementLine key={i} m={m} />)}
+          {open && (
+            <div data-testid={`account-ledger-${account.id}`} className="max-h-64 overflow-y-auto space-y-0.5">
+              {loadingLedger && <p className="text-[11px] text-gray-400">در حال بارگذاری…</p>}
+              {ledger && ledger.length === 0 && !loadingLedger && (
+                <p className="text-[11px] text-gray-400">تراکنشی ثبت نشده</p>
+              )}
+              {(ledger || []).map((m) => <MovementLine key={m.id} m={m} />)}
+            </div>
+          )}
         </div>
       )}
     </div>

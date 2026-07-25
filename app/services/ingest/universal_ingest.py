@@ -168,11 +168,16 @@ async def _classify_text(db: AsyncSession, text: str, filename: str) -> Optional
 async def _feed_finance(
     db: AsyncSession, *, fields: Dict[str, Any], sender: Optional[str],
     filename: str, source_ref: str, user_id: int, det: Optional[Dict[str, Any]],
-    occurred_iso: Optional[str] = None,
-) -> None:
+    occurred_iso: Optional[str] = None, text: Optional[str] = None,
+) -> int:
     """A statement/finance file also flows straight into «مالی» — create/update
     the account card, deduped, without waiting for a manual «file» click. Uses
-    the SAME identity engine as the email scan so the two never double-up."""
+    the SAME identity engine as the email scan so the two never double-up.
+
+    Returns how many per-transaction statement lines were recorded (0 when the
+    file carries none). «از این حساب چه چیزی در فلان تاریخ کم شد» is answered
+    here: the closing balance alone was never enough.
+    """
     try:
         from app.services import finance_email_scan_service as fs
 
@@ -188,18 +193,41 @@ async def _feed_finance(
         currency = fields.get("currency") or (det or {}).get("currency")
         kind = str(fields.get("account_kind") or fields.get("kind") or "bank")
         if institution is None and not ref and not iban:
-            return
+            return 0
         # occurred_iso = the source email's date, so the «only a newer signal
         # moves the balance» guard actually arms (parse_finance_fields carries
         # no date; without this an OLDER statement could overwrite a newer one).
-        await fs.apply_account_signal(
+        res = await fs.apply_account_signal(
             db, user_id, institution=institution, account_ref=ref, iban=iban,
             balance=balance, currency=currency, kind=kind, source="attachment",
             source_ref=source_ref, occurred_iso=(occurred_iso or (det or {}).get("date") or fields.get("date")),
             provider_name=provider,
         )
+        # ریزِ گردش: the per-transaction lines, attached to the card the signal
+        # resolved to. Only ever recorded against a REAL card — parsed lines
+        # with nowhere to live are dropped rather than orphaned.
+        account_id = res.get("account_id")
+        if not account_id or not text:
+            return 0
+        from app.models.finance import FinancialAccount
+        from app.services.ingest.statement_lines import parse_statement_lines
+
+        rows = parse_statement_lines(text, currency=currency)
+        if not rows:
+            return 0
+        acc = await db.get(FinancialAccount, account_id)
+        if acc is None:
+            return 0
+        stats = await fs.record_statement_lines(db, acc, rows, source="attachment")
+        if stats["added"]:
+            logger.info(
+                "statement lines recorded: %s added, %s already known (%s)",
+                stats["added"], stats["skipped"], source_ref,
+            )
+        return int(stats["added"])
     except Exception as exc:
         logger.debug("attachment→finance feed skipped (%s): %r", source_ref, exc)
+        return 0
 
 
 async def extract_from_file(
@@ -284,14 +312,18 @@ async def extract_from_file(
             user_id=user_id, ai_model=ai_model,
         )
         # a statement also self-feeds «مالی» (no manual click needed).
+        lines_added = 0
         if suggested == "finance_account" or det_finance:
             merged = {**(det_finance or {}), **fields}
-            await _feed_finance(
+            lines_added = await _feed_finance(
                 db, fields=merged, sender=sender, filename=filename,
                 source_ref=source_ref, user_id=user_id, det=det_finance,
-                occurred_iso=occurred_iso,
+                occurred_iso=occurred_iso, text=text,
             )
-        return {"status": "proposed", "kind": suggested}
+        out = {"status": "proposed", "kind": suggested}
+        if lines_added:
+            out["statement_lines"] = lines_added
+        return out
     except Exception as exc:
         logger.debug("universal extract skipped (%s): %r", source_ref, exc)
         return {"status": "error"}

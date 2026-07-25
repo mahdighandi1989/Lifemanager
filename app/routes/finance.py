@@ -97,6 +97,9 @@ class FinancialAccountResponse(BaseModel):
     updated_at: Optional[datetime] = None
     # «از این حساب چه چیزی در فلان تاریخ کم شد» — the recorded movements.
     movements: List[dict] = []
+    # ریزِ گردش (2026-07-25): how many per-transaction statement lines this card
+    # has, so the UI can offer «ریزِ گردش» only when there is something to show.
+    txn_count: int = 0
 
 
 # ── Income ──────────────────────────────────────────────────────────
@@ -237,9 +240,16 @@ async def list_financial_accounts(
 
     from app.services.finance_email_scan_service import account_movements
 
+    from sqlalchemy import func as _f
+
     out: List[FinancialAccountResponse] = []
     for a in result.scalars().all():
         pub = account_public_extra(a)
+        count = (
+            await db.execute(
+                select(_f.count(Transaction.id)).where(Transaction.account_id == a.id)
+            )
+        ).scalar() or 0
         out.append(FinancialAccountResponse(
             id=a.id, user_id=a.user_id, name=a.name, kind=a.kind,
             institution=a.institution, currency=a.currency, balance=a.balance,
@@ -247,8 +257,65 @@ async def list_financial_accounts(
             account_ref=pub["account_ref"], iban=pub["iban"],
             last_email_at=pub["last_email_at"], updated_at=a.updated_at,
             movements=await account_movements(db, a.id),
+            txn_count=int(count),
         ))
     return out
+
+
+@router.get("/api/finance/accounts/{account_id}/transactions")
+@handle_errors
+async def account_transactions(
+    account_id: int,
+    limit: int = 200,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """ریزِ گردشِ یک حساب — every recorded movement, newest first.
+
+    This is the read side of the statement-line extraction: «از این حساب چه
+    چیزی در فلان تاریخ کم شده» answered per transaction, not just as a closing
+    balance. Same NULL-inclusive scope as the account list (job-created rows
+    carry a NULL owner).
+    """
+    from app.services.inbox_service import scope_filter
+
+    acc = (
+        await db.execute(
+            select(FinancialAccount).where(
+                FinancialAccount.id == account_id,
+                scope_filter(FinancialAccount.user_id, user_id),
+            )
+        )
+    ).scalars().first()
+    if acc is None:
+        raise HTTPException(status_code=404, detail="Account not found")
+    rows = (
+        await db.execute(
+            select(Transaction)
+            .where(Transaction.account_id == account_id)
+            .order_by(Transaction.occurred_on.desc().nullslast(), Transaction.id.desc())
+            .limit(max(1, min(int(limit or 200), 1000)))
+        )
+    ).scalars().all()
+    return {
+        "ok": True,
+        "success": True,
+        "account_id": account_id,
+        "account_name": acc.name,
+        "currency": acc.currency,
+        "transactions": [
+            {
+                "id": t.id,
+                "date": t.occurred_on.isoformat() if t.occurred_on else None,
+                "description": t.description,
+                "amount": float(t.amount or 0),
+                "type": t.transaction_type,
+                "currency": t.currency or acc.currency,
+                "source": t.source,
+            }
+            for t in rows
+        ],
+    }
 
 
 # ── Per-kind endpoint aliases (audit task 4ae4b3ca ACs 16, 17, 22) ──
