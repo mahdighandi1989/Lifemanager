@@ -95,6 +95,8 @@ class FinancialAccountResponse(BaseModel):
     iban: Optional[str] = None
     last_email_at: Optional[str] = None
     updated_at: Optional[datetime] = None
+    # «از این حساب چه چیزی در فلان تاریخ کم شد» — the recorded movements.
+    movements: List[dict] = []
 
 
 # ── Income ──────────────────────────────────────────────────────────
@@ -233,6 +235,8 @@ async def list_financial_accounts(
     result = await db.execute(stmt)
     from app.services.finance_email_scan_service import account_public_extra
 
+    from app.services.finance_email_scan_service import account_movements
+
     out: List[FinancialAccountResponse] = []
     for a in result.scalars().all():
         pub = account_public_extra(a)
@@ -242,6 +246,7 @@ async def list_financial_accounts(
             source=pub["source"], inferred=pub["inferred"],
             account_ref=pub["account_ref"], iban=pub["iban"],
             last_email_at=pub["last_email_at"], updated_at=a.updated_at,
+            movements=await account_movements(db, a.id),
         ))
     return out
 
@@ -540,6 +545,22 @@ async def scan_finance_emails_endpoint(
 
     summary = await scan_finance_emails(db, user_id)
     return {"ok": True, "success": True, **summary}
+
+
+@router.post("/api/finance/cleanup-auto-cards", tags=["finance"])
+@handle_errors
+async def cleanup_auto_cards(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """پاک‌سازیِ کارت‌های اشتباهِ خودکار — remove machine-created cards that were
+    never real accounts (no balance, no movement). Cards the owner typed, and any
+    card with a real balance or history, are never touched."""
+    from app.services.finance_email_scan_service import cleanup_inferred_junk
+
+    res = await cleanup_inferred_junk(db, user_id)
+    return {"ok": True, "success": True, **res}
 
 
 @router.get("/api/finance/affordable-tasks", tags=["finance"])

@@ -58,6 +58,30 @@ function AccountCard({ account }) {
   );
 }
 
+function AccountRow({ account }) {
+  const movements = account.movements || [];
+  return (
+    <div className="space-y-1">
+      <AccountCard account={account} />
+      {movements.length > 0 && (
+        <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 space-y-0.5" dir="rtl">
+          <p className="text-[11px] font-medium text-gray-500">آخرین تغییرها:</p>
+          {movements.map((m, i) => (
+            <p key={i} className="flex items-center justify-between gap-2 text-[11px] text-gray-600">
+              <span className="truncate">
+                {m.date ? m.date : '—'} · {m.description || (m.source === 'attachment' ? 'از فایل' : 'از ایمیل')}
+              </span>
+              <span className={m.type === 'expense' ? 'text-red-600' : 'text-green-700'} dir="ltr">
+                {m.type === 'expense' ? '−' : '+'}{Number(m.amount || 0).toLocaleString('fa-IR')} {m.currency || ''}
+              </span>
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BudgetPage({ embedded = false }) {
   const [accounts, setAccounts] = useState([]);
   // Per-currency totals from the server (audit #20). null → endpoint not
@@ -82,6 +106,7 @@ function BudgetPage({ embedded = false }) {
   // مالیِ خودتغذیه — pull accounts/balances out of the synced Gmail.
   const [scanning, setScanning] = useState(false);
   const [scanMsg, setScanMsg] = useState(null);
+  const [cleaning, setCleaning] = useState(false);
 
   const loadAccounts = useCallback(() => {
     setLoading(true);
@@ -135,6 +160,25 @@ function BudgetPage({ embedded = false }) {
       setScanMsg('اسکنِ ایمیل‌ها ناموفق بود — شاید گوگل هنوز وصل نیست.');
     } finally {
       setScanning(false);
+    }
+  };
+
+  const cleanupCards = async () => {
+    setCleaning(true);
+    setScanMsg(null);
+    try {
+      const res = await api.post('/finance/cleanup-auto-cards');
+      const d = res.data || {};
+      setScanMsg(
+        d.removed
+          ? `${d.removed} کارتِ اشتباهِ خودکار پاک شد (بدونِ موجودی و بدونِ تغییر).`
+          : 'کارتِ اشتباهی برای پاک‌کردن نبود.',
+      );
+      loadAccounts();
+    } catch {
+      setScanMsg('پاک‌سازی ناموفق بود.');
+    } finally {
+      setCleaning(false);
     }
   };
 
@@ -215,16 +259,28 @@ function BudgetPage({ embedded = false }) {
             <h1 className="text-3xl font-bold text-gray-900 mb-1">برنامه و بودجه</h1>
             <p className="text-gray-500">حساب‌های مالی شما و موجودی به تفکیک ارز.</p>
           </div>
-          <button
-            type="button"
-            onClick={scanEmails}
-            disabled={scanning}
-            data-testid="finance-scan-emails"
-            className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-            title="ایمیل‌های همگام‌شدهٔ گوگل را می‌خواند و برای هر حسابی که پیدا کند کارت می‌سازد و موجودی را به‌روز می‌کند"
-          >
-            {scanning ? 'در حال خواندن ایمیل‌ها…' : '🔄 به‌روزرسانی از ایمیل‌ها'}
-          </button>
+          <div className="flex shrink-0 flex-col gap-2">
+            <button
+              type="button"
+              onClick={scanEmails}
+              disabled={scanning}
+              data-testid="finance-scan-emails"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              title="ایمیل‌های همگام‌شدهٔ گوگل را می‌خواند و برای هر حسابی که پیدا کند کارت می‌سازد و موجودی را به‌روز می‌کند"
+            >
+              {scanning ? 'در حال خواندن ایمیل‌ها…' : '🔄 به‌روزرسانی از ایمیل‌ها'}
+            </button>
+            <button
+              type="button"
+              onClick={cleanupCards}
+              disabled={cleaning}
+              data-testid="finance-cleanup-cards"
+              className="rounded-lg border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+              title="کارت‌هایی که ماشین اشتباه ساخته (بدونِ موجودی و بدونِ هیچ تغییری) پاک می‌شوند — کارت‌های خودت دست نمی‌خورند"
+            >
+              {cleaning ? 'در حال پاک‌سازی…' : '🧹 پاک‌سازیِ کارت‌های اشتباه'}
+            </button>
+          </div>
         </div>
         {scanMsg && (
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 p-3 text-sm text-blue-700" dir="rtl">
@@ -388,7 +444,7 @@ function BudgetPage({ embedded = false }) {
               هنوز حسابی ثبت نشده است.
             </div>
           ) : (
-            accounts.map((a) => <AccountCard key={a.id} account={a} />)
+            accounts.map((a) => <AccountRow key={a.id} account={a} />)
           )}
         </div>
       </div>

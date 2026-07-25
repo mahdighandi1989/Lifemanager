@@ -97,3 +97,74 @@ def test_accounts_list_exposes_email_provenance(api_client):
                     json={"name": "دستی", "kind": "bank", "balance": 10, "currency": "USD"})
     rows = api_client.get("/api/finance/accounts").json()
     assert rows and rows[0]["source"] is None and rows[0]["inferred"] is None
+
+
+# ── precision: the owner's finance page filled with junk cards ───────────────
+
+@pytest.mark.asyncio
+async def test_personal_mailbox_never_opens_an_account(db_session):
+    """«جریدة الفجر» — a newspaper's invoice from a gmail address became a bank
+    card. A personal/free mailbox is never an institution."""
+    assert fs._institution("news@gmail.com", "Invoice") is None
+    assert fs._institution("someone@yahoo.co.uk", "x") is None
+    # a real institution domain still resolves
+    assert fs._institution("alerts@mbankuae.com", "Balance") == "mbankuae"
+
+
+@pytest.mark.asyncio
+async def test_iban_alone_does_not_create_a_card(db_session):
+    """An invoice carries the SENDER's IBAN for payment — that is their account,
+    not the owner's. Only a real, non-zero balance opens a card."""
+    r = await fs.apply_account_signal(
+        db_session, 0, institution="alfajrnews", iban="AE090260751208000088113",
+        balance=None, source="email", source_ref="email:inv1",
+    )
+    await db_session.commit()
+    assert r["account_id"] is None
+    assert (await db_session.execute(select(FinancialAccount))).scalars().first() is None
+
+    # a zero balance is not a signal either
+    r2 = await fs.apply_account_signal(
+        db_session, 0, institution="somebank", account_ref="••4572",
+        balance=0, source="email", source_ref="email:z1",
+    )
+    assert r2["account_id"] is None
+
+
+@pytest.mark.asyncio
+async def test_cleanup_removes_only_machine_junk(db_session):
+    """Cleanup deletes machine-created cards with no balance AND no movement —
+    never the owner's own rows, never a card with real history."""
+    import json as _json
+
+    owner = FinancialAccount(user_id=None, name="حسابِ خودم", kind="bank",
+                             currency="AED", balance=0)  # owner-typed, zero balance
+    junk = FinancialAccount(user_id=None, name="جریدة الفجر", kind="bank",
+                            currency="USD", balance=0,
+                            extra=_json.dumps({"inferred": True, "source": "email"}))
+    real = FinancialAccount(user_id=None, name="bsi ••4006", kind="bank",
+                            currency="AED", balance=15636.22,
+                            extra=_json.dumps({"inferred": True, "source": "email"}))
+    db_session.add_all([owner, junk, real])
+    await db_session.commit()
+
+    res = await fs.cleanup_inferred_junk(db_session, 0)
+    assert res["removed"] == 1 and "جریدة الفجر" in res["names"]
+    names = {a.name for a in (await db_session.execute(select(FinancialAccount))).scalars().all()}
+    assert names == {"حسابِ خودم", "bsi ••4006"}
+
+
+@pytest.mark.asyncio
+async def test_movements_are_reported_per_account(db_session):
+    """«از این حساب چه چیزی در فلان تاریخ کم شد» — the card carries its recorded
+    movements, not just a bare total."""
+    await fs.apply_account_signal(
+        db_session, 0, institution="mbankuae", account_ref="••4006",
+        balance=15636.22, currency="AED", source="email", source_ref="email:m1",
+        occurred_iso="2026-07-20T00:00:00",
+    )
+    await db_session.commit()
+    acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    moves = await fs.account_movements(db_session, acc.id)
+    assert moves and moves[0]["amount"] == 15636.22
+    assert moves[0]["date"] == "2026-07-20" and moves[0]["currency"] == "AED"

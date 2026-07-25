@@ -67,13 +67,26 @@ def _addr_domain(from_addr: Optional[str]) -> Optional[str]:
     return m.group(1).lower()
 
 
+# A personal mailbox is NEVER a financial institution. The owner's finance page
+# filled up with junk («جریدة الفجر» — a newspaper's invoice IBAN became a bank
+# card) because any sender domain was accepted as an institution. Free-mail and
+# obvious non-financial senders can never open an account card.
+_FREE_MAIL = {
+    "gmail", "googlemail", "yahoo", "ymail", "hotmail", "outlook", "live", "msn",
+    "icloud", "me", "aol", "proton", "protonmail", "zoho", "mail", "gmx", "yandex",
+}
+
+
 def _institution(from_addr: Optional[str], subject: Optional[str]) -> Optional[str]:
     """A short, stable institution label from the sender domain (its most
-    distinctive segment), else None."""
+    distinctive segment), else None. Returns None for personal/free mailboxes —
+    a message from a gmail address is not a bank statement."""
     dom = _addr_domain(from_addr)
     if not dom:
         return None
     dom = _TLD.sub("", dom)
+    if any(p in _FREE_MAIL for p in dom.split(".")):
+        return None
     parts = [p for p in dom.split(".") if p and p not in ("mail", "email", "e", "notifications", "alerts", "no-reply", "noreply", "info")]
     if not parts:
         return None
@@ -190,10 +203,13 @@ async def apply_account_signal(
     acc = await _match_account(db, uid, institution, account_ref, source_ref=source_ref)
     created = updated = 0
     if acc is None:
-        # Don't CREATE a phantom card from a bare masked ref alone (a receipt
-        # says «paid with card ending 4321» — that's a purchase, not an account).
-        # A new card needs a real balance or an IBAN.
-        if bal is None and not iban:
+        # PRECISION over recall (the owner's finance page filled with junk):
+        # opening a NEW card needs a real, non-zero BALANCE from a real
+        # institution. An IBAN alone is not enough — an invoice from a
+        # newspaper carries the SENDER's IBAN for payment, which is their
+        # account, not the owner's. A bare masked ref («paid with card ending
+        # 4321») is a purchase, not an account either.
+        if bal is None or bal == 0 or not institution:
             return {"created": 0, "updated": 0, "account_id": None}
         extra = {
             "source": source, "inferred": True, "account_ref": account_ref,
@@ -352,3 +368,62 @@ def account_public_extra(acc: FinancialAccount) -> Dict[str, Any]:
         "iban": e.get("iban"),
         "last_email_at": e.get("last_email_at"),
     }
+
+
+async def account_movements(
+    db: AsyncSession, account_id: int, limit: int = 5
+) -> List[Dict[str, Any]]:
+    """The last few balance movements on a card — «از این حساب چه چیزی در فلان
+    تاریخ کم شد». Reads the Transactions the scan already records, newest first."""
+    rows = (
+        await db.execute(
+            select(Transaction)
+            .where(Transaction.account_id == account_id)
+            .order_by(Transaction.id.desc())
+            .limit(limit)
+        )
+    ).scalars().all()
+    out: List[Dict[str, Any]] = []
+    for t in rows:
+        out.append({
+            "amount": float(t.amount or 0),
+            "type": t.transaction_type,
+            "currency": t.currency,
+            "date": t.occurred_on.isoformat() if t.occurred_on else None,
+            "description": t.description,
+            "source": t.source,
+        })
+    return out
+
+
+async def cleanup_inferred_junk(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
+    """Remove the machine-created cards that were never real accounts.
+
+    The aggressive first version opened a card for anything with an IBAN or a
+    masked ref — a newspaper's invoice, a receipt's card tail — leaving a page
+    full of «0.00» rows. This removes ONLY rows the machine itself created
+    (``extra.inferred``) that carry NO balance and NO recorded movement. Rows the
+    owner typed, or any card with a real balance/history, are never touched."""
+    from sqlalchemy import func as _f
+
+    removed: List[str] = []
+    accounts = (
+        await db.execute(select(FinancialAccount).where(_scope(FinancialAccount.user_id, uid)))
+    ).scalars().all()
+    for a in accounts:
+        e = _extra(a)
+        if not e.get("inferred"):
+            continue  # owner-created — never touched
+        if (_to_decimal(a.balance) or Decimal(0)) != 0:
+            continue  # has a real balance — keep
+        n_txn = (
+            await db.execute(
+                select(_f.count()).select_from(Transaction).where(Transaction.account_id == a.id)
+            )
+        ).scalar() or 0
+        if n_txn:
+            continue  # has history — keep
+        removed.append(a.name)
+        await db.delete(a)
+    await db.commit()
+    return {"removed": len(removed), "names": removed[:20]}
