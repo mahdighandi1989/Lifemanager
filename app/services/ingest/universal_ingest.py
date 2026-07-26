@@ -267,7 +267,33 @@ async def extract_from_file(
     """
     try:
         if await _already_ingested(db, source_ref):
-            return {"status": "duplicate"}
+            # Self-healing (2026-07-25): «کارت‌ها را پاک کردم، دوباره سوییپ زدم،
+            # هیچی نیاورد». The review-item dedup is right — the owner should
+            # never be re-asked about a file he already handled — but the
+            # FINANCE side must not hide behind it: the card's own dedup
+            # memory (source_refs / applied_refs / content-hashed lines) lived
+            # on the deleted row and died with it. So a duplicate still gets a
+            # deterministic-only re-read (no AI, no new inbox item) and its
+            # finance signal re-applied: a deleted card is rebuilt from the
+            # same files; an intact card is a no-op end to end.
+            refreshed = 0
+            try:
+                ready_dup, locked = prepare_bytes(data, mimetype, password=password)
+                if not locked:
+                    from app.services.ingest import text_extract as _tx
+
+                    dup_text = _tx.extract_text(ready_dup, mimetype, filename)
+                    dup_det = _tx.parse_finance_fields(dup_text) if dup_text else None
+                    if dup_det:
+                        await _feed_finance(
+                            db, fields=dict(dup_det), sender=sender, filename=filename,
+                            source_ref=source_ref, user_id=user_id, det=dup_det,
+                            occurred_iso=occurred_iso, text=dup_text,
+                        )
+                        refreshed = 1
+            except Exception as exc:
+                logger.debug("duplicate finance recheck skipped (%s): %r", source_ref, exc)
+            return {"status": "duplicate", "finance_recheck": refreshed}
 
         ready, needs_pw = prepare_bytes(data, mimetype, password=password)
         if needs_pw:

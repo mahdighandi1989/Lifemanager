@@ -341,6 +341,9 @@ async def deep_sweep(
     out["attachments_scanned"] = att.get("scanned", 0)
     out["attachment_candidates"] = att.get("proposed", 0)
     out["locked_files"] = att.get("needs_password", 0)
+    # files already reviewed whose finance signal was re-applied — this is how a
+    # deleted card comes back on the next sweep (self-healing, idempotent).
+    out["finance_rechecked"] = att.get("finance_rechecked", 0)
 
     scan = await fs.scan_finance_emails(db, user_id)
     out["accounts_created"] = scan.get("created", 0)

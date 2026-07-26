@@ -243,9 +243,10 @@ function BudgetPage({ embedded = false }) {
       } else {
         setScanMsg(
           `${d.mirrored_new ?? 0} ایمیلِ تازه از ${d.months ?? 24} ماهِ گذشته آورده شد؛ ` +
-          `${d.attachment_candidates ?? 0} پیوست خوانده شد، ` +
+          `${d.attachment_candidates ?? 0} پیوستِ تازه خوانده شد، ` +
+          `${d.finance_rechecked ?? 0} فایلِ مالیِ قبلی دوباره اعمال شد، ` +
           `${d.locked_files ?? 0} فایلِ رمزدار منتظرِ رمز است، و ` +
-          `${d.accounts_created ?? 0} حسابِ تازه ساخته شد.`,
+          `${d.accounts_created ?? 0} حسابِ تازه از ایمیل‌ها ساخته شد.`,
         );
       }
       loadAccounts();

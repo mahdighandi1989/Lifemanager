@@ -241,3 +241,67 @@ async def test_statement_file_creates_card_and_its_line_items(db_session):
         )
     ).scalars().all()
     assert len(again) == 2
+
+
+@pytest.mark.asyncio
+async def test_deleted_card_is_rebuilt_on_the_next_sweep(db_session):
+    """«همه را ضربدر زدم، دوباره سوییپ زدم، هیچی نیاورد» (2026-07-25). The
+    review-item dedup must not starve the finance side: a duplicate file still
+    gets a deterministic re-read, so a deleted card is rebuilt from the same
+    files — and an intact card stays untouched (idempotent)."""
+    from app.services.ingest.universal_ingest import extract_from_file
+
+    csv = (
+        "Bank Statement\n"
+        "Institution,mbankuae\n"
+        "Account,ending in 4321\n"
+        "Balance,AED 9480.00\n"
+        "Date,Description,Amount,Balance\n"
+        "03/07/2026,POS PURCHASE CARREFOUR,20.00,9500.00\n"
+        "05/07/2026,ATM CASH WITHDRAWAL,20.00,9480.00\n"
+    ).encode("utf-8")
+
+    first = await extract_from_file(
+        db_session, filename="stmt.csv", mimetype="text/csv", data=csv,
+        source_ref="gmail:rb:stmt.csv", user_id=0, sender="alerts@mbankuae.com",
+        occurred_iso="2026-07-06T00:00:00",
+    )
+    await db_session.commit()
+    assert first["status"] == "proposed"
+    acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
+
+    # the owner deletes the card (and its transactions), like the ✖ button does
+    for t in (await db_session.execute(select(Transaction))).scalars().all():
+        await db_session.delete(t)
+    await db_session.delete(acc)
+    await db_session.commit()
+
+    # second sweep: same file, same ref → review says duplicate, finance heals
+    again = await extract_from_file(
+        db_session, filename="stmt.csv", mimetype="text/csv", data=csv,
+        source_ref="gmail:rb:stmt.csv", user_id=0, sender="alerts@mbankuae.com",
+        occurred_iso="2026-07-06T00:00:00",
+    )
+    await db_session.commit()
+    assert again["status"] == "duplicate" and again["finance_recheck"] == 1
+
+    rebuilt = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    assert float(rebuilt.balance) == 9480.0 and rebuilt.institution == "mbankuae"
+    lines = (
+        await db_session.execute(
+            select(Transaction).where(Transaction.source_ref.like("line:%"))
+        )
+    ).scalars().all()
+    assert len(lines) == 2
+
+    # a third sweep over the intact card is a complete no-op
+    await extract_from_file(
+        db_session, filename="stmt.csv", mimetype="text/csv", data=csv,
+        source_ref="gmail:rb:stmt.csv", user_id=0, sender="alerts@mbankuae.com",
+        occurred_iso="2026-07-06T00:00:00",
+    )
+    await db_session.commit()
+    txns = (await db_session.execute(select(Transaction))).scalars().all()
+    assert len([t for t in txns if (t.source_ref or "").startswith("line:")]) == 2
+    final = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    assert float(final.balance) == 9480.0

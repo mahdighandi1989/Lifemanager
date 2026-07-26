@@ -335,7 +335,8 @@ async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[st
 async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0) -> Dict[str, int]:
     """Fetch + extract this email's attachments. Never raises. Only CREATES
     InboxItems — the batched digest is sent by the caller (batch-level)."""
-    empty = {"proposed": 0, "needs_password": 0, "skipped_boilerplate": 0, "new_locked": 0}
+    empty = {"proposed": 0, "needs_password": 0, "skipped_boilerplate": 0, "new_locked": 0,
+             "finance_rechecked": 0}
     mid = getattr(email, "id", None)
     if not mid:
         return dict(empty)
@@ -356,7 +357,7 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
     src_key = credentials.source_key_for(sender)
     pw = await credentials.get_password(db, source_key=src_key)
 
-    proposed = needs = skipped = new_locked = 0
+    proposed = needs = skipped = new_locked = rechecked = 0
     for att in atts:
         source_ref = f"gmail:{mid}:{att['filename']}"
         res = await extract_from_file(
@@ -371,6 +372,8 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
             occurred_iso=occurred_iso,
         )
         st = res.get("status")
+        # the self-healing duplicate path re-applied a finance signal
+        rechecked += int(res.get("finance_recheck") or 0)
         if st in ("proposed", "unreadable"):
             proposed += 1
             # a stored domain password just opened this file → clear any stale
@@ -393,6 +396,7 @@ async def ingest_email_attachments(db: AsyncSession, email, *, user_id: int = 0)
         "needs_password": needs,
         "skipped_boilerplate": skipped,
         "new_locked": new_locked,
+        "finance_rechecked": rechecked,
     }
 
 
@@ -610,13 +614,14 @@ async def backfill_attachments(db: AsyncSession, *, user_id: int = 0, limit: int
             select(PersonalEmail).order_by(PersonalEmail.received_at.asc().nullsfirst()).limit(limit)
         )
     ).scalars().all()
-    proposed = needs = scanned = skipped = 0
+    proposed = needs = scanned = skipped = rechecked = 0
     for em in rows:
         scanned += 1
         r = await ingest_email_attachments(db, em, user_id=user_id)
         proposed += r["proposed"]
         needs += r["needs_password"]
         skipped += r.get("skipped_boilerplate", 0)
+        rechecked += r.get("finance_rechecked", 0)
     await db.commit()
     await notify_locked_digest(db, user_id=user_id)
     await db.commit()
@@ -625,4 +630,5 @@ async def backfill_attachments(db: AsyncSession, *, user_id: int = 0, limit: int
         "proposed": proposed,
         "needs_password": needs,
         "skipped_boilerplate": skipped,
+        "finance_rechecked": rechecked,
     }
