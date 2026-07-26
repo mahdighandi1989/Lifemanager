@@ -440,40 +440,87 @@ def _to_decimal(value: Any):
         return None
 
 
+# Titles arriving from other ingests are not account names: strip the
+# person-suggestion prefix, any <email> part, and pre-escaped HTML entities.
+_RE_TITLE_PREFIX = re.compile(r"^\s*فرد جدید از ایمیل\s*[:：]?\s*", re.I)
+_RE_ANGLE_ADDR = re.compile(r"<[^>]*>|&lt;.*?&gt;")
+
+
+def _clean_provider(raw: Any) -> str:
+    import html as _html
+
+    s = _html.unescape(str(raw or ""))
+    s = _RE_TITLE_PREFIX.sub("", s)
+    s = _RE_ANGLE_ADDR.sub("", s)
+    return re.sub(r"\s{2,}", " ", s).strip(" -—،:") or "حساب"
+
+
+async def _occurred_from_source(db: AsyncSession, source_ref: Optional[str]) -> Optional[str]:
+    """The signal's own date, recovered from the mirrored email the file came
+    from (`gmail:<mid>:<file>` / `email:<id>`). Without a date, an OLD statement
+    confirmed today would count as «newer» and stomp the current balance —
+    exactly what the owner saw (2026-07-25)."""
+    if not source_ref:
+        return None
+    try:
+        from app.models.personal_sync import PersonalEmail
+
+        parts = str(source_ref).split(":")
+        if len(parts) >= 2 and parts[0] in ("gmail", "email"):
+            row = await db.get(PersonalEmail, parts[1])
+            if row is not None and row.received_at is not None:
+                return row.received_at.isoformat()
+    except Exception:
+        pass
+    return None
+
+
 async def _file_as_finance_account(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Dict[str, Any]:
     """Create OR update a bank/broker/exchange account from an approved file,
-    via the SHARED identity engine (finance_email_scan_service.apply_account_signal)
-    so the manual-file path, the email scan, and the attachment auto-feed all
-    reconcile onto ONE account per (account_no → institution) — no more
-    duplicate cards from name-only + HTML-escape-mismatched matching."""
+    via the SHARED identity engine (finance_email_scan_service.apply_account_signal).
+
+    2026-07-25 (owner: «خریدهای طلبات و کارفور را به مالی فرستادم، مثل گاو حساب
+    بانکی ساخت»): a PURCHASE routed to «مالی» is an EXPENSE, not an account.
+    An account card needs an account signal — an IBAN/account number, or a real
+    positive balance. A payload with only an amount (a receipt) is delegated to
+    the transaction filer; a payload with nothing financial at all is refused
+    with a clear message instead of minting a blind 0.00 card (that fallback is
+    where the Carrefour/Talabat/«فرد جدید از ایمیل» junk cards came from).
+    """
     from app.services import finance_email_scan_service as fs
 
-    provider = (s.get("provider") or s.get("title") or "حساب")[:255]
+    provider = _clean_provider(s.get("provider") or s.get("title"))[:255]
     kind = str(s.get("account_kind") or s.get("kind") or "bank")[:32]
     ref = s.get("account_no") or s.get("account_ref")
     iban = s.get("iban")
+    balance = _to_decimal(s.get("balance"))
+    amount = _to_decimal(s.get("amount") or s.get("total"))
+
+    blob = " ".join(str(v) for v in (provider, s.get("title"), s.get("description")) if v)
+    has_account_signal = bool(iban or ref or (balance is not None and balance > 0))
+    if fs.is_not_an_account(blob) or (not has_account_signal and amount is not None):
+        # a receipt/invoice — file it as the expense it is («نقدی/رسیدها»).
+        return await _file_as_transaction(db, s, user_id)
+    if not has_account_signal:
+        raise ValueError(
+            "این مورد هیچ نشانه‌ای از یک حساب ندارد (نه شماره/IBAN، نه موجودی) — "
+            "به‌عنوان «خرید/هزینه» یا «یادداشت» ثبتش کن."
+        )
+
+    occurred = s.get("date") or await _occurred_from_source(db, s.get("source_ref"))
     institution = fs._institution(None, provider) or provider or None
     res = await fs.apply_account_signal(
         db, user_id, institution=institution, account_ref=ref, iban=iban,
-        balance=s.get("balance"), currency=s.get("currency"), kind=kind,
+        balance=balance, currency=s.get("currency"), kind=kind,
         source="attachment", source_ref=s.get("source_ref"),
-        occurred_iso=s.get("date"), provider_name=provider,
+        occurred_iso=occurred, provider_name=provider,
     )
     acct_id = res.get("account_id")
     if acct_id is None:
-        # no financial signal at all → keep the old create so «تأیید» still yields
-        # a card the owner can fill in by hand.
-        from app.models.finance import FinancialAccount
-
-        acct = FinancialAccount(
-            user_id=user_id, name=_esc(provider),
-            kind=(kind if kind in ("bank", "broker", "exchange") else "bank"),
-            institution=_esc(s.get("provider")), currency=str(s.get("currency") or "USD")[:8],
-            balance=_to_decimal(s.get("balance")) or 0,
+        # the shared engine refused (e.g. non-account text) — same rule here.
+        raise ValueError(
+            "این مورد به‌عنوان حسابِ بانکی پذیرفته نشد — اگر خرید است، «خرید/هزینه» را انتخاب کن."
         )
-        db.add(acct)
-        await db.flush()
-        acct_id = acct.id
     return {"kind": "finance_account", "id": acct_id, "title": provider, "link": "/budget"}
 
 

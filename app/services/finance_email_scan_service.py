@@ -271,7 +271,14 @@ async def apply_account_signal(
             extra["source_refs"] = list(srefs)[-200:]
             acc.extra = json.dumps(extra, ensure_ascii=False)
         last_at = extra.get("last_email_at")
-        is_newer = occurred_iso is None or last_at is None or occurred_iso >= last_at
+        # An UNDATED machine signal (it carries a source_ref) must never count
+        # as «newer» than a dated balance — that is how an old statement,
+        # confirmed from the inbox today, stomped the current balance
+        # (2026-07-25). An owner's manual re-file (no source_ref) still wins.
+        if occurred_iso is None and last_at is not None and source_ref is not None:
+            is_newer = False
+        else:
+            is_newer = occurred_iso is None or last_at is None or occurred_iso >= last_at
         # Same rule on UPDATE: a machine-parsed negative is a P/L, not a balance.
         # Never let one overwrite a real balance the owner can see.
         if bal is not None and bal < 0:

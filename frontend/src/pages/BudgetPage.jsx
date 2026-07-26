@@ -101,10 +101,12 @@ function AccountRow({ account, onDelete }) {
   return (
     <div className="space-y-1">
       <AccountCard account={account} />
-      {movements.length > 0 && (
+      {(movements.length > 0 || onDelete) && (
         <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 space-y-0.5" dir="rtl">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[11px] font-medium text-gray-500">آخرین تغییرها:</p>
+            <p className="text-[11px] font-medium text-gray-500">
+              {movements.length > 0 ? 'آخرین تغییرها:' : ''}
+            </p>
             {onDelete && (
               <button
                 type="button"

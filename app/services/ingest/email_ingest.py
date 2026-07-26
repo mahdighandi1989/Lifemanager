@@ -14,7 +14,7 @@ import logging
 import os
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -95,8 +95,31 @@ def _email_iso(em) -> "str | None":
         return None
 
 
+# The sentence(s) in the bank's email that explain how the password is built
+# («your password is your card number followed by your year of birth…»).
+# Shown to the owner verbatim when we could not decode the recipe ourselves —
+# he asked for exactly this (2026-07-25): «بانک‌ها تو ایمیل می‌گن پسورد چه
+# مشخصاتی داره ولی سیستم نمی‌گه».
+_RE_PW_SENTENCE = re.compile(
+    r"[^.\n\r!?؟]*(?:password|passcode|pin\b|رمز|كلمة\s*المرور|گذرواژه)[^.\n\r!?؟]*[.!?؟]?",
+    re.I,
+)
+
+
+def password_hint_from(text: Optional[str]) -> Optional[str]:
+    """The bank's own password instruction, pulled from the email body/snippet.
+    Deterministic, total; None when the text says nothing about a password."""
+    if not text:
+        return None
+    hits = [h.strip() for h in _RE_PW_SENTENCE.findall(text) if len(h.strip()) > 12]
+    if not hits:
+        return None
+    return " ".join(hits[:2])[:300] or None
+
+
 async def _propose_password_request(
-    db, *, sender: str, filename: str, source_ref: str, user_id: int
+    db, *, sender: str, filename: str, source_ref: str, user_id: int,
+    hint: Optional[str] = None,
 ) -> bool:
     """Create a «رمز لازم است» InboxItem once per source_ref — matched across
     ANY status (pending|filed|dismissed), so a dismissed/handled file never
@@ -114,6 +137,9 @@ async def _propose_password_request(
     ).scalars().all()
     if any((r.suggestion or {}).get("source_ref") == source_ref for r in existing):
         return False
+    suggestion = {"source_ref": source_ref, "filename": filename, "source_key": src_key}
+    if hint:
+        suggestion["password_hint"] = hint
     db.add(
         InboxItem(
             user_id=user_id,
@@ -121,7 +147,7 @@ async def _propose_password_request(
             source="attachment",
             status="pending",
             suggested_type="password_request",
-            suggestion={"source_ref": source_ref, "filename": filename, "source_key": src_key},
+            suggestion=suggestion,
             ai_model=None,
         )
     )
@@ -178,6 +204,7 @@ async def _resolve_locked_file(
     from app.services.ingest import identity_facts, password_recipe
 
     domain = credentials.source_key_for(sender)
+    body: Optional[str] = None
     try:
         recipe = await password_recipe.get_stored_recipe(db, domain=domain)
         if not (recipe and recipe.get("has_recipe")):
@@ -216,8 +243,18 @@ async def _resolve_locked_file(
             else:
                 return "dup"
 
+        # No decodable recipe → a plain password ask, but WITH the bank's own
+        # instruction sentence so the owner knows what to type.
+        if body is None:
+            try:
+                from app.services.google_sync.gmail_service import fetch_message_body
+
+                body = await fetch_message_body(db, mid)
+            except Exception:
+                body = None
         if await _propose_password_request(
-            db, sender=sender, filename=att["filename"], source_ref=source_ref, user_id=user_id
+            db, sender=sender, filename=att["filename"], source_ref=source_ref,
+            user_id=user_id, hint=password_hint_from(body),
         ):
             return "request"
         return "dup"

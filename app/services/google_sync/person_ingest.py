@@ -38,7 +38,11 @@ _MIN_SENDER_COUNT = 2  # a human who has written at least twice is worth adding
 _RE_NONHUMAN = re.compile(
     r"(no[-_.]?reply|do[-_.]?not[-_.]?reply|noreply|notifications?@|mailer-daemon|"
     r"postmaster@|bounce|@.*\.(?:mailchimp|sendgrid|amazonses|mailgun)|"
-    r"newsletter|marketing@|support@|billing@|receipts?@|updates?@|team@|hello@)",
+    r"newsletter|marketing@|support@|billing@|receipts?@|updates?@|team@|hello@|"
+    # 2026-07-25: a bank's statement mailbox became «فرد جدید از ایمیل:
+    # estatement@bankfab.com» and was then filed onward as a junk card.
+    r"e?statements?@|ebill|alerts?@|notify@|service@|customer(?:care|service)|"
+    r"admin@|security@|verify@|otp@)",
     re.I,
 )
 _RE_ADDR = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")

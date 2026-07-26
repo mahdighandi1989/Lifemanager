@@ -14,6 +14,7 @@ const TYPE_FA = {
   person: 'شخص',
   subscription: 'اشتراک',
   finance_account: 'حساب مالی',
+  transaction: 'خرید/هزینه',
   document: 'سند',
   password_request: 'رمز لازم',
   password_components: 'اطلاعاتِ رمز',
@@ -107,7 +108,13 @@ function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
         <p className="text-xs text-gray-500 break-words">{unescapeHtml(reason)}</p>
       )}
       {isPasswordReq ? (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-1.5">
+          {item.suggestion?.password_hint && (
+            <p className="rounded-md bg-amber-50 border border-amber-100 px-2 py-1 text-xs text-amber-800" dir="auto" data-testid="password-hint">
+              💡 بانک نوشته: {item.suggestion.password_hint}
+            </p>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
           <input
             type="password"
             value={pw}
@@ -133,6 +140,7 @@ function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
           >
             ✖ رد
           </button>
+          </div>
         </div>
       ) : isComponentsReq ? (
         <div className="space-y-2" dir="rtl">
@@ -193,6 +201,7 @@ function InboxRow({ item, onFile, onDismiss, onPassword, onComponents, busy }) {
           <option value="todo">آیتم لیست</option>
           <option value="note">یادداشت</option>
           <option value="person">شخص</option>
+          <option value="transaction">خرید / هزینه</option>
           <option value="finance_account">حساب مالی</option>
           <option value="document">سند</option>
         </select>
