@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-07-22T00:00:00Z"
 created_at: "2026-07-22T00:00:00Z"
-updated_at: "2026-07-22T00:00:00Z"
+updated_at: "2026-07-30"
 merged_from: []
 ---
 
@@ -86,3 +86,55 @@ Write the missing join as a conservative, idempotent scan over the synced rows:
 - مرتبط: `multimodal-file-ingest-to-review-queue` (capture → review), `activate-
   passive-pages-by-wiring-not-building` (empty ≠ dead; wire the feeder),
   `ontology-lens-over-existing-system` (auto + owner-correctable pattern).
+
+## Update 2026-07-30
+
+The self-feeding pipeline above SHIPPED and then failed the owner in production
+(«تشخیص حساب‌ها و موجودی فوق‌العاده خطا دارد»). A 27-defect audit found the
+recurring causes; the reusable lessons:
+
+1. **Normalise digits at the SAME layer that regexes run.** One half of the
+   pipeline translated Persian/Arabic-Indic digits, the other didn't —
+   «۱۲٬۵۰۰٬۰۰۰» parsed as `12.0` and even booked a fake 12,499,988 delta.
+   The translate table must live in (or before) the parser itself.
+2. **Not every "balance" is THE balance.** Classify the qualifier word:
+   previous/opening/outstanding/rewards/points figures are DISQUALIFIED;
+   available/current/closing outrank a bare «balance». A prose number with no
+   currency and no separators ("work-life balance 10 tips") is not money.
+3. **No currency ⇒ no new record, and never relabel without converting.**
+   A `currency or "USD"` default mints dollar cards out of truncated Rial
+   snippets; a stray `$` must not flip an AED card to USD while keeping the
+   number. Cross-currency writes are refused, not converted implicitly.
+4. **Zero and negative are notices, not balances.** Both are refused on
+   update; the owner types a true zero himself.
+5. **Identity = ref AND institution together.** A last-4 alone collapses two
+   banks' cards into one; an institution alone with several cards is
+   AMBIGUOUS and must be refused, not guessed (`(account, ambiguous)` return
+   shape). Sender-domain brand = LAST non-generic subdomain segment — an
+   any-segment free-mail test makes every `mail.<brand>.com` bank invisible,
+   and max-by-length picks «notification» over a short brand.
+6. **Owner delete needs a tombstone.** A self-heal that rebuilds deleted
+   records from source files re-creates exactly the wrong cards the owner
+   deleted. Record the deleted identity (institution+ref+iban) in a KV
+   tombstone list; auto-creation checks it; an explicit owner action
+   (`trusted=True`) and an explicit «بازگردانی» (clear tombstone) both
+   override it. Deletion ≠ dead end AND deletion ≠ boomerang.
+7. **An owner allow-list beats cleverer heuristics.** When the owner declares
+   «حساب‌های من» (institution/ref/IBAN entries), creation is restricted to
+   matches; empty list = old behaviour, so it's opt-in and behaviour-preserving.
+8. **Synthetic bookkeeping must be marked as such.** Balance-delta rows share
+   the transactions table with real statement lines; tag them (category
+   `_balance_delta`) and exclude from spending reports, or every month
+   double-counts. Every machine write needs a `source_ref` for idempotency —
+   the one path without it (message webhook) duplicated rows forever.
+9. **Dedup memory must be ORDERED.** `list(set(...))[-200:]` evicts random
+   refs (sets are unordered) — an evicted ref re-posts its delta on the next
+   scan. Order-preserving dedupe, newest-tail cap.
+10. **Content-hash line dedup needs an occurrence index** (`hash#2` for the
+    second identical same-day purchase) or genuine repeated movements are
+    silently dropped — while re-parses of the same file stay idempotent
+    because order (hence indices) is deterministic.
+11. **Soft vs hard refusal words.** «Tax Invoice» and unsubscribe footers
+    appear INSIDE real bank statements; such words may only refuse when the
+    text shows no account evidence. Persian keywords need explicit
+    boundaries (`وام` fires inside «عوامل» without them).

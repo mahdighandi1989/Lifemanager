@@ -687,6 +687,22 @@
           {
             "method": "GET",
             "path": "/api/finance/affordable-tasks"
+          },
+          {
+            "method": "GET",
+            "path": "/api/finance/tombstones"
+          },
+          {
+            "method": "POST",
+            "path": "/api/finance/tombstones/clear"
+          },
+          {
+            "method": "GET",
+            "path": "/api/finance/owner-accounts"
+          },
+          {
+            "method": "POST",
+            "path": "/api/finance/owner-accounts"
           }
         ]
       },
@@ -1817,6 +1833,10 @@
       {
         "name": "SystemDiagram",
         "file": "frontend/src/components/SystemDiagram.jsx"
+      },
+      {
+        "name": "FinanceGuardsPanel",
+        "file": "frontend/src/components/FinanceGuardsPanel.jsx"
       }
     ]
   },

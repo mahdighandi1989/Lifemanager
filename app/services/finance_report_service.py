@@ -53,7 +53,23 @@ async def build_report(db: AsyncSession, *, user_id: int = 0, months: int = 6) -
     monthly: dict = defaultdict(lambda: defaultdict(lambda: {
         "income": 0.0, "expense": 0.0, "by_category": defaultdict(float),
     }))
+    # Synthetic balance-delta rows are bookkeeping, not real movements: the
+    # scan writes one whenever a card's total shifts AND the statement's own
+    # lines separately — summing both double-counted every month
+    # (2026-07-30). New rows are tagged category='_balance_delta'; legacy
+    # deltas are recognised by their fixed auto-update description.
+    _AUTO_DELTA_DESCRIPTIONS = {
+        "به‌روزرسانیِ خودکار از فایل",
+        "به‌روزرسانیِ خودکار از ایمیل",
+    }
     for t in rows:
+        desc = t.description or ""
+        if (
+            t.category == "_balance_delta"
+            or desc in _AUTO_DELTA_DESCRIPTIONS
+            or desc.startswith("auto-update from ")
+        ):
+            continue
         d = t.occurred_on or (t.timestamp.date() if t.timestamp else None)
         if d is None:
             continue

@@ -10,8 +10,12 @@ Normalisation on the way in:
   * balance → ``Decimal`` (the ``₿``/``AED`` symbol is kept separately).
   * contact phone → E.164 (``+98 919 786 8647`` → ``+989197868647``).
 """
+import logging
+import re
 from decimal import Decimal, InvalidOperation
 from typing import List, Optional
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel, ConfigDict, Field
@@ -134,6 +138,35 @@ async def import_share_sheet(
             contact_label=payload.contact_label,
         )
         db.add(account)
+
+    # آشتی با «مالی» (2026-07-30): the share-sheet import used to live in its
+    # own island table — the FAB balance the owner imported never reached a
+    # card, the dashboard, or any report. Feed it through the SAME identity
+    # engine as every other signal (trusted: the owner imported it himself).
+    try:
+        from app.services import finance_email_scan_service as _fs
+
+        _digits = re.sub(r"\D", "", account_number or "")
+        _sym = (payload.currency_symbol or "").strip().lower()
+        _cur = {"د.إ": "AED", "aed": "AED", "dhs": "AED", "$": "USD", "usd": "USD"}.get(_sym, "AED")
+        await _fs.apply_account_signal(
+            db,
+            user_id,
+            institution=_fs._institution(None, payload.bank_name)
+            or re.sub(r"[^A-Za-z0-9آ-ی ]+", "", str(payload.bank_name or ""))[:60]
+            or None,
+            account_ref=(f"••{_digits[-4:]}" if len(_digits) >= 4 else None),
+            iban=iban,
+            balance=balance,
+            currency=_cur,
+            kind="bank",
+            source="share_sheet",
+            source_ref=f"sharesheet:{iban or account_number or account.id}",
+            provider_name=payload.bank_name,
+            trusted=True,
+        )
+    except Exception:
+        logger.debug("share-sheet → finance reconcile skipped", exc_info=True)
 
     await db.commit()
     await db.refresh(account)

@@ -514,6 +514,9 @@ async def _file_as_finance_account(db: AsyncSession, s: Dict[str, Any], user_id:
         balance=balance, currency=s.get("currency"), kind=kind,
         source="attachment", source_ref=s.get("source_ref"),
         occurred_iso=occurred, provider_name=provider,
+        # the owner clicked «تأیید» — his explicit approval outranks the
+        # tombstone/allow-list gates that police the MACHINE's auto-feed.
+        trusted=True,
     )
     acct_id = res.get("account_id")
     if acct_id is None:

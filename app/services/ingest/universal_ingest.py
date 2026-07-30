@@ -197,8 +197,12 @@ async def _feed_finance(
         institution = fs._institution(sender, provider or filename) or (
             re.sub(r"[^A-Za-z0-9آ-ی]+", "", str(provider))[:60] if provider else None
         )
-        ref = fields.get("account_no") or (det or {}).get("account_no")
-        iban = fields.get("iban") or (det or {}).get("iban")
+        # DETERMINISTIC WINS for the card's IDENTITY too (2026-07-30): the
+        # model could still overrule account_no/iban and mint a second card
+        # for the same account off a hallucinated number. The regex read the
+        # number off the page; the model may only FILL a gap.
+        ref = (det or {}).get("account_no") or fields.get("account_no")
+        iban = (det or {}).get("iban") or fields.get("iban")
         # DETERMINISTIC WINS for the money. The caller merges `{**det, **ai}`,
         # which let the model's number override a regex that had actually found
         # «موجودی» in the text — that is how a broker statement's floating P/L
@@ -210,6 +214,26 @@ async def _feed_finance(
         currency = (det or {}).get("currency") or fields.get("currency")
         kind = str(fields.get("account_kind") or fields.get("kind") or "bank")
         if institution is None and not ref and not iban:
+            return 0
+        # «خرید، هزینه است نه حساب» — on the AUTO path too (2026-07-30; the
+        # guard existed only on the manual «تأیید» filer, so a gift-card or
+        # delivery receipt reading «Remaining balance: AED 50» minted an
+        # "account"). A receipt/invoice with no account signal never becomes a
+        # card here — it stays a review item for the owner to file.
+        from decimal import Decimal as _D
+
+        try:
+            _bal_d = _D(str(balance)) if balance is not None else None
+        except Exception:
+            _bal_d = None
+        has_account_signal = bool(iban or ref or (_bal_d is not None and _bal_d > 0))
+        doc_kind = str(fields.get("kind") or "").lower()
+        amount_like = fields.get("amount") or fields.get("total")
+        if not has_account_signal and (
+            amount_like is not None
+            or doc_kind in ("receipt", "invoice", "purchase", "expense")
+        ):
+            logger.info("attachment→finance refused (a purchase, not an account): %s", filename)
             return 0
         # occurred_iso = the source email's date, so the «only a newer signal
         # moves the balance» guard actually arms (parse_finance_fields carries

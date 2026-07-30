@@ -33,9 +33,13 @@ def _to_decimal(value) -> Decimal:
 
 async def _gather(db: AsyncSession, user_id: int) -> dict:
     """Collect the raw financial figures used to build the AI prompt."""
+    # NULL-inclusive scope: the auto-created cards carry user_id=NULL in the
+    # anon deployment; the strict filter made insights blind to them.
+    from app.services.inbox_service import scope_filter
+
     accounts = (
         await db.execute(
-            select(FinancialAccount).where(FinancialAccount.user_id == user_id)
+            select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
         )
     ).scalars().all()
     incomes = (
@@ -59,6 +63,15 @@ async def _gather(db: AsyncSession, user_id: int) -> dict:
         )
     ).scalars().all()
 
+    # 12,500,000 IRR + 15,636 AED is NOT one number — totals only make sense
+    # per currency (2026-07-30). The cross-currency sum is kept for backward
+    # compatibility of the response shape but the prompt uses the breakdown.
+    balances_by_currency: dict = {}
+    for a in accounts:
+        cur = (a.currency or "?").upper()
+        balances_by_currency[cur] = balances_by_currency.get(cur, Decimal(0)) + (
+            _to_decimal(a.balance) or Decimal(0)
+        )
     total_balance = sum((_to_decimal(a.balance) for a in accounts), Decimal(0))
     total_assets = sum((_to_decimal(a.value) for a in assets), Decimal(0))
     total_income = sum((_to_decimal(i.amount) for i in incomes), Decimal(0))
@@ -83,6 +96,7 @@ async def _gather(db: AsyncSession, user_id: int) -> dict:
 
     return {
         "account_count": len(accounts),
+        "balances_by_currency": {k: float(v) for k, v in sorted(balances_by_currency.items())},
         "total_balance": float(total_balance),
         "total_assets": float(total_assets),
         "total_income": float(total_income),
@@ -98,7 +112,14 @@ def _build_prompt(summary: dict) -> str:
         "خرید بر اساس بودجهٔ موجود ارائه دهید. کوتاه و کاربردی پاسخ دهید.",
         "",
         f"- تعداد حساب‌ها: {summary['account_count']}",
-        f"- مجموع موجودی حساب‌ها: {summary['total_balance']}",
+        "- موجودی به تفکیک ارز: "
+        + (
+            "، ".join(
+                f"{amount} {cur}"
+                for cur, amount in (summary.get("balances_by_currency") or {}).items()
+            )
+            or str(summary["total_balance"])
+        ),
         f"- مجموع دارایی‌ها: {summary['total_assets']}",
         f"- مجموع درآمدها: {summary['total_income']}",
         f"- بودجهٔ قابل‌دسترس: {summary['available_budget']}"

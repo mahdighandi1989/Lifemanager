@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
+import FinanceGuardsPanel from '../components/FinanceGuardsPanel';
 
 // Budget page (audit task 4ae4b3ca). Lists the user's financial accounts with
 // a summary, a budget-aware purchase check (AC 12), and an AI budget insight
@@ -410,6 +411,9 @@ function BudgetPage({ embedded = false }) {
             {scanMsg}
           </div>
         )}
+
+        {/* نگهبان دقت: «حساب‌های من» + کارت‌های حذف‌شده (tombstones) */}
+        <FinanceGuardsPanel onChanged={loadAccounts} />
 
         {/* Dashboard summary — one row per currency, never a cross-currency sum */}
         <div className="bg-gradient-to-l from-blue-600 to-blue-500 rounded-xl p-6 mb-6 text-white">

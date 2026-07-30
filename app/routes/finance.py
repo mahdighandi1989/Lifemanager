@@ -300,6 +300,16 @@ async def delete_financial_account(
     removed_txns = (
         await db.execute(select(Transaction).where(Transaction.account_id == account_id))
     ).scalars().all()
+    # «✖ این حساب من نیست» must be PERMANENT (2026-07-30): remember the card's
+    # identity as a tombstone so the auto-feed's self-heal never resurrects it
+    # from the same files. The rebuild capability stays — clearing the
+    # tombstone (POST /api/finance/tombstones/clear) re-arms it.
+    from app.services import finance_email_scan_service as _fs
+
+    try:
+        await _fs.add_account_tombstone(db, acc)
+    except Exception:
+        pass
     await db.execute(_delete(Transaction).where(Transaction.account_id == account_id))
     await db.delete(acc)
     await db.commit()
@@ -309,9 +319,95 @@ async def delete_financial_account(
         user_id=user_id, db=db,
     )
     return {
-        "ok": True, "success": True, "deleted": True,
+        "ok": True, "success": True, "deleted": True, "tombstoned": True,
         "name": name, "transactions_removed": len(removed_txns),
     }
+
+
+@router.get("/api/finance/tombstones")
+@handle_errors
+async def list_finance_tombstones(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """کارت‌های حذف‌شده که دیگر خودکار ساخته نمی‌شوند — with their identities,
+    so the owner can un-delete (clear) one and let the files rebuild it."""
+    from app.services import finance_email_scan_service as _fs
+
+    return {"ok": True, "success": True, "tombstones": await _fs.list_account_tombstones(db)}
+
+
+class TombstoneClearPayload(BaseModel):
+    index: Optional[int] = None  # omit → clear all
+
+
+@router.post("/api/finance/tombstones/clear")
+@handle_errors
+async def clear_finance_tombstones(
+    payload: TombstoneClearPayload,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """بازگردانی: drop tombstone(s) so the next sweep may rebuild the card
+    from its files (the d2ddf0e self-heal, now gated behind owner intent)."""
+    from app.services import finance_email_scan_service as _fs
+
+    removed = await _fs.clear_account_tombstones(db, payload.index)
+    await db.commit()
+    return {"ok": True, "success": True, "cleared": removed}
+
+
+@router.get("/api/finance/owner-accounts")
+@handle_errors
+async def list_owner_accounts(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """«حساب‌های من» — the owner-declared allow-list. When non-empty, the
+    auto-feed only CREATES cards matching one of these entries; unknown
+    signals are ignored instead of minted. Empty list = old behaviour."""
+    from app.services import finance_email_scan_service as _fs
+
+    return {"ok": True, "success": True, "accounts": await _fs.get_owner_accounts(db)}
+
+
+class OwnerAccountPayload(BaseModel):
+    action: str  # "add" | "remove"
+    institution: Optional[str] = None
+    account_ref: Optional[str] = None
+    iban: Optional[str] = None
+    label: Optional[str] = None
+    index: Optional[int] = None  # for remove
+
+
+@router.post("/api/finance/owner-accounts")
+@handle_errors
+async def mutate_owner_accounts(
+    payload: OwnerAccountPayload,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    from app.services import finance_email_scan_service as _fs
+
+    entries = await _fs.get_owner_accounts(db)
+    if payload.action == "add":
+        if not (payload.institution or payload.account_ref or payload.iban):
+            raise ValueError("حداقل یکی از بانک/شمارهٔ حساب/IBAN لازم است")
+        entries.append({
+            "institution": (payload.institution or "").strip() or None,
+            "account_ref": (payload.account_ref or "").strip() or None,
+            "iban": (payload.iban or "").replace(" ", "").upper() or None,
+            "label": (payload.label or "").strip() or None,
+        })
+    elif payload.action == "remove":
+        if payload.index is None or not (0 <= payload.index < len(entries)):
+            raise ValueError("index نامعتبر است")
+        entries.pop(payload.index)
+    else:
+        raise ValueError("action must be 'add' or 'remove'")
+    await _fs.set_owner_accounts(db, entries)
+    await db.commit()
+    return {"ok": True, "success": True, "accounts": entries}
 
 
 @router.get("/api/finance/accounts/{account_id}/transactions")
@@ -408,9 +504,11 @@ async def list_bank_accounts(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_required_user_id),
 ):
+    from app.services.inbox_service import scope_filter
+
     result = await db.execute(
         select(FinancialAccount).where(
-            (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "bank")
+            scope_filter(FinancialAccount.user_id, user_id), FinancialAccount.kind == "bank"
         )
     )
     return list(result.scalars().all())
@@ -423,9 +521,11 @@ async def list_broker_accounts(
     user_id: int = Depends(get_required_user_id),
 ):
     """AC 17 — same shape as the bank alias, filtered by kind='broker'."""
+    from app.services.inbox_service import scope_filter
+
     result = await db.execute(
         select(FinancialAccount).where(
-            (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "broker")
+            scope_filter(FinancialAccount.user_id, user_id), FinancialAccount.kind == "broker"
         )
     )
     return list(result.scalars().all())
@@ -492,9 +592,11 @@ async def list_exchange_accounts(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_required_user_id),
 ):
+    from app.services.inbox_service import scope_filter
+
     result = await db.execute(
         select(FinancialAccount).where(
-            (FinancialAccount.user_id == user_id) & (FinancialAccount.kind == "exchange")
+            scope_filter(FinancialAccount.user_id, user_id), FinancialAccount.kind == "exchange"
         )
     )
     return list(result.scalars().all())

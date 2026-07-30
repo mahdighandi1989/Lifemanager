@@ -48,19 +48,26 @@ async def _pick_account(
         return None
     if sender_hint:
         hint = sender_hint.lower()
-        for acc in accounts:
-            for field in (acc.institution, acc.name):
-                if field and len(field) >= 3 and field.lower() in hint:
-                    return acc
-        # Token overlap — but only DISTINCTIVE tokens. Generic banking
-        # words match every account and would pick the wrong one
-        # (2026-07-20 review), so they're stop-worded, and a match only
-        # counts if EXACTLY ONE account contains the token.
+        # Generic banking words match every message («بانک», "bank"…), so an
+        # account NAMED with one would grab every alert (2026-07-30) — the
+        # stop-list guards the account's own fields too, not just the tokens.
         _STOP = {"bank", "بانک", "account", "حساب", "card", "کارت",
                  "balance", "موجودی", "aed", "usd", "irr", "the", "your"}
+        for acc in accounts:
+            for field in (acc.institution, acc.name):
+                if (
+                    field and len(field) >= 3
+                    and field.lower() not in _STOP
+                    and field.lower() in hint
+                ):
+                    return acc
+        # Token overlap — but only DISTINCTIVE tokens: stop-worded, and a
+        # match only counts if EXACTLY ONE account contains the token. Bare
+        # digit runs shorter than 4 are reference-number noise, not an
+        # account identity — they matched the wrong card (2026-07-30).
         tokens = [
             t for t in re.split(r"[^a-z0-9؀-ۿ]+", hint)
-            if len(t) >= 3 and t not in _STOP
+            if len(t) >= 3 and t not in _STOP and not (t.isdigit() and len(t) < 4)
         ]
         for t in tokens:
             matched = [
@@ -99,6 +106,20 @@ async def apply_bank_message(
     if new_balance is None:
         return {"matched": False, "balances_updated": 0}
 
+    # Idempotency (2026-07-30): an IMAP redelivery / re-POST of the SAME
+    # message used to add a phantom income/expense row forever. The message's
+    # content hash is its identity; a seen hash is a clean no-op.
+    import hashlib as _hashlib
+
+    msg_ref = "msg:" + _hashlib.sha1(
+        f"{channel}|{sender or ''}|{body}".encode("utf-8")
+    ).hexdigest()[:20]
+    already = (
+        await db.execute(select(Transaction).where(Transaction.source_ref == msg_ref))
+    ).scalars().first()
+    if already is not None:
+        return {"matched": True, "balances_updated": 0, "reason": "duplicate message"}
+
     account = await _pick_account(
         db, user_id=user_id, account_id=account_id,
         sender_hint=f"{sender or ''} {body[:300]}",
@@ -106,20 +127,34 @@ async def apply_bank_message(
     if account is None:
         return {"matched": True, "balances_updated": 0, "reason": "no confident account match"}
 
+    # A figure in another currency is another measure — never write it onto
+    # this card, and never relabel the card without converting (2026-07-30).
+    msg_currency = getattr(parsed, "currency", None)
+    if msg_currency and account.currency and msg_currency.upper() != str(account.currency).upper():
+        return {
+            "matched": True, "balances_updated": 0,
+            "reason": f"currency mismatch ({msg_currency} ≠ {account.currency})",
+        }
+
     old = Decimal(str(account.balance or 0))
     new = Decimal(str(new_balance))
     delta = new - old
     account.balance = new
-    if getattr(parsed, "currency", None):
-        account.currency = parsed.currency or account.currency
+    if msg_currency and not account.currency:
+        account.currency = msg_currency
 
-    # Record the movement so the change is auditable, not silent.
+    # Record the movement so the change is auditable, not silent — deduped on
+    # the message hash, marked synthetic so reports don't double-count it.
     db.add(
         Transaction(
             account_id=account.id,
             amount=abs(delta),
             transaction_type="income" if delta >= 0 else "expense",
             description=f"auto-update from {channel}",
+            currency=account.currency,
+            source="message",
+            source_ref=msg_ref,
+            category="_balance_delta",
         )
     )
     await db.commit()
