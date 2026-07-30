@@ -1204,6 +1204,31 @@
             "path": "/api/weekly-review/settings"
           }
         ]
+      },
+      {
+        "file": "app/routes/system_map.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/system-map"
+          },
+          {
+            "method": "GET",
+            "path": "/api/system-map/graph"
+          },
+          {
+            "method": "GET",
+            "path": "/api/system-map/activity"
+          },
+          {
+            "method": "POST",
+            "path": "/api/system-map/layout"
+          },
+          {
+            "method": "POST",
+            "path": "/api/system-map/wires"
+          }
+        ]
       }
     ],
     "services": [
@@ -1513,6 +1538,27 @@
           "fallback_narrative",
           "serialize"
         ]
+      },
+      {
+        "file": "app/services/system_graph_service.py",
+        "classes": [],
+        "functions": [
+          "build_graph",
+          "parse_routes_meta",
+          "engine_snapshot",
+          "invalidate_cache"
+        ]
+      },
+      {
+        "file": "app/services/system_pulse_service.py",
+        "classes": [],
+        "functions": [
+          "record_request",
+          "activity_snapshot",
+          "load_learned_edges",
+          "flush_learned_edges",
+          "reset_for_tests"
+        ]
       }
     ]
   },
@@ -1767,6 +1813,10 @@
       {
         "name": "Tasks.test",
         "file": "frontend/src/components/__tests__/Tasks.test.jsx"
+      },
+      {
+        "name": "SystemDiagram",
+        "file": "frontend/src/components/SystemDiagram.jsx"
       }
     ]
   },
