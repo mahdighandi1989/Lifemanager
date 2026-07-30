@@ -6,37 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ProjectProvider } from './context/ProjectContext';
 import { TaskProvider } from './context/TaskContext';
-import Dashboard from './pages/Dashboard';
-import Home from './pages/Home';
-import AISettings from './pages/AISettings';
-import Settings from './pages/Settings';
-import PeopleProfiles from './pages/PeopleProfiles';
-import PersonProfilePage from './pages/PersonProfilePage';
-// Grouped hubs (each reuses the original page components as embedded tabs —
-// no page content/data logic changed):
-import FinanceHub from './pages/FinanceHub';     // برنامه و بودجه + دارایی‌ها
-import AssistantHub from './pages/AssistantHub'; // پیشنهادات + تاریخچه + شخصیت + ترسیم آینده
-import DataHub from './pages/DataHub';           // ایمپورت + فایل‌های من + ادغام تسک‌ها
-import LifeFilePage from './pages/LifeFilePage';
-import DirectivesPage from './pages/DirectivesPage';
-import SelfPortrait from './pages/SelfPortrait';
-import SahatMap from './pages/SahatMap';
-import SahatDetail from './pages/SahatDetail';
-import ListDetail from './pages/ListDetail';
-import Lists from './pages/Lists';
-import SystemMapPage from './pages/SystemMapPage';
-import Writings from './pages/Writings';
-import BrainDashboard from './pages/BrainDashboard';
-import ActivityLogPage from './pages/ActivityLogPage';
-import AttentionCenter from './pages/AttentionCenter';
-import Login from './pages/Login';
-import AdminUsers from './pages/AdminUsers';
-import Notifications from './pages/Notifications';
-import ProjectsHub from './pages/ProjectsHub';
-import ProjectDetailPage from './pages/ProjectDetailPage';
-import DevCenter from './pages/DevCenter';
-import Register from './pages/Register';
-import Tasks from './pages/Tasks';
+import { ROUTES } from './lib/routesMeta';
+import PAGE_COMPONENTS from './routesRegistry';
 
 /**
  * ⏸️ Temporary placeholder — Login page is disabled.
@@ -65,378 +36,37 @@ function App() {
   return (
     // Provider order matters: Auth on the outside so Project/Task can read
     // the token from useAuth() if they ever need to.
+    //
+    // The <Route> tree is generated from lib/routesMeta.js (the SPA's single
+    // source of truth — also read by the live system diagram and by the
+    // X-LM-Page header in lib/api.js). Public entries render bare; everything
+    // else keeps the exact ProtectedRoute > Layout wrapper it always had.
     <AuthProvider>
       <ProjectProvider>
         <TaskProvider>
           <BrowserRouter>
             <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/welcome" element={<Home />} />
-
-              {/* Protected routes */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/tasks"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Tasks />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/projects"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <ProjectsHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              {/* صفحهٔ یک پروژه (2026-07-25): «پروژه‌های من» جایی برای رفتن نداشت */}
-              <Route
-                path="/projects/:id"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <ProjectDetailPage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dev-center"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <DevCenter />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/brain"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <BrainDashboard />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/writings"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Writings />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/lists"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Lists />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/lists/:listId"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <ListDetail />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/activity-log"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <ActivityLogPage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/attention"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AttentionCenter />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/notifications"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Notifications />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings/notifications"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Settings />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/ai-settings"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AISettings />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/import"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <DataHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Settings />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings/ai-models"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Settings />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/budget"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <FinanceHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <FinanceHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/life-file"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <LifeFilePage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/directives"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <DirectivesPage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/self-portrait"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SelfPortrait />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/sahat"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SahatMap />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/sahat/:key"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SahatDetail />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/system-map"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <SystemMapPage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/people-profiles"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <PeopleProfiles />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/people/:id/profile"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <PersonProfilePage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/external-projects"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <ProjectsHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/assistant"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AssistantHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/recommendations"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AssistantHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/personality"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AssistantHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/career-planning"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AssistantHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/drive-files"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <DataHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/assets"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <FinanceHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/merge"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <DataHub />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <AdminUsers />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
+              {ROUTES.map(({ path, page, isPublic }) => {
+                const Page = PAGE_COMPONENTS[page];
+                if (!Page) return null;
+                return (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={
+                      isPublic ? (
+                        <Page />
+                      ) : (
+                        <ProtectedRoute>
+                          <Layout>
+                            <Page />
+                          </Layout>
+                        </ProtectedRoute>
+                      )
+                    }
+                  />
+                );
+              })}
               {/* /self-improvement and /self-improvement/profile removed
                   per user request — the eight خودسازی lists are now
                   accessed from /lists like any other todo list. */}

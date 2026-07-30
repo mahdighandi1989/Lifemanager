@@ -73,6 +73,20 @@ describe('lib/api.js', () => {
     expect(out.headers.Authorization).toBeUndefined();
   });
 
+  test('request interceptor stamps X-LM-Page with the ROUTE PATTERN', () => {
+    // /lists/5 must be reported as its pattern, not the concrete URL —
+    // the live system diagram learns its page→router wires from this.
+    window.history.replaceState({}, '', '/lists/5');
+    const out = captured.requestSuccess({ headers: {} });
+    expect(out.headers['X-LM-Page']).toBe('/lists/:listId');
+  });
+
+  test('X-LM-Page falls back to the raw pathname off the route table', () => {
+    window.history.replaceState({}, '', '/no-such-page');
+    const out = captured.requestSuccess({ headers: {} });
+    expect(out.headers['X-LM-Page']).toBe('/no-such-page');
+  });
+
   test('request interceptor rejects on error', async () => {
     const boom = new Error('boom');
     await expect(captured.requestError(boom)).rejects.toBe(boom);

@@ -11,6 +11,8 @@
  */
 import axios from 'axios';
 
+import { matchRoutePattern } from './routesMeta';
+
 // Backend mounts the JSON routes under /api. baseURL is the same origin
 // when the SPA is served by FastAPI in production, and Vite's dev server
 // can be configured to proxy /api to the backend.
@@ -19,13 +21,26 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// --- Request interceptor: attach the JWT --------------------------------
+// --- Request interceptor: attach the JWT + the originating page ---------
+// X-LM-Page carries the ROUTE PATTERN (e.g. /lists/:listId, not /lists/5)
+// of the page issuing the call. The backend's pulse middleware aggregates
+// these into the live system diagram's page→router wires, learned from
+// real traffic. Best-effort: any failure here must never block a request.
 api.interceptors.request.use(
   (config) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
       config.headers = config.headers ?? {};
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    try {
+      if (typeof window !== 'undefined') {
+        const page = matchRoutePattern(window.location.pathname) || window.location.pathname;
+        config.headers = config.headers ?? {};
+        config.headers['X-LM-Page'] = page;
+      }
+    } catch {
+      // observer only — never let the pulse header break a real call
     }
     return config;
   },
