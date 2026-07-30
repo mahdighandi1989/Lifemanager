@@ -4,17 +4,43 @@ The owner's complaint «یادم نمی‌مونه چی کجاست» can't be fi
 that live in git. This endpoint is the product's self-description: every
 capability, where it lives, whether it's automated, plus live row counts
 so the map doubles as a data census. The نقشهٔ سیستم page renders it.
-"""
-from __future__ import annotations
 
+2026-07-30 — the live diagram (owner: «دیاگرام فعال برنامه را رسم کن …
+باید جریان این دیاگرام زنده باشد»). Three sibling endpoints:
+
+  * GET  /api/system-map/graph    — the full architecture graph, built by
+    INTROSPECTING the running app (see system_graph_service); it can never
+    go stale because it is derived from the code, not written about it.
+  * GET  /api/system-map/activity — the real request pulse (ring buffer fed
+    by SystemPulseMiddleware) + background-engine liveness, polled by the
+    diagram to run light along the wires that actually carry traffic.
+  * POST /api/system-map/layout and /api/system-map/wires — the owner's
+    dragged card positions and hand-drawn wires, persisted server-side in
+    the global_settings KV (backend-synced, survives reloads/devices).
+
+The original GET /api/system-map (the curated capability guide) is kept
+unchanged — quarantine-not-delete; the page shows it as the «راهنما» tab.
+
+NOTE: this module must NOT use `from __future__ import annotations` — the
+@handle_errors wrapper lives in app/middleware.py, so postponed (string)
+annotations would be resolved against THAT module's globals, where
+``Request`` is undefined; FastAPI then misclassifies `request: Request`
+as a required query parameter and every call 422s.
+"""
+import json
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
+from app.dependencies.auth import (
+    enforce_auth_when_required,
+    enforce_write_auth,
+    get_optional_user_id,
+)
 from app.middleware import handle_errors
 
 logger = logging.getLogger(__name__)
@@ -144,3 +170,156 @@ async def system_map(
         },
     ]
     return {"ok": True, "counts": counts, "sections": sections}
+
+
+# ── the live diagram ─────────────────────────────────────────────────────────
+
+_LAYOUT_KEY = "system_map_layout:{user_id}"
+_WIRES_KEY = "system_map_wires:{user_id}"
+
+
+async def _load_kv_json(db: AsyncSession, key: str, default):
+    try:
+        from app.models.global_setting import GlobalSetting
+
+        row = (
+            await db.execute(select(GlobalSetting).where(GlobalSetting.key == key))
+        ).scalar_one_or_none()
+        if row and row.value:
+            return json.loads(row.value)
+    except Exception as exc:
+        logger.debug("system map kv read %s skipped: %s", key, exc)
+    return default
+
+
+async def _save_kv_json(db: AsyncSession, key: str, value) -> None:
+    from app.models.global_setting import GlobalSetting
+
+    payload = json.dumps(value, ensure_ascii=False)
+    row = (
+        await db.execute(select(GlobalSetting).where(GlobalSetting.key == key))
+    ).scalar_one_or_none()
+    if row is None:
+        db.add(GlobalSetting(key=key, value=payload))
+    else:
+        row.value = payload
+    await db.commit()
+
+
+@router.get("/api/system-map/graph", tags=["system-map"])
+@handle_errors
+async def system_map_graph(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """The full architecture graph + this user's saved layout and wires."""
+    from app.services import system_graph_service, system_pulse_service
+
+    graph = system_graph_service.build_graph(request.app)
+    layout = await _load_kv_json(db, _LAYOUT_KEY.format(user_id=user_id), {})
+    wires = await _load_kv_json(db, _WIRES_KEY.format(user_id=user_id), [])
+    learned = await system_pulse_service.load_learned_edges(db)
+    return {
+        "ok": True,
+        "success": True,
+        **graph,
+        "layout": layout,
+        "manual_wires": wires,
+        "learned_wires": learned,
+        "engines": system_graph_service.engine_snapshot(request.app),
+    }
+
+
+@router.get("/api/system-map/activity", tags=["system-map"])
+@handle_errors
+async def system_map_activity(
+    request: Request,
+    window: float = 60.0,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _gate: None = Depends(enforce_auth_when_required),
+) -> dict:
+    """The real pulse: recent request activity + engine liveness.
+
+    Polled by the diagram every few seconds; also the lazy flush point for
+    traffic-learned wires (written through THIS request's session so test
+    dependency overrides and the pool are honoured — never a private engine).
+    """
+    from app.services import system_graph_service, system_pulse_service
+
+    window = max(5.0, min(float(window), 300.0))
+    snapshot = system_pulse_service.activity_snapshot(window)
+    await system_pulse_service.load_learned_edges(db)
+    await system_pulse_service.flush_learned_edges(db)
+    return {
+        "ok": True,
+        "success": True,
+        **snapshot,
+        "engines": system_graph_service.engine_snapshot(request.app),
+    }
+
+
+class LayoutPayload(BaseModel):
+    positions: dict = {}
+    view: dict = {}
+    hidden_kinds: list[str] = []
+
+
+@router.post("/api/system-map/layout", tags=["system-map"])
+@handle_errors
+async def save_system_map_layout(
+    payload: LayoutPayload,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
+) -> dict:
+    """Persist dragged card positions / view state for this user."""
+    await _save_kv_json(
+        db,
+        _LAYOUT_KEY.format(user_id=user_id),
+        {
+            "positions": payload.positions,
+            "view": payload.view,
+            "hidden_kinds": payload.hidden_kinds,
+        },
+    )
+    return {"ok": True, "success": True}
+
+
+class WirePayload(BaseModel):
+    action: str  # "add" | "remove"
+    source: str
+    target: str
+    label: str = ""
+
+
+@router.post("/api/system-map/wires", tags=["system-map"])
+@handle_errors
+async def mutate_system_map_wires(
+    payload: WirePayload,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+    _write_gate: None = Depends(enforce_write_auth),
+) -> dict:
+    """Add/remove a hand-drawn wire — the drag-to-connect gesture on the
+    diagram lands here, so the connection is backend-synced, not cosmetic."""
+    if payload.action not in ("add", "remove"):
+        raise ValueError("action must be 'add' or 'remove'")
+    if not payload.source or not payload.target or payload.source == payload.target:
+        raise ValueError("source and target must be two different node ids")
+    key = _WIRES_KEY.format(user_id=user_id)
+    wires: list = await _load_kv_json(db, key, [])
+    wires = [
+        w for w in wires
+        if not (w.get("source") == payload.source and w.get("target") == payload.target)
+    ]
+    if payload.action == "add":
+        wires.append({
+            "source": payload.source,
+            "target": payload.target,
+            "label": payload.label or "",
+        })
+    await _save_kv_json(db, key, wires)
+    return {"ok": True, "success": True, "manual_wires": wires}

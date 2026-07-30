@@ -188,6 +188,46 @@ app.add_middleware(SlowAPIMiddleware)
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
+# --- System pulse (نبض زندهٔ سیستم) ------------------------------------------
+# Pure observer feeding the live diagram (/system-map): after the response is
+# produced, note WHICH router module served the request (scope["route"] is set
+# by the Starlette router during call_next) plus the SPA page that caused it
+# (X-LM-Page header attached by frontend/src/lib/api.js). Memory-only on the
+# request path — the DB is only touched lazily by the /api/system-map/activity
+# poller through its own request-scoped session. Recording is fully wrapped:
+# a pulse failure must never affect a real request.
+class SystemPulseMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        import time as _time
+
+        started = _time.monotonic()
+        response = await call_next(request)
+        try:
+            route = request.scope.get("route")
+            endpoint = getattr(route, "endpoint", None)
+            module = getattr(endpoint, "__module__", "") or ""
+            path = getattr(route, "path", request.url.path)
+            # Only app.routes.* handlers count, and the map's own endpoints
+            # are excluded so the diagram doesn't light itself up by polling.
+            if module.startswith("app.routes.") and not path.startswith("/api/system-map"):
+                from app.services import system_pulse_service
+
+                system_pulse_service.record_request(
+                    module=module,
+                    method=request.method,
+                    path=path,
+                    page=request.headers.get("x-lm-page"),
+                    status=response.status_code,
+                    dur_ms=int((_time.monotonic() - started) * 1000),
+                )
+        except Exception:  # noqa: BLE001 — observer must never break requests
+            pass
+        return response
+
+
+app.add_middleware(SystemPulseMiddleware)
+
+
 # When the connection pool is saturated, SQLAlchemy raises QueuePool.TimeoutError
 # (a subclass of sqlalchemy.exc.TimeoutError) after settings.DB_POOL_TIMEOUT
 # seconds. Surface this as a proper 503 instead of a generic 500 so clients and
