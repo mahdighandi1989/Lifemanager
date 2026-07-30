@@ -673,15 +673,22 @@ function SystemDiagram({ currentPath }) {
                       strokeWidth={selected === node.id ? 2.5 : isHot ? 2.5 : 1.2}
                       className={isHot ? 'animate-pulse' : undefined}
                     />
-                    {/* activity dot: real traffic/liveness only */}
+                    {/* activity dot: real traffic/liveness only. The blink is
+                        SMIL (animate r/opacity) — CSS animate-ping scales from
+                        the SVG origin, not the circle center, and jumps. */}
                     <circle
                       cx={NODE_W - 10}
                       cy={9}
                       r={4}
                       fill={dead ? '#ef4444' : isHot ? '#10b981' : isWarm ? '#f59e0b' : '#d1d5db'}
-                      className={isHot ? 'animate-ping' : undefined}
-                    />
-                    {isHot && <circle cx={NODE_W - 10} cy={9} r={3} fill="#10b981" />}
+                    >
+                      {isHot && (
+                        <>
+                          <animate attributeName="r" values="4;7;4" dur="1.1s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" values="1;0.4;1" dur="1.1s" repeatCount="indefinite" />
+                        </>
+                      )}
+                    </circle>
                     <text
                       x={NODE_W / 2}
                       y={17}

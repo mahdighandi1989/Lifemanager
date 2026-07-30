@@ -123,6 +123,23 @@ def test_pulse_records_traffic_and_learns_page_wires(api_client):
     )
 
 
+def test_pulse_rejects_unregistered_page_headers(api_client):
+    """X-LM-Page is untrusted client input: a value that is not a registered
+    route pattern must not mint a page wire (unbounded-memory guard)."""
+    api_client.get("/api/lists", headers={"X-LM-Page": "/definitely-not-a-page"})
+    data = api_client.get("/api/system-map/activity").json()
+    # the router pulse is still real …
+    assert "app/routes/lists.py" in data["routers"]
+    # … but no wire is learned from the bogus page.
+    assert data["pairs"] == []
+
+
+def test_layout_payload_size_is_bounded(api_client):
+    huge = {"positions": {f"n{i}": {"x": i, "y": i} for i in range(20000)}}
+    res = api_client.post("/api/system-map/layout", json={**huge, "view": {}, "hidden_kinds": []})
+    assert res.status_code == 400
+
+
 def test_pulse_ignores_the_maps_own_polling(api_client):
     # the diagram polls its own endpoints constantly; that must not light
     # the map up (self-noise exclusion in the middleware).

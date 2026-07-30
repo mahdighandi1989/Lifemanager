@@ -192,10 +192,15 @@ async def _load_kv_json(db: AsyncSession, key: str, default):
     return default
 
 
+_MAX_KV_BYTES = 262_144  # a layout/wires blob has no business being >256KB
+
+
 async def _save_kv_json(db: AsyncSession, key: str, value) -> None:
     from app.models.global_setting import GlobalSetting
 
     payload = json.dumps(value, ensure_ascii=False)
+    if len(payload.encode("utf-8")) > _MAX_KV_BYTES:
+        raise ValueError("payload too large")
     row = (
         await db.execute(select(GlobalSetting).where(GlobalSetting.key == key))
     ).scalar_one_or_none()

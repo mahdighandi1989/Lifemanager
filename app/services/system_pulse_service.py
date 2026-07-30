@@ -34,12 +34,34 @@ logger = logging.getLogger(__name__)
 _LEARNED_KEY = "system_map_learned_edges"
 _FLUSH_INTERVAL_SECONDS = 30.0
 _EVENTS: deque = deque(maxlen=4000)
+_MAX_LEARNED_PAIRS = 3000  # hard bound — the KV row must stay small
 
 # (page_pattern, router_file) → {"hits": int, "last_seen": epoch}
 _learned: dict[tuple[str, str], dict] = {}
 _learned_loaded = False
 _learned_dirty = False
 _last_flush = 0.0
+
+# X-LM-Page is a client-supplied header, so it is UNTRUSTED input: without
+# validation any client could mint unlimited distinct "page" strings and
+# grow _learned (and the persisted JSON) without bound. Only patterns that
+# actually exist in the SPA's route registry are accepted.
+_valid_pages_cache: dict = {"ts": 0.0, "patterns": frozenset()}
+
+
+def _valid_pages() -> frozenset:
+    now = time.time()
+    if now - _valid_pages_cache["ts"] > 60.0 or not _valid_pages_cache["patterns"]:
+        try:
+            from app.services.system_graph_service import parse_routes_meta
+
+            _valid_pages_cache["patterns"] = frozenset(
+                e["path"] for e in parse_routes_meta()
+            )
+        except Exception:
+            pass
+        _valid_pages_cache["ts"] = now
+    return _valid_pages_cache["patterns"]
 
 
 def record_request(
@@ -59,6 +81,8 @@ def record_request(
         router_file = _module_file(module)
         if not router_file:
             return
+        if page and page not in _valid_pages():
+            page = None  # untrusted header value — not a registered page
         now = time.time()
         _EVENTS.append({
             "ts": now,
@@ -70,10 +94,12 @@ def record_request(
             "dur_ms": dur_ms,
         })
         if page:
-            entry = _learned.setdefault((page, router_file), {"hits": 0, "last_seen": 0.0})
-            entry["hits"] += 1
-            entry["last_seen"] = now
-            _learned_dirty = True
+            pair = (page, router_file)
+            if pair in _learned or len(_learned) < _MAX_LEARNED_PAIRS:
+                entry = _learned.setdefault(pair, {"hits": 0, "last_seen": 0.0})
+                entry["hits"] += 1
+                entry["last_seen"] = now
+                _learned_dirty = True
     except Exception:  # pragma: no cover — observer must stay silent
         pass
 
