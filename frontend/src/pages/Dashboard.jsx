@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
 import GoogleLifePanel from '../components/GoogleLifePanel';
+import OpenQuestionsPanel from '../components/OpenQuestionsPanel';
 import { unescapeHtml } from '../lib/text';
 
 // Use /api so the fetches reach the JSON endpoints, not the SPA route.
@@ -721,6 +722,10 @@ function Dashboard() {
             {tasksBuckets?.due_today?.map((t) => <TaskRow key={`t${t.id}`} task={t} tone="today" />)}
             {tasksBuckets?.upcoming?.map((t) => <TaskRow key={`u${t.id}`} task={t} tone="upcoming" />)}
           </SectionCard>
+
+          {/* پرسش‌های رفعِ ابهام — بالای صندوق، چون جوابشان چند جای برنامه را
+              درست می‌کند و نباید زیرِ بقیه گم شوند. */}
+          <OpenQuestionsPanel />
 
           {/* Inbox pending review */}
           <SectionCard

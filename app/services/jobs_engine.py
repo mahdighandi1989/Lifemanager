@@ -264,6 +264,14 @@ async def _job_activity_archive(db: AsyncSession) -> dict[str, Any]:
     return await archive_tick(db)
 
 
+async def _job_clarifications(db: AsyncSession) -> dict[str, Any]:
+    """فرم‌های پرسشِ سررسیده را می‌فرستد و رهاشده‌ها را park می‌کند — همان
+    «اگر جواب ندادم یا پیام بالا رفت، بعداً دوباره بپرس»."""
+    from app.services.clarification_service import dispatch_pending
+
+    return await dispatch_pending(db)
+
+
 async def _job_mobile_watchdog(db: AsyncSession) -> dict[str, Any]:
     """نگهبان اتصال موبایل — گوشیِ ساکت‌شده را با تلگرام هشدار می‌دهد (تکرار
     تا وصل شدن) و برگشتنش را هم خبر می‌دهد. جزئیات در mobile_watchdog_service."""
@@ -344,6 +352,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_email_scan", "شناساییِ حساب‌ها از ایمیل (خودتغذیه)",
      lambda: _env_minutes("FINANCE_EMAIL_SCAN_INTERVAL_MINUTES", 6 * 60.0),
      _job_finance_email_scan),
+    ("clarifications", "پرسش‌های رفعِ ابهام (تلگرام)",
+     lambda: _env_minutes("CLARIFICATION_INTERVAL_MINUTES", 20.0),
+     _job_clarifications),
     ("mobile_watchdog", "نگهبان اتصال موبایل",
      lambda: _env_minutes("MOBILE_WATCHDOG_INTERVAL_MINUTES", 15.0),
      _job_mobile_watchdog),

@@ -56,6 +56,7 @@ PERSISTENT_REPLY_KEYBOARD: Dict[str, Any] = {
     "keyboard": [
         [{"text": "📋 کارها"}, {"text": "🆕 کار جدید"}],
         [{"text": "📥 صندوق ورودی"}, {"text": "📊 وضعیت"}, {"text": "📋 منو"}],
+        [{"text": "❓ پرسش‌های باز"}],
     ],
     "resize_keyboard": True,
     "is_persistent": True,
@@ -68,6 +69,7 @@ TEXT_ALIASES: Dict[str, str] = {
     "📥 صندوق ورودی": "/inbox",
     "📊 وضعیت": "/status",
     "📋 منو": "/menu",
+    "❓ پرسش‌های باز": "/questions",
 }
 
 # How many open tasks /tasks lists at once.
@@ -429,6 +431,17 @@ class TelegramBot:
             logger.info("telegram: ignoring chat %s (not configured)", chat_id_str)
             return {"ok": True, "ignored": True}
 
+        # Clarification form replies (2026-07-31). MUST run before compose:
+        # a reply to a question form is an answer, not a new task. Bound by
+        # reply_to_message.message_id, so a form that scrolled far up is still
+        # answerable and several open forms never get mixed up.
+        try:
+            answered = await self._maybe_handle_clarification_reply(chat_id_str, message, text)
+            if answered is not None:
+                return answered
+        except Exception as exc:
+            logger.exception("clarification reply handling crashed: %r", exc)
+
         # Compose: media (voice/photo/document/video/…) — or text while a compose
         # session is open — is buffered into one task. Runs BEFORE the text-command
         # path so attachments aren't dropped (they carry no message.text).
@@ -456,6 +469,45 @@ class TelegramBot:
             except Exception:
                 pass
             return {"ok": True, "handler_error": str(exc)[:200]}
+
+    async def _maybe_handle_clarification_reply(
+        self, chat_id: str, message: Dict[str, Any], text: str
+    ) -> Optional[Dict[str, Any]]:
+        """Is this message an answer to an open question form? Then parse it,
+        record it, file it, and report back. None → not a form reply."""
+        if not text:
+            return None
+        reply_to = (message.get("reply_to_message") or {}).get("message_id")
+        if not reply_to:
+            return None
+        from app.database import SessionLocal
+        from app.services import clarification_service as clar
+
+        async with SessionLocal() as session:
+            result = await clar.handle_reply(
+                session, text=text, reply_to_message_id=reply_to
+            )
+        if result is None:
+            return None
+        await self.send(result["feedback"], chat_id=chat_id, silent=True)
+        return {"ok": True, "handled": "clarification_answered",
+                "clarification_id": result["clarification_id"],
+                "filled": result["filled"], "remaining": result["remaining"]}
+
+    async def _cmd_questions(self, chat_id: str) -> Dict[str, Any]:
+        """«❓ سوال‌های باز» — پیام‌های قبلی بالا رفته‌اند؟ همه را دوباره بفرست."""
+        from app.database import SessionLocal
+        from app.services import clarification_service as clar
+
+        async with SessionLocal() as session:
+            forms = await clar.open_forms(session, limit=clar.MAX_OPEN_FORMS)
+            if not forms:
+                await self.send("✅ هیچ پرسشِ بازی ندارم — همه‌چیز روشن است.",
+                                chat_id=chat_id, silent=True,
+                                reply_markup=PERSISTENT_REPLY_KEYBOARD)
+                return {"ok": True, "handled": "questions_none"}
+            res = await clar.resend_all(session)
+        return {"ok": True, "handled": "questions_resent", **res}
 
     async def _maybe_route_to_compose(
         self, chat_id: str, message: Dict[str, Any], text: str
@@ -644,6 +696,9 @@ class TelegramBot:
 
         if lower == "/menu":
             return await self._cmd_menu(chat_id)
+
+        if lower in ("/questions", "/q", "/soal"):
+            return await self._cmd_questions(chat_id)
 
         if lower == "/status":
             return await self._cmd_status(chat_id)
@@ -945,6 +1000,9 @@ class TelegramBot:
         if data == "menu:new_task":
             await self.answer_callback(cq_id)
             return await self._start_compose_flow(chat_id)
+        if data.startswith("clar:"):
+            return await self._handle_clarification_callback(chat_id, cq_id, data)
+
         if data.startswith("task:done:"):
             task_id = data.split(":", 2)[2]
             return await self._complete_task(chat_id, cq_id, task_id)
@@ -972,6 +1030,35 @@ class TelegramBot:
         return {"ok": True, "handled": "cb_unknown", "data": data[:60]}
 
     # ── domain helpers (tasks) ───────────────────────────────────────────────
+    async def _handle_clarification_callback(
+        self, chat_id: str, cq_id: str, data: str
+    ) -> Dict[str, Any]:
+        """«⏰ بعداً» / «🚫 مربوط نیست» روی یک فرمِ پرسش."""
+        from app.database import SessionLocal
+        from app.services import clarification_service as clar
+
+        parts = data.split(":")
+        action = parts[1] if len(parts) > 1 else ""
+        try:
+            cid = int(parts[2])
+        except (IndexError, ValueError):
+            await self.answer_callback(cq_id)
+            return {"ok": True, "handled": "clar_bad_callback"}
+
+        async with SessionLocal() as session:
+            if action == "snooze":
+                ok = await clar.snooze(session, cid, hours=24)
+                msg = "⏰ باشد، فردا دوباره می‌پرسم." if ok else "پیدا نشد."
+            elif action == "skip":
+                ok = await clar.skip(session, cid)
+                # حذف نمی‌شود — فقط از چرخهٔ پرسش بیرون می‌رود و در برنامه می‌ماند.
+                msg = "🚫 دیگر نمی‌پرسم (در برنامه بایگانی می‌ماند)." if ok else "پیدا نشد."
+            else:
+                msg = "دستور ناشناخته."
+        await self.answer_callback(cq_id, msg[:180])
+        await self.send(msg, chat_id=chat_id, silent=True)
+        return {"ok": True, "handled": f"clar_{action}", "id": cid}
+
     async def _list_open_tasks(self, session) -> List[Any]:
         from sqlalchemy import or_, select
         from app.models.task import Task, TaskStatus

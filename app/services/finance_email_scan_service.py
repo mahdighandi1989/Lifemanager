@@ -396,6 +396,56 @@ async def set_owner_accounts(db: AsyncSession, entries: list) -> None:
     await _kv_set_list(db, _OWNER_ACCOUNTS_KEY, entries)
 
 
+async def _ask_which_account(
+    db: AsyncSession, uid: int, *, institution: Optional[str], balance,
+    currency: Optional[str], source_ref: Optional[str], evidence: Optional[str] = None,
+) -> None:
+    """«این پیام مالِ کدام کارت است؟» — با گزینه‌های واقعیِ همان بانک.
+
+    این یکی از معدود جاهایی است که گزینه‌ها را خودمان می‌دهیم (نه مدل)، چون
+    فهرستِ کارت‌ها یک واقعیتِ قطعیِ دیتابیسی است و حدسِ مدل فقط خرابش می‌کند."""
+    try:
+        from app.models.finance import FinancialAccount
+        from app.services import clarification_service as clar
+
+        rows = (
+            await db.execute(
+                select(FinancialAccount).where(
+                    FinancialAccount.institution == institution,
+                    or_(FinancialAccount.user_id == uid, FinancialAccount.user_id.is_(None))
+                    if uid == 0 else (FinancialAccount.user_id == uid),
+                )
+            )
+        ).scalars().all()
+        names = [r.name for r in rows if r.name][:8]
+        if len(names) < 2:
+            return
+        amount = f"{balance:,}".rstrip("0").rstrip(".") if balance is not None else "—"
+        await clar.ask(
+            db,
+            topic=f"موجودیِ {amount} {currency or ''} از «{institution}» مالِ کدام کارت است؟",
+            context=(evidence or "")[:1000],
+            source="finance",
+            # یک ابهام برای هر (بانک+منبع) — پیامِ تکراری فرمِ تکراری نمی‌سازد.
+            source_ref=f"finance-ambiguous:{institution}:{source_ref or ''}"[:191],
+            target={"kind": "finance_account", "institution": institution,
+                    "balance": str(balance) if balance is not None else None,
+                    "currency": currency, "source_ref": source_ref},
+            questions=[{
+                "key": "account_name",
+                "label": f"کدام کارتِ «{institution}»؟",
+                "type": "choice",
+                "choices": names,
+                "why": "چند کارت در این بانک هست و پیام شمارهٔ کارت ندارد — بدون جوابِ تو، ثبت نمی‌کنم.",
+                "required": True,
+            }],
+            priority=5,   # پول مهم است؛ جلوتر از بقیه پرسیده شود
+            user_id=uid,
+        )
+    except Exception as exc:
+        logger.debug("ambiguous-account question skipped: %r", exc)
+
+
 async def apply_account_signal(
     db: AsyncSession,
     uid: int,
@@ -434,8 +484,16 @@ async def apply_account_signal(
     if acc is None and ambiguous:
         # several cards at this institution and no ref — no way to know which
         # one the signal means. Guessing overwrote real balances; refuse.
-        logger.info("finance signal ambiguous at %s — several cards, no ref; skipped", institution)
-        return {"created": 0, "updated": 0, "account_id": None, "reason": "ambiguous"}
+        # ...but refusing silently means the signal is simply LOST. Since
+        # 2026-07-31 we ASK the owner instead (خواستهٔ مالک: ابهام نه مغفول
+        # بماند نه اشتباه ثبت شود). The refusal itself is unchanged — nothing
+        # is written until he answers.
+        logger.info("finance signal ambiguous at %s — several cards, no ref; asking", institution)
+        await _ask_which_account(
+            db, uid, institution=institution, balance=bal, currency=currency,
+            source_ref=source_ref, evidence=evidence,
+        )
+        return {"created": 0, "updated": 0, "account_id": None, "reason": "ambiguous", "asked": True}
     if acc is None:
         # PRECISION over recall (the owner's finance page filled with junk):
         # opening a NEW card needs a real, non-zero BALANCE from a real

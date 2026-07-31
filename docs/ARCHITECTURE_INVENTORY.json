@@ -240,6 +240,12 @@
         "classes": [
           "WeeklyReview"
         ]
+      },
+      {
+        "file": "app/models/clarification.py",
+        "classes": [
+          "Clarification"
+        ]
       }
     ],
     "routes": [
@@ -1306,6 +1312,35 @@
             "path": "/api/mobile/diagnostics"
           }
         ]
+      },
+      {
+        "file": "app/routes/clarifications.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/clarifications"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/answer"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/skip"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/snooze"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/resend"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/ask"
+          }
+        ]
       }
     ],
     "services": [
@@ -1683,6 +1718,26 @@
           "category_hint",
           "compose_text"
         ]
+      },
+      {
+        "file": "app/services/clarification_service.py",
+        "classes": [],
+        "functions": [
+          "ask",
+          "render_form",
+          "send_form",
+          "dispatch_pending",
+          "parse_reply",
+          "record_answers",
+          "file_answers",
+          "handle_reply",
+          "feedback_text",
+          "snooze",
+          "skip",
+          "open_forms",
+          "resend_all",
+          "to_dict"
+        ]
       }
     ]
   },
@@ -1949,6 +2004,10 @@
       {
         "name": "MobileChannelsStrip",
         "file": "frontend/src/components/MobileChannelsStrip.jsx"
+      },
+      {
+        "name": "OpenQuestionsPanel",
+        "file": "frontend/src/components/OpenQuestionsPanel.jsx"
       }
     ]
   },

@@ -394,6 +394,30 @@ async def _route_inbox(db, user_id, sender, text, occurred_at, device, ref) -> D
     return {"routed_to": ("inbox" if item_id else "inbox_dup"), "inbox_item_id": item_id}
 
 
+# ── asking instead of guessing ───────────────────────────────────────────────
+# «ارتباط دوطرفه» (۲۰۲۶-۰۷-۳۱): هر جای این خط لوله که شک دارد، به‌جای ثبتِ
+# یک حدس، می‌تواند بپرسد. یک تابع، پس افزودنِ نقطهٔ پرسشِ تازه یک خط است.
+
+def _short_topic(sender: str, text: str) -> str:
+    head = re.sub(r"\s+", " ", (text or "")).strip()[:70]
+    who = re.sub(r"\s+", " ", (sender or "")).strip()[:40]
+    return f"{who}: {head}" if who else head or "یک پیامِ ورودی"
+
+
+async def _ask_about(db, user_id, *, topic, text, source, source_ref, target, hint=None) -> None:
+    try:
+        from app.services import clarification_service as clar
+
+        await clar.ask(
+            db, topic=topic, context=(text or "")[:1500], source=source,
+            source_ref=f"ask:{source_ref}"[:191], target=target, hint=hint,
+            user_id=user_id,
+        )
+        await db.commit()
+    except Exception as exc:
+        logger.debug("clarification ask skipped: %r", exc)
+
+
 # ── the registry: (category → router). First matching category wins. ─────────
 # Adding a new routed type = add a classifier branch above + a line here.
 _ROUTERS: Dict[str, Callable] = {
@@ -476,6 +500,21 @@ async def dispatch_signal(
             if res.get("routed_to"):
                 out["routed_to"] = res["routed_to"]
             out.update({k: v for k, v in res.items() if k != "routed_to"})
+
+            # مسیر گرفت، ولی مدل مطمئن نبود → به‌جای اینکه یک حدس بی‌سروصدا
+            # ثبت شود، همان‌جا می‌پرسیم. مقصدِ فعلی دست‌نخورده می‌ماند (چیزی
+            # گم نمی‌شود) و جوابِ مالک بعداً اصلاحش می‌کند.
+            if (
+                confidence is not None and confidence < 0.55
+                and out.get("inbox_item_id")
+            ):
+                await _ask_about(
+                    db, user_id, topic=_short_topic(sender, text), text=text,
+                    source=source, source_ref=source_ref,
+                    target={"kind": "inbox_item", "id": out["inbox_item_id"]},
+                    hint=f"موتور این را «{category}» تشخیص داد ولی مطمئن نیست "
+                         f"(اطمینان {confidence:.0%}).",
+                )
         return out
     except Exception as exc:  # observer-safe
         logger.debug("mobile dispatch skipped: %r", exc)

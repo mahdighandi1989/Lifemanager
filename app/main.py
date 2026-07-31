@@ -27,6 +27,7 @@ from app.routes import (
     backup,
     directives,
     global_search,
+    clarifications,
     system_map,
     trash,
     weekly_review,
@@ -948,6 +949,7 @@ app.include_router(directives.router, tags=["directives"])
 app.include_router(assistant_chat.router, tags=["ai"])
 app.include_router(global_search.router, tags=["search"])
 app.include_router(system_map.router, tags=["system-map"])
+app.include_router(clarifications.router, tags=["clarifications"])
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.
 app.include_router(mobile.router, tags=["mobile"])

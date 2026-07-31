@@ -11,6 +11,7 @@ from app.models.ai_provider import AIProvider, GlobalAnalysisPrompt
 from app.models.ai_usage import AIUsageLog
 from app.models.ai_catalog import AICatalogModel, AICatalogProvider, AITaskRoute
 from app.models.import_job import ImportJob
+from app.models.clarification import Clarification
 from app.models.inbox_item import InboxItem
 from app.models.analysis_prompt import AnalysisPrompt
 from app.models.external_project import ExternalProject, ExternalProjectConnection
@@ -80,6 +81,7 @@ __all__ = [
     "AICatalogModel",
     "AITaskRoute",
     "ImportJob",
+    "Clarification",
     "InboxItem",
     "AnalysisPrompt",
     "ExternalProject",
