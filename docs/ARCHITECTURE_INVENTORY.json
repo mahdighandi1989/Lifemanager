@@ -1339,6 +1339,10 @@
           {
             "method": "POST",
             "path": "/api/clarifications/ask"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/edit"
           }
         ]
       }
@@ -1736,7 +1740,8 @@
           "skip",
           "open_forms",
           "resend_all",
-          "to_dict"
+          "to_dict",
+          "edit_answers"
         ]
       }
     ]

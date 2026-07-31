@@ -77,6 +77,31 @@ async def answer_clarification(
             "item": clar.to_dict(c), "feedback": clar.feedback_text(c, outcome, filed)}
 
 
+@router.post("/api/clarifications/{clarification_id}/edit", tags=["clarifications"])
+@handle_errors
+async def edit_clarification(
+    clarification_id: int,
+    payload: Dict[str, Any] = Body(default={}),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """ویرایشِ جوابِ قبلی — «اشتباه نوشتم» یا «نظرم عوض شد».
+
+    ``{"answers": {"<key>": "<مقدار تازه>"}}``. مقدارِ **خالی** یعنی «این جواب
+    را پس گرفتم» و همان پرسش دوباره باز و پرسیدنی می‌شود. پس از ویرایش، دوباره
+    در سیستم ثبت می‌شود تا مقدارِ غلطِ قبلی جا نماند."""
+    from app.models.clarification import Clarification
+
+    edits = payload.get("answers")
+    if not isinstance(edits, dict) or not edits:
+        raise ValueError("answers is required")
+    res = await clar.edit_answers(db, clarification_id, {k: str(v or "") for k, v in edits.items()})
+    if res is None:
+        raise HTTPException(status_code=404, detail="clarification not found")
+    c = await db.get(Clarification, int(clarification_id))
+    return {"ok": True, "success": True, **res, "item": clar.to_dict(c)}
+
+
 @router.post("/api/clarifications/{clarification_id}/skip", tags=["clarifications"])
 @handle_errors
 async def skip_clarification(

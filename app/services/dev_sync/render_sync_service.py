@@ -43,6 +43,17 @@ _DASHBOARD_SEGMENTS = {
 _owner_id_cache: Dict[str, str] = {}
 
 
+def reset_for_tests() -> None:
+    """Drop the process-wide owner-id cache.
+
+    It is keyed by a hash of the API token, which is realistic in production
+    (one token → one owner) but leaks between tests: two suites using the same
+    fake token but different fake owners would silently reuse the first one's
+    id and query the wrong owner. An autouse fixture calls this per test — the
+    same pattern as ``system_pulse_service.reset_for_tests``."""
+    _owner_id_cache.clear()
+
+
 def _headers(token: str) -> Dict[str, str]:
     return {"Authorization": f"Bearer {token}", "Accept": "application/json"}
 

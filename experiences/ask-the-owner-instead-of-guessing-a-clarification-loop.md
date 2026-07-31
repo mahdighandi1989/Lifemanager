@@ -118,3 +118,60 @@ parsed is how a human-in-the-loop system loses its human.
 7. Re-ask on escalating backoff; park, never delete; revive on new questions.
 8. Mirror the whole thing in-app, so a broken channel does not restore the
    silence you were eliminating.
+
+## Update 2026-07-31 — editing answers, and the JSON column that silently discarded them
+
+Three lessons from the first review pass of this loop.
+
+**1. A mutable JSON column does not persist in-place edits — and same-session
+tests will not catch it.** The obvious code is wrong:
+
+```python
+questions = list(row.questions or [])   # shallow copy: same dicts inside
+questions[0]["answer"] = value          # mutates objects the OLD value also holds
+row.questions = questions               # old == new → no UPDATE emitted
+```
+
+The ORM captures the previous value, compares it to the new one at flush, finds
+them equal (they share the inner dicts), and emits nothing. Every test that
+reads back through the same session passes, because the in-memory object *does*
+have the answer. Only a read from a **fresh session** exposes it. Fix: deep-copy
+before mutating and mark the attribute dirty explicitly. Then write the
+regression test so it opens a new session — a test that reuses the session is
+testing your object graph, not your database.
+
+**2. The form must be re-fillable, and the numbering must be stable.** Rendering
+only the *unanswered* fields seems tidy but is a correctness bug: after a partial
+answer the list shrinks, so "2)" means a different question on the next send and
+the user's reply lands on the wrong field. Number **all** fields every time and
+print the current answer after the colon. Editing and filling then become the
+same gesture — change the value and send — which is also the whole answer to
+"can I correct something later?".
+
+**3. Corrections must re-run the filing, not just update the form.** An edited
+answer that is not re-applied leaves the original wrong value in the system,
+which is precisely the failure the loop exists to prevent. Distinguish a *new*
+answer from an *edited* one in the return value so the feedback can say which
+happened, and skip the case where the user simply returns the prefilled form
+unchanged — that is not an edit and should produce no noise.
+
+## Update 2026-07-31 — a standing backlog must stop announcing itself
+
+A related complaint surfaced in the same review: a separate digest was pushing
+"80–100 files waiting for a password" every six hours, forever. It shares a root
+cause with everything above — **a reminder loop that does not model whether
+anything changed becomes noise, and noise trains the user to ignore the channel
+you need for real questions.**
+
+The discipline that fixed it generalizes to any "N items pending" notification:
+
+- **Count only what is actionable.** The system already classified some of those
+  files as not worth asking about; they were still in the number. An inflated
+  count is not just noise, it destroys trust in every other number you report.
+- **Push on change, not on schedule.** Hash the set of pending ids. Same set →
+  stay silent; that is a dashboard state, not news.
+- **Name what is new.** When the set grows, list the *new* items, not the whole
+  backlog again.
+- **Escalate then stop.** A few reminders at increasing intervals, then silence
+  until the set actually changes — and say so in the last message, so silence
+  reads as a decision rather than a failure.

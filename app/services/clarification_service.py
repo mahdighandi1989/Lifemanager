@@ -29,11 +29,13 @@ from __future__ import annotations
 import json
 import logging
 import re
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import flag_modified
 
 logger = logging.getLogger(__name__)
 
@@ -171,6 +173,23 @@ def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
 
 # ── ساخت / ادغام ────────────────────────────────────────────────────────────
 
+# ── نوشتن روی ستون‌های JSON ─────────────────────────────────────────────────
+# دامِ کلاسیکِ SQLAlchemy: ستونِ JSONِ ساده «تغییرِ درجا» را نمی‌بیند. اگر
+# `list(c.questions)` بگیری و دیکشنری‌های درونش را عوض کنی، لیستِ قدیم و جدید
+# *همان* دیکشنری‌ها را دارند، پس در flush برابر دیده می‌شوند و UPDATE صادر
+# نمی‌شود — جواب در حافظه هست و در دیتابیس نیست. (این دقیقاً یک بار اتفاق
+# افتاد: تست‌های هم‌نشست سبز بودند و رکوردِ واقعی خالی.) پس: کپیِ عمیق برای
+# ویرایش، و flag_modified موقعِ نوشتن.
+
+def _questions_of(c) -> List[Dict[str, Any]]:
+    return deepcopy(list(c.questions or []))
+
+
+def _write_json(obj, field: str, value) -> None:
+    setattr(obj, field, value)
+    flag_modified(obj, field)
+
+
 def _unanswered(c) -> List[Dict[str, Any]]:
     return [q for q in (c.questions or []) if not str(q.get("answer") or "").strip()]
 
@@ -227,10 +246,10 @@ async def ask(
             return None  # مدل گفت ابهامِ واقعی‌ای نیست — سؤالِ الکی نمی‌سازیم
 
         if existing is not None:
-            merged = _merge_fields(existing.questions or [], fields)
+            merged = _merge_fields(_questions_of(existing), fields)
             if len(merged) == len(existing.questions or []):
                 return existing          # چیزی تازه نبود
-            existing.questions = merged
+            _write_json(existing, "questions", merged)
             # سؤالِ تازه = فرم دوباره «باز» است و باید دوباره فرستاده شود.
             existing.status = "partial" if _answered(existing) else "open"
             if existing.status == "parked":
@@ -293,34 +312,37 @@ async def _targets_text(db: AsyncSession, user_id: int) -> str:
 
 # ── رندرِ فرم ───────────────────────────────────────────────────────────────
 
+def _type_hint(q: Dict[str, Any]) -> str:
+    if q.get("type") == "choice" and q.get("choices"):
+        return "  (" + " / ".join(q["choices"][:6]) + ")"
+    return {"date": "  (تاریخ)", "yesno": "  (بله / خیر)", "number": "  (عدد)"}.get(
+        q.get("type"), ""
+    )
+
+
 def render_form(c, *, reminder: bool = False) -> str:
-    """فرمِ پرشدنی: هر خط یک فیلد با «:» — مالک جلوی هر کدام می‌نویسد و
-    می‌فرستد. خالی‌گذاشتن مجاز است و همان فیلد بعداً دوباره پرسیده می‌شود."""
-    pending = _unanswered(c)
-    done = _answered(c)
+    """فرمِ پرشدنی و **قابلِ ویرایش**.
+
+    شماره‌گذاری روی *همهٔ* فیلدهاست، نه فقط بی‌جواب‌ها. دو دلیل:
+      • شماره‌ها بینِ ارسال‌های پیاپی جابه‌جا نمی‌شوند — وگرنه «۲)» این دفعه
+        سؤالِ دیگری بود و جوابِ مالک روی فیلدِ اشتباه می‌نشست.
+      • جوابِ قبلی جلوی خطش نوشته می‌شود، پس ویرایش و پرکردن یک حرکت‌اند:
+        مقدار را عوض کن و بفرست.
+    """
     head = "🔄 *یادآوری — هنوز جواب نگرفتم*" if reminder else "❓ *یک ابهام هست، لطفاً کمک کن*"
     lines = [head, "", f"*موضوع:* {c.topic}"]
     if c.context:
-        snippet = (c.context or "").strip().replace("\n", " ")[:220]
+        snippet = re.sub(r"\s+", " ", (c.context or "")).strip()[:220]
         lines.append(f"_{snippet}_")
-    if done:
-        lines += ["", f"✅ قبلاً جواب دادی: {len(done)} مورد"]
-    lines += ["", "برای جواب، همین پیام را *ریپلای* کن و خط‌ها را پر کن:", ""]
-    for idx, q in enumerate(pending, start=1):
-        hint = ""
-        if q.get("type") == "choice" and q.get("choices"):
-            hint = "  (" + " / ".join(q["choices"][:6]) + ")"
-        elif q.get("type") == "date":
-            hint = "  (تاریخ)"
-        elif q.get("type") == "yesno":
-            hint = "  (بله / خیر)"
-        elif q.get("type") == "number":
-            hint = "  (عدد)"
-        lines.append(f"{idx}) {q['label']}{hint}:")
+    lines += ["", "همین پیام را *ریپلای* کن و خط‌ها را پر کن:", ""]
+    for idx, q in enumerate(c.questions or [], start=1):
+        answer = str(q.get("answer") or "").strip()
+        shown = answer if len(answer) <= 60 else answer[:57] + "…"
+        lines.append(f"{idx}) {q['label']}{'' if answer else _type_hint(q)}: {shown}")
     lines += [
         "",
-        "• هر خطی را که جوابش را نمی‌دانی *خالی* بگذار — بعداً دوباره می‌پرسم.",
-        "• جوابِ کوتاه یا بلند، هر دو خوب است.",
+        "• خطِ خالی را می‌توانی خالی بگذاری — بعداً دوباره می‌پرسم.",
+        "• خطی که پر است جوابِ قبلیِ توست؛ عوضش کنی، *به‌روز* می‌شود.",
     ]
     return "\n".join(lines)
 
@@ -459,8 +481,11 @@ _ANSWER_PROMPT = """صاحبِ برنامه به یک فرمِ پرسش جواب
 
 
 async def parse_reply(db: AsyncSession, c, text: str) -> Dict[str, str]:
-    """جوابِ آزادِ کاربر → {key: value}. خالی‌ها برنمی‌گردند."""
-    pending = _unanswered(c)
+    """جوابِ آزادِ کاربر → {key: value}. خالی‌ها برنمی‌گردند.
+
+    روی **همهٔ** فیلدها کار می‌کند، نه فقط بی‌جواب‌ها — چون فرم قابلِ ویرایش
+    است و مالک ممکن است جوابِ قبلی‌اش را عوض کند."""
+    pending = list(c.questions or [])
     if not pending:
         return {}
     heuristic = _heuristic_map(pending, text)
@@ -575,27 +600,39 @@ async def record_answers(db: AsyncSession, c, mapped: Dict[str, str], *, raw: st
     """جواب‌ها را روی فیلدها می‌نشاند و وضعیت را به‌روز می‌کند."""
     now = datetime.now(timezone.utc)
     note = mapped.pop("_note", None)
-    questions = list(c.questions or [])
+    questions = _questions_of(c)
     filled = 0
+    edited: Dict[str, Any] = {}
     for q in questions:
         value = mapped.get(q.get("key"))
-        if _meaningful(value):
-            q["answer"] = str(value)[:2000]
-            q["answered_at"] = now.isoformat()
+        if not _meaningful(value):
+            continue
+        new_value = str(value)[:2000]
+        old_value = str(q.get("answer") or "")
+        if old_value and old_value == new_value:
+            continue                      # همان جوابِ قبلی، تکرارِ فرمِ پرشده
+        if old_value:
+            # ویرایشِ جوابِ قبلی از راهِ همان فرم — «اشتباه نوشتم / عوض شد».
+            edited[q["key"]] = {"before": old_value, "after": new_value}
+        else:
             filled += 1
-    c.questions = questions
+        q["answer"] = new_value
+        q["answered_at"] = now.isoformat()
+    _write_json(c, "questions", questions)
     history = list(c.answers or [])
     history.append({"at": now.isoformat(), "text": (raw or "")[:2000], "via": via,
-                    **({"note": note} if note else {})})
-    c.answers = history[-20:]
+                    **({"note": note} if note else {}),
+                    **({"edited": edited} if edited else {})})
+    _write_json(c, "answers", history[-20:])
     remaining = _unanswered(c)
     c.status = "answered" if not remaining else ("partial" if _answered(c) else "open")
-    if filled:
+    if filled or edited:
         # جوابِ تازه = چرخهٔ پرسش از نو، تا بقیهٔ فیلدها بی‌فاصله دوباره نپرند
         c.attempts = 0
         c.last_sent_at = now
     await db.flush()
-    return {"filled": filled, "remaining": len(remaining), "note": note}
+    return {"filled": filled, "edited": len(edited), "edits": edited,
+            "remaining": len(remaining), "note": note}
 
 
 # ── ثبتِ جواب‌ها در بخش‌های واقعی ────────────────────────────────────────────
@@ -614,7 +651,7 @@ async def file_answers(db: AsyncSession, c) -> List[Dict[str, Any]]:
     except Exception as exc:
         logger.debug("clarification filing failed (%s): %r", kind, exc)
         result = []
-    c.result = (c.result or []) + list(result or [])
+    _write_json(c, "result", list(c.result or []) + list(result or []))
     if not _unanswered(c):
         c.status = "filed"
         c.filed_at = datetime.now(timezone.utc)
@@ -781,7 +818,10 @@ async def handle_reply(db: AsyncSession, *, text: str, reply_to_message_id: Any 
         return None
     mapped = await parse_reply(db, c, text)
     outcome = await record_answers(db, c, mapped, raw=text, via="telegram")
-    filed = await file_answers(db, c) if outcome["filled"] else []
+    # ویرایش هم مثل جوابِ تازه باید دوباره ثبت شود، وگرنه جوابِ اصلاح‌شده در
+    # فرم می‌ماند و سیستم با مقدارِ غلطِ قبلی جلو می‌رود.
+    changed = outcome["filled"] or outcome.get("edited")
+    filed = await file_answers(db, c) if changed else []
     await db.commit()
     return {"clarification_id": c.id, **outcome, "filed": filed,
             "feedback": feedback_text(c, outcome, filed)}
@@ -792,7 +832,9 @@ def feedback_text(c, outcome: Dict[str, Any], filed: List[Dict[str, Any]]) -> st
     lines = []
     if outcome.get("filled"):
         lines.append(f"✅ {outcome['filled']} جواب ثبت شد — «{c.topic[:60]}»")
-    else:
+    if outcome.get("edited"):
+        lines.append(f"✏️ {outcome['edited']} جوابِ قبلی به‌روز شد و دوباره ثبت شد.")
+    if not outcome.get("filled") and not outcome.get("edited"):
         lines.append(f"🤔 از پیامت چیزی برای «{c.topic[:60]}» برداشت نکردم.")
     for r in filed or []:
         lines.append(f"• ثبت شد در: {r.get('label') or r.get('where')}")
@@ -804,6 +846,63 @@ def feedback_text(c, outcome: Dict[str, Any], filed: List[Dict[str, Any]]) -> st
     else:
         lines.append("🎉 این موضوع کامل شد.")
     return "\n".join(lines)
+
+
+async def edit_answers(
+    db: AsyncSession, clarification_id: int, edits: Dict[str, str], *, refile: bool = True
+) -> Optional[Dict[str, Any]]:
+    """ویرایشِ جوابِ قبلی — «اشتباه نوشتم» یا «نظرم عوض شد».
+
+    بدونِ این، یک جوابِ غلط برای همیشه در سیستم می‌ماند و دقیقاً همان
+    «ثبتِ اشتباه»ی می‌شود که این حلقه برای جلوگیری از آن ساخته شد.
+
+    قواعد:
+      * مقدارِ تازه جایگزین می‌شود؛ مقدارِ **خالی** یعنی «این جواب را پس گرفتم»
+        → فیلد دوباره باز و دوباره پرسیدنی می‌شود.
+      * تاریخچهٔ ویرایش در ``answers`` می‌ماند (چیزی پاک نمی‌شود).
+      * پس از ویرایش، دوباره ثبت می‌شود تا سیستم با جوابِ درست هم‌گام شود.
+    """
+    from app.models.clarification import Clarification
+
+    c = await db.get(Clarification, int(clarification_id))
+    if c is None:
+        return None
+    now = datetime.now(timezone.utc)
+    questions = _questions_of(c)
+    valid = {q.get("key") for q in questions}
+    changed: Dict[str, Any] = {}
+    for key, value in (edits or {}).items():
+        if key not in valid:
+            continue
+        target = next(q for q in questions if q.get("key") == key)
+        before = target.get("answer")
+        if _meaningful(value):
+            target["answer"] = str(value).strip()[:2000]
+            target["answered_at"] = now.isoformat()
+        else:
+            target["answer"] = None       # پس‌گرفتن → دوباره باز
+            target["answered_at"] = None
+        if before != target.get("answer"):
+            changed[key] = {"before": before, "after": target.get("answer")}
+    if not changed:
+        return {"edited": 0, "remaining": len(_unanswered(c)), "refiled": []}
+
+    _write_json(c, "questions", questions)
+    history = list(c.answers or [])
+    history.append({"at": now.isoformat(), "via": "edit", "edited": changed})
+    _write_json(c, "answers", history[-20:])
+    remaining = _unanswered(c)
+    if remaining:
+        # فیلدی دوباره باز شد → چرخهٔ پرسش از نو شروع می‌شود.
+        c.status = "partial" if _answered(c) else "open"
+        c.attempts = 0
+        c.filed_at = None
+    else:
+        c.status = "answered"
+    refiled = await file_answers(db, c) if (refile and _answered(c)) else []
+    await db.commit()
+    return {"edited": len(changed), "changed": changed,
+            "remaining": len(remaining), "refiled": refiled}
 
 
 async def snooze(db: AsyncSession, clarification_id: int, hours: int = 24) -> bool:

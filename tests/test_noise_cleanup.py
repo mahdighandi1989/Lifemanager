@@ -126,3 +126,129 @@ async def test_mark_all_read(db_session):
         await db_session.execute(select(Notification).where(Notification.is_read.is_(False)))
     ).scalars().all()
     assert unread == []
+
+
+# ── انضباطِ یادآوریِ فایل‌های رمزدار (۲۰۲۶-۰۷-۳۱) ────────────────────────────
+# شکایتِ مالک: «هی می‌زند ۸۰-۱۰۰ فایل منتظر رمز است — آزاردهنده و آشفته.»
+# ریشه: هر ۶ ساعت همان انبارِ ثابت دوباره push می‌شد، و boilerplateِ بی‌ارزش
+# هم در شمارش می‌آمد و عدد را باد می‌کرد.
+
+def _digest_state(db_session):
+    from app.models.global_setting import GlobalSetting
+    from sqlalchemy import select as _sel
+    return db_session.execute(
+        _sel(GlobalSetting).where(GlobalSetting.key == "ingest_locked_digest:last_at")
+    )
+
+
+async def _force_digest_age(db_session, hours):
+    """آخرین ارسال را «قدیمی» کن تا فاصلهٔ زمانی مانع نباشد."""
+    import json as _json
+    from datetime import datetime, timedelta, timezone
+
+    from sqlalchemy import select as _sel
+
+    from app.models.global_setting import GlobalSetting
+
+    row = (await db_session.execute(
+        _sel(GlobalSetting).where(GlobalSetting.key == "ingest_locked_digest:last_at")
+    )).scalar_one_or_none()
+    state = _json.loads(row.value)
+    state["last_at"] = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+    row.value = _json.dumps(state, ensure_ascii=False)
+    await db_session.commit()
+
+
+@pytest.mark.asyncio
+async def test_an_unchanged_backlog_stops_nagging(db_session, monkeypatch):
+    sent = []
+
+    async def _fake_notify(event, **kw):
+        sent.append(kw.get("message"))
+        return {"ok": True}
+
+    import app.services.notification_service as ns
+    monkeypatch.setattr(ns, "notify_event", _fake_notify)
+
+    db_session.add_all([_pw_item(f"Statement{i}.pdf") for i in range(5)])
+    await db_session.commit()
+
+    # اولین push
+    assert (await email_ingest.notify_locked_digest(db_session, user_id=0))["sent"] is True
+    await db_session.commit()
+
+    # همان مجموعه، با گذشتِ زمانِ کافی → دو یادآوری دیگر و بعد سکوت
+    for _ in range(2):
+        await _force_digest_age(db_session, hours=200)
+        res = await email_ingest.notify_locked_digest(db_session, user_id=0)
+        await db_session.commit()
+        assert res["sent"] is True
+
+    await _force_digest_age(db_session, hours=1000)
+    quiet = await email_ingest.notify_locked_digest(db_session, user_id=0)
+    assert quiet["sent"] is False and quiet["reason"] == "backlog_quiet"
+    assert len(sent) == 3           # سه بار، نه بی‌نهایت
+    assert "دیگر یادآوری نمی‌کنم" in sent[-1]
+
+
+@pytest.mark.asyncio
+async def test_a_new_locked_file_reopens_the_reminder_and_names_the_new_ones(db_session, monkeypatch):
+    sent = []
+
+    async def _fake_notify(event, **kw):
+        sent.append(kw.get("message"))
+        return {"ok": True}
+
+    import app.services.notification_service as ns
+    monkeypatch.setattr(ns, "notify_event", _fake_notify)
+
+    db_session.add_all([_pw_item("Old1.pdf"), _pw_item("Old2.pdf")])
+    await db_session.commit()
+    await email_ingest.notify_locked_digest(db_session, user_id=0)
+    await db_session.commit()
+
+    # به سکوت برسان
+    for _ in range(3):
+        await _force_digest_age(db_session, hours=500)
+        await email_ingest.notify_locked_digest(db_session, user_id=0)
+        await db_session.commit()
+    before = len(sent)
+
+    # فایلِ تازه → دوباره خبر می‌دهد، و *تازه‌ها* را نام می‌برد
+    db_session.add(_pw_item("BrandNew.pdf"))
+    await db_session.commit()
+    await _force_digest_age(db_session, hours=500)
+    res = await email_ingest.notify_locked_digest(db_session, user_id=0)
+    await db_session.commit()
+    assert res["sent"] is True and res["new"] == 1
+    assert len(sent) == before + 1
+    assert "BrandNew.pdf" in sent[-1]
+    assert "تازه رسید" in sent[-1]
+
+
+@pytest.mark.asyncio
+async def test_worthless_boilerplate_is_not_counted_in_the_alert(db_session, monkeypatch):
+    """عددِ «۱۰۰ فایل» واقعاً ۱۰۰ تا نبود — boilerplateای که خودمان
+    «نمی‌ارزد رمزش را بپرسیم» تشخیص داده بودیم هم شمرده می‌شد."""
+    sent = []
+
+    async def _fake_notify(event, **kw):
+        sent.append(kw.get("message"))
+        return {"ok": True}
+
+    import app.services.notification_service as ns
+    monkeypatch.setattr(ns, "notify_event", _fake_notify)
+
+    real = _pw_item("Bank-Statement.pdf")
+    junk = [_pw_item(n) for n in ("Terms and Conditions.pdf", "Privacy Policy.pdf",
+                                  "Risk Disclosure.pdf")]
+    assert email_ingest._is_worthless_locked("Terms and Conditions.pdf") is True
+    db_session.add_all([real, *junk])
+    await db_session.commit()
+
+    res = await email_ingest.notify_locked_digest(db_session, user_id=0)
+    await db_session.commit()
+    assert res["sent"] is True
+    assert res["pending"] == 1          # فقط موردِ واقعی
+    assert res["total_locked"] == 4     # ولی صادقانه می‌گوید کل چندتاست
+    assert "Terms and Conditions" not in sent[0]

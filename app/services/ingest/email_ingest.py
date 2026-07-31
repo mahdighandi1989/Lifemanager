@@ -263,10 +263,27 @@ async def _resolve_locked_file(
         return "error"
 
 
+# «انبارِ کهنه دوباره داد نمی‌زند» (۲۰۲۶-۰۷-۳۱، شکایتِ مالک: «هی می‌زند ۸۰-۱۰۰
+# فایل منتظر رمز است، آزاردهنده و آشفته»). سه قاعده:
+#   1. فقط فایل‌هایی شمرده می‌شوند که واقعاً ارزشِ پرسیدنِ رمز دارند —
+#      boilerplateِ کارگزاری‌ها همین حالا هم «بی‌ارزش» شناخته شده بود، ولی در
+#      شمارش می‌آمد و عدد را باد می‌کرد.
+#   2. اگر **مجموعه عوض نشده**، دوباره فرستاده نمی‌شود. یک انبارِ ثابت خبر
+#      نیست؛ جایش داشبورد است.
+#   3. حتی وقتی عوض می‌شود، فاصله فزاینده است و بعد از چند بار ساکت می‌شود تا
+#      خودِ مجموعه تغییر کند. یادآوری آری، غر زدن نه.
+_DIGEST_BACKOFF_HOURS = (0, 24, 72)
+
+
 async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[str, Any]:
-    """Send ONE «فایل‌های رمزدار» digest (in-app + Telegram) covering ALL pending
-    locked files, at most once per cooldown window. The files still land in the
-    inbox; only the push is coalesced. Never raises. The caller commits."""
+    """Send ONE «فایل‌های رمزدار» digest (in-app + Telegram) — but only when the
+    actionable set has actually CHANGED, on an escalating backoff, and never
+    more than a few times for the same standing backlog. The files still land in
+    the inbox and stay on the dashboard; only the push is disciplined.
+    Never raises. The caller commits."""
+    import hashlib as _hashlib
+    import json as _json
+
     from app.models.global_setting import GlobalSetting
     from app.models.inbox_item import InboxItem
 
@@ -279,34 +296,75 @@ async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[st
                 )
             )
         ).scalars().all()
-        n = len(pend)
+        # قاعدهٔ ۱ — چیزی که خودمان «نیارزیدن به رمز» تشخیص داده‌ایم، در عددِ
+        # هشدار هم نباید بیاید؛ وگرنه «۱۰۰ فایل» در واقع ۱۰۰ تا نیست.
+        actionable = [
+            p for p in pend
+            if not _is_worthless_locked((p.suggestion or {}).get("filename"))
+        ]
+        n = len(actionable)
         if n == 0:
-            return {"sent": False, "pending": 0}
+            return {"sent": False, "pending": 0, "total_locked": len(pend)}
 
-        # Durable cooldown — an in-process timer would reset on every Render
-        # free-tier restart (see experiences/periodic-attention-engine…).
+        signature = _hashlib.sha1(
+            ",".join(str(p.id) for p in sorted(actionable, key=lambda x: x.id)).encode()
+        ).hexdigest()[:16]
+
         row = (
             await db.execute(select(GlobalSetting).where(GlobalSetting.key == _DIGEST_STAMP_KEY))
         ).scalar_one_or_none()
         now = datetime.now(timezone.utc)
+        state: Dict[str, Any] = {}
         if row and row.value:
             try:
-                last = datetime.fromisoformat(row.value)
+                state = _json.loads(row.value)
+                if not isinstance(state, dict):
+                    state = {}
+            except Exception:
+                # فرمتِ قدیمی: فقط یک ISO. به‌عنوان «آخرین ارسال» می‌خوانیمش.
+                state = {"last_at": row.value, "sig": None, "pushes": 1}
+
+        known_ids = set(state.get("ids") or [])
+        fresh_ids = [p.id for p in actionable if p.id not in known_ids]
+        changed = state.get("sig") != signature
+        pushes = 0 if changed else int(state.get("pushes") or 0)
+
+        # قاعدهٔ ۳ — سقفِ تکرار روی یک مجموعهٔ ثابت.
+        if not changed and pushes >= len(_DIGEST_BACKOFF_HOURS):
+            return {"sent": False, "pending": n, "reason": "backlog_quiet"}
+
+        wait_h = _DIGEST_BACKOFF_HOURS[min(pushes, len(_DIGEST_BACKOFF_HOURS) - 1)]
+        last_at = state.get("last_at")
+        if last_at:
+            try:
+                last = datetime.fromisoformat(str(last_at))
                 if last.tzinfo is None:
                     last = last.replace(tzinfo=timezone.utc)
-                if (now - last).total_seconds() < _DIGEST_COOLDOWN_S:
+                elapsed = (now - last).total_seconds()
+                # مجموعه که عوض نشده باشد، فاصلهٔ فزاینده؛ عوض شده باشد، همان
+                # کفِ ۶ ساعته تا یک سیلِ ایمیل چند پیام پشت‌سرهم نسازد.
+                floor = wait_h * 3600 if not changed else _DIGEST_COOLDOWN_S
+                if elapsed < floor:
                     return {"sent": False, "pending": n, "reason": "cooldown"}
             except Exception:
                 pass
 
-        names = [(p.suggestion or {}).get("filename") or "?" for p in pend[:8]]
-        more = f"\nو {n - 8} مورد دیگر" if n > 8 else ""
+        shown = [p for p in actionable if p.id in set(fresh_ids)] or actionable
+        names = [(p.suggestion or {}).get("filename") or "?" for p in shown[:8]]
+        more = f"\nو {len(shown) - 8} مورد دیگر" if len(shown) > 8 else ""
+        head = (
+            f"{len(fresh_ids)} فایلِ رمزدارِ تازه رسید (جمعاً {n} تا منتظرِ رمز):"
+            if fresh_ids and changed else
+            f"{n} فایلِ رمزدار منتظرِ رمز است:"
+        )
         message = (
-            f"{n} فایلِ رمزدار منتظرِ رمز است:\n"
+            head + "\n"
             + "\n".join(f"• {nm}" for nm in names)
             + more
             + "\nدر داشبورد → صندوق ورودی رمزشان را وارد کن."
         )
+        if not changed:
+            message += "\n(تا وقتی فایلِ تازه‌ای نیاید، دیگر یادآوری نمی‌کنم.)"
         try:
             from app.services.notification_service import notify_event
 
@@ -322,11 +380,16 @@ async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[st
         except Exception as exc:
             logger.debug("locked digest notify failed: %r", exc)
 
+        new_state = _json.dumps({
+            "sig": signature, "last_at": now.isoformat(),
+            "pushes": pushes + 1, "ids": [p.id for p in actionable][:500],
+        }, ensure_ascii=False)
         if row is None:
-            db.add(GlobalSetting(key=_DIGEST_STAMP_KEY, value=now.isoformat()))
+            db.add(GlobalSetting(key=_DIGEST_STAMP_KEY, value=new_state))
         else:
-            row.value = now.isoformat()
-        return {"sent": True, "pending": n}
+            row.value = new_state
+        return {"sent": True, "pending": n, "new": len(fresh_ids),
+                "total_locked": len(pend), "push": pushes + 1}
     except Exception as exc:
         logger.debug("locked digest skipped: %r", exc)
         return {"sent": False, "pending": 0}

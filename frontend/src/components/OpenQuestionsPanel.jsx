@@ -60,16 +60,36 @@ function Field({ field, value, onChange }) {
 
 function QuestionCard({ item, onDone }) {
   const open = (item.questions || []).filter((q) => !q.answer);
+  const answered = (item.questions || []).filter((q) => q.answer);
   const [draft, setDraft] = useState({});
+  const [edits, setEdits] = useState({});
+  const [showAnswered, setShowAnswered] = useState(false);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState('');
 
   const submit = async () => {
     setBusy(true);
     try {
-      const res = await api.post(`/clarifications/${item.id}/answer`, { answers: draft });
-      setFeedback(res.data?.feedback || '');
+      let last = '';
+      // ویرایشِ جوابِ قبلی و جوابِ تازه دو مسیرِ جدا دارند: ویرایش مقدارِ
+      // ثبت‌شده در سیستم را هم اصلاح می‌کند، نه فقط متنِ فرم را.
+      const changed = Object.fromEntries(
+        Object.entries(edits).filter(([k, v]) => {
+          const q = answered.find((a) => a.key === k);
+          return q && String(v) !== String(q.answer);
+        }),
+      );
+      if (Object.keys(changed).length > 0) {
+        const res = await api.post(`/clarifications/${item.id}/edit`, { answers: changed });
+        last = `✏️ ${res.data?.edited || 0} جواب به‌روز شد.`;
+      }
+      if (Object.keys(draft).length > 0) {
+        const res = await api.post(`/clarifications/${item.id}/answer`, { answers: draft });
+        last = res.data?.feedback || last;
+      }
+      setFeedback(last || 'چیزی برای ثبت نبود.');
       setDraft({});
+      setEdits({});
       onDone();
     } catch {
       setFeedback('ثبت نشد — دوباره تلاش کن.');
@@ -94,9 +114,31 @@ function QuestionCard({ item, onDone }) {
       {item.context ? (
         <div className="mt-0.5 line-clamp-2 text-xs text-gray-500">{item.context}</div>
       ) : null}
-      {item.answered_count > 0 ? (
-        <div className="mt-1 text-xs text-emerald-700">
-          ✅ {item.answered_count} پرسش قبلاً جواب گرفته
+      {answered.length > 0 ? (
+        <button
+          type="button"
+          onClick={() => setShowAnswered((v) => !v)}
+          className="mt-1 text-xs text-emerald-700 hover:underline"
+        >
+          ✅ {answered.length} پرسش قبلاً جواب گرفته — {showAnswered ? 'بستن' : 'دیدن و ویرایش'}
+        </button>
+      ) : null}
+
+      {showAnswered ? (
+        <div className="mt-2 space-y-2 rounded-lg bg-white/70 p-2">
+          {answered.map((q) => (
+            <div key={q.key}>
+              <label className="mb-0.5 block text-xs text-gray-600">{q.label}</label>
+              <Field
+                field={q}
+                value={edits[q.key] !== undefined ? edits[q.key] : q.answer || ''}
+                onChange={(v) => setEdits((d) => ({ ...d, [q.key]: v }))}
+              />
+            </div>
+          ))}
+          <div className="text-[11px] text-gray-500">
+            مقدار را عوض کنی، در سیستم هم به‌روز می‌شود. خالی بگذاری، دوباره پرسیده می‌شود.
+          </div>
         </div>
       ) : null}
 
@@ -152,6 +194,11 @@ function OpenQuestionsPanel() {
 
   useEffect(() => {
     load();
+    // پرسش‌ها همان لحظه‌ای ساخته می‌شوند که موتور به ابهام می‌خورد (اسکنِ
+    // ایمیل، رسیدنِ پیامک) — نه با کلیکِ کاربر. پس میزِ فرمان باید خودش
+    // تازه شود، وگرنه تا رفرشِ دستی، «منتظرِ پاسخ» عقب می‌ماند.
+    const timer = setInterval(load, 60_000);
+    return () => clearInterval(timer);
   }, [load]);
 
   const pending = items.filter((i) => (i.questions || []).some((q) => !q.answer));

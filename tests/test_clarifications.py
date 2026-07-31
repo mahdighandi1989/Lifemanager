@@ -297,7 +297,10 @@ async def test_feedback_is_honest_when_nothing_was_understood(db):
 
 # ── رندرِ فرم ───────────────────────────────────────────────────────────────
 
-def test_form_lists_only_unanswered_questions_and_shows_choices():
+def test_form_is_editable_stable_numbering_and_prefilled_answers():
+    """فرم باید *قابلِ ویرایش* باشد: همهٔ فیلدها با شمارهٔ ثابت، جوابِ قبلی
+    جلوی خطش. اگر فقط بی‌جواب‌ها شماره می‌خوردند، «۲)» در هر ارسال سؤالِ
+    دیگری می‌شد و جواب روی فیلدِ اشتباه می‌نشست."""
     class _Fake:
         topic = "موضوعِ آزمایشی"
         context = "متنِ زمینه"
@@ -308,10 +311,11 @@ def test_form_lists_only_unanswered_questions_and_shows_choices():
         ]
 
     text = clar.render_form(_Fake())
-    assert "کدام است؟" in text
-    assert "جوابش را دادم" not in text        # سؤالِ جواب‌داده دوباره پرسیده نمی‌شود
+    assert "1) جوابش را دادم: بله" in text    # جوابِ قبلی نشان داده و قابل تغییر
+    assert "2) کدام است؟" in text             # شمارهٔ فیلدِ باز ثابت مانده
     assert "اول / دوم" in text
-    assert "خالی" in text                     # اجازهٔ خالی‌گذاشتن صریح گفته شده
+    assert "خالی" in text
+    assert "به‌روز" in text                   # صریح گفته که ویرایش ممکن است
 
 
 def test_reminder_form_says_it_is_a_reminder():
@@ -364,3 +368,137 @@ def test_api_skip_keeps_the_record(api_client):
 def test_api_rejects_a_form_without_a_topic(api_client):
     r = api_client.post("/api/clarifications/ask", json={"topic": ""})
     assert r.status_code in (400, 422)
+
+
+# ── ویرایشِ جوابِ داده‌شده ──────────────────────────────────────────────────
+# «آیا بعداً می‌شود جواب‌های داده‌شده را از داخل سیستم یا تلگرام ویرایش کرد؟»
+
+@pytest.mark.asyncio
+async def test_replying_again_edits_a_previous_answer(db):
+    """از تلگرام: همان فرم را دوباره ریپلای کن و مقدار را عوض کن."""
+    c = await clar.ask(db, topic="t", source_ref="ed1", questions=_fields("مبلغ؟", "بابتِ چه؟"))
+    first = await clar.parse_reply(db, c, "1) ۱۰۰ هزار\n2) تاکسی")
+    await clar.record_answers(db, c, first, raw="…")
+    await db.commit()
+    assert c.status == "answered"
+
+    again = await clar.parse_reply(db, c, "1) ۲۵۰ هزار")
+    out = await clar.record_answers(db, c, again, raw="۲۵۰")
+    await db.commit()
+    assert out["edited"] == 1
+    assert out["filled"] == 0                      # فیلدِ تازه‌ای پر نشد
+    assert c.questions[0]["answer"] == "۲۵۰ هزار"
+    assert c.questions[1]["answer"] == "تاکسی"     # بقیه دست‌نخورده
+    assert out["edits"]["f1"]["before"] == "۱۰۰ هزار"
+
+
+@pytest.mark.asyncio
+async def test_resending_the_same_value_is_not_counted_as_an_edit(db):
+    """فرمِ پرشده را عیناً برگرداند → هیچ تغییری ثبت نمی‌شود (نویزِ الکی ممنوع)."""
+    c = await clar.ask(db, topic="t", source_ref="ed2", questions=_fields("مبلغ؟"))
+    await clar.record_answers(db, c, {"f1": "۱۰۰"}, raw="۱۰۰")
+    out = await clar.record_answers(db, c, {"f1": "۱۰۰"}, raw="۱۰۰")
+    await db.commit()
+    assert out["edited"] == 0 and out["filled"] == 0
+
+
+@pytest.mark.asyncio
+async def test_edit_api_can_retract_an_answer_and_reopen_the_question(db):
+    """از داخلِ برنامه: مقدارِ خالی یعنی «این جواب را پس گرفتم» → دوباره باز."""
+    c = await clar.ask(db, topic="t", source_ref="ed3", questions=_fields("کِی؟", "کجا؟"))
+    await clar.record_answers(db, c, {"f1": "دیروز", "f2": "تهران"}, raw="…")
+    await db.commit()
+
+    res = await clar.edit_answers(db, c.id, {"f1": ""})
+    assert res["edited"] == 1
+    assert res["remaining"] == 1
+    assert c.questions[0]["answer"] is None
+    assert c.status == "partial"
+    assert c.attempts == 0                          # دوباره پرسیده خواهد شد
+
+
+@pytest.mark.asyncio
+async def test_an_edited_answer_is_re_filed_into_the_system(db):
+    """ویرایش باید سیستم را هم به‌روز کند، وگرنه مقدارِ غلطِ قبلی جا می‌ماند."""
+    import json
+
+    from app.models.finance import FinancialAccount
+
+    a = FinancialAccount(user_id=0, name="ملت — اول", kind="bank",
+                         institution="mellat", currency="IRR", balance=1)
+    b = FinancialAccount(user_id=0, name="ملت — دوم", kind="bank",
+                         institution="mellat", currency="IRR", balance=2)
+    db.add_all([a, b])
+    await db.flush()
+
+    c = await clar.ask(
+        db, topic="کدام کارت؟", source="finance", source_ref="ed4",
+        target={"kind": "finance_account", "institution": "mellat",
+                "balance": "900000", "currency": "IRR"},
+        questions=[{"key": "account_name", "label": "کدام کارت؟", "type": "choice",
+                    "choices": ["ملت — اول", "ملت — دوم"]}],
+    )
+    await clar.record_answers(db, c, {"account_name": "ملت — اول"}, raw="اول")
+    await clar.file_answers(db, c)
+    await db.commit()
+    assert float(a.balance) == 900_000.0
+
+    # اشتباه بود — کارتِ دوم درست است
+    await clar.edit_answers(db, c.id, {"account_name": "ملت — دوم"})
+    assert float(b.balance) == 900_000.0
+    assert json.loads(b.extra or "{}").get("owner_balance_at")
+
+
+def test_edit_endpoint_updates_and_reports(api_client):
+    made = api_client.post("/api/clarifications/ask", json={
+        "topic": "این هزینه بابتِ چه بود؟", "source_ref": "api-edit",
+        "questions": [{"key": "purpose", "label": "بابتِ چه؟", "type": "short"}],
+    }).json()
+    cid = made["item"]["id"]
+    api_client.post(f"/api/clarifications/{cid}/answer",
+                    json={"answers": {"purpose": "تعمیر ماشین"}})
+    res = api_client.post(f"/api/clarifications/{cid}/edit",
+                          json={"answers": {"purpose": "تعمیر موتور"}})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["edited"] == 1
+    assert body["changed"]["purpose"]["before"] == "تعمیر ماشین"
+    assert body["item"]["questions"][0]["answer"] == "تعمیر موتور"
+
+
+@pytest.mark.asyncio
+async def test_answers_actually_reach_the_database_not_just_memory():
+    """دامِ ستونِ JSON: تغییرِ درجا در حافظه دیده می‌شود ولی UPDATE صادر
+    نمی‌شود. این تست عمداً با **نشستِ تازه** می‌خواند تا آن حالت دوباره
+    پنهان نشود (یک بار واقعاً اتفاق افتاد)."""
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from app.database import Base
+    from app.models.clarification import Clarification
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+
+    async with factory() as s1:
+        c = await clar.ask(s1, topic="t", source_ref="persist",
+                           questions=_fields("سؤال یک", "سؤال دو"))
+        await s1.commit()
+        cid = c.id
+        await clar.record_answers(s1, c, {"f1": "جوابِ ماندگار"}, raw="…")
+        await s1.commit()
+
+    async with factory() as s2:                       # نشستِ کاملاً تازه
+        row = await s2.get(Clarification, cid)
+        assert row.questions[0]["answer"] == "جوابِ ماندگار"
+        assert row.questions[1]["answer"] in (None, "")
+        assert row.status == "partial"
+        # و ویرایش هم باید در دیتابیس بنشیند
+        await clar.edit_answers(s2, cid, {"f1": "جوابِ اصلاح‌شده"}, refile=False)
+
+    async with factory() as s3:
+        row = await s3.get(Clarification, cid)
+        assert row.questions[0]["answer"] == "جوابِ اصلاح‌شده"
+        assert any(h.get("via") == "edit" for h in (row.answers or []))
+    await engine.dispose()
