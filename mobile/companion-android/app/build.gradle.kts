@@ -28,5 +28,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.json:json:20240303")
+    // org.json عمداً وابستگی نیست — خودِ اندروید آن را دارد و افزودنش
+    // کلاس تکراری می‌سازد.
 }

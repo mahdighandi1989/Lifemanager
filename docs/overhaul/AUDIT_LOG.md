@@ -2809,3 +2809,13 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **VERIFY** ۸ تست جدید موبایل/ترمیم + تست owner-pinned-balance؛ کل بک‌اند: **۱۴۲۷ پاس /
   همان ۱۳ شکست baseline**؛ build و vitest بدون خطای جدید؛ راستی‌آزمایی دستی: SMS فارسی
   «موجودی: ۱۲٬۵۰۰٬۰۰۰ ریال» → 12,500,000 IRR روی کارتِ درست، تحویل مجدد → no-op.
+
+- **CHANGE (نصب بی‌دردسر اپ همراه، 2026-07-30)** مالک نباید Android Studio نصب کند و
+  محیط ابری هم به SDK اندروید دسترسی ندارد → workflow جدید
+  `.github/workflows/build-companion-apk.yml`: سرورهای GitHub با هر تغییرِ
+  `mobile/companion-android/**` APK را می‌سازند، در `release/companion.apk` به ریپو
+  کامیت می‌کنند (بدون حلقه — مسیر release از trigger مستثنا + گارد actor) و در
+  Release «companion-apk» هم می‌گذارند. بک‌اند آن را در `GET /companion.apk` سرو
+  می‌کند (بدون فایل → 404 فارسیِ روشن، تست‌شده) — نصب برای مالک یعنی بازکردن
+  «سایت/companion.apk» روی گوشی. وابستگی org.json از build حذف شد (کلاس تکراری با
+  خود اندروید). راهنمای README به روند بدون-ابزار به‌روز شد.

@@ -1280,6 +1280,14 @@
           {
             "method": "GET",
             "path": "/api/mobile/status"
+          },
+          {
+            "method": "GET",
+            "path": "/companion.apk"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/apk"
           }
         ]
       }

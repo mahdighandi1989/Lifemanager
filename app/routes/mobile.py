@@ -229,6 +229,36 @@ async def heartbeat(
     return {"ok": True, "success": True}
 
 
+@router.get("/companion.apk", tags=["mobile"])
+@router.get("/api/mobile/apk", tags=["mobile"])
+async def download_companion_apk():
+    """فایل نصبی اپ همراه — the CI-built APK, served from the app itself so
+    the owner just opens «سایت/companion.apk» on the phone and taps install.
+    (Built by .github/workflows/build-companion-apk.yml, committed to
+    mobile/companion-android/release/.)"""
+    from pathlib import Path
+
+    from fastapi.responses import FileResponse, JSONResponse
+
+    apk = (
+        Path(__file__).resolve().parents[2]
+        / "mobile" / "companion-android" / "release" / "companion.apk"
+    )
+    if not apk.exists():
+        return JSONResponse(
+            status_code=404,
+            content={
+                "ok": False,
+                "detail": "companion.apk هنوز ساخته نشده — چند دقیقه بعد از هر تغییرِ اپ همراه، GitHub Actions آن را می‌سازد.",
+            },
+        )
+    return FileResponse(
+        str(apk),
+        media_type="application/vnd.android.package-archive",
+        filename="lifemanager-companion.apk",
+    )
+
+
 @router.get("/api/mobile/status", tags=["mobile"])
 @handle_errors
 async def mobile_status(

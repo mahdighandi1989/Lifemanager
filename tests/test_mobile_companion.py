@@ -122,3 +122,11 @@ def test_rebuild_removes_machine_cards_and_keeps_manual(api_client):
     names = [a["name"] for a in api_client.get("/api/finance/accounts").json()]
     assert "دستی من" in names
     assert manual["id"] in [a["id"] for a in api_client.get("/api/finance/accounts").json()]
+
+
+def test_companion_apk_route_degrades_gracefully(api_client):
+    """Until CI commits the built APK, /companion.apk answers a clear Persian
+    404 (not the SPA shell, not a 500)."""
+    r = api_client.get("/companion.apk")
+    assert r.status_code == 404
+    assert "companion.apk" in r.json()["detail"]
