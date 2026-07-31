@@ -656,3 +656,96 @@ async def test_unrouted_email_now_reaches_the_dispatcher(db_session, monkeypatch
     assert "email:m-appt" in seen
     assert "email:m-news" not in seen
     assert res["dispatched"] == 1
+
+
+# ── the three remaining sources, now wired ─────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_calendar_event_reaches_the_person_but_does_not_flood_inbox(db_session, monkeypatch):
+    """رویداد تقویم: جلسه با فردِ شناخته‌شده → تعاملِ MEETING روی پروفایلِ او؛
+    ولی خودِ «قرار» دوباره در صندوق کپی نمی‌شود (ضدِ دوبله)."""
+    import datetime as dt
+
+    from app.models.person import Person
+    from app.services.google_sync import calendar_service
+
+    db_session.add(Person(name="دکتر رحیمی", phone="0509990000"))
+    await db_session.commit()
+
+    items = [{
+        "id": "ev-1", "summary": "جلسه با دکتر رحیمی", "description": "",
+        "location": "کلینیک", "start": {"dateTime": "2026-08-01T10:00:00Z"},
+        "end": {"dateTime": "2026-08-01T11:00:00Z"}, "status": "confirmed",
+    }]
+
+    async def _fetcher(method, url, headers, json_body=None):
+        return {"items": items}
+
+    res = await calendar_service.sync_calendar(
+        db_session, fetcher=_fetcher, access_token="at",
+        now=dt.datetime(2026, 7, 31, tzinfo=dt.timezone.utc),
+    )
+    assert res["ok"] is True and res["new"] == 1
+
+    # a MEETING interaction landed on the person…
+    from sqlalchemy import select as _s
+
+    from app.models.interaction import Interaction, InteractionType
+
+    inter = (await db_session.execute(
+        _s(Interaction).where(Interaction.type == InteractionType.MEETING)
+    )).scalars().all()
+    assert len(inter) == 1
+    # …and the calendar event was NOT duplicated into the inbox
+    from app.models.inbox_item import InboxItem
+
+    inbox = (await db_session.execute(_s(InboxItem))).scalars().all()
+    assert all("جلسه با دکتر رحیمی" not in (i.content or "") for i in inbox)
+
+
+@pytest.mark.asyncio
+async def test_person_matched_by_name_not_only_phone(db_session):
+    """اعلانِ پیام‌رسان عنوانش نامِ مخاطب است — بدون تطبیقِ نام، هرگز به
+    پروفایلِ کسی نمی‌رسید."""
+    from app.models.person import Person
+    from app.services.mobile_dispatch_service import _match_person
+
+    db_session.add(Person(name="علی"))
+    db_session.add(Person(name="علی‌رضا محمدی"))
+    await db_session.commit()
+
+    p = await _match_person(db_session, "علی‌رضا محمدی", "سلام خوبی؟")
+    assert p is not None and p.name == "علی‌رضا محمدی"   # longest match wins
+    assert (await _match_person(db_session, "کسی", "متنِ بی‌ربط")) is None
+
+
+@pytest.mark.asyncio
+async def test_telegram_file_now_flows_through_the_universal_extractor(db_session, monkeypatch):
+    """فایلی که با تلگرام می‌آید باید همان مسیرِ پیوستِ ایمیل را برود (تا
+    صورت‌حساب به «مالی» برسد) — نه فقط به توضیحِ یک کار بچسبد."""
+    from app.services import telegram_compose
+
+    seen = {}
+
+    async def _fake_extract(db, **kw):
+        seen.update(kw)
+        return {"status": "proposed", "kind": "finance_account"}
+
+    import app.services.ingest.universal_ingest as ui
+    monkeypatch.setattr(ui, "extract_from_file", _fake_extract)
+
+    buf = telegram_compose.ComposeBuffer(chat_id="1")
+    buf.items.append(telegram_compose.ComposeItem(
+        order=1, kind="document", added_at=0.0, file_id="f1",
+        mime="application/pdf", filename="statement.pdf",
+    ))
+
+    class _Bot:
+        async def download_file(self, fid):
+            return b"%PDF-1.4 fake"
+
+    flow = telegram_compose.ComposeService()
+    await flow._analyse_items(buf, _Bot())
+    assert seen.get("source_ref") == "telegram:f1"
+    assert seen.get("filename") == "statement.pdf"
+    assert buf.items[0].ingested in ("finance_account", "proposed", "duplicate")

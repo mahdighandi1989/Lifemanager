@@ -62,7 +62,9 @@ async def test_gmail_sync_upserts_and_dedups(db_session):
     messages = [_msg("m1", "سلام"), _msg("m2", "Invoice #22", unread=False)]
     fetch = _gmail_fetcher(messages)
     r1 = await gmail_service.sync_gmail(db_session, fetcher=fetch, access_token="at-1")
-    assert r1 == {"ok": True, "fetched": 2, "new": 2}
+    # subset check: the sync result grew a «routed» counter (calendar events
+    # now go through the central dispatcher) — additive keys are allowed.
+    assert {k: r1[k] for k in ("ok", "fetched", "new")} == {"ok": True, "fetched": 2, "new": 2}
     r2 = await gmail_service.sync_gmail(db_session, fetcher=fetch, access_token="at-1")
     assert r2["new"] == 0
     rows = (await db_session.execute(select(PersonalEmail))).scalars().all()
@@ -144,7 +146,9 @@ async def test_calendar_sync_upserts(db_session):
     r1 = await calendar_service.sync_calendar(
         db_session, fetcher=_cal_fetcher(items), access_token="at-1", now=NOW
     )
-    assert r1 == {"ok": True, "fetched": 2, "new": 2}
+    # subset check: the sync result grew a «routed» counter (calendar events
+    # now go through the central dispatcher) — additive keys are allowed.
+    assert {k: r1[k] for k in ("ok", "fetched", "new")} == {"ok": True, "fetched": 2, "new": 2}
     rows = (await db_session.execute(select(PersonalEvent))).scalars().all()
     ev1 = next(r for r in rows if r.id == "ev1")
     ev2 = next(r for r in rows if r.id == "ev2")

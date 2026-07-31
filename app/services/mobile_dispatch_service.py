@@ -69,22 +69,36 @@ def _digits_tail(value: str, n: int = 7) -> str:
     return d[-n:] if len(d) >= n else d
 
 
-async def _match_person(db: AsyncSession, sender: str):
-    """A Person whose phone tail matches the sender (calls/SMS carry a number).
-    None when the sender isn't a digits string or matches nobody."""
-    tail = _digits_tail(sender)
-    if len(tail) < 5:
-        return None
+async def _match_person(db: AsyncSession, sender: str, text: str = ""):
+    """The Person this signal is about — by phone tail (calls/SMS) OR by name.
+
+    Name matching matters more than it looks: a messenger notification's title
+    IS the contact's name, and a calendar event says «جلسه با علی». Without it
+    those signals would never reach anyone's profile. Guarded against false
+    positives: names shorter than 3 chars are ignored, and the longest match
+    wins so «علی» doesn't steal a signal that names «علی‌رضا»."""
     try:
         from app.models.person import Person
 
-        people = (await db.execute(select(Person).where(Person.phone.isnot(None)))).scalars().all()
-        for p in people:
-            if tail == _digits_tail(p.phone):
-                return p
+        people = (await db.execute(select(Person))).scalars().all()
     except Exception:
         return None
-    return None
+
+    tail = _digits_tail(sender)
+    if len(tail) >= 5:
+        for p in people:
+            if p.phone and tail == _digits_tail(p.phone):
+                return p
+
+    haystack = f"{sender or ''}\n{(text or '')[:300]}"
+    best = None
+    for p in people:
+        name = (p.name or "").strip()
+        if len(name) < 3 or name not in haystack:
+            continue
+        if best is None or len(name) > len((best.name or "")):
+            best = p
+    return best
 
 
 # ── classification ──────────────────────────────────────────────────────────
@@ -315,11 +329,13 @@ async def _route_finance(db, user_id, sender, text, occurred_at, device, ref) ->
     return {"routed_to": "finance", "finance": res}
 
 
-async def _route_person_message(db, user_id, sender, text, occurred_at, device, ref) -> Dict[str, Any]:
-    """A message from a KNOWN contact → a MESSAGE interaction on their profile,
-    so the relationship reflects real contact — and, if it also looks
-    actionable, a copy into the inbox."""
-    person = await _match_person(db, sender)
+async def _route_person_message(
+    db, user_id, sender, text, occurred_at, device, ref, interaction_type: str = "message",
+) -> Dict[str, Any]:
+    """A signal from/about a KNOWN contact → an interaction on their profile,
+    so the relationship reflects real contact (message for chat, meeting for a
+    calendar event)."""
+    person = await _match_person(db, sender, text)
     routed = None
     if person is not None:
         try:
@@ -334,7 +350,7 @@ async def _route_person_message(db, user_id, sender, text, occurred_at, device, 
                 except Exception:
                     when = None
             await pps.record_interaction(
-                db, person_id=person.id, type="message",
+                db, person_id=person.id, type=interaction_type,
                 summary=(text or "")[:120], date=when, dedup_note=ref, reanalyze=False,
             )
             await db.commit()
@@ -373,6 +389,8 @@ async def dispatch_signal(
     occurred_at: Optional[str],
     device: Optional[str],
     source_ref: str,
+    skip_categories: Tuple[str, ...] = (),
+    interaction_type: str = "message",
 ) -> Dict[str, Any]:
     """Classify one mobile signal and route it to the domain that owns it.
 
@@ -391,11 +409,22 @@ async def dispatch_signal(
         if category in _NOISE:
             return out
 
-        # A message from a known contact always feeds their profile first…
+        # A signal about a known contact ALWAYS feeds their profile first —
+        # even when the domain routing below is skipped (a calendar «جلسه با
+        # علی» must still reach علی, while the event itself stays in the
+        # calendar and is not copied into the inbox).
         if category in ("message", "appointment", "task"):
-            pm = await _route_person_message(db, user_id, sender, text, occurred_at, device, source_ref)
+            pm = await _route_person_message(
+                db, user_id, sender, text, occurred_at, device, source_ref,
+                interaction_type=interaction_type,
+            )
             if pm.get("routed_to"):
                 out.update(pm)
+
+        # ``skip_categories`` = «این دسته را خودِ همین دامنه دارد» — مثلاً یک
+        # رویدادِ تقویم خودش «قرار» است و نباید دوباره در صندوق کپی شود.
+        if category in skip_categories:
+            return out
 
         # مسیر: یا رجیستریِ اختصاصی، یا — برای هر مقصدِ شناخته‌شدهٔ صندوق —
         # خودِ صندوق (که فایل‌کنندهٔ همان مقصد را دارد). این همان چیزی است که

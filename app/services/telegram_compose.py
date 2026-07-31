@@ -74,6 +74,9 @@ class ComposeItem:
     extracted: Optional[str] = None
     drive_link: Optional[str] = None
     error: Optional[str] = None
+    # نتیجهٔ عبور از استخراج‌گرِ عمومیِ فایل (مالی/مدرک/صندوق) — تا در گزارش
+    # به مالک بگوییم فایل فقط ضمیمه نشد، بلکه به بخشِ خودش هم رفت.
+    ingested: Optional[str] = None
 
 
 @dataclass
@@ -385,6 +388,30 @@ class ComposeService:
                 sections.append(f"## پیوست {it.order} ({it.kind}: {it.filename})\n[دانلود نشد]")
                 continue
             it.data = data  # keep the bytes for the Google Drive upload step
+
+            # ── همان استخراج‌گرِ فایلِ برنامه (2026-07-31) ─────────────────
+            # تا امروز فایلی که با تلگرام می‌آمد فقط «تحلیل متنی» می‌شد و به
+            # توضیحِ یک کار می‌چسبید: یک صورت‌حسابِ بانکی هرگز به «مالی»
+            # نمی‌رسید و یک مدرک هرگز مدرک نمی‌شد. حالا همان مسیرِ پیوستِ
+            # ایمیل/درایو را می‌رود (استخراج قطعی + تغذیهٔ مالی + صندوق)،
+            # با source_ref مخصوصِ تلگرام تا دوباره ثبت نشود.
+            try:
+                from app.services.ingest.universal_ingest import extract_from_file
+
+                async with SessionLocal() as session:
+                    ingest = await extract_from_file(
+                        session,
+                        filename=it.filename or f"telegram-{it.kind}",
+                        mimetype=it.mime,
+                        data=data,
+                        source_ref=f"telegram:{it.file_id}",
+                        user_id=0,
+                    )
+                    await session.commit()
+                if isinstance(ingest, dict) and ingest.get("status") in ("proposed", "duplicate"):
+                    it.ingested = ingest.get("kind") or ingest.get("status")
+            except Exception as exc:  # ingest is a bonus — never break compose
+                logger.debug("telegram file ingest skipped (%s): %r", it.filename, exc)
 
             prompt = _ANALYSIS_PROMPTS.get(it.kind, _ANALYSIS_PROMPTS["default"])
             try:

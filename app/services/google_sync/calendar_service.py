@@ -101,6 +101,7 @@ async def sync_calendar(
         return {"ok": False, "error": diagnosis["detail"], "reason": diagnosis["reason"], "fetched": 0, "new": 0}
 
     new_count = 0
+    fresh: list = []
     sync_ts = datetime.now(timezone.utc)
     try:
         ids = [e["id"] for e in events]
@@ -118,6 +119,7 @@ async def sync_calendar(
                 row = PersonalEvent(**e)
                 db.add(row)
                 new_count += 1
+                fresh.append(row)
             else:
                 for field, value in e.items():
                     setattr(row, field, value)
@@ -126,4 +128,39 @@ async def sync_calendar(
     except Exception as exc:
         await db.rollback()
         return {"ok": False, "error": f"db: {type(exc).__name__}", "fetched": len(events), "new": 0}
-    return {"ok": True, "fetched": len(events), "new": new_count}
+
+    # ── مسیریابیِ رویدادهای تازه (2026-07-31) ────────────────────────────
+    # تا امروز تقویم فقط «آینه» بود: رویداد ذخیره می‌شد و هیچ‌جا اثر نداشت.
+    # حالا هر رویدادِ تازه از مسیریابِ مرکزی می‌گذرد — با دو قید:
+    #   • دستهٔ «appointment» رد می‌شود (رویداد خودش قرار است؛ کپی‌کردنش در
+    #     صندوق فقط شلوغی است) — همان قاعدهٔ ضدِ دوبله.
+    #   • جلسه با فردِ شناخته‌شده → یک تعاملِ MEETING روی پروفایلِ او، پس
+    #     رابطه‌ها از دیدارهای واقعی تغذیه می‌شوند.
+    # چیزی که واقعاً کارِ آماده‌سازی دارد («مدارک را ببر»، «هزینه را پرداخت
+    # کن») همچنان مسیر می‌گیرد.
+    routed = 0
+    try:
+        from app.services import mobile_dispatch_service as dispatch
+
+        for row in fresh[:25]:  # سقف: یک همگام‌سازیِ اولیه نباید سیل بسازد
+            if (row.status or "") == "cancelled":
+                continue
+            text = "\n".join(
+                p for p in ((row.summary or ""), (row.location or ""), (row.description or ""))
+                if p
+            ).strip()
+            if not text:
+                continue
+            res = await dispatch.dispatch_signal(
+                db, 0, source="calendar", sender=(row.summary or ""), text=text,
+                occurred_at=(row.start_at.isoformat() if row.start_at else None),
+                device=None, source_ref=f"calendar:{row.id}",
+                skip_categories=("appointment",),
+                interaction_type="meeting",
+            )
+            if res.get("routed_to"):
+                routed += 1
+    except Exception as exc:
+        logger.debug("calendar dispatch skipped: %r", exc)
+
+    return {"ok": True, "fetched": len(events), "new": new_count, "routed": routed}

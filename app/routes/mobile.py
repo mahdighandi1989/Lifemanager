@@ -443,6 +443,81 @@ async def download_companion_apk():
     )
 
 
+@router.get("/api/mobile/diagnostics", tags=["mobile"])
+@handle_errors
+async def mobile_diagnostics(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """«چرا فلان چیز ثبت نشده؟» — کانال به کانال، با راهنمای فارسی.
+
+    برای هر مجرای موبایل (پیامک/اعلان/تماس/کارکرد/صفحه/نبض) می‌گوید چند رویداد
+    ثبت شده و آخرینش کی بوده. کانالِ خاموش یعنی دسترسیِ آن روی گوشی داده نشده
+    (اندروید بعضی دسترسی‌ها — مخصوصاً «دسترسی به اعلان‌ها» — را با هر نصبِ
+    مجددِ اپ از نو خاموش می‌کند). این تشخیص را حدسی نمی‌گذاریم."""
+    from sqlalchemy import func as _f
+
+    from app.models.activity_log import ActivityLog
+
+    channels = {
+        "mobile_sms": {
+            "fa": "پیامک‌ها",
+            "hint": "در تنظیمات گوشی، اجازهٔ «پیامک» (SMS) را به اپ همراه بده.",
+        },
+        "mobile_notification": {
+            "fa": "اعلان‌های گوشی",
+            "hint": (
+                "دسترسی «Notification access» را از تنظیمات گوشی به اپ همراه بده — "
+                "اندروید این دسترسی را بعد از هر نصبِ مجدد خودش خاموش می‌کند."
+            ),
+        },
+        "mobile_call": {
+            "fa": "تماس‌ها",
+            "hint": "اجازهٔ «تاریخچهٔ تماس» (Call log) را بده؛ همگام‌سازی هر ساعت است.",
+        },
+        "mobile_usage": {
+            "fa": "کارکرد اپ‌ها",
+            "hint": "دسترسی «Usage access» را از تنظیمات بده؛ گزارش هر ۱۲ ساعت می‌آید.",
+        },
+        "mobile_screen": {
+            "fa": "متن صفحه",
+            "hint": "اختیاری — دسترسی «Accessibility» را از تنظیمات فعال کن.",
+        },
+        "mobile_heartbeat": {
+            "fa": "نبض دستگاه",
+            "hint": "اگر این هم خاموش است، اپ اصلاً به سرور وصل نیست (آدرس/توکن را چک کن).",
+        },
+    }
+    rows = (
+        await db.execute(
+            select(
+                ActivityLog.action,
+                _f.count(ActivityLog.id),
+                _f.max(_f.coalesce(ActivityLog.occurred_at, ActivityLog.created_at)),
+            )
+            .where(ActivityLog.action.in_(list(channels.keys())))
+            .group_by(ActivityLog.action)
+        )
+    ).all()
+    stats = {a: (int(c or 0), t) for a, c, t in rows}
+
+    out = []
+    for action, meta in channels.items():
+        count, last = stats.get(action, (0, None))
+        out.append({
+            "action": action,
+            "label": meta["fa"],
+            "count": count,
+            "last_at": last.isoformat() if last else None,
+            "status": "ok" if count else "silent",
+            "hint": None if count else meta["hint"],
+        })
+    return {
+        "ok": True, "success": True, "channels": out,
+        "silent": [c["label"] for c in out if c["status"] == "silent"],
+    }
+
+
 @router.get("/api/mobile/insights", tags=["mobile"])
 @handle_errors
 async def mobile_insights(

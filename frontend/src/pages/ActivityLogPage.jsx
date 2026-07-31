@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
+import MobileChannelsStrip from '../components/MobileChannelsStrip';
 import {
   ACTION_COLORS,
   ENTITY_FA,
@@ -87,6 +88,9 @@ function ActivityLogPage() {
           امور مالی، نوشته‌ها و … — این‌جا با زمان ثبت می‌شود. روی هر ردیف بزنید تا به
           همان بخش بروید.
         </p>
+        {/* کدام مجرای موبایل داده می‌فرستد و کدام خاموش است */}
+        <MobileChannelsStrip />
+
         {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
 
         <form

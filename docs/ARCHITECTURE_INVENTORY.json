@@ -1300,6 +1300,10 @@
           {
             "method": "GET",
             "path": "/api/mobile/insights"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/diagnostics"
           }
         ]
       }
@@ -1663,6 +1667,7 @@
         "classes": [],
         "functions": [
           "classify_signal",
+          "classify_signal_smart",
           "dispatch_signal"
         ]
       }
@@ -1927,6 +1932,10 @@
       {
         "name": "FinanceGuardsPanel",
         "file": "frontend/src/components/FinanceGuardsPanel.jsx"
+      },
+      {
+        "name": "MobileChannelsStrip",
+        "file": "frontend/src/components/MobileChannelsStrip.jsx"
       }
     ]
   },

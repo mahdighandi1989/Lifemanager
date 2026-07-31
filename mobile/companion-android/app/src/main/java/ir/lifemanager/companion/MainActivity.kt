@@ -92,9 +92,84 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        listOf(title, urlInput, tokenInput, deviceInput, saveBtn, notifBtn, usageBtn, a11yBtn, status)
+        // وضعیتِ زندهٔ دسترسی‌ها — «چرا اعلان‌ها ثبت نمی‌شود؟» باید همین‌جا
+        // با یک نگاه جواب بگیرد، نه با حدس. اندروید دسترسیِ اعلان‌ها را با
+        // هر نصبِ مجددِ اپ خاموش می‌کند؛ این صفحه آن را لو می‌دهد.
+        val permStatus = TextView(this).apply { setPadding(0, 24, 0, 8) }
+        permStatusView = permStatus
+
+        val testBtn = Button(this).apply {
+            text = "ارسال رویدادِ تست (برای بررسی اتصال)"
+            setOnClickListener {
+                val json = JSONObject()
+                    .put("app", "ir.lifemanager.companion")
+                    .put("title", "تست اتصال")
+                    .put("text", "این یک رویداد آزمایشی از اپ همراه است")
+                    .put("device", Net.deviceName(this@MainActivity))
+                    .toString()
+                Net.enqueue(this@MainActivity, "/api/mobile/notification", json)
+                sendHeartbeat()
+                status.text = "رویداد تست فرستاده شد — در «لاگ فعالیت‌ها» یا /api/mobile/diagnostics ببین."
+            }
+        }
+
+        listOf(title, urlInput, tokenInput, deviceInput, saveBtn, notifBtn, usageBtn, a11yBtn,
+               testBtn, permStatus, status)
             .forEach { root.addView(it) }
         setContentView(root)
+        refreshPermissionStatus()
+    }
+
+    private var permStatusView: TextView? = null
+
+    override fun onResume() {
+        super.onResume()
+        refreshPermissionStatus()   // برگشت از تنظیمات → وضعیت تازه
+    }
+
+    /** ✅/❌ برای هر دسترسی، تا خاموش‌بودنِ یکی پنهان نماند. */
+    private fun refreshPermissionStatus() {
+        val sms = checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
+        val calls = checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
+        val notif = isNotificationAccessGranted()
+        val usage = isUsageAccessGranted()
+        val a11y = isAccessibilityGranted()
+        fun mark(on: Boolean) = if (on) "✅" else "❌"
+        permStatusView?.text = buildString {
+            append("وضعیت دسترسی‌ها:\n")
+            append("${mark(sms)} پیامک\n")
+            append("${mark(calls)} تاریخچهٔ تماس\n")
+            append("${mark(notif)} اعلان‌ها (Notification access)\n")
+            append("${mark(usage)} آمار مصرف (Usage access)\n")
+            append("${mark(a11y)} خواندن صفحه (Accessibility — اختیاری)\n")
+            if (!notif) append("\n⚠️ اعلان‌ها خاموش است — دکمهٔ بالا را بزن و اپ را در فهرست فعال کن.")
+        }
+    }
+
+    private fun isNotificationAccessGranted(): Boolean = try {
+        val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+        flat?.contains(packageName) == true
+    } catch (_: Exception) {
+        false
+    }
+
+    private fun isUsageAccessGranted(): Boolean = try {
+        val usm = getSystemService(Context.USAGE_STATS_SERVICE) as? android.app.usage.UsageStatsManager
+        val end = System.currentTimeMillis()
+        !(usm?.queryUsageStats(
+            android.app.usage.UsageStatsManager.INTERVAL_DAILY, end - 3600_000, end
+        ).isNullOrEmpty())
+    } catch (_: Exception) {
+        false
+    }
+
+    private fun isAccessibilityGranted(): Boolean = try {
+        val flat = Settings.Secure.getString(
+            contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
+        flat?.contains(packageName) == true
+    } catch (_: Exception) {
+        false
     }
 
     private fun requestSmsPermission() {

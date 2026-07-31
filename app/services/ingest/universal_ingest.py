@@ -117,15 +117,14 @@ async def _propose(
     filename: str,
     user_id: int,
     ai_model: Optional[str],
-) -> None:
+):
     from app.models.inbox_item import InboxItem
 
     fa = {k: v for k, v in (fields or {}).items() if v not in (None, "", [])}
     content = title or filename
     if summary:
         content = f"{content} — {summary}"
-    db.add(
-        InboxItem(
+    item = InboxItem(
             user_id=user_id,
             content=content[:2000],
             source="attachment",
@@ -141,7 +140,9 @@ async def _propose(
             },
             ai_model=ai_model,
         )
-    )
+    db.add(item)
+    await db.flush()
+    return item
 
 
 async def _classify_text(db: AsyncSession, text: str, filename: str) -> Optional[Dict[str, Any]]:
@@ -372,13 +373,38 @@ async def extract_from_file(
 
         suggested = _KIND_MAP.get(str(parsed.get("kind") or "other").lower(), "note")
         fields = parsed.get("fields") or {}
-        await _propose(
+        item = await _propose(
             db, suggested_type=suggested,
             title=str(parsed.get("title") or filename)[:200],
             summary=str(parsed.get("summary") or "")[:500],
             fields=fields, source_ref=source_ref, filename=filename,
             user_id=user_id, ai_model=ai_model,
         )
+        # ── تریاژِ کاملِ صندوق برای فایل‌های غیرِ ساختاریافته (2026-07-31) ──
+        # مورد استخراج‌شده از فایل تا امروز هرگز از تریاژِ خودِ صندوق رد
+        # نمی‌شد: یک «کار»ِ برآمده از فایل نه موعد داشت، نه اولویت، نه لیستِ
+        # مقصد. حالا برای انواعِ عمومی (کار/یادداشت) تریاژ اجرا و نتیجه‌اش
+        # با فیلدهای استخراج‌شده ADGAM (نه بازنویسی) می‌شود — پس هیچ فیلدِ
+        # مالی/مدرکیِ ساختاریافته‌ای از دست نمی‌رود.
+        if suggested in ("task", "note") and item is not None:
+            try:
+                from app.services import inbox_service
+
+                triage = await inbox_service.classify_content(
+                    db, item.content, user_id=user_id
+                )
+                extra = triage.get("suggestion") or {}
+                merged = dict(item.suggestion or {})
+                for key in ("due_date", "priority", "list_name", "category", "section", "person_name"):
+                    if extra.get(key) and not merged.get(key):
+                        merged[key] = extra[key]
+                item.suggestion = merged
+                # فقط وقتی نوعِ دقیق‌تری پیشنهاد شد، ارتقا بده (note → todo/task).
+                new_kind = triage.get("suggested_type")
+                if suggested == "note" and new_kind in ("task", "todo", "person"):
+                    item.suggested_type = new_kind
+            except Exception as exc:
+                logger.debug("attachment triage enrich skipped (%s): %r", source_ref, exc)
         # a statement also self-feeds «مالی» (no manual click needed).
         lines_added = 0
         if suggested == "finance_account" or det_finance:

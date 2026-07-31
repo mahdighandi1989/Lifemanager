@@ -121,3 +121,48 @@ async def dispatch(db, uid, *, sender, text, occurred_at, ref):
 - The universal-capture inbox pattern (AI triage as the catch-all filer).
 - generic-activity-log-with-entity-linking (the raw complete record the
   dispatcher observes but does not replace).
+
+## Update 2026-07-31 — generalizing the dispatcher to non-mobile sources
+
+Once a second and third source (calendar sync, chat bot, file attachments) were
+pushed through the same dispatcher, three gaps appeared that a single-source
+design never exposes. All three are general.
+
+**1. Per-source suppression must be a parameter, not a branch.** A calendar event
+classified as `appointment` should *not* be copied into the inbox — the event
+already is the appointment; the copy is pure noise. But an SMS classified
+`appointment` absolutely should be. The fix is a `skip_categories=(...)` argument
+supplied by the caller, rather than teaching the classifier about its callers.
+Same for the interaction type a source implies: a calendar hit is a `meeting`, an
+SMS is a `message` — pass `interaction_type` in, don't infer it inside.
+
+**2. Suppression must not suppress identity.** The subtle ordering bug: with
+`skip_categories` checked first, «جلسه با علی» (a meeting with a known contact)
+was dropped whole — no inbox copy (correct) *and* no interaction on Ali's profile
+(wrong). Person/entity resolution is not one of the domain routes; it is a
+cross-cutting enrichment that must run **before** any per-source suppression:
+
+```
+if category in NOISE: return
+route_to_person(...)          # always — identity is not a destination
+if category in skip_categories: return
+route_to_domain(...)
+```
+
+**3. Match entities by every identifier the source can carry.** The dispatcher
+originally matched contacts by phone-number tail, which is all an SMS has. A
+messenger notification's title is a **display name**, and a calendar summary is
+free text — so name matching (longest match wins, to stop "Ali" swallowing
+"Ali Rezaei") had to be added. Rule: the entity resolver takes the whole signal,
+not the field one source happens to populate.
+
+**4. A source with its own mini-brain still needs the shared one.** The chat bot
+had grown a private 2-destination router and never handed media to the file
+extractor. The correct shape is: shared dispatcher first, source-specific flow
+only for what the dispatcher declined to route.
+
+**5. Enrichment merges, it never overwrites.** Attachment extraction produces
+high-confidence structured fields; the AI triage pass produces additional ones
+(due date, list, section, person). Merge field-by-field into empty slots only,
+and allow type upgrades in one direction only (`note → task`), so a guess can
+never overwrite a determination.

@@ -693,6 +693,34 @@ class TelegramBot:
             _clear_state(chat_id)
             return await self._create_task(chat_id, text)
 
+        # ── مسیریابِ مرکزی، قبل از compose (2026-07-31) ──────────────────
+        # تا امروز هر متنِ ساده‌ای در تلگرام فقط می‌توانست «کار» یا «آیتم لیست»
+        # شود (مغزِ دومقصدیِ compose). حالا اول از همان مسیریابی می‌گذرد که
+        # پیامک/ایمیل/تقویم از آن می‌گذرند: پیامِ مالی به مالی، پیامی که نامِ
+        # یک فرد دارد به پروفایلِ او، و مواردِ روشنِ دیگر به صندوق. اگر
+        # مسیریاب چیزی پیدا نکرد (گپِ معمولی)، دقیقاً مثل قبل compose می‌شود.
+        try:
+            import hashlib as _h
+
+            from app.database import SessionLocal
+            from app.services import mobile_dispatch_service as dispatch
+
+            ref = "tg:" + _h.sha1(f"{chat_id}|{text}".encode()).hexdigest()[:16]
+            async with SessionLocal() as session:
+                routed = await dispatch.dispatch_signal(
+                    session, 0, source="telegram", sender=str(chat_id), text=text,
+                    occurred_at=None, device=None, source_ref=ref,
+                )
+            target = routed.get("routed_to")
+            if target in ("finance", "inbox"):
+                where = "«مالی»" if target == "finance" else "«صندوق ورودی»"
+                return await self._send(
+                    chat_id,
+                    f"✅ ثبت شد و به {where} رفت (دستهٔ تشخیص‌داده‌شده: {routed.get('category')}).",
+                )
+        except Exception as exc:  # routing is a bonus — compose is the floor
+            logger.debug("telegram dispatch skipped: %r", exc)
+
         # Any other plain text → treat it as the start of an intelligent task
         # compose (analyse + auto/manual routing), not a dead-end nudge.
         return await self._start_compose_flow(chat_id, initial_text=text)
