@@ -44,9 +44,12 @@ async def _own_or_404(db: AsyncSession, clarification_id: int, user_id: int):
 async def list_clarifications(
     limit: int = 20,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_required_user_id),
 ) -> dict:
-    """پرسش‌های باز (و بایگانی‌شده‌ها) — همان‌هایی که در تلگرام پرسیده می‌شوند."""
+    """پرسش‌های باز (و بایگانی‌شده‌ها) — همان‌هایی که در تلگرام پرسیده می‌شوند.
+
+    مثلِ شش endpointِ همسایه، توکنِ جعلی/منقضی باید ۴۰۱ بگیرد نه اینکه بی‌صدا
+    به دامنهٔ ناشناس تنزل کند (ممیزی ۲۰۲۶-۰۷-۳۱)."""
     rows = await clar.open_forms(db, limit=max(1, min(int(limit), 100)), user_id=user_id)
     return {
         "ok": True, "success": True,
@@ -174,7 +177,7 @@ async def resend_clarifications(
     user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """همه را دوباره در تلگرام بفرست — وقتی پیام‌ها بالا رفته‌اند."""
-    return {"ok": True, "success": True, **await clar.resend_all(db)}
+    return {"ok": True, "success": True, **await clar.resend_all(db, user_id=user_id)}
 
 
 @router.post("/api/clarifications/ask", tags=["clarifications"])

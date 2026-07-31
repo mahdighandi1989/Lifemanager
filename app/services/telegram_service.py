@@ -309,6 +309,7 @@ class TelegramBot:
     async def edit_message_text(
         self, chat_id: str, message_id: int, text: str, *,
         reply_markup: Optional[Dict[str, Any]] = None,
+        parse_mode: str = "Markdown",
     ) -> Dict[str, Any]:
         """Edit a previously-sent message in place (used for the live compose
         status). Silently ignores the 'message is not modified' no-op."""
@@ -453,16 +454,6 @@ class TelegramBot:
             logger.info("telegram: ignoring chat %s (not configured)", chat_id_str)
             return {"ok": True, "ignored": True}
 
-        # حالتِ «سؤال دارم»: متنِ بعدیِ کاربر یک پرسشِ متقابل است، نه جوابِ فرم
-        # و نه کارِ جدید. قبل از همه بررسی می‌شود.
-        try:
-            if text:
-                asked = await self._maybe_handle_clarification_question(chat_id_str, text)
-                if asked is not None:
-                    return asked
-        except Exception as exc:
-            logger.exception("clarification question handling crashed: %r", exc)
-
         # Clarification form replies (2026-07-31). MUST run before compose:
         # a reply to a question form is an answer, not a new task. Bound by
         # reply_to_message.message_id, so a form that scrolled far up is still
@@ -491,6 +482,21 @@ class TelegramBot:
         if text in TEXT_ALIASES:
             _clear_state(chat_id_str)
             text = TEXT_ALIASES[text]
+
+        # حالتِ «سؤال دارم» — فقط برای یک پیامِ **سادهٔ** متنی. نسخهٔ اول قبل از
+        # همه‌چیز اجرا می‌شد و /cancel، /help، دکمه‌های کیبورد و حتی جوابِ واقعیِ
+        # فرم را می‌بلعید؛ یعنی مالک بدونِ راهِ خروج در گفتگو گیر می‌کرد
+        # (ممیزی ۲۰۲۶-۰۷-۳۱). حالا دستور و ریپلای از آن رد می‌شوند و خودشان
+        # حالت را می‌بندند.
+        if text.startswith("/") or text in TEXT_ALIASES.values():
+            _clear_state(chat_id_str)
+        else:
+            try:
+                asked = await self._maybe_handle_clarification_question(chat_id_str, text)
+                if asked is not None:
+                    return asked
+            except Exception as exc:
+                logger.exception("clarification question handling crashed: %r", exc)
 
         try:
             return await self._handle_command(chat_id_str, text)
@@ -1027,8 +1033,10 @@ class TelegramBot:
         chat_id = str(chat.get("id") or "")
 
         # Security gate (same as text path).
+        # یک callback بدونِ پیام، chat_id خالی می‌دهد؛ شرطِ `and chat_id` آن را
+        # از گیت رد می‌کرد و اجازهٔ نوشتنِ جواب می‌داد (ممیزی ۲۰۲۶-۰۷-۳۱).
         configured = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip()
-        if configured and chat_id and chat_id != configured:
+        if configured and chat_id != configured:
             await self.answer_callback(cq_id)
             return {"ok": True, "ignored": True}
 
@@ -1108,13 +1116,24 @@ class TelegramBot:
                 out = await clar.answer_field(session, c, qi, value)
                 await session.commit()
                 await self.answer_callback(cq_id, f"✅ ثبت شد: {value[:60]}")
-                await self.send(
-                    clar.feedback_text(c, out, out.get("filed") or []),
-                    chat_id=chat_id, silent=True,
-                )
-                if clar._unanswered(c):          # هنوز پرسشِ باز هست → فرمِ تازه
+                # فرم را **در جای خودش** به‌روز کن، نه اینکه پیامِ تازه بفرستی.
+                # نسخهٔ اول با هر ضربه یک فرمِ تازه می‌فرستاد (۲N-۱ پیام برای N
+                # پرسش) و نسخه‌های قدیمی با دکمه‌های زنده باقی می‌ماندند
+                # (ممیزی ۲۰۲۶-۰۷-۳۱).
+                edited = {"ok": False}
+                if c.message_id:
+                    edited = await self.edit_message_text(
+                        chat_id, int(c.message_id), clar.render_form(c),
+                        reply_markup=clar._form_markup(c), parse_mode="HTML",
+                    )
+                if not edited.get("ok") and clar._unanswered(c):
                     await clar.send_form(session, c)
                     await session.commit()
+                if not clar._unanswered(c):       # کامل شد → فیدبکِ نهایی
+                    await self.send(
+                        clar.feedback_text(c, out, out.get("filed") or []),
+                        chat_id=chat_id, silent=True,
+                    )
                 return {"ok": True, "handled": "clar_pick", "id": cid}
 
             if action == "ask":
@@ -1125,7 +1144,8 @@ class TelegramBot:
                 await self.send(
                     "❓ <b>بپرس</b> — هرچه از این پرسش مبهم است.\n"
                     "<i>جوابت را می‌دهم و بعد همان فرم را دوباره می‌فرستم، "
-                    "پس چیزی گم نمی‌شود.</i>",
+                    "پس چیزی گم نمی‌شود.</i>\n\n"
+                    "برای بستنِ گفتگو /cancel بزن یا مستقیم به فرم جواب بده.",
                     chat_id=chat_id, silent=True, parse_mode="HTML",
                     reply_markup={"force_reply": True,
                                   "input_field_placeholder": "سؤالت را بنویس"},
@@ -1160,6 +1180,12 @@ class TelegramBot:
         state = _chat_state.get(chat_id) or {}
         if state.get("phase") != "clar_qa" or not text:
             return None
+        if text.strip().startswith("/"):      # دستور هرگز سؤالِ متقابل نیست
+            _clear_state(chat_id)
+            return None
+        # هر دور، مهلت را تازه کن — گفتگو ممکن است طول بکشد و کاربر نباید
+        # وسطِ فکرکردن از حالت بیفتد و پیامش «کار جدید» شود.
+        _set_state(chat_id, "clar_qa", clarification_id=state.get("clarification_id"))
         cid = state.get("clarification_id")
         from app.database import SessionLocal
         from app.models.clarification import Clarification

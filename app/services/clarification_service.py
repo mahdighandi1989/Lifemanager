@@ -341,50 +341,64 @@ _EXT_FA = {
 }
 
 
-def humanize_topic(raw: str) -> str:
-    """موضوعِ خوانا از یک رشتهٔ خام (که ممکن است نامِ فایل یا متنِ تکراری باشد).
+def _looks_machine_made(text: str) -> bool:
+    """آیا این رشته «نامِ فایل/شناسه» است یا جملهٔ آدمیزاد؟
 
-    توکن‌محور است، نه regexِ روی کلِ رشته: نامِ فایل‌ها اجزا را با «_» به هم
-    می‌چسبانند، پس مرزِ واژه اصلاً وجود ندارد و یک UUIDِ چسبیده هرگز حذف
-    نمی‌شد."""
+    تمیزکاریِ تهاجمی فقط برای حالتِ اول مجاز است. نسخهٔ اول این تفکیک را
+    نداشت و روی متنِ عادی هم اجرا می‌شد: «موجودیِ 1,000,000 IRR» به
+    «موجودیِ 1 000 IRR» تبدیل می‌شد (هزار برابر کمتر!) و «فاکتور شماره
+    1002345» شمارهٔ فاکتورش را از دست می‌داد (ممیزی ۲۰۲۶-۰۷-۳۱).
+    """
+    if _UUID_RE.search(text) or _HASH_RE.search(text):
+        return True
+    if re.search(r"\.(pdf|jpe?g|png|webp|docx?|xlsx?|csv|zip|mp3|ogg|m4a)\b", text, re.I):
+        return True
+    # یک توکنِ بلندِ چسبیده با _ یا - و بدونِ فاصله = نامِ فایل
+    return bool(re.fullmatch(r"[\w.\-]{12,}", text.strip()))
+
+
+def humanize_topic(raw: str) -> str:
+    """موضوعِ خوانا. متنِ آدمیزاد دست‌نخورده می‌ماند؛ فقط نامِ فایل/شناسه
+    تمیز می‌شود."""
     text = re.sub(r"\s+", " ", str(raw or "")).strip().replace("📎", " ")
+    text = re.sub(r"\s+", " ", text).strip()
     if not text:
         return "یک موردِ نامشخص"
-    # شناسه‌های ماشینی را قبل از توکن‌بندی درسته بردار — مرزِ واژه وجود ندارد
-    # چون نامِ فایل همه‌چیز را با «_» می‌چسباند.
+    if not _looks_machine_made(text):
+        # جملهٔ عادی: فقط تکرارِ بلافصلِ همان عبارت را بردار و کوتاهش کن.
+        text = re.sub(r"^(.{4,40}?)[:\s]+\1\b", r"\1", text).strip(" :،-")
+        return text[:120]
+
+    kind = ""
+    m = re.search(r"\.([A-Za-z0-9]{2,5})(?:\s|$)", text)
+    if m and m.group(1).lower() in _EXT_FA:
+        kind = _EXT_FA[m.group(1).lower()]
+        text = text[: m.start()] + " " + text[m.end():]
     text = _UUID_RE.sub(" ", text)
     text = _HASH_RE.sub(" ", text)
 
-    kind = ""
-    m = re.search(r"\.([A-Za-z0-9]{2,5})(?:\b|$)", text)
-    if m:
-        kind = _EXT_FA.get(m.group(1).lower(), "")
-        text = text[: m.start()] + " " + text[m.end():]
-
-    tokens = [t for t in re.split(r"[\s_\-:،,./\\]+", text) if t]
+    tokens = [t for t in re.split(r"[\s_\-:،,/\\]+", text) if t]
     noise = {"scan", "bundle", "img", "image", "doc", "docs", "file", "files",
              "attachment", "attachments", "untitled", "copy", "final", "new"}
     kept, seen = [], set()
     for tok in tokens:
-        low = tok.lower()
-        if low in noise:
+        low = tok.lower().strip(".")
+        if low in noise or not low:
             continue
-        # شناسه‌های ماشینی: هگزِ بلند، عددِ بلند، رشتهٔ درهم
-        if len(tok) >= 6 and re.fullmatch(r"[0-9a-f]+", low):
-            continue
-        if len(tok) >= 6 and tok.isdigit():
+        # شناسهٔ ماشینی: هگزِ بلندی که هم رقم دارد هم حرف (پس «1002345» و
+        # «1403» و «000» سالم می‌مانند)
+        if (len(low) >= 8 and re.fullmatch(r"[0-9a-f]+", low)
+                and any(ch.isdigit() for ch in low) and any(ch.isalpha() for ch in low)):
             continue
         if low in seen:                       # «Project_manager: Project_manager»
             continue
         seen.add(low)
-        kept.append(tok)
+        kept.append(tok.strip("."))
 
     clean = re.sub(r"\s+", " ", " ".join(kept)).strip(" _-.:")
     if len(clean) < 3:
         return f"یک {kind or 'مورد'}ِ بدونِ عنوان"
-    if kind:
-        return f"{kind}: {clean[:80]}"
-    return clean[:100]
+    return f"{kind}: {clean[:80]}" if kind else clean[:100]
 
 
 # ── رندرِ HTML (به‌جای Markdown) ─────────────────────────────────────────────
@@ -441,13 +455,30 @@ def render_form(c, *, reminder: bool = False) -> str:
             why = str(q.get("why") or "").strip()
             if why:
                 lines.append(f"   <i>{_esc(why)}</i>")
-    lines += [
+    footer = [
         "",
         "• خطی که نمی‌دانی را خالی بگذار — بعداً دوباره می‌پرسم.",
         "• خطی که پر است جوابِ قبلیِ توست؛ عوضش کنی به‌روز می‌شود.",
         "• سؤالم را نفهمیدی؟ دکمهٔ «❓ سؤال دارم» را بزن.",
     ]
-    return "\n".join(lines)
+    # بودجهٔ طول: سقفِ تلگرام ۴۰۹۶ است و برشِ خامِ لایهٔ ارسال، وسطِ یک تگِ
+    # HTML می‌بُرد → تلگرام کلِ پیام را رد می‌کرد و نسخهٔ بدونِ قالب می‌رفت
+    # (تگ‌های خام و بی‌راهنما). حالا خودمان جا باز می‌کنیم: اول توضیحِ «چرا»،
+    # بعد نقلِ‌قول، و راهنما هرگز قربانی نمی‌شود (ممیزی ۲۰۲۶-۰۷-۳۱).
+    budget = 3600
+    def _size(body):
+        return len("\n".join(body + footer))
+    if _size(lines) > budget:
+        lines = [ln for ln in lines if not ln.startswith("   <i>")]
+    if _size(lines) > budget:
+        lines = [ln for ln in lines if not ln.startswith("<blockquote>")]
+    while _size(lines) > budget and len(lines) > 6:
+        lines.pop(-1)                      # آخرین پرسش‌ها کوتاه می‌شوند
+        lines.append("… (بقیهٔ پرسش‌ها را بعد از این جواب‌ها می‌فرستم)")
+        if _size(lines) <= budget:
+            break
+        lines.pop(-1)
+    return "\n".join(lines + footer)
 
 
 def _pick_rows(c) -> List[List[Dict[str, Any]]]:
@@ -918,7 +949,16 @@ async def _apply_to_finance_account(db: AsyncSession, c, target: Dict[str, Any])
 
     from app.models.finance import FinancialAccount
 
-    picked = next((q.get("answer") for q in _answered(c) if q.get("answer")), None)
+    # فیلدِ «کدام حساب» را صریح پیدا کن. نسخهٔ اول اولین فیلدِ جواب‌داده را
+    # می‌گرفت، پس هر فیلدِ دیگری که زودتر جواب می‌گرفت، انتخابِ حساب را
+    # می‌ربود و موجودی بی‌صدا نوشته نمی‌شد (ممیزی ۲۰۲۶-۰۷-۳۱).
+    wanted_key = str(target.get("field") or "account_name")
+    q = (
+        next((q for q in _answered(c) if q.get("key") == wanted_key), None)
+        or next((q for q in _answered(c) if q.get("type") == "choice" and q.get("choices")), None)
+        or next(iter(_answered(c)), None)
+    )
+    picked = (q or {}).get("answer")
     if not picked:
         return []
     picked = str(picked).strip()
@@ -945,12 +985,16 @@ async def _apply_to_finance_account(db: AsyncSession, c, target: Dict[str, Any])
     # نوشتنِ مبلغ روی کارتِ دوم کافی نیست: کارتِ اول یک موجودیِ **ساختگی** با
     # مهرِ owner_balance_at نگه می‌داشت که هیچ سیگنالِ خودکاری هم نمی‌توانست
     # تصحیحش کند. پس هر ثبتِ قبلیِ همین فرم روی کارتِ دیگر، عقب زده می‌شود.
-    prior = [
-        r for r in (c.result or [])
-        if r.get("where") == "finance_account" and r.get("id") and r.get("id") != acc.id
-    ]
+    # اولین (قدیمی‌ترین) عکسِ هر کارت، و فقط یک بار. نسخهٔ اول همهٔ ثبت‌های
+    # قبلی را به‌ترتیب بازپخش می‌کرد، پس اگر یک کارت دو بار ثبت شده بود،
+    # آخرین «prev_balance» (که خودش عددِ ساختگی بود) برنده می‌شد و همان
+    # خرابی‌ای می‌ماند که این بلوک برای جلوگیری‌اش هست (ممیزی ۲۰۲۶-۰۷-۳۱).
+    first_snapshot: Dict[int, Dict[str, Any]] = {}
+    for r in (c.result or []):
+        if r.get("where") == "finance_account" and r.get("id") and r.get("id") != acc.id:
+            first_snapshot.setdefault(int(r["id"]), r)
     reverted = []
-    for entry in prior:
+    for entry in first_snapshot.values():
         old_acc = await db.get(FinancialAccount, int(entry["id"]))
         if old_acc is None:
             continue
@@ -997,10 +1041,21 @@ async def _apply_to_finance_account(db: AsyncSession, c, target: Dict[str, Any])
             wrote = True
 
     await db.flush()
+    label = f"کارتِ «{acc.name}»" + (" — موجودی ثبت شد" if wrote else " — انتخاب ثبت شد")
+    # اگر همین کارت قبلاً ثبت شده، عکسِ **اولیه**اش را نگه دار و ردیفِ تازه
+    # نساز — وگرنه prev_balance با عددِ نوشته‌شده جایگزین می‌شود.
+    existing = next(
+        (r for r in (c.result or [])
+         if r.get("where") == "finance_account" and r.get("id") == acc.id),
+        None,
+    )
+    if existing is not None:
+        existing["label"] = label
+        _write_json(c, "result", list(c.result or []))
+        return reverted
     return reverted + [{
         "where": "finance_account", "id": acc.id,
-        "prev_balance": prev_balance, "had_owner_pin": had_pin,
-        "label": f"کارتِ «{acc.name}»" + (" — موجودی ثبت شد" if wrote else " — انتخاب ثبت شد"),
+        "prev_balance": prev_balance, "had_owner_pin": had_pin, "label": label,
     }]
 
 
@@ -1321,11 +1376,11 @@ def owns(c, user_id: Optional[int]) -> bool:
     return owner == user_id or (user_id == 0 and c.user_id is None)
 
 
-async def resend_all(db: AsyncSession) -> Dict[str, Any]:
+async def resend_all(db: AsyncSession, *, user_id: Optional[int] = None) -> Dict[str, Any]:
     """دستورِ «سؤال‌های باز» در تلگرام: همه را دوباره بفرست، چون پیامِ قبلی
     بالا رفته. شمارندهٔ تلاش را جلو نمی‌برد — این خواستهٔ خودِ کاربر است."""
     sent = 0
-    for c in await open_forms(db, limit=MAX_OPEN_FORMS):
+    for c in await open_forms(db, limit=MAX_OPEN_FORMS, user_id=user_id):
         if not _unanswered(c):
             continue
         before = int(c.attempts or 0)

@@ -329,3 +329,66 @@ async def test_inbox_command_routes_all_forms(monkeypatch):
     assert (await bot.handle_update(_msg_update("/inbox\nیادداشت چندخطی\nخط دوم")))["handled"] == "inbox_captured"
     assert (await bot.handle_update(_msg_update("/inbox")))["handled"] == "inbox_captured"
     assert seen == ["خرید نان", "یادداشت چندخطی\nخط دوم", ""]
+
+
+# ── ممیزیِ ۲۰۲۶-۰۷-۳۱: دو ایرادِ بحرانی در جریانِ تلگرام ─────────────────────
+
+@pytest.mark.asyncio
+async def test_edit_message_text_builds_a_valid_payload(monkeypatch):
+    """`parse_mode` پارامتر نبود و هر فراخوانیِ واقعی NameError می‌داد — پیامِ
+    وضعیتِ compose هیچ‌وقت به‌روز نمی‌شد و همان متن دوباره ثبت می‌شد. تست‌های
+    قبلی نمی‌گرفتند چون بدونِ توکن، تابع زودتر برمی‌گشت."""
+    import httpx
+
+    from app.services.telegram_service import TelegramBot
+
+    seen = {}
+
+    class _Resp:
+        status_code = 200
+
+        def json(self):
+            return {"result": {"message_id": 5}}
+
+    class _Client:
+        def __init__(self, *a, **k):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *a):
+            return False
+
+        async def post(self, url, json=None):
+            seen.update(json or {})
+            return _Resp()
+
+    monkeypatch.setattr(httpx, "AsyncClient", _Client)
+    res = await TelegramBot("1:x", "555").edit_message_text("555", 5, "سلام")
+    assert res.get("ok") is True
+    assert seen["parse_mode"] == "Markdown"
+    assert seen["text"] == "سلام"
+
+
+@pytest.mark.asyncio
+async def test_commands_and_taps_always_escape_the_question_conversation(monkeypatch):
+    """حالتِ «سؤال دارم» نباید /cancel، /help و دکمه‌های کیبورد را ببلعد —
+    وگرنه مالک بدونِ راهِ خروج گیر می‌کند (ممیزی ۲۰۲۶-۰۷-۳۱)."""
+    from unittest.mock import AsyncMock
+
+    from app.services.telegram_service import TelegramBot, _chat_state, _set_state
+
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "555")
+    bot = TelegramBot("1:x", "555")
+    monkeypatch.setattr(TelegramBot, "send", AsyncMock(return_value={"ok": True, "message_id": 1}))
+    monkeypatch.setattr(TelegramBot, "send_with_reply_keyboard",
+                        AsyncMock(return_value={"ok": True, "message_id": 1}))
+
+    for n, text in enumerate(["/cancel", "/help", "📋 منو"]):
+        _set_state("555", "clar_qa", clarification_id=1)
+        res = await bot.handle_update(
+            {"update_id": 9000 + n, "message": {"chat": {"id": 555}, "text": text}}
+        )
+        assert res.get("handled") != "clar_discussed", f"{text} بلعیده شد"
+        assert (_chat_state.get("555") or {}).get("phase") != "clar_qa", f"{text} حالت را نبست"

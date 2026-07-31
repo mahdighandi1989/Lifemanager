@@ -316,7 +316,7 @@ def test_form_is_editable_stable_numbering_and_prefilled_answers():
     assert "اول / دوم" in text
     assert "خالی" in text
     assert "به‌روز" in text                          # صریح گفته که ویرایش ممکن است
-    assert "<b>" in text and "&" not in text.replace("&nbsp;", "")   # HTML امن
+    assert "<b>موضوع:</b>" in text                   # قالبِ خودمان
 
 
 def test_reminder_form_says_it_is_a_reminder():
@@ -615,8 +615,19 @@ def test_a_filename_topic_becomes_something_a_human_can_read():
     assert len(topic) < 60
 
 
-def test_humanize_keeps_a_real_persian_topic_intact():
-    assert clar.humanize_topic("پیامک بانک ملت — واریز ۲٬۵۰۰٬۰۰۰ ریال").startswith("پیامک بانک ملت")
+@pytest.mark.parametrize("topic", [
+    "پیامک بانک ملت — واریز ۲٬۵۰۰٬۰۰۰ ریال",
+    "موجودیِ 1,000,000 IRR از «mellat» مالِ کدام کارت است؟",
+    "واریز 1.500.000 ریال",
+    "فاکتور شماره 1002345 شرکت آلفا",
+    "تماس با 09121234567 درباره قرارداد",
+    "گزارش مالی 1403.06 شرکت",
+])
+def test_humanize_never_touches_a_real_topic(topic):
+    """متنِ آدمیزاد باید **عیناً** بماند. نسخهٔ اول ارقام را می‌خورد و
+    «1,000,000» را «1 000» می‌کرد — یعنی مالک دربارهٔ مبلغی هزار برابر
+    کوچک‌تر سؤال می‌شد (ممیزی ۲۰۲۶-۰۷-۳۱)."""
+    assert clar.humanize_topic(topic) == topic
 
 
 def test_the_form_is_html_and_escapes_hostile_content():
@@ -702,3 +713,82 @@ def test_discuss_endpoint_answers_and_keeps_the_form(api_client):
     assert body["answer"]
     assert len(body["discussion"]) == 2
     assert body["item"]["open_count"] == 1        # پرسشِ اصلی هنوز باز است
+
+
+# ── اصلاحاتِ ممیزیِ دومِ ۲۰۲۶-۰۷-۳۱ ─────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_correcting_twice_still_restores_the_original_balance(db):
+    """اگر یک کارت دو بار ثبت شده باشد، بازگردانی باید **قدیمی‌ترین** عکس را
+    برگرداند — وگرنه عددِ ساختگی به‌عنوان «مقدار قبلی» می‌ماند."""
+    import json
+
+    from app.models.finance import FinancialAccount
+
+    a = FinancialAccount(user_id=0, name="ملت — اول", kind="bank",
+                         institution="mellat", currency="IRR", balance=1)
+    b = FinancialAccount(user_id=0, name="ملت — دوم", kind="bank",
+                         institution="mellat", currency="IRR", balance=2)
+    db.add_all([a, b])
+    await db.flush()
+
+    c = await clar.ask(
+        db, topic="کدام کارت؟", source="finance", source_ref="twice",
+        target={"kind": "finance_account", "field": "account_name",
+                "institution": "mellat", "balance": "900000", "currency": "IRR"},
+        questions=[{"key": "account_name", "label": "کدام؟", "type": "choice",
+                    "choices": ["ملت — اول", "ملت — دوم"]}],
+    )
+    await clar.record_answers(db, c, {"account_name": "ملت — اول"}, raw="اول")
+    await clar.file_answers(db, c)
+    await clar.edit_answers(db, c.id, {"account_name": "اول"})      # تطبیقِ نرم، همان کارت
+    await clar.edit_answers(db, c.id, {"account_name": "ملت — دوم"})
+    await db.commit()
+
+    assert float(b.balance) == 900_000.0
+    assert float(a.balance) == 1.0                                  # عددِ اصلی
+    assert "owner_balance_at" not in json.loads(a.extra or "{}")
+
+
+@pytest.mark.asyncio
+async def test_the_account_is_taken_from_the_account_question_not_the_first_one(db):
+    """فیلدی که زودتر جواب می‌گیرد نباید انتخابِ حساب را برُباید."""
+    from app.models.finance import FinancialAccount
+
+    acc = FinancialAccount(user_id=0, name="ملت — دوم", kind="bank",
+                           institution="mellat", currency="IRR", balance=5)
+    db.add(acc)
+    await db.flush()
+
+    c = await clar.ask(
+        db, topic="t", source="finance", source_ref="fieldpick",
+        target={"kind": "finance_account", "field": "account_name",
+                "institution": "mellat", "balance": "700000", "currency": "IRR"},
+        questions=[
+            {"key": "note", "label": "توضیح؟", "type": "short"},
+            {"key": "account_name", "label": "کدام کارت؟", "type": "choice",
+             "choices": ["ملت — دوم"]},
+        ],
+    )
+    await clar.record_answers(db, c, {"note": "بابت اجاره"}, raw="…")
+    await clar.record_answers(db, c, {"account_name": "ملت — دوم"}, raw="…")
+    await clar.file_answers(db, c)
+    await db.commit()
+    assert float(acc.balance) == 700_000.0      # نه اینکه «بابت اجاره» را حساب بگیرد
+
+
+def test_a_huge_form_still_fits_telegram_and_keeps_its_footer():
+    class _Fake:
+        id = 1
+        topic = "موضوع " * 20
+        context = "متنِ زمینه " * 60
+        questions = [
+            {"key": f"k{i}", "label": "پرسشِ خیلی طولانی " * 15, "type": "short",
+             "why": "دلیلِ خیلی طولانی " * 15, "answer": None}
+            for i in range(8)
+        ]
+
+    text = clar.render_form(_Fake())
+    assert len(text) <= 3600
+    assert "❓ سؤال دارم" in text                # راهنما هرگز قربانی نمی‌شود
+    assert text.count("<b>") == text.count("</b>")   # هیچ تگی نصفه بریده نشده

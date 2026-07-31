@@ -450,7 +450,8 @@ async def _ask_which_account(
             # هر پیامِ مبهم یک فرمِ تازه می‌ساخت و ادغامِ کلیدِ مشترک هرگز
             # فعال نمی‌شد؛ یک جاروی صندوقِ ایمیل ده‌ها فرم می‌ساخت.
             source_ref=f"finance-ambiguous:{(institution or '').lower()}"[:191],
-            target={"kind": "finance_account", "institution": institution,
+            target={"kind": "finance_account", "field": "account_name",
+                    "institution": institution,
                     "balance": str(balance) if balance is not None else None,
                     "currency": currency, "source_ref": source_ref},
             questions=[{
