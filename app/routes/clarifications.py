@@ -25,6 +25,20 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+async def _own_or_404(db: AsyncSession, clarification_id: int, user_id: int):
+    """فرمِ این کاربر — وگرنه ۴۰۴.
+
+    بدونِ این، هر کاربرِ واردشده می‌توانست فرمِ کاربرِ دیگر را بخواند و جواب
+    بدهد، و جوابش روی حسابِ مالیِ **او** می‌نشست (ممیزی ۲۰۲۶-۰۷-۳۱). ۴۰۴ و نه
+    ۴۰۳، تا وجود/عدمِ وجودِ رکوردِ دیگران هم لو نرود."""
+    from app.models.clarification import Clarification
+
+    c = await db.get(Clarification, int(clarification_id))
+    if c is None or not clar.owns(c, user_id):
+        raise HTTPException(status_code=404, detail="clarification not found")
+    return c
+
+
 @router.get("/api/clarifications", tags=["clarifications"])
 @handle_errors
 async def list_clarifications(
@@ -33,7 +47,7 @@ async def list_clarifications(
     user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """پرسش‌های باز (و بایگانی‌شده‌ها) — همان‌هایی که در تلگرام پرسیده می‌شوند."""
-    rows = await clar.open_forms(db, limit=max(1, min(int(limit), 100)))
+    rows = await clar.open_forms(db, limit=max(1, min(int(limit), 100)), user_id=user_id)
     return {
         "ok": True, "success": True,
         "items": [clar.to_dict(c) for c in rows],
@@ -56,11 +70,7 @@ async def answer_clarification(
       * ``{"text": "..."}``                    — یک متنِ آزاد، مثل تلگرام
     فیلدِ خالی «بی‌جواب» می‌ماند و بعداً دوباره پرسیده می‌شود.
     """
-    from app.models.clarification import Clarification
-
-    c = await db.get(Clarification, int(clarification_id))
-    if c is None:
-        raise HTTPException(status_code=404, detail="clarification not found")
+    c = await _own_or_404(db, clarification_id, user_id)
 
     answers = payload.get("answers")
     text = str(payload.get("text") or "")
@@ -71,7 +81,9 @@ async def answer_clarification(
         mapped = await clar.parse_reply(db, c, text)
 
     outcome = await clar.record_answers(db, c, mapped, raw=text or "(فرم برنامه)", via="app")
-    filed = await clar.file_answers(db, c) if outcome["filled"] else []
+    # ویرایش هم باید دوباره ثبت شود، وگرنه فیدبک ادعا می‌کند ثبت شد ولی مقدارِ
+    # قبلی در سیستم می‌ماند (ممیزی ۲۰۲۶-۰۷-۳۱).
+    filed = await clar.file_answers(db, c) if (outcome["filled"] or outcome.get("edited")) else []
     await db.commit()
     return {"ok": True, "success": True, **outcome, "filed": filed,
             "item": clar.to_dict(c), "feedback": clar.feedback_text(c, outcome, filed)}
@@ -90,15 +102,16 @@ async def edit_clarification(
     ``{"answers": {"<key>": "<مقدار تازه>"}}``. مقدارِ **خالی** یعنی «این جواب
     را پس گرفتم» و همان پرسش دوباره باز و پرسیدنی می‌شود. پس از ویرایش، دوباره
     در سیستم ثبت می‌شود تا مقدارِ غلطِ قبلی جا نماند."""
-    from app.models.clarification import Clarification
-
+    c = await _own_or_404(db, clarification_id, user_id)
     edits = payload.get("answers")
     if not isinstance(edits, dict) or not edits:
         raise ValueError("answers is required")
-    res = await clar.edit_answers(db, clarification_id, {k: str(v or "") for k, v in edits.items()})
+    res = await clar.edit_answers(
+        db, clarification_id, {k: str(v or "") for k, v in edits.items()}, user_id=user_id
+    )
     if res is None:
         raise HTTPException(status_code=404, detail="clarification not found")
-    c = await db.get(Clarification, int(clarification_id))
+    await db.refresh(c)
     return {"ok": True, "success": True, **res, "item": clar.to_dict(c)}
 
 
@@ -110,7 +123,8 @@ async def skip_clarification(
     user_id: int = Depends(get_required_user_id),
 ) -> dict:
     """«مربوط نیست» — از چرخهٔ پرسش بیرون، ولی حذف نمی‌شود (قاعدهٔ قرنطینه)."""
-    ok = await clar.skip(db, clarification_id)
+    await _own_or_404(db, clarification_id, user_id)
+    ok = await clar.skip(db, clarification_id, user_id=user_id)
     if not ok:
         raise HTTPException(status_code=404, detail="clarification not found")
     return {"ok": True, "success": True, "skipped": True}
@@ -124,7 +138,8 @@ async def snooze_clarification(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_required_user_id),
 ) -> dict:
-    ok = await clar.snooze(db, clarification_id, hours=hours)
+    await _own_or_404(db, clarification_id, user_id)
+    ok = await clar.snooze(db, clarification_id, hours=hours, user_id=user_id)
     if not ok:
         raise HTTPException(status_code=404, detail="clarification not found")
     return {"ok": True, "success": True, "snoozed_hours": hours}

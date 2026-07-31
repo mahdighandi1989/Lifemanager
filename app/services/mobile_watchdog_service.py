@@ -47,20 +47,26 @@ async def device_last_seen(db: AsyncSession) -> Dict[str, datetime]:
     """Newest mobile signal per device (devices that ever reported)."""
     from app.models.activity_log import ActivityLog
 
+    # GROUP BY per device, not "newest 500 rows globally" (2026-07-31 audit):
+    # with the old cap a phone that stayed dead simply fell out of the window
+    # once a LIVE phone produced 500 newer rows — the watchdog then decided it
+    # had "returned", sent a false «✅ اتصال موبایل برگشت», cleared the alert
+    # state, and could never report that phone silent again.
+    from sqlalchemy import func as _f
+
     rows = (
         await db.execute(
-            select(ActivityLog.context_id, ActivityLog.created_at)
+            select(ActivityLog.context_id, _f.max(ActivityLog.created_at))
             .where(
                 ActivityLog.action.in_(_MOBILE_ACTIONS),
                 ActivityLog.context_type == "device",
             )
-            .order_by(ActivityLog.created_at.desc(), ActivityLog.id.desc())
-            .limit(500)
+            .group_by(ActivityLog.context_id)
         )
     ).all()
     seen: Dict[str, datetime] = {}
     for device, at in rows:
-        if device and at is not None and device not in seen:
+        if device and at is not None:
             seen[device] = at if at.tzinfo else at.replace(tzinfo=timezone.utc)
     return seen
 

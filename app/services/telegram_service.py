@@ -158,6 +158,17 @@ def send_message_sync(*, body: str, chat_id: Optional[str] = None) -> bool:
         return False
 
 
+def _extract_message_id(response) -> Optional[int]:
+    """message_id from a Bot-API response, or None. Used by every send path so
+    a retried send is still bindable (a clarification form must be replyable)."""
+    try:
+        if response.status_code != 200:
+            return None
+        return (response.json().get("result") or {}).get("message_id")
+    except Exception:
+        return None
+
+
 class TelegramBot:
     """Async Telegram bot client + webhook dispatcher.
 
@@ -244,16 +255,23 @@ class TelegramBot:
                         pass
                     return {"ok": True, "silent": silent, "message_id": mid}
                 body = r.text
+                # Both retry paths must report message_id exactly like the happy
+                # path. They did not, so a form whose Markdown failed to parse was
+                # DELIVERED but never bound to its record — the owner's reply then
+                # became a new task and the question could never be answered
+                # (2026-07-31 audit).
                 if r.status_code == 429:
                     self._absorb_429(body)
                     await asyncio.sleep(min(5.0, max(1.0, self._global_pause_until - time.monotonic())))
                     r2 = await client.post(url, json=payload)
                     return {"ok": r2.status_code == 200, "retried_after_429": True,
+                            "message_id": _extract_message_id(r2),
                             "error": None if r2.status_code == 200 else f"HTTP {r2.status_code}"}
                 if "can't parse" in body.lower():
                     payload.pop("parse_mode", None)
                     r3 = await client.post(url, json=payload)
                     return {"ok": r3.status_code == 200,
+                            "message_id": _extract_message_id(r3),
                             "error": None if r3.status_code == 200 else f"HTTP {r3.status_code}"}
                 return {"ok": False, "error": f"HTTP {r.status_code}: {body[:200]}"}
         except Exception as exc:
@@ -477,15 +495,17 @@ class TelegramBot:
         record it, file it, and report back. None → not a form reply."""
         if not text:
             return None
-        reply_to = (message.get("reply_to_message") or {}).get("message_id")
+        replied = message.get("reply_to_message") or {}
+        reply_to = replied.get("message_id")
         if not reply_to:
             return None
+        quoted = str(replied.get("text") or replied.get("caption") or "")
         from app.database import SessionLocal
         from app.services import clarification_service as clar
 
         async with SessionLocal() as session:
             result = await clar.handle_reply(
-                session, text=text, reply_to_message_id=reply_to
+                session, text=text, reply_to_message_id=reply_to, quoted_text=quoted,
             )
         if result is None:
             return None
@@ -769,12 +789,18 @@ class TelegramBot:
             target = routed.get("routed_to")
             if target in ("finance", "inbox"):
                 where = "«مالی»" if target == "finance" else "«صندوق ورودی»"
-                return await self._send(
-                    chat_id,
+                # `self._send` وجود نداشت: هر بار AttributeError می‌داد، در
+                # except پایین بی‌صدا بلعیده می‌شد و پیام به فلوِ compose
+                # می‌افتاد — یعنی تأییدِ مسیریابی هرگز نمی‌آمد و همان متن دو
+                # بار ثبت می‌شد (ممیزی ۲۰۲۶-۰۷-۳۱).
+                await self.send(
                     f"✅ ثبت شد و به {where} رفت (دستهٔ تشخیص‌داده‌شده: {routed.get('category')}).",
+                    chat_id=chat_id, silent=True, reply_markup=PERSISTENT_REPLY_KEYBOARD,
                 )
+                return {"ok": True, "handled": "dispatched", "routed_to": target,
+                        "category": routed.get("category")}
         except Exception as exc:  # routing is a bonus — compose is the floor
-            logger.debug("telegram dispatch skipped: %r", exc)
+            logger.warning("telegram dispatch skipped: %r", exc)
 
         # Any other plain text → treat it as the start of an intelligent task
         # compose (analyse + auto/manual routing), not a dead-end nudge.

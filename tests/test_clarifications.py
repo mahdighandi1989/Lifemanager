@@ -502,3 +502,97 @@ async def test_answers_actually_reach_the_database_not_just_memory():
         assert row.questions[0]["answer"] == "جوابِ اصلاح‌شده"
         assert any(h.get("via") == "edit" for h in (row.answers or []))
     await engine.dispose()
+
+
+# ── اصلاحاتِ ممیزیِ ۲۰۲۶-۰۷-۳۱ ──────────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_correcting_the_card_reverts_the_wrong_one(db):
+    """اصلاحِ «کدام کارت؟» باید کارتِ اشتباه را هم برگرداند — وگرنه یک کارت
+    موجودیِ ساختگی با مهرِ مالک نگه می‌دارد که هیچ سیگنالی هم اصلاحش نمی‌کند."""
+    import json
+
+    from app.models.finance import FinancialAccount
+
+    a = FinancialAccount(user_id=0, name="ملت — اول", kind="bank",
+                         institution="mellat", currency="IRR", balance=1)
+    b = FinancialAccount(user_id=0, name="ملت — دوم", kind="bank",
+                         institution="mellat", currency="IRR", balance=2)
+    db.add_all([a, b])
+    await db.flush()
+
+    c = await clar.ask(
+        db, topic="کدام کارت؟", source="finance", source_ref="revert",
+        target={"kind": "finance_account", "institution": "mellat",
+                "balance": "900000", "currency": "IRR"},
+        questions=[{"key": "account_name", "label": "کدام؟", "type": "choice",
+                    "choices": ["ملت — اول", "ملت — دوم"]}],
+    )
+    await clar.record_answers(db, c, {"account_name": "ملت — اول"}, raw="اول")
+    await clar.file_answers(db, c)
+    await db.commit()
+    assert float(a.balance) == 900_000.0
+
+    await clar.edit_answers(db, c.id, {"account_name": "ملت — دوم"})
+    assert float(b.balance) == 900_000.0
+    assert float(a.balance) == 1.0                                   # برگشت
+    assert "owner_balance_at" not in json.loads(a.extra or "{}")     # مهر هم برداشته شد
+
+
+@pytest.mark.asyncio
+async def test_partial_replies_do_not_create_duplicate_inbox_items(db):
+    """جوابِ نصفه طبیعی است، پس ثبت باید idempotent باشد — نه یک کپیِ ناقص
+    به‌ازای هر جواب."""
+    from sqlalchemy import select
+
+    from app.models.inbox_item import InboxItem
+
+    c = await clar.ask(db, topic="یک چیزِ مبهم", source_ref="idem",
+                       questions=_fields("این چیست؟", "برای که؟"))
+    await clar.record_answers(db, c, {"f1": "قبضِ برق"}, raw="…")
+    await clar.file_answers(db, c)
+    await clar.record_answers(db, c, {"f2": "برای خانه"}, raw="…")
+    await clar.file_answers(db, c)
+    await db.commit()
+
+    items = (await db.execute(select(InboxItem))).scalars().all()
+    assert len(items) == 1                       # یک آیتم، نه دو
+    assert "برای خانه" in (items[0].content or "")   # و کامل‌ترین نسخه
+
+
+@pytest.mark.asyncio
+async def test_an_undelivered_form_does_not_burn_its_attempt_budget(db, monkeypatch):
+    """اگر ارسال شکست بخورد، تلاش نباید شمرده شود — وگرنه فرمی که هرگز تحویل
+    نشده بعد از ۵ بار «رهاشده» می‌شود و دیگر پرسیده نمی‌شود."""
+    class _Bot:
+        chat_id = "1"
+
+        def is_configured(self):
+            return True
+
+        async def send(self, *a, **k):
+            return {"ok": False, "error": "HTTP 400"}
+
+    import app.services.telegram_service as ts
+    monkeypatch.setattr(ts, "get_telegram_bot", lambda: _Bot())
+
+    c = await clar.ask(db, topic="t", source_ref="undeliv", questions=_fields("س"))
+    assert await clar.send_form(db, c) is False
+    assert c.attempts == 0
+    assert c.message_id is None
+
+
+def test_a_bare_answer_containing_a_colon_is_kept_whole():
+    """«ساعت ۹: قرار با دکتر» یک جوابِ کامل است، نه «عنوان: مقدار»."""
+    assert clar._strip_prefix("ساعت ۹: قرار با دکتر", "کِی و کجا؟") == "ساعت ۹: قرار با دکتر"
+    # ولی وقتی قبل از «:» واقعاً متنِ همان پرسش است، بریده می‌شود
+    assert clar._strip_prefix("کِی بود: دیروز", "کِی بود؟") == "دیروز"
+
+
+def test_owns_rejects_another_users_form():
+    class _C:
+        user_id = 7
+
+    assert clar.owns(_C(), 7) is True
+    assert clar.owns(_C(), 9) is False
+    assert clar.owns(_C(), None) is True     # مسیرهای داخلی (تلگرام تک‌مالکی)

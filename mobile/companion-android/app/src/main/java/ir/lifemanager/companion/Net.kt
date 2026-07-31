@@ -49,6 +49,8 @@ object Net {
 }
 
 class PostWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
+    companion object { const val MAX_ATTEMPTS = 12 }
+
     override suspend fun doWork(): Result {
         val path = inputData.getString("path") ?: return Result.failure()
         val json = inputData.getString("json") ?: return Result.failure()
@@ -66,12 +68,17 @@ class PostWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
             client.newCall(request).execute().use { resp ->
                 when {
                     resp.isSuccessful -> Result.success()
-                    resp.code == 401 -> Result.failure() // توکن غلط — تلاش دوباره بی‌فایده
+                    // ۴xx یعنی «این محتوا هیچ‌وقت پذیرفته نمی‌شود» — تلاشِ
+                    // دوباره فقط باتری می‌سوزاند. WorkManager سقفِ تلاش ندارد،
+                    // پس بدون این، یک پیلودِ نامعتبر تا ابد retry می‌شد.
+                    resp.code in 400..499 -> Result.failure()
+                    // خطای سرور/شبکه: تلاش دوباره، ولی نه بی‌نهایت.
+                    runAttemptCount >= MAX_ATTEMPTS -> Result.failure()
                     else -> Result.retry()
                 }
             }
         } catch (e: Exception) {
-            Result.retry()
+            if (runAttemptCount >= MAX_ATTEMPTS) Result.failure() else Result.retry()
         }
     }
 }

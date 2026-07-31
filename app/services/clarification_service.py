@@ -396,7 +396,14 @@ async def send_form(db: AsyncSession, c, *, reminder: bool = False) -> bool:
                 "input_field_placeholder": "خط‌ها را پر کن و بفرست",
             },
         )
+        ok = bool(isinstance(res, dict) and res.get("ok"))
         mid = res.get("message_id") if isinstance(res, dict) else None
+        if not ok:
+            # ارسال نشد → تلاش را نسوزان. نسخهٔ اول بی‌قید شمارنده را بالا
+            # می‌برد، پس فرمی که اصلاً تحویل نشده بود بعد از ۵ بار «رهاشده»
+            # می‌شد و دیگر هرگز پرسیده نمی‌شد (ممیزی ۲۰۲۶-۰۷-۳۱).
+            logger.debug("clarification form not delivered: %r", res)
+            return False
         if mid:
             c.message_id = str(mid)
             c.chat_id = str(bot.chat_id or "") or c.chat_id
@@ -560,19 +567,24 @@ def _heuristic_map(pending: List[Dict[str, Any]], text: str) -> Dict[str, str]:
     # ابتدای خط را می‌کَنیم، وگرنه «۱) نمی‌دانم» به‌عنوان جوابِ واقعی جا می‌افتد
     # چون خودِ رشتهٔ کامل در فهرستِ «بی‌جواب»ها نیست.
     if not out and len(pending) == 1:
-        bare = _strip_prefix(text)
+        bare = _strip_prefix(text, pending[0].get("label") or "")
         if _meaningful(bare):
             out[pending[0]["key"]] = bare[:2000]
     return out
 
 
-def _strip_prefix(value: str) -> str:
-    """«۲) جواب» / «عنوان: جواب» → «جواب»."""
+def _strip_prefix(value: str, label: str = "") -> str:
+    """«۲) جواب» → «جواب»، و «عنوانِ همان پرسش: جواب» → «جواب».
+
+    برشِ کورِ اولین «:» غلط بود: جوابِ «ساعت ۹: قرار با دکتر» به «قرار با
+    دکتر» تبدیل می‌شد و نیمهٔ اولِ حرفِ مالک بی‌صدا حذف می‌شد (ممیزی
+    ۲۰۲۶-۰۷-۳۱). حالا فقط وقتی بریده می‌شود که چیزی که قبل از «:» آمده
+    واقعاً **خودِ متنِ پرسش** باشد."""
     line = re.sub(r"\s+", " ", str(value or "")).strip()
-    line = re.sub(r"^[\(\[]?\s*[0-9۰-۹]{1,2}\s*[\)\].\-:]\s*", "", line)
+    line = re.sub(r"^[\(\[]?\s*[0-9۰-۹]{1,2}\s*[\)\].\-]\s*", "", line)
     if ":" in line:
         head, _, tail = line.partition(":")
-        if tail.strip():
+        if tail.strip() and label and _norm_label(head) and _norm_label(head) in _norm_label(label):
             line = tail.strip()
     return line.strip()
 
@@ -666,16 +678,34 @@ def answers_text(c) -> str:
     )
 
 
+def _prior_result(c, where: str) -> Optional[Dict[str, Any]]:
+    """ثبتِ قبلیِ همین فرم در همین مقصد (اگر بوده)."""
+    for entry in reversed(c.result or []):
+        if entry.get("where") == where and entry.get("id"):
+            return entry
+    return None
+
+
 async def _apply_to_inbox(db: AsyncSession, c, target: Dict[str, Any]) -> List[Dict[str, Any]]:
     """پیش‌فرض: موضوع + جواب‌ها یک آیتمِ صندوق می‌شود و تریاژِ خودِ صندوق
-    آن را به مقصدِ درست می‌برد — همان تضمینِ «هیچ‌چیز هدر نمی‌رود»."""
+    آن را به مقصدِ درست می‌برد — همان تضمینِ «هیچ‌چیز هدر نمی‌رود».
+
+    **یک آیتم به‌ازای هر فرم، نه هر جواب** (ممیزی ۲۰۲۶-۰۷-۳۱): جوابِ نصفه
+    طبیعی است، پس این تابع چند بار صدا زده می‌شود؛ نسخهٔ اول هر بار یک آیتمِ
+    تازه می‌ساخت و مالک چند کپیِ ناقص برای تریاژ می‌دید. حالا اگر قبلاً ساخته
+    شده باشد، همان **به‌روز** می‌شود."""
     from app.models.inbox_item import InboxItem
     from app.services import inbox_service
 
-    content = f"{c.topic}\n{c.context or ''}\n\n{answers_text(c)}".strip()
-    item = InboxItem(user_id=c.user_id or 0, content=content[:4000],
-                     source="clarification", status="pending")
-    db.add(item)
+    content = f"{c.topic}\n{c.context or ''}\n\n{answers_text(c)}".strip()[:4000]
+    prior = _prior_result(c, "inbox")
+    item = await db.get(InboxItem, int(prior["id"])) if prior else None
+    if item is not None and item.status == "pending":
+        item.content = content
+    else:
+        item = InboxItem(user_id=c.user_id or 0, content=content,
+                         source="clarification", status="pending")
+        db.add(item)
     await db.flush()
     try:
         item = await inbox_service.apply_classification(db, item, user_id=c.user_id or 0)
@@ -696,7 +726,17 @@ async def _apply_to_inbox_item(db: AsyncSession, c, target: Dict[str, Any]) -> L
     item = await db.get(InboxItem, int(target.get("id") or 0))
     if item is None:
         return await _apply_to_inbox(db, c, target)
-    item.content = f"{item.content}\n\n— پاسخِ مالک —\n{answers_text(c)}"[:4000]
+    # جوابِ نصفه یعنی این تابع چند بار اجرا می‌شود. نسخهٔ اول هر بار بلوکِ
+    # «پاسخِ مالک» را دوباره می‌چسباند و دوباره file_item می‌زد، پس یک آیتم دو
+    # موجودیت می‌ساخت و اولی یتیم می‌ماند. حالا بلوک **جایگزین** می‌شود و
+    # آیتمِ فایل‌شده دوباره فایل نمی‌شود (ممیزی ۲۰۲۶-۰۷-۳۱).
+    marker = "\n\n— پاسخِ مالک —\n"
+    base = (item.content or "").split(marker)[0]
+    item.content = f"{base}{marker}{answers_text(c)}"[:4000]
+    if item.status == "filed":
+        await db.flush()
+        return [{"where": (item.filed_entity_type or "inbox"), "id": item.filed_entity_id or item.id,
+                 "label": "موردِ قبلی به‌روز شد (دوباره ساخته نشد)"}]
     await db.flush()
     try:
         item = await inbox_service.apply_classification(db, item, user_id=c.user_id or 0)
@@ -756,23 +796,68 @@ async def _apply_to_finance_account(db: AsyncSession, c, target: Dict[str, Any])
         return [{"where": "finance", "id": None,
                  "label": f"کارتی به نامِ «{picked[:40]}» پیدا نشد — دست‌نخورده ماند"}]
 
-    raw_balance = target.get("balance")
-    if raw_balance not in (None, ""):
+    # ── اصلاحِ جوابِ قبلی باید کارتِ قبلی را هم برگرداند ────────────────────
+    # (۲۰۲۶-۰۷-۳۱) اگر مالک اول «کارت اول» را انتخاب کند و بعد اصلاحش کند،
+    # نوشتنِ مبلغ روی کارتِ دوم کافی نیست: کارتِ اول یک موجودیِ **ساختگی** با
+    # مهرِ owner_balance_at نگه می‌داشت که هیچ سیگنالِ خودکاری هم نمی‌توانست
+    # تصحیحش کند. پس هر ثبتِ قبلیِ همین فرم روی کارتِ دیگر، عقب زده می‌شود.
+    prior = [
+        r for r in (c.result or [])
+        if r.get("where") == "finance_account" and r.get("id") and r.get("id") != acc.id
+    ]
+    reverted = []
+    for entry in prior:
+        old_acc = await db.get(FinancialAccount, int(entry["id"]))
+        if old_acc is None:
+            continue
+        if entry.get("prev_balance") is not None:
+            try:
+                old_acc.balance = Decimal(str(entry["prev_balance"]))
+            except (InvalidOperation, ValueError):
+                pass
         try:
-            acc.balance = Decimal(str(raw_balance))
-        except (InvalidOperation, ValueError):
-            raw_balance = None
-    if raw_balance not in (None, ""):
-        try:
-            extra = _json.loads(acc.extra or "{}")
+            old_extra = _json.loads(old_acc.extra or "{}")
         except Exception:
-            extra = {}
-        extra["owner_balance_at"] = datetime.now(timezone.utc).isoformat()
-        extra["balance_evidence"] = "پاسخِ مالک به پرسشِ رفعِ ابهام"
-        acc.extra = _json.dumps(extra, ensure_ascii=False)
+            old_extra = {}
+        if not entry.get("had_owner_pin"):
+            old_extra.pop("owner_balance_at", None)
+        old_extra.pop("balance_evidence", None)
+        old_acc.extra = _json.dumps(old_extra, ensure_ascii=False)
+        reverted.append({"where": "finance_account_reverted", "id": old_acc.id,
+                         "label": f"کارتِ «{old_acc.name}» به حالتِ قبل برگشت"})
+
+    raw_balance = target.get("balance")
+    try:
+        extra = _json.loads(acc.extra or "{}")
+    except Exception:
+        extra = {}
+    prev_balance = str(acc.balance if acc.balance is not None else "")
+    had_pin = bool(extra.get("owner_balance_at"))
+
+    wrote = False
+    if raw_balance not in (None, ""):
+        try:
+            value = Decimal(str(raw_balance))
+        except (InvalidOperation, ValueError):
+            value = None
+        # همان دو گاردِ مسیرِ قطعیِ مالی: ارزِ ناهمخوان و عددِ نامثبت هرگز روی
+        # کارت نمی‌نشیند — جوابِ مالک «کدام کارت» است، نه «هر عددی بنویس».
+        target_currency = (target.get("currency") or "").upper()
+        if value is not None and value > 0 and not (
+            target_currency and acc.currency and target_currency != str(acc.currency).upper()
+        ):
+            acc.balance = value
+            extra["owner_balance_at"] = datetime.now(timezone.utc).isoformat()
+            extra["balance_evidence"] = "پاسخِ مالک به پرسشِ رفعِ ابهام"
+            acc.extra = _json.dumps(extra, ensure_ascii=False)
+            wrote = True
+
     await db.flush()
-    return [{"where": "finance_account", "id": acc.id,
-             "label": f"کارتِ «{acc.name}»" + (" — موجودی ثبت شد" if raw_balance else " — انتخاب ثبت شد")}]
+    return reverted + [{
+        "where": "finance_account", "id": acc.id,
+        "prev_balance": prev_balance, "had_owner_pin": had_pin,
+        "label": f"کارتِ «{acc.name}»" + (" — موجودی ثبت شد" if wrote else " — انتخاب ثبت شد"),
+    }]
 
 
 _APPLIERS: Dict[str, Callable] = {
@@ -811,9 +896,47 @@ async def newest_open(db: AsyncSession):
     ).scalar_one_or_none()
 
 
-async def handle_reply(db: AsyncSession, *, text: str, reply_to_message_id: Any = None) -> Optional[Dict[str, Any]]:
+FORM_MARKER = "همین پیام را *ریپلای* کن"
+
+
+async def find_by_quoted_text(db: AsyncSession, quoted: str):
+    """فرمِ متناظر با متنِ پیامی که کاربر به آن ریپلای زده.
+
+    چرا لازم است: هر یادآوری یک پیامِ تازه است و ``message_id`` فقط آخری را
+    نگه می‌دارد، پس ریپلای به نسخهٔ **قبلیِ** همان فرم شناخته نمی‌شد و جوابِ
+    مالک به فلوِ «کار جدید» می‌افتاد (ممیزی ۲۰۲۶-۰۷-۳۱). با تطبیقِ عنوانِ
+    موضوع در متنِ نقل‌شده، هر نسخه‌ای از فرم قابلِ جواب می‌ماند — و چون
+    نشانهٔ فرم هم باید باشد، ریپلای به یک پیامِ بی‌ربط اشتباه گرفته نمی‌شود."""
+    from app.models.clarification import Clarification
+
+    body = quoted or ""
+    if FORM_MARKER not in body and "❓" not in body and "🔄" not in body:
+        return None
+    rows = (
+        await db.execute(
+            select(Clarification)
+            .where(Clarification.status.in_(("open", "partial", "parked", "answered")))
+            .order_by(Clarification.id.desc())
+            .limit(50)
+        )
+    ).scalars().all()
+    best = None
+    for c in rows:
+        topic = (c.topic or "").strip()
+        if len(topic) >= 6 and topic[:120] in body:
+            if best is None or len(topic) > len(best.topic or ""):
+                best = c
+    return best
+
+
+async def handle_reply(
+    db: AsyncSession, *, text: str, reply_to_message_id: Any = None,
+    quoted_text: str = "",
+) -> Optional[Dict[str, Any]]:
     """جوابِ تلگرام → تحلیل → ثبت → فیدبک. None یعنی «این پیام جوابِ فرم نبود»."""
     c = await find_by_message(db, reply_to_message_id)
+    if c is None:
+        c = await find_by_quoted_text(db, quoted_text)
     if c is None:
         return None
     mapped = await parse_reply(db, c, text)
@@ -849,7 +972,8 @@ def feedback_text(c, outcome: Dict[str, Any], filed: List[Dict[str, Any]]) -> st
 
 
 async def edit_answers(
-    db: AsyncSession, clarification_id: int, edits: Dict[str, str], *, refile: bool = True
+    db: AsyncSession, clarification_id: int, edits: Dict[str, str], *,
+    refile: bool = True, user_id: Optional[int] = None,
 ) -> Optional[Dict[str, Any]]:
     """ویرایشِ جوابِ قبلی — «اشتباه نوشتم» یا «نظرم عوض شد».
 
@@ -865,7 +989,7 @@ async def edit_answers(
     from app.models.clarification import Clarification
 
     c = await db.get(Clarification, int(clarification_id))
-    if c is None:
+    if c is None or not owns(c, user_id):
         return None
     now = datetime.now(timezone.utc)
     questions = _questions_of(c)
@@ -905,40 +1029,58 @@ async def edit_answers(
             "remaining": len(remaining), "refiled": refiled}
 
 
-async def snooze(db: AsyncSession, clarification_id: int, hours: int = 24) -> bool:
+async def snooze(db: AsyncSession, clarification_id: int, hours: int = 24,
+                 user_id: Optional[int] = None) -> bool:
     from app.models.clarification import Clarification
 
     c = await db.get(Clarification, int(clarification_id))
-    if c is None:
+    if c is None or not owns(c, user_id):
         return False
     c.snoozed_until = datetime.now(timezone.utc) + timedelta(hours=max(1, int(hours)))
     await db.commit()
     return True
 
 
-async def skip(db: AsyncSession, clarification_id: int) -> bool:
+async def skip(db: AsyncSession, clarification_id: int, user_id: Optional[int] = None) -> bool:
     """«مربوط نیست» — از چرخه بیرون می‌رود ولی حذف نمی‌شود."""
     from app.models.clarification import Clarification
 
     c = await db.get(Clarification, int(clarification_id))
-    if c is None:
+    if c is None or not owns(c, user_id):
         return False
     c.status = "skipped"
     await db.commit()
     return True
 
 
-async def open_forms(db: AsyncSession, limit: int = 20) -> List[Any]:
+async def open_forms(db: AsyncSession, limit: int = 20, user_id: Optional[int] = None) -> List[Any]:
+    """پرسش‌های باز. ``user_id`` را همیشه از مسیرِ HTTP بده — بدونِ آن، فهرست
+    فرم‌های همهٔ کاربران را برمی‌گرداند و متنِ خامِ پیامکِ بانکیِ یکی به دیگری
+    نشت می‌کند (۲۰۲۶-۰۷-۳۱)."""
     from app.models.clarification import Clarification
 
+    stmt = select(Clarification).where(
+        Clarification.status.in_(("open", "partial", "parked"))
+    )
+    if user_id is not None:
+        from app.services.inbox_service import scope_filter
+
+        stmt = stmt.where(scope_filter(Clarification.user_id, user_id))
     return (
         await db.execute(
-            select(Clarification)
-            .where(Clarification.status.in_(("open", "partial", "parked")))
-            .order_by(Clarification.priority.desc(), Clarification.id.desc())
-            .limit(limit)
+            stmt.order_by(Clarification.priority.desc(), Clarification.id.desc()).limit(limit)
         )
     ).scalars().all()
+
+
+def owns(c, user_id: Optional[int]) -> bool:
+    """آیا این فرم متعلق به همین کاربر است؟ (۰/NULL = دامنهٔ ناشناس، مثل بقیهٔ
+    جدول‌ها). ``None`` یعنی «بررسی نکن» — فقط برای مسیرهای داخلی مثل تلگرام
+    که خودشان تک‌مالکی‌اند."""
+    if user_id is None:
+        return True
+    owner = c.user_id or 0
+    return owner == user_id or (user_id == 0 and c.user_id is None)
 
 
 async def resend_all(db: AsyncSession) -> Dict[str, Any]:

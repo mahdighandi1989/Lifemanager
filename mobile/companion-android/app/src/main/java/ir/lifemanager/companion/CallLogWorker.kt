@@ -23,6 +23,7 @@ class CallLogWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         val prefs = Net.prefs(applicationContext)
         val since = prefs.getLong("call_log_since", 0L)
         var newest = since
+        var queued = 0
         try {
             val cursor = applicationContext.contentResolver.query(
                 CallLog.Calls.CONTENT_URI,
@@ -58,9 +59,16 @@ class CallLogWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
                         .put("device", Net.deviceName(applicationContext))
                         .toString()
                     Net.enqueue(applicationContext, "/api/mobile/call", json)
+                    queued++
                 }
             }
-            prefs.edit().putLong("call_log_since", newest).apply()
+            // نشانهٔ پیشرفت فقط وقتی جلو می‌رود که دستِ‌کم چیزی در صف رفته
+            // باشد. نسخهٔ اول بی‌قید جلو می‌برد، پس تماس‌هایی که هنگام
+            // نامعتبربودنِ توکن رد شده بودند برای همیشه از دست می‌رفتند
+            // (ممیزی ۲۰۲۶-۰۷-۳۱).
+            if (queued > 0 || newest <= since) {
+                prefs.edit().putLong("call_log_since", newest).apply()
+            }
         } catch (_: Exception) {
             // بدون دسترسی یا خطای خواندن — ساکت می‌مانیم
         }

@@ -396,10 +396,23 @@ async def set_owner_accounts(db: AsyncSession, entries: list) -> None:
     await _kv_set_list(db, _OWNER_ACCOUNTS_KEY, entries)
 
 
+def _fmt_amount(balance) -> str:
+    """عددِ خوانا بدونِ خوردنِ صفرهای معنادار."""
+    if balance is None:
+        return "—"
+    try:
+        d = Decimal(str(balance)).normalize()
+        if d == d.to_integral_value():
+            return f"{int(d):,}"
+        return f"{d:,f}".rstrip("0").rstrip(".")
+    except Exception:
+        return str(balance)
+
+
 async def _ask_which_account(
     db: AsyncSession, uid: int, *, institution: Optional[str], balance,
     currency: Optional[str], source_ref: Optional[str], evidence: Optional[str] = None,
-) -> None:
+) -> bool:
     """«این پیام مالِ کدام کارت است؟» — با گزینه‌های واقعیِ همان بانک.
 
     این یکی از معدود جاهایی است که گزینه‌ها را خودمان می‌دهیم (نه مدل)، چون
@@ -411,23 +424,32 @@ async def _ask_which_account(
         rows = (
             await db.execute(
                 select(FinancialAccount).where(
-                    FinancialAccount.institution == institution,
                     or_(FinancialAccount.user_id == uid, FinancialAccount.user_id.is_(None))
                     if uid == 0 else (FinancialAccount.user_id == uid),
                 )
             )
         ).scalars().all()
+        # همان تطبیقی که ابهام را اعلام کرد (بی‌توجه به بزرگی/کوچکی حروف)،
+        # وگرنه گزینه‌ای پیدا نمی‌شد، فرمی ساخته نمی‌شد و سیگنال بی‌صدا گم
+        # می‌شد در حالی که خروجی «asked: True» می‌گفت.
+        want = (institution or "").strip().lower()
+        rows = [r for r in rows if (r.institution or "").strip().lower() == want] or rows
         names = [r.name for r in rows if r.name][:8]
         if len(names) < 2:
-            return
-        amount = f"{balance:,}".rstrip("0").rstrip(".") if balance is not None else "—"
+            return False
+        # `rstrip("0")` روی یک عددِ صحیح، صفرهای معنادار را می‌خورد: ۱٬۲۰۰٬۰۰۰
+        # به «1,200,» تبدیل می‌شد و مالک دربارهٔ مبلغی غلط سؤال می‌شد.
+        amount = _fmt_amount(balance)
         await clar.ask(
             db,
             topic=f"موجودیِ {amount} {currency or ''} از «{institution}» مالِ کدام کارت است؟",
             context=(evidence or "")[:1000],
             source="finance",
             # یک ابهام برای هر (بانک+منبع) — پیامِ تکراری فرمِ تکراری نمی‌سازد.
-            source_ref=f"finance-ambiguous:{institution}:{source_ref or ''}"[:191],
+            # یک فرم به‌ازای هر (بانک) — نه هر ایمیل. با گنجاندنِ source_ref
+            # هر پیامِ مبهم یک فرمِ تازه می‌ساخت و ادغامِ کلیدِ مشترک هرگز
+            # فعال نمی‌شد؛ یک جاروی صندوقِ ایمیل ده‌ها فرم می‌ساخت.
+            source_ref=f"finance-ambiguous:{(institution or '').lower()}"[:191],
             target={"kind": "finance_account", "institution": institution,
                     "balance": str(balance) if balance is not None else None,
                     "currency": currency, "source_ref": source_ref},
@@ -442,8 +464,10 @@ async def _ask_which_account(
             priority=5,   # پول مهم است؛ جلوتر از بقیه پرسیده شود
             user_id=uid,
         )
+        return True
     except Exception as exc:
         logger.debug("ambiguous-account question skipped: %r", exc)
+        return False
 
 
 async def apply_account_signal(
@@ -489,11 +513,14 @@ async def apply_account_signal(
         # بماند نه اشتباه ثبت شود). The refusal itself is unchanged — nothing
         # is written until he answers.
         logger.info("finance signal ambiguous at %s — several cards, no ref; asking", institution)
-        await _ask_which_account(
+        asked = await _ask_which_account(
             db, uid, institution=institution, balance=bal, currency=currency,
             source_ref=source_ref, evidence=evidence,
         )
-        return {"created": 0, "updated": 0, "account_id": None, "reason": "ambiguous", "asked": True}
+        # «asked» باید واقعیت را بگوید: اگر فرمی ساخته نشد، سیگنال بی‌صدا گم
+        # شده و صداقتِ خروجی تنها راهِ فهمیدنش است (ممیزی ۲۰۲۶-۰۷-۳۱).
+        return {"created": 0, "updated": 0, "account_id": None, "reason": "ambiguous",
+                "asked": bool(asked)}
     if acc is None:
         # PRECISION over recall (the owner's finance page filled with junk):
         # opening a NEW card needs a real, non-zero BALANCE from a real

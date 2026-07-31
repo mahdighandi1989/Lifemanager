@@ -39,7 +39,14 @@ async def _pick_account(
     with several accounts and no confident match we refuse (None) rather
     than corrupt the wrong balance.
     """
-    stmt = select(FinancialAccount).where(FinancialAccount.user_id == user_id)
+    # NULL-owner rows are the ones the email auto-feed mints (it stores
+    # user_id=None for the anon scope), so a bare ``user_id == uid`` made every
+    # machine-created card invisible to the SMS path — every bank SMS was
+    # silently refused with «no confident account match» (2026-07-31 audit).
+    # Same NULL-aware helper every other reader of this table uses.
+    from app.services.inbox_service import scope_filter
+
+    stmt = select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
     if account_id is not None:
         stmt = stmt.where(FinancialAccount.id == account_id)
         return (await db.execute(stmt)).scalars().first()
@@ -89,6 +96,7 @@ async def apply_bank_message(
     body: str,
     account_id: Optional[int] = None,
     sender: Optional[str] = None,
+    occurred_iso: Optional[str] = None,
 ) -> dict:
     """Parse ``body`` (channel ``email``|``sms``), update the matching account's
     balance, record the delta as a Transaction, and trigger the affordable-tasks
@@ -136,12 +144,40 @@ async def apply_bank_message(
             "reason": f"currency mismatch ({msg_currency} ≠ {account.currency})",
         }
 
-    old = Decimal(str(account.balance or 0))
     new = Decimal(str(new_balance))
+
+    # اولویتِ حرفِ مالک (۲۰۲۶-۰۷-۳۱): همان قاعده‌ای که مسیرِ ایمیل دارد و اینجا
+    # نداشت — موجودی‌ای که خودِ مالک وارد کرده (یا با پاسخ به پرسشِ رفعِ ابهام
+    # تثبیت شده) حقیقتِ نهایی است؛ فقط سیگنالی با تاریخِ **جدیدتر** می‌تواند
+    # حرکتش دهد. بدون این، یک پیامکِ قدیمی عددِ دستیِ مالک را پاک می‌کرد و
+    # برچسبِ «تنظیم دستی مالک» هم سرِ جایش می‌ماند، یعنی برچسب دروغ می‌گفت.
+    import json as _json
+
+    try:
+        extra = _json.loads(account.extra or "{}")
+    except Exception:
+        extra = {}
+    owner_at = extra.get("owner_balance_at")
+    if owner_at and (not occurred_iso or str(occurred_iso) <= str(owner_at)):
+        return {
+            "matched": True, "balances_updated": 0,
+            "reason": "owner-pinned balance is newer",
+        }
+    # کارت با موجودیِ صفر/منفی باز نمی‌شود و حرکت هم نمی‌کند — عددِ منفیِ
+    # یک صورت‌حسابِ کارگزاری «موجودی» نیست (همان قاعدهٔ مسیرِ ایمیل).
+    if new <= 0:
+        return {"matched": True, "balances_updated": 0, "reason": "non-positive balance refused"}
+
+    old = Decimal(str(account.balance or 0))
     delta = new - old
     account.balance = new
     if msg_currency and not account.currency:
         account.currency = msg_currency
+    # برچسبِ منشأ باید با واقعیت بخواند، وگرنه عددِ ماشینی «دستیِ مالک» دیده می‌شود.
+    extra["balance_evidence"] = f"پیام {channel}" + (f" از {sender}" if sender else "")
+    if occurred_iso:
+        extra["last_message_at"] = str(occurred_iso)
+    account.extra = _json.dumps(extra, ensure_ascii=False)
 
     # Record the movement so the change is auditable, not silent — deduped on
     # the message hash, marked synthetic so reports don't double-count it.

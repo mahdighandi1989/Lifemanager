@@ -1051,3 +1051,54 @@ async def test_when_the_device_itself_is_silent_channels_are_unknown_not_broken(
     assert body["device_live"] is False
     assert ch["mobile_notification"]["status"] == "unknown"
     assert ch["mobile_heartbeat"]["status"] == "silent"   # خودِ نبض واقعاً قطع است
+
+
+# ── اصلاحاتِ ممیزیِ ۲۰۲۶-۰۷-۳۱ ──────────────────────────────────────────────
+
+def test_a_resent_usage_report_updates_the_day_instead_of_duplicating(api_client):
+    """گزارشِ کارکرد تجمعی است و هر ۱۲ ساعت دوباره می‌آید — دو ردیف یعنی
+    زمانِ صفحه و قفل‌گشایی دوبار شمرده می‌شود."""
+    token = _pair(api_client)
+    body = {"day": "2026-07-31", "unlocks": 40, "device": "s24",
+            "apps": [{"name": "tg", "minutes": 30}]}
+    api_client.post("/api/mobile/usage", json=body, headers={"X-Device-Token": token})
+    body2 = dict(body, unlocks=95, apps=[{"name": "tg", "minutes": 88}])
+    r = api_client.post("/api/mobile/usage", json=body2, headers={"X-Device-Token": token})
+    assert r.json().get("updated") is True
+
+    log = api_client.get("/api/activity-log", params={"action": "mobile_usage"}).json()
+    items = log.get("items") or []
+    assert len(items) == 1                       # یک ردیف برای آن روز
+    assert "95" in (items[0].get("detail") or "")   # و تازه‌ترین عدد
+
+
+@pytest.mark.asyncio
+async def test_a_dead_phone_stays_silent_even_behind_a_chatty_one(client_and_db):
+    """نگهبان قبلاً فقط ۵۰۰ ردیفِ آخر را می‌دید، پس گوشیِ مرده پشتِ یک گوشیِ
+    پرحرف گم می‌شد و «✅ اتصال برگشت» دروغ می‌گرفت."""
+    import datetime as dt
+
+    from app.services.mobile_watchdog_service import silent_devices
+
+    client, session = client_and_db
+    token = client.get("/api/mobile/token").json()["token"]
+    client.post("/api/mobile/heartbeat", json={"device": "old"},
+                headers={"X-Device-Token": token})
+    await _age_actions(session, ["mobile_heartbeat"], days=3)
+    for _ in range(3):
+        client.post("/api/mobile/heartbeat", json={"device": "new"},
+                    headers={"X-Device-Token": token})
+
+    silent = await silent_devices(session, dt.datetime.now(dt.timezone.utc))
+    assert [d["device"] for d in silent] == ["old"]
+
+
+def test_person_matching_needs_a_word_boundary_and_the_right_owner():
+    """«علی» نباید داخلِ واژهٔ دیگری گیر کند."""
+    import re
+
+    from app.services.mobile_dispatch_service import _match_person  # noqa: F401
+
+    # مرزِ واژه‌ای که در تطبیق استفاده می‌شود
+    assert re.search(r"(?<!\w)علی(?!\w)", "سلام علی جان") is not None
+    assert re.search(r"(?<!\w)علی(?!\w)", "تعالی") is None

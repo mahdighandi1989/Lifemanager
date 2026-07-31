@@ -326,7 +326,14 @@ async def notify_locked_digest(db: AsyncSession, *, user_id: int = 0) -> Dict[st
 
         known_ids = set(state.get("ids") or [])
         fresh_ids = [p.id for p in actionable if p.id not in known_ids]
-        changed = state.get("sig") != signature
+        # فقط **رسیدنِ تازه** خبر است. اگر مالک یک فایل را باز کند مجموعه عوض
+        # می‌شود ولی کوچک‌تر شده — نسخهٔ اول این را «تغییر» می‌دید، شمارنده را
+        # صفر می‌کرد و سه یادآوریِ دیگر دربارهٔ انباری که فقط کمتر شده بود
+        # می‌فرستاد؛ یعنی هر بار که مالک کاری می‌کرد، بیشتر غر می‌زد
+        # (ممیزی ۲۰۲۶-۰۷-۳۱).
+        changed = bool(fresh_ids)
+        if state.get("sig") is None:
+            changed = True
         pushes = 0 if changed else int(state.get("pushes") or 0)
 
         # قاعدهٔ ۳ — سقفِ تکرار روی یک مجموعهٔ ثابت.

@@ -69,7 +69,7 @@ def _digits_tail(value: str, n: int = 7) -> str:
     return d[-n:] if len(d) >= n else d
 
 
-async def _match_person(db: AsyncSession, sender: str, text: str = ""):
+async def _match_person(db: AsyncSession, sender: str, text: str = "", user_id: int = 0):
     """The Person this signal is about — by phone tail (calls/SMS) OR by name.
 
     Name matching matters more than it looks: a messenger notification's title
@@ -79,8 +79,13 @@ async def _match_person(db: AsyncSession, sender: str, text: str = ""):
     wins so «علی» doesn't steal a signal that names «علی‌رضا»."""
     try:
         from app.models.person import Person
+        from app.services.inbox_service import scope_filter
 
-        people = (await db.execute(select(Person))).scalars().all()
+        # بدونِ این فیلتر، سیگنالِ یک کاربر روی پروفایلِ فردِ کاربرِ دیگر
+        # می‌نشست (ممیزی ۲۰۲۶-۰۷-۳۱).
+        people = (
+            await db.execute(select(Person).where(scope_filter(Person.user_id, user_id)))
+        ).scalars().all()
     except Exception:
         return None
 
@@ -94,7 +99,8 @@ async def _match_person(db: AsyncSession, sender: str, text: str = ""):
     best = None
     for p in people:
         name = (p.name or "").strip()
-        if len(name) < 3 or name not in haystack:
+        # مرزِ واژه لازم است: «علی» نباید داخلِ «تعالی» یا نامِ یک برند گیر کند.
+        if len(name) < 3 or not re.search(rf"(?<!\w){re.escape(name)}(?!\w)", haystack):
             continue
         if best is None or len(name) > len((best.name or "")):
             best = p
@@ -345,7 +351,12 @@ async def _capture_to_inbox(
 async def _route_finance(db, user_id, sender, text, occurred_at, device, ref) -> Dict[str, Any]:
     from app.services.finance_ingest_service import apply_bank_message
 
-    res = await apply_bank_message(db, user_id=user_id, channel="sms", body=text, sender=sender)
+    # occurred_at را جلو می‌بریم تا قاعدهٔ «فقط سیگنالِ جدیدتر از عددِ دستیِ
+    # مالک می‌تواند حرکتش دهد» بتواند تاریخ‌ها را مقایسه کند.
+    res = await apply_bank_message(
+        db, user_id=user_id, channel="sms", body=text, sender=sender,
+        occurred_iso=occurred_at,
+    )
     return {"routed_to": "finance", "finance": res}
 
 
@@ -355,7 +366,7 @@ async def _route_person_message(
     """A signal from/about a KNOWN contact → an interaction on their profile,
     so the relationship reflects real contact (message for chat, meeting for a
     calendar event)."""
-    person = await _match_person(db, sender, text)
+    person = await _match_person(db, sender, text, user_id=user_id)
     routed = None
     if person is not None:
         try:

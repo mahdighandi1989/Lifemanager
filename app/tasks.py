@@ -230,6 +230,60 @@ def run_self_improvement_profile_analytics() -> dict[str, Any]:
         return {"error": str(exc)}
 
 
+_REC_STATE_KEY = "context_rec_notify_state"
+_REC_COOLDOWN_H = 12
+
+
+async def _recommendation_is_new(db, user_id: int, text: str) -> bool:
+    """آیا این پیشنهاد واقعاً تازه است؟ (امضا + کول‌داون، در global_settings)
+
+    این جاب هر ۳۰ دقیقه اجرا می‌شود و تولیدکننده‌هایش قطعی‌اند، پس یک زمینهٔ
+    ثابت همان متن را تا ابد می‌سازد. بدون این گارد، مالک روزی ~۴۸ اعلانِ
+    یکسان می‌گرفت (ممیزی ۲۰۲۶-۰۷-۳۱). کول‌داون در global_settings است نه در
+    حافظه، چون Render رایگان مدام ری‌استارت می‌شود."""
+    import hashlib
+    import json as _json
+    from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+
+    from sqlalchemy import select as _sel
+
+    from app.models.global_setting import GlobalSetting
+
+    sig = hashlib.sha1(f"{user_id}|{text}".encode("utf-8")).hexdigest()[:16]
+    row = (
+        await db.execute(_sel(GlobalSetting).where(GlobalSetting.key == _REC_STATE_KEY))
+    ).scalar_one_or_none()
+    try:
+        state = _json.loads(row.value) if row and row.value else {}
+        if not isinstance(state, dict):
+            state = {}
+    except Exception:
+        state = {}
+    now = _dt.now(_tz.utc)
+    entry = state.get(str(user_id)) or {}
+    if entry.get("sig") == sig:
+        last = entry.get("at")
+        if last:
+            try:
+                when = _dt.fromisoformat(str(last))
+                if when.tzinfo is None:
+                    when = when.replace(tzinfo=_tz.utc)
+                if now - when < _td(hours=_REC_COOLDOWN_H):
+                    return False
+            except Exception:
+                pass
+    state[str(user_id)] = {"sig": sig, "at": now.isoformat()}
+    if len(state) > 200:
+        state = dict(sorted(state.items(), key=lambda kv: str(kv[1].get("at") or ""))[-200:])
+    payload = _json.dumps(state, ensure_ascii=False)
+    if row is None:
+        db.add(GlobalSetting(key=_REC_STATE_KEY, value=payload))
+    else:
+        row.value = payload
+    await db.commit()
+    return True
+
+
 async def _analyze_all_user_contexts() -> tuple[int, int]:
     """For every user with a stored UserContext, fuse their latest snapshot
     through the recommendation engine (location/physiological/behavioral) and
@@ -269,15 +323,24 @@ async def _analyze_all_user_contexts() -> tuple[int, int]:
                 recs_generated += len(recs)
                 # Surface the freshest recommendation as a (silent) in-app
                 # notification so it reaches the bell, not just the recs list.
+                #
+                # ...but only when it is actually NEW (2026-07-31 audit). This
+                # job runs every 30 minutes and its producers are deterministic:
+                # a stale UserContext (or a heart_rate that is set once and never
+                # cleared) yields the SAME recommendation text forever, so the
+                # owner was getting ~48 identical bell rows a day, growing without
+                # bound. Signature + cooldown, the same discipline the finance
+                # analysis job uses.
                 try:
-                    await notify_event(
-                        "recommendation",
-                        user_id=ctx.user_id,
-                        db=db,
-                        message=recs[0]["text"],
-                        priority="normal",
-                        silent=True,
-                    )
+                    if await _recommendation_is_new(db, ctx.user_id, recs[0]["text"]):
+                        await notify_event(
+                            "recommendation",
+                            user_id=ctx.user_id,
+                            db=db,
+                            message=recs[0]["text"],
+                            priority="normal",
+                            silent=True,
+                        )
                 except Exception as exc:
                     logger.debug("recommendation notify failed for user %s: %r", ctx.user_id, exc)
     return users_analyzed, recs_generated

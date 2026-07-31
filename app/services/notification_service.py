@@ -712,6 +712,22 @@ register_event(
     priority="high",
     channels=["in_app", "telegram"],
 )
+# قطعیِ اتصالِ موبایل — تا امروز ثبت نشده بود، پس notify_event کانالی پیدا
+# نمی‌کرد و هشدارِ «گوشی قطع شد» هرگز به تلگرام نمی‌رسید؛ فقط یک ردیفِ زنگوله
+# می‌شد که مالک باید برنامه را باز می‌کرد تا ببیندش — دقیقاً همان چیزی که این
+# نگهبان برای جلوگیری از آن ساخته شده بود (ممیزی ۲۰۲۶-۰۷-۳۱).
+register_event(
+    "mobile_offline",
+    title="📵 اتصال موبایل قطع است",
+    priority="high",
+    silent=False,
+    channels=["in_app", "telegram"],
+)
+register_event(
+    "mobile_online",
+    title="✅ اتصال موبایل برگشت",
+    channels=["in_app", "telegram"],
+)
 register_event("morning_brief", title="☀️ برنامهٔ امروز", channels=["in_app"])
 register_event("weekly_review", title="📒 مرور هفتگی", channels=["in_app"])
 # گزارش روز شخصی (google_sync) — تقویم + ایمیل‌های منتظر اقدام + وضعیت

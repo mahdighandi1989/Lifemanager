@@ -408,11 +408,37 @@ async def ingest_usage(
         "unlocks": payload.unlocks,
         "sessions": (payload.sessions or [])[:50],
     }
+    # یک ردیف به‌ازای هر (روز، دستگاه) — نه هر POST. گزارشِ کارکرد **تجمعی**
+    # است و اپ همراه هر ۱۲ ساعت همان روز را دوباره می‌فرستد، پس نسخهٔ اول
+    # ردیفِ تازه می‌ساخت و خلاصه‌ها زمانِ صفحه و قفل‌گشایی را دوبار می‌شمردند
+    # (ممیزی ۲۰۲۶-۰۷-۳۱). گزارشِ تازه‌تر جای قبلی را می‌گیرد.
+    from app.models.activity_log import ActivityLog
+
+    device_key = (payload.device or "phone")[:64]
+    existing = (
+        await db.execute(
+            select(ActivityLog)
+            .where(
+                ActivityLog.action == "mobile_usage",
+                ActivityLog.entity_id == payload.day,
+                ActivityLog.context_id == device_key,
+            )
+            .order_by(ActivityLog.id.desc())
+            .limit(1)
+        )
+    ).scalars().first()
+    detail = _json.dumps(summary, ensure_ascii=False)[:4000]
+    if existing is not None:
+        existing.detail = detail
+        existing.entity_label = f"کارکرد موبایل {payload.day}"
+        await db.commit()
+        return {"ok": True, "success": True, "recorded": len(top),
+                "unlocks": payload.unlocks, "updated": True}
     await record_activity(
         action="mobile_usage", entity_type="usage", entity_id=payload.day,
         entity_label=f"کارکرد موبایل {payload.day}",
-        detail=_json.dumps(summary, ensure_ascii=False)[:4000],
-        context_type="device", context_id=(payload.device or "phone")[:64],
+        detail=detail,
+        context_type="device", context_id=device_key,
         user_id=user_id, db=db,
     )
     return {"ok": True, "success": True, "recorded": len(top), "unlocks": payload.unlocks}
