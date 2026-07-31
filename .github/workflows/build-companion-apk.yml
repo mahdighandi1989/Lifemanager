@@ -36,6 +36,9 @@ jobs:
           java-version: "17"
 
       - name: Build debug APK
+        env:
+          APK_VERSION_CODE: ${{ github.run_number }}
+          APK_VERSION_NAME: "1.${{ github.run_number }}"
         run: gradle assembleDebug -p mobile/companion-android --no-daemon
 
       - name: Commit the APK back so the app serves it at /companion.apk

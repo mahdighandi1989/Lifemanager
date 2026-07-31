@@ -2840,3 +2840,9 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **VERIFY** ۳ تست جدید (دسته‌بندی/ضد دوبله/چرخهٔ کامل نگهبان: سکوت→هشدار→cooldown→
   برگشت→اوکی)؛ تست APK با وجود فایل CI شرطی شد؛ کل بک‌اند ۱۴۳۱ پاس / همان ۱۳ baseline؛
   build سبز. push این تغییرات، CI را هم وادار به ساخت APK تازه (با BootReceiver) می‌کند.
+- **FIX (نصبِ به‌روزرسانی اپ همراه، 2026-07-31)** مالک: «App not installed با اینکه نصب
+  است». ریشه: هر run در GitHub Actions با debug-key یک‌بارمصرفِ خودش امضا می‌کرد →
+  امضای build جدید با نصب قبلی فرق داشت و اندروید به‌درستی رد می‌کرد. درمان: keystore
+  ثابتِ اختصاصی (`signing/companion.keystore`، فقط اعتبار sideload شخصی) برای debug و
+  release + versionCode/Name پویا از `github.run_number` تا هر build یک upgrade واقعی
+  باشد. هزینهٔ گذار: یک بار uninstall/install برای نصب‌های قبلی (در README ثبت شد).
