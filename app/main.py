@@ -28,6 +28,7 @@ from app.routes import (
     directives,
     global_search,
     clarifications,
+    owner_identity,
     system_map,
     trash,
     weekly_review,
@@ -380,6 +381,33 @@ async def startup_event():
                 )
         except Exception as exc:
             logger.debug("skip notifications.%s migration: %s", col_name, exc)
+
+    # user_locations — device / speed (2026-07-31): which phone reported the
+    # point. New columns on an existing table ⇒ idempotent ALTER required.
+    for col_name, col_type in (("device", "VARCHAR(64)"), ("speed_kmh", "DOUBLE PRECISION")):
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE user_locations ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip user_locations.%s migration: %s", col_name, exc)
+
+    # identity_documents — date_of_birth / sex / nationality (2026-07-31).
+    # The route accepted these and threw them away; now they are stored, so a
+    # new column on an existing table needs the idempotent ALTER too.
+    for col_name, col_type in (
+        ("date_of_birth", "VARCHAR(32)"),
+        ("sex", "VARCHAR(16)"),
+        ("nationality", "VARCHAR(64)"),
+    ):
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE identity_documents ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip identity_documents.%s migration: %s", col_name, exc)
 
     # clarifications.discussion — the two-way Q&A thread (2026-07-31). New
     # column on an existing table ⇒ create_all() will NOT add it, so the
@@ -961,6 +989,7 @@ app.include_router(assistant_chat.router, tags=["ai"])
 app.include_router(global_search.router, tags=["search"])
 app.include_router(system_map.router, tags=["system-map"])
 app.include_router(clarifications.router, tags=["clarifications"])
+app.include_router(owner_identity.router, tags=["identity-profile"])
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.
 app.include_router(mobile.router, tags=["mobile"])

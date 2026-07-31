@@ -31,6 +31,12 @@ class IdentityDocument(Base):
     issue_place = Column(String(64), nullable=True)          # DUBAI
     # Cut off at the bottom of the source image → may be unknown.
     accompanied_by = Column(String(255), nullable=True)
+    # (۲۰۲۶-۰۷-۳۱) این سه فیلد را اسکیما از اول می‌گرفت و مسیر ثبت **دور
+    # می‌ریخت** — یعنی تاریخ تولدِ واردشدهٔ مالک هرگز ذخیره نمی‌شد و هیچ‌جای
+    # برنامه سن را نمی‌دانست. verbatim ذخیره می‌شوند (همان قاعدهٔ issue_date).
+    date_of_birth = Column(String(32), nullable=True)        # "08 Mar 1989" (as shown)
+    sex = Column(String(16), nullable=True)                  # M / F
+    nationality = Column(String(64), nullable=True)          # IRAN
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

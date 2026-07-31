@@ -444,6 +444,81 @@ async def ingest_usage(
     return {"ok": True, "success": True, "recorded": len(top), "unlocks": payload.unlocks}
 
 
+class LocationPoint(BaseModel):
+    lat: float
+    lon: float
+    at: Optional[str] = None            # ISO — زمانِ خودِ نقطه، نه رسیدن
+    accuracy_m: Optional[float] = None
+    speed_kmh: Optional[float] = None
+
+
+class LocationPayload(BaseModel):
+    """بستهٔ نقاط. اپ همراه چند نقطه را با هم می‌فرستد تا در قطعیِ اینترنت
+    صف شود و یک‌جا سینک شود — مثل بقیهٔ مجراها."""
+    points: List[LocationPoint] = []
+    device: Optional[str] = None
+    # وضعیتِ خودِ سرویسِ موقعیت روی گوشی (روشن/خاموش) — پایهٔ هشدارِ خاموشی.
+    location_enabled: Optional[bool] = None
+
+
+@router.post("/api/mobile/location", tags=["mobile"])
+@handle_errors
+async def ingest_location(
+    payload: LocationPayload,
+    x_device_token: Optional[str] = Header(default=None),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """نقاطِ موقعیت → user_locations (+ یک ردیفِ لاگ برای زنده‌بودنِ مجرا).
+
+    ضدتکرار روی (دستگاه، زمان) است، چون صفِ آفلاین ممکن است یک بسته را دوباره
+    بفرستد و مسیرِ تکراری کلِ خوشه‌بندی را خراب می‌کند."""
+    await _require_device(db, x_device_token)
+    from app.models.user_location import UserLocation
+
+    device = (payload.device or "phone")[:64]
+    stored = 0
+    newest = None
+    for pt in (payload.points or [])[:500]:
+        when = None
+        if pt.at:
+            try:
+                when = _dtm.datetime.fromisoformat(str(pt.at).replace("Z", "+00:00"))
+            except Exception:
+                when = None
+        when = when or _dtm.datetime.now(_dtm.timezone.utc)
+        dup = (
+            await db.execute(
+                select(UserLocation.id).where(
+                    UserLocation.device == device, UserLocation.timestamp == when
+                ).limit(1)
+            )
+        ).first()
+        if dup:
+            continue
+        db.add(UserLocation(
+            user_id=user_id, latitude=float(pt.lat), longitude=float(pt.lon),
+            accuracy_m=pt.accuracy_m, speed_kmh=pt.speed_kmh,
+            device=device, timestamp=when,
+        ))
+        stored += 1
+        newest = when if newest is None or when > newest else newest
+
+    if stored:
+        await record_activity(
+            action="mobile_location", entity_type="location", entity_id=None,
+            entity_label=device,
+            detail=f"{stored} نقطهٔ موقعیت",
+            context_type="device", context_id=device,
+            occurred_at=newest.isoformat() if newest else None,
+            user_id=user_id, db=db,
+        )
+    else:
+        await db.commit()
+    return {"ok": True, "success": True, "stored": stored,
+            "received": len(payload.points or [])}
+
+
 class HeartbeatPayload(BaseModel):
     device: str
     battery: Optional[int] = None
@@ -605,6 +680,11 @@ async def mobile_diagnostics(
         "mobile_usage": {
             "fa": "کارکرد اپ‌ها", "perm": "usage", "window_h": 36,
             "hint": "دسترسی «Usage access» را از تنظیمات بده؛ گزارش هر ۱۲ ساعت می‌آید.",
+        },
+        "mobile_location": {
+            "fa": "موقعیت مکانی", "perm": "location", "window_h": 6,
+            "hint": ("دسترسی «موقعیت مکانی» را روی «همیشه» بگذار و بهینه‌سازی "
+                     "باتری را برای اپ همراه خاموش کن — وگرنه اندروید سرویس را می‌کشد."),
         },
         "mobile_screen": {
             "fa": "متن صفحه", "perm": "accessibility", "window_h": 24 * 3,

@@ -58,7 +58,12 @@ async def create_emirates_id(
         user_id=user_id,
         emirates_id_number=payload.id_number,
         full_name=payload.full_name,
-        issue_place=payload.nationality,  # card nationality stored as context
+        # ملیت ستونِ خودش را دارد؛ issue_place دیگر دوپهلو نیست (قبلاً هم
+        # «امارتِ صدور» و هم «ملیت» در همین ستون می‌نشست و مصرف‌کننده
+        # نمی‌توانست تشخیص بدهد کدام است).
+        nationality=payload.nationality,
+        date_of_birth=payload.date_of_birth.isoformat() if payload.date_of_birth else None,
+        sex=payload.sex,
         expiry_date=payload.expiry_date.isoformat() if payload.expiry_date else None,
     )
     db.add(doc)

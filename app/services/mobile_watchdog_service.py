@@ -26,7 +26,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 logger = logging.getLogger(__name__)
 
 _STATE_KEY = "mobile_watchdog_state"
-_MOBILE_ACTIONS = ("mobile_heartbeat", "mobile_sms", "mobile_notification", "mobile_usage", "mobile_call", "mobile_screen")
+_MOBILE_ACTIONS = ("mobile_heartbeat", "mobile_sms", "mobile_notification",
+                   "mobile_usage", "mobile_call", "mobile_screen", "mobile_location")
 
 
 def _threshold_minutes() -> float:

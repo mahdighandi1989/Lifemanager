@@ -1059,7 +1059,28 @@ async def _apply_to_finance_account(db: AsyncSession, c, target: Dict[str, Any])
     }]
 
 
+async def _apply_to_owner_identity(db: AsyncSession, c, target: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """جوابِ «تاریخ تولدت؟» / «کجا زندگی می‌کنی؟» → همان فیلدِ پروفایل."""
+    from app.services import owner_identity_service as ident
+
+    field = str(target.get("field") or "")
+    q = next((q for q in _answered(c) if q.get("key") == field), None) or next(iter(_answered(c)), None)
+    value = (q or {}).get("answer")
+    return await ident.apply_clarification_answer(db, target, value or "")
+
+
+async def _apply_to_place(db: AsyncSession, c, target: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """جوابِ «اینجا کجاست؟» / «آنجا چه کردی؟» → مکان یا سفر."""
+    from app.services import place_service
+
+    answers = {q.get("key"): q.get("answer") for q in _answered(c) if q.get("answer")}
+    return await place_service.apply_place_answer(db, target, answers)
+
+
 _APPLIERS: Dict[str, Callable] = {
+    "owner_identity": _apply_to_owner_identity,
+    "place": _apply_to_place,
+    "trip": _apply_to_place,
     "inbox_item": _apply_to_inbox_item,
     "person": _apply_to_person,
     "finance_account": _apply_to_finance_account,

@@ -246,6 +246,21 @@
         "classes": [
           "Clarification"
         ]
+      },
+      {
+        "file": "app/models/owner_identity.py",
+        "classes": [
+          "OwnerIdentityField"
+        ]
+      },
+      {
+        "file": "app/models/place.py",
+        "classes": [
+          "Place",
+          "Visit",
+          "Trip",
+          "RoutePattern"
+        ]
       }
     ],
     "routes": [
@@ -1310,6 +1325,10 @@
           {
             "method": "GET",
             "path": "/api/mobile/diagnostics"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/location"
           }
         ]
       },
@@ -1347,6 +1366,27 @@
           {
             "method": "POST",
             "path": "/api/clarifications/{clarification_id}/discuss"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/owner_identity.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/identity-profile"
+          },
+          {
+            "method": "POST",
+            "path": "/api/identity-profile/refresh"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/identity-profile/{field}"
+          },
+          {
+            "method": "POST",
+            "path": "/api/identity-profile/ask-missing"
           }
         ]
       }
@@ -1750,6 +1790,36 @@
           "discuss",
           "answer_field"
         ]
+      },
+      {
+        "file": "app/services/owner_identity_service.py",
+        "classes": [],
+        "functions": [
+          "refresh",
+          "get_identity",
+          "set_field",
+          "refresh_derived",
+          "ask_missing",
+          "apply_clarification_answer",
+          "summary_lines",
+          "parse_loose_date"
+        ]
+      },
+      {
+        "file": "app/services/place_service.py",
+        "classes": [],
+        "functions": [
+          "haversine_m",
+          "segment_points",
+          "infer_kind",
+          "ingest_points",
+          "pattern_key",
+          "learn_patterns",
+          "ask_about_places",
+          "apply_place_answer",
+          "get_named_place",
+          "summary_lines"
+        ]
       }
     ]
   },
@@ -1930,6 +2000,10 @@
       {
         "name": "Writings",
         "file": "frontend/src/pages/Writings.jsx"
+      },
+      {
+        "name": "IdentityProfile",
+        "file": "frontend/src/pages/IdentityProfile.jsx"
       }
     ],
     "components": [

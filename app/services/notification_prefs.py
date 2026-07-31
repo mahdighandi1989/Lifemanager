@@ -62,6 +62,8 @@ EVENT_CATALOG: List[Dict[str, Any]] = [
      "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": False},
     {"key": "weekly_review", "label": "مرور هفتگی", "help": "گزارش و پیشنهادهای هفتگی هوش مصنوعی",
      "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": False},
+    {"key": "location_off", "label": "خاموش‌بودنِ موقعیت مکانی", "help": "وقتی ردیابیِ موقعیت روی گوشی خاموش یا باطل شده — روی خودِ گوشی هم هشدار داده می‌شود",
+     "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": True},
     {"key": "mobile_offline", "label": "قطعیِ اتصال موبایل", "help": "وقتی اپ همراه دیگر سیگنالی نمی‌فرستد؛ تا وصل شدن تکرار می‌شود",
      "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": True},
     {"key": "mobile_online", "label": "بازگشتِ اتصال موبایل", "help": "یک‌بار، وقتی گوشی دوباره سیگنال می‌فرستد",

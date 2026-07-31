@@ -52,6 +52,14 @@ async def compose_digest(
     except Exception:
         pass
 
+    # مکان‌ها و رفت‌وآمد — تا این داده هم مثل بقیه واقعاً به‌کار برود.
+    try:
+        from app.services.place_service import summary_lines as _places
+
+        lines.extend(await _places(db, 0, days=7))
+    except Exception:
+        pass
+
     # خلاصهٔ زندگیِ موبایل (کارکرد/تماس/پیامک) — دادهٔ گوشی دیگر هرز نمی‌رود.
     try:
         from app.services.mobile_insights_service import build_mobile_summary, summary_to_fa_lines

@@ -134,6 +134,7 @@ class MainActivity : AppCompatActivity() {
         val notif = Perms.notifications(this)
         val usage = Perms.usage(this)
         val a11y = Perms.accessibility(this)
+        val loc = Perms.location(this)
         fun mark(on: Boolean) = if (on) "✅" else "❌"
         permStatusView?.text = buildString {
             append("وضعیت دسترسی‌ها:\n")
@@ -142,7 +143,9 @@ class MainActivity : AppCompatActivity() {
             append("${mark(notif)} اعلان‌ها (Notification access)\n")
             append("${mark(usage)} آمار مصرف (Usage access)\n")
             append("${mark(a11y)} خواندن صفحه (Accessibility — اختیاری)\n")
+            append("${mark(loc)} موقعیت مکانی\n")
             if (!notif) append("\n⚠️ اعلان‌ها خاموش است — دکمهٔ بالا را بزن و اپ را در فهرست فعال کن.")
+            if (!loc) append("\n🛑 موقعیت مکانی ثبت نمی‌شود — اجازه را روی «همیشه» بگذار و GPS را روشن کن.")
         }
     }
 
@@ -155,6 +158,11 @@ class MainActivity : AppCompatActivity() {
             need.add(Manifest.permission.RECEIVE_SMS)
         if (checkSelfPermission(Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED)
             need.add(Manifest.permission.READ_CALL_LOG)
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            need.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED)
+            need.add("android.permission.POST_NOTIFICATIONS")
         if (need.isNotEmpty()) ActivityCompat.requestPermissions(this, need.toTypedArray(), 1)
     }
 
@@ -182,6 +190,12 @@ class MainActivity : AppCompatActivity() {
         wm.enqueueUniquePeriodicWork(
             "calllog", ExistingPeriodicWorkPolicy.UPDATE,
             PeriodicWorkRequestBuilder<CallLogWorker>(1, TimeUnit.HOURS).build(),
+        )
+        // ۱۵ دقیقه کمترین دورهٔ مجازِ WorkManager است. نقطه‌ها در بافرِ محلی
+        // جمع می‌شوند، پس قطعیِ اینترنت چیزی را از بین نمی‌برد.
+        wm.enqueueUniquePeriodicWork(
+            "location", ExistingPeriodicWorkPolicy.UPDATE,
+            PeriodicWorkRequestBuilder<LocationWorker>(15, TimeUnit.MINUTES).build(),
         )
     }
 }

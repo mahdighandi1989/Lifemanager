@@ -41,6 +41,11 @@ object Perms {
         ).isNullOrEmpty())
     } catch (_: Exception) { false }
 
+    /** «موقعیت مکانی» = هم اجازه، هم روشن‌بودنِ خودِ سرویس. هر دو لازم است؛
+     * اجازهٔ بدونِ GPSِ روشن هیچ نقطه‌ای نمی‌دهد. */
+    fun location(ctx: Context): Boolean =
+        LocationWorker.hasPermission(ctx) && LocationWorker.providerEnabled(ctx)
+
     fun accessibility(ctx: Context): Boolean = try {
         Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
             ?.contains(ctx.packageName) == true
@@ -53,4 +58,5 @@ object Perms {
         .put("notification", notifications(ctx))
         .put("usage", usage(ctx))
         .put("accessibility", accessibility(ctx))
+        .put("location", location(ctx))
 }

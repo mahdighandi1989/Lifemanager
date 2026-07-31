@@ -67,6 +67,25 @@ async def _live_context(db: AsyncSession, user_id: int) -> Dict[str, Any]:
     try:
         # زندگیِ موبایل — تا دستیار به «چقدر با گوشی‌ام کار کردم؟» و «با کی
         # بیشتر تماس داشتم؟» با دادهٔ واقعی جواب بدهد (نه دیگر هرزرفتن).
+        # «من که هستم» + «کجا بوده‌ام» هم بخشی از زمینهٔ دستیارند — وگرنه
+        # دستیار دربارهٔ صاحبش هیچ نمی‌داند و مکان‌ها جزیره می‌مانند.
+        try:
+            from app.services.owner_identity_service import summary_lines as _ident
+
+            identity = await _ident(db, 0)
+            if identity:
+                ctx["identity"] = identity
+        except Exception:
+            pass
+        try:
+            from app.services.place_service import summary_lines as _places
+
+            places = await _places(db, 0, days=7)
+            if places:
+                ctx["places"] = places
+        except Exception:
+            pass
+
         from app.services.mobile_insights_service import build_mobile_summary
 
         summary = await build_mobile_summary(db, days=7)

@@ -18,6 +18,7 @@ import DataHub from './pages/DataHub';
 import LifeFilePage from './pages/LifeFilePage';
 import DirectivesPage from './pages/DirectivesPage';
 import SelfPortrait from './pages/SelfPortrait';
+import IdentityProfile from './pages/IdentityProfile';
 import SahatMap from './pages/SahatMap';
 import SahatDetail from './pages/SahatDetail';
 import ListDetail from './pages/ListDetail';
@@ -49,6 +50,7 @@ const PAGE_COMPONENTS = {
   LifeFilePage,
   DirectivesPage,
   SelfPortrait,
+  IdentityProfile,
   SahatMap,
   SahatDetail,
   ListDetail,

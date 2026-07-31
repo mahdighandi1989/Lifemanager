@@ -728,6 +728,13 @@ register_event(
     title="✅ اتصال موبایل برگشت",
     channels=["in_app", "telegram"],
 )
+register_event(
+    "location_off",
+    title="🛑 موقعیت مکانی خاموش است",
+    priority="high",
+    silent=False,
+    channels=["in_app", "telegram"],
+)
 register_event("morning_brief", title="☀️ برنامهٔ امروز", channels=["in_app"])
 register_event("weekly_review", title="📒 مرور هفتگی", channels=["in_app"])
 # گزارش روز شخصی (google_sync) — تقویم + ایمیل‌های منتظر اقدام + وضعیت

@@ -264,6 +264,29 @@ async def _job_activity_archive(db: AsyncSession) -> dict[str, Any]:
     return await archive_tick(db)
 
 
+async def _job_places(db: AsyncSession) -> dict[str, Any]:
+    """نقاطِ خامِ موقعیت → مکان/بازدید/سفر، بعد الگوها، بعد (کم) پرسش.
+
+    ترتیب مهم است: اول باید سفرها ساخته شوند تا الگو شمرده شود، و الگو باید
+    شمرده شود تا معلوم شود کدام سفر «خلافِ الگو» است — تنها چیزی که پرسیدن
+    دارد (قیدِ صریحِ مالک: مسیرِ آموخته‌شده دیگر سؤال ندارد)."""
+    from app.services import place_service
+
+    ingested = await place_service.ingest_points(db)
+    learned = await place_service.learn_patterns(db)
+    asked = await place_service.ask_about_places(db)
+    return {**ingested, **learned, **asked}
+
+
+async def _job_owner_identity(db: AsyncSession) -> dict[str, Any]:
+    """پروفایلِ هویت را از همهٔ داده‌ها تازه کن و آنچه را نمی‌داند بپرس."""
+    from app.services import owner_identity_service as ident
+
+    refreshed = await ident.refresh(db)
+    asked = await ident.ask_missing(db, limit=1)
+    return {**refreshed, **asked}
+
+
 async def _job_clarifications(db: AsyncSession) -> dict[str, Any]:
     """فرم‌های پرسشِ سررسیده را می‌فرستد و رهاشده‌ها را park می‌کند — همان
     «اگر جواب ندادم یا پیام بالا رفت، بعداً دوباره بپرس»."""
@@ -352,6 +375,12 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_email_scan", "شناساییِ حساب‌ها از ایمیل (خودتغذیه)",
      lambda: _env_minutes("FINANCE_EMAIL_SCAN_INTERVAL_MINUTES", 6 * 60.0),
      _job_finance_email_scan),
+    ("places", "مکان‌ها و الگوهای رفت‌وآمد",
+     lambda: _env_minutes("PLACES_INTERVAL_MINUTES", 60.0),
+     _job_places),
+    ("owner_identity", "به‌روزرسانیِ پروفایلِ هویت",
+     lambda: _env_minutes("IDENTITY_INTERVAL_MINUTES", 12 * 60.0),
+     _job_owner_identity),
     ("clarifications", "پرسش‌های رفعِ ابهام (تلگرام)",
      lambda: _env_minutes("CLARIFICATION_INTERVAL_MINUTES", 20.0),
      _job_clarifications),
