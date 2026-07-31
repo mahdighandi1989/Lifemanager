@@ -2819,3 +2819,8 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
   می‌کند (بدون فایل → 404 فارسیِ روشن، تست‌شده) — نصب برای مالک یعنی بازکردن
   «سایت/companion.apk» روی گوشی. وابستگی org.json از build حذف شد (کلاس تکراری با
   خود اندروید). راهنمای README به روند بدون-ابزار به‌روز شد.
+- **VERIFY (CI اپ همراه، 2026-07-31)** اجرای اول workflow قرمز شد (فراموشیِ
+  `gradle.properties` با `android.useAndroidX=true`) — لاگ از GitHub گرفته، اصلاح و
+  merge شد؛ اجرای دوم سبز: `companion.apk` (۴MB) توسط CI به
+  `mobile/companion-android/release/` کامیت شد (0a88c5b) و release «companion-apk»
+  ساخته شد. بعد از deploy رندر، «سایت/companion.apk» فایل نصبی را می‌دهد.
