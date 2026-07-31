@@ -381,6 +381,17 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip notifications.%s migration: %s", col_name, exc)
 
+    # clarifications.discussion — the two-way Q&A thread (2026-07-31). New
+    # column on an existing table ⇒ create_all() will NOT add it, so the
+    # idempotent startup ALTER is required next to the alembic migration.
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("ALTER TABLE clarifications ADD COLUMN IF NOT EXISTS discussion JSON")
+            )
+    except Exception as exc:
+        logger.debug("skip clarifications.discussion migration: %s", exc)
+
     # users profile fields — bio / display_name — added so the
     # /api/users/profile sanitiser can actually persist the sanitised
     # values. Idempotent ADD COLUMN IF NOT EXISTS for legacy DBs.

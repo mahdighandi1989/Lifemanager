@@ -311,11 +311,12 @@ def test_form_is_editable_stable_numbering_and_prefilled_answers():
         ]
 
     text = clar.render_form(_Fake())
-    assert "1) جوابش را دادم: بله" in text    # جوابِ قبلی نشان داده و قابل تغییر
-    assert "2) کدام است؟" in text             # شمارهٔ فیلدِ باز ثابت مانده
+    assert "1) جوابش را دادم: <b>بله</b>" in text   # جوابِ قبلی، قابل تغییر
+    assert "2) کدام است؟" in text                   # شمارهٔ فیلدِ باز ثابت مانده
     assert "اول / دوم" in text
     assert "خالی" in text
-    assert "به‌روز" in text                   # صریح گفته که ویرایش ممکن است
+    assert "به‌روز" in text                          # صریح گفته که ویرایش ممکن است
+    assert "<b>" in text and "&" not in text.replace("&nbsp;", "")   # HTML امن
 
 
 def test_reminder_form_says_it_is_a_reminder():
@@ -596,3 +597,108 @@ def test_owns_rejects_another_users_form():
     assert clar.owns(_C(), 7) is True
     assert clar.owns(_C(), 9) is False
     assert clar.owns(_C(), None) is True     # مسیرهای داخلی (تلگرام تک‌مالکی)
+
+
+# ── بازسازیِ فرم پس از بازخوردِ مالک (۲۰۲۶-۰۷-۳۱) ────────────────────────────
+# مالک تصویرِ فرمِ واقعی را فرستاد: موضوعش «Project_manager: Project_manager
+# 📎 scan_bundle_<uuid>.pdf» بود، Markdown روی «_» شکسته بود، و پرسش‌ها از او
+# می‌خواستند خودش دسته‌بندی کند.
+
+def test_a_filename_topic_becomes_something_a_human_can_read():
+    raw = ("Project_manager: Project_manager 📎 "
+           "scan_bundle_c9e90b2b-4141-4012-b343-5a5f60b0268a_be398aa6.pdf")
+    topic = clar.humanize_topic(raw)
+    assert "c9e90b2b" not in topic and "5a5f60b0268a" not in topic   # شناسهٔ ماشینی
+    assert "scan" not in topic.lower() and "bundle" not in topic.lower()
+    assert topic.count("Project") == 1                              # تکرار حذف شد
+    assert topic.startswith("PDF")                                  # نوعِ فایل گفته شد
+    assert len(topic) < 60
+
+
+def test_humanize_keeps_a_real_persian_topic_intact():
+    assert clar.humanize_topic("پیامک بانک ملت — واریز ۲٬۵۰۰٬۰۰۰ ریال").startswith("پیامک بانک ملت")
+
+
+def test_the_form_is_html_and_escapes_hostile_content():
+    """نامِ فایل پر از «_» است و Markdown را می‌شکست؛ HTML با escape امن است."""
+    class _Fake:
+        id = 1
+        topic = "a_b_c <script>"
+        context = "متن & نشانه <b>"
+        questions = [{"key": "x", "label": "چه چیزی_مهم است؟", "type": "short", "answer": None}]
+
+    text = clar.render_form(_Fake())
+    assert "&lt;script&gt;" in text          # escape شده
+    assert "<script>" not in text
+    assert "&amp;" in text
+    assert "<b>موضوع:</b>" in text           # قالبِ خودمان سالم مانده
+
+
+def test_choice_questions_become_one_tap_buttons():
+    class _Fake:
+        id = 5
+        topic = "t"
+        context = ""
+        questions = [
+            {"key": "a", "label": "کدام کارت؟", "type": "choice",
+             "choices": ["ملت", "ملی"], "answer": None},
+            {"key": "b", "label": "توضیح بده", "type": "short", "answer": None},
+        ]
+
+    markup = clar._form_markup(_Fake())
+    flat = [b for row in markup["inline_keyboard"] for b in row]
+    picks = [b for b in flat if b["callback_data"].startswith("clar:pick:")]
+    assert [b["text"] for b in picks] == ["ملت", "ملی"]      # فیلدِ متنی دکمه ندارد
+    assert any(b["callback_data"] == "clar:ask:5" for b in flat)   # «سؤال دارم»
+    assert any(b["callback_data"] == "clar:skip:5" for b in flat)
+
+
+@pytest.mark.asyncio
+async def test_one_tap_answer_records_and_files(db):
+    c = await clar.ask(db, topic="t", source_ref="tap",
+                       questions=[{"key": "a", "label": "کدام؟", "type": "choice",
+                                   "choices": ["اول", "دوم"]}])
+    out = await clar.answer_field(db, c, 0, "دوم")
+    await db.commit()
+    assert out["filled"] == 1
+    assert c.questions[0]["answer"] == "دوم"
+    assert c.status == "filed"
+
+
+@pytest.mark.asyncio
+async def test_asking_back_is_remembered_and_never_loses_the_questions(db):
+    """خواستهٔ صریحِ مالک: چند دور پرسشِ متقابل، بدونِ گم‌شدنِ موضوع و سؤال‌ها."""
+    c = await clar.ask(db, topic="موضوعِ اصلی", context="متنِ اصلی", source_ref="qa",
+                       questions=_fields("پرسشِ یک", "پرسشِ دو"))
+    await db.commit()
+
+    a1 = await clar.discuss(db, c, "منظورت از پرسشِ یک چیست؟")
+    a2 = await clar.discuss(db, c, "هنوز نفهمیدم، مثال بزن")
+    await db.commit()
+
+    assert a1 and a2
+    roles = [t["role"] for t in c.discussion]
+    assert roles == ["owner", "assistant", "owner", "assistant"]   # نخ حفظ شده
+    assert c.discussion[0]["text"] == "منظورت از پرسشِ یک چیست؟"
+    # و مهم‌تر: موضوع و پرسش‌های اصلی دست‌نخورده‌اند
+    assert c.topic == "موضوعِ اصلی"
+    assert [q["label"] for q in c.questions] == ["پرسشِ یک", "پرسشِ دو"]
+    assert clar.to_dict(c)["open_count"] == 2
+    # گفتگو یعنی مالک درگیر است → یادآوری از نو، نه «هنوز جواب نگرفتم»
+    assert c.attempts == 0
+    assert "پرسشِ یک" in clar.render_form(c)      # فرم هنوز کامل است
+
+
+def test_discuss_endpoint_answers_and_keeps_the_form(api_client):
+    made = api_client.post("/api/clarifications/ask", json={
+        "topic": "این هزینه بابتِ چه بود؟", "source_ref": "api-qa",
+        "questions": [{"key": "p", "label": "بابتِ چه؟", "type": "short"}],
+    }).json()
+    cid = made["item"]["id"]
+    res = api_client.post(f"/api/clarifications/{cid}/discuss",
+                          json={"question": "منظورت کدام هزینه است؟"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["answer"]
+    assert len(body["discussion"]) == 2
+    assert body["item"]["open_count"] == 1        # پرسشِ اصلی هنوز باز است

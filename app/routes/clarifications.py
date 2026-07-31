@@ -115,6 +115,28 @@ async def edit_clarification(
     return {"ok": True, "success": True, **res, "item": clar.to_dict(c)}
 
 
+@router.post("/api/clarifications/{clarification_id}/discuss", tags=["clarifications"])
+@handle_errors
+async def discuss_clarification(
+    clarification_id: int,
+    payload: Dict[str, Any] = Body(default={}),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """پرسشِ متقابل: «خودم دربارهٔ این پرسش سؤال دارم».
+
+    جواب کوتاه برمی‌گردد و نخِ گفتگو ذخیره می‌شود، ولی پرسش‌های اصلی
+    دست‌نخورده می‌مانند — همان تضمینی که در تلگرام هم هست."""
+    c = await _own_or_404(db, clarification_id, user_id)
+    question = str(payload.get("question") or "").strip()
+    if not question:
+        raise ValueError("question is required")
+    answer = await clar.discuss(db, c, question)
+    await db.commit()
+    return {"ok": True, "success": True, "answer": answer,
+            "discussion": c.discussion or [], "item": clar.to_dict(c)}
+
+
 @router.post("/api/clarifications/{clarification_id}/skip", tags=["clarifications"])
 @handle_errors
 async def skip_clarification(

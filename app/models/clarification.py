@@ -55,6 +55,10 @@ class Clarification(Base):
     answers = Column(JSON, nullable=True)
     # نتیجهٔ ثبت: [{"where": "task", "id": 12, "label": "…"}]
     result = Column(JSON, nullable=True)
+    # گفتگوی دوطرفه دربارهٔ همین ابهام (۲۰۲۶-۰۷-۳۱، خواستهٔ مالک: «اگر خودم
+    # سؤالی داشتم بتوانم بپرسم و جواب بگیرم، حتی چند بار — ولی موضوع و
+    # سؤال‌های اصلی نباید گم شود»). هر عنصر: {"at","role":"owner|assistant","text"}
+    discussion = Column(JSON, nullable=True)
 
     # open | partial | answered | filed | skipped | parked
     status = Column(String(16), nullable=False, default="open", index=True)

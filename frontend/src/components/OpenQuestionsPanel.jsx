@@ -66,6 +66,11 @@ function QuestionCard({ item, onDone }) {
   const [showAnswered, setShowAnswered] = useState(false);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState('');
+  // پرسشِ متقابل: «خودم دربارهٔ این سؤال، سؤال دارم». نخ نگه داشته می‌شود و
+  // پرسش‌های اصلی سرِ جایشان می‌مانند — همان قراردادِ تلگرام.
+  const [thread, setThread] = useState(item.discussion || []);
+  const [question, setQuestion] = useState('');
+  const [asking, setAsking] = useState(false);
 
   const submit = async () => {
     setBusy(true);
@@ -158,6 +163,47 @@ function QuestionCard({ item, onDone }) {
         ))}
       </div>
 
+      {thread.length > 0 ? (
+        <div className="mt-2 space-y-1 rounded-lg bg-white/70 p-2 text-xs">
+          {thread.map((t, i) => (
+            <div key={i} className={t.role === 'owner' ? 'text-gray-700' : 'text-blue-700'}>
+              <span className="font-medium">{t.role === 'owner' ? 'تو: ' : 'من: '}</span>
+              {t.text}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {asking ? (
+        <div className="mt-2 flex gap-2">
+          <input
+            className="flex-1 rounded-lg border border-gray-300 px-2 py-1.5 text-xs"
+            value={question}
+            placeholder="چه چیزی از این پرسش مبهم است؟"
+            onChange={(e) => setQuestion(e.target.value)}
+          />
+          <button
+            type="button"
+            disabled={busy || !question.trim()}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                const res = await api.post(`/clarifications/${item.id}/discuss`, { question });
+                setThread(res.data?.discussion || []);
+                setQuestion('');
+              } catch {
+                setFeedback('نتوانستم جواب بدهم — دوباره تلاش کن.');
+              } finally {
+                setBusy(false);
+              }
+            }}
+            className="rounded-lg bg-gray-700 px-3 py-1 text-xs text-white disabled:opacity-50"
+          >
+            بپرس
+          </button>
+        </div>
+      ) : null}
+
       {feedback ? <div className="mt-2 text-xs text-emerald-700">{feedback}</div> : null}
 
       <div className="mt-2 flex gap-2">
@@ -168,6 +214,14 @@ function QuestionCard({ item, onDone }) {
           className="rounded-lg bg-blue-600 px-3 py-1 text-xs text-white disabled:opacity-50"
         >
           {busy ? 'در حال ثبت…' : 'ثبت جواب‌ها'}
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => setAsking((v) => !v)}
+          className="rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-700"
+        >
+          ❓ سؤال دارم
         </button>
         <button
           type="button"

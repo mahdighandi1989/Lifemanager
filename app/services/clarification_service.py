@@ -61,11 +61,22 @@ _QUESTION_PROMPT = """تو دستیارِ یک برنامهٔ مدیریت زن�
 "type": "short|long|choice|date|number|yesno", "choices": ["..."],
 "why": "چرا این را می‌پرسیم، یک جملهٔ کوتاه فارسی", "required": true}}]}}
 
-قواعد:
-- حداکثر {max_fields} فیلد. فقط چیزی را بپرس که واقعاً از متن معلوم نیست.
-- چیزی را که خودت از متن می‌فهمی **نپرس**.
-- «choice» فقط وقتی گزینه‌ها واقعاً محدود و مشخص‌اند؛ choices را پر کن.
-- label باید طوری باشد که با یک خطِ کوتاه هم قابل جواب باشد.
+قواعد (سخت‌گیرانه — پرسشِ بد بدتر از نپرسیدن است):
+- حداکثر {max_fields} فیلد، و در عمل ۱ تا ۳ تا کافی است.
+- **هرگز** از او نپرس این داده به کدام بخش برنامه برود (سند/کار/یادداشت/
+  تراکنش). دسته‌بندی کارِ توست، نه او. اگر مطمئن نیستی، خودت محتمل‌ترین را
+  انتخاب کن و فقط دربارهٔ «واقعیتی» که نمی‌دانی بپرس.
+- **هرگز** «عنوان کوتاه چیست؟» یا «توضیح بده» نپرس؛ اینها را از متن بساز.
+- فقط چیزی را بپرس که یک انسان با یک نگاه می‌داند و از متن **قابل استخراج
+  نیست** — مثلاً «این هزینه بابتِ کدام پروژه بود؟» یا «مهلتش کِی است؟».
+- هر پرسش باید مستقل و بدونِ خواندنِ متنِ اصلی هم قابل‌فهم باشد؛ به «این
+  مورد» یا «این ورودی» ارجاع نده، خودِ چیز را نام ببر.
+- «why» را حتماً پر کن: یک جمله که بگوید این جواب چه چیزی را در برنامه درست
+  می‌کند. مالک باید بفهمد چرا وقت می‌گذارد.
+- «choice» فقط وقتی گزینه‌ها واقعاً محدود و مشخص‌اند؛ choices را پر کن —
+  گزینه‌ای بودن یعنی او فقط یک دکمه می‌زند و این بهترین حالت است.
+- اگر متنِ ورودی آن‌قدر بی‌محتواست که پرسشِ معناداری نمی‌شود ساخت (مثلاً فقط
+  یک نامِ فایل)، fields را **خالی** برگردان — سؤالِ بی‌معنا نپرس.
 - اگر هیچ ابهامِ واقعی‌ای نیست، fields را خالی برگردان.
 
 موضوع: {topic}
@@ -240,7 +251,8 @@ async def ask(
         if fields is None:
             targets = await _targets_text(db, user_id)
             fields, model_name = await _generate_questions(
-                db, topic=topic, context=context, targets=targets, hint=hint
+                db, topic=humanize_topic(topic), context=context,
+                targets=targets, hint=hint,
             )
         if not fields and existing is None:
             return None  # مدل گفت ابهامِ واقعی‌ای نیست — سؤالِ الکی نمی‌سازیم
@@ -259,7 +271,8 @@ async def ask(
             return existing
 
         row = Clarification(
-            user_id=user_id, topic=topic[:300], context=(context or "")[:4000],
+            user_id=user_id, topic=humanize_topic(topic)[:300],
+            context=(context or "")[:4000],
             source=source[:48], source_ref=(source_ref or "")[:191] or None,
             target=target or {"kind": "none"}, questions=fields, answers=[],
             result=[], status="open", priority=int(priority), attempts=0,
@@ -310,6 +323,86 @@ async def _targets_text(db: AsyncSession, user_id: int) -> str:
         return "task, todo, note, person, finance_account, document, transaction"
 
 
+
+# ── خوانا کردنِ موضوع ────────────────────────────────────────────────────────
+# چرا لازم است (بازخوردِ مالک، ۲۰۲۶-۰۷-۳۱): فرمِ واقعی با این موضوع رفت —
+# «Project_manager: Project_manager 📎 scan_bundle_c9e90b2b-4141-4012-...pdf»
+# یعنی نامِ فرستنده دوبار، یک UUID، و پسوندِ فایل. برای آدم بی‌معناست، و
+# بدتر: مدل هم با همین متنِ بی‌معنا سؤال می‌سازد، پس سؤال‌ها هم بی‌معنا
+# می‌شوند. تمیزکاری باید سرِ **ساخت** انجام شود، نه سرِ نمایش.
+
+# بدونِ \b — نامِ فایل شناسه را با «_» می‌چسباند، پس مرزِ واژه‌ای در کار نیست.
+_UUID_RE = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){1,4}(?:-[0-9a-f]{6,12})?", re.I)
+_HASH_RE = re.compile(r"(?<![0-9a-z])[0-9a-f]{16,}(?![0-9a-z])", re.I)
+_EXT_FA = {
+    "pdf": "PDF", "jpg": "تصویر", "jpeg": "تصویر", "png": "تصویر", "webp": "تصویر",
+    "doc": "سند word", "docx": "سند word", "xls": "صفحهٔ اکسل", "xlsx": "صفحهٔ اکسل",
+    "csv": "جدول", "zip": "بستهٔ فشرده", "mp3": "صوت", "ogg": "صوت", "m4a": "صوت",
+}
+
+
+def humanize_topic(raw: str) -> str:
+    """موضوعِ خوانا از یک رشتهٔ خام (که ممکن است نامِ فایل یا متنِ تکراری باشد).
+
+    توکن‌محور است، نه regexِ روی کلِ رشته: نامِ فایل‌ها اجزا را با «_» به هم
+    می‌چسبانند، پس مرزِ واژه اصلاً وجود ندارد و یک UUIDِ چسبیده هرگز حذف
+    نمی‌شد."""
+    text = re.sub(r"\s+", " ", str(raw or "")).strip().replace("📎", " ")
+    if not text:
+        return "یک موردِ نامشخص"
+    # شناسه‌های ماشینی را قبل از توکن‌بندی درسته بردار — مرزِ واژه وجود ندارد
+    # چون نامِ فایل همه‌چیز را با «_» می‌چسباند.
+    text = _UUID_RE.sub(" ", text)
+    text = _HASH_RE.sub(" ", text)
+
+    kind = ""
+    m = re.search(r"\.([A-Za-z0-9]{2,5})(?:\b|$)", text)
+    if m:
+        kind = _EXT_FA.get(m.group(1).lower(), "")
+        text = text[: m.start()] + " " + text[m.end():]
+
+    tokens = [t for t in re.split(r"[\s_\-:،,./\\]+", text) if t]
+    noise = {"scan", "bundle", "img", "image", "doc", "docs", "file", "files",
+             "attachment", "attachments", "untitled", "copy", "final", "new"}
+    kept, seen = [], set()
+    for tok in tokens:
+        low = tok.lower()
+        if low in noise:
+            continue
+        # شناسه‌های ماشینی: هگزِ بلند، عددِ بلند، رشتهٔ درهم
+        if len(tok) >= 6 and re.fullmatch(r"[0-9a-f]+", low):
+            continue
+        if len(tok) >= 6 and tok.isdigit():
+            continue
+        if low in seen:                       # «Project_manager: Project_manager»
+            continue
+        seen.add(low)
+        kept.append(tok)
+
+    clean = re.sub(r"\s+", " ", " ".join(kept)).strip(" _-.:")
+    if len(clean) < 3:
+        return f"یک {kind or 'مورد'}ِ بدونِ عنوان"
+    if kind:
+        return f"{kind}: {clean[:80]}"
+    return clean[:100]
+
+
+# ── رندرِ HTML (به‌جای Markdown) ─────────────────────────────────────────────
+# Markdown تلگرام روی «_» و «*» داخلِ نامِ فایل و متنِ فارسی می‌شکند — در
+# فرمِ واقعی نامِ فایل ایتالیک شد و جمله به‌هم ریخت. HTML با escape امن است.
+
+def _esc(value: Any) -> str:
+    import html as _html
+
+    return _html.escape(str(value or ""))
+
+
+def _progress(c) -> str:
+    total = len(c.questions or [])
+    done = len(_answered(c))
+    return f"{done} از {total} پاسخ داده شده"
+
+
 # ── رندرِ فرم ───────────────────────────────────────────────────────────────
 
 def _type_hint(q: Dict[str, Any]) -> str:
@@ -321,37 +414,79 @@ def _type_hint(q: Dict[str, Any]) -> str:
 
 
 def render_form(c, *, reminder: bool = False) -> str:
-    """فرمِ پرشدنی و **قابلِ ویرایش**.
+    """فرمِ پرشدنی و قابلِ ویرایش — با HTML، نه Markdown.
 
-    شماره‌گذاری روی *همهٔ* فیلدهاست، نه فقط بی‌جواب‌ها. دو دلیل:
-      • شماره‌ها بینِ ارسال‌های پیاپی جابه‌جا نمی‌شوند — وگرنه «۲)» این دفعه
-        سؤالِ دیگری بود و جوابِ مالک روی فیلدِ اشتباه می‌نشست.
-      • جوابِ قبلی جلوی خطش نوشته می‌شود، پس ویرایش و پرکردن یک حرکت‌اند:
-        مقدار را عوض کن و بفرست.
+    چرا HTML: Markdownِ تلگرام روی «_» و «*» می‌شکند و نامِ فایل‌های واقعی پر
+    از «_» است؛ در فرمِ واقعی جمله ایتالیک و به‌هم‌ریخته رسید. با escape هیچ
+    ورودی‌ای نمی‌تواند قالب را خراب کند.
+
+    شماره‌گذاری روی *همهٔ* فیلدهاست تا بینِ ارسال‌های پیاپی جابه‌جا نشود، و
+    جوابِ قبلی جلوی خطش می‌آید تا ویرایش و پرکردن یک حرکت باشند.
     """
-    head = "🔄 *یادآوری — هنوز جواب نگرفتم*" if reminder else "❓ *یک ابهام هست، لطفاً کمک کن*"
-    lines = [head, "", f"*موضوع:* {c.topic}"]
-    if c.context:
-        snippet = re.sub(r"\s+", " ", (c.context or "")).strip()[:220]
-        lines.append(f"_{snippet}_")
-    lines += ["", "همین پیام را *ریپلای* کن و خط‌ها را پر کن:", ""]
+    head = "🔄 <b>یادآوری — هنوز جواب نگرفتم</b>" if reminder else "❓ <b>یک ابهام دارم</b>"
+    lines = [head, "", f"📌 <b>موضوع:</b> {_esc(c.topic)}"]
+    snippet = re.sub(r"\s+", " ", (c.context or "")).strip()
+    if snippet:
+        lines.append(f"<blockquote>{_esc(snippet[:250])}</blockquote>")
+    lines.append(f"📊 <i>{_progress(c)}</i>")
+    lines += ["", "<b>برای جواب، همین پیام را ریپلای کن و خط‌ها را پر کن:</b>", ""]
     for idx, q in enumerate(c.questions or [], start=1):
         answer = str(q.get("answer") or "").strip()
-        shown = answer if len(answer) <= 60 else answer[:57] + "…"
-        lines.append(f"{idx}) {q['label']}{'' if answer else _type_hint(q)}: {shown}")
+        if answer:
+            shown = answer if len(answer) <= 60 else answer[:57] + "…"
+            lines.append(f"{idx}) {_esc(q['label'])}: <b>{_esc(shown)}</b>  ✅")
+        else:
+            hint = _type_hint(q)
+            lines.append(f"{idx}) {_esc(q['label'])}{_esc(hint)}: ______")
+            why = str(q.get("why") or "").strip()
+            if why:
+                lines.append(f"   <i>{_esc(why)}</i>")
     lines += [
         "",
-        "• خطِ خالی را می‌توانی خالی بگذاری — بعداً دوباره می‌پرسم.",
-        "• خطی که پر است جوابِ قبلیِ توست؛ عوضش کنی، *به‌روز* می‌شود.",
+        "• خطی که نمی‌دانی را خالی بگذار — بعداً دوباره می‌پرسم.",
+        "• خطی که پر است جوابِ قبلیِ توست؛ عوضش کنی به‌روز می‌شود.",
+        "• سؤالم را نفهمیدی؟ دکمهٔ «❓ سؤال دارم» را بزن.",
     ]
     return "\n".join(lines)
 
 
+def _pick_rows(c) -> List[List[Dict[str, Any]]]:
+    """دکمه‌های آماده برای فیلدهای گزینه‌ای/بله‌خیر — تایپ‌نکردن بهترین UX است."""
+    rows: List[List[Dict[str, Any]]] = []
+    for qi, q in enumerate(c.questions or []):
+        if str(q.get("answer") or "").strip():
+            continue
+        options: List[str] = []
+        if q.get("type") == "choice":
+            options = list(q.get("choices") or [])[:6]
+        elif q.get("type") == "yesno":
+            options = ["بله", "خیر"]
+        if not options:
+            continue
+        rows.append([{"text": f"↓ {str(q.get('label') or '')[:48]}", "callback_data": "clar:noop"}])
+        row: List[Dict[str, Any]] = []
+        for oi, opt in enumerate(options):
+            row.append({"text": str(opt)[:28], "callback_data": f"clar:pick:{c.id}:{qi}:{oi}"})
+            if len(row) == 2:
+                rows.append(row)
+                row = []
+        if row:
+            rows.append(row)
+    return rows
+
+
 def _form_markup(c) -> Dict[str, Any]:
-    return {"inline_keyboard": [[
+    """کیبوردِ شیشه‌ای: گزینه‌های آماده + پرسیدنِ متقابل + تعویق/رد."""
+    rows = _pick_rows(c)
+    rows.append([
+        {"text": "❓ سؤال دارم", "callback_data": f"clar:ask:{c.id}"},
+        {"text": "📄 نمایش دوباره", "callback_data": f"clar:show:{c.id}"},
+    ])
+    rows.append([
         {"text": "⏰ بعداً", "callback_data": f"clar:snooze:{c.id}"},
         {"text": "🚫 مربوط نیست", "callback_data": f"clar:skip:{c.id}"},
-    ]]}
+    ])
+    return {"inline_keyboard": rows}
 
 
 # ── ارسال و ارسالِ مجدد ─────────────────────────────────────────────────────
@@ -389,12 +524,19 @@ async def send_form(db: AsyncSession, c, *, reminder: bool = False) -> bool:
         bot = get_telegram_bot()
         if not bot.is_configured():
             return False
-        res = await bot.send(
-            render_form(c, reminder=reminder), silent=not reminder,
-            reply_markup={
+        # کیبوردِ شیشه‌ای (گزینه‌های آماده + «سؤال دارم») بر force_reply مقدم
+        # است، چون تلگرام فقط یکی را در هر پیام می‌پذیرد و یک‌ضربه‌ای‌بودنِ
+        # گزینه‌ها ارزشش بیشتر است. اگر هیچ فیلدِ دکمه‌ای نبود، force_reply
+        # می‌آید تا کادرِ جواب خودش باز شود.
+        markup = _form_markup(c)
+        if not _pick_rows(c):
+            markup = {
                 "force_reply": True,
                 "input_field_placeholder": "خط‌ها را پر کن و بفرست",
-            },
+            }
+        res = await bot.send(
+            render_form(c, reminder=reminder), silent=not reminder,
+            reply_markup=markup, parse_mode="HTML",
         )
         ok = bool(isinstance(res, dict) and res.get("ok"))
         mid = res.get("message_id") if isinstance(res, dict) else None
@@ -413,7 +555,9 @@ async def send_form(db: AsyncSession, c, *, reminder: bool = False) -> bool:
         # ارسالِ اول تمیز می‌ماند (فقط کادرِ جواب باز می‌شود)؛ دکمه‌های
         # «بعداً/مربوط نیست» فقط از یادآوریِ دوم به بعد می‌آیند — یعنی دقیقاً
         # وقتی که مالک یک بار جواب نداده و شاید اصلاً نخواهد جواب بدهد.
-        if reminder:
+        # وقتی force_reply رفته (فرمِ تمام‌متنی)، دکمه‌ها در یک پیامِ کوتاهِ
+        # جدا می‌آیند — فقط از یادآوریِ دوم به بعد، تا ارسالِ اول شلوغ نشود.
+        if reminder and not _pick_rows(c):
             try:
                 await bot.send("این پرسش را می‌خواهی چه کنم؟", silent=True,
                                reply_markup=_form_markup(c))
@@ -1029,6 +1173,100 @@ async def edit_answers(
             "remaining": len(remaining), "refiled": refiled}
 
 
+# ── گفتگوی دوطرفه دربارهٔ همان ابهام ────────────────────────────────────────
+# خواستهٔ مالک (۲۰۲۶-۰۷-۳۱): «اگر در پاسخ به سؤالش، خودم سؤالی داشتم بتوانم
+# بپرسم و جواب بگیرم — حتی چند بار — ولی بعدش موضوع و سؤال‌های اصلی نباید
+# فراموش و گم شود.» پس: هر دور پرسش‌وپاسخ در `discussion` ذخیره می‌شود (تا
+# دورِ بعد حافظه داشته باشد) و **بلافاصله بعدش خودِ فرم دوباره نشان داده
+# می‌شود** — یعنی نخِ اصلی هرگز رها نمی‌شود.
+
+_DISCUSS_PROMPT = """صاحبِ برنامه دربارهٔ پرسشی که از او پرسیده‌ای، خودش سؤال دارد.
+کوتاه، دقیق و فارسی جواب بده تا ابهامش رفع شود و بتواند فرم را پر کند.
+
+قواعد:
+- فقط بر اساس اطلاعاتِ زیر جواب بده. چیزی که نمی‌دانی را صادقانه بگو نمی‌دانم.
+- اگر پرسیده «منظورت چیست؟»، پرسشِ خودت را ساده‌تر و با یک مثال توضیح بده.
+- جوابت حداکثر ۴ جمله باشد. فهرستِ سؤال‌ها را دوباره تکرار نکن.
+
+موضوعِ ابهام: {topic}
+متنِ اصلی که این ابهام از آن آمده:
+{context}
+
+پرسش‌هایی که از او پرسیده‌ام:
+{questions}
+
+گفتگوی تا اینجا:
+{history}
+
+سؤالِ او: {question}
+"""
+
+
+def _discussion(c) -> List[Dict[str, Any]]:
+    return list(c.discussion or [])
+
+
+async def discuss(db: AsyncSession, c, question: str) -> str:
+    """یک دورِ پرسشِ متقابل: جوابِ کوتاه + ذخیره در نخِ گفتگو.
+
+    هرگز استثنا نمی‌دهد — اگر مدل نبود، یک جوابِ صادقانه برمی‌گردد تا مالک
+    بلاتکلیف نماند."""
+    now = datetime.now(timezone.utc)
+    thread = _discussion(c)
+    thread.append({"at": now.isoformat(), "role": "owner", "text": (question or "")[:1500]})
+
+    history = "\n".join(
+        f"{'من' if t.get('role') == 'assistant' else 'او'}: {t.get('text', '')[:300]}"
+        for t in thread[-8:]
+    )
+    questions_txt = "\n".join(
+        f"- {q.get('label')}" + (f" (جواب داده: {q.get('answer')})" if q.get("answer") else "")
+        for q in (c.questions or [])
+    )
+    answer = ""
+    try:
+        from app.services.ai.inference_gateway import complete
+
+        res = await complete(
+            db,
+            _DISCUSS_PROMPT.format(
+                topic=(c.topic or "")[:200], context=(c.context or "")[:1500],
+                questions=questions_txt[:1200], history=history[:2000],
+                question=(question or "")[:500],
+            ),
+            task="inbox_triage", max_tokens=400,
+        )
+        if res.get("ok"):
+            answer = re.sub(r"\s+\n", "\n", (res.get("text") or "").strip())[:1200]
+    except Exception as exc:
+        logger.debug("clarification discuss fell back: %r", exc)
+    if not answer:
+        answer = (
+            "الان نمی‌توانم توضیحِ بیشتری بدهم. اگر پرسشم مبهم است، همان خط را "
+            "خالی بگذار یا با جملهٔ خودت بنویس — بعداً از رویش می‌فهمم."
+        )
+    thread.append({"at": now.isoformat(), "role": "assistant", "text": answer})
+    _write_json(c, "discussion", thread[-30:])
+    # پرسیدنِ متقابل یعنی مالک درگیر است؛ چرخهٔ یادآوری از نو شروع شود تا
+    # وسطِ گفتگو پیامِ «هنوز جواب نگرفتم» نیاید.
+    c.attempts = 0
+    c.last_sent_at = now
+    await db.flush()
+    return answer
+
+
+async def answer_field(db: AsyncSession, c, field_index: int, value: str) -> Dict[str, Any]:
+    """جوابِ یک فیلد با **یک ضربه** (دکمهٔ گزینه‌ای) — بدونِ تایپ."""
+    questions = _questions_of(c)
+    if not (0 <= field_index < len(questions)):
+        return {"filled": 0, "remaining": len(_unanswered(c))}
+    key = questions[field_index].get("key")
+    mapped = {key: value}
+    outcome = await record_answers(db, c, mapped, raw=f"[دکمه] {value}", via="telegram-button")
+    filed = await file_answers(db, c) if (outcome["filled"] or outcome.get("edited")) else []
+    return {**outcome, "filed": filed}
+
+
 async def snooze(db: AsyncSession, clarification_id: int, hours: int = 24,
                  user_id: Optional[int] = None) -> bool:
     from app.models.clarification import Clarification
@@ -1112,6 +1350,7 @@ def to_dict(c) -> Dict[str, Any]:
         "questions": c.questions or [],
         "answers": c.answers or [],
         "result": c.result or [],
+        "discussion": c.discussion or [],
         "target": c.target or {},
         "last_sent_at": c.last_sent_at.isoformat() if c.last_sent_at else None,
         "created_at": c.created_at.isoformat() if c.created_at else None,

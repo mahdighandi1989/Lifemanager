@@ -224,9 +224,13 @@ class TelegramBot:
         silent: bool = False,
         reply_markup: Optional[Dict[str, Any]] = None,
         chat_id: Optional[str] = None,
+        parse_mode: str = "Markdown",
     ) -> Dict[str, Any]:
-        """Send a Markdown message. Retries once without parse_mode on a parse
-        error and once after a 429. Never raises — returns ``{ok, ...}``."""
+        """Send a message. ``parse_mode`` may be "Markdown" (default, for the
+        existing callers) or "HTML" — HTML is the safe choice for any text that
+        embeds user/file content, because Markdown breaks on a bare «_» or «*»
+        and Telegram then mangles the whole message. Retries once without
+        parse_mode on a parse error and once after a 429. Never raises."""
         target = (chat_id or self.chat_id or "").strip()
         if not self.bot_token or not target:
             return {"ok": False, "error": "TELEGRAM_BOT_TOKEN/CHAT_ID unset"}
@@ -237,7 +241,7 @@ class TelegramBot:
         payload: Dict[str, Any] = {
             "chat_id": target,
             "text": text,
-            "parse_mode": "Markdown",
+            "parse_mode": parse_mode,
             "disable_web_page_preview": True,
             "disable_notification": bool(silent),
         }
@@ -314,7 +318,7 @@ class TelegramBot:
             text = text[:3990] + "\n…[truncated]"
         payload: Dict[str, Any] = {
             "chat_id": chat_id, "message_id": message_id, "text": text,
-            "parse_mode": "Markdown", "disable_web_page_preview": True,
+            "parse_mode": parse_mode, "disable_web_page_preview": True,
         }
         if reply_markup:
             payload["reply_markup"] = reply_markup
@@ -449,6 +453,16 @@ class TelegramBot:
             logger.info("telegram: ignoring chat %s (not configured)", chat_id_str)
             return {"ok": True, "ignored": True}
 
+        # حالتِ «سؤال دارم»: متنِ بعدیِ کاربر یک پرسشِ متقابل است، نه جوابِ فرم
+        # و نه کارِ جدید. قبل از همه بررسی می‌شود.
+        try:
+            if text:
+                asked = await self._maybe_handle_clarification_question(chat_id_str, text)
+                if asked is not None:
+                    return asked
+        except Exception as exc:
+            logger.exception("clarification question handling crashed: %r", exc)
+
         # Clarification form replies (2026-07-31). MUST run before compose:
         # a reply to a question form is an answer, not a new task. Bound by
         # reply_to_message.message_id, so a form that scrolled far up is still
@@ -509,6 +523,7 @@ class TelegramBot:
             )
         if result is None:
             return None
+        _clear_state(chat_id)      # جواب دادی → حالتِ گفتگو بسته می‌شود
         await self.send(result["feedback"], chat_id=chat_id, silent=True)
         return {"ok": True, "handled": "clarification_answered",
                 "clarification_id": result["clarification_id"],
@@ -1059,12 +1074,16 @@ class TelegramBot:
     async def _handle_clarification_callback(
         self, chat_id: str, cq_id: str, data: str
     ) -> Dict[str, Any]:
-        """«⏰ بعداً» / «🚫 مربوط نیست» روی یک فرمِ پرسش."""
+        """دکمه‌های فرمِ پرسش: انتخابِ گزینه، پرسشِ متقابل، نمایش، تعویق، رد."""
         from app.database import SessionLocal
+        from app.models.clarification import Clarification
         from app.services import clarification_service as clar
 
         parts = data.split(":")
         action = parts[1] if len(parts) > 1 else ""
+        if action == "noop":            # برچسبِ عنوانِ پرسش، دکمهٔ واقعی نیست
+            await self.answer_callback(cq_id)
+            return {"ok": True, "handled": "clar_noop"}
         try:
             cid = int(parts[2])
         except (IndexError, ValueError):
@@ -1072,6 +1091,55 @@ class TelegramBot:
             return {"ok": True, "handled": "clar_bad_callback"}
 
         async with SessionLocal() as session:
+            if action == "pick":
+                # یک‌ضربه‌ای: گزینه انتخاب شد → ثبت و نمایشِ دوبارهٔ فرم
+                try:
+                    qi, oi = int(parts[3]), int(parts[4])
+                except (IndexError, ValueError):
+                    await self.answer_callback(cq_id)
+                    return {"ok": True, "handled": "clar_bad_pick"}
+                c = await session.get(Clarification, cid)
+                if c is None:
+                    await self.answer_callback(cq_id, "پیدا نشد.")
+                    return {"ok": True, "handled": "clar_missing"}
+                q = (c.questions or [])[qi] if qi < len(c.questions or []) else None
+                options = list((q or {}).get("choices") or []) or ["بله", "خیر"]
+                value = options[oi] if oi < len(options) else ""
+                out = await clar.answer_field(session, c, qi, value)
+                await session.commit()
+                await self.answer_callback(cq_id, f"✅ ثبت شد: {value[:60]}")
+                await self.send(
+                    clar.feedback_text(c, out, out.get("filed") or []),
+                    chat_id=chat_id, silent=True,
+                )
+                if clar._unanswered(c):          # هنوز پرسشِ باز هست → فرمِ تازه
+                    await clar.send_form(session, c)
+                    await session.commit()
+                return {"ok": True, "handled": "clar_pick", "id": cid}
+
+            if action == "ask":
+                # پرسشِ متقابل: حالتِ گفتگو باز می‌شود؛ متنِ بعدیِ کاربر سؤالِ
+                # اوست. نخِ اصلی گم نمی‌شود چون بعدِ جواب، فرم دوباره می‌آید.
+                _set_state(chat_id, "clar_qa", clarification_id=cid)
+                await self.answer_callback(cq_id, "بپرس!")
+                await self.send(
+                    "❓ <b>بپرس</b> — هرچه از این پرسش مبهم است.\n"
+                    "<i>جوابت را می‌دهم و بعد همان فرم را دوباره می‌فرستم، "
+                    "پس چیزی گم نمی‌شود.</i>",
+                    chat_id=chat_id, silent=True, parse_mode="HTML",
+                    reply_markup={"force_reply": True,
+                                  "input_field_placeholder": "سؤالت را بنویس"},
+                )
+                return {"ok": True, "handled": "clar_ask_opened", "id": cid}
+
+            if action == "show":
+                c = await session.get(Clarification, cid)
+                if c is not None:
+                    await clar.send_form(session, c)
+                    await session.commit()
+                await self.answer_callback(cq_id)
+                return {"ok": True, "handled": "clar_shown", "id": cid}
+
             if action == "snooze":
                 ok = await clar.snooze(session, cid, hours=24)
                 msg = "⏰ باشد، فردا دوباره می‌پرسم." if ok else "پیدا نشد."
@@ -1084,6 +1152,34 @@ class TelegramBot:
         await self.answer_callback(cq_id, msg[:180])
         await self.send(msg, chat_id=chat_id, silent=True)
         return {"ok": True, "handled": f"clar_{action}", "id": cid}
+
+    async def _maybe_handle_clarification_question(
+        self, chat_id: str, text: str
+    ) -> Optional[Dict[str, Any]]:
+        """کاربر در حالتِ «سؤال دارم» است → جوابش را بده و فرم را برگردان."""
+        state = _chat_state.get(chat_id) or {}
+        if state.get("phase") != "clar_qa" or not text:
+            return None
+        cid = state.get("clarification_id")
+        from app.database import SessionLocal
+        from app.models.clarification import Clarification
+        from app.services import clarification_service as clar
+
+        async with SessionLocal() as session:
+            c = await session.get(Clarification, int(cid or 0))
+            if c is None:
+                _clear_state(chat_id)
+                return None
+            answer = await clar.discuss(session, c, text)
+            await session.commit()
+            await self.send(f"💬 {answer}", chat_id=chat_id, silent=True)
+            # نخِ اصلی برمی‌گردد — همان چیزی که مالک خواست گم نشود.
+            await clar.send_form(session, c)
+            await session.commit()
+        # حالت باز می‌ماند تا اگر باز هم سؤال داشت بتواند بپرسد؛ با جواب‌دادن
+        # به فرم (ریپلای) یا /cancel بسته می‌شود.
+        _set_state(chat_id, "clar_qa", clarification_id=cid)
+        return {"ok": True, "handled": "clar_discussed", "id": cid}
 
     async def _list_open_tasks(self, session) -> List[Any]:
         from sqlalchemy import or_, select

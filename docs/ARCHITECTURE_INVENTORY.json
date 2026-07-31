@@ -1343,6 +1343,10 @@
           {
             "method": "POST",
             "path": "/api/clarifications/{clarification_id}/edit"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/discuss"
           }
         ]
       }
@@ -1741,7 +1745,10 @@
           "open_forms",
           "resend_all",
           "to_dict",
-          "edit_answers"
+          "edit_answers",
+          "humanize_topic",
+          "discuss",
+          "answer_field"
         ]
       }
     ]
