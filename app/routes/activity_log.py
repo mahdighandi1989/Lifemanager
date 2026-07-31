@@ -98,13 +98,21 @@ def _apply_filters(
 
 
 def _serialize(row: ActivityLog) -> dict:
+    # اعلان‌های گوشیِ ثبت‌شده پیش از ۲۰۲۶-۰۷-۳۱ نامِ بستهٔ نرم‌افزاری را در
+    # entity_label دارند («org.telegram.messenger») که یعنی «نامعلوم». به‌جای
+    # مهاجرتِ داده، همین‌جا خوانا می‌شود: داده دست‌نخورده، نمایش درست.
+    from app.services.mobile_identity_service import display_entity_label
+
+    label = display_entity_label(row.entity_type, row.entity_label)
     return {
         "id": row.id,
         "user_id": row.user_id,
         "action": row.action,
         "entity_type": row.entity_type,
         "entity_id": row.entity_id,
-        "entity_label": row.entity_label,
+        "entity_label": label,
+        # برچسبِ خامِ ذخیره‌شده (برای جست‌وجو/عیب‌یابی) — چیزی پنهان نمی‌شود.
+        "entity_label_raw": row.entity_label,
         "context_type": row.context_type,
         "context_id": row.context_id,
         "detail": row.detail,

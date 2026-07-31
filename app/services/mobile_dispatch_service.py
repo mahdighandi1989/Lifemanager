@@ -103,21 +103,35 @@ async def _match_person(db: AsyncSession, sender: str, text: str = ""):
 
 # ── classification ──────────────────────────────────────────────────────────
 
-def classify_signal(sender: str, text: str) -> str:
+def classify_signal(
+    sender: str, text: str, *, app: str = "", category_hint: Optional[str] = None
+) -> str:
     """One intent label for a mobile signal. Order matters (first hit wins):
-    mirrored → otp → promo → finance → appointment → task → message.
+    mirrored → otp → finance → promo → appointment → task → message.
     ``message`` is the neutral default (chatter/notification with no action).
 
     This is the DETERMINISTIC floor: it always works, needs no model, and its
     noise verdicts (mirrored/otp) are authoritative — the model is never asked
-    about those. :func:`classify_signal_smart` layers the model on top."""
+    about those. :func:`classify_signal_smart` layers the model on top.
+
+    ``app`` is the package name (notifications only). It used to arrive folded
+    into ``sender``; now that ``sender`` carries the *human* sender, mirror
+    detection reads the package explicitly.
+
+    ``category_hint`` is what the notification's own app declared it to be
+    (Notification.CATEGORY_*). It is the most authoritative non-money signal
+    there is — the app knows whether it just sent a promo — so it wins over
+    the keyword guesses, but never over an OTP or a hard money match."""
     blob = f"{sender}\n{text}"
-    if any((sender or "").startswith(p) for p in _MIRRORED_APPS):
+    probe = f"{app or ''} {sender or ''}".strip()
+    if any(probe.startswith(p) or (app or "").startswith(p) for p in _MIRRORED_APPS):
         return "mirrored"
     if _OTP_RE.search(text):
         return "otp"
     if _fin_hint().search(blob):
         return "finance"
+    if category_hint:
+        return category_hint
     if _PROMO_RE.search(text):
         return "promo"
     if _APPT_RE.search(text):
@@ -213,12 +227,18 @@ _SIGNAL_PROMPT = """تو مسیریابِ سیگنال‌های ورودیِ ی�
 """
 
 
-async def classify_signal_smart(db, sender: str, text: str) -> Tuple[str, Optional[float], Optional[str]]:
+async def classify_signal_smart(
+    db, sender: str, text: str, *, app: str = "", category_hint: Optional[str] = None
+) -> Tuple[str, Optional[float], Optional[str]]:
     """(category, confidence, model) — the model's verdict when it is available
     and allowed, else the deterministic one (confidence None)."""
-    base = classify_signal(sender, text)
+    base = classify_signal(sender, text, app=app, category_hint=category_hint)
     # Noise verdicts are certain and cheap — never spend a model call on them.
-    if base in ("mirrored", "otp"):
+    # ``system`` and a self-declared ``promo`` come from the app itself, so
+    # asking a model to second-guess them is pure waste.
+    if base in ("mirrored", "otp", "system"):
+        return base, None, None
+    if category_hint and base == category_hint and category_hint in ("promo", "system"):
         return base, None, None
 
     key = _cache_key(sender, text)
@@ -357,7 +377,13 @@ async def _route_person_message(
             routed = "person"
         except Exception as exc:
             logger.debug("person message route skipped: %r", exc)
-    return {"routed_to": routed, "person_id": (person.id if person else None)}
+    return {
+        "routed_to": routed,
+        "person_id": (person.id if person else None),
+        # نامِ فرد برمی‌گردد تا ستونِ لاگ بتواند «چه کسی» را آدم‌فهم بنویسد،
+        # نه فقط یک شماره.
+        "person_name": (person.name if person else None),
+    }
 
 
 async def _route_inbox(db, user_id, sender, text, occurred_at, device, ref) -> Dict[str, Any]:
@@ -376,21 +402,25 @@ _ROUTERS: Dict[str, Callable] = {
     "task": _route_inbox,
 }
 # Categories that are pure noise for ROUTING (still logged/archived/aggregated):
-_NOISE = {"mirrored", "otp", "promo"}
+# ``system`` = ongoing/service notifications (music player, download, battery)
+# that the app itself declared — recorded, never routed.
+_NOISE = {"mirrored", "otp", "promo", "system"}
 
 
 async def dispatch_signal(
     db: AsyncSession,
     user_id: int,
     *,
-    source: str,          # "sms" | "notification"
-    sender: str,          # phone number or app package / title
+    source: str,          # "sms" | "notification" | "calendar" | "telegram" | …
+    sender: str,          # phone number, or the resolved HUMAN sender of a notification
     text: str,
     occurred_at: Optional[str],
     device: Optional[str],
     source_ref: str,
     skip_categories: Tuple[str, ...] = (),
     interaction_type: str = "message",
+    app: str = "",                          # package name (notifications)
+    category_hint: Optional[str] = None,    # what the source itself declared
 ) -> Dict[str, Any]:
     """Classify one mobile signal and route it to the domain that owns it.
 
@@ -401,7 +431,9 @@ async def dispatch_signal(
     try:
         # مدل تصمیم می‌گیرد (با گاردریل‌ها)؛ اگر مدل نبود/مطمئن نبود، قاعدهٔ
         # قطعی جواب می‌دهد — پس روی دیپلویِ بدون کلید هم دقیقاً کار می‌کند.
-        category, confidence, model = await classify_signal_smart(db, sender, text)
+        category, confidence, model = await classify_signal_smart(
+            db, sender, text, app=app, category_hint=category_hint
+        )
         out: Dict[str, Any] = {
             "category": category, "routed_to": None,
             "confidence": confidence, "classifier": (model or "rules"),

@@ -1670,6 +1670,19 @@
           "classify_signal_smart",
           "dispatch_signal"
         ]
+      },
+      {
+        "file": "app/services/mobile_identity_service.py",
+        "classes": [],
+        "functions": [
+          "looks_like_package",
+          "pretty_app",
+          "resolve_sender",
+          "notification_label",
+          "display_entity_label",
+          "category_hint",
+          "compose_text"
+        ]
       }
     ]
   },

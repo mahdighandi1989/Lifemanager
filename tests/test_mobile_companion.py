@@ -749,3 +749,156 @@ async def test_telegram_file_now_flows_through_the_universal_extractor(db_sessio
     assert seen.get("source_ref") == "telegram:f1"
     assert seen.get("filename") == "statement.pdf"
     assert buf.items[0].ingested in ("finance_account", "proposed", "duplicate")
+
+
+# ── هویتِ اعلان: «کدام اپ / از طرفِ چه کسی» (اصلاح ۲۰۲۶-۰۷-۳۱) ──────────────
+# گزارشِ مالک: خیلی از اعلان‌ها بی‌اپ و بی‌فرستنده ثبت می‌شدند — فقط متن.
+
+def test_pretty_app_turns_a_package_into_a_human_name():
+    from app.services import mobile_identity_service as ident
+
+    assert ident.pretty_app("org.telegram.messenger") == "تلگرام"
+    assert ident.pretty_app("com.whatsapp") == "واتس‌اپ"
+    # اپِ ناشناخته هم باید خوانا شود، نه اینکه نامِ بسته بماند
+    assert ident.pretty_app("com.acme.superapp") == "Acme"
+    # برچسبِ خودِ گوشی بر همه‌چیز مقدم است
+    assert ident.pretty_app("com.acme.superapp", "سوپر اپ") == "سوپر اپ"
+    # برچسبی که خودش نامِ بسته است، برچسب حساب نمی‌شود
+    assert ident.pretty_app("org.telegram.messenger", "org.telegram.messenger") == "تلگرام"
+    assert ident.looks_like_package("com.instagram.android") is True
+    assert ident.looks_like_package("علی رضایی") is False
+
+
+def test_resolve_sender_precedence_never_returns_blank():
+    from app.services import mobile_identity_service as ident
+
+    # MessagingStyle: نامِ واقعیِ مخاطب — بر عنوان مقدم
+    assert ident.resolve_sender(
+        app="org.telegram.messenger", title="تلگرام", sender_name="علی رضایی",
+    ) == "علی رضایی"
+    # عنوانِ شمارشی («۳ پیام جدید») فرستنده نیست
+    assert ident.resolve_sender(
+        app="com.whatsapp", title="۳ پیام جدید", sub_text="گروه خانواده",
+    ) == "گروه خانواده"
+    # اعلانِ تبلیغاتیِ بی‌عنوان → دستِ‌کم نامِ اپ، نه خالی
+    assert ident.resolve_sender(app="com.digikala", title="") == "دیجی‌کالا"
+
+
+def test_notification_records_app_and_sender_not_a_package(api_client):
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/notification",
+        json={
+            "app": "org.telegram.messenger", "app_label": "Telegram",
+            "title": "۲ پیام جدید", "text": "پیام جدید",
+            "sender_name": "سارا محمدی", "device": "s24",
+        },
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["sender"] == "سارا محمدی"
+    assert body["app_name"] == "Telegram"
+    log = api_client.get("/api/activity-log", params={"action": "mobile_notification"}).json()
+    labels = [i.get("entity_label") or "" for i in (log.get("items") or [])]
+    assert any("سارا محمدی" in v and "Telegram" in v for v in labels)
+    assert not any(v.startswith("org.telegram") for v in labels)
+
+
+def test_promotional_notification_without_a_title_still_names_its_app(api_client):
+    """دقیقاً موردِ گزارش‌شده: اعلانِ تبلیغاتی بدونِ فرستنده — قبلاً فقط متن
+    ثبت می‌شد و ستونِ «چه چیزی» عملاً خالی بود."""
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.digikala", "title": "", "text": "۵۰٪ تخفیف ویژه",
+              "android_category": "promo", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200
+    assert r.json()["sender"] == "دیجی‌کالا"
+    # اپ خودش گفته تبلیغ است → دسته promo و بدونِ مسیریابی (فقط لاگ)
+    assert r.json()["category"] == "promo"
+    assert r.json()["routed_to"] is None
+    log = api_client.get("/api/activity-log", params={"action": "mobile_notification"}).json()
+    assert any("دیجی‌کالا" in (i.get("entity_label") or "") for i in (log.get("items") or []))
+
+
+def test_old_client_payload_still_works_and_is_named(api_client):
+    """اپِ نصب‌شدهٔ قدیمی فقط app/title/text می‌فرستد — نباید چیزی بشکند."""
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.instagram.android", "title": "", "text": "لایک جدید"},
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200
+    assert r.json()["sender"] == "اینستاگرام"
+
+
+def test_notification_body_prefers_the_full_text_over_a_summary(api_client):
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.whatsapp", "title": "گروه کار", "text": "۳ پیام جدید",
+              "lines": ["علی: فردا جلسه داریم", "رضا: باشه"], "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    log = api_client.get("/api/activity-log", params={"action": "mobile_notification"}).json()
+    details = [i.get("detail") or "" for i in (log.get("items") or [])]
+    assert any("فردا جلسه داریم" in d for d in details)
+
+
+def test_ongoing_service_notification_is_logged_but_never_routed(api_client):
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.spotify.music", "title": "در حال پخش", "text": "آهنگ",
+              "android_category": "transport", "ongoing": True, "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    assert r.json()["category"] == "system"
+    assert r.json()["routed_to"] is None
+    log = api_client.get("/api/activity-log", params={"action": "mobile_notification"}).json()
+    assert (log.get("total") or len(log.get("items") or [])) >= 1  # ثبت شده، فقط مسیر نگرفته
+
+
+def test_mirrored_app_is_detected_from_the_package_not_the_sender():
+    from app.services.mobile_dispatch_service import classify_signal
+
+    # حالا sender نامِ آدم است؛ تشخیصِ آینه باید از package بیاید
+    assert classify_signal("علی", "هر متنی", app="com.google.android.gm") == "mirrored"
+    # و سازگاری با فراخوانِ قدیمی (package داخلِ sender)
+    assert classify_signal("com.google.android.gm", "x") == "mirrored"
+
+
+def test_android_category_never_overrules_a_money_signal():
+    from app.services.mobile_dispatch_service import classify_signal
+
+    assert classify_signal(
+        "بانک", "مبلغ 1,200,000 ریال به حساب شما واریز شد", category_hint="promo",
+    ) == "finance"
+    assert classify_signal("x", "کد تایید 1234", category_hint="msg") == "otp"
+
+
+def test_historical_rows_with_a_package_label_render_readable():
+    """رکوردهای قدیمی نامِ بسته دارند — بدون مهاجرت، در لحظهٔ نمایش خوانا شوند."""
+    from app.services.mobile_identity_service import display_entity_label
+
+    assert display_entity_label("phone_notification", "org.telegram.messenger") == "تلگرام"
+    assert display_entity_label("phone_notification", "علی · com.whatsapp") == "علی · واتس‌اپ"
+    # هر چیزِ دیگری دست‌نخورده می‌ماند
+    assert display_entity_label("task", "org.telegram.messenger") == "org.telegram.messenger"
+    assert display_entity_label("phone_notification", "سارا · تلگرام") == "سارا · تلگرام"
+
+
+def test_sms_from_a_known_contact_shows_the_name_in_the_log(api_client):
+    token = _pair(api_client)
+    api_client.post("/api/persons", json={"name": "مریم احمدی", "phone": "09121234567"})
+    api_client.post(
+        "/api/mobile/sms",
+        json={"sender": "+989121234567", "body": "سلام خوبی؟", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    log = api_client.get("/api/activity-log", params={"action": "mobile_sms"}).json()
+    assert any("مریم احمدی" in (i.get("entity_label") or "") for i in (log.get("items") or []))

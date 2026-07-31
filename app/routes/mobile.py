@@ -20,7 +20,7 @@ content hash, currency-mismatch refused, synthetic delta marked).
 import hmac
 import logging
 import secrets
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
@@ -141,9 +141,12 @@ async def ingest_sms(
         occurred_at=payload.received_at, device=payload.device, source_ref=ref,
     )
     category = routed.get("category", "message")
+    # «چه کسی» به‌جای «چه شماره‌ای»، وقتی فرستنده مخاطبِ شناخته‌شده است.
+    who = routed.get("person_name")
+    sms_label = f"{who} · {payload.sender}" if who else payload.sender
     await record_activity(
         action="mobile_sms", entity_type="sms", entity_id=None,
-        entity_label=payload.sender[:255],
+        entity_label=sms_label[:255],
         detail=f"[{category}→{routed.get('routed_to') or '—'}] {body}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         occurred_at=payload.received_at,
@@ -158,6 +161,16 @@ class NotificationPayload(BaseModel):
     text: Optional[str] = None
     posted_at: Optional[str] = None
     device: Optional[str] = None
+    # فیلدهای هویتی (کلاینتِ ۲۰۲۶-۰۷-۳۱ به بعد). همه اختیاری‌اند تا اپِ نصب‌شدهٔ
+    # قدیمی دقیقاً مثل قبل کار کند — سرور با هرچه رسید بهترین نام را می‌سازد.
+    app_label: Optional[str] = None      # نامِ خواندنیِ اپ از خودِ گوشی
+    sender_name: Optional[str] = None    # نامِ مخاطب از MessagingStyle
+    conversation: Optional[str] = None   # نامِ گفتگو/گروه
+    sub_text: Optional[str] = None       # جایی که برندها نامشان را می‌گذارند
+    lines: Optional[List[str]] = None    # InboxStyle: چند پیامِ روی‌هم
+    android_category: Optional[str] = None  # اعلامِ خودِ اپ (promo/msg/event/…)
+    channel: Optional[str] = None
+    ongoing: Optional[bool] = None
 
 
 @router.post("/api/mobile/notification", tags=["mobile"])
@@ -169,11 +182,27 @@ async def ingest_notification(
     user_id: int = Depends(get_optional_user_id),
 ) -> dict:
     """A phone notification → activity log; bank-app notifications also feed
-    the finance engine (same guards as SMS/email — nothing blind)."""
+    the finance engine (same guards as SMS/email — nothing blind).
+
+    Identity first (fix 2026-07-31): a notification is stored with a readable
+    app name and a resolved sender, so «which app / from whom» is never blank.
+    """
     await _require_device(db, x_device_token)
-    text = " ".join(v for v in (payload.title, payload.text) if v).strip()
+    from app.services import mobile_identity_service as ident
+
+    text = ident.compose_text(
+        title=payload.title, text=payload.text,
+        sub_text=payload.sub_text, lines=payload.lines,
+    )
     if not text:
         raise ValueError("empty notification")
+
+    app_name = ident.pretty_app(payload.app, payload.app_label)
+    sender = ident.resolve_sender(
+        app=payload.app, app_label=payload.app_label, title=payload.title,
+        sender_name=payload.sender_name, conversation=payload.conversation,
+        sub_text=payload.sub_text,
+    )
 
     import hashlib as _h
 
@@ -181,21 +210,23 @@ async def ingest_notification(
     from app.services import mobile_dispatch_service as dispatch
 
     routed = await dispatch.dispatch_signal(
-        db, user_id, source="notification", sender=payload.app, text=text,
+        db, user_id, source="notification", sender=sender, text=text,
         occurred_at=payload.posted_at, device=payload.device, source_ref=ref,
+        app=payload.app,
+        category_hint=ident.category_hint(payload.android_category, bool(payload.ongoing)),
     )
     category = routed.get("category", "message")
     await record_activity(
         # entity_type مجزا از «notification» درون‌برنامه‌ای تا با آن اشتباه/
         # لینک نشود (اعلان گوشی ≠ اعلان مرکز اعلان‌ها).
         action="mobile_notification", entity_type="phone_notification", entity_id=None,
-        entity_label=payload.app[:255],
+        entity_label=ident.notification_label(sender, app_name),
         detail=f"[{category}→{routed.get('routed_to') or '—'}] {text}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         occurred_at=payload.posted_at,
         user_id=user_id, db=db,
     )
-    return {"ok": True, "success": True, **routed}
+    return {"ok": True, "success": True, "app_name": app_name, "sender": sender, **routed}
 
 
 def _digits_tail(value: str, n: int = 7) -> str:
