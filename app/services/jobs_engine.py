@@ -256,6 +256,14 @@ async def _job_finance_analysis(db: AsyncSession) -> dict[str, Any]:
     return {"notified": True, "month": summary["month"]}
 
 
+async def _job_mobile_watchdog(db: AsyncSession) -> dict[str, Any]:
+    """نگهبان اتصال موبایل — گوشیِ ساکت‌شده را با تلگرام هشدار می‌دهد (تکرار
+    تا وصل شدن) و برگشتنش را هم خبر می‌دهد. جزئیات در mobile_watchdog_service."""
+    from app.services.mobile_watchdog_service import watchdog_tick
+
+    return await watchdog_tick(db)
+
+
 async def _job_finance_email_scan(db: AsyncSession) -> dict[str, Any]:
     """مالیِ خودتغذیه — read the synced Gmail and keep the finance cards live
     (create a card per newly-seen account, update balances). Owner-triggerable
@@ -328,6 +336,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_email_scan", "شناساییِ حساب‌ها از ایمیل (خودتغذیه)",
      lambda: _env_minutes("FINANCE_EMAIL_SCAN_INTERVAL_MINUTES", 6 * 60.0),
      _job_finance_email_scan),
+    ("mobile_watchdog", "نگهبان اتصال موبایل",
+     lambda: _env_minutes("MOBILE_WATCHDOG_INTERVAL_MINUTES", 15.0),
+     _job_mobile_watchdog),
     ("finance_periodic_analysis", "تحلیل دوره‌ای مالی + اطلاعیه",
      lambda: _env_minutes("FINANCE_ANALYSIS_INTERVAL_MINUTES", 24 * 60.0),
      _job_finance_analysis),

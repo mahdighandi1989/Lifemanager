@@ -8,6 +8,20 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import org.json.JSONObject
 
+/** بعد از خاموش/روشن شدن گوشی: تنظیمات (آدرس/توکن) در SharedPreferences
+ * مانده‌اند و WorkManager هم کارهای دوره‌ای را خودش برمی‌گرداند — این گیرنده
+ * فقط یک نبضِ فوری می‌فرستد تا سرور بداند گوشی برگشته است. */
+class BootReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+        val json = JSONObject()
+            .put("device", Net.deviceName(context))
+            .put("app_version", "boot")
+            .toString()
+        Net.enqueue(context, "/api/mobile/heartbeat", json)
+    }
+}
+
 /** هر SMS ورودی — پیامک بانک همان لحظه به موتور مالی برنامه می‌رسد. */
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

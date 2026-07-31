@@ -41,6 +41,17 @@ async def compose_digest(
     )
     lines: List[str] = [f"📒 گزارش روز — {today.isoformat()}"]
 
+    # قطعی موبایل — اگر همین حالا هم ادامه دارد، موضوعِ اولِ گزارش است.
+    try:
+        from app.services.mobile_watchdog_service import silent_devices
+
+        for d in await silent_devices(db, now):
+            lines.append(
+                f"⛔ قطعی موبایل: گوشی «{d['device']}» از {d['minutes']} دقیقه پیش ساکت است — اپ همراه/اینترنت را چک کن."
+            )
+    except Exception:
+        pass
+
     # تقویم: امروز باقی‌مانده + فردا
     try:
         events = (
@@ -359,6 +370,13 @@ async def collect_digest_data(
         data["finance"] = {"balances_by_currency": [], "subscriptions": []}
         data["people"] = {"reminders": [], "reminders_count": 0}
 
+    try:
+        from app.services.mobile_watchdog_service import silent_devices
+
+        data["mobile_silent"] = await silent_devices(db)
+    except Exception:
+        data["mobile_silent"] = []
+
     return data
 
 
@@ -474,6 +492,16 @@ def render_digest_html(
         for i, t in enumerate(todos)
     )
 
+    # قطعی موبایل — موضوع برجسته: تا وقتی گوشی ساکت است، بالای گزارش می‌نشیند.
+    outage_html = ""
+    for d in data.get("mobile_silent", []) or []:
+        outage_html += (
+            f'<div style="font-size:13px;color:#991b1b">📵 گوشی «{_esc(d.get("device"))}» از '
+            f'{_esc(d.get("minutes"))} دقیقه پیش هیچ سیگنالی نفرستاده است — اپ همراه یا اینترنت آن را چک کن.</div>'
+        )
+    if outage_html:
+        outage_html = section("⛔ قطعی اتصال موبایل", outage_html, color="#dc2626")
+
     tiles = (
         '<table role="presentation" width="100%" cellspacing="6" cellpadding="0" dir="rtl">'
         "<tr>"
@@ -486,6 +514,7 @@ def render_digest_html(
         + tile(data.get("inbox_pending", 0), "صندوق ورودی")
         + "</tr></table>"
     )
+    tiles = outage_html + tiles
 
     events_html = ""
     for title, key in (("امروز", "events_today"), ("فردا", "events_tomorrow")):

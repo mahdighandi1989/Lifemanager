@@ -39,6 +39,35 @@ router = APIRouter()
 
 _TOKEN_KEY = "mobile_device_token"
 
+# اپ‌هایی که محتوایشان از سیم‌کشی دیگری (آینهٔ Gmail/Calendar/Drive) کامل
+# خوانده می‌شود — اعلان‌شان فقط لاگ می‌شود تا هیچ سیگنالی دو بار شمرده نشود.
+_MIRRORED_APPS = (
+    "com.google.android.gm", "com.google.android.calendar",
+    "com.google.android.apps.docs", "com.google.android.apps.drive",
+)
+import re as _re
+
+_OTP_RE = _re.compile(r"(?i)(otp|رمز\s*(یکبار|پویا)|verification\s*code|کد\s*تایید|کد\s*ورود)")
+_PROMO_RE = _re.compile(r"(?i)(off\b|discount|تخفیف|جشنواره|اقساطی|فروش\s*ویژه|unsubscribe)")
+
+
+def _classify(sender_or_app: str, text: str) -> str:
+    """دستهٔ قطعی هر رویداد موبایل — تا در لاگ فعالیت‌ها با یک نگاه (یا با
+    جستجوی [دسته]) معلوم باشد چه بوده و بعداً به قسمتِ خودش برود:
+    mirrored | otp | promo | finance | message"""
+    blob = f"{sender_or_app}\n{text}"
+    if any(sender_or_app.startswith(p) for p in _MIRRORED_APPS):
+        return "mirrored"
+    if _OTP_RE.search(text):
+        return "otp"
+    from app.services.finance_email_scan_service import _FIN_HINT
+
+    if _FIN_HINT.search(blob):
+        return "finance"
+    if _PROMO_RE.search(text):
+        return "promo"
+    return "message"
+
 
 async def _get_token(db: AsyncSession) -> Optional[str]:
     row = (
@@ -100,27 +129,28 @@ async def ingest_sms(
     if not body:
         raise ValueError("empty sms body")
 
+    category = _classify(payload.sender, body)
     await record_activity(
         action="mobile_sms", entity_type="sms", entity_id=None,
         entity_label=payload.sender[:255],
-        detail=body[:500],
+        detail=f"[{category}] {body}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         user_id=user_id, db=db,
     )
 
     finance: dict = {"matched": False, "balances_updated": 0}
     try:
-        from app.services.finance_email_scan_service import _FIN_HINT
         from app.services.finance_ingest_service import apply_bank_message
 
-        if _FIN_HINT.search(f"{payload.sender}\n{body}"):
+        # رمز یکبارمصرف عدد دارد ولی پول نیست — به مالی نمی‌رود.
+        if category == "finance":
             finance = await apply_bank_message(
                 db, user_id=user_id, channel="sms", body=body, sender=payload.sender,
             )
     except Exception as exc:  # a weird SMS must never fail the ingest
         logger.debug("mobile sms finance apply skipped: %r", exc)
 
-    return {"ok": True, "success": True, "finance": finance}
+    return {"ok": True, "success": True, "finance": finance, "category": category}
 
 
 class NotificationPayload(BaseModel):
@@ -146,27 +176,31 @@ async def ingest_notification(
     if not text:
         raise ValueError("empty notification")
 
+    category = _classify(payload.app, text)
     await record_activity(
         action="mobile_notification", entity_type="notification", entity_id=None,
         entity_label=payload.app[:255],
-        detail=text[:500],
+        detail=f"[{category}] {text}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         user_id=user_id, db=db,
     )
 
     finance: dict = {"matched": False, "balances_updated": 0}
+    # سیم‌کشیِ ضد دوبله: اعلانِ اپ‌های Gmail/Calendar/Drive همان چیزی است که
+    # آینهٔ همگام‌سازی گوگل کامل و دقیق می‌خواند — اگر این‌جا هم به مالی
+    # بخورد، یک سیگنال دو بار حساب می‌شود. فقط لاگ می‌شود، مالی نمی‌رود.
     try:
         from app.services.finance_email_scan_service import _FIN_HINT
         from app.services.finance_ingest_service import apply_bank_message
 
-        if _FIN_HINT.search(f"{payload.app}\n{text}"):
+        if category != "mirrored" and _FIN_HINT.search(f"{payload.app}\n{text}"):
             finance = await apply_bank_message(
                 db, user_id=user_id, channel="notification", body=text, sender=payload.app,
             )
     except Exception as exc:
         logger.debug("mobile notification finance apply skipped: %r", exc)
 
-    return {"ok": True, "success": True, "finance": finance}
+    return {"ok": True, "success": True, "finance": finance, "category": category}
 
 
 class UsagePayload(BaseModel):
