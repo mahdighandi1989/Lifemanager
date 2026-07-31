@@ -85,16 +85,25 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
             }
         }
+        val a11yBtn = Button(this).apply {
+            text = "دادن دسترسی خواندن صفحه (Accessibility) — اختیاری"
+            setOnClickListener {
+                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            }
+        }
 
-        listOf(title, urlInput, tokenInput, deviceInput, saveBtn, notifBtn, usageBtn, status)
+        listOf(title, urlInput, tokenInput, deviceInput, saveBtn, notifBtn, usageBtn, a11yBtn, status)
             .forEach { root.addView(it) }
         setContentView(root)
     }
 
     private fun requestSmsPermission() {
-        if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECEIVE_SMS), 1)
-        }
+        val need = mutableListOf<String>()
+        if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED)
+            need.add(Manifest.permission.RECEIVE_SMS)
+        if (checkSelfPermission(Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED)
+            need.add(Manifest.permission.READ_CALL_LOG)
+        if (need.isNotEmpty()) ActivityCompat.requestPermissions(this, need.toTypedArray(), 1)
     }
 
     private fun sendHeartbeat() {
@@ -114,6 +123,10 @@ class MainActivity : AppCompatActivity() {
         wm.enqueueUniquePeriodicWork(
             "usage", ExistingPeriodicWorkPolicy.UPDATE,
             PeriodicWorkRequestBuilder<UsageWorker>(12, TimeUnit.HOURS).build(),
+        )
+        wm.enqueueUniquePeriodicWork(
+            "calllog", ExistingPeriodicWorkPolicy.UPDATE,
+            PeriodicWorkRequestBuilder<CallLogWorker>(1, TimeUnit.HOURS).build(),
         )
     }
 }
@@ -151,10 +164,22 @@ class UsageWorker(ctx: Context, params: androidx.work.WorkerParameters) :
                             .put("minutes", it.totalTimeInForeground / 60_000)
                     )
                 }
+            // تعداد باز کردن قفل گوشی امروز (رویدادهای USER_INTERACTION/SCREEN).
+            var unlocks = 0
+            try {
+                val events = usm.queryEvents(start, end)
+                val e = android.app.usage.UsageEvents.Event()
+                while (events.hasNextEvent()) {
+                    events.getNextEvent(e)
+                    if (e.eventType == android.app.usage.UsageEvents.Event.KEYGUARD_HIDDEN) unlocks++
+                }
+            } catch (_: Exception) {}
+
             val day = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(end)
             val json = JSONObject()
                 .put("day", day)
                 .put("apps", apps)
+                .put("unlocks", unlocks)
                 .put("device", Net.deviceName(applicationContext))
                 .toString()
             Net.enqueue(applicationContext, "/api/mobile/usage", json)

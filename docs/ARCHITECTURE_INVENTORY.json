@@ -1288,6 +1288,14 @@
           {
             "method": "GET",
             "path": "/api/mobile/apk"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/call"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/screen"
           }
         ]
       }
@@ -1619,6 +1627,15 @@
           "load_learned_edges",
           "flush_learned_edges",
           "reset_for_tests"
+        ]
+      },
+      {
+        "file": "app/services/mobile_watchdog_service.py",
+        "classes": [],
+        "functions": [
+          "watchdog_tick",
+          "silent_devices",
+          "device_last_seen"
         ]
       }
     ]

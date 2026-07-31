@@ -203,9 +203,125 @@ async def ingest_notification(
     return {"ok": True, "success": True, "finance": finance, "category": category}
 
 
+def _digits_tail(value: str, n: int = 7) -> str:
+    d = _re.sub(r"\D", "", value or "")
+    return d[-n:] if len(d) >= n else d
+
+
+async def _match_person_by_phone(db: AsyncSession, number: str):
+    """Link a call to an existing «افراد» profile by phone tail — so a call
+    lands on the RIGHT person, not a duplicate. None when no confident match."""
+    tail = _digits_tail(number)
+    if len(tail) < 5:
+        return None
+    try:
+        from app.models.person import Person
+
+        people = (await db.execute(select(Person).where(Person.phone.isnot(None)))).scalars().all()
+        for p in people:
+            if tail and tail == _digits_tail(p.phone):
+                return p
+    except Exception:
+        pass
+    return None
+
+
+class CallPayload(BaseModel):
+    number: str
+    name: Optional[str] = None
+    call_type: str = "unknown"  # incoming | outgoing | missed | rejected
+    duration_sec: int = 0
+    at: Optional[str] = None  # ISO
+    device: Optional[str] = None
+
+
+@router.post("/api/mobile/call", tags=["mobile"])
+@handle_errors
+async def ingest_call(
+    payload: CallPayload,
+    x_device_token: Optional[str] = Header(default=None),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """یک تماسِ گوشی → لاگ فعالیت، و اگر شماره در «افراد» باشد به همان فرد وصل
+    می‌شود (نه رکورد تکراری). صدای تماس منتقل نمی‌شود — اندروید آن را بسته؛ فقط
+    شماره/نوع/مدت/زمان. Idempotent بر (شماره، زمان)."""
+    await _require_device(db, x_device_token)
+    number = (payload.number or "").strip()
+    if not number:
+        raise ValueError("empty call number")
+
+    # dedup: the device re-reads the whole call log, so key on number+time.
+    import hashlib as _hashlib
+
+    ref = "call:" + _hashlib.sha1(f"{number}|{payload.at or ''}|{payload.call_type}".encode()).hexdigest()[:16]
+    from app.models.activity_log import ActivityLog
+
+    dup = (
+        await db.execute(select(ActivityLog.id).where(ActivityLog.entity_id == ref))
+    ).first()
+    if dup:
+        return {"ok": True, "success": True, "duplicate": True}
+
+    person = await _match_person_by_phone(db, number)
+    label = (payload.name or (person.name if person else None) or number)[:255]
+    verb = {"incoming": "تماس ورودی", "outgoing": "تماس خروجی",
+            "missed": "تماس بی‌پاسخ", "rejected": "تماس ردشده"}.get(payload.call_type, "تماس")
+    await record_activity(
+        action="mobile_call", entity_type="call", entity_id=ref,
+        entity_label=label,
+        detail=f"[call] {verb} — {number} — {payload.duration_sec}s",
+        context_type=("person" if person else "device"),
+        context_id=(str(person.id) if person else (payload.device or "phone")[:64]),
+        user_id=user_id, db=db,
+    )
+    return {"ok": True, "success": True, "linked_person_id": (person.id if person else None)}
+
+
+class ScreenPayload(BaseModel):
+    app: str
+    text: str
+    at: Optional[str] = None
+    device: Optional[str] = None
+
+
+@router.post("/api/mobile/screen", tags=["mobile"])
+@handle_errors
+async def ingest_screen(
+    payload: ScreenPayload,
+    x_device_token: Optional[str] = Header(default=None),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """متنِ روی صفحه (از سرویس Accessibility) → لاگ فعالیت، دسته‌بندی‌شده.
+
+    صادقانه محدود: فقط متن (نه ویدیو/صدا/عکس)، و رمز/OTP سمت سرور هم پاک می‌شود
+    (علاوه بر رد شدنِ فیلدهای رمز روی خود گوشی). حجم بالا دارد؛ throttling روی
+    گوشی انجام می‌شود و این‌جا هم متن بریده می‌شود."""
+    await _require_device(db, x_device_token)
+    text = (payload.text or "").strip()
+    if len(text) < 3:
+        raise ValueError("empty screen text")
+
+    # belt-and-suspenders redaction: never persist an OTP/verification code,
+    # even if the phone-side filter missed it.
+    redacted = _re.sub(r"\b\d{4,8}\b", "▮▮▮", text) if _OTP_RE.search(text) else text
+    category = _classify(payload.app, text)
+    await record_activity(
+        action="mobile_screen", entity_type="screen", entity_id=None,
+        entity_label=payload.app[:255],
+        detail=f"[{category}] {redacted}"[:1000],
+        context_type="device", context_id=(payload.device or "phone")[:64],
+        user_id=user_id, db=db,
+    )
+    return {"ok": True, "success": True, "category": category}
+
+
 class UsagePayload(BaseModel):
     day: str  # YYYY-MM-DD
     apps: list  # [{app, minutes}]
+    unlocks: Optional[int] = None       # دفعات باز کردن قفل گوشی
+    sessions: Optional[list] = None     # [{app, opened_at, minutes}] — بازه‌های دقیق
     device: Optional[str] = None
 
 
@@ -226,14 +342,19 @@ async def ingest_usage(
         (a for a in payload.apps if isinstance(a, dict)),
         key=lambda a: -(a.get("minutes") or 0),
     )[:20]
+    summary = {
+        "apps": top,
+        "unlocks": payload.unlocks,
+        "sessions": (payload.sessions or [])[:50],
+    }
     await record_activity(
         action="mobile_usage", entity_type="usage", entity_id=payload.day,
         entity_label=f"کارکرد موبایل {payload.day}",
-        detail=_json.dumps(top, ensure_ascii=False)[:2000],
+        detail=_json.dumps(summary, ensure_ascii=False)[:4000],
         context_type="device", context_id=(payload.device or "phone")[:64],
         user_id=user_id, db=db,
     )
-    return {"ok": True, "success": True, "recorded": len(top)}
+    return {"ok": True, "success": True, "recorded": len(top), "unlocks": payload.unlocks}
 
 
 class HeartbeatPayload(BaseModel):

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">همراه مدیریت زندگی</string>
+    <string name="a11y_desc">خواندن متنِ روی صفحه و ارسال به سرورِ خودت (اختیاری — می‌توانی خاموشش کنی).</string>
 </resources>

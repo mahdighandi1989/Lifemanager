@@ -213,3 +213,69 @@ def test_watchdog_alerts_on_silence_and_clears_on_return(api_client, monkeypatch
     )
     res4 = asyncio.run(_run())
     assert res4["all_clear"] == 1 and sent[-1] == "mobile_online"
+
+
+def test_call_links_to_person_and_dedupes(api_client):
+    token = _pair(api_client)
+    # a known person with a phone
+    pr = api_client.post("/api/persons", json={"name": "علی رضایی", "phone": "+971501234567"})
+    assert pr.status_code == 201, pr.text
+    call = {
+        "number": "0501234567", "call_type": "incoming", "duration_sec": 65,
+        "at": "2026-07-31T09:00:00", "device": "s24",
+    }
+    r = api_client.post("/api/mobile/call", json=call, headers={"X-Device-Token": token})
+    assert r.status_code == 200
+    body = r.json()
+    # matched by phone tail → linked to the person, not a stray record
+    assert body.get("linked_person_id") is not None
+    # same call again → deduped
+    r2 = api_client.post("/api/mobile/call", json=call, headers={"X-Device-Token": token})
+    assert r2.json().get("duplicate") is True
+    log = api_client.get("/api/activity-log", params={"action": "mobile_call"}).json()
+    assert (log.get("total") or len(log.get("items") or [])) == 1
+
+
+def test_call_requires_token(api_client):
+    _pair(api_client)
+    r = api_client.post("/api/mobile/call", json={"number": "123"})
+    assert r.status_code == 401
+
+
+def test_screen_text_is_categorized_and_otp_redacted(api_client):
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/screen",
+        json={"app": "org.telegram.messenger", "text": "پروفایل: مریم — سلام خوبی",
+              "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200 and r.json()["category"] in ("message", "promo", "finance")
+
+    # an OTP visible on screen must be redacted before it is stored
+    r2 = api_client.post(
+        "/api/mobile/screen",
+        json={"app": "com.bank.app", "text": "کد تایید شما 123456 است", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    assert r2.status_code == 200
+    log = api_client.get("/api/activity-log", params={"action": "mobile_screen"}).json()
+    joined = " ".join(i.get("detail", "") for i in (log.get("items") or []))
+    assert "123456" not in joined and "▮▮▮" in joined
+
+
+def test_screen_requires_token(api_client):
+    _pair(api_client)
+    r = api_client.post("/api/mobile/screen", json={"app": "x", "text": "hello world"})
+    assert r.status_code == 401
+
+
+def test_usage_records_unlocks(api_client):
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/usage",
+        json={"day": "2026-07-31", "device": "s24", "unlocks": 42,
+              "apps": [{"app": "org.telegram", "minutes": 30}]},
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200 and r.json()["unlocks"] == 42
