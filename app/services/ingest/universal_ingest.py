@@ -243,6 +243,7 @@ async def _feed_finance(
             balance=balance, currency=currency, kind=kind, source="attachment",
             source_ref=source_ref, occurred_iso=(occurred_iso or (det or {}).get("date") or fields.get("date")),
             provider_name=provider,
+            evidence=(det or {}).get("evidence"),
         )
         # ریزِ گردش: the per-transaction lines, attached to the card the signal
         # resolved to. Only ever recorded against a REAL card — parsed lines

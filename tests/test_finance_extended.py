@@ -87,7 +87,9 @@ def test_sms_listener_parses_persian_balance():
 
     parsed = parse_sms("بانك ملت: موجودی: 12,500,000 ریال")
     assert parsed.balance == 12_500_000.0
-    assert parsed.currency in ("ریال", "RIAL")
+    # 2026-07-30: the currency comes back CANONICAL (IRR) so the finance
+    # engine's cross-currency guard compares like with like.
+    assert parsed.currency in ("ریال", "RIAL", "IRR")
 
 
 def test_sms_listener_parses_withdrawal_direction():

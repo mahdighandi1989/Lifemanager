@@ -411,6 +411,7 @@ async def apply_account_signal(
     occurred_iso: Optional[str] = None,
     provider_name: Optional[str] = None,
     trusted: bool = False,
+    evidence: Optional[str] = None,
 ) -> Dict[str, Any]:
     """The ONE place a detected account becomes/updates a card — shared by the
     email-text scan AND the attachment extractor, so both reconcile onto the
@@ -472,6 +473,10 @@ async def apply_account_signal(
         }
         if iban:
             extra["iban"] = iban
+        if evidence:
+            # provenance: the exact sentence this number was read from, shown
+            # on the card so a wrong figure is EXPLAINABLE, not a mystery.
+            extra["balance_evidence"] = str(evidence)[:220]
         base = (provider_name or institution or (iban or account_ref) or "حساب")
         name = base if not account_ref else f"{base} {account_ref}"
         acc = FinancialAccount(
@@ -504,6 +509,12 @@ async def apply_account_signal(
             is_newer = False
         else:
             is_newer = occurred_iso is None or last_at is None or occurred_iso >= last_at
+        # A balance the OWNER typed by hand is the ground truth: only a signal
+        # dated AFTER his edit may move it (2026-07-30 — «همه موجودی‌ها اشتباهه»
+        # must end with a number he can pin down himself).
+        owner_at = extra.get("owner_balance_at")
+        if owner_at and (occurred_iso is None or occurred_iso <= owner_at):
+            bal = None
         # Same rule on UPDATE: a machine-parsed negative is a P/L, not a balance,
         # and a ZERO is a dormant-account/rewards notice — neither may overwrite
         # a real balance the owner can see (he edits a true zero himself).
@@ -543,6 +554,8 @@ async def apply_account_signal(
                     extra["account_ref"] = account_ref
                 if iban and not extra.get("iban"):
                     extra["iban"] = iban
+                if evidence:
+                    extra["balance_evidence"] = str(evidence)[:220]
                 acc.extra = json.dumps(extra, ensure_ascii=False)
                 updated = 1
     return {"created": created, "updated": updated, "account_id": acc.id}
@@ -591,6 +604,7 @@ async def scan_finance_emails(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
                 kind=_kind(text), source="email",
                 source_ref=f"email:{e.id}",
                 occurred_iso=(e.received_at.isoformat() if e.received_at else None),
+                evidence=getattr(parsed, "raw_match", None),
             )
             created += res["created"]
             updated += res["updated"]
@@ -659,6 +673,9 @@ def account_public_extra(acc: FinancialAccount) -> Dict[str, Any]:
         "account_ref": e.get("account_ref"),
         "iban": e.get("iban"),
         "last_email_at": e.get("last_email_at"),
+        # provenance + owner override — «این عدد از کجا آمد» and «من خودم گفتم»
+        "balance_evidence": e.get("balance_evidence"),
+        "owner_balance_at": e.get("owner_balance_at"),
         # An archived card is history, not a live account (the imported Excel
         # sheet from before the system existed). Kept in full, filed apart.
         "archived": bool(e.get("archived")),

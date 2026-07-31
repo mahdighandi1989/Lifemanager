@@ -73,7 +73,24 @@ function MovementLine({ m }) {
   );
 }
 
-function AccountRow({ account, onDelete }) {
+function AccountRow({ account, onDelete, onEdited }) {
+  // «این عدد از کجا آمد» + اصلاح دستی — عددِ خودِ مالک همیشه برنده است.
+  const fixBalance = async () => {
+    // eslint-disable-next-line no-alert
+    const raw = window.prompt(
+      `موجودی درست «${account.name}» به ${account.currency || ''}؟`,
+      String(account.balance ?? ''),
+    );
+    if (raw === null || raw.trim() === '') return;
+    const value = Number(raw.replace(/[,٬\s]/g, ''));
+    if (Number.isNaN(value) || value < 0) return;
+    try {
+      await api.put(`/finance/accounts/${account.id}`, { balance: value });
+      if (onEdited) onEdited();
+    } catch {
+      // خطا در ذخیره — کارت دست‌نخورده می‌ماند
+    }
+  };
   const movements = account.movements || [];
   // ریزِ گردش (2026-07-25): the card previews the last few movements; the full
   // ledger is one click away and loads on demand — «از این حساب چه چیزی در
@@ -104,10 +121,27 @@ function AccountRow({ account, onDelete }) {
       <AccountCard account={account} />
       {(movements.length > 0 || onDelete) && (
         <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 space-y-0.5" dir="rtl">
+          {/* شفافیت: منبعِ دقیق عدد موجودی، تا «چرا این عدد؟» بی‌جواب نماند */}
+          {(account.balance_evidence || account.owner_balance_at) && (
+            <p className="text-[10px] text-gray-400" data-testid={`account-evidence-${account.id}`}>
+              {account.owner_balance_at
+                ? '✍️ موجودی را خودت تنظیم کرده‌ای — فقط سیگنالِ جدیدتر می‌تواند عوضش کند'
+                : <>خوانده‌شده از: <span dir="ltr">«{account.balance_evidence}»</span></>}
+            </p>
+          )}
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] font-medium text-gray-500">
               {movements.length > 0 ? 'آخرین تغییرها:' : ''}
             </p>
+            <button
+              type="button"
+              data-testid={`account-fix-balance-${account.id}`}
+              onClick={fixBalance}
+              className="text-[11px] text-blue-600 hover:underline"
+              title="موجودی درست را خودت وارد کن — عدد تو همیشه بر حدس ماشین مقدم است"
+            >
+              ✍️ اصلاح موجودی
+            </button>
             {onDelete && (
               <button
                 type="button"
@@ -404,6 +438,32 @@ function BudgetPage({ embedded = false }) {
             >
               {cleaning ? 'در حال پاک‌سازی…' : '🧹 پاک‌سازیِ کارت‌های اشتباه'}
             </button>
+            <button
+              type="button"
+              data-testid="finance-rebuild-cards"
+              onClick={async () => {
+                // eslint-disable-next-line no-alert
+                if (!window.confirm(
+                  'همهٔ کارت‌های ماشینی پاک و با موتورِ دقیقِ جدید از نو ساخته می‌شوند. کارت‌هایی که خودت ساخته‌ای دست نمی‌خورند. ادامه؟',
+                )) return;
+                setScanMsg(null);
+                try {
+                  const res = await api.post('/finance/rebuild-auto-cards');
+                  const d = res.data || {};
+                  setScanMsg(
+                    `♻️ ${d.removed ?? 0} کارت ماشینی پاک شد و ${d.created ?? 0} کارت با موتور جدید ساخته شد.` +
+                    ' برای فایل‌ها/پیوست‌ها «بازخوانی عمیق» را هم بزن.',
+                  );
+                  loadAccounts();
+                } catch {
+                  setScanMsg('بازتولید ناموفق بود.');
+                }
+              }}
+              className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100"
+              title="موجودی‌های غلطِ ثبت‌شده با موتور قدیمی؟ همه را پاک کن و بگذار موتور جدید از نو و درست بسازد"
+            >
+              ♻️ بازتولید از نو (اصلاح موجودی‌های غلط)
+            </button>
           </div>
         </div>
         {scanMsg && (
@@ -571,7 +631,9 @@ function BudgetPage({ embedded = false }) {
               هنوز حسابی ثبت نشده است.
             </div>
           ) : (
-            liveAccounts.map((a) => <AccountRow key={a.id} account={a} onDelete={deleteAccount} />)
+            liveAccounts.map((a) => (
+              <AccountRow key={a.id} account={a} onDelete={deleteAccount} onEdited={loadAccounts} />
+            ))
           )}
         </div>
 

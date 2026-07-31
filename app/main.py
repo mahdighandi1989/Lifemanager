@@ -73,6 +73,7 @@ from app.routes import (
     users,
     webhook,
     writings,
+    mobile,
 )
 
 # Configure logging
@@ -945,6 +946,9 @@ app.include_router(directives.router, tags=["directives"])
 app.include_router(assistant_chat.router, tags=["ai"])
 app.include_router(global_search.router, tags=["search"])
 app.include_router(system_map.router, tags=["system-map"])
+# نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
+# heartbeat, device-token gated). Absolute /api/mobile/* paths.
+app.include_router(mobile.router, tags=["mobile"])
 
 
 # ── Telegram webhook self-heal supervisor ────────────────────────────────────

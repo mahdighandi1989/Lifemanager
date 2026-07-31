@@ -187,6 +187,7 @@ def parse_finance_fields(text: str, *, provider_hint: Optional[str] = None) -> O
             "iban": iban,
             "balance": balance,
             "currency": currency,
+            "evidence": getattr(parsed, "raw_match", None),
         }
     except Exception as exc:
         logger.debug("parse_finance_fields failed: %r", exc)

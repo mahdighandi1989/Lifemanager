@@ -258,6 +258,47 @@ def test_delete_endpoint_tombstones_and_clear_restores(api_client):
     assert api_client.get("/api/finance/tombstones").json()["tombstones"] == []
 
 
+@pytest.mark.asyncio
+async def test_owner_pinned_balance_blocks_older_machine_signals(db_session):
+    """owner_balance_at is the ground truth: only a signal dated AFTER the
+    owner's manual edit may move the number; provenance is recorded."""
+    import json as _json
+
+    await fs.apply_account_signal(
+        db_session, 0, institution="fab", account_ref="••4006",
+        balance=100, currency="AED", source="email", source_ref="email:e1",
+        occurred_iso="2026-07-01T00:00:00",
+        evidence="Available Balance: AED 100.00",
+    )
+    await db_session.commit()
+    acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
+    extra = _json.loads(acc.extra)
+    assert extra["balance_evidence"] == "Available Balance: AED 100.00"
+
+    # owner pins the truth
+    extra["owner_balance_at"] = "2026-07-10T00:00:00"
+    acc.extra = _json.dumps(extra)
+    acc.balance = 465.44
+    await db_session.commit()
+
+    # an older signal is refused…
+    old = await fs.apply_account_signal(
+        db_session, 0, institution="fab", account_ref="••4006",
+        balance=999, currency="AED", source="email", source_ref="email:e2",
+        occurred_iso="2026-07-05T00:00:00",
+    )
+    assert old["updated"] == 0
+    assert float((await db_session.execute(select(FinancialAccount))).scalars().one().balance) == 465.44
+
+    # …a NEWER one still lands (the feed keeps living).
+    new = await fs.apply_account_signal(
+        db_session, 0, institution="fab", account_ref="••4006",
+        balance=500, currency="AED", source="email", source_ref="email:e3",
+        occurred_iso="2026-07-20T00:00:00",
+    )
+    assert new["updated"] == 1
+
+
 # ── Phase 3: bookkeeping ────────────────────────────────────────────────────
 
 @pytest.mark.asyncio

@@ -94,6 +94,10 @@ class FinancialAccountResponse(BaseModel):
     account_ref: Optional[str] = None
     iban: Optional[str] = None
     last_email_at: Optional[str] = None
+    # شفافیت (2026-07-30): the sentence the balance was read from + the moment
+    # the owner pinned it by hand (his number always wins over older signals).
+    balance_evidence: Optional[str] = None
+    owner_balance_at: Optional[str] = None
     updated_at: Optional[datetime] = None
     # «از این حساب چه چیزی در فلان تاریخ کم شد» — the recorded movements.
     movements: List[dict] = []
@@ -259,6 +263,8 @@ async def list_financial_accounts(
             source=pub["source"], inferred=pub["inferred"],
             account_ref=pub["account_ref"], iban=pub["iban"],
             last_email_at=pub["last_email_at"], updated_at=a.updated_at,
+            balance_evidence=pub.get("balance_evidence"),
+            owner_balance_at=pub.get("owner_balance_at"),
             movements=await account_movements(db, a.id),
             txn_count=int(count),
             archived=pub.get("archived", False),
@@ -321,6 +327,132 @@ async def delete_financial_account(
     return {
         "ok": True, "success": True, "deleted": True, "tombstoned": True,
         "name": name, "transactions_removed": len(removed_txns),
+    }
+
+
+class FinancialAccountUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, max_length=255)
+    institution: Optional[str] = Field(default=None, max_length=255)
+    currency: Optional[str] = Field(default=None, max_length=8)
+    balance: Optional[Decimal] = None
+
+
+@router.put("/api/finance/accounts/{account_id}", response_model=FinancialAccountResponse)
+@handle_errors
+async def update_financial_account(
+    account_id: int,
+    payload: FinancialAccountUpdate = Body(...),
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+):
+    """اصلاح دستی کارت — و مهم‌تر: موجودی‌ای که مالک خودش وارد کند حقیقتِ
+    نهایی است؛ فقط سیگنالی با تاریخِ جدیدتر از این لحظه می‌تواند حرکتش دهد
+    (`owner_balance_at` در apply_account_signal)."""
+    import json as _json
+    from datetime import datetime as _dt, timezone as _tz
+
+    from app.services.inbox_service import scope_filter
+
+    acc = (
+        await db.execute(
+            select(FinancialAccount).where(
+                FinancialAccount.id == account_id,
+                scope_filter(FinancialAccount.user_id, user_id),
+            )
+        )
+    ).scalars().first()
+    if acc is None:
+        raise HTTPException(status_code=404, detail="Account not found")
+    if payload.name is not None:
+        acc.name = payload.name
+    if payload.institution is not None:
+        acc.institution = payload.institution
+    if payload.currency is not None:
+        acc.currency = payload.currency.upper()
+    if payload.balance is not None:
+        if payload.balance < 0:
+            raise ValueError("موجودی منفی را فقط در توضیحات ثبت کن — کارت منفی نمی‌شود")
+        acc.balance = payload.balance
+        try:
+            extra = _json.loads(acc.extra or "{}")
+        except Exception:
+            extra = {}
+        extra["owner_balance_at"] = _dt.now(_tz.utc).isoformat()
+        extra["balance_evidence"] = "تنظیم دستی مالک"
+        acc.extra = _json.dumps(extra, ensure_ascii=False)
+    await db.commit()
+    await db.refresh(acc)
+    await record_activity(
+        action="update", entity_type="account", entity_id=acc.id,
+        entity_label=acc.name, detail="اصلاح دستی کارت/موجودی توسط مالک",
+        user_id=user_id, db=db,
+    )
+    from app.services.finance_email_scan_service import account_public_extra
+
+    pub = account_public_extra(acc)
+    return FinancialAccountResponse(
+        id=acc.id, user_id=acc.user_id, name=acc.name, kind=acc.kind,
+        institution=acc.institution, currency=acc.currency, balance=acc.balance,
+        source=pub["source"], inferred=pub["inferred"],
+        account_ref=pub["account_ref"], iban=pub["iban"],
+        last_email_at=pub["last_email_at"], updated_at=acc.updated_at,
+        balance_evidence=pub.get("balance_evidence"),
+        owner_balance_at=pub.get("owner_balance_at"),
+        archived=pub.get("archived", False),
+    )
+
+
+@router.post("/api/finance/rebuild-auto-cards")
+@handle_errors
+async def rebuild_auto_cards(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """«از نو بساز»: the escape from balances the OLD engine wrote wrong.
+
+    Deletes every machine-created card (``extra.inferred``) together with its
+    machine transactions — manual cards untouched — then re-runs the email
+    scan with the CURRENT precise engine. Tombstones are respected (a card
+    the owner declared «این حساب من نیست» stays gone) and NO tombstone is
+    added here: this is machine cleanup, not an owner verdict. For
+    attachment-based cards, run «بازخوانی عمیق» afterwards — the self-heal
+    re-applies each file through the new engine too."""
+    from sqlalchemy import delete as _delete
+
+    from app.services import finance_email_scan_service as _fs
+    from app.services.inbox_service import scope_filter
+
+    accounts = (
+        await db.execute(
+            select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
+        )
+    ).scalars().all()
+    removed = []
+    for acc in accounts:
+        try:
+            import json as _json
+
+            inferred = bool(_json.loads(acc.extra or "{}").get("inferred"))
+        except Exception:
+            inferred = False
+        if not inferred:
+            continue
+        removed.append(acc.name)
+        await db.execute(_delete(Transaction).where(Transaction.account_id == acc.id))
+        await db.delete(acc)
+    await db.commit()
+
+    summary = await _fs.scan_finance_emails(db, user_id)
+    await record_activity(
+        action="rebuild", entity_type="account", entity_id=None,
+        entity_label="بازتولید کارت‌های خودکار",
+        detail=f"{len(removed)} کارت ماشینی پاک و از نو ساخته شد ({summary.get('created', 0)} کارت تازه)",
+        user_id=user_id, db=db,
+    )
+    return {
+        "ok": True, "success": True,
+        "removed": len(removed), "removed_names": removed[:20],
+        **{k: summary.get(k, 0) for k in ("scanned", "financial", "created", "updated")},
     }
 
 

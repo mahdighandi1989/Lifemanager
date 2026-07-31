@@ -703,6 +703,14 @@
           {
             "method": "POST",
             "path": "/api/finance/owner-accounts"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/finance/accounts/{account_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/api/finance/rebuild-auto-cards"
           }
         ]
       },
@@ -1243,6 +1251,35 @@
           {
             "method": "POST",
             "path": "/api/system-map/wires"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/mobile.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/mobile/token"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/sms"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/notification"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/usage"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/heartbeat"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/status"
           }
         ]
       }

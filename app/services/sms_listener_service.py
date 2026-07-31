@@ -24,13 +24,15 @@ class ParsedSms:
 
 
 class SmsListenerService:
-    """Parse a single bank SMS body into structured balance/movement data."""
+    """Parse a single bank SMS body into structured balance/movement data.
 
-    _BALANCE_RE = re.compile(
-        r"(?:موجودی|balance|بالانس)\s*(?:is|:|：)?\s*"
-        r"([\d,]+(?:\.\d+)?)\s*(ریال|تومان|RIAL|USD|EUR|\$)?",
-        re.IGNORECASE,
-    )
+    2026-07-30: the balance half DELEGATES to the (hardened) email parser so
+    SMS and email read numbers identically — Persian/Arabic digits and the
+    «٬» separator included; «موجودی: ۱۲٬۵۰۰٬۰۰۰ ریال» used to parse as 12.0
+    here. Currency comes back CANONICAL (IRR, not «ریال») so the
+    cross-currency guard in apply_bank_message compares like with like.
+    """
+
     _AMOUNT_RE = re.compile(
         r"(?P<dir>برداشت|واریز|withdraw\w*|deposit\w*|debit|credit)"
         r"\D{0,20}?([\d,]+(?:\.\d+)?)",
@@ -40,14 +42,13 @@ class SmsListenerService:
 
     def parse_sms(self, sms_body: str) -> ParsedSms:
         """Return the balance + any single movement found in ``sms_body``."""
-        body = sms_body or ""
+        from app.services.email_parser_service import _DIGITS, parse_balance
 
-        balance: Optional[float] = None
-        currency: Optional[str] = None
-        bal = self._BALANCE_RE.search(body)
-        if bal:
-            balance = float(bal.group(1).replace(",", ""))
-            currency = bal.group(2)
+        body = (sms_body or "").translate(_DIGITS)
+
+        parsed = parse_balance(body)
+        balance: Optional[float] = parsed.balance
+        currency: Optional[str] = parsed.currency
 
         amount: Optional[float] = None
         direction: Optional[str] = None
@@ -57,13 +58,12 @@ class SmsListenerService:
             kw = mov.group("dir").lower()
             direction = "debit" if any(w in kw for w in self._DEBIT_WORDS) else "credit"
 
-        matched = bal or mov
         return ParsedSms(
             balance=balance,
             currency=currency,
             amount=amount,
             direction=direction,
-            raw_match=matched.group(0) if matched else None,
+            raw_match=parsed.raw_match or (mov.group(0) if mov else None),
         )
 
 
