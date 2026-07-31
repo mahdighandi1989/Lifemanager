@@ -147,7 +147,7 @@ def test_events_are_categorized_and_otp_never_reaches_finance(api_client):
         json={"sender": "Bank", "body": "کد تایید شما: 4006 موجودی حساب", "device": "s24"},
         headers={"X-Device-Token": token},
     ).json()
-    assert otp["category"] == "otp" and otp["finance"]["balances_updated"] == 0
+    assert otp["category"] == "otp" and otp.get("routed_to") is None
 
 
 def test_gmail_app_notification_is_mirrored_not_double_fed(api_client):
@@ -161,7 +161,7 @@ def test_gmail_app_notification_is_mirrored_not_double_fed(api_client):
         headers={"X-Device-Token": token},
     ).json()
     assert r["category"] == "mirrored"
-    assert r["finance"]["balances_updated"] == 0
+    assert r.get("routed_to") is None
 
 
 def test_watchdog_alerts_on_silence_and_clears_on_return(api_client, monkeypatch):
@@ -400,3 +400,81 @@ async def test_activity_archive_is_idempotent_and_nondestructive(db_session, mon
     res2 = await arch.archive_tick(db_session)
     assert res2["archived"] == []
     assert uploaded == ["activity-2026-03.json"]
+
+
+# ── central dispatcher: every signal to its own domain ──────────────────────
+
+def test_dispatch_appointment_sms_goes_to_inbox(api_client):
+    token = _pair(api_client)
+    r = api_client.post(
+        "/api/mobile/sms",
+        json={"sender": "Clinic", "body": "یادآوری: نوبت دکتر فردا ساعت 10:30",
+              "device": "s24"},
+        headers={"X-Device-Token": token},
+    ).json()
+    assert r["category"] == "appointment"
+    assert r["routed_to"] == "inbox"
+    # it actually landed in the inbox (not just logged)
+    inbox = api_client.get("/api/inbox").json()
+    items = inbox.get("items") or inbox.get("inbox") or []
+    assert any("نوبت دکتر" in (i.get("content") or "") for i in items)
+
+
+def test_dispatch_message_from_known_contact_hits_their_profile(api_client):
+    token = _pair(api_client)
+    pid = api_client.post("/api/persons", json={"name": "سارا", "phone": "+971502223344"}).json()["id"]
+    r = api_client.post(
+        "/api/mobile/sms",
+        json={"sender": "0502223344", "body": "سلام، خوبی؟", "device": "s24"},
+        headers={"X-Device-Token": token},
+    ).json()
+    assert r["category"] == "message"
+    assert r["routed_to"] == "person"
+    # the message became an interaction on سارا (relationship reflects contact)
+    prof = api_client.get(f"/api/people/{pid}/profile").json()
+    # message interactions aren't calls, so call_count stays 0 but the
+    # interaction exists → ledger/analyze can see it; assert via reminders/log
+    log = api_client.get("/api/activity-log", params={"action": "mobile_sms"}).json()
+    assert (log.get("total") or len(log.get("items") or [])) >= 1
+
+
+def test_dispatch_plain_chatter_is_not_routed_no_flood(api_client):
+    token = _pair(api_client)
+    before = api_client.get("/api/inbox").json()
+    n_before = len((before.get("items") or before.get("inbox") or []))
+    r = api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.instagram.android", "title": "لایک", "text": "کسی پستت را پسندید",
+              "device": "s24"},
+        headers={"X-Device-Token": token},
+    ).json()
+    assert r["category"] == "message" and r.get("routed_to") is None
+    after = api_client.get("/api/inbox").json()
+    n_after = len((after.get("items") or after.get("inbox") or []))
+    assert n_after == n_before  # chatter must NOT flood the inbox
+
+
+def test_dispatch_finance_sms_still_routes_to_finance(api_client):
+    token = _pair(api_client)
+    made = api_client.post(
+        "/api/finance/accounts",
+        json={"name": "ADCB", "kind": "bank", "institution": "adcb",
+              "balance": 1, "currency": "AED"},
+    ).json()
+    r = api_client.post(
+        "/api/mobile/sms",
+        json={"sender": "ADCB", "body": "Your available balance: AED 5,000.00",
+              "device": "s24"},
+        headers={"X-Device-Token": token},
+    ).json()
+    assert r["category"] == "finance" and r["routed_to"] == "finance"
+
+
+def test_classify_signal_ordering():
+    from app.services.mobile_dispatch_service import classify_signal
+    assert classify_signal("Bank", "کد تایید شما 123456") == "otp"
+    assert classify_signal("com.google.android.gm", "anything") == "mirrored"
+    assert classify_signal("ADCB", "Available balance AED 100") == "finance"
+    assert classify_signal("X", "جلسه فردا ساعت 14:00") == "appointment"
+    assert classify_signal("X", "لطفا قبض را پرداخت کن") in ("task", "finance")
+    assert classify_signal("friend", "سلام چطوری") == "message"

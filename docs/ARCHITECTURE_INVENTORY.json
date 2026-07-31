@@ -1657,6 +1657,14 @@
           "archive_tick",
           "get_archive_status"
         ]
+      },
+      {
+        "file": "app/services/mobile_dispatch_service.py",
+        "classes": [],
+        "functions": [
+          "classify_signal",
+          "dispatch_signal"
+        ]
       }
     ]
   },

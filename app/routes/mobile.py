@@ -129,29 +129,27 @@ async def ingest_sms(
     if not body:
         raise ValueError("empty sms body")
 
-    category = _classify(payload.sender, body)
+    import hashlib as _h
+
+    ref = "sms:" + _h.sha1(f"{payload.sender}|{body}|{payload.received_at or ''}".encode()).hexdigest()[:16]
+    # مسیریابِ مرکزی: طبقه‌بندی + هدایت به دامنهٔ درست (مالی/فرد/صندوق) — «هر
+    # داده به جای خودش». راه‌اندازیِ تک‌تکِ نوع‌ها این‌جا نیست؛ یک درگاه است.
+    from app.services import mobile_dispatch_service as dispatch
+
+    routed = await dispatch.dispatch_signal(
+        db, user_id, source="sms", sender=payload.sender, text=body,
+        occurred_at=payload.received_at, device=payload.device, source_ref=ref,
+    )
+    category = routed.get("category", "message")
     await record_activity(
         action="mobile_sms", entity_type="sms", entity_id=None,
         entity_label=payload.sender[:255],
-        detail=f"[{category}] {body}"[:500],
+        detail=f"[{category}→{routed.get('routed_to') or '—'}] {body}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         occurred_at=payload.received_at,
         user_id=user_id, db=db,
     )
-
-    finance: dict = {"matched": False, "balances_updated": 0}
-    try:
-        from app.services.finance_ingest_service import apply_bank_message
-
-        # رمز یکبارمصرف عدد دارد ولی پول نیست — به مالی نمی‌رود.
-        if category == "finance":
-            finance = await apply_bank_message(
-                db, user_id=user_id, channel="sms", body=body, sender=payload.sender,
-            )
-    except Exception as exc:  # a weird SMS must never fail the ingest
-        logger.debug("mobile sms finance apply skipped: %r", exc)
-
-    return {"ok": True, "success": True, "finance": finance, "category": category}
+    return {"ok": True, "success": True, **routed}
 
 
 class NotificationPayload(BaseModel):
@@ -177,34 +175,27 @@ async def ingest_notification(
     if not text:
         raise ValueError("empty notification")
 
-    category = _classify(payload.app, text)
+    import hashlib as _h
+
+    ref = "notif:" + _h.sha1(f"{payload.app}|{text}|{payload.posted_at or ''}".encode()).hexdigest()[:16]
+    from app.services import mobile_dispatch_service as dispatch
+
+    routed = await dispatch.dispatch_signal(
+        db, user_id, source="notification", sender=payload.app, text=text,
+        occurred_at=payload.posted_at, device=payload.device, source_ref=ref,
+    )
+    category = routed.get("category", "message")
     await record_activity(
         # entity_type مجزا از «notification» درون‌برنامه‌ای تا با آن اشتباه/
         # لینک نشود (اعلان گوشی ≠ اعلان مرکز اعلان‌ها).
         action="mobile_notification", entity_type="phone_notification", entity_id=None,
         entity_label=payload.app[:255],
-        detail=f"[{category}] {text}"[:500],
+        detail=f"[{category}→{routed.get('routed_to') or '—'}] {text}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         occurred_at=payload.posted_at,
         user_id=user_id, db=db,
     )
-
-    finance: dict = {"matched": False, "balances_updated": 0}
-    # سیم‌کشیِ ضد دوبله: اعلانِ اپ‌های Gmail/Calendar/Drive همان چیزی است که
-    # آینهٔ همگام‌سازی گوگل کامل و دقیق می‌خواند — اگر این‌جا هم به مالی
-    # بخورد، یک سیگنال دو بار حساب می‌شود. فقط لاگ می‌شود، مالی نمی‌رود.
-    try:
-        from app.services.finance_email_scan_service import _FIN_HINT
-        from app.services.finance_ingest_service import apply_bank_message
-
-        if category != "mirrored" and _FIN_HINT.search(f"{payload.app}\n{text}"):
-            finance = await apply_bank_message(
-                db, user_id=user_id, channel="notification", body=text, sender=payload.app,
-            )
-    except Exception as exc:
-        logger.debug("mobile notification finance apply skipped: %r", exc)
-
-    return {"ok": True, "success": True, "finance": finance, "category": category}
+    return {"ok": True, "success": True, **routed}
 
 
 def _digits_tail(value: str, n: int = 7) -> str:
