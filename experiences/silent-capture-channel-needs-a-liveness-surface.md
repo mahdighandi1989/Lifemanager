@@ -78,8 +78,23 @@ that report on the page where the user notices the absence.
   signs each build with a throwaway key, every update silently disarms the app.
   Ship a stable signing key, and warn that a one-time uninstall/reinstall is
   needed when the key changes.
-- **`last_at` must come from the event's own timestamp**, not the row-insert
-  time, or an offline queue that drains later makes a dead channel look alive.
+- **Liveness must be measured with the server-receive time, not the event's own
+  timestamp.** These are different clocks and picking the wrong one inverts the
+  answer. A channel whose worker is healthy but ships week-old records (a call
+  log, a backfill) looks dead if you rank by event time; the receive time
+  correctly says "this channel is reporting". Show the event time to the user,
+  but compute `silent` from when you heard from it.
+- **Three-way status is not optional — it is the whole feature.** A first
+  version here graded `ok` whenever the lifetime count was above zero, which
+  meant a channel that worked and then died stayed green forever: it could not
+  detect the exact failure it was built for. Grade against a *window*, per
+  channel, with a period matched to that channel's natural rhythm.
+- **A dead device must not be reported as five dead channels.** If the agent
+  itself has stopped reporting, per-channel verdicts are noise. Add an
+  `unknown` state gated on the agent's own liveness and say so plainly.
+- **A grant report beats any inference.** Once the device sends its actual
+  permission state, `off` replaces guesswork entirely — keep the inferred
+  `silent` only as the fallback for clients too old to report.
 - **Don't alert on a channel that legitimately idles.** Pick the silence window
   per channel (a heartbeat every 15 min ≠ a call log that can be empty for days),
   and only alert on `silent`, never on `never`.

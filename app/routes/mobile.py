@@ -20,7 +20,8 @@ content hash, currency-mismatch refused, synthetic delta marked).
 import hmac
 import logging
 import secrets
-from typing import List, Optional
+import datetime as _dtm
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
@@ -421,6 +422,51 @@ class HeartbeatPayload(BaseModel):
     device: str
     battery: Optional[int] = None
     app_version: Optional[str] = None
+    # وضعیتِ زندهٔ دسترسی‌های گوشی (کلاینتِ ۲۰۲۶-۰۷-۳۱ به بعد؛ اختیاری، پس
+    # اپِ قدیمی دقیقاً مثل قبل کار می‌کند). با این، «مجرای خاموش» تشخیص است
+    # نه حدس: اندروید «Notification access» را با هر نصبِ مجدد باطل می‌کند و
+    # تا امروز هیچ‌کس خبردار نمی‌شد.
+    perms: Optional[Dict[str, bool]] = None
+
+
+_PERMS_KEY = "mobile_device_perms"
+
+
+async def _save_device_perms(db: AsyncSession, device: str, perms: Dict[str, bool]) -> None:
+    """آخرین وضعیتِ دسترسی‌های هر دستگاه در global_settings (بدون جدول تازه)."""
+    import json as _json
+
+    row = (
+        await db.execute(select(GlobalSetting).where(GlobalSetting.key == _PERMS_KEY))
+    ).scalar_one_or_none()
+    try:
+        state = _json.loads(row.value) if row and row.value else {}
+    except Exception:
+        state = {}
+    state[device[:64]] = {
+        "perms": {str(k)[:32]: bool(v) for k, v in list(perms.items())[:20]},
+        "at": _dtm.datetime.now(_dtm.timezone.utc).isoformat(),
+    }
+    # سقف، تا یک دستگاهِ عوضی نتواند این کلید را بی‌نهایت بزرگ کند.
+    if len(state) > 50:
+        state = dict(sorted(state.items(), key=lambda kv: kv[1].get("at") or "")[-50:])
+    payload = _json.dumps(state, ensure_ascii=False)
+    if row is None:
+        db.add(GlobalSetting(key=_PERMS_KEY, value=payload))
+    else:
+        row.value = payload
+
+
+async def _load_device_perms(db: AsyncSession) -> dict:
+    import json as _json
+
+    row = (
+        await db.execute(select(GlobalSetting).where(GlobalSetting.key == _PERMS_KEY))
+    ).scalar_one_or_none()
+    try:
+        return _json.loads(row.value) if row and row.value else {}
+    except Exception:
+        return {}
 
 
 @router.post("/api/mobile/heartbeat", tags=["mobile"])
@@ -434,6 +480,11 @@ async def heartbeat(
     """«زنده‌ام» — keeps the device visible on /api/mobile/status (and, through
     the pulse middleware, on the live system diagram's mobile router card)."""
     await _require_device(db, x_device_token)
+    if payload.perms:
+        try:
+            await _save_device_perms(db, payload.device, payload.perms)
+        except Exception:  # نبض هرگز نباید سرِ گزارشِ دسترسی‌ها بیفتد
+            logger.debug("device perms not stored", exc_info=True)
     await record_activity(
         action="mobile_heartbeat", entity_type="device", entity_id=payload.device[:64],
         entity_label=payload.device[:255],
@@ -480,72 +531,135 @@ async def mobile_diagnostics(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_required_user_id),
 ) -> dict:
-    """«چرا فلان چیز ثبت نشده؟» — کانال به کانال، با راهنمای فارسی.
+    """«چرا فلان چیز ثبت نشده؟» — کانال به کانال، بدونِ حدس.
 
-    برای هر مجرای موبایل (پیامک/اعلان/تماس/کارکرد/صفحه/نبض) می‌گوید چند رویداد
-    ثبت شده و آخرینش کی بوده. کانالِ خاموش یعنی دسترسیِ آن روی گوشی داده نشده
-    (اندروید بعضی دسترسی‌ها — مخصوصاً «دسترسی به اعلان‌ها» — را با هر نصبِ
-    مجددِ اپ از نو خاموش می‌کند). این تشخیص را حدسی نمی‌گذاریم."""
+    وضعیتِ هر مجرا چهارحالته است، چون «هیچ داده‌ای نیست» چند معنیِ کاملاً
+    متفاوت دارد و یکی‌کردنشان همان چیزی بود که خرابی را ماه‌ها پنهان کرد:
+
+      * ``off``     — خودِ گوشی گزارش داده که دسترسیِ این مجرا باطل است.
+                      قطعی‌ترین تشخیص؛ حدس نیست.
+      * ``never``   — هرگز چیزی نفرستاده → احتمالاً از اول اجازه داده نشده.
+      * ``silent``  — قبلاً می‌فرستاد، حالا در بازهٔ انتظارش ساکت است → به احتمال
+                      زیاد دسترسی‌اش باطل شده (اندروید «Notification access» را
+                      با هر نصبِ مجدد باطل می‌کند). **این همان حالتی است که
+                      نسخهٔ اول نمی‌دید**: چون فقط «تعدادِ کل > صفر» را می‌سنجید،
+                      مجرایی که مُرده بود تا ابد ✅ می‌ماند.
+      * ``ok``      — تازه و سرِپا.
+
+    اگر خودِ گوشی ساکت باشد (نبض کهنه)، مجراها ``unknown`` می‌شوند: وقتی اپ
+    اصلاً وصل نیست، مقصر دانستنِ تک‌تکِ دسترسی‌ها گمراه‌کننده است.
+    """
     from sqlalchemy import func as _f
 
     from app.models.activity_log import ActivityLog
 
+    # window_h = بازه‌ای که سکوتِ بیشتر از آن، مشکوک است. برای هر مجرا با ریتمِ
+    # خودش (نبض ۳۰دقیقه‌ای، تماس ساعتی، کارکرد ۱۲ساعته) و با حاشیهٔ کافی تا
+    # نبودِ طبیعیِ داده هشدارِ الکی نسازد.
     channels = {
+        "mobile_heartbeat": {
+            "fa": "نبض دستگاه", "perm": None, "window_h": 3,
+            "hint": "اگر این هم خاموش است، اپ اصلاً به سرور وصل نیست (آدرس/توکن را چک کن).",
+        },
         "mobile_sms": {
-            "fa": "پیامک‌ها",
+            "fa": "پیامک‌ها", "perm": "sms", "window_h": 24 * 7,
             "hint": "در تنظیمات گوشی، اجازهٔ «پیامک» (SMS) را به اپ همراه بده.",
         },
         "mobile_notification": {
-            "fa": "اعلان‌های گوشی",
+            "fa": "اعلان‌های گوشی", "perm": "notification", "window_h": 24,
             "hint": (
                 "دسترسی «Notification access» را از تنظیمات گوشی به اپ همراه بده — "
                 "اندروید این دسترسی را بعد از هر نصبِ مجدد خودش خاموش می‌کند."
             ),
         },
         "mobile_call": {
-            "fa": "تماس‌ها",
+            "fa": "تماس‌ها", "perm": "call_log", "window_h": 24 * 7,
             "hint": "اجازهٔ «تاریخچهٔ تماس» (Call log) را بده؛ همگام‌سازی هر ساعت است.",
         },
         "mobile_usage": {
-            "fa": "کارکرد اپ‌ها",
+            "fa": "کارکرد اپ‌ها", "perm": "usage", "window_h": 36,
             "hint": "دسترسی «Usage access» را از تنظیمات بده؛ گزارش هر ۱۲ ساعت می‌آید.",
         },
         "mobile_screen": {
-            "fa": "متن صفحه",
+            "fa": "متن صفحه", "perm": "accessibility", "window_h": 24 * 3,
             "hint": "اختیاری — دسترسی «Accessibility» را از تنظیمات فعال کن.",
         },
-        "mobile_heartbeat": {
-            "fa": "نبض دستگاه",
-            "hint": "اگر این هم خاموش است، اپ اصلاً به سرور وصل نیست (آدرس/توکن را چک کن).",
-        },
     }
-    rows = (
-        await db.execute(
-            select(
-                ActivityLog.action,
-                _f.count(ActivityLog.id),
-                _f.max(_f.coalesce(ActivityLog.occurred_at, ActivityLog.created_at)),
-            )
-            .where(ActivityLog.action.in_(list(channels.keys())))
-            .group_by(ActivityLog.action)
-        )
-    ).all()
-    stats = {a: (int(c or 0), t) for a, c, t in rows}
+
+    now = _dtm.datetime.now(_dtm.timezone.utc)
+
+    def _aware(value):
+        if value is None:
+            return None
+        return value if value.tzinfo else value.replace(tzinfo=_dtm.timezone.utc)
+
+    async def _counts(since=None) -> dict:
+        # created_at = «کِی سرور شنید» — معیارِ درستِ زنده‌بودنِ مجرا. occurred_at
+        # زمانِ خودِ رویداد است و برای صفِ آفلاین کهنه به نظر می‌رسد؛ استفاده از
+        # آن، مجرای سالمی را که دادهٔ قدیمی می‌فرستد «خاموش» نشان می‌داد.
+        stmt = select(
+            ActivityLog.action, _f.count(ActivityLog.id), _f.max(ActivityLog.created_at)
+        ).where(ActivityLog.action.in_(list(channels.keys())))
+        if since is not None:
+            stmt = stmt.where(ActivityLog.created_at >= since)
+        rows = (await db.execute(stmt.group_by(ActivityLog.action))).all()
+        return {a: (int(c or 0), _aware(t)) for a, c, t in rows}
+
+    total = await _counts()
+    last_24h = await _counts(now - _dtm.timedelta(hours=24))
+    last_7d = await _counts(now - _dtm.timedelta(days=7))
+
+    # دسترسی‌های گزارش‌شدهٔ دستگاه‌ها (هر کلیدی که دستِ‌کم یک گوشی داده باشد،
+    # داده‌شده حساب می‌شود — چند گوشی ممکن است تنظیمات متفاوتی داشته باشند).
+    reported = await _load_device_perms(db)
+    granted: dict = {}
+    perms_seen = False
+    for entry in reported.values():
+        perms = (entry or {}).get("perms") or {}
+        if perms:
+            perms_seen = True
+        for key, value in perms.items():
+            granted[key] = bool(granted.get(key)) or bool(value)
+
+    hb_last = total.get("mobile_heartbeat", (0, None))[1]
+    device_live = bool(hb_last and (now - hb_last).total_seconds() <= 3 * 3600)
 
     out = []
     for action, meta in channels.items():
-        count, last = stats.get(action, (0, None))
+        count, last = total.get(action, (0, None))
+        perm_key = meta["perm"]
+        perm_known = perms_seen and perm_key is not None and perm_key in granted
+        status = "ok"
+        hint = None
+        if perm_known and not granted.get(perm_key):
+            status, hint = "off", meta["hint"]
+        elif count == 0:
+            status, hint = "never", meta["hint"]
+        elif last is None or (now - last).total_seconds() > meta["window_h"] * 3600:
+            if action != "mobile_heartbeat" and not device_live:
+                status = "unknown"
+                hint = "خودِ گوشی ساکت است — تا وصل نشود نمی‌شود دربارهٔ این مجرا قضاوت کرد."
+            else:
+                status = "silent"
+                hint = meta["hint"]
         out.append({
             "action": action,
             "label": meta["fa"],
             "count": count,
+            "count_24h": last_24h.get(action, (0, None))[0],
+            "count_7d": last_7d.get(action, (0, None))[0],
             "last_at": last.isoformat() if last else None,
-            "status": "ok" if count else "silent",
-            "hint": None if count else meta["hint"],
+            "window_hours": meta["window_h"],
+            "granted": granted.get(perm_key) if perm_known else None,
+            "status": status,
+            "hint": hint,
         })
     return {
         "ok": True, "success": True, "channels": out,
-        "silent": [c["label"] for c in out if c["status"] == "silent"],
+        "device_live": device_live,
+        "perms_reported": perms_seen,
+        # مجراهایی که واقعاً نیاز به کار دارند (unknown یعنی «نمی‌دانیم»، نه خرابی)
+        "silent": [c["label"] for c in out if c["status"] in ("off", "silent", "never")],
     }
 
 

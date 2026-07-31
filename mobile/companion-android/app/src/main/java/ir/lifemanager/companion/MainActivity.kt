@@ -129,11 +129,11 @@ class MainActivity : AppCompatActivity() {
 
     /** ✅/❌ برای هر دسترسی، تا خاموش‌بودنِ یکی پنهان نماند. */
     private fun refreshPermissionStatus() {
-        val sms = checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
-        val calls = checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-        val notif = isNotificationAccessGranted()
-        val usage = isUsageAccessGranted()
-        val a11y = isAccessibilityGranted()
+        val sms = Perms.sms(this)
+        val calls = Perms.callLog(this)
+        val notif = Perms.notifications(this)
+        val usage = Perms.usage(this)
+        val a11y = Perms.accessibility(this)
         fun mark(on: Boolean) = if (on) "✅" else "❌"
         permStatusView?.text = buildString {
             append("وضعیت دسترسی‌ها:\n")
@@ -146,31 +146,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun isNotificationAccessGranted(): Boolean = try {
-        val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
-        flat?.contains(packageName) == true
-    } catch (_: Exception) {
-        false
-    }
-
-    private fun isUsageAccessGranted(): Boolean = try {
-        val usm = getSystemService(Context.USAGE_STATS_SERVICE) as? android.app.usage.UsageStatsManager
-        val end = System.currentTimeMillis()
-        !(usm?.queryUsageStats(
-            android.app.usage.UsageStatsManager.INTERVAL_DAILY, end - 3600_000, end
-        ).isNullOrEmpty())
-    } catch (_: Exception) {
-        false
-    }
-
-    private fun isAccessibilityGranted(): Boolean = try {
-        val flat = Settings.Secure.getString(
-            contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        flat?.contains(packageName) == true
-    } catch (_: Exception) {
-        false
-    }
+    // خواندنِ وضعیتِ دسترسی‌ها در Perms.kt است — همان‌جایی که نبض هم از آن
+    // می‌خواند، تا صفحهٔ اپ و گزارشِ سرور هرگز دو حرفِ متفاوت نزنند.
 
     private fun requestSmsPermission() {
         val need = mutableListOf<String>()
@@ -185,6 +162,9 @@ class MainActivity : AppCompatActivity() {
         val json = JSONObject()
             .put("device", Net.deviceName(this))
             .put("app_version", "1.0")
+            // وضعیتِ دسترسی‌ها همراهِ نبض می‌رود تا سرور بتواند «مجرای خاموش»
+            // را تشخیص بدهد، نه حدس بزند.
+            .put("perms", Perms.asJson(this))
             .toString()
         Net.enqueue(this, "/api/mobile/heartbeat", json)
     }
@@ -209,7 +189,10 @@ class MainActivity : AppCompatActivity() {
 class HeartbeatWorker(ctx: Context, params: androidx.work.WorkerParameters) :
     androidx.work.CoroutineWorker(ctx, params) {
     override suspend fun doWork(): Result {
-        val json = JSONObject().put("device", Net.deviceName(applicationContext)).toString()
+        val json = JSONObject()
+            .put("device", Net.deviceName(applicationContext))
+            .put("perms", Perms.asJson(applicationContext))
+            .toString()
         Net.enqueue(applicationContext, "/api/mobile/heartbeat", json)
         return Result.success()
     }

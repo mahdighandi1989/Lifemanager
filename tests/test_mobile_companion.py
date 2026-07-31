@@ -8,6 +8,7 @@ Also here: the finance repair kit — rebuild-auto-cards, the provenance line,
 and the owner-typed balance always winning (PUT).
 """
 import pytest
+import pytest_asyncio
 
 
 def _pair(api_client) -> str:
@@ -902,3 +903,151 @@ def test_sms_from_a_known_contact_shows_the_name_in_the_log(api_client):
     )
     log = api_client.get("/api/activity-log", params={"action": "mobile_sms"}).json()
     assert any("مریم احمدی" in (i.get("entity_label") or "") for i in (log.get("items") or []))
+
+
+# ── تشخیصِ مجرای خاموش (بازنویسی ۲۰۲۶-۰۷-۳۱) ─────────────────────────────────
+# نسخهٔ اولِ /diagnostics فقط «تعدادِ کل > صفر» را می‌سنجید، پس مجرایی که کار
+# می‌کرد و بعد مُرد تا ابد ✅ می‌ماند — یعنی دقیقاً همان خرابی‌ای که قرار بود
+# بگیرد را نمی‌گرفت. این تست‌ها آن حالت را میخ می‌کنند.
+
+def _diag(api_client) -> dict:
+    r = api_client.get("/api/mobile/diagnostics")
+    assert r.status_code == 200
+    return {c["action"]: c for c in r.json()["channels"]}
+
+
+def test_diagnostics_reports_never_for_a_channel_with_no_data(api_client):
+    _pair(api_client)
+    ch = _diag(api_client)
+    assert ch["mobile_notification"]["status"] == "never"
+    assert ch["mobile_notification"]["hint"]
+    assert ch["mobile_notification"]["count_24h"] == 0
+
+
+def test_a_revoked_permission_is_reported_as_off_even_with_old_data(api_client):
+    """قلبِ ماجرا: اعلان‌ها قبلاً کار می‌کرد و اندروید دسترسی را باطل کرد.
+    داده‌های قدیمی هست، ولی وضعیت باید «باطل شده» باشد نه «فعال»."""
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.whatsapp", "title": "علی", "text": "سلام", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    # گوشی گزارش می‌دهد: دسترسیِ اعلان باطل شده
+    api_client.post(
+        "/api/mobile/heartbeat",
+        json={"device": "s24", "perms": {
+            "sms": True, "notification": False, "call_log": True,
+            "usage": True, "accessibility": False,
+        }},
+        headers={"X-Device-Token": token},
+    )
+    ch = _diag(api_client)
+    assert ch["mobile_notification"]["status"] == "off"
+    assert ch["mobile_notification"]["granted"] is False
+    assert "Notification access" in (ch["mobile_notification"]["hint"] or "")
+    # و مجرایی که دسترسی دارد و تازه است، فعال بماند
+    assert ch["mobile_heartbeat"]["status"] == "ok"
+    assert api_client.get("/api/mobile/diagnostics").json()["perms_reported"] is True
+
+
+def test_a_granted_channel_with_fresh_data_is_ok(api_client):
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/notification",
+        json={"app": "com.whatsapp", "title": "علی", "text": "سلام", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    api_client.post(
+        "/api/mobile/heartbeat",
+        json={"device": "s24", "perms": {"notification": True}},
+        headers={"X-Device-Token": token},
+    )
+    ch = _diag(api_client)
+    assert ch["mobile_notification"]["status"] == "ok"
+    assert ch["mobile_notification"]["count_24h"] == 1
+    assert ch["mobile_notification"]["granted"] is True
+
+
+@pytest_asyncio.fixture
+async def client_and_db():
+    """کلاینت و نشستِ دیتابیس روی **یک** موتور — لازم است چون باید زمانِ
+    رکوردها را عقب ببریم و ببینیم تشخیص چه می‌گوید (fixtureهای مشترک هرکدام
+    موتورِ جدا دارند)."""
+    from fastapi.testclient import TestClient
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from app.database import Base, get_db
+    from app.main import app
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+
+    async def _get_db():
+        async with factory() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = _get_db
+    async with factory() as session:
+        yield TestClient(app), session
+    app.dependency_overrides.clear()
+    await engine.dispose()
+
+
+async def _age_actions(session, actions, days):
+    """رکوردهای این کانال‌ها را «کهنه» کن (created_at = معیارِ زنده‌بودن)."""
+    import datetime as dt
+
+    from sqlalchemy import select as _sel
+
+    from app.models.activity_log import ActivityLog
+
+    rows = (await session.execute(
+        _sel(ActivityLog).where(ActivityLog.action.in_(actions))
+    )).scalars().all()
+    for r in rows:
+        r.created_at = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=days)
+    await session.commit()
+
+
+@pytest.mark.asyncio
+async def test_stale_channel_with_a_live_device_is_silent(client_and_db):
+    """داده هست ولی کهنه، و خودِ گوشی زنده است → «قطع شده» (نه «فعال»)."""
+    client, session = client_and_db
+    token = client.get("/api/mobile/token").json()["token"]
+    client.post(
+        "/api/mobile/notification",
+        json={"app": "com.whatsapp", "title": "علی", "text": "سلام", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    client.post("/api/mobile/heartbeat", json={"device": "s24"},
+                headers={"X-Device-Token": token})
+    await _age_actions(session, ["mobile_notification"], days=3)   # نبض تازه می‌ماند
+
+    ch = {c["action"]: c for c in client.get("/api/mobile/diagnostics").json()["channels"]}
+    assert ch["mobile_notification"]["status"] == "silent"
+    assert ch["mobile_notification"]["count_24h"] == 0
+    assert ch["mobile_notification"]["count"] == 1  # پاک نشده، فقط کهنه است
+
+
+@pytest.mark.asyncio
+async def test_when_the_device_itself_is_silent_channels_are_unknown_not_broken(client_and_db):
+    """اگر خودِ گوشی خاموش است، مقصر دانستنِ تک‌تکِ دسترسی‌ها گمراه‌کننده است."""
+    client, session = client_and_db
+    token = client.get("/api/mobile/token").json()["token"]
+    client.post(
+        "/api/mobile/notification",
+        json={"app": "com.whatsapp", "title": "علی", "text": "سلام", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    client.post("/api/mobile/heartbeat", json={"device": "s24"},
+                headers={"X-Device-Token": token})
+    await _age_actions(session, ["mobile_notification", "mobile_heartbeat"], days=3)
+
+    body = client.get("/api/mobile/diagnostics").json()
+    ch = {c["action"]: c for c in body["channels"]}
+    assert body["device_live"] is False
+    assert ch["mobile_notification"]["status"] == "unknown"
+    assert ch["mobile_heartbeat"]["status"] == "silent"   # خودِ نبض واقعاً قطع است

@@ -9,6 +9,24 @@
 import React, { useEffect, useState } from 'react';
 import api from '../lib/api';
 
+// چهار حالتِ متفاوت — چون «داده‌ای نیست» چند معنیِ کاملاً متفاوت دارد و
+// یکی‌کردنشان همان چیزی بود که خرابیِ اعلان‌ها را پنهان کرد.
+const STATUS_ICON = { ok: '✅', off: '⛔', silent: '⚠️', never: '⭕', unknown: '❔' };
+const STATUS_COLOR = {
+  ok: 'text-emerald-600',
+  off: 'text-red-600',
+  silent: 'text-amber-600',
+  never: 'text-gray-500',
+  unknown: 'text-gray-400',
+};
+const STATUS_FA = {
+  ok: 'فعال',
+  off: 'دسترسی باطل شده',
+  silent: 'قطع شده',
+  never: 'هرگز داده نداده',
+  unknown: 'گوشی ساکت است',
+};
+
 function MobileChannelsStrip() {
   const [channels, setChannels] = useState(null);
   const [open, setOpen] = useState(false);
@@ -29,7 +47,9 @@ function MobileChannelsStrip() {
   }, []);
 
   if (!channels || channels.length === 0) return null;
-  const silent = channels.filter((c) => c.status === 'silent');
+  // «unknown» یعنی خودِ گوشی ساکت است و نمی‌شود دربارهٔ مجرا قضاوت کرد — خرابی
+  // حساب نمی‌شود، وگرنه هر بار که گوشی خاموش است پنج هشدارِ الکی می‌دهد.
+  const broken = channels.filter((c) => ['off', 'silent', 'never'].includes(c.status));
 
   return (
     <div
@@ -44,9 +64,9 @@ function MobileChannelsStrip() {
       >
         <span className="text-sm font-medium text-gray-700">
           کانال‌های موبایل
-          {silent.length > 0 ? (
+          {broken.length > 0 ? (
             <span className="mr-2 text-xs text-amber-600">
-              {silent.length} کانال هیچ داده‌ای نفرستاده
+              {broken.length} کانال داده نمی‌فرستد
             </span>
           ) : (
             <span className="mr-2 text-xs text-emerald-600">همه فعال</span>
@@ -59,22 +79,23 @@ function MobileChannelsStrip() {
         <ul className="mt-2 space-y-1.5">
           {channels.map((c) => (
             <li key={c.action} className="text-xs" data-testid={`mobile-channel-${c.action}`}>
-              <span className={c.status === 'ok' ? 'text-emerald-600' : 'text-amber-600'}>
-                {c.status === 'ok' ? '✅' : '❌'}
+              <span className={STATUS_COLOR[c.status] || 'text-gray-400'}>
+                {STATUS_ICON[c.status] || '•'}
               </span>
               <span className="mx-1.5 text-gray-700">{c.label}</span>
-              {c.status === 'ok' ? (
-                <span className="text-gray-400">
-                  <span dir="ltr">{c.count}</span> رویداد
-                  {c.last_at ? (
-                    <span className="mx-1" dir="ltr">
-                      · {String(c.last_at).slice(0, 16).replace('T', ' ')}
-                    </span>
-                  ) : null}
-                </span>
-              ) : (
-                <span className="text-gray-500">{c.hint}</span>
-              )}
+              <span className="text-gray-400">
+                {STATUS_FA[c.status] || c.status}
+                {' · '}
+                <span dir="ltr">{c.count_24h ?? 0}</span> در ۲۴ ساعت
+                {' / '}
+                <span dir="ltr">{c.count_7d ?? 0}</span> در ۷ روز
+                {c.last_at ? (
+                  <span className="mx-1" dir="ltr">
+                    · {String(c.last_at).slice(0, 16).replace('T', ' ')}
+                  </span>
+                ) : null}
+              </span>
+              {c.hint ? <div className="mt-0.5 mr-6 text-gray-500">{c.hint}</div> : null}
             </li>
           ))}
         </ul>
