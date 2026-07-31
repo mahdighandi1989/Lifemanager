@@ -36,7 +36,24 @@ logger = logging.getLogger(__name__)
 # «subscription» is filed by the auto-ingest pipeline (a recognised
 # subscription-provider email) rather than the text classifier, but it flows
 # through the same review-then-file queue.
+# Declared here for readability; RE-DERIVED at the bottom of this module from
+# the FILERS registry, so a new destination is ONE registration (a `_file_as_x`
+# + its FILERS line) and the triage prompt, the validation and the mobile
+# dispatcher all pick it up automatically — never three edits in three places.
 INBOX_TARGETS = ("task", "todo", "note", "person", "subscription", "finance_account", "document", "transaction")
+
+# Persian labels for the destinations, used in the triage prompt and the UI.
+# A target with no label falls back to its key (so it still works).
+TARGET_FA = {
+    "task": "کار (اقدامی که باید انجام شود)",
+    "todo": "آیتم لیست (چک‌لیستِ یکی از لیست‌های موجود)",
+    "note": "یادداشت/نوشته (چیزی که باید نگه داشته شود)",
+    "person": "فرد (معرفی یا اطلاعات یک آدم)",
+    "subscription": "اشتراک (سرویس دوره‌ای مثل نتفلیکس)",
+    "finance_account": "حساب مالی (بانک/بروکر/صرافی — با شماره یا موجودی)",
+    "document": "مدرک (شناسنامه/گواهینامه/بیمه‌نامه با تاریخ انقضا)",
+    "transaction": "تراکنش مالی (خرید/هزینه/رسید)",
+}
 
 # Fallback list for explicit todo filings that match no existing list —
 # auto-created so a "به لیست بفرست" choice can never dead-end.
@@ -46,7 +63,7 @@ _TRIAGE_PROMPT = """تو دستیار دسته‌بندی «صندوق ورود�
 متن خام زیر را بخوان و تشخیص بده به کدام بخش تعلق دارد. فقط یک شیء JSON برگردان، بدون هیچ توضیح اضافه:
 
 {{
-  "type": "task | todo | note | person",
+  "type": "یکی از کلیدهای «مقصدهای مجاز» پایین",
   "title": "عنوان کوتاه (حداکثر ۱۲۰ نویسه)",
   "description": "خلاصه/جزئیات (اختیاری)",
   "priority": "low | normal | high",
@@ -54,18 +71,23 @@ _TRIAGE_PROMPT = """تو دستیار دسته‌بندی «صندوق ورود�
   "list_name": "نام یکی از لیست‌های موجود یا null",
   "category": "دستهٔ یادداشت وقتی type=note است، وگرنه null",
   "person_name": "نام شخص وقتی type=person است، وگرنه null",
+  "section": "نام بخشی از برنامه که این مورد به آن مربوط است (از فهرست بخش‌ها) یا null",
   "reason": "یک جمله فارسی: چرا این مقصد"
 }}
 
+مقصدهای مجاز (type را فقط از این کلیدها انتخاب کن):
+{targets}
+
 راهنما:
-- «task» = کاری که باید انجام شود (اقدام، پیگیری، خرید، پرداخت، تماس کاری).
-- «todo» = آیتم چک‌لیستی که به یکی از لیست‌های موجود می‌خورد (list_name را فقط از فهرست زیر انتخاب کن).
-- «note» = فکر، ایده، خاطره، مطلب آموختنی — چیزی که باید «نگه داشته» شود نه انجام.
-- «person» = معرفی/اطلاعات یک آدم (نام + شماره/ایمیل/توضیح).
+- «todo» را وقتی بده که آیتم به یکی از لیست‌های موجود بخورد (list_name را فقط از فهرست لیست‌ها بردار).
 - اگر تاریخ یا موعدی در متن هست در due_date بگذار.
+- «section» فقط یک راهنماست برای این‌که این مورد به کدام بخش برنامه مربوط می‌شود؛ مقصد اصلی همان type است.
 
 لیست‌های موجود کاربر:
 {lists}
+
+بخش‌های برنامه:
+{pages}
 
 متن خام:
 {content}
@@ -192,9 +214,17 @@ async def classify_content(db: AsyncSession, content: str, *, user_id: int = 0) 
     try:
         from app.services.ai.inference_gateway import complete
 
-        lists = await _list_names(db, user_id)
-        lists_txt = "\n".join(f"- {n}" for n in lists) or "(هیچ لیستی نیست)"
-        prompt = _TRIAGE_PROMPT.format(lists=lists_txt, content=content[:6000])
+        # مقصدها/لیست‌ها/بخش‌ها همگی زنده‌اند: افزودنِ یک فایل‌کننده یا یک لیست
+        # یا یک صفحهٔ تازه، بلافاصله در همین پرامپت دیده می‌شود (بدون ویرایش کد).
+        catalog = await destination_catalog(db, user_id)
+        targets_txt = "\n".join(
+            f"- {t['key']}: {t['label']}" for t in catalog["targets"]
+        )
+        lists_txt = "\n".join(f"- {n}" for n in catalog["lists"]) or "(هیچ لیستی نیست)"
+        pages_txt = "\n".join(f"- {p['label']}" for p in catalog["pages"]) or "(نامشخص)"
+        prompt = _TRIAGE_PROMPT.format(
+            targets=targets_txt, lists=lists_txt, pages=pages_txt, content=content[:6000]
+        )
         res = await complete(db, prompt, task="inbox_triage", max_tokens=700)
     except Exception as exc:  # gateway import/resolve crash — keep capturing
         logger.warning("inbox triage AI call failed (falling back): %r", exc)
@@ -228,6 +258,11 @@ async def classify_content(db: AsyncSession, content: str, *, user_id: int = 0) 
         else None,
         "person_name": (str(obj.get("person_name")).strip() or None)
         if obj.get("person_name") and str(obj.get("person_name")).lower() not in ("null", "none")
+        else None,
+        # «کدام بخشِ برنامه» — راهنمای مسیریابی برای بخش‌هایی که هنوز
+        # فایل‌کنندهٔ اختصاصی ندارند؛ باعث می‌شود دادهٔ تازه بی‌صاحب نماند.
+        "section": (str(obj.get("section")).strip() or None)
+        if obj.get("section") and str(obj.get("section")).lower() not in ("null", "none")
         else None,
         "reason": str(obj.get("reason") or "")[:500] or None,
     }
@@ -645,6 +680,60 @@ async def _file_as_person(db: AsyncSession, s: Dict[str, Any], user_id: int) -> 
     }
 
 
+# ── The destination registry (single registration point) ────────────────────
+# Adding a destination = write `_file_as_<x>` above + ONE line here. From this
+# dict we derive INBOX_TARGETS (validation + the triage prompt) and the mobile
+# dispatcher's routable set, so a new section of the app becomes reachable by
+# the router automatically — the same «derive, never hand-maintain» rule the
+# live system map follows.
+FILERS = {
+    "task": _file_as_task,
+    "todo": _file_as_todo,
+    "note": _file_as_note,
+    "person": _file_as_person,
+    "subscription": _file_as_subscription,
+    "finance_account": _file_as_finance_account,
+    "document": _file_as_document,
+    "transaction": _file_as_transaction,
+}
+
+# Re-derived from the registry (the tuple near the top is the readable
+# declaration; THIS is the truth the code runs on).
+INBOX_TARGETS = tuple(FILERS.keys())
+
+
+async def destination_catalog(db: AsyncSession, user_id: int = 0) -> Dict[str, Any]:
+    """The LIVE picture of where an incoming signal may be filed.
+
+    Three layers, all derived at call time so the router never goes stale:
+      * ``targets``  — from FILERS (a new filer appears here instantly)
+      * ``lists``    — the owner's actual todo lists (a new list is targetable)
+      * ``pages``    — the SPA's live route registry, as context for the model
+        («این به کدام بخش برنامه مربوط است؟») even before a filer exists.
+    """
+    catalog: Dict[str, Any] = {
+        "targets": [{"key": k, "label": TARGET_FA.get(k, k)} for k in INBOX_TARGETS],
+        "lists": [],
+        "pages": [],
+    }
+    try:
+        catalog["lists"] = await _list_names(db, user_id)
+    except Exception:
+        pass
+    try:
+        from app.services.system_graph_service import parse_routes_meta
+
+        seen = set()
+        for entry in parse_routes_meta():
+            label = entry.get("label") or entry.get("page")
+            if label and label not in seen and entry.get("group") != "public":
+                seen.add(label)
+                catalog["pages"].append({"label": label, "path": entry.get("path")})
+    except Exception:
+        pass
+    return catalog
+
+
 async def file_item(
     db: AsyncSession,
     item: InboxItem,
@@ -679,17 +768,7 @@ async def file_item(
         if value is not None:
             base[key] = value
 
-    filer = {
-        "task": _file_as_task,
-        "todo": _file_as_todo,
-        "note": _file_as_note,
-        "person": _file_as_person,
-        "subscription": _file_as_subscription,
-        "finance_account": _file_as_finance_account,
-        "document": _file_as_document,
-        "transaction": _file_as_transaction,
-    }[kind]
-    created = await filer(db, base, user_id)
+    created = await FILERS[kind](db, base, user_id)
 
     item.status = "filed"
     item.filed_entity_type = created["kind"]

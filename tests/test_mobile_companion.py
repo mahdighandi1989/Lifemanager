@@ -478,3 +478,181 @@ def test_classify_signal_ordering():
     assert classify_signal("X", "جلسه فردا ساعت 14:00") == "appointment"
     assert classify_signal("X", "لطفا قبض را پرداخت کن") in ("task", "finance")
     assert classify_signal("friend", "سلام چطوری") == "message"
+
+
+# ── AI-model classification (with deterministic guardrails) ────────────────
+
+@pytest.mark.asyncio
+async def test_model_verdict_wins_when_confident(db_session, monkeypatch):
+    """مدل تصمیم می‌گیرد: متنی که قاعدهٔ کلیدواژه‌ای «گپ» می‌دید، با مدل
+    «قرار» تشخیص داده می‌شود."""
+    from app.services import mobile_dispatch_service as md
+
+    md._AI_CACHE.clear()
+    md._ai_calls.clear()
+    text = "میبینمت پیش دکتر واسه چکاپ"          # no keyword the regex knows
+    assert md.classify_signal("friend", text) == "message"
+
+    import app.services.ai.inference_gateway as gw
+
+    async def _fake(db, prompt, **kw):
+        return {"ok": True, "text": '{"category":"appointment","confidence":0.9,"reason":"قرار"}',
+                "model": "test-model"}
+
+    monkeypatch.setattr(gw, "complete", _fake)
+    category, conf, model = await md.classify_signal_smart(db_session, "friend", text)
+    assert category == "appointment" and conf == 0.9 and model == "test-model"
+
+
+@pytest.mark.asyncio
+async def test_noise_never_reaches_the_model(db_session, monkeypatch):
+    """OTP و اعلانِ اپ‌های آینه‌ای هرگز هزینهٔ مدل نمی‌دهند (و اشتباه نمی‌روند)."""
+    from app.services import mobile_dispatch_service as md
+
+    md._AI_CACHE.clear()
+    md._ai_calls.clear()
+    called = []
+
+    import app.services.ai.inference_gateway as gw
+
+    async def _fake(db, prompt, **kw):
+        called.append(1)
+        return {"ok": True, "text": '{"category":"finance","confidence":1.0}', "model": "m"}
+
+    monkeypatch.setattr(gw, "complete", _fake)
+    assert (await md.classify_signal_smart(db_session, "Bank", "کد تایید شما 1234"))[0] == "otp"
+    assert (await md.classify_signal_smart(db_session, "com.google.android.gm", "x"))[0] == "mirrored"
+    assert called == []
+
+
+@pytest.mark.asyncio
+async def test_model_failure_falls_back_to_rules(db_session, monkeypatch):
+    from app.services import mobile_dispatch_service as md
+
+    md._AI_CACHE.clear()
+    md._ai_calls.clear()
+    import app.services.ai.inference_gateway as gw
+
+    async def _boom(db, prompt, **kw):
+        raise RuntimeError("no key")
+
+    monkeypatch.setattr(gw, "complete", _boom)
+    category, conf, model = await md.classify_signal_smart(
+        db_session, "ADCB", "Your available balance: AED 10.00"
+    )
+    assert category == "finance" and model is None  # rules, not the model
+
+
+@pytest.mark.asyncio
+async def test_hesitant_model_cannot_override_hard_finance_signal(db_session, monkeypatch):
+    from app.services import mobile_dispatch_service as md
+
+    md._AI_CACHE.clear()
+    md._ai_calls.clear()
+    import app.services.ai.inference_gateway as gw
+
+    async def _unsure(db, prompt, **kw):
+        return {"ok": True, "text": '{"category":"promo","confidence":0.2}', "model": "m"}
+
+    monkeypatch.setattr(gw, "complete", _unsure)
+    category, conf, _ = await md.classify_signal_smart(
+        db_session, "ADCB", "Your available balance: AED 5,000.00"
+    )
+    assert category == "finance" and conf == 0.2
+
+
+@pytest.mark.asyncio
+async def test_ai_cap_and_cache_bound_the_cost(db_session, monkeypatch):
+    from app.services import mobile_dispatch_service as md
+
+    md._AI_CACHE.clear()
+    md._ai_calls.clear()
+    calls = []
+    import app.services.ai.inference_gateway as gw
+
+    async def _fake(db, prompt, **kw):
+        calls.append(1)
+        return {"ok": True, "text": '{"category":"message","confidence":0.8}', "model": "m"}
+
+    monkeypatch.setattr(gw, "complete", _fake)
+    monkeypatch.setattr(md, "_ai_hourly_cap", lambda: 1)
+    await md.classify_signal_smart(db_session, "a", "متن اول")
+    await md.classify_signal_smart(db_session, "a", "متن اول")   # cache hit
+    await md.classify_signal_smart(db_session, "b", "متن دوم")   # over the cap
+    assert len(calls) == 1
+
+
+# ── the destination registry updates itself ────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_new_filer_becomes_routable_without_touching_the_router(db_session):
+    """افزودنِ یک مقصد جدید = یک خط در رجیستریِ فایل‌کننده‌ها؛ هم اعتبارسنجی،
+    هم پرامپت تریاژ، هم دسته‌های مسیریاب خودبه‌خود آن را می‌بینند."""
+    from app.services import inbox_service, mobile_dispatch_service as md
+
+    assert inbox_service.INBOX_TARGETS == tuple(inbox_service.FILERS.keys())
+    before = set(md._category_help())
+
+    async def _file_as_vehicle(db, s, user_id):  # pragma: no cover - registry probe
+        return {"kind": "vehicle", "id": 1, "title": "x", "link": "/life-file"}
+
+    inbox_service.FILERS["vehicle"] = _file_as_vehicle
+    inbox_service.INBOX_TARGETS = tuple(inbox_service.FILERS.keys())
+    try:
+        assert "vehicle" in md._category_help()          # router sees it
+        assert set(md._category_help()) - before == {"vehicle"}
+        catalog = await inbox_service.destination_catalog(db_session, 0)
+        assert any(t["key"] == "vehicle" for t in catalog["targets"])
+    finally:
+        inbox_service.FILERS.pop("vehicle", None)
+        inbox_service.INBOX_TARGETS = tuple(inbox_service.FILERS.keys())
+
+
+@pytest.mark.asyncio
+async def test_destination_catalog_is_live(db_session):
+    """کاتالوگ زنده است: لیستِ تازه‌ساخته و صفحه‌های برنامه در آن دیده می‌شوند."""
+    from app.models.todo_list import TodoList
+    from app.services import inbox_service
+
+    db_session.add(TodoList(name="لیستِ تازهٔ من"))
+    await db_session.commit()
+    catalog = await inbox_service.destination_catalog(db_session, 0)
+    assert "لیستِ تازهٔ من" in catalog["lists"]
+    assert any(p["label"] for p in catalog["pages"])       # pages come from routesMeta
+    assert {"key": "task", "label": inbox_service.TARGET_FA["task"]} in catalog["targets"]
+
+
+@pytest.mark.asyncio
+async def test_unrouted_email_now_reaches_the_dispatcher(db_session, monkeypatch):
+    """ایمیلی که هیچ‌کدام از مسیرهای اختصاصی (بانک/اشتراک/فرد) برش نمی‌داشت،
+    تا امروز فقط برچسب می‌خورد و رها می‌شد. حالا مسیریابِ مرکزی جایش را
+    پیدا می‌کند — و خبرنامه/OTP همچنان نویز می‌مانند."""
+    import datetime as dt
+
+    from app.models.personal_sync import PersonalEmail
+    from app.services.google_sync import triage_service
+
+    db_session.add(PersonalEmail(
+        id="m-appt", from_addr="clinic@hospital.ae", subject="Appointment reminder",
+        snippet="Your appointment is tomorrow at 10:30", received_at=dt.datetime(2026, 7, 31),
+    ))
+    db_session.add(PersonalEmail(
+        id="m-news", from_addr="news@shop.com", subject="Weekly newsletter",
+        snippet="unsubscribe here for our newsletter", received_at=dt.datetime(2026, 7, 31),
+    ))
+    await db_session.commit()
+
+    seen = []
+    from app.services import mobile_dispatch_service as md
+
+    async def _spy(db, uid, **kw):
+        seen.append(kw.get("source_ref"))
+        return {"category": "appointment", "routed_to": "inbox"}
+
+    monkeypatch.setattr(md, "dispatch_signal", _spy)
+    res = await triage_service.analyze_new_emails(db_session, limit=10)
+    assert res["ok"] is True
+    # the appointment mail was dispatched; the newsletter was NOT (noise gate)
+    assert "email:m-appt" in seen
+    assert "email:m-news" not in seen
+    assert res["dispatched"] == 1

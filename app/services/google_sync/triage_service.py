@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 
 CATEGORIES = ("action", "important", "receipt", "newsletter", "otp", "other")
 
+# دسته‌هایی که به مسیریابِ مرکزی فرستاده نمی‌شوند: خبرنامه و رمزِ یکبارمصرف
+# نویزند، و «رسید» را همان اسکنِ مالی جداگانه می‌خواند (دوباره‌کاری ممنوع).
+_NO_DISPATCH_CATEGORIES = ("newsletter", "otp", "receipt")
+
 _RE_OTP = re.compile(r"\b(otp|verification code|security code|کد تایید|رمز یکبار)\b", re.I)
 _RE_RECEIPT = re.compile(
     r"\b(receipt|invoice|payment|order confirm|فاکتور|رسید|پرداخت|صورتحساب)\b", re.I
@@ -177,6 +181,7 @@ async def analyze_new_emails(
     finance_routed = 0
     subscription_candidates = 0
     person_candidates = 0
+    dispatched = 0
     scored_people: set = set()
     for email in rows:
         result, model = await _ai_triage(db, email)
@@ -190,14 +195,17 @@ async def analyze_new_emails(
         email.analyzed_at = now
         if email.needs_action:
             action_titles.append((email.subject or email.ai_summary or "بدون موضوع")[:80])
+        routed = False
         if await _route_bank_email(db, email):
             finance_routed += 1
+            routed = True
         # Auto-ingest (opt-in): recognised subscription-provider mails become
         # review-queue candidates the owner files into اشتراک‌ها with one tap.
         from app.services.google_sync.subscription_ingest import route_subscription_email
 
         if await route_subscription_email(db, email, user_id=0):
             subscription_candidates += 1
+            routed = True
 
         # People CRM auto-feed: a mail from a KNOWN person records an interaction
         # (auto — feeds the relationship score); an unknown repeated human sender
@@ -207,8 +215,37 @@ async def analyze_new_emails(
         pid = await person_ingest.record_email_interaction(db, email, user_id=0)
         if pid is not None:
             scored_people.add(pid)
+            routed = True
         elif await person_ingest.route_person_email(db, email, user_id=0):
             person_candidates += 1
+            routed = True
+
+        # ── the fall-through, finally wired (2026-07-31) ─────────────────
+        # Until now an email that matched none of the three hardcoded routers
+        # above got an ``ai_category`` label and NOTHING else — the label had
+        # no consumer, so most mail was analysed and then dropped on the floor.
+        # Anything still unrouted now goes through the SAME central dispatcher
+        # the phone signals use: it classifies (model + deterministic floor)
+        # and either routes to the owning domain or captures it in the inbox
+        # for triage. Pure noise categories never reach it, so nothing floods.
+        if not routed and (email.ai_category or "") not in _NO_DISPATCH_CATEGORIES:
+            try:
+                from app.services import mobile_dispatch_service as dispatch
+
+                text = "\n".join(
+                    p for p in ((email.subject or ""), (email.snippet or "")) if p
+                ).strip()
+                if text:
+                    res = await dispatch.dispatch_signal(
+                        db, 0, source="email",
+                        sender=(email.from_addr or ""), text=text,
+                        occurred_at=(email.received_at.isoformat() if email.received_at else None),
+                        device=None, source_ref=f"email:{email.id}",
+                    )
+                    if res.get("routed_to"):
+                        dispatched += 1
+            except Exception as exc:  # a routing hiccup must not fail the batch
+                logger.debug("email dispatch skipped (%s): %r", email.id, exc)
     try:
         await db.commit()
     except Exception:
@@ -268,4 +305,7 @@ async def analyze_new_emails(
         "subscription_candidates": subscription_candidates,
         "person_candidates": person_candidates,
         "interactions_recorded": len(scored_people),
+        # ایمیل‌هایی که هیچ مسیرِ اختصاصی نداشتند و مسیریابِ مرکزی جایشان را
+        # پیدا کرد (به‌جای برچسب‌خوردن و رهاشدن).
+        "dispatched": dispatched,
     }

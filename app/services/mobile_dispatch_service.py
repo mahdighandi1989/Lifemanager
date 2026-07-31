@@ -92,7 +92,11 @@ async def _match_person(db: AsyncSession, sender: str):
 def classify_signal(sender: str, text: str) -> str:
     """One intent label for a mobile signal. Order matters (first hit wins):
     mirrored → otp → promo → finance → appointment → task → message.
-    ``message`` is the neutral default (chatter/notification with no action)."""
+    ``message`` is the neutral default (chatter/notification with no action).
+
+    This is the DETERMINISTIC floor: it always works, needs no model, and its
+    noise verdicts (mirrored/otp) are authoritative — the model is never asked
+    about those. :func:`classify_signal_smart` layers the model on top."""
     blob = f"{sender}\n{text}"
     if any((sender or "").startswith(p) for p in _MIRRORED_APPS):
         return "mirrored"
@@ -107,6 +111,162 @@ def classify_signal(sender: str, text: str) -> str:
     if _TASK_RE.search(text):
         return "task"
     return "message"
+
+
+# ── model-backed classification ─────────────────────────────────────────────
+# The heuristic above is coarse by construction: it cannot tell «قرار با دکتر»
+# from «قرار بود بگم»، nor spot a type nobody wrote a keyword for. So the model
+# decides — but under strict guardrails, because a phone emits hundreds of
+# signals a day:
+#   1. Deterministic noise (mirrored app / OTP) NEVER reaches the model.
+#   2. Identical texts are answered from a small in-process cache.
+#   3. An hourly cap bounds quota burn; over the cap → heuristic.
+#   4. Any failure (no key, timeout, bad JSON) → heuristic. Keyless deploys
+#      behave exactly as before.
+_AI_CACHE: Dict[str, str] = {}
+_AI_CACHE_MAX = 500
+_ai_calls: List[float] = []  # timestamps of model classifications this hour
+
+
+def _ai_hourly_cap() -> int:
+    import os
+
+    try:
+        return int(os.getenv("MOBILE_AI_CLASSIFY_PER_HOUR", "120"))
+    except Exception:
+        return 120
+
+
+def _cache_key(sender: str, text: str) -> str:
+    import hashlib
+
+    return hashlib.sha1(f"{sender}|{text[:400]}".encode("utf-8")).hexdigest()[:20]
+
+
+def _under_cap() -> bool:
+    import time
+
+    now = time.time()
+    _ai_calls[:] = [t for t in _ai_calls if now - t < 3600]
+    return len(_ai_calls) < _ai_hourly_cap()
+
+
+# دسته‌های پایه + مقصدهای زندهٔ صندوق (از رجیستریِ فایل‌کننده‌ها). پس اگر
+# فردا بخش/فایل‌کنندهٔ تازه‌ای اضافه شود، همین‌جا خودبه‌خود قابل انتخاب می‌شود.
+_BASE_CATEGORY_HELP = {
+    "finance": "پیام دربارهٔ حساب/موجودی/تراکنشِ خودِ کاربر",
+    "appointment": "قرار/نوبت/جلسه با زمان",
+    "task": "کاری که باید انجام شود",
+    "promo": "تبلیغ/فروش/خبرنامه",
+    "message": "گفتگو یا اطلاع‌رسانیِ بدون اقدام",
+}
+
+
+def _category_help() -> Dict[str, str]:
+    """دسته‌های مجاز = پایه + هر مقصدی که صندوق ورودی امروز می‌شناسد."""
+    help_map = dict(_BASE_CATEGORY_HELP)
+    try:
+        from app.services.inbox_service import INBOX_TARGETS, TARGET_FA
+
+        for key in INBOX_TARGETS:
+            if key in ("task",):  # already a base category
+                continue
+            help_map.setdefault(key, TARGET_FA.get(key, key))
+    except Exception:
+        pass
+    return help_map
+
+
+_SIGNAL_PROMPT = """تو مسیریابِ سیگنال‌های ورودیِ یک برنامهٔ مدیریت زندگی هستی.
+یک پیام (پیامک یا اعلانِ گوشی) را می‌خوانی و می‌گویی به کدام دسته تعلق دارد.
+فقط یک شیء JSON برگردان، بدون توضیح اضافه:
+
+{{"category": "یکی از کلیدهای زیر", "confidence": 0.0, "reason": "یک جمله فارسی"}}
+
+دسته‌های مجاز:
+{categories}
+
+قواعد:
+- «finance» فقط وقتی پیام دربارهٔ حساب/موجودی/تراکنشِ خودِ کاربر است.
+- «appointment» = قرار/نوبت/جلسه با زمان مشخص یا قابل‌استنتاج.
+- «task» = کاری که از کاربر خواسته شده یا باید انجام دهد (پرداخت، تمدید، ارسال…).
+- «promo» = تبلیغ/فروش/خبرنامه. «message» = گفتگو یا اطلاع‌رسانیِ بدون اقدام.
+- اگر مطمئن نیستی، confidence را پایین بده؛ حدس بی‌پایه نزن.
+
+فرستنده: {sender}
+متن:
+{text}
+"""
+
+
+async def classify_signal_smart(db, sender: str, text: str) -> Tuple[str, Optional[float], Optional[str]]:
+    """(category, confidence, model) — the model's verdict when it is available
+    and allowed, else the deterministic one (confidence None)."""
+    base = classify_signal(sender, text)
+    # Noise verdicts are certain and cheap — never spend a model call on them.
+    if base in ("mirrored", "otp"):
+        return base, None, None
+
+    key = _cache_key(sender, text)
+    cached = _AI_CACHE.get(key)
+    if cached:
+        return cached, None, "cache"
+    if not _under_cap():
+        return base, None, None
+
+    try:
+        import time
+
+        from app.services.ai.inference_gateway import complete
+
+        help_map = _category_help()
+        categories = "\n".join(f"- {c}: {d}" for c, d in help_map.items())
+        prompt = _SIGNAL_PROMPT.format(
+            categories=categories, sender=(sender or "")[:120], text=(text or "")[:1500]
+        )
+        _ai_calls.append(time.time())
+        res = await complete(db, prompt, task="inbox_triage", max_tokens=200)
+        if not res.get("ok"):
+            return base, None, None
+        obj = _parse_json_object(res.get("text") or "")
+        if not obj:
+            return base, None, None
+        category = str(obj.get("category") or "").strip().lower()
+        if category not in help_map:
+            return base, None, None
+        try:
+            confidence = float(obj.get("confidence"))
+        except Exception:
+            confidence = None
+        # A hesitant model must not overrule a confident regex: when the
+        # deterministic path found finance (a hard money signal) and the model
+        # is unsure, keep the deterministic verdict.
+        if confidence is not None and confidence < 0.5 and base != "message":
+            return base, confidence, res.get("model")
+        if len(_AI_CACHE) >= _AI_CACHE_MAX:
+            _AI_CACHE.clear()
+        _AI_CACHE[key] = category
+        return category, confidence, res.get("model")
+    except Exception as exc:
+        logger.debug("smart classify fell back: %r", exc)
+        return base, None, None
+
+
+def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
+    import json
+
+    cleaned = re.sub(r"```(?:json)?", "", text or "").strip()
+    decoder = json.JSONDecoder()
+    for start in range(len(cleaned)):
+        if cleaned[start] != "{":
+            continue
+        try:
+            obj, _ = decoder.raw_decode(cleaned[start:])
+        except ValueError:
+            continue
+        if isinstance(obj, dict):
+            return obj
+    return None
 
 
 # ── inbox capture (the extensible catch-all) ────────────────────────────────
@@ -221,8 +381,13 @@ async def dispatch_signal(
     log). ``routed_to`` is None when the signal is noise or neutral chatter
     (kept only in the activity log + insights + archive)."""
     try:
-        category = classify_signal(sender, text)
-        out: Dict[str, Any] = {"category": category, "routed_to": None}
+        # مدل تصمیم می‌گیرد (با گاردریل‌ها)؛ اگر مدل نبود/مطمئن نبود، قاعدهٔ
+        # قطعی جواب می‌دهد — پس روی دیپلویِ بدون کلید هم دقیقاً کار می‌کند.
+        category, confidence, model = await classify_signal_smart(db, sender, text)
+        out: Dict[str, Any] = {
+            "category": category, "routed_to": None,
+            "confidence": confidence, "classifier": (model or "rules"),
+        }
         if category in _NOISE:
             return out
 
@@ -232,7 +397,18 @@ async def dispatch_signal(
             if pm.get("routed_to"):
                 out.update(pm)
 
+        # مسیر: یا رجیستریِ اختصاصی، یا — برای هر مقصدِ شناخته‌شدهٔ صندوق —
+        # خودِ صندوق (که فایل‌کنندهٔ همان مقصد را دارد). این همان چیزی است که
+        # بخش‌های آیندهٔ برنامه را بدون کدنویسی قابل مسیریابی می‌کند.
         router = _ROUTERS.get(category)
+        if router is None and category not in ("message", "promo"):
+            try:
+                from app.services.inbox_service import INBOX_TARGETS
+
+                if category in INBOX_TARGETS:
+                    router = _route_inbox
+            except Exception:
+                router = None
         if router is not None:
             res = await router(db, user_id, sender, text, occurred_at, device, source_ref)
             # finance/inbox routing wins the reported routed_to when present.
