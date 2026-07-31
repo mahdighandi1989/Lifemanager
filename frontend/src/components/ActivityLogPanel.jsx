@@ -143,7 +143,7 @@ function ActivityLogPanel({ entityType, entityId = null, title = 'لاگ فعا�
                         }`}
                       >
                         <td className="py-2 pl-2 text-gray-400 whitespace-nowrap text-xs">
-                          {formatWhen(e.created_at)}
+                          {formatWhen(e.display_at || e.created_at)}
                         </td>
                         <td className="py-2 pl-2 whitespace-nowrap">
                           <span

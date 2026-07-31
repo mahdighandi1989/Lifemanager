@@ -7,6 +7,7 @@ engine (deduped, currency-guarded); everything lands in the activity log;
 Also here: the finance repair kit — rebuild-auto-cards, the provenance line,
 and the owner-typed balance always winning (PUT).
 """
+import pytest
 
 
 def _pair(api_client) -> str:
@@ -279,3 +280,123 @@ def test_usage_records_unlocks(api_client):
         headers={"X-Device-Token": token},
     )
     assert r.status_code == 200 and r.json()["unlocks"] == 42
+
+
+def test_call_creates_person_interaction_and_contact_stats(api_client):
+    """The whole point: a call must MOVE the person's profile, not just log."""
+    token = _pair(api_client)
+    pr = api_client.post("/api/persons", json={"name": "مریم", "phone": "+971509998877"})
+    pid = pr.json()["id"]
+    api_client.post(
+        "/api/mobile/call",
+        json={"number": "0509998877", "call_type": "outgoing", "duration_sec": 120,
+              "at": "2026-07-30T18:00:00", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    prof = api_client.get(f"/api/people/{pid}/profile").json()
+    assert prof["contact"]["call_count"] == 1
+    assert prof["contact"]["last_contacted_at"].startswith("2026-07-30")
+    # same call re-synced → deduped, no double interaction
+    api_client.post(
+        "/api/mobile/call",
+        json={"number": "0509998877", "call_type": "outgoing", "duration_sec": 120,
+              "at": "2026-07-30T18:00:00", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    prof2 = api_client.get(f"/api/people/{pid}/profile").json()
+    assert prof2["contact"]["call_count"] == 1
+
+
+def test_mobile_insights_summarizes_real_usage(api_client):
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/usage",
+        json={"day": "2026-07-31", "device": "s24", "unlocks": 55,
+              "apps": [{"app": "org.telegram.messenger", "minutes": 90},
+                       {"app": "com.instagram.android", "minutes": 45}]},
+        headers={"X-Device-Token": token},
+    )
+    pr = api_client.post("/api/persons", json={"name": "بابا", "phone": "0551112222"})
+    api_client.post(
+        "/api/mobile/call",
+        json={"number": "0551112222", "call_type": "incoming", "duration_sec": 30,
+              "at": "2026-07-31T10:00:00", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    ins = api_client.get("/api/mobile/insights").json()
+    assert ins["has_data"] is True
+    assert ins["unlocks"] == 55
+    assert ins["screen_minutes"] == 135
+    assert ins["calls"] == 1
+    assert any(c["name"] == "بابا" for c in ins["top_contacts"])
+    assert any("تلگرام" in a["app"] for a in ins["top_apps"])
+
+
+def test_activity_occurred_at_preserves_real_event_time(api_client):
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/call",
+        json={"number": "0500000000", "call_type": "incoming", "duration_sec": 5,
+              "at": "2026-05-01T08:30:00", "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    items = api_client.get("/api/activity-log", params={"action": "mobile_call"}).json()["items"]
+    row = items[0]
+    assert row["occurred_at"].startswith("2026-05-01")
+    assert row["display_at"].startswith("2026-05-01")
+
+
+@pytest.mark.asyncio
+async def test_activity_archive_is_idempotent_and_nondestructive(db_session, monkeypatch):
+    import datetime as _dt
+
+    from app.models.activity_log import ActivityLog
+    from app.services import activity_archive_service as arch
+
+    # a row in a CLOSED past month
+    db_session.add(ActivityLog(
+        action="mobile_call", entity_type="call", entity_label="x",
+        occurred_at=_dt.datetime(2026, 3, 10, tzinfo=_dt.timezone.utc),
+    ))
+    await db_session.commit()
+
+    uploaded = []
+
+    class _StubClient:
+        async def get_or_create_folder(self, name, parent=None):
+            return "folder"
+
+        async def upload(self, *, file_name, parent, media=None):
+            uploaded.append(file_name)
+            return "fileid"
+
+    async def _stub_upload(**kw):
+        uploaded.append(kw["file_name"])
+        return {"drive_file_id": "id"}
+
+    import app.services.google_drive_service as gds
+    monkeypatch.setattr(gds, "upload_file", _stub_upload)
+    import app.services.google_api_client as gac
+
+    async def _client(db):
+        return _StubClient()
+
+    monkeypatch.setattr(gac, "build_drive_client", _client)
+    import app.services.drive_settings_service as dss
+
+    async def _tok(db):
+        return "rt"
+
+    monkeypatch.setattr(dss, "resolve_refresh_token", _tok)
+
+    res = await arch.archive_tick(db_session)
+    assert res["archived"] == [{"month": "2026-03", "rows": 1}]
+    assert uploaded == ["activity-2026-03.json"]
+    # row still in DB (nondestructive)
+    from sqlalchemy import func as _f, select as _s
+    n = (await db_session.execute(_s(_f.count()).select_from(ActivityLog))).scalar()
+    assert n == 1
+    # second run → nothing re-uploaded (idempotent)
+    res2 = await arch.archive_tick(db_session)
+    assert res2["archived"] == []
+    assert uploaded == ["activity-2026-03.json"]

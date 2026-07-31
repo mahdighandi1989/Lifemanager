@@ -52,6 +52,14 @@ async def compose_digest(
     except Exception:
         pass
 
+    # خلاصهٔ زندگیِ موبایل (کارکرد/تماس/پیامک) — دادهٔ گوشی دیگر هرز نمی‌رود.
+    try:
+        from app.services.mobile_insights_service import build_mobile_summary, summary_to_fa_lines
+
+        lines.extend(summary_to_fa_lines(await build_mobile_summary(db, days=7)))
+    except Exception:
+        pass
+
     # تقویم: امروز باقی‌مانده + فردا
     try:
         events = (
@@ -376,6 +384,13 @@ async def collect_digest_data(
         data["mobile_silent"] = await silent_devices(db)
     except Exception:
         data["mobile_silent"] = []
+
+    try:
+        from app.services.mobile_insights_service import build_mobile_summary
+
+        data["mobile_summary"] = await build_mobile_summary(db, days=7)
+    except Exception:
+        data["mobile_summary"] = {}
 
     return data
 

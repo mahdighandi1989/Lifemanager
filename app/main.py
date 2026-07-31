@@ -434,6 +434,8 @@ async def startup_event():
         ("todo_items", "deleted_at", "TIMESTAMP WITH TIME ZONE"),
         ("personal_writings", "deleted_at", "TIMESTAMP WITH TIME ZONE"),
         ("activity_logs", "payload_before", "TEXT"),
+        # زمانِ واقعیِ رویداد (تماس/پیامکِ قدیمی که امروز استخراج می‌شود).
+        ("activity_logs", "occurred_at", "TIMESTAMP WITH TIME ZONE"),
         # CRM date columns for the attention rules (phase 3, 2026-07-20).
         ("persons", "birthday", "DATE"),
         ("persons", "next_follow_up", "DATE"),

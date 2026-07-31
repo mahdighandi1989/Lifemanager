@@ -1296,6 +1296,10 @@
           {
             "method": "POST",
             "path": "/api/mobile/screen"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/insights"
           }
         ]
       }
@@ -1636,6 +1640,22 @@
           "watchdog_tick",
           "silent_devices",
           "device_last_seen"
+        ]
+      },
+      {
+        "file": "app/services/mobile_insights_service.py",
+        "classes": [],
+        "functions": [
+          "build_mobile_summary",
+          "summary_to_fa_lines"
+        ]
+      },
+      {
+        "file": "app/services/activity_archive_service.py",
+        "classes": [],
+        "functions": [
+          "archive_tick",
+          "get_archive_status"
         ]
       }
     ]

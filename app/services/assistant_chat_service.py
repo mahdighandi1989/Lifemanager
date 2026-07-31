@@ -64,6 +64,16 @@ async def _live_context(db: AsyncSession, user_id: int) -> Dict[str, Any]:
         }
     except Exception as exc:
         logger.debug("chat context: build_today skipped: %r", exc)
+    try:
+        # زندگیِ موبایل — تا دستیار به «چقدر با گوشی‌ام کار کردم؟» و «با کی
+        # بیشتر تماس داشتم؟» با دادهٔ واقعی جواب بدهد (نه دیگر هرزرفتن).
+        from app.services.mobile_insights_service import build_mobile_summary
+
+        summary = await build_mobile_summary(db, days=7)
+        if summary.get("has_data"):
+            ctx["mobile"] = summary
+    except Exception as exc:
+        logger.debug("chat context: mobile summary skipped: %r", exc)
     return ctx
 
 

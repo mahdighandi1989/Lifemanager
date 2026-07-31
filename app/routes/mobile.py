@@ -135,6 +135,7 @@ async def ingest_sms(
         entity_label=payload.sender[:255],
         detail=f"[{category}] {body}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
+        occurred_at=payload.received_at,
         user_id=user_id, db=db,
     )
 
@@ -178,10 +179,13 @@ async def ingest_notification(
 
     category = _classify(payload.app, text)
     await record_activity(
-        action="mobile_notification", entity_type="notification", entity_id=None,
+        # entity_type مجزا از «notification» درون‌برنامه‌ای تا با آن اشتباه/
+        # لینک نشود (اعلان گوشی ≠ اعلان مرکز اعلان‌ها).
+        action="mobile_notification", entity_type="phone_notification", entity_id=None,
         entity_label=payload.app[:255],
         detail=f"[{category}] {text}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
+        occurred_at=payload.posted_at,
         user_id=user_id, db=db,
     )
 
@@ -273,8 +277,41 @@ async def ingest_call(
         detail=f"[call] {verb} — {number} — {payload.duration_sec}s",
         context_type=("person" if person else "device"),
         context_id=(str(person.id) if person else (payload.device or "phone")[:64]),
+        occurred_at=payload.at,
         user_id=user_id, db=db,
     )
+
+    # این تماس باید در پروفایلِ همان فرد «معنا» پیدا کند — نه فقط یک ردیفِ لاگ.
+    # با ثبتِ Interaction از نوع CALL، امتیاز رابطه و کارنامهٔ فرد واقعاً تکان
+    # می‌خورد (تا حالا InteractionType.CALL هیچ تولیدکننده‌ای نداشت — هرز می‌رفت).
+    if person is not None:
+        try:
+            from datetime import datetime as _dt
+
+            from app.services import person_profile_service as pps
+
+            when = None
+            if payload.at:
+                try:
+                    when = _dt.fromisoformat(payload.at.replace("Z", "+00:00"))
+                except Exception:
+                    when = None
+            await pps.record_interaction(
+                db,
+                person_id=person.id,
+                type="call",
+                summary=f"{verb} — {payload.duration_sec}s",
+                date=when,
+                dedup_note=ref,  # همان کلیدِ ضدتکرارِ تماس
+                reanalyze=False,  # امتیاز در جابِ شبانه بازمحاسبه می‌شود، نه هر تماس
+            )
+            # record_activity بالاتر همین session را commit کرده؛ Interaction
+            # فقط flush شده — پس این‌جا commit لازم است وگرنه با بستن session
+            # از دست می‌رود.
+            await db.commit()
+        except Exception as exc:
+            logger.debug("call→interaction skipped: %r", exc)
+
     return {"ok": True, "success": True, "linked_person_id": (person.id if person else None)}
 
 
@@ -312,6 +349,7 @@ async def ingest_screen(
         entity_label=payload.app[:255],
         detail=f"[{category}] {redacted}"[:1000],
         context_type="device", context_id=(payload.device or "phone")[:64],
+        occurred_at=payload.at,
         user_id=user_id, db=db,
     )
     return {"ok": True, "success": True, "category": category}
@@ -414,6 +452,22 @@ async def download_companion_apk():
     )
 
 
+@router.get("/api/mobile/insights", tags=["mobile"])
+@handle_errors
+async def mobile_insights(
+    days: int = 7,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_required_user_id),
+) -> dict:
+    """خلاصهٔ زندگیِ موبایل — کارکرد صفحه، قفل‌گشایی، تماس‌ها (و پرتماس‌ترین
+    افراد)، پیامک/اعلان به تفکیک دسته. همان دیدی که دستیار و گزارش روزانه
+    استفاده می‌کنند — تا دادهٔ گوشی واقعاً به‌کار برود."""
+    from app.services.mobile_insights_service import build_mobile_summary
+
+    days = max(1, min(int(days), 90))
+    return {"ok": True, "success": True, **await build_mobile_summary(db, days=days)}
+
+
 @router.get("/api/mobile/status", tags=["mobile"])
 @handle_errors
 async def mobile_status(
@@ -427,7 +481,7 @@ async def mobile_status(
         await db.execute(
             select(ActivityLog)
             .where(ActivityLog.action.in_(
-                ("mobile_heartbeat", "mobile_sms", "mobile_notification", "mobile_usage")
+                ("mobile_heartbeat", "mobile_sms", "mobile_notification", "mobile_usage", "mobile_call", "mobile_screen")
             ))
             .order_by(ActivityLog.created_at.desc(), ActivityLog.id.desc())
             .limit(200)

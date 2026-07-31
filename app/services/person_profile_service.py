@@ -298,6 +298,56 @@ async def record_task_link_interactions(
     return recorded
 
 
+async def contact_stats(db: AsyncSession, person_id: int) -> dict:
+    """«آخرین تماس / تعدادِ تماس‌ها» — از Interactionهای نوع CALL که حالا
+    مسیرِ موبایل تولید می‌کند. تا این نبود، تماس‌ها فقط در لاگ می‌ماندند و
+    پروفایلِ فرد از آن‌ها بی‌خبر بود."""
+    from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+
+    from sqlalchemy import func as _f
+
+    from app.models.interaction import Interaction, InteractionType
+
+    try:
+        total = (
+            await db.execute(
+                select(_f.count(Interaction.id)).where(
+                    Interaction.person_id == person_id,
+                    Interaction.type == InteractionType.CALL,
+                )
+            )
+        ).scalar() or 0
+        last = (
+            await db.execute(
+                select(Interaction.date, Interaction.summary)
+                .where(
+                    Interaction.person_id == person_id,
+                    Interaction.type == InteractionType.CALL,
+                )
+                .order_by(Interaction.date.desc().nullslast(), Interaction.id.desc())
+                .limit(1)
+            )
+        ).first()
+        since = _dt.now(_tz.utc) - _td(days=30)
+        last30 = (
+            await db.execute(
+                select(_f.count(Interaction.id)).where(
+                    Interaction.person_id == person_id,
+                    Interaction.type == InteractionType.CALL,
+                    Interaction.date >= since,
+                )
+            )
+        ).scalar() or 0
+        return {
+            "call_count": int(total),
+            "calls_last_30d": int(last30),
+            "last_contacted_at": (last[0].isoformat() if last and last[0] else None),
+            "last_call_summary": (last[1] if last else None),
+        }
+    except Exception:
+        return {"call_count": 0, "calls_last_30d": 0, "last_contacted_at": None}
+
+
 def serialize(profile: PersonProfile, person: Optional[object] = None) -> dict:
     """The profile as the page reads it.
 

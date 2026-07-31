@@ -51,6 +51,7 @@ async def record_activity(
     payload_before=None,
     user_id: Optional[int] = None,
     request: Optional[Request] = None,
+    occurred_at=None,
     db=None,
 ) -> None:
     """Persist a single activity entry (never raises).
@@ -78,6 +79,18 @@ async def record_activity(
             ),
             ip_address=_client_ip(request),
         )
+        # زمانِ واقعیِ رویداد اگر داده شود (رشتهٔ ISO یا datetime) — وگرنه
+        # server_default همان created_at را می‌گذارد و occurred_at خالی می‌ماند.
+        if occurred_at is not None:
+            try:
+                from datetime import datetime as _dt
+
+                entry.occurred_at = (
+                    occurred_at if not isinstance(occurred_at, str)
+                    else _dt.fromisoformat(occurred_at.replace("Z", "+00:00"))
+                )
+            except Exception:
+                pass
         if db is not None:
             db.add(entry)
             await db.commit()

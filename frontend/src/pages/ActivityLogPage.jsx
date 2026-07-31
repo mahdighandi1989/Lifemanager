@@ -180,7 +180,7 @@ function ActivityLogPage() {
                   return (
                     <tr key={e.id} className="border-b border-gray-50 align-top">
                       <td className="py-2.5 px-3 text-gray-400 whitespace-nowrap text-xs">
-                        {formatWhen(e.created_at)}
+                        {formatWhen(e.display_at || e.created_at)}
                       </td>
                       <td className="py-2.5 px-3 whitespace-nowrap">
                         <span

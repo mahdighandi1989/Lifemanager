@@ -22,6 +22,13 @@ export const ENTITY_FA = {
   brain_upload: 'داده ذهن',
   notification: 'اعلان',
   auth: 'ورود/خروج',
+  // رویدادهای موبایل (نسخهٔ همراه)
+  sms: 'پیامک',
+  call: 'تماس',
+  screen: 'صفحهٔ گوشی',
+  usage: 'کارکرد موبایل',
+  device: 'دستگاه',
+  phone_notification: 'اعلان گوشی',
 };
 
 // action → Persian verb.
@@ -37,6 +44,8 @@ export const VERB_FA = {
   print: 'چاپ',
   login: 'ورود',
   logout: 'خروج',
+  mobile_sms: 'پیامک', mobile_call: 'تماس', mobile_notification: 'اعلان گوشی',
+  mobile_screen: 'مشاهدهٔ صفحه', mobile_usage: 'کارکرد موبایل', mobile_heartbeat: 'نبض دستگاه',
 };
 
 // action → Tailwind chip classes (fallback: gray).
@@ -52,6 +61,9 @@ export const ACTION_COLORS = {
   print: 'bg-amber-100 text-amber-700',
   login: 'bg-purple-100 text-purple-700',
   logout: 'bg-purple-100 text-purple-700',
+  mobile_sms: 'bg-sky-100 text-sky-700', mobile_call: 'bg-sky-100 text-sky-700',
+  mobile_notification: 'bg-sky-100 text-sky-700', mobile_screen: 'bg-sky-100 text-sky-700',
+  mobile_usage: 'bg-sky-100 text-sky-700', mobile_heartbeat: 'bg-gray-100 text-gray-500',
 };
 
 export function actionLabel(action) {
@@ -60,6 +72,9 @@ export function actionLabel(action) {
 
 // «verb + entity» summary, e.g. «ایجاد تسک».
 export function activityWhat(e) {
+  if (typeof e.action === 'string' && e.action.startsWith('mobile_')) {
+    return ENTITY_FA[e.entity_type] || VERB_FA[e.action] || 'رویداد موبایل';
+  }
   const verb = VERB_FA[e.action] || e.action || '';
   const ent = e.entity_type ? ENTITY_FA[e.entity_type] || e.entity_type : '';
   return ent ? `${verb} ${ent}` : verb;
@@ -100,6 +115,16 @@ export function activityLink(e) {
       return '/brain';
     case 'notification':
       return '/notifications';
+    case 'call':
+    case 'sms':
+    case 'phone_notification':
+      return e.context_type === 'person' && e.context_id
+        ? `/people/${e.context_id}/profile`
+        : '/activity-log';
+    case 'screen':
+    case 'usage':
+    case 'device':
+      return '/activity-log';
     default:
       return '';
   }

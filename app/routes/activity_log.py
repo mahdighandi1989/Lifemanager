@@ -113,6 +113,12 @@ def _serialize(row: ActivityLog) -> dict:
         "payload_before": row.payload_before,
         "ip_address": row.ip_address,
         "created_at": row.created_at.isoformat() if row.created_at else None,
+        # زمانِ واقعیِ رویداد (اگر منبع داده باشد)؛ «زمانِ نمایشی» = این یا created_at.
+        "occurred_at": row.occurred_at.isoformat() if row.occurred_at else None,
+        "display_at": (
+            (row.occurred_at or row.created_at).isoformat()
+            if (row.occurred_at or row.created_at) else None
+        ),
     }
 
 
@@ -123,7 +129,10 @@ async def _paged(db: AsyncSession, stmt, page: int, page_size: int) -> dict:
     rows = (
         (
             await db.execute(
-                stmt.order_by(ActivityLog.created_at.desc(), ActivityLog.id.desc())
+                stmt.order_by(
+                    func.coalesce(ActivityLog.occurred_at, ActivityLog.created_at).desc(),
+                    ActivityLog.id.desc(),
+                )
                 .offset((page - 1) * page_size)
                 .limit(page_size)
             )
@@ -252,7 +261,10 @@ async def export_activity_csv(
     rows = (
         (
             await db.execute(
-                stmt.order_by(ActivityLog.created_at.desc(), ActivityLog.id.desc())
+                stmt.order_by(
+                    func.coalesce(ActivityLog.occurred_at, ActivityLog.created_at).desc(),
+                    ActivityLog.id.desc(),
+                )
                 .limit(_EXPORT_MAX_ROWS)
             )
         )

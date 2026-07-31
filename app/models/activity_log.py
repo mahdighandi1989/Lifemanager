@@ -53,6 +53,10 @@ class ActivityLog(Base):
     payload_before = Column(Text, nullable=True)
     ip_address = Column(String(64), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    # زمانِ واقعیِ رویداد (نه لحظهٔ ثبت رکورد) — یک تماسِ ماهِ پیش که امروز
+    # استخراج می‌شود created_at=امروز دارد ولی occurred_at=ماهِ پیش. مسیرهای
+    # خواندن بر COALESCE(occurred_at, created_at) مرتب می‌کنند و نمایش می‌دهند.
+    occurred_at = Column(DateTime(timezone=True), nullable=True, index=True)
 
     def __repr__(self) -> str:
         return (

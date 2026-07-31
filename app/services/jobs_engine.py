@@ -256,6 +256,14 @@ async def _job_finance_analysis(db: AsyncSession) -> dict[str, Any]:
     return {"notified": True, "month": summary["month"]}
 
 
+async def _job_activity_archive(db: AsyncSession) -> dict[str, Any]:
+    """آرشیوِ لاگ‌ها به گوگل درایو — ماه‌های بسته‌شده را (بدون حذف از دیتابیس)
+    یک بار روی Drive ذخیره می‌کند تا لاگ‌ها زیاد شوند ولی چیزی گم نشود."""
+    from app.services.activity_archive_service import archive_tick
+
+    return await archive_tick(db)
+
+
 async def _job_mobile_watchdog(db: AsyncSession) -> dict[str, Any]:
     """نگهبان اتصال موبایل — گوشیِ ساکت‌شده را با تلگرام هشدار می‌دهد (تکرار
     تا وصل شدن) و برگشتنش را هم خبر می‌دهد. جزئیات در mobile_watchdog_service."""
@@ -339,6 +347,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("mobile_watchdog", "نگهبان اتصال موبایل",
      lambda: _env_minutes("MOBILE_WATCHDOG_INTERVAL_MINUTES", 15.0),
      _job_mobile_watchdog),
+    ("activity_archive", "آرشیوِ لاگ‌ها به درایو",
+     lambda: _env_minutes("ACTIVITY_ARCHIVE_INTERVAL_MINUTES", 24 * 60.0),
+     _job_activity_archive),
     ("finance_periodic_analysis", "تحلیل دوره‌ای مالی + اطلاعیه",
      lambda: _env_minutes("FINANCE_ANALYSIS_INTERVAL_MINUTES", 24 * 60.0),
      _job_finance_analysis),

@@ -31,9 +31,12 @@ class SmsReceiver : BroadcastReceiver() {
         val sender = messages.firstOrNull()?.displayOriginatingAddress ?: "unknown"
         val body = messages.joinToString("") { it.messageBody ?: "" }
         if (body.isBlank()) return
+        // زمانِ واقعیِ رسیدنِ پیامک (نه لحظهٔ ثبت در سرور) — تا لاگ درست مرتب شود.
+        val ts = messages.firstOrNull()?.timestampMillis ?: System.currentTimeMillis()
         val json = JSONObject()
             .put("sender", sender)
             .put("body", body)
+            .put("received_at", java.time.Instant.ofEpochMilli(ts).toString())
             .put("device", Net.deviceName(context))
             .toString()
         Net.enqueue(context, "/api/mobile/sms", json)
@@ -56,6 +59,7 @@ class NotifListener : NotificationListenerService() {
                 .put("app", sbn.packageName)
                 .put("title", title)
                 .put("text", text)
+                .put("posted_at", java.time.Instant.ofEpochMilli(sbn.postTime).toString())
                 .put("device", Net.deviceName(this))
                 .toString()
             Net.enqueue(this, "/api/mobile/notification", json)

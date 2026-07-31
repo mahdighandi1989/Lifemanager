@@ -269,7 +269,9 @@ async def get_person_profile(
     if person is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Person not found")
     profile = await person_profile_service.get_or_create_profile(db, person_id=person_id)
-    return person_profile_service.serialize(profile, person)
+    out = person_profile_service.serialize(profile, person)
+    out["contact"] = await person_profile_service.contact_stats(db, person_id)
+    return out
 
 
 @router.post("/api/people/{person_id}/profile/analyze", tags=["persons"])
