@@ -7,7 +7,11 @@ surface, so every route resolves the caller through ``app/dependencies/auth.py``
 (``get_current_user``) and every service query is scoped by ``user_id``. These
 tests pin that end-to-end auth chain:
 
-  * no bearer            -> 403 (strict ``get_current_user``; no anon access)
+  * no bearer            -> 401 (strict ``get_current_user``; no anon access.
+                            401 not 403 — the caller gave no identity at all,
+                            and the SPA interceptor keys stale-token cleanup
+                            on 401. 403 is reserved for «شناخته‌شده ولی
+                            بی‌اجازه», e.g. the pending-approval gate.)
   * authenticated create -> 201, owner taken from the token (never the body)
   * cross-tenant mutate  -> 404 (a row you don't own is invisible)
   * owner mutate         -> succeeds
@@ -60,10 +64,14 @@ def _create(client, name: str = "Cal", service_type: str = "calendar"):
 
 
 def test_mutations_require_authentication(api_client):
-    """No bearer token -> the strict auth dependency 403s every mutation."""
-    assert _create(api_client).status_code == 403
-    assert api_client.patch("/integrations/1", json={"name": "x"}).status_code == 403
-    assert api_client.delete("/integrations/1").status_code == 403
+    """No bearer token -> the strict auth dependency 401s every mutation."""
+    created = _create(api_client)
+    assert created.status_code == 401
+    # پاسخ باید هدرِ استانداردِ چالش را داشته باشد، وگرنه کلاینت نمی‌فهمد
+    # که باید دوباره وارد شود.
+    assert created.headers.get("www-authenticate") == "Bearer"
+    assert api_client.patch("/integrations/1", json={"name": "x"}).status_code == 401
+    assert api_client.delete("/integrations/1").status_code == 401
 
 
 def test_create_scopes_owner_to_token_identity(api_client):

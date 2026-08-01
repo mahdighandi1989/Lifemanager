@@ -56,8 +56,19 @@ def test_global_setting_model_fields():
 
 # ── /api/settings/global-analysis-prompt admin gate (AC 57-59) ───────
 
-def test_settings_global_prompt_no_token_403(api_client):
-    assert api_client.get("/api/settings/global-analysis-prompt").status_code == 403
+def test_settings_global_prompt_no_token_401(api_client):
+    """No credentials at all → 401, *not* 403.
+
+    The two codes are not interchangeable here and the split is deliberate:
+    401 means «هویتی ندادی» and carries ``WWW-Authenticate``, 403 means
+    «هویتت را دادی ولی اجازه نداری» (the next test). The SPA's axios
+    interceptor (``frontend/src/lib/api.js``) keys the drop-stale-token +
+    bounce-to-login path on 401 alone — answering 403 for a missing token
+    would leave a dead token in localStorage forever.
+    """
+    r = api_client.get("/api/settings/global-analysis-prompt")
+    assert r.status_code == 401
+    assert r.headers.get("www-authenticate") == "Bearer"
 
 
 def test_settings_global_prompt_non_admin_403(api_client):

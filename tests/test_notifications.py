@@ -7,9 +7,13 @@ prefixed ``router``) is a mutation surface, so every route resolves the caller
 through ``app/dependencies/auth.py`` (``get_current_user``) and every service
 query is scoped by ``user_id``. These tests pin that end-to-end auth chain:
 
-  * no bearer            -> 403 (strict ``get_current_user``; the anon
+  * no bearer            -> 401 (strict ``get_current_user``; the anon
                             NotificationBell uses the separate ``api_router``
-                            ``GET /api/notifications`` instead — see the route)
+                            ``GET /api/notifications`` instead — see the route.
+                            401 not 403: no identity was offered at all, and
+                            the SPA's axios interceptor clears the stale token
+                            on 401 only. 403 stays reserved for an identified
+                            caller who lacks permission.)
   * authenticated create -> 201, owner taken from the token (never the body)
   * cross-tenant mutate  -> 404 (a notification you don't own is invisible)
   * owner mutate         -> succeeds
@@ -56,12 +60,14 @@ def _create(client, title: str = "Hi"):
 
 
 def test_mutations_require_authentication(api_client):
-    """No bearer token -> the strict auth dependency 403s every mutation and
+    """No bearer token -> the strict auth dependency 401s every mutation and
     the owner-scoped list."""
-    assert _create(api_client).status_code == 403
-    assert api_client.patch("/notifications/1/read").status_code == 403
-    assert api_client.delete("/notifications/1").status_code == 403
-    assert api_client.get("/notifications/").status_code == 403
+    created = _create(api_client)
+    assert created.status_code == 401
+    assert created.headers.get("www-authenticate") == "Bearer"
+    assert api_client.patch("/notifications/1/read").status_code == 401
+    assert api_client.delete("/notifications/1").status_code == 401
+    assert api_client.get("/notifications/").status_code == 401
 
 
 def test_create_scopes_owner_to_token_identity(api_client):

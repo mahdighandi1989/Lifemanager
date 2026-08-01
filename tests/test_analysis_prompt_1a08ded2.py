@@ -33,15 +33,14 @@ def test_get_analysis_prompt_default_empty(api_client):
     assert r.json()["prompt_text"] == ""
 
 
-# ── AC 26: non-admin / anonymous PUT -> 403 ──────────────────────────
+# ── AC 26: anonymous PUT -> 401, authenticated non-admin PUT -> 403 ──
+# دو کدِ متفاوت برای دو وضعیتِ متفاوت: «هویت ندادی» در برابر «هویت دادی
+# ولی اجازه نداری». یکی‌کردنشان همان اشتباهی بود که این تست را کهنه کرد.
 
-def test_put_analysis_prompt_anonymous_403(api_client):
-    assert (
-        api_client.put(
-            "/api/ai/analysis_prompt", json={"prompt_text": "x"}
-        ).status_code
-        == 403
-    )
+def test_put_analysis_prompt_anonymous_401(api_client):
+    r = api_client.put("/api/ai/analysis_prompt", json={"prompt_text": "x"})
+    assert r.status_code == 401
+    assert r.headers.get("www-authenticate") == "Bearer"
 
 
 def test_put_analysis_prompt_non_admin_403(api_client):

@@ -280,9 +280,15 @@ async def test_google_tick_stamps_and_env_not_baked(db_session, monkeypatch):
 # ── routes ───────────────────────────────────────────────────────────────────
 @pytest.fixture
 def fake_google(monkeypatch):
+    # این تست از راهِ HTTP می‌رود و روتِ /api/google/emails روی یک پنجرهٔ
+    # «۷ روز اخیر» با ساعتِ واقعیِ سیستم فیلتر می‌کند. پس تاریخِ این پیام‌ها
+    # باید نسبت به «الان» باشد، نه ثابت: با تاریخِ ثابتِ NOW این تست فقط تا
+    # هفت روز بعد از آن تاریخ سبز می‌ماند و بعد بدون هیچ تغییری در کد قرمز
+    # می‌شود — دقیقاً همان چیزی که ۲۰۲۶-۰۷-۲۶ اتفاق افتاد.
+    recent = datetime.now(timezone.utc) - timedelta(hours=2)
     messages = [
-        _msg("r1", "Action required: sign the form", "please sign"),
-        _msg("r2", "hello", "چطوری", unread=False),
+        _msg("r1", "Action required: sign the form", "please sign", ts=recent),
+        _msg("r2", "hello", "چطوری", unread=False, ts=recent),
     ]
 
     async def fake_token(db):

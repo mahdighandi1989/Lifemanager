@@ -25,11 +25,32 @@ The fix adds ``get_required_user_id`` and points the sensitive routes
 ``get_optional_user_id`` is deliberately left lenient (the dashboard /
 self-improvement reads depend on the anon fallback even with a garbage
 token) — a regression guard for that is included at the bottom.
+
+Note on the unit doubles (rewritten 2026-08-01)
+-----------------------------------------------
+The first version of these unit tests was written against an EARLIER shape
+of the dependency: ``get_required_user_id(credentials=..., db=...)`` that
+built an ``AuthService`` internally. The dependency was later refactored to
+take the whole ``Request`` (so the token can arrive in the ``access_token``
+cookie as well as the header — see ``_extract_token``) and to resolve the
+token through the module-level ``validate_token``. The old doubles kept
+patching a name (``auth_deps.AuthService``) that no longer exists and
+calling a keyword (``credentials=``) that no longer exists, so all five
+unit tests died in setup — they were pinning an API instead of a
+behaviour, and stopped guarding the security property entirely while
+still *looking* like coverage.
+
+They are now expressed against the real signature: a real
+``starlette.Request`` carrying (or not carrying) the credential, and a
+minimal DB double, so they exercise ``_extract_token`` →
+``_resolve_data_scope_user_id`` for real. The behaviours pinned are
+unchanged — that contract is the point, not the plumbing.
 """
 from __future__ import annotations
 
 import pytest
 from fastapi import HTTPException
+from starlette.requests import Request
 
 from app.config import settings
 from app.dependencies import auth as auth_deps
@@ -43,11 +64,27 @@ from app.dependencies.auth import (
 # --- Test doubles ----------------------------------------------------------
 
 
-class _Creds:
-    """Stand-in for HTTPAuthorizationCredentials (only .credentials is read)."""
+def _request(*, bearer: str | None = None, cookie: str | None = None) -> Request:
+    """A real ``Request`` carrying the credential the way a client would.
 
-    def __init__(self, token: str):
-        self.credentials = token
+    Built from a raw ASGI scope rather than mocked, so ``_extract_token``'s
+    header/cookie parsing is genuinely exercised — that parsing is the part
+    an attacker touches first.
+    """
+    headers: list[tuple[bytes, bytes]] = []
+    if bearer is not None:
+        headers.append((b"authorization", f"Bearer {bearer}".encode()))
+    if cookie is not None:
+        headers.append((b"cookie", f"access_token={cookie}".encode()))
+    return Request(
+        {
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "query_string": b"",
+            "headers": headers,
+        }
+    )
 
 
 class _FakeUser:
@@ -55,21 +92,32 @@ class _FakeUser:
         self.id = uid
 
 
-def _patch_verify(monkeypatch, *, returns=None, raises=None):
-    """Swap the AuthService the dependency constructs for one whose
-    ``verify_token`` returns / raises whatever the test wants — keeps the
-    unit tests independent of the DB."""
+class _FakeResult:
+    def __init__(self, user):
+        self._user = user
 
-    class _FakeAuthService:
-        def __init__(self, db):
-            self._db = db
+    def scalar_one_or_none(self):
+        return self._user
 
-        async def verify_token(self, token):
-            if raises is not None:
-                raise raises
-            return returns
 
-    monkeypatch.setattr(auth_deps, "AuthService", _FakeAuthService)
+class _FakeDB:
+    """Minimal AsyncSession stand-in — the dependency only ever awaits
+    ``execute()`` and reads ``scalar_one_or_none()`` off the result."""
+
+    def __init__(self, user=None, raises: BaseException | None = None):
+        self._user = user
+        self._raises = raises
+
+    async def execute(self, *_args, **_kwargs):
+        if self._raises is not None:
+            raise self._raises
+        return _FakeResult(self._user)
+
+
+def _patch_token(monkeypatch, payload):
+    """Pin what the JWT decoder yields for any token, so these unit tests
+    stay independent of signing keys and clock skew."""
+    monkeypatch.setattr(auth_deps, "validate_token", lambda _tok: payload)
 
 
 # --- get_required_user_id: unit behaviour ----------------------------------
@@ -78,29 +126,55 @@ def _patch_verify(monkeypatch, *, returns=None, raises=None):
 @pytest.mark.asyncio
 async def test_required_valid_token_returns_user_id(monkeypatch):
     """A valid bearer resolves to the real user id."""
-    _patch_verify(monkeypatch, returns=_FakeUser(42))
-    uid = await get_required_user_id(credentials=_Creds("good.jwt"), db=None)
+    _patch_token(monkeypatch, {"sub": "42"})
+    uid = await get_required_user_id(
+        _request(bearer="good.jwt"), db=_FakeDB(user=_FakeUser(42))
+    )
     assert uid == 42
+
+
+@pytest.mark.asyncio
+async def test_required_token_in_cookie_also_resolves(monkeypatch):
+    """The OAuth HTML pages carry the token in the ``access_token`` cookie —
+    a plain browser navigation cannot add an Authorization header. That path
+    must resolve identically, or those pages 401 forever."""
+    _patch_token(monkeypatch, {"sub": "7"})
+    uid = await get_required_user_id(
+        _request(cookie="good.jwt"), db=_FakeDB(user=_FakeUser(7))
+    )
+    assert uid == 7
 
 
 @pytest.mark.asyncio
 async def test_required_invalid_token_is_401_even_when_bypass_on(monkeypatch):
     """A present-but-invalid token is rejected with 401 regardless of
     REQUIRE_AUTH — a forged/expired token must never reach the anon scope."""
-    _patch_verify(monkeypatch, returns=None)
+    _patch_token(monkeypatch, None)  # decoder rejects it
     monkeypatch.setattr(settings, "REQUIRE_AUTH", False)
     with pytest.raises(HTTPException) as exc:
-        await get_required_user_id(credentials=_Creds("forged.jwt"), db=None)
+        await get_required_user_id(_request(bearer="forged.jwt"), db=_FakeDB())
     assert exc.value.status_code == 401
     assert "Invalid or expired token" in exc.value.detail
 
 
 @pytest.mark.asyncio
+async def test_required_valid_signature_unknown_user_is_401(monkeypatch):
+    """A correctly-signed token whose ``sub`` no longer exists (deleted
+    account) must not fall through to the anon scope either."""
+    _patch_token(monkeypatch, {"sub": "999"})
+    with pytest.raises(HTTPException) as exc:
+        await get_required_user_id(_request(bearer="orphan.jwt"), db=_FakeDB(user=None))
+    assert exc.value.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_required_token_resolution_exception_is_401(monkeypatch):
     """If token resolution blows up, fail closed with 401 — never anon."""
-    _patch_verify(monkeypatch, raises=RuntimeError("db exploded"))
+    _patch_token(monkeypatch, {"sub": "1"})
     with pytest.raises(HTTPException) as exc:
-        await get_required_user_id(credentials=_Creds("boom.jwt"), db=None)
+        await get_required_user_id(
+            _request(bearer="boom.jwt"), db=_FakeDB(raises=RuntimeError("db exploded"))
+        )
     assert exc.value.status_code == 401
 
 
@@ -109,7 +183,7 @@ async def test_required_no_header_falls_back_to_anon_by_default(monkeypatch):
     """REQUIRE_AUTH=False (default): a missing header still resolves to the
     anon scope so the current login-bypass frontend keeps working."""
     monkeypatch.setattr(settings, "REQUIRE_AUTH", False)
-    uid = await get_required_user_id(credentials=None, db=None)
+    uid = await get_required_user_id(_request(), db=_FakeDB())
     assert uid == DEFAULT_ANON_USER_ID
 
 
@@ -118,7 +192,7 @@ async def test_required_no_header_is_401_when_require_auth_on(monkeypatch):
     """REQUIRE_AUTH=True: a missing header is refused with 401."""
     monkeypatch.setattr(settings, "REQUIRE_AUTH", True)
     with pytest.raises(HTTPException) as exc:
-        await get_required_user_id(credentials=None, db=None)
+        await get_required_user_id(_request(), db=_FakeDB())
     assert exc.value.status_code == 401
     assert "Authentication required" in exc.value.detail
 
@@ -191,8 +265,19 @@ async def test_optional_invalid_token_still_falls_back_to_anon(monkeypatch):
     """The lenient dependency must NOT start 401-ing on a bad token — the
     self-improvement / dashboard reads rely on the anon fallback (see
     tests/test_self_improvement.py::test_overview_with_garbage_token...)."""
-    _patch_verify(monkeypatch, returns=None)
-    uid = await get_optional_user_id(credentials=_Creds("garbage"), db=None)
+    _patch_token(monkeypatch, None)  # decoder rejects it
+    uid = await get_optional_user_id(_request(bearer="garbage"), db=_FakeDB())
+    assert uid == DEFAULT_ANON_USER_ID
+
+
+@pytest.mark.asyncio
+async def test_optional_resolution_exception_still_falls_back_to_anon(monkeypatch):
+    """Even a DB blow-up must not turn the lenient dependency into a 401 —
+    that is the whole reason the two dependencies exist separately."""
+    _patch_token(monkeypatch, {"sub": "1"})
+    uid = await get_optional_user_id(
+        _request(bearer="ok.jwt"), db=_FakeDB(raises=RuntimeError("db exploded"))
+    )
     assert uid == DEFAULT_ANON_USER_ID
 
 

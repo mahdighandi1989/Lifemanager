@@ -503,27 +503,37 @@ async def test_logout_redirects_home_and_clears_cookie(oauth_app):
 
 
 @pytest.mark.asyncio
-async def test_google_login_redirects_to_consent_when_configured(
-    oauth_app, monkeypatch
-):
-    """/auth/google builds a Google consent URL when GOOGLE_CLIENT_ID is set."""
+async def test_google_login_serves_gis_page_when_configured(oauth_app, monkeypatch):
+    """/auth/google serves the Google Identity Services sign-in page.
+
+    Contract change, deliberately (see ``google_login``'s docstring): the
+    entry point used to 302 to Google's classic consent screen, which
+    required a configured ``GOOGLE_REDIRECT_URI`` matching the deployment
+    origin. It now renders the in-browser GIS credential flow instead, so
+    the operator only has to authorise the origin. The redirect half of the
+    classic flow is NOT gone — ``/auth/google/callback`` still exchanges a
+    ``code`` (covered above) — only this entry point changed shape.
+
+    The test previously asserted the old 302 and had been failing ever
+    since the switch; it is realigned to the live contract, and the two
+    things that actually matter are what it now pins: the page is served,
+    and it carries the configured client id (without it the GIS button
+    renders but can never mint a credential).
+    """
     client, _, _ = oauth_app
     monkeypatch.setattr(
         auth_google.settings, "GOOGLE_CLIENT_ID", "cid.apps.googleusercontent.com"
     )
-    monkeypatch.setattr(
-        auth_google.settings,
-        "GOOGLE_REDIRECT_URI",
-        "http://localhost:8000/auth/google/callback",
-    )
 
     resp = client.get("/auth/google")
 
-    assert resp.status_code in (302, 307)
-    loc = resp.headers["location"]
-    assert loc.startswith("https://accounts.google.com/o/oauth2/v2/auth")
-    assert "client_id=cid.apps.googleusercontent.com" in loc
-    assert "response_type=code" in loc
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("text/html")
+    body = resp.text
+    assert "cid.apps.googleusercontent.com" in body
+    # the GIS client library and the POST-back endpoint that mints our cookie
+    assert "accounts.google.com/gsi/client" in body
+    assert "/auth/google/token" in body
 
 
 @pytest.mark.asyncio

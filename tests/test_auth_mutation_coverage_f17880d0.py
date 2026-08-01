@@ -137,50 +137,103 @@ def test_todo_item_mutation_scoped_through_list_owner(api_client):
 
 
 # --- ROLE CHANGE (admin gate stays enforced) --------------------------------
-
-@pytest.mark.asyncio
-async def test_role_change_endpoint_rejects_non_admin():
-    """The approve-user (role/permission change) handler must 403 a
-    non-admin caller. The router is only mounted when GOOGLE_CLIENT_ID is
-    configured, so we exercise the handler directly to prove the permission
-    gate (``is_admin``) guards the mutation regardless of mounting."""
-    from fastapi import HTTPException
-
-    from app.routes.auth_google import approve_pending_user
-
-    non_admin = types.SimpleNamespace(
-        id=5, email="nobody@example.com", role=None, permissions=None
-    )
-    with pytest.raises(HTTPException) as exc:
-        await approve_pending_user(
-            user_id=9, permissions="read-only", db=None, current_user=non_admin
-        )
-    assert exc.value.status_code == 403
+#
+# Why these go through HTTP and not a direct call (rewritten 2026-08-01):
+# the admin gate lives in ``Depends(get_current_admin_user)``, i.e. in the
+# SIGNATURE, not the body. Calling ``approve_pending_user(...)`` as a plain
+# Python function never evaluates that dependency — the earlier version of
+# these tests did exactly that, passing ``current_user=non_admin`` straight
+# into the body, so the gate was never reached: the "rejects non-admin" test
+# only ever died on ``db=None``, and the "allows admin" twin proved nothing
+# about authorization at all. Mounting the router and calling it over HTTP
+# is what actually runs the gate.
 
 
-@pytest.mark.asyncio
-async def test_role_change_endpoint_allows_admin(monkeypatch):
-    """An admin (by role) passes the gate; we stub the DB-touching service so
-    the test stays at the authorization layer."""
+@pytest.fixture
+def approve_client(monkeypatch):
+    """The auth_google router mounted standalone (it is only mounted on the
+    real app when GOOGLE_CLIENT_ID is configured), with the caller pinned by
+    overriding ``get_current_user`` — the gate under test,
+    ``get_current_admin_user``, still runs for real on top of it.
+
+    Yields ``(client, as_caller)``.
+    """
+    from fastapi import FastAPI
+
     import app.routes.auth_google as ag
-    from app.models.user_oauth import OAuthUser, UserRole
+    from app.dependencies.auth import get_current_user
 
-    approved = types.SimpleNamespace(id=9, email="approved@example.com")
+    approved = types.SimpleNamespace(
+        id=9,
+        email="approved@example.com",
+        name="Approved",
+        role="user",
+        permissions="read-only",
+        status="approved",
+        created_at=None,
+    )
 
     async def _fake_approve_user(db, user_id, permissions):
+        # Keeps the test at the authorization layer — the DB half of the
+        # handler is covered by tests/test_auth_google.py.
         return approved
 
     monkeypatch.setattr(ag, "approve_user", _fake_approve_user)
 
-    admin = types.SimpleNamespace(
-        id=1, email="admin@example.com", role=UserRole.ADMIN, permissions=None
+    async def _no_db():
+        yield None
+
+    test_app = FastAPI()
+    test_app.include_router(ag.router)
+    test_app.dependency_overrides[get_db] = _no_db
+
+    def as_caller(user):
+        test_app.dependency_overrides[get_current_user] = lambda: user
+
+    yield TestClient(test_app, raise_server_exceptions=False), as_caller
+    test_app.dependency_overrides.clear()
+
+
+def test_role_change_endpoint_rejects_non_admin(approve_client):
+    """A non-admin caller is refused by ``get_current_admin_user`` with 403 —
+    the role/permission mutation never reaches the service."""
+    client, as_caller = approve_client
+    as_caller(
+        types.SimpleNamespace(
+            id=5, email="nobody@example.com", role=None, permissions=None, status="approved"
+        )
     )
-    result = await ag.approve_pending_user(
-        user_id=9, permissions="read-only", db=None, current_user=admin
+    resp = client.post("/admin/approve-user/9", params={"permissions": "read-only"})
+    assert resp.status_code == 403, resp.text
+    assert "admin" in resp.json()["detail"].lower()
+
+
+def test_role_change_endpoint_rejects_anonymous(approve_client):
+    """No caller at all → 401 from ``get_current_user``, before the admin
+    gate is even consulted. Pinned separately so a future change that made
+    the route anonymous-reachable could not hide behind the 403 test."""
+    client, _ = approve_client
+    resp = client.post("/admin/approve-user/9", params={"permissions": "read-only"})
+    assert resp.status_code == 401, resp.text
+
+
+def test_role_change_endpoint_allows_admin(approve_client):
+    """An admin (by role) passes the gate and the mutation goes through."""
+    from app.models.user_oauth import UserRole
+
+    client, as_caller = approve_client
+    as_caller(
+        types.SimpleNamespace(
+            id=1,
+            email="admin@example.com",
+            role=UserRole.ADMIN,
+            permissions=None,
+            status="approved",
+        )
     )
-    assert result is approved
-    # Sanity: the imported OAuthUser shape is what the gate reasons about.
-    assert hasattr(OAuthUser, "role")
+    resp = client.post("/admin/approve-user/9", params={"permissions": "read-only"})
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["id"] == 9
 
 
 # --- USER PROFILE UPDATE (POST /api/users/profile) --------------------------
