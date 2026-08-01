@@ -67,8 +67,11 @@ function MobileChannelsStrip() {
         <span className="text-sm font-medium text-gray-700">
           کانال‌های موبایل
           {broken.length > 0 ? (
+            // «مشکل‌دار»، نه «داده نمی‌فرستد»: یک مجرای partial ممکن است همین
+            // حالا داده بفرستد و فقط پیش‌نیازِ پایداری‌اش کم باشد — برچسبِ قبلی
+            // با متنِ خودِ همان سطر («فعال، ولی ناپایدار») تناقض داشت.
             <span className="mr-2 text-xs text-amber-600">
-              {broken.length} کانال داده نمی‌فرستد
+              {broken.length} کانال نیاز به رسیدگی دارد
             </span>
           ) : (
             <span className="mr-2 text-xs text-emerald-600">همه فعال</span>

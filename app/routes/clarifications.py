@@ -195,7 +195,9 @@ async def ask_clarification(
         db, topic=topic, context=str(payload.get("context") or ""),
         source=str(payload.get("source") or "manual"),
         source_ref=payload.get("source_ref"),
-        target=payload.get("target"),
+        # مقصد از بدنهٔ درخواست می‌آید و تعیین می‌کند جوابِ فرم کجا بنشیند —
+        # پس قبل از ذخیره باید به دامنهٔ خودِ همین کاربر بسته شود.
+        target=await clar.sanitize_target(db, payload.get("target"), user_id=user_id),
         questions=payload.get("questions"),
         priority=int(payload.get("priority") or 0),
         user_id=user_id,

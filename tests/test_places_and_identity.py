@@ -388,9 +388,26 @@ def test_location_requires_the_device_token(api_client):
     assert r.status_code == 401
 
 
-def test_an_empty_batch_still_reports_the_location_switch(api_client):
-    """وقتی موقعیت خاموش است نقطه‌ای نیست — ولی خبرِ خاموشی باید برسد،
-    وگرنه تشخیصِ «مجرای خاموش» دوباره حدسی می‌شود."""
+def test_an_empty_batch_still_reports_the_location_switch(api_client, monkeypatch):
+    """وقتی موقعیت خاموش است نقطه‌ای نیست — ولی خبرِ خاموشی باید برسد.
+
+    نسخهٔ اول فقط ۲۰۰ را می‌سنجید، و چون سرور آن زمان `location_enabled` را
+    دور می‌ریخت، عملاً هیچ‌چیزِ نامش را ثابت نمی‌کرد. حالا خودِ **هشدار** را
+    می‌سنجد — قیدِ صریحِ مالک: «اگر لوکیشن خاموش بود هشدار جدی بده».
+    (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+    """
+    import app.routes.mobile as mobile_routes
+
+    sent = []
+
+    async def _fake_notify(event, **kw):
+        sent.append((event, kw.get("title"), kw.get("priority")))
+        return True
+
+    import app.services.notification_service as notif
+
+    monkeypatch.setattr(notif, "notify_event", _fake_notify)
+
     token = api_client.get("/api/mobile/token").json()["token"]
     r = api_client.post(
         "/api/mobile/location",
@@ -398,6 +415,17 @@ def test_an_empty_batch_still_reports_the_location_switch(api_client):
         headers={"X-Device-Token": token},
     )
     assert r.status_code == 200 and r.json()["stored"] == 0
+    assert [e for e, _t, _p in sent] == ["location_off"], "هشدارِ خاموشی باید فرستاده شود"
+    assert sent[0][2] == "high", "«هشدار جدی» یعنی اولویتِ بالا"
+
+    # و تکرارِ بی‌فایده ندارد — همان درسِ «ماشینِ نویز».
+    api_client.post(
+        "/api/mobile/location",
+        json={"points": [], "device": "s24", "location_enabled": False},
+        headers={"X-Device-Token": token},
+    )
+    assert len(sent) == 1, "در پنجرهٔ خنک‌شدن نباید دوباره هشدار بدهد"
+    assert mobile_routes._LOC_OFF_COOLDOWN_H > 0
 
 
 @pytest.mark.asyncio
@@ -417,3 +445,87 @@ async def test_dense_precise_points_become_one_stay_not_many(db):
     res = await ps.ingest_points(db, 0, since_hours=24)
     assert res["places"] == 1
     assert len((await db.execute(select(Place))).scalars().all()) == 1
+
+
+# ── پنجرهٔ غلتان، اقامتِ طولانی، و سفرِ توضیح‌داده‌شده (ممیزیِ ۲۰۲۶-۰۸-۰۱) ───
+
+@pytest.mark.asyncio
+async def test_a_long_stay_is_one_visit_even_as_the_window_sweeps_through_it(db_session):
+    """کارِ دوره‌ای ساعتی است و پنجره‌اش ۴۸ ساعته و **غلتان**.
+
+    وقتی لبهٔ پنجره از وسطِ یک اقامتِ طولانی رد می‌شود، اولین نقطهٔ باقی‌مانده
+    هر بار عوض می‌شود. با ضدتکرارِ «برابریِ دقیقِ لحظهٔ ورود»، یک شبِ خواب هر
+    ساعت یک بازدیدِ تازه می‌ساخت و مجموعِ دقیقه‌ها چند برابر می‌شد.
+    """
+    from sqlalchemy import select
+
+    from app.models.place import Place, Visit
+    from app.models.user_location import UserLocation
+    from app.services import place_service as ps
+
+    base = dt.datetime.now(UTC) - dt.timedelta(hours=12)
+    # یک اقامتِ ۹ ساعته: هر ۱۵ دقیقه یک نقطه، همه در یک نقطهٔ ثابت
+    for i in range(37):
+        db_session.add(UserLocation(
+            user_id=0, latitude=25.2000, longitude=55.2700, device="s24",
+            timestamp=base + dt.timedelta(minutes=15 * i),
+        ))
+    await db_session.commit()
+
+    # پنجره را قدم‌به‌قدم کوچک کن — دقیقاً همان اثری که گذشتِ زمان دارد.
+    for hours in (13, 12, 11, 10, 9, 8, 7, 6, 5, 4):
+        await ps.ingest_points(db_session, 0, since_hours=hours)
+
+    visits = (await db_session.execute(select(Visit))).scalars().all()
+    place = (await db_session.execute(select(Place))).scalars().one()
+    assert len(visits) == 1, f"یک اقامت باید یک بازدید باشد، نه {len(visits)}"
+    assert place.visit_count == 1
+    # ۹ ساعت = ۵۴۰ دقیقه؛ کمی رواداری برای برشِ پنجره
+    assert 400 <= (place.total_minutes or 0) <= 545, place.total_minutes
+
+
+@pytest.mark.asyncio
+async def test_an_explained_trip_is_never_flagged_again(db_session):
+    """قیدِ صریحِ مالک: مسیری که توضیح داده شد دیگر پرسیده نمی‌شود."""
+    from app.models.place import Trip
+    from app.services import place_service as ps
+
+    trip = Trip(
+        user_id=0, from_place_id=1, to_place_id=2,
+        started_at=dt.datetime.now(UTC) - dt.timedelta(hours=3),
+        ended_at=dt.datetime.now(UTC) - dt.timedelta(hours=2),
+        minutes=60, distance_km=12, pattern_key="1:2:5:8", is_anomaly=True,
+    )
+    db_session.add(trip)
+    await db_session.commit()
+
+    out = await ps.apply_place_answer(
+        db_session, {"kind": "trip", "trip_id": trip.id, "user_id": 0},
+        {"note": "رفتم بیمارستان"},
+    )
+    await db_session.commit()
+    assert out and out[0]["where"] == "trip"
+    # جوابِ مالک باید **ذخیره** شود، نه فقط در پیامِ تأیید تکرار شود
+    assert trip.note == "رفتم بیمارستان"
+    assert trip.explained_at is not None
+    assert trip.is_anomaly is False
+
+    # و اجرای بعدیِ کشفِ الگو دوباره علامتش نمی‌زند
+    await ps.learn_patterns(db_session, 0)
+    await db_session.refresh(trip)
+    assert trip.is_anomaly is False, "سفرِ توضیح‌داده‌شده نباید دوباره غیرعادی شود"
+
+
+def test_the_hour_histogram_uses_the_owners_local_clock():
+    """هیستوگرام با ساعتِ محلی پر می‌شود، چون `infer_kind` هم محلی می‌سنجد.
+
+    با ساعتِ UTC، خوابِ ۲۳ محلی (۱۹ UTC) در سطلِ «اداری» می‌افتاد و خانه
+    «محل کار» برچسب می‌خورد.
+    """
+    from app.services import place_service as ps
+
+    # ۲۳:۰۰ محلی در UTC+4 یعنی ۱۹:۰۰ UTC
+    at_utc = dt.datetime(2026, 7, 20, 19, 0, tzinfo=UTC)
+    hist = ps._bump_histogram(None, at_utc, 300)
+    assert hist["23"] == 300, "باید در سطلِ ۲۳ محلی بنشیند، نه ۱۹"
+    assert hist["19"] == 0

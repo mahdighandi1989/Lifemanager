@@ -13,6 +13,13 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # نگهبانِ همان الگویِ ۰۰۵۶–۰۰۶۱: تیرِ رایگانِ Render در startup
+    # ``create_all()`` می‌زند، پس ممکن است جدول همین حالا وجود داشته باشد.
+    # بدونِ این بررسی، ``alembic upgrade head`` روی چنین دیتابیسی با
+    # «table already exists» می‌شکست و **بقیهٔ مهاجرت‌ها هم اجرا نمی‌شدند».
+    bind = op.get_bind()
+    if "clarifications" in sa.inspect(bind).get_table_names():
+        return
     op.create_table(
         "clarifications",
         sa.Column("id", sa.Integer(), primary_key=True),
@@ -45,4 +52,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_table("clarifications")
+    bind = op.get_bind()
+    if "clarifications" in sa.inspect(bind).get_table_names():
+        op.drop_table("clarifications")

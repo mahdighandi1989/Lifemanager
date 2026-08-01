@@ -122,6 +122,23 @@ class NotifListener : NotificationListenerService() {
             b.getParcelable<android.app.Person>("sender_person")?.name?.toString()?.trim().orEmpty()
         } catch (_: Throwable) { "" }
 
+    /**
+     * اندروید گاهی اتصالِ شنونده را قطع می‌کند — بعد از به‌روزرسانیِ خودِ اپ،
+     * کم‌حافظگی، یا خطای سیستمی. بدونِ درخواستِ اتصالِ دوباره، شنونده تا
+     * راه‌اندازیِ بعدیِ گوشی مرده می‌ماند و اعلان‌ها بی‌صدا ثبت نمی‌شوند —
+     * دقیقاً همان خرابیِ خاموشی که صفحهٔ تشخیص برای دیدنش ساخته شد.
+     */
+    override fun onListenerDisconnected() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                requestRebind(
+                    android.content.ComponentName(this, NotifListener::class.java)
+                )
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         try {
             if (sbn.packageName == packageName) return

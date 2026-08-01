@@ -1085,7 +1085,10 @@ async def test_a_dead_phone_stays_silent_even_behind_a_chatty_one(client_and_db)
     client.post("/api/mobile/heartbeat", json={"device": "old"},
                 headers={"X-Device-Token": token})
     await _age_actions(session, ["mobile_heartbeat"], days=3)
-    for _ in range(3):
+    # باید از سقفِ ۵۰۰ ردیفِ کوئریِ سراسری **عبور** کند، وگرنه تست همان چیزی
+    # را که نامش را می‌برد نمی‌سنجد: با ۴ ردیف، نسخهٔ معیوب (کوئریِ سقف‌دارِ
+    # سراسری) هم سبز می‌ماند. (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+    for _ in range(520):
         client.post("/api/mobile/heartbeat", json={"device": "new"},
                     headers={"X-Device-Token": token})
 
@@ -1093,15 +1096,30 @@ async def test_a_dead_phone_stays_silent_even_behind_a_chatty_one(client_and_db)
     assert [d["device"] for d in silent] == ["old"]
 
 
-def test_person_matching_needs_a_word_boundary_and_the_right_owner():
-    """«علی» نباید داخلِ واژهٔ دیگری گیر کند."""
-    import re
+@pytest.mark.asyncio
+async def test_person_matching_needs_a_word_boundary_and_the_right_owner(client_and_db):
+    """«علی» نباید داخلِ واژهٔ دیگری گیر کند — و نباید از مرزِ مالک رد شود.
 
-    from app.services.mobile_dispatch_service import _match_person  # noqa: F401
+    نسخهٔ اول این تست الگویی را که **خودش** تعریف کرده بود می‌سنجید و اصلاً
+    `_match_person` را صدا نمی‌زد؛ یعنی هر دو گاردی که نامش را می‌برد
+    می‌توانستند حذف شوند و تست همچنان سبز بماند (ممیزیِ ۲۰۲۶-۰۸-۰۱).
+    """
+    from app.models.person import Person
+    from app.services.mobile_dispatch_service import _match_person
 
-    # مرزِ واژه‌ای که در تطبیق استفاده می‌شود
-    assert re.search(r"(?<!\w)علی(?!\w)", "سلام علی جان") is not None
-    assert re.search(r"(?<!\w)علی(?!\w)", "تعالی") is None
+    _, session = client_and_db
+    mine = Person(user_id=0, name="علی")
+    theirs = Person(user_id=99, name="نازنین")
+    session.add_all([mine, theirs])
+    await session.commit()
+
+    hit = await _match_person(session, "", "سلام علی جان", user_id=0)
+    assert hit is not None and hit.id == mine.id
+
+    # داخلِ واژه گیر نمی‌کند
+    assert await _match_person(session, "", "تعالی و پیشرفت", user_id=0) is None
+    # و فردِ کاربرِ دیگر دیده نمی‌شود
+    assert await _match_person(session, "", "با نازنین حرف زدم", user_id=0) is None
 
 
 def test_always_on_prerequisites_show_as_partial_not_ok(api_client):

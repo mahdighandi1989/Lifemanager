@@ -58,6 +58,9 @@ export const LINKS = [
   // now instead of at the bottom next to the system tools. Route + testid
   // unchanged.
   { to: '/dev-center', label: 'کار و توسعه', testid: 'sidebar-link-dev-center', group: 'life_pages' },
+  // 2026-08-01: صفحهٔ «من که هستم» ساخته شد ولی هیچ دری نداشت — فقط با تایپِ
+  // آدرس باز می‌شد. یک صفحه‌ای که از منو دیده نشود، عملاً وجود ندارد.
+  { to: '/identity-profile', label: 'من که هستم', testid: 'sidebar-link-identity-profile', group: 'life_pages' },
 
   // ابزار — helpers.
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant', group: 'tools' },

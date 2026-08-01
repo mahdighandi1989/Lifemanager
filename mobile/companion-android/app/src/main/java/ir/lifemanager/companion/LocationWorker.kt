@@ -116,9 +116,14 @@ class LocationWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
             warnLocationOff("سرویسِ موقعیتِ گوشی (GPS) خاموش است.")
         }
 
-        // وقتی سرویسِ دقیق روشن است، خودش لحظه‌به‌لحظه می‌نویسد؛ کارگر فقط
-        // بافر را خالی می‌کند و نقطهٔ تکراری اضافه نمی‌کند.
-        if (!LocationTrackingService.isEnabled(applicationContext)) {
+        // وقتی سرویسِ دقیق **واقعاً زنده است**، خودش لحظه‌به‌لحظه می‌نویسد؛
+        // کارگر فقط بافر را خالی می‌کند و نقطهٔ تکراری اضافه نمی‌کند.
+        //
+        // چرا isAlive و نه isEnabled: ترجیح ممکن است روی true مانده باشد در
+        // حالی که سرویس خودش را متوقف کرده (اجازهٔ «تقریبی»، کشته‌شدن توسط
+        // سازنده). با تکیه بر ترجیح، کارگر هم نمونه‌برداری نمی‌کرد و هر دو
+        // مجرا با هم ساکت می‌شدند. (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+        if (!LocationTrackingService.isAlive(applicationContext)) {
             readPoint()?.let { LocationBuffer.add(applicationContext, it) }
         }
         val arr = LocationBuffer.drain(applicationContext)

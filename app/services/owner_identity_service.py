@@ -173,7 +173,7 @@ async def _x_date_of_birth(db, uid):
     # مالک ممکن است خودش در «واقعیت‌های هویتی» وارد کرده باشد (رمزنگاری‌شده،
     # فقط سمتِ سرور خوانده می‌شود — هرگز به کلاینت نمی‌رود).
     try:
-        from app.services import identity_facts
+        from app.services.ingest import identity_facts
 
         raw = await identity_facts.get_fact(db, fact_key="dob", user_id=uid)
         if raw:
@@ -185,8 +185,14 @@ async def _x_date_of_birth(db, uid):
 
 
 async def _x_age(db, uid):
-    dob = await _x_date_of_birth(db, uid)
-    if not dob:
+    # سن از **همان مقداری** حساب می‌شود که در پروفایل نشسته، نه از استخراجِ
+    # دوبارهٔ سند. اگر مالک تاریخِ تولد را اصلاح و قفل کرده باشد، خواندنِ
+    # دوبارهٔ سند سنِ متناقض می‌ساخت: تاریخِ تولدِ اصلاح‌شده کنارِ سنِ قدیمی.
+    # (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+    stored = await _row(db, uid, "date_of_birth")
+    dob = ({"value": stored.value, "confidence": 1.0} if stored is not None
+           and stored.owner_locked and stored.value else await _x_date_of_birth(db, uid))
+    if not dob or not dob.get("value"):
         return None
     parsed = parse_loose_date(dob["value"])
     if not parsed:

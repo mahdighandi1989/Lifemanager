@@ -489,6 +489,11 @@ async def ingest_location(
             except Exception:
                 when = None
         when = when or _dtm.datetime.now(_dtm.timezone.utc)
+        # همیشه آگاه‌از-منطقه (UTC). نقطه‌ای با زمانِ **بی‌منطقه** در مقایسهٔ
+        # ضدتکرار با زمانِ آگاه، `TypeError` می‌داد و کلِ بسته با ۵۰۰ رد
+        # می‌شد — یعنی یک نقطهٔ بدشکل، تمامِ صفِ آفلاین را زمین می‌زد.
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=_dtm.timezone.utc)
         dup = (
             await db.execute(
                 select(UserLocation.id).where(
@@ -517,8 +522,92 @@ async def ingest_location(
         )
     else:
         await db.commit()
+
+    # هشدارِ «موقعیت خاموش است» — قیدِ صریحِ مالک («اگر لوکیشن خاموش بود هشدار
+    # جدی بده»). گوشی خودش هم محلی هشدار می‌دهد (برای وقتی که اینترنت نیست)،
+    # ولی رویدادِ `location_off` تا امروز هیچ فرستنده‌ای نداشت: این فیلد خوانده
+    # می‌شد و دور ریخته می‌شد، پس نسخهٔ تلگرامیِ هشدار هرگز نمی‌رسید.
+    # (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+    if payload.location_enabled is False:
+        await _alert_location_off(db, device, user_id)
+    elif payload.location_enabled is True:
+        await _clear_location_off(db, device)
+
     return {"ok": True, "success": True, "stored": stored,
             "received": len(payload.points or [])}
+
+
+# هر چند وقت یک‌بار می‌شود دوباره هشدار داد (ساعت). «جدی» یعنی نمی‌گذاریم گم
+# شود، نه اینکه هر بستهٔ نقطه یک پیام بسازد — همان درسِ «ماشینِ نویز».
+_LOC_OFF_COOLDOWN_H = 6
+_LOC_OFF_KEY = "mobile_location_off_alerts"
+
+
+async def _get_json_setting(db: AsyncSession, key: str) -> Dict:
+    row = (
+        await db.execute(select(GlobalSetting).where(GlobalSetting.key == key))
+    ).scalar_one_or_none()
+    try:
+        import json as _json
+
+        return _json.loads(row.value) if row and row.value else {}
+    except Exception:
+        return {}
+
+
+async def _set_json_setting(db: AsyncSession, key: str, value: Dict) -> None:
+    import json as _json
+
+    payload = _json.dumps(value)[:8000]
+    row = (
+        await db.execute(select(GlobalSetting).where(GlobalSetting.key == key))
+    ).scalar_one_or_none()
+    if row is None:
+        db.add(GlobalSetting(key=key, value=payload))
+    else:
+        row.value = payload
+    await db.commit()
+
+
+async def _alert_location_off(db: AsyncSession, device: str, user_id: int) -> None:
+    try:
+        from app.services.notification_service import notify_event
+
+        state = await _get_json_setting(db, _LOC_OFF_KEY)
+        now = _dtm.datetime.now(_dtm.timezone.utc)
+        last = state.get(device)
+        if last:
+            try:
+                if (now - _dtm.datetime.fromisoformat(last)).total_seconds() < _LOC_OFF_COOLDOWN_H * 3600:
+                    return
+            except Exception:
+                pass
+        await notify_event(
+            "location_off",
+            user_id=user_id,
+            db=db,
+            title="📍 موقعیت مکانی خاموش است",
+            message=(
+                f"گوشی «{device}» گزارش داد که سرویسِ موقعیت خاموش یا باطل شده. "
+                "تا روشن نشود، مسیرها و الگوهای رفت‌وآمد ثبت نمی‌شوند."
+            ),
+            priority="high",
+        )
+        state[device] = now.isoformat()
+        await _set_json_setting(db, _LOC_OFF_KEY, state)
+    except Exception as exc:  # هشدار هرگز نباید خودِ ورودی را بشکند
+        logger.debug("location_off alert skipped: %r", exc)
+
+
+async def _clear_location_off(db: AsyncSession, device: str) -> None:
+    """موقعیت دوباره روشن شد → یادداشتِ هشدار پاک می‌شود تا خاموشیِ بعدی
+    فوراً (نه بعد از cooldown) هشدار بدهد."""
+    try:
+        state = await _get_json_setting(db, _LOC_OFF_KEY)
+        if state.pop(device, None) is not None:
+            await _set_json_setting(db, _LOC_OFF_KEY, state)
+    except Exception as exc:
+        logger.debug("location_off clear skipped: %r", exc)
 
 
 class HeartbeatPayload(BaseModel):
@@ -780,7 +869,10 @@ async def mobile_diagnostics(
         "device_live": device_live,
         "perms_reported": perms_seen,
         # مجراهایی که واقعاً نیاز به کار دارند (unknown یعنی «نمی‌دانیم»، نه خرابی)
-        "silent": [c["label"] for c in out if c["status"] in ("off", "silent", "never")],
+        # «partial» هم اینجاست: مجرایی که پیش‌نیازش نیست عملاً داده نمی‌فرستد،
+        # و نبودنش از این فهرست یعنی هر مصرف‌کنندهٔ بعدی آن را سالم می‌بیند.
+        "silent": [c["label"] for c in out
+                   if c["status"] in ("off", "silent", "never", "partial")],
     }
 
 

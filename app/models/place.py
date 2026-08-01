@@ -91,6 +91,14 @@ class Trip(Base):
     # آیا این سفر خلافِ الگوی شناخته‌شده بود (تنها حالتی که سؤال/هشدار دارد)
     is_anomaly = Column(Boolean, nullable=False, default=False)
 
+    # توضیحِ خودِ مالک («آنجا چه کردی؟») و لحظه‌ای که داد. تا پیش از
+    # ۲۰۲۶-۰۸-۰۱ جوابِ مالک فقط در پیامِ تأیید تکرار می‌شد و **ذخیره نمی‌شد**،
+    # و چون `learn_patterns` هر ساعت `is_anomaly` را از نو حساب می‌کرد، همان
+    # سفر دوباره غیرعادی می‌شد و دوباره پرسیده می‌شد — دقیقاً خلافِ قیدِ صریحِ
+    # مالک که «مسیرِ توضیح‌داده‌شده دیگر پرسیده نشود».
+    note = Column(Text, nullable=True)
+    explained_at = Column(DateTime(timezone=True), nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 

@@ -126,14 +126,29 @@ async def _nearest_place(db: AsyncSession, uid: int, lat: float, lon: float):
     return best
 
 
-def _bump_histogram(hist: Optional[Dict[str, Any]], start: datetime, minutes: float) -> Dict[str, float]:
+# ساعتِ محلیِ مالک، نه UTC. همان پیش‌فرضِ موتورِ توجه و فرمان‌ها (امارات، +۴).
+# چرا مهم است: هیستوگرام با ساعتِ UTC پر می‌شد ولی `infer_kind` آن را با
+# ساعت‌های «شب» و «اداری»ِ **محلی** می‌سنجید. با اختلافِ ۴ ساعت، خوابِ شب
+# (۲۳ محلی = ۱۹ UTC) در سطلِ اداری می‌افتاد و خانه به‌جای خانه، «محل کار»
+# برچسب می‌خورد — یعنی هم پروفایل غلط می‌شد و هم سؤالِ «اینجا کجاست؟»
+# پرسیده نمی‌شد. (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+TZ_OFFSET_MINUTES = 240
+
+
+def _local_hour(moment: datetime) -> int:
+    return (_aware(moment) + timedelta(minutes=TZ_OFFSET_MINUTES)).hour
+
+
+def _bump_histogram(
+    hist: Optional[Dict[str, Any]], start: datetime, minutes: float
+) -> Dict[str, float]:
     out = {str(h): 0.0 for h in range(24)}
     for k, v in (hist or {}).items():
         try:
             out[str(int(k))] = float(v)
         except Exception:
             continue
-    hour = _aware(start).hour
+    hour = _local_hour(start)
     out[str(hour)] = out.get(str(hour), 0.0) + float(minutes or 0)
     return out
 
@@ -201,16 +216,46 @@ async def ingest_points(db: AsyncSession, uid: int = 0, *, since_hours: int = 48
             await db.flush()
             made_places += 1
 
-        # ضدتکرار: همین بازه قبلاً ثبت شده؟
-        dup = (
+        # ضدتکرار بر اساسِ **هم‌پوشانی**، نه برابریِ دقیقِ لحظهٔ ورود.
+        #
+        # چرا (ممیزیِ ۲۰۲۶-۰۸-۰۱): پنجرهٔ ورودی غلتان است (پیش‌فرض ۴۸ ساعت) و
+        # کارِ دوره‌ای هر ساعت اجرا می‌شود. وقتی لبهٔ پنجره از **وسطِ** یک
+        # اقامتِ طولانی رد می‌شود، اولین نقطهٔ باقی‌مانده هر بار عوض می‌شود، پس
+        # `arrived_at` هرگز برابر نمی‌شد و یک شبِ خوابِ ۹ ساعته هر ساعت یک
+        # بازدیدِ تازه می‌ساخت: ۹ ردیف، `visit_count=9` و `total_minutes` تقریباً
+        # ۵ برابرِ واقعیت. و در جهتِ عکس، اقامتی که هنوز **ادامه دارد** چون
+        # `arrived_at`ش عوض نمی‌شد هرگز به‌روز نمی‌شد و روی دقیقه‌های اجرای اول
+        # یخ می‌زد.
+        #
+        # حالا هر بازدیدی که بازه‌اش با این اقامت هم‌پوشانی دارد، **همان** بازدید
+        # است: کِش می‌آید و فقط تفاضلِ دقیقه‌ها به مجموع اضافه می‌شود.
+        # `visit_count` فقط برای بازدیدِ واقعاً تازه بالا می‌رود.
+        existing = (
             await db.execute(
-                select(Visit.id).where(
+                select(Visit).where(
                     Visit.place_id == place.id,
-                    Visit.arrived_at == stay["start"],
-                ).limit(1)
+                    Visit.arrived_at <= stay["end"],
+                    Visit.left_at >= stay["start"],
+                ).order_by(Visit.arrived_at.asc()).limit(1)
             )
-        ).first()
-        if dup is None:
+        ).scalar_one_or_none()
+
+        if existing is not None:
+            before = float(existing.minutes or 0)
+            existing.arrived_at = min(_aware(existing.arrived_at), _aware(stay["start"]))
+            existing.left_at = max(_aware(existing.left_at), _aware(stay["end"]))
+            existing.minutes = round(
+                (_aware(existing.left_at) - _aware(existing.arrived_at)).total_seconds() / 60.0, 2
+            )
+            delta = float(existing.minutes) - before
+            if delta > 0:
+                place.total_minutes = float(place.total_minutes or 0) + delta
+                place.hour_histogram = _bump_histogram(
+                    place.hour_histogram, existing.arrived_at, delta
+                )
+            place.last_seen_at = max(_aware(place.last_seen_at or existing.left_at),
+                                     _aware(existing.left_at))
+        else:
             db.add(Visit(
                 user_id=uid, place_id=place.id, device=stay.get("device"),
                 arrived_at=stay["start"], left_at=stay["end"], minutes=stay["minutes"],
@@ -220,12 +265,13 @@ async def ingest_points(db: AsyncSession, uid: int = 0, *, since_hours: int = 48
             place.total_minutes = float(place.total_minutes or 0) + stay["minutes"]
             place.hour_histogram = _bump_histogram(place.hour_histogram, stay["start"], stay["minutes"])
             place.last_seen_at = stay["end"]
-            if not place.owner_locked:
-                guessed = infer_kind(place.hour_histogram, place.visit_count)
-                if guessed:
-                    place.kind = guessed
-                    if not place.label:
-                        place.label = "خانه" if guessed == "home" else "محل کار"
+
+        if not place.owner_locked:
+            guessed = infer_kind(place.hour_histogram, place.visit_count)
+            if guessed:
+                place.kind = guessed
+                if not place.label:
+                    place.label = "خانه" if guessed == "home" else "محل کار"
 
         if previous is not None:
             prev_place, prev_stay = previous
@@ -324,6 +370,12 @@ async def learn_patterns(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     # حالا «خلافِ الگو» را علامت بزن: سفری که الگویش هنوز آموخته نشده و
     # تک‌افتاده است. سفرِ آموخته‌شده هرگز anomaly نیست — قیدِ صریحِ مالک.
     for trip in trips:
+        if trip.explained_at is not None:
+            # مالک این سفر را توضیح داده. «دیگر نپرس مگر خلافِ الگو» یعنی
+            # چیزی که یک بار توضیح داده شد، با اجرای بعدیِ کار دوباره
+            # غیرعادی نشود — وگرنه همان سؤال هر ساعت برمی‌گشت.
+            trip.is_anomaly = False
+            continue
         key = trip.pattern_key
         row = patterns.get(key) if key else None
         anomaly = bool(key) and (row is None or not row.learned) and (counted.get(key, 0) <= 1)
@@ -416,9 +468,17 @@ async def apply_place_answer(db: AsyncSession, target: Dict[str, Any], answers: 
 
     kind_map = {"خانه": "home", "محل کار": "work", "ورزش": "gym",
                 "خرید": "shopping", "دیدار": "social", "جای دیگر": "other"}
+    # مالکِ فرم (که کلیرفیکیشن از توکن روی مقصد مهر می‌زند) تنها مرجعِ دامنه
+    # است. شناسهٔ مکان/سفر می‌تواند از بدنهٔ درخواست آمده باشد، پس ردیفی که
+    # مالِ این کاربر نیست باید انگار وجود نداشته باشد.
+    uid = int(target.get("user_id") or 0)
+
+    def _mine(row) -> bool:
+        return row is not None and (getattr(row, "user_id", None) or 0) == uid
+
     if target.get("kind") == "place":
         place = await db.get(Place, int(target.get("place_id") or 0))
-        if place is None:
+        if not _mine(place):
             return []
         if answers.get("label"):
             place.label = str(answers["label"])[:160]
@@ -430,14 +490,18 @@ async def apply_place_answer(db: AsyncSession, target: Dict[str, Any], answers: 
                  "label": f"مکان «{place.label or '—'}» ثبت شد"}]
     if target.get("kind") == "trip":
         trip = await db.get(Trip, int(target.get("trip_id") or 0))
-        if trip is None:
+        if not _mine(trip):
             return []
         note = answers.get("note")
         if note:
-            visit_note = str(note)[:2000]
+            trip.note = str(note)[:2000]
             trip.is_anomaly = False          # توضیح داده شد، دیگر غیرعادی نیست
+            # مهرِ «توضیح داده شد» — همین است که `learn_patterns` را از
+            # علامت‌زدنِ دوبارهٔ این سفر بازمی‌دارد.
+            trip.explained_at = datetime.now(timezone.utc)
             await db.flush()
-            return [{"where": "trip", "id": trip.id, "label": f"سفر توضیح داده شد: {visit_note[:40]}"}]
+            return [{"where": "trip", "id": trip.id,
+                     "label": f"سفر توضیح داده شد: {trip.note[:40]}"}]
     return []
 
 

@@ -49,8 +49,34 @@ class LocationTrackingService : Service(), LocationListener {
         // هر چند نقطه یک بار به صفِ ارسال بدهد
         const val FLUSH_EVERY = 12
 
+        const val PREF_ALIVE_AT = "precise_tracking_alive_at"
+        // اگر سرویس بیشتر از این مدت نبضی نزده باشد، «روشن» حسابش نمی‌کنیم.
+        // سرویس هر بار که نقطه‌ای نگه می‌دارد (حداکثر هر ۱۵ ثانیه) مهر می‌زند،
+        // پس ۶ دقیقه سخاوتمندانه است.
+        const val ALIVE_WINDOW_MS = 6 * 60 * 1000L
+
         fun isEnabled(ctx: Context): Boolean =
             Net.prefs(ctx).getBoolean(PREF_ENABLED, false)
+
+        /**
+         * آیا سرویس **واقعاً** دارد کار می‌کند؟
+         *
+         * چرا جدا از [isEnabled]: آن یکی فقط یک ترجیح است. سرویس می‌تواند
+         * خودش را متوقف کند (اجازهٔ «تقریبی» به‌جای «دقیق»، نبودِ اجازه،
+         * کشته‌شدن توسط سازنده) در حالی که ترجیح روی true مانده. کارگرِ
+         * دوره‌ای با دیدنِ همان ترجیح از نمونه‌برداری صرف‌نظر می‌کرد، پس
+         * **هیچ‌کدام** از دو مجرا چیزی ثبت نمی‌کرد و رابط همچنان «روشن»
+         * نشان می‌داد. (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+         */
+        fun isAlive(ctx: Context): Boolean {
+            if (!isEnabled(ctx)) return false
+            val at = Net.prefs(ctx).getLong(PREF_ALIVE_AT, 0L)
+            return at > 0L && (System.currentTimeMillis() - at) < ALIVE_WINDOW_MS
+        }
+
+        fun markAlive(ctx: Context) {
+            Net.prefs(ctx).edit().putLong(PREF_ALIVE_AT, System.currentTimeMillis()).apply()
+        }
 
         fun setEnabled(ctx: Context, on: Boolean) {
             Net.prefs(ctx).edit().putBoolean(PREF_ENABLED, on).apply()
@@ -139,7 +165,10 @@ class LocationTrackingService : Service(), LocationListener {
         val granted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
         if (!granted) {
-            // بدونِ اجازه، سرویسِ روشنِ بی‌فایده فقط باتری می‌سوزاند.
+            // بدونِ اجازه، سرویسِ روشنِ بی‌فایده فقط باتری می‌سوزاند. ترجیح هم
+            // پاک می‌شود تا کارگرِ دوره‌ای دوباره مسئولیت را بردارد؛ وگرنه هر
+            // دو مجرا ساکت می‌ماندند.
+            Net.prefs(this).edit().putBoolean(PREF_ENABLED, false).apply()
             stopSelf()
             return START_NOT_STICKY
         }
@@ -151,9 +180,11 @@ class LocationTrackingService : Service(), LocationListener {
                 }
             }
         } catch (_: Exception) {
+            Net.prefs(this).edit().putBoolean(PREF_ENABLED, false).apply()
             stopSelf()
             return START_NOT_STICKY
         }
+        markAlive(this)
         // START_STICKY: اگر اندروید سرویس را کشت، خودش برش می‌گرداند.
         return START_STICKY
     }
@@ -166,6 +197,8 @@ class LocationTrackingService : Service(), LocationListener {
         }
         lastKept = location
         kept += 1
+        // نبضِ زنده‌بودن — پایهٔ isAlive().
+        markAlive(this)
         try {
             LocationBuffer.add(
                 this,

@@ -393,6 +393,18 @@ async def startup_event():
         except Exception as exc:
             logger.debug("skip user_locations.%s migration: %s", col_name, exc)
 
+    # place_trips — note / explained_at (2026-08-01): the owner's own answer to
+    # «آنجا چه کردی؟». Without it the answer was echoed back and dropped, and
+    # the hourly pattern job re-flagged the same trip as anomalous forever.
+    for col_name, col_type in (("note", "TEXT"), ("explained_at", "TIMESTAMPTZ")):
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE place_trips ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+                )
+        except Exception as exc:
+            logger.debug("skip place_trips.%s migration: %s", col_name, exc)
+
     # identity_documents — date_of_birth / sex / nationality (2026-07-31).
     # The route accepted these and threw them away; now they are stored, so a
     # new column on an existing table needs the idempotent ALTER too.

@@ -37,6 +37,35 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
 
+
+def _scope(model, user_id: Optional[int]):
+    """محدودهٔ دادهٔ یک کاربر — همان قاعدهٔ همه‌جای پروژه.
+
+    ردیف‌های قدیمی ``user_id`` ندارند (NULL) و متعلق به دامنهٔ ناشناس (۰)
+    هستند، پس برابریِ خشک ``user_id == uid`` آن‌ها را نامرئی می‌کند. این تابع
+    همان جفت را برمی‌گرداند تا هیچ کوئری‌ای نه چیزی گم کند و نه چیزی از
+    کاربرِ دیگر ببیند.
+    """
+    uid = int(user_id or 0)
+    if uid == 0:
+        return or_(model.user_id == 0, model.user_id.is_(None))
+    return model.user_id == uid
+
+
+# مجرای تلگرام تک‌مالکی است (یک بات، یک chat_id پیکربندی‌شده). هر چیزی که از
+# آن طرف می‌رود یا می‌آید متعلق به همین دامنه است — همان دامنهٔ ناشناس/تک‌مستأجرِ
+# بقیهٔ برنامه.
+TELEGRAM_SCOPE_USER_ID = 0
+
+
+def _row_in_scope(row, user_id: Optional[int]) -> bool:
+    """همان قاعده، ولی روی یک ردیفِ از پیش خوانده‌شده (بعد از ``db.get``)."""
+    if row is None:
+        return False
+    owner = getattr(row, "user_id", None)
+    uid = int(user_id or 0)
+    return (owner or 0) == uid
+
 logger = logging.getLogger(__name__)
 
 MAX_FIELDS = 6            # یک فرمِ طولانی پر نمی‌شود؛ سؤالِ بیشتر → دفعهٔ بعد
@@ -237,6 +266,13 @@ async def ask(
                     select(Clarification)
                     .where(
                         Clarification.source_ref == source_ref,
+                        # ادغام فقط **درونِ دامنهٔ همان کاربر**. بدونِ این شرط،
+                        # دو کاربر که source_ref یکسانی تولید می‌کنند (مثلاً
+                        # «sms:<همان شناسه>») به یک فرم می‌رسیدند: دومی موضوع و
+                        # متنِ خامِ اولی را پس می‌گرفت و جوابش روی مقصدِ او
+                        # می‌نشست. ردیف‌های قدیمی user_id NULL دارند و همان
+                        # دامنهٔ ناشناس (۰) حساب می‌شوند — مثل بقیهٔ جدول‌ها.
+                        _scope(Clarification, user_id),
                         # «filed»/«skipped» بسته‌اند: جوابشان قبلاً جایی نشسته،
                         # پس سؤالِ تازه فرمِ تازه است. بقیه — حتی «answered»ی که
                         # هنوز ثبت نشده — پذیرای سؤالِ تازه‌اند.
@@ -613,7 +649,16 @@ async def dispatch_pending(db: AsyncSession, now: Optional[datetime] = None) -> 
         rows = (
             await db.execute(
                 select(Clarification)
-                .where(Clarification.status.in_(("open", "partial")))
+                .where(
+                    Clarification.status.in_(("open", "partial")),
+                    # تلگرام **یک** مقصد دارد: مالک. پس فقط فرم‌های دامنهٔ
+                    # مالک آنجا فرستاده می‌شوند. بدونِ این شرط، فرمِ هر حسابِ
+                    # دیگری با متنِ خامش (پیامکِ بانکی، اعلانِ شخصی) در چتِ
+                    # مالک بالا می‌آمد و جوابِ مالک هم روی دادهٔ آن حساب
+                    # می‌نشست. فرم‌های بقیه در «سؤال‌های باز»ِ خودشان می‌مانند
+                    # — چیزی حذف نمی‌شود، فقط از این مجرا بیرون است.
+                    _scope(Clarification, TELEGRAM_SCOPE_USER_ID),
+                )
                 .order_by(Clarification.priority.desc(), Clarification.id.asc())
                 .limit(50)
             )
@@ -830,7 +875,12 @@ async def file_answers(db: AsyncSession, c) -> List[Dict[str, Any]]:
     رجیستریِ ``_APPLIERS`` مثل مسیریابِ سیگنال کار می‌کند: نوعِ تازه = یک خطِ
     تازه، نه شاخهٔ if در همه‌جا. مقصدِ ناشناخته → صندوقِ ورودی (که خودش تریاژ
     دارد) تا هیچ جوابی هدر نرود."""
-    target = c.target or {}
+    # مقصد از بدنهٔ درخواست هم می‌تواند آمده باشد (POST /api/clarifications/ask)،
+    # پس هیچ‌وقت نباید هویتِ خودش را تعیین کند. مالکِ فرم — که از توکن آمده و
+    # روی رکورد نشسته — همیشه جایگزینِ هر user_id ای می‌شود که در مقصد نوشته
+    # شده است. بدونِ این، بدنهٔ درخواست می‌توانست جوابِ فرم را روی پروفایلِ
+    # کاربرِ دیگری بنشاند.
+    target = {**(c.target or {}), "user_id": int(c.user_id or 0)}
     kind = str(target.get("kind") or "none")
     applier = _APPLIERS.get(kind, _apply_to_inbox)
     try:
@@ -899,6 +949,11 @@ async def _apply_to_inbox_item(db: AsyncSession, c, target: Dict[str, Any]) -> L
     from app.services import inbox_service
 
     item = await db.get(InboxItem, int(target.get("id") or 0))
+    # شناسه از مقصد می‌آید و مقصد می‌تواند از بدنهٔ درخواست آمده باشد؛ پس
+    # مالکیت اینجا هم بررسی می‌شود، نه فقط موقعِ ساختِ فرم. آیتمی که مالِ این
+    # کاربر نیست انگار وجود ندارد → جواب در صندوقِ خودش می‌نشیند و هدر نمی‌رود.
+    if item is not None and not _row_in_scope(item, c.user_id):
+        item = None
     if item is None:
         return await _apply_to_inbox(db, c, target)
     # جوابِ نصفه یعنی این تابع چند بار اجرا می‌شود. نسخهٔ اول هر بار بلوکِ
@@ -926,7 +981,12 @@ async def _apply_to_inbox_item(db: AsyncSession, c, target: Dict[str, Any]) -> L
 async def _apply_to_person(db: AsyncSession, c, target: Dict[str, Any]) -> List[Dict[str, Any]]:
     from app.services import person_profile_service as pps
 
+    from app.models.person import Person
+
     pid = int(target.get("id") or 0)
+    # مثل صندوق: شناسه از مقصد می‌آید، پس مالکیتش باید همین‌جا تأیید شود.
+    if pid and not _row_in_scope(await db.get(Person, pid), c.user_id):
+        pid = 0
     if not pid:
         return await _apply_to_inbox(db, c, target)
     await pps.record_interaction(
@@ -1097,7 +1157,12 @@ async def find_by_message(db: AsyncSession, message_id: Any):
         return None
     return (
         await db.execute(
-            select(Clarification).where(Clarification.message_id == str(message_id)).limit(1)
+            select(Clarification)
+            .where(Clarification.message_id == str(message_id),
+                   # مجرای تلگرام فقط دامنهٔ مالک را می‌بیند — همان قیدِ
+                   # dispatch_pending، اینجا در جهتِ برگشت.
+                   _scope(Clarification, TELEGRAM_SCOPE_USER_ID))
+            .limit(1)
         )
     ).scalar_one_or_none()
 
@@ -1109,7 +1174,8 @@ async def newest_open(db: AsyncSession):
     return (
         await db.execute(
             select(Clarification)
-            .where(Clarification.status.in_(("open", "partial")))
+            .where(Clarification.status.in_(("open", "partial")),
+                   _scope(Clarification, TELEGRAM_SCOPE_USER_ID))
             .order_by(Clarification.last_sent_at.desc().nullslast(), Clarification.id.desc())
             .limit(1)
         )
@@ -1135,7 +1201,8 @@ async def find_by_quoted_text(db: AsyncSession, quoted: str):
     rows = (
         await db.execute(
             select(Clarification)
-            .where(Clarification.status.in_(("open", "partial", "parked", "answered")))
+            .where(Clarification.status.in_(("open", "partial", "parked", "answered")),
+                   _scope(Clarification, TELEGRAM_SCOPE_USER_ID))
             .order_by(Clarification.id.desc())
             .limit(50)
         )
@@ -1385,6 +1452,53 @@ async def open_forms(db: AsyncSession, limit: int = 20, user_id: Optional[int] =
             stmt.order_by(Clarification.priority.desc(), Clarification.id.desc()).limit(limit)
         )
     ).scalars().all()
+
+
+async def sanitize_target(
+    db: AsyncSession, target: Any, *, user_id: int
+) -> Dict[str, Any]:
+    """مقصدی که از سمتِ کلاینت آمده را به دامنهٔ خودِ همان کاربر می‌بندد.
+
+    ``POST /api/clarifications/ask`` بدنهٔ دلخواه می‌گیرد و ``target`` همان
+    چیزی است که بعداً تعیین می‌کند جوابِ فرم **کجا** بنشیند. بدونِ این تابع،
+    بدنهٔ درخواست می‌توانست شناسهٔ ردیفِ کاربرِ دیگری را نام ببرد.
+
+    قاعده: نوعِ ناشناخته → «none»؛ شناسه‌ای که مالِ این کاربر نیست → «none»؛
+    و ``user_id`` هرگز از کلاینت پذیرفته نمی‌شود (``file_answers`` هم دوباره
+    مهرش می‌زند — دو لایه، چون این مسیر امنیتی است).
+
+    چیزی حذف نمی‌شود: مقصدِ ردشده به «none» تنزل می‌کند، یعنی جواب در صندوقِ
+    ورودیِ خودِ کاربر می‌نشیند و تریاژ می‌شود.
+    """
+    from app.models.inbox_item import InboxItem
+    from app.models.person import Person
+    from app.models.place import Place, Trip
+
+    if not isinstance(target, dict):
+        return {"kind": "none"}
+    kind = str(target.get("kind") or "none")
+    if kind not in _APPLIERS:
+        return {"kind": "none"}
+
+    clean = {k: v for k, v in target.items() if k != "user_id"}
+    clean["kind"] = kind
+
+    # (مدل, کلیدِ شناسه) برای هر نوعی که به یک ردیفِ مشخص اشاره می‌کند.
+    owned = {
+        "inbox_item": (InboxItem, "id"),
+        "person": (Person, "id"),
+        "place": (Place, "place_id"),
+        "trip": (Trip, "trip_id"),
+    }.get(kind)
+    if owned is not None:
+        model, key = owned
+        try:
+            row_id = int(clean.get(key) or 0)
+        except (TypeError, ValueError):
+            return {"kind": "none"}
+        if not row_id or not _row_in_scope(await db.get(model, row_id), user_id):
+            return {"kind": "none"}
+    return clean
 
 
 def owns(c, user_id: Optional[int]) -> bool:

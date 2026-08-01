@@ -465,6 +465,24 @@ class TelegramBot:
         except Exception as exc:
             logger.exception("clarification reply handling crashed: %r", exc)
 
+        # «سؤال دارم» بر compose مقدم است — ولی فقط برای یک پیامِ **سادهٔ**
+        # متنی. مالک دکمهٔ «بپرس» را همین الان زده و انتظارِ جواب دارد؛ اگر
+        # جلسهٔ compose باز مانده باشد، متنِ سؤال به‌جای رسیدن به discuss() در
+        # بافرِ «کارِ جدید» می‌نشست و مالک وضعیتِ compose پس می‌گرفت — یعنی
+        # همان حلقهٔ دوطرفه بی‌صدا قطع می‌شد. (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+        if (
+            text
+            and not text.startswith("/")
+            and text not in TEXT_ALIASES
+            and (_chat_state.get(chat_id_str) or {}).get("phase") == "clar_qa"
+        ):
+            try:
+                asked = await self._maybe_handle_clarification_question(chat_id_str, text)
+                if asked is not None:
+                    return asked
+            except Exception as exc:
+                logger.exception("clarification question handling crashed: %r", exc)
+
         # Compose: media (voice/photo/document/video/…) — or text while a compose
         # session is open — is buffered into one task. Runs BEFORE the text-command
         # path so attachments aren't dropped (they carry no message.text).
@@ -1155,7 +1173,14 @@ class TelegramBot:
             if action == "show":
                 c = await session.get(Clarification, cid)
                 if c is not None:
-                    await clar.send_form(session, c)
+                    # «نمایش دوباره» درخواستِ خودِ مالک است، نه تلاشِ سیستم —
+                    # همان قاعده‌ای که `resend_all` دارد. بدونِ این، پنج بار
+                    # زدنِ این دکمه سقفِ تلاش را پر می‌کرد و فرم park می‌شد؛
+                    # یعنی «دوباره نشانم بده» عملاً «دیگر نپرس» می‌شد.
+                    # (ممیزیِ ۲۰۲۶-۰۸-۰۱)
+                    before = int(c.attempts or 0)
+                    if await clar.send_form(session, c, reminder=True):
+                        c.attempts = before
                     await session.commit()
                 await self.answer_callback(cq_id)
                 return {"ok": True, "handled": "clar_shown", "id": cid}

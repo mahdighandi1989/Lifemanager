@@ -24,14 +24,20 @@ function Row({ item, onSaved }) {
   const [draft, setDraft] = useState(item.value || '');
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => setDraft(item.value || ''), [item.value]);
 
   const save = async () => {
     setBusy(true);
+    setError('');
     try {
       await api.put(`/identity-profile/${item.field}`, { value: draft });
       onSaved();
+    } catch {
+      // یک ذخیرهٔ ناموفق نباید عینِ ذخیرهٔ موفق به‌نظر برسد: قبلاً کلیک هیچ
+      // اثری نداشت و مالک فکر می‌کرد ثبت شده.
+      setError('ذخیره نشد — دوباره تلاش کن.');
     } finally {
       setBusy(false);
     }
@@ -64,6 +70,7 @@ function Row({ item, onSaved }) {
           ثبت
         </button>
       </div>
+      {error ? <div className="mt-1 text-[11px] text-red-600">{error}</div> : null}
       {(item.sources || []).length > 0 ? (
         <button
           type="button"
@@ -91,12 +98,15 @@ function Row({ item, onSaved }) {
 function IdentityProfile() {
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   const load = useCallback(() => {
     api
       .get('/identity-profile')
-      .then((res) => setData(res.data))
-      .catch(() => setData({ fields: [], known: 0, total: 0 }));
+      // خطا را به «پروفایلِ خالی» ترجمه نکن: «۰ از ۰» دقیقاً شبیهِ یک پروفایلِ
+      // تازه است، پس از دست‌رفتنِ داده از نرسیدنِ داده قابلِ تشخیص نبود.
+      .then((res) => { setData(res.data); setLoadError(''); })
+      .catch(() => setLoadError('پروفایل خوانده نشد — اتصال یا سرور مشکل دارد.'));
   }, []);
 
   useEffect(() => {
@@ -105,14 +115,33 @@ function IdentityProfile() {
 
   const run = async (path) => {
     setBusy(true);
+    setLoadError('');
     try {
       await api.post(`/identity-profile/${path}`);
       load();
+    } catch {
+      setLoadError('انجام نشد — دوباره تلاش کن.');
     } finally {
       setBusy(false);
     }
   };
 
+  if (loadError && !data) {
+    return (
+      <div dir="rtl" className="mx-auto max-w-3xl p-6">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-2 font-medium">{loadError}</div>
+          <button
+            type="button"
+            onClick={load}
+            className="rounded-lg border border-red-300 px-3 py-1 text-xs"
+          >
+            تلاش دوباره
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (!data) return <div dir="rtl" className="p-6 text-gray-500">در حال بارگذاری…</div>;
 
   return (
@@ -124,6 +153,9 @@ function IdentityProfile() {
             {data.known} از {data.total} مورد از روی داده‌های خودت پیدا شده — بقیه را
             یا اینجا بنویس یا بگذار در تلگرام بپرسم.
           </p>
+          {loadError ? (
+            <p className="mt-1 text-xs text-red-600">{loadError}</p>
+          ) : null}
         </div>
         <div className="flex gap-2">
           <button

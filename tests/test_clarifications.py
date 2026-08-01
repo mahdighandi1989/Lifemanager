@@ -792,3 +792,137 @@ def test_a_huge_form_still_fits_telegram_and_keeps_its_footer():
     assert len(text) <= 3600
     assert "❓ سؤال دارم" in text                # راهنما هرگز قربانی نمی‌شود
     assert text.count("<b>") == text.count("</b>")   # هیچ تگی نصفه بریده نشده
+
+
+# ── دامنهٔ داده و مقصدِ کلاینت‌محور (ممیزیِ ۲۰۲۶-۰۸-۰۱) ──────────────────────
+#
+# «مقصد» (``target``) تعیین می‌کند جوابِ فرم **کجا** بنشیند، و روی
+# ``POST /api/clarifications/ask`` مستقیماً از بدنهٔ درخواست می‌آید. تا پیش از
+# این ممیزی نه موقعِ ذخیره تأیید می‌شد و نه موقعِ ثبت، پس بدنهٔ درخواست
+# می‌توانست شناسهٔ ردیفِ کاربرِ دیگری را نام ببرد. این تست‌ها همان مسیر را
+# می‌بندند — و چون مسیرِ امنیتی است، هر دو لایه جدا سنجیده می‌شود.
+
+
+@pytest.mark.asyncio
+async def test_a_target_pointing_at_another_users_row_is_refused(db):
+    """لایهٔ ۱ (مرز): مقصدی که مالِ این کاربر نیست به «none» تنزل می‌کند."""
+    from app.models.inbox_item import InboxItem
+
+    victim = InboxItem(user_id=7, content="یادداشتِ خصوصیِ کاربرِ دیگر", status="open")
+    db.add(victim)
+    await db.flush()
+
+    clean = await clar.sanitize_target(
+        db, {"kind": "inbox_item", "id": victim.id}, user_id=9
+    )
+    assert clean == {"kind": "none"}, "مقصدِ کاربرِ دیگر نباید پذیرفته شود"
+
+    # و مقصدِ خودِ کاربر دست‌نخورده می‌ماند
+    mine = InboxItem(user_id=9, content="مالِ خودم", status="open")
+    db.add(mine)
+    await db.flush()
+    assert await clar.sanitize_target(
+        db, {"kind": "inbox_item", "id": mine.id}, user_id=9
+    ) == {"kind": "inbox_item", "id": mine.id}
+
+
+@pytest.mark.asyncio
+async def test_a_client_supplied_user_id_never_survives_into_the_applier(db):
+    """لایهٔ ۲ (ثبت): هویتِ مقصد همیشه از مالکِ فرم می‌آید، نه از بدنه.
+
+    بدونِ این، «تاریخ تولدت؟» را می‌شد روی پروفایلِ کاربرِ دیگری نشاند —
+    ``apply_clarification_answer`` شناسه را از خودِ ``target`` می‌خواند.
+    """
+    c = await clar.ask(
+        db, topic="تاریخ تولدت؟", source_ref="ident:1", user_id=9,
+        target={"kind": "owner_identity", "field": "date_of_birth", "user_id": 7},
+        questions=[{"key": "date_of_birth", "label": "تاریخ تولد؟", "type": "short"}],
+    )
+    await db.flush()
+    seen = {}
+
+    async def _spy(db_, target, value):
+        seen.update(target)
+        return [{"where": "owner_identity", "id": None, "label": "ok"}]
+
+    import app.services.owner_identity_service as ident
+
+    original, ident.apply_clarification_answer = ident.apply_clarification_answer, _spy
+    try:
+        await clar.record_answers(db, c, {"date_of_birth": "1989-03-08"}, raw="x", via="test")
+        await clar.file_answers(db, c)
+    finally:
+        ident.apply_clarification_answer = original
+
+    assert seen.get("user_id") == 9, "مقصد باید هویتِ مالکِ فرم را بگیرد، نه ۷ را"
+
+
+@pytest.mark.asyncio
+async def test_the_same_source_ref_for_two_users_stays_two_forms(db):
+    """ادغامِ source_ref نباید از مرزِ کاربر رد شود.
+
+    دو کاربر می‌توانند شناسهٔ منبعِ یکسان بسازند (مثلاً «sms:<همان شناسه>»).
+    قبلاً دومی فرمِ اولی را پس می‌گرفت — یعنی موضوع و متنِ خامِ کاربرِ اول
+    (پیامکِ بانکی!) به کاربرِ دوم برمی‌گشت.
+    """
+    a = await clar.ask(db, topic="مالِ کاربر ۱", source_ref="dup", user_id=1,
+                       questions=_fields("سؤالِ یک"))
+    b = await clar.ask(db, topic="مالِ کاربر ۲", source_ref="dup", user_id=2,
+                       questions=_fields("سؤالِ دو"))
+    await db.commit()
+    assert a is not None and b is not None
+    assert a.id != b.id, "فرمِ دو کاربر نباید یکی شود"
+    assert b.topic == "مالِ کاربر ۲"
+    assert (a.user_id, b.user_id) == (1, 2)
+
+
+@pytest.mark.asyncio
+async def test_telegram_only_sees_the_owner_scope(db):
+    """تلگرام یک مقصد دارد: مالک. فرمِ حساب‌های دیگر نباید آنجا برود."""
+    other = await clar.ask(db, topic="مالِ کاربرِ دیگر", source_ref="o1", user_id=42,
+                           questions=_fields("سؤال"))
+    mine = await clar.ask(db, topic="مالِ مالک", source_ref="o2", user_id=0,
+                          questions=_fields("سؤال"))
+    await db.commit()
+    assert other is not None and mine is not None
+
+    newest = await clar.newest_open(db)
+    assert newest is not None and newest.id == mine.id
+
+    other.message_id = "555"
+    mine.message_id = "556"
+    await db.flush()
+    assert await clar.find_by_message(db, "555") is None, "پیامِ کاربرِ دیگر نباید از تلگرام قابلِ جواب باشد"
+    assert (await clar.find_by_message(db, "556")).id == mine.id
+
+
+# ── قراردادِ توکنِ جعلی روی هر دو روترِ تازه (ممیزیِ ۲۰۲۶-۰۸-۰۱) ─────────────
+#
+# هر دو روتر روی `get_required_user_id` نشسته‌اند، یعنی «توکنِ حاضر ولی
+# نامعتبر» باید همیشه ۴۰۱ بگیرد — حتی وقتی REQUIRE_AUTH خاموش است. تا امروز
+# هیچ تستی این را نمی‌سنجید: می‌شد هر ۱۲ نقطه را به وابستگیِ نرم عوض کرد و کلِ
+# سوئیت سبز می‌ماند. این یعنی دادهٔ خامِ پیامکِ بانکی و پروفایلِ هویتی بدونِ
+# نگهبانِ آزموده رها بود.
+
+_FORGED = {"Authorization": "Bearer not.a.real.jwt"}
+
+_MUTATIONS = [
+    ("get", "/api/clarifications", None),
+    ("post", "/api/clarifications/1/answer", {"field": 0, "value": "x"}),
+    ("post", "/api/clarifications/1/edit", {"field": 0, "value": "x"}),
+    ("post", "/api/clarifications/1/discuss", {"question": "چرا؟"}),
+    ("post", "/api/clarifications/1/skip", {}),
+    ("post", "/api/clarifications/1/snooze", {}),
+    ("post", "/api/clarifications/resend", {}),
+    ("post", "/api/clarifications/ask", {"topic": "t"}),
+    ("get", "/api/identity-profile", None),
+    ("post", "/api/identity-profile/refresh", {}),
+    ("put", "/api/identity-profile/full_name", {"value": "x"}),
+    ("post", "/api/identity-profile/ask-missing", {}),
+]
+
+
+@pytest.mark.parametrize("method,path,body", _MUTATIONS)
+def test_a_forged_bearer_is_refused_on_every_new_endpoint(api_client, method, path, body):
+    resp = api_client.request(method.upper(), path, json=body, headers=_FORGED)
+    assert resp.status_code == 401, f"{method.upper()} {path} → {resp.status_code}: {resp.text[:160]}"
