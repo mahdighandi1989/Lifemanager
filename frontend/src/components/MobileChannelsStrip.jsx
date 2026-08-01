@@ -11,13 +11,14 @@ import api from '../lib/api';
 
 // چهار حالتِ متفاوت — چون «داده‌ای نیست» چند معنیِ کاملاً متفاوت دارد و
 // یکی‌کردنشان همان چیزی بود که خرابیِ اعلان‌ها را پنهان کرد.
-const STATUS_ICON = { ok: '✅', off: '⛔', silent: '⚠️', never: '⭕', unknown: '❔' };
+const STATUS_ICON = { ok: '✅', off: '⛔', silent: '⚠️', never: '⭕', unknown: '❔', partial: '🟡' };
 const STATUS_COLOR = {
   ok: 'text-emerald-600',
   off: 'text-red-600',
   silent: 'text-amber-600',
   never: 'text-gray-500',
   unknown: 'text-gray-400',
+  partial: 'text-amber-600',
 };
 const STATUS_FA = {
   ok: 'فعال',
@@ -25,6 +26,7 @@ const STATUS_FA = {
   silent: 'قطع شده',
   never: 'هرگز داده نداده',
   unknown: 'گوشی ساکت است',
+  partial: 'فعال، ولی ناپایدار',
 };
 
 function MobileChannelsStrip() {
@@ -49,7 +51,7 @@ function MobileChannelsStrip() {
   if (!channels || channels.length === 0) return null;
   // «unknown» یعنی خودِ گوشی ساکت است و نمی‌شود دربارهٔ مجرا قضاوت کرد — خرابی
   // حساب نمی‌شود، وگرنه هر بار که گوشی خاموش است پنج هشدارِ الکی می‌دهد.
-  const broken = channels.filter((c) => ['off', 'silent', 'never'].includes(c.status));
+  const broken = channels.filter((c) => ['off', 'silent', 'never', 'partial'].includes(c.status));
 
   return (
     <div

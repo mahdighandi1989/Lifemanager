@@ -99,6 +99,50 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // «همیشه روشن» دو پیش‌نیاز دارد که اپ تا امروز هیچ‌کدام را نمی‌خواست:
+        // (۱) اجازهٔ موقعیتِ پس‌زمینه — از اندروید ۱۰ باید **جدا** خواسته شود و
+        //     از اندروید ۱۱ اصلاً دیالوگ ندارد و فقط از تنظیمات می‌شود.
+        // (۲) معافیت از بهینه‌سازیِ باتری — وگرنه سازنده سرویس را می‌کشد.
+        val alwaysBtn = Button(this).apply {
+            text = "🔓 اجازهٔ «همیشه» + آزادسازی از بهینه‌سازی باتری"
+            setOnClickListener {
+                if (!LocationWorker.hasPermission(this@MainActivity)) {
+                    requestSmsPermission()
+                    return@setOnClickListener
+                }
+                if (!Perms.backgroundLocation(this@MainActivity)) {
+                    if (android.os.Build.VERSION.SDK_INT in 29..29) {
+                        ActivityCompat.requestPermissions(
+                            this@MainActivity,
+                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), 2,
+                        )
+                    } else {
+                        // اندروید ۱۱+: فقط از صفحهٔ تنظیماتِ خودِ اپ، گزینهٔ
+                        // «Allow all the time».
+                        status.text = "در صفحهٔ باز شده: مجوزها ← موقعیت مکانی ← «همیشه»"
+                        startActivity(
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                .setData(android.net.Uri.parse("package:$packageName"))
+                        )
+                    }
+                    return@setOnClickListener
+                }
+                if (!Perms.batteryUnrestricted(this@MainActivity)) {
+                    try {
+                        startActivity(
+                            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                                .setData(android.net.Uri.parse("package:$packageName"))
+                        )
+                    } catch (_: Exception) {
+                        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    }
+                    return@setOnClickListener
+                }
+                status.text = "✅ همه‌چیز برای «همیشه روشن» آماده است."
+                refreshPermissionStatus()
+            }
+        }
+
         val usageBtn = Button(this).apply {
             text = "دادن دسترسی آمار مصرف (Usage access)"
             setOnClickListener {
@@ -134,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         listOf(title, urlInput, tokenInput, deviceInput, saveBtn, notifBtn, usageBtn, a11yBtn,
-               preciseBtn, testBtn, permStatus, status)
+               preciseBtn, alwaysBtn, testBtn, permStatus, status)
             .forEach { root.addView(it) }
         setContentView(root)
         refreshPermissionStatus()
@@ -165,8 +209,14 @@ class MainActivity : AppCompatActivity() {
             append("${mark(a11y)} خواندن صفحه (Accessibility — اختیاری)\n")
             append("${mark(loc)} موقعیت مکانی\n")
             append("${mark(LocationTrackingService.isEnabled(this@MainActivity))} ردیابی دقیق مسیر\n")
+            append("${mark(Perms.backgroundLocation(this@MainActivity))} موقعیت در پس‌زمینه («همیشه»)\n")
+            append("${mark(Perms.batteryUnrestricted(this@MainActivity))} آزاد از بهینه‌سازی باتری\n")
             if (!notif) append("\n⚠️ اعلان‌ها خاموش است — دکمهٔ بالا را بزن و اپ را در فهرست فعال کن.")
             if (!loc) append("\n🛑 موقعیت مکانی ثبت نمی‌شود — اجازه را روی «همیشه» بگذار و GPS را روشن کن.")
+            if (loc && !Perms.backgroundLocation(this@MainActivity))
+                append("\n⚠️ اجازه فقط «موقع استفاده» است — با بسته‌شدنِ اپ، ثبت قطع می‌شود.")
+            if (!Perms.batteryUnrestricted(this@MainActivity))
+                append("\n⚠️ بهینه‌سازی باتری روشن است — گوشی ممکن است سرویس را بخوابانَد.")
         }
     }
 

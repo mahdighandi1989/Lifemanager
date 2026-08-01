@@ -3,6 +3,7 @@ package ir.lifemanager.companion
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
 import org.json.JSONObject
 
@@ -51,6 +52,19 @@ object Perms {
             ?.contains(ctx.packageName) == true
     } catch (_: Exception) { false }
 
+    /** «همیشه» (پس‌زمینه) — جدا از اجازهٔ عادیِ موقعیت. بدونِ این، وقتی اپ
+     * بسته است کارگرِ دوره‌ای هیچ نقطه‌ای نمی‌گیرد. */
+    fun backgroundLocation(ctx: Context): Boolean =
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) location(ctx)
+        else ctx.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+
+    /** معافیت از بهینه‌سازیِ باتری — وگرنه سیستم سرویس را می‌خوابانَد. */
+    fun batteryUnrestricted(ctx: Context): Boolean = try {
+        val pm = ctx.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        pm.isIgnoringBatteryOptimizations(ctx.packageName)
+    } catch (_: Exception) { false }
+
     /** همان کلیدهایی که سرور در /api/mobile/diagnostics انتظار دارد. */
     fun asJson(ctx: Context): JSONObject = JSONObject()
         .put("sms", sms(ctx))
@@ -59,4 +73,6 @@ object Perms {
         .put("usage", usage(ctx))
         .put("accessibility", accessibility(ctx))
         .put("location", location(ctx))
+        .put("location_background", backgroundLocation(ctx))
+        .put("battery_unrestricted", batteryUnrestricted(ctx))
 }

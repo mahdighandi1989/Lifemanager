@@ -1102,3 +1102,43 @@ def test_person_matching_needs_a_word_boundary_and_the_right_owner():
     # مرزِ واژه‌ای که در تطبیق استفاده می‌شود
     assert re.search(r"(?<!\w)علی(?!\w)", "سلام علی جان") is not None
     assert re.search(r"(?<!\w)علی(?!\w)", "تعالی") is None
+
+
+def test_always_on_prerequisites_show_as_partial_not_ok(api_client):
+    """موقعیت روشن است ولی «همیشه» یا آزادیِ باتری نیست → گوشی هر لحظه
+    می‌تواند خاموشش کند. این باید دیده شود، نه اینکه ناگهان ساکت شود."""
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/location",
+        json={"points": [{"lat": 25.2, "lon": 55.2}], "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    api_client.post(
+        "/api/mobile/heartbeat",
+        json={"device": "s24", "perms": {
+            "location": True, "location_background": False, "battery_unrestricted": False,
+        }},
+        headers={"X-Device-Token": token},
+    )
+    ch = {c["action"]: c for c in api_client.get("/api/mobile/diagnostics").json()["channels"]}
+    assert ch["mobile_location"]["status"] == "partial"
+    assert "همیشه" in ch["mobile_location"]["hint"]
+    assert "باتری" in ch["mobile_location"]["hint"]
+
+
+def test_all_prerequisites_granted_is_plain_ok(api_client):
+    token = _pair(api_client)
+    api_client.post(
+        "/api/mobile/location",
+        json={"points": [{"lat": 25.2, "lon": 55.2}], "device": "s24"},
+        headers={"X-Device-Token": token},
+    )
+    api_client.post(
+        "/api/mobile/heartbeat",
+        json={"device": "s24", "perms": {
+            "location": True, "location_background": True, "battery_unrestricted": True,
+        }},
+        headers={"X-Device-Token": token},
+    )
+    ch = {c["action"]: c for c in api_client.get("/api/mobile/diagnostics").json()["channels"]}
+    assert ch["mobile_location"]["status"] == "ok"

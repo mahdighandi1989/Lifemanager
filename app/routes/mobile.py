@@ -685,6 +685,7 @@ async def mobile_diagnostics(
         },
         "mobile_location": {
             "fa": "موقعیت مکانی", "perm": "location", "window_h": 6,
+            "extra_perms": ("location_background", "battery_unrestricted"),
             "hint": ("دسترسی «موقعیت مکانی» را روی «همیشه» بگذار و بهینه‌سازی "
                      "باتری را برای اپ همراه خاموش کن — وگرنه اندروید سرویس را می‌کشد."),
         },
@@ -741,6 +742,18 @@ async def mobile_diagnostics(
         hint = None
         if perm_known and not granted.get(perm_key):
             status, hint = "off", meta["hint"]
+        elif perms_seen and any(
+            k in granted and not granted[k] for k in (meta.get("extra_perms") or ())
+        ):
+            # مجرا روشن است ولی پیش‌نیازهای «همیشه روشن» نیستند — گوشی هر لحظه
+            # می‌تواند خاموشش کند و این باید دیده شود، نه اینکه ناگهان ساکت شود.
+            missing = [k for k in (meta.get("extra_perms") or ())
+                       if k in granted and not granted[k]]
+            status = "partial"
+            hint = ("برای ثبتِ پیوسته لازم است: "
+                    + "، ".join({"location_background": "اجازهٔ «همیشه»",
+                                 "battery_unrestricted": "آزادی از بهینه‌سازی باتری"}[m]
+                                for m in missing))
         elif count == 0:
             status, hint = "never", meta["hint"]
         elif last is None or (now - last).total_seconds() > meta["window_h"] * 3600:

@@ -45,8 +45,27 @@ async def _fake_github(url, headers):
     raise AssertionError(f"unexpected github url {url}")
 
 
+# زمانِ **ثابت** برای هر تست، نه «الان».
+#
+# چرا (ریشه‌یابیِ ۲۰۲۶-۰۷-۳۱): این تابع قبلاً `datetime.now()` را به ثانیه گرد
+# می‌کرد. شناسهٔ هر ردیفِ لاگ md5(service|timestamp|message) است، پس وقتی
+# مرحلهٔ آخرِ تست «همان لاگ‌ها» را دوباره می‌گیرد تا ثابت کند تکراری‌اند و
+# مسئلهٔ حل‌شده را باز نمی‌کنند، اگر آن فراخوانی به **ثانیهٔ بعد** می‌افتاد،
+# fake یک خطِ لاگِ واقعاً تازه می‌ساخت و کدِ محصول درست عمل می‌کرد و مسئله را
+# دوباره باز می‌کرد — تست بی‌گناه رد می‌شد. احتمالِ ردشدن = احتمالِ عبور از
+# مرزِ ثانیه ≈ ۱۶٪، که با ۴ از ۲۵ اجرای اندازه‌گیری‌شده می‌خوانَد.
+#
+# نتیجه: fakeی که ادعا می‌کند «همان لاگ‌ها» را برمی‌گرداند باید واقعاً همان‌ها
+# را برگرداند. زمان یک بار در هر تست ثابت می‌شود (fixture) تا هم تازه باشد و
+# هم بینِ فراخوانی‌های همان تست تکان نخورد.
+_FROZEN_TS = None
+
+
 def _now_iso():
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000000000Z")
+    global _FROZEN_TS
+    if _FROZEN_TS is None:
+        _FROZEN_TS = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000000000Z")
+    return _FROZEN_TS
 
 
 async def _fake_render(url, headers):
@@ -78,6 +97,8 @@ async def _fake_render(url, headers):
 
 @pytest.fixture
 def fake_net(monkeypatch):
+    global _FROZEN_TS
+    _FROZEN_TS = None          # هر تست زمانِ تازهٔ خودش را می‌گیرد، بعد ثابت می‌ماند
     _no_env(monkeypatch)
     monkeypatch.setattr(github_sync_service, "_default_fetcher", _fake_github)
     monkeypatch.setattr(render_sync_service, "_default_fetcher", _fake_render)
