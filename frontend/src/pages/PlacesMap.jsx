@@ -229,6 +229,15 @@ function PlacesMap() {
         </select>
       </div>
 
+      {data.addresses_available === false && data.places_without_address > 0 ? (
+        <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-6 text-amber-800">
+          <span dir="ltr">{data.places_without_address}</span> مکان فقط مختصات دارد و
+          نشانیِ متنی‌شان نمی‌آید، چون کلیدِ Google Maps
+          (<span dir="ltr">GOOGLE_MAPS_API_KEY</span>) تنظیم نشده. لینکِ نقشهٔ هر
+          مکان همچنان کار می‌کند — با تنظیمِ کلید، نشانی‌ها خودشان پر می‌شوند.
+        </div>
+      ) : null}
+
       <TrackCanvas tracks={tracks} places={places} />
 
       {tracks.length > 1 ? (

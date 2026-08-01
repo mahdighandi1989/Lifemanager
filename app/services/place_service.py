@@ -418,16 +418,17 @@ async def learn_patterns(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
 
 # ── مرحلهٔ ۴: پرسیدن — کم، و فقط جایی که واقعاً لازم است ────────────────────
 
-async def _place_name(db: AsyncSession, place_id: Optional[int]) -> str:
+async def _place_row(db: AsyncSession, place_id: Optional[int]):
+    from app.models.place import Place
+
+    return await db.get(Place, int(place_id)) if place_id else None
+
+
+def _name_of(row) -> str:
     """نامِ خواندنیِ یک مکان: برچسبِ مالک ← نشانی ← مختصات.
 
     هیچ‌وقت رشتهٔ خالی برنمی‌گرداند؛ «جایی ناشناس» صادقانه‌تر از سکوت است.
     """
-    from app.models.place import Place
-
-    if not place_id:
-        return "جایی ناشناس"
-    row = await db.get(Place, int(place_id))
     if row is None:
         return "جایی ناشناس"
     if row.label:
@@ -435,6 +436,10 @@ async def _place_name(db: AsyncSession, place_id: Optional[int]) -> str:
     if row.address:
         return str(row.address)[:80]
     return f"نقطهٔ {row.latitude:.4f}, {row.longitude:.4f}"
+
+
+async def _place_name(db: AsyncSession, place_id: Optional[int]) -> str:
+    return _name_of(await _place_row(db, place_id))
 
 
 def _clock(moment) -> str:
@@ -453,8 +458,15 @@ async def _trip_topic(db: AsyncSession, trip) -> str:
 
 
 async def _trip_context(db: AsyncSession, trip) -> str:
-    frm = await _place_name(db, trip.from_place_id)
-    to = await _place_name(db, trip.to_place_id)
+    """متنِ سؤالِ سفر — با **لینکِ نقشه برای مقصد**.
+
+    بدونِ لینک، وقتی نشانی هنوز حل نشده باشد سؤال به «از نقطهٔ ۲۵٫۲۱۷۷،
+    ۵۵٫۲۷۸۲ به نقطهٔ ۲۵٫۳۰۶۷، ۵۵٫۳۶۴۹» تبدیل می‌شود که هیچ‌کس نمی‌تواند
+    جوابش را بدهد. (۲۰۲۶-۰۸-۰۲)
+    """
+    frm_row = await _place_row(db, trip.from_place_id)
+    to_row = await _place_row(db, trip.to_place_id)
+    frm, to = _name_of(frm_row), _name_of(to_row)
     start, end = _clock(trip.started_at), _clock(trip.ended_at)
     bits = [f"از «{frm}» به «{to}»"]
     if start:
@@ -463,7 +475,53 @@ async def _trip_context(db: AsyncSession, trip) -> str:
         bits.append(f"{round(trip.minutes)} دقیقه")
     if trip.distance_km:
         bits.append(f"{round(trip.distance_km, 1)} کیلومتر")
-    return "این مسیر با الگوهای همیشگی‌ات نمی‌خواند — " + "، ".join(bits) + "."
+    text = "این مسیر با الگوهای همیشگی‌ات نمی‌خواند — " + "، ".join(bits) + "."
+    if to_row is not None:
+        text += f" مقصد روی نقشه: {maps_link(to_row.latitude, to_row.longitude)}"
+    return text
+
+
+def maps_link(lat: float, lon: float) -> str:
+    """لینکِ نقشه برای یک مختصات.
+
+    چرا این مهم‌ترین تکه است: نشانیِ متنی به کلیدِ Google Maps نیاز دارد و
+    ممکن است نباشد — ولی این لینک **همیشه** کار می‌کند و رایگان است. مالک
+    یک ضربه می‌زند و دقیقاً می‌بیند کجاست.
+
+    بدونِ این، سؤالِ «این مکان کجاست؟ (مختصات ۲۵٫۳۰۶۷، ۵۵٫۳۶۴۹)» جوابی
+    نداشت: هیچ‌کس از روی دو عدد جا را به یاد نمی‌آورد. (۲۰۲۶-۰۸-۰۲)
+
+    تک‌پارامتری است (بدونِ ``&``) چون متنِ فرم html-escape می‌شود و ``&``
+    به ``&amp;`` تبدیل می‌شد و لینک را می‌شکست.
+    """
+    return f"https://maps.google.com/?q={lat:.6f},{lon:.6f}"
+
+
+async def backfill_addresses(db: AsyncSession, uid: int = 0, limit: int = 25) -> Dict[str, Any]:
+    """نشانیِ مکان‌هایی که هنوز ندارند را پر کن.
+
+    جغرافیای معکوس فقط هنگامِ **ساختِ** مکان صدا زده می‌شود، پس مکان‌هایی که
+    قبل از آن کشف شده بودند برای همیشه بی‌نشانی می‌ماندند. این تابع در هر
+    اجرای کارِ دوره‌ای چند تا را پر می‌کند تا گذشته هم برسد.
+    """
+    from app.models.place import Place
+
+    rows = (
+        await db.execute(
+            select(Place)
+            .where(_scope(Place.user_id, uid), Place.address.is_(None))
+            .order_by(Place.visit_count.desc().nullslast())
+            .limit(max(1, int(limit)))
+        )
+    ).scalars().all()
+    filled = 0
+    for place in rows:
+        await _resolve_address(place)
+        if place.address:
+            filled += 1
+    if filled:
+        await db.commit()
+    return {"checked": len(rows), "filled": filled}
 
 
 async def ask_about_places(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
@@ -491,9 +549,14 @@ async def ask_about_places(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     for place in unnamed:
         c = await clar.ask(
             db,
-            topic=f"این مکان کجاست؟ ({place.visit_count} بار آنجا بوده‌ای)",
-            context=f"مختصات {place.latitude:.4f}, {place.longitude:.4f} — "
-                    f"مجموعاً {round(place.total_minutes or 0)} دقیقه.",
+            topic=(f"{place.address[:70]} — اینجا کجاست؟"
+                   if place.address else
+                   f"این مکان کجاست؟ ({place.visit_count} بار آنجا بوده‌ای)"),
+            context=(
+                (f"{place.address} — " if place.address else "")
+                + f"{place.visit_count} بار، مجموعاً {round(place.total_minutes or 0)} دقیقه. "
+                + f"روی نقشه: {maps_link(place.latitude, place.longitude)}"
+            ),
             source="location",
             source_ref=f"place:{uid}:{place.id}",
             target={"kind": "place", "place_id": place.id},

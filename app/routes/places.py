@@ -81,10 +81,22 @@ async def list_places(
         )
     ).scalars().all()
 
+    # آیا نشانیِ متنی اصلاً ممکن است؟ بدونِ کلیدِ Maps هرگز نمی‌آید و مالک
+    # باید **بداند** چرا — نه اینکه منتظرِ چیزی بماند که هیچ‌وقت نمی‌رسد.
+    try:
+        from app.services.google_maps_service import _maps_key
+
+        addresses_available = bool(_maps_key())
+    except Exception:
+        addresses_available = False
+    missing_address = sum(1 for p in places if not p.address)
+
     return {
         "ok": True,
         "success": True,
         "tz_offset_minutes": TZ_OFFSET_MINUTES,
+        "addresses_available": addresses_available,
+        "places_without_address": missing_address,
         "places": [
             {
                 "id": p.id,

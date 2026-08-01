@@ -273,9 +273,13 @@ async def _job_places(db: AsyncSession) -> dict[str, Any]:
     from app.services import place_service
 
     ingested = await place_service.ingest_points(db)
+    # نشانیِ مکان‌های قدیمی را هم برسان: جغرافیای معکوس فقط هنگامِ ساختِ
+    # مکان صدا زده می‌شود، پس هرچه پیش از آن کشف شده بود بی‌نشانی می‌ماند و
+    # سؤالِ «اینجا کجاست؟» با دو عددِ خام می‌رفت — سؤالی که جواب ندارد.
+    addresses = await place_service.backfill_addresses(db)
     learned = await place_service.learn_patterns(db)
     asked = await place_service.ask_about_places(db)
-    return {**ingested, **learned, **asked}
+    return {**ingested, **learned, **asked, "addresses_filled": addresses["filled"]}
 
 
 async def _job_owner_identity(db: AsyncSession) -> dict[str, Any]:
