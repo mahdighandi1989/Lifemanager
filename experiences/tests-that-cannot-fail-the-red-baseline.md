@@ -121,6 +121,23 @@ _dt.datetime = _Shifted
 - Patching `datetime` in a probe does not shift `time.time()` or C-level
   clocks, and only reaches modules imported *after* the patch. It finds the
   rolling-window class of bug, not every clock dependency.
+- **The probe has two isinstance traps, and both manufacture fake failures.**
+  (1) Every value it hands back must be an instance of the SUBSTITUTED class:
+  libraries do `isinstance(x, datetime)`, and after substitution that name is
+  the subclass — returning a plain `datetime` makes those checks silently
+  False (a JWT library stops converting `exp`, then json refuses to serialise
+  it). (2) Do NOT substitute `date` as well: `datetime` subclasses the
+  ORIGINAL `date`, so swapping that name breaks `isinstance(a_datetime, date)`
+  everywhere. In one real run these two mistakes turned 13 findings into 60.
+- **Budget for triage, and expect most hits to be artifacts.** A shifted app
+  clock disagrees with any clock the probe cannot reach — `date.today()` in
+  the test itself, and above all `server_default=func.now()`, which is the
+  DATABASE's clock. Those rows look 120 days stale under the probe and are
+  perfectly fresh in production. Classify each hit by *which two clocks
+  disagreed* before calling anything a bug.
+- A test that reads `date.today()` while the code under test reads
+  `datetime.now(tz)` is already half-broken: pin the test to the same clock
+  source the product uses.
 - **Fix the gate, not just the tests.** Once the baseline is zero, make the
   merge gate mean zero — otherwise the next stale test just starts a new
   baseline.

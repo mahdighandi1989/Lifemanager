@@ -305,23 +305,37 @@ async def test_owner_pinned_balance_blocks_older_machine_signals(db_session):
 async def test_balance_delta_is_not_summed_in_the_monthly_report(db_session):
     from app.services.finance_report_service import build_report
 
+    # ``build_report(months=2)`` returns a window relative to the real clock,
+    # so the fixture must be dated inside that window. Hardcoding a month
+    # here made this test a time bomb: it was green while «الان» was still
+    # within two months of that literal, and would have started failing with
+    # a bare StopIteration on the first of the month after — with no code
+    # change to point at.
+    # Read the SAME clock the service reads (``datetime.now(timezone.utc)``),
+    # not ``date.today()`` — a test that derives "now" from a different source
+    # than the code under test is one timezone or one frozen clock away from
+    # disagreeing with it.
+    import datetime as dt
+
+    month = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m")
+
     await fs.apply_account_signal(
         db_session, 0, institution="mbankuae", account_ref="••4006",
         balance=10000, currency="AED", source="email", source_ref="email:r1",
-        occurred_iso="2026-07-01T00:00:00",
+        occurred_iso=f"{month}-01T00:00:00",
     )
     await db_session.commit()
     acc = (await db_session.execute(select(FinancialAccount))).scalars().one()
     # the statement's real line
     await fs.record_statement_lines(db_session, acc, [{
-        "date": "2026-07-03", "description": "POS COFFEE", "amount": 600.0,
+        "date": f"{month}-03", "description": "POS COFFEE", "amount": 600.0,
         "direction": "out", "currency": "AED",
     }])
     await db_session.commit()
 
     report = await build_report(db_session, user_id=0, months=2)
-    july = next(m for m in report if m["month"] == "2026-07")
-    aed = next(c for c in july["currencies"] if c["currency"] == "AED")
+    this_month = next(m for m in report if m["month"] == month)
+    aed = next(c for c in this_month["currencies"] if c["currency"] == "AED")
     # ONLY the real 600 movement counts — the 10,000 opening delta is
     # bookkeeping, not spending/income.
     assert aed["expense"] == 600.0 and aed["income"] == 0.0
