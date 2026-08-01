@@ -68,7 +68,10 @@ class MainActivity : AppCompatActivity() {
                     .apply()
                 requestSmsPermission()
                 schedulePeriodicWork()
-                LocationTrackingService.startIfEnabled(this)
+                // this@MainActivity و نه this: اینجا داخلِ `Button(...).apply {}`
+                // هستیم، پس گیرندهٔ `this` خودِ دکمه است نه اکتیویتی — و Button
+                // یک Context نیست. (خطای کامپایلِ CI در ۲۰۲۶-۰۸-۰۱)
+                LocationTrackingService.startIfEnabled(this@MainActivity)
                 sendHeartbeat()
                 status.text = "ذخیره شد. ضربان فرستاده شد — در برنامهٔ وب /api/mobile/status را ببین.\n" +
                     "دسترسی اعلان‌ها و آمار مصرف را هم از دکمه‌های زیر بده."
