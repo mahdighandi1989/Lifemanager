@@ -37,7 +37,19 @@ elif url.startswith("postgres://"):
 config.set_main_option("sqlalchemy.url", url)
 
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # disable_existing_loggers=False عمدی است (۲۰۲۶-۰۸-۰۱).
+    #
+    # پیش‌فرضِ fileConfig مقدارش True است و هر لاگری را که **از قبل ساخته
+    # شده** خاموش می‌کند — یعنی به‌محضِ اینکه alembic در همین پروسه بالا
+    # بیاید، تمامِ لاگرهای app.* ساکت می‌شوند و `logger.setLevel()` هم
+    # برشان نمی‌گرداند (باید `disabled` را دستی False کرد).
+    #
+    # چطور پیدا شد: تستی که ثابت می‌کرد «ردیفِ ناخوانا بی‌سروصدا صفر نمی‌سازد
+    # و هشدار می‌دهد» تنها سبز بود و در سوئیتِ کامل قرمز. علتش رفتارِ محصول
+    # نبود؛ هر تستِ مهاجرت که جلوتر اجرا می‌شد لاگرها را خاموش می‌کرد.
+    # همان مکانیزم در پروسه‌ای که مهاجرت اجرا کند و بعد به کارش ادامه دهد
+    # هشدارهای واقعی را هم می‌بلعد — پس ریشه اصلاح شد، نه آن تست.
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = Base.metadata
 
