@@ -26,8 +26,24 @@ async def read_identity(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_required_user_id),
 ) -> dict:
-    """همهٔ فیلدها — حتی خالی‌ها، تا معلوم باشد چه چیزی را هنوز نمی‌دانیم."""
-    return {"ok": True, "success": True, **await ident.get_identity(db, user_id)}
+    """تصویرِ یکپارچه: حرفِ خودِ مالک + آنچه بقیهٔ برنامه دربارهٔ او می‌داند.
+
+    ``fields`` همان قراردادِ قبلی است و دست‌نخورده می‌ماند (مسیرِ ویرایش و قفل
+    رویش سوار است). ``groups``/``sources`` تازه‌اند و از گردآورنده می‌آیند —
+    که **هیچ داده‌ای ذخیره نمی‌کند** و فقط سطح‌های موجود را کنار هم می‌گذارد.
+    هر کارت لینکِ صفحه‌ای را دارد که صاحبِ آن داده است، تا این صفحه به‌جای
+    جزیرهٔ تازه، درِ ورودیِ بقیه باشد.
+    """
+    base = await ident.get_identity(db, user_id)
+    insight: Dict[str, Any] = {"groups": [], "sources": [], "unavailable": []}
+    try:
+        from app.services import owner_insight
+
+        collected = await owner_insight.collect(db, user_id)
+        insight = {k: collected[k] for k in ("groups", "sources", "unavailable")}
+    except Exception as exc:  # گردآورنده هرگز نباید صفحه را از کار بیندازد
+        logger.warning("owner-insight collect failed: %r", exc)
+    return {"ok": True, "success": True, **base, **insight}
 
 
 @router.post("/api/identity-profile/refresh", tags=["identity-profile"])

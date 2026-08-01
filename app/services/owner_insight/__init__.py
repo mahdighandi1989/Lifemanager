@@ -76,7 +76,17 @@ def _load_providers() -> None:
     _LOADED = True
 
 
-def providers() -> List[Provider]:
+def registered_providers() -> List[Provider]:
+    """فهرستِ منابعِ ثبت‌شده، مرتب.
+
+    چرا اسمش `providers` نیست: زیرپکیجی به همان نام کنارِ همین ماژول هست، و
+    پایتون هنگامِ import کردنِ زیرپکیج، خودِ ماژول را روی همان نام در فضای‌نامِ
+    پکیجِ والد می‌نشانَد. یعنی اگر این تابع `providers` نام داشت، بعد از
+    اولین بارگذاری با ماژول جایگزین می‌شد و فراخوانیِ دوم
+    `TypeError: 'module' object is not callable` می‌داد — تابعی که **یک بار**
+    کار می‌کند و بعد می‌شکند. (روتِ /identity-profile در درخواستِ دوم ۵۰۰
+    می‌گرفت.) تستِ رگرسیون: tests/test_owner_insight_spine.py
+    """
     _load_providers()
     return sorted(_REGISTRY.values(), key=lambda p: (p.group_order, p.key))
 
@@ -89,7 +99,7 @@ async def collect(
     هیچ provider ای نمی‌تواند بقیه را زمین بزند: استثنا و مهلتِ زمانی هر دو
     مهار می‌شوند و منبعِ خراب فقط با یک یادداشتِ صادقانه غایب می‌ماند.
     """
-    chosen = [p for p in providers() if only is None or p.key == only]
+    chosen = [p for p in registered_providers() if only is None or p.key == only]
 
     async def _run(p: Provider):
         try:
@@ -135,4 +145,4 @@ def _grouped(facets: List[Facet]) -> List[Dict[str, Any]]:
     ]
 
 
-__all__ = ["register", "providers", "collect", "Facet", "FacetGroup", "Provider"]
+__all__ = ["register", "registered_providers", "collect", "Facet", "FacetGroup", "Provider"]
