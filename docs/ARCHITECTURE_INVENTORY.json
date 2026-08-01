@@ -2004,6 +2004,10 @@
       {
         "name": "IdentityProfile",
         "file": "frontend/src/pages/IdentityProfile.jsx"
+      },
+      {
+        "name": "PlacesMap",
+        "file": "frontend/src/pages/PlacesMap.jsx"
       }
     ],
     "components": [
