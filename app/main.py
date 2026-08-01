@@ -28,6 +28,7 @@ from app.routes import (
     directives,
     global_search,
     clarifications,
+    places,
     owner_identity,
     system_map,
     trash,
@@ -1001,6 +1002,7 @@ app.include_router(assistant_chat.router, tags=["ai"])
 app.include_router(global_search.router, tags=["search"])
 app.include_router(system_map.router, tags=["system-map"])
 app.include_router(clarifications.router, tags=["clarifications"])
+app.include_router(places.router, tags=["places"])
 app.include_router(owner_identity.router, tags=["identity-profile"])
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.

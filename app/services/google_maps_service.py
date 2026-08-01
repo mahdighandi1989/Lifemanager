@@ -65,6 +65,54 @@ async def geocode_address(address: str) -> Optional[dict]:
         return None
 
 
+async def reverse_geocode(lat: float, lon: float) -> Optional[dict]:
+    """مختصات → نشانیِ خواندنی. جهتِ عکسِ ``geocode_address``.
+
+    چرا لازم شد (۲۰۲۶-۰۸-۰۱): مکان‌های کشف‌شده فقط یک جفت عدد بودند و مالک
+    در گزارش‌ها «نقطهٔ ۲۵٫۲۰۰۱، ۵۵٫۲۷۰۳» می‌دید. ستونِ ``places.address``
+    از همان اول وجود داشت ولی **هیچ‌جا نوشته نمی‌شد**، چون این تابع نبود.
+
+    برمی‌گرداند ``{formatted_address, short_name}`` یا None. بدونِ کلید
+    None می‌دهد و فراخوان با مختصات ادامه می‌دهد — مثل بقیهٔ مسیرهای
+    اختیاریِ این پروژه، نبودِ اعتبارنامه یعنی افتِ کیفیت، نه خطا.
+
+    ``short_name`` نامِ کوتاهِ محله/ساختمان است (اولین جزء با نوعِ معنادار)،
+    چون نشانیِ کاملِ گوگل برای یک برچسبِ فارسی خیلی بلند است.
+    """
+    if not _maps_key():
+        return None
+    try:
+        import httpx
+
+        async with httpx.AsyncClient(timeout=_timeout()) as client:
+            resp = await client.get(
+                _GEOCODE_URL,
+                params={"latlng": f"{lat},{lon}", "key": _maps_key(),
+                        "language": "fa"},
+            )
+        data = resp.json()
+        results = data.get("results") or []
+        if not results:
+            return None
+        best = results[0]
+        formatted = best.get("formatted_address")
+        short = None
+        # ترتیبِ ترجیح: نقطهٔ دیدنی → محله → منطقه → شهر
+        wanted = ("point_of_interest", "premise", "neighborhood",
+                  "sublocality", "locality")
+        for kind in wanted:
+            for comp in best.get("address_components") or []:
+                if kind in (comp.get("types") or []):
+                    short = comp.get("long_name")
+                    break
+            if short:
+                break
+        return {"formatted_address": formatted, "short_name": short or formatted}
+    except Exception as exc:  # شبکه/سهمیه/شکلِ پاسخ — افت کن، نترکان
+        logger.warning("reverse_geocode failed for %s,%s: %r", lat, lon, exc)
+        return None
+
+
 async def find_nearby_places(
     lat: float, lng: float, *, keyword: str = "", radius_m: int = 1500
 ) -> List[dict]:

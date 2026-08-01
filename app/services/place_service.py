@@ -176,6 +176,29 @@ def infer_kind(hist: Optional[Dict[str, Any]], visit_count: int) -> Optional[str
     return None
 
 
+async def _resolve_address(place) -> None:
+    """نشانیِ خواندنی را روی مکان بنشان. هرگز استثنا نمی‌دهد.
+
+    ستونِ ``places.address`` از ابتدا وجود داشت و هیچ‌وقت پر نمی‌شد؛ نتیجه‌اش
+    این بود که مالک در هر گزارشی «نقطهٔ ۲۵٫۲۰۰۱، ۵۵٫۲۷۰۳» می‌دید.
+    """
+    if place is None or place.address:
+        return
+    try:
+        from app.services.google_maps_service import reverse_geocode
+
+        hit = await reverse_geocode(place.latitude, place.longitude)
+        if hit and hit.get("formatted_address"):
+            place.address = str(hit["formatted_address"])[:400]
+            # نامِ کوتاه فقط پیشنهادِ اولیه است — تا مالک خودش اسمی نگذاشته،
+            # بهتر از مختصات است؛ و چون owner_locked نمی‌شود، حرفِ او بعداً
+            # جایگزینش می‌کند.
+            if not place.label and hit.get("short_name"):
+                place.label = str(hit["short_name"])[:160]
+    except Exception as exc:
+        logger.debug("address lookup skipped for place %s: %r", getattr(place, "id", None), exc)
+
+
 async def ingest_points(db: AsyncSession, uid: int = 0, *, since_hours: int = 48) -> Dict[str, Any]:
     """نقاطِ خامِ اخیر را به مکان/بازدید/سفر تبدیل کن. idempotent است:
     بازدیدی که بازه‌اش قبلاً ثبت شده دوباره ساخته نمی‌شود."""
@@ -215,6 +238,11 @@ async def ingest_points(db: AsyncSession, uid: int = 0, *, since_hours: int = 48
             db.add(place)
             await db.flush()
             made_places += 1
+            # نشانی را **یک بار برای هر مکان** حل کن، نه برای هر نقطه.
+            # یک شبِ خواب صدها نقطه دارد ولی یک مکان است، پس این یعنی چند
+            # فراخوانی در کل — نه هزاران. بدونِ کلیدِ نقشه بی‌سروصدا None
+            # می‌ماند و مختصات نمایش داده می‌شود.
+            await _resolve_address(place)
 
         # ضدتکرار بر اساسِ **هم‌پوشانی**، نه برابریِ دقیقِ لحظهٔ ورود.
         #
@@ -390,6 +418,54 @@ async def learn_patterns(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
 
 # ── مرحلهٔ ۴: پرسیدن — کم، و فقط جایی که واقعاً لازم است ────────────────────
 
+async def _place_name(db: AsyncSession, place_id: Optional[int]) -> str:
+    """نامِ خواندنیِ یک مکان: برچسبِ مالک ← نشانی ← مختصات.
+
+    هیچ‌وقت رشتهٔ خالی برنمی‌گرداند؛ «جایی ناشناس» صادقانه‌تر از سکوت است.
+    """
+    from app.models.place import Place
+
+    if not place_id:
+        return "جایی ناشناس"
+    row = await db.get(Place, int(place_id))
+    if row is None:
+        return "جایی ناشناس"
+    if row.label:
+        return str(row.label)
+    if row.address:
+        return str(row.address)[:80]
+    return f"نقطهٔ {row.latitude:.4f}, {row.longitude:.4f}"
+
+
+def _clock(moment) -> str:
+    if not moment:
+        return ""
+    local = _aware(moment) + timedelta(minutes=TZ_OFFSET_MINUTES)
+    return local.strftime("%H:%M")
+
+
+async def _trip_topic(db: AsyncSession, trip) -> str:
+    frm = await _place_name(db, trip.from_place_id)
+    to = await _place_name(db, trip.to_place_id)
+    when = _clock(trip.started_at)
+    at = f"ساعت {when} " if when else ""
+    return f"{at}از «{frm}» رفتی به «{to}» — آنجا چه بود؟"[:300]
+
+
+async def _trip_context(db: AsyncSession, trip) -> str:
+    frm = await _place_name(db, trip.from_place_id)
+    to = await _place_name(db, trip.to_place_id)
+    start, end = _clock(trip.started_at), _clock(trip.ended_at)
+    bits = [f"از «{frm}» به «{to}»"]
+    if start:
+        bits.append(f"از {start}" + (f" تا {end}" if end else ""))
+    if trip.minutes:
+        bits.append(f"{round(trip.minutes)} دقیقه")
+    if trip.distance_km:
+        bits.append(f"{round(trip.distance_km, 1)} کیلومتر")
+    return "این مسیر با الگوهای همیشگی‌ات نمی‌خواند — " + "، ".join(bits) + "."
+
+
 async def ask_about_places(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     """دو نوع پرسش، هر دو یک‌بارمصرف:
 
@@ -443,11 +519,15 @@ async def ask_about_places(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
         )
     ).scalars().all()
     for trip in odd:
+        # سؤال باید بگوید **از کجا به کجا و کِی** — نه فقط «چند کیلومتر».
+        # نسخهٔ اول با اینکه from_place_id/to_place_id/started_at را در دست
+        # داشت، هیچ‌کدام را استفاده نمی‌کرد و می‌پرسید «۸.۴ کیلومتر جابه‌جا
+        # شدی، کجا بودی؟» — سؤالی که خودِ مالک نمی‌توانست جوابش را به یاد
+        # بیاورد چون هیچ نشانه‌ای در آن نبود. (۲۰۲۶-۰۸-۰۱)
         c = await clar.ask(
             db,
-            topic="یک رفت‌وآمدِ غیرعادی داشتی — چه بود؟",
-            context=f"سفری که با الگوهای همیشگی‌ات نمی‌خواند "
-                    f"({round(trip.minutes or 0)} دقیقه، {round(trip.distance_km or 0, 1)} کیلومتر).",
+            topic=await _trip_topic(db, trip),
+            context=await _trip_context(db, trip),
             source="location",
             source_ref=f"trip:{uid}:{trip.id}",
             target={"kind": "trip", "trip_id": trip.id},

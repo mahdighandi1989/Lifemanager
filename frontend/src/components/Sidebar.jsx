@@ -61,6 +61,7 @@ export const LINKS = [
   // 2026-08-01: صفحهٔ «من که هستم» ساخته شد ولی هیچ دری نداشت — فقط با تایپِ
   // آدرس باز می‌شد. یک صفحه‌ای که از منو دیده نشود، عملاً وجود ندارد.
   { to: '/identity-profile', label: 'من که هستم', testid: 'sidebar-link-identity-profile', group: 'life_pages' },
+  { to: '/places', label: 'کجاها بوده‌ام', testid: 'sidebar-link-places', group: 'life_pages' },
 
   // ابزار — helpers.
   { to: '/assistant', label: 'دستیار هوشمند', testid: 'sidebar-link-assistant', group: 'tools' },

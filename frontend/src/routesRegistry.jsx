@@ -19,6 +19,7 @@ import LifeFilePage from './pages/LifeFilePage';
 import DirectivesPage from './pages/DirectivesPage';
 import SelfPortrait from './pages/SelfPortrait';
 import IdentityProfile from './pages/IdentityProfile';
+import PlacesMap from './pages/PlacesMap';
 import SahatMap from './pages/SahatMap';
 import SahatDetail from './pages/SahatDetail';
 import ListDetail from './pages/ListDetail';
@@ -51,6 +52,7 @@ const PAGE_COMPONENTS = {
   DirectivesPage,
   SelfPortrait,
   IdentityProfile,
+  PlacesMap,
   SahatMap,
   SahatDetail,
   ListDetail,

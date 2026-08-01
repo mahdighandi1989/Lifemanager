@@ -46,6 +46,7 @@ export const ROUTES = [
   { path: '/writings', page: 'Writings', label: 'نوشته‌های من', group: 'life_pages' },
   { path: '/self-portrait', page: 'SelfPortrait', label: 'خودنگاره', group: 'life_pages' },
   { path: '/identity-profile', page: 'IdentityProfile', label: 'من که هستم', group: 'life_pages' },
+  { path: '/places', page: 'PlacesMap', label: 'کجاها بوده‌ام', group: 'life_pages' },
   { path: '/brain', page: 'BrainDashboard', label: 'رشد ذهن و هوش', group: 'life_pages' },
   { path: '/dev-center', page: 'DevCenter', label: 'کار و توسعه', group: 'life_pages' },
 
