@@ -334,3 +334,86 @@ def test_identity_api_reads_edits_and_refreshes(api_client):
 
 def test_identity_api_rejects_an_unknown_field(api_client):
     assert api_client.put("/api/identity-profile/salary", json={"value": "x"}).status_code in (400, 422)
+
+
+# ── ردیابیِ دقیق (سرویسِ پیش‌زمینه) ─────────────────────────────────────────
+
+def test_a_precise_batch_is_stored_and_labelled(api_client):
+    """سرویسِ دقیق نقاط را دسته‌ای می‌فرستد؛ باید همه ذخیره شوند و در لاگ
+    معلوم باشد از کدام حالت آمده‌اند."""
+    token = api_client.get("/api/mobile/token").json()["token"]
+    base = dt.datetime(2026, 7, 31, 8, 0, tzinfo=UTC)
+    points = [
+        {"lat": 25.2 + i * 0.0004, "lon": 55.2 + i * 0.0004,
+         "at": (base + dt.timedelta(seconds=20 * i)).isoformat(),
+         "accuracy_m": 8.0, "speed_kmh": 34.0}
+        for i in range(12)
+    ]
+    r = api_client.post(
+        "/api/mobile/location",
+        json={"points": points, "device": "s24", "location_enabled": True, "precise": True},
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200
+    assert r.json()["stored"] == 12
+
+    log = api_client.get("/api/activity-log", params={"action": "mobile_location"}).json()
+    details = [i.get("detail") or "" for i in (log.get("items") or [])]
+    assert any("ردیابی دقیق" in d for d in details)
+
+
+def test_a_resent_batch_does_not_duplicate_points(api_client):
+    """صفِ آفلاین ممکن است یک بسته را دوباره بفرستد — نقطهٔ تکراری کلِ
+    خوشه‌بندی و الگوها را خراب می‌کند."""
+    token = api_client.get("/api/mobile/token").json()["token"]
+    base = dt.datetime(2026, 7, 31, 9, 0, tzinfo=UTC)
+    batch = {
+        "points": [
+            {"lat": 25.3, "lon": 55.3, "at": (base + dt.timedelta(seconds=30 * i)).isoformat()}
+            for i in range(5)
+        ],
+        "device": "s24", "precise": True,
+    }
+    first = api_client.post("/api/mobile/location", json=batch,
+                            headers={"X-Device-Token": token}).json()
+    second = api_client.post("/api/mobile/location", json=batch,
+                             headers={"X-Device-Token": token}).json()
+    assert first["stored"] == 5
+    assert second["stored"] == 0 and second["received"] == 5
+
+
+def test_location_requires_the_device_token(api_client):
+    api_client.get("/api/mobile/token")
+    r = api_client.post("/api/mobile/location", json={"points": [], "device": "x"})
+    assert r.status_code == 401
+
+
+def test_an_empty_batch_still_reports_the_location_switch(api_client):
+    """وقتی موقعیت خاموش است نقطه‌ای نیست — ولی خبرِ خاموشی باید برسد،
+    وگرنه تشخیصِ «مجرای خاموش» دوباره حدسی می‌شود."""
+    token = api_client.get("/api/mobile/token").json()["token"]
+    r = api_client.post(
+        "/api/mobile/location",
+        json={"points": [], "device": "s24", "location_enabled": False},
+        headers={"X-Device-Token": token},
+    )
+    assert r.status_code == 200 and r.json()["stored"] == 0
+
+
+@pytest.mark.asyncio
+async def test_dense_precise_points_become_one_stay_not_many(db):
+    """نقاطِ متراکمِ سرویسِ دقیق نباید هر کدام یک «مکان» بسازند."""
+    from sqlalchemy import select
+
+    from app.models.place import Place
+    from app.models.user_location import UserLocation
+
+    base = dt.datetime.now(UTC) - dt.timedelta(hours=2)
+    for i in range(40):                     # هر ۲۰ ثانیه یک نقطه، همان‌جا
+        db.add(UserLocation(user_id=0, latitude=25.2 + (i % 3) * 0.00002,
+                            longitude=55.2, device="s24",
+                            timestamp=base + dt.timedelta(seconds=20 * i)))
+    await db.commit()
+    res = await ps.ingest_points(db, 0, since_hours=24)
+    assert res["places"] == 1
+    assert len((await db.execute(select(Place))).scalars().all()) == 1

@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <!-- اندروید ۱۳+ برای هشدارِ محلیِ «موقعیت خاموش است» اجازه می‌خواهد -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- ردیابیِ دقیق: سرویسِ پیش‌زمینه تنها راهِ مجازِ ثبتِ پیوستهٔ مسیر است -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -43,6 +46,11 @@
         </receiver>
 
         <!-- هر اعلان گوشی → صف ارسال (نیازمند Notification access از تنظیمات) -->
+        <service
+            android:name=".LocationTrackingService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
         <service android:name=".NotifListener" android:exported="false"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>

@@ -19,6 +19,11 @@ class BootReceiver : BroadcastReceiver() {
             .put("app_version", "boot")
             .toString()
         Net.enqueue(context, "/api/mobile/heartbeat", json)
+        // ردیابیِ دقیق را بعد از ریبوت برگردان — اگر مالک روشنش کرده بود.
+        try {
+            LocationTrackingService.startIfEnabled(context)
+        } catch (_: Exception) {
+        }
     }
 }
 

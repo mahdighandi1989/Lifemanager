@@ -459,6 +459,8 @@ class LocationPayload(BaseModel):
     device: Optional[str] = None
     # وضعیتِ خودِ سرویسِ موقعیت روی گوشی (روشن/خاموش) — پایهٔ هشدارِ خاموشی.
     location_enabled: Optional[bool] = None
+    # آیا از سرویسِ «ردیابیِ دقیق» آمده (لحظه‌به‌لحظه) یا از کارگرِ دوره‌ای.
+    precise: Optional[bool] = None
 
 
 @router.post("/api/mobile/location", tags=["mobile"])
@@ -508,7 +510,7 @@ async def ingest_location(
         await record_activity(
             action="mobile_location", entity_type="location", entity_id=None,
             entity_label=device,
-            detail=f"{stored} نقطهٔ موقعیت",
+            detail=f"{stored} نقطهٔ موقعیت" + (" (ردیابی دقیق)" if payload.precise else ""),
             context_type="device", context_id=device,
             occurred_at=newest.isoformat() if newest else None,
             user_id=user_id, db=db,

@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
                     .apply()
                 requestSmsPermission()
                 schedulePeriodicWork()
+                LocationTrackingService.startIfEnabled(this)
                 sendHeartbeat()
                 status.text = "ذخیره شد. ضربان فرستاده شد — در برنامهٔ وب /api/mobile/status را ببین.\n" +
                     "دسترسی اعلان‌ها و آمار مصرف را هم از دکمه‌های زیر بده."
@@ -79,6 +80,25 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
             }
         }
+        // ردیابیِ دقیق: اختیاری و پیش‌فرض خاموش، چون باتری می‌برد. متنِ دکمه
+        // خودش وضعیت را می‌گوید تا معلوم باشد الان روشن است یا نه.
+        lateinit var preciseBtn: Button
+        preciseBtn = Button(this).apply {
+            text = if (LocationTrackingService.isEnabled(this@MainActivity))
+                "⏹ خاموش‌کردن ردیابی دقیق مسیر" else "▶️ روشن‌کردن ردیابی دقیق مسیر (باتری بیشتر)"
+            setOnClickListener {
+                val turningOn = !LocationTrackingService.isEnabled(this@MainActivity)
+                if (turningOn && !LocationWorker.hasPermission(this@MainActivity)) {
+                    requestSmsPermission()
+                    return@setOnClickListener
+                }
+                LocationTrackingService.setEnabled(this@MainActivity, turningOn)
+                preciseBtn.text = if (turningOn)
+                    "⏹ خاموش‌کردن ردیابی دقیق مسیر" else "▶️ روشن‌کردن ردیابی دقیق مسیر (باتری بیشتر)"
+                refreshPermissionStatus()
+            }
+        }
+
         val usageBtn = Button(this).apply {
             text = "دادن دسترسی آمار مصرف (Usage access)"
             setOnClickListener {
@@ -114,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         listOf(title, urlInput, tokenInput, deviceInput, saveBtn, notifBtn, usageBtn, a11yBtn,
-               testBtn, permStatus, status)
+               preciseBtn, testBtn, permStatus, status)
             .forEach { root.addView(it) }
         setContentView(root)
         refreshPermissionStatus()
@@ -144,6 +164,7 @@ class MainActivity : AppCompatActivity() {
             append("${mark(usage)} آمار مصرف (Usage access)\n")
             append("${mark(a11y)} خواندن صفحه (Accessibility — اختیاری)\n")
             append("${mark(loc)} موقعیت مکانی\n")
+            append("${mark(LocationTrackingService.isEnabled(this@MainActivity))} ردیابی دقیق مسیر\n")
             if (!notif) append("\n⚠️ اعلان‌ها خاموش است — دکمهٔ بالا را بزن و اپ را در فهرست فعال کن.")
             if (!loc) append("\n🛑 موقعیت مکانی ثبت نمی‌شود — اجازه را روی «همیشه» بگذار و GPS را روشن کن.")
         }

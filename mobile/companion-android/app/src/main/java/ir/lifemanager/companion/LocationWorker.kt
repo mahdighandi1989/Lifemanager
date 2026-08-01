@@ -32,10 +32,8 @@ import org.json.JSONObject
 class LocationWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
     companion object {
-        const val BUFFER_KEY = "location_buffer"
         const val LAST_WARN_KEY = "location_off_warned_at"
         const val CHANNEL_ID = "lifemanager_location"
-        const val MAX_BUFFER = 2000
         // فاصلهٔ هشدارِ محلی، تا تبدیل به آزار نشود
         const val WARN_COOLDOWN_MS = 6L * 60 * 60 * 1000
 
@@ -91,20 +89,6 @@ class LocationWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
         }
     }
 
-    private fun buffer(): JSONArray = try {
-        JSONArray(Net.prefs(applicationContext).getString(BUFFER_KEY, "[]"))
-    } catch (_: Exception) { JSONArray() }
-
-    private fun saveBuffer(arr: JSONArray) {
-        // سقف: قطعیِ خیلی طولانی نباید حافظه را بی‌نهایت بزرگ کند؛ قدیمی‌ترها
-        // کنار می‌روند، نه تازه‌ها.
-        val trimmed = if (arr.length() <= MAX_BUFFER) arr else JSONArray().also { out ->
-            for (i in (arr.length() - MAX_BUFFER) until arr.length()) out.put(arr.get(i))
-        }
-        Net.prefs(applicationContext).edit()
-            .putString(BUFFER_KEY, trimmed.toString()).apply()
-    }
-
     @Suppress("MissingPermission")
     private fun readPoint(): JSONObject? {
         if (!hasPermission(applicationContext)) return null
@@ -132,9 +116,12 @@ class LocationWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
             warnLocationOff("سرویسِ موقعیتِ گوشی (GPS) خاموش است.")
         }
 
-        val arr = buffer()
-        readPoint()?.let { arr.put(it) }
-        saveBuffer(arr)
+        // وقتی سرویسِ دقیق روشن است، خودش لحظه‌به‌لحظه می‌نویسد؛ کارگر فقط
+        // بافر را خالی می‌کند و نقطهٔ تکراری اضافه نمی‌کند.
+        if (!LocationTrackingService.isEnabled(applicationContext)) {
+            readPoint()?.let { LocationBuffer.add(applicationContext, it) }
+        }
+        val arr = LocationBuffer.drain(applicationContext)
 
         if (arr.length() == 0) {
             // حتی وقتی نقطه‌ای نیست، وضعیتِ خاموشی را به سرور خبر بده — همان
@@ -153,10 +140,9 @@ class LocationWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
             .put("device", Net.deviceName(applicationContext))
             .put("location_enabled", granted && enabled)
             .toString()
-        Net.enqueue(applicationContext, "/api/mobile/location", json)
-        // بافر بعد از **صف‌شدن** پاک می‌شود؛ خودِ صف تحویل را تضمین می‌کند و
+        // drain بالا بافر را برداشته؛ صفِ WorkManager تحویل را تضمین می‌کند و
         // در قطعیِ اینترنت با backoff دوباره تلاش می‌کند.
-        saveBuffer(JSONArray())
+        Net.enqueue(applicationContext, "/api/mobile/location", json)
         return Result.success()
     }
 }
