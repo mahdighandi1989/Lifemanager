@@ -76,6 +76,30 @@ class Facet:
     owns_page: str = ""              # مسیرِ صفحه‌ای که صاحبِ این داده است
     owner_locked: bool = False       # مالک خودش نوشته/قفل کرده
     editable_field: Optional[str] = None   # اگر قابلِ ویرایشِ مستقیم است
+    # آدرسِ **ردیف**، وقتی این ادعا دربارهٔ یک چیزِ مشخص است (نه یک جمع).
+    # `owns_page` دستِ‌نخورده می‌ماند — حدودِ بیست assertion در شش فایلِ تست
+    # آن را دقیقاً «یک مسیرِ خالی» می‌خواهند — و `link` جداگانه ساخته می‌شود.
+    focus_kind: str = ""
+    focus_id: Any = None
+    # کدام سطح‌ها اجازه دارند این ادعا را نشان دهند. خالی یعنی «فقط صفحهٔ
+    # گردآورنده». عمداً یک فهرستِ صریح است و نه یک عددِ salience: عدد را
+    # آن‌قدر تنظیم می‌کنند تا بی‌معنا شود، ولی افزودنِ یک سطح یک خطِ خوانا در
+    # diff است که نویسنده‌اش باید پایش بایستد.
+    surfaces: List[str] = field(default_factory=list)
+
+    @property
+    def focus(self) -> str:
+        """توکنِ `kind:id` یا رشتهٔ خالی — همان املایی که `focus_service` می‌شناسد."""
+        from app.services.focus_service import focus_token
+
+        return focus_token(self.focus_kind, self.focus_id) or ""
+
+    @property
+    def link(self) -> str:
+        """درِ خروجی: اگر ردیف مشخص است، به خودِ ردیف؛ وگرنه به صفحهٔ صاحبش."""
+        from app.services.focus_service import focus_url
+
+        return focus_url(self.owns_page, self.focus_kind, self.focus_id)
 
     def as_dict(self) -> Dict[str, Any]:
         return {
@@ -91,6 +115,9 @@ class Facet:
             "owns_page": self.owns_page,
             "owner_locked": self.owner_locked,
             "editable_field": self.editable_field,
+            "focus": self.focus,
+            "link": self.link,
+            "surfaces": list(self.surfaces),
         }
 
 

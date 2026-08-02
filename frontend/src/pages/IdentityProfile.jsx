@@ -20,6 +20,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
+// کارت از اینجا به components/FacetStrip منتقل شد تا صفحه‌های دیگر هم
+// بتوانند همین را نشان دهند؛ رندرِ این صفحه عوض نمی‌شود.
+import { FacetCard } from '../components/FacetStrip';
 
 const SOURCE_FA = {
   owner: 'خودت وارد کردی',
@@ -32,71 +35,6 @@ const SOURCE_FA = {
   own_lists: 'لیست‌های خودت',
   derived: 'محاسبه‌شده',
 };
-
-const TONE = {
-  good: { ring: 'border-emerald-200', dot: 'bg-emerald-500', text: 'text-emerald-700' },
-  watch: { ring: 'border-amber-200', dot: 'bg-amber-500', text: 'text-amber-700' },
-  neutral: { ring: 'border-gray-200', dot: 'bg-gray-300', text: 'text-gray-500' },
-};
-
-const KIND_FA = {
-  fact: 'از سند',
-  measured: 'از دادهٔ واقعی',
-  inferred: 'استنباط',
-  owner: 'حرفِ خودت',
-};
-
-/** یک ادعا دربارهٔ مالک. */
-function FacetCard({ item }) {
-  const [open, setOpen] = useState(false);
-  const tone = TONE[item.tone] || TONE.neutral;
-
-  return (
-    <li className={`rounded-xl border bg-white p-3 ${tone.ring}`}>
-      <div className="flex items-start gap-2">
-        <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${tone.dot}`} />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-sm font-medium text-gray-800">{item.title}</span>
-            <span className={`shrink-0 text-[11px] ${tone.text}`}>
-              {KIND_FA[item.kind] || item.kind}
-              {item.confidence ? ` · ${Math.round(item.confidence * 100)}٪` : ''}
-            </span>
-          </div>
-          <p className="mt-1 text-sm leading-6 text-gray-700">{item.statement}</p>
-
-          <div className="mt-1.5 flex flex-wrap items-center gap-3">
-            {item.evidence?.length > 0 ? (
-              <button
-                type="button"
-                onClick={() => setOpen((v) => !v)}
-                className="text-[11px] text-blue-600 hover:underline"
-              >
-                {open ? 'بستن' : 'این را از کجا آوردی؟'}
-              </button>
-            ) : null}
-            {item.owns_page ? (
-              <Link
-                to={item.owns_page}
-                className="text-[11px] text-gray-500 hover:text-blue-600 hover:underline"
-              >
-                رفتن به سرچشمه‌اش ↩
-              </Link>
-            ) : null}
-          </div>
-
-          {open && item.evidence?.length > 0 ? (
-            <ul className="mt-1 space-y-0.5 text-[11px] leading-5 text-gray-500">
-              {item.evidence.map((e, i) => (
-                <li key={i}>• {e}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </div>
-    </li>
-  );
-}
 
 /** فیلدی که خودِ مالک می‌نویسد — حرفِ او همیشه مقدم است. */
 function OwnerField({ item, onSaved }) {

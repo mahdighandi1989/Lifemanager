@@ -541,6 +541,43 @@
         ]
       },
       {
+        "file": "app/routes/clarifications.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/clarifications"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/answer"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/skip"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/snooze"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/resend"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/ask"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/edit"
+          },
+          {
+            "method": "POST",
+            "path": "/api/clarifications/{clarification_id}/discuss"
+          }
+        ]
+      },
+      {
         "file": "app/routes/command_center.py",
         "endpoints": [
           {
@@ -626,6 +663,15 @@
           {
             "method": "GET",
             "path": "/api/external-projects"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/facets.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/facets"
           }
         ]
       },
@@ -895,6 +941,63 @@
         ]
       },
       {
+        "file": "app/routes/mobile.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/mobile/token"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/sms"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/notification"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/usage"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/heartbeat"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/status"
+          },
+          {
+            "method": "GET",
+            "path": "/companion.apk"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/apk"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/call"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/screen"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/insights"
+          },
+          {
+            "method": "GET",
+            "path": "/api/mobile/diagnostics"
+          },
+          {
+            "method": "POST",
+            "path": "/api/mobile/location"
+          }
+        ]
+      },
+      {
         "file": "app/routes/notifications.py",
         "endpoints": [
           {
@@ -957,6 +1060,27 @@
           {
             "method": "PATCH",
             "path": "/api/v1/oversight/connections/{connection_id}/time-budget"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/owner_identity.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/identity-profile"
+          },
+          {
+            "method": "POST",
+            "path": "/api/identity-profile/refresh"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/identity-profile/{field}"
+          },
+          {
+            "method": "POST",
+            "path": "/api/identity-profile/ask-missing"
           }
         ]
       },
@@ -1082,6 +1206,31 @@
           {
             "method": "PUT",
             "path": "/api/settings/global-analysis-prompt"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/system_map.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/system-map"
+          },
+          {
+            "method": "GET",
+            "path": "/api/system-map/graph"
+          },
+          {
+            "method": "GET",
+            "path": "/api/system-map/activity"
+          },
+          {
+            "method": "POST",
+            "path": "/api/system-map/layout"
+          },
+          {
+            "method": "POST",
+            "path": "/api/system-map/wires"
           }
         ]
       },
@@ -1249,146 +1398,6 @@
             "path": "/api/weekly-review/settings"
           }
         ]
-      },
-      {
-        "file": "app/routes/system_map.py",
-        "endpoints": [
-          {
-            "method": "GET",
-            "path": "/api/system-map"
-          },
-          {
-            "method": "GET",
-            "path": "/api/system-map/graph"
-          },
-          {
-            "method": "GET",
-            "path": "/api/system-map/activity"
-          },
-          {
-            "method": "POST",
-            "path": "/api/system-map/layout"
-          },
-          {
-            "method": "POST",
-            "path": "/api/system-map/wires"
-          }
-        ]
-      },
-      {
-        "file": "app/routes/mobile.py",
-        "endpoints": [
-          {
-            "method": "GET",
-            "path": "/api/mobile/token"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/sms"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/notification"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/usage"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/heartbeat"
-          },
-          {
-            "method": "GET",
-            "path": "/api/mobile/status"
-          },
-          {
-            "method": "GET",
-            "path": "/companion.apk"
-          },
-          {
-            "method": "GET",
-            "path": "/api/mobile/apk"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/call"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/screen"
-          },
-          {
-            "method": "GET",
-            "path": "/api/mobile/insights"
-          },
-          {
-            "method": "GET",
-            "path": "/api/mobile/diagnostics"
-          },
-          {
-            "method": "POST",
-            "path": "/api/mobile/location"
-          }
-        ]
-      },
-      {
-        "file": "app/routes/clarifications.py",
-        "endpoints": [
-          {
-            "method": "GET",
-            "path": "/api/clarifications"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/{clarification_id}/answer"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/{clarification_id}/skip"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/{clarification_id}/snooze"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/resend"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/ask"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/{clarification_id}/edit"
-          },
-          {
-            "method": "POST",
-            "path": "/api/clarifications/{clarification_id}/discuss"
-          }
-        ]
-      },
-      {
-        "file": "app/routes/owner_identity.py",
-        "endpoints": [
-          {
-            "method": "GET",
-            "path": "/api/identity-profile"
-          },
-          {
-            "method": "POST",
-            "path": "/api/identity-profile/refresh"
-          },
-          {
-            "method": "PUT",
-            "path": "/api/identity-profile/{field}"
-          },
-          {
-            "method": "POST",
-            "path": "/api/identity-profile/ask-missing"
-          }
-        ]
       }
     ],
     "services": [
@@ -1401,6 +1410,14 @@
         "file": "app/services/_todo_seed_data.py",
         "classes": [],
         "functions": []
+      },
+      {
+        "file": "app/services/activity_archive_service.py",
+        "classes": [],
+        "functions": [
+          "archive_tick",
+          "get_archive_status"
+        ]
       },
       {
         "file": "app/services/activity_log_service.py",
@@ -1498,6 +1515,30 @@
         ]
       },
       {
+        "file": "app/services/clarification_service.py",
+        "classes": [],
+        "functions": [
+          "ask",
+          "render_form",
+          "send_form",
+          "dispatch_pending",
+          "parse_reply",
+          "record_answers",
+          "file_answers",
+          "handle_reply",
+          "feedback_text",
+          "snooze",
+          "skip",
+          "open_forms",
+          "resend_all",
+          "to_dict",
+          "edit_answers",
+          "humanize_topic",
+          "discuss",
+          "answer_field"
+        ]
+      },
+      {
         "file": "app/services/command_center_service.py",
         "classes": [],
         "functions": [
@@ -1532,6 +1573,14 @@
           "_encrypt_api_key",
           "create_external_project",
           "list_external_projects"
+        ]
+      },
+      {
+        "file": "app/services/focus_service.py",
+        "classes": [],
+        "functions": [
+          "focus_token",
+          "focus_url"
         ]
       },
       {
@@ -1610,6 +1659,45 @@
         ]
       },
       {
+        "file": "app/services/mobile_dispatch_service.py",
+        "classes": [],
+        "functions": [
+          "classify_signal",
+          "classify_signal_smart",
+          "dispatch_signal"
+        ]
+      },
+      {
+        "file": "app/services/mobile_identity_service.py",
+        "classes": [],
+        "functions": [
+          "looks_like_package",
+          "pretty_app",
+          "resolve_sender",
+          "notification_label",
+          "display_entity_label",
+          "category_hint",
+          "compose_text"
+        ]
+      },
+      {
+        "file": "app/services/mobile_insights_service.py",
+        "classes": [],
+        "functions": [
+          "build_mobile_summary",
+          "summary_to_fa_lines"
+        ]
+      },
+      {
+        "file": "app/services/mobile_watchdog_service.py",
+        "classes": [],
+        "functions": [
+          "watchdog_tick",
+          "silent_devices",
+          "device_last_seen"
+        ]
+      },
+      {
         "file": "app/services/notification_service.py",
         "classes": [
           "_InMemoryNotification",
@@ -1625,6 +1713,20 @@
         ]
       },
       {
+        "file": "app/services/owner_identity_service.py",
+        "classes": [],
+        "functions": [
+          "refresh",
+          "get_identity",
+          "set_field",
+          "refresh_derived",
+          "ask_missing",
+          "apply_clarification_answer",
+          "summary_lines",
+          "parse_loose_date"
+        ]
+      },
+      {
         "file": "app/services/person_service.py",
         "classes": [],
         "functions": [
@@ -1634,6 +1736,22 @@
           "get_all_persons_for_user",
           "update_person",
           "delete_person"
+        ]
+      },
+      {
+        "file": "app/services/place_service.py",
+        "classes": [],
+        "functions": [
+          "haversine_m",
+          "segment_points",
+          "infer_kind",
+          "ingest_points",
+          "pattern_key",
+          "learn_patterns",
+          "ask_about_places",
+          "apply_place_answer",
+          "get_named_place",
+          "summary_lines"
         ]
       },
       {
@@ -1669,6 +1787,27 @@
         ]
       },
       {
+        "file": "app/services/system_graph_service.py",
+        "classes": [],
+        "functions": [
+          "build_graph",
+          "parse_routes_meta",
+          "engine_snapshot",
+          "invalidate_cache"
+        ]
+      },
+      {
+        "file": "app/services/system_pulse_service.py",
+        "classes": [],
+        "functions": [
+          "record_request",
+          "activity_snapshot",
+          "load_learned_edges",
+          "flush_learned_edges",
+          "reset_for_tests"
+        ]
+      },
+      {
         "file": "app/services/todo_item_service.py",
         "classes": [],
         "functions": [
@@ -1697,128 +1836,6 @@
           "update_settings",
           "fallback_narrative",
           "serialize"
-        ]
-      },
-      {
-        "file": "app/services/system_graph_service.py",
-        "classes": [],
-        "functions": [
-          "build_graph",
-          "parse_routes_meta",
-          "engine_snapshot",
-          "invalidate_cache"
-        ]
-      },
-      {
-        "file": "app/services/system_pulse_service.py",
-        "classes": [],
-        "functions": [
-          "record_request",
-          "activity_snapshot",
-          "load_learned_edges",
-          "flush_learned_edges",
-          "reset_for_tests"
-        ]
-      },
-      {
-        "file": "app/services/mobile_watchdog_service.py",
-        "classes": [],
-        "functions": [
-          "watchdog_tick",
-          "silent_devices",
-          "device_last_seen"
-        ]
-      },
-      {
-        "file": "app/services/mobile_insights_service.py",
-        "classes": [],
-        "functions": [
-          "build_mobile_summary",
-          "summary_to_fa_lines"
-        ]
-      },
-      {
-        "file": "app/services/activity_archive_service.py",
-        "classes": [],
-        "functions": [
-          "archive_tick",
-          "get_archive_status"
-        ]
-      },
-      {
-        "file": "app/services/mobile_dispatch_service.py",
-        "classes": [],
-        "functions": [
-          "classify_signal",
-          "classify_signal_smart",
-          "dispatch_signal"
-        ]
-      },
-      {
-        "file": "app/services/mobile_identity_service.py",
-        "classes": [],
-        "functions": [
-          "looks_like_package",
-          "pretty_app",
-          "resolve_sender",
-          "notification_label",
-          "display_entity_label",
-          "category_hint",
-          "compose_text"
-        ]
-      },
-      {
-        "file": "app/services/clarification_service.py",
-        "classes": [],
-        "functions": [
-          "ask",
-          "render_form",
-          "send_form",
-          "dispatch_pending",
-          "parse_reply",
-          "record_answers",
-          "file_answers",
-          "handle_reply",
-          "feedback_text",
-          "snooze",
-          "skip",
-          "open_forms",
-          "resend_all",
-          "to_dict",
-          "edit_answers",
-          "humanize_topic",
-          "discuss",
-          "answer_field"
-        ]
-      },
-      {
-        "file": "app/services/owner_identity_service.py",
-        "classes": [],
-        "functions": [
-          "refresh",
-          "get_identity",
-          "set_field",
-          "refresh_derived",
-          "ask_missing",
-          "apply_clarification_answer",
-          "summary_lines",
-          "parse_loose_date"
-        ]
-      },
-      {
-        "file": "app/services/place_service.py",
-        "classes": [],
-        "functions": [
-          "haversine_m",
-          "segment_points",
-          "infer_kind",
-          "ingest_points",
-          "pattern_key",
-          "learn_patterns",
-          "ask_about_places",
-          "apply_place_answer",
-          "get_named_place",
-          "summary_lines"
         ]
       }
     ]
@@ -2012,92 +2029,96 @@
     ],
     "components": [
       {
-        "name": "Footer",
-        "file": "frontend/src/components/Footer.jsx"
-      },
-      {
-        "name": "Header",
-        "file": "frontend/src/components/Header.jsx"
-      },
-      {
-        "name": "Layout",
-        "file": "frontend/src/components/Layout.jsx"
-      },
-      {
-        "name": "ProtectedRoute",
-        "file": "frontend/src/components/ProtectedRoute.jsx"
-      },
-      {
-        "name": "Sidebar",
-        "file": "frontend/src/components/Sidebar.jsx"
-      },
-      {
-        "name": "NotificationBell",
-        "file": "frontend/src/components/NotificationBell.jsx"
-      },
-      {
-        "name": "LocationTracker",
-        "file": "frontend/src/components/LocationTracker.jsx"
-      },
-      {
-        "name": "RecommendationPanel",
-        "file": "frontend/src/components/RecommendationPanel.jsx"
+        "name": "AIFeedbackWidget",
+        "file": "frontend/src/components/AIFeedbackWidget.jsx"
       },
       {
         "name": "CareerPathPanel",
         "file": "frontend/src/components/CareerPathPanel.jsx"
       },
       {
-        "name": "AIFeedbackWidget",
-        "file": "frontend/src/components/AIFeedbackWidget.jsx"
+        "name": "Dashboard.test",
+        "file": "frontend/src/components/__tests__/Dashboard.test.jsx"
       },
       {
         "name": "DeduplicationPanel",
         "file": "frontend/src/components/deduplication/DeduplicationPanel.jsx"
       },
       {
-        "name": "Dashboard.test",
-        "file": "frontend/src/components/__tests__/Dashboard.test.jsx"
-      },
-      {
-        "name": "Footer.test",
-        "file": "frontend/src/components/__tests__/Footer.test.jsx"
-      },
-      {
-        "name": "Header.test",
-        "file": "frontend/src/components/__tests__/Header.test.jsx"
-      },
-      {
-        "name": "Layout.test",
-        "file": "frontend/src/components/__tests__/Layout.test.jsx"
-      },
-      {
-        "name": "Projects.test",
-        "file": "frontend/src/components/__tests__/Projects.test.jsx"
-      },
-      {
-        "name": "Sidebar.test",
-        "file": "frontend/src/components/__tests__/Sidebar.test.jsx"
-      },
-      {
-        "name": "Tasks.test",
-        "file": "frontend/src/components/__tests__/Tasks.test.jsx"
-      },
-      {
-        "name": "SystemDiagram",
-        "file": "frontend/src/components/SystemDiagram.jsx"
+        "name": "FacetStrip",
+        "file": "frontend/src/components/FacetStrip.jsx"
       },
       {
         "name": "FinanceGuardsPanel",
         "file": "frontend/src/components/FinanceGuardsPanel.jsx"
       },
       {
+        "name": "Footer",
+        "file": "frontend/src/components/Footer.jsx"
+      },
+      {
+        "name": "Footer.test",
+        "file": "frontend/src/components/__tests__/Footer.test.jsx"
+      },
+      {
+        "name": "Header",
+        "file": "frontend/src/components/Header.jsx"
+      },
+      {
+        "name": "Header.test",
+        "file": "frontend/src/components/__tests__/Header.test.jsx"
+      },
+      {
+        "name": "Layout",
+        "file": "frontend/src/components/Layout.jsx"
+      },
+      {
+        "name": "Layout.test",
+        "file": "frontend/src/components/__tests__/Layout.test.jsx"
+      },
+      {
+        "name": "LocationTracker",
+        "file": "frontend/src/components/LocationTracker.jsx"
+      },
+      {
         "name": "MobileChannelsStrip",
         "file": "frontend/src/components/MobileChannelsStrip.jsx"
       },
       {
+        "name": "NotificationBell",
+        "file": "frontend/src/components/NotificationBell.jsx"
+      },
+      {
         "name": "OpenQuestionsPanel",
         "file": "frontend/src/components/OpenQuestionsPanel.jsx"
+      },
+      {
+        "name": "Projects.test",
+        "file": "frontend/src/components/__tests__/Projects.test.jsx"
+      },
+      {
+        "name": "ProtectedRoute",
+        "file": "frontend/src/components/ProtectedRoute.jsx"
+      },
+      {
+        "name": "RecommendationPanel",
+        "file": "frontend/src/components/RecommendationPanel.jsx"
+      },
+      {
+        "name": "Sidebar",
+        "file": "frontend/src/components/Sidebar.jsx"
+      },
+      {
+        "name": "Sidebar.test",
+        "file": "frontend/src/components/__tests__/Sidebar.test.jsx"
+      },
+      {
+        "name": "SystemDiagram",
+        "file": "frontend/src/components/SystemDiagram.jsx"
+      },
+      {
+        "name": "Tasks.test",
+        "file": "frontend/src/components/__tests__/Tasks.test.jsx"
       }
     ]
   },

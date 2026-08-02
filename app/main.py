@@ -29,6 +29,7 @@ from app.routes import (
     global_search,
     clarifications,
     places,
+    facets,
     owner_identity,
     system_map,
     trash,
@@ -1004,6 +1005,7 @@ app.include_router(system_map.router, tags=["system-map"])
 app.include_router(clarifications.router, tags=["clarifications"])
 app.include_router(places.router, tags=["places"])
 app.include_router(owner_identity.router, tags=["identity-profile"])
+app.include_router(facets.router, tags=["facets"])
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.
 app.include_router(mobile.router, tags=["mobile"])

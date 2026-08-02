@@ -282,6 +282,10 @@ async def _named_weaknesses_facet(db: AsyncSession, uid: int) -> Optional[Facet]
         source_label=SRC_OWN_LISTS,
         owns_page=PAGE_LISTS,
         owner_locked=True,
+        # فقط وقتی **یک** لیست خوانده شده، آدرسِ ردیف معنا دارد؛ با چند لیست
+        # هیچ مقصدِ درستی وجود ندارد و انتخابِ اولی یعنی بردنِ مالک به جای غلط.
+        focus_kind="list" if len(wanted_ids) == 1 else "",
+        focus_id=wanted_ids[0] if len(wanted_ids) == 1 else None,
     )
 
 

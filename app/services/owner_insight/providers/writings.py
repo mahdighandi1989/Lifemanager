@@ -341,6 +341,11 @@ def _unanalysed_facet(writings: List[Any], total_chars: int, *, reason: str) -> 
         evidence=evidence,
         source_label=SOURCE,
         owns_page=PAGE,
+        # این کارت یک نوشتهٔ مشخص را نام می‌برد («بلندترینش …»), پس در
+        # خروجی‌اش هم باید به همان برسد نه به سرِ فهرست. `/writings` قبلاً
+        # `useFocusTarget` را دارد، پس این لینک همین حالا واقعاً فرود می‌آید.
+        focus_kind="writing",
+        focus_id=longest.id,
     )
 
 
