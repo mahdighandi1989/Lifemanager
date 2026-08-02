@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
 from app.middleware import handle_errors
+from app.services.focus_service import focus_url
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +46,14 @@ async def global_search(
     results: List[Dict[str, Any]] = []
 
     def add(kind: str, kind_fa: str, id_, title: str, snippet: str, url: str) -> None:
+        # The search already knows the exact row and used to throw the id away
+        # at the link — every hit landed on a page ROOT and the owner had to
+        # find the thing again by eye. `?focus=` carries the row through, and
+        # a page that ignores the param behaves exactly as before.
         results.append({
             "kind": kind, "kind_fa": kind_fa, "id": id_,
             "title": (title or "")[:120], "snippet": (snippet or "")[:160],
-            "url": url,
+            "url": focus_url(url, kind, id_),
         })
 
     try:  # tasks

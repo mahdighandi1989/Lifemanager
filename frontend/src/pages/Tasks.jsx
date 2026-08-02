@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useFocusTarget } from '../lib/focus';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 import SahatChip from '../components/SahatChip';
 import api from '../lib/api';
@@ -169,7 +170,10 @@ function TaskRow({ task, onToggle, onChanged }) {
       ? task.priority
       : null;
   return (
-    <div className="p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+    <div
+      data-focus-id={`task:${task.id}`}
+      className="p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
+    >
       <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">
         <button
@@ -234,6 +238,8 @@ function TaskRow({ task, onToggle, onChanged }) {
 }
 
 function Tasks() {
+  // ?focus=<kind>:<id> — arrive ON the row, not merely on the page.
+  useFocusTarget();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

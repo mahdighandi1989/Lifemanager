@@ -48,6 +48,8 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.services.focus_service import focus_url
+
 logger = logging.getLogger(__name__)
 
 SAHAT_MAP_TYPE = "sahat_map"
@@ -475,7 +477,21 @@ async def build_sahat_map(
         for th in threads_reg
     }
 
-    def att(sahat: str, label: str, weight: int, link: str, kind: str = "overdue") -> None:
+    def att(
+        sahat: str,
+        label: str,
+        weight: int,
+        link: str,
+        kind: str = "overdue",
+        focus: tuple | None = None,
+    ) -> None:
+        # `focus=("task", t.id)` turns «کارِ عقب‌افتاده: فلان» from a link at
+        # /tasks into a link at THAT task. The card already names one specific
+        # row; dropping the owner at the page root and making him find it again
+        # is the whole «جزیره‌ای» feeling in miniature. Optional: aggregate
+        # cards («۵ موردِ تلنبارشده») legitimately have no single row.
+        if focus:
+            link = focus_url(link, focus[0], focus[1])
         cells[sahat]["attention"].append({
             "label": label[:120], "weight": weight, "link": link, "kind": kind,
             "kind_fa": ATTENTION_KINDS_FA.get(kind, "پیگیری"),
@@ -519,9 +535,10 @@ async def build_sahat_map(
             elif overdue:
                 if person_linked:
                     att(sahat, f"کارِ عقب‌افتاده — یک نفر منتظرشه: {t.title}", U_WAITING, "/tasks",
-                        kind="waiting")
+                        kind="waiting", focus=("task", t.id))
                 else:
-                    att(sahat, f"کارِ عقب‌افتاده: {t.title}", U_OVERDUE, "/tasks", kind="overdue")
+                    att(sahat, f"کارِ عقب‌افتاده: {t.title}", U_OVERDUE, "/tasks", kind="overdue",
+                        focus=("task", t.id))
             if detail and t.status != TaskStatus.DONE and len(cell["detail"]["tasks"]) < 60:
                 steps = t.steps if isinstance(t.steps, list) else []
                 s_total = sum(1 for s in steps if isinstance(s, dict) and s.get("text"))
@@ -577,8 +594,8 @@ async def build_sahat_map(
                 thr_sample(th["key"], lst.name)
             for i in rows:
                 if not i.is_completed and i.due_date and i.due_date < today:
-                    att(sahat, f"آیتمِ موعدگذشته: {(i.content or '')[:60]}", U_OVERDUE, "/lists",
-                        kind="overdue")
+                    att(sahat, f"آیتمِ موعدگذشته: {(i.content or '')[:60]}", U_OVERDUE,
+                        f"/lists/{lst.id}", kind="overdue", focus=("todo", i.id))
             if detail and len(cell["detail"]["lists"]) < 60:
                 cell["detail"]["lists"].append({
                     "id": lst.id, "name": lst.name, "done": done, "total": len(rows),
@@ -645,7 +662,8 @@ async def build_sahat_map(
             missed = int(getattr(d, "times_missed", 0) or 0)
             done_n = int(getattr(d, "times_done", 0) or 0)
             if status == "active" and missed > max(done_n, 2):
-                att(sahat, f"مسیرِ راکد: {(d.title or '')[:60]}", U_STALE, "/directives", kind="stale")
+                att(sahat, f"مسیرِ راکد: {(d.title or '')[:60]}", U_STALE, "/directives",
+                    kind="stale", focus=("directive", d.id))
             if detail and status in ("active", "proposed") and len(cell["detail"]["directives"]) < 60:
                 cell["detail"]["directives"].append({
                     "id": d.id, "title": d.title, "status": status,
@@ -697,8 +715,8 @@ async def build_sahat_map(
         for p in people:
             nf = getattr(p, "next_follow_up", None)
             if nf and nf < today:
-                att("digaran", f"می‌خواستی پیگیری کنی: {p.name}", U_WAITING, "/people-profiles",
-                    kind="waiting")
+                att("digaran", f"می‌خواستی پیگیری کنی: {p.name}", U_WAITING,
+                    f"/people/{p.id}/profile", kind="waiting", focus=("person", p.id))
                 people_overdue.append({"id": p.id, "name": p.name, "next_follow_up": nf.isoformat()})
             prof = profiles.get(p.id)
             ledger = pps.build_ledger(prof) if prof is not None else None

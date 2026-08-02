@@ -21,6 +21,7 @@
  *   DELETE /api/todo-items/{id}                  → 204
  */
 import React, { useEffect, useState } from 'react';
+import { useFocusTarget } from '../lib/focus';
 import { Link, useParams } from 'react-router-dom';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 
@@ -290,7 +291,7 @@ function ItemRow({ item, index, listId, allLists, onChanged, onDeleted }) {
   };
 
   return (
-    <div className="border-b border-gray-100 last:border-0">
+    <div data-focus-id={`todo:${item.id}`} className="border-b border-gray-100 last:border-0">
       <div className="flex items-center gap-3 p-4 hover:bg-gray-50">
         <button
           onClick={toggleComplete}
@@ -549,6 +550,8 @@ export function SelfImprovementPanel({ listId }) {
 }
 
 function ListDetail() {
+  // ?focus=<kind>:<id> — arrive ON the row, not merely on the page.
+  useFocusTarget();
   const { listId } = useParams();
   const id = parseInt(listId, 10);
   const [list, setList] = useState(null);

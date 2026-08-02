@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusTarget } from '../lib/focus';
 import api from '../lib/api';
 import ActivityLogPanel from '../components/ActivityLogPanel';
 import SahatChip from '../components/SahatChip';
@@ -115,6 +116,8 @@ function WritingForm({ initial, onSaved, onCancel }) {
 }
 
 function Writings() {
+  // ?focus=<kind>:<id> — arrive ON the row, not merely on the page.
+  useFocusTarget();
   const [writings, setWritings] = useState([]);
   const [selected, setSelected] = useState(null); // full writing incl. body
   const [loading, setLoading] = useState(true);
@@ -198,7 +201,7 @@ function Writings() {
                   <p className="text-xs font-semibold text-gray-400 mb-2">{cat}</p>
                   <ul className="space-y-1">
                     {writings.filter((w) => (w.category || 'بدون دسته') === cat).map((w) => (
-                      <li key={w.id} className="flex items-start gap-1">
+                      <li key={w.id} data-focus-id={`writing:${w.id}`} className="flex items-start gap-1">
                         <button
                           onClick={() => open(w.id)}
                           data-testid={`writing-item-${w.id}`}

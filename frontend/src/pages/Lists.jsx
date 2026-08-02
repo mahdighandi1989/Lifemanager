@@ -11,6 +11,7 @@
  *   DELETE /api/lists/{id}             → 204
  */
 import React, { useEffect, useState } from 'react';
+import { useFocusTarget } from '../lib/focus';
 import { Link, useNavigate } from 'react-router-dom';
 import SahatChip from '../components/SahatChip';
 
@@ -67,7 +68,10 @@ function NewListForm({ onCreated }) {
 function ListRow({ list, onDelete }) {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-between p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50">
+    <div
+      data-focus-id={`list:${list.id}`}
+      className="flex items-center justify-between p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50"
+    >
       <Link
         to={`/lists/${list.id}`}
         className="flex-1 flex items-center gap-3 text-right"
@@ -97,6 +101,8 @@ function ListRow({ list, onDelete }) {
 }
 
 function Lists() {
+  // ?focus=<kind>:<id> — arrive ON the row, not merely on the page.
+  useFocusTarget();
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
