@@ -22,8 +22,10 @@ import html
 import json
 import logging
 import re
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional
+
+UTC = timezone.utc
 
 from sqlalchemy import func, insert, or_, select
 from sqlalchemy.orm.attributes import flag_modified
@@ -69,6 +71,7 @@ _TRIAGE_PROMPT = """تو دستیار دسته‌بندی «صندوق ورود�
   "description": "خلاصه/جزئیات (اختیاری)",
   "priority": "low | normal | high",
   "due_date": "YYYY-MM-DD یا null",
+  "due_time": "HH:MM (۲۴ساعته) اگر ساعتی در متن آمده، وگرنه null",
   "list_name": "نام یکی از لیست‌های موجود یا null",
   "category": "دستهٔ یادداشت وقتی type=note است، وگرنه null",
   "person_name": "نام شخص وقتی type=person است، وگرنه null",
@@ -83,6 +86,12 @@ _TRIAGE_PROMPT = """تو دستیار دسته‌بندی «صندوق ورود�
 راهنما:
 - «todo» را وقتی بده که آیتم به یکی از لیست‌های موجود بخورد (list_name را فقط از فهرست لیست‌ها بردار).
 - اگر تاریخ یا موعدی در متن هست در due_date بگذار.
+- تاریخ‌های نسبی («فردا»، «پس‌فردا»، «دوشنبه»، «هفتهٔ بعد») را با «امروز» پایین
+  حساب کن و نتیجه را به‌صورت YYYY-MM-DD میلادی بنویس. هرگز تاریخ را حدس نزن.
+- اگر ساعتی هم گفته شده («ساعت ۱۰»، «۱۰ صبح»، «۵ عصر») آن را ۲۴ساعته در
+  due_time بگذار؛ «۵ عصر» یعنی 17:00.
+
+امروز: {today}
 - «section» فقط یک راهنماست برای این‌که این مورد به کدام بخش برنامه مربوط می‌شود؛ مقصد اصلی همان type است.
 
 لیست‌های موجود کاربر:
@@ -115,13 +124,62 @@ def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def _fa_digits(value: Any) -> str:
+    """Persian/Arabic-Indic digits → ASCII. Models answer in whichever the
+    prompt was written in, so «۱۴۰۵-۰۵-۱۲» must parse like «1405-05-12»."""
+    return str(value).translate(
+        str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
+    )
+
+
 def _norm_date(value: Any) -> Optional[date]:
     if not value:
         return None
+    raw = _fa_digits(value).strip()
+    if raw.lower() in ("null", "none", ""):
+        return None
     try:
-        return date.fromisoformat(str(value).strip()[:10])
+        return date.fromisoformat(raw[:10])
     except ValueError:
         return None
+
+
+def _deadline_from(day: Any, clock: Any) -> Optional[datetime]:
+    """A date + «HH:MM» → an aware UTC timestamp, or None.
+
+    The owner speaks in local time («ساعت ۱۰» means 10:00 Dubai), so the
+    offset is subtracted on the way in — storing the wall-clock reading as
+    if it were UTC would shift every appointment by four hours."""
+    from datetime import timedelta
+
+    from app.services.place_service import TZ_OFFSET_MINUTES
+
+    d, t = _norm_date(day), _norm_time(clock)
+    if not d or not t:
+        return None
+    hour, minute = (int(p) for p in t.split(":"))
+    local = datetime(d.year, d.month, d.day, hour, minute, tzinfo=UTC)
+    return local - timedelta(minutes=TZ_OFFSET_MINUTES)
+
+
+# Digit-lookarounds, not \b: in «2026-08-03T09:05» the boundary before «09»
+# does not exist (T and 0 are both word chars) and the clock was missed.
+_RE_CLOCK = re.compile(r"(?<!\d)([01]?\d|2[0-3])\s*[:٫.]\s*([0-5]\d)(?!\d)")
+
+
+def _norm_time(value: Any) -> Optional[str]:
+    """«۱۰:۳۰» / «10:30» / «2026-08-03T10:30» → ``"HH:MM"``.
+
+    A bare hour is NOT accepted here: the model is asked for HH:MM and a
+    lone «10» is as likely to be a quantity as a clock reading. Guessing
+    would put a wrong time on the owner's calendar, which is worse than
+    keeping only the date."""
+    if not value:
+        return None
+    m = _RE_CLOCK.search(_fa_digits(value))
+    if not m:
+        return None
+    return f"{int(m.group(1)):02d}:{m.group(2)}"
 
 
 def _norm_priority(value: Any) -> str:
@@ -164,6 +222,7 @@ def _heuristic_classify(content: str) -> Dict[str, Any]:
         "description": text[:4000],
         "priority": "normal",
         "due_date": None,
+        "due_time": None,
         "list_name": None,
         "category": None,
         "person_name": first_line[:120] if kind == "person" else None,
@@ -207,6 +266,27 @@ async def _list_names(db: AsyncSession, user_id: int) -> List[str]:
     return [n for n in rows if n]
 
 
+_FA_WEEKDAYS = (
+    "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه", "شنبه", "یکشنبه",
+)
+
+
+def _today_line() -> str:
+    """«امروز» as the model must see it, in the OWNER's timezone.
+
+    Without this the model cannot resolve «فردا» at all — it either answers
+    null (the date is silently lost) or invents one from its training data.
+    Local, not UTC: at 02:00 Dubai the UTC date is still yesterday, so «فردا»
+    would land a day early. `TZ_OFFSET_MINUTES` is the same single source the
+    place/habit code reads."""
+    from datetime import timedelta
+
+    from app.services.place_service import TZ_OFFSET_MINUTES
+
+    now = datetime.now(UTC) + timedelta(minutes=TZ_OFFSET_MINUTES)
+    return f"{now.date().isoformat()} ({_FA_WEEKDAYS[now.weekday()]}) ساعت {now:%H:%M}"
+
+
 async def classify_content(db: AsyncSession, content: str, *, user_id: int = 0) -> Dict[str, Any]:
     """Return ``{"suggested_type", "suggestion", "ai_model"}`` for ``content``.
 
@@ -225,7 +305,11 @@ async def classify_content(db: AsyncSession, content: str, *, user_id: int = 0) 
         lists_txt = "\n".join(f"- {n}" for n in catalog["lists"]) or "(هیچ لیستی نیست)"
         pages_txt = "\n".join(f"- {p['label']}" for p in catalog["pages"]) or "(نامشخص)"
         prompt = _TRIAGE_PROMPT.format(
-            targets=targets_txt, lists=lists_txt, pages=pages_txt, content=content[:6000]
+            targets=targets_txt,
+            lists=lists_txt,
+            pages=pages_txt,
+            today=_today_line(),
+            content=content[:6000],
         )
         res = await complete(db, prompt, task="inbox_triage", max_tokens=700)
     except Exception as exc:  # gateway import/resolve crash — keep capturing
@@ -252,6 +336,7 @@ async def classify_content(db: AsyncSession, content: str, *, user_id: int = 0) 
             if _norm_date(obj.get("due_date"))
             else None
         ),
+        "due_time": _norm_time(obj.get("due_time")),
         "list_name": (str(obj.get("list_name")).strip() or None)
         if obj.get("list_name") and str(obj.get("list_name")).lower() not in ("null", "none")
         else None,
@@ -399,6 +484,10 @@ async def _file_as_task(db: AsyncSession, s: Dict[str, Any], user_id: int) -> Di
         priority=_to_task_priority(s.get("priority", "normal")),
         user_id=user_id,
         due_date=_norm_date(s.get("due_date")),
+        # `due_date` is the planning bucket (a Date); `deadline` is the real
+        # timestamp. «نوبت دکتر فردا ساعت ۱۰» used to keep the day and drop the
+        # hour — the hour lands here, so nothing the owner said is thrown away.
+        deadline=_deadline_from(s.get("due_date"), s.get("due_time")),
         sahat=_auto_sahat(f"{s.get('title', '')} {s.get('description', '')}"),
     )
     db.add(task)
