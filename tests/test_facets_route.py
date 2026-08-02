@@ -81,18 +81,69 @@ async def test_facets_endpoint_answers_twice(api_client):
         assert body["degraded"] is False
 
 
+def _stub_collect(monkeypatch, facets):
+    """Make collect() return a known set.
+
+    WITHOUT this the api_client fixture's database is empty, `collect()`
+    returns ZERO facets, and every assertion below is trivially true over an
+    empty list — the whole curation ruleset could be deleted and the suite
+    would stay green. (Found by an adversarial review of this very file; see
+    experiences/tests-that-cannot-fail-the-red-baseline.md.)
+    """
+    async def fake_collect(db, uid=0, **kw):
+        return {"facets": list(facets), "groups": [], "sources": [], "unavailable": []}
+
+    from app.services import owner_insight
+
+    monkeypatch.setattr(owner_insight, "collect", fake_collect)
+
+
+_LOUD = [
+    {"key": "self_model_diligence", "group": "self", "surfaces": []},
+    {"key": "self_model_interests", "group": "self", "surfaces": []},
+    {"key": "unlinked_empty_stores", "group": "unlinked", "surfaces": []},
+    {"key": "doc_full_name", "group": "facts", "surfaces": []},
+    {"key": "writings_corpus_unanalysed", "group": "self", "surfaces": ["dashboard"]},
+    {"key": "habits_internalized", "group": "habits", "surfaces": []},
+]
+
+
 @pytest.mark.asyncio
-async def test_endpoint_never_serves_the_quarantined_or_quiet(api_client):
+async def test_endpoint_never_serves_the_quarantined_or_quiet(api_client, monkeypatch):
+    _stub_collect(monkeypatch, _LOUD)
     body = api_client.get("/api/facets").json()
     keys = {f["key"] for f in body["facets"]}
     groups = {f["group"] for f in body["facets"]}
+
+    assert keys, "the stub produced nothing — this guard would be vacuous"
+    assert keys == {"writings_corpus_unanalysed", "habits_internalized"}
     assert keys.isdisjoint(QUARANTINED_KEYS)
     assert groups.isdisjoint(QUIET_GROUPS)
 
 
 @pytest.mark.asyncio
-async def test_limit_is_honoured(api_client):
-    assert len(api_client.get("/api/facets?limit=1").json()["facets"]) <= 1
+async def test_endpoint_reopens_a_quiet_group_on_request(api_client, monkeypatch):
+    """Rule 2 over HTTP, not just over `curate()`: nothing is a one-way door."""
+    _stub_collect(monkeypatch, _LOUD)
+    body = api_client.get("/api/facets?groups=facts").json()
+    assert [f["key"] for f in body["facets"]] == ["doc_full_name"]
+
+    body = api_client.get("/api/facets?include=self_model_diligence").json()
+    assert "self_model_diligence" in {f["key"] for f in body["facets"]}
+
+
+@pytest.mark.asyncio
+async def test_endpoint_surface_filter(api_client, monkeypatch):
+    _stub_collect(monkeypatch, _LOUD)
+    body = api_client.get("/api/facets?surface=dashboard").json()
+    assert [f["key"] for f in body["facets"]] == ["writings_corpus_unanalysed"]
+
+
+@pytest.mark.asyncio
+async def test_limit_is_honoured(api_client, monkeypatch):
+    _stub_collect(monkeypatch, _LOUD)
+    assert len(api_client.get("/api/facets").json()["facets"]) == 2
+    assert len(api_client.get("/api/facets?limit=1").json()["facets"]) == 1
 
 
 @pytest.mark.asyncio

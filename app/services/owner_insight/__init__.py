@@ -36,6 +36,7 @@ import logging
 import pkgutil
 from typing import Any, Callable, Dict, List, Optional
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.owner_insight.base import Facet, FacetGroup, Provider
@@ -110,6 +111,23 @@ async def collect(
         except Exception as exc:
             logger.debug("owner-insight provider %s failed: %r", p.key, exc)
             return None
+
+    # اتصال را **قبل از** پخش‌شدن بگیر. با `pool_pre_ping=True` (پیش‌فرضِ
+    # app/database.py) هر checkout یک رفت‌وبرگشتِ واقعی دارد، پس اولین
+    # statement روی یک session همیشه به حلقهٔ رویداد کنترل می‌دهد. اگر آن
+    # اولین statement داخلِ gather صادر شود، منبع‌های ۲ تا ۷ وسطِ
+    # provisioning وارد می‌شوند و SQLAlchemy می‌گوید «This session is
+    # provisioning a new connection; concurrent operations are not
+    # permitted» — هر هفت‌تا در except خودشان بلعیده می‌شوند و روت با
+    # ok=True و صفر کارت جواب می‌دهد. یعنی خرابیِ کامل، کاملاً بی‌صدا.
+    #
+    # اندازه‌گیری‌شده (sqlite، session مشترک، ۷ statement همزمان × ۱۰ session):
+    #   pool_pre_ping=False → ۶/۷۰ شکست   |   pool_pre_ping=True → ۶۰/۷۰ شکست
+    # مجموعه‌تست این را نمی‌دید چون موتورِ tests/conftest.py pre-ping ندارد.
+    try:
+        await db.execute(select(1))
+    except Exception as exc:  # پایگاه‌داده واقعاً خواب است — بگذار providerها بگویند
+        logger.debug("owner-insight could not warm the session: %r", exc)
 
     results = await asyncio.gather(*[_run(p) for p in chosen])
 

@@ -120,7 +120,7 @@ export default function FacetStrip({
     api
       .get(`/facets?${params.toString()}`)
       .then((res) => { if (alive) setItems(res.data?.facets || []); })
-      .catch(() => { if (alive) setItems([]); })
+      .catch(() => { if (alive) setItems([]); });
     return () => { alive = false; };
   }, [limit, surface, groups]);
 

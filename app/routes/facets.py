@@ -103,8 +103,15 @@ def curate(
 @router.get("/api/facets", tags=["facets"])
 @handle_errors
 async def read_facets(
-    groups: Optional[str] = Query(default=None, description="فقط این گروه‌ها (با کاما)"),
-    include: Optional[str] = Query(default=None, description="برگرداندنِ کارتِ قرنطینه‌شده"),
+    groups: Optional[str] = Query(
+        default=None,
+        description="فقط این گروه‌ها — یک پارامتر، جدا با کاما: ?groups=facts,unlinked "
+                    "(تکرارِ پارامتر فقط آخری را نگه می‌دارد)",
+    ),
+    include: Optional[str] = Query(
+        default=None,
+        description="برگرداندنِ کارتِ قرنطینه‌شده — جدا با کاما، نه پارامترِ تکراری",
+    ),
     surface: str = Query(default="", description="فقط کارت‌هایی که این سطح را اعلام کرده‌اند"),
     limit: int = Query(default=0, ge=0, le=100),
     db: AsyncSession = Depends(get_db),
