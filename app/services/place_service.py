@@ -524,6 +524,71 @@ async def backfill_addresses(db: AsyncSession, uid: int = 0, limit: int = 25) ->
     return {"checked": len(rows), "filled": filled}
 
 
+async def refresh_location_questions(db: AsyncSession, uid: int = 0, limit: int = 20) -> Dict[str, Any]:
+    """متنِ سؤال‌های بازِ مکان/سفر را دوباره بساز.
+
+    چرا لازم است (۲۰۲۶-۰۸-۰۲): ``topic`` و ``context`` **ستونِ دیتابیس**اند و
+    لحظهٔ ساختِ فرم نوشته می‌شوند. پس سؤال‌هایی که قبلاً ساخته شده بودند
+    برای همیشه متنِ قدیمیِ «مختصات ۲۵٫۳۰۶۷، ۵۵٫۳۶۴۹» را نگه می‌دارند — حتی
+    بعد از اینکه نشانی حل شد و لینکِ نقشه اضافه شد. مالک اصلاح را روی
+    سؤالِ تازه می‌دید و روی سؤالِ باز نه، و درست می‌گفت که «هنوز فقط عدد است».
+
+    اینجا فقط **متن** به‌روز می‌شود؛ جواب‌ها، وضعیت و شمارندهٔ تلاش دست
+    نمی‌خورند.
+    """
+    from app.models.clarification import Clarification
+    from app.models.place import Place, Trip
+
+    rows = (
+        await db.execute(
+            select(Clarification)
+            .where(Clarification.source == "location",
+                   Clarification.status.in_(("open", "partial", "parked")))
+            .order_by(Clarification.id.desc())
+            .limit(max(1, int(limit)))
+        )
+    ).scalars().all()
+
+    updated = 0
+    for c in rows:
+        target = c.target or {}
+        kind = str(target.get("kind") or "")
+        try:
+            if kind == "place":
+                place = await db.get(Place, int(target.get("place_id") or 0))
+                if place is None:
+                    continue
+                topic = (f"{place.address[:70]} — اینجا کجاست؟" if place.address
+                         else f"این مکان کجاست؟ ({place.visit_count} بار آنجا بوده‌ای)")
+                context = (
+                    (f"{place.address} — " if place.address else "")
+                    + f"{place.visit_count} بار، مجموعاً {round(place.total_minutes or 0)} دقیقه. "
+                    + f"روی نقشه: {maps_link(place.latitude, place.longitude)}"
+                )
+            elif kind == "trip":
+                trip = await db.get(Trip, int(target.get("trip_id") or 0))
+                if trip is None:
+                    continue
+                topic = await _trip_topic(db, trip)
+                context = await _trip_context(db, trip)
+            else:
+                continue
+        except Exception as exc:
+            logger.debug("refresh of clarification %s skipped: %r", c.id, exc)
+            continue
+
+        if (c.topic or "") != topic[:300] or (c.context or "") != context[:4000]:
+            c.topic = topic[:300]
+            c.context = context[:4000]
+            # متنِ تازه باید دوباره فرستاده شود، وگرنه مالک همان پیامِ قدیمی
+            # را در تلگرام می‌بیند.
+            c.last_sent_at = None
+            updated += 1
+    if updated:
+        await db.commit()
+    return {"questions_refreshed": updated}
+
+
 async def ask_about_places(db: AsyncSession, uid: int = 0) -> Dict[str, Any]:
     """دو نوع پرسش، هر دو یک‌بارمصرف:
 

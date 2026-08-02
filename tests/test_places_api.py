@@ -194,3 +194,63 @@ async def test_backfill_fills_addresses_for_places_created_before_geocoding(db, 
 
     # بارِ دوم چیزی برای پرکردن نیست — دوباره‌کاری و هزینهٔ الکی ممنوع
     assert (await ps.backfill_addresses(db, 0))["filled"] == 0
+
+
+# ── پژواکِ خودِ برنامه و متنِ کهنه (ممیزیِ ۲۰۲۶-۰۸-۰۲) ───────────────────────
+
+def test_the_app_never_asks_where_to_file_its_own_telegram_message():
+    """حلقهٔ بازخورد: ربات پیام می‌دهد، اعلانش برمی‌گردد، و برنامه از مالک
+    می‌پرسد پیامِ خودش را کجا ثبت کند. باید «نویز» شمرده شود."""
+    from app.services.mobile_dispatch_service import classify_signal, is_own_echo
+
+    assert is_own_echo("org.telegram.messenger", "Lifemanager_bot", "❓ یک ابهام دارم")
+    assert is_own_echo("org.telegram.messenger", "هرکس", "برای جواب، همین پیام را ریپلای کن")
+    # ...ولی پیامِ آدمِ واقعی در تلگرام باید سالم رد شود
+    assert not is_own_echo("org.telegram.messenger", "علی", "فردا ساعت ۵ میای؟")
+    # ...و اپِ دیگری با همان متن، پژواکِ ما نیست
+    assert not is_own_echo("com.whatsapp", "Lifemanager_bot", "یک ابهام دارم")
+
+    verdict = classify_signal(
+        app="org.telegram.messenger", sender="Lifemanager_bot",
+        text="❓ یک ابهام دارم — این مکان کجاست؟",
+    )
+    assert verdict == "mirrored", verdict
+
+
+@pytest.mark.asyncio
+async def test_an_open_question_written_before_the_fix_gets_its_text_rewritten(db):
+    """topic/context ستونِ دیتابیس‌اند، پس سؤالِ باز متنِ کهنه را نگه می‌داشت
+    و مالک همچنان فقط مختصات می‌دید."""
+    from app.models.clarification import Clarification
+    from app.models.place import Place
+    from app.services import place_service as ps
+
+    place = Place(user_id=0, latitude=25.3067, longitude=55.3649, radius_m=180,
+                  visit_count=4, total_minutes=95.0,
+                  address="Baniyas Road, Deira, Dubai")
+    db.add(place)
+    await db.flush()
+    stale = Clarification(
+        user_id=0, source="location", source_ref=f"place:0:{place.id}",
+        topic="این مکان کجاست؟ (4 بار آنجا بوده‌ای)",
+        context="مختصات 25.3067, 55.3649 — مجموعاً 95 دقیقه.",
+        target={"kind": "place", "place_id": place.id},
+        questions=[{"key": "label", "label": "اسم؟", "type": "short"}],
+        answers=[], result=[], status="open", priority=1, attempts=2,
+        last_sent_at=dt.datetime.now(UTC),
+    )
+    db.add(stale)
+    await db.commit()
+
+    out = await ps.refresh_location_questions(db, 0)
+    assert out["questions_refreshed"] == 1
+    await db.refresh(stale)
+    assert "Baniyas Road" in stale.topic
+    assert "maps.google.com" in stale.context
+    assert "مختصات 25.3067" not in stale.context
+    # جواب‌ها و شمارنده دست نمی‌خورند؛ فقط دوباره فرستاده می‌شود
+    assert stale.attempts == 2 and stale.status == "open"
+    assert stale.last_sent_at is None
+
+    # اجرای دوم چیزی برای تغییر ندارد
+    assert (await ps.refresh_location_questions(db, 0))["questions_refreshed"] == 0

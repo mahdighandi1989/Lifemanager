@@ -277,9 +277,12 @@ async def _job_places(db: AsyncSession) -> dict[str, Any]:
     # مکان صدا زده می‌شود، پس هرچه پیش از آن کشف شده بود بی‌نشانی می‌ماند و
     # سؤالِ «اینجا کجاست؟» با دو عددِ خام می‌رفت — سؤالی که جواب ندارد.
     addresses = await place_service.backfill_addresses(db)
+    # سؤال‌های بازی که با متنِ قدیمی (فقط مختصات) ساخته شده‌اند را بازنویسی کن.
+    refreshed = await place_service.refresh_location_questions(db)
     learned = await place_service.learn_patterns(db)
     asked = await place_service.ask_about_places(db)
-    return {**ingested, **learned, **asked, "addresses_filled": addresses["filled"]}
+    return {**ingested, **learned, **asked, **refreshed,
+            "addresses_filled": addresses["filled"]}
 
 
 async def _job_owner_identity(db: AsyncSession) -> dict[str, Any]:

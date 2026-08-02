@@ -39,6 +39,55 @@ _MIRRORED_APPS = (
     "com.google.android.apps.docs", "com.google.android.apps.drive",
 )
 
+# ── حلقهٔ بازخوردِ خودمان (۲۰۲۶-۰۸-۰۲) ──────────────────────────────────────
+#
+# ربطِ خودِ لایف‌منیجر در تلگرام پیام می‌فرستد → تلگرامِ گوشی اعلان می‌دهد →
+# شنوندهٔ اعلان همان را می‌گیرد → مسیریاب آن را «پیامِ تازه» می‌بیند → صندوق
+# ورودی → و برنامه از مالک می‌پرسد **پیامِ خودش را کجا ثبت کند**. مالک این
+# را روی میز فرمان دید و حق داشت که مسخره‌اش کند.
+#
+# چرا کلِ تلگرام را «آینه» نمی‌کنیم: پیامِ آدم‌های واقعی در تلگرام ارزشمند
+# است و باید مسیریابی شود. فقط پیامِ **خودِ ربات** باید بیفتد بیرون، و آن را
+# از دو راه می‌شناسیم: نامِ ربات (از تنظیمات) و امضاهای متنیِ خودِ فرم‌ها.
+_SELF_TEXT_MARKERS = (
+    "همین پیام را",          # «…را ریپلای کن و خط‌ها را پر کن»
+    "یک ابهام دارم",
+    "یادآوری — هنوز جواب نگرفتم",
+    "سؤال‌های باز",
+    "این مسیر با الگوهای همیشگی‌ات نمی‌خواند",
+    "پروفایل: ",
+)
+
+
+def _self_bot_names() -> tuple:
+    """نام‌هایی که اعلانِ آمده از آن‌ها، پژواکِ خودِ ماست."""
+    import os
+
+    names = []
+    for key in ("TELEGRAM_BOT_USERNAME", "TELEGRAM_BOT_NAME"):
+        val = (os.environ.get(key) or "").strip().lstrip("@")
+        if val:
+            names.append(val.lower())
+    # پیش‌فرضِ منطقی حتی وقتی متغیر تنظیم نشده باشد
+    names += ["lifemanager_bot", "lifemanager"]
+    return tuple(dict.fromkeys(names))
+
+
+def is_own_echo(app: str, sender: str, text: str) -> bool:
+    """آیا این اعلان، پیامِ خودِ برنامه است که از تلگرام برگشته؟
+
+    هرگز نباید سؤال بسازد: مالک قبلاً آن را در تلگرام خوانده و پاسخش هم
+    همان‌جاست.
+    """
+    pkg = (app or "").lower()
+    if not pkg.startswith("org.telegram"):
+        return False
+    who = (sender or "").lower()
+    if any(name in who for name in _self_bot_names()):
+        return True
+    body = text or ""
+    return any(marker in body for marker in _SELF_TEXT_MARKERS)
+
 _OTP_RE = re.compile(r"(?i)(otp|رمز\s*(یکبار|پویا)|verification\s*code|کد\s*تایید|کد\s*ورود|one[-\s]?time)")
 _PROMO_RE = re.compile(r"(?i)(off\b|discount|تخفیف|جشنواره|اقساطی|فروش\s*ویژه|unsubscribe|promo)")
 # قرار/رویداد زمان‌دار → شایستهٔ تقویم/صندوق.
@@ -131,6 +180,9 @@ def classify_signal(
     blob = f"{sender}\n{text}"
     probe = f"{app or ''} {sender or ''}".strip()
     if any(probe.startswith(p) or (app or "").startswith(p) for p in _MIRRORED_APPS):
+        return "mirrored"
+    # پژواکِ خودِ برنامه از تلگرام — پیش از هر چیزِ دیگر، چون هیچ‌وقت سؤال ندارد.
+    if is_own_echo(app or "", sender or "", text or ""):
         return "mirrored"
     if _OTP_RE.search(text):
         return "otp"
