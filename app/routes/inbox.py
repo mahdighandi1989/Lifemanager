@@ -20,6 +20,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, sta
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.database import get_db
 from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
@@ -188,6 +189,56 @@ async def file_inbox_item(
         user_id=user_id, request=request, db=db,
     )
     return {"ok": True, "success": True, "item": _serialize(item), "created": created}
+
+
+@router.get("/api/inbox/targets", tags=["inbox"])
+@handle_errors
+async def inbox_targets(
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """مقصدهای **واقعی** برای انتخاب — از رجیستریِ زنده، نه فهرستِ هاردکد.
+
+    میز فرمان تا امروز ۷ گزینهٔ ثابت نشان می‌داد که از `FILERS` عقب افتاده
+    بود (مثلاً «اشتراک» اصلاً نبود) و راهی برای انتخابِ **کدام لیست** نداشت.
+    (۲۰۲۶-۰۸-۰۲)
+    """
+    return {"ok": True, "success": True,
+            **await inbox_service.destination_catalog(db, user_id)}
+
+
+@router.post("/api/inbox/{item_id}/unfile", tags=["inbox"])
+@handle_errors
+async def unfile_inbox_item(
+    item_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_optional_user_id),
+) -> dict:
+    """ثبتِ خودکار را برگردان — شرطِ لازمِ اینکه ثبتِ خودکار مجاز باشد.
+
+    چیزی حذف نمی‌شود: موجودیتِ ساخته‌شده دست‌نخورده می‌ماند (اگر اشتباه بود
+    مالک خودش پاکش می‌کند) و فقط ردیفِ صندوق به «منتظر تصمیم» برمی‌گردد تا
+    دوباره قابلِ هدایت باشد.
+    """
+    item = await _get_scoped_item(db, item_id, user_id)
+    payload = dict(item.suggestion or {})
+    was = {"entity_type": item.filed_entity_type, "entity_id": item.filed_entity_id}
+    item.status = "pending"
+    item.filed_entity_type = None
+    item.filed_entity_id = None
+    payload.pop("filed_by", None)
+    payload["unfiled_from"] = was
+    item.suggestion = payload
+    flag_modified(item, "suggestion")
+    await db.commit()
+    await db.refresh(item)
+    await record_activity(
+        action="unfile", entity_type="inbox_item", entity_id=item.id,
+        detail="ثبتِ خودکار برگردانده شد — دوباره منتظر تصمیم",
+        user_id=user_id, request=request, db=db,
+    )
+    return {"ok": True, "success": True, "item": _serialize(item), "reverted": was}
 
 
 @router.post("/api/inbox/{item_id}/dismiss", tags=["inbox"])

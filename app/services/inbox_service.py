@@ -26,6 +26,7 @@ from datetime import date
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, insert, or_, select
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.inbox_item import InboxItem
@@ -72,7 +73,8 @@ _TRIAGE_PROMPT = """تو دستیار دسته‌بندی «صندوق ورود�
   "category": "دستهٔ یادداشت وقتی type=note است، وگرنه null",
   "person_name": "نام شخص وقتی type=person است، وگرنه null",
   "section": "نام بخشی از برنامه که این مورد به آن مربوط است (از فهرست بخش‌ها) یا null",
-  "reason": "یک جمله فارسی: چرا این مقصد"
+  "reason": "یک جمله فارسی: چرا این مقصد",
+  "confidence": "عددی بین ۰ تا ۱ — چقدر مطمئنی. اگر شک داری کمتر از ۰٫۷ بده"
 }}
 
 مقصدهای مجاز (type را فقط از این کلیدها انتخاب کن):
@@ -265,18 +267,92 @@ async def classify_content(db: AsyncSession, content: str, *, user_id: int = 0) 
         if obj.get("section") and str(obj.get("section")).lower() not in ("null", "none")
         else None,
         "reason": str(obj.get("reason") or "")[:500] or None,
+        "confidence": _norm_confidence(obj.get("confidence")),
     }
     return {"suggested_type": kind, "suggestion": suggestion, "ai_model": res.get("model")}
 
 
-async def apply_classification(db: AsyncSession, item: InboxItem, *, user_id: int = 0) -> InboxItem:
-    """Run triage for ``item`` and persist the suggestion on the row."""
+def _norm_confidence(value) -> float:
+    """اطمینانِ مدل، همیشه عددی بین ۰ و ۱.
+
+    مدل‌ها مقیاس را جابه‌جا می‌کنند: گاهی ۰٫۸، گاهی ۸ (از ۱۰)، گاهی ۸۵ (درصد).
+    هر سه پذیرفته می‌شوند. هر چیزِ دیگری — متن، خالی، منفی، بزرگ‌تر از ۱۰۰ —
+    صفر است.
+
+    جهتِ خطا عمدی است: مقدارِ مبهم به **صفر** می‌افتد، یعنی زیرِ آستانه، یعنی
+    «از مالک بپرس». هرگز به سمتِ ثبتِ خودکار گرد نمی‌شود؛ حدسِ خودکار روی
+    دادهٔ نامطمئن دقیقاً همان چیزی است که نباید بشود.
+    """
+    try:
+        num = float(str(value).strip().replace("٫", ".").replace("٪", ""))
+    except (TypeError, ValueError):
+        return 0.0
+    if num < 0:
+        return 0.0
+    if num <= 1.0:
+        return num
+    if num <= 10.0:        # مقیاسِ ۰ تا ۱۰
+        return num / 10.0
+    if num <= 100.0:       # درصد
+        return num / 100.0
+    return 0.0             # بی‌معنا → بپرس
+
+
+# ── ثبتِ خودکار وقتی مدل مطمئن است ─────────────────────────────────────────
+#
+# چرا (۲۰۲۶-۰۸-۰۲، شکایتِ صریحِ مالک «مگه هوش مصنوعی تشخیص نمیده»): تا امروز
+# **هیچ مسیرِ خودکاری وجود نداشت**. `apply_classification` فقط پیشنهاد را
+# ذخیره می‌کرد و ردیف `pending` می‌ماند؛ تنها راهِ خروجش کلیکِ خودِ مالک بود.
+# یعنی مدل درست تشخیص می‌داد و جوابش دور ریخته می‌شد و باز از مالک پرسیده
+# می‌شد — هر سیگنالِ گوشی یک سؤال روی میز فرمان.
+#
+# فقط مقصدهای **برگشت‌پذیر** خودکار ثبت می‌شوند. آدم و حساب و سند خودکار
+# ساخته نمی‌شوند چون هویت/پول می‌سازند و اشتباهشان گران است.
+AUTOFILE_SAFE = ("task", "todo", "note")
+
+
+def _autofile_threshold() -> float:
+    import os
+
+    try:
+        return max(0.0, min(1.0, float(os.getenv("INBOX_AUTOFILE_CONFIDENCE", "0.75"))))
+    except (TypeError, ValueError):
+        return 0.75
+
+
+async def apply_classification(
+    db: AsyncSession, item: InboxItem, *, user_id: int = 0, autofile: bool = True
+) -> InboxItem:
+    """تریاژ کن، پیشنهاد را ثبت کن، و اگر مدل **مطمئن** بود خودت ثبتش کن.
+
+    ``autofile=False`` برای مسیرهایی است که خودشان بعداً ثبت می‌کنند (مثلاً
+    پاسخِ فرمِ ابهام) تا دوبار ثبت نشود.
+    """
     result = await classify_content(db, item.content, user_id=user_id)
     item.suggested_type = result["suggested_type"]
     item.suggestion = result["suggestion"]
     item.ai_model = result["ai_model"]
     await db.commit()
     await db.refresh(item)
+
+    confidence = float((item.suggestion or {}).get("confidence") or 0.0)
+    if (
+        autofile
+        and item.status == "pending"
+        and item.suggested_type in AUTOFILE_SAFE
+        and confidence >= _autofile_threshold()
+    ):
+        try:
+            await file_item(db, item, user_id=user_id)
+            payload = dict(item.suggestion or {})
+            payload["filed_by"] = "ai"          # تا رابط بتواند «برگردان» بدهد
+            item.suggestion = payload
+            flag_modified(item, "suggestion")
+            await db.commit()
+            await db.refresh(item)
+        except Exception as exc:
+            # ثبتِ خودکار هرگز نباید ورودی را از بین ببرد — می‌ماند pending.
+            logger.warning("auto-file skipped for inbox item %s: %r", item.id, exc)
     return item
 
 

@@ -349,13 +349,22 @@ async def _targets_text(db: AsyncSession, user_id: int) -> str:
         from app.services.inbox_service import destination_catalog
 
         cat = await destination_catalog(db, user_id)
-        parts = [", ".join(cat.get("targets") or [])]
+        # targets فهرستی از dict است ({key, label})، نه رشته. نسخهٔ اول
+        # مستقیم join می‌کرد و **هر بار** TypeError می‌داد؛ except خالیِ زیر
+        # صدایش را می‌خورد و تابع همیشه همان رشتهٔ هاردکدِ ۷تایی را برمی‌گرداند.
+        # یعنی رجیستریِ زنده — که کلِ هدفش همین بود — در تنها جایی که شکلِ
+        # سؤالِ مالک را تعیین می‌کند مرده بود. (۲۰۲۶-۰۸-۰۲)
+        parts = [", ".join(t["key"] for t in (cat.get("targets") or []) if t.get("key"))]
         if cat.get("lists"):
-            parts.append("لیست‌ها: " + ", ".join(cat["lists"][:20]))
+            parts.append("لیست‌ها: " + ", ".join(str(x) for x in cat["lists"][:20]))
         if cat.get("pages"):
-            parts.append("صفحه‌ها: " + ", ".join(cat["pages"][:25]))
+            parts.append("صفحه‌ها: " + ", ".join(
+                (p.get("label") if isinstance(p, dict) else str(p)) for p in cat["pages"][:25]
+            ))
         return " | ".join(p for p in parts if p)
-    except Exception:
+    except Exception as exc:
+        # صدادار، نه خاموش: همین سکوت بود که خرابیِ بالا را ماه‌ها پنهان کرد.
+        logger.warning("clarification targets fell back to the hardcoded list: %r", exc)
         return "task, todo, note, person, finance_account, document, transaction"
 
 
