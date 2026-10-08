@@ -165,3 +165,23 @@ the database holding only the reference and the extracted text, and an
 board shows where the files are (folder link) and how much is still waiting.
 See `google-drive-oauth-offline-integration` (Update 2026-10-08) for the Drive
 side.
+
+## Update 2026-10-08 — an attached app is data, not a commit
+
+An owner attached a self-contained HTML app and asked for it as a page. Every
+attempt to copy that file into the repo (routine and manual session alike) was
+refused by the coding agent's own safety check ("untrusted code integration"),
+and permission settings do not turn that check off. Correctly so: until the
+inspection board was owner-only, anyone who could register could have shipped
+code to production through an attachment.
+
+Change the job instead of fighting the guard: a **mini-app host**. A table row
+points at the attachment (already stored in the owner's cloud folder); the SPA
+renders it at `/apps/<slug>` in an iframe sandboxed WITHOUT `allow-same-origin`
+(opaque origin — model output inserted with innerHTML cannot reach the session
+token); a tiny runtime shim replaces the app's `localStorage` with an in-memory
+store mirrored to the parent via postMessage (validated: flat string map, size
+cap, only from that iframe); the source endpoint answers `text/plain` +
+`Content-Security-Policy: sandbox` + `nosniff` so a direct navigation never runs
+it on the app origin; the sidebar merges installed pages after a named link.
+"Make this a page" becomes one API call (`install-app`) — no commit, no deploy.

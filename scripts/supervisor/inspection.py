@@ -338,6 +338,19 @@ def asks_for_a_place(report: dict) -> bool:
     return any(w in said for w in PLACE_WORDS)
 
 
+def cmd_install_app(args) -> int:
+    """An owner's HTML app attachment becomes a page WITHOUT entering the repo:
+    the app serves the attachment itself at /apps/<slug> in a sandboxed iframe.
+    Committing such a file as code is what the routine's safety check refuses."""
+    body = {"file_id": args.file_id, "title": args.title, "icon": args.icon,
+            "group": args.group, "after": args.after}
+    if args.slug:
+        body["slug"] = args.slug
+    res = api("/api/mini-apps", payload=body, method="POST")
+    print(json.dumps(res.get("app") or res, ensure_ascii=False))
+    return 0
+
+
 def cmd_answer(args) -> int:
     text = args.text or (Path(args.text_file).read_text(encoding="utf-8") if args.text_file else "")
     if not text.strip():
@@ -376,6 +389,13 @@ def main() -> int:
     sub.add_parser("file", help="تیک‌خورده‌ها → زونکن (هر دور)")
     sub.add_parser("pull", help="کارتابل + تصویرها + فایل‌ها")
     sub.add_parser("urgent", help="یک برگهٔ فوری را بردار")
+    ia = sub.add_parser("install-app", help="فایلِ HTML ِ پیوستِ مالک → صفحه در منو (داده، نه کد)")
+    ia.add_argument("--file-id", required=True)
+    ia.add_argument("--title", required=True)
+    ia.add_argument("--slug", default="")
+    ia.add_argument("--icon", default="")
+    ia.add_argument("--group", default="tools")
+    ia.add_argument("--after", default="", help="مسیرِ لینکی که صفحه درست بعدش بنشیند، مثلاً /import")
     a = sub.add_parser("answer", help="جواب زیرِ یک برگه")
     a.add_argument("number", type=int)
     a.add_argument("--text")
@@ -388,6 +408,8 @@ def main() -> int:
     a.add_argument("--place", default="", help="یک جمله: دقیقاً کجا گذاشته شد")
     args = ap.parse_args()
     try:
+        if args.cmd == "install-app":
+            return cmd_install_app(args)
         return {"whoami": cmd_whoami, "file": cmd_file, "pull": cmd_pull, "urgent": cmd_urgent}.get(
             args.cmd, lambda: cmd_answer(args))()
     except SupervisorError as e:

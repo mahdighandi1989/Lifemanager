@@ -1998,6 +1998,10 @@
         "file": "frontend/src/pages/InspectionPage.jsx"
       },
       {
+        "name": "MiniAppPage",
+        "file": "frontend/src/pages/MiniAppPage.jsx"
+      },
+      {
         "name": "LifeFilePage",
         "file": "frontend/src/pages/LifeFilePage.jsx"
       },

@@ -31,6 +31,7 @@ from app.routes import (
     places,
     facets,
     inspection,
+    mini_apps,
     owner_identity,
     system_map,
     trash,
@@ -1013,6 +1014,7 @@ app.include_router(places.router, tags=["places"])
 app.include_router(owner_identity.router, tags=["identity-profile"])
 app.include_router(facets.router, tags=["facets"])
 app.include_router(inspection.router, tags=["inspection"])  # «نظارت و سرکشی»
+app.include_router(mini_apps.router, tags=["mini-apps"])  # «صفحه‌های افزوده» (HTML ِ مالک به‌عنوانِ داده)
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.
 app.include_router(mobile.router, tags=["mobile"])

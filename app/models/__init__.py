@@ -25,6 +25,7 @@ from app.models.inspection import (  # «نظارت و سرکشی»
     InspectionReport,
     InspectionShot,
 )
+from app.models.mini_app import MiniApp  # «صفحه‌های افزوده»
 from app.models.drive_file import DriveFile
 from app.models.user_asset import UserAsset
 from app.models.person_task import person_tasks  # noqa: F401  (association table)
@@ -162,4 +163,5 @@ __all__ = [
     "InspectionFile",
     "InspectionFileChunk",
     "InspectionBinder",
+    "MiniApp",
 ]

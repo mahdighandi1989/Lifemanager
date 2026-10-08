@@ -6,6 +6,7 @@ import { unescapeHtml } from '../lib/text';
 import NotificationBell from './NotificationBell';
 import { InspectionToggle } from './inspection/InspectionProvider';
 import { LINKS as SIDEBAR_LINKS } from './Sidebar';
+import { mergeLinks, useMiniAppLinks } from '../lib/miniApps';
 
 /**
  * GlobalSearch — the one query box over every content domain (critic #5/#7).
@@ -140,6 +141,7 @@ function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const miniAppLinks = useMiniAppLinks();
 
   // 2026-07-21 nav-consolidation (owner audit «کمتر ولی زنده»): the desktop
   // header used to carry its own row of nav links — with raw English labels
@@ -247,7 +249,7 @@ function Header() {
           className="md:hidden absolute top-16 inset-x-0 bg-white border-b border-gray-200 shadow-lg z-40 flex flex-col p-3 space-y-1"
         >
           {[
-            ...SIDEBAR_LINKS,
+            ...mergeLinks(SIDEBAR_LINKS, miniAppLinks),
             { to: '/notifications', label: 'اعلان‌ها', testid: 'link-notifications' },
             // «مدیریت کاربران» (/admin/users) quarantined from nav on 2026-07-21:
             // this is a single-tenant personal app, so user administration has

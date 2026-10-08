@@ -18,6 +18,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { mergeLinks, useMiniAppLinks } from '../lib/miniApps';
 
 // group keys → Persian section headers (rendered only in the desktop Sidebar).
 export const NAV_GROUPS = [
@@ -97,6 +98,8 @@ const SECONDARY_GROUPS = ['life_pages', 'tools', 'system'];
 
 function Sidebar() {
   const location = useLocation();
+  // «صفحه‌های افزوده» — owner-installed pages join their group (data, not code)
+  const navLinks = mergeLinks(LINKS, useMiniAppLinks());
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
     if (location.pathname.startsWith(path)) return true;
@@ -108,7 +111,7 @@ function Sidebar() {
   const isActiveNav = (path) =>
     path === '/sahat' ? location.pathname === '/sahat' : isActive(path);
 
-  const secondaryLinks = LINKS.filter((l) => SECONDARY_GROUPS.includes(l.group));
+  const secondaryLinks = navLinks.filter((l) => SECONDARY_GROUPS.includes(l.group));
   const onSecondary = secondaryLinks.some((l) => isActive(l.to));
   const [showMore, setShowMore] = useState(() => onSecondary);
 
@@ -121,7 +124,7 @@ function Sidebar() {
   }, [onSecondary]);
 
   const renderGroup = (key, title) => {
-    const items = LINKS.filter((l) => l.group === key);
+    const items = navLinks.filter((l) => l.group === key);
     if (items.length === 0) return null;
     return (
       <div key={key} className="mb-1">

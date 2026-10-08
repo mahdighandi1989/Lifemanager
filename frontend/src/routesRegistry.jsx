@@ -25,6 +25,7 @@ import SahatDetail from './pages/SahatDetail';
 import ListDetail from './pages/ListDetail';
 import Lists from './pages/Lists';
 import InspectionPage from './pages/InspectionPage';
+import MiniAppPage from './pages/MiniAppPage';
 import SystemMapPage from './pages/SystemMapPage';
 import Writings from './pages/Writings';
 import BrainDashboard from './pages/BrainDashboard';
@@ -59,6 +60,7 @@ const PAGE_COMPONENTS = {
   ListDetail,
   Lists,
   InspectionPage,
+  MiniAppPage,
   SystemMapPage,
   Writings,
   BrainDashboard,

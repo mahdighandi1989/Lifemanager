@@ -33,6 +33,7 @@ import { everyText, fa, humanGap, localClock, rushMessage } from '../lib/inspect
 import { shrinkShot } from '../lib/inspection/shots';
 import { geometryLabel } from '../lib/inspection/spot';
 import { toast } from '../lib/inspection/toast';
+import { MINI_APPS_EVT, miniAppsApi } from '../lib/miniApps';
 
 // The page's own sub-pages — in the `TABS` convention, so the live inventory
 // (and the supervisor) discover them exactly like every other hub's tabs.
@@ -730,6 +731,17 @@ function FileRow({ f, filed, onPeek, act }) {
       window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
     } catch (e) { toast.error(apiError(e)); } finally { setBusy(false); }
   };
+  // «صفحه‌های افزوده»: the attachment becomes a page as DATA (no code commit)
+  const installAsPage = async () => {
+    const title = window.prompt('نامِ صفحه در منو:', (f.filename || '').replace(/\.html?$/i, ''));
+    if (!title) return;
+    setBusy(true);
+    try {
+      const app = await miniAppsApi.install({ file_id: f.id, title, after: '/import' });
+      window.dispatchEvent(new Event(MINI_APPS_EVT));
+      toast.success(`نصب شد: ${app.path}`);
+    } catch (e) { toast.error(apiError(e)); } finally { setBusy(false); }
+  };
   return (
     <div dir="rtl" className="rounded-md border border-sky-100 bg-white px-2 py-1.5 text-[11px]">
       <div className="flex items-center gap-2 flex-wrap">
@@ -750,6 +762,10 @@ function FileRow({ f, filed, onPeek, act }) {
         {f.extract_status === 'ok' && <button type="button" onClick={() => onPeek(f)} className="text-sky-700 hover:underline">متن</button>}
         <button type="button" disabled={busy} onClick={() => void download()} className="text-sky-700 hover:underline">{busy ? '…' : 'دانلود'}</button>
         {!!f.drive_link && <a href={f.drive_link} target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">درایو</a>}
+        {/\.html?$/i.test(f.filename || '') && (
+          <button type="button" disabled={busy} onClick={() => void installAsPage()} data-testid={`install-app-${f.id}`}
+            className="text-emerald-700 hover:underline" title="همین فایل، بی‌تغییر، به‌عنوانِ یک صفحه در منوی «ابزار»">نصب به‌عنوانِ صفحه</button>
+        )}
         {!filed && (
           <button type="button" className="text-red-600 hover:underline" title="برداشتن (نسخهٔ درایو می‌ماند)"
             onClick={() => { if (window.confirm(`«${f.filename}» برداشته شود؟`)) void act(() => inspectionApi.removeFile(f.id), 'برداشته شد'); }}>×</button>
