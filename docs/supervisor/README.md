@@ -69,7 +69,7 @@ Lifemanager تک‌مالک است؛ ناظر **کاربر نیست** — یک �
 
 ```bash
 python3 scripts/supervisor/inspection.py whoami   # ورود و هویتِ ناظر (۰ = درست · ۳ = نه)
-python3 scripts/supervisor/inspection.py file     # تیک‌خورده‌ها (آبی) → زونکن — هر دور
+python3 scripts/supervisor/inspection.py file     # تیک‌خورده‌ها (آبی) → زونکن + مانده‌های پایگاه‌داده → درایو — هر دور
 python3 scripts/supervisor/inspection.py pull     # QUEUE.md + shots/ + files/  (خروجِ ۴ = بدهی)
 python3 scripts/supervisor/inspection.py urgent   # یک برگهٔ فوری (۰ خالی · ۵ برداشته شد · ۳ خطا)
 python3 scripts/supervisor/inspection.py answer N --outcome … --after … --dep … [--place …]
@@ -98,3 +98,10 @@ scripts/supervisor/ship.sh "type(scope): summary" # گیتِ قانونِ ۴ ⇒
 زیرصفحه‌ها» (همان inventory، زنده)، «زونکن‌ها (بایگانی)»، و «روتین‌ها و راهنما». دکمهٔ «📝 نظارت» در سرآیندِ هر
 صفحه حالتِ ثبت را روشن می‌کند: کادر بکش (یا Alt+کشیدن)، و در پنجرهٔ ثبت انتخاب کن «گزارشِ جدید» یا
 «ذیلِ گزارشِ N» — با متن و هر نوع فایل تا ۱۰۰ مگابایت.
+
+**جای فایل‌ها:** پیوست‌ها و تصویرهای هر گزارش در گوگل درایوِ پروژه‌اند —
+`LifeManagerData/inspection/report-NNNN/` (تصویرها در `shots/`)، هر فایل با نامِ `ref-<شناسه>-<نام>`،
+نوعِ واقعی، description (شمارهٔ گزارش، عنوان، sha256) و `appProperties` ِ `lm_report`/`lm_file`؛ هر
+آپلود با md5 ِ درایو راستی‌آزمایی می‌شود. پایگاه‌داده فقط رفرنس و متنِ استخراج‌شده را دارد. وقتی درایو
+در دسترس نباشد، بایت‌ها موقتاً در پایگاه‌داده می‌مانند و در دورِ بعدِ ناظر (یا با دکمهٔ «انتقال به درایو»)
+منتقل می‌شوند. وضعیت: `GET /api/inspection/storage` یا `inspection.py whoami`.

@@ -6,5 +6,9 @@
 
 روالِ کامل: [`../README.md`](../README.md) › «چطور دستورِ ناظر را عوض کنم؟».
 
+- `PROMPT-v1-2026-10-08.md` و `URGENT_PROMPT-v1-2026-10-08.md` — پیش از v2: فایل‌ها و تصویرها به
+  پوشهٔ درایوِ هر گزارش (`LifeManagerData/inspection/report-NNNN`) با رفرنس و md5؛ `file` مانده‌های
+  پایگاه‌داده را هر دور منتقل می‌کند؛ هیچ تغییری در درایو جز از راهِ برنامه.
+
 (نسخهٔ ۱ ِ هر دو در ۲۰۲۶-۱۰-۰۸ ساخته شد — الگو: Detective-1 `PROMPT` v3 / `URGENT_PROMPT` v10 و
-ALLIN1 `PROMPT` v14 / `URGENT_PROMPT` v6؛ هنوز نسخهٔ قبلی‌ای نیست.)
+ALLIN1 `PROMPT` v14 / `URGENT_PROMPT` v6.)

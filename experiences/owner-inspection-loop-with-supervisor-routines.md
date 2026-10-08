@@ -153,3 +153,15 @@ Step 2: read docs/supervisor/URGENT_PROMPT.md and follow it exactly. Empty queue
 - Related: `headless-crawl-must-verify-it-reached-the-page`,
   `live-architecture-diagram-from-runtime-introspection`,
   `silent-capture-channel-needs-a-liveness-surface`, `tests-that-cannot-fail-the-red-baseline`.
+
+## Update 2026-10-08 — the bytes belong in the owner's cloud folder, not the database
+
+Point 5 above ("cloud drive first, database second") was not enough on its own:
+pictures were always kept in the database, and anything that fell back to the
+database stayed there forever. The finished shape: one folder per sheet
+(`<AppRoot>/inspection/report-NNNN/` + `shots/`), every upload checksum-verified,
+the database holding only the reference and the extracted text, and an
+`offload()` step that every supervisor round runs to move what had to wait. The
+board shows where the files are (folder link) and how much is still waiting.
+See `google-drive-oauth-offline-integration` (Update 2026-10-08) for the Drive
+side.

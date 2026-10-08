@@ -57,6 +57,7 @@ from app.models.inspection import (
     sheet_glow,
 )
 from app.services import inspection_files as ifiles
+from app.services import inspection_drive as idrive
 from app.services import supervisor_auth
 from app.services.activity_log_service import record_activity
 from app.services.supervisor_rounds import next_full_round, next_round, record_round
@@ -318,6 +319,7 @@ def _to_dict(r: InspectionReport, files: Optional[list] = None) -> dict:
         **_urgent_state(r),
         "files": [_file_dict(f) for f in files],
         "read_debt": file_read_debt(files),
+        "drive_folder_link": idrive.folder_link(getattr(r, "drive_folder_id", "") or ""),
         "binder": ({"id": r.binder_id, "number": r.binder_number, "page": r.binder_page,
                     "filed_at": _utc(r.filed_at)} if r.binder_id else None),
     }
@@ -642,6 +644,28 @@ async def delete_file(request: Request, file_id: str, db: AsyncSession = Depends
     return {"ok": True, "success": True}
 
 
+@router.get("/api/inspection/storage", dependencies=[Depends(_gate)], tags=["inspection"])
+async def storage_status(db: AsyncSession = Depends(get_db)):
+    """Where the sheets' files and pictures live: Drive connected? which folder?
+    how much is still waiting in the database?"""
+    return {"success": True, **await idrive.status(db)}
+
+
+@router.post("/api/inspection/storage/offload", dependencies=[Depends(_gate)], tags=["inspection"])
+async def storage_offload(request: Request, db: AsyncSession = Depends(get_db),
+                          user_id: int = Depends(get_optional_user_id)):
+    """Move everything still held in the database to its sheet's Drive folder.
+    The supervisor runs it every round (`inspection.py file`); the owner has a
+    button. Nothing is deleted from the DB before Drive's checksum matched."""
+    res = await idrive.offload(db)
+    if res["files_moved"] or res["shots_moved"]:
+        await record_activity(action="inspection_offload", entity_type="inspection", entity_id="storage",
+                              entity_label="نظارت و سرکشی → درایو",
+                              detail=f"{res['files_moved']} فایل و {res['shots_moved']} تصویر به درایو رفت",
+                              user_id=user_id, request=request, db=db)
+    return {"success": True, **res}
+
+
 @router.get("/api/inspection/shots/{shot_id}", dependencies=[Depends(_gate)], tags=["inspection"])
 async def get_shot(shot_id: str, db: AsyncSession = Depends(get_db)):
     import base64
@@ -649,6 +673,16 @@ async def get_shot(shot_id: str, db: AsyncSession = Depends(get_db)):
     shot = (await db.execute(select(InspectionShot).where(InspectionShot.id == shot_id))).scalar_one_or_none()
     if shot is None:
         raise HTTPException(status_code=404, detail="تصویر پیدا نشد")
+    if (shot.store or "") == "drive" and shot.drive_id:
+        client, why = await idrive.client_or_reason(db)
+        if client is None:
+            raise HTTPException(status_code=503, detail=f"تصویر در درایو است ولی الان در دسترس نیست — {why}")
+        try:
+            raw = await client.download(shot.drive_id)
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(status_code=502, detail=f"گرفتنِ تصویر از درایو نشد: {exc}"[:300]) from exc
+        return Response(content=raw, media_type=shot.mime or "image/jpeg",
+                        headers={"Cache-Control": "private, max-age=86400"})
     try:
         raw = base64.b64decode(shot.data or "")
     except Exception:  # noqa: BLE001
@@ -744,6 +778,10 @@ async def create_report(request: Request, payload: CreateIn, db: AsyncSession = 
     await db.commit()
     await db.refresh(r)
     await _log(db, request, user_id, "inspection_report_created", r, f"{r.reopen}")
+    # the picture goes to the sheet's Drive folder now (best effort, bounded);
+    # if Drive is down it waits in the DB for the supervisor's next round
+    await idrive.offload_quietly(db, r.id)
+    await db.refresh(r)
     return {"ok": True, "success": True, "report": _to_dict(r, [])}
 
 
@@ -783,7 +821,8 @@ async def upload_file(
     ex = ifiles.extract(data, filename, mime)
     fid = uuid.uuid4().hex[:24]
     placed = await ifiles.store(db, data=data, filename=filename, mime=mime,
-                                report_number=int(r.number or 0), file_id=fid)
+                                report_number=int(r.number or 0), file_id=fid,
+                                report=r, note_id=_clean(note_id, 40))
     row = InspectionFile(
         id=fid, report_id=r.id, note_id=_clean(note_id, 40), uploaded_by=_actor(request),
         filename=placed["filename"], mime=mime, byte_size=placed["byte_size"],
@@ -929,6 +968,8 @@ async def add_note(request: Request, report_id: str, payload: NoteIn,
     await _log(db, request, user_id,
                "inspection_reviewer_note" if reviewer else "inspection_owner_note", r,
                (f"نتیجه: {payload.outcome}" if reviewer else "یادداشتِ مالک"))
+    await idrive.offload_quietly(db, r.id)
+    await db.refresh(r)
     return {"ok": True, "success": True, "report": _to_dict(r, await _files_of(db, r.id))}
 
 

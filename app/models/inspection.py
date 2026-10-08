@@ -135,6 +135,9 @@ class InspectionReport(Base):
     binder_page = Column(Integer, default=0)
     filed_at = Column(DateTime(timezone=True), nullable=True)
 
+    # --- this sheet's own Drive folder: LifeManagerData/inspection/report-NNNN
+    drive_folder_id = Column(String(120), default="")
+
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return f"<InspectionReport(number={self.number}, status='{self.status}')>"
 
@@ -150,10 +153,15 @@ class InspectionShot(Base):
     note_id = Column(String(40), index=True, default="")
     kind = Column(String(10), default="before")
     mime = Column(String(40), default="image/jpeg")
-    #: base64 payload WITHOUT the data-URL prefix.
+    #: base64 payload WITHOUT the data-URL prefix — emptied once the picture
+    #: has been moved to Drive (`store == "drive"`), so the database keeps only
+    #: the reference.
     data = Column(Text, default="")
     byte_size = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    #: "" / `db` = bytes in `data` · `drive` = bytes in Drive (`drive_id`)
+    store = Column(String(12), default="")
+    drive_id = Column(String(120), default="")
 
 
 class InspectionFile(Base):

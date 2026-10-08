@@ -527,6 +527,11 @@ async def startup_event():
         # افراد (2026-07-25): the owner's own verdict on a relationship, which
         # always beats the computed one (mirrors migration 0053).
         ("person_profiles", "relationship_override", "VARCHAR(32)"),
+        # «نظارت و سرکشی» → Drive (2026-10-08): screenshots move to Drive and
+        # each sheet remembers its folder (mirrors migration 0063).
+        ("inspection_shots", "store", "VARCHAR(12)"),
+        ("inspection_shots", "drive_id", "VARCHAR(120)"),
+        ("inspection_reports", "drive_folder_id", "VARCHAR(120)"),
     ]
     for table, col_name, col_type in _profiling_columns:
         try:

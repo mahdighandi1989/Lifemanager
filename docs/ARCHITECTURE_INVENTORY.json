@@ -1638,6 +1638,16 @@
         ]
       },
       {
+        "file": "app/services/inspection_drive.py",
+        "classes": [],
+        "functions": [
+          "put_file",
+          "put_shot",
+          "offload",
+          "status"
+        ]
+      },
+      {
         "file": "app/services/inspection_inventory.py",
         "classes": [],
         "functions": [

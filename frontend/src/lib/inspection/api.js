@@ -22,6 +22,8 @@ export const inspectionApi = {
   inventory: () => api.get('/inspection/inventory').then((r) => r.data),
   binders: () => api.get('/inspection/binders').then((r) => r.data),
   fileApproved: () => api.post('/inspection/file').then((r) => r.data),
+  storage: () => api.get('/inspection/storage').then((r) => r.data),
+  offload: () => api.post('/inspection/storage/offload').then((r) => r.data),
   fileText: (fileId, offset = 0) => api.get(`/inspection/files/${fileId}/text`, { params: { offset } })
     .then((r) => r.data),
   removeFile: (fileId) => api.delete(`/inspection/files/${fileId}`).then((r) => r.data),

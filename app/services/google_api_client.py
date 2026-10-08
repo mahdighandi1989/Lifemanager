@@ -181,6 +181,38 @@ class GoogleDriveClient:
         )
         return created["id"]
 
+    async def upload_ex(self, *, file_name: str, parent: Optional[str], media: bytes,
+                        mime_type: str = "application/octet-stream", description: str = "",
+                        app_properties: Optional[dict] = None) -> dict:
+        """Like ``upload`` but keeps the REAL mime type (so Drive previews it),
+        carries a reference (``description`` + searchable ``appProperties``),
+        goes resumable above 5 MB, and returns Drive's ``md5Checksum`` so the
+        caller can prove the bytes arrived intact. ``upload`` is unchanged."""
+        return await asyncio.to_thread(self._upload_ex_sync, file_name, parent, media,
+                                       mime_type, description, app_properties or {})
+
+    def _upload_ex_sync(self, file_name, parent, media, mime_type, description, app_properties) -> dict:
+        from googleapiclient.http import MediaIoBaseUpload
+
+        data = bytes(media or b"")
+        big = len(data) > 5 * 1024 * 1024
+        media_body = MediaIoBaseUpload(io.BytesIO(data), mimetype=mime_type or "application/octet-stream",
+                                       chunksize=8 * 1024 * 1024 if big else -1, resumable=big)
+        meta = {"name": file_name, "mimeType": mime_type or "application/octet-stream"}
+        if parent:
+            meta["parents"] = [parent]
+        if description:
+            meta["description"] = description[:4000]
+        if app_properties:
+            meta["appProperties"] = {str(k)[:60]: str(v)[:60] for k, v in app_properties.items()}
+        created = (
+            self._drive.files()
+            .create(body=meta, media_body=media_body, fields="id, md5Checksum, webViewLink")
+            .execute(num_retries=3)
+        )
+        return {"id": created["id"], "md5": created.get("md5Checksum") or "",
+                "link": created.get("webViewLink") or ""}
+
     async def share_link(self, drive_file_id: str) -> str:
         # The canonical shareable-link shape (deterministic, no round-trip).
         from app.services.google_drive_service import build_share_link

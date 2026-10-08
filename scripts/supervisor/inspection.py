@@ -193,7 +193,10 @@ def files_block(r: dict) -> list[str]:
         if not f.get("durable", True):
             lines.append("  - ⚠️ روی دیسکِ سرور است (با دیپلویِ بعدی پاک می‌شود) — همین دور بخوانش و به مالک بگو درایو وصل نیست")
         elif f.get("store") == "db":
-            lines.append("  - در پایگاه‌داده نگه داشته شده (درایو وصل نیست) — ماندگار است؛ در گزارش یک‌بار بگو درایو وصل نیست")
+            lines.append(f"  - فعلاً در پایگاه‌داده (منتظرِ انتقال به درایو): {f.get('store_note') or ''} — "
+                         "`inspection.py file` منتقلش می‌کند؛ اگر نشد، دلیلش را گزارش کن")
+        elif f.get("drive_link"):
+            lines.append(f"  - در درایو: {f['drive_link']}")
     lines.append("")
     return lines
 
@@ -208,15 +211,31 @@ def _clean_workdir() -> None:
 def cmd_whoami() -> int:
     c = credentials()
     me = api("/api/inspection/whoami")
+    st, body = request("/api/inspection/storage")
+    store = json.loads(body or b"{}") if st == 200 else {"error": f"HTTP {st}"}
     print(json.dumps({"base": c["base"], "credential_source": c["source"],
                       "supervisor": me.get("supervisor"),
-                      "server_configured": me.get("supervisor_configured")}, ensure_ascii=False))
+                      "server_configured": me.get("supervisor_configured"),
+                      # where the owner's files live: Drive folder + what still waits in the DB
+                      "storage": {"drive_connected": (store.get("drive") or {}).get("connected"),
+                                  "drive_reason": (store.get("drive") or {}).get("reason"),
+                                  "folder_link": (store.get("drive") or {}).get("folder_link"),
+                                  "files": store.get("files"), "shots": store.get("shots"),
+                                  "db_bytes": store.get("db_bytes"), "error": store.get("error")}},
+                     ensure_ascii=False))
     return 0 if me.get("supervisor") else 3
 
 
 def cmd_file() -> int:
     res = api("/api/inspection/file", payload={}, method="POST")
-    print(json.dumps({"filed": res.get("filed", 0), "pages": res.get("pages", [])}, ensure_ascii=False))
+    # every round also moves what had to wait in the database (Drive was down,
+    # or an upload failed its checksum) into the sheet's Drive folder
+    off = api("/api/inspection/storage/offload", payload={}, method="POST")
+    print(json.dumps({"filed": res.get("filed", 0), "pages": res.get("pages", []),
+                      "to_drive": {"drive": off.get("drive"), "files_moved": off.get("files_moved", 0),
+                                   "shots_moved": off.get("shots_moved", 0), "left_in_db": off.get("left", 0),
+                                   "reason": off.get("reason") or "", "failed": off.get("failed") or []}},
+                     ensure_ascii=False))
     return 0
 
 

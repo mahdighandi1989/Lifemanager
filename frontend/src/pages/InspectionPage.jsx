@@ -223,6 +223,8 @@ function Board() {
 
       {generalOpen && <GeneralRequest onDone={() => { setGeneralOpen(false); void load(); }} />}
 
+      <StorageLine />
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {tiles.map(([k, label, cls]) => (
           <button type="button" key={k} onClick={() => setFilter(k)}
@@ -315,6 +317,57 @@ function RoundChip({ kind, nr, tick }) {
 }
 
 /** Show/hide the page highlights and their strength — this viewer only. */
+/** Where the sheets' files and pictures live — the project's Drive folder —
+ *  and what is still waiting in the database (moved by the supervisor's round,
+ *  or right now with the button). */
+function StorageLine() {
+  const [st, setSt] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+  const load = useCallback(() => { inspectionApi.storage().then(setSt).catch(() => setSt(null)); }, []);
+  useEffect(() => { load(); }, [load]);
+  if (!st) return null;
+  const waiting = (st.files?.db || 0) + (st.files?.local || 0) + (st.shots?.db || 0);
+  const move = async () => {
+    setBusy(true); setMsg('');
+    try {
+      const r = await inspectionApi.offload();
+      setMsg(r.drive ? `${fa(r.files_moved)} فایل و ${fa(r.shots_moved)} تصویر به درایو رفت`
+        + (r.failed?.length ? ` — ${fa(r.failed.length)} مورد نشد` : '') : (r.reason || 'درایو در دسترس نیست'));
+      load();
+    } catch (e) { setMsg(apiError(e)); } finally { setBusy(false); }
+  };
+  return (
+    <div dir="rtl" data-testid="inspection-storage"
+      className={`rounded-lg border px-3 py-2 text-xs flex flex-wrap items-center gap-2 ${st.drive?.connected
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-amber-200 bg-amber-50 text-amber-900'}`}>
+      {st.drive?.connected ? (
+        <span>
+          📁 فایل‌ها و تصویرها در گوگل درایو، پوشهٔ{' '}
+          <a href={st.drive.folder_link} target="_blank" rel="noreferrer" className="underline font-medium">
+            <span dir="ltr">LifeManagerData/inspection</span>
+          </a>{' '}
+          — هر گزارش زیرپوشهٔ خودش را دارد ({fa(st.files?.drive || 0)} فایل، {fa(st.shots?.drive || 0)} تصویر).
+        </span>
+      ) : (
+        <span>⚠ درایو الان در دسترس نیست ({st.drive?.reason}) — فایل‌ها موقتاً در پایگاه‌داده می‌مانند و بعد منتقل می‌شوند.</span>
+      )}
+      {waiting > 0 && (
+        <>
+          <span>· {fa(waiting)} مورد هنوز در پایگاه‌داده</span>
+          {st.drive?.connected && (
+            <button type="button" disabled={busy} onClick={() => void move()} data-testid="inspection-offload"
+              className="rounded border border-current px-2 py-0.5 hover:bg-white/60 disabled:opacity-60">
+              {busy ? '…' : 'انتقال به درایو'}
+            </button>
+          )}
+        </>
+      )}
+      {msg && <span className="text-gray-700">{msg}</span>}
+    </div>
+  );
+}
+
 function HighlightPrefs() {
   const [on, setOn] = useState(true);
   const [op, setOp] = useState(HL_DEFAULT_OPACITY);
@@ -540,6 +593,11 @@ function SheetDetail({ r, reload, act }) {
       {!r.general && (
         <div className="rounded-lg bg-gray-50 p-2 text-[11px] text-gray-600 space-y-0.5">
           <div><b>نشانیِ دقیق:</b> <span dir="ltr">{r.reopen}</span></div>
+          {!!r.drive_folder_link && (
+            <div><b>پوشهٔ این گزارش در درایو:</b>{' '}
+              <a href={r.drive_folder_link} target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">باز کن ↗</a>
+            </div>
+          )}
           {!!r.geometry && (
             <>
               <div><b>مختصات و ابعاد:</b> {geometryLabel(r.geometry)}</div>
@@ -687,7 +745,7 @@ function FileRow({ f, filed, onPeek, act }) {
           </span>
         )}
         {!f.durable && <span className="text-red-700" title={f.store_note}>⚠ در درایو ذخیره نشد — با دیپلویِ بعدی پاک می‌شود</span>}
-        {f.store === 'db' && <span className="text-slate-500" title={f.store_note}>در پایگاه‌داده (درایو وصل نیست)</span>}
+        {f.store === 'db' && <span className="text-slate-500" title={f.store_note}>در پایگاه‌داده — منتظرِ انتقال به درایو</span>}
         <span className="flex-1" />
         {f.extract_status === 'ok' && <button type="button" onClick={() => onPeek(f)} className="text-sky-700 hover:underline">متن</button>}
         <button type="button" disabled={busy} onClick={() => void download()} className="text-sky-700 hover:underline">{busy ? '…' : 'دانلود'}</button>

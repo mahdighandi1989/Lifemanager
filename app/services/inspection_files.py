@@ -301,7 +301,7 @@ def local_dir() -> Path:
 
 
 async def store(db, *, data: bytes, filename: str, mime: str, report_number: int = 0,
-                file_id: str = "") -> dict:
+                file_id: str = "", report=None, note_id: str = "") -> dict:
     """Put the bytes where they will still be there next month.
 
     Drive first (`LifeManagerData/inspection/report-<n>/`). Without Drive, the
@@ -320,29 +320,47 @@ async def store(db, *, data: bytes, filename: str, mime: str, report_number: int
            "drive_id": "", "drive_link": "", "local_path": "", "store_note": ""}
 
     reason = ""
-    try:
-        from app.services import drive_settings_service as dss
-        from app.services.google_api_client import build_drive_client
-        from app.services.google_drive_service import upload_file
+    if report is not None:
+        # the sheet's own Drive folder, real mime type, reference, md5-verified
+        # (app/services/inspection_drive.py)
+        from app.services import inspection_drive as idrive
 
-        client = await build_drive_client(db)
+        client, reason = await idrive.client_or_reason(db)
         if client is not None:
-            res = await upload_file(
-                refresh_token=await dss.resolve_refresh_token(db),
-                file_name=stored_name, data_type=DRIVE_DATA_TYPE,
-                record_id=f"report-{int(report_number)}", media=data, client=client)
-            out.update(store="drive", drive_id=res.get("drive_file_id") or "",
-                       drive_link=res.get("drive_link") or "")
-            return out
-        reason = "Google Drive وصل نیست"
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("inspection file → Drive failed: %r", exc)
-        reason = f"آپلود به Drive شکست خورد: {type(exc).__name__}: {exc}"[:300]
+            try:
+                placed = await idrive.put_file(db, client, report=report, file_id=file_id,
+                                               note_id=note_id, filename=name, data=data,
+                                               mime=mime, sha256=sha)
+                out.update(store="drive", drive_id=placed["id"], drive_link=placed["link"])
+                return out
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("inspection file → Drive failed: %r", exc)
+                reason = f"آپلود به Drive شکست خورد: {type(exc).__name__}: {exc}"[:300]
+    else:
+        try:
+            from app.services import drive_settings_service as dss
+            from app.services.google_api_client import build_drive_client
+            from app.services.google_drive_service import upload_file
+
+            client = await build_drive_client(db)
+            if client is not None:
+                res = await upload_file(
+                    refresh_token=await dss.resolve_refresh_token(db),
+                    file_name=stored_name, data_type=DRIVE_DATA_TYPE,
+                    record_id=f"report-{int(report_number)}", media=data, client=client)
+                out.update(store="drive", drive_id=res.get("drive_file_id") or "",
+                           drive_link=res.get("drive_link") or "")
+                return out
+            reason = "Google Drive وصل نیست"
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("inspection file → Drive failed: %r", exc)
+            reason = f"آپلود به Drive شکست خورد: {type(exc).__name__}: {exc}"[:300]
 
     if file_id:
         for seq, at in enumerate(range(0, len(data), FILE_CHUNK_BYTES)):
             db.add(InspectionFileChunk(file_id=file_id, seq=seq, data=data[at:at + FILE_CHUNK_BYTES]))
-        out.update(store="db", store_note=reason + " — در پایگاه‌داده نگه داشته شد")
+        out.update(store="db", store_note=reason + " — فعلاً در پایگاه‌داده نگه داشته شد؛ "
+                                                   "دورِ بعدیِ ناظر به درایو منتقلش می‌کند")
         return out
 
     path = local_dir() / f"r{int(report_number)}-{stored_name}"

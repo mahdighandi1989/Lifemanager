@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-06-28T00:00:00Z"
 created_at: "2026-06-28T00:00:00Z"
-updated_at: "2026-06-28T00:00:00Z"
+updated_at: "2026-10-08T00:00:00Z"
 merged_from: []
 ---
 
@@ -212,3 +212,28 @@ rather than rebuilding the rest.
   `users/me/messages/send` بفرست — ایمیلِ «از طرف خودم به خودم» برای گزارش روزانه؛
   SMTP فقط fallback.
 - متادیتا+snippet را ذخیره کن نه بدنهٔ کامل (`format=metadata`) — حریم خصوصی و حجم.
+
+## Update 2026-10-08 — storing app files in Drive: reference, real type, verified, and a way back
+
+When a feature's attachments must live in the app's Drive folder (so the
+database keeps only a reference), four things a generic `upload()` gets wrong:
+
+1. **Find the root by its cached id, not by name.** `name = 'AppData'` without a
+   parent searches the whole Drive; once the app holds `drive.readonly`, any
+   same-named folder the user owns can win. Cache the root id at connect time
+   and build children from it.
+2. **Send the real mime type.** `application/octet-stream` for everything means
+   Drive cannot preview a PDF or an image, and the user's folder becomes opaque.
+3. **Resumable above ~5 MB**, with retries (`MediaIoBaseUpload(..., resumable=True)`
+   + `execute(num_retries=3)`; `execute()` drives the chunk loop itself).
+4. **Verify, then delete the local copy.** Ask for `md5Checksum` in the create
+   response and compare with the md5 of the bytes sent; a mismatch is a failed
+   upload. Keep a durable local fallback (DB chunk rows) and an `offload()` pass
+   that moves what fell back, deleting the local copy only after the checksum
+   matched.
+
+Give every object a reference a human and a script can follow back: an app id in
+the file NAME (`ref-<id8>-<name>`), a description (record number, title, sha256),
+and `appProperties` (searchable: `appProperties has { key='lm_report' and value='7' }`).
+Add a new method (`upload_ex`) instead of changing `upload()` — other callers keep
+their behaviour.
