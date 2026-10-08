@@ -1,0 +1,3979 @@
+{
+ "pages": [
+  {
+   "path": "/login",
+   "page": "Login",
+   "label": "ورود",
+   "group": "public",
+   "file": "frontend/src/pages/Login.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 92,
+   "buttons": 1,
+   "inputs": 2,
+   "forms": 1,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 0,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/register",
+   "page": "Register",
+   "label": "ثبت‌نام",
+   "group": "public",
+   "file": "frontend/src/pages/Register.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 123,
+   "buttons": 1,
+   "inputs": 4,
+   "forms": 1,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 0,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/welcome",
+   "page": "Home",
+   "label": "خوش‌آمد",
+   "group": "public",
+   "file": "frontend/src/pages/Home.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 67,
+   "buttons": 0,
+   "inputs": 0,
+   "forms": 0,
+   "links": 2,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/",
+   "page": "Dashboard",
+   "label": "میز فرمان",
+   "group": "daily",
+   "file": "frontend/src/pages/Dashboard.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 1085,
+   "buttons": 17,
+   "inputs": 4,
+   "forms": 0,
+   "links": 17,
+   "api_calls": 12,
+   "testids": 23,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/tasks",
+   "page": "Tasks",
+   "label": "کارها",
+   "group": "daily",
+   "file": "frontend/src/pages/Tasks.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 580,
+   "buttons": 9,
+   "inputs": 7,
+   "forms": 2,
+   "links": 0,
+   "api_calls": 3,
+   "testids": 13,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/lists",
+   "page": "Lists",
+   "label": "لیست‌ها",
+   "group": "daily",
+   "file": "frontend/src/pages/Lists.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 176,
+   "buttons": 2,
+   "inputs": 1,
+   "forms": 1,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 2,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/lists/:listId",
+   "page": "ListDetail",
+   "label": "جزئیات لیست",
+   "group": "daily",
+   "file": "frontend/src/pages/ListDetail.jsx",
+   "parametric": true,
+   "alias_of": "",
+   "lines": 677,
+   "buttons": 12,
+   "inputs": 5,
+   "forms": 1,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 14,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/directives",
+   "page": "DirectivesPage",
+   "label": "مسیر نهادینه‌سازی",
+   "group": "daily",
+   "file": "frontend/src/pages/DirectivesPage.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 499,
+   "buttons": 12,
+   "inputs": 3,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 21,
+   "testids": 12,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/attention",
+   "page": "AttentionCenter",
+   "label": "مراقبت و مرور",
+   "group": "daily",
+   "file": "frontend/src/pages/AttentionCenter.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 240,
+   "buttons": 4,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 5,
+   "testids": 1,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/sahat",
+   "page": "SahatMap",
+   "label": "نقشهٔ خداشهر",
+   "group": "life",
+   "file": "frontend/src/pages/SahatMap.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 289,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 7,
+   "api_calls": 2,
+   "testids": 3,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/sahat/:key",
+   "page": "SahatDetail",
+   "label": "ساحت",
+   "group": "life",
+   "file": "frontend/src/pages/SahatDetail.jsx",
+   "parametric": true,
+   "alias_of": "",
+   "lines": 356,
+   "buttons": 3,
+   "inputs": 2,
+   "forms": 1,
+   "links": 12,
+   "api_calls": 2,
+   "testids": 2,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/projects",
+   "page": "ProjectsHub",
+   "label": "پروژه‌ها",
+   "group": "life_pages",
+   "file": "frontend/src/pages/ProjectsHub.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 95,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 6,
+   "tabs": [
+    {
+     "id": "mine",
+     "label": "پروژه‌های من",
+     "quarantined": false
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/projects?tab=mine",
+     "label": "پروژه‌ها ← پروژه‌های من",
+     "quarantined": false
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/projects/:id",
+   "page": "ProjectDetailPage",
+   "label": "جزئیات پروژه",
+   "group": "life_pages",
+   "file": "frontend/src/pages/ProjectDetailPage.jsx",
+   "parametric": true,
+   "alias_of": "",
+   "lines": 233,
+   "buttons": 2,
+   "inputs": 4,
+   "forms": 2,
+   "links": 2,
+   "api_calls": 0,
+   "testids": 15,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/external-projects",
+   "page": "ProjectsHub",
+   "label": "پروژه‌های بیرونی",
+   "group": "life_pages",
+   "file": "frontend/src/pages/ProjectsHub.jsx",
+   "parametric": false,
+   "alias_of": "/projects",
+   "lines": 95,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 6,
+   "tabs": [
+    {
+     "id": "mine",
+     "label": "پروژه‌های من",
+     "quarantined": false
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/budget",
+   "page": "FinanceHub",
+   "label": "مالی",
+   "group": "life_pages",
+   "file": "frontend/src/pages/FinanceHub.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 432,
+   "buttons": 2,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 4,
+   "testids": 15,
+   "tabs": [
+    {
+     "id": "budget",
+     "label": "برنامه و بودجه",
+     "quarantined": false
+    },
+    {
+     "id": "reports",
+     "label": "گزارش ماهانه",
+     "quarantined": false
+    },
+    {
+     "id": "others",
+     "label": "حساب‌های دیگر",
+     "quarantined": false
+    },
+    {
+     "id": "log",
+     "label": "لاگ مالی",
+     "quarantined": false
+    },
+    {
+     "id": "assets",
+     "label": "دارایی‌ها (رسانه‌ای)",
+     "quarantined": true
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/budget?tab=budget",
+     "label": "مالی ← برنامه و بودجه",
+     "quarantined": false
+    },
+    {
+     "url": "/budget?tab=reports",
+     "label": "مالی ← گزارش ماهانه",
+     "quarantined": false
+    },
+    {
+     "url": "/budget?tab=others",
+     "label": "مالی ← حساب‌های دیگر",
+     "quarantined": false
+    },
+    {
+     "url": "/budget?tab=log",
+     "label": "مالی ← لاگ مالی",
+     "quarantined": false
+    },
+    {
+     "url": "/budget?tab=assets",
+     "label": "مالی ← دارایی‌ها (رسانه‌ای)",
+     "quarantined": true
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/finance",
+   "page": "FinanceHub",
+   "label": "مالی",
+   "group": "life_pages",
+   "file": "frontend/src/pages/FinanceHub.jsx",
+   "parametric": false,
+   "alias_of": "/budget",
+   "lines": 432,
+   "buttons": 2,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 4,
+   "testids": 15,
+   "tabs": [
+    {
+     "id": "budget",
+     "label": "برنامه و بودجه",
+     "quarantined": false
+    },
+    {
+     "id": "reports",
+     "label": "گزارش ماهانه",
+     "quarantined": false
+    },
+    {
+     "id": "others",
+     "label": "حساب‌های دیگر",
+     "quarantined": false
+    },
+    {
+     "id": "log",
+     "label": "لاگ مالی",
+     "quarantined": false
+    },
+    {
+     "id": "assets",
+     "label": "دارایی‌ها (رسانه‌ای)",
+     "quarantined": true
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/assets",
+   "page": "FinanceHub",
+   "label": "دارایی‌ها",
+   "group": "life_pages",
+   "file": "frontend/src/pages/FinanceHub.jsx",
+   "parametric": false,
+   "alias_of": "/budget",
+   "lines": 432,
+   "buttons": 2,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 4,
+   "testids": 15,
+   "tabs": [
+    {
+     "id": "budget",
+     "label": "برنامه و بودجه",
+     "quarantined": false
+    },
+    {
+     "id": "reports",
+     "label": "گزارش ماهانه",
+     "quarantined": false
+    },
+    {
+     "id": "others",
+     "label": "حساب‌های دیگر",
+     "quarantined": false
+    },
+    {
+     "id": "log",
+     "label": "لاگ مالی",
+     "quarantined": false
+    },
+    {
+     "id": "assets",
+     "label": "دارایی‌ها (رسانه‌ای)",
+     "quarantined": true
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/life-file",
+   "page": "LifeFilePage",
+   "label": "پروندهٔ زندگی",
+   "group": "life_pages",
+   "file": "frontend/src/pages/LifeFilePage.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 345,
+   "buttons": 3,
+   "inputs": 1,
+   "forms": 1,
+   "links": 1,
+   "api_calls": 2,
+   "testids": 10,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/people-profiles",
+   "page": "PeopleProfiles",
+   "label": "افراد",
+   "group": "life_pages",
+   "file": "frontend/src/pages/PeopleProfiles.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 227,
+   "buttons": 1,
+   "inputs": 5,
+   "forms": 1,
+   "links": 1,
+   "api_calls": 1,
+   "testids": 14,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/people/:id/profile",
+   "page": "PersonProfilePage",
+   "label": "پروفایل فرد",
+   "group": "life_pages",
+   "file": "frontend/src/pages/PersonProfilePage.jsx",
+   "parametric": true,
+   "alias_of": "",
+   "lines": 402,
+   "buttons": 6,
+   "inputs": 6,
+   "forms": 2,
+   "links": 0,
+   "api_calls": 2,
+   "testids": 31,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/writings",
+   "page": "Writings",
+   "label": "نوشته‌های من",
+   "group": "life_pages",
+   "file": "frontend/src/pages/Writings.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 295,
+   "buttons": 5,
+   "inputs": 5,
+   "forms": 1,
+   "links": 0,
+   "api_calls": 3,
+   "testids": 8,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/self-portrait",
+   "page": "SelfPortrait",
+   "label": "خودنگاره",
+   "group": "life_pages",
+   "file": "frontend/src/pages/SelfPortrait.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 172,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 2,
+   "testids": 4,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/identity-profile",
+   "page": "IdentityProfile",
+   "label": "من که هستم",
+   "group": "life_pages",
+   "file": "frontend/src/pages/IdentityProfile.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 232,
+   "buttons": 5,
+   "inputs": 1,
+   "forms": 0,
+   "links": 1,
+   "api_calls": 2,
+   "testids": 0,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/places",
+   "page": "PlacesMap",
+   "label": "کجاها بوده‌ام",
+   "group": "life_pages",
+   "file": "frontend/src/pages/PlacesMap.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 311,
+   "buttons": 1,
+   "inputs": 1,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 2,
+   "testids": 0,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/brain",
+   "page": "BrainDashboard",
+   "label": "رشد ذهن و هوش",
+   "group": "life_pages",
+   "file": "frontend/src/pages/BrainDashboard.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 293,
+   "buttons": 1,
+   "inputs": 6,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 3,
+   "testids": 4,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/dev-center",
+   "page": "DevCenter",
+   "label": "کار و توسعه",
+   "group": "life_pages",
+   "file": "frontend/src/pages/DevCenter.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 728,
+   "buttons": 15,
+   "inputs": 2,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 4,
+   "testids": 12,
+   "tabs": [
+    {
+     "id": "overview",
+     "label": "نمای کلی",
+     "quarantined": false
+    },
+    {
+     "id": "live",
+     "label": "لاگ زنده",
+     "quarantined": false
+    },
+    {
+     "id": "errors",
+     "label": "خطاها",
+     "quarantined": false
+    },
+    {
+     "id": "stats",
+     "label": "آمار",
+     "quarantined": false
+    },
+    {
+     "id": "summaries",
+     "label": "کارنامهٔ روزانه",
+     "quarantined": false
+    },
+    {
+     "id": "settings",
+     "label": "تنظیمات",
+     "quarantined": false
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/dev-center?tab=overview",
+     "label": "کار و توسعه ← نمای کلی",
+     "quarantined": false
+    },
+    {
+     "url": "/dev-center?tab=live",
+     "label": "کار و توسعه ← لاگ زنده",
+     "quarantined": false
+    },
+    {
+     "url": "/dev-center?tab=errors",
+     "label": "کار و توسعه ← خطاها",
+     "quarantined": false
+    },
+    {
+     "url": "/dev-center?tab=stats",
+     "label": "کار و توسعه ← آمار",
+     "quarantined": false
+    },
+    {
+     "url": "/dev-center?tab=summaries",
+     "label": "کار و توسعه ← کارنامهٔ روزانه",
+     "quarantined": false
+    },
+    {
+     "url": "/dev-center?tab=settings",
+     "label": "کار و توسعه ← تنظیمات",
+     "quarantined": false
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/assistant",
+   "page": "AssistantHub",
+   "label": "دستیار هوشمند",
+   "group": "tools",
+   "file": "frontend/src/pages/AssistantHub.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 78,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "assistant",
+     "label": "پیشنهادات هوشمند",
+     "quarantined": false
+    },
+    {
+     "id": "recommendations",
+     "label": "تاریخچه پیشنهادات",
+     "quarantined": true
+    },
+    {
+     "id": "personality",
+     "label": "پروفایل شخصیت",
+     "quarantined": true
+    },
+    {
+     "id": "career",
+     "label": "ترسیم آینده",
+     "quarantined": true
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/assistant?tab=assistant",
+     "label": "دستیار هوشمند ← پیشنهادات هوشمند",
+     "quarantined": false
+    },
+    {
+     "url": "/assistant?tab=recommendations",
+     "label": "دستیار هوشمند ← تاریخچه پیشنهادات",
+     "quarantined": true
+    },
+    {
+     "url": "/assistant?tab=personality",
+     "label": "دستیار هوشمند ← پروفایل شخصیت",
+     "quarantined": true
+    },
+    {
+     "url": "/assistant?tab=career",
+     "label": "دستیار هوشمند ← ترسیم آینده",
+     "quarantined": true
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/recommendations",
+   "page": "AssistantHub",
+   "label": "پیشنهادات",
+   "group": "tools",
+   "file": "frontend/src/pages/AssistantHub.jsx",
+   "parametric": false,
+   "alias_of": "/assistant",
+   "lines": 78,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "assistant",
+     "label": "پیشنهادات هوشمند",
+     "quarantined": false
+    },
+    {
+     "id": "recommendations",
+     "label": "تاریخچه پیشنهادات",
+     "quarantined": true
+    },
+    {
+     "id": "personality",
+     "label": "پروفایل شخصیت",
+     "quarantined": true
+    },
+    {
+     "id": "career",
+     "label": "ترسیم آینده",
+     "quarantined": true
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/personality",
+   "page": "AssistantHub",
+   "label": "شخصیت",
+   "group": "tools",
+   "file": "frontend/src/pages/AssistantHub.jsx",
+   "parametric": false,
+   "alias_of": "/assistant",
+   "lines": 78,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "assistant",
+     "label": "پیشنهادات هوشمند",
+     "quarantined": false
+    },
+    {
+     "id": "recommendations",
+     "label": "تاریخچه پیشنهادات",
+     "quarantined": true
+    },
+    {
+     "id": "personality",
+     "label": "پروفایل شخصیت",
+     "quarantined": true
+    },
+    {
+     "id": "career",
+     "label": "ترسیم آینده",
+     "quarantined": true
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/career-planning",
+   "page": "AssistantHub",
+   "label": "ترسیم آینده",
+   "group": "tools",
+   "file": "frontend/src/pages/AssistantHub.jsx",
+   "parametric": false,
+   "alias_of": "/assistant",
+   "lines": 78,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "assistant",
+     "label": "پیشنهادات هوشمند",
+     "quarantined": false
+    },
+    {
+     "id": "recommendations",
+     "label": "تاریخچه پیشنهادات",
+     "quarantined": true
+    },
+    {
+     "id": "personality",
+     "label": "پروفایل شخصیت",
+     "quarantined": true
+    },
+    {
+     "id": "career",
+     "label": "ترسیم آینده",
+     "quarantined": true
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/import",
+   "page": "DataHub",
+   "label": "داده (ایمپورت و ادغام)",
+   "group": "tools",
+   "file": "frontend/src/pages/DataHub.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 58,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "import",
+     "label": "ایمپورت داده",
+     "quarantined": false
+    },
+    {
+     "id": "files",
+     "label": "فایل‌های من",
+     "quarantined": false
+    },
+    {
+     "id": "merge",
+     "label": "ادغام تسک‌ها",
+     "quarantined": false
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/import?tab=import",
+     "label": "داده (ایمپورت و ادغام) ← ایمپورت داده",
+     "quarantined": false
+    },
+    {
+     "url": "/import?tab=files",
+     "label": "داده (ایمپورت و ادغام) ← فایل‌های من",
+     "quarantined": false
+    },
+    {
+     "url": "/import?tab=merge",
+     "label": "داده (ایمپورت و ادغام) ← ادغام تسک‌ها",
+     "quarantined": false
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/drive-files",
+   "page": "DataHub",
+   "label": "فایل‌های درایو",
+   "group": "tools",
+   "file": "frontend/src/pages/DataHub.jsx",
+   "parametric": false,
+   "alias_of": "/import",
+   "lines": 58,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "import",
+     "label": "ایمپورت داده",
+     "quarantined": false
+    },
+    {
+     "id": "files",
+     "label": "فایل‌های من",
+     "quarantined": false
+    },
+    {
+     "id": "merge",
+     "label": "ادغام تسک‌ها",
+     "quarantined": false
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/merge",
+   "page": "DataHub",
+   "label": "ادغام",
+   "group": "tools",
+   "file": "frontend/src/pages/DataHub.jsx",
+   "parametric": false,
+   "alias_of": "/import",
+   "lines": 58,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "import",
+     "label": "ایمپورت داده",
+     "quarantined": false
+    },
+    {
+     "id": "files",
+     "label": "فایل‌های من",
+     "quarantined": false
+    },
+    {
+     "id": "merge",
+     "label": "ادغام تسک‌ها",
+     "quarantined": false
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/settings",
+   "page": "Settings",
+   "label": "تنظیمات",
+   "group": "tools",
+   "file": "frontend/src/pages/Settings.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 96,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "ai",
+     "label": "هوش مصنوعی",
+     "quarantined": false
+    },
+    {
+     "id": "notifications",
+     "label": "اعلان‌ها",
+     "quarantined": false
+    },
+    {
+     "id": "drive",
+     "label": "گوگل درایو",
+     "quarantined": false
+    },
+    {
+     "id": "dev",
+     "label": "مرکز توسعه",
+     "quarantined": false
+    },
+    {
+     "id": "attention",
+     "label": "مراقبت و مرور",
+     "quarantined": false
+    },
+    {
+     "id": "safety",
+     "label": "ایمنی داده",
+     "quarantined": false
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/settings?tab=ai",
+     "label": "تنظیمات ← هوش مصنوعی",
+     "quarantined": false
+    },
+    {
+     "url": "/settings?tab=notifications",
+     "label": "تنظیمات ← اعلان‌ها",
+     "quarantined": false
+    },
+    {
+     "url": "/settings?tab=drive",
+     "label": "تنظیمات ← گوگل درایو",
+     "quarantined": false
+    },
+    {
+     "url": "/settings?tab=dev",
+     "label": "تنظیمات ← مرکز توسعه",
+     "quarantined": false
+    },
+    {
+     "url": "/settings?tab=attention",
+     "label": "تنظیمات ← مراقبت و مرور",
+     "quarantined": false
+    },
+    {
+     "url": "/settings?tab=safety",
+     "label": "تنظیمات ← ایمنی داده",
+     "quarantined": false
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/settings/notifications",
+   "page": "Settings",
+   "label": "تنظیمات اعلان",
+   "group": "tools",
+   "file": "frontend/src/pages/Settings.jsx",
+   "parametric": false,
+   "alias_of": "/settings",
+   "lines": 96,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "ai",
+     "label": "هوش مصنوعی",
+     "quarantined": false
+    },
+    {
+     "id": "notifications",
+     "label": "اعلان‌ها",
+     "quarantined": false
+    },
+    {
+     "id": "drive",
+     "label": "گوگل درایو",
+     "quarantined": false
+    },
+    {
+     "id": "dev",
+     "label": "مرکز توسعه",
+     "quarantined": false
+    },
+    {
+     "id": "attention",
+     "label": "مراقبت و مرور",
+     "quarantined": false
+    },
+    {
+     "id": "safety",
+     "label": "ایمنی داده",
+     "quarantined": false
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/settings/ai-models",
+   "page": "Settings",
+   "label": "تنظیمات مدل‌ها",
+   "group": "tools",
+   "file": "frontend/src/pages/Settings.jsx",
+   "parametric": false,
+   "alias_of": "/settings",
+   "lines": 96,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 4,
+   "tabs": [
+    {
+     "id": "ai",
+     "label": "هوش مصنوعی",
+     "quarantined": false
+    },
+    {
+     "id": "notifications",
+     "label": "اعلان‌ها",
+     "quarantined": false
+    },
+    {
+     "id": "drive",
+     "label": "گوگل درایو",
+     "quarantined": false
+    },
+    {
+     "id": "dev",
+     "label": "مرکز توسعه",
+     "quarantined": false
+    },
+    {
+     "id": "attention",
+     "label": "مراقبت و مرور",
+     "quarantined": false
+    },
+    {
+     "id": "safety",
+     "label": "ایمنی داده",
+     "quarantined": false
+    }
+   ],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/ai-settings",
+   "page": "AISettings",
+   "label": "تنظیمات AI",
+   "group": "tools",
+   "file": "frontend/src/pages/AISettings.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 445,
+   "buttons": 9,
+   "inputs": 8,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 20,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/notifications",
+   "page": "Notifications",
+   "label": "اعلان‌ها",
+   "group": "tools",
+   "file": "frontend/src/pages/Notifications.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 338,
+   "buttons": 4,
+   "inputs": 1,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 2,
+   "testids": 3,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/inspection",
+   "page": "InspectionPage",
+   "label": "نظارت و سرکشی",
+   "group": "system",
+   "file": "frontend/src/pages/InspectionPage.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 926,
+   "buttons": 24,
+   "inputs": 9,
+   "forms": 0,
+   "links": 6,
+   "api_calls": 0,
+   "testids": 12,
+   "tabs": [
+    {
+     "id": "board",
+     "label": "کارتابل",
+     "quarantined": false
+    },
+    {
+     "id": "pages",
+     "label": "نقشهٔ صفحه‌ها و زیرصفحه‌ها",
+     "quarantined": false
+    },
+    {
+     "id": "binders",
+     "label": "زونکن‌ها (بایگانی)",
+     "quarantined": false
+    },
+    {
+     "id": "how",
+     "label": "روتین‌ها و راهنما",
+     "quarantined": false
+    }
+   ],
+   "subpages": [
+    {
+     "url": "/inspection?tab=board",
+     "label": "نظارت و سرکشی ← کارتابل",
+     "quarantined": false
+    },
+    {
+     "url": "/inspection?tab=pages",
+     "label": "نظارت و سرکشی ← نقشهٔ صفحه‌ها و زیرصفحه‌ها",
+     "quarantined": false
+    },
+    {
+     "url": "/inspection?tab=binders",
+     "label": "نظارت و سرکشی ← زونکن‌ها (بایگانی)",
+     "quarantined": false
+    },
+    {
+     "url": "/inspection?tab=how",
+     "label": "نظارت و سرکشی ← روتین‌ها و راهنما",
+     "quarantined": false
+    }
+   ],
+   "reports": {}
+  },
+  {
+   "path": "/system-map",
+   "page": "SystemMapPage",
+   "label": "نقشهٔ سیستم",
+   "group": "system",
+   "file": "frontend/src/pages/SystemMapPage.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 174,
+   "buttons": 2,
+   "inputs": 0,
+   "forms": 0,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 7,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/activity-log",
+   "page": "ActivityLogPage",
+   "label": "لاگ فعالیت‌ها",
+   "group": "system",
+   "file": "frontend/src/pages/ActivityLogPage.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 253,
+   "buttons": 5,
+   "inputs": 5,
+   "forms": 1,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 6,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
+   "path": "/admin/users",
+   "page": "AdminUsers",
+   "label": "مدیریت کاربران",
+   "group": "system",
+   "file": "frontend/src/pages/AdminUsers.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 195,
+   "buttons": 4,
+   "inputs": 2,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 0,
+   "testids": 0,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  }
+ ],
+ "backend": {
+  "routes": [
+   {
+    "path": "/api/activity-log",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/activity-log",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/activity-log/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/activity-log/entity/{entity_type}/{entity_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/activity-log/export.csv",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/analysis_prompt",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/analysis_prompt",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/ai/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/analyze-tasks",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/assessments/holistic_profile",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/assessments/holistic_profile/{profile_user_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/career_paths",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/chat",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/configs",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/configs",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/configs/{config_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/ai/configs/{config_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/ai/correlate_needs",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/dynamic-analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/feedback",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/generate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/global-prompt",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/global-prompt",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/ai/guidance",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/guidance/generate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/hallucination-flags",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/identify_interests",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/metrics",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/models",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/models",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/models/{model_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/ai/models/{model_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/ai/models/{model_id}/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/overview",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/personality/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/personality/profile",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/personalized_recommendations",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/providers",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/providers",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/providers/{key}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/ai/providers/{key}/sync-models",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/providers/{provider_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/ai/providers/{provider_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/providers/{provider_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/ai/providers/{provider_id}/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/query",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/routes",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/routes/{task}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/ai/self_model",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/self_model/refresh",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/sentiment/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/ai/sentiment/profile",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/ai/user_data_context",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/assets",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/assets/external-drives",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/assets/scan",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/assets/scan-status",
+    "methods": []
+   },
+   {
+    "path": "/api/assets/sync",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/assets/task-suggestions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/attention/create-task",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/attention/morning-brief",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/attention/run",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/attention/scan",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/attention/settings",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/attention/settings",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/backup/export",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/backup/run",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/backup/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/bank-accounts",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/bank-accounts",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/bank-accounts/import-share-sheet",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/bank-accounts/share-sheets",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/brain/dashboard",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/brain/reminder",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/brain/reminder",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/brain/upload",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/brain/uploads",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/broker-accounts",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/broker-accounts",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/clarifications/ask",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications/resend",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications/{clarification_id}/answer",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications/{clarification_id}/discuss",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications/{clarification_id}/edit",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications/{clarification_id}/skip",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/clarifications/{clarification_id}/snooze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/cleanup/auto-purge",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/cleanup/locked-boilerplate",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/cleanup/locked-boilerplate/dismiss",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/cleanup/test-junk",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/cleanup/test-junk/remove",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/command-center/today",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/context/location",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/context/physiological",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/context/recommendations",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/context/voice",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/deduplication/groups",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/deduplication/merge",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/deduplication/scan",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/dev/errors",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/errors/{issue_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/dev/integrations",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/integrations/{provider}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/dev/integrations/{provider}/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/dev/logs",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/logs/fetch",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/dev/logs/stats",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/overview",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/projects",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/projects/{dev_project_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/dev/projects/{dev_project_id}/create-task",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/dev/projects/{dev_project_id}/feed",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/services",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/services/{service_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/dev/settings",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/settings",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/dev/summaries",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/dev/summaries/generate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/dev/sync/github",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/dev/sync/render",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/directives",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/approve-all",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/config",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/directives/config",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/directives/context",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/directives/extract",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/reject-all",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/report",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/directives/today",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/approve",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/done",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/miss",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/reject",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/schedule",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/schedule/auto",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/steps/generate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/directives/{directive_id}/steps/toggle",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/documents/identity",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/documents/identity",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/documents/uae-license",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/documents/uae-license/extract",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/documents/vehicle-license/extract",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/drive/disconnect",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/drive/files",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/drive/folders",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/drive/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/drive/sync",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/drive/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/drive/upload",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/drive/upload-file",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/exchange-accounts",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/exchange-accounts",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/external-projects",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/external-projects",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/facets",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/files/{file_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/files/{file_id}/download",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/files/{file_id}/raw",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/accounts",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/accounts",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/accounts/{account_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/finance/accounts/{account_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/finance/accounts/{account_id}/transactions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/affordable-tasks",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/assets",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/assets",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/balances-by-currency",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/budget/evaluate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/cleanup-auto-cards",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/incomes",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/incomes",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/ingest-message",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/insights",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/owner-accounts",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/owner-accounts",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/rebuild-auto-cards",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/reports/monthly",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/scan-emails",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/tombstones",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/tombstones/clear",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/finance/transactions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/finance/transactions",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/google/digest/run",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/google/emails",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/google/emails/{email_id}/create-task",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/google/events",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/google/events/{event_id}/create-task",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/google/settings",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/google/settings",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/google/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/google/sync",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/google/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/health",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/health/db",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/identity-profile",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/identity-profile/ask-missing",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/identity-profile/refresh",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/identity-profile/{field}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/identity/emirates-id",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/imports/ai-models",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/imports/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/imports/jobs",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/imports/jobs/{job_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/imports/targets",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/imports/{target}",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/imports/{target}/template",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inbox",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inbox",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/auto-ingest",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inbox/auto-ingest",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/inbox/backfill",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/deep-sweep",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/password",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/password-components",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/retry-unreadable",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/targets",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inbox/{item_id}/dismiss",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/{item_id}/file",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/{item_id}/reclassify",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inbox/{item_id}/unfile",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/binders",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/file",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/files/{file_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/inspection/files/{file_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/files/{file_id}/raw",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/files/{file_id}/text",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/inventory",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/queue",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/rounds",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/shots/{shot_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/urgent",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/urgent/claim",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/whoami",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}/files",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}/notes",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}/notes/{note_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}/status",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}/urgent",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/inspection/{report_id}/urgent",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/interests",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/interests",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/interests/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/interests/",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/interests/{interest_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/lists",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/lists",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/lists/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/lists/",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/lists/sync-from-file",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/lists/{list_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/lists/{list_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/lists/{list_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/lists/{list_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/lists/{list_id}/items",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/lists/{list_id}/items",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/local-files",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/local-files",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/location",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/location/history",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/merge/execute",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/merge/suggestions",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/apk",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/mobile/call",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/diagnostics",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/mobile/heartbeat",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/insights",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/mobile/location",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/notification",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/screen",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/sms",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mobile/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/mobile/token",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/mobile/usage",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/neteller/wallet",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/neteller/wallet",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/notifications",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/notifications/mark-all-read",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/notifications/preferences",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/notifications/preferences",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/notifications/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/notifications/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/oversight/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/people-profiles",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/people-profiles",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/people-profiles/summary",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/people-profiles/{person_id}/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile/deed",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile/note",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile/relationship",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile/reminders",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/people/{person_id}/profile/suggestions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/persons",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/persons",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/persons/{person_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/persons/{person_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/persons/{person_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/persons/{person_id}/tasks",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/places",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/places/track",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/planner/generate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/projects",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/projects",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/projects/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/projects/",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/projects/{project_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/projects/{project_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/projects/{project_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/projects/{project_id}/tasks",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/recommendations",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/recommendations/{rec_id}/read",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/rta/dashboard",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/rta/dashboard",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/sahat/assign",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/sahat/district/{key}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/sahat/map",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/sahat/refresh",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/sahat/threads",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/sahat/threads",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/sahat/threads/{thread_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/search",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/self-improvement/daily-update",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/self-improvement/overview",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/self-improvement/profile-analytics",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/self-improvement/profile-analytics/refresh",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/settings/ai-usage",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/settings/global-analysis-prompt",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/settings/global-analysis-prompt",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/settings/jobs-status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/settings/owner-actions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/subscriptions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/subscriptions",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/system-map",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/system-map/activity",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/system-map/graph",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/system-map/layout",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/system-map/wires",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/tasks",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/tasks",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/tasks/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/tasks/",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/tasks/search",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}/persons",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}/persons",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}/steps",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}/steps/generate",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/tasks/{task_id}/steps/toggle",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/telegram/delete-webhook",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/telegram/heal-webhook",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/telegram/set-webhook",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/telegram/status",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/telegram/test",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/telegram/webhook",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/todo-items",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/todo-items/",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}/move",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}/share",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}/toggle-complete",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}/toggle-star",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/todo-items/{item_id}/unshare",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/trash",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/trash/todo-items/{item_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/trash/todo-items/{item_id}/restore",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/trash/writings/{writing_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/trash/writings/{writing_id}/restore",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/users/profile",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/users/{user_id}/interests",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/v1/context/analyze",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/connections",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/connections",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/connections/{connection_id}/sync",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/connections/{connection_id}/time-budget",
+    "methods": [
+     "PATCH"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/neglected",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/tasks",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/v1/oversight/time-allocation",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/vehicles/extract",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/version",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/version/",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/weekly-review",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/weekly-review/latest",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/weekly-review/run",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/weekly-review/settings",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/weekly-review/settings",
+    "methods": [
+     "PUT"
+    ]
+   },
+   {
+    "path": "/api/writings",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/writings",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/writings/{writing_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/writings/{writing_id}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/writings/{writing_id}",
+    "methods": [
+     "PUT"
+    ]
+   }
+  ],
+  "services": [
+   "_personal_development_seed_data",
+   "_personal_writings_seed_data",
+   "_self_improvement_seed_data",
+   "_todo_seed_data",
+   "activity_archive_service",
+   "activity_log_service",
+   "ai/ai_data_access_service",
+   "ai/analysis_prompt_service",
+   "ai/career_path_service",
+   "ai/catalog",
+   "ai/catalog_tester",
+   "ai/content_analysis_service",
+   "ai/gateway_seam",
+   "ai/hallucination_service",
+   "ai/holistic_profile_service",
+   "ai/image_service",
+   "ai/inference_gateway",
+   "ai/interest_identification_service",
+   "ai/manager",
+   "ai/metrics",
+   "ai/model_service",
+   "ai/nlp_service",
+   "ai/performance_service",
+   "ai/person_behavior",
+   "ai/personality_service",
+   "ai/profile_analysis",
+   "ai/provider_service",
+   "ai/recommendation_service",
+   "ai/sentiment_personality_service",
+   "ai/task_feedback",
+   "ai_ingestion_service",
+   "ai_service",
+   "asset_scan_service",
+   "asset_to_task_linker",
+   "assistant_chat_service",
+   "attention_service",
+   "auth_service",
+   "backup_service",
+   "brain_service",
+   "budget_notification_service",
+   "budget_service",
+   "clarification_service",
+   "cleanup_service",
+   "cold_tiering_service",
+   "command_center_service",
+   "consolidation_service",
+   "context_engine/activity_service",
+   "context_engine/audio_context_service",
+   "context_engine/biometric_service",
+   "context_engine/location_service",
+   "context_engine/orchestrator_service",
+   "context_engine/voice_mood_service",
+   "context_engine/wearable_service",
+   "crypt_service",
+   "data_classification_service",
+   "data_ingestion_service",
+   "deduplication_service",
+   "dev_sync/engine",
+   "dev_sync/error_issue_service",
+   "dev_sync/github_sync_service",
+   "dev_sync/log_summary_service",
+   "dev_sync/render_sync_service",
+   "dev_sync/token_service",
+   "directive_service",
+   "drive_settings_service",
+   "email_parser_service",
+   "event_publisher",
+   "external_project_service",
+   "finance_ai_service",
+   "finance_email_scan_service",
+   "finance_imap_service",
+   "finance_ingest_service",
+   "finance_report_service",
+   "focus_service",
+   "google_api_client",
+   "google_auth",
+   "google_drive_service",
+   "google_maps_service",
+   "google_sync/calendar_service",
+   "google_sync/digest_service",
+   "google_sync/engine",
+   "google_sync/gmail_service",
+   "google_sync/person_ingest",
+   "google_sync/subscription_ingest",
+   "google_sync/triage_service",
+   "import_service",
+   "inbox_service",
+   "ingest/attachments",
+   "ingest/credentials",
+   "ingest/drive_ingest",
+   "ingest/email_ingest",
+   "ingest/identity_facts",
+   "ingest/password_recipe",
+   "ingest/statement_lines",
+   "ingest/text_extract",
+   "ingest/universal_ingest",
+   "inspection_files",
+   "inspection_inventory",
+   "integration_service",
+   "integrations/external_project_interface",
+   "integrations/generic_http_adapter",
+   "jobs_engine",
+   "list_service",
+   "local_file_service",
+   "migration_runner",
+   "mobile_dispatch_service",
+   "mobile_identity_service",
+   "mobile_insights_service",
+   "mobile_watchdog_service",
+   "notification_prefs",
+   "notification_service",
+   "oversight_service",
+   "owner_identity_service",
+   "owner_insight/base",
+   "owner_insight/providers/behaviour",
+   "owner_insight/providers/documents",
+   "owner_insight/providers/habits",
+   "owner_insight/providers/self_model",
+   "owner_insight/providers/unlinked",
+   "owner_insight/providers/world",
+   "owner_insight/providers/writings",
+   "person_profile_service",
+   "person_service",
+   "personal_development_seed",
+   "personal_writings_seed",
+   "place_service",
+   "planner_service",
+   "recommendation_engine",
+   "sahat_service",
+   "self_improvement_service",
+   "self_model_service",
+   "sheets_service",
+   "similarity_service",
+   "sms_listener_service",
+   "steps_util",
+   "supervisor_auth",
+   "supervisor_rounds",
+   "system_graph_service",
+   "system_pulse_service",
+   "task_analysis",
+   "telegram_compose",
+   "telegram_service",
+   "todo_item_service",
+   "transcription_service",
+   "uae_license_extraction_service",
+   "user_data_migration",
+   "user_interest_service",
+   "vehicle_extraction_service",
+   "weekly_review_service"
+  ],
+  "models": [
+   "activity_log",
+   "ai_assessment",
+   "ai_catalog",
+   "ai_feedback",
+   "ai_model_config",
+   "ai_provider",
+   "ai_usage",
+   "analysis_prompt",
+   "asset",
+   "attention_mark",
+   "bank_account",
+   "behavior_log",
+   "brain",
+   "broker_account",
+   "clarification",
+   "context",
+   "dev_sync",
+   "directive",
+   "drive_file",
+   "exchange_account",
+   "external_project",
+   "finance",
+   "financial_account",
+   "global_setting",
+   "identity_document",
+   "identity_fact",
+   "import_job",
+   "inbox_item",
+   "income",
+   "indexed_data_source_entry",
+   "inspection",
+   "integration",
+   "interaction",
+   "local_file_entry",
+   "neteller_wallet",
+   "notification",
+   "oversight_task",
+   "owner_identity",
+   "person",
+   "person_profile",
+   "person_task",
+   "personal_sync",
+   "personal_writing",
+   "personality",
+   "place",
+   "project",
+   "recommendation",
+   "rta_account",
+   "sahat_thread",
+   "self_improvement",
+   "subscription_account",
+   "task",
+   "todo_item",
+   "todo_list",
+   "uae_license",
+   "user",
+   "user_asset",
+   "user_comment",
+   "user_interest",
+   "user_location",
+   "user_oauth",
+   "user_taste",
+   "webhook_event",
+   "weekly_review"
+  ],
+  "errors": []
+ },
+ "totals": {
+  "pages": 42,
+  "subpages": 29,
+  "buttons": 168,
+  "inputs": 84,
+  "forms": 15,
+  "links": 56,
+  "api_calls": 80,
+  "api_routes": 404,
+  "services": 149,
+  "models": 64
+ },
+ "errors": [],
+ "alarms": []
+}

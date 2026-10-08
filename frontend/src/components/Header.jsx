@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import { unescapeHtml } from '../lib/text';
 import NotificationBell from './NotificationBell';
+import { InspectionToggle } from './inspection/InspectionProvider';
 import { LINKS as SIDEBAR_LINKS } from './Sidebar';
 
 /**
@@ -196,6 +197,7 @@ function Header() {
 
           <div className="flex items-center space-x-3">
             {isAuthenticated && <GlobalSearch />}
+            {isAuthenticated && <InspectionToggle />}
             {isAuthenticated && <NotificationBell />}
             {isAuthenticated ? (
               <>

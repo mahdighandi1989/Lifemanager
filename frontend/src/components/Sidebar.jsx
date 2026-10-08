@@ -72,6 +72,7 @@ export const LINKS = [
   { to: '/settings', label: 'تنظیمات', testid: 'sidebar-link-settings', group: 'tools' },
 
   // سیستم و فنی — developer/meta tools (kept, quarantined to the bottom).
+  { to: '/inspection', label: '📝 نظارت و سرکشی', testid: 'sidebar-link-inspection', group: 'system' },
   { to: '/system-map', label: 'نقشهٔ سیستم', testid: 'sidebar-link-system-map', group: 'system' },
   { to: '/activity-log', label: 'لاگ فعالیت‌ها', testid: 'sidebar-link-activity-log', group: 'system' },
 ];

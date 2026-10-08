@@ -181,3 +181,12 @@ inbox/*
 # Local backup archives — the automatic-backup service's fallback when Google
 # Drive is offline (app/services/backup_service.py). Never commit life data.
 data/backups/
+
+# «نظارت و سرکشی» — the supervisor's working copy, rebuilt by every
+# `inspection.py pull/urgent` (docs/supervisor/inspection/README.md); only the
+# README there is tracked. storage/inspection is the last-resort file store.
+docs/supervisor/inspection/QUEUE.md
+docs/supervisor/inspection/URGENT.md
+docs/supervisor/inspection/shots/
+docs/supervisor/inspection/files/
+storage/inspection/

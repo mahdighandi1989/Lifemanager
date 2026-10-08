@@ -261,6 +261,15 @@
           "Trip",
           "RoutePattern"
         ]
+      },
+      {
+        "file": "app/models/inspection.py",
+        "classes": [
+          "InspectionReport",
+          "InspectionShot",
+          "InspectionFile",
+          "InspectionBinder"
+        ]
       }
     ],
     "routes": [
@@ -803,6 +812,19 @@
           {
             "method": "POST",
             "path": "/api/inbox/{item_id}/reclassify"
+          }
+        ]
+      },
+      {
+        "file": "app/routes/inspection.py",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/inspection"
+          },
+          {
+            "method": "POST",
+            "path": "/api/inspection"
           }
         ]
       },
@@ -1607,6 +1629,24 @@
         ]
       },
       {
+        "file": "app/services/inspection_files.py",
+        "classes": [],
+        "functions": [
+          "extract",
+          "store",
+          "load"
+        ]
+      },
+      {
+        "file": "app/services/inspection_inventory.py",
+        "classes": [],
+        "functions": [
+          "build",
+          "pages",
+          "page_tabs"
+        ]
+      },
+      {
         "file": "app/services/integration_service.py",
         "classes": [
           "IntegrationService"
@@ -1787,6 +1827,23 @@
         ]
       },
       {
+        "file": "app/services/supervisor_auth.py",
+        "classes": [],
+        "functions": [
+          "expected_token",
+          "is_supervisor_token"
+        ]
+      },
+      {
+        "file": "app/services/supervisor_rounds.py",
+        "classes": [],
+        "functions": [
+          "record_round",
+          "next_round",
+          "next_full_round"
+        ]
+      },
+      {
         "file": "app/services/system_graph_service.py",
         "classes": [],
         "functions": [
@@ -1919,8 +1976,16 @@
         "file": "frontend/src/pages/__tests__/Home.test.jsx"
       },
       {
+        "name": "IdentityProfile",
+        "file": "frontend/src/pages/IdentityProfile.jsx"
+      },
+      {
         "name": "Import",
         "file": "frontend/src/pages/Import.jsx"
+      },
+      {
+        "name": "InspectionPage",
+        "file": "frontend/src/pages/InspectionPage.jsx"
       },
       {
         "name": "LifeFilePage",
@@ -1961,6 +2026,10 @@
       {
         "name": "PersonalityProfilePage",
         "file": "frontend/src/pages/PersonalityProfilePage.jsx"
+      },
+      {
+        "name": "PlacesMap",
+        "file": "frontend/src/pages/PlacesMap.jsx"
       },
       {
         "name": "ProjectDetailPage",
@@ -2017,14 +2086,6 @@
       {
         "name": "Writings",
         "file": "frontend/src/pages/Writings.jsx"
-      },
-      {
-        "name": "IdentityProfile",
-        "file": "frontend/src/pages/IdentityProfile.jsx"
-      },
-      {
-        "name": "PlacesMap",
-        "file": "frontend/src/pages/PlacesMap.jsx"
       }
     ],
     "components": [
@@ -2067,6 +2128,14 @@
       {
         "name": "Header.test",
         "file": "frontend/src/components/__tests__/Header.test.jsx"
+      },
+      {
+        "name": "InspectionHighlights",
+        "file": "frontend/src/components/inspection/InspectionHighlights.jsx"
+      },
+      {
+        "name": "InspectionProvider",
+        "file": "frontend/src/components/inspection/InspectionProvider.jsx"
       },
       {
         "name": "Layout",

@@ -65,6 +65,7 @@ export const ROUTES = [
   { path: '/notifications', page: 'Notifications', label: 'اعلان‌ها', group: 'tools' },
 
   // سیستم و فنی
+  { path: '/inspection', page: 'InspectionPage', label: 'نظارت و سرکشی', group: 'system' },
   { path: '/system-map', page: 'SystemMapPage', label: 'نقشهٔ سیستم', group: 'system' },
   { path: '/activity-log', page: 'ActivityLogPage', label: 'لاگ فعالیت‌ها', group: 'system' },
   { path: '/admin/users', page: 'AdminUsers', label: 'مدیریت کاربران', group: 'system' },

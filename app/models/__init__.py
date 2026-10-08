@@ -18,6 +18,13 @@ from app.models.inbox_item import InboxItem
 from app.models.analysis_prompt import AnalysisPrompt
 from app.models.external_project import ExternalProject, ExternalProjectConnection
 from app.models.oversight_task import OversightTask
+from app.models.inspection import (  # «نظارت و سرکشی»
+    InspectionBinder,
+    InspectionFile,
+    InspectionFileChunk,
+    InspectionReport,
+    InspectionShot,
+)
 from app.models.drive_file import DriveFile
 from app.models.user_asset import UserAsset
 from app.models.person_task import person_tasks  # noqa: F401  (association table)
@@ -150,4 +157,9 @@ __all__ = [
     "DevLog",
     "DevLogSummary",
     "todo_list_items",
+    "InspectionReport",
+    "InspectionShot",
+    "InspectionFile",
+    "InspectionFileChunk",
+    "InspectionBinder",
 ]
