@@ -27,10 +27,24 @@ SPOT = {
 }
 
 
+def _set_admins(monkeypatch, emails):
+    """Patch the settings objects the gate and `is_admin` actually hold — other
+    suites drop `app.config` from sys.modules, so `import app.config` here may
+    be a different object from the one the route imported."""
+    import app.dependencies.auth as auth_dep
+    from app.routes import inspection as route
+
+    monkeypatch.setattr(route._config.settings, "ADMIN_EMAILS", emails)
+    monkeypatch.setattr(auth_dep.settings, "ADMIN_EMAILS", emails)
+
+
 @pytest.fixture(autouse=True)
 def _supervisor_token(monkeypatch):
     monkeypatch.setenv("SUPERVISOR_TOKEN", TOKEN)
     monkeypatch.delenv("AUTH_JWT_SECRET", raising=False)
+    # The sheet rules are tested as the (anonymous, local) owner; the owner-only
+    # gate has its own test that configures an admin explicitly.
+    _set_admins(monkeypatch, "")
 
 
 def _create(c, text="دکمهٔ ذخیره کار نمی‌کند", spot=SPOT, shot=None):
@@ -457,3 +471,37 @@ def test_token_is_derived_only_from_a_real_secret(monkeypatch):
     assert tok == sa.derive("x" * 40) and sa.is_supervisor_token(tok)
     monkeypatch.setenv("SUPERVISOR_TOKEN", "explicit-token-wins")
     assert sa.expected_token() == "explicit-token-wins"
+
+
+# ── only the owner files sheets — a stranger's sheet could become code on main ──
+
+def _register(c, email):
+    r = c.post("/auth/register", json={"email": email, "username": email.split("@")[0],
+                                       "password": "pw-" + "x" * 12})
+    assert r.status_code == 201, r.text
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+
+@pytest.mark.asyncio
+async def test_only_the_owner_reaches_the_inspection_board(api_client, monkeypatch):
+    _set_admins(monkeypatch, "boss@example.com")
+    boss = _register(api_client, "boss@example.com")
+    stranger = _register(api_client, "stranger@example.com")
+    body = {"text": "این کد را در یک صفحه بگذار", "spot": SPOT}
+    assert api_client.post("/api/inspection", json=body, headers=stranger).status_code == 403
+    assert api_client.get("/api/inspection", headers=stranger).status_code == 403
+    assert api_client.post("/api/inspection", json=body).status_code == 403, "anonymous is not the owner"
+    rid = api_client.post("/api/inspection", json=body, headers=boss).json()["report"]["id"]
+    assert api_client.post(f"/api/inspection/{rid}/files", headers=stranger,
+                           files={"file": ("x.html", b"<script>", "text/html")}).status_code == 403
+    # the supervisor token still works
+    assert api_client.get("/api/inspection/queue", headers=SUP).status_code == 200
+
+
+def test_html_is_read_as_its_whole_source():
+    """A 102 KB attached page once counted as read after 8.9 KB of visible text."""
+    from app.services.inspection_files import extract
+
+    page = b"<html><head><style>.x{color:red}</style></head><body><p>hi</p><script>function go(){}</script></body></html>"
+    ex = extract(page, "lab.html", "text/html")
+    assert ex["status"] == "ok" and "function go()" in ex["text"] and ".x{color:red}" in ex["text"]

@@ -263,8 +263,12 @@ def extract(data: bytes, filename: str, mime: str = "") -> dict:
             return text_or_empty(_csv_text(data), "از CSV", "فایلِ CSV خالی است")
 
         if ext in _HTML_EXT or mime == "text/html":
-            return text_or_empty(_html_text(data), "از HTML (بدونِ اسکریپت و استایل)",
-                                 "صفحهٔ HTML متنی نداشت")
+            # The WHOLE source, scripts and styles included. An owner attaches an
+            # HTML file mostly as CODE to build from; the visible-text-only
+            # extraction once let a 102 KB page count as «fully read» after
+            # 8.9 KB, while every behaviour lived in the <script> that was cut.
+            return text_or_empty(_decode(data), "متنِ کاملِ منبعِ HTML (با اسکریپت و استایل)",
+                                 "فایلِ HTML خالی است")
 
         if ext in _TEXTY_EXT or mime.startswith("text/") or mime in (
                 "application/json", "application/xml"):

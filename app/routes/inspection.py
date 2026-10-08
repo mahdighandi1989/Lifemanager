@@ -34,7 +34,14 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import enforce_auth_when_required, get_optional_user_id
+import app.config as _config
+from app.dependencies.auth import (
+    _extract_token,
+    _resolve_token_to_user,
+    enforce_auth_when_required,
+    get_optional_user_id,
+    is_admin,
+)
 from app.models.global_setting import GlobalSetting
 from app.models.inspection import (
     BINDER_CAPACITY,
@@ -100,10 +107,26 @@ def _is_reviewer(request: Request) -> bool:
 
 
 async def _gate(request: Request, db: AsyncSession = Depends(get_db)) -> None:
-    """A valid supervisor token passes; everyone else goes through the app's gate."""
+    """A valid supervisor token passes; everyone else goes through the app's
+    gate AND must be the OWNER.
+
+    Why the owner check (2026-10-08): the supervisor routine turns a sheet into
+    code on `main` (= a deploy). Production registration has no invite code, so
+    without this any stranger could sign up and file a sheet carrying code for
+    the routine to ship — the routine's own permission guard rightly refused to
+    integrate an attachment for exactly that reason. «Owner» = the app's admin
+    (`is_admin`: ADMIN_EMAILS or an admin role). With no admin configured (local
+    runs, tests) behaviour is unchanged."""
     if _is_reviewer(request):
         return
     await enforce_auth_when_required(request, db)
+    if not _config.settings.admin_emails_list:  # read at call time — tests swap the object
+        return
+    token = _extract_token(request)
+    user = await _resolve_token_to_user(token, db) if token else None
+    if user is None or not is_admin(user):
+        raise HTTPException(status_code=403,
+                            detail="«نظارت و سرکشی» فقط برای مالکِ سامانه است")
 
 
 def _refuse_reviewer(request: Request, detail: str) -> None:
