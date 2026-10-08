@@ -326,10 +326,10 @@ def files_block(r: dict) -> list[str]:
 
 
 def _clean_workdir() -> None:
-    for d in (SHOTS, FILES):
+    import shutil
+    for d in (SHOTS, FILES):          # unpacked archives and video frames are folders
         if d.exists():
-            for f in d.glob("*"):
-                f.unlink()
+            shutil.rmtree(d)
 
 
 def cmd_whoami() -> int:
