@@ -309,10 +309,15 @@ def test_call_creates_person_interaction_and_contact_stats(api_client):
 
 
 def test_mobile_insights_summarizes_real_usage(api_client):
+    # /api/mobile/insights looks back 7 days from NOW, so the data must be recent:
+    # pinned to 2026-07-31 this test passed until 2026-08-07 and then went red forever.
+    from datetime import date, timedelta
+
+    day = (date.today() - timedelta(days=1)).isoformat()
     token = _pair(api_client)
     api_client.post(
         "/api/mobile/usage",
-        json={"day": "2026-07-31", "device": "s24", "unlocks": 55,
+        json={"day": day, "device": "s24", "unlocks": 55,
               "apps": [{"app": "org.telegram.messenger", "minutes": 90},
                        {"app": "com.instagram.android", "minutes": 45}]},
         headers={"X-Device-Token": token},
@@ -321,7 +326,7 @@ def test_mobile_insights_summarizes_real_usage(api_client):
     api_client.post(
         "/api/mobile/call",
         json={"number": "0551112222", "call_type": "incoming", "duration_sec": 30,
-              "at": "2026-07-31T10:00:00", "device": "s24"},
+              "at": f"{day}T10:00:00", "device": "s24"},
         headers={"X-Device-Token": token},
     )
     ins = api_client.get("/api/mobile/insights").json()
