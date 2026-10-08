@@ -201,7 +201,7 @@ def _html_text(data: bytes) -> str:
     return html.unescape(re.sub(r"[ \t]+", " ", txt))
 
 
-def extract(data: bytes, filename: str, mime: str = "") -> dict:
+def extract(data: bytes, filename: str, mime: str = "", _depth: int = 0) -> dict:
     """Pull readable text out of one file.
 
     Returns ``{status, text, note, page_count, truncated}`` with ``status`` one
@@ -225,9 +225,25 @@ def extract(data: bytes, filename: str, mime: str = "") -> dict:
     def text_or_empty(text: str, ok_note: str, empty_note: str) -> dict:
         return done("ok", text, ok_note) if (text or "").strip() else done("empty", "", empty_note)
 
+    from app.services import inspection_formats as fmt
+
+    def read(d: bytes, n: str, m: str, depth: int) -> dict:
+        return extract(d, n, m, _depth=depth)
+
     try:
+        if ext == ".svg" or mime == "image/svg+xml":
+            # an SVG is text (XML) — read all of it; `pull` also renders it to PNG
+            return text_or_empty(_decode(data), "منبعِ کاملِ SVG (متن)", "SVG خالی است")
+
         if mime.startswith("image/") or ext in _IMAGE_EXT:
-            return done("image", "", "تصویر است — متنی برای استخراج ندارد؛ ناظر باید بازش کند و نگاه کند")
+            return done("image", "", "تصویر است — ناظر باید بازش کند و نگاه کند "
+                                     "(`pull` قالب‌های غیرِ png/jpg/gif/webp را به PNG تبدیل می‌کند)")
+
+        if fmt.is_media(name, mime):
+            # transcribed IN FULL by inspection_media (POST /files/{id}/extract,
+            # which `pull` and the page both trigger) — never «nothing to read»
+            return done("pending", "", "صوت/ویدیو — در صفِ رونویسیِ کامل (متنِ کامل با زمان‌بندی؛ "
+                                       "برای ویدیو، شرحِ تصویر هم)")
 
         if ext == ".pdf" or mime == "application/pdf":
             text, pages, with_text = _pdf_text(data)
@@ -246,8 +262,8 @@ def extract(data: bytes, filename: str, mime: str = "") -> dict:
                                  "فایلِ Word باز شد ولی متنی نداشت")
 
         if ext == ".doc" or mime == "application/msword":
-            return done("unsupported", "", "قالبِ قدیمیِ .doc — استخراج‌کننده نداریم؛ "
-                                           "ناظر باید بازش کند (یا .docx بفرست)")
+            return text_or_empty(fmt.doc_text(data), "از Word ِ قدیمی (.doc) — متنِ کامل",
+                                 "فایلِ .doc باز شد ولی متنی نداشت")
 
         if ext == ".pptx" or "presentationml" in mime:
             return text_or_empty(_pptx_text(data), "از PowerPoint", "اسلایدها متنی نداشتند")
@@ -256,8 +272,26 @@ def extract(data: bytes, filename: str, mime: str = "") -> dict:
             return text_or_empty(_xlsx_text(data), "از کاربرگ", "کاربرگ باز شد ولی سلولِ پُری نداشت")
 
         if ext == ".xls" or mime == "application/vnd.ms-excel":
-            return done("unsupported", "", "قالبِ قدیمیِ .xls — استخراج‌کننده نداریم؛ "
-                                           "ناظر باید بازش کند (یا .xlsx بفرست)")
+            return text_or_empty(fmt.xls_text(data), "از Excel ِ قدیمی (.xls) — همهٔ کاربرگ‌ها",
+                                 "کاربرگ باز شد ولی سلولِ پُری نداشت")
+
+        if ext == ".rtf" or mime in ("application/rtf", "text/rtf"):
+            return text_or_empty(fmt.rtf_text(data), "از RTF", "RTF متنی نداشت")
+
+        if ext in (".odt", ".ods", ".odp") or "opendocument" in mime:
+            return text_or_empty(fmt.odf_text(data), "از OpenDocument", "سند باز شد ولی متنی نداشت")
+
+        if ext == ".epub" or mime == "application/epub+zip":
+            return text_or_empty(fmt.epub_text(data, lambda b: _html_text(b)),
+                                 "از EPUB — همهٔ فصل‌ها به ترتیب", "کتاب متنی نداشت")
+
+        if ext == ".eml" or mime == "message/rfc822":
+            return text_or_empty(fmt.eml_text(data, read, _depth, lambda b: _html_text(b)),
+                                 "ایمیل — سرآیندها، متن و همهٔ پیوست‌ها", "ایمیل خالی است")
+
+        if ext == ".msg" or mime == "application/vnd.ms-outlook":
+            return text_or_empty(fmt.msg_text(data, read, _depth),
+                                 "ایمیلِ Outlook — متن و همهٔ پیوست‌ها", "ایمیل خالی است")
 
         if ext == ".csv" or mime == "text/csv":
             return text_or_empty(_csv_text(data), "از CSV", "فایلِ CSV خالی است")
@@ -274,17 +308,20 @@ def extract(data: bytes, filename: str, mime: str = "") -> dict:
                 "application/json", "application/xml"):
             return text_or_empty(_decode(data), "متنِ ساده", "فایل خالی است")
 
-        if ext == ".zip" or mime in ("application/zip", "application/x-zip-compressed"):
-            with zipfile.ZipFile(io.BytesIO(data)) as z:
-                names = z.namelist()
-            listing = "\n".join(names[:2000])
-            more = f"\n… و {len(names) - 2000} مورد دیگر" if len(names) > 2000 else ""
-            return done("ok", f"--- فهرستِ محتویاتِ آرشیو ({len(names)} مورد) ---\n{listing}{more}",
-                        "فقط فهرستِ فایل‌ها؛ برای دیدنِ محتوا باید بازش کرد", truncated=True)
+        if ext == ".zip" or mime in ("application/zip", "application/x-zip-compressed") or (
+                ext not in _TEXTY_EXT and zipfile.is_zipfile(io.BytesIO(data))):
+            text, truncated, note, media = fmt.zip_text(data, read, _depth)
+            if media and _depth == 0:
+                # audio/video inside: not read until transcribed in full
+                # (POST /files/{id}/extract) — the archive waits with them
+                return done("pending", text, note + f" — {media} صوت/ویدیو منتظرِ رونویسیِ کامل", truncated=truncated)
+            return done("ok", text, note, truncated=truncated) if text.strip() else done(
+                "empty", "", note or "آرشیو خالی است")
 
-        if mime.startswith(("audio/", "video/")):
-            return done("unsupported", "", "صوت/ویدیو است — متنی برای استخراج ندارد؛ "
-                                           "ناظر باید خودِ فایل را باز کند")
+        sniffed = fmt.sniff_text(data)
+        if sniffed is not None:
+            return text_or_empty(sniffed, f"متنِ کامل (قالبِ «{ext or mime or 'بی‌پسوند'}» متنی بود)",
+                                 "فایل خالی است")
 
         # Deliberately NOT «empty»: we never tried, and saying so is the point.
         return done("unsupported", "",

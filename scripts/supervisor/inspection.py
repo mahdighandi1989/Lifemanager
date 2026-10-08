@@ -71,6 +71,107 @@ def _save_shot(shot_id: str, name: str) -> str | None:
     return _rel(path)
 
 
+VIEWABLE = (".png", ".jpg", ".jpeg", ".gif", ".webp")
+VIDEO_EXT = (".mp4", ".mov", ".mkv", ".webm", ".avi", ".3gp", ".m4v", ".wmv", ".mpeg", ".mpg", ".mts", ".ts")
+
+
+def ensure_extracted(r: dict) -> dict:
+    """Every attachment still `pending` (audio/video awaiting its FULL transcript,
+    or an archive holding some) is extracted NOW, before the brief is written —
+    then the sheet is re-read. Transcribing an hour of audio takes minutes."""
+    pending = [f for f in r.get("files") or [] if f.get("extract_status") == "pending"]
+    for f in pending:
+        st, raw = request(f"/api/inspection/files/{f['id']}/extract", method="POST", timeout=1800)
+        if st != 200:
+            print(json.dumps({"extract_failed": f.get("filename"), "http": st,
+                              "detail": raw.decode("utf-8", "replace")[:300]}, ensure_ascii=False), file=sys.stderr)
+    if pending:
+        r = api(f"/api/inspection/{r['id']}").get("report") or r
+    return r
+
+
+def _viewable(path: Path) -> Path | None:
+    """A copy the Read tool can SHOW. HEIC/TIFF/BMP/AVIF/ICO… via Pillow (+pillow-heif),
+    SVG via the headless browser. None when no converter is installed — said so."""
+    ext = path.suffix.lower()
+    if ext in VIEWABLE:
+        return path
+    out = path.with_name(path.name + ".png")
+    if ext == ".svg":
+        try:
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as pw:
+                b = pw.chromium.launch()
+                pg = b.new_page()
+                pg.goto(path.resolve().as_uri())
+                pg.screenshot(path=str(out), full_page=True)
+                b.close()
+            return out
+        except Exception:  # noqa: BLE001
+            return None
+    try:
+        from PIL import Image
+        try:
+            import pillow_heif
+            pillow_heif.register_heif_opener()
+        except Exception:  # noqa: BLE001
+            pass
+        with Image.open(path) as im:
+            frames = getattr(im, "n_frames", 1)
+            im.seek(0)
+            im.convert("RGB").save(out)
+            for i in range(1, min(frames, 50)):          # multi-page TIFF: every page
+                im.seek(i)
+                im.convert("RGB").save(path.with_name(f"{path.name}.p{i + 1}.png"))
+        return out
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _video_frames(path: Path) -> tuple[str, int]:
+    """One frame every 5 s (≤ 360) so the supervisor SEES the video, not only its
+    transcript. Needs imageio-ffmpeg (scripts/supervisor/requirements.txt)."""
+    try:
+        import subprocess
+
+        import imageio_ffmpeg
+        dest = path.with_name(path.name + ".frames")
+        dest.mkdir(exist_ok=True)
+        subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-loglevel", "error", "-i", str(path),
+                        "-vf", "fps=1/5,scale='min(1280,iw)':-2", "-frames:v", "360",
+                        str(dest / "t%04d.jpg")], check=True, timeout=1200)
+        return _rel(dest), len(list(dest.glob("*.jpg")))
+    except Exception as exc:  # noqa: BLE001
+        return f"(فریم گرفته نشد: {type(exc).__name__})", 0
+
+
+def _unzip(path: Path) -> tuple[str, list[str]]:
+    """Every member on disk (no path escapes), images made viewable, videos framed."""
+    import zipfile
+    dest = path.with_name(path.name + ".d")
+    notes = []
+    with zipfile.ZipFile(path) as z:
+        for info in z.infolist():
+            target = (dest / info.filename).resolve()
+            if info.is_dir() or not str(target).startswith(str(dest.resolve())):
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(z.read(info))
+            ext = target.suffix.lower()
+            if ext in VIDEO_EXT:
+                d, n = _video_frames(target)
+                notes.append(f"{info.filename}: {n} فریم در `{d}`")
+            elif ext == ".zip":
+                d, inner = _unzip(target)
+                notes += [f"{info.filename}/ {x}" for x in inner]
+            else:
+                v = _viewable(target) if ext in (".heic", ".heif", ".tif", ".tiff", ".bmp", ".avif",
+                                                    ".ico", ".svg") else None
+                if v and v != target:
+                    notes.append(f"{info.filename}: برای دیدن ← `{_rel(v)}`")
+    return _rel(dest), notes
+
+
 def _read_file_fully(f: dict, number: int) -> dict:
     """ONE attached sample, completely — the server counts what it served, so a
     partial pull leaves a debt that blocks the answer. That is the point."""
@@ -97,19 +198,42 @@ def _read_file_fully(f: dict, number: int) -> dict:
         path = FILES / f"r{number}-{safe}.txt"
         path.write_text(text, encoding="utf-8")
         out.update(chars=len(text), path=_rel(path))
-        if not f.get("text_truncated"):
+        low = name.lower()
+        # the text is complete, but some files must ALSO be looked at: what is
+        # inside an archive (pictures, videos), a video's picture, a PDF's pages
+        if not f.get("text_truncated") and not low.endswith((".zip", ".pdf") + VIDEO_EXT):
             return out
         out["note"] = (out["note"] + " | " if out["note"] else "") + \
             "متنش بریده شده بود — خودِ فایل هم گرفته شد؛ بقیه‌اش فقط در آن است"
         out["complete"] = False
     # no text to read (image / scanned PDF / unknown type) — OPEN it
-    st, raw = request(f"/api/inspection/files/{fid}/raw")
+    st, raw = request(f"/api/inspection/files/{fid}/raw", timeout=600)
     if st == 200 and raw:
         path = FILES / f"r{number}-{safe}"
         path.write_bytes(raw)
         out.update(raw_path=_rel(path), complete=True)
         if not out["path"]:
             out.update(path=_rel(path), chars=len(raw))
+        low = name.lower()
+        extra = []
+        if low.endswith(".zip"):
+            d, inner = _unzip(path)
+            extra.append(f"همهٔ محتوای آرشیو باز شد در `{d}`" + (" — " + "؛ ".join(inner) if inner else ""))
+        elif low.endswith(VIDEO_EXT):
+            d, n = _video_frames(path)
+            extra.append(f"{n} فریم (هر ۵ ثانیه) در `{d}` — **نگاهشان کن**؛ متنِ کامل (گفتار + شرحِ تصویر) بالاست")
+        elif low.endswith(".pdf"):
+            extra.append("PDF را با ابزارِ Read و پارامترِ `pages` **همهٔ صفحه‌ها** را ببین (۲۰ تا ۲۰ تا) — "
+                         "جدول، شکل و صفحه‌های اسکن فقط آن‌جا دیده می‌شوند")
+        elif status == "image" or low.endswith((".heic", ".heif", ".tif", ".tiff", ".bmp", ".avif", ".ico")):
+            v = _viewable(path)
+            if v is None:
+                extra.append("تبدیل به قالبِ قابلِ دیدن نشد — `pip install -r scripts/supervisor/requirements.txt`")
+            elif v != path:
+                extra.append(f"برای دیدن: `{_rel(v)}`")
+                out["raw_path"] = _rel(v)
+        if extra:
+            out["note"] = (out["note"] + " | " if out["note"] else "") + " | ".join(extra)
     else:
         out["note"] = (out["note"] + " | " if out["note"] else "") + f"گرفتنِ خودِ فایل نشد: HTTP {st}"
     return out
@@ -242,7 +366,7 @@ def cmd_file() -> int:
 def cmd_pull() -> int:
     q = api("/api/inspection/queue")
     _clean_workdir()
-    reports = q.get("reports") or []
+    reports = [ensure_extracted(r) for r in q.get("reports") or []]
     lines = [
         "# کارتابلِ «نظارت و سرکشی» — Lifemanager", "",
         f"- بدهیِ این دور (**باید همین دور جواب بگیرند**): **{q.get('owed', 0)}**",
@@ -289,6 +413,7 @@ def cmd_urgent() -> int:
                           "in_progress_elsewhere": got.get("busy", 0)}, ensure_ascii=False))
         return 0
     _clean_workdir()
+    r = ensure_extracted(r)
     lines = [f"# ⚡ فوری — گزارشِ {r['number']}: {r['title']}", "",
              "> مالک این را **خارج از نوبت** خواسته است. همین حالا انجامش بده، بعد جوابش را با",
              "> `inspection.py answer` بنویس. تا جواب ندهی از صفِ فوری بیرون نمی‌رود.", "",

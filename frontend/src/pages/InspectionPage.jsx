@@ -760,6 +760,11 @@ function FileRow({ f, filed, onPeek, act }) {
         {f.store === 'db' && <span className="text-slate-500" title={f.store_note}>در پایگاه‌داده — منتظرِ انتقال به درایو</span>}
         <span className="flex-1" />
         {f.extract_status === 'ok' && <button type="button" onClick={() => onPeek(f)} className="text-sky-700 hover:underline">متن</button>}
+        {f.extract_status !== 'ok' && f.extract_status !== 'image' && (
+          <button type="button" disabled={busy} title="دوباره بخوان — صوت/ویدیو: رونویسیِ کامل"
+            onClick={() => { setBusy(true); void act(() => inspectionApi.extract(f.id), 'خوانده شد').finally(() => setBusy(false)); }}
+            className="text-violet-700 hover:underline">{busy ? '…' : 'خواندنِ دوباره'}</button>
+        )}
         <button type="button" disabled={busy} onClick={() => void download()} className="text-sky-700 hover:underline">{busy ? '…' : 'دانلود'}</button>
         {!!f.drive_link && <a href={f.drive_link} target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">درایو</a>}
         {/\.html?$/i.test(f.filename || '') && (

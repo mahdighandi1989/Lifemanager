@@ -185,3 +185,20 @@ cap, only from that iframe); the source endpoint answers `text/plain` +
 `Content-Security-Policy: sandbox` + `nosniff` so a direct navigation never runs
 it on the app origin; the sidebar merges installed pages after a named link.
 "Make this a page" becomes one API call (`install-app`) — no commit, no deploy.
+
+## Update 2026-10-08 — "read everything, completely" per format
+
+A reviewer that cannot hear or open a format will quietly skip it unless the
+server makes skipping impossible. What made it complete:
+- extract at upload with a reader per format (legacy Word via the OLE piece
+  table, legacy Excel, RTF, OpenDocument, EPUB in spine order, e-mail WITH its
+  attachments, archives RECURSIVELY with each member through its own reader,
+  and "anything that decodes as text" regardless of extension);
+- audio/video become a verbatim, time-stamped transcript (video: + scene and
+  on-screen text), produced by a multimodal model via its file API, CONTINUED
+  until an explicit end marker so output-token limits cannot cut it short;
+- a `pending` status that is a read debt which opening the bytes does NOT clear
+  (opening audio is not hearing it), and `failed` with the reason when no model
+  exists — so the queue never jams and the reviewer never claims to have heard;
+- the reviewer's CLI converts every image format to one its viewer shows, unpacks
+  archives to disk, and samples video frames, so "look at it" is possible too.

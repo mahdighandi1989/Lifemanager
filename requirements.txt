@@ -49,3 +49,7 @@ google-auth-oauthlib==1.2.1
 # image, and an XLSX upload there returns a clear "use CSV" error instead of 500.
 openpyxl==3.1.5
 pypdf>=4.0.0
+# «نظارت و سرکشی» — every attached format read in full (app/services/inspection_formats.py)
+olefile==0.47
+xlrd==2.0.2
+striprtf==0.0.33

@@ -6,3 +6,6 @@
 # --host <staging>` to validate the tuned connection pool under sustained load.
 # The deterministic concurrency contract is covered by tests/test_database.py.
 locust>=2.31,<3
+
+# Tests: a real Excel-97 (.xls) is written to prove the .xls reader (tests/test_inspection_formats.py)
+xlwt>=1.3

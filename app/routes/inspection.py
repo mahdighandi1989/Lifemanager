@@ -65,6 +65,7 @@ from app.models.inspection import (
 )
 from app.services import inspection_files as ifiles
 from app.services import inspection_drive as idrive
+from app.services import inspection_media as imedia
 from app.services import supervisor_auth
 from app.services.activity_log_service import record_activity
 from app.services.supervisor_rounds import next_full_round, next_round, record_round
@@ -670,8 +671,54 @@ async def delete_file(request: Request, file_id: str, db: AsyncSession = Depends
 @router.get("/api/inspection/storage", dependencies=[Depends(_gate)], tags=["inspection"])
 async def storage_status(db: AsyncSession = Depends(get_db)):
     """Where the sheets' files and pictures live: Drive connected? which folder?
-    how much is still waiting in the database?"""
-    return {"success": True, **await idrive.status(db)}
+    how much is still waiting in the database? — and which model transcribes
+    audio/video (None = attached media cannot be read yet)."""
+    return {"success": True, **await idrive.status(db), "media_model": await imedia.model_name(db)}
+
+
+@router.post("/api/inspection/files/{file_id}/extract", dependencies=[Depends(_gate)], tags=["inspection"])
+async def extract_file(request: Request, file_id: str, db: AsyncSession = Depends(get_db),
+                       user_id: int = Depends(get_optional_user_id)):
+    """(Re)read one attachment with today's readers — and for audio/video (or an
+    archive holding them) produce the FULL transcript. `pull` calls this for every
+    file still `pending`; the page calls it right after a media upload. New text
+    means a new reading duty: the supervisor's read counter starts over."""
+    row = await _file_or_404(db, file_id)
+    try:
+        data = await ifiles.load(db, row)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=410, detail=f"خودِ فایل در دسترس نیست: {exc}"[:300]) from exc
+    ex = ifiles.extract(data, row.filename or "", row.mime or "")
+    status, text, note, truncated = ex["status"], ex["text"] or "", ex["note"], bool(ex.get("truncated"))
+    is_zip = (row.filename or "").lower().endswith(".zip")
+    if status == "pending" and not is_zip:
+        res = await imedia.transcribe(db, data, row.filename or "", row.mime or "")
+        if res["ok"]:
+            status, text, note, truncated = "ok", res["text"], res["note"], res["truncated"]
+        else:
+            # «failed», not «pending»: the reason is written and the sheet can still
+            # be answered (needs-owner) — a permanent debt would jam the queue
+            status, note = "failed", res["note"]
+    elif status == "pending" and is_zip:
+        media = await imedia.transcribe_zip_members(db, data)
+        ok = sum(1 for _, res in media if res["ok"])
+        for name, res in media:
+            text += (f"\n\n===== رونویسیِ کاملِ {name} =====\n" + (res["text"] if res["ok"] else f"[{res['note']}]"))
+            truncated = truncated or bool(res.get("truncated"))
+        status = "ok"
+        note += f" — {ok} از {len(media)} صوت/ویدیوی داخلش کامل رونویسی شد" + (
+            "؛ بقیه: دلیلش در متن آمده" if ok < len(media) else "")
+    changed = text != (row.text or "")
+    row.extract_status, row.extract_note, row.text = status, note, text
+    row.text_chars, row.text_truncated = len(text), truncated
+    if changed:
+        row.read_chars, row.read_at, row.read_by = 0, None, ""
+    await db.commit()
+    await db.refresh(row)
+    r = (await db.execute(select(InspectionReport).where(InspectionReport.id == row.report_id))).scalar_one_or_none()
+    await _log(db, request, user_id, "inspection_file_extract", r,
+               f"«{row.filename}» ← {row.extract_status} ({row.text_chars} نویسه)")
+    return {"ok": True, "success": True, "file": _file_dict(row)}
 
 
 @router.post("/api/inspection/storage/offload", dependencies=[Depends(_gate)], tags=["inspection"])

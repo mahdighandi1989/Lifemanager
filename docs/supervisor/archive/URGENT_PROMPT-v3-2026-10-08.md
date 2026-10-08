@@ -1,14 +1,14 @@
 ---
 name: صفِ فوریِ «نظارت و سرکشی» — Lifemanager
-version: 4
+version: 3
 created: 2026-10-08
 updated: 2026-10-08
-supersedes: docs/supervisor/archive/URGENT_PROMPT-v3-2026-10-08.md
+supersedes: docs/supervisor/archive/URGENT_PROMPT-v2-2026-10-08.md
 archive: docs/supervisor/archive/
 routine: «صفِ فوریِ نظارت و سرکشی — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ روتینِ «صفِ فوری» — نسخهٔ ۴
+# دستورِ روتینِ «صفِ فوری» — نسخهٔ ۳
 
 > **این فایل تنها مرجعِ رفتارِ روتینِ صفِ فوری است.** پرامپتِ خودِ Routine عمداً
 > کوتاه و ثابت است و فقط به این آدرس اشاره می‌کند. هر تغییری **این‌جا** نوشته
@@ -96,7 +96,7 @@ python3 scripts/supervisor/inspection.py urgent
    python3 -c "import fastapi, pytest, pypdf, openpyxl, aiosqlite" 2>/dev/null || \
      { python3 -m pip install -q --ignore-installed cryptography && python3 -m pip install -q -r requirements.txt; }
    [ -d frontend/node_modules ] || (cd frontend && npm ci --no-audit --no-fund)
-   python3 -m pip install -q -r scripts/supervisor/requirements.txt   # Pillow/HEIC، ffmpeg، playwright
+   python3 -c "import playwright" 2>/dev/null || python3 -m pip install -q playwright==1.56.0
    # هرگز `playwright install` نزن — کرومیومِ محیط در /opt/pw-browsers است
    ```
    (`--ignore-installed cryptography`: نسخهٔ debianِ cryptography را pip نمی‌تواند حذف کند و
@@ -114,9 +114,6 @@ python3 scripts/supervisor/inspection.py urgent
    1‑ج. یادداشتی که مالک **ذیلِ** برگه نوشته و کادرِ خودش را دارد، به **همان جای تازه** اشاره
    می‌کند، نه به کادرِ برگهٔ اصلی؛ فایل‌هایش هم مالِ همان یادداشت‌اند. «درخواستِ عمومی» کادر ندارد
    — خواسته‌ای کلی است؛ جای کار را خودت پیدا کن و بنویس کجاست.
-   1‑ج٢. **هر قالبی کامل:** متن و رونویسی‌ها را تا آخر بخوان، تصویرها و فریم‌های ویدیو و صفحه‌های PDF را
-   ببین (جدولِ «هر قالبی، کامل» در `PROMPT.md`). رونویسیِ `failed` ⇒ ادعای شنیدن نکن، `needs-owner`.
-   پیوستی که «الگو» است ⇒ بفهم و خودت بنویس، عیناً کپی نکن.
    1‑د. **پیوستِ HTML ای که باید «صفحه» شود** (یک اپِ مستقل) ⇒ `inspection.py install-app` — فایل را در
    ریپو کپی یا بازنویسی **نکن** (بخشِ «پیوستی که خودش یک صفحه است» در `PROMPT.md`). بررسیِ ایمنیِ Claude Code
    کامیتِ چنین فایلی را همیشه رد می‌کند؛ نصب به‌عنوانِ داده همان نتیجه را بی‌کامیت می‌دهد.

@@ -38,8 +38,19 @@ export const inspectionApi = {
       onUploadProgress: (e) => {
         if (onProgress && e.total) onProgress(Math.round((100 * e.loaded) / e.total));
       },
-    }).then((r) => r.data);
+    }).then((r) => {
+      // audio/video (or an archive holding some): start the FULL transcript now,
+      // in the background — the supervisor's round would otherwise do it later
+      const f = r.data?.file;
+      if (f?.extract_status === 'pending') {
+        api.post(`/inspection/files/${f.id}/extract`, null, { timeout: 30 * 60 * 1000 }).catch(() => {});
+      }
+      return r.data;
+    });
   },
+  /** (Re)read one attachment — today's readers; audio/video → full transcript. */
+  extract: (fileId) => api.post(`/inspection/files/${fileId}/extract`, null, { timeout: 30 * 60 * 1000 })
+    .then((r) => r.data),
   shotUrl: (shotId) => `/inspection/shots/${shotId}`,
   rawUrl: (fileId) => `/inspection/files/${fileId}/raw`,
 };

@@ -105,12 +105,12 @@ def credentials() -> dict:
 
 
 def request(path: str, *, body: bytes | None = None, headers: dict | None = None,
-            method: str = "GET") -> tuple[int, bytes]:
+            method: str = "GET", timeout: float | None = None) -> tuple[int, bytes]:
     c = credentials()
     h = {HEADER: c["token"], **(headers or {})}
     req = urllib.request.Request(f"{c['base']}{path}", data=body, headers=h, method=method)
     try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        with urllib.request.urlopen(req, timeout=timeout or TIMEOUT) as r:
             return r.status, r.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()
