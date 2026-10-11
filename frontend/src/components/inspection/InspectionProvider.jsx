@@ -121,8 +121,13 @@ export default function InspectionProvider({ children }) {
     try {
       const { toJpeg } = await import('html-to-image');
       const el = pageElementsAt(sp.rect.x + sp.rect.w / 2, sp.rect.y + sp.rect.h / 2)[0];
-      const surface = el?.closest?.('[data-report-surface]') || document.querySelector('[data-report-surface]');
-      if (!el || !surface) return;
+      // the box's own surface — or, for the menu/header/footer (outside every
+      // surface), its own ancestors up to the body; never an unrelated surface
+      const surface = el?.closest?.('[data-report-surface]') || document.body;
+      if (!el) {
+        toast('زیرِ این کادر چیزی برای تصویر پیدا نشد — اسکرین‌شاتِ خودت را Ctrl+V کن', 'info', 7000);
+        return;
+      }
       // the largest ancestor of the box that is affordable to rasterise — a
       // 20-megapixel page or a 9000-node subtree can freeze or kill the tab
       const tgt = boundedCaptureTarget(captureChain(el, surface), (n) => ({
@@ -139,6 +144,9 @@ export default function InspectionProvider({ children }) {
       const data = await withDeadline(toJpeg(tgt, {
         quality: 0.82, pixelRatio: ratio, cacheBust: true, backgroundColor: '#ffffff',
         style: { margin: '0' },
+        // never our own layers (the dialog, the dimming, the toasts) — a capture
+        // of the whole page used to photograph the report dialog over it
+        filter: (n) => !(n?.nodeType === 1 && n.hasAttribute?.('data-inspection-layer')),
       }), CAPTURE_DEADLINE_MS);
       if (!data) {
         setShot(null);

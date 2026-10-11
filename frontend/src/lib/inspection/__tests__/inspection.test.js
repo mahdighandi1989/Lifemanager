@@ -9,7 +9,7 @@ import { boxesFor } from '../../../components/inspection/InspectionHighlights';
 import { humanGap, rushMessage } from '../nextRound';
 import { boxInImage, clampCrop, planSize } from '../shots';
 import {
-  boundedCaptureTarget, captureRatio, measureSpot, normalizePath, placeSpot,
+  boundedCaptureTarget, captureChain, captureRatio, measureSpot, normalizePath, placeSpot,
   querySelectorPath, resolveSpot, sheetOnScreen, verifiedSelector, visibleText,
 } from '../spot';
 
@@ -122,6 +122,23 @@ describe('a capture must never kill the tab', () => {
     const chain = ['surface', 'card', 'row'];
     const sizes = { surface: { w: 1200, h: 19000, nodes: 9000 }, card: { w: 1200, h: 800, nodes: 900 }, row: { w: 1200, h: 40, nodes: 5 } };
     expect(boundedCaptureTarget(chain, (t) => sizes[t])).toBe('card');
+  });
+  it('a short bar (the header) still gets a picture when nothing taller is affordable', () => {
+    const chain = ['body', 'layout', 'header', 'input'];
+    const sizes = { body: { w: 1360, h: 2111, nodes: 9000 }, layout: { w: 1360, h: 2111, nodes: 8000 },
+      header: { w: 1339, h: 70, nodes: 40 }, input: { w: 170, h: 30, nodes: 1 } };
+    expect(boundedCaptureTarget(chain, (t) => sizes[t])).toBe('header');
+  });
+  it('the chain is the boxed element\'s OWN ancestors — never an unrelated surface', () => {
+    const mk = (name, parent) => ({ name, tagName: name === 'html' ? 'HTML' : 'DIV', parentElement: parent });
+    const html = mk('html', null);
+    const body = mk('body', html);
+    const surface = mk('surface', body);
+    const aside = mk('aside', body);
+    const link = mk('link', aside);
+    expect(captureChain(link, surface).map((n) => n.name)).toEqual(['body', 'aside', 'link']);
+    const card = mk('card', surface);
+    expect(captureChain(card, surface).map((n) => n.name)).toEqual(['surface', 'card']);
   });
   it('draws an enormous element at less than 1:1', () => {
     expect(captureRatio({ w: 4000, h: 4000 })).toBeLessThan(1);

@@ -878,17 +878,24 @@ function FollowUp({ r, reload }) {
 
 function AuthedImage({ path, caption, good }) {
   const [src, setSrc] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let url = null;
     let alive = true;
-    authedObjectUrl(path).then((u) => { url = u; if (alive) setSrc(u); }).catch(() => {});
+    setFailed(false);
+    // a failed load used to stay a grey placeholder forever, silently
+    authedObjectUrl(path).then((u) => { url = u; if (alive) setSrc(u); }).catch(() => { if (alive) setFailed(true); });
     return () => { alive = false; if (url) URL.revokeObjectURL(url); };
-  }, [path]);
+  }, [path, attempt]);
   return (
     <figure className="max-w-xs">
       {src
         ? <a href={src} target="_blank" rel="noreferrer"><img src={src} alt={caption} className={`rounded border max-w-full ${good ? 'border-emerald-300' : 'border-gray-300'}`} /></a>
-        : <div className="h-16 w-28 animate-pulse rounded bg-gray-100" />}
+        : failed
+          ? <button type="button" onClick={() => setAttempt((n) => n + 1)}
+              className="h-16 w-28 rounded border border-red-200 bg-red-50 text-[10px] text-red-700">تصویر بار نشد — دوباره</button>
+          : <div className="h-16 w-28 animate-pulse rounded bg-gray-100" />}
       <figcaption className={`text-[10px] ${good ? 'text-emerald-700' : 'text-gray-500'}`}>{caption}</figcaption>
     </figure>
   );

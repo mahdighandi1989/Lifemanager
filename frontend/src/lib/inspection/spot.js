@@ -286,11 +286,14 @@ export function boundedCaptureTarget(chain, sizeOf, budget = CAPTURE_MAX_PX, max
     && s.w * s.h <= budget && s.w <= maxSide && s.h <= maxSide
     && s.h >= CAPTURE_MIN_H && (s.nodes ?? 0) <= CAPTURE_MAX_NODES;
   for (const t of chain) if (fits(sizeOf(t))) return t;
+  // nothing tall enough fits: the largest affordable one, however short — a
+  // 70-px header bar is still a picture of the header (sheet 5: a box on the
+  // header got NO picture because every candidate under 160 px was skipped)
   let best = null;
   let bestArea = -1;
   for (const t of chain) {
     const s = sizeOf(t);
-    if (!s || !(s.w > 0) || s.h < CAPTURE_MIN_H) continue;
+    if (!s || !(s.w > 0) || !(s.h > 0)) continue;
     if ((s.nodes ?? 0) > CAPTURE_MAX_NODES) continue;
     const area = s.w * s.h;
     if (area > bestArea) { bestArea = area; best = t; }
@@ -305,15 +308,20 @@ export function captureRatio(size, budget = CAPTURE_MAX_PX, maxSide = CAPTURE_MA
   return Math.min(1, Math.sqrt(budget / (w * h)), maxSide / Math.max(w, h));
 }
 
+/**
+ * The boxed element's OWN ancestors, outermost first, up to `target` (or the
+ * body). Never an element the box is not inside: a box on the side menu or the
+ * header used to fall back to the page's main surface, so the picture showed
+ * the page content instead of what was boxed (sheet 3), or nothing (sheet 5).
+ */
 export function captureChain(el, target) {
   const out = [];
   let cur = el ?? null;
-  while (cur) {
+  while (cur && cur.tagName !== 'HTML') {
     out.push(cur);
     if (cur === target) break;
     cur = cur.parentElement;
   }
-  if (target && !out.includes(target)) out.push(target);
   return out.reverse();
 }
 
