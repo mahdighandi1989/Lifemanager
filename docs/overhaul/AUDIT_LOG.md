@@ -4031,3 +4031,20 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
   ابهامِ واقعیِ خوانایی. چیزی تغییر نکرد (منطقِ مالی حساس).
 - **FINDING** (OPEN_ITEMS ‏۳، ریشه): ‏`GET /auth/me` فقط در `app/routes/auth_google.py` تعریف شده که عمداً mount نیست ⇒ ۴۰۴ روی هر صفحه؛
   `AuthContext` عمداً تحمل می‌کند (کاربر را بیرون نمی‌اندازد) ولی اطلاعاتِ کاربر (is_admin/status) هرگز نمی‌رسد. `/auth/users` هم همین‌طور (OPEN_ITEMS ‏۵). اصلاح = تصمیمِ auth ⇒ پیشنهاد، نه اجرا.
+
+## 2026-10-11 — FINDING + CHANGE: بازبینیِ پس از سقفِ مصرفِ هفتگی — چه ناقص ماند و چه بسته شد
+
+- **FINDING (روتین‌ها، ۸ تا ۱۱ اکتبر):** همهٔ روتین‌های ناظرِ Lifemanager، Detective-1، project-management، trading-system،
+  video-processor و detective اجرا شدند (آخرین اجراها SUCCEEDED). تنها اجرای ازدست‌رفته در این شش پروژه: **دورِ کاملِ
+  ALLIN1 در ۲۰۲۶-۱۰-۱۰** (`USAGE_LIMIT_REACHED`) ⇒ همین امروز دستی اجرا شد (`fire_trigger`).
+- **FINDING (برگهٔ ۳):** دورِ کاملِ ۲۰۲۶-۱۰-۱۱ نصبِ `learning-architecture.html` را نتوانست — classifier ِ اجرای بی‌ناظر
+  `install-app` را رد کرد و برگه `not-done` ماند. **CHANGE:** از نشستِ اصلی نصب شد ⇒ `/apps/learning-architecture` (منوی ابزار، بعد از
+  `/apps/neuro-focus`)؛ سورسِ ۹۶۸٬۶۶۴ بایتی سرو و رندر شد؛ برگهٔ ۳ ⇒ `fixed` با تصویرِ بعد. OPEN_ITEMS ‏#۱۲ بسته.
+- **CHANGE (`ruff.toml`):** `tests/test_lint.py` در کانتینرِ تازهٔ روتین قرمز بود چون ruff ‏0.16 قواعدِ پیش‌فرضش را گسترد (۱۱۹ اخطارِ
+  قدیمی روی فایل‌های دست‌نخورده). قواعدِ کلاسیک `E4,E7,E9,F` پین شد؛ با 0.15.8 و 0.16.8 هر دو سبز. OPEN_ITEMS ‏#۱۱ بسته.
+- **OPEN_ITEMS ‏#۱ و #۲ بسته:** هر دو روتین مخزن دارند و دورِ اول کامل کار کرد (RUNLOG ۲۰۲۶-۱۰-۱۱).
+- **وارسیِ production:** endpoint ِ `…/files/{id}/extract` روی Lifemanager، Detective-1، ALLIN1 و trading-system زنده است (۴۰۱ در برابرِ
+  ۴۰۴/۴۰۵ ِ مسیرِ ساختگی)؛ project-management (`7698099`) طبقِ وضعیتِ دیپلوی روی GitHub موفق؛ video-processor طبقِ RUNLOG ِ دورِ کاملش.
+  `media_model` ِ Lifemanager حالا «Gemini 2.0 Flash» است (کلید گذاشته شده). کلیدِ Gemini روی Render: Detective-1 حالا دارد؛ ALLIN1 و
+  trading-system هنوز در env ندارند (ممکن است در تنظیماتِ داخلی‌شان باشد).
+- گیت: pytest ‏۱۸۴۰ سبز · `npm run build` سبز.
