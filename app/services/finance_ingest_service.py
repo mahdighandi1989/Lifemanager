@@ -88,6 +88,67 @@ async def _pick_account(
     return None
 
 
+async def explain_bank_message(
+    db: AsyncSession,
+    *,
+    user_id: int,
+    channel: str,
+    body: str,
+    sender: Optional[str] = None,
+    occurred_iso: Optional[str] = None,
+) -> dict:
+    """DRY RUN of :func:`apply_bank_message` — the same checks in the same order,
+    and NOTHING written. For the supervisor's read-only finance audit: why did
+    this SMS/email move (or not move) a balance? (2026-10-11, sheet 2.)"""
+    import hashlib as _hashlib
+    import json as _json
+
+    if channel == "sms":
+        from app.services.sms_listener_service import parse_sms
+
+        parsed = parse_sms(body)
+    else:
+        from app.services.email_parser_service import parse_balance
+
+        parsed = parse_balance(body)
+    out = {"parsed_balance": getattr(parsed, "balance", None),
+           "parsed_currency": getattr(parsed, "currency", None),
+           "raw_match": getattr(parsed, "raw_match", None)}
+    if out["parsed_balance"] is None:
+        return {**out, "would_apply": False, "reason": "no balance in text"}
+    msg_ref = "msg:" + _hashlib.sha1(f"{channel}|{sender or ''}|{body}".encode("utf-8")).hexdigest()[:20]
+    seen = (await db.execute(select(Transaction).where(Transaction.source_ref == msg_ref))).scalars().first()
+    account = await _pick_account(db, user_id=user_id, account_id=None,
+                                  sender_hint=f"{sender or ''} {body[:300]}")
+    if account is not None:
+        out.update(account_id=account.id, account_name=account.name, account_currency=account.currency,
+                   account_balance=float(account.balance or 0))
+    if seen is not None:
+        return {**out, "would_apply": False, "reason": "already applied (duplicate message)",
+                "applied_to_account_id": seen.account_id}
+    if account is None:
+        return {**out, "would_apply": False, "reason": "no confident account match"}
+    try:
+        extra = _json.loads(account.extra or "{}")
+    except Exception:
+        extra = {}
+    cur = out["parsed_currency"]
+    if cur and account.currency and cur.upper() != str(account.currency).upper():
+        machine = (extra.get("source") == "email" or extra.get("inferred")) and not extra.get("owner_balance_at")
+        if not machine:
+            return {**out, "would_apply": False, "reason": f"currency mismatch ({cur} ≠ {account.currency})"}
+        out["would_relabel"] = f"{account.currency} → {cur}"
+    last_at = extra.get("last_message_at")
+    if occurred_iso and last_at and str(occurred_iso) < str(last_at):
+        return {**out, "would_apply": False, "reason": "older than the last applied message"}
+    owner_at = extra.get("owner_balance_at")
+    if owner_at and (not occurred_iso or str(occurred_iso) <= str(owner_at)):
+        return {**out, "would_apply": False, "reason": "owner-pinned balance is newer"}
+    if Decimal(str(out["parsed_balance"])) <= 0:
+        return {**out, "would_apply": False, "reason": "non-positive balance refused"}
+    return {**out, "would_apply": True, "reason": ""}
+
+
 async def apply_bank_message(
     db: AsyncSession,
     *,

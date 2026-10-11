@@ -1014,6 +1014,8 @@ app.include_router(places.router, tags=["places"])
 app.include_router(owner_identity.router, tags=["identity-profile"])
 app.include_router(facets.router, tags=["facets"])
 app.include_router(inspection.router, tags=["inspection"])  # «نظارت و سرکشی»
+from app.routes import inspection_audit  # noqa: E402
+app.include_router(inspection_audit.router, tags=["inspection"])  # ناظر: بازبینیِ فقط‌خواندنیِ مالی
 app.include_router(mini_apps.router, tags=["mini-apps"])  # «صفحه‌های افزوده» (HTML ِ مالک به‌عنوانِ داده)
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.
