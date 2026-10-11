@@ -23,6 +23,50 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.finance import FinancialAccount, Transaction
 
 
+# Chat/utility apps are never a bank, whatever their text says (2026-10-11):
+# 318 of 400 «finance» notifications were the owner's TRADING BOT's Telegram
+# status reports («موجودی: $860.86»), and they were aimed at a bank card.
+_NOT_A_BANK = ("telegram", "whatsapp", "signal", "messenger", "instagram", "clock", "gmail", "outlook")
+# A wrapper sender (the SMS app's notification) carries the bank in the text.
+_WRAPPERS = ("messages", "sms", "google messages", "samsung messages")
+_REF_RE = re.compile(r"(?i)(?:ending(?:\s*with)?|card|account|a/c|xx+|\*{2,})\s*[x*]*\s*(\d{3,4})\b")
+
+
+def bank_of(sender: Optional[str], body: str) -> Optional[str]:
+    """The bank a message comes from — or None when it is not a bank at all."""
+    who = (sender or "").strip()
+    if who.lower() in _NOT_A_BANK:
+        return None
+    if who.lower() in _WRAPPERS or not who:
+        head = re.split(r"\s*[|:\n]\s*", (body or "").strip(), maxsplit=1)[0].strip()
+        who = head if 2 <= len(head) <= 40 else ""
+    if not who or who.lower() in _NOT_A_BANK or who.isdigit():
+        return None
+    return who
+
+
+async def _create_from_sms(db, *, user_id, institution, body, balance, currency, occurred_iso):
+    """A bank seen ONLY by SMS gets its card (2026-10-11). Before, only e-mail
+    created cards — banks that never e-mail a statement (Mashreq, BSI, FAB…)
+    had their every SMS refused with «no confident account match»."""
+    import json as _json
+
+    m = _REF_RE.search(body or "")
+    ref = m.group(1) if m else ""
+    acc = FinancialAccount(
+        user_id=(user_id or None), name=f"{institution} ••{ref}" if ref else institution,
+        kind="credit" if re.search(r"(?i)credit\s*card", body or "") else "bank",
+        institution=institution.lower(), currency=currency, balance=Decimal(str(balance)),
+        extra=_json.dumps({"source": "sms", "inferred": True, "ref": ref,
+                           "balance_evidence": f"پیامکِ {institution}",
+                           **({"last_message_at": str(occurred_iso)} if occurred_iso else {})},
+                          ensure_ascii=False),
+    )
+    db.add(acc)
+    await db.flush()
+    return acc
+
+
 async def _pick_account(
     db: AsyncSession,
     *,
@@ -116,6 +160,9 @@ async def explain_bank_message(
            "raw_match": getattr(parsed, "raw_match", None)}
     if out["parsed_balance"] is None:
         return {**out, "would_apply": False, "reason": "no balance in text"}
+    institution = bank_of(sender, body) if channel == "sms" else (sender or "")
+    if channel == "sms" and institution is None:
+        return {**out, "would_apply": False, "reason": "not a bank (chat/utility app)"}
     msg_ref = "msg:" + _hashlib.sha1(f"{channel}|{sender or ''}|{body}".encode("utf-8")).hexdigest()[:20]
     seen = (await db.execute(select(Transaction).where(Transaction.source_ref == msg_ref))).scalars().first()
     account = await _pick_account(db, user_id=user_id, account_id=None,
@@ -127,6 +174,8 @@ async def explain_bank_message(
         return {**out, "would_apply": False, "reason": "already applied (duplicate message)",
                 "applied_to_account_id": seen.account_id}
     if account is None:
+        if channel == "sms" and institution and out["parsed_currency"] and out["parsed_balance"] > 0:
+            return {**out, "would_apply": True, "reason": "", "would_create": institution}
         return {**out, "would_apply": False, "reason": "no confident account match"}
     try:
         extra = _json.loads(account.extra or "{}")
@@ -174,6 +223,9 @@ async def apply_bank_message(
     new_balance = getattr(parsed, "balance", None)
     if new_balance is None:
         return {"matched": False, "balances_updated": 0}
+    institution = bank_of(sender, body) if channel == "sms" else (sender or "")
+    if channel == "sms" and institution is None:
+        return {"matched": False, "balances_updated": 0, "reason": "not a bank (chat/utility app)"}
 
     # Idempotency (2026-07-30): an IMAP redelivery / re-POST of the SAME
     # message used to add a phantom income/expense row forever. The message's
@@ -194,6 +246,16 @@ async def apply_bank_message(
         sender_hint=f"{sender or ''} {body[:300]}",
     )
     if account is None:
+        cur = getattr(parsed, "currency", None)
+        if channel == "sms" and institution and cur and Decimal(str(new_balance)) > 0:
+            acc = await _create_from_sms(db, user_id=user_id, institution=institution, body=body,
+                                         balance=new_balance, currency=cur, occurred_iso=occurred_iso)
+            db.add(Transaction(account_id=acc.id, amount=Decimal(0), transaction_type="income",
+                               description="card opened from sms", currency=cur, source="message",
+                               source_ref=msg_ref, category="_balance_delta"))
+            await db.commit()
+            return {"matched": True, "balances_updated": 1, "account_id": acc.id, "created": True,
+                    "balance": float(new_balance), "delta": 0.0}
         return {"matched": True, "balances_updated": 0, "reason": "no confident account match"}
 
     import json as _json
@@ -296,3 +358,40 @@ async def apply_bank_message(
         "delta": float(delta),
         "affordable_task_ids": affordable,
     }
+
+
+
+async def replay_recent_sms(db: AsyncSession, *, days: int = 60, limit: int = 2000) -> dict:
+    """Apply every finance SMS/notification of the last ``days`` that has not
+    been applied yet, OLDEST FIRST — so the newest balance ends on each card.
+    Idempotent (message hash) and order-safe («older than the last applied»).
+    Bank SMS that arrived before the 2026-10-11 fixes were dropped for good;
+    this gives them their effect without the owner pressing anything."""
+    from datetime import datetime, timedelta, timezone
+
+    from app.models.activity_log import ActivityLog
+
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    rows = (await db.execute(
+        select(ActivityLog).where(ActivityLog.action.in_(("mobile_sms", "mobile_notification")),
+                                  ActivityLog.created_at >= since)
+        .order_by(ActivityLog.id.desc()).limit(limit))).scalars().all()
+    applied = created = 0
+    for lg in reversed(rows):
+        d = lg.detail or ""
+        if not d.startswith("[finance"):
+            continue
+        body = d.split("] ", 1)[1] if "] " in d else d
+        if body.startswith("(") and ") " in body:
+            body = body.split(") ", 1)[1]
+        sender = (lg.entity_label or "").split(" · ")[-1]
+        when = getattr(lg, "occurred_at", None) or lg.created_at
+        try:
+            res = await apply_bank_message(db, user_id=int(lg.user_id or 0), channel="sms", body=body,
+                                           sender=sender, occurred_iso=when.isoformat() if when else None)
+        except Exception:  # noqa: BLE001 — one bad row must not stop the rest
+            await db.rollback()
+            continue
+        applied += int(res.get("balances_updated") or 0)
+        created += int(bool(res.get("created")))
+    return {"scanned": len(rows), "applied": applied, "cards_created": created}

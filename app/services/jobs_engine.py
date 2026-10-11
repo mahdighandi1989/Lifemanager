@@ -215,6 +215,14 @@ async def _job_finance_email_poll(db: AsyncSession) -> dict[str, Any]:
     return {"checked_emails": len(bodies), "balances_updated": updated}
 
 
+async def _job_finance_sms_replay(db: AsyncSession) -> dict[str, Any]:
+    """Bank SMS that did not reach a card get another chance, oldest first —
+    the newest balance always ends on the card (2026-10-11)."""
+    from app.services.finance_ingest_service import replay_recent_sms
+
+    return await replay_recent_sms(db)
+
+
 async def _job_finance_analysis(db: AsyncSession) -> dict[str, Any]:
     """Periodic income/expense/profit-loss review → ONE clear notification,
     fired only when the current month's per-currency totals actually change
@@ -379,6 +387,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_email_poll", "پول‌خوانی ایمیل بانکی (IMAP)",
      lambda: _env_minutes("FINANCE_POLL_INTERVAL_MINUTES", 30.0),
      _job_finance_email_poll),
+    ("finance_sms_replay", "اعمالِ پیامک‌های بانکیِ جامانده (قدیمی→جدید)",
+     lambda: _env_minutes("FINANCE_SMS_REPLAY_INTERVAL_MINUTES", 60.0),
+     _job_finance_sms_replay),
     ("finance_email_scan", "شناساییِ حساب‌ها از ایمیل (خودتغذیه)",
      lambda: _env_minutes("FINANCE_EMAIL_SCAN_INTERVAL_MINUTES", 6 * 60.0),
      _job_finance_email_scan),

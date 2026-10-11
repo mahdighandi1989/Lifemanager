@@ -128,3 +128,41 @@ async def test_an_owner_typed_card_still_refuses_another_currency(db_session):
                                    body="مانده:45,300,000 ريال", occurred_iso="2026-10-11T00:00:00+00:00")
     assert res["balances_updated"] == 0 and res["reason"].startswith("currency mismatch")
     assert acc.currency == "USD"
+
+
+# ── 2026-10-11 (real data): banks seen only by SMS never got a card ─────────────
+@pytest.mark.asyncio
+async def test_a_bank_seen_only_by_sms_gets_its_card_and_the_next_sms_moves_it(db_session):
+    first = await apply_bank_message(
+        db_session, user_id=0, channel="sms", sender="MBANKAlert",
+        body="Purchase of AED 141.04 was made with Card ending XX917. Available Balance: AED 826.78",
+        occurred_iso="2026-10-10T16:59:00+00:00")
+    assert first["balances_updated"] == 1 and first.get("created")
+    nxt = await apply_bank_message(
+        db_session, user_id=0, channel="sms", sender="MBANKAlert",
+        body="Purchase of AED 10.00 was made with Card ending XX917. Available Balance: AED 816.78",
+        occurred_iso="2026-10-10T17:37:00+00:00")
+    assert nxt["balances_updated"] == 1 and not nxt.get("created")
+    acc = await db_session.get(FinancialAccount, first["account_id"])
+    assert float(acc.balance) == 816.78 and acc.currency == "AED" and acc.name == "MBANKAlert ••917"
+
+
+@pytest.mark.asyncio
+async def test_a_trading_bot_on_telegram_never_touches_a_bank_card(db_session):
+    acc = FinancialAccount(user_id=None, name="rakbank ••6039", kind="bank", institution="rakbank",
+                           currency="AED", balance=391.7, extra=json.dumps({"source": "email", "inferred": True}))
+    db_session.add(acc)
+    await db_session.flush()
+    res = await apply_bank_message(db_session, user_id=0, channel="sms", sender="Telegram",
+                                   body="trading-system | 💼 موجودی:      $860.86 | rakbank")
+    assert res["balances_updated"] == 0 and res["reason"] == "not a bank (chat/utility app)"
+    assert float(acc.balance) == 391.7 and acc.currency == "AED"
+
+
+@pytest.mark.asyncio
+async def test_the_sms_app_wrapper_names_the_bank_from_the_text(db_session):
+    res = await apply_bank_message(db_session, user_id=0, channel="sms", sender="Messages",
+                                   body="FAB | FAB: Debit Card Purchase | Card XXXX9091 | AED 163.95 | Balance AED 306.43")
+    assert res.get("created")
+    acc = await db_session.get(FinancialAccount, res["account_id"])
+    assert acc.institution == "fab" and float(acc.balance) == 306.43
