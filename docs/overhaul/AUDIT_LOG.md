@@ -4168,3 +4168,27 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
   (۱۰px سرریزِ افقی از هدرِ خودِ برنامه است و در `/dashboard` هم هست — مالِ این صفحه نیست).
 - **برای مالک:** در تنظیماتِ AI می‌شود برای task ِ `learning_architecture` مدل گذاشت؛ بی‌آن، فقط «پیشنهادِ پرونده/مسئله با AI» پیامِ «مدلی تنظیم نشده» می‌دهد،
   همهٔ داوری‌ها قطعی و بی‌AI کار می‌کنند. اتصال به بخش‌های دیگرِ برنامه را مالک بعداً انجام می‌دهد.
+
+## 2026-10-11 — CHANGE: «معماری یادگیری عمیق» دفترچهٔ راهنمای زنده، دفترِ پیشرفت و دفترِ کارِ خودش را دارد؛ منبعش به ریپو آمد
+- **خواستهٔ مالک:** دفترچه‌ای برای این صفحه که هر تغییر را ثبت کند، نمودار و نقشهٔ اجزا و فلسفه و فهرست داشته باشد، نمودارِ پیشرفت/پسرفت
+  داشته باشد، داخلِ صفحه دیده شود، در GitHub باشد و با فرانت همگام بماند؛ هر نشست/ایجنت/برگهٔ «نظارت و سرکشی» بداند چه کند. الگو:
+  جزوه‌های trading-system و Detective-1. بقیهٔ Lifemanager وارد نشود.
+- **FINDING:** منبعِ برنامه فقط روی دیسکِ نشستِ سازنده بود (در ریپو فقط بستهٔ ساخته‌شده) ⇒ هیچ نشستِ دیگری نمی‌توانست تغییرش دهد.
+  الگوها: Detective-1 جزوه را در برنامه نشان می‌دهد ولی نمودار/فهرستش دستی‌اند و رانش کرده بودند؛ جزوه‌های trading-system فقط در GitHub‌اند.
+- **CHANGE:** `apps/learning-architecture/` — `src/` (منبع)، `build.py` (ساخت + همگام‌سازی + `--check`)، `tools/handbook.py` (تجزیه‌گر/دروازه،
+  سازندهٔ فهرست و نمودار)، `docs/` (HANDBOOK، PROGRESS با ۲۴ رویداد، WORKLOG با ۱۱ بخشِ امضاشده که ۱ تا ۱۰ از رونوشتِ کار **بازسازی** شد؛
+  `docs/audits/`)، `tests/*.js` (آزمون‌های مرورگرِ سازنده)، `sources/`، `AGENTS.md`. ساختِ دوباره **همان نامِ هش‌دارِ بستهٔ مستقر** را داد
+  (`lla.8da1af506d.js` / `lla.25769062e5.css`) ⇒ منبعِ منتقل‌شده = چیزی که الان در production است.
+- **CHANGE (فرانت):** نوارِ «📘 دفترچهٔ راهنما · 📈 نمودارِ پیشرفت · 🗒️ دفترِ کار» در صفحه؛ `?doc=HANDBOOK|PROGRESS|WORKLOG#anchor`؛
+  `components/learning-architecture/HandbookView.jsx` (markdown با `marked`، نمودارهای `mermaid` ِ تنبل‌بار با securityLevel=strict، فهرستِ
+  جست‌وجوپذیر، هر `##` یک `data-report-section` با anchor ِ GitHub)، `ProgressChart.jsx` (نمودارِ بومی از `progress.json`، یک محور، تولتیپ،
+  کارتِ رویداد با پیوند به دفترِ کار)، `lib/llaHandbook.js`. برنامه زیرِ دفترچه سوار می‌ماند. وابستگی‌های تازه: `marked`، `mermaid`.
+- **CHANGE (دروازه):** `tests/test_learning_architecture_handbook.py` — `build.py --check`، قواعدِ دفترها، تستِ «دروازه رانش را می‌گیرد»،
+  برابریِ slug ِ پایتون و فرانت روی همهٔ عنوان‌های واقعی، ثبتِ صفحه.
+- **CHANGE (دستورها):** `CLAUDE.md` (بندِ ثابت + سطرِ نقشه)؛ `docs/supervisor/PROMPT.md` و `URGENT_PROMPT.md` ⇒ v6 (برگه روی این صفحه ⇒
+  `apps/learning-architecture/AGENTS.md`)، v5 بایگانی شد؛ درس: `experiences/living-handbook-generated-from-ledger-with-sync-gate.md`.
+- **FINDING (کوچک):** `tests/scan_epi.js` ِ سازنده هنوز `APP.runCourt` ِ پیش از بازطراحی را صدا می‌زد ⇒ به `runThree` به‌روز شد؛ اسکن: تنها
+  رشتهٔ لاتین ترجمهٔ انگلیسیِ یک حدیث در «مفاهیم» است (نه کد).
+- **VERIFY:** آزمون‌های مرورگرِ سازنده (test، test2، test3، test_epi، test_bt) NO ERRORS؛ Chromium روی سرورِ محلی: ۱۵ بخش، ۳ نمودارِ mermaid
+  بی‌خطا، نمودارِ روند، فهرست ⇒ anchor، پیوندِ PROGRESS.md ⇒ سند، دکمهٔ سند ⇒ بخشِ WORKLOG، بازکردنِ `?doc=HANDBOOK#…` روی همان بخش،
+  بازگشت به برنامه، بی‌خطای کنسول. pytest کامل و `npm run build` سبز (عددها در WORKLOG (11)).

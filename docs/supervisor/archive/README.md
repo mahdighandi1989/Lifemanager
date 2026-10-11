@@ -19,3 +19,4 @@
 (نسخهٔ ۱ ِ هر دو در ۲۰۲۶-۱۰-۰۸ ساخته شد — الگو: Detective-1 `PROMPT` v3 / `URGENT_PROMPT` v10 و
 ALLIN1 `PROMPT` v14 / `URGENT_PROMPT` v6.)
 - `PROMPT-v4-2026-10-11.md` و `URGENT_PROMPT-v4-2026-10-11.md` — پیش از v5: نصبِ پیوستِ HTML به‌عنوانِ صفحه دیگر کارِ روتین نیست (بررسیِ ایمنی دو بار ردش کرد) — کارِ مالک با تیکِ «صفحهٔ جدا شود» هنگامِ پیوست یا دکمهٔ کنارِ فایل؛ روتین فقط می‌سنجد و `needs-owner` می‌دهد.
+- `PROMPT-v5-2026-10-11.md` و `URGENT_PROMPT-v5-2026-10-11.md` — پیش از v6: صفحهٔ `/apps/learning-architecture` حالا منبع و دفترچهٔ زندهٔ خودش را دارد (`apps/learning-architecture/`)؛ برگه‌های آن صفحه طبقِ `AGENTS.md` ِ همان پوشه و با ثبت در WORKLOG/PROGRESS/HANDBOOK ِ خودش رسیدگی می‌شوند (دستورِ مالک ۲۰۲۶-۱۰-۱۱).

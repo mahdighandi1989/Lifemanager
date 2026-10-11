@@ -1,0 +1,216 @@
+"""Build «معماری یادگیری عمیق و کارخانهٔ معرفت‌شناسی» and sync it into the Lifemanager frontend.
+
+    python apps/learning-architecture/build.py           # build + sync (run after ANY change here)
+    python apps/learning-architecture/build.py --check   # merge gate: exit 1 if anything is out of sync
+
+What one run does (deterministic — same sources ⇒ same bytes):
+  1. dist/  (gitignored): artifact.html (claude.ai artifact body), learning-architecture.html
+     (standalone), gas/ (Google Apps Script project) and lla/ (the host bundle).
+  2. docs/HANDBOOK.md: the progress-chart block is regenerated from docs/PROGRESS.md.
+  3. frontend/public/assets/lla/: lla.<hash>.js, lla.<hash>.css, and the three documents +
+     progress.json under docs/ with content-hashed names; stale lla.* files are removed.
+  4. frontend/src/lib/llaBundle.js: the manifest the page imports (names only).
+--check performs 1–4 in memory and lists every difference instead of writing.
+"""
+import hashlib
+import json
+import os
+import re
+import shutil
+import sys
+
+B = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(B, "tools"))
+import handbook as hb  # noqa: E402
+
+REPO = os.path.dirname(os.path.dirname(B))
+A = os.path.join(B, "src", "app")
+TD = os.path.join(B, "src", "tech")
+DOCS = os.path.join(B, "docs")
+D = os.path.join(B, "dist")
+FRONT = os.path.join(REPO, "frontend")
+ASSETS = os.path.join(FRONT, "public", "assets", "lla")
+MANIFEST_JS = os.path.join(FRONT, "src", "lib", "llaBundle.js")
+DOC_NAMES = ["HANDBOOK", "PROGRESS", "WORKLOG"]
+GITHUB = "https://github.com/mahdighandi1989/Lifemanager/blob/main/apps/learning-architecture/docs/"
+
+
+def rd(p):
+    with open(p, encoding="utf-8") as f:
+        return f.read()
+
+
+def h10(s):
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()[:10]
+
+
+def sources():
+    css = rd(os.path.join(A, "style.css"))
+    core = "\n".join(rd(os.path.join(A, f)) for f in ["core.js", "core2.js", "core3.js"])
+    techs = [rd(os.path.join(TD, "t_%s.js" % x)) for x in "abcde"]
+    techs[0] += "\n" + rd(os.path.join(TD, "src_a.js"))
+    techs[1] += "\n" + rd(os.path.join(TD, "src_b.js"))
+    app = "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
+                                                   "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js"])
+    epibook = rd(os.path.join(A, "epi_book.js"))
+    epidata = rd(os.path.join(A, "epi_core.js")) + "\n" + "".join(rd(os.path.join(A, "epi_st_%s.js" % x)) + "\n" for x in "abcd")
+    btfiles = ["epi_feat.js", "epi_rules.js", "epi_cases_a.js", "epi_cases_b.js", "epi_problems.js", "epi_field.js",
+               "epi_blind.js", "epi_engine.js", "epi_bt_core.js"]
+    epibt = "".join(rd(os.path.join(A, f)) + "\n" for f in btfiles)
+    for name, s in [("core", core), ("app", app), ("epibook", epibook), ("epidata", epidata), ("epibt", epibt)] + \
+            [("t%d" % i, t) for i, t in enumerate(techs)]:
+        assert "</script" not in s.lower(), name
+        assert "<?" not in s, name
+    return css, core, techs, app, epibook, epidata, epibt
+
+
+def _scope(css, root=".lla"):
+    """Prefix every selector with the host root; drop dark-mode blocks (the host is light)."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    out, pos = [], 0
+    while pos < len(css):
+        ob = css.find("{", pos)
+        if ob < 0:
+            break
+        sel = css[pos:ob].strip()
+        depth, j = 1, ob + 1
+        while depth and j < len(css):
+            depth += {"{": 1, "}": -1}.get(css[j], 0)
+            j += 1
+        body = css[ob + 1:j - 1]
+        if sel.startswith("@media") and "prefers-color-scheme" in sel:
+            pos = j
+            continue
+        if sel.startswith("@media") or sel.startswith("@supports"):
+            out.append(sel + "{" + _scope(body, root) + "}")
+            pos = j
+            continue
+        if sel.startswith("@"):
+            out.append(sel + "{" + body + "}")
+            pos = j
+            continue
+        if 'data-theme="dark"' in sel:
+            pos = j
+            continue
+        sels = []
+        for x in sel.split(","):
+            x = x.strip()
+            if not x:
+                continue
+            if x in (":root", "html", "body", "html,body"):
+                sels.append(root)
+            elif x == "*":
+                sels.extend([root, root + " *"])
+            elif x.startswith("body "):
+                sels.append(root + " " + x[5:])
+            else:
+                sels.append(root + " " + x)
+        out.append(",".join(sels) + "{" + body + "}")
+        pos = j
+    return "".join(out)
+
+
+def build_dist():
+    """Standalone outputs (artifact / html / Apps Script). Not part of the merge gate."""
+    css, core, techs, app, epibook, epidata, epibt = sources()
+    shutil.rmtree(D, ignore_errors=True)
+    os.makedirs(os.path.join(D, "gas"))
+    title = "معماری یادگیری عمیق و کارخانه معرفت‌شناسی"
+    fonts = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;600;700;800&family=JetBrains+Mono:wght@400&display=swap">')
+    body = '<div id="app" dir="rtl"></div>\n'
+    scripts = ("<script>" + core + "</script>\n" + "".join("<script>" + t + "</script>\n" for t in techs) +
+               "<script>" + epibook + "</script>\n<script>" + epidata + "</script>\n<script>" + epibt + "</script>\n<script>" + app + "</script>\n")
+    w = lambda p, s: open(os.path.join(D, p), "w", encoding="utf-8").write(s)
+    w("artifact.html", "<title>" + title + "</title>\n<meta name=\"description\" content=\"۴۵ تکنیک یادگیری عمیق با کارگاه تمرین، گراف روابط و پروتکل‌ها؛ و کارخانه معرفت‌شناسی بر پایه جزوه مصباح\">\n"
+      + fonts + "\n<style>" + css + "</style>\n" + body + scripts)
+    w("learning-architecture.html", '<!doctype html>\n<html lang="fa" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>'
+      + title + "</title>\n" + fonts + "\n<style>" + css + "</style>\n</head>\n<body>\n" + body + scripts + "</body>\n</html>\n")
+    w("gas/Index.html", '<!doctype html>\n<html lang="fa" dir="rtl">\n<head>\n<base target="_top">\n<meta charset="utf-8">\n' + fonts + "\n<style>" + css
+      + "</style>\n</head>\n<body>\n" + body + "<?!= include('core'); ?>\n" + "".join("<?!= include('tech_%s'); ?>\n" % x for x in "abcde")
+      + "<?!= include('epi_book'); ?>\n<?!= include('epi_data'); ?>\n<?!= include('epi_bt'); ?>\n<?!= include('app'); ?>\n</body>\n</html>\n")
+    w("gas/core.html", "<script>\n" + core + "\n</script>\n")
+    for x, t in zip("abcde", techs):
+        w("gas/tech_%s.html" % x, "<script>\n" + t + "\n</script>\n")
+    for n, s in [("app", app), ("epi_book", epibook), ("epi_data", epidata), ("epi_bt", epibt)]:
+        w("gas/%s.html" % n, "<script>\n" + s + "\n</script>\n")
+    w("gas/EpiBacktest.gs", "/* ساخته‌شده از src/app/epi_*.js — دستی ویرایش نکن. */\nfunction epiDefine_() {\nvar window = globalThis;\n" + epibt + "\n}\n" + rd(os.path.join(A, "EpiServer.gs")))
+    shutil.copy(os.path.join(A, "Code.gs"), os.path.join(D, "gas", "Code.gs"))
+    shutil.copy(os.path.join(A, "README.md"), os.path.join(D, "gas", "README.md"))
+    json.dump({"timeZone": "Asia/Dubai", "dependencies": {}, "exceptionLogging": "STACKDRIVER", "runtimeVersion": "V8",
+               "webapp": {"executeAs": "USER_DEPLOYING", "access": "MYSELF"}}, open(os.path.join(D, "gas", "appsscript.json"), "w"), indent=2)
+    shutil.make_archive(os.path.join(D, "learning-architecture-gas"), "zip", os.path.join(D, "gas"))
+
+
+def plan():
+    """Everything the sync writes, as {absolute path: text}, plus the doc problems."""
+    css, core, techs, app, epibook, epidata, epibt = sources()
+    lla_js = core + "\n" + "\n".join(techs) + "\n" + epibook + "\n" + epidata + "\n" + epibt + "\n" + app
+    lla_css = (_scope(css) + "\n.lla{min-height:70vh;font-family:var(--f-body);color:var(--ink);background:var(--paper)}\n"
+               ".lla .app{min-height:70vh}\n")
+    docs = {n: rd(os.path.join(DOCS, n + ".md")) for n in DOC_NAMES}
+    rows, entries, _ = hb.validate(docs["HANDBOOK"], docs["PROGRESS"], docs["WORKLOG"])
+    docs["HANDBOOK"] = hb.regenerate(docs["HANDBOOK"], rows)
+    _, _, problems = hb.validate(docs["HANDBOOK"], docs["PROGRESS"], docs["WORKLOG"])
+    files = {os.path.join(DOCS, "HANDBOOK.md"): docs["HANDBOOK"]}
+    manifest = {"js": "lla.%s.js" % h10(lla_js), "css": "lla.%s.css" % h10(lla_css), "docs": {}, "github": GITHUB}
+    files[os.path.join(ASSETS, manifest["js"])] = lla_js
+    files[os.path.join(ASSETS, manifest["css"])] = lla_css
+    pj = hb.progress_json(rows, entries)
+    for name, text in list(docs.items()) + [("progress", pj)]:
+        ext = "json" if name == "progress" else "md"
+        fn = "docs/%s.%s.%s" % (name, h10(text), ext)
+        manifest["docs"][name] = fn
+        files[os.path.join(ASSETS, fn)] = text
+    files[MANIFEST_JS] = ("/**\n * The built bundle + documents of «معماری یادگیری عمیق و کارخانه معرفت‌شناسی», served from\n"
+                         " * public/assets/lla/. Content-hashed names: a new build is never served stale.\n"
+                         " * GENERATED by apps/learning-architecture/build.py — do not edit by hand.\n */\n"
+                         "export const LLA_BUNDLE = " + json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + ";\n")
+    return files, problems
+
+
+def existing_generated():
+    out = set()
+    for root, _, names in os.walk(ASSETS):
+        for n in names:
+            out.add(os.path.join(root, n))
+    return out
+
+
+def check():
+    files, problems = plan()
+    for p, text in files.items():
+        rel = os.path.relpath(p, REPO)
+        if not os.path.exists(p):
+            problems.append("missing generated file %s — run: python apps/learning-architecture/build.py" % rel)
+        elif rd(p) != text:
+            problems.append("out of date: %s — run: python apps/learning-architecture/build.py" % rel)
+    for p in sorted(existing_generated() - set(files)):
+        problems.append("stale file %s (not produced by the current sources) — run the build" % os.path.relpath(p, REPO))
+    return problems
+
+
+def sync():
+    files, problems = plan()
+    for p in existing_generated() - set(files):
+        os.remove(p)
+    for p, text in files.items():
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        if not os.path.exists(p) or rd(p) != text:
+            with open(p, "w", encoding="utf-8") as f:
+                f.write(text)
+    return files, problems
+
+
+if __name__ == "__main__":
+    if "--check" in sys.argv:
+        probs = check()
+        print("\n".join(probs) if probs else "learning-architecture: sources, bundle and handbook are in sync")
+        sys.exit(1 if probs else 0)
+    build_dist()
+    files, probs = sync()
+    m = json.loads(rd(MANIFEST_JS).split("= ", 1)[1].rstrip(";\n"))
+    print("bundle", m["js"], m["css"], "docs", ", ".join(m["docs"].values()))
+    if probs:
+        print("DOCUMENTATION PROBLEMS (the merge gate will fail until fixed):\n  " + "\n  ".join(probs))
+        sys.exit(1)

@@ -48,6 +48,17 @@ Treat every change as a production change.
     owner. Never push to a branch you weren't told to.
 - **Commits:** `type(scope): summary` — small, one concern, reversible; merge only when
   verified-green. Do not include model identifiers or session URLs in commit messages.
+- **`/apps/learning-architecture` («معماری یادگیری عمیق و کارخانهٔ معرفت‌شناسی») — scoped page with its OWN
+  handbook (owner 2026-10-11, standing).** Everything about it lives in `apps/learning-architecture/`:
+  source (`src/`), build (`build.py`), and three living documents in `docs/` — `HANDBOOK.md` (philosophy,
+  component map, how to use it, decisions, open items), `PROGRESS.md` (trend ledger → the progress chart),
+  `WORKLOG.md` (signed, append-only). The owner reads the same files on GitHub and inside the page
+  («📘 دفترچهٔ راهنما» button, `?doc=`). **Before touching this page — including any «نظارت و سرکشی» sheet
+  on it — read `apps/learning-architecture/AGENTS.md` and follow it:** edit only the source, never the
+  bundle in `frontend/public/assets/lla/`; run `python apps/learning-architecture/build.py`; add a WORKLOG
+  entry (+ PROGRESS row if it moved forward/back, + handbook section). `tests/test_learning_architecture_handbook.py`
+  fails the merge gate on any drift. **Scope:** nothing from the rest of Lifemanager goes into that
+  handbook or page (the rest is still in flux); the owner will wire connections himself later.
 
 ## What this system is
 
@@ -105,6 +116,7 @@ in `main.py` AND an alembic migration.**
 | Docs map / inventories | `docs/` (`ARCHITECTURE_INVENTORY.md`, `API.md`), `docs/overhaul/` (audit log + ledgers) |
 | Binding lessons | `experiences/` (format in its README — merge, don't replace) |
 | Decision reports | `docs/decisions/` (root `decision_*.md` is gitignored) |
+| `/apps/learning-architecture` page (source, build, its own handbook/progress/worklog) | `apps/learning-architecture/` (start at its `AGENTS.md`); host: `frontend/src/pages/LearningArchitecturePage.jsx`, `frontend/src/components/learning-architecture/`; data: `app/routes/app_records.py` |
 
 ## Conventions
 

@@ -1,14 +1,14 @@
 ---
 name: صفِ فوریِ «نظارت و سرکشی» — Lifemanager
-version: 5
+version: 6
 created: 2026-10-08
 updated: 2026-10-11
-supersedes: docs/supervisor/archive/URGENT_PROMPT-v4-2026-10-11.md
+supersedes: docs/supervisor/archive/URGENT_PROMPT-v5-2026-10-11.md
 archive: docs/supervisor/archive/
 routine: «صفِ فوریِ نظارت و سرکشی — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ روتینِ «صفِ فوری» — نسخهٔ ۵
+# دستورِ روتینِ «صفِ فوری» — نسخهٔ ۶
 
 > **این فایل تنها مرجعِ رفتارِ روتینِ صفِ فوری است.** پرامپتِ خودِ Routine عمداً
 > کوتاه و ثابت است و فقط به این آدرس اشاره می‌کند. هر تغییری **این‌جا** نوشته
@@ -149,6 +149,10 @@ python3 scripts/supervisor/inspection.py urgent
    شد — یک مدخلِ `CHANGE` در انتهای `docs/overhaul/AUDIT_LOG.md` (قانونِ ۵)؛ درسِ قابلِ‌استفادهٔ
    مجدد ⇒ `experiences/` (ادغام، نه جایگزینی). امضا: `ناظرِ خودکار (Claude Code routine)` — بدونِ
    نامِ مدل. این ثبت‌ها را هم با `ship.sh` بفرست.
+
+**برگه روی `/apps/learning-architecture`** (برنامه یا دفترچهٔ راهنمای خودش، v6): پیش از هر تغییر
+`apps/learning-architecture/AGENTS.md` را بخوان و اجرا کن — منبع نه بسته، `build.py`، و ثبت در `apps/learning-architecture/docs/`
+(WORKLOG ِ امضاشده، PROGRESS اگر جلو/عقب رفت، HANDBOOK). قاعدهٔ کامل: بخشِ «برگه‌ای روی معماری یادگیری عمیق» در `docs/supervisor/PROMPT.md`.
 
 ## ۴) بعد از جواب
 

@@ -1,14 +1,14 @@
 ---
 name: ناظرِ خودکارِ Lifemanager (Automated Supervisor)
-version: 5
+version: 6
 created: 2026-10-08
 updated: 2026-10-11
-supersedes: docs/supervisor/archive/PROMPT-v4-2026-10-11.md
+supersedes: docs/supervisor/archive/PROMPT-v5-2026-10-11.md
 archive: docs/supervisor/archive/
 routine: «ناظرِ خودکارِ سامانه — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۵
+# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۶
 
 > **این فایل تنها مرجعِ رفتارِ ناظر است.** پرامپتِ خودِ Routine فقط یک اشاره به
 > این آدرس است. هر تغییری در وظایفِ ناظر **این‌جا** نوشته می‌شود؛ نسخهٔ قبلی
@@ -213,6 +213,21 @@ print(json.dumps(api('/api/inspection/audit/finance?days=30'), ensure_ascii=Fals
 «اجرای خشک»: چه موجودی‌ای خوانده شد، کدام کارت، اعمال می‌شد یا نه و **چرا**. برگه‌ای که می‌گوید «این عدد غلط است» را **با همین داده**
 جواب بده، نه با حدس؛ هیچ عددِ مالی را در ریپو/گزارشِ عمومی ننویس (فقط در جوابِ زیرِ برگه، تا حدی که لازم است).
 
+### برگه‌ای روی «معماری یادگیری عمیق» (`/apps/learning-architecture…`) — دفترچهٔ خودش را دارد (v6، ۲۰۲۶-۱۰-۱۱، دستورِ مالک)
+
+این صفحه منبع، ساخت و **دفترچهٔ راهنمای زندهٔ خودش** را دارد: `apps/learning-architecture/` (HANDBOOK + PROGRESS + WORKLOG در
+`docs/`، همان چیزی که مالک در گیت‌هاب و با دکمهٔ «📘 دفترچهٔ راهنما» داخلِ صفحه می‌بیند). برای هر برگه‌ای که نشانیِ بازگشتش
+`/apps/learning-architecture` است (چه روی برنامه `?tab=…`، چه روی دفترچه `?doc=…#…`):
+1. **اول `apps/learning-architecture/AGENTS.md` را بخوان و مو‌به‌مو اجرا کن.** `section_id` ِ کادر می‌گوید منبع کجاست (نمای برنامه ⇒
+   `src/app/`؛ anchor ِ دفترچه ⇒ `docs/HANDBOOK.md`؛ `progress-chart` ⇒ `docs/PROGRESS.md`).
+2. هرگز بستهٔ `frontend/public/assets/lla/` را دستی ویرایش نکن؛ منبع ⇒ `python apps/learning-architecture/build.py`.
+3. ثبت **علاوه بر** ثبت‌های همیشگیِ بخشِ ۴: یک بخشِ امضاشده در `apps/learning-architecture/docs/WORKLOG.md`، سطرِ PROGRESS اگر صفحه
+   جلو/عقب رفت، و بخشِ مربوطِ HANDBOOK. جوابِ زیرِ برگه شمارهٔ WORKLOG را بگوید.
+4. دروازه: `tests/test_learning_architecture_handbook.py` (داخلِ همان pytest ِ قانونِ ۴) — قرمز یعنی ناهمگامی؛ با `build.py` درست کن، تست را دست نزن.
+5. سه اصلِ ثابتِ صفحه (دفترچه §۱): متنِ جزوه دست نمی‌خورد؛ AI در داوری نقشی ندارد؛ هیچ قاعده/وزنی برای سبز کردنِ یک واقعه عوض نمی‌شود.
+   برگه‌ای که یکی از این‌ها را بشکند ⇒ انجام نده، `needs-owner` با دلیل.
+6. **دامنه:** چیزی از بقیهٔ برنامه به این صفحه/دفترچه وصل نکن مگر برگه صریحاً همین را بخواهد.
+
 ### ۰-ب-۲) خواندنِ خواسته — جایی که ناظرها در عمل شکست خوردند
 
 مالکِ ALLIN1 (۲۰۲۶‑۰۹‑۳۰): «چندین مورد … مربوط به **نوع عملکرد در رسیدگی به کاری بود که بهش
@@ -383,6 +398,7 @@ pytest و build **گیتِ ادغام**اند — قرمزی = بالاترین 
 | `docs/supervisor/INVENTORY.md` + `inventory.json` + `page_map.json` | بازتولیدشده در همین اجرا |
 | `docs/overhaul/AUDIT_LOG.md` | قانونِ ۵ — هر یافته/تصمیم/تغییر/برگشت، تاریخ‌دار و نوع‌دار |
 | `experiences/` | هر درسِ قابلِ استفادهٔ مجدد (قالب در README همان پوشه؛ ادغام، نه جایگزینی) |
+| `apps/learning-architecture/docs/` | فقط وقتی کار روی `/apps/learning-architecture` بود: WORKLOG (امضاشده) + PROGRESS + HANDBOOK — `apps/learning-architecture/AGENTS.md` |
 
 امضا: `ناظرِ خودکار (Claude Code routine)` — بدونِ نامِ مدل. همهٔ این‌ها را هم با `ship.sh` بفرست.
 

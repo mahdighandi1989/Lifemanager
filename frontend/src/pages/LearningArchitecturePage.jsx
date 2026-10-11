@@ -11,8 +11,14 @@
  *     (`?tab=<view>&a=<arg>&s=<sub>`), so a sheet's «reopen» lands on the same spot;
  *   • its AI critic goes through Lifemanager's own AI layer (task
  *     «learning_architecture»), never with a provider key in the browser.
- * The app itself is a vanilla-JS bundle built from its own sources
- * (public/assets/lla/*, see lib/llaBundle.js), styled under `.lla` only.
+ * The app itself is a vanilla-JS bundle built from its own sources in
+ * apps/learning-architecture/src (public/assets/lla/*, see lib/llaBundle.js),
+ * styled under `.lla` only. NEVER edit the bundle — edit the source and run
+ * `python apps/learning-architecture/build.py` (see apps/learning-architecture/AGENTS.md).
+ *
+ * «📘 دفترچهٔ راهنما» (`?doc=HANDBOOK|PROGRESS|WORKLOG#anchor`) shows the page's
+ * handbook, progress ledger and work log — the same files as on GitHub — while
+ * the app stays mounted (hidden) underneath, so closing it returns to the same spot.
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -20,6 +26,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { LLA_BUNDLE } from '../lib/llaBundle';
 import MiniAppPage from './MiniAppPage';
+import HandbookView from '../components/learning-architecture/HandbookView';
 
 const APP = 'learning-architecture';
 const BASE = `/apps/${APP}`;
@@ -58,7 +65,11 @@ export default function LearningArchitecturePage() {
   const mount = useRef(null);
   const [err, setErr] = useState('');
   const [ready, setReady] = useState(false);
-  const legacy = new URLSearchParams(location.search).get('legacy') === '1';
+  const query = new URLSearchParams(location.search);
+  const legacy = query.get('legacy') === '1';
+  const doc = ['HANDBOOK', 'PROGRESS', 'WORKLOG'].includes(query.get('doc')) ? query.get('doc') : '';
+  const hash = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+  const appQuery = useRef('');
   const navRef = useRef(navigate);
   navRef.current = navigate;
 
@@ -103,9 +114,23 @@ export default function LearningArchitecturePage() {
 
   // back/forward, or «نظارت و سرکشی» reopening a sheet: follow the URL
   useEffect(() => {
-    if (legacy || !ready || !window.APP || !window.APP.goFromURL) return;
+    if (legacy || doc || !ready || !window.APP || !window.APP.goFromURL) return;
+    appQuery.current = location.search;
     window.APP.goFromURL(readQuery(location.search));
-  }, [location.search, ready, legacy]);
+  }, [location.search, ready, legacy, doc]);
+
+  const openDoc = (key, anchor) => navigate(`${BASE}?doc=${key}${anchor ? `#${encodeURIComponent(anchor)}` : ''}`);
+  const closeDoc = () => {
+    let back = appQuery.current || '';
+    const st = window.APP && window.APP.state;
+    if (!back && st && st.view) {
+      const q = new URLSearchParams({ tab: st.view });
+      if (st.arg != null) q.set('a', String(st.arg));
+      if (st.sub) q.set('s', st.sub);
+      back = `?${q.toString()}`;
+    }
+    navigate(`${BASE}${back}`);
+  };
 
   if (legacy) {
     return (
@@ -121,9 +146,23 @@ export default function LearningArchitecturePage() {
 
   return (
     <div dir="rtl" data-testid="learning-architecture-page">
+      <div className="mb-2 flex flex-wrap items-center gap-2 text-sm" data-report-section="lla-toolbar" data-report-section-label="نوارِ بالای صفحه (دفترچه)">
+        <button type="button" onClick={() => (doc ? closeDoc() : openDoc('HANDBOOK'))}
+          className={`rounded-lg border px-3 py-1.5 font-medium ${doc ? 'border-sky-300 bg-sky-50 text-sky-800' : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}>
+          {doc ? '↩ بازگشت به برنامه' : '📘 دفترچهٔ راهنما'}
+        </button>
+        {!doc && (
+          <>
+            <button type="button" onClick={() => openDoc('PROGRESS')} className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 hover:bg-gray-50">📈 نمودارِ پیشرفت</button>
+            <button type="button" onClick={() => openDoc('WORKLOG')} className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 hover:bg-gray-50">🗒️ دفترِ کار</button>
+            <span className="text-[12px] text-gray-500">چیست، چرا، چطور کار می‌کند، و چه سیری داشته</span>
+          </>
+        )}
+      </div>
+      {doc && <HandbookView doc={doc} hash={hash} onDoc={openDoc} onClose={closeDoc} />}
       {err && <div className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700 mb-3">{err}</div>}
-      {!ready && !err && <div className="p-10 text-center text-sm text-gray-500">در حالِ بارگذاری…</div>}
-      <div className="lla rounded-xl overflow-hidden border border-gray-200">
+      {!ready && !err && !doc && <div className="p-10 text-center text-sm text-gray-500">در حالِ بارگذاری…</div>}
+      <div className="lla rounded-xl overflow-hidden border border-gray-200" style={doc ? { display: 'none' } : undefined}>
         <div id="app" dir="rtl" ref={mount} />
       </div>
       <p className="text-[11px] text-gray-400 mt-2">
