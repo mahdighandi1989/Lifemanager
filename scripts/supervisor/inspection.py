@@ -296,6 +296,20 @@ def notes_block(r: dict, prefix: str) -> list[str]:
     return lines
 
 
+_APPS: dict | None = None
+
+
+def _installed_apps() -> dict:
+    """source_file_id → installed page path (fetched once per run)."""
+    global _APPS
+    if _APPS is None:
+        try:
+            _APPS = {a.get("source_file_id"): a.get("path") for a in api("/api/mini-apps").get("apps") or []}
+        except Exception:  # noqa: BLE001 — the brief still lists the file
+            _APPS = {}
+    return _APPS
+
+
 def files_block(r: dict) -> list[str]:
     if not r.get("files"):
         return []
@@ -308,6 +322,12 @@ def files_block(r: dict) -> list[str]:
                      f"{f.get('extract_label') or got['status']}) — مالِ {owner}")
         if f.get("caption"):
             lines.append(f"  - توضیحِ مالک: {f['caption']}")
+        if re.search(r"\.html?$", f.get("filename") or "", re.I):
+            page = _installed_apps().get(f.get("id"))
+            lines.append(f"  - 🧩 **به‌عنوانِ صفحه نصب است:** `{page}` — اگر برگه همین را خواسته، فقط بسنج و جواب بده" if page else
+                         "  - 🧩 به‌عنوانِ صفحه نصب **نیست** — اگر برگه «صفحه شدن» خواسته: خودت `install-app` نزن "
+                         "(اجرای بی‌ناظر را بررسیِ ایمنی رد می‌کند)؛ `needs-owner` با یک جمله: «کنارِ فایل ⇒ «نصب به‌عنوانِ صفحه»، "
+                         "یا هنگامِ پیوست تیکِ «صفحهٔ جدا شود»»")
         if got["path"]:
             lines.append(f"  - محتوا: `{got['path']}`" + (f" — {got['chars']} نویسه" if got["chars"] else ""))
         if got["raw_path"] and got["raw_path"] != got["path"]:

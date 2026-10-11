@@ -33,7 +33,8 @@ import { everyText, fa, humanGap, localClock, rushMessage } from '../lib/inspect
 import { shrinkShot } from '../lib/inspection/shots';
 import { geometryLabel } from '../lib/inspection/spot';
 import { toast } from '../lib/inspection/toast';
-import { MINI_APPS_EVT, miniAppsApi } from '../lib/miniApps';
+import { MINI_APPS_EVT, installUploaded, miniAppsApi } from '../lib/miniApps';
+import HtmlPageToggle from '../components/inspection/HtmlPageToggle';
 
 // The page's own sub-pages — in the `TABS` convention, so the live inventory
 // (and the supervisor) discover them exactly like every other hub's tabs.
@@ -412,7 +413,11 @@ function GeneralRequest({ onDone }) {
       for (const f of files) {
         try {
           setPct({ name: f.name, pct: 0 });
-          await inspectionApi.upload(report.id, f, { onProgress: (p) => setPct({ name: f.name, pct: p }) });
+          const up = await inspectionApi.upload(report.id, f, { onProgress: (p) => setPct({ name: f.name, pct: p }) });
+          if (up?.file?.id && f.lmAsPage) {
+            try { const app = await installUploaded(up.file.id, f.name); toast.success(`صفحهٔ جدا نصب شد: ${app.path} — در منوی «ابزار»`); }
+            catch (e) { failed.push(`${f.name}: نصب به‌عنوانِ صفحه نشد (${apiError(e)}) — دکمهٔ «نصب به‌عنوانِ صفحه» کنارِ فایل`); }
+          }
         } catch (e) { failed.push(`${f.name} (${apiError(e)})`); }
       }
       setPct(null);
@@ -472,6 +477,7 @@ function FilePicker({ files, setFiles, shot, setShot, pct }) {
         <div key={`${f.name}-${i}`} dir="rtl" className="flex items-center gap-2 rounded-md bg-gray-50 px-2 py-1 text-[11px] text-gray-700">
           <span className="truncate">{f.name}</span>
           <span className="text-gray-400">{(f.size / (1024 * 1024)).toFixed(1)} مگابایت</span>
+          <HtmlPageToggle file={f} onChange={() => setFiles((p) => [...p])} />
           <span className="flex-1" />
           <button type="button" className="text-red-600" onClick={() => setFiles((p) => p.filter((_, j) => j !== i))}>×</button>
         </div>
@@ -840,6 +846,10 @@ function FollowUp({ r, reload }) {
           setPct({ name: f.name, pct: 0 });
           const up = await inspectionApi.upload(r.id, f, { onProgress: (p) => setPct({ name: f.name, pct: p }) });
           if (up?.file?.id) ids.push(up.file.id);
+          if (up?.file?.id && f.lmAsPage) {
+            try { const app = await installUploaded(up.file.id, f.name); toast.success(`صفحهٔ جدا نصب شد: ${app.path} — در منوی «ابزار»`); }
+            catch (e) { failed.push(`${f.name}: نصب به‌عنوانِ صفحه نشد (${apiError(e)}) — دکمهٔ «نصب به‌عنوانِ صفحه» کنارِ فایل`); }
+          }
         } catch (e) { failed.push(`${f.name} (${apiError(e)})`); }
       }
       setPct(null);

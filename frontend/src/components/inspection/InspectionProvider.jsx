@@ -30,6 +30,8 @@ import {
   verifiedSelector, withDeadline,
 } from '../../lib/inspection/spot';
 import { TOAST_EVT, toast } from '../../lib/inspection/toast';
+import { installUploaded } from '../../lib/miniApps';
+import HtmlPageToggle from './HtmlPageToggle';
 
 const Ctx = createContext(null);
 export const useInspection = () => useContext(Ctx);
@@ -240,6 +242,7 @@ export default function InspectionProvider({ children }) {
       // the other files, and the owner is told exactly which one did not go up
       const failed = [];
       const uploaded = [];
+      const installed = [];
       for (const f of picked) {
         try {
           setUpPct({ name: f.name, pct: 0 });
@@ -247,8 +250,13 @@ export default function InspectionProvider({ children }) {
             onProgress: (pct) => setUpPct({ name: f.name, pct }),
           });
           if (up?.file?.id) uploaded.push(up.file.id);
+          if (up?.file?.id && f.lmAsPage) {
+            try { installed.push((await installUploaded(up.file.id, f.name)).path); }
+            catch (e) { failed.push(`${f.name}: نصب به‌عنوانِ صفحه نشد (${apiError(e)}) — دکمهٔ «نصب به‌عنوانِ صفحه» کنارِ فایل`); }
+          }
         } catch (e) { failed.push(`${f.name} (${apiError(e)})`); }
       }
+      if (installed.length) toast.success(`صفحهٔ جدا نصب شد: ${installed.join('، ')} — در منوی «ابزار»`);
       setUpPct(null);
       if (under) {
         // the follow-up carries its OWN box and picture, and claims only the
@@ -408,6 +416,7 @@ export default function InspectionProvider({ children }) {
                     className="flex items-center gap-2 rounded-md bg-gray-50 px-2 py-1 text-[11px] text-gray-700">
                     <span className="truncate">{f.name}</span>
                     <span className="text-gray-400">{(f.size / (1024 * 1024)).toFixed(1)} مگابایت</span>
+                    <HtmlPageToggle file={f} onChange={() => setPicked((prev) => [...prev])} />
                     <span className="flex-1" />
                     <button type="button" title="برداشتن" className="text-red-600 hover:underline"
                       onClick={() => setPicked((prev) => prev.filter((_, j) => j !== i))}>×</button>

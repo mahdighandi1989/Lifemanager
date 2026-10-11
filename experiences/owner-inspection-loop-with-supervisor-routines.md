@@ -216,3 +216,21 @@ server makes skipping impossible. What made it complete:
   the in-product one-click install button.
 - **Fresh containers drift:** a globally installed linter with no project config turns a skip-if-missing lint test
   red. Pin it or ship its config; until then deselect and say so.
+
+## Update 2026-10-11 — an unattended agent must not be the one that PUBLISHES an attachment as a running page
+
+Two sheets in a row (1 and 3) asked «make this attached HTML a page». Turning the install into a data
+operation (`install-app` → served from storage in a sandboxed iframe, no commit) was not enough: the
+unattended routine's safety check also refuses *publishing* an untrusted attachment as a live page, so
+the routine answered `not-done` and the owner was left with the work — while the same command run from
+the attended session went through. The fix is to move the act to the person who owns the file:
+
+- the attach dialog offers «صفحهٔ جدا شود» next to each HTML file; ticked ⇒ the owner's own browser
+  installs it right after the upload (`installUploaded`), placed after the last installed page;
+- the reviewer's brief marks each HTML file «🧩 installed at /apps/…» or «not installed»;
+- the reviewer only VERIFIES an installed page (and wires it in with its own code later); when it is not
+  installed it answers `needs-owner` with the one-click instruction and never retries the install.
+
+**Lesson:** when an automated reviewer is refused an action for safety reasons, don't look for a
+different command that does the same thing — put the action where the authority is (the owner's click)
+and give the reviewer the job of checking it.

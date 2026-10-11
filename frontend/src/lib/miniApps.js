@@ -22,6 +22,29 @@ export const miniAppsApi = {
 };
 
 export const MINI_APPS_EVT = 'lm:mini-apps-changed';
+
+/** An HTML file the owner can turn into a page while attaching it. */
+export const isHtmlFile = (f) => /\.html?$/i.test(f?.name || f?.filename || '') || (f?.type || '').startsWith('text/html');
+
+/**
+ * Install an uploaded attachment as a page — the OWNER's own action, done the
+ * moment the file goes up («این فایل صفحه شود» ticked). The unattended review
+ * routine is never the one that installs: its safety check refuses publishing
+ * an attachment as a running page (sheets 1 and 3), so the owner's tick is the
+ * install and the routine only verifies and wires it in.
+ * Placed right after the last installed page (else after «/import»).
+ */
+export async function installUploaded(fileId, filename) {
+  const title = (filename || '').replace(/\.html?$/i, '').replace(/[-_]+/g, ' ').trim() || 'صفحهٔ افزوده';
+  let after = '/import';
+  try {
+    const apps = await miniAppsApi.list();
+    if (apps.length) after = apps[apps.length - 1].path;
+  } catch { /* the default place is fine */ }
+  const app = await miniAppsApi.install({ file_id: fileId, title, after });
+  window.dispatchEvent(new Event(MINI_APPS_EVT));
+  return app;
+}
 const MAX_STORE_CHARS = 20000;
 
 export const storeKey = (slug) => `lm.miniapp.${slug}`;
