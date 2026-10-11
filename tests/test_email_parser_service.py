@@ -51,3 +51,11 @@ def test_bank_sms_balance_words_are_read(text, balance, currency):
 def test_the_new_words_do_not_turn_prose_into_money():
     assert parse_balance("work-life balance 10 tips").balance is None
     assert parse_balance("global market update").balance is None
+
+
+def test_a_unitless_balance_takes_the_only_currency_the_message_names():
+    r = parse_balance("Dear Customer,AED 1000.00 has been Credited to your account XXXXXX000001. "
+                      "Available balance is 1014.82")
+    assert r.balance == 1014.82 and r.currency == "AED"
+    # two currencies in the text ⇒ no guess
+    assert parse_balance("Paid USD 5 and AED 3. Balance 100.50").currency is None

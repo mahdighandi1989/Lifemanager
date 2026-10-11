@@ -165,6 +165,16 @@ class EmailParserService:
                 best_rank = rank
                 if rank == 0:
                     break  # first preferred match wins
+        if best is not None and best.currency is None:
+            # «AED 1000.00 has been credited … Available balance is 1014.82»: the
+            # balance itself carries no unit, but when the WHOLE message names
+            # exactly one currency, that is its unit (2026-10-11, Mashreq SMS).
+            found = {
+                self._CURRENCY.get(t.lower())
+                for t in re.findall(r"(?i)(?<![A-Za-z])(" + self._CUR_TOKEN + r")(?![A-Za-z])", text)
+            } - {None}
+            if len(found) == 1:
+                best = ParsedBalance(balance=best.balance, currency=found.pop(), raw_match=best.raw_match)
         return best or ParsedBalance(balance=None, currency=None)
 
 
