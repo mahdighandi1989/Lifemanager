@@ -41,6 +41,8 @@ async def _available_budget(
     ).scalars().all()
     by_currency: dict[str, Decimal] = {}
     for a in rows:
+        if a.kind == "credit":  # available credit is not money the owner has
+            continue
         cur = (a.currency or "?").upper()
         by_currency[cur] = by_currency.get(cur, Decimal(0)) + Decimal(a.balance or 0)
     if not by_currency:
@@ -63,6 +65,8 @@ async def balances_by_currency(db: AsyncSession, user_id: int) -> list[dict]:
     ).scalars().all()
     grouped: dict[str, dict] = {}
     for a in rows:
+        if a.kind == "credit":  # shown apart (credit_cards) — never in «موجودی»
+            continue
         cur = (a.currency or "?").upper()
         g = grouped.setdefault(cur, {"currency": cur, "total": Decimal(0), "accounts": 0})
         g["total"] += Decimal(a.balance or 0)
@@ -71,6 +75,21 @@ async def balances_by_currency(db: AsyncSession, user_id: int) -> list[dict]:
         {"currency": g["currency"], "total": float(g["total"]), "accounts": g["accounts"]}
         for g in sorted(grouped.values(), key=lambda g: -g["total"])
     ]
+
+
+async def credit_cards(db: AsyncSession, user_id: int) -> list[dict]:
+    """Credit cards, apart: what each still lets you spend (available credit).
+    Never added to a balance total (owner, 2026-10-11)."""
+    from app.services.inbox_service import scope_filter
+
+    rows = (
+        await db.execute(
+            select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id),
+                                           FinancialAccount.kind == "credit")
+        )
+    ).scalars().all()
+    return [{"id": a.id, "name": a.name, "currency": (a.currency or "?").upper(),
+             "available_credit": float(a.balance or 0)} for a in rows]
 
 
 async def evaluate_purchase(

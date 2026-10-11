@@ -46,6 +46,11 @@ class FinancialAccount(Base):
 
     __tablename__ = "financial_accounts"
 
+    #: kind ``credit`` = a credit card: its «balance» is the AVAILABLE CREDIT
+    #: (the bank's money, a limit), never the owner's money — it is shown apart
+    #: and left out of every «موجودی» total (owner, 2026-10-11).
+    CREDIT = "credit"
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=True)
     name = Column(String(255), nullable=False)

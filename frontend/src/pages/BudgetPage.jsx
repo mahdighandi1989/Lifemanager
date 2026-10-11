@@ -10,6 +10,7 @@ const KIND_LABELS = {
   bank: 'بانک',
   broker: 'بروکر/فارکس',
   exchange: 'صرافی',
+  credit: 'کارت اعتباری',
   broker_forex: 'بروکر/فارکس',
   exchange_iranian: 'صرافی ایرانی',
   exchange_foreign: 'صرافی خارجی',
@@ -188,6 +189,8 @@ function BudgetPage({ embedded = false }) {
   // Per-currency totals from the server (audit #20). null → endpoint not
   // available / shape mismatch → fall back to grouping client-side.
   const [currencyBalances, setCurrencyBalances] = useState(null);
+  // کارت‌های اعتباری جدا (۲۰۲۶-۱۰-۱۱): عددشان «اعتبارِ قابلِ استفاده» است، نه پول — هرگز در جمعِ موجودی.
+  const [creditCards, setCreditCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -225,6 +228,7 @@ function BudgetPage({ embedded = false }) {
       .then((res) => {
         const b = res.data?.balances;
         setCurrencyBalances(Array.isArray(b) ? b : null);
+        setCreditCards(Array.isArray(res.data?.credit) ? res.data.credit : []);
       })
       .catch(() => setCurrencyBalances(null));
   }, []);
@@ -349,7 +353,7 @@ function BudgetPage({ embedded = false }) {
   const balanceRows =
     currencyBalances ??
     Object.values(
-      accounts.reduce((acc, a) => {
+      accounts.filter((a) => a.kind !== 'credit').reduce((acc, a) => {
         const cur = (a.currency || '?').toUpperCase();
         acc[cur] = acc[cur] || { currency: cur, total: 0, accounts: 0 };
         acc[cur].total += Number(a.balance) || 0;
@@ -399,7 +403,9 @@ function BudgetPage({ embedded = false }) {
 
   // Live accounts first; the imported archive (pre-system Excel history) is
   // filed separately below so a 0.00 card from 2024 never leads the page.
-  const liveAccounts = accounts.filter((a) => !a.archived);
+  const liveAccounts = accounts.filter((a) => !a.archived && a.kind !== 'credit');
+  const creditAccounts = accounts.filter((a) => !a.archived && a.kind === 'credit');
+  const moneyAccountCount = accounts.filter((a) => a.kind !== 'credit').length;
   const archivedAccounts = accounts.filter((a) => a.archived);
 
   return (
@@ -487,7 +493,7 @@ function BudgetPage({ embedded = false }) {
 
         {/* Dashboard summary — one row per currency, never a cross-currency sum */}
         <div className="bg-gradient-to-l from-blue-600 to-blue-500 rounded-xl p-6 mb-6 text-white">
-          <p className="text-blue-100 text-sm">موجودی به تفکیک ارز ({accounts.length} حساب)</p>
+          <p className="text-blue-100 text-sm">موجودی به تفکیک ارز ({moneyAccountCount.toLocaleString('fa-IR')} حساب — بدونِ کارت‌های اعتباری)</p>
           <div className="mt-2 space-y-1.5" data-testid="budget-total">
             {balanceRows.length === 0 ? (
               <p className="text-3xl font-bold">۰</p>
@@ -513,6 +519,24 @@ function BudgetPage({ embedded = false }) {
           </div>
         </div>
 
+        {/* کارت‌های اعتباری — جدا، با رنگِ دیگر، و بیرون از هر جمعی (مالک، ۲۰۲۶-۱۰-۱۱) */}
+        {creditCards.length > 0 && (
+          <div dir="rtl" className="rounded-xl border-2 border-dashed border-violet-300 bg-violet-50 p-4 mb-6" data-testid="credit-cards">
+            <p className="text-sm font-semibold text-violet-900">💳 کارت‌های اعتباری — اعتبارِ قابلِ استفاده</p>
+            <p className="mt-0.5 text-xs text-violet-700">این عدد پولِ تو نیست، سقفی است که بانک هنوز اجازهٔ خرجش را می‌دهد — به همین دلیل در «موجودی» بالا جمع نمی‌شود.</p>
+            <div className="mt-2 space-y-1">
+              {creditCards.map((c) => (
+                <div key={c.id} className="flex items-center justify-between gap-3 text-sm" data-testid={`credit-card-${c.id}`}>
+                  <span className="text-violet-900">{c.name}</span>
+                  <span className="font-semibold text-violet-900" dir="ltr">
+                    {c.currency} {Number(c.available_credit || 0).toLocaleString('fa-IR')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Manual entry — record accounts + incomes (raw memo: "اینجا ثبت بکنم") */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6" data-testid="add-account">
           <h2 className="font-semibold text-gray-900 mb-3">افزودن حساب</h2>
@@ -533,6 +557,7 @@ function BudgetPage({ embedded = false }) {
               <option value="bank">بانک</option>
               <option value="broker">بروکر/فارکس</option>
               <option value="exchange">صرافی</option>
+              <option value="credit">کارت اعتباری (اعتبارِ قابلِ استفاده)</option>
             </select>
             <input
               data-testid="account-balance-input"
@@ -646,6 +671,17 @@ function BudgetPage({ embedded = false }) {
             ))
           )}
         </div>
+
+        {creditAccounts.length > 0 && (
+          <div dir="rtl" className="mt-6 rounded-xl border-2 border-dashed border-violet-300 bg-violet-50/60 p-3" data-testid="credit-account-list">
+            <p className="mb-2 text-sm font-semibold text-violet-900">💳 کارت‌های اعتباری — عددِ هر کدام «اعتبارِ قابلِ استفاده» است، نه موجودی</p>
+            <div className="space-y-3">
+              {creditAccounts.map((a) => (
+                <AccountRow key={a.id} account={a} onDelete={deleteAccount} onEdited={loadAccounts} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* آرشیو — imported history (the Excel sheet from before this system
             existed). Kept in full, but it is not a live account and must not

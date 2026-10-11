@@ -66,12 +66,19 @@ async def _gather(db: AsyncSession, user_id: int) -> dict:
     # 12,500,000 IRR + 15,636 AED is NOT one number — totals only make sense
     # per currency (2026-07-30). The cross-currency sum is kept for backward
     # compatibility of the response shape but the prompt uses the breakdown.
+    # credit cards: available credit is the bank's money — kept apart (2026-10-11)
+    credit = [a for a in accounts if a.kind == "credit"]
+    accounts = [a for a in accounts if a.kind != "credit"]
     balances_by_currency: dict = {}
     for a in accounts:
         cur = (a.currency or "?").upper()
         balances_by_currency[cur] = balances_by_currency.get(cur, Decimal(0)) + (
             _to_decimal(a.balance) or Decimal(0)
         )
+    credit_available: dict = {}
+    for a in credit:
+        cur = (a.currency or "?").upper()
+        credit_available[cur] = credit_available.get(cur, Decimal(0)) + (_to_decimal(a.balance) or Decimal(0))
     total_balance = sum((_to_decimal(a.balance) for a in accounts), Decimal(0))
     total_assets = sum((_to_decimal(a.value) for a in assets), Decimal(0))
     total_income = sum((_to_decimal(i.amount) for i in incomes), Decimal(0))
@@ -97,6 +104,7 @@ async def _gather(db: AsyncSession, user_id: int) -> dict:
     return {
         "account_count": len(accounts),
         "balances_by_currency": {k: float(v) for k, v in sorted(balances_by_currency.items())},
+        "credit_available_by_currency": {k: float(v) for k, v in sorted(credit_available.items())},
         "total_balance": float(total_balance),
         "total_assets": float(total_assets),
         "total_income": float(total_income),

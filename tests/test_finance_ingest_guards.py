@@ -166,3 +166,32 @@ async def test_the_sms_app_wrapper_names_the_bank_from_the_text(db_session):
     assert res.get("created")
     acc = await db_session.get(FinancialAccount, res["account_id"])
     assert acc.institution == "fab" and float(acc.balance) == 306.43
+
+
+# ── 2026-10-11 (owner): «کارت اعتباری جدا — محاسبات غلط نباشه» ─────────────────
+@pytest.mark.asyncio
+async def test_a_credit_card_is_kept_out_of_every_balance_total(db_session):
+    from app.services.budget_service import balances_by_currency, credit_cards
+
+    db_session.add(FinancialAccount(user_id=None, name="BSI", kind="bank", institution="bsi",
+                                    currency="AED", balance=1000))
+    await db_session.flush()
+    res = await apply_bank_message(
+        db_session, user_id=0, channel="sms", sender="Rakbank",
+        body="You spent AED 46.30 on your Credit Card 526039******5397. Combined Available Balance: AED 9.04.")
+    acc = await db_session.get(FinancialAccount, res["account_id"])
+    assert acc.kind == "credit"
+    totals = await balances_by_currency(db_session, 0)
+    assert totals == [{"currency": "AED", "total": 1000.0, "accounts": 1}]
+    assert [c["available_credit"] for c in await credit_cards(db_session, 0)] == [9.04]
+
+
+@pytest.mark.asyncio
+async def test_a_machine_card_the_bank_calls_a_credit_card_is_reclassified(db_session):
+    acc = FinancialAccount(user_id=None, name="rakbank ••6039", kind="bank", institution="rakbank",
+                           currency="AED", balance=391.7, extra=json.dumps({"source": "email", "inferred": True}))
+    db_session.add(acc)
+    await db_session.flush()
+    await apply_bank_message(db_session, user_id=0, channel="sms", sender="Rakbank",
+                             body="You spent AED 69.45 on your Credit Card. Combined Available Balance: AED 55.34.")
+    assert acc.kind == "credit"
