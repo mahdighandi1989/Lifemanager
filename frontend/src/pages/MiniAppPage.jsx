@@ -7,8 +7,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { buildSrcDoc, miniAppsApi, readStore, sanitizeStore, storeKey } from '../lib/miniApps';
 
-export default function MiniAppPage() {
-  const { slug } = useParams();
+export default function MiniAppPage(props) {
+  const params = useParams();
+  const slug = (props && props.slug) || params.slug;
   const [app, setApp] = useState(null);
   const [doc, setDoc] = useState('');
   const [err, setErr] = useState('');

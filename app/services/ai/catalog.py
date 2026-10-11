@@ -52,6 +52,7 @@ TASK_TYPES: List[Dict[str, str]] = [
     {"id": "inbox_triage", "label": "تریاژ صندوق ورودی", "description": "پیشنهاد نوع/موعد/لیست برای آیتم‌های ثبت‌شده.", "preferred": "fast"},
     {"id": "telegram_compose", "label": "ساخت تسک از تلگرام", "description": "تبدیل پیام‌های تلگرام به تسک ساخت‌یافته.", "preferred": "fast"},
     {"id": "dev_log_summary", "label": "کارنامهٔ توسعه", "description": "خلاصهٔ فارسی لاگ‌های GitHub/Render مرکز توسعه.", "preferred": "fast"},
+    {"id": "learning_architecture", "label": "معماری یادگیری و کارخانه معرفت‌شناسی", "description": "منتقدِ کارگاه‌ها و ایستگاه‌ها، پیشنهادِ وقایع برای صفِ تأیید، تجزیهٔ مسئله‌های بزرگ.", "preferred": "reasoning"},
 ]
 
 DEFAULT_PROVIDER_KEY = "anthropic"

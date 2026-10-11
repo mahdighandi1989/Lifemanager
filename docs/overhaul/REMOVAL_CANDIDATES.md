@@ -171,3 +171,9 @@ how to revive it.
   پیامک رفت (تازه‌ترین موجودیِ پیامکِ بانک برنده است؛ کارتِ ماشینیِ اشتباه‌ارز ارزِ پیامِ بانک را می‌گیرد؛ «مانده»/«Avl Bal» خوانده می‌شود).
 - **کجا:** `frontend/src/pages/BudgetPage.jsx` پشتِ `SHOW_REBUILD_BUTTON = false`. endpoint ِ `POST /api/finance/rebuild-auto-cards` دست نخورد.
 - **برگرداندن:** `SHOW_REBUILD_BUTTON = true`. **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.
+
+## 2026-10-11 — مینی‌اپِ قدیمیِ «معماری یادگیری عمیق» (`/apps/learning-architecture`) — قرنطینه، نه حذف
+- **چرا:** نسخهٔ نو (`pages/LearningArchitecturePage.jsx`، بومی، دادهٔ DB، «نظارت و سرکشی» فعال) جایش نشست.
+- **کجا:** همان مینی‌اپِ نصب‌شده؛ با `/apps/learning-architecture?legacy=1` باز می‌شود (`MiniAppPage slug="learning-architecture"`). داده‌اش دست‌نخورده.
+- **برگرداندن:** خطِ `/apps/learning-architecture` را از `frontend/src/lib/routesMeta.js` بردار ⇒ `/apps/:slug` دوباره نسخهٔ قدیمی را نشان می‌دهد.
+- **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.

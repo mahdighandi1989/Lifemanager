@@ -58,6 +58,7 @@ export const ROUTES = [
   { path: '/import', page: 'DataHub', label: 'داده (ایمپورت و ادغام)', group: 'tools' },
   { path: '/drive-files', page: 'DataHub', label: 'فایل‌های درایو', group: 'tools' },
   { path: '/merge', page: 'DataHub', label: 'ادغام', group: 'tools' },
+  { path: '/apps/learning-architecture', page: 'LearningArchitecturePage', label: 'معماری یادگیری عمیق', group: 'tools' },
   { path: '/apps/:slug', page: 'MiniAppPage', label: 'صفحهٔ افزوده', group: 'tools' },
   { path: '/settings', page: 'Settings', label: 'تنظیمات', group: 'tools' },
   { path: '/settings/notifications', page: 'Settings', label: 'تنظیمات اعلان', group: 'tools' },

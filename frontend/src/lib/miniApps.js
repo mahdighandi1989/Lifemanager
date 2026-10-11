@@ -98,10 +98,23 @@ export function useMiniAppLinks() {
   }));
 }
 
+/**
+ * Pages that are part of the repo but live under /apps/ (they replaced an
+ * installed page of the same path). If the installed row is still there its
+ * sidebar place is kept; if it was retired, the link is still shown.
+ */
+export const BUILTIN_APP_LINKS = [
+  { to: '/apps/learning-architecture', label: '🧠 معماری یادگیری عمیق', testid: 'sidebar-link-app-learning-architecture', group: 'tools', after: '' },
+];
+
 /** Static links + installed pages, each page right after its `after` link. */
 export function mergeLinks(links, extra) {
   const out = [...links];
-  for (const e of extra) {
+  const seen = new Set(out.map((l) => l.to));
+  const all = [...extra, ...BUILTIN_APP_LINKS.filter((b) => !extra.some((e) => e.to === b.to))];
+  for (const e of all) {
+    if (seen.has(e.to)) continue;
+    seen.add(e.to);
     let at = e.after ? out.findIndex((l) => l.to === e.after) : -1;
     if (at < 0) {
       const lastInGroup = out.map((l) => l.group).lastIndexOf(e.group);

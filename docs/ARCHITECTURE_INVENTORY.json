@@ -2002,6 +2002,10 @@
         "file": "frontend/src/pages/MiniAppPage.jsx"
       },
       {
+        "name": "LearningArchitecturePage",
+        "file": "frontend/src/pages/LearningArchitecturePage.jsx"
+      },
+      {
         "name": "LifeFilePage",
         "file": "frontend/src/pages/LifeFilePage.jsx"
       },

@@ -32,6 +32,7 @@ from app.routes import (
     facets,
     inspection,
     mini_apps,
+    app_records,
     owner_identity,
     system_map,
     trash,
@@ -1017,6 +1018,7 @@ app.include_router(inspection.router, tags=["inspection"])  # «نظارت و س
 from app.routes import inspection_audit  # noqa: E402
 app.include_router(inspection_audit.router, tags=["inspection"])  # ناظر: بازبینیِ فقط‌خواندنیِ مالی
 app.include_router(mini_apps.router, tags=["mini-apps"])  # «صفحه‌های افزوده» (HTML ِ مالک به‌عنوانِ داده)
+app.include_router(app_records.router, tags=["app-records"])  # رکوردها و درِ هوش مصنوعیِ برنامه‌های درون‌ریپو
 # نسخهٔ همراه — the phone watcher's ingest surface (SMS/notification/usage/
 # heartbeat, device-token gated). Absolute /api/mobile/* paths.
 app.include_router(mobile.router, tags=["mobile"])
