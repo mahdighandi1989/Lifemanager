@@ -2,6 +2,8 @@
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S, C = A.C;
   var NAV = [
+    { g: "دوره: از صفر" },
+    ["course", "🧭 دورهٔ گام‌به‌گام", "۴۵ درسِ کوتاه به ترتیب، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
     { g: "مسیر یادگیری" },
@@ -18,6 +20,7 @@
   ];
   var SETTINGS = ["settings", "تنظیمات", "کلید هوش مصنوعی و پشتیبان‌گیری (برای هر دو سامانه)"];
   var START = ["start", "از اینجا شروع کن", "این برنامه چیست و برای هر خواسته از کجا شروع کنی"];
+  A.NAV = NAV; A.NAV_SETTINGS = SETTINGS; A.NAV_START = START;
   A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start") ? (A.lastSys || "learn") : "learn"; };
   A.state = { view: "home", arg: null, sub: null };
   A.go = function (view, arg, sub) {
@@ -29,13 +32,13 @@
   };
   A.shell = function () {
     var app = A.mountEl || document.getElementById("app"); app.innerHTML = "";
-    function navBtn(n) { return h("button", { class: "nav", "data-v": n[0], title: n[2], onclick: function () { A.go(n[0]); } }, h("span", { class: "nt" }, n[1]), h("span", { class: "nd" }, n[2])); }
+    function navBtn(n) { return h("button", { class: "nav", "data-v": n[0], title: n[2], onclick: function () { (A.goRoot || A.go)(n[0]); } }, h("span", { class: "nt" }, n[1]), h("span", { class: "nd" }, n[2])); }
     function navList(arr, sys) { return h("div", { class: "navlist", "data-sys": sys }, arr.map(function (n) { return n.g ? h("div", { class: "navg" }, n.g) : navBtn(n); })); }
     var nav = h("nav", { class: "side", "aria-label": "بخش‌ها" },
       h("div", { class: "brand" }, h("div", { class: "bmark", "aria-hidden": "true" }, svgMark()), h("div", {}, h("div", { class: "bname", id: "bname" }, "معماری یادگیری عمیق"), h("div", { class: "bsub", id: "bsub" }, "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه"))),
       h("div", { class: "sysw", role: "tablist", "aria-label": "سامانه" },
-        h("button", { class: "sysb", "data-sys": "learn", role: "tab", onclick: function () { A.go("home"); } }, "سامانه یادگیری"),
-        h("button", { class: "sysb", "data-sys": "epi", role: "tab", onclick: function () { A.go("e_home"); } }, "کارخانه معرفت‌شناسی")),
+        h("button", { class: "sysb", "data-sys": "learn", role: "tab", onclick: function () { (A.goRoot || A.go)("home"); } }, "سامانه یادگیری"),
+        h("button", { class: "sysb", "data-sys": "epi", role: "tab", onclick: function () { (A.goRoot || A.go)("e_home"); } }, "کارخانه معرفت‌شناسی")),
       h("div", { class: "navlist" }, navBtn(START)),
       navList(NAV, "learn"), navList(A.EPI_NAV || [], "epi"),
       h("div", { class: "navlist" }, navBtn(SETTINGS)),
@@ -57,10 +60,10 @@
     var bn = document.getElementById("bname"), bs = document.getElementById("bsub");
     if (bn) bn.textContent = sys === "epi" ? "کارخانه معرفت‌شناسی" : "معماری یادگیری عمیق";
     if (bs) bs.textContent = sys === "epi" ? fa(((window.EPI || {}).HALLS || []).length) + " سالن · " + fa((A.ESTL || []).length) + " ایستگاه · جزوه مصباح" : "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه";
-    document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || (A.state.view === "topic" && b.dataset.v === "topics") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases")); });
+    document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || (A.state.view === "topic" && b.dataset.v === "topics") || (A.state.view === "lesson" && b.dataset.v === "course") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases")); });
     var main = document.getElementById("main"); main.innerHTML = "";
     /* برای «نظارت و سرکشی» میزبان: هر نما یک بخش نام‌دار است */
-    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", topic: "موضوع", proto: "پروتکل", e_case: "پرونده کارخانه" })[A.state.view] || A.state.view; })();
+    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", proto: "پروتکل", e_case: "پرونده کارخانه" })[A.state.view] || A.state.view; })();
     main.setAttribute("data-report-section", A.state.view); main.setAttribute("data-report-section-label", lab);
     var fn = A.V[A.state.view] || A.V.home;
     try { main.appendChild(fn(A.state.arg, A.state.sub)); }
@@ -139,6 +142,14 @@
     var cpts = A.calibPoints(); var br = A.brier(cpts);
     var rt = A.recallTrend();
     root.appendChild(A.head("امروز · " + A.fdate(A.today()), "از فهمیدن تا ماندن", "کارهایی که امروز موعدشان رسیده و پیشرفتت اینجاست. برای یاد گرفتن خودِ روش‌ها برنامه ۸ هفته‌ای را دنبال کن؛ برای فهم یک موضوع تازه به «موضوع‌ها» برو."));
+    if (A.courseState) {
+      var cst = A.courseState(), cnl = A.courseNext && A.courseNext();
+      root.appendChild(h("section", { class: "card crs-home" },
+        h("div", { class: "row between wrap gap" },
+          h("div", {}, h("div", { class: "eyebrow" }, "🧭 دورهٔ گام‌به‌گام"),
+            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + fa(cnl.tid) + " · " + A.TM[cnl.tid].fa : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۲۰ دقیقه.")),
+          h("button", { class: "btn", onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره"))));
+    }
     var due = A.dueList();
     root.appendChild(h("section", { class: "grid2" },
       h("div", { class: "card" }, h("h2", {}, "کارهای موعددار"),

@@ -4192,3 +4192,19 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **VERIFY:** آزمون‌های مرورگرِ سازنده (test، test2، test3، test_epi، test_bt) NO ERRORS؛ Chromium روی سرورِ محلی: ۱۵ بخش، ۳ نمودارِ mermaid
   بی‌خطا، نمودارِ روند، فهرست ⇒ anchor، پیوندِ PROGRESS.md ⇒ سند، دکمهٔ سند ⇒ بخشِ WORKLOG، بازکردنِ `?doc=HANDBOOK#…` روی همان بخش،
   بازگشت به برنامه، بی‌خطای کنسول. pytest کامل و `npm run build` سبز (عددها در WORKLOG (11)).
+
+## 2026-10-12 — CHANGE: «معماری یادگیری عمیق» — راه‌یابی (📍/ردِ پا/↩ برگرد) و «دورهٔ گام‌به‌گام» ِ ۴۵ درسی
+- **خواستهٔ مالک:** «با هر کلیک گم می‌شوم، از کجا آمدم و برای چه، و راهِ برگشت نیست … وارد اقیانوس شدم از وسطش … فقط متن، بی‌نمودار و
+  شبیه‌ساز … سیستم فراری‌دهنده است» — بی‌حذفِ چیزی. انتخابِ مالک: یک دوره از صفر تا آخر، اول سامانهٔ یادگیری.
+- **CHANGE:** `apps/learning-architecture/src/app/a10_nav.js` (راه‌یابی برای همهٔ صفحه‌ها) و `a11_course.js` (دوره، نقشهٔ سفر، درسِ پنج‌قدمی،
+  ۶ شبیه‌ساز، تمرین‌های عمومی از دادهٔ خودِ تکنیک، کشوی «نگاهِ کوتاه»)؛ منو/صفحهٔ شروع/«امروز» به دوره وصل شدند. جزئیات و تصمیم‌ها:
+  `apps/learning-architecture/docs/WORKLOG.md` (12)، HANDBOOK §۲/§۴/§۱۰/§۱۲، PROGRESS #۲۵–۲۶.
+- **VERIFY:** همهٔ آزمون‌های مرورگرِ سازنده (+ `tests/test_course.js` ِ تازه) NO ERRORS؛ داخلِ Lifemanager روی سرورِ محلی: «برگرد» از
+  دغدغه‌ها، Back ِ مرورگر، شروعِ دوره، شبیه‌ساز، `?tab=lesson&a=37&s=s2`، ذخیرهٔ پیشرفتِ دوره در `app_records`، بی‌خطای کنسول؛
+  `build.py --check` و `npm run build` سبز.
+- **FINDING (مستقل از این تغییر):** ساعتِ ۰۰:۰۰ تا ۰۴:۰۰ ِ دبی (که تاریخِ UTC هنوز دیروز است) ۷ آزمونِ تاریخ‌محور قرمزند —
+  `test_attention` (۳)، `test_command_center::test_task_buckets_by_due_date`، `test_self_model::test_diligence_index_from_followthrough`،
+  `test_weekly_review::test_run_generates_review_with_stats_and_fallback_narrative`،
+  `test_auth_mutation_coverage_f17880d0::test_planner_scopes_to_token_identity_ignoring_body_user_id`. روی `main` ِ دست‌نخورده هم همین
+  ۷ قرمزند (با `git stash` سنجیده شد) و چند ساعت پیش همه سبز بودند؛ با `TZ=Asia/Dubai` هم برطرف نمی‌شوند (ترکیبِ `date.today()` و
+  تاریخِ دبیِ برنامه). بقیهٔ ۱۸۶۱ آزمون سبز. ادغام با همین یادداشت انجام شد؛ اصلاحِ این آزمون‌ها کارِ جداگانه است (یکسان‌کردنِ «امروز» در آزمون و برنامه).
