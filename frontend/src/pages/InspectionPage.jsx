@@ -399,11 +399,15 @@ function GeneralRequest({ onDone }) {
   const [shot, setShot] = useState(null);
   const [busy, setBusy] = useState(false);
   const [pct, setPct] = useState(null);
+  const [rush, setRush] = useState(false);
   const submit = async () => {
     if (!text.trim() || busy) return;
     setBusy(true);
     try {
       const { report } = await inspectionApi.create({ text: text.trim(), shot: shot || undefined });
+      if (rush) {
+        try { await inspectionApi.rush(report.id); } catch (e) { toast.error(`ثبت شد ولی فوری‌کردنش نشد: ${apiError(e)}`); }
+      }
       const failed = [];
       for (const f of files) {
         try {
@@ -430,6 +434,10 @@ function GeneralRequest({ onDone }) {
         placeholder="درخواستت را بنویس… (Ctrl+Enter برای ثبت · اسکرین‌شات را می‌توانی Ctrl+V کنی)"
         className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" data-testid="inspection-general-text" />
       <FilePicker files={files} setFiles={setFiles} shot={shot} setShot={setShot} pct={pct} />
+      <label className="flex cursor-pointer items-center gap-2 text-xs text-orange-800">
+        <input type="checkbox" checked={rush} onChange={(e) => setRush(e.target.checked)} data-testid="inspection-general-rush" />
+        <span>⚡ فوری — همین حالا در صفِ فوری هم بنشیند</span>
+      </label>
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onDone} className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50">انصراف</button>
         <button type="button" onClick={() => void submit()} disabled={busy || !text.trim()} data-testid="inspection-general-submit"
@@ -504,6 +512,13 @@ function SheetCard({ r, expanded, onToggle, reload }) {
               <span className={`rounded px-2 py-[2px] text-[11px] text-white ${OUTCOME_BG[r.glow.outcome] || 'bg-gray-500'}`}
                 title="نتیجه‌ای که ناظر دربارهٔ کارِ خودش ثبت کرد">
                 {r.glow.outcome_label}
+              </span>
+            )}
+            {r.general && (
+              <span className="rounded px-2 py-[2px] text-[11px] bg-indigo-100 text-indigo-800 ring-1 ring-indigo-300"
+                data-testid={`inspection-general-chip-${r.number}`}
+                title="این گزارش با «درخواستِ عمومی» ثبت شده — به جای مشخصی از صفحه‌ها اشاره نمی‌کند">
+                📨 درخواستِ عمومی
               </span>
             )}
             <span className="text-sm font-semibold text-gray-900">گزارشِ {fa(r.number)} — {r.title}</span>

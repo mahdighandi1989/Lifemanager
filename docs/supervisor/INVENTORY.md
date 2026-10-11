@@ -6,16 +6,16 @@
 
 | سنجه | تعداد |
 |---|---|
-| صفحه‌ها | 42 |
+| صفحه‌ها | 43 |
 | زیرصفحه‌ها (تب‌ها) | 29 |
-| دکمه‌ها | 168 |
-| ورودی‌ها | 84 |
+| دکمه‌ها | 172 |
+| ورودی‌ها | 85 |
 | فرم‌ها | 15 |
-| لینک‌ها | 56 |
+| لینک‌ها | 59 |
 | فراخوانی‌های API در صفحه‌ها | 80 |
-| مسیرهای API | 404 |
-| سرویس‌ها | 149 |
-| مدل‌ها | 64 |
+| مسیرهای API | 411 |
+| سرویس‌ها | 152 |
+| مدل‌ها | 65 |
 
 ## صفحه‌ها و زیرصفحه‌ها
 
@@ -54,12 +54,13 @@
 | `/import` | داده (ایمپورت و ادغام) | tools | `?tab=import`، `?tab=files`، `?tab=merge` | 1 | 0 | 0 |
 | `/drive-files` | فایل‌های درایو | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
 | `/merge` | ادغام | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
+| `/apps/:slug` | صفحهٔ افزوده | tools | — | 1 | 0 | 0 |
 | `/settings` | تنظیمات | tools | `?tab=ai`، `?tab=notifications`، `?tab=drive`، `?tab=dev`، `?tab=attention`، `?tab=safety` | 1 | 0 | 0 |
 | `/settings/notifications` | تنظیمات اعلان | tools | درِ دیگرِ `/settings` | 1 | 0 | 0 |
 | `/settings/ai-models` | تنظیمات مدل‌ها | tools | درِ دیگرِ `/settings` | 1 | 0 | 0 |
 | `/ai-settings` | تنظیمات AI | tools | — | 9 | 8 | 0 |
 | `/notifications` | اعلان‌ها | tools | — | 4 | 1 | 2 |
-| `/inspection` | نظارت و سرکشی | system | `?tab=board`، `?tab=pages`، `?tab=binders`، `?tab=how` | 24 | 9 | 0 |
+| `/inspection` | نظارت و سرکشی | system | `?tab=board`، `?tab=pages`، `?tab=binders`، `?tab=how` | 27 | 10 | 0 |
 | `/system-map` | نقشهٔ سیستم | system | — | 2 | 0 | 0 |
 | `/activity-log` | لاگ فعالیت‌ها | system | — | 5 | 5 | 0 |
 | `/admin/users` | مدیریت کاربران | system | — | 4 | 2 | 0 |
@@ -296,12 +297,15 @@
 | POST | `/api/inspection/file` |
 | DELETE | `/api/inspection/files/{file_id}` |
 | GET | `/api/inspection/files/{file_id}` |
+| POST | `/api/inspection/files/{file_id}/extract` |
 | GET | `/api/inspection/files/{file_id}/raw` |
 | GET | `/api/inspection/files/{file_id}/text` |
 | GET | `/api/inspection/inventory` |
 | GET | `/api/inspection/queue` |
 | GET | `/api/inspection/rounds` |
 | GET | `/api/inspection/shots/{shot_id}` |
+| GET | `/api/inspection/storage` |
+| POST | `/api/inspection/storage/offload` |
 | GET | `/api/inspection/urgent` |
 | POST | `/api/inspection/urgent/claim` |
 | GET | `/api/inspection/whoami` |
@@ -335,6 +339,10 @@
 | GET | `/api/location/history` |
 | POST | `/api/merge/execute` |
 | POST | `/api/merge/suggestions` |
+| GET | `/api/mini-apps` |
+| POST | `/api/mini-apps` |
+| DELETE | `/api/mini-apps/{slug}` |
+| GET | `/api/mini-apps/{slug}/source` |
 | GET | `/api/mobile/apk` |
 | POST | `/api/mobile/call` |
 | GET | `/api/mobile/diagnostics` |

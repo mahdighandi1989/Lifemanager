@@ -981,6 +981,25 @@
    "reports": {}
   },
   {
+   "path": "/apps/:slug",
+   "page": "MiniAppPage",
+   "label": "صفحهٔ افزوده",
+   "group": "tools",
+   "file": "frontend/src/pages/MiniAppPage.jsx",
+   "parametric": true,
+   "alias_of": "",
+   "lines": 69,
+   "buttons": 1,
+   "inputs": 0,
+   "forms": 0,
+   "links": 1,
+   "api_calls": 0,
+   "testids": 2,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
    "path": "/settings",
    "page": "Settings",
    "label": "تنظیمات",
@@ -1207,13 +1226,13 @@
    "file": "frontend/src/pages/InspectionPage.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 926,
-   "buttons": 24,
-   "inputs": 9,
+   "lines": 1020,
+   "buttons": 27,
+   "inputs": 10,
    "forms": 0,
-   "links": 6,
+   "links": 8,
    "api_calls": 0,
-   "testids": 12,
+   "testids": 17,
    "tabs": [
     {
      "id": "board",
@@ -2687,6 +2706,12 @@
     ]
    },
    {
+    "path": "/api/inspection/files/{file_id}/extract",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
     "path": "/api/inspection/files/{file_id}/raw",
     "methods": [
      "GET"
@@ -2720,6 +2745,18 @@
     "path": "/api/inspection/shots/{shot_id}",
     "methods": [
      "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/storage",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/storage/offload",
+    "methods": [
+     "POST"
     ]
    },
    {
@@ -2918,6 +2955,30 @@
     "path": "/api/merge/suggestions",
     "methods": [
      "POST"
+    ]
+   },
+   {
+    "path": "/api/mini-apps",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/mini-apps",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/mini-apps/{slug}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/mini-apps/{slug}/source",
+    "methods": [
+     "GET"
     ]
    },
    {
@@ -3840,8 +3901,11 @@
    "ingest/statement_lines",
    "ingest/text_extract",
    "ingest/universal_ingest",
+   "inspection_drive",
    "inspection_files",
+   "inspection_formats",
    "inspection_inventory",
+   "inspection_media",
    "integration_service",
    "integrations/external_project_interface",
    "integrations/generic_http_adapter",
@@ -3929,6 +3993,7 @@
    "integration",
    "interaction",
    "local_file_entry",
+   "mini_app",
    "neteller_wallet",
    "notification",
    "oversight_task",
@@ -3963,16 +4028,16 @@
   "errors": []
  },
  "totals": {
-  "pages": 42,
+  "pages": 43,
   "subpages": 29,
-  "buttons": 168,
-  "inputs": 84,
+  "buttons": 172,
+  "inputs": 85,
   "forms": 15,
-  "links": 56,
+  "links": 59,
   "api_calls": 80,
-  "api_routes": 404,
-  "services": 149,
-  "models": 64
+  "api_routes": 411,
+  "services": 152,
+  "models": 65
  },
  "errors": [],
  "alarms": []

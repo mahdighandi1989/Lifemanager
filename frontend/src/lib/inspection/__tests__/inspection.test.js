@@ -103,8 +103,17 @@ describe('the way back includes the tab', () => {
         { id: 'n1', spot: { reopen: '/tasks', geometry: g } }, { id: 'n2', spot: { reopen: '/lists', geometry: g } }] },
       { id: 'b', status: 'filed', reopen: '/tasks', geometry: g, notes: [] },
     ];
-    const keys = boxesFor(reports, { pathname: '/tasks', search: '' }).map((b) => b.key);
-    expect(keys).toEqual(['a', 'a:n1']);
+    const here = boxesFor(reports, { pathname: '/tasks', search: '' }).filter((b) => !b.elsewhere);
+    expect(here.map((b) => b.key)).toEqual(['a', 'a:n1']);
+  });
+
+  it('a box from another route is kept but flagged — only page chrome may draw it', () => {
+    const g = { doc: { x: 1, y: 1, w: 5, h: 5 }, anchor: { path: '[data-testid="sidebar-link-x"]' } };
+    const reports = [{ id: 'm', status: 'open', reopen: '/finance', geometry: g, notes: [] }];
+    const all = boxesFor(reports, { pathname: '/tasks', search: '' });
+    expect(all).toHaveLength(1);
+    expect(all[0].elsewhere).toBe(true);
+    expect(boxesFor(reports, { pathname: '/finance', search: '' })[0].elsewhere).toBe(false);
   });
 });
 

@@ -49,6 +49,7 @@ export default function InspectionProvider({ children }) {
   const [target, setTarget] = useState('');        // '' = new sheet; else the sheet it goes under
   const [upPct, setUpPct] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [rush, setRush] = useState(false);         // «⚡ فوری» ticked BEFORE filing
   const [reports, setReports] = useState([]);
   const [tabLabels, setTabLabels] = useState({});  // `${path}|${tab}` → Persian label
   const start = useRef(null);
@@ -225,7 +226,7 @@ export default function InspectionProvider({ children }) {
   const openSheets = useMemo(
     () => reports.filter((r) => r.status === 'open' || r.status === 'answered'), [reports]);
 
-  const close = () => { setSpot(null); setPicked([]); setTarget(''); setText(''); setShot(null); };
+  const close = () => { setSpot(null); setPicked([]); setTarget(''); setText(''); setShot(null); setRush(false); };
 
   const submit = async () => {
     if (!spot || !text.trim() || busy) return;
@@ -262,6 +263,15 @@ export default function InspectionProvider({ children }) {
         toast.success(picked.length
           ? `گزارشِ ${rep.number} با ${picked.length} فایل ثبت شد — ناظر باید کاملشان را بخواند`
           : `گزارشِ ${rep.number} ثبت شد — ناظر در دورِ بعد جواب می‌دهد`);
+      }
+      if (rush) {
+        // the sheet is already filed — a failed rush must not read as a failed report
+        try {
+          await inspectionApi.rush(rep.id);
+          toast.success(`گزارشِ ${rep.number} در صفِ فوری هم نشست`);
+        } catch (e) {
+          toast.error(`گزارش ثبت شد ولی فوری‌کردنش نشد: ${apiError(e)} — از صفحهٔ نظارت دکمهٔ ⚡ را بزن`);
+        }
       }
       close();
       await refresh();
@@ -413,6 +423,13 @@ export default function InspectionProvider({ children }) {
                 در حالِ بالا رفتن: {upPct.name} — {upPct.pct}٪
               </div>
             )}
+
+            <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-lg border border-orange-200 bg-orange-50/60 px-3 py-2 text-xs text-orange-800"
+              title="ناظر خارج از نوبت (در دورِ بعدیِ صفِ فوری) سراغش می‌رود">
+              <input type="checkbox" checked={rush} onChange={(e) => setRush(e.target.checked)}
+                data-testid="inspection-rush-on-file" />
+              <span>⚡ فوری — همین حالا در صفِ فوری هم بنشیند (لازم نیست از صفحهٔ نظارت بزنی)</span>
+            </label>
 
             <div className="mt-2 flex items-center gap-2 flex-wrap">
               <button type="button" onClick={() => void renderRegion(spot)} disabled={shooting}

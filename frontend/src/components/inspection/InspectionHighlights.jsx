@@ -26,31 +26,46 @@ import {
   readHighlightOpacity, readHighlightsEnabled,
 } from '../../lib/inspection/api';
 import { placeSpot, sheetOnScreen } from '../../lib/inspection/spot';
+import { useInspection } from './InspectionProvider';
 
 export const toneOf = (r) => TONE_RGB[r.status] || TONE_RGB[r.glow?.tone] || TONE_RGB.open;
 
-/** Every box of every live sheet that belongs on THIS screen. */
+/**
+ * Every box of every live sheet that could belong on THIS screen. A box whose
+ * route is not this one is kept as `elsewhere`: it is drawn only if its anchor
+ * is page CHROME (sidebar / header / footer — outside `<main>`), which is the
+ * same on every route. «اگر تو منوی اصلی کادر بکشم و برم صفحه دیگه، اون کادر
+ * دیگه دیده نمیشه» — the menu is not part of any one page.
+ */
 export function boxesFor(reports, location) {
   const out = [];
   for (const r of reports || []) {
     if (r.status === 'filed') continue;
-    if (r.geometry && sheetOnScreen(r.reopen, location)) {
-      out.push({ key: r.id, report: r, geometry: r.geometry, noteIndex: 0 });
+    if (r.geometry) {
+      out.push({ key: r.id, report: r, geometry: r.geometry, noteIndex: 0,
+                 elsewhere: !sheetOnScreen(r.reopen, location) });
     }
     (r.notes || []).forEach((n, i) => {
       if (i === 0 || !n.spot?.geometry) return;
-      if (sheetOnScreen(n.spot.reopen, location)) {
-        out.push({ key: `${r.id}:${n.id}`, report: r, geometry: n.spot.geometry, noteIndex: i });
-      }
+      out.push({ key: `${r.id}:${n.id}`, report: r, geometry: n.spot.geometry, noteIndex: i,
+                 elsewhere: !sheetOnScreen(n.spot.reopen, location) });
     });
   }
   return out;
 }
 
+/** The anchor lives outside every page surface ⇒ it is shared chrome. */
+const isChrome = (el) => !!el && !el.closest('[data-report-surface]');
+
 export default function InspectionHighlights() {
   const location = useLocation();
+  const ins = useInspection();
+  // The 📝 switch in the header is the master: off ⇒ nothing is drawn (the
+  // sheets stay filed and the supervisor still reads them); on ⇒ every box.
+  const modeOn = !!ins?.active;
   const [reports, setReports] = useState([]);
-  const [enabled, setEnabled] = useState(true);
+  const [prefOn, setEnabled] = useState(true);
+  const enabled = prefOn && modeOn;
   const [opacity, setOpacity] = useState(HL_DEFAULT_OPACITY);
   const [placed, setPlaced] = useState([]);
   const [hover, setHover] = useState(null);
@@ -99,18 +114,22 @@ export default function InspectionHighlights() {
     if (raf.current !== null) return;
     raf.current = requestAnimationFrame(() => {
       raf.current = null;
+      let chromeOnly = false;
       const lookup = (sel) => {
         try {
           const el = document.querySelector(sel);
           if (!el) return null;
+          if (chromeOnly && !isChrome(el)) return null;
           const b = el.getBoundingClientRect();
           return { x: b.left + window.scrollX, y: b.top + window.scrollY, w: b.width, h: b.height };
         } catch { return null; }
       };
       const out = [];
       for (const b of boxes) {
+        chromeOnly = b.elsewhere;
         const place = placeSpot(b.geometry, lookup);
-        if (place) out.push({ ...b, place });
+        // a box from another route has no business at its stored coordinates here
+        if (place && (!b.elsewhere || !place.approximate)) out.push({ ...b, place });
       }
       setPlaced(out);
     });

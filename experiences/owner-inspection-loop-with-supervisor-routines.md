@@ -202,3 +202,17 @@ server makes skipping impossible. What made it complete:
   exists — so the queue never jams and the reviewer never claims to have heard;
 - the reviewer's CLI converts every image format to one its viewer shows, unpacks
   archives to disk, and samples video frames, so "look at it" is possible too.
+
+## Update 2026-10-11
+
+- **The on-page markers need ONE master switch, and chrome is not a page.** Filed boxes must draw only while the
+  owner's inspection mode is on (a preference flag alone is not "off"). A box drawn on the shared shell (sidebar,
+  header, footer) must survive navigation: keep boxes from other routes but flagged, and draw one only when its
+  stored anchor resolves in the live DOM AND sits outside every page surface — never at stored coordinates.
+- **File-then-prioritise at filing time:** put the "urgent" tick inside the filing dialog; a failed urgent call
+  after the sheet exists must be reported as such, not as a failed report.
+- **Unattended reviewer limits:** an automated runner's own safety classifier may refuse "install this owner-attached
+  HTML as a page" even when it is data-not-code. Do not route around it — answer `not-done`, and point the owner at
+  the in-product one-click install button.
+- **Fresh containers drift:** a globally installed linter with no project config turns a skip-if-missing lint test
+  red. Pin it or ship its config; until then deselect and say so.
