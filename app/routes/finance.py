@@ -70,7 +70,7 @@ class AssetResponse(BaseModel):
 
 class FinancialAccountCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    kind: str = Field(default="bank", pattern="^(bank|broker|exchange)$")
+    kind: str = Field(default="bank", pattern="^(bank|broker|exchange|credit)$")
     institution: Optional[str] = Field(default=None, max_length=255)
     currency: str = Field(default="USD", max_length=8)
     balance: Decimal = Field(default=Decimal(0), ge=0)
@@ -239,7 +239,7 @@ async def list_financial_accounts(
 
     stmt = select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
     if kind:
-        if kind not in ("bank", "broker", "exchange"):
+        if kind not in ("bank", "broker", "exchange", "credit"):
             raise HTTPException(status_code=400, detail="invalid kind filter")
         stmt = stmt.where(FinancialAccount.kind == kind)
     result = await db.execute(stmt)
@@ -958,9 +958,11 @@ async def finance_balances_by_currency(
     _gate: None = Depends(enforce_auth_when_required),
 ):
     """موجودی‌ها به تفکیک ارز — هیچ‌وقت ارزها با هم جمع نمی‌شوند (audit #20)."""
-    from app.services.budget_service import balances_by_currency
+    from app.services.budget_service import balances_by_currency, credit_cards
 
-    return {"ok": True, "balances": await balances_by_currency(db, user_id)}
+    # credit cards apart: their number is available credit, not money (2026-10-11)
+    return {"ok": True, "balances": await balances_by_currency(db, user_id),
+            "credit": await credit_cards(db, user_id)}
 
 
 @router.get("/api/finance/reports/monthly", tags=["finance"])

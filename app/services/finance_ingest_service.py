@@ -29,6 +29,26 @@ from app.models.finance import FinancialAccount, Transaction
 _NOT_A_BANK = ("telegram", "whatsapp", "signal", "messenger", "instagram", "clock", "gmail", "outlook")
 # A wrapper sender (the SMS app's notification) carries the bank in the text.
 _WRAPPERS = ("messages", "sms", "google messages", "samsung messages")
+_CREDIT_RE = re.compile(r"(?i)(credit\s*card|کارت\s*اعتباری|combined\s*available|credit\s*limit)")
+
+
+def _mark_credit_if_needed(account, body: str) -> bool:
+    """A MACHINE card whose bank calls it a credit card becomes kind=credit, so
+    its number (available credit) leaves every balance total (2026-10-11)."""
+    import json as _json
+
+    if account is None or account.kind == "credit" or not _CREDIT_RE.search(body or ""):
+        return False
+    try:
+        extra = _json.loads(account.extra or "{}")
+    except Exception:
+        extra = {}
+    if not (extra.get("inferred") or extra.get("source") in ("email", "sms")):
+        return False  # an owner-made card keeps the kind the owner chose
+    account.kind = "credit"
+    return True
+
+
 _REF_RE = re.compile(r"(?i)(?:ending(?:\s*with)?|card|account|a/c|xx+|\*{2,})\s*[x*]*\s*(\d{3,4})\b")
 
 
@@ -55,7 +75,7 @@ async def _create_from_sms(db, *, user_id, institution, body, balance, currency,
     ref = m.group(1) if m else ""
     acc = FinancialAccount(
         user_id=(user_id or None), name=f"{institution} ••{ref}" if ref else institution,
-        kind="credit" if re.search(r"(?i)credit\s*card", body or "") else "bank",
+        kind="credit" if _CREDIT_RE.search(body or "") else "bank",
         institution=institution.lower(), currency=currency, balance=Decimal(str(balance)),
         extra=_json.dumps({"source": "sms", "inferred": True, "ref": ref,
                            "balance_evidence": f"پیامکِ {institution}",
@@ -73,6 +93,7 @@ async def _pick_account(
     user_id: int,
     account_id: Optional[int],
     sender_hint: Optional[str] = None,
+    strict: bool = False,
 ) -> Optional[FinancialAccount]:
     """Resolve WHICH account a bank message belongs to.
 
@@ -127,7 +148,10 @@ async def _pick_account(
             ]
             if len(matched) == 1:
                 return matched[0]
-    if len(accounts) == 1:
+    # «the only card» is a guess — never for a message whose bank we KNOW: an
+    # SMS from Rakbank landed on the lone BSI card (2026-10-11). With strict,
+    # an unmatched bank gets its own card instead (`_create_from_sms`).
+    if len(accounts) == 1 and not strict:
         return accounts[0]
     return None
 
@@ -166,7 +190,8 @@ async def explain_bank_message(
     msg_ref = "msg:" + _hashlib.sha1(f"{channel}|{sender or ''}|{body}".encode("utf-8")).hexdigest()[:20]
     seen = (await db.execute(select(Transaction).where(Transaction.source_ref == msg_ref))).scalars().first()
     account = await _pick_account(db, user_id=user_id, account_id=None,
-                                  sender_hint=f"{sender or ''} {body[:300]}")
+                                  sender_hint=f"{sender or ''} {body[:300]}",
+                                  strict=(channel == "sms" and bool(institution)))
     if account is not None:
         out.update(account_id=account.id, account_name=account.name, account_currency=account.currency,
                    account_balance=float(account.balance or 0))
@@ -244,6 +269,7 @@ async def apply_bank_message(
     account = await _pick_account(
         db, user_id=user_id, account_id=account_id,
         sender_hint=f"{sender or ''} {body[:300]}",
+        strict=(channel == "sms" and bool(institution)),
     )
     if account is None:
         cur = getattr(parsed, "currency", None)
@@ -257,6 +283,8 @@ async def apply_bank_message(
             return {"matched": True, "balances_updated": 1, "account_id": acc.id, "created": True,
                     "balance": float(new_balance), "delta": 0.0}
         return {"matched": True, "balances_updated": 0, "reason": "no confident account match"}
+
+    _mark_credit_if_needed(account, body)
 
     import json as _json
 
@@ -386,6 +414,11 @@ async def replay_recent_sms(db: AsyncSession, *, days: int = 60, limit: int = 20
             body = body.split(") ", 1)[1]
         sender = (lg.entity_label or "").split(" · ")[-1]
         when = getattr(lg, "occurred_at", None) or lg.created_at
+        if _CREDIT_RE.search(body) and bank_of(sender, body):
+            acc = await _pick_account(db, user_id=int(lg.user_id or 0), account_id=None,
+                                      sender_hint=f"{sender} {body[:300]}", strict=True)
+            if _mark_credit_if_needed(acc, body):
+                await db.commit()
         try:
             res = await apply_bank_message(db, user_id=int(lg.user_id or 0), channel="sms", body=body,
                                            sender=sender, occurred_iso=when.isoformat() if when else None)

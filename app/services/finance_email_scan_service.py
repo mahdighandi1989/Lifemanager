@@ -181,7 +181,12 @@ def _account_ref(text: str) -> Optional[str]:
     return None
 
 
+_CREDIT_HINT = re.compile(r"(?i)(credit\s*card|کارت\s*اعتباری|combined\s*available\s*(balance|limit)|credit\s*limit)")
+
+
 def _kind(text: str) -> str:
+    if _CREDIT_HINT.search(text):
+        return "credit"
     if _BROKER_HINT.search(text):
         return "broker"
     if _EXCHANGE_HINT.search(text):
@@ -567,7 +572,7 @@ async def apply_account_signal(
         name = base if not account_ref else f"{base} {account_ref}"
         acc = FinancialAccount(
             user_id=None if uid == 0 else uid,
-            name=name[:255], kind=(kind if kind in ("bank", "broker", "exchange") else "bank"),
+            name=name[:255], kind=(kind if kind in ("bank", "broker", "exchange", "credit") else "bank"),
             institution=institution or provider_name, currency=currency,
             balance=(bal if bal is not None else Decimal(0)),
             extra=json.dumps(extra, ensure_ascii=False),

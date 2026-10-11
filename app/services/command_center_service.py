@@ -280,7 +280,8 @@ async def _finance_bucket(db: AsyncSession, user_id: int) -> Dict[str, Any]:
                     func.count(FinancialAccount.id),
                     func.sum(FinancialAccount.balance),
                 )
-                .where(_scope(FinancialAccount.user_id, user_id))
+                .where(_scope(FinancialAccount.user_id, user_id),
+                       FinancialAccount.kind != "credit")  # available credit is not money (2026-10-11)
                 .group_by(FinancialAccount.currency)
             )
         ).all()
