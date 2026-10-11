@@ -180,6 +180,9 @@ function AccountRow({ account, onDelete, onEdited }) {
   );
 }
 
+/** «♻️ بازتولید از نو» — quarantined 2026-10-11 (see the note at the button). */
+const SHOW_REBUILD_BUTTON = false;
+
 function BudgetPage({ embedded = false }) {
   const [accounts, setAccounts] = useState([]);
   // Per-currency totals from the server (audit #20). null → endpoint not
@@ -438,6 +441,12 @@ function BudgetPage({ embedded = false }) {
             >
               {cleaning ? 'در حال پاک‌سازی…' : '🧹 پاک‌سازیِ کارت‌های اشتباه'}
             </button>
+            {/* QUARANTINED (owner, 2026-10-11: «کار اضافه‌ست، صفحه رو شلوغ می‌کنه و درست هم نکرد»).
+                The fix belongs in the pipeline — the newest bank SMS balance wins, and a
+                machine-guessed card takes the bank's own currency — not in a manual
+                button. The endpoint POST /api/finance/rebuild-auto-cards stays; set
+                SHOW_REBUILD_BUTTON to bring the button back. (docs/overhaul/REMOVAL_CANDIDATES.md) */}
+            {SHOW_REBUILD_BUTTON && (
             <button
               type="button"
               data-testid="finance-rebuild-cards"
@@ -464,6 +473,7 @@ function BudgetPage({ embedded = false }) {
             >
               ♻️ بازتولید از نو (اصلاح موجودی‌های غلط)
             </button>
+            )}
           </div>
         </div>
         {scanMsg && (

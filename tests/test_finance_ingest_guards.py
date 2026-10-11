@@ -86,3 +86,45 @@ async def test_a_non_positive_balance_is_refused(db_session):
     )
     assert res["balances_updated"] == 0
     assert float(acc.balance) == 10.0
+
+
+# ── 2026-10-11 (owner): «هر پیامکِ بانک موجودیِ کامل را دارد — آخری باید بزند» ──
+@pytest.mark.asyncio
+async def test_the_newest_sms_balance_wins_and_an_older_one_arriving_late_is_ignored(db_session):
+    acc = FinancialAccount(user_id=0, name="ADCB", kind="bank", institution="adcb",
+                           currency="AED", balance=100)
+    db_session.add(acc)
+    await db_session.flush()
+    new = await apply_bank_message(db_session, user_id=0, channel="sms", sender="ADCB",
+                                   body="ADCB: Purchase AED 20.00. Avl Bal AED 7,700.00",
+                                   occurred_iso="2026-10-11T09:00:00+00:00")
+    assert new["balances_updated"] == 1 and float(acc.balance) == 7700.0
+    late = await apply_bank_message(db_session, user_id=0, channel="sms", sender="ADCB",
+                                    body="ADCB: Purchase AED 10.00. Avl Bal AED 9,000.00",
+                                    occurred_iso="2026-10-10T09:00:00+00:00")
+    assert late["balances_updated"] == 0 and late["reason"] == "older than the last applied message"
+    assert float(acc.balance) == 7700.0
+
+
+@pytest.mark.asyncio
+async def test_a_machine_guessed_dollar_card_takes_the_banks_rial_balance_and_currency(db_session):
+    acc = FinancialAccount(user_id=0, name="ملت", kind="bank", institution="ملت", currency="USD",
+                           balance=4224209.74, extra=json.dumps({"source": "email", "inferred": True}))
+    db_session.add(acc)
+    await db_session.flush()
+    res = await apply_bank_message(db_session, user_id=0, channel="sms", sender="ملت",
+                                   body="بانک ملت\nبرداشت:1,200,000\nمانده:45,300,000 ريال")
+    assert res["balances_updated"] == 1
+    assert acc.currency == "IRR" and float(acc.balance) == 45300000.0
+
+
+@pytest.mark.asyncio
+async def test_an_owner_typed_card_still_refuses_another_currency(db_session):
+    acc = FinancialAccount(user_id=0, name="ملت", kind="bank", institution="ملت", currency="USD",
+                           balance=10, extra=json.dumps({"owner_balance_at": "2026-01-01T00:00:00+00:00"}))
+    db_session.add(acc)
+    await db_session.flush()
+    res = await apply_bank_message(db_session, user_id=0, channel="sms", sender="ملت",
+                                   body="مانده:45,300,000 ريال", occurred_iso="2026-10-11T00:00:00+00:00")
+    assert res["balances_updated"] == 0 and res["reason"].startswith("currency mismatch")
+    assert acc.currency == "USD"

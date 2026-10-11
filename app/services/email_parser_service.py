@@ -45,6 +45,8 @@ class EmailParserService:
     # Recognised currency tokens -> canonical code.
     _CURRENCY = {
         "ریال": "IRR",
+        "ريال": "IRR",      # Arabic yeh — how many bank SMS write it
+        "دلار": "USD",
         "rial": "IRR",
         "irr": "IRR",
         "تومان": "IRT",
@@ -74,7 +76,7 @@ class EmailParserService:
 
     _CUR_TOKEN = (
         r"usd|eur|aed|gbp|irr|aud|cad|dhs|sar|qar|omr|kwd|bhd|try|chf|inr|"
-        r"ریال|تومان|درهم|د\.إ|[$€£]"
+        r"ریال|ريال|تومان|دلار|درهم|د\.إ|[$€£]"
     )
 
     # A qualifier that means «this number is NOT the live balance»:
@@ -84,7 +86,7 @@ class EmailParserService:
         r"loyalty|points?|bonus|قبلی|پیشین|بدهی|امتیاز)"
     )
     # …and one that marks the SPENDABLE truth, preferred over a bare «balance».
-    _PREFERRED = re.compile(r"(?i)(available|current|closing|قابل\s*برداشت)")
+    _PREFERRED = re.compile(r"(?i)(available|avail|avl|current|closing|قابل\s*برداشت)")
 
     # Handles: «موجودی: 12,500,000 ریال» / «Balance: $1,234.56» / «balance is
     # 1000 USD» / «Balance: USD 1,234.56» / «AED 500» (currency before the
@@ -93,7 +95,11 @@ class EmailParserService:
     _BALANCE_RE = re.compile(
         r"(?P<qual>[A-Za-z؀-ۿ]+[ \t]+)?"
         r"(?P<kw>موجودیِ?\s*قابل\s*برداشت|available\s*balance|current\s*balance|"
-        r"closing\s*balance|موجودی|balance|بالانس)"
+        r"closing\s*balance|موجودی|balance|بالانس|"
+        # 2026-10-11 (owner): «مانده» (Iranian bank SMS) and the UAE short forms
+        # «Avl Bal» / «Avail. Bal» / «Available Bal» / «Bal:» were not balances
+        # at all — such an SMS was ignored however many arrived.
+        r"مانده(?:ٔ|\s*ی)?(?:\s*حساب)?|(?:avl|avail(?:able)?)\.?\s*bal\b\.?|\bbal\b\.?(?=\s*(?:is|:|：|" + _CUR_TOKEN + r"|\d)))"
         r"\s*(?:is|:|：|of)?\s*"
         r"(?P<cur0>" + _CUR_TOKEN + r")?\s*"
         r"(?P<amount>\d[\d.,]*)\s*"

@@ -114,6 +114,17 @@ class SmsPayload(BaseModel):
     device: Optional[str] = None
 
 
+def _finance_note(routed: dict) -> str:
+    """Why a bank message did / did not move a balance — written into the
+    activity log so a dropped SMS is never silent again (2026-10-11)."""
+    fin = routed.get("finance") if isinstance(routed, dict) else None
+    if not isinstance(fin, dict):
+        return ""
+    if fin.get("balances_updated"):
+        return f"(موجودی ← {fin.get('balance')}) "
+    return f"(اعمال نشد: {fin.get('reason') or 'موجودی در متن نبود'}) "
+
+
 @router.post("/api/mobile/sms", tags=["mobile"])
 @handle_errors
 async def ingest_sms(
@@ -148,7 +159,7 @@ async def ingest_sms(
     await record_activity(
         action="mobile_sms", entity_type="sms", entity_id=None,
         entity_label=sms_label[:255],
-        detail=f"[{category}→{routed.get('routed_to') or '—'}] {body}"[:500],
+        detail=f"[{category}→{routed.get('routed_to') or '—'}] {_finance_note(routed)}{body}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         occurred_at=payload.received_at,
         user_id=user_id, db=db,
@@ -222,7 +233,7 @@ async def ingest_notification(
         # لینک نشود (اعلان گوشی ≠ اعلان مرکز اعلان‌ها).
         action="mobile_notification", entity_type="phone_notification", entity_id=None,
         entity_label=ident.notification_label(sender, app_name),
-        detail=f"[{category}→{routed.get('routed_to') or '—'}] {text}"[:500],
+        detail=f"[{category}→{routed.get('routed_to') or '—'}] {_finance_note(routed)}{text}"[:500],
         context_type="device", context_id=(payload.device or "phone")[:64],
         occurred_at=payload.posted_at,
         user_id=user_id, db=db,

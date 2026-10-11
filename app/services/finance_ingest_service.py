@@ -135,14 +135,38 @@ async def apply_bank_message(
     if account is None:
         return {"matched": True, "balances_updated": 0, "reason": "no confident account match"}
 
+    import json as _json
+
+    try:
+        extra = _json.loads(account.extra or "{}")
+    except Exception:
+        extra = {}
+
     # A figure in another currency is another measure — never write it onto
     # this card, and never relabel the card without converting (2026-07-30).
+    # EXCEPT (2026-10-11, owner): a card the MACHINE guessed (from an e-mail
+    # snippet, never typed by the owner) whose bank now sends a full balance in
+    # a stated currency — the bank's own SMS is the truth for both the number
+    # and the currency, so the card takes both (it is a replacement, not a
+    # conversion). A Rial account wrongly opened as dollars used to reject every
+    # Rial SMS forever and keep showing millions of «USD».
     msg_currency = getattr(parsed, "currency", None)
+    relabel = None
     if msg_currency and account.currency and msg_currency.upper() != str(account.currency).upper():
-        return {
-            "matched": True, "balances_updated": 0,
-            "reason": f"currency mismatch ({msg_currency} ≠ {account.currency})",
-        }
+        machine_guess = (extra.get("source") == "email" or extra.get("inferred")) and not extra.get("owner_balance_at")
+        if not machine_guess:
+            return {
+                "matched": True, "balances_updated": 0,
+                "reason": f"currency mismatch ({msg_currency} ≠ {account.currency})",
+            }
+        relabel = (str(account.currency), msg_currency.upper())
+
+    # NEWEST BALANCE WINS (2026-10-11, owner): every bank SMS carries the full
+    # balance, so the last message decides — but a phone that re-sends a batch
+    # out of order must not let an older SMS overwrite a newer balance.
+    last_at = extra.get("last_message_at")
+    if occurred_iso and last_at and str(occurred_iso) < str(last_at):
+        return {"matched": True, "balances_updated": 0, "reason": "older than the last applied message"}
 
     new = Decimal(str(new_balance))
 
@@ -151,12 +175,6 @@ async def apply_bank_message(
     # تثبیت شده) حقیقتِ نهایی است؛ فقط سیگنالی با تاریخِ **جدیدتر** می‌تواند
     # حرکتش دهد. بدون این، یک پیامکِ قدیمی عددِ دستیِ مالک را پاک می‌کرد و
     # برچسبِ «تنظیم دستی مالک» هم سرِ جایش می‌ماند، یعنی برچسب دروغ می‌گفت.
-    import json as _json
-
-    try:
-        extra = _json.loads(account.extra or "{}")
-    except Exception:
-        extra = {}
     owner_at = extra.get("owner_balance_at")
     if owner_at and (not occurred_iso or str(occurred_iso) <= str(owner_at)):
         return {
@@ -171,6 +189,11 @@ async def apply_bank_message(
     old = Decimal(str(account.balance or 0))
     delta = new - old
     account.balance = new
+    if relabel:
+        # a different unit: the old number is not comparable — no delta row
+        account.currency = relabel[1]
+        extra["currency_corrected"] = f"{relabel[0]} → {relabel[1]} (پیامِ بانک)"
+        delta = Decimal(0)
     if msg_currency and not account.currency:
         account.currency = msg_currency
     # برچسبِ منشأ باید با واقعیت بخواند، وگرنه عددِ ماشینی «دستیِ مالک» دیده می‌شود.
