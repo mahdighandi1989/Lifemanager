@@ -80,8 +80,7 @@ async def finance_audit(days: int = Query(30, ge=1, le=365), messages: int = Que
         if len(fin_msgs) >= messages:
             break
     clar = (await db.execute(select(Clarification).order_by(Clarification.id.desc()).limit(80))).scalars().all()
-    await db.rollback()  # nothing was written; make that explicit
-    return {
+    out = {
         "ok": True, "success": True, "read_only": True,
         "balances_by_scope": {s: [{"currency": c, "total": float(v["total"]), "accounts": v["accounts"]}
                                   for c, v in cur.items()] for s, cur in by_scope.items()},
@@ -95,3 +94,8 @@ async def finance_audit(days: int = Query(30, ge=1, le=365), messages: int = Que
         "clarifications": [{c.name: _iso(getattr(r, c.name)) for c in Clarification.__table__.columns}
                            for r in clar],
     }
+    # nothing was written; say so explicitly — AFTER the rows were read (a
+    # rollback expires them, and reading an expired row afterwards is lazy IO
+    # outside the async context: MissingGreenlet on Postgres, 2026-10-11)
+    await db.rollback()
+    return out
