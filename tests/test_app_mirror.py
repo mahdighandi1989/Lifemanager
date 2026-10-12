@@ -6,6 +6,14 @@ import json
 
 import pytest
 
+def _signin(api_client, email="owner-la@example.com"):
+    """The page is behind login; /api/app-records refuses anonymous callers."""
+    r = api_client.post("/auth/register", json={"email": email, "password": "hunter2-long", "username": email.split("@")[0]})
+    assert r.status_code == 201, r.text
+    api_client.headers.update({"Authorization": f"Bearer {r.json()['access_token']}"})
+    return api_client
+
+
 BASE = "/api/app-records/learning-architecture"
 
 
@@ -17,6 +25,7 @@ def _item(rid="case_1", title="خبر کانال", rows=None):
 
 @pytest.mark.asyncio
 async def test_queue_status_and_delete_flow(api_client):
+    _signin(api_client)
     r = api_client.post(f"{BASE}/mirror", json={"items": [_item()]})
     assert r.status_code == 200 and r.json()["changed"] == 1
     assert api_client.post(f"{BASE}/mirror", json={"items": [_item()]}).json()["changed"] == 0, "same doc ⇒ no rewrite"
@@ -33,6 +42,7 @@ async def test_queue_status_and_delete_flow(api_client):
 
 @pytest.mark.asyncio
 async def test_sync_without_drive_keeps_rows_pending_with_a_clear_message(api_client):
+    _signin(api_client)
     api_client.post(f"{BASE}/mirror", json={"items": [_item("topic_1", "موضوع")]})
     r = api_client.post(f"{BASE}/mirror/sync").json()
     assert r["ok"] and r["written"] == 0 and r.get("skipped") == "no_drive"
@@ -53,13 +63,24 @@ class FakeDrive:
 
 class FakeWriter:
     def __init__(self):
-        self.sheets, self.writes, self.renames, self.alive = 0, [], [], set()
+        self.sheets, self.writes, self.renames, self.alive, self.moves = 0, [], [], set(), []
+        self.names, self.parents = {}, {}
+
+    def meta(self, fid):
+        if fid not in self.alive:
+            return None
+        return {"id": fid, "name": self.names.get(fid), "parents": self.parents.get(fid, [])}
 
     def exists(self, fid):
         return fid in self.alive
 
     def rename(self, fid, name):
         self.renames.append((fid, name))
+        self.names[fid] = name
+
+    def move(self, fid, new_parent, old):
+        self.moves.append((fid, new_parent, old))
+        self.parents[fid] = [new_parent]
 
     def create_sheet(self, name, parent):
         self.sheets += 1
@@ -90,7 +111,9 @@ async def test_sync_builds_folder_tree_and_sheet_once_then_updates_in_place(db_s
     grp_id = drive.folders[("پرونده‌ها", app_id)]
     rec_folder = [k for k in drive.folders if k[1] == grp_id][0]
     assert rec_folder[0].startswith("خبر کانال · ")
-    writer.alive.add(drive.folders[rec_folder])
+    fid = drive.folders[rec_folder]
+    writer.alive.add(fid)
+    writer.names[fid], writer.parents[fid] = rec_folder[0], [grp_id]
     assert writer.sheets == 1 and writer.writes[-1][2] == ["خلاصه", "تصدیق‌ها"]
     assert writer.writes[-1][3][1]["rows"][1] == ["1", "دلار فردا بالا می‌رود"], "cells are strings"
 
@@ -100,6 +123,17 @@ async def test_sync_builds_folder_tree_and_sheet_once_then_updates_in_place(db_s
     await svc.upsert(db_session, user_id=1, app="learning-architecture", items=[_item(title="خبر کانال ۲")], deleted=[])
     await svc.sync_pending(db_session, clients=(drive, writer))
     assert writer.sheets == 1 and len(writer.writes) == 2 and writer.writes[-1][1] == "خبر کانال ۲"
+    assert writer.renames[-1] == (fid, svc.record_folder_name("خبر کانال ۲", "case_1")), "title change ⇒ folder renamed"
+    n_renames = len(writer.renames)
+    await svc.upsert(db_session, user_id=1, app="learning-architecture", items=[_item(title="خبر کانال ۲", rows=[["x"]])], deleted=[])
+    await svc.sync_pending(db_session, clients=(drive, writer))
+    assert len(writer.renames) == n_renames, "same name ⇒ no rename call"
+    # group changed (e.g. topic ↔ course) ⇒ the SAME folder is moved, not duplicated
+    moved = _item(title="خبر کانال ۲", rows=[["y"]])
+    moved["group"] = "دوره"
+    await svc.upsert(db_session, user_id=1, app="learning-architecture", items=[moved], deleted=[])
+    await svc.sync_pending(db_session, clients=(drive, writer))
+    assert writer.moves and writer.moves[-1][0] == fid and writer.sheets == 1
     # deleted ⇒ folder renamed, not deleted
     await svc.upsert(db_session, user_id=1, app="learning-architecture", items=[], deleted=["case_1"])
     await svc.sync_pending(db_session, clients=(drive, writer))
@@ -130,11 +164,14 @@ def test_writer_sizes_the_grid_and_sends_valid_sheets_requests():
             calls.append((self.name, self.kw))
             return self.result if self.result is not None else {}
 
-    state = {"tabs": {"Sheet1": 0}}
+    state = {"tabs": {"Sheet1": 0, "قدیمی‌ها": 5, "خلاصه": 7}}
 
     class Values:
         def clear(self, **kw):
             return Exec("clear", kw)
+
+        def batchClear(self, **kw):
+            return Exec("batchClear", kw)
 
         def batchUpdate(self, **kw):
             return Exec("values.batchUpdate", kw)
@@ -159,10 +196,83 @@ def test_writer_sizes_the_grid_and_sends_valid_sheets_requests():
     rows = [["h"] * 30] + [["x"] * 30 for _ in range(2500)]
     _Writer(None, Sheets()).write("SID", "عنوان", [{"name": "خلاصه", "rows": rows}, {"name": "تصدیق‌ها", "rows": [["#"]]}])
     fmt = [c for c in calls if c[0] == "batchUpdate"][-1][1]["body"]["requests"]
-    grids = [r["updateSheetProperties"]["properties"]["gridProperties"] for r in fmt if "updateSheetProperties" in r]
+    grids = [r["updateSheetProperties"]["properties"]["gridProperties"] for r in fmt
+             if "gridProperties" in r.get("updateSheetProperties", {}).get("properties", {})]
     assert grids[0]["rowCount"] >= 2501 and grids[0]["columnCount"] >= 30, "grid grown past the 1000×26 default"
     assert any("deleteSheet" in r for r in fmt), "Google's empty default tab is removed once real tabs exist"
     assert any(r.get("updateSpreadsheetProperties", {}).get("properties", {}).get("title") == "عنوان" for r in fmt)
     data = [c for c in calls if c[0] == "values.batchUpdate"][-1][1]["body"]
     assert data["valueInputOption"] == "RAW" and data["data"][0]["range"] == "'خلاصه'!A1"
-    assert [c[1]["range"] for c in calls if c[0] == "clear"] == ["'خلاصه'", "'تصدیق‌ها'"]
+    order = [c[0] for c in calls]
+    assert order.index("values.batchUpdate") < order.index("batchClear"), "write first, then clear only the stale tail"
+    assert "clear" not in order, "a whole tab is never blanked before the write"
+    tails = [c for c in calls if c[0] == "batchClear"][-1][1]["body"]["ranges"]
+    assert "'خلاصه'!A2502:AF2521" in tails and "'تصدیق‌ها'!B1:F1" in tails
+    stale = [r["updateSheetProperties"]["properties"] for r in fmt if "updateSheetProperties" in r
+             and r["updateSheetProperties"]["properties"].get("sheetId") == 5]
+    assert stale and stale[0]["title"].startswith("(قدیمی) "), "a section the doc no longer has is kept + labelled"
+    assert not any(r.get("deleteSheet", {}).get("sheetId") == 5 for r in fmt)
+
+
+def test_a_transient_drive_error_is_not_taken_as_gone():
+    from app.services.app_mirror_service import _Writer, is_quota_error
+
+    class HttpErr(Exception):
+        def __init__(self, st, msg=""):
+            super().__init__(msg or f"HTTP {st}")
+            self.resp = type("R", (), {"status": st})()
+
+    class Files:
+        def __init__(self, exc):
+            self.exc = exc
+
+        def get(self, **kw):
+            exc = self.exc
+
+            class E:
+                def execute(self, num_retries=0):
+                    raise exc
+            return E()
+
+    class Drive:
+        def __init__(self, exc):
+            self._f = Files(exc)
+
+        def files(self):
+            return self._f
+
+    assert _Writer(Drive(HttpErr(404)), None).meta("x") is None
+    with pytest.raises(HttpErr):
+        _Writer(Drive(HttpErr(503)), None).meta("x")
+    assert is_quota_error(HttpErr(429)) and is_quota_error(HttpErr(403, "userRateLimitExceeded"))
+    assert not is_quota_error(HttpErr(403, "insufficientPermissions"))
+
+
+@pytest.mark.asyncio
+async def test_failed_rows_go_last_and_quota_stops_the_run(db_session, monkeypatch):
+    from app.services import app_mirror_service as svc
+    from app.services import inspection_drive
+
+    async def fake_root(db, client):
+        return "ROOT"
+
+    monkeypatch.setattr(inspection_drive, "root_folder", fake_root)
+    await svc.upsert(db_session, user_id=1, app="learning-architecture",
+                     items=[_item("case_a"), _item("case_b"), _item("case_c")], deleted=[])
+
+    class Quota(Exception):
+        resp = type("R", (), {"status": 429})()
+
+    class QuotaWriter(FakeWriter):
+        def write(self, sheet_id, title, tabs):
+            raise Quota("rate")
+
+    drive = FakeDrive()
+    res = await svc.sync_pending(db_session, clients=(drive, QuotaWriter()))
+    assert res["stopped"] == "quota" and res["failed"] == 1 and res["written"] == 0, "first quota error ends the run"
+    writer = FakeWriter()
+    res = await svc.sync_pending(db_session, clients=(drive, writer), limit=2)
+    titles = [w[0] for w in writer.writes]
+    assert res["written"] == 2 and len(titles) == 2
+    st = await svc.status(db_session, user_id=1, app="learning-architecture")
+    assert sum(1 for i in st["items"] if i["pending"]) == 1

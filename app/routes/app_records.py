@@ -18,13 +18,14 @@ import json
 import re
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_required_user_id
+from app.dependencies.auth import get_signed_in_user_id
 from app.models.app_record import AppRecord
 
 router = APIRouter()
@@ -34,6 +35,22 @@ _APP = re.compile(r"^[a-z0-9][a-z0-9-]{1,62}$")
 _APPS = {"learning-architecture"}
 _MAX_REC_CHARS = 2_000_000
 _MAX_BATCH = 500
+#: whole request body (the page sends ≤ 3 MB chunks); bigger is refused before parsing
+_MAX_BODY = 8_000_000
+#: records per user per app (the page's real use is in the hundreds)
+_MAX_RECORDS = 20_000
+#: record ids are the page's own A.uid() ("case_l9x…") or fixed names ("settings", "course");
+#: no "/" (a DELETE path could never reach it), no spaces, no control characters
+_REC_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
+
+
+async def _body_cap(request: Request) -> None:
+    try:
+        n = int(request.headers.get("content-length") or 0)
+    except ValueError:
+        n = 0
+    if n > _MAX_BODY:
+        raise HTTPException(status_code=413, detail="درخواست بزرگ‌تر از سقف است")
 
 
 def _check_app(app: str) -> str:
@@ -46,8 +63,20 @@ class BulkIn(BaseModel):
     records: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class MirrorTab(BaseModel):
+    name: str = Field("", max_length=200)
+    rows: List[List[Any]] = Field(default_factory=list, max_length=5000)
+
+
+class MirrorItem(BaseModel):
+    rec_id: str = Field(..., min_length=1, max_length=128)
+    group: str = Field("", max_length=200)
+    title: str = Field("", max_length=1000)
+    tabs: List[MirrorTab] = Field(default_factory=list, max_length=40)
+
+
 class MirrorIn(BaseModel):
-    items: List[Dict[str, Any]] = Field(default_factory=list, max_length=200)
+    items: List[MirrorItem] = Field(default_factory=list, max_length=200)
     deleted: List[str] = Field(default_factory=list, max_length=200)
 
 
@@ -58,7 +87,7 @@ class AIIn(BaseModel):
 
 
 @router.get("/api/app-records/{app}", tags=["app-records"])
-async def list_records(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+async def list_records(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
     rows = (await db.execute(select(AppRecord).where(AppRecord.app == app, AppRecord.user_id == user_id))).scalars().all()
     out = []
@@ -70,40 +99,63 @@ async def list_records(app: str, db: AsyncSession = Depends(get_db), user_id: in
     return {"ok": True, "success": True, "records": out}
 
 
-@router.post("/api/app-records/{app}/bulk", tags=["app-records"])
-async def save_records(app: str, payload: BulkIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+@router.post("/api/app-records/{app}/bulk", tags=["app-records"], dependencies=[Depends(_body_cap)])
+async def save_records(app: str, payload: BulkIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+    """Per-record outcome: one bad record (no/invalid id, over the size cap) is
+    REJECTED with a reason and the rest are saved — it used to fail the whole
+    batch, and the page then retried that batch forever."""
     _check_app(app)
     recs = payload.records
     if len(recs) > _MAX_BATCH:
         raise HTTPException(status_code=413, detail="دستهٔ رکوردها بزرگ است")
-    ids = []
+    if recs and not any(isinstance(r, dict) and _REC_ID.match(str(r.get("id") or "")) for r in recs):
+        raise HTTPException(status_code=422, detail="هر رکورد شناسهٔ معتبر لازم دارد")
+    good: Dict[str, tuple] = {}
+    rejected = []
     for rec in recs:
-        rid = str(rec.get("id") or "").strip()
-        if not rid or len(rid) > 128:
-            raise HTTPException(status_code=422, detail="هر رکورد شناسهٔ معتبر لازم دارد")
-        ids.append(rid)
-    existing = {}
-    if ids:
-        rows = (await db.execute(select(AppRecord).where(AppRecord.app == app, AppRecord.user_id == user_id,
-                                                         AppRecord.rec_id.in_(ids)))).scalars().all()
-        existing = {r.rec_id: r for r in rows}
-    for rec, rid in zip(recs, ids):
+        rid = str(rec.get("id") or "") if isinstance(rec, dict) else ""
+        if not _REC_ID.match(rid):
+            rejected.append({"id": rid[:128], "reason": "شناسهٔ نامعتبر"})
+            continue
         text = json.dumps(rec, ensure_ascii=False)
         if len(text) > _MAX_REC_CHARS:
-            raise HTTPException(status_code=413, detail=f"رکورد «{rid}» بزرگ‌تر از سقف است")
-        row = existing.get(rid)
-        if row is None:
-            row = AppRecord(user_id=user_id, app=app, rec_id=rid)
-            db.add(row)
-            existing[rid] = row
-        row.rtype = str(rec.get("type") or "")[:40]
-        row.data = text
-    await db.commit()
-    return {"ok": True, "success": True, "saved": len(recs)}
+            rejected.append({"id": rid, "reason": "بزرگ‌تر از سقفِ یک رکورد (۲ میلیون نویسه)"})
+            continue
+        good[rid] = (rec, text)  # the last copy of a duplicated id wins
+    for attempt in (1, 2):
+        try:
+            existing = {}
+            if good:
+                rows = (await db.execute(select(AppRecord).where(AppRecord.app == app, AppRecord.user_id == user_id,
+                                                                 AppRecord.rec_id.in_(list(good))))).scalars().all()
+                existing = {r.rec_id: r for r in rows}
+            new_ids = [rid for rid in good if rid not in existing]
+            if new_ids:
+                count = (await db.execute(select(func.count()).select_from(AppRecord).where(
+                    AppRecord.app == app, AppRecord.user_id == user_id))).scalar() or 0
+                room = max(0, _MAX_RECORDS - count)
+                for rid in new_ids[room:]:
+                    rejected.append({"id": rid, "reason": "سقفِ تعدادِ رکوردها پر است"})
+                    good.pop(rid)
+            for rid, (rec, text) in good.items():
+                row = existing.get(rid)
+                if row is None:
+                    row = AppRecord(user_id=user_id, app=app, rec_id=rid)
+                    db.add(row)
+                row.rtype = str(rec.get("type") or "")[:40]
+                row.data = text
+            await db.commit()
+            break
+        except IntegrityError:
+            # a concurrent request inserted one of these ids first ⇒ re-read and update instead
+            await db.rollback()
+            if attempt == 2:
+                raise HTTPException(status_code=409, detail="ذخیرهٔ هم‌زمان؛ دوباره تلاش کن")
+    return {"ok": True, "success": True, "saved": len(good), "rejected": rejected}
 
 
 @router.delete("/api/app-records/{app}/{rec_id}", tags=["app-records"])
-async def delete_record(app: str, rec_id: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+async def delete_record(app: str, rec_id: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
     row = (await db.execute(select(AppRecord).where(AppRecord.app == app, AppRecord.user_id == user_id,
                                                     AppRecord.rec_id == rec_id))).scalar_one_or_none()
@@ -117,7 +169,7 @@ async def delete_record(app: str, rec_id: str, db: AsyncSession = Depends(get_db
 
 
 @router.post("/api/app-records/{app}/ai", tags=["app-records"])
-async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
     from app.services.ai.inference_gateway import complete
 
@@ -131,27 +183,32 @@ async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), us
 
 
 @router.get("/api/app-records/{app}/mirror", tags=["app-records"])
-async def mirror_status(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+async def mirror_status(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
     from app.services.app_mirror_service import status
 
     return {"ok": True, "success": True, **(await status(db, user_id=user_id, app=app))}
 
 
-@router.post("/api/app-records/{app}/mirror", tags=["app-records"])
-async def mirror_queue(app: str, payload: MirrorIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+@router.post("/api/app-records/{app}/mirror", tags=["app-records"], dependencies=[Depends(_body_cap)])
+async def mirror_queue(app: str, payload: MirrorIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
     from app.services.app_mirror_service import upsert
 
     try:
-        res = await upsert(db, user_id=user_id, app=app, items=payload.items, deleted=payload.deleted)
+        items = [i.model_dump() for i in payload.items]
+        try:
+            res = await upsert(db, user_id=user_id, app=app, items=items, deleted=payload.deleted)
+        except IntegrityError:  # a concurrent queue of the same record — re-read and update
+            await db.rollback()
+            res = await upsert(db, user_id=user_id, app=app, items=items, deleted=payload.deleted)
     except ValueError as exc:
         raise HTTPException(status_code=413, detail=str(exc)) from exc
     return {"ok": True, "success": True, **res}
 
 
 @router.post("/api/app-records/{app}/mirror/sync", tags=["app-records"])
-async def mirror_sync(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+async def mirror_sync(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
     from app.services.app_mirror_service import sync_pending
 

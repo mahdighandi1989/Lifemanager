@@ -261,6 +261,42 @@ async def get_current_active_user(
         )
     return current_user
 
+async def get_signed_in_user_id(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> int:
+    """Strictest identity dependency: a valid token is ALWAYS required (even
+    with ``REQUIRE_AUTH=false``) and a Google account that is still
+    ``pending``/``rejected`` is refused (403) — it would otherwise map to the
+    shared single-tenant scope and read the owner's data (2026-10-12 audit of
+    /api/app-records). Returns the same data-scope id as
+    :func:`get_required_user_id`, so a route can swap dependencies without
+    touching its body. Used where the frontend is always behind login anyway
+    (the page is inside ``ProtectedRoute``), so the owner sees no change."""
+    token = _extract_token(request)
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    try:
+        user = await _resolve_token_to_user(token, db)
+        uid = await _resolve_data_scope_user_id(token, db) if user is not None else None
+    except Exception:
+        user, uid = None, None
+    if user is None or uid is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    st = getattr(user, "status", None)
+    if st in ("pending", "rejected") or getattr(user, "is_active", True) is False:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="حسابِ شما هنوز تأیید نشده است")
+    return uid
+
+
 def is_admin(current_user: AuthContext) -> bool:
     """Role-based admin check across both user shapes.
 
