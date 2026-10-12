@@ -105,6 +105,18 @@ export default function LearningArchitecturePage() {
       mirror: (payload) => api.post(`/app-records/${APP}/mirror`, payload).then((r) => r.data),
       mirrorList: () => api.get(`/app-records/${APP}/mirror`).then((r) => r.data),
       mirrorSync: () => api.post(`/app-records/${APP}/mirror/sync`).then((r) => r.data),
+      // «پیوست‌ها»: the bytes go straight to the record's Drive folder; the server keeps only a pointer
+      files: (recId) => api.get(`/app-records/${APP}/files`, { params: { rec_id: recId } }).then((r) => r.data.files || []),
+      upload: (recId, file, meta) => {
+        const fd = new FormData();
+        fd.append('rec_id', recId);
+        fd.append('group', (meta && meta.group) || '');
+        fd.append('title', (meta && meta.title) || '');
+        fd.append('file', file);
+        return api.post(`/app-records/${APP}/files`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data.file);
+      },
+      delFile: (id) => api.delete(`/app-records/${APP}/files/${id}`).then((r) => r.data),
+      usage: () => api.get(`/app-records/${APP}/usage`).then((r) => r.data),
     };
     loadBundle()
       .then(() => {

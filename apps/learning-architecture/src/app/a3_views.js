@@ -63,13 +63,13 @@
     var bn = document.getElementById("bname"), bs = document.getElementById("bsub");
     if (bn) bn.textContent = sys === "epi" ? "کارخانه معرفت‌شناسی" : "معماری یادگیری عمیق";
     if (bs) bs.textContent = sys === "epi" ? fa(((window.EPI || {}).HALLS || []).length) + " سالن · " + fa((A.ESTL || []).length) + " ایستگاه · جزوه مصباح" : "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه";
-    document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || (A.state.view === "topic" && b.dataset.v === "topics") || (A.state.view === "lesson" && b.dataset.v === "course") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases")); });
+    document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || ((A.state.view === "topic" || A.state.view === "journey") && b.dataset.v === "topics") || (A.state.view === "lesson" && b.dataset.v === "course") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases")); });
     var main = document.getElementById("main"); if (!main) return; main.innerHTML = "";
     // in the host, nothing renders before the records arrive: a view could otherwise save defaults (e.g. settings)
     // over the owner's real data — a deep link or the host's URL effect can call render that early (2026-10-12 audit)
     if (A.HOST && !A.S.loaded) { main.appendChild(h("div", { class: "card" }, "در حالِ بارگذاریِ داده‌ها…")); return; }
     /* برای «نظارت و سرکشی» میزبان: هر نما یک بخش نام‌دار است */
-    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", proto: "پروتکل", e_case: "پرونده کارخانه" })[A.state.view] || A.state.view; })();
+    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه" })[A.state.view] || A.state.view; })();
     main.setAttribute("data-report-section", A.state.view); main.setAttribute("data-report-section-label", lab);
     var fn = A.V[A.state.view] || A.V.home;
     try { main.appendChild(fn(A.state.arg, A.state.sub)); }
@@ -83,7 +83,10 @@
   };
   A.phaseChip = function (n) { var p = C.PHASES[n]; return h("span", { class: "chip ph", style: { "--pc": "var(--p" + n + ")" } }, "فاز " + fa(n) + " · " + p.short); };
   A.priChip = function (id) { var p = C.PRIORITY[id]; return h("span", { class: "chip pri p" + p, title: C.PRIORITY_INFO[p].why }, "اولویت " + C.PRIORITY_INFO[p].fa); };
-  A.evChip = function (t) { var m = { A: "شواهد قوی", B: "شواهد متوسط", C: "اکتشافی/تجربه‌محور" }; return h("span", { class: "chip ev ev" + t.ev.lvl, title: t.ev.note }, "سطح " + t.ev.lvl + " · " + m[t.ev.lvl]); };
+  /* قاعدهٔ تکنیک‌های ترکیبی (ممیزی B28، ۲۰۲۶-۱۰-۱۲): وقتی خودِ ترکیب آزمون نشده و شواهد فقط برای اجزا هست (ev.basis = "components")،
+     سطح = B فقط اگر سازوکارِ اصلی‌اش شواهدِ مستقیم و فراتحلیلی دارد، وگرنه C؛ و همیشه برچسبِ «بر پایهٔ اجزا» می‌گیرد. */
+  A.EV_BASIS = { components: "بر پایهٔ اجزا؛ خودِ ترکیب آزمون نشده" };
+  A.evChip = function (t) { var m = { A: "شواهد قوی", B: "شواهد متوسط", C: "اکتشافی/تجربه‌محور" }; var b = A.EV_BASIS[t.ev.basis]; return h("span", { class: "chip ev ev" + t.ev.lvl, title: (b ? b + " — " : "") + t.ev.note }, "سطح " + t.ev.lvl + " · " + m[t.ev.lvl] + (b ? " · بر پایهٔ اجزا" : "")); };
   A.techLink = function (id, opts) {
     var t = A.TM[id]; if (!t) return h("span", {}, "#" + id);
     return h("button", { class: "tlink", style: { "--pc": "var(--p" + A.phaseOf(id) + ")" }, onclick: function () { A.go("tech", id, opts && opts.sub); } }, h("b", {}, fa(id)), " ", t.fa);
@@ -153,7 +156,7 @@
       root.appendChild(h("section", { class: "card crs-home" },
         h("div", { class: "row between wrap gap" },
           h("div", {}, h("div", { class: "eyebrow" }, "🧭 دورهٔ گام‌به‌گام"),
-            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + fa(cnl.tid) + " · " + A.TM[cnl.tid].fa : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۵۵ دقیقه و قابلِ تقسیم به چند نشست.")),
+            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + (A.courseLessonName ? A.courseLessonName(cnl) : fa(cnl.tid) + " · " + (A.TM[cnl.tid] || {}).fa) : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۵۵ دقیقه و قابلِ تقسیم به چند نشست.")),
           h("button", { class: "btn", onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره"))));
     }
     var due = A.dueList();
@@ -268,7 +271,7 @@
         sec("فلسفه و ریشه", para(t.philo)),
         t.fix ? sec("اصلاحیه نسبت به اسناد شما", para(t.fix), "fixsec") : null),
       h("aside", { class: "colside" },
-        sec("سطح شواهد: " + t.ev.lvl, para(t.ev.note), "evsec ev" + t.ev.lvl),
+        sec("سطح شواهد: " + t.ev.lvl + (A.EV_BASIS[t.ev.basis] ? " (" + A.EV_BASIS[t.ev.basis] + ")" : ""), para(t.ev.note), "evsec ev" + t.ev.lvl),
         sec("کی به کار ببرم", para(t.when)),
         sec("کی کار نمی‌کند", para(t.limits)),
         sec("منبع در اسناد", h("p", { class: "small" }, t.src)),

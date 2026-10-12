@@ -145,9 +145,25 @@
   };
   function fieldsFor(s, cs) { return cs.mode === "quick" ? s.ws.filter(function (f) { return f.qk || f.t === "info"; }) : s.ws; }
   function stDone(cs, sid) { return !!(cs.st && cs.st[sid] && cs.st[sid].done); }
+  /* کاربرگِ یک ایستگاه روی یک پرونده — همان که صفحهٔ پرونده می‌سازد (فیلدهای مسیر، فهرستِ تصدیق‌ها، بازنگاشتِ شماره‌ها
+     با حذفِ یک تصدیق، برچسب‌های دسترس‌پذیری). دورهٔ کارخانه (a13) هم همین را صدا می‌زند تا منطق دو جا نباشد. */
+  A.epiStationWS = function (cs, sid, onSave, prefix) {
+    var s = SM[sid], st = sdat(cs, sid), claims = claimsOf(cs), snap = claims.slice();
+    var ws = A.renderWS(fieldsFor(s, cs), st.data, function () {
+      // حذف یک تصدیق از فهرست: ارجاع‌های شماره‌ای ایستگاه‌های دیگر جابه‌جا نشوند
+      if (s.id === "st_tasdiq") { var now = claimsOf(cs); if (now.length < snap.length) remapClaims(cs, snap, now); snap = now; }
+      if (onSave) onSave();
+    }, { prefix: prefix || "e_" + s.id, claims: claims });
+    a11yWS(ws);
+    return ws;
+  };
+  A.epiFields = fieldsFor;
+  A.epiClaimsOf = claimsOf;
 
   /* ---------- پوسته: نماهای کارخانه ---------- */
   A.EPI_NAV = [
+    { g: "شروع" },
+    ["epi_course", "🧭 دورهٔ گام‌به‌گام", "ایستگاه‌ها به ترتیبِ مسیر، درس‌به‌درس، روی یک ادعای واقعیِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
     { g: "کار" },
     ["e_home", "میز کار", "یک خبر یا ادعا را بسنج؛ از اینجا شروع کن"],
     ["e_cases", "پرونده‌ها", "همه سنجش‌هایت و گزارش‌هایشان"],
@@ -181,6 +197,7 @@
   A.V.e_home = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی · " + A.fdate(A.today()), "هر چیز را از ایستگاه‌ها عبور بده", "یک خبر، ادعا یا برداشت را بنویس و «ورود به کارخانه» را بزن؛ کارخانه گام‌به‌گام کمکت می‌کند بسنجی چقدر معتبر است. پایه کار: " + E.SOURCE + "."));
+    if (A.epiCourseCard) { try { root.appendChild(A.epiCourseCard()); } catch (e) { console.error(e); } }
     var ti = h("input", { id: "ncT", type: "text", placeholder: "عنوان کوتاه پرونده" });
     var ta = h("textarea", { id: "ncI", rows: 4, placeholder: "ورودی: یک برداشت، خبر، ادعا، گزارش، متن، استدلال یا باور خودت — همان‌طور که هست" });
     var kind = h("select", { id: "ncK", "aria-label": "نوع ورودی" }, h("option", { value: "" }, "نوع ورودی (اختیاری؛ در پذیرش هم می‌شود تعیین کرد)"), Object.keys(E.KIND_SUGGEST).map(function (k) { return h("option", { value: k }, k); }));
@@ -308,13 +325,7 @@
     function nextOf() { var r = routeList(cs).map(function (x) { return x.id; }); var i = r.indexOf(s.id); return i >= 0 && r[i + 1] ? SM[r[i + 1]] : null; }
     var goBtn = h("button", { class: "btn" });
     function lbl() { var n = nextOf(); goBtn.textContent = n ? "ثبت و ایستگاه بعد: " + n.fa : "ثبت و گزارش"; }
-    var snap = claims.slice();
-    var ws = A.renderWS(fields, st.data, function () {
-      // حذف یک تصدیق از فهرست: ارجاع‌های شماره‌ای ایستگاه‌های دیگر جابه‌جا نشوند
-      if (s.id === "st_tasdiq") { var now = claimsOf(cs); if (now.length < snap.length) remapClaims(cs, snap, now); snap = now; }
-      save(); lbl();
-    }, { prefix: "e_" + s.id, claims: claims });
-    a11yWS(ws);
+    var ws = A.epiStationWS(cs, s.id, function () { save(); lbl(); });
     wrap.appendChild(ws);
     if (s.id === "st_final") wrap.appendChild(outcomes(cs));
     // روبریک

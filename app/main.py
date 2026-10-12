@@ -310,8 +310,13 @@ async def startup_event():
         async with SessionLocal() as session:
             summary = await seed_ai_catalog(session)
             logger.info("AI catalog seed: %s", summary)
+        await _remember_ai_seed({"ok": True, **summary})
     except Exception as exc:
-        logger.debug("skip AI catalog seed: %s", exc)
+        # 2026-10-12: this used to be logger.debug — production silently kept two shut-down
+        # Gemini models because a failing seed left no trace. Now it is a warning AND
+        # remembered (shown in GET /api/ai/overview → "seed") so it can be seen without logs.
+        logger.warning("AI catalog seed failed: %r", exc, exc_info=True)
+        await _remember_ai_seed({"ok": False, "error": f"{type(exc).__name__}: {exc}"[:500]})
 
     # Anchor the anonymous data scope. Per-user tables (tasks, user_contexts,
     # contextual_recommendations, finance, drive_files, …) carry a FK
@@ -1465,3 +1470,27 @@ else:
     @app.get("/")
     async def root():
         return {"message": "Lifemanager API is running. Frontend not built yet."}
+
+
+
+async def _remember_ai_seed(result: dict) -> None:
+    """Keep the last boot-time AI-catalog seed result (GlobalSetting «ai_catalog_seed»); never raises."""
+    try:
+        import json as _json
+        from datetime import datetime as _dt, timezone as _tz
+
+        from sqlalchemy import select as _select
+
+        from app.database import SessionLocal
+        from app.models.global_setting import GlobalSetting
+
+        async with SessionLocal() as s:
+            row = (await s.execute(_select(GlobalSetting).where(GlobalSetting.key == "ai_catalog_seed"))).scalars().first()
+            val = _json.dumps({**result, "at": _dt.now(_tz.utc).isoformat()}, ensure_ascii=False, default=str)
+            if row is None:
+                s.add(GlobalSetting(key="ai_catalog_seed", value=val))
+            else:
+                row.value = val
+            await s.commit()
+    except Exception:
+        pass

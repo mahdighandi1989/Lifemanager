@@ -599,3 +599,110 @@ nav.crumbs .trailall ol{margin:6px 0 0;padding-inline-start:20px}
 .drv{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
 .drvlink{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--ink);text-decoration:none;font-size:.82rem}
 .drvlink:hover{border-color:var(--accent);color:var(--accent)}
+/* === a13_epi_course BEGIN === */
+/* دورهٔ گام‌به‌گامِ کارخانه — بیشترِ ظاهر از .crs-* ِ دورهٔ یادگیری می‌آید؛ این‌جا فقط چیزهای تازه */
+.door.mainepi{border:2px solid var(--accent);background:linear-gradient(180deg,var(--accent-soft),var(--surface) 60%)}
+@media (max-width:480px){.ecrs .crs-road,.ecrs .crs-road.compact{grid-template-columns:1fr}}
+.ecrs-halls{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin:6px 0}
+.ecrs-hall{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--surface-2);min-width:0}
+.ecrs-hall.on{border:2px solid var(--accent);background:var(--accent-soft)}
+.ecrs-hall.end{border-style:double;border-width:3px}
+.ecrs-hallt{font-weight:800;font-size:.85rem}
+.ecrs-halln{line-height:1.5;overflow-wrap:anywhere}
+.ecrs-sts{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.ecrs-st{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--ink-2);background:var(--surface);display:grid;place-items:center;font-size:.7rem;line-height:1}
+.ecrs-st.cond{border-style:dashed}
+.ecrs-st.done{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ecrs-st.cur{width:26px;height:26px;border:2px solid var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-soft)}
+.ecrs-co{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface)}
+.ecrs-co summary{cursor:pointer}
+.ecrs-drill .ditem:first-of-type{border-top:0}
+.ecrs-feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:8px 14px}
+.ecrs-frow{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ecrs-frow label{line-height:1.6}
+.ecrs-frow select,.ecrs-frow input{max-width:100%;min-width:0}
+.ecrs-ceil{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--surface-2)}
+.ecrs-ceilhead{display:flex;flex-direction:column;gap:2px}
+.ecrs-ceilv{font-size:1.6rem;font-variant-numeric:tabular-nums;color:var(--accent)}
+.ecrs-ceil .crs-meter i{background:var(--accent)}
+.ecrs-cap{padding:6px 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:4px;min-width:0}
+.ecrs-cap.bind{border:2px solid var(--bad);background:var(--bad-soft)}
+.ecrs-capbar{position:relative;height:18px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.ecrs-capbar i{display:block;height:100%;background:var(--warn-soft);border-left:2px solid var(--warn)}
+.ecrs-cap.bind .ecrs-capbar i{background:color-mix(in srgb,var(--bad) 25%,var(--surface));border-left-color:var(--bad)}
+.ecrs-capbar span{position:absolute;inset:0;display:grid;place-items:center;font-size:.78rem;font-weight:700}
+.ecrs-route{margin:0;padding-inline-start:1.4em;columns:2 220px;column-gap:18px}
+.ecrs-peek .dialog{width:min(760px,100%);max-width:760px}
+.ecrs .crs-top span,.ecrs .lead,.ecrs .crs-def .big{overflow-wrap:anywhere}
+/* === a13_epi_course END === */
+/* === a15_journey BEGIN === */
+/* سفرِ گام‌به‌گام روی موضوع + درس‌های روال در دوره */
+.jr-cta{border:2px solid var(--accent);background:var(--accent-soft)}
+.jr-cta .jr-ctat{flex:1 1 260px;min-width:0}
+.jr-go{white-space:normal;text-align:center;max-width:100%}
+.tcwrap{display:flex;flex-direction:column;gap:6px;min-width:0}
+.tcwrap .tcard{flex:1}
+.jr-tbtn{align-self:flex-start;white-space:normal;text-align:right;max-width:100%}
+.jr-strip{list-style:none;margin:6px 0 14px;padding:0;display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px}
+.jr-st{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;position:relative}
+.jr-st+.jr-st::before{content:"";position:absolute;top:15px;left:calc(50% + 15px);width:calc(100% - 26px);height:2px;background:var(--line)}
+.jr-stb{width:30px;height:30px;border-radius:50%;border:2px solid var(--pc,var(--accent));background:var(--surface);color:var(--ink);font:inherit;font-weight:800;font-size:.8rem;cursor:pointer;padding:0;display:grid;place-items:center;position:relative;z-index:1}
+.jr-st.done .jr-stb{background:var(--pc,var(--accent));color:#fff}
+.jr-st.other .jr-stb{border-style:dashed}
+.jr-st.here .jr-stb{box-shadow:0 0 0 4px var(--accent-soft);border-color:var(--accent);background:var(--accent-soft)}
+.jr-stl{font-size:.68rem;line-height:1.35;text-align:center;color:var(--ink-2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.jr-st.here .jr-stl{color:var(--ink);font-weight:700}
+@media (max-width:720px){
+  .jr-strip{grid-template-columns:repeat(6,minmax(0,1fr));row-gap:10px}
+  .jr-st+.jr-st::before{display:none}
+  .jr-stl{display:none}
+}
+.jr-now{border-top:3px solid var(--accent)}
+.jr-now .wsform{margin-top:10px}
+.jr-kind{margin-top:10px}
+.jr-kind select{max-width:100%}
+.jr-more summary{cursor:pointer;font-weight:700}
+.jr-nav .btn,.jr-back{white-space:normal}
+.crs-jhint{margin:8px 0 0}
+/* درس‌های روال در دوره */
+.crs-dot.pr{border-radius:4px}
+.crs-wlist li.pr{list-style-type:square}
+.crs-whenopt{text-align:right;white-space:normal}
+.crs-whenopt.ok{border-color:var(--accent);background:var(--accent-soft)}
+.crs-whenopt.bad{border-color:#c0552a;opacity:.7}
+.crs-next{border-inline-start:3px solid var(--accent)}
+/* === a15_journey END === */
+/* === a14_sims BEGIN === */
+.sim-fb{margin-top:6px;padding:6px 10px;border-radius:8px;font-size:.86rem;line-height:1.8;overflow-wrap:anywhere}
+.sim-fb.ok{background:var(--good-soft);color:var(--good)}
+.sim-fb.no{background:var(--bad-soft);color:var(--bad)}
+.sim-q .crs-whyopt{display:block;width:100%;max-width:100%}
+.btn.sim-right:disabled{opacity:1;border-color:var(--good);color:var(--good);background:var(--good-soft);cursor:default}
+.sim-text{padding:12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);line-height:2;white-space:pre-wrap;overflow-wrap:anywhere}
+.sim-closed{padding:14px;border-radius:10px;border:2px dashed var(--line);text-align:center}
+.sim-list{margin:4px 0;padding-inline-start:20px}.sim-list li{margin:4px 0}
+.sim-m{border-radius:4px;padding:0 3px}
+.sim-m.j{background:var(--warn-soft);color:var(--warn);font-weight:700}
+.sim-m.v{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.sim-m.c{background:var(--good-soft);color:var(--good);font-weight:700}
+.sim-legend{align-items:center}
+.sim-layers{display:flex;flex-direction:column;gap:6px}
+.sim-layer{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);border-inline-start:6px solid var(--line)}
+.sim-layer.l0{border-inline-start-color:var(--accent);background:var(--accent-soft)}
+.sim-layer.l1{border-inline-start-color:var(--ink-2);margin-inline-end:8%}
+.sim-layer.l2{margin-inline-end:16%;opacity:.85}
+.sim-map svg{display:block;max-width:100%;height:auto}
+.sim-pareto{display:flex;flex-direction:column;gap:4px}
+.sim-prow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.8fr) 3.2em;gap:8px;align-items:center;padding:4px 6px;border-radius:8px;font-size:.88rem}
+.sim-prow.head{font-weight:700}
+.sim-prow.top{background:var(--accent-soft)}
+.sim-prow .nm{overflow-wrap:anywhere}
+.sim-prow .bar{display:flex;align-items:center;gap:6px;min-width:0}
+.sim-prow .bar i{display:block;height:10px;border-radius:99px;background:var(--accent);min-width:3px}
+.sim-ladder{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.sim-rung{display:grid;grid-template-columns:4.5em minmax(0,1fr);gap:8px;align-items:center;padding:8px 12px;border-radius:10px;border:1px dashed var(--line);background:var(--surface)}
+.sim-rung.on{border-style:solid;border-color:var(--accent);background:var(--accent-soft)}
+.sim-rung.mid{border:2px solid var(--ink-2);background:var(--surface-2);font-weight:700}
+.sim-step{text-align:center}
+@media (max-width:520px){.sim-prow{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,.9fr) 2.8em;font-size:.8rem;gap:5px}}
+/* === a14_sims END === */

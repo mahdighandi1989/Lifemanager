@@ -40,8 +40,10 @@
    - بخشِ مربوطِ `docs/HANDBOOK.md`: تصمیم ⇒ §۱۰ (با «ردشده»)، کارِ باز ⇒ §۱۲، عددِ تازهٔ آزمون ⇒ §۶، و «به‌روزرسانی:» به امروز.
 4. دوباره `python apps/learning-architecture/build.py` (فهرست و نمودار و نسخه‌های فرانت را بازمی‌سازد).
 5. دروازه (قانونِ ۴ ِ ریپو): `python -m pytest tests/ -q` و `cd frontend && npm run build`. اگر رفتارِ برنامه عوض شد:
-   `cd apps/learning-architecture && npm i --no-save playwright@1 && for t in tests/*.js; do node $t; done`
+   `cd apps/learning-architecture && npm i --no-save playwright@1.56 && for t in tests/*.js; do node $t; done`
    (Chromium در `/opt/pw-browsers`؛ `playwright install` نزن). هر آزمون باید «NO ERRORS» بدهد.
+   اگر ذخیره/ورود/تاریخچه/آینه/پیوست/میزبان عوض شد: `python apps/learning-architecture/tests/host/run_host_e2e.py`
+   (برنامهٔ واقعی با پایگاه‌دادهٔ موقت؛ آزمون‌های `tests/host/*.js`) — باید «host e2e: all NO ERRORS» بدهد.
 6. ثبتِ عمومی: `docs/overhaul/AUDIT_LOG.md` و درس در `experiences/` — بعد ادغام در `main` طبقِ `/CLAUDE.md`.
 
 ## خطوطِ قرمز

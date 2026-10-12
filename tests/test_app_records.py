@@ -86,3 +86,25 @@ async def test_malformed_mirror_input_is_a_422_not_a_500(api_client):
     assert api_client.post(base, json={"items": ["x"]}).status_code == 422
     assert api_client.post(base, json={"items": [{"rec_id": "c1", "tabs": "nope"}]}).status_code == 422
     assert api_client.post(base, json={"items": [{"rec_id": "c1", "tabs": [{"name": "a", "rows": [[1, None]]}]}]}).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_usage_reports_ai_calls_and_an_estimated_cost_only_when_priced(db_session):
+    from app.models.ai_catalog import AICatalogModel
+    from app.models.ai_usage import AIUsageLog
+    from app.routes.app_records import app_usage
+
+    db_session.add(AICatalogModel(model_key="m1", provider_key="gemini", display_name="Gemini X", enabled=True,
+                                  capabilities=["text"], priority=2, source="live", is_custom=False,
+                                  input_cost_per_1m=1.0, output_cost_per_1m=4.0))
+    db_session.add(AIUsageLog(task="learning_architecture", model="Gemini X", provider="gemini", ok=True,
+                              prompt_chars=4_000_000, output_chars=400_000))
+    db_session.add(AIUsageLog(task="learning_architecture", model="Unpriced", provider="gemini", ok=True,
+                              prompt_chars=400, output_chars=40))
+    db_session.add(AIUsageLog(task="other_task", model="Gemini X", provider="gemini", ok=True, prompt_chars=9, output_chars=9))
+    await db_session.commit()
+    r = await app_usage("learning-architecture", db_session, 0)
+    ms = {m["model"]: m for m in r["ai_30d"]["models"]}
+    assert set(ms) == {"Gemini X", "Unpriced"}, "only this page's task"
+    assert ms["Gemini X"]["est_cost_usd"] == 1.4  # 1M in tokens × $1 + 0.1M out × $4
+    assert ms["Unpriced"]["est_cost_usd"] is None and r["ai_30d"]["all_priced"] is False

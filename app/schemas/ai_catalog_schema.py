@@ -39,6 +39,10 @@ class CatalogModelUpdate(BaseModel):
     temperature: Optional[float] = None
     priority: Optional[int] = None
     notes: Optional[str] = None
+    # USD per 1M tokens — providers don't publish prices through their APIs, so the owner enters
+    # them (from the provider's pricing page); used only for the ESTIMATED cost shown in usage views
+    input_cost_per_1m: Optional[float] = None
+    output_cost_per_1m: Optional[float] = None
 
 
 class CatalogTaskRouteUpdate(BaseModel):

@@ -128,6 +128,23 @@ function AISettings({ embedded = false }) {
     }
   };
 
+  // USD per 1M tokens, typed by the owner from the provider's pricing page (APIs don't publish prices);
+  // used only for ESTIMATED cost in usage views
+  const savePrice = async (id, key, value) => {
+    if (value === '') return;
+    const v = Number(value);
+    if (!Number.isFinite(v) || v < 0) { setError('قیمت باید عددِ مثبت باشد'); return; }
+    try {
+      const res = await fetch(`/api/ai/models/${id}`, {
+        method: 'PUT', headers: jsonHeaders(), body: JSON.stringify({ [key]: v }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await load();
+    } catch (e) {
+      setError('خطا در ذخیرهٔ قیمت: ' + e.message);
+    }
+  };
+
   const deleteModel = async (id) => {
     try {
       const res = await fetch(`/api/ai/models/${id}`, { method: 'DELETE', headers: authHeaders() });
@@ -339,6 +356,18 @@ function AISettings({ embedded = false }) {
                       {m.source === 'discovered' && <span className="text-[10px] bg-sky-50 text-sky-600 rounded px-1.5">کشف‌شده</span>}
                       {m.source === 'live' && <span title="هر روز خودکار با فهرستِ زندهٔ ارائه‌دهنده همگام می‌شود" className="text-[10px] bg-emerald-50 text-emerald-700 rounded px-1.5">خودکار</span>}
                       {(m.notes || '').includes('[owner]') && <span title="انتخابِ دستیِ شما؛ به‌روزرسانیِ خودکار آن را عوض نمی‌کند (جز وقتی مدل از فهرستِ ارائه‌دهنده حذف شود)" className="text-[10px] bg-violet-50 text-violet-700 rounded px-1.5">انتخابِ شما</span>}
+                      <details className="text-[11px] text-gray-500" dir="rtl">
+                        <summary className="cursor-pointer">💲 قیمت {m.input_cost_per_1m != null ? `(${m.input_cost_per_1m}/${m.output_cost_per_1m ?? '?'} $)` : '(وارد نشده)'}</summary>
+                        <div className="flex flex-wrap items-center gap-1 mt-1">
+                          <span>دلار برای هر میلیون توکن — ورودی:</span>
+                          <input type="number" min="0" step="0.01" defaultValue={m.input_cost_per_1m ?? ''} className="w-20 border rounded px-1"
+                            onBlur={(e) => savePrice(m.id, 'input_cost_per_1m', e.target.value)} aria-label="قیمتِ ورودی" />
+                          <span>خروجی:</span>
+                          <input type="number" min="0" step="0.01" defaultValue={m.output_cost_per_1m ?? ''} className="w-20 border rounded px-1"
+                            onBlur={(e) => savePrice(m.id, 'output_cost_per_1m', e.target.value)} aria-label="قیمتِ خروجی" />
+                          <span className="text-gray-400">از صفحهٔ قیمتِ ارائه‌دهنده؛ فقط برای «هزینهٔ تخمینی»</span>
+                        </div>
+                      </details>
                       <span className="flex gap-1 flex-wrap">
                         {(m.capabilities || []).map((c) => (
                           <span key={c} className="text-[10px] bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">{capLabel(c)}</span>

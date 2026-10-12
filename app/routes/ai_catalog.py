@@ -72,7 +72,28 @@ async def ai_catalog_overview(
         "tasks": TASK_TYPES,
         "capabilities": CAPABILITIES,
         "status": await ai_manager.status(db),
+        # diagnostics (no secrets): last boot-time seed + last automatic live-list refresh
+        "maintenance": await _maintenance(db),
     }
+
+
+async def _maintenance(db: AsyncSession) -> Dict[str, Any]:
+    import json as _json
+
+    from app.models.global_setting import GlobalSetting
+
+    out: Dict[str, Any] = {"seed": None, "model_refresh": None}
+    try:
+        rows = {r.key: r.value for r in (await db.execute(select(GlobalSetting).where(
+            GlobalSetting.key.in_(["ai_catalog_seed", "jobs_engine_stamps"])))).scalars().all()}
+        if rows.get("ai_catalog_seed"):
+            out["seed"] = _json.loads(rows["ai_catalog_seed"])
+        if rows.get("jobs_engine_stamps"):
+            st = (_json.loads(rows["jobs_engine_stamps"]) or {}).get("ai_model_refresh") or {}
+            out["model_refresh"] = {k: st.get(k) for k in ("last_run", "last_ok", "last_error", "last_result")} if st else None
+    except Exception as exc:  # noqa: BLE001
+        out["error"] = type(exc).__name__
+    return out
 
 
 @router.put("/providers/{key}")
@@ -205,6 +226,10 @@ async def update_catalog_model(
         model.priority = payload.priority
     if payload.notes is not None:
         model.notes = payload.notes
+    if payload.input_cost_per_1m is not None:
+        model.input_cost_per_1m = max(0.0, float(payload.input_cost_per_1m))
+    if payload.output_cost_per_1m is not None:
+        model.output_cost_per_1m = max(0.0, float(payload.output_cost_per_1m))
     if owner_toggled:
         from app.services.ai.model_discovery import OWNER_MARK
 

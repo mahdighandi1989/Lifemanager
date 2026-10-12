@@ -7,6 +7,10 @@
     GET    /api/app-records/{app}/mirror        Drive mirror status + folder/sheet links per record
     POST   /api/app-records/{app}/mirror        {items: [{rec_id, group, title, tabs}], deleted: [rec_id]} — queue for Drive
     POST   /api/app-records/{app}/mirror/sync   write the caller's pending mirrors to Drive now
+    GET    /api/app-records/{app}/files?rec_id= attachments of a record (pointers; bytes are in Drive)
+    POST   /api/app-records/{app}/files         upload (multipart rec_id, group, title, file) straight to the record's Drive folder
+    DELETE /api/app-records/{app}/files/{id}    hide; the Drive file is only renamed
+    GET    /api/app-records/{app}/usage         database/Drive footprint + AI use (30 days, estimated cost)
 
 First tenant: «معماری یادگیری عمیق و کارخانه معرفت‌شناسی» (`/apps/learning-architecture`).
 Records are the app's own JSON documents; the server only scopes them by user,
@@ -214,3 +218,84 @@ async def mirror_sync(app: str, db: AsyncSession = Depends(get_db), user_id: int
 
     res = await sync_pending(db, user_id=user_id, app=app, limit=40)
     return {"ok": True, "success": True, **res}
+
+
+# ---------------------------------------------------------------- پیوست‌ها (bytes ONLY in Drive) + مصرف
+
+from fastapi import File, Form, UploadFile  # noqa: E402
+
+
+@router.get("/api/app-records/{app}/files", tags=["app-records"])
+async def files_list(app: str, rec_id: str = "", db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+    _check_app(app)
+    from app.services.app_mirror_service import list_attachments
+
+    return {"ok": True, "success": True, "files": await list_attachments(db, user_id=user_id, app=app, rec_id=rec_id or None)}
+
+
+@router.post("/api/app-records/{app}/files", tags=["app-records"])
+async def files_upload(app: str, rec_id: str = Form(...), group: str = Form(""), title: str = Form(""),
+                       file: UploadFile = File(...), db: AsyncSession = Depends(get_db),
+                       user_id: int = Depends(get_signed_in_user_id)):
+    """The file goes straight into the record's Drive folder (…/<title · id>/پیوست‌ها/);
+    the database keeps only a pointer. Drive not connected ⇒ 503 (never stored on the server)."""
+    _check_app(app)
+    if not _REC_ID.match(rec_id or ""):
+        raise HTTPException(status_code=422, detail="شناسهٔ رکورد نامعتبر است")
+    from app.services.app_mirror_service import MAX_FILE_BYTES, DriveUnavailable, upload_attachment
+
+    data = await file.read(MAX_FILE_BYTES + 1)
+    if len(data) > MAX_FILE_BYTES:
+        raise HTTPException(status_code=413, detail="فایل بزرگ‌تر از ۲۵ مگابایت است")
+    if not data:
+        raise HTTPException(status_code=422, detail="فایل خالی است")
+    try:
+        f = await upload_attachment(db, user_id=user_id, app=app, rec_id=rec_id, group=group[:60], title=title[:200],
+                                    filename=file.filename or "file", mime=file.content_type or "", data=data)
+    except DriveUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=413, detail=str(exc)) from exc
+    return {"ok": True, "success": True, "file": f}
+
+
+@router.delete("/api/app-records/{app}/files/{file_id}", tags=["app-records"])
+async def files_delete(app: str, file_id: int, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+    _check_app(app)
+    from app.services.app_mirror_service import delete_attachment
+
+    return {"ok": True, "success": True, "deleted": await delete_attachment(db, user_id=user_id, app=app, file_id=file_id)}
+
+
+@router.get("/api/app-records/{app}/usage", tags=["app-records"])
+async def app_usage(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+    """Storage this page uses in the server database and in Drive, plus its AI use over 30 days
+    (calls, characters ≈ tokens×4, and an ESTIMATED cost only where the model has a price)."""
+    _check_app(app)
+    from datetime import datetime, timedelta, timezone
+
+    from app.models.ai_catalog import AICatalogModel
+    from app.models.ai_usage import AIUsageLog
+    from app.services.app_mirror_service import usage
+
+    store = await usage(db, user_id=user_id, app=app)
+    since = datetime.now(timezone.utc) - timedelta(days=30)
+    rows = (await db.execute(select(AIUsageLog.model, func.count(AIUsageLog.id), func.coalesce(func.sum(AIUsageLog.prompt_chars), 0),
+                                    func.coalesce(func.sum(AIUsageLog.output_chars), 0))
+                             .where(AIUsageLog.task == "learning_architecture", AIUsageLog.created_at >= since)
+                             .group_by(AIUsageLog.model))).all()
+    prices = {m.display_name: m for m in (await db.execute(select(AICatalogModel))).scalars().all()}
+    models, total, priced_all = [], 0.0, True
+    for model, n, pc, oc in rows:
+        m = prices.get(model)
+        tin, tout = int(pc or 0) / 4.0, int(oc or 0) / 4.0
+        cost = None
+        if m is not None and m.input_cost_per_1m is not None and m.output_cost_per_1m is not None:
+            cost = round(tin / 1e6 * m.input_cost_per_1m + tout / 1e6 * m.output_cost_per_1m, 4)
+            total += cost
+        else:
+            priced_all = False
+        models.append({"model": model or "", "calls": int(n), "prompt_chars": int(pc or 0), "output_chars": int(oc or 0),
+                       "est_tokens": int(tin + tout), "est_cost_usd": cost})
+    return {"ok": True, "success": True, "storage": store,
+            "ai_30d": {"models": models, "est_cost_usd": round(total, 4) if models else 0.0, "all_priced": priced_all}}

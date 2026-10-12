@@ -161,6 +161,20 @@
       fields.forEach(function (f) {
         if (!f.req) return;
         var ok = A.filled(data[f.k]);
+        // data-driven table constraints (audit B27): distinct values in a column / at least one matching row
+        if (ok && Array.isArray(data[f.k]) && (f.distinct || f.needOne)) {
+          var rows = data[f.k].filter(function (r) { return r && typeof r === "object" && A.filled(r); });
+          if (f.distinct) {
+            var seen = {}; rows.forEach(function (r) { var v = String(r[f.distinct.col] || "").trim(); if (v) seen[v] = 1; });
+            if (Object.keys(seen).length < f.distinct.n) { ok = false; missing.push(f.l + " — " + f.distinct.msg); }
+          }
+          if (ok && f.needOne) {
+            var re = new RegExp(f.needOne.re);
+            if (!rows.some(function (r) { return re.test(String(r[f.needOne.col] || "")); })) { ok = false; missing.push(f.l + " — " + f.needOne.msg); }
+          }
+          var el2 = root.querySelector('[data-k="' + f.k + '"]'); if (el2) el2.classList.toggle("missing", !ok);
+          if (!ok) return;
+        }
         var el = root.querySelector('[data-k="' + f.k + '"]');
         if (el) el.classList.toggle("missing", !ok);
         if (!ok) missing.push(f.l);
@@ -276,7 +290,8 @@
   };
   FIELD.timer = function (f, d, ch, id) {
     var st = d[f.k] = d[f.k] || { sec: 0, done: false };
-    var target = (f.min || 10) * 60, iv = null;
+    // f.max = a CEILING (stop and move on when it's reached — audit B25), f.min = a target to reach
+    var cap = f.max || 0, target = (cap || f.min || 10) * 60, iv = null;
     var disp = h("div", { class: "tdisp", "aria-live": "polite" });
     var bar = h("div", { class: "tbar" }, h("i", {}));
     function show() {
@@ -288,10 +303,20 @@
     var bStart = h("button", { class: "btn sm", type: "button", id: id, onclick: function () {
       if (iv) { clearInterval(iv); iv = null; bStart.textContent = "ادامه"; ch(); return; }
       bStart.textContent = "مکث";
-      iv = setInterval(function () { st.sec++; if (st.sec >= target && !st.done) { st.done = true; A.toast("زمان تمام شد. حالا ادامه بده."); ch(); } show(); if (!document.body.contains(box)) clearInterval(iv); }, 1000);
+      iv = setInterval(function () {
+        if (cap && st.sec >= target) { clearInterval(iv); iv = null; bStart.textContent = "ادامه"; show(); return; }
+        st.sec++;
+        if (st.sec >= target && !st.done) {
+          st.done = true;
+          if (cap) { clearInterval(iv); iv = null; bStart.textContent = "ادامه"; A.toast("سقفِ " + fa(cap) + " دقیقه رسید: بیش از این تلاش نکن — حالا پاسخ را ببین و مقایسه کن."); }
+          else A.toast("زمان تمام شد. حالا ادامه بده.");
+          ch();
+        }
+        show(); if (!document.body.contains(box)) clearInterval(iv);
+      }, 1000);
     } }, st.sec ? "ادامه" : "شروع");
     var box = h("div", { class: "timer" }, disp, bar, h("div", { class: "row gap" }, bStart, h("button", { class: "btn ghost sm", type: "button", onclick: function () { st.sec = 0; st.done = false; show(); ch(); } }, "صفر"),
-      h("span", { class: "small muted" }, "هدف: " + fa(f.min || 10) + " دقیقه")));
+      h("span", { class: "small muted" }, cap ? "سقف: " + fa(cap) + " دقیقه (نه کف — زودتر هم می‌توانی تمام کنی)" : "هدف: " + fa(f.min || 10) + " دقیقه")));
     show(); return box;
   };
   FIELD.lock = function (f, d, ch, id, updaters) {

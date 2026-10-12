@@ -276,3 +276,57 @@ async def test_failed_rows_go_last_and_quota_stops_the_run(db_session, monkeypat
     assert res["written"] == 2 and len(titles) == 2
     st = await svc.status(db_session, user_id=1, app="learning-architecture")
     assert sum(1 for i in st["items"] if i["pending"]) == 1
+
+
+class FakeDriveUp(FakeDrive):
+    def __init__(self):
+        super().__init__()
+        self.uploads = []
+
+    async def upload_ex(self, *, file_name, parent, media, mime_type="", description="", app_properties=None):
+        self.uploads.append((file_name, parent, len(media), mime_type))
+        return {"id": f"file{len(self.uploads)}", "md5": "", "link": f"https://drive/file{len(self.uploads)}"}
+
+
+@pytest.mark.asyncio
+async def test_attachments_go_to_the_record_folder_in_drive_and_only_a_pointer_is_kept(db_session, monkeypatch):
+    from app.services import app_mirror_service as svc
+    from app.services import inspection_drive
+
+    async def fake_root(db, client):
+        return "ROOT"
+
+    monkeypatch.setattr(inspection_drive, "root_folder", fake_root)
+    drive, writer = FakeDriveUp(), FakeWriter()
+    f = await svc.upload_attachment(db_session, user_id=1, app="learning-architecture", rec_id="case_9", group="پرونده‌ها",
+                                    title="خبر", filename="سند/۱.pdf", mime="application/pdf", data=b"%PDF-1", clients=(drive, writer))
+    assert f["name"] == "سند／۱.pdf" and f["size"] == 6 and f["link"]
+    grp = drive.folders[("پرونده‌ها", drive.folders[("learning-architecture", "ROOT")])]
+    rec = [v for k, v in drive.folders.items() if k[1] == grp][0]
+    assert drive.uploads[0][1] == drive.folders[("پیوست‌ها", rec)], "inside <record folder>/پیوست‌ها"
+    # the mirror later writes its sheet into the SAME folder
+    st = await svc.status(db_session, user_id=1, app="learning-architecture")
+    assert st["items"][0]["folder_url"].endswith(rec)
+    assert len(await svc.list_attachments(db_session, user_id=1, app="learning-architecture", rec_id="case_9")) == 1
+    u = await svc.usage(db_session, user_id=1, app="learning-architecture")
+    assert u["files"] == 1 and u["file_bytes_in_drive"] == 6
+    # delete ⇒ hidden + renamed in Drive, never deleted
+    writer.alive.add("file1")
+    assert await svc.delete_attachment(db_session, user_id=1, app="learning-architecture", file_id=f["id"], clients=(drive, writer))
+    assert writer.renames[-1] == ("file1", svc.DELETED_PREFIX + "سند／۱.pdf")
+    assert await svc.list_attachments(db_session, user_id=1, app="learning-architecture") == []
+    # someone else's file id ⇒ refused
+    assert not await svc.delete_attachment(db_session, user_id=2, app="learning-architecture", file_id=f["id"], clients=(drive, writer))
+
+
+@pytest.mark.asyncio
+async def test_without_drive_an_upload_is_refused_not_stored_on_the_server(api_client):
+    _signin(api_client)
+    r = api_client.post("/api/app-records/learning-architecture/files", data={"rec_id": "case_1"},
+                        files={"file": ("a.txt", b"hello", "text/plain")})
+    assert r.status_code == 503 and "درایو" in r.json()["detail"]
+    assert api_client.get("/api/app-records/learning-architecture/files").json()["files"] == []
+    u = api_client.get("/api/app-records/learning-architecture/usage").json()
+    assert u["storage"]["files"] == 0 and u["ai_30d"]["models"] == []
+    assert api_client.post("/api/app-records/learning-architecture/files", data={"rec_id": "a/b"},
+                           files={"file": ("a.txt", b"x", "text/plain")}).status_code == 422

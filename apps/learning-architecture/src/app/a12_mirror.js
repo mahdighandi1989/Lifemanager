@@ -199,6 +199,54 @@
     A.mirrorInfo().then(function (info) { slot.innerHTML = ""; slot.appendChild(chip(info, rid)); });
   };
 
+  /* ---------- 📎 پیوست‌ها: خودِ فایل مستقیم در فولدرِ همان مورد در درایو؛ سرور فقط اشاره‌گر نگه می‌دارد ---------- */
+  function fsize(n) { return n >= 1048576 ? fa((n / 1048576).toFixed(1)) + " مگابایت" : fa(Math.max(1, Math.round(n / 1024))) + " کیلوبایت"; }
+  function attachSection(rid, meta) {
+    var sec = h("section", { class: "card attach", "data-report-section": "attachments", "data-report-section-label": "پیوست‌ها" },
+      h("h3", {}, "📎 پیوست‌ها"), h("p", { class: "small muted" }, "فایل (عکس، صوت، PDF، …) مستقیم در فولدرِ همین مورد در گوگل درایو نگه داشته می‌شود — نه در سرور؛ حداکثر ۲۵ مگابایت. حذف در این‌جا فایل را در درایو فقط تغییرِ نام می‌دهد."));
+    var list = h("ul", { class: "plain small" }, h("li", { class: "muted" }, "در حالِ خواندن…"));
+    var inp = h("input", { type: "file", multiple: true, "aria-label": "انتخابِ فایل", onchange: function () { up(Array.prototype.slice.call(inp.files || [])); } });
+    var st = h("span", { class: "small muted" });
+    function load() {
+      A.HOST.files(rid).then(function (fs) {
+        list.innerHTML = "";
+        if (!fs.length) list.appendChild(h("li", { class: "muted" }, "هنوز پیوستی نیست."));
+        fs.forEach(function (f) {
+          list.appendChild(h("li", { class: "row gap wrap" }, h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name), h("span", { class: "muted" }, fsize(f.size)),
+            h("button", { class: "linkish", onclick: function () { if (!confirm("پیوستِ «" + f.name + "» از این‌جا برداشته شود؟ (در درایو فقط تغییرِ نام می‌دهد)")) return; A.HOST.delFile(f.id).then(load, function (e) { A.toast(errText(e), "bad"); }); } }, "برداشتن")));
+        });
+      }, function (e) { list.innerHTML = ""; list.appendChild(h("li", { class: "bad" }, errText(e))); });
+    }
+    function errText(e) { var d = e && e.response && e.response.data; return (d && d.detail) || (e && e.message) || "خطا"; }
+    function up(files) {
+      if (!files.length) return;
+      var i = 0;
+      (function next() {
+        if (i >= files.length) { st.textContent = ""; inp.value = ""; load(); A._mirrorCache = null; return; }
+        var f = files[i++];
+        if (f.size > 25 * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از ۲۵ مگابایت است", "bad"); return next(); }
+        st.textContent = "در حالِ فرستادنِ «" + f.name + "» به درایو…";
+        A.HOST.upload(rid, f, meta).then(next, function (e) { A.toast(errText(e), "bad"); next(); });
+      })();
+    }
+    sec.appendChild(h("div", { class: "row gap wrap" }, inp, st));
+    sec.appendChild(list);
+    load();
+    return sec;
+  }
+  if (A.HOST.upload) {
+    [["e_case", function (cs) { return { group: "پرونده‌ها", title: cs.title || "پرونده" }; }],
+     ["topic", function (t) { return { group: "موضوع‌ها", title: t.title || "موضوع" }; }]].forEach(function (x) {
+      var raw = A.V[x[0]]; if (!raw) return;
+      A.V[x[0]] = function (id) {
+        var root = raw.apply(this, arguments);
+        var r = S.get(id);
+        if (r && !r.sample && root && root.appendChild) root.appendChild(attachSection(id, x[1](r)));
+        return root;
+      };
+    });
+  }
+
   /* ---------- در «تنظیمات»: وضعیت و همگام‌سازیِ الان ---------- */
   var rawSettings = A.V.settings;
   A.V.settings = function () {
@@ -220,6 +268,19 @@
             .then(function (r) { A.toast((r && r.skipped === "no_drive") ? "درایو وصل نیست؛ چیزی گم نمی‌شود و بعداً نوشته می‌شود." : (r && r.busy) ? "همگام‌سازی همین حالا در جریان است؛ چند دقیقهٔ دیگر نگاه کن." : (r && r.stopped === "quota") ? "سقفِ دقیقه‌ایِ گوگل پر شد؛ بقیه در نوبتِ بعدی (حداکثر ۱۵ دقیقه) نوشته می‌شود." : "نوشته شد: " + fa((r && r.written) || 0) + " مورد" + ((r && r.pending > r.written) ? " — بقیه در نوبت" : "")); A._mirrorCache = null; A.render(); },
               function (er) { A.toast((er && er.message) || "خطا", "bad"); b.disabled = false; });
         } }, "همگام‌سازیِ الان")));
+      if (A.HOST.usage) {
+        var us = h("div", { class: "small mt" }, "در حالِ خواندنِ حجم و مصرف…"); sec.appendChild(us);
+        A.HOST.usage().then(function (u) {
+          var s0 = u.storage || {}, ai = u.ai_30d || {};
+          var kb = function (n) { return n >= 1048576 ? fa((n / 1048576).toFixed(1)) + " مگابایت" : fa(Math.round(n / 1024)) + " کیلوبایت"; };
+          us.innerHTML = "";
+          us.appendChild(h("h3", {}, "📦 حجم و هزینه"));
+          us.appendChild(h("p", {}, "در پایگاه‌دادهٔ سرور: " + fa(s0.records || 0) + " رکورد (" + kb(s0.record_chars || 0) + ") + رونوشتِ خوانای آینه (" + kb(s0.mirror_chars || 0) + "). در درایو: " + fa(s0.files || 0) + " پیوست (" + kb(s0.file_bytes_in_drive || 0) + ") — پیوست‌ها جایی از سرور نمی‌گیرند."));
+          var ms = ai.models || [];
+          us.appendChild(h("p", {}, ms.length ? "هوش مصنوعیِ این صفحه در ۳۰ روزِ گذشته: " + ms.map(function (m) { return (m.model || "؟") + " · " + fa(m.calls) + " درخواست · حدودِ " + fa(m.est_tokens) + " توکن" + (m.est_cost_usd != null ? " · ≈ " + fa(m.est_cost_usd) + " دلار" : ""); }).join("؛ ") + "." : "هوش مصنوعیِ این صفحه در ۳۰ روزِ گذشته استفاده نشده است."));
+          if (ms.length && !ai.all_priced) us.appendChild(h("p", { class: "small muted" }, "برای دیدنِ هزینهٔ تخمینی، قیمتِ مدل را در «تنظیماتِ AI ‹ 💲 قیمت» از صفحهٔ قیمتِ ارائه‌دهنده وارد کن (ارائه‌دهنده‌ها قیمت را از راهِ API نمی‌دهند). توکن ≈ نویسه÷۴ است؛ عددِ دقیق فقط در صورت‌حسابِ ارائه‌دهنده."));
+        }, function () { us.textContent = "حجم و مصرف خوانده نشد."; });
+      }
       var errs = items.filter(function (i) { return i.error; }).slice(0, 5);
       if (errs.length) sec.appendChild(h("ul", { class: "small" }, errs.map(function (i) { return h("li", {}, i.title + ": " + i.error); })));
     });

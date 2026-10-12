@@ -13,29 +13,57 @@
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S, C = A.C, TM = A.TM;
   var WEEKS = C.CURRICULUM;
-  var LESSONS = [];
-  WEEKS.forEach(function (w) { w.ids.forEach(function (id, i) { LESSONS.push({ tid: id, w: w.w, wi: i, wn: w.ids.length }); }); });
+  var LESSONS = [], PM = A.PM;
+  /* درس‌های روال (۲۰۲۶-۱۰-۱۲): در پایانِ هر منزل، برای هر روالِ همان هفته یک درس. کلیدشان رشتهٔ شناسهٔ روال است ("P3")،
+     تا با کلیدهای عددیِ درس‌های تکنیک (done/step/warm) هرگز برخورد نکنند. FARM روال نیست (در C.PROTOCOLS نیست) ⇒ درس ندارد؛
+     در نقشهٔ منزل به صفحهٔ مزرعه پیوند می‌خورد. */
+  function weekProtos(w) { return (w.protos || []).filter(function (p) { return !!PM[p]; }); }
+  WEEKS.forEach(function (w) {
+    var ps = weekProtos(w), n = w.ids.length + ps.length;
+    w.ids.forEach(function (id, i) { LESSONS.push({ tid: id, w: w.w, wi: i, wn: n, fa: TM[id].fa }); });
+    ps.forEach(function (pid, j) { LESSONS.push({ tid: pid, pid: pid, w: w.w, wi: w.ids.length + j, wn: n, fa: PM[pid].fa }); });
+  });
   var LIDX = {}; LESSONS.forEach(function (l, i) { LIDX[l.tid] = i; });
   A.COURSE_LESSONS = LESSONS;
+  function lessonsOf(w) { return LESSONS.filter(function (l) { return l.w === w.w; }); }
+  function lessonName(l) { return l.pid ? "روال · " + l.fa : fa(l.tid) + " · " + l.fa; }
+  A.courseLessonName = lessonName;
+  var NTECH = LESSONS.filter(function (l) { return !l.pid; }).length, NPROTO = LESSONS.length - NTECH;
 
   /* ---------- زمانِ تقریبیِ هر درس (به‌جای یک ادعای یکسان برای همه) ----------
      برآورد از روی خودِ درس: خواندنِ قدمِ ۱، تمرینِ قدمِ ۲، فیلدهای کاربرگِ قدمِ ۳ (و زمان‌سنج‌هایش)، و قدمِ ۴.
      کف = فقط فیلدهای الزامی؛ سقف = همهٔ فیلدها. وزن‌ها تخمینِ دقیقه به ازای هر نوع فیلدند، نه اندازه‌گیری. */
   var FW = { text: 1.5, area: 2.5, list: 3, table: 4, chain: 4, tree: 5, graph: 4, draw: 5, scale: 0.5, sel: 0.5, checks: 1, lock: 2.5, calib: 3, jargon: 3, pareto: 4, info: 0.5 };
-  function lessonMin(t) {
-    var read = [t.def, t.when].concat(t.steps || []).join(" ").length / 1000;
-    var fixed = 3 + read + (SIM[t.id] ? 6 : 3) + 4, lo = 0, hi = 0;
-    (t.ws || []).forEach(function (f) { var m = f.t === "timer" ? (f.min || 5) : (FW[f.t] || 2); hi += m; if (f.req || f.t === "timer") lo += m; });
-    function r5(x) { return Math.max(5, Math.round(x / 5) * 5); }
-    return [r5(fixed + lo), r5(fixed + hi)];
-  }
-  function minText(t) { var m = lessonMin(t); return m[0] === m[1] ? "حدودِ " + fa(m[0]) + " دقیقه" : "حدودِ " + fa(m[0]) + " تا " + fa(m[1]) + " دقیقه"; }
-  function courseSpan() {
-    var lo = 1e9, hi = 0;
-    LESSONS.forEach(function (l) { var m = lessonMin(TM[l.tid]); lo = Math.min(lo, m[0]); hi = Math.max(hi, m[1]); });
+  function wsMin(ws) {
+    var lo = 0, hi = 0;
+    (ws || []).forEach(function (f) { var m = f.t === "timer" ? (f.max || f.min || 5) : (FW[f.t] || 2); hi += m; if (f.req || f.t === "timer") lo += m; });
     return [lo, hi];
   }
-  A.courseLessonMinutes = function (tid) { return TM[tid] ? lessonMin(TM[tid]) : null; };
+  function r5(x) { return Math.max(5, Math.round(x / 5) * 5); }
+  function lessonMin(t) {
+    var read = [t.def, t.when].concat(t.steps || []).join(" ").length / 1000;
+    var fixed = 3 + read + (SIM[t.id] ? 6 : 3) + 4, w = wsMin(t.ws);
+    return [r5(fixed + w[0]), r5(fixed + w[1])];
+  }
+  /* درسِ روال: خواندنِ قدمِ ۱ (چرا/کی/اصلاحیه)، ۳ دقیقه تمرین، اجرای کاربرگِ خودِ روال، ۴ دقیقه زمان‌بندی و کارت.
+     روالِ بی‌کاربرگ (P10، صفِ منابع) با «مدت»ِ خودش (۲ دقیقه) حساب می‌شود، نه با عددِ ساختگی. */
+  function protoMin(p) {
+    var read = [p.why, p.when, p.fix].join(" ").length / 1000;
+    var fixed = 3 + read + 3 + 4, w = (p.ws || []).length ? wsMin(p.ws) : [2, 2];
+    return [r5(fixed + w[0]), r5(fixed + w[1])];
+  }
+  function lMin(l) { return l.pid ? protoMin(PM[l.pid]) : lessonMin(TM[l.tid]); }
+  function minTextM(m) { return m[0] === m[1] ? "حدودِ " + fa(m[0]) + " دقیقه" : "حدودِ " + fa(m[0]) + " تا " + fa(m[1]) + " دقیقه"; }
+  function minText(t) { return minTextM(lessonMin(t)); }
+  function courseSpan() {
+    var lo = 1e9, hi = 0;
+    LESSONS.forEach(function (l) { var m = lMin(l); lo = Math.min(lo, m[0]); hi = Math.max(hi, m[1]); });
+    return [lo, hi];
+  }
+  A.courseLessonMinutes = function (tid) { var i = LIDX[tid]; return i != null ? lMin(LESSONS[i]) : TM[tid] ? lessonMin(TM[tid]) : null; };
+  /* برآوردِ همان وزن‌ها برای هر کاربرگ (سفرِ موضوع از آن استفاده می‌کند؛ منطقِ دوم نمی‌سازد) */
+  A.wsMinutes = function (ws) { var w = wsMin(ws); return [r5(w[0]), r5(w[1])]; };
+  A.minutesText = minTextM;
 
   /* ---------- وضعیت ---------- */
   function st() {
@@ -53,6 +81,12 @@
       if (c.done[e.tid]) return;
       c.done[e.tid] = String(e.updated || e.created || A.today()).slice(0, 10);
       c.elsewhere[e.tid] = e.id;
+    });
+    /* همین قاعده برای روال‌ها: اجرای کامل‌شدهٔ همان روال بیرون از دوره */
+    S.all("pr", function (r) { return r.status === "done" && !r.sample && !r.course && LIDX[r.pid] != null; }).forEach(function (r) {
+      if (c.done[r.pid]) return;
+      c.done[r.pid] = String(r.updated || r.created || A.today()).slice(0, 10);
+      c.elsewhere[r.pid] = r.id;
     });
   }
   /* یک تغییرِ واقعی = یک نوشتن. saveSoon چند تغییرِ پشتِ‌سرِهم را در یک نوشتن جمع می‌کند. */
@@ -72,6 +106,7 @@
 
   /* ---------- کشوی کناری (به‌جای پرت‌شدن) ---------- */
   A.peekTech = function (id) {
+    if (PM[id]) return A.peekProto(id);
     var t = TM[id]; if (!t) return;
     var ov = h("div", { class: "overlay crs-peek", role: "dialog", "aria-modal": "true", "aria-label": t.fa, onclick: function (e) { if (e.target === ov) ov.remove(); } });
     ov.appendChild(h("div", { class: "dialog" },
@@ -86,6 +121,23 @@
     A.layer().appendChild(ov);
   };
   function peekChip(id) { var t = TM[id]; return t ? h("button", { class: "tlink", onclick: function () { A.peekTech(id); } }, h("b", {}, fa(id)), " ", t.fa) : null; }
+  A.peekChip = peekChip;
+  var FQ = { session: "پس از هر جلسه", daily: "روزانه", weekly: "هفتگی", monthly: "ماهانه", topic137: "روز ۱، ۳ و ۷ پس از یادگیری", course: "هر دوره", concept: "برای هر مفهوم", ongoing: "پیوسته (هر بار که لازم شد)" };
+  A.protoFreqText = function (p) { return FQ[p.freq] || "پیوسته"; };
+  A.peekProto = function (pid) {
+    var p = PM[pid]; if (!p) return;
+    var ov = h("div", { class: "overlay crs-peek", role: "dialog", "aria-modal": "true", "aria-label": p.fa, onclick: function (e) { if (e.target === ov) ov.remove(); } });
+    ov.appendChild(h("div", { class: "dialog" },
+      h("div", { class: "eyebrow" }, "نگاهِ کوتاه · تو همین‌جا می‌مانی"),
+      h("h3", {}, "روال · " + p.fa),
+      h("p", { class: "small" }, h("strong", {}, "کی: "), p.when, " · ", h("strong", {}, "هر چند وقت: "), FQ[p.freq] || "پیوسته", " · ", h("strong", {}, "مدت: "), p.dur),
+      h("p", {}, sent1(p.why, 2)),
+      LIDX[pid] != null ? h("p", { class: "small muted" }, "در دوره: منزلِ " + fa(LESSONS[LIDX[pid]].w) + "، درسِ " + fa(LIDX[pid] + 1) + " از " + fa(LESSONS.length)) : null,
+      h("div", { class: "row gap wrap" },
+        h("button", { class: "btn", onclick: function () { ov.remove(); } }, "بستن و ادامه"),
+        h("button", { class: "btn ghost", onclick: function () { ov.remove(); if (p.custom === "queue") A.go("protos", null, "queue"); else A.go("proto", pid); } }, "صفحهٔ کاملِ روال (با «↩ برگرد» برمی‌گردی)"))));
+    A.layer().appendChild(ov);
+  };
 
   /* ---------- نقشهٔ دوره ---------- */
   function stepIcons() {
@@ -99,7 +151,7 @@
     var root = h("div", { class: "page crs" });
     var span = courseSpan();
     if (mode === "new") {
-      root.appendChild(A.head("دورهٔ گام‌به‌گام", "از صفر، یک قدم در هر بار", "این دوره همهٔ ۴۵ تکنیک را در ۸ منزل و ۴۵ درس جلو می‌برد. هر درس بسته به کاربرگش " + fa(span[0]) + " تا " + fa(span[1]) + " دقیقه طول می‌کشد (زمانِ تقریبیِ هر درس سرِ خودش نوشته شده) و لازم نیست یک‌نفس تمامش کنی: همه‌چیز ذخیره می‌شود. لازم نیست چیزی از قبل بدانی و لازم نیست جای دیگری بروی: هر درس خودش می‌گوید چه بکنی و بعدش کجا بروی."));
+      root.appendChild(A.head("دورهٔ گام‌به‌گام", "از صفر، یک قدم در هر بار", "این دوره همهٔ " + fa(NTECH) + " تکنیک و " + fa(NPROTO) + " روالِ تکرار را در ۸ منزل و " + fa(LESSONS.length) + " درس جلو می‌برد (روالِ هر منزل، درسِ آخرِ همان منزل است). هر درس بسته به کاربرگش " + fa(span[0]) + " تا " + fa(span[1]) + " دقیقه طول می‌کشد (زمانِ تقریبیِ هر درس سرِ خودش نوشته شده) و لازم نیست یک‌نفس تمامش کنی: همه‌چیز ذخیره می‌شود. لازم نیست چیزی از قبل بدانی و لازم نیست جای دیگری بروی: هر درس خودش می‌گوید چه بکنی و بعدش کجا بروی."));
       root.appendChild(h("section", { class: "card" }, h("h2", {}, "هر درس همیشه همین پنج قدم است"), stepIcons(),
         h("p", { class: "small muted" }, "قدمِ «گرم‌کردن» خودش دو تکنیکِ دوره است (بازیابیِ فعال و تکرارِ فاصله‌دار): هر درسی که تمام کنی، چند روز بعد دوباره از حافظه پرسیده می‌شود.")));
       root.appendChild(h("section", { class: "card" }, h("h2", {}, "مسیر: ۸ منزل"), weekStrip(c, true)));
@@ -133,15 +185,16 @@
   function weekStrip(c, compact, cur) {
     var nl = nextLesson(c);
     return h("ol", { class: "crs-road" + (compact ? " compact" : "") }, WEEKS.map(function (w) {
-      var done = w.ids.filter(function (id) { return c.done[id]; }).length, all = w.ids.length;
+      var wl = lessonsOf(w);
+      var done = wl.filter(function (l) { return c.done[l.tid]; }).length, all = wl.length;
       var here = nl && nl.w === w.w;
       return h("li", { class: "crs-stop" + (done === all ? " done" : "") + (here ? " here" : "") + (cur === w.w ? " cur" : "") },
         h("div", { class: "crs-stopn" }, done === all ? "✓" : fa(w.w)),
         h("div", { class: "crs-stopb" },
           h("div", { class: "crs-stopt" }, (here ? "📍 " : "") + "منزلِ " + fa(w.w) + " · " + w.fa),
-          h("div", { class: "crs-dots", "aria-label": fa(done) + " از " + fa(all) + " درس" }, w.ids.map(function (id) {
-            var on = !!c.done[id], now = nl && nl.tid === id;
-            return h("button", { class: "crs-dot" + (on ? " on" : "") + (now ? " now" : ""), title: fa(id) + " · " + TM[id].fa + (on ? (c.elsewhere[id] ? " (بیرون از دوره انجام شده)" : " (تمام‌شده)") : now ? " (درسِ بعدیِ تو)" : ""),
+          h("div", { class: "crs-dots", "aria-label": fa(done) + " از " + fa(all) + " درس" }, wl.map(function (l) {
+            var id = l.tid, on = !!c.done[id], now = nl && nl.tid === id;
+            return h("button", { class: "crs-dot" + (l.pid ? " pr" : "") + (on ? " on" : "") + (now ? " now" : ""), title: lessonName(l) + (on ? (c.elsewhere[id] ? " (بیرون از دوره انجام شده)" : " (تمام‌شده)") : now ? " (درسِ بعدیِ تو)" : ""),
               onclick: function () { if (c.topic) A.go("lesson", id, c.step[id] || "s1"); } });
           })),
           compact ? null : h("div", { class: "small muted" }, fa(done) + " از " + fa(all) + " درس")));
@@ -163,19 +216,22 @@
           h("div", { class: "small" }, "موضوعِ دوره: ", h("b", {}, tp.title), " ", h("button", { class: "linkish small", onclick: function () { A._crsChange = true; A.render(); } }, "(عوض کن)"))),
         nl ? h("div", { class: "col" },
           h("button", { class: "btn lg", onclick: function () { A.go("lesson", nl.tid, c.step[nl.tid] || "s1"); /* گرم‌کردنِ موعد را خودِ درس پیش می‌اندازد */ } },
-            warmDue ? "▶ ادامه: اول گرم‌کردنِ امروز، بعد درسِ " + fa(LIDX[nl.tid] + 1) : "▶ ادامه: درسِ " + fa(LIDX[nl.tid] + 1) + " — " + TM[nl.tid].fa),
-          h("span", { class: "small muted" }, "زمانِ تقریبیِ این درس: " + minText(TM[nl.tid])))
+            warmDue ? "▶ ادامه: اول گرم‌کردنِ امروز، بعد درسِ " + fa(LIDX[nl.tid] + 1) : "▶ ادامه: درسِ " + fa(LIDX[nl.tid] + 1) + " — " + (nl.pid ? "روالِ " : "") + nl.fa),
+          h("span", { class: "small muted" }, "زمانِ تقریبیِ این درس: " + minTextM(lMin(nl))))
           : h("span", { class: "pill good" }, "دوره تمام شد 🎉"))));
-    root.appendChild(h("section", { class: "card" }, h("h2", {}, "مسیر"), h("p", { class: "small muted" }, "هر خال یک درس است؛ پُر = تمام‌شده (در دوره یا بیرون از آن)، 📍 = درسِ بعدیِ تو. روی هر خال بزنی همان درس باز می‌شود."), weekStrip(c, false)));
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "مسیر"), h("p", { class: "small muted" }, "هر خال یک درس است؛ پُر = تمام‌شده (در دوره یا بیرون از آن)، 📍 = درسِ بعدیِ تو، خالِ چهارگوش = درسِ یک روالِ تکرار (آخرِ هر منزل). روی هر خال بزنی همان درس باز می‌شود."), weekStrip(c, false)));
     var cw = nl ? weekOf(nl.w) : WEEKS[WEEKS.length - 1];
+    var farm = (cw.protos || []).filter(function (p) { return !PM[p]; });
     root.appendChild(h("section", { class: "card" },
       h("h2", {}, "منزلِ " + fa(cw.w) + ": " + cw.fa),
       h("p", {}, cw.why),
-      h("ol", { class: "crs-wlist" }, cw.ids.map(function (id) {
-        return h("li", { class: c.done[id] ? "on" : "" }, h("button", { class: "linkish", onclick: function () { A.go("lesson", id, c.step[id] || "s1"); } }, (c.done[id] ? "✓ " : "") + fa(id) + " · " + TM[id].fa + (c.elsewhere[id] ? " (بیرون از دوره انجام شده)" : "")),
-          h("span", { class: "small muted" }, " — " + (TM[id].when || "").slice(0, 90) + "…"));
+      h("ol", { class: "crs-wlist" }, lessonsOf(cw).map(function (l) {
+        var id = l.tid, when = l.pid ? PM[l.pid].when : TM[id].when;
+        return h("li", { class: (c.done[id] ? "on" : "") + (l.pid ? " pr" : "") }, h("button", { class: "linkish", onclick: function () { A.go("lesson", id, c.step[id] || "s1"); } }, (c.done[id] ? "✓ " : "") + lessonName(l) + (c.elsewhere[id] ? " (بیرون از دوره انجام شده)" : "")),
+          h("span", { class: "small muted" }, " — " + (when || "").slice(0, 90) + ((when || "").length > 90 ? "…" : "")));
       })),
-      (cw.protos || []).length ? h("p", { class: "small muted" }, "روال‌های این منزل (بعد از درس‌ها؛ در بخشِ «پروتکل‌ها»، و مزرعه در صفحهٔ خودش): " + cw.protos.map(protoName).join("، ")) : null));
+      farm.length ? h("p", { class: "small muted" }, "همراهِ این منزل: " + farm.map(protoName).join("، ") + " — روالِ تکرار نیست و درسِ جداگانه ندارد؛ یک صفحه است. ",
+        farm.indexOf("FARM") >= 0 ? h("button", { class: "linkish small", onclick: function () { A.go("farm"); } }, "باز کردنِ مزرعه") : null) : null));
     return root;
   };
 
@@ -274,7 +330,7 @@
       h("p", { class: "small muted" }, "هر موضوعی که یاد می‌گیری از این ۹ فاز می‌گذرد؛ این تکنیک ابزارِ فازِ «" + C.PHASES[A.phaseOf(t.id)].fa + "» است.")));
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "اجرایش، قدم‌به‌قدم"), stepFlow(t)));
     box.appendChild(h("section", { class: "card soft" }, h("h3", {}, "کی به کار می‌آید"), h("p", {}, t.when)));
-    box.appendChild(h("details", { class: "card" }, h("summary", {}, "چرا کار می‌کند؟ (اختیاری)"), h("p", {}, t.why), t.ev ? h("p", { class: "small muted" }, "سطحِ شواهد " + t.ev.lvl + ": " + t.ev.note) : null));
+    box.appendChild(h("details", { class: "card" }, h("summary", {}, "چرا کار می‌کند؟ (اختیاری)"), h("p", {}, t.why), t.ev ? h("p", { class: "small muted" }, "سطحِ شواهد " + t.ev.lvl + (A.EV_BASIS && A.EV_BASIS[t.ev.basis] ? " (" + A.EV_BASIS[t.ev.basis] + ")" : "") + ": " + t.ev.note) : null));
     if (t.example) box.appendChild(h("details", { class: "card" }, h("summary", {}, "یک نمونهٔ واقعی ببین (اختیاری)"), h("h4", {}, t.example.title), h("p", { class: "small" }, t.example.text)));
     return box;
   }
@@ -285,12 +341,8 @@
   /* جفت‌گام‌های مجاور (اندیسِ ۰-مبنا) که به هر دو ترتیب درست‌اند */
   var ORDER_SWAP = { 15: [[2, 3]], 18: [[1, 2]], 28: [[0, 1]], 29: [[0, 1]], 34: [[1, 2]], 38: [[0, 1]], 23: [[1, 2]], 16: [[2, 3]] };
   A._courseOrderRules = { skip: ORDER_SKIP, swap: ORDER_SWAP };
-  function orderGame(t) {
-    if (ORDER_SKIP[t.id]) return null;
-    var steps = t.steps.slice(0, 5);
-    if (steps.length < 3) return null;
-    var rank = steps.map(function (_, i) { return i; });
-    (ORDER_SWAP[t.id] || []).forEach(function (p) { if (p[1] < steps.length) rank[p[1]] = p[0]; });
+  /* تختهٔ ترتیب: کارت‌های به‌هم‌ریخته؛ rank[i] رتبهٔ درستِ کارتِ i (رتبهٔ برابر = هر دو ترتیب پذیرفته). مشترکِ تکنیک و روال. */
+  function orderBoard(steps, rank, onDone, extra) {
     var order = A.shuffle(steps.map(function (_, i) { return i; }));
     if (order.every(function (v, i) { return v === i; })) order.reverse();
     var picked = {}, n = 0, tries = 0;
@@ -301,12 +353,21 @@
         if (b.classList.contains("ok")) return;
         tries++;
         if (canPick(i)) { picked[i] = 1; n++; b.classList.add("ok"); b.insertBefore(h("span", { class: "n" }, fa(n)), b.firstChild);
-          if (n === steps.length) { out.textContent = tries === steps.length ? "بی‌خطا! ترتیب را درست می‌دانی." : "تمام شد با " + fa(tries - steps.length) + " اشتباه. ترتیبِ درست حالا روی کارت‌هاست."; out.className = "small good"; markTry(t.id, "order"); }
+          if (n === steps.length) { out.textContent = (tries === steps.length ? "بی‌خطا! ترتیب را درست می‌دانی." : "تمام شد با " + fa(tries - steps.length) + " اشتباه. ترتیبِ درست حالا روی کارت‌هاست.") + (extra ? " " + extra : ""); out.className = "small good"; onDone(); }
           else out.textContent = "درست. حالا گامِ " + fa(n + 1) + "؟";
         } else { b.classList.add("bad"); setTimeout(function () { b.classList.remove("bad"); }, 600); out.textContent = "این گامِ " + fa(n + 1) + " نیست. دوباره نگاه کن: کدام باید قبل از بقیه بیاید؟"; }
       } }, h("span", {}, steps[i]));
       return b;
     }));
+    return [list, out];
+  }
+  function orderGame(t) {
+    if (ORDER_SKIP[t.id]) return null;
+    var steps = t.steps.slice(0, 5);
+    if (steps.length < 3) return null;
+    var rank = steps.map(function (_, i) { return i; });
+    (ORDER_SWAP[t.id] || []).forEach(function (p) { if (p[1] < steps.length) rank[p[1]] = p[0]; });
+    var bd = orderBoard(steps, rank, function () { markTry(t.id, "order"); }), list = bd[0], out = bd[1];
     var sw = (ORDER_SWAP[t.id] || []).filter(function (p) { return p[1] < steps.length; });
     return h("section", { class: "card" }, h("h3", {}, "ترتیب را بساز"), h("p", { class: "small" }, "این " + fa(steps.length) + " گامِ اولِ اجرای «" + t.fa + "» به‌هم‌ریخته‌اند. به ترتیبِ درست رویشان بزن."),
       sw.length ? h("p", { class: "small muted" }, sw.map(function (p) { return "گام‌های " + fa(p[0] + 1) + " و " + fa(p[1] + 1); }).join("، ") + " را می‌شود به هر دو ترتیب انجام داد؛ هر دو ترتیب پذیرفته است.") : null,
@@ -370,7 +431,9 @@
     var hd = exHandle(c, t), ex = hd.ex, tp = S.get(c.topic);
     var box = h("div", { class: "col gap" });
     box.appendChild(h("section", { class: "card soft" }, h("p", {}, "حالا «" + t.fa + "» را روی موضوعِ خودت اجرا کن: ", h("b", {}, tp ? tp.title : "—"), ". فیلدهای ستاره‌دار لازم‌اند؛ بقیه اختیاری. هر چه بنویسی خودکار ذخیره می‌شود."),
-      t.example ? h("details", {}, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ نمونه را ببین"), h("p", { class: "small" }, h("b", {}, t.example.title + ": "), t.example.text)) : null));
+      t.example ? h("details", {}, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ نمونه را ببین"), h("p", { class: "small" }, h("b", {}, t.example.title + ": "), t.example.text)) : null,
+      tp && A.V.journey ? h("p", { class: "small muted crs-jhint" }, "این درس فقط یک تکنیک را روی موضوعت اجرا می‌کند. اگر بخواهی همین موضوع را از اول تا آخر (مسیرِ ۱۱ گامیِ از میوه تا ریشه و بازگشت) قدم‌به‌قدم طی کنی، «",
+        h("button", { class: "linkish small", onclick: function () { A.go("journey", tp.id); } }, "🧭 سفرِ گام‌به‌گام روی همین موضوع"), "» را باز کن؛ با «↩ برگرد» به همین درس برمی‌گردی.") : null));
     var savef = A.debounce(function () { hd.put(); }, 400);
     ex.data = ex.data || {};
     var ws = A.renderWS(t.ws, ex.data, function () { savef(); }, { prefix: "crs" });
@@ -432,6 +495,7 @@
     A._crsChange = false;
     if (topicLost(c)) return onboarding(c, "lost");
     if (!c.topic) return onboarding(c, nDone(c) ? "pick" : "new");
+    if (LIDX[tid] != null && LESSONS[LIDX[tid]].pid) return protoLesson(c, LESSONS[LIDX[tid]], sub);
     tid = +tid; var t = TM[tid], L = LESSONS[LIDX[tid]];
     if (!t || !L) return A.empty("این درس پیدا نشد.", h("button", { class: "btn", onclick: function () { A.go("course"); } }, "نقشهٔ دوره"));
     var want = /^s[0-4]$/.test(sub || "") ? sub : "s1";
@@ -485,6 +549,231 @@
     }
     return root;
   };
+
+  /* ================= درسِ روال (پروتکل) =================
+     همان پنج قدم، اما برای یک «روالِ تکرار»: ۱ روال چیست، کی و هر چند وقت، چرا · ۲ تمرین‌هایی که فقط از دادهٔ خودِ روال
+     ساخته می‌شوند (و اگر پاسخشان از داده یکتا درنمی‌آید، اصلاً ساخته نمی‌شوند) · ۳ یک بار اجرا روی موضوعِ دوره با کاربرگِ
+     واقعیِ خودِ روال (همان رکوردِ "pr" ِ A.startProto؛ فقط با اولین ورودیِ واقعی ساخته می‌شود) · ۴ نوبتِ بعد + کارتِ مرور. */
+  var PSTEPS = [["s0", "۰ گرم‌کردن"], ["s1", "۱ روال چیست"], ["s2", "۲ امتحان کن"], ["s3", "۳ یک بار اجرا کن"], ["s4", "۴ نوبتِ بعد و بستن"]];
+  /* «کی اجرایش کنی؟» فقط وقتی ساخته می‌شود که متنِ «کی»ِ خودِ روال یک آهنگِ یکتا بگوید:
+     P6 هم «ماهانه» است هم «هنگامِ ورود به هر علم»؛ P8 هم «هر دوره» است هم «پایانِ هر بخش» ⇒ پاسخِ یکتا ندارند. */
+  var WHEN_SKIP = { P6: "متنِ خودِ روال دو آهنگ می‌گوید: «هنگامِ ورود به هر علم» و «مرورِ ماهانه».", P8: "متنِ خودِ روال دو آهنگ می‌گوید: «شروعِ هر دوره» و «پایانِ هر بخش» (که به «پس از هر جلسه» نزدیک است)." };
+  /* گزینه‌هایی که در دادهٔ روال‌ها هم‌پوشانی دارند، کنارِ هم گزینهٔ غلط نمی‌شوند (P7 «هر مسئلهٔ پیچیده» ≈ P11 «هر مفهوم/فرمول»؛
+     P3 «پس از هر مبحثِ سنگین» ≈ «برای هر مفهوم»). */
+  var WHEN_CONFUSE = { session: ["concept"], concept: ["session", "topic137"], topic137: ["concept"] };
+  /* «در امروز خودکار یادآوری می‌شود» فقط برای همین‌ها راست است (A.dueList) */
+  var REMIND = { P2: "هر روز تا اجرای همان روز", P4: "هر بار که ۷ روز از آخرین اجرا گذشته باشد", P5: "هر بار که ۷ روز از آخرین اجرا گذشته باشد", P9: "هر بار که ۳۰ روز از آخرین اجرا گذشته باشد" };
+  var NEXT = { session: "پایانِ جلسهٔ آموزشیِ بعدی‌ات (ویدیو، فصل، پادکست)", daily: "فردا، پایانِ روز — و بعد هر روز", weekly: "یک هفته بعد", monthly: "یک ماه بعد",
+    topic137: "روزهای ۱، ۳ و ۷ پس از امروز", course: "شروعِ دورهٔ بعدی‌ات، و پایانِ هر بخشِ همین دوره", concept: "مفهومِ بعدی‌ای که می‌خواهی از ریشه بفهمی", ongoing: "هر بار که منبعِ تازه‌ای وسوسه‌ات کرد" };
+  A._courseProtoRules = { whenSkip: WHEN_SKIP, confuse: WHEN_CONFUSE };
+
+  function protoPreset(p, tp) {
+    tp = tp || {};
+    return ({ P1: { src: tp.src || "" }, P3: { topic: tp.title || "" }, P8: { course: tp.src || tp.title || "" }, P7: { p: tp.title || "" }, P5: { concept: tp.title || "" },
+      P11: { fruit: tp.title || "", ftype: tp.kind || "" } })[p.id] || {};
+  }
+  A.protoPreset = function (pid, tp) { return PM[pid] ? protoPreset(PM[pid], tp) : {}; };
+  /* اجرای روال روی موضوعِ دوره: تا اولین ورودیِ واقعی فقط در حافظه است */
+  function prHandle(c, p) {
+    var r = c.ex[p.id] && S.get(c.ex[p.id]);
+    if (!r) r = S.all("pr", function (x) { return x.pid === p.id && x.course && !x.sample && (!c.topic || !x.topic || x.topic === c.topic); })[0] || null;
+    var live = !!r;
+    if (!r) r = { id: A.uid("pr"), type: "pr", pid: p.id, topic: c.topic || "", sched: "", node: "", status: "draft", data: protoPreset(p, S.get(c.topic)), course: true };
+    if (!r.topic && c.topic) r.topic = c.topic;
+    r.data = r.data || {};
+    return { r: r, live: function () { return live; }, put: function () { if (!live) { live = true; c.ex[p.id] = r.id; } S.put(r); } };
+  }
+  function lockChain(p) {
+    /* ترتیبی که خودِ کاربرگ قفل کرده: فیلدِ «قفل» تا فیلدِ after پر نشود باز نمی‌شود. فقط زنجیرهٔ خطیِ بی‌انشعاب. */
+    var ws = p.ws || [], F = {}, nxt = {}, branch = false;
+    ws.forEach(function (f) { F[f.k] = f; });
+    ws.forEach(function (f) { if (f.t === "lock" && f.after && F[f.after]) { if (nxt[f.after]) branch = true; nxt[f.after] = f.k; } });
+    if (branch) return null;
+    var best = [];
+    Object.keys(nxt).forEach(function (s) {
+      if (F[s].t === "lock" && F[s].after && F[F[s].after]) return; // وسطِ زنجیره است
+      var ch = [s]; while (nxt[ch[ch.length - 1]]) ch.push(nxt[ch[ch.length - 1]]);
+      if (ch.length > best.length) best = ch;
+    });
+    return best.length >= 2 ? best.map(function (k) { return F[k]; }) : null;
+  }
+  function protoSee(p) {
+    var box = h("div", { class: "col gap" });
+    box.appendChild(h("section", { class: "card crs-def" }, h("div", { class: "eyebrow" }, "روال در یک نگاه"), h("p", { class: "big" }, p.fa),
+      h("div", { class: "row gap wrap" }, h("span", { class: "pill" }, "هر چند وقت: " + (FQ[p.freq] || "پیوسته")), h("span", { class: "pill" }, "مدتِ هر اجرا: " + p.dur))));
+    box.appendChild(h("section", { class: "card soft" }, h("h3", {}, "کی اجرایش می‌کنی"), h("p", {}, p.when)));
+    box.appendChild(h("section", { class: "card" }, h("h3", {}, "چرا"), h("p", {}, p.why)));
+    var flds = (p.ws || []).filter(function (f) { return f.t !== "info"; });
+    if (flds.length) box.appendChild(h("section", { class: "card" }, h("h3", {}, "در هر اجرا چه می‌کنی (همان کاربرگِ روال)"),
+      h("ol", { class: "crs-flow" }, flds.map(function (f, i) { return h("li", {}, h("span", { class: "n" }, fa(i + 1)), h("span", {}, f.l, f.req ? h("b", { class: "reqmark", title: "الزامی" }, " *") : null)); })),
+      h("p", { class: "small muted" }, "ستاره = لازم؛ بقیه اختیاری. فیلدهای «قفل» تا پیش از تلاشِ خودت باز نمی‌شوند.")));
+    else if (p.custom === "queue") box.appendChild(h("section", { class: "card" }, h("h3", {}, "در هر اجرا چه می‌کنی"),
+      h("p", {}, "این روال کاربرگ ندارد؛ کارش مرتب‌کردنِ «صفِ منابع» است: هر منبع یا «فعال» است، یا «در صف»، یا «معدن» (فقط برای استخراجِ یک ساختارِ مشخص). قدمِ ۳ همان صف را همین‌جا باز می‌کند.")));
+    box.appendChild(h("section", { class: "card" }, h("h3", {}, "تکنیک‌هایی که این روال به کار می‌گیرد"), h("div", { class: "row gap wrap" }, p.ids.map(peekChip)),
+      h("p", { class: "small muted" }, "روی هر کدام بزنی، تعریفِ کوتاهش همین‌جا باز می‌شود.")));
+    if (p.fix) box.appendChild(h("details", { class: "card" }, h("summary", {}, "اصلاحیه نسبت به اسنادِ اصلی (اختیاری)"), h("p", { class: "small" }, p.fix)));
+    return box;
+  }
+  function whenGame(p) {
+    if (WHEN_SKIP[p.id] || !FQ[p.freq]) return null;
+    var cats = []; C.PROTOCOLS.forEach(function (x) { if (FQ[x.freq] && cats.indexOf(x.freq) < 0) cats.push(x.freq); });
+    var bad = (WHEN_CONFUSE[p.freq] || []);
+    var wrong = A.shuffle(cats.filter(function (f) { return f !== p.freq && bad.indexOf(f) < 0; })).slice(0, 3);
+    if (wrong.length < 2) return null;
+    var opts = A.shuffle(wrong.concat([p.freq]));
+    var out = h("p", { class: "small muted" }, "یک گزینه را انتخاب کن.");
+    var row = h("div", { class: "col gap crs-when" }, opts.map(function (f) {
+      return h("button", { class: "btn ghost crs-whenopt", onclick: function (e) {
+        if (f === p.freq) {
+          e.target.classList.add("ok"); row.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+          out.textContent = "✓ درست — «" + FQ[f] + "». متنِ خودِ روال: " + p.when; out.className = "small good"; markTry(p.id, "when");
+        } else { e.target.classList.add("bad"); e.target.disabled = true; out.textContent = "✗ نه — «" + FQ[f] + "» آهنگِ این روال نیست. دوباره «کی»ِ قدمِ ۱ را به یاد بیاور."; out.className = "small warn"; }
+      } }, FQ[f]);
+    }));
+    return h("section", { class: "card" }, h("h3", {}, "کی اجرایش می‌کنی؟"), h("p", { class: "small" }, "«" + p.fa + "» را هر چند وقت یک بار اجرا می‌کنی؟"), row, out);
+  }
+  function lockGame(p) {
+    var ch = lockChain(p); if (!ch) return null;
+    var steps = ch.map(function (f) { return f.l; }), rank = steps.map(function (_, i) { return i; });
+    var bd = orderBoard(steps, rank, function () { markTry(p.id, "order"); }, "این ترتیب در خودِ کاربرگ قفل شده: بخشِ مقایسه تا تلاشِ از حافظه‌ات ثبت نشود باز نمی‌شود (اثرِ آزمون و اثرِ تولید).");
+    return h("section", { class: "card" }, h("h3", {}, "کدام اول؟"), h("p", { class: "small" }, "این " + fa(steps.length) + " کارِ «" + p.fa + "» به‌هم‌ریخته‌اند. به ترتیبی بزن که در هر اجرا انجامشان می‌دهی."), bd[0], bd[1]);
+  }
+  function techGame(p) {
+    /* «این روال کدام تکنیک‌ها را به کار می‌گیرد؟» — درست = فهرستِ ids ِ خودِ روال؛ غلط فقط از فازهایی که هیچ‌کدام از تکنیک‌های روال در آن نیست
+       (تا گزینهٔ غلط «به‌نوعی هم به کار می‌رود» نباشد). */
+    var phs = {}; p.ids.forEach(function (id) { phs[A.phaseOf(id)] = 1; });
+    var pool = A.T.filter(function (t) { return p.ids.indexOf(t.id) < 0 && !phs[A.phaseOf(t.id)]; });
+    if (p.ids.length < 2 || pool.length < 2) return null;
+    var items = A.shuffle(A.shuffle(p.ids.slice()).slice(0, 2).map(function (id) { return { id: id, ok: true }; })
+      .concat(A.shuffle(pool.slice()).slice(0, 2).map(function (t) { return { id: t.id, ok: false }; })));
+    var left = items.length, right = 0;
+    var out = h("p", { class: "small muted" }, "برای هر تکنیک بگو: این روال به کارش می‌گیرد یا نه؟");
+    return h("section", { class: "card" }, h("h3", {}, "کدام تکنیک‌ها در این روال کار می‌کنند؟"),
+      h("div", { class: "col gap" }, items.map(function (it) {
+        var fb = h("div", { class: "small" });
+        var row = h("div", { class: "crs-spot" }, h("p", {}, fa(it.id) + " · " + TM[it.id].fa), h("div", { class: "row gap wrap" }, [["به کار می‌گیرد", true], ["در این روال نیست", false]].map(function (o) {
+          return h("button", { class: "btn sm ghost", onclick: function (e) {
+            var good = o[1] === it.ok; left--; if (good) right++;
+            row.classList.add(good ? "ok" : "bad"); e.target.parentNode.replaceWith(fb);
+            fb.textContent = (good ? "✓ درست — " : "✗ نه — ") + (it.ok ? "این تکنیک در فهرستِ خودِ این روال است." : "این تکنیک مالِ فازِ «" + C.PHASES[A.phaseOf(it.id)].fa + "» است و این روال به آن تکیه نمی‌کند.");
+            if (!left) { out.textContent = fa(right) + " از " + fa(items.length) + " درست."; out.className = "small " + (right === items.length ? "good" : "warn"); markTry(p.id, "tech"); }
+          } }, o[0]);
+        })), fb);
+        return row;
+      })), out);
+  }
+  function protoTry(p) {
+    var box = h("div", { class: "col gap" });
+    [whenGame(p), lockGame(p), techGame(p)].forEach(function (g) { if (g) box.appendChild(g); });
+    if (!box.children.length) box.appendChild(A.empty("برای این روال تمرینی که پاسخش از دادهٔ خودِ روال یکتا دربیاید نیست؛ قدمِ ۱ را یک بار دیگر بخوان و برو سراغِ قدمِ ۳."));
+    return box;
+  }
+  function protoDo(c, p, ctl) {
+    var tp = S.get(c.topic), box = h("div", { class: "col gap" });
+    if (p.custom === "queue") {
+      box.appendChild(h("section", { class: "card soft" }, h("p", {}, "منبع‌هایی را که الان درگیرشان هستی — از جمله منبعِ «", h("b", {}, tp ? tp.title : "موضوعِ دوره"), "» — اینجا بنویس و هر کدام را «فعال»، «صف» یا «معدن» کن. سقفِ پیشنهادی ۲ منبعِ فعال است. دست‌کم یک منبع لازم است.")));
+      box.appendChild(A.protoQueue ? A.protoQueue() : h("button", { class: "btn", onclick: function () { A.go("protos", null, "queue"); } }, "باز کردنِ صفِ منابع"));
+      ctl.validate = function () { return S.all("srcq").length ? [] : ["دست‌کم یک منبع در صف"]; };
+      return box;
+    }
+    var hd = prHandle(c, p), r = hd.r;
+    box.appendChild(h("section", { class: "card soft" }, h("p", {}, "حالا «" + p.fa + "» را یک بار واقعاً روی موضوعِ خودت اجرا کن: ", h("b", {}, tp ? tp.title : "—"), ". فیلدهای ستاره‌دار لازم‌اند؛ هر چه بنویسی خودکار ذخیره می‌شود و همین اجرا در «پروتکل‌ها › سابقه» هم دیده می‌شود.")));
+    var savef = A.debounce(function () { hd.put(); }, 400);
+    var ws = A.renderWS(p.ws, r.data, function () { savef(); }, { prefix: "crp" });
+    ctl.validate = function () { return ws._validate(); };
+    box.appendChild(h("section", { class: "card wsform" }, ws));
+    return box;
+  }
+  function protoClose(c, p, finish) {
+    var box = h("div", { class: "col gap" }), tp = S.get(c.topic);
+    if (p.rubric && p.custom !== "queue") {
+      var hd = prHandle(c, p), r = hd.r; r.rubric = r.rubric || [];
+      box.appendChild(h("section", { class: "card" }, h("h3", {}, "خودارزیابی: درست اجرا کردم؟"), h("div", { class: "rubric" }, p.rubric.map(function (q, i) {
+        return h("div", { class: "rrow" }, h("div", { class: "rc" }, q), h("div", { class: "seg", role: "radiogroup", "aria-label": q }, [0, 1, 2].map(function (v) {
+          return h("button", { type: "button", role: "radio", "aria-checked": r.rubric[i] === v ? "true" : "false", class: "sg" + (r.rubric[i] === v ? " on" : ""), onclick: function (e) {
+            if (r.rubric[i] === v) return;
+            r.rubric[i] = v; e.target.parentNode.querySelectorAll(".sg").forEach(function (b, j) { b.classList.toggle("on", j === v); b.setAttribute("aria-checked", j === v ? "true" : "false"); }); hd.put();
+          } }, ["۰ · نه", "۱ · تا حدودی", "۲ · کامل"][v]);
+        })));
+      }))));
+    }
+    /* نوبتِ بعد */
+    var nx = h("section", { class: "card crs-next" }, h("h3", {}, "نوبتِ بعدی‌ات"), h("p", {}, h("b", {}, NEXT[p.freq] || "هر بار که لازم شد"), " — " + p.when));
+    if (p.id === "P3") {
+      var mine = function () { return S.all("sched", function (s) { return s.topic === c.topic && s.proto === "P3"; }).sort(function (a, b) { return a.due < b.due ? -1 : 1; }); };
+      var list = function () { return h("div", { class: "row gap wrap" }, mine().map(function (s) { return h("span", { class: "pill" + (s.done ? " good" : "") }, s.label + " · " + A.fdate(s.due) + (s.done ? " ✓" : "")); })); };
+      if (mine().length) nx.appendChild(h("div", {}, h("p", { class: "small good" }, "چرخهٔ ۱-۳-۷ برای این موضوع زمان‌بندی شده و هر نوبت روزِ خودش در «امروز» ظاهر می‌شود:"), list()));
+      else nx.appendChild(h("button", { class: "btn crs-sched", onclick: function (e) {
+        A.start137(c.topic, tp ? tp.title : "");
+        e.target.replaceWith(h("div", {}, h("p", { class: "small good" }, "زمان‌بندی شد؛ هر نوبت روزِ خودش در «امروز» ظاهر می‌شود:"), list()));
+      } }, "زمان‌بندیِ روز ۱، ۳ و ۷ از امروز"));
+    } else if (REMIND[p.id]) nx.appendChild(h("p", { class: "small good" }, "لازم نیست یادت بماند: «امروز» خودش یادآوری می‌کند — " + REMIND[p.id] + "."));
+    else nx.appendChild(h("p", { class: "small muted" }, "این روال یادآورِ خودکار ندارد، چون به رخداد بسته است نه به تقویم. برای این‌که یادت بماند، کارتِ مرورِ پایین را بساز: «مرور» در روزهای بعد می‌پرسد کی و چطور اجرایش می‌کنی."));
+    box.appendChild(nx);
+    var made = !!c.cards[p.id];
+    var q = "روالِ «" + p.fa + "»: کی و هر چند وقت اجرایش می‌کنی، و چرا کار می‌کند؟ (بی‌نگاه)";
+    var a = "کی: " + p.when + "\nهر چند وقت: " + (FQ[p.freq] || "پیوسته") + " · مدت: " + p.dur + "\nچرا: " + sent1(p.why, 2);
+    box.appendChild(h("section", { class: "card" }, h("h3", {}, "کارتِ مرور"), h("p", { class: "small" }, q),
+      made ? h("p", { class: "small good" }, "کارتِ مرورِ این روال قبلاً ساخته شده.") : h("button", { class: "btn ghost sm crs-pcard", onclick: function (e) {
+        if (c.cards[p.id]) return;
+        var cd = A.newCard(q, a, { pid: p.id, topic: c.topic });
+        c.cards[p.id] = cd && cd.id || 1; save(c);
+        e.target.replaceWith(h("p", { class: "small good" }, "کارتِ مرور ساخته شد."));
+      } }, "کارتِ مرور بساز")));
+    box.appendChild(h("div", { class: "row gap wrap" }, h("button", { class: "btn lg", onclick: finish }, c.done[p.id] && !c.elsewhere[p.id] ? "✓ تمام‌شده — برو به درسِ بعد" : "✓ این درس تمام شد — درسِ بعد ←")));
+    return box;
+  }
+  function protoLesson(c, L, sub) {
+    var p = PM[L.pid], pid = p.id;
+    var want = /^s[0-4]$/.test(sub || "") ? sub : "s1";
+    var step = want, gated = false;
+    if (want !== "s0" && !c.done[pid] && gateOpen(c, pid)) { step = "s0"; gated = true; A.state.sub = "s0"; }
+    if (step !== "s0" && c.step[pid] !== step) { c.step[pid] = step; saveSoon(c); }
+    var w = weekOf(L.w), li = LIDX[pid];
+    var root = h("div", { class: "page crs" });
+    root.appendChild(h("div", { class: "crs-top" },
+      h("div", { class: "crs-bar" }, h("i", { style: { width: pct(c) + "%" } })),
+      h("div", { class: "row between wrap gap small" },
+        h("span", {}, "منزلِ " + fa(L.w) + " از ۸ · " + w.fa + " · درسِ " + fa(L.wi + 1) + " از " + fa(L.wn) + " (روالِ این منزل)", h("span", { class: "muted" }, " (کلِ دوره: " + fa(li + 1) + " از " + fa(LESSONS.length) + ")")),
+        h("button", { class: "btn ghost sm", onclick: function () { A.go("course"); } }, "🗺️ نقشهٔ دوره"))));
+    root.appendChild(A.head("درسِ " + fa(li + 1) + " · روال", p.fa, "درس‌های این منزل مهارت‌ها را ساختند؛ این روال برنامهٔ به‌کاربستنِ آن‌ها در روزمره است. تا آخرِ این درس می‌دانی کی و چطور اجرایش کنی، یک بار روی موضوعِ خودت اجرایش کرده‌ای و نوبتِ بعدی‌اش معلوم است. زمانِ تقریبی: " + minTextM(protoMin(p)) + " (برآورد از روی کاربرگِ همین روال؛ هر چه بنویسی ذخیره می‌شود)."));
+    if (c.elsewhere[pid]) root.appendChild(h("section", { class: "card soft crs-elsewhere" },
+      h("p", {}, h("b", {}, "این روال را پیش‌تر بیرون از دوره اجرا کرده‌ای"), " (" + A.fdate(c.done[pid]) + "). در پیشرفتِ دوره حساب شده؛ اگر بخواهی می‌توانی مرورش کنی یا روی موضوعِ دوره هم اجرایش کنی."),
+      h("div", { class: "row gap wrap" }, h("button", { class: "btn sm", onclick: function () { goNextLesson(c); } }, "برو به درسِ بعد ←"))));
+    var order = PSTEPS.map(function (s) { return s[0]; });
+    function goStep(s) { A.go("lesson", pid, s); }
+    root.appendChild(A.tabs(PSTEPS.map(function (s) { return [s[0], (c.done[pid] && s[0] === "s4" ? "✓ " : "") + s[1]]; }), step, goStep));
+    var ctl = {}, body;
+    if (step === "s0") { var to = gated ? want : "s1"; body = warmStep(c, pid, function () { goStep(to); }, gated ? "ادامه به " + STEPNAME[to] + " ←" : "برو به قدمِ ۱ ←", gated); }
+    else if (step === "s1") body = protoSee(p);
+    else if (step === "s2") body = protoTry(p);
+    else if (step === "s3") body = protoDo(c, p, ctl);
+    else body = protoClose(c, p, function () {
+      if (p.custom === "queue") {
+        if (!S.all("srcq").length) { A.toast("قدمِ ۳: دست‌کم یک منبع در صف بنویس.", "bad"); goStep("s3"); return; }
+      } else {
+        var hd = prHandle(c, p), r = hd.r;
+        var miss = A.renderWS(p.ws, r.data, function () {}, { prefix: "chk" })._validate();
+        if (miss.length) { A.toast("کاربرگِ قدمِ ۳ هنوز کامل نیست: " + miss.slice(0, 2).join("، ") + (miss.length > 2 ? "…" : ""), "bad"); goStep("s3"); return; }
+        r.status = "done"; hd.put(); try { A.onProtoDone(r); } catch (e) { console.error(e); }
+      }
+      if (!c.done[pid] || c.elsewhere[pid]) { c.done[pid] = A.today(); delete c.elsewhere[pid]; }
+      save(c);
+      A.toast("درسِ " + fa(li + 1) + " تمام شد.");
+      goNextLesson(c);
+    });
+    root.appendChild(h("div", { class: "crs-body" }, body));
+    if (step !== "s4" && step !== "s0") {
+      var i = order.indexOf(step);
+      root.appendChild(h("div", { class: "row between gap crs-nav" },
+        i > 0 ? h("button", { class: "btn ghost", onclick: function () { goStep(order[i - 1]); } }, "→ قدمِ قبل") : h("span"),
+        h("button", { class: "btn", onclick: function () {
+          if (step === "s3" && ctl.validate) { var miss = ctl.validate(); if (miss.length) { A.toast("این‌ها هنوز خالی‌اند: " + miss.slice(0, 3).join("، "), "bad"); return; } }
+          goStep(order[i + 1]);
+        } }, "قدمِ بعد ←")));
+    }
+    return root;
+  }
 
   /* ================= تصویرها و شبیه‌سازهای ویژه =================
      همه «مدلِ ساده‌شده برای شهود»اند؛ شکلِ اثر از پژوهش است، عددهای روی محورها نمادین‌اند. */

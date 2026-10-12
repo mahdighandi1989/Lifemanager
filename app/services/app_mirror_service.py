@@ -402,3 +402,108 @@ async def status(db: AsyncSession, *, user_id: Optional[int], app: str) -> Dict[
     root = await dss.get_root_folder_id(db)
     return {"connected": await dss.is_connected(db), "root_url": folder_url(root or ""),
             "items": [row_view(r) for r in rows]}
+
+
+# ---------------------------------------------------------------- attachments (bytes live ONLY in Drive)
+
+ATTACH_FOLDER = "پیوست‌ها"
+MAX_FILE_BYTES = 25 * 1024 * 1024
+
+
+class DriveUnavailable(RuntimeError):
+    pass
+
+
+async def _record_folder(db: AsyncSession, drive_client, writer, *, user_id, app: str, rec_id: str,
+                         group: str, title: str) -> str:
+    """The record's own Drive folder (the one the mirror uses); created if needed.
+    The mirror row is created as well (pending) so the next sync writes its sheet there."""
+    from app.services.inspection_drive import root_folder
+
+    row = (await db.execute(select(AppMirror).where(AppMirror.app == app, AppMirror.user_id == user_id,
+                                                    AppMirror.rec_id == rec_id))).scalar_one_or_none()
+    if row is not None and row.folder_id and await asyncio.to_thread(writer.exists, row.folder_id):
+        return row.folder_id
+    grp = _clean_name(group or (row.grp if row else "") or "سایر", 60)
+    ttl = title or (row.title if row else "") or rec_id
+    root = await root_folder(db, drive_client)
+    app_id = await drive_client.get_or_create_folder(app, parent=root)
+    grp_id = await drive_client.get_or_create_folder(grp, parent=app_id)
+    fid = await drive_client.get_or_create_folder(record_folder_name(ttl, rec_id), parent=grp_id)
+    if row is None:
+        row = AppMirror(user_id=user_id, app=app, rec_id=rec_id, grp=grp, title=_clean_name(ttl, 200), doc="",
+                        doc_hash="", synced_hash="", sheet_id="", error="")
+        db.add(row)
+    row.folder_id = fid
+    await db.commit()
+    return fid
+
+
+async def upload_attachment(db: AsyncSession, *, user_id, app: str, rec_id: str, group: str, title: str,
+                            filename: str, mime: str, data: bytes, clients=None) -> Dict[str, Any]:
+    from app.models.app_file import AppFile
+
+    if len(data) > MAX_FILE_BYTES:
+        raise ValueError("فایل بزرگ‌تر از ۲۵ مگابایت است")
+    drive_client, writer = clients if clients is not None else await _clients(db)
+    if drive_client is None:
+        raise DriveUnavailable("گوگل درایو وصل نیست — پیوست فقط در درایو نگه داشته می‌شود (نه در سرور)؛ اول در تنظیماتِ Lifemanager درایو را وصل کن.")
+    fid = await _record_folder(db, drive_client, writer, user_id=user_id, app=app, rec_id=rec_id, group=group, title=title)
+    sub = await drive_client.get_or_create_folder(ATTACH_FOLDER, parent=fid)
+    name = _clean_name(filename, 200)
+    up = await drive_client.upload_ex(file_name=name, parent=sub, media=data, mime_type=mime or "application/octet-stream",
+                                      description=f"{app} · {rec_id}", app_properties={"app": app, "rec": rec_id[:60]})
+    row = AppFile(user_id=user_id, app=app, rec_id=rec_id, name=name, mime=(mime or "")[:120], size=len(data),
+                  drive_id=up["id"], link=up.get("link") or f"https://drive.google.com/file/d/{up['id']}/view", deleted=False)
+    db.add(row)
+    await db.commit()
+    return file_view(row)
+
+
+def file_view(f) -> dict:
+    return {"id": f.id, "rec_id": f.rec_id, "name": f.name, "mime": f.mime or "", "size": f.size or 0,
+            "link": f.link or "", "created_at": f.created_at.isoformat() if f.created_at else None}
+
+
+async def list_attachments(db: AsyncSession, *, user_id, app: str, rec_id: Optional[str] = None) -> List[dict]:
+    from app.models.app_file import AppFile
+
+    q = select(AppFile).where(AppFile.app == app, AppFile.user_id == user_id, or_(AppFile.deleted.is_(None), AppFile.deleted.is_(False)))
+    if rec_id:
+        q = q.where(AppFile.rec_id == rec_id)
+    return [file_view(f) for f in (await db.execute(q.order_by(AppFile.id))).scalars().all()]
+
+
+async def delete_attachment(db: AsyncSession, *, user_id, app: str, file_id: int, clients=None) -> bool:
+    """Hidden here; in Drive only RENAMED (never deleted)."""
+    from app.models.app_file import AppFile
+
+    f = await db.get(AppFile, file_id)
+    if f is None or f.app != app or f.user_id != user_id or f.deleted:
+        return False
+    f.deleted = True
+    await db.commit()
+    try:
+        drive_client, writer = clients if clients is not None else await _clients(db)
+        if writer is not None and f.drive_id:
+            await asyncio.to_thread(writer.rename, f.drive_id, (DELETED_PREFIX + f.name)[:255])
+    except Exception as exc:  # noqa: BLE001 — the rename is cosmetic; the pointer is already hidden
+        logger.warning("attachment rename failed: %s", exc)
+    return True
+
+
+async def usage(db: AsyncSession, *, user_id, app: str) -> Dict[str, Any]:
+    """How much of the server's database this app uses (records + mirror copies) and how much sits in Drive."""
+    from sqlalchemy import func as F
+
+    from app.models.app_file import AppFile
+    from app.models.app_record import AppRecord
+
+    n_rec, b_rec = (await db.execute(select(F.count(AppRecord.id), F.coalesce(F.sum(F.length(AppRecord.data)), 0)).where(
+        AppRecord.app == app, AppRecord.user_id == user_id))).one()
+    n_mir, b_mir = (await db.execute(select(F.count(AppMirror.id), F.coalesce(F.sum(F.length(AppMirror.doc)), 0)).where(
+        AppMirror.app == app, AppMirror.user_id == user_id))).one()
+    n_f, b_f = (await db.execute(select(F.count(AppFile.id), F.coalesce(F.sum(AppFile.size), 0)).where(
+        AppFile.app == app, AppFile.user_id == user_id, or_(AppFile.deleted.is_(None), AppFile.deleted.is_(False))))).one()
+    return {"records": int(n_rec or 0), "record_chars": int(b_rec or 0), "mirrors": int(n_mir or 0),
+            "mirror_chars": int(b_mir or 0), "files": int(n_f or 0), "file_bytes_in_drive": int(b_f or 0)}

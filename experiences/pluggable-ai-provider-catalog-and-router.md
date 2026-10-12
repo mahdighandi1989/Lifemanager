@@ -185,3 +185,11 @@ sentence that pinpoints the fix — always bubble up `error.type` + `error.messa
 - Treat an empty/blocked answer (`finishReason` SAFETY/RECITATION, `promptFeedback.blockReason`) as an error, not "ok with empty text".
 - Checklist elsewhere: job interval ≥ your scheduler's floor; test "vanished model", "came back", "empty list", "owner pin", "key collision";
   show "auto" / "your choice" badges in the settings UI so the owner can see why a model is on.
+
+## Update 2026-10-12 (3) — a boot-time seed that fails silently looks exactly like "the fix never shipped"
+- Symptom: the new catalog was deployed (the new frontend bundle was being served) but production still listed the old models.
+  The seed ran inside `try/except: logger.debug(...)` at startup — the failure left no trace at the default log level.
+- Rule: never swallow a startup migration/seed at debug level. Log a warning with traceback AND persist the last result
+  (ok/error/time) somewhere a read-only status endpoint can show without log access; check that endpoint after every deploy.
+- Reproduce upgrades against the real engine: run the OLD seed, then the NEW one, on a throw-away Postgres (`initdb` + `pg_ctl`
+  in a temp dir) — SQLite in tests hides dialect-specific failures.

@@ -128,9 +128,10 @@
     if (!tops.length) root.appendChild(A.empty("هنوز موضوعی نساخته‌ای. عنوان اولین موضوع را در کادر بالا بنویس."));
     root.appendChild(h("div", { class: "tgrid" }, tops.map(function (t) {
       var pr = topicProgress(t.id);
-      return h("button", { class: "tcard", onclick: function () { A.go("topic", t.id); } }, h("div", { class: "tfa" }, t.title), h("div", { class: "small muted" }, (t.dom || "") + (t.src ? " · " + t.src : "")),
+      return h("div", { class: "tcwrap" }, h("button", { class: "tcard", onclick: function () { A.go("topic", t.id); } }, h("div", { class: "tfa" }, t.title), h("div", { class: "small muted" }, (t.dom || "") + (t.src ? " · " + t.src : "")),
         h("div", { class: "phbar" }, C.PHASES.map(function (p) { return h("i", { class: pr.ph[p.n] ? "on" : "", style: { "--pc": "var(--p" + p.n + ")" }, title: "فاز " + fa(p.n) }); })),
-        h("div", { class: "small" }, fa(pr.n) + " تمرین · " + fa(pr.phases) + " از ۹ فاز"), t.sample ? h("span", { class: "chip" }, "نمونه") : null);
+        h("div", { class: "small" }, fa(pr.n) + " تمرین · " + fa(pr.phases) + " از ۹ فاز"), t.sample ? h("span", { class: "chip" }, "نمونه") : null),
+        A.journeyButton ? A.journeyButton(t, true) : null);
     })));
     return root;
   };
@@ -147,6 +148,7 @@
     var pr = topicProgress(id);
     root.appendChild(A.head("موضوع" + (t.dom ? " · " + t.dom : ""), t.title, t.src ? "منبع: " + t.src : null,
       h("div", { class: "row gap wrap" }, h("span", { class: "pill" }, fa(pr.n) + " تمرین کامل"), h("span", { class: "pill" }, fa(pr.phases) + " از ۹ فاز"), t.sample ? h("span", { class: "chip" }, "نمونه") : null)));
+    if (A.journeyButton) root.appendChild(A.journeyButton(t));
     var scheds = S.all("sched", function (s) { return s.topic === id; }).sort(function (a, b) { return a.due.localeCompare(b.due); });
     root.appendChild(h("div", { class: "card" }, h("div", { class: "row between wrap" }, h("h3", {}, "چرخه بازیابی ۱-۳-۷ برای این موضوع"),
       scheds.length ? null : h("button", { class: "btn sm", onclick: function () { A.start137(id, t.title); A.render(); } }, "شروع چرخه از امروز")),
@@ -272,6 +274,7 @@
       A.confirmBtn("حذف", function () { S.del(r.id); A.go("proto", pid); })));
     return root;
   };
+  A.protoQueue = function () { return queue(); };
   function queue() {
     var wrap = h("div", {});
     var act = S.all("srcq", function (s) { return s.status === "active"; });

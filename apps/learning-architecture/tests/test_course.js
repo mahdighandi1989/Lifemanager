@@ -120,8 +120,59 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main .btn:has-text("ببینم چطور بودم")'); info.calib = await p.locator('main .crs-calib').count();
   // peek: ارجاع در دوره پرت نمی‌کند
   await p.evaluate(() => APP.peekTech(12)); info.peek = await p.locator('.crs-peek').count(); await p.click('.crs-peek .btn:has-text("بستن")'); info.viewAfterPeek = await p.evaluate(() => APP.state.view);
+  // درس‌های روال: آخرِ هر منزل، کلیدِ رشته‌ای، FARM درس نیست
+  info.week1 = await p.evaluate(() => APP.COURSE_LESSONS.filter(l => l.w === 1).map(l => l.tid).join(','));
+  info.protoLessons = await p.evaluate(() => APP.COURSE_LESSONS.filter(l => l.pid).map(l => l.pid).join(','));
+  // a12 BUILD.course فقط در میزبان نصب می‌شود؛ همان عبارت‌هایش (l.tid، (A.TM[l.tid]||{}).fa، c.warm[l.tid]) این‌جا بازاجرا می‌شوند
+  info.mirrorRows = await p.evaluate(() => { try { const c = APP.courseState(); if (APP.MIRROR_BUILD) return APP.MIRROR_BUILD.course(c).tabs[1].rows.length; return 1 + APP.COURSE_LESSONS.map((l, i) => { const w = (c.warm || {})[l.tid] || {}; return [i + 1, l.w, l.tid + ' · ' + ((APP.TM[l.tid] || {}).fa || ''), (c.done || {})[l.tid] || '', w.due || '']; }).length; } catch (e) { return 'ERR ' + e.message; } });
+  info.lessonsN = await p.evaluate(() => APP.COURSE_LESSONS.length);
+  info.p1Min = await p.evaluate(() => APP.courseLessonMinutes('P1'));
+  await p.evaluate(() => APP.go('lesson', 'P1', 's1'));
+  info.p1H1 = await p.locator('main h1').innerText(); info.p1Flow = await p.locator('main .crs-flow li').count();
+  info.p1Lead = await p.locator('main .phead .lead').innerText();
+  // قدمِ ۲: «کی اجرایش می‌کنی؟» — غلط ⇒ ✗، درست ⇒ ✓
+  await p.evaluate(() => APP.go('lesson', 'P1', 's2'));
+  info.p1Order = await p.locator('main .crs-order').count(); // P1 قفلِ ترتیبی ندارد ⇒ بازیِ ترتیب ندارد
+  const wrongOpt = p.locator('main .crs-whenopt:not(:has-text("پس از هر جلسه"))').first(); await wrongOpt.click();
+  info.whenWrong = await p.locator('main .crs-when + p').innerText();
+  await p.locator('main .crs-whenopt:has-text("پس از هر جلسه")').click();
+  info.whenRight = await p.locator('main .crs-when + p').innerText();
+  info.whenSkipped = 0; for (const x of ['P6', 'P8']) { await p.evaluate(x => APP.go('lesson', x, 's2'), x); info.whenSkipped += await p.locator('main .crs-whenopt').count(); }
+  // P3: ترتیبی که کاربرگ قفل کرده (برگه سفید ← مقایسه)
+  await p.evaluate(() => APP.go('lesson', 'P3', 's2'));
+  const p3 = await p.evaluate(() => ['dump', 'cmp'].map(k => APP.PM.P3.ws.find(f => f.k === k).l));
+  for (const l of p3) await p.locator('main .crs-ocard', { hasText: l.slice(0, 30) }).first().click();
+  info.p3Order = await p.locator('main .small.good:has-text("بی‌خطا")').count();
+  // قدمِ ۳: دیدن ≠ ساختن؛ ورودی ⇒ یک اجرای P1 روی موضوعِ دوره
+  info.puts_p1_s3 = await putsDuring(() => p.evaluate(() => APP.go('lesson', 'P1', 's3')));
+  info.prOnView = await p.evaluate(() => APP.S.all('pr', r => r.pid === 'P1').length);
+  await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(100);
+  info.p1Blocked = await p.evaluate(() => APP.state.sub) === 's3';
+  for (const el of await p.locator('main .wsform textarea, main .wsform input[type=text]').all()) { if (await el.isVisible() && await el.isEditable()) await el.fill('اجرای آزمایشیِ روال'); }
+  for (const sel of await p.locator('main .wsform select').all()) { const opts = await sel.locator('option').allTextContents(); if (opts.length > 1) await sel.selectOption({ index: 1 }); }
+  await p.waitForTimeout(700);
+  info.prRun = await p.evaluate(() => { const rs = APP.S.all('pr', r => r.pid === 'P1'); return rs.length + '|' + (rs[0] && rs[0].topic === APP.courseState().topic) + '|' + (rs[0] && rs[0].course); });
+  await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(150);
+  info.p1AtS4 = await p.evaluate(() => APP.state.sub);
+  if (info.p1AtS4 !== 's4') info.p1Missing = await p.locator('.toast').allTextContents();
+  // قدمِ ۴: نوبتِ بعد + کارتِ مرور + پایان
+  info.p1Next = await p.locator('main .crs-next').innerText();
+  await p.click('main .crs-pcard'); await p.waitForTimeout(100);
+  info.p1Card = await p.evaluate(() => APP.S.all('card', c => c.pid === 'P1').length);
+  await p.click('main .btn.lg'); await p.waitForTimeout(200);
+  info.p1Done = await p.evaluate(() => !!APP.courseState().done.P1 + '|' + (APP.S.all('pr', r => r.pid === 'P1')[0] || {}).status);
+  // P3: زمان‌بندیِ ۱-۳-۷ روی موضوعِ دوره
+  await p.evaluate(() => APP.go('lesson', 'P3', 's4')); await p.click('main .crs-sched'); await p.waitForTimeout(100);
+  info.p3Sched = await p.evaluate(() => APP.S.all('sched', s => s.topic === APP.courseState().topic && s.proto === 'P3').length);
+  // P10: صفِ منابع همین‌جا
+  await p.evaluate(() => APP.go('lesson', 'P10', 's3')); info.p10Queue = await p.locator('main #sqT').count();
+  // نقشه: خال‌های چهارگوشِ روال؛ مزرعه پیوند است نه درس
+  await p.evaluate(() => APP.go('course')); info.prDots = await p.locator('main .crs-dot.pr').count();
+  for (const id of await p.evaluate(() => APP.COURSE_LESSONS.filter(l => l.pid).map(l => l.tid))) for (const s of ['s1', 's2', 's3', 's4']) { await p.evaluate(x => APP.go('lesson', x[0], x[1]), [id, s]); await bad('proto lesson ' + id + ' ' + s); }
+  await p.evaluate(() => APP.go('home')); await bad('home');
   // موبایل
   await p.setViewportSize({ width: 390, height: 844 });
+  for (const v of [['lesson', 'P1', 's2'], ['lesson', 'P3', 's4'], ['lesson', 'P10', 's3']]) { await p.evaluate(x => APP.go(...x), v); await p.waitForTimeout(120); const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth); if (ov > 2) errors.push('mobile overflow ' + v.join('/') + ' ' + ov); }
   for (const v of [['course'], ['lesson', 42, 's2'], ['lesson', 37, 's2'], ['lesson', 37, 's1'], ['start']]) { await p.evaluate(x => APP.go(...x), v); await p.waitForTimeout(120); const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth); if (ov > 2) errors.push('mobile overflow ' + v.join('/') + ' ' + ov); }
   await p.evaluate(() => APP.go('lesson', 37, 's2')); await p.screenshot({ path: path.join(__dirname, '..', 'dist', 'shot_course_mobile.png') });
   await p.setViewportSize({ width: 1280, height: 900 });
@@ -154,6 +205,25 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   if (info.orderSwapOk !== 1) errors.push('swappable pair not accepted');
   if (info.orderSkipped !== 0) errors.push('order game shown for excluded technique');
   if (info.spotPool) errors.push('ambiguous spot item still in pool');
+  // درس‌های روال
+  if (info.week1 !== '37,32,41,42,40,P1,P10') errors.push('week-1 lessons: ' + info.week1);
+  if (/FARM/.test(info.protoLessons)) errors.push('FARM became a lesson');
+  if (info.mirrorRows !== info.lessonsN + 1) errors.push('mirror course sheet: ' + info.mirrorRows);
+  if (!Array.isArray(info.p1Min) || !(info.p1Min[0] >= 5)) errors.push('proto lesson minutes: ' + JSON.stringify(info.p1Min));
+  if (!/فیلتر ورودی/.test(info.p1H1) || info.p1Flow < 5 || !/زمانِ تقریبی: حدودِ/.test(info.p1Lead)) errors.push('P1 step 1: ' + info.p1H1);
+  if (info.p1Order !== 0) errors.push('order game for P1 (no lock order in its data)');
+  if (!/^✗/.test(info.whenWrong) || !/^✓/.test(info.whenRight)) errors.push('when-game feedback: ' + info.whenWrong + ' / ' + info.whenRight);
+  if (info.whenSkipped !== 0) errors.push('when-game shown for ambiguous P6/P8');
+  if (info.p3Order !== 1) errors.push('P3 lock-order game failed');
+  if (info.puts_p1_s3.some(x => /^pr:/.test(x)) || info.prOnView !== 0) errors.push('viewing proto step 3 created a run: ' + JSON.stringify(info.puts_p1_s3));
+  if (!info.p1Blocked) errors.push('proto step 3 not gated');
+  if (info.prRun !== '1|true|true') errors.push('proto run record: ' + info.prRun);
+  if (info.p1AtS4 !== 's4') errors.push('proto s3->s4 blocked: ' + JSON.stringify(info.p1Missing));
+  if (!/نوبتِ بعدی/.test(info.p1Next) || info.p1Card !== 1) errors.push('proto schedule/card: ' + info.p1Card);
+  if (info.p1Done !== 'true|done') errors.push('proto lesson not finished: ' + info.p1Done);
+  if (info.p3Sched !== 3) errors.push('P3 1-3-7 not scheduled: ' + info.p3Sched);
+  if (info.p10Queue !== 1) errors.push('P10 queue not inline');
+  if (info.prDots !== info.protoLessons.split(',').length) errors.push('proto dots on map: ' + info.prDots);
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();
 })();
