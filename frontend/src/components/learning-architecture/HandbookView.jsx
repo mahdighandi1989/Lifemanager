@@ -11,7 +11,7 @@
  *     `?doc=HANDBOOK#<anchor>` and lands on that very section.
  * Content comes only from this repository (never user input), so the HTML is trusted.
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { marked } from 'marked';
 
 import {
@@ -68,13 +68,13 @@ function wrapSections(root, docLabel) {
   });
 }
 
-function Part({ md, docLabel, onReady }) {
+function Part({ md, docLabel, onReady, seen }) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.innerHTML = marked.parse(md || '', { gfm: true });
-    assignHeadingIds(el);
+    assignHeadingIds(el, { ...(seen || {}) });  // a copy: re-running this effect never double-counts
     wrapSections(el, docLabel);
     el.querySelectorAll('table').forEach((t) => {
       const box = document.createElement('div');
@@ -105,7 +105,7 @@ function Part({ md, docLabel, onReady }) {
         onReady?.();
       });
     } else onReady?.();
-  }, [md, docLabel, onReady]);
+  }, [md, docLabel, onReady, seen]);
   return <div ref={ref} className={PROSE} />;
 }
 
@@ -134,14 +134,18 @@ export default function HandbookView({ doc, hash, onDoc, onClose }) {
     if (el) el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
   }, []);
 
+  // stable callback (hash read through a ref): changing the anchor must only SCROLL — it used to
+  // re-parse the markdown and re-render every mermaid diagram on each TOC click
+  const hashRef = useRef(hash);
+  hashRef.current = hash;
   const onReady = useCallback(() => {
     if (!body.current) return;
     const hs = Array.from(body.current.querySelectorAll('h2,h3'))
       .map((h) => ({ id: h.id, text: h.textContent.trim(), lvl: h.tagName === 'H2' ? 2 : 3 }))
       .filter((t) => t.text !== 'فهرست');
     setToc(hs);
-    if (hash) setTimeout(() => scrollTo(hash, false), 30);
-  }, [hash, scrollTo]);
+    if (hashRef.current) setTimeout(() => scrollTo(hashRef.current, false), 30);
+  }, [scrollTo]);
 
   useEffect(() => { if (hash && toc.length) scrollTo(hash); }, [hash, toc.length, scrollTo]);
 
@@ -157,6 +161,15 @@ export default function HandbookView({ doc, hash, onDoc, onClose }) {
   };
 
   const [before, after] = doc === 'HANDBOOK' ? splitAtChart(text) : [text, null];
+  // the part after the chart continues the duplicate-heading numbering of the part before it (as on GitHub)
+  const seenAfter = useMemo(() => {
+    if (after == null) return {};
+    const tmp = document.createElement('div');
+    tmp.innerHTML = marked.parse(before || '', { gfm: true });
+    const seen = {};
+    assignHeadingIds(tmp, seen);
+    return seen;
+  }, [before, after]);
   const shown = toc.filter((t) => !filter || t.text.includes(filter));
 
   return (
@@ -197,7 +210,7 @@ export default function HandbookView({ doc, hash, onDoc, onClose }) {
         {text && after != null && (
           <>
             <div className="my-4">{progress && <ProgressChart data={progress} onOpenWorklog={(id) => onDoc('WORKLOG', id)} />}</div>
-            <Part md={after} docLabel={docLabel} onReady={onReady} />
+            <Part md={after} docLabel={docLabel} onReady={onReady} seen={seenAfter} />
           </>
         )}
       </article>

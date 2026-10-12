@@ -69,7 +69,7 @@ export default function ProgressChart({ data, onOpenWorklog }) {
           <span className="inline-flex items-center gap-1"><i className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: FLAT }} />۰ خنثی</span>
           <span className="inline-flex items-center gap-1"><i className="inline-block w-4 h-0.5" style={{ background: INK }} />جمعِ جاری</span>
         </div>
-        <svg viewBox={`0 0 ${g.W} ${g.H}`} className="w-full h-auto" dir="ltr" role="img"
+        <svg viewBox={`0 0 ${g.W} ${g.H}`} className="w-full h-auto" dir="ltr" role="group"
           aria-label={`نمودارِ روند: ${rows.length} رویداد، جمعِ جاری ${last.cumulative}`}
           onMouseLeave={() => setHover(null)}>
           {g.ticks.map((v) => (
@@ -95,9 +95,10 @@ export default function ProgressChart({ data, onOpenWorklog }) {
                 <path d={path} fill={color} opacity={sel === r.n || hover === i ? 1 : 0.85}
                   stroke={sel === r.n ? INK : 'none'} strokeWidth="1.5" />
                 <rect x={g.x(i) - g.band / 2} y={g.T} width={g.band} height={g.H - g.T - g.B} fill="transparent"
-                  tabIndex={0} style={{ cursor: 'pointer', outline: 'none' }}
+                  tabIndex={0} role="button" aria-label={`رویدادِ ${r.n} · ${r.date} · ${dirWord(r.dir)} · ${r.event}`}
+                  aria-pressed={sel === r.n} style={{ cursor: 'pointer' }}
                   onMouseEnter={() => setHover(i)} onFocus={() => setHover(i)} onBlur={() => setHover(null)}
-                  onClick={() => setSel(r.n)} onKeyDown={(e) => { if (e.key === 'Enter') setSel(r.n); }}>
+                  onClick={() => setSel(r.n)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSel(r.n); } }}>
                   <title>{`#${r.n} · ${r.date} · ${r.dir}\n${r.event}`}</title>
                 </rect>
                 {(rows.length <= 16 || i % 2 === 0 || i === rows.length - 1) && (

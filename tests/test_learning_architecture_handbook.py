@@ -64,6 +64,15 @@ def test_validator_actually_catches_drift():
     assert any("no gaps" in p for p in hb.validate(handbook, gap, worklog)[2])
     unsigned = worklog + "\n## 2099-01-01 (%d) — بی‌امضا\n- **[CHANGE]** x\n" % (max(hb.parse_worklog(worklog)[0]) + 1)
     assert any("signature" in p for p in hb.validate(handbook, progress, unsigned)[2])
+    # a newest WORKLOG entry nobody cites is caught even on the SAME date as the last PROGRESS row …
+    last_date = hb.parse_progress(progress)[0][-1]["date"]
+    nn = max(hb.parse_worklog(worklog)[0]) + 1
+    sig = "> **امضا:** `x` · %s · y\n" % last_date
+    uncited = worklog + "\n## %s (%d) — بی‌ردیف\n- **[CHANGE]** x\n%s" % (last_date, nn, sig)
+    assert any("not cited" in p for p in hb.validate(handbook, progress, uncited)[2])
+    # … unless the entry says it did not move the chart
+    exempt = worklog + "\n## %s (%d) — فقط متن\n- **[CHANGE]** x — %s\n%s" % (last_date, nn, hb.NO_CHART, sig)
+    assert not any("not cited" in p for p in hb.validate(handbook, progress, exempt)[2])
     stale_chart = handbook.replace(hb.render_chart(hb.parse_progress(progress)[0]), hb.render_chart([]))
     assert any("chart is stale" in p for p in hb.validate(stale_chart, progress, worklog)[2])
     broken_link = handbook + "\n[x](#عنوانی-که-نیست)\n"

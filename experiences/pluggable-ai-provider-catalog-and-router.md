@@ -165,3 +165,23 @@ sentence that pinpoints the fix — always bubble up `error.type` + `error.messa
   و بخش‌های `thought` را از پاسخ بیرون بگذار.
 - چک‌لیست: هر چند ماه صفحهٔ deprecations ِ هر ارائه‌دهنده را با کاتالوگ مقایسه کن؛ شمارندهٔ درخواست/خطا و قیمتِ هر مدل را پر نگه دار تا «صفر» معنا داشته باشد.
 
+
+## Update 2026-10-12 (2) — don't hand-maintain the model list: reconcile against the provider's live list
+- The previous update still relied on a person noticing deprecations. Better: a daily background job (plus the existing "sync" button)
+  fetches the provider's own `/models` list (all pages) and **reconciles** the catalog:
+  - classify each live id from its name + provider metadata (Gemini: `gemini-<ver>-<pro|flash|flash-lite>[-NNN]`, `supportedGenerationMethods`
+    must include `generateContent`, `outputTokenLimit`/`inputTokenLimit` → caps; Claude: `claude-<tier>-<ver>`); skip embeddings/image/audio/live;
+  - per tier, only the **newest stable** model is switched on with the tier's priority; older stable get a worse priority; previews and
+    unknown families are added **off**;
+  - a catalog row whose id is no longer listed is switched **off and labelled** (kept, never deleted) — the router then routes around it;
+  - **an empty list or any fetch error retires nothing** (a provider outage must not switch off every model);
+  - the owner's manual edits (on/off, priority, capabilities) are marked (`[owner]`) and survive the refresh; only a vanished model is
+    still switched off;
+  - mark reconciled rows (`source="live"`) so the static boot-time seed stops overwriting them — otherwise each deploy undoes the refresh.
+- Unique-key trap: the same model id can exist under two providers (API key vs. subscription) or as an owner's custom row → derive a free key.
+- Secrets: send the key in a header (`x-goog-api-key`), never in the URL — URLs end up in exception text, logs and UI error messages;
+  scrub provider errors before showing them. Pin `base_url` to the provider's official https host, or an editable base URL becomes
+  a way to post the key to any server.
+- Treat an empty/blocked answer (`finishReason` SAFETY/RECITATION, `promptFeedback.blockReason`) as an error, not "ok with empty text".
+- Checklist elsewhere: job interval ≥ your scheduler's floor; test "vanished model", "came back", "empty list", "owner pin", "key collision";
+  show "auto" / "your choice" badges in the settings UI so the owner can see why a model is on.

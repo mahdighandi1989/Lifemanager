@@ -3,7 +3,7 @@
   var h = A.h, fa = A.fa, S = A.S, C = A.C;
   var NAV = [
     { g: "دوره: از صفر" },
-    ["course", "🧭 دورهٔ گام‌به‌گام", "۴۵ درسِ کوتاه به ترتیب، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
+    ["course", "🧭 دورهٔ گام‌به‌گام", "۴۵ درس به ترتیب (هر درس ۱۵ تا ۵۵ دقیقه، قابلِ تقسیم)، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
     { g: "مسیر یادگیری" },
@@ -24,9 +24,12 @@
   A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start") ? (A.lastSys || "learn") : "learn"; };
   A.state = { view: "home", arg: null, sub: null };
   A.go = function (view, arg, sub) {
-    A.state = { view: view, arg: arg == null ? null : arg, sub: sub || null };
-    if (A.HOST && A.HOST.navigate) { try { A.HOST.navigate({ tab: view, a: arg == null ? "" : String(arg), s: sub || "" }); } catch (e) { } }
+    // a change of sub-tab inside the same page REPLACES the history entry (so the browser's Back and the app's
+    // «↩ برگرد» agree: one history step = one page the learner actually moved to)
+    var samePage = A.state.view === view && String(A.state.arg == null ? "" : A.state.arg) === String(arg == null ? "" : arg);
+    if (A.HOST && A.HOST.navigate) { try { A.HOST.navigate({ tab: view, a: arg == null ? "" : String(arg), s: sub || "", replace: samePage || !!A._replaceNav }); } catch (e) { } }
     else { try { if (!arg && history.replaceState) history.replaceState(null, "", "#" + view); } catch (e) { } }
+    A.state = { view: view, arg: arg == null ? null : arg, sub: sub || null }; A._replaceNav = false;
     A.render(); try { (A.mountEl && A.mountEl.scrollIntoView) ? A.mountEl.scrollIntoView({ block: "start" }) : window.scrollTo(0, 0); } catch (e) { window.scrollTo(0, 0); }
     var m = document.getElementById("main"); if (m) m.focus({ preventScroll: true });
   };
@@ -61,13 +64,16 @@
     if (bn) bn.textContent = sys === "epi" ? "کارخانه معرفت‌شناسی" : "معماری یادگیری عمیق";
     if (bs) bs.textContent = sys === "epi" ? fa(((window.EPI || {}).HALLS || []).length) + " سالن · " + fa((A.ESTL || []).length) + " ایستگاه · جزوه مصباح" : "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه";
     document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || (A.state.view === "topic" && b.dataset.v === "topics") || (A.state.view === "lesson" && b.dataset.v === "course") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases")); });
-    var main = document.getElementById("main"); main.innerHTML = "";
+    var main = document.getElementById("main"); if (!main) return; main.innerHTML = "";
+    // in the host, nothing renders before the records arrive: a view could otherwise save defaults (e.g. settings)
+    // over the owner's real data — a deep link or the host's URL effect can call render that early (2026-10-12 audit)
+    if (A.HOST && !A.S.loaded) { main.appendChild(h("div", { class: "card" }, "در حالِ بارگذاریِ داده‌ها…")); return; }
     /* برای «نظارت و سرکشی» میزبان: هر نما یک بخش نام‌دار است */
     var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", proto: "پروتکل", e_case: "پرونده کارخانه" })[A.state.view] || A.state.view; })();
     main.setAttribute("data-report-section", A.state.view); main.setAttribute("data-report-section-label", lab);
     var fn = A.V[A.state.view] || A.V.home;
     try { main.appendChild(fn(A.state.arg, A.state.sub)); }
-    catch (e) { console.error(e); main.appendChild(h("div", { class: "card bad" }, "خطا در نمایش این بخش: " + e.message)); }
+    catch (e) { console.error(e); main.appendChild(h("div", { class: "card bad" }, h("p", {}, "این بخش نمایش داده نشد (" + e.message + ") — شاید پیوند قدیمی یا ناقص است."), h("button", { class: "btn sm", onclick: function () { (A.goRoot || A.go)("home"); } }, "رفتن به خانه"))); }
   };
   A.V = {};
 
@@ -147,7 +153,7 @@
       root.appendChild(h("section", { class: "card crs-home" },
         h("div", { class: "row between wrap gap" },
           h("div", {}, h("div", { class: "eyebrow" }, "🧭 دورهٔ گام‌به‌گام"),
-            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + fa(cnl.tid) + " · " + A.TM[cnl.tid].fa : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۲۰ دقیقه.")),
+            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + fa(cnl.tid) + " · " + A.TM[cnl.tid].fa : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۵۵ دقیقه و قابلِ تقسیم به چند نشست.")),
           h("button", { class: "btn", onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره"))));
     }
     var due = A.dueList();

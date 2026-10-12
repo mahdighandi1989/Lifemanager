@@ -25,9 +25,10 @@ export function slug(text) {
     .replace(/ /g, '-');
 }
 
-/** Assigns GitHub-identical ids to every heading in `root` (duplicates → -1, -2). */
-export function assignHeadingIds(root) {
-  const seen = {};
+/** Assigns GitHub-identical ids to every heading in `root` (duplicates → -1, -2).
+ *  Pass the same `seen` for consecutive parts of ONE document (the handbook is split
+ *  around the native chart) so duplicate numbering continues like on GitHub. */
+export function assignHeadingIds(root, seen = {}) {
   root.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach((h) => {
     let s = slug(h.textContent);
     if (s in seen) { seen[s] += 1; s = `${s}-${seen[s]}`; } else seen[s] = 0;

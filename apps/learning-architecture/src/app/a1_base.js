@@ -93,8 +93,22 @@ var APP = window.APP = {};
   S.init = function (cb) {
     if (A.HOST) {
       S.mode = "host"; S.setStatus("در حال بارگذاری…");
-      A.HOST.load().then(function (arr) { (arr || []).forEach(function (r) { if (r && r.id) S.recs[r.id] = r; }); S.setStatus("همگام"); cb(); },
-        function (e) { S.setStatus("خطای بارگذاری"); A.toast("بارگذاری داده ناموفق بود: " + ((e && e.message) || e), "bad"); cb(); });
+      // a FAILED load must never continue into the app: seed()/settings would then be written over the
+      // owner's real data on the server. Show the error with a retry instead (2026-10-12 audit).
+      S.loaded = false;
+      // (a remount reloads; a change still queued for the server is newer than the server's copy — keep it)
+      A.HOST.load().then(function (arr) { (arr || []).forEach(function (r) { if (r && r.id && !hostPending[r.id] && !hostDel[r.id]) S.recs[r.id] = r; }); S.loaded = true; S.setStatus("همگام"); cb(); pumpHost(); },
+        function (e) {
+          S.setStatus("خطای بارگذاری");
+          var main = document.getElementById("main") || document.getElementById("app");
+          var msg = (e && e.response && e.response.status === 401) ? "نشستِ ورود تمام شده — دوباره وارد شو." : "بارگذاریِ داده ناموفق بود: " + ((e && e.message) || e);
+          if (main) {
+            main.innerHTML = "";
+            main.appendChild(A.h("section", { class: "card bad" }, A.h("h2", {}, "داده‌ها بارگذاری نشد"),
+              A.h("p", {}, msg + " — تا داده‌ها نیامده‌اند چیزی ذخیره نمی‌شود تا روی اطلاعاتِ تو نوشته نشود."),
+              A.h("button", { class: "btn", onclick: function () { S.init(cb); } }, "تلاشِ دوباره")));
+          } else A.toast(msg, "bad");
+        });
       return;
     }
     if (S.isGAS()) {
@@ -119,13 +133,52 @@ var APP = window.APP = {};
       .withFailureHandler(function (e) { S.setStatus("خطای ذخیره"); A.toast("ذخیره در Sheets ناموفق بود؛ دوباره تلاش می‌شود.", "bad"); batch.forEach(function (r) { if (!pending[r.id]) pending[r.id] = r; }); setTimeout(flushGAS, 4000); })
       .api_saveMany(JSON.stringify(batch));
   }, 700);
-  var hostPending = {};
-  var flushHost = A.debounce(function () {
-    var batch = Object.keys(hostPending).map(function (id) { return hostPending[id]; }); hostPending = {};
-    if (!batch.length) return;
-    S.setStatus("در حال ذخیره…");
-    A.HOST.saveMany(batch).then(function () { S.setStatus("همگام"); }, function () { S.setStatus("خطای ذخیره"); A.toast("ذخیره ناموفق بود؛ دوباره تلاش می‌شود.", "bad"); batch.forEach(function (r) { if (!hostPending[r.id]) hostPending[r.id] = r; }); setTimeout(flushHost, 4000); });
-  }, 700);
+  /* ذخیرهٔ میزبان: دسته‌های کوچک (≤۱۰۰ رکورد، ≤~۳ میلیون نویسه)، یکی‌یکی؛ رکوردِ ردشده (شناسه/حجم) با پیام کنار
+     گذاشته می‌شود و دیگر بی‌پایان تکرار نمی‌شود؛ خطای شبکه/سرور با فاصلهٔ فزاینده (۴ث تا ۲دقیقه) دوباره. */
+  var hostPending = {}, hostDel = {}, hostBusy = false, hostWait = 4000, hostTimer = null;
+  var MAX_CHUNK_CHARS = 3000000;
+  function retryHost() { clearTimeout(hostTimer); hostTimer = setTimeout(function () { hostTimer = null; pumpHost(); }, hostWait); hostWait = Math.min(hostWait * 2, 120000); }
+  function hostFailed(e) {
+    var st = e && e.response && e.response.status;
+    // a 4xx the same request will hit again (401 = session expired ⇒ kept and retried after re-login, never dropped)
+    return st && st >= 400 && st < 500 && [401, 403, 408, 409, 429].indexOf(st) < 0 ? st : 0;
+  }
+  function pumpHost() {
+    if (hostBusy || hostTimer || !S.loaded) return;
+    var dels = Object.keys(hostDel);
+    if (dels.length) {
+      var id = dels[0]; hostBusy = true;
+      A.HOST.del(id).then(function () { delete hostDel[id]; hostBusy = false; hostWait = 4000; pumpHost(); },
+        function (e) { hostBusy = false; if (hostFailed(e)) { delete hostDel[id]; A.toast("حذف ناموفق بود (" + hostFailed(e) + ")", "bad"); pumpHost(); } else { S.setStatus("خطای حذف — دوباره تلاش می‌شود"); retryHost(); } });
+      return;
+    }
+    var ids = Object.keys(hostPending);
+    if (!ids.length) { S.setStatus("همگام"); return; }
+    var batch = [], size = 0;
+    for (var i = 0; i < ids.length && batch.length < 100; i++) {
+      var r = hostPending[ids[i]], n = JSON.stringify(r).length;
+      if (batch.length && size + n > MAX_CHUNK_CHARS) break;
+      batch.push(r); size += n;
+    }
+    batch.forEach(function (r) { delete hostPending[r.id]; });
+    hostBusy = true; S.setStatus("در حال ذخیره…");
+    A.HOST.saveMany(batch).then(function (res) {
+      hostBusy = false; hostWait = 4000;
+      var rej = (res && res.rejected) || [];
+      if (rej.length) A.toast("ذخیره نشد: " + rej.map(function (x) { return (x.id || "?") + " — " + x.reason; }).join("؛ "), "bad");
+      pumpHost();
+    }, function (e) {
+      hostBusy = false;
+      var bad = hostFailed(e);
+      if (bad) { S.setStatus("خطای ذخیره"); A.toast("ذخیره رد شد (" + bad + ")؛ این دسته دوباره فرستاده نمی‌شود.", "bad"); pumpHost(); return; }
+      batch.forEach(function (r) { if (!hostPending[r.id] && S.recs[r.id] === r) hostPending[r.id] = r; });
+      var st = e && e.response && e.response.status;
+      S.setStatus(st === 401 ? "نشستِ ورود تمام شده — دوباره وارد شو؛ تغییرها نگه داشته شده‌اند" : "خطای ذخیره — دوباره تلاش می‌شود"); retryHost();
+    });
+  }
+  var flushHost = A.debounce(pumpHost, 700);
+  S.flushNow = function () { if (S.mode === "host") pumpHost(); };
+  try { window.addEventListener("pagehide", function () { S.flushNow(); }); document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") S.flushNow(); }); } catch (e) { }
   var flushLocal = A.debounce(function () {
     try { localStorage.setItem(LSKEY, JSON.stringify(S.recs)); S.setStatus("ذخیره در همین مرورگر"); }
     catch (e) { S.setStatus("ذخیره ناموفق (فضای مرورگر)"); }
@@ -133,13 +186,13 @@ var APP = window.APP = {};
   S.put = function (r) {
     r.updated = new Date().toISOString(); if (!r.created) r.created = r.updated;
     S.recs[r.id] = r;
-    if (S.mode === "host") { hostPending[r.id] = r; flushHost(); }
+    if (S.mode === "host") { delete hostDel[r.id]; hostPending[r.id] = r; flushHost(); }
     else if (S.mode === "gas") { pending[r.id] = r; flushGAS(); } else flushLocal();
     return r;
   };
   S.del = function (id) {
     delete S.recs[id];
-    if (S.mode === "host") { A.HOST.del(id).catch(function () { A.toast("حذف ناموفق بود", "bad"); }); return; }
+    if (S.mode === "host") { delete hostPending[id]; hostDel[id] = 1; flushHost(); return; }  // a queued save must not resurrect it
     if (S.mode === "gas") { google.script.run.withFailureHandler(function () { A.toast("حذف در Sheets ناموفق بود", "bad"); }).api_delete(id); }
     else flushLocal();
   };

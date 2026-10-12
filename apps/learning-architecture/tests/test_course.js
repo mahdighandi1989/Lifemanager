@@ -9,6 +9,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
+  // شمارشِ نوشتن‌ها (S.put) برای آزمونِ «دیدن ≠ ذخیره» و «یک تغییر = یک نوشتن»
+  await p.evaluate(() => { window.__puts = []; const o = APP.S.put; APP.S.put = function (r) { window.__puts.push(r.type + ':' + r.id); return o.apply(this, arguments); }; });
+  const putsDuring = async (fn) => { await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); return p.evaluate(() => window.__puts.slice()); };
   const bad = async (lab) => { if (await p.locator('main .card.bad').count()) errors.push('render ' + lab); };
 
   // ۱) راه‌یابی: از «دغدغه‌ها» روی یک تکنیک ⇒ «برگرد» همان‌جا
@@ -35,15 +38,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.lesson1 = await p.evaluate(() => APP.state.view + ':' + APP.state.arg + ':' + APP.state.sub);
   info.visual37 = await p.locator('main .crs-phases .crs-ph.on').count();
   // قدمِ ۲: شبیه‌ساز + ترتیب + درست/اشتباه
-  await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(200);
+  info.puts_s1_s2 = await putsDuring(() => p.click('main .crs-nav .btn:has-text("قدمِ بعد")'));
   info.sim37 = await p.locator('main .crs-cup').count();
   await p.locator('main .crs-tog').first().click();
-  const steps = await p.evaluate(() => APP.TM[37].steps.slice(0, 5));
-  for (const s of steps) await p.locator('main .crs-ocard', { hasText: s.slice(0, 40) }).first().click();
-  info.orderDone = await p.locator('main .small.good:has-text("بی‌خطا")').count();
+  info.order37 = await p.locator('main .crs-order').count(); // ۳۷ از بازیِ ترتیب کنار رفته
   for (let i = 0; i < 4; i++) { const btn = p.locator('main .crs-spot .btn:has-text("کارِ درست")').first(); if (await btn.count()) await btn.click(); }
-  // قدمِ ۳: کاربرگ روی موضوع
-  await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(200);
+  // قدمِ ۳: کاربرگ روی موضوع — دیدنِ قدم نباید کاربرگِ پیش‌نویس بسازد؛ یک تغییرِ قدم = یک نوشتن
+  info.puts_s2_s3 = await putsDuring(() => p.click('main .crs-nav .btn:has-text("قدمِ بعد")'));
+  info.exOnView = await p.evaluate(() => APP.S.all('ex', e => e.tid === 37).length);
+  info.puts_rerender = await putsDuring(() => p.evaluate(() => APP.render()));
   info.wsFields = await p.locator('main .wsform input[type=text], main .wsform textarea').count();
   await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(150);
   info.blockedEmpty = await p.evaluate(() => APP.state.sub) === 's3';
@@ -54,6 +57,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   for (const rd of await p.locator('main .wsform input[type=radio]').all()) { if (await rd.isVisible()) await rd.check(); }
   for (const add of await p.locator('main .wsform button:has-text("افزودن")').all()) { if (await add.isVisible()) { await add.click(); } }
   for (const el of await p.locator('main .wsform textarea, main .wsform input[type=text]').all()) { if (await el.isVisible() && await el.isEditable() && !(await el.inputValue())) await el.fill('پاسخِ آزمایشی'); }
+  await p.waitForTimeout(700); info.exAfterInput = await p.evaluate(() => APP.S.all('ex', e => e.tid === 37).length);
   await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(200);
   info.atCheck = await p.evaluate(() => APP.state.sub);
   if (info.atCheck !== 's4') info.missing = await p.locator('.toast').allTextContents();
@@ -61,6 +65,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   for (const seg of await p.locator('main .rubric .seg').all()) await seg.locator('.sg').nth(2).click();
   await p.fill('main textarea', 'چیدنِ محیط تا حافظهٔ کاری برای فهم آزاد بماند');
   await p.click('main .btn:has-text("مقایسه کن و کارت بساز")');
+  info.recallSaved = await p.evaluate(() => ((APP.courseState().recall || {})[37] || {}).txt || '');
+  info.cardQ = await p.evaluate(() => (APP.S.all('card', c => c.tid === 37)[0] || {}).q || '');
   await p.click('main .btn.lg'); await p.waitForTimeout(300);
   info.afterFinish = await p.evaluate(() => APP.state.view + ':' + APP.state.arg + ':' + APP.state.sub);
   info.done = await p.evaluate(() => Object.keys(APP.courseState().done).length);
@@ -68,11 +74,36 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // نقشه
   await p.click('main .btn:has-text("نقشهٔ دوره")'); await p.waitForTimeout(200);
   info.mapDotsOn = await p.locator('main .crs-dot.on').count(); info.mapNow = await p.locator('main .crs-dot.now').count();
-  // گرم‌کردن: فردا موعد است ⇒ تاریخ را جلو ببر
-  await p.evaluate(() => { const c = APP.courseState(); c.done[37] = APP.addDays(APP.today(), -2); APP.S.put(c); APP.go('lesson', 32, 's0'); });
-  info.warmCards = await p.locator('main textarea').count();
+  // گرم‌کردن: فردا موعد است ⇒ تاریخ را جلو ببر. «ادامه» نباید گرم‌کردنِ موعد را دور بزند.
+  await p.evaluate(() => { const c = APP.courseState(); c.done[37] = APP.addDays(APP.today(), -2); c.step[32] = 's3'; APP.S.put(c); APP.go('lesson', 32, 's2'); });
+  info.gateSub = await p.evaluate(() => APP.state.sub); // باید s0 باشد
+  await p.click('main .crs-skipwarm'); await p.waitForTimeout(150);
+  info.afterSkip = await p.evaluate(() => APP.state.sub + ':' + (APP.courseState().warmSkip === APP.today()));
+  await p.evaluate(() => { const c = APP.courseState(); delete c.warmSkip; APP.S.put(c); APP.go('course'); });
+  await p.click('main .crs-now .btn.lg'); await p.waitForTimeout(150);
+  info.continueSub = await p.evaluate(() => APP.state.sub); // باید s0 باشد
+  info.warmCards = await p.locator('main .crs-body textarea').count();
+  await p.click('main .crs-body .btn:has-text("ادامه به")'); await p.waitForTimeout(100);
+  info.blockedUngraded = await p.evaluate(() => APP.state.sub) === 's0';
+  await p.fill('main .crs-body textarea', 'پاسخِ گرم‌کردنِ آزمایشی');
   await p.click('main .btn:has-text("پاسخ را نشان بده")'); await p.click('main .btn:has-text("یادم بود")'); await p.waitForTimeout(100);
   info.warmNext = await p.evaluate(() => (APP.courseState().warm[37] || {}).due);
+  info.warmLog = await p.evaluate(() => { const l = (APP.courseState().warm[37] || {}).log || []; return l.length ? l[l.length - 1].txt + '@' + l[l.length - 1].d : ''; });
+  await p.click('main .crs-body .btn:has-text("ادامه به")'); await p.waitForTimeout(150);
+  info.afterWarm = await p.evaluate(() => APP.state.sub); // همان قدمی که می‌خواست (پس از «رد کن» روی s2 مانده بود)
+  // تکنیکی که بیرون از دوره تمام شده ⇒ در دوره پذیرفته می‌شود
+  await p.evaluate(() => { const e = APP.newEx(32, ''); e.status = 'done'; APP.S.put(e); APP.go('course'); });
+  info.adopted = await p.evaluate(() => !!APP.courseState().elsewhere[32] && !!APP.courseState().done[32]);
+  info.nextAfterAdopt = await p.evaluate(() => (APP.courseNext() || {}).tid);
+  await p.evaluate(() => APP.go('lesson', 32, 's1')); info.elsewhereNote = await p.locator('main .crs-elsewhere').count();
+  // بازیِ ترتیب: ۱۵ با جفتِ جابه‌جاپذیرِ (۲،۳) — ترتیبِ ۰،۱،۳،۲،۴ هم پذیرفته است
+  await p.evaluate(() => APP.go('lesson', 15, 's2'));
+  const st15 = await p.evaluate(() => APP.TM[15].steps.slice(0, 5));
+  for (const i of [0, 1, 3, 2, 4]) await p.locator('main .crs-ocard', { hasText: st15[i].slice(0, 40) }).first().click();
+  info.orderSwapOk = await p.locator('main .small.good:has-text("بی‌خطا")').count();
+  info.orderSkipped = 0;
+  for (const id of [5, 13, 36, 37, 10, 12, 21, 22, 25, 45]) { await p.evaluate(x => APP.go('lesson', x, 's2'), id); info.orderSkipped += await p.locator('main .crs-order').count(); }
+  info.spotPool = await p.evaluate(() => [APP._courseSpotPool(44).m.some(x => /^عکس/.test(x)), APP._courseSpotPool(14).s.includes(APP.TM[14].steps[2]), APP._courseSpotPool(5).m.includes(APP.TM[5].mistakes[3])].some(Boolean));
   // همهٔ درس‌ها و قدم‌های ۱ و ۲ بی‌خطا
   const ids = await p.evaluate(() => APP.COURSE_LESSONS.map(l => l.tid));
   for (const id of ids) for (const s of ['s1', 's2', 's4']) { await p.evaluate(x => APP.go('lesson', x[0], x[1]), [id, s]); await bad('lesson ' + id + ' ' + s); }
@@ -98,9 +129,31 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.evaluate(() => APP.go('lesson', 42, 's2')); await p.screenshot({ path: path.join(__dirname, '..', 'dist', 'shot_course_sim.png'), fullPage: true });
   console.log(JSON.stringify(info, null, 1));
   const must = info.afterChip === 'tech' && info.backView === 'concerns' && info.trailAfterBack === 0 && info.trailAfterSidebar === 0 && info.onboarding === 1 &&
-    /^lesson:37:s1$/.test(info.lesson1) && info.sim37 === 1 && info.orderDone === 1 && info.blockedEmpty && info.atCheck === 's4' && info.done === 1 && info.cards === 1 &&
+    /^lesson:37:s1$/.test(info.lesson1) && info.sim37 === 1 && info.order37 === 0 && info.blockedEmpty && info.atCheck === 's4' && info.done === 1 && info.cards === 1 &&
     info.mapDotsOn === 1 && info.mapNow === 1 && info.warmCards >= 1 && info.warmNext && info.whyRoot === 1 && info.calib === 1 && info.peek === 1 && info.viewAfterPeek === 'lesson';
   if (!must) errors.push('flow check failed');
+  // ۱ و ۲: دیدن ≠ ذخیره؛ یک تغییرِ قدم = یک نوشتن
+  const onlyCourse = a => a.length === 1 && a[0] === 'course:course';
+  if (!onlyCourse(info.puts_s1_s2)) errors.push('step s1->s2 writes: ' + JSON.stringify(info.puts_s1_s2));
+  if (!onlyCourse(info.puts_s2_s3)) errors.push('step s2->s3 writes: ' + JSON.stringify(info.puts_s2_s3));
+  if (info.puts_rerender.length) errors.push('re-render wrote: ' + JSON.stringify(info.puts_rerender));
+  if (info.exOnView !== 0) errors.push('viewing step 3 created a draft ex');
+  if (info.exAfterInput !== 1) errors.push('typing did not create exactly one ex: ' + info.exAfterInput);
+  // ۵: گرم‌کردن پیش از ادامه + ردکردنِ صریح
+  if (info.gateSub !== 's0' || info.continueSub !== 's0') errors.push('continue skipped due warm-up: ' + info.gateSub + '/' + info.continueSub);
+  if (info.afterSkip !== 's2:true') errors.push('explicit skip failed: ' + info.afterSkip);
+  if (!info.blockedUngraded) errors.push('ungraded warm-up let through');
+  if (info.afterWarm !== 's2') errors.push('after warm-up did not return to wanted step: ' + info.afterWarm);
+  // ۶: پاسخ‌های بازیابی ذخیره می‌شوند
+  if (!/^پاسخِ گرم‌کردنِ آزمایشی@\d{4}-/.test(info.warmLog)) errors.push('warm answer not saved: ' + info.warmLog);
+  if (!/حافظهٔ کاری/.test(info.recallSaved)) errors.push('s4 recall not saved');
+  if (/چیست/.test(info.cardQ)) errors.push('review card is definitional: ' + info.cardQ);
+  // ۷: انجام‌شده بیرون از دوره
+  if (!info.adopted || info.nextAfterAdopt === 32 || info.elsewhereNote !== 1) errors.push('outside completion not adopted');
+  // ۱۳ و ۱۴: بازیِ ترتیب و تشخیص
+  if (info.orderSwapOk !== 1) errors.push('swappable pair not accepted');
+  if (info.orderSkipped !== 0) errors.push('order game shown for excluded technique');
+  if (info.spotPool) errors.push('ambiguous spot item still in pool');
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();
 })();

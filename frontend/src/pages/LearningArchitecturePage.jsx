@@ -53,7 +53,8 @@ function loadBundle() {
     s.src = `/assets/lla/${LLA_BUNDLE.js}`;
     s.async = true;
     s.onload = () => resolve();
-    s.onerror = () => { bundlePromise = null; reject(new Error('بستهٔ برنامه بارگذاری نشد')); };
+    // usual cause: a new version was deployed while this tab was open (bundle names are content-hashed)
+    s.onerror = () => { bundlePromise = null; reject(new Error('stale-bundle')); };
     document.body.appendChild(s);
   });
   return bundlePromise;
@@ -68,7 +69,8 @@ export default function LearningArchitecturePage() {
   const query = new URLSearchParams(location.search);
   const legacy = query.get('legacy') === '1';
   const doc = ['HANDBOOK', 'PROGRESS', 'WORKLOG'].includes(query.get('doc')) ? query.get('doc') : '';
-  const hash = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+  // a malformed %-escape in a pasted/old link must not crash the whole page
+  const hash = (() => { const raw = (location.hash || '').replace(/^#/, ''); try { return decodeURIComponent(raw); } catch { return raw; } })();
   const appQuery = useRef('');
   const navRef = useRef(navigate);
   navRef.current = navigate;
@@ -87,14 +89,17 @@ export default function LearningArchitecturePage() {
         if (!r.data.ok) throw new Error(r.data.error || 'هوش مصنوعی پاسخ نداد');
         return r.data.text;
       }),
-      navigate: ({ tab, a, s }) => {
+      navigate: ({ tab, a, s, replace }) => {
         const q = new URLSearchParams();
         if (tab) q.set('tab', tab);
         if (a) q.set('a', a);
         if (s) q.set('s', s);
         const next = `${BASE}?${q.toString()}`;
-        if (`${window.location.pathname}${window.location.search}` !== next) navRef.current(next);
+        // sub-tab changes inside one page REPLACE the entry, so one history step = one page (the app's
+        // «↩ برگرد» then uses historyBack and agrees with the browser's Back button)
+        if (`${window.location.pathname}${window.location.search}` !== next) navRef.current(next, { replace: !!replace });
       },
+      historyBack: (n) => window.history.go(-Math.max(1, n | 0)),
       initial: () => readQuery(window.location.search),
       // «آینهٔ درایو»: each case/topic/course → its own folder + spreadsheet under LifeManagerData
       mirror: (payload) => api.post(`/app-records/${APP}/mirror`, payload).then((r) => r.data),
@@ -104,6 +109,8 @@ export default function LearningArchitecturePage() {
     loadBundle()
       .then(() => {
         if (!alive || !mount.current) return;
+        // the bundle bound A.HOST on its first load; a remount must hand it THIS mount's host (fresh navigate ref)
+        window.APP.HOST = window.LLA_HOST;
         window.APP.mountEl = mount.current;
         window.APP.boot();
         setReady(true);
@@ -123,8 +130,19 @@ export default function LearningArchitecturePage() {
     window.APP.goFromURL(readQuery(location.search));
   }, [location.search, ready, legacy, doc]);
 
-  const openDoc = (key, anchor) => navigate(`${BASE}?doc=${key}${anchor ? `#${encodeURIComponent(anchor)}` : ''}`);
+  // «بازگشت به برنامه» goes BACK to the history entry the handbook was opened from (React Router keeps
+  // the entry index in history.state.idx), so the browser's Back doesn't lead into the handbook again.
+  // A deep link straight into ?doc= has no such entry: then the app is opened forward, as before.
+  const appIdx = useRef(null);
+  const histIdx = () => (window.history.state && typeof window.history.state.idx === 'number' ? window.history.state.idx : null);
+  const openDoc = (key, anchor) => {
+    if (!doc) appIdx.current = histIdx();
+    navigate(`${BASE}?doc=${key}${anchor ? `#${encodeURIComponent(anchor)}` : ''}`);
+  };
   const closeDoc = () => {
+    const from = appIdx.current; const cur = histIdx();
+    appIdx.current = null;
+    if (from != null && cur != null && cur > from) { navigate(from - cur); return; }
     let back = appQuery.current || '';
     const st = window.APP && window.APP.state;
     if (!back && st && st.view) {
@@ -164,7 +182,12 @@ export default function LearningArchitecturePage() {
         )}
       </div>
       {doc && <HandbookView doc={doc} hash={hash} onDoc={openDoc} onClose={closeDoc} />}
-      {err && <div className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700 mb-3">{err}</div>}
+      {err && (
+        <div className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700 mb-3">
+          {err === 'stale-bundle' ? 'بستهٔ برنامه بارگذاری نشد — احتمالاً نسخهٔ تازه‌ای منتشر شده است.' : err}{' '}
+          <button type="button" className="underline font-medium" onClick={() => window.location.reload()}>تازه‌کردنِ صفحه</button>
+        </div>
+      )}
       {!ready && !err && !doc && <div className="p-10 text-center text-sm text-gray-500">در حالِ بارگذاری…</div>}
       <div className="lla rounded-xl overflow-hidden border border-gray-200" style={doc ? { display: 'none' } : undefined}>
         <div id="app" dir="rtl" ref={mount} />

@@ -101,6 +101,9 @@ def parse_progress(text):
     return rows, problems
 
 
+NO_CHART = "بی‌اثر بر نمودار"
+
+
 def parse_worklog(text):
     """Return (entries, problems). entries: {n: {date, title}}."""
     problems, entries, order = [], {}, []
@@ -117,6 +120,7 @@ def parse_worklog(text):
         order.append(n)
         end = heads[idx + 1][0] if idx + 1 < len(heads) else len(lines)
         body = [l for l in lines[i + 1:end] if l.strip()]
+        entries[n]["body"] = "\n".join(body)
         if not body or not SIGNATURE.match(body[-1]):
             problems.append("WORKLOG.md:%d entry (%d) does not end with a signature line «> **امضا:** `who` · YYYY-MM-DD · how it was verified»" % (i + 1, n))
     if order != list(range(1, len(order) + 1)):
@@ -174,7 +178,18 @@ def render_chart(rows):
     xs = ", ".join('"#%d"' % r["n"] for r in rows)
     lo = min(0, min(r["cumulative"] for r in rows), min(r["score"] for r in rows))
     hi = max(1, max(r["cumulative"] for r in rows))
-    cases_hi = max([r["cases"] or 0 for r in rows] + [1])
+    # a blank cell means "not measured at this event", NOT zero: carry the last known value forward so the
+    # line/bars don't plunge to 0 (2026-10-12 audit); the axis covers BOTH series so no bar is clipped.
+    def carried(key):
+        out, last = [], 0
+        for r in rows:
+            v = r.get(key)
+            if v is not None and v != "":
+                last = v
+            out.append(last)
+        return out
+    rules_c, cases_c = carried("rules"), carried("cases")
+    cases_hi = max([int(v or 0) for v in rules_c + cases_c] + [1])
     parts = [CHART_BEGIN, "",
              "```mermaid", "xychart-beta",
              '    title "Trajectory - bar: this event (up +1, down -1, fix +1), line: running total"',
@@ -184,11 +199,11 @@ def render_chart(rows):
              "    line [%s]" % ", ".join(str(r["cumulative"]) for r in rows),
              "```", "",
              "```mermaid", "xychart-beta",
-             '    title "Library size - line: cases, bar: rules (state after each event)"',
+             '    title "Library size - line: cases, bar: rules (state after each event; blank = last known)"',
              "    x-axis [%s]" % xs,
              '    y-axis "count" 0 --> %d' % int(cases_hi * 1.1 + 1),
-             "    bar [%s]" % ", ".join(_ascii(r["rules"]) for r in rows),
-             "    line [%s]" % ", ".join(_ascii(r["cases"]) for r in rows),
+             "    bar [%s]" % ", ".join(_ascii(v) for v in rules_c),
+             "    line [%s]" % ", ".join(_ascii(v) for v in cases_c),
              "```", "",
              "> نقطه‌ها = سطرهای [دفتر پیشرفت](PROGRESS.md) (#%d تا #%d). جمعِ جاری الان **%d** است. "
              "این بلوک را دستی ویرایش نکن؛ `python apps/learning-architecture/build.py` آن را از روی دفتر می‌سازد."
@@ -267,7 +282,10 @@ def validate(handbook, progress, worklog_text):
     elif rows and m.group(1) < rows[-1]["date"]:
         problems.append("HANDBOOK.md «به‌روزرسانی» (%s) is older than the newest PROGRESS row (%s)" % (m.group(1), rows[-1]["date"]))
     if entries and rows:
+        # the newest entry must be on the chart — on ANY date (a same-day entry used to slip through) —
+        # unless it says so explicitly with «بی‌اثر بر نمودار» (e.g. a docs-only fix)
         newest = max(entries)
-        if not any(newest in r["refs"] for r in rows) and entries[newest]["date"] > rows[-1]["date"]:
-            problems.append("WORKLOG (%d) is newer than every PROGRESS row — add a row if it moved the page forward/back" % newest)
+        if not any(newest in r["refs"] for r in rows) and NO_CHART not in entries[newest].get("body", ""):
+            problems.append("WORKLOG (%d) is not cited by any PROGRESS row — add a row (the page moved forward/back or a "
+                            "bug was fixed), or write «%s» in the entry if it truly did not" % (newest, NO_CHART))
     return rows, entries, problems

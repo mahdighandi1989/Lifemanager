@@ -177,3 +177,9 @@ how to revive it.
 - **کجا:** همان مینی‌اپِ نصب‌شده؛ با `/apps/learning-architecture?legacy=1` باز می‌شود (`MiniAppPage slug="learning-architecture"`). داده‌اش دست‌نخورده.
 - **برگرداندن:** خطِ `/apps/learning-architecture` را از `frontend/src/lib/routesMeta.js` بردار ⇒ `/apps/:slug` دوباره نسخهٔ قدیمی را نشان می‌دهد.
 - **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.
+
+## `catalog_tester._legacy_sync_provider_models` (قرنطینه 2026-10-12)
+- **چه بود:** سینکِ قدیمیِ «دریافت مدل‌ها از ارائه‌دهنده» — هر شناسهٔ زنده را خاموش و فقط با قابلیتِ `text` اضافه می‌کرد و هیچ مدلِ مرده‌ای را خاموش نمی‌کرد.
+- **جایگزین:** `app/services/ai/model_discovery.refresh_provider` (همان دکمه + کارِ روزانهٔ `ai_model_refresh`).
+- **برگرداندن:** در `catalog_tester.sync_provider_models` به‌جای `refresh_provider` همان `_legacy_sync_provider_models` را صدا بزن.
+- **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.

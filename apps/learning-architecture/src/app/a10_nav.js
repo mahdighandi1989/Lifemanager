@@ -61,24 +61,40 @@
     if (!A._noTrail && moving && mainEl()) {
       var ctx = clickContext(), title = pageTitle();
       A.trail.push({ view: cur.view, arg: cur.arg, sub: cur.sub, label: title, ctx: ctx && ctx !== title ? ctx : "", scroll: scrollPos() });
-      if (A.trail.length > 25) A.trail.shift();
+      if (A.trail.length > 25) { A.trail.shift(); A._trailPushed = -1; }  // history no longer matches 1:1 ⇒ fall back to forward navigation
+      else if (A._trailPushed === A.trail.length - 1) A._trailPushed = A.trail.length;
+      else A._trailPushed = -1;
     }
     A._noTrail = false;
     rawGo(view, arg, sub);
   };
   /* منوی کناری: شروعِ تازه */
-  A.goRoot = function (view, arg, sub) { A.trail = []; A._noTrail = true; A.go(view, arg, sub); };
-  /* برگشت به یک قدمِ مشخص از ردِ پا (پیش‌فرض: آخرین) */
-  A.back = function (i) {
-    if (!A.trail.length) return;
-    if (i == null) i = A.trail.length - 1;
-    var e = A.trail[i]; A.trail = A.trail.slice(0, i);
-    A._noTrail = true; A.go(e.view, e.arg, e.sub);
-    var sp = e.scroll || {};
+  A.goRoot = function (view, arg, sub) { A.trail = []; A._trailPushed = 0; A._noTrail = true; A.go(view, arg, sub); };
+  A._trailPushed = 0;
+  /* برگشت به یک قدمِ مشخص از ردِ پا (پیش‌فرض: آخرین).
+     در میزبان، هر قدمِ ردِ پا دقیقاً یک خانهٔ تاریخچهٔ مرورگر است (زبانه‌های درونِ یک صفحه جایگزین می‌کنند)، پس برگشت با
+     history.go(-n) انجام می‌شود تا دکمهٔ Back ِ مرورگر و «↩ برگرد» یکی باشند و تاریخچه با رفت‌وبرگشت پر نشود. */
+  var pendingScroll = null;
+  function restoreScroll(sp) {
+    sp = sp || {};
     setTimeout(function () {
       var m = mainEl(); if (m && sp.main) m.scrollTop = sp.main;
       if (sp.win) window.scrollTo(0, sp.win);
     }, 30);
+  }
+  A.back = function (i) {
+    if (!A.trail.length) return;
+    if (i == null) i = A.trail.length - 1;
+    var e = A.trail[i], steps = A.trail.length - i;
+    if (A.HOST && A.HOST.navigate && A.HOST.historyBack && A._trailPushed === A.trail.length) {
+      pendingScroll = e.scroll || {};
+      A.HOST.historyBack(steps);  // the host's URL effect calls goFromURL → trims the trail and renders
+      return;
+    }
+    A.trail = A.trail.slice(0, i);
+    A._trailPushed = A.trail.length;
+    A._noTrail = true; A._replaceNav = !!A.HOST; A.go(e.view, e.arg, e.sub);
+    restoreScroll(e.scroll);
   };
   /* بازگشت با دکمهٔ Back ِ مرورگر (میزبان) */
   var rawFromURL = A.goFromURL;
@@ -91,8 +107,11 @@
         if (e.view === q.tab && String(e.arg == null ? "" : e.arg) === String(q.a || "")) { A.trail = A.trail.slice(0, i); break; }
         if (i === 0) A.trail = [];
       }
+      A._trailPushed = A.trail.length;
     }
-    return rawFromURL(q);
+    var out = rawFromURL(q);
+    if (pendingScroll) { restoreScroll(pendingScroll); pendingScroll = null; }
+    return out;
   };
 
   function crumbs() {

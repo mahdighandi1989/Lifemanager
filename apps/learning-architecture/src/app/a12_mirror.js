@@ -63,7 +63,7 @@
   BUILD.topic = function (t) {
     var id = t.id, tabs = [];
     tabs.push({ name: "خلاصه", rows: [["فیلد", "مقدار"], ["عنوان", t.title || ""], ["حوزه", t.dom || ""], ["منبع", t.src || ""], ["نوع", t.kind || ""],
-      ["موضوعِ دوره", t.course ? "بله" : ""], ["ساخته‌شده", dt(t.created)], ["آخرین تغییر", dt(t.updated)], ["در برنامه", link("topic", id)]] });
+      ["موضوعِ دوره", (S.get("course") || {}).topic === id ? "بله" : ""], ["ساخته‌شده", dt(t.created)], ["آخرین تغییر", dt(t.updated)], ["در برنامه", link("topic", id)]] });
     var exs = S.all("ex", function (e) { return e.topic === id && !e.sample; });
     tabs.push({ name: "تمرین‌ها", rows: [["تکنیک", "فاز", "وضعیت", "نمرهٔ روبریک", "آخرین تغییر", "در برنامه"]].concat(exs.map(function (e) {
       var T = A.TM[e.tid] || {}; var p = A.rubricPct(e);
@@ -95,29 +95,67 @@
   A.MIRROR_BUILD = BUILD;
 
   /* ---------- صف: چه چیزی دوباره ساخته شود ---------- */
-  var dirty = {}, gone = {}, timer = null;
+  var dirty = {}, gone = {}, timer = null, busy = false, wait = 5000;
+  var courseTopic = null;  // the course's topic last seen — when it changes, the OLD topic's sheet is rebuilt too
   function owners(r) {
     if (!r) return [];
-    if (BUILD[r.type]) return [r.id];
     var out = [];
+    if (BUILD[r.type]) out.push(r.id);
+    if (r.type === "course") {
+      if (r.topic) out.push(r.topic);
+      if (courseTopic && courseTopic !== r.topic) out.push(courseTopic);
+      courseTopic = r.topic || null;
+      return out;
+    }
     if (r.topic && (r.type === "ex" || r.type === "pr" || r.type === "sched" || r.type === "card")) out.push(r.topic);
     if (r.type === "topic" || (r.type === "ex" && r.course)) out.push("course");
     return out;
   }
-  function schedule() { clearTimeout(timer); timer = setTimeout(flush, 2500); }
+  function schedule(ms) { if (busy) return; clearTimeout(timer); timer = setTimeout(flush, ms || 2500); }
+  /* every dirty id is sent — in chunks of ≤40 items / ~2.5 MB, one request at a time; a failed request puts its ids
+     back and retries with a growing pause (5 s → 5 min); nothing is ever dropped (2026-10-12 audit). */
   function flush() {
-    var items = [];
-    Object.keys(dirty).forEach(function (id) { var r = S.get(id); if (r && BUILD[r.type] && !r.sample) { try { var d = BUILD[r.type](r); d.rec_id = id; items.push(d); } catch (e) { console.error(e); } } });
-    var del = Object.keys(gone);
-    dirty = {}; gone = {};
-    if (!items.length && !del.length) return;
-    A.HOST.mirror({ items: items.slice(0, 200), deleted: del.slice(0, 200) }).then(function () { A._mirrorCache = null; }, function (e) { console.warn("mirror", e); });
+    timer = null;
+    if (busy) return;
+    var ids = Object.keys(dirty), items = [], size = 0, sent = [];
+    for (var i = 0; i < ids.length && items.length < 40; i++) {
+      var id = ids[i], r = S.get(id); sent.push(id);
+      if (!(r && BUILD[r.type] && !r.sample)) continue;
+      try { var d = BUILD[r.type](r); d.rec_id = id; var n = JSON.stringify(d).length; if (items.length && size + n > 2500000) { sent.pop(); break; } items.push(d); size += n; } catch (e) { console.error(e); }
+    }
+    var del = Object.keys(gone).slice(0, 200);
+    sent.forEach(function (id) { delete dirty[id]; }); del.forEach(function (id) { delete gone[id]; });
+    if (!items.length && !del.length) { if (Object.keys(dirty).length) schedule(50); return; }
+    busy = true;
+    A.HOST.mirror({ items: items, deleted: del }).then(function () {
+      busy = false; wait = 5000; A._mirrorCache = null;
+      if (Object.keys(dirty).length || Object.keys(gone).length) schedule(300);
+    }, function (e) {
+      busy = false;
+      var st = e && e.response && e.response.status;
+      if (st === 422 || st === 413) { console.warn("mirror rejected", st, e); return; }  // the same request would fail again
+      sent.forEach(function (id) { dirty[id] = 1; }); del.forEach(function (id) { if (!S.get(id)) gone[id] = 1; });
+      console.warn("mirror", e); schedule(wait); wait = Math.min(wait * 2, 300000);
+    });
   }
   var rawPut = S.put, rawDel = S.del;
-  S.put = function (r) { var out = rawPut.apply(this, arguments); try { owners(r).forEach(function (id) { dirty[id] = 1; }); schedule(); } catch (e) { } return out; };
-  S.del = function (id) { var r = S.get(id); var out = rawDel.apply(this, arguments); try { if (r && BUILD[r.type]) { gone[id] = 1; delete dirty[id]; } else owners(r).forEach(function (x) { dirty[x] = 1; }); schedule(); } catch (e) { } return out; };
+  S.put = function (r) { var out = rawPut.apply(this, arguments); try { owners(r).forEach(function (id) { dirty[id] = 1; delete gone[id]; }); schedule(); } catch (e) { } return out; };
+  S.del = function (id) { var r = S.get(id); var out = rawDel.apply(this, arguments); try { if (r && BUILD[r.type]) { gone[id] = 1; delete dirty[id]; } owners(r).forEach(function (x) { if (x !== id) dirty[x] = 1; }); schedule(); } catch (e) { } return out; };
+  try { window.addEventListener("pagehide", function () { if (Object.keys(dirty).length || Object.keys(gone).length) flush(); }); } catch (e) { }
 
   /* ---------- پرکردنِ اولیه: هر موردی که هنوز آینه ندارد ---------- */
+  /* resolves once every queued change has been handed to the server (or after ~60 s) */
+  A.mirrorDrain = function () {
+    return new Promise(function (res) {
+      var n = 0;
+      (function tick() {
+        if (!busy && !Object.keys(dirty).length && !Object.keys(gone).length) return res(true);
+        if (!busy && !timer) flush();
+        if (++n > 240) return res(false);
+        setTimeout(tick, 250);
+      })();
+    });
+  };
   A.mirrorBackfill = function () {
     return A.mirrorInfo(true).then(function (info) {
       if (!info) return 0;
@@ -134,7 +172,8 @@
     A._mirrorCache = A.HOST.mirrorList().then(function (d) { var m = {}; (d.items || []).forEach(function (i) { m[i.rec_id] = i; }); d.map = m; return d; }, function () { A._mirrorCache = null; return null; });
     return A._mirrorCache;
   };
-  setTimeout(function () { try { A.mirrorBackfill(); } catch (e) { } }, 6000);
+  // backfill only once the records have really loaded (S.loaded) — a fixed timer could run before a slow load and see nothing
+  (function waitLoaded(n) { if (S.loaded) { courseTopic = (S.get("course") || {}).topic || null; setTimeout(function () { try { A.mirrorBackfill(); } catch (e) { } }, 2000); } else if (n < 120) setTimeout(function () { waitLoaded(n + 1); }, 1000); })(0);
 
   /* ---------- نشان‌دادنِ پیوند در خودِ صفحه ---------- */
   var REC_OF = { e_case: function () { return A.state.arg; }, topic: function () { return A.state.arg; }, course: function () { return "course"; }, lesson: function () { return "course"; } };
@@ -155,7 +194,7 @@
     rawRender();
     var f = REC_OF[A.state.view]; if (!f) return;
     var rid = f(); if (!rid) return;
-    var bar = document.querySelector("#main .crumbs .where"); if (!bar) return;
+    var bar = document.querySelector("#main nav.crumbs .where"); if (!bar) return;
     var slot = h("span", { class: "drvslot" }); bar.appendChild(slot);
     A.mirrorInfo().then(function (info) { slot.innerHTML = ""; slot.appendChild(chip(info, rid)); });
   };
@@ -177,8 +216,8 @@
         info.root_url ? h("a", { class: "btn ghost sm", href: info.root_url, target: "_blank", rel: "noopener" }, "باز کردنِ LifeManagerData") : null,
         h("button", { class: "btn sm", onclick: function (e) {
           var b = e.target; b.disabled = true; b.textContent = "در حالِ نوشتن در درایو…";
-          A.mirrorBackfill().then(function () { flush(); return new Promise(function (r) { setTimeout(r, 800); }); }).then(function () { return A.HOST.mirrorSync(); })
-            .then(function (r) { A.toast((r && r.skipped === "no_drive") ? "درایو وصل نیست؛ چیزی گم نمی‌شود و بعداً نوشته می‌شود." : "نوشته شد: " + fa((r && r.written) || 0) + " مورد"); A._mirrorCache = null; A.render(); },
+          A.mirrorBackfill().then(function () { clearTimeout(timer); timer = null; return A.mirrorDrain(); }).then(function () { return A.HOST.mirrorSync(); })
+            .then(function (r) { A.toast((r && r.skipped === "no_drive") ? "درایو وصل نیست؛ چیزی گم نمی‌شود و بعداً نوشته می‌شود." : (r && r.busy) ? "همگام‌سازی همین حالا در جریان است؛ چند دقیقهٔ دیگر نگاه کن." : (r && r.stopped === "quota") ? "سقفِ دقیقه‌ایِ گوگل پر شد؛ بقیه در نوبتِ بعدی (حداکثر ۱۵ دقیقه) نوشته می‌شود." : "نوشته شد: " + fa((r && r.written) || 0) + " مورد" + ((r && r.pending > r.written) ? " — بقیه در نوبت" : "")); A._mirrorCache = null; A.render(); },
               function (er) { A.toast((er && er.message) || "خطا", "bad"); b.disabled = false; });
         } }, "همگام‌سازیِ الان")));
       var errs = items.filter(function (i) { return i.error; }).slice(0, 5);
