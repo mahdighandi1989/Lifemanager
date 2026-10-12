@@ -7,7 +7,7 @@
 (function (A) {
   var h = A.h;
   var rawGo = A.go, rawRender = A.render;
-  var PARENT = { tech: "lib", topic: "topics", proto: "protos", e_case: "e_cases", lesson: "course" };
+  var PARENT = A.NAV_PARENT = { tech: "lib", topic: "topics", proto: "protos", e_case: "e_cases", lesson: "course", kcase: "kcases", knot: "kcases" };
   A.trail = [];
   var lastClick = null;
   document.addEventListener("click", function (e) { lastClick = e.target; }, true);

@@ -388,6 +388,14 @@ async def _job_ai_model_refresh(db: AsyncSession) -> dict[str, Any]:
     return {k: {f: v.get(f) for f in ("ok", "added", "enabled", "retired", "message")} for k, v in res.items()}
 
 
+async def _job_app_reminders(db: AsyncSession) -> dict[str, Any]:
+    """Due «یادآورهای برنامه» ⇒ Telegram / e-mail, once each, honest per-channel result
+    (owner 2026-10-12, «گره‌گشا»)."""
+    from app.services.app_reminder_service import deliver_due
+
+    return await deliver_due(db)
+
+
 JobFn = Callable[[AsyncSession], Awaitable[dict[str, Any]]]
 
 # (key, title_fa, interval_minutes_fn, body). Interval is resolved at tick
@@ -443,6 +451,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("ai_model_refresh", "به‌روزرسانیِ خودکارِ فهرستِ مدل‌های هوش مصنوعی",
      lambda: _env_minutes("AI_MODEL_REFRESH_INTERVAL_MINUTES", 24 * 60.0),
      _job_ai_model_refresh),
+    ("app_reminders", "یادآورهای تلگرام/ایمیلِ برنامه‌ها (گره‌گشا)",
+     lambda: _env_minutes("APP_REMINDERS_INTERVAL_MINUTES", 15.0),
+     _job_app_reminders),
 ]
 
 

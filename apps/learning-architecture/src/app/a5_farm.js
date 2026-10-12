@@ -261,8 +261,8 @@
   function srcLink(sr) {
     var r = S.get(sr.id);
     if (sr.t === "eco") return h("button", { class: "linkish small", onclick: function () { A.go("e_concepts", sr.id); } }, sr.label || "مفهوم جزوه معرفت‌شناسی");
-    var label = sr.label || (r ? (r.type === "topic" ? "موضوع: " + r.title : r.type === "ex" ? "تمرین تکنیک " + fa(r.tid) : r.type === "pr" ? (A.PM[r.pid] ? A.PM[r.pid].fa : "") : r.type === "case" ? "پرونده معرفتی: " + r.title : r.type) : "منبع حذف‌شده");
-    return h("button", { class: "linkish small", onclick: function () { if (!r) return; if (r.type === "case") A.go("e_case", r.id); else if (r.type === "topic") A.go("topic", r.id); else if (r.type === "ex") A.go("tech", r.tid, "ws:" + r.id); else if (r.type === "pr") A.go("proto", r.pid, r.id); } }, label);
+    var label = sr.label || (r ? (r.type === "topic" ? "موضوع: " + r.title : r.type === "ex" ? "تمرین تکنیک " + fa(r.tid) : r.type === "pr" ? (A.PM[r.pid] ? A.PM[r.pid].fa : "") : r.type === "case" ? "پرونده معرفتی: " + r.title : r.type === "knot" ? "گرهِ ذهنی: " + (r.name || "بی‌نام") : r.type) : "منبع حذف‌شده");
+    return h("button", { class: "linkish small", onclick: function () { if (!r) return; if (r.type === "case") A.go("e_case", r.id); else if (r.type === "topic") A.go("topic", r.id); else if (r.type === "ex") A.go("tech", r.tid, "ws:" + r.id); else if (r.type === "pr") A.go("proto", r.pid, r.id); else if (r.type === "knot" && A.V.knot) A.go("knot", r.id); } }, label);
   }
   function nodePanel(n) {
     var t = S.get(n.tree), path = A.nodePath(n);

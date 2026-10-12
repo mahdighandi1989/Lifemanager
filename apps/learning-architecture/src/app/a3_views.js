@@ -6,6 +6,8 @@
     ["course", "🧭 دورهٔ گام‌به‌گام", "۴۵ درس به ترتیب (هر درس ۱۵ تا ۵۵ دقیقه، قابلِ تقسیم)، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
+    { g: "گره‌گشا" },
+    ["kcases", "🪢 گره‌گشا: جایی گیر کردم", "مسئله‌ای که حل نشد، کاری که نمی‌فهمی چرا کردی، یا نتیجه‌ای اجتماعی که نمی‌فهمی — تا ریشه، با شاهد"],
     { g: "مسیر یادگیری" },
     ["map", "نقشه و گراف", "مراحل یادگیری (" + fa(C.PHASES.length) + " فاز)، ارتباط تکنیک‌ها، برنامه " + fa(C.CURRICULUM.length) + " هفته‌ای"],
     ["lib", "۴۵ تکنیک", "هر روش یادگیری: چرا کار می‌کند، چطور، و تمرینش"],
@@ -63,13 +65,13 @@
     var bn = document.getElementById("bname"), bs = document.getElementById("bsub");
     if (bn) bn.textContent = sys === "epi" ? "کارخانه معرفت‌شناسی" : "معماری یادگیری عمیق";
     if (bs) bs.textContent = sys === "epi" ? fa(((window.EPI || {}).HALLS || []).length) + " سالن · " + fa((A.ESTL || []).length) + " ایستگاه · جزوه مصباح" : "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه";
-    document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || ((A.state.view === "topic" || A.state.view === "journey") && b.dataset.v === "topics") || (A.state.view === "lesson" && b.dataset.v === "course") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases")); });
+    document.querySelectorAll(".nav").forEach(function (b) { b.classList.toggle("on", b.dataset.v === A.state.view || (A.state.view === "tech" && b.dataset.v === "lib") || ((A.state.view === "topic" || A.state.view === "journey") && b.dataset.v === "topics") || (A.state.view === "lesson" && b.dataset.v === "course") || (A.state.view === "proto" && b.dataset.v === "protos") || (A.state.view === "e_case" && b.dataset.v === "e_cases") || ((A.state.view === "kcase" || A.state.view === "knot") && b.dataset.v === "kcases")); });
     var main = document.getElementById("main"); if (!main) return; main.innerHTML = "";
     // in the host, nothing renders before the records arrive: a view could otherwise save defaults (e.g. settings)
     // over the owner's real data — a deep link or the host's URL effect can call render that early (2026-10-12 audit)
     if (A.HOST && !A.S.loaded) { main.appendChild(h("div", { class: "card" }, "در حالِ بارگذاریِ داده‌ها…")); return; }
     /* برای «نظارت و سرکشی» میزبان: هر نما یک بخش نام‌دار است */
-    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه" })[A.state.view] || A.state.view; })();
+    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه", kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن" })[A.state.view] || A.state.view; })();
     main.setAttribute("data-report-section", A.state.view); main.setAttribute("data-report-section-label", lab);
     var fn = A.V[A.state.view] || A.V.home;
     try { main.appendChild(fn(A.state.arg, A.state.sub)); }
@@ -132,6 +134,9 @@
     if (nn) items.push({ k: "farm", txt: fa(nn) + " نهال در نهالستان مزرعه", sub: "جای‌گذاری هر مفهوم در درخت علم خودش", go: function () { A.go("farm", null, "nursery"); } });
     var ed = A.epiDue ? A.epiDue().length : 0;
     if (ed) items.push({ k: "farm", txt: fa(ed) + " پرونده معرفتی موعد بازبینی", sub: "نتیجه واقعی را ثبت کن؛ به کالیبراسیون مشترک می‌رود", go: function () { A.go("e_home"); } });
+    /* گره‌گشا: یک سطرِ ترکیبی برای همهٔ ورزش‌های موعد (a17) */
+    var kd = 0; if (A.kpracticeDue) { try { kd = (A.kpracticeDue() || []).length; } catch (e) { kd = 0; } }
+    if (kd) items.push({ k: "knot", txt: fa(kd) + " ورزشِ گره موعد است", sub: "شناختنِ ساختارِ گره‌هایت در شکل‌های تازه", go: function () { A.go("kpractice"); } });
     if (act > 2) items.unshift({ k: "warn", txt: fa(act) + " منبع فعال هم‌زمان (سقف پیشنهادی ۲)", sub: "بار بیرونی بالاست؛ یکی را به صف یا معدن ببر", go: function () { A.go("protos", null, "queue"); } });
     return items;
   };

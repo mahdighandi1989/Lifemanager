@@ -11,6 +11,9 @@
     POST   /api/app-records/{app}/files         upload (multipart rec_id, group, title, file) straight to the record's Drive folder
     DELETE /api/app-records/{app}/files/{id}    hide; the Drive file is only renamed
     GET    /api/app-records/{app}/usage         database/Drive footprint + AI use (30 days, estimated cost)
+    GET    /api/app-records/{app}/reminders     the caller's reminders + which channels this server can deliver on
+    POST   /api/app-records/{app}/reminders     upsert one {key, due_date, hour, tz, title, body, detail?, link, channels}
+    DELETE /api/app-records/{app}/reminders/{key}  cancel
 
 First tenant: «معماری یادگیری عمیق و کارخانه معرفت‌شناسی» (`/apps/learning-architecture`).
 Records are the app's own JSON documents; the server only scopes them by user,
@@ -299,3 +302,47 @@ async def app_usage(app: str, db: AsyncSession = Depends(get_db), user_id: int =
                        "est_tokens": int(tin + tout), "est_cost_usd": cost})
     return {"ok": True, "success": True, "storage": store,
             "ai_30d": {"models": models, "est_cost_usd": round(total, 4) if models else 0.0, "all_priced": priced_all}}
+
+
+# ---------------------------------------------------------------- یادآورها (تلگرام/ایمیل)
+
+class ReminderIn(BaseModel):
+    key: str = Field(..., min_length=1, max_length=160)
+    due_date: str = Field(..., min_length=10, max_length=10)
+    hour: int = Field(9, ge=0, le=23)
+    tz: str = Field("Asia/Dubai", max_length=64)
+    title: str = Field("", max_length=200)
+    body: str = Field("", max_length=2000)
+    detail: Any = None
+    link: str = Field("", max_length=500)
+    channels: Any = None
+
+
+@router.get("/api/app-records/{app}/reminders", tags=["app-records"])
+async def reminders_list(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+    _check_app(app)
+    from app.services.app_reminder_service import listing
+
+    return {"ok": True, "success": True, **(await listing(db, user_id=user_id, app=app))}
+
+
+@router.post("/api/app-records/{app}/reminders", tags=["app-records"])
+async def reminders_upsert(app: str, payload: ReminderIn, db: AsyncSession = Depends(get_db),
+                           user_id: int = Depends(get_signed_in_user_id)):
+    """The page decides what is due and when; the server only delivers (job ``app_reminders``)."""
+    _check_app(app)
+    from app.services.app_reminder_service import upsert
+
+    try:
+        res = await upsert(db, user_id=user_id, app=app, items=[payload.model_dump()])
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return {"ok": True, "success": True, **res}
+
+
+@router.delete("/api/app-records/{app}/reminders/{key}", tags=["app-records"])
+async def reminders_cancel(app: str, key: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+    _check_app(app)
+    from app.services.app_reminder_service import cancel
+
+    return {"ok": True, "success": True, "cancelled": await cancel(db, user_id=user_id, app=app, key=key)}

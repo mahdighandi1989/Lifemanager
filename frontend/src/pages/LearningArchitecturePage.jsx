@@ -117,6 +117,10 @@ export default function LearningArchitecturePage() {
       },
       delFile: (id) => api.delete(`/app-records/${APP}/files/${id}`).then((r) => r.data),
       usage: () => api.get(`/app-records/${APP}/usage`).then((r) => r.data),
+      // «گره‌گشا» follow-ups: the page decides what is due; the server delivers by Telegram / e-mail
+      remind: (payload) => api.post(`/app-records/${APP}/reminders`, payload).then((r) => r.data),
+      unremind: (key) => api.delete(`/app-records/${APP}/reminders/${encodeURIComponent(key)}`).then((r) => r.data),
+      remindStatus: () => api.get(`/app-records/${APP}/reminders`).then((r) => ({ ...(r.data.channels || {}), items: r.data.items || [] })),
     };
     loadBundle()
       .then(() => {

@@ -92,6 +92,40 @@
       { name: "خلاصه", rows: [["فیلد", "مقدار"], ["موضوعِ دوره", tp ? tp.title : ""], ["شروع", c.started || ""], ["درس‌های تمام‌شده", Object.keys(c.done || {}).length + " از " + L.length], ["در برنامه", link("course")]] },
       { name: "پیشرفت", rows: rows }] };
   };
+  /* گره‌گشا (§۱۲.۹ ِ طرح): آینهٔ هر موقعیت و هر گره **انتخابی** است (`mirror: true` روی همان رکورد)؛ احساس‌ها و یادداشت‌های
+     F7/F9 فقط با انتخابِ جدا (`mirrorPrivate`). سازنده‌ای که null برگرداند ⇒ اگر قبلاً فولدری بوده، تغییرِ نام (نه حذف). */
+  var PRIVFAM = { F7: 1, F9: 1 };
+  BUILD.kcase = function (kc) {
+    if (!kc.mirror) return null;
+    var it = kc.intake || {}, priv = !!kc.mirrorPrivate, R = kc.root || {};
+    var famName = function (f) { var x = (A.KF || []).filter(function (y) { return y.id === f; })[0]; return x ? f + " · " + x.fa : (f || ""); };
+    var kn = (kc.knots || []).map(function (id) { var k = S.get(id); return k ? (k.name || id) : id; }).join("، ");
+    var tabs = [{ name: "خلاصه", rows: [["فیلد", "مقدار"], ["عنوان", kc.title || ""], ["نوع", (kc.kinds || it.kinds || []).join("، ")], ["وضعیت", kc.status || ""],
+      ["گره‌ها", kn], ["گرهِ اصلی", famName(R.primary)], ["اطمینان", R.conf == null ? "" : R.conf + "٪"], ["ساخته‌شده", dt(kc.created)], ["آخرین تغییر", dt(kc.updated)], ["در برنامه", link("kcase", kc.id)]] }];
+    var inRows = [["فیلد", "مقدار"]];
+    [["what", "چه شد"], ["expected", "چه انتظار داشتم"], ["actual", "در واقع چه شد"], ["thoughts", "چه فکرهایی کردم/چه کردم"], ["statement", "صورتِ مسئله"],
+     ["answer", "پاسخِ درست"], ["stuckAt", "کجا گیر کردم"], ["context", "زمینه"], ["claim", "نتیجه‌ای که دربارهٔ خودم گرفتم"], ["seen", "پاسخ را دیده بودم؟"],
+     ["freq", "چند بار"], ["lag", "فاصله تا نوشتن"]].forEach(function (f) { if (A.filled(it[f[0]])) inRows.push([f[1], txt(it[f[0]])]); });
+    if (priv) [["emo", "شدتِ احساس"], ["emoName", "نامِ احساس"]].forEach(function (f) { if (A.filled(it[f[0]])) inRows.push([f[1], txt(it[f[0]])]); });
+    tabs.push({ name: "ورودی", rows: inRows });
+    var rk = []; try { rk = A.knotRank ? A.knotRank(kc) : []; } catch (e) { rk = []; }
+    tabs.push({ name: "فرضیه‌ها", rows: [["خانواده", "امتیاز (ترتیبِ بررسی)", "چرا"]].concat(rk.map(function (r) { return [famName(r.fam), String(Math.round((r.score || 0) * 100) / 100), !priv && PRIVFAM[r.fam] ? "(خصوصی)" : txt((r.why || []).map(function (w) { return typeof w === "string" ? w : (w.t || w.fa || ""); }))]; })) });
+    tabs.push({ name: "شواهد", rows: [["خانواده", "جهت", "شاهد", "منبع"]].concat((kc.ev || []).filter(function (e) { return priv || !PRIVFAM[e.fam]; }).map(function (e) { return [famName(e.fam), String(e.dir == null ? (e.w || "") : e.dir), e.text || "", e.src || ""]; })) });
+    var why = (R.why5 || []).map(function (w, i) { return ["چرای " + (i + 1), w.why || "", w.ev || "", w.rival || ""]; });
+    tabs.push({ name: "ریشه", rows: [["", "پاسخ", "شاهد", "تبیینِ رقیبِ بیرونی"], ["گرهِ اصلی", famName(R.primary), "", ""]].concat(why).concat(R.loop2 ? [["متغیرِ حاکم", R.loop2, "", ""]] : []) });
+    tabs.push({ name: "مداخله‌ها", rows: [["مداخله", "انجام‌شده"]].concat((kc.acts || []).map(function (a) { var T = a.tid && A.TM[a.tid]; return [T ? a.tid + " · " + T.fa : (a.ext || a.fa || ""), a.done ? "✓" : ""]; })) });
+    return { group: "گره‌گشا — موقعیت‌ها", title: kc.title || "موقعیت", tabs: tabs };
+  };
+  BUILD.knot = function (k) {
+    if (!k.mirror) return null;
+    var priv = !!k.mirrorPrivate || !PRIVFAM[k.fam];
+    var tabs = [{ name: "کارتِ گره", rows: [["فیلد", "مقدار"], ["نام", k.name || ""], ["خانواده", k.fam || ""], ["وضعیت", (A.KSTATUS || {})[k.status] || k.status || ""],
+      ["ساختارِ عمیق", priv ? (k.principle || "") : "(خصوصی)"], ["نشانه‌ها", priv ? txt(k.signals) : "(خصوصی)"], ["حرکتِ مقابل", priv ? txt(k.counter) : "(خصوصی)"],
+      ["مثال", priv ? txt(k.example) : "(خصوصی)"], ["در برنامه", link("knot", k.id)]] }];
+    tabs.push({ name: "موقعیت‌ها", rows: [["موقعیت", "تاریخ"]].concat((k.cases || []).map(function (id) { var c = S.get(id); return [c ? c.title || id : id, c ? dt(c.created) : ""]; })) });
+    tabs.push({ name: "ورزش", rows: [["تاریخ", "شکل", "اطمینان", "درست"]].concat((k.log || []).slice(-200).map(function (e) { return [e.d || dt(e.at), e.form || "", e.conf == null ? "" : e.conf + "٪", e.ok == null ? "" : (e.ok ? "✓" : "✗")]; })) });
+    return { group: "گره‌گشا — گره‌ها", title: k.name || "گره", tabs: tabs };
+  };
   A.MIRROR_BUILD = BUILD;
 
   /* ---------- صف: چه چیزی دوباره ساخته شود ---------- */
@@ -108,6 +142,8 @@
       return out;
     }
     if (r.topic && (r.type === "ex" || r.type === "pr" || r.type === "sched" || r.type === "card")) out.push(r.topic);
+    if ((r.type === "kitem" || r.type === "kexp") && r.knot) out.push(r.knot);
+    if (r.type === "kcase") (r.knots || []).forEach(function (id) { out.push(id); });
     if (r.type === "topic" || (r.type === "ex" && r.course)) out.push("course");
     return out;
   }
@@ -121,7 +157,7 @@
     for (var i = 0; i < ids.length && items.length < 40; i++) {
       var id = ids[i], r = S.get(id); sent.push(id);
       if (!(r && BUILD[r.type] && !r.sample)) continue;
-      try { var d = BUILD[r.type](r); d.rec_id = id; var n = JSON.stringify(d).length; if (items.length && size + n > 2500000) { sent.pop(); break; } items.push(d); size += n; } catch (e) { console.error(e); }
+      try { var d = BUILD[r.type](r); if (!d) { gone[id] = 1; continue; } d.rec_id = id; var n = JSON.stringify(d).length; if (items.length && size + n > 2500000) { sent.pop(); break; } items.push(d); size += n; } catch (e) { console.error(e); }
     }
     var del = Object.keys(gone).slice(0, 200);
     sent.forEach(function (id) { delete dirty[id]; }); del.forEach(function (id) { delete gone[id]; });
@@ -161,7 +197,7 @@
       if (!info) return 0;
       var known = {}; (info.items || []).forEach(function (i) { known[i.rec_id] = 1; });
       var n = 0;
-      Object.keys(BUILD).forEach(function (t) { S.all(t, function (r) { return !r.sample; }).forEach(function (r) { if (!known[r.id]) { dirty[r.id] = 1; n++; } }); });
+      Object.keys(BUILD).forEach(function (t) { S.all(t, function (r) { return !r.sample && (t !== "kcase" && t !== "knot" || r.mirror); }).forEach(function (r) { if (!known[r.id]) { dirty[r.id] = 1; n++; } }); });
       if (n) schedule();
       return n;
     });
@@ -176,7 +212,8 @@
   (function waitLoaded(n) { if (S.loaded) { courseTopic = (S.get("course") || {}).topic || null; setTimeout(function () { try { A.mirrorBackfill(); } catch (e) { } }, 2000); } else if (n < 120) setTimeout(function () { waitLoaded(n + 1); }, 1000); })(0);
 
   /* ---------- نشان‌دادنِ پیوند در خودِ صفحه ---------- */
-  var REC_OF = { e_case: function () { return A.state.arg; }, topic: function () { return A.state.arg; }, course: function () { return "course"; }, lesson: function () { return "course"; } };
+  var REC_OF = { e_case: function () { return A.state.arg; }, topic: function () { return A.state.arg; }, course: function () { return "course"; }, lesson: function () { return "course"; },
+    kcase: function () { var r = S.get(A.state.arg); return r && r.mirror ? A.state.arg : null; }, knot: function () { var r = S.get(A.state.arg); return r && r.mirror ? A.state.arg : null; } };
   function chip(info, rid) {
     var box = h("span", { class: "drv" });
     if (!info) return box;
@@ -191,6 +228,7 @@
   }
   var rawRender = A.render;
   A.render = function () {
+    try { wrapKnotViews(); } catch (e) { }
     rawRender();
     var f = REC_OF[A.state.view]; if (!f) return;
     var rid = f(); if (!rid) return;
@@ -234,6 +272,27 @@
     load();
     return sec;
   }
+  /* «📁 درایو» برای موقعیت و گرهِ گره‌گشا: انتخابی، با هشدارِ حریم */
+  function driveToggles(r) {
+    function cb(lab, key, hint) {
+      return h("label", { class: "row gap small" }, h("input", { type: "checkbox", checked: !!r[key], onchange: function (e) { r[key] = e.target.checked; S.put(r); A.toast(e.target.checked ? "در فهرستِ آینهٔ درایو قرار گرفت." : "از آینه برداشته شد (فولدرِ موجود فقط تغییرِ نام می‌دهد)."); } }), lab, hint ? h("span", { class: "muted" }, " — " + hint) : null);
+    }
+    return h("section", { class: "card", dir: "rtl", "data-report-section": "kdrive", "data-report-section-label": "درایوِ گره‌گشا" },
+      h("h3", {}, "📁 نسخه در گوگل درایو (انتخابی)"),
+      h("p", { class: "small muted" }, "این‌ها خود‌کاوی‌اند؛ پیش‌فرض فقط در همین برنامه می‌مانند. اگر بخواهی، یک فولدرِ جدا با شیتِ خوانا در «LifeManagerData › learning-architecture › گره‌گشا» ساخته می‌شود."),
+      cb("یک فولدر و شیت برای این مورد در درایو", "mirror"),
+      cb("احساس‌ها و یادداشت‌های خصوصی (هیجانی/باور دربارهٔ خود) هم در شیت بیاید", "mirrorPrivate", "پیش‌فرض: نه"));
+  }
+  // a16 (which defines these views) loads AFTER this file ⇒ wrap lazily, once, on the first render
+  function wrapKnotViews() { ["kcase", "knot"].forEach(function (v) {
+    var raw = A.V[v]; if (!raw || raw._kdrive) return;
+    A.V[v] = function (id) {
+      var root = raw.apply(this, arguments), r = S.get(id);
+      try { if (r && root && root.appendChild) { root.appendChild(driveToggles(r)); if (A.HOST.upload && v === "kcase") root.appendChild(attachSection(id, { group: "گره‌گشا — موقعیت‌ها", title: r.title || "موقعیت" })); } } catch (e) { console.error(e); }
+      return root;
+    };
+    A.V[v]._kdrive = true;
+  }); }
   if (A.HOST.upload) {
     [["e_case", function (cs) { return { group: "پرونده‌ها", title: cs.title || "پرونده" }; }],
      ["topic", function (t) { return { group: "موضوع‌ها", title: t.title || "موضوع" }; }]].forEach(function (x) {
