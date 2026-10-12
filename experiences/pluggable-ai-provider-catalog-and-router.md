@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-06-28T00:00:00Z"
 created_at: "2026-06-28T00:00:00Z"
-updated_at: "2026-06-28T00:00:00Z"
+updated_at: "2026-10-12T00:00:00Z"
 merged_from: []
 ---
 
@@ -154,3 +154,14 @@ working across model generations without a per-model allow/deny list.
 Debugging lesson (again): the cause was only visible because the test surfaced
 the provider's response BODY. A bare "400 Bad Request" or "401" hides the one
 sentence that pinpoints the fix — always bubble up `error.type` + `error.message`.
+
+## Update 2026-10-12 — models die silently; the catalog must retire them
+- مشکل: کاتالوگِ ثابت مدل‌هایی را نگه داشت که ارائه‌دهنده خاموششان کرده بود؛ چون هیچ مسیری مدلِ ثابت نداشت، «انتخابِ خودکار» همه را به
+  مدلِ مرده فرستاد و هیچ هشداری نبود (شمارنده صفر، هزینه ثبت‌نشده).
+- راه: در تعریفِ کاتالوگ `retired: True` ⇒ seed ِ هر بوت ردیف را خاموش می‌کند (حذف نمی‌کند) و اولویتش را پایین می‌برد؛ مدلِ جایگزین با
+  قابلیت‌های درست (reasoning/fast) اضافه می‌شود تا انتخابِ خودکار خودش به آن برسد. یک آزمون بنویس که با ردیف‌های قدیمیِ «روشن» شروع
+  می‌کند (شبیهِ production) نه با پایگاه‌دادهٔ خالی.
+- مدل‌های «فکرکننده» (Gemini 2.5+/3.x، …) سقفِ خروجی را صرفِ استدلال می‌کنند: پاسخِ خالی + `MAX_TOKENS` ⇒ یک تلاشِ دوباره با سقفِ بزرگ‌تر،
+  و بخش‌های `thought` را از پاسخ بیرون بگذار.
+- چک‌لیست: هر چند ماه صفحهٔ deprecations ِ هر ارائه‌دهنده را با کاتالوگ مقایسه کن؛ شمارندهٔ درخواست/خطا و قیمتِ هر مدل را پر نگه دار تا «صفر» معنا داشته باشد.
+

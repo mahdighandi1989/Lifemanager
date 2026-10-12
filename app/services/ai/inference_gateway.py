@@ -191,11 +191,27 @@ async def _gemini_text(rm, prompt, system, max_tokens, temperature) -> str:
         resp = await client.post(url, json=payload)
         resp.raise_for_status()
         data = resp.json()
+        text, finish = _gemini_parse(data)
+        # Gemini 2.5+/3.x "thinking" models count their reasoning against
+        # maxOutputTokens: a small cap can be spent entirely on thinking and the
+        # answer comes back empty with finishReason=MAX_TOKENS. Retry once with
+        # room for both rather than returning "".
+        if not text.strip() and finish == "MAX_TOKENS" and max_tokens:
+            payload["generationConfig"]["maxOutputTokens"] = max(int(max_tokens) * 4, 8192)
+            resp = await client.post(url, json=payload)
+            resp.raise_for_status()
+            text, finish = _gemini_parse(resp.json())
+    return text
+
+
+def _gemini_parse(data: Dict[str, Any]):
+    """(answer text without thought parts, finishReason)."""
     cands = data.get("candidates", [])
     if not cands:
-        return ""
+        return "", None
     parts = cands[0].get("content", {}).get("parts", [])
-    return "".join(p.get("text", "") for p in parts if isinstance(p, dict))
+    text = "".join(p.get("text", "") for p in parts if isinstance(p, dict) and not p.get("thought"))
+    return text, cands[0].get("finishReason")
 
 
 async def _openai_text(rm, prompt, system, max_tokens, temperature) -> str:

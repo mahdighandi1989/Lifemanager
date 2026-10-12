@@ -111,8 +111,13 @@ PROVIDER_CATALOG: Dict[str, Dict[str, Any]] = {
         "recommended": False,
         "notes": "کلید Google AI Studio. دید تصویر، صوت/ویدئو، و زمینه‌ی بسیار بلند.",
         "models": [
-            {"model_key": "gemini-2.0-flash", "display_name": "Gemini 2.0 Flash", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
-            {"model_key": "gemini-1.5-pro", "display_name": "Gemini 1.5 Pro", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 2000000, "priority": 3},
+            # 2026-10-12: Google retired 1.5 (2025) and 2.0 Flash (shutdown from 2026-06-01, replacement
+            # gemini-3.6-flash) — https://ai.google.dev/gemini-api/docs/deprecations. Current models first;
+            # the retired rows stay in the DB (quarantine, never deleted) but are switched off by the seed.
+            {"model_key": "gemini-3.8-flash", "display_name": "Gemini 3.8 Flash", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
+            {"model_key": "gemini-3.6-flash", "display_name": "Gemini 3.6 Flash", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
+            {"model_key": "gemini-2.0-flash", "display_name": "Gemini 2.0 Flash (بازنشسته)", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 8, "retired": True},
+            {"model_key": "gemini-1.5-pro", "display_name": "Gemini 1.5 Pro (بازنشسته)", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 2000000, "priority": 9, "retired": True},
         ],
     },
     "deepseek": {
@@ -232,7 +237,7 @@ async def seed_ai_catalog(db) -> Dict[str, int]:
                     api_model_id=mdef.get("api_model_id"),
                     provider_key=provider_key,
                     display_name=mdef.get("display_name", mdef["model_key"]),
-                    enabled=True,
+                    enabled=not mdef.get("retired"),
                     capabilities=list(mdef.get("capabilities", [])),
                     max_output_tokens=mdef.get("max_output_tokens"),
                     context_window=mdef.get("context_window"),
@@ -246,6 +251,13 @@ async def seed_ai_catalog(db) -> Dict[str, int]:
             )
             counts["models_added"] += 1
         elif not model.is_custom:
+            # A model the provider has shut down: switch it off so the resolver never
+            # routes to a dead endpoint (row kept — quarantine, not delete).
+            if mdef.get("retired"):
+                if model.enabled:
+                    model.enabled = False
+                    counts["models_retired"] = counts.get("models_retired", 0) + 1
+                model.priority = int(mdef.get("priority", model.priority or 9))
             # Refresh metadata for catalog/discovered rows; keep ``enabled``.
             model.api_model_id = mdef.get("api_model_id")
             model.provider_key = provider_key
