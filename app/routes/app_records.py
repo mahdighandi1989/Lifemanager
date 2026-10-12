@@ -4,6 +4,9 @@
     POST   /api/app-records/{app}/bulk          upsert a batch {records: [{id, type, ...}]}
     DELETE /api/app-records/{app}/{rec_id}      remove one record
     POST   /api/app-records/{app}/ai            {system, user} → text, through Lifemanager's AI layer
+    GET    /api/app-records/{app}/mirror        Drive mirror status + folder/sheet links per record
+    POST   /api/app-records/{app}/mirror        {items: [{rec_id, group, title, tabs}], deleted: [rec_id]} — queue for Drive
+    POST   /api/app-records/{app}/mirror/sync   write the caller's pending mirrors to Drive now
 
 First tenant: «معماری یادگیری عمیق و کارخانه معرفت‌شناسی» (`/apps/learning-architecture`).
 Records are the app's own JSON documents; the server only scopes them by user,
@@ -41,6 +44,11 @@ def _check_app(app: str) -> str:
 
 class BulkIn(BaseModel):
     records: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class MirrorIn(BaseModel):
+    items: List[Dict[str, Any]] = Field(default_factory=list, max_length=200)
+    deleted: List[str] = Field(default_factory=list, max_length=200)
 
 
 class AIIn(BaseModel):
@@ -102,6 +110,9 @@ async def delete_record(app: str, rec_id: str, db: AsyncSession = Depends(get_db
     if row is not None:
         await db.delete(row)
         await db.commit()
+    from app.services.app_mirror_service import mark_deleted
+
+    await mark_deleted(db, user_id=user_id, app=app, rec_id=rec_id)  # Drive folder is renamed, never deleted
     return {"ok": True, "success": True, "deleted": row is not None}
 
 
@@ -117,3 +128,32 @@ async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), us
         msg = "مدلی برای «معماری یادگیری» تنظیم نشده؛ در تنظیمات AI مدلی برای این کار یا «عمومی» بگذار." if err == "no_model" else f"خطای سرویس هوش مصنوعی: {err}"
         return {"ok": False, "success": False, "error": msg, "text": ""}
     return {"ok": True, "success": True, "text": res.get("text") or "", "model": res.get("model")}
+
+
+@router.get("/api/app-records/{app}/mirror", tags=["app-records"])
+async def mirror_status(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+    _check_app(app)
+    from app.services.app_mirror_service import status
+
+    return {"ok": True, "success": True, **(await status(db, user_id=user_id, app=app))}
+
+
+@router.post("/api/app-records/{app}/mirror", tags=["app-records"])
+async def mirror_queue(app: str, payload: MirrorIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+    _check_app(app)
+    from app.services.app_mirror_service import upsert
+
+    try:
+        res = await upsert(db, user_id=user_id, app=app, items=payload.items, deleted=payload.deleted)
+    except ValueError as exc:
+        raise HTTPException(status_code=413, detail=str(exc)) from exc
+    return {"ok": True, "success": True, **res}
+
+
+@router.post("/api/app-records/{app}/mirror/sync", tags=["app-records"])
+async def mirror_sync(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_required_user_id)):
+    _check_app(app)
+    from app.services.app_mirror_service import sync_pending
+
+    res = await sync_pending(db, user_id=user_id, app=app, limit=40)
+    return {"ok": True, "success": True, **res}

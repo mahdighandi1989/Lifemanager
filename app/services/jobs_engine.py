@@ -368,6 +368,15 @@ async def _job_file_reconcile(db: AsyncSession) -> dict[str, Any]:
 
 # --- registry ---------------------------------------------------------------
 
+async def _job_app_mirror(db: AsyncSession) -> dict[str, Any]:
+    """«آینهٔ درایو»: pending app-record mirrors (each case/topic of
+    «معماری یادگیری عمیق» → its own Drive folder + spreadsheet) are written.
+    Drive offline ⇒ rows stay pending; nothing is lost."""
+    from app.services.app_mirror_service import sync_pending
+
+    return await sync_pending(db, limit=40)
+
+
 JobFn = Callable[[AsyncSession], Awaitable[dict[str, Any]]]
 
 # (key, title_fa, interval_minutes_fn, body). Interval is resolved at tick
@@ -417,6 +426,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("file_reconcile", "هرس ایندکس فایل‌های حذف‌شده",
      lambda: _env_minutes("FILE_SYNC_INTERVAL_MINUTES", 30.0),
      _job_file_reconcile),
+    ("app_mirror", "آینهٔ درایوِ رکوردهای برنامه (فولدر + شیت)",
+     lambda: _env_minutes("APP_MIRROR_INTERVAL_MINUTES", 15.0),
+     _job_app_mirror),
 ]
 
 

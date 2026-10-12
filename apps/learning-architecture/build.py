@@ -51,7 +51,7 @@ def sources():
     techs[0] += "\n" + rd(os.path.join(TD, "src_a.js"))
     techs[1] += "\n" + rd(os.path.join(TD, "src_b.js"))
     app = "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
-                                                   "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js", "a10_nav.js", "a11_course.js"])
+                                                   "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js", "a10_nav.js", "a11_course.js", "a12_mirror.js"])
     epibook = rd(os.path.join(A, "epi_book.js"))
     epidata = rd(os.path.join(A, "epi_core.js")) + "\n" + "".join(rd(os.path.join(A, "epi_st_%s.js" % x)) + "\n" for x in "abcd")
     btfiles = ["epi_feat.js", "epi_rules.js", "epi_cases_a.js", "epi_cases_b.js", "epi_problems.js", "epi_field.js",

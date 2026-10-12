@@ -593,3 +593,9 @@ section.test.badv{border-right-color:var(--bad)}
 .crs-now .btn.lg,.crs-home .btn{white-space:normal;max-width:100%;text-align:center;line-height:1.6}
 .crs-now .row.between>div{flex:1 1 180px;min-width:0}
 @media (max-width:860px){.crs-now .btn.lg,.crs-home .btn{flex:1 1 100%}}
+
+/* ===== آینهٔ درایو (a12_mirror.js) ===== */
+.drvslot{margin-inline-start:auto;display:inline-flex}
+.drv{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
+.drvlink{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--ink);text-decoration:none;font-size:.82rem}
+.drvlink:hover{border-color:var(--accent);color:var(--accent)}

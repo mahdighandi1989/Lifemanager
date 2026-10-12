@@ -27,6 +27,7 @@ from app.models.inspection import (  # «نظارت و سرکشی»
 )
 from app.models.mini_app import MiniApp  # «صفحه‌های افزوده»
 from app.models.app_record import AppRecord  # رکوردهای برنامه‌های درون‌ریپو (معماری یادگیری عمیق)
+from app.models.app_mirror import AppMirror  # آینهٔ درایوِ رکوردهای برنامه (فولدر + شیت برای هر مورد)
 from app.models.drive_file import DriveFile
 from app.models.user_asset import UserAsset
 from app.models.person_task import person_tasks  # noqa: F401  (association table)
@@ -166,4 +167,5 @@ __all__ = [
     "InspectionBinder",
     "MiniApp",
     "AppRecord",
+    "AppMirror",
 ]

@@ -4223,3 +4223,13 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **VERIFY:** `tests/test_ai_gemini_refresh.py` (خاموش‌شدنِ ردیف‌های قدیمیِ روشن، انتخابِ مدلِ تازه برای reasoning/fast، تلاشِ دوباره)؛ pytest
   کامل ۱۸۷۰ سبز (آزمون‌های ساعت‌محورِ دیشب هم امروز صبح سبزند ⇒ تأییدِ تشخیصِ «اختلافِ تاریخِ UTC و دبی»)؛ `npm run build` سبز.
   **باز:** یک درخواستِ واقعی روی production از این محیط ممکن نبود (دسترسی به سرور بسته است) ⇒ مالک: تنظیماتِ AI › «آزمایش» روی Gemini 3.8 Flash.
+
+## 2026-10-12 — CHANGE: «آینهٔ درایو» برای رکوردهای برنامه (اولین کاربر: معماری یادگیری عمیق)
+- **FINDING:** ساختارِ درایوِ پروژه از قبل هست (`LifeManagerData/` + `inspection/report-NNNN/`، `Backups`، `ActivityArchive`، …)؛ «LifeManager» ِ خرداد خالی/بی‌استفاده
+  (دست نخورد). `LifeManagerIndex` با وجودِ کد ساخته نشده.
+- **DECISION (مالک):** درایو آینهٔ همیشه‌به‌روز؛ پایگاه‌داده منبعِ اصلی.
+- **CHANGE:** مدل `AppMirror` (`app_mirrors`) + migration `0066_app_mirrors`؛ `app/services/app_mirror_service.py`؛ سه endpoint زیرِ
+  `/api/app-records/{app}/mirror`؛ حذفِ رکورد ⇒ `mark_deleted` (فولدر تغییرِ نام، نه حذف)؛ کارِ `app_mirror` در `jobs_engine.JOBS` (۱۵ دقیقه،
+  `APP_MIRROR_INTERVAL_MINUTES`؛ آزمونِ موتور کوتاه‌تر از ۱۵ را نمی‌پذیرد). الگو همان `inspection_drive`: ریشهٔ کش‌شده، یک فولدر برای هر مورد. صفحه سندِ تب‌دار را می‌سازد، سرور تفسیر نمی‌کند
+  ⇒ نوعِ تازه بی‌تغییرِ سرور. جزئیات: `apps/learning-architecture/docs/WORKLOG.md` (14).
+- **VERIFY:** `tests/test_app_mirror.py` (۵)؛ pytest کامل و `npm run build` (پایین)؛ e2e ِ محلی. **باز:** نوشتنِ واقعی در گوگل فقط در production دیده می‌شود.

@@ -96,6 +96,10 @@ export default function LearningArchitecturePage() {
         if (`${window.location.pathname}${window.location.search}` !== next) navRef.current(next);
       },
       initial: () => readQuery(window.location.search),
+      // «آینهٔ درایو»: each case/topic/course → its own folder + spreadsheet under LifeManagerData
+      mirror: (payload) => api.post(`/app-records/${APP}/mirror`, payload).then((r) => r.data),
+      mirrorList: () => api.get(`/app-records/${APP}/mirror`).then((r) => r.data),
+      mirrorSync: () => api.post(`/app-records/${APP}/mirror/sync`).then((r) => r.data),
     };
     loadBundle()
       .then(() => {
