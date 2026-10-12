@@ -39,6 +39,7 @@
   }
   function navEntry(view) {
     var lists = [[A.NAV || [], "سامانه یادگیری"], [A.EPI_NAV || [], "کارخانه معرفت‌شناسی"]];
+    if (A.lastSys === "epi") lists.reverse();  // صفحه‌ای که در هر دو منو هست (مثلاً «مسئله‌های بزرگ»): ردِ سامانهٔ فعلی
     for (var l = 0; l < lists.length; l++) {
       var g = "";
       for (var i = 0; i < lists[l][0].length; i++) {

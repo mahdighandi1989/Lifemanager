@@ -567,6 +567,7 @@
     kc.pans = kc.pans || {}; kc.ladder = kc.ladder || {}; kc.root = kc.root || {}; kc.root.extra = kc.root.extra || []; kc.root.why5 = kc.root.why5 || [];
     kc.knots = kc.knots || []; kc.acts = kc.acts || []; kc.hyps = kc.hyps || []; return kc;
   }
+  A.knotNewCase = function () { return fill(blank()); };  // برای پل‌های بیرونی (مثلاً «گیر کردم» ِ مسئله‌های بزرگ، a19): همان شکلِ موقعیتِ عادی
   function autoTitle(kc) { var t = String((kc.intake || {}).what || "").trim().replace(/\s+/g, " "); return t ? (t.length > 60 ? t.slice(0, 58) + "…" : t) : "موقعیت"; }
   function snapshot(kc) { var r = {}; A.knotRank(kc).forEach(function (x) { r[x.fam] = { score: x.score, why: x.why }; }); kc.rank = r; }
   /* یک دستگیره برای هر نمایش: رکورد فقط با اولین تغییرِ واقعی ساخته می‌شود؛ هر تغییر = یک نوشتن (تایپ با درنگ جمع می‌شود). */

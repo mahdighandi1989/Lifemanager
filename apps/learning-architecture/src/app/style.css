@@ -978,3 +978,42 @@ table.kp-log th,table.kp-log td{padding:4px 6px;border-bottom:1px solid var(--li
 }
 @media (max-width:520px){.ks-bar{grid-template-columns:minmax(0,1fr) auto}.ks-bar .ks-track{grid-column:1 / -1;grid-row:2}}
 /* === a18_kmap END === */
+/* === a19_moves BEGIN === */
+.mv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.mv-card{border-right:4px solid var(--pc,var(--accent));display:flex;flex-direction:column;gap:6px}
+.mv-card h2{margin:0;font-size:1.02rem}
+.mv-card .chip{white-space:normal}
+.mv-chip{font-size:.8rem;max-width:100%;white-space:normal;text-align:right}
+.mv-chips{margin-top:6px}
+.mv-stage{display:flex;flex-direction:column;gap:4px;border-right:3px solid var(--line)}
+.mv-stage p{margin:.2em 0}
+.mv-techs li{margin:.35em 0}
+.mv-transfer summary{cursor:pointer}
+.mv-practice{border:1px solid var(--accent);display:flex;flex-direction:column;gap:10px}
+.mv-practice h2:focus{outline:none}
+.mv-practice fieldset{border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;margin:0;min-width:0}
+.mv-practice legend{font-weight:800;padding:0 6px}
+.mv-practice legend:focus{outline:none}
+.mv-item{background:var(--surface-2);border-radius:var(--r);padding:10px 12px}
+.mv-item h3{margin:.3em 0 0}
+.mv-opt{display:flex;flex-direction:column;gap:2px;text-align:right;white-space:normal}
+.mv-od{font-weight:400;line-height:1.6}
+.mv-stuckrow{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.mv-stuckrow .small{flex:1 1 220px;min-width:0}
+.mv-era-list{padding-inline-start:1.2em}
+.mv-era-list li{margin:.4em 0}
+.mv-era-list p{margin:.1em 0 .3em}
+.mv-plist li{margin:.35em 0}
+.mv-plist li.mv-flagged{background:var(--warn-soft);border-right:3px solid var(--warn);border-radius:6px;padding:4px 8px}
+.mv-flag{margin:.3em 0;padding:4px 8px;border-radius:6px;font-size:.88rem}
+.mv-flag.open{background:var(--bad-soft);border-right:3px solid var(--bad)}
+.mv-flag.accepted{background:var(--warn-soft);border-right:3px solid var(--warn)}
+.mv-flag.fixed{background:var(--good-soft);border-right:3px solid var(--good)}
+.mv-flag p{margin:.1em 0}
+.mv-vsum.bad{color:var(--bad);font-weight:700}
+.mv-kback{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.mv-kback p{margin:0;flex:1 1 220px;min-width:0}
+.mv-masked{filter:blur(5px);user-select:none}
+.mv-golist{white-space:normal;text-align:right}
+@media (max-width:520px){.mv-grid{grid-template-columns:minmax(0,1fr)}.mv-practice fieldset{padding:6px 8px}}
+/* === a19_moves END === */
