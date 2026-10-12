@@ -28,7 +28,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies.auth import get_optional_user_id
+from app.dependencies.auth import get_optional_user_id, get_signed_in_user_id
 from app.middleware import handle_errors
 from app.models.ai_catalog import AICatalogModel, AICatalogProvider, AITaskRoute
 from app.schemas.ai_catalog_schema import (
@@ -81,7 +81,7 @@ async def update_catalog_provider(
     key: str,
     payload: CatalogProviderUpdate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     provider = await db.get(AICatalogProvider, key)
     if provider is None:
@@ -89,6 +89,13 @@ async def update_catalog_provider(
     if payload.enabled is not None:
         provider.enabled = payload.enabled
     if payload.base_url is not None:
+        # a catalog provider's key may only go to its official host (else the
+        # stored key could be redirected to a stranger's server)
+        from app.services.ai.manager import AIManager
+
+        trial = type("P", (), {"key": provider.key, "base_url": payload.base_url or None})()
+        if payload.base_url and AIManager.safe_base_url(trial) != payload.base_url:
+            raise HTTPException(status_code=422, detail="نشانیِ سرور برای این ارائه‌دهنده مجاز نیست (فقط نشانیِ رسمی)")
         provider.base_url = payload.base_url or None
     if payload.notes is not None:
         provider.notes = payload.notes
@@ -105,7 +112,7 @@ async def update_catalog_provider(
 async def sync_catalog_provider_models(
     key: str,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     from app.services.ai.catalog_tester import sync_provider_models
 
@@ -129,7 +136,7 @@ async def list_catalog_models(
 async def create_catalog_model(
     payload: CatalogModelCreate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     provider = await db.get(AICatalogProvider, payload.provider_key)
     if provider is None:
@@ -169,7 +176,7 @@ async def update_catalog_model(
     model_id: int,
     payload: CatalogModelUpdate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     model = await db.get(AICatalogModel, model_id)
     if model is None:
@@ -177,8 +184,15 @@ async def update_catalog_model(
     if payload.display_name is not None:
         model.display_name = payload.display_name
     if payload.enabled is not None:
+        # the owner's hand-made choice: the daily live refresh keeps it (only a
+        # model the provider no longer lists is still switched off). Marked
+        # after ``notes`` below so a notes edit in the same request keeps it.
+        owner_toggled = bool(payload.enabled) != bool(model.enabled)
         model.enabled = payload.enabled
+    else:
+        owner_toggled = False
     if payload.capabilities is not None:
+        owner_toggled = True  # a hand-set capability list is kept by the live refresh too
         model.capabilities = [c for c in payload.capabilities if c in CAPABILITY_IDS]
     if payload.max_output_tokens is not None:
         model.max_output_tokens = payload.max_output_tokens
@@ -187,9 +201,15 @@ async def update_catalog_model(
     if payload.temperature is not None:
         model.temperature = payload.temperature
     if payload.priority is not None:
+        owner_toggled = owner_toggled or payload.priority != model.priority
         model.priority = payload.priority
     if payload.notes is not None:
         model.notes = payload.notes
+    if owner_toggled:
+        from app.services.ai.model_discovery import OWNER_MARK
+
+        if OWNER_MARK not in (model.notes or ""):
+            model.notes = ((model.notes or "") + " " + OWNER_MARK).strip()
     await db.commit()
     await db.refresh(model)
     return model.to_dict()
@@ -200,7 +220,7 @@ async def update_catalog_model(
 async def delete_catalog_model(
     model_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     model = await db.get(AICatalogModel, model_id)
     if model is None:
@@ -227,7 +247,7 @@ async def delete_catalog_model(
 async def test_catalog_model(
     model_id: int,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     from app.services.ai.catalog_tester import test_model
 
@@ -250,7 +270,7 @@ async def update_catalog_route(
     task: str,
     payload: CatalogTaskRouteUpdate = Body(...),
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_optional_user_id),
+    user_id: int = Depends(get_signed_in_user_id),
 ) -> Dict[str, Any]:
     valid_tasks = {t["id"] for t in TASK_TYPES}
     if task not in valid_tasks:

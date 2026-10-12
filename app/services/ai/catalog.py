@@ -114,8 +114,8 @@ PROVIDER_CATALOG: Dict[str, Dict[str, Any]] = {
             # 2026-10-12: Google retired 1.5 (2025) and 2.0 Flash (shutdown from 2026-06-01, replacement
             # gemini-3.6-flash) — https://ai.google.dev/gemini-api/docs/deprecations. Current models first;
             # the retired rows stay in the DB (quarantine, never deleted) but are switched off by the seed.
-            {"model_key": "gemini-3.8-flash", "display_name": "Gemini 3.8 Flash", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
-            {"model_key": "gemini-3.6-flash", "display_name": "Gemini 3.6 Flash", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 2},
+            {"model_key": "gemini-3.8-flash", "display_name": "Gemini 3.8 Flash", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 65536, "context_window": 1000000, "priority": 2},
+            {"model_key": "gemini-3.6-flash", "display_name": "Gemini 3.6 Flash", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 65536, "context_window": 1000000, "priority": 2},
             {"model_key": "gemini-2.0-flash", "display_name": "Gemini 2.0 Flash (بازنشسته)", "capabilities": ["text", "vision", "audio", "fast", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 1000000, "priority": 8, "retired": True},
             {"model_key": "gemini-1.5-pro", "display_name": "Gemini 1.5 Pro (بازنشسته)", "capabilities": ["text", "vision", "audio", "reasoning", "long_context", "code", "documents"], "max_output_tokens": 8192, "context_window": 2000000, "priority": 9, "retired": True},
         ],
@@ -250,7 +250,9 @@ async def seed_ai_catalog(db) -> Dict[str, int]:
                 )
             )
             counts["models_added"] += 1
-        elif not model.is_custom:
+        elif not model.is_custom and model.source != "live":
+            # (``source == "live"``: the daily live refresh — model_discovery — owns this
+            # row now; the static seed must not undo it on the next boot.)
             # A model the provider has shut down: switch it off so the resolver never
             # routes to a dead endpoint (row kept — quarantine, not delete).
             if mdef.get("retired"):

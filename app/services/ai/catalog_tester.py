@@ -42,7 +42,7 @@ async def test_model(db: AsyncSession, model_id: int) -> Dict[str, Any]:
         display_name=model.display_name,
         api_key=key,
         auth_scheme=provider.auth_scheme,
-        base_url=provider.base_url,
+        base_url=ai_manager.safe_base_url(provider),
         capabilities=list(model.capabilities or []),
     )
     start = time.monotonic()
@@ -83,16 +83,28 @@ async def test_model(db: AsyncSession, model_id: int) -> Dict[str, Any]:
             except Exception:
                 if getattr(resp, "text", ""):
                     detail = f" — {resp.text[:400]}"
+        from app.services.ai.inference_gateway import scrub_secrets
+
         return {
             "ok": False,
             "latency_ms": latency,
             "status_code": status,
-            "message": f"{type(exc).__name__}: {exc}{detail}",
+            "message": scrub_secrets(f"{type(exc).__name__}: {exc}{detail}"),
         }
 
 
 async def sync_provider_models(db: AsyncSession, provider_key: str) -> Dict[str, Any]:
-    """Fetch the provider's live model list and reconcile into the catalog."""
+    """«همگام‌سازیِ مدل‌ها» button — now the same full reconcile the daily
+    ``ai_model_refresh`` job runs (model_discovery): new models classified and
+    the newest stable switched on, vanished ones switched off (kept)."""
+    from app.services.ai.model_discovery import refresh_provider
+
+    return await refresh_provider(db, provider_key)
+
+
+async def _legacy_sync_provider_models(db: AsyncSession, provider_key: str) -> Dict[str, Any]:
+    """QUARANTINED 2026-10-12 (REMOVAL_CANDIDATES): the old add-only sync
+    (every id added disabled as text-only; nothing ever retired). Kept callable."""
     provider = await db.get(AICatalogProvider, provider_key)
     if provider is None:
         return {"ok": False, "message": "ارائه‌دهنده پیدا نشد"}
@@ -103,7 +115,9 @@ async def sync_provider_models(db: AsyncSession, provider_key: str) -> Dict[str,
     try:
         live_ids = await _list_models(provider, key)
     except Exception as exc:
-        return {"ok": False, "message": f"عدم دریافت فهرست مدل‌ها: {exc}"}
+        from app.services.ai.inference_gateway import safe_error_text
+
+        return {"ok": False, "message": f"عدم دریافت فهرست مدل‌ها: {safe_error_text(exc)}"}
     if not live_ids:
         return {"ok": False, "message": "فهرست مدلی برنگشت"}
 
@@ -145,7 +159,7 @@ async def _list_models(provider: AICatalogProvider, key: str):
     """Return a list of live model ids from the provider's models API."""
     import httpx
 
-    root = (provider.base_url or "").rstrip("/")
+    root = (ai_manager.safe_base_url(provider) or "").rstrip("/")
     async with httpx.AsyncClient(timeout=30.0) as client:
         if provider.key in {"anthropic", "claude_subscription"}:
             headers = {"anthropic-version": "2023-06-01"}
@@ -161,7 +175,8 @@ async def _list_models(provider: AICatalogProvider, key: str):
             resp.raise_for_status()
             return [m["id"] for m in resp.json().get("data", [])]
         if provider.key == "gemini":
-            resp = await client.get(f"{root}/v1beta/models?key={key}&pageSize=1000")
+            resp = await client.get(f"{root}/v1beta/models", params={"pageSize": 1000},
+                                    headers={"x-goog-api-key": key})
             resp.raise_for_status()
             out = []
             for m in resp.json().get("models", []):

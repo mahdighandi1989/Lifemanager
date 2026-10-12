@@ -2,7 +2,7 @@
 
 Native support for three provider families (ported from ALLIN1):
   * Anthropic  → POST {base_url}/v1/messages  (x-api-key, or Bearer for OAuth)
-  * Gemini     → POST {base_url}/v1beta/models/{model}:generateContent?key=
+  * Gemini     → POST {base_url}/v1beta/models/{model}:generateContent (key in x-goog-api-key)
   * OpenAI-compatible (everything else) → POST {base_url}/chat/completions
 
 ``complete`` does text; ``complete_multimodal`` sends PDFs/images for extraction.
@@ -13,6 +13,7 @@ route can always degrade to a placeholder.
 from __future__ import annotations
 
 import base64
+import re
 import os
 from typing import Any, Dict, List, Optional
 
@@ -41,6 +42,49 @@ def _is_gemini(rm: ResolvedModel) -> bool:
 
 
 # --- text completion ---------------------------------------------------------
+
+# --- safety helpers (2026-10-12 hardening review) ----------------------------
+_SECRET_PATTERNS = (
+    re.compile(r"([?&]key=)[^&\s'\"]+"),
+    re.compile(r"AIza[0-9A-Za-z_\-]{20,}"),
+    re.compile(r"sk-[A-Za-z0-9_\-]{16,}"),
+)
+
+
+def scrub_secrets(text: str) -> str:
+    """Remove API keys from any text that may reach a client or a log."""
+    out = str(text or "")
+    for rx in _SECRET_PATTERNS:
+        out = rx.sub(lambda m: (m.group(1) + "***") if m.groups() else "***", out)
+    return out
+
+
+def safe_error_text(exc: BaseException) -> str:
+    """A provider failure as a short, key-free message: HTTP status + the
+    provider's own error message — never the request URL (which used to carry
+    the Gemini key in its query string and leaked it to the browser)."""
+    resp = getattr(exc, "response", None)
+    code = getattr(resp, "status_code", None)
+    if code is not None:
+        detail = ""
+        try:
+            body = resp.json()
+            err = body.get("error") if isinstance(body, dict) else None
+            if isinstance(err, dict):
+                detail = str(err.get("message") or err.get("status") or err.get("type") or "")
+            elif isinstance(err, str):
+                detail = err
+        except Exception:
+            detail = (getattr(resp, "text", "") or "")[:200]
+        return scrub_secrets(f"HTTP {code}" + (f": {detail[:300]}" if detail else ""))
+    return scrub_secrets(f"{type(exc).__name__}: {exc}")[:400]
+
+
+class EmptyAnswer(RuntimeError):
+    """The provider answered 200 but with no usable text (blocked, safety,
+    cut off before any answer…) — a failure, not an empty success."""
+
+
 async def complete(
     db: AsyncSession,
     prompt: str,
@@ -74,6 +118,8 @@ async def complete(
             text = await _gemini_text(rm, prompt, system, max_tokens, temperature)
         else:
             text = await _openai_text(rm, prompt, system, max_tokens, temperature)
+        if not (text or "").strip():
+            raise EmptyAnswer("پاسخِ خالی از مدل")
         await _record_usage(
             db, task=task, rm=rm, ok=True, error=None,
             prompt_chars=len(prompt), output_chars=len(text or ""),
@@ -81,13 +127,14 @@ async def complete(
         )
         return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
     except Exception as exc:  # transport / provider error → uniform failure
+        err = safe_error_text(exc)
         await _record_usage(
             db, task=task, rm=rm, ok=False,
-            error=f"{type(exc).__name__}: {exc}",
+            error=err,
             prompt_chars=len(prompt), output_chars=0,
             latency_ms=int((_time.perf_counter() - _start) * 1000),
         )
-        return {"ok": False, "error": f"{type(exc).__name__}: {exc}", "text": "", "model": rm.display_name}
+        return {"ok": False, "error": err, "text": "", "model": rm.display_name}
 
 
 async def _record_usage(
@@ -173,11 +220,23 @@ async def _anthropic_post(client, url, headers, payload):
 
 
 async def _gemini_text(rm, prompt, system, max_tokens, temperature) -> str:
+    return await _gemini_generate(rm, [{"text": prompt}], system, max_tokens, temperature)
+
+
+GEMINI_STOP_OK = {"STOP", "MAX_TOKENS", None, ""}
+
+
+async def _gemini_generate(rm, parts, system, max_tokens, temperature) -> str:
+    """One generateContent call for every Gemini path. The key travels in the
+    ``x-goog-api-key`` header (never the URL). Thinking models (2.5+/3.x) count
+    their reasoning against maxOutputTokens: an empty answer cut at MAX_TOKENS
+    is retried once with room; a blocked/empty answer raises EmptyAnswer."""
     import httpx
 
     root = (rm.base_url or "https://generativelanguage.googleapis.com").rstrip("/")
-    url = f"{root}/v1beta/models/{rm.model_key}:generateContent?key={rm.api_key}"
-    payload: Dict[str, Any] = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
+    url = f"{root}/v1beta/models/{rm.model_key}:generateContent"
+    headers = {"x-goog-api-key": rm.api_key or ""}
+    payload: Dict[str, Any] = {"contents": [{"role": "user", "parts": parts}]}
     if system:
         payload["systemInstruction"] = {"parts": [{"text": system}]}
     gen: Dict[str, Any] = {}
@@ -188,30 +247,30 @@ async def _gemini_text(rm, prompt, system, max_tokens, temperature) -> str:
     if gen:
         payload["generationConfig"] = gen
     async with httpx.AsyncClient(timeout=_timeout()) as client:
-        resp = await client.post(url, json=payload)
+        resp = await client.post(url, headers=headers, json=payload)
         resp.raise_for_status()
-        data = resp.json()
-        text, finish = _gemini_parse(data)
-        # Gemini 2.5+/3.x "thinking" models count their reasoning against
-        # maxOutputTokens: a small cap can be spent entirely on thinking and the
-        # answer comes back empty with finishReason=MAX_TOKENS. Retry once with
-        # room for both rather than returning "".
+        text, finish, block = _gemini_parse(resp.json())
         if not text.strip() and finish == "MAX_TOKENS" and max_tokens:
             payload["generationConfig"]["maxOutputTokens"] = max(int(max_tokens) * 4, 8192)
-            resp = await client.post(url, json=payload)
+            resp = await client.post(url, headers=headers, json=payload)
             resp.raise_for_status()
-            text, finish = _gemini_parse(resp.json())
+            text, finish, block = _gemini_parse(resp.json())
+    if not text.strip():
+        raise EmptyAnswer(f"Gemini پاسخی نداد (finishReason={finish or '-'}, block={block or '-'})")
+    if finish not in GEMINI_STOP_OK:
+        raise EmptyAnswer(f"Gemini پاسخ را نیمه‌کاره متوقف کرد (finishReason={finish})")
     return text
 
 
 def _gemini_parse(data: Dict[str, Any]):
-    """(answer text without thought parts, finishReason)."""
+    """(answer text without thought parts, finishReason, promptFeedback.blockReason)."""
+    block = (data.get("promptFeedback") or {}).get("blockReason")
     cands = data.get("candidates", [])
     if not cands:
-        return "", None
-    parts = cands[0].get("content", {}).get("parts", [])
+        return "", None, block
+    parts = (cands[0].get("content") or {}).get("parts", []) or []
     text = "".join(p.get("text", "") for p in parts if isinstance(p, dict) and not p.get("thought"))
-    return text, cands[0].get("finishReason")
+    return text, cands[0].get("finishReason"), block
 
 
 async def _openai_text(rm, prompt, system, max_tokens, temperature) -> str:
@@ -278,9 +337,11 @@ async def complete_multimodal(
             text = await _gemini_multimodal(rm, prompt, files, system, max_tokens)
         else:
             text = await _openai_multimodal(rm, prompt, files, system, max_tokens)
+        if not (text or "").strip():
+            raise EmptyAnswer("پاسخِ خالی از مدل")
         return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
     except Exception as exc:
-        return {"ok": False, "error": f"{type(exc).__name__}: {exc}", "text": "", "model": rm.display_name}
+        return {"ok": False, "error": safe_error_text(exc), "text": "", "model": rm.display_name}
 
 
 def _b64(data: bytes) -> str:
@@ -325,28 +386,12 @@ async def _anthropic_multimodal(rm, prompt, files, system, max_tokens) -> str:
 
 
 async def _gemini_multimodal(rm, prompt, files, system, max_tokens) -> str:
-    import httpx
-
-    root = (rm.base_url or "https://generativelanguage.googleapis.com").rstrip("/")
-    url = f"{root}/v1beta/models/{rm.model_key}:generateContent?key={rm.api_key}"
     parts: List[Dict[str, Any]] = []
     for f in files:
         parts.append({"inline_data": {"mime_type": f.get("mimetype") or "application/octet-stream",
                                        "data": _b64(f["data"])}})
     parts.append({"text": prompt})
-    payload: Dict[str, Any] = {"contents": [{"role": "user", "parts": parts}]}
-    if system:
-        payload["systemInstruction"] = {"parts": [{"text": system}]}
-    if max_tokens:
-        payload["generationConfig"] = {"maxOutputTokens": max_tokens}
-    async with httpx.AsyncClient(timeout=_timeout()) as client:
-        resp = await client.post(url, json=payload)
-        resp.raise_for_status()
-        data = resp.json()
-    cands = data.get("candidates", [])
-    if not cands:
-        return ""
-    return "".join(p.get("text", "") for p in cands[0].get("content", {}).get("parts", []) if isinstance(p, dict))
+    return await _gemini_generate(rm, parts, system, max_tokens, None)
 
 
 async def _openai_multimodal(rm, prompt, files, system, max_tokens) -> str:

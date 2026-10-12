@@ -60,6 +60,39 @@ class AIManager:
         return bool(cls.effective_api_key(provider))
 
     # ---- resolution --------------------------------------------------------
+    # The hosts a catalog provider's key may be sent to (2026-10-12 hardening):
+    # a base_url edited to anything else (the settings routes are reachable
+    # without login while REQUIRE_AUTH is off) would hand the stored key to a
+    # stranger, so it is ignored in favour of the catalog's official endpoint.
+    OFFICIAL_HOSTS = {
+        "anthropic": ("api.anthropic.com",),
+        "claude_subscription": ("api.anthropic.com",),
+        "gemini": ("generativelanguage.googleapis.com",),
+        "openai": ("api.openai.com",),
+        "deepseek": ("api.deepseek.com",),
+        "openrouter": ("openrouter.ai",),
+        "perplexity": ("api.perplexity.ai",),
+        "xai": ("api.x.ai",),
+    }
+
+    @classmethod
+    def safe_base_url(cls, provider: AICatalogProvider) -> Optional[str]:
+        allowed = cls.OFFICIAL_HOSTS.get(provider.key)
+        url = provider.base_url
+        if not allowed or not url:
+            return url
+        from urllib.parse import urlparse
+
+        try:
+            u = urlparse(url)
+        except ValueError:
+            u = None
+        if u is not None and u.scheme == "https" and (u.hostname or "").lower() in allowed:
+            return url
+        from app.services.ai.catalog import PROVIDER_CATALOG
+
+        return (PROVIDER_CATALOG.get(provider.key) or {}).get("base_url")
+
     def _build(self, task: str, model: AICatalogModel, provider: AICatalogProvider) -> ResolvedModel:
         return ResolvedModel(
             task=task,
@@ -68,7 +101,7 @@ class AIManager:
             display_name=model.display_name,
             api_key=self.effective_api_key(provider),
             auth_scheme=provider.auth_scheme,
-            base_url=provider.base_url,
+            base_url=self.safe_base_url(provider),
             capabilities=list(model.capabilities or []),
             max_output_tokens=model.max_output_tokens,
             temperature=model.temperature,

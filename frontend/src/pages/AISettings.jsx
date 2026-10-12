@@ -324,7 +324,8 @@ function AISettings({ embedded = false }) {
                 </div>
 
                 {/* Models */}
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">مدل‌ها</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-1">مدل‌ها</h3>
+                <p dir="rtl" className="text-[11px] text-gray-500 mb-2">فهرستِ مدل‌ها هر ۲۴ ساعت خودکار از ارائه‌دهنده گرفته می‌شود: مدلِ تازهٔ پایدار روشن، مدلِ حذف‌شده خاموش (نگه داشته می‌شود). دکمهٔ بالا همین کار را همین الان انجام می‌دهد.</p>
                 <ul className="divide-y divide-gray-100 mb-3">
                   {provModels.length === 0 ? (
                     <li className="text-xs text-gray-400 py-2">مدلی نیست — یک مدل سفارشی اضافه کن یا همگام‌سازی کن.</li>
@@ -336,6 +337,8 @@ function AISettings({ embedded = false }) {
                       </label>
                       {m.is_custom && <span className="text-[10px] bg-amber-50 text-amber-600 rounded px-1.5">سفارشی</span>}
                       {m.source === 'discovered' && <span className="text-[10px] bg-sky-50 text-sky-600 rounded px-1.5">کشف‌شده</span>}
+                      {m.source === 'live' && <span title="هر روز خودکار با فهرستِ زندهٔ ارائه‌دهنده همگام می‌شود" className="text-[10px] bg-emerald-50 text-emerald-700 rounded px-1.5">خودکار</span>}
+                      {(m.notes || '').includes('[owner]') && <span title="انتخابِ دستیِ شما؛ به‌روزرسانیِ خودکار آن را عوض نمی‌کند (جز وقتی مدل از فهرستِ ارائه‌دهنده حذف شود)" className="text-[10px] bg-violet-50 text-violet-700 rounded px-1.5">انتخابِ شما</span>}
                       <span className="flex gap-1 flex-wrap">
                         {(m.capabilities || []).map((c) => (
                           <span key={c} className="text-[10px] bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">{capLabel(c)}</span>

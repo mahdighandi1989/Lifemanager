@@ -101,7 +101,21 @@ def test_overview_dual_mounted(api_client):
     assert api_client.get("/ai/overview").status_code == 200
 
 
+def _signin(api_client):
+    r = api_client.post("/auth/register", json={"email": "cat@example.com", "password": "hunter2-long", "username": "cat"})
+    api_client.headers.update({"Authorization": f"Bearer {r.json()['access_token']}"})
+
+
+def test_catalog_mutations_need_a_signed_in_caller(api_client):
+    """2026-10-12 audit: anyone on the internet could change keys/models."""
+    assert api_client.put("/api/ai/routes/general", json={"model_id": None}).status_code == 401
+    assert api_client.post("/api/ai/models", json={"model_key": "x", "provider_key": "gemini"}).status_code == 401
+    assert api_client.put("/api/ai/providers/gemini", json={"api_key": "x"}).status_code == 401
+    assert api_client.get("/api/ai/models").status_code == 200, "reads stay as they were"
+
+
 def test_create_model_rejects_unknown_provider(api_client):
+    _signin(api_client)
     res = api_client.post(
         "/api/ai/models",
         json={"model_key": "x-custom", "provider_key": "does-not-exist"},
@@ -110,4 +124,5 @@ def test_create_model_rejects_unknown_provider(api_client):
 
 
 def test_update_unknown_route_rejected(api_client):
+    _signin(api_client)
     assert api_client.put("/api/ai/routes/not-a-task", json={"model_id": 0}).status_code == 400

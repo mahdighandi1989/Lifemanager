@@ -69,13 +69,20 @@ def _root(rm) -> str:
     return (rm.base_url or "https://generativelanguage.googleapis.com").rstrip("/")
 
 
+def _kh(rm, extra: Optional[dict] = None) -> dict:
+    """The Gemini key in a header, never in the URL (a URL ends up in error text)."""
+    h = {"x-goog-api-key": rm.api_key or ""}
+    h.update(extra or {})
+    return h
+
+
 async def _upload(client, rm, data: bytes, mime: str, name: str) -> dict:
     """Gemini Files API, resumable — returns {name, uri}; waits until ACTIVE."""
     start = await client.post(
-        f"{_root(rm)}/upload/v1beta/files?key={rm.api_key}",
-        headers={"X-Goog-Upload-Protocol": "resumable", "X-Goog-Upload-Command": "start",
-                 "X-Goog-Upload-Header-Content-Length": str(len(data)),
-                 "X-Goog-Upload-Header-Content-Type": mime},
+        f"{_root(rm)}/upload/v1beta/files",
+        headers=_kh(rm, {"X-Goog-Upload-Protocol": "resumable", "X-Goog-Upload-Command": "start",
+                         "X-Goog-Upload-Header-Content-Length": str(len(data)),
+                         "X-Goog-Upload-Header-Content-Type": mime}),
         json={"file": {"display_name": name[:100]}})
     start.raise_for_status()
     url = start.headers.get("x-goog-upload-url")
@@ -91,7 +98,7 @@ async def _upload(client, rm, data: bytes, mime: str, name: str) -> dict:
         if f.get("state") == "FAILED":
             raise IOError("Gemini فایل را پردازش نکرد (FAILED)")
         await asyncio.sleep(5)
-        r = await client.get(f"{_root(rm)}/v1beta/{f['name']}?key={rm.api_key}")
+        r = await client.get(f"{_root(rm)}/v1beta/{f['name']}", headers=_kh(rm))
         r.raise_for_status()
         f = r.json()
     raise IOError("پردازشِ فایل در Gemini تمام نشد (۱۰ دقیقه)")
@@ -127,12 +134,12 @@ async def transcribe(db, data: bytes, filename: str, mime: str) -> dict:
             for _ in range(MAX_ROUNDS):
                 payload = {"contents": contents,
                            "generationConfig": {"temperature": 0, "maxOutputTokens": rm.max_output_tokens or 32768}}
-                r = await client.post(f"{_root(rm)}/v1beta/models/{rm.model_key}:generateContent?key={rm.api_key}",
-                                      json=payload)
+                r = await client.post(f"{_root(rm)}/v1beta/models/{rm.model_key}:generateContent",
+                                      headers=_kh(rm), json=payload)
                 r.raise_for_status()
                 cand = (r.json().get("candidates") or [{}])[0]
                 piece = "".join(p.get("text", "") for p in (cand.get("content") or {}).get("parts", [])
-                                if isinstance(p, dict))
+                                if isinstance(p, dict) and not p.get("thought"))
                 if END in piece:
                     chunks.append(piece.split(END)[0])
                     finished = True
@@ -152,7 +159,7 @@ async def transcribe(db, data: bytes, filename: str, mime: str) -> dict:
         finally:
             if uploaded and uploaded.get("name"):
                 try:
-                    await client.delete(f"{_root(rm)}/v1beta/{uploaded['name']}?key={rm.api_key}")
+                    await client.delete(f"{_root(rm)}/v1beta/{uploaded['name']}", headers=_kh(rm))
                 except Exception:  # noqa: BLE001 — Gemini expires it in 48h anyway
                     pass
 

@@ -377,6 +377,17 @@ async def _job_app_mirror(db: AsyncSession) -> dict[str, Any]:
     return await sync_pending(db, limit=40)
 
 
+async def _job_ai_model_refresh(db: AsyncSession) -> dict[str, Any]:
+    """Live AI model list → catalog, for every enabled + keyed provider: new
+    models added (newest stable switched on), vanished ones switched off
+    (kept). No hard-coded model list, no button needed (owner 2026-10-12).
+    A provider outage / empty list never switches anything off."""
+    from app.services.ai.model_discovery import refresh_all
+
+    res = await refresh_all(db)
+    return {k: {f: v.get(f) for f in ("ok", "added", "enabled", "retired", "message")} for k, v in res.items()}
+
+
 JobFn = Callable[[AsyncSession], Awaitable[dict[str, Any]]]
 
 # (key, title_fa, interval_minutes_fn, body). Interval is resolved at tick
@@ -429,6 +440,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("app_mirror", "آینهٔ درایوِ رکوردهای برنامه (فولدر + شیت)",
      lambda: _env_minutes("APP_MIRROR_INTERVAL_MINUTES", 15.0),
      _job_app_mirror),
+    ("ai_model_refresh", "به‌روزرسانیِ خودکارِ فهرستِ مدل‌های هوش مصنوعی",
+     lambda: _env_minutes("AI_MODEL_REFRESH_INTERVAL_MINUTES", 24 * 60.0),
+     _job_ai_model_refresh),
 ]
 
 
