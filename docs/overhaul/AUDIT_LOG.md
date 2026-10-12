@@ -4248,3 +4248,9 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **VERIFY:** pytest کامل؛ `npm run build`؛ آزمون‌های مرورگرِ صفحه؛ `apps/learning-architecture/tests/host/run_host_e2e.py`.
 - **REVERT (پیشنهادِ قبلی):** «`REQUIRE_AUTH=true` را روشن کن» نادرست بود — از قبل روشن بود.
 - **CORRECTION (همان روز):** پس از انتشار، `maintenance` در production نشان داد بذر سالم بوده و `ai_model_refresh` در 08:51Z اجرا شده (۶۲ مدل، ۱۱ تازه، `gemini-3.8-flash` روشن، دو مدلِ بازنشسته خاموش). یافتهٔ «شکستِ بی‌صدای بذر» نادرست بود (خواندنِ کهنه)؛ ثبت و نمایشِ نتیجه می‌ماند.
+
+## 2026-10-12 — «گره‌گشا» (کشفِ گره‌های ذهنی/رفتاری/روانی) + یادآورهای تلگرام/ایمیل برای برنامه‌های درون‌ریپو
+- **DECISION (مالک):** مسیرِ «جایی گیر کردم / کاری کردم که نمی‌فهمم چرا» با همهٔ سناریوها، ورزیدگی با نمونه‌های متنوع، درایو، تلگرام/ایمیل، نقشهٔ ذهن.
+- **CHANGE (سرور):** `app/models/app_reminder.py` (`AppReminder`, `AppReminderSend`)، migration `0068_app_reminders`، `app/services/app_reminder_service.py`، مسیرهای `/api/app-records/{app}/reminders` (ورودِ الزامی)، کارِ `app_reminders` در `jobs_engine.JOBS`. ارسال فقط در بازهٔ محلیِ [ساعت، +۱۲ساعت]، سقفِ ۳ در روز از روی لاگِ ارسال، نتیجهٔ صادقانهٔ هر کانال (`send_email`/`send_telegram` ِ قدیمی بی‌پیکربندی True برمی‌گردانند؛ این‌جا `skipped_unconfigured` ثبت می‌شود)، جیمیلِ وصل‌شده‌ای که خطا داد = `failed` و تلاشِ دوباره فقط برای همان کانال.
+- **CHANGE (صفحه):** جزئیات در `apps/learning-architecture/docs/WORKLOG.md` (18) و طرحِ بازبینی‌شده `apps/learning-architecture/docs/specs/KNOTS.md`.
+- **VERIFY:** `tests/test_app_reminders.py`؛ pytest کامل؛ `npm run build`؛ آزمون‌های مرورگرِ صفحه و `run_host_e2e.py`.

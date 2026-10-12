@@ -65,7 +65,12 @@
     knot.status = status;
     if (status === "practised") knot.solvedAt = at;
     if (status === "returned") knot.returnedAt = at;
-    if (!opts.noSave) S.put(knot);
+    if (knot.hist.length > 120) knot.hist = knot.hist.slice(-120);
+    /* پس از ذخیره، یادآورِ پیگیری هم‌گام می‌شود (a17)؛ مثلاً گرهِ «بازگشته» دوباره یادآور می‌گیرد. با noSave صدازننده
+       خودش همین حالا ذخیره می‌کند ⇒ هم‌گام‌سازی یک قدم بعد (پس از همان ذخیره) اجرا می‌شود. opts.noRemind ⇒ بی یادآور. */
+    function remind() { if (typeof A.kremindSync === "function") { try { A.kremindSync(knot); } catch (e) { console.error(e); } } }
+    if (!opts.noSave) { S.put(knot); if (!opts.noRemind) remind(); }
+    else if (!opts.noRemind) setTimeout(remind, 0);
     return true;
   };
 
@@ -74,18 +79,14 @@
   function byCreated(a, b) { return String(a.created || "").localeCompare(String(b.created || "")) || String(a.id).localeCompare(String(b.id)); }
   function allKnots() { return S.all("knot").sort(byCreated); }
   function allCases() { return S.all("kcase").sort(byCreated); }
-  /* گره‌های ریشهٔ یک موقعیت (قدمِ ۳): root.primary + root.extra — منبعِ یال‌های هم‌رخداد */
-  function rootKnots(c) {
-    var r = (c && c.root) || {}, out = [];
-    [r.primary].concat(Array.isArray(r.extra) ? r.extra : []).forEach(function (x) { var id = idOf(x); if (id && out.indexOf(id) < 0) out.push(id); });
-    return out;
-  }
-  /* همهٔ گره‌هایی که یک موقعیت به آن‌ها اشاره می‌کند (ریشه + knots[]) */
+  /* گره‌های یک موقعیت (قدمِ ۳): kc.knots = [اصلی، کمکی‌ها…] — منبعِ یال‌های «هم‌رخداد در یک موقعیت».
+     root.primary / root.extra شناسهٔ «خانواده» (F1…) است نه گره؛ خانوادهٔ کمکیِ بی‌گره یالی نمی‌سازد (ممیزی ۲۰۲۶-۱۰-۱۲). */
   function caseKnotRefs(c) {
-    var out = rootKnots(c);
-    (Array.isArray(c.knots) ? c.knots : []).forEach(function (x) { var id = idOf(x); if (id && out.indexOf(id) < 0) out.push(id); });
+    var out = [];
+    (Array.isArray(c && c.knots) ? c.knots : []).forEach(function (x) { var id = idOf(x); if (id && out.indexOf(id) < 0) out.push(id); });
     return out;
   }
+  var rootKnots = caseKnotRefs;
   /* موقعیت‌های پیوندخوردهٔ یک گره: A.knotCases (a16) اگر هست، وگرنه knot.cases ∪ موقعیت‌هایی که به آن اشاره می‌کنند */
   function casesOf(k, cases) {
     if (typeof A.knotCases === "function") {
@@ -212,9 +213,12 @@
      ده بازه: [۰،۱۰)، …، [۹۰،۱۰۰] (۱۰۰ در بازهٔ آخر). */
   A.kmapCalib = function () {
     var raw = [];
-    S.all("kitem", function (it) { return !it.bad; }).forEach(function (it) {
+    /* فقط نمونه‌هایی که پاسخِ دقیق دارند (A.kcountable ِ a17: کد، هوش مصنوعیِ وارسی‌شده، ساختهٔ کاربر با عدد/گزینه)؛
+       خودسنجی‌ها (روبریک/متنِ آزاد) و «وارسی‌نشده»ها «درستی»ِ قابلِ‌اتکا ندارند و بیرون‌اند (ممیزی ۲۰۲۶-۱۰-۱۲). */
+    var countable = typeof A.kcountable === "function" ? A.kcountable : function (it) { return !it.bad; };
+    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) {
       (Array.isArray(it.hist) ? it.hist : []).forEach(function (x) {
-        if (!x || x.conf == null || x.conf === "" || x.ok == null || x.ok === "") return;
+        if (!x || x.self || x.conf == null || x.conf === "" || x.ok == null || x.ok === "") return;
         var c = parseFloat(x.conf); if (isNaN(c)) return;
         raw.push({ c: c, ok: x.ok === true || x.ok === 1 || x.ok === "1" || x.ok === "true" });
       });
@@ -597,7 +601,7 @@
   function calibCard() {
     var C = A.kmapCalib(), card = h("section", { class: "card km-chart km-calib", "aria-labelledby": "kmCaT" });
     card.appendChild(h("h2", { id: "kmCaT" }, "کالیبراسیونِ ورزش‌های گره"));
-    card.appendChild(h("p", { class: "small muted" }, "اطمینانی که پیش از هر پاسخ در ورزشِ گره دادی، در برابرِ درصدِ پاسخ‌های درست — در ده بازهٔ ۱۰ درصدی. این نمودار جدا از کالیبراسیونِ مشترکِ برنامه است (دامنهٔ دیگری است) و نمونه‌های «معیوب» در آن نیستند."));
+    card.appendChild(h("p", { class: "small muted" }, "اطمینانی که پیش از هر پاسخ در ورزشِ گره دادی، در برابرِ درصدِ پاسخ‌های درست — در ده بازهٔ ۱۰ درصدی. این نمودار جدا از کالیبراسیونِ مشترکِ برنامه است (دامنهٔ دیگری است). فقط نمونه‌های پاسخ‌دقیق حساب می‌شوند؛ خودسنجی‌ها (روبریک، متنِ آزاد)، «وارسی‌نشده»ها و نمونه‌های «معیوب» در آن نیستند."));
     if (!C.n) { card.appendChild(h("p", { class: "small muted km-cempty" }, "هنوز پاسخی با درصدِ اطمینان در ورزش‌های گره ثبت نشده.")); return card; }
     var W = 420, H = 320, L = 44, R = 14, Tp = 14, B = 44, w = W - L - R, hh = H - Tp - B;
     function X(c) { return L + w * c / 100; } function Y(a) { return Tp + hh * (1 - a / 100); }
@@ -983,7 +987,7 @@
     note: "نمودارِ توضیحیِ نمایشی، بر پایهٔ «ارزیابیِ پویا» (Vygotsky/Feuerstein؛ Campione & Brown 1987): پله‌ای که در آن قفل باز می‌شود خودش شاهد است — ولی شاهدِ ضعیف (+۱)، چون هر پله پس از زمان و راهنمایی‌های پله‌های قبلی می‌آید. وزن‌ها همان وزن‌های ثابتِ طرحِ گره‌گشا هستند، نه برآورد.",
     draw: function () {
       var L = [
-        ["۰", "۲ تا ۵ دقیقهٔ دیگر بی‌راهنمایی", null, "پلهٔ کنترل: اگر همین‌جا باز شد، فقط زمانِ بیشتری لازم بود؛ برای هیچ خانواده‌ای امتیاز نمی‌دهد."],
+        ["۰", "۲ تا ۵ دقیقهٔ دیگر بی‌راهنمایی", "F4", "پلهٔ کنترل: اگر همین‌جا باز شد، فقط زمانِ بیشتری لازم بود — شاهدِ ضعیفِ کنترل (+۱) هم برای «پایش و فراشناخت» (زیرنوعِ قاعدهٔ توقف: شاید زود دست کشیده بودی) و هم برای «ظرفیت و حالتِ ذهنی» (شاید فشار/بار)؛ همان دو شاهدی که موتورِ قدمِ ۲ ثبت می‌کند.", "F5"],
         ["۱", "صورت را دوباره و کلمه‌به‌کلمه بخوان", "F2", "+۱ (ضعیف) برای «بازنماییِ مسئله» — زیرنوعِ خواندن."],
         ["۲", "هدف و همهٔ قیدها را بازگو کن؛ کدام را خودت فرض کردی؟", "F2", "+۱ (ضعیف) برای «بازنماییِ مسئله» — زیرنوعِ بازنمایی/قیدِ خودساخته."],
         ["۳", "روی کاغذ رسم یا جدول کن", "F5", "+۱ (ضعیف) برای «ظرفیت و حالتِ ذهنی» — بارِ حافظهٔ کاری."],
@@ -996,7 +1000,7 @@
       L.forEach(function (r, i) {
         list.appendChild(h("li", { class: "ks-rung", "data-step": i },
           h("button", { type: "button", class: "btn ghost sm ks-rb", "aria-pressed": "false", onclick: function () { sel = i; mark(); } },
-            h("b", {}, "پلهٔ " + r[0] + ": "), r[1], r[2] ? h("span", { class: "chip" }, famName(r[2])) : h("span", { class: "chip" }, i === 0 ? "کنترل" : "تشخیصی نیست"))));
+            h("b", {}, "پلهٔ " + r[0] + ": "), r[1], r[2] ? h("span", { class: "chip" }, famName(r[2])) : null, r[4] ? h("span", { class: "chip" }, famName(r[4])) : null, i === 0 ? h("span", { class: "chip" }, "کنترل · ضعیف") : !r[2] ? h("span", { class: "chip" }, "تشخیصی نیست") : null)));
       });
       box.appendChild(list);
       box.appendChild(h("button", { type: "button", class: "btn ghost sm", "data-act": "none", onclick: function () { sel = -1; mark(); } }, "هیچ پله‌ای باز نکرد"));

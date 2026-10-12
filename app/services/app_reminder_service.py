@@ -166,24 +166,53 @@ async def _send_email(db: AsyncSession, subject: str, text: str) -> str:
             to = ""
     if not to:
         return "skipped_unconfigured"
+    gmail_err = None
     try:
         from app.services.google_sync.gmail_service import send_email_gmail
 
         res = await send_email_gmail(db, to, subject, text)
         if res.get("ok"):
             return "sent"
+        if res.get("error") != "not_connected":
+            gmail_err = res.get("error") or "error"
     except Exception as exc:  # noqa: BLE001
-        logger.warning("reminder gmail failed: %s", type(exc).__name__)
-    if not (os.environ.get("SMTP_HOST") or "").strip():
-        return "skipped_unconfigured"
-    from app.services.notification_service import send_email
+        gmail_err = type(exc).__name__
+        logger.warning("reminder gmail failed: %s", gmail_err)
+    if (os.environ.get("SMTP_HOST") or "").strip():
+        from app.services.notification_service import send_email
 
-    ok = await asyncio.to_thread(send_email, to=to, subject=subject, body=text)
-    return "sent" if ok else "failed"
+        ok = await asyncio.to_thread(send_email, to=to, subject=subject, body=text)
+        return "sent" if ok else "failed"
+    # Gmail IS connected but errored ⇒ a real failure (retried), not «unconfigured»
+    return "failed" if gmail_err else "skipped_unconfigured"
+
+
+WINDOW_HOURS = 12  # never send outside [hour, hour+12) local — no 23:30 or 04:30 messages
+
+
+def _in_window(now: datetime, hour: int, tz: str) -> bool:
+    loc = now.astimezone(_zone(tz))
+    start = datetime.combine(loc.date(), time(max(0, min(23, hour)), 0), tzinfo=_zone(tz))
+    return start <= loc < start + timedelta(hours=WINDOW_HOURS)
+
+
+def _next_window(now: datetime, hour: int, tz: str) -> datetime:
+    """The next moment ≥ now that is inside the local send window (today's hour or tomorrow's)."""
+    if _in_window(now, hour, tz):
+        return now
+    loc = now.astimezone(_zone(tz))
+    today = send_time_utc(loc.date().isoformat(), hour, tz)
+    return today if today > now else send_time_utc((loc.date() + timedelta(days=1)).isoformat(), hour, tz)
 
 
 async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, senders=None) -> Dict[str, Any]:
-    """Send every pending reminder whose time has come (the ``app_reminders`` job)."""
+    """Send every pending reminder whose time has come (the ``app_reminders`` job).
+
+    * only inside the local window [hour, hour+12h); a late upsert or a retry outside it waits;
+    * at most DAILY_CAP deliveries per user/app per LOCAL day, counted from the send log;
+    * a channel that already got the message is never re-sent; only failed channels are retried."""
+    from app.models.app_reminder import AppReminderSend
+
     now = now or datetime.now(timezone.utc)
     tg_send, mail_send = senders or (_send_telegram, lambda subj, txt: _send_email(db, subj, txt))
     rows = (await db.execute(select(AppReminder).where(AppReminder.status.in_(["pending", "retry"]),
@@ -191,21 +220,28 @@ async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, sende
                              .order_by(AppReminder.send_at, AppReminder.id).limit(50))).scalars().all()
     out = {"due": len(rows), "sent": 0, "deferred": 0, "failed": 0, "unconfigured": 0}
     for r in rows:
-        zone = _zone(r.tz)
-        local_day = now.astimezone(zone).date()
-        start = datetime.combine(local_day, time(0, 0), tzinfo=zone).astimezone(timezone.utc)
-        sent_today = (await db.execute(select(func.count(AppReminder.id)).where(
-            AppReminder.user_id == r.user_id, AppReminder.app == r.app, AppReminder.sent_at >= start,
-            AppReminder.status.in_(["sent", "partial"])))).scalar() or 0
-        if sent_today >= DAILY_CAP:
-            nxt = local_day + timedelta(days=1)
-            r.send_at = send_time_utc(nxt.isoformat(), r.hour, r.tz)
+        if not _in_window(now, r.hour if r.hour is not None else 9, r.tz):
+            r.send_at = _next_window(now, r.hour if r.hour is not None else 9, r.tz)
             out["deferred"] += 1
             await db.commit()
             continue
-        chans = [c for c in (r.channels or "").split(",") if c]
+        zone = _zone(r.tz)
+        local_day = now.astimezone(zone).date()
+        start = datetime.combine(local_day, time(0, 0), tzinfo=zone).astimezone(timezone.utc)
+        sent_today = (await db.execute(select(func.count(AppReminderSend.id)).where(
+            AppReminderSend.user_id == r.user_id, AppReminderSend.app == r.app, AppReminderSend.at >= start))).scalar() or 0
+        try:
+            prev = json.loads(r.result or "{}") if r.status == "retry" else {}
+        except ValueError:
+            prev = {}
+        chans = [c for c in (r.channels or "").split(",") if c and prev.get(c) != "sent"]
+        if sent_today >= DAILY_CAP and not any(v == "sent" for v in prev.values()):
+            r.send_at = send_time_utc((local_day + timedelta(days=1)).isoformat(), r.hour, r.tz)
+            out["deferred"] += 1
+            await db.commit()
+            continue
         text = _text(r)
-        res = {}
+        res = dict(prev)
         for c in chans:
             try:
                 res[c] = await (tg_send(text) if c == "telegram" else mail_send(r.title or "یادآور", text))
@@ -215,16 +251,18 @@ async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, sende
         vals = set(res.values())
         r.attempts = (r.attempts or 0) + 1
         r.result = json.dumps(res, ensure_ascii=False)
-        if "sent" in vals and "failed" not in vals:
-            r.status, r.sent_at = "sent", now
-            out["sent"] += 1
-        elif "sent" in vals:
-            r.status, r.sent_at = "partial", now
-            out["sent"] += 1
-        elif "failed" in vals and r.attempts < MAX_ATTEMPTS:
+        newly = [c for c in chans if res.get(c) == "sent"]
+        if newly and not any(v == "sent" for v in prev.values()):
+            db.add(AppReminderSend(user_id=r.user_id, app=r.app, rkey=r.rkey, at=now, result=r.result))
+        if "failed" in vals and r.attempts < MAX_ATTEMPTS:
             r.status = "retry"
-            r.send_at = now + timedelta(minutes=min(15 * (2 ** r.attempts), 360))
+            r.send_at = _next_window(now + timedelta(minutes=min(15 * (2 ** r.attempts), 360)), r.hour if r.hour is not None else 9, r.tz)
+            if "sent" in vals:
+                r.sent_at = r.sent_at or now
             out["failed"] += 1
+        elif "sent" in vals:
+            r.status, r.sent_at = ("partial" if "failed" in vals else "sent"), (r.sent_at or now)
+            out["sent"] += 1
         elif "failed" in vals:
             r.status = "failed"
             out["failed"] += 1

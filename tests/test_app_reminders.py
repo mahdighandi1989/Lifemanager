@@ -84,3 +84,72 @@ def test_reminder_job_is_registered():
     from app.services.jobs_engine import JOBS
 
     assert {k: fn() for k, _t, fn, _b in JOBS}["app_reminders"] == 15.0
+
+
+@pytest.mark.asyncio
+async def test_audit_window_partial_retry_and_cap_after_reupsert(db_session):
+    from datetime import timedelta
+
+    from app.models.app_reminder import AppReminder
+    from app.services import app_reminder_service as svc
+    from sqlalchemy import select
+
+    base = {"title": "گره‌گشا", "body": "یک ورزشِ گره موعد است", "link": "?tab=kpractice", "hour": 9, "tz": "Asia/Tehran"}
+    calls = []
+
+    async def tg(text):
+        calls.append("tg"); return "sent"
+
+    async def mail_fail(subj, text):
+        calls.append("mail"); return "failed"
+
+    # (I7) upserted late at night for «today 9:00» ⇒ NOT sent at 23:30 local; waits for tomorrow 9:00
+    late = datetime(2026, 10, 13, 20, 0, tzinfo=timezone.utc)  # 23:30 Tehran
+    await svc.upsert(db_session, user_id=7, app="a", items=[dict(base, key="w", due_date="2026-10-13", channels=["telegram"])])
+    r = await svc.deliver_due(db_session, now=late, senders=(tg, mail_fail))
+    assert r["deferred"] == 1 and calls == []
+    row = (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "w"))).scalar_one()
+    assert row.send_at.replace(tzinfo=timezone.utc) == datetime(2026, 10, 14, 5, 30, tzinfo=timezone.utc)
+    await svc.cancel(db_session, user_id=7, app="a", key="w")
+
+    # (I8) partial: Telegram sent, email failed ⇒ retry ONLY e-mail, never re-send Telegram
+    t = datetime(2026, 10, 14, 5, 31, tzinfo=timezone.utc)
+    await svc.upsert(db_session, user_id=8, app="a", items=[dict(base, key="p", due_date="2026-10-14")])
+    await svc.deliver_due(db_session, now=t, senders=(tg, mail_fail))
+    row = (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "p"))).scalar_one()
+    assert row.status == "retry" and calls.count("tg") == 1
+    calls.clear()
+    await svc.deliver_due(db_session, now=row.send_at.replace(tzinfo=timezone.utc) + timedelta(seconds=1), senders=(tg, mail_fail))
+    assert calls == ["mail"], "only the failed channel is retried"
+
+    # (I9) cap counts real deliveries: 3 sent, then one re-upserted + one new ⇒ no 4th message today
+    calls.clear()
+    for i in range(3):
+        await svc.upsert(db_session, user_id=9, app="a", items=[dict(base, key=f"c{i}", due_date="2026-10-14", channels=["telegram"])])
+    await svc.deliver_due(db_session, now=t, senders=(tg, mail_fail))
+    assert calls.count("tg") == 3
+    await svc.upsert(db_session, user_id=9, app="a", items=[dict(base, key="c0", due_date="2026-10-14", hour=10, channels=["telegram"]),
+                                                          dict(base, key="c9", due_date="2026-10-14", channels=["telegram"])])
+    r = await svc.deliver_due(db_session, now=t + timedelta(hours=2), senders=(tg, mail_fail))
+    assert calls.count("tg") == 3 and r["deferred"] == 2
+
+
+@pytest.mark.asyncio
+async def test_connected_gmail_error_is_a_failure_not_unconfigured(db_session, monkeypatch):
+    from app.services import app_reminder_service as svc
+    from app.services.google_sync import gmail_service
+
+    monkeypatch.setenv("NOTIFICATION_EMAIL_TO", "owner@example.com")
+    monkeypatch.delenv("SMTP_HOST", raising=False)
+
+    async def boom(db, to, subj, body, **kw):
+        return {"ok": False, "error": "http_500"}
+
+    monkeypatch.setattr(gmail_service, "send_email_gmail", boom)
+    assert await svc._send_email(db_session, "s", "t") == "failed"
+
+    async def nc(db, to, subj, body, **kw):
+        return {"ok": False, "error": "not_connected"}
+
+    monkeypatch.setattr(gmail_service, "send_email_gmail", nc)
+    assert await svc._send_email(db_session, "s", "t") == "skipped_unconfigured"

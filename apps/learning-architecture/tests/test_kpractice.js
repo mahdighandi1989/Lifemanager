@@ -94,11 +94,27 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.mast2 = await p.evaluate(() => APP.kmastery(APP.S.get('knot_t1')).crit);
   await p.waitForTimeout(1500);
   info.unremPractised = await p.evaluate(() => window.__unrem.includes('knot:knot_t1'));
-  info.shist = await p.evaluate(() => (APP.S.get('knot_t1').shist || []).map(x => x.to).join('>'));
+  // I2: one status writer (A.knotSetStatus) ⇒ knot.hist; a17 no longer writes shist
+  info.shist = await p.evaluate(() => (APP.S.get('knot_t1').hist || []).map(x => x.status).join('>') + (APP.S.get('knot_t1').shist ? '|SHIST' : ''));
+  // Minor6: a wrong answer after «ورزیده‌شده» does not silently drop the status — it stays, with a visible note
+  info.lapse = await p.evaluate(() => {
+    const it = APP.kitemsOf('knot_t1').find(i => !i.decoy && APP.kcountable(i));
+    APP.krecord(it, { ok: false, conf: 70, ans: 'x', saw: true, sess: 'lapse' });
+    const k = APP.S.get('knot_t1'), m = APP.kmastery(k);
+    return k.status + '|' + m.status + '|' + !!m.lapse + '|' + APP.knotStatus(k);
+  });
+  await p.evaluate(() => APP.go('kpractice', 'knot_t1')); await p.waitForTimeout(100);
+  info.lapseShown = await p.locator('main .kp-lapse').innerText().catch(() => '');
+  await p.evaluate(() => APP.go('knot', 'knot_t1')); await p.waitForTimeout(100);
+  info.lapseShownKnot = await p.locator('main .kn-lapse').count();
+  await p.waitForTimeout(1400);
   // ۶) بازگشت: موقعیتِ تازه پس از ورزیده‌شدن
   await p.waitForTimeout(20);
-  await p.evaluate(() => { APP.S.put({ id: 'kc_new', type: 'kcase', title: 'دوباره پیش آمد', knots: ['knot_t1'] }); const k = APP.S.get('knot_t1'); k.cases = ['kc_new']; APP.S.put(k); APP.go('kpractice'); });
+  await p.evaluate(() => { window.__rem = []; APP.S.put({ id: 'kc_new', type: 'kcase', title: 'دوباره پیش آمد', knots: ['knot_t1'] }); const k = APP.S.get('knot_t1'); k.cases = ['kc_new']; APP.S.put(k); APP.go('kpractice'); });
   info.status3 = await p.evaluate(() => APP.S.get('knot_t1').status + '|' + !!APP.S.get('knot_t1').returnedAt);
+  await p.waitForTimeout(50);
+  info.remAfterReturn = await p.evaluate(() => window.__rem.filter(x => x.key === 'knot:knot_t1').length);
+  info.histAfterReturn = await p.evaluate(() => (APP.S.get('knot_t1').hist || []).map(x => x.status).join('>'));
   await p.evaluate(() => { APP.S.put({ id: 'knot_t3', type: 'knot', name: 'ب', fam: 'F4', status: 'practised', solvedAt: new Date().toISOString(), cases: [] }); });
   info.knotReturned = await p.evaluate(() => APP.knotReturned('knot_t3') + '|' + APP.S.get('knot_t3').status + '|' + APP.knotReturned('knot_t3'));
   // ۷) نمونهٔ معیوب ⇒ بیرون از معیار
@@ -127,27 +143,34 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.go('kpractice', 'knot_t2', 'items');
   });
   info.codeGensF4 = await p.locator('main [data-gen]').count();
+  // Minor5: the SAME notice component as a16 (exact preview + whole-word name removal) before every AI request
   await p.click('main #kpAI'); await p.waitForTimeout(150);
-  info.gate = await p.locator('main .kp-gate').count();
+  info.gate = await p.locator('.kn-ai').count();
+  info.gatePreviewRaw = await p.inputValue('#knAiPre');
   info.aiCallsBeforeOk = await p.evaluate(() => window.__ai.length);
-  await p.check('main #kpStrip'); await p.fill('main #kpNames', 'علی');
-  await p.click('main .kp-gate .btn:has-text("بفرست")'); await p.waitForTimeout(800);
+  await p.fill('#knAiNames', 'علی'); await p.waitForTimeout(80);
+  info.gatePreview = await p.inputValue('#knAiPre');
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(800);
   info.ai = await p.evaluate(() => APP.kitemsOf('knot_t2').filter(i => i.gen.by === 'ai').map(i => i.answer + ':' + (i.ver.ok ? 'ok' : 'unv') + ':' + i.ver.agree + ':' + (i.ver.deepOk ? 'deep' : 'nodeep')).sort().join(' '));
   info.rejected = await p.evaluate(() => APP._klastRep.rejected.map(r => r.why.slice(0, 12)).join(' | '));
   info.solverCalls = await p.evaluate(() => window.__ai.filter(x => x.sys !== APP.KGEN_SYS.slice(0, 40)).length);
-  info.namesStripped = await p.evaluate(() => window.__ai.every(x => !/علی/.test(x.user)) && /«شخصِ ۱»/.test(window.__ai[0].user));
+  info.namesStripped = await p.evaluate(() => window.__ai.every(x => !/(^|[^آ-ی])علی([^آ-ی]|$)/.test(x.user)) && /\[شخص\]/.test(window.__ai[0].user));
+  info.previewExact = await p.evaluate(pv => window.__ai[0].user === pv, info.gatePreview);
+  info.previewHadName = /علی/.test(info.gatePreviewRaw) && !/(^|[^آ-ی])علی([^آ-ی]|$)/.test(info.gatePreview);
   info.solverNoAnswer = await p.evaluate(() => window.__ai.filter(x => /کدام آزمون/.test(x.user)).every(x => !/"answer"\s*:\s*"b"/.test(x.user)));
   info.unvHidden = await p.evaluate(() => { const u = APP.kitemsOf('knot_t2').find(i => i.ver && !i.ver.ok); const a = APP.kservable(u); const st = APP.S.settings(); st.knots = st.knots || {}; st.knots.showUnverified = true; const b2 = APP.kservable(u); st.knots.showUnverified = false; return a + '|' + b2 + '|' + APP.kcountable(u); });
   info.unvLabel = await p.locator('main details summary:has-text("وارسی‌نشده")').count();
-  // دومین درخواست در همین نشست: اعلام دوباره نمی‌آید
+  // دومین درخواست در همین نشست: اعلام دوباره می‌آید (پیش از هر درخواست) و تا «بفرست» چیزی فرستاده نمی‌شود
   await p.evaluate(() => { window.__ai = []; APP.go('kpractice', 'knot_t2', 'items'); });
-  await p.click('main #kpAI'); await p.waitForTimeout(800);
-  info.gateAgain = await p.locator('main .kp-gate').count(); info.aiCalls2 = await p.evaluate(() => window.__ai.length);
-  // ایمنی: کلیدواژهٔ آسیب به خود ⇒ پیامِ کمک پیش از هر درخواست
-  await p.evaluate(() => { window.__ai = []; APP.S.put({ id: 'knot_t4', type: 'knot', name: 'ج', fam: 'F8', principle: 'نفرینِ دانش', example: 'گاهی به خودکشی فکر می‌کنم', cases: [], status: 'open' }); APP.go('kpractice', 'knot_t4', 'items'); });
+  await p.click('main #kpAI'); await p.waitForTimeout(400);
+  info.gateAgain = await p.locator('.kn-ai').count(); info.aiCalls2 = await p.evaluate(() => window.__ai.length);
+  await p.click('.kn-ai .btn.ghost'); await p.waitForTimeout(100);
+  info.cancelNoCall = await p.evaluate(() => window.__ai.length) === 0 && await p.locator('main #kpAI').isEnabled();
+  // ایمنی (C1): همان بررسیِ a16 — «دلم می‌خواد بمیرم» هم (که فهرستِ قدیمیِ a17 نمی‌دید) کارتِ کمک را پیش از هر درخواست می‌آورد
+  await p.evaluate(() => { window.__ai = []; APP.S.put({ id: 'knot_t4', type: 'knot', name: 'ج', fam: 'F8', principle: 'نفرینِ دانش', example: 'دلم می‌خواد بمیرم وقتی جلسه این‌طور می‌شود', cases: [], status: 'open' }); APP.go('kpractice', 'knot_t4', 'items'); });
   await p.click('main #kpAI'); await p.waitForTimeout(150);
-  info.safety = await p.locator('main .kp-gate.bad').count(); info.safetyText = /۱۲۳/.test(await p.locator('main .kp-gate.bad').innerText());
-  await p.click('main .kp-gate.bad .btn:has-text("فعلاً نه")'); await p.waitForTimeout(100);
+  info.safety = await p.locator('.kn-safe').count(); info.safetyText = /123/.test(await p.locator('.kn-safe').innerText()) && (await p.locator('.kn-ai').count()) === 0;
+  await p.click('.kn-safe .btn.ghost'); await p.waitForTimeout(100);
   info.safetyNoCall = await p.evaluate(() => window.__ai.length);
   // بی هوش مصنوعی: قالبِ کاربر
   await p.evaluate(() => APP.go('kpractice', 'knot_t4', 'items'));
@@ -183,6 +206,13 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.settingSaved = await p.evaluate(() => APP.S.settings().knots.notify.detail);
   await p.evaluate(() => { APP.S.put({ id: 'knot_t5', type: 'knot', name: 'ترس از قضاوت', fam: 'F7', cases: [], status: 'open' }); APP.kmakeUser(APP.S.get('knot_t5'), { atype: 'rubric', prompt: 'در جلسه نظرت را بگو', rubric: ['یک جمله', 'زمانِ مناسب'], form: 'real' }); });
   info.f7NoDetail = await p.evaluate(() => APP.kremindPayload(APP.S.get('knot_t5')).detail === null);
+  // I5: F7/F9 as a SECONDARY family of the knot, or in the root of a linked situation ⇒ still no detail
+  info.privExtra = await p.evaluate(() => {
+    const mk = (id, o) => { APP.S.put(Object.assign({ id, type: 'knot', name: 'گرهِ ' + id, cases: [], status: 'open' }, o)); APP.kmakeCode(id, 'jars', 1, 0, 1); return APP.kremindPayload(APP.S.get(id)); };
+    APP.S.put({ id: 'kc_t7', type: 'kcase', title: 't7', root: { primary: 'F3', extra: [{ fam: 'F9' }] }, knots: ['knot_t7'] });
+    const a = mk('knot_t6', { fam: 'F8', extra: [{ fam: 'F7' }] }), b = mk('knot_t7', { fam: 'F3', cases: ['kc_t7'] }), c = mk('knot_t8', { fam: 'F3' });
+    return [a.detail === null, b.detail === null, !!c.detail].join(',');
+  });
   await p.click('main label[for="kpTg"]'); await p.click('main label[for="kpEm"]'); await p.waitForTimeout(100);
   info.bothOffUnremind = await p.evaluate(() => window.__unrem.includes('knot:knot_t2'));
   await p.click('main label[for="kpTg"]'); await p.click('main label[for="kpDet"]'); await p.waitForTimeout(50);
@@ -193,6 +223,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.evaluate(() => { APP.kmakeCode('knot_t1', 'wason', 1, 0, 1); });
   info.dueRow = await p.evaluate(() => APP.dueList().filter(x => /ورزشِ گره/.test(x.txt)).length);
   await p.evaluate(() => APP.go('home')); await bad('home');
+  // I4: F1 has no code generator ⇒ an honest notice; F2 now offers the hidden-constraint task in 3 forms + «بازخوانیِ صورت»
+  await p.evaluate(() => { APP.S.put({ id: 'knot_f1', type: 'knot', name: 'مفهوم', fam: 'F1', principle: 'p', cases: [], status: 'open' }); APP.S.put({ id: 'knot_f2', type: 'knot', name: 'بازنمایی', fam: 'F2', principle: 'p', cases: [], status: 'open' }); APP.go('kpractice', 'knot_f1', 'items'); });
+  info.f1Gap = await p.locator('main .kp-codegap').count() + ':' + await p.evaluate(() => APP.kcodeGap(APP.S.get('knot_t1')) === null);
+  await p.evaluate(() => APP.go('knot', 'knot_f1')); await p.waitForTimeout(80);
+  info.f1GapKnot = await p.locator('main .kn-codegap').count();
+  await p.evaluate(() => APP.go('kpractice', 'knot_f2', 'items'));
+  info.f2Gens = await p.evaluate(() => [...document.querySelectorAll('main [data-gen]')].map(b => b.dataset.gen).join(','));
+  await p.click('main [data-gen="reread"]'); await p.waitForTimeout(80); await p.click('main [data-gen="hidden24"]'); await p.waitForTimeout(100);
+  info.f2Forms = await p.evaluate(() => [...new Set(APP.kitemsOf('knot_f2').filter(i => !i.decoy).map(i => i.form))].sort().join(','));
   // جلسهٔ درهم‌تنیده: نامِ گره پیش از پاسخ پنهان
   await p.evaluate(() => { APP.kmakeCode('knot_t3', 'rule246', 1, 0, 1); APP.go('kpractice', null, 'run'); });
   info.interleavedHidesName = (await p.locator('main .kp-item .chip:has-text("گره:")').count()) === 0;
@@ -233,12 +272,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.s2 === 8, 'session 2 items: ' + info.s2);
   chk(info.status2 === 'practised', 'not practised after s2: ' + info.status2 + ' ' + JSON.stringify(info.mast2));
   chk(info.unremPractised, 'practised knot reminder not cancelled');
-  chk(info.shist === 'working>practised', 'status history: ' + info.shist);
+  chk(info.shist === 'working>practised', 'status history (single writer, no shist): ' + info.shist);
+  chk(info.lapse === 'practised|practised|true|practised' && /پس از ورزیدگی/.test(info.lapseShown) && info.lapseShownKnot === 1, 'Minor6 lapse: ' + info.lapse + ' ' + info.lapseShown + ' ' + info.lapseShownKnot);
   chk(info.status3 === 'returned|true', 'returned detection: ' + info.status3);
+  chk(info.remAfterReturn >= 1 && info.histAfterReturn === 'working>practised>returned', 'I2 returned ⇒ follow-up reminder + hist: ' + info.remAfterReturn + ' ' + info.histAfterReturn);
   chk(info.knotReturned === 'true|returned|false', 'A.knotReturned: ' + info.knotReturned);
   chk(info.badExcluded, 'bad item not excluded');
   chk(info.codeGensF4 === 3, 'F4 code generators: ' + info.codeGensF4);
   chk(info.gate === 1 && info.aiCallsBeforeOk === 0, 'provider notice before AI call');
+  chk(info.previewExact && info.previewHadName, 'Minor5 preview is exactly what is sent: ' + info.previewExact + ' ' + info.previewHadName);
   chk(info.ai === '7:ok:3:deep b:unv:2:deep', 'AI verify outcome: ' + info.ai);
   chk(/نشت/.test(info.rejected) && /ساختار/.test(info.rejected), 'rejections: ' + info.rejected);
   chk(info.solverCalls === 6, 'three independent solves per item: ' + info.solverCalls);
@@ -246,7 +288,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.solverNoAnswer, 'solver saw the answer');
   chk(info.unvHidden === 'false|true|false', 'unverified visibility/countable: ' + info.unvHidden);
   chk(info.unvLabel >= 1, 'unverified label');
-  chk(info.gateAgain === 0 && info.aiCalls2 > 0, 'notice once per session');
+  chk(info.gateAgain === 1 && info.aiCalls2 === 0 && info.cancelNoCall, 'Minor5 notice before EVERY request: ' + [info.gateAgain, info.aiCalls2, info.cancelNoCall]);
   chk(info.safety === 1 && info.safetyText && info.safetyNoCall === 0, 'safety gate');
   chk(info.userLeakBlocked === 1 && info.userLeak2 === 1 && info.userCountable === true, 'user template: ' + [info.userLeakBlocked, info.userLeak2, info.userCountable]);
   chk(info.exp0 === 'working' && info.exp1 === 'working' && info.exp2 === 'practised', 'experiments mastery: ' + [info.exp0, info.exp1, info.exp2]);
@@ -255,6 +297,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(/تنظیم‌نشده/.test(info.notifyStatus), 'honest status text');
   chk(info.detailOn && info.settingSaved === true, 'detail toggle');
   chk(info.f7NoDetail, 'F7 detail must be null');
+  chk(info.privExtra === 'true,true,true', 'I5 F7/F9 in extras or linked roots: ' + info.privExtra);
+  chk(info.f1Gap === '1:true' && info.f1GapKnot === 1, 'I4c F1 notice: ' + info.f1Gap + ' ' + info.f1GapKnot);
+  chk(info.f2Gens === 'hidden24,reread' && info.f2Forms.split(',').length >= 3, 'I4b F2 code forms: ' + info.f2Gens + ' / ' + info.f2Forms);
   chk(info.bothOffUnremind, 'channels off ⇒ unremind');
   chk(info.sweep, 'deleted knot sweep');
   chk(info.dueRow === 1, 'today row');

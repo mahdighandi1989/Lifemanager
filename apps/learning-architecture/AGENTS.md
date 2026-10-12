@@ -23,6 +23,7 @@
 | `docs/PROGRESS.md` | دفترِ پیشرفت (منبعِ نمودار) | فقط **افزودنِ** سطر |
 | `docs/WORKLOG.md` | دفترِ کار | فقط **افزودنِ** بخش به انتها |
 | `docs/audits/` | گزارش‌های ممیزی و بازسازیِ تاریخچه (مدرک) | فقط افزودن |
+| `docs/specs/` | طرح‌های مرجعِ بخش‌های بزرگ (مثلاً `KNOTS.md` برای «گره‌گشا»؛ §۱۲ ِ آن الزامی است) | بله — تغییرِ طرح ⇒ WORKLOG |
 | `sources/` | متن‌های خامِ اسنادِ مالک و جزوه (برای `tools/parse_epi.py`) | نه |
 | `tests/*.js` | آزمون‌های مرورگرِ سازنده (Playwright روی `dist/learning-architecture.html`) | بله |
 | `dist/` | خروجیِ ساخت (gitignored): artifact، html ِ مستقل، Apps Script + zip | نه |

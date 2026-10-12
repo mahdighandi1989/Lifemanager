@@ -95,30 +95,48 @@
   /* گره‌گشا (§۱۲.۹ ِ طرح): آینهٔ هر موقعیت و هر گره **انتخابی** است (`mirror: true` روی همان رکورد)؛ احساس‌ها و یادداشت‌های
      F7/F9 فقط با انتخابِ جدا (`mirrorPrivate`). سازنده‌ای که null برگرداند ⇒ اگر قبلاً فولدری بوده، تغییرِ نام (نه حذف). */
   var PRIVFAM = { F7: 1, F9: 1 };
+  /* خانواده‌هایی که یک موقعیت یا گره به آن‌ها مربوط است: اصلی + کمکی‌ها (و برای موقعیت، خانواده‌های گره‌های پیوندخورده؛
+     برای گره، ریشهٔ موقعیت‌هایش). اگر F7 یا F9 در **هر کدام** باشد، موقعیت/گره «حساس» است (ممیزی ۲۰۲۶-۱۰-۱۲: پیش‌تر فقط اصلی دیده می‌شد). */
+  function famsOfRoot(R) { R = R || {}; return [R.primary].concat((R.extra || []).map(function (x) { return x && (x.fam || x); })).filter(Boolean); }
+  function famsOfKnot(k) { return k ? [].concat(Array.isArray(k.fam) ? k.fam : [k.fam]).concat((k.extra || []).map(function (x) { return x && (x.fam || x); })).filter(Boolean) : []; }
+  function anyPriv(fams) { return fams.some(function (f) { return PRIVFAM[f]; }); }
+  function kcaseSensitive(kc) {
+    var fs = famsOfRoot(kc.root);
+    (kc.knots || []).forEach(function (id) { fs = fs.concat(famsOfKnot(S.get(id))); });
+    return anyPriv(fs);
+  }
+  function knotSensitive(k) {
+    var fs = famsOfKnot(k);
+    (k.cases || []).forEach(function (id) { var c = S.get(id); if (c) fs = fs.concat(famsOfRoot(c.root)); });
+    return anyPriv(fs);
+  }
+  A.mirrorSensitive = function (r) { return r && r.type === "knot" ? knotSensitive(r) : r && r.type === "kcase" ? kcaseSensitive(r) : false; };
+  var PRIV_TXT = "(خصوصی)";
   BUILD.kcase = function (kc) {
     if (!kc.mirror) return null;
-    var it = kc.intake || {}, priv = !!kc.mirrorPrivate, R = kc.root || {};
+    var it = kc.intake || {}, priv = !!kc.mirrorPrivate, R = kc.root || {}, sens = !priv && kcaseSensitive(kc);
     var famName = function (f) { var x = (A.KF || []).filter(function (y) { return y.id === f; })[0]; return x ? f + " · " + x.fa : (f || ""); };
     var kn = (kc.knots || []).map(function (id) { var k = S.get(id); return k ? (k.name || id) : id; }).join("، ");
     var tabs = [{ name: "خلاصه", rows: [["فیلد", "مقدار"], ["عنوان", kc.title || ""], ["نوع", (kc.kinds || it.kinds || []).join("، ")], ["وضعیت", kc.status || ""],
-      ["گره‌ها", kn], ["گرهِ اصلی", famName(R.primary)], ["اطمینان", R.conf == null ? "" : R.conf + "٪"], ["ساخته‌شده", dt(kc.created)], ["آخرین تغییر", dt(kc.updated)], ["در برنامه", link("kcase", kc.id)]] }];
+      ["گره‌ها", kn], ["گرهِ اصلی", famName(R.primary)], ["گره‌های کمکی", famsOfRoot(R).slice(1).map(famName).join("، ")], ["اطمینان", R.conf == null ? "" : R.conf + "٪"], ["ساخته‌شده", dt(kc.created)], ["آخرین تغییر", dt(kc.updated)], ["در برنامه", link("kcase", kc.id)]] }];
     var inRows = [["فیلد", "مقدار"]];
     [["what", "چه شد"], ["expected", "چه انتظار داشتم"], ["actual", "در واقع چه شد"], ["thoughts", "چه فکرهایی کردم/چه کردم"], ["statement", "صورتِ مسئله"],
      ["answer", "پاسخِ درست"], ["stuckAt", "کجا گیر کردم"], ["context", "زمینه"], ["claim", "نتیجه‌ای که دربارهٔ خودم گرفتم"], ["seen", "پاسخ را دیده بودم؟"],
-     ["freq", "چند بار"], ["lag", "فاصله تا نوشتن"]].forEach(function (f) { if (A.filled(it[f[0]])) inRows.push([f[1], txt(it[f[0]])]); });
+     ["freq", "چند بار"], ["lag", "فاصله تا نوشتن"]].forEach(function (f) { if (A.filled(it[f[0]])) inRows.push([f[1], sens && f[0] === "claim" ? PRIV_TXT : txt(it[f[0]])]); });
     if (priv) [["emo", "شدتِ احساس"], ["emoName", "نامِ احساس"]].forEach(function (f) { if (A.filled(it[f[0]])) inRows.push([f[1], txt(it[f[0]])]); });
     tabs.push({ name: "ورودی", rows: inRows });
     var rk = []; try { rk = A.knotRank ? A.knotRank(kc) : []; } catch (e) { rk = []; }
-    tabs.push({ name: "فرضیه‌ها", rows: [["خانواده", "امتیاز (ترتیبِ بررسی)", "چرا"]].concat(rk.map(function (r) { return [famName(r.fam), String(Math.round((r.score || 0) * 100) / 100), !priv && PRIVFAM[r.fam] ? "(خصوصی)" : txt((r.why || []).map(function (w) { return typeof w === "string" ? w : (w.t || w.fa || ""); }))]; })) });
+    tabs.push({ name: "فرضیه‌ها", rows: [["خانواده", "امتیاز (ترتیبِ بررسی)", "چرا"]].concat(rk.map(function (r) { return [famName(r.fam), String(Math.round((r.score || 0) * 100) / 100), !priv && (sens || PRIVFAM[r.fam]) ? PRIV_TXT : txt((r.why || []).map(function (w) { return typeof w === "string" ? w : (w.t || w.fa || ""); }))]; })) });
     tabs.push({ name: "شواهد", rows: [["خانواده", "جهت", "شاهد", "منبع"]].concat((kc.ev || []).filter(function (e) { return priv || !PRIVFAM[e.fam]; }).map(function (e) { return [famName(e.fam), String(e.dir == null ? (e.w || "") : e.dir), e.text || "", e.src || ""]; })) });
-    var why = (R.why5 || []).map(function (w, i) { return ["چرای " + (i + 1), w.why || "", w.ev || "", w.rival || ""]; });
-    tabs.push({ name: "ریشه", rows: [["", "پاسخ", "شاهد", "تبیینِ رقیبِ بیرونی"], ["گرهِ اصلی", famName(R.primary), "", ""]].concat(why).concat(R.loop2 ? [["متغیرِ حاکم", R.loop2, "", ""]] : []) });
+    var why = (R.why5 || []).map(function (w, i) { return sens ? ["چرای " + (i + 1), PRIV_TXT, PRIV_TXT, PRIV_TXT] : ["چرای " + (i + 1), w.why || "", w.ev || "", w.rival || ""]; });
+    tabs.push({ name: "ریشه", rows: [["", "پاسخ", "شاهد", "تبیینِ رقیبِ بیرونی"], ["گرهِ اصلی", famName(R.primary), "", ""]].concat(why).concat(R.loop2 ? [["متغیرِ حاکم", sens ? PRIV_TXT : R.loop2, "", ""]] : [])
+      .concat(R.rival ? [["تبیینِ رقیبِ اصلی", sens ? PRIV_TXT : R.rival, "", ""]] : []).concat(R.disagree ? [["چرا با رتبه‌بندی مخالفم", sens ? PRIV_TXT : R.disagree, "", ""]] : []) });
     tabs.push({ name: "مداخله‌ها", rows: [["مداخله", "انجام‌شده"]].concat((kc.acts || []).map(function (a) { var T = a.tid && A.TM[a.tid]; return [T ? a.tid + " · " + T.fa : (a.ext || a.fa || ""), a.done ? "✓" : ""]; })) });
     return { group: "گره‌گشا — موقعیت‌ها", title: kc.title || "موقعیت", tabs: tabs };
   };
   BUILD.knot = function (k) {
     if (!k.mirror) return null;
-    var priv = !!k.mirrorPrivate || !PRIVFAM[k.fam];
+    var priv = !!k.mirrorPrivate || !knotSensitive(k);
     var tabs = [{ name: "کارتِ گره", rows: [["فیلد", "مقدار"], ["نام", k.name || ""], ["خانواده", k.fam || ""], ["وضعیت", (A.KSTATUS || {})[k.status] || k.status || ""],
       ["ساختارِ عمیق", priv ? (k.principle || "") : "(خصوصی)"], ["نشانه‌ها", priv ? txt(k.signals) : "(خصوصی)"], ["حرکتِ مقابل", priv ? txt(k.counter) : "(خصوصی)"],
       ["مثال", priv ? txt(k.example) : "(خصوصی)"], ["در برنامه", link("knot", k.id)]] }];
@@ -239,9 +257,10 @@
 
   /* ---------- 📎 پیوست‌ها: خودِ فایل مستقیم در فولدرِ همان مورد در درایو؛ سرور فقط اشاره‌گر نگه می‌دارد ---------- */
   function fsize(n) { return n >= 1048576 ? fa((n / 1048576).toFixed(1)) + " مگابایت" : fa(Math.max(1, Math.round(n / 1024))) + " کیلوبایت"; }
-  function attachSection(rid, meta) {
+  function attachSection(rid, meta, note) {
     var sec = h("section", { class: "card attach", "data-report-section": "attachments", "data-report-section-label": "پیوست‌ها" },
-      h("h3", {}, "📎 پیوست‌ها"), h("p", { class: "small muted" }, "فایل (عکس، صوت، PDF، …) مستقیم در فولدرِ همین مورد در گوگل درایو نگه داشته می‌شود — نه در سرور؛ حداکثر ۲۵ مگابایت. حذف در این‌جا فایل را در درایو فقط تغییرِ نام می‌دهد."));
+      h("h3", {}, "📎 پیوست‌ها"), h("p", { class: "small muted" }, "فایل (عکس، صوت، PDF، …) مستقیم در فولدرِ همین مورد در گوگل درایو نگه داشته می‌شود — نه در سرور؛ حداکثر ۲۵ مگابایت. حذف در این‌جا فایل را در درایو فقط تغییرِ نام می‌دهد."),
+      note ? h("p", { class: "small warnline kn-attnote" }, note) : null);
     var list = h("ul", { class: "plain small" }, h("li", { class: "muted" }, "در حالِ خواندن…"));
     var inp = h("input", { type: "file", multiple: true, "aria-label": "انتخابِ فایل", onchange: function () { up(Array.prototype.slice.call(inp.files || [])); } });
     var st = h("span", { class: "small muted" });
@@ -288,7 +307,9 @@
     var raw = A.V[v]; if (!raw || raw._kdrive) return;
     A.V[v] = function (id) {
       var root = raw.apply(this, arguments), r = S.get(id);
-      try { if (r && root && root.appendChild) { root.appendChild(driveToggles(r)); if (A.HOST.upload && v === "kcase") root.appendChild(attachSection(id, { group: "گره‌گشا — موقعیت‌ها", title: r.title || "موقعیت" })); } } catch (e) { console.error(e); }
+      try { if (r && root && root.appendChild) { root.appendChild(driveToggles(r)); if (A.HOST.upload && v === "kcase") root.appendChild(attachSection(id, { group: "گره‌گشا — موقعیت‌ها", title: r.title || "موقعیت" },
+        /* بارگذاری کاری صریح است و مجاز می‌ماند، ولی آینهٔ این موقعیت خاموش است ⇒ صادقانه بگو که فولدر ساخته می‌شود */
+        r.mirror ? null : "آینهٔ درایوِ این موقعیت خاموش است؛ گذاشتنِ پیوست، فولدرِ این موقعیت را در درایو می‌سازد.")); } } catch (e) { console.error(e); }
       return root;
     };
     A.V[v]._kdrive = true;

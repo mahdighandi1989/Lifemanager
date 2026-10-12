@@ -22,12 +22,31 @@ const { chromium } = require('playwright');
   await p.evaluate(id => APP.go('kcase', id), ids); await p.waitForTimeout(1500);
   info.toggle = await p.locator('main section[data-report-section="kdrive"] input[type=checkbox]').count();
   info.attach = await p.locator('main section.attach').count();
+  info.attachNoteWhenMirrorOff = await p.locator('main section.attach .kn-attnote').count();  // Minor8: honest one-liner — uploading creates the case's Drive folder
   await p.locator('main section[data-report-section="kdrive"] input[type=checkbox]').first().check(); await p.waitForTimeout(3500);
   const sent = mirrorBodies.map(m => (m.items || []).find(i => i.rec_id === ids)).filter(Boolean).pop();
   info.mirrored = !!sent;
   const flat = sent ? JSON.stringify(sent.tabs) : '';
   info.privateKeptOut = sent && !/خشم/.test(flat) && !/یادداشتِ خصوصی/.test(flat) && /شاهدِ ارتباطی/.test(flat);
   info.group = sent && sent.group; if (!info.privateKeptOut) info.flatDebug = flat.slice(0, 1200);
+  // I6 (audit 2026-10-12): F7 only as a SECONDARY family still keeps the claim, the whys, the governing variable and the knot card private
+  const sec = await p.evaluate(() => {
+    const k = APP.S.put({ id: APP.uid('knot'), type: 'knot', name: 'گرهِ آزمونِ حریم', fam: 'F8', extra: [{ fam: 'F7' }], principle: 'اصلِ-پنهانِ-کارت', signals: 'نشانه-پنهان', counter: 'حرکت-پنهان', example: 'مثال-پنهان', cases: [], status: 'open', mirror: true });
+    const kc = APP.S.put({ id: APP.uid('kc'), type: 'kcase', title: 'آزمونِ میزبان: کمکیِ هیجانی', mirror: true, kinds: ['social'],
+      intake: { what: 'x', expected: 'y', actual: 'z', thoughts: 't', seen: 'na', claim: 'ادعای-خصوصی-دربارهٔ-خودم' },
+      root: { primary: 'F8', extra: [{ fam: 'F7', sub: '' }], confirmed: true, why5: [{ why: 'چرای-خصوصی', ev: 'شاهد-خصوصی', kind: 'in', rival: 'رقیب-خصوصی' }], loop2: 'متغیر-خصوصی', rival: 'رقیبِ-اصلیِ-خصوصی' },
+      ev: [{ fam: 'F8', dir: 1, text: 'شاهدِ ارتباطیِ دوم' }], knots: [k.id], status: 'rooted' });
+    k.cases = [kc.id]; APP.S.put(k);
+    return { kc: kc.id, k: k.id };
+  });
+  await p.waitForTimeout(4000);
+  const sentSec = mirrorBodies.map(m => (m.items || []).find(i => i.rec_id === sec.kc)).filter(Boolean).pop();
+  const sentKnot = mirrorBodies.map(m => (m.items || []).find(i => i.rec_id === sec.k)).filter(Boolean).pop();
+  const fs = sentSec ? JSON.stringify(sentSec.tabs) : '', fk = sentKnot ? JSON.stringify(sentKnot.tabs) : '';
+  info.secondaryF7Mirrored = !!sentSec && !!sentKnot;
+  info.secondaryF7Private = !!sentSec && !/خصوصی-دربارهٔ|چرای-خصوصی|شاهد-خصوصی|رقیب-خصوصی|متغیر-خصوصی|رقیبِ-اصلیِ-خصوصی/.test(fs) && /شاهدِ ارتباطیِ دوم/.test(fs);
+  info.secondaryF7KnotPrivate = !!sentKnot && !/پنهان/.test(fk) && /گرهِ آزمونِ حریم/.test(fk);
+  if (!info.secondaryF7Private || !info.secondaryF7KnotPrivate) info.secDebug = (fs + ' || ' + fk).slice(0, 1500);
   // reminders: the host door reaches the server
   await p.evaluate(() => APP.HOST.remind({ key: 'knot:test', due_date: '2026-12-01', tz: 'Asia/Dubai', hour: 9, title: 'گره‌گشا', body: 'یک ورزشِ گره موعد است', link: '?tab=kpractice&a=x', channels: { telegram: true, email: true } }));
   const st = await p.evaluate(() => APP.HOST.remindStatus());

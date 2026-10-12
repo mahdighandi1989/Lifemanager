@@ -38,10 +38,17 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
     window.__badStatus = APP.knotSetStatus(g('k4'), 'solved');   // وضعیتِ نامعتبر ⇒ false
     g('k3').links = [{ to: 'k1', rel: 'root-of' }]; S.put(g('k3'));
     const C = [['c1', 'آزمونِ هوشِ شنبه', 'k1', ['k2', 'k6']], ['c2', 'مسئلهٔ فیزیک', 'k1', ['k2']], ['c3', 'جلسهٔ مدیران', 'k4', []], ['c4', 'پروژهٔ دیرکرد', 'k5', ['k8']]];
-    C.forEach(([id, title, primary, extra]) => S.put({ id, type: 'kcase', title, root: { primary, extra }, knots: [primary].concat(extra), created: T }));
+    // a16 shape: root.primary / root.extra[].fam are FAMILY ids; the knots (primary first, then auxiliary knots) live in kc.knots
+    C.forEach(([id, title, primary, extra]) => S.put({ id, type: 'kcase', title, root: { primary: S.get(primary).fam, extra: extra.map(x => ({ fam: S.get(x).fam })) }, knots: [primary].concat(extra), created: T }));
+    // a family-only secondary (no auxiliary knot) makes no co-occurrence edge: c3 gets two secondary FAMILIES but keeps one knot
+    const c3 = S.get('c3'); c3.root.extra = [{ fam: 'F7' }, { fam: 'F10' }]; S.put(c3);
     const I = [['i1', 'k1', [[95, true], [92, false], [55, true]]], ['i2', 'k2', [[15, false], [100, true], [58, false]]],
       ['i3', 'k3', [[95, true]], true], ['i4', 'k5', [[50, null]]]];
-    I.forEach(([id, knot, hs, bad]) => S.put({ id, type: 'kitem', knot, bad: !!bad, hist: hs.map(([conf, ok]) => ({ at: T, conf, ok })) }));
+    I.forEach(([id, knot, hs, bad]) => S.put({ id, type: 'kitem', knot, bad: !!bad, atype: 'int', gen: { by: 'code:jars' }, hist: hs.map(([conf, ok]) => ({ at: T, conf, ok })) }));
+    // excluded from calibration (Minor7): a self-graded rubric item, a free-text item and an unverified AI item
+    S.put({ id: 'i5', type: 'kitem', knot: 'k4', atype: 'rubric', gen: { by: 'user' }, hist: [{ at: T, conf: 90, ok: true, self: { kind: 'rubric' } }] });
+    S.put({ id: 'i6', type: 'kitem', knot: 'k4', atype: 'text', gen: { by: 'user' }, hist: [{ at: T, conf: 35, ok: true, self: { kind: 'text' } }] });
+    S.put({ id: 'i7', type: 'kitem', knot: 'k1', atype: 'int', gen: { by: 'ai' }, ver: { ok: false }, hist: [{ at: T, conf: 25, ok: true }] });
   });
   info.statusFn = await p.evaluate(() => ({ noChange: window.__noChange, bad: window.__badStatus, hist: APP.S.get('k4').hist, ret: APP.S.get('k4').returnedAt, solved: APP.S.get('k3').solvedAt }));
   chk(info.statusFn.noChange === false && info.statusFn.bad === false && info.statusFn.hist.length === 2 && info.statusFn.hist[1].from === 'practised' && info.statusFn.ret && info.statusFn.solved, 'knotSetStatus ' + JSON.stringify(info.statusFn));
@@ -225,13 +232,14 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
   // نردبان
   const L = sim('ladder');
   await L.locator('.ks-rung[data-step="3"] button').click(); const l3 = await L.locator('.sim-fb.ok').textContent(); const tried = await L.locator('.ks-rung.tried').count();
-  await L.locator('.ks-rung[data-step="0"] button').click(); const l0 = await L.locator('.ks-ladder > div .ks-info').first().textContent();
+  // Minor4: step 0 says exactly what the engine records — weak control evidence (+1) for F4 (stop rule) and F5
+  await L.locator('.ks-rung[data-step="0"] button').click(); const l0 = await L.locator('.ks-ladder > div .sim-fb').first().textContent();
   await L.locator('.ks-rung[data-step="6"] button').click(); const l6 = await L.locator('.ks-ladder > div .ks-info').first().textContent();
   await L.locator('.ks-contrast [data-side="a"] .btn:has-text("حل شد")').click(); await L.locator('.ks-contrast [data-side="b"] .btn:has-text("حل نشد")').click();
   const c3 = await L.locator('.ks-contrast .sim-fb.ok').textContent();
   await L.locator('.ks-contrast [data-side="b"] .btn:has-text("حل شد")').click(); const cm3 = await L.locator('.ks-contrast .sim-fb.no').textContent();
   info.ladder = { l3, tried, l0, l6, c3, cm3, rungs: await L.locator('.ks-rung').count() };
-  chk(info.ladder.rungs === 7 && /\+۱/.test(l3) && /ظرفیت/.test(l3) && tried === 3 && /کنترل/.test(l0) && !/\+۱/.test(l0) && /تشخیصی نیست/.test(l6) && /\+۳/.test(c3) && /−۳/.test(cm3), 'ladder ' + JSON.stringify(info.ladder));
+  chk(info.ladder.rungs === 7 && /\+۱/.test(l3) && /ظرفیت/.test(l3) && tried === 3 && /کنترل/.test(l0) && /\+۱/.test(l0) && /پایش/.test(l0) && /ظرفیت/.test(l0) && /تشخیصی نیست/.test(l6) && /\+۳/.test(c3) && /−۳/.test(cm3), 'ladder ' + JSON.stringify(info.ladder));
   // یک شبیه‌ساز تنها
   await p.evaluate(() => APP.go('ksims', 'ladder')); await p.waitForTimeout(60);
   chk(await p.locator('main .ks-sim').count() === 1, 'single sim view');

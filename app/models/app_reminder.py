@@ -34,3 +34,16 @@ class AppReminder(Base):
     sent_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class AppReminderSend(Base):
+    """One row per delivery attempt that reached at least one channel — the daily cap counts
+    THESE (a re-scheduled reminder can never sneak past the cap) and they are the audit trail."""
+    __tablename__ = "app_reminder_sends"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, index=True, nullable=True)
+    app = Column(String(64), index=True, nullable=False)
+    rkey = Column(String(160), nullable=False)
+    at = Column(DateTime(timezone=True), index=True, nullable=False)
+    result = Column(Text, default="")

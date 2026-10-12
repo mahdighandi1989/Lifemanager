@@ -54,7 +54,8 @@ function indep24(nums, T) {
 }
 function evalAscii(s) { if (!/^[0-9+\-*/() ]+$/.test(s)) throw new Error('bad expr'); return Function('return (' + s + ')')(); }
 
-const SEEDS = { jars: 70, rule246: 50, wason: 70, bayes: 70, wmchain: 70, hidden24: 20 };
+const SEEDS = { jars: 70, rule246: 50, wason: 70, bayes: 70, wmchain: 70, hidden24: 20, reread: 70 };
+const jarsL3 = { answers: {}, n: 0 };
 for (const key of Object.keys(A.KGEN)) {
   const G = A.KGEN[key]; info.byKey[key] = { n: 0, decoys: 0, forms: {} };
   if (!G.fams.length || !G.forms.length || typeof G.make !== 'function') fail(key + ': registry shape');
@@ -90,11 +91,28 @@ for (const key of Object.keys(A.KGEN)) {
     // ---------- بازمحاسبهٔ مستقل ----------
     if (key === 'jars') {
       const { caps, T } = it.params, mc = minCostIndep(caps, T);
+      // «فرمولِ گرم‌کردن» (setv): +۱ روی بزرگ‌ترین کوزه، −۱ و −۲ روی دو کوزهٔ دیگر — در سطحِ ۳ برچسب‌ها جابه‌جا می‌شوند، پس از params خوانده
+      // و الگویش مستقل وارسی می‌شود
+      const setv = it.params.setv || [-1, 1, -2], bigI = caps.indexOf(Math.max(...caps));
+      if (setv.slice().sort().join() !== '-1,-2,1' || setv[bigI] !== 1) fail(tag + ': set formula shape ' + setv);
+      if (level < 3 && setv.join() !== '-1,1,-2') fail(tag + ': levels 1-2 keep the classic labels');
       if (!decoy && !(mc.cost === 2 && mc.sols.length === 1)) fail(tag + ': non-decoy should have unique 2-move path ' + JSON.stringify(mc));
-      if (decoy && !(mc.cost === 4 && mc.sols.length === 1 && mc.sols[0].join() === '-1,1,-2')) fail(tag + ': decoy should have only B−A−2C ' + JSON.stringify(mc));
-      if (caps[1] - caps[0] - 2 * caps[2] !== T) fail(tag + ': set formula must reach T');
-      it.params.warm.forEach(w => { const m = minCostIndep(w.caps, w.T); if (!(m.cost === 4 && m.sols.length === 1)) fail(tag + ': warm-up not set-only'); });
-      if (it.atype === 'int') { if (+it.answer !== mc.cost) fail(tag + ': int answer != min cost'); }
+      if (decoy && !(mc.cost === 4 && mc.sols.length === 1 && mc.sols[0].join() === setv.join())) fail(tag + ': decoy should have only the set formula ' + JSON.stringify(mc));
+      if (setv[0] * caps[0] + setv[1] * caps[1] + setv[2] * caps[2] !== T) fail(tag + ': set formula must reach T');
+      it.params.warm.forEach(w => { const m = minCostIndep(w.caps, w.T); if (!(m.cost === 4 && m.sols.length === 1 && m.sols[0].join() === setv.join())) fail(tag + ': warm-up not set-only'); });
+      if (it.atype === 'int') fail(tag + ': level 3 must not be the constant minimum count');
+      else if (it.exact === 'jars') {
+        if (level !== 3) fail(tag + ': jars text only at level 3');
+        if (parseVec(it.answer).join() !== mc.sols[0].join()) fail(tag + ': L3 answer != independent shortest ' + it.answer);
+        jarsL3.n++; jarsL3.answers[(decoy ? 'D:' : 'N:') + it.answer] = 1;
+        // other spellings of the same path are accepted; the set path (non-decoy), a non-reaching path and junk are not
+        const sp = it.answer.replace(/\s+/g, '').replace(/−/g, '-');
+        if (it.check(sp.toLowerCase()) !== true) fail(tag + ': lower-case spelling rejected');
+        const terms = sp.match(/[+-]?\d*[ABC]/g); if (terms.length === 2 && terms[1][0] === '+' && it.check(terms[1].slice(1) + '+' + terms[0]) !== true) fail(tag + ': reordered sum rejected');
+        if (!decoy && it.check(setv.map((c, i) => (c < 0 ? '-' : '+') + (Math.abs(c) > 1 ? Math.abs(c) : '') + 'ABC'[i]).join('')) !== false) fail(tag + ': longer set path accepted');
+        if (it.check('A+B+C') !== false && caps[0] + caps[1] + caps[2] !== T) fail(tag + ': non-reaching path accepted');
+        if (it.check('salam') !== false) fail(tag + ': junk accepted');
+      }
       else {
         const right = it.choices.find(c => c.id === it.answer), v = parseVec(right.t);
         if (v.join() !== mc.sols[0].join()) fail(tag + ': choice answer != independent min ' + right.t);
@@ -150,7 +168,18 @@ for (const key of Object.keys(A.KGEN)) {
       if (it.steps.length !== p.ops.length) fail(tag + ': steps/ops');
       if (decoy ? it.steps.length !== 2 : it.steps.length < 4) fail(tag + ': load level');
     }
+    if (key === 'reread') {
+      const p = it.params; let want;
+      if (it.form === 'verbal') want = decoy ? p.L / p.d : p.L / p.d + 1;          // دورِ بسته: تیرک = فاصله؛ خطِ باز با دو سر: فاصله + ۱
+      else if (it.form === 'numeric') want = decoy ? p.b - p.a : p.b - p.a + 1;     // [a, b) یا [a, b]
+      else want = decoy ? p.n * p.h : (p.n - 1) * p.h;                               // اولی پس از h ساعت یا همین حالا
+      if (+it.answer !== want) fail(tag + ': reread ' + it.answer + ' vs ' + want);
+      if (!decoy && +it.answer === p.naive) fail(tag + ': non-decoy where the naive count is right');
+      if (decoy && +it.answer !== p.naive) fail(tag + ': decoy where the naive count is wrong');
+      if (it.atype !== 'int') fail(tag + ': reread must be exact int');
+    }
     if (key === 'hidden24') {
+      if (it.form === 'visual' && !(it.svg && it.svg.type === 'cards' && it.svg.nums.join() === it.params.nums.join())) fail(tag + ': visual cards');
       const { nums, target } = it.params, used = (it.answer.match(/\d+/g) || []).map(Number).sort((a, b) => a - b).join();
       if (used !== nums.slice().sort((a, b) => a - b).join()) fail(tag + ': numbers used');
       if (Math.abs(evalAscii(it.answer) - target) > 1e-9) fail(tag + ': eval ' + it.answer);
@@ -182,6 +211,10 @@ const r1 = A.krng(42), r2 = A.krng(42); for (let i = 0; i < 20; i++) if (r1() !=
 ['دیگر برنمی‌گردد', 'مغزت قوی‌تر', 'ضریب هوشت', 'ضریبِ هوشت', 'IQت'].forEach(w => { if (code.includes(w)) fail('forbidden claim in source: ' + w); });
 // ---------- نگاشتِ خانواده‌ها ----------
 info.famMap = {}; ['F1', 'F2', 'F3', 'F4', 'F5', 'F11'].forEach(f => { info.famMap[f] = A.kgenFor(f); });
-['F3', 'F4', 'F5', 'F11'].forEach(f => { const forms = new Set(); A.kgenFor(f).forEach(k => A.KGEN[k].forms.forEach(x => forms.add(x))); if (forms.size < 3) fail(f + ' has <3 code forms'); });
+['F2', 'F3', 'F4', 'F5', 'F11'].forEach(f => { const forms = new Set(); A.kgenFor(f).forEach(k => A.KGEN[k].forms.forEach(x => forms.add(x))); if (forms.size < 3) fail(f + ' has <3 code forms'); });
+// سطحِ ۳ ِ کوزه‌ها: پاسخ ثابت نیست (ممیزی: پیش‌تر همیشه ۲ یا ۴ بود)
+info.jarsL3 = { n: jarsL3.n, distinct: Object.keys(jarsL3.answers).length };
+if (jarsL3.n && Object.keys(jarsL3.answers).filter(x => x[0] === 'N').length < 4) fail('jars L3 non-decoy answers barely vary: ' + Object.keys(jarsL3.answers));
+if (jarsL3.n && Object.keys(jarsL3.answers).filter(x => x[0] === 'D').length < 3) fail('jars L3 decoy answers barely vary: ' + Object.keys(jarsL3.answers));
 console.log(JSON.stringify(info, null, 1));
 console.log(errors.length ? errors.join('\n') : 'NO ERRORS');

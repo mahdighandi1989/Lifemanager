@@ -23,6 +23,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#knThk', o.thk || 'همان لحظه کاری را کردم که به ذهنم رسید');
     await p.check(`#knSeen_${['yes', 'no', 'na'].indexOf(o.seen)}`);
     if (o.statement) await p.fill('#knStmt', o.statement);
+    if (o.kinds.includes('problem') && !info.stmtHint) info.stmtHint = await p.locator('main .kn-prob .fhint').first().innerText();
     if (o.answer) await p.fill('#knAns', o.answer);
     if (o.claim) await p.fill('#knClaim', o.claim);
     if (o.freq) await p.selectOption('#knFreq', o.freq);
@@ -47,6 +48,35 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   if (info.data.fams !== 12 || info.data.ids !== 'F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,F11,F12') errors.push('families: ' + info.data.ids);
   if (info.data.badTid.length || info.data.badW.length || info.data.badKind.length || info.data.noSrcExt.length) errors.push('data: ' + JSON.stringify(info.data));
+
+  /* ۰-ب) ممیزیِ ۲۰۲۶-۱۰-۱۲: ایمنی (یک نرمال‌ساز، یک فهرست برای a16 و a17)، حذفِ نامِ واژه‌کامل، پالایشِ حالِ درونیِ شخصِ سوم، رتبه */
+  info.audit = await p.evaluate(() => {
+    const HIT = ['دلم می‌خواد بمیرم', 'دیگر نمی‌خواهم زنده باشم', 'خودكشي', 'می‌خواهم خودم را از بین ببرم', 'کاش نبودم', 'میخوام تمومش کنم', 'به خودم صدمه می‌زنم',
+      'خودمو از بین ببرم', 'صدمه بزنم به خودم', 'دیگه خسته‌ام، می‌خوام همه‌چی رو تموم کنم', 'بمیرم برات', 'I want to kill myself', 'thinking about suicide', 'I hurt myself', 'end my life', 'خودكُشي'];
+    const MISS = ['می‌خواهم این عادت را از بین ببرم', 'می‌خوام این مسئله رو تمومش کنم', 'گزارش را امشب تمومش کنم', 'وضعیتِ فعلی', 'به خودم قول دادم', 'نمیرم سرِ کار', 'عقب میرم'];
+    const a16 = HIT.filter(x => !APP.knotSafetyHit(x)), a17 = HIT.filter(x => !APP.kSafetyLocal(x).hit), fp = MISS.filter(x => APP.knotSafetyHit(x));
+    const R = APP.kRedact, red = [R('وضعیتِ فعلی و علی', 'علی'), R('رضایتِ رضا', 'رضا'), R('علي آمد', 'علی'), R('علی‌رضا و علیِ ما', 'علی'), R('Ali and Alibaba', 'Ali'), R('سارا رضایی، سارا', 'سارا رضایی، سارا'), APP.kstripNames('رضایت رضا', ['رضا'])];
+    const hyp = (x, people, names) => APP.knotHypOk(Object.assign({ fam: 'F8', rival: '', test: '' }, x), people || '', names || []);
+    const H = {
+      aliLikes: hyp({ fam: 'F10', text: 'علی چون مدیر را دوست دارد پیشنهادش پذیرفته شد', rival: '—', test: '—' }),
+      envy: hyp({ text: 'همکار حسادت می‌کند و می‌خواهد تو را کنار بزند' }), adhd: hyp({ fam: 'F5', text: 'شاید بیش‌فعالی داری' }),
+      frame: hyp({ text: 'پیامت از زاویهٔ هدفِ مدیر نبود', rival: 'مدیرها به سابقه نگاه می‌کنند', test: 'پیام را در یک جمله بگو' }),
+      behav: hyp({ text: 'مدیر در جلسه سه بار حرفت را قطع کرد' }), byPeople: hyp({ text: 'سارا فکر می‌کند تو آماده نیستی' }, 'سارا'), byNames: hyp({ text: 'سارا علاقه‌ای به این طرح ندارد' }, '', ['سارا']),
+      him: hyp({ text: 'او خوشش نمی‌آید' }), flani: hyp({ text: 'فلانی می‌داند که حق با توست' }), token: hyp({ text: '[شخص] حس می‌کند تهدید شده' }), rivalMind: hyp({ text: 'پیام بلند بود', rival: 'رئیس از تو دلخور است' })
+    };
+    const mk = (kinds, intake) => ({ kinds, intake: Object.assign({ stmts: [] }, intake), ev: [] });
+    const order = (kc, n) => APP.knotRank(kc).slice(0, n).map(r => r.fam).join(',');
+    const rank = {
+      A1: order(mk(['problem'], { stmts: ['s_oneway'], pressure: 8, freq: 'some', claim: 'این نشان می‌دهد من در الگویابی ضعیفم' }), 5),
+      A2: order(mk(['problem'], { stmts: ['s_rule'], freq: 'once', claim: 'من فیزیک بلد نیستم' }), 2),
+      B: order(mk(['social'], { stmts: ['s_knowmore', 's_unheard'], others: 'yes', emo: 7, freq: 'often', claim: 'من از علی بیشتر می‌فهمم ولی مدیرها حرفِ او را قبول دارند' }), 4),
+      C: order(mk(['behavior', 'inference'], { stmts: ['s_nothink', 's_popular'], freq: 'once', others: 'yes', claim: 'این نشان می‌دهد من همیشه راهِ سخت‌تر را انتخاب می‌کنم' }), 4),
+      shared: (() => { const r = APP.knotRank(mk(['problem'], {})); const g = f => r.find(x => x.fam === f).score; return [g('F1'), g('F2'), g('F3')].join(','); })()
+    };
+    const f9 = ['من فیزیک بلد نیستم', 'نمی‌تونم ریاضی یاد بگیرم', 'نمی‌توانم ارائه بدهم', 'استعدادش رو ندارم', 'استعدادش را ندارم', 'هیچ‌وقت درست نمی‌شوم'].filter(c => !(APP.knotRank(mk(['problem'], { claim: c })).find(x => x.fam === 'F9').score > 0));
+    const t31 = (APP.KF.find(F => F.id === 'F9').acts.find(a => a.tid === 31) || {}).note || '';
+    return { a16, a17, fp, red, H, rank, f9, t31 };
+  });
 
   /* ۱) منو، درِ شروع، دیدنِ فهرست و «تازه» چیزی نمی‌نویسد */
   info.nav = await p.locator('.nav[data-v="kcases"]').count();
@@ -90,15 +120,28 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // re-answering a probe replaces its evidence (no double counting)
   await p.click('main [data-probe="f1_named"] .kn-opt:has-text("بی‌نامِ مفهوم هم")'); await p.waitForTimeout(250);
   info.f1Reanswer = await p.evaluate(id => APP.knotRank(APP.S.get(id)).find(x => x.fam === 'F1').score, mathId);
-  info.f1Collapsed = await p.locator('main details.kn-more [data-probe="f1_named"]').count(); // fell out of the top three, still reachable
+  info.f1Collapsed = await p.locator('main details.kn-more [data-probe="f12_zero"]').count(); // a family outside the top three is still reachable
   await p.evaluate(() => document.querySelectorAll('main details.kn-more').forEach(d => { d.open = true; }));
   await p.click('main [data-probe="f1_named"] .kn-opt:has-text("فقط با نامِ مفهوم")'); await p.waitForTimeout(250);
   info.ledgerRows = await p.locator('main .kn-evt tbody tr').count();
   await next(); info.s3 = await st();
   await p.click('main .kn-confirm'); await p.waitForTimeout(150);
   info.rootBlocked = (await st()).endsWith('s3') && await p.evaluate(() => APP.S.all('knot').length) === 0;
-  await p.selectOption('#knRootFam', 'F1'); await p.waitForTimeout(300);
+  // I1: a family with NO supporting evidence (F12) cannot be confirmed without a written reason; ≥1 «چرا» and a rival for the root are required
+  await p.selectOption('#knRootFam', 'F12'); await p.waitForTimeout(300);
   await p.fill('#knConf', '70'); await p.waitForTimeout(100);
+  info.supHint = await p.locator('main .kn-sup').innerText();
+  await p.click('main .kn-confirm'); await p.waitForTimeout(200);
+  info.rootReq = await p.evaluate(() => ['disagree', 'rival', 'why'].map(k => document.querySelectorAll(`main [data-k="${k}"].missing`).length).join(','));
+  info.noSupportBlocked = (await st()).endsWith('s3') && await p.evaluate(() => APP.S.all('knot').length) === 0;
+  await p.fill('#knRootRival', 'شاید فقط زمان کم بود و مفهوم را بلد بودم'); await p.waitForTimeout(80);
+  await p.click('main button:has-text("یک «چرا»ی دیگر")'); await p.waitForTimeout(80);
+  await p.fill('#knW_0', 'فاکتوریل را در کلاس فقط یک بار دیده بودم'); await p.fill('#knWe_0', 'در جزوه‌ام هیچ مثالی از آن نیست'); await p.selectOption('#knWt_0', 'out'); await p.waitForTimeout(150);
+  await p.click('main .kn-confirm'); await p.waitForTimeout(200);
+  info.noSupportStillBlocked = (await st()).endsWith('s3') && await p.evaluate(() => APP.S.all('knot').length) === 0 && await p.locator('main [data-k="disagree"].missing').count() === 1;
+  await p.selectOption('#knRootFam', 'F1'); await p.waitForTimeout(300);   // F1 has a «له» contrast ⇒ no reason needed
+  info.supF1 = await p.locator('main .kn-sup').innerText();
+  info.disagreeOptional = await p.locator('#knDisagree').count();
   await p.click('main .kn-confirm'); await p.waitForTimeout(300);
   info.s4 = await st();
   info.knot = await p.evaluate(id => { const kc = APP.S.get(id); const k = APP.S.get(kc.knots[0]); return k ? k.fam + '|' + k.status + '|' + k.cases.join(',') + '|' + kc.status : 'none'; }, mathId);
@@ -159,8 +202,24 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main .kn-confirm'); await p.waitForTimeout(200);
   info.rivalBlocked = (await st()).endsWith('s3');
   await p.fill('#knWr_0', 'دستورِ جلسه از قبل به نفعِ پیشنهادِ دیگر بسته شده بود'); await p.waitForTimeout(100);
+  await p.click('main .kn-confirm'); await p.waitForTimeout(200);
+  info.rootRivalBlocked = (await st()).endsWith('s3') && await p.locator('main [data-k="rival"].missing').count() === 1;
+  await p.fill('#knRootRival', 'شاید تصمیم پیش از جلسه گرفته شده بود و ربطی به من نداشت'); await p.waitForTimeout(80);
+  // I3: an auxiliary knot for a secondary family (F8) — created once, stored in kc.knots after the primary
+  await p.check('#knEx_F8'); await p.waitForTimeout(150);
+  info.auxRow = await p.locator('main .kn-exknot[data-fam="F8"] select').count();
+  await p.selectOption('#knExK_F8', 'new'); await p.waitForTimeout(150);
+  await p.fill('#knExN_F8', 'پیامِ فنی برای مخاطبِ غیرفنی'); await p.waitForTimeout(100);
   await p.click('main .kn-confirm'); await p.waitForTimeout(300);
   info.socKnot = await p.evaluate(id => { const kc = APP.S.get(id); const k = APP.S.get(kc.knots[0]); return k ? k.fam + '|' + kc.root.control : 'none'; }, socId);
+  info.socKnots = await p.evaluate(id => { const kc = APP.S.get(id); return kc.knots.map(x => { const k = APP.S.get(x); return k.fam + ':' + (k.cases.indexOf(id) >= 0) + ':' + k.name; }).join('|'); }, socId);
+  const nKnots = await p.evaluate(() => APP.S.all('knot').length);
+  await p.evaluate(id => APP.go('kcase', id, 's3'), socId); await p.waitForTimeout(200);
+  await p.click('main .kn-confirm'); await p.waitForTimeout(300);   // re-confirm must not create duplicates
+  info.reconfirmNoDup = nKnots === await p.evaluate(() => APP.S.all('knot').length);
+  await p.evaluate(() => APP.go('kmap')); await p.waitForTimeout(300);
+  info.coEdges = await p.locator('main .km-e.co').count();
+  await p.evaluate(id => APP.go('kcase', id, 's4'), socId); await p.waitForTimeout(200);
   info.socActs = await p.locator('main .kn-act').allTextContents().then(a => a.map(x => x.slice(0, 30)).join(' / '));
   info.extLabel = await p.locator('main .kn-act .kn-ext').count();
 
@@ -229,9 +288,17 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
   await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(300);
   info.leakRejected = (await p.inputValue('#knLad4')) === '' && !(await p.evaluate(id => (APP.S.get(id).ladder.steps || null), ladId));
-  await p.evaluate(() => { APP.callAI = () => Promise.resolve('{"s4":"از رقمِ یکان شروع کن","s5":"تجزیه به عوامل","s6":"دو رقم را به شکلِ جفت‌های ضربیِ ۸ بنویس"}'); });
+  // Minor3: no literal leak, but an independent solver derives «42» from the hints alone ⇒ rejected
+  await p.evaluate(() => { window.__lad = []; APP.callAI = (sys, user) => { window.__lad.push({ sys, user }); return Promise.resolve(sys === APP.KSYS_LADCHK ? '{"answer":"۴۲"}' : '{"s4":"رقمِ دهگان دو برابرِ رقمِ یکان است","s5":"تجزیه به عوامل","s6":"رقمِ یکان دو است"}'); }; });
+  await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
+  info.ladMore = await p.locator('.kn-ai .kn-ai-more').count();
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(300);
+  info.ladChk = await p.evaluate(() => ({ n: window.__lad.length, second: window.__lad[1] && window.__lad[1].sys === APP.KSYS_LADCHK, noStmt: !!window.__lad[1] && window.__lad[1].user.indexOf('حاصل‌ضربِ') < 0 && window.__lad[1].user.indexOf('42') < 0 }));
+  info.ladChkRejected = (await p.inputValue('#knLad4')) === '';
+  await p.evaluate(() => { APP.callAI = (sys) => Promise.resolve(sys === APP.KSYS_LADCHK ? '{"answer":null}' : '{"s4":"از رقمِ یکان شروع کن","s5":"تجزیه به عوامل","s6":"دو رقم را به شکلِ جفت‌های ضربیِ ۸ بنویس"}'); });
   await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
   await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(300);
+  info.ladChkAccepted = (await p.inputValue('#knLad4')) !== '';
   await p.click('main .kn-ladder button:has-text("ذخیرهٔ پله‌ها")'); await p.waitForTimeout(250);
   await p.click('main .kn-lad-open'); await p.waitForTimeout(250);
   info.ladEv = await p.evaluate(id => APP.S.get(id).ev.map(e => e.fam + ':' + e.w + ':' + e.kind).join('|'), ladId);
@@ -243,6 +310,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.dueYes = await p.evaluate(() => { APP.kpracticeDue = () => [1, 2, 3]; const n = APP.dueList().filter(d => /ورزشِ گره/.test(d.txt)).length; delete APP.kpracticeDue; return n; });
 
   /* ۱۲) P9: گره‌های بازگشته؛ و پیوند به گرهِ ورزیده ⇒ «بازگشته» */
+  // I2: the a16 «returned» path goes through the single status writer, which then syncs the follow-up reminder
+  // (spy on the reminder sync itself — its HOST.remind behaviour is covered in test_kpractice.js)
+  await p.evaluate(() => { window.__rem = []; const raw = APP.kremindSync; APP.kremindSync = function (k) { window.__rem.push({ key: 'knot:' + k.id, status: k.status }); return raw.apply(this, arguments); }; });
   await p.evaluate(k => { const x = APP.S.get(k); x.status = 'practised'; APP.S.put(x); }, knotId);
   await intake({ kinds: ['problem'], what: 'باز هم در یک مسئلهٔ شمارش گیر کردم', seen: 'yes', stmts: ['s_rule'] });
   const retId = await p.evaluate(() => APP.state.arg);
@@ -251,8 +321,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await next(); await p.selectOption('#knRootFam', 'F1'); await p.waitForTimeout(250); await p.fill('#knConf', '60');
   info.similar = await p.locator(`#knPick_0`).count() && await p.evaluate(() => document.querySelector('#knPick_0').value);
   await p.check('#knPick_0'); await p.waitForTimeout(80);
+  await p.fill('#knRootRival', 'شاید این بار فقط عجله داشتم'); await p.click('main button:has-text("یک «چرا»ی دیگر")'); await p.waitForTimeout(80);
+  await p.fill('#knW_0', 'شمارشِ ترتیب را هنوز خودکار نمی‌شناسم'); await p.fill('#knWe_0', 'دوباره سراغِ جمع رفتم'); await p.selectOption('#knWt_0', 'out'); await p.waitForTimeout(120);
   await p.click('main .kn-confirm'); await p.waitForTimeout(300);
   info.returned = await p.evaluate(([k, id]) => APP.S.get(k).status + '|' + APP.S.get(k).cases.indexOf(id), [knotId, retId]);
+  info.returnedRemind = await p.evaluate(k => window.__rem.filter(r => r.key === 'knot:' + k && r.status === 'returned').length + '|' + (APP.S.get(k).hist || []).map(h => h.status).join('>'), knotId);
+
   await p.evaluate(() => APP.go('proto', 'P9')); await p.waitForTimeout(200);
   info.p9 = await p.locator('main .kn-p9 li').count();
 
@@ -267,6 +341,22 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
 
   console.log(JSON.stringify(info, null, 1));
   const E = (c, m) => { if (!c) errors.push(m); };
+  // ---- ممیزیِ ۲۰۲۶-۱۰-۱۲ ----
+  const AU = info.audit;
+  E(!AU.a16.length && !AU.a17.length, 'C1/C2 safety misses: a16=' + AU.a16 + ' a17=' + AU.a17);
+  E(!AU.fp.length, 'C2 safety false positives: ' + AU.fp);
+  E(JSON.stringify(AU.red) === JSON.stringify(['وضعیتِ فعلی و [شخص]', 'رضایتِ [شخص]', '[شخص] آمد', 'علی‌رضا و [شخص]ِ ما', '[شخص] and Alibaba', '[شخص]، [شخص]', 'رضایت [شخص]']), 'C3 whole-word redaction: ' + JSON.stringify(AU.red));
+  E(!AU.H.aliLikes && !AU.H.envy && !AU.H.adhd && AU.H.frame && AU.H.behav && !AU.H.byPeople && !AU.H.byNames && !AU.H.him && !AU.H.flani && !AU.H.token && !AU.H.rivalMind, 'C4 third-party mind filter: ' + JSON.stringify(AU.H));
+  E(AU.rank.A1 === 'F3,F11,F5,F1,F2' && AU.rank.A2 === 'F1,F9' && AU.rank.B === 'F8,F7,F9,F10' && AU.rank.C === 'F11,F6,F9,F7', 'Minor1 scenario orders: ' + JSON.stringify(AU.rank));
+  E(AU.rank.shared === '0.33,0.33,0.33', 'Minor1 shared kind signal must weigh the same for F1/F2/F3: ' + AU.rank.shared);
+  E(!AU.f9.length, 'Minor2 F9 patterns missed: ' + AU.f9);
+  E(/Sisk 2018/.test(AU.t31) && /Yeager 2019/.test(AU.t31), 'intervention 31 label: ' + AU.t31);
+  E(/پیوست‌ها/.test(info.stmtHint || '') && !/ممکن نیست/.test(info.stmtHint || ''), 'photo hint: ' + info.stmtHint);
+  E(info.rootReq === '1,1,1' && info.noSupportBlocked && info.noSupportStillBlocked && /هیچ شاهدِ «له»/.test(info.supHint), 'I1 root needs support/reason + rival + why: ' + info.rootReq + ' ' + info.noSupportBlocked + ' ' + info.noSupportStillBlocked);
+  E(/شاهدِ له/.test(info.supF1) && info.disagreeOptional === 0, 'I1 supported family: ' + info.supF1 + ' ' + info.disagreeOptional);
+  E(info.rootRivalBlocked, 'I1 root rival not required');
+  E(info.auxRow === 1 && /^F10:true:.*\|F8:true:پیامِ فنی/.test(info.socKnots) && info.reconfirmNoDup && info.coEdges >= 1, 'I3 auxiliary knot / co-occurrence: ' + info.socKnots + ' dup-safe=' + info.reconfirmNoDup + ' edges=' + info.coEdges);
+  E(info.ladMore === 1 && info.ladChk.n === 2 && info.ladChk.second && info.ladChk.noStmt && info.ladChkRejected && info.ladChkAccepted, 'Minor3 ladder independent check: ' + JSON.stringify(info.ladChk) + ' ' + info.ladChkRejected + ' ' + info.ladChkAccepted);
   E(info.nav === 1, 'nav entry'); E(info.door === 1, 'start door');
   E(info.putsView0.length === 0, 'viewing list/new wrote: ' + info.putsView0);
   E(/kcase:new:in/.test(info.newView), 'new view: ' + info.newView); E(info.label === 'موقعیتِ گره‌گشا', 'section label: ' + info.label);
@@ -277,8 +367,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.ladderOff === 1 && info.ladderBtns === 0, 'ladder not disabled when answer seen');
   E(info.isoBox === 1 && info.needIso === 1 && info.needIsoAfter === 0, 'isomorph path');
   E(info.ev === 'F1:1:3:contrast|F2:-1:1:fact', 'evidence: ' + info.ev);
-  E(info.rankAfter.same && info.rankAfter.f1 === 5 && info.rankAfter.f2 === -0.67, 'ranking math: ' + JSON.stringify(info.rankAfter));
-  E(info.f1Reanswer === -1, 're-answer replaces evidence: ' + info.f1Reanswer);
+  // F1: kind «problem» 1÷3 + s_rule 3÷1 (its only specific signal) + contrast +3 = 6.33; F2: 1÷3 − 1 (fact) = −0.67
+  E(info.rankAfter.same && info.rankAfter.f1 === 6.33 && info.rankAfter.f2 === -0.67, 'ranking math: ' + JSON.stringify(info.rankAfter));
+  E(info.f1Reanswer === 0.33, 're-answer replaces evidence: ' + info.f1Reanswer);
   E(info.ledgerRows === 2, 'ledger rows: ' + info.ledgerRows);
   E(info.rootBlocked, 'root confirmed without primary');
   E(/s4$/.test(info.s4) && /^F1\|open\|kc_/.test(info.knot) && /rooted$/.test(info.knot), 'knot: ' + info.knot);
@@ -315,6 +406,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.dueNo === 0 && info.dueYes === 1, 'today row');
   E(info.similar === knotId, 'similar knot suggestion: ' + info.similar);
   E(/^returned\|1$/.test(info.returned) && info.p9 === 1, 'returned/P9: ' + info.returned + ' ' + info.p9);
+  E(/^[1-9]\d*\|.*returned$/.test(info.returnedRemind), 'I2 a16 returned path ⇒ reminder + hist: ' + info.returnedRemind);
   E(!info.overflow.length, 'mobile overflow: ' + info.overflow.join(' '));
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();
