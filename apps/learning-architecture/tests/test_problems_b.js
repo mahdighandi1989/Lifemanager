@@ -49,7 +49,7 @@ NEW.forEach(p => {
     E(STR(s.id) && !sids.has(s.id), S + 'id missing/duplicate'); sids.add(s.id);
     E(typeof s.year === 'number' || typeof s.year === 'string', S + 'year');
     ['who', 'ctx', 'q', 'move', 'idea', 'hint'].forEach(k => E(STR(s[k]), S + 'missing ' + k));
-    E(Array.isArray(s.opts) && s.opts.length >= 2, S + 'opts >= 2');
+    E(Array.isArray(s.opts) && s.opts.length >= 3, S + 'opts >= 3 (a 2-option stage is a coin flip and invites length cues)');
     E((s.opts || []).filter(o => o.ok === true).length === 1, S + 'exactly one ok option');
     (s.opts || []).forEach((o, j) => { E(STR(o.t) && STR(o.why) && typeof o.ok === 'boolean' && typeof o.hist === 'string', S + 'opt ' + j + ' fields'); });
     E(Array.isArray(s.st) && s.st.length >= 1 && s.st.every(x => ST.has(x)), S + 'st ids ' + JSON.stringify(s.st));
@@ -79,6 +79,61 @@ NEW.forEach(p => {
   const js = JSON.stringify(p); E(!/<\/script/i.test(js) && js.indexOf('<?') < 0, P + 'forbidden markup');
   info[p.id] = p.stages.length + ' stages / ' + p.dead.length + ' dead / ' + p.drills.length + ' drills / ' + p.lessons.length + ' lessons';
 });
+// ---------- سوگیریِ گزینه‌ها (ممیزی: «بلندترین گزینه برنده است») ----------
+// - در هر مسئله، گزینهٔ درست در حداکثر ۳۵٪ ِ گام‌ها (و ۳۵٪ ِ تمرین‌ها) بلندترین باشد (تساوی = بلندترین، سخت‌گیرانه).
+// - در دست‌کم ۸۰٪ ِ گام‌ها/تمرین‌ها: |طولِ درست − میانگینِ طولِ نادرست‌ها| ≤ ۰٫۳۵ × میانگینِ نادرست‌ها.
+// - تمرین‌ها دقیقاً ۴ گزینه.
+// - «ربات بلندترین گزینه» در سطحِ ۱ (همهٔ گام‌ها، بار اول) باید زیرِ ۸۰٪ بماند.
+// - ctx نباید جوابِ گام را لو بدهد: هیچ دنبالهٔ ۴ واژه‌ایِ مشترک میانِ ctx و متنِ گزینهٔ درست.
+// - نشانهٔ سطحی: واژه‌های «علامت‌دار» نباید به‌طورِ نظام‌مند فقط در گزینهٔ درست بیایند.
+const norm = s => String(s).replace(/[ً-ْٔ‌]/g, '').replace(/[«»()،؛:.,؟?!"'\[\]\/…\-—]/g, ' ');
+const toks = s => norm(s).split(/\s+/).filter(Boolean);
+const grams = (s, n) => { const t = toks(s), g = new Set(); for (let i = 0; i + n <= t.length; i++) g.add(t.slice(i, i + n).join(' ')); return g; };
+const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+const bias = {};
+let botRight = 0, botTotal = 0;
+const CUES = ['کنترل', 'هر دو', 'شاید', 'موقت', 'مستقل', 'فرضیه', 'دقیق', 'جدا'];
+const cueOnlyOk = {}, cueOnlyWrong = {};
+NEW.forEach(p => {
+  const P = p.id + ': ';
+  let longS = 0, closeS = 0, ratioS = [];
+  (p.stages || []).forEach(s => {
+    const L = s.opts.map(o => o.t.length), k = s.opts.findIndex(o => o.ok), W = L.filter((_, i) => i !== k), mw = mean(W);
+    if (L[k] >= Math.max(...W)) longS++;
+    if (Math.abs(L[k] - mw) <= 0.35 * mw) closeS++;
+    ratioS.push(L[k] / mw);
+    // ربات: بلندترین گزینه را می‌زند (در تساوی، نخستین بلندترین در ترتیبِ داده)
+    const pick = L.indexOf(Math.max(...L)); botTotal++; if (s.opts[pick].ok) botRight++;
+    // ctx ↔ گزینهٔ درست
+    const cg = grams(s.ctx, 4), shared = [...grams(s.opts[k].t, 4)].filter(g => cg.has(g));
+    E(!shared.length, P + 'stage ' + s.id + ': ctx gives away the correct option (shared 4-gram: ' + shared.join(' | ') + ')');
+    CUES.forEach(c => {
+      const inOk = norm(s.opts[k].t).includes(norm(c)), inW = s.opts.some((o, i) => i !== k && norm(o.t).includes(norm(c)));
+      if (inOk && !inW) cueOnlyOk[c] = (cueOnlyOk[c] || 0) + 1;
+      if (inW && !inOk) cueOnlyWrong[c] = (cueOnlyWrong[c] || 0) + 1;
+    });
+  });
+  const nS = (p.stages || []).length;
+  E(longS <= 0.35 * nS, P + 'correct option is the longest in ' + longS + '/' + nS + ' stages (max 35%)');
+  E(closeS >= 0.8 * nS, P + 'length-comparable stages ' + closeS + '/' + nS + ' (min 80%)');
+  let longD = 0, closeD = 0;
+  (p.drills || []).forEach((d, i) => {
+    E(d.opts.length === 4, P + 'drill ' + i + ': exactly 4 options');
+    const L = d.opts.map(o => o.length), W = L.filter((_, j) => j !== d.a), mw = mean(W);
+    if (L[d.a] >= Math.max(...W)) longD++;
+    if (Math.abs(L[d.a] - mw) <= 0.35 * mw) closeD++;
+  });
+  const nD = (p.drills || []).length;
+  E(longD <= 0.35 * nD, P + 'drill correct option is the longest in ' + longD + '/' + nD + ' (max 35%)');
+  E(closeD >= 0.8 * nD, P + 'length-comparable drills ' + closeD + '/' + nD + ' (min 80%)');
+  bias[p.id] = 'stages longest-correct ' + longS + '/' + nS + ', comparable ' + closeS + '/' + nS + ', mean len ratio ' + mean(ratioS).toFixed(2) + ' · drills longest-correct ' + longD + '/' + nD + ', comparable ' + closeD + '/' + nD;
+});
+E(botRight / botTotal < 0.8, 'longest-option bot scored ' + botRight + '/' + botTotal + ' on level 1 (must stay < 80%)');
+CUES.forEach(c => { const a = cueOnlyOk[c] || 0, b = cueOnlyWrong[c] || 0; E(a <= 3 || a <= 2 * b, 'surface cue «' + c + '» appears only in the correct option in ' + a + ' stages (only in a wrong one: ' + b + ')'); });
+console.log(JSON.stringify(bias, null, 1));
+console.log('longest-option bot (level 1, data): ' + botRight + '/' + botTotal + ' = ' + Math.round(100 * botRight / botTotal) + '%');
+console.log('cue only-in-correct / only-in-wrong: ' + CUES.map(c => c + ' ' + (cueOnlyOk[c] || 0) + '/' + (cueOnlyWrong[c] || 0)).join(' · '));
+
 // build.py: فایل در btfiles بلافاصله پس از epi_problems.js
 const build = fs.readFileSync(path.join(ROOT, 'build.py'), 'utf8');
 E(/"epi_problems\.js",\s*"epi_problems_b\.js"/.test(build), 'build.py btfiles must list epi_problems_b.js right after epi_problems.js');

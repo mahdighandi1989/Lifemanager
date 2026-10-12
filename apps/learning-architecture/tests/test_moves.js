@@ -174,7 +174,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     window.__ai = [];
     const decomp = { title: 'مسئلهٔ تزریقی', field: 'فیزیک', open: '۱۸۰۰–۱۹۰۰', statement: 's', why_hard: 'w', answer: 'a', src: [], era: { known: 'k', assumed: '', tools: 't' },
       stages: [{ id: 'n1', year: 1801, who: 'الف', ctx: 'c', q: 'q?', opts: [{ t: 'درست', ok: true, why: 'w' }, { t: 'نادرست', ok: false, why: 'w' }], move: 'm1', idea: 'i', st: [], lvl: 1, mv: ['mv_represent', 'mv_bogus'] },
-        { id: 'n2', year: 1850, who: 'ب', ctx: 'c', q: 'q2?', opts: [{ t: 'درست', ok: true, why: 'w' }], move: 'm2', idea: 'i', st: [], lvl: 2, mv: 'mv_contra' }],
+        { id: 'n2', year: 1850, who: 'ب', ctx: 'c', q: 'q2?', opts: [{ t: 'درست', ok: true, why: 'w' }, { t: 'نادرست', ok: false, why: 'w' }], move: 'm2', idea: 'i', st: [], lvl: 2, mv: 'mv_contra' }],
       dead: [{ who: 'ج', year: 1820, idea: 'ایده', flaw: 'شکاف', st: [] }], lessons: [], drills: [] };
     APP.callAI = function (sys, user) {
       window.__ai.push({ sys, user });
@@ -225,7 +225,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // مسئلهٔ تأییدشده در شمارشِ حرکت‌ها
   if (!(await p.evaluate(() => APP.moveStages('mv_contra').some(x => x.p.title === 'مسئلهٔ تزریقی')))) errors.push('approved injected not counted');
   // بازبینی که شکست بخورد ⇒ پرچمِ کلیِ باز
-  await p.evaluate(() => { let n = 0; APP.callAI = () => (++n === 1 ? Promise.resolve(JSON.stringify({ title: 'دومی', stages: [{ q: 'q', ctx: 'c', opts: [{ t: 'x', ok: true, why: 'w' }], move: 'm', idea: 'i' }] })) : Promise.reject(new Error('شبکه قطع است'))); });
+  await p.evaluate(() => { let n = 0; APP.callAI = () => (++n === 1 ? Promise.resolve(JSON.stringify({ title: 'دومی', field: 'ف', statement: 'ص', answer: 'پ', why_hard: 'چ', stages: [{ q: 'q', ctx: 'c', opts: [{ t: 'x', ok: true, why: 'w' }, { t: 'y', ok: false, why: 'w' }], move: 'm', idea: 'i' }] })) : Promise.reject(new Error('شبکه قطع است'))); });
   await go('e_prob', null, 'inject');
   await p.fill('#pbIn_title', 'دومی'); await p.fill('#pbIn_statement', 'ص'); await p.fill('#pbIn_answer', 'پ'); await p.fill('#pbIn_src', 'منبع');
   await p.click('main .pb-ai'); await p.waitForTimeout(400);

@@ -86,7 +86,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   for (const k of ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'end']) { await p.evaluate(x => APP.go('journey', x[0], x[1]), [tid, k]); await bad('journey ' + k); }
   info.jobs = await p.evaluate(() => APP.C.PIPELINE.map(s => { const j = APP._journeyJob(s.k); return s.k + '=' + (j.tech || j.proto); }).join(' '));
   // درسِ دوره (قدمِ ۳) سفر را معرفی می‌کند
-  await p.evaluate(tid => { const c = APP.courseState() || { id: 'course', type: 'course', done: {} }; c.topic = tid; APP.S.put(c); APP.go('lesson', 37, 's3'); }, tid); await p.waitForTimeout(100);
+  await p.evaluate(tid => { const c = APP.courseState() || { id: 'course', type: 'course', done: {} }; c.topic = tid; c.warmSkip = APP.today(); APP.S.put(c); APP.go('lesson', 37, 's3'); }, tid); await p.waitForTimeout(100);
   info.courseHint = await p.locator('main .crs-jhint').count();
   // موبایل
   await p.setViewportSize({ width: 390, height: 844 });

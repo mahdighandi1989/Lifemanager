@@ -165,3 +165,15 @@ _dt.datetime = _Shifted
 - مرتبط: [write-gate-next-to-optional-identity](write-gate-next-to-optional-identity.md)
   — the auth split (401 vs 403, strict vs lenient identity) that the
   status-code bucket above turns on.
+
+## Update 2026-10-13 — clock-window failures from a local-vs-UTC "today"
+
+Five suites (attention, command center, self model, weekly review, planner scoping) went red
+only between 20:00 and 24:00 UTC on a machine whose TZ was Asia/Dubai: the services take
+«today» as `datetime.now(timezone.utc).date()` while the fixtures used `date.today()` (local).
+Production (Render) is UTC, so the product was right and the tests were wrong. The fix was not
+to patch five files but to pin the suite's clock zone once in `tests/conftest.py`
+(`os.environ["TZ"] = "UTC"; time.tzset()`) — the gate now matches production on any machine.
+**Apply elsewhere:** when a failure appears/disappears with wall-clock time, compare the
+service's notion of "today" with the fixture's before touching either; pin the test process to
+the production timezone centrally rather than sprinkling conversions.

@@ -1017,3 +1017,18 @@ table.kp-log th,table.kp-log td{padding:4px 6px;border-bottom:1px solid var(--li
 .mv-golist{white-space:normal;text-align:right}
 @media (max-width:520px){.mv-grid{grid-template-columns:minmax(0,1fr)}.mv-practice fieldset{padding:6px 8px}}
 /* === a19_moves END === */
+/* === a8_prob BEGIN === */
+/* گزینه‌ها: هم‌عرض و هم‌ارتفاع در هر دسته (طولِ متن از روی اندازهٔ دکمه لو نمی‌رود) */
+.pb-opts{display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:1fr;gap:6px}
+.pb-opts>.dopt{display:flex;align-items:center;box-sizing:border-box;width:100%;min-width:0;white-space:normal;text-align:right;overflow-wrap:anywhere}
+.pb-opts>.mv-opt{flex-direction:column;align-items:stretch;justify-content:center}
+/* «↩ برگرد» ِ شناور روی صفحه‌های مسئله/حرکت روی بازخورد و برچسب‌ها می‌افتاد ⇒ این‌جا در جریانِ صفحه، زیرِ محتوا (همان دکمه بالای صفحه هم هست) */
+#main:has(.pb-page)>.backfab,#main:has(.page.mv)>.backfab{position:static;margin-top:20px}
+.pb-year{unicode-bidi:isolate;white-space:nowrap}
+.pb-err{white-space:pre-wrap;overflow-wrap:anywhere;margin:.4em 0;font:inherit;font-size:.86rem;background:var(--bad-soft);border-right:3px solid var(--bad);border-radius:6px;padding:6px 10px}
+.pb-src{margin:.3em 0;padding-inline-start:1.2em}
+.pb-srclink{overflow-wrap:anywhere}
+.pb-broken{border-right:4px solid var(--bad)}
+.pb-minelbl{font-weight:700;font-size:.92rem}
+.pb-changed{border-right:3px solid var(--warn)}
+/* === a8_prob END === */

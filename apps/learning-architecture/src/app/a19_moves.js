@@ -102,9 +102,8 @@
       n5: ["mv_represent", "mv_assume"],    // تیت: صورتِ هم‌ارزِ یالی؛ کنار گذاشتنِ فرضِ اثبات‌نشدهٔ دورِ همیلتونی
       n4: ["mv_anomaly"],                   // هیوود: مثالِ نقضِ گام جدی گرفته شد، نه «احتمالاً درست است»
       n6: ["mv_decompose"],                 // اجتناب‌ناپذیری + تقلیل‌پذیری: فهرستِ متناهیِ پوشاننده
-      n7: ["mv_invariant"],                 // هش: «بار» از فرمولِ اویلر (پایستگی)
-      n8: ["mv_compute"],                   // اپل و هاکن: وارسیِ رایانه‌ای
-      n10: ["mv_measure"]                   // گونتیه: ابزارِ دقیق‌ترِ وارسی (دستیارِ اثبات)
+      n7: ["mv_compute"],                   // هش: گزینهٔ درست «مقیاس ⇒ ابزارِ محاسباتی لازم است»؛ تخلیه ابزارِ ساختنِ فهرست است، نه ناوردایی که چیزی را ناممکن کند
+      n8: ["mv_compute"]                    // اپل و هاکن: وارسیِ رایانه‌ای
     },
     pb_poincare: {
       n1: ["mv_invariant"],                 // همولوژی ناوردای ضعیفی است ⇒ مثالِ نقض
@@ -162,7 +161,7 @@
   /* گام‌هایی که عمداً برچسب نگرفتند: حرکتِ قاطعشان یکی از ۱۶ حرکت نیست. */
   A.MOVE_UNTAGGED = {
     pb_flt: { n7: "خواندنِ دقیقِ یک نتیجهٔ جزئی (فالتینگز) — داوری، نه حرکتِ حل", n6: "شواهدِ عددی؛ درسِ گام تفکیکِ «بررسی‌شده» از «همه» است، نه خودِ محاسبه", n9: "داوریِ مستقل و کشفِ شکاف", n10: "ترکیبِ دو رویکردِ ناکافی؛ در فهرستِ ۱۶ حرکت معادلِ دقیقی ندارد" },
-    pb_fourcolor: { n1: "صورت‌بندیِ دقیقِ شرایط — پیش‌نیازِ همهٔ حرکت‌ها، نه یکی از آن‌ها", n9: "بازسازیِ مستقلِ برهان (وارسی)" },
+    pb_fourcolor: { n1: "صورت‌بندیِ دقیقِ شرایط — پیش‌نیازِ همهٔ حرکت‌ها، نه یکی از آن‌ها", n9: "بازسازیِ مستقلِ برهان (وارسی)", n10: "وارسیِ صوری در دستیارِ اثبات — اعتبارسنجیِ برهانی که از پیش هست (هم‌خانوادهٔ n9)، نه حرکتِ حل؛ «ابزارِ دقیق‌تر» این‌جا به سنجشِ یک اثر برنمی‌گردد" },
     pb_poincare: { n4: "پذیرفتنِ ویژه بودنِ بُعدِ ۳ — داوری دربارهٔ حدِّ یک تعمیم", n7: "شناساییِ دقیقِ مانع؛ تشخیص، نه حرکتِ حل", n10: "وارسیِ جمعیِ برهان" },
     pb_quintic: { n1: "انباشتِ ترفند؛ درسِ گام پرسیدنِ «چرا کار کرد» است", n7: "داوری دربارهٔ گزارشِ پواسون و انتشار" },
     pb_greek: { n1: "موفقیتِ جزئی (هلال‌ها)؛ درسِ گام هشدار دربارهٔ تعمیمِ شتاب‌زده است", n4: "تصمیمِ نهادی بر پایهٔ نرخِ پایه", n9: "ماجرای لایحهٔ ایندیانا — داوریِ نهادی" },
@@ -174,6 +173,7 @@
   /* ---------- دسترسی ---------- */
   function probs() { return A.probs ? A.probs() : (window.EPI_PROBLEMS || []); }
   function yr(y) { return A.probYear ? A.probYear(y) : fa(y == null ? "" : y); }
+  function yrWho(s, lead) { var a = [], y = s && s.year; if (y != null && y !== "") a.push(h("bdi", { class: "pb-year" }, yr(y))); if (s && s.who) a.push(s.who); if (!a.length) return null; var out = [lead || ""]; a.forEach(function (x, i) { if (i) out.push(" · "); out.push(x); }); return out; }
   A.stageMoves = function (p, s) {
     var raw = s && s.mv != null ? s.mv : ((A.MOVE_TAGS[p && p.id] || {})[s && s.id]);
     var arr = typeof raw === "string" ? [raw] : Array.isArray(raw) ? raw : [];
@@ -211,13 +211,29 @@
   function accText(mv) { var a = A.moveAcc(mv); return a.n ? fa(a.ok) + " از " + fa(a.n) + " (" + fa(Math.round(100 * a.ok / a.n)) + "٪)" : "هنوز تمرین نشده"; }
 
   /* ---------- «🪢 این‌جا گیر کردم» ⇒ موقعیتِ عادیِ گره‌گشا ---------- */
+  /* زمینهٔ خنثی: هر جملهٔ ctx که با متنِ یکی از گزینه‌ها یا با move/idea ِ همان گام دست‌کم ۴ واژهٔ پیاپیِ مشترک دارد، حذف می‌شود
+     (پاسخ از راهِ زمینه لو نرود). متنِ کاملِ ctx فقط پس از دیدنِ پاسخ به صورتِ مسئله افزوده می‌شود. */
+  function words(t) {
+    return String(t || "").replace(/[يى]/g, "ی").replace(/ك/g, "ک").replace(/[\u064B-\u0655\u0670\u0640]/g, "").replace(/\u200c/g, " ")
+      .replace(/[0-9۰-۹٠-٩]+/g, function (d) { return d.replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return "٠١٢٣٤٥٦٧٨٩".indexOf(c); }); })
+      .toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  }
+  function grams(t, n) { var w = words(t), out = {}; for (var i = 0; i + n <= w.length; i++) out[w.slice(i, i + n).join(" ")] = 1; return out; }
+  function sentences(t) { return String(t || "").split(/(?<=[.!?؟؛])\s+|\n+/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  A.probNeutralCtx = function (s) {
+    var bad = {};
+    (s.opts || []).map(function (o) { return o && o.t; }).concat([s.move, s.idea]).forEach(function (t) { Object.assign(bad, grams(t, 4)); });
+    return sentences(s.ctx).filter(function (x) { var g = grams(x, 4); return !Object.keys(g).some(function (k) { return bad[k]; }); }).join(" ");
+  };
+  A.probShares4 = function (a, b) { var g = grams(b, 4); return Object.keys(grams(a, 4)).filter(function (k) { return g[k]; }); };
   function stuck(p, s, idx, st) {
     var ex = S.all("kcase", function (c) { return c.src && c.src.type === "eprob" && c.src.pid === p.id && c.src.sid === s.id && c.status !== "closed" && c.status !== "done"; })[0];
     if (ex) { A.toast("برای همین گام پیش‌تر یک موقعیت ساخته‌ای؛ همان باز شد."); A.go("kcase", ex.id, ex.step || "in"); return ex; }
     var kc = A.knotNewCase(), ok = (s.opts || []).filter(function (o) { return o.ok; })[0];
     var where = "گامِ " + fa(idx + 1) + " از مسئلهٔ «" + p.title + "»";
     kc.kinds = ["problem"]; kc.title = "گیر در " + where; kc.titleSet = true;
-    kc.intake.statement = (s.ctx || "") + "\n\n" + (s.q || "");          // فقط زمینه و پرسش — پاسخ هرگز در صورتِ مسئله نمی‌آید
+    var seen = !!(st && st.revealed), nctx = seen ? (s.ctx || "") : A.probNeutralCtx(s);
+    kc.intake.statement = (nctx ? nctx + "\n\n" : "") + (s.q || "");    // فقط زمینهٔ خنثی و پرسش — پاسخ هرگز در صورتِ مسئله نمی‌آید
     kc.intake.answer = ok ? ok.t : (s.move || "");                          // برای نردبان و کنترلِ نشت (در فرم تا «نمایش» پوشیده است)
     kc.intake.answerHow = "مسیرِ تاریخیِ ثبت‌شده در «مسئله‌های بزرگ» (" + [yr(s.year), s.who].filter(Boolean).join("، ") + ")";
     kc.intake.stuckAt = where + (s.year != null && s.year !== "" ? " — لحظهٔ تاریخیِ " + yr(s.year) : "");
@@ -225,11 +241,23 @@
     kc.intake.seen = st && st.revealed ? "yes" : "no";
     if (st && st.mine && String(st.mine).trim()) kc.intake.thoughts = String(st.mine).trim();
     kc.src = { type: "eprob", pid: p.id, sid: s.id };
+    if (!seen && normWS(nctx) !== normWS(s.ctx)) kc.src.ctxHeld = String(s.ctx || "");   // پس از دیدنِ پاسخ به صورت افزوده می‌شود
     try { var r = {}; (A.knotRank ? A.knotRank(kc) : []).forEach(function (x) { r[x.fam] = { score: x.score, why: x.why }; }); kc.rank = r; } catch (e) { }
     S.put(kc);
     A.go("kcase", kc.id, "in");
     return kc;
   }
+  function normWS(t) { return String(t || "").replace(/\s+/g, " ").trim(); }
+  /* زمینهٔ کاملِ نگه‌داشته را (یک‌بار) به صورتِ موقعیت بیفزا — وقتی پاسخ دیده شد */
+  function releaseCtx(kc) {
+    if (!kc || !kc.src || !kc.src.ctxHeld) return false;
+    var it = kc.intake = kc.intake || {}; var q = (A.getProb && A.getProb(kc.src.pid) || { stages: [] }).stages.filter(function (x) { return x.id === kc.src.sid; })[0];
+    it.statement = "زمینهٔ کامل (پس از دیدنِ پاسخ): " + kc.src.ctxHeld + "\n\n" + (it.statement || (q && q.q) || "");
+    delete kc.src.ctxHeld; S.put(kc);
+    var ta = document.getElementById("knStmt"); if (ta) ta.value = it.statement;
+    return true;
+  }
+  A.probReleaseCtx = releaseCtx;
   A.probStuck = function (p, s, idx, getState) {
     if (!A.V.kcase || typeof A.knotNewCase !== "function") return null;
     return h("div", { class: "row gap wrap mv-stuckrow" },
@@ -274,7 +302,7 @@
     var others = x.mv.filter(function (t) { return t !== cur; });
     return h("article", { class: "card mv-stage", "data-pid": x.p.id, "data-sid": x.s.id },
       h("div", { class: "row between wrap gap" }, h("button", { class: "linkish", onclick: function () { A.go("e_prob", x.p.id, "about"); } }, h("strong", {}, x.p.title)), h("span", { class: "chip" }, x.p.field || "")),
-      h("div", { class: "small muted" }, "گامِ " + fa(x.i + 1) + " · " + [yr(x.s.year), x.s.who].filter(Boolean).join(" · ")),
+      h("div", { class: "small muted", dir: "rtl" }, "گامِ " + fa(x.i + 1), yrWho(x.s, " · ")),
       h("p", { class: "small" }, x.s.ctx || ""), h("p", {}, h("strong", {}, x.s.q || "")),
       others.length ? h("div", { class: "row gap wrap small" }, h("span", { class: "muted" }, "همراه با: "), others.map(function (t) { return mvLink(t); })) : null,
       h("div", { class: "row gap wrap" }, h("button", { class: "btn sm mv-try", onclick: function () { A.go("e_prob", x.p.id, "sim:" + x.s.id); } }, "تمرین کن ←")));
@@ -340,13 +368,13 @@
       sec.appendChild(h("div", { class: "row between wrap gap small muted" }, h("span", {}, "پرسشِ " + fa(S2.k + 1) + " از " + fa(S2.items.length)), h("span", {}, "تشخیصِ درست تا این‌جا: " + fa(S2.score))));
       var card = h("div", { class: "mv-item" });
       card.appendChild(h("div", { class: "row between wrap gap" }, h("strong", {}, it.p.title), h("span", { class: "chip" }, it.p.field || "")));
-      card.appendChild(h("div", { class: "small muted" }, [yr(it.s.year), it.s.who].filter(Boolean).join(" · ")));
+      card.appendChild(h("div", { class: "small muted", dir: "rtl" }, yrWho(it.s, "")));
       card.appendChild(h("p", {}, h("strong", {}, "وضعِ دانش: "), it.s.ctx || ""));
       card.appendChild(h("h3", {}, it.s.q || ""));
       sec.appendChild(card);
       var q1 = h("fieldset", { class: "mv-q1" }, h("legend", {}, "کدام حرکت این‌جا کار می‌کند؟"));
       var fb1 = h("div", { class: "dfb" });
-      var bs = h("div", { class: "dopts mv-opts" }, it.choices.map(function (c) {
+      var bs = h("div", { class: "dopts mv-opts pb-opts" }, it.choices.map(function (c) {
         return h("button", { class: "dopt mv-opt", "data-mv": c, disabled: S2.phase !== "move" ? true : null, onclick: function () {
           if (S2.phase !== "move") return;
           var ok = it.mv.indexOf(c) >= 0; S2.phase = "stage"; if (ok) S2.score++;
@@ -364,7 +392,7 @@
       function stagePart() {
         q2.classList.remove("hidden"); q2.innerHTML = ""; q2.appendChild(h("legend", {}, "حالا خودِ گام: حرکتِ بعدی کدام است؟"));
         var ord = A.shuffle((it.s.opts || []).map(function (_, j) { return j; })), fb2 = h("div", { class: "dfb" });
-        var os = h("div", { class: "dopts" }, ord.map(function (j) { var o = it.s.opts[j]; return h("button", { class: "dopt mv-sopt", onclick: function (e) {
+        var os = h("div", { class: "dopts pb-opts" }, ord.map(function (j) { var o = it.s.opts[j]; return h("button", { class: "dopt mv-sopt", onclick: function (e) {
           var b = e.currentTarget; if (b.disabled) return; b.disabled = true; b.classList.add(o.ok ? "right" : "wrong");
           fb2.appendChild(h("div", { class: "small " + (o.ok ? "good" : "bad") }, (o.ok ? "درست: " : "نه: ") + (o.why || "") + (o.hist ? " — " + o.hist : "")));
           if (o.ok) {
@@ -415,10 +443,11 @@
         var sec = h("section", { class: "card soft mv-kback", dir: "rtl" }, h("p", { class: "small" }, "این موقعیت از «مسئله‌های بزرگ» آمده است: ", h("b", {}, p ? p.title + (idx >= 0 ? " · گامِ " + fa(idx + 1) : "") : "مسئله‌ای که دیگر در دسترس نیست"), "."),
           p ? h("button", { class: "btn ghost sm mv-kback-go", onclick: function () { A.go("e_prob", src.pid, "sim:" + src.sid); } }, "🧗 برگشت به همان گام در شبیه‌ساز") : null);
         var hd = root.querySelector(".phead"); if (hd && hd.parentNode) hd.parentNode.insertBefore(sec, hd.nextSibling); else root.insertBefore(sec, root.firstChild);
+        if (src.ctxHeld && (kc.intake || {}).seen === "yes") releaseCtx(kc);
         var ans = root.querySelector("#knAns");
         if (ans && (kc.intake || {}).seen !== "yes") {
           ans.classList.add("mv-masked"); ans.setAttribute("aria-describedby", "mvAnsNote");
-          var show = h("button", { type: "button", class: "btn ghost sm mv-unmask", onclick: function () { ans.classList.remove("mv-masked"); show.remove(); note.textContent = "پاسخ نمایش داده شد. اگر حالا آن را دیده‌ای، «پاسخ/راه‌حل را دیده‌ای؟» را به «بله» تغییر بده."; } }, "نمایشِ پاسخ (لو می‌دهد)");
+          var show = h("button", { type: "button", class: "btn ghost sm mv-unmask", onclick: function () { ans.classList.remove("mv-masked"); show.remove(); var k2 = S.get(id); if (releaseCtx(k2)) { var t2 = root.querySelector("#knStmt"); if (t2) t2.value = k2.intake.statement; } note.textContent = "پاسخ نمایش داده شد. اگر حالا آن را دیده‌ای، «پاسخ/راه‌حل را دیده‌ای؟» را به «بله» تغییر بده."; } }, "نمایشِ پاسخ (لو می‌دهد)");
           var note = h("div", { class: "fhint", id: "mvAnsNote" }, "پاسخ پوشیده است چون هنوز در شبیه‌ساز آن را ندیده‌ای؛ نردبانِ راهنمایی فقط برای این‌که چیزی لو نرود از آن استفاده می‌کند.");
           ans.parentNode.insertBefore(h("div", { class: "row gap wrap" }, show), ans.nextSibling); ans.parentNode.appendChild(note);
         }

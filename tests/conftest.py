@@ -10,6 +10,16 @@ import importlib
 import os
 
 os.environ.setdefault("RATE_LIMIT_DISABLED", "true")
+# Production (Render) runs in UTC and several services take «today» as the UTC date, while
+# many tests build fixtures with a local date.today(). On a non-UTC machine those two dates
+# differ for hours every day (e.g. Asia/Dubai after 20:00 UTC) and ~5 suites fail by the
+# clock. Pin the suite to the production timezone so the merge gate is deterministic.
+os.environ["TZ"] = "UTC"
+try:
+    import time as _time
+    _time.tzset()
+except AttributeError:  # Windows has no tzset; nothing to pin there
+    pass
 # A stable signing key keeps token-shape assertions deterministic.
 os.environ.setdefault("JWT_SECRET_KEY", "test-key-not-for-prod")
 # Bootstrap admin identity for the admin-gated suites. The admin email used
