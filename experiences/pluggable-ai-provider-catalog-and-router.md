@@ -193,3 +193,6 @@ sentence that pinpoints the fix — always bubble up `error.type` + `error.messa
   (ok/error/time) somewhere a read-only status endpoint can show without log access; check that endpoint after every deploy.
 - Reproduce upgrades against the real engine: run the OLD seed, then the NEW one, on a throw-away Postgres (`initdb` + `pg_ctl`
   in a temp dir) — SQLite in tests hides dialect-specific failures.
+- **Correction (same day):** in this case the seed had NOT failed — my reading of the public status endpoint was stale (read
+  before the first refresh run / from an intermediate cache). The persisted result is what proved it. Lesson on top of the lesson:
+  before concluding "the deploy didn't take", read a status that carries its own timestamp (seed `at`, job `last_run`).
