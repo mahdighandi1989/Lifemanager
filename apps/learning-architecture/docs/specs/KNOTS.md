@@ -213,3 +213,13 @@
 - `knot`: `{id, type:"knot", name, fam, sub, principle, signals, counter, example, cases[], links[{to, rel}], status, items[{id, form, prompt, answer|rubric,
   deep, trap, level, verified, decoy}], log[{at, itemId, conf, ok}], next, interval, solvedAt, returnedAt}`
 - سرور: جدولِ `app_reminders` (کلید یکتا برای هر کاربر/برنامه، زمان، عنوان، متن، پیوند، وضعیتِ هر کانال، ارسال‌شده‌در).
+
+## ۱۳. قراردادِ میانِ ماژول‌ها (برای سازنده‌ها)
+- `a16_knots.js` (ثبت، تونل‌های ۰ تا ۴، داده‌ها، پیوندها): `A.KF` = آرایهٔ ۱۲ خانواده `{id:"F1".., fa, subs[{id,fa,src}], signals[{id,fa,w,test(intake)}], probes[{id,fa,kind:"contrast"|"fact"|"counterfactual", ask, scoreFrom(ans)}], acts[{tid}|{ext,fa,src,ev}], blurb}`؛
+  `A.knotRank(kcase)` ⇒ `[{fam, score, why[]}]`؛ `A.newKnot(o)`، `A.knotCases(knotId)`؛ نماها: `A.V.kcases` (فهرست و «موقعیتِ تازه»)، `A.V.kcase(id, step)`، `A.V.knot(id, tab)`.
+- `a17_kpractice.js` (قدمِ ۵ و ۶): `A.KGEN` = ثبت‌گاهِ سازنده‌های برنامه‌وار `{key: {fa, fams[], make(level, rng) ⇒ {prompt, answer, check(ans), explain, deep, trap, form, decoy?}}}`؛
+  `A.kitemsOf(knotId)`، `A.kpracticeDue()` ⇒ آیتم‌های موعد، `A.V.kpractice(knotId|null)` (جلسهٔ درهم‌تنیده)، `A.kmastery(knot)` ⇒ `{status, why}`؛
+  یادآورها از راهِ `A.HOST.remind({key, due_date, tz, title, body, link, detail})` / `A.HOST.unremind(key)` (اگر نبود، بی‌اثر).
+- `a18_kmap.js` (نقشه و شبیه‌سازها): `A.V.kmap()`؛ `A.KSIM` = ثبت‌گاهِ شبیه‌سازها `{key: {title, fams[], note, draw()}}`؛ `A.knotSimFor(fam)` ⇒ کلیدهای مرتبط.
+- رکوردِ `kitem`: `{id, type:"kitem", knot, form, prompt, answer, atype:"int"|"choice"|"text"|"rubric", choices?, rubric?, deep, trap, level, decoy, gen:{by:"code:<key>"|"ai"|"user", at}, ver:{n, agree, multi, deepOk}|null, bad:false, due, iv, hist[{at, conf, ok}]}`.
+- وضعیتِ گره: `"open" | "working" | "practised" | "returned"` (برچسب‌ها: باز · در حالِ باز شدن · ورزیده‌شده · بازگشته).
