@@ -5,6 +5,18 @@ from datetime import datetime, timezone
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _all_channels_on():
+    """Notification settings with every channel on (the owner can switch them in «تنظیمات › اعلان‌ها»)."""
+    from app.services import notification_prefs as np
+
+    old = np._cache
+    p = np._default_prefs(); p["channels"]["email"]["enabled"] = True
+    np.set_cache(p)
+    yield
+    np.set_cache(old)
+
+
 def _signin(api_client):
     r = api_client.post("/auth/register", json={"email": "rem@example.com", "password": "hunter2-long", "username": "rem"})
     api_client.headers.update({"Authorization": f"Bearer {r.json()['access_token']}"})
@@ -153,3 +165,56 @@ async def test_connected_gmail_error_is_a_failure_not_unconfigured(db_session, m
 
     monkeypatch.setattr(gmail_service, "send_email_gmail", nc)
     assert await svc._send_email(db_session, "s", "t") == "skipped_unconfigured"
+
+
+
+@pytest.mark.asyncio
+async def test_notification_settings_rule_event_and_channels(db_session):
+    from app.models.app_reminder import AppReminder
+    from app.services import app_reminder_service as svc
+    from app.services import notification_prefs as np
+    from sqlalchemy import select
+
+    async def tg(text):
+        return "sent"
+
+    async def mail(subj, text):
+        return "sent"
+
+    at = datetime(2026, 10, 13, 5, 1, tzinfo=timezone.utc)
+    p = np._default_prefs(); p["events"]["knot_practice"] = False; np.set_cache(p)
+    await svc.upsert(db_session, user_id=1, app="a", items=[{"key": "m", "due_date": "2026-10-13", "tz": "Asia/Dubai"}])
+    await svc.deliver_due(db_session, now=at, senders=(tg, mail))
+    assert (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "m"))).scalar_one().status == "muted"
+    p = np._default_prefs(); np.set_cache(p)  # defaults: e-mail channel off in the settings
+    await svc.upsert(db_session, user_id=1, app="a", items=[{"key": "n", "due_date": "2026-10-13", "tz": "Asia/Dubai"}])
+    await svc.deliver_due(db_session, now=at, senders=(tg, mail))
+    r = (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "n"))).scalar_one()
+    assert r.status == "sent" and '"email": "off_in_settings"' in r.result
+
+
+def test_event_is_listed_in_the_notification_settings():
+    from app.services.notification_prefs import EVENT_CATALOG
+
+    assert any(e["key"] == "knot_practice" and "telegram" in e["channels"] and "email" in e["channels"] for e in EVENT_CATALOG)
+
+
+@pytest.mark.asyncio
+async def test_bell_copy_goes_to_the_in_app_notifications(db_session, monkeypatch):
+    from app.models.app_reminder import AppReminder
+    from app.services import app_reminder_service as svc
+    from sqlalchemy import select
+
+    async def tg(text):
+        return "skipped_unconfigured"
+
+    async def mail(db, subj, text):
+        return "skipped_unconfigured"
+
+    monkeypatch.setattr(svc, "_send_telegram", tg)
+    monkeypatch.setattr(svc, "_send_email", mail)
+    await svc.upsert(db_session, user_id=1, app="a", items=[{"key": "b", "due_date": "2026-10-13", "tz": "Asia/Dubai",
+                                                             "title": "ورزشِ گره‌گشا", "body": "یک ورزشِ گره موعد است"}])
+    await svc.deliver_due(db_session, now=datetime(2026, 10, 13, 5, 1, tzinfo=timezone.utc))
+    r = (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "b"))).scalar_one()
+    assert '"in_app": "sent"' in r.result and r.status == "sent"

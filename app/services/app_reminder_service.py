@@ -205,6 +205,31 @@ def _next_window(now: datetime, hour: int, tz: str) -> datetime:
     return today if today > now else send_time_utc((loc.date() + timedelta(days=1)).isoformat(), hour, tz)
 
 
+EVENT = "knot_practice"  # the row in «تنظیمات › اعلان‌ها» that switches these reminders on/off
+
+
+def _prefs():
+    try:
+        from app.services import notification_prefs as np
+
+        return np
+    except Exception:  # noqa: BLE001
+        return None
+
+
+async def _send_in_app(db: AsyncSession, r: AppReminder) -> str:
+    try:
+        from app.services.notification_service import notify_event
+
+        n = await notify_event(EVENT, user_id=int(r.user_id or 0), db=db, title=r.title or "ورزشِ گره‌گشا",
+                               message=(r.detail or r.body or "").strip() or "یک ورزشِ گره موعد است",
+                               action_link=_public_link(r.link or ""), action_text="باز کن")
+        return "sent" if n is not None else "failed"
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("reminder in-app failed: %s", type(exc).__name__)
+        return "failed"
+
+
 async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, senders=None) -> Dict[str, Any]:
     """Send every pending reminder whose time has come (the ``app_reminders`` job).
 
@@ -240,9 +265,21 @@ async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, sende
             out["deferred"] += 1
             await db.commit()
             continue
+        # the owner's notification settings (Settings › اعلان‌ها) rule: event off ⇒ nothing is sent;
+        # a channel switched off there ⇒ «off_in_settings» (honest, not a failure, not «sent»)
+        np = _prefs()
+        if np is not None and not np.event_enabled(EVENT):
+            r.status, r.result = "muted", json.dumps({"event": "off_in_settings"}, ensure_ascii=False)
+            await db.commit()
+            continue
         text = _text(r)
         res = dict(prev)
+        if "in_app" not in res and senders is None:
+            res["in_app"] = await _send_in_app(db, r)
         for c in chans:
+            if np is not None and not np.channel_enabled(c):
+                res[c] = "off_in_settings"
+                continue
             try:
                 res[c] = await (tg_send(text) if c == "telegram" else mail_send(r.title or "یادآور", text))
             except Exception as exc:  # noqa: BLE001
@@ -251,7 +288,7 @@ async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, sende
         vals = set(res.values())
         r.attempts = (r.attempts or 0) + 1
         r.result = json.dumps(res, ensure_ascii=False)
-        newly = [c for c in chans if res.get(c) == "sent"]
+        newly = [c for c in list(chans) + ["in_app"] if res.get(c) == "sent" and prev.get(c) != "sent"]
         if newly and not any(v == "sent" for v in prev.values()):
             db.add(AppReminderSend(user_id=r.user_id, app=r.app, rkey=r.rkey, at=now, result=r.result))
         if "failed" in vals and r.attempts < MAX_ATTEMPTS:

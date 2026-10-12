@@ -91,6 +91,9 @@ class AIIn(BaseModel):
     system: str = Field("", max_length=20_000)
     user: str = Field(..., min_length=1, max_length=60_000)
     max_tokens: int = Field(2500, ge=64, le=8192)
+    # ids of this user's attachments (app_files) to show the model — e.g. the photo of an IQ item.
+    # Images/PDF only; the bytes are fetched from Drive for this one call and never stored here.
+    file_ids: List[int] = Field(default_factory=list, max_length=4)
 
 
 @router.get("/api/app-records/{app}", tags=["app-records"])
@@ -175,13 +178,43 @@ async def delete_record(app: str, rec_id: str, db: AsyncSession = Depends(get_db
     return {"ok": True, "success": True, "deleted": row is not None}
 
 
+_AI_MIMES = ("image/", "application/pdf")
+_AI_MAX_BYTES = 8 * 1024 * 1024
+
+
+async def _attachment_bytes(db: AsyncSession, user_id: int, app: str, ids: List[int]) -> List[Dict[str, Any]]:
+    """Fetch the caller's own image/PDF attachments from Drive for ONE model call."""
+    from app.models.app_file import AppFile
+    from app.services.google_api_client import build_drive_client
+
+    rows = (await db.execute(select(AppFile).where(AppFile.id.in_(ids), AppFile.user_id == user_id, AppFile.app == app))).scalars().all()
+    rows = [r for r in rows if not r.deleted and (r.mime or "").startswith(_AI_MIMES) and (r.size or 0) <= _AI_MAX_BYTES]
+    if not rows:
+        return []
+    drive = await build_drive_client(db)
+    if drive is None:
+        raise HTTPException(status_code=503, detail="گوگل درایو وصل نیست؛ تصویرِ پیوست خوانده نشد.")
+    out = []
+    for r in rows:
+        try:
+            out.append({"filename": r.name, "mimetype": r.mime, "data": await drive.download(r.drive_id)})
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(status_code=502, detail=f"خواندنِ پیوستِ «{r.name}» از درایو ناموفق بود") from exc
+    return out
+
+
 @router.post("/api/app-records/{app}/ai", tags=["app-records"])
 async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
     _check_app(app)
-    from app.services.ai.inference_gateway import complete
+    from app.services.ai.inference_gateway import complete, complete_multimodal
 
-    res = await complete(db, payload.user, task="learning_architecture", system=payload.system or None,
-                         max_tokens=payload.max_tokens)
+    files = await _attachment_bytes(db, user_id, app, payload.file_ids) if payload.file_ids else []
+    if files:
+        res = await complete_multimodal(db, payload.user, files, task="learning_architecture",
+                                        system=payload.system or None, max_tokens=payload.max_tokens)
+    else:
+        res = await complete(db, payload.user, task="learning_architecture", system=payload.system or None,
+                             max_tokens=payload.max_tokens)
     if not res.get("ok"):
         err = res.get("error") or "no_model"
         msg = "مدلی برای «معماری یادگیری» تنظیم نشده؛ در تنظیمات AI مدلی برای این کار یا «عمومی» بگذار." if err == "no_model" else f"خطای سرویس هوش مصنوعی: {err}"

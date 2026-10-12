@@ -695,6 +695,9 @@ register_event("ai_feedback", title="بازخورد هوش مصنوعی", channe
 # task_done uses the bare-form register call the AC's static grep checks for;
 # its title/message come from the _DEFAULT_EVENT_* tables above.
 register_event("task_done")
+# «گره‌گشا» (معماری یادگیری عمیق): practice reminders — the bell copy; Telegram/e-mail are sent by
+# app_reminder_service, which honours the same event + channel toggles of the notification settings.
+register_event("knot_practice", title="ورزشِ گره‌گشا", priority="normal", silent=True, channels=["in_app"])
 register_event(
     "login_succeeded",
     title="ورود موفق",

@@ -68,6 +68,8 @@ EVENT_CATALOG: List[Dict[str, Any]] = [
      "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": True},
     {"key": "mobile_online", "label": "بازگشتِ اتصال موبایل", "help": "یک‌بار، وقتی گوشی دوباره سیگنال می‌فرستد",
      "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": False},
+    {"key": "knot_practice", "label": "ورزشِ گره‌گشا (معماری یادگیری)", "help": "یادآورِ ورزش‌های موعدِ گره‌های ذهنی؛ متنِ پیش‌فرض خنثی است و فقط پیوند دارد",
+     "channels": ["in_app", "telegram", "email"], "default_enabled": True, "default_sound": False},
     {"key": "personal_digest", "label": "گزارش روز (تقویم + ایمیل)", "help": "هر شب: رویدادهای امروز/فردا، ایمیل‌های منتظر اقدام و وضعیت پروژه‌ها؛ نسخهٔ ایمیلی از تنظیمات گوگل کنترل می‌شود",
      "channels": ["in_app", "telegram"], "default_enabled": True, "default_sound": False},
 ]
