@@ -909,7 +909,9 @@
     var n = opts.n || 4;
     var ask = strip(A.kAsk(k, n));
     var rep = { accepted: [], unverified: [], rejected: [] };
-    return A.callAI(A.KGEN_SYS, ask).then(function (t) {
+    /* تصویرِ پیوستِ موقعیت (اگر کاربر در دروازه پذیرفت) فقط به **سازنده** می‌رود؛ سه حلِ وارسی (A.kverify) فقط متنِ نمونه را می‌بینند */
+    var fids = (opts.fileIds || []).slice(0, 4);
+    return (fids.length ? A.callAI(A.KGEN_SYS, ask, { fileIds: fids }) : A.callAI(A.KGEN_SYS, ask)).then(function (t) {
       var o; try { o = parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); }
       var arr = Array.isArray(o) ? o : (o && o.items) || [];
       if (!arr.length) throw new Error("سازنده نمونه‌ای نداد");
@@ -1007,15 +1009,25 @@
      همان جزءِ a16 (A.knotAIGate): بررسیِ ایمنی ⇐ اعلامِ ارائه‌دهندهٔ بیرونی + پیش‌نمایشِ دقیقِ متن + حذفِ نام ⇐ تأیید. a17 فقط تأیید و
      نام‌ها را می‌گیرد و خودش درخواست‌ها (سازنده + سه حل) را با همان حذفِ نام می‌فرستد. اگر a16 نباشد، کارتِ ساده‌ترِ همین‌جا با پیش‌نمایش. */
   A._kaiReset = function () { };  // (سازگاری با آزمون‌های قدیمی؛ دیگر حافظهٔ نشستی در کار نیست)
+  /* موقعیت‌های این گره، تازه‌ترین اول — دروازه اولین‌شان را که عکس/PDF ِ پیوست دارد پیشنهاد می‌کند
+     (پیش‌فرض روشن فقط اگر آن موقعیت «مسئله» است). فقط در میزبان؛ نسخهٔ مستقل پیوست ندارد. */
+  A.kattachCases = function (k) {
+    var ids = {}, out = [];
+    (k.cases || []).forEach(function (id) { ids[id] = 1; });
+    S.all("kcase", function (c) { return (c.knots || []).indexOf(k.id) >= 0; }).forEach(function (c) { ids[c.id] = 1; });
+    Object.keys(ids).forEach(function (id) { var c = S.get(id); if (c && c.type === "kcase") out.push(c); });
+    return out.sort(function (a, b) { return String(b.created || "").localeCompare(String(a.created || "")); }).map(function (c) { return c.id; });
+  };
   function aiGate(box, k) {
     var text = A.kAsk(k);
     return new Promise(function (resolve, reject) {
       if (typeof A.knotAIGate === "function") {
         var sent = false;
-        A.knotAIGate({ purpose: "ساختنِ نمونه‌های ورزش برای این گره", noPriv: true,
-          more: "پس از ساخت، هر نمونه سه بار جداگانه و بی پاسخ برای حل فرستاده می‌شود (ساختارِ عمیقِ گره + متنِ همان نمونه، با همین حذفِ نام).",
+        var acs = A.kattachCases(k);
+        A.knotAIGate({ purpose: "ساختنِ نمونه‌های ورزش برای این گره", noPriv: true, attach: acs.length ? { recIds: acs } : null,
+          more: "پس از ساخت، هر نمونه سه بار جداگانه و بی پاسخ برای حل فرستاده می‌شود (ساختارِ عمیقِ گره + متنِ همان نمونه، با همین حذفِ نام؛ تصویرِ پیوست به این سه حل نمی‌رود).",
           build: function () { return text; },
-          onSend: function (t, meta) { sent = true; resolve({ names: (meta && meta.names) || [] }); },
+          onSend: function (t, meta) { sent = true; resolve({ names: (meta && meta.names) || [], fileIds: (meta && meta.fileIds) || [] }); },
           onDone: function () { if (!sent) reject(new Error("لغو شد")); } });
         return;
       }
@@ -1073,7 +1085,7 @@
       var b = e.target; b.disabled = true;
       aiGate(out, k).then(function (pref) {
         b.textContent = "در حالِ ساخت و سه حلِ مستقل…";
-        return A.kmakeAI(k, { names: pref.names }).then(function (rep) {
+        return A.kmakeAI(k, { names: pref.names, fileIds: pref.fileIds || [] }).then(function (rep) {
           A._klastRep = rep;
           A.toast("وارسی‌شده: " + fa(rep.accepted.length) + " · وارسی‌نشده: " + fa(rep.unverified.length) + " · کنار گذاشته: " + fa(rep.rejected.length));
           A.render();

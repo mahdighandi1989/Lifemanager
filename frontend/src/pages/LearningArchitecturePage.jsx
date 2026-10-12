@@ -85,7 +85,8 @@ export default function LearningArchitecturePage() {
       load: () => api.get(`/app-records/${APP}`).then((r) => r.data.records || []),
       saveMany: (records) => api.post(`/app-records/${APP}/bulk`, { records }).then((r) => r.data),
       del: (id) => api.delete(`/app-records/${APP}/${encodeURIComponent(id)}`).then((r) => r.data),
-      ai: (system, user) => api.post(`/app-records/${APP}/ai`, { system, user }).then((r) => {
+      // opts.fileIds: the caller's own image/PDF attachments (≤4) for a vision-capable model — e.g. the photo of an IQ item
+      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: (opts && opts.fileIds) || [] }).then((r) => {
         if (!r.data.ok) throw new Error(r.data.error || 'هوش مصنوعی پاسخ نداد');
         return r.data.text;
       }),

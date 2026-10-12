@@ -769,6 +769,11 @@ nav.crumbs .trailall ol{margin:6px 0 0;padding-inline-start:20px}
 .kn-whysec.missing{outline:2px solid var(--bad);outline-offset:2px}
 .kp-lapse,.kn-lapse{font-weight:600}
 .kn-ai-more{margin:4px 0 0}
+.kn-ai-att{margin:6px 0 0;padding:6px 8px;border:1px dashed var(--line);border-radius:8px}
+.kn-ai-files{margin:4px 0 0;overflow-wrap:anywhere}
+.kn-epil li{margin:0 0 8px}
+.kn-crslink{margin:4px 0 0}
+.kn-photo input[type=file],.kn-uplist{max-width:100%;overflow-wrap:anywhere}
 .kn-acts{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
 .kn-act{border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;background:var(--surface)}
 .kn-act.done{border-color:var(--good)}

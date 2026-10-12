@@ -92,8 +92,11 @@
       { name: "خلاصه", rows: [["فیلد", "مقدار"], ["موضوعِ دوره", tp ? tp.title : ""], ["شروع", c.started || ""], ["درس‌های تمام‌شده", Object.keys(c.done || {}).length + " از " + L.length], ["در برنامه", link("course")]] },
       { name: "پیشرفت", rows: rows }] };
   };
-  /* گره‌گشا (§۱۲.۹ ِ طرح): آینهٔ هر موقعیت و هر گره **انتخابی** است (`mirror: true` روی همان رکورد)؛ احساس‌ها و یادداشت‌های
-     F7/F9 فقط با انتخابِ جدا (`mirrorPrivate`). سازنده‌ای که null برگرداند ⇒ اگر قبلاً فولدری بوده، تغییرِ نام (نه حذف). */
+  /* گره‌گشا: «برای هر مسئله فولدر در درایو» (مالک ۲۰۲۶-۱۰-۱۲) ⇒ آینهٔ هر موقعیت و هر گره **پیش‌فرض روشن** است و فقط با
+     `mirror === false` روی همان رکورد خاموش می‌شود (پیش‌تر طبقِ §۱۲.۹ ِ طرح انتخابی بود). احساس‌ها و یادداشت‌های F7/F9 همچنان
+     فقط با انتخابِ جدا (`mirrorPrivate`). سازنده‌ای که null برگرداند ⇒ اگر قبلاً فولدری بوده، تغییرِ نام (نه حذف). */
+  function mirrorOn(r) { return !!r && r.mirror !== false; }
+  A.mirrorOn = mirrorOn;
   var PRIVFAM = { F7: 1, F9: 1 };
   /* خانواده‌هایی که یک موقعیت یا گره به آن‌ها مربوط است: اصلی + کمکی‌ها (و برای موقعیت، خانواده‌های گره‌های پیوندخورده؛
      برای گره، ریشهٔ موقعیت‌هایش). اگر F7 یا F9 در **هر کدام** باشد، موقعیت/گره «حساس» است (ممیزی ۲۰۲۶-۱۰-۱۲: پیش‌تر فقط اصلی دیده می‌شد). */
@@ -113,7 +116,7 @@
   A.mirrorSensitive = function (r) { return r && r.type === "knot" ? knotSensitive(r) : r && r.type === "kcase" ? kcaseSensitive(r) : false; };
   var PRIV_TXT = "(خصوصی)";
   BUILD.kcase = function (kc) {
-    if (!kc.mirror) return null;
+    if (!mirrorOn(kc)) return null;
     var it = kc.intake || {}, priv = !!kc.mirrorPrivate, R = kc.root || {}, sens = !priv && kcaseSensitive(kc);
     var famName = function (f) { var x = (A.KF || []).filter(function (y) { return y.id === f; })[0]; return x ? f + " · " + x.fa : (f || ""); };
     var kn = (kc.knots || []).map(function (id) { var k = S.get(id); return k ? (k.name || id) : id; }).join("، ");
@@ -135,7 +138,7 @@
     return { group: "گره‌گشا — موقعیت‌ها", title: kc.title || "موقعیت", tabs: tabs };
   };
   BUILD.knot = function (k) {
-    if (!k.mirror) return null;
+    if (!mirrorOn(k)) return null;
     var priv = !!k.mirrorPrivate || !knotSensitive(k);
     var tabs = [{ name: "کارتِ گره", rows: [["فیلد", "مقدار"], ["نام", k.name || ""], ["خانواده", k.fam || ""], ["وضعیت", (A.KSTATUS || {})[k.status] || k.status || ""],
       ["ساختارِ عمیق", priv ? (k.principle || "") : "(خصوصی)"], ["نشانه‌ها", priv ? txt(k.signals) : "(خصوصی)"], ["حرکتِ مقابل", priv ? txt(k.counter) : "(خصوصی)"],
@@ -215,7 +218,7 @@
       if (!info) return 0;
       var known = {}; (info.items || []).forEach(function (i) { known[i.rec_id] = 1; });
       var n = 0;
-      Object.keys(BUILD).forEach(function (t) { S.all(t, function (r) { return !r.sample && (t !== "kcase" && t !== "knot" || r.mirror); }).forEach(function (r) { if (!known[r.id]) { dirty[r.id] = 1; n++; } }); });
+      Object.keys(BUILD).forEach(function (t) { S.all(t, function (r) { return !r.sample && (t !== "kcase" && t !== "knot" || mirrorOn(r)); }).forEach(function (r) { if (!known[r.id]) { dirty[r.id] = 1; n++; } }); });
       if (n) schedule();
       return n;
     });
@@ -231,7 +234,7 @@
 
   /* ---------- نشان‌دادنِ پیوند در خودِ صفحه ---------- */
   var REC_OF = { e_case: function () { return A.state.arg; }, topic: function () { return A.state.arg; }, course: function () { return "course"; }, lesson: function () { return "course"; },
-    kcase: function () { var r = S.get(A.state.arg); return r && r.mirror ? A.state.arg : null; }, knot: function () { var r = S.get(A.state.arg); return r && r.mirror ? A.state.arg : null; } };
+    kcase: function () { var r = S.get(A.state.arg); return mirrorOn(r) ? A.state.arg : null; }, knot: function () { var r = S.get(A.state.arg); return mirrorOn(r) ? A.state.arg : null; } };
   function chip(info, rid) {
     var box = h("span", { class: "drv" });
     if (!info) return box;
@@ -291,16 +294,20 @@
     load();
     return sec;
   }
-  /* «📁 درایو» برای موقعیت و گرهِ گره‌گشا: انتخابی، با هشدارِ حریم */
+  /* «📁 درایو» برای موقعیت و گرهِ گره‌گشا: پیش‌فرض روشن (خاموش‌کردنی)، با هشدارِ حریم */
   function driveToggles(r) {
-    function cb(lab, key, hint) {
-      return h("label", { class: "row gap small" }, h("input", { type: "checkbox", checked: !!r[key], onchange: function (e) { r[key] = e.target.checked; S.put(r); A.toast(e.target.checked ? "در فهرستِ آینهٔ درایو قرار گرفت." : "از آینه برداشته شد (فولدرِ موجود فقط تغییرِ نام می‌دهد)."); } }), lab, hint ? h("span", { class: "muted" }, " — " + hint) : null);
+    function cb(lab, key, hint, on) {
+      return h("label", { class: "row gap small" }, h("input", { type: "checkbox", "data-key": key, checked: on, onchange: function (e) {
+        r[key] = e.target.checked; S.put(r);
+        if (key === "mirror") A.toast(e.target.checked ? "در فهرستِ آینهٔ درایو قرار گرفت." : "از آینه برداشته شد (فولدرِ موجود فقط تغییرِ نام می‌دهد، حذف نمی‌شود).");
+        else A.toast(e.target.checked ? "یادداشت‌های خصوصی هم در شیت می‌آیند." : "یادداشت‌های خصوصی از شیت بیرون ماندند.");
+      } }), lab, hint ? h("span", { class: "muted" }, " — " + hint) : null);
     }
     return h("section", { class: "card", dir: "rtl", "data-report-section": "kdrive", "data-report-section-label": "درایوِ گره‌گشا" },
-      h("h3", {}, "📁 نسخه در گوگل درایو (انتخابی)"),
-      h("p", { class: "small muted" }, "این‌ها خود‌کاوی‌اند؛ پیش‌فرض فقط در همین برنامه می‌مانند. اگر بخواهی، یک فولدرِ جدا با شیتِ خوانا در «LifeManagerData › learning-architecture › گره‌گشا» ساخته می‌شود."),
-      cb("یک فولدر و شیت برای این مورد در درایو", "mirror"),
-      cb("احساس‌ها و یادداشت‌های خصوصی (هیجانی/باور دربارهٔ خود) هم در شیت بیاید", "mirrorPrivate", "پیش‌فرض: نه"));
+      h("h3", {}, "📁 نسخه در گوگل درایو"),
+      h("p", { class: "small muted" }, "برای هر موقعیت/گره یک فولدر و شیت در درایو ساخته می‌شود (خاموش‌کردنی)؛ احساس‌ها و یادداشت‌های هیجانی/باورِ خود فقط با انتخابِ جدا. جای فولدرها: «LifeManagerData › learning-architecture › گره‌گشا»."),
+      cb("یک فولدر و شیت برای این مورد در درایو", "mirror", "پیش‌فرض: بله", mirrorOn(r)),
+      cb("احساس‌ها و یادداشت‌های خصوصی (هیجانی/باور دربارهٔ خود) هم در شیت بیاید", "mirrorPrivate", "پیش‌فرض: نه", !!r.mirrorPrivate));
   }
   // a16 (which defines these views) loads AFTER this file ⇒ wrap lazily, once, on the first render
   function wrapKnotViews() { ["kcase", "knot"].forEach(function (v) {
@@ -309,7 +316,7 @@
       var root = raw.apply(this, arguments), r = S.get(id);
       try { if (r && root && root.appendChild) { root.appendChild(driveToggles(r)); if (A.HOST.upload && v === "kcase") root.appendChild(attachSection(id, { group: "گره‌گشا — موقعیت‌ها", title: r.title || "موقعیت" },
         /* بارگذاری کاری صریح است و مجاز می‌ماند، ولی آینهٔ این موقعیت خاموش است ⇒ صادقانه بگو که فولدر ساخته می‌شود */
-        r.mirror ? null : "آینهٔ درایوِ این موقعیت خاموش است؛ گذاشتنِ پیوست، فولدرِ این موقعیت را در درایو می‌سازد.")); } } catch (e) { console.error(e); }
+        mirrorOn(r) ? null : "آینهٔ درایوِ این موقعیت خاموش است؛ گذاشتنِ پیوست، فولدرِ این موقعیت را در درایو می‌سازد.")); } } catch (e) { console.error(e); }
       return root;
     };
     A.V[v]._kdrive = true;

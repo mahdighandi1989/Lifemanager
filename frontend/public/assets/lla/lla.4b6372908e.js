@@ -14178,8 +14178,10 @@ var APP = window.APP = {};
     "۵) فقط یک سرنخ بده، نه راه‌حل.\n" +
     "۶) اگر خطای محتوایی (علمی، مالی، فنی) دیدی، دقیق بگو کجا و چرا نادرست است، بدون نوشتن متن جایگزین کامل.\n" +
     "۷) فارسی روشن و دقیق، بدون تعارف، بدون اغراق، بدون عبارت‌های کلیشه‌ای. حداکثر ۳۵۰ کلمه. ساختار: «نمره روبریک»، «ضعیف‌ترین گام»، «پرسش‌ها»، «یک سرنخ»، «خطای محتوایی (اگر هست)».";
-  A.callAI = function (system, user) {
-    if (A.HOST && A.HOST.ai) return A.HOST.ai(system, user);
+  /* opts (اختیاری): {fileIds:[…]} — شناسهٔ پیوست‌های همین کاربر (عکس/PDF) که میزبان همراهِ درخواست به مدلِ بینا می‌دهد.
+     فقط میزبان (Lifemanager) آن را می‌فهمد؛ نسخهٔ مستقل و Apps Script نادیده‌اش می‌گیرند (پیوست ندارند). */
+  A.callAI = function (system, user, opts) {
+    if (A.HOST && A.HOST.ai) return opts ? A.HOST.ai(system, user, opts) : A.HOST.ai(system, user);
     return new Promise(function (resolve, reject) {
       if (S.mode === "gas") {
         google.script.run.withSuccessHandler(function (r) { resolve(r); }).withFailureHandler(function (e) { reject(e); }).api_ai(system, user);
@@ -18859,8 +18861,11 @@ APP.goFromURL = function (q) {
       { name: "خلاصه", rows: [["فیلد", "مقدار"], ["موضوعِ دوره", tp ? tp.title : ""], ["شروع", c.started || ""], ["درس‌های تمام‌شده", Object.keys(c.done || {}).length + " از " + L.length], ["در برنامه", link("course")]] },
       { name: "پیشرفت", rows: rows }] };
   };
-  /* گره‌گشا (§۱۲.۹ ِ طرح): آینهٔ هر موقعیت و هر گره **انتخابی** است (`mirror: true` روی همان رکورد)؛ احساس‌ها و یادداشت‌های
-     F7/F9 فقط با انتخابِ جدا (`mirrorPrivate`). سازنده‌ای که null برگرداند ⇒ اگر قبلاً فولدری بوده، تغییرِ نام (نه حذف). */
+  /* گره‌گشا: «برای هر مسئله فولدر در درایو» (مالک ۲۰۲۶-۱۰-۱۲) ⇒ آینهٔ هر موقعیت و هر گره **پیش‌فرض روشن** است و فقط با
+     `mirror === false` روی همان رکورد خاموش می‌شود (پیش‌تر طبقِ §۱۲.۹ ِ طرح انتخابی بود). احساس‌ها و یادداشت‌های F7/F9 همچنان
+     فقط با انتخابِ جدا (`mirrorPrivate`). سازنده‌ای که null برگرداند ⇒ اگر قبلاً فولدری بوده، تغییرِ نام (نه حذف). */
+  function mirrorOn(r) { return !!r && r.mirror !== false; }
+  A.mirrorOn = mirrorOn;
   var PRIVFAM = { F7: 1, F9: 1 };
   /* خانواده‌هایی که یک موقعیت یا گره به آن‌ها مربوط است: اصلی + کمکی‌ها (و برای موقعیت، خانواده‌های گره‌های پیوندخورده؛
      برای گره، ریشهٔ موقعیت‌هایش). اگر F7 یا F9 در **هر کدام** باشد، موقعیت/گره «حساس» است (ممیزی ۲۰۲۶-۱۰-۱۲: پیش‌تر فقط اصلی دیده می‌شد). */
@@ -18880,7 +18885,7 @@ APP.goFromURL = function (q) {
   A.mirrorSensitive = function (r) { return r && r.type === "knot" ? knotSensitive(r) : r && r.type === "kcase" ? kcaseSensitive(r) : false; };
   var PRIV_TXT = "(خصوصی)";
   BUILD.kcase = function (kc) {
-    if (!kc.mirror) return null;
+    if (!mirrorOn(kc)) return null;
     var it = kc.intake || {}, priv = !!kc.mirrorPrivate, R = kc.root || {}, sens = !priv && kcaseSensitive(kc);
     var famName = function (f) { var x = (A.KF || []).filter(function (y) { return y.id === f; })[0]; return x ? f + " · " + x.fa : (f || ""); };
     var kn = (kc.knots || []).map(function (id) { var k = S.get(id); return k ? (k.name || id) : id; }).join("، ");
@@ -18902,7 +18907,7 @@ APP.goFromURL = function (q) {
     return { group: "گره‌گشا — موقعیت‌ها", title: kc.title || "موقعیت", tabs: tabs };
   };
   BUILD.knot = function (k) {
-    if (!k.mirror) return null;
+    if (!mirrorOn(k)) return null;
     var priv = !!k.mirrorPrivate || !knotSensitive(k);
     var tabs = [{ name: "کارتِ گره", rows: [["فیلد", "مقدار"], ["نام", k.name || ""], ["خانواده", k.fam || ""], ["وضعیت", (A.KSTATUS || {})[k.status] || k.status || ""],
       ["ساختارِ عمیق", priv ? (k.principle || "") : "(خصوصی)"], ["نشانه‌ها", priv ? txt(k.signals) : "(خصوصی)"], ["حرکتِ مقابل", priv ? txt(k.counter) : "(خصوصی)"],
@@ -18982,7 +18987,7 @@ APP.goFromURL = function (q) {
       if (!info) return 0;
       var known = {}; (info.items || []).forEach(function (i) { known[i.rec_id] = 1; });
       var n = 0;
-      Object.keys(BUILD).forEach(function (t) { S.all(t, function (r) { return !r.sample && (t !== "kcase" && t !== "knot" || r.mirror); }).forEach(function (r) { if (!known[r.id]) { dirty[r.id] = 1; n++; } }); });
+      Object.keys(BUILD).forEach(function (t) { S.all(t, function (r) { return !r.sample && (t !== "kcase" && t !== "knot" || mirrorOn(r)); }).forEach(function (r) { if (!known[r.id]) { dirty[r.id] = 1; n++; } }); });
       if (n) schedule();
       return n;
     });
@@ -18998,7 +19003,7 @@ APP.goFromURL = function (q) {
 
   /* ---------- نشان‌دادنِ پیوند در خودِ صفحه ---------- */
   var REC_OF = { e_case: function () { return A.state.arg; }, topic: function () { return A.state.arg; }, course: function () { return "course"; }, lesson: function () { return "course"; },
-    kcase: function () { var r = S.get(A.state.arg); return r && r.mirror ? A.state.arg : null; }, knot: function () { var r = S.get(A.state.arg); return r && r.mirror ? A.state.arg : null; } };
+    kcase: function () { var r = S.get(A.state.arg); return mirrorOn(r) ? A.state.arg : null; }, knot: function () { var r = S.get(A.state.arg); return mirrorOn(r) ? A.state.arg : null; } };
   function chip(info, rid) {
     var box = h("span", { class: "drv" });
     if (!info) return box;
@@ -19058,16 +19063,20 @@ APP.goFromURL = function (q) {
     load();
     return sec;
   }
-  /* «📁 درایو» برای موقعیت و گرهِ گره‌گشا: انتخابی، با هشدارِ حریم */
+  /* «📁 درایو» برای موقعیت و گرهِ گره‌گشا: پیش‌فرض روشن (خاموش‌کردنی)، با هشدارِ حریم */
   function driveToggles(r) {
-    function cb(lab, key, hint) {
-      return h("label", { class: "row gap small" }, h("input", { type: "checkbox", checked: !!r[key], onchange: function (e) { r[key] = e.target.checked; S.put(r); A.toast(e.target.checked ? "در فهرستِ آینهٔ درایو قرار گرفت." : "از آینه برداشته شد (فولدرِ موجود فقط تغییرِ نام می‌دهد)."); } }), lab, hint ? h("span", { class: "muted" }, " — " + hint) : null);
+    function cb(lab, key, hint, on) {
+      return h("label", { class: "row gap small" }, h("input", { type: "checkbox", "data-key": key, checked: on, onchange: function (e) {
+        r[key] = e.target.checked; S.put(r);
+        if (key === "mirror") A.toast(e.target.checked ? "در فهرستِ آینهٔ درایو قرار گرفت." : "از آینه برداشته شد (فولدرِ موجود فقط تغییرِ نام می‌دهد، حذف نمی‌شود).");
+        else A.toast(e.target.checked ? "یادداشت‌های خصوصی هم در شیت می‌آیند." : "یادداشت‌های خصوصی از شیت بیرون ماندند.");
+      } }), lab, hint ? h("span", { class: "muted" }, " — " + hint) : null);
     }
     return h("section", { class: "card", dir: "rtl", "data-report-section": "kdrive", "data-report-section-label": "درایوِ گره‌گشا" },
-      h("h3", {}, "📁 نسخه در گوگل درایو (انتخابی)"),
-      h("p", { class: "small muted" }, "این‌ها خود‌کاوی‌اند؛ پیش‌فرض فقط در همین برنامه می‌مانند. اگر بخواهی، یک فولدرِ جدا با شیتِ خوانا در «LifeManagerData › learning-architecture › گره‌گشا» ساخته می‌شود."),
-      cb("یک فولدر و شیت برای این مورد در درایو", "mirror"),
-      cb("احساس‌ها و یادداشت‌های خصوصی (هیجانی/باور دربارهٔ خود) هم در شیت بیاید", "mirrorPrivate", "پیش‌فرض: نه"));
+      h("h3", {}, "📁 نسخه در گوگل درایو"),
+      h("p", { class: "small muted" }, "برای هر موقعیت/گره یک فولدر و شیت در درایو ساخته می‌شود (خاموش‌کردنی)؛ احساس‌ها و یادداشت‌های هیجانی/باورِ خود فقط با انتخابِ جدا. جای فولدرها: «LifeManagerData › learning-architecture › گره‌گشا»."),
+      cb("یک فولدر و شیت برای این مورد در درایو", "mirror", "پیش‌فرض: بله", mirrorOn(r)),
+      cb("احساس‌ها و یادداشت‌های خصوصی (هیجانی/باور دربارهٔ خود) هم در شیت بیاید", "mirrorPrivate", "پیش‌فرض: نه", !!r.mirrorPrivate));
   }
   // a16 (which defines these views) loads AFTER this file ⇒ wrap lazily, once, on the first render
   function wrapKnotViews() { ["kcase", "knot"].forEach(function (v) {
@@ -19076,7 +19085,7 @@ APP.goFromURL = function (q) {
       var root = raw.apply(this, arguments), r = S.get(id);
       try { if (r && root && root.appendChild) { root.appendChild(driveToggles(r)); if (A.HOST.upload && v === "kcase") root.appendChild(attachSection(id, { group: "گره‌گشا — موقعیت‌ها", title: r.title || "موقعیت" },
         /* بارگذاری کاری صریح است و مجاز می‌ماند، ولی آینهٔ این موقعیت خاموش است ⇒ صادقانه بگو که فولدر ساخته می‌شود */
-        r.mirror ? null : "آینهٔ درایوِ این موقعیت خاموش است؛ گذاشتنِ پیوست، فولدرِ این موقعیت را در درایو می‌سازد.")); } } catch (e) { console.error(e); }
+        mirrorOn(r) ? null : "آینهٔ درایوِ این موقعیت خاموش است؛ گذاشتنِ پیوست، فولدرِ این موقعیت را در درایو می‌سازد.")); } } catch (e) { console.error(e); }
       return root;
     };
     A.V[v]._kdrive = true;
@@ -20696,7 +20705,9 @@ APP.goFromURL = function (q) {
           O("yes", "احتمالاً بله", [["F3", 1, "heur"]]), O("no", "نه", [["F3", -1]])], { need: "problem" }),
         P("f3_hint", "contrast", "راهنماییِ راهبرد با/بی", "روی هم‌ریخت (یا همین مسئله اگر هنوز بازش نکرده‌ای): اول بی‌کمک؛ اگر نشد، فقط یک راهنماییِ راهبرد («از آخر»، «حالتِ خاص»، «قرینه») را ببین و دوباره تلاش کن.", [
           O("only", "فقط با راهنماییِ راهبرد حل شد", [["F3", 1, "heur"]]), O("without", "بی‌آن هم حل شد", [["F3", -1]]), O("neither", "با آن هم حل نشد", [["F3", -1]])], { need: "problem", iso: true })],
-      acts: [T(11), { pid: "P7", fa: "حل از ۳ مسیر" }, T(14), T(1), T(6), T(5), T(7), T(43)] },
+      acts: [T(11), { pid: "P7", fa: "حل از ۳ مسیر" }, T(14), T(1), T(6), T(5), T(7), T(43),
+        /* «مسئله‌های بزرگ» ِ کارخانه (a8_prob، نمای e_prob): پیوندِ معنایی، نه تکنیک — آخرِ فهرست */
+        { prob: true, fa: "مسئله‌های بزرگ", note: "تمرینِ انتخابِ حرکتِ بعدی در مسئله‌های واقعیِ تاریخی؛ همان مهارتِ «عوض‌کردنِ راه»" }] },
     { id: "F4", fa: "پایش و فراشناخت", blurb: "وارسی نشد، اطمینان بیش از درستی بود، یا قاعدهٔ توقف (زود ول کردن/زیاد ماندن) بد بود.",
       subs: [{ id: "nocheck", fa: "بی‌وارسی", src: "" },
         { id: "over", fa: "اطمینانِ بیش‌ازحد/توهمِ فهم", src: "Koriat 1997؛ Kruger & Dunning 1999 — با برچسبِ «مناقشهٔ آماری»: Gignac & Zajenkowski 2020" },
@@ -20827,6 +20838,18 @@ APP.goFromURL = function (q) {
           score: function (ans) { var p = N(ans && ans.pred), r = N(ans && ans.real); if (p == null || r == null || p <= 0) return []; return r > p * 1.25 ? [{ fam: "F12", dir: 1, sub: "plan" }] : [{ fam: "F12", dir: -1, sub: "" }]; } })],
       acts: [T(9, "کلاسِ مرجع برای زمان"), T(11), T(23), X("impl2", "قصدِ اجرایی «اگر… آنگاه…»", "Gollwitzer & Sheeran 2006", "", IMPL_HOW)] }
   ];
+  /* پیوندِ معناییِ هر خانواده به ایستگاه‌های کارخانهٔ معرفت‌شناسی (مالک ۲۰۲۶-۱۰-۱۲: «ارتباطِ معناییِ دقیق، نه تعارفی»).
+     هر پیوند یک «چرا»ی یک‌خطی دارد که به کاربر نشان داده می‌شود؛ خانواده‌ای که پیوندِ واقعی ندارد (F3، F5، F6، F7، F10، F12) هیچ نمی‌گیرد.
+     شناسه‌ای که در A.EST نباشد هنگامِ نمایش کنار می‌رود. */
+  var EPI_LINKS = {
+    F1: [{ st: "st_tasdiq", why: "تصور یا تصدیق: مفهوم را نمی‌شناختم یا حکم را؟" }],
+    F2: [{ st: "st_worlds", why: "واقع، فهم، زبان: فرقِ خودِ مسئله با فهمِ تو و کلماتش" }, { st: "st_herm", why: "خواندنِ دقیقِ متنِ صورتِ مسئله" }],
+    F4: [{ st: "st_grade", why: "پیش از اعلامِ پاسخ، اعتبارش چقدر است؟" }, { st: "st_conflict", why: "وقتی دو برداشت با هم نمی‌خوانند" }],
+    F8: [{ st: "st_expert", why: "مدیرها به تخصصِ چه کسی تکیه می‌کنند و با چه ملاک‌هایی — همان سازوکارِ «استناد به تخصصِ دیگران»" }, { st: "st_herm", why: "فهمِ متن و گوینده: پیامِ تو چطور فهمیده می‌شود" }],
+    F9: [{ st: "st_background", why: "پیش‌زمینه‌هایی که برداشتت را شکل داده‌اند" }, { st: "st_grade", why: "درجهٔ اعتبارِ برداشت" }, { st: "st_resp", why: "مسئولیتِ معرفتی: چقدر باید مطمئن باشم پیش از اینکه دربارهٔ خودم حکم کنم" }],
+    F11: [{ st: "st_istiqra", why: "از چند مورد به قاعده رسیدن — همان کاری که با یک اتفاق کردی" }, { st: "st_tajrobe", why: "تجربه کی معتبر است" }, { st: "st_grade", why: "درجهٔ اعتبارِ برداشت" }]
+  };
+  A.KF.forEach(function (F) { F.epi = EPI_LINKS[F.id] || []; });
   var KFM = {}; A.KF.forEach(function (F, i) { F.n = i + 1; KFM[F.id] = F; });
   A.KFM = KFM;
   function famName(id) { var F = KFM[id]; return F ? fa(F.n) + " · " + F.fa : id; }
@@ -21017,22 +21040,64 @@ APP.goFromURL = function (q) {
     try { return JSON.parse(s.slice(i, j + 1)); } catch (e) { return null; }
   }
   A.knotParseJSON = parseJSON;
+  /* ---------- پیوستِ تصویری برای هوش مصنوعی («عکسِ سؤالِ آزمونِ هوش»؛ مالک ۲۰۲۶-۱۰-۱۲) ----------
+     فقط در میزبان (A.HOST.files): عکس/PDF ِ پیوست‌های یک موقعیت (≤ ۸ مگابایت، حداکثر ۴) — همان مرزی که سرور هم می‌گذارد.
+     recIds به ترتیبِ اولویت؛ اولین موقعیتی که پیوستِ مناسب دارد برگزیده می‌شود. نسخهٔ مستقل ⇒ null (همه‌چیز بی تصویر کار می‌کند). */
+  var AI_FILE_MAX = 8 * 1024 * 1024;
+  function aiFileOk(f) { return !!f && f.id != null && (/^image\//.test(f.mime || "") || f.mime === "application/pdf") && (+f.size || 0) <= AI_FILE_MAX; }
+  A.knotAIFileOk = aiFileOk;
+  A.knotAttachables = function (recIds) {
+    if (!(A.HOST && typeof A.HOST.files === "function")) return Promise.resolve(null);
+    var ids = (recIds || []).filter(Boolean), i = 0;
+    return new Promise(function (resolve) {
+      (function next() {
+        if (i >= ids.length) return resolve(null);
+        var rid = ids[i++], pr;
+        try { pr = A.HOST.files(rid); } catch (e) { return next(); }
+        Promise.resolve(pr).then(function (fs) {
+          var ok = (fs || []).filter(aiFileOk).slice(0, 4);
+          if (ok.length) resolve({ recId: rid, files: ok }); else next();
+        }, function () { next(); });
+      })();
+    });
+  };
   function aiGate(o) {
     /* o: {purpose, system, build(includePrivate) ⇒ text, people, onResult(txt, meta) [may return a promise], onDone(),
            noPriv (no private-fields toggle), more (extra line: what else is sent in the same action),
-           onSend(text, meta) ⇒ confirm-only: the caller makes the request(s) itself with the confirmed text/names (a17)}
+           onSend(text, meta) ⇒ confirm-only: the caller makes the request(s) itself with the confirmed text/names (a17),
+           attach: {recIds:[kcase ids, by priority]} ⇒ in the host, the case's image/PDF attachments are listed with a checkbox
+             (default ON when that case's kinds include "problem") and meta.fileIds carries the chosen ids}
        Same component for every AI request of the knot workshop: safety check ⇒ notice + exact preview + name removal ⇒ request. */
     function start() {
       if (A.knotSafetyHit(o.build(true))) { A.knotSafetyCard(open, o.onDone); return; }
       open();
     }
     function open() {
-      var strip = true, priv = false;
+      var strip = true, priv = false, att = null, attOn = false;
       var names = h("input", { type: "text", id: "knAiNames", placeholder: "مثلاً: علی، سارا رضایی", oninput: upd });
       var pre = h("textarea", { id: "knAiPre", rows: 7, readonly: true, class: "kn-pre" });
       function finalText() { var t = o.build(priv); return strip ? stripNames(t, names.value) : t; }
-      function meta() { return { names: strip ? nameList(names.value) : [], strip: strip, priv: priv }; }
+      function meta() { return { names: strip ? nameList(names.value) : [], strip: strip, priv: priv, fileIds: att && attOn ? att.files.map(function (f) { return f.id; }) : [] }; }
       function upd() { pre.value = finalText(); }
+      /* پیوستِ تصویری: فقط اگر میزبان پیوست دارد؛ تا خوانده نشده، چیزی فرستاده نمی‌شود (fileIds خالی) */
+      var attBox = null;
+      if (o.attach && A.HOST && typeof A.HOST.files === "function") {
+        attBox = h("div", { class: "kn-ai-att small muted", "aria-live": "polite" }, "در حالِ خواندنِ پیوست‌های تصویری…");
+        A.knotAttachables(o.attach.recIds).then(function (r) {
+          attBox.innerHTML = "";
+          if (!r) { attBox.textContent = "پیوستِ تصویری (عکس/PDF) برای این موقعیت نیست؛ فقط متن فرستاده می‌شود."; return; }
+          att = r; var rec = S.get(r.recId) || {};
+          attOn = (rec.kinds || []).indexOf("problem") >= 0;
+          var warn = h("p", { class: "small warnline kn-ai-attw" + (attOn ? "" : " hidden") }, "تصویر/PDF ِ پیوست هم همراهِ همین متن برای همان ارائه‌دهندهٔ بیرونیِ هوش مصنوعی فرستاده می‌شود. «حذفِ نام‌ها» فقط روی متن اثر دارد، نه روی محتوای تصویر.");
+          attBox.classList.remove("muted");
+          attBox.appendChild(h("label", { class: "row gap", for: "knAiAtt" }, h("input", { type: "checkbox", id: "knAiAtt", checked: attOn, onchange: function (e) { attOn = e.target.checked; warn.classList.toggle("hidden", !attOn); } }),
+            "تصویرِ پیوست هم فرستاده شود (" + fa(r.files.length) + ")"));
+          attBox.appendChild(h("ul", { class: "plain small kn-ai-files" }, r.files.map(function (f) { return h("li", {}, "📎 ", h("bdi", {}, f.name || "پیوست")); })));
+          var ids0 = o.attach.recIds || [];
+          if (ids0.length > 1 || ids0[0] !== r.recId) attBox.appendChild(h("p", { class: "small muted" }, "از موقعیتِ «" + (rec.title || "موقعیت") + "»."));
+          attBox.appendChild(warn);
+        }, function () { attBox.textContent = "پیوست‌ها خوانده نشد؛ فقط متن فرستاده می‌شود."; });
+      }
       var ov = h("div", { class: "overlay kn-ai", role: "dialog", "aria-modal": "true", "aria-labelledby": "knAiT" });
       var send = h("button", { class: "btn", onclick: function () { var t = finalText(), m = meta(); ov.remove(); if (o.onSend) o.onSend(t, m); else call(t, m); } }, "بفرست");
       ov.appendChild(h("div", { class: "dialog wide", dir: "rtl" },
@@ -21043,12 +21108,13 @@ APP.goFromURL = function (q) {
         h("label", { for: "knAiNames", class: "small" }, "نام‌هایی که نباید فرستاده شوند" + (o.people ? " (دیگرانِ درگیر را «" + o.people + "» نوشته‌ای؛ اگر نامِ واقعی است این‌جا هم بنویس)" : "")), names,
         o.noPriv ? null : h("label", { class: "row gap small" }, h("input", { type: "checkbox", onchange: function (e) { priv = e.target.checked; upd(); } }), "فیلدهای خصوصی (نام و شدتِ احساس) هم فرستاده شود"),
         h("label", { for: "knAiPre", class: "small muted" }, "دقیقاً همین فرستاده می‌شود:"), pre,
+        attBox,
         o.more ? h("p", { class: "small muted kn-ai-more" }, o.more) : null,
         h("div", { class: "row gap wrap" }, send, h("button", { class: "btn ghost", onclick: function () { ov.remove(); if (o.onDone) o.onDone(); } }, "انصراف"))));
       upd(); A.layer().appendChild(ov); send.focus();
     }
     function call(text, m) {
-      Promise.resolve().then(function () { return A.callAI(o.system, text); })
+      Promise.resolve().then(function () { return m.fileIds && m.fileIds.length ? A.callAI(o.system, text, { fileIds: m.fileIds }) : A.callAI(o.system, text); })
         .then(function (txt) { return o.onResult(txt, m); }).then(null, function (e) { A.toast((e && e.message) || "اتصال به هوش مصنوعی برقرار نشد", "bad"); })
         .then(function () { if (o.onDone) o.onDone(); });
     }
@@ -21215,6 +21281,41 @@ APP.goFromURL = function (q) {
     }));
   }
 
+  /* ---------- «عکسِ سؤال» درست در کارتِ ثبت (فقط میزبان) ----------
+     همان درِ «پیوست‌ها»ی a12 (A.HOST.upload ⇒ فولدرِ همین موقعیت در درایو؛ سرور فقط اشاره‌گر نگه می‌دارد)، پس پیوست در فهرستِ
+     «📎 پیوست‌ها»ی پایینِ صفحه هم هست. موقعیت تا اولین ورودی ساخته نمی‌شود؛ انتخابِ فایل خودش ورودی است ⇒ اگر هنوز نیست، همین‌جا ساخته می‌شود. */
+  function upErr(e) { var d = e && e.response && e.response.data; return (d && d.detail) || (e && e.message) || "فرستادنِ فایل ناموفق بود"; }
+  function photoField(H) {
+    var kc = H.kc, st = h("span", { class: "small muted kn-upst", "aria-live": "polite" }), list = h("ul", { class: "plain small kn-uplist" });
+    function load() {
+      if (!H.live() || typeof A.HOST.files !== "function") return;
+      Promise.resolve(A.HOST.files(kc.id)).then(function (fs) {
+        list.innerHTML = "";
+        (fs || []).forEach(function (f) { list.appendChild(h("li", {}, h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📎 " + (f.name || "پیوست")))); });
+      }, function () { });
+    }
+    var inp = h("input", { type: "file", id: "knPhoto", accept: "image/*,application/pdf", multiple: true, onchange: function () {
+      var files = Array.prototype.slice.call(inp.files || []); if (!files.length) return;
+      if (!H.live()) H.put(); else H.flush();   // the record must exist before its first attachment
+      var i = 0, ok = 0;
+      (function next() {
+        if (i >= files.length) {
+          inp.value = ""; A._mirrorCache = null;
+          if (ok) { st.textContent = ""; A.toast(fa(ok) + " فایل در فولدرِ این موقعیت در درایو گذاشته شد."); redraw(); }
+          return;
+        }
+        var f = files[i++];
+        if (f.size > 25 * 1048576) { st.textContent = "«" + f.name + "» بزرگ‌تر از ۲۵ مگابایت است."; A.toast(st.textContent, "bad"); return next(); }
+        st.textContent = "در حالِ فرستادنِ «" + f.name + "» به درایو…";
+        Promise.resolve().then(function () { return A.HOST.upload(kc.id, f, { group: "گره‌گشا — موقعیت‌ها", title: kc.title || "موقعیت" }); })
+          .then(function () { ok++; next(); }, function (e) { st.textContent = upErr(e); st.classList.remove("muted"); st.classList.add("bad"); A.toast(st.textContent, "bad"); next(); });
+      })();
+    } });
+    load();
+    return fld("عکسِ سؤال (اختیاری)", h("div", { class: "col gap kn-photo" }, h("div", { class: "row gap wrap" }, inp, st), list),
+      { hint: "عکس یا PDF ِ صورتِ مسئله؛ مستقیم در فولدرِ همین موقعیت در گوگل درایو (نه در سرور). اگر هوش مصنوعی بخواهی، پیش از هر درخواست می‌پرسیم که تصویر هم فرستاده شود یا نه." });
+  }
+
   /* ---------- ثبت ---------- */
   var SHOWN_SAFE = {};
   function intakeStep(H) {
@@ -21227,7 +21328,8 @@ APP.goFromURL = function (q) {
     function set(k) { return function (v) { it[k] = v; ch(); }; }
     var probSec = h("section", { class: "card kn-prob" + (isProblem(kc) ? "" : " hidden") },
       h("h3", {}, "اگر مسئله است"),
-      fld("صورتِ کامل", area("knStmt", it.statement, 4, set("statement")), { hint: A.HOST && A.HOST.upload ? "پس از ثبت، عکسِ مسئله را در بخشِ «پیوست‌ها»ی همین موقعیت بگذار (فقط داخلِ Lifemanager)." : "پس از ثبت، عکسِ مسئله را در بخشِ «پیوست‌ها»ی همین موقعیت بگذار (فقط داخلِ Lifemanager؛ در این نسخهٔ مستقل پیوست نیست — متن را بنویس)." }),
+      fld("صورتِ کامل", area("knStmt", it.statement, 4, set("statement")), { hint: A.HOST && A.HOST.upload ? "عکسِ مسئله را همین پایین در «عکسِ سؤال» بگذار؛ در «پیوست‌ها»ی همین موقعیت هم دیده می‌شود. اگر صورت فقط در عکس است، این‌جا یک جملهٔ کوتاه بنویس (مثلاً «صورت در عکسِ پیوست است»)." : "پس از ثبت، عکسِ مسئله را در بخشِ «پیوست‌ها»ی همین موقعیت بگذار (فقط داخلِ Lifemanager؛ در این نسخهٔ مستقل پیوست نیست — متن را بنویس)." }),
+      A.HOST && typeof A.HOST.upload === "function" ? photoField(H) : null,
       fld("پاسخِ درست", txt("knAns", it.answer, set("answer")), { hint: "برای نردبانِ راهنمایی و کنترلِ نشت لازم است." }),
       fld("از کجا معلوم است که این پاسخ درست است؟", txt("knAnsHow", it.answerHow, set("answerHow"))),
       fld("کجا دقیقاً گیر کردم؟", area("knStuck", it.stuckAt, 2, set("stuckAt"))),
@@ -21358,7 +21460,7 @@ APP.goFromURL = function (q) {
     var out = h("div", { class: "col gap kn-aiout" });
     var btn = h("button", { class: "btn ghost", onclick: function () {
       btn.disabled = true; btn.textContent = "در حالِ پرسیدن…";
-      aiGate({ purpose: "پیشنهادِ فرضیهٔ فرعی و تبیینِ رقیب", system: SYS_HYP, people: kc.intake.people, build: function (priv) { return caseText(kc, priv, rk); },
+      aiGate({ purpose: "پیشنهادِ فرضیهٔ فرعی و تبیینِ رقیب", system: SYS_HYP, people: kc.intake.people, attach: { recIds: [kc.id] }, build: function (priv) { return caseText(kc, priv, rk); },
         onResult: function (t, m) { showHyps(H, t, out, m); }, onDone: function () { btn.disabled = false; btn.textContent = "🤖 پیشنهادِ هوش مصنوعی: فرضیهٔ فرعی و تبیینِ رقیب"; } });
     } }, "🤖 پیشنهادِ هوش مصنوعی: فرضیهٔ فرعی و تبیینِ رقیب");
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "پیشنهادِ اختیاری"),
@@ -21450,8 +21552,8 @@ APP.goFromURL = function (q) {
       var aib = h("button", { class: "btn ghost sm", onclick: function () {
         if (!String(it.statement || "").trim() || !String(it.answer || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» و «پاسخِ درست» لازم است (برای کنترلِ نشت).", "bad"); return; }
         aib.disabled = true;
-        aiGate({ purpose: "ساختنِ پله‌های ۴ تا ۶ ِ نردبان", system: SYS_LAD, people: it.people, noPriv: true,
-          more: "پس از ساخت، یک درخواستِ دومِ مستقل فقط با خودِ سه پله (بی صورتِ مسئله و بی پاسخ) فرستاده می‌شود تا ببیند آیا پاسخِ نهایی از خودِ پله‌ها درمی‌آید؛ اگر درآمد، پله‌ها کنار می‌روند.",
+        aiGate({ purpose: "ساختنِ پله‌های ۴ تا ۶ ِ نردبان", system: SYS_LAD, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
+          more: "پس از ساخت، یک درخواستِ دومِ مستقل فقط با خودِ سه پله (بی صورتِ مسئله، بی پاسخ و بی تصویرِ پیوست) فرستاده می‌شود تا ببیند آیا پاسخِ نهایی از خودِ پله‌ها درمی‌آید؛ اگر درآمد، پله‌ها کنار می‌روند.",
           build: function () { return "صورتِ مسئله: " + it.statement + "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
           onResult: function (t, m) {
             var o = parseJSON(t); var v = o && [o.s4, o.s5, o.s6].map(function (x) { return String(x || "").trim(); });
@@ -21499,7 +21601,7 @@ APP.goFromURL = function (q) {
     var aib = h("button", { class: "btn ghost sm", onclick: function () {
       if (!String(it.statement || "").trim()) { A.toast("برای ساختنِ هم‌ریخت «صورتِ کامل» لازم است.", "bad"); return; }
       aib.disabled = true;
-      aiGate({ purpose: "ساختنِ یک هم‌ریخت", system: SYS_ISO, people: it.people, noPriv: true,
+      aiGate({ purpose: "ساختنِ یک هم‌ریخت", system: SYS_ISO, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
         build: function () { return "مسئلهٔ اصلی: " + it.statement + (it.answer ? "\nپاسخِ اصلی (تکرار نشود): " + it.answer : ""); },
         onResult: function (t2) {
           var o = parseJSON(t2); out.innerHTML = "";
@@ -21763,7 +21865,7 @@ APP.goFromURL = function (q) {
   }
 
   /* ---------- قدمِ ۴: بازکردن ---------- */
-  function actKey(a) { return a.tid ? "t" + a.tid : a.ext ? "x:" + a.ext : a.pid ? "p:" + a.pid : a.epi ? "epi" : a.farm ? "farm" : "?"; }
+  function actKey(a) { return a.tid ? "t" + a.tid : a.ext ? "x:" + a.ext : a.pid ? "p:" + a.pid : a.epi ? "epi" : a.farm ? "farm" : a.prob ? "prob" : "?"; }
   A.knotActs = function (kc) {
     var R = kc.root || {}, list = [], seen = {};
     [{ fam: R.primary, sub: R.sub }].concat(R.extra || []).forEach(function (fs) {
@@ -21785,6 +21887,7 @@ APP.goFromURL = function (q) {
       h("p", { class: "small" }, "مداخله‌ها به ترتیبِ اولویت. هر تکنیک کاربرگِ واقعیِ خودش را همین‌جا روی همین موقعیت باز می‌کند (با اولین نوشته‌ات ذخیره می‌شود). مداخله‌های «بیرون از ۴۵ تکنیک» منبع و سطحِ شواهدشان را کنارشان دارند.")));
     var acts = A.knotActs(kc);
     box.appendChild(h("section", { class: "card" }, h("h2", {}, "مداخله‌ها"), h("ol", { class: "kn-acts" }, acts.map(function (x, i) { return actRow(H, k, x, i); }))));
+    var el = epiLinksSec(kc); if (el) box.appendChild(el);
     box.appendChild(knotCardEditor(k, { kc: kc, H: H }));
     if (A.V.kpractice) box.appendChild(h("section", { class: "card kn-close" }, h("h3", {}, "بعد: ورزیدگی"),
       h("p", { class: "small" }, "ورزش یعنی شناختنِ همین ساختار در ظاهرهای تازه (و نمونه‌های بدلی که گره در آن‌ها نیست) — نه حفظِ یک راه‌حل. تمرینِ سؤال‌های شبیهِ آزمونِ هوش نمرهٔ همان نوع آزمون را با آشنایی بالا می‌برد، نه توانِ کلی را."),
@@ -21800,13 +21903,13 @@ APP.goFromURL = function (q) {
     if (a.tid) { var t = A.TM[a.tid]; title = fa(a.tid) + " · " + (t ? t.fa : ""); chip = h("span", { class: "chip" }, "تکنیکِ " + fa(a.tid)); }
     else if (a.pid) { title = A.pn ? A.pn(a.pid) : a.fa; chip = h("span", { class: "chip" }, "روال"); }
     else if (a.ext) { title = a.fa; chip = h("span", { class: "chip kn-ext" }, "بیرون از ۴۵ تکنیک"); }
-    else { title = a.fa; chip = h("span", { class: "chip" }, a.epi ? "کارخانه" : "مزرعه"); }
+    else { title = a.fa; chip = h("span", { class: "chip" }, a.epi || a.prob ? "کارخانه" : "مزرعه"); }
     var openB = h("button", { class: "btn ghost sm", "aria-expanded": "false", onclick: function () {
       var on = panel.classList.toggle("hidden"); openB.setAttribute("aria-expanded", on ? "false" : "true"); openB.textContent = on ? "باز کن" : "ببند";
       if (!on && !panel.firstChild) fillPanel();
     } }, "باز کن");
     li.appendChild(h("div", { class: "row between wrap gap" }, h("div", {}, h("span", { class: "kn-an" }, fa(i + 1)), " ", h("b", {}, title), " ", chip, rec && rec.done ? h("span", { class: "chip good" }, "✓ انجام شد") : null,
-      a.note ? h("div", { class: "small muted" }, a.note) : null, x.fam !== kc.root.primary ? h("div", { class: "small muted" }, "از گرهِ کمکی: " + famName(x.fam)) : null), openB));
+      a.note ? h("div", { class: "small muted" }, a.prob ? "چرا: " + a.note : a.note) : null, a.tid ? courseLink(a.tid) : null, x.fam !== kc.root.primary ? h("div", { class: "small muted" }, "از گرهِ کمکی: " + famName(x.fam)) : null), openB));
     li.appendChild(panel);
     function mark(extra) {
       var r = actRec(kc, x.key); if (!r) { r = { key: x.key }; if (a.tid) r.tid = a.tid; if (a.ext) r.ext = a.ext; kc.acts.push(r); }
@@ -21843,9 +21946,43 @@ APP.goFromURL = function (q) {
       } else if (a.epi) {
         panel.appendChild(h("p", { class: "small" }, "جملهٔ نتیجه‌ات را در کارخانه بسنج: از کجا آمده، با چه ملاکی سنجیده می‌شود، و چه چیزی باطلش می‌کند."));
         panel.appendChild(factoryBtn(H));
+      } else if (a.prob) {
+        panel.appendChild(h("p", { class: "small" }, "در «مسئله‌های بزرگ» ِ کارخانه، در هر لحظهٔ تاریخیِ یک مسئلهٔ مشهور حرکتِ بعدی را انتخاب می‌کنی و می‌بینی کدام راه بن‌بست شد — همان «عوض‌کردنِ راه» که این گره کم دارد (با «↩ برگرد» برمی‌گردی)."));
+        panel.appendChild(h("button", { class: "btn sm kn-prob-go", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob"); } }, "🏛️ برو به «مسئله‌های بزرگ»"));
       } else if (a.farm) panel.appendChild(nurseryBtn(k));
     }
     return li;
+  }
+  /* تکنیکی که درسِ «دورهٔ گام‌به‌گام» هم هست ⇒ یک پیوند به همان درس (A.COURSE_LESSONS از a11) */
+  function courseLink(tid) {
+    var L = (A.COURSE_LESSONS || []).filter(function (l) { return !l.pid && +l.tid === +tid; })[0];
+    if (!L || !A.V.lesson) return null;
+    return h("p", { class: "small kn-crslink" }, "این تکنیک درسِ دورهٔ گام‌به‌گام هم هست (منزلِ " + fa(L.w) + ") — ",
+      h("button", { class: "linkish small", onclick: function () { A.go("lesson", L.tid, "s1"); } }, "📚 درسِ «" + (L.fa || "") + "» در دوره"),
+      h("span", { class: "muted" }, " (با «↩ برگرد» برمی‌گردی)"));
+  }
+  A.knotCourseLink = courseLink;
+  /* قدمِ ۴ ⇐ ایستگاه‌های کارخانه: برای خانوادهٔ اصلی و کمکی‌ها، هر کدام با «چرا»ی خودش؛ بی‌پیوند ⇒ هیچ (نه بخشِ خالی) */
+  A.knotEpiLinks = function (kc) {
+    var R = (kc && kc.root) || {}, out = [], seen = {};
+    [R.primary].concat((R.extra || []).map(function (x) { return x && (x.fam || x); })).forEach(function (fam) {
+      var F = KFM[fam]; if (!F) return;
+      (F.epi || []).forEach(function (l) {
+        if (seen[l.st] || !(A.EST && A.EST[l.st])) return;
+        seen[l.st] = 1; out.push({ st: l.st, why: l.why, fam: fam });
+      });
+    });
+    return out;
+  };
+  function epiLinksSec(kc) {
+    var ls = A.knotEpiLinks(kc); if (!ls.length) return null;
+    return h("section", { class: "card kn-epilinks", "data-report-section": "kepi", "data-report-section-label": "در کارخانهٔ معرفت‌شناسی" },
+      h("h3", {}, "🏭 در کارخانهٔ معرفت‌شناسی"),
+      h("p", { class: "small muted" }, "ایستگاه‌هایی که دقیقاً به سازوکارِ همین خانواده مربوط‌اند؛ هر کدام با یک خط «چرا»."),
+      h("ul", { class: "plain kn-epil" }, ls.map(function (l) {
+        return h("li", { "data-st": l.st }, h("button", { class: "linkish", onclick: function () { A.go("e_st", l.st); } }, "🏭 " + A.EST[l.st].fa),
+          h("span", { class: "muted small" }, " · " + famName(l.fam)), h("div", { class: "small" }, "چرا: " + l.why));
+      })));
   }
   function nurseryBtn(k) {
     var done = S.all("seedling", function (s) { return s.src && s.src.id === k.id; }).length;
@@ -21903,6 +22040,8 @@ APP.goFromURL = function (q) {
       "مسئله‌ای که حل نشد، واکنشی که از خودت دیدی، یا نتیجه‌ای اجتماعی که نمی‌فهمی. هر موقعیت از چند تونل می‌گذرد تا ریشه را — با شاهد و با تأییدِ خودت — پیدا کنی و کم‌کم بازش کنی."));
     root.appendChild(h("section", { class: "card soft small" }, h("p", {}, "صادقانه: این ابزار ریشه را حدس نمی‌زند و حکم نمی‌دهد؛ فرضیه‌ها را کنارِ هم می‌گذارد و تو با شاهد انتخاب می‌کنی. ورزش، شناختنِ همان ساختار را در شکل‌های تازه تمرین می‌دهد؛ قولِ «قوی‌ترشدنِ مغز» یا «بالا رفتنِ ضریبِ هوش» نمی‌دهد، و نمی‌گوید گره دیگر برنمی‌گردد — آزمونِ واقعی، موقعیتِ واقعیِ بعدی است."),
       h("p", { class: "muted" }, "تشخیصِ بالینی و درمان نیست.")));
+    if (A.V.concerns) root.appendChild(h("p", { class: "small kn-concern" }, "این بخش پاسخِ دغدغهٔ شمارهٔ ۱۰ توست — «گره‌های ذهنی‌ام باز شوند و با تمرین محو شوند». ",
+      h("button", { class: "linkish small", onclick: function () { A.go("concerns", "c10"); } }, "دیدنِ دغدغه‌ها")));
     if (A.knotEmoStreak()) root.appendChild(emoCard());
     root.appendChild(h("div", { class: "row gap wrap" },
       h("button", { class: "btn lg kn-new", onclick: function () { A.go("kcase", "new", "in"); } }, "+ موقعیتِ تازه"),
@@ -22006,6 +22145,21 @@ APP.goFromURL = function (q) {
       var cs = S.get(id), src = cs && cs.src, kc = src && src.type === "kcase" && S.get(src.id);
       if (kc && root && root.insertBefore) root.insertBefore(h("section", { class: "card soft kn-back" }, h("p", { class: "small" }, "این پرونده از یک موقعیتِ «گره‌گشا» آمده است: ", h("b", {}, kc.title || "موقعیت"), "."),
         h("button", { class: "btn ghost sm", onclick: function () { A.go("kcase", kc.id, "s0"); } }, "🪢 برگشت به همان موقعیت")), root.children[1] || null);
+    } catch (e) { console.error(e); }
+    return root;
+  };
+  /* دغدغه‌ها: c10 («گره‌های ذهنی‌ام … باز شوند و با تمرین …») دقیقاً همین ابزار است و c7 («حفظ نه … عمقِ کار را بفهمم») اصلِ ورزشِ آن.
+     فقط یک پیوند زیرِ همان دو کارت (بی‌ویرایشِ a4)؛ دغدغهٔ دیگری پیوند نمی‌گیرد. */
+  var KCONCERN = { c10: "این ابزار برای همین ساخته شده: هر گیرکردن را از تونل‌ها می‌گذراند تا ریشه را با شاهد پیدا کنی، بازش کنی و با نمونه‌های متنوع ورزیده شوی.",
+    c7: "ورزشِ گره‌گشا حفظِ راه‌حل نیست: همان ساختار را در ظاهرهای تازه و در نمونه‌های بدلی تشخیص می‌دهی — یعنی فهمِ عمق." };
+  var rawConcerns = A.V.concerns;
+  if (rawConcerns) A.V.concerns = function () {
+    var root = rawConcerns.apply(this, arguments);
+    try {
+      Object.keys(KCONCERN).forEach(function (cid) {
+        var card = root && root.querySelector && root.querySelector("#cc_" + cid); if (!card) return;
+        card.appendChild(h("div", { class: "kv mt kn-concern-link", "data-concern": cid }, h("span", {}, h("button", { class: "linkish", onclick: function () { A.go("kcases"); } }, "🪢 گره‌گشا")), h("span", { class: "small" }, KCONCERN[cid])));
+      });
     } catch (e) { console.error(e); }
     return root;
   };
@@ -22936,7 +23090,9 @@ APP.goFromURL = function (q) {
     var n = opts.n || 4;
     var ask = strip(A.kAsk(k, n));
     var rep = { accepted: [], unverified: [], rejected: [] };
-    return A.callAI(A.KGEN_SYS, ask).then(function (t) {
+    /* تصویرِ پیوستِ موقعیت (اگر کاربر در دروازه پذیرفت) فقط به **سازنده** می‌رود؛ سه حلِ وارسی (A.kverify) فقط متنِ نمونه را می‌بینند */
+    var fids = (opts.fileIds || []).slice(0, 4);
+    return (fids.length ? A.callAI(A.KGEN_SYS, ask, { fileIds: fids }) : A.callAI(A.KGEN_SYS, ask)).then(function (t) {
       var o; try { o = parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); }
       var arr = Array.isArray(o) ? o : (o && o.items) || [];
       if (!arr.length) throw new Error("سازنده نمونه‌ای نداد");
@@ -23034,15 +23190,25 @@ APP.goFromURL = function (q) {
      همان جزءِ a16 (A.knotAIGate): بررسیِ ایمنی ⇐ اعلامِ ارائه‌دهندهٔ بیرونی + پیش‌نمایشِ دقیقِ متن + حذفِ نام ⇐ تأیید. a17 فقط تأیید و
      نام‌ها را می‌گیرد و خودش درخواست‌ها (سازنده + سه حل) را با همان حذفِ نام می‌فرستد. اگر a16 نباشد، کارتِ ساده‌ترِ همین‌جا با پیش‌نمایش. */
   A._kaiReset = function () { };  // (سازگاری با آزمون‌های قدیمی؛ دیگر حافظهٔ نشستی در کار نیست)
+  /* موقعیت‌های این گره، تازه‌ترین اول — دروازه اولین‌شان را که عکس/PDF ِ پیوست دارد پیشنهاد می‌کند
+     (پیش‌فرض روشن فقط اگر آن موقعیت «مسئله» است). فقط در میزبان؛ نسخهٔ مستقل پیوست ندارد. */
+  A.kattachCases = function (k) {
+    var ids = {}, out = [];
+    (k.cases || []).forEach(function (id) { ids[id] = 1; });
+    S.all("kcase", function (c) { return (c.knots || []).indexOf(k.id) >= 0; }).forEach(function (c) { ids[c.id] = 1; });
+    Object.keys(ids).forEach(function (id) { var c = S.get(id); if (c && c.type === "kcase") out.push(c); });
+    return out.sort(function (a, b) { return String(b.created || "").localeCompare(String(a.created || "")); }).map(function (c) { return c.id; });
+  };
   function aiGate(box, k) {
     var text = A.kAsk(k);
     return new Promise(function (resolve, reject) {
       if (typeof A.knotAIGate === "function") {
         var sent = false;
-        A.knotAIGate({ purpose: "ساختنِ نمونه‌های ورزش برای این گره", noPriv: true,
-          more: "پس از ساخت، هر نمونه سه بار جداگانه و بی پاسخ برای حل فرستاده می‌شود (ساختارِ عمیقِ گره + متنِ همان نمونه، با همین حذفِ نام).",
+        var acs = A.kattachCases(k);
+        A.knotAIGate({ purpose: "ساختنِ نمونه‌های ورزش برای این گره", noPriv: true, attach: acs.length ? { recIds: acs } : null,
+          more: "پس از ساخت، هر نمونه سه بار جداگانه و بی پاسخ برای حل فرستاده می‌شود (ساختارِ عمیقِ گره + متنِ همان نمونه، با همین حذفِ نام؛ تصویرِ پیوست به این سه حل نمی‌رود).",
           build: function () { return text; },
-          onSend: function (t, meta) { sent = true; resolve({ names: (meta && meta.names) || [] }); },
+          onSend: function (t, meta) { sent = true; resolve({ names: (meta && meta.names) || [], fileIds: (meta && meta.fileIds) || [] }); },
           onDone: function () { if (!sent) reject(new Error("لغو شد")); } });
         return;
       }
@@ -23100,7 +23266,7 @@ APP.goFromURL = function (q) {
       var b = e.target; b.disabled = true;
       aiGate(out, k).then(function (pref) {
         b.textContent = "در حالِ ساخت و سه حلِ مستقل…";
-        return A.kmakeAI(k, { names: pref.names }).then(function (rep) {
+        return A.kmakeAI(k, { names: pref.names, fileIds: pref.fileIds || [] }).then(function (rep) {
           A._klastRep = rep;
           A.toast("وارسی‌شده: " + fa(rep.accepted.length) + " · وارسی‌نشده: " + fa(rep.unverified.length) + " · کنار گذاشته: " + fa(rep.rejected.length));
           A.render();

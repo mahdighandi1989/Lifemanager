@@ -214,8 +214,10 @@ var APP = window.APP = {};
     "۵) فقط یک سرنخ بده، نه راه‌حل.\n" +
     "۶) اگر خطای محتوایی (علمی، مالی، فنی) دیدی، دقیق بگو کجا و چرا نادرست است، بدون نوشتن متن جایگزین کامل.\n" +
     "۷) فارسی روشن و دقیق، بدون تعارف، بدون اغراق، بدون عبارت‌های کلیشه‌ای. حداکثر ۳۵۰ کلمه. ساختار: «نمره روبریک»، «ضعیف‌ترین گام»، «پرسش‌ها»، «یک سرنخ»، «خطای محتوایی (اگر هست)».";
-  A.callAI = function (system, user) {
-    if (A.HOST && A.HOST.ai) return A.HOST.ai(system, user);
+  /* opts (اختیاری): {fileIds:[…]} — شناسهٔ پیوست‌های همین کاربر (عکس/PDF) که میزبان همراهِ درخواست به مدلِ بینا می‌دهد.
+     فقط میزبان (Lifemanager) آن را می‌فهمد؛ نسخهٔ مستقل و Apps Script نادیده‌اش می‌گیرند (پیوست ندارند). */
+  A.callAI = function (system, user, opts) {
+    if (A.HOST && A.HOST.ai) return opts ? A.HOST.ai(system, user, opts) : A.HOST.ai(system, user);
     return new Promise(function (resolve, reject) {
       if (S.mode === "gas") {
         google.script.run.withSuccessHandler(function (r) { resolve(r); }).withFailureHandler(function (e) { reject(e); }).api_ai(system, user);

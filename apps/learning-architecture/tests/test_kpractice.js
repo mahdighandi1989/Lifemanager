@@ -242,6 +242,39 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   for (const t of [[1, 2, 3], [3, 2, 1]]) { const ins = p.locator('main .kp-probe input'); for (let j = 0; j < 3; j++) await ins.nth(j).fill(String(t[j])); await p.click('main .kp-probe .btn'); }
   info.probeAfter = await p.locator('main #kpConf').count();
   info.probeTruth = await p.evaluate(() => { const it = APP.kitemsOf('knot_t3').find(i => i.params && i.params.rule); const shown = [...document.querySelectorAll('main .kp-probes li')].map(li => li.classList.contains('ok')); return shown.join() === [APP.kprobe(it, [1, 2, 3]), APP.kprobe(it, [3, 2, 1])].join(); });
+  // ۱۲) پیوستِ تصویری (میزبانِ ساختگی): سازندهٔ نمونه‌ها عکسِ تازه‌ترین موقعیتِ پیوست‌دارِ گره را می‌گیرد؛ سه حلِ وارسی هرگز
+  await p.evaluate(() => {
+    window.__ai3 = [];
+    APP.S.put({ id: 'kc_img0', type: 'kcase', title: 'موقعیتِ قدیمیِ اجتماعی', kinds: ['social'], intake: { what: 'x' }, knots: ['knot_img'], created: '2026-10-01T10:00:00Z' });
+    APP.S.put({ id: 'kc_img1', type: 'kcase', title: 'سؤالِ تصویریِ آزمونِ هوش', kinds: ['problem'], intake: { what: 'x' }, knots: ['knot_img'], created: '2026-11-01T10:00:00Z' });
+    APP.S.put({ id: 'kc_img2', type: 'kcase', title: 'تازه‌ترین ولی بی‌پیوست', kinds: ['problem'], intake: { what: 'x' }, knots: ['knot_img'], created: '2026-11-02T10:00:00Z' });
+    APP.S.put({ id: 'knot_img', type: 'knot', name: 'الگوی شکل‌ها', fam: 'F2', principle: 'شکل را جزءبه‌جزء نمی‌خوانم و قیدِ پنهان را نمی‌بینم', signals: 'یک شکلِ شلوغ', counter: 'اجزا را جدا بشمار', example: 'ماتریسِ شکل‌ها', cases: ['kc_img0', 'kc_img1', 'kc_img2'], status: 'open' });
+    window.__filesAsked = [];
+    APP.HOST.files = (rid) => { window.__filesAsked.push(rid); return Promise.resolve(rid === 'kc_img1' ? [{ id: 71, name: 'q.png', mime: 'image/png', size: 2000, link: '#' }, { id: 72, name: 'big.png', mime: 'image/png', size: 9e6, link: '#' }, { id: 73, name: 'n.txt', mime: 'text/plain', size: 5, link: '#' }] : rid === 'kc_img0' ? [{ id: 70, name: 'old.png', mime: 'image/png', size: 100, link: '#' }] : []); };
+    APP.HOST.upload = () => Promise.resolve({});
+    const items = { items: [{ form: 'numeric', decoy: false, level: 1, prompt: 'حاصلِ پنج به‌اضافهٔ شش؟', atype: 'int', answer: '11', deep: 'x', trap: 'y', explain: 'z' }] };
+    APP.callAI = function (sys, user, opts) {
+      window.__ai3.push({ gen: sys === APP.KGEN_SYS, fileIds: (opts && opts.fileIds) || null, user });
+      return Promise.resolve(sys === APP.KGEN_SYS ? JSON.stringify(items) : JSON.stringify({ answer: '11', multi: false, deep: true, why: '.' }));
+    };
+    APP.go('kpractice', 'knot_img', 'items');
+  });
+  await p.click('main #kpAI'); await p.waitForTimeout(300);
+  info.imgLabel = await p.locator('.kn-ai label[for="knAiAtt"]').innerText().catch(() => '');
+  info.imgOn = await p.isChecked('#knAiAtt').catch(() => null);
+  info.imgFrom = await p.locator('.kn-ai .kn-ai-att').innerText().catch(() => '');
+  info.imgWarn = await p.locator('.kn-ai .kn-ai-attw:not(.hidden)').count();
+  info.imgAsked = await p.evaluate(() => window.__filesAsked.join(','));
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(900);
+  info.imgCalls = await p.evaluate(() => window.__ai3.map(x => (x.gen ? 'gen' : 'solve') + ':' + JSON.stringify(x.fileIds)).join(' '));
+  info.imgSolverText = await p.evaluate(() => window.__ai3.filter(x => !x.gen).every(x => /پنج به‌اضافهٔ شش/.test(x.user)));
+  // بی‌تیک ⇒ هیچ fileIds
+  await p.evaluate(() => { window.__ai3 = []; APP.go('kpractice', 'knot_img', 'items'); });
+  await p.click('main #kpAI'); await p.waitForTimeout(300);
+  await p.uncheck('#knAiAtt'); info.imgWarnOff = await p.locator('.kn-ai .kn-ai-attw:not(.hidden)').count();
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(900);
+  info.imgOffCalls = await p.evaluate(() => window.__ai3.every(x => x.fileIds === null) && window.__ai3.length === 4);
+  await p.evaluate(() => { delete APP.HOST.files; delete APP.HOST.upload; });
   // موبایل
   await p.setViewportSize({ width: 390, height: 844 });
   for (const v of [['kpractice'], ['kpractice', 'knot_t1'], ['kpractice', 'knot_t1', 'items'], ['kpractice', 'knot_t4', 'exp'], ['kpractice', 'knot_t1', 'run'], ['settings']]) {
@@ -305,6 +338,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.dueRow === 1, 'today row');
   chk(info.interleavedHidesName, 'knot name visible before answer');
   chk(info.probeGate === 0 && info.probeAfter === 1 && info.probeTruth, 'probe gate ' + info.probeGate + '/' + info.probeAfter + '/' + info.probeTruth);
+  chk(/تصویرِ پیوست هم فرستاده شود \(۱\)/.test(info.imgLabel) && info.imgOn === true && info.imgWarn === 1 && /سؤالِ تصویریِ آزمونِ هوش/.test(info.imgFrom), 'knot image offer: ' + info.imgLabel + ' ' + info.imgOn + ' ' + info.imgFrom);
+  chk(info.imgAsked === 'kc_img2,kc_img1', 'newest case with an image first: ' + info.imgAsked);
+  chk(info.imgCalls === 'gen:[71] solve:null solve:null solve:null' && info.imgSolverText, 'generator gets the image, the three verifying solvers never: ' + info.imgCalls);
+  chk(info.imgWarnOff === 0 && info.imgOffCalls, 'unticked => no fileIds: ' + info.imgOffCalls);
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();
 })();

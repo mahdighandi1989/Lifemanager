@@ -330,6 +330,92 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.evaluate(() => APP.go('proto', 'P9')); await p.waitForTimeout(200);
   info.p9 = await p.locator('main .kn-p9 li').count();
 
+  /* ۱۴) پیوندهای معناییِ دقیق (مالک ۲۰۲۶-۱۰-۱۲): ایستگاه‌های کارخانه برای هر خانواده با «چرا»، درسِ دوره برای تکنیک، «مسئله‌های بزرگ» برای F3،
+     دغدغه‌های c10/c7 — و هیچ پیوندِ تعارفی برای خانواده‌های بی‌ربط */
+  const L = await p.evaluate(() => {
+    const mk = (prim, extra, kinds, more) => {
+      const kn = APP.newKnot({ name: 'گرهِ پیوند ' + prim, fam: prim, cases: [] });
+      const kc = APP.S.put(Object.assign({ id: APP.uid('kc'), type: 'kcase', title: 'پیوند ' + prim, kinds: kinds || ['inference'], intake: { stmts: [], what: 'یک اتفاق', expected: 'الف', actual: 'ب', thoughts: 'پ', seen: 'na' },
+        premise: { verdict: 'yes' }, ev: [{ fam: prim, dir: 1, w: 1, kind: 'fact', text: 'شاهد', src: 'manual' }], root: { primary: prim, extra: extra || [], why5: [], confirmed: true },
+        knots: [kn.id], acts: [], hyps: [], pans: {}, ladder: {}, status: 'rooted', step: 's4' }, more || {}));
+      kn.cases = [kc.id]; APP.S.put(kn); return kc.id;
+    };
+    return { F11: mk('F11'), F8: mk('F8', [], ['social']), F2: mk('F2', [], ['problem'], { intake: { stmts: [], what: 'یک سؤالِ شکل', expected: 'الف', actual: 'ب', thoughts: 'پ', seen: 'no', statement: 'صورت در عکسِ پیوست است', answer: '42' } }),
+      F3: mk('F3', [], ['problem']), F6: mk('F6', [], ['behavior']), F9x: mk('F9', [{ fam: 'F11', sub: '' }]) };
+  });
+  info.epiL = {};
+  for (const f of Object.keys(L)) {
+    await p.evaluate(id => APP.go('kcase', id, 's4'), L[f]); await p.waitForTimeout(150); await bad('links ' + f);
+    info.epiL[f] = (await p.locator('main .kn-epil li[data-st]').evaluateAll(els => els.map(e => e.getAttribute('data-st')))).join(',');
+    if (f === 'F11') {
+      info.epiWhy = await p.locator('main .kn-epil li').evaluateAll(els => els.every(e => /چرا: .{8,}/.test(e.innerText)));
+      info.epiSec = await p.locator('main .kn-epilinks h3').innerText();
+      info.crsLinks = await p.locator('main .kn-act .kn-crslink').count();
+      info.crsLinkTids = await p.evaluate(() => Array.from(document.querySelectorAll('main .kn-act')).filter(li => li.querySelector('.kn-crslink')).map(li => li.getAttribute('data-act')).join(','));
+      info.crsExpected = await p.evaluate(id => APP.knotActs(APP.S.get(id)).filter(x => x.a.tid && APP.COURSE_LESSONS.some(l => !l.pid && +l.tid === +x.a.tid)).map(x => x.key).join(','), L.F11);
+      info.crsText = await p.locator('main .kn-crslink').first().innerText();
+    }
+    if (f === 'F6') info.epiSecF6 = await p.locator('main .kn-epilinks').count();
+    if (f === 'F3') {
+      info.probAct = await p.locator('main .kn-act[data-act="prob"]').count();
+      info.probWhy = await p.locator('main .kn-act[data-act="prob"]').innerText();
+      info.probNotOthers = await p.evaluate(id => APP.knotActs(APP.S.get(id)).some(x => x.key === 'prob'), L.F11);
+    }
+  }
+  // کلیکِ ایستگاه ⇒ همان صفحهٔ ایستگاه با «↩ برگرد» به همین موقعیت
+  await p.evaluate(id => APP.go('kcase', id, 's4'), L.F11); await p.waitForTimeout(150);
+  await p.click('main .kn-epil li[data-st="st_istiqra"] button'); await p.waitForTimeout(200);
+  info.epiGo = await st(); await bad('e_st');
+  info.epiBack = await p.evaluate(() => (APP.trail || []).slice(-1).map(e => e.view + ':' + e.arg)[0] || '');
+  await p.evaluate(id => APP.go('kcase', id, 's4'), L.F11); await p.waitForTimeout(150);
+  await p.click('main .kn-crslink button'); await p.waitForTimeout(200);
+  info.crsGo = await st();
+  await p.evaluate(id => APP.go('kcase', id, 's4'), L.F3); await p.waitForTimeout(150);
+  await p.click('main .kn-act[data-act="prob"] .btn.ghost'); await p.waitForTimeout(80);
+  await p.click('main .kn-act[data-act="prob"] .kn-prob-go'); await p.waitForTimeout(200);
+  info.probGo = await st(); await bad('e_prob');
+  // دغدغه‌ها: فقط c10 و c7 پیوند می‌گیرند؛ فهرستِ موقعیت‌ها به دغدغهٔ ۱۰ برمی‌گردد
+  await p.evaluate(() => APP.go('concerns')); await p.waitForTimeout(200);
+  info.concernLinks = (await p.locator('main .kn-concern-link').evaluateAll(els => els.map(e => e.getAttribute('data-concern') + ':' + (e.closest('.concern') || {}).id))).join(',');
+  info.concernWhy = await p.locator('main .kn-concern-link').evaluateAll(els => els.every(e => e.innerText.length > 30));
+  await p.click('main .kn-concern-link[data-concern="c10"] button'); await p.waitForTimeout(200);
+  info.concernGo = await st();
+  info.kcConcern = await p.locator('main .kn-concern').innerText();
+  await p.click('main .kn-concern button'); await p.waitForTimeout(200);
+  info.kcConcernGo = await st();
+  // نسخهٔ مستقل: درِ هوش مصنوعی هیچ بخشِ پیوست ندارد و درخواست بی fileIds می‌رود
+  await p.evaluate(() => { window.__aiO = []; APP.callAI = (s, u, o) => { window.__aiO.push(o || null); return Promise.resolve('[]'); }; });
+  await p.evaluate(id => APP.go('kcase', id, 's1'), L.F2); await p.waitForTimeout(150);
+  await p.click('main button:has-text("پیشنهادِ هوش مصنوعی")'); await p.waitForTimeout(150);
+  info.attStandalone = await p.locator('.kn-ai .kn-ai-att').count();
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(300);
+  info.optsStandalone = await p.evaluate(() => JSON.stringify(window.__aiO));
+  // میزبانِ ساختگی با پیوست: «مسئله» ⇒ پیش‌فرض روشن، fileIds فقط پیوستِ تصویری ≤ ۸ مگابایت؛ «برداشت» ⇒ پیش‌فرض خاموش
+  await p.evaluate(() => {
+    window.__aiH = [];
+    window.__loaded0 = APP.S.loaded; APP.S.loaded = true;  // (میزبانِ واقعی پس از بارگذاری؛ این‌جا داده محلی است)
+    APP.HOST = { files: () => Promise.resolve([{ id: 5, name: 'q.png', mime: 'image/png', size: 3000, link: '#' }, { id: 6, name: 'big.jpg', mime: 'image/jpeg', size: 9e6, link: '#' }, { id: 7, name: 'a.txt', mime: 'text/plain', size: 9, link: '#' }]) };
+    APP.callAI = (s, u, o) => { window.__aiH.push({ chk: s === APP.KSYS_LADCHK, o: o || null, u }); return Promise.resolve(s === APP.KSYS_LADCHK ? '{"answer":null}' : /^تو سازندهٔ راهنمایی/.test(s) ? '{"s4":"از حالتِ خاص شروع کن","s5":"تقارن","s6":"دو بخشِ شکل را جدا بشمار"}' : '[]'); };
+  });
+  await p.evaluate(id => APP.go('kcase', id, 's1'), L.F2); await p.waitForTimeout(150);
+  await p.click('main button:has-text("پیشنهادِ هوش مصنوعی")'); await p.waitForTimeout(250);
+  info.attLabel = await p.locator('.kn-ai label[for="knAiAtt"]').innerText().catch(() => '');
+  info.attOnProblem = await p.isChecked('#knAiAtt').catch(() => null);
+  info.attWarn = await p.locator('.kn-ai .kn-ai-attw:not(.hidden)').innerText().catch(() => '');
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(300);
+  info.hypOpts = await p.evaluate(() => JSON.stringify(window.__aiH.map(x => x.o)));
+  // نردبان: سازنده تصویر را می‌گیرد، حل‌کنندهٔ مستقلِ نشت هرگز
+  await p.evaluate(id => { const kc = APP.S.get(id); kc.ladder = { cur: 4 }; APP.S.put(kc); window.__aiH = []; APP.go('kcase', id, 's2'); }, L.F2); await p.waitForTimeout(200);
+  await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(250);
+  info.ladMoreNoImg = /بی تصویرِ پیوست/.test(await p.locator('.kn-ai .kn-ai-more').innerText());
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(400);
+  info.ladOpts = await p.evaluate(() => window.__aiH.map(x => (x.chk ? 'chk:' : 'gen:') + JSON.stringify(x.o)).join(' '));
+  await p.evaluate(id => APP.go('kcase', id, 's1'), L.F11); await p.waitForTimeout(150);
+  await p.click('main button:has-text("پیشنهادِ هوش مصنوعی")'); await p.waitForTimeout(250);
+  info.attOffInference = await p.isChecked('#knAiAtt').catch(() => null);
+  await p.click('.kn-ai .btn.ghost'); await p.waitForTimeout(100);
+  await p.evaluate(() => { delete APP.HOST; APP.S.loaded = window.__loaded0; });
+
   /* ۱۳) موبایل ۳۹۰: بی‌سرریزِ افقی */
   await p.setViewportSize({ width: 390, height: 844 });
   info.overflow = [];
@@ -408,6 +494,23 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(/^returned\|1$/.test(info.returned) && info.p9 === 1, 'returned/P9: ' + info.returned + ' ' + info.p9);
   E(/^[1-9]\d*\|.*returned$/.test(info.returnedRemind), 'I2 a16 returned path ⇒ reminder + hist: ' + info.returnedRemind);
   E(!info.overflow.length, 'mobile overflow: ' + info.overflow.join(' '));
+  // ---- پیوندهای معنایی و پیوستِ تصویری (۲۰۲۶-۱۰-۱۲) ----
+  E(info.epiL.F11 === 'st_istiqra,st_tajrobe,st_grade' && info.epiL.F8 === 'st_expert,st_herm' && info.epiL.F2 === 'st_worlds,st_herm', 'factory links per family: ' + JSON.stringify(info.epiL));
+  E(info.epiL.F9x === 'st_background,st_grade,st_resp,st_istiqra,st_tajrobe', 'factory links primary+extra, deduped: ' + info.epiL.F9x);
+  E(info.epiL.F6 === '' && info.epiL.F3 === '' && info.epiSecF6 === 0, 'no courtesy factory links for F6/F3: ' + info.epiL.F6 + '/' + info.epiL.F3 + '/' + info.epiSecF6);
+  E(info.epiWhy && /کارخانهٔ معرفت‌شناسی/.test(info.epiSec), 'factory link «why» lines: ' + info.epiWhy + ' ' + info.epiSec);
+  E(info.epiGo === 'e_st:st_istiqra:null' && info.epiBack === 'kcase:' + L.F11, 'factory link navigation/back: ' + info.epiGo + ' ' + info.epiBack);
+  E(info.crsLinks >= 1 && info.crsLinkTids === info.crsExpected && /درسِ دورهٔ گام‌به‌گام/.test(info.crsText), 'course-lesson link: ' + info.crsLinks + ' ' + info.crsLinkTids + ' vs ' + info.crsExpected);
+  E(/^lesson:\d+:s1$/.test(info.crsGo), 'course link goes to the lesson: ' + info.crsGo);
+  E(info.probAct === 1 && /چرا: تمرینِ انتخابِ حرکتِ بعدی/.test(info.probWhy) && !info.probNotOthers && /^e_prob:/.test(info.probGo), 'F3 «big problems» link: ' + info.probAct + ' ' + info.probGo);
+  E(info.concernLinks === 'c7:cc_c7,c10:cc_c10' || info.concernLinks === 'c10:cc_c10,c7:cc_c7', 'concern links only under c7/c10: ' + info.concernLinks);
+  E(info.concernWhy && /^kcases:/.test(info.concernGo), 'concern link why/navigation: ' + info.concernGo);
+  E(/دغدغهٔ شمارهٔ ۱۰/.test(info.kcConcern) && info.kcConcernGo === 'concerns:c10:null', 'kcases ⇒ concern 10: ' + info.kcConcernGo);
+  E(info.attStandalone === 0 && info.optsStandalone === '[null]', 'standalone AI door has no attachments: ' + info.attStandalone + ' ' + info.optsStandalone);
+  E(/تصویرِ پیوست هم فرستاده شود \(۱\)/.test(info.attLabel) && info.attOnProblem === true && /ارائه‌دهندهٔ بیرونی/.test(info.attWarn), 'attachment checkbox (problem ⇒ on): ' + info.attLabel + ' ' + info.attOnProblem);
+  E(info.hypOpts === '[{"fileIds":[5]}]', 'hypothesis request carries only the eligible image: ' + info.hypOpts);
+  E(info.ladMoreNoImg && info.ladOpts === 'gen:{"fileIds":[5]} chk:null', 'ladder: generator gets the image, the leak solver never: ' + info.ladOpts);
+  E(info.attOffInference === false, 'attachment default off for a non-problem case: ' + info.attOffInference);
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();
 })();
