@@ -489,6 +489,8 @@
   /* ================= تصویرها و شبیه‌سازهای ویژه =================
      همه «مدلِ ساده‌شده برای شهود»اند؛ شکلِ اثر از پژوهش است، عددهای روی محورها نمادین‌اند. */
   var VIS = {}, SIM = {};
+  // extension points: other modules (e.g. a14_sims.js) register more simulators/visuals here
+  A.COURSE_SIM = SIM; A.COURSE_VIS = VIS;
   var svg = A.svg;
   function rangeIn(label, min, max, val, oninput, step) {
     var out = h("output", {}, fa(val));
