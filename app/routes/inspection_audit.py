@@ -123,3 +123,24 @@ async def ai_probe(payload: _AIProbe, db: AsyncSession = Depends(get_db)):
     if not res.get("ok"):
         return {"ok": False, "success": False, "error": res.get("error") or "no_model", "text": ""}
     return {"ok": True, "success": True, "text": res.get("text") or "", "model": res.get("model")}
+
+
+@router.get("/api/inspection/audit/epi-decisions", dependencies=[Depends(_gate)], tags=["inspection"])
+async def epi_decisions(db: AsyncSession = Depends(get_db)):
+    """The owner's decisions on the continuous backtest's rule-change proposals (owner 2026-10-13: the periodic
+    supervisor runs the factory backtest «همیشه، هر دوره» and proposes rule changes; the owner decides in the
+    page). READ-ONLY and narrow: only `learning-architecture` records whose id starts with ``ebtp_`` — nothing
+    else of the owner's data is exposed. Same gate as the board."""
+    from app.models.app_record import AppRecord
+
+    rows = (await db.execute(select(AppRecord).where(AppRecord.app == "learning-architecture",
+                                                     AppRecord.rec_id.like("ebtp\\_%", escape="\\"))
+                             .order_by(AppRecord.rec_id))).scalars().all()
+    out = []
+    for r in rows:
+        try:
+            d = json.loads(r.data or "{}")
+        except ValueError:
+            d = {}
+        out.append({"id": r.rec_id[len("ebtp_"):], "decision": d.get("decision"), "at": d.get("at")})
+    return {"ok": True, "success": True, "read_only": True, "decisions": out}

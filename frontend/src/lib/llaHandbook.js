@@ -15,6 +15,7 @@ export const DOCS = [
   { key: 'HANDBOOK', label: 'دفترچهٔ راهنما' },
   { key: 'PROGRESS', label: 'دفترِ پیشرفت' },
   { key: 'WORKLOG', label: 'دفترِ کار' },
+  { key: 'VERIFIED_BOOKLET', label: 'جزوهٔ متقن (بک‌تست)' },
 ];
 
 export function slug(text) {

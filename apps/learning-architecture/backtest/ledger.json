@@ -1,0 +1,86 @@
+{
+ "rounds": [
+  {
+   "round": 1,
+   "at": "2026-10-13",
+   "note": "دورِ پایه: فقط پیکرهٔ بذر (۱۶۹ مورد)",
+   "corpus": {
+    "n": 169,
+    "tiers": {
+     "real": 92,
+     "booklet": 51,
+     "problem": 26
+    },
+    "new": 0,
+    "files": 0
+   },
+   "books": {
+    "mesbah": {
+     "n": 169,
+     "sound": 61,
+     "healthAlarms": 1,
+     "failures": 108,
+     "detected": 104,
+     "located": 102,
+     "fullyLocated": 85,
+     "controls": {
+      "agree": 0.957,
+      "negAgree": 0.348,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 7,
+    "fixed": 0,
+    "resolved": 0,
+    "verified": 0
+   },
+   "coverage": {
+    "rulesTested": 49,
+    "rules": 69,
+    "sectionsTested": 54,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_tasdiq_nonclaim",
+     "r_truth_narrow",
+     "r_badihi_pseudo",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_chain_broken",
+     "r_naql_mubham_q",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_herm_meaning_sig",
+     "r_r_sanad_ahad"
+    ],
+    "byDomain": {
+     "پزشکی": 20,
+     "علم": 17,
+     "ریاضی": 28,
+     "فناوری و مهندسی": 14,
+     "زندگی روزمره": 13,
+     "دین": 19,
+     "فلسفه": 21,
+     "تاریخ و سیاست": 9,
+     "مالی و بانکی": 9,
+     "بازار و معامله": 4,
+     "حقوق و قضا": 8,
+     "رسانه و خبر": 7
+    }
+   }
+  }
+ ]
+}

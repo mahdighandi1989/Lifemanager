@@ -79,3 +79,24 @@ def test_ai_probe_is_gated_and_uses_the_page_task(api_client, monkeypatch):
     assert r.status_code == 200 and r.json()["text"] == "{}"
     assert seen == {"user": "u", "task": "learning_architecture", "system": "s"}
     assert api_client.post("/api/inspection/audit/ai", json={"user": "x" * 40001}, headers=SUP).status_code == 413
+
+
+@pytest.mark.asyncio
+async def test_supervisor_reads_only_the_backtest_decisions(api_client):
+    """Continuous backtest (2026-10-13): the supervisor reads the owner's verdicts on rule proposals —
+    and nothing else of the page's records."""
+    from app.models.app_record import AppRecord
+
+    gen = await _session()
+    db = await gen.__anext__()
+    db.add(AppRecord(user_id=1, app="learning-architecture", rec_id="ebtp_p1", rtype="ebtp",
+                     data=json.dumps({"id": "ebtp_p1", "decision": "yes", "at": "2026-10-13T10:00:00Z"})))
+    db.add(AppRecord(user_id=1, app="learning-architecture", rec_id="kcase_private", rtype="kcase",
+                     data=json.dumps({"id": "kcase_private", "title": "خصوصی"})))
+    db.add(AppRecord(user_id=1, app="learning-architecture", rec_id="ebtpx_other", rtype="x", data="{}"))
+    await db.commit()
+    r = api_client.get("/api/inspection/audit/epi-decisions", headers=SUP)
+    assert r.status_code == 200, r.text
+    assert r.json()["decisions"] == [{"id": "p1", "decision": "yes", "at": "2026-10-13T10:00:00Z"}]
+    assert "خصوصی" not in r.text
+    assert api_client.get("/api/inspection/audit/epi-decisions").status_code in (401, 403)

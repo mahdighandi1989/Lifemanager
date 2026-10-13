@@ -68,7 +68,7 @@ export default function LearningArchitecturePage() {
   const [ready, setReady] = useState(false);
   const query = new URLSearchParams(location.search);
   const legacy = query.get('legacy') === '1';
-  const doc = ['HANDBOOK', 'PROGRESS', 'WORKLOG'].includes(query.get('doc')) ? query.get('doc') : '';
+  const doc = ['HANDBOOK', 'PROGRESS', 'WORKLOG', 'VERIFIED_BOOKLET'].includes(query.get('doc')) ? query.get('doc') : '';
   // a malformed %-escape in a pasted/old link must not crash the whole page
   const hash = (() => { const raw = (location.hash || '').replace(/^#/, ''); try { return decodeURIComponent(raw); } catch { return raw; } })();
   const appQuery = useRef('');
@@ -104,6 +104,8 @@ export default function LearningArchitecturePage() {
         if (`${window.location.pathname}${window.location.search}` !== next) navRef.current(next, { replace: !!replace });
       },
       historyBack: (n) => window.history.go(-Math.max(1, n | 0)),
+      // the app's own «📜 جزوهٔ متقن» link (e_bt › بک‌تستِ پیوسته) opens the generated document in the handbook viewer
+      openDoc: (key) => { if (openDocRef.current) openDocRef.current(key); },
       initial: () => readQuery(window.location.search),
       // «آینهٔ درایو»: each case/topic/course → its own folder + spreadsheet under LifeManagerData
       mirror: (payload) => api.post(`/app-records/${APP}/mirror`, payload).then((r) => r.data),
@@ -155,10 +157,12 @@ export default function LearningArchitecturePage() {
   // A deep link straight into ?doc= has no such entry: then the app is opened forward, as before.
   const appIdx = useRef(null);
   const histIdx = () => (window.history.state && typeof window.history.state.idx === 'number' ? window.history.state.idx : null);
+  const openDocRef = useRef(null);
   const openDoc = (key, anchor) => {
     if (!doc) appIdx.current = histIdx();
     navigate(`${BASE}?doc=${key}${anchor ? `#${encodeURIComponent(anchor)}` : ''}`);
   };
+  openDocRef.current = openDoc;
   const closeDoc = () => {
     const from = appIdx.current; const cur = histIdx();
     appIdx.current = null;
@@ -197,6 +201,7 @@ export default function LearningArchitecturePage() {
           <>
             <button type="button" onClick={() => openDoc('PROGRESS')} className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 hover:bg-gray-50">📈 نمودارِ پیشرفت</button>
             <button type="button" onClick={() => openDoc('WORKLOG')} className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 hover:bg-gray-50">🗒️ دفترِ کار</button>
+            <button type="button" onClick={() => openDoc('VERIFIED_BOOKLET')} className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 hover:bg-gray-50">📜 جزوهٔ متقن</button>
             <span className="text-[12px] text-gray-500">چیست، چرا، چطور کار می‌کند، و چه سیری داشته</span>
           </>
         )}

@@ -105,4 +105,4 @@ def test_page_is_registered_and_reads_the_generated_manifest():
     assert "LLA_BUNDLE" in page and "HandbookView" in page
     with open(os.path.join(REPO, "frontend", "src", "lib", "llaBundle.js"), encoding="utf-8") as f:
         manifest = json.loads(f.read().split("= ", 1)[1].rstrip().rstrip(";"))
-    assert set(manifest["docs"]) == {"HANDBOOK", "PROGRESS", "WORKLOG", "progress"}
+    assert set(manifest["docs"]) == {"HANDBOOK", "PROGRESS", "WORKLOG", "VERIFIED_BOOKLET", "progress"}

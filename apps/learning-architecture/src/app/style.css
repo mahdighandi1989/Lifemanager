@@ -1056,3 +1056,12 @@ button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
 .orient-flow{border:2px solid var(--accent);margin:0 0 12px}
 .orient-flow-step{font-size:1.02rem;margin:6px 0 8px}
 .orient-hint{margin-bottom:12px}
+
+/* ===== بک‌تستِ پیوسته (a22_btlive.js) ===== */
+.bt-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.bt-stat{padding:10px 12px}
+.bt-stat.bad{border-color:var(--bad,#b42318)}
+.bt-num{font-size:1.25rem;font-weight:800;margin:2px 0}
+.bt-spark{color:var(--accent);vertical-align:middle}
+.bt-finding{padding:8px 10px;margin:6px 0}
+.bt-ev summary{cursor:pointer}

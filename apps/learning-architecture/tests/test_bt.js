@@ -13,7 +13,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.evaluate(() => APP.go('e_home')); await page.waitForTimeout(200);
   info.cycles = await page.evaluate(() => (APP.S.get('ecycle') || {}).runs || 0); if (info.cycles !== 1) errors.push('auto cycle ' + info.cycles);
   // three tests
-  await page.evaluate(() => APP.go('e_bt')); await page.waitForSelector('section.test', { timeout: 30000 });
+  await page.evaluate(() => APP.go('e_bt', null, 'three')); await page.waitForSelector('section.test', { timeout: 30000 });
   info.tests = await page.locator('section.test').count(); if (info.tests !== 3) errors.push('three tests ' + info.tests);
   info.recipe = (await page.locator('section.test .pill').allTextContents()).join(' | ');
   for (const enc of ['B', 'F']) { await page.selectOption('#btEnc', enc); await page.waitForSelector('section.test'); info['v' + enc] = (await page.locator('section.test .pill').allTextContents()).join(' | '); }
@@ -79,7 +79,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.setViewportSize({ width: 390, height: 844 });
   for (const v of [['e_bt'], ['e_lib'], ['e_living'], ['e_prob', 'pb_fourcolor', 'sim'], ['e_aut']]) { await page.evaluate(x => APP.go(...x), v); await page.waitForTimeout(150); const ov = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth); if (ov > 2) errors.push('mobile overflow ' + v[0] + ' ' + ov); }
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.evaluate(() => APP.go('e_bt')); await page.waitForSelector('section.test'); await page.screenshot({ path: __dirname + '/../dist/shot_bt.png', fullPage: true });
+  await page.evaluate(() => APP.go('e_bt', null, 'three')); await page.waitForSelector('section.test'); await page.screenshot({ path: __dirname + '/../dist/shot_bt.png', fullPage: true });
   await page.evaluate(() => { APP.simState = { pid: 'pb_semmelweis', lv: 1, order: 'hist', i: 1 }; APP.go('e_prob', 'pb_semmelweis', 'sim'); }); await page.screenshot({ path: __dirname + '/../dist/shot_sim.png' });
   await page.evaluate(() => APP.go('e_living')); await page.screenshot({ path: __dirname + '/../dist/shot_living.png' });
   console.log(JSON.stringify(info, null, 1));

@@ -1,0 +1,2675 @@
+{
+ "round": 1,
+ "at": "2026-10-13",
+ "cases": [
+  {
+   "id": "cs_semmelweis_rejection",
+   "t": "رد یافته زملوایس درباره تب نفاس از سوی جامعه پزشکی وین",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_semmelweis_method",
+   "t": "استدلال زملوایس: حذف فرضیه‌ها و آزمون وضع و رفع",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_snow_cholera",
+   "t": "جان اسنو و انتقال وبا از راه آب (پمپ برادستریت و «آزمایش بزرگ»)",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_miasma_board",
+   "t": "رد نظریه آب اسنو و ماندن بر نظریه میاسما",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_conflict",
+    "st_background"
+   ],
+   "ex": [
+    "st_conflict",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_whitehead",
+   "t": "کشیش هنری وایتهد: بررسی برای رد اسنو که به تأیید او رسید",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_thalidomide_grunenthal",
+   "t": "اعلام بی‌خطری تالیدومید (کونترگان)",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_tajrobe",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_kelsey_fda",
+   "t": "فرانسس کلسی و خودداری FDA از تأیید تالیدومید",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_wakefield_mmr",
+   "t": "مقاله ویکفیلد درباره واکسن MMR و اوتیسم",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_background"
+   ],
+   "ex": [
+    "st_expert",
+    "st_istiqra",
+    "st_tajrobe",
+    "st_background"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_theranos",
+   "t": "تراناس: اعتماد سرمایه‌گذاران و والگرینز به دستگاه ادیسون",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_expert",
+    "st_background",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_hpylori",
+   "t": "مارشال و وارن: هلیکوباکتر پیلوری و زخم معده",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_hrt_observational",
+   "t": "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "missed",
+   "fl": [],
+   "ex": [
+    "st_tajrobe"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_whi_trial",
+   "t": "کارآزمایی تصادفی WHI درباره درمان هورمونی",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_lobotomy",
+   "t": "لوکوتومی پیشانی مونیز و گسترش لوبوتومی",
+   "tier": "real",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_resp"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_tajrobe",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_eddington_1919",
+   "t": "آزمون خمش نور در خورشیدگرفتگی ۱۹۱۹ (ادینگتون و دایسون)",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_nrays_blondlot",
+   "t": "پرتوهای N بلوندلو",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_hiss"
+   ],
+   "ex": [
+    "st_hiss",
+    "st_tajrobe"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_nrays_wood",
+   "t": "آزمون رابرت وود و ابطال پرتوهای N",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_clever_hans_osten",
+   "t": "هانس زیرک: باور به حساب کردن اسب",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_tajrobe",
+    "st_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_clever_hans_pfungst",
+   "t": "آزمون‌های اسکار فونگست درباره هانس زیرک",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_cold_fusion",
+   "t": "همجوشی سرد فلایشمن و پانز",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe",
+    "st_conflict",
+    "st_background"
+   ],
+   "ex": [
+    "st_tajrobe",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_piltdown",
+   "t": "انسان پیلت‌داون",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_conflict",
+    "st_background"
+   ],
+   "ex": [
+    "st_naql",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_lysenko",
+   "t": "لیسنکوئیسم در شوروی",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_truth",
+    "st_tajrobe",
+    "st_conflict",
+    "st_background"
+   ],
+   "ex": [
+    "st_truth",
+    "st_tajrobe",
+    "st_conflict",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_lavoisier_combustion",
+   "t": "لاووازیه: سوختن به‌مثابه ترکیب با اکسیژن",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_lavoisier_acids",
+   "t": "لاووازیه: «همه اسیدها اکسیژن دارند»",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "missed",
+   "fl": [],
+   "ex": [
+    "st_istiqra"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_leverrier_neptune",
+   "t": "پیش‌بینی نپتون از روی اختلال مدار اورانوس",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_leverrier_vulcan",
+   "t": "ولکان: سیاره‌ای که نبود",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_naql",
+    "st_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_michelson_morley",
+   "t": "آزمایش مایکلسون و مورلی",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_opera_neutrinos",
+   "t": "نوترینوهای «سریع‌تر از نور» اپرا",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_galileo_jupiter",
+   "t": "گالیله و قمرهای مشتری",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_wegener_rejection",
+   "t": "رد رانش قاره‌ای وگنر به سبب نبود سازوکار",
+   "tier": "real",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_kempe_fourcolor",
+   "t": "اثبات کمپه برای قضیه چهاررنگ (۱۸۷۹)",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_heawood_fivecolor",
+   "t": "هیوود: یافتن رخنه کمپه و اثبات قضیه پنج‌رنگ",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_lame_flt",
+   "t": "اثبات لامه برای قضیه آخر فرما (۱۸۴۷)",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_liouville_kummer",
+   "t": "لیوویل و کومر: شناسایی فرض پنهان و اعداد ایدئال",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_wiles_1993",
+   "t": "اعلام اثبات وایلز در ۱۹۹۳ و رخنه آن",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_wiles_1995",
+   "t": "اثبات نهایی وایلز و تیلور (۱۹۹۵)",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_fermat_numbers",
+   "t": "فرما: «همه اعداد فرما اول‌اند»",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_istiqra"
+   ],
+   "ex": [
+    "st_istiqra"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_euler_f5",
+   "t": "اویلر و تجزیه عدد پنجم فرما",
+   "tier": "real",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_challenger",
+   "t": "تصمیم پرتاب چلنجر در سرما",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_mars_climate_orbiter",
+   "t": "از دست رفتن مدارگرد اقلیم مریخ: پوند یا نیوتن",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_worlds",
+    "st_conflict",
+    "st_resp"
+   ],
+   "ex": [
+    "st_worlds",
+    "st_conflict",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_therac25",
+   "t": "تراک‌۲۵: «دستگاه نمی‌تواند اوردوز بدهد»",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe",
+    "st_conflict",
+    "st_resp"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_conflict",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_tacoma_narrows",
+   "t": "پل تاکوما ناروز",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_tajrobe"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_hubble_mirror",
+   "t": "عیب آینه اصلی تلسکوپ هابل",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe",
+    "st_conflict",
+    "st_resp"
+   ],
+   "ex": [
+    "st_tajrobe",
+    "st_conflict",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_boeing_737max",
+   "t": "سامانه MCAS بوئینگ ۷۳۷ مکس",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_aql",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_ariane5_501",
+   "t": "پرواز ۵۰۱ آریان ۵: نرم‌افزار آریان ۴ در موشکی دیگر",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe",
+    "st_resp"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_tajrobe",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_citicorp_center",
+   "t": "لمسوریه و بحران پنهان برج سیتی‌کورپ",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_hyatt_walkway",
+   "t": "فروریختن پل‌های معلق هتل حیات ریجنسی کانزاس‌سیتی",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_resp"
+   ],
+   "ex": [
+    "st_expert",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_feynman_oring",
+   "t": "آزمون آب یخ فاینمن در کمیسیون چلنجر",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_hubble_diagnosis",
+   "t": "تشخیص دقیق عیب هابل و طراحی اپتیک اصلاحی",
+   "tier": "real",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "bk_stick_sight",
+   "t": "چوب کج در آب: حکم باصره",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_hiss"
+   ],
+   "ex": [
+    "st_hiss"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_stick_touch",
+   "t": "چوب در آب: داوری لمس در برابر باصره",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "bk_phantom_limb",
+   "t": "درد اندام خیالی (فانتوم)",
+   "tier": "booklet",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_appendicitis_referred",
+   "t": "درد ارجاعی آپاندیسیت",
+   "tier": "booklet",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_pain_relief_healing",
+   "t": "آرام شدن درد و پنداشت التیام",
+   "tier": "booklet",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_false_hunger",
+   "t": "گرسنگی کاذب",
+   "tier": "booklet",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_itch_pain",
+   "t": "اشتباه خارش با درد",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_dusk_object",
+   "t": "شیء نامتعین در تاریکی غروب",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core",
+    "st_hiss"
+   ],
+   "ex": [
+    "st_core",
+    "st_hiss"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_fear_label",
+   "t": "ترس و وسواس: یافت حالت و داوری درباره خطر",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_hasan_basri",
+   "t": "حسن بصری و ندای جنگ جمل",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core",
+    "st_shohud"
+   ],
+   "ex": [
+    "st_core",
+    "st_shohud"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_reflective_error",
+   "t": "خطای انعکاسی در مکاشفه",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core",
+    "st_shohud"
+   ],
+   "ex": [
+    "st_core",
+    "st_shohud"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_faqr_misapplied",
+   "t": "یافت فقر وجودی و تطبیق آن بر مصداق باطل",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core"
+   ],
+   "ex": [
+    "st_core"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_munafiqun_testimony",
+   "t": "شهادت منافقان: صدق معرفتی و صدق اخلاقی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_truth"
+   ],
+   "ex": [
+    "st_truth"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_universal_by_count",
+   "t": "جزئی پنداشتن «خورشید» و «شریک‌الباری»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_partial"
+   ],
+   "ex": [
+    "st_partial"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_part_whole_hand",
+   "t": "«دست انسان، انسان است»: خلط کلی و کل",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_partial",
+    "st_aql"
+   ],
+   "ex": [
+    "st_partial"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_winged_horse",
+   "t": "اسب بالدار: ساخته تخیل یا ادراک واقع؟",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_partial"
+   ],
+   "ex": [
+    "st_partial"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_hume_causality",
+   "t": "هیوم: انکار ضرورت علّی چون حس نمی‌شود",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_ctype",
+    "st_aql"
+   ],
+   "ex": [
+    "st_ctype"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_kant_causality",
+   "t": "کانت: علیت به‌مثابه قالب پیشینی ذهن",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_ctype",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_ctype",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_absolute_skeptic",
+   "t": "شکاک مطلق: «هیچ معرفت یقینی وجود ندارد»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref"
+   ],
+   "ex": [
+    "st_selfref"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_protagoras",
+   "t": "پروتاگوراس: «انسان مقیاس همه چیز است»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref"
+   ],
+   "ex": [
+    "st_selfref"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_doubt_exclusive_routes",
+   "t": "شبهه انحصار راه‌های شناخت در حس و عقل",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_aql",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_doubt_world_link",
+   "t": "شبهه پیوستگی عینی جهان",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_worlds",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_worlds",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_doubt_colored_glasses",
+   "t": "شبهه عینک رنگی (واسطه‌گری ابزار ادراک)",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_aql",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_holism_quine",
+   "t": "کل‌گرایی معرفتی: «هیچ گزاره‌ای مصون از بازنگری نیست»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_worlds",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_worlds",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_gadamer_relativism",
+   "t": "هرمنوتیک فلسفی و نفی دسترسی به مراد مؤلف",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref",
+    "st_herm"
+   ],
+   "ex": [
+    "st_selfref",
+    "st_herm"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_mko_eclecticism",
+   "t": "التقاط سازمان مجاهدین خلق با مارکسیسم",
+   "tier": "booklet",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_conflict",
+    "st_r_struct"
+   ],
+   "ex": [
+    "st_conflict",
+    "st_r_struct"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_russell_chicken",
+   "t": "جوجه راسل",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_istiqra"
+   ],
+   "ex": [
+    "st_istiqra"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_boiling_relativity",
+   "t": "نقطه جوش در اورست و نسبیت هستی‌شناختی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "علم",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_worlds",
+    "st_aql",
+    "st_selfref"
+   ],
+   "ex": [
+    "st_worlds",
+    "st_aql",
+    "st_selfref"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_gettier_case1",
+   "t": "مثال نخست گتیه: باور صادق موجه از راه مقدمه کاذب",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_yadollah",
+   "t": "«یدالله»: پذیرش ظاهر ناسازگار با برهان",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_r_conflict"
+   ],
+   "ex": [
+    "st_r_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_khalaqa_adam",
+   "t": "تقطیع حدیث «خلق الله آدم علی صورته»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_herm",
+    "st_r_conflict"
+   ],
+   "ex": [
+    "st_herm",
+    "st_r_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_pluralism_quran_evidence",
+   "t": "استناد به بقره ۶۲ و اسم «هادی» برای پلورالیسم",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_worlds",
+    "st_herm",
+    "st_r_plural"
+   ],
+   "ex": [
+    "st_worlds",
+    "st_herm",
+    "st_r_plural"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_turuq_saying",
+   "t": "«الطرق الی الله بعدد نفوس الخلائق»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_herm",
+    "st_r_sources",
+    "st_r_plural"
+   ],
+   "ex": [
+    "st_naql",
+    "st_herm",
+    "st_r_sources",
+    "st_r_plural"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_hick_pluralism",
+   "t": "جان هیک: گوهر و صدف و تمثیل فیل در تاریکی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref",
+    "st_r_plural"
+   ],
+   "ex": [
+    "st_selfref",
+    "st_r_plural"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_fatwa_relativism",
+   "t": "اختلاف فتواها به‌مثابه دلیل تعدد قرائت‌ها",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_herm",
+    "st_r_readings"
+   ],
+   "ex": [
+    "st_herm",
+    "st_r_readings"
+   ],
+   "full": true
+  },
+  {
+   "id": "bk_vision_to_external",
+   "t": "گذر از احساس بینایی به وجود علتی بیرونی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "bk_i_am_happy",
+   "t": "«من شاد هستم»: وجدانی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "bk_whole_greater",
+   "t": "«کل از جزء خود بزرگ‌تر است»: اولی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "bk_tawatur_ghadir",
+   "t": "خبر متواتر: حدیث غدیر",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "bk_taqlid_alam",
+   "t": "رجوع به فقیه اعلم در حکم فرعی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_ltcm",
+   "t": "LTCM و تعمیم همبستگی‌های تاریخی",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_tajrobe"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_aql"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_ratings2008",
+   "t": "رتبه AAA اوراق رهنی و کارشناسِ ذی‌نفع",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_resp"
+   ],
+   "ex": [
+    "st_expert",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_madoff_sec",
+   "t": "بازرسی SEC از مدوف بدون تأیید مستقل معاملات",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_conflict",
+    "st_resp"
+   ],
+   "ex": [
+    "st_naql",
+    "st_conflict",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_markopolos",
+   "t": "تحلیل مارکوپولوس: بازده مدوف با راهبرد اعلامی ناممکن است",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_thorp_madoff",
+   "t": "ادوارد تورپ و تطبیق معاملات مدوف با سوابق بازار (۱۹۹۱)",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_enron_andersen",
+   "t": "حسابرسی آرتور اندرسن از انرون",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert"
+   ],
+   "ex": [
+    "st_expert"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_barings",
+   "t": "بانک بیرینگز و سودهای «آربیتراژ» نیک لیسون",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_naql",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_wirecard_ey",
+   "t": "وایرکارد: تأیید موجودی امانی بدون استعلام مستقیم از بانک",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_resp"
+   ],
+   "ex": [
+    "st_naql",
+    "st_expert",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_ponzi_barron",
+   "t": "کلارنس بارون و حساب کوپن‌های پستی پونزی (۱۹۲۰)",
+   "tier": "real",
+   "r": 0,
+   "d": "مالی و بانکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_blackmonday",
+   "t": "دوشنبه سیاه ۱۹۸۷ و بیمه سبد",
+   "tier": "real",
+   "r": 0,
+   "d": "بازار و معامله",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_partial",
+    "st_aql"
+   ],
+   "ex": [
+    "st_partial",
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_knight",
+   "t": "نایت کپیتال ۲۰۱۲: ۹۷ هشدار پیش از گشایش بازار",
+   "tier": "real",
+   "r": 0,
+   "d": "بازار و معامله",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_conflict",
+    "st_resp"
+   ],
+   "ex": [
+    "st_conflict",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_burry",
+   "t": "مایکل بری و خواندن پرونده وام‌های پشتوانه (۲۰۰۵)",
+   "tier": "real",
+   "r": 0,
+   "d": "بازار و معامله",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_chanos",
+   "t": "جیم چینوس و تحلیل صورت‌های مالی انرون",
+   "tier": "real",
+   "r": 0,
+   "d": "بازار و معامله",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_curveball",
+   "t": "«کِرو بال» و ادعای آزمایشگاه‌های سیار سلاح زیستی عراق",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_expert",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_naql",
+    "st_expert",
+    "st_conflict",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_pearl_radar",
+   "t": "پرل هاربر: تفسیر پژواک رادار اپانا",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_hiss",
+    "st_background",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_cuba_u2",
+   "t": "بحران موشکی کوبا: شناسایی سکوهای موشکی از عکس‌های U-2",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_bayofpigs",
+   "t": "خلیج خوک‌ها: طرحی که طراحانش ارزیابی‌اش کردند",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_expert",
+    "st_conflict",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_midway_af",
+   "t": "میدوی ۱۹۴۲: آزمون «AF کم‌آب است»",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_zimmermann",
+   "t": "تلگراف زیمرمان و احراز صدور (۱۹۱۷)",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_tulip_mackay",
+   "t": "روایت مکِی از «جنون لاله» و ورشکستگی همگانی",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql"
+   ],
+   "ex": [
+    "st_naql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_columbus",
+   "t": "برآورد فاصله کلمب تا آسیا: نتیجه خوش‌اقبال از استدلال معیوب",
+   "tier": "real",
+   "r": 0,
+   "d": "تاریخ و سیاست",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_dreyfus",
+   "t": "پرونده دریفوس: «بوردرو» و شهادت برتیون",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_conflict",
+    "st_background"
+   ],
+   "ex": [
+    "st_expert",
+    "st_conflict",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_picquart",
+   "t": "پیکار و شناسایی خط استرهازی (۱۸۹۶)",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_salem",
+   "t": "دادگاه‌های سیلم و «شاهد شبحی»",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core",
+    "st_partial",
+    "st_shohud",
+    "st_background"
+   ],
+   "ex": [
+    "st_core",
+    "st_partial",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_mather_spectral",
+   "t": "اینکریس مدر: شاهد شبحی برای محکومیت کافی نیست",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_sallyclark",
+   "t": "سالی کلارک و «یک در ۷۳ میلیون»",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql",
+    "st_expert"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_cotton",
+   "t": "جنیفر تامپسون و رونالد کاتن: اطمینان کامل، حافظه آلوده",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_yad",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_yad"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_pitchfork",
+   "t": "پرونده نارباره: DNA در برابر اعتراف (۱۹۸۶)",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_heilbronn",
+   "t": "«شبح هایلبرون»: زنی که در ۴۰ صحنه جرم بود",
+   "tier": "real",
+   "r": 0,
+   "d": "حقوق و قضا",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tajrobe"
+   ],
+   "ex": [
+    "st_tajrobe"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_wotw_panic",
+   "t": "«وحشت سراسری» جنگ دنیاها: روایت روزنامه‌ها از یک برنامه رادیویی",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_background"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_background"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_dewey1948",
+   "t": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": false,
+   "k": "mislocated",
+   "fl": [
+    "st_tajrobe"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_literarydigest",
+   "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": false,
+   "k": "mislocated",
+   "fl": [
+    "st_tajrobe"
+   ],
+   "ex": [
+    "st_istiqra"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_gallup1936",
+   "t": "گالوپ ۱۹۳۶: نمونه کوچک ولی معرف",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_hitlerdiaries",
+   "t": "یادداشت‌های جعلی هیتلر و مجله اشترن (۱۹۸۳)",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_expert",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_naql",
+    "st_expert",
+    "st_background",
+    "st_resp"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_bellingcat_mh17",
+   "t": "بلینگکت و ردیابی پرتابگر بوک در پرونده MH17",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_mclean_enron",
+   "t": "بتانی مکلین: «آیا انرون گران‌قیمت است؟» (۲۰۰۱)",
+   "tier": "real",
+   "r": 0,
+   "d": "رسانه و خبر",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_montecarlo",
+   "t": "کازینوی مونت‌کارلو ۱۹۱۳: بیست‌وشش بار سیاه",
+   "tier": "real",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_keech",
+   "t": "پیشگویی طوفان ۲۱ دسامبر ۱۹۵۴ و «وقتی پیشگویی شکست می‌خورد»",
+   "tier": "real",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_core",
+    "st_shohud",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_core",
+    "st_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_harrytruman_sthelens",
+   "t": "هری آر. ترومن و کوه سنت هلنز (۱۹۸۰)",
+   "tier": "real",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_conflict"
+   ],
+   "ex": [
+    "st_istiqra",
+    "st_conflict"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_tillysmith",
+   "t": "تیلی اسمیت و نشانه‌های سونامی در پوکت (۲۰۰۴)",
+   "tier": "real",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_smong",
+   "t": "«اسمونگ»: روایت شفاهی که مردم سیمئولوئه را نجات داد (۲۰۰۴)",
+   "tier": "real",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_tylenol1982",
+   "t": "قتل‌های تیلنول شیکاگو (۱۹۸۲): کارخانه یا قفسه فروشگاه؟",
+   "tier": "real",
+   "r": 0,
+   "d": "زندگی روزمره",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_hadith_sura_cut",
+   "t": "«خلق‌الله آدم علی صورته» با تقطیع",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_naql",
+    "st_herm",
+    "st_r_conflict"
+   ],
+   "ex": [
+    "st_herm",
+    "st_r_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_hadith_sura_full",
+   "t": "«خلق‌الله آدم علی صورته» با قرینه پیوسته",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_kab_relativism",
+   "t": "از اختلاف در «کعب» تا نسبی‌گرایی قرائت‌ها",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_herm",
+    "st_r_readings"
+   ],
+   "ex": [
+    "st_herm",
+    "st_r_readings"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_hick_elephant",
+   "t": "جان هیک: گوهر و صدف و تمثیل فیل در تاریکی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref",
+    "st_r_plural"
+   ],
+   "ex": [
+    "st_selfref",
+    "st_r_plural"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_plural_talazum",
+   "t": "مغالطه تلازم: انحصار حقانیت یعنی محرومیت همه و نفی همزیستی؟",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_r_plural"
+   ],
+   "ex": [
+    "st_r_plural"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_three_domains",
+   "t": "تفکیک حقانیت، نجات و رفتار در نگرش اسلامی",
+   "tier": "booklet",
+   "r": 0,
+   "d": "دین",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_millerites",
+   "t": "میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴",
+   "tier": "real",
+   "r": 0,
+   "d": "دین",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_naql",
+    "st_aql"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_b_protagoras",
+   "t": "پروتاگوراس: «انسان مقیاس همه چیز است»",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref"
+   ],
+   "ex": [
+    "st_selfref"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_plato_peritrope",
+   "t": "افلاطون در ته‌تتوس: سخن پروتاگوراس خودش را باطل می‌کند",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_holism",
+   "t": "کل‌گرایی معرفتی: هیچ گزاره‌ای حتی امتناع تناقض ثابت نیست",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_worlds",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_worlds",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_gadamer",
+   "t": "هرمنوتیک فلسفی: مراد مؤلف دست‌نیافتنی است",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_selfref",
+    "st_herm"
+   ],
+   "ex": [
+    "st_selfref",
+    "st_herm"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_b_hirsch",
+   "t": "هرش: تمایز «معنا» و «اهمیت» (۱۹۶۷)",
+   "tier": "real",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_b_skeptic_twoways",
+   "t": "شبهه انحصار راه‌ها: حس و عقل خطا می‌کنند، پس یقین ناممکن است",
+   "tier": "booklet",
+   "r": 0,
+   "d": "فلسفه",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "ex": [
+    "st_aql",
+    "st_selfref",
+    "st_doubts"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_flt_lame",
+   "t": "برهان لامه برای قضیه فرما (۱۸۴۷)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_flt_numeric",
+   "t": "تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_flt_wiles93",
+   "t": "اعلام برهان وایلز با شکاف (۱۹۹۳)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_flt_wiles95",
+   "t": "برهان پذیرفته‌شده وایلز و تیلور–وایلز (۱۹۹۵)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_4c_kempe",
+   "t": "برهان کمپه برای چهار رنگ (۱۸۷۹)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_4c_heawood",
+   "t": "کشف خطای کمپه و قضیه پنج‌رنگ (هیوود، ۱۸۹۰)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_4c_ah",
+   "t": "برهان رایانه‌ای اپل و هاکن (۱۹۷۶)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_4c_rsst",
+   "t": "بازسازی مستقل (۱۹۹۶) و وارسی صوری Coq (۲۰۰۵)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_poinc_1900",
+   "t": "ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "missed",
+   "fl": [],
+   "ex": [
+    "st_aql"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_pb_poinc_whitehead",
+   "t": "برهان نادرست وایتهد (۱۹۳۴)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_poinc_perelman",
+   "t": "برهان پرلمن و وارسی جمعی (۲۰۰۲–۲۰۰۶)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_quintic_ruffini",
+   "t": "برهان روفینی برای حل‌ناپذیری (۱۷۹۹)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_quintic_abel",
+   "t": "برهان آبل (۱۸۲۴–۱۸۲۶)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_quintic_poisson",
+   "t": "گزارش پواسون درباره دست‌نوشته گالوا (۱۸۳۱)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_greek_wantzel",
+   "t": "برهان ونتسل (۱۸۳۷)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_greek_indiana",
+   "t": "لایحه π ایندیانا (۱۸۹۷)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "missed",
+   "fl": [],
+   "ex": [
+    "st_aql",
+    "st_expert"
+   ],
+   "full": false
+  },
+  {
+   "id": "cs_pb_greek_hobbes",
+   "t": "ادعای تربیع دایره توسط هابز و نقد والیس (دهه ۱۶۵۰)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_aql",
+    "st_conflict"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_par_saccheri",
+   "t": "رد فرض حاده توسط ساکری (۱۷۳۳)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql",
+    "st_background"
+   ],
+   "ex": [
+    "st_aql",
+    "st_background"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_par_legendre",
+   "t": "اثبات‌های لژاندر برای اصل توازی (از ۱۷۹۴)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
+   "ex": [
+    "st_aql"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_par_beltrami",
+   "t": "هندسه هذلولوی و اثبات سازگاری نسبی (۱۸۲۹–۱۸۶۸)",
+   "tier": "problem",
+   "r": 0,
+   "d": "ریاضی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_long_h4",
+   "t": "آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)",
+   "tier": "problem",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": true,
+   "k": "health_alarm",
+   "fl": [
+    "st_istiqra"
+   ],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_long_generalize",
+   "t": "تعمیم از یک ساعت موفق به روش عملی (۱۷۶۲–۱۷۶۵)",
+   "tier": "problem",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_istiqra"
+   ],
+   "ex": [
+    "st_istiqra"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_long_k1",
+   "t": "تکرار مستقل K1 و سفر کوک (۱۷۶۹–۱۷۷۵)",
+   "tier": "problem",
+   "r": 0,
+   "d": "فناوری و مهندسی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_semm_handwash",
+   "t": "استنتاج علّی زملوایس و مداخله آهک کلردار (۱۸۴۷)",
+   "tier": "problem",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": true,
+   "k": "ok",
+   "fl": [],
+   "ex": [],
+   "full": null
+  },
+  {
+   "id": "cs_pb_semm_reject",
+   "t": "رد یافته زملوایس توسط جامعه پزشکی (۱۸۴۹–۱۸۶۰)",
+   "tier": "problem",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tasdiq",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "ex": [
+    "st_tasdiq",
+    "st_conflict",
+    "st_background",
+    "st_resp"
+   ],
+   "full": true
+  },
+  {
+   "id": "cs_pb_semm_atmos",
+   "t": "تبیین «تأثیرات جوّی» برای تفاوت دو بخش (۱۸۴۶)",
+   "tier": "problem",
+   "r": 0,
+   "d": "پزشکی",
+   "ok": false,
+   "k": "ok",
+   "fl": [
+    "st_tasdiq",
+    "st_expert",
+    "st_conflict"
+   ],
+   "ex": [
+    "st_tasdiq",
+    "st_conflict"
+   ],
+   "full": true
+  }
+ ]
+}

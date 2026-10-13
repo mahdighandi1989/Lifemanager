@@ -1,0 +1,228 @@
+{
+ "updated": "2026-10-13",
+ "round": 1,
+ "attributions": [
+  "اشتباه جزوه (استاد)",
+  "بدفهمی یا پیاده‌سازی نادرست سازنده",
+  "خطای رمزگذاری پرونده",
+  "برچسب حقیقت پرونده نادرست است",
+  "خلأ جزوه (ملاکی ندارد)",
+  "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+  "نامعلوم — بررسی بیشتر"
+ ],
+ "findings": [
+  {
+   "id": "f_cs_b_dewey1948",
+   "case": "cs_b_dewey1948",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra",
+    "st_resp"
+   ],
+   "flagged": [
+    "st_tajrobe"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_small_n",
+    "r_resp_inquiry"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51",
+    "s6",
+    "s71",
+    "s80",
+    "s86"
+   ],
+   "lastSeenRound": 1
+  },
+  {
+   "id": "f_cs_b_literarydigest",
+   "case": "cs_b_literarydigest",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [
+    "st_tajrobe"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_small_n"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 1
+  },
+  {
+   "id": "f_cs_hrt_observational",
+   "case": "cs_hrt_observational",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای",
+   "tier": "real",
+   "expected": [
+    "st_tajrobe"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_tajrobe_ceiling",
+    "r_tajrobe_no_vazraf",
+    "r_tajrobe_hidden"
+   ],
+   "secs": [
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 1
+  },
+  {
+   "id": "f_cs_lavoisier_acids",
+   "case": "cs_lavoisier_acids",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "لاووازیه: «همه اسیدها اکسیژن دارند»",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_small_n"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 1
+  },
+  {
+   "id": "f_cs_pb_greek_indiana",
+   "case": "cs_pb_greek_indiana",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "لایحه π ایندیانا (۱۸۹۷)",
+   "tier": "problem",
+   "expected": [
+    "st_aql",
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s49",
+    "s50"
+   ],
+   "lastSeenRound": 1
+  },
+  {
+   "id": "f_cs_pb_long_h4",
+   "case": "cs_pb_long_h4",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "health_alarm",
+   "title": "آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)",
+   "tier": "problem",
+   "expected": [],
+   "flagged": [
+    "st_istiqra"
+   ],
+   "rules": [
+    "r_istiqra_small_n"
+   ],
+   "secs": [
+    "s50"
+   ],
+   "lastSeenRound": 1
+  },
+  {
+   "id": "f_cs_pb_poinc_1900",
+   "case": "cs_pb_poinc_1900",
+   "opened": "2026-10-13",
+   "openedRound": 1,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)",
+   "tier": "problem",
+   "expected": [
+    "st_aql"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50"
+   ],
+   "lastSeenRound": 1
+  }
+ ]
+}

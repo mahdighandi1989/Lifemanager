@@ -118,10 +118,10 @@
       h("p", { class: "small muted" }, "قاعده‌هایی که روی هیچ رخداد واقعی فعال نشدند (" + fa(t.sens.length - rows.length) + ") فقط با مثال‌های جزوه و سناریوهای کاشته آزموده شده‌اند."));
   }
   A.V.e_bt = function (arg, tab) {
-    tab = tab || "three";
+    tab = tab || "live";  // پیش‌فرض: بک‌تستِ پیوسته (۲۰۲۶-۱۰-۱۳)
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "اعتبارسنجی کارخانه و جزوه", "آیا می‌شود به کارخانه اعتماد کرد؟ سه آزمون پشت‌سرهم: ۱) کارخانه همان را می‌گوید که جزوه می‌گوید؟ ۲) جزوه با وقایع تاریخی می‌خواند؟ ۳) در وقایع امروز درست درمی‌آید؟"));
-    root.appendChild(A.tabs([["three", "سه آزمون"], ["sens", "حساسیت قاعده‌ها"], ["cycle", "تکرار دوره‌ای"], ["enc", "پایداری رمزگذاری"], ["hist", "تاریخچه"], ["about", "روش و حدود"]], tab, function (k) { A.go("e_bt", null, k); }));
+    root.appendChild(A.tabs([["live", "♾ بک‌تستِ پیوسته"], ["three", "سه آزمون"], ["sens", "حساسیت قاعده‌ها"], ["cycle", "تکرار دوره‌ای"], ["enc", "پایداری رمزگذاری"], ["hist", "تاریخچه"], ["about", "روش و حدود"]], tab, function (k) { A.go("e_bt", null, k); }));
     var body = h("div", { class: "col gap" }); root.appendChild(body);
     if (tab === "about") { body.appendChild(h("section", { class: "card" }, BT.INTRO.map(function (p) { return h("div", {}, String(p).split("\n").map(function (l) { return h("p", {}, l); })); }))); return root; }
     if (tab === "hist") {
@@ -132,10 +132,11 @@
     }
     if (tab === "enc") { body.appendChild(encAgreement()); return root; }
     if (tab === "cycle") { body.appendChild(cyclePanel()); return root; }
-    if (!A.lastThree || (A.lastThree.meta && A.lastThree.meta.enc !== (A.encSel || "A"))) A.runThree(A.encSel || "A");
+    if (tab === "live" && A.btLivePanel) { body.appendChild(A.btLivePanel()); return root; }
+    if (!A.lastThree || (A.lastThree.meta && A.lastThree.meta.enc !== (A.encSel || "A"))) A.runThree(A.encSel || "A", false);  // دیدن ≠ ثبتِ اجرا (۲۰۲۶-۱۰-۱۳)
     if (tab === "sens") { body.appendChild(sensView(A.lastThree)); return root; }
     var encSel = h("select", { id: "btEnc", onchange: function (e) { A.encSel = e.target.value; A.lastThree = null; A.render(); } }, Object.keys(ENC).map(function (k) { return h("option", { value: k, selected: (A.encSel || "A") === k }, ENC[k]); }));
-    body.appendChild(h("section", { class: "card" }, h("div", { class: "row gap wrap" }, h("label", { for: "btEnc" }, "رمزگذاری پرونده‌ها:"), encSel, h("button", { class: "btn ghost sm", onclick: function () { A.lastThree = null; A.render(); } }, "اجرای دوباره")),
+    body.appendChild(h("section", { class: "card" }, h("div", { class: "row gap wrap" }, h("label", { for: "btEnc" }, "رمزگذاری پرونده‌ها:"), encSel, h("button", { class: "btn ghost sm", onclick: function () { A.runThree(A.encSel || "A", true); A.render(); } }, "اجرای دوباره (و ثبت در تاریخچه)")),
       h("p", { class: "small muted" }, "رمزگذاری یعنی ویژگی‌هایی که برای هر ادعای پرونده ثبت شده. «رمزگذاری کور» را کسی انجام داده که سرانجام پرونده‌ها را نمی‌دانست؛ اگر نتیجه با آن هم بماند، به نحوه رمزگذاری وابسته نیست.")));
     body.appendChild(threeView(A.lastThree));
     return root;

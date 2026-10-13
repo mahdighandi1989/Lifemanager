@@ -527,6 +527,12 @@ def cmd_answer(args) -> int:
     return 0
 
 
+def cmd_epi_decisions() -> int:
+    """Owner's verdicts on the continuous backtest's rule proposals (read-only, ``ebtp_*`` only)."""
+    print(json.dumps(api("/api/inspection/audit/epi-decisions"), ensure_ascii=False, indent=1))
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="«نظارت و سرکشی» — the supervisor's side (Lifemanager)")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -534,6 +540,7 @@ def main() -> int:
     sub.add_parser("file", help="تیک‌خورده‌ها → زونکن (هر دور)")
     sub.add_parser("pull", help="کارتابل + تصویرها + فایل‌ها")
     sub.add_parser("urgent", help="یک برگهٔ فوری را بردار")
+    sub.add_parser("epi-decisions", help="تصمیم‌های مالک دربارهٔ پیشنهادهای بک‌تستِ پیوسته (فقط‌خواندنی)")
     ia = sub.add_parser("install-app", help="فایلِ HTML ِ پیوستِ مالک → صفحه در منو (داده، نه کد)")
     ia.add_argument("--file-id", required=True)
     ia.add_argument("--title", required=True)
@@ -555,7 +562,7 @@ def main() -> int:
     try:
         if args.cmd == "install-app":
             return cmd_install_app(args)
-        return {"whoami": cmd_whoami, "file": cmd_file, "pull": cmd_pull, "urgent": cmd_urgent}.get(
+        return {"whoami": cmd_whoami, "file": cmd_file, "pull": cmd_pull, "urgent": cmd_urgent, "epi-decisions": cmd_epi_decisions}.get(
             args.cmd, lambda: cmd_answer(args))()
     except SupervisorError as e:
         print(json.dumps({"error": str(e)}, ensure_ascii=False), file=sys.stderr)

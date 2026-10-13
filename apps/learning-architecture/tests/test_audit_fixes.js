@@ -19,7 +19,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const ebt0 = await p.evaluate(() => APP.S.all('ebt').length);
   await go('e_living'); await go('e_aut');
   chk(await p.evaluate(() => APP.S.all('ebt').length) === ebt0, 'viewing living/aut must not record a run');
-  await go('e_bt');
+  await go('e_bt', null, 'three');
   chk(await p.locator('main .t1-honest').count() === 1 && await p.locator('main .t1-approve').count() === 1, 'test1 honesty box + approve button');
   await p.click('main .t1-approve'); await p.waitForTimeout(150);
   chk(await p.evaluate(() => APP.rulesApproved() === APP.lastThree.a.rulesHash), 'rules approved');
