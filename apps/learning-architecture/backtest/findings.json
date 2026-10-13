@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-13",
- "round": 4,
+ "round": 5,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -12,11 +12,42 @@
  ],
  "findings": [
   {
+   "id": "f_bk_russell_chicken",
+   "case": "bk_russell_chicken",
+   "opened": "2026-10-13",
+   "openedRound": 5,
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "دورِ ۵، پس از قضیه‌ای شدنِ سقفِ استقراء: «فردا هم دانه می‌دهد» پیش‌بینیِ «موردِ بعدی» است (رمزگذارِ کور) و قضیهٔ T_next از شمار، سقفِ (n+1)/(n+2) می‌دهد — با صدها روز ≈ ۹۹٫۷؛ پس اطمینانِ ۹۹ ٪ جوجه از راهِ «شمار» بیش‌اطمینانی نیست. درسِ جزوه این‌جا شمار نیست، علت است: «تکرارِ داده‌های حسی به‌تنهایی … باید علت … کشف شود» و «مشروط به عدمِ دخالتِ عواملِ پنهان» (s51) — و خودِ «چرا» ی این پرونده همین را می‌گوید. ملاکِ s51 در کارخانه فقط روی «تجربه» (hidden_ctrl) نشسته، نه روی «استقراء». ⇒ پیشنهادِ p_case_chicken برای مالک.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "جوجه راسل",
+   "tier": "booklet",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 5
+  },
+  {
    "id": "f_cs_b_dewey1948",
    "case": "cs_b_dewey1948",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "برچسب حقیقت پرونده نادرست است",
    "note": "موتور درست کار کرده: تنها سقفی که شکسته شده r_tajrobe_hidden (۷۰، شرط s51: «اعتبار قوانین تجربی همواره مشروط به عدم دخالت عوامل پنهان») است و سقف استقراء ناقص (۸۰، s50: «حتی با افزایش شواهد به مرز یقین نمی‌رسد») با conf=90 و تحمل ۱۰ شکسته نمی‌شود. خودِ truth.why به همین عامل پنهانِ کنترل‌نشده با استناد به s51 تکیه می‌کند و رمزگذاری hidden_ctrl:false دارد، ولی st_tajrobe را در fail نیاورده؛ این با قرارداد پیکره (تالیدومید، تاکوما، آریان ۵، لوبوتومی: استقراء + hidden_ctrl:false ⇒ st_tajrobe در fail) ناسازگار است.",
    "fix": {
@@ -26,13 +57,12 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 7,
+    "fresh": 6,
     "freshOk": 6,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
      "r2_chamberlain_hitler_face",
-     "r2_central_park_five",
      "r2_nyt_goddard_1920",
      "r2_abs_startup_loi",
      "r2_abs_desk_stablecoin"
@@ -62,7 +92,8 @@
     "s80",
     "s86"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 1,
+   "verified": "2026-10-13"
   },
   {
    "id": "f_cs_b_literarydigest",
@@ -79,12 +110,9 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 2,
-    "freshOk": 1,
-    "ids": [
-     "r2_central_park_five",
-     "r2_nyt_goddard_1920"
-    ]
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
    },
    "kind": "mislocated",
    "title": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
@@ -111,11 +139,19 @@
    "case": "cs_hrt_observational",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "diagnosed",
+   "status": "fixed",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": "s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است. — به‌روز (دورِ ۴): پیشنهادِ p_found_vazraf همین را با قضیهٔ T_null (حداکثر ½) بی عددِ قراردادیِ ۴۵ حل می‌کند و جایگزینِ p_tajrobe_none است.",
-   "fix": null,
-   "retest": null,
+   "fix": {
+    "what": "پیشنهادِ p_found_vazraf (پذیرفتهٔ مالک): r_tajrobe_no_vazraf ۸۰ ⇒ ۵۰ با قضیهٔ T_null",
+    "round": 5
+   },
+   "retest": {
+    "since": 5,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "missed",
    "title": "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای",
    "tier": "real",
@@ -150,12 +186,9 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 2,
-    "freshOk": 1,
-    "ids": [
-     "r2_central_park_five",
-     "r2_nyt_goddard_1920"
-    ]
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
    },
    "kind": "missed",
    "title": "لاووازیه: «همه اسیدها اکسیژن دارند»",
@@ -176,11 +209,37 @@
    "lastSeenRound": 1
   },
   {
+   "id": "f_cs_pb_flt_numeric",
+   "case": "cs_pb_flt_numeric",
+   "opened": "2026-10-13",
+   "openedRound": 5,
+   "status": "diagnosed",
+   "attribution": "برچسب حقیقت پرونده نادرست است",
+   "note": "دورِ ۵: تصدیقِ «قضیهٔ فرما برای همهٔ نماها درست است (بر پایهٔ همین شواهد)» حکمِ کلی بر دامنهٔ نامحدود از شمارِ محدود است (رمزگذارِ کور: کلی نامحدود)؛ قضیهٔ T_universal (s51: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر») ⇒ اطمینانِ ۶۰ ٪ «بر پایهٔ همین شواهد» بیش از توجیه است، هرچند حکم بعدها درست درآمد (درستیِ نتیجه ≠ موجه بودنِ اطمینان). برچسبِ «سالم» ِ پرونده با s50 («با افزایشِ شواهد بالا می‌رود») نوشته شده و با s51 نمی‌خواند ⇒ پیشنهادِ p_case_flt برای مالک.",
+   "fix": null,
+   "retest": null,
+   "kind": "health_alarm",
+   "title": "تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)",
+   "tier": "problem",
+   "expected": [],
+   "flagged": [
+    "st_istiqra"
+   ],
+   "rules": [
+    "r_istiqra_universal"
+   ],
+   "secs": [
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 5
+  },
+  {
    "id": "f_cs_pb_greek_indiana",
    "case": "cs_pb_greek_indiana",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "هیچ‌یک از دو تصدیق conf ندارد و سقف‌ها فقط از راه «conf > سقف + تحمل» به پرچم بدل می‌شوند؛ پس با وجود سقف ۰ (r_conflict_cert)، ۲۵ (r_aql_matter_false، s40: «یقین … تنها زمانی حاصل می‌شود که هم مادهٔ استدلال صادق … باشد») و ۲۵ (r_expert_out_of_field، s49: «درجه تبحر، صلاحیت…») موتور کور است. پیکرهٔ مسائل ریاضی (روفینی، لژاندر، وایتهد) برای ادعای منتشر/عمل‌شده conf تقریبی ۹۰ می‌گذارد؛ مجلس با تصویب لایحه‌ای که روش را «حقیقت ریاضی» می‌خواند بر k2 عمل کرد (acted:true). با conf، سخت‌ترین سقف r_conflict_cert است و پرچم در st_conflict می‌نشیند — که خود truth.why («با برهان قطعی (لیندمان) ناسازگار بود",
    "fix": {
@@ -191,7 +250,7 @@
    "retest": {
     "since": 1,
     "fresh": 5,
-    "freshOk": 4,
+    "freshOk": 5,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -224,7 +283,8 @@
     "s49",
     "s50"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 1,
+   "verified": "2026-10-13"
   },
   {
    "id": "f_cs_pb_long_h4",
@@ -265,7 +325,7 @@
    "case": "cs_pb_poinc_1900",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "r_aql_matter_unproven درست فعال شد (سقف ۴۵؛ s40: مقدمات «باید … از طریق سلسله‌مراتب به بدیهیات منتهی شوند»، s44: «اعتبار صوری برهان به‌تنهایی کافی نیست»)، ولی چون conf رمز نشده هیچ پرچمی ساخته نمی‌شود. truth.why می‌گوید «چون شدت اطمینانش مستند نیست، conf رمزگذاری نشده»، اما پوانکاره حکم را در «مکمل دوم» (۱۹۰۰) منتشر و «ادعا کرد» و truth.right بدیلش را «طرح به‌صورت پرسش یا حدس» می‌داند؛ پیکرهٔ هم‌خانواده (روفینی، لژاندر، وایتهد: «عدد اطمینان تقریب سامانه از رفتار انتشار است») در همین وضع conf≈۹۰ می‌گذارد.",
    "fix": {
@@ -276,7 +336,7 @@
    "retest": {
     "since": 1,
     "fresh": 4,
-    "freshOk": 3,
+    "freshOk": 4,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
@@ -302,18 +362,27 @@
     "s44",
     "s50"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 1,
+   "verified": "2026-10-13"
   },
   {
    "id": "f_r2_nyt_goddard_1920",
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
    "openedRound": 3,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": " — دورِ ۵: فقط کمینهٔ سقف‌ها مقصر شمرده می‌شد و حکمِ کلی از استقراء سقفِ قضیه‌ای نداشت (s51).",
+   "fix": {
+    "what": "p_found_half + p_found_scope (پذیرفتهٔ مالک): هر سقفِ گذشته‌شده ایستگاهش پرچم می‌خورد؛ گسترهٔ «کلی نامحدود» ⇒ قضیهٔ T_universal",
+    "round": 5
+   },
+   "retest": {
+    "since": 5,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "mislocated",
    "title": "سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹",
    "tier": "real",

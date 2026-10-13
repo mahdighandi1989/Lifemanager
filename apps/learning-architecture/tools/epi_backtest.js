@@ -290,6 +290,11 @@ function syncProposals(fnd, n) {
       "؛ کاملاً در جای درست " + im.fullBefore + " ⇒ " + im.fullAfter + (im.refined.length ? " (" + im.refined.join("، ") + ")" : "") + (im.extra.length ? "؛ پرچمِ اضافه/کم بی تغییرِ حکم: " + im.extra.join("، ") : "") + "."
       : "اثر هنوز سنجیدنی نیست (ویژگیِ لازم در پرونده‌ها رمزگذاری نشده).";
     const o = { id: p.id, title: p.title, why: p.why, evidence: ev, source: "foundation" };
+    const prev = list.find((x) => x.id === p.id);
+    if (p.applied) {  // پذیرفته و اعمال‌شده: شاهدِ پیش از اعمال می‌ماند (بعد از اعمال، سنجش دیگر «تغییر» نمی‌بیند)
+      o.applied = p.applied; o.appliedWhat = p.appliedWhat;
+      if (prev && prev.evidence && !prev.applied) o.evidence = prev.evidence; else if (prev && prev.evidence) o.evidence = prev.evidence;
+    }
     if (p.finding) o.finding = p.finding; if (p.supersedes) o.supersedes = p.supersedes;
     const i = list.findIndex((x) => x.id === p.id);
     if (i >= 0) list[i] = Object.assign({}, list[i], o); else list.push(o);

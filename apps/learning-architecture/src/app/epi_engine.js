@@ -50,7 +50,8 @@
   function wOf(cfg, r) { var w = cfg && cfg.w && cfg.w[r.id]; return w == null ? 1 : w; }
   /* سقفِ یک قاعده: پیش‌فرض همان عددِ جزوه/سامانه؛ cfg.derived (آزمایشی، پیش‌فرض خاموش) ⇒ برای قاعده‌های «بدیهی‌پایه» کرانِ قضیه
      (EPI_FOUND.DER) — فقط برای سنجیدنِ اثر در حافظه؛ هیچ سقفی خودکار عوض نمی‌شود (تصمیم با مالک) */
-  function capOf(cfg, r) {
+  function capOf(cfg, r, f) {
+    if (r.capf) { var CF = W.EPI_FOUND && W.EPI_FOUND.CAPF[r.capf], v = CF && f ? CF(f) : null; return v == null ? r.cap : v; }   // سقفِ قضیه‌ای از ویژگی‌های همان تصدیق
     var dv = cfg && cfg.derived, FD = W.EPI_FOUND;   // true ⇒ همه؛ آرایه ⇒ فقط همین قاعده‌ها (برای سنجیدنِ اثرِ تک‌تکِ پیشنهادها)
     var d = dv && (dv === true || dv.indexOf(r.id) >= 0) && FD && FD.DER[r.id];
     if (!d || (d.k !== "B" && d.k !== "X")) return r.cap;
@@ -61,12 +62,12 @@
   X.capOf = capOf;
   X.runClaim = function (k, cfg, R) {
     R = R || rulesFor(cfg); var f = k.f || {};
-    var ceil = 100, bind = null, ties = [], fired = [], stScore = {};
+    var ceil = 100, bind = null, caps = [], fired = [], stScore = {};
     R.forEach(function (r) {
       if (!X.cond(r.when, f)) return;
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
-      if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r)); if (c < ceil) { ceil = c; bind = r; ties = [r]; } else if (c === ceil && bind) ties.push(r); }
+      if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r, f)); caps.push([r, c]); if (c < ceil) { ceil = c; bind = r; } }
       else if (r.eff === "flag") stScore[r.st] = (stScore[r.st] || 0) + w;
     });
     var flags = [];
@@ -77,9 +78,12 @@
     var FD = W.EPI_FOUND;
     var over = conf != null && (cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(ceil) : conf > ceil + tol);
     if (over) flags.push({ st: bind ? bind.st : "st_grade", kind: "over", rules: bind ? [bind.id] : [], gap: Math.round(conf - ceil) });
-    // با کرانِ قضیه چند شرط هم‌زمان به «حداکثر شک» می‌رسند و هر کدام به‌تنهایی دلیلِ بیش‌اطمینانی است ⇒ همهٔ ایستگاه‌هایشان
-    // (فقط در حالتِ آزمایشیِ derived؛ پیش‌فرض همان «اولین سقفِ کمینه» می‌ماند)
-    if (over && cfg && cfg.derived) ties.forEach(function (r) { if (r !== bind && !flags.some(function (x) { return x.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - ceil) }); });
+    // هر سقفی که اطمینان از آن گذشته، به‌تنهایی دلیلِ بیش‌اطمینانی است (شرط‌ها مستقل‌اند؛ هر کدام کرانِ خودش را دارد) ⇒ ایستگاهِ همه، نه فقط
+    // کمینه. (p_found_half، مالک ۲۰۲۶-۱۰-۱۳: پیش از آن فقط «اولین» قاعدهٔ کمینه مقصر بود و مکان‌یابی به ترتیب و اندازهٔ سقف‌ها بسته بود)
+    if (over) caps.forEach(function (x) {
+      var r = x[0], c = x[1], past = cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(c) : conf > c + tol;
+      if (r !== bind && past && !flags.some(function (y) { return y.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - c) });
+    });
     flags.sort(function (a, b) { return (PIDX[a.st] || 0) - (PIDX[b.st] || 0); });
     return { id: k.id, ceil: Math.round(ceil), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
   };
@@ -170,7 +174,7 @@
         if (!X.cond(r.when, f)) continue;
         var bad = JSON.parse(JSON.stringify(f)), good = JSON.parse(JSON.stringify(f));
         if (r.eff === "cap") {
-          var eff = 100 - wOf(cfg, r) * (100 - r.cap);
+          var eff = 100 - wOf(cfg, r) * (100 - capOf(cfg, r, f));
           if (eff + cfg.tol + 1 > 100) break; /* این سقف با این تحمل نقض‌شدنی نیست؛ کنترل مثبت برایش معنا ندارد */
           var cn = "conf" in f ? f.conf : null;
           bad.conf = Math.min(100, Math.round(eff + cfg.tol + 3 + R() * 12));

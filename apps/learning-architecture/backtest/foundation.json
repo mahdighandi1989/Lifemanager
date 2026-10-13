@@ -1,11 +1,11 @@
 {
- "round": 4,
+ "round": 5,
  "at": "2026-10-13",
  "classes": {
-  "B": 21,
+  "B": 25,
   "S": 14,
   "O": 4,
-  "X": 3,
+  "X": 2,
   "?": 0
  },
  "rules": [
@@ -72,8 +72,8 @@
    "id": "r_aql_invalid_form",
    "fa": "صورت استدلال نامعتبر",
    "st": "st_aql",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s40",
     "s44"
@@ -86,7 +86,7 @@
    "baseFa": "",
    "note": "صورتِ نامعتبر چیزی نمی‌افزاید؛ «لزوماً کاذب نیست» (s40)",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_aql_nondeductive",
@@ -112,8 +112,8 @@
    "id": "r_aql_matter_unproven",
    "fa": "مقدمه اثبات‌نشده",
    "st": "st_aql",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s40",
     "s44"
@@ -126,14 +126,14 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_aql_matter_false",
    "fa": "مقدمه کاذب",
    "st": "st_aql",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s40"
    ],
@@ -145,14 +145,14 @@
    "baseFa": "",
    "note": "مادهٔ کاذب این استدلال را بی‌اثر می‌کند، نه نتیجه را کاذب",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_not_issued",
    "fa": "صدور خبر احراز نشده",
    "st": "st_naql",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s47"
    ],
@@ -164,14 +164,14 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_unreliable",
    "fa": "گزارشگر غیرموثق، بی‌قرینه همسو",
    "st": "st_naql",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s47",
     "s48"
@@ -184,14 +184,14 @@
    "baseFa": "",
    "note": "گزارشِ ناموثق پشتوانه نیست؛ نتیجه به حالِ بی‌دلیل برمی‌گردد",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_unreliable_corrob",
    "fa": "گزارشگر غیرموثق با قرینه همسو",
    "st": "st_naql",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s47",
     "s48"
@@ -204,14 +204,14 @@
    "baseFa": "",
    "note": "قرینهٔ همسو گزارشِ ناموثق را ثقه نمی‌کند؛ بی‌دلیلِ مستقل، تقارن",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_narrator_unknown",
    "fa": "وثاقت گزارشگر نامعلوم",
    "st": "st_naql",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s47"
    ],
@@ -223,14 +223,14 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_chain_broken",
    "fa": "زنجیره طولی با حلقه مجهول",
    "st": "st_naql",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s47"
    ],
@@ -242,7 +242,7 @@
    "baseFa": "",
    "note": "حلقهٔ نامعلوم ≤ ½ (T_unknown) و زنجیره ≤ ضعیف‌ترین حلقه — «اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌سازد» (s47)",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_ahad",
@@ -343,8 +343,8 @@
    "id": "r_naql_mubham_noq",
    "fa": "دلالت مبهم بدون قرینه همسو",
    "st": "st_naql",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s48"
    ],
@@ -356,7 +356,7 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_naql_mubham_q",
@@ -380,8 +380,8 @@
    "id": "r_expert_method_weak",
    "fa": "روش کارشناس ضعیف یا نامعلوم",
    "st": "st_expert",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s49"
    ],
@@ -393,14 +393,14 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_expert_out_of_field",
    "fa": "کارشناس بیرون از حوزه تخصص",
    "st": "st_expert",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s49"
    ],
@@ -412,14 +412,14 @@
    "baseFa": "",
    "note": "تخصص در حوزهٔ دیگر برای این حکم پشتوانه نیست",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_expert_comp_unknown",
    "fa": "صلاحیت کارشناس نامعلوم",
    "st": "st_expert",
-   "cap": 45,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s49"
    ],
@@ -431,7 +431,7 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_expert_bias",
@@ -468,8 +468,66 @@
    "bound": "≈0 (حکمِ کلی) / (n+1)/(n+2) (موردِ بعدی)",
    "base": null,
    "baseFa": "",
-   "note": "سقفِ ۸۰ برای حکمِ کلیِ استقراییِ ناقص با قضیهٔ خودِ جزوه (s51: نسبت «نزدیک به صفر») نمی‌خواند؛ برای پیش‌بینیِ موردِ بعدی عدد از n می‌آید. کارخانه میانِ «حکمِ کلی» و «موردِ بعدی» فرق نمی‌گذارد (ویژگی‌اش نیست).",
+   "note": "گذرا: فقط تصدیق‌های بی «گستره». سقفِ ۸۰ برای حکمِ کلیِ استقراییِ ناقص با قضیهٔ خودِ جزوه (s51: نسبت «نزدیک به صفر») نمی‌خواند؛ برای پیش‌بینیِ موردِ بعدی عدد از n می‌آید. کارخانه میانِ «حکمِ کلی» و «موردِ بعدی» فرق نمی‌گذارد (ویژگی‌اش نیست).",
    "consistent": false,
+   "stricterThanTheorem": false
+  },
+  {
+   "id": "r_istiqra_universal",
+   "fa": "حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص",
+   "st": "st_istiqra",
+   "cap": 1,
+   "capDeg": "wahm",
+   "sec": [
+    "s51",
+    "s50"
+   ],
+   "k": "B",
+   "th": "T_universal",
+   "thFa": "حکمِ کلی از استقراءِ ناقص بر دامنهٔ نامحدود ⇒ نزدیک به صفر",
+   "bound": 1,
+   "base": null,
+   "baseFa": "",
+   "note": "صفرِ حدی؛ ۱ کوچک‌ترین واحدِ مقیاس — «لزوماً کاذب نیست» (s40)",
+   "consistent": true,
+   "stricterThanTheorem": false
+  },
+  {
+   "id": "r_istiqra_finite",
+   "fa": "حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص",
+   "st": "st_istiqra",
+   "cap": 50,
+   "capDeg": "shakk",
+   "sec": [
+    "s50"
+   ],
+   "k": "B",
+   "th": "T_finite",
+   "thFa": "حکمِ کلی بر مجموعهٔ معینِ M عضوی پس از n موافق ⇒ (n+1)/(M+1)",
+   "bound": "100(n+1)/(M+1)",
+   "base": null,
+   "baseFa": "",
+   "note": "عدد از n و M ِ همان تصدیق",
+   "consistent": true,
+   "stricterThanTheorem": false
+  },
+  {
+   "id": "r_istiqra_next",
+   "fa": "پیش‌بینیِ موردِ بعدی از استقراءِ ناقص",
+   "st": "st_istiqra",
+   "cap": 67,
+   "capDeg": "zann",
+   "sec": [
+    "s50"
+   ],
+   "k": "B",
+   "th": "T_next",
+   "thFa": "موردِ بعدی پس از n موردِ موافق ⇒ (n+1)/(n+2)",
+   "bound": "100(n+1)/(n+2)",
+   "base": null,
+   "baseFa": "",
+   "note": "عدد از n ِ همان تصدیق",
+   "consistent": true,
    "stricterThanTheorem": false
   },
   {
@@ -487,7 +545,7 @@
    "bound": "(n+1)/(n+2)",
    "base": null,
    "baseFa": "",
-   "note": "برای موردِ بعدی قضیه عددِ دقیق می‌دهد (n=۲ ⇒ ۷۵، n=۵ ⇒ ۸۶، n=۹ ⇒ ۹۱)؛ سقفِ ثابتِ ۷۰ قراردادی است؛ برای حکمِ کلی ≈ ۰.",
+   "note": "گذرا: فقط تصدیق‌های بی «گستره». برای موردِ بعدی قضیه عددِ دقیق می‌دهد (n=۲ ⇒ ۷۵، n=۵ ⇒ ۸۶، n=۹ ⇒ ۹۱)؛ سقفِ ثابتِ ۷۰ قراردادی است؛ برای حکمِ کلی ≈ ۰.",
    "consistent": false,
    "stricterThanTheorem": false
   },
@@ -514,20 +572,20 @@
    "id": "r_tajrobe_no_vazraf",
    "fa": "تجربه بدون وضع و رفع ≈ استقراء ناقص",
    "st": "st_tajrobe",
-   "cap": 80,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s51",
     "s50"
    ],
-   "k": "X",
+   "k": "B",
    "th": "T_null",
    "thFa": "استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید",
    "bound": 50,
    "base": null,
    "baseFa": "",
-   "note": "جزوه تجربهٔ بی وضع‌ورفع را «تکرارِ داده‌های حسی» می‌داند که «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» (s51): این شاهد به قانونِ کلی چیزی نمی‌افزاید ⇒ T_null ⇒ حداکثر شک (½)؛ سقفِ ۸۰ (ظن) با این نمی‌خواند. (اگر خودِ ادعا «همهٔ موارد بی‌استثنا» باشد، T_universal ⇒ نزدیک به صفر.)",
-   "consistent": false,
+   "note": "جزوه تجربهٔ بی وضع‌ورفع را «تکرارِ داده‌های حسی» می‌داند که «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» (s51) ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر شک (½). سقفِ قبلی ۸۰ (ظن) ناسازگار بود؛ مالک ۲۰۲۶-۱۰-۱۳ پیشنهادِ p_found_vazraf را پذیرفت.",
+   "consistent": true,
    "stricterThanTheorem": false
   },
   {
@@ -757,8 +815,8 @@
    "id": "r_bg_missing",
    "fa": "پیش‌زمینه بایسته فراهم نبود",
    "st": "st_background",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s70",
     "s69"
@@ -771,14 +829,14 @@
    "baseFa": "",
    "note": "بی پیش‌زمینهٔ بایسته فهمِ مقصود احراز نشده",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_r_sanad_weak",
    "fa": "منبع دینی ضعیف یا بی‌سند",
    "st": "st_r_sources",
-   "cap": 25,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s73",
     "s87",
@@ -792,7 +850,7 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": true
+   "stricterThanTheorem": false
   },
   {
    "id": "r_r_sanad_ahad",
@@ -819,59 +877,23 @@
   "num": {
    "kinds": {
     "ok": 183,
-    "health_alarm": 0,
+    "health_alarm": 1,
     "missed": 1,
-    "mislocated": 1
+    "mislocated": 0
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 173,
-    "health_alarm": 0,
-    "missed": 11,
-    "mislocated": 1
+    "ok": 180,
+    "health_alarm": 1,
+    "missed": 4,
+    "mislocated": 0
    },
    "changed": [
     {
-     "id": "cs_nrays_blondlot",
-     "t": "پرتوهای N بلوندلو",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_lavoisier_acids",
-     "t": "لاووازیه: «همه اسیدها اکسیژن دارند»",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_fermat_numbers",
-     "t": "فرما: «همه اعداد فرما اول‌اند»",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_tacoma_narrows",
-     "t": "پل تاکوما ناروز",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
      "id": "bk_stick_sight",
      "t": "چوب کج در آب: حکم باصره",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "bk_russell_chicken",
-     "t": "جوجه راسل",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_b_heilbronn",
-     "t": "«شبح هایلبرون»: زنی که در ۴۰ صحنه جرم بود",
      "from": "ok",
      "to": "missed"
     },
@@ -884,12 +906,6 @@
     {
      "id": "cs_b_literarydigest",
      "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_pb_long_generalize",
-     "t": "تعمیم از یک ساعت موفق به روش عملی (۱۷۶۲–۱۷۶۵)",
      "from": "ok",
      "to": "missed"
     }
@@ -897,61 +913,24 @@
   },
   "derived": {
    "kinds": {
-    "ok": 184,
-    "health_alarm": 0,
-    "missed": 0,
-    "mislocated": 1
+    "ok": 183,
+    "health_alarm": 1,
+    "missed": 1,
+    "mislocated": 0
    },
-   "changed": [
-    {
-     "id": "cs_hrt_observational",
-     "t": "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای",
-     "from": "missed",
-     "to": "ok"
-    }
-   ]
+   "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 176,
-    "health_alarm": 0,
-    "missed": 8,
-    "mislocated": 1
+    "ok": 180,
+    "health_alarm": 1,
+    "missed": 4,
+    "mislocated": 0
    },
    "changed": [
     {
-     "id": "cs_hrt_observational",
-     "t": "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای",
-     "from": "missed",
-     "to": "ok"
-    },
-    {
-     "id": "cs_lavoisier_acids",
-     "t": "لاووازیه: «همه اسیدها اکسیژن دارند»",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_fermat_numbers",
-     "t": "فرما: «همه اعداد فرما اول‌اند»",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_tacoma_narrows",
-     "t": "پل تاکوما ناروز",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
      "id": "bk_stick_sight",
      "t": "چوب کج در آب: حکم باصره",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "bk_russell_chicken",
-     "t": "جوجه راسل",
      "from": "ok",
      "to": "missed"
     },
@@ -964,12 +943,6 @@
     {
      "id": "cs_b_literarydigest",
      "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_pb_long_generalize",
-     "t": "تعمیم از یک ساعت موفق به روش عملی (۱۷۶۲–۱۷۶۵)",
      "from": "ok",
      "to": "missed"
     }
@@ -1081,39 +1054,24 @@
  },
  "impacts": {
   "p_found_half": {
-   "rules": 21,
-   "ceilings": 66,
+   "rules": 25,
+   "ceilings": 0,
    "fixed": [],
    "broken": [],
-   "refined": [
-    "پرتوهای N بلوندلو",
-    "سالی کلارک و «یک در ۷۳ میلیون»",
-    "میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴"
-   ],
-   "extra": [
-    "«دست انسان، انسان است»: خلط کلی و کل"
-   ],
-   "fullBefore": 90,
-   "fullAfter": 93
+   "refined": [],
+   "extra": [],
+   "fullBefore": 101,
+   "fullAfter": 101
   },
   "p_found_vazraf": {
    "rules": 1,
-   "ceilings": 8,
-   "fixed": [
-    "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای"
-   ],
+   "ceilings": 0,
+   "fixed": [],
    "broken": [],
-   "refined": [
-    "پرتوهای N بلوندلو",
-    "سالی کلارک و «یک در ۷۳ میلیون»",
-    "میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴"
-   ],
-   "extra": [
-    "مقاله ویکفیلد درباره واکسن MMR و اوتیسم",
-    "لوکوتومی پیشانی مونیز و گسترش لوبوتومی"
-   ],
-   "fullBefore": 90,
-   "fullAfter": 94
+   "refined": [],
+   "extra": [],
+   "fullBefore": 101,
+   "fullAfter": 101
   },
   "p_found_scope": null
  }

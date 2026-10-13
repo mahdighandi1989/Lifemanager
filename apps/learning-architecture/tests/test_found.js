@@ -18,8 +18,9 @@ chk(Object.values(F.DER).every(d => F.TH[d.th]), 'every derivation names a real 
 chk(Object.values(F.DER).filter(d => d.k === 'S').every(d => F.BASE[d.base]), 'every S rule names a base parameter');
 const rep = F.report();
 chk(rep.filter(r => r.k === 'B').every(r => r.consistent === true), 'B caps never exceed their theorem bound');
-chk(rep.filter(r => r.k === 'X').map(r => r.id).sort().join() === 'r_istiqra_incomplete,r_istiqra_small_n,r_tajrobe_no_vazraf', 'the three inconsistent caps');
-chk(rep.filter(r => r.stricterThanTheorem).every(r => r.cap < 50), 'stricter-than-theorem flags only the sub-half caps');
+chk(rep.filter(r => r.k === 'X').map(r => r.id).sort().join() === 'r_istiqra_incomplete,r_istiqra_small_n', 'only the two transitional induction caps remain inconsistent');
+chk(EPI_RULES.filter(r => r.capf).every(r => F.CAPF[r.capf]) && F.CAPF.next({ ind_n: 9 }) === 100 * 10 / 11 && F.CAPF.finite({ ind_n: 30, dom_n: 30 }) === 100 && F.CAPF.finite({ ind_n: 4, dom_n: 99 }) === 5, 'formula caps are the theorems');
+chk(F.report().filter(r => r.stricterThanTheorem).length === 0, 'accepted: no cap is stricter than its theorem without proof');
 chk(F.degreeOf(100) === 'yaqin' && F.degreeOf(0) === 'kidhb' && F.degreeOf(50) === 'shakk' && F.degreeOf(51) === 'zann' && F.degreeOf(49) === 'wahm', 'degree boundaries');
 // ۲) پیش‌فرض
 const cs = T.loadCorpus(), base = X.DEFAULT_CFG('mesbah');
@@ -27,8 +28,13 @@ chk(!base.deg && !base.derived, 'default config has no experimental mode');
 const same = cs.every(c => { const a = T.verdict(c, base), b = T.verdict(c, Object.assign({}, base, { deg: false, derived: false })); return a.kind === b.kind && a.flagged.join() === b.flagged.join(); });
 chk(same, 'experimental options off ⇒ identical verdicts');
 const fnd = T.foundation(cs);
-chk(fnd.modes.derived.kinds.health_alarm === 0 && fnd.modes.derived.changed.every(c => c.to === 'ok'), 'theorem bounds break no correct verdict ' + JSON.stringify(fnd.modes.derived.changed));
-chk(fnd.impacts.p_found_vazraf && fnd.impacts.p_found_vazraf.broken.length === 0 && fnd.impacts.p_found_scope === null, 'proposal impacts measured');
+chk(fnd.modes.derived.changed.every(c => c.to === 'ok'), 'theorem bounds break no correct verdict ' + JSON.stringify(fnd.modes.derived.changed));
+chk(fnd.impacts.p_found_vazraf && fnd.impacts.p_found_vazraf.broken.length === 0, 'proposal impacts measured');
+// گسترهٔ ادعا: «کلی نامحدود» ⇒ صفرِ حدی، «موردِ بعدی» ⇒ (n+1)/(n+2)؛ تصدیقِ بی‌گستره همان قاعدهٔ گذرا
+const run1 = f => X.runClaim({ id: 'k', f: Object.assign({ way: 'استقراء', ind_complete: false, conf: 60 }, f) }, base);
+chk(run1({ scope: 'کلی نامحدود', ind_n: 4000 }).bind === 'r_istiqra_universal' && run1({ scope: 'کلی نامحدود' }).over, 'universal from counting ⇒ limit-zero cap');
+chk(run1({ scope: 'مورد بعدی', ind_n: 9, conf: 95 }).ceil === 91 && !run1({ scope: 'مورد بعدی', ind_n: 9, conf: 95 }).over, 'next case ⇒ (n+1)/(n+2)');
+chk(run1({ ind_n: 5 }).fired.indexOf('r_istiqra_small_n') >= 0 && run1({ scope: 'مورد بعدی', ind_n: 5 }).fired.indexOf('r_istiqra_small_n') < 0, 'transitional rules only for claims without scope');
 // ۳) پایه‌ها
 const mk = (n, sample, t) => Array.from({ length: n }, (_, i) => ({ id: 'g' + i, grp: 'g' + i, sample, claims: [{ truth: t(i), f: { way: 'نقل', narrator: 'موثق' } }] }));
 chk(F.measure(mk(500, 'curated', () => true)).p_thiqa.sufficient === false, 'curated sample never counted, however large');
@@ -52,12 +58,12 @@ chk(T.validate(Object.assign({}, cs.find(c => c.tier === 'real' && c.src), { sam
   info.page = await p.evaluate(() => ({ ax: document.querySelectorAll('main .found-ax li').length, rows: document.querySelectorAll('main .found-rules tbody tr').length,
     x: document.querySelectorAll('main .found-rules tbody tr[data-k="X"]').length, modes: document.querySelectorAll('main .found-modes tbody tr').length,
     base: document.querySelectorAll('main .found-base tbody tr').length, th: document.querySelectorAll('main .found-th li').length }));
-  chk(info.page.ax === 5 && info.page.rows === 42 && info.page.x === 3 && info.page.modes === 4 && info.page.base === 8 && info.page.th >= 10, 'found tab content ' + JSON.stringify(info.page));
+  chk(info.page.ax === 5 && info.page.rows === caps.length && info.page.x === 2 && info.page.modes === 4 && info.page.base === 8 && info.page.th >= 10, 'found tab content ' + JSON.stringify(info.page));
   await p.selectOption('main .card select', 'X'); await p.waitForTimeout(80);
-  chk(await p.locator('main .found-rules tbody tr').count() === 3, 'filter by class');
+  chk(await p.locator('main .found-rules tbody tr').count() === 2, 'filter by class');
   await p.evaluate(() => APP.go('e_bt', null, 'live')); await p.waitForTimeout(200);
   info.props = await p.evaluate(() => [...document.querySelectorAll('main .bt-proposal')].map(x => x.dataset.id + (x.classList.contains('superseded') ? '*' : '')));
-  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0, 'superseded proposal marked, foundation proposals listed ' + info.props);
+  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === 3, 'superseded proposal marked, foundation proposals listed ' + info.props);
   await p.click('main .bt-proposal[data-id="p_found_half"] button:has-text("مبنایش")'); await p.waitForTimeout(150);
   chk(await p.locator('main .found-rules').count() === 1, 'proposal links to its foundation');
   await p.setViewportSize({ width: 390, height: 800 }); await p.waitForTimeout(150);

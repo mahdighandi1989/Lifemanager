@@ -217,7 +217,8 @@
      "conflict_ignored": true,
      "conf": 90,
      "acted": true,
-     "stakes": "زیاد"
+     "stakes": "زیاد",
+     "scope": "کلی نامحدود"
     }
    }
   ],
@@ -331,7 +332,8 @@
      "inquiry": "ممکن بود و انجام نشد",
      "conf": 95,
      "acted": true,
-     "stakes": "متوسط"
+     "stakes": "متوسط",
+     "scope": "کلی نامحدود"
     }
    }
   ],

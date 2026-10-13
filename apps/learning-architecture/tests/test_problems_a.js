@@ -17,9 +17,11 @@ const sha = o => crypto.createHash('sha256').update(JSON.stringify(o)).digest('h
 /* هش‌ها از `git show f6c4b66:apps/learning-architecture/src/app/epi_problems.js` هنگامِ نوشتنِ آزمون.
    به‌روز ۲۰۲۶-۱۰-۱۳ (بک‌تستِ پیوسته، دورِ ۱ — WORKLOG ِ صفحه (31)): سه اصلاحِ مستندِ سازنده در cases —
    pb_greek/cs_pb_greek_indiana (conf + st_conflict)، pb_longitude/cs_pb_long_h4 (ind_complete)، pb_poincare/cs_pb_poinc_1900 (conf).
+   به‌روز ۲۰۲۶-۱۰-۱۳ (WORKLOG (33)، p_found_scope پذیرفتهٔ مالک): ویژگیِ «گسترهٔ ادعا» (scope) با رمزگذاریِ کور روی دو تصدیقِ استقرایی
+   (cs_pb_flt_numeric/k2، cs_pb_long_generalize/k1) افزوده شد؛ هیچ مقدارِ دیگری عوض نشد.
    هر تغییرِ بعدیِ cases فقط از همین مسیر (یافته ⇒ تشخیص ⇒ اصلاح، با ثبت در WORKLOG) و با به‌روزکردنِ همین هش‌ها. */
-const CASES_SHA = '45b272ff88a170b3ec3027a0c6d51a9c40a2f367381f24647bd3f683cd49ac8c';
-const PROTECTED_SHA = '865da7a69ed1cbc29dee371317e74a064f7ddb75cbe82b637ee10482bce0838e';
+const CASES_SHA = '374ecd04841737899bd6029d0a7f7d357d859b7e8180b032f368803835bea87c';
+const PROTECTED_SHA = 'c0f463089996fa5c68c529e8a1393f5fd2347d6be97e8ceab650fec00d8b2c1d';
 const IDS = 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis';
 
 function protectedView(list) {

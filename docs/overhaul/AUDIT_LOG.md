@@ -4334,3 +4334,9 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **RUN:** دورِ ۴: کرانِ قضیه ⇒ ۰ حکمِ خراب، HRT دیده شد، مکان‌یابیِ کامل ۹۰ ⇒ ۹۴؛ فقط درجه‌ها ⇒ ۱۰ شکست از دست می‌رود؛ ۸ پایه «ناکافی».
 - **PROPOSAL:** `p_found_half`، `p_found_vazraf` (جایگزینِ `p_tajrobe_none`)، `p_found_scope` — منتظرِ مالک.
 - **درس:** `experiences/grounding-confidence-numbers-in-axioms.md` (+ به‌روزِ `continuous-backtest-for-a-rule-based-judge.md`).
+
+## 2026-10-13 — «معماری یادگیری عمیق»: اعمالِ پیشنهادهای مبنایی (تصمیمِ مالک)
+- **DECISION (مالک):** `p_found_half` و `p_found_vazraf` پذیرفته؛ `p_found_scope` «بسازش».
+- **CHANGE:** ۱۵ سقف ⇒ ۵۰ (کرانِ قضیه)؛ موتور: هر سقفِ گذشته‌شده ایستگاهش پرچم می‌خورد؛ ویژگیِ `scope`/`dom_n` و سه قاعدهٔ استقراییِ فرمولی (`capf`)؛ رمزگذاریِ کورِ ۱۹ تصدیق؛ دو قاعدهٔ قدیم «گذرا» (حذف نشد).
+- **RUN:** دورِ ۵: مکان‌یابیِ کامل ۹۰ ⇒ ۱۰۱؛ HRT و گادارد درست؛ جوجهٔ راسل (دیده‌نشده) و شواهدِ عددیِ فرما (هشدارِ کاذب) با قضیه نخواندند ⇒ `p_case_chicken`، `p_case_flt` برای مالک.
+- **درس:** به‌روزِ `experiences/grounding-confidence-numbers-in-axioms.md`.

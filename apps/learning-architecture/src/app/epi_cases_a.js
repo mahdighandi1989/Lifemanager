@@ -111,7 +111,7 @@
     actor: "گروننتال بر پایه آزمون‌های محدود حیوانی، دارو را برای همه، از جمله زنان باردار، ایمن اعلام کرد.",
     claims: [
       { id: "k1", txt: "تالیدومید داروی بی‌خطری است، حتی برای زنان باردار", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, conf: 90, acted: true, stakes: HIGH, hidden_ctrl: false, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP }, truth: false }
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, conf: 90, acted: true, stakes: HIGH, hidden_ctrl: false, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe", "st_conflict", "st_background", "st_resp"],
       why: "از نیافتن دوز کشنده در جوندگان (استقراء ناقص در جمعیتی دیگر و برای پیامدی دیگر) به ایمنی کلی، از جمله برای جنین، تعمیم داده شد (s50). اثر بر جنین اصلاً آزموده نشده بود؛ عامل پنهان کنترل نشد (s51). گزارش‌های نوریت شاهد ناسازگار بودند و کنار گذاشته شدند (s53)؛ منفعت تجاری پیش‌زمینه نابایسته بود (s70)؛ و با بهای خطای بسیار زیاد، تحقیق ممکن پیش از تبلیغ انجام نشد.",
@@ -141,7 +141,7 @@
     actor: "ویکفیلد بر پایه مجموعه‌ای کوچک از موارد، رابطه علّی را القا کرد و توصیه عملی داد؛ بخشی از رسانه‌ها و والدین به اعتبار تخصص او عمل کردند.",
     claims: [
       { id: "k1", txt: "واکسن MMR با بیماری روده‌ای و اوتیسم در کودکان مرتبط است", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, ind_n: 12, vazraf: false, hidden_ctrl: false, conf: 70, acted: true, stakes: HIGH, bg_undue: true }, truth: false },
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 12, vazraf: false, hidden_ctrl: false, conf: 70, acted: true, stakes: HIGH, bg_undue: true }, truth: false },
       { id: "k2", txt: "چون متخصصی در لنست چنین گفته، باید از واکسن MMR پرهیز کرد", role: "اصلی",
         f: { way: TAKH, x_method: XM_WEAK, x_bias: true, conf: 70, acted: true, stakes: HIGH }, truth: false }
     ],
@@ -218,7 +218,7 @@
     actor: "مونیز و پیروانش بر پایه شمار کمی بیمار با پیگیری کوتاه، اثربخشی جراحی را پذیرفتند و آن را گسترده به کار بستند.",
     claims: [
       { id: "k1", txt: "لوکوتومی پیشانی بیماری‌های روانی شدید را درمان یا بهتر می‌کند و سودش بر زیانش می‌چربد", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, ind_n: 20, vazraf: false, hidden_ctrl: false, conf: 80, acted: true, stakes: HIGH, inquiry: INQ_SKIP }, truth: false }
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 20, vazraf: false, hidden_ctrl: false, conf: 80, acted: true, stakes: HIGH, inquiry: INQ_SKIP }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe", "st_resp"],
       why: "تعمیم از ۲۰ مورد با پیگیری کوتاه به حکمی کلی (s50)؛ «بهبود» با معیارهای سنجش‌نشده و بی‌گروه مقایسه داوری شد، پس عوامل پنهان (سیر طبیعی بیماری، آرام‌شدن به بهای از دست رفتن کارکرد) کنترل نشد (s51). با بهای جبران‌ناپذیر جراحی مغز، پیگیری درازمدت پیش از گسترش ممکن بود و انجام نشد.",
@@ -381,7 +381,7 @@
     actor: "لاووازیه از شمار محدودی اسید، حکمی کلی درباره همه اسیدها صادر کرد.",
     claims: [
       { id: "k1", txt: "اکسیژن جزء لازم هر اسید است", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, ind_n: 4, conf: 85, acted: true, stakes: LOW }, truth: false }  /* بک‌تستِ پیوسته، دورِ ۱ (۲۰۲۶-۱۰-۱۳): رمزگذاری — داستان «از شمارِ محدودی اسید» را می‌گوید، ind_n جا افتاده بود (s50) */
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 4, conf: 85, acted: true, stakes: LOW }, truth: false }  /* بک‌تستِ پیوسته، دورِ ۱ (۲۰۲۶-۱۰-۱۳): رمزگذاری — داستان «از شمارِ محدودی اسید» را می‌گوید، ind_n جا افتاده بود (s50) */
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "تعمیم از شمار محدودی از مصادیق به همه اسیدها، استقراء ناقص است که حتی با افزایش موارد به یقین نمی‌رسد (s50)؛ همان دانشمندی که در سوختن روشی سالم داشت، اینجا اطمینانی فراتر از شواهد نشان داد و حتی ترکیب اسید موریاتیک را بر پایه همین تعمیم پیش‌فرض گرفت.",
@@ -591,7 +591,7 @@
     actor: "فرما از پنج مورد نخست، حکمی کلی درباره بی‌نهایت عدد صادر کرد.",
     claims: [
       { id: "k1", txt: "هر عدد به شکل ۲^(۲^n)+۱ اول است", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, ind_n: 5, conf: 85, stakes: LOW }, truth: false }
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 5, conf: 85, stakes: LOW }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "پنج مورد از بی‌نهایت؛ استقراء ناقص حتی با موارد بیشتر به یقین نمی‌رسد (s50) و در ریاضیات حکم کلی تنها با برهان ثابت می‌شود (s40). اطمینان بالا بی‌پشتوانه بود؛ اذعان فرما به نداشتن اثبات درست بود، ولی اطمینانش متناسب با آن نبود.",
@@ -656,7 +656,7 @@
     actor: "AECL بر پایه سابقه کارکرد بی‌حادثه نرم‌افزار و تحلیل ایمنی‌ای که نرم‌افزار را تقریباً بی‌خطا فرض می‌کرد، گزارش‌های آسیب را نپذیرفت.",
     claims: [
       { id: "k1", txt: "نرم‌افزار تراک‌۲۵ ایمن است و دستگاه نمی‌تواند پرتو بیش از حد بدهد", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, hidden_ctrl: false, conflict_ignored: true, inquiry: INQ_SKIP, conf: 95, acted: true, stakes: HIGH }, truth: false }
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, conflict_ignored: true, inquiry: INQ_SKIP, conf: 95, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_conflict", "st_resp"],
       why: "سابقه کارکرد بی‌حادثه، استقراء ناقصی است که برای ترکیب‌های نادر ورودی و زمان‌بندی هیچ تضمینی نمی‌دهد (s50)؛ و آن سابقه در دستگاهی با قفل سخت‌افزاری به دست آمده بود، یعنی عامل پنهانی که در طرح تازه حذف شده بود. گزارش‌های آسیب بیماران شاهد ناسازگار بودند و رد شدند (s53)؛ با بهای جان انسان، بازسازی و بررسی هر گزارش ممکن بود و دیر انجام شد.",
@@ -671,7 +671,7 @@
     actor: "طراحان بر پایه نظریه و تجربه پل‌های پیشین، پایداری عرشه باریک را در برابر باد پذیرفتند.",
     claims: [
       { id: "k1", txt: "عرشه باریک با تیر ورقی کم‌عمق در برابر باد پایدار است", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 90, acted: true, stakes: HIGH }, truth: false }
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 90, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe"],
       why: "تعمیم از پل‌هایی با نسبت‌های دیگر به طرحی بیرون از دامنه آزموده‌شده، استقراء ناقص بود (s50). عامل پنهان (رفتار آیرودینامیکی عرشه انعطاف‌پذیر) در «قانونی» که طرح بر آن تکیه داشت کنترل نشده بود؛ اعتبار قانون تجربی مشروط به نبود دخالت عوامل پنهان است (s51).",
@@ -718,7 +718,7 @@
     actor: "تیم توسعه بر پایه کارکرد موفق در آریان ۴، نرم‌افزار را بی‌آزمون با مسیر تازه، برای آریان ۵ ایمن دانست.",
     claims: [
       { id: "k1", txt: "نرم‌افزار سامانه مرجع اینرسی آریان ۴ در آریان ۵ هم بی‌خطر کار می‌کند", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, hidden_ctrl: false, inquiry: INQ_SKIP, conf: 90, acted: true, stakes: HIGH }, truth: false }
+        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, inquiry: INQ_SKIP, conf: 90, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe", "st_resp"],
       why: "کارکرد موفق در یک دامنه (مسیر آریان ۴) به دامنه‌ای دیگر تعمیم داده شد: استقراء ناقص (s50). شرطی که سلامت را تضمین می‌کرد (حد سرعت افقی) عاملی بود که در وضع تازه تغییر کرده بود و کنترل نشد (s51). آزمون با داده‌های مسیر آریان ۵ ممکن بود و انجام نشد.",
@@ -1215,7 +1215,7 @@
     actor: "جوجه از تکرار روزانه، آینده را پیش‌بینی می‌کند.",
     claims: [
       { id: "k1", txt: "فردا هم صاحب مزرعه به من دانه می‌دهد", role: "اصلی",
-        f: { way: ISTQ, ind_complete: false, conf: 99, acted: true, stakes: HIGH }, truth: false }
+        f: { scope: "مورد بعدی", way: ISTQ, ind_complete: false, conf: 99, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "s50: استقراء ناقص حتی با افزایش شواهد به یقین نمی‌رسد؛ s51: تکرار داده حسی به‌تنهایی قانون نمی‌سازد و باید علت (چرا صاحب مزرعه دانه می‌دهد) با اصول عقلی کشف شود. اطمینان تقریباً کامل از شمار تکرارها برخاست، نه از شناخت علت.",
