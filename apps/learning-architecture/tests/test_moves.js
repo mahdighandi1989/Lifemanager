@@ -10,6 +10,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
+  // ۲۰۲۶-۱۰-۱۳: ۱۳ مسئلهٔ آماده «نمونهٔ آمادهٔ سازنده»اند و پیش‌فرض پنهان؛ این آزمون خودِ آن‌ها را می‌سنجد ⇒ روشن
+  await p.evaluate(() => { const st = APP.S.settings(); st.samples = true; APP.S.saveSettings(st); });
   await p.evaluate(() => { window.__puts = []; const o = APP.S.put; APP.S.put = function (r) { window.__puts.push(r.type + ':' + r.id); return o.apply(this, arguments); }; });
   const bad = async (lab) => { if (await p.locator('main .card.bad').count()) errors.push('render ' + lab + ': ' + await p.locator('main .card.bad').first().innerText()); };
   const go = async (...a) => { await p.evaluate(x => APP.go(...x), a); await p.waitForTimeout(120); await bad(a.join('/')); };
@@ -176,23 +178,27 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       stages: [{ id: 'n1', year: 1801, who: 'الف', ctx: 'c', q: 'q?', opts: [{ t: 'درست', ok: true, why: 'w' }, { t: 'نادرست', ok: false, why: 'w' }], move: 'm1', idea: 'i', st: [], lvl: 1, mv: ['mv_represent', 'mv_bogus'] },
         { id: 'n2', year: 1850, who: 'ب', ctx: 'c', q: 'q2?', opts: [{ t: 'درست', ok: true, why: 'w' }, { t: 'نادرست', ok: false, why: 'w' }], move: 'm2', idea: 'i', st: [], lvl: 2, mv: 'mv_contra' }],
       dead: [{ who: 'ج', year: 1820, idea: 'ایده', flaw: 'شکاف', st: [] }], lessons: [], drills: [] };
+    // وارسیِ پاسخ‌ها (۲۰۲۶-۱۰-۱۳): سه حل‌کنندهٔ ساختگی که گزینهٔ «درست» را از روی متن پیدا می‌کنند (شناسهٔ حرفی، ترتیبِ به‌هم‌ریخته)
+    window.__answerCheck = (user) => JSON.stringify(user.split(/\n(?=\[)/).map(b => { const m = /^\[([^\]]+)\]/.exec(b); if (!m) return null; const mm = /\n([a-h])\) درست\s*(\n|$)/.exec(b); return { id: m[1], pick: mm ? mm[1] : 'a', multi: false }; }).filter(Boolean));
     APP.callAI = function (sys, user) {
       window.__ai.push({ sys, user });
+      if (sys.indexOf(APP.PROB_CHECK_TAIL) >= 0) return Promise.resolve(window.__answerCheck(user));
       return Promise.resolve(window.__ai.length === 1 ? JSON.stringify(decomp) : 'نتیجه: ' + JSON.stringify([{ sid: 'n1', ok: true, issue: '' }, { sid: 'n2', ok: false, issue: 'سالِ ۱۸۵۰ در منابع نیست و نامطمئن است' }]));
     };
   });
   await go('e_prob', null, 'inject');
   await p.fill('#pbIn_title', 'مسئلهٔ تزریقی'); await p.fill('#pbIn_statement', 'صورت'); await p.fill('#pbIn_answer', 'پاسخ');
   const nRec0 = await p.evaluate(() => APP.S.all('eprob').length);
-  await p.click('main .pb-ai'); await p.waitForTimeout(200);
-  if (await p.evaluate(() => window.__ai.length) !== 0 || await p.evaluate(() => APP.S.all('eprob').length) !== nRec0) errors.push('AI ran without a source');
+  // منبع از ۲۰۲۶-۱۰-۱۳ اختیاری است (مالک: «مسئله را با جوابش تزریق کنم»)؛ مسیرِ بی‌منبع در test_own_problems.js
   await p.fill('#pbIn_src', 'کتابِ تاریخِ فیزیک، فصل ۳\nhttps://example.org/source');
   await p.click('main .pb-ai'); await p.waitForTimeout(600);
   const ai = await p.evaluate(() => window.__ai);
-  if (ai.length !== 2) errors.push('ai calls ' + ai.length);
+  if (ai.length !== 5) errors.push('ai calls ' + ai.length + ' (decomp + verifier + 3 answer checks)');
   else {
     if (!/mv_special/.test(ai[0].sys) || !/era/.test(ai[0].sys)) errors.push('PROB_SYS lacks mv/era');
     if (ai[1].sys !== await p.evaluate(() => APP.PROB_VERIFY_SYS) || !/example\.org/.test(ai[1].user) || !/"n2"/.test(ai[1].user)) errors.push('verifier call input');
+    const tail = await p.evaluate(() => APP.PROB_CHECK_TAIL);
+    if (![2, 3, 4].every(i => ai[i].sys.endsWith(tail) && /\[n1\]/.test(ai[i].user) && !/"ok"/.test(ai[i].user))) errors.push('answer-check calls (3 solvers, no ok labels)');
   }
   const rec = await p.evaluate(() => APP.S.all('eprob', r => r.status === 'pending' && r.p.title === 'مسئلهٔ تزریقی')[0]);
   info.verify = rec && rec.verify && rec.verify.flags.map(f => f.sid + ':' + f.state);
@@ -249,7 +255,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('.navlist[data-sys="epi"] .nav[data-v="e_prob"]'); await p.waitForTimeout(100);
   if (await p.evaluate(() => APP.lastSys) !== 'epi') errors.push('factory entry left the factory');
   await go('start');
-  const door = p.locator('main .door', { hasText: 'می‌خواهم حلِ مسئله‌های سخت را از روی مسیرِ واقعیِ کاشفانشان تمرین کنم' });
+  const door = p.locator('main .door', { hasText: 'می‌خواهم حل‌کنندهٔ یک مسئلهٔ سختِ حل‌شده و مسئله‌های مشابهش بشوم' });
   if (!(await door.count())) errors.push('start door missing');
   else { await door.locator('.btn').click(); await p.waitForTimeout(100); if (await p.evaluate(() => APP.state.view) !== 'e_prob') errors.push('door target'); }
 

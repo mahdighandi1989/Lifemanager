@@ -29,7 +29,14 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.putsKnotView = await putsDuring(() => p.evaluate(() => APP.go('kpractice', 'knot_t1')));
   info.transfer = await p.locator('main .kp-note').count();
 
-  // ۲) نمونه‌های کد برای F3: کوزه‌ها و قیدِ پنهان
+  // ۲۰۲۶-۱۰-۱۳: سازنده‌های کد «نمونهٔ آمادهٔ سازنده»اند (مسئلهٔ مالک نیستند) ⇒ پیش‌فرض پنهان؛ بخشِ هوش مصنوعی «از روی مسئلهٔ خودت» اول است
+  await p.evaluate(() => APP.go('kpractice', 'knot_t1', 'items'));
+  info.hiddenGens = await p.locator('main [data-gen]').count();
+  info.firstCard = (await p.locator('main section.card h2:has-text("ساخت"), main section.card h2:has-text("نمونه‌های تازه")').first().textContent() || '').trim();
+  if (info.hiddenGens !== 0) errors.push('code generators should be hidden by default');
+  if (!/مسئلهٔ خودت/.test(info.firstCard)) errors.push('AI-from-your-problem card should come first: ' + info.firstCard);
+  await p.evaluate(() => { const st = APP.S.settings(); st.samples = true; APP.S.saveSettings(st); });
+  // ۲) نمونه‌های کد برای F3: کوزه‌ها و قیدِ پنهان (با «نمونه‌های آمادهٔ سازنده»)
   await p.evaluate(() => APP.go('kpractice', 'knot_t1', 'items'));
   info.genBtns = await p.locator('main [data-gen]').count();
   await p.click('main [data-gen="jars"]'); await p.waitForTimeout(100);

@@ -13,6 +13,8 @@ const SHOTS = process.env.PB_SHOTS || path.join(__dirname, '..', 'dist');
   p.on('dialog', d => { errors.push('dialog ' + d.message()); d.dismiss(); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
+  // ۲۰۲۶-۱۰-۱۳: ۱۳ مسئلهٔ آماده «نمونهٔ آمادهٔ سازنده»اند و پیش‌فرض پنهان؛ این آزمون خودِ آن‌ها را می‌سنجد ⇒ روشن
+  await p.evaluate(() => { const st = APP.S.settings(); st.samples = true; APP.S.saveSettings(st); });
   const go = async (...a) => { await p.evaluate(x => APP.go(...x), a); await p.waitForTimeout(100); };
   const overflow = () => p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   const unlock = (pid, upto) => p.evaluate(([pid, upto]) => {
@@ -224,8 +226,13 @@ const SHOTS = process.env.PB_SHOTS || path.join(__dirname, '..', 'dist');
       stages: [{ id: 'n1', year: 1801, who: 'الف', ctx: 'c', q: 'q?', opts: [{ t: 'درست', ok: true, why: 'w' }, { t: 'نادرست', ok: false, why: 'w' }, { t: 'سوم', ok: false, why: 'w' }], move: 'm1', idea: 'i', lvl: 1 },
         { id: 'n2', year: -300, who: 'ب', ctx: 'c', q: 'q2?', opts: [{ t: 'درست', ok: true, why: 'w' }, { t: 'نادرست', ok: false, why: 'w' }], move: 'm2', idea: 'i', lvl: 2 }],
       dead: [{ who: 'ج', year: 1820, idea: 'ایده', flaw: 'شکاف' }], lessons: ['درس'], drills: [{ lvl: 1, q: 'q', opts: ['x', 'y'], a: 1, why: 'w' }] };
+    // وارسیِ پاسخ‌ها (۲۰۲۶-۱۰-۱۳): سه حل‌کنندهٔ ساختگیِ «درست‌کار» — گزینهٔ درست را از رکوردِ در انتظار برمی‌دارند و حرفش را در پرسشِ به‌هم‌ریخته پیدا می‌کنند
+    window.__answerCheck = (user) => { const r = APP.S.all('eprob', x => x.status === 'pending').slice(-1)[0]; const items = APP.probCheckItems(r.p);
+      return JSON.stringify(user.split(/\n(?=\[)/).map(b => { const m = /^\[([^\]]+)\]/.exec(b); if (!m) return null; const it = items.find(x => x.id === m[1]); const want = it ? it.opts[it.ok] : null;
+        const ln = b.split('\n').find(l => /^[a-h]\) /.test(l) && l.slice(3) === want); return { id: m[1], pick: ln ? ln[0] : 'z', multi: false }; }).filter(Boolean)); };
     APP.callAI = function (sys, user) {
       window.__ai.push({ sys, user });
+      if (sys.indexOf(APP.PROB_CHECK_TAIL) >= 0) return Promise.resolve(window.__answerCheck(user));
       if (window.__ai.length === 1) return Promise.resolve(JSON.stringify(decomp));
       const t = JSON.parse(user.slice(user.indexOf('تجزیه:\n') + 7));
       return Promise.resolve(JSON.stringify(t.stages.concat(t.dead).map(x => ({ sid: x.id, ok: x.id !== 'n2' || window.__ai.length > 2, issue: x.id === 'n2' ? 'سالِ ۳۰۰ پ.م. نامطمئن' : '' }))));

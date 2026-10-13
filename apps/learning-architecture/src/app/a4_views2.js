@@ -486,6 +486,15 @@
   };
 
   /* ---------- تنظیمات ---------- */
+  /* «نمونه‌های آمادهٔ سازنده» (مالک، ۲۰۲۶-۱۰-۱۳: «تو که نباید مسئله طرح کنی؛ قرار شد مسئله‌ها را من بدهم»):
+     ۶ شبیه‌سازِ نمایشیِ گره، ۶ سازندهٔ برنامه‌وارِ نمونه و ۱۳ مسئلهٔ بزرگِ آماده را سازنده نوشته، نه مالک. پیش‌فرض پنهان‌اند و فقط
+     با همین گزینه در تنظیمات دیده می‌شوند (قرنطینه، نه حذف — همان الگوی «مثال‌های ساختهٔ سامانه»، WORKLOG (2)).
+     داده‌ها و بک‌تستِ کارخانه دست نمی‌خورند (بک‌تست مستقیم از EPI_PROBLEMS می‌خواند). */
+  A.showSamples = function () { try { return S.settings().samples === true; } catch (e) { return false; } };
+  A.samplesNote = function (what) {
+    return h("p", { class: "small muted samples-note", dir: "rtl" }, what + " پنهان است، چون سازنده آن را نوشته و مسئلهٔ تو نیست. اگر خواستی ببینی: ",
+      h("button", { class: "linkish", type: "button", onclick: function () { A.go("settings"); } }, "تنظیمات › نمونه‌های آمادهٔ سازنده"), ".");
+  };
   A.V.settings = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("تنظیمات", "هوش مصنوعی و داده‌ها", "کلید هوش مصنوعی (اختیاری) و پشتیبان‌گیری از داده‌ها؛ برای هر دو سامانه."));
@@ -517,6 +526,13 @@
     }
     root.appendChild(h("div", { class: "card" }, h("h3", {}, "مثال‌های کارشده ساخته سامانه"), h("p", { class: "small" }, "مثال‌های ترید، بانک، بازی و سینما در بخش «اجرا» را سامانه نوشته است و در منابع شما نیست. متن «کاربرد عملی» PDF همیشه نمایش داده می‌شود."),
       h("label", { class: "chk", for: "hideGen" }, h("input", { type: "checkbox", id: "hideGen", checked: !!st.hideGen, onchange: function (e) { st.hideGen = e.target.checked; S.saveSettings(st); } }), "پنهان کردن مثال‌های ساخته سامانه")));
+    root.appendChild(h("div", { class: "card samples-card", dir: "rtl" }, h("h3", {}, "نمونه‌های آمادهٔ سازنده (نه مسئله‌های تو)"),
+      h("p", { class: "small" }, "مسئله‌ها را تو می‌دهی؛ گره‌گشا و «مسئله‌های بزرگ» از مسئله‌های خودت کار می‌کنند. این‌ها را سازنده از پیش نوشته و به‌طورِ پیش‌فرض پنهان‌اند:"),
+      h("ul", { class: "small" }, h("li", {}, "۶ شبیه‌سازِ نمایشیِ گره (کوزه‌های آب، ۲-۴-۶، نفرینِ دانش، حافظهٔ کاری، وضعیتِ پایانی، نردبان)"),
+        h("li", {}, "۶ سازندهٔ برنامه‌وارِ نمونه در ورزشِ گره (کوزهٔ آب، قاعدهٔ پنهان، کارت‌های واسون، نرخِ پایه، زنجیرهٔ حافظه، قیدِ پنهان)"),
+        h("li", {}, "۱۳ مسئلهٔ بزرگِ آماده (و حرکت‌ها و تمرین‌هایی که از آن‌ها ساخته می‌شود)")),
+      h("p", { class: "small muted" }, "پنهان‌بودن چیزی را پاک نمی‌کند: نمونه‌هایی که قبلاً ساخته‌ای و پیشرفتت می‌مانند، و پرونده‌های بک‌تستِ کارخانه همیشه سر جایشان‌اند."),
+      h("label", { class: "chk", for: "showSamples" }, h("input", { type: "checkbox", id: "showSamples", checked: st.samples === true, onchange: function (e) { st.samples = e.target.checked; S.saveSettings(st); A.toast(e.target.checked ? "نمونه‌های آماده نشان داده می‌شوند." : "نمونه‌های آماده پنهان شدند."); } }), "نمونه‌های آمادهٔ سازنده را هم نشان بده")));
     var jg = h("textarea", { id: "jg", rows: 3, "aria-label": "واژه‌های تخصصی (با ویرگول جدا کن)" }); jg.value = (st.jargon || []).join("، ");
     root.appendChild(h("div", { class: "card" }, h("h3", {}, "فهرست اصطلاحات شخصی برای تحلیلگر فاینمن"), h("p", { class: "small muted" }, "واژه‌هایی که در حوزه خودت اصطلاح فنی محسوب می‌شوند (با «،» جدا کن). فهرست پایه: " + C.JARGON_SEED.slice(0, 18).join("، ") + "…"),
       jg, h("button", { class: "btn", onclick: function () { st.jargon = jg.value.split(/[،,\n]/).map(function (x) { return x.trim(); }).filter(Boolean); S.saveSettings(st); A.toast("ذخیره شد."); } }, "ذخیره")));

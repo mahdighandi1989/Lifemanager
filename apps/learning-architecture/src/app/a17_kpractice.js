@@ -34,6 +34,17 @@
   A.krng = mulberry;
   A.kfa = fa;
   A.kltr = ltr;
+  /* «تقریباً همان مسئلهٔ اصلی؟» (۲۰۲۶-۱۰-۱۳): نمونهٔ ورزش باید ساختارِ مسئلهٔ کاربر را در ظاهری تازه داشته باشد، نه خودِ آن مسئله را
+     با یکی‌دو عددِ عوض‌شده. سنجه: همپوشانیِ مجموعهٔ واژه‌ها (ژاکارد، واژه‌های ≥ ۲ نویسه، ارقام یکسان‌شده) ≥ ۰٫۶. */
+  function wordSet(t) {
+    var o = {}; norm(t).replace(/[يى]/g, "ی").replace(/ك/g, "ک").split(/[^\p{L}\p{N}]+/u).forEach(function (w) { if (w.length >= 2) o[w] = 1; }); return o;
+  }
+  A.kNearCopy = function (a, b) {
+    var x = wordSet(a), y = wordSet(b), kx = Object.keys(x), ky = Object.keys(y);
+    if (kx.length < 4 || ky.length < 4) return false;
+    var inter = kx.filter(function (w) { return y[w]; }).length, uni = kx.length + ky.length - inter;
+    return uni > 0 && inter / uni >= 0.6;
+  };
 
   /* ---------- عددِ گویا (برای حسابِ دقیق، بی خطای اعشار) ---------- */
   function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a || 1; }
@@ -554,6 +565,7 @@
   /* گرهِ نمونه‌محوری که برای خانوادهٔ اصلی‌اش سازندهٔ کدی نیست (امروز: F1 «دانش و مفهوم» — ساختارش به محتوای خودِ کاربر وابسته است):
      صادقانه بگو که «ورزیده‌شده» فقط با نمونه‌های پاسخ‌دقیقِ وارسی‌شدهٔ هوش مصنوعی یا ساختهٔ خودِ کاربر (عددی/گزینه‌ای) ممکن است. */
   A.kcodeGap = function (k) {
+    if (!(A.showSamples && A.showSamples())) return null;   // سازنده‌های کد «نمونهٔ آمادهٔ سازنده»اند و پنهان (۲۰۲۶-۱۰-۱۳)
     var f = k && (Array.isArray(k.fam) ? k.fam[0] : k.fam);
     if (!f || (A.kmode && A.kmode(k) !== "items") || A.kgenFor(f).length) return null;
     return "برای خانوادهٔ «" + (A.kfamName ? A.kfamName(f) : f) + "» سازندهٔ برنامه‌وار (پاسخِ محاسبه‌شده با کد) نداریم. برای رسیدن به «ورزیده‌شده» دست‌کم ۳ شکلِ متفاوت از نمونه‌های پاسخ‌دقیق لازم است: ساختهٔ هوش مصنوعی که از سه حلِ مستقل گذشته (وارسی‌شده)، یا ساختهٔ خودت با پاسخِ عددی یا گزینه‌ای. نمونه‌های «وارسی‌نشده» و خودسنجی‌ها به معیار نمی‌روند.";
@@ -817,7 +829,8 @@
     "۴) هر نمونه دقیقاً یک پاسخِ قابلِ‌دفاع داشته باشد. پاسخ یا متنِ گزینهٔ درست نباید در prompt یا hints بیاید.\n" +
     "۵) ظاهرها متنوع و ساختار هم‌ریشه با گره؛ نمونهٔ «بدلی» (decoy=true) ظاهرش شبیه است ولی ساختارِ گره در آن نیست.\n" +
     "۶) visual: شکل را با کلمات دقیق توصیف کن؛ اختیاری: \"svg\":{\"shapes\":[{\"t\":\"rect\",\"x\":0,\"y\":0,\"w\":10,\"h\":10},{\"t\":\"circle\",\"cx\":0,\"cy\":0,\"r\":5},{\"t\":\"line\",\"x1\":0,\"y1\":0,\"x2\":5,\"y2\":5},{\"t\":\"text\",\"x\":0,\"y\":0,\"s\":\"…\"}]} در کادرِ ۲۰۰ در ۱۲۰.\n" +
-    "۷) فارسیِ روشن با نیم‌فاصلهٔ درست؛ نامِ آدمِ واقعی نیاور؛ دربارهٔ حالِ درونیِ شخصِ سوم حکم نکن؛ هیچ ادعای بالینی یا درمانی.";
+    "۷) فارسیِ روشن با نیم‌فاصلهٔ درست؛ نامِ آدمِ واقعی نیاور؛ دربارهٔ حالِ درونیِ شخصِ سوم حکم نکن؛ هیچ ادعای بالینی یا درمانی.\n" +
+    "۸) «مسئله(های) اصلیِ کاربر» که آمده، دانه است: هر نمونه (جز بدلی) باید همان ساختارِ عمیق و همان تلهٔ آن مسئله را داشته باشد، در ظاهر، زمینه و عددهای کاملاً تازه. نسخهٔ کمی‌تغییریافتهٔ خودِ آن مسئله نساز، پاسخش را تکرار نکن و از مسئله‌های معروفِ کتاب‌ها (مثلِ کوزه‌های آب یا کارت‌های واسون) به‌جای آن استفاده نکن.";
   var SOLVERS = [
     "تو حل‌کنندهٔ دقیقی هستی. مسئله را مستقل و گام‌به‌گام حل کن.",
     "تو منتقدِ بدبینی هستی: اول دنبالِ ابهام، دو پاسخِ قابلِ‌دفاع یا ایراد در صورت بگرد، سپس مسئله را حل کن.",
@@ -847,10 +860,29 @@
   }
   A.kstripNames = function (s, names) { return stripper(names)(s); };
   /* متنِ دقیقِ درخواستِ سازنده (همان که در پیش‌نمایشِ در دیده می‌شود؛ حذفِ نام روی کلِ همین متن اعمال می‌شود) */
+  /* مسئله(های) اصلیِ خودِ کاربر — دانهٔ نمونه‌ها (مالک، ۲۰۲۶-۱۰-۱۳: «نمونه‌های بیشتری … مربوط به همون گره»؛ تا پیش از این فقط
+     کارتِ گره فرستاده می‌شد و هوش مصنوعی مسئلهٔ واقعیِ کاربر را نمی‌دید). دو موقعیتِ تازه‌ترِ پیوندخورده؛ برای گره‌های خصوصی
+     (هیجان/باور دربارهٔ خود) فقط صورت، پاسخ و «کجا گیر کردم» — نه روایت و فکرها. متن پیش از ارسال در دروازه دیده و نام‌ها حذف می‌شوند. */
+  A.kSeedCases = function (k) {
+    var ids = A.kattachCases ? A.kattachCases(k) : (k.cases || []);
+    return ids.map(function (id) { return S.get(id); }).filter(function (c) { return c && c.type === "kcase"; }).slice(0, 2);
+  };
+  function seedText(k) {
+    var priv = A.kprivateKnot ? A.kprivateKnot(k) : false;
+    var F = [["statement", "صورتِ مسئله"], ["answer", "پاسخِ درست"], ["answerHow", "از کجا معلوم است"], ["stuckAt", "کجا گیر کرد"]];
+    if (!priv) F = F.concat([["what", "چه شد"], ["expected", "چه انتظار داشت"], ["actual", "در واقع چه شد"], ["thoughts", "چه فکرهایی کرد/چه کرد"]]);
+    return A.kSeedCases(k).map(function (c, i) {
+      var it = c.intake || {}, L = [];
+      F.forEach(function (f) { var v = String(it[f[0]] || "").trim(); if (v) L.push(f[1] + ": " + v); });
+      return L.length ? "مسئلهٔ اصلیِ " + fa(i + 1) + " (" + (c.title || "موقعیت") + "):\n" + L.join("\n") : "";
+    }).filter(Boolean).join("\n\n");
+  }
+  A.kSeedText = seedText;
   A.kAsk = function (k, n) {
     var mode = A.kmode(k), forms = mode === "exp" ? ["real", "verbal", "real"] : ["numeric", "visual", "verbal", "real", "abstract"];
     n = n || 4;
-    return "کارتِ گره:\n" + knotCard(k, function (x) { return x; }) + "\n\nخواسته: " + fa(n) + " نمونهٔ تازه با این شکل‌ها: " + forms.slice(0, n).map(function (f) { return f + " (" + FORMS[f] + ")"; }).join("، ") +
+    var seed = seedText(k);
+    return "کارتِ گره:\n" + knotCard(k, function (x) { return x; }) + (seed ? "\n\n" + seed + "\n(نمونه‌ها از روی همین مسئله(ها) ساخته شوند: همان ساختار و تله، ظاهرِ تازه؛ نه کپیِ آن.)" : "") + "\n\nخواسته: " + fa(n) + " نمونهٔ تازه با این شکل‌ها: " + forms.slice(0, n).map(function (f) { return f + " (" + FORMS[f] + ")"; }).join("، ") +
       " + یک نمونهٔ بدلی (decoy=true). " + (mode === "exp" ? "این گره اجتماعی/رفتاری است: atype=rubric (معیارهای مشاهده‌پذیر) یا choice فقط اگر پاسخ واقعاً یکتاست." : "فقط atype=int یا choice.") +
       " سطحِ دشواری را از ۱ تا ۳ متنوع کن.";
   };
@@ -919,6 +951,8 @@
       arr.slice(0, n + 2).forEach(function (raw) {
         chain = chain.then(function () {
           var bad = validAI(raw); if (bad) { rep.rejected.push({ prompt: raw && raw.prompt, why: "ساختار: " + bad }); return; }
+          var orig = A.kSeedCases(k).map(function (c) { return (c.intake || {}).statement || ""; }).filter(function (x) { return String(x).trim(); });
+          if (orig.some(function (o) { return A.kNearCopy(raw.prompt, o); })) { rep.rejected.push({ prompt: raw.prompt, why: "تقریباً همان مسئلهٔ اصلیِ خودت است، نه نمونه‌ای تازه با همان ساختار" }); return; }
           if (mode !== "exp" && raw.atype === "rubric") { rep.rejected.push({ prompt: raw.prompt, why: "برای این گره فقط نمونهٔ پاسخ‌دار پذیرفته است" }); return; }
           var it = baseItem(k.id, { form: raw.form, prompt: String(raw.prompt), answer: raw.atype === "rubric" ? "" : String(raw.answer).trim(), atype: raw.atype, choices: raw.atype === "choice" ? raw.choices.map(function (c) { return { id: String(c.id), t: String(c.t) }; }) : null,
             rubric: raw.atype === "rubric" ? raw.rubric.map(String) : null, hints: Array.isArray(raw.hints) ? raw.hints.map(String) : null, deep: String(raw.deep || ""), trap: String(raw.trap || ""), explain: String(raw.explain || ""),
@@ -1059,8 +1093,11 @@
   function genPanel(k) {
     var box = h("div", { class: "col gap" }), mode = A.kmode(k), fams = famsOf(k);
     var keys = []; fams.forEach(function (f) { A.kgenFor(f).forEach(function (x) { if (keys.indexOf(x) < 0) keys.push(x); }); });
-    var c1 = h("section", { class: "card" }, h("h2", {}, "ساختِ برنامه‌وار (پاسخِ محاسبه‌شده)"));
-    if (keys.length) {
+    /* سازنده‌های کد مسئله‌های آمادهٔ کتاب‌ها را می‌سازند، نه مسئلهٔ مالک را ⇒ فقط با «نمونه‌های آمادهٔ سازنده» (۲۰۲۶-۱۰-۱۳) و پایینِ صفحه */
+    var samples = !!(A.showSamples && A.showSamples());
+    var c1 = h("section", { class: "card kp-samples" }, h("h2", {}, "ساختِ برنامه‌وار — نمونهٔ آمادهٔ سازنده (مسئلهٔ تو نیست)"));
+    if (!samples) c1 = null;
+    else if (keys.length) {
       c1.appendChild(h("p", { class: "small" }, "پاسخِ این نمونه‌ها با کد محاسبه می‌شود، نه با حدس؛ هر نمونه با یک «دانه» ذخیره می‌شود و دوباره همان ساخته می‌شود. هر دسته: ۳ نمونه در شکل‌های مختلف + ۱ بدلی."));
       var lv = h("select", { id: "kpLv", "aria-label": "سطحِ دشواری" }, [1, 2, 3].map(function (l) { return h("option", { value: l }, "سطحِ " + fa(l)); }));
       c1.appendChild(h("div", { class: "row gap wrap" }, h("label", { for: "kpLv", class: "small" }, "دشواری:"), lv));
@@ -1073,10 +1110,11 @@
           } }, "ساختِ ۴ نمونه")));
       });
     } else c1.appendChild(h("p", { class: "small" }, "برای خانوادهٔ «" + A.kfamName(famOf(k)) + "» سازندهٔ برنامه‌وار نداریم: ساختارِ این گره به محتوای خودت وابسته است. با هوش مصنوعی (وارسی‌شده) یا با قالبِ پایین خودت نمونه بساز." + (mode === "exp" ? " این گره رفتاری/اجتماعی است و اصلش «آزمایشِ واقعی» است (زبانهٔ «آزمایش‌ها»)." : "")));
-    var gap0 = A.kcodeGap(k); if (gap0) c1.appendChild(h("p", { class: "small warnline kp-codegap" }, gap0));
-    box.appendChild(c1);
+    var gap0 = c1 && A.kcodeGap(k); if (gap0) c1.appendChild(h("p", { class: "small warnline kp-codegap" }, gap0));
 
-    var c2 = h("section", { class: "card" }, h("h2", {}, "ساخت با هوش مصنوعی (سه حلِ مستقل)"));
+    var c2 = h("section", { class: "card" }, h("h2", {}, "نمونه‌های تازه از روی مسئلهٔ خودت (هوش مصنوعی + سه حلِ مستقل)"));
+    var seedN = A.kSeedCases(k).filter(function (c) { return String((c.intake || {}).statement || (c.intake || {}).what || "").trim(); }).length;
+    c2.appendChild(h("p", { class: "small" + (seedN ? "" : " warnline") }, seedN ? "دانه: " + fa(seedN) + " موقعیتِ خودت که به این گره پیوند خورده (صورت، پاسخ، کجا گیر کردی). نمونه‌ها همان ساختار و تله را در ظاهری تازه دارند؛ نمونه‌ای که تقریباً همان مسئلهٔ اصلی باشد کنار می‌رود." : "هنوز موقعیتی با صورت یا شرحِ ماجرا به این گره پیوند نخورده؛ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند."));
     c2.appendChild(h("p", { class: "small" }, "سازنده فقط JSON ِ ساختاری با پاسخِ محدود (عددِ صحیح یا شناسهٔ گزینه" + (mode === "exp" ? "، یا روبریک برای موقعیت‌های اجتماعی" : "") + ") می‌دهد. سپس هر نمونه سه بار، با سه دستورِ متفاوت و بی‌دیدنِ پاسخ، حل می‌شود (درِ هوش مصنوعیِ این صفحه دما نمی‌گیرد؛ تفاوت از دستورهاست). فقط اگر هر سه با پاسخِ سازنده یکی باشند، هیچ‌کدام دو پاسخ نبینند و داوریِ «ساختارِ گره هست/نیست» با بدلی‌بودن بخواند، نمونه «وارسی‌شده» است. وگرنه با برچسبِ «وارسی‌نشده» نگه داشته و به‌طورِ پیش‌فرض پنهان می‌شود. نمونه‌ای که پاسخش در صورت پیداست اصلاً نگه داشته نمی‌شود."));
     var out = h("div", { class: "col gap", "aria-live": "polite" });
     if (!(k.principle || k.deep)) c2.appendChild(h("p", { class: "small bad" }, "اول «ساختارِ عمیق» ِ کارتِ گره را بنویس (قدمِ ۴)؛ بی آن نمونه‌سازی معنا ندارد."));
@@ -1097,6 +1135,7 @@
     c2.appendChild(out);
     box.appendChild(c2);
     box.appendChild(userTemplate(k));
+    if (c1) box.appendChild(c1);
     return box;
   }
   function userTemplate(k) {

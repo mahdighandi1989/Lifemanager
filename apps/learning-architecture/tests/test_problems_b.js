@@ -151,6 +151,7 @@ let pw = null; try { pw = require('playwright'); } catch (e) { pw = null; }
     page.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
     await page.route('**/fonts.googleapis.com/**', r => r.abort());
     await page.goto('file://' + DIST); await page.waitForSelector('.nav'); await page.waitForTimeout(300);
+    await page.evaluate(() => { const st = APP.S.settings(); st.samples = true; APP.S.saveSettings(st); });  // نمونه‌های آماده پیش‌فرض پنهان‌اند (۲۰۲۶-۱۰-۱۳)
     const ids = await page.evaluate(() => (window.EPI_PROBLEMS || []).map(p => p.id));
     EXPECT.forEach(id => E(ids.includes(id), 'built bundle lacks ' + id));
     await page.evaluate(() => APP.go('e_prob')); await page.waitForTimeout(150);

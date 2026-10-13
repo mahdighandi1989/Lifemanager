@@ -675,6 +675,8 @@
       h("button", { class: "btn sm", onclick: function () { A.knotSafetyCard(function () { kc.safetyAck = now(); H.put(); redraw(); }); } }, "خواندنِ پیام")));
     var body = cur === "in" ? intakeStep(H) : cur === "s0" ? premiseStep(H) : cur === "s1" ? rankStep(H) : cur === "s2" ? probeStep(H) : cur === "s3" ? rootStep(H) : unpackStep(H);
     root.appendChild(h("div", { class: "kn-body" }, body));
+    /* «🧪 شبیه‌سازِ همین مسئله» (۲۰۲۶-۱۰-۱۳): شبیه‌ساز از مسئلهٔ خودِ مالک، با همان موتورِ «مسئله‌های بزرگ» (a8) */
+    if (live && isProblem(kc) && A.probCaseBox) { try { var pcb = A.probCaseBox(kc, seenIso(kc)); if (pcb) root.appendChild(pcb); } catch (e) { console.warn(e); } }
     var oi = ORDER.indexOf(cur);
     root.appendChild(h("div", { class: "row between gap kn-nav" },
       oi > 0 ? h("button", { class: "btn ghost", onclick: function () { goStep(H, ORDER[oi - 1]); } }, "→ قدمِ قبل") : h("span"),
@@ -1064,6 +1066,7 @@
   }
   function simLinks(fam) {
     if (!A.knotSimFor || !A.KSIM) return null;
+    if (!(A.showSamples && A.showSamples())) return null;   // نمایش‌های آماده فقط با «نمونه‌های آمادهٔ سازنده» (۲۰۲۶-۱۰-۱۳)
     var keys = []; try { keys = A.knotSimFor(fam) || []; } catch (e) { keys = []; }
     keys = keys.filter(function (k) { return A.KSIM[k]; });
     if (!keys.length) return null;

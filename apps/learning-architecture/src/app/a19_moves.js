@@ -277,10 +277,15 @@
     var root = h("div", { class: "page mv", dir: "rtl" });
     var tagged = allTagged(), ps = probs();
     root.appendChild(A.head("حلِ مسئله", "حرکت‌های حلِ مسئله",
-      "۱۶ حرکتِ تکرارشونده که در مسیرِ واقعیِ حلِ مسئله‌های بزرگ قاطع بوده‌اند. هر حرکت را در مسئله‌های رشته‌های مختلف ببین، بعد با «تمرینِ درهم» تشخیصش را بیازما: پیش از دیدنِ گزینه‌ها، اول بگو کدام حرکت این‌جا کار می‌کند.",
+      "۱۶ حرکتِ تکرارشونده در حلِ مسئله. هر حرکت را در گام‌های مسئله‌هایی که خودت وارد کرده‌ای ببین، بعد با «تمرینِ درهم» تشخیصش را بیازما: پیش از دیدنِ گزینه‌ها، اول بگو کدام حرکت این‌جا کار می‌کند.",
       h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", onclick: function () { A.go("e_prob"); } }, "🧗 مسئله‌های بزرگ"))));
     root.appendChild(transferNote());
-    root.appendChild(h("p", { class: "small muted" }, fa(tagged.length) + " گام از " + fa(ps.length) + " مسئله برچسبِ حرکت دارند."));
+    /* حرکت‌ها فقط از مسئله‌هایی پر می‌شوند که خودِ مالک وارد کرده (۲۰۲۶-۱۰-۱۳)؛ نمونه‌های آمادهٔ سازنده فقط با گزینهٔ تنظیمات */
+    if (!ps.length) root.appendChild(h("section", { class: "card mv-empty", dir: "rtl" }, h("h2", {}, "هنوز مسئله‌ای وارد نکرده‌ای"),
+      h("p", {}, "این صفحه گام‌های مسئله‌هایی را که خودت آورده‌ای بر اساسِ «حرکتِ قاطعِ» هر گام کنار هم می‌گذارد و تمرینِ درهم را از همان‌ها می‌سازد. با اولین مسئلهٔ تأییدشده (از «مسئله‌های بزرگ» یا «شبیه‌سازِ همین مسئله» در گره‌گشا) پر می‌شود."),
+      h("div", { class: "row gap wrap" }, h("button", { class: "btn", onclick: function () { A.go("e_prob", null, "inject"); } }, "افزودنِ مسئلهٔ تو")),
+      A.samplesNote ? A.samplesNote("گام‌های «۱۳ مسئلهٔ آماده»ای که سازنده نوشته") : null));
+    root.appendChild(h("p", { class: "small muted" }, fa(tagged.length) + " گام از " + fa(ps.length) + " مسئله برچسبِ حرکت دارند" + (A.showSamples && A.showSamples() ? " (با نمونه‌های آمادهٔ سازنده)" : " (فقط مسئله‌های خودت)") + "."));
     root.appendChild(h("div", { class: "mv-grid" }, MOVES.map(function (m) {
       var st = A.moveStages(m.id), np = {}; st.forEach(function (x) { np[x.p.id] = 1; });
       return h("section", { class: "card mv-card", style: { "--pc": "var(--p" + (m.n % 9) + ")" }, "data-mv": m.id },

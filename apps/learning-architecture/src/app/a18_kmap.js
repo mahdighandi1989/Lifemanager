@@ -258,8 +258,9 @@
   /* ---------------- منو: «گره‌گشا» ---------------- */
   (function addNav() {
     var NAV = A.NAV; if (!Array.isArray(NAV)) return;
-    var mine = [["kmap", "🗺️ نقشهٔ ذهن", "گره‌ها، پیوندهایشان و روندِ باز شدن؛ کالیبراسیونِ ورزش‌ها"],
-      ["ksims", "🧪 شبیه‌سازهای گره", "کوزه‌های آب، ۲-۴-۶، نفرینِ دانش، حافظهٔ کاری، وضعیتِ پایانی، نردبانِ راهنمایی"]];
+    /* «🧪 شبیه‌سازهای گره» دیگر در منو نیست (مالک، ۲۰۲۶-۱۰-۱۳): شش نمایشِ آماده‌اند، نه مسئله‌های مالک؛ فقط با «نمونه‌های آمادهٔ
+       سازنده» در تنظیمات دیده می‌شوند (A.showSamples). */
+    var mine = [["kmap", "🗺️ نقشهٔ ذهن", "گره‌ها، پیوندهایشان و روندِ باز شدن؛ کالیبراسیونِ ورزش‌ها"]];
     var have = function (k) { return NAV.some(function (n) { return Array.isArray(n) && n[0] === k; }); };
     var gi = -1;
     NAV.forEach(function (n, i) { if (n && n.g && /گره/.test(n.g)) gi = i; });
@@ -281,7 +282,7 @@
         h("p", { class: "small" }, "نقشه از «گره‌گشا» پر می‌شود: یک «موقعیت» ثبت کن (جایی که گیر کردی، کاری کردی که نمی‌فهمی چرا، یا نتیجه‌ای گرفتی که نمی‌فهمی)، از تونل‌ها بگذر، و در قدمِ ۳ گرهِ ریشه را خودت تأیید کن. هر گرهِ تأییدشده این‌جا یک دایره می‌شود؛ گره‌هایی که در یک موقعیت با هم ریشه بوده‌اند به هم وصل می‌شوند."),
         h("div", { class: "row gap wrap", style: { justifyContent: "center" } },
           A.V.kcases ? h("button", { class: "btn", onclick: function () { A.go("kcases"); } }, "رفتن به «گره‌گشا»") : h("span", { class: "small muted" }, "(بخشِ ثبتِ موقعیت هنوز در این نسخه بارگذاری نشده.)"),
-          h("button", { class: "btn ghost", onclick: function () { A.go("ksims"); } }, "🧪 شبیه‌سازهای گره"))));
+          samplesOn() ? h("button", { class: "btn ghost", onclick: function () { A.go("ksims"); } }, "🧪 شبیه‌سازهای گره (نمونه‌های آماده)") : null)));
       return root;
     }
     var byId = {}; knots.forEach(function (k) { byId[k.id] = k; });
@@ -536,7 +537,7 @@
           } }, "پیوند بده"), msg));
       }
       /* شبیه‌سازهای مرتبط */
-      var sims = A.knotSimFor(k.fam);
+      var sims = samplesOn() ? A.knotSimFor(k.fam) : [];
       if (sims.length) drawer.appendChild(h("div", { class: "row gap wrap small" }, h("span", { class: "muted" }, "شبیه‌سازِ مرتبط:"),
         sims.map(function (key) { return h("button", { type: "button", class: "linkish", onclick: function () { A.go("ksims", key); } }, A.KSIM[key].title); })));
       /* کارها */
@@ -642,6 +643,7 @@
 
   /* ======================= شبیه‌سازها ======================= */
   var KSIM = A.KSIM = A.KSIM || {};
+  function samplesOn() { return !!(A.showSamples && A.showSamples()); }
   function reg(key, o) { if (!KSIM[key]) KSIM[key] = o; }
   A.knotSimFor = function (fam) {
     if (fam && typeof fam === "object") fam = fam.fam;
@@ -1051,6 +1053,11 @@
   /* ---------------- نمای شبیه‌سازها ---------------- */
   A.V.ksims = function (key) {
     var root = h("div", { class: "page ks-page", dir: "rtl" }), keys = Object.keys(KSIM);
+    if (!samplesOn()) {
+      root.appendChild(A.head("گره‌گشا", "🧪 شبیه‌سازهای گره", null));
+      root.appendChild(A.samplesNote ? A.samplesNote("این شش شبیه‌سازِ نمایشی") : h("p", { class: "small muted" }, "این بخش پنهان است."));
+      return root;
+    }
     if (key && !KSIM[key]) key = null;
     root.appendChild(A.head("گره‌گشا", "🧪 شبیه‌سازهای گره", "هر شبیه‌ساز یک سازوکارِ شناخته‌شده را با یک تمرینِ کوتاه نشان می‌دهد. همه «نمایشی»اند: نتیجه‌شان شاهدی کوچک دربارهٔ همان لحظه است، نه تشخیص؛ و هیچ‌چیز از آن‌ها ذخیره نمی‌شود."));
     root.appendChild(h("nav", { class: "row gap wrap ks-index", "aria-label": "شبیه‌سازها" },

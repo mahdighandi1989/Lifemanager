@@ -15,7 +15,8 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
 
   // منو
   chk(await p.locator('.nav[data-v="kmap"]').count() === 1, 'nav kmap missing');
-  chk(await p.locator('.nav[data-v="ksims"]').count() === 1, 'nav ksims missing');
+  // ۲۰۲۶-۱۰-۱۳: شش شبیه‌سازِ نمایشی «نمونهٔ آمادهٔ سازنده»اند — در منو نیستند و پیش‌فرض پنهان‌اند
+  chk(await p.locator('.nav[data-v="ksims"]').count() === 0, 'nav ksims should be gone');
 
   // ۱) حالتِ خالی
   await p.click('.nav[data-v="kmap"]'); await p.waitForTimeout(100);
@@ -92,7 +93,7 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
   info.drawer = { open: await p.locator('main .km-drawer:not([hidden])').count(), title: await p.locator('#kmDrT').textContent(), focus: await p.evaluate(() => document.activeElement && document.activeElement.id),
     cases: await p.locator('main .km-drawer h3:has-text("موقعیت‌ها")').textContent(), open_btn_disabled: await p.locator('main .km-drawer .btn:has-text("باز کن")').isDisabled(),
     why: await p.locator('main .km-drawer .km-why').textContent(), sim: await p.locator('main .km-drawer .linkish:has-text("کوزه‌های آب")').count() };
-  chk(info.drawer.open === 1 && info.drawer.title === 'اولین راه را تا ته رفتن' && info.drawer.focus === 'kmDrT' && /۲/.test(info.drawer.cases) && info.drawer.open_btn_disabled === !(await p.evaluate(() => !!APP.V.kpractice)) && info.drawer.sim === 1, 'drawer ' + JSON.stringify(info.drawer));
+  chk(info.drawer.open === 1 && info.drawer.title === 'اولین راه را تا ته رفتن' && info.drawer.focus === 'kmDrT' && /۲/.test(info.drawer.cases) && info.drawer.open_btn_disabled === !(await p.evaluate(() => !!APP.V.kpractice)) && info.drawer.sim === 0, 'drawer (no sample-sim link by default) ' + JSON.stringify(info.drawer));
   // ۴) پیوندِ تازه از کشو: دقیقاً یک S.put
   await p.evaluate(() => { const o = APP.S.put; window.__puts = []; APP.S.put = function (r) { window.__puts.push(r.id); return o.apply(this, arguments); }; });
   await p.selectOption('main .km-addlink select[aria-label="نوعِ پیوند"]', 'related');
@@ -165,8 +166,10 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
   await p.evaluate(() => APP.go('kmap')); await p.waitForTimeout(80);
   await p.screenshot({ path: path.join(__dirname, '..', 'dist', 'shot_kmap.png'), fullPage: true });
 
-  // ۱۰) شبیه‌سازها
-  await p.evaluate(() => { APP.KSIM_MS = 60; APP.go('ksims'); }); await p.waitForTimeout(100);
+  // ۱۰) شبیه‌سازها — پیش‌فرض پنهان (فقط یادداشت)، سپس با «نمونه‌های آمادهٔ سازنده»
+  await p.evaluate(() => { APP.go('ksims'); }); await p.waitForTimeout(100);
+  chk(await p.locator('main .ks-sim').count() === 0 && await p.locator('main .samples-note').count() === 1, 'sims hidden by default (note shown)');
+  await p.evaluate(() => { const st = APP.S.settings(); st.samples = true; APP.S.saveSettings(st); APP.KSIM_MS = 60; APP.go('ksims'); }); await p.waitForTimeout(100);
   info.sims = await p.evaluate(() => ({ keys: Object.keys(APP.KSIM), f3: APP.knotSimFor('F3'), f8: APP.knotSimFor({ fam: 'F8' }), cards: document.querySelectorAll('main .ks-sim').length, demo: document.querySelectorAll('main .ks-sim .ks-demo').length, notInCourse: !Object.keys(APP.COURSE_SIM || {}).some(k => /jars|w246|curse/.test(k)) }));
   chk(JSON.stringify(info.sims.keys) === '["jars","w246","curse","wm","endstate","ladder"]' && info.sims.cards === 6 && info.sims.demo === 6 && info.sims.f3.includes('jars') && info.sims.f3.includes('ladder') && JSON.stringify(info.sims.f8) === '["curse"]' && info.sims.notInCourse, 'sims ' + JSON.stringify(info.sims));
   const sim = k => p.locator(`main .ks-sim[data-ksim="${k}"]`);
