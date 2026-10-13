@@ -27,6 +27,7 @@
 | `backtest/corpus/*.json` | پیکرهٔ بک‌تستِ پیوسته (افزودهٔ هر دور؛ واقعی + انتزاعی، رمزگذاریِ کور) | فقط با `tools/epi_backtest.js add`؛ اصلاحِ یافته یا `excluded` با دلیل |
 | `backtest/ledger.json`, `findings.json`, `results.json`, `proposals.json` | دفترِ دورها، یافته‌ها و سرانجامشان، حکمِ هر واقعه، پیشنهادهای منتظرِ مالک | `ledger/results` **هرگز** (ساختهٔ `run`)؛ `findings` فقط علت/اصلاح/وضع؛ `proposals` افزودن |
 | `tools/epi_backtest.js` | اجراکنندهٔ قطعیِ بک‌تستِ پیوسته (`status`/`add`/`run`) — همان موتورِ صفحه در Node | بله (با احتیاط؛ آزمون: `tests/test_backtest_tool.js`) |
+| `src/app/epi_found.js` | مبنای درجه‌ها: اصولِ بدیهی، قضیه‌ها با برهان، اشتقاقِ هر سقف (B/S/O/X)، سنجشِ پایه فقط با نمونهٔ بی‌گزینش و کافی | بله، ولی هر قضیهٔ تازه برهان از اصولِ موجود می‌خواهد؛ آزمون: `tests/test_found.js`. عددِ برازش‌شده روی پیکره ممنوع |
 | `docs/VERIFIED_BOOKLET.md` | «جزوهٔ متقن» — هر بخشِ جزوه با وضعِ آزموده‌شدنش | **هرگز** (ساختهٔ `run`) |
 | `sources/` | متن‌های خامِ اسنادِ مالک و جزوه (برای `tools/parse_epi.py`) | نه |
 | `tests/*.js` | آزمون‌های مرورگرِ سازنده (Playwright روی `dist/learning-architecture.html`) | بله |

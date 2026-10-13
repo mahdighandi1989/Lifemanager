@@ -48,22 +48,38 @@
   /* ---------- اجرای یک پرونده از لوله‌کشی ---------- */
   function rulesFor(cfg) { var R = W.EPI_RULES || []; return cfg && cfg.books ? R.filter(function (r) { return cfg.books.indexOf(r.book) >= 0; }) : R; }
   function wOf(cfg, r) { var w = cfg && cfg.w && cfg.w[r.id]; return w == null ? 1 : w; }
+  /* سقفِ یک قاعده: پیش‌فرض همان عددِ جزوه/سامانه؛ cfg.derived (آزمایشی، پیش‌فرض خاموش) ⇒ برای قاعده‌های «بدیهی‌پایه» کرانِ قضیه
+     (EPI_FOUND.DER) — فقط برای سنجیدنِ اثر در حافظه؛ هیچ سقفی خودکار عوض نمی‌شود (تصمیم با مالک) */
+  function capOf(cfg, r) {
+    var dv = cfg && cfg.derived, FD = W.EPI_FOUND;   // true ⇒ همه؛ آرایه ⇒ فقط همین قاعده‌ها (برای سنجیدنِ اثرِ تک‌تکِ پیشنهادها)
+    var d = dv && (dv === true || dv.indexOf(r.id) >= 0) && FD && FD.DER[r.id];
+    if (!d || (d.k !== "B" && d.k !== "X")) return r.cap;
+    if (typeof d.bound === "number") return d.bound;
+    if (d.bound === "<50") return Math.min(r.cap, 49);
+    return r.cap;
+  }
+  X.capOf = capOf;
   X.runClaim = function (k, cfg, R) {
     R = R || rulesFor(cfg); var f = k.f || {};
-    var ceil = 100, bind = null, fired = [], stScore = {};
+    var ceil = 100, bind = null, ties = [], fired = [], stScore = {};
     R.forEach(function (r) {
       if (!X.cond(r.when, f)) return;
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
-      if (r.eff === "cap") { var c = 100 - w * (100 - r.cap); if (c < ceil) { ceil = c; bind = r; } }
+      if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r)); if (c < ceil) { ceil = c; bind = r; ties = [r]; } else if (c === ceil && bind) ties.push(r); }
       else if (r.eff === "flag") stScore[r.st] = (stScore[r.st] || 0) + w;
     });
     var flags = [];
     Object.keys(stScore).forEach(function (st) { if (stScore[st] >= ((cfg && cfg.th) || X.COURT.th)) flags.push({ st: st, kind: "flag", rules: fired.filter(function (id) { var r = X.RM[id]; return r.eff === "flag" && r.st === st && wOf(cfg, r) > 0; }) }); });
     var tol = cfg && cfg.tol != null ? cfg.tol : X.COURT.tol;
     var conf = has(f, "conf") ? +f.conf : null;
-    var over = conf != null && conf > ceil + tol;
+    // cfg.deg (آزمایشی، پیش‌فرض خاموش): مقایسه میانِ «درجه»های جزوه (یقین/ظن/شک/وهم/کذب — EPI_FOUND.DEG) به‌جای عدد + تحملِ قراردادیِ ۱۰
+    var FD = W.EPI_FOUND;
+    var over = conf != null && (cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(ceil) : conf > ceil + tol);
     if (over) flags.push({ st: bind ? bind.st : "st_grade", kind: "over", rules: bind ? [bind.id] : [], gap: Math.round(conf - ceil) });
+    // با کرانِ قضیه چند شرط هم‌زمان به «حداکثر شک» می‌رسند و هر کدام به‌تنهایی دلیلِ بیش‌اطمینانی است ⇒ همهٔ ایستگاه‌هایشان
+    // (فقط در حالتِ آزمایشیِ derived؛ پیش‌فرض همان «اولین سقفِ کمینه» می‌ماند)
+    if (over && cfg && cfg.derived) ties.forEach(function (r) { if (r !== bind && !flags.some(function (x) { return x.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - ceil) }); });
     flags.sort(function (a, b) { return (PIDX[a.st] || 0) - (PIDX[b.st] || 0); });
     return { id: k.id, ceil: Math.round(ceil), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
   };
@@ -200,7 +216,7 @@
     var maxVars = Math.max(1, Math.floor(X.split.neffOf(IS) / X.COURT.perVar) - 1);
     vars = vars.slice(0, maxVars);
     var grid = [0, 0.25, 0.5, 0.75, 1], tolGrid = [0, 5, 10, 15, 20, 30];
-    function clone(c) { return { w: JSON.parse(JSON.stringify(c.w || {})), tol: c.tol, th: c.th, books: c.books, name: c.name }; }
+    function clone(c) { return { w: JSON.parse(JSON.stringify(c.w || {})), tol: c.tol, th: c.th, books: c.books, name: c.name, deg: c.deg, derived: c.derived }; }
     function score(c) { evals++; var e = X.evaluate(IS, c); return e.lb + 1e-4 * e.score; }
     var best = clone(base), bestS = score(best);
     for (var rs = 0; rs < (opt.restarts || 3); rs++) {

@@ -52,7 +52,7 @@ def ledger_js():
         p = os.path.join(bt, n)
         return json.loads(rd(p)) if os.path.exists(p) else d
     data = {"ledger": j("ledger.json", {"rounds": []}), "findings": j("findings.json", {"findings": []}), "results": j("results.json", {"cases": []}),
-            "proposals": j("proposals.json", {"proposals": []})}
+            "proposals": j("proposals.json", {"proposals": []}), "foundation": j("foundation.json", None)}
     return "window.EPI_BT_LEDGER = " + json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n"
 
 
@@ -66,12 +66,12 @@ def sources():
                                                    "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js", "a10_nav.js", "a11_course.js",
                                                    "a12_mirror.js", "a13_epi_course.js", "a14_sims.js", "a15_journey.js",
                                                    "a16_knots.js", "a17_kpractice.js", "a18_kmap.js", "a19_moves.js", "a20_similar.js",
-                                                   "a21_orient.js", "a22_btlive.js"]
+                                                   "a21_orient.js", "a22_btlive.js", "a23_found.js"]
                                                   if os.path.exists(os.path.join(A, f)))
     epibook = rd(os.path.join(A, "epi_book.js"))
     epidata = rd(os.path.join(A, "epi_core.js")) + "\n" + "".join(rd(os.path.join(A, "epi_st_%s.js" % x)) + "\n" for x in "abcd")
     btfiles = ["epi_feat.js", "epi_rules.js", "epi_cases_a.js", "epi_cases_b.js", "epi_problems.js", "epi_problems_b.js", "epi_field.js",
-               "epi_blind.js", "epi_engine.js", "epi_bt_core.js"]
+               "epi_blind.js", "epi_engine.js", "epi_found.js", "epi_bt_core.js"]
     epibt = "".join(rd(os.path.join(A, f)) + "\n" for f in btfiles) + ledger_js()
     for name, s in [("core", core), ("app", app), ("epibook", epibook), ("epidata", epidata), ("epibt", epibt)] + \
             [("t%d" % i, t) for i, t in enumerate(techs)]:

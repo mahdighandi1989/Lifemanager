@@ -243,6 +243,127 @@
      "رسانه و خبر": 12
     }
    }
+  },
+  {
+   "round": 4,
+   "at": "2026-10-13",
+   "note": "دورِ ۴: مبنای درجه‌ها — هر سقف به قضیه/پایه/ترتیبی/ناسازگار؛ بی واقعهٔ تازه",
+   "corpus": {
+    "n": 185,
+    "tiers": {
+     "real": 104,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 4
+    },
+    "new": 0,
+    "files": 1
+   },
+   "books": {
+    "mesbah": {
+     "n": 185,
+     "sound": 68,
+     "healthAlarms": 0,
+     "failures": 117,
+     "detected": 116,
+     "located": 115,
+     "fullyLocated": 90,
+     "controls": {
+      "agree": 0.981,
+      "negAgree": 0.389,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 2,
+    "fixed": 6,
+    "resolved": 0,
+    "verified": 0
+   },
+   "coverage": {
+    "rulesTested": 52,
+    "rules": 69,
+    "sectionsTested": 54,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_pseudo",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad"
+    ],
+    "byDomain": {
+     "پزشکی": 20,
+     "علم": 17,
+     "ریاضی": 28,
+     "فناوری و مهندسی": 14,
+     "زندگی روزمره": 15,
+     "دین": 19,
+     "فلسفه": 21,
+     "تاریخ و سیاست": 11,
+     "مالی و بانکی": 11,
+     "بازار و معامله": 5,
+     "حقوق و قضا": 12,
+     "رسانه و خبر": 12
+    }
+   },
+   "foundation": {
+    "classes": {
+     "B": 21,
+     "S": 14,
+     "O": 4,
+     "X": 3,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 183,
+      "health_alarm": 0,
+      "missed": 1,
+      "mislocated": 1,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 173,
+      "health_alarm": 0,
+      "missed": 11,
+      "mislocated": 1,
+      "changed": 10
+     },
+     "derived": {
+      "ok": 184,
+      "health_alarm": 0,
+      "missed": 0,
+      "mislocated": 1,
+      "changed": 1
+     },
+     "both": {
+      "ok": 176,
+      "health_alarm": 0,
+      "missed": 8,
+      "mislocated": 1,
+      "changed": 9
+     }
+    },
+    "baseSufficient": 0,
+    "baseTotal": 8
+   }
   }
  ]
 }

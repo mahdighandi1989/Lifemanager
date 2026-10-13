@@ -56,3 +56,8 @@ if (fresh.length >= 3 && fresh.every(ok)) finding.status = "verified";
 
 ## 🔗 References
 - مرتبط: owner-supplied-content-not-builder-samples
+
+## Update 2026-10-13
+- پیکرهٔ بک‌تستی که برای آزمودنِ قاعده‌ها گزینش شده، برای **برازشِ عددها** (وزن/سقف) معتبر نیست: نسبت‌هایش به گزینش بسته‌اند. سنجشِ مقدارهای پایه
+  فقط روی واقعه‌های علامت‌خورده `sample: "unselected"` و با آستانهٔ کفایت؛ اثرِ هر جایگزینیِ مبنایی هر دور در حافظه سنجیده و به‌صورتِ پیشنهاد
+  نوشته می‌شود. ر.ک. `experiences/grounding-confidence-numbers-in-axioms.md`.

@@ -1065,3 +1065,8 @@ button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
 .bt-spark{color:var(--accent);vertical-align:middle}
 .bt-finding{padding:8px 10px;margin:6px 0}
 .bt-ev summary{cursor:pointer}
+/* «🧱 مبنای درجه‌ها» */
+.found-modes td:first-child,.found-modes th:first-child{min-width:11em}
+.found-rules td:first-child{min-width:12em}
+.found-ax{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.5rem}
+.bt-proposal.superseded{opacity:.7}

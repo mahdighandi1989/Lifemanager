@@ -4327,3 +4327,10 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **CHANGE:** صفحه: `a21_orient.js` (نقشهٔ کل، نوارِ «این‌جا»، سه مسیرِ کاری، واژه‌نامه — بی حذف)، `a22_btlive.js` (زبانهٔ «♾ بک‌تستِ پیوسته»). ابزار: `apps/learning-architecture/tools/epi_backtest.js` + `backtest/` (پیکره، دفتر، یافته‌ها، نتایج، پیشنهادها) + `docs/VERIFIED_BOOKLET.md` (سندِ چهارمِ دفترچه). سرور: `GET /api/inspection/audit/epi-decisions` (فقط‌خواندنی، فقط `ebtp_*`) در `app/routes/inspection_audit.py`؛ `scripts/supervisor/inspection.py epi-decisions`. فرانت: «📜 جزوهٔ متقن» در `LearningArchitecturePage.jsx` و `llaHandbook.js`. روتینِ تازهٔ شبانه با `docs/supervisor/BACKTEST_PROMPT.md`.
 - **RUN:** سه دور: پایه ۷ یافته (۱ هشدارِ کاذب) ⇒ ۶ اصلاحِ مستندِ سازنده (برچسب/رمزگذاری) + ۱ پیشنهادِ قاعده برای مالک ⇒ ۱۶ واقعهٔ تازه با رمزگذاریِ کور: ۶ واقعهٔ سالم بی‌پرچم، ۱۵/۱۶ درست. جزئیات: WORKLOG ِ صفحه (30)، (31).
 - **درس:** `experiences/continuous-backtest-for-a-rule-based-judge.md`، `experiences/orientation-layer-for-a-sprawling-app.md`.
+
+## 2026-10-13 — «معماری یادگیری عمیق»: مبنای درجه‌ها (عددهای کارخانه به بدیهیات)
+- **FINDING:** سقف‌های اطمینانِ ۴۲ قاعده و «تحملِ ۱۰» قراردادِ سامانه بودند؛ جزوه فقط درجه‌های کیفی می‌دهد ولی صریحاً «حسابِ احتمالات» را مبنای تصدیق‌های غیرمنتهی به بدیهیات می‌داند (s40) و پایه‌ها را با «سنجشِ تطابق با واقعیات» (s52).
+- **CHANGE:** `apps/learning-architecture/src/app/epi_found.js` (۵ اصل، ۱۲ قضیه با برهان، اشتقاقِ هر سقف: ۲۱ B / ۱۴ S / ۴ O / ۳ X، سنجشِ پایه فقط با نمونهٔ بی‌گزینش و کافی)؛ موتور: گزینه‌های پیش‌فرض‌خاموشِ `deg`/`derived`؛ `tools/epi_backtest.js`: `foundation()` + `foundation.json` + پیشنهادهای `p_found_*`؛ صفحه: زبانهٔ «🧱 مبنای درجه‌ها». پیش‌فرض و حکم‌ها دست‌نخورده.
+- **RUN:** دورِ ۴: کرانِ قضیه ⇒ ۰ حکمِ خراب، HRT دیده شد، مکان‌یابیِ کامل ۹۰ ⇒ ۹۴؛ فقط درجه‌ها ⇒ ۱۰ شکست از دست می‌رود؛ ۸ پایه «ناکافی».
+- **PROPOSAL:** `p_found_half`، `p_found_vazraf` (جایگزینِ `p_tajrobe_none`)، `p_found_scope` — منتظرِ مالک.
+- **درس:** `experiences/grounding-confidence-numbers-in-axioms.md` (+ به‌روزِ `continuous-backtest-for-a-rule-based-judge.md`).
