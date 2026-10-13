@@ -261,7 +261,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.HOST.upload = () => Promise.resolve({});
     const items = { items: [{ form: 'numeric', decoy: false, level: 1, prompt: 'حاصلِ پنج به‌اضافهٔ شش؟', atype: 'int', answer: '11', deep: 'x', trap: 'y', explain: 'z' }] };
     APP.callAI = function (sys, user, opts) {
-      window.__ai3.push({ gen: sys === APP.KGEN_SYS, fileIds: (opts && opts.fileIds) || null, user });
+      window.__ai3.push({ gen: sys === APP.KGEN_SYS, fileIds: (opts && opts.fileIds && opts.fileIds.length) ? opts.fileIds : null, user });
       return Promise.resolve(sys === APP.KGEN_SYS ? JSON.stringify(items) : JSON.stringify({ answer: '11', multi: false, deep: true, why: '.' }));
     };
     APP.go('kpractice', 'knot_img', 'items');

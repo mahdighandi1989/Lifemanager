@@ -46,8 +46,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       return JSON.stringify(user.split(/\n(?=\[)/).map(b => { const m = /^\[([^\]]+)\]/.exec(b); if (!m) return null; const it = items.find(x => x.id === m[1]);
         let want = it ? it.opts[it.ok] : null; if (m[1] === window.__wrongOn && si === 1) want = it.opts.find((o, i) => i !== it.ok);
         const ln = b.split('\n').find(l => /^[a-h]\) /.test(l) && l.slice(3) === want); return { id: m[1], pick: ln ? ln[0] : 'z', multi: false }; }).filter(Boolean)); };
-    APP.callAI = function (sys, user) {
-      window.__ai.push({ sys, user });
+    APP.callAI = function (sys, user, opts) {
+      window.__ai.push({ sys, user, mt: opts && opts.maxTokens });
       if (sys.indexOf(APP.PROB_CHECK_TAIL) >= 0) { const si = window.__ai.filter(x => x.sys.indexOf(APP.PROB_CHECK_TAIL) >= 0).length - 1; return Promise.resolve(window.__answerCheck(user, si % 3)); }
       if (sys === APP.PROB_VERIFY_SYS) return Promise.resolve(JSON.stringify([{ sid: 'n1', ok: true }, { sid: 'n2', ok: true }]));
       return Promise.resolve(JSON.stringify(decomp));
@@ -59,6 +59,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main .pb-ai'); await p.waitForTimeout(800);
   info.inj = await p.evaluate(() => { const r = APP.S.all('eprob', x => x.p && x.p.title === 'مسئلهٔ خودم: تقسیمِ ارث')[0]; return { calls: window.__ai.length, nosrc: r && r.nosrc, check: r && r.check && r.check.flags.map(f => f.sid + ':' + f.state).join(), res: r && r.check && r.check.res }; });
   chk(info.inj.calls === 5 && info.inj.nosrc === true && info.inj.check === 'n2:open' && info.inj.res.n1.agree === 3 && info.inj.res['drill:1'].agree === 3, 'inject + check ' + JSON.stringify(info.inj));
+  // بودجهٔ پاسخ (۲۰۲۶-۱۰-۱۳، اجرای واقعی): پیش‌فرضِ ۲۵۰۰ ِ سرور تجزیهٔ کامل را وسطِ JSON می‌برید
+  chk(await p.evaluate(() => window.__ai[0].mt === 8192 && window.__ai[1].mt === 4000 && window.__ai.slice(2).every(c => c.mt === 4000)), 'answer budgets: ' + JSON.stringify(await p.evaluate(() => window.__ai.map(c => c.mt))));
   chk(await p.evaluate(() => window.__ai.slice(2).every(c => !/"ok"/.test(c.user) && /\[n1\]/.test(c.user) && /\[drill:1\]/.test(c.user))), 'solvers never see the ok labels');
   await go('e_prob', null, 'pending');
   const C = () => p.locator('main section.pb-pending', { hasText: 'تقسیمِ ارث' });

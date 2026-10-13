@@ -357,7 +357,7 @@
     var send = { stages: pick(p.stages), dead: pick(p.dead) };
     var prev = r.verify || {}, oldFlags = prev.flags || [];
     return Promise.resolve().then(function () {
-      return A.callAI(A.PROB_VERIFY_SYS, "منابعِ کاربر:\n" + (srcText || (p.src || []).join("\n") || "—") + "\n\nتجزیه:\n" + JSON.stringify({ title: p.title, field: p.field, open: p.open, era: p.era || null, stages: send.stages, dead: send.dead }));
+      return A.callAI(A.PROB_VERIFY_SYS, "منابعِ کاربر:\n" + (srcText || (p.src || []).join("\n") || "—") + "\n\nتجزیه:\n" + JSON.stringify({ title: p.title, field: p.field, open: p.open, era: p.era || null, stages: send.stages, dead: send.dead }), { maxTokens: 4000 });
     }).then(function (txt) {
       var arr = parseJ(txt, true, "پاسخِ بازبین JSON ِ معتبر نبود"); if (arr && !Array.isArray(arr)) arr = arr.items || arr.verdicts || null;
       if (!Array.isArray(arr)) throw new Error("پاسخِ بازبین آرایه نبود");
@@ -453,7 +453,7 @@
     var SOL = (A.KSOLVERS && A.KSOLVERS.length >= 3) ? A.KSOLVERS : CHECK_SOLVERS, runs = [], chain = Promise.resolve();
     [0, 1, 2].forEach(function (si) {
       chain = chain.then(function () {
-        return A.callAI(SOL[si] + A.PROB_CHECK_TAIL, checkPrompt(p, items, si, r.redact)).then(function (t) {
+        return A.callAI(SOL[si] + A.PROB_CHECK_TAIL, checkPrompt(p, items, si, r.redact), { maxTokens: 4000 }).then(function (t) {
           var arr; try { arr = A.parseJSONLoose(t); } catch (e) { arr = null; }
           if (arr && !Array.isArray(arr)) arr = arr.items || arr.answers || null;
           runs[si] = Array.isArray(arr) ? arr : null;
@@ -544,7 +544,7 @@
   A.probFromCase = function (kc, text, meta) {
     meta = meta || {};
     var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 4);
-    return (fids.length ? A.callAI(sys, text, { fileIds: fids }) : A.callAI(sys, text)).then(function (txt) {
+    return A.callAI(sys, text, { fileIds: fids, maxTokens: 8192 }).then(function (txt) {
       var raw = parseJ(txt, true, AI_BAD_JSON);
       if (raw && typeof raw === "object" && !Array.isArray(raw)) {
         var it = kc.intake || {};
@@ -608,7 +608,7 @@
         if (!f.title || !f.statement || !f.answer) { A.toast("عنوان، صورت و پاسخ لازم است.", "bad"); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
         var b = e.target; b.disabled = true; b.textContent = "در حال تجزیه…";
-        A.callAI(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes)
+        A.callAI(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes, { maxTokens: 8192 })
           .then(function (txt) {
             var raw = parseJ(txt, true, AI_BAD_JSON);
             if (raw && typeof raw === "object" && !Array.isArray(raw) && (raw.src == null || (Array.isArray(raw.src) && !raw.src.length))) raw.src = f.src.split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean);

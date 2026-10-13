@@ -943,7 +943,7 @@
     var rep = { accepted: [], unverified: [], rejected: [] };
     /* تصویرِ پیوستِ موقعیت (اگر کاربر در دروازه پذیرفت) فقط به **سازنده** می‌رود؛ سه حلِ وارسی (A.kverify) فقط متنِ نمونه را می‌بینند */
     var fids = (opts.fileIds || []).slice(0, 4);
-    return (fids.length ? A.callAI(A.KGEN_SYS, ask, { fileIds: fids }) : A.callAI(A.KGEN_SYS, ask)).then(function (t) {
+    return A.callAI(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }).then(function (t) {
       var o; try { o = parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); }
       var arr = Array.isArray(o) ? o : (o && o.items) || [];
       if (!arr.length) throw new Error("سازنده نمونه‌ای نداد");
