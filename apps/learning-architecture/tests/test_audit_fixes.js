@@ -14,7 +14,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
 
   // ۱) آزمونِ ۱: مکان‌یابیِ کامل، پوششِ قاعده‌ها، اثرِ انگشت
   info.t1 = await p.evaluate(() => { const t = APP.runThree('A', false); return { full: t.a.fullScore, partial: t.a.partial.length, tested: t.a.coverage.tested.length, n: t.a.coverage.n, hash: !!t.a.rulesHash }; });
-  chk(info.t1.n === 69 && info.t1.tested > 0 && info.t1.tested < 69 && info.t1.full < 1 && info.t1.partial > 0 && info.t1.hash, 'test1 honesty metrics ' + JSON.stringify(info.t1));
+  // پس از داوریِ جزوه و انتقالِ قاعدهٔ مکاشفه (۲۰۲۶-۱۰-۱۳): هر ۵۱ مثال کامل؛ قاعده‌های بی‌مثال هنوز هستند
+  chk(info.t1.n === 69 && info.t1.tested > 30 && info.t1.tested < 69 && info.t1.full === 1 && info.t1.partial === 0 && info.t1.hash, 'test1 honesty metrics ' + JSON.stringify(info.t1));
   const ebt0 = await p.evaluate(() => APP.S.all('ebt').length);
   await go('e_living'); await go('e_aut');
   chk(await p.evaluate(() => APP.S.all('ebt').length) === ebt0, 'viewing living/aut must not record a run');

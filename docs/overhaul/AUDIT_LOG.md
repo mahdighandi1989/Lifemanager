@@ -4301,3 +4301,7 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **FINDING:** همهٔ رکوردهای آینه با `HttpError 403 … Google Sheets API has not been used in project 31712827799 before or it is disabled` شکست می‌خوردند. علت تنظیمِ پروژهٔ گوگل است (Sheets API روشن نیست)، نه کد و نه اجازهٔ مالک.
 - **CHANGE:** `app/services/app_mirror_service.py` — `api_disabled_message`: پیامِ فارسی با پیوندِ Enable، توقفِ اجرا به‌جای کوبیدنِ هر رکورد؛ صفحه خطاهای هم‌علت را یک بار نشان می‌دهد. آزمون در `tests/test_app_mirror.py`. WORKLOG ِ صفحه (27).
 - **ACTION (مالک):** Enable کردنِ Google Sheets API در کنسولِ Google Cloud.
+
+## 2026-10-13 — «معماری یادگیری عمیق»: قاعدهٔ مکاشفه به ایستگاهِ شهود
+- **DECISION (مالک):** `r_core_mystic_unchecked` از st_core به st_shohud منتقل شد.
+- **CHANGE:** `apps/learning-architecture/src/app/epi_rules.js` (فقط ایستگاه + یادداشت). مکان‌یابیِ کاملِ مثال‌های جزوه ۵۱ از ۵۱. WORKLOG ِ صفحه (28).
