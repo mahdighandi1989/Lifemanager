@@ -67,7 +67,11 @@ BINDER_CAPACITY = 40
 
 #: How long a claim on an urgent sheet is honoured. Long enough for a real
 #: answer, short enough that a crashed run does not park a sheet for a day.
-URGENT_CLAIM_TTL_S = 45 * 60
+#: 90 min (was 45, 2026-10-13): a real fix + the ~8-min merge gate ran ~50 min and
+#: the claim lapsed mid-work ⇒ the page said «در انتظارِ ناظر» while the run was
+#: still on it (and a parallel run could have claimed the same sheet). Still well
+#: under the 3-hour urgent cadence, so a crashed run frees the sheet before the next one.
+URGENT_CLAIM_TTL_S = 90 * 60
 
 #: Where a sheet that points at no place on screen says it is from.
 GENERAL_PAGE = "/inspection"

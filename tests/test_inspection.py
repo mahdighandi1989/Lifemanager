@@ -226,7 +226,10 @@ async def test_claim_expires_so_a_crashed_run_cannot_wedge_the_queue(api_client,
     api_client.post(f"/api/inspection/{a}/urgent")
     api_client.post("/api/inspection/urgent/claim", json={}, headers=SUP)
     real_now = mod._now
-    monkeypatch.setattr(mod, "_now", lambda: real_now() + timedelta(minutes=46))
+    monkeypatch.setattr(mod, "_now", lambda: real_now() + timedelta(minutes=60))
+    held = api_client.post("/api/inspection/urgent/claim", json={}, headers=SUP).json()
+    assert not held.get("report"), "a 60-minute-old claim is still honoured (a long real fix)"
+    monkeypatch.setattr(mod, "_now", lambda: real_now() + timedelta(minutes=91))
     again = api_client.post("/api/inspection/urgent/claim", json={}, headers=SUP).json()
     assert again["report"]["id"] == a
 
