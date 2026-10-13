@@ -18249,6 +18249,13 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     o.truth = o.truth || { ok: false, fail: [] }; o.truth.fail = (o.truth.fail || []).filter(function (s) { return window.EPI_PIPE.indexOf(s) >= 0; });
     return errs;
   }
+  /* درخواستِ JSON با یک تلاشِ دوباره (اجرای واقعی با مدلِ production، ۲۰۲۶-۱۰-۱۳): گاهی پاسخِ کاملِ مدل JSON ِ نامعتبر است؛ یک بار دیگر
+     همان درخواست فرستاده می‌شود و اگر باز نامعتبر بود، همان خطای قبلی. parse = تابعِ تجزیهٔ خودِ فراخواننده (باید روی خطا throw کند). */
+  A.callAIJson = function (system, user, opts, parse) {
+    function again() { return A.callAI(system, user, opts).then(function (t2) { return parse(t2); }); }
+    // خطای گذرای ارائه‌دهنده (مثلاً ReadTimeout روی پاسخِ بزرگ — همان اجرای واقعی) هم یک بار دوباره
+    return A.callAI(system, user, opts).then(function (t) { try { return parse(t); } catch (e) { return again(); } }, function () { return again(); });
+  };
   A.parseJSONLoose = function (txt) { var s = String(txt || ""); var i = Math.min.apply(null, ["[", "{"].map(function (ch) { var p = s.indexOf(ch); return p < 0 ? 1e9 : p; })); var j = Math.max(s.lastIndexOf("]"), s.lastIndexOf("}")); return JSON.parse(s.slice(i, j + 1)); };
   function harvestPanel() {
     var n = h("input", { type: "number", min: 1, max: 8, value: 4, id: "hvN" });
@@ -18822,7 +18829,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     });
     (p.drills || []).forEach(function (d, i) {
       if (!d || !Array.isArray(d.opts)) return;
-      out.push({ id: "drill:" + (i + 1), kind: "drill", ctx: "", q: d.q || "", opts: d.opts.map(String), ok: d.a, obj: { q: d.q || "", opts: d.opts.map(String), a: d.a } });
+      out.push({ id: "drill" + (i + 1), kind: "drill", ctx: "", q: d.q || "", opts: d.opts.map(String), ok: d.a, obj: { q: d.q || "", opts: d.opts.map(String), a: d.a } });
     });
     return out;
   }
@@ -18839,15 +18846,28 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     });
     return strip(L.join("\n"));
   }
+  /* پاسخِ حل‌کننده‌ها: اول JSON ِ کامل؛ اگر نشد، تک‌تکِ اشیاء — اجرای واقعی (۲۰۲۶-۱۰-۱۳) نشان داد مدل گاهی می‌نویسد
+     {"drill:2", "pick": …} (کلیدِ "id" جا می‌افتد) و همین یک خطا کلِ پاسخِ آن حل‌کننده را باطل می‌کرد. */
+  function parseAnswers(t) {
+    var arr = null;
+    try { arr = A.parseJSONLoose(t); } catch (e) { arr = null; }
+    if (arr && !Array.isArray(arr)) arr = arr.items || arr.answers || null;
+    if (Array.isArray(arr)) return arr;
+    var out = [];
+    (String(t || "").match(/\{[^{}]*\}/g) || []).forEach(function (m) {
+      var fixed = m.replace(/^\{\s*"([^"]+)"\s*,/, function (all, k) { return k === "id" ? all : '{"id":"' + k + '",'; });
+      try { var o = JSON.parse(fixed); if (o && o.id != null) out.push(o); } catch (e) { }
+    });
+    return out.length ? out : null;
+  }
+  A.probParseAnswers = parseAnswers;
   function checkAnswers(r) {
     var p = r.p, items = checkItems(p).filter(function (it) { return it.opts.length >= 2 && it.opts.length <= LET.length; });
     var SOL = (A.KSOLVERS && A.KSOLVERS.length >= 3) ? A.KSOLVERS : CHECK_SOLVERS, runs = [], chain = Promise.resolve();
     [0, 1, 2].forEach(function (si) {
       chain = chain.then(function () {
         return A.callAI(SOL[si] + A.PROB_CHECK_TAIL, checkPrompt(p, items, si, r.redact), { maxTokens: 4000 }).then(function (t) {
-          var arr; try { arr = A.parseJSONLoose(t); } catch (e) { arr = null; }
-          if (arr && !Array.isArray(arr)) arr = arr.items || arr.answers || null;
-          runs[si] = Array.isArray(arr) ? arr : null;
+          runs[si] = parseAnswers(t);
         }, function () { runs[si] = null; });
       });
     });
@@ -18935,8 +18955,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   A.probFromCase = function (kc, text, meta) {
     meta = meta || {};
     var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 4);
-    return A.callAI(sys, text, { fileIds: fids, maxTokens: 8192 }).then(function (txt) {
-      var raw = parseJ(txt, true, AI_BAD_JSON);
+    return A.callAIJson(sys, text, { fileIds: fids, maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); }).then(function (raw) {
       if (raw && typeof raw === "object" && !Array.isArray(raw)) {
         var it = kc.intake || {};
         if (!raw.title) raw.title = kc.title || "مسئلهٔ من"; if (!raw.field) raw.field = "مسئلهٔ شخصی";
@@ -18999,9 +19018,8 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
         if (!f.title || !f.statement || !f.answer) { A.toast("عنوان، صورت و پاسخ لازم است.", "bad"); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
         var b = e.target; b.disabled = true; b.textContent = "در حال تجزیه…";
-        A.callAI(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes, { maxTokens: 8192 })
-          .then(function (txt) {
-            var raw = parseJ(txt, true, AI_BAD_JSON);
+        A.callAIJson(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes, { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
+          .then(function (raw) {
             if (raw && typeof raw === "object" && !Array.isArray(raw) && (raw.src == null || (Array.isArray(raw.src) && !raw.src.length))) raw.src = f.src.split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean);
             var o = validP(raw);
             var r = store(o, "ai"); if (nosrc) { r.nosrc = true; S.put(r); } b.textContent = "در حال بازبینیِ تاریخی…";
@@ -20505,7 +20523,7 @@ APP.goFromURL = function (q) {
         (A.stageMoves ? A.stageMoves(p, st) : st.mv || []).map(function (m) { return A.MOVES && A.MOVES[m] ? A.MOVES[m].fa : m; }).join("، "), st.lvl || "", c ? c.agree + (c.multi ? " (دوپهلو)" : "") : ""];
     })) });
     tabs.push({ name: "بن‌بست‌ها", rows: [["سال · شخص", "ایده", "شکاف"]].concat((p.dead || []).map(function (d) { return [[d.year, d.who].filter(function (x) { return x != null && x !== ""; }).join(" · "), d.idea || "", d.flaw || ""]; })) });
-    tabs.push({ name: "تمرین‌ها", rows: [["#", "پرسش", "پاسخِ درست", "وارسی (هم‌نظر از ۳)"]].concat((p.drills || []).map(function (d, i) { var c = res["drill:" + (i + 1)]; return [i + 1, d.q || "", (d.opts || [])[d.a] || "", c ? String(c.agree) : ""]; })) });
+    tabs.push({ name: "تمرین‌ها", rows: [["#", "پرسش", "پاسخِ درست", "وارسی (هم‌نظر از ۳)"]].concat((p.drills || []).map(function (d, i) { var c = res["drill" + (i + 1)]; return [i + 1, d.q || "", (d.opts || [])[d.a] || "", c ? String(c.agree) : ""]; })) });
     var its = S.all("pbitem", function (x) { return x.pid === p.id; });
     tabs.push({ name: "هم‌ساختار", rows: [["صورت", "پاسخ", "شکل", "بدلی", "وارسی", "پاسخ‌ها", "درست", "موعد"]].concat(its.map(function (x) {
       var ans = x.atype === "choice" ? ((x.choices || []).filter(function (c) { return c.id === x.answer; })[0] || {}).t || x.answer : x.answer, hh = x.hist || [];
@@ -24731,8 +24749,9 @@ APP.goFromURL = function (q) {
     var rep = { accepted: [], unverified: [], rejected: [] };
     /* تصویرِ پیوستِ موقعیت (اگر کاربر در دروازه پذیرفت) فقط به **سازنده** می‌رود؛ سه حلِ وارسی (A.kverify) فقط متنِ نمونه را می‌بینند */
     var fids = (opts.fileIds || []).slice(0, 4);
-    return A.callAI(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }).then(function (t) {
-      var o; try { o = parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); }
+    var call = A.callAIJson ? A.callAIJson(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }, function (t) { try { return parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } })
+      : A.callAI(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }).then(function (t) { try { return parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } });
+    return call.then(function (o) {
       var arr = Array.isArray(o) ? o : (o && o.items) || [];
       if (!arr.length) throw new Error("سازنده نمونه‌ای نداد");
       var chain = Promise.resolve();
@@ -26969,8 +26988,7 @@ APP.goFromURL = function (q) {
     var strip = names.length && A.kstripNames ? function (x) { return A.kstripNames(x, names); } : function (x) { return x; };
     var ask = opts.text || strip(A.pbAsk(p, n)), rep = { accepted: [], unverified: [], rejected: [] };
     var pk = { id: "pb:" + p.id, name: p.title, principle: principle(p) };
-    return A.callAI(A.PB_SIM_SYS, ask, { maxTokens: 8192 }).then(function (t) {
-      var o; try { o = A.parseJSONLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); }
+    return A.callAIJson(A.PB_SIM_SYS, ask, { maxTokens: 8192 }, function (t) { try { return A.parseJSONLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } }).then(function (o) {
       var arr = Array.isArray(o) ? o : (o && o.items) || [];
       if (!arr.length) throw new Error("سازنده مسئله‌ای نداد");
       var chain = Promise.resolve(), at = nowISO();

@@ -295,6 +295,13 @@
     o.truth = o.truth || { ok: false, fail: [] }; o.truth.fail = (o.truth.fail || []).filter(function (s) { return window.EPI_PIPE.indexOf(s) >= 0; });
     return errs;
   }
+  /* درخواستِ JSON با یک تلاشِ دوباره (اجرای واقعی با مدلِ production، ۲۰۲۶-۱۰-۱۳): گاهی پاسخِ کاملِ مدل JSON ِ نامعتبر است؛ یک بار دیگر
+     همان درخواست فرستاده می‌شود و اگر باز نامعتبر بود، همان خطای قبلی. parse = تابعِ تجزیهٔ خودِ فراخواننده (باید روی خطا throw کند). */
+  A.callAIJson = function (system, user, opts, parse) {
+    function again() { return A.callAI(system, user, opts).then(function (t2) { return parse(t2); }); }
+    // خطای گذرای ارائه‌دهنده (مثلاً ReadTimeout روی پاسخِ بزرگ — همان اجرای واقعی) هم یک بار دوباره
+    return A.callAI(system, user, opts).then(function (t) { try { return parse(t); } catch (e) { return again(); } }, function () { return again(); });
+  };
   A.parseJSONLoose = function (txt) { var s = String(txt || ""); var i = Math.min.apply(null, ["[", "{"].map(function (ch) { var p = s.indexOf(ch); return p < 0 ? 1e9 : p; })); var j = Math.max(s.lastIndexOf("]"), s.lastIndexOf("}")); return JSON.parse(s.slice(i, j + 1)); };
   function harvestPanel() {
     var n = h("input", { type: "number", min: 1, max: 8, value: 4, id: "hvN" });

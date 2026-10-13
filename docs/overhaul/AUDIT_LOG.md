@@ -4269,3 +4269,10 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **CHANGE (فقط صفحه، بی‌تغییرِ سرور):** `a4_views2.js` (گزینهٔ تنظیمات)، `a8_prob.js` (فهرست، تزریقِ بی‌منبع، وارسیِ پاسخ‌ها، «شبیه‌سازِ همین مسئله»)، `a16`–`a19`، تازه `a20_similar.js` («مسئله‌های هم‌ساختار» با تمرینِ فاصله‌دار و موعد در «امروز»)، `build.py`.
 - **VERIFY:** آزمونِ تازهٔ `tests/test_own_problems.js` + ۱۸ آزمونِ مرورگرِ دیگر NO ERRORS؛ `run_host_e2e.py` all NO ERRORS؛ pytest کامل؛ `npm run build`. اجرای واقعی با مدلِ production هنوز دیده نشده (HANDBOOK §۱۲ ردیف ۲۰).
 - **درس:** `experiences/owner-supplied-content-not-builder-samples.md`.
+
+## 2026-10-13 — «معماری یادگیری عمیق»: اجرای واقعی با مدلِ production + آینهٔ درایو برای «مسئله‌های من»
+- **CHANGE (سرور):** `POST /api/inspection/audit/ai` در `app/routes/inspection_audit.py` — دروازهٔ ناظر/مالک؛ کارِ `learning_architecture` را روی پرسش‌های داده‌شده اجرا می‌کند؛ دادهٔ مالک خوانده/نوشته نمی‌شود (آزمون در `tests/test_inspection_audit.py`).
+- **FINDING:** اجرای خودِ کدِ صفحه با Gemini 3.8 Flash ِ production سه خرابی نشان داد که آزمون‌های ساختگی نمی‌دیدند: پیش‌فرضِ ۲۵۰۰ توکنِ `/api/app-records/{app}/ai` تجزیه‌ها و دسته‌های نمونه را وسطِ JSON می‌برید؛ پاسخِ بدشکلِ یک حل‌کننده (`{"drill:2", …}`) کلِ وارسی را باطل می‌کرد؛ JSON ِ گاه‌به‌گاه نامعتبر.
+- **CHANGE (صفحه):** `HOST.ai` ⇐ `opts.maxTokens`؛ خوانشِ مقاومِ پاسخِ حل‌کننده‌ها؛ `A.callAIJson` (یک تلاشِ دوباره)؛ `BUILD.eprob` در آینهٔ درایو. جزئیات: WORKLOG ِ صفحه (22).
+- **VERIFY:** اجرای واقعیِ پس از اصلاح سالم؛ همهٔ آزمون‌های صفحه، `run_host_e2e.py`، pytest کامل، `npm run build`.
+- **درس:** `experiences/owner-supplied-content-not-builder-samples.md` ⇒ «## Update 2026-10-13».

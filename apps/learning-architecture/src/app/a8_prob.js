@@ -431,7 +431,7 @@
     });
     (p.drills || []).forEach(function (d, i) {
       if (!d || !Array.isArray(d.opts)) return;
-      out.push({ id: "drill:" + (i + 1), kind: "drill", ctx: "", q: d.q || "", opts: d.opts.map(String), ok: d.a, obj: { q: d.q || "", opts: d.opts.map(String), a: d.a } });
+      out.push({ id: "drill" + (i + 1), kind: "drill", ctx: "", q: d.q || "", opts: d.opts.map(String), ok: d.a, obj: { q: d.q || "", opts: d.opts.map(String), a: d.a } });
     });
     return out;
   }
@@ -448,15 +448,28 @@
     });
     return strip(L.join("\n"));
   }
+  /* پاسخِ حل‌کننده‌ها: اول JSON ِ کامل؛ اگر نشد، تک‌تکِ اشیاء — اجرای واقعی (۲۰۲۶-۱۰-۱۳) نشان داد مدل گاهی می‌نویسد
+     {"drill:2", "pick": …} (کلیدِ "id" جا می‌افتد) و همین یک خطا کلِ پاسخِ آن حل‌کننده را باطل می‌کرد. */
+  function parseAnswers(t) {
+    var arr = null;
+    try { arr = A.parseJSONLoose(t); } catch (e) { arr = null; }
+    if (arr && !Array.isArray(arr)) arr = arr.items || arr.answers || null;
+    if (Array.isArray(arr)) return arr;
+    var out = [];
+    (String(t || "").match(/\{[^{}]*\}/g) || []).forEach(function (m) {
+      var fixed = m.replace(/^\{\s*"([^"]+)"\s*,/, function (all, k) { return k === "id" ? all : '{"id":"' + k + '",'; });
+      try { var o = JSON.parse(fixed); if (o && o.id != null) out.push(o); } catch (e) { }
+    });
+    return out.length ? out : null;
+  }
+  A.probParseAnswers = parseAnswers;
   function checkAnswers(r) {
     var p = r.p, items = checkItems(p).filter(function (it) { return it.opts.length >= 2 && it.opts.length <= LET.length; });
     var SOL = (A.KSOLVERS && A.KSOLVERS.length >= 3) ? A.KSOLVERS : CHECK_SOLVERS, runs = [], chain = Promise.resolve();
     [0, 1, 2].forEach(function (si) {
       chain = chain.then(function () {
         return A.callAI(SOL[si] + A.PROB_CHECK_TAIL, checkPrompt(p, items, si, r.redact), { maxTokens: 4000 }).then(function (t) {
-          var arr; try { arr = A.parseJSONLoose(t); } catch (e) { arr = null; }
-          if (arr && !Array.isArray(arr)) arr = arr.items || arr.answers || null;
-          runs[si] = Array.isArray(arr) ? arr : null;
+          runs[si] = parseAnswers(t);
         }, function () { runs[si] = null; });
       });
     });
@@ -544,8 +557,7 @@
   A.probFromCase = function (kc, text, meta) {
     meta = meta || {};
     var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 4);
-    return A.callAI(sys, text, { fileIds: fids, maxTokens: 8192 }).then(function (txt) {
-      var raw = parseJ(txt, true, AI_BAD_JSON);
+    return A.callAIJson(sys, text, { fileIds: fids, maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); }).then(function (raw) {
       if (raw && typeof raw === "object" && !Array.isArray(raw)) {
         var it = kc.intake || {};
         if (!raw.title) raw.title = kc.title || "مسئلهٔ من"; if (!raw.field) raw.field = "مسئلهٔ شخصی";
@@ -608,9 +620,8 @@
         if (!f.title || !f.statement || !f.answer) { A.toast("عنوان، صورت و پاسخ لازم است.", "bad"); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
         var b = e.target; b.disabled = true; b.textContent = "در حال تجزیه…";
-        A.callAI(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes, { maxTokens: 8192 })
-          .then(function (txt) {
-            var raw = parseJ(txt, true, AI_BAD_JSON);
+        A.callAIJson(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes, { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
+          .then(function (raw) {
             if (raw && typeof raw === "object" && !Array.isArray(raw) && (raw.src == null || (Array.isArray(raw.src) && !raw.src.length))) raw.src = f.src.split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean);
             var o = validP(raw);
             var r = store(o, "ai"); if (nosrc) { r.nosrc = true; S.put(r); } b.textContent = "در حال بازبینیِ تاریخی…";

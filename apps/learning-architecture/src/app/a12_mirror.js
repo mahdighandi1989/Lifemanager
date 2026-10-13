@@ -166,7 +166,7 @@
         (A.stageMoves ? A.stageMoves(p, st) : st.mv || []).map(function (m) { return A.MOVES && A.MOVES[m] ? A.MOVES[m].fa : m; }).join("، "), st.lvl || "", c ? c.agree + (c.multi ? " (دوپهلو)" : "") : ""];
     })) });
     tabs.push({ name: "بن‌بست‌ها", rows: [["سال · شخص", "ایده", "شکاف"]].concat((p.dead || []).map(function (d) { return [[d.year, d.who].filter(function (x) { return x != null && x !== ""; }).join(" · "), d.idea || "", d.flaw || ""]; })) });
-    tabs.push({ name: "تمرین‌ها", rows: [["#", "پرسش", "پاسخِ درست", "وارسی (هم‌نظر از ۳)"]].concat((p.drills || []).map(function (d, i) { var c = res["drill:" + (i + 1)]; return [i + 1, d.q || "", (d.opts || [])[d.a] || "", c ? String(c.agree) : ""]; })) });
+    tabs.push({ name: "تمرین‌ها", rows: [["#", "پرسش", "پاسخِ درست", "وارسی (هم‌نظر از ۳)"]].concat((p.drills || []).map(function (d, i) { var c = res["drill" + (i + 1)]; return [i + 1, d.q || "", (d.opts || [])[d.a] || "", c ? String(c.agree) : ""]; })) });
     var its = S.all("pbitem", function (x) { return x.pid === p.id; });
     tabs.push({ name: "هم‌ساختار", rows: [["صورت", "پاسخ", "شکل", "بدلی", "وارسی", "پاسخ‌ها", "درست", "موعد"]].concat(its.map(function (x) {
       var ans = x.atype === "choice" ? ((x.choices || []).filter(function (c) { return c.id === x.answer; })[0] || {}).t || x.answer : x.answer, hh = x.hist || [];

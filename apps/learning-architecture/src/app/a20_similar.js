@@ -84,8 +84,7 @@
     var strip = names.length && A.kstripNames ? function (x) { return A.kstripNames(x, names); } : function (x) { return x; };
     var ask = opts.text || strip(A.pbAsk(p, n)), rep = { accepted: [], unverified: [], rejected: [] };
     var pk = { id: "pb:" + p.id, name: p.title, principle: principle(p) };
-    return A.callAI(A.PB_SIM_SYS, ask, { maxTokens: 8192 }).then(function (t) {
-      var o; try { o = A.parseJSONLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); }
+    return A.callAIJson(A.PB_SIM_SYS, ask, { maxTokens: 8192 }, function (t) { try { return A.parseJSONLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } }).then(function (o) {
       var arr = Array.isArray(o) ? o : (o && o.items) || [];
       if (!arr.length) throw new Error("سازنده مسئله‌ای نداد");
       var chain = Promise.resolve(), at = nowISO();

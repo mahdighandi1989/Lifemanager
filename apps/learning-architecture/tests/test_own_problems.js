@@ -58,10 +58,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.fill('#pbIn_title', 'مسئلهٔ خودم: تقسیمِ ارث'); await p.fill('#pbIn_statement', 'صورت'); await p.fill('#pbIn_answer', 'پاسخ');
   await p.click('main .pb-ai'); await p.waitForTimeout(800);
   info.inj = await p.evaluate(() => { const r = APP.S.all('eprob', x => x.p && x.p.title === 'مسئلهٔ خودم: تقسیمِ ارث')[0]; return { calls: window.__ai.length, nosrc: r && r.nosrc, check: r && r.check && r.check.flags.map(f => f.sid + ':' + f.state).join(), res: r && r.check && r.check.res }; });
-  chk(info.inj.calls === 5 && info.inj.nosrc === true && info.inj.check === 'n2:open' && info.inj.res.n1.agree === 3 && info.inj.res['drill:1'].agree === 3, 'inject + check ' + JSON.stringify(info.inj));
+  chk(info.inj.calls === 5 && info.inj.nosrc === true && info.inj.check === 'n2:open' && info.inj.res.n1.agree === 3 && info.inj.res['drill1'].agree === 3, 'inject + check ' + JSON.stringify(info.inj));
   // بودجهٔ پاسخ (۲۰۲۶-۱۰-۱۳، اجرای واقعی): پیش‌فرضِ ۲۵۰۰ ِ سرور تجزیهٔ کامل را وسطِ JSON می‌برید
   chk(await p.evaluate(() => window.__ai[0].mt === 8192 && window.__ai[1].mt === 4000 && window.__ai.slice(2).every(c => c.mt === 4000)), 'answer budgets: ' + JSON.stringify(await p.evaluate(() => window.__ai.map(c => c.mt))));
-  chk(await p.evaluate(() => window.__ai.slice(2).every(c => !/"ok"/.test(c.user) && /\[n1\]/.test(c.user) && /\[drill:1\]/.test(c.user))), 'solvers never see the ok labels');
+  // پاسخِ بدشکلِ واقعیِ مدل (کلیدِ id جاافتاده) نباید کلِ پاسخِ یک حل‌کننده را باطل کند
+  chk(await p.evaluate(() => JSON.stringify(APP.probParseAnswers('```json\n[\n {"id": "n1", "pick": "b"},\n {"drill2", "pick": "c", "multi": false}\n]\n```'))) === '[{"id":"n1","pick":"b"},{"id":"drill2","pick":"c","multi":false}]', 'tolerant answer parsing');
+  chk(await p.evaluate(() => window.__ai.slice(2).every(c => !/"ok"/.test(c.user) && /\[n1\]/.test(c.user) && /\[drill1\]/.test(c.user))), 'solvers never see the ok labels');
   await go('e_prob', null, 'pending');
   const C = () => p.locator('main section.pb-pending', { hasText: 'تقسیمِ ارث' });
   chk(await C().locator('.pb-nosrc').count() === 1, 'no-source chip');
@@ -104,7 +106,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       { form: 'abstract', decoy: false, level: 3, prompt: 'مسئلهٔ دوپهلو دربارهٔ نسبت‌ها با دو پاسخ ممکن', atype: 'int', answer: '5', moves: [] }];
     APP.callAI = function (sys, user) {
       window.__ai.push({ sys, user });
-      if (sys === APP.PB_SIM_SYS) return Promise.resolve(JSON.stringify({ items: window.__gen }));
+      if (sys === APP.PB_SIM_SYS) { window.__gcount = (window.__gcount || 0) + 1; return Promise.resolve(window.__gcount === 1 ? 'پاسخِ خراب {"items": [' : window.__gcount === 3 ? Promise.reject(new Error('خطای سرویس هوش مصنوعی: ReadTimeout')) : JSON.stringify({ items: window.__gen })); }  // اولی خراب ⇒ یک تلاشِ دوباره
       const it = window.__gen.find(g => user.indexOf(g.prompt) >= 0); const si = APP.KSOLVERS.findIndex(x => sys.indexOf(x) === 0);
       if (!it) return Promise.resolve('{}');
       const ans = /دوپهلو/.test(it.prompt) && si === 1 ? '6' : it.answer;
@@ -115,6 +117,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.locator('main .pbs-make').count() === 1, 'similar tab has the make button');
   await p.click('main .pbs-make'); await sendGate(); await p.waitForTimeout(1200);
   info.sim = await p.evaluate(pid => { const all = APP.pbItemsOf(pid); return { n: all.length, ok: all.filter(x => x.ver && x.ver.ok).length, serv: all.filter(APP.pbServable).length, rej: (APP._pbLastRep || {}).rejected.map(x => x.why.slice(0, 12)) }; }, pid);
+  chk(await p.evaluate(() => window.__gcount) === 2, 'invalid generator JSON retried once');
+  // خطای گذرا (ReadTimeout) ⇒ یک تلاشِ دوباره و موفقیت
+  info.retryTimeout = await p.evaluate(async pid => { const rep = await APP.pbMake(APP.getProb(pid), { n: 1 }); return { calls: window.__gcount, ok: rep.accepted.length + rep.unverified.length + rep.rejected.length > 0 }; }, pid);
+  chk(info.retryTimeout.calls === 4 && info.retryTimeout.ok, 'transient error retried once ' + JSON.stringify(info.retryTimeout));
+  await p.evaluate(pid => { APP.pbItemsOf(pid).slice(4).forEach(x => APP.S.del(x.id)); }, pid);
   chk(info.sim.n === 4 && info.sim.ok === 3 && info.sim.serv === 3 && info.sim.rej.length === 2, 'similar items ' + JSON.stringify(info.sim));
   chk(await p.evaluate(() => window.__ai[0].sys === APP.PB_SIM_SYS && /حرکت‌های قاطعِ حل/.test(window.__ai[0].user) && /تقسیمِ ارث/.test(window.__ai[0].user)), 'generator sees the own problem and its moves');
   await go('e_prob', pid, 'similar');
