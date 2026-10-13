@@ -30,7 +30,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.evaluate(() => APP.go('e_lib', null, 'add'));
   const inputs = page.locator('main section.card input[type=text]'); await inputs.nth(0).fill('آزمون افزودن پرونده');
   await page.locator('main details input[type=text]').first().fill('این وام بازپرداخت می‌شود چون مشتری همیشه خوش‌حساب بوده');
-  await page.selectOption('#fe_way', 'استقراء'); await page.selectOption('#fe_ind_complete', '0'); await page.fill('#fe_conf', '98');
+  await page.selectOption('#fe_k1_way', 'استقراء'); await page.selectOption('#fe_k1_ind_complete', '0'); await page.fill('#fe_k1_conf', '98');
   await page.locator('main .checks input').nth(5).check();
   await page.click('main .btn:has-text("ثبت پرونده")'); await page.waitForSelector('.eng');
   info.added = await page.evaluate(() => APP.S.all('ecase').length);
@@ -73,7 +73,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.probsAfter = await page.evaluate(() => APP.S.all('eprob', p => p.status === 'approved').length);
   // case engine panel from a human case
   await page.evaluate(() => { const c = APP.newCase({ title: 'خبر کانال', input: 'کانالی گفت دلار فردا ۱۰٪ بالا می‌رود' }); c.st.st_tasdiq = { data: { claims: [{ txt: 'دلار فردا ۱۰٪ بالا می‌رود' }] }, done: true, rubric: [] }; APP.S.put(c); APP.go('e_case', c.id, 'engine'); });
-  await page.waitForSelector('.feated'); await page.selectOption('#fe_way', 'نقل'); await page.selectOption('#fe_narrator', 'غیرموثق'); await page.fill('#fe_conf', '90'); await page.waitForTimeout(500);
+  await page.waitForSelector('.feated'); await page.selectOption('#fe_c1_way', 'نقل'); await page.selectOption('#fe_c1_narrator', 'غیرموثق'); await page.fill('#fe_c1_conf', '90'); await page.waitForTimeout(500);
   info.engineVerdict = await page.locator('main .verdict h2').first().textContent();
   // mobile
   await page.setViewportSize({ width: 390, height: 844 });

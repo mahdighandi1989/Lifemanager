@@ -721,6 +721,12 @@
       .sort(function (a, b) { return (a.due || "").localeCompare(b.due || ""); })
       .map(function (it) { return { knot: ks[it.knot], item: it }; });
   };
+  /* آزمایش‌های واقعیِ موعد (ممیزی ۲۰۲۶-۱۰-۱۳): برای گره‌های رفتاری/اجتماعی تنها «ورزش» همین‌اند، ولی نه در «امروز» دیده می‌شدند نه در
+     فهرستِ ورزش — در حالی که یادآور همان روز «یک ورزشِ گره موعد است» می‌فرستاد */
+  A.kexpDue = function () {
+    var t = A.today(), ks = {}; S.all("knot").forEach(function (k) { ks[k.id] = k; });
+    return S.all("kexp", function (x) { return ks[x.knot] && x.status === "planned" && x.due && x.due <= t; }).map(function (x) { return { knot: ks[x.knot], exp: x }; });
+  };
   A.knotNext = function (k) {
     var ds = A.kitemsOf(k.id).filter(A.kservable).map(function (it) { return it.due || A.today(); });
     A.kexpsOf(k.id).forEach(function (x) { if (x.status === "planned" && x.due) ds.push(x.due); });
@@ -778,6 +784,17 @@
   var remindT = {};
   function remindSoon(id) { clearTimeout(remindT[id]); remindT[id] = setTimeout(function () { delete remindT[id]; var k = S.get(id); if (k) A.kremindSync(k); }, 1200); }
   /* گره‌های پاک‌شده: یادآورشان لغو می‌شود (اگر a16 خودش A.knotDeleted را صدا نزده باشد) */
+  /* «امروز»: یک سطر برای آزمایش‌های واقعیِ موعد (a3 فقط نمونه‌ها را می‌شمارد) */
+  if (typeof A.dueList === "function" && !A.dueList._kexp) {
+    var rawDueX = A.dueList;   // نامِ جدا: «rawDue» پایین‌تر در همین فایل هم هست و var مشترک می‌شود ⇒ بازگشتِ بی‌پایان
+    A.dueList = function () {
+      var items = rawDueX.apply(this, arguments) || [], ed = [];
+      try { ed = A.kexpDue(); } catch (e) { ed = []; }
+      if (ed.length) items.push({ k: "knot", txt: fa(ed.length) + " آزمایشِ واقعیِ گره موعد است", sub: "پیش‌بینی ⇐ انجام ⇐ مشاهده ⇐ ثبت", go: function () { A.go("kpractice", ed[0].knot.id, "exp"); } });
+      return items;
+    };
+    A.dueList._kexp = true;
+  }
   A.kremindSweep = function () {
     var rk = ((S.settings().knots || {}).rk) || {};
     Object.keys(rk).forEach(function (id) { if (!S.get(id)) unremind(id); });
@@ -1114,8 +1131,10 @@
     var gap0 = c1 && A.kcodeGap(k); if (gap0) c1.appendChild(h("p", { class: "small warnline kp-codegap" }, gap0));
 
     var c2 = h("section", { class: "card" }, h("h2", {}, "نمونه‌های تازه از روی مسئلهٔ خودت (هوش مصنوعی + سه حلِ مستقل)"));
-    var seedN = A.kSeedCases(k).filter(function (c) { return String((c.intake || {}).statement || (c.intake || {}).what || "").trim(); }).length;
-    c2.appendChild(h("p", { class: "small" + (seedN ? "" : " warnline") }, seedN ? "دانه: " + fa(seedN) + " موقعیتِ خودت که به این گره پیوند خورده (صورت، پاسخ، کجا گیر کردی). نمونه‌ها همان ساختار و تله را در ظاهری تازه دارند؛ نمونه‌ای که تقریباً همان مسئلهٔ اصلی باشد کنار می‌رود." : "هنوز موقعیتی با صورت یا شرحِ ماجرا به این گره پیوند نخورده؛ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند."));
+    /* پیامِ دانه دقیقاً همان است که فرستاده می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳: برای گره‌های خصوصی چیزی فرستاده نمی‌شد ولی پیام «دانه: ۱ موقعیت» می‌گفت) */
+    var seedTxt = A.kSeedText(k), seedN = (seedTxt.match(/مسئلهٔ اصلیِ /g) || []).length, privK = A.kprivateKnot ? A.kprivateKnot(k) : false;
+    c2.appendChild(h("p", { class: "small" + (seedN ? "" : " warnline") }, seedN ? "دانه: " + fa(seedN) + " موقعیتِ خودت که به این گره پیوند خورده — " + (privK ? "چون این گره هیجانی/باورِ دربارهٔ خود است، فقط صورت، پاسخ و «کجا گیر کردم» فرستاده می‌شود (نه روایت و فکرها)." : "صورت، پاسخ، کجا گیر کردی، و روایت و فکرهایت.") + " متنِ دقیق را پیش از ارسال می‌بینی. نمونه‌ای که تقریباً همان مسئلهٔ اصلی باشد کنار می‌رود." :
+      privK ? "این گره هیجانی/باورِ دربارهٔ خود است؛ از موقعیت‌هایش فقط صورت/پاسخ/«کجا گیر کردم» فرستاده می‌شود و این‌ها خالی‌اند ⇒ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند. برای این گره‌ها «آزمایشِ واقعی» اصل است." : "هنوز موقعیتی با صورت یا شرحِ ماجرا به این گره پیوند نخورده؛ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند."));
     c2.appendChild(h("p", { class: "small" }, "سازنده فقط JSON ِ ساختاری با پاسخِ محدود (عددِ صحیح یا شناسهٔ گزینه" + (mode === "exp" ? "، یا روبریک برای موقعیت‌های اجتماعی" : "") + ") می‌دهد. سپس هر نمونه سه بار، با سه دستورِ متفاوت و بی‌دیدنِ پاسخ، حل می‌شود (درِ هوش مصنوعیِ این صفحه دما نمی‌گیرد؛ تفاوت از دستورهاست). فقط اگر هر سه با پاسخِ سازنده یکی باشند، هیچ‌کدام دو پاسخ نبینند و داوریِ «ساختارِ گره هست/نیست» با بدلی‌بودن بخواند، نمونه «وارسی‌شده» است. وگرنه با برچسبِ «وارسی‌نشده» نگه داشته و به‌طورِ پیش‌فرض پنهان می‌شود. نمونه‌ای که پاسخش در صورت پیداست اصلاً نگه داشته نمی‌شود."));
     var out = h("div", { class: "col gap", "aria-live": "polite" });
     if (!(k.principle || k.deep)) c2.appendChild(h("p", { class: "small bad" }, "اول «ساختارِ عمیق» ِ کارتِ گره را بنویس (قدمِ ۴)؛ بی آن نمونه‌سازی معنا ندارد."));
@@ -1460,7 +1479,7 @@
     root.appendChild(A.tabs([["over", "پیشرفت"], ["items", "نمونه‌ها (" + fa(A.kitemsOf(k.id).filter(function (x) { return !x.bad; }).length) + ")"], ["exp", "آزمایش‌ها (" + fa(A.kexpsOf(k.id).length) + ")"]], tab, function (t) { A.go("kpractice", k.id, t); }));
     if (tab === "items") { root.appendChild(itemsList(k)); root.appendChild(genPanel(k)); return root; }
     if (tab === "exp") { root.appendChild(expPanel(k)); return root; }
-    var due = A.kitemsOf(k.id).filter(function (it) { return A.kservable(it) && (it.due || A.today()) <= A.today(); }).length;
+    var due = A.kitemsOf(k.id).filter(function (it) { return A.kservable(it) && (it.due || A.today()) <= A.today(); }).length + A.kexpsOf(k.id).filter(function (x) { return x.status === "planned" && x.due && x.due <= A.today(); }).length;
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "وضعیت: " + A.KSTATUS[k.status || "open"]),
       h("p", { class: "small" }, mode === "exp" ? "این گره رفتاری/اجتماعی است: با آزمایش‌های واقعیِ ثبت‌شده ورزیده می‌شود؛ نمونه‌های روبریک فقط خودسنجی‌اند." : "این گره با نمونه‌های پاسخ‌دقیق در شکل‌های گوناگون و نمونه‌های بدلی ورزیده می‌شود."),
       m.lapse ? h("p", { class: "warnline kp-lapse" }, A.KLAPSE) : null,
@@ -1484,11 +1503,13 @@
     A.kremindSweep();
     var root = h("div", { class: "page kp" }), knots = S.all("knot");
     knots.forEach(function (k) { A.kstatusSync(k); });
-    var due = A.kpracticeDue();
+    var due = A.kpracticeDue(), edue = A.kexpDue();
     root.appendChild(A.head("گره‌گشا · ورزیدگی", "ورزشِ گره‌ها", "نمونه‌های تازه با همان ساختارِ عمیق در ظاهرهای گوناگون، به‌علاوهٔ نمونه‌های بدلی؛ پیش از پاسخ اطمینان، پس از پاسخ «چرا؟». گره‌های رفتاری و اجتماعی با آزمایشِ واقعی."));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, fa(due.length) + " نمونهٔ موعد"),
       h("p", { class: "small" }, due.length ? "از " + fa(Object.keys(due.reduce(function (a, d) { a[d.knot.id] = 1; return a; }, {})).length) + " گره، درهم‌آمیخته." : "امروز چیزی موعد نیست."),
       h("button", { class: "btn lg", type: "button", disabled: !due.length, onclick: function () { delete SESS._all; A.go("kpractice", null, "run"); } }, "شروعِ جلسهٔ درهم‌تنیده")));
+    if (edue.length) root.appendChild(h("section", { class: "card kp-expdue" }, h("h2", {}, fa(edue.length) + " آزمایشِ واقعیِ موعد"),
+      h("ul", { class: "small" }, edue.map(function (d) { return h("li", {}, h("button", { class: "linkish", type: "button", onclick: function () { A.go("kpractice", d.knot.id, "exp"); } }, knotName(d.knot)), " — " + (d.exp.what || d.exp.plan || d.exp.predict || "آزمایش") + " (موعد " + A.fdate(d.exp.due) + ")"); }))));
     if (!knots.length) root.appendChild(A.empty("هنوز گره‌ای ثبت نشده. گره پس از تشخیص در «گره‌گشا» (موقعیت ⇐ ریشه ⇐ کارتِ گره) ساخته می‌شود.", A.V.kcases ? h("button", { class: "btn", type: "button", onclick: function () { A.go("kcases"); } }, "رفتن به موقعیت‌ها") : null));
     else root.appendChild(h("section", { class: "card" }, h("h2", {}, "گره‌ها"), h("ul", { class: "kp-klist" }, knots.map(function (k) {
       var m = A.kmastery(k), nx = A.knotNext(k), okN = m.why.filter(function (w) { return w.ok; }).length;

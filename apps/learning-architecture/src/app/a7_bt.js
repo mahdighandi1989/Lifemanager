@@ -40,7 +40,8 @@
 
   /* ---------- سه آزمون ---------- */
   A.btCfg = function () { return X.DEFAULT_CFG(); };
-  A.runThree = function (enc) {
+  /* record=false (۲۰۲۶-۱۰-۱۳): باز کردنِ «جزوهٔ زنده» یا «اختلاف‌ها» فقط برای نمایش حساب می‌کند و اجرای «دستی» در تاریخچه ثبت نمی‌کند */
+  A.runThree = function (enc, record) {
     enc = enc || "A";
     var cases = A.btCases(enc), seed = X.hash(new Date().toISOString().slice(0, 10));
     var t = X.three(cases, X.DEFAULT_CFG(), seed);
@@ -49,7 +50,7 @@
     t.sens = X.ruleSensitivity(cases, X.DEFAULT_CFG());
     t.meta = { enc: enc, at: new Date().toISOString(), n: cases.length };
     A.lastThree = t;
-    S.put({ id: A.uid("ebt"), type: "ebt", meta: { mode: "three", enc: enc, at: t.meta.at, n: cases.length }, ok: t.a.ok && t.b.ok,
+    if (record !== false) S.put({ id: A.uid("ebt"), type: "ebt", meta: { mode: "three", enc: enc, at: t.meta.at, n: cases.length }, ok: t.a.ok && t.b.ok,
       m: { a: t.a.ok, book: t.a.bookScore, b: t.b.ok, agree: t.b.agree, lb: t.b.lb, sens: t.b.sens, spec: t.b.spec, pf1: t.b.claims.pFalseFlagged, pf0: t.b.claims.pFalseUnflagged, c: t.c.neff },
       aut: t.a.bad.map(function (x) { return { id: x.cs.id, stage: "a", truthFail: x.cs.truth.fail || [], flagged: x.res.flagged }; })
         .concat(t.b.disagree.map(function (x) { return { id: x.cs.id, stage: "b", fieldOk: x.ok, flagged: x.res.flagged }; })) });
@@ -61,12 +62,29 @@
       h("div", { class: "row between wrap" }, h("h2", {}, "آزمون " + fa(n) + " — " + title), h("span", { class: "pill " + (ok === true ? "good" : ok === false ? "bad" : "") }, verdict)),
       h("p", {}, h("strong", {}, "پرسش: "), q), h("p", { class: "small" }, h("strong", {}, "محک: "), yard), body, h("p", { class: "small muted" }, h("strong", {}, "اگر رد شود یعنی: "), meaning));
   }
+  /* ممیزیِ ۲۰۲۶-۱۰-۱۳: سه سنجهٔ صادقانه کنارِ آزمونِ ۱ — بی تغییرِ قاعده یا معیارِ قبول (تصمیم با مالک) */
+  A.rulesApproved = function () { var o = S.get("epi_rules_ok"); return o && o.hash; };
+  function t1Honesty(a) {
+    if (!a || a.fullScore == null) return null;
+    var okH = A.rulesApproved(), cur = a.rulesHash, cov = a.coverage || { tested: [], untested: [], n: 0 };
+    return h("div", { class: "card soft t1-honest", dir: "rtl" },
+      h("p", { class: "small" }, h("strong", {}, "مکان‌یابیِ کامل: "), pct(a.fullScore) + " (" + fa(a.nBook - a.partial.length - (a.book.rows || []).filter(function (x) { return !x.fate.pass; }).length) + " از " + fa(a.nBook) + ") — «قبول» یعنی دست‌کم یکی از ایستگاه‌هایی که جزوه می‌گوید پرچم خورده؛ این‌جا شمرده می‌شود چند مثال «همهٔ» آن ایستگاه‌ها را گرفتند."),
+      a.partial.length ? h("details", { class: "small" }, h("summary", {}, fa(a.partial.length) + " مثال فقط بخشی از ایستگاه‌ها را گرفت — داوری با تو (خطای سازنده یا برچسبِ جزوه؟)"),
+        h("ul", {}, a.partial.map(function (x) { var miss = (x.cs.truth.fail || []).filter(function (s) { return x.res.flagged.indexOf(s) < 0; }); return h("li", {}, h("button", { class: "linkish", onclick: function () { A.go("e_lib", x.cs.id); } }, x.cs.title), " — جزوه: " + (x.cs.truth.fail || []).map(stName).join("، ") + " · گرفته‌نشده: " + miss.map(stName).join("، ")); }))) : null,
+      h("p", { class: "small" }, h("strong", {}, "پوششِ قاعده‌ها: "), fa(cov.tested.length) + " از " + fa(cov.n) + " قاعده با مثال‌های خودِ جزوه آزموده می‌شوند (خاموش‌کردنشان حکمِ دست‌کم یک مثال را عوض می‌کند). " + fa(cov.untested.length) + " قاعدهٔ دیگر فقط با سناریوهای ساختگی سنجیده می‌شوند که از خودِ قاعده‌ها ساخته شده‌اند — محکِ مستقل نیستند؛ رانشِ آن‌ها را «اثرِ انگشتِ قاعده‌ها» می‌گیرد."),
+      cov.untested.length ? h("details", { class: "small" }, h("summary", {}, "قاعده‌های بی‌مثال در جزوه (" + fa(cov.untested.length) + ")"), h("div", { class: "row gap wrap" }, cov.untested.map(function (id) { return ruleChip(id); }))) : null,
+      h("p", { class: "small " + (okH && okH !== cur ? "bad" : "") }, h("strong", {}, "اثرِ انگشتِ قاعده‌ها: "),
+        !okH ? "هنوز نسخه‌ای از قاعده‌ها را تأیید نکرده‌ای. پس از مرور، تأییدش کن تا هر تغییرِ بعدی در قاعده‌ها (حتی بی‌اثر بر مثال‌ها) در دورهٔ هفتگی هشدار بدهد." :
+        okH === cur ? "قاعده‌ها همان نسخه‌ای‌اند که تأیید کرده‌ای." : "⚠ قاعده‌ها از آخرین تأییدِ تو تغییر کرده‌اند — پیش از اعتماد، تغییر را در «جزوهٔ زنده» و دفترِ کار ببین.",
+        " ", okH !== cur ? h("button", { class: "btn ghost sm t1-approve", onclick: function () { S.put({ id: "epi_rules_ok", type: "erules", hash: cur, at: new Date().toISOString() }); A.toast("این نسخهٔ قاعده‌ها تأیید شد."); A.render(); } }, "این نسخهٔ قاعده‌ها را تأیید می‌کنم") : null));
+  }
   function threeView(t) {
     var box = h("div", { class: "col gap" });
     var aBad = t.a.bad.length;
     box.appendChild(testCard(1, "آیا کارخانه همان جزوه است؟", "وقتی مثال‌های خود جزوه را به کارخانه می‌دهیم، همان حکمی را می‌دهد که جزوه داده؟ و خطایی که عمداً در سناریو کاشته‌ایم، در همان ایستگاه گرفته می‌شود؟",
       "فقط خود جزوه (" + fa(t.a.nBook) + " مثال) و " + fa(t.a.synthN) + " سناریوی ساختگی با خطای کاشته.", t.a.ok, t.a.ok ? "قبول" : "رد",
       h("div", {}, h("p", {}, "مثال‌های جزوه درست داوری شد: " + pct(t.a.bookScore) + " · خطاهای کاشته در ایستگاه درست: " + pct(t.a.posF) + " · همزادهای سالم بی‌پرچم: " + pct(t.a.posH)),
+        t1Honesty(t.a),
         aBad ? h("div", {}, h("p", { class: "small" }, fa(aBad) + " مورد ناهمخوان (هر کدام خطای سازنده است، نه جزوه):"), h("ul", { class: "small" }, t.a.bad.slice(0, 20).map(function (x) { return h("li", {}, h("button", { class: "linkish", onclick: function () { A.go("e_lib", x.cs.id); } }, x.cs.title), " — ", dc(x.fate.why)); }))) : h("p", { class: "small good" }, "هیچ ناهمخوانی‌ای نیست.")),
       "کارخانه جزوه را درست پیاده نکرده (ایراد از سازنده است). تا این آزمون قبول نشود، نتیجه آزمون ۲ را نمی‌شود به گردن جزوه انداخت."));
     var cl = t.b.claims;
@@ -146,7 +164,8 @@
   A.epiCycleDue = function () { var st = cycState(); return !st.last || A.daysBetween(st.last.slice(0, 10), A.today()) >= 7; };
   A.runCycle = function () {
     var st = cycState();
-    var r = X.cycle({ runs: st.runs, sigs: st.sigs }, A.btCases("A"), new Date().toISOString());
+    var ok0 = S.get("epi_rules_ok");
+    var r = X.cycle({ runs: st.runs, sigs: st.sigs, rulesOk: ok0 && ok0.hash }, A.btCases("A"), new Date().toISOString());
     st.runs = (st.runs || 0) + 1; st.sigs = r.sigs; st.last = r.report.at; st.reports = [r.report].concat(st.reports || []).slice(0, 30); S.put(st);
     S.put({ id: A.uid("ebt"), type: "ebt", meta: { mode: "cycle", enc: "A", at: r.report.at, n: 0 }, ok: r.report.a.ok && r.report.b.ok, m: { a: r.report.a.ok, book: r.report.a.book, b: r.report.b.ok, agree: r.report.b.agree, lb: r.report.b.lb, c: r.report.c.n }, aut: [] });
     return r.report;
@@ -237,14 +256,14 @@
   }
 
   /* ---------- ویرایشگر ویژگی‌ها (مشترک: پرونده بک‌تست و پرونده انسانی) ---------- */
-  A.featEditor = function (f, onCh) {
+  A.featEditor = function (f, onCh, pre) {
     var box = h("div", { class: "feated" }), last = -1;
     FEAT.forEach(function (d) {
       var st = A.EST && A.EST[d.st], hall = st ? st.hall : 0;
       if (hall !== last) { last = hall; box.appendChild(h("div", { class: "rhall" }, (E && E.HALLS[hall] ? "سالن " + fa(hall) + " · " + E.HALLS[hall].fa : ""))); }
-      var id = "fe_" + d.k, ctl;
-      if (d.t === "enum") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value; onCh && onCh(); } }, h("option", { value: "" }, "نامعلوم"), d.v.map(function (v) { return h("option", { value: v, selected: f[d.k] === v }, v); }));
-      else if (d.t === "bool") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value === "1"; onCh && onCh(); } }, h("option", { value: "" }, "نامعلوم"), h("option", { value: "1", selected: f[d.k] === true }, "بله"), h("option", { value: "0", selected: f[d.k] === false }, "خیر"));
+      var id = "fe_" + (pre ? pre + "_" : "") + d.k, ctl;   // پیشوند برای هر تصدیق ⇒ شناسه‌ها و برچسب‌ها یکتا (ممیزی ۲۰۲۶-۱۰-۱۳)
+      if (d.t === "enum") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value; onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), d.v.map(function (v) { return h("option", { value: v, selected: f[d.k] === v }, v); }));
+      else if (d.t === "bool") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value === "1"; onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), h("option", { value: "1", selected: f[d.k] === true }, "بله"), h("option", { value: "0", selected: f[d.k] === false }, "خیر"));
       else ctl = h("input", { id: id, type: "number", min: 0, max: 100, value: f[d.k] == null ? "" : f[d.k], oninput: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = Math.max(0, Math.min(100, +e.target.value)); onCh && onCh(); } });
       box.appendChild(h("div", { class: "ferow" + (d.dx ? " dx" : "") }, h("label", { for: id, class: "small" }, d.fa, d.dx ? h("span", { class: "chip", title: "ویژگی تشخیصی: خودش داوری است" }, "تشخیصی") : null), ctl));
     });
@@ -264,7 +283,7 @@
       c.claims.forEach(function (k, i) {
         var tx = h("input", { type: "text", value: k.txt, placeholder: "متن تصدیق", oninput: function (e) { k.txt = e.target.value; } });
         var tr = h("select", { onchange: function (e) { k.truth = e.target.value === "" ? null : e.target.value === "1"; } }, h("option", { value: "" }, "سرانجام نامعلوم"), h("option", { value: "1", selected: k.truth === true }, "درست بود"), h("option", { value: "0", selected: k.truth === false }, "نادرست بود"));
-        cl.appendChild(h("details", { class: "card soft", open: i === c.claims.length - 1 || null }, h("summary", {}, "تصدیق " + fa(i + 1) + ": " + (k.txt || "…")), tx, tr, A.featEditor(k.f)));
+        cl.appendChild(h("details", { class: "card soft", open: i === c.claims.length - 1 || null }, h("summary", {}, "تصدیق " + fa(i + 1) + ": " + (k.txt || "…")), tx, tr, A.featEditor(k.f, null, "k" + (i + 1))));
       });
     }
     drawClaims();
@@ -333,7 +352,7 @@
   A.V.e_aut = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "اختلاف‌ها برای داوری", "هر جا نتیجه کارخانه با جواب درست نخواند، اینجا می‌آید تا تو بگویی ایراد از کجاست (جزوه، سازنده، یا خود پرونده). ایرادی که به جزوه نسبت بدهی، زیر همان بخش جزوه و در «جزوه زنده» دیده می‌شود."));
-    if (!A.lastThree) A.runThree("A");
+    if (!A.lastThree) A.runThree("A", false);
     var t = A.lastThree;
     function item(cs, stage, info, opts) {
       var secs = [], culprits = [];
@@ -373,13 +392,13 @@
     return { t: "با تاریخ می‌خواند (روی " + fa(s.onFlawed) + " روش معیوب درست فعال شد)", c: "good", err: err };
   }
   A.snapshotLiving = function (why) {
-    if (!A.lastThree) A.runThree("A");
+    if (!A.lastThree) A.runThree("A", false);
     var t = A.lastThree, vs = S.all("eliving"), v = vs.length + 1;
     S.put({ id: "eliv_" + v, type: "eliving", v: v, why: why || "", rules: (window.EPI_RULES || []).map(function (r) { var s = ruleStatus(r, t.sens); return { id: r.id, st: s.t, err: s.err.length }; }), m: { a: t.a.ok, agree: t.b.agree, lb: t.b.lb } });
   };
   A.V.e_living = function (arg, focus) {
     var root = h("div", { class: "page" });
-    if (!A.lastThree) A.runThree("A");
+    if (!A.lastThree) A.runThree("A", false);
     var t = A.lastThree, vs = S.all("eliving").sort(function (a, b) { return b.v - a.v; });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "جزوه زنده", "همه قاعده‌های جزوه یک‌جا: متن پشتوانه هرکدام، نتیجه‌اش در آزمون‌ها، و ایرادهایی که ثبت کرده‌ای. هر بار نسخه تازه ثبت کنی، تغییرات نسبت به نسخه قبل نشان داده می‌شود."));
     root.appendChild(h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", onclick: function () { A.snapshotLiving("ثبت دستی"); A.toast("نسخه ثبت شد"); A.render(); } }, "ثبت نسخه تازه"),
@@ -426,16 +445,36 @@
       tmp.claims.forEach(function (k, i) { out.appendChild(h("section", { class: "card" }, h("h3", {}, fa(i + 1) + ". " + k.txt), claimEngine(k, r.claims[i]))); });
     }
     var save = A.debounce(function () { S.put(cs); calc(); }, 300);
-    claims.forEach(function (t, i) { cs.feat[i + 1] = cs.feat[i + 1] || {}; root.appendChild(h("details", { class: "card", open: i === 0 || null }, h("summary", {}, h("strong", {}, "رمزگذاری تصدیق " + fa(i + 1) + ": "), t), A.featEditor(cs.feat[i + 1], save))); });
+    /* کاربرگ ⇒ رمزگذاری (ممیزی ۲۰۲۶-۱۰-۱۳: موتور کاربرگ‌ها را نمی‌دید؛ «نقل» با اطمینانِ ۹۵ «خطایی ندید» می‌گفت).
+       فقط خانه‌های خالی پر می‌شوند — انتخابِ دستیِ تو دست نمی‌خورد: راه از «راه معرفت هر تصدیق»، اطمینان از «درجهٔ نهایی» ِ «حکم نهایی»،
+       بهای خطا از «هزینه خطا» ِ پذیرش (۱–۲ کم، ۳ متوسط، ۴–۵ زیاد). */
+    var filled = [];
+    (function prefill() {
+      var D = function (sid) { return (cs.st && cs.st[sid] && cs.st[sid].data) || {}; };
+      var ways = (D("st_route").ways || []).filter(function (r) { return r && r.c && r.w; }).sort(function (a, b) { return (+a.ord || 99) - (+b.ord || 99); });
+      var fin = (D("st_final").final || []).filter(function (r) { return r && r.c; }), stk = +D("st_intake").stakes;
+      claims.forEach(function (t, i) {
+        var f = cs.feat[i + 1] = cs.feat[i + 1] || {}, n = String(i + 1), w = ways.filter(function (r) { return String(r.c) === n; })[0], fr = fin.filter(function (r) { return String(r.c) === n; })[0];
+        if (f.way == null && w) { f.way = w.w; filled.push(fa(i + 1) + ": راه ← " + w.w); }
+        if (f.conf == null && fr && fr.p !== "" && fr.p != null && !isNaN(+String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))) { f.conf = Math.max(0, Math.min(100, +String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))); filled.push(fa(i + 1) + ": اطمینان ← " + fa(f.conf) + "٪"); }
+        if (f.stakes == null && stk >= 1) { f.stakes = stk <= 2 ? "کم" : stk === 3 ? "متوسط" : "زیاد"; filled.push(fa(i + 1) + ": بهای خطا ← " + f.stakes); }
+      });
+      if (filled.length && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
+    })();
+    if (filled.length) root.appendChild(h("p", { class: "small card soft feat-prefill", dir: "rtl" }, "از کاربرگ‌های همین پرونده پر شد (فقط خانه‌های خالی؛ قابلِ تغییر): " + filled.join(" · ")));
+    claims.forEach(function (t, i) { cs.feat[i + 1] = cs.feat[i + 1] || {}; root.appendChild(h("details", { class: "card", open: i === 0 || null }, h("summary", {}, h("strong", {}, "رمزگذاری تصدیق " + fa(i + 1) + ": "), t), A.featEditor(cs.feat[i + 1], save, "c" + (i + 1)))); });
     root.appendChild(out); calc();
-    if (!cs.fwdAt) { cs.fwdAt = new Date().toISOString(); S.put(cs); }
+    /* اگر نتیجه پیش از اولین رمزگذاری ثبت شده، این پرونده «پس‌نگر» است و به دفترِ پیش‌رو نمی‌رود (ممیزی ۲۰۲۶-۱۰-۱۳) */
+    if (!cs.fwdAt) { cs.fwdAt = new Date().toISOString(); if (cs.outcomeAt || Object.keys(cs.outcome || {}).some(function (k) { return cs.outcome[k]; })) cs.fwdLate = true; S.put(cs); }
     root.appendChild(h("section", { class: "card soft" }, h("h3", {}, "دفتر پیش‌رو"), h("p", { class: "small" }, "این رمزگذاری پیش از معلوم شدن نتیجه ثبت شد (" + A.fdate(cs.fwdAt) + "). وقتی نتیجه واقعی در «حکم نهایی» ثبت شود، این پرونده با برچسب‌گذاری تو وارد دفتر پیش‌رو می‌شود. دفتر پیش‌رو سخت‌ترین آزمون سامانه است، چون دانش پسینی در آن نیست."),
       h("button", { class: "btn ghost sm", onclick: function () {
         var fin = cs.st && cs.st.st_final && cs.st.st_final.data; var outc = cs.outcome || {};
         if (!fin || !Object.keys(outc).length) { A.toast("اول نتیجه واقعی را در «حکم نهایی» ثبت کن.", "bad"); return; }
+        if (cs.fwdLate || (cs.outcomeAt && cs.fwdAt > cs.outcomeAt)) { A.toast("رمزگذاریِ این پرونده پس از معلوم‌شدنِ نتیجه انجام شد؛ دفترِ پیش‌رو فقط رمزگذاریِ پیش از نتیجه را می‌پذیرد (وگرنه آزمونِ ۳ با دانستنِ جواب باد می‌کند).", "bad"); return; }
+        var featUse = cs.featFrozen || cs.feat || {};   // رمزگذاریِ لحظهٔ نتیجه، نه ویرایش‌های بعدی
         var anyFalse = Object.keys(outc).some(function (k) { return outc[k] === "نادرست"; });
         var c2 = { id: "ecase_fw_" + cs.id, type: "ecase", kind: "forward", by: "user", status: "approved", title: cs.title, dom: "زندگی روزمره", year: new Date().getFullYear(), grp: cs.id, src: [], story: (cs.st.st_intake && cs.st.st_intake.data.input) || "", actor: "خودم",
-          claims: claims.map(function (t, i) { return { id: "k" + (i + 1), txt: t, f: cs.feat[i + 1] || {}, truth: outc[String(i + 1)] === "درست" ? true : outc[String(i + 1)] === "نادرست" ? false : null }; }),
+          claims: claims.map(function (t, i) { return { id: "k" + (i + 1), txt: t, f: featUse[i + 1] || {}, truth: outc[String(i + 1)] === "درست" ? true : outc[String(i + 1)] === "نادرست" ? false : null }; }),
           truth: { ok: !anyFalse, fail: [], why: "برچسب از نتیجه واقعی پرونده انسانی", right: "" }, field: { ok: null, basis: "پرونده پیش‌رو: محک، سرانجام واقعی ادعاهاست" }, out: (function () { var o = {}; claims.forEach(function (t, i) { var v = outc[String(i + 1)]; o["k" + (i + 1)] = v === "درست" ? true : v === "نادرست" ? false : null; }); return o; })(), encodedAt: cs.fwdAt, addedAt: new Date().toISOString() };
         S.put(c2); A.toast("به دفتر پیش‌رو رفت (آزمون ۳)."); A.go("e_lib", c2.id);
       } }, "افزودن به دفتر پیش‌رو (پس از معلوم شدن نتیجه)")));

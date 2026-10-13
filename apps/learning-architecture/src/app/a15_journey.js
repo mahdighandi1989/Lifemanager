@@ -64,20 +64,32 @@
   }
   function handle(t, j) { return j.tech ? exHandle(t, j.tech) : prHandle(t, j.proto); }
 
-  /* ---------- وضعیت ---------- */
+  /* ---------- وضعیت ----------
+     یک سنجه برای هر دو صفحه (ممیزی ۲۰۲۶-۱۰-۱۳): گامی «انجام‌شده» است که صفحهٔ موضوع (A.pipelineStatus) آن را انجام‌شده ببیند.
+     j.done فقط ردِ این است که گام از کدام راه بسته شد (سفر یا راهِ دیگر)؛ هرگز به‌تنهایی گام را تمام‌شده نمی‌کند. */
   function jst(t) { var j = t.journey || {}; return { step: j.step || "", done: j.done || {}, started: j.started || "" }; }
   function writeJ(t, j) { if (!j.started) j.started = A.today(); t.journey = j; S.put(t); }
   function firstOpen(t, j) {
     var ps = A.pipelineStatus(t);
-    for (var i = 0; i < PL.length; i++) if (!j.done[PL[i].k] && !ps[PL[i].k]) return PL[i].k;
+    for (var i = 0; i < PL.length; i++) if (!ps[PL[i].k]) return PL[i].k;
     return "end";
   }
-  function nDone(t, j) { var ps = A.pipelineStatus(t); return PL.filter(function (s) { return j.done[s.k] || ps[s.k]; }).length; }
+  function openSteps(t) { var ps = A.pipelineStatus(t); return PL.filter(function (s) { return !ps[s.k]; }); }
+  function nDone(t, j) { return PL.length - openSteps(t).length; }
+  A.journeyProgress = function (t) { var o = openSteps(t); return { done: PL.length - o.length, all: PL.length, open: o.map(function (s) { return s.k; }) }; };
+  /* آنچه صفحهٔ موضوع برای هر گام می‌سنجد (A.pipelineStatus) — وقتی کاربرگ پر شده ولی سنجه هنوز برقرار نیست، همین گفته می‌شود */
+  var NEED = {
+    S1: "نوعِ موضوع (میوه، گره شخصی یا گره مرزی)", S2: "یک کاربرگِ کامل از فازِ ۱ (یا «استخراج عصاره دوره»)", S3: "یک اجرای کاملِ «۵ خط دلتا»",
+    S4: "دست‌کم یک پلهٔ فرود در «بیان دیگر»", S5: "کاشت در مزرعه (زنجیرهٔ فرود یا همین مفهوم، در درختِ علمِ خودش)", S6: "یک کاربرگِ کامل از فازِ ۴",
+    S7: "«بذر» در «بیان دیگر» (یا یک کاربرگِ کامل از فازِ ۵)", S8: "بازسازیِ رو به بالا در «بیان دیگر» (یا یکی از تکنیک‌های ۲۶، ۲۷، ۲۸)",
+    S9: "یک کاربرگِ کامل از فازِ ۷ (یا مقایسه در «بیان دیگر»)", S10: "یک اجرای کاملِ «برگه سفید ۱-۳-۷»", S11: "یک اجرای کاملِ «قرائت روز» یا «بازی کارآگاهی»"
+  };
 
   /* ---------- دکمه‌ها برای صفحهٔ موضوع و فهرستِ موضوع‌ها ---------- */
   A.journeyButton = function (t, small) {
-    var j = jst(t), at = j.step && KIDX[j.step] != null ? KIDX[j.step] : -1;
-    var label = j.step === "end" ? "🧭 سفرِ گام‌به‌گام (تمام‌شده — مرور)" : at >= 0 ? "🧭 ادامهٔ سفرِ گام‌به‌گام · گامِ " + fa(at + 1) + " از " + fa(PL.length) : "🧭 سفرِ گام‌به‌گام روی این موضوع";
+    var j = jst(t), at = j.step && KIDX[j.step] != null ? KIDX[j.step] : -1, nOpen = openSteps(t).length;
+    /* همان سنجهٔ صفحهٔ پایان: «تمام‌شده» فقط وقتی هر ۱۱ گام انجام شده باشد */
+    var label = !nOpen ? "🧭 سفرِ گام‌به‌گام (تمام‌شده — مرور)" : j.step === "end" ? "🧭 سفرِ گام‌به‌گام · " + fa(nOpen) + " گامِ باز مانده" : at >= 0 ? "🧭 ادامهٔ سفرِ گام‌به‌گام · گامِ " + fa(at + 1) + " از " + fa(PL.length) : "🧭 سفرِ گام‌به‌گام روی این موضوع";
     var b = h("button", { class: small ? "btn sm ghost jr-tbtn" : "btn lg jr-go", onclick: function () { A.go("journey", t.id); } }, label);
     if (small) return b;
     return h("section", { class: "card jr-cta", dir: "rtl" }, h("div", { class: "row between wrap gap" },
@@ -89,7 +101,7 @@
   function strip(t, j, cur) {
     var ps = A.pipelineStatus(t);
     return h("ol", { class: "jr-strip", "aria-label": "مسیرِ " + fa(PL.length) + " گامی" }, PL.map(function (s, i) {
-      var mine = !!j.done[s.k], other = !mine && !!ps[s.k], here = s.k === cur;
+      var mine = !!ps[s.k] && !!j.done[s.k], other = !!ps[s.k] && !j.done[s.k], here = s.k === cur;
       return h("li", { class: "jr-st" + (mine ? " done" : "") + (other ? " other" : "") + (here ? " here" : ""), style: { "--pc": "var(--p" + s.ph + ")" } },
         h("button", { class: "jr-stb", "aria-current": here ? "step" : null, title: "گامِ " + fa(i + 1) + ": " + s.fa + (mine ? " (تمام‌شده)" : other ? " (پیش‌تر از راهِ دیگری انجام شده)" : ""), onclick: function () {
           if (s.k === cur) return;
@@ -135,7 +147,7 @@
     var now = h("section", { class: "card jr-now" }, h("div", { class: "eyebrow" }, "کارِ همین حالا · فقط همین"), h("h2", {}, title),
       h("p", { class: "small muted" }, "فیلدهای ستاره‌دار لازم‌اند تا «گامِ بعد» باز شود؛ هر چه بنویسی خودکار ذخیره می‌شود و همین کاربرگ در صفحهٔ " + (jb.tech ? "تکنیک" : "پروتکل") + " و صفحهٔ موضوع هم دیده می‌شود." + (est ? " زمانِ تقریبی: " + A.minutesText(est) + "." : "")),
       jb.tech ? h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "این تکنیک چیست؟ "), A.peekChip(jb.tech)) : h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "این روال چیست؟ "), h("button", { class: "tlink proto", onclick: function () { A.peekProto(jb.proto); } }, PM[jb.proto].fa)),
-      jb.tech && TM[jb.tech].example ? h("details", {}, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ نمونه را ببین"), h("p", { class: "small" }, h("b", {}, TM[jb.tech].example.title + ": "), TM[jb.tech].example.text)) : null);
+      jb.tech && (A.showGenExample ? A.showGenExample(TM[jb.tech]) : TM[jb.tech].example) ? h("details", { class: "gen" }, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ مثالِ ساختهٔ سامانه را ببین (تولیدی)"), A.genExampleNote ? A.genExampleNote() : null, h("p", { class: "small" }, h("b", {}, TM[jb.tech].example.title + ": "), TM[jb.tech].example.text)) : null);
     var kindSel = null;
     if (jb.kind) {
       kindSel = h("select", { id: "jrKind", onchange: function (e) { t.kind = e.target.value; S.put(t); kindBox.classList.toggle("missing", !t.kind); } },
@@ -146,13 +158,29 @@
     }
     var ws = A.renderWS(flds, rec.data, function () { savef(); }, { prefix: "jr" });
     now.appendChild(h("div", { class: "wsform" }, ws));
+    /* گامِ ۵ یعنی «کاشت در مزرعه»؛ تا کاشته نشده، صفحهٔ موضوع این گام را باز می‌بیند ⇒ سفر هم تیک نمی‌زند و کاشت همین‌جاست */
+    var plantBox = null;
+    if (jb.plant) {
+      var p11 = S.all("pr", function (r) { return r.pid === "P11" && r.topic === t.id; })[0];
+      var canChain = p11 && A.plantP11 && A.filled(p11.data.fruit) && (p11.data.descent || []).some(function (x) { return x && x.what; });
+      plantBox = h("div", { class: "fld req jr-plant", "data-k": "plant" },
+        h("div", { class: "flabel" }, "کاشت در مزرعه", h("span", { class: "reqmark", title: "الزامی" }, " *")),
+        ps.S5 ? h("p", { class: "small good" }, "✓ کاشته شده — صفحهٔ موضوع هم این گام را انجام‌شده می‌بیند.")
+          : h("div", { class: "col gap" },
+            h("p", { class: "small muted" }, "این گام وقتی تمام است که مفهوم واقعاً در درختِ علمِ خودش کاشته شود. " + (canChain ? "زنجیرهٔ فرودِ گامِ ۴ آماده است." : "زنجیرهٔ فرودِ «بیان دیگر» (گامِ ۴) هنوز پله ندارد؛ می‌توانی همین مفهوم را تنها بکاری.")),
+            h("div", { class: "row gap wrap" },
+              canChain ? h("button", { class: "btn sm jr-plantchain", type: "button", onclick: function () { A.plantP11(p11); } }, "🌱 کاشتِ زنجیرهٔ فرود در مزرعه") : null,
+              A.placeDialog ? h("button", { class: "btn sm" + (canChain ? " ghost" : "") + " jr-plantone", type: "button", onclick: function () {
+                var txt = ""; flds.forEach(function (f) { if (!txt && (f.t === "text" || f.t === "area") && A.filled(rec.data[f.k])) txt = String(rec.data[f.k]).slice(0, 200); });
+                A.placeDialog({ text: t.title, body: txt, src: { t: "topic", id: t.id } }, function (node) { if (node) A.render(); });
+              } }, "🌱 کاشتِ همین مفهوم در مزرعه") : null,
+              !canChain ? h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("journey", t.id, "S4"); } }, "← گامِ ۴ (فرود)") : null)));
+      now.appendChild(plantBox);
+    }
     root.appendChild(now);
     /* کارهای جانبیِ همین گام */
     var extra = h("div", { class: "row gap wrap" });
-    if (jb.plant) {
-      var p11 = S.all("pr", function (r) { return r.pid === "P11" && r.topic === t.id; })[0];
-      if (p11 && A.plantP11) extra.appendChild(h("button", { class: "btn ghost sm", onclick: function () { A.plantP11(p11); } }, p11.data.__planted ? "🌱 کاشتِ دوباره در مزرعه" : "🌱 کاشتِ زنجیرهٔ فرود در مزرعه"));
-    }
+    if (jb.plant && p11 && A.plantP11 && ps.S5) extra.appendChild(h("button", { class: "btn ghost sm", onclick: function () { A.plantP11(p11); } }, p11.data.__planted ? "🌱 کاشتِ دوباره در مزرعه" : "🌱 کاشتِ زنجیرهٔ فرود در مزرعه"));
     if (jb.sched) {
       var sc = S.all("sched", function (x) { return x.topic === t.id; });
       extra.appendChild(sc.length ? h("span", { class: "small muted" }, "چرخهٔ ۱-۳-۷ زمان‌بندی شده: " + sc.map(function (x) { return x.label + " · " + A.fdate(x.due) + (x.done ? " ✓" : ""); }).join("، "))
@@ -168,6 +196,7 @@
     function validate() {
       var miss = ws._validate();
       if (jb.kind && !t.kind) { miss.unshift("نوعِ موضوع"); if (kindBox) kindBox.classList.add("missing"); }
+      if (plantBox && !A.pipelineStatus(t).S5) { miss.push("کاشت در مزرعه"); plantBox.classList.add("missing"); }
       return miss;
     }
     root.appendChild(h("div", { class: "row between gap crs-nav jr-nav" },
@@ -176,6 +205,9 @@
         var miss = validate();
         if (miss.length) { A.toast("این‌ها هنوز خالی‌اند: " + miss.slice(0, 3).join("، ") + (miss.length > 3 ? "…" : ""), "bad"); var f = root.querySelector(".missing"); if (f && f.scrollIntoView) f.scrollIntoView({ block: "center" }); return; }
         finishUnit(jb, hd);
+        /* گامِ ۱۰: چرخهٔ ۱-۳-۷ واقعاً زمان‌بندی شود (همان A.start137 ِ صفحهٔ موضوع)، نه فقط وعده */
+        if (jb.sched && !S.all("sched", function (x) { return x.topic === t.id; }).length) A.start137(t.id, t.title);
+        if (!A.pipelineStatus(t)[cur]) { A.toast("صفحهٔ موضوع این گام را هنوز انجام‌شده نمی‌بیند؛ لازم است: " + (NEED[cur] || "کاربرگِ کامل"), "bad"); return; }
         j.done[cur] = A.today(); j.step = next(cur); writeJ(t, j);
         A.toast("گامِ " + fa(i + 1) + " تمام شد.");
         A.go("journey", t.id, j.step);
@@ -194,7 +226,26 @@
     if (r.sched) { var sc = S.get(r.sched); if (sc && !sc.done) { sc.done = true; S.put(sc); } }
   }
   function endView(root, t, j) {
-    root.appendChild(A.head("سفرِ گام‌به‌گام · " + t.title, "سفر روی این موضوع تمام شد", "هر " + fa(PL.length) + " گام را پشتِ سر گذاشته‌ای. از این‌جا به بعد کارِ روال‌هاست: چرخهٔ ۱-۳-۷ و قرائتِ روز خودشان در «امروز» ظاهر می‌شوند."));
+    var open = openSteps(t);
+    if (open.length) {
+      /* به انتهای نوار رسیده‌ای ولی همهٔ گام‌ها انجام نشده‌اند: صادقانه بگو کدام‌ها باز مانده‌اند */
+      root.appendChild(A.head("سفرِ گام‌به‌گام · " + t.title, fa(open.length) + " گام هنوز باز است", "به انتهای مسیر رسیدی، اما سفر وقتی تمام است که هر " + fa(PL.length) + " گام انجام شده باشد (همان چیزی که صفحهٔ موضوع می‌سنجد). " + fa(PL.length - open.length) + " از " + fa(PL.length) + " گام انجام شده؛ این‌ها مانده‌اند:"));
+      root.appendChild(h("section", { class: "card jr-open" }, h("ol", { class: "plain" }, open.map(function (s) {
+        return h("li", { class: "row gap wrap" }, h("button", { class: "linkish", onclick: function () { if (j.started && j.step !== s.k) { j.step = s.k; writeJ(t, j); } A.go("journey", t.id, s.k); } }, "گامِ " + fa(KIDX[s.k] + 1) + ": " + s.fa), h("span", { class: "small muted" }, " — لازم: " + (NEED[s.k] || "")));
+      }))));
+      root.appendChild(h("div", { class: "row gap wrap" },
+        h("button", { class: "btn", onclick: function () { var k = open[0].k; if (j.started && j.step !== k) { j.step = k; writeJ(t, j); } A.go("journey", t.id, k); } }, "رفتن به اولین گامِ باز ←"),
+        h("button", { class: "btn ghost", onclick: function () { A.go("topic", t.id); } }, "صفحهٔ موضوع")));
+      return root;
+    }
+    var sc = S.all("sched", function (x) { return x.topic === t.id; }).sort(function (a, b) { return a.due < b.due ? -1 : 1; });
+    var left = sc.filter(function (x) { return !x.done; });
+    root.appendChild(A.head("سفرِ گام‌به‌گام · " + t.title, "سفر روی این موضوع تمام شد", "هر " + fa(PL.length) + " گام انجام شده است. از این‌جا به بعد کارِ روال‌هاست."));
+    root.appendChild(h("section", { class: "card jr-after" }, h("ul", { class: "plain" },
+      h("li", {}, left.length ? "چرخهٔ ۱-۳-۷ برای این موضوع زمان‌بندی شده و هر نوبت روزِ خودش در «امروز» ظاهر می‌شود: " + left.map(function (x) { return x.label + " · " + A.fdate(x.due); }).join("، ")
+        : sc.length ? "چرخهٔ ۱-۳-۷ ِ این موضوع تمام شده (" + fa(sc.length) + " نوبت)." : "چرخهٔ ۱-۳-۷ برای این موضوع زمان‌بندی نشده.",
+        !sc.length ? h("button", { class: "btn ghost sm jr-sched", onclick: function () { A.start137(t.id, t.title); A.render(); } }, "زمان‌بندیِ روز ۱، ۳ و ۷") : null),
+      h("li", {}, "«قرائت روز» هر روز تا اجرای همان روز در «امروز» یادآوری می‌شود؛ این مفهوم را در آن به‌عنوانِ عینک به کار ببر."))));
     root.appendChild(h("div", { class: "row gap wrap" },
       h("button", { class: "btn", onclick: function () { A.go("topic", t.id); } }, "صفحهٔ موضوع"),
       h("button", { class: "btn ghost", onclick: function () { A.go("journey", t.id, PL[0].k); } }, "مرورِ گام‌ها از اول")));

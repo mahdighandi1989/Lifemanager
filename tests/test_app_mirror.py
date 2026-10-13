@@ -6,6 +6,14 @@ import json
 
 import pytest
 
+
+@pytest.fixture(autouse=True)
+def _owner_is_admin(monkeypatch):
+    """AI/Drive/attachments/reminders are owner-only once ADMIN_EMAILS is set (audit 2026-10-13); the test
+    owner accounts are the admins here, strangers are not."""
+    from app.config import settings
+    monkeypatch.setattr(settings, "ADMIN_EMAILS", "owner-la@example.com,rem@example.com,owner@example.com")
+
 def _signin(api_client, email="owner-la@example.com"):
     """The page is behind login; /api/app-records refuses anonymous callers."""
     r = api_client.post("/auth/register", json={"email": email, "password": "hunter2-long", "username": email.split("@")[0]})

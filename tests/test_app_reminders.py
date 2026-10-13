@@ -17,6 +17,14 @@ def _all_channels_on():
     np.set_cache(old)
 
 
+
+@pytest.fixture(autouse=True)
+def _owner_is_admin(monkeypatch):
+    """AI/Drive/attachments/reminders are owner-only once ADMIN_EMAILS is set (audit 2026-10-13); the test
+    owner accounts are the admins here, strangers are not."""
+    from app.config import settings
+    monkeypatch.setattr(settings, "ADMIN_EMAILS", "owner-la@example.com,rem@example.com,owner@example.com")
+
 def _signin(api_client):
     r = api_client.post("/auth/register", json={"email": "rem@example.com", "password": "hunter2-long", "username": "rem"})
     api_client.headers.update({"Authorization": f"Bearer {r.json()['access_token']}"})

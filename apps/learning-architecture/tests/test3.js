@@ -4,7 +4,7 @@ await p.route('**/fonts.googleapis.com/**', r => r.abort());
 await p.goto('file://'+path.join(__dirname,'..','dist','learning-architecture.html'));await p.waitForSelector('.nav');
 const r=await p.evaluate(()=>{
  const A=APP,S=A.S;
- A.startProto('P1'); let pr=S.all('pr',x=>x.pid==='P1')[0]; Object.assign(pr.data,{src:'دوره',q1:'حلقه بازخورد',q2:'تریلینگ',qq:'تأخیر حلقه را چطور بسنجم؟',d:['a','b','c'],hook:'h'}); pr.status='done'; A.onProtoDone(pr);
+ let pr=A.startProto('P1'); /* startProto فقط پیش‌نویسِ درون‌حافظه می‌سازد (دیدن ≠ ذخیره، ممیزی ۲۰۲۶-۱۰-۱۳) */ Object.assign(pr.data,{src:'دوره',q1:'حلقه بازخورد',q2:'تریلینگ',qq:'تأخیر حلقه را چطور بسنجم؟',d:['a','b','c'],hook:'h'}); pr.status='done'; A.onProtoDone(pr);
  const st=S.all('struct',s=>s.fa==='حلقه بازخورد')[0];
  const ex=A.newEx(45,''); ex.data.gaps=['چرا X؟']; ex.status='done'; A.onExDone(ex);
  const ns=A.nurseryNew().map(x=>x.text);

@@ -235,7 +235,8 @@
     var seen = !!(st && st.revealed), nctx = seen ? (s.ctx || "") : A.probNeutralCtx(s);
     kc.intake.statement = (nctx ? nctx + "\n\n" : "") + (s.q || "");    // فقط زمینهٔ خنثی و پرسش — پاسخ هرگز در صورتِ مسئله نمی‌آید
     kc.intake.answer = ok ? ok.t : (s.move || "");                          // برای نردبان و کنترلِ نشت (در فرم تا «نمایش» پوشیده است)
-    kc.intake.answerHow = "مسیرِ تاریخیِ ثبت‌شده در «مسئله‌های بزرگ» (" + [yr(s.year), s.who].filter(Boolean).join("، ") + ")";
+    var whoYr = [yr(s.year), s.who].filter(Boolean).join("، ");
+    kc.intake.answerHow = p.origin && p.origin.type === "kcase" ? "راه‌حلِ تأییدشده در «شبیه‌سازِ همین مسئله»" : "مسیرِ تاریخیِ ثبت‌شده در «مسئله‌های بزرگ»" + (whoYr ? " (" + whoYr + ")" : "");
     kc.intake.stuckAt = where + (s.year != null && s.year !== "" ? " — لحظهٔ تاریخیِ " + yr(s.year) : "");
     kc.intake.what = "در شبیه‌سازِ «مسئله‌های بزرگ»، در " + where + " حرکتِ بعدی را پیدا نکردم.";
     kc.intake.seen = st && st.revealed ? "yes" : "no";

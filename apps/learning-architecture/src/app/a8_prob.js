@@ -165,12 +165,13 @@
 
   /* ---------- شبیه‌ساز ---------- */
   function sim(p) {
+    var own = !!(p.origin && p.origin.type === "kcase");   // مسئلهٔ شخصی ⇒ بی واژگانِ «تاریخی» (ممیزی ۲۰۲۶-۱۰-۱۳)
     var pg = prog(p.id), n = p.stages.length;
     var st = A.simState && A.simState.pid === p.id ? A.simState : (A.simState = { pid: p.id, lv: 1, order: "hist", i: 0 });
     var box = h("div", { class: "col gap" });
     box.appendChild(h("section", { class: "card" }, h("div", { class: "row gap wrap" },
       [1, 2, 3, 4].map(function (l) { var u = unlocked(pg, l, n), s = lvStats(pg, l, n); return h("button", { class: "btn sm " + (st.lv === l ? "" : "ghost"), disabled: !u, title: u ? LV[l].d : "قفل: سطح قبل را با دست‌کم ۸۰٪ درست تمام کن", onclick: function () { st.lv = l; st.i = 0; A.render(); } }, LV[l].fa + " — " + fa(s.done) + " از " + fa(n) + " گام" + (s.done ? "، " + fa(Math.round(100 * s.pct)) + "٪ درست" : "")); })),
-      h("div", { class: "row gap wrap mt" }, h("label", { class: "small", for: "smOrd" }, "ترتیب گام‌ها:"), h("select", { id: "smOrd", onchange: function (e) { st.order = e.target.value; st.i = 0; A.render(); } }, [["hist", "تاریخی (همان‌طور که رخ داد)"], ["e2h", "از آسان به سخت"], ["h2e", "از سخت به آسان"]].map(function (o) { return h("option", { value: o[0], selected: st.order === o[0] }, o[1]); })),
+      h("div", { class: "row gap wrap mt" }, h("label", { class: "small", for: "smOrd" }, "ترتیب گام‌ها:"), h("select", { id: "smOrd", onchange: function (e) { st.order = e.target.value; st.i = 0; A.render(); } }, [["hist", own ? "ترتیبِ راه‌حل" : "تاریخی (همان‌طور که رخ داد)"], ["e2h", "از آسان به سخت"], ["h2e", "از سخت به آسان"]].map(function (o) { return h("option", { value: o[0], selected: st.order === o[0] }, o[1]); })),
         A.confirmBtn("صفر کردن پیشرفت این سطح", function () { delete pg.lv[st.lv]; S.put(pg); A.render(); })),
       h("p", { class: "small muted" }, LV[st.lv].d + " سطح بعد وقتی باز می‌شود که همه گام‌های این سطح را با دست‌کم ۸۰٪ درستِ بار اول تمام کنی.")));
     var idx = p.stages.map(function (_, i) { return i; });
@@ -208,7 +209,7 @@
     if (st.lv === 1) { card.insertBefore(h("p", { class: "small hint" }, "سرنخ: " + (s0.hint || "—")), area); options(true); }
     else if (st.lv === 2) { var hb = h("button", { class: "btn ghost sm", onclick: function () { hb.replaceWith(h("p", { class: "small hint" }, "سرنخ: " + (s0.hint || "—"))); used = true; } }, "سرنخ (بار اول را نادرست حساب می‌کند)"); var used = false; area.appendChild(hb); var o2 = options; o2(true); var _f = finish; finish = function (first, self) { _f(first && !used, self); }; }
     else {
-      ta = h("textarea", { id: "pbMine", rows: 4, "aria-describedby": "pbMineHint", placeholder: "حرکت پیشنهادی تو در این لحظه تاریخی، با دلیلش (بی‌نگاه به پاسخ)" }); if (rec && rec.mine) ta.value = rec.mine;
+      ta = h("textarea", { id: "pbMine", rows: 4, "aria-describedby": "pbMineHint", placeholder: own ? "حرکتِ پیشنهادیِ تو در این مرحله، با دلیلش (بی‌نگاه به پاسخ)" : "حرکت پیشنهادی تو در این لحظه تاریخی، با دلیلش (بی‌نگاه به پاسخ)" }); if (rec && rec.mine) ta.value = rec.mine;
       area.appendChild(h("label", { for: "pbMine", class: "pb-minelbl" }, "حرکتِ پیشنهادیِ تو (پیش از دیدنِ " + (st.lv === 3 ? "گزینه‌ها" : "حرکتِ واقعی") + ")"));
       area.appendChild(ta);
       area.appendChild(h("div", { class: "small muted", id: "pbMineHint" }, "دست‌کم یک جملهٔ کامل، با دلیلش. متنت همراهِ نمرهٔ این گام ذخیره می‌شود."));
@@ -219,7 +220,7 @@
         if (st.lv === 3) options(true);
         else {
           revealed = true;
-          area.appendChild(h("div", { class: "card soft" }, h("p", {}, h("strong", {}, "حرکت واقعی: "), s0.move), h("p", {}, h("strong", {}, "ایده: "), s0.idea), h("p", { class: "small" }, h("strong", {}, "گزینه‌هایی که آن زمان مطرح بود: "), A.shuffle(s0.opts.slice()).map(function (o) { return (o.ok ? "✓ " : "✗ ") + o.t; }).join(" · ")),
+          area.appendChild(h("div", { class: "card soft" }, h("p", {}, h("strong", {}, "حرکت واقعی: "), s0.move), h("p", {}, h("strong", {}, "ایده: "), s0.idea), h("p", { class: "small" }, h("strong", {}, (own ? "گزینه‌ها: " : "گزینه‌هایی که آن زمان مطرح بود: ")), A.shuffle(s0.opts.slice()).map(function (o) { return (o.ok ? "✓ " : "✗ ") + o.t; }).join(" · ")),
             A.moveChips ? A.moveChips(p, s0, "حرکتِ این گام: ") : null));
           area.appendChild(h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "حرکت تو چقدر با حرکت واقعی (یا معادل معتبرش) می‌خواند؟"), [0, 1, 2].map(function (v) { return h("button", { class: "btn ghost sm", onclick: function () { area.lastChild.remove(); finishMaster(v); } }, ["۰ نه", "۱ تاحدی", "۲ کامل"][v]); })));
         }

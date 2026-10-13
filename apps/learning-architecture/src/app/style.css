@@ -1032,3 +1032,6 @@ table.kp-log th,table.kp-log td{padding:4px 6px;border-bottom:1px solid var(--li
 .pb-minelbl{font-weight:700;font-size:.92rem}
 .pb-changed{border-right:3px solid var(--warn)}
 /* === a8_prob END === */
+
+/* ممیزی ۲۰۲۶-۱۰-۱۳: یک واژهٔ بسیار بلندِ بی‌فاصله (نشانی، کد) صفحهٔ موبایل را ۲۰۰۰px پهن می‌کرد */
+.page, .card, .page p, .page li, .page td, .page h2, .page h3 { overflow-wrap: anywhere; }

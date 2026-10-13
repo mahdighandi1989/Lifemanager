@@ -184,12 +184,30 @@
   ];
 
   /* ---------- میز کار ---------- */
+  /* تاریخِ بازبینی ⇒ YYYY-MM-DD ِ میلادی یا null (ممیزی ۲۰۲۶-۱۰-۱۳: «۱۴۰۵-۰۸-۲۰» و «2026/10/01» در مقایسهٔ رشته‌ای غلط موعد می‌شدند).
+     ارقامِ فارسی/عربی و «/» یکسان می‌شوند؛ سالِ کمتر از ۱۷۰۰ شمسی فرض و به میلادی تبدیل می‌شود (Intl، تقویمِ persian). */
+  A.epiRevDate = function (v) {
+    var s = String(v || "").trim().replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 0x660; }).replace(/[\/.]/g, "-");
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s); if (!m) return null;
+    var y = +m[1], mo = +m[2], d = +m[3]; if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    if (y < 1700) {   // شمسی ⇒ میلادی (الگوریتمِ استانداردِ jalali_to_gregorian)
+      var jy = y + 1595, days = -355668 + 365 * jy + Math.floor(jy / 33) * 8 + Math.floor(((jy % 33) + 3) / 4) + d + (mo < 7 ? (mo - 1) * 31 : (mo - 7) * 30 + 186);
+      var gy = 400 * Math.floor(days / 146097); days %= 146097;
+      if (days > 36524) { gy += 100 * Math.floor(--days / 36524); days %= 36524; if (days >= 365) days++; }
+      gy += 4 * Math.floor(days / 1461); days %= 1461;
+      if (days > 365) { gy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+      var gd = days + 1, sal = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], gm = 0;
+      for (gm = 0; gm < 13 && gd > sal[gm]; gm++) gd -= sal[gm];
+      y = gy; mo = gm; d = gd;
+    }
+    return y + "-" + ("0" + mo).slice(-2) + "-" + ("0" + d).slice(-2);
+  };
   function dueReviews() {
     var t = A.today();
     return S.all("case", function (cs) {
       var d = cs.st && cs.st.st_final && cs.st.st_final.data; if (!d || !d.revdate) return false;
-      var rd = String(d.revdate).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); });
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(rd) || rd > t) return false;
+      var rd = A.epiRevDate(d.revdate);
+      if (!rd || rd > t) return false;
       return (d.final || []).some(function (r) { return r.c && !(cs.outcome || {})[r.c]; });
     });
   }
@@ -229,6 +247,7 @@
       var cy = S.get("ecycle"), lr = cy && cy.reports && cy.reports[0], pend = S.all("ecase", function (c) { return c.status === "pending"; }).length;
       root.appendChild(h("section", { class: "card" }, h("h2", {}, "اعتبار کارخانه و جزوه"),
         lr && lr.a ? h("p", { class: "small" }, "آخرین بررسی خودکار: " + A.fdate(lr.at) + " — آزمون ۱ (کارخانه همان جزوه است): " + (lr.a.ok ? "✓ قبول" : "✗ رد") + " · آزمون ۲ (جزوه با تاریخ): هم‌خوانی " + fa(Math.round(100 * (lr.b.agree || 0))) + "٪") : h("p", { class: "small" }, "هنوز بررسی خودکاری اجرا نشده."),
+        lr && lr.rulesChanged ? h("p", { class: "small bad" }, "⚠ قاعده‌های کارخانه از آخرین نسخه‌ای که تأیید کرده‌ای تغییر کرده‌اند (حتی اگر آزمون‌ها سبز باشند). در «سه آزمون» ببین و تأیید کن.") : null,
         pend ? h("p", { class: "small" }, fa(pend) + " واقعه پیشنهادی منتظر تأیید توست.") : null,
         h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", onclick: function () { A.go("e_bt"); } }, "سه آزمون"), pend ? h("button", { class: "btn ghost sm", onclick: function () { A.go("e_lib", null, "pending"); } }, "صف تأیید") : null)));
     }
@@ -338,6 +357,12 @@
     lbl();
     goBtn.addEventListener("click", function () {
       var miss = ws._validate(); if (miss.length) { A.toast("الزامی: " + miss.join("، "), "bad"); return; }
+      /* پذیرش (ممیزی ۲۰۲۶-۱۰-۱۳): «ورودی مبهم» یعنی «پیش از ادامه کامل شود» — جلو نمی‌رود؛ و حکم با «قلمرو» نباید تناقض داشته باشد */
+      if (s.id === "st_intake") {
+        var vd = String(st.data.verdict || ""), sp = String(st.data.special || "");
+        if (/مبهم یا ناقص/.test(vd)) { A.toast("حکمِ این ایستگاه می‌گوید ورودی مبهم یا ناقص است؛ اول ورودی را کامل کن و حکم را عوض کن.", "bad"); return; }
+        if (/دین/.test(vd) !== /^دین/.test(sp)) { A.toast("«قلمرو» و «حکمِ این ایستگاه» با هم نمی‌خوانند (یکی دین، دیگری عام). یکی را اصلاح کن.", "bad"); return; }
+      }
       st.done = true;
       if (s.id === "st_final" && /بسته شد|نداشت/.test(st.data.verdict || "")) cs.status = "closed";
       S.put(cs);
@@ -370,6 +395,8 @@
       });
     });
     if (cs.outcome) { var o = {}; Object.keys(cs.outcome).forEach(function (k) { if (map[+k]) o[map[+k]] = cs.outcome[k]; }); cs.outcome = o; }
+    /* رمزگذاریِ هر تصدیق (cs.feat) هم با همان نگاشت جابه‌جا می‌شود — ممیزی ۲۰۲۶-۱۰-۱۳: حذفِ تصدیقِ میانی ویژگی‌های «ب» را به «ج» می‌داد */
+    ["feat", "featFrozen"].forEach(function (key) { if (!cs[key]) return; var f = {}; Object.keys(cs[key]).forEach(function (k) { if (map[+k]) f[map[+k]] = cs[key][k]; }); cs[key] = f; });
   }
   /* دسترس‌پذیری: ورودی‌های بی‌برچسب فهرست‌ها و زنجیره‌ها (ردیف‌های تازه هم) برچسب فیلد خود را می‌گیرند */
   function a11yWS(ws) {
@@ -417,7 +444,10 @@
     return h("div", { class: "card soft" }, h("h3", {}, "نتیجه واقعی (پس از بازبینی)"), h("p", { class: "small muted" }, "وقتی معیار بازبینی معلوم شد، اینجا ثبت کن. فقط «درست» و «نادرست» به کالیبراسیون مشترک می‌رود."),
       rowsWithP.map(function (r) {
         return h("div", { class: "row gap wrap" }, h("span", {}, fa(r.c) + ". " + (claims[+r.c - 1] || "").slice(0, 80) + " — " + fa(r.p) + "٪"),
-          h("select", { "aria-label": "نتیجه ادعای " + r.c, onchange: function (e) { cs.outcome[r.c] = e.target.value; S.put(cs); A.toast("ثبت شد"); } }, ["", "درست", "نادرست", "نامعلوم"].map(function (o) { return h("option", { value: o, selected: (cs.outcome[r.c] || "") === o }, o || "—"); })));
+          h("select", { "aria-label": "نتیجه ادعای " + r.c, onchange: function (e) {
+            /* دفترِ پیش‌رو (آزمون ۳) فقط رمزگذاریِ پیش از نتیجه را می‌پذیرد: لحظهٔ اولین نتیجه ثبت و رمزگذاریِ همان لحظه منجمد می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳) */
+            if (e.target.value && !cs.outcomeAt) { cs.outcomeAt = new Date().toISOString(); if (cs.fwdAt) cs.featFrozen = JSON.parse(JSON.stringify(cs.feat || {})); }
+            cs.outcome[r.c] = e.target.value; S.put(cs); A.toast("ثبت شد"); } }, ["", "درست", "نادرست", "نامعلوم"].map(function (o) { return h("option", { value: o, selected: (cs.outcome[r.c] || "") === o }, o || "—"); })));
       }));
   }
   function report(cs) {

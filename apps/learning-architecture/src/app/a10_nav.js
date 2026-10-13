@@ -17,11 +17,27 @@
     var se = document.scrollingElement || document.documentElement;
     return { win: window.scrollY || se.scrollTop || 0, main: (mainEl() || {}).scrollTop || 0 };
   }
+  /* نامِ فارسیِ نماهایی که در منو نیستند — «↩ برگرد به …» هرگز شناسهٔ خامِ نما (e_case، kcase…) نشان نمی‌دهد (ممیزی ۲۰۲۶-۱۰-۱۳) */
+  var VIEW_FA = A.VIEW_FA = { tech: "صفحهٔ تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام", proto: "پروتکل", e_case: "پروندهٔ کارخانه",
+    kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن", ksims: "شبیه‌سازهای گره", move: "حرکتِ حلِ مسئله", moves: "حرکت‌های حلِ مسئله",
+    epi_course: "دورهٔ کارخانه", epi_lesson: "درسِ دورهٔ کارخانه", course: "دورهٔ گام‌به‌گام", home: "امروز", start: "از اینجا شروع کن", settings: "تنظیمات" };
+  function recTitle(view, arg) {
+    var r = arg != null && A.S && A.S.get ? A.S.get(arg) : null;
+    if (!r || typeof r !== "object") return "";
+    var t = r.title || r.fa || r.name || r.q || "";
+    return typeof t === "string" ? t.replace(/\s+/g, " ").trim().slice(0, 60) : "";
+  }
+  function viewLabel(view, arg) {
+    var base = navLabel(view) || VIEW_FA[view] || "", rt = recTitle(view, arg);
+    if (rt) return (VIEW_FA[view] && !navLabel(view) ? VIEW_FA[view] + ": " : "") + rt;
+    return base || "صفحهٔ قبلی";
+  }
+  A.viewLabel = viewLabel;
   function pageTitle() {
     var m = mainEl(); var h1 = m && m.querySelector("h1");
     var t = h1 ? h1.textContent.trim() : "";
     if (A.state.view === "tech" && A.TM[A.state.arg]) t = A.fa(A.state.arg) + " · " + A.TM[A.state.arg].fa;
-    return t || navLabel(A.state.view) || A.state.view;
+    return t || viewLabel(A.state.view, A.state.arg);
   }
   /* بخشی از صفحه که رویش زدی: نزدیک‌ترین کارت/بخش با عنوان */
   function clickContext() {

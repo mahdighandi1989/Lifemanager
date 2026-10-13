@@ -54,6 +54,14 @@ var APP = window.APP = {};
   A.pad = function (n) { return n < 10 ? "0" + n : "" + n; };
   A.today = function () { var d = new Date(); return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); };
   A.addDays = function (ds, n) { var p = ds.split("-"); var d = new Date(+p[0], +p[1] - 1, +p[2]); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); };
+  /* تاریخِ محلیِ یک زمانِ ISO (برای مقایسه با A.today() که محلی است). slice(0,10) روی ISO تاریخِ UTC را می‌دهد و
+     در تهران بینِ ۰۰:۰۰ تا ۰۳:۳۰ یک روز عقب است (ممیزی ۲۰۲۶-۱۰-۱۳). رشتهٔ YYYY-MM-DD همان‌طور برمی‌گردد. */
+  A.localDay = function (iso) {
+    if (!iso) return "";
+    var s = String(iso); if (s.length <= 10) return s;
+    var d = new Date(s); if (isNaN(d.getTime())) return s.slice(0, 10);
+    return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate());
+  };
   A.daysBetween = function (a, b) { var pa = a.split("-"), pb = b.split("-"); return Math.round((new Date(+pb[0], +pb[1] - 1, +pb[2]) - new Date(+pa[0], +pa[1] - 1, +pa[2])) / 864e5); };
   A.uid = function (p) { return (p || "r") + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); };
   A.fdate = function (iso) {
@@ -177,14 +185,26 @@ var APP = window.APP = {};
     });
   }
   var flushHost = A.debounce(pumpHost, 700);
-  S.flushNow = function () { if (S.mode === "host") pumpHost(); };
-  try { window.addEventListener("pagehide", function () { S.flushNow(); }); document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") S.flushNow(); }); } catch (e) { }
-  var flushLocal = A.debounce(function () {
+  /* حالتِ محلی: نوشتن با تأخیرِ ۳۰۰ms جمع می‌شود؛ اما اگر صفحه بسته/بازبارگذاری شود (pagehide، پنهان‌شدن، beforeunload)
+     نوشتنِ معوق همان لحظه انجام می‌شود تا تغییرِ کمتر از ۳۰۰ms پیش از بارگذاری گم نشود (ممیزی ۲۰۲۶-۱۰-۱۳). */
+  var localDirty = false, localTimer = null;
+  function writeLocal() {
+    if (localTimer) { clearTimeout(localTimer); localTimer = null; }
+    if (!localDirty) return; localDirty = false;
     try { localStorage.setItem(LSKEY, JSON.stringify(S.recs)); S.setStatus("ذخیره در همین مرورگر"); }
     catch (e) { S.setStatus("ذخیره ناموفق (فضای مرورگر)"); }
-  }, 300);
-  S.put = function (r) {
-    r.updated = new Date().toISOString(); if (!r.created) r.created = r.updated;
+  }
+  function flushLocal() { localDirty = true; if (localTimer) clearTimeout(localTimer); localTimer = setTimeout(writeLocal, 300); }
+  S.flushNow = function () { if (S.mode === "host") pumpHost(); else if (S.mode === "local") writeLocal(); };
+  try {
+    window.addEventListener("pagehide", function () { S.flushNow(); });
+    window.addEventListener("beforeunload", function () { S.flushNow(); });
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") S.flushNow(); });
+  } catch (e) { }
+  /* o.keepTime: زمانِ «updated» ِ خودِ رکورد حفظ شود (ورودِ پشتیبان؛ ممیزی ۲۰۲۶-۱۰-۱۳) — وگرنه هر نوشتن زمانِ اکنون را می‌گیرد */
+  S.put = function (r, o) {
+    if (!(o && o.keepTime && r.updated)) r.updated = new Date().toISOString();
+    if (!r.created) r.created = r.updated;
     S.recs[r.id] = r;
     if (S.mode === "host") { delete hostDel[r.id]; hostPending[r.id] = r; flushHost(); }
     else if (S.mode === "gas") { pending[r.id] = r; flushGAS(); } else flushLocal();
@@ -319,6 +339,6 @@ var APP = window.APP = {};
   A.brier = function (pts) { if (!pts.length) return null; var s = 0; pts.forEach(function (x) { s += (x.p - x.o) * (x.p - x.o); }); return s / pts.length; };
   A.recallTrend = function () {
     return S.all("pr", function (r) { return (r.pid === "P3" || r.pid === "P4") && r.status === "done" && r.data && r.data.pct != null; })
-      .sort(function (a, b) { return a.created.localeCompare(b.created); }).map(function (r) { return { d: r.created.slice(0, 10), v: +r.data.pct }; });
+      .sort(function (a, b) { return a.created.localeCompare(b.created); }).map(function (r) { return { d: A.localDay(r.created), v: +r.data.pct }; });
   };
 })(APP);

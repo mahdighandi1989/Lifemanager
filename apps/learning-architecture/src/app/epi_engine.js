@@ -315,7 +315,8 @@
       if (since.length >= C.decayMin) { var e = X.evaluate(since, state.lockedCfg); rep.decay = { n: since.length, score: e.score, lb: e.lb, fail: e.score < C.oosFrac * C.floor }; }
       else rep.decay = { n: since.length, wait: true };
     }
-    var sigs = (state.sigs || []).concat(Object.keys(seen)).slice(-4000);
+    var sigs = Object.keys(seen).slice(-4000);   // seen already holds the old ones (audit 2026-10-13: was duplicating them)
+    rep.rulesHash = X.rulesHash(); rep.rulesChanged = !!(state.rulesOk && state.rulesOk !== rep.rulesHash);
     return { report: rep, sigs: sigs };
   };
 
@@ -335,7 +336,34 @@
     var posF = sF.length ? sF.filter(function (x) { return x.fate.located; }).length / sF.length : 1, posH = sH.length ? sH.filter(function (x) { return x.fate.pass; }).length / sH.length : 1;
     var bad = eB.rows.filter(function (x) { return !x.fate.pass; }).concat(eS.rows.filter(function (x) { return !x.fate.pass; }));
     var ok = eB.score >= X.T.a.book && posF >= X.T.a.synth && posH >= X.T.a.synth;
-    return { ok: ok, book: eB, nBook: book.length, bookScore: eB.score, synthN: syn.length, posF: posF, posH: posH, bad: bad };
+    /* ممیزیِ ۲۰۲۶-۱۰-۱۳ — صداقتِ ابزار، بی تغییرِ قاعده یا معیارِ قبول:
+       (۱) «مکان‌یابیِ کامل»: X.fate یک پرونده را درست می‌شمارد اگر «یکی» از ایستگاه‌های موردانتظار پرچم بخورد؛ این‌جا جداگانه
+           گزارش می‌شود چند مثالِ جزوه «همهٔ» ایستگاه‌های موردانتظار را پرچم گرفتند، و ناقص‌ها برای داوریِ مالک فهرست می‌شوند.
+       (۲) «پوششِ قاعده‌ها»: کدام قاعده‌ها با مثال‌های جزوه واقعاً آزموده می‌شوند (خاموش‌کردنشان حکمِ دست‌کم یک مثال را عوض می‌کند).
+           سناریوهای ساختگی از خودِ قاعده‌ها ساخته می‌شوند، پس برای بقیه محکِ مستقل نیستند. */
+    function full(x) { var t = x.cs.truth || {}; return t.ok === true ? x.res.healthy : (t.fail || []).every(function (s) { return x.res.flagged.indexOf(s) >= 0; }); }
+    var partial = eB.rows.filter(function (x) { return x.fate.pass && !full(x); });
+    var fullScore = eB.rows.length ? eB.rows.filter(full).length / eB.rows.length : 1;
+    var cov = X.bookCoverage(book, cfg);
+    return { ok: ok, book: eB, nBook: book.length, bookScore: eB.score, synthN: syn.length, posF: posF, posH: posH, bad: bad,
+      fullScore: fullScore, partial: partial, coverage: cov, rulesHash: X.rulesHash() };
+  };
+  /* قاعده‌ای «با مثال‌های جزوه آزموده» است اگر خاموش‌کردنش پرچم‌ها، نخستین نقطهٔ خطا یا سقفِ دست‌کم یک مثال را عوض کند */
+  X.bookCoverage = function (book, cfg) {
+    cfg = cfg || X.DEFAULT_CFG();
+    function sig(cs, c) { var r = X.runCase(cs, c); return JSON.stringify([r.flagged, r.first, (r.claims || []).map(function (k) { return k && (k.cap != null ? k.cap : k.ceil); })]); }
+    var base = book.map(function (cs) { return sig(cs, cfg); }), tested = [], untested = [];
+    (W.EPI_RULES || []).forEach(function (rule) {
+      var c2 = JSON.parse(JSON.stringify(cfg)); c2.w = Object.assign({}, cfg.w || {}); c2.w[rule.id] = 0;
+      var hit = book.some(function (cs, i) { return sig(cs, c2) !== base[i]; });
+      (hit ? tested : untested).push(rule.id);
+    });
+    return { tested: tested, untested: untested, n: tested.length + untested.length };
+  };
+  /* اثرِ انگشتِ قاعده‌ها (تعریف + شرطِ کد): نسخه‌ای که مالک تأیید کرده با نسخهٔ فعلی مقایسه می‌شود ⇒ رانشِ قاعده‌ها
+     حتی وقتی هیچ مثالی آن را نمی‌بیند پیدا می‌شود */
+  X.rulesHash = function () {
+    return String(X.hash(JSON.stringify(W.EPI_RULES || [], function (k, v) { return typeof v === "function" ? String(v) : v; })));
   };
   function fieldOf(c) {
     var F = W.EPI_FIELD || {};

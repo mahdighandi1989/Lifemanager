@@ -4241,7 +4241,7 @@ window.EPI_ST.push({
     { k: "conclusion", t: "area", l: "حکم در یک بند", rows: 3, req: true, qk: true },
     { k: "act", t: "sel", l: "اقدام", req: true, qk: true, opts: ["اقدام بر پایهٔ آن", "اقدام مشروط یا محتاطانه (با حد ضرر)", "تحقیق بیشتر پیش از هر اقدام", "کنار گذاشتن ادعا", "اقدامی لازم نیست (فقط فهم)"] },
     { k: "check", t: "text", l: "چه مشاهده، سند یا رخدادی بعداً درستی ادعای اصلی را معلوم می‌کند؟", qk: true },
-    { k: "revdate", t: "text", l: "تاریخ بازبینی (YYYY-MM-DD)", h: "مثلاً ۳۰ روز بعد؛ در میز کار یادآوری می‌شود" },
+    { k: "revdate", t: "text", l: "تاریخ بازبینی (مثلاً 2026-11-20 یا ۱۴۰۵-۰۸-۲۹)", h: "میلادی یا شمسی؛ مثلاً ۳۰ روز بعد. در میز کار یادآوری می‌شود. در «مسیر سریع» هم هست تا پرونده‌های سریع هم موعد بگیرند.", qk: true },
     { k: "verdict", t: "sel", l: "حکم این ایستگاه", req: true, qk: true, opts: ["پرونده بسته شد: حکم و اقدام روشن است", "پرونده باز می‌ماند: منتظر قرینه یا تحقیق", "پرونده نشان داد ورودی اصلاً تصدیق سنجش‌پذیر نداشت"] }
   ],
   out: "حکم نهایی، اقدام، معیار بازبینی و — پس از معلوم شدن نتیجه — یک نقطهٔ کالیبراسیون.",
@@ -14840,7 +14840,8 @@ window.EPI_PROBLEMS.push({
       if (since.length >= C.decayMin) { var e = X.evaluate(since, state.lockedCfg); rep.decay = { n: since.length, score: e.score, lb: e.lb, fail: e.score < C.oosFrac * C.floor }; }
       else rep.decay = { n: since.length, wait: true };
     }
-    var sigs = (state.sigs || []).concat(Object.keys(seen)).slice(-4000);
+    var sigs = Object.keys(seen).slice(-4000);   // seen already holds the old ones (audit 2026-10-13: was duplicating them)
+    rep.rulesHash = X.rulesHash(); rep.rulesChanged = !!(state.rulesOk && state.rulesOk !== rep.rulesHash);
     return { report: rep, sigs: sigs };
   };
 
@@ -14860,7 +14861,34 @@ window.EPI_PROBLEMS.push({
     var posF = sF.length ? sF.filter(function (x) { return x.fate.located; }).length / sF.length : 1, posH = sH.length ? sH.filter(function (x) { return x.fate.pass; }).length / sH.length : 1;
     var bad = eB.rows.filter(function (x) { return !x.fate.pass; }).concat(eS.rows.filter(function (x) { return !x.fate.pass; }));
     var ok = eB.score >= X.T.a.book && posF >= X.T.a.synth && posH >= X.T.a.synth;
-    return { ok: ok, book: eB, nBook: book.length, bookScore: eB.score, synthN: syn.length, posF: posF, posH: posH, bad: bad };
+    /* ممیزیِ ۲۰۲۶-۱۰-۱۳ — صداقتِ ابزار، بی تغییرِ قاعده یا معیارِ قبول:
+       (۱) «مکان‌یابیِ کامل»: X.fate یک پرونده را درست می‌شمارد اگر «یکی» از ایستگاه‌های موردانتظار پرچم بخورد؛ این‌جا جداگانه
+           گزارش می‌شود چند مثالِ جزوه «همهٔ» ایستگاه‌های موردانتظار را پرچم گرفتند، و ناقص‌ها برای داوریِ مالک فهرست می‌شوند.
+       (۲) «پوششِ قاعده‌ها»: کدام قاعده‌ها با مثال‌های جزوه واقعاً آزموده می‌شوند (خاموش‌کردنشان حکمِ دست‌کم یک مثال را عوض می‌کند).
+           سناریوهای ساختگی از خودِ قاعده‌ها ساخته می‌شوند، پس برای بقیه محکِ مستقل نیستند. */
+    function full(x) { var t = x.cs.truth || {}; return t.ok === true ? x.res.healthy : (t.fail || []).every(function (s) { return x.res.flagged.indexOf(s) >= 0; }); }
+    var partial = eB.rows.filter(function (x) { return x.fate.pass && !full(x); });
+    var fullScore = eB.rows.length ? eB.rows.filter(full).length / eB.rows.length : 1;
+    var cov = X.bookCoverage(book, cfg);
+    return { ok: ok, book: eB, nBook: book.length, bookScore: eB.score, synthN: syn.length, posF: posF, posH: posH, bad: bad,
+      fullScore: fullScore, partial: partial, coverage: cov, rulesHash: X.rulesHash() };
+  };
+  /* قاعده‌ای «با مثال‌های جزوه آزموده» است اگر خاموش‌کردنش پرچم‌ها، نخستین نقطهٔ خطا یا سقفِ دست‌کم یک مثال را عوض کند */
+  X.bookCoverage = function (book, cfg) {
+    cfg = cfg || X.DEFAULT_CFG();
+    function sig(cs, c) { var r = X.runCase(cs, c); return JSON.stringify([r.flagged, r.first, (r.claims || []).map(function (k) { return k && (k.cap != null ? k.cap : k.ceil); })]); }
+    var base = book.map(function (cs) { return sig(cs, cfg); }), tested = [], untested = [];
+    (W.EPI_RULES || []).forEach(function (rule) {
+      var c2 = JSON.parse(JSON.stringify(cfg)); c2.w = Object.assign({}, cfg.w || {}); c2.w[rule.id] = 0;
+      var hit = book.some(function (cs, i) { return sig(cs, c2) !== base[i]; });
+      (hit ? tested : untested).push(rule.id);
+    });
+    return { tested: tested, untested: untested, n: tested.length + untested.length };
+  };
+  /* اثرِ انگشتِ قاعده‌ها (تعریف + شرطِ کد): نسخه‌ای که مالک تأیید کرده با نسخهٔ فعلی مقایسه می‌شود ⇒ رانشِ قاعده‌ها
+     حتی وقتی هیچ مثالی آن را نمی‌بیند پیدا می‌شود */
+  X.rulesHash = function () {
+    return String(X.hash(JSON.stringify(W.EPI_RULES || [], function (k, v) { return typeof v === "function" ? String(v) : v; })));
   };
   function fieldOf(c) {
     var F = W.EPI_FIELD || {};
@@ -15018,6 +15046,14 @@ var APP = window.APP = {};
   A.pad = function (n) { return n < 10 ? "0" + n : "" + n; };
   A.today = function () { var d = new Date(); return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); };
   A.addDays = function (ds, n) { var p = ds.split("-"); var d = new Date(+p[0], +p[1] - 1, +p[2]); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); };
+  /* تاریخِ محلیِ یک زمانِ ISO (برای مقایسه با A.today() که محلی است). slice(0,10) روی ISO تاریخِ UTC را می‌دهد و
+     در تهران بینِ ۰۰:۰۰ تا ۰۳:۳۰ یک روز عقب است (ممیزی ۲۰۲۶-۱۰-۱۳). رشتهٔ YYYY-MM-DD همان‌طور برمی‌گردد. */
+  A.localDay = function (iso) {
+    if (!iso) return "";
+    var s = String(iso); if (s.length <= 10) return s;
+    var d = new Date(s); if (isNaN(d.getTime())) return s.slice(0, 10);
+    return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate());
+  };
   A.daysBetween = function (a, b) { var pa = a.split("-"), pb = b.split("-"); return Math.round((new Date(+pb[0], +pb[1] - 1, +pb[2]) - new Date(+pa[0], +pa[1] - 1, +pa[2])) / 864e5); };
   A.uid = function (p) { return (p || "r") + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); };
   A.fdate = function (iso) {
@@ -15141,14 +15177,26 @@ var APP = window.APP = {};
     });
   }
   var flushHost = A.debounce(pumpHost, 700);
-  S.flushNow = function () { if (S.mode === "host") pumpHost(); };
-  try { window.addEventListener("pagehide", function () { S.flushNow(); }); document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") S.flushNow(); }); } catch (e) { }
-  var flushLocal = A.debounce(function () {
+  /* حالتِ محلی: نوشتن با تأخیرِ ۳۰۰ms جمع می‌شود؛ اما اگر صفحه بسته/بازبارگذاری شود (pagehide، پنهان‌شدن، beforeunload)
+     نوشتنِ معوق همان لحظه انجام می‌شود تا تغییرِ کمتر از ۳۰۰ms پیش از بارگذاری گم نشود (ممیزی ۲۰۲۶-۱۰-۱۳). */
+  var localDirty = false, localTimer = null;
+  function writeLocal() {
+    if (localTimer) { clearTimeout(localTimer); localTimer = null; }
+    if (!localDirty) return; localDirty = false;
     try { localStorage.setItem(LSKEY, JSON.stringify(S.recs)); S.setStatus("ذخیره در همین مرورگر"); }
     catch (e) { S.setStatus("ذخیره ناموفق (فضای مرورگر)"); }
-  }, 300);
-  S.put = function (r) {
-    r.updated = new Date().toISOString(); if (!r.created) r.created = r.updated;
+  }
+  function flushLocal() { localDirty = true; if (localTimer) clearTimeout(localTimer); localTimer = setTimeout(writeLocal, 300); }
+  S.flushNow = function () { if (S.mode === "host") pumpHost(); else if (S.mode === "local") writeLocal(); };
+  try {
+    window.addEventListener("pagehide", function () { S.flushNow(); });
+    window.addEventListener("beforeunload", function () { S.flushNow(); });
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") S.flushNow(); });
+  } catch (e) { }
+  /* o.keepTime: زمانِ «updated» ِ خودِ رکورد حفظ شود (ورودِ پشتیبان؛ ممیزی ۲۰۲۶-۱۰-۱۳) — وگرنه هر نوشتن زمانِ اکنون را می‌گیرد */
+  S.put = function (r, o) {
+    if (!(o && o.keepTime && r.updated)) r.updated = new Date().toISOString();
+    if (!r.created) r.created = r.updated;
     S.recs[r.id] = r;
     if (S.mode === "host") { delete hostDel[r.id]; hostPending[r.id] = r; flushHost(); }
     else if (S.mode === "gas") { pending[r.id] = r; flushGAS(); } else flushLocal();
@@ -15283,7 +15331,7 @@ var APP = window.APP = {};
   A.brier = function (pts) { if (!pts.length) return null; var s = 0; pts.forEach(function (x) { s += (x.p - x.o) * (x.p - x.o); }); return s / pts.length; };
   A.recallTrend = function () {
     return S.all("pr", function (r) { return (r.pid === "P3" || r.pid === "P4") && r.status === "done" && r.data && r.data.pct != null; })
-      .sort(function (a, b) { return a.created.localeCompare(b.created); }).map(function (r) { return { d: r.created.slice(0, 10), v: +r.data.pct }; });
+      .sort(function (a, b) { return a.created.localeCompare(b.created); }).map(function (r) { return { d: A.localDay(r.created), v: +r.data.pct }; });
   };
 })(APP);
 /* ===== موتور کارگاه: فیلدها، تحلیلگرها، نمودارها ===== */
@@ -15740,7 +15788,8 @@ var APP = window.APP = {};
   var h = A.h, fa = A.fa, S = A.S, C = A.C;
   var NAV = [
     { g: "دوره: از صفر" },
-    ["course", "🧭 دورهٔ گام‌به‌گام", "۴۵ درس به ترتیب (هر درس ۱۵ تا ۵۵ دقیقه، قابلِ تقسیم)، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
+    /* شمار و زمانِ درس‌ها را دوره (a11_course.js، A.courseBlurb) از روی خودِ درس‌ها می‌سازد و همین متن را هنگامِ بارگذاری جایگزین می‌کند */
+    ["course", "🧭 دورهٔ گام‌به‌گام", "تکنیک‌ها و روال‌ها، درس به درس و به ترتیب، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
     { g: "گره‌گشا" },
@@ -15777,7 +15826,10 @@ var APP = window.APP = {};
   };
   A.shell = function () {
     var app = A.mountEl || document.getElementById("app"); app.innerHTML = "";
-    function navBtn(n) { return h("button", { class: "nav", "data-v": n[0], title: n[2], onclick: function () { (A.goRoot || A.go)(n[0]); } }, h("span", { class: "nt" }, n[1]), h("span", { class: "nd" }, n[2])); }
+    function navBtn(n) {
+      var d = n[0] === "course" && A.courseNavText ? A.courseNavText() : n[2];
+      return h("button", { class: "nav", "data-v": n[0], title: d, onclick: function () { (A.goRoot || A.go)(n[0]); } }, h("span", { class: "nt" }, n[1]), h("span", { class: "nd" }, d));
+    }
     function navList(arr, sys) { return h("div", { class: "navlist", "data-sys": sys }, arr.map(function (n) { return n.g ? h("div", { class: "navg" }, n.g) : navBtn(n); })); }
     var nav = h("nav", { class: "side", "aria-label": "بخش‌ها" },
       h("div", { class: "brand" }, h("div", { class: "bmark", "aria-hidden": "true" }, svgMark()), h("div", {}, h("div", { class: "bname", id: "bname" }, "معماری یادگیری عمیق"), h("div", { class: "bsub", id: "bsub" }, "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه"))),
@@ -15811,7 +15863,7 @@ var APP = window.APP = {};
     // over the owner's real data — a deep link or the host's URL effect can call render that early (2026-10-12 audit)
     if (A.HOST && !A.S.loaded) { main.appendChild(h("div", { class: "card" }, "در حالِ بارگذاریِ داده‌ها…")); return; }
     /* برای «نظارت و سرکشی» میزبان: هر نما یک بخش نام‌دار است */
-    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه", kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن" })[A.state.view] || A.state.view; })();
+    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه", kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن" })[A.state.view] || (A.viewLabel ? A.viewLabel(A.state.view, A.state.arg) : A.state.view); })();
     main.setAttribute("data-report-section", A.state.view); main.setAttribute("data-report-section-label", lab);
     var fn = A.V[A.state.view] || A.V.home;
     try { main.appendChild(fn(A.state.arg, A.state.sub)); }
@@ -15864,7 +15916,7 @@ var APP = window.APP = {};
       var tp = S.get(s.topic);
       items.push({ k: "sched", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · موعد " + A.fdate(s.due), go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
     });
-    function lastRun(pid) { var r = S.all("pr", function (x) { return x.pid === pid && x.status === "done"; })[0]; return r ? r.created.slice(0, 10) : null; }
+    function lastRun(pid) { var r = S.all("pr", function (x) { return x.pid === pid && x.status === "done"; })[0]; return r ? A.localDay(r.created) : null; }
     var p2 = lastRun("P2"); if (p2 !== t) items.push({ k: "p", txt: "قرائت ۱۰ دقیقه‌ای امروز", sub: "یک رخداد امروز از پشت یک عینک علمی", go: function () { A.startProto("P2"); } });
     [["P4", 7, "جلسه هفتگی برگه سفید"], ["P5", 7, "تولید هفتگی بازی کارآگاهی"], ["P9", 30, "ممیزی دوحلقه‌ای ماهانه"]].forEach(function (x) {
       var l = lastRun(x[0]); if (!l || A.daysBetween(l, t) >= x[1]) items.push({ k: "p", txt: x[2], sub: l ? "آخرین اجرا " + A.fdate(l) : "هنوز اجرا نشده", go: function () { A.startProto(x[0]); } });
@@ -15901,11 +15953,15 @@ var APP = window.APP = {};
     root.appendChild(A.head("امروز · " + A.fdate(A.today()), "از فهمیدن تا ماندن", "کارهایی که امروز موعدشان رسیده و پیشرفتت اینجاست. برای یاد گرفتن خودِ روش‌ها برنامه ۸ هفته‌ای را دنبال کن؛ برای فهم یک موضوع تازه به «موضوع‌ها» برو."));
     if (A.courseState) {
       var cst = A.courseState(), cnl = A.courseNext && A.courseNext();
+      var cwarm = cst && cst.topic && A.courseWarmDue ? A.courseWarmDue().length : 0;
       root.appendChild(h("section", { class: "card crs-home" },
         h("div", { class: "row between wrap gap" },
           h("div", {}, h("div", { class: "eyebrow" }, "🧭 دورهٔ گام‌به‌گام"),
-            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + (A.courseLessonName ? A.courseLessonName(cnl) : fa(cnl.tid) + " · " + (A.TM[cnl.tid] || {}).fa) : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۵۵ دقیقه و قابلِ تقسیم به چند نشست.")),
-          h("button", { class: "btn", onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره"))));
+            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + (A.courseLessonName ? A.courseLessonName(cnl) : fa(cnl.tid) + " · " + (A.TM[cnl.tid] || {}).fa) : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ " + (A.courseBlurb ? A.courseBlurb(true) : "هر درس قابلِ تقسیم به چند نشست است.")),
+              cwarm ? h("div", { class: "small crs-homewarm" }, "گرم‌کردنِ امروز موعد است: " + fa(cwarm) + " پرسش از درس‌های قبلی (فاصله‌های ۱، ۳، ۷، ۲۱ و ۶۰ روزه).") : null),
+          h("div", { class: "row gap wrap" },
+            cwarm && !cnl ? h("button", { class: "btn crs-warmgo", onclick: function () { A.go("course", null, "warm"); } }, "▶ گرم‌کردنِ امروز") : null,
+            h("button", { class: "btn" + (cwarm && !cnl ? " ghost" : ""), onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره")))));
     }
     var due = A.dueList();
     root.appendChild(h("section", { class: "grid2" },
@@ -16174,14 +16230,14 @@ var APP = window.APP = {};
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/^\s*[-*•] (.*)$/gm, "<li>$1</li>").replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br>");
     el.innerHTML = "<p>" + html + "</p>"; return el;
   };
-  A.cardDialog = function (q, a, extra) {
+  A.cardDialog = function (q, a, extra, onDone) {
     var ov = h("div", { class: "overlay", role: "dialog", "aria-modal": "true", "aria-label": "ساخت کارت مرور" });
     var qi = h("textarea", { id: "cdq", rows: 3 }); qi.value = q;
     var ai = h("textarea", { id: "cda", rows: 4 }); ai.value = a;
     ov.appendChild(h("div", { class: "dialog" }, h("h3", {}, "کارت مرور فاصله‌دار"),
       h("p", { class: "small muted" }, "کارت خوب «چرا» یا «چگونه» می‌پرسد، نه تعریف. پاسخ را با کلمات خودت بنویس."),
       h("label", { for: "cdq" }, "پرسش (رو)"), qi, h("label", { for: "cda" }, "پاسخ (پشت)"), ai,
-      h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { if (!qi.value.trim() || !ai.value.trim()) { A.toast("رو و پشت کارت را پر کن.", "bad"); return; } A.newCard(qi.value.trim(), ai.value.trim(), extra); ov.remove(); A.toast("کارت ساخته شد؛ از امروز در صف مرور است."); } }, "ساخت کارت"),
+      h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { if (!qi.value.trim() || !ai.value.trim()) { A.toast("رو و پشت کارت را پر کن.", "bad"); return; } var cd = A.newCard(qi.value.trim(), ai.value.trim(), extra); ov.remove(); A.toast("کارت ساخته شد؛ از امروز در صف مرور است."); if (onDone) onDone(cd); } }, "ساخت کارت"),
         h("button", { class: "btn ghost", onclick: function () { ov.remove(); } }, "انصراف"))));
     A.layer().appendChild(ov); qi.focus();
   };
@@ -16367,10 +16423,19 @@ var APP = window.APP = {};
   };
 
   /* ---------- پروتکل‌ها ---------- */
+  /* دیدن ≠ ذخیره (ممیزی ۲۰۲۶-۱۰-۱۳): زدنِ یک کارِ موعد در «امروز» یا «اجرای تازه» فقط یک پیش‌نویسِ درون‌حافظه می‌سازد؛
+     رکورد با اولین ورودیِ واقعی (فیلد، موضوع، روبریک، ثبت) نوشته می‌شود. اگر پیش‌نویسِ نیمه‌کاره‌ای از همان روال با همان موضوع/نوبت
+     هست، همان باز می‌شود تا پیش‌نویسِ تکراری ساخته نشود. */
+  var DRAFTS = A._protoDrafts = {};
+  A.protoDraft = function (id) { return DRAFTS[id] || null; };
   A.startProto = function (pid, o) {
     o = o || {};
-    var r = S.put({ id: A.uid("pr"), type: "pr", pid: pid, topic: o.topic || "", sched: o.sched || "", node: o.node || "", status: "draft", data: o.preset || {} });
+    var same = S.all("pr", function (x) { return x.pid === pid && x.status !== "done" && !x.sample && (x.topic || "") === (o.topic || "") && (x.sched || "") === (o.sched || "") && (x.node || "") === (o.node || ""); })[0];
+    if (same) { A.go("proto", pid, same.id); return same; }
+    var r = { id: A.uid("pr"), type: "pr", pid: pid, topic: o.topic || "", sched: o.sched || "", node: o.node || "", status: "draft", data: o.preset || {}, created: new Date().toISOString() };
+    DRAFTS[r.id] = r;
     A.go("proto", pid, r.id);
+    return r;
   };
   A.V.protos = function (arg, sub) {
     var root = h("div", { class: "page" });
@@ -16404,7 +16469,7 @@ var APP = window.APP = {};
     var root = h("div", { class: "page" });
     root.appendChild(h("div", { class: "crumbs" }, h("button", { class: "linkish", onclick: function () { A.go("protos"); } }, "← پروتکل‌ها")));
     root.appendChild(A.head("پروتکل · " + p.dur, p.fa, p.why));
-    var r = runId && S.get(runId);
+    var r = runId && (S.get(runId) || DRAFTS[runId]);
     if (!r) {
       var runs = S.all("pr", function (x) { return x.pid === pid; });
       root.appendChild(h("button", { class: "btn", onclick: function () { A.startProto(pid); } }, "اجرای تازه"));
@@ -16414,8 +16479,8 @@ var APP = window.APP = {};
       }))) : A.empty("هنوز اجرا نشده."));
       return root;
     }
-    var save = A.debounce(function () { S.put(r); }, 500);
-    root.appendChild(h("div", { class: "row gap wrap" }, h("label", { for: "prTopic", class: "small" }, "موضوع:"), A.topicSelect(r.topic, function (v) { r.topic = v; S.put(r); }, "prTopic"),
+    var save = A.debounce(function () { S.put(r); delete DRAFTS[r.id]; }, 500);
+    root.appendChild(h("div", { class: "row gap wrap" }, h("label", { for: "prTopic", class: "small" }, "موضوع:"), A.topicSelect(r.topic, function (v) { r.topic = v; S.put(r); delete DRAFTS[r.id]; }, "prTopic"),
       h("span", { class: "small muted" }, r.status === "done" ? "کامل‌شده · " + A.fdate(r.updated) : "پیش‌نویس · خودکار ذخیره می‌شود")));
     var ws = A.renderWS(p.ws, r.data, save, { prefix: "pr" });
     var formCard = h("div", { class: "card wsform" }, ws);
@@ -16437,7 +16502,7 @@ var APP = window.APP = {};
     }
     if (pid === "P4" || pid === "P2") {
       var span = pid === "P4" ? 7 : 0;
-      var deltas = S.all("pr", function (x) { return x.pid === "P1" && x.status === "done" && A.daysBetween(x.created.slice(0, 10), A.today()) <= span; });
+      var deltas = S.all("pr", function (x) { return x.pid === "P1" && x.status === "done" && A.daysBetween(A.localDay(x.created), A.today()) <= span; });
       var box = h("div", { class: "card soft deltas" + (r.data.cmp__open ? "" : " hidden") }, h("h3", {}, pid === "P4" ? "ثبت‌های ۵ خط دلتای این هفته" : "ثبت‌های ۵ خط دلتای امروز"),
         deltas.length ? deltas.map(function (x) { return h("div", { class: "delta" }, h("strong", {}, x.data.src || ""), h("ul", {}, (x.data.d || []).filter(Boolean).map(function (d) { return h("li", {}, d); })), h("div", { class: "small" }, "پرسش: " + (x.data.qq || "") + " · قلاب: " + (x.data.hook || ""))); }) : h("p", { class: "muted small" }, "ثبتی پیدا نشد."));
       root.appendChild(box);
@@ -16459,7 +16524,7 @@ var APP = window.APP = {};
         A.toast(fa(gs.length) + " کارت ساخته شد.");
       } }, "ساخت کارت از شکاف‌ها") : null,
       pid === "P1" && r.data.q1 ? h("button", { class: "btn ghost", onclick: function () { A.addStructInstance(r.data.q1, r.data.q2 || r.data.src, r.data.dom); } }, "افزودن مصداق به اطلس") : null,
-      A.confirmBtn("حذف", function () { S.del(r.id); A.go("proto", pid); })));
+      A.confirmBtn("حذف", function () { delete DRAFTS[r.id]; if (S.get(r.id)) S.del(r.id); A.go("proto", pid); })));
     return root;
   };
   A.protoQueue = function () { return queue(); };
@@ -16507,7 +16572,7 @@ var APP = window.APP = {};
   }
   function session(cards, mode) {
     var wrap = h("div", { class: "review" });
-    if (!cards.length) { wrap.appendChild(A.empty(mode === "due" ? "کارتی موعد امروز نیست. کارت‌ها از کارگاه تکنیک‌ها و شکاف‌های برگه سفید ساخته می‌شوند." : "هنوز کارتی نساخته‌ای.", h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}); } }, "ساخت کارت"))); return wrap; }
+    if (!cards.length) { wrap.appendChild(A.empty(mode === "due" ? "کارتی موعد امروز نیست. کارت‌ها از کارگاه تکنیک‌ها و شکاف‌های برگه سفید ساخته می‌شوند." : "هنوز کارتی نساخته‌ای.", h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}, function () { A.render(); }); } }, "ساخت کارت"))); return wrap; }
     var i = 0, area = h("div", {});
     wrap.appendChild(h("p", { class: "small muted" }, mode === "mix" ? "کارت‌ها از موضوع‌ها و تکنیک‌های مختلف یک‌درمیان چیده شده‌اند تا مجبور شوی اول تشخیص دهی «این از کدام نوع است» (ارزش اصلی درهم‌تنیدن). نمره‌ها زمان‌بندی را هم به‌روز می‌کنند." : "کارت‌ها از موضوع‌های مختلف یک‌درمیان چیده شده‌اند."));
     wrap.appendChild(area);
@@ -16517,19 +16582,20 @@ var APP = window.APP = {};
       area.innerHTML = "";
       if (i >= cards.length) { area.appendChild(h("div", { class: "card done" }, h("h3", {}, "تمام شد"), h("p", {}, fa(cards.length) + " کارت مرور شد."), h("button", { class: "btn", onclick: function () { A.go("review", null, "calib"); } }, "دیدن کالیبراسیون"))); return; }
       var c = cards[i], tp = c.topic && S.get(c.topic);
-      var conf = 60;
+      var conf = 60, preConf = null;  // اطمینانِ پیش از دیدنِ پاسخ؛ پس از «نمایش پاسخ» قفل می‌شود (کالیبراسیونِ صادق)
       var att = h("textarea", { id: "rvAtt", rows: 3, placeholder: "پاسخت را از حافظه بنویس (حتی ناقص)." });
       var co = h("output", {}, fa(conf) + "٪");
+      var slider = h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { if (preConf != null) { e.target.value = preConf; return; } conf = +e.target.value; co.textContent = fa(conf) + "٪"; } });
       var back = h("div", { class: "back hidden" });
       var grades = h("div", { class: "grades hidden" }, [[0, "اصلاً یادم نبود"], [1, "اشتباه"], [2, "اشتباه اما آشنا"], [3, "درست، با زحمت زیاد"], [4, "درست، با کمی تردید"], [5, "آسان و کامل"]].map(function (g) {
-        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], conf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
+        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], preConf == null ? conf : preConf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
       }));
       area.appendChild(h("div", { class: "card flash" },
         h("div", { class: "row between wrap small muted" }, h("span", {}, "کارت " + fa(i + 1) + " از " + fa(cards.length)), h("span", {}, (c.tid ? "تکنیک " + fa(c.tid) + " · " : "") + (tp ? tp.title : ""))),
         h("div", { class: "q" }, c.q),
         h("label", { for: "rvAtt", class: "small" }, "پاسخ تو"), att,
-        h("div", { class: "scale" }, h("label", { for: "rvConf", class: "small" }, "اطمینان"), h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { conf = +e.target.value; co.textContent = fa(conf) + "٪"; } }), co),
-        h("button", { class: "btn", onclick: function (e) { back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
+        h("div", { class: "scale" }, h("label", { for: "rvConf", class: "small" }, "اطمینان"), slider, co),
+        h("button", { class: "btn", onclick: function (e) { preConf = conf; slider.disabled = true; slider.setAttribute("aria-disabled", "true"); co.textContent = fa(preConf) + "٪ (پیش از دیدنِ پاسخ ثبت شد)"; back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
         back, grades));
       back.appendChild(h("div", { class: "small muted" }, "پاسخ:")); back.appendChild(h("div", { class: "a" }, c.a));
     }
@@ -16537,7 +16603,7 @@ var APP = window.APP = {};
   function cardList() {
     var cards = S.all("card");
     var wrap = h("div", {});
-    wrap.appendChild(h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}); } }, "کارت تازه"), h("span", { class: "small muted" }, fa(cards.length) + " کارت")));
+    wrap.appendChild(h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}, function () { A.render(); }); } }, "کارت تازه"), h("span", { class: "small muted" }, fa(cards.length) + " کارت")));
     if (!cards.length) return wrap;
     wrap.appendChild(h("div", { class: "scrollx" }, h("table", { class: "dt mt" }, h("thead", {}, h("tr", {}, h("th", {}, "پرسش"), h("th", {}, "پاسخ"), h("th", {}, "موعد"), h("th", {}, "فاصله"), h("th", {}, ""))),
       h("tbody", {}, cards.map(function (c) {
@@ -16732,7 +16798,7 @@ var APP = window.APP = {};
       h("label", { for: "exJ", class: "small" }, "خروجی"), ex,
       h("label", { for: "imJ", class: "small" }, "ورود"), im,
       h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () {
-        try { var arr = JSON.parse(im.value); if (!Array.isArray(arr)) throw new Error("قالب نادرست"); arr.forEach(function (r) { if (r && r.id && r.type) S.put(r); }); A.toast(fa(arr.length) + " رکورد وارد شد."); A.render(); }
+        try { var arr = JSON.parse(im.value); if (!Array.isArray(arr)) throw new Error("قالب نادرست"); arr.forEach(function (r) { if (r && r.id && r.type) S.put(r, { keepTime: true }); }); /* زمانِ «updated» ِ پشتیبان حفظ می‌شود */ A.toast(fa(arr.length) + " رکورد وارد شد."); A.render(); }
         catch (e) { A.toast("JSON نامعتبر: " + e.message, "bad"); }
       } }, "ورود داده"), A.confirmBtn("حذف نمونه‌ها", function () { S.all(null, function (r) { return r.sample; }).forEach(function (r) { S.del(r.id); }); A.toast("نمونه‌ها حذف شدند."); A.render(); }))));
     root.appendChild(h("p", { class: "small muted" }, "حالت ذخیره: " + (S.mode === "host" ? "پایگاه داده Lifemanager" : S.mode === "gas" ? "Google Sheets" : "همین مرورگر") + " · " + fa(Object.keys(S.recs).length) + " رکورد"));
@@ -17487,12 +17553,30 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   ];
 
   /* ---------- میز کار ---------- */
+  /* تاریخِ بازبینی ⇒ YYYY-MM-DD ِ میلادی یا null (ممیزی ۲۰۲۶-۱۰-۱۳: «۱۴۰۵-۰۸-۲۰» و «2026/10/01» در مقایسهٔ رشته‌ای غلط موعد می‌شدند).
+     ارقامِ فارسی/عربی و «/» یکسان می‌شوند؛ سالِ کمتر از ۱۷۰۰ شمسی فرض و به میلادی تبدیل می‌شود (Intl، تقویمِ persian). */
+  A.epiRevDate = function (v) {
+    var s = String(v || "").trim().replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 0x660; }).replace(/[\/.]/g, "-");
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s); if (!m) return null;
+    var y = +m[1], mo = +m[2], d = +m[3]; if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    if (y < 1700) {   // شمسی ⇒ میلادی (الگوریتمِ استانداردِ jalali_to_gregorian)
+      var jy = y + 1595, days = -355668 + 365 * jy + Math.floor(jy / 33) * 8 + Math.floor(((jy % 33) + 3) / 4) + d + (mo < 7 ? (mo - 1) * 31 : (mo - 7) * 30 + 186);
+      var gy = 400 * Math.floor(days / 146097); days %= 146097;
+      if (days > 36524) { gy += 100 * Math.floor(--days / 36524); days %= 36524; if (days >= 365) days++; }
+      gy += 4 * Math.floor(days / 1461); days %= 1461;
+      if (days > 365) { gy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+      var gd = days + 1, sal = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], gm = 0;
+      for (gm = 0; gm < 13 && gd > sal[gm]; gm++) gd -= sal[gm];
+      y = gy; mo = gm; d = gd;
+    }
+    return y + "-" + ("0" + mo).slice(-2) + "-" + ("0" + d).slice(-2);
+  };
   function dueReviews() {
     var t = A.today();
     return S.all("case", function (cs) {
       var d = cs.st && cs.st.st_final && cs.st.st_final.data; if (!d || !d.revdate) return false;
-      var rd = String(d.revdate).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); });
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(rd) || rd > t) return false;
+      var rd = A.epiRevDate(d.revdate);
+      if (!rd || rd > t) return false;
       return (d.final || []).some(function (r) { return r.c && !(cs.outcome || {})[r.c]; });
     });
   }
@@ -17532,6 +17616,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       var cy = S.get("ecycle"), lr = cy && cy.reports && cy.reports[0], pend = S.all("ecase", function (c) { return c.status === "pending"; }).length;
       root.appendChild(h("section", { class: "card" }, h("h2", {}, "اعتبار کارخانه و جزوه"),
         lr && lr.a ? h("p", { class: "small" }, "آخرین بررسی خودکار: " + A.fdate(lr.at) + " — آزمون ۱ (کارخانه همان جزوه است): " + (lr.a.ok ? "✓ قبول" : "✗ رد") + " · آزمون ۲ (جزوه با تاریخ): هم‌خوانی " + fa(Math.round(100 * (lr.b.agree || 0))) + "٪") : h("p", { class: "small" }, "هنوز بررسی خودکاری اجرا نشده."),
+        lr && lr.rulesChanged ? h("p", { class: "small bad" }, "⚠ قاعده‌های کارخانه از آخرین نسخه‌ای که تأیید کرده‌ای تغییر کرده‌اند (حتی اگر آزمون‌ها سبز باشند). در «سه آزمون» ببین و تأیید کن.") : null,
         pend ? h("p", { class: "small" }, fa(pend) + " واقعه پیشنهادی منتظر تأیید توست.") : null,
         h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", onclick: function () { A.go("e_bt"); } }, "سه آزمون"), pend ? h("button", { class: "btn ghost sm", onclick: function () { A.go("e_lib", null, "pending"); } }, "صف تأیید") : null)));
     }
@@ -17641,6 +17726,12 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     lbl();
     goBtn.addEventListener("click", function () {
       var miss = ws._validate(); if (miss.length) { A.toast("الزامی: " + miss.join("، "), "bad"); return; }
+      /* پذیرش (ممیزی ۲۰۲۶-۱۰-۱۳): «ورودی مبهم» یعنی «پیش از ادامه کامل شود» — جلو نمی‌رود؛ و حکم با «قلمرو» نباید تناقض داشته باشد */
+      if (s.id === "st_intake") {
+        var vd = String(st.data.verdict || ""), sp = String(st.data.special || "");
+        if (/مبهم یا ناقص/.test(vd)) { A.toast("حکمِ این ایستگاه می‌گوید ورودی مبهم یا ناقص است؛ اول ورودی را کامل کن و حکم را عوض کن.", "bad"); return; }
+        if (/دین/.test(vd) !== /^دین/.test(sp)) { A.toast("«قلمرو» و «حکمِ این ایستگاه» با هم نمی‌خوانند (یکی دین، دیگری عام). یکی را اصلاح کن.", "bad"); return; }
+      }
       st.done = true;
       if (s.id === "st_final" && /بسته شد|نداشت/.test(st.data.verdict || "")) cs.status = "closed";
       S.put(cs);
@@ -17673,6 +17764,8 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       });
     });
     if (cs.outcome) { var o = {}; Object.keys(cs.outcome).forEach(function (k) { if (map[+k]) o[map[+k]] = cs.outcome[k]; }); cs.outcome = o; }
+    /* رمزگذاریِ هر تصدیق (cs.feat) هم با همان نگاشت جابه‌جا می‌شود — ممیزی ۲۰۲۶-۱۰-۱۳: حذفِ تصدیقِ میانی ویژگی‌های «ب» را به «ج» می‌داد */
+    ["feat", "featFrozen"].forEach(function (key) { if (!cs[key]) return; var f = {}; Object.keys(cs[key]).forEach(function (k) { if (map[+k]) f[map[+k]] = cs[key][k]; }); cs[key] = f; });
   }
   /* دسترس‌پذیری: ورودی‌های بی‌برچسب فهرست‌ها و زنجیره‌ها (ردیف‌های تازه هم) برچسب فیلد خود را می‌گیرند */
   function a11yWS(ws) {
@@ -17720,7 +17813,10 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     return h("div", { class: "card soft" }, h("h3", {}, "نتیجه واقعی (پس از بازبینی)"), h("p", { class: "small muted" }, "وقتی معیار بازبینی معلوم شد، اینجا ثبت کن. فقط «درست» و «نادرست» به کالیبراسیون مشترک می‌رود."),
       rowsWithP.map(function (r) {
         return h("div", { class: "row gap wrap" }, h("span", {}, fa(r.c) + ". " + (claims[+r.c - 1] || "").slice(0, 80) + " — " + fa(r.p) + "٪"),
-          h("select", { "aria-label": "نتیجه ادعای " + r.c, onchange: function (e) { cs.outcome[r.c] = e.target.value; S.put(cs); A.toast("ثبت شد"); } }, ["", "درست", "نادرست", "نامعلوم"].map(function (o) { return h("option", { value: o, selected: (cs.outcome[r.c] || "") === o }, o || "—"); })));
+          h("select", { "aria-label": "نتیجه ادعای " + r.c, onchange: function (e) {
+            /* دفترِ پیش‌رو (آزمون ۳) فقط رمزگذاریِ پیش از نتیجه را می‌پذیرد: لحظهٔ اولین نتیجه ثبت و رمزگذاریِ همان لحظه منجمد می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳) */
+            if (e.target.value && !cs.outcomeAt) { cs.outcomeAt = new Date().toISOString(); if (cs.fwdAt) cs.featFrozen = JSON.parse(JSON.stringify(cs.feat || {})); }
+            cs.outcome[r.c] = e.target.value; S.put(cs); A.toast("ثبت شد"); } }, ["", "درست", "نادرست", "نامعلوم"].map(function (o) { return h("option", { value: o, selected: (cs.outcome[r.c] || "") === o }, o || "—"); })));
       }));
   }
   function report(cs) {
@@ -17994,7 +18090,8 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
 
   /* ---------- سه آزمون ---------- */
   A.btCfg = function () { return X.DEFAULT_CFG(); };
-  A.runThree = function (enc) {
+  /* record=false (۲۰۲۶-۱۰-۱۳): باز کردنِ «جزوهٔ زنده» یا «اختلاف‌ها» فقط برای نمایش حساب می‌کند و اجرای «دستی» در تاریخچه ثبت نمی‌کند */
+  A.runThree = function (enc, record) {
     enc = enc || "A";
     var cases = A.btCases(enc), seed = X.hash(new Date().toISOString().slice(0, 10));
     var t = X.three(cases, X.DEFAULT_CFG(), seed);
@@ -18003,7 +18100,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     t.sens = X.ruleSensitivity(cases, X.DEFAULT_CFG());
     t.meta = { enc: enc, at: new Date().toISOString(), n: cases.length };
     A.lastThree = t;
-    S.put({ id: A.uid("ebt"), type: "ebt", meta: { mode: "three", enc: enc, at: t.meta.at, n: cases.length }, ok: t.a.ok && t.b.ok,
+    if (record !== false) S.put({ id: A.uid("ebt"), type: "ebt", meta: { mode: "three", enc: enc, at: t.meta.at, n: cases.length }, ok: t.a.ok && t.b.ok,
       m: { a: t.a.ok, book: t.a.bookScore, b: t.b.ok, agree: t.b.agree, lb: t.b.lb, sens: t.b.sens, spec: t.b.spec, pf1: t.b.claims.pFalseFlagged, pf0: t.b.claims.pFalseUnflagged, c: t.c.neff },
       aut: t.a.bad.map(function (x) { return { id: x.cs.id, stage: "a", truthFail: x.cs.truth.fail || [], flagged: x.res.flagged }; })
         .concat(t.b.disagree.map(function (x) { return { id: x.cs.id, stage: "b", fieldOk: x.ok, flagged: x.res.flagged }; })) });
@@ -18015,12 +18112,29 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       h("div", { class: "row between wrap" }, h("h2", {}, "آزمون " + fa(n) + " — " + title), h("span", { class: "pill " + (ok === true ? "good" : ok === false ? "bad" : "") }, verdict)),
       h("p", {}, h("strong", {}, "پرسش: "), q), h("p", { class: "small" }, h("strong", {}, "محک: "), yard), body, h("p", { class: "small muted" }, h("strong", {}, "اگر رد شود یعنی: "), meaning));
   }
+  /* ممیزیِ ۲۰۲۶-۱۰-۱۳: سه سنجهٔ صادقانه کنارِ آزمونِ ۱ — بی تغییرِ قاعده یا معیارِ قبول (تصمیم با مالک) */
+  A.rulesApproved = function () { var o = S.get("epi_rules_ok"); return o && o.hash; };
+  function t1Honesty(a) {
+    if (!a || a.fullScore == null) return null;
+    var okH = A.rulesApproved(), cur = a.rulesHash, cov = a.coverage || { tested: [], untested: [], n: 0 };
+    return h("div", { class: "card soft t1-honest", dir: "rtl" },
+      h("p", { class: "small" }, h("strong", {}, "مکان‌یابیِ کامل: "), pct(a.fullScore) + " (" + fa(a.nBook - a.partial.length - (a.book.rows || []).filter(function (x) { return !x.fate.pass; }).length) + " از " + fa(a.nBook) + ") — «قبول» یعنی دست‌کم یکی از ایستگاه‌هایی که جزوه می‌گوید پرچم خورده؛ این‌جا شمرده می‌شود چند مثال «همهٔ» آن ایستگاه‌ها را گرفتند."),
+      a.partial.length ? h("details", { class: "small" }, h("summary", {}, fa(a.partial.length) + " مثال فقط بخشی از ایستگاه‌ها را گرفت — داوری با تو (خطای سازنده یا برچسبِ جزوه؟)"),
+        h("ul", {}, a.partial.map(function (x) { var miss = (x.cs.truth.fail || []).filter(function (s) { return x.res.flagged.indexOf(s) < 0; }); return h("li", {}, h("button", { class: "linkish", onclick: function () { A.go("e_lib", x.cs.id); } }, x.cs.title), " — جزوه: " + (x.cs.truth.fail || []).map(stName).join("، ") + " · گرفته‌نشده: " + miss.map(stName).join("، ")); }))) : null,
+      h("p", { class: "small" }, h("strong", {}, "پوششِ قاعده‌ها: "), fa(cov.tested.length) + " از " + fa(cov.n) + " قاعده با مثال‌های خودِ جزوه آزموده می‌شوند (خاموش‌کردنشان حکمِ دست‌کم یک مثال را عوض می‌کند). " + fa(cov.untested.length) + " قاعدهٔ دیگر فقط با سناریوهای ساختگی سنجیده می‌شوند که از خودِ قاعده‌ها ساخته شده‌اند — محکِ مستقل نیستند؛ رانشِ آن‌ها را «اثرِ انگشتِ قاعده‌ها» می‌گیرد."),
+      cov.untested.length ? h("details", { class: "small" }, h("summary", {}, "قاعده‌های بی‌مثال در جزوه (" + fa(cov.untested.length) + ")"), h("div", { class: "row gap wrap" }, cov.untested.map(function (id) { return ruleChip(id); }))) : null,
+      h("p", { class: "small " + (okH && okH !== cur ? "bad" : "") }, h("strong", {}, "اثرِ انگشتِ قاعده‌ها: "),
+        !okH ? "هنوز نسخه‌ای از قاعده‌ها را تأیید نکرده‌ای. پس از مرور، تأییدش کن تا هر تغییرِ بعدی در قاعده‌ها (حتی بی‌اثر بر مثال‌ها) در دورهٔ هفتگی هشدار بدهد." :
+        okH === cur ? "قاعده‌ها همان نسخه‌ای‌اند که تأیید کرده‌ای." : "⚠ قاعده‌ها از آخرین تأییدِ تو تغییر کرده‌اند — پیش از اعتماد، تغییر را در «جزوهٔ زنده» و دفترِ کار ببین.",
+        " ", okH !== cur ? h("button", { class: "btn ghost sm t1-approve", onclick: function () { S.put({ id: "epi_rules_ok", type: "erules", hash: cur, at: new Date().toISOString() }); A.toast("این نسخهٔ قاعده‌ها تأیید شد."); A.render(); } }, "این نسخهٔ قاعده‌ها را تأیید می‌کنم") : null));
+  }
   function threeView(t) {
     var box = h("div", { class: "col gap" });
     var aBad = t.a.bad.length;
     box.appendChild(testCard(1, "آیا کارخانه همان جزوه است؟", "وقتی مثال‌های خود جزوه را به کارخانه می‌دهیم، همان حکمی را می‌دهد که جزوه داده؟ و خطایی که عمداً در سناریو کاشته‌ایم، در همان ایستگاه گرفته می‌شود؟",
       "فقط خود جزوه (" + fa(t.a.nBook) + " مثال) و " + fa(t.a.synthN) + " سناریوی ساختگی با خطای کاشته.", t.a.ok, t.a.ok ? "قبول" : "رد",
       h("div", {}, h("p", {}, "مثال‌های جزوه درست داوری شد: " + pct(t.a.bookScore) + " · خطاهای کاشته در ایستگاه درست: " + pct(t.a.posF) + " · همزادهای سالم بی‌پرچم: " + pct(t.a.posH)),
+        t1Honesty(t.a),
         aBad ? h("div", {}, h("p", { class: "small" }, fa(aBad) + " مورد ناهمخوان (هر کدام خطای سازنده است، نه جزوه):"), h("ul", { class: "small" }, t.a.bad.slice(0, 20).map(function (x) { return h("li", {}, h("button", { class: "linkish", onclick: function () { A.go("e_lib", x.cs.id); } }, x.cs.title), " — ", dc(x.fate.why)); }))) : h("p", { class: "small good" }, "هیچ ناهمخوانی‌ای نیست.")),
       "کارخانه جزوه را درست پیاده نکرده (ایراد از سازنده است). تا این آزمون قبول نشود، نتیجه آزمون ۲ را نمی‌شود به گردن جزوه انداخت."));
     var cl = t.b.claims;
@@ -18100,7 +18214,8 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   A.epiCycleDue = function () { var st = cycState(); return !st.last || A.daysBetween(st.last.slice(0, 10), A.today()) >= 7; };
   A.runCycle = function () {
     var st = cycState();
-    var r = X.cycle({ runs: st.runs, sigs: st.sigs }, A.btCases("A"), new Date().toISOString());
+    var ok0 = S.get("epi_rules_ok");
+    var r = X.cycle({ runs: st.runs, sigs: st.sigs, rulesOk: ok0 && ok0.hash }, A.btCases("A"), new Date().toISOString());
     st.runs = (st.runs || 0) + 1; st.sigs = r.sigs; st.last = r.report.at; st.reports = [r.report].concat(st.reports || []).slice(0, 30); S.put(st);
     S.put({ id: A.uid("ebt"), type: "ebt", meta: { mode: "cycle", enc: "A", at: r.report.at, n: 0 }, ok: r.report.a.ok && r.report.b.ok, m: { a: r.report.a.ok, book: r.report.a.book, b: r.report.b.ok, agree: r.report.b.agree, lb: r.report.b.lb, c: r.report.c.n }, aut: [] });
     return r.report;
@@ -18191,14 +18306,14 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   }
 
   /* ---------- ویرایشگر ویژگی‌ها (مشترک: پرونده بک‌تست و پرونده انسانی) ---------- */
-  A.featEditor = function (f, onCh) {
+  A.featEditor = function (f, onCh, pre) {
     var box = h("div", { class: "feated" }), last = -1;
     FEAT.forEach(function (d) {
       var st = A.EST && A.EST[d.st], hall = st ? st.hall : 0;
       if (hall !== last) { last = hall; box.appendChild(h("div", { class: "rhall" }, (E && E.HALLS[hall] ? "سالن " + fa(hall) + " · " + E.HALLS[hall].fa : ""))); }
-      var id = "fe_" + d.k, ctl;
-      if (d.t === "enum") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value; onCh && onCh(); } }, h("option", { value: "" }, "نامعلوم"), d.v.map(function (v) { return h("option", { value: v, selected: f[d.k] === v }, v); }));
-      else if (d.t === "bool") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value === "1"; onCh && onCh(); } }, h("option", { value: "" }, "نامعلوم"), h("option", { value: "1", selected: f[d.k] === true }, "بله"), h("option", { value: "0", selected: f[d.k] === false }, "خیر"));
+      var id = "fe_" + (pre ? pre + "_" : "") + d.k, ctl;   // پیشوند برای هر تصدیق ⇒ شناسه‌ها و برچسب‌ها یکتا (ممیزی ۲۰۲۶-۱۰-۱۳)
+      if (d.t === "enum") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value; onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), d.v.map(function (v) { return h("option", { value: v, selected: f[d.k] === v }, v); }));
+      else if (d.t === "bool") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value === "1"; onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), h("option", { value: "1", selected: f[d.k] === true }, "بله"), h("option", { value: "0", selected: f[d.k] === false }, "خیر"));
       else ctl = h("input", { id: id, type: "number", min: 0, max: 100, value: f[d.k] == null ? "" : f[d.k], oninput: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = Math.max(0, Math.min(100, +e.target.value)); onCh && onCh(); } });
       box.appendChild(h("div", { class: "ferow" + (d.dx ? " dx" : "") }, h("label", { for: id, class: "small" }, d.fa, d.dx ? h("span", { class: "chip", title: "ویژگی تشخیصی: خودش داوری است" }, "تشخیصی") : null), ctl));
     });
@@ -18218,7 +18333,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       c.claims.forEach(function (k, i) {
         var tx = h("input", { type: "text", value: k.txt, placeholder: "متن تصدیق", oninput: function (e) { k.txt = e.target.value; } });
         var tr = h("select", { onchange: function (e) { k.truth = e.target.value === "" ? null : e.target.value === "1"; } }, h("option", { value: "" }, "سرانجام نامعلوم"), h("option", { value: "1", selected: k.truth === true }, "درست بود"), h("option", { value: "0", selected: k.truth === false }, "نادرست بود"));
-        cl.appendChild(h("details", { class: "card soft", open: i === c.claims.length - 1 || null }, h("summary", {}, "تصدیق " + fa(i + 1) + ": " + (k.txt || "…")), tx, tr, A.featEditor(k.f)));
+        cl.appendChild(h("details", { class: "card soft", open: i === c.claims.length - 1 || null }, h("summary", {}, "تصدیق " + fa(i + 1) + ": " + (k.txt || "…")), tx, tr, A.featEditor(k.f, null, "k" + (i + 1))));
       });
     }
     drawClaims();
@@ -18287,7 +18402,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   A.V.e_aut = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "اختلاف‌ها برای داوری", "هر جا نتیجه کارخانه با جواب درست نخواند، اینجا می‌آید تا تو بگویی ایراد از کجاست (جزوه، سازنده، یا خود پرونده). ایرادی که به جزوه نسبت بدهی، زیر همان بخش جزوه و در «جزوه زنده» دیده می‌شود."));
-    if (!A.lastThree) A.runThree("A");
+    if (!A.lastThree) A.runThree("A", false);
     var t = A.lastThree;
     function item(cs, stage, info, opts) {
       var secs = [], culprits = [];
@@ -18327,13 +18442,13 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     return { t: "با تاریخ می‌خواند (روی " + fa(s.onFlawed) + " روش معیوب درست فعال شد)", c: "good", err: err };
   }
   A.snapshotLiving = function (why) {
-    if (!A.lastThree) A.runThree("A");
+    if (!A.lastThree) A.runThree("A", false);
     var t = A.lastThree, vs = S.all("eliving"), v = vs.length + 1;
     S.put({ id: "eliv_" + v, type: "eliving", v: v, why: why || "", rules: (window.EPI_RULES || []).map(function (r) { var s = ruleStatus(r, t.sens); return { id: r.id, st: s.t, err: s.err.length }; }), m: { a: t.a.ok, agree: t.b.agree, lb: t.b.lb } });
   };
   A.V.e_living = function (arg, focus) {
     var root = h("div", { class: "page" });
-    if (!A.lastThree) A.runThree("A");
+    if (!A.lastThree) A.runThree("A", false);
     var t = A.lastThree, vs = S.all("eliving").sort(function (a, b) { return b.v - a.v; });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "جزوه زنده", "همه قاعده‌های جزوه یک‌جا: متن پشتوانه هرکدام، نتیجه‌اش در آزمون‌ها، و ایرادهایی که ثبت کرده‌ای. هر بار نسخه تازه ثبت کنی، تغییرات نسبت به نسخه قبل نشان داده می‌شود."));
     root.appendChild(h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", onclick: function () { A.snapshotLiving("ثبت دستی"); A.toast("نسخه ثبت شد"); A.render(); } }, "ثبت نسخه تازه"),
@@ -18380,16 +18495,36 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       tmp.claims.forEach(function (k, i) { out.appendChild(h("section", { class: "card" }, h("h3", {}, fa(i + 1) + ". " + k.txt), claimEngine(k, r.claims[i]))); });
     }
     var save = A.debounce(function () { S.put(cs); calc(); }, 300);
-    claims.forEach(function (t, i) { cs.feat[i + 1] = cs.feat[i + 1] || {}; root.appendChild(h("details", { class: "card", open: i === 0 || null }, h("summary", {}, h("strong", {}, "رمزگذاری تصدیق " + fa(i + 1) + ": "), t), A.featEditor(cs.feat[i + 1], save))); });
+    /* کاربرگ ⇒ رمزگذاری (ممیزی ۲۰۲۶-۱۰-۱۳: موتور کاربرگ‌ها را نمی‌دید؛ «نقل» با اطمینانِ ۹۵ «خطایی ندید» می‌گفت).
+       فقط خانه‌های خالی پر می‌شوند — انتخابِ دستیِ تو دست نمی‌خورد: راه از «راه معرفت هر تصدیق»، اطمینان از «درجهٔ نهایی» ِ «حکم نهایی»،
+       بهای خطا از «هزینه خطا» ِ پذیرش (۱–۲ کم، ۳ متوسط، ۴–۵ زیاد). */
+    var filled = [];
+    (function prefill() {
+      var D = function (sid) { return (cs.st && cs.st[sid] && cs.st[sid].data) || {}; };
+      var ways = (D("st_route").ways || []).filter(function (r) { return r && r.c && r.w; }).sort(function (a, b) { return (+a.ord || 99) - (+b.ord || 99); });
+      var fin = (D("st_final").final || []).filter(function (r) { return r && r.c; }), stk = +D("st_intake").stakes;
+      claims.forEach(function (t, i) {
+        var f = cs.feat[i + 1] = cs.feat[i + 1] || {}, n = String(i + 1), w = ways.filter(function (r) { return String(r.c) === n; })[0], fr = fin.filter(function (r) { return String(r.c) === n; })[0];
+        if (f.way == null && w) { f.way = w.w; filled.push(fa(i + 1) + ": راه ← " + w.w); }
+        if (f.conf == null && fr && fr.p !== "" && fr.p != null && !isNaN(+String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))) { f.conf = Math.max(0, Math.min(100, +String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))); filled.push(fa(i + 1) + ": اطمینان ← " + fa(f.conf) + "٪"); }
+        if (f.stakes == null && stk >= 1) { f.stakes = stk <= 2 ? "کم" : stk === 3 ? "متوسط" : "زیاد"; filled.push(fa(i + 1) + ": بهای خطا ← " + f.stakes); }
+      });
+      if (filled.length && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
+    })();
+    if (filled.length) root.appendChild(h("p", { class: "small card soft feat-prefill", dir: "rtl" }, "از کاربرگ‌های همین پرونده پر شد (فقط خانه‌های خالی؛ قابلِ تغییر): " + filled.join(" · ")));
+    claims.forEach(function (t, i) { cs.feat[i + 1] = cs.feat[i + 1] || {}; root.appendChild(h("details", { class: "card", open: i === 0 || null }, h("summary", {}, h("strong", {}, "رمزگذاری تصدیق " + fa(i + 1) + ": "), t), A.featEditor(cs.feat[i + 1], save, "c" + (i + 1)))); });
     root.appendChild(out); calc();
-    if (!cs.fwdAt) { cs.fwdAt = new Date().toISOString(); S.put(cs); }
+    /* اگر نتیجه پیش از اولین رمزگذاری ثبت شده، این پرونده «پس‌نگر» است و به دفترِ پیش‌رو نمی‌رود (ممیزی ۲۰۲۶-۱۰-۱۳) */
+    if (!cs.fwdAt) { cs.fwdAt = new Date().toISOString(); if (cs.outcomeAt || Object.keys(cs.outcome || {}).some(function (k) { return cs.outcome[k]; })) cs.fwdLate = true; S.put(cs); }
     root.appendChild(h("section", { class: "card soft" }, h("h3", {}, "دفتر پیش‌رو"), h("p", { class: "small" }, "این رمزگذاری پیش از معلوم شدن نتیجه ثبت شد (" + A.fdate(cs.fwdAt) + "). وقتی نتیجه واقعی در «حکم نهایی» ثبت شود، این پرونده با برچسب‌گذاری تو وارد دفتر پیش‌رو می‌شود. دفتر پیش‌رو سخت‌ترین آزمون سامانه است، چون دانش پسینی در آن نیست."),
       h("button", { class: "btn ghost sm", onclick: function () {
         var fin = cs.st && cs.st.st_final && cs.st.st_final.data; var outc = cs.outcome || {};
         if (!fin || !Object.keys(outc).length) { A.toast("اول نتیجه واقعی را در «حکم نهایی» ثبت کن.", "bad"); return; }
+        if (cs.fwdLate || (cs.outcomeAt && cs.fwdAt > cs.outcomeAt)) { A.toast("رمزگذاریِ این پرونده پس از معلوم‌شدنِ نتیجه انجام شد؛ دفترِ پیش‌رو فقط رمزگذاریِ پیش از نتیجه را می‌پذیرد (وگرنه آزمونِ ۳ با دانستنِ جواب باد می‌کند).", "bad"); return; }
+        var featUse = cs.featFrozen || cs.feat || {};   // رمزگذاریِ لحظهٔ نتیجه، نه ویرایش‌های بعدی
         var anyFalse = Object.keys(outc).some(function (k) { return outc[k] === "نادرست"; });
         var c2 = { id: "ecase_fw_" + cs.id, type: "ecase", kind: "forward", by: "user", status: "approved", title: cs.title, dom: "زندگی روزمره", year: new Date().getFullYear(), grp: cs.id, src: [], story: (cs.st.st_intake && cs.st.st_intake.data.input) || "", actor: "خودم",
-          claims: claims.map(function (t, i) { return { id: "k" + (i + 1), txt: t, f: cs.feat[i + 1] || {}, truth: outc[String(i + 1)] === "درست" ? true : outc[String(i + 1)] === "نادرست" ? false : null }; }),
+          claims: claims.map(function (t, i) { return { id: "k" + (i + 1), txt: t, f: featUse[i + 1] || {}, truth: outc[String(i + 1)] === "درست" ? true : outc[String(i + 1)] === "نادرست" ? false : null }; }),
           truth: { ok: !anyFalse, fail: [], why: "برچسب از نتیجه واقعی پرونده انسانی", right: "" }, field: { ok: null, basis: "پرونده پیش‌رو: محک، سرانجام واقعی ادعاهاست" }, out: (function () { var o = {}; claims.forEach(function (t, i) { var v = outc[String(i + 1)]; o["k" + (i + 1)] = v === "درست" ? true : v === "نادرست" ? false : null; }); return o; })(), encodedAt: cs.fwdAt, addedAt: new Date().toISOString() };
         S.put(c2); A.toast("به دفتر پیش‌رو رفت (آزمون ۳)."); A.go("e_lib", c2.id);
       } }, "افزودن به دفتر پیش‌رو (پس از معلوم شدن نتیجه)")));
@@ -18563,12 +18698,13 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
 
   /* ---------- شبیه‌ساز ---------- */
   function sim(p) {
+    var own = !!(p.origin && p.origin.type === "kcase");   // مسئلهٔ شخصی ⇒ بی واژگانِ «تاریخی» (ممیزی ۲۰۲۶-۱۰-۱۳)
     var pg = prog(p.id), n = p.stages.length;
     var st = A.simState && A.simState.pid === p.id ? A.simState : (A.simState = { pid: p.id, lv: 1, order: "hist", i: 0 });
     var box = h("div", { class: "col gap" });
     box.appendChild(h("section", { class: "card" }, h("div", { class: "row gap wrap" },
       [1, 2, 3, 4].map(function (l) { var u = unlocked(pg, l, n), s = lvStats(pg, l, n); return h("button", { class: "btn sm " + (st.lv === l ? "" : "ghost"), disabled: !u, title: u ? LV[l].d : "قفل: سطح قبل را با دست‌کم ۸۰٪ درست تمام کن", onclick: function () { st.lv = l; st.i = 0; A.render(); } }, LV[l].fa + " — " + fa(s.done) + " از " + fa(n) + " گام" + (s.done ? "، " + fa(Math.round(100 * s.pct)) + "٪ درست" : "")); })),
-      h("div", { class: "row gap wrap mt" }, h("label", { class: "small", for: "smOrd" }, "ترتیب گام‌ها:"), h("select", { id: "smOrd", onchange: function (e) { st.order = e.target.value; st.i = 0; A.render(); } }, [["hist", "تاریخی (همان‌طور که رخ داد)"], ["e2h", "از آسان به سخت"], ["h2e", "از سخت به آسان"]].map(function (o) { return h("option", { value: o[0], selected: st.order === o[0] }, o[1]); })),
+      h("div", { class: "row gap wrap mt" }, h("label", { class: "small", for: "smOrd" }, "ترتیب گام‌ها:"), h("select", { id: "smOrd", onchange: function (e) { st.order = e.target.value; st.i = 0; A.render(); } }, [["hist", own ? "ترتیبِ راه‌حل" : "تاریخی (همان‌طور که رخ داد)"], ["e2h", "از آسان به سخت"], ["h2e", "از سخت به آسان"]].map(function (o) { return h("option", { value: o[0], selected: st.order === o[0] }, o[1]); })),
         A.confirmBtn("صفر کردن پیشرفت این سطح", function () { delete pg.lv[st.lv]; S.put(pg); A.render(); })),
       h("p", { class: "small muted" }, LV[st.lv].d + " سطح بعد وقتی باز می‌شود که همه گام‌های این سطح را با دست‌کم ۸۰٪ درستِ بار اول تمام کنی.")));
     var idx = p.stages.map(function (_, i) { return i; });
@@ -18606,7 +18742,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     if (st.lv === 1) { card.insertBefore(h("p", { class: "small hint" }, "سرنخ: " + (s0.hint || "—")), area); options(true); }
     else if (st.lv === 2) { var hb = h("button", { class: "btn ghost sm", onclick: function () { hb.replaceWith(h("p", { class: "small hint" }, "سرنخ: " + (s0.hint || "—"))); used = true; } }, "سرنخ (بار اول را نادرست حساب می‌کند)"); var used = false; area.appendChild(hb); var o2 = options; o2(true); var _f = finish; finish = function (first, self) { _f(first && !used, self); }; }
     else {
-      ta = h("textarea", { id: "pbMine", rows: 4, "aria-describedby": "pbMineHint", placeholder: "حرکت پیشنهادی تو در این لحظه تاریخی، با دلیلش (بی‌نگاه به پاسخ)" }); if (rec && rec.mine) ta.value = rec.mine;
+      ta = h("textarea", { id: "pbMine", rows: 4, "aria-describedby": "pbMineHint", placeholder: own ? "حرکتِ پیشنهادیِ تو در این مرحله، با دلیلش (بی‌نگاه به پاسخ)" : "حرکت پیشنهادی تو در این لحظه تاریخی، با دلیلش (بی‌نگاه به پاسخ)" }); if (rec && rec.mine) ta.value = rec.mine;
       area.appendChild(h("label", { for: "pbMine", class: "pb-minelbl" }, "حرکتِ پیشنهادیِ تو (پیش از دیدنِ " + (st.lv === 3 ? "گزینه‌ها" : "حرکتِ واقعی") + ")"));
       area.appendChild(ta);
       area.appendChild(h("div", { class: "small muted", id: "pbMineHint" }, "دست‌کم یک جملهٔ کامل، با دلیلش. متنت همراهِ نمرهٔ این گام ذخیره می‌شود."));
@@ -18617,7 +18753,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
         if (st.lv === 3) options(true);
         else {
           revealed = true;
-          area.appendChild(h("div", { class: "card soft" }, h("p", {}, h("strong", {}, "حرکت واقعی: "), s0.move), h("p", {}, h("strong", {}, "ایده: "), s0.idea), h("p", { class: "small" }, h("strong", {}, "گزینه‌هایی که آن زمان مطرح بود: "), A.shuffle(s0.opts.slice()).map(function (o) { return (o.ok ? "✓ " : "✗ ") + o.t; }).join(" · ")),
+          area.appendChild(h("div", { class: "card soft" }, h("p", {}, h("strong", {}, "حرکت واقعی: "), s0.move), h("p", {}, h("strong", {}, "ایده: "), s0.idea), h("p", { class: "small" }, h("strong", {}, (own ? "گزینه‌ها: " : "گزینه‌هایی که آن زمان مطرح بود: ")), A.shuffle(s0.opts.slice()).map(function (o) { return (o.ok ? "✓ " : "✗ ") + o.t; }).join(" · ")),
             A.moveChips ? A.moveChips(p, s0, "حرکتِ این گام: ") : null));
           area.appendChild(h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "حرکت تو چقدر با حرکت واقعی (یا معادل معتبرش) می‌خواند؟"), [0, 1, 2].map(function (v) { return h("button", { class: "btn ghost sm", onclick: function () { area.lastChild.remove(); finishMaster(v); } }, ["۰ نه", "۱ تاحدی", "۲ کامل"][v]); })));
         }
@@ -19126,7 +19262,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S;
   var DOORS = [
-    { sys: "یادگیری", t: "می‌خواهم از صفر، قدم‌به‌قدم یاد بگیرم و اجرا کنم", d: "اگر نمی‌دانی از کجا شروع کنی، از اینجا. بقیهٔ درها برای وقتی است که راه را بلدی.", steps: ["یک موضوعِ واقعی انتخاب کن که می‌خواهی عمیق بفهمی.", "دوره ۴۵ درس در ۸ منزل است (هر درس ۱۵ تا ۵۵ دقیقه، قابلِ تقسیم به چند نشست)؛ هر درس پنج قدمِ ثابت دارد: گرم‌کردن، ببین و بفهم، امتحان کن، انجام بده، بسنج و ببند.", "نقشهٔ دوره همیشه نشان می‌دهد کجایی و قدمِ بعدی‌ات چیست."], go: ["course"], btn: "🧭 شروعِ دوره", main: true },
+    { sys: "یادگیری", t: "می‌خواهم از صفر، قدم‌به‌قدم یاد بگیرم و اجرا کنم", d: "اگر نمی‌دانی از کجا شروع کنی، از اینجا. بقیهٔ درها برای وقتی است که راه را بلدی.", steps: ["یک موضوعِ واقعی انتخاب کن که می‌خواهی عمیق بفهمی.", function () { return (A.courseBlurb ? A.courseBlurb() : "دوره درس‌به‌درس در ۸ منزل جلو می‌رود.") + " هر درس پنج قدمِ ثابت دارد: گرم‌کردن، ببین و بفهم، امتحان کن، انجام بده، بسنج و ببند."; }, "نقشهٔ دوره همیشه نشان می‌دهد کجایی و قدمِ بعدی‌ات چیست."], go: ["course"], btn: "🧭 شروعِ دوره", main: true },
     { sys: "یادگیری", t: "می‌خواهم یک موضوع را عمیق بفهمم", d: "مثلاً «مشتق چیست» یا «ATR چرا برای حد ضرر خوب است».", steps: ["به «موضوع‌ها» برو و عنوان موضوع را بنویس.", "سامانه یک مسیر ۱۱ گامی می‌سازد. گام‌ها را به ترتیب جلو برو؛ هر گام کاربرگ و راهنمای خودش را دارد.", "هر چه فهمیدی در «مزرعه» در درخت همان علم کاشته می‌شود تا بعداً گم نشود."], go: ["topics"], btn: "موضوع‌ها" },
     { sys: "یادگیری", t: "می‌خواهم روش‌های یادگیری را تمرین کنم", d: "۴۵ تکنیک، از «برگه سفید» تا «پرسشگری سقراطی».", steps: ["در «نقشه و گراف» برنامه ۸ هفته‌ای را ببین؛ هفته اول با چند تکنیک پایه شروع می‌شود.", "هر تکنیک چهار بخش دارد: چرا کار می‌کند، دقیقاً چطور، کارگاه تمرین، و ارتباطاتش.", "«امروز» هر روز می‌گوید چه چیزی موعد است."], go: ["map", null, "plan"], btn: "برنامه ۸ هفته‌ای" },
     { sys: "گره‌گشا", t: "جایی گیر کردم یا کاری کردم که نمی‌فهمم چرا", d: "مسئله‌ای که حل نشد، واکنشی که از خودت دیدی، یا نتیجه‌ای اجتماعی که نمی‌فهمی.", steps: ["موقعیت را بی‌تفسیر ثبت کن؛ اول سنجیده می‌شود که اصلاً گره هست یا نه.", "هر ۱۲ خانوادهٔ فرضیه (از دانش و بازنمایی تا هیجان، رابطه و ساختارِ موقعیت) با دلیل نشان داده می‌شوند؛ آزمون‌های کوتاه آن‌ها را از هم جدا می‌کنند.", "ریشه را خودت با شاهد تأیید می‌کنی، با تکنیک‌های واقعی بازش می‌کنی و کارتِ گره را خودت می‌نویسی."], go: ["kcases"], btn: "🪢 گره‌گشا" },
@@ -19151,7 +19287,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     root.appendChild(A.head("راهنما", "از اینجا شروع کن", "این برنامه دو بخش دارد: «سامانه یادگیری» برای عمیق فهمیدن یک موضوع، و «کارخانه معرفت‌شناسی» برای سنجیدن اینکه یک ادعا یا برداشت چقدر معتبر است. هر دو حافظه مشترک دارند. خواسته‌ات را در کارت‌های زیر پیدا کن و دکمه‌اش را بزن."));
     root.appendChild(h("section", { class: "doors" }, DOORS.map(function (d, i) {
       return h("div", { class: "card door" + (d.main ? " main" : "") + (d.mainEpi ? " mainepi" : "") }, h("div", { class: "eyebrow" }, d.sys === "یادگیری" ? "سامانه یادگیری" : d.sys === "گره‌گشا" ? "گره‌گشا" : d.sys === "حلِ مسئله" ? "حلِ مسئله" : "کارخانه معرفت‌شناسی"), h("h2", {}, d.t), h("p", { class: "small muted" }, d.d),
-        h("ol", { class: "small" }, d.steps.map(function (s) { return h("li", {}, s); })),
+        h("ol", { class: "small" }, d.steps.map(function (s) { return h("li", {}, typeof s === "function" ? s() : s); })),
         h("button", { class: "btn", onclick: function () { A.go.apply(null, d.go); } }, d.btn + " ←"));
     })));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "چند واژه که زیاد می‌بینی"), h("dl", { class: "words" }, WORDS.map(function (w) { return [h("dt", {}, w[0]), h("dd", {}, w[1])]; }))));
@@ -19189,11 +19325,27 @@ APP.goFromURL = function (q) {
     var se = document.scrollingElement || document.documentElement;
     return { win: window.scrollY || se.scrollTop || 0, main: (mainEl() || {}).scrollTop || 0 };
   }
+  /* نامِ فارسیِ نماهایی که در منو نیستند — «↩ برگرد به …» هرگز شناسهٔ خامِ نما (e_case، kcase…) نشان نمی‌دهد (ممیزی ۲۰۲۶-۱۰-۱۳) */
+  var VIEW_FA = A.VIEW_FA = { tech: "صفحهٔ تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام", proto: "پروتکل", e_case: "پروندهٔ کارخانه",
+    kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن", ksims: "شبیه‌سازهای گره", move: "حرکتِ حلِ مسئله", moves: "حرکت‌های حلِ مسئله",
+    epi_course: "دورهٔ کارخانه", epi_lesson: "درسِ دورهٔ کارخانه", course: "دورهٔ گام‌به‌گام", home: "امروز", start: "از اینجا شروع کن", settings: "تنظیمات" };
+  function recTitle(view, arg) {
+    var r = arg != null && A.S && A.S.get ? A.S.get(arg) : null;
+    if (!r || typeof r !== "object") return "";
+    var t = r.title || r.fa || r.name || r.q || "";
+    return typeof t === "string" ? t.replace(/\s+/g, " ").trim().slice(0, 60) : "";
+  }
+  function viewLabel(view, arg) {
+    var base = navLabel(view) || VIEW_FA[view] || "", rt = recTitle(view, arg);
+    if (rt) return (VIEW_FA[view] && !navLabel(view) ? VIEW_FA[view] + ": " : "") + rt;
+    return base || "صفحهٔ قبلی";
+  }
+  A.viewLabel = viewLabel;
   function pageTitle() {
     var m = mainEl(); var h1 = m && m.querySelector("h1");
     var t = h1 ? h1.textContent.trim() : "";
     if (A.state.view === "tech" && A.TM[A.state.arg]) t = A.fa(A.state.arg) + " · " + A.TM[A.state.arg].fa;
-    return t || navLabel(A.state.view) || A.state.view;
+    return t || viewLabel(A.state.view, A.state.arg);
   }
   /* بخشی از صفحه که رویش زدی: نزدیک‌ترین کارت/بخش با عنوان */
   function clickContext() {
@@ -19382,10 +19534,20 @@ APP.goFromURL = function (q) {
     LESSONS.forEach(function (l) { var m = lMin(l); lo = Math.min(lo, m[0]); hi = Math.max(hi, m[1]); });
     return [lo, hi];
   }
+  /* متنِ کوتاهِ دوره برای منو، صفحهٔ شروع و «امروز» — همان شمار و همان برآوردِ courseSpan ِ صفحهٔ آغازِ دوره (ممیزی ۲۰۲۶-۱۰-۱۳:
+     متن‌های ثابتِ «۴۵ درس، ۱۵ تا ۵۵ دقیقه» کهنه بودند). short: فقط زمان. */
+  A.courseSpan = function () { return courseSpan(); };
+  A.courseBlurb = function (short) {
+    var sp = courseSpan(), mins = "هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه";
+    if (short) return mins + " و قابلِ تقسیم به چند نشست.";
+    return "دوره " + fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک و " + fa(NPROTO) + " روالِ تکرار) در " + fa(WEEKS.length) + " منزل است (" + mins + "، قابلِ تقسیم به چند نشست).";
+  };
   A.courseLessonMinutes = function (tid) { var i = LIDX[tid]; return i != null ? lMin(LESSONS[i]) : TM[tid] ? lessonMin(TM[tid]) : null; };
   /* برآوردِ همان وزن‌ها برای هر کاربرگ (سفرِ موضوع از آن استفاده می‌کند؛ منطقِ دوم نمی‌سازد) */
   A.wsMinutes = function (ws) { var w = wsMin(ws); return [r5(w[0]), r5(w[1])]; };
   A.minutesText = minTextM;
+  /* توضیحِ منوی کناری (a3_views.js، A.shell هنگامِ راه‌اندازی صدایش می‌زند؛ نه هنگامِ بارگذاری، چون شبیه‌سازها بعداً ثبت می‌شوند) */
+  A.courseNavText = function () { var sp = courseSpan(); return fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک + " + fa(NPROTO) + " روال) به ترتیب — هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه، قابلِ تقسیم — روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"; };
 
   /* ---------- وضعیت ---------- */
   function st() {
@@ -19401,13 +19563,13 @@ APP.goFromURL = function (q) {
   function adopt(c) {
     S.all("ex", function (e) { return e.status === "done" && !e.sample && !e.course && LIDX[e.tid] != null; }).forEach(function (e) {
       if (c.done[e.tid]) return;
-      c.done[e.tid] = String(e.updated || e.created || A.today()).slice(0, 10);
+      c.done[e.tid] = A.localDay(e.updated || e.created) || A.today();
       c.elsewhere[e.tid] = e.id;
     });
     /* همین قاعده برای روال‌ها: اجرای کامل‌شدهٔ همان روال بیرون از دوره */
     S.all("pr", function (r) { return r.status === "done" && !r.sample && !r.course && LIDX[r.pid] != null; }).forEach(function (r) {
       if (c.done[r.pid]) return;
-      c.done[r.pid] = String(r.updated || r.created || A.today()).slice(0, 10);
+      c.done[r.pid] = A.localDay(r.updated || r.created) || A.today();
       c.elsewhere[r.pid] = r.id;
     });
   }
@@ -19522,13 +19684,22 @@ APP.goFromURL = function (q) {
           compact ? null : h("div", { class: "small muted" }, fa(done) + " از " + fa(all) + " درس")));
     }));
   }
-  A.V.course = function () {
+  A.V.course = function (arg, sub) {
     var c = st();
     if (topicLost(c)) return onboarding(c, "lost");
     if (!c.topic) return onboarding(c, nDone(c) ? "pick" : "new");
     if (A._crsChange) return onboarding(c, "change");
     var nl = nextLesson(c), tp = S.get(c.topic);
+    /* گرم‌کردن پس از پایانِ دوره (ممیزی ۲۰۲۶-۱۰-۱۳): درسِ بعدی نیست تا گرم‌کردن را پیش بیندازد، پس گرم‌کردنِ موعد
+       همین‌جا (زیرنمای warm) اجرا می‌شود؛ فاصله‌های ۱، ۳، ۷، ۲۱ و ۶۰ روزه با پایانِ دوره تمام نمی‌شوند. */
+    if (sub === "warm") {
+      var wroot = h("div", { class: "page crs" });
+      wroot.appendChild(A.head("دورهٔ گام‌به‌گام", "گرم‌کردنِ امروز", "بازیابیِ درس‌هایی که تمام کرده‌ای، با فاصلهٔ فزاینده. بعدش به نقشهٔ دوره برمی‌گردی."));
+      wroot.appendChild(h("div", { class: "crs-body" }, warmStep(c, null, function () { A.go("course"); }, "برگرد به نقشهٔ دوره ←", false)));
+      return wroot;
+    }
     var warmDue = nl && gateOpen(c, nl.tid);
+    var warmAfter = !nl ? A.courseWarmDue().length : 0;
     var root = h("div", { class: "page crs" });
     root.appendChild(A.head("دورهٔ گام‌به‌گام", "نقشهٔ سفر", "کجای دوره‌ای، چقدر مانده، و قدمِ بعدی‌ات چیست."));
     root.appendChild(h("section", { class: "card crs-now" },
@@ -19536,11 +19707,15 @@ APP.goFromURL = function (q) {
       h("div", { class: "row between wrap gap" },
         h("div", {}, h("div", { class: "small muted" }, progressText(c)),
           h("div", { class: "small" }, "موضوعِ دوره: ", h("b", {}, tp.title), " ", h("button", { class: "linkish small", onclick: function () { A._crsChange = true; A.render(); } }, "(عوض کن)"))),
-        nl ? h("div", { class: "col" },
-          h("button", { class: "btn lg", onclick: function () { A.go("lesson", nl.tid, c.step[nl.tid] || "s1"); /* گرم‌کردنِ موعد را خودِ درس پیش می‌اندازد */ } },
+        /* دکمه در موبایل تمام‌عرض: قاعدهٔ ‎flex:1 1 100%‎ ِ style.css در ستون (col) روی ارتفاع می‌نشست و دکمه را ۴۲px باریک می‌کرد */
+        nl ? h("div", { class: "col crs-nowgo", style: { flex: "1 1 240px", minWidth: "0", alignItems: "stretch" } },
+          h("button", { class: "btn lg", style: { flex: "0 0 auto", width: "100%" }, onclick: function () { A.go("lesson", nl.tid, c.step[nl.tid] || "s1"); /* گرم‌کردنِ موعد را خودِ درس پیش می‌اندازد */ } },
             warmDue ? "▶ ادامه: اول گرم‌کردنِ امروز، بعد درسِ " + fa(LIDX[nl.tid] + 1) : "▶ ادامه: درسِ " + fa(LIDX[nl.tid] + 1) + " — " + (nl.pid ? "روالِ " : "") + nl.fa),
           h("span", { class: "small muted" }, "زمانِ تقریبیِ این درس: " + minTextM(lMin(nl))))
-          : h("span", { class: "pill good" }, "دوره تمام شد 🎉"))));
+          : h("div", { class: "col crs-nowgo", style: { flex: "1 1 240px", minWidth: "0", alignItems: "stretch" } },
+            h("span", { class: "pill good" }, "دوره تمام شد 🎉"),
+            warmAfter ? h("button", { class: "btn lg crs-warmgo", style: { flex: "0 0 auto", width: "100%" }, onclick: function () { A.go("course", null, "warm"); } }, "▶ گرم‌کردنِ امروز: " + fa(warmAfter) + " پرسشِ موعد") : null,
+            warmAfter ? h("span", { class: "small muted" }, "درس‌هایی که تمام کرده‌ای با فاصله‌های ۱، ۳، ۷، ۲۱ و ۶۰ روزه دوباره از حافظه پرسیده می‌شوند.") : null))));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "مسیر"), h("p", { class: "small muted" }, "هر خال یک درس است؛ پُر = تمام‌شده (در دوره یا بیرون از آن)، 📍 = درسِ بعدیِ تو، خالِ چهارگوش = درسِ یک روالِ تکرار (آخرِ هر منزل). روی هر خال بزنی همان درس باز می‌شود."), weekStrip(c, false)));
     var cw = nl ? weekOf(nl.w) : WEEKS[WEEKS.length - 1];
     var farm = (cw.protos || []).filter(function (p) { return !PM[p]; });
@@ -19586,6 +19761,20 @@ APP.goFromURL = function (q) {
     }).sort(function (a, b) { return ((c.warm[a] || {}).due || c.done[a]) < ((c.warm[b] || {}).due || c.done[b]) ? -1 : 1; }).slice(0, 2);
   }
   function hasWarm(c, tid) { return dueWarm(c, tid).length > 0; }
+  /* همهٔ گرم‌کردن‌های موعد (برای «امروز» و نقشه). تا درسِ بعدی هست، همان دروازهٔ «ادامه» را می‌خواند (یک دور در روز)؛
+     پس از پایانِ دوره هر پرسشِ موعد تا وقتی امروز آگاهانه رد نشده نشان داده می‌شود. */
+  A.courseWarmDue = function () {
+    var c = S.get("course"); if (!c || !c.topic) return [];
+    c = st(); var d = A.today();
+    if (c.warmSkip === d) return [];
+    var nl = nextLesson(c);
+    if (nl && c.warmDay === d) return [];
+    return Object.keys(c.done).map(Number).filter(function (id) {
+      if (!TM[id] || LIDX[id] == null) return false;
+      var w = c.warm[id] || { due: A.addDays(c.done[id], 1) };
+      return (w.due || "") <= d;
+    });
+  };
   /* «ادامه» نباید گرم‌کردنِ موعد را بی‌صدا دور بزند: تا امروز یک دور انجام نشده یا آگاهانه رد نشده، اول گرم‌کردن. */
   function gateOpen(c, tid) { var d = A.today(); return hasWarm(c, tid) && c.warmDay !== d && c.warmSkip !== d; }
   function warmStep(c, tid, next, nextLabel, gated) {
@@ -19631,6 +19820,13 @@ APP.goFromURL = function (q) {
     return box;
   }
 
+  /* مثالِ هر تکنیک (t.example) را سامانه نوشته، نه منبعِ مالک ⇒ همیشه «تولیدی/ساختهٔ سامانه» برچسب می‌خورد و تنظیمِ
+     «پنهان کردن مثال‌های ساخته سامانه» (hideGen) در درس‌ها هم اعمال می‌شود، نه فقط در صفحهٔ تکنیک (ممیزی ۲۰۲۶-۱۰-۱۳). */
+  function showGen(t) { return !!(t && t.example) && !S.settings().hideGen; }
+  A.showGenExample = showGen;
+  function genNote() { return h("p", { class: "small muted" }, "این مثال را سامانه نوشته تا شکلِ اجرای کامل را ببینی؛ نمونهٔ واقعی یا توصیه نیست. از «تنظیمات» می‌توانی همهٔ مثال‌های ساختهٔ سامانه را پنهان کنی."); }
+  A.genExampleNote = genNote;
+
   /* ---------- قدمِ ۱: ببین و بفهم ---------- */
   function phaseStrip(id) {
     var ph = A.phaseOf(id);
@@ -19653,7 +19849,7 @@ APP.goFromURL = function (q) {
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "اجرایش، قدم‌به‌قدم"), stepFlow(t)));
     box.appendChild(h("section", { class: "card soft" }, h("h3", {}, "کی به کار می‌آید"), h("p", {}, t.when)));
     box.appendChild(h("details", { class: "card" }, h("summary", {}, "چرا کار می‌کند؟ (اختیاری)"), h("p", {}, t.why), t.ev ? h("p", { class: "small muted" }, "سطحِ شواهد " + t.ev.lvl + (A.EV_BASIS && A.EV_BASIS[t.ev.basis] ? " (" + A.EV_BASIS[t.ev.basis] + ")" : "") + ": " + t.ev.note) : null));
-    if (t.example) box.appendChild(h("details", { class: "card" }, h("summary", {}, "یک نمونهٔ واقعی ببین (اختیاری)"), h("h4", {}, t.example.title), h("p", { class: "small" }, t.example.text)));
+    if (showGen(t)) box.appendChild(h("details", { class: "card gen" }, h("summary", {}, "یک مثالِ ساختهٔ سامانه ببین (تولیدی، در منابعِ تو نیست؛ اختیاری)"), genNote(), h("h4", {}, t.example.title), h("p", { class: "small" }, t.example.text)));
     return box;
   }
 
@@ -19741,19 +19937,23 @@ APP.goFromURL = function (q) {
 
   /* ---------- قدمِ ۳: روی موضوعِ خودت ---------- */
   /* کاربرگ تا اولین ورودیِ واقعی فقط در حافظه است؛ hd.put() آن را می‌سازد/ذخیره می‌کند. */
+  /* موضوعِ دوره که عوض شود، کاربرگِ قبلی با موضوعِ قبلی می‌ماند و درسِ نیمه‌کاره روی موضوعِ تازه ادامه می‌یابد (ممیزی ۲۰۲۶-۱۰-۱۳):
+     c.ex[tid] فقط وقتی به کار می‌رود که کاربرگش روی همین موضوع (یا بی‌موضوع) باشد. */
+  function onTopic(c, r) { return !c.topic || !r.topic || r.topic === c.topic; }
   function exHandle(c, t) {
     var ex = c.ex[t.id] && S.get(c.ex[t.id]);
-    if (!ex) ex = S.all("ex", function (e) { return e.tid === t.id && e.course && !e.sample && (!c.topic || !e.topic || e.topic === c.topic); })[0] || null;
+    if (ex && !onTopic(c, ex)) ex = null;
+    if (!ex) ex = S.all("ex", function (e) { return e.tid === t.id && e.course && !e.sample && onTopic(c, e); })[0] || null;
     var live = !!ex;
     if (!ex) ex = { id: A.uid("ex"), type: "ex", tid: t.id, topic: c.topic || "", status: "draft", data: {}, rubric: [], course: true };
     if (!ex.topic && c.topic) ex.topic = c.topic;
-    return { ex: ex, live: function () { return live; }, put: function () { if (!live) { live = true; c.ex[t.id] = ex.id; } S.put(ex); } };
+    return { ex: ex, live: function () { return live; }, put: function () { live = true; if (c.ex[t.id] !== ex.id) { c.ex[t.id] = ex.id; saveSoon(c); } S.put(ex); } };
   }
   function doStep(c, t, ctl) {
     var hd = exHandle(c, t), ex = hd.ex, tp = S.get(c.topic);
     var box = h("div", { class: "col gap" });
     box.appendChild(h("section", { class: "card soft" }, h("p", {}, "حالا «" + t.fa + "» را روی موضوعِ خودت اجرا کن: ", h("b", {}, tp ? tp.title : "—"), ". فیلدهای ستاره‌دار لازم‌اند؛ بقیه اختیاری. هر چه بنویسی خودکار ذخیره می‌شود."),
-      t.example ? h("details", {}, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ نمونه را ببین"), h("p", { class: "small" }, h("b", {}, t.example.title + ": "), t.example.text)) : null,
+      showGen(t) ? h("details", { class: "gen" }, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ مثالِ ساختهٔ سامانه را ببین (تولیدی)"), genNote(), h("p", { class: "small" }, h("b", {}, t.example.title + ": "), t.example.text)) : null,
       tp && A.V.journey ? h("p", { class: "small muted crs-jhint" }, "این درس فقط یک تکنیک را روی موضوعت اجرا می‌کند. اگر بخواهی همین موضوع را از اول تا آخر (مسیرِ ۱۱ گامیِ از میوه تا ریشه و بازگشت) قدم‌به‌قدم طی کنی، «",
         h("button", { class: "linkish small", onclick: function () { A.go("journey", tp.id); } }, "🧭 سفرِ گام‌به‌گام روی همین موضوع"), "» را باز کن؛ با «↩ برگرد» به همین درس برمی‌گردی.") : null));
     var savef = A.debounce(function () { hd.put(); }, 400);
@@ -19792,11 +19992,13 @@ APP.goFromURL = function (q) {
     var made = !!c.cards[t.id];
     var rec = h("section", { class: "card" }, h("h3", {}, "پیش از بستن، از حافظه"),
       h("p", { class: "small" }, QA.q),
-      h("p", { class: "small muted" }, "یک بار بی‌نگاه بنویس؛ بعد مقایسه کن. همین پرسش به یک کارتِ مرور تبدیل می‌شود که «مرور» در روزهای بعد می‌پرسد. نوشته‌ات ذخیره می‌شود."), ta,
-      made ? h("p", { class: "small good" }, "کارتِ مرورِ این درس قبلاً ساخته شده.") : h("button", { class: "btn ghost sm mt", onclick: function (e) {
+      h("p", { class: "small muted" }, "یک بار بی‌نگاه بنویس؛ بعد مقایسه کن. همین پرسش به یک کارتِ مرور تبدیل می‌شود که «مرور» از فردا و در روزهای بعد می‌پرسد. نوشته‌ات ذخیره می‌شود. برای بستنِ درس هر دو لازم‌اند: نوشتنِ از حافظه و ساختنِ کارت."), ta,
+      made ? h("p", { class: "small good" }, "کارتِ مرورِ این درس قبلاً ساخته شده.") : h("button", { class: "btn ghost sm mt crs-mkcard", onclick: function (e) {
+        if (!ta.value.trim()) { A.toast("اول بی‌نگاه از حافظه بنویس (حتی ناقص)؛ بعد مقایسه کن.", "bad"); ta.focus(); return; }
         e.target.replaceWith(h("div", { class: "crs-reveal" }, h("p", { class: "small" }, h("b", {}, "گام‌ها:")), stepFlow(t), h("p", {}, h("b", {}, "چرا کار می‌کند: "), sent1(t.why, 2))));
         if (!c.cards[t.id]) {
-          var cd = A.newCard(QA.q, QA.a, { tid: t.id, topic: c.topic });
+          /* موعدِ اولین مرور فردا است، نه امروز: همین الان پاسخ را دیدی (ممیزی ۲۰۲۶-۱۰-۱۳) */
+          var cd = A.newCard(QA.q, QA.a, { tid: t.id, topic: c.topic, due: A.addDays(A.today(), 1) });
           c.cards[t.id] = cd && cd.id || 1;
           if (ta.value.trim()) c.recall[t.id] = { d: A.today(), txt: ta.value };
           save(c); A.toast("کارتِ مرور ساخته شد.");
@@ -19853,6 +20055,12 @@ APP.goFromURL = function (q) {
       var hd = exHandle(c, t), ex = hd.ex;
       var miss = A.renderWS(t.ws, ex.data || {}, function () {}, { prefix: "chk" })._validate();
       if (miss.length) { A.toast("کاربرگِ قدمِ ۳ هنوز کامل نیست: " + miss.slice(0, 2).join("، ") + (miss.length > 2 ? "…" : ""), "bad"); goStep("s3"); return; }
+      /* همان که متنِ قدم می‌گوید: نوشتنِ از حافظه + کارتِ مرور (درسی که قبلاً در دوره بسته شده دوباره قفل نمی‌شود) */
+      if (!(c.done[tid] && !c.elsewhere[tid])) {
+        var rc = c.recall[tid];
+        if (!(rc && rc.txt && rc.txt.trim())) { A.toast("پیش از بستن: در «پیش از بستن، از حافظه» بی‌نگاه بنویس.", "bad"); var tx = document.querySelector("main .crs-body textarea"); if (tx) { tx.focus(); if (tx.scrollIntoView) tx.scrollIntoView({ block: "center" }); } return; }
+        if (!c.cards[tid]) { A.toast("پیش از بستن: «مقایسه کن و کارت بساز» را بزن تا کارتِ مرورِ این درس ساخته شود.", "bad"); var mb = document.querySelector("main .crs-mkcard"); if (mb && mb.scrollIntoView) mb.scrollIntoView({ block: "center" }); return; }
+      }
       ex.status = "done"; hd.put(); try { A.onExDone(ex); } catch (e) { console.error(e); }
       if (!c.done[tid] || c.elsewhere[tid]) { c.done[tid] = A.today(); delete c.elsewhere[tid]; }
       save(c);
@@ -19898,12 +20106,13 @@ APP.goFromURL = function (q) {
   /* اجرای روال روی موضوعِ دوره: تا اولین ورودیِ واقعی فقط در حافظه است */
   function prHandle(c, p) {
     var r = c.ex[p.id] && S.get(c.ex[p.id]);
-    if (!r) r = S.all("pr", function (x) { return x.pid === p.id && x.course && !x.sample && (!c.topic || !x.topic || x.topic === c.topic); })[0] || null;
+    if (r && !onTopic(c, r)) r = null;
+    if (!r) r = S.all("pr", function (x) { return x.pid === p.id && x.course && !x.sample && onTopic(c, x); })[0] || null;
     var live = !!r;
     if (!r) r = { id: A.uid("pr"), type: "pr", pid: p.id, topic: c.topic || "", sched: "", node: "", status: "draft", data: protoPreset(p, S.get(c.topic)), course: true };
     if (!r.topic && c.topic) r.topic = c.topic;
     r.data = r.data || {};
-    return { r: r, live: function () { return live; }, put: function () { if (!live) { live = true; c.ex[p.id] = r.id; } S.put(r); } };
+    return { r: r, live: function () { return live; }, put: function () { live = true; if (c.ex[p.id] !== r.id) { c.ex[p.id] = r.id; saveSoon(c); } S.put(r); } };
   }
   function lockChain(p) {
     /* ترتیبی که خودِ کاربرگ قفل کرده: فیلدِ «قفل» تا فیلدِ after پر نشود باز نمی‌شود. فقط زنجیرهٔ خطیِ بی‌انشعاب. */
@@ -20038,7 +20247,7 @@ APP.goFromURL = function (q) {
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "کارتِ مرور"), h("p", { class: "small" }, q),
       made ? h("p", { class: "small good" }, "کارتِ مرورِ این روال قبلاً ساخته شده.") : h("button", { class: "btn ghost sm crs-pcard", onclick: function (e) {
         if (c.cards[p.id]) return;
-        var cd = A.newCard(q, a, { pid: p.id, topic: c.topic });
+        var cd = A.newCard(q, a, { pid: p.id, topic: c.topic, due: A.addDays(A.today(), 1) });
         c.cards[p.id] = cd && cd.id || 1; save(c);
         e.target.replaceWith(h("p", { class: "small good" }, "کارتِ مرور ساخته شد."));
       } }, "کارتِ مرور بساز")));
@@ -22063,20 +22272,32 @@ APP.goFromURL = function (q) {
   }
   function handle(t, j) { return j.tech ? exHandle(t, j.tech) : prHandle(t, j.proto); }
 
-  /* ---------- وضعیت ---------- */
+  /* ---------- وضعیت ----------
+     یک سنجه برای هر دو صفحه (ممیزی ۲۰۲۶-۱۰-۱۳): گامی «انجام‌شده» است که صفحهٔ موضوع (A.pipelineStatus) آن را انجام‌شده ببیند.
+     j.done فقط ردِ این است که گام از کدام راه بسته شد (سفر یا راهِ دیگر)؛ هرگز به‌تنهایی گام را تمام‌شده نمی‌کند. */
   function jst(t) { var j = t.journey || {}; return { step: j.step || "", done: j.done || {}, started: j.started || "" }; }
   function writeJ(t, j) { if (!j.started) j.started = A.today(); t.journey = j; S.put(t); }
   function firstOpen(t, j) {
     var ps = A.pipelineStatus(t);
-    for (var i = 0; i < PL.length; i++) if (!j.done[PL[i].k] && !ps[PL[i].k]) return PL[i].k;
+    for (var i = 0; i < PL.length; i++) if (!ps[PL[i].k]) return PL[i].k;
     return "end";
   }
-  function nDone(t, j) { var ps = A.pipelineStatus(t); return PL.filter(function (s) { return j.done[s.k] || ps[s.k]; }).length; }
+  function openSteps(t) { var ps = A.pipelineStatus(t); return PL.filter(function (s) { return !ps[s.k]; }); }
+  function nDone(t, j) { return PL.length - openSteps(t).length; }
+  A.journeyProgress = function (t) { var o = openSteps(t); return { done: PL.length - o.length, all: PL.length, open: o.map(function (s) { return s.k; }) }; };
+  /* آنچه صفحهٔ موضوع برای هر گام می‌سنجد (A.pipelineStatus) — وقتی کاربرگ پر شده ولی سنجه هنوز برقرار نیست، همین گفته می‌شود */
+  var NEED = {
+    S1: "نوعِ موضوع (میوه، گره شخصی یا گره مرزی)", S2: "یک کاربرگِ کامل از فازِ ۱ (یا «استخراج عصاره دوره»)", S3: "یک اجرای کاملِ «۵ خط دلتا»",
+    S4: "دست‌کم یک پلهٔ فرود در «بیان دیگر»", S5: "کاشت در مزرعه (زنجیرهٔ فرود یا همین مفهوم، در درختِ علمِ خودش)", S6: "یک کاربرگِ کامل از فازِ ۴",
+    S7: "«بذر» در «بیان دیگر» (یا یک کاربرگِ کامل از فازِ ۵)", S8: "بازسازیِ رو به بالا در «بیان دیگر» (یا یکی از تکنیک‌های ۲۶، ۲۷، ۲۸)",
+    S9: "یک کاربرگِ کامل از فازِ ۷ (یا مقایسه در «بیان دیگر»)", S10: "یک اجرای کاملِ «برگه سفید ۱-۳-۷»", S11: "یک اجرای کاملِ «قرائت روز» یا «بازی کارآگاهی»"
+  };
 
   /* ---------- دکمه‌ها برای صفحهٔ موضوع و فهرستِ موضوع‌ها ---------- */
   A.journeyButton = function (t, small) {
-    var j = jst(t), at = j.step && KIDX[j.step] != null ? KIDX[j.step] : -1;
-    var label = j.step === "end" ? "🧭 سفرِ گام‌به‌گام (تمام‌شده — مرور)" : at >= 0 ? "🧭 ادامهٔ سفرِ گام‌به‌گام · گامِ " + fa(at + 1) + " از " + fa(PL.length) : "🧭 سفرِ گام‌به‌گام روی این موضوع";
+    var j = jst(t), at = j.step && KIDX[j.step] != null ? KIDX[j.step] : -1, nOpen = openSteps(t).length;
+    /* همان سنجهٔ صفحهٔ پایان: «تمام‌شده» فقط وقتی هر ۱۱ گام انجام شده باشد */
+    var label = !nOpen ? "🧭 سفرِ گام‌به‌گام (تمام‌شده — مرور)" : j.step === "end" ? "🧭 سفرِ گام‌به‌گام · " + fa(nOpen) + " گامِ باز مانده" : at >= 0 ? "🧭 ادامهٔ سفرِ گام‌به‌گام · گامِ " + fa(at + 1) + " از " + fa(PL.length) : "🧭 سفرِ گام‌به‌گام روی این موضوع";
     var b = h("button", { class: small ? "btn sm ghost jr-tbtn" : "btn lg jr-go", onclick: function () { A.go("journey", t.id); } }, label);
     if (small) return b;
     return h("section", { class: "card jr-cta", dir: "rtl" }, h("div", { class: "row between wrap gap" },
@@ -22088,7 +22309,7 @@ APP.goFromURL = function (q) {
   function strip(t, j, cur) {
     var ps = A.pipelineStatus(t);
     return h("ol", { class: "jr-strip", "aria-label": "مسیرِ " + fa(PL.length) + " گامی" }, PL.map(function (s, i) {
-      var mine = !!j.done[s.k], other = !mine && !!ps[s.k], here = s.k === cur;
+      var mine = !!ps[s.k] && !!j.done[s.k], other = !!ps[s.k] && !j.done[s.k], here = s.k === cur;
       return h("li", { class: "jr-st" + (mine ? " done" : "") + (other ? " other" : "") + (here ? " here" : ""), style: { "--pc": "var(--p" + s.ph + ")" } },
         h("button", { class: "jr-stb", "aria-current": here ? "step" : null, title: "گامِ " + fa(i + 1) + ": " + s.fa + (mine ? " (تمام‌شده)" : other ? " (پیش‌تر از راهِ دیگری انجام شده)" : ""), onclick: function () {
           if (s.k === cur) return;
@@ -22134,7 +22355,7 @@ APP.goFromURL = function (q) {
     var now = h("section", { class: "card jr-now" }, h("div", { class: "eyebrow" }, "کارِ همین حالا · فقط همین"), h("h2", {}, title),
       h("p", { class: "small muted" }, "فیلدهای ستاره‌دار لازم‌اند تا «گامِ بعد» باز شود؛ هر چه بنویسی خودکار ذخیره می‌شود و همین کاربرگ در صفحهٔ " + (jb.tech ? "تکنیک" : "پروتکل") + " و صفحهٔ موضوع هم دیده می‌شود." + (est ? " زمانِ تقریبی: " + A.minutesText(est) + "." : "")),
       jb.tech ? h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "این تکنیک چیست؟ "), A.peekChip(jb.tech)) : h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "این روال چیست؟ "), h("button", { class: "tlink proto", onclick: function () { A.peekProto(jb.proto); } }, PM[jb.proto].fa)),
-      jb.tech && TM[jb.tech].example ? h("details", {}, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ نمونه را ببین"), h("p", { class: "small" }, h("b", {}, TM[jb.tech].example.title + ": "), TM[jb.tech].example.text)) : null);
+      jb.tech && (A.showGenExample ? A.showGenExample(TM[jb.tech]) : TM[jb.tech].example) ? h("details", { class: "gen" }, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ مثالِ ساختهٔ سامانه را ببین (تولیدی)"), A.genExampleNote ? A.genExampleNote() : null, h("p", { class: "small" }, h("b", {}, TM[jb.tech].example.title + ": "), TM[jb.tech].example.text)) : null);
     var kindSel = null;
     if (jb.kind) {
       kindSel = h("select", { id: "jrKind", onchange: function (e) { t.kind = e.target.value; S.put(t); kindBox.classList.toggle("missing", !t.kind); } },
@@ -22145,13 +22366,29 @@ APP.goFromURL = function (q) {
     }
     var ws = A.renderWS(flds, rec.data, function () { savef(); }, { prefix: "jr" });
     now.appendChild(h("div", { class: "wsform" }, ws));
+    /* گامِ ۵ یعنی «کاشت در مزرعه»؛ تا کاشته نشده، صفحهٔ موضوع این گام را باز می‌بیند ⇒ سفر هم تیک نمی‌زند و کاشت همین‌جاست */
+    var plantBox = null;
+    if (jb.plant) {
+      var p11 = S.all("pr", function (r) { return r.pid === "P11" && r.topic === t.id; })[0];
+      var canChain = p11 && A.plantP11 && A.filled(p11.data.fruit) && (p11.data.descent || []).some(function (x) { return x && x.what; });
+      plantBox = h("div", { class: "fld req jr-plant", "data-k": "plant" },
+        h("div", { class: "flabel" }, "کاشت در مزرعه", h("span", { class: "reqmark", title: "الزامی" }, " *")),
+        ps.S5 ? h("p", { class: "small good" }, "✓ کاشته شده — صفحهٔ موضوع هم این گام را انجام‌شده می‌بیند.")
+          : h("div", { class: "col gap" },
+            h("p", { class: "small muted" }, "این گام وقتی تمام است که مفهوم واقعاً در درختِ علمِ خودش کاشته شود. " + (canChain ? "زنجیرهٔ فرودِ گامِ ۴ آماده است." : "زنجیرهٔ فرودِ «بیان دیگر» (گامِ ۴) هنوز پله ندارد؛ می‌توانی همین مفهوم را تنها بکاری.")),
+            h("div", { class: "row gap wrap" },
+              canChain ? h("button", { class: "btn sm jr-plantchain", type: "button", onclick: function () { A.plantP11(p11); } }, "🌱 کاشتِ زنجیرهٔ فرود در مزرعه") : null,
+              A.placeDialog ? h("button", { class: "btn sm" + (canChain ? " ghost" : "") + " jr-plantone", type: "button", onclick: function () {
+                var txt = ""; flds.forEach(function (f) { if (!txt && (f.t === "text" || f.t === "area") && A.filled(rec.data[f.k])) txt = String(rec.data[f.k]).slice(0, 200); });
+                A.placeDialog({ text: t.title, body: txt, src: { t: "topic", id: t.id } }, function (node) { if (node) A.render(); });
+              } }, "🌱 کاشتِ همین مفهوم در مزرعه") : null,
+              !canChain ? h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("journey", t.id, "S4"); } }, "← گامِ ۴ (فرود)") : null)));
+      now.appendChild(plantBox);
+    }
     root.appendChild(now);
     /* کارهای جانبیِ همین گام */
     var extra = h("div", { class: "row gap wrap" });
-    if (jb.plant) {
-      var p11 = S.all("pr", function (r) { return r.pid === "P11" && r.topic === t.id; })[0];
-      if (p11 && A.plantP11) extra.appendChild(h("button", { class: "btn ghost sm", onclick: function () { A.plantP11(p11); } }, p11.data.__planted ? "🌱 کاشتِ دوباره در مزرعه" : "🌱 کاشتِ زنجیرهٔ فرود در مزرعه"));
-    }
+    if (jb.plant && p11 && A.plantP11 && ps.S5) extra.appendChild(h("button", { class: "btn ghost sm", onclick: function () { A.plantP11(p11); } }, p11.data.__planted ? "🌱 کاشتِ دوباره در مزرعه" : "🌱 کاشتِ زنجیرهٔ فرود در مزرعه"));
     if (jb.sched) {
       var sc = S.all("sched", function (x) { return x.topic === t.id; });
       extra.appendChild(sc.length ? h("span", { class: "small muted" }, "چرخهٔ ۱-۳-۷ زمان‌بندی شده: " + sc.map(function (x) { return x.label + " · " + A.fdate(x.due) + (x.done ? " ✓" : ""); }).join("، "))
@@ -22167,6 +22404,7 @@ APP.goFromURL = function (q) {
     function validate() {
       var miss = ws._validate();
       if (jb.kind && !t.kind) { miss.unshift("نوعِ موضوع"); if (kindBox) kindBox.classList.add("missing"); }
+      if (plantBox && !A.pipelineStatus(t).S5) { miss.push("کاشت در مزرعه"); plantBox.classList.add("missing"); }
       return miss;
     }
     root.appendChild(h("div", { class: "row between gap crs-nav jr-nav" },
@@ -22175,6 +22413,9 @@ APP.goFromURL = function (q) {
         var miss = validate();
         if (miss.length) { A.toast("این‌ها هنوز خالی‌اند: " + miss.slice(0, 3).join("، ") + (miss.length > 3 ? "…" : ""), "bad"); var f = root.querySelector(".missing"); if (f && f.scrollIntoView) f.scrollIntoView({ block: "center" }); return; }
         finishUnit(jb, hd);
+        /* گامِ ۱۰: چرخهٔ ۱-۳-۷ واقعاً زمان‌بندی شود (همان A.start137 ِ صفحهٔ موضوع)، نه فقط وعده */
+        if (jb.sched && !S.all("sched", function (x) { return x.topic === t.id; }).length) A.start137(t.id, t.title);
+        if (!A.pipelineStatus(t)[cur]) { A.toast("صفحهٔ موضوع این گام را هنوز انجام‌شده نمی‌بیند؛ لازم است: " + (NEED[cur] || "کاربرگِ کامل"), "bad"); return; }
         j.done[cur] = A.today(); j.step = next(cur); writeJ(t, j);
         A.toast("گامِ " + fa(i + 1) + " تمام شد.");
         A.go("journey", t.id, j.step);
@@ -22193,7 +22434,26 @@ APP.goFromURL = function (q) {
     if (r.sched) { var sc = S.get(r.sched); if (sc && !sc.done) { sc.done = true; S.put(sc); } }
   }
   function endView(root, t, j) {
-    root.appendChild(A.head("سفرِ گام‌به‌گام · " + t.title, "سفر روی این موضوع تمام شد", "هر " + fa(PL.length) + " گام را پشتِ سر گذاشته‌ای. از این‌جا به بعد کارِ روال‌هاست: چرخهٔ ۱-۳-۷ و قرائتِ روز خودشان در «امروز» ظاهر می‌شوند."));
+    var open = openSteps(t);
+    if (open.length) {
+      /* به انتهای نوار رسیده‌ای ولی همهٔ گام‌ها انجام نشده‌اند: صادقانه بگو کدام‌ها باز مانده‌اند */
+      root.appendChild(A.head("سفرِ گام‌به‌گام · " + t.title, fa(open.length) + " گام هنوز باز است", "به انتهای مسیر رسیدی، اما سفر وقتی تمام است که هر " + fa(PL.length) + " گام انجام شده باشد (همان چیزی که صفحهٔ موضوع می‌سنجد). " + fa(PL.length - open.length) + " از " + fa(PL.length) + " گام انجام شده؛ این‌ها مانده‌اند:"));
+      root.appendChild(h("section", { class: "card jr-open" }, h("ol", { class: "plain" }, open.map(function (s) {
+        return h("li", { class: "row gap wrap" }, h("button", { class: "linkish", onclick: function () { if (j.started && j.step !== s.k) { j.step = s.k; writeJ(t, j); } A.go("journey", t.id, s.k); } }, "گامِ " + fa(KIDX[s.k] + 1) + ": " + s.fa), h("span", { class: "small muted" }, " — لازم: " + (NEED[s.k] || "")));
+      }))));
+      root.appendChild(h("div", { class: "row gap wrap" },
+        h("button", { class: "btn", onclick: function () { var k = open[0].k; if (j.started && j.step !== k) { j.step = k; writeJ(t, j); } A.go("journey", t.id, k); } }, "رفتن به اولین گامِ باز ←"),
+        h("button", { class: "btn ghost", onclick: function () { A.go("topic", t.id); } }, "صفحهٔ موضوع")));
+      return root;
+    }
+    var sc = S.all("sched", function (x) { return x.topic === t.id; }).sort(function (a, b) { return a.due < b.due ? -1 : 1; });
+    var left = sc.filter(function (x) { return !x.done; });
+    root.appendChild(A.head("سفرِ گام‌به‌گام · " + t.title, "سفر روی این موضوع تمام شد", "هر " + fa(PL.length) + " گام انجام شده است. از این‌جا به بعد کارِ روال‌هاست."));
+    root.appendChild(h("section", { class: "card jr-after" }, h("ul", { class: "plain" },
+      h("li", {}, left.length ? "چرخهٔ ۱-۳-۷ برای این موضوع زمان‌بندی شده و هر نوبت روزِ خودش در «امروز» ظاهر می‌شود: " + left.map(function (x) { return x.label + " · " + A.fdate(x.due); }).join("، ")
+        : sc.length ? "چرخهٔ ۱-۳-۷ ِ این موضوع تمام شده (" + fa(sc.length) + " نوبت)." : "چرخهٔ ۱-۳-۷ برای این موضوع زمان‌بندی نشده.",
+        !sc.length ? h("button", { class: "btn ghost sm jr-sched", onclick: function () { A.start137(t.id, t.title); A.render(); } }, "زمان‌بندیِ روز ۱، ۳ و ۷") : null),
+      h("li", {}, "«قرائت روز» هر روز تا اجرای همان روز در «امروز» یادآوری می‌شود؛ این مفهوم را در آن به‌عنوانِ عینک به کار ببر."))));
     root.appendChild(h("div", { class: "row gap wrap" },
       h("button", { class: "btn", onclick: function () { A.go("topic", t.id); } }, "صفحهٔ موضوع"),
       h("button", { class: "btn ghost", onclick: function () { A.go("journey", t.id, PL[0].k); } }, "مرورِ گام‌ها از اول")));
@@ -22328,7 +22588,7 @@ APP.goFromURL = function (q) {
           O("only", "فقط با راهنماییِ راهبرد حل شد", [["F3", 1, "heur"]]), O("without", "بی‌آن هم حل شد", [["F3", -1]]), O("neither", "با آن هم حل نشد", [["F3", -1]])], { need: "problem", iso: true })],
       acts: [T(11), { pid: "P7", fa: "حل از ۳ مسیر" }, T(14), T(1), T(6), T(5), T(7), T(43),
         /* «مسئله‌های بزرگ» ِ کارخانه (a8_prob، نمای e_prob): پیوندِ معنایی، نه تکنیک — آخرِ فهرست */
-        { prob: true, fa: "مسئله‌های بزرگ", note: "تمرینِ انتخابِ حرکتِ بعدی در مسئله‌های واقعیِ تاریخی؛ همان مهارتِ «عوض‌کردنِ راه»" }] },
+        { prob: true, fa: "مسئله‌های بزرگ", note: "تمرینِ انتخابِ حرکتِ بعدی در گام‌به‌گامِ حلِ مسئلهٔ خودت (و مسئله‌هایی که خودت وارد کرده‌ای)؛ همان مهارتِ «عوض‌کردنِ راه»" }] },
     { id: "F4", fa: "پایش و فراشناخت", blurb: "وارسی نشد، اطمینان بیش از درستی بود، یا قاعدهٔ توقف (زود ول کردن/زیاد ماندن) بد بود.",
       subs: [{ id: "nocheck", fa: "بی‌وارسی", src: "" },
         { id: "over", fa: "اطمینانِ بیش‌ازحد/توهمِ فهم", src: "Koriat 1997؛ Kruger & Dunning 1999 — با برچسبِ «مناقشهٔ آماری»: Gignac & Zajenkowski 2020" },
@@ -22561,6 +22821,9 @@ APP.goFromURL = function (q) {
     ["آرزوی مرگ", new RegExp("(?:دلم|آرزوی|آرزوم) ?مرگ")],
     ["کاش نبودم", new RegExp("کاش(?: [" + FL + "]+){0,2} (?:نبودم|نیست بودم|به دنیا نیومده بودم|به دنیا نیامده بودم|مرده بودم)")],
     ["نمی‌خواهم زنده باشم", new RegExp("نمی ?(?:خواهم|خوام) (?:دیگه |دیگر )?زنده (?:باشم|بمونم|بمانم)")],
+    /* ممیزی ۲۰۲۶-۱۰-۱۳: «یه مشت قرص بخورم و تمومش کنم» و «از پل بپرم» دیده نمی‌شد */
+    ["قرص زیاد خوردن", new RegExp("(?:یه مشت|یک مشت|همه ?ی|همهٔ|کلی|یه بسته|یک بسته|بسته) ?(?:[" + FL + "]+ ){0,2}قرص(?: [" + FL + "]+){0,3} ?(?:بخورم|می ?خورم|خوردن)")],
+    ["پریدن از بلندی", new RegExp("از (?:پل|بالای|پشت ?بام|ساختمان|طبقه|بلندی|کوه|صخره)(?: [" + FL + "]+){0,2} ?(?:بپرم|می ?پرم|پایین بپرم|بیفتم|خودمو پرت|خودم را پرت)")],
     ["به زندگی‌ام پایان", new RegExp("(?:به )?زندگی ?(?:م|ام|مو|ام را|م را) ?(?:را |رو )?(?:پایان|تموم|تمام) ?(?:بدم|بدهم|کنم|می ?دم|میدم)")]
   ];
   /* «تمومش کنم» فقط وقتی دربارهٔ زندگی/خود است: پنجرهٔ ۴۰ نویسه در دو سو. یا واژهٔ زندگی/خود/مرگ در پنجره هست،
@@ -22615,7 +22878,8 @@ APP.goFromURL = function (q) {
   /* ---------- هوش مصنوعی: بررسیِ ایمنی ⇐ اعلامِ ارسال (+ حذفِ نام‌ها) ⇐ درخواست. خروجی فقط پیشنهاد است. ---------- */
   var DIAG = /adhd|بیش ?فعالی|نقص توجه|کم ?توجهی|خوانش ?پریشی|نارساخوانی|dyslexi|اوتیسم|autis|افسردگی|depress|دوقطبی|bipolar|اختلال|disorder|وسواس|ocd/;
   /* حالِ درونی (§۱۲.۱۰: هیچ فرضیهٔ هوش مصنوعی دربارهٔ حالِ درونیِ شخصِ سوم). روی متنِ نرمال‌شده (نیم‌فاصله ⇒ فاصله). */
-  var MIND = /فکر می ?کن|می ?خواه|می ?خواد|قصد|نیت|حسادت|حسود|کینه|متنفر|دوست ?(?:ن)?دار|علاقه|خوش ?ش|خوششان|بدش|می ?دان|می ?دون|احساس می ?کن|حس می ?کن|انگیزه|می ?ترس|ترسید|عصبانی|ناراحت|دلخور|حسرت|تحقیر|رقابت می ?کن|حس می ?ک|باور دار|معتقد/;
+  /* ممیزی ۲۰۲۶-۱۰-۱۳: صورت‌های رایجِ دیگر (گذشته، «گمان/خیال»، «بیزار/نفرت»، «احساسِ تهدید»، «نگران»، «رنجیده») رد نمی‌شدند */
+  var MIND = /فکر[\s\u200c]?(?:می[\s\u200c]?)?(?:کن|کرد)|گمان|خیال|می[\s\u200c]?پندار|پنداشت|تصور[\s\u200c]?می|می[\s\u200c]?خواه|می[\s\u200c]?خواد|خواست|قصد|نیت|حسادت|حسود|کینه|متنفر|نفرت|بیزار|دوست[\s\u200c]?(?:ن)?دار|علاقه|خوش[\s\u200c]?ش|خوششان|بدش|می[\s\u200c]?دان|می[\s\u200c]?دون|احساس|حس[\s\u200c]?(?:می|کرد|ِ)|انگیزه|می[\s\u200c]?ترس|ترسید|هراس|نگران|تهدید|عصبانی|خشمگین|ناراحت|دلخور|رنجید|رنجیده|دلش|حسرت|تحقیر|رقابت|باور[\s\u200c]?دار|معتقد|دلسرد|احترام[\s\u200c]?نمی/;
   /* شخصِ سوم: نقش‌ها، ضمیرها، «فلانی»، نشانِ «[شخص]» و هر نامی که کاربر در «دیگرانِ درگیر» یا در خانهٔ حذفِ نام نوشته است */
   var OTHERS = /مدیر|همکار|رئیس|سرپرست|کارفرما|ایشان|دیگران|طرف ?مقابل|فلانی|\[شخص\]|(?:^|[^آ-ی])(?:او|اون|وی|آن ?ها|اونا|آنان)(?=$|[^آ-ی])/;
   function nameList(names) {
@@ -22699,7 +22963,9 @@ APP.goFromURL = function (q) {
       var pre = h("textarea", { id: "knAiPre", rows: 7, readonly: true, class: "kn-pre" });
       function finalText() { var t = o.build(priv); return strip ? stripNames(t, names.value) : t; }
       function meta() { return { names: strip ? nameList(names.value) : [], strip: strip, priv: priv, fileIds: att && attOn ? att.files.map(function (f) { return f.id; }) : [] }; }
-      function upd() { pre.value = finalText(); }
+      /* o.maskPreview: متنی که در پیش‌نمایش پوشیده می‌شود ولی فرستاده می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳: پاسخی که کاربر هنوز ندیده
+         در پیش‌نمایشِ نردبان دیده می‌شد) — پیش‌نمایش صریحاً می‌گوید چه چیزی پوشیده است */
+      function upd() { pre.value = o.maskPreview ? o.maskPreview(finalText()) : finalText(); }
       /* پیوستِ تصویری: فقط اگر میزبان پیوست دارد؛ تا خوانده نشده، چیزی فرستاده نمی‌شود (fileIds خالی) */
       var attBox = null;
       if (o.attach && A.HOST && typeof A.HOST.files === "function") {
@@ -23171,12 +23437,15 @@ APP.goFromURL = function (q) {
         var vals = [4, 5, 6].map(function (n) { return ins[n].value.trim(); });
         if (vals.some(function (v) { return !v; })) { A.toast("هر سه پله را بنویس.", "bad"); return; }
         if (A.knotLeaks(it.answer, vals).length) { A.toast("پله‌ای پاسخِ نهایی را دارد؛ آن را بی‌پاسخ بنویس.", "bad"); return; }
-        L.steps = { 4: vals[0], 5: vals[1], 6: vals[2] }; L.by = "user"; L.at = now(); L.cur = cur; kc.ladder = L; H.put(); redraw();
+        /* منشأ (ممیزی ۲۰۲۶-۱۰-۱۳): اگر پله‌ها همان پیشنهادِ هوش مصنوعی‌اند (یا ویرایشِ آن)، «ai»/«ai+user» ثبت می‌شود نه «user» */
+        var g = A._knotLadAI && A._knotLadAI[kc.id], same = g && [0, 1, 2].every(function (i) { return g[i] === vals[i]; });
+        L.steps = { 4: vals[0], 5: vals[1], 6: vals[2] }; L.by = g ? (same ? "ai" : "ai+user") : "user"; L.at = now(); L.cur = cur; kc.ladder = L; H.put(); redraw();
       } }, "ذخیرهٔ پله‌ها");
       var aib = h("button", { class: "btn ghost sm", onclick: function () {
         if (!String(it.statement || "").trim() || !String(it.answer || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» و «پاسخِ درست» لازم است (برای کنترلِ نشت).", "bad"); return; }
         aib.disabled = true;
         aiGate({ purpose: "ساختنِ پله‌های ۴ تا ۶ ِ نردبان", system: SYS_LAD, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
+          maskPreview: it.seen === "yes" ? null : function (t) { var a = String(it.answer || ""); return a ? t.split(a).join("•••• (پاسخ — این‌جا پنهان، چون هنوز ندیده‌ای؛ فقط برای این‌که هوش مصنوعی آن را لو ندهد فرستاده می‌شود)") : t; },
           more: "پس از ساخت، یک درخواستِ دومِ مستقل فقط با خودِ سه پله (بی صورتِ مسئله، بی پاسخ و بی تصویرِ پیوست) فرستاده می‌شود تا ببیند آیا پاسخِ نهایی از خودِ پله‌ها درمی‌آید؛ اگر درآمد، پله‌ها کنار می‌روند.",
           build: function () { return "صورتِ مسئله: " + it.statement + "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
           onResult: function (t, m) {
@@ -23194,6 +23463,7 @@ APP.goFromURL = function (q) {
                 A.toast("یک حل‌کنندهٔ مستقل از خودِ این پله‌ها (بی صورتِ مسئله) به پاسخِ نهایی رسید؛ پله‌ها کنار گذاشته شد. دستی بنویس یا دوباره بخواه.", "bad"); return;
               }
               [4, 5, 6].forEach(function (n, i) { ins[n].value = v[i]; });
+              A._knotLadAI = A._knotLadAI || {}; A._knotLadAI[kc.id] = v.slice();
               A.toast("پله‌ها در خانه‌ها گذاشته شد — بخوان، اگر لازم است اصلاح کن و «ذخیره» بزن (ساختهٔ هوش مصنوعی؛ وارسی‌شده برای نشتِ متنی و با یک حل‌کنندهٔ مستقل که از خودِ پله‌ها به پاسخ نرسید — درستیِ راهنمایی وارسی نشده).");
             }, function () {
               A.toast("وارسیِ دوم (آیا پاسخ از خودِ پله‌ها درمی‌آید؟) انجام نشد؛ پله‌ها گذاشته نشد. دوباره بخواه یا دستی بنویس.", "bad");
@@ -23211,13 +23481,13 @@ APP.goFromURL = function (q) {
   var SYS_LAD = "تو سازندهٔ راهنمایی‌های پله‌ای برای یک مسئله هستی. هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ننویس. خروجی فقط JSON: {\"s4\":\"یک راهنماییِ راهبرد (از آخر/حالتِ خاص/قرینه) بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهومِ کلیدی\",\"s6\":\"گامِ کلیدی بدونِ پاسخِ نهایی\"}. فارسی، کوتاه.";
   var SYS_LADCHK = "تو حل‌کننده‌ای هستی که فقط سه «راهنمایی» از یک مسئلهٔ پنهان را می‌بینی، نه خودِ مسئله را. بگو آیا پاسخِ نهاییِ مسئله را فقط از روی همین راهنمایی‌ها می‌شود دقیق به دست آورد. اگر می‌شود، آن را بنویس؛ اگر نمی‌شود، null. خروجی فقط JSON: {\"answer\": \"…\" | null}.";
   A.KSYS_LADCHK = SYS_LADCHK;
-  var SYS_ISO ="تو سازندهٔ «هم‌ریخت» هستی: مسئله‌ای با همان ساختارِ عمیق و همان گامِ کلیدی، اما با ظاهر، زمینه و عددهای کاملاً متفاوت. پاسخِ مسئلهٔ اصلی را تکرار نکن. خروجی فقط JSON: {\"problem\":\"صورتِ کاملِ هم‌ریخت\",\"answer\":\"پاسخِ هم‌ریخت\"}. فارسی.";
+  var SYS_ISO ="تو سازندهٔ «هم‌ریخت» هستی: مسئله‌ای با همان ساختارِ عمیق و همان گامِ کلیدی، اما با ظاهر، زمینه و عددهای کاملاً متفاوت. پاسخِ مسئلهٔ اصلی را تکرار نکن و هیچ‌کدام از عددها یا جمله‌های مسئلهٔ اصلی را در صورت نیاور (اگر دنباله است، دنبالهٔ دیگری با همان قاعده؛ اگر داستان است، داستانِ دیگری). پاسخِ هم‌ریخت اگر ممکن است یک عددِ صحیح با رقمِ لاتین باشد. خروجی فقط JSON: {\"problem\":\"صورتِ کاملِ هم‌ریخت\",\"answer\":\"پاسخِ هم‌ریخت\"}. فارسی.";
   function isoBox(H) {
     var kc = H.kc, it = kc.intake, iso = kc.iso;
     var sec = h("section", { class: "card kn-iso" }, h("h3", {}, "هم‌ریخت (همان ساختار، ظاهرِ نو)"),
       h("p", { class: "small" }, it.seen === "yes" ? "پاسخ را دیده‌ای؛ آزمون‌های مقایسه‌ای و «بی‌فشار دوباره حل کن» روی یک هم‌ریخت انجام می‌شوند." : "قفل با نردبان باز شده؛ آزمون‌های مقایسه‌ای را روی یک هم‌ریخت انجام بده."));
     var t = area("knIso", iso && iso.by === "user" ? iso.text : "", 3, function (v) { kc.iso = v.trim() ? { text: v, by: "user", at: now() } : null; H.soon(); }, "هم‌ریخت را خودت بنویس…");
-    if (iso && iso.by === "ai") sec.appendChild(h("div", { class: "card soft" }, h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده"), h("p", {}, iso.text),
+    if (iso && iso.by === "ai") sec.appendChild(h("div", { class: "card soft" }, iso.verified ? h("span", { class: "chip good" }, "ساختهٔ هوش مصنوعی — وارسی‌شده ۳ از ۳") : h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده"), h("p", {}, iso.text),
       iso.answer ? h("details", {}, h("summary", { class: "small" }, "پاسخِ هم‌ریخت (پس از تلاش)"), h("p", { class: "small" }, iso.answer)) : null,
       h("button", { class: "btn ghost sm", onclick: function () { kc.iso = null; H.put(); redraw(); } }, "کنار بگذار")));
     else sec.appendChild(fld("هم‌ریختِ خودت", t));
@@ -23227,12 +23497,28 @@ APP.goFromURL = function (q) {
       aib.disabled = true;
       aiGate({ purpose: "ساختنِ یک هم‌ریخت", system: SYS_ISO, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
         build: function () { return "مسئلهٔ اصلی: " + it.statement + (it.answer ? "\nپاسخِ اصلی (تکرار نشود): " + it.answer : ""); },
-        onResult: function (t2) {
-          var o = parseJSON(t2); out.innerHTML = "";
-          if (!o || !String(o.problem || "").trim()) { A.toast("پاسخِ هوش مصنوعی قالبِ درستی نداشت.", "bad"); return; }
-          if (it.answer && A.knotLeaks(it.answer, [o.problem]).length) { A.toast("هم‌ریخت پاسخِ مسئلهٔ اصلی را در خودش داشت؛ کنار گذاشته شد.", "bad"); return; }
-          out.appendChild(h("div", { class: "card soft" }, h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده"), h("p", {}, o.problem),
-            h("button", { class: "btn sm", onclick: function () { kc.iso = { text: String(o.problem), answer: String(o.answer || ""), by: "ai", at: now(), verified: false }; H.put(); redraw(); } }, "همین را بپذیر")));
+        onResult: function (t2, m) {
+          /* اجرای واقعی (۲۰۲۶-۱۰-۱۳): مدل گاهی همان دنباله/عددهای مسئلهٔ اصلی را تکرار می‌کرد ⇒ نشت ⇒ رد. یک تلاشِ دوبارهٔ خودکار،
+             و پاسخِ عددیِ هم‌ریخت با همان سه حلِ مستقلِ گره‌گشا (A.kverify) وارسی می‌شود — خواستهٔ مالک: «با جوابِ غلط تمرین نکنم». */
+          function bad(o) {
+            if (!o || !String(o.problem || "").trim()) return "پاسخِ هوش مصنوعی قالبِ درستی نداشت.";
+            if (it.answer && A.knotLeaks(it.answer, [o.problem]).length) return "هم‌ریخت پاسخِ مسئلهٔ اصلی را در خودش داشت؛ کنار گذاشته شد.";
+            if (A.kNearCopy && A.kNearCopy(o.problem, it.statement)) return "هم‌ریخت تقریباً همان مسئلهٔ اصلی بود؛ کنار گذاشته شد.";
+            return null;
+          }
+          var o = parseJSON(t2), why = bad(o), sys = SYS_ISO, ask = "مسئلهٔ اصلی: " + it.statement + (it.answer ? "\nپاسخِ اصلی (تکرار نشود): " + it.answer : "");
+          if (m && m.names && m.names.length && A.kRedact) ask = A.kRedact(ask, m.names);
+          var first = why ? Promise.resolve(A.callAI(sys, ask + "\n(تلاشِ قبلی پذیرفته نشد: " + why + " عددها و جمله‌های مسئلهٔ اصلی را به کار نبر.)")).then(function (t3) { var o2 = parseJSON(t3); var w2 = bad(o2); if (w2) throw new Error(w2); return o2; }) : Promise.resolve(o);
+          return first.then(function (ok) {
+            var ans = String(ok.answer || "").trim(), latin = ans.replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); });
+            var check = /^-?\d+$/.test(latin) && A.kverify ? A.kverify({ principle: "همان ساختارِ عمیقِ این مسئلهٔ اصلی: " + it.statement }, { prompt: String(ok.problem), atype: "int", answer: latin, decoy: false }, function (x) { return m && m.names && m.names.length && A.kRedact ? A.kRedact(x, m.names) : x; }) : Promise.resolve(null);
+            return check.then(function (ver) {
+              out.innerHTML = "";
+              var chip = ver ? (ver.ok ? h("span", { class: "chip good" }, "ساختهٔ هوش مصنوعی — وارسی‌شده ۳ از ۳") : h("span", { class: "chip bad" }, "وارسی‌نشده — " + ver.why)) : h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده (پاسخِ عددی ندارد)");
+              out.appendChild(h("div", { class: "card soft kn-isoai" }, chip, h("p", {}, ok.problem),
+                h("button", { class: "btn sm", onclick: function () { kc.iso = { text: String(ok.problem), answer: ans, by: "ai", at: now(), verified: !!(ver && ver.ok), ver: ver || null }; H.put(); redraw(); } }, "همین را بپذیر")));
+            });
+          }, function (e) { out.innerHTML = ""; A.toast((e && e.message) || why || "ساخته نشد", "bad"); });
         }, onDone: function () { aib.disabled = false; } });
     } }, "🤖 هم‌ریخت بساز");
     sec.appendChild(h("div", { class: "row gap wrap" }, aib)); sec.appendChild(out);
@@ -23572,8 +23858,14 @@ APP.goFromURL = function (q) {
         panel.appendChild(h("p", { class: "small" }, "جملهٔ نتیجه‌ات را در کارخانه بسنج: از کجا آمده، با چه ملاکی سنجیده می‌شود، و چه چیزی باطلش می‌کند."));
         panel.appendChild(factoryBtn(H));
       } else if (a.prob) {
-        panel.appendChild(h("p", { class: "small" }, "در «مسئله‌های بزرگ» ِ کارخانه، در هر لحظهٔ تاریخیِ یک مسئلهٔ مشهور حرکتِ بعدی را انتخاب می‌کنی و می‌بینی کدام راه بن‌بست شد — همان «عوض‌کردنِ راه» که این گره کم دارد (با «↩ برگرد» برمی‌گردی)."));
-        panel.appendChild(h("button", { class: "btn sm kn-prob-go", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob"); } }, "🏛️ برو به «مسئله‌های بزرگ»"));
+        /* ممیزی ۲۰۲۶-۱۰-۱۳: با نمونه‌های آماده پنهان، این متن از «مسئلهٔ مشهور» حرف می‌زد و به فهرستی خالی می‌برد ⇒ اول «شبیه‌سازِ همین مسئله» */
+        var ownP = A.probOfCase ? A.probOfCase(kc) : null, mine = A.probsMine ? A.probsMine().length : 0;
+        panel.appendChild(h("p", { class: "small" }, "در شبیه‌سازِ گام‌به‌گام، در هر لحظه حرکتِ بعدی را انتخاب می‌کنی و می‌بینی کدام راه بن‌بست می‌شود — همان «عوض‌کردنِ راه» که این گره کم دارد. " +
+          (ownP && ownP.status === "approved" ? "شبیه‌سازِ همین مسئلهٔ خودت آماده است." : ownP ? "شبیه‌سازِ همین مسئله ساخته شده و منتظرِ تأییدِ توست." : "اگر این موقعیت «مسئله» است، پایینِ همین صفحه «🧪 شبیه‌سازِ همین مسئله» را بساز.") +
+          (mine ? " " + fa(mine) + " مسئلهٔ دیگرِ خودت هم در «مسئله‌های بزرگ» هست." : "") + " (با «↩ برگرد» برمی‌گردی)"));
+        panel.appendChild(h("div", { class: "row gap wrap" },
+          ownP && ownP.status === "approved" ? h("button", { class: "btn sm kn-prob-own", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob", ownP.p.id, "sim"); } }, "🧪 شبیه‌سازِ همین مسئله") : null,
+          h("button", { class: "btn sm ghost kn-prob-go", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob", null, ownP && ownP.status !== "approved" ? "pending" : null); } }, "🏛️ «مسئله‌های بزرگ» ِ خودت")));
       } else if (a.farm) panel.appendChild(nurseryBtn(k));
     }
     return li;
@@ -24527,6 +24819,12 @@ APP.goFromURL = function (q) {
       .sort(function (a, b) { return (a.due || "").localeCompare(b.due || ""); })
       .map(function (it) { return { knot: ks[it.knot], item: it }; });
   };
+  /* آزمایش‌های واقعیِ موعد (ممیزی ۲۰۲۶-۱۰-۱۳): برای گره‌های رفتاری/اجتماعی تنها «ورزش» همین‌اند، ولی نه در «امروز» دیده می‌شدند نه در
+     فهرستِ ورزش — در حالی که یادآور همان روز «یک ورزشِ گره موعد است» می‌فرستاد */
+  A.kexpDue = function () {
+    var t = A.today(), ks = {}; S.all("knot").forEach(function (k) { ks[k.id] = k; });
+    return S.all("kexp", function (x) { return ks[x.knot] && x.status === "planned" && x.due && x.due <= t; }).map(function (x) { return { knot: ks[x.knot], exp: x }; });
+  };
   A.knotNext = function (k) {
     var ds = A.kitemsOf(k.id).filter(A.kservable).map(function (it) { return it.due || A.today(); });
     A.kexpsOf(k.id).forEach(function (x) { if (x.status === "planned" && x.due) ds.push(x.due); });
@@ -24584,6 +24882,17 @@ APP.goFromURL = function (q) {
   var remindT = {};
   function remindSoon(id) { clearTimeout(remindT[id]); remindT[id] = setTimeout(function () { delete remindT[id]; var k = S.get(id); if (k) A.kremindSync(k); }, 1200); }
   /* گره‌های پاک‌شده: یادآورشان لغو می‌شود (اگر a16 خودش A.knotDeleted را صدا نزده باشد) */
+  /* «امروز»: یک سطر برای آزمایش‌های واقعیِ موعد (a3 فقط نمونه‌ها را می‌شمارد) */
+  if (typeof A.dueList === "function" && !A.dueList._kexp) {
+    var rawDueX = A.dueList;   // نامِ جدا: «rawDue» پایین‌تر در همین فایل هم هست و var مشترک می‌شود ⇒ بازگشتِ بی‌پایان
+    A.dueList = function () {
+      var items = rawDueX.apply(this, arguments) || [], ed = [];
+      try { ed = A.kexpDue(); } catch (e) { ed = []; }
+      if (ed.length) items.push({ k: "knot", txt: fa(ed.length) + " آزمایشِ واقعیِ گره موعد است", sub: "پیش‌بینی ⇐ انجام ⇐ مشاهده ⇐ ثبت", go: function () { A.go("kpractice", ed[0].knot.id, "exp"); } });
+      return items;
+    };
+    A.dueList._kexp = true;
+  }
   A.kremindSweep = function () {
     var rk = ((S.settings().knots || {}).rk) || {};
     Object.keys(rk).forEach(function (id) { if (!S.get(id)) unremind(id); });
@@ -24920,8 +25229,10 @@ APP.goFromURL = function (q) {
     var gap0 = c1 && A.kcodeGap(k); if (gap0) c1.appendChild(h("p", { class: "small warnline kp-codegap" }, gap0));
 
     var c2 = h("section", { class: "card" }, h("h2", {}, "نمونه‌های تازه از روی مسئلهٔ خودت (هوش مصنوعی + سه حلِ مستقل)"));
-    var seedN = A.kSeedCases(k).filter(function (c) { return String((c.intake || {}).statement || (c.intake || {}).what || "").trim(); }).length;
-    c2.appendChild(h("p", { class: "small" + (seedN ? "" : " warnline") }, seedN ? "دانه: " + fa(seedN) + " موقعیتِ خودت که به این گره پیوند خورده (صورت، پاسخ، کجا گیر کردی). نمونه‌ها همان ساختار و تله را در ظاهری تازه دارند؛ نمونه‌ای که تقریباً همان مسئلهٔ اصلی باشد کنار می‌رود." : "هنوز موقعیتی با صورت یا شرحِ ماجرا به این گره پیوند نخورده؛ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند."));
+    /* پیامِ دانه دقیقاً همان است که فرستاده می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳: برای گره‌های خصوصی چیزی فرستاده نمی‌شد ولی پیام «دانه: ۱ موقعیت» می‌گفت) */
+    var seedTxt = A.kSeedText(k), seedN = (seedTxt.match(/مسئلهٔ اصلیِ /g) || []).length, privK = A.kprivateKnot ? A.kprivateKnot(k) : false;
+    c2.appendChild(h("p", { class: "small" + (seedN ? "" : " warnline") }, seedN ? "دانه: " + fa(seedN) + " موقعیتِ خودت که به این گره پیوند خورده — " + (privK ? "چون این گره هیجانی/باورِ دربارهٔ خود است، فقط صورت، پاسخ و «کجا گیر کردم» فرستاده می‌شود (نه روایت و فکرها)." : "صورت، پاسخ، کجا گیر کردی، و روایت و فکرهایت.") + " متنِ دقیق را پیش از ارسال می‌بینی. نمونه‌ای که تقریباً همان مسئلهٔ اصلی باشد کنار می‌رود." :
+      privK ? "این گره هیجانی/باورِ دربارهٔ خود است؛ از موقعیت‌هایش فقط صورت/پاسخ/«کجا گیر کردم» فرستاده می‌شود و این‌ها خالی‌اند ⇒ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند. برای این گره‌ها «آزمایشِ واقعی» اصل است." : "هنوز موقعیتی با صورت یا شرحِ ماجرا به این گره پیوند نخورده؛ نمونه‌ها فقط از کارتِ گره ساخته می‌شوند."));
     c2.appendChild(h("p", { class: "small" }, "سازنده فقط JSON ِ ساختاری با پاسخِ محدود (عددِ صحیح یا شناسهٔ گزینه" + (mode === "exp" ? "، یا روبریک برای موقعیت‌های اجتماعی" : "") + ") می‌دهد. سپس هر نمونه سه بار، با سه دستورِ متفاوت و بی‌دیدنِ پاسخ، حل می‌شود (درِ هوش مصنوعیِ این صفحه دما نمی‌گیرد؛ تفاوت از دستورهاست). فقط اگر هر سه با پاسخِ سازنده یکی باشند، هیچ‌کدام دو پاسخ نبینند و داوریِ «ساختارِ گره هست/نیست» با بدلی‌بودن بخواند، نمونه «وارسی‌شده» است. وگرنه با برچسبِ «وارسی‌نشده» نگه داشته و به‌طورِ پیش‌فرض پنهان می‌شود. نمونه‌ای که پاسخش در صورت پیداست اصلاً نگه داشته نمی‌شود."));
     var out = h("div", { class: "col gap", "aria-live": "polite" });
     if (!(k.principle || k.deep)) c2.appendChild(h("p", { class: "small bad" }, "اول «ساختارِ عمیق» ِ کارتِ گره را بنویس (قدمِ ۴)؛ بی آن نمونه‌سازی معنا ندارد."));
@@ -25266,7 +25577,7 @@ APP.goFromURL = function (q) {
     root.appendChild(A.tabs([["over", "پیشرفت"], ["items", "نمونه‌ها (" + fa(A.kitemsOf(k.id).filter(function (x) { return !x.bad; }).length) + ")"], ["exp", "آزمایش‌ها (" + fa(A.kexpsOf(k.id).length) + ")"]], tab, function (t) { A.go("kpractice", k.id, t); }));
     if (tab === "items") { root.appendChild(itemsList(k)); root.appendChild(genPanel(k)); return root; }
     if (tab === "exp") { root.appendChild(expPanel(k)); return root; }
-    var due = A.kitemsOf(k.id).filter(function (it) { return A.kservable(it) && (it.due || A.today()) <= A.today(); }).length;
+    var due = A.kitemsOf(k.id).filter(function (it) { return A.kservable(it) && (it.due || A.today()) <= A.today(); }).length + A.kexpsOf(k.id).filter(function (x) { return x.status === "planned" && x.due && x.due <= A.today(); }).length;
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "وضعیت: " + A.KSTATUS[k.status || "open"]),
       h("p", { class: "small" }, mode === "exp" ? "این گره رفتاری/اجتماعی است: با آزمایش‌های واقعیِ ثبت‌شده ورزیده می‌شود؛ نمونه‌های روبریک فقط خودسنجی‌اند." : "این گره با نمونه‌های پاسخ‌دقیق در شکل‌های گوناگون و نمونه‌های بدلی ورزیده می‌شود."),
       m.lapse ? h("p", { class: "warnline kp-lapse" }, A.KLAPSE) : null,
@@ -25290,11 +25601,13 @@ APP.goFromURL = function (q) {
     A.kremindSweep();
     var root = h("div", { class: "page kp" }), knots = S.all("knot");
     knots.forEach(function (k) { A.kstatusSync(k); });
-    var due = A.kpracticeDue();
+    var due = A.kpracticeDue(), edue = A.kexpDue();
     root.appendChild(A.head("گره‌گشا · ورزیدگی", "ورزشِ گره‌ها", "نمونه‌های تازه با همان ساختارِ عمیق در ظاهرهای گوناگون، به‌علاوهٔ نمونه‌های بدلی؛ پیش از پاسخ اطمینان، پس از پاسخ «چرا؟». گره‌های رفتاری و اجتماعی با آزمایشِ واقعی."));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, fa(due.length) + " نمونهٔ موعد"),
       h("p", { class: "small" }, due.length ? "از " + fa(Object.keys(due.reduce(function (a, d) { a[d.knot.id] = 1; return a; }, {})).length) + " گره، درهم‌آمیخته." : "امروز چیزی موعد نیست."),
       h("button", { class: "btn lg", type: "button", disabled: !due.length, onclick: function () { delete SESS._all; A.go("kpractice", null, "run"); } }, "شروعِ جلسهٔ درهم‌تنیده")));
+    if (edue.length) root.appendChild(h("section", { class: "card kp-expdue" }, h("h2", {}, fa(edue.length) + " آزمایشِ واقعیِ موعد"),
+      h("ul", { class: "small" }, edue.map(function (d) { return h("li", {}, h("button", { class: "linkish", type: "button", onclick: function () { A.go("kpractice", d.knot.id, "exp"); } }, knotName(d.knot)), " — " + (d.exp.what || d.exp.plan || d.exp.predict || "آزمایش") + " (موعد " + A.fdate(d.exp.due) + ")"); }))));
     if (!knots.length) root.appendChild(A.empty("هنوز گره‌ای ثبت نشده. گره پس از تشخیص در «گره‌گشا» (موقعیت ⇐ ریشه ⇐ کارتِ گره) ساخته می‌شود.", A.V.kcases ? h("button", { class: "btn", type: "button", onclick: function () { A.go("kcases"); } }, "رفتن به موقعیت‌ها") : null));
     else root.appendChild(h("section", { class: "card" }, h("h2", {}, "گره‌ها"), h("ul", { class: "kp-klist" }, knots.map(function (k) {
       var m = A.kmastery(k), nx = A.knotNext(k), okN = m.why.filter(function (w) { return w.ok; }).length;
@@ -26676,7 +26989,8 @@ APP.goFromURL = function (q) {
     var seen = !!(st && st.revealed), nctx = seen ? (s.ctx || "") : A.probNeutralCtx(s);
     kc.intake.statement = (nctx ? nctx + "\n\n" : "") + (s.q || "");    // فقط زمینهٔ خنثی و پرسش — پاسخ هرگز در صورتِ مسئله نمی‌آید
     kc.intake.answer = ok ? ok.t : (s.move || "");                          // برای نردبان و کنترلِ نشت (در فرم تا «نمایش» پوشیده است)
-    kc.intake.answerHow = "مسیرِ تاریخیِ ثبت‌شده در «مسئله‌های بزرگ» (" + [yr(s.year), s.who].filter(Boolean).join("، ") + ")";
+    var whoYr = [yr(s.year), s.who].filter(Boolean).join("، ");
+    kc.intake.answerHow = p.origin && p.origin.type === "kcase" ? "راه‌حلِ تأییدشده در «شبیه‌سازِ همین مسئله»" : "مسیرِ تاریخیِ ثبت‌شده در «مسئله‌های بزرگ»" + (whoYr ? " (" + whoYr + ")" : "");
     kc.intake.stuckAt = where + (s.year != null && s.year !== "" ? " — لحظهٔ تاریخیِ " + yr(s.year) : "");
     kc.intake.what = "در شبیه‌سازِ «مسئله‌های بزرگ»، در " + where + " حرکتِ بعدی را پیدا نکردم.";
     kc.intake.seen = st && st.revealed ? "yes" : "no";

@@ -60,10 +60,20 @@
     LESSONS.forEach(function (l) { var m = lMin(l); lo = Math.min(lo, m[0]); hi = Math.max(hi, m[1]); });
     return [lo, hi];
   }
+  /* متنِ کوتاهِ دوره برای منو، صفحهٔ شروع و «امروز» — همان شمار و همان برآوردِ courseSpan ِ صفحهٔ آغازِ دوره (ممیزی ۲۰۲۶-۱۰-۱۳:
+     متن‌های ثابتِ «۴۵ درس، ۱۵ تا ۵۵ دقیقه» کهنه بودند). short: فقط زمان. */
+  A.courseSpan = function () { return courseSpan(); };
+  A.courseBlurb = function (short) {
+    var sp = courseSpan(), mins = "هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه";
+    if (short) return mins + " و قابلِ تقسیم به چند نشست.";
+    return "دوره " + fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک و " + fa(NPROTO) + " روالِ تکرار) در " + fa(WEEKS.length) + " منزل است (" + mins + "، قابلِ تقسیم به چند نشست).";
+  };
   A.courseLessonMinutes = function (tid) { var i = LIDX[tid]; return i != null ? lMin(LESSONS[i]) : TM[tid] ? lessonMin(TM[tid]) : null; };
   /* برآوردِ همان وزن‌ها برای هر کاربرگ (سفرِ موضوع از آن استفاده می‌کند؛ منطقِ دوم نمی‌سازد) */
   A.wsMinutes = function (ws) { var w = wsMin(ws); return [r5(w[0]), r5(w[1])]; };
   A.minutesText = minTextM;
+  /* توضیحِ منوی کناری (a3_views.js، A.shell هنگامِ راه‌اندازی صدایش می‌زند؛ نه هنگامِ بارگذاری، چون شبیه‌سازها بعداً ثبت می‌شوند) */
+  A.courseNavText = function () { var sp = courseSpan(); return fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک + " + fa(NPROTO) + " روال) به ترتیب — هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه، قابلِ تقسیم — روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"; };
 
   /* ---------- وضعیت ---------- */
   function st() {
@@ -79,13 +89,13 @@
   function adopt(c) {
     S.all("ex", function (e) { return e.status === "done" && !e.sample && !e.course && LIDX[e.tid] != null; }).forEach(function (e) {
       if (c.done[e.tid]) return;
-      c.done[e.tid] = String(e.updated || e.created || A.today()).slice(0, 10);
+      c.done[e.tid] = A.localDay(e.updated || e.created) || A.today();
       c.elsewhere[e.tid] = e.id;
     });
     /* همین قاعده برای روال‌ها: اجرای کامل‌شدهٔ همان روال بیرون از دوره */
     S.all("pr", function (r) { return r.status === "done" && !r.sample && !r.course && LIDX[r.pid] != null; }).forEach(function (r) {
       if (c.done[r.pid]) return;
-      c.done[r.pid] = String(r.updated || r.created || A.today()).slice(0, 10);
+      c.done[r.pid] = A.localDay(r.updated || r.created) || A.today();
       c.elsewhere[r.pid] = r.id;
     });
   }
@@ -200,13 +210,22 @@
           compact ? null : h("div", { class: "small muted" }, fa(done) + " از " + fa(all) + " درس")));
     }));
   }
-  A.V.course = function () {
+  A.V.course = function (arg, sub) {
     var c = st();
     if (topicLost(c)) return onboarding(c, "lost");
     if (!c.topic) return onboarding(c, nDone(c) ? "pick" : "new");
     if (A._crsChange) return onboarding(c, "change");
     var nl = nextLesson(c), tp = S.get(c.topic);
+    /* گرم‌کردن پس از پایانِ دوره (ممیزی ۲۰۲۶-۱۰-۱۳): درسِ بعدی نیست تا گرم‌کردن را پیش بیندازد، پس گرم‌کردنِ موعد
+       همین‌جا (زیرنمای warm) اجرا می‌شود؛ فاصله‌های ۱، ۳، ۷، ۲۱ و ۶۰ روزه با پایانِ دوره تمام نمی‌شوند. */
+    if (sub === "warm") {
+      var wroot = h("div", { class: "page crs" });
+      wroot.appendChild(A.head("دورهٔ گام‌به‌گام", "گرم‌کردنِ امروز", "بازیابیِ درس‌هایی که تمام کرده‌ای، با فاصلهٔ فزاینده. بعدش به نقشهٔ دوره برمی‌گردی."));
+      wroot.appendChild(h("div", { class: "crs-body" }, warmStep(c, null, function () { A.go("course"); }, "برگرد به نقشهٔ دوره ←", false)));
+      return wroot;
+    }
     var warmDue = nl && gateOpen(c, nl.tid);
+    var warmAfter = !nl ? A.courseWarmDue().length : 0;
     var root = h("div", { class: "page crs" });
     root.appendChild(A.head("دورهٔ گام‌به‌گام", "نقشهٔ سفر", "کجای دوره‌ای، چقدر مانده، و قدمِ بعدی‌ات چیست."));
     root.appendChild(h("section", { class: "card crs-now" },
@@ -214,11 +233,15 @@
       h("div", { class: "row between wrap gap" },
         h("div", {}, h("div", { class: "small muted" }, progressText(c)),
           h("div", { class: "small" }, "موضوعِ دوره: ", h("b", {}, tp.title), " ", h("button", { class: "linkish small", onclick: function () { A._crsChange = true; A.render(); } }, "(عوض کن)"))),
-        nl ? h("div", { class: "col" },
-          h("button", { class: "btn lg", onclick: function () { A.go("lesson", nl.tid, c.step[nl.tid] || "s1"); /* گرم‌کردنِ موعد را خودِ درس پیش می‌اندازد */ } },
+        /* دکمه در موبایل تمام‌عرض: قاعدهٔ ‎flex:1 1 100%‎ ِ style.css در ستون (col) روی ارتفاع می‌نشست و دکمه را ۴۲px باریک می‌کرد */
+        nl ? h("div", { class: "col crs-nowgo", style: { flex: "1 1 240px", minWidth: "0", alignItems: "stretch" } },
+          h("button", { class: "btn lg", style: { flex: "0 0 auto", width: "100%" }, onclick: function () { A.go("lesson", nl.tid, c.step[nl.tid] || "s1"); /* گرم‌کردنِ موعد را خودِ درس پیش می‌اندازد */ } },
             warmDue ? "▶ ادامه: اول گرم‌کردنِ امروز، بعد درسِ " + fa(LIDX[nl.tid] + 1) : "▶ ادامه: درسِ " + fa(LIDX[nl.tid] + 1) + " — " + (nl.pid ? "روالِ " : "") + nl.fa),
           h("span", { class: "small muted" }, "زمانِ تقریبیِ این درس: " + minTextM(lMin(nl))))
-          : h("span", { class: "pill good" }, "دوره تمام شد 🎉"))));
+          : h("div", { class: "col crs-nowgo", style: { flex: "1 1 240px", minWidth: "0", alignItems: "stretch" } },
+            h("span", { class: "pill good" }, "دوره تمام شد 🎉"),
+            warmAfter ? h("button", { class: "btn lg crs-warmgo", style: { flex: "0 0 auto", width: "100%" }, onclick: function () { A.go("course", null, "warm"); } }, "▶ گرم‌کردنِ امروز: " + fa(warmAfter) + " پرسشِ موعد") : null,
+            warmAfter ? h("span", { class: "small muted" }, "درس‌هایی که تمام کرده‌ای با فاصله‌های ۱، ۳، ۷، ۲۱ و ۶۰ روزه دوباره از حافظه پرسیده می‌شوند.") : null))));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "مسیر"), h("p", { class: "small muted" }, "هر خال یک درس است؛ پُر = تمام‌شده (در دوره یا بیرون از آن)، 📍 = درسِ بعدیِ تو، خالِ چهارگوش = درسِ یک روالِ تکرار (آخرِ هر منزل). روی هر خال بزنی همان درس باز می‌شود."), weekStrip(c, false)));
     var cw = nl ? weekOf(nl.w) : WEEKS[WEEKS.length - 1];
     var farm = (cw.protos || []).filter(function (p) { return !PM[p]; });
@@ -264,6 +287,20 @@
     }).sort(function (a, b) { return ((c.warm[a] || {}).due || c.done[a]) < ((c.warm[b] || {}).due || c.done[b]) ? -1 : 1; }).slice(0, 2);
   }
   function hasWarm(c, tid) { return dueWarm(c, tid).length > 0; }
+  /* همهٔ گرم‌کردن‌های موعد (برای «امروز» و نقشه). تا درسِ بعدی هست، همان دروازهٔ «ادامه» را می‌خواند (یک دور در روز)؛
+     پس از پایانِ دوره هر پرسشِ موعد تا وقتی امروز آگاهانه رد نشده نشان داده می‌شود. */
+  A.courseWarmDue = function () {
+    var c = S.get("course"); if (!c || !c.topic) return [];
+    c = st(); var d = A.today();
+    if (c.warmSkip === d) return [];
+    var nl = nextLesson(c);
+    if (nl && c.warmDay === d) return [];
+    return Object.keys(c.done).map(Number).filter(function (id) {
+      if (!TM[id] || LIDX[id] == null) return false;
+      var w = c.warm[id] || { due: A.addDays(c.done[id], 1) };
+      return (w.due || "") <= d;
+    });
+  };
   /* «ادامه» نباید گرم‌کردنِ موعد را بی‌صدا دور بزند: تا امروز یک دور انجام نشده یا آگاهانه رد نشده، اول گرم‌کردن. */
   function gateOpen(c, tid) { var d = A.today(); return hasWarm(c, tid) && c.warmDay !== d && c.warmSkip !== d; }
   function warmStep(c, tid, next, nextLabel, gated) {
@@ -309,6 +346,13 @@
     return box;
   }
 
+  /* مثالِ هر تکنیک (t.example) را سامانه نوشته، نه منبعِ مالک ⇒ همیشه «تولیدی/ساختهٔ سامانه» برچسب می‌خورد و تنظیمِ
+     «پنهان کردن مثال‌های ساخته سامانه» (hideGen) در درس‌ها هم اعمال می‌شود، نه فقط در صفحهٔ تکنیک (ممیزی ۲۰۲۶-۱۰-۱۳). */
+  function showGen(t) { return !!(t && t.example) && !S.settings().hideGen; }
+  A.showGenExample = showGen;
+  function genNote() { return h("p", { class: "small muted" }, "این مثال را سامانه نوشته تا شکلِ اجرای کامل را ببینی؛ نمونهٔ واقعی یا توصیه نیست. از «تنظیمات» می‌توانی همهٔ مثال‌های ساختهٔ سامانه را پنهان کنی."); }
+  A.genExampleNote = genNote;
+
   /* ---------- قدمِ ۱: ببین و بفهم ---------- */
   function phaseStrip(id) {
     var ph = A.phaseOf(id);
@@ -331,7 +375,7 @@
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "اجرایش، قدم‌به‌قدم"), stepFlow(t)));
     box.appendChild(h("section", { class: "card soft" }, h("h3", {}, "کی به کار می‌آید"), h("p", {}, t.when)));
     box.appendChild(h("details", { class: "card" }, h("summary", {}, "چرا کار می‌کند؟ (اختیاری)"), h("p", {}, t.why), t.ev ? h("p", { class: "small muted" }, "سطحِ شواهد " + t.ev.lvl + (A.EV_BASIS && A.EV_BASIS[t.ev.basis] ? " (" + A.EV_BASIS[t.ev.basis] + ")" : "") + ": " + t.ev.note) : null));
-    if (t.example) box.appendChild(h("details", { class: "card" }, h("summary", {}, "یک نمونهٔ واقعی ببین (اختیاری)"), h("h4", {}, t.example.title), h("p", { class: "small" }, t.example.text)));
+    if (showGen(t)) box.appendChild(h("details", { class: "card gen" }, h("summary", {}, "یک مثالِ ساختهٔ سامانه ببین (تولیدی، در منابعِ تو نیست؛ اختیاری)"), genNote(), h("h4", {}, t.example.title), h("p", { class: "small" }, t.example.text)));
     return box;
   }
 
@@ -419,19 +463,23 @@
 
   /* ---------- قدمِ ۳: روی موضوعِ خودت ---------- */
   /* کاربرگ تا اولین ورودیِ واقعی فقط در حافظه است؛ hd.put() آن را می‌سازد/ذخیره می‌کند. */
+  /* موضوعِ دوره که عوض شود، کاربرگِ قبلی با موضوعِ قبلی می‌ماند و درسِ نیمه‌کاره روی موضوعِ تازه ادامه می‌یابد (ممیزی ۲۰۲۶-۱۰-۱۳):
+     c.ex[tid] فقط وقتی به کار می‌رود که کاربرگش روی همین موضوع (یا بی‌موضوع) باشد. */
+  function onTopic(c, r) { return !c.topic || !r.topic || r.topic === c.topic; }
   function exHandle(c, t) {
     var ex = c.ex[t.id] && S.get(c.ex[t.id]);
-    if (!ex) ex = S.all("ex", function (e) { return e.tid === t.id && e.course && !e.sample && (!c.topic || !e.topic || e.topic === c.topic); })[0] || null;
+    if (ex && !onTopic(c, ex)) ex = null;
+    if (!ex) ex = S.all("ex", function (e) { return e.tid === t.id && e.course && !e.sample && onTopic(c, e); })[0] || null;
     var live = !!ex;
     if (!ex) ex = { id: A.uid("ex"), type: "ex", tid: t.id, topic: c.topic || "", status: "draft", data: {}, rubric: [], course: true };
     if (!ex.topic && c.topic) ex.topic = c.topic;
-    return { ex: ex, live: function () { return live; }, put: function () { if (!live) { live = true; c.ex[t.id] = ex.id; } S.put(ex); } };
+    return { ex: ex, live: function () { return live; }, put: function () { live = true; if (c.ex[t.id] !== ex.id) { c.ex[t.id] = ex.id; saveSoon(c); } S.put(ex); } };
   }
   function doStep(c, t, ctl) {
     var hd = exHandle(c, t), ex = hd.ex, tp = S.get(c.topic);
     var box = h("div", { class: "col gap" });
     box.appendChild(h("section", { class: "card soft" }, h("p", {}, "حالا «" + t.fa + "» را روی موضوعِ خودت اجرا کن: ", h("b", {}, tp ? tp.title : "—"), ". فیلدهای ستاره‌دار لازم‌اند؛ بقیه اختیاری. هر چه بنویسی خودکار ذخیره می‌شود."),
-      t.example ? h("details", {}, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ نمونه را ببین"), h("p", { class: "small" }, h("b", {}, t.example.title + ": "), t.example.text)) : null,
+      showGen(t) ? h("details", { class: "gen" }, h("summary", { class: "small" }, "نمی‌دانی چه بنویسی؟ مثالِ ساختهٔ سامانه را ببین (تولیدی)"), genNote(), h("p", { class: "small" }, h("b", {}, t.example.title + ": "), t.example.text)) : null,
       tp && A.V.journey ? h("p", { class: "small muted crs-jhint" }, "این درس فقط یک تکنیک را روی موضوعت اجرا می‌کند. اگر بخواهی همین موضوع را از اول تا آخر (مسیرِ ۱۱ گامیِ از میوه تا ریشه و بازگشت) قدم‌به‌قدم طی کنی، «",
         h("button", { class: "linkish small", onclick: function () { A.go("journey", tp.id); } }, "🧭 سفرِ گام‌به‌گام روی همین موضوع"), "» را باز کن؛ با «↩ برگرد» به همین درس برمی‌گردی.") : null));
     var savef = A.debounce(function () { hd.put(); }, 400);
@@ -470,11 +518,13 @@
     var made = !!c.cards[t.id];
     var rec = h("section", { class: "card" }, h("h3", {}, "پیش از بستن، از حافظه"),
       h("p", { class: "small" }, QA.q),
-      h("p", { class: "small muted" }, "یک بار بی‌نگاه بنویس؛ بعد مقایسه کن. همین پرسش به یک کارتِ مرور تبدیل می‌شود که «مرور» در روزهای بعد می‌پرسد. نوشته‌ات ذخیره می‌شود."), ta,
-      made ? h("p", { class: "small good" }, "کارتِ مرورِ این درس قبلاً ساخته شده.") : h("button", { class: "btn ghost sm mt", onclick: function (e) {
+      h("p", { class: "small muted" }, "یک بار بی‌نگاه بنویس؛ بعد مقایسه کن. همین پرسش به یک کارتِ مرور تبدیل می‌شود که «مرور» از فردا و در روزهای بعد می‌پرسد. نوشته‌ات ذخیره می‌شود. برای بستنِ درس هر دو لازم‌اند: نوشتنِ از حافظه و ساختنِ کارت."), ta,
+      made ? h("p", { class: "small good" }, "کارتِ مرورِ این درس قبلاً ساخته شده.") : h("button", { class: "btn ghost sm mt crs-mkcard", onclick: function (e) {
+        if (!ta.value.trim()) { A.toast("اول بی‌نگاه از حافظه بنویس (حتی ناقص)؛ بعد مقایسه کن.", "bad"); ta.focus(); return; }
         e.target.replaceWith(h("div", { class: "crs-reveal" }, h("p", { class: "small" }, h("b", {}, "گام‌ها:")), stepFlow(t), h("p", {}, h("b", {}, "چرا کار می‌کند: "), sent1(t.why, 2))));
         if (!c.cards[t.id]) {
-          var cd = A.newCard(QA.q, QA.a, { tid: t.id, topic: c.topic });
+          /* موعدِ اولین مرور فردا است، نه امروز: همین الان پاسخ را دیدی (ممیزی ۲۰۲۶-۱۰-۱۳) */
+          var cd = A.newCard(QA.q, QA.a, { tid: t.id, topic: c.topic, due: A.addDays(A.today(), 1) });
           c.cards[t.id] = cd && cd.id || 1;
           if (ta.value.trim()) c.recall[t.id] = { d: A.today(), txt: ta.value };
           save(c); A.toast("کارتِ مرور ساخته شد.");
@@ -531,6 +581,12 @@
       var hd = exHandle(c, t), ex = hd.ex;
       var miss = A.renderWS(t.ws, ex.data || {}, function () {}, { prefix: "chk" })._validate();
       if (miss.length) { A.toast("کاربرگِ قدمِ ۳ هنوز کامل نیست: " + miss.slice(0, 2).join("، ") + (miss.length > 2 ? "…" : ""), "bad"); goStep("s3"); return; }
+      /* همان که متنِ قدم می‌گوید: نوشتنِ از حافظه + کارتِ مرور (درسی که قبلاً در دوره بسته شده دوباره قفل نمی‌شود) */
+      if (!(c.done[tid] && !c.elsewhere[tid])) {
+        var rc = c.recall[tid];
+        if (!(rc && rc.txt && rc.txt.trim())) { A.toast("پیش از بستن: در «پیش از بستن، از حافظه» بی‌نگاه بنویس.", "bad"); var tx = document.querySelector("main .crs-body textarea"); if (tx) { tx.focus(); if (tx.scrollIntoView) tx.scrollIntoView({ block: "center" }); } return; }
+        if (!c.cards[tid]) { A.toast("پیش از بستن: «مقایسه کن و کارت بساز» را بزن تا کارتِ مرورِ این درس ساخته شود.", "bad"); var mb = document.querySelector("main .crs-mkcard"); if (mb && mb.scrollIntoView) mb.scrollIntoView({ block: "center" }); return; }
+      }
       ex.status = "done"; hd.put(); try { A.onExDone(ex); } catch (e) { console.error(e); }
       if (!c.done[tid] || c.elsewhere[tid]) { c.done[tid] = A.today(); delete c.elsewhere[tid]; }
       save(c);
@@ -576,12 +632,13 @@
   /* اجرای روال روی موضوعِ دوره: تا اولین ورودیِ واقعی فقط در حافظه است */
   function prHandle(c, p) {
     var r = c.ex[p.id] && S.get(c.ex[p.id]);
-    if (!r) r = S.all("pr", function (x) { return x.pid === p.id && x.course && !x.sample && (!c.topic || !x.topic || x.topic === c.topic); })[0] || null;
+    if (r && !onTopic(c, r)) r = null;
+    if (!r) r = S.all("pr", function (x) { return x.pid === p.id && x.course && !x.sample && onTopic(c, x); })[0] || null;
     var live = !!r;
     if (!r) r = { id: A.uid("pr"), type: "pr", pid: p.id, topic: c.topic || "", sched: "", node: "", status: "draft", data: protoPreset(p, S.get(c.topic)), course: true };
     if (!r.topic && c.topic) r.topic = c.topic;
     r.data = r.data || {};
-    return { r: r, live: function () { return live; }, put: function () { if (!live) { live = true; c.ex[p.id] = r.id; } S.put(r); } };
+    return { r: r, live: function () { return live; }, put: function () { live = true; if (c.ex[p.id] !== r.id) { c.ex[p.id] = r.id; saveSoon(c); } S.put(r); } };
   }
   function lockChain(p) {
     /* ترتیبی که خودِ کاربرگ قفل کرده: فیلدِ «قفل» تا فیلدِ after پر نشود باز نمی‌شود. فقط زنجیرهٔ خطیِ بی‌انشعاب. */
@@ -716,7 +773,7 @@
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "کارتِ مرور"), h("p", { class: "small" }, q),
       made ? h("p", { class: "small good" }, "کارتِ مرورِ این روال قبلاً ساخته شده.") : h("button", { class: "btn ghost sm crs-pcard", onclick: function (e) {
         if (c.cards[p.id]) return;
-        var cd = A.newCard(q, a, { pid: p.id, topic: c.topic });
+        var cd = A.newCard(q, a, { pid: p.id, topic: c.topic, due: A.addDays(A.today(), 1) });
         c.cards[p.id] = cd && cd.id || 1; save(c);
         e.target.replaceWith(h("p", { class: "small good" }, "کارتِ مرور ساخته شد."));
       } }, "کارتِ مرور بساز")));

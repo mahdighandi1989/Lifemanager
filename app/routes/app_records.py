@@ -48,7 +48,17 @@ _MAX_BODY = 8_000_000
 _MAX_RECORDS = 20_000
 #: record ids are the page's own A.uid() ("case_l9x…") or fixed names ("settings", "course");
 #: no "/" (a DELETE path could never reach it), no spaces, no control characters
-_REC_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
+_REC_ID_RX = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}")
+
+
+class _FullMatch:
+    """`$` also matches before a trailing newline (audit 2026-10-13: id "ok\n" was saved) ⇒ full-string match only."""
+
+    def match(self, s: str):
+        return _REC_ID_RX.fullmatch(s or "")
+
+
+_REC_ID = _FullMatch()
 
 
 async def _body_cap(request: Request) -> None:
@@ -58,6 +68,29 @@ async def _body_cap(request: Request) -> None:
         n = 0
     if n > _MAX_BODY:
         raise HTTPException(status_code=413, detail="درخواست بزرگ‌تر از سقف است")
+    # chunked uploads carry no content-length (audit 2026-10-13: 9.5 MB passed) ⇒ measure the real body too;
+    # Starlette caches it, so the route still parses it normally.
+    if len(await request.body()) > _MAX_BODY:
+        raise HTTPException(status_code=413, detail="درخواست بزرگ‌تر از سقف است")
+
+
+async def _owner_channels(request: Request, db: AsyncSession = Depends(get_db),
+                          user_id: int = Depends(get_signed_in_user_id)) -> int:
+    """AI, Drive mirror, attachments and reminders spend the OWNER's resources (the app's one connected Drive,
+    its Telegram chat and e-mail, its AI providers). Production registration has no invite code, so any
+    signed-in stranger reached them (audit 2026-10-13). Same «owner» rule as «نظارت و سرکشی»'s gate:
+    when ADMIN_EMAILS is configured the caller must be an admin; with no admin configured (local runs,
+    tests) behaviour is unchanged. A user's own records stay available to every signed-in user."""
+    from app.config import settings as _settings
+    from app.dependencies.auth import _extract_token, _resolve_token_to_user, is_admin
+
+    if not _settings.admin_emails_list:
+        return user_id
+    token = _extract_token(request)
+    user = await _resolve_token_to_user(token, db) if token else None
+    if user is None or not is_admin(user):
+        raise HTTPException(status_code=403, detail="هوش مصنوعی، درایو، پیوست و یادآورِ این صفحه فقط برای مالکِ سامانه است")
+    return user_id
 
 
 def _check_app(app: str) -> str:
@@ -67,7 +100,7 @@ def _check_app(app: str) -> str:
 
 
 class BulkIn(BaseModel):
-    records: List[Dict[str, Any]] = Field(default_factory=list)
+    records: List[Any] = Field(default_factory=list)   # non-objects are rejected one by one below, not the whole batch
 
 
 class MirrorTab(BaseModel):
@@ -204,7 +237,7 @@ async def _attachment_bytes(db: AsyncSession, user_id: int, app: str, ids: List[
 
 
 @router.post("/api/app-records/{app}/ai", tags=["app-records"])
-async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(_owner_channels)):
     _check_app(app)
     from app.services.ai.inference_gateway import complete, complete_multimodal
 
@@ -231,7 +264,7 @@ async def mirror_status(app: str, db: AsyncSession = Depends(get_db), user_id: i
 
 
 @router.post("/api/app-records/{app}/mirror", tags=["app-records"], dependencies=[Depends(_body_cap)])
-async def mirror_queue(app: str, payload: MirrorIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+async def mirror_queue(app: str, payload: MirrorIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(_owner_channels)):
     _check_app(app)
     from app.services.app_mirror_service import upsert
 
@@ -248,7 +281,7 @@ async def mirror_queue(app: str, payload: MirrorIn, db: AsyncSession = Depends(g
 
 
 @router.post("/api/app-records/{app}/mirror/sync", tags=["app-records"])
-async def mirror_sync(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+async def mirror_sync(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(_owner_channels)):
     _check_app(app)
     from app.services.app_mirror_service import sync_pending
 
@@ -272,7 +305,7 @@ async def files_list(app: str, rec_id: str = "", db: AsyncSession = Depends(get_
 @router.post("/api/app-records/{app}/files", tags=["app-records"])
 async def files_upload(app: str, rec_id: str = Form(...), group: str = Form(""), title: str = Form(""),
                        file: UploadFile = File(...), db: AsyncSession = Depends(get_db),
-                       user_id: int = Depends(get_signed_in_user_id)):
+                       user_id: int = Depends(_owner_channels)):
     """The file goes straight into the record's Drive folder (…/<title · id>/پیوست‌ها/);
     the database keeps only a pointer. Drive not connected ⇒ 503 (never stored on the server)."""
     _check_app(app)
@@ -296,7 +329,7 @@ async def files_upload(app: str, rec_id: str = Form(...), group: str = Form(""),
 
 
 @router.delete("/api/app-records/{app}/files/{file_id}", tags=["app-records"])
-async def files_delete(app: str, file_id: int, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+async def files_delete(app: str, file_id: int, db: AsyncSession = Depends(get_db), user_id: int = Depends(_owner_channels)):
     _check_app(app)
     from app.services.app_mirror_service import delete_attachment
 
@@ -304,7 +337,7 @@ async def files_delete(app: str, file_id: int, db: AsyncSession = Depends(get_db
 
 
 @router.get("/api/app-records/{app}/usage", tags=["app-records"])
-async def app_usage(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+async def app_usage(app: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id), request: Request = None):
     """Storage this page uses in the server database and in Drive, plus its AI use over 30 days
     (calls, characters ≈ tokens×4, and an ESTIMATED cost only where the model has a price)."""
     _check_app(app)
@@ -316,10 +349,17 @@ async def app_usage(app: str, db: AsyncSession = Depends(get_db), user_id: int =
 
     store = await usage(db, user_id=user_id, app=app)
     since = datetime.now(timezone.utc) - timedelta(days=30)
+    # AIUsageLog has no user column: the AI log is the OWNER's spend — only the owner sees it (audit 2026-10-13)
+    see_ai = True
+    if request is not None:  # direct (internal) calls are the owner's own
+        try:
+            await _owner_channels(request, db, user_id)
+        except HTTPException:
+            see_ai = False
     rows = (await db.execute(select(AIUsageLog.model, func.count(AIUsageLog.id), func.coalesce(func.sum(AIUsageLog.prompt_chars), 0),
                                     func.coalesce(func.sum(AIUsageLog.output_chars), 0))
                              .where(AIUsageLog.task == "learning_architecture", AIUsageLog.created_at >= since)
-                             .group_by(AIUsageLog.model))).all()
+                             .group_by(AIUsageLog.model))).all() if see_ai else []
     prices = {m.display_name: m for m in (await db.execute(select(AICatalogModel))).scalars().all()}
     models, total, priced_all = [], 0.0, True
     for model, n, pc, oc in rows:
@@ -361,7 +401,7 @@ async def reminders_list(app: str, db: AsyncSession = Depends(get_db), user_id: 
 
 @router.post("/api/app-records/{app}/reminders", tags=["app-records"])
 async def reminders_upsert(app: str, payload: ReminderIn, db: AsyncSession = Depends(get_db),
-                           user_id: int = Depends(get_signed_in_user_id)):
+                           user_id: int = Depends(_owner_channels)):
     """The page decides what is due and when; the server only delivers (job ``app_reminders``)."""
     _check_app(app)
     from app.services.app_reminder_service import upsert
@@ -374,7 +414,7 @@ async def reminders_upsert(app: str, payload: ReminderIn, db: AsyncSession = Dep
 
 
 @router.delete("/api/app-records/{app}/reminders/{key}", tags=["app-records"])
-async def reminders_cancel(app: str, key: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_signed_in_user_id)):
+async def reminders_cancel(app: str, key: str, db: AsyncSession = Depends(get_db), user_id: int = Depends(_owner_channels)):
     _check_app(app)
     from app.services.app_reminder_service import cancel
 

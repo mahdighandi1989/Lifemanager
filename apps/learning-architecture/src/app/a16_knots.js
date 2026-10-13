@@ -126,7 +126,7 @@
           O("only", "فقط با راهنماییِ راهبرد حل شد", [["F3", 1, "heur"]]), O("without", "بی‌آن هم حل شد", [["F3", -1]]), O("neither", "با آن هم حل نشد", [["F3", -1]])], { need: "problem", iso: true })],
       acts: [T(11), { pid: "P7", fa: "حل از ۳ مسیر" }, T(14), T(1), T(6), T(5), T(7), T(43),
         /* «مسئله‌های بزرگ» ِ کارخانه (a8_prob، نمای e_prob): پیوندِ معنایی، نه تکنیک — آخرِ فهرست */
-        { prob: true, fa: "مسئله‌های بزرگ", note: "تمرینِ انتخابِ حرکتِ بعدی در مسئله‌های واقعیِ تاریخی؛ همان مهارتِ «عوض‌کردنِ راه»" }] },
+        { prob: true, fa: "مسئله‌های بزرگ", note: "تمرینِ انتخابِ حرکتِ بعدی در گام‌به‌گامِ حلِ مسئلهٔ خودت (و مسئله‌هایی که خودت وارد کرده‌ای)؛ همان مهارتِ «عوض‌کردنِ راه»" }] },
     { id: "F4", fa: "پایش و فراشناخت", blurb: "وارسی نشد، اطمینان بیش از درستی بود، یا قاعدهٔ توقف (زود ول کردن/زیاد ماندن) بد بود.",
       subs: [{ id: "nocheck", fa: "بی‌وارسی", src: "" },
         { id: "over", fa: "اطمینانِ بیش‌ازحد/توهمِ فهم", src: "Koriat 1997؛ Kruger & Dunning 1999 — با برچسبِ «مناقشهٔ آماری»: Gignac & Zajenkowski 2020" },
@@ -359,6 +359,9 @@
     ["آرزوی مرگ", new RegExp("(?:دلم|آرزوی|آرزوم) ?مرگ")],
     ["کاش نبودم", new RegExp("کاش(?: [" + FL + "]+){0,2} (?:نبودم|نیست بودم|به دنیا نیومده بودم|به دنیا نیامده بودم|مرده بودم)")],
     ["نمی‌خواهم زنده باشم", new RegExp("نمی ?(?:خواهم|خوام) (?:دیگه |دیگر )?زنده (?:باشم|بمونم|بمانم)")],
+    /* ممیزی ۲۰۲۶-۱۰-۱۳: «یه مشت قرص بخورم و تمومش کنم» و «از پل بپرم» دیده نمی‌شد */
+    ["قرص زیاد خوردن", new RegExp("(?:یه مشت|یک مشت|همه ?ی|همهٔ|کلی|یه بسته|یک بسته|بسته) ?(?:[" + FL + "]+ ){0,2}قرص(?: [" + FL + "]+){0,3} ?(?:بخورم|می ?خورم|خوردن)")],
+    ["پریدن از بلندی", new RegExp("از (?:پل|بالای|پشت ?بام|ساختمان|طبقه|بلندی|کوه|صخره)(?: [" + FL + "]+){0,2} ?(?:بپرم|می ?پرم|پایین بپرم|بیفتم|خودمو پرت|خودم را پرت)")],
     ["به زندگی‌ام پایان", new RegExp("(?:به )?زندگی ?(?:م|ام|مو|ام را|م را) ?(?:را |رو )?(?:پایان|تموم|تمام) ?(?:بدم|بدهم|کنم|می ?دم|میدم)")]
   ];
   /* «تمومش کنم» فقط وقتی دربارهٔ زندگی/خود است: پنجرهٔ ۴۰ نویسه در دو سو. یا واژهٔ زندگی/خود/مرگ در پنجره هست،
@@ -413,7 +416,8 @@
   /* ---------- هوش مصنوعی: بررسیِ ایمنی ⇐ اعلامِ ارسال (+ حذفِ نام‌ها) ⇐ درخواست. خروجی فقط پیشنهاد است. ---------- */
   var DIAG = /adhd|بیش ?فعالی|نقص توجه|کم ?توجهی|خوانش ?پریشی|نارساخوانی|dyslexi|اوتیسم|autis|افسردگی|depress|دوقطبی|bipolar|اختلال|disorder|وسواس|ocd/;
   /* حالِ درونی (§۱۲.۱۰: هیچ فرضیهٔ هوش مصنوعی دربارهٔ حالِ درونیِ شخصِ سوم). روی متنِ نرمال‌شده (نیم‌فاصله ⇒ فاصله). */
-  var MIND = /فکر می ?کن|می ?خواه|می ?خواد|قصد|نیت|حسادت|حسود|کینه|متنفر|دوست ?(?:ن)?دار|علاقه|خوش ?ش|خوششان|بدش|می ?دان|می ?دون|احساس می ?کن|حس می ?کن|انگیزه|می ?ترس|ترسید|عصبانی|ناراحت|دلخور|حسرت|تحقیر|رقابت می ?کن|حس می ?ک|باور دار|معتقد/;
+  /* ممیزی ۲۰۲۶-۱۰-۱۳: صورت‌های رایجِ دیگر (گذشته، «گمان/خیال»، «بیزار/نفرت»، «احساسِ تهدید»، «نگران»، «رنجیده») رد نمی‌شدند */
+  var MIND = /فکر[\s\u200c]?(?:می[\s\u200c]?)?(?:کن|کرد)|گمان|خیال|می[\s\u200c]?پندار|پنداشت|تصور[\s\u200c]?می|می[\s\u200c]?خواه|می[\s\u200c]?خواد|خواست|قصد|نیت|حسادت|حسود|کینه|متنفر|نفرت|بیزار|دوست[\s\u200c]?(?:ن)?دار|علاقه|خوش[\s\u200c]?ش|خوششان|بدش|می[\s\u200c]?دان|می[\s\u200c]?دون|احساس|حس[\s\u200c]?(?:می|کرد|ِ)|انگیزه|می[\s\u200c]?ترس|ترسید|هراس|نگران|تهدید|عصبانی|خشمگین|ناراحت|دلخور|رنجید|رنجیده|دلش|حسرت|تحقیر|رقابت|باور[\s\u200c]?دار|معتقد|دلسرد|احترام[\s\u200c]?نمی/;
   /* شخصِ سوم: نقش‌ها، ضمیرها، «فلانی»، نشانِ «[شخص]» و هر نامی که کاربر در «دیگرانِ درگیر» یا در خانهٔ حذفِ نام نوشته است */
   var OTHERS = /مدیر|همکار|رئیس|سرپرست|کارفرما|ایشان|دیگران|طرف ?مقابل|فلانی|\[شخص\]|(?:^|[^آ-ی])(?:او|اون|وی|آن ?ها|اونا|آنان)(?=$|[^آ-ی])/;
   function nameList(names) {
@@ -497,7 +501,9 @@
       var pre = h("textarea", { id: "knAiPre", rows: 7, readonly: true, class: "kn-pre" });
       function finalText() { var t = o.build(priv); return strip ? stripNames(t, names.value) : t; }
       function meta() { return { names: strip ? nameList(names.value) : [], strip: strip, priv: priv, fileIds: att && attOn ? att.files.map(function (f) { return f.id; }) : [] }; }
-      function upd() { pre.value = finalText(); }
+      /* o.maskPreview: متنی که در پیش‌نمایش پوشیده می‌شود ولی فرستاده می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳: پاسخی که کاربر هنوز ندیده
+         در پیش‌نمایشِ نردبان دیده می‌شد) — پیش‌نمایش صریحاً می‌گوید چه چیزی پوشیده است */
+      function upd() { pre.value = o.maskPreview ? o.maskPreview(finalText()) : finalText(); }
       /* پیوستِ تصویری: فقط اگر میزبان پیوست دارد؛ تا خوانده نشده، چیزی فرستاده نمی‌شود (fileIds خالی) */
       var attBox = null;
       if (o.attach && A.HOST && typeof A.HOST.files === "function") {
@@ -969,12 +975,15 @@
         var vals = [4, 5, 6].map(function (n) { return ins[n].value.trim(); });
         if (vals.some(function (v) { return !v; })) { A.toast("هر سه پله را بنویس.", "bad"); return; }
         if (A.knotLeaks(it.answer, vals).length) { A.toast("پله‌ای پاسخِ نهایی را دارد؛ آن را بی‌پاسخ بنویس.", "bad"); return; }
-        L.steps = { 4: vals[0], 5: vals[1], 6: vals[2] }; L.by = "user"; L.at = now(); L.cur = cur; kc.ladder = L; H.put(); redraw();
+        /* منشأ (ممیزی ۲۰۲۶-۱۰-۱۳): اگر پله‌ها همان پیشنهادِ هوش مصنوعی‌اند (یا ویرایشِ آن)، «ai»/«ai+user» ثبت می‌شود نه «user» */
+        var g = A._knotLadAI && A._knotLadAI[kc.id], same = g && [0, 1, 2].every(function (i) { return g[i] === vals[i]; });
+        L.steps = { 4: vals[0], 5: vals[1], 6: vals[2] }; L.by = g ? (same ? "ai" : "ai+user") : "user"; L.at = now(); L.cur = cur; kc.ladder = L; H.put(); redraw();
       } }, "ذخیرهٔ پله‌ها");
       var aib = h("button", { class: "btn ghost sm", onclick: function () {
         if (!String(it.statement || "").trim() || !String(it.answer || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» و «پاسخِ درست» لازم است (برای کنترلِ نشت).", "bad"); return; }
         aib.disabled = true;
         aiGate({ purpose: "ساختنِ پله‌های ۴ تا ۶ ِ نردبان", system: SYS_LAD, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
+          maskPreview: it.seen === "yes" ? null : function (t) { var a = String(it.answer || ""); return a ? t.split(a).join("•••• (پاسخ — این‌جا پنهان، چون هنوز ندیده‌ای؛ فقط برای این‌که هوش مصنوعی آن را لو ندهد فرستاده می‌شود)") : t; },
           more: "پس از ساخت، یک درخواستِ دومِ مستقل فقط با خودِ سه پله (بی صورتِ مسئله، بی پاسخ و بی تصویرِ پیوست) فرستاده می‌شود تا ببیند آیا پاسخِ نهایی از خودِ پله‌ها درمی‌آید؛ اگر درآمد، پله‌ها کنار می‌روند.",
           build: function () { return "صورتِ مسئله: " + it.statement + "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
           onResult: function (t, m) {
@@ -992,6 +1001,7 @@
                 A.toast("یک حل‌کنندهٔ مستقل از خودِ این پله‌ها (بی صورتِ مسئله) به پاسخِ نهایی رسید؛ پله‌ها کنار گذاشته شد. دستی بنویس یا دوباره بخواه.", "bad"); return;
               }
               [4, 5, 6].forEach(function (n, i) { ins[n].value = v[i]; });
+              A._knotLadAI = A._knotLadAI || {}; A._knotLadAI[kc.id] = v.slice();
               A.toast("پله‌ها در خانه‌ها گذاشته شد — بخوان، اگر لازم است اصلاح کن و «ذخیره» بزن (ساختهٔ هوش مصنوعی؛ وارسی‌شده برای نشتِ متنی و با یک حل‌کنندهٔ مستقل که از خودِ پله‌ها به پاسخ نرسید — درستیِ راهنمایی وارسی نشده).");
             }, function () {
               A.toast("وارسیِ دوم (آیا پاسخ از خودِ پله‌ها درمی‌آید؟) انجام نشد؛ پله‌ها گذاشته نشد. دوباره بخواه یا دستی بنویس.", "bad");
@@ -1009,13 +1019,13 @@
   var SYS_LAD = "تو سازندهٔ راهنمایی‌های پله‌ای برای یک مسئله هستی. هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ننویس. خروجی فقط JSON: {\"s4\":\"یک راهنماییِ راهبرد (از آخر/حالتِ خاص/قرینه) بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهومِ کلیدی\",\"s6\":\"گامِ کلیدی بدونِ پاسخِ نهایی\"}. فارسی، کوتاه.";
   var SYS_LADCHK = "تو حل‌کننده‌ای هستی که فقط سه «راهنمایی» از یک مسئلهٔ پنهان را می‌بینی، نه خودِ مسئله را. بگو آیا پاسخِ نهاییِ مسئله را فقط از روی همین راهنمایی‌ها می‌شود دقیق به دست آورد. اگر می‌شود، آن را بنویس؛ اگر نمی‌شود، null. خروجی فقط JSON: {\"answer\": \"…\" | null}.";
   A.KSYS_LADCHK = SYS_LADCHK;
-  var SYS_ISO ="تو سازندهٔ «هم‌ریخت» هستی: مسئله‌ای با همان ساختارِ عمیق و همان گامِ کلیدی، اما با ظاهر، زمینه و عددهای کاملاً متفاوت. پاسخِ مسئلهٔ اصلی را تکرار نکن. خروجی فقط JSON: {\"problem\":\"صورتِ کاملِ هم‌ریخت\",\"answer\":\"پاسخِ هم‌ریخت\"}. فارسی.";
+  var SYS_ISO ="تو سازندهٔ «هم‌ریخت» هستی: مسئله‌ای با همان ساختارِ عمیق و همان گامِ کلیدی، اما با ظاهر، زمینه و عددهای کاملاً متفاوت. پاسخِ مسئلهٔ اصلی را تکرار نکن و هیچ‌کدام از عددها یا جمله‌های مسئلهٔ اصلی را در صورت نیاور (اگر دنباله است، دنبالهٔ دیگری با همان قاعده؛ اگر داستان است، داستانِ دیگری). پاسخِ هم‌ریخت اگر ممکن است یک عددِ صحیح با رقمِ لاتین باشد. خروجی فقط JSON: {\"problem\":\"صورتِ کاملِ هم‌ریخت\",\"answer\":\"پاسخِ هم‌ریخت\"}. فارسی.";
   function isoBox(H) {
     var kc = H.kc, it = kc.intake, iso = kc.iso;
     var sec = h("section", { class: "card kn-iso" }, h("h3", {}, "هم‌ریخت (همان ساختار، ظاهرِ نو)"),
       h("p", { class: "small" }, it.seen === "yes" ? "پاسخ را دیده‌ای؛ آزمون‌های مقایسه‌ای و «بی‌فشار دوباره حل کن» روی یک هم‌ریخت انجام می‌شوند." : "قفل با نردبان باز شده؛ آزمون‌های مقایسه‌ای را روی یک هم‌ریخت انجام بده."));
     var t = area("knIso", iso && iso.by === "user" ? iso.text : "", 3, function (v) { kc.iso = v.trim() ? { text: v, by: "user", at: now() } : null; H.soon(); }, "هم‌ریخت را خودت بنویس…");
-    if (iso && iso.by === "ai") sec.appendChild(h("div", { class: "card soft" }, h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده"), h("p", {}, iso.text),
+    if (iso && iso.by === "ai") sec.appendChild(h("div", { class: "card soft" }, iso.verified ? h("span", { class: "chip good" }, "ساختهٔ هوش مصنوعی — وارسی‌شده ۳ از ۳") : h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده"), h("p", {}, iso.text),
       iso.answer ? h("details", {}, h("summary", { class: "small" }, "پاسخِ هم‌ریخت (پس از تلاش)"), h("p", { class: "small" }, iso.answer)) : null,
       h("button", { class: "btn ghost sm", onclick: function () { kc.iso = null; H.put(); redraw(); } }, "کنار بگذار")));
     else sec.appendChild(fld("هم‌ریختِ خودت", t));
@@ -1025,12 +1035,28 @@
       aib.disabled = true;
       aiGate({ purpose: "ساختنِ یک هم‌ریخت", system: SYS_ISO, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
         build: function () { return "مسئلهٔ اصلی: " + it.statement + (it.answer ? "\nپاسخِ اصلی (تکرار نشود): " + it.answer : ""); },
-        onResult: function (t2) {
-          var o = parseJSON(t2); out.innerHTML = "";
-          if (!o || !String(o.problem || "").trim()) { A.toast("پاسخِ هوش مصنوعی قالبِ درستی نداشت.", "bad"); return; }
-          if (it.answer && A.knotLeaks(it.answer, [o.problem]).length) { A.toast("هم‌ریخت پاسخِ مسئلهٔ اصلی را در خودش داشت؛ کنار گذاشته شد.", "bad"); return; }
-          out.appendChild(h("div", { class: "card soft" }, h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده"), h("p", {}, o.problem),
-            h("button", { class: "btn sm", onclick: function () { kc.iso = { text: String(o.problem), answer: String(o.answer || ""), by: "ai", at: now(), verified: false }; H.put(); redraw(); } }, "همین را بپذیر")));
+        onResult: function (t2, m) {
+          /* اجرای واقعی (۲۰۲۶-۱۰-۱۳): مدل گاهی همان دنباله/عددهای مسئلهٔ اصلی را تکرار می‌کرد ⇒ نشت ⇒ رد. یک تلاشِ دوبارهٔ خودکار،
+             و پاسخِ عددیِ هم‌ریخت با همان سه حلِ مستقلِ گره‌گشا (A.kverify) وارسی می‌شود — خواستهٔ مالک: «با جوابِ غلط تمرین نکنم». */
+          function bad(o) {
+            if (!o || !String(o.problem || "").trim()) return "پاسخِ هوش مصنوعی قالبِ درستی نداشت.";
+            if (it.answer && A.knotLeaks(it.answer, [o.problem]).length) return "هم‌ریخت پاسخِ مسئلهٔ اصلی را در خودش داشت؛ کنار گذاشته شد.";
+            if (A.kNearCopy && A.kNearCopy(o.problem, it.statement)) return "هم‌ریخت تقریباً همان مسئلهٔ اصلی بود؛ کنار گذاشته شد.";
+            return null;
+          }
+          var o = parseJSON(t2), why = bad(o), sys = SYS_ISO, ask = "مسئلهٔ اصلی: " + it.statement + (it.answer ? "\nپاسخِ اصلی (تکرار نشود): " + it.answer : "");
+          if (m && m.names && m.names.length && A.kRedact) ask = A.kRedact(ask, m.names);
+          var first = why ? Promise.resolve(A.callAI(sys, ask + "\n(تلاشِ قبلی پذیرفته نشد: " + why + " عددها و جمله‌های مسئلهٔ اصلی را به کار نبر.)")).then(function (t3) { var o2 = parseJSON(t3); var w2 = bad(o2); if (w2) throw new Error(w2); return o2; }) : Promise.resolve(o);
+          return first.then(function (ok) {
+            var ans = String(ok.answer || "").trim(), latin = ans.replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); });
+            var check = /^-?\d+$/.test(latin) && A.kverify ? A.kverify({ principle: "همان ساختارِ عمیقِ این مسئلهٔ اصلی: " + it.statement }, { prompt: String(ok.problem), atype: "int", answer: latin, decoy: false }, function (x) { return m && m.names && m.names.length && A.kRedact ? A.kRedact(x, m.names) : x; }) : Promise.resolve(null);
+            return check.then(function (ver) {
+              out.innerHTML = "";
+              var chip = ver ? (ver.ok ? h("span", { class: "chip good" }, "ساختهٔ هوش مصنوعی — وارسی‌شده ۳ از ۳") : h("span", { class: "chip bad" }, "وارسی‌نشده — " + ver.why)) : h("span", { class: "chip" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده (پاسخِ عددی ندارد)");
+              out.appendChild(h("div", { class: "card soft kn-isoai" }, chip, h("p", {}, ok.problem),
+                h("button", { class: "btn sm", onclick: function () { kc.iso = { text: String(ok.problem), answer: ans, by: "ai", at: now(), verified: !!(ver && ver.ok), ver: ver || null }; H.put(); redraw(); } }, "همین را بپذیر")));
+            });
+          }, function (e) { out.innerHTML = ""; A.toast((e && e.message) || why || "ساخته نشد", "bad"); });
         }, onDone: function () { aib.disabled = false; } });
     } }, "🤖 هم‌ریخت بساز");
     sec.appendChild(h("div", { class: "row gap wrap" }, aib)); sec.appendChild(out);
@@ -1370,8 +1396,14 @@
         panel.appendChild(h("p", { class: "small" }, "جملهٔ نتیجه‌ات را در کارخانه بسنج: از کجا آمده، با چه ملاکی سنجیده می‌شود، و چه چیزی باطلش می‌کند."));
         panel.appendChild(factoryBtn(H));
       } else if (a.prob) {
-        panel.appendChild(h("p", { class: "small" }, "در «مسئله‌های بزرگ» ِ کارخانه، در هر لحظهٔ تاریخیِ یک مسئلهٔ مشهور حرکتِ بعدی را انتخاب می‌کنی و می‌بینی کدام راه بن‌بست شد — همان «عوض‌کردنِ راه» که این گره کم دارد (با «↩ برگرد» برمی‌گردی)."));
-        panel.appendChild(h("button", { class: "btn sm kn-prob-go", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob"); } }, "🏛️ برو به «مسئله‌های بزرگ»"));
+        /* ممیزی ۲۰۲۶-۱۰-۱۳: با نمونه‌های آماده پنهان، این متن از «مسئلهٔ مشهور» حرف می‌زد و به فهرستی خالی می‌برد ⇒ اول «شبیه‌سازِ همین مسئله» */
+        var ownP = A.probOfCase ? A.probOfCase(kc) : null, mine = A.probsMine ? A.probsMine().length : 0;
+        panel.appendChild(h("p", { class: "small" }, "در شبیه‌سازِ گام‌به‌گام، در هر لحظه حرکتِ بعدی را انتخاب می‌کنی و می‌بینی کدام راه بن‌بست می‌شود — همان «عوض‌کردنِ راه» که این گره کم دارد. " +
+          (ownP && ownP.status === "approved" ? "شبیه‌سازِ همین مسئلهٔ خودت آماده است." : ownP ? "شبیه‌سازِ همین مسئله ساخته شده و منتظرِ تأییدِ توست." : "اگر این موقعیت «مسئله» است، پایینِ همین صفحه «🧪 شبیه‌سازِ همین مسئله» را بساز.") +
+          (mine ? " " + fa(mine) + " مسئلهٔ دیگرِ خودت هم در «مسئله‌های بزرگ» هست." : "") + " (با «↩ برگرد» برمی‌گردی)"));
+        panel.appendChild(h("div", { class: "row gap wrap" },
+          ownP && ownP.status === "approved" ? h("button", { class: "btn sm kn-prob-own", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob", ownP.p.id, "sim"); } }, "🧪 شبیه‌سازِ همین مسئله") : null,
+          h("button", { class: "btn sm ghost kn-prob-go", onclick: function () { mark({ started: now() }); H.put(); A.go("e_prob", null, ownP && ownP.status !== "approved" ? "pending" : null); } }, "🏛️ «مسئله‌های بزرگ» ِ خودت")));
       } else if (a.farm) panel.appendChild(nurseryBtn(k));
     }
     return li;

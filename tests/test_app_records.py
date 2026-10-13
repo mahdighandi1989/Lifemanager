@@ -3,6 +3,14 @@ scoped per user, upserted in batches) and its AI door through Lifemanager's
 own AI layer — no provider key ever in the browser."""
 import pytest
 
+
+@pytest.fixture(autouse=True)
+def _owner_is_admin(monkeypatch):
+    """AI/Drive/attachments/reminders are owner-only once ADMIN_EMAILS is set (audit 2026-10-13); the test
+    owner accounts are the admins here, strangers are not."""
+    from app.config import settings
+    monkeypatch.setattr(settings, "ADMIN_EMAILS", "owner-la@example.com,rem@example.com,owner@example.com")
+
 def _signin(api_client, email="owner-la@example.com"):
     """The page is behind login; /api/app-records refuses anonymous callers."""
     r = api_client.post("/auth/register", json={"email": email, "password": "hunter2-long", "username": email.split("@")[0]})
@@ -108,3 +116,26 @@ async def test_usage_reports_ai_calls_and_an_estimated_cost_only_when_priced(db_
     assert set(ms) == {"Gemini X", "Unpriced"}, "only this page's task"
     assert ms["Gemini X"]["est_cost_usd"] == 1.4  # 1M in tokens × $1 + 0.1M out × $4
     assert ms["Unpriced"]["est_cost_usd"] is None and r["ai_30d"]["all_priced"] is False
+
+
+def test_audit_2026_10_13_owner_only_channels_ids_batches_and_body(api_client):
+    """Audit fixes: a stranger may keep their own records but not spend the owner's AI/Drive/reminders;
+    ids are full-matched; a non-object entry is rejected alone; a chunked body over the cap is refused."""
+    base = "/api/app-records/learning-architecture"
+    _signin(api_client, "stranger@example.com")
+    assert api_client.post(base + "/bulk", json={"records": [{"id": "s1", "type": "case"}]}).json()["saved"] == 1
+    assert api_client.post(base + "/ai", json={"system": "s", "user": "u"}).status_code == 403
+    assert api_client.post(base + "/mirror", json={"items": []}).status_code == 403
+    assert api_client.post(base + "/mirror/sync").status_code == 403
+    assert api_client.post(base + "/reminders", json={"items": []}).status_code == 403
+    assert api_client.get(base + "/usage").json().get("ai", {}).get("models", []) == []
+    r = api_client.post(base + "/bulk", json={"records": [{"id": "ok1"}, 5, "s", None, {"id": "bad\n"}]})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["saved"] == 1 and len(body["rejected"]) == 4
+
+    def gen():
+        chunk = b'{"records": [' + b",".join([b'{"id":"c%d","pad":"%s"}' % (i, b"x" * 100000) for i in range(95)]) + b"]}"
+        yield chunk
+    r2 = api_client.post(base + "/bulk", content=gen(), headers={"Content-Type": "application/json"})
+    assert r2.status_code == 413

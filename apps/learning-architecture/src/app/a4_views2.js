@@ -179,10 +179,19 @@
   };
 
   /* ---------- پروتکل‌ها ---------- */
+  /* دیدن ≠ ذخیره (ممیزی ۲۰۲۶-۱۰-۱۳): زدنِ یک کارِ موعد در «امروز» یا «اجرای تازه» فقط یک پیش‌نویسِ درون‌حافظه می‌سازد؛
+     رکورد با اولین ورودیِ واقعی (فیلد، موضوع، روبریک، ثبت) نوشته می‌شود. اگر پیش‌نویسِ نیمه‌کاره‌ای از همان روال با همان موضوع/نوبت
+     هست، همان باز می‌شود تا پیش‌نویسِ تکراری ساخته نشود. */
+  var DRAFTS = A._protoDrafts = {};
+  A.protoDraft = function (id) { return DRAFTS[id] || null; };
   A.startProto = function (pid, o) {
     o = o || {};
-    var r = S.put({ id: A.uid("pr"), type: "pr", pid: pid, topic: o.topic || "", sched: o.sched || "", node: o.node || "", status: "draft", data: o.preset || {} });
+    var same = S.all("pr", function (x) { return x.pid === pid && x.status !== "done" && !x.sample && (x.topic || "") === (o.topic || "") && (x.sched || "") === (o.sched || "") && (x.node || "") === (o.node || ""); })[0];
+    if (same) { A.go("proto", pid, same.id); return same; }
+    var r = { id: A.uid("pr"), type: "pr", pid: pid, topic: o.topic || "", sched: o.sched || "", node: o.node || "", status: "draft", data: o.preset || {}, created: new Date().toISOString() };
+    DRAFTS[r.id] = r;
     A.go("proto", pid, r.id);
+    return r;
   };
   A.V.protos = function (arg, sub) {
     var root = h("div", { class: "page" });
@@ -216,7 +225,7 @@
     var root = h("div", { class: "page" });
     root.appendChild(h("div", { class: "crumbs" }, h("button", { class: "linkish", onclick: function () { A.go("protos"); } }, "← پروتکل‌ها")));
     root.appendChild(A.head("پروتکل · " + p.dur, p.fa, p.why));
-    var r = runId && S.get(runId);
+    var r = runId && (S.get(runId) || DRAFTS[runId]);
     if (!r) {
       var runs = S.all("pr", function (x) { return x.pid === pid; });
       root.appendChild(h("button", { class: "btn", onclick: function () { A.startProto(pid); } }, "اجرای تازه"));
@@ -226,8 +235,8 @@
       }))) : A.empty("هنوز اجرا نشده."));
       return root;
     }
-    var save = A.debounce(function () { S.put(r); }, 500);
-    root.appendChild(h("div", { class: "row gap wrap" }, h("label", { for: "prTopic", class: "small" }, "موضوع:"), A.topicSelect(r.topic, function (v) { r.topic = v; S.put(r); }, "prTopic"),
+    var save = A.debounce(function () { S.put(r); delete DRAFTS[r.id]; }, 500);
+    root.appendChild(h("div", { class: "row gap wrap" }, h("label", { for: "prTopic", class: "small" }, "موضوع:"), A.topicSelect(r.topic, function (v) { r.topic = v; S.put(r); delete DRAFTS[r.id]; }, "prTopic"),
       h("span", { class: "small muted" }, r.status === "done" ? "کامل‌شده · " + A.fdate(r.updated) : "پیش‌نویس · خودکار ذخیره می‌شود")));
     var ws = A.renderWS(p.ws, r.data, save, { prefix: "pr" });
     var formCard = h("div", { class: "card wsform" }, ws);
@@ -249,7 +258,7 @@
     }
     if (pid === "P4" || pid === "P2") {
       var span = pid === "P4" ? 7 : 0;
-      var deltas = S.all("pr", function (x) { return x.pid === "P1" && x.status === "done" && A.daysBetween(x.created.slice(0, 10), A.today()) <= span; });
+      var deltas = S.all("pr", function (x) { return x.pid === "P1" && x.status === "done" && A.daysBetween(A.localDay(x.created), A.today()) <= span; });
       var box = h("div", { class: "card soft deltas" + (r.data.cmp__open ? "" : " hidden") }, h("h3", {}, pid === "P4" ? "ثبت‌های ۵ خط دلتای این هفته" : "ثبت‌های ۵ خط دلتای امروز"),
         deltas.length ? deltas.map(function (x) { return h("div", { class: "delta" }, h("strong", {}, x.data.src || ""), h("ul", {}, (x.data.d || []).filter(Boolean).map(function (d) { return h("li", {}, d); })), h("div", { class: "small" }, "پرسش: " + (x.data.qq || "") + " · قلاب: " + (x.data.hook || ""))); }) : h("p", { class: "muted small" }, "ثبتی پیدا نشد."));
       root.appendChild(box);
@@ -271,7 +280,7 @@
         A.toast(fa(gs.length) + " کارت ساخته شد.");
       } }, "ساخت کارت از شکاف‌ها") : null,
       pid === "P1" && r.data.q1 ? h("button", { class: "btn ghost", onclick: function () { A.addStructInstance(r.data.q1, r.data.q2 || r.data.src, r.data.dom); } }, "افزودن مصداق به اطلس") : null,
-      A.confirmBtn("حذف", function () { S.del(r.id); A.go("proto", pid); })));
+      A.confirmBtn("حذف", function () { delete DRAFTS[r.id]; if (S.get(r.id)) S.del(r.id); A.go("proto", pid); })));
     return root;
   };
   A.protoQueue = function () { return queue(); };
@@ -319,7 +328,7 @@
   }
   function session(cards, mode) {
     var wrap = h("div", { class: "review" });
-    if (!cards.length) { wrap.appendChild(A.empty(mode === "due" ? "کارتی موعد امروز نیست. کارت‌ها از کارگاه تکنیک‌ها و شکاف‌های برگه سفید ساخته می‌شوند." : "هنوز کارتی نساخته‌ای.", h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}); } }, "ساخت کارت"))); return wrap; }
+    if (!cards.length) { wrap.appendChild(A.empty(mode === "due" ? "کارتی موعد امروز نیست. کارت‌ها از کارگاه تکنیک‌ها و شکاف‌های برگه سفید ساخته می‌شوند." : "هنوز کارتی نساخته‌ای.", h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}, function () { A.render(); }); } }, "ساخت کارت"))); return wrap; }
     var i = 0, area = h("div", {});
     wrap.appendChild(h("p", { class: "small muted" }, mode === "mix" ? "کارت‌ها از موضوع‌ها و تکنیک‌های مختلف یک‌درمیان چیده شده‌اند تا مجبور شوی اول تشخیص دهی «این از کدام نوع است» (ارزش اصلی درهم‌تنیدن). نمره‌ها زمان‌بندی را هم به‌روز می‌کنند." : "کارت‌ها از موضوع‌های مختلف یک‌درمیان چیده شده‌اند."));
     wrap.appendChild(area);
@@ -329,19 +338,20 @@
       area.innerHTML = "";
       if (i >= cards.length) { area.appendChild(h("div", { class: "card done" }, h("h3", {}, "تمام شد"), h("p", {}, fa(cards.length) + " کارت مرور شد."), h("button", { class: "btn", onclick: function () { A.go("review", null, "calib"); } }, "دیدن کالیبراسیون"))); return; }
       var c = cards[i], tp = c.topic && S.get(c.topic);
-      var conf = 60;
+      var conf = 60, preConf = null;  // اطمینانِ پیش از دیدنِ پاسخ؛ پس از «نمایش پاسخ» قفل می‌شود (کالیبراسیونِ صادق)
       var att = h("textarea", { id: "rvAtt", rows: 3, placeholder: "پاسخت را از حافظه بنویس (حتی ناقص)." });
       var co = h("output", {}, fa(conf) + "٪");
+      var slider = h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { if (preConf != null) { e.target.value = preConf; return; } conf = +e.target.value; co.textContent = fa(conf) + "٪"; } });
       var back = h("div", { class: "back hidden" });
       var grades = h("div", { class: "grades hidden" }, [[0, "اصلاً یادم نبود"], [1, "اشتباه"], [2, "اشتباه اما آشنا"], [3, "درست، با زحمت زیاد"], [4, "درست، با کمی تردید"], [5, "آسان و کامل"]].map(function (g) {
-        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], conf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
+        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], preConf == null ? conf : preConf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
       }));
       area.appendChild(h("div", { class: "card flash" },
         h("div", { class: "row between wrap small muted" }, h("span", {}, "کارت " + fa(i + 1) + " از " + fa(cards.length)), h("span", {}, (c.tid ? "تکنیک " + fa(c.tid) + " · " : "") + (tp ? tp.title : ""))),
         h("div", { class: "q" }, c.q),
         h("label", { for: "rvAtt", class: "small" }, "پاسخ تو"), att,
-        h("div", { class: "scale" }, h("label", { for: "rvConf", class: "small" }, "اطمینان"), h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { conf = +e.target.value; co.textContent = fa(conf) + "٪"; } }), co),
-        h("button", { class: "btn", onclick: function (e) { back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
+        h("div", { class: "scale" }, h("label", { for: "rvConf", class: "small" }, "اطمینان"), slider, co),
+        h("button", { class: "btn", onclick: function (e) { preConf = conf; slider.disabled = true; slider.setAttribute("aria-disabled", "true"); co.textContent = fa(preConf) + "٪ (پیش از دیدنِ پاسخ ثبت شد)"; back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
         back, grades));
       back.appendChild(h("div", { class: "small muted" }, "پاسخ:")); back.appendChild(h("div", { class: "a" }, c.a));
     }
@@ -349,7 +359,7 @@
   function cardList() {
     var cards = S.all("card");
     var wrap = h("div", {});
-    wrap.appendChild(h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}); } }, "کارت تازه"), h("span", { class: "small muted" }, fa(cards.length) + " کارت")));
+    wrap.appendChild(h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { A.cardDialog("", "", {}, function () { A.render(); }); } }, "کارت تازه"), h("span", { class: "small muted" }, fa(cards.length) + " کارت")));
     if (!cards.length) return wrap;
     wrap.appendChild(h("div", { class: "scrollx" }, h("table", { class: "dt mt" }, h("thead", {}, h("tr", {}, h("th", {}, "پرسش"), h("th", {}, "پاسخ"), h("th", {}, "موعد"), h("th", {}, "فاصله"), h("th", {}, ""))),
       h("tbody", {}, cards.map(function (c) {
@@ -544,7 +554,7 @@
       h("label", { for: "exJ", class: "small" }, "خروجی"), ex,
       h("label", { for: "imJ", class: "small" }, "ورود"), im,
       h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () {
-        try { var arr = JSON.parse(im.value); if (!Array.isArray(arr)) throw new Error("قالب نادرست"); arr.forEach(function (r) { if (r && r.id && r.type) S.put(r); }); A.toast(fa(arr.length) + " رکورد وارد شد."); A.render(); }
+        try { var arr = JSON.parse(im.value); if (!Array.isArray(arr)) throw new Error("قالب نادرست"); arr.forEach(function (r) { if (r && r.id && r.type) S.put(r, { keepTime: true }); }); /* زمانِ «updated» ِ پشتیبان حفظ می‌شود */ A.toast(fa(arr.length) + " رکورد وارد شد."); A.render(); }
         catch (e) { A.toast("JSON نامعتبر: " + e.message, "bad"); }
       } }, "ورود داده"), A.confirmBtn("حذف نمونه‌ها", function () { S.all(null, function (r) { return r.sample; }).forEach(function (r) { S.del(r.id); }); A.toast("نمونه‌ها حذف شدند."); A.render(); }))));
     root.appendChild(h("p", { class: "small muted" }, "حالت ذخیره: " + (S.mode === "host" ? "پایگاه داده Lifemanager" : S.mode === "gas" ? "Google Sheets" : "همین مرورگر") + " · " + fa(Object.keys(S.recs).length) + " رکورد"));

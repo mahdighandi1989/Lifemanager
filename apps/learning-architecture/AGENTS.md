@@ -29,7 +29,8 @@
 | `dist/` | خروجیِ ساخت (gitignored): artifact، html ِ مستقل، Apps Script + zip | نه |
 | `frontend/public/assets/lla/**`, `frontend/src/lib/llaBundle.js` | خروجیِ همگام‌سازی | **هرگز** |
 | `frontend/src/pages/LearningArchitecturePage.jsx`, `frontend/src/components/learning-architecture/`, `frontend/src/lib/llaHandbook.js` | میزبان و نمایشگرِ دفترچه | بله |
-| `app/routes/app_records.py`, `app/models/app_record.py` | دادهٔ برنامه (`app_records`) و مسیرِ AI | بله، با قواعدِ ریپو |
+| `app/routes/app_records.py`, `app/models/app_record.py`, `app_mirror.py`, `app_file.py`, `app_reminder.py`, `app/services/app_mirror_service.py`, `app/services/app_reminder_service.py` | دادهٔ برنامه (`app_records`)، مسیرِ AI، آینهٔ درایو، پیوست‌ها، یادآورها (کارهای `app_mirror` و `app_reminders`). AI/درایو/پیوست/یادآور **فقط برای مالک** (`_owner_channels`) | بله، با قواعدِ ریپو |
+| `app/routes/inspection_audit.py` | ممیزیِ فقط‌خواندنیِ ناظر + `POST /api/inspection/audit/ai` (اجرای همان کارِ AI ِ این صفحه با پرسش‌های خنثی، برای آزمودنِ مسیرِ واقعی) | بله |
 
 ## هر تغییر — به همین ترتیب
 1. منبع را تغییر بده (`src/…` یا میزبان).
@@ -42,7 +43,8 @@
 4. دوباره `python apps/learning-architecture/build.py` (فهرست و نمودار و نسخه‌های فرانت را بازمی‌سازد).
 5. دروازه (قانونِ ۴ ِ ریپو): `python -m pytest tests/ -q` و `cd frontend && npm run build`. اگر رفتارِ برنامه عوض شد:
    `cd apps/learning-architecture && npm i --no-save playwright@1.56 && for t in tests/*.js; do node $t; done`
-   (Chromium در `/opt/pw-browsers`؛ `playwright install` نزن). هر آزمون باید «NO ERRORS» بدهد.
+   (Chromium در `/opt/pw-browsers`؛ `playwright install` نزن). هر آزمون باید «NO ERRORS» بدهد (`scan_epi.js` «no page errors» و `test3.js` «no errors» چاپ می‌کنند — همان معنا).
+   اگر مسیرِ AI عوض شد، یک بار با مدلِ واقعی هم اجرا کن (`POST /api/inspection/audit/ai` با توکنِ ناظر؛ الگو: WORKLOG (22)) — هوش مصنوعیِ ساختگی بریدگیِ پاسخ و JSON ِ بدشکل را نشان نمی‌دهد.
    اگر ذخیره/ورود/تاریخچه/آینه/پیوست/میزبان عوض شد: `python apps/learning-architecture/tests/host/run_host_e2e.py`
    (برنامهٔ واقعی با پایگاه‌دادهٔ موقت؛ آزمون‌های `tests/host/*.js`) — باید «host e2e: all NO ERRORS» بدهد.
 6. ثبتِ عمومی: `docs/overhaul/AUDIT_LOG.md` و درس در `experiences/` — بعد ادغام در `main` طبقِ `/CLAUDE.md`.

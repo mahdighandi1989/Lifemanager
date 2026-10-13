@@ -3,7 +3,8 @@
   var h = A.h, fa = A.fa, S = A.S, C = A.C;
   var NAV = [
     { g: "دوره: از صفر" },
-    ["course", "🧭 دورهٔ گام‌به‌گام", "۴۵ درس به ترتیب (هر درس ۱۵ تا ۵۵ دقیقه، قابلِ تقسیم)، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
+    /* شمار و زمانِ درس‌ها را دوره (a11_course.js، A.courseBlurb) از روی خودِ درس‌ها می‌سازد و همین متن را هنگامِ بارگذاری جایگزین می‌کند */
+    ["course", "🧭 دورهٔ گام‌به‌گام", "تکنیک‌ها و روال‌ها، درس به درس و به ترتیب، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
     { g: "گره‌گشا" },
@@ -40,7 +41,10 @@
   };
   A.shell = function () {
     var app = A.mountEl || document.getElementById("app"); app.innerHTML = "";
-    function navBtn(n) { return h("button", { class: "nav", "data-v": n[0], title: n[2], onclick: function () { (A.goRoot || A.go)(n[0]); } }, h("span", { class: "nt" }, n[1]), h("span", { class: "nd" }, n[2])); }
+    function navBtn(n) {
+      var d = n[0] === "course" && A.courseNavText ? A.courseNavText() : n[2];
+      return h("button", { class: "nav", "data-v": n[0], title: d, onclick: function () { (A.goRoot || A.go)(n[0]); } }, h("span", { class: "nt" }, n[1]), h("span", { class: "nd" }, d));
+    }
     function navList(arr, sys) { return h("div", { class: "navlist", "data-sys": sys }, arr.map(function (n) { return n.g ? h("div", { class: "navg" }, n.g) : navBtn(n); })); }
     var nav = h("nav", { class: "side", "aria-label": "بخش‌ها" },
       h("div", { class: "brand" }, h("div", { class: "bmark", "aria-hidden": "true" }, svgMark()), h("div", {}, h("div", { class: "bname", id: "bname" }, "معماری یادگیری عمیق"), h("div", { class: "bsub", id: "bsub" }, "۴۵ تکنیک · ۹ فاز · ۲۴ دغدغه"))),
@@ -74,7 +78,7 @@
     // over the owner's real data — a deep link or the host's URL effect can call render that early (2026-10-12 audit)
     if (A.HOST && !A.S.loaded) { main.appendChild(h("div", { class: "card" }, "در حالِ بارگذاریِ داده‌ها…")); return; }
     /* برای «نظارت و سرکشی» میزبان: هر نما یک بخش نام‌دار است */
-    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه", kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن" })[A.state.view] || A.state.view; })();
+    var lab = (function () { var all = NAV.concat(A.EPI_NAV || [], [SETTINGS, START]); for (var i = 0; i < all.length; i++) if (all[i][0] === A.state.view) return all[i][1]; return ({ tech: "صفحه تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام روی موضوع", proto: "پروتکل", e_case: "پرونده کارخانه", kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن" })[A.state.view] || (A.viewLabel ? A.viewLabel(A.state.view, A.state.arg) : A.state.view); })();
     main.setAttribute("data-report-section", A.state.view); main.setAttribute("data-report-section-label", lab);
     var fn = A.V[A.state.view] || A.V.home;
     try { main.appendChild(fn(A.state.arg, A.state.sub)); }
@@ -127,7 +131,7 @@
       var tp = S.get(s.topic);
       items.push({ k: "sched", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · موعد " + A.fdate(s.due), go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
     });
-    function lastRun(pid) { var r = S.all("pr", function (x) { return x.pid === pid && x.status === "done"; })[0]; return r ? r.created.slice(0, 10) : null; }
+    function lastRun(pid) { var r = S.all("pr", function (x) { return x.pid === pid && x.status === "done"; })[0]; return r ? A.localDay(r.created) : null; }
     var p2 = lastRun("P2"); if (p2 !== t) items.push({ k: "p", txt: "قرائت ۱۰ دقیقه‌ای امروز", sub: "یک رخداد امروز از پشت یک عینک علمی", go: function () { A.startProto("P2"); } });
     [["P4", 7, "جلسه هفتگی برگه سفید"], ["P5", 7, "تولید هفتگی بازی کارآگاهی"], ["P9", 30, "ممیزی دوحلقه‌ای ماهانه"]].forEach(function (x) {
       var l = lastRun(x[0]); if (!l || A.daysBetween(l, t) >= x[1]) items.push({ k: "p", txt: x[2], sub: l ? "آخرین اجرا " + A.fdate(l) : "هنوز اجرا نشده", go: function () { A.startProto(x[0]); } });
@@ -164,11 +168,15 @@
     root.appendChild(A.head("امروز · " + A.fdate(A.today()), "از فهمیدن تا ماندن", "کارهایی که امروز موعدشان رسیده و پیشرفتت اینجاست. برای یاد گرفتن خودِ روش‌ها برنامه ۸ هفته‌ای را دنبال کن؛ برای فهم یک موضوع تازه به «موضوع‌ها» برو."));
     if (A.courseState) {
       var cst = A.courseState(), cnl = A.courseNext && A.courseNext();
+      var cwarm = cst && cst.topic && A.courseWarmDue ? A.courseWarmDue().length : 0;
       root.appendChild(h("section", { class: "card crs-home" },
         h("div", { class: "row between wrap gap" },
           h("div", {}, h("div", { class: "eyebrow" }, "🧭 دورهٔ گام‌به‌گام"),
-            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + (A.courseLessonName ? A.courseLessonName(cnl) : fa(cnl.tid) + " · " + (A.TM[cnl.tid] || {}).fa) : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ هر درس ۱۵ تا ۵۵ دقیقه و قابلِ تقسیم به چند نشست.")),
-          h("button", { class: "btn", onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره"))));
+            h("div", {}, cst && cst.topic ? (cnl ? "درسِ بعدی‌ات: " + (A.courseLessonName ? A.courseLessonName(cnl) : fa(cnl.tid) + " · " + (A.TM[cnl.tid] || {}).fa) : "دوره را تمام کرده‌ای.") : "نمی‌دانی از کجا شروع کنی؟ دوره قدم‌به‌قدم می‌بردت؛ " + (A.courseBlurb ? A.courseBlurb(true) : "هر درس قابلِ تقسیم به چند نشست است.")),
+              cwarm ? h("div", { class: "small crs-homewarm" }, "گرم‌کردنِ امروز موعد است: " + fa(cwarm) + " پرسش از درس‌های قبلی (فاصله‌های ۱، ۳، ۷، ۲۱ و ۶۰ روزه).") : null),
+          h("div", { class: "row gap wrap" },
+            cwarm && !cnl ? h("button", { class: "btn crs-warmgo", onclick: function () { A.go("course", null, "warm"); } }, "▶ گرم‌کردنِ امروز") : null,
+            h("button", { class: "btn" + (cwarm && !cnl ? " ghost" : ""), onclick: function () { if (cst && cst.topic && cnl) A.go("lesson", cnl.tid, (cst.step || {})[cnl.tid] || "s1"); else A.go("course"); } }, cst && cst.topic ? (cnl ? "▶ ادامهٔ دوره" : "نقشهٔ دوره") : "▶ شروعِ دوره")))));
     }
     var due = A.dueList();
     root.appendChild(h("section", { class: "grid2" },
@@ -437,14 +445,14 @@
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/^\s*[-*•] (.*)$/gm, "<li>$1</li>").replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br>");
     el.innerHTML = "<p>" + html + "</p>"; return el;
   };
-  A.cardDialog = function (q, a, extra) {
+  A.cardDialog = function (q, a, extra, onDone) {
     var ov = h("div", { class: "overlay", role: "dialog", "aria-modal": "true", "aria-label": "ساخت کارت مرور" });
     var qi = h("textarea", { id: "cdq", rows: 3 }); qi.value = q;
     var ai = h("textarea", { id: "cda", rows: 4 }); ai.value = a;
     ov.appendChild(h("div", { class: "dialog" }, h("h3", {}, "کارت مرور فاصله‌دار"),
       h("p", { class: "small muted" }, "کارت خوب «چرا» یا «چگونه» می‌پرسد، نه تعریف. پاسخ را با کلمات خودت بنویس."),
       h("label", { for: "cdq" }, "پرسش (رو)"), qi, h("label", { for: "cda" }, "پاسخ (پشت)"), ai,
-      h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { if (!qi.value.trim() || !ai.value.trim()) { A.toast("رو و پشت کارت را پر کن.", "bad"); return; } A.newCard(qi.value.trim(), ai.value.trim(), extra); ov.remove(); A.toast("کارت ساخته شد؛ از امروز در صف مرور است."); } }, "ساخت کارت"),
+      h("div", { class: "row gap" }, h("button", { class: "btn", onclick: function () { if (!qi.value.trim() || !ai.value.trim()) { A.toast("رو و پشت کارت را پر کن.", "bad"); return; } var cd = A.newCard(qi.value.trim(), ai.value.trim(), extra); ov.remove(); A.toast("کارت ساخته شد؛ از امروز در صف مرور است."); if (onDone) onDone(cd); } }, "ساخت کارت"),
         h("button", { class: "btn ghost", onclick: function () { ov.remove(); } }, "انصراف"))));
     A.layer().appendChild(ov); qi.focus();
   };

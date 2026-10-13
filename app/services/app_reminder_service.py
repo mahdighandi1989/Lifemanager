@@ -83,7 +83,7 @@ async def upsert(db: AsyncSession, *, user_id, app: str, items: List[dict]) -> D
         row.detail = (str(it["detail"])[:2000] if it.get("detail") else None)
         row.link = str(it.get("link") or "")[:500]
         row.channels = _clean_channels(it.get("channels") if it.get("channels") is not None else list(CHANNELS))
-        if changed or row.status in (None, "", "cancelled"):
+        if changed or row.status in (None, "", "cancelled", "muted"):  # muted = event was off at due time; re-armed by the next upsert (audit 2026-10-13)
             row.status, row.attempts, row.sent_at = "pending", 0, None
         n += 1
     await db.commit()
