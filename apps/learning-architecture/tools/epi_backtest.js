@@ -48,7 +48,8 @@ function corpusFiles() { try { return fs.readdirSync(CORPUS).filter((f) => /\.js
 function loadCorpus() {
   const seed = X.seedCases().map((c) => Object.assign({}, c, { tier: c.kind === "booklet" ? "booklet" : c.kind === "problem" ? "problem" : "real", round: 0, books: c.books || ["mesbah"] }));
   const added = [];
-  for (const f of corpusFiles()) for (const c of rd(path.join(CORPUS, f), [])) added.push(c);
+  // مالک واقعه‌ای را «رد» کرده (excluded) ⇒ از هر دورِ بعد بیرون؛ خودِ مورد با دلیلش در فایل می‌ماند (تاریخچه)
+  for (const f of corpusFiles()) for (const c of rd(path.join(CORPUS, f), [])) if (!c.excluded) added.push(c);
   return seed.concat(added);
 }
 

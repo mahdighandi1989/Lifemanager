@@ -142,5 +142,6 @@ async def epi_decisions(db: AsyncSession = Depends(get_db)):
             d = json.loads(r.data or "{}")
         except ValueError:
             d = {}
-        out.append({"id": r.rec_id[len("ebtp_"):], "decision": d.get("decision"), "at": d.get("at")})
+        out.append({"id": r.rec_id[len("ebtp_"):], "decision": d.get("decision"), "at": d.get("at"),
+                    **({"why": str(d.get("why") or "")[:500]} if d.get("why") else {})})
     return {"ok": True, "success": True, "read_only": True, "decisions": out}

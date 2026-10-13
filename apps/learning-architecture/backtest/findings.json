@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-13",
- "round": 2,
+ "round": 3,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -26,9 +26,17 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 7,
+    "freshOk": 6,
+    "ids": [
+     "r2_cbs_killian_memos",
+     "r2_brian_williams_rpg",
+     "r2_chamberlain_hitler_face",
+     "r2_central_park_five",
+     "r2_nyt_goddard_1920",
+     "r2_abs_startup_loi",
+     "r2_abs_desk_stablecoin"
+    ]
    },
    "kind": "mislocated",
    "title": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
@@ -71,9 +79,12 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 2,
+    "freshOk": 1,
+    "ids": [
+     "r2_central_park_five",
+     "r2_nyt_goddard_1920"
+    ]
    },
    "kind": "mislocated",
    "title": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
@@ -121,7 +132,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 2,
+   "lastSeenRound": 3,
    "proposal": "p_tajrobe_none"
   },
   {
@@ -139,9 +150,12 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 2,
+    "freshOk": 1,
+    "ids": [
+     "r2_central_park_five",
+     "r2_nyt_goddard_1920"
+    ]
    },
    "kind": "missed",
    "title": "لاووازیه: «همه اسیدها اکسیژن دارند»",
@@ -176,9 +190,15 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 5,
+    "freshOk": 4,
+    "ids": [
+     "r2_cbs_killian_memos",
+     "r2_chamberlain_hitler_face",
+     "r2_central_park_five",
+     "r2_nyt_goddard_1920",
+     "r2_abs_desk_stablecoin"
+    ]
    },
    "kind": "missed",
    "title": "لایحه π ایندیانا (۱۸۹۷)",
@@ -255,9 +275,14 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 4,
+    "freshOk": 3,
+    "ids": [
+     "r2_chamberlain_hitler_face",
+     "r2_central_park_five",
+     "r2_nyt_goddard_1920",
+     "r2_abs_desk_stablecoin"
+    ]
    },
    "kind": "missed",
    "title": "ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)",
@@ -278,6 +303,46 @@
     "s50"
    ],
    "lastSeenRound": 1
+  },
+  {
+   "id": "f_r2_nyt_goddard_1920",
+   "case": "r2_nyt_goddard_1920",
+   "opened": "2026-10-13",
+   "openedRound": 3,
+   "status": "open",
+   "attribution": null,
+   "note": "",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹",
+   "tier": "real",
+   "expected": [
+    "st_aql",
+    "st_grade",
+    "st_resp"
+   ],
+   "flagged": [
+    "st_conflict"
+   ],
+   "rules": [
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_grade_false_zero",
+    "r_resp_inquiry"
+   ],
+   "secs": [
+    "s40",
+    "s44",
+    "s50",
+    "s6",
+    "s71",
+    "s80",
+    "s86"
+   ],
+   "lastSeenRound": 3
   }
  ]
 }

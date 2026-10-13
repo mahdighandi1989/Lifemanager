@@ -92,7 +92,11 @@
             x.why ? h("p", { class: "small" }, h("b", {}, x.ok ? "چرا سالم بود: " : "چرا شکست خورد: "), x.why) : null,
             x.right ? h("p", { class: "small" }, h("b", {}, x.ok ? "چه چیزی درستش کرد: " : "راهِ درست: "), x.right) : null,
             (x.fx || []).length ? h("p", { class: "small" }, h("b", {}, "راهِ درست به حکمِ کارخانه: "), x.fx.join(" ")) : null,
-            (x.src || []).length ? h("p", { class: "small muted" }, "منبع: " + x.src.join("؛ ")) : null)
+            (x.src || []).length ? h("p", { class: "small muted" }, "منبع: " + x.src.join("؛ ")) : null,
+            /* اختیارِ مالک بر پیکره: واقعهٔ نادرست/جعلی را رد کن ⇒ ناظر در دورِ بعد کنارش می‌گذارد (excluded) */
+            (function () { var rec = S.get("ebtp_x_" + x.id);
+              return rec ? h("p", { class: "small bad" }, "تو این واقعه را رد کرده‌ای — دورِ بعد کنار گذاشته می‌شود.")
+                : h("button", { class: "linkish small bt-reject", onclick: function () { var why = prompt("چرا این واقعه نادرست است؟ (اختیاری)") || ""; S.put({ id: "ebtp_x_" + x.id, type: "ebtp", decision: "exclude", why: why, at: new Date().toISOString() }); A.render(); } }, "✗ این واقعه نادرست/ساختگی است — ردش کن"); })())
           : h("button", { class: "linkish", onclick: function () { A.go("e_lib", x.id); } }, x.t);
         rows.appendChild(h("tr", { class: x.k !== "ok" ? "warnrow" : "" }, h("td", {}, name), h("td", { class: "small" }, x.d || ""),
           h("td", { class: "small" }, { real: "واقعی", abstract: "انتزاعی", booklet: "مثالِ جزوه", problem: "مسئله" }[x.tier] || x.tier), h("td", {}, x.ok ? "سالم" : "شکست"),

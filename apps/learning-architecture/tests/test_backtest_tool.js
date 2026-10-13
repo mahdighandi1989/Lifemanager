@@ -30,5 +30,9 @@ const vb = fs.readFileSync(path.join(dir, 'VERIFIED_BOOKLET.md'), 'utf8');
 chk(/^# جزوهٔ متقن/.test(vb) && /## فصلِ 1/.test(vb) && /⚠/.test(vb) && /✅/.test(vb), 'verified booklet generated with statuses');
 const led = JSON.parse(fs.readFileSync(path.join(dir, 'ledger.json')));
 chk(led.rounds.length === 3 && led.rounds.every(r => r.coverage && Array.isArray(r.coverage.untested)), 'ledger rows');
+// ردِ مالک ⇒ excluded ⇒ از دورهای بعد بیرون (خودِ مورد در فایل می‌ماند)
+const cf = path.join(dir, 'corpus', fs.readdirSync(path.join(dir, 'corpus'))[0]); const cc = JSON.parse(fs.readFileSync(cf)); cc[0].excluded = true; cc[0].excludedWhy = 'آزمون'; fs.writeFileSync(cf, JSON.stringify(cc));
+const r4 = run('run');
+chk(r4.corpus.n === 169 && JSON.parse(fs.readFileSync(cf)).length === 1, 'an excluded event leaves the corpus but stays on file');
 fs.rmSync(dir, { recursive: true, force: true });
 console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
