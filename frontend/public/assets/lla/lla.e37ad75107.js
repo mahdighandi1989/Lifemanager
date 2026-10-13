@@ -19149,16 +19149,45 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     function inp(lbl, k, ta, ph) { var id = "pbIn_" + k; var el = ta ? h("textarea", { id: id, rows: ta, placeholder: ph || "", oninput: function (e) { f[k] = e.target.value; } }) : h("input", { id: id, type: "text", placeholder: ph || "", oninput: function (e) { f[k] = e.target.value; } }); return h("div", {}, h("label", { for: id }, lbl), el); }
     var jsonTa = h("textarea", { rows: 6, class: "mono", "aria-label": "JSON ِ کاملِ مسئله", placeholder: "یا JSON کامل مسئله را طبق طرح بچسبان" });
     var out = h("div", { "aria-live": "polite" });
-    function store(o, by) { var id = "pb_u_" + Date.now().toString(36); o.id = id; var r = { id: "eprob_" + id, type: "eprob", status: "pending", by: by, p: o }; S.put(r); out.innerHTML = ""; out.appendChild(h("p", {}, "مسئله در صف تأیید است. پیش از تأیید، گام‌ها و درستی تاریخی‌شان را بسنج.")); return r; }
+    /* شناسهٔ مسئله از همین حالا (۲۰۲۶-۱۰-۱۳): پیوست‌های صورت/حل پیش از تجزیه در فولدرِ همین مسئله در درایو می‌نشینند و
+       هوش مصنوعی هنگامِ تجزیه آن‌ها را می‌خواند؛ پس از ثبت، شناسهٔ تازه برای مسئلهٔ بعدی. */
+    var pid = "pb_u_" + Date.now().toString(36), attWrap = h("div", { class: "pb-att" }), attAi = true, attShown = false;
+    function attFiles() {
+      if (!attShown || !attAi || !(A.HOST && A.HOST.files)) return Promise.resolve([]);
+      return Promise.resolve(A.HOST.files("eprob_" + pid)).then(function (fs) {
+        return (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); }).slice(0, 4).map(function (x) { return x.id; });
+      }, function () { return []; });
+    }
+    function attBlock() {
+      if (!(A.HOST && A.HOST.upload && A.attachSection)) return null;
+      var btn = h("button", { class: "btn ghost sm pb-attbtn", onclick: function () {
+        if (!String(f.title || "").trim()) { A.toast("اول عنوانِ مسئله را بنویس تا فولدرش در درایو درست نام بگیرد.", "bad"); return; }
+        attShown = true; btn.remove();
+        attWrap.appendChild(A.attachSection("eprob_" + pid, { group: "مسئله‌های من", title: f.title.trim() }));
+        attWrap.appendChild(h("label", { class: "row gap small", for: "pbAttAi" }, h("input", { type: "checkbox", id: "pbAttAi", checked: true, onchange: function (e) { attAi = e.target.checked; } }),
+          "عکس/PDF ِ پیوست هم برای تجزیه به هوش مصنوعی فرستاده شود (تا ۴ فایل، هر کدام تا ۸ مگابایت) — همان ارائه‌دهندهٔ بیرونیِ تجزیه آن را می‌بیند"));
+      } }, "📎 صورت یا حل را عکس/PDF داری؟ پیوست کن");
+      attWrap.appendChild(h("p", { class: "small muted" }, "اگر صورتِ مسئله یا حلش روی کاغذ، در کتاب یا PDF است، لازم نیست تایپش کنی: پیوست کن تا هوش مصنوعی از خودِ تصویر بخواند (فایل در فولدرِ همین مسئله در گوگل درایو می‌ماند)."));
+      attWrap.appendChild(btn);
+      return attWrap;
+    }
+    function store(o, by) { var id = pid; pid = "pb_u_" + Date.now().toString(36); o.id = id;
+      if (attShown) { attShown = false; attWrap.innerHTML = ""; var b2 = attBlock(); if (b2 !== attWrap && b2) attWrap.appendChild(b2); } var r = { id: "eprob_" + id, type: "eprob", status: "pending", by: by, p: o }; S.put(r); out.innerHTML = ""; out.appendChild(h("p", {}, "مسئله در صف تأیید است. پیش از تأیید، گام‌ها و درستی تاریخی‌شان را بسنج.")); return r; }
     return h("section", { class: "card col gap", dir: "rtl" }, h("h2", {}, "افزودنِ مسئلهٔ سختِ حل‌شده — مسئلهٔ تو"),
       h("p", { class: "small" }, "مسئله و پاسخ نهایی‌اش را بنویس (از هر علمی: ریاضی، فیزیک، فلسفه، روان‌شناسی…). هوش مصنوعی فقط مسیرِ حل را به گام‌های تصمیم، گزینه‌ها، بن‌بست‌ها و تمرین‌ها می‌شکند. بعد دو وارسیِ جدا: «بازبینِ تاریخی» تاریخ‌ها، اشخاص و رویدادها را می‌سنجد، و «وارسیِ پاسخ‌ها» هر گام و هر تمرین را سه بار جداگانه حل می‌کند تا گزینهٔ «درست» واقعاً درست باشد. نتیجه پیش از ورود به شبیه‌ساز به تأییدِ تو می‌رسد؛ تا هر پرچم را اصلاح یا آگاهانه نپذیری، تأیید بسته است. اگر مسئله‌ای است که خودت در آن گیر کرده‌ای، از «🪢 گره‌گشا» برو: آن‌جا هم ریشهٔ گیرکردن پیدا می‌شود و هم «شبیه‌سازِ همین مسئله» ساخته می‌شود."),
       inp("عنوان", "title"), inp("رشته", "field"), inp("بازه حل‌نشده ماندن", "open", 0, "مثلاً ۱۶۳۷–۱۹۹۵"), inp("صورت مسئله", "statement", 4), inp("پاسخ نهایی و حل‌کننده", "answer", 3),
       inp("منابع (اختیاری، ولی بازبینیِ تاریخی را دقیق‌تر می‌کند — نامِ کتاب/مقاله یا نشانیِ اینترنتی؛ هر منبع در یک سطر)", "src", 2), inp("یادداشت (اختیاری)", "notes", 2),
+      attBlock(),
       h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-ai", onclick: function (e) {
-        if (!f.title || !f.statement || !f.answer) { A.toast("عنوان، صورت و پاسخ لازم است.", "bad"); return; }
+        if (!f.title) { A.toast("عنوان لازم است.", "bad"); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
-        var b = e.target; b.disabled = true; b.textContent = "در حال تجزیه…";
-        A.callAIJson(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + f.statement + "\nپاسخ: " + f.answer + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes, { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
+        var b = e.target;
+        attFiles().then(function (fileIds) {
+        /* صورت و پاسخ لازم است — یا تایپ‌شده یا در عکس/PDF ِ پیوستی که برای هوش مصنوعی فرستاده می‌شود */
+        if ((!f.statement || !f.answer) && !fileIds.length) { A.toast(attShown && attAi ? "صورت و پاسخ لازم است — تایپ کن، یا عکس/PDF ِ آن را پیوست کن (فقط عکس و PDF خوانده می‌شود)." : "عنوان، صورت و پاسخ لازم است (یا عکس/PDF ِ آن را پیوست کن).", "bad"); return; }
+        b.disabled = true; b.textContent = fileIds.length ? "در حال خواندنِ پیوست و تجزیه…" : "در حال تجزیه…";
+        var fromFile = fileIds.length ? "\n(" + fa(fileIds.length) + " عکس/PDF ِ پیوست همراهِ این پیام است: صورت" + (f.answer ? "" : " و پاسخ و حل") + "ِ مسئله را از آن بخوان؛ اگر چیزی در تصویر خوانا نیست، حدس نزن و در یادداشت بگو.)" : "";
+        return A.callAIJson(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + (f.statement || "(در پیوست)") + "\nپاسخ: " + (f.answer || "(در پیوست)") + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes + fromFile, fileIds.length ? { maxTokens: 8192, fileIds: fileIds } : { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
           .then(function (raw) {
             if (raw && typeof raw === "object" && !Array.isArray(raw) && (raw.src == null || (Array.isArray(raw.src) && !raw.src.length))) raw.src = f.src.split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean);
             var o = validP(raw);
@@ -19175,6 +19204,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
           })
           .catch(function (err) { var m = (err && err.message) || String(err); out.innerHTML = ""; out.appendChild(h("pre", { class: "small bad pb-err", role: "alert" }, m)); A.toast(m.split("\n")[0], "bad"); })
           .then(function () { b.disabled = false; b.textContent = "تجزیه با هوش مصنوعی"; });
+        });
       } }, "تجزیه با هوش مصنوعی"), h("button", { class: "btn ghost pb-manual", onclick: function () {
         try { store(validP(parseJ(jsonTa.value)), "user"); } catch (er) { var m = er.message || String(er); out.innerHTML = ""; out.appendChild(h("pre", { class: "small bad pb-err", role: "alert" }, m)); A.toast(m.split("\n")[0], "bad"); }
       } }, "ثبت JSON دستی")),
@@ -20924,6 +20954,24 @@ APP.goFromURL = function (q) {
     };
     A.V[v]._kdrive = true;
   }); }
+  A.attachSection = attachSection;   // a8 (فرمِ «افزودنِ مسئلهٔ تو») هم همین را به کار می‌برد
+  /* مسئله‌های خودِ مالک (۲۰۲۶-۱۰-۱۳): صورت و حلِ مسئله اغلب عکسِ صفحهٔ کتاب، PDF ِ مقاله یا حلِ دست‌نویس است ⇒ پیوست در صفحهٔ
+     همان مسئله، در همان فولدرِ «مسئله‌های من» که آینه‌اش می‌سازد. نمونه‌های آمادهٔ سازنده رکورد ندارند ⇒ پیوست ندارند. */
+  if (A.HOST.upload && A.V.e_prob) {
+    var rawProb = A.V.e_prob;
+    A.V.e_prob = function (pid) {
+      var root = rawProb.apply(this, arguments);
+      try {
+        var r = pid ? S.get("eprob_" + pid) : null;
+        if (r && r.p && r.status !== "rejected" && root && root.appendChild) {
+          var o = r.origin || r.p.origin, kc = o && o.type === "kcase" ? S.get(o.id) : null;
+          root.appendChild(attachSection(r.id, { group: "مسئله‌های من", title: r.p.title || "مسئله" },
+            kc && !mirrorOn(kc) ? "آینهٔ درایوِ موقعیتِ این مسئله خاموش است؛ گذاشتنِ پیوست، فولدرِ این مسئله را در درایو می‌سازد." : null));
+        }
+      } catch (e) { console.error(e); }
+      return root;
+    };
+  }
   if (A.HOST.upload) {
     [["e_case", function (cs) { return { group: "پرونده‌ها", title: cs.title || "پرونده" }; }],
      ["topic", function (t) { return { group: "موضوع‌ها", title: t.title || "موضوع" }; }]].forEach(function (x) {

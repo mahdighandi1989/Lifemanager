@@ -354,6 +354,24 @@
     };
     A.V[v]._kdrive = true;
   }); }
+  A.attachSection = attachSection;   // a8 (فرمِ «افزودنِ مسئلهٔ تو») هم همین را به کار می‌برد
+  /* مسئله‌های خودِ مالک (۲۰۲۶-۱۰-۱۳): صورت و حلِ مسئله اغلب عکسِ صفحهٔ کتاب، PDF ِ مقاله یا حلِ دست‌نویس است ⇒ پیوست در صفحهٔ
+     همان مسئله، در همان فولدرِ «مسئله‌های من» که آینه‌اش می‌سازد. نمونه‌های آمادهٔ سازنده رکورد ندارند ⇒ پیوست ندارند. */
+  if (A.HOST.upload && A.V.e_prob) {
+    var rawProb = A.V.e_prob;
+    A.V.e_prob = function (pid) {
+      var root = rawProb.apply(this, arguments);
+      try {
+        var r = pid ? S.get("eprob_" + pid) : null;
+        if (r && r.p && r.status !== "rejected" && root && root.appendChild) {
+          var o = r.origin || r.p.origin, kc = o && o.type === "kcase" ? S.get(o.id) : null;
+          root.appendChild(attachSection(r.id, { group: "مسئله‌های من", title: r.p.title || "مسئله" },
+            kc && !mirrorOn(kc) ? "آینهٔ درایوِ موقعیتِ این مسئله خاموش است؛ گذاشتنِ پیوست، فولدرِ این مسئله را در درایو می‌سازد." : null));
+        }
+      } catch (e) { console.error(e); }
+      return root;
+    };
+  }
   if (A.HOST.upload) {
     [["e_case", function (cs) { return { group: "پرونده‌ها", title: cs.title || "پرونده" }; }],
      ["topic", function (t) { return { group: "موضوع‌ها", title: t.title || "موضوع" }; }]].forEach(function (x) {
