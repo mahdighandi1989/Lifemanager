@@ -10653,7 +10653,8 @@ window.EPI_DOS.push(
       { id: "k1", txt: "چیزی در دوردست می‌بینم", role: "مقدمه",
         f: { way: BAD, core: CORE_PURE, badihi: B_WJ, conf: 100, stakes: LOW }, truth: true },
       { id: "k2", txt: "آن چیز یک انسان است", role: "اصلی",
-        f: { way: HIS, core: CORE_INT, interp_unchecked: true, hidden_inf: true, sense_ctrl: false, conf: 80, stakes: LOW }, truth: false }
+        /* داوریِ جزوه ۲۰۲۶-۱۰-۱۳: interp_unchecked («تفسیر هم‌اعتبار یافت») و «بی‌درنگ» با اطمینانِ ۸۰ نمی‌خواند؛ هم‌تای bk_stick_sight ۹۰ است (s19، s43) */
+        f: { way: HIS, core: CORE_INT, interp_unchecked: true, hidden_inf: true, sense_ctrl: false, conf: 90, stakes: LOW }, truth: false }
     ],
     truth: { ok: false, fail: ["st_core", "st_hiss"],
       why: "s19: اصل دیدن صائب است ولی تعیین ماهیت شیء ادراکی حصولی است؛ تفسیر هم‌اعتبار یافت گرفته شد، و شرایط نامساعد ادراک (نور کم، فاصله) بستر استنتاج پنهان شد (s43).",
@@ -11003,7 +11004,8 @@ window.EPI_DOS.push(
       { id: "k1", txt: "خدا دستی جسمانی دارد", role: "اصلی",
         f: { way: NAQL, dalala: D_ZAHIR, r_tawil_needed: true, conflict_cert: true, conf: 80, stakes: HIGH }, truth: false }
     ],
-    truth: { ok: false, fail: ["st_conflict", "st_r_conflict"],
+    /* داوریِ جزوه ۲۰۲۶-۱۰-۱۳: s80 برای «یدالله» درمانِ ویژهٔ تأویل را می‌دهد (st_r_conflict)؛ s53 دربارهٔ کنار گذاشتنِ طرفِ غیریقینی است و همان خطا را دوبار شمردن بود (r_conflict_cert عمداً با r_tawil_needed خاموش است) */
+    truth: { ok: false, fail: ["st_r_conflict"],
       why: "s53: در تعارض معرفت یقینی (برهان عقلی نفی تجسم) با غیریقینی (ظاهر لفظ که نص نیست)، یقینی مقدم است. s80: ظواهر متون ناسازگار با اصول عقلی قطعی، مانند «یدالله»، به معنای نمادین کنایی (قدرت) بازگردانده می‌شوند.",
       right: "اگر دلالت ظاهری از نص جدا و ظاهر با برهان قطعی سنجیده و تأویل می‌شد، تجسیم لازم نمی‌آمد." }
   });
@@ -11016,7 +11018,8 @@ window.EPI_DOS.push(
     actor: "خوانندگان بر پایه جمله تقطیع‌شده درباره صفات خدا حکم کردند.",
     claims: [
       { id: "k1", txt: "خدا صورتی جسمانی دارد که آدم بر آن آفریده شد", role: "اصلی",
-        f: { way: NAQL, context_ignored: true, dalala: D_MOBHAM, conf: 75, stakes: HIGH }, truth: false }
+        /* داوریِ جزوه ۲۰۲۶-۱۰-۱۳: why ِ خودِ این پرونده و هم‌تایش cs_b_hadith_sura_cut به s80 (تأویلِ برداشتِ تجسیمی) تکیه دارند ⇒ r_tawil_needed جا افتاده بود */
+        f: { way: NAQL, context_ignored: true, dalala: D_MOBHAM, r_tawil_needed: true, conf: 75, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_herm", "st_r_conflict"],
       why: "s85 (عامل چهارم): غفلت از قرائن پیوسته کلام و شأن صدور؛ تقطیع جمله سبب توهم تجسیم شد. فهم مراد گوینده با قرائن سنجیده می‌شود (s69، s70). افزون بر آن، برداشت تجسیمی با براهین عقلی قطعی نفی تجسم ناسازگار بود و طبق قاعده s80 باید به معنای درخور بازگردانده می‌شد، نه پذیرفته.",
@@ -11050,7 +11053,8 @@ window.EPI_DOS.push(
       { id: "k1", txt: "این عبارت سخن معصوم است", role: "مقدمه",
         f: { way: NAQL, issued: false, r_sanad: RS_WEAK, conf: 70, stakes: MID }, truth: false },
       { id: "k2", txt: "همه شریعت‌ها، حتی منسوخ، به یک اندازه راه حق‌اند", role: "اصلی",
-        f: { way: NAQL, context_ignored: true, r_plural_fallacy: true, conf: 75, stakes: HIGH }, truth: false }
+        /* داوریِ جزوه ۲۰۲۶-۱۰-۱۳: s87.3 «فاقد هرگونه سند روایی» — k2 هم بر همین گفتهٔ بی‌سند تکیه دارد ⇒ issued: false (s47: اصلِ صدور) */
+        f: { way: NAQL, context_ignored: true, r_plural_fallacy: true, issued: false, conf: 75, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_naql", "st_herm", "st_r_sources", "st_r_plural"],
       why: "صدور خبر احراز نشده و عبارت بی‌سند است (s47، s73)؛ مراد گویندگانش (کثرت راه‌های خداشناسی به حقیقت واحد) نادیده گرفته شد (s87)؛ و تکثر شیوه‌ها با حقانیت یکسان شرایع خلط شد (s81، s83).",
