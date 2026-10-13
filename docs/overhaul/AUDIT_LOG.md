@@ -4283,3 +4283,8 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **CHANGE (صفحه):** جزئیات در WORKLOG ِ صفحه (23). هیچ قاعده/وزن/معیارِ قبولِ کارخانه عوض نشد؛ آزمونِ ۱ فقط سنجه‌های صادقانه گرفت.
 - **VERIFY:** ۲۱ آزمونِ مرورگرِ صفحه، `run_host_e2e.py`، pytest کامل، `npm run build`، و هر دکمهٔ AI با مدلِ واقعیِ production.
 - **درس:** `experiences/owner-supplied-content-not-builder-samples.md` (Update) — ممیزیِ «با اجرا»، و دسترسیِ منابعِ مشترکِ مالک.
+
+## 2026-10-13 — «معماری یادگیری عمیق»: دکمه‌های له‌شده
+- **FINDING:** کلاسِ سراسریِ `.lg` (خطِ راهنمای نمودار) با `.btn.lg` برخورد داشت ⇒ دکمه‌های بزرگ ۲۲px؛ کلیدِ دو سامانه سرریز می‌کرد.
+- **CHANGE:** `apps/learning-architecture/src/app/style.css` (`.lg:not(.btn)`، `.sysb` شکستنی). آزمونِ هندسی در `test_audit_fixes.js`. WORKLOG ِ صفحه (24).
+- **درس:** `experiences/global-utility-class-collision-crushes-components.md`.

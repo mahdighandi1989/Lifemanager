@@ -283,7 +283,7 @@ table.wt textarea{min-height:2.4em}
 .fsplit,.floop{font-size:.85rem;color:var(--ink-2);padding:4px 64px 4px 0;font-weight:600}
 .floop{color:var(--p7)}
 .netctl{margin:6px 0}
-.lg{display:inline-block;width:22px;height:0;border-top:2px solid var(--ink-2)}
+.lg:not(.btn){display:inline-block;width:22px;height:0;border-top:2px solid var(--ink-2)}
 .lg-feeds{border-top-color:var(--accent);border-top-style:dashed}
 .lg-pairs{border-top-color:var(--p6);border-top-style:dotted}
 .netbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
@@ -419,7 +419,7 @@ details.gen[open] summary{margin-bottom:6px}
 .navg{font-size:.72rem;font-weight:800;color:var(--ink-2);padding:10px 10px 2px;letter-spacing:0}
 .navlist[hidden]{display:none!important}
 .sysw{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px}
-.sysb{all:unset;cursor:pointer;flex:1;text-align:center;font-size:.8rem;font-weight:700;padding:5px 6px;border-radius:7px;color:var(--ink-2);white-space:nowrap}
+.sysb{all:unset;cursor:pointer;flex:1 1 auto;min-width:0;text-align:center;font-size:.8rem;font-weight:700;padding:5px 6px;border-radius:7px;color:var(--ink-2);white-space:normal;line-height:1.35;overflow-wrap:normal}
 .sysb.on{background:var(--accent);color:var(--accent-ink)}
 .sysb:focus-visible{outline:2px solid var(--accent)}
 @media (max-width:900px){.navg{display:none}.sysw{flex:0 0 auto}}
@@ -1034,4 +1034,6 @@ table.kp-log th,table.kp-log td{padding:4px 6px;border-bottom:1px solid var(--li
 /* === a8_prob END === */
 
 /* ممیزی ۲۰۲۶-۱۰-۱۳: یک واژهٔ بسیار بلندِ بی‌فاصله (نشانی، کد) صفحهٔ موبایل را ۲۰۰۰px پهن می‌کرد */
-.page, .card, .page p, .page li, .page td, .page h2, .page h3 { overflow-wrap: anywhere; }
+/* فقط متن، نه ظرف‌ها: روی .page/.card به دکمه‌ها ارث می‌رسید و min-content ِ دکمه را چند نویسه می‌کرد ⇒ دکمه‌های له‌شده (۲۰۲۶-۱۰-۱۳، اسکرین‌شاتِ مالک) */
+.page p, .page li, .page td, .page h2, .page h3, .page pre, .page blockquote, .card p, .card li { overflow-wrap: anywhere; }
+button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }

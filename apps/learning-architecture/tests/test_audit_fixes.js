@@ -77,6 +77,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await go('kpractice');
   chk(await p.locator('main .kp-expdue').count() === 1, 'overdue experiment on the practice page');
 
+  // ۶) دکمه‌های بزرگ (`.btn.lg`) نباید با کلاسِ خطِ راهنمای نمودار (`.lg`) له شوند؛ کلیدِ دو سامانه سرریز نکند
+  info.lgBtn = await p.evaluate(() => [...document.querySelectorAll('main .btn.lg')].map(x => { const r = x.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
+  chk(info.lgBtn.length > 0 && info.lgBtn.every(([w, h]) => w > 60 && h > 30), 'large buttons not crushed ' + JSON.stringify(info.lgBtn));
+  chk(await p.evaluate(() => [...document.querySelectorAll('.sysb')].every(x => x.scrollWidth <= x.clientWidth + 1)), 'system switch labels fit');
+
   console.log(JSON.stringify(info, null, 1).slice(0, 1200));
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();
