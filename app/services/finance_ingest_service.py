@@ -52,6 +52,12 @@ def _mark_credit_if_needed(account, body: str) -> bool:
 _REF_RE = re.compile(r"(?i)(?:ending(?:\s*with)?|card|account|a/c|xx+|\*{2,})\s*[x*]*\s*(\d{3,4})\b")
 
 
+def _is_wallet(label) -> bool:
+    from app.services.finance_account_identity import is_wallet
+
+    return is_wallet(label)
+
+
 def bank_of(sender: Optional[str], body: str) -> Optional[str]:
     """The bank a message comes from — or None when it is not a bank at all."""
     who = (sender or "").strip()
@@ -65,6 +71,22 @@ def bank_of(sender: Optional[str], body: str) -> Optional[str]:
     return who
 
 
+async def _identity_card(db, *, user_id, institution, body, currency):
+    """The card this bank SMS identifies by ACCOUNT NUMBER (2026-10-13, sheet 6):
+    «BSIUAE … a/c 4006» is the Bank Saderat card whose IBAN ends in 4006 — not a
+    new «BSIUAE ••4006» card. Same bank (alias-aware) + same currency + a unique
+    card; never by balance. None ⇒ fall back to the name-based pick."""
+    from app.services.finance_account_identity import find_card
+    from app.services.inbox_service import scope_filter
+
+    m = _REF_RE.search(body or "")
+    if not m or not institution:
+        return None
+    accounts = (await db.execute(select(FinancialAccount).where(
+        scope_filter(FinancialAccount.user_id, user_id)))).scalars().all()
+    return find_card(accounts, ref=m.group(1), institution=institution, currency=currency)
+
+
 async def _create_from_sms(db, *, user_id, institution, body, balance, currency, occurred_iso):
     """A bank seen ONLY by SMS gets its card (2026-10-11). Before, only e-mail
     created cards — banks that never e-mail a statement (Mashreq, BSI, FAB…)
@@ -75,7 +97,8 @@ async def _create_from_sms(db, *, user_id, institution, body, balance, currency,
     ref = m.group(1) if m else ""
     acc = FinancialAccount(
         user_id=(user_id or None), name=f"{institution} ••{ref}" if ref else institution,
-        kind="credit" if _CREDIT_RE.search(body or "") else "bank",
+        # Salik/Nol/… are prepaid balances, not banks (owner 2026-10-13)
+        kind=("wallet" if _is_wallet(institution) else "credit" if _CREDIT_RE.search(body or "") else "bank"),
         institution=institution.lower(), currency=currency, balance=Decimal(str(balance)),
         extra=_json.dumps({"source": "sms", "inferred": True, "ref": ref,
                            "balance_evidence": f"پیامکِ {institution}",
@@ -189,9 +212,14 @@ async def explain_bank_message(
         return {**out, "would_apply": False, "reason": "not a bank (chat/utility app)"}
     msg_ref = "msg:" + _hashlib.sha1(f"{channel}|{sender or ''}|{body}".encode("utf-8")).hexdigest()[:20]
     seen = (await db.execute(select(Transaction).where(Transaction.source_ref == msg_ref))).scalars().first()
-    account = await _pick_account(db, user_id=user_id, account_id=None,
-                                  sender_hint=f"{sender or ''} {body[:300]}",
-                                  strict=(channel == "sms" and bool(institution)))
+    account = None
+    if channel == "sms" and institution:
+        account = await _identity_card(db, user_id=user_id, institution=institution, body=body,
+                                       currency=out["parsed_currency"])
+    if account is None:
+        account = await _pick_account(db, user_id=user_id, account_id=None,
+                                      sender_hint=f"{sender or ''} {body[:300]}",
+                                      strict=(channel == "sms" and bool(institution)))
     if account is not None:
         out.update(account_id=account.id, account_name=account.name, account_currency=account.currency,
                    account_balance=float(account.balance or 0))
@@ -266,11 +294,16 @@ async def apply_bank_message(
     if already is not None:
         return {"matched": True, "balances_updated": 0, "reason": "duplicate message"}
 
-    account = await _pick_account(
-        db, user_id=user_id, account_id=account_id,
-        sender_hint=f"{sender or ''} {body[:300]}",
-        strict=(channel == "sms" and bool(institution)),
-    )
+    account = None
+    if account_id is None and channel == "sms" and institution:
+        account = await _identity_card(db, user_id=user_id, institution=institution, body=body,
+                                       currency=getattr(parsed, "currency", None))
+    if account is None:
+        account = await _pick_account(
+            db, user_id=user_id, account_id=account_id,
+            sender_hint=f"{sender or ''} {body[:300]}",
+            strict=(channel == "sms" and bool(institution)),
+        )
     if account is None:
         cur = getattr(parsed, "currency", None)
         if channel == "sms" and institution and cur and Decimal(str(new_balance)) > 0:

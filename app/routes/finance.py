@@ -239,7 +239,7 @@ async def list_financial_accounts(
 
     stmt = select(FinancialAccount).where(scope_filter(FinancialAccount.user_id, user_id))
     if kind:
-        if kind not in ("bank", "broker", "exchange", "credit"):
+        if kind not in ("bank", "broker", "exchange", "credit", "wallet"):
             raise HTTPException(status_code=400, detail="invalid kind filter")
         stmt = stmt.where(FinancialAccount.kind == kind)
     result = await db.execute(stmt)

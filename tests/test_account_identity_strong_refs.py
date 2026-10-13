@@ -46,10 +46,16 @@ async def test_equal_balance_alone_never_merges(db_session):
 
 
 @pytest.mark.asyncio
-async def test_masked_tail_needs_second_signal(db_session):
+async def test_masked_tail_needs_the_same_bank_not_the_same_balance(db_session):
+    # 2026-10-13 (second pass): the second signal is the BANK (alias-aware), not the
+    # balance — a balance changes with every transaction, so «same tail, different
+    # balance» is simply the account's newer balance; the same tail at ANOTHER bank
+    # is another account.
     await _sig(db_session, "bsi", IBAN, 10456.78, "2026-10-11T00:00:00", "f:1")
-    # same tail, DIFFERENT balance ⇒ stays separate
     await _sig(db_session, "BSIUAE", "••4006", 500, "2026-10-12T00:00:00", "f:2")
+    await db_session.commit()
+    assert await _count(db_session) == 1
+    await _sig(db_session, "fab", "••4006", 500, "2026-10-12T00:00:00", "f:3")
     await db_session.commit()
     assert await _count(db_session) == 2
 

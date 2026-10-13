@@ -274,36 +274,19 @@ async def _match_account(
             if source_ref in set(ex.get("source_refs") or []) or source_ref in set(ex.get("applied_refs") or []):
                 return a, False
     if ref:
-        for a in accounts:
-            if _extra(a).get("account_ref") == ref and _institution_compatible(a, institution):
-                return a, False
-        # Same account seen through another source with a differently-written
-        # ref (IBAN vs bare account number): only a STRONG digit-tail match
-        # counts (≥10 shared digits). Institution NAMES are deliberately not
-        # compared here: the same bank is spelled «bsi» by one source and
-        # «Bank Saderat …» by another. Only a UNIQUE such card merges.
-        strong = [
-            a for a in accounts
-            if any(_refs_same_account(ref, x) for x in (_extra(a).get("account_ref"), _extra(a).get("iban")) if x)
-        ]
-        if len(strong) == 1:
-            return strong[0], False
-        # A masked last-4 («••4006») is only a hint. It joins an existing card
-        # only when that card's full ref ends in those 4 digits, it is the ONLY
-        # such card, and a second independent signal agrees (same currency AND
-        # same balance). Balance alone — or a bare last-4 — never merges.
-        tail = _weak_ref_tail(ref)
-        if tail and balance is not None and currency:
-            cands = [
-                a for a in accounts
-                if any(_ref_digits(x).endswith(tail) and len(_ref_digits(x)) >= _STRONG_REF_DIGITS
-                       for x in (_extra(a).get("account_ref"), _extra(a).get("iban")) if x)
-            ]
-            if len(cands) == 1:
-                c = cands[0]
-                if (c.currency or "").upper() == str(currency).upper() \
-                        and _to_decimal(c.balance) == balance:
-                    return c, False
+        # ONE identity for every source (2026-10-13, sheet 6): a full account number
+        # / IBAN matches by digits whatever the bank is CALLED; a masked last-4 only
+        # at the same bank (alias-aware), same currency, and a unique card. Several
+        # cards already sharing the identity ⇒ the canonical one (not a new card) —
+        # `finance_account_identity.reconcile_duplicates` folds the rest. Never by
+        # balance. (The old exact match demanded equal bank NAMES and refused the
+        # same IBAN under «Bank Saderat Iran»; the tail match merged only into a
+        # UNIQUE card, so two duplicates minted a third.)
+        from app.services.finance_account_identity import find_card
+
+        hit = find_card(accounts, ref=ref, institution=institution, currency=currency)
+        if hit is not None:
+            return hit, False
         # a real ref that matches no stored ref ⇒ a DISTINCT account; do not
         # fall through to the loose institution-substring match.
         return None, False
@@ -637,7 +620,7 @@ async def apply_account_signal(
         name = base if not account_ref else f"{base} {account_ref}"
         acc = FinancialAccount(
             user_id=None if uid == 0 else uid,
-            name=name[:255], kind=(kind if kind in ("bank", "broker", "exchange", "credit") else "bank"),
+            name=name[:255], kind=(kind if kind in ("bank", "broker", "exchange", "credit", "wallet") else "bank"),
             institution=institution or provider_name, currency=currency,
             balance=(bal if bal is not None else Decimal(0)),
             extra=json.dumps(extra, ensure_ascii=False),

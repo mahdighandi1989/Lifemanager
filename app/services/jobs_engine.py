@@ -215,6 +215,17 @@ async def _job_finance_email_poll(db: AsyncSession) -> dict[str, Any]:
     return {"checked_emails": len(bodies), "balances_updated": updated}
 
 
+async def _job_finance_identity(db: AsyncSession) -> dict[str, Any]:
+    """One account = one card (owner 2026-10-13, sheet 6): fold machine-made cards
+    of the SAME account (IBAN / account number / the bank's masked SMS ref) into one,
+    and file Salik/Nol-style prepaid balances as «کیف‌پول», not «بانک». Idempotent —
+    a clean table is a no-op."""
+    from app.services.finance_account_identity import reconcile_duplicates, relabel_wallets
+
+    res = await reconcile_duplicates(db)
+    return {"groups": res["groups"], "merged": res["merged"], "wallets": await relabel_wallets(db)}
+
+
 async def _job_finance_sms_replay(db: AsyncSession) -> dict[str, Any]:
     """Bank SMS that did not reach a card get another chance, oldest first —
     the newest balance always ends on the card (2026-10-11)."""
@@ -415,6 +426,9 @@ JOBS: list[tuple[str, str, Callable[[], float], JobFn]] = [
     ("finance_email_poll", "پول‌خوانی ایمیل بانکی (IMAP)",
      lambda: _env_minutes("FINANCE_POLL_INTERVAL_MINUTES", 30.0),
      _job_finance_email_poll),
+    ("finance_identity", "یک حساب = یک کارت (ادغامِ کارت‌های تکراریِ یک حساب)",
+     lambda: _env_minutes("FINANCE_IDENTITY_INTERVAL_MINUTES", 30.0),
+     _job_finance_identity),
     ("finance_sms_replay", "اعمالِ پیامک‌های بانکیِ جامانده (قدیمی→جدید)",
      lambda: _env_minutes("FINANCE_SMS_REPLAY_INTERVAL_MINUTES", 60.0),
      _job_finance_sms_replay),

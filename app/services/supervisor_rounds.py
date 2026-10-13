@@ -70,7 +70,7 @@ def next_round(now: datetime, raw: str | None,
     """
     now = _utc(now)
     stamps = _parse(raw)
-    sched = _scheduled(stamps)
+    sched = _scheduled(_runs(stamps))
     gaps = [(b - a).total_seconds() for a, b in zip(sched, sched[1:])
             if 0 < (b - a).total_seconds() <= 24 * 3600]
 
@@ -152,6 +152,23 @@ def _parse_cron(expr: str) -> tuple[int, int, list[int]]:
         return int(minute), int(hour), days
     except (ValueError, AttributeError):
         return 47, 1, [0, 3]
+
+
+#: Knocks closer than this belong to ONE run (it claims again after each answer).
+SAME_RUN_S = 60 * 60
+
+
+def _runs(stamps: list[datetime]) -> list[datetime]:
+    """One knock per run — the first. A run answers a sheet and claims again
+    (`urgent` once more, maybe twice in a minute); those follow-up knocks are
+    not a schedule. Without this, two knocks a minute apart read as «every
+    1 minute» and the page said «the fast queue has not come for a long time»
+    (production 2026-10-13)."""
+    out: list[datetime] = []
+    for t in stamps:
+        if not out or (t - out[-1]).total_seconds() >= SAME_RUN_S:
+            out.append(t)
+    return out
 
 
 def _scheduled(stamps: list[datetime]) -> list[datetime]:

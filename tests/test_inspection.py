@@ -508,3 +508,18 @@ def test_html_is_read_as_its_whole_source():
     page = b"<html><head><style>.x{color:red}</style></head><body><p>hi</p><script>function go(){}</script></body></html>"
     ex = extract(page, "lab.html", "text/html")
     assert ex["status"] == "ok" and "function go()" in ex["text"] and ".x{color:red}" in ex["text"]
+
+
+def test_a_run_that_claims_twice_does_not_read_as_every_minute_and_stale():
+    """Production 2026-10-13: the urgent run answered a sheet and claimed again twice a minute apart;
+    the cadence became «every 1 minute» and the page said the fast queue had not come for a long time."""
+    import json as _json
+    from datetime import datetime as _dt, timezone as _tz
+    from app.services.supervisor_rounds import next_round
+
+    base = _dt(2026, 10, 13, 15, 55, 50, tzinfo=_tz.utc)
+    knocks = [base - timedelta(hours=3 * i) for i in range(6, 0, -1)] + [
+        base, _dt(2026, 10, 13, 16, 44, 30, tzinfo=_tz.utc), _dt(2026, 10, 13, 16, 45, 25, tzinfo=_tz.utc)]
+    r = next_round(_dt(2026, 10, 13, 16, 58, 50, tzinfo=_tz.utc), _json.dumps([k.isoformat() for k in knocks]))
+    assert r["basis"] == "observed" and r["every_minutes"] == 180
+    assert r["at"].startswith("2026-10-13T18:55")

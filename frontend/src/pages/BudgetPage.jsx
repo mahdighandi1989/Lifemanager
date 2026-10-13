@@ -11,6 +11,7 @@ const KIND_LABELS = {
   broker: 'بروکر/فارکس',
   exchange: 'صرافی',
   credit: 'کارت اعتباری',
+  wallet: 'کیف‌پول / اعتبارِ پیش‌پرداخت',
   broker_forex: 'بروکر/فارکس',
   exchange_iranian: 'صرافی ایرانی',
   exchange_foreign: 'صرافی خارجی',
