@@ -1,5 +1,5 @@
 {
- "round": 1,
+ "round": 2,
  "at": "2026-10-13",
  "cases": [
   {
@@ -361,12 +361,14 @@
    "r": 0,
    "d": "علم",
    "ok": false,
-   "k": "missed",
-   "fl": [],
+   "k": "ok",
+   "fl": [
+    "st_istiqra"
+   ],
    "ex": [
     "st_istiqra"
    ],
-   "full": false
+   "full": true
   },
   {
    "id": "cs_leverrier_neptune",
@@ -1912,12 +1914,13 @@
    "r": 0,
    "d": "رسانه و خبر",
    "ok": false,
-   "k": "mislocated",
+   "k": "ok",
    "fl": [
     "st_tajrobe"
    ],
    "ex": [
     "st_istiqra",
+    "st_tajrobe",
     "st_resp"
    ],
    "full": false
@@ -1929,12 +1932,13 @@
    "r": 0,
    "d": "رسانه و خبر",
    "ok": false,
-   "k": "mislocated",
+   "k": "ok",
    "fl": [
     "st_tajrobe"
    ],
    "ex": [
-    "st_istiqra"
+    "st_istiqra",
+    "st_tajrobe"
    ],
    "full": false
   },
@@ -2410,12 +2414,14 @@
    "r": 0,
    "d": "ریاضی",
    "ok": false,
-   "k": "missed",
-   "fl": [],
+   "k": "ok",
+   "fl": [
+    "st_aql"
+   ],
    "ex": [
     "st_aql"
    ],
-   "full": false
+   "full": true
   },
   {
    "id": "cs_pb_poinc_whitehead",
@@ -2504,11 +2510,14 @@
    "r": 0,
    "d": "ریاضی",
    "ok": false,
-   "k": "missed",
-   "fl": [],
+   "k": "ok",
+   "fl": [
+    "st_conflict"
+   ],
    "ex": [
     "st_aql",
-    "st_expert"
+    "st_expert",
+    "st_conflict"
    ],
    "full": false
   },
@@ -2583,10 +2592,8 @@
    "r": 0,
    "d": "فناوری و مهندسی",
    "ok": true,
-   "k": "health_alarm",
-   "fl": [
-    "st_istiqra"
-   ],
+   "k": "ok",
+   "fl": [],
    "ex": [],
    "full": null
   },

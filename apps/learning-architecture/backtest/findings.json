@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-13",
- "round": 1,
+ "round": 2,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -16,11 +16,20 @@
    "case": "cs_b_dewey1948",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "برچسب حقیقت پرونده نادرست است",
+   "note": "موتور درست کار کرده: تنها سقفی که شکسته شده r_tajrobe_hidden (۷۰، شرط s51: «اعتبار قوانین تجربی همواره مشروط به عدم دخالت عوامل پنهان») است و سقف استقراء ناقص (۸۰، s50: «حتی با افزایش شواهد به مرز یقین نمی‌رسد») با conf=90 و تحمل ۱۰ شکسته نمی‌شود. خودِ truth.why به همین عامل پنهانِ کنترل‌نشده با استناد به s51 تکیه می‌کند و رمزگذاری hidden_ctrl:false دارد، ولی st_tajrobe را در fail نیاورده؛ این با قرارداد پیکره (تالیدومید، تاکوما، آریان ۵، لوبوتومی: استقراء + hidden_ctrl:false ⇒ st_tajrobe در fail) ناسازگار است.",
+   "fix": {
+    "what": "truth.fail: [st_istiqra, st_resp] → [st_istiqra, st_tajrobe, st_resp]. (جانبی، بدون اثر بر حکم: st_resp هرگز پرچم نمی‌خورد چون r_resp_inquiry «stakes=زیاد» می‌خواهد و k2 «متوسط» رمز شده؛ اگر مالک بهای خطا را برای تیتر صفحهٔ اول «زیاد» بداند، k2.stakes متوسط→زیاد هم st_resp را می‌یابد — این را جداگانه تصمیم بگیرید.)",
+    "round": 1,
+    "type": "label"
+   },
+   "retest": {
+    "since": 1,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "mislocated",
    "title": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
    "tier": "real",
@@ -52,11 +61,20 @@
    "case": "cs_b_literarydigest",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "برچسب حقیقت پرونده نادرست است",
+   "note": "همان سازوکار دیویی: با conf=90 فقط سقف r_tajrobe_hidden (۷۰) شکسته می‌شود؛ سقف استقراء ناقص ۸۰ است و s50 فقط می‌گوید ناقص «به مرز یقین نمی‌رسد»، پس در عدد ۹۰ خطای استقرایی محض دیده نمی‌شود. truth.why خودش علت را «عامل پنهان … کنترل نشده بود (s51)» می‌داند و hidden_ctrl:false رمز کرده، اما st_tajrobe را در fail نگذاشته؛ برچسب ناقص است (هم‌زاد سالمش cs_b_gallup1936 هم hidden_ctrl را برای همین استقراء رمز می‌کند).",
+   "fix": {
+    "what": "truth.fail: [st_istiqra] → [st_istiqra, st_tajrobe]. یادداشت: معیار «نماینده بودن نمونه» که علت واقعی شکست است در جزوه نیست (ext ایستگاه st_istiqra: «معیارهای شمار، تنوع و نماینده بودن نمونه… افزودهٔ سامانه‌اند»)؛ اگر مالک بخواهد سوگیری نمونه زیر st_istiqra بنشیند، آن خلأ جزوه است و ویژگی/قاعدهٔ تازه می‌خواهد.",
+    "round": 1,
+    "type": "label"
+   },
+   "retest": {
+    "since": 1,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "mislocated",
    "title": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
    "tier": "real",
@@ -82,9 +100,9 @@
    "case": "cs_hrt_observational",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
+   "status": "diagnosed",
+   "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
+   "note": "s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است.",
    "fix": null,
    "retest": null,
    "kind": "missed",
@@ -103,18 +121,28 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 2,
+   "proposal": "p_tajrobe_none"
   },
   {
    "id": "f_cs_lavoisier_acids",
    "case": "cs_lavoisier_acids",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "داستان و actor صریحاً می‌گویند حکم «از شمار محدودی اسید» (گوگردی، فسفری، نیتریک و…) گرفته شد، ولی ind_n رمز نشده؛ پس فقط r_istiqra_incomplete (۸۰؛ s50: «ارزش معرفتی استقراء ناقص حتی با افزایش شواهد به مرز یقین نمی‌رسد») فعال می‌شود و conf=85 زیر ۸۰+۱۰ می‌ماند. ویژگی ind_n دقیقاً برای همین بخش از s50 (ارزش استقراء «از منظر حساب احتمالات» با شمار موارد) ساخته شده است.",
+   "fix": {
+    "what": "claim k1, key ind_n: (نامعلوم) → 4 (اسیدهای گوگردی، فسفری، نیتریک و کربنیک که لاووازیه تا ۱۷۷۷ اکسیژن‌دار بودنشان را نشان داده بود؛ هر عدد <۱۰ همین اثر را دارد). نتیجه: r_istiqra_small_n سقف ۷۰، conf 85 > 80 ⇒ پرچم over در st_istiqra.",
+    "round": 1,
+    "type": "encoding"
+   },
+   "retest": {
+    "since": 1,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "missed",
    "title": "لاووازیه: «همه اسیدها اکسیژن دارند»",
    "tier": "real",
@@ -138,11 +166,20 @@
    "case": "cs_pb_greek_indiana",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "هیچ‌یک از دو تصدیق conf ندارد و سقف‌ها فقط از راه «conf > سقف + تحمل» به پرچم بدل می‌شوند؛ پس با وجود سقف ۰ (r_conflict_cert)، ۲۵ (r_aql_matter_false، s40: «یقین … تنها زمانی حاصل می‌شود که هم مادهٔ استدلال صادق … باشد») و ۲۵ (r_expert_out_of_field، s49: «درجه تبحر، صلاحیت…») موتور کور است. پیکرهٔ مسائل ریاضی (روفینی، لژاندر، وایتهد) برای ادعای منتشر/عمل‌شده conf تقریبی ۹۰ می‌گذارد؛ مجلس با تصویب لایحه‌ای که روش را «حقیقت ریاضی» می‌خواند بر k2 عمل کرد (acted:true). با conf، سخت‌ترین سقف r_conflict_cert است و پرچم در st_conflict می‌نشیند — که خود truth.why («با برهان قطعی (لیندمان) ناسازگار بود",
+   "fix": {
+    "what": "دو جزء لازم (هیچ‌کدام به‌تنهایی کافی نیست؛ در حافظه آزموده شد): (۱) رمزگذاری: claim k2, key conf: (نامعلوم) → 90 (تقریب سامانه از عمل تصویب، هم‌قرارداد روفینی/لژاندر)؛ (۲) برچسب: truth.fail [st_aql, st_expert] → [st_aql, st_expert, st_conflict]. فقط (۱): پرچم st_conflict ⇒ هنوز رد (مکان نادرست). یادداشت طراحی: موتور بیش‌اطمینانی را فقط به ایستگاه سقفِ تعیین‌کننده نسبت می‌دهد، پس st_aql و st_expert",
+    "round": 1,
+    "type": "encoding"
+   },
+   "retest": {
+    "since": 1,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "missed",
    "title": "لایحه π ایندیانا (۱۸۹۷)",
    "tier": "problem",
@@ -174,11 +211,20 @@
    "case": "cs_pb_long_h4",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "هشدار سلامت مشروع نیست: r_istiqra_small_n (ind_n=2 < 10، vazraf نامعلوم) روی k1 سقف ۷۰ گذاشت و conf=90 ⇒ پرچم over در st_istiqra. اما حکم، به تصریح truth.why، «درباره همین دستگاه در همین آزمون‌ها بود (نه تعمیم به روش)»؛ مجموعه محدود و همه اعضایش بررسی شده، یعنی استقراء تام که طبق s50 «نتیجه آن قطعی و دارای اعتبار صددرصدی است» (مثال ایستگاه: «۲۴ قسط گذشته … استقراء تام»). رمزگذار ind_n را گذاشت ولی ind_complete:true را جا انداخت.",
+   "fix": {
+    "what": "claim k1, key ind_complete: (نامعلوم) → true. نتیجه: r_istiqra_small_n (شرط not ind_complete) خاموش، سقف ۹۵ از r_tajrobe_ceiling، conf 90 ⇒ بی‌پرچم، سالم. (جایگزین هم‌ارز: حذف ind_n، چون راه «تجربه» است نه استقراء؛ ind_complete:true به لفظ s50 نزدیک‌تر است.)",
+    "round": 1,
+    "type": "encoding"
+   },
+   "retest": {
+    "since": 1,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "health_alarm",
    "title": "آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)",
    "tier": "problem",
@@ -199,11 +245,20 @@
    "case": "cs_pb_poinc_1900",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "open",
-   "attribution": null,
-   "note": "",
-   "fix": null,
-   "retest": null,
+   "status": "fixed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "r_aql_matter_unproven درست فعال شد (سقف ۴۵؛ s40: مقدمات «باید … از طریق سلسله‌مراتب به بدیهیات منتهی شوند»، s44: «اعتبار صوری برهان به‌تنهایی کافی نیست»)، ولی چون conf رمز نشده هیچ پرچمی ساخته نمی‌شود. truth.why می‌گوید «چون شدت اطمینانش مستند نیست، conf رمزگذاری نشده»، اما پوانکاره حکم را در «مکمل دوم» (۱۹۰۰) منتشر و «ادعا کرد» و truth.right بدیلش را «طرح به‌صورت پرسش یا حدس» می‌داند؛ پیکرهٔ هم‌خانواده (روفینی، لژاندر، وایتهد: «عدد اطمینان تقریب سامانه از رفتار انتشار است») در همین وضع conf≈۹۰ می‌گذارد.",
+   "fix": {
+    "what": "claim k1, key conf: (نامعلوم) → 90 (تقریب سامانه از ادعای منتشرشده، هم‌قرارداد cs_pb_quintic_ruffini/cs_pb_par_legendre) و جملهٔ «conf رمزگذاری نشده» در truth.why اصلاح شود. نتیجه: 90 > 45+10 ⇒ پرچم over در st_aql (r_aql_matter_unproven).",
+    "round": 1,
+    "type": "encoding"
+   },
+   "retest": {
+    "since": 1,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
    "kind": "missed",
    "title": "ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)",
    "tier": "problem",

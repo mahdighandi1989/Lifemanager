@@ -14,9 +14,12 @@ const P = window.EPI_PROBLEMS, errors = [], rows = [];
 const L = s => [...String(s)].length;
 const sha = o => crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex');
 
-/* هش‌ها از `git show f6c4b66:apps/learning-architecture/src/app/epi_problems.js` هنگامِ نوشتنِ آزمون */
-const CASES_SHA = '93c0cc1b4c0725e35fb45225b62923f8bfffcda0036db98af7d9642844b6f149';
-const PROTECTED_SHA = '0713635b48ad3b502ce2391aa2c271765e7e9adecb2ea3558dc02fe6056e6acb';
+/* هش‌ها از `git show f6c4b66:apps/learning-architecture/src/app/epi_problems.js` هنگامِ نوشتنِ آزمون.
+   به‌روز ۲۰۲۶-۱۰-۱۳ (بک‌تستِ پیوسته، دورِ ۱ — WORKLOG ِ صفحه (31)): سه اصلاحِ مستندِ سازنده در cases —
+   pb_greek/cs_pb_greek_indiana (conf + st_conflict)، pb_longitude/cs_pb_long_h4 (ind_complete)، pb_poincare/cs_pb_poinc_1900 (conf).
+   هر تغییرِ بعدیِ cases فقط از همین مسیر (یافته ⇒ تشخیص ⇒ اصلاح، با ثبت در WORKLOG) و با به‌روزکردنِ همین هش‌ها. */
+const CASES_SHA = '45b272ff88a170b3ec3027a0c6d51a9c40a2f367381f24647bd3f683cd49ac8c';
+const PROTECTED_SHA = '865da7a69ed1cbc29dee371317e74a064f7ddb75cbe82b637ee10482bce0838e';
 const IDS = 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis';
 
 function protectedView(list) {
