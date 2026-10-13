@@ -226,3 +226,38 @@ async def test_bell_copy_goes_to_the_in_app_notifications(db_session, monkeypatc
     await svc.deliver_due(db_session, now=datetime(2026, 10, 13, 5, 1, tzinfo=timezone.utc))
     r = (await db_session.execute(select(AppReminder).where(AppReminder.rkey == "b"))).scalar_one()
     assert '"in_app": "sent"' in r.result and r.status == "sent"
+
+
+@pytest.mark.asyncio
+async def test_per_channel_detail_telegram_only_email_neutral(db_session):
+    """Owner 2026-10-13: details can be on for Telegram and off for e-mail (or the reverse); the
+    old shape (plain ``detail`` text, no ``detail_channels``) still means «every channel»."""
+    from app.services import app_reminder_service as svc
+
+    base = {"due_date": "2026-10-13", "hour": 9, "tz": "Asia/Dubai", "title": "گره‌گشا", "body": "یک ورزشِ گره موعد است",
+            "link": "?tab=kpractice&a=k", "channels": {"telegram": True, "email": True}, "detail": "گره: «کفِ دست»"}
+    await svc.upsert(db_session, user_id=41, app="learning-architecture", items=[dict(base, key="a", detail_channels=["telegram"])])
+    await svc.upsert(db_session, user_id=42, app="learning-architecture", items=[dict(base, key="b", detail_channels=["email"])])
+    await svc.upsert(db_session, user_id=43, app="learning-architecture", items=[dict(base, key="c")])  # old shape
+    await svc.upsert(db_session, user_id=44, app="learning-architecture", items=[dict(base, key="d", detail_channels=[])])
+    got = {}
+
+    async def tg(text):
+        got.setdefault("tg", []).append(text); return "sent"
+
+    async def mail(subj, text):
+        got.setdefault("mail", []).append(text); return "sent"
+
+    await svc.deliver_due(db_session, now=datetime(2026, 10, 13, 5, 1, tzinfo=timezone.utc), senders=(tg, mail))
+    has = lambda xs: [("کفِ دست" in t) for t in xs]
+    # order follows send_at (equal) then insertion: a, b, c, d
+    assert sorted(has(got["tg"])) == [False, False, True, True] and sorted(has(got["mail"])) == [False, False, True, True]
+    rows = {r.rkey: r for r in (await db_session.execute(__import__("sqlalchemy").select(svc.AppReminder))).scalars().all()}
+    assert "کفِ دست" in svc._text(rows["a"], "telegram") and "کفِ دست" not in svc._text(rows["a"], "email")
+    assert "کفِ دست" not in svc._text(rows["b"], "telegram") and "کفِ دست" in svc._text(rows["b"], "email")
+    assert "کفِ دست" in svc._text(rows["c"], "telegram") and "کفِ دست" in svc._text(rows["c"], "email")
+    assert rows["d"].detail is None and "یک ورزشِ گره موعد است" in svc._text(rows["d"], "email")
+    assert svc._detail_for(rows["a"], "in_app") == "گره: «کفِ دست»"
+    # a broken stored value fails closed (neutral), never half-leaks
+    rows["a"].detail = '{"text": "x", "chan'
+    assert svc._detail_for(rows["a"], "telegram") == ""

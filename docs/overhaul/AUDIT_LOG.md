@@ -4288,3 +4288,7 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **FINDING:** کلاسِ سراسریِ `.lg` (خطِ راهنمای نمودار) با `.btn.lg` برخورد داشت ⇒ دکمه‌های بزرگ ۲۲px؛ کلیدِ دو سامانه سرریز می‌کرد.
 - **CHANGE:** `apps/learning-architecture/src/app/style.css` (`.lg:not(.btn)`، `.sysb` شکستنی). آزمونِ هندسی در `test_audit_fixes.js`. WORKLOG ِ صفحه (24).
 - **درس:** `experiences/global-utility-class-collision-crushes-components.md`.
+
+## 2026-10-13 — یادآورهای برنامه: جزئیات برای هر کانال جدا
+- **CHANGE:** `app/services/app_reminder_service.py` (`_pack_detail`/`_detail_for`/`_text(r, channel)`)، `app/routes/app_records.py` (`detail_channels` ِ اختیاری). بی ستونِ تازه: همان `detail` (متنِ ساده = همهٔ کانال‌ها، شکلِ قدیم؛ JSON ِ `{"text","channels"}` = فقط آن‌ها). صفحه: WORKLOG (25).
+- **DECISION:** دامنهٔ مشترکِ دو حسابِ گوگلِ تأییدشده — مالک: هر دو مالِ خودش؛ بدونِ تغییر.

@@ -12,7 +12,7 @@
     DELETE /api/app-records/{app}/files/{id}    hide; the Drive file is only renamed
     GET    /api/app-records/{app}/usage         database/Drive footprint + AI use (30 days, estimated cost)
     GET    /api/app-records/{app}/reminders     the caller's reminders + which channels this server can deliver on
-    POST   /api/app-records/{app}/reminders     upsert one {key, due_date, hour, tz, title, body, detail?, link, channels}
+    POST   /api/app-records/{app}/reminders     upsert one {key, due_date, hour, tz, title, body, detail?, detail_channels?, link, channels}
     DELETE /api/app-records/{app}/reminders/{key}  cancel
 
 First tenant: «معماری یادگیری عمیق و کارخانه معرفت‌شناسی» (`/apps/learning-architecture`).
@@ -387,6 +387,7 @@ class ReminderIn(BaseModel):
     title: str = Field("", max_length=200)
     body: str = Field("", max_length=2000)
     detail: Any = None
+    detail_channels: Any = None  # None ⇒ detail goes to every channel (old shape); ["telegram"] ⇒ only there
     link: str = Field("", max_length=500)
     channels: Any = None
 

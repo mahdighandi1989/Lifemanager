@@ -80,7 +80,7 @@ async def upsert(db: AsyncSession, *, user_id, app: str, items: List[dict]) -> D
         row.send_at = send_time_utc(due, hour, tz)
         row.title = str(it.get("title") or "")[:200]
         row.body = str(it.get("body") or "")[:2000]
-        row.detail = (str(it["detail"])[:2000] if it.get("detail") else None)
+        row.detail = _pack_detail(it.get("detail"), it.get("detail_channels"))
         row.link = str(it.get("link") or "")[:500]
         row.channels = _clean_channels(it.get("channels") if it.get("channels") is not None else list(CHANNELS))
         if changed or row.status in (None, "", "cancelled", "muted"):  # muted = event was off at due time; re-armed by the next upsert (audit 2026-10-13)
@@ -141,8 +141,44 @@ def _public_link(link: str) -> str:
     return (base + path) if base else path
 
 
-def _text(r: AppReminder) -> str:
-    parts = [r.title or "یادآور", (r.detail or r.body or "").strip(), _public_link(r.link or "")]
+# Per-channel details (owner 2026-10-13): «details in Telegram but not in e-mail» (or the reverse).
+# Stored in the SAME ``detail`` column — no schema change: plain text = every channel (the old
+# shape, still accepted and still read); ``{"text": …, "channels": [...]}`` = only those channels.
+_DETAIL_CH = ("telegram", "email")
+
+
+def _pack_detail(detail, detail_channels=None) -> Optional[str]:
+    txt = str(detail)[:2000] if detail else ""
+    if not txt:
+        return None
+    if detail_channels is None:
+        return txt
+    chans = [c for c in _DETAIL_CH if c in (detail_channels or [])] if isinstance(detail_channels, (list, tuple)) else []
+    if not chans:
+        return None  # details asked for no channel ⇒ nothing stored, every message stays neutral
+    if len(chans) == len(_DETAIL_CH):
+        return txt
+    return json.dumps({"text": txt, "channels": chans}, ensure_ascii=False)
+
+
+def _detail_for(r: AppReminder, channel: str) -> str:
+    """The detail text for ONE channel ("telegram" | "email" | "in_app"); "" ⇒ the neutral body."""
+    raw = (r.detail or "").strip()
+    if not raw:
+        return ""
+    if raw.startswith('{"text"'):
+        try:
+            d = json.loads(raw)
+        except ValueError:
+            return ""  # unreadable ⇒ fail closed (neutral text), never leak a half-parsed detail
+        txt = str(d.get("text") or "").strip()
+        # in-app lives inside the owner's own app ⇒ it shows the detail if ANY channel was allowed it
+        return txt if (channel == "in_app" or channel in (d.get("channels") or [])) else ""
+    return raw
+
+
+def _text(r: AppReminder, channel: str = "telegram") -> str:
+    parts = [r.title or "یادآور", (_detail_for(r, channel) or r.body or "").strip(), _public_link(r.link or "")]
     return "\n".join(p for p in parts if p)
 
 
@@ -222,7 +258,7 @@ async def _send_in_app(db: AsyncSession, r: AppReminder) -> str:
         from app.services.notification_service import notify_event
 
         n = await notify_event(EVENT, user_id=int(r.user_id or 0), db=db, title=r.title or "ورزشِ گره‌گشا",
-                               message=(r.detail or r.body or "").strip() or "یک ورزشِ گره موعد است",
+                               message=(_detail_for(r, "in_app") or r.body or "").strip() or "یک ورزشِ گره موعد است",
                                action_link=_public_link(r.link or ""), action_text="باز کن")
         return "sent" if n is not None else "failed"
     except Exception as exc:  # noqa: BLE001
@@ -272,7 +308,6 @@ async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, sende
             r.status, r.result = "muted", json.dumps({"event": "off_in_settings"}, ensure_ascii=False)
             await db.commit()
             continue
-        text = _text(r)
         res = dict(prev)
         if "in_app" not in res and senders is None:
             res["in_app"] = await _send_in_app(db, r)
@@ -281,6 +316,7 @@ async def deliver_due(db: AsyncSession, *, now: Optional[datetime] = None, sende
                 res[c] = "off_in_settings"
                 continue
             try:
+                text = _text(r, c)
                 res[c] = await (tg_send(text) if c == "telegram" else mail_send(r.title or "یادآور", text))
             except Exception as exc:  # noqa: BLE001
                 logger.warning("reminder %s failed: %s", c, type(exc).__name__)

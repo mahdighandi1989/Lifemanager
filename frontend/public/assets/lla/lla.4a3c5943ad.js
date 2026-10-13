@@ -24684,7 +24684,7 @@ APP.goFromURL = function (q) {
   function nowISO() { return new Date().toISOString(); }
   A.kitemsOf = function (knotId) { return S.all("kitem", function (r) { return r.knot === knotId; }).sort(function (a, b) { return (a.created || "").localeCompare(b.created || ""); }); };
   A.kexpsOf = function (knotId) { return S.all("kexp", function (r) { return r.knot === knotId; }).sort(function (a, b) { return (a.created || "").localeCompare(b.created || ""); }); };
-  function kset() { var st = S.settings(); var k = st.knots || {}; var n = k.notify || {}; return { notify: { telegram: n.telegram !== false, email: n.email !== false, detail: !!n.detail, hour: n.hour == null ? 9 : +n.hour }, showUnverified: !!k.showUnverified, tz: k.tz || "" }; }
+  function kset() { var st = S.settings(); var k = st.knots || {}; var n = k.notify || {}; return { notify: { telegram: n.telegram !== false, email: n.email !== false, detail: !!n.detail, detailTg: n.detailTg !== false, detailEm: n.detailEm !== false, hour: n.hour == null ? 9 : +n.hour }, showUnverified: !!k.showUnverified, tz: k.tz || "" }; }
   A.kset = kset;
   /* نمونه به معیار می‌رود؟ کد = بله؛ هوش مصنوعی = فقط وارسی‌شده؛ کاربر = فقط پاسخِ دقیق (عدد/گزینه)؛ روبریک/متنِ آزاد = هرگز */
   A.kcountable = function (it) {
@@ -24865,7 +24865,14 @@ APP.goFromURL = function (q) {
     if (s.notify.detail && !A.kprivateKnot(k)) {
       var items = A.kitemsOf(k.id).filter(function (it) { return A.kservable(it) && it.atype !== "rubric" && !A.kleak(it); });
       var fresh = items.filter(function (it) { return !(it.hist || []).length; })[0] || items[0];
-      p.detail = "گره: «" + (k.name || "بی‌نام") + "»" + (fresh ? "\nنمونهٔ تازه (فقط صورت): " + String(fresh.prompt).slice(0, 400) : "");
+      /* جزئیات برای هر کانال جدا (مالک ۲۰۲۶-۱۰-۱۳): مثلاً در تلگرام آری، در ایمیل نه. هیچ کانالی ⇒ بی جزئیات. */
+      var dch = [];
+      if (s.notify.telegram && s.notify.detailTg) dch.push("telegram");
+      if (s.notify.email && s.notify.detailEm) dch.push("email");
+      if (dch.length) {
+        p.detail = "گره: «" + (k.name || "بی‌نام") + "»" + (fresh ? "\nنمونهٔ تازه (فقط صورت): " + String(fresh.prompt).slice(0, 400) : "");
+        p.detail_channels = dch;
+      }
     }
     return p;
   };
@@ -25654,6 +25661,7 @@ APP.goFromURL = function (q) {
     A.V.settings = function () {
       var root = rawSettings.apply(this, arguments), s = kset();
       function save(mut) { var st = S.settings(); st.knots = st.knots || {}; st.knots.notify = st.knots.notify || {}; mut(st.knots); S.saveSettings(st); S.all("knot").forEach(function (k) { A.kremindSync(k); }); }
+      function dcb(id, label, on, fn) { var x = cb(id, label, on, fn); x.style.display = "inline-flex"; x.style.marginInlineEnd = "1em"; if (!s.notify.detail) x.querySelector("input").disabled = true; return x; }
       function cb(id, label, on, fn) { return h("label", { class: "chk", for: id }, h("input", { type: "checkbox", id: id, checked: on, onchange: function (e) { var v = e.target.checked; save(function (kn) { fn(kn, v); }); } }), label); }
       var hour = h("select", { id: "kpHour", onchange: function (e) { var v = +e.target.value; save(function (kn) { kn.notify.hour = v; }); } }, [6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 21].map(function (x) { return h("option", { value: x, selected: x === s.notify.hour }, fa(x) + ":۰۰"); }));
       var status = hostRemind()
@@ -25668,9 +25676,15 @@ APP.goFromURL = function (q) {
         cb("kpTg", "تلگرام", s.notify.telegram, function (kn, v) { kn.notify.telegram = v; }),
         cb("kpEm", "ایمیل", s.notify.email, function (kn, v) { kn.notify.email = v; }),
         cb("kpDet", "جزئیات در پیام: نامِ گره و صورتِ یک نمونهٔ تازه (هرگز پاسخ؛ برای گره‌های هیجانی و باورِ دربارهٔ خود هیچ‌وقت)", s.notify.detail, function (kn, v) { kn.notify.detail = v; }),
+        h("div", { class: "kp-detch small", dir: "rtl", style: "margin-inline-start:1.6em" + (s.notify.detail ? "" : ";opacity:.55") },
+          h("span", { class: "muted" }, "جزئیات در کدام کانال:"), " ",
+          dcb("kpDetTg", "تلگرام", s.notify.detailTg, function (kn, v) { kn.notify.detailTg = v; }),
+          dcb("kpDetEm", "ایمیل", s.notify.detailEm, function (kn, v) { kn.notify.detailEm = v; })),
         h("div", { class: "row gap wrap" }, h("label", { for: "kpHour", class: "small" }, "ساعتِ ارسال:"), hour, h("span", { class: "small muted" }, "منطقهٔ زمانی: " + tz())),
         live,
         cb("kpUnv", "نمایشِ نمونه‌های «وارسی‌نشدهٔ» هوش مصنوعی در جلسه (با برچسب؛ به معیار نمی‌روند)", s.showUnverified, function (kn, v) { kn.showUnverified = v; }));
+      var detIn = sec.querySelector("#kpDet"), detBox = sec.querySelector(".kp-detch");
+      if (detIn && detBox) detIn.addEventListener("change", function () { detBox.style.opacity = detIn.checked ? "" : ".55"; [].forEach.call(detBox.querySelectorAll("input"), function (x) { x.disabled = !detIn.checked; }); });
       root.insertBefore(sec, root.children[1] || null);
       return root;
     };

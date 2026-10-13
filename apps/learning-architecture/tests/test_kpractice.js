@@ -220,6 +220,17 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const a = mk('knot_t6', { fam: 'F8', extra: [{ fam: 'F7' }] }), b = mk('knot_t7', { fam: 'F3', cases: ['kc_t7'] }), c = mk('knot_t8', { fam: 'F3' });
     return [a.detail === null, b.detail === null, !!c.detail].join(',');
   });
+  // جزئیات برای هر کانال جدا (۲۰۲۶-۱۰-۱۳): پیش‌فرض هر دو؛ خاموش‌کردنِ ایمیل ⇒ فقط تلگرام؛ هر دو خاموش ⇒ بی جزئیات
+  info.detCh = await p.evaluate(() => { const c = APP.kremindPayload(APP.S.get('knot_t8')); return c.detail_channels.join(','); });
+  const chkDet = (await p.locator('#kpDetTg').isEnabled()) && (await p.locator('#kpDetEm').isEnabled());
+  await p.click('main label[for="kpDetEm"]'); await p.waitForTimeout(80);
+  info.detTgOnly = await p.evaluate(() => { const c = APP.kremindPayload(APP.S.get('knot_t8')); return c.detail_channels.join(',') + ':' + !!c.detail; });
+  await p.click('main label[for="kpDetTg"]'); await p.waitForTimeout(80);
+  info.detNone = await p.evaluate(() => { const c = APP.kremindPayload(APP.S.get('knot_t8')); return c.detail === null && !c.detail_channels; });
+  await p.click('main label[for="kpDetTg"]'); await p.click('main label[for="kpDetEm"]'); await p.waitForTimeout(80);
+  await p.click('main label[for="kpDet"]'); await p.waitForTimeout(50);
+  info.detSubDisabled = chkDet && (await p.locator('#kpDetTg').isDisabled());
+  await p.click('main label[for="kpDet"]'); await p.waitForTimeout(50);
   await p.click('main label[for="kpTg"]'); await p.click('main label[for="kpEm"]'); await p.waitForTimeout(100);
   info.bothOffUnremind = await p.evaluate(() => window.__unrem.includes('knot:knot_t2'));
   await p.click('main label[for="kpTg"]'); await p.click('main label[for="kpDet"]'); await p.waitForTimeout(50);
@@ -341,6 +352,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.f1Gap === '1:true' && info.f1GapKnot === 1, 'I4c F1 notice: ' + info.f1Gap + ' ' + info.f1GapKnot);
   chk(info.f2Gens === 'hidden24,reread' && info.f2Forms.split(',').length >= 3, 'I4b F2 code forms: ' + info.f2Gens + ' / ' + info.f2Forms);
   chk(info.bothOffUnremind, 'channels off ⇒ unremind');
+  chk(info.detCh === 'telegram,email' && info.detTgOnly === 'telegram:true' && info.detNone === true && info.detSubDisabled === true, 'per-channel detail: ' + [info.detCh, info.detTgOnly, info.detNone, info.detSubDisabled].join(' | '));
   chk(info.sweep, 'deleted knot sweep');
   chk(info.dueRow === 1, 'today row');
   chk(info.interleavedHidesName, 'knot name visible before answer');
