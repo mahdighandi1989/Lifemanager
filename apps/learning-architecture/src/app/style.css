@@ -1037,3 +1037,22 @@ table.kp-log th,table.kp-log td{padding:4px 6px;border-bottom:1px solid var(--li
 /* فقط متن، نه ظرف‌ها: روی .page/.card به دکمه‌ها ارث می‌رسید و min-content ِ دکمه را چند نویسه می‌کرد ⇒ دکمه‌های له‌شده (۲۰۲۶-۱۰-۱۳، اسکرین‌شاتِ مالک) */
 .page p, .page li, .page td, .page h2, .page h3, .page pre, .page blockquote, .card p, .card li { overflow-wrap: anywhere; }
 button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
+
+/* ===== راه‌یابیِ کل (a21_orient.js) ===== */
+.orient-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:14px;align-items:start;margin:10px 0 16px}
+.orient-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.orient-col>h2{margin:0}
+.orient-job h3{margin:0 0 6px}
+.orient-job .chip{font-size:.78rem}
+.orient-src,.orient-out{padding:10px 12px}
+.orient-src p,.orient-out p{margin:4px 0}
+.orient-go{margin-top:8px}
+@media (max-width:900px){.orient-grid{grid-template-columns:1fr}}
+.orient-strip{border:1px solid var(--line);border-inline-start:4px solid var(--accent);background:var(--surface-2);border-radius:10px;padding:8px 12px;margin:0 0 12px}
+.orient-strip[data-job="ws"]{border-inline-start-color:var(--ink-2)}
+.orient-strip.folded{background:transparent;border:0;padding:0 2px;margin:0 0 6px}
+.orient-line{align-items:baseline}
+.orient-tail{margin-top:4px;gap:14px}
+.orient-flow{border:2px solid var(--accent);margin:0 0 12px}
+.orient-flow-step{font-size:1.02rem;margin:6px 0 8px}
+.orient-hint{margin-bottom:12px}

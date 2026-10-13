@@ -73,7 +73,7 @@
   A.wsMinutes = function (ws) { var w = wsMin(ws); return [r5(w[0]), r5(w[1])]; };
   A.minutesText = minTextM;
   /* توضیحِ منوی کناری (a3_views.js، A.shell هنگامِ راه‌اندازی صدایش می‌زند؛ نه هنگامِ بارگذاری، چون شبیه‌سازها بعداً ثبت می‌شوند) */
-  A.courseNavText = function () { var sp = courseSpan(); return fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک + " + fa(NPROTO) + " روال) به ترتیب — هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه، قابلِ تقسیم — روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"; };
+  A.courseNavText = function () { var sp = courseSpan(); return fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک + " + fa(NPROTO) + " روال) به ترتیب — هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه، قابلِ تقسیم — روی موضوعِ خودت؛ برای یادگرفتنِ خودِ روش‌ها"; };
 
   /* ---------- وضعیت ---------- */
   function st() {

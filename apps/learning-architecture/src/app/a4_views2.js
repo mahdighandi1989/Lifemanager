@@ -590,6 +590,8 @@
       var hv = (location.hash || "").replace("#", "");
       if (A.HOST && A.HOST.initial) { var q = A.HOST.initial(); if (q && q.tab && A.V[q.tab]) { A.state = { view: q.tab, arg: q.a === "" || q.a == null ? null : (/^\d+$/.test(q.a) ? +q.a : q.a), sub: q.s || null }; A.render(); return; } hv = ""; }
       if (hv && A.V[hv] && ["tech", "topic", "proto", "e_case"].indexOf(hv) < 0) A.state.view = hv;
+      /* اولین ورود پس از لایهٔ راه‌یابی (۲۰۲۶-۱۰-۱۳): «نقشهٔ کل» — نه وسطِ «امروز» */
+      else if (!hv && A.V.whole && !((S.settings().orient || {}).seen)) A.state.view = "whole";
       else if (!hv && !(S.settings().seenStart)) A.state.view = "start";
       A.render();
     });

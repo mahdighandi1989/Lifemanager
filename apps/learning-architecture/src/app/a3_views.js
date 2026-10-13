@@ -4,7 +4,7 @@
   var NAV = [
     { g: "دوره: از صفر" },
     /* شمار و زمانِ درس‌ها را دوره (a11_course.js، A.courseBlurb) از روی خودِ درس‌ها می‌سازد و همین متن را هنگامِ بارگذاری جایگزین می‌کند */
-    ["course", "🧭 دورهٔ گام‌به‌گام", "تکنیک‌ها و روال‌ها، درس به درس و به ترتیب، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
+    ["course", "🧭 دورهٔ یادگیری (گام‌به‌گام)", "یادگرفتنِ خودِ روش‌های یادگیری: تکنیک‌ها و روال‌ها، درس به درس، روی موضوعِ خودت"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
     { g: "گره‌گشا" },
@@ -15,7 +15,7 @@
     { g: "مسیر یادگیری" },
     ["map", "نقشه و گراف", "مراحل یادگیری (" + fa(C.PHASES.length) + " فاز)، ارتباط تکنیک‌ها، برنامه " + fa(C.CURRICULUM.length) + " هفته‌ای"],
     ["lib", "۴۵ تکنیک", "هر روش یادگیری: چرا کار می‌کند، چطور، و تمرینش"],
-    ["topics", "موضوع‌ها", "چیزی که می‌خواهی عمیق بفهمی؛ از اینجا شروع کن"],
+    ["topics", "موضوع‌ها", "چیزی که می‌خواهی عمیق بفهمی؛ سفرِ ۱۱ گامی قدم‌به‌قدم می‌بردت"],
     ["farm", "مزرعه", "هر مفهومی که فهمیدی، در درخت علم خودش (مسیر " + fa(C.PIPELINE.length) + " گامی)"],
     ["protos", "پروتکل‌ها", fa(C.PROTOCOLS.length) + " روال تکرار: از «پس از هر جلسه» تا «هر دوره»، و صف منابع"],
     ["review", "مرور", "مرور کارت‌های امروز و سنجش میزان اطمینانت"],
@@ -27,7 +27,7 @@
   var SETTINGS = ["settings", "تنظیمات", "کلید هوش مصنوعی و پشتیبان‌گیری (برای هر دو سامانه)"];
   var START = ["start", "از اینجا شروع کن", "این برنامه چیست و برای هر خواسته از کجا شروع کنی"];
   A.NAV = NAV; A.NAV_SETTINGS = SETTINGS; A.NAV_START = START;
-  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start") ? (A.lastSys || "learn") : "learn"; };
+  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start" || v === "whole") ? (A.lastSys || "learn") : "learn"; };
   A.state = { view: "home", arg: null, sub: null };
   A.go = function (view, arg, sub) {
     // a change of sub-tab inside the same page REPLACES the history entry (so the browser's Back and the app's
@@ -51,7 +51,7 @@
       h("div", { class: "sysw", role: "tablist", "aria-label": "سامانه" },
         h("button", { class: "sysb", "data-sys": "learn", role: "tab", onclick: function () { (A.goRoot || A.go)("home"); } }, "سامانه یادگیری"),
         h("button", { class: "sysb", "data-sys": "epi", role: "tab", onclick: function () { (A.goRoot || A.go)("e_home"); } }, "کارخانه معرفت‌شناسی")),
-      h("div", { class: "navlist" }, navBtn(START)),
+      h("div", { class: "navlist" }, A.NAV_WHOLE ? navBtn(A.NAV_WHOLE) : null, navBtn(START)),
       navList(NAV, "learn"), navList(A.EPI_NAV || [], "epi"),
       h("div", { class: "navlist" }, navBtn(SETTINGS)),
       h("div", { class: "sync" }, h("span", { id: "syncState" }, S.status)));

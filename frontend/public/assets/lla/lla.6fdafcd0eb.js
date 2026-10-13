@@ -15793,7 +15793,7 @@ var APP = window.APP = {};
   var NAV = [
     { g: "دوره: از صفر" },
     /* شمار و زمانِ درس‌ها را دوره (a11_course.js، A.courseBlurb) از روی خودِ درس‌ها می‌سازد و همین متن را هنگامِ بارگذاری جایگزین می‌کند */
-    ["course", "🧭 دورهٔ گام‌به‌گام", "تکنیک‌ها و روال‌ها، درس به درس و به ترتیب، روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
+    ["course", "🧭 دورهٔ یادگیری (گام‌به‌گام)", "یادگرفتنِ خودِ روش‌های یادگیری: تکنیک‌ها و روال‌ها، درس به درس، روی موضوعِ خودت"],
     { g: "کار روزانه" },
     ["home", "امروز", "کارهای امروز و پیشرفتت"],
     { g: "گره‌گشا" },
@@ -15804,7 +15804,7 @@ var APP = window.APP = {};
     { g: "مسیر یادگیری" },
     ["map", "نقشه و گراف", "مراحل یادگیری (" + fa(C.PHASES.length) + " فاز)، ارتباط تکنیک‌ها، برنامه " + fa(C.CURRICULUM.length) + " هفته‌ای"],
     ["lib", "۴۵ تکنیک", "هر روش یادگیری: چرا کار می‌کند، چطور، و تمرینش"],
-    ["topics", "موضوع‌ها", "چیزی که می‌خواهی عمیق بفهمی؛ از اینجا شروع کن"],
+    ["topics", "موضوع‌ها", "چیزی که می‌خواهی عمیق بفهمی؛ سفرِ ۱۱ گامی قدم‌به‌قدم می‌بردت"],
     ["farm", "مزرعه", "هر مفهومی که فهمیدی، در درخت علم خودش (مسیر " + fa(C.PIPELINE.length) + " گامی)"],
     ["protos", "پروتکل‌ها", fa(C.PROTOCOLS.length) + " روال تکرار: از «پس از هر جلسه» تا «هر دوره»، و صف منابع"],
     ["review", "مرور", "مرور کارت‌های امروز و سنجش میزان اطمینانت"],
@@ -15816,7 +15816,7 @@ var APP = window.APP = {};
   var SETTINGS = ["settings", "تنظیمات", "کلید هوش مصنوعی و پشتیبان‌گیری (برای هر دو سامانه)"];
   var START = ["start", "از اینجا شروع کن", "این برنامه چیست و برای هر خواسته از کجا شروع کنی"];
   A.NAV = NAV; A.NAV_SETTINGS = SETTINGS; A.NAV_START = START;
-  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start") ? (A.lastSys || "learn") : "learn"; };
+  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start" || v === "whole") ? (A.lastSys || "learn") : "learn"; };
   A.state = { view: "home", arg: null, sub: null };
   A.go = function (view, arg, sub) {
     // a change of sub-tab inside the same page REPLACES the history entry (so the browser's Back and the app's
@@ -15840,7 +15840,7 @@ var APP = window.APP = {};
       h("div", { class: "sysw", role: "tablist", "aria-label": "سامانه" },
         h("button", { class: "sysb", "data-sys": "learn", role: "tab", onclick: function () { (A.goRoot || A.go)("home"); } }, "سامانه یادگیری"),
         h("button", { class: "sysb", "data-sys": "epi", role: "tab", onclick: function () { (A.goRoot || A.go)("e_home"); } }, "کارخانه معرفت‌شناسی")),
-      h("div", { class: "navlist" }, navBtn(START)),
+      h("div", { class: "navlist" }, A.NAV_WHOLE ? navBtn(A.NAV_WHOLE) : null, navBtn(START)),
       navList(NAV, "learn"), navList(A.EPI_NAV || [], "epi"),
       h("div", { class: "navlist" }, navBtn(SETTINGS)),
       h("div", { class: "sync" }, h("span", { id: "syncState" }, S.status)));
@@ -16838,6 +16838,8 @@ var APP = window.APP = {};
       var hv = (location.hash || "").replace("#", "");
       if (A.HOST && A.HOST.initial) { var q = A.HOST.initial(); if (q && q.tab && A.V[q.tab]) { A.state = { view: q.tab, arg: q.a === "" || q.a == null ? null : (/^\d+$/.test(q.a) ? +q.a : q.a), sub: q.s || null }; A.render(); return; } hv = ""; }
       if (hv && A.V[hv] && ["tech", "topic", "proto", "e_case"].indexOf(hv) < 0) A.state.view = hv;
+      /* اولین ورود پس از لایهٔ راه‌یابی (۲۰۲۶-۱۰-۱۳): «نقشهٔ کل» — نه وسطِ «امروز» */
+      else if (!hv && A.V.whole && !((S.settings().orient || {}).seen)) A.state.view = "whole";
       else if (!hv && !(S.settings().seenStart)) A.state.view = "start";
       A.render();
     });
@@ -17536,9 +17538,9 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   /* ---------- پوسته: نماهای کارخانه ---------- */
   A.EPI_NAV = [
     { g: "شروع" },
-    ["epi_course", "🧭 دورهٔ گام‌به‌گام", "ایستگاه‌ها به ترتیبِ مسیر، درس‌به‌درس، روی یک ادعای واقعیِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"],
+    ["epi_course", "🧭 دورهٔ سنجش (گام‌به‌گام)", "یادگرفتنِ خودِ جزوه: ایستگاه‌ها به ترتیبِ مسیر، درس‌به‌درس، روی یک ادعای واقعیِ خودت"],
     { g: "کار" },
-    ["e_home", "میز کار", "یک خبر یا ادعا را بسنج؛ از اینجا شروع کن"],
+    ["e_home", "میز کار", "یک خبر، ادعا یا تصمیم را بسنج — کارِ اصلیِ کارخانه"],
     ["e_cases", "پرونده‌ها", "همه سنجش‌هایت و گزارش‌هایشان"],
     { g: "دستگاه‌ها" },
     ["e_map", "نقشه کارخانه", fa(E.HALLS.length) + " سالن و " + fa(ST.length) + " ایستگاه؛ هر پرونده از کجا می‌گذرد"],
@@ -17546,7 +17548,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     ["e_concepts", "مفاهیم", fa(CO.length) + " اصطلاح جزوه و راه تشخیص هرکدام"],
     { g: "اعتبارسنجی و تکامل" },
     ["e_bt", "اعتبارسنجی کارخانه و جزوه", "سه آزمون: آیا می‌شود به کارخانه و جزوه اعتماد کرد؟"],
-    ["e_lib", "کتابخانه وقایع", "نمونه‌های واقعی و مثال‌های جزوه برای آزمون؛ صف تأیید"],
+    ["e_lib", "کتابخانهٔ وقایع (پرونده‌های آزمون)", "وقایعِ واقعی و مثال‌های جزوه که بک‌تست روی آن‌ها اجرا می‌شود؛ صفِ تأیید"],
     ["e_aut", "اختلاف‌ها برای داوری", "جاهایی که کارخانه اشتباه کرد؛ تو بگو ایراد از کجاست"],
     ["e_living", "جزوه زنده", "هر قاعده جزوه و نتیجه‌اش در آزمون‌ها"],
     ["e_prob", "مسئله‌های بزرگ", "مسئلهٔ حل‌شدهٔ خودت را گام‌به‌گام شبیه‌ساز و تمرین کن"],
@@ -19319,6 +19321,9 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   A.V.start = function () {
     var root = h("div", { class: "page start" });
     root.appendChild(A.head("راهنما", "از اینجا شروع کن", "این برنامه دو بخش دارد: «سامانه یادگیری» برای عمیق فهمیدن یک موضوع، و «کارخانه معرفت‌شناسی» برای سنجیدن اینکه یک ادعا یا برداشت چقدر معتبر است. هر دو حافظه مشترک دارند. خواسته‌ات را در کارت‌های زیر پیدا کن و دکمه‌اش را بزن."));
+    if (A.V.whole) root.appendChild(h("section", { class: "card orient-hint", dir: "rtl" }, h("strong", {}, "اول تصویرِ کل: "),
+      "این برنامه از سه چیزی که دادی (ایده‌ها و دغدغه‌ها، جزوهٔ معرفت‌شناسی، آموزش‌های یادگیری) سه «کار» ساخته — فهمیدن، سنجیدن، گره‌گشایی. «نقشهٔ کل» نشان می‌دهد هر در به کدام کار می‌رسد. ",
+      h("button", { class: "btn sm", onclick: function () { A.go("whole"); } }, "🧭 نقشهٔ کل")));
     root.appendChild(h("section", { class: "doors" }, DOORS.map(function (d, i) {
       return h("div", { class: "card door" + (d.main ? " main" : "") + (d.mainEpi ? " mainepi" : "") }, h("div", { class: "eyebrow" }, d.sys === "یادگیری" ? "سامانه یادگیری" : d.sys === "گره‌گشا" ? "گره‌گشا" : d.sys === "حلِ مسئله" ? "حلِ مسئله" : "کارخانه معرفت‌شناسی"), h("h2", {}, d.t), h("p", { class: "small muted" }, d.d),
         h("ol", { class: "small" }, d.steps.map(function (s) { return h("li", {}, typeof s === "function" ? s() : s); })),
@@ -19581,7 +19586,7 @@ APP.goFromURL = function (q) {
   A.wsMinutes = function (ws) { var w = wsMin(ws); return [r5(w[0]), r5(w[1])]; };
   A.minutesText = minTextM;
   /* توضیحِ منوی کناری (a3_views.js، A.shell هنگامِ راه‌اندازی صدایش می‌زند؛ نه هنگامِ بارگذاری، چون شبیه‌سازها بعداً ثبت می‌شوند) */
-  A.courseNavText = function () { var sp = courseSpan(); return fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک + " + fa(NPROTO) + " روال) به ترتیب — هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه، قابلِ تقسیم — روی موضوعِ خودت؛ اگر نمی‌دانی از کجا شروع کنی، همین‌جا"; };
+  A.courseNavText = function () { var sp = courseSpan(); return fa(LESSONS.length) + " درس (" + fa(NTECH) + " تکنیک + " + fa(NPROTO) + " روال) به ترتیب — هر درس " + fa(sp[0]) + " تا " + fa(sp[1]) + " دقیقه، قابلِ تقسیم — روی موضوعِ خودت؛ برای یادگرفتنِ خودِ روش‌ها"; };
 
   /* ---------- وضعیت ---------- */
   function st() {
@@ -27507,4 +27512,212 @@ APP.goFromURL = function (q) {
     sec.appendChild(fb);
     return sec;
   }
+})(APP);
+/* ===== راه‌یابیِ کل: «این برنامه چیست، من کجای آنم، و چرا» (مالک ۲۰۲۶-۱۰-۱۳) =====
+   شکایتِ مالک: «وارد که می‌شوم گیج می‌شوم … مثلِ این‌که وسطِ اقیانوس افتاده‌ام و نمی‌دانم به کدام سمت شنا کنم؛ هر بخش نوشته‌ای
+   است که نمی‌دانم نسبتش با بقیه چیست». ممیزیِ اجرایی (WORKLOG (30)) نشان داد حق با اوست: ۴۲ نما، دو منوی موازی، پنج جا که
+   می‌گویند «از اینجا شروع کن»، واژه‌های چندمعنایی (گره، نقشه، پرونده، مسیر)، و هیچ تصویری از کل یا از نسبتِ هر بخش با
+   سه چیزی که مالک داد (ایده‌ها و دغدغه‌ها، جزوهٔ معرفت‌شناسی، آموزش‌های یادگیری).
+   این لایه فقط اضافه می‌کند — هیچ نما، دکمه یا منویی حذف نمی‌شود:
+     (۱) نمای «🧭 نقشهٔ کل»: سه منبع ⇒ سه «کارِ» واقعی ⇒ حاصلِ هر کار؛ و کارگاهِ سازنده جدا و با برچسبِ «برای کارِ روزانه لازم نیست».
+     (۲) نوارِ «این‌جا» زیرِ «📍»: این صفحه کدام کار است، به چه درد می‌خورد، و قدمِ بعد.
+     (۳) سه «مسیرِ کاری» ِ قدم‌به‌قدم (گیر کرده‌ام / می‌خواهم عمیق بفهمم / می‌خواهم بسنجم) که از صفحه‌های واقعی رد می‌شوند.
+     (۴) واژه‌نامهٔ ساده و یک نام برای هر معنا (فقط برچسبِ نمایشی؛ شناسهٔ نماها دست نمی‌خورد). */
+(function (A) {
+  var h = A.h, fa = A.fa, S = A.S;
+
+  /* ---------- سه منبع: آنچه مالک به سامانه داد ---------- */
+  var SOURCES = [
+    { id: "a", fa: "ایده‌ها و دغدغه‌های خودت", d: "آنچه دسته‌بندی‌نشده دادی: «حفظ نه، عمق»، «آموزش جریانِ زندگی شود»، «جایی گیر می‌کنم و نمی‌فهمم چرا»… (" + fa((A.C && A.C.CONCERNS || []).length) + " دغدغه).", go: "concerns" },
+    { id: "b", fa: "جزوهٔ معرفت‌شناسیِ مصباح", d: "ملاک‌های سنجیدنِ این‌که یک ادعا از کجا آمده و چقدر می‌شود به آن اطمینان داشت.", go: "e_book" },
+    { id: "c", fa: "آموزش‌های یادگیری", d: "۴۵ تکنیکِ یادگیریِ عمیق در ۹ فاز، و روال‌های تکرار.", go: "lib" }
+  ];
+  /* ---------- سه کار: هر روز فقط یکی از این‌ها را لازم داری ---------- */
+  var JOBS = [
+    { id: "understand", ic: "🌱", fa: "فهمیدنِ عمیق", from: ["c", "a"],
+      when: "وقتی می‌خواهی چیزی را واقعاً بفهمی و یادت بماند — نه فقط بخوانی.",
+      gives: "فهمِ ماندگار: کاربرگ‌های تمرین، کارت‌های مرور با موعد، و نهالِ آن مفهوم در «مزرعه» (درختِ علمِ تو).",
+      start: "learn", pages: ["topics", "journey", "lib", "review", "farm", "home", "course", "map", "protos"] },
+    { id: "judge", ic: "⚖️", fa: "سنجیدنِ ادعا و تصمیم", from: ["b"],
+      when: "وقتی می‌خواهی بدانی یک خبر، ادعا، برداشت یا تصمیم چقدر معتبر است و خطایش کجاست.",
+      gives: "حکم با سقفِ اطمینان، نخستین نقطهٔ خطا، راهِ درست، و تاریخِ بازبینی تا نتیجهٔ واقعی را بعداً ثبت کنی.",
+      start: "judge", pages: ["e_home", "e_cases", "e_st", "e_concepts", "e_map", "epi_course"] },
+    { id: "untie", ic: "🪢", fa: "گره‌گشایی و حلِ مسئله", from: ["a", "b", "c"],
+      when: "وقتی جایی گیر کرده‌ای: مسئله‌ای حل نشد، کاری کردی که نمی‌فهمی چرا، یا نتیجه‌ای که نمی‌فهمی.",
+      gives: "ریشهٔ گیر (با شاهد)، «گرهِ ذهنی»ِ تکرارشونده، ورزش‌های فاصله‌دار برای بازکردنش، و حرکت‌های حلِ مسئله.",
+      start: "stuck", pages: ["kcases", "kpractice", "kmap", "e_prob", "moves"] }
+  ];
+  var WORKSHOP = { ic: "🛠", fa: "کارگاهِ سازنده و مرجع",
+    d: "این‌ها برای ساختن، آزمودن و مستندکردنِ خودِ سامانه‌اند — که آیا کارخانه همان جزوه است، جزوه با تاریخ می‌خواند، و متن‌های مرجع. برای کارِ روزانه لازمشان نداری.",
+    pages: ["e_bt", "e_lib", "e_aut", "e_living", "e_book", "e_dos", "e_cov", "concerns", "atlas", "base", "start", "settings"] };
+
+  /* ---------- هر نما: کدام کار، چیست، به چه کار می‌آید، قدمِ بعد ---------- */
+  var M = A.VIEW_META = {
+    whole: { j: null, what: "تصویرِ کلِ برنامه.", why: "تا بدانی هر بخش از کدام منبع آمده، چه می‌سازد و کی به کارت می‌آید." },
+    start: { j: "ws", what: "فهرستِ درها: برای هر خواسته، از کجا شروع کنی.", why: "اگر خواسته‌ات را می‌دانی و فقط درش را می‌خواهی.", next: [["whole", "نقشهٔ کل"]] },
+    settings: { j: "ws", what: "تنظیمات: هوش مصنوعی، درایو، یادآورها، پشتیبان.", why: "یک بار تنظیم می‌کنی؛ کارِ روزانه این‌جا نیست." },
+    home: { j: "understand", what: "کارهای موعدِ امروز از هر سه کار: کارت‌های مرور، روال‌ها، ورزش‌های گره، پرونده‌هایی که تاریخِ بازبینی‌شان رسیده.", why: "هر روز از این‌جا شروع کن؛ فقط آنچه امروز موعد است.", next: [["review", "مرورِ کارت‌ها"]] },
+    course: { j: "understand", what: "دورهٔ یادگیری: روش‌های یادگیری را درس‌به‌درس، به ترتیب، روی موضوعِ خودت یاد می‌گیری.", why: "برای یادگرفتنِ خودِ «روش‌ها» (منبعِ آموزش‌ها) — نه برای فهمیدنِ یک موضوعِ مشخص.", next: [["topics", "یک موضوعِ خودت"]] },
+    lesson: { j: "understand", what: "یک درس از دورهٔ یادگیری (یک تکنیک یا یک روال) در ۵ قدم.", why: "تکنیک را روی موضوعِ خودت اجرا می‌کنی و یک کارت مرور می‌سازد.", next: [["course", "درسِ بعدیِ دوره"]] },
+    topics: { j: "understand", what: "موضوع‌هایی که می‌خواهی عمیق بفهمی.", why: "یک موضوع بساز تا مسیرِ ۱۱ گامی (سفر) قدم‌به‌قدم ببردت.", next: [["review", "مرور"], ["farm", "مزرعه"]] },
+    topic: { j: "understand", what: "صفحهٔ یک موضوع: کاربرگ‌ها، کارت‌ها و جایش در مزرعه.", why: "همه‌چیزِ این موضوع یک‌جا؛ «سفرِ گام‌به‌گام» راهنمایِ ترتیب است.", next: [["review", "مرور"]] },
+    journey: { j: "understand", what: "سفرِ ۱۱ گامیِ یک موضوع: از پرسشِ اول تا کاشتن در مزرعه و مرورِ فاصله‌دار.", why: "تا بدانی برای فهمیدنِ همین موضوع الان کدام قدم را برداری.", next: [["topics", "موضوع‌ها"]] },
+    lib: { j: "understand", what: "۴۵ روشِ یادگیری (منبعِ آموزش‌ها): هر کدام چرا کار می‌کند و چطور.", why: "مرجعِ روش‌ها؛ هر تکنیک کارگاهِ تمرین دارد که روی موضوعت اجرا می‌شود." },
+    tech: { j: "understand", what: "یک روشِ یادگیری: چرا، چطور، و کارگاهِ تمرینش.", why: "کاربرگی که این‌جا پر می‌کنی کارتِ مرور می‌سازد و به موضوعت وصل می‌شود.", next: [["review", "مرور"]] },
+    map: { j: "understand", what: "۹ فازِ یادگیری، گرافِ ارتباطِ تکنیک‌ها، و برنامهٔ ۸ هفته‌ای.", why: "اگر می‌خواهی روش‌ها را به ترتیبِ هفته‌ای تمرین کنی." },
+    farm: { j: "understand", what: "مزرعه: درختِ علمِ تو؛ هر مفهومی که فهمیدی جایی از ریشه تا میوه دارد.", why: "تا دانسته‌هایت پراکنده نماند و ببینی کدام شاخه هنوز «گرهِ درخت» (جای خالی) دارد." },
+    protos: { j: "understand", what: "روال‌های تکرار (پس از هر جلسه، روزانه، هفتگی…).", why: "عادت‌هایی که فهم را ماندگار می‌کنند؛ موعدشان در «امروز» می‌آید." },
+    proto: { j: "understand", what: "یک روالِ تکرار.", why: "انجامش کن تا موعدِ بعدی‌اش در «امروز» بیاید." },
+    review: { j: "understand", what: "مرورِ کارت‌های موعد، با اطمینانِ پیش از دیدنِ پاسخ.", why: "یادآوریِ فاصله‌دار؛ بدونِ آن، فهمیده‌ها فراموش می‌شوند." },
+    concerns: { j: "ws", what: "دغدغه‌های خودت (منبعِ ایده‌ها) و این‌که هر کدام را کدام بخش جواب می‌دهد.", why: "تا ببینی سامانه برای کدام خواسته‌ات چه دارد." },
+    atlas: { j: "ws", what: "الگوهای مشترکِ علوم و زندگی.", why: "مرجع؛ برای دیدنِ پیوندِ رشته‌ها." },
+    base: { j: "ws", what: "پشتوانهٔ علمیِ روش‌ها و اصلاحیه‌ها.", why: "مرجع؛ اگر خواستی بدانی هر روش بر چه پژوهشی تکیه دارد." },
+    epi_course: { j: "judge", what: "دورهٔ سنجش: ایستگاه‌های جزوه را درس‌به‌درس روی یک ادعای واقعیِ خودت یاد می‌گیری.", why: "برای یادگرفتنِ خودِ «روشِ سنجیدن» (منبعِ جزوه).", next: [["e_home", "سنجیدنِ یک ادعا"]] },
+    epi_lesson: { j: "judge", what: "یک درس از دورهٔ سنجش: یک ایستگاه روی ادعای خودت.", why: "ایستگاه را یاد می‌گیری و همان‌جا پرونده‌ات را جلو می‌بری.", next: [["epi_course", "درسِ بعدی"]] },
+    e_home: { j: "judge", what: "میزِ کار: ادعا، خبر یا تصمیمی را که می‌خواهی بسنجی این‌جا وارد کن.", why: "از این‌جا یک «پروندهٔ سنجش» ساخته می‌شود که از ایستگاه‌ها می‌گذرد.", next: [["e_cases", "پرونده‌ها"]] },
+    e_cases: { j: "judge", what: "همهٔ پرونده‌های سنجشِ تو و حکمشان.", why: "پرونده‌ای که تاریخِ بازبینی‌اش رسیده را باز کن و نتیجهٔ واقعی را ثبت کن." },
+    e_case: { j: "judge", what: "یک پروندهٔ سنجش: ادعا از ایستگاه‌ها می‌گذرد و در پایان حکم و تصمیم می‌گیرد.", why: "هر ایستگاه یک کاربرگ است؛ «داوریِ قطعی» نخستین نقطهٔ خطا و سقفِ اطمینان را می‌گوید.", next: [["e_cases", "پرونده‌ها"]] },
+    e_map: { j: "judge", what: "نقشهٔ کارخانه: ۶ سالن و ۳۱ ایستگاه به ترتیبِ عبور.", why: "تا ببینی هر پرونده از کجا می‌گذرد و هر ایستگاه کجای جزوه است." },
+    e_st: { j: "judge", what: "ایستگاه‌ها: هر گامِ سنجش با متنِ جزوه، مثال و تمرین.", why: "وقتی در پرونده‌ای نمی‌دانی یک ایستگاه چه می‌خواهد، این‌جا." },
+    e_concepts: { j: "judge", what: "اصطلاح‌های جزوه و راهِ تشخیصِ هر کدام.", why: "فرهنگِ جزوه؛ وقتی واژه‌ای را نمی‌فهمی." },
+    e_book: { j: "ws", what: "متنِ کامل و دست‌نخوردهٔ جزوه (منبعِ جزوه).", why: "مرجع؛ هر بخش نشان می‌دهد کجای کارخانه به کار رفته." },
+    e_dos: { j: "ws", what: "بخش‌های روایی و تاریخیِ جزوه که ایستگاه نشده‌اند.", why: "مرجع." },
+    e_cov: { j: "ws", what: "کدام بخشِ جزوه کجا به کار رفته، و نکته‌ها دربارهٔ خودِ متن.", why: "مرجعِ سازنده." },
+    e_bt: { j: "ws", what: "اعتبارسنجیِ کارخانه و جزوه (بک‌تست).", why: "آیا کارخانه همان جزوه است، جزوه با تاریخ می‌خواند، و در وقایعِ جاری درست درمی‌آید." },
+    e_lib: { j: "ws", what: "کتابخانهٔ وقایعِ واقعی و مثال‌های جزوه که بک‌تست روی آن‌ها اجرا می‌شود.", why: "مادهٔ آزمون؛ صفِ تأییدِ وقایعِ تازه." },
+    e_aut: { j: "ws", what: "جاهایی که کارخانه با واقعیت نخواند.", why: "تو می‌گویی ایراد از جزوه است یا از سازنده؛ زیرِ همان بخشِ جزوه ثبت می‌شود." },
+    e_living: { j: "ws", what: "جزوهٔ زنده: هر قاعده و وضعش در آزمون‌ها.", why: "کدام قاعده آزموده و درست است، کدام زیرِ سؤال." },
+    kcases: { j: "untie", what: "گره‌گشا: موقعیت‌هایی که در آن‌ها گیر کردی.", why: "یک موقعیت ثبت کن تا تا ریشه، با شاهد، برسی.", next: [["kpractice", "ورزشِ گره‌ها"]] },
+    kcase: { j: "untie", what: "یک موقعیتِ گیر: چه شد، چه انتظار داشتی، و پله‌پله تا ریشه.", why: "ریشه که پیدا شد، «گرهِ ذهنی» ساخته می‌شود و ورزش می‌گیرد.", next: [["kpractice", "ورزشِ گره‌ها"]] },
+    knot: { j: "untie", what: "یک «گرهِ ذهنی»: الگوی گیرِ تکرارشونده‌ای که در چند موقعیت دیده شده.", why: "تا با ورزش و آزمایشِ واقعی بازش کنی.", next: [["kpractice", "ورزش"]] },
+    kpractice: { j: "untie", what: "ورزشِ گره‌ها: نمونه‌های تازه با همان ساختارِ گیر، با فاصله و درهم.", why: "تا الگو را در ظاهرِ تازه هم بشناسی، نه فقط در همان موقعیت.", next: [["kmap", "نقشهٔ ذهن"]] },
+    kmap: { j: "untie", what: "نقشهٔ ذهن: گره‌ها، پیوندشان و روندِ بازشدن.", why: "تا ببینی کدام گره بیشتر جلوی تو را می‌گیرد." },
+    ksims: { j: "untie", what: "شبیه‌سازهای آمادهٔ گره (نمونهٔ سازنده).", why: "برای تمرین؛ پیش‌فرض پنهان." },
+    e_prob: { j: "untie", what: "مسئله‌های بزرگ: مسئلهٔ سختِ حل‌شده‌ای را که خودت می‌آوری، گام‌به‌گام شبیه‌سازی می‌کنی.", why: "تا مسیرِ حل را از درون تجربه کنی و مسئله‌های هم‌ساختار بسازی.", next: [["moves", "حرکت‌های حل"]] },
+    moves: { j: "untie", what: "حرکت‌های حلِ مسئله: ۱۶ حرکتِ تکرارشونده و تمرینِ تشخیصشان.", why: "تا در مسئلهٔ تازه بدانی کدام حرکت به کار می‌آید." },
+    move: { j: "untie", what: "یک حرکتِ حلِ مسئله و گام‌هایی که از آن استفاده کرده‌اند.", why: "تمرینِ تشخیصِ همین حرکت." }
+  };
+  var JOB = {}; JOBS.forEach(function (j) { JOB[j.id] = j; }); JOB.ws = WORKSHOP;
+
+  /* ---------- سه مسیرِ کاری: قدم‌به‌قدم از صفحه‌های واقعی ---------- */
+  var FLOWS = A.ORIENT_FLOWS = {
+    stuck: { fa: "جایی گیر کرده‌ام", ic: "🪢", steps: [
+      { v: "kcases", t: "«+ موقعیتِ تازه» را بزن و بی‌تفسیر بنویس چه شد، چه انتظار داشتی و چه دیدی." },
+      { v: "kcases", t: "موقعیت را باز کن و نردبان را پله‌پله جلو برو تا ریشه — هر حدس با شاهد." },
+      { v: "kcases", t: "اگر ریشه «باوری دربارهٔ خودت» بود، از دکمهٔ همان‌جا یک پروندهٔ سنجش بساز؛ اگر مسئله بود، «شبیه‌سازِ همین مسئله»." },
+      { v: "kpractice", t: "گرهِ ساخته‌شده را ورزش بده: جلسهٔ درهم‌تنیده، با اطمینان پیش از پاسخ." },
+      { v: "kmap", t: "روندِ بازشدنِ گره‌هایت را این‌جا ببین؛ موعدهای بعدی در «امروز» می‌آید." }] },
+    learn: { fa: "می‌خواهم موضوعی را عمیق بفهمم", ic: "🌱", steps: [
+      { v: "topics", t: "یک موضوع بساز (مثلاً «مشتق چیست»)." },
+      { v: "topics", t: "موضوع را باز کن و «سفرِ گام‌به‌گام» را بزن؛ سفر قدم‌به‌قدم می‌گوید کدام تکنیک را حالا اجرا کنی." },
+      { v: "farm", t: "مفهومی که فهمیدی را در درختِ علمِ خودش بکار (سفر در قدمِ کاشت همین را می‌خواهد)." },
+      { v: "review", t: "فردا و روزهای بعد: کارت‌های موعد را مرور کن — موعدها در «امروز» هم هست." }] },
+    judge: { fa: "می‌خواهم ادعا یا تصمیمی را بسنجم", ic: "⚖️", steps: [
+      { v: "e_home", t: "ادعا، خبر یا تصمیم را در «میزِ کار» بنویس؛ «مسیرِ سریع» برای شروع بس است." },
+      { v: "e_cases", t: "پرونده را باز کن و ایستگاه‌ها را یکی‌یکی پر کن؛ هر جا ایستگاهی را نفهمیدی، از «ایستگاه‌ها» یا «مفاهیم» کمک بگیر." },
+      { v: "e_cases", t: "در پایان، حکم و تاریخِ بازبینی را ثبت کن." },
+      { v: "home", t: "وقتی تاریخِ بازبینی رسید، در «امروز» می‌آید: نتیجهٔ واقعی را ثبت کن تا ببینی سنجشت درست بود یا نه." }] }
+  };
+  function flowState() { var f = (S.settings().orient || {}).flow; return f && FLOWS[f.id] ? f : null; }
+  function setFlow(f) { var st = S.settings(); st.orient = st.orient || {}; st.orient.flow = f; S.saveSettings(st); }
+  A.startFlow = function (id) { setFlow({ id: id, i: 0 }); A.go(FLOWS[id].steps[0].v); };
+
+  /* ---------- واژه‌نامه: یک نام برای هر معنا ---------- */
+  var WORDS = A.ORIENT_WORDS = [
+    ["تصدیق / ادعا", "جمله‌ای که چیزی را دربارهٔ چیزی می‌گوید و می‌تواند درست یا نادرست باشد. «دلار فردا بالا می‌رود» ادعاست."],
+    ["پروندهٔ سنجش", "یک ادعا یا تصمیم که از ایستگاه‌های کارخانه می‌گذرد و حکم می‌گیرد. (در «کارگاه»، «پرونده‌های پشتوانه» چیز دیگری است: بخش‌های روایی جزوه.)"],
+    ["ایستگاه / سالن", "هر ایستگاه یک گامِ سنجش است که از یک بحثِ جزوه آمده؛ ایستگاه‌ها در ۶ سالن گروه شده‌اند."],
+    ["سقفِ اطمینان / پرچم", "بیشترین اطمینانی که جزوه به آن نوع ادعا اجازه می‌دهد؛ اگر بیشتر مطمئن بودی، آن ایستگاه پرچم می‌خورد."],
+    ["داوریِ قطعی", "اجرای قاعده‌های جزوه روی پرونده — بی هوش مصنوعی — که نخستین نقطهٔ خطا را نشان می‌دهد."],
+    ["رمزگذاری", "ثبتِ ویژگی‌های یک ادعا (از چه راهی آمده، چقدر مطمئنی…) تا قاعده‌ها رویش اجرا شوند."],
+    ["گرهِ ذهنی", "در گره‌گشا: الگوی گیرِ تکرارشونده در فکر یا رفتارِ تو. (با «گرهِ درخت» در مزرعه یکی نیست.)"],
+    ["گرهِ درخت", "در مزرعه: جایی از درختِ علم که هنوز خالی یا نیمه‌کاره است."],
+    ["مزرعه", "درختِ علمِ تو؛ هر مفهومی که فهمیدی از ریشه تا میوه جایی دارد."],
+    ["سفرِ ۱۱ گامی", "راهنمای ترتیبِ کار روی یک موضوع؛ ۱۱ گام است و از ۹ «فازِ یادگیری» (دسته‌بندیِ تکنیک‌ها) جداست."],
+    ["دوره", "دو دوره هست: «دورهٔ یادگیری» برای یادگرفتنِ روش‌ها، «دورهٔ سنجش» برای یادگرفتنِ جزوه."],
+    ["نقشه", "«نقشهٔ کل» (همین صفحه)، «نقشه و گراف» (فازهای یادگیری)، «نقشهٔ کارخانه» (سالن‌ها)، «نقشهٔ ذهن» (گره‌ها) — چهار چیزِ جدا."],
+    ["بک‌تست", "آزمودنِ خودِ کارخانه و جزوه با وقایعِ واقعی و سناریوها — کارِ کارگاه، نه کارِ روزانهٔ تو."]
+  ];
+
+  /* ---------- نمای «🧭 نقشهٔ کل» ---------- */
+  function pageBtn(v) {
+    var lab = (A.viewLabel && A.viewLabel(v)) || v;
+    return h("button", { class: "chip linkish orient-page", "data-v": v, onclick: function () { A.go(v); } }, lab);
+  }
+  A.V.whole = function () {
+    var root = h("div", { class: "page orient-whole", dir: "rtl" });
+    root.appendChild(A.head("راهنما", "🧭 نقشهٔ کل — این برنامه چیست و تو کجای آنی",
+      "سه چیزی که به سامانه دادی این‌جا سه «کارِ» واقعی شده‌اند. هر روز فقط یکی از این سه کار را لازم داری؛ بقیهٔ صفحه‌ها یا جزئی از همان کارند یا کارگاهِ سازنده."));
+    var grid = h("section", { class: "orient-grid", "aria-label": "منبع، کار، حاصل" });
+    grid.appendChild(h("div", { class: "orient-col" }, h("h2", { class: "small muted" }, "۱. آنچه دادی (منبع)"),
+      SOURCES.map(function (s) { return h("div", { class: "card soft orient-src", "data-src": s.id }, h("strong", {}, s.fa), h("p", { class: "small" }, s.d), h("button", { class: "linkish small", onclick: function () { A.go(s.go); } }, "دیدنِ خودِ منبع")); })));
+    grid.appendChild(h("div", { class: "orient-col" }, h("h2", { class: "small muted" }, "۲. کاری که برایت می‌کند"),
+      JOBS.map(function (j) {
+        return h("div", { class: "card orient-job", "data-job": j.id },
+          h("h3", {}, j.ic + " " + j.fa), h("p", { class: "small" }, h("b", {}, "کی؟ "), j.when),
+          h("p", { class: "small muted" }, "از: " + j.from.map(function (x) { return (SOURCES.filter(function (s) { return s.id === x; })[0] || {}).fa; }).filter(Boolean).join(" + ")),
+          h("div", { class: "row gap wrap" }, j.pages.map(pageBtn)),
+          h("button", { class: "btn sm orient-go", "data-flow": j.start, onclick: function () { A.startFlow(j.start); } }, "قدم‌به‌قدم شروع کن ←"));
+      })));
+    grid.appendChild(h("div", { class: "orient-col" }, h("h2", { class: "small muted" }, "۳. حاصل"),
+      JOBS.map(function (j) { return h("div", { class: "card soft orient-out", "data-job": j.id }, h("strong", {}, j.ic + " " + j.fa), h("p", { class: "small" }, j.gives)); })));
+    root.appendChild(grid);
+    root.appendChild(h("section", { class: "card orient-daily", dir: "rtl" }, h("h2", {}, "هر روز از کجا؟"),
+      h("p", {}, "از «امروز»: فقط آنچه موعد است — کارت‌های مرور، روال‌ها، ورزش‌های گره، و پرونده‌هایی که وقتِ ثبتِ نتیجه‌شان رسیده. اگر چیزی تازه پیش آمد، یکی از سه کارِ بالا را قدم‌به‌قدم شروع کن."),
+      h("button", { class: "btn ghost sm", onclick: function () { A.go("home"); } }, "رفتن به «امروز»")));
+    root.appendChild(h("details", { class: "card soft orient-ws" }, h("summary", {}, WORKSHOP.ic + " " + WORKSHOP.fa + " — برای کارِ روزانه لازم نیست"),
+      h("p", { class: "small" }, WORKSHOP.d), h("div", { class: "row gap wrap" }, WORKSHOP.pages.map(pageBtn))));
+    root.appendChild(h("details", { class: "card orient-words", open: true }, h("summary", {}, "واژه‌نامه — یک نام برای هر معنا"),
+      h("dl", { class: "words" }, WORDS.map(function (w) { return [h("dt", {}, w[0]), h("dd", {}, w[1])]; }))));
+    var st = S.settings(); if (!(st.orient && st.orient.seen)) { st.orient = st.orient || {}; st.orient.seen = true; S.saveSettings(st); }
+    return root;
+  };
+  A.NAV_WHOLE = ["whole", "🧭 نقشهٔ کل", "این برنامه چیست، از چه ساخته شده، و تو کجای آنی"];
+  if (A.VIEW_FA) A.VIEW_FA.whole = "نقشهٔ کل";
+  /* صفحه‌هایی که در منو نیستند: پدرِ درست تا «📍» ناقص نماند (ممیزی) */
+  if (A.NAV_PARENT) { A.NAV_PARENT.journey = "topics"; A.NAV_PARENT.epi_lesson = "epi_course"; A.NAV_PARENT.ksims = "kmap"; A.NAV_PARENT.move = "moves"; }
+
+  /* ---------- نوارِ «این‌جا» (زیرِ «📍») و مسیرِ کاریِ فعال ---------- */
+  function strip() {
+    var v = A.state.view, m = M[v];
+    if (!m || v === "whole") return null;
+    var on = !((S.settings().orient || {}).hide);
+    var j = m.j ? JOB[m.j] : null;
+    var box = h("div", { class: "orient-strip" + (on ? "" : " folded"), dir: "rtl", "data-job": m.j || "" });
+    if (!on) { box.appendChild(h("button", { class: "linkish small orient-unfold", onclick: function () { var st = S.settings(); st.orient = st.orient || {}; st.orient.hide = false; S.saveSettings(st); A.render(); } }, "🧭 این صفحه چیست؟")); return box; }
+    box.appendChild(h("div", { class: "row gap wrap orient-line" },
+      j ? h("span", { class: "chip orient-job-chip" }, j.ic + " " + j.fa) : null,
+      h("span", { class: "small orient-what" }, m.what), m.why ? h("span", { class: "small muted orient-why" }, "— " + m.why) : null));
+    var tail = h("div", { class: "row gap wrap small orient-tail" });
+    (m.next || []).forEach(function (n) { tail.appendChild(h("button", { class: "linkish orient-next", onclick: function () { A.go(n[0]); } }, "بعدش: " + n[1] + " ←")); });
+    tail.appendChild(h("button", { class: "linkish orient-tomap", onclick: function () { A.go("whole"); } }, "🧭 نقشهٔ کل"));
+    tail.appendChild(h("button", { class: "linkish muted orient-fold", title: "این نوار را جمع کن (از تنظیمات یا همین‌جا برمی‌گردد)", onclick: function () { var st = S.settings(); st.orient = st.orient || {}; st.orient.hide = true; S.saveSettings(st); A.render(); } }, "جمع کن"));
+    box.appendChild(tail);
+    return box;
+  }
+  function flowBox() {
+    var f = flowState(); if (!f) return null;
+    var fl = FLOWS[f.id], i = Math.max(0, Math.min(f.i, fl.steps.length - 1)), s = fl.steps[i], here = A.state.view === s.v;
+    var box = h("div", { class: "card orient-flow", dir: "rtl", "data-flow": f.id },
+      h("div", { class: "row between wrap" }, h("strong", {}, fl.ic + " مسیرِ «" + fl.fa + "» — قدمِ " + fa(i + 1) + " از " + fa(fl.steps.length)),
+        h("button", { class: "linkish small orient-flow-end", onclick: function () { setFlow(null); A.render(); } }, "خروج از مسیر")),
+      h("p", { class: "orient-flow-step" }, s.t),
+      h("div", { class: "row gap wrap" },
+        here ? null : h("button", { class: "btn sm orient-flow-go", onclick: function () { A.go(s.v); } }, "برو به این قدم («" + ((A.viewLabel && A.viewLabel(s.v)) || s.v) + "»)"),
+        i > 0 ? h("button", { class: "btn ghost sm orient-flow-prev", onclick: function () { setFlow({ id: f.id, i: i - 1 }); A.go(fl.steps[i - 1].v); } }, "→ قدمِ قبل") : null,
+        i < fl.steps.length - 1 ? h("button", { class: "btn sm orient-flow-next", onclick: function () { setFlow({ id: f.id, i: i + 1 }); A.go(fl.steps[i + 1].v); } }, "انجام شد — قدمِ بعد ←")
+          : h("button", { class: "btn sm orient-flow-done", onclick: function () { setFlow(null); A.toast("مسیر تمام شد. هر روز از «امروز» ادامه بده."); A.go("home"); } }, "پایانِ مسیر ✓")));
+    return box;
+  }
+  var rawRender = A.render;
+  A.render = function () {
+    rawRender();
+    var m = document.getElementById("main"); if (!m || (A.HOST && !S.loaded)) return;
+    try {
+      var cr = m.querySelector("nav.crumbs"), at = cr ? cr.nextSibling : m.firstChild;
+      var s = strip(), f = flowBox();
+      if (f) m.insertBefore(f, at);
+      if (s) m.insertBefore(s, f || at);
+    } catch (e) { console.error(e); }
+  };
 })(APP);
