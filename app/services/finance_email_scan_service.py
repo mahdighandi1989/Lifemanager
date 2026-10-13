@@ -215,9 +215,45 @@ def _institution_compatible(acc: FinancialAccount, institution: Optional[str]) -
     return a in b or b in a
 
 
+def _ref_digits(ref: Optional[str]) -> str:
+    """Digits that identify the account inside a ref. An IBAN drops its
+    country+check prefix («AE53») so only the bank-code+account part remains."""
+    r = re.sub(r"\s+", "", str(ref or ""))
+    if re.match(r"^[A-Za-z]{2}\d{2}", r) and len(r) >= 15:
+        r = r[4:]
+    return re.sub(r"\D", "", r)
+
+
+_STRONG_REF_DIGITS = 10
+
+
+def _refs_same_account(a: Optional[str], b: Optional[str]) -> bool:
+    """STRONG equivalence between two refs of one account: identical, or the
+    shorter one is a ≥10-digit tail of the longer («2776274214006» is the
+    account-number part of IBAN «AE53 013 0002776274214006»). Never true for a
+    masked last-4 — four digits are a hint, not an identity; and NEVER decided
+    by balance (equal balances prove nothing: 2026-10-13 owner)."""
+    if not a or not b:
+        return False
+    da, db_ = _ref_digits(a), _ref_digits(b)
+    short, long_ = (da, db_) if len(da) <= len(db_) else (db_, da)
+    # identical MASKED refs («••4321» at two banks) are not strong either
+    return len(short) >= _STRONG_REF_DIGITS and long_.endswith(short)
+
+
+def _weak_ref_tail(ref: Optional[str]) -> Optional[str]:
+    """The last-4 of a MASKED ref («••4006»), else None (strong refs aren't weak)."""
+    r = str(ref or "")
+    d = _ref_digits(r)
+    if 3 <= len(d) <= 6 and not re.match(r"^[A-Za-z]{2}\d{2}", r):
+        return d[-4:]
+    return None
+
+
 async def _match_account(
     db: AsyncSession, uid: int, institution: Optional[str], ref: Optional[str],
     source_ref: Optional[str] = None,
+    balance: Optional[Decimal] = None, currency: Optional[str] = None,
 ) -> tuple:
     """Find the account this signal belongs to → (account, ambiguous).
 
@@ -241,6 +277,33 @@ async def _match_account(
         for a in accounts:
             if _extra(a).get("account_ref") == ref and _institution_compatible(a, institution):
                 return a, False
+        # Same account seen through another source with a differently-written
+        # ref (IBAN vs bare account number): only a STRONG digit-tail match
+        # counts (≥10 shared digits). Institution NAMES are deliberately not
+        # compared here: the same bank is spelled «bsi» by one source and
+        # «Bank Saderat …» by another. Only a UNIQUE such card merges.
+        strong = [
+            a for a in accounts
+            if any(_refs_same_account(ref, x) for x in (_extra(a).get("account_ref"), _extra(a).get("iban")) if x)
+        ]
+        if len(strong) == 1:
+            return strong[0], False
+        # A masked last-4 («••4006») is only a hint. It joins an existing card
+        # only when that card's full ref ends in those 4 digits, it is the ONLY
+        # such card, and a second independent signal agrees (same currency AND
+        # same balance). Balance alone — or a bare last-4 — never merges.
+        tail = _weak_ref_tail(ref)
+        if tail and balance is not None and currency:
+            cands = [
+                a for a in accounts
+                if any(_ref_digits(x).endswith(tail) and len(_ref_digits(x)) >= _STRONG_REF_DIGITS
+                       for x in (_extra(a).get("account_ref"), _extra(a).get("iban")) if x)
+            ]
+            if len(cands) == 1:
+                c = cands[0]
+                if (c.currency or "").upper() == str(currency).upper() \
+                        and _to_decimal(c.balance) == balance:
+                    return c, False
         # a real ref that matches no stored ref ⇒ a DISTINCT account; do not
         # fall through to the loose institution-substring match.
         return None, False
@@ -509,7 +572,9 @@ async def apply_account_signal(
     if bal is None and not account_ref and not iban:
         return {"created": 0, "updated": 0, "account_id": None}
 
-    acc, ambiguous = await _match_account(db, uid, institution, account_ref, source_ref=source_ref)
+    acc, ambiguous = await _match_account(
+        db, uid, institution, account_ref, source_ref=source_ref, balance=bal, currency=currency,
+    )
     created = updated = 0
     if acc is None and ambiguous:
         # several cards at this institution and no ref — no way to know which
