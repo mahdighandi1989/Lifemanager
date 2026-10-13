@@ -86,8 +86,9 @@ export default function LearningArchitecturePage() {
       saveMany: (records) => api.post(`/app-records/${APP}/bulk`, { records }).then((r) => r.data),
       del: (id) => api.delete(`/app-records/${APP}/${encodeURIComponent(id)}`).then((r) => r.data),
       // opts.fileIds: the caller's own image/PDF attachments (≤4) for a vision-capable model — e.g. the photo of an IQ item
-      // opts.maxTokens: answer budget for large JSON (whole decompositions, batches of problems) — the server default (2500) cut them off (2026-10-13)
-      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: (opts && opts.fileIds) || [], ...(opts && opts.maxTokens ? { max_tokens: Math.min(8192, opts.maxTokens) } : {}) }).then((r) => {
+      // opts.maxTokens: answer budget. The server default (2500) cut decompositions and batches mid-JSON, and the gateway accepts a reply
+      // stopped at MAX_TOKENS as success — so long critiques/«بیان دیگر» were silently truncated too. Every call gets ≥ 6000 (2026-10-13).
+      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: (opts && opts.fileIds) || [], max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000) }).then((r) => {
         if (!r.data.ok) throw new Error(r.data.error || 'هوش مصنوعی پاسخ نداد');
         return r.data.text;
       }),

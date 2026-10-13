@@ -18268,7 +18268,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
         var b = e.target; b.disabled = true; b.textContent = "در حال گردآوری…";
         var titles = SEED.concat(userCases()).map(function (c) { return c.title; }).join("؛ ");
         var msg = "تعداد: " + n.value + (dom.value ? "\nحوزه: " + dom.value : "") + "\nاین‌ها را تکرار نکن: " + titles.slice(0, 6000);
-        A.callAI(BT.HARVEST_SYS + schemaText() + "\nایستگاه‌های مجاز fail: " + window.EPI_PIPE.join(", "), msg).then(function (txt) {
+        A.callAI(BT.HARVEST_SYS + schemaText() + "\nایستگاه‌های مجاز fail: " + window.EPI_PIPE.join(", "), msg, { maxTokens: 8192 }).then(function (txt) {
           var arr; try { arr = A.parseJSONLoose(txt); } catch (er) { throw new Error("پاسخ JSON معتبر نبود"); }
           if (!Array.isArray(arr)) arr = [arr];
           var nOk = 0; arr.forEach(function (o) { var errs = validateCase(o); o.id = A.uid("ecase"); o.type = "ecase"; o.kind = "real"; o.by = "ai"; o.status = "pending"; o.grp = o.grp ? "ai_" + o.grp : o.id; o.aiErr = errs; S.put(o); nOk++; });
