@@ -4296,3 +4296,8 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 ## 2026-10-13 — «معماری یادگیری عمیق»: داوریِ ۶ مثالِ ناقصِ جزوه
 - **FINDING:** جزوه کامل خوانده شد؛ هر ۶ مثالِ ناقص خطای سازنده بود (رمزگذاری/برچسب)، نه جزوه. ۲ مثال (s23/s24) فقط با جابه‌جاییِ ایستگاهِ یک قاعده کامل می‌شوند — تصمیمِ مالک.
 - **CHANGE:** `apps/learning-architecture/src/app/epi_cases_a.js` (۴ مثال). مکان‌یابیِ کامل ۰٫۸۸ ⇒ ۰٫۹۶. بی تغییرِ قاعده/وزن/معیار/متنِ جزوه. WORKLOG ِ صفحه (26).
+
+## 2026-10-13 — آینهٔ درایو: Google Sheets API خاموش در پروژهٔ Google Cloud
+- **FINDING:** همهٔ رکوردهای آینه با `HttpError 403 … Google Sheets API has not been used in project 31712827799 before or it is disabled` شکست می‌خوردند. علت تنظیمِ پروژهٔ گوگل است (Sheets API روشن نیست)، نه کد و نه اجازهٔ مالک.
+- **CHANGE:** `app/services/app_mirror_service.py` — `api_disabled_message`: پیامِ فارسی با پیوندِ Enable، توقفِ اجرا به‌جای کوبیدنِ هر رکورد؛ صفحه خطاهای هم‌علت را یک بار نشان می‌دهد. آزمون در `tests/test_app_mirror.py`. WORKLOG ِ صفحه (27).
+- **ACTION (مالک):** Enable کردنِ Google Sheets API در کنسولِ Google Cloud.

@@ -31,5 +31,11 @@ const { chromium } = require('playwright');
   // learning course: protocol lesson + new simulator renders
   await p.evaluate(() => APP.go('lesson', 36, 's2')); await p.waitForTimeout(1200);
   info.sim36 = await p.locator('main .crs-sim').count();
+  // خطای هم‌علتِ آینه (مثلاً «Google Sheets API روشن نیست») یک بار با شمار، نه بیست بار
+  await p.evaluate(() => { const m = 'API روشن نیست — Enable کن: https://console.developers.google.com/apis/api/sheets.googleapis.com/overview?project=1'; APP.mirrorInfo = () => Promise.resolve({ connected: true, root_url: '', items: Array.from({ length: 20 }, (_, i) => ({ title: 'پرونده ' + i, pending: true, error: m })) }); APP.go('settings'); });
+  await p.waitForTimeout(250);
+  info.mirrErr = await p.locator('main .mirror-err').allInnerTexts();
+  if (!(info.mirrErr.length === 1 && /۲۰ مورد/.test(info.mirrErr[0]) && /Enable/.test(info.mirrErr[0]))) errors.push('grouped mirror error ' + JSON.stringify(info.mirrErr));
+
   console.log(JSON.stringify(info, null, 1)); console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); await b.close();
 })();

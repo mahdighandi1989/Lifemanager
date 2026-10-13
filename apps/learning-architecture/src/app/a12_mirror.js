@@ -401,8 +401,10 @@
           if (ms.length && !ai.all_priced) us.appendChild(h("p", { class: "small muted" }, "برای دیدنِ هزینهٔ تخمینی، قیمتِ مدل را در «تنظیماتِ AI ‹ 💲 قیمت» از صفحهٔ قیمتِ ارائه‌دهنده وارد کن (ارائه‌دهنده‌ها قیمت را از راهِ API نمی‌دهند). توکن ≈ نویسه÷۴ است؛ عددِ دقیق فقط در صورت‌حسابِ ارائه‌دهنده."));
         }, function () { us.textContent = "حجم و مصرف خوانده نشد."; });
       }
-      var errs = items.filter(function (i) { return i.error; }).slice(0, 5);
-      if (errs.length) sec.appendChild(h("ul", { class: "small" }, errs.map(function (i) { return h("li", {}, i.title + ": " + i.error); })));
+      /* خطاهای هم‌علت (مثلاً «API روشن نیست») یک بار با شمار، نه بیست بار */
+      var byMsg = {}, order = [];
+      items.filter(function (i) { return i.error; }).forEach(function (i) { if (!byMsg[i.error]) { byMsg[i.error] = []; order.push(i.error); } byMsg[i.error].push(i.title); });
+      if (order.length) sec.appendChild(h("ul", { class: "small", dir: "rtl" }, order.slice(0, 5).map(function (m) { var t = byMsg[m]; return h("li", { class: "mirror-err" }, (t.length > 1 ? fa(t.length) + " مورد (" + t.slice(0, 3).join("، ") + (t.length > 3 ? "، …" : "") + ")" : t[0]) + ": ", h("span", { style: "overflow-wrap:anywhere" }, m)); })));
     });
     return root;
   };

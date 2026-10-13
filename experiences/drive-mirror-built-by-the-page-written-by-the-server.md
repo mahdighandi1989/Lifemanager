@@ -48,3 +48,8 @@ BUILD.case = rec => ({ group: "Cases", title: rec.title, tabs: [
 
 ## 🔗 References
 - مرتبط: owner-inspection-loop-with-supervisor-routines, mount-standalone-app-natively-instead-of-iframe, google-drive-oauth-offline-integration
+
+## Update 2026-10-13 — «API در پروژهٔ ابری خاموش است» یک علت است، نه N خطا
+- یک API ِ خاموش (`403 SERVICE_DISABLED` / `accessNotConfigured` / «has not been used in project … or it is disabled») را از خطای رکورد و از سهمیه جدا کن: هر رکورد همان‌طور شکست می‌خورد تا مالک یک بار آن را Enable کند.
+- با اولین وقوع اجرا را متوقف کن (مثلِ سهمیه)، همان پیام را روی صف بنشان، و نامِ دقیقِ API + پیوندِ Enable با شمارهٔ پروژه را به زبانِ کاربر بده. در UI خطاهای هم‌متن را گروه کن («۲۰ مورد: …»).
+- Drive API و Sheets API جدا روشن/خاموش می‌شوند: «درایو وصل است» و ساخته‌شدنِ فولدرها تضمین نمی‌کند که شیت نوشته شود.

@@ -286,6 +286,45 @@ async def test_failed_rows_go_last_and_quota_stops_the_run(db_session, monkeypat
     assert sum(1 for i in st["items"] if i["pending"]) == 1
 
 
+
+@pytest.mark.asyncio
+async def test_sheets_api_disabled_is_said_once_in_persian_and_stops_the_run(db_session, monkeypatch):
+    """Production 2026-10-13: «Google Sheets API has not been used in project … or it is disabled» ⇒ every
+    record failed with the raw English HttpError. It is ONE cause (a switch in Google Cloud), not 20 bad rows."""
+    from app.services import app_mirror_service as svc
+    from app.services import inspection_drive
+
+    async def fake_root(db, client):
+        return "ROOT"
+
+    monkeypatch.setattr(inspection_drive, "root_folder", fake_root)
+    await svc.upsert(db_session, user_id=1, app="learning-architecture",
+                     items=[_item("case_a"), _item("case_b"), _item("case_c")], deleted=[])
+
+    class Disabled(Exception):
+        resp = type("R", (), {"status": 403})()
+
+    calls = []
+
+    class OffWriter(FakeWriter):
+        def create_sheet(self, title, folder_id):
+            calls.append(title)
+            raise Disabled('<HttpError 403 when requesting https://sheets.googleapis.com/v4/spreadsheets returned '
+                           '"Google Sheets API has not been used in project 31712827799 before or it is disabled.">')
+
+    res = await svc.sync_pending(db_session, clients=(FakeDrive(), OffWriter()))
+    assert res["stopped"] == "api_disabled" and len(calls) == 1, "one try, not one per record"
+    st = await svc.status(db_session, user_id=1, app="learning-architecture")
+    errs = {i["error"] for i in st["items"]}
+    assert len(errs) == 1, errs
+    msg = errs.pop()
+    assert "Google Sheets API" in msg and "sheets.googleapis.com/overview?project=31712827799" in msg and "Enable" in msg
+    assert "HttpError" not in msg
+    assert not svc.is_quota_error(Disabled("x")) and svc.api_disabled_message(Exception("boom")) == ""
+    # once enabled, the next run writes everything
+    res = await svc.sync_pending(db_session, clients=(FakeDrive(), FakeWriter()))
+    assert res["written"] == 3
+
 class FakeDriveUp(FakeDrive):
     def __init__(self):
         super().__init__()

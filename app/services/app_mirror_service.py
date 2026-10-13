@@ -166,6 +166,34 @@ def is_quota_error(exc: Exception) -> bool:
     return st == 429 or (st == 403 and ("ratelimitexceeded" in text or "rate_limit" in text or "quota" in text))
 
 
+_APIS = (("sheets.googleapis.com", "Google Sheets API"), ("drive.googleapis.com", "Google Drive API"))
+
+
+def api_disabled_message(exc: Exception) -> str:
+    """A Google API switched off in the Cloud project (403 SERVICE_DISABLED) is NOT a per-record
+    failure: every record fails the same way until the owner enables it once. Return the honest
+    Persian remedy (with the exact enable link), or "" if this is some other error."""
+    text = str(exc)
+    body = getattr(exc, "content", b"")
+    try:
+        text += " " + (body.decode("utf-8", "ignore") if isinstance(body, (bytes, bytearray)) else str(body or ""))
+    except Exception:  # noqa: BLE001
+        pass
+    low = text.lower()
+    if not ("service_disabled" in low or "accessnotconfigured" in low or "has not been used in project" in low
+            or ("it is disabled" in low and "api" in low)):
+        return ""
+    import re
+
+    api, label = next(((a, lab) for a, lab in _APIS if a in low), ("", "Google API"))
+    m = re.search(r"project[= ](\d{4,})", text)
+    proj = m.group(1) if m else ""
+    link = (f"https://console.developers.google.com/apis/api/{api}/overview" + (f"?project={proj}" if proj else "")) if api else \
+        "https://console.cloud.google.com/apis/library"
+    return (f"«{label}» در پروژهٔ Google Cloud ِ این برنامه روشن نیست (مشکل از اجازهٔ تو یا از این رکورد نیست). "
+            f"یک بار این‌جا Enable کن: {link} — چند دقیقه بعد «همگام‌سازیِ الان» را بزن؛ چیزی گم نشده و همه از صف نوشته می‌شوند.")
+
+
 def _col(n: int) -> str:
     """1 → A, 27 → AA."""
     out = ""
@@ -384,6 +412,14 @@ async def _sync_pending(db: AsyncSession, *, user_id, app, limit, clients) -> Di
 
             r.error = scrub_secrets(f"{type(exc).__name__}: {exc}")[:500]
             logger.warning("app mirror %s/%s failed: %s", r.app, r.rec_id, r.error)
+            disabled = api_disabled_message(exc)
+            if disabled:  # the same cause for every row ⇒ say it once, stop hammering Google (next run resumes)
+                for x in rows:
+                    if (x.synced_hash or "") != (x.doc_hash or ""):
+                        x.error = disabled[:500]
+                stopped = "api_disabled"
+                await db.commit()
+                break
             if is_quota_error(exc):
                 stopped = "quota"
                 await db.commit()
