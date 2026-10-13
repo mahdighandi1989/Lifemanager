@@ -62,3 +62,20 @@ async def test_supervisor_reads_cards_and_why_each_sms_did_or_did_not_apply(api_
 def test_a_stranger_cannot_read_it(api_client):
     r = api_client.get("/api/inspection/audit/finance")
     assert r.status_code in (401, 403)
+
+
+def test_ai_probe_is_gated_and_uses_the_page_task(api_client, monkeypatch):
+    import app.services.ai.inference_gateway as gw
+
+    seen = {}
+
+    async def fake_complete(db, user, task=None, system=None, max_tokens=None, **kw):
+        seen.update(user=user, task=task, system=system)
+        return {"ok": True, "text": "{}", "model": "m"}
+
+    monkeypatch.setattr(gw, "complete", fake_complete)
+    assert api_client.post("/api/inspection/audit/ai", json={"user": "x"}).status_code in (401, 403)
+    r = api_client.post("/api/inspection/audit/ai", json={"system": "s", "user": "u"}, headers=SUP)
+    assert r.status_code == 200 and r.json()["text"] == "{}"
+    assert seen == {"user": "u", "task": "learning_architecture", "system": "s"}
+    assert api_client.post("/api/inspection/audit/ai", json={"user": "x" * 40001}, headers=SUP).status_code == 413

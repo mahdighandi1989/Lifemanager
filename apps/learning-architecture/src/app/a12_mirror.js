@@ -147,6 +147,36 @@
     tabs.push({ name: "ورزش", rows: [["تاریخ", "شکل", "اطمینان", "درست"]].concat((k.log || []).slice(-200).map(function (e) { return [e.d || dt(e.at), e.form || "", e.conf == null ? "" : e.conf + "٪", e.ok == null ? "" : (e.ok ? "✓" : "✗")]; })) });
     return { group: "گره‌گشا — گره‌ها", title: k.name || "گره", tabs: tabs };
   };
+  /* مسئله‌های خودِ مالک (۲۰۲۶-۱۰-۱۳): هر مسئلهٔ واردشده یا «شبیه‌سازِ همین مسئله» یک فولدر + یک شیت — صورت و پاسخ، گام‌ها با گزینهٔ درست و
+     نتیجهٔ وارسیِ سه‌حلی، بن‌بست‌ها، تمرین‌ها، مسئله‌های هم‌ساختار (pbitem) و پیشرفتِ شبیه‌ساز. نمونه‌های آمادهٔ سازنده رکورد ندارند ⇒ آینه نمی‌شوند.
+     مسئلهٔ شخصی از گره‌گشا تابعِ همان انتخابِ درایوِ موقعیتش است. */
+  BUILD.eprob = function (r) {
+    if (!r || !r.p || r.status === "rejected") return null;
+    var p = r.p, o = r.origin || p.origin;
+    if (o && o.type === "kcase") { var kc = S.get(o.id); if (kc && !mirrorOn(kc)) return null; }
+    var chk = r.check || {}, res = chk.res || {};
+    var tabs = [{ name: "خلاصه", rows: [["فیلد", "مقدار"], ["عنوان", p.title || ""], ["رشته", p.field || ""], ["بازهٔ حل‌نشده", p.open || ""],
+      ["وضعیت", r.status === "approved" ? "تأییدشده" : "در انتظارِ تأیید"], ["سازنده", r.personal ? "شبیه‌سازِ همین مسئله (از گره‌گشا)" : r.by === "ai" ? "تجزیهٔ هوش مصنوعی" : "دستی"],
+      ["منابع", (p.src || []).join("\n") || (r.nosrc ? "بی‌منبع" : "")], ["وارسیِ پاسخ‌ها", chk.at ? dt(chk.at) + " — " + (chk.flags || []).length + " پرچم" : "اجرا نشده"],
+      ["در برنامه", link("e_prob", p.id, "about")]] }];
+    tabs.push({ name: "صورت و پاسخ", rows: [["فیلد", "مقدار"], ["صورت", p.statement || ""], ["پاسخِ نهایی", p.answer || ""], [r.personal ? "چرا گیرانداز است" : "چرا سال‌ها حل نشد", p.why_hard || ""], ["درس‌ها", txt(p.lessons || [])]] });
+    tabs.push({ name: "گام‌ها", rows: [["#", "سال · شخص", "وضع تا این لحظه", "پرسش", "گزینهٔ درست", "حرکت", "حرکت‌ها", "سطح", "وارسی (هم‌نظر از ۳)"]].concat((p.stages || []).map(function (st, i) {
+      var ok = (st.opts || []).filter(function (x) { return x && x.ok; })[0], c = res[st.id];
+      return [i + 1, [st.year, st.who].filter(function (x) { return x != null && x !== ""; }).join(" · "), st.ctx || "", st.q || "", ok ? ok.t : "", st.move || "",
+        (A.stageMoves ? A.stageMoves(p, st) : st.mv || []).map(function (m) { return A.MOVES && A.MOVES[m] ? A.MOVES[m].fa : m; }).join("، "), st.lvl || "", c ? c.agree + (c.multi ? " (دوپهلو)" : "") : ""];
+    })) });
+    tabs.push({ name: "بن‌بست‌ها", rows: [["سال · شخص", "ایده", "شکاف"]].concat((p.dead || []).map(function (d) { return [[d.year, d.who].filter(function (x) { return x != null && x !== ""; }).join(" · "), d.idea || "", d.flaw || ""]; })) });
+    tabs.push({ name: "تمرین‌ها", rows: [["#", "پرسش", "پاسخِ درست", "وارسی (هم‌نظر از ۳)"]].concat((p.drills || []).map(function (d, i) { var c = res["drill:" + (i + 1)]; return [i + 1, d.q || "", (d.opts || [])[d.a] || "", c ? String(c.agree) : ""]; })) });
+    var its = S.all("pbitem", function (x) { return x.pid === p.id; });
+    tabs.push({ name: "هم‌ساختار", rows: [["صورت", "پاسخ", "شکل", "بدلی", "وارسی", "پاسخ‌ها", "درست", "موعد"]].concat(its.map(function (x) {
+      var ans = x.atype === "choice" ? ((x.choices || []).filter(function (c) { return c.id === x.answer; })[0] || {}).t || x.answer : x.answer, hh = x.hist || [];
+      return [x.prompt || "", ans || "", x.form || "", x.decoy ? "بله" : "", x.bad ? "معیوب" : x.ver && x.ver.ok ? "۳ از ۳" : "وارسی‌نشده", hh.length, hh.filter(function (e) { return e.ok; }).length, x.due || ""];
+    })) });
+    var pg = S.get("eprog_" + p.id) || { lv: {} }, pr = [["سطح", "گام", "درست در بارِ اول", "خودسنجی", "حرکتِ خودم", "تاریخ"]];
+    Object.keys(pg.lv || {}).forEach(function (lv) { var L = pg.lv[lv] || {}; Object.keys(L).forEach(function (sid) { var e = L[sid] || {}; pr.push([lv, sid, e.first === true ? "✓" : e.first === false ? "✗" : "", e.self == null ? "" : e.self, e.mine || "", dt(e.at)]); }); });
+    tabs.push({ name: "پیشرفتِ شبیه‌ساز", rows: pr });
+    return { group: "مسئله‌های من", title: p.title || "مسئله", tabs: tabs };
+  };
   A.MIRROR_BUILD = BUILD;
 
   /* ---------- صف: چه چیزی دوباره ساخته شود ---------- */
@@ -164,6 +194,8 @@
     }
     if (r.topic && (r.type === "ex" || r.type === "pr" || r.type === "sched" || r.type === "card")) out.push(r.topic);
     if ((r.type === "kitem" || r.type === "kexp") && r.knot) out.push(r.knot);
+    if (r.type === "pbitem" && r.pid) out.push("eprob_" + r.pid);
+    if (r.type === "eprog" && /^eprog_/.test(r.id)) out.push("eprob_" + r.id.slice(6));
     if (r.type === "kcase") (r.knots || []).forEach(function (id) { out.push(id); });
     if (r.type === "topic" || (r.type === "ex" && r.course)) out.push("course");
     return out;
@@ -234,6 +266,7 @@
 
   /* ---------- نشان‌دادنِ پیوند در خودِ صفحه ---------- */
   var REC_OF = { e_case: function () { return A.state.arg; }, topic: function () { return A.state.arg; }, course: function () { return "course"; }, lesson: function () { return "course"; },
+    e_prob: function () { var id = A.state.arg ? "eprob_" + A.state.arg : null, r = id && S.get(id); return r && BUILD.eprob(r) ? id : null; },
     kcase: function () { var r = S.get(A.state.arg); return mirrorOn(r) ? A.state.arg : null; }, knot: function () { var r = S.get(A.state.arg); return mirrorOn(r) ? A.state.arg : null; } };
   function chip(info, rid) {
     var box = h("span", { class: "drv" });

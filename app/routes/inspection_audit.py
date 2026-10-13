@@ -16,7 +16,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -99,3 +100,26 @@ async def finance_audit(days: int = Query(30, ge=1, le=365), messages: int = Que
     # outside the async context: MissingGreenlet on Postgres, 2026-10-11)
     await db.rollback()
     return out
+
+
+class _AIProbe(BaseModel):
+    system: str = ""
+    user: str
+    max_tokens: int | None = None
+
+
+@router.post("/api/inspection/audit/ai", dependencies=[Depends(_gate)], tags=["inspection"])
+async def ai_probe(payload: _AIProbe, db: AsyncSession = Depends(get_db)):
+    """The supervisor runs the learning-architecture page's REAL AI path (task «learning_architecture», the
+    model production would use) on prompts it supplies — e.g. the answer-check / same-structure pipelines
+    on a neutral test problem (owner, 2026-10-13: «اون دو کار باز رو تموم کن»). No owner data is read or
+    written; the only side effect is the gateway's own usage log. Same gate as the board."""
+    if len(payload.system) > 20000 or len(payload.user) > 40000:
+        raise HTTPException(status_code=413, detail="prompt too large")
+    from app.services.ai.inference_gateway import complete
+
+    res = await complete(db, payload.user, task="learning_architecture", system=payload.system or None,
+                         max_tokens=min(payload.max_tokens or 4000, 8000))
+    if not res.get("ok"):
+        return {"ok": False, "success": False, "error": res.get("error") or "no_model", "text": ""}
+    return {"ok": True, "success": True, "text": res.get("text") or "", "model": res.get("model")}

@@ -67,6 +67,18 @@ const { chromium } = require('playwright');
   const st = await api('/api/app-records/learning-architecture/mirror');
   const a = (st.items || []).find(i => i.rec_id === tp[0]);
   info.mirrorItems = (st.items || []).length;
+  // 5b) مسئله‌های خودِ مالک (۲۰۲۶-۱۰-۱۳): مسئلهٔ تأییدشده + مسئلهٔ هم‌ساختار ⇒ یک سندِ «مسئله‌های من» با ۷ زبانه؛ ردشده آینه نمی‌شود
+  mirrorBodies.length = 0;
+  await p.evaluate(() => {
+    const pp = { id: 'pb_u_mirror', title: 'مسئلهٔ آینه', field: 'ریاضی', statement: 's', answer: 'a', why_hard: 'w', src: [], stages: [{ id: 'n1', q: 'q', opts: [{ t: 'درست', ok: true }, { t: 'غلط', ok: false }], mv: ['mv_represent'] }], dead: [], drills: [], lessons: [] };
+    APP.S.put({ id: 'eprob_pb_u_mirror', type: 'eprob', status: 'approved', by: 'ai', p: pp, check: { at: '2026-10-13T00:00:00Z', res: { n1: { agree: 3 } }, flags: [] } });
+    APP.S.put({ id: 'eprob_pb_u_rej', type: 'eprob', status: 'rejected', by: 'ai', p: Object.assign({}, pp, { id: 'pb_u_rej' }) });
+    APP.S.put({ id: APP.uid('pbitem'), type: 'pbitem', pid: 'pb_u_mirror', prompt: 'p', atype: 'int', answer: '3', form: 'numeric', ver: { ok: true }, hist: [], due: APP.today() });
+  });
+  await p.waitForTimeout(3500);
+  const pbDocs = [].concat.apply([], mirrorBodies.map(m => (m.items || []))).filter(i => /^eprob_/.test(i.rec_id));
+  info.mirrorProblem = pbDocs.map(d => d.rec_id + ':' + d.group + ':' + (d.tabs || []).length + ':' + ((d.tabs || []).find(t => t.name === 'هم‌ساختار') || { rows: [] }).rows.length);
+  if (!pbDocs.some(d => d.rec_id === 'eprob_pb_u_mirror' && d.group === 'مسئله‌های من' && d.tabs.length === 7) || pbDocs.some(d => d.rec_id === 'eprob_pb_u_rej')) errors.push('problem mirror ' + JSON.stringify(info.mirrorProblem));
 
   // 6) handbook close goes BACK to the app entry
   await p.evaluate(() => APP.goRoot('home')); await p.waitForTimeout(500);
