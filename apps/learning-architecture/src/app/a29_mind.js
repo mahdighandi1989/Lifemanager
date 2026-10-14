@@ -56,6 +56,8 @@
     }
     S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist); });
     S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist); });
+    /* کارت‌های مرور: اطمینان پیش از دیدنِ پاسخ (c) و نمرهٔ یادآوری (g ≥ ۳ = درست) ⇒ یادگیری و حافظه */
+    S.all("card", function (c) { return !c.sample; }).forEach(function (c) { ingest("s_learn", (c.hist || []).map(function (x) { return { at: x.d, conf: x.c, ok: x.g >= 3 }; })); });
     /* حرکت‌ها: شمارِ پاسخ‌های درست/نادرستِ هر حرکت (دفترِ حرکت‌ها زمان و حرکت را با هم نگه نمی‌دارد ⇒ در روندِ ماهانه نمی‌آید) */
     var mp = S.get("moves_prog"); Object.keys((mp && mp.by) || {}).forEach(function (mv) { var b = mp.by[mv], d = M.dimOf("move:" + mv); for (var i = 0; i < (b.n || 0); i++) put(d, { at: "", ok: i < (b.ok || 0) }); });
     /* داوریِ معرفتی: درجهٔ نهاییِ تو ↔ نتیجهٔ واقعیِ ثبت‌شده در بازبینی */
@@ -69,6 +71,13 @@
         D.s_epi.cal.push({ p: p, ok: ok, at: at });
         D.s_epi.ans.push({ at: at, ok: (p >= 0.5) === ok });
       });
+    });
+    /* ⛓ زنجیرهٔ نگرانی (حسِ اول ↔ رخ داد/نداد) و 🎯 دفترِ پیش‌بینی (احتمال ↔ شد/نشد) ⇒ کالیبراسیونِ همان بُعد */
+    S.all("wchain", function (c) { return c.feel != null && (c.outcome === "رخ داد" || c.outcome === "رخ نداد"); }).forEach(function (c) {
+      var p = c.feel / 100, ok = c.outcome === "رخ داد"; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok });
+    });
+    S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) {
+      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
     });
     S.all("eprob", function (p) { return !p.sample; }).forEach(function (p) { D.s_problem.items.push({ t: "prob", id: p.id, fa: (p.p && p.p.title) || "مسئله", st: p.status, at: p.created }); });
     /* شاخص‌ها */

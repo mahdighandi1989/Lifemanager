@@ -1,14 +1,14 @@
 ---
 name: ناظرِ خودکارِ Lifemanager (Automated Supervisor)
-version: 7
+version: 8
 created: 2026-10-08
 updated: 2026-10-14
-supersedes: docs/supervisor/archive/PROMPT-v6-2026-10-11.md
+supersedes: docs/supervisor/archive/PROMPT-v7-2026-10-14.md
 archive: docs/supervisor/archive/
 routine: «ناظرِ خودکارِ سامانه — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۷
+# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۸
 
 > **این فایل تنها مرجعِ رفتارِ ناظر است.** پرامپتِ خودِ Routine فقط یک اشاره به
 > این آدرس است. هر تغییری در وظایفِ ناظر **این‌جا** نوشته می‌شود؛ نسخهٔ قبلی
@@ -380,6 +380,11 @@ python3 scripts/supervisor/page_map.py    # هر صفحه و هر تب در Chro
 > فیلدِ `errors` داشت یا اسکریپت کدِ **۲** داد، عددها ناقص‌اند — محیط را درست کن و دوباره اجرا کن،
 > و هرگز آن اجرا را مبنای «حذفِ قابلیت» قرار نده. `page_map.py` صفحه‌ای را که به جای دیگری (مثلاً
 > `/login`) رفت «اندازه‌گیری‌نشده» ثبت می‌کند، نه «بی‌کنترل».
+
+**«🗺 قلمروِ سامانه‌ها» ِ صفحهٔ `/apps/learning-architecture` (v8، ۲۰۲۶-۱۰-۱۴، دستورِ مالک):** این قلمرو (`sys-territory`) مالِ توست.
+هر دور پس از کارتابل: `python3 apps/learning-architecture/tools/sys_territory.py status` ⇒ ۲ تا ۴ حوزهٔ کم‌گام (و برگه‌های دستیار با
+`area=sys-territory`) را **با شاهد** یک گام جلو ببر — منبعِ واقعیِ وارسی‌شده، گزاره و ردهٔ آن بر پایهٔ اصول، یا بستنِ کمبودِ صفحه با ساختنِ
+ابزارِ واقعی — دقیقاً طبقِ بخشِ «🗺 قلمروِ سامانه‌ها» در `apps/learning-architecture/AGENTS.md` (گامِ ۵ را هرگز ننویس؛ `check` باید سبز بماند).
 
 **دیاگرامِ زندهٔ `/system-map`** از روی همین قراردادها خودش را می‌سازد (CLAUDE.md). اگر چیزی که
 اضافه شده در آن نیست، کسی قرارداد را دور زده — ثبتِ درست را اصلاح کن، **نه نقشه را**.
