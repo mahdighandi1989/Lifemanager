@@ -926,7 +926,8 @@
     out.appendChild(h("p", { class: "small muted" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده؛ فقط پیشنهاد." + (dropped ? " " + fa(dropped) + " پیشنهاد کنار گذاشته شد (قالبِ نادرست، اشارهٔ تشخیصی، یا فرضیه دربارهٔ حالِ درونیِ دیگران)." : "")));
     ok.forEach(function (x) {
       var added = kc.hyps.some(function (y) { return y.text === x.text; });
-      var b = h("button", { class: "btn sm", disabled: added, onclick: function () {
+      // برچسبِ یکتا برای هر پیشنهاد (کارزارِ آزمون sc09/sc12: پنج دکمهٔ هم‌نام؛ دستیار نمی‌دانست کدام مالِ کدام خانواده است)
+      var b = h("button", { class: "btn sm", disabled: added, "aria-label": "افزودن به فرضیه‌های " + x.fam + " " + ((KFM[x.fam] || {}).fa || "") + ": «" + String(x.text || "").slice(0, 50) + "»", onclick: function () {
         kc.hyps.push({ fam: x.fam, sub: String(x.sub || ""), text: String(x.text), rival: String(x.rival || ""), test: String(x.test || ""), by: "ai", at: now() }); H.put();
         b.disabled = true; b.textContent = "افزوده شد";
       } }, added ? "افزوده شده" : "افزودن به فرضیه‌های این خانواده");

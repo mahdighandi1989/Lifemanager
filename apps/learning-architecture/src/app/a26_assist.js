@@ -172,6 +172,12 @@
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
     sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "")); });
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
+    // متنِ دیدنیِ صفحه (فشرده): پیشنهادهای هوش مصنوعی، عددها، پیام‌ها — کارزارِ آزمون (sc09/sc12): دستیار فقط فیلد و دکمه می‌دید و حدس می‌زد
+    try {
+      var main = document.getElementById("main"), c = main && main.cloneNode(true);
+      if (c) { c.querySelectorAll("script,style,svg,select,textarea,input,option,button,[hidden],details:not([open]) > :not(summary)").forEach(function (x) { x.remove(); });
+        var tx = String(c.textContent || "").replace(/\s+/g, " ").trim(); if (tx) L.push("متنِ صفحه (فشرده؛ فقط برای دیدن، نه کلید): " + clip(tx, 3000)); }
+    } catch (e) { }
     return L.join("\n");
   }
   /* کلیدِ کهنه (نما دوباره رسم شد) ⇒ با همان برچسب و نوع و «چندمین» دوباره پیدا کن.

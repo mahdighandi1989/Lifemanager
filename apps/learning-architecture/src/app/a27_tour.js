@@ -86,7 +86,7 @@
       add("موقعیت ثبت شد (گره‌گشا)", kc);
       add("پله‌ها تا ریشه و «ریشه را تأیید کن» — تصمیمِ خودت", kc && kc.root && kc.root.confirmed, true, true);
       add("گرهِ ذهنی ساخته شد", c.knot.length);
-      add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.length);
+      add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.filter(function (x) { return A.kservable ? A.kservable(x) : true; }).length);
       add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
       var ks = c.knot;
       add("ورزیده شد — با معیارِ خودِ گره‌گشا", ks.length && ks.every(knotSolved), false);

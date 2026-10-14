@@ -25779,7 +25779,8 @@ APP.goFromURL = function (q) {
     out.appendChild(h("p", { class: "small muted" }, "ساختهٔ هوش مصنوعی — وارسی‌نشده؛ فقط پیشنهاد." + (dropped ? " " + fa(dropped) + " پیشنهاد کنار گذاشته شد (قالبِ نادرست، اشارهٔ تشخیصی، یا فرضیه دربارهٔ حالِ درونیِ دیگران)." : "")));
     ok.forEach(function (x) {
       var added = kc.hyps.some(function (y) { return y.text === x.text; });
-      var b = h("button", { class: "btn sm", disabled: added, onclick: function () {
+      // برچسبِ یکتا برای هر پیشنهاد (کارزارِ آزمون sc09/sc12: پنج دکمهٔ هم‌نام؛ دستیار نمی‌دانست کدام مالِ کدام خانواده است)
+      var b = h("button", { class: "btn sm", disabled: added, "aria-label": "افزودن به فرضیه‌های " + x.fam + " " + ((KFM[x.fam] || {}).fa || "") + ": «" + String(x.text || "").slice(0, 50) + "»", onclick: function () {
         kc.hyps.push({ fam: x.fam, sub: String(x.sub || ""), text: String(x.text), rival: String(x.rival || ""), test: String(x.test || ""), by: "ai", at: now() }); H.put();
         b.disabled = true; b.textContent = "افزوده شد";
       } }, added ? "افزوده شده" : "افزودن به فرضیه‌های این خانواده");
@@ -30814,6 +30815,12 @@ APP.goFromURL = function (q) {
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
     sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "")); });
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
+    // متنِ دیدنیِ صفحه (فشرده): پیشنهادهای هوش مصنوعی، عددها، پیام‌ها — کارزارِ آزمون (sc09/sc12): دستیار فقط فیلد و دکمه می‌دید و حدس می‌زد
+    try {
+      var main = document.getElementById("main"), c = main && main.cloneNode(true);
+      if (c) { c.querySelectorAll("script,style,svg,select,textarea,input,option,button,[hidden],details:not([open]) > :not(summary)").forEach(function (x) { x.remove(); });
+        var tx = String(c.textContent || "").replace(/\s+/g, " ").trim(); if (tx) L.push("متنِ صفحه (فشرده؛ فقط برای دیدن، نه کلید): " + clip(tx, 3000)); }
+    } catch (e) { }
     return L.join("\n");
   }
   /* کلیدِ کهنه (نما دوباره رسم شد) ⇒ با همان برچسب و نوع و «چندمین» دوباره پیدا کن.
@@ -31507,7 +31514,7 @@ APP.goFromURL = function (q) {
       add("موقعیت ثبت شد (گره‌گشا)", kc);
       add("پله‌ها تا ریشه و «ریشه را تأیید کن» — تصمیمِ خودت", kc && kc.root && kc.root.confirmed, true, true);
       add("گرهِ ذهنی ساخته شد", c.knot.length);
-      add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.length);
+      add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.filter(function (x) { return A.kservable ? A.kservable(x) : true; }).length);
       add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
       var ks = c.knot;
       add("ورزیده شد — با معیارِ خودِ گره‌گشا", ks.length && ks.every(knotSolved), false);
@@ -32115,6 +32122,9 @@ APP.goFromURL = function (q) {
     return ss.concat([{ id: "s_epi", fa: "داوریِ معرفتی" }]);
   };
   M.dimOf = function (ref) {
+    // خانوادهٔ گره یک بُعدِ اصلی دارد (معنای خودِ خانواده)؛ شمارشِ حوزه‌ها فقط برای فن/حرکت/ایستگاه — کارزارِ آزمون (sc01، sc03، sc04):
+    // F11 در شش حوزهٔ «خودشناسی» آمده بود و گره‌های برداشت زیرِ خودشناسی می‌رفتند
+    var kf = /^kfam:(F\d+)$/.exec(ref); if (kf && KF_DEFAULT[kf[1]]) return KF_DEFAULT[kf[1]];
     var cnt = {};
     ((window.SYS_TERR || {}).systems || []).forEach(function (m) { (m.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { if ((a.tools || []).indexOf(ref) >= 0) cnt[m.id] = (cnt[m.id] || 0) + 1; }); }); });
     var best = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a] || a.localeCompare(b); })[0];

@@ -17,6 +17,9 @@
     return ss.concat([{ id: "s_epi", fa: "داوریِ معرفتی" }]);
   };
   M.dimOf = function (ref) {
+    // خانوادهٔ گره یک بُعدِ اصلی دارد (معنای خودِ خانواده)؛ شمارشِ حوزه‌ها فقط برای فن/حرکت/ایستگاه — کارزارِ آزمون (sc01، sc03، sc04):
+    // F11 در شش حوزهٔ «خودشناسی» آمده بود و گره‌های برداشت زیرِ خودشناسی می‌رفتند
+    var kf = /^kfam:(F\d+)$/.exec(ref); if (kf && KF_DEFAULT[kf[1]]) return KF_DEFAULT[kf[1]];
     var cnt = {};
     ((window.SYS_TERR || {}).systems || []).forEach(function (m) { (m.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { if ((a.tools || []).indexOf(ref) >= 0) cnt[m.id] = (cnt[m.id] || 0) + 1; }); }); });
     var best = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a] || a.localeCompare(b); })[0];
