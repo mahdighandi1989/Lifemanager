@@ -35,6 +35,7 @@ routine: «بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناس
    (`verified`/`corrected`)؛ هر `request` را **در همین دور و پیش از گردآوریِ عادی** انجام بده، با `python3 scripts/supervisor/inspection.py answer`
    زیرِ برگه‌اش جواب بنویس و `--status done`. اگر کارِ عادیِ همین دورت برگهٔ بازی را هم حل کرد، `handoff.py add --by backtest --kind owner-did
    --sheet N …` بزن تا صفِ فوری دوباره‌کاری نکند. پیش از پوش: `python3 scripts/supervisor/handoff.py guard --routine backtest && python3 scripts/supervisor/handoff.py check`.
+   اگر پوش به‌خاطرِ عقب‌بودن رد شد و rebase کردی: `python3 scripts/supervisor/handoff.py check --fix` (نمای `HANDOFFS.md` بازسازی شود) و دوباره `guard`، سپس دروازه.
    قراردادِ کامل: بخشِ «هماهنگی میانِ روتین‌ها» در پایینِ همین فایل.
 1. **همگام شو و وضع را بخوان:** `node apps/learning-architecture/tools/epi_backtest.js status` — پیکره، حوزه‌های کم‌شمار،
    قاعده‌هایی که هیچ واقعه‌ای نیازموده، سهمِ وقایعِ سالم. `python3 scripts/supervisor/inspection.py epi-decisions` —
@@ -151,7 +152,7 @@ routine: «بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناس
 
 همهٔ دستورها در همین گیت‌اند (`docs/supervisor/*.md`) و پیامِ هر Routine فقط اشاره‌گر است — پس هر روتین دستورِ دیگری را **می‌تواند و
 باید** بخواند. منبعِ واحدِ «چه کسی مالکِ چیست»: **`docs/supervisor/ownership.json`** (مسیرها، مالک، تنها ابزار/روشِ تغییر، بخشِ
-دستورِ مالک، دفترِ مالک). دفترِ دست‌به‌دست: **`docs/supervisor/handoffs.json`** (+ نمای خوانای `HANDOFFS.md`). ابزار:
+دستورِ مالک، دفترِ مالک). دفترِ دست‌به‌دست: **`docs/supervisor/handoffs/`** — یک فایل برای هر مورد، تا دو روتین هرگز تعارض نخورند (+ نمای خوانای `HANDOFFS.md`). ابزار:
 `python3 scripts/supervisor/handoff.py` (`owner` · `precheck` · `add` · `inbox` · `close` · `check` · `guard`).
 
 **هویت:** اولِ هر اجرا `export SUPERVISOR_ROUTINE=backtest` — `ship.sh` با آن نگهبانِ دست‌به‌دست را اجرا می‌کند و پوشی را که به قلمروِ

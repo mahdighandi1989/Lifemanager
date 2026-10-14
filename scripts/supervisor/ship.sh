@@ -55,6 +55,7 @@ gate() {
 say "Hand-off guard (${SUPERVISOR_ROUTINE:-no routine})"
 git fetch -q origin main 2>/dev/null || true
 python3 scripts/supervisor/handoff.py guard --routine "${SUPERVISOR_ROUTINE:-}" --base origin/main || exit 1
+python3 scripts/supervisor/handoff.py check --fix >/dev/null || true   # regenerate the HANDOFFS.md view
 python3 scripts/supervisor/handoff.py check || exit 1
 
 gate || exit 1
@@ -73,6 +74,9 @@ retry git fetch -q origin main
 if ! git merge-base --is-ancestor origin/main HEAD; then
   echo "main has moved — rebasing onto origin/main and running the gate again"
   git rebase -q origin/main || { git rebase --abort; echo "❌ rebase conflict — resolve it, nothing was pushed"; exit 1; }
+  # another routine's hand-offs arrived: the view (merge=union) is regenerated, the guard runs again on the rebased work
+  python3 scripts/supervisor/handoff.py check --fix >/dev/null || true
+  python3 scripts/supervisor/handoff.py guard --routine "${SUPERVISOR_ROUTINE:-}" --base origin/main || exit 1
   gate || exit 1
   if [ -n "$(git status --porcelain)" ]; then git add -A && git commit -q -m "build: frontend/dist after rebase"; fi
 fi

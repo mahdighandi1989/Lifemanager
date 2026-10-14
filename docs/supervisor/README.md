@@ -39,7 +39,7 @@
 
 - [`ownership.json`](ownership.json) — هر قلمرو (مسیرها) ⇐ مالک، تنها ابزار/روشِ تغییر، بخشِ دستورِ مالک، دفترِ مالک. صفحهٔ «معماری یادگیری» هم آن را
   می‌خواند تا «💬 دستیار» برگه را به قلمرو و روتینِ درست بفرستد.
-- [`handoffs.json`](handoffs.json) / [`HANDOFFS.md`](HANDOFFS.md) — هر کار در قلمروِ دیگری (`did`)، هر درخواست از مالک (`request`)، و هر
+- [`handoffs/`](handoffs/) (یک فایل برای هر مورد) / [`HANDOFFS.md`](HANDOFFS.md) — هر کار در قلمروِ دیگری (`did`)، هر درخواست از مالک (`request`)، و هر
   «مالک خودش انجام داده بود» (`owner-did`)؛ با بستنِ مالک (`verified` / `corrected` / `done`).
 - [`scripts/supervisor/handoff.py`](../../scripts/supervisor/handoff.py) — `owner`، `precheck` («قبلاً انجام شده؟»)، `add`، `inbox` (اولِ هر دور)،
   `close`، `check` (کهنه‌ها)، `guard` (در `ship.sh`: پوشِ بی‌دست‌به‌دست به قلمروِ دیگری رد می‌شود).

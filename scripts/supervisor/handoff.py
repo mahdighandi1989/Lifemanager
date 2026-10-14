@@ -5,7 +5,7 @@
  و اگر روتینِ اصلی زودتر انجامش داده بود، نظارت و سرکشی دوباره‌کاری نکند و خرابش نکند — بی روتینِ تازه».
 
 The rules live in ``docs/supervisor/ownership.json`` (who owns which paths, the only tool/procedure that may change
-them, the ledger). The ledger of cross-routine work is ``docs/supervisor/handoffs.json`` (+ the readable
+them, the ledger). The ledger of cross-routine work is ``docs/supervisor/handoffs/<id>.json`` — one file per entry (+ the readable
 ``HANDOFFS.md``, regenerated on every write). Every routine prompt points here.
 
     handoff.py owner PATH…                     which area/owner/procedure governs these paths
@@ -32,7 +32,8 @@ from typing import Any, Dict, List, Optional
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OWN = os.path.join(ROOT, "docs", "supervisor", "ownership.json")
-LEDGER = os.path.join(ROOT, "docs", "supervisor", "handoffs.json")
+LEDGER = os.path.join(ROOT, "docs", "supervisor", "handoffs")   # ONE FILE PER ENTRY — two routines never conflict
+LEGACY = os.path.join(ROOT, "docs", "supervisor", "handoffs.json")  # the first single-file ledger (h1, h2) — migrated, kept readable
 VIEW = os.path.join(ROOT, "docs", "supervisor", "HANDOFFS.md")
 KINDS = {"did": "کار در قلمروِ دیگری (روتینِ مالک باید بسنجد)",
          "request": "درخواست از روتینِ مالک (او انجام می‌دهد)",
@@ -50,10 +51,20 @@ def load_own() -> Dict[str, Any]:
 
 
 def load() -> Dict[str, Any]:
-    if not os.path.exists(LEDGER):
-        return {"version": 1, "entries": []}
-    with open(LEDGER, encoding="utf-8") as f:
-        return json.load(f)
+    """All entries, oldest first. A concurrent run of two routines (ran 2026-10-14 in a simulation: both appended to
+    one JSON file ⇒ a rebase conflict and the same id twice) is why each entry is its own file with a unique id."""
+    ents: List[Dict[str, Any]] = []
+    if os.path.isdir(LEDGER):
+        for n in sorted(os.listdir(LEDGER)):
+            if n.endswith(".json"):
+                with open(os.path.join(LEDGER, n), encoding="utf-8") as f:
+                    ents.append(json.load(f))
+    if os.path.exists(LEGACY):
+        with open(LEGACY, encoding="utf-8") as f:
+            have = {e["id"] for e in ents}
+            ents += [e for e in json.load(f).get("entries", []) if e["id"] not in have]
+    ents.sort(key=lambda e: (e.get("at", ""), e.get("id", "")))
+    return {"version": 2, "entries": ents}
 
 
 def owners(area: Dict[str, Any]) -> List[str]:
@@ -84,7 +95,7 @@ def render(data: Dict[str, Any]) -> str:
     own = load_own()
     names = {k: v["fa"] for k, v in own["routines"].items()}
     areas = {a["id"]: a["fa"] for a in own["areas"]}
-    lines = ["# دست‌به‌دستِ کار میانِ روتین‌ها (خودکار از `handoffs.json` — دستی ویرایش نکن)", "",
+    lines = ["# دست‌به‌دستِ کار میانِ روتین‌ها (خودکار از `handoffs/*.json` — دستی ویرایش نکن)", "",
              "هر کاری که یک روتین در قلمروِ روتینِ دیگری کرد (یا از او خواست) این‌جاست؛ روتینِ مالک در آغازِ هر دور",
              "`python3 scripts/supervisor/handoff.py inbox --routine <خودش>` را می‌زند، می‌سنجد و می‌بندد. قواعد: `ownership.json`.", ""]
     ents = data.get("entries", [])
@@ -100,12 +111,40 @@ def render(data: Dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def save(data: Dict[str, Any]) -> None:
-    with open(LEDGER, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
+def save_entry(e: Dict[str, Any]) -> None:
+    os.makedirs(LEDGER, exist_ok=True)
+    with open(os.path.join(LEDGER, e["id"] + ".json"), "w", encoding="utf-8") as f:
+        json.dump(e, f, ensure_ascii=False, indent=1)
         f.write("\n")
+    write_view()
+
+
+def write_view() -> None:
     with open(VIEW, "w", encoding="utf-8") as f:
-        f.write(render(data))
+        f.write(render(load()))
+
+
+def migrate() -> int:
+    """handoffs.json (v1) ⇒ one file per entry; the old file is removed only after every entry exists as a file."""
+    if not os.path.exists(LEGACY):
+        return 0
+    with open(LEGACY, encoding="utf-8") as f:
+        old = json.load(f).get("entries", [])
+    for e in old:
+        if not os.path.exists(os.path.join(LEDGER, e["id"] + ".json")):
+            os.makedirs(LEDGER, exist_ok=True)
+            with open(os.path.join(LEDGER, e["id"] + ".json"), "w", encoding="utf-8") as f:
+                json.dump(e, f, ensure_ascii=False, indent=1)
+                f.write("\n")
+    os.remove(LEGACY)
+    write_view()
+    return len(old)
+
+
+def new_id(by: str) -> str:
+    import secrets
+
+    return "h" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + "-" + by + "-" + secrets.token_hex(2)
 
 
 def git(*args: str) -> str:
@@ -163,16 +202,13 @@ def cmd_add(a) -> int:
         print("قلمروِ ناشناخته: " + a.area); return 2
     if a.kind not in KINDS:
         print("نوعِ ناشناخته: " + a.kind); return 2
-    data = load()
-    n = 1 + max([int(e["id"][1:]) for e in data["entries"]] or [0])
-    e = {"id": f"h{n}", "at": now(), "by": a.by, "area": ar["id"], "owner": owners(ar), "kind": a.kind, "sheet": a.sheet,
+    e = {"id": new_id(a.by), "at": now(), "by": a.by, "area": ar["id"], "owner": owners(ar), "kind": a.kind, "sheet": a.sheet,
          "what": a.what.strip(), "procedure": a.procedure or ar["procedure"], "commit": a.commit or "",
          "status": "open"}
     if a.kind == "owner-did":
         e["status"] = "done"
         e["closed"] = {"by": a.by, "at": now(), "note": "روتینِ مالک خودش انجام داده بود — بی کارِ اضافه", "commit": a.commit or ""}
-    data["entries"].append(e)
-    save(data)
+    save_entry(e)
     print(f"{e['id']} ثبت شد ({KINDS[a.kind]})")
     return 0
 
@@ -206,7 +242,7 @@ def cmd_close(a) -> int:
         print("فقط روتینِ مالکِ این قلمرو (یا ناظرِ عمومی برای کهنه‌ها) می‌بندد"); return 1
     e["status"] = a.status
     e["closed"] = {"by": a.by, "at": now(), "note": a.note.strip(), "commit": a.commit or ""}
-    save(data)
+    save_entry(e)
     print(f"{e['id']} ⇒ {a.status}")
     return 0
 
@@ -259,7 +295,7 @@ def cmd_check(a) -> int:
     if not os.path.exists(VIEW) or open(VIEW, encoding="utf-8").read() != render(data):
         print("❌ HANDOFFS.md با handoffs.json هم‌خوان نیست — `handoff.py check --fix`")
         if a.fix:
-            save(data); print("بازسازی شد.")
+            write_view(); print("بازسازی شد.")
         else:
             errs.append("view")
     return 1 if errs else 0
@@ -298,11 +334,13 @@ def guard(routine: str, paths: List[str], new_entries: List[Dict[str, Any]], own
 def cmd_guard(a) -> int:
     if not a.routine:
         print("(SUPERVISOR_ROUTINE تعریف نشده — نشستِ انسانی/دستی؛ نگهبانِ دست‌به‌دست اجرا نشد)"); return 0
+    listing = git("ls-tree", "--name-only", f"{a.base}", "docs/supervisor/handoffs/")
+    old_ids = {os.path.basename(x)[:-5] for x in listing.splitlines() if x.endswith(".json")}
     base_ledger = git("show", f"{a.base}:docs/supervisor/handoffs.json")
     try:
-        old_ids = {e["id"] for e in json.loads(base_ledger)["entries"]} if base_ledger.strip() else set()
+        old_ids |= {e["id"] for e in json.loads(base_ledger)["entries"]} if base_ledger.strip() else set()
     except Exception:  # noqa: BLE001
-        old_ids = set()
+        pass
     new = [e for e in load()["entries"] if e["id"] not in old_ids]
     bad = guard(a.routine, changed_paths(a.base), new)
     if bad:
@@ -325,6 +363,7 @@ def main(argv=None) -> int:
     p = sp.add_parser("close"); p.add_argument("id"); p.add_argument("--by", required=True); p.add_argument("--status", required=True)
     p.add_argument("--note", required=True); p.add_argument("--commit"); p.set_defaults(f=cmd_close)
     p = sp.add_parser("check"); p.add_argument("--fix", action="store_true"); p.set_defaults(f=cmd_check)
+    p = sp.add_parser("migrate"); p.set_defaults(f=lambda a: print(f"{migrate()} مورد منتقل شد") or 0)
     p = sp.add_parser("guard"); p.add_argument("--routine", default=os.environ.get("SUPERVISOR_ROUTINE", "")); p.add_argument("--base", default="origin/main"); p.set_defaults(f=cmd_guard)
     a = ap.parse_args(argv)
     return a.f(a)

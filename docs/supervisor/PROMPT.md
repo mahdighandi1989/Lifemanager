@@ -312,7 +312,7 @@ print(json.dumps(api('/api/inspection/audit/finance?days=30'), ensure_ascii=Fals
 
 همهٔ دستورها در همین گیت‌اند (`docs/supervisor/*.md`) و پیامِ هر Routine فقط اشاره‌گر است — پس هر روتین دستورِ دیگری را **می‌تواند و
 باید** بخواند. منبعِ واحدِ «چه کسی مالکِ چیست»: **`docs/supervisor/ownership.json`** (مسیرها، مالک، تنها ابزار/روشِ تغییر، بخشِ
-دستورِ مالک، دفترِ مالک). دفترِ دست‌به‌دست: **`docs/supervisor/handoffs.json`** (+ نمای خوانای `HANDOFFS.md`). ابزار:
+دستورِ مالک، دفترِ مالک). دفترِ دست‌به‌دست: **`docs/supervisor/handoffs/`** — یک فایل برای هر مورد، تا دو روتین هرگز تعارض نخورند (+ نمای خوانای `HANDOFFS.md`). ابزار:
 `python3 scripts/supervisor/handoff.py` (`owner` · `precheck` · `add` · `inbox` · `close` · `check` · `guard`).
 
 **هویت:** اولِ هر اجرا `export SUPERVISOR_ROUTINE=general` — `ship.sh` با آن نگهبانِ دست‌به‌دست را اجرا می‌کند و پوشی را که به قلمروِ

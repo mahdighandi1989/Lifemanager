@@ -1,0 +1,2 @@
+# generated view of docs/supervisor/handoffs/*.json — never a merge conflict; ship.sh regenerates it after every rebase
+docs/supervisor/HANDOFFS.md merge=union

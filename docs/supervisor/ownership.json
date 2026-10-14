@@ -10,7 +10,7 @@
   "shared": [
     "apps/learning-architecture/docs/WORKLOG.md", "apps/learning-architecture/docs/PROGRESS.md", "apps/learning-architecture/docs/HANDBOOK.md",
     "docs/overhaul/AUDIT_LOG.md", "experiences/*", "frontend/public/assets/lla/*", "frontend/dist/*", "frontend/src/lib/llaBundle.js",
-    "docs/supervisor/handoffs.json", "docs/supervisor/HANDOFFS.md", "docs/supervisor/RUNLOG.md", "docs/supervisor/OPEN_ITEMS.md"
+    "docs/supervisor/handoffs/*", "docs/supervisor/handoffs.json", "docs/supervisor/HANDOFFS.md", ".gitattributes", "docs/supervisor/RUNLOG.md", "docs/supervisor/OPEN_ITEMS.md"
   ],
   "areas": [
     {"id": "epi-rules", "fa": "قاعده‌ها، سقف‌ها، ایستگاه‌ها، وزن‌ها، اصول و متنِ جزوه", "page": true,
@@ -35,7 +35,7 @@
      "paths": ["apps/learning-architecture/*"],
      "tool": "منبع در apps/learning-architecture/src/ ⇒ python apps/learning-architecture/build.py", "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب", "ledger": "apps/learning-architecture/docs/WORKLOG.md"},
     {"id": "supervisor", "fa": "دستورهای روتین‌ها و ابزارهای ناظر", "page": false,
-     "owner": "general",
+     "owner": ["general", "urgent"],
      "paths": ["docs/supervisor/*", "scripts/supervisor/*"],
      "tool": "بایگانیِ نسخه + version در frontmatter (docs/supervisor/README.md)", "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟", "ledger": "docs/supervisor/archive/README.md"},
     {"id": "app", "fa": "بقیهٔ Lifemanager", "page": false,

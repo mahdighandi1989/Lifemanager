@@ -1,0 +1,15 @@
+{
+ "id": "h1",
+ "at": "2026-10-14T12:55:27Z",
+ "by": "session",
+ "area": "supervisor",
+ "owner": [
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "دستورها: PROMPT/URGENT_PROMPT v7 و BACKTEST_PROMPT v2 (بخشِ «هماهنگی میانِ روتین‌ها»)، ownership.json، handoffs.json، handoff.py، نگهبانِ ship.sh — WORKLOG 45. ناظرِ عمومی: روال را با یک برگهٔ واقعی بیازما و اگر جایی گنگ است اصلاح کن.",
+ "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟",
+ "commit": "",
+ "status": "open"
+}

@@ -1,0 +1,16 @@
+{
+ "id": "h2",
+ "at": "2026-10-14T12:55:27Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "دستیار: تشخیصِ افتراقی، نظرِ دوم (learning_architecture)، برگه با قلمرو/مالک/روالِ رسیدگی، HOST.sheets؛ خواندنِ کاملِ پیوست‌ها؛ WORKLOG 44–45. بسنج که برگه‌های «[دستیار · …]» در عمل درست ارجاع می‌شوند.",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "",
+ "status": "open"
+}
