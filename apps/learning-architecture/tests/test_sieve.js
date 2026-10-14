@@ -33,7 +33,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await AS.send('می‌خوام ماشین بخرم ولی هر بار با همسرم سرش دعوامون می‌شه');
     const d = s.tour.diag || {};
     out.found = d.F11 && d.F11.st === 'found' && d.F11.facet === 'f1';
-    out.noEvidence = d.F7 && d.F7.st === 'ask';                     // «پیدا شد» بی شاهد ⇒ «باید پرسید»
+    out.noEvidence = d.F7 && d.F7.st === 'ask';
+    AS._turnSession = s; AS.DO.tour_diag({ layers: [{ id: 'F5', st: 'no', why: '—' }, { id: 'F11', st: 'found', why: 'هر بار ۸۰٪ مطمئن بودم' }] });
+    out.noNeedsWhy = s.tour.diag.F5.st === 'ask'; out.multi = /خسیسی/.test(s.tour.diag.F11.why) && /۸۰٪/.test(s.tour.diag.F11.why);                     // «پیدا شد» بی شاهد ⇒ «باید پرسید»
     out.prompt = /# گره‌های پیشینِ کاربر[\s\S]*برچسب را حکم گرفتن/.test(__calls[0].user) && /# غربالِ لایه‌ها/.test(AS.tourText(s)) && /سنجیده‌نشده:/.test(AS.tourText(s));
     out.unknown = /لایهٔ ناشناخته: nope/.test(JSON.stringify(s.msgs));
     // کشوی تور
@@ -71,7 +73,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const S = info.sieve;
   chk(S.pend && S.fams === 12 && S.n >= 22, 'layers = base + all 12 knot families from the registry: ' + S.n + '/' + S.fams);
   chk(S.rules, 'root-first sieve rules replace "every aspect = a facet"');
-  chk(S.found && S.noEvidence && S.unknown, '"found" needs the user\'s own words (else "ask"); unknown layer ids are reported');
+  chk(S.noNeedsWhy && S.multi && S.found && S.noEvidence && S.unknown, '"found" needs the user\'s own words (else "ask"); unknown layer ids are reported');
   chk(S.prompt && S.drawer, 'the model sees prior knots and the sieve state; the drawer shows the sieve');
   chk(S.made && S.gate && S.items && S.refShown && S.topic, 'prerequisite map: AI only after «بفرست», marked unverified; user self-rates; missing ⇒ learning topic with science › branch');
   chk(/^100000>111/.test(S.ms), 'prereq facet milestones come from the map, the self-ratings and the topics: ' + S.ms);

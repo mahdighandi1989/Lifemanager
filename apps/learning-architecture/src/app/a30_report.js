@@ -135,8 +135,8 @@
   var ST_FA = { todo: "مانده", now: "در جریان", done: "انجام شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
   var C = { ink: "#1f2937", mute: "#6b7280", line: "#e5e7eb", ok: "#047857", warn: "#b45309", bad: "#b91c1c", head: "#0f766e", soft: "#f0fdfa" };
   function sec(title, inner) { return '<tr><td style="padding:18px 22px 6px;font-size:17px;font-weight:700;color:' + C.head + ';border-top:1px solid ' + C.line + '">' + title + '</td></tr><tr><td style="padding:4px 22px 14px;font-size:14px;line-height:1.9;color:' + C.ink + '">' + inner + "</td></tr>"; }
-  function recTitle(r) { var x = S.get(r.id); if (!x) return r.type + ":" + r.id; return x.title || x.name || (x.p && x.p.title) || r.id; }
-  var TYPE_FA = { kcase: "موقعیتِ گره‌گشا", knot: "گره", "case": "پروندهٔ سنجش", eprob: "مسئلهٔ بزرگ", topic: "موضوع" };
+  function recTitle(r) { var x = S.get(r.id); if (!x) return ""; return x.title || x.name || x.q || x.note || (x.p && x.p.title) || ""; }
+  var TYPE_FA = { kcase: "موقعیتِ گره‌گشا", knot: "گره", "case": "پروندهٔ سنجش", eprob: "مسئلهٔ بزرگ", topic: "موضوع", fcast: "پیش‌بینی", wchain: "زنجیرهٔ نگرانی", kexp: "آزمایشِ واقعی", ex: "کاربرگ", value: "ارزش", meaning: "وارسیِ معنا", prereq: "نقشهٔ پیش‌نیازها" };
   R.build = function (s, evs) {
     CUR = s;
     var t = s.tour, title = s.title || s.pinned || t.goal || "تور", m = A.MIND ? A.MIND.model() : null;
@@ -147,10 +147,12 @@
     return chain.then(function () {
       // وجهِ کنارگذاشته نه «پیشرفت» است نه در مخرج (کارزارِ آزمون sc08: «۳ از ۶» با یک وجهِ تهیِ کنارگذاشته)
       var live = t.facets.filter(function (f) { return f.status !== "skipped"; }), done = live.filter(function (f) { return f.status === "done"; }).length;
+      // شمارِ صادقِ نشانه‌ها کنارِ «پایه برپا شد» (کارزارِ آزمون c10: «۳ از ۴ وجه» در حالی که نشانه‌ها ۲/۳، ۵/۸، ۲/۴ بود)
+      var msOk = 0, msAll = 0; live.forEach(function (f) { AS.tourMilestones(f).forEach(function (m) { msAll++; if (m.ok) msOk++; }); });
       var H = [];
       H.push('<!doctype html><html dir="rtl" lang="fa"><head><meta charset="utf-8"></head><body style="margin:0;background:#f3f4f6"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;font-family:Tahoma,Vazirmatn,Arial,sans-serif"><tr><td align="center" style="padding:16px">');
       H.push('<table role="presentation" width="680" cellpadding="0" cellspacing="0" dir="rtl" style="max-width:680px;width:100%;background:#fff;border-radius:12px;overflow:hidden;text-align:right">');
-      H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پیشرفت: ' + fa(done) + " از " + fa(live.length) + " وجه" + (live.length < t.facets.length ? " (" + fa(t.facets.length - live.length) + " کنار گذاشته)" : "") + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
+      H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پایهٔ ' + fa(done) + " از " + fa(live.length) + " وجه برپا شد · نشانه‌های حل‌شدن: " + fa(msOk) + " از " + fa(msAll) + (live.length < t.facets.length ? " (" + fa(t.facets.length - live.length) + " کنار گذاشته)" : "") + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
       if (s.safetyAt) H.push('<tr><td style="padding:14px 22px;background:#fff7ed;font-size:14px;line-height:1.9;color:' + C.ink + '"><b>🤝 پیش از هر چیز</b><br>در این گفت‌وگو از حالِ سختی گفتی. اگر امروز هم سخت است، همین حالا با یک نفرِ نزدیک یا یک متخصص حرف بزن.<br><span style="color:' + C.mute + '">' + esc(A.KHELP || "") + "</span><br>(به خاطرِ حریمِ خصوصی، متنِ گفت‌وگو در این ایمیل نمی‌آید.)</td></tr>");
       if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + (e.detail ? '<div style="color:' + C.mute + ';font-size:12px">' + esc(e.detail) + "</div>" : "") + "</li>"; }).join("") + "</ul>"));
       /* نقشهٔ راه */

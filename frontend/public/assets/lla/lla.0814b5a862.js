@@ -31213,6 +31213,8 @@ APP.goFromURL = function (q) {
         acts.filter(function (x) { return x && /^tour_/.test(x.do) && DO[x.do]; }).forEach(function (x) { try { var m = DO[x.do](x); if (m) tnotes.push(m); } catch (e) { tnotes.push(e.message); } });
         acts = acts.filter(function (x) { return !(x && /^tour_/.test(x.do)); });
         if (tnotes.length) s.msgs.push({ role: "sys", at: now(), text: tnotes.join(" · ") });
+        // شناسهٔ رکورد در متنِ پاسخ نمی‌ماند (کارزارِ آزمون c10: «fc_mv8l49yh0q1ge» در گفت‌وگو)
+        o.reply = String(o.reply || "").replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|pq|achat|rep)_[A-Za-z0-9]{6,}\b/g, "").replace(/\s{2,}/g, " ");
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a);
         // بخشی که بیرون از این صفحه است: صادقانه و جدا گفته و در سشن نگه داشته می‌شود (نیمی‌مربوط ≠ نامربوط)
@@ -32633,8 +32635,8 @@ APP.goFromURL = function (q) {
   var ST_FA = { todo: "مانده", now: "در جریان", done: "انجام شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
   var C = { ink: "#1f2937", mute: "#6b7280", line: "#e5e7eb", ok: "#047857", warn: "#b45309", bad: "#b91c1c", head: "#0f766e", soft: "#f0fdfa" };
   function sec(title, inner) { return '<tr><td style="padding:18px 22px 6px;font-size:17px;font-weight:700;color:' + C.head + ';border-top:1px solid ' + C.line + '">' + title + '</td></tr><tr><td style="padding:4px 22px 14px;font-size:14px;line-height:1.9;color:' + C.ink + '">' + inner + "</td></tr>"; }
-  function recTitle(r) { var x = S.get(r.id); if (!x) return r.type + ":" + r.id; return x.title || x.name || (x.p && x.p.title) || r.id; }
-  var TYPE_FA = { kcase: "موقعیتِ گره‌گشا", knot: "گره", "case": "پروندهٔ سنجش", eprob: "مسئلهٔ بزرگ", topic: "موضوع" };
+  function recTitle(r) { var x = S.get(r.id); if (!x) return ""; return x.title || x.name || x.q || x.note || (x.p && x.p.title) || ""; }
+  var TYPE_FA = { kcase: "موقعیتِ گره‌گشا", knot: "گره", "case": "پروندهٔ سنجش", eprob: "مسئلهٔ بزرگ", topic: "موضوع", fcast: "پیش‌بینی", wchain: "زنجیرهٔ نگرانی", kexp: "آزمایشِ واقعی", ex: "کاربرگ", value: "ارزش", meaning: "وارسیِ معنا", prereq: "نقشهٔ پیش‌نیازها" };
   R.build = function (s, evs) {
     CUR = s;
     var t = s.tour, title = s.title || s.pinned || t.goal || "تور", m = A.MIND ? A.MIND.model() : null;
@@ -32645,10 +32647,12 @@ APP.goFromURL = function (q) {
     return chain.then(function () {
       // وجهِ کنارگذاشته نه «پیشرفت» است نه در مخرج (کارزارِ آزمون sc08: «۳ از ۶» با یک وجهِ تهیِ کنارگذاشته)
       var live = t.facets.filter(function (f) { return f.status !== "skipped"; }), done = live.filter(function (f) { return f.status === "done"; }).length;
+      // شمارِ صادقِ نشانه‌ها کنارِ «پایه برپا شد» (کارزارِ آزمون c10: «۳ از ۴ وجه» در حالی که نشانه‌ها ۲/۳، ۵/۸، ۲/۴ بود)
+      var msOk = 0, msAll = 0; live.forEach(function (f) { AS.tourMilestones(f).forEach(function (m) { msAll++; if (m.ok) msOk++; }); });
       var H = [];
       H.push('<!doctype html><html dir="rtl" lang="fa"><head><meta charset="utf-8"></head><body style="margin:0;background:#f3f4f6"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;font-family:Tahoma,Vazirmatn,Arial,sans-serif"><tr><td align="center" style="padding:16px">');
       H.push('<table role="presentation" width="680" cellpadding="0" cellspacing="0" dir="rtl" style="max-width:680px;width:100%;background:#fff;border-radius:12px;overflow:hidden;text-align:right">');
-      H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پیشرفت: ' + fa(done) + " از " + fa(live.length) + " وجه" + (live.length < t.facets.length ? " (" + fa(t.facets.length - live.length) + " کنار گذاشته)" : "") + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
+      H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پایهٔ ' + fa(done) + " از " + fa(live.length) + " وجه برپا شد · نشانه‌های حل‌شدن: " + fa(msOk) + " از " + fa(msAll) + (live.length < t.facets.length ? " (" + fa(t.facets.length - live.length) + " کنار گذاشته)" : "") + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
       if (s.safetyAt) H.push('<tr><td style="padding:14px 22px;background:#fff7ed;font-size:14px;line-height:1.9;color:' + C.ink + '"><b>🤝 پیش از هر چیز</b><br>در این گفت‌وگو از حالِ سختی گفتی. اگر امروز هم سخت است، همین حالا با یک نفرِ نزدیک یا یک متخصص حرف بزن.<br><span style="color:' + C.mute + '">' + esc(A.KHELP || "") + "</span><br>(به خاطرِ حریمِ خصوصی، متنِ گفت‌وگو در این ایمیل نمی‌آید.)</td></tr>");
       if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + (e.detail ? '<div style="color:' + C.mute + ';font-size:12px">' + esc(e.detail) + "</div>" : "") + "</li>"; }).join("") + "</ul>"));
       /* نقشهٔ راه */
@@ -32931,10 +32935,10 @@ APP.goFromURL = function (q) {
     { g: "پایه", id: "want", fa: "خواستهٔ واقعیِ پشتِ حرف", q: "در واقع چه می‌خواهد؟ «حل‌شدن» برایش چه شکلی است؟ چه چیزی را نگفته؟" },
     { g: "پایه", id: "recur", fa: "تکرار و ریشهٔ مشترک", q: "این الگو پیش‌تر هم رخ داده؟ با گره‌ها و موقعیت‌های پیشینش (فهرستِ «# گره‌های پیشینِ کاربر») همان ریشه/ساختار را دارد؟" },
     { g: "معرفت", id: "claim", fa: "ادعا یا باورِ پنهان", q: "کدام جمله‌اش ادعایی است که اگر نادرست باشد همه‌چیز عوض می‌شود؟ (کارخانه)" },
-    { g: "معرفت", id: "route", fa: "راهِ دانستن و خطای همان راه", q: "آن را از کجا می‌داند — حس، نقل، تجربه، استقراء، تخصصِ دیگران، شهود؟ خطای رایجِ همان راه اینجا هست؟" },
+    { g: "معرفت", id: "route", fa: "راهِ دانستن و خطای همان راه", q: "آن را از کجا می‌داند — حس، نقل، تجربه، استقراء، تخصصِ دیگران، شهود؟ خطای رایجِ همان راه اینجا هست؟ دانشِ «عملی/ضمنی» (چشم و بو، مهارتِ دست) هم راهِ خودش را دارد: تمرین با بازخوردِ فوری و دیدنِ کارِ استاد، نه فقط دستورِ نوشته." },
     { g: "مسئله و دانش", id: "problem", fa: "مسئلهٔ سختِ مشخص", q: "مسئله‌ای مشخص (حل‌شده یا نه) هست که باید تجزیه، شبیه‌سازی و با هم‌ساختارها تمرین شود؟" },
     { g: "مسئله و دانش", id: "prereq", fa: "دانشِ پیش‌نیازِ نبوده", q: "برای فهمیدن/حلِ آن کدام مفهوم از کدام علم و در کدام گامِ حل لازم است — و آیا آن را دارد؟ (🧩 نقشهٔ پیش‌نیازها)" },
-    { g: "مسئله و دانش", id: "learn", fa: "یادگیری و ماندگاری", q: "چیزی هست که باید عمیق فهمیده و ماندگار شود (موضوع، سفرِ ۱۱ گامی، مرور)؟" },
+    { g: "مسئله و دانش", id: "learn", fa: "یادگیری و ماندگاری", q: "چیزی هست که باید عمیق فهمیده و ماندگار شود (موضوع، سفرِ ۱۱ گامی، مرور)؟ «چطور این نوع چیز را یاد بگیرم» (مثلاً مهارتِ ضمنی با بازخورد) خودش درسی است که به چیزهای دیگرِ زندگی‌اش هم منتقل می‌شود؟" },
     { g: "پایه", id: "info", fa: "اطلاعاتِ ناموجود", q: "برای تشخیص چه چیزی را هنوز نمی‌دانیم و باید یکی‌یکی از او پرسید؟" },
     { g: "پایه", id: "territory", fa: "حوزه‌ای که هنوز نیست", q: "حوزه و ابزارش در قلمروها هست؟ گامِ ۰/۱ و او همین حالا لازم دارد ⇒ برگه." },
     { g: "پایه", id: "outside", fa: "بیرون از این صفحه", q: "کدام بخش واقعاً کارِ این صفحه نیست (درمان، حقوق، پولِ شخصی، تصمیمِ خودِ زندگی)؟ — فقط همان بخش، نه کلِ حرف." }
@@ -32958,9 +32962,14 @@ APP.goFromURL = function (q) {
     var d = s.tour.diag = s.tour.diag || {};
     list.forEach(function (x) {
       var L = x && layerOf(x.id); if (!L) { bad.push(String(x && x.id)); return; }
-      var st = ST[x.st] ? x.st : "ask";
-      if (st === "found" && !String(x.why || "").trim()) st = "ask";   // «پیدا شد» فقط با شاهد از حرفِ خودِ کاربر
-      d[L.id] = { st: st, why: clip(x.why || "", 300), facet: x.facet ? String(x.facet).slice(0, 12) : "", at: nowIso() };
+      var st = ST[x.st] ? x.st : "ask", why = String(x.why || "").replace(/^[\s—\-–.]+$/, "").trim();
+      // «پیدا شد» فقط با شاهد از حرفِ خودِ کاربر؛ «رد شد» هم فقط با دلیل — «هنوز نگفته» یعنی «باید پرسید» (کارزارِ آزمون c09/c10: ۲۰ لایه پس از یک پاسخ رد شد)
+      if ((st === "found" || st === "no") && why.length < 3) st = "ask";
+      var prev = d[L.id];
+      // یک لایه چند یافته می‌گیرد (کارزارِ آزمون c10: کالیبراسیون زیرِ نشخوار گم شد)
+      if (prev && prev.st === "found" && st === "found" && prev.why && prev.why.indexOf(why) < 0) why = prev.why + " ؛ " + why;
+      if (prev && prev.st === "found" && st === "no") { (prev.hist = prev.hist || []).push({ st: prev.st, why: prev.why, at: prev.at }); }
+      d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), hist: prev && prev.hist };
     });
     return bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "";
   };
@@ -33002,6 +33011,7 @@ APP.goFromURL = function (q) {
     "- مسئلهٔ علمی/هوشی/فلسفی که فهمیده یا حل نشده: دست‌کم سه لایه را جدا بسنج — گرهِ ذهنی (کدام خانواده: بازنمایی، راهبرد، پایش، …)، خطای معرفتی، و **دانشِ پیش‌نیاز** (کدام مفهوم، از کدام علم و شاخه، در کدام گامِ حل) ⇒ وجهِ kind=prereq با «🧩 نقشهٔ پیش‌نیازها» (نمای prereq). جوابِ مسئله را نگو؛ کاربر را تا خودِ حل ببر.",
     "- رتبهٔ خانواده‌ها در گره‌گشا «ترتیبِ بررسی» است نه احتمال؛ اگر با یافتهٔ غربال نمی‌خواند (مثلاً بازنمایی پایین آمد چون «صورت را درست بازگفت» ولی خطا در **مدلِ** مسئله بود — فضای نمونهٔ نادرست، شمردنِ جعبه به جای سکه)، صریح به کاربر بگو و آزمونِ همان خانواده را جلو بیاور؛ تصمیمِ ریشه با خودِ اوست.",
     "- لایهٔ «تکرار و ریشهٔ مشترک»: اگر گرهِ پیشینی ثبت نیست، «رد شد» نکن — «باید پرسید» بگذار و بپرس «پیش‌تر هم این حس/این نوع گیر را داشته‌ای؟». برای مسئله‌ای با پاسخِ معلوم، «🧪 شبیه‌سازِ همین مسئله» و «مسئله‌های هم‌ساختار» را هم پیشنهاد کن. فقط دربارهٔ چیزی که در پویشِ همین صفحه می‌بینی بگو «این‌جا بنویس/ببین»؛ رابطِ ناموجود را توصیف نکن.",
+    "- غربال در یک نوبت بسته نمی‌شود: آنچه کاربر هنوز نگفته «باید پرسید» است نه «رد شد» (رد فقط با دلیل از حرفِ خودش). پرسش‌های «باید پرسید» را یکی‌یکی بپرس و با هر پاسخ غربال را به‌روز کن؛ تکرار در حوزه‌های **دیگرِ** زندگی‌اش را صریح بپرس («در یادگرفتنِ چیزهای دیگر هم همین‌طور بوده؟»). ترتیبِ وجه‌ها را با همان دلیلی که در why نوشتی هم‌خوان نگه دار.",
     "- اولویت: ایمنی؛ ریشه‌ای که بقیه از آن می‌رویند (گره یا پیش‌نیاز)؛ آنچه زمان‌دار است؛ فهم پیش از تمرین.",
     "- نخستین پاسخ به هر مسئلهٔ تازه: جواب، حکم یا یافتهٔ نهایی را نگو — حتی اگر از «# دانسته‌های قلمرو» می‌دانی (کارزارِ آزمون c08: معنای درستِ p و تکرارنشدنِ پژوهش در همان پاسخِ اول لو رفت). اول یک یا دو پرسشِ دقیق برای لایه‌هایی که «باید پرسید» است (بی پیشنهادِ جواب)، بعد غربال؛ یافتهٔ قطعی را وقتی بگو که کاربر خودش به آن رسیده یا ایستگاهِ مربوط طی شده. لایهٔ «اطلاعاتِ ناموجود» را جدی بسنج: چه عددی، منبعی یا واقعیتی هنوز نیست؟",
     "- در reply هرگز کلید یا کد ننویس (f1، k12، F7، شناسهٔ حوزه یا رکورد) — نامِ فارسیِ وجه، خانواده یا حوزه را بگو."

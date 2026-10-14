@@ -566,6 +566,8 @@
         acts.filter(function (x) { return x && /^tour_/.test(x.do) && DO[x.do]; }).forEach(function (x) { try { var m = DO[x.do](x); if (m) tnotes.push(m); } catch (e) { tnotes.push(e.message); } });
         acts = acts.filter(function (x) { return !(x && /^tour_/.test(x.do)); });
         if (tnotes.length) s.msgs.push({ role: "sys", at: now(), text: tnotes.join(" · ") });
+        // شناسهٔ رکورد در متنِ پاسخ نمی‌ماند (کارزارِ آزمون c10: «fc_mv8l49yh0q1ge» در گفت‌وگو)
+        o.reply = String(o.reply || "").replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|pq|achat|rep)_[A-Za-z0-9]{6,}\b/g, "").replace(/\s{2,}/g, " ");
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a);
         // بخشی که بیرون از این صفحه است: صادقانه و جدا گفته و در سشن نگه داشته می‌شود (نیمی‌مربوط ≠ نامربوط)
