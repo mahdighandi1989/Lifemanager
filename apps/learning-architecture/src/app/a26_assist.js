@@ -209,6 +209,7 @@
       catch (e) { return "مرورگر اجازهٔ پیوستِ خودکار نداد — خودت بگذار"; }
     }
   };
+  AS.DO = DO;   // a27_tour.js adds the tour operations here
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
@@ -219,7 +220,7 @@
         if (!a || !DO[a.do]) return;
         // کلیدهای k… مالِ صفحهٔ پیشین‌اند: پس از رفتن به نمای تازه هرگز به کار نمی‌روند (پرکردنِ فیلدِ اشتباه) —
         // نوبتِ خودکارِ بعدی با فیلدهای همین صفحه پر می‌کند
-        if (moved && a.do !== "go") { skipped++; return; }
+        if (moved && /^(fill|highlight|click|attach)$/.test(a.do)) { skipped++; return; }
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         if (r) notes.push(r);
         if (a.do === "go" && !r) { moved = true; return wait(350); }
@@ -299,6 +300,7 @@
     var L = ["# سشن", "نام: " + (s.title || "(هنوز بی‌نام)"), "خواستهٔ اصلی (سنجاق‌شده): " + (s.pinned || "(هنوز نیست)"), "حافظهٔ سشن: " + (s.memory || "(خالی)")];
     if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]" + (x.view ? " (" + x.view + ")" : ""); }).join(" "));
     if (s.files && s.files.length) L.push("پیوست‌های سشن (id=نام): " + s.files.map(function (f) { return f.id + "=" + f.name; }).join("، ") + " — اگر برای پاسخ دوباره به محتوای یکی لازم داری، reread بده.");
+    if (AS.tourText) { var tt = AS.tourText(s); if (tt) L.push(tt); }
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
     L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
     L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
@@ -391,7 +393,7 @@
       reopen: "/apps/learning-architecture" + q, dom_path: ".as-root", covered_text: clip(s.pinned || g.title, 400) };
     var files = (s.files || []).map(function (f) { return blobs[f.id]; }).filter(Boolean);
     return A.HOST.report({ text: text, spot: spot, urgent: true, files: files }).then(function (r) {
-      s.reports.push({ key: key, id: r.id, number: r.number, title: clip(g.title, 80), area: g.area, kind: g.kind, at: now() }); S.put(s); return r;
+      s.reports.push({ key: key, id: r.id, number: r.number, title: clip(g.title, 80), area: g.area, kind: g.kind, facet: g.facet || "", at: now() }); S.put(s); return r;
     });
   };
 
@@ -470,7 +472,7 @@
     var auto = 0;
     function turn(msg, extra, ids, first) {
       var sc = AS.scan();
-      return AS.openSheets().then(function (l) { AS._sheets = l; return ask(SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
+      return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; return ask(AS.SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
         if (o.title && !s.title) s.title = clip(o.title, 80);
         if (o.pinned && (!s.pinned || o.pinned !== s.pinned)) s.pinned = clip(o.pinned, 300);
@@ -478,20 +480,36 @@
         if (Array.isArray(o.steps) && o.steps.length) s.steps = o.steps.slice(0, 20).map(function (x) { return { t: clip(x.t, 140), s: /^(done|now|todo)$/.test(x.s) ? x.s : "todo", view: A.V[x.view] ? x.view : "" }; });
         s.status = o.status || "related";
         var acts = s.status === "unrelated" ? [] : (Array.isArray(o.actions) ? o.actions : []);
+        // عملیاتِ تور پیش از هر چیز (حتی پیش از ثبتِ برگه): برگه‌ای که برای وجهی از تور است باید آن وجه را پیدا کند
+        // (شبیه‌سازیِ ۲۰۲۶-۱۰-۱۴: tour_plan و gap در یک پاسخ ⇒ برگه پیش از ساختِ تور ثبت شد و وجه «منتظر» نشد)
+        var tnotes = [];
+        acts.filter(function (x) { return x && /^tour_/.test(x.do) && DO[x.do]; }).forEach(function (x) { try { var m = DO[x.do](x); if (m) tnotes.push(m); } catch (e) { tnotes.push(e.message); } });
+        acts = acts.filter(function (x) { return !(x && /^tour_/.test(x.do)); });
+        if (tnotes.length) s.msgs.push({ role: "sys", at: now(), text: tnotes.join(" · ") });
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a); if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
         S.put(s); paint();
         var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
           if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
           sheetCache.at = 0;
-          return AS.fileGap(s, t.gap);
+          return AS.fileGap(s, t.gap).then(function (r) { if (r && !r.dup && AS.tourBlock && t.gap.facet) AS.tourBlock(s, t.gap.facet, r, t.gap); return r; });
         }).then(function (r) {
           if (!r) return;
           s.msgs.push({ role: "sys", at: now(), text: r.dup ? "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." : r.local ? "برگه ساخته شد ولی این نسخه به «نظارت و سرکشی» وصل نیست؛ متنش در سشن ماند." : "🛎 برگهٔ فوری #" + fa(r.number) + " در «نظارت و سرکشی» ثبت شد." });
           S.put(s); paint();
         }, function (e) { s.msgs.push({ role: "sys", at: now(), text: "ثبتِ برگهٔ فوری نشد: " + errText(e) }); S.put(s); paint(); }) : Promise.resolve();
         return gap.then(function () { return AS.run(acts); }).then(function (res) {
+          if (AS.tourAfterTurn) { try { AS.tourAfterTurn(s); S.put(s); paint(); } catch (e) { console.error(e); } }
           if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
+          // پنجره‌ای (تأییدِ فرستادن به هوش مصنوعی، پرسشِ ایمنی، …) باز شد: تصمیمِ خودِ کاربر است — دستیار کنار می‌رود و صریح می‌گوید
+          var ov = Array.prototype.slice.call(document.querySelectorAll(".overlay, [role=dialog][aria-modal=true]")).filter(function (x) { return !x.closest(".as-root") && x.getClientRects().length > 0; })[0];
+          if (ov) {
+            var ot = (ov.querySelector("h2,h3") || {}).textContent || "یک پنجره";
+            s.msgs.push({ role: "sys", at: now(), text: "🪟 پنجرهٔ «" + clip(ot, 80) + "» باز شد. آن را بخوان؛ اگر موافقی دکمه‌اش (مثلاً «بفرست») را **خودت** بزن — فرستادنِ متنت به هوش مصنوعی و حذفِ نام‌ها تصمیمِ خودِ توست. بعد برای ادامه 💬 را بزن." });
+            S.put(s); if (ui && !ui.panel.hidden) AS.toggle(false);
+            A.toast("پنجرهٔ تأیید باز شد — بررسی کن و خودت بزن؛ دستیار کنار رفت.");
+            return;
+          }
           var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
           var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
           if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
@@ -533,16 +551,60 @@
     handle.addEventListener("pointerup", function () { if (!st) return; var m = st.moved; st = null; if (m) { var r = box.getBoundingClientRect(); store("pos", { x: Math.round(r.left), y: Math.round(r.top) }); placePanel(); } else if (onTap) onTap(); });
   }
   /* پنجره کنارِ دکمه باز می‌شود (بالا یا پایینِ آن، هر کدام جا دارد)؛ در موبایل برگهٔ پایینِ صفحه است (CSS) */
+  /* اندازه و جای پنجره (مالک ۲۰۲۶-۱۰-۱۴: «پنجره را بشود کشید و بزرگ‌تر و کوچک‌تر کرد»): با کشیدنِ سرتیتر جابه‌جا، با دو گوشهٔ پایین
+     بزرگ/کوچک، ⤢ بیشینه/برگشت؛ همه به خاطر می‌ماند. تا کاربر جابه‌جایش نکرده، کنارِ دکمه باز می‌شود. موبایل: برگهٔ پایینِ صفحه. */
+  var MINW = 300, MINH = 300;
+  function clampG(g) {
+    var W = window.innerWidth, H = window.innerHeight;
+    var w = Math.min(Math.max(MINW, g.w || 400), W - 16), hh = Math.min(Math.max(MINH, g.h || 520), H - 16);
+    return { x: Math.min(Math.max(8, g.x == null ? W - w - 18 : g.x), W - w - 8), y: Math.min(Math.max(8, g.y == null ? 60 : g.y), H - hh - 8), w: w, h: hh, max: !!g.max };
+  }
+  function setGeom(P, g) {
+    var W = window.innerWidth, H = window.innerHeight;
+    if (g.max) g = { x: Math.round(W * 0.04), y: Math.round(H * 0.05), w: Math.round(W * 0.92), h: Math.round(H * 0.88), max: true };
+    else g = clampG(g);
+    P.style.left = g.x + "px"; P.style.top = g.y + "px"; P.style.right = "auto"; P.style.bottom = "auto";
+    P.style.width = g.w + "px"; P.style.height = g.h + "px"; P.style.maxHeight = "none";
+    P.classList.toggle("as-max", !!g.max);
+  }
+  AS.geom = function () { return store("pgeom"); };
   function placePanel() {
     if (!ui || ui.panel.hidden) return;
     var P = ui.panel, r = ui.fab.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight;
-    if (W <= 600) { P.style.left = P.style.top = P.style.right = P.style.bottom = ""; return; }
+    if (W <= 600) { P.style.left = P.style.top = P.style.right = P.style.bottom = P.style.width = P.style.height = ""; return; }
+    var g = store("pgeom");
+    if (g) { setGeom(P, g); return; }
+    P.style.width = P.style.height = "";
     var w = Math.min(400, W - 16), right = Math.min(Math.max(8, W - r.right), W - w - 8);
     P.style.right = right + "px"; P.style.left = "auto";
     if (r.top > H / 2) { P.style.bottom = (H - r.top + 8) + "px"; P.style.top = "auto"; P.style.maxHeight = Math.max(240, r.top - 16) + "px"; }
     else { P.style.top = (r.bottom + 8) + "px"; P.style.bottom = "auto"; P.style.maxHeight = Math.max(240, H - r.bottom - 16) + "px"; }
   }
   window.addEventListener("resize", function () { if (ui) { place(ui.root); placePanel(); } });
+  function panelDrag(handle, mode) {   // mode: "move" | "r" (گوشهٔ پایین‌راست) | "l" (گوشهٔ پایین‌چپ)
+    var st = null;
+    handle.addEventListener("pointerdown", function (e) {
+      if (e.button || window.innerWidth <= 600 || (mode === "move" && e.target.closest("button"))) return;
+      var r = ui.panel.getBoundingClientRect(); st = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, w: r.width, h: r.height };
+      try { handle.setPointerCapture(e.pointerId); } catch (x) { } e.preventDefault();
+    });
+    handle.addEventListener("pointermove", function (e) {
+      if (!st) return; var dx = e.clientX - st.x, dy = e.clientY - st.y, g;
+      if (mode === "move") g = { x: st.l + dx, y: st.t + dy, w: st.w, h: st.h };
+      else if (mode === "r") g = { x: st.l, y: st.t, w: st.w + dx, h: st.h + dy };
+      else g = { x: st.l + dx, y: st.t, w: st.w - dx, h: st.h + dy };
+      if (mode === "l" && g.w < MINW) { g.x -= MINW - g.w; g.w = MINW; }
+      setGeom(ui.panel, g);
+    });
+    handle.addEventListener("pointerup", function () {
+      if (!st) return; st = null; var r = ui.panel.getBoundingClientRect();
+      store("pgeom", { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), max: false });
+    });
+  }
+  AS.toggleMax = function () {
+    var g = store("pgeom") || (function () { var r = ui.panel.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; })();
+    g.max = !g.max; store("pgeom", g); placePanel();
+  };
   var pend = [];
   function build() {
     var root = h("div", { class: "as-root", dir: "rtl", "data-report-section": "assistant", "data-report-section-label": "💬 دستیار" });
@@ -562,11 +624,18 @@
       h("b", { class: "as-ttl" }, ui.view === "list" ? "سشن‌ها" : (s && s.title) || "دستیار"),
       h("button", { class: "as-ib", type: "button", title: "سشن‌ها", "aria-label": "فهرستِ سشن‌ها", onclick: function () { ui.view = ui.view === "list" ? "chat" : "list"; paint(); } }, "☰"),
       h("button", { class: "as-ib", type: "button", title: "سشنِ تازه", "aria-label": "سشنِ تازه", onclick: function () { AS.newSession(); ui.view = "chat"; AS.clearMarks(); paint(); } }, "＋"),
+      h("button", { class: "as-ib as-maxb", type: "button", title: "بزرگ / اندازهٔ قبلی", "aria-label": "بیشینه یا برگشت", onclick: function () { AS.toggleMax(); } }, "⤢"),
       h("button", { class: "as-ib", type: "button", title: "بستن", "aria-label": "بستن", onclick: function () { AS.toggle(false); } }, "✕"));
+    head.title = "برای جابه‌جاییِ پنجره بکش؛ دو بار بزن تا بزرگ شود";
+    panelDrag(head, "move");
+    head.addEventListener("dblclick", function (e) { if (!e.target.closest("button")) AS.toggleMax(); });
     P.appendChild(head);
+    var gr = h("span", { class: "as-grip r", title: "بزرگ/کوچک کردن", "aria-hidden": "true" }), gl = h("span", { class: "as-grip l", title: "بزرگ/کوچک کردن", "aria-hidden": "true" });
+    panelDrag(gr, "r"); panelDrag(gl, "l"); P.appendChild(gr); P.appendChild(gl);
     if (ui.view === "list") { P.appendChild(listView()); return; }
     if (s && s.pinned) P.appendChild(h("div", { class: "as-pin", title: "خواستهٔ اصلیِ این سشن" }, "📌 ", s.pinned));
-    if (s && s.steps && s.steps.length) {
+    if (s && s.tour && AS.tourDrawer) P.appendChild(AS.tourDrawer(s));
+    else if (s && s.steps && s.steps.length) {
       var done = s.steps.filter(function (x) { return x.s === "done"; }).length;
       P.appendChild(h("details", { class: "as-steps", open: store("stepsOpen") ? true : null, ontoggle: function (e) { store("stepsOpen", e.target.open); } },
         h("summary", {}, "مراحل · " + fa(done) + " از " + fa(s.steps.length), h("span", { class: "as-bar" }, h("i", { style: { width: Math.round(100 * done / s.steps.length) + "%" } }))),
@@ -609,6 +678,8 @@
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }
 
+  AS.paint = function () { paint(); };
+  AS.store = store; AS.clip = clip; AS.errText = errText; AS.labelOf = labelOf;
   /* هر رسمِ صفحه: دستیار سرِ جایش بماند (بی‌آن‌که نما را عوض کند) */
   var rawRender = A.render;
   A.render = function () {

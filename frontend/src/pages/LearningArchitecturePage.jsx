@@ -125,7 +125,10 @@ export default function LearningArchitecturePage() {
       },
       // «دستیار»: the open «نظارت و سرکشی» sheets of THIS page — so the chat never files a duplicate and knows what is already pending
       sheets: () => api.get('/inspection', { params: { page: '/apps/learning-architecture', limit: 200 } }).then((r) => (r.data.reports || []).map((x) => ({
-        number: x.number, title: x.title, status: x.status, urgent: !!x.urgent_at, section: x.section_label || '', created: x.created_at || '' }))),
+        id: x.id, number: x.number, title: x.title, status: x.status, urgent: !!x.urgent_at, section: x.section_label || '', created: x.created_at || '' }))),
+      // «🧭 تور»: one sheet with its notes (to verify a routine's answer) and an owner note under it (reopens an answered sheet)
+      sheet: (id) => api.get(`/inspection/${encodeURIComponent(id)}`).then((r) => r.data.report || null),
+      note: (id, text) => api.post(`/inspection/${encodeURIComponent(id)}/notes`, { text }).then((r) => r.data),
       // «دستیار»: a capability gap the chat found → a «نظارت و سرکشی» sheet (urgent when asked), with the issue's files attached
       report: async ({ text, spot, urgent, files }) => {
         const r = await api.post('/inspection', { text, spot });

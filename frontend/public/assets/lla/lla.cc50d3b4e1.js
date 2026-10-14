@@ -30833,6 +30833,7 @@ APP.goFromURL = function (q) {
       catch (e) { return "مرورگر اجازهٔ پیوستِ خودکار نداد — خودت بگذار"; }
     }
   };
+  AS.DO = DO;   // a27_tour.js adds the tour operations here
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
@@ -30843,7 +30844,7 @@ APP.goFromURL = function (q) {
         if (!a || !DO[a.do]) return;
         // کلیدهای k… مالِ صفحهٔ پیشین‌اند: پس از رفتن به نمای تازه هرگز به کار نمی‌روند (پرکردنِ فیلدِ اشتباه) —
         // نوبتِ خودکارِ بعدی با فیلدهای همین صفحه پر می‌کند
-        if (moved && a.do !== "go") { skipped++; return; }
+        if (moved && /^(fill|highlight|click|attach)$/.test(a.do)) { skipped++; return; }
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         if (r) notes.push(r);
         if (a.do === "go" && !r) { moved = true; return wait(350); }
@@ -30923,6 +30924,7 @@ APP.goFromURL = function (q) {
     var L = ["# سشن", "نام: " + (s.title || "(هنوز بی‌نام)"), "خواستهٔ اصلی (سنجاق‌شده): " + (s.pinned || "(هنوز نیست)"), "حافظهٔ سشن: " + (s.memory || "(خالی)")];
     if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]" + (x.view ? " (" + x.view + ")" : ""); }).join(" "));
     if (s.files && s.files.length) L.push("پیوست‌های سشن (id=نام): " + s.files.map(function (f) { return f.id + "=" + f.name; }).join("، ") + " — اگر برای پاسخ دوباره به محتوای یکی لازم داری، reread بده.");
+    if (AS.tourText) { var tt = AS.tourText(s); if (tt) L.push(tt); }
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
     L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
     L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
@@ -31015,7 +31017,7 @@ APP.goFromURL = function (q) {
       reopen: "/apps/learning-architecture" + q, dom_path: ".as-root", covered_text: clip(s.pinned || g.title, 400) };
     var files = (s.files || []).map(function (f) { return blobs[f.id]; }).filter(Boolean);
     return A.HOST.report({ text: text, spot: spot, urgent: true, files: files }).then(function (r) {
-      s.reports.push({ key: key, id: r.id, number: r.number, title: clip(g.title, 80), area: g.area, kind: g.kind, at: now() }); S.put(s); return r;
+      s.reports.push({ key: key, id: r.id, number: r.number, title: clip(g.title, 80), area: g.area, kind: g.kind, facet: g.facet || "", at: now() }); S.put(s); return r;
     });
   };
 
@@ -31094,7 +31096,7 @@ APP.goFromURL = function (q) {
     var auto = 0;
     function turn(msg, extra, ids, first) {
       var sc = AS.scan();
-      return AS.openSheets().then(function (l) { AS._sheets = l; return ask(SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
+      return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; return ask(AS.SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
         if (o.title && !s.title) s.title = clip(o.title, 80);
         if (o.pinned && (!s.pinned || o.pinned !== s.pinned)) s.pinned = clip(o.pinned, 300);
@@ -31102,20 +31104,36 @@ APP.goFromURL = function (q) {
         if (Array.isArray(o.steps) && o.steps.length) s.steps = o.steps.slice(0, 20).map(function (x) { return { t: clip(x.t, 140), s: /^(done|now|todo)$/.test(x.s) ? x.s : "todo", view: A.V[x.view] ? x.view : "" }; });
         s.status = o.status || "related";
         var acts = s.status === "unrelated" ? [] : (Array.isArray(o.actions) ? o.actions : []);
+        // عملیاتِ تور پیش از هر چیز (حتی پیش از ثبتِ برگه): برگه‌ای که برای وجهی از تور است باید آن وجه را پیدا کند
+        // (شبیه‌سازیِ ۲۰۲۶-۱۰-۱۴: tour_plan و gap در یک پاسخ ⇒ برگه پیش از ساختِ تور ثبت شد و وجه «منتظر» نشد)
+        var tnotes = [];
+        acts.filter(function (x) { return x && /^tour_/.test(x.do) && DO[x.do]; }).forEach(function (x) { try { var m = DO[x.do](x); if (m) tnotes.push(m); } catch (e) { tnotes.push(e.message); } });
+        acts = acts.filter(function (x) { return !(x && /^tour_/.test(x.do)); });
+        if (tnotes.length) s.msgs.push({ role: "sys", at: now(), text: tnotes.join(" · ") });
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a); if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
         S.put(s); paint();
         var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
           if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
           sheetCache.at = 0;
-          return AS.fileGap(s, t.gap);
+          return AS.fileGap(s, t.gap).then(function (r) { if (r && !r.dup && AS.tourBlock && t.gap.facet) AS.tourBlock(s, t.gap.facet, r, t.gap); return r; });
         }).then(function (r) {
           if (!r) return;
           s.msgs.push({ role: "sys", at: now(), text: r.dup ? "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." : r.local ? "برگه ساخته شد ولی این نسخه به «نظارت و سرکشی» وصل نیست؛ متنش در سشن ماند." : "🛎 برگهٔ فوری #" + fa(r.number) + " در «نظارت و سرکشی» ثبت شد." });
           S.put(s); paint();
         }, function (e) { s.msgs.push({ role: "sys", at: now(), text: "ثبتِ برگهٔ فوری نشد: " + errText(e) }); S.put(s); paint(); }) : Promise.resolve();
         return gap.then(function () { return AS.run(acts); }).then(function (res) {
+          if (AS.tourAfterTurn) { try { AS.tourAfterTurn(s); S.put(s); paint(); } catch (e) { console.error(e); } }
           if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
+          // پنجره‌ای (تأییدِ فرستادن به هوش مصنوعی، پرسشِ ایمنی، …) باز شد: تصمیمِ خودِ کاربر است — دستیار کنار می‌رود و صریح می‌گوید
+          var ov = Array.prototype.slice.call(document.querySelectorAll(".overlay, [role=dialog][aria-modal=true]")).filter(function (x) { return !x.closest(".as-root") && x.getClientRects().length > 0; })[0];
+          if (ov) {
+            var ot = (ov.querySelector("h2,h3") || {}).textContent || "یک پنجره";
+            s.msgs.push({ role: "sys", at: now(), text: "🪟 پنجرهٔ «" + clip(ot, 80) + "» باز شد. آن را بخوان؛ اگر موافقی دکمه‌اش (مثلاً «بفرست») را **خودت** بزن — فرستادنِ متنت به هوش مصنوعی و حذفِ نام‌ها تصمیمِ خودِ توست. بعد برای ادامه 💬 را بزن." });
+            S.put(s); if (ui && !ui.panel.hidden) AS.toggle(false);
+            A.toast("پنجرهٔ تأیید باز شد — بررسی کن و خودت بزن؛ دستیار کنار رفت.");
+            return;
+          }
           var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
           var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
           if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
@@ -31157,16 +31175,60 @@ APP.goFromURL = function (q) {
     handle.addEventListener("pointerup", function () { if (!st) return; var m = st.moved; st = null; if (m) { var r = box.getBoundingClientRect(); store("pos", { x: Math.round(r.left), y: Math.round(r.top) }); placePanel(); } else if (onTap) onTap(); });
   }
   /* پنجره کنارِ دکمه باز می‌شود (بالا یا پایینِ آن، هر کدام جا دارد)؛ در موبایل برگهٔ پایینِ صفحه است (CSS) */
+  /* اندازه و جای پنجره (مالک ۲۰۲۶-۱۰-۱۴: «پنجره را بشود کشید و بزرگ‌تر و کوچک‌تر کرد»): با کشیدنِ سرتیتر جابه‌جا، با دو گوشهٔ پایین
+     بزرگ/کوچک، ⤢ بیشینه/برگشت؛ همه به خاطر می‌ماند. تا کاربر جابه‌جایش نکرده، کنارِ دکمه باز می‌شود. موبایل: برگهٔ پایینِ صفحه. */
+  var MINW = 300, MINH = 300;
+  function clampG(g) {
+    var W = window.innerWidth, H = window.innerHeight;
+    var w = Math.min(Math.max(MINW, g.w || 400), W - 16), hh = Math.min(Math.max(MINH, g.h || 520), H - 16);
+    return { x: Math.min(Math.max(8, g.x == null ? W - w - 18 : g.x), W - w - 8), y: Math.min(Math.max(8, g.y == null ? 60 : g.y), H - hh - 8), w: w, h: hh, max: !!g.max };
+  }
+  function setGeom(P, g) {
+    var W = window.innerWidth, H = window.innerHeight;
+    if (g.max) g = { x: Math.round(W * 0.04), y: Math.round(H * 0.05), w: Math.round(W * 0.92), h: Math.round(H * 0.88), max: true };
+    else g = clampG(g);
+    P.style.left = g.x + "px"; P.style.top = g.y + "px"; P.style.right = "auto"; P.style.bottom = "auto";
+    P.style.width = g.w + "px"; P.style.height = g.h + "px"; P.style.maxHeight = "none";
+    P.classList.toggle("as-max", !!g.max);
+  }
+  AS.geom = function () { return store("pgeom"); };
   function placePanel() {
     if (!ui || ui.panel.hidden) return;
     var P = ui.panel, r = ui.fab.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight;
-    if (W <= 600) { P.style.left = P.style.top = P.style.right = P.style.bottom = ""; return; }
+    if (W <= 600) { P.style.left = P.style.top = P.style.right = P.style.bottom = P.style.width = P.style.height = ""; return; }
+    var g = store("pgeom");
+    if (g) { setGeom(P, g); return; }
+    P.style.width = P.style.height = "";
     var w = Math.min(400, W - 16), right = Math.min(Math.max(8, W - r.right), W - w - 8);
     P.style.right = right + "px"; P.style.left = "auto";
     if (r.top > H / 2) { P.style.bottom = (H - r.top + 8) + "px"; P.style.top = "auto"; P.style.maxHeight = Math.max(240, r.top - 16) + "px"; }
     else { P.style.top = (r.bottom + 8) + "px"; P.style.bottom = "auto"; P.style.maxHeight = Math.max(240, H - r.bottom - 16) + "px"; }
   }
   window.addEventListener("resize", function () { if (ui) { place(ui.root); placePanel(); } });
+  function panelDrag(handle, mode) {   // mode: "move" | "r" (گوشهٔ پایین‌راست) | "l" (گوشهٔ پایین‌چپ)
+    var st = null;
+    handle.addEventListener("pointerdown", function (e) {
+      if (e.button || window.innerWidth <= 600 || (mode === "move" && e.target.closest("button"))) return;
+      var r = ui.panel.getBoundingClientRect(); st = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, w: r.width, h: r.height };
+      try { handle.setPointerCapture(e.pointerId); } catch (x) { } e.preventDefault();
+    });
+    handle.addEventListener("pointermove", function (e) {
+      if (!st) return; var dx = e.clientX - st.x, dy = e.clientY - st.y, g;
+      if (mode === "move") g = { x: st.l + dx, y: st.t + dy, w: st.w, h: st.h };
+      else if (mode === "r") g = { x: st.l, y: st.t, w: st.w + dx, h: st.h + dy };
+      else g = { x: st.l + dx, y: st.t, w: st.w - dx, h: st.h + dy };
+      if (mode === "l" && g.w < MINW) { g.x -= MINW - g.w; g.w = MINW; }
+      setGeom(ui.panel, g);
+    });
+    handle.addEventListener("pointerup", function () {
+      if (!st) return; st = null; var r = ui.panel.getBoundingClientRect();
+      store("pgeom", { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), max: false });
+    });
+  }
+  AS.toggleMax = function () {
+    var g = store("pgeom") || (function () { var r = ui.panel.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; })();
+    g.max = !g.max; store("pgeom", g); placePanel();
+  };
   var pend = [];
   function build() {
     var root = h("div", { class: "as-root", dir: "rtl", "data-report-section": "assistant", "data-report-section-label": "💬 دستیار" });
@@ -31186,11 +31248,18 @@ APP.goFromURL = function (q) {
       h("b", { class: "as-ttl" }, ui.view === "list" ? "سشن‌ها" : (s && s.title) || "دستیار"),
       h("button", { class: "as-ib", type: "button", title: "سشن‌ها", "aria-label": "فهرستِ سشن‌ها", onclick: function () { ui.view = ui.view === "list" ? "chat" : "list"; paint(); } }, "☰"),
       h("button", { class: "as-ib", type: "button", title: "سشنِ تازه", "aria-label": "سشنِ تازه", onclick: function () { AS.newSession(); ui.view = "chat"; AS.clearMarks(); paint(); } }, "＋"),
+      h("button", { class: "as-ib as-maxb", type: "button", title: "بزرگ / اندازهٔ قبلی", "aria-label": "بیشینه یا برگشت", onclick: function () { AS.toggleMax(); } }, "⤢"),
       h("button", { class: "as-ib", type: "button", title: "بستن", "aria-label": "بستن", onclick: function () { AS.toggle(false); } }, "✕"));
+    head.title = "برای جابه‌جاییِ پنجره بکش؛ دو بار بزن تا بزرگ شود";
+    panelDrag(head, "move");
+    head.addEventListener("dblclick", function (e) { if (!e.target.closest("button")) AS.toggleMax(); });
     P.appendChild(head);
+    var gr = h("span", { class: "as-grip r", title: "بزرگ/کوچک کردن", "aria-hidden": "true" }), gl = h("span", { class: "as-grip l", title: "بزرگ/کوچک کردن", "aria-hidden": "true" });
+    panelDrag(gr, "r"); panelDrag(gl, "l"); P.appendChild(gr); P.appendChild(gl);
     if (ui.view === "list") { P.appendChild(listView()); return; }
     if (s && s.pinned) P.appendChild(h("div", { class: "as-pin", title: "خواستهٔ اصلیِ این سشن" }, "📌 ", s.pinned));
-    if (s && s.steps && s.steps.length) {
+    if (s && s.tour && AS.tourDrawer) P.appendChild(AS.tourDrawer(s));
+    else if (s && s.steps && s.steps.length) {
       var done = s.steps.filter(function (x) { return x.s === "done"; }).length;
       P.appendChild(h("details", { class: "as-steps", open: store("stepsOpen") ? true : null, ontoggle: function (e) { store("stepsOpen", e.target.open); } },
         h("summary", {}, "مراحل · " + fa(done) + " از " + fa(s.steps.length), h("span", { class: "as-bar" }, h("i", { style: { width: Math.round(100 * done / s.steps.length) + "%" } }))),
@@ -31233,10 +31302,353 @@ APP.goFromURL = function (q) {
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }
 
+  AS.paint = function () { paint(); };
+  AS.store = store; AS.clip = clip; AS.errText = errText; AS.labelOf = labelOf;
   /* هر رسمِ صفحه: دستیار سرِ جایش بماند (بی‌آن‌که نما را عوض کند) */
   var rawRender = A.render;
   A.render = function () {
     rawRender.apply(this, arguments);
     try { if (!ui || !document.contains(ui.root)) { ui = null; build(); if (store("open")) AS.toggle(true); } } catch (e) { console.error(e); }
   };
+})(APP);
+/* ===== «🧭 تور»: یک مسئلهٔ چندوجهی ⇒ چند بخش، به ترتیب، بی فراموشی، با تمرین و پیگیری (مالک ۲۰۲۶-۱۰-۱۴) =====
+   خواستهٔ مالک: «اگر موضوعی که به دستیار می‌گویم به چند قسمت مربوط باشد — بخشی حلِ مسئلهٔ بزرگ، بخشی خطای معرفتی، بخشی گرهِ ذهنی، بخشی
+   حوزه‌ای که هنوز در سامانه نیست — دستیار اولویت‌بندی و ترتیب‌بندی کند، مرحله‌به‌مرحله و بی‌فراموشی مرا از همهٔ ایستگاه‌ها عبور دهد،
+   برای روزها و هفته‌های آینده تمرین برنامه‌ریزی و پیگیری کند، شبیه‌سازی‌ها ساخته شود؛ و برگه‌ای را که برای حوزهٔ نبوده ثبت کرده پیگیری کند:
+   اگر ناقص ساخته شد، زیرِ همان برگه با دلیل راهنمایی کند تا درست شود، و بعد مرا از همان وجه هم عبور دهد».
+   اصل: هیچ زیرساختِ موازی ساخته نمی‌شود. بخش‌ها خودشان تمرینِ فاصله‌دار دارند (کارت، ورزشِ گره، مسئلهٔ هم‌ساختار، تاریخِ بازبینیِ پرونده،
+   چرخهٔ ۱-۳-۷) و همه در «امروز» می‌آیند. تور (۱) ترتیب و وضعِ هر وجه را **ماندگار** نگه می‌دارد (حافظهٔ مدل نیست)، (۲) پیشرفت را از **خودِ
+   رکوردها** می‌سنجد، (۳) رکوردهای ساخته‌شده را به وجهِ خودش وصل می‌کند و تمرین‌های آینده‌شان را نشان می‌دهد، (۴) در «امروز» و با یادآور
+   پیگیری می‌کند، (۵) برگهٔ حوزهٔ نبوده را تا درست‌شدن دنبال می‌کند و بعد همان وجه را باز می‌کند. */
+(function (A) {
+  var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
+  if (!AS) return;
+  var clip = AS.clip, store = AS.store;
+
+  var KIND = {
+    knot: { fa: "گرهِ ذهنی", ic: "🪢", view: "kcases" },
+    claim: { fa: "سنجشِ ادعا/باور", ic: "⚖️", view: "e_home" },
+    problem: { fa: "مسئلهٔ بزرگ و شبیه‌ساز", ic: "🧩", view: "e_prob" },
+    learn: { fa: "فهمیدنِ عمیق", ic: "🌱", view: "topics" },
+    territory: { fa: "حوزه‌ای که هنوز نیست", ic: "🗺", view: "maps" },
+    other: { fa: "گامِ دیگر", ic: "•", view: "" }
+  };
+  var ROOT_TYPE = { knot: "kcase", claim: "case", problem: "eprob", learn: "topic" };
+  var ST_FA = { todo: "مانده", now: "در جریان", done: "انجام شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
+  function nowIso() { return new Date().toISOString(); }
+  function get(id) { return id ? S.get(id) : null; }
+
+  /* ---------- رکوردهای هر وجه (ریشه + فرزندان، از پیوندهای خودِ رکوردها) ---------- */
+  function refsOf(f) { return (f.refs || []).map(function (r) { return get(r.id); }).filter(Boolean); }
+  function children(f) {
+    var roots = refsOf(f), out = { kcase: [], knot: [], kitem: [], kexp: [], "case": [], eprob: [], pbitem: [], topic: [], card: [], sched: [], ex: [] };
+    roots.forEach(function (r) { if (out[r.type]) out[r.type].push(r); });
+    out.kcase.forEach(function (kc) {
+      (kc.knots || []).forEach(function (id) { var k = get(id); if (k && out.knot.indexOf(k) < 0) out.knot.push(k); });
+      var ec = kc.premise && kc.premise.ecase && get(kc.premise.ecase); if (ec && out["case"].indexOf(ec) < 0) out["case"].push(ec);
+    });
+    var kid = out.knot.map(function (k) { return k.id; });
+    if (kid.length) {
+      out.kitem = S.all("kitem", function (x) { return kid.indexOf(x.knot) >= 0 && !x.bad; });
+      out.kexp = S.all("kexp", function (x) { return kid.indexOf(x.knot) >= 0; });
+    }
+    var pids = out.eprob.map(function (r) { return r.p && r.p.id; }).filter(Boolean);
+    if (pids.length) out.pbitem = S.all("pbitem", function (x) { return pids.indexOf(x.pid) >= 0; });
+    var tids = out.topic.map(function (t) { return t.id; });
+    if (tids.length) {
+      out.card = S.all("card", function (c) { return tids.indexOf(c.topic) >= 0 && !c.susp; });
+      out.sched = S.all("sched", function (x) { return tids.indexOf(x.topic) >= 0; });
+      out.ex = S.all("ex", function (x) { return tids.indexOf(x.topic) >= 0 && !x.sample; });
+    }
+    return out;
+  }
+  /* ---------- نشانه‌های پیشرفت: از خودِ داده، نه از حرفِ مدل ---------- */
+  function milestones(f) {
+    var c = children(f), m = [];
+    function add(t, ok, core, mine) { m.push({ t: t, ok: !!ok, core: core !== false, mine: !!mine }); }
+    if (f.kind === "knot") {
+      var kc = c.kcase[0];
+      add("موقعیت ثبت شد (گره‌گشا)", kc);
+      add("پله‌ها تا ریشه و «ریشه را تأیید کن» — تصمیمِ خودت", kc && kc.root && kc.root.confirmed, true, true);
+      add("گرهِ ذهنی ساخته شد", c.knot.length);
+      add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.length);
+      add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
+    } else if (f.kind === "claim") {
+      var cs = c["case"][0], fin = cs && cs.st && cs.st.st_final;
+      add("پروندهٔ سنجش در کارخانه ساخته شد", cs);
+      add("ایستگاه‌ها گذرانده شد" + (cs ? " (" + fa(Object.keys(cs.st || {}).filter(function (k) { return (cs.st[k] || {}).done; }).length) + ")" : ""), fin && fin.done);
+      add("تاریخِ بازبینی گذاشته شد (پیگیریِ نتیجهٔ واقعی)", fin && fin.data && fin.data.revdate);
+    } else if (f.kind === "problem") {
+      var pr = c.eprob[0];
+      add("مسئله وارد و تجزیه شد", pr);
+      add("تأییدِ مسئله پس از وارسی — تصمیمِ خودت", pr && pr.status === "approved", true, true);
+      add("شبیه‌ساز تمرین شد", pr && pr.p && S.get("eprog_" + pr.p.id), false);
+      add("مسئله‌های هم‌ساختارِ فاصله‌دار ساخته شد", c.pbitem.length);
+    } else if (f.kind === "learn") {
+      var tp = c.topic[0], jp = tp && A.journeyProgress ? A.journeyProgress(tp) : null;
+      add("موضوع ساخته شد", tp);
+      add("سفرِ گام‌به‌گام" + (jp ? " (" + fa(jp.done) + " از " + fa(jp.all) + ")" : ""), jp && jp.done >= Math.min(4, jp.all), false);
+      add("کارت‌های مرور یا چرخهٔ ۱-۳-۷ زمان‌بندی شد", c.card.length || c.sched.length);
+    } else if (f.kind === "territory") {
+      var b = f.blocked || {};
+      add("برگهٔ ساختِ حوزه ثبت شد" + (b.number ? " (#" + fa(b.number) + ")" : ""), b.number);
+      add("روتینِ مسئول ساخت و دستیار درستیِ آن را وارسی کرد", b.verified);
+    }
+    // گام‌های نوشتهٔ مدل فقط برای وجه‌هایی که نشانهٔ داده‌محور ندارند (وگرنه تکرارِ همان نشانه‌ها می‌شد — شبیه‌سازیِ ۲۰۲۶-۱۰-۱۴)
+    if (f.kind === "other") (f.steps || []).forEach(function (s) { add(s.t, s.done, false); });
+    return m;
+  }
+  function coreDone(f) { var m = milestones(f).filter(function (x) { return x.core; }); return m.length > 0 && m.every(function (x) { return x.ok; }); }
+  /* تمرین‌های آینده‌ای که همین بخش‌ها زمان‌بندی کرده‌اند */
+  function practice(f) {
+    var c = children(f), out = [], t = A.today();
+    function first(arr, fld) { var d = arr.map(function (x) { return x[fld]; }).filter(Boolean).sort(); return d[0] || ""; }
+    if (c.kitem.length) out.push({ t: fa(c.kitem.length) + " ورزشِ گره", due: first(c.kitem, "due"), view: "kpractice" });
+    var ke = c.kexp.filter(function (x) { return x.status === "planned"; }); if (ke.length) out.push({ t: "آزمایشِ واقعی", due: first(ke, "due"), view: "kpractice", arg: ke[0].knot, sub: "exp" });
+    if (c.pbitem.length) out.push({ t: fa(c.pbitem.length) + " مسئلهٔ هم‌ساختار", due: first(c.pbitem, "due"), view: "e_prob", arg: (c.pbitem[0] || {}).pid, sub: "similar" });
+    if (c.card.length) out.push({ t: fa(c.card.length) + " کارتِ مرور", due: first(c.card, "due"), view: "review" });
+    var sc = c.sched.filter(function (x) { return !x.done; }); if (sc.length) out.push({ t: "چرخهٔ ۱-۳-۷ (برگهٔ سفید)", due: first(sc, "due"), view: "topic", arg: sc[0].topic });
+    c["case"].forEach(function (cs) { var d = cs.st && cs.st.st_final && cs.st.st_final.data; var rd = d && d.revdate && A.epiRevDate ? A.epiRevDate(d.revdate) : ""; if (rd) out.push({ t: "بازبینیِ نتیجهٔ واقعیِ «" + clip(cs.title, 40) + "»", due: rd, view: "e_case", arg: cs.id }); });
+    out.forEach(function (p) { p.overdue = p.due && p.due <= t; });
+    return out.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
+  }
+  AS.tourMilestones = milestones; AS.tourPractice = practice; AS.tourChildren = children;
+
+  /* ---------- عملیاتِ تور (از پاسخِ مدل) ---------- */
+  function T(s) { return s.tour; }
+  function fac(s, key) { return T(s) && T(s).facets.filter(function (f) { return f.key === key; })[0]; }
+  function current(s) { var t = T(s); return t && t.facets.filter(function (f) { return f.status === "now"; })[0]; }
+  function advance(s) {
+    var t = T(s); if (!t) return null;
+    if (current(s)) return current(s);
+    var n = t.facets.filter(function (f) { return f.status === "todo"; })[0];
+    if (n) { n.status = "now"; n.startedAt = n.startedAt || nowIso(); }
+    if (!n && t.facets.every(function (f) { return f.status === "done" || f.status === "skipped"; })) t.doneAt = t.doneAt || nowIso();
+    return n || null;
+  }
+  function normFacet(x, i) {
+    var k = KIND[x.kind] ? x.kind : "other";
+    return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, title: clip(x.title || KIND[k].fa, 120), why: clip(x.why || "", 300),
+      view: A.V[x.view] ? x.view : KIND[k].view, arg: x.arg == null ? "" : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : "",
+      steps: (x.steps || []).slice(0, 12).map(function (st) { return { t: clip(typeof st === "string" ? st : st.t, 140), done: false }; }),
+      status: "todo", refs: [], createdAt: nowIso() };
+  }
+  var DO = AS.DO;
+  DO.tour_plan = function (a) {
+    var s = AS._turnSession; if (!s || !Array.isArray(a.facets) || !a.facets.length) return "طرحِ تور خالی بود";
+    var fs = a.facets.slice(0, 10).map(normFacet);
+    if (!s.tour) {
+      s.tour = { goal: clip(a.goal || s.pinned || "", 300), createdAt: nowIso(), facets: fs };
+    } else {   // طرحِ تازه چیزی را بی‌صدا پاک نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
+      var have = {}; s.tour.facets.forEach(function (f) { have[f.key] = f; });
+      fs.forEach(function (f) { if (!have[f.key]) s.tour.facets.push(f); else { have[f.key].title = f.title; have[f.key].why = f.why || have[f.key].why; } });
+    }
+    advance(s); return "";
+  };
+  DO.tour_add = function (a) { return DO.tour_plan({ facets: [a.facet || a] }); };
+  DO.tour_focus = function (a) {
+    var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجهِ «" + (a.facet || "") + "» در تور نیست";
+    if (f.status === "blocked") return "وجهِ «" + f.title + "» منتظرِ ساختِ حوزه است";
+    var c = current(s); if (c && c !== f) c.status = "todo";
+    f.status = "now"; f.startedAt = f.startedAt || nowIso(); return "";
+  };
+  DO.tour_step = function (a) { var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست"; var st = (f.steps || [])[+a.step - 1]; if (st) st.done = a.done !== false; return ""; };
+  DO.tour_link = function (a) {
+    var s = AS._turnSession, f = s && fac(s, a.facet), r = get(a.id); if (!f || !r) return "پیوند به رکوردِ ناموجود";
+    if (!(f.refs || []).some(function (x) { return x.id === r.id; })) f.refs.push({ id: r.id, type: r.type }); return "";
+  };
+  DO.tour_done = function (a) {
+    var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست";
+    if (!coreDone(f) && !a.why) return "«" + f.title + "» هنوز نشانه‌های پایانش کامل نیست — اگر واقعاً تمام است، دلیل بنویس";
+    f.status = "done"; f.doneAt = nowIso(); f.doneBy = coreDone(f) ? "evidence" : "assistant: " + clip(a.why, 200); advance(s); return "";
+  };
+  DO.tour_skip = function (a) {
+    var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست";
+    if (!a.why) return "کنار گذاشتنِ وجه بی دلیل ممکن نیست";
+    f.status = "skipped"; f.skipWhy = clip(a.why, 300); advance(s); return "";
+  };
+
+  /* برگهٔ «حوزه‌ای که نیست» ⇒ همان وجه منتظر می‌ماند؛ بقیهٔ تور ادامه دارد */
+  AS.tourBlock = function (s, key, r, g) {
+    var f = fac(s, key); if (!f || !r || !r.id) return;
+    f.status = "blocked"; f.blocked = { id: r.id, number: r.number, area: g.area, title: g.title, at: nowIso(), checks: [], seenNote: "" };
+    advance(s); S.put(s);
+  };
+
+  /* ---------- پس از هر نوبت: پیوندِ خودکار، پیشرفت، رفتن به وجهِ بعد ---------- */
+  AS.tourAfterTurn = function (s) {
+    var t = T(s); if (!t) return;
+    // خوداصلاحی: برگه‌ای که برای وجهی ثبت شده ولی وجه به آن وصل نشده (مثلاً برگه پیش از ساختِ تور) ⇒ همان وجه منتظرِ همان برگه
+    (s.reports || []).forEach(function (r) {
+      var f = r.facet && fac(s, r.facet);
+      if (f && !f.blocked && r.id && f.status !== "done" && f.status !== "skipped") { f.status = "blocked"; f.blocked = { id: r.id, number: r.number, area: r.area, title: r.title, at: r.at, checks: [], seenNote: "" }; }
+    });
+    var c = current(s), msgs = [];
+    if (c && ROOT_TYPE[c.kind]) {   // رکوردِ اصلیِ تازه‌ای که از آغازِ این وجه ساخته شد ⇒ به همین وجه
+      var since = c.startedAt || c.createdAt, typ = ROOT_TYPE[c.kind];
+      S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
+        var taken = t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === r.id; }); });
+        if (!taken) { c.refs.push({ id: r.id, type: r.type }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
+      });
+    }
+    t.facets.forEach(function (f) {
+      if ((f.status === "now" || f.status === "todo") && f.kind !== "territory" && f.kind !== "other" && coreDone(f)) {
+        f.status = "done"; f.doneAt = nowIso(); f.doneBy = "evidence";
+        msgs.push("✓ وجهِ «" + f.title + "» کامل شد (از روی خودِ داده‌ها)" + (practice(f).length ? "؛ تمرین‌هایش زمان‌بندی شده و در «امروز» می‌آید" : ""));
+      }
+    });
+    var n = advance(s);
+    if (msgs.length) s.msgs.push({ role: "sys", at: nowIso(), text: msgs.join(" · ") + (n && msgs.some(function (x) { return /^✓/.test(x); }) ? " — بعدی: «" + n.title + "»" : "") });
+    if (t.doneAt && !t.doneSaid) { t.doneSaid = true; s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 همهٔ وجه‌های تور تمام شد. تمرین‌های آینده در «امروز» می‌آیند؛ اگر وجهی منتظرِ برگه بود، پس از ساختش دوباره خبرت می‌کنم." }); }
+    syncReminder(s);
+  };
+
+  /* ---------- متنِ تور برای مدل (حافظهٔ ماندگار — مدل همین را دنبال می‌کند) ---------- */
+  AS.tourText = function (s) {
+    var t = T(s); if (!t) return "";
+    var L = ["# تور (ماندگار؛ همین را دنبال کن، چیزی را از قلم نینداز) — هدف: " + (t.goal || s.pinned || "")];
+    t.facets.forEach(function (f, i) {
+      var ms = milestones(f), pr = practice(f);
+      L.push((i + 1) + ") [" + f.key + "] " + KIND[f.kind].fa + " — «" + f.title + "» — وضع: " + f.status + (f.status === "now" ? " ◀ همین حالا" : "") +
+        " — نما: " + f.view + (f.arg ? " arg=" + f.arg : "") + (f.sub ? " sub=" + f.sub : "") +
+        " — نشانه‌ها: " + ms.map(function (m) { return (m.ok ? "✓" : "○") + m.t + (m.mine ? " (کارِ کاربر)" : ""); }).join("؛ ") +
+        ((f.refs || []).length ? " — رکوردها: " + f.refs.map(function (r) { return r.type + ":" + r.id; }).join("، ") : "") +
+        (pr.length ? " — تمرینِ زمان‌بندی‌شده: " + pr.map(function (p) { return p.t + " " + p.due; }).join("، ") : "") +
+        (f.blocked ? " — برگهٔ #" + f.blocked.number + (f.blocked.verified ? " (ساخته و وارسی شد)" : " (منتظر)") : "") + (f.why ? " — چرا: " + f.why : ""));
+    });
+    return L.join("\n");
+  };
+
+  /* ---------- قاعده‌های تور برای مدل ---------- */
+  AS.SYS += "\n" + [
+    "# تور: مسئلهٔ چندوجهی",
+    "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود.",
+    "- ترتیب: (۱) وجهی که نتیجه‌اش ورودیِ وجهِ دیگر است اول (مثلاً ریشهٔ گیر پیش از ساختنِ شبیه‌سازِ همان مسئله؛ سنجشِ باوری که تصمیم بر آن بنا شده پیش از عمل)؛ (۲) آنچه زمان‌دار است زودتر؛ (۳) فهمیدنِ عمیقِ مفهومی که در همه مشترک است پیش از تمرینِ تخصصی؛ (۴) وجهِ «territory» (حوزه‌ای که نیست) جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و با بقیه ادامه بده.",
+    "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",
+    "- تمرین برای روزهای آینده را خودِ بخش‌ها می‌سازند — مطمئن شو ساخته شود: گره ⇒ «ساختِ ۴ نمونه» یا «ساختِ نمونه با هوش مصنوعی» و یک آزمایشِ واقعی؛ مسئلهٔ بزرگ ⇒ «ساختِ ۴ مسئلهٔ هم‌ساختار + ۱ بدلی» و شبیه‌ساز؛ یادگیری ⇒ کارتِ مرور و «شروع چرخه از امروز»؛ ادعا ⇒ تاریخِ بازبینی در ایستگاهِ پایانی. شبیه‌سازِ مسئلهٔ خودش از موقعیتِ گره با «ساختنِ شبیه‌سازِ همین مسئله».",
+    "- تصمیم‌های کاربر (ریشه را تأیید کن، تأییدِ مسئله، بپذیر/رد کن) را نزن: هایلایت کن و یک جمله بگو چرا تصمیم با خودِ اوست.",
+    "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
+  ].join("\n");
+
+  /* ---------- کشوی تور ---------- */
+  AS.tourDrawer = function (s) {
+    var t = T(s), all = t.facets.length, done = t.facets.filter(function (f) { return f.status === "done" || f.status === "skipped"; }).length;
+    var box = h("details", { class: "as-steps as-tour", open: store("tourOpen") === false ? null : true, ontoggle: function (e) { store("tourOpen", e.target.open); } },
+      h("summary", {}, "🧭 تور · " + fa(done) + " از " + fa(all), h("span", { class: "as-bar" }, h("i", { style: { width: Math.round(100 * done / Math.max(1, all)) + "%" } }))));
+    var ol = h("ol", { class: "as-tl" });
+    t.facets.forEach(function (f) {
+      var ms = milestones(f), pr = practice(f), K = KIND[f.kind], okN = ms.filter(function (m) { return m.ok; }).length;
+      var open = f.status === "now" || (f.status === "blocked" && !f.blocked.verified && (f.blocked.checks || []).length);
+      ol.appendChild(h("li", { class: "as-st as-facet " + f.status, "data-facet": f.key },
+        h("details", { open: open ? true : null },
+          h("summary", {},
+            h("span", { class: "as-dot", "aria-hidden": "true" }, f.status === "done" ? "✓" : f.status === "now" ? "●" : f.status === "blocked" ? "⏳" : f.status === "skipped" ? "–" : "○"),
+            h("b", {}, K.ic + " " + f.title), " ", h("span", { class: "small muted" }, (ST_FA[f.status] || f.status) + (ms.length ? " · " + fa(okN) + "/" + fa(ms.length) : ""))),
+          h("ul", { class: "plain small as-ms" }, ms.map(function (m) { return h("li", { class: m.ok ? "ok" : "" }, (m.ok ? "✓ " : "○ ") + m.t); })),
+          pr.length ? h("div", { class: "small as-pr" }, "📅 ", pr.map(function (p) { return h("button", { class: "linkish" + (p.overdue ? " bad" : ""), type: "button", onclick: function () { A.go(p.view, p.arg || null, p.sub || null); } }, p.t + " · " + A.fdate(p.due)); })) : null,
+          f.blocked ? h("div", { class: "small as-blk" }, "🛎 برگهٔ #" + fa(f.blocked.number) + " — " + (f.blocked.verified ? "حوزه ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
+            (f.blocked.checks && f.blocked.checks.length ? " · " + fa(f.blocked.checks.length) + " بار پیگیری" : ""),
+            !f.blocked.verified ? h("button", { class: "linkish", type: "button", onclick: function () { AS.tourCheckSheets(s, true).then(function () { AS.paint(); }); } }, " بررسیِ دوباره") : null) : null,
+          f.view && f.status !== "skipped" ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go(f.view, f.arg || null, f.sub || null); } }, "↗ رفتن به این بخش") : null)));
+    });
+    box.appendChild(ol);
+    if (!t.doneAt) box.appendChild(h("button", { class: "btn sm", type: "button", onclick: function () { AS.send("[ادامهٔ تور]"); } }, "▶ ادامهٔ تور"));
+    return box;
+  };
+
+  /* ---------- پیگیریِ برگه‌ها: تا درست‌ساختن، بعد بازکردنِ همان وجه ---------- */
+  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ فقط JSON: {\"ok\":true|false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
+  AS.VERIFY_SYS = VERIFY_SYS;
+  var MAX_FOLLOW = 4, lastSweep = 0;
+  function reviewerNotes(rep) { return (rep.notes || []).filter(function (n) { return n.by === "reviewer"; }); }
+  AS.tourCheckSheets = function (s, force) {
+    if (!(A.HOST && A.HOST.sheet)) return Promise.resolve();
+    var t = T(s); if (!t) return Promise.resolve();
+    var todo = t.facets.filter(function (f) { return f.status === "blocked" && f.blocked && f.blocked.id && !f.blocked.verified; });
+    var chain = Promise.resolve();
+    todo.forEach(function (f) {
+      chain = chain.then(function () {
+        return Promise.resolve(A.HOST.sheet(f.blocked.id)).then(function (rep) {
+          if (!rep) return;
+          var rv = reviewerNotes(rep), last = rv[rv.length - 1];
+          if (!last || !(rep.status === "answered" || rep.status === "approved")) return;   // هنوز جوابی نیامده
+          if (!force && last.id === f.blocked.seenNote) return;                            // همین جواب را دیده‌ایم
+          if (A._loadedAt && Date.parse(last.at || 0) > A._loadedAt) {
+            if (f.blocked.reloadAsked !== last.id) { f.blocked.reloadAsked = last.id; s.msgs.push({ role: "sys", at: nowIso(), text: "🛎 روتین زیرِ برگهٔ #" + fa(f.blocked.number) + " جواب داد. صفحه را یک بار تازه کن (نسخهٔ تازهٔ سامانه) تا ساخته‌شده را با خودِ سامانه بسنجم." }); S.put(s); }
+            return;
+          }
+          f.blocked.seenNote = last.id;
+          var u = "# نقشهٔ کنونیِ سامانه\n" + AS.manifest() + "\n\n# برگه (کمبودی که دستیار ثبت کرد)\n" + (f.blocked.title || "") + "\nقلمرو: " + (f.blocked.area || "") +
+            "\nوجهِ کاربر: " + f.title + (f.why ? " — " + f.why : "") + "\n\n# جواب‌های روتین زیرِ برگه\n" + rv.map(function (n) { return "- (" + (n.outcome || "") + ") " + clip(n.text, 2500) + ((n.commits || []).length ? " — کامیت‌ها: " + n.commits.join("، ") : ""); }).join("\n") +
+            "\n\n# پیگیری‌های قبلیِ دستیار\n" + (f.blocked.checks || []).map(function (c) { return "- " + c.at.slice(0, 10) + " " + (c.ok ? "درست" : "ناقص") + ": " + clip(c.reason, 300); }).join("\n");
+          return A.callAI(VERIFY_SYS, u, { task: "learning_architecture", maxTokens: 3000 }).then(function (txt) {
+            var o = (A.parseJSONLoose || JSON.parse)(typeof txt === "object" ? txt.text : txt);
+            f.blocked.checks.push({ at: nowIso(), ok: !!o.ok, reason: clip(o.reason, 500), note: last.id });
+            if (o.ok) {
+              f.blocked.verified = true; f.status = f.status === "blocked" ? "todo" : f.status;
+              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) + " — حالا وجهِ «" + f.title + "» را با هم طی می‌کنیم." });
+              advance(s);
+            } else if (f.blocked.checks.filter(function (c) { return !c.ok; }).length > MAX_FOLLOW) {
+              s.msgs.push({ role: "sys", at: nowIso(), text: "⚠️ برگهٔ #" + fa(f.blocked.number) + " پس از " + fa(MAX_FOLLOW) + " بار پیگیری هنوز درست نشده — این را خودت ببین (" + clip(o.reason, 200) + ")." });
+            } else {
+              var note = "[دستیار · پیگیریِ برگه — بار " + fa(f.blocked.checks.length) + "]\nآنچه ساخته شد با خواسته و وجهِ کاربر نمی‌خواند:\n" + clip(o.reason, 1500) + "\n\n" + clip(o.followup || "", 4000) +
+                "\n\nروال: همان بخشِ «هماهنگی میانِ روتین‌ها» (precheck ⇒ دستورِ روتینِ مالکِ قلمرو ⇒ دست‌به‌دست). این یادداشت برگه را دوباره باز کرد.";
+              return Promise.resolve(A.HOST.note(f.blocked.id, note)).then(function () {
+                s.msgs.push({ role: "sys", at: nowIso(), text: "↩ برگهٔ #" + fa(f.blocked.number) + " را با دلیل دوباره باز کردم: " + clip(o.reason, 200) });
+              });
+            }
+          }, function (e) { f.blocked.seenNote = ""; s.msgs.push({ role: "sys", at: nowIso(), text: "وارسیِ برگهٔ #" + fa(f.blocked.number) + " نشد: " + AS.errText(e) }); });
+        }, function () { });
+      });
+    });
+    return chain.then(function () { S.put(s); });
+  };
+  /* جاروی دوره‌ای: هنگامِ رسمِ صفحه، حداکثر هر ۲۰ دقیقه، برای همهٔ سشن‌های تور‌دار */
+  A._loadedAt = A._loadedAt || Date.now();
+  AS.tourSweep = function (force) {
+    if (!force && Date.now() - lastSweep < 20 * 60000) return Promise.resolve();
+    lastSweep = Date.now();
+    var ss = S.all("achat", function (x) { return x.tour && x.tour.facets.some(function (f) { return f.status === "blocked"; }); });
+    return ss.reduce(function (p, s) { return p.then(function () { return AS.tourCheckSheets(s); }); }, Promise.resolve()).then(function () { if (ss.length) AS.paint(); });
+  };
+
+  /* ---------- «امروز»: ادامهٔ تور و خبرِ ساخته‌شدنِ حوزه ---------- */
+  function openTour(s, f) { store("cur", s.id); if (f && f.view) A.go(f.view, f.arg || null, f.sub || null); AS.toggle(true); }
+  if (typeof A.dueList === "function" && !A.dueList._tour) {
+    var rawDueT = A.dueList;
+    A.dueList = function () {
+      var items = rawDueT.apply(this, arguments) || [];
+      S.all("achat", function (x) { return x.tour && !x.tour.doneAt; }).forEach(function (s) {
+        var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
+        var ready = s.tour.facets.filter(function (x) { return x.blocked && x.blocked.verified && x.status === "todo"; })[0];
+        if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned, 40) + "»", go: function () { openTour(s, ready); } });
+        else if (f && A.localDay(s.updated) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned, 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+      });
+      return items;
+    };
+    A.dueList._tour = true;
+  }
+  /* یادآور (همان کانال‌هایی که برای گره‌ها انتخاب کرده‌ای): فردا، اگر تور نیمه‌کاره است */
+  function syncReminder(s) {
+    if (!(A.HOST && A.HOST.remind)) return;
+    var n = ((S.settings().knots || {}).notify) || {}, key = "tour:" + s.id;
+    var open = s.tour && !s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; });
+    try {
+      if (!open || (!n.telegram && !n.email)) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
+      var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
+      var due = A.addDays(A.today(), 1); if (s._rem === due) return;
+      var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
+      var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
+        body: "تورِ «" + clip(s.title || s.pinned, 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده.",
+        link: "?tab=" + encodeURIComponent((f && f.view) || "home"), channels: { telegram: !!n.telegram, email: !!n.email } });
+      if (pr && pr.catch) pr.catch(function () { });
+      s._rem = due;
+    } catch (e) { }
+  }
+  var rawRenderT = A.render;
+  A.render = function () {
+    rawRenderT.apply(this, arguments);
+    try { if (A.HOST && A.HOST.sheet && A.S.loaded) AS.tourSweep(); } catch (e) { console.error(e); }
+  };
+  AS.tourKinds = KIND;
 })(APP);
