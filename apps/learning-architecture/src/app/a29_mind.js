@@ -141,7 +141,8 @@
     S.all("achat", function (s) { return s.tour; }).forEach(function (s) { ev.push({ at: s.tour.createdAt, fa: "🧭 تورِ تازه: «" + (s.title || s.pinned || "") + "»" }); if (s.tour.doneAt) ev.push({ at: s.tour.doneAt, fa: "🧭 ترتیبِ تور طی شد: «" + (s.title || "") + "»" }); if (s.tour.masteredAt) ev.push({ at: s.tour.masteredAt, fa: "🏁 تور تا تسلط کامل شد: «" + (s.title || "") + "»" }); });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,
-      cases: cases.length, probs: S.all("eprob", function (p) { return !p.sample; }).length, tours: S.all("achat", function (s) { return s.tour; }).length, answers: dims.reduce(function (t, d) { return t + D[d.id].ans.length; }, 0) };
+    /* «مسئله‌ها»: مسئلهٔ خودِ کاربر در گره‌گشا و نقشهٔ پیش‌نیاز هم مسئله است (کارزارِ آزمونِ دوم c16/c17: «مسئله‌ها ۰») */
+      cases: cases.length, probs: S.all("eprob", function (p) { return !p.sample; }).length + S.all("prereq").length + S.all("kcase", function (c) { return !c.sample && c.intake && (c.intake.kinds || []).indexOf("problem") >= 0; }).length, tours: S.all("achat", function (s) { return s.tour; }).length, answers: dims.reduce(function (t, d) { return t + D[d.id].ans.length; }, 0) };
     return { at: new Date().toISOString(), dims: dims.map(function (d) { return D[d.id]; }), black: black, far: far, ahead: ahead, due: due, events: ev.slice(0, 60), tot: tot };
   };
 

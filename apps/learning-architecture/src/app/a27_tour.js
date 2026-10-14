@@ -389,7 +389,7 @@
     if (t.doneAt && !t.doneSaid) {
       t.doneSaid = true;
       var fu = t.facets.filter(function (f) { return followups(f).length; });
-      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 پایهٔ همهٔ وجه‌های تور به ترتیب برپا شد" + (mastered(t) ? "" : " — هنوز تمام نیست: نشانه‌های مانده تا تسلط پیگیری می‌شوند") + "؛ تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
+      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 پایهٔ همهٔ وجه‌های تور به ترتیب برپا شد" + (mastered(t) ? "" : " — هنوز تمام نیست: نشانه‌های مانده تا تسلط پیگیری می‌شوند") + (function () { try { var Ls = AS.sieveLayers ? AS.sieveLayers() : [], d = t.diag || {}, o = Ls.filter(function (L) { return !d[L.id] || d[L.id].st === "ask"; }); return o.length ? " — و " + A.fa(o.length) + " لایهٔ غربال هنوز سنجیده یا پرسیده نشده (" + o.slice(0, 4).map(function (L) { return L.fa; }).join("، ") + (o.length > 4 ? "، …" : "") + ")" : ""; } catch (e) { return ""; } })() + "؛ تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
         (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
     }
     if (t.doneAt && !t.masteredAt && mastered(t)) { t.masteredAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "🏁 همهٔ نشانه‌های همهٔ وجه‌ها ✓ شد — تور کامل شد. مرورهای فاصله‌دار همچنان در «امروز» می‌آید." }); }
@@ -416,7 +416,7 @@
     var from = A.addDays(A.today(), -14), fresh = [];
     ["kcase", "case", "eprob", "topic", "wchain", "fcast", "kexp", "value", "meaning"].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && !linked[r.id] && String(r.created || r.date || "") >= from; }).forEach(function (r) { fresh.push(r); }); });
     fresh.sort(function (a, b) { return String(b.created || "").localeCompare(String(a.created || "")); });
-    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link): " + fresh.slice(0, 10).map(function (r) { return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || (r.p && r.p.title) || "", 40) + "»"; }).join("، "));
+    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link): " + fresh.slice(0, 10).map(function (r) { return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || r.plan || r.statement || (r.intake && r.intake.what) || (r.p && r.p.title) || "", 40) + "»"; }).join("، "));
     var unl = (s.reports || []).filter(function (r) { return r.number && !r.facet; });
     if (unl.length) L.push("برگه‌های ثبت‌شده که به وجهی وصل نیستند: " + unl.map(function (r) { return "#" + r.number; }).join("، ") + " — با {\"do\":\"tour_link\",\"facet\":\"fN\",\"id\":\"#شماره\"} به وجهِ territory وصل کن تا پاسخِ روتین سنجیده شود.");
     return L.join("\n");

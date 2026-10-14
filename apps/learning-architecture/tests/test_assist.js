@@ -125,7 +125,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   chk(info.att.files === 1 && info.att.ch === 1, 'attach puts the session file into the form\'s file input');
   chk(info.att.clicked === 0 && /خودت بزن/.test(info.att.notes), 'never clicks delete-like buttons');
-  chk(/پیدا نشد/.test(info.att.notes), 'unknown key is reported, not guessed');
+  chk(/پیدا نشد|دیگر روی صفحه نیست/.test(info.att.notes), 'unknown key is reported (without the key code), not guessed');
 
   // ۸) سشنِ تازه، فهرست، ادامهٔ قبلی
   await p.click('.as-head [aria-label="سشنِ تازه"]');

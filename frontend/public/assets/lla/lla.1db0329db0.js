@@ -30898,7 +30898,7 @@ APP.goFromURL = function (q) {
       return "";
     },
     fill: function (a) {
-      var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
+      var x = el(a.k); if (!x) return "آن فیلد دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین";
       if (isAnswer(x)) return ANSWER_NOTE;
       // بخشِ «به قلمِ خودت» (کارتِ گره): نوشتن خودش بخشی از یادگرفتن است — فقط زرد، نه پر (کارزارِ آزمون sc01/sc07)
       if (x.closest && x.closest("[data-own]")) { reveal(x); mark(x, a.why || "این را با جمله‌های خودت بنویس", "hl"); return "«" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» به قلمِ خودِ توست — زردش کردم؛ می‌توانی همان جمله‌هایی را که گفتی این‌جا بنویسی"; }
@@ -30916,9 +30916,9 @@ APP.goFromURL = function (q) {
       mark(x, a.why || "دستیار از حرفِ تو پر کرد — اگر درست نیست عوضش کن", "fill");
       return "";
     },
-    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; if (isAnswer(x)) return ANSWER_NOTE; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
+    highlight: function (a) { var x = el(a.k); if (!x) return "آن فیلد دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین"; if (isAnswer(x)) return ANSWER_NOTE; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
     click: function (a) {
-      var x = el(a.k); if (!x) return "دکمهٔ " + a.k + " پیدا نشد";
+      var x = el(a.k); if (!x) return "آن دکمه دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین";
       if (isAnswer(x)) return ANSWER_NOTE;
       var bt = (x.textContent || "") + " " + (x.getAttribute("aria-label") || "");
       // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
@@ -30970,6 +30970,9 @@ APP.goFromURL = function (q) {
       if (A.toast !== rawToast) A.toast = rawToast;
       var first = document.querySelector(".as-hl") || document.querySelector(".as-filled");
       if (first && first.scrollIntoView) try { first.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { }
+      // یادداشتِ تکراری یک بار با شمار (کارزارِ آزمونِ دوم c18: «این را خودت پر کن» ۹ بار)
+      var cnt = {}, uniq = []; notes.forEach(function (n) { if (cnt[n]) cnt[n]++; else { cnt[n] = 1; uniq.push(n); } });
+      notes = uniq.map(function (n) { return cnt[n] > 1 ? n + " (×" + A.fa(cnt[n]) + ")" : n; });
       return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
     });
   };
@@ -31868,7 +31871,7 @@ APP.goFromURL = function (q) {
     if (t.doneAt && !t.doneSaid) {
       t.doneSaid = true;
       var fu = t.facets.filter(function (f) { return followups(f).length; });
-      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 پایهٔ همهٔ وجه‌های تور به ترتیب برپا شد" + (mastered(t) ? "" : " — هنوز تمام نیست: نشانه‌های مانده تا تسلط پیگیری می‌شوند") + "؛ تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
+      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 پایهٔ همهٔ وجه‌های تور به ترتیب برپا شد" + (mastered(t) ? "" : " — هنوز تمام نیست: نشانه‌های مانده تا تسلط پیگیری می‌شوند") + (function () { try { var Ls = AS.sieveLayers ? AS.sieveLayers() : [], d = t.diag || {}, o = Ls.filter(function (L) { return !d[L.id] || d[L.id].st === "ask"; }); return o.length ? " — و " + A.fa(o.length) + " لایهٔ غربال هنوز سنجیده یا پرسیده نشده (" + o.slice(0, 4).map(function (L) { return L.fa; }).join("، ") + (o.length > 4 ? "، …" : "") + ")" : ""; } catch (e) { return ""; } })() + "؛ تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
         (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
     }
     if (t.doneAt && !t.masteredAt && mastered(t)) { t.masteredAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "🏁 همهٔ نشانه‌های همهٔ وجه‌ها ✓ شد — تور کامل شد. مرورهای فاصله‌دار همچنان در «امروز» می‌آید." }); }
@@ -31895,7 +31898,7 @@ APP.goFromURL = function (q) {
     var from = A.addDays(A.today(), -14), fresh = [];
     ["kcase", "case", "eprob", "topic", "wchain", "fcast", "kexp", "value", "meaning"].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && !linked[r.id] && String(r.created || r.date || "") >= from; }).forEach(function (r) { fresh.push(r); }); });
     fresh.sort(function (a, b) { return String(b.created || "").localeCompare(String(a.created || "")); });
-    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link): " + fresh.slice(0, 10).map(function (r) { return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || (r.p && r.p.title) || "", 40) + "»"; }).join("، "));
+    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link): " + fresh.slice(0, 10).map(function (r) { return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || r.plan || r.statement || (r.intake && r.intake.what) || (r.p && r.p.title) || "", 40) + "»"; }).join("، "));
     var unl = (s.reports || []).filter(function (r) { return r.number && !r.facet; });
     if (unl.length) L.push("برگه‌های ثبت‌شده که به وجهی وصل نیستند: " + unl.map(function (r) { return "#" + r.number; }).join("، ") + " — با {\"do\":\"tour_link\",\"facet\":\"fN\",\"id\":\"#شماره\"} به وجهِ territory وصل کن تا پاسخِ روتین سنجیده شود.");
     return L.join("\n");
@@ -32390,7 +32393,8 @@ APP.goFromURL = function (q) {
     S.all("achat", function (s) { return s.tour; }).forEach(function (s) { ev.push({ at: s.tour.createdAt, fa: "🧭 تورِ تازه: «" + (s.title || s.pinned || "") + "»" }); if (s.tour.doneAt) ev.push({ at: s.tour.doneAt, fa: "🧭 ترتیبِ تور طی شد: «" + (s.title || "") + "»" }); if (s.tour.masteredAt) ev.push({ at: s.tour.masteredAt, fa: "🏁 تور تا تسلط کامل شد: «" + (s.title || "") + "»" }); });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,
-      cases: cases.length, probs: S.all("eprob", function (p) { return !p.sample; }).length, tours: S.all("achat", function (s) { return s.tour; }).length, answers: dims.reduce(function (t, d) { return t + D[d.id].ans.length; }, 0) };
+    /* «مسئله‌ها»: مسئلهٔ خودِ کاربر در گره‌گشا و نقشهٔ پیش‌نیاز هم مسئله است (کارزارِ آزمونِ دوم c16/c17: «مسئله‌ها ۰») */
+      cases: cases.length, probs: S.all("eprob", function (p) { return !p.sample; }).length + S.all("prereq").length + S.all("kcase", function (c) { return !c.sample && c.intake && (c.intake.kinds || []).indexOf("problem") >= 0; }).length, tours: S.all("achat", function (s) { return s.tour; }).length, answers: dims.reduce(function (t, d) { return t + D[d.id].ans.length; }, 0) };
     return { at: new Date().toISOString(), dims: dims.map(function (d) { return D[d.id]; }), black: black, far: far, ahead: ahead, due: due, events: ev.slice(0, 60), tot: tot };
   };
 
@@ -32706,7 +32710,8 @@ APP.goFromURL = function (q) {
   }
   var C = { ink: "#1f2937", mute: "#6b7280", line: "#e5e7eb", ok: "#047857", warn: "#b45309", bad: "#b91c1c", head: "#0f766e", soft: "#f0fdfa" };
   function sec(title, inner) { return '<tr><td style="padding:18px 22px 6px;font-size:17px;font-weight:700;color:' + C.head + ';border-top:1px solid ' + C.line + '">' + title + '</td></tr><tr><td style="padding:4px 22px 14px;font-size:14px;line-height:1.9;color:' + C.ink + '">' + inner + "</td></tr>"; }
-  function recTitle(r) { var x = S.get(r.id); if (!x) return ""; return x.title || x.name || x.q || x.note || (x.p && x.p.title) || ""; }
+  // آزمایشِ واقعی «plan» دارد، موقعیتِ گره‌گشا «intake.what» (کارزارِ آزمونِ دوم c19: «»…«» ِ خالی در ایمیل)
+  function recTitle(r) { var x = S.get(r.id); if (!x) return ""; return x.title || x.name || x.q || x.plan || x.predict || x.note || x.statement || (x.intake && (x.intake.what || x.intake.statement)) || (x.p && x.p.title) || ""; }
   var TYPE_FA = { kcase: "موقعیتِ گره‌گشا", knot: "گره", "case": "پروندهٔ سنجش", eprob: "مسئلهٔ بزرگ", topic: "موضوع", fcast: "پیش‌بینی", wchain: "زنجیرهٔ نگرانی", kexp: "آزمایشِ واقعی", ex: "کاربرگ", value: "ارزش", meaning: "وارسیِ معنا", prereq: "نقشهٔ پیش‌نیازها" };
   R.build = function (s, evs) {
     CUR = s;
@@ -32725,6 +32730,17 @@ APP.goFromURL = function (q) {
       H.push('<table role="presentation" width="680" cellpadding="0" cellspacing="0" dir="rtl" style="max-width:680px;width:100%;background:#fff;border-radius:12px;overflow:hidden;text-align:right">');
       H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پایهٔ ' + fa(done) + " از " + fa(live.length) + " وجه برپا شد · نشانه‌های حل‌شدن: " + fa(msOk) + " از " + fa(msAll) + (live.length < t.facets.length ? " (" + fa(t.facets.length - live.length) + " کنار گذاشته)" : "") + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
       if (s.safetyAt) H.push('<tr><td style="padding:14px 22px;background:#fff7ed;font-size:14px;line-height:1.9;color:' + C.ink + '"><b>🤝 پیش از هر چیز</b><br>در این گفت‌وگو از حالِ سختی گفتی. اگر امروز هم سخت است، همین حالا با یک نفرِ نزدیک یا یک متخصص حرف بزن.<br><span style="color:' + C.mute + '">' + esc(A.KHELP || "") + "</span><br>(به خاطرِ حریمِ خصوصی، متنِ گفت‌وگو در این ایمیل نمی‌آید.)</td></tr>");
+      /* نتیجه در یک نگاه: آنچه واقعاً رخ داد، از خودِ داده‌ها (کارزارِ آزمونِ دوم c16/c17: هیچ ایمیلی صریح نمی‌گفت «خودت حل کردی») */
+      var outc = []; try { live.forEach(function (f) { var c = AS.tourChildren ? AS.tourChildren(f) : {};
+        (c.kcase || []).forEach(function (kc) {
+          var L = kc.ladder || {}; if (L.opened != null && L.opened >= 0) outc.push("خودت گره را باز کردی" + (L.opened > 0 ? " (پس از راهنماییِ پلهٔ " + fa(L.opened) + ")" : " (بی راهنمایی)") + " — «" + clip((kc.intake && kc.intake.what) || f.title, 50) + "»");
+          if (kc.root && kc.root.confirmed) { var k = S.get((kc.knots || [])[0]); outc.push("ریشه را خودت تأیید کردی" + (k && k.name ? ": «" + clip(k.name, 50) + "»" : "") + (k && k.status === "returned" ? " — همان گرهِ پیشین، بازگشته" : "")); }
+        });
+        (c.prereq || []).forEach(function (pq) { var k = A.prereqState ? A.prereqState(pq) : null; if (k && k.n) outc.push("نقشهٔ پیش‌نیازها: " + fa(k.n) + " مفهوم، " + fa(k.miss.length) + " تا را نداشتی" + (pq.back ? " — بازگشت به خودِ مسئله: " + pq.back : " — هنوز به خودِ مسئله برنگشته‌ای")); });
+        scores(f).forEach(function (x) { outc.push(x); });
+      }); } catch (e) { }
+      outc = outc.filter(function (x, i, a) { return a.indexOf(x) === i; });
+      if (outc.length) H.push(sec("🎯 نتیجه در یک نگاه", "<ul style=\"margin:0;padding-right:18px\">" + outc.slice(0, 8).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>"));
       if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + (e.detail ? '<div style="color:' + C.mute + ';font-size:12px">' + esc(e.detail) + "</div>" : "") + "</li>"; }).join("") + "</ul>"));
       /* نقشهٔ راه */
       var rows = t.facets.map(function (f, i) {
@@ -32743,7 +32759,7 @@ APP.goFromURL = function (q) {
         var ms = f.status === "skipped" ? [] : AS.tourMilestones(f), pr = f.status === "skipped" ? [] : AS.tourPractice(f), b = f.blocked;
         var inner = (f.why ? '<div style="color:' + C.mute + '">چرا این‌جای ترتیب: ' + esc(f.why) + "</div>" : "") +
           '<ul style="margin:6px 0;padding-right:18px">' + ms.map(function (x) { return '<li style="color:' + (x.ok ? C.ok : C.ink) + '">' + (x.ok ? "✓ " : "○ ") + esc(x.t) + "</li>"; }).join("") + "</ul>" +
-          ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { return esc((TYPE_FA[r.type] || r.type) + " «" + clip(recTitle(r), 50) + "»"); }).join("، ") + "</div>" : "") +
+          ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { var tt = clip(recTitle(r), 50); return esc((TYPE_FA[r.type] || r.type) + (tt ? " «" + tt + "»" : "")); }).join("، ") + "</div>" : "") +
           (scores(f).length ? "<div><b>🎯 نتیجهٔ تمرین‌ها:</b> " + esc(scores(f).join("؛ ")) + "</div>" : "") +
           (pr.length ? "<div><b>📅 تمرین‌های زمان‌بندی‌شده:</b> " + pr.map(function (p) { return esc(p.t + " — " + (A.fdate ? A.fdate(p.due) : p.due)) + (p.overdue ? ' <span style="color:' + C.bad + '">(موعد)</span>' : ""); }).join("؛ ") + "</div>" : "") +
           (b ? '<div style="margin-top:6px;padding:8px;background:' + C.soft + ';border-radius:8px"><b>🛎 برگهٔ #' + fa(b.number) + "</b> (" + esc(b.area || "") + ") — " + (b.verified ? "ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
@@ -33004,7 +33020,7 @@ APP.goFromURL = function (q) {
   var BASE = [
     { g: "پایه", id: "safety", fa: "ایمنی و حال", q: "نشانهٔ پریشانیِ جدی هست؟ اول حالش." },
     { g: "پایه", id: "want", fa: "خواستهٔ واقعیِ پشتِ حرف", q: "در واقع چه می‌خواهد؟ «حل‌شدن» برایش چه شکلی است؟ چه چیزی را نگفته؟" },
-    { g: "پایه", id: "recur", fa: "تکرار و ریشهٔ مشترک", q: "این الگو پیش‌تر هم رخ داده؟ با گره‌ها و موقعیت‌های پیشینش (فهرستِ «# گره‌های پیشینِ کاربر») همان ریشه/ساختار را دارد؟" },
+    { g: "پایه", id: "recur", fa: "تکرار و ریشهٔ مشترک", q: "این الگو پیش‌تر هم رخ داده؟ در جاهای دیگرِ زندگی هم (کار، رابطه، پول، درس) همین شکل را دارد؟ با گره‌ها و موقعیت‌های پیشینش (فهرستِ «# گره‌های پیشینِ کاربر») همان ریشه/ساختار را دارد؟" },
     { g: "معرفت", id: "claim", fa: "ادعا یا باورِ پنهان", q: "کدام جمله‌اش ادعایی است که اگر نادرست باشد همه‌چیز عوض می‌شود؟ (کارخانه)" },
     { g: "معرفت", id: "route", fa: "راهِ دانستن و خطای همان راه", q: "آن را از کجا می‌داند — حس، نقل، تجربه، استقراء، تخصصِ دیگران، شهود؟ خطای رایجِ همان راه اینجا هست؟ دانشِ «عملی/ضمنی» (چشم و بو، مهارتِ دست) هم راهِ خودش را دارد: تمرین با بازخوردِ فوری و دیدنِ کارِ استاد، نه فقط دستورِ نوشته." },
     { g: "مسئله و دانش", id: "problem", fa: "مسئلهٔ سختِ مشخص", q: "مسئله‌ای مشخص (حل‌شده یا نه) هست که باید تجزیه، شبیه‌سازی و با هم‌ساختارها تمرین شود؟" },

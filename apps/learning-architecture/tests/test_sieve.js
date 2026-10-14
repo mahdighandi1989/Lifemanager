@@ -72,6 +72,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     s.msgs.push({ role: 'ai', text: 'وجهِ f2 و خانوادهٔ F11 و حوزهٔ dc_career_income و رکوردِ kc_abc123 و برگهٔ sys-territory deferred', at: '' });
     s.tour.facets[0].status = 'done';
     const rep = await APP.REPORT.build(s, [{ k: 'facet', fa: '✓ پایهٔ f1 برپا شد' }]);
+    out.outcome = /نتیجه در یک نگاه[\s\S]*نقشهٔ پیش‌نیازها: ۲ مفهوم/.test(rep.html);
     out.honest = /پایه برپا شد · /.test(rep.text) && !/— انجام شد/.test(rep.text);
     const all = rep.subject + rep.html + rep.text;
     out.noCodes = !/\bf\d{1,2}\b/.test(all) && !/\bF\d{1,2}\b/.test(all) && !/\b(?:dc|sc|sf|md|ln|pr)_[a-z_]+/.test(all) && !/kc_abc123/.test(all) && !/sys-territory|deferred/.test(all);
@@ -89,6 +90,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.ownClick, 'the assistant never presses an owner-only button (e.g. sending the problem to the AI)');
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');
   chk(S.alias && S.owed, 'near-miss layer names (repeat, f3) map to the real layer');
+  chk(S.outcome, 'the e-mail opens with the outcome in plain words, derived from the data');
   chk(S.honest, 'a facet with open milestones is never reported as «انجام شد»');
   chk(S.noCodes && S.humanized, 'the e-mail carries no internal codes (facet keys, family codes, area/record ids, sheet jargon) — names instead');
   console.log(JSON.stringify(info).slice(0, 2500));

@@ -224,7 +224,7 @@
       return "";
     },
     fill: function (a) {
-      var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
+      var x = el(a.k); if (!x) return "آن فیلد دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین";
       if (isAnswer(x)) return ANSWER_NOTE;
       // بخشِ «به قلمِ خودت» (کارتِ گره): نوشتن خودش بخشی از یادگرفتن است — فقط زرد، نه پر (کارزارِ آزمون sc01/sc07)
       if (x.closest && x.closest("[data-own]")) { reveal(x); mark(x, a.why || "این را با جمله‌های خودت بنویس", "hl"); return "«" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» به قلمِ خودِ توست — زردش کردم؛ می‌توانی همان جمله‌هایی را که گفتی این‌جا بنویسی"; }
@@ -242,9 +242,9 @@
       mark(x, a.why || "دستیار از حرفِ تو پر کرد — اگر درست نیست عوضش کن", "fill");
       return "";
     },
-    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; if (isAnswer(x)) return ANSWER_NOTE; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
+    highlight: function (a) { var x = el(a.k); if (!x) return "آن فیلد دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین"; if (isAnswer(x)) return ANSWER_NOTE; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
     click: function (a) {
-      var x = el(a.k); if (!x) return "دکمهٔ " + a.k + " پیدا نشد";
+      var x = el(a.k); if (!x) return "آن دکمه دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین";
       if (isAnswer(x)) return ANSWER_NOTE;
       var bt = (x.textContent || "") + " " + (x.getAttribute("aria-label") || "");
       // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
@@ -296,6 +296,9 @@
       if (A.toast !== rawToast) A.toast = rawToast;
       var first = document.querySelector(".as-hl") || document.querySelector(".as-filled");
       if (first && first.scrollIntoView) try { first.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { }
+      // یادداشتِ تکراری یک بار با شمار (کارزارِ آزمونِ دوم c18: «این را خودت پر کن» ۹ بار)
+      var cnt = {}, uniq = []; notes.forEach(function (n) { if (cnt[n]) cnt[n]++; else { cnt[n] = 1; uniq.push(n); } });
+      notes = uniq.map(function (n) { return cnt[n] > 1 ? n + " (×" + A.fa(cnt[n]) + ")" : n; });
       return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
     });
   };
