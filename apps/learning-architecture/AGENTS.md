@@ -26,6 +26,8 @@
 | `docs/specs/` | طرح‌های مرجعِ بخش‌های بزرگ (مثلاً `KNOTS.md` برای «گره‌گشا»؛ §۱۲ ِ آن الزامی است) | بله — تغییرِ طرح ⇒ WORKLOG |
 | `backtest/corpus/*.json` | پیکرهٔ بک‌تستِ پیوسته (افزودهٔ هر دور؛ واقعی + انتزاعی، رمزگذاریِ کور) | فقط با `tools/epi_backtest.js add`؛ اصلاحِ یافته یا `excluded` با دلیل |
 | `backtest/samples/*.json` | قاب‌های بی‌گزینش برای سنجشِ مقدارهای پایه (k+1)/(n+2) | فقط با `tools/epi_backtest.js sample`؛ قابِ دست‌چین یا موردِ احرازنشده ممنوع؛ ردِ مالک ⇒ `excluded` |
+| `src/app/epi_territory.js` | نقشهٔ کاملِ قلمروِ معرفت‌شناسی (گروه‌ها/حوزه‌ها/منابع/بخش‌های جزوه) | فقط با منبعِ معتبر و آزمون (`tests/test_territory.js`)؛ حذفِ حوزه ممنوع |
+| `backtest/territory.json`، `backtest/reviews/*.json`، `docs/TERRITORY.md` | پیشرفتِ هر حوزه، بازبینی‌های مستقل، سندِ زندهٔ قلمرو | فقط با `epi_backtest.js territory|review|run`؛ TERRITORY.md را ابزار می‌سازد |
 | `backtest/ledger.json`, `findings.json`, `results.json`, `proposals.json` | دفترِ دورها، یافته‌ها و سرانجامشان، حکمِ هر واقعه، پیشنهادهای منتظرِ مالک | `ledger/results` **هرگز** (ساختهٔ `run`)؛ `findings` فقط علت/اصلاح/وضع؛ `proposals` افزودن |
 | `tools/epi_backtest.js` | اجراکنندهٔ قطعیِ بک‌تستِ پیوسته (`status`/`add`/`run`) — همان موتورِ صفحه در Node | بله (با احتیاط؛ آزمون: `tests/test_backtest_tool.js`) |
 | `src/app/epi_found.js` | مبنای درجه‌ها: اصولِ بدیهی، قضیه‌ها با برهان، اشتقاقِ هر سقف (B/S/O/X)، سنجشِ پایه فقط با نمونهٔ بی‌گزینش و کافی | بله، ولی هر قضیهٔ تازه برهان از اصولِ موجود می‌خواهد؛ آزمون: `tests/test_found.js`. عددِ برازش‌شده روی پیکره ممنوع |

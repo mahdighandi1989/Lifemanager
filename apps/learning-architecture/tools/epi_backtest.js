@@ -105,12 +105,31 @@ function bookSeed(a) {
   if (!rules.length) return null;
   const claims = rules.map((r) => { const d = FD.DER[r.id] || {};
     return { txt: r.fa, rule: r.id, kind: r.eff === "flag" ? "theorem" : d.k === "S" ? "base" : "theorem", th: r.eff === "flag" ? "A0" : d.th, base: d.base || undefined, src: "جزوه " + (r.sec || []).join(",") }; });
-  return { stage: 4, claims, rules: rules.map((r) => r.id), sources: ["جزوهٔ معرفت‌شناسی (مصباح) " + secs.join("، ")], seeded: true };
+  return { stage: 4, claims, rules: rules.map((r) => r.id), sources: ["جزوهٔ معرفت‌شناسی (مصباح) " + secs.join("، ")], seeded: true, bookOnly: true };
 }
 function validateTerr(u, cur, round) {
   const e = [], FD = global.EPI_FOUND, T = global.EPI_TERR, area = terrAreas().find((a) => a.id === u.area);
   if (!area) return ["حوزهٔ ناشناخته: " + u.area];
   const st = (cur && cur.stage) || 0, to = u.stage;
+  /* «گسترش»: حوزه‌ای که فقط بخشِ جزوه‌اش پوشش دارد، از ادبیاتِ بیرون از جزوه کامل می‌شود — همان شاهدهای گام‌های ۱ تا ۴ در یک بسته */
+  if (u.widen) {
+    if (!(cur && cur.bookOnly)) return ["گسترش فقط برای حوزهٔ «فقط بخشِ جزوه»"];
+    if (!u.what || String(u.what).length < 15) e.push("what: چه کردی، دقیق");
+    if (!((u.sources || []).length >= 2 && u.sources.every((x) => /\S{6,}/.test(String(x))))) e.push("گسترش: دست‌کم دو منبعِ واقعیِ بیرون از جزوه");
+    const cl = u.claims || [];
+    if (cl.length < 3) e.push("گسترش: دست‌کم سه گزارهٔ محوریِ تازه از ادبیات");
+    cl.forEach((c, i) => {
+      if (!c.txt || !c.src) e.push("گزارهٔ " + i + ": متن و منبع");
+      if (["theorem", "base", "outside"].indexOf(c.kind) < 0) e.push("گزارهٔ " + i + ": kind");
+      if (c.kind === "theorem" && !(FD.TH[c.th] || FD.AX.some((a) => a.id === c.th) || (c.proof && c.proof.text && (c.proof.from || []).length && c.proof.from.every((x) => FD.TH[x] || FD.AX.some((a) => a.id === x))))) e.push("گزارهٔ " + i + ": قضیهٔ موجود یا برهان از اصولِ موجود");
+      if (c.kind === "base" && !(FD.BASE[c.base] || (c.base_new && c.base_new.fa && c.base_new.select))) e.push("گزارهٔ " + i + ": مقدارِ پایه");
+      if (c.kind === "outside" && !(c.why && c.why.length >= 25)) e.push("گزارهٔ " + i + ": دلیلِ «بیرون از قلمرو»");
+    });
+    const P0 = rd(P.proposals, { proposals: [] }).proposals || [];
+    if ((u.rules || []).some((id) => !X.RM[id] && !P0.some((p) => p.id === id))) e.push("گسترش: قاعدهٔ موجود یا پیشنهادِ ثبت‌شده");
+    if (cl.some((c) => c.kind !== "outside") && !(u.rules || []).length) e.push("گسترش: گزاره‌های قضیه‌ای قاعده (موجود/پیشنهاد) می‌خواهند");
+    return e;
+  }
   if (to !== st + 1) e.push("فقط یک گام جلو: اکنون " + st + "، درخواست " + to);
   if (to >= 5) e.push("گامِ ۵ (تثبیت) را فقط خودِ ابزار با وقایعِ تازه می‌دهد");
   if (!u.what || String(u.what).length < 15) e.push("what: چه کردی، دقیق");
@@ -144,9 +163,15 @@ function applyTerritory(file) {
   items.forEach((u) => {
     const cur = S0.areas[u.area] || { stage: 0, history: [] }, e = validateTerr(u, cur, round);
     if (e.length) { bad.push({ area: u.area, errors: e }); return; }
-    const nx = Object.assign({}, cur, { stage: u.stage });
-    if (u.sources) nx.sources = u.sources; if (u.claims) nx.claims = u.claims; if (u.rules) nx.rules = u.rules; if (u.boundary) nx.boundary = u.boundary;
-    nx.history = (cur.history || []).concat([{ round, at: today, stage: u.stage, what: u.what, by: u.by || "ناظرِ بک‌تست" }]);
+    let nx;
+    if (u.widen) {
+      nx = Object.assign({}, cur, { bookOnly: false, sources: (cur.sources || []).concat(u.sources), claims: (cur.claims || []).concat(u.claims), rules: Array.from(new Set((cur.rules || []).concat(u.rules || []))) });
+      nx.history = (cur.history || []).concat([{ round, at: today, stage: cur.stage, what: "گسترش از ادبیاتِ بیرون از جزوه: " + u.what, by: u.by || "ناظرِ بک‌تست" }]);
+    } else {
+      nx = Object.assign({}, cur, { stage: u.stage });
+      if (u.sources) nx.sources = u.sources; if (u.claims) nx.claims = u.claims; if (u.rules) nx.rules = u.rules; if (u.boundary) nx.boundary = u.boundary;
+      nx.history = (cur.history || []).concat([{ round, at: today, stage: u.stage, what: u.what, by: u.by || "ناظرِ بک‌تست" }]);
+    }
     S0.areas[u.area] = nx; ok.push(u.area);
   });
   wr(P.territory, S0);
@@ -158,7 +183,7 @@ function territoryRound(byCase, round, today) {
   areas.forEach((a) => {
     let cur = S0.areas[a.id];
     if (!cur) { const sd = bookSeed(a); cur = sd ? Object.assign(sd, { history: [{ round, at: today, stage: 4, what: "پوششِ جزوه: " + sd.rules.length + " قاعدهٔ کارخانه روی بخش‌های " + (a.book || []).join("، ") + "؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»", by: "ابزار" }] }) : { stage: 0, history: [] }; S0.areas[a.id] = cur; }
-    if (cur.stage === 4 && (cur.rules || []).length) {
+    if (cur.stage === 4 && !cur.bookOnly && (cur.rules || []).length) {
       const since = (cur.history.filter((h) => h.stage === 4).slice(-1)[0] || {}).round || 0;
       const fresh = Object.values(byCase).filter((v) => v.round > since && v.round > 0 && v.fired.some((r) => cur.rules.indexOf(r) >= 0));
       cur.verify = { since, fresh: fresh.length, ok: fresh.filter((v) => v.kind === "ok").length, ids: fresh.slice(0, 10).map((v) => v.id) };
@@ -169,7 +194,7 @@ function territoryRound(byCase, round, today) {
   const byStage = [0, 0, 0, 0, 0, 0]; areas.forEach((a) => { byStage[(S0.areas[a.id] || {}).stage || 0]++; });
   const movedThisRound = areas.filter((a) => ((S0.areas[a.id] || {}).history || []).some((h) => h.round === round && h.by !== "ابزار" || (h.round === round && h.stage === 5))).map((a) => a.id);
   fs.writeFileSync(P.territoryDoc, territoryMd(S0, areas, round, today));
-  return { areas: areas.length, groups: (global.EPI_TERR.groups || []).length, byStage, score: areas.reduce((t, a) => t + ((S0.areas[a.id] || {}).stage || 0), 0), max: areas.length * 5, moved: movedThisRound };
+  return { areas: areas.length, groups: (global.EPI_TERR.groups || []).length, byStage, bookOnly: areas.filter((a) => (S0.areas[a.id] || {}).bookOnly).length, score: areas.reduce((t, a) => t + ((S0.areas[a.id] || {}).stage || 0), 0), max: areas.length * 5, moved: movedThisRound };
 }
 function territoryMd(S0, areas, round, today) {
   const T = global.EPI_TERR, L = [], ST = T.STAGES;
@@ -184,7 +209,7 @@ function territoryMd(S0, areas, round, today) {
     L.push("## " + g.fa + (g.en ? " — " + g.en : ""), "");
     g.areas.forEach((a) => {
       const c = S0.areas[a.id] || { stage: 0 }, s = ST[c.stage || 0];
-      L.push("### " + "▰".repeat(c.stage || 0) + "▱".repeat(5 - (c.stage || 0)) + " " + a.fa + (a.en ? " (" + a.en + ")" : "") + " — " + s.fa, "");
+      L.push("### " + "▰".repeat(c.stage || 0) + "▱".repeat(5 - (c.stage || 0)) + " " + a.fa + (a.en ? " (" + a.en + ")" : "") + " — " + s.fa + (c.bookOnly ? " (فقط بخشِ جزوه — گسترش از ادبیات مانده)" : ""), "");
       if (a.desc_fa) L.push(a.desc_fa, "");
       if ((a.book || []).length) L.push("- جزوه: " + a.book.join("، "));
       if ((c.sources || []).length && !c.seeded) L.push("- منابع: " + c.sources.join("؛ "));
@@ -327,9 +352,11 @@ function foundation(cases) {
     conventional: rep.filter((r) => r.conventional).length, audit: axiomAudit(), samples: loadSamples().length };
 }
 
-function run(note) {
+function run(note, rerun) {
   const cases = loadCorpus();
   const ledger = rd(P.ledger, { rounds: [] });
+  /* --rerun: اجرای دوباره پس از اصلاح‌ها همان دور است، نه دورِ تازهٔ «بی ماده» — ردیفِ آخر جایگزین می‌شود (موادِ همان دور شمرده می‌مانند) */
+  if (rerun && ledger.rounds.length) { const lastR = ledger.rounds.pop(); note = note || lastR.note; }
   const prevBase = ((ledger.rounds[ledger.rounds.length - 1] || {}).foundation || {}).baseval || {};
   applyBase();
   const old = rd(P.findings, { findings: [] });
@@ -532,7 +559,8 @@ function status() {
     soundShare: +(sound / cases.length).toFixed(2), samples: loadSamples().length,
     baseNeeds: Object.entries(base).sort((a, b) => a[1].n - b[1].n).map(([k, v]) => k + " (" + v.fa + "): " + v.n + " موردِ سنجیده، مقدار " + v.p),
     audit: axiomAudit(),
-    territoryFrontier: (() => { const S0 = terrState(); return terrAreas().map((a) => ({ id: a.id, fa: a.fa, stage: (S0.areas[a.id] || {}).stage || 0 })).sort((x, y) => x.stage - y.stage).slice(0, 12); })(), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
+    territoryFrontier: (() => { const S0 = terrState(); return terrAreas().map((a) => { const c = S0.areas[a.id] || {}; return { id: a.id, fa: a.fa, group: a.group, stage: c.stage || 0, bookOnly: !!c.bookOnly, next: c.bookOnly ? "widen" : "stage " + ((c.stage || 0) + 1) }; })
+      .sort((x, y) => (x.bookOnly ? 2.5 : x.stage) - (y.bookOnly ? 2.5 : y.stage)).slice(0, 15); })(), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
 }
 
 function add(file) {
@@ -560,8 +588,8 @@ if (require.main === module) {
   else if (cmd === "territory") console.log(JSON.stringify(applyTerritory(a1), null, 1));
   else if (cmd === "review") { const r = addReview(a1); console.log(JSON.stringify(r, null, 1)); if (!r.ok) process.exit(3); }
   else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v }, null, 1)); if (v.length) process.exit(3); }
-  else if (cmd === "run") console.log(JSON.stringify(run(a1 === "--note" ? a2 : ""), null, 1));
-  else { console.log("usage: status | add <file.json> | sample <file.json> | territory <file.json> | review <file.json> | audit | run [--note text]"); process.exit(1); }
+  else if (cmd === "run") { const args = process.argv.slice(3), ni = args.indexOf("--note"); console.log(JSON.stringify(run(ni >= 0 ? args[ni + 1] : "", args.indexOf("--rerun") >= 0), null, 1)); }
+  else { console.log("usage: status | add <file.json> | sample <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
 }
 module.exports = { validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples,
   applyTerritory, validateTerr, terrAreas, terrState, addReview, territoryMd };

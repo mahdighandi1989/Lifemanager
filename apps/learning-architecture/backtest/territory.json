@@ -1,0 +1,2786 @@
+{
+ "areas": {
+  "a_truth": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "صدق و کذب برای تصور، انشا یا پرسش",
+     "rule": "r_tasdiq_nonclaim",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s27,s38"
+    },
+    {
+     "txt": "خلط صدق معرفتی و صدق اخلاقی",
+     "rule": "r_truth_mix",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s38,s6"
+    },
+    {
+     "txt": "تنگ‌گرفتن واقعیت",
+     "rule": "r_truth_narrow",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s38,s9"
+    },
+    {
+     "txt": "ترک تحقیق ممکن پیش از عمل پرخطر",
+     "rule": "r_resp_inquiry",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s86,s6,s71"
+    }
+   ],
+   "rules": [
+    "r_tasdiq_nonclaim",
+    "r_truth_mix",
+    "r_truth_narrow",
+    "r_resp_inquiry"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s6، s38"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s6، s38؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_belief": {
+   "stage": 0,
+   "history": []
+  },
+  "a_evidence": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_rationality": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_norms": {
+   "stage": 0,
+   "history": []
+  },
+  "a_certainty": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد",
+     "rule": "r_badihi_pseudo",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s40"
+    },
+    {
+     "txt": "حکم غیرحضوری، وجدانی گرفته شد",
+     "rule": "r_badihi_wijdani_other",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s11"
+    },
+    {
+     "txt": "صورت استدلال نامعتبر",
+     "rule": "r_aql_invalid_form",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "مقدمه اثبات‌نشده",
+     "rule": "r_aql_matter_unproven",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "مقدمه کاذب",
+     "rule": "r_aql_matter_false",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "صفر فقط برای کذب یقینی",
+     "rule": "r_grade_false_zero",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "ناسازگار با معرفت یقینی",
+     "rule": "r_conflict_cert",
+     "kind": "theorem",
+     "th": "T_conflict",
+     "src": "جزوه s53,s40"
+    }
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_badihi_wijdani_other",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_istiqra_incomplete",
+    "r_grade_false_zero",
+    "r_conflict_cert"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s39، s40"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 9 قاعدهٔ کارخانه روی بخش‌های s39، s40؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_higher_order_evidence": {
+   "stage": 0,
+   "history": []
+  },
+  "a_kinds_of_knowledge": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تنگ‌گرفتن واقعیت",
+     "rule": "r_truth_narrow",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s38,s9"
+    },
+    {
+     "txt": "حکم غیرحضوری، وجدانی گرفته شد",
+     "rule": "r_badihi_wijdani_other",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s11"
+    },
+    {
+     "txt": "«شهود» نامیدن حدس یا الهام درباره بیرون",
+     "rule": "r_shohud_misrouted",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s11"
+    }
+   ],
+   "rules": [
+    "r_truth_narrow",
+    "r_badihi_wijdani_other",
+    "r_shohud_misrouted"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s8، s9، s11"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s8، s9، s11؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_tripartite_analysis": {
+   "stage": 0,
+   "history": []
+  },
+  "a_gettier_problem": {
+   "stage": 0,
+   "history": []
+  },
+  "a_defeasibility_theory": {
+   "stage": 0,
+   "history": []
+  },
+  "a_modal_anti_luck": {
+   "stage": 0,
+   "history": []
+  },
+  "a_fallibilism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_knowledge_first": {
+   "stage": 0,
+   "history": []
+  },
+  "a_knowledge_how": {
+   "stage": 0,
+   "history": []
+  },
+  "a_acquaintance": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "حکم غیرحضوری، وجدانی گرفته شد",
+     "rule": "r_badihi_wijdani_other",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s11"
+    },
+    {
+     "txt": "«شهود» نامیدن حدس یا الهام درباره بیرون",
+     "rule": "r_shohud_misrouted",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s11"
+    }
+   ],
+   "rules": [
+    "r_badihi_wijdani_other",
+    "r_shohud_misrouted"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s11"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s11؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_higher_order_knowledge": {
+   "stage": 0,
+   "history": []
+  },
+  "a_justification_concept": {
+   "stage": 0,
+   "history": []
+  },
+  "a_internalism_externalism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_evidentialism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_reliabilism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_proper_functionalism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_conservatism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_basing_relation": {
+   "stage": 0,
+   "history": []
+  },
+  "a_defeaters": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "قرینه خلاف",
+     "rule": "r_naql_contra_qarina",
+     "kind": "theorem",
+     "th": "T_against",
+     "src": "جزوه s47,s53"
+    },
+    {
+     "txt": "ناسازگار با معرفت یقینی",
+     "rule": "r_conflict_cert",
+     "kind": "theorem",
+     "th": "T_conflict",
+     "src": "جزوه s53,s40"
+    },
+    {
+     "txt": "شاهد ناسازگار بی‌سنجش کنار رفت",
+     "rule": "r_conflict_ignored",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s53"
+    },
+    {
+     "txt": "ظاهر ناسازگار با برهان قطعی، بی‌تأویل",
+     "rule": "r_r_tawil",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s53,s48,s77"
+    }
+   ],
+   "rules": [
+    "r_naql_contra_qarina",
+    "r_conflict_cert",
+    "r_conflict_ignored",
+    "r_r_tawil"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s53"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s53؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_entitlement_transmission": {
+   "stage": 0,
+   "history": []
+  },
+  "a_regress_problem": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد",
+     "rule": "r_badihi_pseudo",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s40"
+    },
+    {
+     "txt": "صورت استدلال نامعتبر",
+     "rule": "r_aql_invalid_form",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "مقدمه اثبات‌نشده",
+     "rule": "r_aql_matter_unproven",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "مقدمه کاذب",
+     "rule": "r_aql_matter_false",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "صفر فقط برای کذب یقینی",
+     "rule": "r_grade_false_zero",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "ناسازگار با معرفت یقینی",
+     "rule": "r_conflict_cert",
+     "kind": "theorem",
+     "th": "T_conflict",
+     "src": "جزوه s53,s40"
+    },
+    {
+     "txt": "پیش‌زمینه بایسته فراهم نبود",
+     "rule": "r_bg_missing",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s70,s69"
+    },
+    {
+     "txt": "هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده",
+     "rule": "r_herm_readings_equal",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s67,s68,s69"
+    },
+    {
+     "txt": "خلط معنا و اهمیت",
+     "rule": "r_herm_meaning_sig",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69"
+    },
+    {
+     "txt": "نادیده گرفتن قرائن متن و موقعیت (تقطیع)",
+     "rule": "r_herm_context",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69,s85,s48"
+    }
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_istiqra_incomplete",
+    "r_grade_false_zero",
+    "r_conflict_cert",
+    "r_bg_missing",
+    "r_herm_readings_equal",
+    "r_herm_meaning_sig",
+    "r_herm_context"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s40، s69"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 12 قاعدهٔ کارخانه روی بخش‌های s40، s69؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_foundationalism": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد",
+     "rule": "r_badihi_pseudo",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s40"
+    },
+    {
+     "txt": "حس بدون کنترل شرایط",
+     "rule": "r_hiss_uncontrolled",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_sense_unctrl",
+     "src": "جزوه s43,s46"
+    },
+    {
+     "txt": "استنتاج پنهان عادتی بی‌آزمون",
+     "rule": "r_hiss_hidden_inf",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_inf",
+     "src": "جزوه s43,s46,s19"
+    },
+    {
+     "txt": "صورت استدلال نامعتبر",
+     "rule": "r_aql_invalid_form",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "مقدمه اثبات‌نشده",
+     "rule": "r_aql_matter_unproven",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "مقدمه کاذب",
+     "rule": "r_aql_matter_false",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "صفر فقط برای کذب یقینی",
+     "rule": "r_grade_false_zero",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "ناسازگار با معرفت یقینی",
+     "rule": "r_conflict_cert",
+     "kind": "theorem",
+     "th": "T_conflict",
+     "src": "جزوه s53,s40"
+    },
+    {
+     "txt": "ادعای خودشکن (شک یا نسبیت فراگیر)",
+     "rule": "r_selfref",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s56,s57,s59,s63,s67"
+    }
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_istiqra_incomplete",
+    "r_grade_false_zero",
+    "r_conflict_cert",
+    "r_selfref"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s40، s46، s57"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 11 قاعدهٔ کارخانه روی بخش‌های s40، s46، s57؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_coherentism": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "ادعای خودشکن (شک یا نسبیت فراگیر)",
+     "rule": "r_selfref",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s56,s57,s59,s63,s67"
+    },
+    {
+     "txt": "شبهه شکاکانه از یکی از چهار الگو",
+     "rule": "r_doubt_pattern",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s59,s60,s61,s62,s63"
+    }
+   ],
+   "rules": [
+    "r_selfref",
+    "r_doubt_pattern"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s62، s63"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s62، s63؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_infinitism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_perception": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تفسیر حصولی، خطاناپذیر پنداشته شد",
+     "rule": "r_core_interp_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s18,s19,s21,s22"
+    },
+    {
+     "txt": "حس بدون کنترل شرایط",
+     "rule": "r_hiss_uncontrolled",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_sense_unctrl",
+     "src": "جزوه s43,s46"
+    },
+    {
+     "txt": "استنتاج پنهان عادتی بی‌آزمون",
+     "rule": "r_hiss_hidden_inf",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_inf",
+     "src": "جزوه s43,s46,s19"
+    },
+    {
+     "txt": "شبهه شکاکانه از یکی از چهار الگو",
+     "rule": "r_doubt_pattern",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s59,s60,s61,s62,s63"
+    }
+   ],
+   "rules": [
+    "r_core_interp_unchecked",
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf",
+    "r_doubt_pattern"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s21، s43، s61"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s21، s43، s61؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_memory": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "یادآوری بیش از معرفت نخستین منتقل نمی‌کند (≤۲۵)",
+     "rule": "r_yad_orig_t1",
+     "kind": "theorem",
+     "th": "T_weakest",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۲۶–۵۰)",
+     "rule": "r_yad_orig_t2",
+     "kind": "theorem",
+     "th": "T_weakest",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۵۱–۷۰)",
+     "rule": "r_yad_orig_t3",
+     "kind": "theorem",
+     "th": "T_weakest",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۷۱–۸۵)",
+     "rule": "r_yad_orig_t4",
+     "kind": "theorem",
+     "th": "T_weakest",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "یادآوری معرفت غیریقینی، یقینی نمی‌شود (۸۶–۹۹)",
+     "rule": "r_yad_orig_t5",
+     "kind": "theorem",
+     "th": "T_weakest",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "حافظه با سند یا واقعیت بیرونی سنجیده نشده",
+     "rule": "r_yad_undoc",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mem",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "حافظه سنجیده‌نشده × معرفت نخستین ۷۱–۸۵",
+     "rule": "r_yad_undoc_t4",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mem",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "حافظه سنجیده‌نشده × معرفت نخستین ۵۱–۷۰",
+     "rule": "r_yad_undoc_t3",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mem",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "حافظه سنجیده‌نشده × معرفت نخستین ۲۶–۵۰",
+     "rule": "r_yad_undoc_t2",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mem",
+     "src": "جزوه s52"
+    },
+    {
+     "txt": "حافظه سنجیده‌نشده × معرفت نخستین ≤۲۵",
+     "rule": "r_yad_undoc_t1",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mem",
+     "src": "جزوه s52"
+    }
+   ],
+   "rules": [
+    "r_yad_orig_t1",
+    "r_yad_orig_t2",
+    "r_yad_orig_t3",
+    "r_yad_orig_t4",
+    "r_yad_orig_t5",
+    "r_yad_undoc",
+    "r_yad_undoc_t4",
+    "r_yad_undoc_t3",
+    "r_yad_undoc_t2",
+    "r_yad_undoc_t1"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s52"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 10 قاعدهٔ کارخانه روی بخش‌های s52؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_self_knowledge": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "خلط واقع، فهم و زبان",
+     "rule": "r_worlds_mix",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s16,s22,s19"
+    },
+    {
+     "txt": "تفسیر حصولی، خطاناپذیر پنداشته شد",
+     "rule": "r_core_interp_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s18,s19,s21,s22"
+    },
+    {
+     "txt": "تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد",
+     "rule": "r_core_interp_notcert",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s42,s19"
+    },
+    {
+     "txt": "استنتاج پنهان عادتی بی‌آزمون",
+     "rule": "r_hiss_hidden_inf",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_inf",
+     "src": "جزوه s43,s46,s19"
+    }
+   ],
+   "rules": [
+    "r_worlds_mix",
+    "r_core_interp_unchecked",
+    "r_core_interp_notcert",
+    "r_hiss_hidden_inf"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s18، s19"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s18، s19؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_a_priori": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد",
+     "rule": "r_badihi_pseudo",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s40"
+    },
+    {
+     "txt": "حکم غیرحضوری، وجدانی گرفته شد",
+     "rule": "r_badihi_wijdani_other",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s11"
+    },
+    {
+     "txt": "صورت استدلال نامعتبر",
+     "rule": "r_aql_invalid_form",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "مقدمه اثبات‌نشده",
+     "rule": "r_aql_matter_unproven",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s40,s44"
+    }
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_badihi_wijdani_other",
+    "r_aql_invalid_form",
+    "r_aql_matter_unproven"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s39، s44"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s39، s44؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_testimony": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "صدور خبر احراز نشده",
+     "rule": "r_naql_not_issued",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s47"
+    },
+    {
+     "txt": "گزارشگر غیرموثق، بی‌قرینه همسو",
+     "rule": "r_naql_unreliable",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s47,s48"
+    },
+    {
+     "txt": "گزارشگر غیرموثق با قرینه همسو",
+     "rule": "r_naql_unreliable_corrob",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s47,s48"
+    },
+    {
+     "txt": "وثاقت گزارشگر نامعلوم",
+     "rule": "r_naql_narrator_unknown",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s47"
+    },
+    {
+     "txt": "زنجیره طولی با حلقه مجهول",
+     "rule": "r_naql_chain_broken",
+     "kind": "theorem",
+     "th": "T_weakest",
+     "src": "جزوه s47"
+    },
+    {
+     "txt": "خبر واحد یقین‌آور نیست",
+     "rule": "r_naql_ahad",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_thiqa",
+     "src": "جزوه s48,s47"
+    },
+    {
+     "txt": "خبر واحد بی‌قرینه",
+     "rule": "r_naql_no_qarina",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_thiqa",
+     "src": "جزوه s47,s48"
+    },
+    {
+     "txt": "قرینه خلاف",
+     "rule": "r_naql_contra_qarina",
+     "kind": "theorem",
+     "th": "T_against",
+     "src": "جزوه s47,s53"
+    },
+    {
+     "txt": "دلالت غیرنص یقین‌آور نیست",
+     "rule": "r_naql_nonnass",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "ظاهر بدون قرینه همسو",
+     "rule": "r_naql_zahir_noq",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_zahir",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "دلالت مبهم بدون قرینه همسو",
+     "rule": "r_naql_mubham_noq",
+     "kind": "theorem",
+     "th": "T_ambig",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "دلالت مبهم با قرینه همسو",
+     "rule": "r_naql_mubham_q",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mubham_q",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "نادیده گرفتن قرائن متن و موقعیت (تقطیع)",
+     "rule": "r_herm_context",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69,s85,s48"
+    },
+    {
+     "txt": "منبع دینی ضعیف یا بی‌سند",
+     "rule": "r_r_sanad_weak",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s73,s87,s47"
+    },
+    {
+     "txt": "خبر واحد موثق دینی یقین‌آور نیست",
+     "rule": "r_r_sanad_ahad",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_thiqa",
+     "src": "جزوه s73,s48,s74"
+    },
+    {
+     "txt": "ظاهر ناسازگار با برهان قطعی، بی‌تأویل",
+     "rule": "r_r_tawil",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s53,s48,s77"
+    }
+   ],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_herm_context",
+    "r_r_sanad_weak",
+    "r_r_sanad_ahad",
+    "r_r_tawil"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s47، s48"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 16 قاعدهٔ کارخانه روی بخش‌های s47، s48؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_inference_reasoning": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد",
+     "rule": "r_badihi_pseudo",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s40"
+    },
+    {
+     "txt": "صورت استدلال نامعتبر",
+     "rule": "r_aql_invalid_form",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "مقدمه اثبات‌نشده",
+     "rule": "r_aql_matter_unproven",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "مقدمه کاذب",
+     "rule": "r_aql_matter_false",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "صفر فقط برای کذب یقینی",
+     "rule": "r_grade_false_zero",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "ناسازگار با معرفت یقینی",
+     "rule": "r_conflict_cert",
+     "kind": "theorem",
+     "th": "T_conflict",
+     "src": "جزوه s53,s40"
+    }
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_istiqra_incomplete",
+    "r_grade_false_zero",
+    "r_conflict_cert"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s40، s44"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 8 قاعدهٔ کارخانه روی بخش‌های s40، s44؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_semantic_knowledge": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "خلط واقع، فهم و زبان",
+     "rule": "r_worlds_mix",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s16,s22,s19"
+    },
+    {
+     "txt": "تفسیر حصولی، خطاناپذیر پنداشته شد",
+     "rule": "r_core_interp_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s18,s19,s21,s22"
+    },
+    {
+     "txt": "پیش‌زمینه بایسته فراهم نبود",
+     "rule": "r_bg_missing",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s70,s69"
+    },
+    {
+     "txt": "هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده",
+     "rule": "r_herm_readings_equal",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s67,s68,s69"
+    },
+    {
+     "txt": "خلط معنا و اهمیت",
+     "rule": "r_herm_meaning_sig",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69"
+    },
+    {
+     "txt": "نادیده گرفتن قرائن متن و موقعیت (تقطیع)",
+     "rule": "r_herm_context",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69,s85,s48"
+    }
+   ],
+   "rules": [
+    "r_worlds_mix",
+    "r_core_interp_unchecked",
+    "r_bg_missing",
+    "r_herm_readings_equal",
+    "r_herm_meaning_sig",
+    "r_herm_context"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s16، s22، s69"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 6 قاعدهٔ کارخانه روی بخش‌های s16، s22، s69؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_induction": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص",
+     "rule": "r_istiqra_universal",
+     "kind": "theorem",
+     "th": "T_universal",
+     "src": "جزوه s51,s50"
+    },
+    {
+     "txt": "حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص",
+     "rule": "r_istiqra_finite",
+     "kind": "theorem",
+     "th": "T_finite",
+     "src": "جزوه s50"
+    },
+    {
+     "txt": "پیش‌بینیِ موردِ بعدی از استقراءِ ناقص",
+     "rule": "r_istiqra_next",
+     "kind": "theorem",
+     "th": "T_next",
+     "src": "جزوه s50"
+    },
+    {
+     "txt": "استقراء ناقص با موارد اندک",
+     "rule": "r_istiqra_small_n",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50"
+    },
+    {
+     "txt": "تجربه بدون وضع و رفع ≈ استقراء ناقص",
+     "rule": "r_tajrobe_no_vazraf",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s51,s50"
+    },
+    {
+     "txt": "استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده",
+     "rule": "r_istiqra_hidden",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_factor",
+     "src": "جزوه s51,s50"
+    }
+   ],
+   "rules": [
+    "r_aql_nondeductive",
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_tajrobe_no_vazraf",
+    "r_istiqra_hidden"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s50"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 8 قاعدهٔ کارخانه روی بخش‌های s50؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_abduction_ibe": {
+   "stage": 0,
+   "history": []
+  },
+  "a_confirmation": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص",
+     "rule": "r_istiqra_universal",
+     "kind": "theorem",
+     "th": "T_universal",
+     "src": "جزوه s51,s50"
+    },
+    {
+     "txt": "حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص",
+     "rule": "r_istiqra_finite",
+     "kind": "theorem",
+     "th": "T_finite",
+     "src": "جزوه s50"
+    },
+    {
+     "txt": "پیش‌بینیِ موردِ بعدی از استقراءِ ناقص",
+     "rule": "r_istiqra_next",
+     "kind": "theorem",
+     "th": "T_next",
+     "src": "جزوه s50"
+    },
+    {
+     "txt": "استقراء ناقص با موارد اندک",
+     "rule": "r_istiqra_small_n",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50"
+    },
+    {
+     "txt": "تجربه به پای برهان و شهود نمی‌رسد",
+     "rule": "r_tajrobe_ceiling",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s51"
+    },
+    {
+     "txt": "تجربه بدون وضع و رفع ≈ استقراء ناقص",
+     "rule": "r_tajrobe_no_vazraf",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s51,s50"
+    },
+    {
+     "txt": "عوامل پنهان کنترل نشده",
+     "rule": "r_tajrobe_hidden",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_factor",
+     "src": "جزوه s51"
+    },
+    {
+     "txt": "استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده",
+     "rule": "r_istiqra_hidden",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_factor",
+     "src": "جزوه s51,s50"
+    }
+   ],
+   "rules": [
+    "r_aql_nondeductive",
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_tajrobe_ceiling",
+    "r_tajrobe_no_vazraf",
+    "r_tajrobe_hidden",
+    "r_istiqra_hidden"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s50، s51"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 10 قاعدهٔ کارخانه روی بخش‌های s50، s51؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_scientific_knowledge": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص",
+     "rule": "r_istiqra_universal",
+     "kind": "theorem",
+     "th": "T_universal",
+     "src": "جزوه s51,s50"
+    },
+    {
+     "txt": "تجربه به پای برهان و شهود نمی‌رسد",
+     "rule": "r_tajrobe_ceiling",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s51"
+    },
+    {
+     "txt": "تجربه بدون وضع و رفع ≈ استقراء ناقص",
+     "rule": "r_tajrobe_no_vazraf",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s51,s50"
+    },
+    {
+     "txt": "عوامل پنهان کنترل نشده",
+     "rule": "r_tajrobe_hidden",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_factor",
+     "src": "جزوه s51"
+    },
+    {
+     "txt": "استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده",
+     "rule": "r_istiqra_hidden",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_factor",
+     "src": "جزوه s51,s50"
+    }
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_tajrobe_ceiling",
+    "r_tajrobe_no_vazraf",
+    "r_tajrobe_hidden",
+    "r_istiqra_hidden"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s51"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 6 قاعدهٔ کارخانه روی بخش‌های s51؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_underdetermination_realism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_explanation": {
+   "stage": 0,
+   "history": []
+  },
+  "a_thought_experiments_models": {
+   "stage": 0,
+   "history": []
+  },
+  "a_math_logic": {
+   "stage": 0,
+   "history": []
+  },
+  "a_modal_knowledge": {
+   "stage": 0,
+   "history": []
+  },
+  "a_moral_epistemology": {
+   "stage": 0,
+   "history": []
+  },
+  "a_aesthetic_knowledge": {
+   "stage": 0,
+   "history": []
+  },
+  "a_religious_epistemology": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "مکاشفه بی‌سنجش با عقل و وحی",
+     "rule": "r_core_mystic_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s23,s24,s72"
+    },
+    {
+     "txt": "ترک تحقیق ممکن پیش از عمل پرخطر",
+     "rule": "r_resp_inquiry",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s86,s6,s71"
+    },
+    {
+     "txt": "گزاره دینی با راه نامتناسب",
+     "rule": "r_r_route",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s73,s74,s72"
+    },
+    {
+     "txt": "منبع دینی ضعیف یا بی‌سند",
+     "rule": "r_r_sanad_weak",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s73,s87,s47"
+    },
+    {
+     "txt": "خبر واحد موثق دینی یقین‌آور نیست",
+     "rule": "r_r_sanad_ahad",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_thiqa",
+     "src": "جزوه s73,s48,s74"
+    },
+    {
+     "txt": "ظاهر ناسازگار با برهان قطعی، بی‌تأویل",
+     "rule": "r_r_tawil",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s53,s48,s77"
+    }
+   ],
+   "rules": [
+    "r_core_mystic_unchecked",
+    "r_resp_inquiry",
+    "r_r_route",
+    "r_r_sanad_weak",
+    "r_r_sanad_ahad",
+    "r_r_tawil"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s71، s72، s73، s74، s80"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 6 قاعدهٔ کارخانه روی بخش‌های s71، s72، s73، s74، s80؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_legal_epistemology": {
+   "stage": 0,
+   "history": []
+  },
+  "a_other_minds": {
+   "stage": 0,
+   "history": []
+  },
+  "a_pyrrhonian": {
+   "stage": 0,
+   "history": []
+  },
+  "a_radical_skepticism": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "ادعای خودشکن (شک یا نسبیت فراگیر)",
+     "rule": "r_selfref",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s56,s57,s59,s63,s67"
+    },
+    {
+     "txt": "شبهه شکاکانه از یکی از چهار الگو",
+     "rule": "r_doubt_pattern",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s59,s60,s61,s62,s63"
+    }
+   ],
+   "rules": [
+    "r_selfref",
+    "r_doubt_pattern"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s54، s56، s57، s59، s60، s61"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s54، s56، s57، s59، s60، s61؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_epistemic_closure": {
+   "stage": 0,
+   "history": []
+  },
+  "a_rule_following_skepticism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_moorean_hinge": {
+   "stage": 0,
+   "history": []
+  },
+  "a_externalist_transcendental_responses": {
+   "stage": 0,
+   "history": []
+  },
+  "a_contextualism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_contrastivism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_pragmatic_encroachment": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_relativism": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "ادعای خودشکن (شک یا نسبیت فراگیر)",
+     "rule": "r_selfref",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s56,s57,s59,s63,s67"
+    },
+    {
+     "txt": "شبهه شکاکانه از یکی از چهار الگو",
+     "rule": "r_doubt_pattern",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s59,s60,s61,s62,s63"
+    },
+    {
+     "txt": "هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده",
+     "rule": "r_herm_readings_equal",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s67,s68,s69"
+    }
+   ],
+   "rules": [
+    "r_selfref",
+    "r_doubt_pattern",
+    "r_herm_readings_equal"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s55، s56، s63، s67، s68"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s55، s56، s63، s67، s68؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_epistemic_modals": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_logic": {
+   "stage": 0,
+   "history": []
+  },
+  "a_bayesian": {
+   "stage": 0,
+   "history": []
+  },
+  "a_belief_credence": {
+   "stage": 0,
+   "history": []
+  },
+  "a_accuracy_dutch_book": {
+   "stage": 0,
+   "history": []
+  },
+  "a_belief_revision": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_paradoxes": {
+   "stage": 0,
+   "history": []
+  },
+  "a_common_knowledge_self_location": {
+   "stage": 0,
+   "history": []
+  },
+  "a_disagreement": {
+   "stage": 0,
+   "history": []
+  },
+  "a_trust_expertise": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "روش کارشناس ضعیف یا نامعلوم",
+     "rule": "r_expert_method_weak",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s49"
+    },
+    {
+     "txt": "کارشناس بیرون از حوزه تخصص",
+     "rule": "r_expert_out_of_field",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s49"
+    },
+    {
+     "txt": "صلاحیت کارشناس نامعلوم",
+     "rule": "r_expert_comp_unknown",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s49"
+    },
+    {
+     "txt": "تعارض منافع یا ناپایبندی کارشناس",
+     "rule": "r_expert_bias",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_expert_bias",
+     "src": "جزوه s49"
+    }
+   ],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s49"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s49؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_group_epistemology": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_injustice": {
+   "stage": 0,
+   "history": []
+  },
+  "a_feminist_standpoint": {
+   "stage": 0,
+   "history": []
+  },
+  "a_ignorance": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_autonomy_paternalism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_virtue_epistemology": {
+   "stage": 0,
+   "history": []
+  },
+  "a_intellectual_virtues_vices": {
+   "stage": 0,
+   "history": []
+  },
+  "a_epistemic_value": {
+   "stage": 0,
+   "history": []
+  },
+  "a_understanding": {
+   "stage": 0,
+   "history": []
+  },
+  "a_wisdom": {
+   "stage": 0,
+   "history": []
+  },
+  "a_ethics_of_belief": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "پیش‌زمینه نابایسته مهار نشد",
+     "rule": "r_bg_undue",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s70,s65"
+    },
+    {
+     "txt": "پیش‌زمینه بایسته فراهم نبود",
+     "rule": "r_bg_missing",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s70,s69"
+    },
+    {
+     "txt": "ترک تحقیق ممکن پیش از عمل پرخطر",
+     "rule": "r_resp_inquiry",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s86,s6,s71"
+    },
+    {
+     "txt": "ظاهر ناسازگار با برهان قطعی، بی‌تأویل",
+     "rule": "r_r_tawil",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s53,s48,s77"
+    }
+   ],
+   "rules": [
+    "r_bg_undue",
+    "r_bg_missing",
+    "r_resp_inquiry",
+    "r_r_tawil"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s70، s80"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s70، s80؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_doxastic_voluntarism": {
+   "stage": 0,
+   "history": []
+  },
+  "a_inquiry": {
+   "stage": 0,
+   "history": []
+  },
+  "a_metaepistemology": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "خلط صدق معرفتی و صدق اخلاقی",
+     "rule": "r_truth_mix",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s38,s6"
+    },
+    {
+     "txt": "تنگ‌گرفتن واقعیت",
+     "rule": "r_truth_narrow",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s38,s9"
+    },
+    {
+     "txt": "ترک تحقیق ممکن پیش از عمل پرخطر",
+     "rule": "r_resp_inquiry",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s86,s6,s71"
+    }
+   ],
+   "rules": [
+    "r_truth_mix",
+    "r_truth_narrow",
+    "r_resp_inquiry"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s4، s5، s6، s8، s9"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s4، s5، s6، s8، s9؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_intuitions_method": {
+   "stage": 0,
+   "history": []
+  },
+  "a_experimental_epistemology": {
+   "stage": 0,
+   "history": []
+  },
+  "a_naturalized": {
+   "stage": 0,
+   "history": []
+  },
+  "a_evolutionary": {
+   "stage": 0,
+   "history": []
+  },
+  "a_pragmatist": {
+   "stage": 0,
+   "history": []
+  },
+  "a_history_ancient_medieval": {
+   "stage": 0,
+   "history": []
+  },
+  "a_history_modern": {
+   "stage": 0,
+   "history": []
+  },
+  "a_history_twentieth": {
+   "stage": 0,
+   "history": []
+  },
+  "a_cross_cultural": {
+   "stage": 0,
+   "history": []
+  },
+  "a_misinformation": {
+   "stage": 0,
+   "history": []
+  },
+  "a_political_epistemology": {
+   "stage": 0,
+   "history": []
+  },
+  "a_education": {
+   "stage": 0,
+   "history": []
+  },
+  "a_technology_extended": {
+   "stage": 0,
+   "history": []
+  },
+  "a_ai_machine": {
+   "stage": 0,
+   "history": []
+  },
+  "a_huduri_husuli": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "خلط واقع، فهم و زبان",
+     "rule": "r_worlds_mix",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s16,s22,s19"
+    },
+    {
+     "txt": "تفسیر حصولی، خطاناپذیر پنداشته شد",
+     "rule": "r_core_interp_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s18,s19,s21,s22"
+    },
+    {
+     "txt": "تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد",
+     "rule": "r_core_interp_notcert",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s42,s19"
+    },
+    {
+     "txt": "حکم غیرحضوری، وجدانی گرفته شد",
+     "rule": "r_badihi_wijdani_other",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s11"
+    },
+    {
+     "txt": "«شهود» نامیدن حدس یا الهام درباره بیرون",
+     "rule": "r_shohud_misrouted",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s11"
+    },
+    {
+     "txt": "حس بدون کنترل شرایط",
+     "rule": "r_hiss_uncontrolled",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_sense_unctrl",
+     "src": "جزوه s43,s46"
+    },
+    {
+     "txt": "استنتاج پنهان عادتی بی‌آزمون",
+     "rule": "r_hiss_hidden_inf",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_inf",
+     "src": "جزوه s43,s46,s19"
+    }
+   ],
+   "rules": [
+    "r_worlds_mix",
+    "r_core_interp_unchecked",
+    "r_core_interp_notcert",
+    "r_badihi_wijdani_other",
+    "r_shohud_misrouted",
+    "r_hiss_uncontrolled",
+    "r_hiss_hidden_inf"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s11، s12، s13، s14، s17، s18، s19، s46"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 7 قاعدهٔ کارخانه روی بخش‌های s11، s12، s13، s14، s17، s18، s19، s46؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_tasawwur_tasdiq": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق مبهم",
+     "rule": "r_tasdiq_vague",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s27,s28"
+    },
+    {
+     "txt": "صدق و کذب برای تصور، انشا یا پرسش",
+     "rule": "r_tasdiq_nonclaim",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s27,s38"
+    },
+    {
+     "txt": "مغالطه کل و جزء / خلط کلی و کل",
+     "rule": "r_partial_part_whole",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s30"
+    },
+    {
+     "txt": "داوری کلیت از روی شمار مصداق",
+     "rule": "r_partial_by_count",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s30"
+    },
+    {
+     "txt": "تصویر خیالی یا تخیلی به‌جای ادراک حسی",
+     "rule": "r_partial_imagined",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s31"
+    }
+   ],
+   "rules": [
+    "r_tasdiq_vague",
+    "r_tasdiq_nonclaim",
+    "r_partial_part_whole",
+    "r_partial_by_count",
+    "r_partial_imagined"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s27، s28، s30، s31"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 5 قاعدهٔ کارخانه روی بخش‌های s27، s28، s30، s31؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_concept_types": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "خلط اقسام مفاهیم کلی",
+     "rule": "r_ctype_mix",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s33,s34,s35,s36"
+    }
+   ],
+   "rules": [
+    "r_ctype_mix"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s33، s34، s35، s36"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 1 قاعدهٔ کارخانه روی بخش‌های s33، s34، s35، s36؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_badihiyyat": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد",
+     "rule": "r_badihi_pseudo",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s40"
+    },
+    {
+     "txt": "حکم غیرحضوری، وجدانی گرفته شد",
+     "rule": "r_badihi_wijdani_other",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s39,s11"
+    },
+    {
+     "txt": "صورت استدلال نامعتبر",
+     "rule": "r_aql_invalid_form",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "قالب غیرقیاسی یقین‌آور نیست",
+     "rule": "r_aql_nondeductive",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s40,s50"
+    },
+    {
+     "txt": "مقدمه اثبات‌نشده",
+     "rule": "r_aql_matter_unproven",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s40,s44"
+    },
+    {
+     "txt": "مقدمه کاذب",
+     "rule": "r_aql_matter_false",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "استقراء ناقص هرگز یقینی نیست",
+     "rule": "r_istiqra_incomplete",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s50,s40,s51"
+    },
+    {
+     "txt": "صفر فقط برای کذب یقینی",
+     "rule": "r_grade_false_zero",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s40"
+    },
+    {
+     "txt": "ناسازگار با معرفت یقینی",
+     "rule": "r_conflict_cert",
+     "kind": "theorem",
+     "th": "T_conflict",
+     "src": "جزوه s53,s40"
+    }
+   ],
+   "rules": [
+    "r_badihi_pseudo",
+    "r_badihi_wijdani_other",
+    "r_aql_invalid_form",
+    "r_aql_nondeductive",
+    "r_aql_matter_unproven",
+    "r_aql_matter_false",
+    "r_istiqra_incomplete",
+    "r_grade_false_zero",
+    "r_conflict_cert"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s39، s40"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 9 قاعدهٔ کارخانه روی بخش‌های s39، s40؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_tawatur": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "گزارشگر غیرموثق، بی‌قرینه همسو",
+     "rule": "r_naql_unreliable",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s47,s48"
+    },
+    {
+     "txt": "گزارشگر غیرموثق با قرینه همسو",
+     "rule": "r_naql_unreliable_corrob",
+     "kind": "theorem",
+     "th": "T_unknown",
+     "src": "جزوه s47,s48"
+    },
+    {
+     "txt": "خبر واحد یقین‌آور نیست",
+     "rule": "r_naql_ahad",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_thiqa",
+     "src": "جزوه s48,s47"
+    },
+    {
+     "txt": "خبر واحد بی‌قرینه",
+     "rule": "r_naql_no_qarina",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_thiqa",
+     "src": "جزوه s47,s48"
+    },
+    {
+     "txt": "دلالت غیرنص یقین‌آور نیست",
+     "rule": "r_naql_nonnass",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "ظاهر بدون قرینه همسو",
+     "rule": "r_naql_zahir_noq",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_zahir",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "دلالت مبهم بدون قرینه همسو",
+     "rule": "r_naql_mubham_noq",
+     "kind": "theorem",
+     "th": "T_ambig",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "دلالت مبهم با قرینه همسو",
+     "rule": "r_naql_mubham_q",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_mubham_q",
+     "src": "جزوه s48"
+    },
+    {
+     "txt": "نادیده گرفتن قرائن متن و موقعیت (تقطیع)",
+     "rule": "r_herm_context",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69,s85,s48"
+    },
+    {
+     "txt": "خبر واحد موثق دینی یقین‌آور نیست",
+     "rule": "r_r_sanad_ahad",
+     "kind": "base",
+     "th": "T_below1",
+     "base": "p_thiqa",
+     "src": "جزوه s73,s48,s74"
+    },
+    {
+     "txt": "ظاهر ناسازگار با برهان قطعی، بی‌تأویل",
+     "rule": "r_r_tawil",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s53,s48,s77"
+    }
+   ],
+   "rules": [
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_herm_context",
+    "r_r_sanad_ahad",
+    "r_r_tawil"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s48"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 11 قاعدهٔ کارخانه روی بخش‌های s48؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_wahy_ilham": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "مکاشفه بی‌سنجش با عقل و وحی",
+     "rule": "r_core_mystic_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s23,s24,s72"
+    },
+    {
+     "txt": "گزاره دینی با راه نامتناسب",
+     "rule": "r_r_route",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s73,s74,s72"
+    }
+   ],
+   "rules": [
+    "r_core_mystic_unchecked",
+    "r_r_route"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s25، s72"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s25، s72؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_mystical_intuition": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "تفسیر حصولی، خطاناپذیر پنداشته شد",
+     "rule": "r_core_interp_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s18,s19,s21,s22"
+    },
+    {
+     "txt": "تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد",
+     "rule": "r_core_interp_notcert",
+     "kind": "theorem",
+     "th": "T_below1",
+     "src": "جزوه s42,s19"
+    },
+    {
+     "txt": "مکاشفه بی‌سنجش با عقل و وحی",
+     "rule": "r_core_mystic_unchecked",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s23,s24,s72"
+    },
+    {
+     "txt": "«شهود» نامیدن حدس یا الهام درباره بیرون",
+     "rule": "r_shohud_misrouted",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s42,s11"
+    }
+   ],
+   "rules": [
+    "r_core_interp_unchecked",
+    "r_core_interp_notcert",
+    "r_core_mystic_unchecked",
+    "r_shohud_misrouted"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s23، s24، s42"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s23، s24، s42؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_religious_hermeneutics": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "پیش‌زمینه نابایسته مهار نشد",
+     "rule": "r_bg_undue",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s70,s65"
+    },
+    {
+     "txt": "پیش‌زمینه بایسته فراهم نبود",
+     "rule": "r_bg_missing",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s70,s69"
+    },
+    {
+     "txt": "ادعای خودشکن (شک یا نسبیت فراگیر)",
+     "rule": "r_selfref",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s56,s57,s59,s63,s67"
+    },
+    {
+     "txt": "هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده",
+     "rule": "r_herm_readings_equal",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s67,s68,s69"
+    },
+    {
+     "txt": "خلط معنا و اهمیت",
+     "rule": "r_herm_meaning_sig",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69"
+    },
+    {
+     "txt": "نادیده گرفتن قرائن متن و موقعیت (تقطیع)",
+     "rule": "r_herm_context",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s69,s85,s48"
+    },
+    {
+     "txt": "ظاهر ناسازگار با برهان قطعی، بی‌تأویل",
+     "rule": "r_r_tawil",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s53,s48,s77"
+    },
+    {
+     "txt": "بطون یا تکثر فتاوا دلیل نسبیت قرائت‌ها",
+     "rule": "r_r_readings",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s76,s77,s78"
+    }
+   ],
+   "rules": [
+    "r_bg_undue",
+    "r_bg_missing",
+    "r_selfref",
+    "r_herm_readings_equal",
+    "r_herm_meaning_sig",
+    "r_herm_context",
+    "r_r_tawil",
+    "r_r_readings"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s64، s65، s67، s68، s69، s70، s76، s77، s78، s85"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 8 قاعدهٔ کارخانه روی بخش‌های s64، s65، s67، s68، s69، s70، s76، s77، s78، s85؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  },
+  "a_pluralism": {
+   "stage": 4,
+   "claims": [
+    {
+     "txt": "ترک تحقیق ممکن پیش از عمل پرخطر",
+     "rule": "r_resp_inquiry",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s80,s86,s6,s71"
+    },
+    {
+     "txt": "منبع دینی ضعیف یا بی‌سند",
+     "rule": "r_r_sanad_weak",
+     "kind": "theorem",
+     "th": "T_null",
+     "src": "جزوه s73,s87,s47"
+    },
+    {
+     "txt": "مغالطه تلازم میان حقانیت، نجات و رفتار",
+     "rule": "r_r_plural",
+     "kind": "theorem",
+     "th": "A0",
+     "src": "جزوه s81,s83,s86"
+    }
+   ],
+   "rules": [
+    "r_resp_inquiry",
+    "r_r_sanad_weak",
+    "r_r_plural"
+   ],
+   "sources": [
+    "جزوهٔ معرفت‌شناسی (مصباح) s81، s82، s83، s86، s87"
+   ],
+   "seeded": true,
+   "history": [
+    {
+     "round": 11,
+     "at": "2026-10-14",
+     "stage": 4,
+     "what": "پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s81، s82، s83، s86، s87؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»",
+     "by": "ابزار"
+    }
+   ],
+   "verify": {
+    "since": 11,
+    "fresh": 0,
+    "ok": 0,
+    "ids": []
+   },
+   "bookOnly": true
+  }
+ },
+ "round": 11,
+ "updated": "2026-10-14"
+}

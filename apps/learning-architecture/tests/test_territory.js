@@ -24,7 +24,8 @@ chk(orphan.length === 0, 'every booklet section that carries rules belongs to an
 const r1 = run('run', '--note', 'پایه');
 const st = JSON.parse(fs.readFileSync(path.join(dir, 'territory.json')));
 const seeded = areas.filter(a => (st.areas[a.id] || {}).seeded);
-chk(seeded.length >= 5 && seeded.every(a => st.areas[a.id].stage === 4 && st.areas[a.id].claims.length), 'booklet areas seeded at stage 4 with classified claims');
+chk(seeded.length >= 5 && seeded.every(a => st.areas[a.id].stage === 4 && st.areas[a.id].claims.length && st.areas[a.id].bookOnly), 'booklet areas seeded at stage 4, marked «booklet part only»');
+const bo = seeded[0].id, base3 = [1, 2, 3].map(i => ({ txt: 'گزارهٔ تازهٔ ادبیات شمارهٔ ' + i, src: 'SEP', kind: 'outside', why: 'به ارزش‌ها برمی‌گردد نه به صدق؛ از اصول بیرون نمی‌آید' }));
 chk(r1.territory && r1.territory.areas === areas.length && r1.routine.alarms.some(a => /قلمرو/.test(a)), 'ledger has territory stats; «no area moved» alarm');
 chk(fs.existsSync(path.join(dir, 'TERRITORY.md')) && /# قلمروِ معرفت‌شناسی/.test(fs.readFileSync(path.join(dir, 'TERRITORY.md'), 'utf8')), 'TERRITORY.md generated');
 const open = areas.find(a => !(st.areas[a.id] || {}).seeded);
@@ -42,6 +43,10 @@ chk(W([{ area: open.id, stage: 4, what: 'قاعده‌های موجود', rules:
 chk(W([{ area: open.id, stage: 5, what: 'تثبیتِ دستی' }]).rejected.length === 1, 'stage 5 only by the tool');
 const st2 = JSON.parse(fs.readFileSync(path.join(dir, 'territory.json')));
 chk(st2.areas[open.id].history.length === 4 && st2.areas[open.id].history.every(h => h.what && h.round), 'history kept, one entry per step');
+chk(W([{ area: bo, widen: true, what: 'گسترشِ آزمایشی از ادبیات', sources: ['فقط یکی'], claims: base3 }]).rejected.length === 1, 'widen needs two outside sources');
+chk(W([{ area: bo, widen: true, what: 'گسترشِ آزمایشی از ادبیات', sources: ['SEP: Testimony https://plato.stanford.edu/entries/testimony-episprob/', 'IEP https://iep.utm.edu/ep-testi/'], claims: base3 }]).advanced.length === 1, 'widen with evidence');
+chk(JSON.parse(fs.readFileSync(path.join(dir, 'territory.json'))).areas[bo].bookOnly === false, 'widened area no longer «booklet part only»');
+chk(W([{ area: open.id, widen: true, what: 'گسترشِ نابه‌جا', sources: ['a b c d e f', 'g h i j k l'], claims: base3 }]).rejected.length === 1, 'widen only for booklet-only areas');
 const r2 = run('run');
 chk(!r2.routine.alarms.some(a => /قلمرو/.test(a)) && r2.routine.alarms.some(a => /بازبینی/.test(a)), 'area moved ⇒ no territory alarm; missing review of previous round ⇒ alarm');
 const rv = path.join(dir, 'rv.json');

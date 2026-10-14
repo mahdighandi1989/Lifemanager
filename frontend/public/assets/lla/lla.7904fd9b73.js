@@ -15258,6 +15258,2020 @@ window.EPI_PROBLEMS.push({
   };
 })(typeof window !== "undefined" ? window : globalThis);
 
+/* ===== نقشهٔ قلمروِ معرفت‌شناسی (مالک ۲۰۲۶-۱۰-۱۴) =====
+   مالک: «تشخیص دهد در علمِ معرفت‌شناسی چه دروازه‌ها و حوزه‌هایی هست و به همه رسوخ کند و قلمروش را بر پایهٔ بدیهیاتِ قطعی گسترش دهد …
+   نقشه ناقص نباشد، کامل و جامع … در هر حوزه دقیقاً پیشرفت کند و روندش در جزوه‌ها و مستندات ثبت شود».
+   این فایل فقط «نقشه» است (ثابت، از منابعِ معتبر گردآوری‌شده — `sources`). پیشرفتِ هر حوزه در `backtest/territory.json` است و فقط
+   ابزارِ قطعیِ `tools/epi_backtest.js territory` آن را جلو می‌برد (هر گام با شاهد؛ گامِ آخر را خودِ ابزار با وقایعِ تازه تأیید می‌کند).
+   `book`: بخش‌هایی از جزوهٔ مصباح که این حوزه را پوشش می‌دهند (قاعده‌های کارخانه روی همین بخش‌ها نشسته‌اند). */
+(function (W) {
+  var T = W.EPI_TERR = W.EPI_TERR || {};
+  T.STAGES = [
+    { n: 0, fa: "نقشه‌شده", need: "در نقشه هست؛ هنوز کاری نشده" },
+    { n: 1, fa: "منابع خوانده شد", need: "دست‌کم دو منبعِ معتبرِ واقعی (عنوان + پیوند/ارجاع) که خوانده شد" },
+    { n: 2, fa: "گزاره‌ها فهرست شد", need: "دست‌کم سه گزاره/ملاکِ محوریِ حوزه (آنچه می‌گوید کِی باور موجه است)" },
+    { n: 3, fa: "رده‌بندی بر پایهٔ بدیهیات", need: "هر گزاره یکی از سه: قضیه (برهان از اصولِ ثابت) · قضیه × مقدارِ پایهٔ سنجیدنی · بیرون از قلمروِ قطعی (با دلیل)" },
+    { n: 4, fa: "قاعده یا مرز", need: "برای گزاره‌های قضیه‌ای: قاعدهٔ کارخانه (موجود یا پیشنهادِ ثبت‌شده)؛ اگر همه بیرون‌اند: مرزِ ثبت‌شده" },
+    { n: 5, fa: "تثبیت‌شده", need: "خودِ ابزار: دست‌کم ۳ واقعهٔ تازه که قاعده‌های این حوزه را به کار انداختند، همه درست" }
+  ];
+  /* نقشه: ۱۴ گروه، ۱۰۸ حوزه — گردآوری‌شده (۲۰۲۶-۱۰-۱۴) از فهرستِ مدخل‌های دانشنامهٔ استنفورد (SEP) و IEP، فهرستِ ۷۸ فصلِ
+     Routledge Companion to Epistemology، کتاب‌های درسیِ Audi و Pritchard، منابعِ معرفت‌شناسیِ صوری/اجتماعی/کاربردی، و سنتِ اسلامی
+     (مصباح، «آموزش فلسفه»). نشانی‌های SEP یکی‌یکی وارسی شد. حوزه‌های کم‌منبع (src کوتاه) را ناظر در گامِ ۱ با منابعِ بیشتر می‌خواند. */
+  T.sources = [
+ {
+  "tag": "SEP",
+  "title": "Stanford Encyclopedia of Philosophy — 'Epistemology' (Steup & Neta) and linked/related epistemology entries",
+  "url": "https://plato.stanford.edu/entries/epistemology/"
+ },
+ {
+  "tag": "SEP-toc",
+  "title": "Stanford Encyclopedia of Philosophy — Table of Contents (epistemology-related entries)",
+  "url": "https://plato.stanford.edu/contents.html"
+ },
+ {
+  "tag": "RCE",
+  "title": "Bernecker & Pritchard (eds.), The Routledge Companion to Epistemology (2011), 78 chapters in 10 parts",
+  "url": "https://www.routledge.com/9780415722698"
+ },
+ {
+  "tag": "Audi",
+  "title": "Robert Audi, Epistemology: A Contemporary Introduction to the Theory of Knowledge (2nd/3rd ed., Routledge), chs. 1–10",
+  "url": "https://www.cs.rutgers.edu/~biglars/epis.pdf"
+ },
+ {
+  "tag": "Pritchard",
+  "title": "Duncan Pritchard, What is this thing called Knowledge? (4th ed. 2018 adds applied chapters: technology, education, law, politics; 5th ed. adds social-epistemology part)",
+  "url": "https://www.bookshare.org/browse/book/2005787"
+ },
+ {
+  "tag": "IEP",
+  "title": "Internet Encyclopedia of Philosophy — 'Epistemology' entry and the Epistemology category (85 articles)",
+  "url": "https://iep.utm.edu/category/s-l-m/epistemology/"
+ },
+ {
+  "tag": "FakeNews",
+  "title": "Bernecker, Flowerree & Grundmann (eds.), The Epistemology of Fake News (Oxford UP, 2021)",
+  "url": "https://academic.oup.com/book/39398"
+ },
+ {
+  "tag": "W&O",
+  "title": "Weatherall & O'Connor, 'Fake News and Misinformation' (PhilSci Archive)",
+  "url": "https://philsci-archive.pitt.edu/22510/1/Fake_News_and_Misinformation.pdf"
+ },
+ {
+  "tag": "Goldman1991",
+  "title": "Alvin Goldman, 'Epistemic Paternalism: Communication Control in Law and Society', Journal of Philosophy 88 (1991)",
+  "url": "https://doi.org/10.2307/2026906"
+ },
+ {
+  "tag": "Friedman2020",
+  "title": "Jane Friedman, 'The Epistemic and the Zetetic', Philosophical Review 129 (2020)",
+  "url": "https://doi.org/10.1215/00318108-8311261"
+ },
+ {
+  "tag": "Mesbah",
+  "title": "محمدتقی مصباح یزدی، «آموزش فلسفه»، جلد ۱، بخش دوم: شناخت‌شناسی (درس‌های ۱۱–۲۰)",
+  "url": "https://fidibo.com/book/162293-آموزش-فلسفه-جلد-اول"
+ },
+ {
+  "tag": "SEP-ArabicMind",
+  "title": "SEP — 'Arabic and Islamic Philosophy of Mind' / 'Ibn Sina [Avicenna]'",
+  "url": "https://plato.stanford.edu/entries/arabic-islamic-mind/"
+ },
+ {
+  "tag": "Emadzadeh",
+  "title": "حسین عمادزاده، مقاله دربارهٔ اعتبار شهود عرفانی در معرفت‌شناسی حکمت متعالیه (ensani.ir)",
+  "url": "https://ensani.ir/fa/article/author/50703"
+ },
+ {
+  "tag": "Wikifeqh",
+  "title": "دانشنامهٔ ویکی‌فقه — «معرفت دینی»",
+  "url": "https://fa.wikifeqh.ir/معرفت_دینی"
+ }
+];
+  T.groups = [
+ {
+  "id": "g_foundational_concepts",
+  "fa": "مفاهیم بنیادین و عقلانیت",
+  "en": "Foundational Concepts and Rationality",
+  "areas": [
+   {
+    "id": "a_truth",
+    "fa": "صدق",
+    "en": "Truth",
+    "desc_fa": "نسبت صدق با معرفت و باور را بررسی می‌کند و می‌پرسد صدق چیست و چرا هدف یا معیار باور است.",
+    "key_questions_fa": [
+     "آیا صدق شرط لازم معرفت است؟",
+     "کدام نظریهٔ صدق (مطابقت، انسجام، عمل‌گرایانه، کاهشی) با معرفت‌شناسی سازگارتر است؟",
+     "آیا صدق تنها ارزش بنیادین معرفتی است؟"
+    ],
+    "src": [
+     "RCE ch.1",
+     "SEP truth",
+     "IEP"
+    ],
+    "book": [
+     "s6",
+     "s38"
+    ]
+   },
+   {
+    "id": "a_belief",
+    "fa": "باور",
+    "en": "Belief",
+    "desc_fa": "ماهیت باور، هدف آن و نسبت آن با پذیرش، ایمان و حالت‌های هم‌خانواده را بررسی می‌کند.",
+    "key_questions_fa": [
+     "باور چیست و چه تفاوتی با پذیرش (acceptance) و فرض دارد؟",
+     "آیا باور ذاتاً «معطوف به صدق» است؟",
+     "باور تمام‌عیار چه نسبتی با درجات باور دارد؟"
+    ],
+    "src": [
+     "RCE ch.2",
+     "SEP belief",
+     "IEP Belief, Aim of"
+    ]
+   },
+   {
+    "id": "a_evidence",
+    "fa": "شاهد و قرینه",
+    "en": "Evidence",
+    "desc_fa": "می‌پرسد شاهد چیست، چه چیزی جزو شواهد یک فاعل است و شاهد چگونه از باور پشتیبانی می‌کند.",
+    "key_questions_fa": [
+     "شواهد ما حالات ذهنی‌اند یا گزاره‌ها یا واقعیت‌ها؟",
+     "آیا شاهد ما همان معرفت ماست (E=K)؟",
+     "«پشتیبانی شاهد» از باور را چگونه باید سنجید؟"
+    ],
+    "src": [
+     "RCE ch.6",
+     "SEP evidence",
+     "IEP Evidence"
+    ]
+   },
+   {
+    "id": "a_epistemic_rationality",
+    "fa": "عقلانیت معرفتی",
+    "en": "Epistemic Rationality",
+    "desc_fa": "معیارهای عقلانی بودن باور و استدلال را، در برابر عقلانیت عملی و ابزاری و عقلانیت ساختاری (انسجامی)، بررسی می‌کند.",
+    "key_questions_fa": [
+     "عقلانیت معرفتی چه تفاوتی با توجیه و با عقلانیت عملی دارد؟",
+     "آیا الزامات انسجام (ساختاری) هنجاری‌اند؟",
+     "عقلانیت محدود انسان‌ها چه پیامدی برای هنجارهای معرفتی دارد؟"
+    ],
+    "src": [
+     "RCE ch.4",
+     "SEP rationality-structural",
+     "SEP rationality-instrumental",
+     "SEP bounded rationality"
+    ]
+   },
+   {
+    "id": "a_epistemic_norms",
+    "fa": "هنجارهای معرفتی",
+    "en": "Epistemic Norms",
+    "desc_fa": "هنجارهای حاکم بر باور، ادعا و عمل (مانند هنجار معرفت برای اظهار) و منشأ هنجاری بودن آن‌ها را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چه هنجاری بر اظهار و ادعا حاکم است: معرفت، باور موجه یا صدق؟",
+     "آیا عمل بر پایهٔ یک گزاره مستلزم دانستن آن است؟",
+     "منشأ الزام‌آور بودن هنجارهای معرفتی چیست؟"
+    ],
+    "src": [
+     "RCE ch.5",
+     "IEP Knowledge Norms"
+    ]
+   },
+   {
+    "id": "a_certainty",
+    "fa": "یقین و مراتب آن",
+    "en": "Certainty",
+    "desc_fa": "انواع یقین (روان‌شناختی و معرفتی)، نسبت یقین با معرفت و امکان دستیابی به آن را بررسی می‌کند.",
+    "key_questions_fa": [
+     "یقین معرفتی چیست و چه تفاوتی با اطمینان روانی دارد؟",
+     "آیا معرفت مستلزم یقین است؟",
+     "آیا اصلاً گزاره‌ای یقینی وجود دارد؟"
+    ],
+    "src": [
+     "SEP certainty",
+     "IEP Certainty"
+    ],
+    "book": [
+     "s39",
+     "s40"
+    ]
+   },
+   {
+    "id": "a_higher_order_evidence",
+    "fa": "شاهد مرتبهٔ بالاتر و تردید در خود",
+    "en": "Higher-Order Evidence and Epistemic Self-Doubt",
+    "desc_fa": "می‌پرسد شواهدی دربارهٔ اعتمادپذیری داوری خودمان (خستگی، سوگیری، مخالفت دیگران) چگونه باید باورهای مرتبهٔ اول را تغییر دهد.",
+    "key_questions_fa": [
+     "آیا شاهد مرتبهٔ بالاتر می‌تواند توجیه مرتبهٔ اول را از میان ببرد؟",
+     "وقتی به توانایی‌های خود شک داریم، عقلانی است به آن‌ها اعتماد کنیم؟",
+     "آیا ممکن است عقلانیت ما را به «ناهمخوانی میان مراتب» وادارد؟"
+    ],
+    "src": [
+     "SEP higher-order-evidence",
+     "SEP epistemic-self-doubt"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_nature_of_knowledge",
+  "fa": "ماهیت و تحلیل معرفت",
+  "en": "The Nature and Analysis of Knowledge",
+  "areas": [
+   {
+    "id": "a_kinds_of_knowledge",
+    "fa": "انواع معرفت",
+    "en": "Varieties of Knowledge and Cognitive Success",
+    "desc_fa": "انواع معرفت (گزاره‌ای، مهارتی، آشنایی) و گونه‌های دیگر موفقیت شناختی را از هم تمییز می‌دهد.",
+    "key_questions_fa": [
+     "چه گونه‌هایی از موفقیت شناختی وجود دارد؟",
+     "آیا معرفت گزاره‌ای بنیادی‌ترین نوع معرفت است؟",
+     "چه چیزهایی می‌توانند حامل موفقیت معرفتی باشند: باور، فرد، گروه یا نهاد؟"
+    ],
+    "src": [
+     "SEP epistemology §1–2",
+     "IEP Epistemology §1"
+    ],
+    "book": [
+     "s8",
+     "s9",
+     "s11"
+    ]
+   },
+   {
+    "id": "a_tripartite_analysis",
+    "fa": "تحلیل سنتی معرفت (باور صادق موجه)",
+    "en": "The Traditional (JTB) Analysis of Knowledge",
+    "desc_fa": "تلاش برای تعریف معرفت گزاره‌ای بر حسب شرایط لازم و کافی، به‌ویژه تعریف سه‌جزئی «باور صادق موجه».",
+    "key_questions_fa": [
+     "آیا معرفت قابل تحلیل به شرایط لازم و کافی است؟",
+     "آیا باور، صدق و توجیه هر سه برای معرفت لازم‌اند؟",
+     "تحلیل معرفت چه هدفی را دنبال می‌کند؟"
+    ],
+    "src": [
+     "SEP knowledge-analysis",
+     "IEP Knowledge",
+     "Audi ch.8",
+     "Pritchard"
+    ]
+   },
+   {
+    "id": "a_gettier_problem",
+    "fa": "مسئلهٔ گتیه",
+    "en": "The Gettier Problem",
+    "desc_fa": "موارد گتیه را بررسی می‌کند که در آن‌ها باور صادق موجه به‌سبب بخت معرفت نیست، و راه‌حل‌های پیشنهادی (شرط نفی باور کاذب، نظریهٔ علّی و…) را می‌سنجد.",
+    "key_questions_fa": [
+     "چرا باور صادق موجه در موارد گتیه معرفت نیست؟",
+     "آیا شرط چهارمی می‌تواند مسئله را حل کند؟",
+     "آیا مسئلهٔ گتیه اساساً حل‌شدنی است؟"
+    ],
+    "src": [
+     "RCE ch.12",
+     "IEP Gettier Problems",
+     "SEP knowledge-analysis"
+    ]
+   },
+   {
+    "id": "a_defeasibility_theory",
+    "fa": "نظریهٔ شکست‌پذیری معرفت",
+    "en": "Defeasibility Theory of Knowledge",
+    "desc_fa": "معرفت را باور صادق موجهی می‌داند که هیچ حقیقتِ ناقضی (شکننده‌ای) توجیه آن را از میان نبرد؛ و انواع ناقض‌ها را بررسی می‌کند.",
+    "key_questions_fa": [
+     "شکنندهٔ (ناقض) گمراه‌کننده با شکنندهٔ واقعی چه تفاوتی دارد؟",
+     "آیا شرط «نبودِ ناقض» مسئلهٔ گتیه را حل می‌کند؟"
+    ],
+    "src": [
+     "RCE ch.15",
+     "IEP Gettier Problems §ii"
+    ]
+   },
+   {
+    "id": "a_modal_anti_luck",
+    "fa": "شرایط موجهاتی و معرفت‌شناسی ضدِبخت",
+    "en": "Modal and Anti-Luck Epistemology (Safety, Sensitivity)",
+    "desc_fa": "شرایط موجهاتیِ معرفت مانند حساسیت و ایمنی را برای کنار گذاشتن بخت معرفتی بررسی می‌کند.",
+    "key_questions_fa": [
+     "بخت معرفتی چیست و کدام انواع آن با معرفت ناسازگار است؟",
+     "شرط ایمنی بهتر است یا شرط حساسیت؟",
+     "آیا معرفت باید هم ضدِبخت و هم مبتنی بر توانایی باشد؟"
+    ],
+    "src": [
+     "RCE ch.18",
+     "IEP The Safety Condition for Knowledge",
+     "IEP Epistemic Luck"
+    ]
+   },
+   {
+    "id": "a_fallibilism",
+    "fa": "خطاپذیری‌گرایی",
+    "en": "Fallibilism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که معرفت با امکان خطا سازگار است، و تنش آن با شهودهایی مانند «می‌دانم p اما ممکن است p نباشد».",
+    "key_questions_fa": [
+     "آیا می‌توان چیزی را دانست بی‌آنکه شاهد ما صدق آن را تضمین کند؟",
+     "چرا جملهٔ «می‌دانم p، ولی شاید p نباشد» ناهنجار است؟",
+     "آیا خطاناپذیری‌گرایی به شک‌گرایی می‌انجامد؟"
+    ],
+    "src": [
+     "RCE ch.13",
+     "IEP Fallibilism"
+    ]
+   },
+   {
+    "id": "a_knowledge_first",
+    "fa": "معرفت‌شناسی معرفت‌محور",
+    "en": "Knowledge-First Epistemology",
+    "desc_fa": "معرفت را مفهومی بنیادین و تحلیل‌ناپذیر می‌گیرد و باور، شاهد و توجیه را برحسب آن تبیین می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت یک حالت ذهنی بنیادین است؟",
+     "آیا می‌توان توجیه را برحسب معرفت تعریف کرد؟",
+     "آیا شواهد ما همان معرفت ماست؟"
+    ],
+    "src": [
+     "RCE ch.20",
+     "IEP Knowledge-First Theories of Justification"
+    ]
+   },
+   {
+    "id": "a_knowledge_how",
+    "fa": "دانستنِ چگونگی (معرفت مهارتی)",
+    "en": "Knowledge-How",
+    "desc_fa": "می‌پرسد دانستن اینکه چگونه کاری انجام شود نوعی توانایی است یا نوعی معرفت گزاره‌ای (عقل‌گرایی در برابر ضدعقل‌گرایی).",
+    "key_questions_fa": [
+     "آیا دانستنِ چگونگی به دانستنِ اینکه قابل تحویل است؟",
+     "نسبت مهارت، توانایی و معرفت مهارتی چیست؟"
+    ],
+    "src": [
+     "SEP knowledge-how",
+     "SEP epistemology §2.2"
+    ]
+   },
+   {
+    "id": "a_acquaintance",
+    "fa": "معرفت از راه آشنایی و از راه توصیف",
+    "en": "Knowledge by Acquaintance and by Description",
+    "desc_fa": "تمایز راسلیِ آشنایی مستقیم با اشیا و معرفت توصیفی، و نقش آشنایی در بنیاد معرفت را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آشنایی مستقیم با چه چیزهایی ممکن است؟",
+     "آیا آشنایی خودش معرفت است یا پایهٔ معرفت؟",
+     "آیا معرفت به افراد به معرفت گزاره‌ای تحویل‌پذیر است؟"
+    ],
+    "src": [
+     "SEP knowledge-acquaindescrip",
+     "IEP Knowledge by Acquaintance and Knowledge by Description",
+     "SEP epistemology §2.1"
+    ],
+    "book": [
+     "s11"
+    ]
+   },
+   {
+    "id": "a_higher_order_knowledge",
+    "fa": "معرفت مرتبهٔ دوم و اصل KK",
+    "en": "Second-Order Knowledge and the KK Principle",
+    "desc_fa": "می‌پرسد آیا دانستن مستلزم دانستنِ اینکه می‌دانیم است، و نقش شفافیت حالت‌های معرفتی چیست.",
+    "key_questions_fa": [
+     "آیا اگر بدانیم p، لزوماً می‌دانیم که می‌دانیم p؟",
+     "استدلال‌های ویلیامسون علیه «درخشش» حالات معرفتی چه می‌گوید؟"
+    ],
+    "src": [
+     "RCE ch.53",
+     "IEP KK Principle"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_justification",
+  "fa": "توجیه: نظریه‌ها و ساختار",
+  "en": "Justification: Theories and Structure",
+  "areas": [
+   {
+    "id": "a_justification_concept",
+    "fa": "مفهوم توجیه معرفتی",
+    "en": "The Concept of Epistemic Justification",
+    "desc_fa": "چیستی توجیه، تفاوت توجیه گزاره‌ای و باوری، و تلقی وظیفه‌گرایانه و غیروظیفه‌گرایانه از آن را بررسی می‌کند.",
+    "key_questions_fa": [
+     "توجیه معرفتی دقیقاً چیست؟",
+     "توجیه گزاره‌ای و توجیه باوری چه تفاوتی دارند؟",
+     "آیا توجیه مفهومی وظیفه‌گرایانه (ناظر به تکلیف) است؟"
+    ],
+    "src": [
+     "RCE ch.3",
+     "SEP epistemology §3",
+     "IEP Justification, Epistemic"
+    ]
+   },
+   {
+    "id": "a_internalism_externalism",
+    "fa": "درون‌گرایی و برون‌گرایی",
+    "en": "Internalism and Externalism",
+    "desc_fa": "می‌پرسد آیا عوامل توجیه‌کننده باید از درون برای فاعل در دسترس باشند (درون‌گرایی) یا می‌توانند بیرونی باشند (برون‌گرایی)؛ شامل مسئلهٔ «شیطان فریبکار جدید».",
+    "key_questions_fa": [
+     "آیا توجیه بر حالات ذهنی فاعل استوار (supervene) است؟",
+     "آیا قربانی شیطان فریبکار به اندازهٔ ما موجه است؟",
+     "آیا دسترسی بازتابی شرط توجیه است؟"
+    ],
+    "src": [
+     "RCE ch.14",
+     "SEP justep-intext",
+     "IEP Internalism and Externalism in Epistemology",
+     "IEP Evil Demon Problem, The New"
+    ]
+   },
+   {
+    "id": "a_evidentialism",
+    "fa": "قرینه‌گرایی",
+    "en": "Evidentialism",
+    "desc_fa": "این نظریه را بررسی می‌کند که توجیه باور تنها به تناسب آن با شواهد فاعل بستگی دارد.",
+    "key_questions_fa": [
+     "آیا توجیه فقط تابع شواهد است؟",
+     "آیا ملاحظات عملی می‌توانند دلیل باور باشند؟"
+    ],
+    "src": [
+     "RCE ch.16",
+     "IEP Evidentialism"
+    ]
+   },
+   {
+    "id": "a_reliabilism",
+    "fa": "اعتمادگرایی",
+    "en": "Reliabilism",
+    "desc_fa": "توجیه یا معرفت را برحسب اعتمادپذیری فرایندهای باورساز تبیین می‌کند و مسائلی مانند «مسئلهٔ عام بودن» را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا باور موجه همان باور برآمده از فرایند اعتمادپذیر است؟",
+     "مسئلهٔ عام بودن (generality) چگونه حل می‌شود؟",
+     "اعتمادگرایی با مثال‌های کلرآوایان و شیطان فریبکار چه می‌کند؟"
+    ],
+    "src": [
+     "RCE ch.17",
+     "SEP reliabilism",
+     "IEP Reliabilism"
+    ]
+   },
+   {
+    "id": "a_proper_functionalism",
+    "fa": "کارکرد درست",
+    "en": "Proper Functionalism",
+    "desc_fa": "تضمین معرفتی را برحسب کارکرد درست قوای شناختی مطابق طرح، در محیط مناسب، تبیین می‌کند (پلانتینگا).",
+    "key_questions_fa": [
+     "آیا تضمین (warrant) همان کارکرد درست قواست؟",
+     "«طرح» قوای شناختی از کجا می‌آید: تکامل یا خالق؟"
+    ],
+    "src": [
+     "IEP Proper Functionalism"
+    ]
+   },
+   {
+    "id": "a_conservatism",
+    "fa": "محافظه‌کاری پدیداری و محافظه‌کاری باوری",
+    "en": "Phenomenal and Doxastic Conservatism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که «به نظر رسیدن» یا صرف داشتن باور، در غیاب ناقض، توجیه اولیه فراهم می‌کند.",
+    "key_questions_fa": [
+     "آیا هر نمود (seeming) توجیه در نگاه نخست ایجاد می‌کند؟",
+     "آیا صرف باور داشتن دلیلی برای حفظ باور است؟"
+    ],
+    "src": [
+     "IEP Phenomenal Conservatism",
+     "IEP Doxastic Conservatism"
+    ]
+   },
+   {
+    "id": "a_basing_relation",
+    "fa": "رابطهٔ ابتنا",
+    "en": "The Basing Relation",
+    "desc_fa": "می‌پرسد باور چگونه بر دلیل یا شاهد «مبتنی» می‌شود و این رابطه علّی است یا عقلانی.",
+    "key_questions_fa": [
+     "چه چیزی باور را مبتنی بر یک دلیل می‌کند؟",
+     "آیا رابطهٔ ابتنا علّی است یا اعتقادی یا هر دو؟"
+    ],
+    "src": [
+     "RCE ch.11",
+     "SEP basing-epistemic"
+    ]
+   },
+   {
+    "id": "a_defeaters",
+    "fa": "ناقض‌ها و استدلال شکست‌پذیر",
+    "en": "Defeaters and Defeasible Reasoning",
+    "desc_fa": "انواع ناقض‌ها (ردکننده و تضعیف‌کننده، ذهنی و عینی) و منطق استدلال شکست‌پذیر را بررسی می‌کند.",
+    "key_questions_fa": [
+     "ناقض ردکننده (rebutting) با ناقض تضعیف‌کننده (undercutting) چه فرقی دارد؟",
+     "آیا ناقضِ ناقض توجیه را بازمی‌گرداند؟",
+     "استدلال شکست‌پذیر را چگونه باید صورت‌بندی کرد؟"
+    ],
+    "src": [
+     "IEP Defeaters in Epistemology",
+     "SEP reasoning-defeasible",
+     "RCE ch.15"
+    ],
+    "book": [
+     "s53"
+    ]
+   },
+   {
+    "id": "a_entitlement_transmission",
+    "fa": "استحقاق معرفتی و انتقال توجیه",
+    "en": "Epistemic Entitlement and Transmission of Warrant",
+    "desc_fa": "توجیهِ بی‌نیاز از دلیلِ در دسترس (استحقاق) و شرایط انتقال یا شکست انتقالِ توجیه در استنتاج را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا ما بی‌آنکه دلیلی داشته باشیم حق داریم به برخی گزاره‌ها تکیه کنیم؟",
+     "چرا برخی استدلال‌های معتبر توجیه را منتقل نمی‌کنند (مانند استدلال مور)؟"
+    ],
+    "src": [
+     "IEP Epistemic Entitlement",
+     "SEP transmission-justification-warrant",
+     "IEP Transmission and Transmission Failure in Epistemology"
+    ]
+   },
+   {
+    "id": "a_regress_problem",
+    "fa": "مسئلهٔ تسلسل توجیه و دور معرفتی",
+    "en": "The Regress Problem, Epistemic Circularity and the Criterion",
+    "desc_fa": "مسئلهٔ تسلسل دلیل‌ها، دور معرفتی و «مسئلهٔ معیار» را که پیش‌زمینهٔ نظریه‌های ساختار توجیه‌اند بررسی می‌کند.",
+    "key_questions_fa": [
+     "زنجیرهٔ دلیل‌ها چگونه پایان می‌یابد؟",
+     "آیا اثبات اعتمادپذیری یک قوه با خود آن قوه دوری باطل است؟",
+     "ابتدا باید معیار شناخت را بدانیم یا مصادیق آن را؟"
+    ],
+    "src": [
+     "SEP infinite-regress",
+     "IEP Epistemic Circularity",
+     "IEP Problem of the Criterion",
+     "SEP epistemology §4"
+    ],
+    "book": [
+     "s40",
+     "s69"
+    ]
+   },
+   {
+    "id": "a_foundationalism",
+    "fa": "مبناگرایی",
+    "en": "Foundationalism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که باورهای پایه‌ای بی‌نیاز از استنتاج وجود دارند و دیگر باورها بر آن‌ها استوارند.",
+    "key_questions_fa": [
+     "باورهای پایه چه هستند و چه چیزی آن‌ها را موجه می‌کند؟",
+     "آیا مبانی باید خطاناپذیر باشند؟",
+     "توجیه چگونه از مبانی به باورهای غیرپایه منتقل می‌شود؟"
+    ],
+    "src": [
+     "RCE ch.22",
+     "SEP justep-foundational",
+     "IEP Foundationalism",
+     "Audi ch.7"
+    ],
+    "book": [
+     "s40",
+     "s46",
+     "s57"
+    ]
+   },
+   {
+    "id": "a_coherentism",
+    "fa": "انسجام‌گرایی",
+    "en": "Coherentism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که توجیه از انسجام باور با کل نظام باورها برمی‌خیزد.",
+    "key_questions_fa": [
+     "انسجام دقیقاً چیست؟",
+     "آیا انسجام صدق‌رسان است؟",
+     "انسجام‌گرایی با مسئلهٔ جدا افتادن از جهان (isolation) چه می‌کند؟"
+    ],
+    "src": [
+     "RCE ch.24",
+     "SEP justep-coherence",
+     "IEP Coherentism in Epistemology",
+     "Audi ch.7"
+    ],
+    "book": [
+     "s62",
+     "s63"
+    ]
+   },
+   {
+    "id": "a_infinitism",
+    "fa": "بی‌نهایت‌گرایی",
+    "en": "Infinitism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که توجیه از زنجیره‌ای نامتناهی و غیردوری از دلیل‌ها حاصل می‌شود.",
+    "key_questions_fa": [
+     "آیا ذهن محدود می‌تواند زنجیرهٔ نامتناهی دلیل داشته باشد؟",
+     "آیا بی‌نهایت‌گرایی به شک‌گرایی می‌انجامد؟"
+    ],
+    "src": [
+     "RCE ch.23",
+     "IEP Epistemology, Infinitism in"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_sources",
+  "fa": "منابع معرفت",
+  "en": "Sources of Knowledge",
+  "areas": [
+   {
+    "id": "a_perception",
+    "fa": "ادراک حسی",
+    "en": "Perception",
+    "desc_fa": "چگونگی توجیه باورهای ادراکی، نقش تجربهٔ حسی، رئالیسم مستقیم و غیرمستقیم و نفوذپذیری شناختی ادراک را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا ادراک ما را مستقیماً با جهان مرتبط می‌کند؟",
+     "تجربهٔ حسی چگونه باور ادراکی را موجه می‌کند؟",
+     "آیا نفوذ انتظارات و باورها در ادراک توجیه را تضعیف می‌کند؟"
+    ],
+    "src": [
+     "RCE ch.27",
+     "Audi ch.1",
+     "SEP perception-episprob",
+     "SEP perception-justification",
+     "IEP Epistemology of Perception",
+     "IEP Cognitive Penetrability of Perception and Epistemic Justification"
+    ],
+    "book": [
+     "s21",
+     "s43",
+     "s61"
+    ]
+   },
+   {
+    "id": "a_memory",
+    "fa": "حافظه",
+    "en": "Memory",
+    "desc_fa": "حافظه را به‌عنوان منبع (نگه‌دارنده یا تولیدکنندهٔ) معرفت، و توجیه باورهای حافظه‌ای با وجود فراموشی منبع اصلی، بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا حافظه فقط معرفت را حفظ می‌کند یا می‌تواند معرفت بسازد؟",
+     "باوری که منشأ اولیه‌اش فراموش شده چگونه موجه می‌ماند؟"
+    ],
+    "src": [
+     "RCE ch.30",
+     "Audi ch.2",
+     "SEP memory-episprob",
+     "IEP Memory, Epistemology of"
+    ],
+    "book": [
+     "s52"
+    ]
+   },
+   {
+    "id": "a_self_knowledge",
+    "fa": "خودشناسی و درون‌نگری",
+    "en": "Self-Knowledge and Introspection",
+    "desc_fa": "معرفت فرد به حالات ذهنی خود، اعتبار ویژه (مرجعیت اول‌شخص) و سازوکار درون‌نگری را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت ما به حالات ذهنی خود خطاناپذیر یا ممتاز است؟",
+     "درون‌نگری نوعی ادراک درونی است یا سازوکاری دیگر؟",
+     "آیا برون‌گرایی محتوایی با خودشناسی سازگار است؟"
+    ],
+    "src": [
+     "RCE ch.28",
+     "Audi ch.3",
+     "SEP self-knowledge",
+     "SEP introspection",
+     "SEP epistemology §5.2"
+    ],
+    "book": [
+     "s18",
+     "s19"
+    ]
+   },
+   {
+    "id": "a_a_priori",
+    "fa": "معرفت پیشینی و عقل",
+    "en": "A Priori Knowledge and Reason",
+    "desc_fa": "امکان و ماهیت معرفتِ مستقل از تجربه، شهود عقلی و تمایز پیشینی/پسینی و تحلیلی/ترکیبی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت پیشینی ممکن است و چگونه؟",
+     "آیا شهود عقلی منبع توجیه است؟",
+     "آیا پیشینی بودن با تجدیدنظرپذیری سازگار است؟"
+    ],
+    "src": [
+     "RCE ch.26",
+     "Audi ch.4",
+     "SEP apriori",
+     "IEP A Priori and A Posteriori",
+     "SEP rationalism-empiricism"
+    ],
+    "book": [
+     "s39",
+     "s44"
+    ]
+   },
+   {
+    "id": "a_testimony",
+    "fa": "گواهی (معرفت از راه گفتهٔ دیگران)",
+    "en": "Testimony",
+    "desc_fa": "توجیه باورهای مبتنی بر گفتهٔ دیگران را بررسی می‌کند: تحویل‌گرایی در برابر ضدتحویل‌گرایی، و انتقال یا تولید معرفت با گواهی.",
+    "key_questions_fa": [
+     "آیا برای پذیرش گواهی به دلیل مستقل نیاز داریم؟",
+     "آیا گواهی فقط معرفت را منتقل می‌کند یا می‌تواند آن را تولید کند؟",
+     "اعتماد به گوینده چه نقشی در توجیه دارد؟"
+    ],
+    "src": [
+     "RCE ch.29",
+     "Audi ch.5",
+     "SEP testimony-episprob",
+     "IEP Epistemology of Testimony"
+    ],
+    "book": [
+     "s47",
+     "s48"
+    ]
+   },
+   {
+    "id": "a_inference_reasoning",
+    "fa": "استنتاج و استدلال",
+    "en": "Inference and Reasoning",
+    "desc_fa": "چگونگی گسترش معرفت از راه استنتاج، شرایط استنتاج درست و نسبت قواعد منطقی با هنجارهای استدلال را بررسی می‌کند.",
+    "key_questions_fa": [
+     "استنتاج چه زمانی معرفت را گسترش می‌دهد؟",
+     "آیا قواعد منطق همان هنجارهای استدلال‌اند؟",
+     "شرط «گرفتن» (taking) در استنتاج چیست؟"
+    ],
+    "src": [
+     "Audi ch.6",
+     "SEP epistemology §5.4",
+     "SEP reasoning-defeasible"
+    ],
+    "book": [
+     "s40",
+     "s44"
+    ]
+   },
+   {
+    "id": "a_semantic_knowledge",
+    "fa": "معرفت زبانی و معنایی",
+    "en": "Semantic and Linguistic Knowledge",
+    "desc_fa": "معرفت ما به معنا و زبان، و نسبت آن با فهم سخن دیگران را بررسی می‌کند.",
+    "key_questions_fa": [
+     "دانستن معنای یک واژه چه نوع معرفتی است؟",
+     "آیا معرفت زبانی ضمنی، معرفت گزاره‌ای است؟"
+    ],
+    "src": [
+     "RCE ch.31",
+     "IEP Language, Knowledge of"
+    ],
+    "book": [
+     "s16",
+     "s22",
+     "s69"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_inference_science",
+  "fa": "استقرا، تأیید و معرفت علمی",
+  "en": "Induction, Confirmation and Scientific Knowledge",
+  "areas": [
+   {
+    "id": "a_induction",
+    "fa": "استقرا و مسئلهٔ استقرا",
+    "en": "Induction and the Problem of Induction",
+    "desc_fa": "توجیه استنتاج از موارد مشاهده‌شده به موارد مشاهده‌نشده، شک هیومی و معمای جدید گودمن را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا استقرا توجیه عقلانی دارد؟",
+     "آیا می‌توان استقرا را با خود استقرا موجه کرد؟",
+     "کدام محمول‌ها «فرافکنی‌پذیر»ند؟"
+    ],
+    "src": [
+     "RCE ch.25",
+     "RCE ch.41",
+     "SEP induction-problem",
+     "IEP Epistemology §4.d"
+    ],
+    "book": [
+     "s50"
+    ]
+   },
+   {
+    "id": "a_abduction_ibe",
+    "fa": "استنتاج بهترین تبیین",
+    "en": "Abduction / Inference to the Best Explanation",
+    "desc_fa": "اعتبار استنتاج از تبیین‌گری یک فرضیه به صدق آن و معیارهای «بهترین» تبیین را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا تبیین‌گری نشانهٔ صدق است؟",
+     "فضیلت‌های تبیینی (سادگی، گستره، انسجام) چه وزنی دارند؟",
+     "نسبت استنتاج بهترین تبیین با بیزگرایی چیست؟"
+    ],
+    "src": [
+     "SEP abduction",
+     "IEP Theories of Explanation"
+    ]
+   },
+   {
+    "id": "a_confirmation",
+    "fa": "تأیید",
+    "en": "Confirmation Theory",
+    "desc_fa": "چگونگی تأیید یا ابطال فرضیه‌ها با شواهد، پارادوکس‌های تأیید (کلاغ‌ها، گرو) و سنجه‌های کمّی تأیید را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چه وقت یک شاهد فرضیه‌ای را تأیید می‌کند؟",
+     "پارادوکس کلاغ‌ها چگونه حل می‌شود؟",
+     "کدام سنجهٔ کمّی تأیید درست است؟"
+    ],
+    "src": [
+     "SEP confirmation",
+     "IEP Confirmation and Induction"
+    ],
+    "book": [
+     "s50",
+     "s51"
+    ]
+   },
+   {
+    "id": "a_scientific_knowledge",
+    "fa": "معرفت علمی و ابعاد اجتماعی آن",
+    "en": "Scientific Knowledge",
+    "desc_fa": "ماهیت و توجیه معرفت علمی، نقش جامعهٔ علمی و ارزش‌ها و عینیت در علم را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چه چیزی معرفت علمی را از دیگر انواع معرفت متمایز می‌کند؟",
+     "ساختار اجتماعی علم چگونه بر عینیت اثر می‌گذارد؟",
+     "آیا ارزش‌های غیرمعرفتی جایی مشروع در علم دارند؟"
+    ],
+    "src": [
+     "RCE ch.32",
+     "Audi ch.9",
+     "SEP scientific-knowledge-social",
+     "IEP Objectivity",
+     "IEP Popper: Critical Rationalism"
+    ],
+    "book": [
+     "s51"
+    ]
+   },
+   {
+    "id": "a_underdetermination_realism",
+    "fa": "تعین ناقص نظریه و واقع‌گرایی علمی",
+    "en": "Underdetermination and Scientific Realism",
+    "desc_fa": "می‌پرسد آیا شواهد برای انتخاب میان نظریه‌های رقیب کافی‌اند و آیا باید به صدق تقریبی نظریه‌های موفق باور داشت.",
+    "key_questions_fa": [
+     "آیا نظریه‌ها همواره با شواهد تعین ناقص دارند؟",
+     "آیا موفقیت پیش‌بینی دلیل صدق نظریه است؟"
+    ],
+    "src": [
+     "SEP scientific-underdetermination",
+     "SEP scientific-realism",
+     "SEP epistemology §6.3"
+    ]
+   },
+   {
+    "id": "a_explanation",
+    "fa": "تبیین",
+    "en": "Explanation",
+    "desc_fa": "ماهیت تبیین (علمی و غیرعلمی) و نسبت آن با فهم و تأیید را بررسی می‌کند.",
+    "key_questions_fa": [
+     "تبیین چیست: قانون‌محور، علّی یا وحدت‌بخش؟",
+     "چرا تبیین به فهم می‌انجامد؟"
+    ],
+    "src": [
+     "SEP scientific-explanation",
+     "IEP Theories of Explanation"
+    ]
+   },
+   {
+    "id": "a_thought_experiments_models",
+    "fa": "آزمایش فکری، مدل و شبیه‌سازی",
+    "en": "Thought Experiments, Models and Simulations",
+    "desc_fa": "می‌پرسد چگونه آزمایش‌های فکری، مدل‌ها و شبیه‌سازی‌های رایانه‌ای بی‌مشاهدهٔ مستقیم معرفت تولید می‌کنند.",
+    "key_questions_fa": [
+     "آزمایش فکری از کجا معرفت تازه می‌دهد؟",
+     "آیا نتایج شبیه‌سازی هم‌پایهٔ نتایج آزمایش‌اند؟"
+    ],
+    "src": [
+     "SEP thought-experiment",
+     "SEP simulations-science"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_domains",
+  "fa": "معرفت در قلمروهای خاص",
+  "en": "Domain-Specific Epistemologies",
+  "areas": [
+   {
+    "id": "a_math_logic",
+    "fa": "معرفت ریاضی و منطقی",
+    "en": "Mathematical and Logical Knowledge",
+    "desc_fa": "چگونگی معرفت به حقایق ریاضی و منطقی، نقش برهان، شهود و تجسم در ریاضیات را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چگونه به اشیای انتزاعی ریاضی علم داریم (معضل بناسراف)؟",
+     "آیا معرفت منطقی پیشینی است؟",
+     "آیا تجسم و نمودار می‌توانند ریاضیات را موجه کنند؟"
+    ],
+    "src": [
+     "RCE ch.33",
+     "SEP visual thinking in mathematics",
+     "SEP geometry: epistemology of",
+     "IEP The Cognitive Foundations and Epistemology of Arithmetic and Geometry"
+    ]
+   },
+   {
+    "id": "a_modal_knowledge",
+    "fa": "معرفت موجهاتی",
+    "en": "Modal Knowledge",
+    "desc_fa": "معرفت ما به امکان و ضرورت و نقش تصورپذیری در آن را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا تصورپذیری راهنمای امکان است؟",
+     "معرفت به ضرورت از کجا می‌آید؟"
+    ],
+    "src": [
+     "SEP modality-epistemology"
+    ]
+   },
+   {
+    "id": "a_moral_epistemology",
+    "fa": "معرفت‌شناسی اخلاق",
+    "en": "Moral Epistemology",
+    "desc_fa": "امکان و منابع معرفت اخلاقی (شهود، موازنهٔ متأملانه، گواهی اخلاقی) و شک‌گرایی اخلاقی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت اخلاقی ممکن است؟",
+     "آیا شهودهای اخلاقی توجیه‌کننده‌اند؟",
+     "آیا می‌توان با گواهی معرفت اخلاقی کسب کرد؟"
+    ],
+    "src": [
+     "RCE ch.35",
+     "RCE ch.43",
+     "Audi ch.9",
+     "SEP moral-epistemology",
+     "IEP Moral Epistemology",
+     "SEP reflective-equilibrium"
+    ]
+   },
+   {
+    "id": "a_aesthetic_knowledge",
+    "fa": "معرفت زیبایی‌شناختی",
+    "en": "Aesthetic Knowledge",
+    "desc_fa": "امکان معرفت در داوری‌های زیبایی‌شناختی، نقش آشنایی مستقیم و گواهی زیبایی‌شناختی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا داوری زیبایی‌شناختی می‌تواند معرفت باشد؟",
+     "آیا می‌توان از راه گواهی دانست که اثری زیباست؟",
+     "آیا هنر منبع معرفت است؟"
+    ],
+    "src": [
+     "RCE ch.34",
+     "IEP Art and Epistemology",
+     "SEP-toc aesthetic testimony"
+    ]
+   },
+   {
+    "id": "a_religious_epistemology",
+    "fa": "معرفت‌شناسی دینی",
+    "en": "Religious Epistemology",
+    "desc_fa": "عقلانیت و توجیه باور دینی، قرینه‌گرایی در برابر معرفت‌شناسی اصلاح‌شده، و نقش تجربهٔ دینی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا باور دینی بدون شاهد استدلالی می‌تواند موجه باشد؟",
+     "آیا تجربهٔ دینی منبع توجیه است؟",
+     "تکثر ادیان چه تأثیری بر عقلانیت باور دینی دارد؟"
+    ],
+    "src": [
+     "RCE ch.36",
+     "Audi ch.9",
+     "SEP religion-epistemology",
+     "IEP Religious Epistemology",
+     "IEP Reformed Epistemology",
+     "SEP religious-experience"
+    ],
+    "book": [
+     "s71",
+     "s72",
+     "s73",
+     "s74",
+     "s80"
+    ]
+   },
+   {
+    "id": "a_legal_epistemology",
+    "fa": "معرفت‌شناسی حقوقی",
+    "en": "Legal Epistemology",
+    "desc_fa": "مفهوم شاهد در حقوق، معیارهای اثبات، شواهد صرفاً آماری و اعتبار گواهی در دادگاه را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چرا شواهد صرفاً آماری برای محکومیت کافی نیست؟",
+     "معیار «فراتر از شک معقول» چه نسبتی با معرفت دارد؟"
+    ],
+    "src": [
+     "SEP evidence-legal",
+     "Pritchard"
+    ]
+   },
+   {
+    "id": "a_other_minds",
+    "fa": "معرفت به اذهان دیگر",
+    "en": "Knowledge of Other Minds",
+    "desc_fa": "می‌پرسد چگونه از وجود و محتوای ذهن دیگران آگاه می‌شویم و شک دربارهٔ آن چگونه پاسخ می‌یابد.",
+    "key_questions_fa": [
+     "آیا استدلال تمثیلی برای اذهان دیگر کافی است؟",
+     "آیا می‌توان حالات ذهنی دیگران را مستقیماً ادراک کرد؟"
+    ],
+    "src": [
+     "RCE ch.40"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_skepticism",
+  "fa": "شک‌گرایی و پاسخ‌ها",
+  "en": "Skepticism and Responses",
+  "areas": [
+   {
+    "id": "a_pyrrhonian",
+    "fa": "شک‌گرایی باستان (پورونی و آکادمیک)",
+    "en": "Ancient (Pyrrhonian and Academic) Skepticism",
+    "desc_fa": "شک‌گرایی یونانی، روش تعلیق حکم، حالت‌های (tropes) آگریپا و شک‌گرایی آکادمیک را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا می‌توان بی‌باور زیست؟",
+     "آیا سه‌گانهٔ آگریپا (تسلسل، دور، فرض) گریزناپذیر است؟"
+    ],
+    "src": [
+     "RCE ch.37",
+     "SEP skepticism-ancient",
+     "IEP Ancient Greek Skepticism",
+     "IEP Cicero: Academic Skepticism"
+    ]
+   },
+   {
+    "id": "a_radical_skepticism",
+    "fa": "شک‌گرایی دکارتی و فراگیر",
+    "en": "Cartesian / Radical Skepticism",
+    "desc_fa": "استدلال‌های شکاکانهٔ فراگیر (رؤیا، شیطان فریبکار، مغز در خمره) و انواع شک‌گرایی (عام و گزینشی) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا می‌دانم که مغز در خمره نیستم؟",
+     "استدلال شکاکانه بر کدام مقدمه تکیه دارد: بستار، تعین ناقص یا امکان معرفتی؟"
+    ],
+    "src": [
+     "RCE ch.38",
+     "SEP skepticism",
+     "IEP Contemporary Skepticism",
+     "IEP Brain in a Vat Argument",
+     "SEP epistemology §6",
+     "Audi ch.10"
+    ],
+    "book": [
+     "s54",
+     "s56",
+     "s57",
+     "s59",
+     "s60",
+     "s61"
+    ]
+   },
+   {
+    "id": "a_epistemic_closure",
+    "fa": "اصل بستار معرفتی",
+    "en": "Epistemic Closure",
+    "desc_fa": "این اصل را بررسی می‌کند که معرفت تحت استلزام معلوم بسته است، و نقش آن در استدلال شکاکانه.",
+    "key_questions_fa": [
+     "آیا اگر بدانم p و بدانم p مستلزم q است، q را می‌دانم؟",
+     "آیا انکار بستار (درتسکی، نوزیک) پاسخی معقول به شک است؟"
+    ],
+    "src": [
+     "RCE ch.54",
+     "SEP closure-epistemic",
+     "IEP Epistemic Closure Principles",
+     "SEP epistemology §6.2"
+    ]
+   },
+   {
+    "id": "a_rule_following_skepticism",
+    "fa": "شک دربارهٔ پیروی از قاعده و خودشناسی",
+    "en": "Rule-Following and Self-Knowledge Skepticism",
+    "desc_fa": "شک ویتگنشتاین-کریپکی دربارهٔ معنا و پیروی از قاعده، و شک دربارهٔ معرفت به حالات ذهنی خود را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چه واقعیتی تعیین می‌کند که من از کدام قاعده پیروی می‌کنم؟",
+     "آیا ممکن است دربارهٔ محتوای افکار خود دچار خطا باشیم؟"
+    ],
+    "src": [
+     "RCE ch.42",
+     "RCE ch.39"
+    ]
+   },
+   {
+    "id": "a_moorean_hinge",
+    "fa": "پاسخ‌های عقل سلیم و لولا (مور و ویتگنشتاین)",
+    "en": "Moorean and Hinge Responses",
+    "desc_fa": "پاسخ مور («این یک دست است») و معرفت‌شناسی لولا (باورهای بنیادینِ ناپرسیدنی) در برابر شک‌گرایی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا استدلال مور شک را رد می‌کند یا مصادره به مطلوب است؟",
+     "آیا گزاره‌های لولا اصلاً متعلق معرفت‌اند؟"
+    ],
+    "src": [
+     "RCE ch.68",
+     "IEP Wittgenstein: Epistemology",
+     "SEP transmission-justification-warrant"
+    ]
+   },
+   {
+    "id": "a_externalist_transcendental_responses",
+    "fa": "پاسخ‌های برون‌گرایانه، معناشناختی و استعلایی",
+    "en": "Externalist, Semantic and Transcendental Responses",
+    "desc_fa": "پاسخ‌های مبتنی بر برون‌گرایی معرفتی، برون‌گرایی محتوایی (پاتنم) و استدلال‌های استعلایی/ضدواقع‌گرایانه به شک را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا برون‌گرایی معرفتی شک را پاسخ می‌دهد یا فقط آن را دور می‌زند؟",
+     "آیا مغز در خمره می‌تواند حتی بیندیشد «من مغز در خمره‌ام»؟",
+     "آیا استدلال استعلایی می‌تواند وجود جهان خارج را اثبات کند؟"
+    ],
+    "src": [
+     "RCE ch.44",
+     "RCE ch.45",
+     "RCE ch.46",
+     "SEP skepticism-content-externalism",
+     "IEP Transcendental Arguments"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_attributions",
+  "fa": "معرفت، زبان و بافت",
+  "en": "Knowledge Attributions and Context",
+  "areas": [
+   {
+    "id": "a_contextualism",
+    "fa": "بافت‌گرایی معرفتی",
+    "en": "Epistemic Contextualism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که شرایط صدق جملهٔ «S می‌داند که p» با بافتِ گوینده تغییر می‌کند.",
+    "key_questions_fa": [
+     "آیا «دانستن» واژه‌ای بافت‌حساس است؟",
+     "آیا بافت‌گرایی پاسخ خوبی به شک‌گرایی است؟"
+    ],
+    "src": [
+     "RCE ch.48",
+     "SEP contextualism-epistemology",
+     "IEP Contextualism in Epistemology"
+    ]
+   },
+   {
+    "id": "a_contrastivism",
+    "fa": "تقابل‌گرایی",
+    "en": "Contrastivism",
+    "desc_fa": "معرفت را رابطه‌ای سه‌جزئی میان فاعل، گزاره و بدیلِ متقابل می‌داند.",
+    "key_questions_fa": [
+     "آیا دانستن همیشه دانستنِ «p به‌جای q» است؟",
+     "تقابل‌گرایی چه پیامدی برای شک دارد؟"
+    ],
+    "src": [
+     "RCE ch.47"
+    ]
+   },
+   {
+    "id": "a_pragmatic_encroachment",
+    "fa": "تأثیر ملاحظات عملی (تجاوز عمل‌گرایانه)",
+    "en": "Pragmatic Encroachment and Subject-Sensitive Invariantism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که آنچه برای فاعل در خطر است (اهمیت عملی) در دانستن یا موجه بودن او اثر دارد.",
+    "key_questions_fa": [
+     "آیا با بالا رفتن اهمیت عملی، شاهد بیشتری برای دانستن لازم است؟",
+     "آیا معرفت باید به‌طور کامل «خالص» از ملاحظات عملی باشد؟"
+    ],
+    "src": [
+     "RCE ch.51"
+    ]
+   },
+   {
+    "id": "a_epistemic_relativism",
+    "fa": "نسبی‌گرایی معرفتی",
+    "en": "Epistemic Relativism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که توجیه یا معرفت نسبت به نظام‌های معرفتی، فرهنگ‌ها یا معیارهای ارزیابی است؛ شامل نسبی‌گرایی دربارهٔ اسناد معرفت.",
+    "key_questions_fa": [
+     "آیا معیارهای معرفتی بی‌طرف و همگانی وجود دارد؟",
+     "آیا نسبی‌گرایی معرفتی خودشکن است؟",
+     "آیا صدق جمله‌های معرفتی به بافت ارزیابی وابسته است؟"
+    ],
+    "src": [
+     "RCE ch.8",
+     "RCE ch.49",
+     "SEP relativism",
+     "IEP Epistemology and Relativism",
+     "IEP Relativism"
+    ],
+    "book": [
+     "s55",
+     "s56",
+     "s63",
+     "s67",
+     "s68"
+    ]
+   },
+   {
+    "id": "a_epistemic_modals",
+    "fa": "وجه‌نماهای معرفتی",
+    "en": "Epistemic Modals",
+    "desc_fa": "معنای عبارت‌هایی مانند «شاید»، «باید» و «ممکن است» در کاربرد معرفتی و نسبت آن‌ها با معرفت گوینده را بررسی می‌کند.",
+    "key_questions_fa": [
+     "«ممکن است p» به معرفت چه کسی ارجاع دارد؟",
+     "آیا وجه‌نماهای معرفتی نسبی به ارزیاب‌اند؟"
+    ],
+    "src": [
+     "RCE ch.50",
+     "IEP Epistemic Modality"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_formal",
+  "fa": "معرفت‌شناسی صوری",
+  "en": "Formal Epistemology",
+  "areas": [
+   {
+    "id": "a_epistemic_logic",
+    "fa": "منطق معرفتی و پویا",
+    "en": "Epistemic and Dynamic Epistemic Logic",
+    "desc_fa": "صورت‌بندی منطقی معرفت و باور (منطق‌های موجهاتی) و تغییر آن‌ها با کسب اطلاع (منطق معرفتی پویا) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "کدام اصول موجهاتی (مانند T، 4، 5) برای معرفت درست‌اند؟",
+     "مسئلهٔ «همه‌دانی منطقی» چگونه حل می‌شود؟",
+     "اعلان عمومی چگونه معرفت گروه را تغییر می‌دهد؟"
+    ],
+    "src": [
+     "RCE ch.52",
+     "SEP logic-epistemic",
+     "SEP dynamic-epistemic",
+     "IEP Dynamic Epistemic Logic"
+    ]
+   },
+   {
+    "id": "a_bayesian",
+    "fa": "معرفت‌شناسی بیزی و احتمال",
+    "en": "Bayesian Epistemology and Probability",
+    "desc_fa": "درجات باور (اعتبار) را با نظریهٔ احتمال الگوسازی می‌کند و قواعد شرطی‌سازی و تفسیرهای احتمال را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا درجات باور باید از اصول احتمال پیروی کنند؟",
+     "احتمال‌های پیشین را چگونه باید تعیین کرد؟",
+     "تفسیر درست احتمال (ذهنی، عینی، منطقی) کدام است؟"
+    ],
+    "src": [
+     "RCE ch.55",
+     "SEP epistemology-bayesian",
+     "SEP formal-epistemology",
+     "SEP probability, interpretations of"
+    ]
+   },
+   {
+    "id": "a_belief_credence",
+    "fa": "باور تمام‌عیار و درجهٔ باور",
+    "en": "Full Belief and Credence",
+    "desc_fa": "نسبت باور قطعی با درجهٔ باور (مانند تز لاکی) و بازنمایی‌های صوری باور را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا باور همان درجهٔ باور بالاتر از یک آستانه است؟",
+     "آیا یکی از این دو به دیگری تحویل‌پذیر است؟"
+    ],
+    "src": [
+     "SEP formal-belief"
+    ]
+   },
+   {
+    "id": "a_accuracy_dutch_book",
+    "fa": "استدلال‌های دقت و شرط‌بندی هلندی",
+    "en": "Accuracy-First and Dutch Book Arguments",
+    "desc_fa": "توجیه هنجارهای معرفتی (مانند احتمال‌گرایی) از راه سود معرفتی/دقت یا آسیب‌پذیری در شرط‌بندی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا هنجارهای معرفتی از هدف دقت به دست می‌آیند؟",
+     "آیا استدلال شرط‌بندی هلندی دلیلی معرفتی است یا عملی؟"
+    ],
+    "src": [
+     "SEP epistemic-utility",
+     "SEP dutch-book",
+     "IEP Consequentialism Epistemic"
+    ]
+   },
+   {
+    "id": "a_belief_revision",
+    "fa": "نظریه‌های تغییر باور",
+    "en": "Belief Revision Theory",
+    "desc_fa": "قواعد عقلانی افزودن، حذف و بازنگری باور در پرتو اطلاع تازه (مانند نظریهٔ AGM) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "هنگام تعارض اطلاع تازه با باورها کدام باور را باید کنار گذاشت؟",
+     "اصول حداقل تغییر چه توجیهی دارند؟"
+    ],
+    "src": [
+     "RCE ch.56",
+     "SEP logic-belief-revision"
+    ]
+   },
+   {
+    "id": "a_epistemic_paradoxes",
+    "fa": "پارادوکس‌های معرفتی",
+    "en": "Epistemic Paradoxes",
+    "desc_fa": "پارادوکس‌هایی مانند بخت‌آزمایی، دیباچه، امتحان غافلگیرانه و معرفت‌پذیری (فیچ) و پیامدهای آن‌ها را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا باور به اینکه هر بلیت می‌بازد موجه است؟",
+     "آیا پارادوکس فیچ نشان می‌دهد هر حقیقتی دانستنی نیست؟"
+    ],
+    "src": [
+     "RCE ch.57",
+     "SEP epistemic-paradoxes",
+     "SEP fitch-paradox"
+    ]
+   },
+   {
+    "id": "a_common_knowledge_self_location",
+    "fa": "معرفت مشترک و باورهای خودموقعیت‌یاب",
+    "en": "Common Knowledge and Self-Locating Belief",
+    "desc_fa": "معرفت مشترک در گروه‌ها و باورهای مربوط به جایگاه خود در زمان و مکان (مانند مسئلهٔ زیبای خفته) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "معرفت مشترک چیست و چگونه حاصل می‌شود؟",
+     "در مسئلهٔ زیبای خفته اعتبار باید یک‌دوم باشد یا یک‌سوم؟"
+    ],
+    "src": [
+     "SEP common-knowledge",
+     "SEP self-locating-beliefs"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_social",
+  "fa": "معرفت‌شناسی اجتماعی",
+  "en": "Social Epistemology",
+  "areas": [
+   {
+    "id": "a_disagreement",
+    "fa": "اختلاف نظر همتایان",
+    "en": "Peer Disagreement",
+    "desc_fa": "می‌پرسد وقتی همتای معرفتی‌ام با من مخالف است، باید باورم را تعدیل کنم یا حفظ کنم.",
+    "key_questions_fa": [
+     "آیا اختلاف با همتا ما را به تعلیق یا تعدیل باور ملزم می‌کند؟",
+     "آیا باید به دیدگاه خود وزن ویژه داد؟",
+     "اختلاف دینی و اخلاقی چه پیامدی دارد؟"
+    ],
+    "src": [
+     "RCE ch.7",
+     "SEP disagreement",
+     "IEP Disagreement, Religious"
+    ]
+   },
+   {
+    "id": "a_trust_expertise",
+    "fa": "اعتماد و کارشناسی",
+    "en": "Trust and Expertise",
+    "desc_fa": "اعتماد معرفتی، تشخیص کارشناس واقعی و وابستگی معرفتی به دیگران را بررسی می‌کند.",
+    "key_questions_fa": [
+     "نوآموز چگونه کارشناس قابل اعتماد را تشخیص دهد؟",
+     "اعتماد معرفتی چه زمانی معقول است؟",
+     "وابستگی به کارشناس با خودمختاری معرفتی چگونه جمع می‌شود؟"
+    ],
+    "src": [
+     "SEP trust",
+     "IEP The Ethics and Epistemology of Trust",
+     "SEP epistemology-social"
+    ],
+    "book": [
+     "s49"
+    ]
+   },
+   {
+    "id": "a_group_epistemology",
+    "fa": "معرفت و باور گروهی",
+    "en": "Group Knowledge and Collective Epistemology",
+    "desc_fa": "می‌پرسد آیا گروه‌ها و نهادها می‌توانند باور، توجیه یا معرفت داشته باشند و تجمیع داوری‌ها چگونه است.",
+    "key_questions_fa": [
+     "آیا گروه می‌تواند چیزی بداند که هیچ عضوش نمی‌داند؟",
+     "قضایای هیئت‌منصفه (کندورسه) چه می‌گویند؟"
+    ],
+    "src": [
+     "SEP epistemology-social",
+     "SEP-toc jury theorems",
+     "Pritchard"
+    ]
+   },
+   {
+    "id": "a_epistemic_injustice",
+    "fa": "بی‌عدالتی معرفتی",
+    "en": "Epistemic Injustice",
+    "desc_fa": "آسیب‌ها و ظلم‌هایی را که به فرد در مقام دانا وارد می‌شود (بی‌عدالتی گواهی و تفسیری) بررسی می‌کند.",
+    "key_questions_fa": [
+     "بی‌عدالتی گواهی (کسر اعتبار به‌سبب پیش‌داوری) چیست؟",
+     "بی‌عدالتی تفسیری از کجا ناشی می‌شود؟",
+     "چه فضیلت‌هایی آن را جبران می‌کند؟"
+    ],
+    "src": [
+     "SEP epistemic-injustice",
+     "SEP feminist-social-epistemology",
+     "SEP epistemology §1.6"
+    ]
+   },
+   {
+    "id": "a_feminist_standpoint",
+    "fa": "معرفت‌شناسی فمینیستی و نظریهٔ موضع",
+    "en": "Feminist Epistemology and Standpoint Theory",
+    "desc_fa": "نقش موقعیت اجتماعی، جنسیت و قدرت در معرفت و نظریهٔ موضع را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا موقعیت اجتماعی بر دسترسی معرفتی اثر دارد؟",
+     "آیا جایگاه‌های به‌حاشیه‌رانده امتیاز معرفتی دارند؟"
+    ],
+    "src": [
+     "RCE ch.78",
+     "SEP feminism-epistemology",
+     "IEP Feminist Epistemology",
+     "IEP Feminist Standpoint Theory"
+    ]
+   },
+   {
+    "id": "a_ignorance",
+    "fa": "معرفت‌شناسی جهل",
+    "en": "Epistemology of Ignorance",
+    "desc_fa": "ماهیت جهل و جهلِ برساختهٔ اجتماعی (نادانیِ نظام‌مند و خودخواسته) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "جهل نبودِ معرفت است یا نبودِ باور صادق؟",
+     "جهل چگونه به‌طور اجتماعی تولید و حفظ می‌شود؟"
+    ],
+    "src": [
+     "SEP feminism-epistemology",
+     "SEP feminist-social-epistemology"
+    ]
+   },
+   {
+    "id": "a_epistemic_autonomy_paternalism",
+    "fa": "خودمختاری و پدرسالاری معرفتی",
+    "en": "Epistemic Autonomy and Paternalism",
+    "desc_fa": "می‌پرسد آیا می‌توان مشروعاً دسترسی دیگران به اطلاعات را برای بهبود باورهایشان محدود کرد، و ارزش خودمختاری معرفتی چیست.",
+    "key_questions_fa": [
+     "آیا محدود کردن اطلاعات برای صلاح معرفتی دیگران موجه است؟",
+     "خودمختاری معرفتی چه ارزشی دارد؟"
+    ],
+    "src": [
+     "Goldman1991",
+     "SEP epistemology-social"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_virtue_value",
+  "fa": "فضیلت، ارزش و اخلاق باور",
+  "en": "Virtue, Epistemic Value and the Ethics of Belief",
+  "areas": [
+   {
+    "id": "a_virtue_epistemology",
+    "fa": "معرفت‌شناسی فضیلت",
+    "en": "Virtue Epistemology",
+    "desc_fa": "معرفت و توجیه را برحسب فضیلت‌های فکری (قابلیت‌محور و منش‌محور) تبیین می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت باور صادقی است که از توانایی فکری حاصل شده باشد؟",
+     "فضیلت قابلیت‌محور با فضیلت منش‌محور چه تفاوتی دارد؟"
+    ],
+    "src": [
+     "RCE ch.19",
+     "SEP epistemology-virtue",
+     "IEP Virtue Epistemology",
+     "Audi"
+    ]
+   },
+   {
+    "id": "a_intellectual_virtues_vices",
+    "fa": "فضیلت‌ها و رذیلت‌های فکری",
+    "en": "Intellectual Virtues and Vices",
+    "desc_fa": "فضیلت‌هایی مانند فروتنی فکری، گشوده‌ذهنی و کنجکاوی و رذیلت‌هایی مانند جزم‌اندیشی و بسته‌ذهنی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "فروتنی فکری چیست؟",
+     "آیا گشوده‌ذهنی همیشه فضیلت است؟",
+     "رذیلت فکری چگونه به باور نادرست می‌انجامد؟"
+    ],
+    "src": [
+     "SEP epistemology-virtue",
+     "IEP Virtue Epistemology"
+    ]
+   },
+   {
+    "id": "a_epistemic_value",
+    "fa": "ارزش معرفتی و مسئلهٔ ارزش",
+    "en": "Epistemic Value and the Value Problem",
+    "desc_fa": "می‌پرسد چرا معرفت از باور صادق صرف ارزشمندتر است و چه چیزهایی ارزش معرفتی بنیادین دارند.",
+    "key_questions_fa": [
+     "چرا معرفت بیش از باور صادق ارزش دارد (مسئلهٔ منون)؟",
+     "آیا صدق تنها ارزش معرفتی بنیادین است؟",
+     "آیا پیامدگرایی معرفتی درست است؟"
+    ],
+    "src": [
+     "RCE ch.21",
+     "SEP knowledge-value",
+     "IEP Epistemic Value",
+     "IEP Consequentialism Epistemic"
+    ]
+   },
+   {
+    "id": "a_understanding",
+    "fa": "فهم",
+    "en": "Understanding",
+    "desc_fa": "فهم (چرایی، موضوعی، عینی) را به‌عنوان دستاورد معرفتی متمایز از معرفت بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا فهم نوعی معرفت است؟",
+     "آیا فهم با بخت معرفتی سازگار است؟",
+     "آیا فهم از معرفت ارزشمندتر است؟"
+    ],
+    "src": [
+     "RCE ch.9",
+     "SEP understanding",
+     "IEP Understanding in Epistemology"
+    ]
+   },
+   {
+    "id": "a_wisdom",
+    "fa": "حکمت و فرزانگی",
+    "en": "Wisdom",
+    "desc_fa": "ماهیت حکمت (نظری و عملی) و نسبت آن با معرفت و فضیلت را بررسی می‌کند.",
+    "key_questions_fa": [
+     "حکمت چیست: معرفت گسترده، فروتنی معرفتی یا داوری درست عملی؟",
+     "حکمت چه نسبتی با فهم دارد؟"
+    ],
+    "src": [
+     "RCE ch.10",
+     "SEP wisdom"
+    ]
+   },
+   {
+    "id": "a_ethics_of_belief",
+    "fa": "اخلاق باور",
+    "en": "Ethics of Belief",
+    "desc_fa": "می‌پرسد آیا وظیفه‌ای (اخلاقی یا معرفتی) دربارهٔ چگونگی باور داریم و آیا باور زیانبار یا بی‌دلیل خطاست (کلیفورد و جیمز).",
+    "key_questions_fa": [
+     "آیا باور کردن بدون شاهد کافی همیشه خطاست؟",
+     "آیا ملاحظات اخلاقی می‌توانند بر آنچه باید باور کنیم اثر بگذارند (تجاوز اخلاقی)؟"
+    ],
+    "src": [
+     "SEP ethics-belief"
+    ],
+    "book": [
+     "s70",
+     "s80"
+    ]
+   },
+   {
+    "id": "a_doxastic_voluntarism",
+    "fa": "اراده‌گرایی باوری",
+    "en": "Doxastic Voluntarism",
+    "desc_fa": "می‌پرسد آیا باورها تحت کنترل ارادی‌اند و اگر نیستند، چگونه می‌توان دربارهٔ آن‌ها مسئولیت و وظیفه داشت.",
+    "key_questions_fa": [
+     "آیا می‌توانیم به اراده باور کنیم؟",
+     "آیا مسئولیت باوری مستلزم کنترل ارادی است؟"
+    ],
+    "src": [
+     "SEP doxastic-voluntarism",
+     "IEP Doxastic Voluntarism",
+     "SEP epistemology §3.1"
+    ]
+   },
+   {
+    "id": "a_inquiry",
+    "fa": "معرفت‌شناسی پژوهش (زتتیک)",
+    "en": "Epistemology of Inquiry (Zetetic Epistemology)",
+    "desc_fa": "هنجارهای حاکم بر پرسیدن، جست‌وجو و تحقیق، و نسبت آن‌ها با هنجارهای باور را بررسی می‌کند.",
+    "key_questions_fa": [
+     "چه هنجارهایی بر شروع و پایان تحقیق حاکم است؟",
+     "آیا هنجارهای تحقیق با هنجارهای باور تعارض دارند؟"
+    ],
+    "src": [
+     "Friedman2020"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_meta_method",
+  "fa": "فرامعرفت‌شناسی، روش و سنت‌ها",
+  "en": "Metaepistemology, Method and Traditions",
+  "areas": [
+   {
+    "id": "a_metaepistemology",
+    "fa": "فرامعرفت‌شناسی",
+    "en": "Metaepistemology",
+    "desc_fa": "ماهیت و منزلت مفاهیم و احکام معرفتی (واقع‌گرایی و ضدواقع‌گرایی معرفتی، هنجاری بودن) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا واقعیت‌های معرفتی مستقل از ما وجود دارند؟",
+     "آیا مفاهیم معرفتی هنجاری‌اند؟"
+    ],
+    "src": [
+     "SEP metaepistemology",
+     "IEP Metaepistemology"
+    ],
+    "book": [
+     "s4",
+     "s5",
+     "s6",
+     "s8",
+     "s9"
+    ]
+   },
+   {
+    "id": "a_intuitions_method",
+    "fa": "شهودها و روش در معرفت‌شناسی",
+    "en": "Intuitions and Epistemological Method",
+    "desc_fa": "نقش شهودها، مثال‌های فرضی و موازنهٔ متأملانه در روش معرفت‌شناسی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا شهودهای فلسفی شاهدند؟",
+     "موازنهٔ متأملانه چگونه کار می‌کند؟"
+    ],
+    "src": [
+     "RCE ch.72",
+     "SEP intuition",
+     "SEP reflective-equilibrium"
+    ]
+   },
+   {
+    "id": "a_experimental_epistemology",
+    "fa": "معرفت‌شناسی تجربی و قوم‌معرفت‌شناسی",
+    "en": "Experimental Epistemology and Ethnoepistemology",
+    "desc_fa": "آزمودن تجربی شهودهای معرفتی و تنوع فرهنگی آن‌ها را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا شهودهای معرفتی میان فرهنگ‌ها متفاوت‌اند؟",
+     "یافته‌های تجربی چه پیامدی برای روش فلسفی دارند؟"
+    ],
+    "src": [
+     "RCE ch.73",
+     "IEP Ethnoepistemology"
+    ]
+   },
+   {
+    "id": "a_naturalized",
+    "fa": "معرفت‌شناسی طبیعی‌شده",
+    "en": "Naturalized Epistemology",
+    "desc_fa": "پیوند معرفت‌شناسی با علوم تجربی، به‌ویژه روان‌شناسی شناختی (پیشنهاد کواین) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت‌شناسی باید شاخه‌ای از روان‌شناسی باشد؟",
+     "آیا طبیعی‌سازی هنجاری بودن معرفت‌شناسی را از میان می‌برد؟"
+    ],
+    "src": [
+     "RCE ch.74",
+     "SEP epistemology-naturalized",
+     "IEP Naturalistic Epistemology"
+    ]
+   },
+   {
+    "id": "a_evolutionary",
+    "fa": "معرفت‌شناسی تکاملی",
+    "en": "Evolutionary Epistemology",
+    "desc_fa": "تبیین تکاملی قوای شناختی و رشد معرفت و پیامدهای معرفتی آن را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا تکامل قوای شناختی صدق‌نما را برمی‌گزیند؟",
+     "آیا رشد علم فرایندی شبه‌تکاملی است؟"
+    ],
+    "src": [
+     "RCE ch.75",
+     "SEP epistemology-evolutionary",
+     "IEP Evolutionary Epistemology"
+    ]
+   },
+   {
+    "id": "a_pragmatist",
+    "fa": "معرفت‌شناسی عمل‌گرایانه",
+    "en": "Pragmatist Epistemology",
+    "desc_fa": "رویکرد پیرس، جیمز و دیویی به تحقیق، باور و صدق و نسبت معرفت با عمل را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا معرفت را باید برحسب موفقیت در عمل فهمید؟",
+     "آیا خطاپذیری‌گرایی عمل‌گرایانه راه میانه‌ای میان جزم و شک است؟"
+    ],
+    "src": [
+     "RCE ch.76",
+     "IEP Pragmatism",
+     "IEP Peirce, Charles Sanders: Pragmatism"
+    ]
+   },
+   {
+    "id": "a_history_ancient_medieval",
+    "fa": "تاریخ معرفت‌شناسی: باستان و سده‌های میانه",
+    "en": "History: Ancient and Medieval",
+    "desc_fa": "دیدگاه‌های افلاطون (تئایتتوس)، ارسطو، و معرفت‌شناسی سده‌های میانه دربارهٔ معرفت، اپیستمه و تخنه را بررسی می‌کند.",
+    "key_questions_fa": [
+     "معرفت در تئایتتوس چگونه تعریف می‌شود؟",
+     "تمایز اپیستمه و تخنه چیست؟"
+    ],
+    "src": [
+     "RCE ch.58",
+     "RCE ch.59",
+     "SEP plato-theaetetus",
+     "IEP Aristotle: Epistemology",
+     "SEP episteme-techne"
+    ]
+   },
+   {
+    "id": "a_history_modern",
+    "fa": "تاریخ معرفت‌شناسی: دورهٔ مدرن",
+    "en": "History: Early Modern and Kant",
+    "desc_fa": "عقل‌گرایی و تجربه‌گرایی (دکارت، لاک، لایب‌نیتس، برکلی، هیوم، رید) و فلسفهٔ نقدی کانت را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا همهٔ معرفت از تجربه است؟",
+     "کانت چگونه احکام ترکیبی پیشینی را ممکن می‌داند؟"
+    ],
+    "src": [
+     "RCE ch.60–66",
+     "SEP rationalism-empiricism",
+     "SEP kant-transcendental-idealism"
+    ]
+   },
+   {
+    "id": "a_history_twentieth",
+    "fa": "تاریخ معرفت‌شناسی: سدهٔ بیستم",
+    "en": "History: Twentieth Century",
+    "desc_fa": "معرفت‌شناسی راسل، ویتگنشتاین، کارنپ، کواین، آستین و چیزم را بررسی می‌کند.",
+    "key_questions_fa": [
+     "پوزیتیویسم منطقی معرفت را چگونه می‌فهمید؟",
+     "کواین چه تغییری در معرفت‌شناسی ایجاد کرد؟"
+    ],
+    "src": [
+     "RCE ch.67–71",
+     "IEP Roderick M. Chisholm: Epistemology",
+     "IEP Wittgenstein: Epistemology"
+    ]
+   },
+   {
+    "id": "a_cross_cultural",
+    "fa": "سنت‌های غیرغربی معرفت‌شناسی",
+    "en": "Non-Western Epistemological Traditions",
+    "desc_fa": "معرفت‌شناسی هندی (پرامانه‌ها)، چینی، تبتی و آمریکای لاتین را بررسی می‌کند.",
+    "key_questions_fa": [
+     "منابع معتبر معرفت (پرامانه) در فلسفهٔ هندی کدام‌اند؟",
+     "این سنت‌ها چه چیزی به بحث معاصر می‌افزایند؟"
+    ],
+    "src": [
+     "SEP-toc Indian Philosophy (Classical): epistemology",
+     "SEP-toc Chinese Philosophy: epistemology",
+     "SEP epistemology-latin-america"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_applied",
+  "fa": "معرفت‌شناسی کاربردی، فناوری و اطلاعات",
+  "en": "Applied Epistemology, Technology and Information",
+  "areas": [
+   {
+    "id": "a_misinformation",
+    "fa": "اطلاعات نادرست، اخبار جعلی و نظریه‌های توطئه",
+    "en": "Misinformation, Fake News and Conspiracy Theories",
+    "desc_fa": "ماهیت اطلاعات نادرست و دروغ‌پراکنی، اتاق‌های پژواک، قطبی‌شدن باور و عقلانیت باور به نظریه‌های توطئه را بررسی می‌کند.",
+    "key_questions_fa": [
+     "خبر جعلی چیست و چرا گسترش می‌یابد؟",
+     "آیا باور به نظریه‌های توطئه همیشه نامعقول است؟",
+     "اتاق پژواک با حباب معرفتی چه تفاوتی دارد؟"
+    ],
+    "src": [
+     "FakeNews",
+     "W&O",
+     "IEP Conspiracy Theories"
+    ]
+   },
+   {
+    "id": "a_political_epistemology",
+    "fa": "معرفت‌شناسی سیاسی و دموکراسی",
+    "en": "Political Epistemology",
+    "desc_fa": "ارزش معرفتی دموکراسی، خرد جمعی، و نقش معرفت در مشروعیت سیاسی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا دموکراسی تصمیم‌های درست‌تری تولید می‌کند؟",
+     "جهل رأی‌دهندگان چه پیامدی دارد؟"
+    ],
+    "src": [
+     "Pritchard",
+     "SEP-toc jury theorems",
+     "SEP epistemology-social"
+    ]
+   },
+   {
+    "id": "a_education",
+    "fa": "معرفت‌شناسی آموزش",
+    "en": "Epistemology of Education",
+    "desc_fa": "هدف‌های معرفتی آموزش (معرفت، فهم، تفکر نقادانه، فضیلت فکری) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "هدف معرفتی آموزش چیست: انتقال معرفت یا پرورش فضیلت فکری؟",
+     "آموزش تفکر نقادانه چه نسبتی با اعتماد به مرجع دارد؟"
+    ],
+    "src": [
+     "Pritchard"
+    ]
+   },
+   {
+    "id": "a_technology_extended",
+    "fa": "فناوری و معرفت گسترش‌یافته",
+    "en": "Technology and Extended Knowledge",
+    "desc_fa": "معرفت مبتنی بر ابزارها و فناوری (موتورهای جست‌وجو، اینترنت، ذهن گسترش‌یافته) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا اطلاعات ذخیره‌شده در ابزار می‌تواند جزو معرفت ما باشد؟",
+     "تکیه بر جست‌وجوی اینترنتی چه تأثیری بر فضیلت فکری دارد؟"
+    ],
+    "src": [
+     "Pritchard"
+    ]
+   },
+   {
+    "id": "a_ai_machine",
+    "fa": "معرفت‌شناسی هوش مصنوعی و ماشین",
+    "en": "Epistemology of AI and Machines",
+    "desc_fa": "اعتمادپذیری خروجی‌های سامانه‌های هوشمند، کدری (جعبهٔ سیاه)، گواهی ماشینی و امکان باور و معرفت در ماشین را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا می‌توان به خروجی الگوریتم کدر تکیه کرد و آن را معرفت دانست؟",
+     "آیا گفتهٔ هوش مصنوعی نوعی گواهی است؟",
+     "آیا ماشین می‌تواند دانا یا فهمنده باشد؟"
+    ],
+    "src": [
+     "SEP ethics-ai",
+     "SEP simulations-science",
+     "Pritchard"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_islamic",
+  "fa": "سنت معرفت‌شناسی اسلامی",
+  "en": "Islamic Epistemological Tradition",
+  "areas": [
+   {
+    "id": "a_huduri_husuli",
+    "fa": "علم حضوری و علم حصولی",
+    "en": "Knowledge by Presence and Acquired (Representational) Knowledge",
+    "desc_fa": "تقسیم علم به حضوری (بی‌واسطهٔ صورت ذهنی) و حصولی (با واسطهٔ مفهوم)، خطاناپذیری علم حضوری و ارجاع علوم حصولی به حضوری را بررسی می‌کند.",
+    "key_questions_fa": [
+     "علم حضوری چیست و مصادیق آن کدام‌اند؟",
+     "آیا علم حضوری خطاناپذیر است؟",
+     "آیا همهٔ علوم حصولی به علم حضوری بازمی‌گردند؟"
+    ],
+    "src": [
+     "Mesbah",
+     "SEP-ArabicMind"
+    ],
+    "book": [
+     "s11",
+     "s12",
+     "s13",
+     "s14",
+     "s17",
+     "s18",
+     "s19",
+     "s46"
+    ]
+   },
+   {
+    "id": "a_tasawwur_tasdiq",
+    "fa": "تصور و تصدیق و ارزش معلومات",
+    "en": "Conception, Assent and the Value of Knowledge",
+    "desc_fa": "تقسیم علم حصولی به تصور و تصدیق، مسئلهٔ مطابقت (ارزش معلومات) و وجود ذهنی را بررسی می‌کند.",
+    "key_questions_fa": [
+     "تصور و تصدیق چه تفاوتی دارند؟",
+     "چگونه مطابقت صورت ذهنی با واقع احراز می‌شود؟",
+     "وجود ذهنی چیست و چه نقشی در معرفت دارد؟"
+    ],
+    "src": [
+     "Mesbah",
+     "SEP-ArabicMind"
+    ],
+    "book": [
+     "s27",
+     "s28",
+     "s30",
+     "s31"
+    ]
+   },
+   {
+    "id": "a_concept_types",
+    "fa": "مفاهیم ماهوی، فلسفی و منطقی (معقولات اولی و ثانیه)",
+    "en": "Types of Concepts: Primary and Secondary Intelligibles",
+    "desc_fa": "تقسیم مفاهیم کلی به ماهوی (معقول اول)، فلسفی و منطقی (معقولات ثانیه) و منشأ انتزاع آن‌ها را بررسی می‌کند.",
+    "key_questions_fa": [
+     "معقولات ثانیهٔ فلسفی چگونه از واقعیت انتزاع می‌شوند؟",
+     "آیا مفاهیمی چون علیت ساختهٔ ذهن‌اند؟",
+     "تفاوت معقول ثانی فلسفی و منطقی چیست؟"
+    ],
+    "src": [
+     "Mesbah"
+    ],
+    "book": [
+     "s33",
+     "s34",
+     "s35",
+     "s36"
+    ]
+   },
+   {
+    "id": "a_badihiyyat",
+    "fa": "بدیهیات و مبادی یقین",
+    "en": "Self-Evident Propositions (Badīhiyyāt) and Principles of Certainty",
+    "desc_fa": "تقسیم قضایا به بدیهی و نظری، بدیهیات اولیه و ثانویه (اولیات، وجدانیات، محسوسات، تجربیات، حدسیات، فطریات) و ملاک بداهت را بررسی می‌کند؛ صورت اسلامی مبناگرایی.",
+    "key_questions_fa": [
+     "ملاک بدیهی بودن یک قضیه چیست؟",
+     "آیا تجربیات و حدسیات یقین‌آورند؟",
+     "چگونه نظریات به بدیهیات بازمی‌گردند؟"
+    ],
+    "src": [
+     "Mesbah",
+     "SEP ibn-sina"
+    ],
+    "book": [
+     "s39",
+     "s40"
+    ]
+   },
+   {
+    "id": "a_tawatur",
+    "fa": "تواتر و خبر",
+    "en": "Mass-Transmitted Report (Tawātur) and Testimony",
+    "desc_fa": "یقین‌آوری خبر متواتر، شرایط تواتر و اعتبار خبر واحد را، در نسبت با بحث گواهی، بررسی می‌کند.",
+    "key_questions_fa": [
+     "چرا خبر متواتر یقین‌آور است؟",
+     "چه شمار و شرایطی تواتر را محقق می‌کند؟",
+     "خبر واحد در چه شرایطی حجت است؟"
+    ],
+    "src": [
+     "Mesbah",
+     "SEP ibn-sina"
+    ],
+    "book": [
+     "s48"
+    ]
+   },
+   {
+    "id": "a_wahy_ilham",
+    "fa": "وحی و الهام",
+    "en": "Revelation and Inspiration as Sources of Knowledge",
+    "desc_fa": "وحی و الهام را به‌عنوان منبع معرفت، ویژگی‌های معرفت وحیانی و راه‌های احراز آن بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا وحی منبع مستقل معرفت است؟",
+     "معرفت وحیانی چه نسبتی با عقل دارد؟",
+     "چگونه می‌توان الهام حقیقی را از خیال بازشناخت؟"
+    ],
+    "src": [
+     "Mesbah",
+     "SEP religion-epistemology"
+    ],
+    "book": [
+     "s25",
+     "s72"
+    ]
+   },
+   {
+    "id": "a_mystical_intuition",
+    "fa": "شهود عرفانی",
+    "en": "Mystical Intuition (Kashf / Shuhūd)",
+    "desc_fa": "اعتبار معرفتی شهود و کشف عرفانی، معیارهای سنجش آن و انتقال‌پذیری‌اش را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا شهود عرفانی برای دیگران حجت است؟",
+     "معیار سنجش کشف صحیح از ناصحیح چیست؟"
+    ],
+    "src": [
+     "Emadzadeh",
+     "SEP mysticism",
+     "SEP religious-experience"
+    ],
+    "book": [
+     "s23",
+     "s24",
+     "s42"
+    ]
+   },
+   {
+    "id": "a_religious_hermeneutics",
+    "fa": "فهم متون دینی: حجیت ظواهر و قرائت‌ها",
+    "en": "Interpretation of Religious Texts: Authority of Apparent Meaning and Plural Readings",
+    "desc_fa": "حجیت ظواهر متون، امکان قرائت‌های گوناگون از دین و نسبت معرفت دینی با دین (ثابت و متغیر) را بررسی می‌کند.",
+    "key_questions_fa": [
+     "آیا ظاهر متن دینی حجت است؟",
+     "آیا قرائت‌های متکثر از دین همه معتبرند؟",
+     "معرفت دینی چه نسبتی با خود دین دارد؟"
+    ],
+    "src": [
+     "Wikifeqh",
+     "Mesbah"
+    ],
+    "book": [
+     "s64",
+     "s65",
+     "s67",
+     "s68",
+     "s69",
+     "s70",
+     "s76",
+     "s77",
+     "s78",
+     "s85"
+    ]
+   },
+   {
+    "id": "a_pluralism",
+    "fa": "کثرت‌گرایی دینی و معرفتی",
+    "en": "Religious and Epistemic Pluralism",
+    "desc_fa": "این دیدگاه را بررسی می‌کند که چند نظام باور ناسازگار می‌توانند هم‌زمان حق یا موجه باشند، و نسبت آن با نسبی‌گرایی.",
+    "key_questions_fa": [
+     "آیا ادیان متعارض می‌توانند همگی حق باشند؟",
+     "آیا کثرت‌گرایی به نسبی‌گرایی معرفتی می‌انجامد؟"
+    ],
+    "src": [
+     "SEP religion-epistemology",
+     "IEP Disagreement, Religious",
+     "Wikifeqh"
+    ],
+    "book": [
+     "s81",
+     "s82",
+     "s83",
+     "s86",
+     "s87"
+    ]
+   }
+  ]
+ }
+];
+})(typeof window !== "undefined" ? window : globalThis);
+
 /* ===== بک‌تست کارخانه: متن‌ها، دستورهای سازنده (هوش مصنوعی فقط سازنده)، جزوه‌ها ===== */
 (function (W) {
   W.EPI_BT = {
@@ -15284,7 +17298,7 @@ window.EPI_PROBLEMS.push({
   };
 })(typeof window !== "undefined" ? window : globalThis);
 
-window.EPI_BT_LEDGER = {"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"findings":{"attributions":["اشتباه جزوه (استاد)","بدفهمی یا پیاده‌سازی نادرست سازنده","خطای رمزگذاری پرونده","برچسب حقیقت پرونده نادرست است","خلأ جزوه (ملاکی ندارد)","خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","نامعلوم — بررسی بیشتر"],"findings":[{"attribution":"خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","case":"bk_russell_chicken","expected":["st_istiqra"],"fix":{"round":7,"what":"p_case_chicken (پذیرفتهٔ مالک): قاعدهٔ r_istiqra_hidden (ملاکِ s51 در ایستگاهِ استقراء) + hidden_ctrl=false در رمزگذاریِ جوجه"},"flagged":[],"id":"f_bk_russell_chicken","kind":"missed","lastSeenRound":6,"note":"دورِ ۵، پس از قضیه‌ای شدنِ سقفِ استقراء: «فردا هم دانه می‌دهد» پیش‌بینیِ «موردِ بعدی» است (رمزگذارِ کور) و قضیهٔ T_next از شمار، سقفِ (n+1)/(n+2) می‌دهد — با صدها روز ≈ ۹۹٫۷؛ پس اطمینانِ ۹۹ ٪ جوجه از راهِ «شمار» بیش‌اطمینانی نیست. درسِ جزوه این‌جا شمار نیست، علت است: «تکرارِ داده‌های حسی به‌تنهایی … باید علت … کشف شود» و «مشروط به عدمِ دخالتِ عواملِ پنهان» (s51) — و خودِ «چرا» ی این پرونده همین را می‌گوید. ملاکِ s51 در کارخانه فقط روی «تجربه» (hidden_ctrl) نشسته، نه روی «استقراء». ⇒ پیشنهادِ p_case_chicken برای مالک.","opened":"2026-10-13","openedRound":5,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":7},"rules":["r_istiqra_incomplete","r_istiqra_universal","r_istiqra_finite","r_istiqra_next","r_istiqra_small_n"],"secs":["s40","s50","s51"],"status":"verified","tier":"booklet","title":"جوجه راسل","verified":"2026-10-14"},{"attribution":"برچسب حقیقت پرونده نادرست است","case":"cs_b_dewey1948","expected":["st_istiqra","st_resp"],"fix":{"round":1,"type":"label","what":"truth.fail: [st_istiqra, st_resp] → [st_istiqra, st_tajrobe, st_resp]. (جانبی، بدون اثر بر حکم: st_resp هرگز پرچم نمی‌خورد چون r_resp_inquiry «stakes=زیاد» می‌خواهد و k2 «متوسط» رمز شده؛ اگر مالک بهای خطا را برای تیتر صفحهٔ اول «زیاد» بداند، k2.stakes متوسط→زیاد هم st_resp را می‌یابد — این را جداگانه تصمیم بگیرید.)"},"flagged":["st_tajrobe"],"id":"f_cs_b_dewey1948","kind":"mislocated","lastSeenRound":1,"note":"موتور درست کار کرده: تنها سقفی که شکسته شده r_tajrobe_hidden (۷۰، شرط s51: «اعتبار قوانین تجربی همواره مشروط به عدم دخالت عوامل پنهان») است و سقف استقراء ناقص (۸۰، s50: «حتی با افزایش شواهد به مرز یقین نمی‌رسد») با conf=90 و تحمل ۱۰ شکسته نمی‌شود. خودِ truth.why به همین عامل پنهانِ کنترل‌نشده با استناد به s51 تکیه می‌کند و رمزگذاری hidden_ctrl:false دارد، ولی st_tajrobe را در fail نیاورده؛ این با قرارداد پیکره (تالیدومید، تاکوما، آریان ۵، لوبوتومی: استقراء + hidden_ctrl:false ⇒ st_tajrobe در fail) ناسازگار است.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":13,"freshOk":13,"ids":["r2_cbs_killian_memos","r2_brian_williams_rpg","r2_chamberlain_hitler_face","r2_nyt_goddard_1920","r2_abs_startup_loi","r2_abs_desk_stablecoin","r4_wald_survivorship","r4_kahneman_instructors","r4_columbia_foam","r4_bre_x_busang","r4_yom_kippur_concept","r4_willingham_fire"],"since":1},"rules":["r_istiqra_incomplete","r_istiqra_small_n","r_resp_inquiry"],"secs":["s40","s50","s51","s6","s71","s80","s86"],"status":"verified","tier":"real","title":"«دیویی ترومن را شکست داد» (۱۹۴۸)","verified":"2026-10-13"},{"attribution":"برچسب حقیقت پرونده نادرست است","case":"cs_b_literarydigest","expected":["st_istiqra"],"fix":{"round":1,"type":"label","what":"truth.fail: [st_istiqra] → [st_istiqra, st_tajrobe]. یادداشت: معیار «نماینده بودن نمونه» که علت واقعی شکست است در جزوه نیست (ext ایستگاه st_istiqra: «معیارهای شمار، تنوع و نماینده بودن نمونه… افزودهٔ سامانه‌اند»)؛ اگر مالک بخواهد سوگیری نمونه زیر st_istiqra بنشیند، آن خلأ جزوه است و ویژگی/قاعدهٔ تازه می‌خواهد."},"flagged":["st_tajrobe"],"id":"f_cs_b_literarydigest","kind":"mislocated","lastSeenRound":1,"note":"همان سازوکار دیویی: با conf=90 فقط سقف r_tajrobe_hidden (۷۰) شکسته می‌شود؛ سقف استقراء ناقص ۸۰ است و s50 فقط می‌گوید ناقص «به مرز یقین نمی‌رسد»، پس در عدد ۹۰ خطای استقرایی محض دیده نمی‌شود. truth.why خودش علت را «عامل پنهان … کنترل نشده بود (s51)» می‌داند و hidden_ctrl:false رمز کرده، اما st_tajrobe را در fail نگذاشته؛ برچسب ناقص است (هم‌زاد سالمش cs_b_gallup1936 هم hidden_ctrl را برای همین استقراء رمز می‌کند).","opened":"2026-10-13","openedRound":1,"retest":{"fresh":5,"freshOk":5,"ids":["r4_wald_survivorship","r4_kahneman_instructors","r4_columbia_foam","r4_willingham_fire","r4_abs_survivor_shops"],"since":1},"rules":["r_istiqra_incomplete","r_istiqra_small_n"],"secs":["s40","s50","s51"],"status":"verified","tier":"real","title":"نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست","verified":"2026-10-14"},{"attribution":"خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","case":"cs_hrt_observational","expected":["st_tajrobe"],"fix":{"round":5,"what":"پیشنهادِ p_found_vazraf (پذیرفتهٔ مالک): r_tajrobe_no_vazraf ۸۰ ⇒ ۵۰ با قضیهٔ T_null"},"flagged":[],"id":"f_cs_hrt_observational","kind":"missed","lastSeenRound":4,"note":"s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است. — به‌روز (دورِ ۴): پیشنهادِ p_found_vazraf همین را با قضیهٔ T_null (حداکثر ½) بی عددِ قراردادیِ ۴۵ حل می‌کند و جایگزینِ p_tajrobe_none است.","opened":"2026-10-13","openedRound":1,"proposal":"p_tajrobe_none","retest":{"fresh":6,"freshOk":6,"ids":["r4_wald_survivorship","r4_kahneman_instructors","r4_columbia_foam","r4_willingham_fire","r4_abs_survivor_shops","r4_abs_lab_claim_replic"],"since":5},"rules":["r_tajrobe_ceiling","r_tajrobe_no_vazraf","r_tajrobe_hidden"],"secs":["s50","s51"],"status":"verified","tier":"real","title":"باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_lavoisier_acids","expected":["st_istiqra"],"fix":{"round":1,"type":"encoding","what":"claim k1, key ind_n: (نامعلوم) → 4 (اسیدهای گوگردی، فسفری، نیتریک و کربنیک که لاووازیه تا ۱۷۷۷ اکسیژن‌دار بودنشان را نشان داده بود؛ هر عدد <۱۰ همین اثر را دارد). نتیجه: r_istiqra_small_n سقف ۷۰، conf 85 > 80 ⇒ پرچم over در st_istiqra."},"flagged":[],"id":"f_cs_lavoisier_acids","kind":"missed","lastSeenRound":1,"note":"داستان و actor صریحاً می‌گویند حکم «از شمار محدودی اسید» (گوگردی، فسفری، نیتریک و…) گرفته شد، ولی ind_n رمز نشده؛ پس فقط r_istiqra_incomplete (۸۰؛ s50: «ارزش معرفتی استقراء ناقص حتی با افزایش شواهد به مرز یقین نمی‌رسد») فعال می‌شود و conf=85 زیر ۸۰+۱۰ می‌ماند. ویژگی ind_n دقیقاً برای همین بخش از s50 (ارزش استقراء «از منظر حساب احتمالات» با شمار موارد) ساخته شده است.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":1},"rules":["r_istiqra_incomplete","r_istiqra_small_n"],"secs":["s40","s50","s51"],"status":"verified","tier":"real","title":"لاووازیه: «همه اسیدها اکسیژن دارند»","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_flt_numeric","expected":[],"fix":{"round":6,"what":"conf: 60 ِ ساختگی از k2 برداشته شد؛ stmt ِ r_istiqra_next و r_istiqra_small_n با لفظِ s50 اصلاح شد"},"flagged":["st_istiqra"],"id":"f_cs_pb_flt_numeric","kind":"health_alarm","lastSeenRound":5,"note":"حل شد با خواندنِ کاملِ s50/s51 و پانوشت‌ها (۲۰۲۶-۱۰-۱۴): تناقضی در جزوه نبود. s50 فقط می‌گوید استقراءِ ناقص «حتی با افزایشِ شواهد به مرزِ یقین نمی‌رسد» و «به‌تنهایی نمی‌تواند ضرورت و قطعیتِ کلی را اثبات کند»؛ عبارتِ «با شواهد بالا می‌رود» برداشتِ سازنده بود (یادداشتِ r_istiqra_small_n). s51 علتش را می‌گوید: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر». پانوشتِ s50 (استنفورد) هم صریح است: حسابِ احتمالات دربارهٔ «مشاهده‌های آینده» است نه حکمِ کلی. پس دربارهٔ حکمِ کلیِ فرما، شمارِ چهار میلیون به‌تنهایی اطمینانِ معنادار نمی‌دهد. «۶۰٪» را خودِ پرونده «تقریبِ سامانه، نه ادعای پژوهشگران» می‌نامد؛ رفتارِ مستند (ثابت‌شده اعلام نکردند) همان سالم است. ⇒ عدد برداشته شد؛ متنِ دو قاعده با لفظِ جزوه درست شد.","opened":"2026-10-13","openedRound":5,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":6},"rules":["r_istiqra_universal"],"secs":["s50","s51"],"status":"verified","tier":"problem","title":"تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_greek_indiana","expected":["st_aql","st_expert"],"fix":{"round":1,"type":"encoding","what":"دو جزء لازم (هیچ‌کدام به‌تنهایی کافی نیست؛ در حافظه آزموده شد): (۱) رمزگذاری: claim k2, key conf: (نامعلوم) → 90 (تقریب سامانه از عمل تصویب، هم‌قرارداد روفینی/لژاندر)؛ (۲) برچسب: truth.fail [st_aql, st_expert] → [st_aql, st_expert, st_conflict]. فقط (۱): پرچم st_conflict ⇒ هنوز رد (مکان نادرست). یادداشت طراحی: موتور بیش‌اطمینانی را فقط به ایستگاه سقفِ تعیین‌کننده نسبت می‌دهد، پس st_aql و st_expert"},"flagged":[],"id":"f_cs_pb_greek_indiana","kind":"missed","lastSeenRound":1,"note":"هیچ‌یک از دو تصدیق conf ندارد و سقف‌ها فقط از راه «conf > سقف + تحمل» به پرچم بدل می‌شوند؛ پس با وجود سقف ۰ (r_conflict_cert)، ۲۵ (r_aql_matter_false، s40: «یقین … تنها زمانی حاصل می‌شود که هم مادهٔ استدلال صادق … باشد») و ۲۵ (r_expert_out_of_field، s49: «درجه تبحر، صلاحیت…») موتور کور است. پیکرهٔ مسائل ریاضی (روفینی، لژاندر، وایتهد) برای ادعای منتشر/عمل‌شده conf تقریبی ۹۰ می‌گذارد؛ مجلس با تصویب لایحه‌ای که روش را «حقیقت ریاضی» می‌خواند بر k2 عمل کرد (acted:true). با conf، سخت‌ترین سقف r_conflict_cert است و پرچم در st_conflict می‌نشیند — که خود truth.why («با برهان قطعی (لیندمان) ناسازگار بود","opened":"2026-10-13","openedRound":1,"retest":{"fresh":8,"freshOk":8,"ids":["r2_cbs_killian_memos","r2_chamberlain_hitler_face","r2_central_park_five","r2_nyt_goddard_1920","r2_abs_desk_stablecoin","r4_bre_x_busang","r4_yom_kippur_concept","r4_willingham_fire"],"since":1},"rules":["r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_expert_method_weak","r_expert_out_of_field","r_expert_comp_unknown","r_expert_bias"],"secs":["s40","s44","s49","s50"],"status":"verified","tier":"problem","title":"لایحه π ایندیانا (۱۸۹۷)","verified":"2026-10-13"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_long_h4","expected":[],"fix":{"round":1,"type":"encoding","what":"claim k1, key ind_complete: (نامعلوم) → true. نتیجه: r_istiqra_small_n (شرط not ind_complete) خاموش، سقف ۹۵ از r_tajrobe_ceiling، conf 90 ⇒ بی‌پرچم، سالم. (جایگزین هم‌ارز: حذف ind_n، چون راه «تجربه» است نه استقراء؛ ind_complete:true به لفظ s50 نزدیک‌تر است.)"},"flagged":["st_istiqra"],"id":"f_cs_pb_long_h4","kind":"health_alarm","lastSeenRound":1,"note":"هشدار سلامت مشروع نیست: r_istiqra_small_n (ind_n=2 < 10، vazraf نامعلوم) روی k1 سقف ۷۰ گذاشت و conf=90 ⇒ پرچم over در st_istiqra. اما حکم، به تصریح truth.why، «درباره همین دستگاه در همین آزمون‌ها بود (نه تعمیم به روش)»؛ مجموعه محدود و همه اعضایش بررسی شده، یعنی استقراء تام که طبق s50 «نتیجه آن قطعی و دارای اعتبار صددرصدی است» (مثال ایستگاه: «۲۴ قسط گذشته … استقراء تام»). رمزگذار ind_n را گذاشت ولی ind_complete:true را جا انداخت.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":1},"rules":["r_istiqra_small_n"],"secs":["s50"],"status":"verified","tier":"problem","title":"آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_poinc_1900","expected":["st_aql"],"fix":{"round":1,"type":"encoding","what":"claim k1, key conf: (نامعلوم) → 90 (تقریب سامانه از ادعای منتشرشده، هم‌قرارداد cs_pb_quintic_ruffini/cs_pb_par_legendre) و جملهٔ «conf رمزگذاری نشده» در truth.why اصلاح شود. نتیجه: 90 > 45+10 ⇒ پرچم over در st_aql (r_aql_matter_unproven)."},"flagged":[],"id":"f_cs_pb_poinc_1900","kind":"missed","lastSeenRound":1,"note":"r_aql_matter_unproven درست فعال شد (سقف ۴۵؛ s40: مقدمات «باید … از طریق سلسله‌مراتب به بدیهیات منتهی شوند»، s44: «اعتبار صوری برهان به‌تنهایی کافی نیست»)، ولی چون conf رمز نشده هیچ پرچمی ساخته نمی‌شود. truth.why می‌گوید «چون شدت اطمینانش مستند نیست، conf رمزگذاری نشده»، اما پوانکاره حکم را در «مکمل دوم» (۱۹۰۰) منتشر و «ادعا کرد» و truth.right بدیلش را «طرح به‌صورت پرسش یا حدس» می‌داند؛ پیکرهٔ هم‌خانواده (روفینی، لژاندر، وایتهد: «عدد اطمینان تقریب سامانه از رفتار انتشار است») در همین وضع conf≈۹۰ می‌گذارد.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":5,"freshOk":5,"ids":["r2_chamberlain_hitler_face","r2_central_park_five","r2_nyt_goddard_1920","r2_abs_desk_stablecoin","r4_yom_kippur_concept"],"since":1},"rules":["r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false"],"secs":["s40","s44","s50"],"status":"verified","tier":"problem","title":"ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)","verified":"2026-10-13"},{"attribution":"خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","case":"r2_nyt_goddard_1920","expected":["st_aql","st_grade","st_resp"],"fix":{"round":5,"what":"p_found_half + p_found_scope (پذیرفتهٔ مالک): هر سقفِ گذشته‌شده ایستگاهش پرچم می‌خورد؛ گسترهٔ «کلی نامحدود» ⇒ قضیهٔ T_universal"},"flagged":["st_conflict"],"id":"f_r2_nyt_goddard_1920","kind":"mislocated","lastSeenRound":4,"note":" — دورِ ۵: فقط کمینهٔ سقف‌ها مقصر شمرده می‌شد و حکمِ کلی از استقراء سقفِ قضیه‌ای نداشت (s51).","opened":"2026-10-13","openedRound":3,"retest":{"fresh":5,"freshOk":5,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_bre_x_busang","r4_yom_kippur_concept","r4_willingham_fire"],"since":5},"rules":["r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_grade_false_zero","r_resp_inquiry"],"secs":["s40","s44","s50","s6","s71","s80","s86"],"status":"verified","tier":"real","title":"سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"r4_redfield_arsenic","expected":[],"fix":null,"flagged":["st_expert"],"id":"f_r4_redfield_arsenic","kind":"health_alarm","lastSeenRound":9,"note":"رمزگذارِ کور «کارشناسِ ذی‌اعتبار با روشِ ضعیف» (x_method=ضعیف) را به مسیرِ خودِ کنشگر نسبت داده بود؛ ولی در داستان، کنشگر (ردفیلد) به رأی کارشناسی اتکا نکرد بلکه خودش روشِ مقاله را نقد و بازآزمایی کرد؛ «روشِ ضعیف» ویژگیِ مقالهٔ مورد نقد است نه راهِ معرفتِ کنشگر. راه ⇒ عقل (s49: اعتبارِ استناد به کارشناس فقط وقتی مطرح است که به او اتکا شود).","opened":"2026-10-14","openedRound":9,"resolved":"2026-10-14","resolvedNote":"بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد","retest":{"fresh":0,"freshOk":0,"ids":[],"since":9},"rules":["r_expert_method_weak"],"secs":["s49"],"status":"resolved","tier":"real","title":"میکروب «آرسنیک‌زی» GFAJ-1 و نقد و بازآزمایی ردفیلد (۲۰۱۰–۲۰۱۲)"}],"round":10,"updated":"2026-10-14"},"foundation":{"at":"2026-10-14","audit":[],"base":{"p_expert_bias":{"fa":"درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_hidden_factor":{"fa":"درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_hidden_inf":{"fa":"درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_mem":{"fa":"وثاقتِ حافظهٔ سنجیده‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_mubham_q":{"fa":"درستیِ معنای مبهم با قرینهٔ همسو","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_sense_unctrl":{"fa":"درستیِ حکمِ حسی در شرایطِ کنترل‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_thiqa":{"fa":"صدقِ گزارشِ یک ناقلِ ثقه","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_zahir":{"fa":"درستیِ معنای ظاهر بی‌قرینهٔ همسو","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0}},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"impacts":{"p_found_half":{"broken":[],"ceilings":0,"extra":[],"fixed":[],"fullAfter":109,"fullBefore":109,"refined":[],"rules":25},"p_found_scope":null,"p_found_vazraf":{"broken":[],"ceilings":0,"extra":[],"fixed":[],"fullAfter":109,"fullBefore":109,"refined":[],"rules":1}},"modes":{"both":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"deg":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"derived":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"num":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}}},"round":10,"rules":[{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد","id":"r_core_interp_notcert","k":"O","note":"لایهٔ تفسیرِ حصولی «اعتبارِ مطلق ندارد» (s42)","sec":["s42","s19"],"st":"st_core","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_sense_unctrl","baseFa":"درستیِ حکمِ حسی در شرایطِ کنترل‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ حکمِ حسی در شرایطِ کنترل‌نشده» = 50","consistent":true,"conventional":false,"fa":"حس بدون کنترل شرایط","id":"r_hiss_uncontrolled","k":"S","note":"","sec":["s43","s46"],"st":"st_hiss","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_hidden_inf","baseFa":"درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده» = 50","consistent":true,"conventional":false,"fa":"استنتاج پنهان عادتی بی‌آزمون","id":"r_hiss_hidden_inf","k":"S","note":"","sec":["s43","s46","s19"],"st":"st_hiss","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"صورت استدلال نامعتبر","id":"r_aql_invalid_form","k":"B","note":"صورتِ نامعتبر چیزی نمی‌افزاید؛ «لزوماً کاذب نیست» (s40)","sec":["s40","s44"],"st":"st_aql","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"قالب غیرقیاسی یقین‌آور نیست","id":"r_aql_nondeductive","k":"O","note":"قالبِ غیرقیاسی «یقین‌آور نیست» (s40) — برای حکمِ کلی بر دامنهٔ نامحدود ر.ک. T_universal","sec":["s40","s50"],"st":"st_aql","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"مقدمه اثبات‌نشده","id":"r_aql_matter_unproven","k":"B","note":"","sec":["s40","s44"],"st":"st_aql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"مقدمه کاذب","id":"r_aql_matter_false","k":"B","note":"مادهٔ کاذب این استدلال را بی‌اثر می‌کند، نه نتیجه را کاذب","sec":["s40"],"st":"st_aql","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"صدور خبر احراز نشده","id":"r_naql_not_issued","k":"B","note":"","sec":["s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"گزارشگر غیرموثق، بی‌قرینه همسو","id":"r_naql_unreliable","k":"B","note":"گزارشِ ناموثق پشتوانه نیست؛ نتیجه به حالِ بی‌دلیل برمی‌گردد","sec":["s47","s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"گزارشگر غیرموثق با قرینه همسو","id":"r_naql_unreliable_corrob","k":"B","note":"قرینهٔ همسو گزارشِ ناموثق را ثقه نمی‌کند؛ بی‌دلیلِ مستقل، تقارن","sec":["s47","s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"وثاقت گزارشگر نامعلوم","id":"r_naql_narrator_unknown","k":"B","note":"","sec":["s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"زنجیره طولی با حلقه مجهول","id":"r_naql_chain_broken","k":"B","note":"حلقهٔ نامعلوم ≤ ½ (T_unknown) و زنجیره ≤ ضعیف‌ترین حلقه — «اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌سازد» (s47)","sec":["s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":"p_thiqa","baseFa":"صدقِ گزارشِ یک ناقلِ ثقه","cap":50,"capDeg":"shakk","capText":"پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50","consistent":true,"conventional":false,"fa":"خبر واحد یقین‌آور نیست","id":"r_naql_ahad","k":"S","note":"خبرِ واحد < ۱؛ مقدارش وثاقتِ ناقل","sec":["s48","s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_thiqa","baseFa":"صدقِ گزارشِ یک ناقلِ ثقه","cap":50,"capDeg":"shakk","capText":"پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50","consistent":true,"conventional":false,"fa":"خبر واحد بی‌قرینه","id":"r_naql_no_qarina","k":"S","note":"","sec":["s47","s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":"<50","cap":49.9,"capDeg":"wahm","capText":"کمتر از ۵۰","consistent":true,"conventional":false,"fa":"قرینه خلاف","id":"r_naql_contra_qarina","k":"B","note":"کمتر از ½ (قرینه به سودِ نقیض)؛ کوچک‌ترین گامِ زیرِ ½","sec":["s47","s53"],"st":"st_naql","stricterThanTheorem":false,"th":"T_against","thFa":"قرینهٔ خلاف ⇒ کمتر از ½"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"دلالت غیرنص یقین‌آور نیست","id":"r_naql_nonnass","k":"O","note":"غیرنص «احتمالِ خلاف» دارد (s48)","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_zahir","baseFa":"درستیِ معنای ظاهر بی‌قرینهٔ همسو","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ معنای ظاهر بی‌قرینهٔ همسو» = 50","consistent":true,"conventional":false,"fa":"ظاهر بدون قرینه همسو","id":"r_naql_zahir_noq","k":"S","note":"","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"دلالت مبهم بدون قرینه همسو","id":"r_naql_mubham_noq","k":"B","note":"","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_ambig","thFa":"لفظِ چندمعنا بی‌قرینه ⇒ حداکثر ½"},{"base":"p_mubham_q","baseFa":"درستیِ معنای مبهم با قرینهٔ همسو","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ معنای مبهم با قرینهٔ همسو» = 50","consistent":true,"conventional":false,"fa":"دلالت مبهم با قرینه همسو","id":"r_naql_mubham_q","k":"S","note":"","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"روش کارشناس ضعیف یا نامعلوم","id":"r_expert_method_weak","k":"B","note":"","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"کارشناس بیرون از حوزه تخصص","id":"r_expert_out_of_field","k":"B","note":"تخصص در حوزهٔ دیگر برای این حکم پشتوانه نیست","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"صلاحیت کارشناس نامعلوم","id":"r_expert_comp_unknown","k":"B","note":"","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":"p_expert_bias","baseFa":"درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند» = 50","consistent":true,"conventional":false,"fa":"تعارض منافع یا ناپایبندی کارشناس","id":"r_expert_bias","k":"S","note":"اعتبار = اعتبارِ روش × پایبندیِ کارشناس (s49)","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"استقراء ناقص هرگز یقینی نیست","id":"r_istiqra_incomplete","k":"O","note":"گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — بی‌دانستنِ گستره (کلی یا موردِ بعدی) قضیه فقط «کمتر از یقین» می‌گوید (s50)","sec":["s50","s40","s51"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":"→0","cap":0.1,"capDeg":"wahm","capText":"→۰ (صفرِ حدی)","consistent":true,"conventional":false,"fa":"حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص","id":"r_istiqra_universal","k":"B","note":"صفرِ حدی (کوچک‌ترین مقدارِ مثبت) — «لزوماً کاذب نیست» (s40)؛ هر اطمینانِ مثبتی بیش از توجیه است","sec":["s51","s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_universal","thFa":"حکمِ کلی از استقراءِ ناقص بر دامنهٔ نامحدود ⇒ نزدیک به صفر"},{"base":null,"baseFa":"","bound":"100(n+1)/(M+1)","cap":50,"capDeg":"shakk","capText":"۱۰۰×(n+1)/(M+1)","consistent":true,"conventional":false,"fa":"حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص","id":"r_istiqra_finite","k":"B","note":"عدد از n و M ِ همان تصدیق","sec":["s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_finite","thFa":"حکمِ کلی بر مجموعهٔ معینِ M عضوی پس از n موافق ⇒ (n+1)/(M+1)"},{"base":null,"baseFa":"","bound":"100(n+1)/(n+2)","cap":67,"capDeg":"zann","capText":"۱۰۰×(n+1)/(n+2)","consistent":true,"conventional":false,"fa":"پیش‌بینیِ موردِ بعدی از استقراءِ ناقص","id":"r_istiqra_next","k":"B","note":"عدد از n ِ همان تصدیق","sec":["s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_next","thFa":"موردِ بعدی پس از n موردِ موافق ⇒ (n+1)/(n+2)"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"استقراء ناقص با موارد اندک","id":"r_istiqra_small_n","k":"O","note":"گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — «کمتر از یقین» (s50)","sec":["s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"تجربه به پای برهان و شهود نمی‌رسد","id":"r_tajrobe_ceiling","k":"O","note":"«به پای براهینِ محضِ عقلی یا شهود نمی‌رسد» (s51)","sec":["s51"],"st":"st_tajrobe","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"تجربه بدون وضع و رفع ≈ استقراء ناقص","id":"r_tajrobe_no_vazraf","k":"B","note":"جزوه تجربهٔ بی وضع‌ورفع را «تکرارِ داده‌های حسی» می‌داند که «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» (s51) ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر شک (½). سقفِ قبلی ۸۰ (ظن) ناسازگار بود؛ مالک ۲۰۲۶-۱۰-۱۳ پیشنهادِ p_found_vazraf را پذیرفت.","sec":["s51","s50"],"st":"st_tajrobe","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":"p_hidden_factor","baseFa":"درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50","consistent":true,"conventional":false,"fa":"عوامل پنهان کنترل نشده","id":"r_tajrobe_hidden","k":"S","note":"","sec":["s51"],"st":"st_tajrobe","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_hidden_factor","baseFa":"درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50","consistent":true,"conventional":false,"fa":"استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده","id":"r_istiqra_hidden","k":"S","note":"همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)","sec":["s51","s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":"mem_orig","cap":25,"capDeg":"wahm","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (≤۲۵)","id":"r_yad_orig_t1","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":50,"capDeg":"shakk","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۲۶–۵۰)","id":"r_yad_orig_t2","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":70,"capDeg":"zann","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۵۱–۷۰)","id":"r_yad_orig_t3","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":85,"capDeg":"zann","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۷۱–۸۵)","id":"r_yad_orig_t4","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":95,"capDeg":"zann","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری معرفت غیریقینی، یقینی نمی‌شود (۸۶–۹۹)","id":"r_yad_orig_t5","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه با سند یا واقعیت بیرونی سنجیده نشده","id":"r_yad_undoc","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ۷۱–۸۵","id":"r_yad_undoc_t4","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ۵۱–۷۰","id":"r_yad_undoc_t3","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ۲۶–۵۰","id":"r_yad_undoc_t2","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ≤۲۵","id":"r_yad_undoc_t1","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":0,"cap":0,"capDeg":"kidhb","capText":"0","consistent":true,"conventional":false,"fa":"ناسازگار با معرفت یقینی","id":"r_conflict_cert","k":"B","note":"","sec":["s53","s40"],"st":"st_conflict","stricterThanTheorem":false,"th":"T_conflict","thFa":"تعارض با یقینی ⇒ صفر"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"پیش‌زمینه بایسته فراهم نبود","id":"r_bg_missing","k":"B","note":"بی پیش‌زمینهٔ بایسته فهمِ مقصود احراز نشده","sec":["s70","s69"],"st":"st_background","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"منبع دینی ضعیف یا بی‌سند","id":"r_r_sanad_weak","k":"B","note":"","sec":["s73","s87","s47"],"st":"st_r_sources","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":"p_thiqa","baseFa":"صدقِ گزارشِ یک ناقلِ ثقه","cap":50,"capDeg":"shakk","capText":"پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50","consistent":true,"conventional":false,"fa":"خبر واحد موثق دینی یقین‌آور نیست","id":"r_r_sanad_ahad","k":"S","note":"","sec":["s73","s48","s74"],"st":"st_r_sources","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"}],"samples":0,"suff":{"z":1.96}},"ledger":{"rounds":[{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.957,"negAgree":0.348,"negOk":true,"posDetect":1,"posOk":true},"detected":104,"failures":108,"fullyLocated":85,"healthAlarms":1,"located":102,"n":169,"sound":61}},"corpus":{"files":0,"n":169,"new":0,"tiers":{"booklet":51,"problem":26,"real":92}},"coverage":{"byDomain":{"بازار و معامله":4,"تاریخ و سیاست":9,"حقوق و قضا":8,"دین":19,"رسانه و خبر":7,"ریاضی":28,"زندگی روزمره":13,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":9,"پزشکی":20},"domains":12,"rules":69,"rulesTested":49,"sections":72,"sectionsTested":54,"untested":["r_tasdiq_nonclaim","r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_chain_broken","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_herm_meaning_sig","r_r_sanad_ahad"]},"findings":{"fixed":0,"open":7,"resolved":0,"verified":0},"note":"دورِ پایه: فقط پیکرهٔ بذر (۱۶۹ مورد)","round":1},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.989,"negAgree":0.337,"negOk":true,"posDetect":1,"posOk":true},"detected":107,"failures":108,"fullyLocated":87,"healthAlarms":0,"located":107,"n":169,"sound":61}},"corpus":{"files":0,"n":169,"new":0,"tiers":{"booklet":51,"problem":26,"real":92}},"coverage":{"byDomain":{"بازار و معامله":4,"تاریخ و سیاست":9,"حقوق و قضا":8,"دین":19,"رسانه و خبر":7,"ریاضی":28,"زندگی روزمره":13,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":9,"پزشکی":20},"domains":12,"rules":69,"rulesTested":49,"sections":72,"sectionsTested":54,"untested":["r_tasdiq_nonclaim","r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_chain_broken","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_herm_meaning_sig","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":1,"resolved":0,"verified":0},"note":"دورِ ۱ ِ تشخیص: ۶ اصلاحِ سازنده (برچسب/رمزگذاری) + ۱ پیشنهادِ قاعده برای مالک","round":2},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.981,"negAgree":0.389,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":90,"healthAlarms":0,"located":115,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":16,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":69,"rulesTested":52,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":2,"resolved":0,"verified":0},"note":"دورِ ۳: ۱۶ موردِ تازه (۶ شکستِ واقعی، ۶ سالمِ واقعی، ۴ انتزاعی) با رمزگذاریِ کور","round":3},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.981,"negAgree":0.389,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":90,"healthAlarms":0,"located":115,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":69,"rulesTested":52,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":2,"resolved":0,"verified":0},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":21,"O":4,"S":14,"X":3},"modes":{"both":{"changed":9,"health_alarm":0,"mislocated":1,"missed":8,"ok":176},"deg":{"changed":10,"health_alarm":0,"mislocated":1,"missed":11,"ok":173},"derived":{"changed":1,"health_alarm":0,"mislocated":1,"missed":0,"ok":184},"num":{"changed":0,"health_alarm":0,"mislocated":1,"missed":1,"ok":183}}},"note":"دورِ ۴: مبنای درجه‌ها — هر سقف به قضیه/پایه/ترتیبی/ناسازگار؛ بی واقعهٔ تازه","round":4},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":101,"healthAlarms":1,"located":116,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":72,"rulesTested":53,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":5,"open":2,"resolved":0,"verified":3},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":25,"O":4,"S":14,"X":2},"modes":{"both":{"changed":3,"health_alarm":1,"mislocated":0,"missed":4,"ok":180},"deg":{"changed":3,"health_alarm":1,"mislocated":0,"missed":4,"ok":180},"derived":{"changed":0,"health_alarm":1,"mislocated":0,"missed":1,"ok":183},"num":{"changed":0,"health_alarm":1,"mislocated":0,"missed":1,"ok":183}}},"note":"دورِ ۵: اعمالِ p_found_half و p_found_vazraf (پذیرفتهٔ مالک) و ساختِ p_found_scope (گسترهٔ ادعا، سه سقفِ قضیه‌ای، رمزگذاریِ کور)","round":5},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":101,"healthAlarms":0,"located":116,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":72,"rulesTested":53,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":1,"resolved":0,"verified":3},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":25,"O":4,"S":14,"X":2},"modes":{"both":{"changed":3,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"deg":{"changed":3,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":1,"ok":184},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":1,"ok":184}}},"note":"دورِ ۶: تناقضِ ظاهریِ s50/s51 حل شد — «با شواهد بالا می‌رود» برداشتِ سازنده بود؛ «۶۰٪» ِ فرما عددِ ساختگی","round":6},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":117,"failures":117,"fullyLocated":103,"healthAlarms":0,"located":117,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":7,"open":0,"resolved":0,"verified":3},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":25,"O":4,"S":15,"X":2},"modes":{"both":{"changed":4,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"deg":{"changed":4,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185}}},"note":"دورِ ۷: اعمالِ p_case_chicken (پذیرفتهٔ مالک) — ملاکِ عاملِ پنهان (s51) در ایستگاهِ استقراء","round":7},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":117,"failures":117,"fullyLocated":106,"healthAlarms":0,"located":117,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":7,"open":0,"resolved":0,"verified":3},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"deg":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185}},"samples":0},"note":"دورِ ۸: هیچ عددِ قراردادی — سقف‌های پایه‌ای ⇒ (k+1)/(n+2) ِ نمونه‌های بی‌گزینش (بی‌داده ۵۰)، ترتیبی‌ها ⇒ «کمتر از یقین»، تحمل ⇒ ۰؛ مسیرِ سنجش، مسیرِ «فراتر از جزوه»، نگهبان‌ها","round":8,"routine":{"alarms":["این دور نه واقعهٔ تازه داشت نه نمونهٔ بی‌گزینشِ تازه"],"newEvents":0,"newSamples":0,"staleFindings":[]}},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":0.992,"negAgree":0.322,"negOk":true,"posDetect":1,"posOk":true},"detected":124,"failures":124,"fullyLocated":109,"healthAlarms":1,"located":124,"n":195,"sound":71}},"corpus":{"files":2,"n":195,"new":10,"tiers":{"abstract":6,"booklet":51,"problem":26,"real":112}},"coverage":{"byDomain":{"بازار و معامله":7,"تاریخ و سیاست":12,"حقوق و قضا":13,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":20,"فلسفه":21,"فناوری و مهندسی":16,"مالی و بانکی":11,"پزشکی":21},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":1,"open":1,"resolved":0,"verified":9},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194},"deg":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194},"derived":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194},"num":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194}},"samples":0},"note":"دورِ ۹: ۱۰ واقعهٔ تازه (۷ شکست، ۲ سالم، ۱ سالمِ انتزاعی…)؛ بدون قاب","round":9,"routine":{"alarms":[],"newEvents":10,"newSamples":0,"staleFindings":[]}},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.322,"negOk":true,"posDetect":1,"posOk":true},"detected":124,"failures":124,"fullyLocated":109,"healthAlarms":0,"located":124,"n":195,"sound":71}},"corpus":{"files":2,"n":195,"new":0,"tiers":{"abstract":6,"booklet":51,"problem":26,"real":112}},"coverage":{"byDomain":{"بازار و معامله":7,"تاریخ و سیاست":12,"حقوق و قضا":13,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":20,"فلسفه":21,"فناوری و مهندسی":16,"مالی و بانکی":11,"پزشکی":21},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":0,"open":0,"resolved":1,"verified":10},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"deg":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"samples":0},"note":"دورِ ۹ (پس از اصلاحِ رمزگذاریِ ردفیلد)","round":10,"routine":{"alarms":["این دور نه واقعهٔ تازه داشت نه نمونهٔ بی‌گزینشِ تازه"],"newEvents":0,"newSamples":0,"staleFindings":[]}}]},"proposals":{"proposals":[{"evidence":"آزموده در حافظه روی همهٔ ۱۶۹ موردِ بذر: فقط حکمِ HRT عوض می‌شود (شکستِ دیده‌نشده ⇒ در ایستگاهِ درست)؛ ۴ موردِ دیگر سقفِ پایین‌تر می‌گیرند بی تغییرِ پرچم یا حکم. جایگزین‌های ردشده: پایین‌آوردنِ سقفِ r_tajrobe_hidden به ۴۵ (۶ موردِ دیگر پرچمِ تازه می‌گیرند)؛ بالا بردنِ اطمینانِ HRT به ۸۵ (تنظیمِ مورد برای قبول‌شدن، بی منبع).","finding":"f_cs_hrt_observational","id":"p_tajrobe_none","supersededBy":"p_found_vazraf","title":"قاعدهٔ تازه «تجربهٔ بی وضع‌ورفع و بی کنترلِ عاملِ پنهان» در ایستگاهِ تجربه (سقف ۴۵)","why":"جزوه (s51) دو شرط برای قانونِ تجربی می‌گذارد — آزمودنِ شروط «از راهِ وضع و رفع» و «عدمِ دخالتِ عواملِ پنهان» — و می‌گوید «تکرارِ داده‌های حسی به‌تنهایی قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست». وقتی هیچ‌کدام احراز نشده (مثلِ باور به اثرِ محافظتیِ درمانِ هورمونی از مطالعاتِ مشاهده‌ای)، قاعده‌های کنونی فقط سقفِ ۷۰ می‌دهند و ادعای ۸۰٪ پرچم نمی‌خورد. پیشنهاد: when {way=تجربه, vazraf=false, hidden_ctrl=false} ⇒ سقفِ ۴۵ («شرطِ اعتبار احراز نشده ⇒ ۴۵»، همان اصلِ خودِ قاعده‌ها)."},{"applied":"2026-10-13","appliedWhat":"سقف‌های ۲۵/۴۵ ِ ۱۴ قاعده ⇒ ۵۰؛ هر سقفی که اطمینان از آن گذشته ایستگاهش پرچم می‌خورد (نه فقط کمینه)","evidence":"سنجیده در حافظه روی همهٔ 185 موردِ پیکره: 21 قاعده، سقفِ 66 تصدیق عوض می‌شود؛ شکستِ تازه‌دیده/درست‌شده 0؛ حکمِ درستِ خراب‌شده 0؛ کاملاً در جای درست 90 ⇒ 93 (پرتوهای N بلوندلو، سالی کلارک و «یک در ۷۳ میلیون»، میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴)؛ پرچمِ اضافه/کم بی تغییرِ حکم: «دست انسان، انسان است»: خلط کلی و کل.","id":"p_found_half","source":"foundation","title":"سقف‌های «بدیهی‌پایه» = کرانِ قضیه: «حداکثر شک (½)» به‌جای ۲۵ و ۴۵ ِ قراردادی","why":"قضیه‌های T_unknown/T_null/T_ambig/T_weakest (از امتناعِ تناقض، «کل از جزء بزرگ‌تر»، بازهٔ ۰..۱ و امتناعِ ترجیحِ بلامرجح) فقط می‌گویند «حداکثر ½»؛ ۲۵ و ۴۵ هیچ برهانی ندارند — ۴۵ یعنی «وهم» (ترجیح به سودِ نقیض) بی‌آن‌که دلیلی نقیض را ترجیح دهد، و جزوه می‌گوید چنین تصدیقی «لزوماً کاذب نیست» (s40). وقتی چند شرط هم‌زمان به ½ می‌رسند، هر کدام به‌تنهایی دلیلِ بیش‌اطمینانی است ⇒ ایستگاهِ همه پرچم می‌خورد (نه فقط اولی)."},{"applied":"2026-10-13","appliedWhat":"r_tajrobe_no_vazraf ۸۰ ⇒ ۵۰","evidence":"سنجیده در حافظه روی همهٔ 185 موردِ پیکره: 1 قاعده، سقفِ 8 تصدیق عوض می‌شود؛ شکستِ تازه‌دیده/درست‌شده 1 (باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای)؛ حکمِ درستِ خراب‌شده 0؛ کاملاً در جای درست 90 ⇒ 94 (پرتوهای N بلوندلو، سالی کلارک و «یک در ۷۳ میلیون»، میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴)؛ پرچمِ اضافه/کم بی تغییرِ حکم: مقاله ویکفیلد درباره واکسن MMR و اوتیسم، لوکوتومی پیشانی مونیز و گسترش لوبوتومی.","finding":"f_cs_hrt_observational","id":"p_found_vazraf","source":"foundation","supersedes":"p_tajrobe_none","title":"تجربهٔ بی وضع‌ورفع: «حداکثر شک (½)» به‌جای ۸۰ (ظن) — قضیهٔ T_null","why":"جزوه (s51): تکرارِ داده‌های حسیِ بی وضع‌ورفع «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر ½. این همان مشکلِ HRT را بی عددِ قراردادیِ ۴۵ (پیشنهادِ p_tajrobe_none) حل می‌کند و جای آن را می‌گیرد."},{"applied":"2026-10-13","appliedWhat":"ویژگیِ scope/dom_n، سه قاعدهٔ قضیه‌ای r_istiqra_universal/finite/next، رمزگذاریِ کورِ ۱۹ تصدیق؛ r_istiqra_incomplete/small_n فقط برای تصدیقِ بی‌گستره","evidence":"اعمال‌شده و سنجیده روی همهٔ ۱۸۵ مورد (دورِ ۵؛ همراهِ p_found_half): ۱۹ تصدیق با رمزگذاریِ کور گستره گرفت؛ «کاملاً در جای درست» ۹۰ ⇒ ۱۰۱؛ گادارد ۱۹۲۰ (یافتهٔ باز) و HRT درست شدند؛ دو پرونده با قضیه نخواندند: جوجهٔ راسل (شکستِ دیده‌نشده) و شواهدِ عددیِ فرما (هشدارِ کاذب) — هر دو پیشنهاد برای تصمیمِ تو.","id":"p_found_scope","source":"foundation","title":"ویژگیِ تازهٔ «گسترهٔ ادعا» (کلیِ نامحدود / موردِ بعدی / کلیِ محدود) تا سقف‌های استقراء قضیه شوند","why":"حسابِ احتمالات برای استقراءِ ناقص دو جوابِ متفاوت دارد: حکمِ کلی بر دامنهٔ نامحدود ⇒ نزدیک به صفر (s51: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر»)؛ پیش‌بینیِ موردِ بعدی پس از n موافق ⇒ (n+1)/(n+2). سقف‌های فعلیِ ۸۰ و ۷۰ با هیچ‌کدام نمی‌خوانند و کارخانه فرقِ این دو را نمی‌داند. لاوازیه («هر اسیدی اکسیژن دارد») و فرما («هر عددِ این شکل اول است») کلیِ نامحدودند ⇒ وهم؛ مرغِ راسل («فردا هم دانه می‌دهد») موردِ بعدی است و درسش عاملِ پنهان است (s51)، نه شمار. اثرش تا وقتی پرونده‌ها با این ویژگی رمزگذاری نشده‌اند سنجیدنی نیست."},{"applied":"2026-10-14","appliedWhat":"قاعدهٔ تازهٔ r_istiqra_hidden در ایستگاهِ استقراء (سقفِ ۷۰ ِ همان پایهٔ عاملِ پنهان) + «عاملِ پنهان کنترل نشده» در رمزگذاریِ جوجه","evidence":"سنجیده در حافظه روی همهٔ ۱۸۵ مورد (دورِ ۵): با (۱) و (۲) جوجه دیده می‌شود و کاملاً در جای درست (استقراء؛ ایستگاهِ تجربه هم پرچم می‌خورد)؛ نظرسنجیِ لیتراری‌دایجست کاملاً در جای درست می‌شود و دیویی یک ایستگاهِ درستِ دیگر می‌گیرد؛ هیچ حکمِ درستی خراب نمی‌شود. فقط (۱) بی (۲): جوجه دیده می‌شود ولی در ایستگاهِ نادرست (تجربه). عددِ تازه‌ای ساخته نمی‌شود — سقفِ ۷۰ ِ این قاعده از پایه‌های اندازه‌گیری‌نشده (S) است.","finding":"f_bk_russell_chicken","id":"p_case_chicken","source":"foundation","title":"جوجهٔ راسل: خطا در «علتِ ناشناخته» است، نه در شمار — ملاکِ عاملِ پنهان (s51) برای استقراء هم","why":"با سقفِ قضیه‌ای، شمارِ صدها روز اطمینانِ ۹۹ ٪ به «فردا» را توجیه می‌کند (T_next). جزوه جوجه را برای این آورده که «باید علت کشف شود» و قانون «مشروط به عدمِ دخالتِ عواملِ پنهان» است (s51). پیشنهاد: (۱) در رمزگذاریِ جوجه «عواملِ پنهانِ مؤثر کنترل نشده» (hidden_ctrl=false) ثبت شود — خودِ «چرا» ی پرونده همین را می‌گوید؛ (۲) قاعدهٔ «عاملِ پنهانِ کنترل‌نشده» (r_tajrobe_hidden، اکنون فقط در ایستگاهِ تجربه) برای پیش‌بینیِ استقرایی هم در ایستگاهِ استقراء پرچم بزند."},{"evidence":"اکنون: «هشدارِ کاذب» روی این پرونده. با تغییرِ برچسب: درست، در ایستگاهِ استقراء. هیچ پروندهٔ دیگری عوض نمی‌شود.","finding":"f_cs_pb_flt_numeric","id":"p_case_flt","source":"foundation","title":"شواهدِ عددیِ قضیهٔ فرما: اطمینانِ ۶۰ ٪ به حکمِ کلی «فقط بر پایهٔ شمار» موجه نبود — برچسبِ پرونده به «شکست در ایستگاهِ استقراء»","why":"قضیهٔ T_universal (s51): حکمِ کلی بر دامنهٔ نامحدود از شمارِ محدود — هر قدر هم بزرگ (چهار میلیون) — نزدیک به صفر است. پرونده آن را «سالم» برچسب زده چون حکم «کمتر از یقین» نگه داشته شد (s50). اگر مالک s51 را مقدم بداند، برچسب باید شکست (st_istiqra) شود؛ اگر نه، این میانِ دو بخشِ جزوه اختلاف است و زیرِ همان بخش در «جزوهٔ متقن» ثبت می‌شود.","withdrawn":"لازم نشد: با خواندنِ کاملِ جزوه تناقضی در کار نبود — «با شواهد بالا می‌رود» حرفِ جزوه نبود، برداشتِ سازنده بود، و «۶۰٪» هم عددِ ساختهٔ سامانه. هر دو اصلاح شد؛ پرونده همان «سالم» است چون رفتارِ مستند (ثابت‌شده اعلام نکردن) درست بود."}]},"results":{"at":"2026-10-14","cases":[{"d":"پزشکی","ex":["st_conflict","st_background","st_resp"],"fl":["st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_semmelweis_rejection","k":"ok","ok":false,"r":0,"t":"رد یافته زملوایس درباره تب نفاس از سوی جامعه پزشکی وین","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_semmelweis_method","k":"ok","ok":true,"r":0,"t":"استدلال زملوایس: حذف فرضیه‌ها و آزمون وضع و رفع","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_snow_cholera","k":"ok","ok":true,"r":0,"t":"جان اسنو و انتقال وبا از راه آب (پمپ برادستریت و «آزمایش بزرگ»)","tier":"real"},{"d":"پزشکی","ex":["st_conflict","st_background"],"fl":["st_tajrobe","st_conflict","st_background"],"full":true,"id":"cs_miasma_board","k":"ok","ok":false,"r":0,"t":"رد نظریه آب اسنو و ماندن بر نظریه میاسما","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_whitehead","k":"ok","ok":true,"r":0,"t":"کشیش هنری وایتهد: بررسی برای رد اسنو که به تأیید او رسید","tier":"real"},{"d":"پزشکی","ex":["st_istiqra","st_tajrobe","st_conflict","st_background","st_resp"],"fl":["st_istiqra","st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_thalidomide_grunenthal","k":"ok","ok":false,"r":0,"t":"اعلام بی‌خطری تالیدومید (کونترگان)","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_kelsey_fda","k":"ok","ok":true,"r":0,"t":"فرانسس کلسی و خودداری FDA از تأیید تالیدومید","tier":"real"},{"d":"پزشکی","ex":["st_expert","st_istiqra","st_tajrobe","st_background"],"fl":["st_expert","st_istiqra","st_tajrobe","st_background"],"full":true,"id":"cs_wakefield_mmr","k":"ok","ok":false,"r":0,"t":"مقاله ویکفیلد درباره واکسن MMR و اوتیسم","tier":"real"},{"d":"پزشکی","ex":["st_expert","st_background","st_resp"],"fl":["st_expert","st_background","st_resp"],"full":true,"id":"cs_theranos","k":"ok","ok":false,"r":0,"t":"تراناس: اعتماد سرمایه‌گذاران و والگرینز به دستگاه ادیسون","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_hpylori","k":"ok","ok":true,"r":0,"t":"مارشال و وارن: هلیکوباکتر پیلوری و زخم معده","tier":"real"},{"d":"پزشکی","ex":["st_tajrobe"],"fl":["st_tajrobe"],"full":true,"id":"cs_hrt_observational","k":"ok","ok":false,"r":0,"t":"باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_whi_trial","k":"ok","ok":true,"r":0,"t":"کارآزمایی تصادفی WHI درباره درمان هورمونی","tier":"real"},{"d":"پزشکی","ex":["st_istiqra","st_tajrobe","st_resp"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":true,"id":"cs_lobotomy","k":"ok","ok":false,"r":0,"t":"لوکوتومی پیشانی مونیز و گسترش لوبوتومی","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_eddington_1919","k":"ok","ok":true,"r":0,"t":"آزمون خمش نور در خورشیدگرفتگی ۱۹۱۹ (ادینگتون و دایسون)","tier":"real"},{"d":"علم","ex":["st_hiss","st_tajrobe"],"fl":["st_hiss","st_tajrobe"],"full":true,"id":"cs_nrays_blondlot","k":"ok","ok":false,"r":0,"t":"پرتوهای N بلوندلو","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_nrays_wood","k":"ok","ok":true,"r":0,"t":"آزمون رابرت وود و ابطال پرتوهای N","tier":"real"},{"d":"علم","ex":["st_tajrobe","st_conflict"],"fl":["st_tajrobe","st_conflict"],"full":true,"id":"cs_clever_hans_osten","k":"ok","ok":false,"r":0,"t":"هانس زیرک: باور به حساب کردن اسب","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_clever_hans_pfungst","k":"ok","ok":true,"r":0,"t":"آزمون‌های اسکار فونگست درباره هانس زیرک","tier":"real"},{"d":"علم","ex":["st_tajrobe","st_conflict","st_background","st_resp"],"fl":["st_tajrobe","st_conflict","st_background"],"full":false,"id":"cs_cold_fusion","k":"ok","ok":false,"r":0,"t":"همجوشی سرد فلایشمن و پانز","tier":"real"},{"d":"علم","ex":["st_naql","st_conflict","st_background","st_resp"],"fl":["st_naql","st_conflict","st_background"],"full":false,"id":"cs_piltdown","k":"ok","ok":false,"r":0,"t":"انسان پیلت‌داون","tier":"real"},{"d":"علم","ex":["st_truth","st_tajrobe","st_conflict","st_background"],"fl":["st_truth","st_tajrobe","st_conflict","st_background"],"full":true,"id":"cs_lysenko","k":"ok","ok":false,"r":0,"t":"لیسنکوئیسم در شوروی","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_lavoisier_combustion","k":"ok","ok":true,"r":0,"t":"لاووازیه: سوختن به‌مثابه ترکیب با اکسیژن","tier":"real"},{"d":"علم","ex":["st_istiqra"],"fl":["st_istiqra"],"full":true,"id":"cs_lavoisier_acids","k":"ok","ok":false,"r":0,"t":"لاووازیه: «همه اسیدها اکسیژن دارند»","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_leverrier_neptune","k":"ok","ok":true,"r":0,"t":"پیش‌بینی نپتون از روی اختلال مدار اورانوس","tier":"real"},{"d":"علم","ex":["st_naql","st_conflict"],"fl":["st_naql","st_conflict"],"full":true,"id":"cs_leverrier_vulcan","k":"ok","ok":false,"r":0,"t":"ولکان: سیاره‌ای که نبود","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_michelson_morley","k":"ok","ok":true,"r":0,"t":"آزمایش مایکلسون و مورلی","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_opera_neutrinos","k":"ok","ok":true,"r":0,"t":"نوترینوهای «سریع‌تر از نور» اپرا","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_galileo_jupiter","k":"ok","ok":true,"r":0,"t":"گالیله و قمرهای مشتری","tier":"real"},{"d":"علم","ex":["st_aql","st_conflict"],"fl":["st_aql","st_conflict"],"full":true,"id":"cs_wegener_rejection","k":"ok","ok":false,"r":0,"t":"رد رانش قاره‌ای وگنر به سبب نبود سازوکار","tier":"real"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_kempe_fourcolor","k":"ok","ok":false,"r":0,"t":"اثبات کمپه برای قضیه چهاررنگ (۱۸۷۹)","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_heawood_fivecolor","k":"ok","ok":true,"r":0,"t":"هیوود: یافتن رخنه کمپه و اثبات قضیه پنج‌رنگ","tier":"real"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_lame_flt","k":"ok","ok":false,"r":0,"t":"اثبات لامه برای قضیه آخر فرما (۱۸۴۷)","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_liouville_kummer","k":"ok","ok":true,"r":0,"t":"لیوویل و کومر: شناسایی فرض پنهان و اعداد ایدئال","tier":"real"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_wiles_1993","k":"ok","ok":false,"r":0,"t":"اعلام اثبات وایلز در ۱۹۹۳ و رخنه آن","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_wiles_1995","k":"ok","ok":true,"r":0,"t":"اثبات نهایی وایلز و تیلور (۱۹۹۵)","tier":"real"},{"d":"ریاضی","ex":["st_istiqra"],"fl":["st_istiqra"],"full":true,"id":"cs_fermat_numbers","k":"ok","ok":false,"r":0,"t":"فرما: «همه اعداد فرما اول‌اند»","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_euler_f5","k":"ok","ok":true,"r":0,"t":"اویلر و تجزیه عدد پنجم فرما","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_conflict","st_background","st_resp"],"fl":["st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_challenger","k":"ok","ok":false,"r":0,"t":"تصمیم پرتاب چلنجر در سرما","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_worlds","st_conflict","st_resp"],"fl":["st_worlds","st_conflict","st_resp"],"full":true,"id":"cs_mars_climate_orbiter","k":"ok","ok":false,"r":0,"t":"از دست رفتن مدارگرد اقلیم مریخ: پوند یا نیوتن","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_conflict","st_resp"],"fl":["st_istiqra","st_tajrobe","st_conflict","st_resp"],"full":true,"id":"cs_therac25","k":"ok","ok":false,"r":0,"t":"تراک‌۲۵: «دستگاه نمی‌تواند اوردوز بدهد»","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_tajrobe"],"fl":["st_istiqra","st_tajrobe"],"full":true,"id":"cs_tacoma_narrows","k":"ok","ok":false,"r":0,"t":"پل تاکوما ناروز","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_tajrobe","st_conflict","st_resp"],"fl":["st_tajrobe","st_conflict","st_resp"],"full":true,"id":"cs_hubble_mirror","k":"ok","ok":false,"r":0,"t":"عیب آینه اصلی تلسکوپ هابل","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_aql","st_conflict","st_background","st_resp"],"fl":["st_aql","st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_boeing_737max","k":"ok","ok":false,"r":0,"t":"سامانه MCAS بوئینگ ۷۳۷ مکس","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_tajrobe","st_resp"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":true,"id":"cs_ariane5_501","k":"ok","ok":false,"r":0,"t":"پرواز ۵۰۱ آریان ۵: نرم‌افزار آریان ۴ در موشکی دیگر","tier":"real"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_citicorp_center","k":"ok","ok":true,"r":0,"t":"لمسوریه و بحران پنهان برج سیتی‌کورپ","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_expert","st_resp"],"fl":["st_expert","st_resp"],"full":true,"id":"cs_hyatt_walkway","k":"ok","ok":false,"r":0,"t":"فروریختن پل‌های معلق هتل حیات ریجنسی کانزاس‌سیتی","tier":"real"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_feynman_oring","k":"ok","ok":true,"r":0,"t":"آزمون آب یخ فاینمن در کمیسیون چلنجر","tier":"real"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_hubble_diagnosis","k":"ok","ok":true,"r":0,"t":"تشخیص دقیق عیب هابل و طراحی اپتیک اصلاحی","tier":"real"},{"d":"زندگی روزمره","ex":["st_hiss"],"fl":["st_hiss"],"full":true,"id":"bk_stick_sight","k":"ok","ok":false,"r":0,"t":"چوب کج در آب: حکم باصره","tier":"booklet"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"bk_stick_touch","k":"ok","ok":true,"r":0,"t":"چوب در آب: داوری لمس در برابر باصره","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_phantom_limb","k":"ok","ok":false,"r":0,"t":"درد اندام خیالی (فانتوم)","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_appendicitis_referred","k":"ok","ok":false,"r":0,"t":"درد ارجاعی آپاندیسیت","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_pain_relief_healing","k":"ok","ok":false,"r":0,"t":"آرام شدن درد و پنداشت التیام","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_false_hunger","k":"ok","ok":false,"r":0,"t":"گرسنگی کاذب","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_itch_pain","k":"ok","ok":false,"r":0,"t":"اشتباه خارش با درد","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_core","st_hiss"],"fl":["st_core","st_hiss"],"full":true,"id":"bk_dusk_object","k":"ok","ok":false,"r":0,"t":"شیء نامتعین در تاریکی غروب","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_fear_label","k":"ok","ok":false,"r":0,"t":"ترس و وسواس: یافت حالت و داوری درباره خطر","tier":"booklet"},{"d":"دین","ex":["st_core","st_shohud"],"fl":["st_core","st_shohud"],"full":true,"id":"bk_hasan_basri","k":"ok","ok":false,"r":0,"t":"حسن بصری و ندای جنگ جمل","tier":"booklet"},{"d":"دین","ex":["st_core","st_shohud"],"fl":["st_core","st_shohud"],"full":true,"id":"bk_reflective_error","k":"ok","ok":false,"r":0,"t":"خطای انعکاسی در مکاشفه","tier":"booklet"},{"d":"دین","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_faqr_misapplied","k":"ok","ok":false,"r":0,"t":"یافت فقر وجودی و تطبیق آن بر مصداق باطل","tier":"booklet"},{"d":"دین","ex":["st_truth"],"fl":["st_truth"],"full":true,"id":"bk_munafiqun_testimony","k":"ok","ok":false,"r":0,"t":"شهادت منافقان: صدق معرفتی و صدق اخلاقی","tier":"booklet"},{"d":"فلسفه","ex":["st_partial"],"fl":["st_partial"],"full":true,"id":"bk_universal_by_count","k":"ok","ok":false,"r":0,"t":"جزئی پنداشتن «خورشید» و «شریک‌الباری»","tier":"booklet"},{"d":"فلسفه","ex":["st_partial"],"fl":["st_partial","st_aql"],"full":true,"id":"bk_part_whole_hand","k":"ok","ok":false,"r":0,"t":"«دست انسان، انسان است»: خلط کلی و کل","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_partial"],"fl":["st_partial"],"full":true,"id":"bk_winged_horse","k":"ok","ok":false,"r":0,"t":"اسب بالدار: ساخته تخیل یا ادراک واقع؟","tier":"booklet"},{"d":"فلسفه","ex":["st_ctype"],"fl":["st_ctype","st_aql"],"full":true,"id":"bk_hume_causality","k":"ok","ok":false,"r":0,"t":"هیوم: انکار ضرورت علّی چون حس نمی‌شود","tier":"booklet"},{"d":"فلسفه","ex":["st_ctype","st_doubts"],"fl":["st_ctype","st_doubts"],"full":true,"id":"bk_kant_causality","k":"ok","ok":false,"r":0,"t":"کانت: علیت به‌مثابه قالب پیشینی ذهن","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref"],"fl":["st_selfref"],"full":true,"id":"bk_absolute_skeptic","k":"ok","ok":false,"r":0,"t":"شکاک مطلق: «هیچ معرفت یقینی وجود ندارد»","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref"],"fl":["st_selfref"],"full":true,"id":"bk_protagoras","k":"ok","ok":false,"r":0,"t":"پروتاگوراس: «انسان مقیاس همه چیز است»","tier":"booklet"},{"d":"فلسفه","ex":["st_aql","st_selfref","st_doubts"],"fl":["st_aql","st_selfref","st_doubts"],"full":true,"id":"bk_doubt_exclusive_routes","k":"ok","ok":false,"r":0,"t":"شبهه انحصار راه‌های شناخت در حس و عقل","tier":"booklet"},{"d":"فلسفه","ex":["st_worlds","st_doubts"],"fl":["st_worlds","st_doubts"],"full":true,"id":"bk_doubt_world_link","k":"ok","ok":false,"r":0,"t":"شبهه پیوستگی عینی جهان","tier":"booklet"},{"d":"فلسفه","ex":["st_aql","st_doubts"],"fl":["st_aql","st_doubts"],"full":true,"id":"bk_doubt_colored_glasses","k":"ok","ok":false,"r":0,"t":"شبهه عینک رنگی (واسطه‌گری ابزار ادراک)","tier":"booklet"},{"d":"فلسفه","ex":["st_worlds","st_selfref","st_doubts"],"fl":["st_worlds","st_selfref","st_doubts"],"full":true,"id":"bk_holism_quine","k":"ok","ok":false,"r":0,"t":"کل‌گرایی معرفتی: «هیچ گزاره‌ای مصون از بازنگری نیست»","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref","st_herm"],"fl":["st_selfref","st_herm"],"full":true,"id":"bk_gadamer_relativism","k":"ok","ok":false,"r":0,"t":"هرمنوتیک فلسفی و نفی دسترسی به مراد مؤلف","tier":"booklet"},{"d":"تاریخ و سیاست","ex":["st_conflict","st_r_struct"],"fl":["st_conflict","st_r_struct"],"full":true,"id":"bk_mko_eclecticism","k":"ok","ok":false,"r":0,"t":"التقاط سازمان مجاهدین خلق با مارکسیسم","tier":"booklet"},{"d":"فلسفه","ex":["st_istiqra"],"fl":["st_istiqra","st_tajrobe"],"full":true,"id":"bk_russell_chicken","k":"ok","ok":false,"r":0,"t":"جوجه راسل","tier":"booklet"},{"d":"علم","ex":["st_worlds","st_aql","st_selfref"],"fl":["st_worlds","st_aql","st_selfref"],"full":true,"id":"bk_boiling_relativity","k":"ok","ok":false,"r":0,"t":"نقطه جوش در اورست و نسبیت هستی‌شناختی","tier":"booklet"},{"d":"فلسفه","ex":["st_aql"],"fl":["st_aql","st_naql"],"full":true,"id":"bk_gettier_case1","k":"ok","ok":false,"r":0,"t":"مثال نخست گتیه: باور صادق موجه از راه مقدمه کاذب","tier":"booklet"},{"d":"دین","ex":["st_r_conflict"],"fl":["st_naql","st_r_conflict"],"full":true,"id":"bk_yadollah","k":"ok","ok":false,"r":0,"t":"«یدالله»: پذیرش ظاهر ناسازگار با برهان","tier":"booklet"},{"d":"دین","ex":["st_herm","st_r_conflict"],"fl":["st_naql","st_herm","st_r_conflict"],"full":true,"id":"bk_khalaqa_adam","k":"ok","ok":false,"r":0,"t":"تقطیع حدیث «خلق الله آدم علی صورته»","tier":"booklet"},{"d":"دین","ex":["st_worlds","st_herm","st_r_plural"],"fl":["st_worlds","st_herm","st_r_plural"],"full":true,"id":"bk_pluralism_quran_evidence","k":"ok","ok":false,"r":0,"t":"استناد به بقره ۶۲ و اسم «هادی» برای پلورالیسم","tier":"booklet"},{"d":"دین","ex":["st_naql","st_herm","st_r_sources","st_r_plural"],"fl":["st_naql","st_herm","st_r_sources","st_r_plural"],"full":true,"id":"bk_turuq_saying","k":"ok","ok":false,"r":0,"t":"«الطرق الی الله بعدد نفوس الخلائق»","tier":"booklet"},{"d":"دین","ex":["st_selfref","st_r_plural"],"fl":["st_selfref","st_r_plural"],"full":true,"id":"bk_hick_pluralism","k":"ok","ok":false,"r":0,"t":"جان هیک: گوهر و صدف و تمثیل فیل در تاریکی","tier":"booklet"},{"d":"دین","ex":["st_herm","st_r_readings"],"fl":["st_herm","st_r_readings"],"full":true,"id":"bk_fatwa_relativism","k":"ok","ok":false,"r":0,"t":"اختلاف فتواها به‌مثابه دلیل تعدد قرائت‌ها","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"bk_vision_to_external","k":"ok","ok":true,"r":0,"t":"گذر از احساس بینایی به وجود علتی بیرونی","tier":"booklet"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"bk_i_am_happy","k":"ok","ok":true,"r":0,"t":"«من شاد هستم»: وجدانی","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"bk_whole_greater","k":"ok","ok":true,"r":0,"t":"«کل از جزء خود بزرگ‌تر است»: اولی","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"bk_tawatur_ghadir","k":"ok","ok":true,"r":0,"t":"خبر متواتر: حدیث غدیر","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"bk_taqlid_alam","k":"ok","ok":true,"r":0,"t":"رجوع به فقیه اعلم در حکم فرعی","tier":"booklet"},{"d":"مالی و بانکی","ex":["st_istiqra","st_aql"],"fl":["st_aql","st_istiqra","st_tajrobe"],"full":true,"id":"cs_b_ltcm","k":"ok","ok":false,"r":0,"t":"LTCM و تعمیم همبستگی‌های تاریخی","tier":"real"},{"d":"مالی و بانکی","ex":["st_expert","st_resp"],"fl":["st_expert","st_resp"],"full":true,"id":"cs_b_ratings2008","k":"ok","ok":false,"r":0,"t":"رتبه AAA اوراق رهنی و کارشناسِ ذی‌نفع","tier":"real"},{"d":"مالی و بانکی","ex":["st_naql","st_conflict","st_resp"],"fl":["st_naql","st_conflict","st_resp"],"full":true,"id":"cs_b_madoff_sec","k":"ok","ok":false,"r":0,"t":"بازرسی SEC از مدوف بدون تأیید مستقل معاملات","tier":"real"},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"id":"cs_b_markopolos","k":"ok","ok":true,"r":0,"t":"تحلیل مارکوپولوس: بازده مدوف با راهبرد اعلامی ناممکن است","tier":"real"},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"id":"cs_b_thorp_madoff","k":"ok","ok":true,"r":0,"t":"ادوارد تورپ و تطبیق معاملات مدوف با سوابق بازار (۱۹۹۱)","tier":"real"},{"d":"مالی و بانکی","ex":["st_expert"],"fl":["st_expert"],"full":true,"id":"cs_b_enron_andersen","k":"ok","ok":false,"r":0,"t":"حسابرسی آرتور اندرسن از انرون","tier":"real"},{"d":"مالی و بانکی","ex":["st_naql","st_conflict","st_background","st_resp"],"fl":["st_naql","st_conflict","st_background","st_resp"],"full":true,"id":"cs_b_barings","k":"ok","ok":false,"r":0,"t":"بانک بیرینگز و سودهای «آربیتراژ» نیک لیسون","tier":"real"},{"d":"مالی و بانکی","ex":["st_naql","st_expert","st_resp"],"fl":["st_naql","st_expert","st_resp"],"full":true,"id":"cs_b_wirecard_ey","k":"ok","ok":false,"r":0,"t":"وایرکارد: تأیید موجودی امانی بدون استعلام مستقیم از بانک","tier":"real"},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"id":"cs_b_ponzi_barron","k":"ok","ok":true,"r":0,"t":"کلارنس بارون و حساب کوپن‌های پستی پونزی (۱۹۲۰)","tier":"real"},{"d":"بازار و معامله","ex":["st_partial","st_aql"],"fl":["st_partial","st_aql"],"full":true,"id":"cs_b_blackmonday","k":"ok","ok":false,"r":0,"t":"دوشنبه سیاه ۱۹۸۷ و بیمه سبد","tier":"real"},{"d":"بازار و معامله","ex":["st_conflict","st_resp"],"fl":["st_conflict","st_resp"],"full":true,"id":"cs_b_knight","k":"ok","ok":false,"r":0,"t":"نایت کپیتال ۲۰۱۲: ۹۷ هشدار پیش از گشایش بازار","tier":"real"},{"d":"بازار و معامله","ex":[],"fl":[],"full":null,"id":"cs_b_burry","k":"ok","ok":true,"r":0,"t":"مایکل بری و خواندن پرونده وام‌های پشتوانه (۲۰۰۵)","tier":"real"},{"d":"بازار و معامله","ex":[],"fl":[],"full":null,"id":"cs_b_chanos","k":"ok","ok":true,"r":0,"t":"جیم چینوس و تحلیل صورت‌های مالی انرون","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_naql","st_expert","st_conflict","st_background"],"fl":["st_naql","st_expert","st_conflict","st_background","st_resp"],"full":true,"id":"cs_b_curveball","k":"ok","ok":false,"r":0,"t":"«کِرو بال» و ادعای آزمایشگاه‌های سیار سلاح زیستی عراق","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_hiss","st_background","st_resp"],"fl":["st_hiss","st_background","st_resp"],"full":true,"id":"cs_b_pearl_radar","k":"ok","ok":false,"r":0,"t":"پرل هاربر: تفسیر پژواک رادار اپانا","tier":"real"},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"id":"cs_b_cuba_u2","k":"ok","ok":true,"r":0,"t":"بحران موشکی کوبا: شناسایی سکوهای موشکی از عکس‌های U-2","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_expert","st_conflict","st_background"],"fl":["st_expert","st_conflict","st_background","st_resp"],"full":true,"id":"cs_b_bayofpigs","k":"ok","ok":false,"r":0,"t":"خلیج خوک‌ها: طرحی که طراحانش ارزیابی‌اش کردند","tier":"real"},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"id":"cs_b_midway_af","k":"ok","ok":true,"r":0,"t":"میدوی ۱۹۴۲: آزمون «AF کم‌آب است»","tier":"real"},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"id":"cs_b_zimmermann","k":"ok","ok":true,"r":0,"t":"تلگراف زیمرمان و احراز صدور (۱۹۱۷)","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_naql"],"fl":["st_naql"],"full":true,"id":"cs_b_tulip_mackay","k":"ok","ok":false,"r":0,"t":"روایت مکِی از «جنون لاله» و ورشکستگی همگانی","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_aql","st_conflict"],"fl":["st_aql","st_conflict"],"full":true,"id":"cs_b_columbus","k":"ok","ok":false,"r":0,"t":"برآورد فاصله کلمب تا آسیا: نتیجه خوش‌اقبال از استدلال معیوب","tier":"real"},{"d":"حقوق و قضا","ex":["st_expert","st_conflict","st_background"],"fl":["st_expert","st_conflict","st_background"],"full":true,"id":"cs_b_dreyfus","k":"ok","ok":false,"r":0,"t":"پرونده دریفوس: «بوردرو» و شهادت برتیون","tier":"real"},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"id":"cs_b_picquart","k":"ok","ok":true,"r":0,"t":"پیکار و شناسایی خط استرهازی (۱۸۹۶)","tier":"real"},{"d":"حقوق و قضا","ex":["st_core","st_partial","st_background"],"fl":["st_core","st_partial","st_shohud","st_background"],"full":true,"id":"cs_b_salem","k":"ok","ok":false,"r":0,"t":"دادگاه‌های سیلم و «شاهد شبحی»","tier":"real"},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"id":"cs_b_mather_spectral","k":"ok","ok":true,"r":0,"t":"اینکریس مدر: شاهد شبحی برای محکومیت کافی نیست","tier":"real"},{"d":"حقوق و قضا","ex":["st_aql","st_expert"],"fl":["st_aql","st_expert"],"full":true,"id":"cs_b_sallyclark","k":"ok","ok":false,"r":0,"t":"سالی کلارک و «یک در ۷۳ میلیون»","tier":"real"},{"d":"حقوق و قضا","ex":["st_yad"],"fl":["st_yad","st_conflict"],"full":true,"id":"cs_b_cotton","k":"ok","ok":false,"r":0,"t":"جنیفر تامپسون و رونالد کاتن: اطمینان کامل، حافظه آلوده","tier":"real"},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"id":"cs_b_pitchfork","k":"ok","ok":true,"r":0,"t":"پرونده نارباره: DNA در برابر اعتراف (۱۹۸۶)","tier":"real"},{"d":"حقوق و قضا","ex":["st_tajrobe"],"fl":["st_tajrobe"],"full":true,"id":"cs_b_heilbronn","k":"ok","ok":false,"r":0,"t":"«شبح هایلبرون»: زنی که در ۴۰ صحنه جرم بود","tier":"real"},{"d":"رسانه و خبر","ex":["st_istiqra","st_background"],"fl":["st_background"],"full":false,"id":"cs_b_wotw_panic","k":"ok","ok":false,"r":0,"t":"«وحشت سراسری» جنگ دنیاها: روایت روزنامه‌ها از یک برنامه رادیویی","tier":"real"},{"d":"رسانه و خبر","ex":["st_istiqra","st_tajrobe","st_resp"],"fl":["st_istiqra","st_tajrobe"],"full":false,"id":"cs_b_dewey1948","k":"ok","ok":false,"r":0,"t":"«دیویی ترومن را شکست داد» (۱۹۴۸)","tier":"real"},{"d":"رسانه و خبر","ex":["st_istiqra","st_tajrobe"],"fl":["st_istiqra","st_tajrobe"],"full":true,"id":"cs_b_literarydigest","k":"ok","ok":false,"r":0,"t":"نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست","tier":"real"},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"id":"cs_b_gallup1936","k":"ok","ok":true,"r":0,"t":"گالوپ ۱۹۳۶: نمونه کوچک ولی معرف","tier":"real"},{"d":"رسانه و خبر","ex":["st_naql","st_expert","st_background","st_resp"],"fl":["st_naql","st_expert","st_background","st_resp"],"full":true,"id":"cs_b_hitlerdiaries","k":"ok","ok":false,"r":0,"t":"یادداشت‌های جعلی هیتلر و مجله اشترن (۱۹۸۳)","tier":"real"},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"id":"cs_b_bellingcat_mh17","k":"ok","ok":true,"r":0,"t":"بلینگکت و ردیابی پرتابگر بوک در پرونده MH17","tier":"real"},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"id":"cs_b_mclean_enron","k":"ok","ok":true,"r":0,"t":"بتانی مکلین: «آیا انرون گران‌قیمت است؟» (۲۰۰۱)","tier":"real"},{"d":"زندگی روزمره","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_b_montecarlo","k":"ok","ok":false,"r":0,"t":"کازینوی مونت‌کارلو ۱۹۱۳: بیست‌وشش بار سیاه","tier":"real"},{"d":"زندگی روزمره","ex":["st_core","st_conflict"],"fl":["st_core","st_shohud","st_conflict"],"full":true,"id":"cs_b_keech","k":"ok","ok":false,"r":0,"t":"پیشگویی طوفان ۲۱ دسامبر ۱۹۵۴ و «وقتی پیشگویی شکست می‌خورد»","tier":"real"},{"d":"زندگی روزمره","ex":["st_istiqra","st_conflict"],"fl":["st_conflict"],"full":false,"id":"cs_b_harrytruman_sthelens","k":"ok","ok":false,"r":0,"t":"هری آر. ترومن و کوه سنت هلنز (۱۹۸۰)","tier":"real"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"cs_b_tillysmith","k":"ok","ok":true,"r":0,"t":"تیلی اسمیت و نشانه‌های سونامی در پوکت (۲۰۰۴)","tier":"real"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"cs_b_smong","k":"ok","ok":true,"r":0,"t":"«اسمونگ»: روایت شفاهی که مردم سیمئولوئه را نجات داد (۲۰۰۴)","tier":"real"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"cs_b_tylenol1982","k":"ok","ok":true,"r":0,"t":"قتل‌های تیلنول شیکاگو (۱۹۸۲): کارخانه یا قفسه فروشگاه؟","tier":"real"},{"d":"دین","ex":["st_herm","st_r_conflict"],"fl":["st_naql","st_herm","st_r_conflict"],"full":true,"id":"cs_b_hadith_sura_cut","k":"ok","ok":false,"r":0,"t":"«خلق‌الله آدم علی صورته» با تقطیع","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"cs_b_hadith_sura_full","k":"ok","ok":true,"r":0,"t":"«خلق‌الله آدم علی صورته» با قرینه پیوسته","tier":"booklet"},{"d":"دین","ex":["st_herm","st_r_readings"],"fl":["st_aql","st_herm","st_r_readings"],"full":true,"id":"cs_b_kab_relativism","k":"ok","ok":false,"r":0,"t":"از اختلاف در «کعب» تا نسبی‌گرایی قرائت‌ها","tier":"booklet"},{"d":"دین","ex":["st_selfref","st_r_plural"],"fl":["st_selfref","st_r_plural"],"full":true,"id":"cs_b_hick_elephant","k":"ok","ok":false,"r":0,"t":"جان هیک: گوهر و صدف و تمثیل فیل در تاریکی","tier":"booklet"},{"d":"دین","ex":["st_r_plural"],"fl":["st_aql","st_r_plural"],"full":true,"id":"cs_b_plural_talazum","k":"ok","ok":false,"r":0,"t":"مغالطه تلازم: انحصار حقانیت یعنی محرومیت همه و نفی همزیستی؟","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"cs_b_three_domains","k":"ok","ok":true,"r":0,"t":"تفکیک حقانیت، نجات و رفتار در نگرش اسلامی","tier":"booklet"},{"d":"دین","ex":["st_naql","st_aql"],"fl":["st_aql","st_naql"],"full":true,"id":"cs_b_millerites","k":"ok","ok":false,"r":0,"t":"میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴","tier":"real"},{"d":"فلسفه","ex":["st_selfref"],"fl":["st_selfref"],"full":true,"id":"cs_b_protagoras","k":"ok","ok":false,"r":0,"t":"پروتاگوراس: «انسان مقیاس همه چیز است»","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"cs_b_plato_peritrope","k":"ok","ok":true,"r":0,"t":"افلاطون در ته‌تتوس: سخن پروتاگوراس خودش را باطل می‌کند","tier":"booklet"},{"d":"فلسفه","ex":["st_worlds","st_selfref","st_doubts"],"fl":["st_worlds","st_selfref","st_doubts"],"full":true,"id":"cs_b_holism","k":"ok","ok":false,"r":0,"t":"کل‌گرایی معرفتی: هیچ گزاره‌ای حتی امتناع تناقض ثابت نیست","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref","st_herm"],"fl":["st_selfref","st_herm"],"full":true,"id":"cs_b_gadamer","k":"ok","ok":false,"r":0,"t":"هرمنوتیک فلسفی: مراد مؤلف دست‌نیافتنی است","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"cs_b_hirsch","k":"ok","ok":true,"r":0,"t":"هرش: تمایز «معنا» و «اهمیت» (۱۹۶۷)","tier":"real"},{"d":"فلسفه","ex":["st_aql","st_selfref","st_doubts"],"fl":["st_aql","st_selfref","st_doubts"],"full":true,"id":"cs_b_skeptic_twoways","k":"ok","ok":false,"r":0,"t":"شبهه انحصار راه‌ها: حس و عقل خطا می‌کنند، پس یقین ناممکن است","tier":"booklet"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_flt_lame","k":"ok","ok":false,"r":0,"t":"برهان لامه برای قضیه فرما (۱۸۴۷)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_flt_numeric","k":"ok","ok":true,"r":0,"t":"تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_flt_wiles93","k":"ok","ok":false,"r":0,"t":"اعلام برهان وایلز با شکاف (۱۹۹۳)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_flt_wiles95","k":"ok","ok":true,"r":0,"t":"برهان پذیرفته‌شده وایلز و تیلور–وایلز (۱۹۹۵)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_4c_kempe","k":"ok","ok":false,"r":0,"t":"برهان کمپه برای چهار رنگ (۱۸۷۹)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_4c_heawood","k":"ok","ok":true,"r":0,"t":"کشف خطای کمپه و قضیه پنج‌رنگ (هیوود، ۱۸۹۰)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_4c_ah","k":"ok","ok":true,"r":0,"t":"برهان رایانه‌ای اپل و هاکن (۱۹۷۶)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_4c_rsst","k":"ok","ok":true,"r":0,"t":"بازسازی مستقل (۱۹۹۶) و وارسی صوری Coq (۲۰۰۵)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_poinc_1900","k":"ok","ok":false,"r":0,"t":"ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_poinc_whitehead","k":"ok","ok":false,"r":0,"t":"برهان نادرست وایتهد (۱۹۳۴)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_poinc_perelman","k":"ok","ok":true,"r":0,"t":"برهان پرلمن و وارسی جمعی (۲۰۰۲–۲۰۰۶)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_quintic_ruffini","k":"ok","ok":false,"r":0,"t":"برهان روفینی برای حل‌ناپذیری (۱۷۹۹)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_quintic_abel","k":"ok","ok":true,"r":0,"t":"برهان آبل (۱۸۲۴–۱۸۲۶)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_quintic_poisson","k":"ok","ok":true,"r":0,"t":"گزارش پواسون درباره دست‌نوشته گالوا (۱۸۳۱)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_greek_wantzel","k":"ok","ok":true,"r":0,"t":"برهان ونتسل (۱۸۳۷)","tier":"problem"},{"d":"ریاضی","ex":["st_aql","st_expert","st_conflict"],"fl":["st_expert","st_conflict"],"full":false,"id":"cs_pb_greek_indiana","k":"ok","ok":false,"r":0,"t":"لایحه π ایندیانا (۱۸۹۷)","tier":"problem"},{"d":"ریاضی","ex":["st_aql","st_conflict"],"fl":["st_aql","st_conflict"],"full":true,"id":"cs_pb_greek_hobbes","k":"ok","ok":false,"r":0,"t":"ادعای تربیع دایره توسط هابز و نقد والیس (دهه ۱۶۵۰)","tier":"problem"},{"d":"ریاضی","ex":["st_aql","st_background"],"fl":["st_aql","st_background"],"full":true,"id":"cs_pb_par_saccheri","k":"ok","ok":false,"r":0,"t":"رد فرض حاده توسط ساکری (۱۷۳۳)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_par_legendre","k":"ok","ok":false,"r":0,"t":"اثبات‌های لژاندر برای اصل توازی (از ۱۷۹۴)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_par_beltrami","k":"ok","ok":true,"r":0,"t":"هندسه هذلولوی و اثبات سازگاری نسبی (۱۸۲۹–۱۸۶۸)","tier":"problem"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_pb_long_h4","k":"ok","ok":true,"r":0,"t":"آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)","tier":"problem"},{"d":"فناوری و مهندسی","ex":["st_istiqra"],"fl":["st_istiqra"],"full":true,"id":"cs_pb_long_generalize","k":"ok","ok":false,"r":0,"t":"تعمیم از یک ساعت موفق به روش عملی (۱۷۶۲–۱۷۶۵)","tier":"problem"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_pb_long_k1","k":"ok","ok":true,"r":0,"t":"تکرار مستقل K1 و سفر کوک (۱۷۶۹–۱۷۷۵)","tier":"problem"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_pb_semm_handwash","k":"ok","ok":true,"r":0,"t":"استنتاج علّی زملوایس و مداخله آهک کلردار (۱۸۴۷)","tier":"problem"},{"d":"پزشکی","ex":["st_tasdiq","st_conflict","st_background","st_resp"],"fl":["st_tasdiq","st_conflict","st_background","st_resp"],"full":true,"id":"cs_pb_semm_reject","k":"ok","ok":false,"r":0,"t":"رد یافته زملوایس توسط جامعه پزشکی (۱۸۴۹–۱۸۶۰)","tier":"problem"},{"d":"پزشکی","ex":["st_tasdiq","st_conflict"],"fl":["st_tasdiq","st_expert","st_conflict"],"full":true,"id":"cs_pb_semm_atmos","k":"ok","ok":false,"r":0,"t":"تبیین «تأثیرات جوّی» برای تفاوت دو بخش (۱۸۴۶)","tier":"problem"},{"d":"رسانه و خبر","ex":["st_naql","st_expert","st_resp"],"fl":["st_naql","st_conflict","st_background","st_resp"],"full":false,"fx":["اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش‌زمینه‌هایش (پرسش آغازین، حب و بغض، انتظار، باور پیشین) را آشکار و رده‌بندی می‌کرد و نابایسته‌ها را به اختیار کنار می‌گذاشت، ورودی را دوباره و بی‌آن‌ها می‌خواند."],"id":"r2_cbs_killian_memos","k":"ok","ok":false,"r":3,"right":"اگر تیم پیش از پخش زنجیره را حلقه‌به‌حلقه تا نسخه اصل دنبال می‌کرد، هویت و وثاقت هر واسطه را می‌خواست، و اصالت سند را جدا از درستی مضمونش به کارشناسان می‌سپرد، یا اسناد را کنار می‌گذاشت یا با اطمینانی متناسب و صریحاً تأییدنشده گزارش می‌کرد.","src":["Dick Thornburgh & Louis D. Boccardi, Report of the Independent Review Panel on the September 8, 2004 60 Minutes Wednesday Segment \"For the Record\" (January 2005)","Mary Mapes, Truth and Duty: The Press, the President, and the Privilege of Power (2005)"],"story":"در ۸ سپتامبر ۲۰۰۴ برنامه «۶۰ دقیقه چهارشنبه» سی‌بی‌اس با گزارش دن رادر چهار سند منسوب به سرهنگ جری کیلیان، فرمانده درگذشته جورج دبلیو بوش در گارد ملی هوایی تگزاس، را پخش کرد که از کوتاهی بوش در خدمت و فشار برای «خوش‌سازی» پرونده‌اش حکایت داشت. اسناد فقط به‌صورت رونوشت از بیل برکت، افسر پیشین گارد که با بوش خصومت آشکار داشت، به دست تهیه‌کننده مری میپس رسیده بود. برکت نخست گفت اسناد را از همرزمی به نام جورج کان گرفته و پس از پخش اعتراف کرد این سخن نادرست بوده و اسناد را زنی به نام «لوسی رامیرز» از راه واسطه‌ای ناشناس به او رسانده است؛ هویت این حلقه‌ها هرگز احراز نشد. دو کارشناس اسنادی که سی‌بی‌ا","t":"اسناد کیلیان و برنامه «۶۰ دقیقه» سی‌بی‌اس (۲۰۰۴)","tier":"real","why":"پذیرش خبر به دو مقدمه نیاز دارد: احراز صدور از گوینده اصلی و وثاقت ناقل (s47). اینجا صدور سند از کیلیان احراز نشده بود و سند از راه زنجیره‌ای طولی (کیلیان ← ؟ ← رامیرز ← واسطه ناشناس ← برکت ← سی‌بی‌اس) رسیده بود که دست‌کم یک حلقه‌اش مجهول و یک حلقه‌اش (برکت) با دروغ آشکار درباره منشأ، غیرموثق بود؛ به تصریح s47 اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌کند. نظر کارشناسی هم در موضوع اصلی (اصالت سند، نه فقط امضا روی رونوشت) گرفته نشد و تردید دو کارشناس سنجیده نشد (s49). هم‌خوانی محتوا با روایت‌ها","y":2004},{"d":"رسانه و خبر","ex":["st_yad","st_resp"],"fl":["st_yad","st_conflict","st_resp"],"full":true,"fx":["اگر کنشگر یادآوری را با سند (ایمیل، صورت‌حساب، صورت‌جلسه) یا واقعیت بیرونی تطبیق می‌داد، یا وثاقت حافظه را احراز می‌کرد یا تصدیق را از راه سند جایگزین می‌کرد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r2_brian_williams_rpg","k":"ok","ok":false,"r":3,"right":"اگر پیش از بازگویی روی آنتن، یادآوری خود را با گزارش ضبط‌شده ۲۰۰۳ و گواهی خدمه می‌سنجید، تفاوت «شینوکِ جلوی ما» با «هلی‌کوپترِ ما» را می‌دید و روایت را به همان سند برمی‌گرداند.","src":["Travis J. Tritten, \"NBC's Brian Williams recants Iraq story after soldiers protest\", Stars and Stripes (4 February 2015)","NBC News, statement on the internal review of Brian Williams (18 June 2015)"],"story":"برایان ویلیامز، مجری اخبار شبانگاهی ان‌بی‌سی، در مارس ۲۰۰۳ همراه یک یگان هوانیروز آمریکا در عراق بود؛ در آن روز یک هلی‌کوپتر شینوک دیگر با نارنجک‌انداز مورد اصابت قرار گرفت و ناچار فرود آمد و گزارش خود ویلیامز در همان زمان از اصابت به «شینوکِ جلوی ما» سخن می‌گفت. در سال‌های بعد روایت او در گفت‌وگوها تغییر کرد و در ۲۰۱۳ در برنامه‌ای تلویزیونی و در ۳۰ ژانویه ۲۰۱۵ در خبر شبانگاهی گفت هلی‌کوپتری که خودش در آن بود مورد اصابت قرار گرفته و فرود اضطراری کرده است. سربازانی که در آن پرواز بودند در شبکه‌های اجتماعی اعتراض کردند و استارز اند استرایپس در ۴ فوریه ۲۰۱۵ گزارش داد که هلی‌کوپتر ویلیامز مورد اصا","t":"برایان ویلیامز و «هلی‌کوپتری که مورد اصابت قرار گرفت» (۲۰۰۳–۲۰۱۵)","tier":"real","why":"اعتبار یادآوری تابع دو چیز است: اعتبار معرفت نخستین و وثاقت حافظه که با سنجش تطابق با واقعیات بیرونی و اسناد احراز می‌شود (s52). ادراک نخستین او درست بود و در گزارش ۲۰۰۳ خودش ثبت شده بود؛ آنچه سال‌ها بعد گفت با همان سند ناسازگار بود. روشنی و تکرار روایت جای سنجش با سند را گرفت و حافظه‌ای که بارها بازگو و دگرگون شده بود، بی‌تطبیق با نوار خبر خودش و گواهی خدمه، با اطمینان کامل در رسانه‌ای سراسری عرضه شد. سند در دسترس بود و بهای خطا (اعتبار خبرگزاری) بالا بود (s6).","y":2015},{"d":"تاریخ و سیاست","ex":["st_shohud","st_conflict","st_resp"],"fl":["st_core","st_hiss","st_aql","st_conflict","st_resp"],"full":false,"fx":["اگر کنشگر زاویه را عوض می‌کرد، میانجی را برمی‌داشت، در شرایط عادی تکرار می‌کرد یا حس دیگری (لمس) را به کار می‌گرفت، داوری حسی‌اش به یقین نزدیک می‌شد.","اگر کنشگر هر مقدمه (به‌ویژه مقدمه ناگفته) را تا بدیهی یا تا راه معتبرش دنبال می‌کرد، اطمینانش به نتیجه از اطمینان به ضعیف‌ترین مقدمه بیشتر نمی‌شد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت."],"id":"r2_chamberlain_hitler_face","k":"ok","ok":false,"r":3,"right":"اگر چمبرلین برداشت چهره‌به‌چهره را یک قرینه ضعیف حصولی می‌شمرد و آن را با سابقه پایبندی هیتلر به تعهداتش و ارزیابی‌های اطلاعاتی می‌سنجید، به اعتماد به قول او درجه‌ای پایین می‌داد و سیاست را بر ضمانت‌های قابل راستی‌آزمایی بنا می‌کرد.","src":["Robert Self (ed.), The Neville Chamberlain Diary Letters, Vol. 4: The Downing Street Years 1934–1940 (2005)","Ian Kershaw, Hitler 1936–1945: Nemesis (2000)"],"story":"نویل چمبرلین، نخست‌وزیر بریتانیا، در ۱۵ سپتامبر ۱۹۳۸ در برشتسگادن با هیتلر دیدار کرد تا بحران سودت را حل کند. او در نامه‌ای به خواهرش آیدا در ۱۹ سپتامبر نوشت که به‌رغم سختی و بی‌رحمی‌ای که گمان کرد در چهره هیتلر دیده، این برداشت را پیدا کرده که «اینجا مردی است که وقتی قولی داد می‌توان به او اعتماد کرد». در آن زمان هیتلر پیش‌تر در ۱۹۳۶ راینلند را برخلاف تعهدات لوکارنو نظامی کرده و در مارس ۱۹۳۸ اتریش را ضمیمه کرده بود. چمبرلین پس از توافق مونیخ (۳۰ سپتامبر) و امضای اعلامیه مشترک انگلیس و آلمان، از «صلح برای زمانه ما» سخن گفت. در ۱۵ مارس ۱۹۳۹ آلمان باقی‌مانده چک‌ها را اشغال کرد. انگیزه‌های سیاست ","t":"چمبرلین و «مردی که می‌توان به قولش اعتماد کرد» (۱۹۳۸)","tier":"real","why":"پی بردن به حالت یا نیت دیگری از روی چهره، علم حصولی است نه حضوری (s11)؛ تنها یافتِ حالتِ خودِ عالم نزد او حاضر است و همان ذاتاً معتبر است (s42). برداشت چمبرلین از قابل اعتماد بودن هیتلر حکمی درباره امری بیرونی بود که باید از راه شواهد (سابقه عمل، اظهارات، گزارش‌های اطلاعاتی) سنجیده می‌شد، ولی اعتباری شبیه یافتِ بی‌واسطه گرفت. شواهد ناسازگار در دسترس بود — نقض تعهدات راینلند و ضمیمه کردن اتریش — و در برابر این «برداشت» ترازو نشد (s53). بهای خطا سرنوشت چند کشور بود (s6).","y":1938},{"d":"حقوق و قضا","ex":["st_badihi","st_conflict","st_background"],"fl":["st_naql","st_istiqra","st_tajrobe","st_conflict"],"full":false,"fx":["اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر به‌جای شمردنِ موارد، علتِ نظم را با اصولِ عقلی و وضع‌ورفع می‌جست (s50، s51)، یا ادعا را به «موردِ بعدی» محدود می‌کرد، اطمینانش به حکمِ کلی بالا نمی‌رفت."],"id":"r2_central_park_five","k":"ok","ok":false,"r":3,"right":"اگر داوران مقدمه «بی‌گناه اعتراف نمی‌کند» را نظری می‌شناختند و برایش دلیل می‌خواستند، اعترافات بازجویی‌های طولانی از نوجوانان را با شواهد مستقل (DNA، تطبیق جزئیات با صحنه) می‌سنجیدند و ناسازگاری‌ها را دلیل تردید جدی می‌گرفتند، نه زائده‌ای بر روایت.","src":["Sarah Burns, The Central Park Five: A Chronicle of a City Wilding (2011)","New York County District Attorney's Office, Affirmation in Response to Motion to Vacate Judgment of Conviction, People v. Kharey Wise et al. (December 2002)","Saul M. Kassin et al., \"Police-Induced Confessions: Risk Factors and Recommendations\", Law and Human Behavior 34 (2010)"],"story":"در ۱۹ آوریل ۱۹۸۹ زنی که در سنترال پارک نیویورک می‌دوید مورد تجاوز و ضرب‌وشتم شدید قرار گرفت. پنج نوجوان ۱۴ تا ۱۶ ساله سیاه‌پوست و لاتین‌تبار پس از ساعت‌ها بازجویی، اظهاراتی دادند که در آن‌ها خود و دیگران را در حمله دخیل شمردند و بیشترشان ویدئویی ضبط شد. این اظهارات در جزئیات اساسی (چه کسی چه کرد، کجا و چه زمانی) با یکدیگر و با صحنه جرم ناسازگار بود و نوجوانان بعداً آن‌ها را پس گرفتند و گفتند زیر فشار و با وعده رفتن به خانه داده شده است. آزمایش DNA نمونه‌های به‌دست‌آمده از قربانی با هیچ‌یک از پنج نفر مطابقت نداشت و دادستانی وجود مهاجمی شناسایی‌نشده را پذیرفت، ولی پرونده عمدتاً بر اعترافات بنا ش","t":"پرونده «پنج نفر سنترال پارک»: اعتراف در برابر DNA (۱۹۹۰)","tier":"real","why":"گزاره «بی‌گناه اعتراف نمی‌کند» نه اولی است (صرف تصور اجزایش حکم را نمی‌سازد) و نه وجدانی (گزارش حالتی حاضر در نفسِ داور نیست)؛ تصدیقی نظری درباره رفتار دیگران است که باید با شواهد سنجیده شود (s39، s40)، ولی چون «بدیهی» و «عقل سلیم» می‌نمود، بی‌استدلال مقدمه حکم شد. شواهد ناسازگار در دسترس بود: ناسازگاری اعترافات با هم و با صحنه، و عدم تطابق DNA؛ این‌ها به نفع فرضِ «مهاجم دیگری هم بود» کنار رفت، نه سنجیده شد (s53). فضای خشم عمومی و فشار برای یافتن مجرم پیش‌زمینه نابایسته‌ای بود که در داوری اثر گذ","y":1990},{"d":"حقوق و قضا","ex":["st_tasdiq"],"fl":["st_worlds","st_tasdiq","st_naql","st_herm"],"full":true,"fx":["اگر کنشگر واقع، فهم خود و واژه‌ها را جدا می‌نوشت و معنای مقصود هر واژه کلیدی را معین می‌کرد، از «نامش عوض شد» به «خودش عوض شد» نمی‌رسید.","اگر کنشگر حکم خبریِ پنهان در توصیه یا ترکیب وصفی را بیرون می‌کشید و همان را می‌سنجید، به خودِ انشا صدق و کذب نسبت نمی‌داد.","اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت."],"id":"r2_greenbelt_blackmail","k":"ok","ok":false,"r":3,"right":"اگر داوران حکم خبریِ نهفته در گزارش را بیرون می‌کشیدند («برسلر خرید زمین مدرسه را به مجوز تغییر کاربری گره زد») و همان را می‌سنجیدند، آن را صادق می‌یافتند و صفت تند را — که اِخبار نیست — موضوع صدق و کذب قرار نمی‌دادند.","src":["Greenbelt Cooperative Publishing Ass'n v. Bresler, 398 U.S. 6 (1970)"],"story":"چارلز برسلر، سازنده و توسعه‌دهنده املاک در گرین‌بلت مریلند، هم‌زمان با شورای شهر بر سر دو موضوع مذاکره می‌کرد: شهر می‌خواست زمینی از او برای مدرسه بخرد و او برای زمین دیگری مجوز تغییر کاربری می‌خواست. در جلسات عمومی شورا برخی شهروندان موضع مذاکره‌ای او، یعنی گره زدن این دو معامله به هم، را «باج‌گیری» نامیدند و نشریه محلی گرین‌بلت نیوز ریویو این سخنان را دقیق گزارش کرد. برسلر به اتهام افترا شکایت کرد، به این استدلال که نشریه او را به جرم باج‌گیری متهم کرده است؛ هیئت منصفه به سود او رأی داد و دادگاه تجدیدنظر مریلند حکم را تأیید کرد. دیوان عالی آمریکا در ۱۹۷۰ حکم را نقض کرد و گفت حتی بی‌دقت‌ترین ","t":"«باج‌گیری» در جلسه شورای شهر: پرونده گرین‌بلت علیه برسلر","tier":"real","why":"ارزش‌سنجی صدق و کذب تنها در قلمرو تصدیقات است؛ ترکیب‌های وصفی و تعبیرهای انشایی، تا حکمی خبری را حمل نکنند، متصف به صدق و کذب نمی‌شوند (s27، s38). «باج‌گیری» در دهان شهروندان معترض صفتی ارزیابانه و مبالغه‌آمیز برای موضع مذاکره‌ای بود، نه خبر از رخ دادن جرمی با ارکان حقوقی‌اش؛ داوری به آن به‌مثابه گزاره‌ای کاذب، بیانِ خشم را با اِخبار از واقع یکی گرفت. تصدیقِ خبریِ پنهان در گزارش — اینکه برسلر دو معامله را به هم گره زده — صادق بود و مورد نزاع هم نبود.","y":1970},{"d":"رسانه و خبر","ex":["st_aql","st_grade","st_resp"],"fl":["st_aql","st_istiqra","st_conflict","st_background"],"full":false,"fx":["اگر کنشگر مقدمات را جداگانه می‌سنجید، این استدلال را کنار می‌گذاشت و نتیجه را از راه دیگری می‌آزمود.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر درجه هر طرف را می‌سنجید، طرف یقینی را مقدم می‌کرد و تصدیق ناسازگار را کنار می‌گذاشت (یا اگر متن غیرنص بود، تأویل می‌کرد)."],"id":"r2_nyt_goddard_1920","k":"ok","ok":false,"r":3,"right":"اگر نویسنده مقدمه «نیاز به تکیه‌گاه» را به بدیهی ارجاع می‌داد یا از فیزیک‌دانان می‌پرسید، کاذب بودنش را می‌دید؛ و حتی بدون آن، ادعای جسورانه ولی ناسازگارنشده با یقین را با درجه‌ای میانی و نیازمند آزمون گزارش می‌کرد، نه با تمسخر و حکم ناممکن بودن.","src":["Robert H. Goddard, A Method of Reaching Extreme Altitudes, Smithsonian Miscellaneous Collections vol. 71 no. 2 (1919)","The New York Times, \"A Severe Strain on Credulity\" (editorial, 13 January 1920)","The New York Times, \"A Correction\" (17 July 1969)"],"story":"رابرت گادرد در رساله‌ای که مؤسسه اسمیتسونین در اواخر ۱۹۱۹ منتشر کرد، نظریه و آزمایش‌های خود درباره موشک برای رسیدن به ارتفاعات بسیار بالا را شرح داد و در پایان به امکان فرستادن محموله‌ای کوچک تا ماه اشاره کرد. نیویورک تایمز در سرمقاله ۱۳ ژانویه ۱۹۲۰ این ایده را ناممکن خواند، با این استدلال که موشک در خلأ فراسوی جو چیزی ندارد که به آن «فشار» بیاورد، و نوشت گادرد گویا از دانشی که هر روز در دبیرستان‌ها تدریس می‌شود، یعنی رابطه کنش و واکنش، بی‌بهره است. قانون سوم نیوتن در واقع رانش را از واکنش گازهای بیرون‌رانده بر خود موشک می‌داند و به محیطی برای تکیه نیاز ندارد. روزنامه پیش از نوشتن، نه از فیزیک","t":"سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹","tier":"real","why":"حکم «قطعاً ناممکن» یعنی صفر دادن به ارزش صدق ادعای گادرد؛ ولی صفر فقط جای کذب یقینی است و ادعایی که با هیچ معرفت یقینی ناسازگار نیست، حتی اگر اثبات‌نشده باشد، درجه‌ای میان صفر و یک دارد (s40، تکمیل درس ۸). استدلال سرمقاله هم بر مقدمه‌ای کاذب بنا شده بود («باید به محیطی تکیه کند») و ماده آن به بدیهی نمی‌رسید (s40)؛ در واقع خودِ اصل کنش و واکنش که سرمقاله به آن استناد کرد، به سود گادرد بود. پرسیدن از اهل فن و خواندن آزمایش‌های رساله ممکن بود و انجام نشد (s49، s6).","y":1920},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_spotlight_geoghan","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: احراز صدور از راه سند رسمی، تکیه بر گزارش‌های عرضی مستقل به‌جای تک‌منبع، سنجش دلالت و قرائن (s47، s48)، و انجام تحقیق پیش از عمل.","src":["The Investigative Staff of The Boston Globe, Betrayal: The Crisis in the Catholic Church (2002)","The Boston Globe, \"Church allowed abuse by priest for years\" (6 January 2002)"],"story":"در ۲۰۰۱ تیم تحقیقی «اسپات‌لایت» بوستون گلوب به پیشنهاد سردبیر تازه، مارتی بارون، بررسی اتهام‌های کودک‌آزاری کشیش جان گیگن را آغاز کرد. روزنامه از دادگاه خواست اسناد مهروموم‌شده دعاوی مدنی را از محرمانگی خارج کند و قاضی در اواخر ۲۰۰۱ دستور انتشار آن‌ها را داد. تیم افزون بر مصاحبه با قربانیان و وکلا، از راهنماهای سالانه اسقف‌نشین الگوهای جابه‌جایی کشیشان (مرخصی استعلاجی، «بی‌مأموریت») را استخراج کرد و فهرستی از موارد مشکوک ساخت و هر مورد را با منابع مستقل تطبیق داد. گزارش نخست در ۶ ژانویه ۲۰۰۲ بر پایه نامه‌ها و اسناد داخلی کلیسا نشان داد مقامات اسقف‌نشین، از جمله کاردینال لا، از اتهام‌های گیگن آ","t":"تیم اسپات‌لایت بوستون گلوب و پرونده اسقف‌نشین بوستون (۲۰۰۲)","tier":"real","why":"صدور اسناد احراز شده بود: از پرونده رسمی دادگاه و با حکم قاضی به دست آمدند (s47). گزارش‌ها عرضی و مستقل بودند — قربانیان، وکلا، اسناد کلیسا، داده‌های راهنمای سالانه — و هم‌گرایی چنین گزارش‌هایی احتمال انطباق با واقع را تقویت می‌کند (s47، s48). دلالت اسناد بر مدعا روشن بود (نامه‌های مقامات درباره اتهام‌ها و انتقال‌ها) و قرائن جانبی همسو بود. تیم پیش از انتشار تحقیق ممکن را انجام داد و اطمینانش با قوت شواهد متناسب بود.","y":2002},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_schmitz_daisey","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: سنجش وثاقت راوی، مراجعه به شاهد مستقل دست‌اول، داوری تعارض با قرائن (s47، s48، s53) و انجام تحقیق پیش از انتشار.","src":["This American Life, Episode 460: \"Retraction\" (16 March 2012)","This American Life, Episode 454: \"Mr. Daisey and the Apple Factory\" (6 January 2012)"],"story":"در ژانویه ۲۰۱۲ برنامه رادیویی «این زندگی آمریکایی» بخشی از تک‌گویی نمایشی مایک دیزی را پخش کرد که در آن او مدعی بود در شنژن با کارگران کارخانه فاکسکان، از جمله کارگرانی که با ماده شیمیایی هگزان مسموم شده بودند، دیدار کرده و نگهبانان مسلح را بر در کارخانه دیده است. راب اشمیتز، خبرنگار برنامه «مارکت‌پلیس» در شانگهای، به برخی جزئیات بدگمان شد؛ مثلاً حمل اسلحه برای نگهبانان خصوصی در چین معمول نیست و مسمومیت با هگزان در کارخانه‌ای در سوجو گزارش شده بود، نه شنژن. او به‌جای داوری بر پایه این گمان، مترجم دیزی در آن سفر، کتی لی، را یافت و جزئیات را یک‌به‌یک با او سنجید؛ مترجم بسیاری از صحنه‌ها را رد کر","t":"راب اشمیتز و بازبینی روایت مایک دیزی از کارخانه‌های اپل (۲۰۱۲)","tier":"real","why":"اشمیتز ناسازگاری‌های اولیه را قرینه گرفت نه دلیل قطعی، و برای داوری به شاهد دست‌اولی رفت که حضورش در صحنه احراز می‌شد (s47، s48). روایت دیزی تک‌منبع و بی‌قرینه بود و با قرائن خلاف (الگوی معمول نگهبانی در چین، محل رخداد هگزان) روبه‌رو بود؛ تعارض با ترازوی عقل و قوت قرائن داوری شد (s53). نتیجه با اعتراف خود راوی تأیید شد. اطمینان او پس از تحقیق، نه پیش از آن، بالا رفت.","y":2012},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_reckard_wells_fargo","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: تکیه بر گزارش‌های عرضی مستقل، تطبیق با اسناد و قرائن، شنیدن روایت مقابل و داوری با قوت قرائن (s47، s48، s53).","src":["E. Scott Reckard, \"Wells Fargo's pressure-cooker sales culture comes at a cost\", Los Angeles Times (21 December 2013)","Consumer Financial Protection Bureau, Consent Order, In the Matter of Wells Fargo Bank, N.A., File No. 2016-CFPB-0015 (8 September 2016)"],"story":"اسکات رکارد، خبرنگار لس‌آنجلس تایمز، در دسامبر ۲۰۱۳ گزارشی منتشر کرد که نشان می‌داد فشار سهمیه‌های فروش در شعبه‌های ولز فارگو کارکنان را به باز کردن حساب‌ها و فروش محصولات بدون رضایت مشتریان واداشته است. گزارش بر مصاحبه با شمار زیادی از کارکنان کنونی و پیشین در شعبه‌ها و شهرهای مختلف، اسناد داخلی و پرونده‌های قضایی تکیه داشت، و پاسخ بانک — که اخراج حدود سی کارمند در منطقه لس‌آنجلس به همین دلیل را تأیید کرد — نیز در آن آمد. بانک این موارد را رفتار نادرست چند کارمند خواند. در ۲۰۱۵ دادستان شهر لس‌آنجلس شکایت کرد و در سپتامبر ۲۰۱۶ دفتر حمایت مالی از مصرف‌کننده، ناظر بانکی (OCC) و دادستانی لس‌آنجلس","t":"گزارش لس‌آنجلس تایمز درباره فرهنگ فروش ولز فارگو (۲۰۱۳)","tier":"real","why":"ادعا از گزارش‌های عرضی و مستقل کارکنانی در شعبه‌ها و شهرهای مختلف برآمد که تبانی‌شان بعید بود و هم‌گرایی‌شان احتمال صدق را بالا برد (s47، s48)؛ اسناد داخلی و پرونده‌های قضایی قرینه همسو بودند و حتی پاسخ خود بانک بخشی از واقعیت را تأیید کرد. ادعای «گسترده بودن» بر شمار و پراکندگی موارد تکیه داشت و با اطمینانی متناسب بیان شد؛ روایت مقابل بانک (کار چند فرد) با همین قرائن سنجیده شد (s53). نتیجه با بررسی رسمی ناظران تأیید شد.","y":2013},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_stagg_dday_forecast","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: سنجش تعارض با قوت قرائن، ترجیح تحلیل وضع موجود بر تعمیم صرف از گذشته، به‌روزکردن حکم با داده تازه، و گزارش درجه اطمینان متناسب (s40، s50، s53).","src":["J. M. Stagg, Forecast for Overlord: June 6, 1944 (1971)","John Ross, The Forecast for D-Day: And the Weatherman Behind Ike's Greatest Gamble (2014)"],"story":"جیمز استگ، افسر نیروی هوایی سلطنتی و هواشناس ارشد ستاد آیزنهاور، باید پیش‌بینی سه تیم جدا — اداره هواشناسی بریتانیا، دریاداری و تیم نیروی هوایی ارتش آمریکا — را که اغلب با هم اختلاف داشتند، به یک توصیه بدل می‌کرد. تیم آمریکایی با روش قیاس با الگوهای گذشته هوای ۵ ژوئن را مناسب می‌دانست، ولی استگ با تکیه بر تحلیل نقشه‌ها و دو تیم بریتانیایی توفانی را برای آن روز پیش‌بینی کرد و در بامداد ۴ ژوئن تعویق یک‌روزه را توصیه کرد. عصر ۴ ژوئن، گزارش‌های تازه ایستگاه‌های دیدبانی، از جمله ایستگاه بلک‌ساد پوینت در غرب ایرلند، نشان داد پس از جبهه سرد پنجره‌ای کوتاه از هوای بهتر برای ۶ ژوئن پدید می‌آید؛ استگ ای","t":"پیش‌بینی هوای جیمز استگ و تعویق روز دی (۱۹۴۴)","tier":"real","why":"در تعارض دو شناخت غیریقینی (پیش‌بینی آمریکایی و بریتانیایی) داوری با ترازوی عقل و قوت قرائن انجام شد، نه با مرجعیت یا میل (s53)؛ روش قیاس با گذشته که به استقرائی ناقص تکیه داشت، در برابر تحلیل فیزیکی وضع کنونی وزن کمتری گرفت (s50). داده دیدبانی تازه وارد داوری شد و حکم تغییر کرد، و اطمینان صریحاً میانی و احتمالاتی گزارش شد — همان اعتبار تشکیکی که ملاک عمل بر ترجیح احتمال بالاتر است (s40، تکمیل درس ۸). در عمل پرمخاطره، تحقیق ممکن تا آخرین لحظه انجام شد (s6).","y":1944},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_snp_mayfield_print","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: داوری بر پایه روش نه شمار و مقام کارشناسان، جدی گرفتن شاهد ناسازگار، مهار پیش‌زمینه نابایسته و ادامه تحقیق تا یافتن پاسخ مثبت (s49، s53، s70).","src":["U.S. Department of Justice, Office of the Inspector General, A Review of the FBI's Handling of the Brandon Mayfield Case (March 2006)"],"story":"پس از بمب‌گذاری قطارهای مادرید در ۱۱ مارس ۲۰۰۴، اثر انگشتی نهفته روی کیسه‌ای حاوی چاشنی پیدا شد. اف‌بی‌آی با جست‌وجوی رایانه‌ای و سپس مقایسه سه کارشناس خود آن را به براندون میفیلد، وکیلی در اورگان، نسبت داد و بعدتر کارشناسی مستقل که دادگاه تعیین کرد نیز همین را تأیید کرد. واحد اثر انگشت پلیس ملی اسپانیا مقایسه را خودش انجام داد و در ۱۳ آوریل گزارش داد که نتیجه منفی است؛ کارشناسان اف‌بی‌آی به مادرید رفتند تا استدلال خود را ارائه کنند، ولی اسپانیایی‌ها با اشاره به ناهمخوانی‌های حل‌نشده بر داوری خود ماندند. میفیلد در ۶ مه بازداشت شد و در ۱۹ مه پلیس اسپانیا اثر را به اوهنان داود، شهروند الجزایری، ","t":"پلیس ملی اسپانیا و رد شناسایی اثر انگشت براندون میفیلد (۲۰۰۴)","tier":"real","why":"استناد به تخصص دیگران فقط با اعتبار روش و پایبندی کارشناس به آن پذیرفتنی است (s49)؛ اسپانیایی‌ها شمار و اعتبار سازمانی تأییدکنندگان را جای سنجش روش ننشاندند و مقایسه را خود با همان روش تکرار کردند. در تعارض دو داوری غیریقینی، قرائن (ناهمخوانی‌های حل‌نشده) را وزن کردند (s53) و فشار نهادی و مرجعیت اف‌بی‌آی را — پیش‌زمینه نابایسته — در داوری دخالت ندادند (s70). نتیجه با یافتن صاحب واقعی اثر تأیید شد.","y":2004},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_tichborne_claimant","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: تمایز شمار گزارش‌ها از استقلال آن‌ها، ارزیابی حافظه با سند و واقعیت بیرونی، و داوری تعارض با قوت قرائن (s47، s52، s53).","src":["Rohan McWilliam, The Tichborne Claimant: A Victorian Sensation (2007)","Douglas Woodruff, The Tichborne Claimant: A Victorian Mystery (1957)"],"story":"راجر تیچبورن، وارث خاندانی ثروتمند انگلیسی، در ۱۸۵۴ با غرق شدن کشتی «بلا» ناپدید شد. مادرش با آگهی در پی او بود و در ۱۸۶۶ قصابی از واگا واگا در استرالیا خود را راجر معرفی کرد؛ مادر در ۱۸۶۷ در پاریس او را پسر خود شناخت و بیش از صد نفر، از جمله خدمه و افسرانی که راجر را می‌شناختند، به سود او شهادت دادند. در دادگاه مدنی (۱۸۷۱–۱۸۷۲) معلوم شد مدعی فرانسوی نمی‌داند، در حالی که راجر در فرانسه بزرگ شده و به آن زبان مسلط بود؛ درباره مدرسه استونی‌هرست و رخدادهای زندگی راجر ناآگاه بود؛ و شاهدی گواهی داد که بر بازوی راجر خال‌کوبی کرده بود، حال آنکه مدعی چنین نشانی نداشت. دعوای مدنی فروریخت و در دادگاه کیف","t":"مدعی تیچبورن: دادگاه در برابر صد شاهد (۱۸۷۴)","tier":"real","why":"شمار راویان فقط وقتی یقین یا اطمینان می‌آورد که گزارش‌ها مستقل باشند و تبانی یا اثرپذیری‌شان از هم منتفی باشد (s47، s48)؛ شناسایی‌های پس از پذیرش مادر و پس از سال‌ها، یادآوری‌هایی سنجیده‌نشده با سند بودند (s52). در برابر، شواهدی که با واقعیت بیرونی و سند سنجش‌پذیر بود — توان زبانی، دانسته‌های مدرسه، خال‌کوبی گواهی‌شده — به گزاره مقابل قوت بیشتری می‌داد و دادگاه تعارض را با ترازوی قوت قرائن داوری کرد (s53).","y":1874},{"d":"بازار و معامله","ex":["st_naql","st_resp"],"fl":["st_hiss","st_naql","st_background","st_resp"],"from":"r2_cbs_killian_memos","full":true,"fx":["اگر کنشگر منبع اصلی (متن، صدا، تأیید خود گوینده) را می‌دید و به تصویر بازنشرشده بسنده نمی‌کرد، مقدمه نخست را احراز می‌کرد.","اگر کنشگر پیش‌زمینه‌هایش (پرسش آغازین، حب و بغض، انتظار، باور پیشین) را آشکار و رده‌بندی می‌کرد و نابایسته‌ها را به اختیار کنار می‌گذاشت، ورودی را دوباره و بی‌آن‌ها می‌خواند.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r2_abs_startup_loi","k":"ok","ok":false,"r":3,"right":"اگر سارا صدور را مستقیم از گوینده اصلی می‌پرسید یا حلقه بی‌نام را شناسایی می‌کرد، یا نامه را کنار می‌گذاشت یا پس از احراز صدور بر آن تکیه می‌کرد.","src":[],"story":"سارا، شریک صندوقی کوچک، در آستانه سرمایه‌گذاری در استارت‌آپی بود که ادعا می‌کرد یک زنجیره بزرگ خرده‌فروشی آماده سفارش کلان است. بنیان‌گذار گفت نامه قصد خرید را مستقیم ندارد؛ کارمند پیشینش آن را از «آشنایی در واحد خرید» آن زنجیره گرفته که نامش را نمی‌گوید. سارا فقط تصویر اسکن‌شده نامه را دید که آرم و امضای مدیر خرید را داشت و محتوایش با گفته‌های پیشین بنیان‌گذار جور درمی‌آمد. او می‌توانست با یک تماس به دفتر مدیر خرید صحت نامه را بپرسد، ولی برای عقب نماندن از رقیبان، همان هفته پول را واریز کرد. سه ماه بعد زنجیره خرده‌فروشی اعلام کرد هیچ نامه‌ای صادر نکرده و امضا از سندی دیگر برداشته شده بود.","t":"نامه قصد خرید که از «دوستِ یک دوست» رسید","tier":"abstract","why":"صدور نامه از گوینده اصلی (زنجیره) احراز نشده بود و نامه از زنجیره‌ای طولی رسیده بود (زنجیره ← آشنای بی‌نام ← کارمند پیشین ← بنیان‌گذار ← سارا) که یک حلقه‌اش مجهول بود؛ در نقل طولی وثاقت همه واسطه‌ها لازم است و اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌کند (s47). هم‌خوانی محتوا با ادعای بنیان‌گذار قرینه مستقل نبود، چون از همان منبع ذی‌نفع می‌آمد (s48). استعلام مستقیم ارزان و ممکن بود و با بهای بالا انجام نشد (s6).","y":2024},{"d":"زندگی روزمره","ex":["st_herm"],"fl":["st_naql","st_conflict","st_background","st_herm"],"from":"cs_b_hirsch","full":true,"fx":["اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش‌زمینه‌هایش (پرسش آغازین، حب و بغض، انتظار، باور پیشین) را آشکار و رده‌بندی می‌کرد و نابایسته‌ها را به اختیار کنار می‌گذاشت، ورودی را دوباره و بی‌آن‌ها می‌خواند."],"id":"r2_abs_father_letter","k":"ok","ok":false,"r":3,"right":"اگر پسر معنای نامه را با قرائن (تاریخ، عبارت مقید، گواهی عمو) جدا از اهمیت عاطفی‌اش برای خود می‌نوشت، می‌دید پدر فروش زیر قیمت را منع کرده بود و تصمیم کنونی را پرسشی تازه می‌شمرد.","src":[],"story":"پدر خانواده در زمستانی که بازار کساد بود و خریداری برای مغازه پیشنهاد قیمتی بسیار پایین داده بود، نامه‌ای کوتاه به فرزندانش نوشت: «در این وضع مغازه را نگه دارید و به این قیمت نفروشید.» او دو سال بعد درگذشت. چند سال پس از آن، خریداری پیشنهادی چند برابر قیمت بازار داد و دختر کوچک‌تر خواهان فروش بود. پسر بزرگ‌تر نامه را آورد و گفت معنای آن این است که مغازه هرگز نباید فروخته شود، چون برای او این نامه نماد وفاداری به راه پدر و هویت خانواده است. او به تاریخ نامه، پیشنهاد کم آن زمان و عبارت «در این وضع» نپرداخت و گفت «هر کس نامه را جور دیگری بخواند پدر را نفهمیده است». عموی خانواده که در آن زمستان کن","t":"«مغازه را نگه دارید»: نامه پدر و تصمیم فرزندان","tier":"abstract","why":"هدف ذاتی نوشتن نامه رساندن معنای مدنظر نویسنده به مخاطب است (s69)؛ آنچه نامه برای پسر «معنا می‌دهد» (نماد هویت و وفاداری) اهمیت آن برای اوست، نه مراد پدر. قرائن متصل و منفصل — «در این وضع»، «به این قیمت»، تاریخ نامه، گواهی عمو — مراد را به منع فروش ارزان در آن شرایط محدود می‌کرد و نادیده ماند. علاقه عاطفی به مغازه پیش‌زمینه‌ای نابایسته بود که مهارش در اختیار او بود (s70).","y":2023},{"d":"مالی و بانکی","ex":["st_aql","st_grade","st_resp"],"fl":["st_aql","st_naql","st_conflict","st_resp"],"from":"r2_nyt_goddard_1920","full":false,"fx":["اگر کنشگر هر مقدمه (به‌ویژه مقدمه ناگفته) را تا بدیهی یا تا راه معتبرش دنبال می‌کرد، اطمینانش به نتیجه از اطمینان به ضعیف‌ترین مقدمه بیشتر نمی‌شد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r2_abs_desk_stablecoin","k":"ok","ok":false,"r":3,"right":"اگر رئیس میز مقدمه پشتوانه را با گزارش‌ها می‌سنجید و به هشدار احتمالی درجه‌ای میانی می‌داد، دست‌کم سقفی برای نگهداری نقدینگی در آن توکن می‌گذاشت.","src":[],"story":"تحلیلگر تازه‌کار یک میز معاملات در یادداشتی نوشت که پشتوانه یک توکن ثابت‌قیمت که شرکت بخش بزرگی از نقدینگی خود را در آن نگه می‌دارد، بخشی در اوراق کم‌نقد است و در صورت هجوم برای بازخرید ممکن است توکن از برابری با دلار خارج شود. رئیس میز در جلسه گفت احتمال این رخداد «دقیقاً صفر» است، چون «هر توکن با یک دلار پشتیبانی می‌شود و برابری همیشه حفظ می‌شود»، و یادداشت را بی‌آنکه گزارش‌های پشتوانه را بخواند یا از واحد ریسک نظر بخواهد بایگانی کرد. هیچ گزارش حسابرسی‌شده‌ای وجود نداشت که ترکیب پشتوانه را تماماً نقد نشان دهد. چند ماه بعد با موج بازخرید، توکن دو روز زیر برابری معامله شد و شرکت زیان قابل توجه","t":"«احتمالش صفر است»: رئیس میز معاملات و هشدار تحلیلگر تازه‌کار","tier":"abstract","why":"صفر دادن به ادعای تحلیلگر یعنی کذب یقینی؛ اما هیچ معرفت یقینی با ادعای او ناسازگار نبود و ادعایی که به بدیهی نرسیده لزوماً کاذب نیست و درجه‌ای میان صفر و یک دارد (s40، تکمیل درس ۸). مقدمه «پشتوانه تماماً نقد است» اثبات‌نشده و در واقع نادرست بود، پس ماده استدلال به بدیهی نمی‌رسید (s40). خواندن گزارش‌ها و پرسیدن از واحد ریسک ممکن و ارزان بود و با بهای بالا انجام نشد (s6).","y":2025},{"d":"زندگی روزمره","ex":[],"fl":[],"from":"r2_schmitz_daisey","full":null,"fx":[],"id":"r2_abs_family_voice_msg","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: احراز صدور از گوینده اصلی، مراجعه به منابع مستقل دست‌اول، داوری تعارض با قرائن و تحقیق پیش از عمل (s47، s48، s53).","src":[],"story":"در گروه خانوادگی پیامی صوتی پخش شد که در آن مردی خود را پرستار بیمارستانی در شهری دیگر معرفی می‌کرد و می‌گفت پسرخاله خانواده تصادف کرده و برای عمل فوری باید همان ساعت مبلغی به حسابی شخصی واریز شود. مادر خانواده آماده واریز بود. دختر خانواده به جزئیاتی بدگمان شد: بیمارستان‌ها پیش‌پرداخت را به حساب شخصی نمی‌گیرند و نام بخشی که پرستار گفت در آن بیمارستان وجود نداشت. او به‌جای داوری بر پایه همین گمان، شماره رسمی بیمارستان را از وبگاهش پیدا کرد و پرسید، و هم‌زمان با همسر پسرخاله تماس گرفت؛ هر دو گفتند چنین بیماری بستری نیست و پسرخاله سر کار است. خانواده پول را واریز نکرد و بعدها روشن شد همین پیام ب","t":"پیام صوتی «پسرخاله در بیمارستان است» و تماس مستقیم دختر خانواده","tier":"abstract","why":"پیام تک‌منبع بود، صدورش از بیمارستان احراز نشده بود و با قرائن خلاف (حساب شخصی، بخشِ ناموجود) همراه بود (s47، s48). دختر گمان را دلیل قطعی نگرفت و از دو منبع مستقل و دست‌اول (مرجع رسمی و نزدیک‌ترین شاهد) پرسید؛ تعارض با قوت قرائن داوری شد (s53) و تحقیق ممکن پیش از عمل پرمخاطره انجام شد (s6).","y":2025},{"d":"علم","ex":["st_istiqra"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":true,"fx":["اگر کنشگر می‌پرسید «چه علتی این نظم را پدید آورده و چه چیزی می‌تواند آن را بشکند؟» (s51)، اطمینانش از شمارِ تکرارها بالاتر نمی‌رفت.","اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_wald_survivorship","k":"ok","ok":false,"r":9,"right":"پرسیدن اینکه نمونه چگونه گزینش شده و برآورد اثر نمونه‌ای که غایب است.","src":["Marc Mangel & Francisco J. Samaniego, \"Abraham Wald's Work on Aircraft Survivability\", J. American Statistical Association 79(386): 259–267 (1984)"],"story":"گروه پژوهش آماری دانشگاه کلمبیا در جنگ جهانی دوم از نیروی هوایی دادهٔ محل اصابت گلوله بر هواپیماهای بازگشته را گرفت. به روایت رایج، استدلال شهودی این بود که زره را باید روی نقاطی افزود که بیشترین سوراخ‌ها را دارند. آبراهام والد نشان داد داده فقط هواپیماهای زنده‌مانده را شامل می‌شود: نقاطی که در بازگشته‌ها کمتر سوراخ دارد (مثلاً موتور) احتمالاً همان جاهایی است که اصابت به آن‌ها هواپیما را سرنگون می‌کرد و سوراخ کم نشانهٔ آسیب‌پذیری بیشتر است، نه کمتر.","t":"ارمور هواپیماهای جنگی و تحلیل آبراهام والد (جنگ جهانی دوم)","tier":"real","why":"استقرا از نمونهٔ گزینش‌شده با بقا: هواپیماهای سرنگون‌شده در نمونه نیستند؛ شمار موارد بی‌توجه به سازوکار گزینش حکم کلی ساخت. (نکتهٔ مسیر ۲: خطای بقا در جزوه ملاکِ مستقل ندارد؛ صرفاً از نتیجهٔ ناقص‌بودن استقرا (s50) فهمیده می‌شود.)","y":1943},{"d":"علم","ex":["st_tajrobe"],"fl":["st_tajrobe"],"full":true,"fx":["اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت."],"id":"r4_kahneman_instructors","k":"ok","ok":false,"r":9,"right":"سنجش با گروه کنترل (وضع‌ورفع ستایش/سرزنش) و کنترل عامل پنهان شانس.","src":["Daniel Kahneman, Nobel Prize autobiography (2002)","Daniel Kahneman, Thinking, Fast and Slow (2011), ch. 17"],"story":"دنیل کانمن (که برای نیروی هوایی اسرائیل آموزش روان‌شناسی می‌داد) روایت می‌کند مربیان خلبانی مطمئن بودند ستایش پس از یک مانور عالی عملکرد بعدی را بدتر می‌کند و سرزنش پس از مانور بد عملکرد بعدی را بهتر می‌کند؛ این را از تجربهٔ مکرر خود دیده بودند. کانمن توضیح داد مانورهای بسیار خوب یا بسیار بد تا حدی شانس‌اند و مانور بعدی طبیعتاً به میانگین نزدیک‌تر می‌شود، بی‌آنکه ستایش یا سرزنش اثر داشته باشد (بازگشت به میانگین).","t":"مربیان خلبانی نیروی هوایی اسرائیل و ستایش/سرزنش (روایت کانمن)","tier":"real","why":"قانون تجربی بدون وضع‌ورفع و بدون کنترل عامل پنهان (شانس و بازگشت به میانگین) ساخته شد؛ تکرار داده حسی به‌تنهایی علت را نشان نمی‌دهد (s51). (نکتهٔ مسیر ۲: «بازگشت به میانگین» ملاکِ مستقل ندارد.)","y":1960},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_conflict","st_resp"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":false,"fx":["اگر کنشگر اطمینانش را با شمارِ مواردِ دیده‌شده می‌سنجید — و می‌پرسید علتِ این نظم چیست و آیا عاملی پنهان می‌تواند آن را بشکند (s51) — بیش از این مطمئن نمی‌شد.","اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_columbia_foam","k":"ok","ok":false,"r":9,"right":"سنجش برخورد همین پرواز با داده‌ی خودش، پذیرش درخواست مهندسان و تصویربرداری پیش از بازگشت.","src":["Columbia Accident Investigation Board, Report Volume I (August 2003)"],"story":"حدود ۸۲ ثانیه پس از پرتاب شاتل کلمبیا (۱۶ ژانویهٔ ۲۰۰۳) تکه‌ای از عایق فوم مخزن بیرونی به لبهٔ بال چپ خورد. گروه ارزیابی آوار (DAT) و مهندسان درخواست تصویربرداری ماهواره‌ای/زمینی از بال را مطرح کردند، اما تیم مدیریت مأموریت درخواست را پیگیری نکرد، چون برخورد فوم در پروازهای قبلی هم دیده شده و بدون حادثه بوده و آن را مسئلهٔ نگهداری معمول می‌شمردند نه خطر ایمنی پرواز. شاتل هنگام بازگشت، اول فوریهٔ ۲۰۰۳ از هم پاشید. گزارش هیئت بررسی سانحهٔ کلمبیا (CAIB، اوت ۲۰۰۳) این فرهنگ تصمیم را نقد کرد.","t":"برخورد کفِ مخزن بیرونی به بال کلمبیا و تصمیم نگرفتن به تصویربرداری (۲۰۰۳)","tier":"real","why":"از پروازهای بی‌حادثهٔ پیشین به ایمنی همین برخورد (با تکهٔ بسیار بزرگ‌تر) تعمیم داده شد، درخواست مهندسان (شاهد ناسازگار) سنجیده نشد و تحقیقِ ممکن و ارزان (تصویربرداری) انجام نشد (s50، s53، s6).","y":2003},{"d":"بازار و معامله","ex":["st_naql","st_resp"],"fl":["st_expert","st_resp"],"full":false,"fx":["اگر کنشگر می‌پرسید کارشناس با چه روشی به این نظر رسیده و آن روش در بهترین حالت چه درجه‌ای می‌دهد، نظر را بالاتر از سقف روش نمی‌برد.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_bre_x_busang","k":"ok","ok":false,"r":9,"right":"نمونه‌گیری و آزمایش مستقل در آزمایشگاه دیگر پیش از سرمایه‌گذاری.","src":["Strathcona Mineral Services Ltd., Busang Project, Independent Review (May 1997)"],"story":"شرکت کانادایی بری-ایکس در اندونزی ادعا کرد در بوسانگ یکی از بزرگ‌ترین ذخایر طلای جهان را یافته و سهامش سال‌ها بالا رفت. سرمایه‌گذاران و تحلیلگران به نتایج آزمایش مغزه‌هایی که خود شرکت تهیه و عرضه می‌کرد اتکا داشتند. در ۱۹۹۷ شرکت فری‌پورت-مک‌موران هنگام ارزیابی مالکیت مشترک با حفاری‌های مستقل خود طلای قابل‌توجهی نیافت و گزارش مستقل استراتکونا (مه ۱۹۹۷) نتیجه گرفت نمونه‌های شرکت دست‌کاری (طلا افزوده) شده بود. سهام بی‌ارزش شد.","t":"بری-ایکس و «معدن طلای بوسانگ» (۱۹۹۷)","tier":"real","why":"داده تک‌منبع و از جانب ذی‌نفع بود و استقلال زنجیرهٔ نگهداری نمونه احراز نشد؛ تحقیق مستقل ممکن و در برابر بهای زیاد انجام نشد (s47، s49).","y":1997},{"d":"تاریخ و سیاست","ex":["st_conflict","st_background"],"fl":["st_aql","st_conflict","st_resp"],"full":false,"fx":["اگر کنشگر هر مقدمه (به‌ویژه مقدمه ناگفته) را تا بدیهی یا تا راه معتبرش دنبال می‌کرد، اطمینانش به نتیجه از اطمینان به ضعیف‌ترین مقدمه بیشتر نمی‌شد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_yom_kippur_concept","k":"ok","ok":false,"r":9,"right":"داوری فرض در برابر شاهد ناسازگار و آمادگی بر پایهٔ سناریوی مخالف.","src":["Agranat Commission, Interim Report (April 1974)"],"story":"پیش از ۶ اکتبر ۱۹۷۳ اطلاعات نظامی اسرائیل (امان) بر پایهٔ فرضی که «مفهوم» نامیده می‌شد استدلال می‌کرد مصر بدون توان هوایی برای زدن فرودگاه‌های اسرائیل و سوریه بدون مصر حمله نمی‌کنند؛ پس احتمال جنگ کم است. نشانه‌های رو به افزایش (تحرک نیروها در کانال، هشدارهای منابع) به‌جای بازنگری در فرض، با همین فرض تفسیر یا کم‌اهمیت شمرده شد. حمله در همان روز رخ داد. کمیسیون آگرانات (۱۹۷۴) در گزارش‌های خود به این تفکر تثبیت‌شده اشاره کرد.","t":"«مفهوم» اطلاعاتی اسرائیل و جنگ ۱۹۷۳","tier":"real","why":"فرض از پیش پذیرفته‌شده بر نشانه‌های ناسازگار مقدم شد؛ شاهد ناسازگار در دسترس بی‌سنجش ماند و پیش‌زمینهٔ نابایسته (اعتماد به فرض) در داوری اثر گذاشت (s53).","y":1973},{"d":"حقوق و قضا","ex":["st_expert","st_tajrobe"],"fl":["st_tajrobe","st_resp"],"full":false,"fx":["اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_willingham_fire","k":"ok","ok":false,"r":9,"right":"آزمودن نشانه‌ها در آتش‌های کنترل‌شده با و بدون ماده‌ٔ آتش‌زا و سنجش اعتبار روش پیش از شهادت.","src":["Craig L. Beyler, Analysis of the Fire Investigation Methods and Procedures Used in the Criminal Arson Cases Against Ernest Ray Willingham and Cameron Todd Willingham (17 August 2009)"],"story":"در دسامبر ۱۹۹۱ خانهٔ کامرون تاد ویلینگهام در کورسیکانای تگزاس سوخت و سه دخترش مردند. بازرسان آتش‌نشانی (مانوئل واسکز و داگلاس فاگ) بر پایهٔ تجربهٔ خود و نشانه‌هایی مانند شیشهٔ ترک‌خورده (crazed glass)، الگوهای سوختگی روی کف و «حوضچه‌های» ماده‌ٔ آتش‌زا شهادت دادند آتش عمدی بوده است؛ دادگاه (۱۹۹۲) محکوم و او در ۲۰۰۴ اعدام شد. گزارش کریگ بیلر (۲۰۰۹) برای کمیسیون علم قضایی تگزاس نتیجه گرفت این نشانه‌ها طبق دانش علمی آتش‌سوزی (از جمله NFPA 921) پشتوانهٔ علمی نداشت و همان الگوها در آتش‌های طبیعی هم پدید می‌آیند.","t":"آتش‌سوزی کورسیکانا و شهادت بازرسان آتش (۱۹۹۱–۱۹۹۲)","tier":"real","why":"اعتبار روش کارشناس احراز نشد و قاعدهٔ تجربی (نشانه ⇒ عمد) بی وضع‌ورفع و بی کنترل عامل پنهان (آتش‌های طبیعی با همان نشانه) از تکرار تجربه ساخته شد (s49، s51).","y":1992},{"d":"علم","ex":[],"fl":[],"full":null,"fx":[],"id":"r4_redfield_arsenic","k":"ok","ok":true,"r":9,"right":"ملاک‌های رعایت‌شده: نقد روش، کنترل عامل پنهان، بازتولید مستقل.","src":["Felisa Wolfe-Simon et al., Science 332 (2011), online 2 Dec 2010","Tyler J. Erb et al., \"GFAJ-1 Is an Arsenate-Resistant, Phosphate-Dependent Organism\", Science 337 (2012)"],"story":"در دسامبر ۲۰۱۰ مقاله‌ای در ساینس (ولف-سایمون و همکاران) ادعا کرد باکتری GFAJ-1 در فقدان فسفات می‌تواند آرسنیک را در DNA خود بگنجاند. روزی ردفیلد (میکروبیولوژیست) با نقد روش‌ها (آلودگی فسفات، شست‌وشوی ناکافی DNA) نتایج را نپذیرفت، آزمایش را در آزمایشگاه خود با کنترل‌هایی بازآزمود و گروه او (ارب و همکاران، ساینس ۲۰۱۲) نشان داد آرسنیک در DNA نیست و رشد به ردهای فسفات وابسته است.","t":"میکروب «آرسنیک‌زی» GFAJ-1 و نقد و بازآزمایی ردفیلد (۲۰۱۰–۲۰۱۲)","tier":"real","why":"ادعا با سنجش روش، شناسایی عامل پنهان (فسفات) و بازآزمایی با وضع‌ورفع سنجیده شد و تا آن زمان کمتر از یقین نگه داشته شد (s51، s53).","y":2010},{"d":"پزشکی","ex":[],"fl":[],"full":null,"fx":[],"id":"r4_snu_hwang_panel","k":"ok","ok":true,"r":9,"right":"ملاک‌های رعایت‌شده: تطبیق با واقعیت مستقل، بررسی مدارک اصلی و قضاوت پس از تحقیق.","src":["Seoul National University Investigation Committee, Final Report (10 January 2006)","Donald Kennedy, \"Editorial Retraction\", Science 311:335 (2006)"],"story":"در ۲۰۰۵ هوانگ وو-سوک مقالهٔ ساینس دربارهٔ سلول‌های بنیادی جنینی همسان با بیمار منتشر کرده بود. پس از ادعای تخلف در تأمین تخمک و شک دربارهٔ تصاویر، دانشگاه ملی سئول کمیته‌ای تشکیل داد که نمونهٔ سلول‌ها را با اثر انگشت DNA از نمونه‌های اهداکننده و منابع اصلی مطابقت داد و دفترهای آزمایشگاه را بررسی کرد. گزارش کمیته (ژانویهٔ ۲۰۰۶) نشان داد سلول‌های ادعاشده تولید نشده و داده جعل شده بود؛ ساینس مقاله‌ها را پس گرفت.","t":"کمیتهٔ بررسی دانشگاه ملی سئول دربارهٔ سلول‌های بنیادی هوانگ (۲۰۰۵–۲۰۰۶)","tier":"real","why":"ادعا با آزمون مستقل از گوینده (اثر انگشت DNA) و سند اصلی سنجیده شد و اعتبار گوینده جای سنجش نشست (s49، s6).","y":2005},{"d":"بازار و معامله","ex":["st_istiqra"],"fl":["st_istiqra","st_tajrobe"],"from":"r4_wald_survivorship","full":true,"fx":["اگر کنشگر به‌جای شمردنِ موارد، علتِ نظم را با اصولِ عقلی و وضع‌ورفع می‌جست (s50، s51)، یا ادعا را به «موردِ بعدی» محدود می‌کرد، اطمینانش به حکمِ کلی بالا نمی‌رفت.","اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت."],"id":"r4_abs_survivor_shops","k":"ok","ok":false,"r":9,"right":"بررسی کافه‌های تعطیل‌شده و مقایسه.","src":[],"story":"مشاوری برای راه‌اندازی زنجیرهٔ کافه، ویژگی‌های ۴۰ کافهٔ پررونق شهر را بررسی کرد: همگی چیدمان باز و نورپردازی گرم داشتند. او نتیجه گرفت این ویژگی‌ها رمز موفقیت‌اند و به مشتری توصیه کرد همان طراحی را بسازد. او کافه‌هایی را که در همان چند سال تعطیل شده بودند نه فهرست کرد و نه بررسی؛ بعدها معلوم شد بسیاری از آن‌ها هم همان چیدمان را داشتند.","t":"«از فروشگاه‌های موفق الگو بگیریم»: مطالعهٔ فقط بازماندگان","tier":"abstract","why":"هم‌ساختار والد: نمونه با بقا گزینش شده بود و غایبان بررسی نشدند.","y":2025},{"d":"فناوری و مهندسی","ex":[],"fl":[],"from":"r4_redfield_arsenic","full":null,"fx":[],"id":"r4_abs_lab_claim_replic","k":"ok","ok":true,"r":9,"right":"ملاک‌های رعایت‌شده: کنترل عامل پنهان و بازتولید مستقل.","src":[],"story":"گزارش فنی یک شرکت ادعا می‌کرد ماده‌ای تازه رسانایی بسیار بالا دارد. یکی از مهندسان شرکت دیگر پیش از تغییر خط تولید روش اندازه‌گیری را بررسی کرد، متوجه شد اتصالات نمونه‌ها آلوده به فلز رسانا بوده است و خودش با نمونه‌های شاهد و بدون اتصال آلوده اندازه‌گیری را تکرار کرد. رسانایی مشاهده‌شده ناپدید شد. شرکت دوم خط تولید را تغییر نداد.","t":"ادعای ماده‌ای تازه در گزارش فنی و بازآزمایی تحلیلگر داخلی","tier":"abstract","why":"هم‌ساختار ردفیلد: نقد روش، شناسایی عامل پنهان و بازآزمایی با شاهد پیش از عمل.","y":2025}],"round":10}};
+window.EPI_BT_LEDGER = {"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"findings":{"attributions":["اشتباه جزوه (استاد)","بدفهمی یا پیاده‌سازی نادرست سازنده","خطای رمزگذاری پرونده","برچسب حقیقت پرونده نادرست است","خلأ جزوه (ملاکی ندارد)","خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","نامعلوم — بررسی بیشتر"],"findings":[{"attribution":"خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","case":"bk_russell_chicken","expected":["st_istiqra"],"fix":{"round":7,"what":"p_case_chicken (پذیرفتهٔ مالک): قاعدهٔ r_istiqra_hidden (ملاکِ s51 در ایستگاهِ استقراء) + hidden_ctrl=false در رمزگذاریِ جوجه"},"flagged":[],"id":"f_bk_russell_chicken","kind":"missed","lastSeenRound":6,"note":"دورِ ۵، پس از قضیه‌ای شدنِ سقفِ استقراء: «فردا هم دانه می‌دهد» پیش‌بینیِ «موردِ بعدی» است (رمزگذارِ کور) و قضیهٔ T_next از شمار، سقفِ (n+1)/(n+2) می‌دهد — با صدها روز ≈ ۹۹٫۷؛ پس اطمینانِ ۹۹ ٪ جوجه از راهِ «شمار» بیش‌اطمینانی نیست. درسِ جزوه این‌جا شمار نیست، علت است: «تکرارِ داده‌های حسی به‌تنهایی … باید علت … کشف شود» و «مشروط به عدمِ دخالتِ عواملِ پنهان» (s51) — و خودِ «چرا» ی این پرونده همین را می‌گوید. ملاکِ s51 در کارخانه فقط روی «تجربه» (hidden_ctrl) نشسته، نه روی «استقراء». ⇒ پیشنهادِ p_case_chicken برای مالک.","opened":"2026-10-13","openedRound":5,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":7},"rules":["r_istiqra_incomplete","r_istiqra_universal","r_istiqra_finite","r_istiqra_next","r_istiqra_small_n"],"secs":["s40","s50","s51"],"status":"verified","tier":"booklet","title":"جوجه راسل","verified":"2026-10-14"},{"attribution":"برچسب حقیقت پرونده نادرست است","case":"cs_b_dewey1948","expected":["st_istiqra","st_resp"],"fix":{"round":1,"type":"label","what":"truth.fail: [st_istiqra, st_resp] → [st_istiqra, st_tajrobe, st_resp]. (جانبی، بدون اثر بر حکم: st_resp هرگز پرچم نمی‌خورد چون r_resp_inquiry «stakes=زیاد» می‌خواهد و k2 «متوسط» رمز شده؛ اگر مالک بهای خطا را برای تیتر صفحهٔ اول «زیاد» بداند، k2.stakes متوسط→زیاد هم st_resp را می‌یابد — این را جداگانه تصمیم بگیرید.)"},"flagged":["st_tajrobe"],"id":"f_cs_b_dewey1948","kind":"mislocated","lastSeenRound":1,"note":"موتور درست کار کرده: تنها سقفی که شکسته شده r_tajrobe_hidden (۷۰، شرط s51: «اعتبار قوانین تجربی همواره مشروط به عدم دخالت عوامل پنهان») است و سقف استقراء ناقص (۸۰، s50: «حتی با افزایش شواهد به مرز یقین نمی‌رسد») با conf=90 و تحمل ۱۰ شکسته نمی‌شود. خودِ truth.why به همین عامل پنهانِ کنترل‌نشده با استناد به s51 تکیه می‌کند و رمزگذاری hidden_ctrl:false دارد، ولی st_tajrobe را در fail نیاورده؛ این با قرارداد پیکره (تالیدومید، تاکوما، آریان ۵، لوبوتومی: استقراء + hidden_ctrl:false ⇒ st_tajrobe در fail) ناسازگار است.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":13,"freshOk":13,"ids":["r2_cbs_killian_memos","r2_brian_williams_rpg","r2_chamberlain_hitler_face","r2_nyt_goddard_1920","r2_abs_startup_loi","r2_abs_desk_stablecoin","r4_wald_survivorship","r4_kahneman_instructors","r4_columbia_foam","r4_bre_x_busang","r4_yom_kippur_concept","r4_willingham_fire"],"since":1},"rules":["r_istiqra_incomplete","r_istiqra_small_n","r_resp_inquiry"],"secs":["s40","s50","s51","s6","s71","s80","s86"],"status":"verified","tier":"real","title":"«دیویی ترومن را شکست داد» (۱۹۴۸)","verified":"2026-10-13"},{"attribution":"برچسب حقیقت پرونده نادرست است","case":"cs_b_literarydigest","expected":["st_istiqra"],"fix":{"round":1,"type":"label","what":"truth.fail: [st_istiqra] → [st_istiqra, st_tajrobe]. یادداشت: معیار «نماینده بودن نمونه» که علت واقعی شکست است در جزوه نیست (ext ایستگاه st_istiqra: «معیارهای شمار، تنوع و نماینده بودن نمونه… افزودهٔ سامانه‌اند»)؛ اگر مالک بخواهد سوگیری نمونه زیر st_istiqra بنشیند، آن خلأ جزوه است و ویژگی/قاعدهٔ تازه می‌خواهد."},"flagged":["st_tajrobe"],"id":"f_cs_b_literarydigest","kind":"mislocated","lastSeenRound":1,"note":"همان سازوکار دیویی: با conf=90 فقط سقف r_tajrobe_hidden (۷۰) شکسته می‌شود؛ سقف استقراء ناقص ۸۰ است و s50 فقط می‌گوید ناقص «به مرز یقین نمی‌رسد»، پس در عدد ۹۰ خطای استقرایی محض دیده نمی‌شود. truth.why خودش علت را «عامل پنهان … کنترل نشده بود (s51)» می‌داند و hidden_ctrl:false رمز کرده، اما st_tajrobe را در fail نگذاشته؛ برچسب ناقص است (هم‌زاد سالمش cs_b_gallup1936 هم hidden_ctrl را برای همین استقراء رمز می‌کند).","opened":"2026-10-13","openedRound":1,"retest":{"fresh":5,"freshOk":5,"ids":["r4_wald_survivorship","r4_kahneman_instructors","r4_columbia_foam","r4_willingham_fire","r4_abs_survivor_shops"],"since":1},"rules":["r_istiqra_incomplete","r_istiqra_small_n"],"secs":["s40","s50","s51"],"status":"verified","tier":"real","title":"نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست","verified":"2026-10-14"},{"attribution":"خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","case":"cs_hrt_observational","expected":["st_tajrobe"],"fix":{"round":5,"what":"پیشنهادِ p_found_vazraf (پذیرفتهٔ مالک): r_tajrobe_no_vazraf ۸۰ ⇒ ۵۰ با قضیهٔ T_null"},"flagged":[],"id":"f_cs_hrt_observational","kind":"missed","lastSeenRound":4,"note":"s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است. — به‌روز (دورِ ۴): پیشنهادِ p_found_vazraf همین را با قضیهٔ T_null (حداکثر ½) بی عددِ قراردادیِ ۴۵ حل می‌کند و جایگزینِ p_tajrobe_none است.","opened":"2026-10-13","openedRound":1,"proposal":"p_tajrobe_none","retest":{"fresh":6,"freshOk":6,"ids":["r4_wald_survivorship","r4_kahneman_instructors","r4_columbia_foam","r4_willingham_fire","r4_abs_survivor_shops","r4_abs_lab_claim_replic"],"since":5},"rules":["r_tajrobe_ceiling","r_tajrobe_no_vazraf","r_tajrobe_hidden"],"secs":["s50","s51"],"status":"verified","tier":"real","title":"باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_lavoisier_acids","expected":["st_istiqra"],"fix":{"round":1,"type":"encoding","what":"claim k1, key ind_n: (نامعلوم) → 4 (اسیدهای گوگردی، فسفری، نیتریک و کربنیک که لاووازیه تا ۱۷۷۷ اکسیژن‌دار بودنشان را نشان داده بود؛ هر عدد <۱۰ همین اثر را دارد). نتیجه: r_istiqra_small_n سقف ۷۰، conf 85 > 80 ⇒ پرچم over در st_istiqra."},"flagged":[],"id":"f_cs_lavoisier_acids","kind":"missed","lastSeenRound":1,"note":"داستان و actor صریحاً می‌گویند حکم «از شمار محدودی اسید» (گوگردی، فسفری، نیتریک و…) گرفته شد، ولی ind_n رمز نشده؛ پس فقط r_istiqra_incomplete (۸۰؛ s50: «ارزش معرفتی استقراء ناقص حتی با افزایش شواهد به مرز یقین نمی‌رسد») فعال می‌شود و conf=85 زیر ۸۰+۱۰ می‌ماند. ویژگی ind_n دقیقاً برای همین بخش از s50 (ارزش استقراء «از منظر حساب احتمالات» با شمار موارد) ساخته شده است.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":1},"rules":["r_istiqra_incomplete","r_istiqra_small_n"],"secs":["s40","s50","s51"],"status":"verified","tier":"real","title":"لاووازیه: «همه اسیدها اکسیژن دارند»","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_flt_numeric","expected":[],"fix":{"round":6,"what":"conf: 60 ِ ساختگی از k2 برداشته شد؛ stmt ِ r_istiqra_next و r_istiqra_small_n با لفظِ s50 اصلاح شد"},"flagged":["st_istiqra"],"id":"f_cs_pb_flt_numeric","kind":"health_alarm","lastSeenRound":5,"note":"حل شد با خواندنِ کاملِ s50/s51 و پانوشت‌ها (۲۰۲۶-۱۰-۱۴): تناقضی در جزوه نبود. s50 فقط می‌گوید استقراءِ ناقص «حتی با افزایشِ شواهد به مرزِ یقین نمی‌رسد» و «به‌تنهایی نمی‌تواند ضرورت و قطعیتِ کلی را اثبات کند»؛ عبارتِ «با شواهد بالا می‌رود» برداشتِ سازنده بود (یادداشتِ r_istiqra_small_n). s51 علتش را می‌گوید: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر». پانوشتِ s50 (استنفورد) هم صریح است: حسابِ احتمالات دربارهٔ «مشاهده‌های آینده» است نه حکمِ کلی. پس دربارهٔ حکمِ کلیِ فرما، شمارِ چهار میلیون به‌تنهایی اطمینانِ معنادار نمی‌دهد. «۶۰٪» را خودِ پرونده «تقریبِ سامانه، نه ادعای پژوهشگران» می‌نامد؛ رفتارِ مستند (ثابت‌شده اعلام نکردند) همان سالم است. ⇒ عدد برداشته شد؛ متنِ دو قاعده با لفظِ جزوه درست شد.","opened":"2026-10-13","openedRound":5,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":6},"rules":["r_istiqra_universal"],"secs":["s50","s51"],"status":"verified","tier":"problem","title":"تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_greek_indiana","expected":["st_aql","st_expert"],"fix":{"round":1,"type":"encoding","what":"دو جزء لازم (هیچ‌کدام به‌تنهایی کافی نیست؛ در حافظه آزموده شد): (۱) رمزگذاری: claim k2, key conf: (نامعلوم) → 90 (تقریب سامانه از عمل تصویب، هم‌قرارداد روفینی/لژاندر)؛ (۲) برچسب: truth.fail [st_aql, st_expert] → [st_aql, st_expert, st_conflict]. فقط (۱): پرچم st_conflict ⇒ هنوز رد (مکان نادرست). یادداشت طراحی: موتور بیش‌اطمینانی را فقط به ایستگاه سقفِ تعیین‌کننده نسبت می‌دهد، پس st_aql و st_expert"},"flagged":[],"id":"f_cs_pb_greek_indiana","kind":"missed","lastSeenRound":1,"note":"هیچ‌یک از دو تصدیق conf ندارد و سقف‌ها فقط از راه «conf > سقف + تحمل» به پرچم بدل می‌شوند؛ پس با وجود سقف ۰ (r_conflict_cert)، ۲۵ (r_aql_matter_false، s40: «یقین … تنها زمانی حاصل می‌شود که هم مادهٔ استدلال صادق … باشد») و ۲۵ (r_expert_out_of_field، s49: «درجه تبحر، صلاحیت…») موتور کور است. پیکرهٔ مسائل ریاضی (روفینی، لژاندر، وایتهد) برای ادعای منتشر/عمل‌شده conf تقریبی ۹۰ می‌گذارد؛ مجلس با تصویب لایحه‌ای که روش را «حقیقت ریاضی» می‌خواند بر k2 عمل کرد (acted:true). با conf، سخت‌ترین سقف r_conflict_cert است و پرچم در st_conflict می‌نشیند — که خود truth.why («با برهان قطعی (لیندمان) ناسازگار بود","opened":"2026-10-13","openedRound":1,"retest":{"fresh":8,"freshOk":8,"ids":["r2_cbs_killian_memos","r2_chamberlain_hitler_face","r2_central_park_five","r2_nyt_goddard_1920","r2_abs_desk_stablecoin","r4_bre_x_busang","r4_yom_kippur_concept","r4_willingham_fire"],"since":1},"rules":["r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_expert_method_weak","r_expert_out_of_field","r_expert_comp_unknown","r_expert_bias"],"secs":["s40","s44","s49","s50"],"status":"verified","tier":"problem","title":"لایحه π ایندیانا (۱۸۹۷)","verified":"2026-10-13"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_long_h4","expected":[],"fix":{"round":1,"type":"encoding","what":"claim k1, key ind_complete: (نامعلوم) → true. نتیجه: r_istiqra_small_n (شرط not ind_complete) خاموش، سقف ۹۵ از r_tajrobe_ceiling، conf 90 ⇒ بی‌پرچم، سالم. (جایگزین هم‌ارز: حذف ind_n، چون راه «تجربه» است نه استقراء؛ ind_complete:true به لفظ s50 نزدیک‌تر است.)"},"flagged":["st_istiqra"],"id":"f_cs_pb_long_h4","kind":"health_alarm","lastSeenRound":1,"note":"هشدار سلامت مشروع نیست: r_istiqra_small_n (ind_n=2 < 10، vazraf نامعلوم) روی k1 سقف ۷۰ گذاشت و conf=90 ⇒ پرچم over در st_istiqra. اما حکم، به تصریح truth.why، «درباره همین دستگاه در همین آزمون‌ها بود (نه تعمیم به روش)»؛ مجموعه محدود و همه اعضایش بررسی شده، یعنی استقراء تام که طبق s50 «نتیجه آن قطعی و دارای اعتبار صددرصدی است» (مثال ایستگاه: «۲۴ قسط گذشته … استقراء تام»). رمزگذار ind_n را گذاشت ولی ind_complete:true را جا انداخت.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":3,"freshOk":3,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_abs_survivor_shops"],"since":1},"rules":["r_istiqra_small_n"],"secs":["s50"],"status":"verified","tier":"problem","title":"آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"cs_pb_poinc_1900","expected":["st_aql"],"fix":{"round":1,"type":"encoding","what":"claim k1, key conf: (نامعلوم) → 90 (تقریب سامانه از ادعای منتشرشده، هم‌قرارداد cs_pb_quintic_ruffini/cs_pb_par_legendre) و جملهٔ «conf رمزگذاری نشده» در truth.why اصلاح شود. نتیجه: 90 > 45+10 ⇒ پرچم over در st_aql (r_aql_matter_unproven)."},"flagged":[],"id":"f_cs_pb_poinc_1900","kind":"missed","lastSeenRound":1,"note":"r_aql_matter_unproven درست فعال شد (سقف ۴۵؛ s40: مقدمات «باید … از طریق سلسله‌مراتب به بدیهیات منتهی شوند»، s44: «اعتبار صوری برهان به‌تنهایی کافی نیست»)، ولی چون conf رمز نشده هیچ پرچمی ساخته نمی‌شود. truth.why می‌گوید «چون شدت اطمینانش مستند نیست، conf رمزگذاری نشده»، اما پوانکاره حکم را در «مکمل دوم» (۱۹۰۰) منتشر و «ادعا کرد» و truth.right بدیلش را «طرح به‌صورت پرسش یا حدس» می‌داند؛ پیکرهٔ هم‌خانواده (روفینی، لژاندر، وایتهد: «عدد اطمینان تقریب سامانه از رفتار انتشار است») در همین وضع conf≈۹۰ می‌گذارد.","opened":"2026-10-13","openedRound":1,"retest":{"fresh":5,"freshOk":5,"ids":["r2_chamberlain_hitler_face","r2_central_park_five","r2_nyt_goddard_1920","r2_abs_desk_stablecoin","r4_yom_kippur_concept"],"since":1},"rules":["r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false"],"secs":["s40","s44","s50"],"status":"verified","tier":"problem","title":"ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)","verified":"2026-10-13"},{"attribution":"خلأ پیاده‌سازی (ملاک هست، قاعده نیست)","case":"r2_nyt_goddard_1920","expected":["st_aql","st_grade","st_resp"],"fix":{"round":5,"what":"p_found_half + p_found_scope (پذیرفتهٔ مالک): هر سقفِ گذشته‌شده ایستگاهش پرچم می‌خورد؛ گسترهٔ «کلی نامحدود» ⇒ قضیهٔ T_universal"},"flagged":["st_conflict"],"id":"f_r2_nyt_goddard_1920","kind":"mislocated","lastSeenRound":4,"note":" — دورِ ۵: فقط کمینهٔ سقف‌ها مقصر شمرده می‌شد و حکمِ کلی از استقراء سقفِ قضیه‌ای نداشت (s51).","opened":"2026-10-13","openedRound":3,"retest":{"fresh":5,"freshOk":5,"ids":["r4_wald_survivorship","r4_columbia_foam","r4_bre_x_busang","r4_yom_kippur_concept","r4_willingham_fire"],"since":5},"rules":["r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_grade_false_zero","r_resp_inquiry"],"secs":["s40","s44","s50","s6","s71","s80","s86"],"status":"verified","tier":"real","title":"سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹","verified":"2026-10-14"},{"attribution":"خطای رمزگذاری پرونده","case":"r4_redfield_arsenic","expected":[],"fix":null,"flagged":["st_expert"],"id":"f_r4_redfield_arsenic","kind":"health_alarm","lastSeenRound":9,"note":"رمزگذارِ کور «کارشناسِ ذی‌اعتبار با روشِ ضعیف» (x_method=ضعیف) را به مسیرِ خودِ کنشگر نسبت داده بود؛ ولی در داستان، کنشگر (ردفیلد) به رأی کارشناسی اتکا نکرد بلکه خودش روشِ مقاله را نقد و بازآزمایی کرد؛ «روشِ ضعیف» ویژگیِ مقالهٔ مورد نقد است نه راهِ معرفتِ کنشگر. راه ⇒ عقل (s49: اعتبارِ استناد به کارشناس فقط وقتی مطرح است که به او اتکا شود).","opened":"2026-10-14","openedRound":9,"resolved":"2026-10-14","resolvedNote":"بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد","retest":{"fresh":0,"freshOk":0,"ids":[],"since":9},"rules":["r_expert_method_weak"],"secs":["s49"],"status":"resolved","tier":"real","title":"میکروب «آرسنیک‌زی» GFAJ-1 و نقد و بازآزمایی ردفیلد (۲۰۱۰–۲۰۱۲)"}],"round":11,"updated":"2026-10-14"},"foundation":{"at":"2026-10-14","audit":[],"base":{"p_expert_bias":{"fa":"درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_hidden_factor":{"fa":"درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_hidden_inf":{"fa":"درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_mem":{"fa":"وثاقتِ حافظهٔ سنجیده‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_mubham_q":{"fa":"درستیِ معنای مبهم با قرینهٔ همسو","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_sense_unctrl":{"fa":"درستیِ حکمِ حسی در شرایطِ کنترل‌نشده","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_thiqa":{"fa":"صدقِ گزارشِ یک ناقلِ ثقه","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0},"p_zahir":{"fa":"درستیِ معنای ظاهر بی‌قرینهٔ همسو","frames":0,"hi":null,"lo":null,"measured":false,"n":0,"ok":0,"p":50,"rejected":0}},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"impacts":{"p_found_half":{"broken":[],"ceilings":0,"extra":[],"fixed":[],"fullAfter":109,"fullBefore":109,"refined":[],"rules":25},"p_found_scope":null,"p_found_vazraf":{"broken":[],"ceilings":0,"extra":[],"fixed":[],"fullAfter":109,"fullBefore":109,"refined":[],"rules":1}},"modes":{"both":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"deg":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"derived":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"num":{"changed":[],"kinds":{"health_alarm":0,"mislocated":0,"missed":0,"ok":195}}},"round":11,"rules":[{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد","id":"r_core_interp_notcert","k":"O","note":"لایهٔ تفسیرِ حصولی «اعتبارِ مطلق ندارد» (s42)","sec":["s42","s19"],"st":"st_core","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_sense_unctrl","baseFa":"درستیِ حکمِ حسی در شرایطِ کنترل‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ حکمِ حسی در شرایطِ کنترل‌نشده» = 50","consistent":true,"conventional":false,"fa":"حس بدون کنترل شرایط","id":"r_hiss_uncontrolled","k":"S","note":"","sec":["s43","s46"],"st":"st_hiss","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_hidden_inf","baseFa":"درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده» = 50","consistent":true,"conventional":false,"fa":"استنتاج پنهان عادتی بی‌آزمون","id":"r_hiss_hidden_inf","k":"S","note":"","sec":["s43","s46","s19"],"st":"st_hiss","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"صورت استدلال نامعتبر","id":"r_aql_invalid_form","k":"B","note":"صورتِ نامعتبر چیزی نمی‌افزاید؛ «لزوماً کاذب نیست» (s40)","sec":["s40","s44"],"st":"st_aql","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"قالب غیرقیاسی یقین‌آور نیست","id":"r_aql_nondeductive","k":"O","note":"قالبِ غیرقیاسی «یقین‌آور نیست» (s40) — برای حکمِ کلی بر دامنهٔ نامحدود ر.ک. T_universal","sec":["s40","s50"],"st":"st_aql","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"مقدمه اثبات‌نشده","id":"r_aql_matter_unproven","k":"B","note":"","sec":["s40","s44"],"st":"st_aql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"مقدمه کاذب","id":"r_aql_matter_false","k":"B","note":"مادهٔ کاذب این استدلال را بی‌اثر می‌کند، نه نتیجه را کاذب","sec":["s40"],"st":"st_aql","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"صدور خبر احراز نشده","id":"r_naql_not_issued","k":"B","note":"","sec":["s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"گزارشگر غیرموثق، بی‌قرینه همسو","id":"r_naql_unreliable","k":"B","note":"گزارشِ ناموثق پشتوانه نیست؛ نتیجه به حالِ بی‌دلیل برمی‌گردد","sec":["s47","s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"گزارشگر غیرموثق با قرینه همسو","id":"r_naql_unreliable_corrob","k":"B","note":"قرینهٔ همسو گزارشِ ناموثق را ثقه نمی‌کند؛ بی‌دلیلِ مستقل، تقارن","sec":["s47","s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"وثاقت گزارشگر نامعلوم","id":"r_naql_narrator_unknown","k":"B","note":"","sec":["s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"زنجیره طولی با حلقه مجهول","id":"r_naql_chain_broken","k":"B","note":"حلقهٔ نامعلوم ≤ ½ (T_unknown) و زنجیره ≤ ضعیف‌ترین حلقه — «اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌سازد» (s47)","sec":["s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":"p_thiqa","baseFa":"صدقِ گزارشِ یک ناقلِ ثقه","cap":50,"capDeg":"shakk","capText":"پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50","consistent":true,"conventional":false,"fa":"خبر واحد یقین‌آور نیست","id":"r_naql_ahad","k":"S","note":"خبرِ واحد < ۱؛ مقدارش وثاقتِ ناقل","sec":["s48","s47"],"st":"st_naql","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_thiqa","baseFa":"صدقِ گزارشِ یک ناقلِ ثقه","cap":50,"capDeg":"shakk","capText":"پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50","consistent":true,"conventional":false,"fa":"خبر واحد بی‌قرینه","id":"r_naql_no_qarina","k":"S","note":"","sec":["s47","s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":"<50","cap":49.9,"capDeg":"wahm","capText":"کمتر از ۵۰","consistent":true,"conventional":false,"fa":"قرینه خلاف","id":"r_naql_contra_qarina","k":"B","note":"کمتر از ½ (قرینه به سودِ نقیض)؛ کوچک‌ترین گامِ زیرِ ½","sec":["s47","s53"],"st":"st_naql","stricterThanTheorem":false,"th":"T_against","thFa":"قرینهٔ خلاف ⇒ کمتر از ½"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"دلالت غیرنص یقین‌آور نیست","id":"r_naql_nonnass","k":"O","note":"غیرنص «احتمالِ خلاف» دارد (s48)","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":"p_zahir","baseFa":"درستیِ معنای ظاهر بی‌قرینهٔ همسو","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ معنای ظاهر بی‌قرینهٔ همسو» = 50","consistent":true,"conventional":false,"fa":"ظاهر بدون قرینه همسو","id":"r_naql_zahir_noq","k":"S","note":"","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"دلالت مبهم بدون قرینه همسو","id":"r_naql_mubham_noq","k":"B","note":"","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_ambig","thFa":"لفظِ چندمعنا بی‌قرینه ⇒ حداکثر ½"},{"base":"p_mubham_q","baseFa":"درستیِ معنای مبهم با قرینهٔ همسو","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ معنای مبهم با قرینهٔ همسو» = 50","consistent":true,"conventional":false,"fa":"دلالت مبهم با قرینه همسو","id":"r_naql_mubham_q","k":"S","note":"","sec":["s48"],"st":"st_naql","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"روش کارشناس ضعیف یا نامعلوم","id":"r_expert_method_weak","k":"B","note":"","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"کارشناس بیرون از حوزه تخصص","id":"r_expert_out_of_field","k":"B","note":"تخصص در حوزهٔ دیگر برای این حکم پشتوانه نیست","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"صلاحیت کارشناس نامعلوم","id":"r_expert_comp_unknown","k":"B","note":"","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_unknown","thFa":"شرطِ احرازنشده ⇒ حداکثر ½"},{"base":"p_expert_bias","baseFa":"درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند» = 50","consistent":true,"conventional":false,"fa":"تعارض منافع یا ناپایبندی کارشناس","id":"r_expert_bias","k":"S","note":"اعتبار = اعتبارِ روش × پایبندیِ کارشناس (s49)","sec":["s49"],"st":"st_expert","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"استقراء ناقص هرگز یقینی نیست","id":"r_istiqra_incomplete","k":"O","note":"گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — بی‌دانستنِ گستره (کلی یا موردِ بعدی) قضیه فقط «کمتر از یقین» می‌گوید (s50)","sec":["s50","s40","s51"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":"→0","cap":0.1,"capDeg":"wahm","capText":"→۰ (صفرِ حدی)","consistent":true,"conventional":false,"fa":"حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص","id":"r_istiqra_universal","k":"B","note":"صفرِ حدی (کوچک‌ترین مقدارِ مثبت) — «لزوماً کاذب نیست» (s40)؛ هر اطمینانِ مثبتی بیش از توجیه است","sec":["s51","s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_universal","thFa":"حکمِ کلی از استقراءِ ناقص بر دامنهٔ نامحدود ⇒ نزدیک به صفر"},{"base":null,"baseFa":"","bound":"100(n+1)/(M+1)","cap":50,"capDeg":"shakk","capText":"۱۰۰×(n+1)/(M+1)","consistent":true,"conventional":false,"fa":"حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص","id":"r_istiqra_finite","k":"B","note":"عدد از n و M ِ همان تصدیق","sec":["s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_finite","thFa":"حکمِ کلی بر مجموعهٔ معینِ M عضوی پس از n موافق ⇒ (n+1)/(M+1)"},{"base":null,"baseFa":"","bound":"100(n+1)/(n+2)","cap":67,"capDeg":"zann","capText":"۱۰۰×(n+1)/(n+2)","consistent":true,"conventional":false,"fa":"پیش‌بینیِ موردِ بعدی از استقراءِ ناقص","id":"r_istiqra_next","k":"B","note":"عدد از n ِ همان تصدیق","sec":["s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_next","thFa":"موردِ بعدی پس از n موردِ موافق ⇒ (n+1)/(n+2)"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"استقراء ناقص با موارد اندک","id":"r_istiqra_small_n","k":"O","note":"گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — «کمتر از یقین» (s50)","sec":["s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":"<100","cap":99.9,"capDeg":"zann","capText":"کمتر از ۱۰۰","consistent":true,"conventional":false,"fa":"تجربه به پای برهان و شهود نمی‌رسد","id":"r_tajrobe_ceiling","k":"O","note":"«به پای براهینِ محضِ عقلی یا شهود نمی‌رسد» (s51)","sec":["s51"],"st":"st_tajrobe","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"تجربه بدون وضع و رفع ≈ استقراء ناقص","id":"r_tajrobe_no_vazraf","k":"B","note":"جزوه تجربهٔ بی وضع‌ورفع را «تکرارِ داده‌های حسی» می‌داند که «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» (s51) ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر شک (½). سقفِ قبلی ۸۰ (ظن) ناسازگار بود؛ مالک ۲۰۲۶-۱۰-۱۳ پیشنهادِ p_found_vazraf را پذیرفت.","sec":["s51","s50"],"st":"st_tajrobe","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":"p_hidden_factor","baseFa":"درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50","consistent":true,"conventional":false,"fa":"عوامل پنهان کنترل نشده","id":"r_tajrobe_hidden","k":"S","note":"","sec":["s51"],"st":"st_tajrobe","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_hidden_factor","baseFa":"درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده","cap":50,"capDeg":"shakk","capText":"پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50","consistent":true,"conventional":false,"fa":"استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده","id":"r_istiqra_hidden","k":"S","note":"همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)","sec":["s51","s50"],"st":"st_istiqra","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":"mem_orig","cap":25,"capDeg":"wahm","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (≤۲۵)","id":"r_yad_orig_t1","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":50,"capDeg":"shakk","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۲۶–۵۰)","id":"r_yad_orig_t2","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":70,"capDeg":"zann","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۵۱–۷۰)","id":"r_yad_orig_t3","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":85,"capDeg":"zann","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۷۱–۸۵)","id":"r_yad_orig_t4","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":null,"baseFa":"","bound":"mem_orig","cap":95,"capDeg":"zann","capText":"≤ معرفتِ نخستین","consistent":true,"conventional":false,"fa":"یادآوری معرفت غیریقینی، یقینی نمی‌شود (۸۶–۹۹)","id":"r_yad_orig_t5","k":"B","note":"یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_weakest","thFa":"زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه با سند یا واقعیت بیرونی سنجیده نشده","id":"r_yad_undoc","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ۷۱–۸۵","id":"r_yad_undoc_t4","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ۵۱–۷۰","id":"r_yad_undoc_t3","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ۲۶–۵۰","id":"r_yad_undoc_t2","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":"p_mem","baseFa":"وثاقتِ حافظهٔ سنجیده‌نشده","cap":50,"capDeg":"shakk","capText":"معرفتِ نخستین × وثاقتِ حافظه (50)","consistent":true,"conventional":false,"fa":"حافظه سنجیده‌نشده × معرفت نخستین ≤۲۵","id":"r_yad_undoc_t1","k":"S","note":"= معرفتِ نخستین × وثاقتِ حافظه (s52)","sec":["s52"],"st":"st_yad","stricterThanTheorem":false,"th":"T_product","thFa":"شرط‌های مستقل ⇒ حاصل‌ضرب"},{"base":null,"baseFa":"","bound":0,"cap":0,"capDeg":"kidhb","capText":"0","consistent":true,"conventional":false,"fa":"ناسازگار با معرفت یقینی","id":"r_conflict_cert","k":"B","note":"","sec":["s53","s40"],"st":"st_conflict","stricterThanTheorem":false,"th":"T_conflict","thFa":"تعارض با یقینی ⇒ صفر"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"پیش‌زمینه بایسته فراهم نبود","id":"r_bg_missing","k":"B","note":"بی پیش‌زمینهٔ بایسته فهمِ مقصود احراز نشده","sec":["s70","s69"],"st":"st_background","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":null,"baseFa":"","bound":50,"cap":50,"capDeg":"shakk","capText":"50","consistent":true,"conventional":false,"fa":"منبع دینی ضعیف یا بی‌سند","id":"r_r_sanad_weak","k":"B","note":"","sec":["s73","s87","s47"],"st":"st_r_sources","stricterThanTheorem":false,"th":"T_null","thFa":"استدلالِ بی‌پشتوانه ⇒ هیچ نمی‌افزاید"},{"base":"p_thiqa","baseFa":"صدقِ گزارشِ یک ناقلِ ثقه","cap":50,"capDeg":"shakk","capText":"پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50","consistent":true,"conventional":false,"fa":"خبر واحد موثق دینی یقین‌آور نیست","id":"r_r_sanad_ahad","k":"S","note":"","sec":["s73","s48","s74"],"st":"st_r_sources","stricterThanTheorem":false,"th":"T_below1","thFa":"راهِ غیرِ برهانی ⇒ کمتر از یک"}],"samples":0,"suff":{"z":1.96}},"ledger":{"rounds":[{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.957,"negAgree":0.348,"negOk":true,"posDetect":1,"posOk":true},"detected":104,"failures":108,"fullyLocated":85,"healthAlarms":1,"located":102,"n":169,"sound":61}},"corpus":{"files":0,"n":169,"new":0,"tiers":{"booklet":51,"problem":26,"real":92}},"coverage":{"byDomain":{"بازار و معامله":4,"تاریخ و سیاست":9,"حقوق و قضا":8,"دین":19,"رسانه و خبر":7,"ریاضی":28,"زندگی روزمره":13,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":9,"پزشکی":20},"domains":12,"rules":69,"rulesTested":49,"sections":72,"sectionsTested":54,"untested":["r_tasdiq_nonclaim","r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_chain_broken","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_herm_meaning_sig","r_r_sanad_ahad"]},"findings":{"fixed":0,"open":7,"resolved":0,"verified":0},"note":"دورِ پایه: فقط پیکرهٔ بذر (۱۶۹ مورد)","round":1},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.989,"negAgree":0.337,"negOk":true,"posDetect":1,"posOk":true},"detected":107,"failures":108,"fullyLocated":87,"healthAlarms":0,"located":107,"n":169,"sound":61}},"corpus":{"files":0,"n":169,"new":0,"tiers":{"booklet":51,"problem":26,"real":92}},"coverage":{"byDomain":{"بازار و معامله":4,"تاریخ و سیاست":9,"حقوق و قضا":8,"دین":19,"رسانه و خبر":7,"ریاضی":28,"زندگی روزمره":13,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":9,"پزشکی":20},"domains":12,"rules":69,"rulesTested":49,"sections":72,"sectionsTested":54,"untested":["r_tasdiq_nonclaim","r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_chain_broken","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_herm_meaning_sig","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":1,"resolved":0,"verified":0},"note":"دورِ ۱ ِ تشخیص: ۶ اصلاحِ سازنده (برچسب/رمزگذاری) + ۱ پیشنهادِ قاعده برای مالک","round":2},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.981,"negAgree":0.389,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":90,"healthAlarms":0,"located":115,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":16,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":69,"rulesTested":52,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":2,"resolved":0,"verified":0},"note":"دورِ ۳: ۱۶ موردِ تازه (۶ شکستِ واقعی، ۶ سالمِ واقعی، ۴ انتزاعی) با رمزگذاریِ کور","round":3},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":0.981,"negAgree":0.389,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":90,"healthAlarms":0,"located":115,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":69,"rulesTested":52,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":2,"resolved":0,"verified":0},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":21,"O":4,"S":14,"X":3},"modes":{"both":{"changed":9,"health_alarm":0,"mislocated":1,"missed":8,"ok":176},"deg":{"changed":10,"health_alarm":0,"mislocated":1,"missed":11,"ok":173},"derived":{"changed":1,"health_alarm":0,"mislocated":1,"missed":0,"ok":184},"num":{"changed":0,"health_alarm":0,"mislocated":1,"missed":1,"ok":183}}},"note":"دورِ ۴: مبنای درجه‌ها — هر سقف به قضیه/پایه/ترتیبی/ناسازگار؛ بی واقعهٔ تازه","round":4},{"at":"2026-10-13","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":101,"healthAlarms":1,"located":116,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":72,"rulesTested":53,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":5,"open":2,"resolved":0,"verified":3},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":25,"O":4,"S":14,"X":2},"modes":{"both":{"changed":3,"health_alarm":1,"mislocated":0,"missed":4,"ok":180},"deg":{"changed":3,"health_alarm":1,"mislocated":0,"missed":4,"ok":180},"derived":{"changed":0,"health_alarm":1,"mislocated":0,"missed":1,"ok":183},"num":{"changed":0,"health_alarm":1,"mislocated":0,"missed":1,"ok":183}}},"note":"دورِ ۵: اعمالِ p_found_half و p_found_vazraf (پذیرفتهٔ مالک) و ساختِ p_found_scope (گسترهٔ ادعا، سه سقفِ قضیه‌ای، رمزگذاریِ کور)","round":5},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":116,"failures":117,"fullyLocated":101,"healthAlarms":0,"located":116,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":72,"rulesTested":53,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":6,"open":1,"resolved":0,"verified":3},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":25,"O":4,"S":14,"X":2},"modes":{"both":{"changed":3,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"deg":{"changed":3,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":1,"ok":184},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":1,"ok":184}}},"note":"دورِ ۶: تناقضِ ظاهریِ s50/s51 حل شد — «با شواهد بالا می‌رود» برداشتِ سازنده بود؛ «۶۰٪» ِ فرما عددِ ساختگی","round":6},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":117,"failures":117,"fullyLocated":103,"healthAlarms":0,"located":117,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":7,"open":0,"resolved":0,"verified":3},"foundation":{"baseSufficient":0,"baseTotal":8,"classes":{"?":0,"B":25,"O":4,"S":15,"X":2},"modes":{"both":{"changed":4,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"deg":{"changed":4,"health_alarm":0,"mislocated":0,"missed":4,"ok":181},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185}}},"note":"دورِ ۷: اعمالِ p_case_chicken (پذیرفتهٔ مالک) — ملاکِ عاملِ پنهان (s51) در ایستگاهِ استقراء","round":7},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.398,"negOk":true,"posDetect":1,"posOk":true},"detected":117,"failures":117,"fullyLocated":106,"healthAlarms":0,"located":117,"n":185,"sound":68}},"corpus":{"files":1,"n":185,"new":0,"tiers":{"abstract":4,"booklet":51,"problem":26,"real":104}},"coverage":{"byDomain":{"بازار و معامله":5,"تاریخ و سیاست":11,"حقوق و قضا":12,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":17,"فلسفه":21,"فناوری و مهندسی":14,"مالی و بانکی":11,"پزشکی":20},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":7,"open":0,"resolved":0,"verified":3},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"deg":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":185}},"samples":0},"note":"دورِ ۸: هیچ عددِ قراردادی — سقف‌های پایه‌ای ⇒ (k+1)/(n+2) ِ نمونه‌های بی‌گزینش (بی‌داده ۵۰)، ترتیبی‌ها ⇒ «کمتر از یقین»، تحمل ⇒ ۰؛ مسیرِ سنجش، مسیرِ «فراتر از جزوه»، نگهبان‌ها","round":8,"routine":{"alarms":["این دور نه واقعهٔ تازه داشت نه نمونهٔ بی‌گزینشِ تازه"],"newEvents":0,"newSamples":0,"staleFindings":[]}},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":0.992,"negAgree":0.322,"negOk":true,"posDetect":1,"posOk":true},"detected":124,"failures":124,"fullyLocated":109,"healthAlarms":1,"located":124,"n":195,"sound":71}},"corpus":{"files":2,"n":195,"new":10,"tiers":{"abstract":6,"booklet":51,"problem":26,"real":112}},"coverage":{"byDomain":{"بازار و معامله":7,"تاریخ و سیاست":12,"حقوق و قضا":13,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":20,"فلسفه":21,"فناوری و مهندسی":16,"مالی و بانکی":11,"پزشکی":21},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":1,"open":1,"resolved":0,"verified":9},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194},"deg":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194},"derived":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194},"num":{"changed":0,"health_alarm":1,"mislocated":0,"missed":0,"ok":194}},"samples":0},"note":"دورِ ۹: ۱۰ واقعهٔ تازه (۷ شکست، ۲ سالم، ۱ سالمِ انتزاعی…)؛ بدون قاب","round":9,"routine":{"alarms":[],"newEvents":10,"newSamples":0,"staleFindings":[]}},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.322,"negOk":true,"posDetect":1,"posOk":true},"detected":124,"failures":124,"fullyLocated":109,"healthAlarms":0,"located":124,"n":195,"sound":71}},"corpus":{"files":2,"n":195,"new":0,"tiers":{"abstract":6,"booklet":51,"problem":26,"real":112}},"coverage":{"byDomain":{"بازار و معامله":7,"تاریخ و سیاست":12,"حقوق و قضا":13,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":20,"فلسفه":21,"فناوری و مهندسی":16,"مالی و بانکی":11,"پزشکی":21},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":0,"open":0,"resolved":1,"verified":10},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"deg":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"samples":0},"note":"دورِ ۹ (پس از اصلاحِ رمزگذاریِ ردفیلد)","round":10,"routine":{"alarms":["این دور نه واقعهٔ تازه داشت نه نمونهٔ بی‌گزینشِ تازه"],"newEvents":0,"newSamples":0,"staleFindings":[]}},{"at":"2026-10-14","books":{"mesbah":{"controls":{"agree":1,"negAgree":0.322,"negOk":true,"posDetect":1,"posOk":true},"detected":124,"failures":124,"fullyLocated":109,"healthAlarms":0,"located":124,"n":195,"sound":71}},"corpus":{"files":2,"n":195,"new":0,"tiers":{"abstract":6,"booklet":51,"problem":26,"real":112}},"coverage":{"byDomain":{"بازار و معامله":7,"تاریخ و سیاست":12,"حقوق و قضا":13,"دین":19,"رسانه و خبر":12,"ریاضی":28,"زندگی روزمره":15,"علم":20,"فلسفه":21,"فناوری و مهندسی":16,"مالی و بانکی":11,"پزشکی":21},"domains":12,"rules":73,"rulesTested":54,"sections":72,"sectionsTested":54,"untested":["r_truth_narrow","r_badihi_pseudo","r_badihi_wijdani_other","r_shohud_misrouted","r_naql_unreliable_corrob","r_naql_mubham_q","r_istiqra_finite","r_istiqra_small_n","r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1","r_grade_false_zero","r_r_sanad_ahad"]},"findings":{"fixed":0,"open":0,"resolved":1,"verified":10},"foundation":{"audit":0,"baseChanges":[],"baseMeasured":0,"baseTotal":8,"baseval":{"p_expert_bias":50,"p_hidden_factor":50,"p_hidden_inf":50,"p_mem":50,"p_mubham_q":50,"p_sense_unctrl":50,"p_thiqa":50,"p_zahir":50},"classes":{"?":0,"B":25,"O":6,"S":15,"X":0},"conventional":0,"modes":{"both":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"deg":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"derived":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195},"num":{"changed":0,"health_alarm":0,"mislocated":0,"missed":0,"ok":195}},"samples":0},"note":"دورِ ۱۱: نقشهٔ کاملِ قلمروِ معرفت‌شناسی (۱۴ گروه، ۱۰۸ حوزه) — ۳۳ حوزهٔ جزوه خودکار در گامِ ۴؛ ناظرِ ناظر؛ --rerun","round":11,"routine":{"alarms":["این دور نه واقعهٔ تازه داشت نه نمونهٔ بی‌گزینشِ تازه","در این دور هیچ حوزه‌ای از نقشهٔ قلمرو یک گام جلو نرفت","بازبینیِ مستقلِ دورِ 10 (ناظرِ ناظر) ثبت نشده"],"newEvents":0,"newSamples":0,"staleFindings":[]},"territory":{"areas":108,"bookOnly":33,"byStage":[75,0,0,0,33,0],"groups":14,"max":540,"moved":[],"score":132}}]},"proposals":{"proposals":[{"evidence":"آزموده در حافظه روی همهٔ ۱۶۹ موردِ بذر: فقط حکمِ HRT عوض می‌شود (شکستِ دیده‌نشده ⇒ در ایستگاهِ درست)؛ ۴ موردِ دیگر سقفِ پایین‌تر می‌گیرند بی تغییرِ پرچم یا حکم. جایگزین‌های ردشده: پایین‌آوردنِ سقفِ r_tajrobe_hidden به ۴۵ (۶ موردِ دیگر پرچمِ تازه می‌گیرند)؛ بالا بردنِ اطمینانِ HRT به ۸۵ (تنظیمِ مورد برای قبول‌شدن، بی منبع).","finding":"f_cs_hrt_observational","id":"p_tajrobe_none","supersededBy":"p_found_vazraf","title":"قاعدهٔ تازه «تجربهٔ بی وضع‌ورفع و بی کنترلِ عاملِ پنهان» در ایستگاهِ تجربه (سقف ۴۵)","why":"جزوه (s51) دو شرط برای قانونِ تجربی می‌گذارد — آزمودنِ شروط «از راهِ وضع و رفع» و «عدمِ دخالتِ عواملِ پنهان» — و می‌گوید «تکرارِ داده‌های حسی به‌تنهایی قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست». وقتی هیچ‌کدام احراز نشده (مثلِ باور به اثرِ محافظتیِ درمانِ هورمونی از مطالعاتِ مشاهده‌ای)، قاعده‌های کنونی فقط سقفِ ۷۰ می‌دهند و ادعای ۸۰٪ پرچم نمی‌خورد. پیشنهاد: when {way=تجربه, vazraf=false, hidden_ctrl=false} ⇒ سقفِ ۴۵ («شرطِ اعتبار احراز نشده ⇒ ۴۵»، همان اصلِ خودِ قاعده‌ها)."},{"applied":"2026-10-13","appliedWhat":"سقف‌های ۲۵/۴۵ ِ ۱۴ قاعده ⇒ ۵۰؛ هر سقفی که اطمینان از آن گذشته ایستگاهش پرچم می‌خورد (نه فقط کمینه)","evidence":"سنجیده در حافظه روی همهٔ 185 موردِ پیکره: 21 قاعده، سقفِ 66 تصدیق عوض می‌شود؛ شکستِ تازه‌دیده/درست‌شده 0؛ حکمِ درستِ خراب‌شده 0؛ کاملاً در جای درست 90 ⇒ 93 (پرتوهای N بلوندلو، سالی کلارک و «یک در ۷۳ میلیون»، میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴)؛ پرچمِ اضافه/کم بی تغییرِ حکم: «دست انسان، انسان است»: خلط کلی و کل.","id":"p_found_half","source":"foundation","title":"سقف‌های «بدیهی‌پایه» = کرانِ قضیه: «حداکثر شک (½)» به‌جای ۲۵ و ۴۵ ِ قراردادی","why":"قضیه‌های T_unknown/T_null/T_ambig/T_weakest (از امتناعِ تناقض، «کل از جزء بزرگ‌تر»، بازهٔ ۰..۱ و امتناعِ ترجیحِ بلامرجح) فقط می‌گویند «حداکثر ½»؛ ۲۵ و ۴۵ هیچ برهانی ندارند — ۴۵ یعنی «وهم» (ترجیح به سودِ نقیض) بی‌آن‌که دلیلی نقیض را ترجیح دهد، و جزوه می‌گوید چنین تصدیقی «لزوماً کاذب نیست» (s40). وقتی چند شرط هم‌زمان به ½ می‌رسند، هر کدام به‌تنهایی دلیلِ بیش‌اطمینانی است ⇒ ایستگاهِ همه پرچم می‌خورد (نه فقط اولی)."},{"applied":"2026-10-13","appliedWhat":"r_tajrobe_no_vazraf ۸۰ ⇒ ۵۰","evidence":"سنجیده در حافظه روی همهٔ 185 موردِ پیکره: 1 قاعده، سقفِ 8 تصدیق عوض می‌شود؛ شکستِ تازه‌دیده/درست‌شده 1 (باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای)؛ حکمِ درستِ خراب‌شده 0؛ کاملاً در جای درست 90 ⇒ 94 (پرتوهای N بلوندلو، سالی کلارک و «یک در ۷۳ میلیون»، میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴)؛ پرچمِ اضافه/کم بی تغییرِ حکم: مقاله ویکفیلد درباره واکسن MMR و اوتیسم، لوکوتومی پیشانی مونیز و گسترش لوبوتومی.","finding":"f_cs_hrt_observational","id":"p_found_vazraf","source":"foundation","supersedes":"p_tajrobe_none","title":"تجربهٔ بی وضع‌ورفع: «حداکثر شک (½)» به‌جای ۸۰ (ظن) — قضیهٔ T_null","why":"جزوه (s51): تکرارِ داده‌های حسیِ بی وضع‌ورفع «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر ½. این همان مشکلِ HRT را بی عددِ قراردادیِ ۴۵ (پیشنهادِ p_tajrobe_none) حل می‌کند و جای آن را می‌گیرد."},{"applied":"2026-10-13","appliedWhat":"ویژگیِ scope/dom_n، سه قاعدهٔ قضیه‌ای r_istiqra_universal/finite/next، رمزگذاریِ کورِ ۱۹ تصدیق؛ r_istiqra_incomplete/small_n فقط برای تصدیقِ بی‌گستره","evidence":"اعمال‌شده و سنجیده روی همهٔ ۱۸۵ مورد (دورِ ۵؛ همراهِ p_found_half): ۱۹ تصدیق با رمزگذاریِ کور گستره گرفت؛ «کاملاً در جای درست» ۹۰ ⇒ ۱۰۱؛ گادارد ۱۹۲۰ (یافتهٔ باز) و HRT درست شدند؛ دو پرونده با قضیه نخواندند: جوجهٔ راسل (شکستِ دیده‌نشده) و شواهدِ عددیِ فرما (هشدارِ کاذب) — هر دو پیشنهاد برای تصمیمِ تو.","id":"p_found_scope","source":"foundation","title":"ویژگیِ تازهٔ «گسترهٔ ادعا» (کلیِ نامحدود / موردِ بعدی / کلیِ محدود) تا سقف‌های استقراء قضیه شوند","why":"حسابِ احتمالات برای استقراءِ ناقص دو جوابِ متفاوت دارد: حکمِ کلی بر دامنهٔ نامحدود ⇒ نزدیک به صفر (s51: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر»)؛ پیش‌بینیِ موردِ بعدی پس از n موافق ⇒ (n+1)/(n+2). سقف‌های فعلیِ ۸۰ و ۷۰ با هیچ‌کدام نمی‌خوانند و کارخانه فرقِ این دو را نمی‌داند. لاوازیه («هر اسیدی اکسیژن دارد») و فرما («هر عددِ این شکل اول است») کلیِ نامحدودند ⇒ وهم؛ مرغِ راسل («فردا هم دانه می‌دهد») موردِ بعدی است و درسش عاملِ پنهان است (s51)، نه شمار. اثرش تا وقتی پرونده‌ها با این ویژگی رمزگذاری نشده‌اند سنجیدنی نیست."},{"applied":"2026-10-14","appliedWhat":"قاعدهٔ تازهٔ r_istiqra_hidden در ایستگاهِ استقراء (سقفِ ۷۰ ِ همان پایهٔ عاملِ پنهان) + «عاملِ پنهان کنترل نشده» در رمزگذاریِ جوجه","evidence":"سنجیده در حافظه روی همهٔ ۱۸۵ مورد (دورِ ۵): با (۱) و (۲) جوجه دیده می‌شود و کاملاً در جای درست (استقراء؛ ایستگاهِ تجربه هم پرچم می‌خورد)؛ نظرسنجیِ لیتراری‌دایجست کاملاً در جای درست می‌شود و دیویی یک ایستگاهِ درستِ دیگر می‌گیرد؛ هیچ حکمِ درستی خراب نمی‌شود. فقط (۱) بی (۲): جوجه دیده می‌شود ولی در ایستگاهِ نادرست (تجربه). عددِ تازه‌ای ساخته نمی‌شود — سقفِ ۷۰ ِ این قاعده از پایه‌های اندازه‌گیری‌نشده (S) است.","finding":"f_bk_russell_chicken","id":"p_case_chicken","source":"foundation","title":"جوجهٔ راسل: خطا در «علتِ ناشناخته» است، نه در شمار — ملاکِ عاملِ پنهان (s51) برای استقراء هم","why":"با سقفِ قضیه‌ای، شمارِ صدها روز اطمینانِ ۹۹ ٪ به «فردا» را توجیه می‌کند (T_next). جزوه جوجه را برای این آورده که «باید علت کشف شود» و قانون «مشروط به عدمِ دخالتِ عواملِ پنهان» است (s51). پیشنهاد: (۱) در رمزگذاریِ جوجه «عواملِ پنهانِ مؤثر کنترل نشده» (hidden_ctrl=false) ثبت شود — خودِ «چرا» ی پرونده همین را می‌گوید؛ (۲) قاعدهٔ «عاملِ پنهانِ کنترل‌نشده» (r_tajrobe_hidden، اکنون فقط در ایستگاهِ تجربه) برای پیش‌بینیِ استقرایی هم در ایستگاهِ استقراء پرچم بزند."},{"evidence":"اکنون: «هشدارِ کاذب» روی این پرونده. با تغییرِ برچسب: درست، در ایستگاهِ استقراء. هیچ پروندهٔ دیگری عوض نمی‌شود.","finding":"f_cs_pb_flt_numeric","id":"p_case_flt","source":"foundation","title":"شواهدِ عددیِ قضیهٔ فرما: اطمینانِ ۶۰ ٪ به حکمِ کلی «فقط بر پایهٔ شمار» موجه نبود — برچسبِ پرونده به «شکست در ایستگاهِ استقراء»","why":"قضیهٔ T_universal (s51): حکمِ کلی بر دامنهٔ نامحدود از شمارِ محدود — هر قدر هم بزرگ (چهار میلیون) — نزدیک به صفر است. پرونده آن را «سالم» برچسب زده چون حکم «کمتر از یقین» نگه داشته شد (s50). اگر مالک s51 را مقدم بداند، برچسب باید شکست (st_istiqra) شود؛ اگر نه، این میانِ دو بخشِ جزوه اختلاف است و زیرِ همان بخش در «جزوهٔ متقن» ثبت می‌شود.","withdrawn":"لازم نشد: با خواندنِ کاملِ جزوه تناقضی در کار نبود — «با شواهد بالا می‌رود» حرفِ جزوه نبود، برداشتِ سازنده بود، و «۶۰٪» هم عددِ ساختهٔ سامانه. هر دو اصلاح شد؛ پرونده همان «سالم» است چون رفتارِ مستند (ثابت‌شده اعلام نکردن) درست بود."}]},"results":{"at":"2026-10-14","cases":[{"d":"پزشکی","ex":["st_conflict","st_background","st_resp"],"fl":["st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_semmelweis_rejection","k":"ok","ok":false,"r":0,"t":"رد یافته زملوایس درباره تب نفاس از سوی جامعه پزشکی وین","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_semmelweis_method","k":"ok","ok":true,"r":0,"t":"استدلال زملوایس: حذف فرضیه‌ها و آزمون وضع و رفع","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_snow_cholera","k":"ok","ok":true,"r":0,"t":"جان اسنو و انتقال وبا از راه آب (پمپ برادستریت و «آزمایش بزرگ»)","tier":"real"},{"d":"پزشکی","ex":["st_conflict","st_background"],"fl":["st_tajrobe","st_conflict","st_background"],"full":true,"id":"cs_miasma_board","k":"ok","ok":false,"r":0,"t":"رد نظریه آب اسنو و ماندن بر نظریه میاسما","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_whitehead","k":"ok","ok":true,"r":0,"t":"کشیش هنری وایتهد: بررسی برای رد اسنو که به تأیید او رسید","tier":"real"},{"d":"پزشکی","ex":["st_istiqra","st_tajrobe","st_conflict","st_background","st_resp"],"fl":["st_istiqra","st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_thalidomide_grunenthal","k":"ok","ok":false,"r":0,"t":"اعلام بی‌خطری تالیدومید (کونترگان)","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_kelsey_fda","k":"ok","ok":true,"r":0,"t":"فرانسس کلسی و خودداری FDA از تأیید تالیدومید","tier":"real"},{"d":"پزشکی","ex":["st_expert","st_istiqra","st_tajrobe","st_background"],"fl":["st_expert","st_istiqra","st_tajrobe","st_background"],"full":true,"id":"cs_wakefield_mmr","k":"ok","ok":false,"r":0,"t":"مقاله ویکفیلد درباره واکسن MMR و اوتیسم","tier":"real"},{"d":"پزشکی","ex":["st_expert","st_background","st_resp"],"fl":["st_expert","st_background","st_resp"],"full":true,"id":"cs_theranos","k":"ok","ok":false,"r":0,"t":"تراناس: اعتماد سرمایه‌گذاران و والگرینز به دستگاه ادیسون","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_hpylori","k":"ok","ok":true,"r":0,"t":"مارشال و وارن: هلیکوباکتر پیلوری و زخم معده","tier":"real"},{"d":"پزشکی","ex":["st_tajrobe"],"fl":["st_tajrobe"],"full":true,"id":"cs_hrt_observational","k":"ok","ok":false,"r":0,"t":"باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای","tier":"real"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_whi_trial","k":"ok","ok":true,"r":0,"t":"کارآزمایی تصادفی WHI درباره درمان هورمونی","tier":"real"},{"d":"پزشکی","ex":["st_istiqra","st_tajrobe","st_resp"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":true,"id":"cs_lobotomy","k":"ok","ok":false,"r":0,"t":"لوکوتومی پیشانی مونیز و گسترش لوبوتومی","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_eddington_1919","k":"ok","ok":true,"r":0,"t":"آزمون خمش نور در خورشیدگرفتگی ۱۹۱۹ (ادینگتون و دایسون)","tier":"real"},{"d":"علم","ex":["st_hiss","st_tajrobe"],"fl":["st_hiss","st_tajrobe"],"full":true,"id":"cs_nrays_blondlot","k":"ok","ok":false,"r":0,"t":"پرتوهای N بلوندلو","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_nrays_wood","k":"ok","ok":true,"r":0,"t":"آزمون رابرت وود و ابطال پرتوهای N","tier":"real"},{"d":"علم","ex":["st_tajrobe","st_conflict"],"fl":["st_tajrobe","st_conflict"],"full":true,"id":"cs_clever_hans_osten","k":"ok","ok":false,"r":0,"t":"هانس زیرک: باور به حساب کردن اسب","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_clever_hans_pfungst","k":"ok","ok":true,"r":0,"t":"آزمون‌های اسکار فونگست درباره هانس زیرک","tier":"real"},{"d":"علم","ex":["st_tajrobe","st_conflict","st_background","st_resp"],"fl":["st_tajrobe","st_conflict","st_background"],"full":false,"id":"cs_cold_fusion","k":"ok","ok":false,"r":0,"t":"همجوشی سرد فلایشمن و پانز","tier":"real"},{"d":"علم","ex":["st_naql","st_conflict","st_background","st_resp"],"fl":["st_naql","st_conflict","st_background"],"full":false,"id":"cs_piltdown","k":"ok","ok":false,"r":0,"t":"انسان پیلت‌داون","tier":"real"},{"d":"علم","ex":["st_truth","st_tajrobe","st_conflict","st_background"],"fl":["st_truth","st_tajrobe","st_conflict","st_background"],"full":true,"id":"cs_lysenko","k":"ok","ok":false,"r":0,"t":"لیسنکوئیسم در شوروی","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_lavoisier_combustion","k":"ok","ok":true,"r":0,"t":"لاووازیه: سوختن به‌مثابه ترکیب با اکسیژن","tier":"real"},{"d":"علم","ex":["st_istiqra"],"fl":["st_istiqra"],"full":true,"id":"cs_lavoisier_acids","k":"ok","ok":false,"r":0,"t":"لاووازیه: «همه اسیدها اکسیژن دارند»","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_leverrier_neptune","k":"ok","ok":true,"r":0,"t":"پیش‌بینی نپتون از روی اختلال مدار اورانوس","tier":"real"},{"d":"علم","ex":["st_naql","st_conflict"],"fl":["st_naql","st_conflict"],"full":true,"id":"cs_leverrier_vulcan","k":"ok","ok":false,"r":0,"t":"ولکان: سیاره‌ای که نبود","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_michelson_morley","k":"ok","ok":true,"r":0,"t":"آزمایش مایکلسون و مورلی","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_opera_neutrinos","k":"ok","ok":true,"r":0,"t":"نوترینوهای «سریع‌تر از نور» اپرا","tier":"real"},{"d":"علم","ex":[],"fl":[],"full":null,"id":"cs_galileo_jupiter","k":"ok","ok":true,"r":0,"t":"گالیله و قمرهای مشتری","tier":"real"},{"d":"علم","ex":["st_aql","st_conflict"],"fl":["st_aql","st_conflict"],"full":true,"id":"cs_wegener_rejection","k":"ok","ok":false,"r":0,"t":"رد رانش قاره‌ای وگنر به سبب نبود سازوکار","tier":"real"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_kempe_fourcolor","k":"ok","ok":false,"r":0,"t":"اثبات کمپه برای قضیه چهاررنگ (۱۸۷۹)","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_heawood_fivecolor","k":"ok","ok":true,"r":0,"t":"هیوود: یافتن رخنه کمپه و اثبات قضیه پنج‌رنگ","tier":"real"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_lame_flt","k":"ok","ok":false,"r":0,"t":"اثبات لامه برای قضیه آخر فرما (۱۸۴۷)","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_liouville_kummer","k":"ok","ok":true,"r":0,"t":"لیوویل و کومر: شناسایی فرض پنهان و اعداد ایدئال","tier":"real"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_wiles_1993","k":"ok","ok":false,"r":0,"t":"اعلام اثبات وایلز در ۱۹۹۳ و رخنه آن","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_wiles_1995","k":"ok","ok":true,"r":0,"t":"اثبات نهایی وایلز و تیلور (۱۹۹۵)","tier":"real"},{"d":"ریاضی","ex":["st_istiqra"],"fl":["st_istiqra"],"full":true,"id":"cs_fermat_numbers","k":"ok","ok":false,"r":0,"t":"فرما: «همه اعداد فرما اول‌اند»","tier":"real"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_euler_f5","k":"ok","ok":true,"r":0,"t":"اویلر و تجزیه عدد پنجم فرما","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_conflict","st_background","st_resp"],"fl":["st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_challenger","k":"ok","ok":false,"r":0,"t":"تصمیم پرتاب چلنجر در سرما","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_worlds","st_conflict","st_resp"],"fl":["st_worlds","st_conflict","st_resp"],"full":true,"id":"cs_mars_climate_orbiter","k":"ok","ok":false,"r":0,"t":"از دست رفتن مدارگرد اقلیم مریخ: پوند یا نیوتن","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_conflict","st_resp"],"fl":["st_istiqra","st_tajrobe","st_conflict","st_resp"],"full":true,"id":"cs_therac25","k":"ok","ok":false,"r":0,"t":"تراک‌۲۵: «دستگاه نمی‌تواند اوردوز بدهد»","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_tajrobe"],"fl":["st_istiqra","st_tajrobe"],"full":true,"id":"cs_tacoma_narrows","k":"ok","ok":false,"r":0,"t":"پل تاکوما ناروز","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_tajrobe","st_conflict","st_resp"],"fl":["st_tajrobe","st_conflict","st_resp"],"full":true,"id":"cs_hubble_mirror","k":"ok","ok":false,"r":0,"t":"عیب آینه اصلی تلسکوپ هابل","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_aql","st_conflict","st_background","st_resp"],"fl":["st_aql","st_tajrobe","st_conflict","st_background","st_resp"],"full":true,"id":"cs_boeing_737max","k":"ok","ok":false,"r":0,"t":"سامانه MCAS بوئینگ ۷۳۷ مکس","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_tajrobe","st_resp"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":true,"id":"cs_ariane5_501","k":"ok","ok":false,"r":0,"t":"پرواز ۵۰۱ آریان ۵: نرم‌افزار آریان ۴ در موشکی دیگر","tier":"real"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_citicorp_center","k":"ok","ok":true,"r":0,"t":"لمسوریه و بحران پنهان برج سیتی‌کورپ","tier":"real"},{"d":"فناوری و مهندسی","ex":["st_expert","st_resp"],"fl":["st_expert","st_resp"],"full":true,"id":"cs_hyatt_walkway","k":"ok","ok":false,"r":0,"t":"فروریختن پل‌های معلق هتل حیات ریجنسی کانزاس‌سیتی","tier":"real"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_feynman_oring","k":"ok","ok":true,"r":0,"t":"آزمون آب یخ فاینمن در کمیسیون چلنجر","tier":"real"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_hubble_diagnosis","k":"ok","ok":true,"r":0,"t":"تشخیص دقیق عیب هابل و طراحی اپتیک اصلاحی","tier":"real"},{"d":"زندگی روزمره","ex":["st_hiss"],"fl":["st_hiss"],"full":true,"id":"bk_stick_sight","k":"ok","ok":false,"r":0,"t":"چوب کج در آب: حکم باصره","tier":"booklet"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"bk_stick_touch","k":"ok","ok":true,"r":0,"t":"چوب در آب: داوری لمس در برابر باصره","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_phantom_limb","k":"ok","ok":false,"r":0,"t":"درد اندام خیالی (فانتوم)","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_appendicitis_referred","k":"ok","ok":false,"r":0,"t":"درد ارجاعی آپاندیسیت","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_pain_relief_healing","k":"ok","ok":false,"r":0,"t":"آرام شدن درد و پنداشت التیام","tier":"booklet"},{"d":"پزشکی","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_false_hunger","k":"ok","ok":false,"r":0,"t":"گرسنگی کاذب","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_itch_pain","k":"ok","ok":false,"r":0,"t":"اشتباه خارش با درد","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_core","st_hiss"],"fl":["st_core","st_hiss"],"full":true,"id":"bk_dusk_object","k":"ok","ok":false,"r":0,"t":"شیء نامتعین در تاریکی غروب","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_fear_label","k":"ok","ok":false,"r":0,"t":"ترس و وسواس: یافت حالت و داوری درباره خطر","tier":"booklet"},{"d":"دین","ex":["st_core","st_shohud"],"fl":["st_core","st_shohud"],"full":true,"id":"bk_hasan_basri","k":"ok","ok":false,"r":0,"t":"حسن بصری و ندای جنگ جمل","tier":"booklet"},{"d":"دین","ex":["st_core","st_shohud"],"fl":["st_core","st_shohud"],"full":true,"id":"bk_reflective_error","k":"ok","ok":false,"r":0,"t":"خطای انعکاسی در مکاشفه","tier":"booklet"},{"d":"دین","ex":["st_core"],"fl":["st_core"],"full":true,"id":"bk_faqr_misapplied","k":"ok","ok":false,"r":0,"t":"یافت فقر وجودی و تطبیق آن بر مصداق باطل","tier":"booklet"},{"d":"دین","ex":["st_truth"],"fl":["st_truth"],"full":true,"id":"bk_munafiqun_testimony","k":"ok","ok":false,"r":0,"t":"شهادت منافقان: صدق معرفتی و صدق اخلاقی","tier":"booklet"},{"d":"فلسفه","ex":["st_partial"],"fl":["st_partial"],"full":true,"id":"bk_universal_by_count","k":"ok","ok":false,"r":0,"t":"جزئی پنداشتن «خورشید» و «شریک‌الباری»","tier":"booklet"},{"d":"فلسفه","ex":["st_partial"],"fl":["st_partial","st_aql"],"full":true,"id":"bk_part_whole_hand","k":"ok","ok":false,"r":0,"t":"«دست انسان، انسان است»: خلط کلی و کل","tier":"booklet"},{"d":"زندگی روزمره","ex":["st_partial"],"fl":["st_partial"],"full":true,"id":"bk_winged_horse","k":"ok","ok":false,"r":0,"t":"اسب بالدار: ساخته تخیل یا ادراک واقع؟","tier":"booklet"},{"d":"فلسفه","ex":["st_ctype"],"fl":["st_ctype","st_aql"],"full":true,"id":"bk_hume_causality","k":"ok","ok":false,"r":0,"t":"هیوم: انکار ضرورت علّی چون حس نمی‌شود","tier":"booklet"},{"d":"فلسفه","ex":["st_ctype","st_doubts"],"fl":["st_ctype","st_doubts"],"full":true,"id":"bk_kant_causality","k":"ok","ok":false,"r":0,"t":"کانت: علیت به‌مثابه قالب پیشینی ذهن","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref"],"fl":["st_selfref"],"full":true,"id":"bk_absolute_skeptic","k":"ok","ok":false,"r":0,"t":"شکاک مطلق: «هیچ معرفت یقینی وجود ندارد»","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref"],"fl":["st_selfref"],"full":true,"id":"bk_protagoras","k":"ok","ok":false,"r":0,"t":"پروتاگوراس: «انسان مقیاس همه چیز است»","tier":"booklet"},{"d":"فلسفه","ex":["st_aql","st_selfref","st_doubts"],"fl":["st_aql","st_selfref","st_doubts"],"full":true,"id":"bk_doubt_exclusive_routes","k":"ok","ok":false,"r":0,"t":"شبهه انحصار راه‌های شناخت در حس و عقل","tier":"booklet"},{"d":"فلسفه","ex":["st_worlds","st_doubts"],"fl":["st_worlds","st_doubts"],"full":true,"id":"bk_doubt_world_link","k":"ok","ok":false,"r":0,"t":"شبهه پیوستگی عینی جهان","tier":"booklet"},{"d":"فلسفه","ex":["st_aql","st_doubts"],"fl":["st_aql","st_doubts"],"full":true,"id":"bk_doubt_colored_glasses","k":"ok","ok":false,"r":0,"t":"شبهه عینک رنگی (واسطه‌گری ابزار ادراک)","tier":"booklet"},{"d":"فلسفه","ex":["st_worlds","st_selfref","st_doubts"],"fl":["st_worlds","st_selfref","st_doubts"],"full":true,"id":"bk_holism_quine","k":"ok","ok":false,"r":0,"t":"کل‌گرایی معرفتی: «هیچ گزاره‌ای مصون از بازنگری نیست»","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref","st_herm"],"fl":["st_selfref","st_herm"],"full":true,"id":"bk_gadamer_relativism","k":"ok","ok":false,"r":0,"t":"هرمنوتیک فلسفی و نفی دسترسی به مراد مؤلف","tier":"booklet"},{"d":"تاریخ و سیاست","ex":["st_conflict","st_r_struct"],"fl":["st_conflict","st_r_struct"],"full":true,"id":"bk_mko_eclecticism","k":"ok","ok":false,"r":0,"t":"التقاط سازمان مجاهدین خلق با مارکسیسم","tier":"booklet"},{"d":"فلسفه","ex":["st_istiqra"],"fl":["st_istiqra","st_tajrobe"],"full":true,"id":"bk_russell_chicken","k":"ok","ok":false,"r":0,"t":"جوجه راسل","tier":"booklet"},{"d":"علم","ex":["st_worlds","st_aql","st_selfref"],"fl":["st_worlds","st_aql","st_selfref"],"full":true,"id":"bk_boiling_relativity","k":"ok","ok":false,"r":0,"t":"نقطه جوش در اورست و نسبیت هستی‌شناختی","tier":"booklet"},{"d":"فلسفه","ex":["st_aql"],"fl":["st_aql","st_naql"],"full":true,"id":"bk_gettier_case1","k":"ok","ok":false,"r":0,"t":"مثال نخست گتیه: باور صادق موجه از راه مقدمه کاذب","tier":"booklet"},{"d":"دین","ex":["st_r_conflict"],"fl":["st_naql","st_r_conflict"],"full":true,"id":"bk_yadollah","k":"ok","ok":false,"r":0,"t":"«یدالله»: پذیرش ظاهر ناسازگار با برهان","tier":"booklet"},{"d":"دین","ex":["st_herm","st_r_conflict"],"fl":["st_naql","st_herm","st_r_conflict"],"full":true,"id":"bk_khalaqa_adam","k":"ok","ok":false,"r":0,"t":"تقطیع حدیث «خلق الله آدم علی صورته»","tier":"booklet"},{"d":"دین","ex":["st_worlds","st_herm","st_r_plural"],"fl":["st_worlds","st_herm","st_r_plural"],"full":true,"id":"bk_pluralism_quran_evidence","k":"ok","ok":false,"r":0,"t":"استناد به بقره ۶۲ و اسم «هادی» برای پلورالیسم","tier":"booklet"},{"d":"دین","ex":["st_naql","st_herm","st_r_sources","st_r_plural"],"fl":["st_naql","st_herm","st_r_sources","st_r_plural"],"full":true,"id":"bk_turuq_saying","k":"ok","ok":false,"r":0,"t":"«الطرق الی الله بعدد نفوس الخلائق»","tier":"booklet"},{"d":"دین","ex":["st_selfref","st_r_plural"],"fl":["st_selfref","st_r_plural"],"full":true,"id":"bk_hick_pluralism","k":"ok","ok":false,"r":0,"t":"جان هیک: گوهر و صدف و تمثیل فیل در تاریکی","tier":"booklet"},{"d":"دین","ex":["st_herm","st_r_readings"],"fl":["st_herm","st_r_readings"],"full":true,"id":"bk_fatwa_relativism","k":"ok","ok":false,"r":0,"t":"اختلاف فتواها به‌مثابه دلیل تعدد قرائت‌ها","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"bk_vision_to_external","k":"ok","ok":true,"r":0,"t":"گذر از احساس بینایی به وجود علتی بیرونی","tier":"booklet"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"bk_i_am_happy","k":"ok","ok":true,"r":0,"t":"«من شاد هستم»: وجدانی","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"bk_whole_greater","k":"ok","ok":true,"r":0,"t":"«کل از جزء خود بزرگ‌تر است»: اولی","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"bk_tawatur_ghadir","k":"ok","ok":true,"r":0,"t":"خبر متواتر: حدیث غدیر","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"bk_taqlid_alam","k":"ok","ok":true,"r":0,"t":"رجوع به فقیه اعلم در حکم فرعی","tier":"booklet"},{"d":"مالی و بانکی","ex":["st_istiqra","st_aql"],"fl":["st_aql","st_istiqra","st_tajrobe"],"full":true,"id":"cs_b_ltcm","k":"ok","ok":false,"r":0,"t":"LTCM و تعمیم همبستگی‌های تاریخی","tier":"real"},{"d":"مالی و بانکی","ex":["st_expert","st_resp"],"fl":["st_expert","st_resp"],"full":true,"id":"cs_b_ratings2008","k":"ok","ok":false,"r":0,"t":"رتبه AAA اوراق رهنی و کارشناسِ ذی‌نفع","tier":"real"},{"d":"مالی و بانکی","ex":["st_naql","st_conflict","st_resp"],"fl":["st_naql","st_conflict","st_resp"],"full":true,"id":"cs_b_madoff_sec","k":"ok","ok":false,"r":0,"t":"بازرسی SEC از مدوف بدون تأیید مستقل معاملات","tier":"real"},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"id":"cs_b_markopolos","k":"ok","ok":true,"r":0,"t":"تحلیل مارکوپولوس: بازده مدوف با راهبرد اعلامی ناممکن است","tier":"real"},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"id":"cs_b_thorp_madoff","k":"ok","ok":true,"r":0,"t":"ادوارد تورپ و تطبیق معاملات مدوف با سوابق بازار (۱۹۹۱)","tier":"real"},{"d":"مالی و بانکی","ex":["st_expert"],"fl":["st_expert"],"full":true,"id":"cs_b_enron_andersen","k":"ok","ok":false,"r":0,"t":"حسابرسی آرتور اندرسن از انرون","tier":"real"},{"d":"مالی و بانکی","ex":["st_naql","st_conflict","st_background","st_resp"],"fl":["st_naql","st_conflict","st_background","st_resp"],"full":true,"id":"cs_b_barings","k":"ok","ok":false,"r":0,"t":"بانک بیرینگز و سودهای «آربیتراژ» نیک لیسون","tier":"real"},{"d":"مالی و بانکی","ex":["st_naql","st_expert","st_resp"],"fl":["st_naql","st_expert","st_resp"],"full":true,"id":"cs_b_wirecard_ey","k":"ok","ok":false,"r":0,"t":"وایرکارد: تأیید موجودی امانی بدون استعلام مستقیم از بانک","tier":"real"},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"id":"cs_b_ponzi_barron","k":"ok","ok":true,"r":0,"t":"کلارنس بارون و حساب کوپن‌های پستی پونزی (۱۹۲۰)","tier":"real"},{"d":"بازار و معامله","ex":["st_partial","st_aql"],"fl":["st_partial","st_aql"],"full":true,"id":"cs_b_blackmonday","k":"ok","ok":false,"r":0,"t":"دوشنبه سیاه ۱۹۸۷ و بیمه سبد","tier":"real"},{"d":"بازار و معامله","ex":["st_conflict","st_resp"],"fl":["st_conflict","st_resp"],"full":true,"id":"cs_b_knight","k":"ok","ok":false,"r":0,"t":"نایت کپیتال ۲۰۱۲: ۹۷ هشدار پیش از گشایش بازار","tier":"real"},{"d":"بازار و معامله","ex":[],"fl":[],"full":null,"id":"cs_b_burry","k":"ok","ok":true,"r":0,"t":"مایکل بری و خواندن پرونده وام‌های پشتوانه (۲۰۰۵)","tier":"real"},{"d":"بازار و معامله","ex":[],"fl":[],"full":null,"id":"cs_b_chanos","k":"ok","ok":true,"r":0,"t":"جیم چینوس و تحلیل صورت‌های مالی انرون","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_naql","st_expert","st_conflict","st_background"],"fl":["st_naql","st_expert","st_conflict","st_background","st_resp"],"full":true,"id":"cs_b_curveball","k":"ok","ok":false,"r":0,"t":"«کِرو بال» و ادعای آزمایشگاه‌های سیار سلاح زیستی عراق","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_hiss","st_background","st_resp"],"fl":["st_hiss","st_background","st_resp"],"full":true,"id":"cs_b_pearl_radar","k":"ok","ok":false,"r":0,"t":"پرل هاربر: تفسیر پژواک رادار اپانا","tier":"real"},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"id":"cs_b_cuba_u2","k":"ok","ok":true,"r":0,"t":"بحران موشکی کوبا: شناسایی سکوهای موشکی از عکس‌های U-2","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_expert","st_conflict","st_background"],"fl":["st_expert","st_conflict","st_background","st_resp"],"full":true,"id":"cs_b_bayofpigs","k":"ok","ok":false,"r":0,"t":"خلیج خوک‌ها: طرحی که طراحانش ارزیابی‌اش کردند","tier":"real"},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"id":"cs_b_midway_af","k":"ok","ok":true,"r":0,"t":"میدوی ۱۹۴۲: آزمون «AF کم‌آب است»","tier":"real"},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"id":"cs_b_zimmermann","k":"ok","ok":true,"r":0,"t":"تلگراف زیمرمان و احراز صدور (۱۹۱۷)","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_naql"],"fl":["st_naql"],"full":true,"id":"cs_b_tulip_mackay","k":"ok","ok":false,"r":0,"t":"روایت مکِی از «جنون لاله» و ورشکستگی همگانی","tier":"real"},{"d":"تاریخ و سیاست","ex":["st_aql","st_conflict"],"fl":["st_aql","st_conflict"],"full":true,"id":"cs_b_columbus","k":"ok","ok":false,"r":0,"t":"برآورد فاصله کلمب تا آسیا: نتیجه خوش‌اقبال از استدلال معیوب","tier":"real"},{"d":"حقوق و قضا","ex":["st_expert","st_conflict","st_background"],"fl":["st_expert","st_conflict","st_background"],"full":true,"id":"cs_b_dreyfus","k":"ok","ok":false,"r":0,"t":"پرونده دریفوس: «بوردرو» و شهادت برتیون","tier":"real"},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"id":"cs_b_picquart","k":"ok","ok":true,"r":0,"t":"پیکار و شناسایی خط استرهازی (۱۸۹۶)","tier":"real"},{"d":"حقوق و قضا","ex":["st_core","st_partial","st_background"],"fl":["st_core","st_partial","st_shohud","st_background"],"full":true,"id":"cs_b_salem","k":"ok","ok":false,"r":0,"t":"دادگاه‌های سیلم و «شاهد شبحی»","tier":"real"},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"id":"cs_b_mather_spectral","k":"ok","ok":true,"r":0,"t":"اینکریس مدر: شاهد شبحی برای محکومیت کافی نیست","tier":"real"},{"d":"حقوق و قضا","ex":["st_aql","st_expert"],"fl":["st_aql","st_expert"],"full":true,"id":"cs_b_sallyclark","k":"ok","ok":false,"r":0,"t":"سالی کلارک و «یک در ۷۳ میلیون»","tier":"real"},{"d":"حقوق و قضا","ex":["st_yad"],"fl":["st_yad","st_conflict"],"full":true,"id":"cs_b_cotton","k":"ok","ok":false,"r":0,"t":"جنیفر تامپسون و رونالد کاتن: اطمینان کامل، حافظه آلوده","tier":"real"},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"id":"cs_b_pitchfork","k":"ok","ok":true,"r":0,"t":"پرونده نارباره: DNA در برابر اعتراف (۱۹۸۶)","tier":"real"},{"d":"حقوق و قضا","ex":["st_tajrobe"],"fl":["st_tajrobe"],"full":true,"id":"cs_b_heilbronn","k":"ok","ok":false,"r":0,"t":"«شبح هایلبرون»: زنی که در ۴۰ صحنه جرم بود","tier":"real"},{"d":"رسانه و خبر","ex":["st_istiqra","st_background"],"fl":["st_background"],"full":false,"id":"cs_b_wotw_panic","k":"ok","ok":false,"r":0,"t":"«وحشت سراسری» جنگ دنیاها: روایت روزنامه‌ها از یک برنامه رادیویی","tier":"real"},{"d":"رسانه و خبر","ex":["st_istiqra","st_tajrobe","st_resp"],"fl":["st_istiqra","st_tajrobe"],"full":false,"id":"cs_b_dewey1948","k":"ok","ok":false,"r":0,"t":"«دیویی ترومن را شکست داد» (۱۹۴۸)","tier":"real"},{"d":"رسانه و خبر","ex":["st_istiqra","st_tajrobe"],"fl":["st_istiqra","st_tajrobe"],"full":true,"id":"cs_b_literarydigest","k":"ok","ok":false,"r":0,"t":"نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست","tier":"real"},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"id":"cs_b_gallup1936","k":"ok","ok":true,"r":0,"t":"گالوپ ۱۹۳۶: نمونه کوچک ولی معرف","tier":"real"},{"d":"رسانه و خبر","ex":["st_naql","st_expert","st_background","st_resp"],"fl":["st_naql","st_expert","st_background","st_resp"],"full":true,"id":"cs_b_hitlerdiaries","k":"ok","ok":false,"r":0,"t":"یادداشت‌های جعلی هیتلر و مجله اشترن (۱۹۸۳)","tier":"real"},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"id":"cs_b_bellingcat_mh17","k":"ok","ok":true,"r":0,"t":"بلینگکت و ردیابی پرتابگر بوک در پرونده MH17","tier":"real"},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"id":"cs_b_mclean_enron","k":"ok","ok":true,"r":0,"t":"بتانی مکلین: «آیا انرون گران‌قیمت است؟» (۲۰۰۱)","tier":"real"},{"d":"زندگی روزمره","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_b_montecarlo","k":"ok","ok":false,"r":0,"t":"کازینوی مونت‌کارلو ۱۹۱۳: بیست‌وشش بار سیاه","tier":"real"},{"d":"زندگی روزمره","ex":["st_core","st_conflict"],"fl":["st_core","st_shohud","st_conflict"],"full":true,"id":"cs_b_keech","k":"ok","ok":false,"r":0,"t":"پیشگویی طوفان ۲۱ دسامبر ۱۹۵۴ و «وقتی پیشگویی شکست می‌خورد»","tier":"real"},{"d":"زندگی روزمره","ex":["st_istiqra","st_conflict"],"fl":["st_conflict"],"full":false,"id":"cs_b_harrytruman_sthelens","k":"ok","ok":false,"r":0,"t":"هری آر. ترومن و کوه سنت هلنز (۱۹۸۰)","tier":"real"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"cs_b_tillysmith","k":"ok","ok":true,"r":0,"t":"تیلی اسمیت و نشانه‌های سونامی در پوکت (۲۰۰۴)","tier":"real"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"cs_b_smong","k":"ok","ok":true,"r":0,"t":"«اسمونگ»: روایت شفاهی که مردم سیمئولوئه را نجات داد (۲۰۰۴)","tier":"real"},{"d":"زندگی روزمره","ex":[],"fl":[],"full":null,"id":"cs_b_tylenol1982","k":"ok","ok":true,"r":0,"t":"قتل‌های تیلنول شیکاگو (۱۹۸۲): کارخانه یا قفسه فروشگاه؟","tier":"real"},{"d":"دین","ex":["st_herm","st_r_conflict"],"fl":["st_naql","st_herm","st_r_conflict"],"full":true,"id":"cs_b_hadith_sura_cut","k":"ok","ok":false,"r":0,"t":"«خلق‌الله آدم علی صورته» با تقطیع","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"cs_b_hadith_sura_full","k":"ok","ok":true,"r":0,"t":"«خلق‌الله آدم علی صورته» با قرینه پیوسته","tier":"booklet"},{"d":"دین","ex":["st_herm","st_r_readings"],"fl":["st_aql","st_herm","st_r_readings"],"full":true,"id":"cs_b_kab_relativism","k":"ok","ok":false,"r":0,"t":"از اختلاف در «کعب» تا نسبی‌گرایی قرائت‌ها","tier":"booklet"},{"d":"دین","ex":["st_selfref","st_r_plural"],"fl":["st_selfref","st_r_plural"],"full":true,"id":"cs_b_hick_elephant","k":"ok","ok":false,"r":0,"t":"جان هیک: گوهر و صدف و تمثیل فیل در تاریکی","tier":"booklet"},{"d":"دین","ex":["st_r_plural"],"fl":["st_aql","st_r_plural"],"full":true,"id":"cs_b_plural_talazum","k":"ok","ok":false,"r":0,"t":"مغالطه تلازم: انحصار حقانیت یعنی محرومیت همه و نفی همزیستی؟","tier":"booklet"},{"d":"دین","ex":[],"fl":[],"full":null,"id":"cs_b_three_domains","k":"ok","ok":true,"r":0,"t":"تفکیک حقانیت، نجات و رفتار در نگرش اسلامی","tier":"booklet"},{"d":"دین","ex":["st_naql","st_aql"],"fl":["st_aql","st_naql"],"full":true,"id":"cs_b_millerites","k":"ok","ok":false,"r":0,"t":"میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴","tier":"real"},{"d":"فلسفه","ex":["st_selfref"],"fl":["st_selfref"],"full":true,"id":"cs_b_protagoras","k":"ok","ok":false,"r":0,"t":"پروتاگوراس: «انسان مقیاس همه چیز است»","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"cs_b_plato_peritrope","k":"ok","ok":true,"r":0,"t":"افلاطون در ته‌تتوس: سخن پروتاگوراس خودش را باطل می‌کند","tier":"booklet"},{"d":"فلسفه","ex":["st_worlds","st_selfref","st_doubts"],"fl":["st_worlds","st_selfref","st_doubts"],"full":true,"id":"cs_b_holism","k":"ok","ok":false,"r":0,"t":"کل‌گرایی معرفتی: هیچ گزاره‌ای حتی امتناع تناقض ثابت نیست","tier":"booklet"},{"d":"فلسفه","ex":["st_selfref","st_herm"],"fl":["st_selfref","st_herm"],"full":true,"id":"cs_b_gadamer","k":"ok","ok":false,"r":0,"t":"هرمنوتیک فلسفی: مراد مؤلف دست‌نیافتنی است","tier":"booklet"},{"d":"فلسفه","ex":[],"fl":[],"full":null,"id":"cs_b_hirsch","k":"ok","ok":true,"r":0,"t":"هرش: تمایز «معنا» و «اهمیت» (۱۹۶۷)","tier":"real"},{"d":"فلسفه","ex":["st_aql","st_selfref","st_doubts"],"fl":["st_aql","st_selfref","st_doubts"],"full":true,"id":"cs_b_skeptic_twoways","k":"ok","ok":false,"r":0,"t":"شبهه انحصار راه‌ها: حس و عقل خطا می‌کنند، پس یقین ناممکن است","tier":"booklet"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_flt_lame","k":"ok","ok":false,"r":0,"t":"برهان لامه برای قضیه فرما (۱۸۴۷)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_flt_numeric","k":"ok","ok":true,"r":0,"t":"تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_flt_wiles93","k":"ok","ok":false,"r":0,"t":"اعلام برهان وایلز با شکاف (۱۹۹۳)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_flt_wiles95","k":"ok","ok":true,"r":0,"t":"برهان پذیرفته‌شده وایلز و تیلور–وایلز (۱۹۹۵)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_4c_kempe","k":"ok","ok":false,"r":0,"t":"برهان کمپه برای چهار رنگ (۱۸۷۹)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_4c_heawood","k":"ok","ok":true,"r":0,"t":"کشف خطای کمپه و قضیه پنج‌رنگ (هیوود، ۱۸۹۰)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_4c_ah","k":"ok","ok":true,"r":0,"t":"برهان رایانه‌ای اپل و هاکن (۱۹۷۶)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_4c_rsst","k":"ok","ok":true,"r":0,"t":"بازسازی مستقل (۱۹۹۶) و وارسی صوری Coq (۲۰۰۵)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_poinc_1900","k":"ok","ok":false,"r":0,"t":"ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_poinc_whitehead","k":"ok","ok":false,"r":0,"t":"برهان نادرست وایتهد (۱۹۳۴)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_poinc_perelman","k":"ok","ok":true,"r":0,"t":"برهان پرلمن و وارسی جمعی (۲۰۰۲–۲۰۰۶)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_quintic_ruffini","k":"ok","ok":false,"r":0,"t":"برهان روفینی برای حل‌ناپذیری (۱۷۹۹)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_quintic_abel","k":"ok","ok":true,"r":0,"t":"برهان آبل (۱۸۲۴–۱۸۲۶)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_quintic_poisson","k":"ok","ok":true,"r":0,"t":"گزارش پواسون درباره دست‌نوشته گالوا (۱۸۳۱)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_greek_wantzel","k":"ok","ok":true,"r":0,"t":"برهان ونتسل (۱۸۳۷)","tier":"problem"},{"d":"ریاضی","ex":["st_aql","st_expert","st_conflict"],"fl":["st_expert","st_conflict"],"full":false,"id":"cs_pb_greek_indiana","k":"ok","ok":false,"r":0,"t":"لایحه π ایندیانا (۱۸۹۷)","tier":"problem"},{"d":"ریاضی","ex":["st_aql","st_conflict"],"fl":["st_aql","st_conflict"],"full":true,"id":"cs_pb_greek_hobbes","k":"ok","ok":false,"r":0,"t":"ادعای تربیع دایره توسط هابز و نقد والیس (دهه ۱۶۵۰)","tier":"problem"},{"d":"ریاضی","ex":["st_aql","st_background"],"fl":["st_aql","st_background"],"full":true,"id":"cs_pb_par_saccheri","k":"ok","ok":false,"r":0,"t":"رد فرض حاده توسط ساکری (۱۷۳۳)","tier":"problem"},{"d":"ریاضی","ex":["st_aql"],"fl":["st_aql"],"full":true,"id":"cs_pb_par_legendre","k":"ok","ok":false,"r":0,"t":"اثبات‌های لژاندر برای اصل توازی (از ۱۷۹۴)","tier":"problem"},{"d":"ریاضی","ex":[],"fl":[],"full":null,"id":"cs_pb_par_beltrami","k":"ok","ok":true,"r":0,"t":"هندسه هذلولوی و اثبات سازگاری نسبی (۱۸۲۹–۱۸۶۸)","tier":"problem"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_pb_long_h4","k":"ok","ok":true,"r":0,"t":"آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)","tier":"problem"},{"d":"فناوری و مهندسی","ex":["st_istiqra"],"fl":["st_istiqra"],"full":true,"id":"cs_pb_long_generalize","k":"ok","ok":false,"r":0,"t":"تعمیم از یک ساعت موفق به روش عملی (۱۷۶۲–۱۷۶۵)","tier":"problem"},{"d":"فناوری و مهندسی","ex":[],"fl":[],"full":null,"id":"cs_pb_long_k1","k":"ok","ok":true,"r":0,"t":"تکرار مستقل K1 و سفر کوک (۱۷۶۹–۱۷۷۵)","tier":"problem"},{"d":"پزشکی","ex":[],"fl":[],"full":null,"id":"cs_pb_semm_handwash","k":"ok","ok":true,"r":0,"t":"استنتاج علّی زملوایس و مداخله آهک کلردار (۱۸۴۷)","tier":"problem"},{"d":"پزشکی","ex":["st_tasdiq","st_conflict","st_background","st_resp"],"fl":["st_tasdiq","st_conflict","st_background","st_resp"],"full":true,"id":"cs_pb_semm_reject","k":"ok","ok":false,"r":0,"t":"رد یافته زملوایس توسط جامعه پزشکی (۱۸۴۹–۱۸۶۰)","tier":"problem"},{"d":"پزشکی","ex":["st_tasdiq","st_conflict"],"fl":["st_tasdiq","st_expert","st_conflict"],"full":true,"id":"cs_pb_semm_atmos","k":"ok","ok":false,"r":0,"t":"تبیین «تأثیرات جوّی» برای تفاوت دو بخش (۱۸۴۶)","tier":"problem"},{"d":"رسانه و خبر","ex":["st_naql","st_expert","st_resp"],"fl":["st_naql","st_conflict","st_background","st_resp"],"full":false,"fx":["اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش‌زمینه‌هایش (پرسش آغازین، حب و بغض، انتظار، باور پیشین) را آشکار و رده‌بندی می‌کرد و نابایسته‌ها را به اختیار کنار می‌گذاشت، ورودی را دوباره و بی‌آن‌ها می‌خواند."],"id":"r2_cbs_killian_memos","k":"ok","ok":false,"r":3,"right":"اگر تیم پیش از پخش زنجیره را حلقه‌به‌حلقه تا نسخه اصل دنبال می‌کرد، هویت و وثاقت هر واسطه را می‌خواست، و اصالت سند را جدا از درستی مضمونش به کارشناسان می‌سپرد، یا اسناد را کنار می‌گذاشت یا با اطمینانی متناسب و صریحاً تأییدنشده گزارش می‌کرد.","src":["Dick Thornburgh & Louis D. Boccardi, Report of the Independent Review Panel on the September 8, 2004 60 Minutes Wednesday Segment \"For the Record\" (January 2005)","Mary Mapes, Truth and Duty: The Press, the President, and the Privilege of Power (2005)"],"story":"در ۸ سپتامبر ۲۰۰۴ برنامه «۶۰ دقیقه چهارشنبه» سی‌بی‌اس با گزارش دن رادر چهار سند منسوب به سرهنگ جری کیلیان، فرمانده درگذشته جورج دبلیو بوش در گارد ملی هوایی تگزاس، را پخش کرد که از کوتاهی بوش در خدمت و فشار برای «خوش‌سازی» پرونده‌اش حکایت داشت. اسناد فقط به‌صورت رونوشت از بیل برکت، افسر پیشین گارد که با بوش خصومت آشکار داشت، به دست تهیه‌کننده مری میپس رسیده بود. برکت نخست گفت اسناد را از همرزمی به نام جورج کان گرفته و پس از پخش اعتراف کرد این سخن نادرست بوده و اسناد را زنی به نام «لوسی رامیرز» از راه واسطه‌ای ناشناس به او رسانده است؛ هویت این حلقه‌ها هرگز احراز نشد. دو کارشناس اسنادی که سی‌بی‌ا","t":"اسناد کیلیان و برنامه «۶۰ دقیقه» سی‌بی‌اس (۲۰۰۴)","tier":"real","why":"پذیرش خبر به دو مقدمه نیاز دارد: احراز صدور از گوینده اصلی و وثاقت ناقل (s47). اینجا صدور سند از کیلیان احراز نشده بود و سند از راه زنجیره‌ای طولی (کیلیان ← ؟ ← رامیرز ← واسطه ناشناس ← برکت ← سی‌بی‌اس) رسیده بود که دست‌کم یک حلقه‌اش مجهول و یک حلقه‌اش (برکت) با دروغ آشکار درباره منشأ، غیرموثق بود؛ به تصریح s47 اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌کند. نظر کارشناسی هم در موضوع اصلی (اصالت سند، نه فقط امضا روی رونوشت) گرفته نشد و تردید دو کارشناس سنجیده نشد (s49). هم‌خوانی محتوا با روایت‌ها","y":2004},{"d":"رسانه و خبر","ex":["st_yad","st_resp"],"fl":["st_yad","st_conflict","st_resp"],"full":true,"fx":["اگر کنشگر یادآوری را با سند (ایمیل، صورت‌حساب، صورت‌جلسه) یا واقعیت بیرونی تطبیق می‌داد، یا وثاقت حافظه را احراز می‌کرد یا تصدیق را از راه سند جایگزین می‌کرد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r2_brian_williams_rpg","k":"ok","ok":false,"r":3,"right":"اگر پیش از بازگویی روی آنتن، یادآوری خود را با گزارش ضبط‌شده ۲۰۰۳ و گواهی خدمه می‌سنجید، تفاوت «شینوکِ جلوی ما» با «هلی‌کوپترِ ما» را می‌دید و روایت را به همان سند برمی‌گرداند.","src":["Travis J. Tritten, \"NBC's Brian Williams recants Iraq story after soldiers protest\", Stars and Stripes (4 February 2015)","NBC News, statement on the internal review of Brian Williams (18 June 2015)"],"story":"برایان ویلیامز، مجری اخبار شبانگاهی ان‌بی‌سی، در مارس ۲۰۰۳ همراه یک یگان هوانیروز آمریکا در عراق بود؛ در آن روز یک هلی‌کوپتر شینوک دیگر با نارنجک‌انداز مورد اصابت قرار گرفت و ناچار فرود آمد و گزارش خود ویلیامز در همان زمان از اصابت به «شینوکِ جلوی ما» سخن می‌گفت. در سال‌های بعد روایت او در گفت‌وگوها تغییر کرد و در ۲۰۱۳ در برنامه‌ای تلویزیونی و در ۳۰ ژانویه ۲۰۱۵ در خبر شبانگاهی گفت هلی‌کوپتری که خودش در آن بود مورد اصابت قرار گرفته و فرود اضطراری کرده است. سربازانی که در آن پرواز بودند در شبکه‌های اجتماعی اعتراض کردند و استارز اند استرایپس در ۴ فوریه ۲۰۱۵ گزارش داد که هلی‌کوپتر ویلیامز مورد اصا","t":"برایان ویلیامز و «هلی‌کوپتری که مورد اصابت قرار گرفت» (۲۰۰۳–۲۰۱۵)","tier":"real","why":"اعتبار یادآوری تابع دو چیز است: اعتبار معرفت نخستین و وثاقت حافظه که با سنجش تطابق با واقعیات بیرونی و اسناد احراز می‌شود (s52). ادراک نخستین او درست بود و در گزارش ۲۰۰۳ خودش ثبت شده بود؛ آنچه سال‌ها بعد گفت با همان سند ناسازگار بود. روشنی و تکرار روایت جای سنجش با سند را گرفت و حافظه‌ای که بارها بازگو و دگرگون شده بود، بی‌تطبیق با نوار خبر خودش و گواهی خدمه، با اطمینان کامل در رسانه‌ای سراسری عرضه شد. سند در دسترس بود و بهای خطا (اعتبار خبرگزاری) بالا بود (s6).","y":2015},{"d":"تاریخ و سیاست","ex":["st_shohud","st_conflict","st_resp"],"fl":["st_core","st_hiss","st_aql","st_conflict","st_resp"],"full":false,"fx":["اگر کنشگر زاویه را عوض می‌کرد، میانجی را برمی‌داشت، در شرایط عادی تکرار می‌کرد یا حس دیگری (لمس) را به کار می‌گرفت، داوری حسی‌اش به یقین نزدیک می‌شد.","اگر کنشگر هر مقدمه (به‌ویژه مقدمه ناگفته) را تا بدیهی یا تا راه معتبرش دنبال می‌کرد، اطمینانش به نتیجه از اطمینان به ضعیف‌ترین مقدمه بیشتر نمی‌شد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت."],"id":"r2_chamberlain_hitler_face","k":"ok","ok":false,"r":3,"right":"اگر چمبرلین برداشت چهره‌به‌چهره را یک قرینه ضعیف حصولی می‌شمرد و آن را با سابقه پایبندی هیتلر به تعهداتش و ارزیابی‌های اطلاعاتی می‌سنجید، به اعتماد به قول او درجه‌ای پایین می‌داد و سیاست را بر ضمانت‌های قابل راستی‌آزمایی بنا می‌کرد.","src":["Robert Self (ed.), The Neville Chamberlain Diary Letters, Vol. 4: The Downing Street Years 1934–1940 (2005)","Ian Kershaw, Hitler 1936–1945: Nemesis (2000)"],"story":"نویل چمبرلین، نخست‌وزیر بریتانیا، در ۱۵ سپتامبر ۱۹۳۸ در برشتسگادن با هیتلر دیدار کرد تا بحران سودت را حل کند. او در نامه‌ای به خواهرش آیدا در ۱۹ سپتامبر نوشت که به‌رغم سختی و بی‌رحمی‌ای که گمان کرد در چهره هیتلر دیده، این برداشت را پیدا کرده که «اینجا مردی است که وقتی قولی داد می‌توان به او اعتماد کرد». در آن زمان هیتلر پیش‌تر در ۱۹۳۶ راینلند را برخلاف تعهدات لوکارنو نظامی کرده و در مارس ۱۹۳۸ اتریش را ضمیمه کرده بود. چمبرلین پس از توافق مونیخ (۳۰ سپتامبر) و امضای اعلامیه مشترک انگلیس و آلمان، از «صلح برای زمانه ما» سخن گفت. در ۱۵ مارس ۱۹۳۹ آلمان باقی‌مانده چک‌ها را اشغال کرد. انگیزه‌های سیاست ","t":"چمبرلین و «مردی که می‌توان به قولش اعتماد کرد» (۱۹۳۸)","tier":"real","why":"پی بردن به حالت یا نیت دیگری از روی چهره، علم حصولی است نه حضوری (s11)؛ تنها یافتِ حالتِ خودِ عالم نزد او حاضر است و همان ذاتاً معتبر است (s42). برداشت چمبرلین از قابل اعتماد بودن هیتلر حکمی درباره امری بیرونی بود که باید از راه شواهد (سابقه عمل، اظهارات، گزارش‌های اطلاعاتی) سنجیده می‌شد، ولی اعتباری شبیه یافتِ بی‌واسطه گرفت. شواهد ناسازگار در دسترس بود — نقض تعهدات راینلند و ضمیمه کردن اتریش — و در برابر این «برداشت» ترازو نشد (s53). بهای خطا سرنوشت چند کشور بود (s6).","y":1938},{"d":"حقوق و قضا","ex":["st_badihi","st_conflict","st_background"],"fl":["st_naql","st_istiqra","st_tajrobe","st_conflict"],"full":false,"fx":["اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر به‌جای شمردنِ موارد، علتِ نظم را با اصولِ عقلی و وضع‌ورفع می‌جست (s50، s51)، یا ادعا را به «موردِ بعدی» محدود می‌کرد، اطمینانش به حکمِ کلی بالا نمی‌رفت."],"id":"r2_central_park_five","k":"ok","ok":false,"r":3,"right":"اگر داوران مقدمه «بی‌گناه اعتراف نمی‌کند» را نظری می‌شناختند و برایش دلیل می‌خواستند، اعترافات بازجویی‌های طولانی از نوجوانان را با شواهد مستقل (DNA، تطبیق جزئیات با صحنه) می‌سنجیدند و ناسازگاری‌ها را دلیل تردید جدی می‌گرفتند، نه زائده‌ای بر روایت.","src":["Sarah Burns, The Central Park Five: A Chronicle of a City Wilding (2011)","New York County District Attorney's Office, Affirmation in Response to Motion to Vacate Judgment of Conviction, People v. Kharey Wise et al. (December 2002)","Saul M. Kassin et al., \"Police-Induced Confessions: Risk Factors and Recommendations\", Law and Human Behavior 34 (2010)"],"story":"در ۱۹ آوریل ۱۹۸۹ زنی که در سنترال پارک نیویورک می‌دوید مورد تجاوز و ضرب‌وشتم شدید قرار گرفت. پنج نوجوان ۱۴ تا ۱۶ ساله سیاه‌پوست و لاتین‌تبار پس از ساعت‌ها بازجویی، اظهاراتی دادند که در آن‌ها خود و دیگران را در حمله دخیل شمردند و بیشترشان ویدئویی ضبط شد. این اظهارات در جزئیات اساسی (چه کسی چه کرد، کجا و چه زمانی) با یکدیگر و با صحنه جرم ناسازگار بود و نوجوانان بعداً آن‌ها را پس گرفتند و گفتند زیر فشار و با وعده رفتن به خانه داده شده است. آزمایش DNA نمونه‌های به‌دست‌آمده از قربانی با هیچ‌یک از پنج نفر مطابقت نداشت و دادستانی وجود مهاجمی شناسایی‌نشده را پذیرفت، ولی پرونده عمدتاً بر اعترافات بنا ش","t":"پرونده «پنج نفر سنترال پارک»: اعتراف در برابر DNA (۱۹۹۰)","tier":"real","why":"گزاره «بی‌گناه اعتراف نمی‌کند» نه اولی است (صرف تصور اجزایش حکم را نمی‌سازد) و نه وجدانی (گزارش حالتی حاضر در نفسِ داور نیست)؛ تصدیقی نظری درباره رفتار دیگران است که باید با شواهد سنجیده شود (s39، s40)، ولی چون «بدیهی» و «عقل سلیم» می‌نمود، بی‌استدلال مقدمه حکم شد. شواهد ناسازگار در دسترس بود: ناسازگاری اعترافات با هم و با صحنه، و عدم تطابق DNA؛ این‌ها به نفع فرضِ «مهاجم دیگری هم بود» کنار رفت، نه سنجیده شد (s53). فضای خشم عمومی و فشار برای یافتن مجرم پیش‌زمینه نابایسته‌ای بود که در داوری اثر گذ","y":1990},{"d":"حقوق و قضا","ex":["st_tasdiq"],"fl":["st_worlds","st_tasdiq","st_naql","st_herm"],"full":true,"fx":["اگر کنشگر واقع، فهم خود و واژه‌ها را جدا می‌نوشت و معنای مقصود هر واژه کلیدی را معین می‌کرد، از «نامش عوض شد» به «خودش عوض شد» نمی‌رسید.","اگر کنشگر حکم خبریِ پنهان در توصیه یا ترکیب وصفی را بیرون می‌کشید و همان را می‌سنجید، به خودِ انشا صدق و کذب نسبت نمی‌داد.","اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت."],"id":"r2_greenbelt_blackmail","k":"ok","ok":false,"r":3,"right":"اگر داوران حکم خبریِ نهفته در گزارش را بیرون می‌کشیدند («برسلر خرید زمین مدرسه را به مجوز تغییر کاربری گره زد») و همان را می‌سنجیدند، آن را صادق می‌یافتند و صفت تند را — که اِخبار نیست — موضوع صدق و کذب قرار نمی‌دادند.","src":["Greenbelt Cooperative Publishing Ass'n v. Bresler, 398 U.S. 6 (1970)"],"story":"چارلز برسلر، سازنده و توسعه‌دهنده املاک در گرین‌بلت مریلند، هم‌زمان با شورای شهر بر سر دو موضوع مذاکره می‌کرد: شهر می‌خواست زمینی از او برای مدرسه بخرد و او برای زمین دیگری مجوز تغییر کاربری می‌خواست. در جلسات عمومی شورا برخی شهروندان موضع مذاکره‌ای او، یعنی گره زدن این دو معامله به هم، را «باج‌گیری» نامیدند و نشریه محلی گرین‌بلت نیوز ریویو این سخنان را دقیق گزارش کرد. برسلر به اتهام افترا شکایت کرد، به این استدلال که نشریه او را به جرم باج‌گیری متهم کرده است؛ هیئت منصفه به سود او رأی داد و دادگاه تجدیدنظر مریلند حکم را تأیید کرد. دیوان عالی آمریکا در ۱۹۷۰ حکم را نقض کرد و گفت حتی بی‌دقت‌ترین ","t":"«باج‌گیری» در جلسه شورای شهر: پرونده گرین‌بلت علیه برسلر","tier":"real","why":"ارزش‌سنجی صدق و کذب تنها در قلمرو تصدیقات است؛ ترکیب‌های وصفی و تعبیرهای انشایی، تا حکمی خبری را حمل نکنند، متصف به صدق و کذب نمی‌شوند (s27، s38). «باج‌گیری» در دهان شهروندان معترض صفتی ارزیابانه و مبالغه‌آمیز برای موضع مذاکره‌ای بود، نه خبر از رخ دادن جرمی با ارکان حقوقی‌اش؛ داوری به آن به‌مثابه گزاره‌ای کاذب، بیانِ خشم را با اِخبار از واقع یکی گرفت. تصدیقِ خبریِ پنهان در گزارش — اینکه برسلر دو معامله را به هم گره زده — صادق بود و مورد نزاع هم نبود.","y":1970},{"d":"رسانه و خبر","ex":["st_aql","st_grade","st_resp"],"fl":["st_aql","st_istiqra","st_conflict","st_background"],"full":false,"fx":["اگر کنشگر مقدمات را جداگانه می‌سنجید، این استدلال را کنار می‌گذاشت و نتیجه را از راه دیگری می‌آزمود.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر درجه هر طرف را می‌سنجید، طرف یقینی را مقدم می‌کرد و تصدیق ناسازگار را کنار می‌گذاشت (یا اگر متن غیرنص بود، تأویل می‌کرد)."],"id":"r2_nyt_goddard_1920","k":"ok","ok":false,"r":3,"right":"اگر نویسنده مقدمه «نیاز به تکیه‌گاه» را به بدیهی ارجاع می‌داد یا از فیزیک‌دانان می‌پرسید، کاذب بودنش را می‌دید؛ و حتی بدون آن، ادعای جسورانه ولی ناسازگارنشده با یقین را با درجه‌ای میانی و نیازمند آزمون گزارش می‌کرد، نه با تمسخر و حکم ناممکن بودن.","src":["Robert H. Goddard, A Method of Reaching Extreme Altitudes, Smithsonian Miscellaneous Collections vol. 71 no. 2 (1919)","The New York Times, \"A Severe Strain on Credulity\" (editorial, 13 January 1920)","The New York Times, \"A Correction\" (17 July 1969)"],"story":"رابرت گادرد در رساله‌ای که مؤسسه اسمیتسونین در اواخر ۱۹۱۹ منتشر کرد، نظریه و آزمایش‌های خود درباره موشک برای رسیدن به ارتفاعات بسیار بالا را شرح داد و در پایان به امکان فرستادن محموله‌ای کوچک تا ماه اشاره کرد. نیویورک تایمز در سرمقاله ۱۳ ژانویه ۱۹۲۰ این ایده را ناممکن خواند، با این استدلال که موشک در خلأ فراسوی جو چیزی ندارد که به آن «فشار» بیاورد، و نوشت گادرد گویا از دانشی که هر روز در دبیرستان‌ها تدریس می‌شود، یعنی رابطه کنش و واکنش، بی‌بهره است. قانون سوم نیوتن در واقع رانش را از واکنش گازهای بیرون‌رانده بر خود موشک می‌داند و به محیطی برای تکیه نیاز ندارد. روزنامه پیش از نوشتن، نه از فیزیک","t":"سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹","tier":"real","why":"حکم «قطعاً ناممکن» یعنی صفر دادن به ارزش صدق ادعای گادرد؛ ولی صفر فقط جای کذب یقینی است و ادعایی که با هیچ معرفت یقینی ناسازگار نیست، حتی اگر اثبات‌نشده باشد، درجه‌ای میان صفر و یک دارد (s40، تکمیل درس ۸). استدلال سرمقاله هم بر مقدمه‌ای کاذب بنا شده بود («باید به محیطی تکیه کند») و ماده آن به بدیهی نمی‌رسید (s40)؛ در واقع خودِ اصل کنش و واکنش که سرمقاله به آن استناد کرد، به سود گادرد بود. پرسیدن از اهل فن و خواندن آزمایش‌های رساله ممکن بود و انجام نشد (s49، s6).","y":1920},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_spotlight_geoghan","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: احراز صدور از راه سند رسمی، تکیه بر گزارش‌های عرضی مستقل به‌جای تک‌منبع، سنجش دلالت و قرائن (s47، s48)، و انجام تحقیق پیش از عمل.","src":["The Investigative Staff of The Boston Globe, Betrayal: The Crisis in the Catholic Church (2002)","The Boston Globe, \"Church allowed abuse by priest for years\" (6 January 2002)"],"story":"در ۲۰۰۱ تیم تحقیقی «اسپات‌لایت» بوستون گلوب به پیشنهاد سردبیر تازه، مارتی بارون، بررسی اتهام‌های کودک‌آزاری کشیش جان گیگن را آغاز کرد. روزنامه از دادگاه خواست اسناد مهروموم‌شده دعاوی مدنی را از محرمانگی خارج کند و قاضی در اواخر ۲۰۰۱ دستور انتشار آن‌ها را داد. تیم افزون بر مصاحبه با قربانیان و وکلا، از راهنماهای سالانه اسقف‌نشین الگوهای جابه‌جایی کشیشان (مرخصی استعلاجی، «بی‌مأموریت») را استخراج کرد و فهرستی از موارد مشکوک ساخت و هر مورد را با منابع مستقل تطبیق داد. گزارش نخست در ۶ ژانویه ۲۰۰۲ بر پایه نامه‌ها و اسناد داخلی کلیسا نشان داد مقامات اسقف‌نشین، از جمله کاردینال لا، از اتهام‌های گیگن آ","t":"تیم اسپات‌لایت بوستون گلوب و پرونده اسقف‌نشین بوستون (۲۰۰۲)","tier":"real","why":"صدور اسناد احراز شده بود: از پرونده رسمی دادگاه و با حکم قاضی به دست آمدند (s47). گزارش‌ها عرضی و مستقل بودند — قربانیان، وکلا، اسناد کلیسا، داده‌های راهنمای سالانه — و هم‌گرایی چنین گزارش‌هایی احتمال انطباق با واقع را تقویت می‌کند (s47، s48). دلالت اسناد بر مدعا روشن بود (نامه‌های مقامات درباره اتهام‌ها و انتقال‌ها) و قرائن جانبی همسو بود. تیم پیش از انتشار تحقیق ممکن را انجام داد و اطمینانش با قوت شواهد متناسب بود.","y":2002},{"d":"رسانه و خبر","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_schmitz_daisey","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: سنجش وثاقت راوی، مراجعه به شاهد مستقل دست‌اول، داوری تعارض با قرائن (s47، s48، s53) و انجام تحقیق پیش از انتشار.","src":["This American Life, Episode 460: \"Retraction\" (16 March 2012)","This American Life, Episode 454: \"Mr. Daisey and the Apple Factory\" (6 January 2012)"],"story":"در ژانویه ۲۰۱۲ برنامه رادیویی «این زندگی آمریکایی» بخشی از تک‌گویی نمایشی مایک دیزی را پخش کرد که در آن او مدعی بود در شنژن با کارگران کارخانه فاکسکان، از جمله کارگرانی که با ماده شیمیایی هگزان مسموم شده بودند، دیدار کرده و نگهبانان مسلح را بر در کارخانه دیده است. راب اشمیتز، خبرنگار برنامه «مارکت‌پلیس» در شانگهای، به برخی جزئیات بدگمان شد؛ مثلاً حمل اسلحه برای نگهبانان خصوصی در چین معمول نیست و مسمومیت با هگزان در کارخانه‌ای در سوجو گزارش شده بود، نه شنژن. او به‌جای داوری بر پایه این گمان، مترجم دیزی در آن سفر، کتی لی، را یافت و جزئیات را یک‌به‌یک با او سنجید؛ مترجم بسیاری از صحنه‌ها را رد کر","t":"راب اشمیتز و بازبینی روایت مایک دیزی از کارخانه‌های اپل (۲۰۱۲)","tier":"real","why":"اشمیتز ناسازگاری‌های اولیه را قرینه گرفت نه دلیل قطعی، و برای داوری به شاهد دست‌اولی رفت که حضورش در صحنه احراز می‌شد (s47، s48). روایت دیزی تک‌منبع و بی‌قرینه بود و با قرائن خلاف (الگوی معمول نگهبانی در چین، محل رخداد هگزان) روبه‌رو بود؛ تعارض با ترازوی عقل و قوت قرائن داوری شد (s53). نتیجه با اعتراف خود راوی تأیید شد. اطمینان او پس از تحقیق، نه پیش از آن، بالا رفت.","y":2012},{"d":"مالی و بانکی","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_reckard_wells_fargo","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: تکیه بر گزارش‌های عرضی مستقل، تطبیق با اسناد و قرائن، شنیدن روایت مقابل و داوری با قوت قرائن (s47، s48، s53).","src":["E. Scott Reckard, \"Wells Fargo's pressure-cooker sales culture comes at a cost\", Los Angeles Times (21 December 2013)","Consumer Financial Protection Bureau, Consent Order, In the Matter of Wells Fargo Bank, N.A., File No. 2016-CFPB-0015 (8 September 2016)"],"story":"اسکات رکارد، خبرنگار لس‌آنجلس تایمز، در دسامبر ۲۰۱۳ گزارشی منتشر کرد که نشان می‌داد فشار سهمیه‌های فروش در شعبه‌های ولز فارگو کارکنان را به باز کردن حساب‌ها و فروش محصولات بدون رضایت مشتریان واداشته است. گزارش بر مصاحبه با شمار زیادی از کارکنان کنونی و پیشین در شعبه‌ها و شهرهای مختلف، اسناد داخلی و پرونده‌های قضایی تکیه داشت، و پاسخ بانک — که اخراج حدود سی کارمند در منطقه لس‌آنجلس به همین دلیل را تأیید کرد — نیز در آن آمد. بانک این موارد را رفتار نادرست چند کارمند خواند. در ۲۰۱۵ دادستان شهر لس‌آنجلس شکایت کرد و در سپتامبر ۲۰۱۶ دفتر حمایت مالی از مصرف‌کننده، ناظر بانکی (OCC) و دادستانی لس‌آنجلس","t":"گزارش لس‌آنجلس تایمز درباره فرهنگ فروش ولز فارگو (۲۰۱۳)","tier":"real","why":"ادعا از گزارش‌های عرضی و مستقل کارکنانی در شعبه‌ها و شهرهای مختلف برآمد که تبانی‌شان بعید بود و هم‌گرایی‌شان احتمال صدق را بالا برد (s47، s48)؛ اسناد داخلی و پرونده‌های قضایی قرینه همسو بودند و حتی پاسخ خود بانک بخشی از واقعیت را تأیید کرد. ادعای «گسترده بودن» بر شمار و پراکندگی موارد تکیه داشت و با اطمینانی متناسب بیان شد؛ روایت مقابل بانک (کار چند فرد) با همین قرائن سنجیده شد (s53). نتیجه با بررسی رسمی ناظران تأیید شد.","y":2013},{"d":"تاریخ و سیاست","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_stagg_dday_forecast","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: سنجش تعارض با قوت قرائن، ترجیح تحلیل وضع موجود بر تعمیم صرف از گذشته، به‌روزکردن حکم با داده تازه، و گزارش درجه اطمینان متناسب (s40، s50، s53).","src":["J. M. Stagg, Forecast for Overlord: June 6, 1944 (1971)","John Ross, The Forecast for D-Day: And the Weatherman Behind Ike's Greatest Gamble (2014)"],"story":"جیمز استگ، افسر نیروی هوایی سلطنتی و هواشناس ارشد ستاد آیزنهاور، باید پیش‌بینی سه تیم جدا — اداره هواشناسی بریتانیا، دریاداری و تیم نیروی هوایی ارتش آمریکا — را که اغلب با هم اختلاف داشتند، به یک توصیه بدل می‌کرد. تیم آمریکایی با روش قیاس با الگوهای گذشته هوای ۵ ژوئن را مناسب می‌دانست، ولی استگ با تکیه بر تحلیل نقشه‌ها و دو تیم بریتانیایی توفانی را برای آن روز پیش‌بینی کرد و در بامداد ۴ ژوئن تعویق یک‌روزه را توصیه کرد. عصر ۴ ژوئن، گزارش‌های تازه ایستگاه‌های دیدبانی، از جمله ایستگاه بلک‌ساد پوینت در غرب ایرلند، نشان داد پس از جبهه سرد پنجره‌ای کوتاه از هوای بهتر برای ۶ ژوئن پدید می‌آید؛ استگ ای","t":"پیش‌بینی هوای جیمز استگ و تعویق روز دی (۱۹۴۴)","tier":"real","why":"در تعارض دو شناخت غیریقینی (پیش‌بینی آمریکایی و بریتانیایی) داوری با ترازوی عقل و قوت قرائن انجام شد، نه با مرجعیت یا میل (s53)؛ روش قیاس با گذشته که به استقرائی ناقص تکیه داشت، در برابر تحلیل فیزیکی وضع کنونی وزن کمتری گرفت (s50). داده دیدبانی تازه وارد داوری شد و حکم تغییر کرد، و اطمینان صریحاً میانی و احتمالاتی گزارش شد — همان اعتبار تشکیکی که ملاک عمل بر ترجیح احتمال بالاتر است (s40، تکمیل درس ۸). در عمل پرمخاطره، تحقیق ممکن تا آخرین لحظه انجام شد (s6).","y":1944},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_snp_mayfield_print","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: داوری بر پایه روش نه شمار و مقام کارشناسان، جدی گرفتن شاهد ناسازگار، مهار پیش‌زمینه نابایسته و ادامه تحقیق تا یافتن پاسخ مثبت (s49، s53، s70).","src":["U.S. Department of Justice, Office of the Inspector General, A Review of the FBI's Handling of the Brandon Mayfield Case (March 2006)"],"story":"پس از بمب‌گذاری قطارهای مادرید در ۱۱ مارس ۲۰۰۴، اثر انگشتی نهفته روی کیسه‌ای حاوی چاشنی پیدا شد. اف‌بی‌آی با جست‌وجوی رایانه‌ای و سپس مقایسه سه کارشناس خود آن را به براندون میفیلد، وکیلی در اورگان، نسبت داد و بعدتر کارشناسی مستقل که دادگاه تعیین کرد نیز همین را تأیید کرد. واحد اثر انگشت پلیس ملی اسپانیا مقایسه را خودش انجام داد و در ۱۳ آوریل گزارش داد که نتیجه منفی است؛ کارشناسان اف‌بی‌آی به مادرید رفتند تا استدلال خود را ارائه کنند، ولی اسپانیایی‌ها با اشاره به ناهمخوانی‌های حل‌نشده بر داوری خود ماندند. میفیلد در ۶ مه بازداشت شد و در ۱۹ مه پلیس اسپانیا اثر را به اوهنان داود، شهروند الجزایری، ","t":"پلیس ملی اسپانیا و رد شناسایی اثر انگشت براندون میفیلد (۲۰۰۴)","tier":"real","why":"استناد به تخصص دیگران فقط با اعتبار روش و پایبندی کارشناس به آن پذیرفتنی است (s49)؛ اسپانیایی‌ها شمار و اعتبار سازمانی تأییدکنندگان را جای سنجش روش ننشاندند و مقایسه را خود با همان روش تکرار کردند. در تعارض دو داوری غیریقینی، قرائن (ناهمخوانی‌های حل‌نشده) را وزن کردند (s53) و فشار نهادی و مرجعیت اف‌بی‌آی را — پیش‌زمینه نابایسته — در داوری دخالت ندادند (s70). نتیجه با یافتن صاحب واقعی اثر تأیید شد.","y":2004},{"d":"حقوق و قضا","ex":[],"fl":[],"full":null,"fx":[],"id":"r2_tichborne_claimant","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: تمایز شمار گزارش‌ها از استقلال آن‌ها، ارزیابی حافظه با سند و واقعیت بیرونی، و داوری تعارض با قوت قرائن (s47، s52، s53).","src":["Rohan McWilliam, The Tichborne Claimant: A Victorian Sensation (2007)","Douglas Woodruff, The Tichborne Claimant: A Victorian Mystery (1957)"],"story":"راجر تیچبورن، وارث خاندانی ثروتمند انگلیسی، در ۱۸۵۴ با غرق شدن کشتی «بلا» ناپدید شد. مادرش با آگهی در پی او بود و در ۱۸۶۶ قصابی از واگا واگا در استرالیا خود را راجر معرفی کرد؛ مادر در ۱۸۶۷ در پاریس او را پسر خود شناخت و بیش از صد نفر، از جمله خدمه و افسرانی که راجر را می‌شناختند، به سود او شهادت دادند. در دادگاه مدنی (۱۸۷۱–۱۸۷۲) معلوم شد مدعی فرانسوی نمی‌داند، در حالی که راجر در فرانسه بزرگ شده و به آن زبان مسلط بود؛ درباره مدرسه استونی‌هرست و رخدادهای زندگی راجر ناآگاه بود؛ و شاهدی گواهی داد که بر بازوی راجر خال‌کوبی کرده بود، حال آنکه مدعی چنین نشانی نداشت. دعوای مدنی فروریخت و در دادگاه کیف","t":"مدعی تیچبورن: دادگاه در برابر صد شاهد (۱۸۷۴)","tier":"real","why":"شمار راویان فقط وقتی یقین یا اطمینان می‌آورد که گزارش‌ها مستقل باشند و تبانی یا اثرپذیری‌شان از هم منتفی باشد (s47، s48)؛ شناسایی‌های پس از پذیرش مادر و پس از سال‌ها، یادآوری‌هایی سنجیده‌نشده با سند بودند (s52). در برابر، شواهدی که با واقعیت بیرونی و سند سنجش‌پذیر بود — توان زبانی، دانسته‌های مدرسه، خال‌کوبی گواهی‌شده — به گزاره مقابل قوت بیشتری می‌داد و دادگاه تعارض را با ترازوی قوت قرائن داوری کرد (s53).","y":1874},{"d":"بازار و معامله","ex":["st_naql","st_resp"],"fl":["st_hiss","st_naql","st_background","st_resp"],"from":"r2_cbs_killian_memos","full":true,"fx":["اگر کنشگر منبع اصلی (متن، صدا، تأیید خود گوینده) را می‌دید و به تصویر بازنشرشده بسنده نمی‌کرد، مقدمه نخست را احراز می‌کرد.","اگر کنشگر پیش‌زمینه‌هایش (پرسش آغازین، حب و بغض، انتظار، باور پیشین) را آشکار و رده‌بندی می‌کرد و نابایسته‌ها را به اختیار کنار می‌گذاشت، ورودی را دوباره و بی‌آن‌ها می‌خواند.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r2_abs_startup_loi","k":"ok","ok":false,"r":3,"right":"اگر سارا صدور را مستقیم از گوینده اصلی می‌پرسید یا حلقه بی‌نام را شناسایی می‌کرد، یا نامه را کنار می‌گذاشت یا پس از احراز صدور بر آن تکیه می‌کرد.","src":[],"story":"سارا، شریک صندوقی کوچک، در آستانه سرمایه‌گذاری در استارت‌آپی بود که ادعا می‌کرد یک زنجیره بزرگ خرده‌فروشی آماده سفارش کلان است. بنیان‌گذار گفت نامه قصد خرید را مستقیم ندارد؛ کارمند پیشینش آن را از «آشنایی در واحد خرید» آن زنجیره گرفته که نامش را نمی‌گوید. سارا فقط تصویر اسکن‌شده نامه را دید که آرم و امضای مدیر خرید را داشت و محتوایش با گفته‌های پیشین بنیان‌گذار جور درمی‌آمد. او می‌توانست با یک تماس به دفتر مدیر خرید صحت نامه را بپرسد، ولی برای عقب نماندن از رقیبان، همان هفته پول را واریز کرد. سه ماه بعد زنجیره خرده‌فروشی اعلام کرد هیچ نامه‌ای صادر نکرده و امضا از سندی دیگر برداشته شده بود.","t":"نامه قصد خرید که از «دوستِ یک دوست» رسید","tier":"abstract","why":"صدور نامه از گوینده اصلی (زنجیره) احراز نشده بود و نامه از زنجیره‌ای طولی رسیده بود (زنجیره ← آشنای بی‌نام ← کارمند پیشین ← بنیان‌گذار ← سارا) که یک حلقه‌اش مجهول بود؛ در نقل طولی وثاقت همه واسطه‌ها لازم است و اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌کند (s47). هم‌خوانی محتوا با ادعای بنیان‌گذار قرینه مستقل نبود، چون از همان منبع ذی‌نفع می‌آمد (s48). استعلام مستقیم ارزان و ممکن بود و با بهای بالا انجام نشد (s6).","y":2024},{"d":"زندگی روزمره","ex":["st_herm"],"fl":["st_naql","st_conflict","st_background","st_herm"],"from":"cs_b_hirsch","full":true,"fx":["اگر کنشگر قرینه خلاف را در ترازو می‌گذاشت و دو طرف را با درجه اعتبارشان می‌سنجید، خبر را بی‌درنگ نمی‌پذیرفت.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش‌زمینه‌هایش (پرسش آغازین، حب و بغض، انتظار، باور پیشین) را آشکار و رده‌بندی می‌کرد و نابایسته‌ها را به اختیار کنار می‌گذاشت، ورودی را دوباره و بی‌آن‌ها می‌خواند."],"id":"r2_abs_father_letter","k":"ok","ok":false,"r":3,"right":"اگر پسر معنای نامه را با قرائن (تاریخ، عبارت مقید، گواهی عمو) جدا از اهمیت عاطفی‌اش برای خود می‌نوشت، می‌دید پدر فروش زیر قیمت را منع کرده بود و تصمیم کنونی را پرسشی تازه می‌شمرد.","src":[],"story":"پدر خانواده در زمستانی که بازار کساد بود و خریداری برای مغازه پیشنهاد قیمتی بسیار پایین داده بود، نامه‌ای کوتاه به فرزندانش نوشت: «در این وضع مغازه را نگه دارید و به این قیمت نفروشید.» او دو سال بعد درگذشت. چند سال پس از آن، خریداری پیشنهادی چند برابر قیمت بازار داد و دختر کوچک‌تر خواهان فروش بود. پسر بزرگ‌تر نامه را آورد و گفت معنای آن این است که مغازه هرگز نباید فروخته شود، چون برای او این نامه نماد وفاداری به راه پدر و هویت خانواده است. او به تاریخ نامه، پیشنهاد کم آن زمان و عبارت «در این وضع» نپرداخت و گفت «هر کس نامه را جور دیگری بخواند پدر را نفهمیده است». عموی خانواده که در آن زمستان کن","t":"«مغازه را نگه دارید»: نامه پدر و تصمیم فرزندان","tier":"abstract","why":"هدف ذاتی نوشتن نامه رساندن معنای مدنظر نویسنده به مخاطب است (s69)؛ آنچه نامه برای پسر «معنا می‌دهد» (نماد هویت و وفاداری) اهمیت آن برای اوست، نه مراد پدر. قرائن متصل و منفصل — «در این وضع»، «به این قیمت»، تاریخ نامه، گواهی عمو — مراد را به منع فروش ارزان در آن شرایط محدود می‌کرد و نادیده ماند. علاقه عاطفی به مغازه پیش‌زمینه‌ای نابایسته بود که مهارش در اختیار او بود (s70).","y":2023},{"d":"مالی و بانکی","ex":["st_aql","st_grade","st_resp"],"fl":["st_aql","st_naql","st_conflict","st_resp"],"from":"r2_nyt_goddard_1920","full":false,"fx":["اگر کنشگر هر مقدمه (به‌ویژه مقدمه ناگفته) را تا بدیهی یا تا راه معتبرش دنبال می‌کرد، اطمینانش به نتیجه از اطمینان به ضعیف‌ترین مقدمه بیشتر نمی‌شد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r2_abs_desk_stablecoin","k":"ok","ok":false,"r":3,"right":"اگر رئیس میز مقدمه پشتوانه را با گزارش‌ها می‌سنجید و به هشدار احتمالی درجه‌ای میانی می‌داد، دست‌کم سقفی برای نگهداری نقدینگی در آن توکن می‌گذاشت.","src":[],"story":"تحلیلگر تازه‌کار یک میز معاملات در یادداشتی نوشت که پشتوانه یک توکن ثابت‌قیمت که شرکت بخش بزرگی از نقدینگی خود را در آن نگه می‌دارد، بخشی در اوراق کم‌نقد است و در صورت هجوم برای بازخرید ممکن است توکن از برابری با دلار خارج شود. رئیس میز در جلسه گفت احتمال این رخداد «دقیقاً صفر» است، چون «هر توکن با یک دلار پشتیبانی می‌شود و برابری همیشه حفظ می‌شود»، و یادداشت را بی‌آنکه گزارش‌های پشتوانه را بخواند یا از واحد ریسک نظر بخواهد بایگانی کرد. هیچ گزارش حسابرسی‌شده‌ای وجود نداشت که ترکیب پشتوانه را تماماً نقد نشان دهد. چند ماه بعد با موج بازخرید، توکن دو روز زیر برابری معامله شد و شرکت زیان قابل توجه","t":"«احتمالش صفر است»: رئیس میز معاملات و هشدار تحلیلگر تازه‌کار","tier":"abstract","why":"صفر دادن به ادعای تحلیلگر یعنی کذب یقینی؛ اما هیچ معرفت یقینی با ادعای او ناسازگار نبود و ادعایی که به بدیهی نرسیده لزوماً کاذب نیست و درجه‌ای میان صفر و یک دارد (s40، تکمیل درس ۸). مقدمه «پشتوانه تماماً نقد است» اثبات‌نشده و در واقع نادرست بود، پس ماده استدلال به بدیهی نمی‌رسید (s40). خواندن گزارش‌ها و پرسیدن از واحد ریسک ممکن و ارزان بود و با بهای بالا انجام نشد (s6).","y":2025},{"d":"زندگی روزمره","ex":[],"fl":[],"from":"r2_schmitz_daisey","full":null,"fx":[],"id":"r2_abs_family_voice_msg","k":"ok","ok":true,"r":3,"right":"ملاک‌های رعایت‌شده: احراز صدور از گوینده اصلی، مراجعه به منابع مستقل دست‌اول، داوری تعارض با قرائن و تحقیق پیش از عمل (s47، s48، s53).","src":[],"story":"در گروه خانوادگی پیامی صوتی پخش شد که در آن مردی خود را پرستار بیمارستانی در شهری دیگر معرفی می‌کرد و می‌گفت پسرخاله خانواده تصادف کرده و برای عمل فوری باید همان ساعت مبلغی به حسابی شخصی واریز شود. مادر خانواده آماده واریز بود. دختر خانواده به جزئیاتی بدگمان شد: بیمارستان‌ها پیش‌پرداخت را به حساب شخصی نمی‌گیرند و نام بخشی که پرستار گفت در آن بیمارستان وجود نداشت. او به‌جای داوری بر پایه همین گمان، شماره رسمی بیمارستان را از وبگاهش پیدا کرد و پرسید، و هم‌زمان با همسر پسرخاله تماس گرفت؛ هر دو گفتند چنین بیماری بستری نیست و پسرخاله سر کار است. خانواده پول را واریز نکرد و بعدها روشن شد همین پیام ب","t":"پیام صوتی «پسرخاله در بیمارستان است» و تماس مستقیم دختر خانواده","tier":"abstract","why":"پیام تک‌منبع بود، صدورش از بیمارستان احراز نشده بود و با قرائن خلاف (حساب شخصی، بخشِ ناموجود) همراه بود (s47، s48). دختر گمان را دلیل قطعی نگرفت و از دو منبع مستقل و دست‌اول (مرجع رسمی و نزدیک‌ترین شاهد) پرسید؛ تعارض با قوت قرائن داوری شد (s53) و تحقیق ممکن پیش از عمل پرمخاطره انجام شد (s6).","y":2025},{"d":"علم","ex":["st_istiqra"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":true,"fx":["اگر کنشگر می‌پرسید «چه علتی این نظم را پدید آورده و چه چیزی می‌تواند آن را بشکند؟» (s51)، اطمینانش از شمارِ تکرارها بالاتر نمی‌رفت.","اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_wald_survivorship","k":"ok","ok":false,"r":9,"right":"پرسیدن اینکه نمونه چگونه گزینش شده و برآورد اثر نمونه‌ای که غایب است.","src":["Marc Mangel & Francisco J. Samaniego, \"Abraham Wald's Work on Aircraft Survivability\", J. American Statistical Association 79(386): 259–267 (1984)"],"story":"گروه پژوهش آماری دانشگاه کلمبیا در جنگ جهانی دوم از نیروی هوایی دادهٔ محل اصابت گلوله بر هواپیماهای بازگشته را گرفت. به روایت رایج، استدلال شهودی این بود که زره را باید روی نقاطی افزود که بیشترین سوراخ‌ها را دارند. آبراهام والد نشان داد داده فقط هواپیماهای زنده‌مانده را شامل می‌شود: نقاطی که در بازگشته‌ها کمتر سوراخ دارد (مثلاً موتور) احتمالاً همان جاهایی است که اصابت به آن‌ها هواپیما را سرنگون می‌کرد و سوراخ کم نشانهٔ آسیب‌پذیری بیشتر است، نه کمتر.","t":"ارمور هواپیماهای جنگی و تحلیل آبراهام والد (جنگ جهانی دوم)","tier":"real","why":"استقرا از نمونهٔ گزینش‌شده با بقا: هواپیماهای سرنگون‌شده در نمونه نیستند؛ شمار موارد بی‌توجه به سازوکار گزینش حکم کلی ساخت. (نکتهٔ مسیر ۲: خطای بقا در جزوه ملاکِ مستقل ندارد؛ صرفاً از نتیجهٔ ناقص‌بودن استقرا (s50) فهمیده می‌شود.)","y":1943},{"d":"علم","ex":["st_tajrobe"],"fl":["st_tajrobe"],"full":true,"fx":["اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت."],"id":"r4_kahneman_instructors","k":"ok","ok":false,"r":9,"right":"سنجش با گروه کنترل (وضع‌ورفع ستایش/سرزنش) و کنترل عامل پنهان شانس.","src":["Daniel Kahneman, Nobel Prize autobiography (2002)","Daniel Kahneman, Thinking, Fast and Slow (2011), ch. 17"],"story":"دنیل کانمن (که برای نیروی هوایی اسرائیل آموزش روان‌شناسی می‌داد) روایت می‌کند مربیان خلبانی مطمئن بودند ستایش پس از یک مانور عالی عملکرد بعدی را بدتر می‌کند و سرزنش پس از مانور بد عملکرد بعدی را بهتر می‌کند؛ این را از تجربهٔ مکرر خود دیده بودند. کانمن توضیح داد مانورهای بسیار خوب یا بسیار بد تا حدی شانس‌اند و مانور بعدی طبیعتاً به میانگین نزدیک‌تر می‌شود، بی‌آنکه ستایش یا سرزنش اثر داشته باشد (بازگشت به میانگین).","t":"مربیان خلبانی نیروی هوایی اسرائیل و ستایش/سرزنش (روایت کانمن)","tier":"real","why":"قانون تجربی بدون وضع‌ورفع و بدون کنترل عامل پنهان (شانس و بازگشت به میانگین) ساخته شد؛ تکرار داده حسی به‌تنهایی علت را نشان نمی‌دهد (s51). (نکتهٔ مسیر ۲: «بازگشت به میانگین» ملاکِ مستقل ندارد.)","y":1960},{"d":"فناوری و مهندسی","ex":["st_istiqra","st_conflict","st_resp"],"fl":["st_istiqra","st_tajrobe","st_resp"],"full":false,"fx":["اگر کنشگر اطمینانش را با شمارِ مواردِ دیده‌شده می‌سنجید — و می‌پرسید علتِ این نظم چیست و آیا عاملی پنهان می‌تواند آن را بشکند (s51) — بیش از این مطمئن نمی‌شد.","اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_columbia_foam","k":"ok","ok":false,"r":9,"right":"سنجش برخورد همین پرواز با داده‌ی خودش، پذیرش درخواست مهندسان و تصویربرداری پیش از بازگشت.","src":["Columbia Accident Investigation Board, Report Volume I (August 2003)"],"story":"حدود ۸۲ ثانیه پس از پرتاب شاتل کلمبیا (۱۶ ژانویهٔ ۲۰۰۳) تکه‌ای از عایق فوم مخزن بیرونی به لبهٔ بال چپ خورد. گروه ارزیابی آوار (DAT) و مهندسان درخواست تصویربرداری ماهواره‌ای/زمینی از بال را مطرح کردند، اما تیم مدیریت مأموریت درخواست را پیگیری نکرد، چون برخورد فوم در پروازهای قبلی هم دیده شده و بدون حادثه بوده و آن را مسئلهٔ نگهداری معمول می‌شمردند نه خطر ایمنی پرواز. شاتل هنگام بازگشت، اول فوریهٔ ۲۰۰۳ از هم پاشید. گزارش هیئت بررسی سانحهٔ کلمبیا (CAIB، اوت ۲۰۰۳) این فرهنگ تصمیم را نقد کرد.","t":"برخورد کفِ مخزن بیرونی به بال کلمبیا و تصمیم نگرفتن به تصویربرداری (۲۰۰۳)","tier":"real","why":"از پروازهای بی‌حادثهٔ پیشین به ایمنی همین برخورد (با تکهٔ بسیار بزرگ‌تر) تعمیم داده شد، درخواست مهندسان (شاهد ناسازگار) سنجیده نشد و تحقیقِ ممکن و ارزان (تصویربرداری) انجام نشد (s50، s53، s6).","y":2003},{"d":"بازار و معامله","ex":["st_naql","st_resp"],"fl":["st_expert","st_resp"],"full":false,"fx":["اگر کنشگر می‌پرسید کارشناس با چه روشی به این نظر رسیده و آن روش در بهترین حالت چه درجه‌ای می‌دهد، نظر را بالاتر از سقف روش نمی‌برد.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_bre_x_busang","k":"ok","ok":false,"r":9,"right":"نمونه‌گیری و آزمایش مستقل در آزمایشگاه دیگر پیش از سرمایه‌گذاری.","src":["Strathcona Mineral Services Ltd., Busang Project, Independent Review (May 1997)"],"story":"شرکت کانادایی بری-ایکس در اندونزی ادعا کرد در بوسانگ یکی از بزرگ‌ترین ذخایر طلای جهان را یافته و سهامش سال‌ها بالا رفت. سرمایه‌گذاران و تحلیلگران به نتایج آزمایش مغزه‌هایی که خود شرکت تهیه و عرضه می‌کرد اتکا داشتند. در ۱۹۹۷ شرکت فری‌پورت-مک‌موران هنگام ارزیابی مالکیت مشترک با حفاری‌های مستقل خود طلای قابل‌توجهی نیافت و گزارش مستقل استراتکونا (مه ۱۹۹۷) نتیجه گرفت نمونه‌های شرکت دست‌کاری (طلا افزوده) شده بود. سهام بی‌ارزش شد.","t":"بری-ایکس و «معدن طلای بوسانگ» (۱۹۹۷)","tier":"real","why":"داده تک‌منبع و از جانب ذی‌نفع بود و استقلال زنجیرهٔ نگهداری نمونه احراز نشد؛ تحقیق مستقل ممکن و در برابر بهای زیاد انجام نشد (s47، s49).","y":1997},{"d":"تاریخ و سیاست","ex":["st_conflict","st_background"],"fl":["st_aql","st_conflict","st_resp"],"full":false,"fx":["اگر کنشگر هر مقدمه (به‌ویژه مقدمه ناگفته) را تا بدیهی یا تا راه معتبرش دنبال می‌کرد، اطمینانش به نتیجه از اطمینان به ضعیف‌ترین مقدمه بیشتر نمی‌شد.","اگر کنشگر دو طرف را می‌نوشت، درجه هر کدام را از st_grade می‌آورد و با ملاک قطعیت و قوت قرائن (نه تازگی و شهرت) داوری می‌کرد، شاهد ناسازگار را نادیده نمی‌گرفت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_yom_kippur_concept","k":"ok","ok":false,"r":9,"right":"داوری فرض در برابر شاهد ناسازگار و آمادگی بر پایهٔ سناریوی مخالف.","src":["Agranat Commission, Interim Report (April 1974)"],"story":"پیش از ۶ اکتبر ۱۹۷۳ اطلاعات نظامی اسرائیل (امان) بر پایهٔ فرضی که «مفهوم» نامیده می‌شد استدلال می‌کرد مصر بدون توان هوایی برای زدن فرودگاه‌های اسرائیل و سوریه بدون مصر حمله نمی‌کنند؛ پس احتمال جنگ کم است. نشانه‌های رو به افزایش (تحرک نیروها در کانال، هشدارهای منابع) به‌جای بازنگری در فرض، با همین فرض تفسیر یا کم‌اهمیت شمرده شد. حمله در همان روز رخ داد. کمیسیون آگرانات (۱۹۷۴) در گزارش‌های خود به این تفکر تثبیت‌شده اشاره کرد.","t":"«مفهوم» اطلاعاتی اسرائیل و جنگ ۱۹۷۳","tier":"real","why":"فرض از پیش پذیرفته‌شده بر نشانه‌های ناسازگار مقدم شد؛ شاهد ناسازگار در دسترس بی‌سنجش ماند و پیش‌زمینهٔ نابایسته (اعتماد به فرض) در داوری اثر گذاشت (s53).","y":1973},{"d":"حقوق و قضا","ex":["st_expert","st_tajrobe"],"fl":["st_tajrobe","st_resp"],"full":false,"fx":["اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت.","اگر کنشگر پیش از عمل راه‌های تحقیق در دسترس (منبع، سند، کارشناس، آزمون) را فهرست و می‌پیمود، یا اگر فوریت داشت کمترین اقدام برگشت‌پذیر را برمی‌گزید، جهلش تقصیر نمی‌شد."],"id":"r4_willingham_fire","k":"ok","ok":false,"r":9,"right":"آزمودن نشانه‌ها در آتش‌های کنترل‌شده با و بدون ماده‌ٔ آتش‌زا و سنجش اعتبار روش پیش از شهادت.","src":["Craig L. Beyler, Analysis of the Fire Investigation Methods and Procedures Used in the Criminal Arson Cases Against Ernest Ray Willingham and Cameron Todd Willingham (17 August 2009)"],"story":"در دسامبر ۱۹۹۱ خانهٔ کامرون تاد ویلینگهام در کورسیکانای تگزاس سوخت و سه دخترش مردند. بازرسان آتش‌نشانی (مانوئل واسکز و داگلاس فاگ) بر پایهٔ تجربهٔ خود و نشانه‌هایی مانند شیشهٔ ترک‌خورده (crazed glass)، الگوهای سوختگی روی کف و «حوضچه‌های» ماده‌ٔ آتش‌زا شهادت دادند آتش عمدی بوده است؛ دادگاه (۱۹۹۲) محکوم و او در ۲۰۰۴ اعدام شد. گزارش کریگ بیلر (۲۰۰۹) برای کمیسیون علم قضایی تگزاس نتیجه گرفت این نشانه‌ها طبق دانش علمی آتش‌سوزی (از جمله NFPA 921) پشتوانهٔ علمی نداشت و همان الگوها در آتش‌های طبیعی هم پدید می‌آیند.","t":"آتش‌سوزی کورسیکانا و شهادت بازرسان آتش (۱۹۹۱–۱۹۹۲)","tier":"real","why":"اعتبار روش کارشناس احراز نشد و قاعدهٔ تجربی (نشانه ⇒ عمد) بی وضع‌ورفع و بی کنترل عامل پنهان (آتش‌های طبیعی با همان نشانه) از تکرار تجربه ساخته شد (s49، s51).","y":1992},{"d":"علم","ex":[],"fl":[],"full":null,"fx":[],"id":"r4_redfield_arsenic","k":"ok","ok":true,"r":9,"right":"ملاک‌های رعایت‌شده: نقد روش، کنترل عامل پنهان، بازتولید مستقل.","src":["Felisa Wolfe-Simon et al., Science 332 (2011), online 2 Dec 2010","Tyler J. Erb et al., \"GFAJ-1 Is an Arsenate-Resistant, Phosphate-Dependent Organism\", Science 337 (2012)"],"story":"در دسامبر ۲۰۱۰ مقاله‌ای در ساینس (ولف-سایمون و همکاران) ادعا کرد باکتری GFAJ-1 در فقدان فسفات می‌تواند آرسنیک را در DNA خود بگنجاند. روزی ردفیلد (میکروبیولوژیست) با نقد روش‌ها (آلودگی فسفات، شست‌وشوی ناکافی DNA) نتایج را نپذیرفت، آزمایش را در آزمایشگاه خود با کنترل‌هایی بازآزمود و گروه او (ارب و همکاران، ساینس ۲۰۱۲) نشان داد آرسنیک در DNA نیست و رشد به ردهای فسفات وابسته است.","t":"میکروب «آرسنیک‌زی» GFAJ-1 و نقد و بازآزمایی ردفیلد (۲۰۱۰–۲۰۱۲)","tier":"real","why":"ادعا با سنجش روش، شناسایی عامل پنهان (فسفات) و بازآزمایی با وضع‌ورفع سنجیده شد و تا آن زمان کمتر از یقین نگه داشته شد (s51، s53).","y":2010},{"d":"پزشکی","ex":[],"fl":[],"full":null,"fx":[],"id":"r4_snu_hwang_panel","k":"ok","ok":true,"r":9,"right":"ملاک‌های رعایت‌شده: تطبیق با واقعیت مستقل، بررسی مدارک اصلی و قضاوت پس از تحقیق.","src":["Seoul National University Investigation Committee, Final Report (10 January 2006)","Donald Kennedy, \"Editorial Retraction\", Science 311:335 (2006)"],"story":"در ۲۰۰۵ هوانگ وو-سوک مقالهٔ ساینس دربارهٔ سلول‌های بنیادی جنینی همسان با بیمار منتشر کرده بود. پس از ادعای تخلف در تأمین تخمک و شک دربارهٔ تصاویر، دانشگاه ملی سئول کمیته‌ای تشکیل داد که نمونهٔ سلول‌ها را با اثر انگشت DNA از نمونه‌های اهداکننده و منابع اصلی مطابقت داد و دفترهای آزمایشگاه را بررسی کرد. گزارش کمیته (ژانویهٔ ۲۰۰۶) نشان داد سلول‌های ادعاشده تولید نشده و داده جعل شده بود؛ ساینس مقاله‌ها را پس گرفت.","t":"کمیتهٔ بررسی دانشگاه ملی سئول دربارهٔ سلول‌های بنیادی هوانگ (۲۰۰۵–۲۰۰۶)","tier":"real","why":"ادعا با آزمون مستقل از گوینده (اثر انگشت DNA) و سند اصلی سنجیده شد و اعتبار گوینده جای سنجش نشست (s49، s6).","y":2005},{"d":"بازار و معامله","ex":["st_istiqra"],"fl":["st_istiqra","st_tajrobe"],"from":"r4_wald_survivorship","full":true,"fx":["اگر کنشگر به‌جای شمردنِ موارد، علتِ نظم را با اصولِ عقلی و وضع‌ورفع می‌جست (s50، s51)، یا ادعا را به «موردِ بعدی» محدود می‌کرد، اطمینانش به حکمِ کلی بالا نمی‌رفت.","اگر کنشگر عامل را در حالی که بقیه ثابت بودند می‌گذاشت و برمی‌داشت و اثر را می‌سنجید، از هم‌بستگی به رابطه علّی می‌رسید؛ وگرنه آن را در حد استقراء ناقص نگه می‌داشت."],"id":"r4_abs_survivor_shops","k":"ok","ok":false,"r":9,"right":"بررسی کافه‌های تعطیل‌شده و مقایسه.","src":[],"story":"مشاوری برای راه‌اندازی زنجیرهٔ کافه، ویژگی‌های ۴۰ کافهٔ پررونق شهر را بررسی کرد: همگی چیدمان باز و نورپردازی گرم داشتند. او نتیجه گرفت این ویژگی‌ها رمز موفقیت‌اند و به مشتری توصیه کرد همان طراحی را بسازد. او کافه‌هایی را که در همان چند سال تعطیل شده بودند نه فهرست کرد و نه بررسی؛ بعدها معلوم شد بسیاری از آن‌ها هم همان چیدمان را داشتند.","t":"«از فروشگاه‌های موفق الگو بگیریم»: مطالعهٔ فقط بازماندگان","tier":"abstract","why":"هم‌ساختار والد: نمونه با بقا گزینش شده بود و غایبان بررسی نشدند.","y":2025},{"d":"فناوری و مهندسی","ex":[],"fl":[],"from":"r4_redfield_arsenic","full":null,"fx":[],"id":"r4_abs_lab_claim_replic","k":"ok","ok":true,"r":9,"right":"ملاک‌های رعایت‌شده: کنترل عامل پنهان و بازتولید مستقل.","src":[],"story":"گزارش فنی یک شرکت ادعا می‌کرد ماده‌ای تازه رسانایی بسیار بالا دارد. یکی از مهندسان شرکت دیگر پیش از تغییر خط تولید روش اندازه‌گیری را بررسی کرد، متوجه شد اتصالات نمونه‌ها آلوده به فلز رسانا بوده است و خودش با نمونه‌های شاهد و بدون اتصال آلوده اندازه‌گیری را تکرار کرد. رسانایی مشاهده‌شده ناپدید شد. شرکت دوم خط تولید را تغییر نداد.","t":"ادعای ماده‌ای تازه در گزارش فنی و بازآزمایی تحلیلگر داخلی","tier":"abstract","why":"هم‌ساختار ردفیلد: نقد روش، شناسایی عامل پنهان و بازآزمایی با شاهد پیش از عمل.","y":2025}],"round":11},"territory":{"areas":{"a_a_priori":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_pseudo","src":"جزوه s39,s40","th":"A0","txt":"تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد"},{"kind":"theorem","rule":"r_badihi_wijdani_other","src":"جزوه s39,s11","th":"A0","txt":"حکم غیرحضوری، وجدانی گرفته شد"},{"kind":"theorem","rule":"r_aql_invalid_form","src":"جزوه s40,s44","th":"T_null","txt":"صورت استدلال نامعتبر"},{"kind":"theorem","rule":"r_aql_matter_unproven","src":"جزوه s40,s44","th":"T_unknown","txt":"مقدمه اثبات‌نشده"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s39، s44؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_pseudo","r_badihi_wijdani_other","r_aql_invalid_form","r_aql_matter_unproven"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s39، s44"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_abduction_ibe":{"history":[],"stage":0},"a_accuracy_dutch_book":{"history":[],"stage":0},"a_acquaintance":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_wijdani_other","src":"جزوه s39,s11","th":"A0","txt":"حکم غیرحضوری، وجدانی گرفته شد"},{"kind":"theorem","rule":"r_shohud_misrouted","src":"جزوه s42,s11","th":"A0","txt":"«شهود» نامیدن حدس یا الهام درباره بیرون"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s11؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_wijdani_other","r_shohud_misrouted"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s11"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_aesthetic_knowledge":{"history":[],"stage":0},"a_ai_machine":{"history":[],"stage":0},"a_badihiyyat":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_pseudo","src":"جزوه s39,s40","th":"A0","txt":"تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد"},{"kind":"theorem","rule":"r_badihi_wijdani_other","src":"جزوه s39,s11","th":"A0","txt":"حکم غیرحضوری، وجدانی گرفته شد"},{"kind":"theorem","rule":"r_aql_invalid_form","src":"جزوه s40,s44","th":"T_null","txt":"صورت استدلال نامعتبر"},{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_aql_matter_unproven","src":"جزوه s40,s44","th":"T_unknown","txt":"مقدمه اثبات‌نشده"},{"kind":"theorem","rule":"r_aql_matter_false","src":"جزوه s40","th":"T_null","txt":"مقدمه کاذب"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_grade_false_zero","src":"جزوه s40","th":"A0","txt":"صفر فقط برای کذب یقینی"},{"kind":"theorem","rule":"r_conflict_cert","src":"جزوه s53,s40","th":"T_conflict","txt":"ناسازگار با معرفت یقینی"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 9 قاعدهٔ کارخانه روی بخش‌های s39، s40؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_pseudo","r_badihi_wijdani_other","r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_istiqra_incomplete","r_grade_false_zero","r_conflict_cert"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s39، s40"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_basing_relation":{"history":[],"stage":0},"a_bayesian":{"history":[],"stage":0},"a_belief":{"history":[],"stage":0},"a_belief_credence":{"history":[],"stage":0},"a_belief_revision":{"history":[],"stage":0},"a_certainty":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_pseudo","src":"جزوه s39,s40","th":"A0","txt":"تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد"},{"kind":"theorem","rule":"r_badihi_wijdani_other","src":"جزوه s39,s11","th":"A0","txt":"حکم غیرحضوری، وجدانی گرفته شد"},{"kind":"theorem","rule":"r_aql_invalid_form","src":"جزوه s40,s44","th":"T_null","txt":"صورت استدلال نامعتبر"},{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_aql_matter_unproven","src":"جزوه s40,s44","th":"T_unknown","txt":"مقدمه اثبات‌نشده"},{"kind":"theorem","rule":"r_aql_matter_false","src":"جزوه s40","th":"T_null","txt":"مقدمه کاذب"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_grade_false_zero","src":"جزوه s40","th":"A0","txt":"صفر فقط برای کذب یقینی"},{"kind":"theorem","rule":"r_conflict_cert","src":"جزوه s53,s40","th":"T_conflict","txt":"ناسازگار با معرفت یقینی"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 9 قاعدهٔ کارخانه روی بخش‌های s39، s40؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_pseudo","r_badihi_wijdani_other","r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_istiqra_incomplete","r_grade_false_zero","r_conflict_cert"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s39، s40"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_coherentism":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_selfref","src":"جزوه s56,s57,s59,s63,s67","th":"A0","txt":"ادعای خودشکن (شک یا نسبیت فراگیر)"},{"kind":"theorem","rule":"r_doubt_pattern","src":"جزوه s59,s60,s61,s62,s63","th":"A0","txt":"شبهه شکاکانه از یکی از چهار الگو"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s62، s63؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_selfref","r_doubt_pattern"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s62، s63"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_common_knowledge_self_location":{"history":[],"stage":0},"a_concept_types":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_ctype_mix","src":"جزوه s33,s34,s35,s36","th":"A0","txt":"خلط اقسام مفاهیم کلی"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 1 قاعدهٔ کارخانه روی بخش‌های s33، s34، s35، s36؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_ctype_mix"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s33، s34، s35، s36"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_confirmation":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_istiqra_universal","src":"جزوه s51,s50","th":"T_universal","txt":"حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص"},{"kind":"theorem","rule":"r_istiqra_finite","src":"جزوه s50","th":"T_finite","txt":"حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص"},{"kind":"theorem","rule":"r_istiqra_next","src":"جزوه s50","th":"T_next","txt":"پیش‌بینیِ موردِ بعدی از استقراءِ ناقص"},{"kind":"theorem","rule":"r_istiqra_small_n","src":"جزوه s50","th":"T_below1","txt":"استقراء ناقص با موارد اندک"},{"kind":"theorem","rule":"r_tajrobe_ceiling","src":"جزوه s51","th":"T_below1","txt":"تجربه به پای برهان و شهود نمی‌رسد"},{"kind":"theorem","rule":"r_tajrobe_no_vazraf","src":"جزوه s51,s50","th":"T_null","txt":"تجربه بدون وضع و رفع ≈ استقراء ناقص"},{"base":"p_hidden_factor","kind":"base","rule":"r_tajrobe_hidden","src":"جزوه s51","th":"T_product","txt":"عوامل پنهان کنترل نشده"},{"base":"p_hidden_factor","kind":"base","rule":"r_istiqra_hidden","src":"جزوه s51,s50","th":"T_product","txt":"استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 10 قاعدهٔ کارخانه روی بخش‌های s50، s51؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_aql_nondeductive","r_istiqra_incomplete","r_istiqra_universal","r_istiqra_finite","r_istiqra_next","r_istiqra_small_n","r_tajrobe_ceiling","r_tajrobe_no_vazraf","r_tajrobe_hidden","r_istiqra_hidden"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s50، s51"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_conservatism":{"history":[],"stage":0},"a_contextualism":{"history":[],"stage":0},"a_contrastivism":{"history":[],"stage":0},"a_cross_cultural":{"history":[],"stage":0},"a_defeasibility_theory":{"history":[],"stage":0},"a_defeaters":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_naql_contra_qarina","src":"جزوه s47,s53","th":"T_against","txt":"قرینه خلاف"},{"kind":"theorem","rule":"r_conflict_cert","src":"جزوه s53,s40","th":"T_conflict","txt":"ناسازگار با معرفت یقینی"},{"kind":"theorem","rule":"r_conflict_ignored","src":"جزوه s53","th":"A0","txt":"شاهد ناسازگار بی‌سنجش کنار رفت"},{"kind":"theorem","rule":"r_r_tawil","src":"جزوه s80,s53,s48,s77","th":"A0","txt":"ظاهر ناسازگار با برهان قطعی، بی‌تأویل"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s53؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_naql_contra_qarina","r_conflict_cert","r_conflict_ignored","r_r_tawil"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s53"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_disagreement":{"history":[],"stage":0},"a_doxastic_voluntarism":{"history":[],"stage":0},"a_education":{"history":[],"stage":0},"a_entitlement_transmission":{"history":[],"stage":0},"a_epistemic_autonomy_paternalism":{"history":[],"stage":0},"a_epistemic_closure":{"history":[],"stage":0},"a_epistemic_injustice":{"history":[],"stage":0},"a_epistemic_logic":{"history":[],"stage":0},"a_epistemic_modals":{"history":[],"stage":0},"a_epistemic_norms":{"history":[],"stage":0},"a_epistemic_paradoxes":{"history":[],"stage":0},"a_epistemic_rationality":{"history":[],"stage":0},"a_epistemic_relativism":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_selfref","src":"جزوه s56,s57,s59,s63,s67","th":"A0","txt":"ادعای خودشکن (شک یا نسبیت فراگیر)"},{"kind":"theorem","rule":"r_doubt_pattern","src":"جزوه s59,s60,s61,s62,s63","th":"A0","txt":"شبهه شکاکانه از یکی از چهار الگو"},{"kind":"theorem","rule":"r_herm_readings_equal","src":"جزوه s67,s68,s69","th":"A0","txt":"هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s55، s56، s63، s67، s68؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_selfref","r_doubt_pattern","r_herm_readings_equal"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s55، s56، s63، s67، s68"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_epistemic_value":{"history":[],"stage":0},"a_ethics_of_belief":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_bg_undue","src":"جزوه s70,s65","th":"A0","txt":"پیش‌زمینه نابایسته مهار نشد"},{"kind":"theorem","rule":"r_bg_missing","src":"جزوه s70,s69","th":"T_null","txt":"پیش‌زمینه بایسته فراهم نبود"},{"kind":"theorem","rule":"r_resp_inquiry","src":"جزوه s80,s86,s6,s71","th":"A0","txt":"ترک تحقیق ممکن پیش از عمل پرخطر"},{"kind":"theorem","rule":"r_r_tawil","src":"جزوه s80,s53,s48,s77","th":"A0","txt":"ظاهر ناسازگار با برهان قطعی، بی‌تأویل"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s70، s80؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_bg_undue","r_bg_missing","r_resp_inquiry","r_r_tawil"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s70، s80"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_evidence":{"history":[],"stage":0},"a_evidentialism":{"history":[],"stage":0},"a_evolutionary":{"history":[],"stage":0},"a_experimental_epistemology":{"history":[],"stage":0},"a_explanation":{"history":[],"stage":0},"a_externalist_transcendental_responses":{"history":[],"stage":0},"a_fallibilism":{"history":[],"stage":0},"a_feminist_standpoint":{"history":[],"stage":0},"a_foundationalism":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_pseudo","src":"جزوه s39,s40","th":"A0","txt":"تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد"},{"base":"p_sense_unctrl","kind":"base","rule":"r_hiss_uncontrolled","src":"جزوه s43,s46","th":"T_below1","txt":"حس بدون کنترل شرایط"},{"base":"p_hidden_inf","kind":"base","rule":"r_hiss_hidden_inf","src":"جزوه s43,s46,s19","th":"T_product","txt":"استنتاج پنهان عادتی بی‌آزمون"},{"kind":"theorem","rule":"r_aql_invalid_form","src":"جزوه s40,s44","th":"T_null","txt":"صورت استدلال نامعتبر"},{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_aql_matter_unproven","src":"جزوه s40,s44","th":"T_unknown","txt":"مقدمه اثبات‌نشده"},{"kind":"theorem","rule":"r_aql_matter_false","src":"جزوه s40","th":"T_null","txt":"مقدمه کاذب"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_grade_false_zero","src":"جزوه s40","th":"A0","txt":"صفر فقط برای کذب یقینی"},{"kind":"theorem","rule":"r_conflict_cert","src":"جزوه s53,s40","th":"T_conflict","txt":"ناسازگار با معرفت یقینی"},{"kind":"theorem","rule":"r_selfref","src":"جزوه s56,s57,s59,s63,s67","th":"A0","txt":"ادعای خودشکن (شک یا نسبیت فراگیر)"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 11 قاعدهٔ کارخانه روی بخش‌های s40، s46، s57؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_pseudo","r_hiss_uncontrolled","r_hiss_hidden_inf","r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_istiqra_incomplete","r_grade_false_zero","r_conflict_cert","r_selfref"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s40، s46، s57"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_gettier_problem":{"history":[],"stage":0},"a_group_epistemology":{"history":[],"stage":0},"a_higher_order_evidence":{"history":[],"stage":0},"a_higher_order_knowledge":{"history":[],"stage":0},"a_history_ancient_medieval":{"history":[],"stage":0},"a_history_modern":{"history":[],"stage":0},"a_history_twentieth":{"history":[],"stage":0},"a_huduri_husuli":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_worlds_mix","src":"جزوه s16,s22,s19","th":"A0","txt":"خلط واقع، فهم و زبان"},{"kind":"theorem","rule":"r_core_interp_unchecked","src":"جزوه s42,s18,s19,s21,s22","th":"A0","txt":"تفسیر حصولی، خطاناپذیر پنداشته شد"},{"kind":"theorem","rule":"r_core_interp_notcert","src":"جزوه s42,s19","th":"T_below1","txt":"تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد"},{"kind":"theorem","rule":"r_badihi_wijdani_other","src":"جزوه s39,s11","th":"A0","txt":"حکم غیرحضوری، وجدانی گرفته شد"},{"kind":"theorem","rule":"r_shohud_misrouted","src":"جزوه s42,s11","th":"A0","txt":"«شهود» نامیدن حدس یا الهام درباره بیرون"},{"base":"p_sense_unctrl","kind":"base","rule":"r_hiss_uncontrolled","src":"جزوه s43,s46","th":"T_below1","txt":"حس بدون کنترل شرایط"},{"base":"p_hidden_inf","kind":"base","rule":"r_hiss_hidden_inf","src":"جزوه s43,s46,s19","th":"T_product","txt":"استنتاج پنهان عادتی بی‌آزمون"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 7 قاعدهٔ کارخانه روی بخش‌های s11، s12، s13، s14، s17، s18، s19، s46؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_worlds_mix","r_core_interp_unchecked","r_core_interp_notcert","r_badihi_wijdani_other","r_shohud_misrouted","r_hiss_uncontrolled","r_hiss_hidden_inf"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s11، s12، s13، s14، s17، s18، s19، s46"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_ignorance":{"history":[],"stage":0},"a_induction":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_istiqra_universal","src":"جزوه s51,s50","th":"T_universal","txt":"حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص"},{"kind":"theorem","rule":"r_istiqra_finite","src":"جزوه s50","th":"T_finite","txt":"حکمِ کلی بر مجموعهٔ معین از استقراءِ ناقص"},{"kind":"theorem","rule":"r_istiqra_next","src":"جزوه s50","th":"T_next","txt":"پیش‌بینیِ موردِ بعدی از استقراءِ ناقص"},{"kind":"theorem","rule":"r_istiqra_small_n","src":"جزوه s50","th":"T_below1","txt":"استقراء ناقص با موارد اندک"},{"kind":"theorem","rule":"r_tajrobe_no_vazraf","src":"جزوه s51,s50","th":"T_null","txt":"تجربه بدون وضع و رفع ≈ استقراء ناقص"},{"base":"p_hidden_factor","kind":"base","rule":"r_istiqra_hidden","src":"جزوه s51,s50","th":"T_product","txt":"استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 8 قاعدهٔ کارخانه روی بخش‌های s50؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_aql_nondeductive","r_istiqra_incomplete","r_istiqra_universal","r_istiqra_finite","r_istiqra_next","r_istiqra_small_n","r_tajrobe_no_vazraf","r_istiqra_hidden"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s50"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_inference_reasoning":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_pseudo","src":"جزوه s39,s40","th":"A0","txt":"تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد"},{"kind":"theorem","rule":"r_aql_invalid_form","src":"جزوه s40,s44","th":"T_null","txt":"صورت استدلال نامعتبر"},{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_aql_matter_unproven","src":"جزوه s40,s44","th":"T_unknown","txt":"مقدمه اثبات‌نشده"},{"kind":"theorem","rule":"r_aql_matter_false","src":"جزوه s40","th":"T_null","txt":"مقدمه کاذب"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_grade_false_zero","src":"جزوه s40","th":"A0","txt":"صفر فقط برای کذب یقینی"},{"kind":"theorem","rule":"r_conflict_cert","src":"جزوه s53,s40","th":"T_conflict","txt":"ناسازگار با معرفت یقینی"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 8 قاعدهٔ کارخانه روی بخش‌های s40، s44؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_pseudo","r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_istiqra_incomplete","r_grade_false_zero","r_conflict_cert"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s40، s44"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_infinitism":{"history":[],"stage":0},"a_inquiry":{"history":[],"stage":0},"a_intellectual_virtues_vices":{"history":[],"stage":0},"a_internalism_externalism":{"history":[],"stage":0},"a_intuitions_method":{"history":[],"stage":0},"a_justification_concept":{"history":[],"stage":0},"a_kinds_of_knowledge":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_truth_narrow","src":"جزوه s38,s9","th":"A0","txt":"تنگ‌گرفتن واقعیت"},{"kind":"theorem","rule":"r_badihi_wijdani_other","src":"جزوه s39,s11","th":"A0","txt":"حکم غیرحضوری، وجدانی گرفته شد"},{"kind":"theorem","rule":"r_shohud_misrouted","src":"جزوه s42,s11","th":"A0","txt":"«شهود» نامیدن حدس یا الهام درباره بیرون"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s8، s9، s11؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_truth_narrow","r_badihi_wijdani_other","r_shohud_misrouted"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s8، s9، s11"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_knowledge_first":{"history":[],"stage":0},"a_knowledge_how":{"history":[],"stage":0},"a_legal_epistemology":{"history":[],"stage":0},"a_math_logic":{"history":[],"stage":0},"a_memory":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_yad_orig_t1","src":"جزوه s52","th":"T_weakest","txt":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (≤۲۵)"},{"kind":"theorem","rule":"r_yad_orig_t2","src":"جزوه s52","th":"T_weakest","txt":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۲۶–۵۰)"},{"kind":"theorem","rule":"r_yad_orig_t3","src":"جزوه s52","th":"T_weakest","txt":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۵۱–۷۰)"},{"kind":"theorem","rule":"r_yad_orig_t4","src":"جزوه s52","th":"T_weakest","txt":"یادآوری بیش از معرفت نخستین منتقل نمی‌کند (۷۱–۸۵)"},{"kind":"theorem","rule":"r_yad_orig_t5","src":"جزوه s52","th":"T_weakest","txt":"یادآوری معرفت غیریقینی، یقینی نمی‌شود (۸۶–۹۹)"},{"base":"p_mem","kind":"base","rule":"r_yad_undoc","src":"جزوه s52","th":"T_product","txt":"حافظه با سند یا واقعیت بیرونی سنجیده نشده"},{"base":"p_mem","kind":"base","rule":"r_yad_undoc_t4","src":"جزوه s52","th":"T_product","txt":"حافظه سنجیده‌نشده × معرفت نخستین ۷۱–۸۵"},{"base":"p_mem","kind":"base","rule":"r_yad_undoc_t3","src":"جزوه s52","th":"T_product","txt":"حافظه سنجیده‌نشده × معرفت نخستین ۵۱–۷۰"},{"base":"p_mem","kind":"base","rule":"r_yad_undoc_t2","src":"جزوه s52","th":"T_product","txt":"حافظه سنجیده‌نشده × معرفت نخستین ۲۶–۵۰"},{"base":"p_mem","kind":"base","rule":"r_yad_undoc_t1","src":"جزوه s52","th":"T_product","txt":"حافظه سنجیده‌نشده × معرفت نخستین ≤۲۵"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 10 قاعدهٔ کارخانه روی بخش‌های s52؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_yad_orig_t1","r_yad_orig_t2","r_yad_orig_t3","r_yad_orig_t4","r_yad_orig_t5","r_yad_undoc","r_yad_undoc_t4","r_yad_undoc_t3","r_yad_undoc_t2","r_yad_undoc_t1"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s52"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_metaepistemology":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_truth_mix","src":"جزوه s38,s6","th":"A0","txt":"خلط صدق معرفتی و صدق اخلاقی"},{"kind":"theorem","rule":"r_truth_narrow","src":"جزوه s38,s9","th":"A0","txt":"تنگ‌گرفتن واقعیت"},{"kind":"theorem","rule":"r_resp_inquiry","src":"جزوه s80,s86,s6,s71","th":"A0","txt":"ترک تحقیق ممکن پیش از عمل پرخطر"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s4، s5، s6، s8، s9؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_truth_mix","r_truth_narrow","r_resp_inquiry"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s4، s5، s6، s8، s9"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_misinformation":{"history":[],"stage":0},"a_modal_anti_luck":{"history":[],"stage":0},"a_modal_knowledge":{"history":[],"stage":0},"a_moorean_hinge":{"history":[],"stage":0},"a_moral_epistemology":{"history":[],"stage":0},"a_mystical_intuition":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_core_interp_unchecked","src":"جزوه s42,s18,s19,s21,s22","th":"A0","txt":"تفسیر حصولی، خطاناپذیر پنداشته شد"},{"kind":"theorem","rule":"r_core_interp_notcert","src":"جزوه s42,s19","th":"T_below1","txt":"تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد"},{"kind":"theorem","rule":"r_core_mystic_unchecked","src":"جزوه s23,s24,s72","th":"A0","txt":"مکاشفه بی‌سنجش با عقل و وحی"},{"kind":"theorem","rule":"r_shohud_misrouted","src":"جزوه s42,s11","th":"A0","txt":"«شهود» نامیدن حدس یا الهام درباره بیرون"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s23، s24، s42؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_core_interp_unchecked","r_core_interp_notcert","r_core_mystic_unchecked","r_shohud_misrouted"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s23، s24، s42"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_naturalized":{"history":[],"stage":0},"a_other_minds":{"history":[],"stage":0},"a_perception":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_core_interp_unchecked","src":"جزوه s42,s18,s19,s21,s22","th":"A0","txt":"تفسیر حصولی، خطاناپذیر پنداشته شد"},{"base":"p_sense_unctrl","kind":"base","rule":"r_hiss_uncontrolled","src":"جزوه s43,s46","th":"T_below1","txt":"حس بدون کنترل شرایط"},{"base":"p_hidden_inf","kind":"base","rule":"r_hiss_hidden_inf","src":"جزوه s43,s46,s19","th":"T_product","txt":"استنتاج پنهان عادتی بی‌آزمون"},{"kind":"theorem","rule":"r_doubt_pattern","src":"جزوه s59,s60,s61,s62,s63","th":"A0","txt":"شبهه شکاکانه از یکی از چهار الگو"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s21، s43، s61؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_core_interp_unchecked","r_hiss_uncontrolled","r_hiss_hidden_inf","r_doubt_pattern"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s21، s43، s61"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_pluralism":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_resp_inquiry","src":"جزوه s80,s86,s6,s71","th":"A0","txt":"ترک تحقیق ممکن پیش از عمل پرخطر"},{"kind":"theorem","rule":"r_r_sanad_weak","src":"جزوه s73,s87,s47","th":"T_null","txt":"منبع دینی ضعیف یا بی‌سند"},{"kind":"theorem","rule":"r_r_plural","src":"جزوه s81,s83,s86","th":"A0","txt":"مغالطه تلازم میان حقانیت، نجات و رفتار"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 3 قاعدهٔ کارخانه روی بخش‌های s81، s82، s83، s86، s87؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_resp_inquiry","r_r_sanad_weak","r_r_plural"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s81، s82، s83، s86، s87"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_political_epistemology":{"history":[],"stage":0},"a_pragmatic_encroachment":{"history":[],"stage":0},"a_pragmatist":{"history":[],"stage":0},"a_proper_functionalism":{"history":[],"stage":0},"a_pyrrhonian":{"history":[],"stage":0},"a_radical_skepticism":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_selfref","src":"جزوه s56,s57,s59,s63,s67","th":"A0","txt":"ادعای خودشکن (شک یا نسبیت فراگیر)"},{"kind":"theorem","rule":"r_doubt_pattern","src":"جزوه s59,s60,s61,s62,s63","th":"A0","txt":"شبهه شکاکانه از یکی از چهار الگو"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s54، s56، s57، s59، s60، s61؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_selfref","r_doubt_pattern"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s54، s56، s57، s59، s60، s61"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_regress_problem":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_badihi_pseudo","src":"جزوه s39,s40","th":"A0","txt":"تصدیق نظری، بدیهی (بی‌نیاز از راه) گرفته شد"},{"kind":"theorem","rule":"r_aql_invalid_form","src":"جزوه s40,s44","th":"T_null","txt":"صورت استدلال نامعتبر"},{"kind":"theorem","rule":"r_aql_nondeductive","src":"جزوه s40,s50","th":"T_below1","txt":"قالب غیرقیاسی یقین‌آور نیست"},{"kind":"theorem","rule":"r_aql_matter_unproven","src":"جزوه s40,s44","th":"T_unknown","txt":"مقدمه اثبات‌نشده"},{"kind":"theorem","rule":"r_aql_matter_false","src":"جزوه s40","th":"T_null","txt":"مقدمه کاذب"},{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_grade_false_zero","src":"جزوه s40","th":"A0","txt":"صفر فقط برای کذب یقینی"},{"kind":"theorem","rule":"r_conflict_cert","src":"جزوه s53,s40","th":"T_conflict","txt":"ناسازگار با معرفت یقینی"},{"kind":"theorem","rule":"r_bg_missing","src":"جزوه s70,s69","th":"T_null","txt":"پیش‌زمینه بایسته فراهم نبود"},{"kind":"theorem","rule":"r_herm_readings_equal","src":"جزوه s67,s68,s69","th":"A0","txt":"هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده"},{"kind":"theorem","rule":"r_herm_meaning_sig","src":"جزوه s69","th":"A0","txt":"خلط معنا و اهمیت"},{"kind":"theorem","rule":"r_herm_context","src":"جزوه s69,s85,s48","th":"A0","txt":"نادیده گرفتن قرائن متن و موقعیت (تقطیع)"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 12 قاعدهٔ کارخانه روی بخش‌های s40، s69؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_badihi_pseudo","r_aql_invalid_form","r_aql_nondeductive","r_aql_matter_unproven","r_aql_matter_false","r_istiqra_incomplete","r_grade_false_zero","r_conflict_cert","r_bg_missing","r_herm_readings_equal","r_herm_meaning_sig","r_herm_context"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s40، s69"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_reliabilism":{"history":[],"stage":0},"a_religious_epistemology":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_core_mystic_unchecked","src":"جزوه s23,s24,s72","th":"A0","txt":"مکاشفه بی‌سنجش با عقل و وحی"},{"kind":"theorem","rule":"r_resp_inquiry","src":"جزوه s80,s86,s6,s71","th":"A0","txt":"ترک تحقیق ممکن پیش از عمل پرخطر"},{"kind":"theorem","rule":"r_r_route","src":"جزوه s73,s74,s72","th":"A0","txt":"گزاره دینی با راه نامتناسب"},{"kind":"theorem","rule":"r_r_sanad_weak","src":"جزوه s73,s87,s47","th":"T_null","txt":"منبع دینی ضعیف یا بی‌سند"},{"base":"p_thiqa","kind":"base","rule":"r_r_sanad_ahad","src":"جزوه s73,s48,s74","th":"T_below1","txt":"خبر واحد موثق دینی یقین‌آور نیست"},{"kind":"theorem","rule":"r_r_tawil","src":"جزوه s80,s53,s48,s77","th":"A0","txt":"ظاهر ناسازگار با برهان قطعی، بی‌تأویل"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 6 قاعدهٔ کارخانه روی بخش‌های s71، s72، s73، s74، s80؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_core_mystic_unchecked","r_resp_inquiry","r_r_route","r_r_sanad_weak","r_r_sanad_ahad","r_r_tawil"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s71، s72، s73، s74، s80"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_religious_hermeneutics":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_bg_undue","src":"جزوه s70,s65","th":"A0","txt":"پیش‌زمینه نابایسته مهار نشد"},{"kind":"theorem","rule":"r_bg_missing","src":"جزوه s70,s69","th":"T_null","txt":"پیش‌زمینه بایسته فراهم نبود"},{"kind":"theorem","rule":"r_selfref","src":"جزوه s56,s57,s59,s63,s67","th":"A0","txt":"ادعای خودشکن (شک یا نسبیت فراگیر)"},{"kind":"theorem","rule":"r_herm_readings_equal","src":"جزوه s67,s68,s69","th":"A0","txt":"هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده"},{"kind":"theorem","rule":"r_herm_meaning_sig","src":"جزوه s69","th":"A0","txt":"خلط معنا و اهمیت"},{"kind":"theorem","rule":"r_herm_context","src":"جزوه s69,s85,s48","th":"A0","txt":"نادیده گرفتن قرائن متن و موقعیت (تقطیع)"},{"kind":"theorem","rule":"r_r_tawil","src":"جزوه s80,s53,s48,s77","th":"A0","txt":"ظاهر ناسازگار با برهان قطعی، بی‌تأویل"},{"kind":"theorem","rule":"r_r_readings","src":"جزوه s76,s77,s78","th":"A0","txt":"بطون یا تکثر فتاوا دلیل نسبیت قرائت‌ها"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 8 قاعدهٔ کارخانه روی بخش‌های s64، s65، s67، s68، s69، s70، s76، s77، s78، s85؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_bg_undue","r_bg_missing","r_selfref","r_herm_readings_equal","r_herm_meaning_sig","r_herm_context","r_r_tawil","r_r_readings"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s64، s65، s67، s68، s69، s70، s76، s77، s78، s85"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_rule_following_skepticism":{"history":[],"stage":0},"a_scientific_knowledge":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_istiqra_incomplete","src":"جزوه s50,s40,s51","th":"T_below1","txt":"استقراء ناقص هرگز یقینی نیست"},{"kind":"theorem","rule":"r_istiqra_universal","src":"جزوه s51,s50","th":"T_universal","txt":"حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص"},{"kind":"theorem","rule":"r_tajrobe_ceiling","src":"جزوه s51","th":"T_below1","txt":"تجربه به پای برهان و شهود نمی‌رسد"},{"kind":"theorem","rule":"r_tajrobe_no_vazraf","src":"جزوه s51,s50","th":"T_null","txt":"تجربه بدون وضع و رفع ≈ استقراء ناقص"},{"base":"p_hidden_factor","kind":"base","rule":"r_tajrobe_hidden","src":"جزوه s51","th":"T_product","txt":"عوامل پنهان کنترل نشده"},{"base":"p_hidden_factor","kind":"base","rule":"r_istiqra_hidden","src":"جزوه s51,s50","th":"T_product","txt":"استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 6 قاعدهٔ کارخانه روی بخش‌های s51؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_istiqra_incomplete","r_istiqra_universal","r_tajrobe_ceiling","r_tajrobe_no_vazraf","r_tajrobe_hidden","r_istiqra_hidden"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s51"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_self_knowledge":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_worlds_mix","src":"جزوه s16,s22,s19","th":"A0","txt":"خلط واقع، فهم و زبان"},{"kind":"theorem","rule":"r_core_interp_unchecked","src":"جزوه s42,s18,s19,s21,s22","th":"A0","txt":"تفسیر حصولی، خطاناپذیر پنداشته شد"},{"kind":"theorem","rule":"r_core_interp_notcert","src":"جزوه s42,s19","th":"T_below1","txt":"تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد"},{"base":"p_hidden_inf","kind":"base","rule":"r_hiss_hidden_inf","src":"جزوه s43,s46,s19","th":"T_product","txt":"استنتاج پنهان عادتی بی‌آزمون"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s18، s19؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_worlds_mix","r_core_interp_unchecked","r_core_interp_notcert","r_hiss_hidden_inf"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s18، s19"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_semantic_knowledge":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_worlds_mix","src":"جزوه s16,s22,s19","th":"A0","txt":"خلط واقع، فهم و زبان"},{"kind":"theorem","rule":"r_core_interp_unchecked","src":"جزوه s42,s18,s19,s21,s22","th":"A0","txt":"تفسیر حصولی، خطاناپذیر پنداشته شد"},{"kind":"theorem","rule":"r_bg_missing","src":"جزوه s70,s69","th":"T_null","txt":"پیش‌زمینه بایسته فراهم نبود"},{"kind":"theorem","rule":"r_herm_readings_equal","src":"جزوه s67,s68,s69","th":"A0","txt":"هم‌اعتبار دانستن همه برداشت‌ها / دست‌نیافتنی دانستن مراد گوینده"},{"kind":"theorem","rule":"r_herm_meaning_sig","src":"جزوه s69","th":"A0","txt":"خلط معنا و اهمیت"},{"kind":"theorem","rule":"r_herm_context","src":"جزوه s69,s85,s48","th":"A0","txt":"نادیده گرفتن قرائن متن و موقعیت (تقطیع)"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 6 قاعدهٔ کارخانه روی بخش‌های s16، s22، s69؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_worlds_mix","r_core_interp_unchecked","r_bg_missing","r_herm_readings_equal","r_herm_meaning_sig","r_herm_context"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s16، s22، s69"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_tasawwur_tasdiq":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_tasdiq_vague","src":"جزوه s27,s28","th":"A0","txt":"تصدیق مبهم"},{"kind":"theorem","rule":"r_tasdiq_nonclaim","src":"جزوه s27,s38","th":"A0","txt":"صدق و کذب برای تصور، انشا یا پرسش"},{"kind":"theorem","rule":"r_partial_part_whole","src":"جزوه s30","th":"A0","txt":"مغالطه کل و جزء / خلط کلی و کل"},{"kind":"theorem","rule":"r_partial_by_count","src":"جزوه s30","th":"A0","txt":"داوری کلیت از روی شمار مصداق"},{"kind":"theorem","rule":"r_partial_imagined","src":"جزوه s31","th":"A0","txt":"تصویر خیالی یا تخیلی به‌جای ادراک حسی"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 5 قاعدهٔ کارخانه روی بخش‌های s27، s28، s30، s31؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_tasdiq_vague","r_tasdiq_nonclaim","r_partial_part_whole","r_partial_by_count","r_partial_imagined"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s27، s28، s30، s31"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_tawatur":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_naql_unreliable","src":"جزوه s47,s48","th":"T_null","txt":"گزارشگر غیرموثق، بی‌قرینه همسو"},{"kind":"theorem","rule":"r_naql_unreliable_corrob","src":"جزوه s47,s48","th":"T_unknown","txt":"گزارشگر غیرموثق با قرینه همسو"},{"base":"p_thiqa","kind":"base","rule":"r_naql_ahad","src":"جزوه s48,s47","th":"T_below1","txt":"خبر واحد یقین‌آور نیست"},{"base":"p_thiqa","kind":"base","rule":"r_naql_no_qarina","src":"جزوه s47,s48","th":"T_product","txt":"خبر واحد بی‌قرینه"},{"kind":"theorem","rule":"r_naql_nonnass","src":"جزوه s48","th":"T_below1","txt":"دلالت غیرنص یقین‌آور نیست"},{"base":"p_zahir","kind":"base","rule":"r_naql_zahir_noq","src":"جزوه s48","th":"T_product","txt":"ظاهر بدون قرینه همسو"},{"kind":"theorem","rule":"r_naql_mubham_noq","src":"جزوه s48","th":"T_ambig","txt":"دلالت مبهم بدون قرینه همسو"},{"base":"p_mubham_q","kind":"base","rule":"r_naql_mubham_q","src":"جزوه s48","th":"T_product","txt":"دلالت مبهم با قرینه همسو"},{"kind":"theorem","rule":"r_herm_context","src":"جزوه s69,s85,s48","th":"A0","txt":"نادیده گرفتن قرائن متن و موقعیت (تقطیع)"},{"base":"p_thiqa","kind":"base","rule":"r_r_sanad_ahad","src":"جزوه s73,s48,s74","th":"T_below1","txt":"خبر واحد موثق دینی یقین‌آور نیست"},{"kind":"theorem","rule":"r_r_tawil","src":"جزوه s80,s53,s48,s77","th":"A0","txt":"ظاهر ناسازگار با برهان قطعی، بی‌تأویل"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 11 قاعدهٔ کارخانه روی بخش‌های s48؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_naql_unreliable","r_naql_unreliable_corrob","r_naql_ahad","r_naql_no_qarina","r_naql_nonnass","r_naql_zahir_noq","r_naql_mubham_noq","r_naql_mubham_q","r_herm_context","r_r_sanad_ahad","r_r_tawil"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s48"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_technology_extended":{"history":[],"stage":0},"a_testimony":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_naql_not_issued","src":"جزوه s47","th":"T_unknown","txt":"صدور خبر احراز نشده"},{"kind":"theorem","rule":"r_naql_unreliable","src":"جزوه s47,s48","th":"T_null","txt":"گزارشگر غیرموثق، بی‌قرینه همسو"},{"kind":"theorem","rule":"r_naql_unreliable_corrob","src":"جزوه s47,s48","th":"T_unknown","txt":"گزارشگر غیرموثق با قرینه همسو"},{"kind":"theorem","rule":"r_naql_narrator_unknown","src":"جزوه s47","th":"T_unknown","txt":"وثاقت گزارشگر نامعلوم"},{"kind":"theorem","rule":"r_naql_chain_broken","src":"جزوه s47","th":"T_weakest","txt":"زنجیره طولی با حلقه مجهول"},{"base":"p_thiqa","kind":"base","rule":"r_naql_ahad","src":"جزوه s48,s47","th":"T_below1","txt":"خبر واحد یقین‌آور نیست"},{"base":"p_thiqa","kind":"base","rule":"r_naql_no_qarina","src":"جزوه s47,s48","th":"T_product","txt":"خبر واحد بی‌قرینه"},{"kind":"theorem","rule":"r_naql_contra_qarina","src":"جزوه s47,s53","th":"T_against","txt":"قرینه خلاف"},{"kind":"theorem","rule":"r_naql_nonnass","src":"جزوه s48","th":"T_below1","txt":"دلالت غیرنص یقین‌آور نیست"},{"base":"p_zahir","kind":"base","rule":"r_naql_zahir_noq","src":"جزوه s48","th":"T_product","txt":"ظاهر بدون قرینه همسو"},{"kind":"theorem","rule":"r_naql_mubham_noq","src":"جزوه s48","th":"T_ambig","txt":"دلالت مبهم بدون قرینه همسو"},{"base":"p_mubham_q","kind":"base","rule":"r_naql_mubham_q","src":"جزوه s48","th":"T_product","txt":"دلالت مبهم با قرینه همسو"},{"kind":"theorem","rule":"r_herm_context","src":"جزوه s69,s85,s48","th":"A0","txt":"نادیده گرفتن قرائن متن و موقعیت (تقطیع)"},{"kind":"theorem","rule":"r_r_sanad_weak","src":"جزوه s73,s87,s47","th":"T_null","txt":"منبع دینی ضعیف یا بی‌سند"},{"base":"p_thiqa","kind":"base","rule":"r_r_sanad_ahad","src":"جزوه s73,s48,s74","th":"T_below1","txt":"خبر واحد موثق دینی یقین‌آور نیست"},{"kind":"theorem","rule":"r_r_tawil","src":"جزوه s80,s53,s48,s77","th":"A0","txt":"ظاهر ناسازگار با برهان قطعی، بی‌تأویل"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 16 قاعدهٔ کارخانه روی بخش‌های s47، s48؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_naql_not_issued","r_naql_unreliable","r_naql_unreliable_corrob","r_naql_narrator_unknown","r_naql_chain_broken","r_naql_ahad","r_naql_no_qarina","r_naql_contra_qarina","r_naql_nonnass","r_naql_zahir_noq","r_naql_mubham_noq","r_naql_mubham_q","r_herm_context","r_r_sanad_weak","r_r_sanad_ahad","r_r_tawil"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s47، s48"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_thought_experiments_models":{"history":[],"stage":0},"a_tripartite_analysis":{"history":[],"stage":0},"a_trust_expertise":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_expert_method_weak","src":"جزوه s49","th":"T_unknown","txt":"روش کارشناس ضعیف یا نامعلوم"},{"kind":"theorem","rule":"r_expert_out_of_field","src":"جزوه s49","th":"T_null","txt":"کارشناس بیرون از حوزه تخصص"},{"kind":"theorem","rule":"r_expert_comp_unknown","src":"جزوه s49","th":"T_unknown","txt":"صلاحیت کارشناس نامعلوم"},{"base":"p_expert_bias","kind":"base","rule":"r_expert_bias","src":"جزوه s49","th":"T_product","txt":"تعارض منافع یا ناپایبندی کارشناس"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s49؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_expert_method_weak","r_expert_out_of_field","r_expert_comp_unknown","r_expert_bias"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s49"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_truth":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_tasdiq_nonclaim","src":"جزوه s27,s38","th":"A0","txt":"صدق و کذب برای تصور، انشا یا پرسش"},{"kind":"theorem","rule":"r_truth_mix","src":"جزوه s38,s6","th":"A0","txt":"خلط صدق معرفتی و صدق اخلاقی"},{"kind":"theorem","rule":"r_truth_narrow","src":"جزوه s38,s9","th":"A0","txt":"تنگ‌گرفتن واقعیت"},{"kind":"theorem","rule":"r_resp_inquiry","src":"جزوه s80,s86,s6,s71","th":"A0","txt":"ترک تحقیق ممکن پیش از عمل پرخطر"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 4 قاعدهٔ کارخانه روی بخش‌های s6، s38؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_tasdiq_nonclaim","r_truth_mix","r_truth_narrow","r_resp_inquiry"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s6، s38"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_underdetermination_realism":{"history":[],"stage":0},"a_understanding":{"history":[],"stage":0},"a_virtue_epistemology":{"history":[],"stage":0},"a_wahy_ilham":{"bookOnly":true,"claims":[{"kind":"theorem","rule":"r_core_mystic_unchecked","src":"جزوه s23,s24,s72","th":"A0","txt":"مکاشفه بی‌سنجش با عقل و وحی"},{"kind":"theorem","rule":"r_r_route","src":"جزوه s73,s74,s72","th":"A0","txt":"گزاره دینی با راه نامتناسب"}],"history":[{"at":"2026-10-14","by":"ابزار","round":11,"stage":4,"what":"پوششِ جزوه: 2 قاعدهٔ کارخانه روی بخش‌های s25، s72؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»"}],"rules":["r_core_mystic_unchecked","r_r_route"],"seeded":true,"sources":["جزوهٔ معرفت‌شناسی (مصباح) s25، s72"],"stage":4,"verify":{"fresh":0,"ids":[],"ok":0,"since":11}},"a_wisdom":{"history":[],"stage":0}},"round":11,"updated":"2026-10-14"}};
 
 /* ===== پایه: ابزارها، ذخیره‌سازی، هوش مصنوعی، مرور فاصله‌دار، آمار ===== */
 var APP = window.APP = {};
@@ -18469,7 +20483,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     tab = tab || "live";  // پیش‌فرض: بک‌تستِ پیوسته (۲۰۲۶-۱۰-۱۳)
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "اعتبارسنجی کارخانه و جزوه", "آیا می‌شود به کارخانه اعتماد کرد؟ سه آزمون پشت‌سرهم: ۱) کارخانه همان را می‌گوید که جزوه می‌گوید؟ ۲) جزوه با وقایع تاریخی می‌خواند؟ ۳) در وقایع امروز درست درمی‌آید؟"));
-    root.appendChild(A.tabs([["live", "♾ بک‌تستِ پیوسته"], ["found", "🧱 مبنای درجه‌ها"], ["three", "سه آزمون"], ["sens", "حساسیت قاعده‌ها"], ["cycle", "تکرار دوره‌ای"], ["enc", "پایداری رمزگذاری"], ["hist", "تاریخچه"], ["about", "روش و حدود"]], tab, function (k) { A.go("e_bt", null, k); }));
+    root.appendChild(A.tabs([["live", "♾ بک‌تستِ پیوسته"], ["found", "🧱 مبنای درجه‌ها"], ["terr", "🗺 قلمرو"], ["three", "سه آزمون"], ["sens", "حساسیت قاعده‌ها"], ["cycle", "تکرار دوره‌ای"], ["enc", "پایداری رمزگذاری"], ["hist", "تاریخچه"], ["about", "روش و حدود"]], tab, function (k) { A.go("e_bt", null, k); }));
     var body = h("div", { class: "col gap" }); root.appendChild(body);
     if (tab === "about") { body.appendChild(h("section", { class: "card" }, BT.INTRO.map(function (p) { return h("div", {}, String(p).split("\n").map(function (l) { return h("p", {}, l); })); }))); return root; }
     if (tab === "hist") {
@@ -18482,6 +20496,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     if (tab === "cycle") { body.appendChild(cyclePanel()); return root; }
     if (tab === "live" && A.btLivePanel) { body.appendChild(A.btLivePanel()); return root; }
     if (tab === "found" && A.foundPanel) { body.appendChild(A.foundPanel()); return root; }
+    if (tab === "terr" && A.territoryPanel) { body.appendChild(A.territoryPanel()); return root; }
     if (!A.lastThree || (A.lastThree.meta && A.lastThree.meta.enc !== (A.encSel || "A"))) A.runThree(A.encSel || "A", false);  // دیدن ≠ ثبتِ اجرا (۲۰۲۶-۱۰-۱۳)
     if (tab === "sens") { body.appendChild(sensView(A.lastThree)); return root; }
     var encSel = h("select", { id: "btEnc", onchange: function (e) { A.encSel = e.target.value; A.lastThree = null; A.render(); } }, Object.keys(ENC).map(function (k) { return h("option", { value: k, selected: (A.encSel || "A") === k }, ENC[k]); }));
@@ -28215,6 +30230,58 @@ APP.goFromURL = function (q) {
             return h("tr", { "data-base": k }, h("td", {}, b.fa), h("td", {}, fa(b.p) + "٪" + (b.measured ? "" : " (نمی‌دانیم)")),
               h("td", {}, b.measured ? fa(b.ok) + " درست از " + fa(b.n) : "۰"), h("td", {}, fa(b.frames || 0))); }))))));
     }
+    return box;
+  };
+})(APP);
+/* ===== «🗺 قلمروِ معرفت‌شناسی» در «اعتبارسنجیِ کارخانه و جزوه» (مالک ۲۰۲۶-۱۰-۱۴) =====
+   نقشهٔ کاملِ حوزه‌های معرفت‌شناسی (EPI_TERR، از منابعِ معتبر) و پیشرفتِ گام‌به‌گامِ هر حوزه (backtest/territory.json — فقط ابزارِ قطعی
+   جلو می‌بردش). صفحه چیزی را عوض نمی‌کند؛ همان دفتر را نشان می‌دهد. سندِ همین نقشه با تاریخچهٔ هر حوزه: docs/TERRITORY.md. */
+(function (A) {
+  var h = A.h, fa = A.fa;
+  function D() { return (window.EPI_BT_LEDGER || {}).territory || { areas: {} }; }
+  function bar(stage) { var b = h("span", { class: "terr-bar", "aria-label": "گامِ " + fa(stage) + " از ۵" }); for (var i = 1; i <= 5; i++) b.appendChild(h("i", { class: i <= stage ? "on" : "" })); return b; }
+  A.territoryPanel = function () {
+    var T = window.EPI_TERR || { groups: [], STAGES: [] }, S = D().areas || {}, box = h("div", { class: "col gap terr", dir: "rtl" });
+    var all = []; (T.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { all.push(a); }); });
+    var cnt = T.STAGES.map(function (s) { return all.filter(function (a) { return ((S[a.id] || {}).stage || 0) === s.n; }).length; });
+    var score = all.reduce(function (t, a) { return t + ((S[a.id] || {}).stage || 0); }, 0);
+    box.appendChild(h("section", { class: "card" }, h("h2", {}, "🗺 قلمروِ معرفت‌شناسی — همهٔ حوزه‌ها و پیشرفتِ هر کدام"),
+      h("p", {}, "نقشهٔ کاملِ حوزه‌های این علم، از منابعِ معتبر (فهرستِ منابع پایینِ صفحه). هر حوزه گام‌به‌گام جلو می‌رود و هر گام با شاهد ثبت می‌شود. گسترش فقط بر پایهٔ همان پنج اصلِ بدیهیِ «🧱 مبنای درجه‌ها»: هر گزارهٔ یک حوزه یا قضیه‌ای از آن‌هاست، یا قضیه × مقدارِ پایه‌ای که با واقعیت سنجیده می‌شود، یا صادقانه «بیرون از قلمروِ قطعی» علامت می‌خورد — هیچ چیز ساخته نمی‌شود."),
+      h("ol", { class: "small terr-stages" }, T.STAGES.map(function (s) { return h("li", { value: s.n }, h("b", {}, s.fa + ": "), s.need); })),
+      h("p", { class: "small" }, h("b", {}, "«فقط بخشِ جزوه»: "), "حوزه‌هایی که جزوه پوشش داده خودکار در گامِ ۴ آمده‌اند (قاعده‌ها و رده‌بندی‌شان)، ولی جزوه همهٔ آن حوزه نیست؛ ناظر باید هر کدام را از ادبیاتِ بیرون از جزوه «گسترش» دهد (دو منبع، سه گزارهٔ تازه، رده‌بندی بر پایهٔ بدیهیات) تا به تثبیت برسد."),
+      h("div", { class: "bt-stats" }, T.STAGES.map(function (s, i) { return h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "گامِ " + fa(s.n) + " — " + s.fa), h("div", { class: "bt-num" }, fa(cnt[i]))); })
+        .concat([h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "پیشرفتِ کل"), h("div", { class: "bt-num" }, fa(Math.round(100 * score / Math.max(1, all.length * 5))) + "٪"), h("div", { class: "small" }, fa(all.length) + " حوزه"))]))));
+    var rounds = (((window.EPI_BT_LEDGER || {}).ledger || {}).rounds || []).filter(function (r) { return r.territory; });
+    if (rounds.length) box.appendChild(h("p", { class: "small muted" }, "روند (امتیازِ کل در دورها): " + rounds.map(function (r) { return fa(r.round) + ": " + fa(r.territory.score); }).join(" · ")));
+    var q = h("input", { type: "search", placeholder: "جستجوی حوزه…", "aria-label": "جستجوی حوزه", oninput: function () { fill(); } });
+    var sel = h("select", { "aria-label": "گام", onchange: function () { fill(); } }, [["", "همهٔ گام‌ها"]].concat(T.STAGES.map(function (s) { return [String(s.n), "گامِ " + s.n + " — " + s.fa]; })).map(function (o) { return h("option", { value: o[0] }, o[1]); }));
+    var list = h("div", { class: "col gap" });
+    function fill() {
+      list.innerHTML = ""; var qs = (q.value || "").trim();
+      (T.groups || []).forEach(function (g) {
+        var as = (g.areas || []).filter(function (a) { var st = (S[a.id] || {}).stage || 0; return (sel.value === "" || String(st) === sel.value) && (!qs || (a.fa + " " + (a.en || "") + " " + (a.desc_fa || "")).indexOf(qs) >= 0); });
+        if (!as.length) return;
+        list.appendChild(h("section", { class: "card terr-group", "data-g": g.id }, h("h3", {}, g.fa + (g.en ? " · " + g.en : "") + " (" + fa(as.length) + ")"),
+          h("ul", { class: "plain" }, as.map(function (a) {
+            var c = S[a.id] || { stage: 0 }, st = c.stage || 0;
+            return h("li", { class: "terr-area", "data-a": a.id, "data-stage": st }, h("details", {},
+              h("summary", {}, bar(st), " ", h("b", {}, a.fa), a.en ? h("span", { class: "muted small" }, " · " + a.en) : null, h("span", { class: "chip" }, (T.STAGES[st] || {}).fa || ""), c.bookOnly ? h("span", { class: "chip warn terr-bookonly" }, "فقط بخشِ جزوه") : null),
+              a.desc_fa ? h("p", { class: "small" }, a.desc_fa) : null,
+              (a.key_questions_fa || []).length ? h("ul", { class: "small" }, a.key_questions_fa.map(function (x) { return h("li", {}, x); })) : null,
+              (a.book || []).length ? h("p", { class: "small" }, h("b", {}, "جزوه: "), a.book.join("، ")) : h("p", { class: "small muted" }, "در جزوهٔ مصباح نیست."),
+              (c.claims || []).length ? h("ul", { class: "small terr-claims" }, c.claims.map(function (x) { return h("li", { "data-kind": x.kind || "" }, h("b", {}, ({ theorem: "قضیه", base: "قضیه × پایه", outside: "بیرون از قلمروِ قطعی" }[x.kind] || "گزاره") + ": "), x.txt, x.th ? h("span", { class: "muted" }, " — " + x.th) : null, x.why ? h("span", { class: "muted" }, " — " + x.why) : null); })) : null,
+              c.boundary ? h("p", { class: "small" }, h("b", {}, "مرز: "), c.boundary) : null,
+              c.verify ? h("p", { class: "small muted" }, "تثبیت: " + fa(c.verify.ok) + " از " + fa(c.verify.fresh) + " واقعهٔ تازه درست (لازم ≥ ۳، همه درست)") : null,
+              (c.history || []).length ? h("ol", { class: "small terr-hist" }, c.history.map(function (x) { return h("li", {}, "دورِ " + fa(x.round) + " (" + x.at + ") ⇒ گامِ " + fa(x.stage) + ": " + x.what + " — " + x.by); })) : null));
+          }))));
+      });
+      if (!list.children.length) list.appendChild(h("p", { class: "small muted" }, "حوزه‌ای با این پالایه نیست."));
+    }
+    box.appendChild(h("div", { class: "row gap wrap" }, q, sel));
+    box.appendChild(list); fill();
+    if ((T.sources || []).length) box.appendChild(h("details", { class: "card soft" }, h("summary", {}, "منابعِ نقشه (" + fa(T.sources.length) + ")"),
+      h("ul", { class: "small" }, T.sources.map(function (x) { return h("li", {}, x.url ? h("a", { href: x.url, target: "_blank", rel: "noopener" }, x.title) : x.title); }))));
+    if (A.HOST && A.HOST.openDoc) box.appendChild(h("button", { class: "btn sm", onclick: function () { A.HOST.openDoc("TERRITORY"); } }, "📄 سندِ قلمرو با تاریخچهٔ هر حوزه"));
     return box;
   };
 })(APP);

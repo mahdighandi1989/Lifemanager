@@ -13,6 +13,7 @@
     box.appendChild(h("section", { class: "card" }, h("h2", {}, "🗺 قلمروِ معرفت‌شناسی — همهٔ حوزه‌ها و پیشرفتِ هر کدام"),
       h("p", {}, "نقشهٔ کاملِ حوزه‌های این علم، از منابعِ معتبر (فهرستِ منابع پایینِ صفحه). هر حوزه گام‌به‌گام جلو می‌رود و هر گام با شاهد ثبت می‌شود. گسترش فقط بر پایهٔ همان پنج اصلِ بدیهیِ «🧱 مبنای درجه‌ها»: هر گزارهٔ یک حوزه یا قضیه‌ای از آن‌هاست، یا قضیه × مقدارِ پایه‌ای که با واقعیت سنجیده می‌شود، یا صادقانه «بیرون از قلمروِ قطعی» علامت می‌خورد — هیچ چیز ساخته نمی‌شود."),
       h("ol", { class: "small terr-stages" }, T.STAGES.map(function (s) { return h("li", { value: s.n }, h("b", {}, s.fa + ": "), s.need); })),
+      h("p", { class: "small" }, h("b", {}, "«فقط بخشِ جزوه»: "), "حوزه‌هایی که جزوه پوشش داده خودکار در گامِ ۴ آمده‌اند (قاعده‌ها و رده‌بندی‌شان)، ولی جزوه همهٔ آن حوزه نیست؛ ناظر باید هر کدام را از ادبیاتِ بیرون از جزوه «گسترش» دهد (دو منبع، سه گزارهٔ تازه، رده‌بندی بر پایهٔ بدیهیات) تا به تثبیت برسد."),
       h("div", { class: "bt-stats" }, T.STAGES.map(function (s, i) { return h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "گامِ " + fa(s.n) + " — " + s.fa), h("div", { class: "bt-num" }, fa(cnt[i]))); })
         .concat([h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "پیشرفتِ کل"), h("div", { class: "bt-num" }, fa(Math.round(100 * score / Math.max(1, all.length * 5))) + "٪"), h("div", { class: "small" }, fa(all.length) + " حوزه"))]))));
     var rounds = (((window.EPI_BT_LEDGER || {}).ledger || {}).rounds || []).filter(function (r) { return r.territory; });
@@ -29,7 +30,7 @@
           h("ul", { class: "plain" }, as.map(function (a) {
             var c = S[a.id] || { stage: 0 }, st = c.stage || 0;
             return h("li", { class: "terr-area", "data-a": a.id, "data-stage": st }, h("details", {},
-              h("summary", {}, bar(st), " ", h("b", {}, a.fa), a.en ? h("span", { class: "muted small" }, " · " + a.en) : null, h("span", { class: "chip" }, (T.STAGES[st] || {}).fa || "")),
+              h("summary", {}, bar(st), " ", h("b", {}, a.fa), a.en ? h("span", { class: "muted small" }, " · " + a.en) : null, h("span", { class: "chip" }, (T.STAGES[st] || {}).fa || ""), c.bookOnly ? h("span", { class: "chip warn terr-bookonly" }, "فقط بخشِ جزوه") : null),
               a.desc_fa ? h("p", { class: "small" }, a.desc_fa) : null,
               (a.key_questions_fa || []).length ? h("ul", { class: "small" }, a.key_questions_fa.map(function (x) { return h("li", {}, x); })) : null,
               (a.book || []).length ? h("p", { class: "small" }, h("b", {}, "جزوه: "), a.book.join("، ")) : h("p", { class: "small muted" }, "در جزوهٔ مصباح نیست."),
