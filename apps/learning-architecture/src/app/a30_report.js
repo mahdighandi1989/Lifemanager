@@ -20,7 +20,7 @@
     if (CUR && CUR.tour) t = t.replace(/\[?\b(f\d{1,2})\b\]?/g, function (m0, k) { var f = CUR.tour.facets.filter(function (z) { return z.key === k; })[0]; return f ? "«" + f.title + "»" : ""; });
     t = t.replace(/\b(F\d{1,2})(?:\.[a-z]+)?\b/g, function (m0, k) { var F = (A.KF || []).filter(function (z) { return z.id === k; })[0]; return F ? "«" + F.fa + "»" : m0; });
     t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
-    t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "");
+    t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep|pq)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "").replace(/\(?\b(?:sub|view|arg|tab)=[A-Za-z0-9_:.-]+\)?/g, "");
     t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|kcase|eprob|wchain|fcast|kexp|kitem|pbitem|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
     return t.replace(/\s{2,}/g, " ");
   }

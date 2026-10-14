@@ -39,6 +39,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.man.noMeta.length === 0, 'every view has VIEW_META (what/why) so the assistant can explain it: ' + info.man.noMeta);
   chk(info.man.flows && info.man.tech && info.man.st, 'manifest carries flows, techniques, stations');
   info.lim = await p.evaluate(() => ({ sys: APP.ASSIST.SYS.length, user: APP.ASSIST.prompt(APP.ASSIST.newSession(), 'x', APP.ASSIST.scan(), '').length }));
+  // صفحه‌ای با فیلدهای بسیار: پیامِ تازهٔ کاربر هرگز از تهِ ورودی نمی‌افتد (کارزارِ آزمونِ دوم c11)
+  info.bigPage = await p.evaluate(() => { const m = document.getElementById('main'), keep = m.innerHTML;
+    m.innerHTML = Array.from({ length: 1800 }, (_, i) => '<label>فیلدِ شمارهٔ ' + i + ' با برچسبِ نسبتاً طولانی برای پرکردنِ فهرست <input value="مقدارِ نمونه ' + i + '"></label>').join('');
+    const msg = 'پیامِ تازهٔ کاربر: راهش تخصص دیگران است، حالا داوری را بزن'; const u = APP.ASSIST.prompt(APP.ASSIST.newSession(), msg, APP.ASSIST.scan(), ''); m.innerHTML = keep;
+    return { len: u.length, kept: u.indexOf(msg) > 0, note: /جا نشد/.test(u) }; });
+  chk(info.bigPage.kept && info.bigPage.len <= 58000 && info.bigPage.note, 'a huge page never pushes the user\'s new message out of the prompt: ' + JSON.stringify(info.bigPage));
   await p.evaluate(() => { const s = APP.ASSIST.cur(); APP.S.del(s.id); });
   chk(info.lim.sys < 20000 && info.lim.user < 60000, 'within the server limits (system 20k, user 60k): ' + JSON.stringify(info.lim));
 

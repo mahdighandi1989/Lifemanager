@@ -394,6 +394,17 @@
   AS.prompt = function (s, msg, sc, extra, skipLast) {
     var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n";
     var parts = userPrompt(s, msg, sc, extra, skipLast, -1);
+    /* پیامِ تازهٔ کاربر هرگز بریده نمی‌شود (کارزارِ آزمونِ دوم c11: در صفحه‌ای با فیلدهای بسیار، کل ورودی از ۵۸هزار گذشت و پیامِ کاربر
+       از تهِ آن افتاد — دستیار بی دیدنِ حرف جواب داد). اول فهرستِ صفحه کوتاه می‌شود (با اعلامِ صریح)، بعد نقشهٔ سامانه. */
+    var over = man.length + parts.head.length + parts.tail.length + 200 + Math.min(HIST_CHARS, 6000) - MAX_USER;
+    if (over > 0) {
+      var i0 = parts.head.indexOf("# صفحهٔ فعلی"), i1 = parts.head.lastIndexOf("# گفت‌وگو تا این لحظه");
+      if (i0 >= 0 && i1 > i0) {
+        var pg = parts.head.slice(i0, i1), cut = Math.min(pg.length - 400, over + 300);
+        if (cut > 0) { parts.head = parts.head.slice(0, i0) + pg.slice(0, pg.length - cut) + "\n[سامانه: بقیهٔ فهرستِ این صفحه (" + cut + " نویسه) جا نشد — اگر فیلدی را نمی‌بینی، به کاربر بگو و نخستین کلیدهای بالا را به کار ببر]\n\n" + parts.head.slice(i1); over -= cut; }
+      }
+      if (over > 0) { man = man.slice(0, Math.max(3000, man.length - over - 200)) + "\n[سامانه: بقیهٔ نقشهٔ سامانه جا نشد]\n\n"; }
+    }
     var room = MAX_USER - man.length - parts.head.length - parts.tail.length - 200;
     if (room < 0) {
       var keep = Math.max(2000, parts.tail.length + room - 400);
@@ -401,7 +412,8 @@
       room = 0;
     }
     var hx = history(s, skipLast, Math.min(HIST_CHARS, room));
-    return (man + parts.head + "\n" + hx.join("\n") + "\n" + parts.tail).slice(0, MAX_USER);
+    var body = man + parts.head + "\n" + hx.join("\n") + "\n";
+    return body.slice(0, Math.max(0, MAX_USER - parts.tail.length)) + parts.tail;   // تهِ ورودی (پیامِ تازه) همیشه کامل
   };
   function parse(t) { var o = A.parseJSONLoose ? A.parseJSONLoose(t) : JSON.parse(t); if (!o || typeof o.reply !== "string") throw new Error("پاسخِ دستیار ناخوانا بود"); return o; }
   function unwrap(r) { return r && typeof r === "object" ? r : { text: r, files: [] }; }

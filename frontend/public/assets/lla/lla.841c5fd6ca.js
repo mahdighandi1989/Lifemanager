@@ -31060,6 +31060,17 @@ APP.goFromURL = function (q) {
   AS.prompt = function (s, msg, sc, extra, skipLast) {
     var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n";
     var parts = userPrompt(s, msg, sc, extra, skipLast, -1);
+    /* پیامِ تازهٔ کاربر هرگز بریده نمی‌شود (کارزارِ آزمونِ دوم c11: در صفحه‌ای با فیلدهای بسیار، کل ورودی از ۵۸هزار گذشت و پیامِ کاربر
+       از تهِ آن افتاد — دستیار بی دیدنِ حرف جواب داد). اول فهرستِ صفحه کوتاه می‌شود (با اعلامِ صریح)، بعد نقشهٔ سامانه. */
+    var over = man.length + parts.head.length + parts.tail.length + 200 + Math.min(HIST_CHARS, 6000) - MAX_USER;
+    if (over > 0) {
+      var i0 = parts.head.indexOf("# صفحهٔ فعلی"), i1 = parts.head.lastIndexOf("# گفت‌وگو تا این لحظه");
+      if (i0 >= 0 && i1 > i0) {
+        var pg = parts.head.slice(i0, i1), cut = Math.min(pg.length - 400, over + 300);
+        if (cut > 0) { parts.head = parts.head.slice(0, i0) + pg.slice(0, pg.length - cut) + "\n[سامانه: بقیهٔ فهرستِ این صفحه (" + cut + " نویسه) جا نشد — اگر فیلدی را نمی‌بینی، به کاربر بگو و نخستین کلیدهای بالا را به کار ببر]\n\n" + parts.head.slice(i1); over -= cut; }
+      }
+      if (over > 0) { man = man.slice(0, Math.max(3000, man.length - over - 200)) + "\n[سامانه: بقیهٔ نقشهٔ سامانه جا نشد]\n\n"; }
+    }
     var room = MAX_USER - man.length - parts.head.length - parts.tail.length - 200;
     if (room < 0) {
       var keep = Math.max(2000, parts.tail.length + room - 400);
@@ -31067,7 +31078,8 @@ APP.goFromURL = function (q) {
       room = 0;
     }
     var hx = history(s, skipLast, Math.min(HIST_CHARS, room));
-    return (man + parts.head + "\n" + hx.join("\n") + "\n" + parts.tail).slice(0, MAX_USER);
+    var body = man + parts.head + "\n" + hx.join("\n") + "\n";
+    return body.slice(0, Math.max(0, MAX_USER - parts.tail.length)) + parts.tail;   // تهِ ورودی (پیامِ تازه) همیشه کامل
   };
   function parse(t) { var o = A.parseJSONLoose ? A.parseJSONLoose(t) : JSON.parse(t); if (!o || typeof o.reply !== "string") throw new Error("پاسخِ دستیار ناخوانا بود"); return o; }
   function unwrap(r) { return r && typeof r === "object" ? r : { text: r, files: [] }; }
@@ -32556,7 +32568,7 @@ APP.goFromURL = function (q) {
     if (CUR && CUR.tour) t = t.replace(/\[?\b(f\d{1,2})\b\]?/g, function (m0, k) { var f = CUR.tour.facets.filter(function (z) { return z.key === k; })[0]; return f ? "«" + f.title + "»" : ""; });
     t = t.replace(/\b(F\d{1,2})(?:\.[a-z]+)?\b/g, function (m0, k) { var F = (A.KF || []).filter(function (z) { return z.id === k; })[0]; return F ? "«" + F.fa + "»" : m0; });
     t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
-    t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "");
+    t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep|pq)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "").replace(/\(?\b(?:sub|view|arg|tab)=[A-Za-z0-9_:.-]+\)?/g, "");
     t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|kcase|eprob|wchain|fcast|kexp|kitem|pbitem|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
     return t.replace(/\s{2,}/g, " ");
   }
@@ -33050,6 +33062,7 @@ APP.goFromURL = function (q) {
     "- غربال در یک نوبت بسته نمی‌شود: آنچه کاربر هنوز نگفته «باید پرسید» است نه «رد شد» (رد فقط با دلیل از حرفِ خودش). پرسش‌های «باید پرسید» را یکی‌یکی بپرس و با هر پاسخ غربال را به‌روز کن؛ تکرار در حوزه‌های **دیگرِ** زندگی‌اش را صریح بپرس («در یادگرفتنِ چیزهای دیگر هم همین‌طور بوده؟»). ترتیبِ وجه‌ها را با همان دلیلی که در why نوشتی هم‌خوان نگه دار.",
     "- پس از **هر** پیامِ کاربر غربال را با شاهدِ تازه بازبینی کن: لایه‌ای که «رد شد» بود و حالا شاهد دارد (مثلاً «همیشه دیدم برگ آروم‌تر میاد» ⇒ راهِ دانستن: تعمیمِ تجربهٔ روزمره) را با tour_diag «پیدا شد» کن.",
     "- «📧 گزارشِ تور» خودکار در حینِ تور به ایمیلِ کاربر می‌رود (و «الان بفرست» در کشوی تور هست)؛ اگر گزارش خواست، همین را بگو، نه «نمی‌توانم».",
+    "- عددی یا واقعیتی را که کاربر نداده **فرض نکن** (مثلاً نرخِ مثبتِ کاذب، شیوع، اندازهٔ نمونه): بپرس «در برگهٔ آزمایش/مقاله این عدد آمده؟» و اگر نبود، صریح بگو با کدام فرض جلو می‌روی. تعریف‌ها (حساسیت، ویژگی، …) را دقیق بگو یا از دانسته‌های قلمرو بیاور.",
     "- اولویت: ایمنی؛ ریشه‌ای که بقیه از آن می‌رویند (گره یا پیش‌نیاز)؛ آنچه زمان‌دار است؛ فهم پیش از تمرین.",
     "- نخستین پاسخ به هر مسئلهٔ تازه: جواب، حکم یا یافتهٔ نهایی را نگو — حتی اگر از «# دانسته‌های قلمرو» می‌دانی (کارزارِ آزمون c08: معنای درستِ p و تکرارنشدنِ پژوهش در همان پاسخِ اول لو رفت). اول یک یا دو پرسشِ دقیق برای لایه‌هایی که «باید پرسید» است (بی پیشنهادِ جواب)، بعد غربال؛ یافتهٔ قطعی را وقتی بگو که کاربر خودش به آن رسیده یا ایستگاهِ مربوط طی شده. لایهٔ «اطلاعاتِ ناموجود» را جدی بسنج: چه عددی، منبعی یا واقعیتی هنوز نیست؟",
     "- در reply هرگز کلید یا کد ننویس (f1، k12، F7، شناسهٔ حوزه یا رکورد) — نامِ فارسیِ وجه، خانواده یا حوزه را بگو."
