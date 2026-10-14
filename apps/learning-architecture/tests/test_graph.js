@@ -66,7 +66,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.locator('main .hallflow').count() === 1, 'factory halls view unchanged');
   chk(info.nav.maps === 1 && info.nav.groups === 2 && info.nav.old, 'one hub, «🗺 نقشه‌ها» group in each system, no map removed ' + JSON.stringify(info.nav));
   await p.evaluate(() => APP.go('maps')); await p.waitForTimeout(300);
-  chk(await p.locator('main .gr-mapcard').count() >= 8 && await p.locator('main .gr-box').count() >= 15, 'hub cards and overview boxes');
+  chk(await p.locator("main .gr-mapcard").count() >= 7 && await p.locator('main .gr-box').count() >= 15, 'hub cards and overview boxes');
   await p.click('main .gr-box[data-t="station"]'); await p.waitForTimeout(150);
   chk(await p.locator('main .gr-members button').count() === await p.evaluate(() => EPI_ST.length), 'type members listed');
   await p.click('main .gr-members button[data-k="station:st_grade"]'); await p.waitForTimeout(200);

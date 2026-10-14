@@ -26,8 +26,8 @@
     var root = h("div", { class: "page start" });
     root.appendChild(A.head("راهنما", "از اینجا شروع کن", "این برنامه دو بخش دارد: «سامانه یادگیری» برای عمیق فهمیدن یک موضوع، و «کارخانه معرفت‌شناسی» برای سنجیدن اینکه یک ادعا یا برداشت چقدر معتبر است. هر دو حافظه مشترک دارند. خواسته‌ات را در کارت‌های زیر پیدا کن و دکمه‌اش را بزن."));
     if (A.V.whole) root.appendChild(h("section", { class: "card orient-hint", dir: "rtl" }, h("strong", {}, "اول تصویرِ کل: "),
-      "این برنامه از سه چیزی که دادی (ایده‌ها و دغدغه‌ها، جزوهٔ معرفت‌شناسی، آموزش‌های یادگیری) سه «کار» ساخته — فهمیدن، سنجیدن، گره‌گشایی. «نقشهٔ کل» نشان می‌دهد هر در به کدام کار می‌رسد. ",
-      h("button", { class: "btn sm", onclick: function () { A.go("whole"); } }, "🧭 نقشهٔ کل")));
+      "این برنامه از سه چیزی که دادی (ایده‌ها و دغدغه‌ها، جزوهٔ معرفت‌شناسی، آموزش‌های یادگیری) سه «کار» ساخته — فهمیدن، سنجیدن، گره‌گشایی. «🧭 این برنامه چیست؟» نشان می‌دهد هر در به کدام کار می‌رسد. ",
+      h("button", { class: "btn sm", onclick: function () { A.go("whole"); } }, "🧭 این برنامه چیست؟")));
     root.appendChild(h("section", { class: "doors" }, DOORS.map(function (d, i) {
       return h("div", { class: "card door" + (d.main ? " main" : "") + (d.mainEpi ? " mainepi" : "") }, h("div", { class: "eyebrow" }, d.sys === "یادگیری" ? "سامانه یادگیری" : d.sys === "گره‌گشا" ? "گره‌گشا" : d.sys === "حلِ مسئله" ? "حلِ مسئله" : "کارخانه معرفت‌شناسی"), h("h2", {}, d.t), h("p", { class: "small muted" }, d.d),
         h("ol", { class: "small" }, d.steps.map(function (s) { return h("li", {}, typeof s === "function" ? s() : s); })),
