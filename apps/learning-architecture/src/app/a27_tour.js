@@ -21,7 +21,7 @@
     area: { fa: "حوزهٔ قلمرو (تصمیم، ارتباط، خودشناسی، …)", ic: "🧭", view: "sterr" },
     other: { fa: "گامِ دیگر", ic: "•", view: "" }
   };
-  var ROOT_TYPE = { knot: ["kcase"], claim: ["case"], problem: ["eprob"], learn: ["topic"], territory: ["topic", "case"], area: ["wchain", "fcast", "kexp", "ex", "topic", "case"] };
+  var ROOT_TYPE = { knot: ["kcase"], claim: ["case"], problem: ["eprob"], learn: ["topic"], territory: ["topic", "case"], area: ["wchain", "fcast", "kexp", "ex", "topic", "case", "value", "meaning"] };
   var ST_FA = { todo: "مانده", now: "در جریان", done: "پایه برپا شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
   function nowIso() { return new Date().toISOString(); }
   function get(id) { return id ? S.get(id) : null; }
@@ -29,7 +29,7 @@
   /* ---------- رکوردهای هر وجه (ریشه + فرزندان، از پیوندهای خودِ رکوردها) ---------- */
   function refsOf(f) { return (f.refs || []).map(function (r) { return get(r.id); }).filter(Boolean); }
   function children(f) {
-    var roots = refsOf(f), out = { kcase: [], knot: [], kitem: [], kexp: [], "case": [], eprob: [], pbitem: [], topic: [], card: [], sched: [], ex: [], wchain: [], fcast: [] };
+    var roots = refsOf(f), out = { kcase: [], knot: [], kitem: [], kexp: [], "case": [], eprob: [], pbitem: [], topic: [], card: [], sched: [], ex: [], wchain: [], fcast: [], value: [], meaning: [] };
     roots.forEach(function (r) { if (out[r.type]) out[r.type].push(r); });
     out.kexp = out.kexp.slice(); out.ex = out.ex.slice();
     out.kcase.forEach(function (kc) {
@@ -118,10 +118,10 @@
       add("کارت‌های مرور یا چرخهٔ ۱-۳-۷ زمان‌بندی شد", c.card.length || c.sched.length);
       add("چرخهٔ ۱-۳-۷ تا آخر انجام شد", c.sched.length && c.sched.every(function (x) { return x.done; }), false);
     } else if (f.kind === "area") {
-      var ar = A.SYST && f.area ? A.SYST.find(f.area) : null, used = c.wchain.length + c.fcast.length + c.kexp.length + c.ex.length + c.topic.length + c["case"].length;
+      var ar = A.SYST && f.area ? (A.SYST.byId ? A.SYST.byId(f.area) : A.SYST.find(f.area)) : null, used = c.wchain.length + c.fcast.length + c.kexp.length + c.ex.length + c.topic.length + c["case"].length + c.value.length + c.meaning.length;
       add("کاربستی از ابزارهای حوزهٔ «" + (ar ? ar.a.fa : (f.area || "قلمرو")) + "» ساخته و وصل شد", used);
       add("پیگیری یا تمرینِ آینده زمان‌بندی شد", practice(f).length || c.ex.some(function (x) { return x.status === "done"; }));
-      add("نتیجهٔ واقعی ثبت شد (رخ داد/نداد، شد/نشد، آزمایشِ کامل یا کاربرگِ تمام‌شده)", c.wchain.some(function (x) { return x.outcome; }) || c.fcast.some(function (x) { return x.outcome; }) || c.kexp.some(function (x) { return x.status === "done" || x.doneAt; }) || c.ex.some(function (x) { return x.status === "done"; }), false);
+      add("نتیجهٔ واقعی ثبت شد (رخ داد/نداد، شد/نشد، آزمایشِ کامل یا کاربرگِ تمام‌شده)", c.meaning.length || c.value.some(function (v) { return (v.vs || []).some(function (x) { return (x.rule || "").trim(); }); }) || c.wchain.some(function (x) { return x.outcome; }) || c.fcast.some(function (x) { return x.outcome; }) || c.kexp.some(function (x) { return x.status === "done" || x.doneAt; }) || c.ex.some(function (x) { return x.status === "done"; }), false);
     } else if (f.kind === "territory") {
       var b = f.blocked || {};
       add("برگهٔ ساختِ حوزه ثبت شد" + (b.number ? " (#" + fa(b.number) + ")" : ""), b.number);
@@ -179,10 +179,12 @@
   }
   function normFacet(x, i) {
     var k = KIND[x.kind] ? x.kind : "other";
-    var ar = x.area && A.SYST ? A.SYST.find(String(x.area)) : null;
+    // حوزه از قلمروِ سامانه‌ها یا قلمروِ معرفت‌شناسی (a_…) — کارزارِ آزمون sc08: a_testimony و a_evidence وجهِ area نمی‌شدند
+    var ar = x.area && A.SYST ? (A.SYST.byId ? A.SYST.byId(String(x.area)) : A.SYST.find(String(x.area))) : null, epi = ar && ar.epi;
     if (ar && k === "other") k = "area";
+    var dv = epi ? "e_bt" : KIND[k].view, ds = epi ? "terr" : KIND[k].sub || "";
     return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, area: ar ? ar.a.id : "", title: clip(x.title || x.name || x.t || (ar ? ar.a.fa : "") || KIND[k].fa, 120), why: clip(x.why || "", 300),
-      view: A.V[x.view] ? x.view : KIND[k].view, arg: x.arg == null || x.arg === "" ? (ar ? ar.sys.id : "") : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : (A.V[x.view] ? "" : KIND[k].sub || ""),
+      view: A.V[x.view] ? x.view : dv, arg: x.arg == null || x.arg === "" ? (ar && !epi ? ar.sys.id : "") : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : (A.V[x.view] ? "" : ds),
       steps: (x.steps || []).slice(0, 12).map(function (st) { return { t: clip(typeof st === "string" ? st : st.t, 140), done: false }; }),
       status: "todo", refs: [], createdAt: nowIso() };
   }
@@ -210,7 +212,13 @@
     }
     advance(s); return "";
   };
-  DO.tour_add = function (a) { return DO.tour_plan({ goal: a.goal, facets: [a.facet || a] }); };
+  DO.tour_add = function (a) {
+    // هر سه شکل پذیرفته می‌شود: {"facet":{…}}، فیلدهای تخت، یا {"facets":[…]} — و وجهِ تهی ساخته نمی‌شود (کارزارِ آزمون sc08: وجهِ «گامِ دیگر» بی نما)
+    var list = Array.isArray(a.facets) ? a.facets : [a.facet && typeof a.facet === "object" ? a.facet : a];
+    list = list.filter(function (x) { return x && (String(x.title || "").trim() || x.area || x.view || (x.kind && x.kind !== "other")); });
+    if (!list.length) return "وجهِ تازه عنوان یا نوع ندارد — شکل: {\"do\":\"tour_add\",\"facet\":{\"key\":\"f4\",\"kind\":\"area\",\"area\":\"…\",\"title\":\"…\"}}";
+    return DO.tour_plan({ goal: a.goal, facets: list });
+  };
   DO.tour_goal = function (a) { var s = AS._turnSession; if (!s || !s.tour || !a.goal) return "تور یا هدف نیست"; s.tour.goal = clip(a.goal, 600); return ""; };
   DO.tour_focus = function (a) {
     var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجهِ «" + (a.facet || "") + "» در تور نیست";
@@ -220,7 +228,17 @@
   };
   DO.tour_step = function (a) { var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست"; var st = (f.steps || [])[+a.step - 1]; if (st) st.done = a.done !== false; return ""; };
   DO.tour_link = function (a) {
-    var s = AS._turnSession, f = s && fac(s, a.facet), r = get(a.id); if (!f || !r) return "پیوند به رکوردِ ناموجود";
+    var s = AS._turnSession, f = s && fac(s, a.facet), r = get(a.id);
+    // برگه (شمارهٔ «#101») ⇒ همان وجه منتظرِ همان برگه، تا پاسخِ روتین سنجیده شود (کارزارِ آزمون sc08: برگه به هیچ وجهی وصل نبود)
+    var num = !r && f && String(a.id || "").replace(/[^0-9۰-۹]/g, "").replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); });
+    if (num) {
+      var rep = (s.reports || []).filter(function (x) { return String(x.number) === num; })[0] || (AS._sheets || []).filter(function (x) { return String(x.number) === num; })[0];
+      if (!rep) return "برگهٔ #" + num + " پیدا نشد";
+      if (f.status === "done" || f.status === "skipped") return "وجهِ «" + f.title + "» بسته است";
+      rep.facet = f.key; f.status = "blocked"; f.blocked = { id: rep.id, number: rep.number, area: rep.area || "", title: rep.title || "", at: rep.at || nowIso(), checks: [], seenNote: "" };
+      return "";
+    }
+    if (!f || !r) return "پیوند به رکوردِ ناموجود";
     // یک کار یک بار شمرده می‌شود: رکوردی که ریشهٔ وجهِ دیگری است دوباره وصل نمی‌شود (کارزارِ آزمون sc01: وجهِ تکراری با همان ۸ نشانه)
     var dup = s.tour.facets.filter(function (g) { return g !== f && g.status !== "skipped" && (g.refs || []).some(function (x) { return x.id === r.id; }); })[0];
     if (dup) return "«" + clip(r.title || r.name || r.id, 40) + "» از پیش در وجهِ «" + dup.title + "» شمرده می‌شود — یک کار دو بار شمرده نمی‌شود؛ اگر این وجه همان است، با tour_skip و دلیل کنارش بگذار";
@@ -302,6 +320,14 @@
         (f.status === "done" && followups(f).length ? " — پیگیریِ باز: " + followups(f).map(function (m) { return m.t; }).join("؛ ") : "") +
         (f.blocked ? " — برگهٔ #" + f.blocked.number + (f.blocked.verified ? " (ساخته و وارسی شد)" : " (منتظر)") : "") + (f.why ? " — چرا: " + f.why : ""));
     });
+    // رکوردهای تازهٔ کاربر که هنوز به هیچ وجهی وصل نیستند — تا مدل شناسه‌شان را برای tour_link داشته باشد (کارزارِ آزمون sc08: پیش‌بینی پیدا نمی‌شد)
+    var linked = {}; t.facets.forEach(function (f) { (f.refs || []).forEach(function (r) { linked[r.id] = 1; }); });
+    var from = A.addDays(A.today(), -14), fresh = [];
+    ["kcase", "case", "eprob", "topic", "wchain", "fcast", "kexp", "value", "meaning"].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && !linked[r.id] && String(r.created || r.date || "") >= from; }).forEach(function (r) { fresh.push(r); }); });
+    fresh.sort(function (a, b) { return String(b.created || "").localeCompare(String(a.created || "")); });
+    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link): " + fresh.slice(0, 10).map(function (r) { return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || (r.p && r.p.title) || "", 40) + "»"; }).join("، "));
+    var unl = (s.reports || []).filter(function (r) { return r.number && !r.facet; });
+    if (unl.length) L.push("برگه‌های ثبت‌شده که به وجهی وصل نیستند: " + unl.map(function (r) { return "#" + r.number; }).join("، ") + " — با {\"do\":\"tour_link\",\"facet\":\"fN\",\"id\":\"#شماره\"} به وجهِ territory وصل کن تا پاسخِ روتین سنجیده شود.");
     return L.join("\n");
   };
 
@@ -309,7 +335,7 @@
   AS.SYS += "\n" + [
     "# تور: مسئلهٔ چندوجهی",
     "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود. اگر «# تور» از پیش هست و موضوعِ تازه‌ای آمد، فقط وجه‌های تازه را با کلیدهای تازه (پس از آخرین کلید) بده — وجهِ انجام‌شده هرگز عوض نمی‌شود.",
-    "- پوشش: هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود — تصمیمی که به آن بند است (کار، پول، رابطه) ⇒ kind=area با area از s_decision (مثلاً dc_career_income، dc_risk_uncertainty)؛ دیگران درگیرند (مدیر، دوستان، همسر، جمع) ⇒ area از s_social؛ «این نوع را یاد بگیرم / دفعهٔ بعد حلش کنم» ⇒ learn و area از s_problem یا s_learn؛ معنا، ارزش، هویت ⇒ area از s_self (ابزارش «🧭 ارزش‌ها و معنا»، نمای vals). kind=problem فقط برای یک مسئلهٔ مشخص که در «مسئله‌های بزرگ» وارد می‌شود؛ تمرینِ حرکت‌ها یا خانواده‌های گیر ⇒ learn یا other با گام‌های خودش (نشانه‌های مسئلهٔ بزرگ بر آن نمی‌نشیند). حرفِ کاربر دربارهٔ تمرینی که «کرد» را با صفحه بسنج (پیشرفتِ ثبت‌شده)، نه با گفته. وجهِ area با \"area\":\"<شناسهٔ حوزه از قلمروِ سامانه‌ها>\" ساخته می‌شود و ابزارهای همان حوزه را به کار می‌برد. اگر جنبه‌ای را وجه نمی‌کنی، در reply یک جمله بگو چرا. حوزه‌ای که کاربر همین حالا مستقیم درباره‌اش می‌پرسد و گامش ۰ یا ۱ است (در هر قلمرو) = «الان لازم دارد» ⇒ gap با kind=priority، و تا آن وقت از «# دانسته‌های قلمرو» آنچه هست بگو.",
+    "- پوشش: هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود — تصمیمی که به آن بند است (کار، پول، رابطه) ⇒ kind=area با area از s_decision (مثلاً dc_career_income، dc_risk_uncertainty)؛ دیگران درگیرند (مدیر، دوستان، همسر، جمع) ⇒ area از s_social؛ «این نوع را یاد بگیرم / دفعهٔ بعد حلش کنم» ⇒ learn و area از s_problem یا s_learn؛ معنا، ارزش، هویت ⇒ area از s_self (ابزارش «🧭 ارزش‌ها و معنا»، نمای vals). kind=problem فقط برای یک مسئلهٔ مشخص که در «مسئله‌های بزرگ» وارد می‌شود؛ تمرینِ حرکت‌ها یا خانواده‌های گیر ⇒ learn یا other با گام‌های خودش (نشانه‌های مسئلهٔ بزرگ بر آن نمی‌نشیند). حرفِ کاربر دربارهٔ تمرینی که «کرد» را با صفحه بسنج (پیشرفتِ ثبت‌شده)، نه با گفته. kind=learn فقط برای یک موضوع در «موضوع‌ها» (topics)؛ دوره/درس‌های آماده (مثلاً «🧭 دورهٔ سنجش») ⇒ other با گام. حوزه‌های قلمروِ معرفت‌شناسی (a_…) هم kind=area با همان شناسه‌اند؛ kind=territory فقط برای حوزه‌ای که نیست یا گامش ۰/۱ است و برگه‌اش با «facet» ثبت می‌شود. وجهِ area با \"area\":\"<شناسهٔ حوزه از قلمروِ سامانه‌ها>\" ساخته می‌شود و ابزارهای همان حوزه را به کار می‌برد. اگر جنبه‌ای را وجه نمی‌کنی، در reply یک جمله بگو چرا. حوزه‌ای که کاربر همین حالا مستقیم درباره‌اش می‌پرسد و گامش ۰ یا ۱ است (در هر قلمرو) = «الان لازم دارد» ⇒ gap با kind=priority، و تا آن وقت از «# دانسته‌های قلمرو» آنچه هست بگو.",
     "- آزمونی که چند روز وقت می‌خواهد (مقایسهٔ دو روش، صبر تا رخداد) را بی‌موعد رها نکن: «⏳ آزمایشِ واقعی» ِ گره‌گشا یا «🎯 دفترِ پیش‌بینی» با موعد بساز تا در «امروز» بیاید.",
     "- ترتیب، به همین اولویت: (۱) ایمنی و حالِ کاربر؛ (۲) وابستگی: وجهی که خروجی‌اش ورودیِ دیگری است اول (ریشهٔ گیر پیش از شبیه‌سازِ همان مسئله؛ ریشهٔ یک ترس پیش از سنجشِ پیش‌بینی‌ای که از آن برخاسته — مگر تصمیمی همین روزها به آن پیش‌بینی بند باشد، که آن‌گاه سنجشِ ادعا اول)؛ (۳) آنچه زمان‌دار است زودتر؛ (۴) فهمیدنِ عمیقِ مفهومِ مشترک پیش از تمرینِ تخصصی؛ (۵) وجهِ territory جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و ادامه بده. اگر ادعا از ریشهٔ گره درمی‌آید، پرونده‌اش را با دکمهٔ «🏭 این برداشت را در کارخانه بسنج» ِ خودِ گره‌گشا بساز — سامانه آن را به وجهِ ادعا وصل می‌کند؛ از میزِ کار دوباره نساز.",
     "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",

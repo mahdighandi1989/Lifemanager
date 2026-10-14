@@ -178,10 +178,14 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const tp = { id: 'tp_t2', type: 'topic', title: 'احتمالِ شرطی' }; APP.S.put(tp); APP.S.put({ id: 'sc_t2', type: 'sched', topic: 'tp_t2', due: APP.addDays(APP.today(), 1) });
     AS._turnSession = s; AS.DO.tour_link({ facet: 'f2', id: 'tp_t2' });
     const dupLink = AS.DO.tour_link({ facet: 'f3', id: 'tp_t2' }); // همان کار در وجهِ دیگر دو بار شمرده نمی‌شود
+    // tour_add با آرایه و بی عنوان؛ پیش‌بینیِ وصل‌نشده در متنِ تور؛ برگه با شماره به وجه وصل می‌شود (کارزارِ آزمون sc08)
+    const nF0 = t.facets.length, emptyAdd = AS.DO.tour_add({ facets: [{ kind: 'other' }] }), nF1 = t.facets.length;
+    APP.S.put({ id: 'fc_tt', type: 'fcast', q: 'روزه هوش را بالا می‌برد', p: 80, due: APP.addDays(APP.today(), 30) });
+    const fcInText = /رکوردهای تازهٔ وصل‌نشده[^\n]*fcast:fc_tt/.test(AS.tourText(s));
     s.msgs.forEach(m => { if (m.role === 'user') m.at = new Date(Date.now() - 2 * 864e5).toISOString(); }); s._rem = null; __rem.length = 0;
     AS.tourAfterTurn(s);
     const fu = AS.tourFollowups(t.facets[1]).map(m => m.t).join('|');
-    const out = { dup: /دو بار شمرده نمی‌شود/.test(dupLink) && !(t.facets[2].refs || []).some(x => x.id === 'tp_t2'), done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),
+    const out = { addArr: !!emptyAdd && nF1 === nF0, fcInText, dup: /دو بار شمرده نمی‌شود/.test(dupLink) && !(t.facets[2].refs || []).some(x => x.id === 'tp_t2'), done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),
       today: APP.dueList().some(x => /پیگیریِ تورِ .* تا تسلط/.test(x.txt)), rem: (__rem.slice(-1)[0] || {}).body || '', btn: !!Array.from(document.querySelectorAll('.as-tour .btn')).find(x => /پیگیری تا تسلط/.test(x.textContent)) };
     APP.ASSIST.toggle(true);
     out.btn = !!Array.from(document.querySelectorAll('.as-tour .btn')).find(x => /پیگیری تا تسلط/.test(x.textContent));
@@ -202,7 +206,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.left = t.facets.map(f => f.key + ':' + AS.tourFollowups(f).map(m => m.t).join('/')).join(' || ');
     return out;
   });
-  chk(info.master.dup && info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
+  chk(info.master.addArr && info.master.fcInText && info.master.dup && info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
     'after the order is walked, open follow-ups stay in Today, the reminder and the drawer: ' + JSON.stringify(info.master));
   chk(info.master.notYet === 'false,false' && info.master.held30only === 'true,false' && info.master.recheck, 'solved needs a cold correct answer after 30 and 90 days; the 90-day check shows in Today: ' + JSON.stringify(info.master));
   chk(info.master.mastered, 'when every milestone of every facet is ✓ the tour says it is complete');
@@ -212,9 +216,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const s = APP.ASSIST.cur(), AS = APP.ASSIST, t = s.tour; AS._turnSession = s;
     const before = t.facets.map(f => f.title).join('|');
     AS.DO.tour_plan({ goal: 'جلسهٔ تیم', facets: [{ key: 'f1', kind: 'knot', title: 'سکوت در جلسه' }, { key: 'f2', kind: 'claim', title: 'درون‌گراها مدیرِ بد' }] });
-    return { kept: t.facets.slice(0, 3).map(f => f.title).join('|') === before, keys: t.facets.map(f => f.key + ':' + f.status).join(','), reopened: !t.doneAt && !t.masteredAt, goal: /جلسهٔ تیم/.test(t.goal) };
+    const keys0 = t.facets.map(f => f.key + ':' + f.status).join(',');
+    (s.reports = s.reports || []).push({ id: 'rep77', number: 77, area: 'sys-territory', title: 'حوزهٔ شواهد' }); const sl = AS.DO.tour_link({ facet: 'f5', id: '#۷۷' });
+    const sheetLink = sl === '' && t.facets[4].status === 'blocked' && t.facets[4].blocked.number === 77 && s.reports[s.reports.length - 1].facet === 'f5';
+    return { sheetLink, kept: t.facets.slice(0, 3).map(f => f.title).join('|') === before, keys: keys0, reopened: !t.doneAt && !t.masteredAt, goal: /جلسهٔ تیم/.test(t.goal) };
   });
-  chk(info.replan.kept && info.replan.keys === 'f1:done,f2:done,f3:done,f4:now,f5:todo' && info.replan.reopened && info.replan.goal,
+  chk(info.replan.sheetLink && info.replan.kept && info.replan.keys === 'f1:done,f2:done,f3:done,f4:now,f5:todo' && info.replan.reopened && info.replan.goal,
     'a new plan on an existing tour appends with fresh keys and never rewrites done facets: ' + JSON.stringify(info.replan));
 
   // 13) نیمی‌مربوط، ایمنی، و پرونده‌ای که از ریشهٔ گره ساخته شد ⇒ وجهِ ادعا
