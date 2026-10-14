@@ -281,35 +281,46 @@
   }
   /* تاریخچه: هرچه از گفت‌وگو در بودجه جا شود، کامل (تازه‌ترین‌ها اول انتخاب و به ترتیبِ زمان چیده می‌شوند)؛
      آنچه جا نشود در «حافظهٔ سشن» (خلاصهٔ انباشته‌ای که مدل هر نوبت کامل برمی‌گرداند) هست — پس هیچ‌چیز از اول تا حالا گم نمی‌شود */
-  function history(s, skipLast) {
-    var out = [], used = 0, all = skipLast ? s.msgs.slice(0, -1) : s.msgs;
+  function history(s, skipLast, budget) {
+    var out = [], used = 0, all = skipLast ? s.msgs.slice(0, -1) : s.msgs, cap = budget == null ? HIST_CHARS : budget;
     for (var i = all.length - 1; i >= 0; i--) {
       var m = all[i];
       var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.text || "").slice(0, 4000) +
         (m.files && m.files.length ? " [پیوست: " + m.files.map(function (f) { return (f.id != null ? f.id + "=" : "") + f.name; }).join("، ") + "]" : "");
-      if (used + line.length > HIST_CHARS && out.length) { out.unshift("(" + fa(i + 1) + " پیامِ قدیمی‌تر در «حافظهٔ سشن» خلاصه شده است)"); break; }
+      if (used + line.length > cap && (out.length || cap < 200)) { out.unshift("(" + fa(i + 1) + " پیامِ قدیمی‌تر در «حافظهٔ سشن» خلاصه شده است)"); break; }
       out.unshift(line); used += line.length;
     }
     return out;
   }
-  function userPrompt(s, msg, sc, extra, skipLast) {
+  function userPrompt(s, msg, sc, extra, skipLast, histBudget) {
     var L = ["# سشن", "نام: " + (s.title || "(هنوز بی‌نام)"), "خواستهٔ اصلی (سنجاق‌شده): " + (s.pinned || "(هنوز نیست)"), "حافظهٔ سشن: " + (s.memory || "(خالی)")];
     if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]" + (x.view ? " (" + x.view + ")" : ""); }).join(" "));
     if (s.files && s.files.length) L.push("پیوست‌های سشن (id=نام): " + s.files.map(function (f) { return f.id + "=" + f.name; }).join("، ") + " — اگر برای پاسخ دوباره به محتوای یکی لازم داری، reread بده.");
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
     L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
     L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
-    history(s, skipLast).forEach(function (x) { L.push(x); });
+    var HP = L.length;
     L.push("", "# نوبتِ تازه", msg);
     if (extra) L.push(extra);
-    return L.join("\n");
+    if (histBudget === -1) return { head: L.slice(0, HP).join("\n"), tail: L.slice(HP).join("\n") };
+    var hx = history(s, skipLast, histBudget);
+    return L.slice(0, HP).concat(hx, L.slice(HP)).join("\n");
   }
   /* نقشهٔ سامانه در بخشِ «کاربر» می‌رود (سقفِ سرور ۶۰هزار نویسه؛ پیامِ سیستم ۲۰هزار) — اشراف که بزرگ شد، تماس نمی‌شکند */
   var MAX_USER = 58000;
+  /* بودجه: نقشه + سشن + صفحه + پیامِ تازه + متنِ فایل همیشه کامل؛ تاریخچه هرچه جا بماند (بقیه در «حافظهٔ سشن»).
+     اگر حتی بی تاریخچه جا نشود (فقط نسخهٔ مستقل با فایلِ متنیِ خیلی بزرگ)، متنِ فایل با **اعلامِ صریح** کوتاه می‌شود — هرگز بی‌صدا. */
   AS.prompt = function (s, msg, sc, extra, skipLast) {
-    var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n", rest = userPrompt(s, msg, sc, extra, skipLast);
-    if (man.length + rest.length > MAX_USER) rest = rest.slice(0, Math.max(4000, MAX_USER - man.length));
-    return (man + rest).slice(0, MAX_USER);
+    var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n";
+    var parts = userPrompt(s, msg, sc, extra, skipLast, -1);
+    var room = MAX_USER - man.length - parts.head.length - parts.tail.length - 200;
+    if (room < 0) {
+      var keep = Math.max(2000, parts.tail.length + room - 400);
+      parts.tail = parts.tail.slice(0, keep) + "\n[سامانه: متنِ فایل از این‌جا به بعد در این نسخه جا نشد — به کاربر صادقانه بگو کدام بخش را ندیدی؛ در Lifemanager سرور کلِ فایل را می‌خواند.]";
+      room = 0;
+    }
+    var hx = history(s, skipLast, Math.min(HIST_CHARS, room));
+    return (man + parts.head + "\n" + hx.join("\n") + "\n" + parts.tail).slice(0, MAX_USER);
   };
   function parse(t) { var o = A.parseJSONLoose ? A.parseJSONLoose(t) : JSON.parse(t); if (!o || typeof o.reply !== "string") throw new Error("پاسخِ دستیار ناخوانا بود"); return o; }
   function unwrap(r) { return r && typeof r === "object" ? r : { text: r, files: [] }; }

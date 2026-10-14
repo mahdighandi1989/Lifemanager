@@ -35,6 +35,7 @@ routine: «بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناس
    (`verified`/`corrected`)؛ هر `request` را **در همین دور و پیش از گردآوریِ عادی** انجام بده، با `python3 scripts/supervisor/inspection.py answer`
    زیرِ برگه‌اش جواب بنویس و `--status done`. اگر کارِ عادیِ همین دورت برگهٔ بازی را هم حل کرد، `handoff.py add --by backtest --kind owner-did
    --sheet N …` بزن تا صفِ فوری دوباره‌کاری نکند. پیش از پوش: `python3 scripts/supervisor/handoff.py guard --routine backtest && python3 scripts/supervisor/handoff.py check`.
+   هر کامیتِ این روتین در پایانِ پیام یک خطِ `Routine: backtest` داشته باشد (`git commit -m "…" -m "Routine: backtest"`) تا `precheck` ِ روتین‌های دیگر ببیند کارِ کیست.
    اگر پوش به‌خاطرِ عقب‌بودن رد شد و rebase کردی: `python3 scripts/supervisor/handoff.py check --fix` (نمای `HANDOFFS.md` بازسازی شود) و دوباره `guard`، سپس دروازه.
    قراردادِ کامل: بخشِ «هماهنگی میانِ روتین‌ها» در پایینِ همین فایل.
 1. **همگام شو و وضع را بخوان:** `node apps/learning-architecture/tools/epi_backtest.js status` — پیکره، حوزه‌های کم‌شمار،

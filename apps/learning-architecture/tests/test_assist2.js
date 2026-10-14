@@ -156,6 +156,17 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.gp.dup.filed === 0 && /#۱۲/.test(info.gp.dup.skip), 'an already-open sheet is not duplicated');
   chk(info.gp.down_low.filed === 0 && info.gp.down_high.filed === 1 && /در دسترس نبود/.test(info.gp.down_high.text), 'consultant down ⇒ only a very sure gap is filed, flagged for stricter review');
   chk(info.gp.sheetsInPrompt, 'open sheets of the page travel with every turn');
+  // 11) prompt budget: the new message and the full file text always fit; history takes what is left; a cut is SAID, never silent
+  info.budget = await p.evaluate(() => {
+    const s = APP.ASSIST.newSession(); s.memory = 'م'.repeat(6000);
+    for (let i = 0; i < 80; i++) s.msgs.push({ role: i % 2 ? 'ai' : 'user', text: 'پیامِ طولانی '.repeat(300), at: '' });
+    APP.ASSIST._sheets = Array.from({ length: 60 }, (_, i) => ({ number: i, title: 'برگه '.repeat(30), status: 'open' }));
+    const big = APP.ASSIST.prompt(s, 'پیامِ تازه XYZ', APP.ASSIST.scan(), 'متنِ فایل '.repeat(4000));
+    const small = APP.ASSIST.prompt(s, 'Q2', APP.ASSIST.scan(), 'متنِ کوچکِ فایل ABC');
+    return { big: big.length, bigNew: big.includes('XYZ'), said: big.includes('جا نشد'), small: small.length, smallNew: small.includes('Q2') && small.includes('ABC'), hist: /پیامِ طولانی/.test(small) };
+  });
+  chk(info.budget.big <= 58000 && info.budget.bigNew && info.budget.said, 'over budget: new message kept, the cut file text is announced');
+  chk(info.budget.smallNew && info.budget.hist, 'normal: new message, file text and history all present');
   console.log(JSON.stringify(info).slice(0, 900));
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();

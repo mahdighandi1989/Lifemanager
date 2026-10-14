@@ -65,7 +65,8 @@ if [ -n "$(git status --porcelain)" ]; then
   [ -n "$MSG" ] || { echo "❌ uncommitted changes: pass a commit message"; exit 1; }
   say "Commit"
   git add -A
-  git commit -q -m "$MSG"
+  # «Routine: <name>» trailer — `handoff.py precheck` shows WHICH routine made each commit on an area
+  if [ -n "${SUPERVISOR_ROUTINE:-}" ]; then git commit -q -m "$MSG" -m "Routine: ${SUPERVISOR_ROUTINE}"; else git commit -q -m "$MSG"; fi
 fi
 
 # --- 3. push to main ----------------------------------------------------------

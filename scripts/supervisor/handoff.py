@@ -176,9 +176,13 @@ def cmd_precheck(a) -> int:
     if not ar:
         print("قلمروِ ناشناخته: " + a.area); return 2
     since = a.since or (datetime.now(timezone.utc) - timedelta(days=14)).strftime("%Y-%m-%d")
+    if len(since) == 10:
+        # git reads a bare «2026-10-14» as «that day at the CURRENT time of day» (found in a simulation: the owner's work from
+        # the same morning was missed) — and a sheet filed today may answer work done yesterday: start the day BEFORE, at 00:00
+        since = (datetime.strptime(since, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d") + " 00:00:00"
     print(f"== قلمرو {ar['id']} — مالک: {','.join(owners(ar))} — دستور: {ar['procedure']}")
     pats = [p.rstrip("*") or "." for p in ar["paths"]]
-    log = git("log", f"--since={since}", "--format=%h %ad %s", "--date=short", "--", *pats)
+    log = git("log", f"--since={since}", "--format=%h %ad [%(trailers:key=Routine,valueonly,separator=%x2C)] %s", "--date=iso", "--", *pats)
     print(f"== کامیت‌ها روی این قلمرو از {since}:")
     print(log.strip() or "(هیچ)")
     data = load()
