@@ -86,7 +86,7 @@
       ix.acc = X.ans.length >= MIN_N ? Math.round(100 * X.ans.filter(function (a) { return a.ok; }).length / X.ans.length) : null;
       var b = brier(X.cal); ix.cal = X.cal.length >= MIN_N ? Math.round(100 * (1 - b)) : null;
       ix.ret = X.ret.n >= MIN_N ? Math.round(100 * X.ret.ok / X.ret.n) : null;
-      ix.knot = X.knots.all >= 3 ? Math.round(100 * (X.knots.practised || 0) / X.knots.all) : null;
+      ix.knot = X.knots.all >= MIN_N ? Math.round(100 * (X.knots.practised || 0) / X.knots.all) : null;
       var vals = [ix.acc, ix.cal, ix.ret, ix.knot].filter(function (v) { return v != null; });
       if (ix.acc == null && ix.cal == null) vals = [];   // بی شاخصِ عملکرد (دقت یا کالیبراسیون با ≥ ۵ نمونه) نمره‌ای نیست — وضعِ گره‌ها تنها کافی نیست
       X.ix = ix; X.n = { acc: X.ans.length, cal: X.cal.length, ret: X.ret.n, knot: X.knots.all };
@@ -277,4 +277,20 @@
   A.VIEW_META = A.VIEW_META || {};
   A.VIEW_META.mind = { j: "ws", what: "کارنامهٔ ذهن: هفت بُعد با دقت، کالیبراسیون، ماندگاری و بازشدنِ گره‌ها؛ نقطه‌های سیاه، روند، نقشهٔ کاملِ ذهن، شبکه و مسیرهای پیشِ رو.", why: "تا ذهنت را در یک نگاه و در جزئیات ببینی و بدانی کجا جلو رفته‌ای، کجا گیر کرده‌ای و راهِ بعد چیست." };
   if (A.GRAPH && A.GRAPH.MAPS && !A.GRAPH.MAPS.some(function (x) { return x.v === "mind"; })) A.GRAPH.MAPS.splice(1, 0, { v: "mind", fa: "🧠 کارنامهٔ ذهن", what: "هفت بُعد، نقطه‌های سیاه، روند، نقشهٔ کاملِ ذهن و شبکه" });
+})(APP);
+/* دستیار عددهای کارنامه را هم می‌بیند (کارزارِ آزمون sc09: «عددها را در اسکنم نمی‌بینم» و افتِ ۷۰→۶۱ را حدس زد) — فقط وقتی همین نما باز است */
+(function (A) {
+  if (!A.ASSIST || !A.MIND) return;
+  A.ASSIST.promptHooks = A.ASSIST.promptHooks || [];
+  A.ASSIST.promptHooks.push(function () {
+    if (!A.state || A.state.view !== "mind") return "";
+    var M = A.MIND.model(), L = ["# کارنامهٔ ذهن (همین عددهایی که کاربر می‌بیند؛ عدد = درصد، داخلِ پرانتز = اندازهٔ نمونه؛ زیرِ ۵ نمونه عدد نیست)"];
+    M.dims.forEach(function (d) {
+      var ix = d.ix || {}, n = d.n || {};
+      L.push("- " + (d.fa || d.id) + ": نمره " + (d.score == null ? "—" : d.score) + " · " + d.band + " · دقت " + (ix.acc == null ? "—" : ix.acc) + " (" + (n.acc || 0) + ")" + " · کالیبراسیون " + (ix.cal == null ? "—" : ix.cal) + " (" + (n.cal || 0) + ")" +
+        " · ماندگاری " + (ix.ret == null ? "—" : ix.ret) + " (" + (n.ret || 0) + ")" + " · بازشدنِ گره " + (ix.knot == null ? "—" : ix.knot) + " (" + (n.knot || 0) + ")" + (d.trend == null ? "" : " · روندِ ماهانه " + d.trend));
+    });
+    if ((M.black || []).length) L.push("نقطه‌های سیاه: " + M.black.slice(0, 6).map(function (b) { return b.fa || b.t || ""; }).join(" · "));
+    return L.join("\n");
+  });
 })(APP);
