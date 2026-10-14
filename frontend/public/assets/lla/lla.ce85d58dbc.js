@@ -32096,7 +32096,7 @@ APP.goFromURL = function (q) {
     rel.forEach(function (r) {
       var a = r.a;
       if (r.epi) { L.push("- [معرفت‌شناسی] " + a.id + " «" + a.fa + "» گامِ " + r.st + (r.st <= 1 ? " (هنوز محتوای سنجیده ندارد)" : "") + ": " + (a.desc_fa || "") + (a.key_questions_fa ? " — پرسش‌ها: " + a.key_questions_fa.slice(0, 2).join(" / ") : "")); return; }
-      L.push("- [" + r.sys.fa + "] " + a.id + " «" + a.fa + "» گامِ " + SYS.stage(a) + (a.tools && a.tools.length ? " — ابزارها: " + a.tools.slice(0, 5).join("، ") : "") + (a.gap_fa ? " — کمبودِ صفحه: " + a.gap_fa.slice(0, 160) : ""));
+      L.push("- [" + r.sys.fa + "] " + a.id + " «" + a.fa + "» گامِ " + SYS.stage(a) + (a.tools && a.tools.length ? " — ابزارها: " + a.tools.join("، ") : "") + (a.gap_fa ? " — کمبودِ صفحه: " + a.gap_fa.slice(0, 160) : ""));
       (a.claims || []).slice(0, 3).forEach(function (c) { L.push("   · " + (KIND[c.kind] || c.kind) + ": " + c.fa + " — " + String(c.basis_fa || "").slice(0, 140)); });
     });
     return L.join("\n").slice(0, 4000);
