@@ -1,9 +1,9 @@
 {
- "round": 6,
+ "round": 7,
  "at": "2026-10-14",
  "classes": {
   "B": 25,
-  "S": 14,
+  "S": 15,
   "O": 4,
   "X": 2,
   "?": 0
@@ -607,6 +607,25 @@
    "stricterThanTheorem": false
   },
   {
+   "id": "r_istiqra_hidden",
+   "fa": "استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده",
+   "st": "st_istiqra",
+   "cap": 70,
+   "capDeg": "zann",
+   "sec": [
+    "s51",
+    "s50"
+   ],
+   "k": "S",
+   "th": "T_product",
+   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "base": "p_hidden_factor",
+   "baseFa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
+   "note": "همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)",
+   "consistent": null,
+   "stricterThanTheorem": false
+  },
+  {
    "id": "r_yad_orig_t1",
    "fa": "یادآوری بیش از معرفت نخستین منتقل نمی‌کند (≤۲۵)",
    "st": "st_yad",
@@ -876,9 +895,9 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 184,
+    "ok": 185,
     "health_alarm": 0,
-    "missed": 1,
+    "missed": 0,
     "mislocated": 0
    },
    "changed": []
@@ -898,6 +917,12 @@
      "to": "missed"
     },
     {
+     "id": "bk_russell_chicken",
+     "t": "جوجه راسل",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
      "id": "cs_b_dewey1948",
      "t": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
      "from": "ok",
@@ -913,9 +938,9 @@
   },
   "derived": {
    "kinds": {
-    "ok": 184,
+    "ok": 185,
     "health_alarm": 0,
-    "missed": 1,
+    "missed": 0,
     "mislocated": 0
    },
    "changed": []
@@ -931,6 +956,12 @@
     {
      "id": "bk_stick_sight",
      "t": "چوب کج در آب: حکم باصره",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "bk_russell_chicken",
+     "t": "جوجه راسل",
      "from": "ok",
      "to": "missed"
     },
@@ -1024,8 +1055,8 @@
   },
   "p_hidden_factor": {
    "fa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
-   "matched": 21,
-   "curated": 21,
+   "matched": 22,
+   "curated": 22,
    "groups": 0,
    "ok": 0,
    "sufficient": false,
@@ -1060,8 +1091,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 101,
-   "fullAfter": 101
+   "fullBefore": 103,
+   "fullAfter": 103
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1070,8 +1101,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 101,
-   "fullAfter": 101
+   "fullBefore": 103,
+   "fullAfter": 103
   },
   "p_found_scope": null
  }

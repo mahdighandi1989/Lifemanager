@@ -93,6 +93,7 @@
     r_hiss_hidden_inf: S("T_product", "p_hidden_inf"),
     r_expert_bias: S("T_product", "p_expert_bias", "اعتبار = اعتبارِ روش × پایبندیِ کارشناس (s49)"),
     r_tajrobe_hidden: S("T_product", "p_hidden_factor"),
+    r_istiqra_hidden: S("T_product", "p_hidden_factor", "همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)"),
     r_core_interp_notcert: O("T_below1", "لایهٔ تفسیرِ حصولی «اعتبارِ مطلق ندارد» (s42)"),
     r_aql_nondeductive: O("T_below1", "قالبِ غیرقیاسی «یقین‌آور نیست» (s40) — برای حکمِ کلی بر دامنهٔ نامحدود ر.ک. T_universal"),
     r_naql_nonnass: O("T_below1", "غیرنص «احتمالِ خلاف» دارد (s48)"),

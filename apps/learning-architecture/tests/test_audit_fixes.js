@@ -17,8 +17,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     nRules: (window.EPI_RULES || []).length, missed: (t.a.missed || t.a.miss || []).map(function (x) { return x.id || x; }) }; });
   // پس از داوریِ جزوه و انتقالِ قاعدهٔ مکاشفه (۲۰۲۶-۱۰-۱۳): هر ۵۱ مثال کامل؛ قاعده‌های بی‌مثال هنوز هستند.
   // به‌روز (WORKLOG 33): با سقفِ قضیه‌ایِ «موردِ بعدی» (T_next) جوجهٔ راسل از راهِ شمار دیگر بیش‌اطمینان نیست — یافتهٔ تشخیص‌دادهٔ
-  // f_bk_russell_chicken و پیشنهادِ p_case_chicken منتظرِ مالک؛ تنها استثنای مجاز همین یک مثال است (۵۰ از ۵۱).
-  chk(info.t1.n === info.t1.nRules && info.t1.tested > 30 && info.t1.tested < info.t1.n && info.t1.full >= 50 / 51 - 1e-9 && info.t1.partial === 0 && info.t1.hash, 'test1 honesty metrics ' + JSON.stringify(info.t1));
+  // f_bk_russell_chicken؛ مالک ۲۰۲۶-۱۰-۱۴ p_case_chicken را پذیرفت (WORKLOG 35) ⇒ دوباره هر ۵۱ مثال کامل.
+  chk(info.t1.n === info.t1.nRules && info.t1.tested > 30 && info.t1.tested < info.t1.n && info.t1.full === 1 && info.t1.partial === 0 && info.t1.hash, 'test1 honesty metrics ' + JSON.stringify(info.t1));
   const ebt0 = await p.evaluate(() => APP.S.all('ebt').length);
   await go('e_living'); await go('e_aut');
   chk(await p.evaluate(() => APP.S.all('ebt').length) === ebt0, 'viewing living/aut must not record a run');

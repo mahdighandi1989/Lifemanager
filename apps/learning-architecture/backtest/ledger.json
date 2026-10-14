@@ -610,6 +610,129 @@
     "baseSufficient": 0,
     "baseTotal": 8
    }
+  },
+  {
+   "round": 7,
+   "at": "2026-10-14",
+   "note": "دورِ ۷: اعمالِ p_case_chicken (پذیرفتهٔ مالک) — ملاکِ عاملِ پنهان (s51) در ایستگاهِ استقراء",
+   "corpus": {
+    "n": 185,
+    "tiers": {
+     "real": 104,
+     "booklet": 51,
+     "problem": 26,
+     "abstract": 4
+    },
+    "new": 0,
+    "files": 1
+   },
+   "books": {
+    "mesbah": {
+     "n": 185,
+     "sound": 68,
+     "healthAlarms": 0,
+     "failures": 117,
+     "detected": 117,
+     "located": 117,
+     "fullyLocated": 103,
+     "controls": {
+      "agree": 1,
+      "negAgree": 0.398,
+      "negOk": true,
+      "posDetect": 1,
+      "posOk": true
+     }
+    }
+   },
+   "findings": {
+    "open": 0,
+    "fixed": 7,
+    "resolved": 0,
+    "verified": 3
+   },
+   "coverage": {
+    "rulesTested": 54,
+    "rules": 73,
+    "sectionsTested": 54,
+    "sections": 72,
+    "domains": 12,
+    "untested": [
+     "r_truth_narrow",
+     "r_badihi_pseudo",
+     "r_badihi_wijdani_other",
+     "r_shohud_misrouted",
+     "r_naql_unreliable_corrob",
+     "r_naql_mubham_q",
+     "r_istiqra_finite",
+     "r_istiqra_small_n",
+     "r_yad_orig_t1",
+     "r_yad_orig_t2",
+     "r_yad_orig_t3",
+     "r_yad_orig_t4",
+     "r_yad_orig_t5",
+     "r_yad_undoc_t4",
+     "r_yad_undoc_t3",
+     "r_yad_undoc_t2",
+     "r_yad_undoc_t1",
+     "r_grade_false_zero",
+     "r_r_sanad_ahad"
+    ],
+    "byDomain": {
+     "پزشکی": 20,
+     "علم": 17,
+     "ریاضی": 28,
+     "فناوری و مهندسی": 14,
+     "زندگی روزمره": 15,
+     "دین": 19,
+     "فلسفه": 21,
+     "تاریخ و سیاست": 11,
+     "مالی و بانکی": 11,
+     "بازار و معامله": 5,
+     "حقوق و قضا": 12,
+     "رسانه و خبر": 12
+    }
+   },
+   "foundation": {
+    "classes": {
+     "B": 25,
+     "S": 15,
+     "O": 4,
+     "X": 2,
+     "?": 0
+    },
+    "modes": {
+     "num": {
+      "ok": 185,
+      "health_alarm": 0,
+      "missed": 0,
+      "mislocated": 0,
+      "changed": 0
+     },
+     "deg": {
+      "ok": 181,
+      "health_alarm": 0,
+      "missed": 4,
+      "mislocated": 0,
+      "changed": 4
+     },
+     "derived": {
+      "ok": 185,
+      "health_alarm": 0,
+      "missed": 0,
+      "mislocated": 0,
+      "changed": 0
+     },
+     "both": {
+      "ok": 181,
+      "health_alarm": 0,
+      "missed": 4,
+      "mislocated": 0,
+      "changed": 4
+     }
+    },
+    "baseSufficient": 0,
+    "baseTotal": 8
+   }
   }
  ]
 }

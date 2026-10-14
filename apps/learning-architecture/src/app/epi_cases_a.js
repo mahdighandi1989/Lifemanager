@@ -1215,7 +1215,7 @@
     actor: "جوجه از تکرار روزانه، آینده را پیش‌بینی می‌کند.",
     claims: [
       { id: "k1", txt: "فردا هم صاحب مزرعه به من دانه می‌دهد", role: "اصلی",
-        f: { scope: "مورد بعدی", way: ISTQ, ind_complete: false, conf: 99, acted: true, stakes: HIGH }, truth: false }
+        f: { scope: "مورد بعدی", way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 99, acted: true, stakes: HIGH }, truth: false }  /* p_case_chicken (مالک ۲۰۲۶-۱۰-۱۴): hidden_ctrl=false — «چرا» ی همین پرونده: «باید علت (چرا صاحب مزرعه دانه می‌دهد) … کشف شود» (s51) */
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "s50: استقراء ناقص حتی با افزایش شواهد به یقین نمی‌رسد؛ s51: تکرار داده حسی به‌تنهایی قانون نمی‌سازد و باید علت (چرا صاحب مزرعه دانه می‌دهد) با اصول عقلی کشف شود. اطمینان تقریباً کامل از شمار تکرارها برخاست، نه از شناخت علت.",

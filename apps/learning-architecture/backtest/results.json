@@ -1,5 +1,5 @@
 {
- "round": 6,
+ "round": 7,
  "at": "2026-10-14",
  "cases": [
   {
@@ -1214,12 +1214,15 @@
    "r": 0,
    "d": "فلسفه",
    "ok": false,
-   "k": "missed",
-   "fl": [],
+   "k": "ok",
+   "fl": [
+    "st_istiqra",
+    "st_tajrobe"
+   ],
    "ex": [
     "st_istiqra"
    ],
-   "full": false
+   "full": true
   },
   {
    "id": "bk_boiling_relativity",
@@ -1927,6 +1930,7 @@
    "ok": false,
    "k": "ok",
    "fl": [
+    "st_istiqra",
     "st_tajrobe"
    ],
    "ex": [
@@ -1945,13 +1949,14 @@
    "ok": false,
    "k": "ok",
    "fl": [
+    "st_istiqra",
     "st_tajrobe"
    ],
    "ex": [
     "st_istiqra",
     "st_tajrobe"
    ],
-   "full": false
+   "full": true
   },
   {
    "id": "cs_b_gallup1936",

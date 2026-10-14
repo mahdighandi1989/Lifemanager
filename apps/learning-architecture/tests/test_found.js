@@ -63,7 +63,7 @@ chk(T.validate(Object.assign({}, cs.find(c => c.tier === 'real' && c.src), { sam
   chk(await p.locator('main .found-rules tbody tr').count() === 2, 'filter by class');
   await p.evaluate(() => APP.go('e_bt', null, 'live')); await p.waitForTimeout(200);
   info.props = await p.evaluate(() => [...document.querySelectorAll('main .bt-proposal')].map(x => x.dataset.id + (x.classList.contains('superseded') ? '*' : '')));
-  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === 3, 'superseded proposal marked, foundation proposals listed ' + info.props);
+  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === 4, 'superseded proposal marked, foundation proposals listed ' + info.props);
   await p.click('main .bt-proposal[data-id="p_found_half"] button:has-text("مبنایش")'); await p.waitForTimeout(150);
   chk(await p.locator('main .found-rules').count() === 1, 'proposal links to its foundation');
   await p.setViewportSize({ width: 390, height: 800 }); await p.waitForTimeout(150);
