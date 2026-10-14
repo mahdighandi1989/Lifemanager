@@ -67,8 +67,11 @@
     var t = rawText.apply(this, arguments); if (!t || !s || !s.tour) return t;
     var d = AS.sieveState(s), Ls = AS.sieveLayers(), done = [], open = [];
     Ls.forEach(function (L) { var x = d[L.id]; if (x) done.push("- [" + L.id + "] " + L.fa + ": " + ST[x.st] + (x.why ? " — " + x.why : "") + (x.facet ? " ⇒ " + x.facet : "")); else open.push(L.id + " " + L.fa); });
+    // خانواده‌هایی که غربال پیدا کرد ⇒ در گره‌گشا (قدمِ ۱ و ۲) آزمون‌های همین‌ها جلو بیاید (کارزارِ آزمون c03/c06: رتبهٔ گره‌گشا یافته‌های غربال را نمی‌دید)
+    var fams = (A.KF || []).filter(function (F) { return d[F.id] && d[F.id].st === "found"; }).map(function (F) { return F.id + " " + F.fa; });
     return t + "\n# غربالِ لایه‌ها (" + fa(done.length) + " از " + fa(Ls.length) + ")\n" + (done.join("\n") || "- هنوز هیچ لایه‌ای سنجیده نشده") +
-      (open.length ? "\nسنجیده‌نشده: " + open.join("، ") : "");
+      (open.length ? "\nسنجیده‌نشده: " + open.join("، ") : "") +
+      (fams.length ? "\nخانواده‌هایی که غربال پیدا کرد: " + fams.join("، ") + " — در گره‌گشا (قدمِ ۱ و ۲) آزمون‌های تمایزدهندهٔ همین‌ها را هایلایت کن، هرچند رتبهٔ صفحه پایین‌تر باشد؛ اگر آزمون ردشان کرد، در غربال هم «رد شد» کن." : "");
   };
   AS.promptHooks = AS.promptHooks || [];
   AS.promptHooks.push(function () {
@@ -162,7 +165,8 @@
         } }, "🤖 پیشنهادِ پیش‌نیازها") : null)));
     var rows = p.items.map(function (x, i) {
       var ans = h("textarea", { rows: 2, "aria-label": "پاسخِ تو به پرسشِ تشخیصیِ «" + clip(x.concept, 40) + "»", placeholder: "پاسخِ خودت، از حافظه", onchange: function (e) { x.ans = e.target.value; S.put(p); } }, x.ans || "");
-      var sel = h("select", { "aria-label": "این پیش‌نیاز را داری؟ («" + clip(x.concept, 40) + "»)", onchange: function (e) { x.self = e.target.value; x.selfAt = nowIso(); save(); } }, SELF.map(function (o) { return h("option", { value: o, selected: (x.self || "") === o ? true : null }, o || "— خودت بسنج —"); }));
+      // سنجشِ خود و «حل شد» تصمیمِ خودِ کاربر است: دستیار فقط زرد می‌کند، پر نمی‌کند (data-own — کارزارِ آزمون c03)
+      var sel = h("select", { "data-own": "1", "aria-label": "این پیش‌نیاز را داری؟ («" + clip(x.concept, 40) + "»)", onchange: function (e) { x.self = e.target.value; x.selfAt = nowIso(); save(); } }, SELF.map(function (o) { return h("option", { value: o, selected: (x.self || "") === o ? true : null }, o || "— خودت بسنج —"); }));
       return h("div", { class: "card soft pr-item" },
         h("div", { class: "row gap wrap" }, h("b", {}, fa(i + 1) + ") " + x.concept), h("span", { class: "chip" }, [x.sci, x.sub].filter(Boolean).join(" › ")), x.by === "ai" ? h("span", { class: "small muted" }, "پیشنهادِ هوش مصنوعی — وارسی‌نشده") : null),
         x.why ? h("p", { class: "small" }, "در کدام گام و چرا: " + x.why) : null,
@@ -182,7 +186,7 @@
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "بازگشت به خودِ مسئله"),
       h("p", { class: "small muted" }, "پس از پیش‌نیازها، مسئلهٔ اصلی را دوباره، بی نگاه به راه‌حل، امتحان کن."),
       h("label", { for: "prBack" }, "پاسخ یا راهِ حلِ خودت (پس از پیش‌نیازها)"), h("textarea", { id: "prBack", rows: 3, onchange: function (e) { p.backAns = e.target.value; S.put(p); } }, p.backAns || ""),
-      h("select", { "aria-label": "مسئلهٔ اصلی را دوباره امتحان کردی؟", onchange: function (e) { p.back = e.target.value; p.backAt = nowIso(); save(); } }, ["", "حل شد", "هنوز نه"].map(function (o) { return h("option", { value: o, selected: (p.back || "") === o ? true : null }, o || "— هنوز امتحان نکرده‌ام —"); }))));
+      h("select", { "data-own": "1", "aria-label": "مسئلهٔ اصلی را دوباره امتحان کردی؟", onchange: function (e) { p.back = e.target.value; p.backAt = nowIso(); save(); } }, ["", "حل شد", "هنوز نه"].map(function (o) { return h("option", { value: o, selected: (p.back || "") === o ? true : null }, o || "— هنوز امتحان نکرده‌ام —"); }))));
     root.appendChild(h("button", { class: "linkish", type: "button", onclick: function () { A.go("prereq"); } }, "← همهٔ نقشه‌ها"));
     return root;
   };
