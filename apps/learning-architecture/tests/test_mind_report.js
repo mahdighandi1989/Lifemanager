@@ -141,6 +141,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // 🧭 ارزش‌ها و معنا: ناهم‌خوانیِ اهمیت/وقت و کشمکشِ بی‌قاعده دیده می‌شود؛ وارسیِ معنا در «امروز»
     APP.S.put({ id: 'vl_a', type: 'value', title: 'خانواده', imp: 9, hours: 2, vs: [{ with: 'درآمد', rule: '' }] }); APP.S.put({ id: 'vl_b', type: 'value', title: 'درآمد', imp: 7, hours: 50, vs: [] });
     const vk = APP.valsCheck(); out.vals = vk.gaps.join() + '|' + vk.open.join();
+    // وجهِ حوزهٔ ارزش‌ها رکوردهای ارزش را می‌گیرد، حتی اگر منتظرِ برگه باشد (کارزارِ آزمون sc14)
+    AS._turnSession = s; AS.DO.tour_add({ facet: { key: 'f9', kind: 'area', area: 'sf_values', title: 'کار ⟷ خانواده' } });
+    const fv = s.tour.facets.find(f => f.area === 'sf_values'); fv.status = 'blocked'; AS.tourAfterTurn(s);
+    out.valsLinked = (fv.refs || []).some(r => r.id === 'vl_a') && AS.tourMilestones(fv)[0].ok; fv.status = 'todo';
     out.valsToday = APP.dueList().some(x => /وارسیِ ماهانهٔ معنا/.test(x.txt));
     APP.go('vals'); await new Promise(r => setTimeout(r, 150)); out.valsView = /کشمکش بی قاعدهٔ ترجیح/.test(document.getElementById('main').innerText);
     // ایمیل نتیجهٔ تمرین‌ها را می‌گوید (نه فقط «ساخته شد»)
@@ -162,7 +166,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.camp.chainCalc === '{"prod":6,"min":20,"n":2}', 'worry chain: ceiling = weakest link, independent = product: ' + info.camp.chainCalc);
   chk(info.camp.correct && info.camp.toast, 'a claimed-but-failed action triggers a correction turn; page messages reach the next prompt');
   chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
-  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
+  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook && info.camp.valsLinked, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');

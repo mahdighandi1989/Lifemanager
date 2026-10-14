@@ -31586,11 +31586,11 @@ APP.goFromURL = function (q) {
     return out.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
   }
   /* «رفتن به این بخش»: آخرین رکوردِ وصل‌شدهٔ وجه (نه نمای کهنهٔ طرح) */
-  var VIEW_OF = { kcase: "kcase", knot: "knot", "case": "e_case", eprob: "e_prob", topic: "topic", wchain: "chain", fcast: "fcast" };
+  var VIEW_OF = { kcase: "kcase", knot: "knot", "case": "e_case", eprob: "e_prob", topic: "topic", wchain: "chain", fcast: "fcast", value: "vals", meaning: "vals" };
   function viewOf(f) {
     var r = (f.refs || []).slice().reverse().filter(function (x) { return VIEW_OF[x.type] && get(x.id); })[0];
     if (!r) return { v: f.view, a: f.arg || null, s: f.sub || null };
-    var rec = get(r.id); return r.type === "eprob" ? { v: "e_prob", a: rec.p && rec.p.id, s: null } : r.type === "fcast" ? { v: "fcast", a: null, s: null } : { v: VIEW_OF[r.type], a: r.id, s: null };
+    var rec = get(r.id); return r.type === "eprob" ? { v: "e_prob", a: rec.p && rec.p.id, s: null } : r.type === "fcast" || r.type === "value" || r.type === "meaning" ? { v: VIEW_OF[r.type], a: null, s: null } : { v: VIEW_OF[r.type], a: r.id, s: null };
   }
   AS.tourViewOf = viewOf;
   AS.tourMilestones = milestones; AS.tourPractice = practice; AS.tourChildren = children;
@@ -31711,6 +31711,18 @@ APP.goFromURL = function (q) {
         if (!taken) { c.refs.push({ id: r.id, type: r.type, auto: true }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
       }); });
     }
+    // وجهِ «حوزه» رکوردِ ابزارِ خودِ همان حوزه را می‌گیرد، حتی اگر وقتی ساخته شد وجه منتظرِ برگه یا در صف بود (کارزارِ آزمون sc14:
+    // ارزش‌ها ساخته شد ولی وجهِ ارزش‌ها ۰ از ۳ ماند) — فقط رکوردهای پس از آغازِ تور و هنوز بی‌وجه
+    var AREA_TYPES = { sf_values: ["value", "meaning"], sf_meaning: ["meaning", "value"], md_catastrophizing: ["wchain"], md_worry_uncertainty: ["wchain"], md_anxiety_worry: ["wchain"],
+      dc_calibration_forecasting: ["fcast"], pr_calibration: ["fcast"], dc_planning_fallacy: ["fcast"] };
+    var t0 = t.createdAt || (t.facets[0] || {}).createdAt || "";
+    t.facets.forEach(function (f) {
+      var typs = f.kind === "area" && f.status !== "done" && f.status !== "skipped" && AREA_TYPES[f.area]; if (!typs) return;
+      typs.forEach(function (typ) { S.all(typ, function (r) { return !r.sample && String(r.created || r.date || "") >= t0; }).forEach(function (r) {
+        if (t.facets.some(function (g) { return (g.refs || []).some(function (x) { return x.id === r.id; }); })) return;
+        f.refs.push({ id: r.id, type: r.type, auto: true }); msgs.push("«" + clip(r.title || r.q || r.note || r.id, 40) + "» به وجهِ «" + f.title + "» وصل شد");
+      }); });
+    });
     // پرونده‌ای که از دکمهٔ کارخانهٔ خودِ گره‌گشا ساخته شد (src = موقعیتِ همین تور) ⇒ به وجهِ ادعای همین تور
     var tourKc = {}; t.facets.forEach(function (f) { (f.refs || []).forEach(function (r) { if (r.type === "kcase") tourKc[r.id] = 1; }); });
     var claimF = t.facets.filter(function (f) { return f.kind === "claim" && f.status !== "skipped" && !(f.refs || []).some(function (r) { return r.type === "case"; }); })[0];
