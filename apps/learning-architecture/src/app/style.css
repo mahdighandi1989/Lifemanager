@@ -1076,3 +1076,19 @@ button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
 .terr-bar i.on{background:var(--accent,#2f7d6d)}
 .terr-area summary{cursor:pointer;line-height:1.9}
 .terr-area .chip{margin-inline-start:.4rem}
+/* «🗺 نقشه‌ها» و گرافِ مشترک */
+.gr-maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.5rem;margin-bottom:.75rem}
+.gr-mapcard{text-align:start;cursor:pointer}
+.gr-mapcard.on{outline:2px solid var(--accent,#2f7d6d)}
+.gr-over,.gr-focus{width:100%;min-width:640px;height:auto}
+.gr-box rect{fill:var(--card,#fff);stroke:var(--line,#ccc);stroke-width:1.2}
+.gr-box{cursor:pointer}.gr-box:focus rect,.gr-box:hover rect{stroke-width:2.4}
+.gr-box text,.gr-node text,.gr-center text{font-size:13px;fill:var(--ink,#222)}
+.gr-learn rect,.gr-learn circle{stroke:#2f7d6d}.gr-mine rect,.gr-mine circle{stroke:#b07a12}.gr-epi rect,.gr-epi circle{stroke:#4a5fb0}
+.gr-node circle,.gr-center circle{fill:var(--card,#fff);stroke-width:2.2}.gr-node{cursor:pointer}
+.gr-center circle{fill:var(--accent,#2f7d6d)}
+.gr-ol,.gr-fl{stroke:var(--line,#bbb);opacity:.7}.gr-ol.cross,.gr-fl.cross{stroke:#c0392b;opacity:.85}
+.gr-colh{font-weight:700;font-size:14px;fill:var(--ink,#222)}
+.chip.gr-learn{border-color:#2f7d6d}.chip.gr-mine{border-color:#b07a12}.chip.gr-epi{border-color:#4a5fb0}
+.gr-sys{display:inline-flex;align-items:center;gap:.25rem}
+.km-epi{margin:.4rem 0;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}

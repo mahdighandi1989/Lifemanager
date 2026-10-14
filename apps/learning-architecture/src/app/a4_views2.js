@@ -8,6 +8,7 @@
     root.appendChild(A.head("نقشه", "جریان، شبکه و ترتیب", "تصویر کلی سامانه در سه نما: مراحلی (۹ فاز) که هر موضوع طی می‌کند، اینکه ۴۵ تکنیک چطور و چرا به هم مربوط‌اند، و ترتیب پیشنهادی برای یاد گرفتن خودِ تکنیک‌ها."));
     var tab = sub || "flow";
     root.appendChild(A.tabs([["flow", "جریان ۹ فازی"], ["net", "شبکه روابط"], ["plan", "برنامه ۸ هفته‌ای و اولویت‌ها"]], tab, function (k) { A.go("map", null, k); }));
+    if (A.GRAPH) root.appendChild(h("p", { class: "small" }, "این نقشه فقط لایهٔ تکنیک‌ها و فازهاست. ", h("button", { class: "linkish", onclick: function () { A.GRAPH.open(null); } }, "🕸 گرافِ مشترک"), " همهٔ سامانهٔ یادگیری (سفر، حرکت‌ها، پروتکل‌ها، دغدغه‌ها، گره‌ها، مزرعه، مسئله‌ها) را همراهِ پل‌هایش به معرفت‌شناسی نشان می‌دهد."));
     if (tab === "flow") root.appendChild(flow());
     else if (tab === "net") root.appendChild(network());
     else root.appendChild(plan());

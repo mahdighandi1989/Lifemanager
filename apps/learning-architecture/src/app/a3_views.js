@@ -27,7 +27,7 @@
   var SETTINGS = ["settings", "تنظیمات", "کلید هوش مصنوعی و پشتیبان‌گیری (برای هر دو سامانه)"];
   var START = ["start", "از اینجا شروع کن", "این برنامه چیست و برای هر خواسته از کجا شروع کنی"];
   A.NAV = NAV; A.NAV_SETTINGS = SETTINGS; A.NAV_START = START;
-  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start" || v === "whole") ? (A.lastSys || "learn") : "learn"; };
+  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start" || v === "whole" || v === "maps") ? (A.lastSys || "learn") : "learn"; };
   A.state = { view: "home", arg: null, sub: null };
   A.go = function (view, arg, sub) {
     // a change of sub-tab inside the same page REPLACES the history entry (so the browser's Back and the app's
@@ -51,7 +51,7 @@
       h("div", { class: "sysw", role: "tablist", "aria-label": "سامانه" },
         h("button", { class: "sysb", "data-sys": "learn", role: "tab", onclick: function () { (A.goRoot || A.go)("home"); } }, "سامانه یادگیری"),
         h("button", { class: "sysb", "data-sys": "epi", role: "tab", onclick: function () { (A.goRoot || A.go)("e_home"); } }, "کارخانه معرفت‌شناسی")),
-      h("div", { class: "navlist" }, A.NAV_WHOLE ? navBtn(A.NAV_WHOLE) : null, navBtn(START)),
+      h("div", { class: "navlist" }, A.NAV_WHOLE ? navBtn(A.NAV_WHOLE) : null, A.NAV_MAPS ? navBtn(A.NAV_MAPS) : null, navBtn(START)),
       navList(NAV, "learn"), navList(A.EPI_NAV || [], "epi"),
       h("div", { class: "navlist" }, navBtn(SETTINGS)),
       h("div", { class: "sync" }, h("span", { id: "syncState" }, S.status)));

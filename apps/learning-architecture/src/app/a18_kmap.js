@@ -486,6 +486,13 @@
           ms && ms !== st ? h("div", { class: "muted" }, "وضعیتِ ثبت‌شده «" + STFA[st] + "» است؛ معیارِ ورزیدگی اکنون «" + STFA[ms] + "» می‌گوید.") : null);
       } else why = h("div", { class: "km-why small muted" }, "معیارِ ورزیدگی (بخشِ ورزش) در این نسخه بارگذاری نشده؛ وضعیتِ ثبت‌شده نشان داده می‌شود.");
       drawer.appendChild(why);
+      /* پیوند با معرفت‌شناسی (مالک ۲۰۲۶-۱۰-۱۴: «چرا نقشهٔ ذهن به معرفت‌شناسی اتصال ندارد؟»): ایستگاه‌های خانوادهٔ این گره
+         (همان پیوندِ ثبت‌شدهٔ A.KF[].epi — ساخته نمی‌شود) و رفتن به همین گره در گرافِ مشترک */
+      var fam = A.KFM && A.KFM[k.fam], epi = (fam && fam.epi) || [];
+      drawer.appendChild(h("div", { class: "km-epi small" }, h("b", {}, "در معرفت‌شناسی: "),
+        epi.length ? epi.map(function (x) { var stn = A.EST && A.EST[x.st]; return h("button", { class: "chip linkish", title: x.why || "", onclick: function () { A.go("e_st", x.st); } }, stn ? stn.fa : x.st); })
+          : h("span", { class: "muted" }, "خانوادهٔ این گره هنوز پیوندی به ایستگاه‌های کارخانه ندارد (در گرافِ مشترک «شکاف» است)."),
+        A.GRAPH ? h("button", { class: "btn ghost sm km-graph", onclick: function () { A.GRAPH.open("knot:" + k.id); } }, "🕸 در گرافِ مشترک") : null));
       /* کارتِ گره */
       var card = h("dl", { class: "km-card small" });
       [["principle", "ساختارِ عمیق"], ["signals", "نشانه‌های تشخیص"], ["counter", "حرکتِ مقابل"], ["example", "مثالِ خودت"]].forEach(function (f) {

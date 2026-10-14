@@ -18122,7 +18122,7 @@ var APP = window.APP = {};
   var SETTINGS = ["settings", "تنظیمات", "کلید هوش مصنوعی و پشتیبان‌گیری (برای هر دو سامانه)"];
   var START = ["start", "از اینجا شروع کن", "این برنامه چیست و برای هر خواسته از کجا شروع کنی"];
   A.NAV = NAV; A.NAV_SETTINGS = SETTINGS; A.NAV_START = START;
-  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start" || v === "whole") ? (A.lastSys || "learn") : "learn"; };
+  A.sysOf = function (v) { return /^e_/.test(v) ? "epi" : (v === "settings" || v === "start" || v === "whole" || v === "maps") ? (A.lastSys || "learn") : "learn"; };
   A.state = { view: "home", arg: null, sub: null };
   A.go = function (view, arg, sub) {
     // a change of sub-tab inside the same page REPLACES the history entry (so the browser's Back and the app's
@@ -18146,7 +18146,7 @@ var APP = window.APP = {};
       h("div", { class: "sysw", role: "tablist", "aria-label": "سامانه" },
         h("button", { class: "sysb", "data-sys": "learn", role: "tab", onclick: function () { (A.goRoot || A.go)("home"); } }, "سامانه یادگیری"),
         h("button", { class: "sysb", "data-sys": "epi", role: "tab", onclick: function () { (A.goRoot || A.go)("e_home"); } }, "کارخانه معرفت‌شناسی")),
-      h("div", { class: "navlist" }, A.NAV_WHOLE ? navBtn(A.NAV_WHOLE) : null, navBtn(START)),
+      h("div", { class: "navlist" }, A.NAV_WHOLE ? navBtn(A.NAV_WHOLE) : null, A.NAV_MAPS ? navBtn(A.NAV_MAPS) : null, navBtn(START)),
       navList(NAV, "learn"), navList(A.EPI_NAV || [], "epi"),
       h("div", { class: "navlist" }, navBtn(SETTINGS)),
       h("div", { class: "sync" }, h("span", { id: "syncState" }, S.status)));
@@ -18562,6 +18562,7 @@ var APP = window.APP = {};
     root.appendChild(A.head("نقشه", "جریان، شبکه و ترتیب", "تصویر کلی سامانه در سه نما: مراحلی (۹ فاز) که هر موضوع طی می‌کند، اینکه ۴۵ تکنیک چطور و چرا به هم مربوط‌اند، و ترتیب پیشنهادی برای یاد گرفتن خودِ تکنیک‌ها."));
     var tab = sub || "flow";
     root.appendChild(A.tabs([["flow", "جریان ۹ فازی"], ["net", "شبکه روابط"], ["plan", "برنامه ۸ هفته‌ای و اولویت‌ها"]], tab, function (k) { A.go("map", null, k); }));
+    if (A.GRAPH) root.appendChild(h("p", { class: "small" }, "این نقشه فقط لایهٔ تکنیک‌ها و فازهاست. ", h("button", { class: "linkish", onclick: function () { A.GRAPH.open(null); } }, "🕸 گرافِ مشترک"), " همهٔ سامانهٔ یادگیری (سفر، حرکت‌ها، پروتکل‌ها، دغدغه‌ها، گره‌ها، مزرعه، مسئله‌ها) را همراهِ پل‌هایش به معرفت‌شناسی نشان می‌دهد."));
     if (tab === "flow") root.appendChild(flow());
     else if (tab === "net") root.appendChild(network());
     else root.appendChild(plan());
@@ -20150,6 +20151,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   A.V.e_map = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "نقشه کارخانه", "هر پرونده سالن‌ها را به ترتیب شماره (از راست به چپ) طی می‌کند و «حکم نهایی» همیشه آخرین ایستگاه است. پررنگ: همیشه در مسیر. خط‌چین: فقط وقتی لازم شود. نشان «س»: در مسیر سریع هم هست."));
+    if (A.GRAPH) root.appendChild(h("p", { class: "small" }, "این نقشه ترتیبِ سالن‌ها و ایستگاه‌هاست. ", h("button", { class: "linkish", onclick: function () { A.GRAPH.open(null); } }, "🕸 گرافِ مشترک"), " ایستگاه‌ها را با قاعده‌ها، بخش‌های جزوه، اصول و قضیه‌ها، حوزه‌های قلمرو و پل‌هایشان به سامانهٔ یادگیری نشان می‌دهد."));
     root.appendChild(h("div", { class: "hallflow" }, E.HALLS.map(function (H) {
       var ss = ST.filter(function (s) { return s.hall === H.n; });
       return h("div", { class: "hallcol" }, h("div", { class: "hallh" }, h("b", {}, "سالن " + fa(H.n)), " ", H.fa),
@@ -21675,7 +21677,7 @@ APP.goFromURL = function (q) {
   }
   /* نامِ فارسیِ نماهایی که در منو نیستند — «↩ برگرد به …» هرگز شناسهٔ خامِ نما (e_case، kcase…) نشان نمی‌دهد (ممیزی ۲۰۲۶-۱۰-۱۳) */
   var VIEW_FA = A.VIEW_FA = { tech: "صفحهٔ تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام", proto: "پروتکل", e_case: "پروندهٔ کارخانه",
-    kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهن", ksims: "شبیه‌سازهای گره", move: "حرکتِ حلِ مسئله", moves: "حرکت‌های حلِ مسئله",
+    kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهنِ تو", maps: "نقشه‌ها", ksims: "شبیه‌سازهای گره", move: "حرکتِ حلِ مسئله", moves: "حرکت‌های حلِ مسئله",
     epi_course: "دورهٔ کارخانه", epi_lesson: "درسِ دورهٔ کارخانه", course: "دورهٔ گام‌به‌گام", home: "امروز", start: "از اینجا شروع کن", settings: "تنظیمات" };
   function recTitle(view, arg) {
     var r = arg != null && A.S && A.S.get ? A.S.get(arg) : null;
@@ -28547,6 +28549,13 @@ APP.goFromURL = function (q) {
           ms && ms !== st ? h("div", { class: "muted" }, "وضعیتِ ثبت‌شده «" + STFA[st] + "» است؛ معیارِ ورزیدگی اکنون «" + STFA[ms] + "» می‌گوید.") : null);
       } else why = h("div", { class: "km-why small muted" }, "معیارِ ورزیدگی (بخشِ ورزش) در این نسخه بارگذاری نشده؛ وضعیتِ ثبت‌شده نشان داده می‌شود.");
       drawer.appendChild(why);
+      /* پیوند با معرفت‌شناسی (مالک ۲۰۲۶-۱۰-۱۴: «چرا نقشهٔ ذهن به معرفت‌شناسی اتصال ندارد؟»): ایستگاه‌های خانوادهٔ این گره
+         (همان پیوندِ ثبت‌شدهٔ A.KF[].epi — ساخته نمی‌شود) و رفتن به همین گره در گرافِ مشترک */
+      var fam = A.KFM && A.KFM[k.fam], epi = (fam && fam.epi) || [];
+      drawer.appendChild(h("div", { class: "km-epi small" }, h("b", {}, "در معرفت‌شناسی: "),
+        epi.length ? epi.map(function (x) { var stn = A.EST && A.EST[x.st]; return h("button", { class: "chip linkish", title: x.why || "", onclick: function () { A.go("e_st", x.st); } }, stn ? stn.fa : x.st); })
+          : h("span", { class: "muted" }, "خانوادهٔ این گره هنوز پیوندی به ایستگاه‌های کارخانه ندارد (در گرافِ مشترک «شکاف» است)."),
+        A.GRAPH ? h("button", { class: "btn ghost sm km-graph", onclick: function () { A.GRAPH.open("knot:" + k.id); } }, "🕸 در گرافِ مشترک") : null));
       /* کارتِ گره */
       var card = h("dl", { class: "km-card small" });
       [["principle", "ساختارِ عمیق"], ["signals", "نشانه‌های تشخیص"], ["counter", "حرکتِ مقابل"], ["example", "مثالِ خودت"]].forEach(function (f) {
@@ -29945,7 +29954,7 @@ APP.goFromURL = function (q) {
     ["مزرعه", "درختِ علمِ تو؛ هر مفهومی که فهمیدی از ریشه تا میوه جایی دارد."],
     ["سفرِ ۱۱ گامی", "راهنمای ترتیبِ کار روی یک موضوع؛ ۱۱ گام است و از ۹ «فازِ یادگیری» (دسته‌بندیِ تکنیک‌ها) جداست."],
     ["دوره", "دو دوره هست: «دورهٔ یادگیری» برای یادگرفتنِ روش‌ها، «دورهٔ سنجش» برای یادگرفتنِ جزوه."],
-    ["نقشه", "«نقشهٔ کل» (همین صفحه)، «نقشه و گراف» (فازهای یادگیری)، «نقشهٔ کارخانه» (سالن‌ها)، «نقشهٔ ذهن» (گره‌ها) — چهار چیزِ جدا."],
+    ["نقشه", "همه ذیلِ «🗺 نقشه‌ها»: «نقشهٔ کل» (همین صفحه)، «نقشهٔ مسیرِ یادگیری» (فازها و تکنیک‌ها)، «نقشهٔ ذهنِ تو» (گره‌ها)، «مزرعه»، «نقشهٔ کارخانه» (سالن‌ها)، «قلمرو» (حوزه‌های معرفت‌شناسی) — و «گرافِ مشترک» که همه را به هم وصل می‌کند."],
     ["بک‌تست", "آزمودنِ خودِ کارخانه و جزوه با وقایعِ واقعی و سناریوها — کارِ کارگاه، نه کارِ روزانهٔ تو."]
   ];
 
@@ -30284,4 +30293,274 @@ APP.goFromURL = function (q) {
     if (A.HOST && A.HOST.openDoc) box.appendChild(h("button", { class: "btn sm", onclick: function () { A.HOST.openDoc("TERRITORY"); } }, "📄 سندِ قلمرو با تاریخچهٔ هر حوزه"));
     return box;
   };
+})(APP);
+/* ===== «🗺 نقشه‌ها»: گرافِ مشترکِ زنده (سامانهٔ یادگیری + کارخانهٔ معرفت‌شناسی + داده‌های خودِ مالک) — مالک ۲۰۲۶-۱۰-۱۴ =====
+   مالک: «نقشه و گراف فقط برای سامانهٔ یادگیری است و کامل نیست؛ برای معرفت‌شناسی اصلاً نیست؛ یک نقشهٔ کلی که ارتباطِ این دو را
+   به‌صورتِ گراف نشان دهد، دقیق و واضح و به‌روزشونده … هر چیزی که در به‌روزرسانی‌ها و روتین‌ها انجام می‌شود باید در آن بیاید …
+   و چندین جا "نقشه" نوشته — همه بی حذف ذیلِ یک قسمت».
+   اصل: این گراف **دستی کشیده نمی‌شود**؛ هر بار از خودِ ثبت‌گاه‌ها ساخته می‌شود (A.GRAPH.model) — تکنیک‌ها، فازها، پروتکل‌ها،
+   سفر، دوره، حرکت‌ها، خانواده‌های گره، گره‌ها و موقعیت‌ها، درخت‌های مزرعه، مسئله‌ها، سالن‌ها، ایستگاه‌ها، قاعده‌ها، جزوه،
+   اصول/قضیه‌ها/پایه‌ها، قلمرو، یافته‌ها و پیشنهادها. هر چیزی که هر نشست یا روتین به این ثبت‌گاه‌ها بیفزاید همان لحظه در گراف است.
+   نوعِ تازه‌ای از داده ⇒ در TYPES و build() ثبت شود (آزمونِ tests/test_graph.js پوششِ همهٔ ثبت‌گاه‌ها را می‌سنجد).
+   پیوندها فقط همان‌هایی‌اند که در داده هست — هیچ پیوندی ساخته نمی‌شود؛ جاهایی که پل نیست، «شکاف» نشان داده می‌شود. */
+(function (A) {
+  var h = A.h, fa = A.fa, S = A.S, svg = A.svg;
+  var G = A.GRAPH = {};
+  /* انواعِ گره: sys = learn (سامانهٔ یادگیری) | mine (دادهٔ خودِ تو) | epi (کارخانه و جزوه) */
+  G.TYPES = [
+    { t: "phase", fa: "فازِ یادگیری", sys: "learn" }, { t: "tech", fa: "تکنیک", sys: "learn" }, { t: "proto", fa: "پروتکل", sys: "learn" },
+    { t: "week", fa: "هفتهٔ برنامه/دوره", sys: "learn" }, { t: "concern", fa: "دغدغه", sys: "learn" }, { t: "jstep", fa: "گامِ سفر", sys: "learn" },
+    { t: "move", fa: "حرکتِ حلِ مسئله", sys: "learn" }, { t: "kfam", fa: "خانوادهٔ گره", sys: "learn" },
+    { t: "topic", fa: "موضوعِ تو", sys: "mine" }, { t: "tree", fa: "درختِ مزرعه", sys: "mine" }, { t: "fnode", fa: "مفهومِ مزرعه", sys: "mine" },
+    { t: "knot", fa: "گرهِ ذهنیِ تو", sys: "mine" }, { t: "kcase", fa: "موقعیتِ گره‌گشا", sys: "mine" }, { t: "prob", fa: "مسئله", sys: "mine" },
+    { t: "hall", fa: "سالنِ کارخانه", sys: "epi" }, { t: "station", fa: "ایستگاه", sys: "epi" }, { t: "rule", fa: "قاعده", sys: "epi" },
+    { t: "chapter", fa: "فصلِ جزوه", sys: "epi" }, { t: "section", fa: "بخشِ جزوه", sys: "epi" }, { t: "axiom", fa: "اصلِ بدیهی", sys: "epi" },
+    { t: "theorem", fa: "قضیه", sys: "epi" }, { t: "base", fa: "مقدارِ پایه", sys: "epi" }, { t: "tgroup", fa: "گروهِ قلمرو", sys: "epi" },
+    { t: "area", fa: "حوزهٔ قلمرو", sys: "epi" }, { t: "finding", fa: "یافتهٔ بک‌تست", sys: "epi" }, { t: "proposal", fa: "پیشنهادِ تغییر", sys: "epi" }
+  ];
+  G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
+  G.REL = { in: "عضوِ", req: "پیش‌نیازِ", feeds: "تغذیه می‌کند", pairs: "مکمل", uses: "به کار می‌برد", serves: "پاسخ به دغدغه", core: "تکنیکِ اصلیِ گام",
+    fam: "از خانوادهٔ", has: "دارد", root: "ریشه در", link: "پیوندِ تو", dep: "وابسته به", tag: "حرکت", at: "ایستگاهِ", basis: "مبنا در", proof: "برهان از",
+    measures: "پایه", covers: "پوشش", about: "دربارهٔ", step: "گامِ کنونی", bridge: "پل" };
+
+  function ref(t, id) { return t + ":" + id; }
+  G.build = function () {
+    var N = {}, E = [], C = A.C || {}, W = window;
+    function node(t, id, label, meta) { var k = ref(t, id); if (!N[k]) N[k] = { k: k, t: t, id: String(id), label: String(label || id), sys: G.TM[t].sys, meta: meta || {} }; return N[k]; }
+    function edge(a, b, rel, why) { if (!a || !b || a === b) return; if (!N[a] || !N[b]) return; E.push({ a: a, b: b, rel: rel, why: why || "" }); }
+    /* ---------- سامانهٔ یادگیری ---------- */
+    (C.PHASES || []).forEach(function (p) { node("phase", p.n, "فاز " + fa(p.n) + " · " + (p.short || p.fa), { go: ["map", null, "flow"] }); });
+    (A.T || []).forEach(function (t) { node("tech", t.id, fa(t.id) + ". " + t.fa, { go: ["tech", t.id] }); });
+    (A.T || []).forEach(function (t) { if (A.phaseOf) edge(ref("tech", t.id), ref("phase", A.phaseOf(t.id)), "in"); });
+    (C.EDGES || []).forEach(function (e) { edge(ref("tech", e[0]), ref("tech", e[1]), e[2], e[3]); });
+    (C.PROTOCOLS || []).forEach(function (p) { node("proto", p.id, p.id + " · " + p.fa, { go: ["proto", p.id] }); });
+    (C.PROTOCOLS || []).forEach(function (p) { (p.ids || []).forEach(function (t) { edge(ref("proto", p.id), ref("tech", t), "uses"); }); });
+    Object.keys(C.PHASE_REFS || {}).forEach(function (ph) { (C.PHASE_REFS[ph] || []).forEach(function (pid) { edge(ref("phase", ph), ref("proto", pid), "uses"); }); });
+    (C.CURRICULUM || []).forEach(function (w) { node("week", w.w, "هفتهٔ " + fa(w.w) + " · " + w.fa, { go: ["map", null, "plan"] });
+      (w.ids || []).forEach(function (t) { edge(ref("week", w.w), ref("tech", t), "uses"); }); (w.protos || []).forEach(function (p) { edge(ref("week", w.w), ref("proto", p), "uses"); }); });
+    (C.CONCERNS || []).forEach(function (c) { node("concern", c.id, c.id + " · " + String(c.text || "").slice(0, 60), { go: ["concerns"] }); });
+    (A.T || []).forEach(function (t) { (t.concerns || []).forEach(function (c) { edge(ref("tech", t.id), ref("concern", c), "serves"); }); });
+    (C.PROTOCOLS || []).forEach(function (p) { (p.concerns || []).forEach(function (c) { edge(ref("proto", p.id), ref("concern", c), "serves"); }); });
+    (C.PIPELINE || []).forEach(function (s) { node("jstep", s.k, s.k + " · " + s.fa, { go: ["topics"] }); (s.core || []).forEach(function (t) { edge(ref("jstep", s.k), ref("tech", t), "core"); }); if (s.ph != null) edge(ref("jstep", s.k), ref("phase", s.ph), "in"); });
+    (A.MOVE_LIST || []).forEach(function (m) { node("move", m.id, m.fa, { go: ["move", m.id] }); (m.tech || []).forEach(function (x) { edge(ref("move", m.id), ref("tech", x[0]), "uses", x[1]); }); });
+    (A.KF || []).forEach(function (f) { node("kfam", f.id, f.id + " · " + f.fa, { go: ["kcases"] }); (f.acts || []).forEach(function (a) { if (a.tid) edge(ref("kfam", f.id), ref("tech", a.tid), "uses"); }); });
+    /* ---------- دادهٔ خودِ تو ---------- */
+    var all = function (t) { try { return (S && S.all) ? S.all(t) : []; } catch (e) { return []; } };
+    all("topic").forEach(function (t) { node("topic", t.id, t.title, { go: ["topic", t.id] }); var st = t.journey && t.journey.step; if (st) edge(ref("topic", t.id), ref("jstep", st), "step"); });
+    all("tree").forEach(function (t) { node("tree", t.id, t.name, { go: ["farm", t.id, "tree"] }); });
+    all("fnode").forEach(function (n) { node("fnode", n.id, n.title, { go: ["farm", n.tree, "tree"] }); });
+    all("fnode").forEach(function (n) { edge(ref("fnode", n.id), n.parent ? ref("fnode", n.parent) : ref("tree", n.tree), "in"); (n.deps || []).forEach(function (d) { edge(ref("fnode", n.id), ref("fnode", d), "dep"); }); });
+    all("knot").forEach(function (k) { node("knot", k.id, k.name, { go: ["knot", k.id] }); if (k.fam) edge(ref("knot", k.id), ref("kfam", k.fam), "fam"); });
+    all("knot").forEach(function (k) { (k.links || []).forEach(function (l) { edge(ref("knot", k.id), ref("knot", l.to), "link", l.rel); }); });
+    all("kcase").forEach(function (c) { node("kcase", c.id, c.title, { go: ["kcase", c.id] }); (c.knots || []).forEach(function (k) { edge(ref("kcase", c.id), ref("knot", k), "has"); });
+      if (c.root && c.root.primary) edge(ref("kcase", c.id), ref("kfam", c.root.primary), "root"); if (c.topic) edge(ref("kcase", c.id), ref("topic", c.topic), "about"); });
+    var probs = []; try { probs = A.probs ? A.probs() : []; } catch (e) { }
+    probs.forEach(function (p) { node("prob", p.id, p.title, { go: ["e_prob", p.id] }); });
+    /* ---------- کارخانه و جزوه ---------- */
+    var E0 = W.EPI || {};
+    (E0.HALLS || []).forEach(function (hl) { node("hall", hl.n, "سالنِ " + fa(hl.n) + " · " + hl.fa, { go: ["e_map"] }); });
+    (W.EPI_ST || []).forEach(function (s) { node("station", s.id, s.fa, { go: ["e_st", s.id] }); edge(ref("station", s.id), ref("hall", s.hall), "in"); });
+    var B = W.EPI_BOOK || {};
+    (B.ch || []).forEach(function (c) { node("chapter", c.id, "فصلِ " + fa(c.n) + " · " + c.title, { go: ["e_book"] }); });
+    Object.keys(B.sec || {}).forEach(function (s) { node("section", s, s + " · " + (B.sec[s].title || ""), { go: ["e_book", s] }); edge(ref("section", s), ref("chapter", B.sec[s].ch), "in"); });
+    (W.EPI_ST || []).forEach(function (s) { (s.basis || []).forEach(function (b) { edge(ref("station", s.id), ref("section", b.sec), "basis"); }); });
+    var F = W.EPI_FOUND || {};
+    (F.AX || []).forEach(function (a) { node("axiom", a.id, a.id + " · " + a.fa, { go: ["e_bt", null, "found"] }); (a.sec || []).forEach(function (s) { edge(ref("axiom", a.id), ref("section", s), "basis"); }); });
+    Object.keys(F.TH || {}).forEach(function (t) { node("theorem", t, F.TH[t].fa, { go: ["e_bt", null, "found"] }); });
+    Object.keys(F.TH || {}).forEach(function (t) { (F.TH[t].from || []).forEach(function (x) { edge(ref("theorem", t), (F.TH[x] ? ref("theorem", x) : ref("axiom", x)), "proof"); }); });
+    Object.keys(F.BASE || {}).forEach(function (b) { node("base", b, F.BASE[b].fa, { go: ["e_bt", null, "found"] }); });
+    (W.EPI_RULES || []).forEach(function (r) { node("rule", r.id, r.fa, { go: ["e_bt", null, "found"] }); edge(ref("rule", r.id), ref("station", r.st), "at");
+      (r.sec || []).forEach(function (s) { edge(ref("rule", r.id), ref("section", s), "basis"); });
+      var d = (F.DER || {})[r.id]; if (d) { if (d.th) edge(ref("rule", r.id), F.TH[d.th] ? ref("theorem", d.th) : ref("axiom", d.th), "proof"); if (d.base) edge(ref("rule", r.id), ref("base", d.base), "measures"); } });
+    var T = W.EPI_TERR || {};
+    (T.groups || []).forEach(function (g) { node("tgroup", g.id, g.fa, { go: ["e_bt", null, "terr"] }); (g.areas || []).forEach(function (a) { node("area", a.id, a.fa, { go: ["e_bt", null, "terr"] }); edge(ref("area", a.id), ref("tgroup", g.id), "in"); (a.book || []).forEach(function (s) { edge(ref("area", a.id), ref("section", s), "covers"); }); }); });
+    var L = W.EPI_BT_LEDGER || {}, TS = (L.territory || {}).areas || {};
+    Object.keys(TS).forEach(function (aid) { (TS[aid].rules || []).forEach(function (r) { edge(ref("area", aid), ref("rule", r), "covers"); }); });
+    ((L.findings || {}).findings || []).forEach(function (f) { node("finding", f.id, f.title + " — " + f.status, { go: ["e_bt", null, "live"] }); (f.rules || []).forEach(function (r) { edge(ref("finding", f.id), ref("rule", r), "about"); }); });
+    ((L.proposals || {}).proposals || []).forEach(function (p) { node("proposal", p.id, p.title, { go: ["e_bt", null, "live"] }); if (p.finding) edge(ref("proposal", p.id), ref("finding", p.finding), "about"); });
+    /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
+    (W.EPI_ST || []).forEach(function (s) { (s.tech || []).forEach(function (x) { edge(ref("station", s.id), ref("tech", x.id), "bridge", x.why); }); });
+    (A.KF || []).forEach(function (f) { (f.epi || []).forEach(function (x) { edge(ref("kfam", f.id), ref("station", x.st), "bridge", x.why); }); });
+    probs.forEach(function (p) { (p.stages || []).forEach(function (s) {
+      (s.st || []).forEach(function (st) { edge(ref("prob", p.id), ref("station", st), "bridge"); });
+      (s.tech || []).forEach(function (t) { edge(ref("prob", p.id), ref("tech", t), "uses"); });
+      var mv = []; try { mv = A.stageMoves ? A.stageMoves(p, s) : (s.mv || []); } catch (e) { mv = s.mv || []; }
+      (mv || []).forEach(function (m) { edge(ref("prob", p.id), ref("move", m), "tag"); }); }); });
+    /* یالِ تکراری یکی شود (همان دو سر و همان نوع) */
+    var seen = {}, E2 = []; E.forEach(function (e) { var key = e.a + "|" + e.b + "|" + e.rel; if (!seen[key]) { seen[key] = 1; E2.push(e); } });
+    var adj = {}; E2.forEach(function (e, i) { (adj[e.a] = adj[e.a] || []).push(i); (adj[e.b] = adj[e.b] || []).push(i); });
+    return { nodes: N, edges: E2, adj: adj };
+  };
+  G.model = function () { return G.build(); };
+  /* شکاف‌ها: کجا میانِ دو سامانه پل نیست — فقط گزارش، نه ساختنِ پیوند */
+  G.gaps = function (M) {
+    M = M || G.build();
+    function deg(k, pred) { return (M.adj[k] || []).filter(function (i) { return pred(M.edges[i]); }).length; }
+    var isBridge = function (e) { return M.nodes[e.a] && M.nodes[e.b] && M.nodes[e.a].sys !== M.nodes[e.b].sys && (M.nodes[e.a].sys === "epi" || M.nodes[e.b].sys === "epi"); };
+    var list = function (t) { return Object.keys(M.nodes).filter(function (k) { return M.nodes[k].t === t; }); };
+    return {
+      bridges: M.edges.filter(isBridge).length,
+      stationsNoTech: list("station").filter(function (k) { return !deg(k, isBridge); }),
+      techNoStation: list("tech").filter(function (k) { return !deg(k, isBridge); }),
+      famNoStation: list("kfam").filter(function (k) { return !deg(k, isBridge); }),
+      areasNoRule: list("area").filter(function (k) { return !deg(k, function (e) { return M.nodes[e.a].t === "rule" || M.nodes[e.b].t === "rule"; }); })
+    };
+  };
+
+  /* ======================= نما ======================= */
+  var ST = { sys: { learn: 1, mine: 1, epi: 1 }, focus: null, q: "" };
+  var SYSFA = { learn: "سامانهٔ یادگیری", mine: "دادهٔ خودِ تو", epi: "کارخانه و جزوهٔ معرفت‌شناسی" };
+  function goNode(n) { var g = n.meta && n.meta.go; if (g) A.go(g[0], g[1], g[2]); }
+
+  /* نمای کلان: هر نوع یک جعبه (با شمار)، یال‌های میانِ نوع‌ها با شمار — سه ستون: یادگیری | دادهٔ تو | معرفت‌شناسی */
+  function overview(M) {
+    var counts = {}, links = {};
+    Object.keys(M.nodes).forEach(function (k) { var n = M.nodes[k]; counts[n.t] = (counts[n.t] || 0) + 1; });
+    M.edges.forEach(function (e) { var a = M.nodes[e.a].t, b = M.nodes[e.b].t; if (a === b) return; var key = a < b ? a + "|" + b : b + "|" + a; links[key] = (links[key] || 0) + 1; });
+    var cols = { learn: [], mine: [], epi: [] };
+    G.TYPES.forEach(function (x) { if (counts[x.t] && ST.sys[x.sys]) cols[x.sys].push(x); });
+    var Wd = 960, colX = { learn: 800, mine: 480, epi: 160 }, bw = 210, bh = 30, gap = 10;
+    var rows = Math.max(cols.learn.length, cols.mine.length, cols.epi.length, 1), Ht = 60 + rows * (bh + gap);
+    var pos = {};
+    ["learn", "mine", "epi"].forEach(function (s) { cols[s].forEach(function (x, i) { pos[x.t] = { x: colX[s], y: 50 + i * (bh + gap) + bh / 2 }; }); });
+    var el = svg("svg", { viewBox: "0 0 " + Wd + " " + Ht, class: "gr-over", role: "img", "aria-label": "نمای کلانِ گرافِ مشترک" });
+    ["learn", "mine", "epi"].forEach(function (s) { if (cols[s].length) el.appendChild(svg("text", { x: colX[s], y: 24, "text-anchor": "middle", direction: "rtl", class: "gr-colh gr-" + s }, SYSFA[s])); });
+    Object.keys(links).forEach(function (key) {
+      var ab = key.split("|"), p = pos[ab[0]], q = pos[ab[1]]; if (!p || !q) return;
+      var cross = G.TM[ab[0]].sys !== G.TM[ab[1]].sys, x1 = p.x + (q.x < p.x ? -bw / 2 : q.x > p.x ? bw / 2 : bw / 2), x2 = q.x + (p.x < q.x ? -bw / 2 : p.x > q.x ? bw / 2 : bw / 2);
+      var mx = p.x === q.x ? p.x + bw / 2 + 40 + Math.abs(p.y - q.y) / 6 : (x1 + x2) / 2;
+      var d = "M" + x1 + "," + p.y + " Q" + mx + "," + ((p.y + q.y) / 2) + " " + x2 + "," + q.y;
+      el.appendChild(svg("path", { d: d, class: "gr-ol" + (cross ? " cross" : ""), "stroke-width": String(Math.min(6, 0.8 + Math.log(1 + links[key]))), fill: "none" }, ab[0] + " ↔ " + ab[1] + ": " + links[key]));
+    });
+    G.TYPES.forEach(function (x) {
+      var p = pos[x.t]; if (!p) return;
+      var g = svg("g", { class: "gr-box gr-" + x.sys, tabindex: "0", role: "button", "data-t": x.t, "aria-label": x.fa + " (" + counts[x.t] + ")" });
+      g.appendChild(svg("rect", { x: p.x - bw / 2, y: p.y - bh / 2, width: bw, height: bh, rx: 8 }));
+      g.appendChild(svg("text", { x: p.x, y: p.y + 5, direction: "rtl", "text-anchor": "middle" }, x.fa + " (" + fa(counts[x.t]) + ")"));
+      var pick = function () { ST.type = x.t; ST.focus = null; A.render(); };
+      g.addEventListener("click", pick); g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(); } });
+      el.appendChild(g);
+    });
+    return el;
+  }
+  /* نمای کانونی: یک گره و همهٔ همسایه‌هایش، دسته‌بندی‌شده بر حسبِ نوع در بخش‌های دایره (چیدمانِ قطعی) */
+  function focusView(M, k) {
+    var n = M.nodes[k]; if (!n) return h("p", { class: "small muted" }, "این گره دیگر در داده نیست.");
+    var nb = {}; (M.adj[k] || []).forEach(function (i) { var e = M.edges[i], o = e.a === k ? e.b : e.a; (nb[o] = nb[o] || []).push(e); });
+    var ids = Object.keys(nb), byT = {}; ids.forEach(function (o) { var t = M.nodes[o].t; (byT[t] = byT[t] || []).push(o); });
+    var types = G.TYPES.map(function (x) { return x.t; }).filter(function (t) { return byT[t]; });
+    var MAXN = 70, shown = 0, Wd = 960, Ht = 620, cx = Wd / 2, cy = Ht / 2;
+    var el = svg("svg", { viewBox: "0 0 " + Wd + " " + Ht, class: "gr-focus", role: "img", "aria-label": "همسایه‌های " + n.label });
+    var tot = Math.min(ids.length, MAXN), idx = 0, P = {};
+    types.forEach(function (t) { byT[t].sort().forEach(function (o) { if (shown >= MAXN) return; var a = (idx / Math.max(1, tot)) * 2 * Math.PI - Math.PI / 2; var r = tot > 24 ? (idx % 2 ? 270 : 210) : 230; P[o] = { x: cx + r * Math.cos(a) * 1.3, y: cy + r * Math.sin(a) }; idx++; shown++; }); });
+    Object.keys(P).forEach(function (o) {
+      nb[o].forEach(function (e) {
+        var q = P[o], out = e.a === k;
+        el.appendChild(svg("line", { x1: cx, y1: cy, x2: q.x, y2: q.y, class: "gr-fl rel-" + e.rel + (M.nodes[o].sys !== n.sys ? " cross" : "") }, (G.REL[e.rel] || e.rel) + (e.why ? " — " + e.why : "")));
+      });
+    });
+    Object.keys(P).forEach(function (o) {
+      var m = M.nodes[o], q = P[o], g = svg("g", { class: "gr-node gr-" + m.sys, tabindex: "0", role: "button", "data-k": o });
+      g.appendChild(svg("circle", { cx: q.x, cy: q.y, r: 7 }));
+      var lab = m.label.length > 22 ? m.label.slice(0, 21) + "…" : m.label;
+      /* direction=rtl (bidi): در RTL «start» لبهٔ راستِ متن است ⇒ گرهِ سمتِ چپ: start، سمتِ راست: end */
+      g.appendChild(svg("text", { x: q.x + (q.x < cx ? -11 : 11), y: q.y + 4, direction: "rtl", "text-anchor": q.x < cx ? "start" : "end" }, lab));
+      g.appendChild(svg("title", {}, G.TM[m.t].fa + ": " + m.label + " — " + nb[o].map(function (e) { return G.REL[e.rel] || e.rel; }).join("، ")));
+      var pick = function () { ST.focus = o; A.render(); };
+      g.addEventListener("click", pick); g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(); } });
+      el.appendChild(g);
+    });
+    var c = svg("g", { class: "gr-center gr-" + n.sys });
+    c.appendChild(svg("circle", { cx: cx, cy: cy, r: 13 }));
+    c.appendChild(svg("text", { x: cx, y: cy - 20, direction: "rtl", "text-anchor": "middle" }, n.label.length > 40 ? n.label.slice(0, 39) + "…" : n.label));
+    el.appendChild(c);
+    var more = ids.length > MAXN ? h("p", { class: "small muted" }, "و " + fa(ids.length - MAXN) + " همسایهٔ دیگر — در فهرستِ زیر") : null;
+    var lst = h("details", { class: "gr-nlist" }, h("summary", {}, "همهٔ " + fa(ids.length) + " پیوند، بر حسبِ نوع"),
+      h("div", {}, types.map(function (t) { return h("div", { class: "small" }, h("b", {}, G.TM[t].fa + " (" + fa(byT[t].length) + "): "),
+        byT[t].map(function (o) { return h("button", { class: "linkish gr-nb", "data-k": o, onclick: function () { ST.focus = o; A.render(); } }, M.nodes[o].label); })); })));
+    return h("div", { class: "col gap" },
+      h("div", { class: "row between wrap" }, h("div", {}, h("span", { class: "chip gr-" + n.sys }, G.TM[n.t].fa + " · " + SYSFA[n.sys]), " ", h("b", {}, n.label)),
+        h("div", { class: "row gap" }, n.meta.go ? h("button", { class: "btn sm", onclick: function () { goNode(n); } }, "باز کن") : null, h("button", { class: "btn ghost sm gr-back", onclick: function () { ST.focus = null; A.render(); } }, "↩ نمای کلان"))),
+      h("div", { class: "scrollx" }, el), more, lst);
+  }
+  A.graphPanel = function () {
+    var M = G.build(), box = h("div", { class: "col gap gr", dir: "rtl" }), gp = G.gaps(M);
+    var nN = Object.keys(M.nodes).length;
+    box.appendChild(h("section", { class: "card" }, h("h2", {}, "🕸 گرافِ مشترک — سامانهٔ یادگیری، دادهٔ تو، و معرفت‌شناسی در یک شبکه"),
+      h("p", { class: "small" }, "این گراف هر بار از خودِ داده‌ها ساخته می‌شود، نه دستی: هر تکنیک، فاز، پروتکل، حرکت، گره، موقعیت، درخت، مسئله، ایستگاه، قاعده، بخشِ جزوه، اصل و قضیه، حوزهٔ قلمرو و یافتهٔ بک‌تست. هر چیزی که تو، یک نشست یا روتینِ شبانه بیفزاید، همین لحظه این‌جاست. پیوندها فقط همان‌هایی‌اند که در داده ثبت شده‌اند؛ جاهایی که میانِ دو سامانه پل نیست، پایین‌تر «شکاف» آمده — ساخته نمی‌شوند."),
+      h("div", { class: "bt-stats" },
+        h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "گره"), h("div", { class: "bt-num gr-nn" }, fa(nN))),
+        h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "پیوند"), h("div", { class: "bt-num" }, fa(M.edges.length))),
+        h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, "پل میانِ دو سامانه"), h("div", { class: "bt-num gr-nbr" }, fa(gp.bridges))))));
+    /* پالایه و جستجو */
+    var q = h("input", { type: "search", class: "gr-q", placeholder: "جستجوی هر چیز (تکنیک، ایستگاه، قاعده، گره…)", "aria-label": "جستجو در گراف", value: ST.q || "",
+      oninput: function () { ST.q = q.value; res.innerHTML = ""; fillRes(); } });
+    var res = h("div", { class: "gr-res" });
+    function fillRes() {
+      var s = (ST.q || "").trim(); if (s.length < 2) return;
+      var hits = Object.keys(M.nodes).filter(function (k) { return M.nodes[k].label.indexOf(s) >= 0 || M.nodes[k].id === s; }).slice(0, 30);
+      res.appendChild(h("div", { class: "row gap wrap" }, hits.length ? hits.map(function (k) { var m = M.nodes[k]; return h("button", { class: "chip gr-hit gr-" + m.sys, onclick: function () { ST.focus = k; ST.q = ""; A.render(); } }, G.TM[m.t].fa + ": " + m.label); }) : h("span", { class: "small muted" }, "چیزی پیدا نشد.")));
+    }
+    var sysBox = h("div", { class: "row gap wrap small" }, ["learn", "mine", "epi"].map(function (s) {
+      var cb = h("input", { type: "checkbox", checked: !!ST.sys[s], onchange: function () { ST.sys[s] = cb.checked ? 1 : 0; A.render(); } });
+      return h("label", { class: "gr-sys gr-" + s }, cb, " " + SYSFA[s]); }));
+    box.appendChild(h("section", { class: "card" }, h("div", { class: "row gap wrap" }, q, sysBox), res));
+    fillRes();
+    if (ST.focus) box.appendChild(h("section", { class: "card" }, focusView(M, ST.focus)));
+    else {
+      box.appendChild(h("section", { class: "card" }, h("h3", {}, "نمای کلان — روی هر جعبه بزن تا اعضایش را ببینی؛ روی هر عضو، تا همسایه‌هایش"),
+        h("p", { class: "small muted" }, "ضخامتِ خط = شمارِ پیوندها؛ خطِ رنگی = پل میانِ دو سامانه."), h("div", { class: "scrollx" }, overview(M))));
+      if (ST.type && G.TM[ST.type]) {
+        var ks = Object.keys(M.nodes).filter(function (k) { return M.nodes[k].t === ST.type; });
+        box.appendChild(h("section", { class: "card gr-members" }, h("h3", {}, G.TM[ST.type].fa + " (" + fa(ks.length) + ")"),
+          h("div", { class: "row gap wrap" }, ks.map(function (k) { var m = M.nodes[k]; return h("button", { class: "chip gr-" + m.sys, "data-k": k, onclick: function () { ST.focus = k; A.render(); } }, m.label + " · " + fa((M.adj[k] || []).length)); }))));
+      }
+    }
+    /* شکاف‌ها */
+    function gapRow(lab, arr) { return h("details", { class: "small" }, h("summary", {}, lab + ": " + fa(arr.length)), h("div", { class: "row gap wrap" }, arr.map(function (k) { return h("button", { class: "linkish", onclick: function () { ST.focus = k; A.render(); } }, M.nodes[k].label); }))); }
+    box.appendChild(h("section", { class: "card gr-gaps" }, h("h3", {}, "شکاف‌ها — جایی که میانِ دو سامانه هنوز پلی ثبت نشده"),
+      h("p", { class: "small muted" }, "این‌ها پیوندِ ساختگی نمی‌گیرند؛ فهرستِ کارِ آینده‌اند (برای تو، نشست‌ها و ناظرِ شبانه)."),
+      gapRow("ایستگاه‌هایی که به هیچ تکنیک/خانواده/مسئله‌ای وصل نیستند", gp.stationsNoTech),
+      gapRow("تکنیک‌هایی که به هیچ ایستگاهی وصل نیستند", gp.techNoStation),
+      gapRow("خانواده‌های گره بی پیوند به ایستگاه", gp.famNoStation),
+      gapRow("حوزه‌های قلمرو بی قاعده", gp.areasNoRule)));
+    return box;
+  };
+
+  /* ======================= «🗺 نقشه‌ها»: همهٔ نقشه‌ها ذیلِ یک قسمت (هیچ‌کدام حذف نشد) ======================= */
+  G.MAPS = [
+    { v: "maps", fa: "🕸 گرافِ مشترک", what: "یادگیری + دادهٔ تو + معرفت‌شناسی در یک شبکهٔ زنده؛ پل‌ها و شکاف‌ها" },
+    { v: "whole", fa: "🧭 نقشهٔ کل", what: "این برنامه چیست: سه منبع ⇒ سه کار ⇒ حاصل" },
+    { v: "map", fa: "🧩 نقشهٔ مسیرِ یادگیری", what: "۹ فاز، شبکهٔ ۴۵ تکنیک، برنامهٔ ۸ هفته‌ای" },
+    { v: "kmap", fa: "🗺️ نقشهٔ ذهنِ تو", what: "گره‌های ذهنیِ تو، پیوندهایشان، روندِ باز شدن (از موقعیت‌هایی که خودت ثبت می‌کنی)" },
+    { v: "farm", fa: "🌳 مزرعه", what: "درختِ مفهوم‌هایی که فهمیده‌ای" },
+    { v: "e_map", fa: "🏭 نقشهٔ کارخانه", what: "۶ سالن و ۳۱ ایستگاهِ سنجشِ معرفتی" },
+    { v: "e_bt", s: "terr", fa: "🗺 قلمروِ معرفت‌شناسی", what: "همهٔ حوزه‌های این علم و پیشرفتِ هر کدام" },
+    { v: "e_bt", s: "found", fa: "🧱 مبنای درجه‌ها", what: "اصولِ بدیهی، قضیه‌ها، مبنای هر عدد" }
+  ];
+  A.V.maps = function () {
+    var root = h("div", { class: "page", dir: "rtl" });
+    root.appendChild(A.head("نقشه‌ها", "🗺 همهٔ نقشه‌ها در یک جا", "هر نقشه یک لایه از همین برنامه است؛ «گرافِ مشترک» همه را به هم وصل می‌کند. هیچ‌کدام حذف نشده — از همین‌جا یا از منوی هر سامانه باز می‌شوند."));
+    root.appendChild(h("div", { class: "gr-maps" }, G.MAPS.map(function (m) {
+      return h("button", { class: "card soft gr-mapcard" + (m.v === "maps" ? " on" : ""), "data-v": m.v + (m.s ? ":" + m.s : ""), onclick: function () { if (m.v !== "maps") A.go(m.v, null, m.s || null); } },
+        h("b", {}, m.fa), h("div", { class: "small muted" }, m.what)); })));
+    root.appendChild(A.graphPanel());
+    return root;
+  };
+  G.open = function (k) { ST.focus = k || null; A.go("maps"); };
+  A.NAV_MAPS = ["maps", "🗺 نقشه‌ها (گرافِ مشترک)", "همهٔ نقشه‌ها ذیلِ یک قسمت؛ شبکهٔ زندهٔ یادگیری + معرفت‌شناسی + دادهٔ تو"];
+  /* منو: هر «نقشه» در سامانهٔ خودش ذیلِ گروهِ «🗺 نقشه‌ها» با نامِ روشن — جابه‌جا و نام‌گذاری، نه حذف */
+  (function regroup() {
+    function move(arr, ids, label) {
+      if (!Array.isArray(arr)) return;
+      var items = [];
+      ids.forEach(function (x) { var i = arr.findIndex(function (n) { return Array.isArray(n) && n[0] === x[0]; }); if (i >= 0) { var it = arr.splice(i, 1)[0]; it = [it[0], x[1], it[2]]; items.push(it); } });
+      for (var j = arr.length - 1; j >= 0; j--) if (arr[j] && arr[j].g && !arr.slice(j + 1).length) arr.pop(); /* گروهِ تهیِ آخر */
+      for (var g = arr.length - 1; g >= 0; g--) if (arr[g] && arr[g].g && (!arr[g + 1] || arr[g + 1].g)) arr.splice(g, 1); /* هر گروهِ تهی */
+      if (items.length) { arr.push({ g: label }); items.forEach(function (it) { arr.push(it); }); }
+    }
+    move(A.NAV, [["map", "🧩 نقشهٔ مسیرِ یادگیری"], ["kmap", "🗺️ نقشهٔ ذهنِ تو"]], "🗺 نقشه‌ها");
+    move(A.EPI_NAV, [["e_map", "🏭 نقشهٔ کارخانه"]], "🗺 نقشه‌ها");
+  })();
+  if (A.VIEW_META) A.VIEW_META.maps = { j: "ws", what: "همهٔ نقشه‌ها در یک جا، و گرافِ مشترکِ زنده: یادگیری + دادهٔ تو + معرفت‌شناسی.", why: "تا ببینی هر چیز به چه وصل است و کجا میانِ دو سامانه هنوز پلی نیست." };
 })(APP);

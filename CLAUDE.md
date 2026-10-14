@@ -57,7 +57,8 @@ Treat every change as a production change.
   on it — read `apps/learning-architecture/AGENTS.md` and follow it:** edit only the source, never the
   bundle in `frontend/public/assets/lla/`; run `python apps/learning-architecture/build.py`; add a WORKLOG
   entry (+ PROGRESS row if it moved forward/back, + handbook section). `tests/test_learning_architecture_handbook.py`
-  fails the merge gate on any drift. **Scope:** nothing from the rest of Lifemanager goes into that
+  fails the merge gate on any drift. Its «🗺 نقشه‌ها» shared graph (learning + epistemology + owner data) is DERIVED from the
+  registries — never hand-edit it; add data to its registry (contract in that `AGENTS.md`, test `tests/test_graph.js`). **Scope:** nothing from the rest of Lifemanager goes into that
   handbook or page (the rest is still in flux); the owner will wire connections himself later.
 
 ## What this system is

@@ -469,6 +469,7 @@
   A.V.e_map = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "نقشه کارخانه", "هر پرونده سالن‌ها را به ترتیب شماره (از راست به چپ) طی می‌کند و «حکم نهایی» همیشه آخرین ایستگاه است. پررنگ: همیشه در مسیر. خط‌چین: فقط وقتی لازم شود. نشان «س»: در مسیر سریع هم هست."));
+    if (A.GRAPH) root.appendChild(h("p", { class: "small" }, "این نقشه ترتیبِ سالن‌ها و ایستگاه‌هاست. ", h("button", { class: "linkish", onclick: function () { A.GRAPH.open(null); } }, "🕸 گرافِ مشترک"), " ایستگاه‌ها را با قاعده‌ها، بخش‌های جزوه، اصول و قضیه‌ها، حوزه‌های قلمرو و پل‌هایشان به سامانهٔ یادگیری نشان می‌دهد."));
     root.appendChild(h("div", { class: "hallflow" }, E.HALLS.map(function (H) {
       var ss = ST.filter(function (s) { return s.hall === H.n; });
       return h("div", { class: "hallcol" }, h("div", { class: "hallh" }, h("b", {}, "سالن " + fa(H.n)), " ", H.fa),
