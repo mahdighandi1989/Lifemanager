@@ -154,6 +154,13 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // دستیار عددهای کارنامه را می‌بیند (فقط در همان نما)
     APP.go('mind'); await new Promise(r => setTimeout(r, 150)); out.mindHook = (AS.promptHooks || []).map(f => { try { return f(s, '') || ''; } catch (e) { return ''; } }).join('\n');
     out.mindHook = /# کارنامهٔ ذهن[\s\S]*کالیبراسیون/.test(out.mindHook);
+    // حوزهٔ ناموجود صریح گفته می‌شود؛ بازگشتِ گره در تور و ایمیل دیده می‌شود (کارزارِ آزمون sc17)
+    out.badArea = /در قلمروها نیست/.test(AS.DO.tour_plan({ facets: [{ key: 'fz', kind: 'area', area: 'md_nope', title: 'x' }] }));
+    APP.S.put({ id: 'kn_rt', type: 'knot', name: 'تلفن', status: 'practised', solvedAt: '2026-09-01T08:00:00Z', fam: 'F7' }); APP.S.put({ id: 'kc_rt', type: 'kcase', title: 'ت', knots: ['kn_rt'] });
+    AS.DO.tour_add({ facet: { key: 'fk', kind: 'knot', title: 'ترس از تلفن' } }); const fk = s.tour.facets[s.tour.facets.length - 1]; AS.DO.tour_link({ facet: fk.key, id: 'kc_rt' }); AS.tourAfterTurn(s);
+    const hold = AS.tourMilestones(fk).filter(m => /ماندگاری/.test(m.t)).map(m => m.t).join('|');
+    APP.knotReturned('kn_rt'); const n0 = s.msgs.length; AS.tourAfterTurn(s);
+    out.ret = /\(از /.test(hold) && s.msgs.slice(n0).some(m => /بازگشت/.test(m.text)) && ((s.tour.mailq || []).some(e => e.k === 'reopen') || (window.__mails || []).some(m => /دوباره باز شد/.test((m.subject || '') + (m.html || ''))));
     // یادآورها خاموش ⇒ یک بار صریح گفته می‌شود (نه سکوت)
     APP.HOST.remind = APP.HOST.remind || (async () => ({ ok: true })); const st = APP.S.settings(); st.knots = st.knots || {}; st.knots.notify = { telegram: false, email: false };
     AS.tourSyncReminder(s); AS.tourSyncReminder(s); out.remOff = s.msgs.filter(x => /یادآورها خاموش/.test(x.text)).length;
@@ -166,7 +173,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.camp.chainCalc === '{"prod":6,"min":20,"n":2}', 'worry chain: ceiling = weakest link, independent = product: ' + info.camp.chainCalc);
   chk(info.camp.correct && info.camp.toast, 'a claimed-but-failed action triggers a correction turn; page messages reach the next prompt');
   chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
-  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook && info.camp.valsLinked, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
+  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook && info.camp.valsLinked && info.camp.badArea && info.camp.ret, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');

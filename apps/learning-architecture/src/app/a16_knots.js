@@ -1554,7 +1554,11 @@
     if (gap) root.appendChild(h("p", { class: "card soft small kn-codegap" }, gap));
     root.appendChild(h("div", { class: "row gap wrap" },
       A.V.kpractice ? h("button", { class: "btn", disabled: !cardDone(k), title: cardDone(k) ? "" : "اول کارتِ گره را کامل کن", onclick: function () { A.go("kpractice", k.id); } }, "🏋️ ورزش") : null,
-      A.V.kmap ? h("button", { class: "btn ghost", onclick: function () { A.go("kmap", k.id); } }, "🕸️ در نقشهٔ ذهن") : null));
+      A.V.kmap ? h("button", { class: "btn ghost", onclick: function () { A.go("kmap", k.id); } }, "🕸️ در نقشهٔ ذهن") : null,
+      // «دوباره پیش آمد» (کارزارِ آزمون sc17): بازگشتِ گرهِ ورزیده بی ساختنِ تحلیلِ پنج‌قدمیِ تازه — تصمیمِ خودِ کاربر، با تأیید
+      st === "practised" && A.knotReturned && A.confirmBtn ? A.confirmBtn("↩ دوباره پیش آمد", function () {
+        A.knotReturned(k.id); A.toast("ثبت شد: «بازگشته». ماندگاری دوباره از نو سنجیده می‌شود؛ اگر خواستی موقعیتِ تازه را در گره‌گشا ثبت کن تا چرایی‌اش روشن شود."); A.render();
+      }) : null));
     var t = tab || "card";
     root.appendChild(A.tabs([["card", "کارت"], ["cases", "موقعیت‌ها (" + fa(A.knotCases(k.id).length) + ")"], ["links", "پیوندها"]], t, function (x) { A.go("knot", k.id, x); }));
     if (t === "cases") {

@@ -99,6 +99,8 @@
       var dys = X.ans.concat(X.cal).map(function (a) { return String(a.at || "").slice(0, 10); }).filter(Boolean).sort();
       X.spread = dys.length ? A.daysBetween(dys[0], dys[dys.length - 1]) : 0;
       if (X.score != null && X.score >= 65 && X.spread < 3) X.band = "در حالِ رشد · تک‌نوبت";
+      // گرهِ بازگشته در همین بُعد ⇒ «استوار» نیست (کارزارِ آزمون sc17: پس از بازگشت «۹۸ · استوار» ماند)
+      if (X.band === "استوار" && (X.knots.returned || 0) > 0) X.band = "ورزیده · گرهِ بازگشته";
       /* روندِ ماهانه: دقت و کالیبراسیونِ هر ماه (نمونهٔ ماه ≥ ۳) */
       var bym = {}; X.ans.forEach(function (a) { var m = month(a.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).n++; if (a.ok) bym[m].ok++; });
       X.cal.forEach(function (c) { var m = month(c.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).cal.push(c); });

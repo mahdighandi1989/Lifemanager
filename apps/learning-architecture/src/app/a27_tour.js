@@ -90,7 +90,9 @@
       add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
       var ks = c.knot;
       add("ورزیده شد — با معیارِ خودِ گره‌گشا", ks.length && ks.every(knotSolved), false);
-      HOLD.forEach(function (n) { add("ماندگاری: " + fa(n) + " روز پس از ورزیدگی، بی‌بازگشت و هنوز درست", ks.length && ks.every(function (k) { return knotHeld(k, n); }), false); });
+      // تاریخِ هر وارسیِ ماندگاری دیده شود (کارزارِ آزمون sc17: تاریخِ ۹۰ روزه هیچ‌جا نبود)
+      var sv = ks.length && ks.every(knotSolved) ? ks.map(function (k) { return String(k.solvedAt).slice(0, 10); }).sort().pop() : "";
+      HOLD.forEach(function (n) { add("ماندگاری: " + fa(n) + " روز پس از ورزیدگی، بی‌بازگشت و هنوز درست" + (sv ? " (از " + (A.fdate ? A.fdate(plusDays(sv, n)) : plusDays(sv, n)) + ")" : ""), ks.length && ks.every(function (k) { return knotHeld(k, n); }), false); });
     } else if (f.kind === "claim") {
       var cs = c["case"][0], fin = cs && cs.st && cs.st.st_final;
       add("پروندهٔ سنجش در کارخانه ساخته شد", cs);
@@ -177,10 +179,12 @@
     if (!n && t.facets.every(function (f) { return f.status === "done" || f.status === "skipped"; })) t.doneAt = t.doneAt || nowIso();
     return n || null;
   }
+  var BAD_AREA = [];
   function normFacet(x, i) {
     var k = KIND[x.kind] ? x.kind : "other";
     // حوزه از قلمروِ سامانه‌ها یا قلمروِ معرفت‌شناسی (a_…) — کارزارِ آزمون sc08: a_testimony و a_evidence وجهِ area نمی‌شدند
     var ar = x.area && A.SYST ? (A.SYST.byId ? A.SYST.byId(String(x.area)) : A.SYST.find(String(x.area))) : null, epi = ar && ar.epi;
+    if (x.area && !ar) BAD_AREA.push(String(x.area));
     if (ar && k === "other") k = "area";
     var dv = epi ? "e_bt" : KIND[k].view, ds = epi ? "terr" : KIND[k].sub || "";
     return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, area: ar ? ar.a.id : "", title: clip(x.title || x.name || x.t || (ar ? ar.a.fa : "") || KIND[k].fa, 120), why: clip(x.why || "", 300),
@@ -191,7 +195,7 @@
   var DO = AS.DO;
   DO.tour_plan = function (a) {
     var s = AS._turnSession; if (!s || !Array.isArray(a.facets) || !a.facets.length) return "طرحِ تور خالی بود";
-    var fs = a.facets.slice(0, 10).map(normFacet);
+    BAD_AREA = []; var fs = a.facets.slice(0, 10).map(normFacet), bad = BAD_AREA.slice();
     if (!s.tour) {
       s.tour = { goal: clip(a.goal || s.pinned || "", 300), createdAt: nowIso(), facets: fs };
     } else {   // طرحِ تازه چیزی را بی‌صدا پاک یا بازنویسی نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
@@ -210,7 +214,9 @@
         if (t.doneAt) { delete t.doneAt; delete t.doneSaid; delete t.masteredAt; }   // تورِ تمام‌شده با وجهِ تازه دوباره باز است
       }
     }
-    advance(s); return "";
+    advance(s);
+    // شناسهٔ حوزهٔ ناموجود بی‌صدا خالی نمی‌شود (کارزارِ آزمون sc17: md_catastrophizing نبود و وجه بی‌حوزه ماند)
+    return bad.length ? "حوزهٔ «" + bad.join("، ") + "» در قلمروها نیست — وجه بی حوزه ساخته شد؛ شناسهٔ درست را از «# دانسته‌های قلمرو» بردار یا با know بخواه" : "";
   };
   DO.tour_add = function (a) {
     // هر سه شکل پذیرفته می‌شود: {"facet":{…}}، فیلدهای تخت، یا {"facets":[…]} — و وجهِ تهی ساخته نمی‌شود (کارزارِ آزمون sc08: وجهِ «گامِ دیگر» بی نما)
@@ -283,15 +289,25 @@
     }
     // وجهِ «حوزه» رکوردِ ابزارِ خودِ همان حوزه را می‌گیرد، حتی اگر وقتی ساخته شد وجه منتظرِ برگه یا در صف بود (کارزارِ آزمون sc14:
     // ارزش‌ها ساخته شد ولی وجهِ ارزش‌ها ۰ از ۳ ماند) — فقط رکوردهای پس از آغازِ تور و هنوز بی‌وجه
-    var AREA_TYPES = { sf_values: ["value", "meaning"], sf_meaning: ["meaning", "value"], md_catastrophizing: ["wchain"], md_worry_uncertainty: ["wchain"], md_anxiety_worry: ["wchain"],
-      dc_calibration_forecasting: ["fcast"], pr_calibration: ["fcast"], dc_planning_fallacy: ["fcast"] };
+    // نوعِ رکورد از ابزارهای خودِ حوزه در ثبت‌گاه می‌آید (view:chain ⇒ زنجیره، view:fcast ⇒ پیش‌بینی، view:vals ⇒ ارزش/معنا) — نه فهرستِ دستی
+    var VIEW_TYPES = { chain: ["wchain"], fcast: ["fcast"], vals: ["value", "meaning"] };
+    function areaTypes(id) { var x = A.SYST && A.SYST.find ? A.SYST.find(id) : null, out = []; ((x && x.a.tools) || []).forEach(function (tl) { var m = /^view:(\w+)$/.exec(tl); if (m && VIEW_TYPES[m[1]]) out = out.concat(VIEW_TYPES[m[1]]); }); return out.length ? out : null; }
     var t0 = t.createdAt || (t.facets[0] || {}).createdAt || "";
     t.facets.forEach(function (f) {
-      var typs = f.kind === "area" && f.status !== "done" && f.status !== "skipped" && AREA_TYPES[f.area]; if (!typs) return;
+      var typs = f.kind === "area" && f.status !== "done" && f.status !== "skipped" && f.area && areaTypes(f.area); if (!typs) return;
       typs.forEach(function (typ) { S.all(typ, function (r) { return !r.sample && String(r.created || r.date || "") >= t0; }).forEach(function (r) {
         if (t.facets.some(function (g) { return (g.refs || []).some(function (x) { return x.id === r.id; }); })) return;
         f.refs.push({ id: r.id, type: r.type, auto: true }); msgs.push("«" + clip(r.title || r.q || r.note || r.id, 40) + "» به وجهِ «" + f.title + "» وصل شد");
       }); });
+    });
+    // گرهِ ورزیده بازگشت ⇒ صریح گفته می‌شود و «تسلطِ کامل» پس گرفته می‌شود (کارزارِ آزمون sc17: بازگشت در تور دیده نمی‌شد)
+    t.facets.forEach(function (f) {
+      if (f.kind !== "knot" || f.status === "skipped") return;
+      children(f).knot.forEach(function (k) {
+        if (!k.returnedAt || (f.retSeen || "") >= k.returnedAt) return;
+        f.retSeen = k.returnedAt; if (t.masteredAt) { t.masteredAt = null; }
+        msgs.push("↩ گرهِ «" + clip(k.name || "گره", 40) + "» بازگشت — ورزیدگی و ماندگاری دوباره از نو سنجیده می‌شود (این شکست نیست؛ نشان می‌دهد کجا هنوز کار دارد)");
+      });
     });
     // پرونده‌ای که از دکمهٔ کارخانهٔ خودِ گره‌گشا ساخته شد (src = موقعیتِ همین تور) ⇒ به وجهِ ادعای همین تور
     var tourKc = {}; t.facets.forEach(function (f) { (f.refs || []).forEach(function (r) { if (r.type === "kcase") tourKc[r.id] = 1; }); });
@@ -350,7 +366,7 @@
   AS.SYS += "\n" + [
     "# تور: مسئلهٔ چندوجهی",
     "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود. اگر «# تور» از پیش هست و موضوعِ تازه‌ای آمد، فقط وجه‌های تازه را با کلیدهای تازه (پس از آخرین کلید) بده — وجهِ انجام‌شده هرگز عوض نمی‌شود.",
-    "- پوشش: هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود — تصمیمی که به آن بند است (کار، پول، رابطه) ⇒ kind=area با area از s_decision (مثلاً dc_career_income، dc_risk_uncertainty)؛ دیگران درگیرند (مدیر، دوستان، همسر، جمع) ⇒ area از s_social؛ «این نوع را یاد بگیرم / دفعهٔ بعد حلش کنم» ⇒ learn و area از s_problem یا s_learn؛ معنا، ارزش، هویت ⇒ area از s_self (ابزارش «🧭 ارزش‌ها و معنا»، نمای vals). kind=problem فقط برای یک مسئلهٔ مشخص که در «مسئله‌های بزرگ» وارد می‌شود؛ تمرینِ حرکت‌ها یا خانواده‌های گیر ⇒ learn یا other با گام‌های خودش (نشانه‌های مسئلهٔ بزرگ بر آن نمی‌نشیند). حرفِ کاربر دربارهٔ تمرینی که «کرد» را با صفحه بسنج (پیشرفتِ ثبت‌شده)، نه با گفته. ترسِ زنجیره‌ای («اگر … آن‌گاه … آن‌گاه …») ⇒ kind=area با area md_catastrophizing یا md_worry_uncertainty و ابزارِ «⛓ زنجیرهٔ نگرانی» (نه kind=knot)؛ پیش‌بینیِ زمان‌دار ⇒ kind=area با «🎯 دفترِ پیش‌بینی». «دیدنِ» یک نما (کارنامه، نقشه) وجه نیست — همان‌جا ببر و در گفت‌وگو توضیح بده. kind=learn فقط برای یک موضوع در «موضوع‌ها» (topics)؛ دوره/درس‌های آماده (مثلاً «🧭 دورهٔ سنجش») ⇒ other با گام. حوزه‌های قلمروِ معرفت‌شناسی (a_…) هم kind=area با همان شناسه‌اند؛ kind=territory فقط برای حوزه‌ای که نیست یا گامش ۰/۱ است و برگه‌اش با «facet» ثبت می‌شود. وجهِ area با \"area\":\"<شناسهٔ حوزه از قلمروِ سامانه‌ها>\" ساخته می‌شود و ابزارهای همان حوزه را به کار می‌برد. اگر جنبه‌ای را وجه نمی‌کنی، در reply یک جمله بگو چرا. حوزه‌ای که کاربر همین حالا مستقیم درباره‌اش می‌پرسد و گامش ۰ یا ۱ است (در هر قلمرو) = «الان لازم دارد» ⇒ gap با kind=priority، و تا آن وقت از «# دانسته‌های قلمرو» آنچه هست بگو.",
+    "- پوشش: هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود — تصمیمی که به آن بند است (کار، پول، رابطه) ⇒ kind=area با area از s_decision (مثلاً dc_career_income، dc_risk_uncertainty)؛ دیگران درگیرند (مدیر، دوستان، همسر، جمع) ⇒ area از s_social؛ «این نوع را یاد بگیرم / دفعهٔ بعد حلش کنم» ⇒ learn و area از s_problem یا s_learn؛ معنا، ارزش، هویت ⇒ area از s_self (ابزارش «🧭 ارزش‌ها و معنا»، نمای vals). kind=problem فقط برای یک مسئلهٔ مشخص که در «مسئله‌های بزرگ» وارد می‌شود؛ تمرینِ حرکت‌ها یا خانواده‌های گیر ⇒ learn یا other با گام‌های خودش (نشانه‌های مسئلهٔ بزرگ بر آن نمی‌نشیند). حرفِ کاربر دربارهٔ تمرینی که «کرد» را با صفحه بسنج (پیشرفتِ ثبت‌شده)، نه با گفته. ترسِ زنجیره‌ای («اگر … آن‌گاه … آن‌گاه …») ⇒ kind=area با area md_worry_uncertainty یا md_anxiety_fear و ابزارِ «⛓ زنجیرهٔ نگرانی» (نه kind=knot)؛ پیش‌بینیِ زمان‌دار ⇒ kind=area با «🎯 دفترِ پیش‌بینی». «دیدنِ» یک نما (کارنامه، نقشه) وجه نیست — همان‌جا ببر و در گفت‌وگو توضیح بده. kind=learn فقط برای یک موضوع در «موضوع‌ها» (topics)؛ دوره/درس‌های آماده (مثلاً «🧭 دورهٔ سنجش») ⇒ other با گام. حوزه‌های قلمروِ معرفت‌شناسی (a_…) هم kind=area با همان شناسه‌اند؛ kind=territory فقط برای حوزه‌ای که نیست یا گامش ۰/۱ است و برگه‌اش با «facet» ثبت می‌شود. وجهِ area با \"area\":\"<شناسهٔ حوزه از قلمروِ سامانه‌ها>\" ساخته می‌شود و ابزارهای همان حوزه را به کار می‌برد. اگر جنبه‌ای را وجه نمی‌کنی، در reply یک جمله بگو چرا. حوزه‌ای که کاربر همین حالا مستقیم درباره‌اش می‌پرسد و گامش ۰ یا ۱ است (در هر قلمرو) = «الان لازم دارد» ⇒ gap با kind=priority، و تا آن وقت از «# دانسته‌های قلمرو» آنچه هست بگو.",
     "- آزمونی که چند روز وقت می‌خواهد (مقایسهٔ دو روش، صبر تا رخداد) را بی‌موعد رها نکن: «⏳ آزمایشِ واقعی» ِ گره‌گشا یا «🎯 دفترِ پیش‌بینی» با موعد بساز تا در «امروز» بیاید.",
     "- ترتیب، به همین اولویت: (۱) ایمنی و حالِ کاربر؛ (۲) وابستگی: وجهی که خروجی‌اش ورودیِ دیگری است اول (ریشهٔ گیر پیش از شبیه‌سازِ همان مسئله؛ ریشهٔ یک ترس پیش از سنجشِ پیش‌بینی‌ای که از آن برخاسته — مگر تصمیمی همین روزها به آن پیش‌بینی بند باشد، که آن‌گاه سنجشِ ادعا اول)؛ (۳) آنچه زمان‌دار است زودتر؛ (۴) فهمیدنِ عمیقِ مفهومِ مشترک پیش از تمرینِ تخصصی؛ (۵) وجهِ territory جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و ادامه بده. اگر ادعا از ریشهٔ گره درمی‌آید، پرونده‌اش را با دکمهٔ «🏭 این برداشت را در کارخانه بسنج» ِ خودِ گره‌گشا بساز — سامانه آن را به وجهِ ادعا وصل می‌کند؛ از میزِ کار دوباره نساز.",
     "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",

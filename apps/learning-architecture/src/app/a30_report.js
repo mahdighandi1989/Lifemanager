@@ -9,7 +9,7 @@
   var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
   if (!AS) return;
   var R = A.REPORT = {};
-  var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet)$/;
+  var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen)$/;
   function nowIso() { return new Date().toISOString(); }
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function clip(x, n) { x = String(x || "").replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
@@ -46,7 +46,9 @@
     return out;
   }
   R.scores = scores;
-  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
+  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt,
+    // کدام نشانه‌ها ✓ است (بی شمارهٔ پرانتزی) — تا ایمیل بگوید دقیقاً چه تازه شد یا دوباره باز شد (کارزارِ آزمون sc17: ماندگاریِ ۳۰ روزه و بازگشت گم بود)
+    ms: (function () { var o = {}; t.facets.forEach(function (f) { o[f.key] = AS.tourMilestones(f).filter(function (m) { return m.ok; }).map(function (m) { return m.t.replace(/\s*\([^)]*\)\s*$/, ""); }); }); return o; })() }; }
   function events(s, before) {
     var t = s.tour, ev = [], b = before || { st: "", done: false, m: false };
     if (!before) ev.push({ k: "plan", fa: "تورِ تازه با " + fa(t.facets.length) + " وجه: " + t.facets.map(function (f) { return "«" + f.title + "»"; }).join("، ") });
@@ -59,7 +61,12 @@
       // موضوعِ ایمیل کوتاه و بی اصطلاحاتِ داخلی؛ دلیلِ فنی فقط در متن (کارزارِ آزمون: موضوع‌ها «deferred»، «sf_values گامِ ۰» داشتند)
       var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: c.ok ? "✅ آنچه برای «" + f.title + "» کم بود ساخته شد" : c.lag ? "⏳ ساخته‌شدنِ «" + f.title + "» هنوز دیده نمی‌شود" : "↩ ساختِ «" + f.title + "» هنوز درست نیست؛ پیگیری کردم", detail: clip(c.reason, 300) }); }
       var okN = AS.tourMilestones(f).filter(function (m) { return m.ok; }).length;
-      if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
+      // آخرین وضعِ ثبت‌شده (پس از نوبتِ پیش) — تا تغییرِ بیرون از نوبت هم (مثلاً «↩ دوباره پیش آمد») دیده شود
+      var was = (t.lastMs || b.ms || {})[f.key], now = AS.tourMilestones(f).filter(function (m) { return m.ok; }).map(function (m) { return m.t.replace(/\s*\([^)]*\)\s*$/, ""); });
+      if (o && was && f.status !== "skipped") {
+        now.filter(function (x) { return was.indexOf(x) < 0; }).forEach(function (x) { if (!(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ «" + f.title + "»: " + x, detail: "✓ " + x }); });
+        was.filter(function (x) { return now.indexOf(x) < 0; }).forEach(function (x) { ev.push({ k: "reopen", fa: "↩ «" + f.title + "»: «" + x + "» دوباره باز شد", detail: "این نشانه از روی داده‌ها دیگر برقرار نیست (مثلاً گره بازگشت) — دوباره سنجیده می‌شود" }); });
+      } else if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
     });
     if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 همهٔ وجه‌ها به ترتیب طی شد" });
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
@@ -67,7 +74,7 @@
   }
   R.note = function (s, before, noFlush) {
     if (!s || !s.tour) return;
-    var ev = events(s, before);
+    var ev = events(s, before); try { s.tour.lastMs = snap(s.tour).ms; } catch (e) { }
     if (ev.length) { s.tour.mailq = (s.tour.mailq || []).concat(ev.map(function (e) { e.at = nowIso(); return e; })).slice(-40); S.put(s); }
     // طرحِ تور پیش از کارهای همان نوبت ساخته می‌شود ⇒ فرستادن پس از نوبت (تا گزارش وضعِ واقعیِ پس از کارها را بگوید — کارزارِ آزمون)
     if (!noFlush && (s.tour.mailq || []).length) R.flush(s, (s.tour.mailq || []).some(function (e) { return BIG.test(e.k); }));

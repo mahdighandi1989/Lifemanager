@@ -26407,7 +26407,11 @@ APP.goFromURL = function (q) {
     if (gap) root.appendChild(h("p", { class: "card soft small kn-codegap" }, gap));
     root.appendChild(h("div", { class: "row gap wrap" },
       A.V.kpractice ? h("button", { class: "btn", disabled: !cardDone(k), title: cardDone(k) ? "" : "اول کارتِ گره را کامل کن", onclick: function () { A.go("kpractice", k.id); } }, "🏋️ ورزش") : null,
-      A.V.kmap ? h("button", { class: "btn ghost", onclick: function () { A.go("kmap", k.id); } }, "🕸️ در نقشهٔ ذهن") : null));
+      A.V.kmap ? h("button", { class: "btn ghost", onclick: function () { A.go("kmap", k.id); } }, "🕸️ در نقشهٔ ذهن") : null,
+      // «دوباره پیش آمد» (کارزارِ آزمون sc17): بازگشتِ گرهِ ورزیده بی ساختنِ تحلیلِ پنج‌قدمیِ تازه — تصمیمِ خودِ کاربر، با تأیید
+      st === "practised" && A.knotReturned && A.confirmBtn ? A.confirmBtn("↩ دوباره پیش آمد", function () {
+        A.knotReturned(k.id); A.toast("ثبت شد: «بازگشته». ماندگاری دوباره از نو سنجیده می‌شود؛ اگر خواستی موقعیتِ تازه را در گره‌گشا ثبت کن تا چرایی‌اش روشن شود."); A.render();
+      }) : null));
     var t = tab || "card";
     root.appendChild(A.tabs([["card", "کارت"], ["cases", "موقعیت‌ها (" + fa(A.knotCases(k.id).length) + ")"], ["links", "پیوندها"]], t, function (x) { A.go("knot", k.id, x); }));
     if (t === "cases") {
@@ -31520,7 +31524,9 @@ APP.goFromURL = function (q) {
       add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
       var ks = c.knot;
       add("ورزیده شد — با معیارِ خودِ گره‌گشا", ks.length && ks.every(knotSolved), false);
-      HOLD.forEach(function (n) { add("ماندگاری: " + fa(n) + " روز پس از ورزیدگی، بی‌بازگشت و هنوز درست", ks.length && ks.every(function (k) { return knotHeld(k, n); }), false); });
+      // تاریخِ هر وارسیِ ماندگاری دیده شود (کارزارِ آزمون sc17: تاریخِ ۹۰ روزه هیچ‌جا نبود)
+      var sv = ks.length && ks.every(knotSolved) ? ks.map(function (k) { return String(k.solvedAt).slice(0, 10); }).sort().pop() : "";
+      HOLD.forEach(function (n) { add("ماندگاری: " + fa(n) + " روز پس از ورزیدگی، بی‌بازگشت و هنوز درست" + (sv ? " (از " + (A.fdate ? A.fdate(plusDays(sv, n)) : plusDays(sv, n)) + ")" : ""), ks.length && ks.every(function (k) { return knotHeld(k, n); }), false); });
     } else if (f.kind === "claim") {
       var cs = c["case"][0], fin = cs && cs.st && cs.st.st_final;
       add("پروندهٔ سنجش در کارخانه ساخته شد", cs);
@@ -31607,10 +31613,12 @@ APP.goFromURL = function (q) {
     if (!n && t.facets.every(function (f) { return f.status === "done" || f.status === "skipped"; })) t.doneAt = t.doneAt || nowIso();
     return n || null;
   }
+  var BAD_AREA = [];
   function normFacet(x, i) {
     var k = KIND[x.kind] ? x.kind : "other";
     // حوزه از قلمروِ سامانه‌ها یا قلمروِ معرفت‌شناسی (a_…) — کارزارِ آزمون sc08: a_testimony و a_evidence وجهِ area نمی‌شدند
     var ar = x.area && A.SYST ? (A.SYST.byId ? A.SYST.byId(String(x.area)) : A.SYST.find(String(x.area))) : null, epi = ar && ar.epi;
+    if (x.area && !ar) BAD_AREA.push(String(x.area));
     if (ar && k === "other") k = "area";
     var dv = epi ? "e_bt" : KIND[k].view, ds = epi ? "terr" : KIND[k].sub || "";
     return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, area: ar ? ar.a.id : "", title: clip(x.title || x.name || x.t || (ar ? ar.a.fa : "") || KIND[k].fa, 120), why: clip(x.why || "", 300),
@@ -31621,7 +31629,7 @@ APP.goFromURL = function (q) {
   var DO = AS.DO;
   DO.tour_plan = function (a) {
     var s = AS._turnSession; if (!s || !Array.isArray(a.facets) || !a.facets.length) return "طرحِ تور خالی بود";
-    var fs = a.facets.slice(0, 10).map(normFacet);
+    BAD_AREA = []; var fs = a.facets.slice(0, 10).map(normFacet), bad = BAD_AREA.slice();
     if (!s.tour) {
       s.tour = { goal: clip(a.goal || s.pinned || "", 300), createdAt: nowIso(), facets: fs };
     } else {   // طرحِ تازه چیزی را بی‌صدا پاک یا بازنویسی نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
@@ -31640,7 +31648,9 @@ APP.goFromURL = function (q) {
         if (t.doneAt) { delete t.doneAt; delete t.doneSaid; delete t.masteredAt; }   // تورِ تمام‌شده با وجهِ تازه دوباره باز است
       }
     }
-    advance(s); return "";
+    advance(s);
+    // شناسهٔ حوزهٔ ناموجود بی‌صدا خالی نمی‌شود (کارزارِ آزمون sc17: md_catastrophizing نبود و وجه بی‌حوزه ماند)
+    return bad.length ? "حوزهٔ «" + bad.join("، ") + "» در قلمروها نیست — وجه بی حوزه ساخته شد؛ شناسهٔ درست را از «# دانسته‌های قلمرو» بردار یا با know بخواه" : "";
   };
   DO.tour_add = function (a) {
     // هر سه شکل پذیرفته می‌شود: {"facet":{…}}، فیلدهای تخت، یا {"facets":[…]} — و وجهِ تهی ساخته نمی‌شود (کارزارِ آزمون sc08: وجهِ «گامِ دیگر» بی نما)
@@ -31713,15 +31723,25 @@ APP.goFromURL = function (q) {
     }
     // وجهِ «حوزه» رکوردِ ابزارِ خودِ همان حوزه را می‌گیرد، حتی اگر وقتی ساخته شد وجه منتظرِ برگه یا در صف بود (کارزارِ آزمون sc14:
     // ارزش‌ها ساخته شد ولی وجهِ ارزش‌ها ۰ از ۳ ماند) — فقط رکوردهای پس از آغازِ تور و هنوز بی‌وجه
-    var AREA_TYPES = { sf_values: ["value", "meaning"], sf_meaning: ["meaning", "value"], md_catastrophizing: ["wchain"], md_worry_uncertainty: ["wchain"], md_anxiety_worry: ["wchain"],
-      dc_calibration_forecasting: ["fcast"], pr_calibration: ["fcast"], dc_planning_fallacy: ["fcast"] };
+    // نوعِ رکورد از ابزارهای خودِ حوزه در ثبت‌گاه می‌آید (view:chain ⇒ زنجیره، view:fcast ⇒ پیش‌بینی، view:vals ⇒ ارزش/معنا) — نه فهرستِ دستی
+    var VIEW_TYPES = { chain: ["wchain"], fcast: ["fcast"], vals: ["value", "meaning"] };
+    function areaTypes(id) { var x = A.SYST && A.SYST.find ? A.SYST.find(id) : null, out = []; ((x && x.a.tools) || []).forEach(function (tl) { var m = /^view:(\w+)$/.exec(tl); if (m && VIEW_TYPES[m[1]]) out = out.concat(VIEW_TYPES[m[1]]); }); return out.length ? out : null; }
     var t0 = t.createdAt || (t.facets[0] || {}).createdAt || "";
     t.facets.forEach(function (f) {
-      var typs = f.kind === "area" && f.status !== "done" && f.status !== "skipped" && AREA_TYPES[f.area]; if (!typs) return;
+      var typs = f.kind === "area" && f.status !== "done" && f.status !== "skipped" && f.area && areaTypes(f.area); if (!typs) return;
       typs.forEach(function (typ) { S.all(typ, function (r) { return !r.sample && String(r.created || r.date || "") >= t0; }).forEach(function (r) {
         if (t.facets.some(function (g) { return (g.refs || []).some(function (x) { return x.id === r.id; }); })) return;
         f.refs.push({ id: r.id, type: r.type, auto: true }); msgs.push("«" + clip(r.title || r.q || r.note || r.id, 40) + "» به وجهِ «" + f.title + "» وصل شد");
       }); });
+    });
+    // گرهِ ورزیده بازگشت ⇒ صریح گفته می‌شود و «تسلطِ کامل» پس گرفته می‌شود (کارزارِ آزمون sc17: بازگشت در تور دیده نمی‌شد)
+    t.facets.forEach(function (f) {
+      if (f.kind !== "knot" || f.status === "skipped") return;
+      children(f).knot.forEach(function (k) {
+        if (!k.returnedAt || (f.retSeen || "") >= k.returnedAt) return;
+        f.retSeen = k.returnedAt; if (t.masteredAt) { t.masteredAt = null; }
+        msgs.push("↩ گرهِ «" + clip(k.name || "گره", 40) + "» بازگشت — ورزیدگی و ماندگاری دوباره از نو سنجیده می‌شود (این شکست نیست؛ نشان می‌دهد کجا هنوز کار دارد)");
+      });
     });
     // پرونده‌ای که از دکمهٔ کارخانهٔ خودِ گره‌گشا ساخته شد (src = موقعیتِ همین تور) ⇒ به وجهِ ادعای همین تور
     var tourKc = {}; t.facets.forEach(function (f) { (f.refs || []).forEach(function (r) { if (r.type === "kcase") tourKc[r.id] = 1; }); });
@@ -31780,7 +31800,7 @@ APP.goFromURL = function (q) {
   AS.SYS += "\n" + [
     "# تور: مسئلهٔ چندوجهی",
     "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود. اگر «# تور» از پیش هست و موضوعِ تازه‌ای آمد، فقط وجه‌های تازه را با کلیدهای تازه (پس از آخرین کلید) بده — وجهِ انجام‌شده هرگز عوض نمی‌شود.",
-    "- پوشش: هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود — تصمیمی که به آن بند است (کار، پول، رابطه) ⇒ kind=area با area از s_decision (مثلاً dc_career_income، dc_risk_uncertainty)؛ دیگران درگیرند (مدیر، دوستان، همسر، جمع) ⇒ area از s_social؛ «این نوع را یاد بگیرم / دفعهٔ بعد حلش کنم» ⇒ learn و area از s_problem یا s_learn؛ معنا، ارزش، هویت ⇒ area از s_self (ابزارش «🧭 ارزش‌ها و معنا»، نمای vals). kind=problem فقط برای یک مسئلهٔ مشخص که در «مسئله‌های بزرگ» وارد می‌شود؛ تمرینِ حرکت‌ها یا خانواده‌های گیر ⇒ learn یا other با گام‌های خودش (نشانه‌های مسئلهٔ بزرگ بر آن نمی‌نشیند). حرفِ کاربر دربارهٔ تمرینی که «کرد» را با صفحه بسنج (پیشرفتِ ثبت‌شده)، نه با گفته. ترسِ زنجیره‌ای («اگر … آن‌گاه … آن‌گاه …») ⇒ kind=area با area md_catastrophizing یا md_worry_uncertainty و ابزارِ «⛓ زنجیرهٔ نگرانی» (نه kind=knot)؛ پیش‌بینیِ زمان‌دار ⇒ kind=area با «🎯 دفترِ پیش‌بینی». «دیدنِ» یک نما (کارنامه، نقشه) وجه نیست — همان‌جا ببر و در گفت‌وگو توضیح بده. kind=learn فقط برای یک موضوع در «موضوع‌ها» (topics)؛ دوره/درس‌های آماده (مثلاً «🧭 دورهٔ سنجش») ⇒ other با گام. حوزه‌های قلمروِ معرفت‌شناسی (a_…) هم kind=area با همان شناسه‌اند؛ kind=territory فقط برای حوزه‌ای که نیست یا گامش ۰/۱ است و برگه‌اش با «facet» ثبت می‌شود. وجهِ area با \"area\":\"<شناسهٔ حوزه از قلمروِ سامانه‌ها>\" ساخته می‌شود و ابزارهای همان حوزه را به کار می‌برد. اگر جنبه‌ای را وجه نمی‌کنی، در reply یک جمله بگو چرا. حوزه‌ای که کاربر همین حالا مستقیم درباره‌اش می‌پرسد و گامش ۰ یا ۱ است (در هر قلمرو) = «الان لازم دارد» ⇒ gap با kind=priority، و تا آن وقت از «# دانسته‌های قلمرو» آنچه هست بگو.",
+    "- پوشش: هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود — تصمیمی که به آن بند است (کار، پول، رابطه) ⇒ kind=area با area از s_decision (مثلاً dc_career_income، dc_risk_uncertainty)؛ دیگران درگیرند (مدیر، دوستان، همسر، جمع) ⇒ area از s_social؛ «این نوع را یاد بگیرم / دفعهٔ بعد حلش کنم» ⇒ learn و area از s_problem یا s_learn؛ معنا، ارزش، هویت ⇒ area از s_self (ابزارش «🧭 ارزش‌ها و معنا»، نمای vals). kind=problem فقط برای یک مسئلهٔ مشخص که در «مسئله‌های بزرگ» وارد می‌شود؛ تمرینِ حرکت‌ها یا خانواده‌های گیر ⇒ learn یا other با گام‌های خودش (نشانه‌های مسئلهٔ بزرگ بر آن نمی‌نشیند). حرفِ کاربر دربارهٔ تمرینی که «کرد» را با صفحه بسنج (پیشرفتِ ثبت‌شده)، نه با گفته. ترسِ زنجیره‌ای («اگر … آن‌گاه … آن‌گاه …») ⇒ kind=area با area md_worry_uncertainty یا md_anxiety_fear و ابزارِ «⛓ زنجیرهٔ نگرانی» (نه kind=knot)؛ پیش‌بینیِ زمان‌دار ⇒ kind=area با «🎯 دفترِ پیش‌بینی». «دیدنِ» یک نما (کارنامه، نقشه) وجه نیست — همان‌جا ببر و در گفت‌وگو توضیح بده. kind=learn فقط برای یک موضوع در «موضوع‌ها» (topics)؛ دوره/درس‌های آماده (مثلاً «🧭 دورهٔ سنجش») ⇒ other با گام. حوزه‌های قلمروِ معرفت‌شناسی (a_…) هم kind=area با همان شناسه‌اند؛ kind=territory فقط برای حوزه‌ای که نیست یا گامش ۰/۱ است و برگه‌اش با «facet» ثبت می‌شود. وجهِ area با \"area\":\"<شناسهٔ حوزه از قلمروِ سامانه‌ها>\" ساخته می‌شود و ابزارهای همان حوزه را به کار می‌برد. اگر جنبه‌ای را وجه نمی‌کنی، در reply یک جمله بگو چرا. حوزه‌ای که کاربر همین حالا مستقیم درباره‌اش می‌پرسد و گامش ۰ یا ۱ است (در هر قلمرو) = «الان لازم دارد» ⇒ gap با kind=priority، و تا آن وقت از «# دانسته‌های قلمرو» آنچه هست بگو.",
     "- آزمونی که چند روز وقت می‌خواهد (مقایسهٔ دو روش، صبر تا رخداد) را بی‌موعد رها نکن: «⏳ آزمایشِ واقعی» ِ گره‌گشا یا «🎯 دفترِ پیش‌بینی» با موعد بساز تا در «امروز» بیاید.",
     "- ترتیب، به همین اولویت: (۱) ایمنی و حالِ کاربر؛ (۲) وابستگی: وجهی که خروجی‌اش ورودیِ دیگری است اول (ریشهٔ گیر پیش از شبیه‌سازِ همان مسئله؛ ریشهٔ یک ترس پیش از سنجشِ پیش‌بینی‌ای که از آن برخاسته — مگر تصمیمی همین روزها به آن پیش‌بینی بند باشد، که آن‌گاه سنجشِ ادعا اول)؛ (۳) آنچه زمان‌دار است زودتر؛ (۴) فهمیدنِ عمیقِ مفهومِ مشترک پیش از تمرینِ تخصصی؛ (۵) وجهِ territory جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و ادامه بده. اگر ادعا از ریشهٔ گره درمی‌آید، پرونده‌اش را با دکمهٔ «🏭 این برداشت را در کارخانه بسنج» ِ خودِ گره‌گشا بساز — سامانه آن را به وجهِ ادعا وصل می‌کند؛ از میزِ کار دوباره نساز.",
     "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",
@@ -32221,6 +32241,8 @@ APP.goFromURL = function (q) {
       var dys = X.ans.concat(X.cal).map(function (a) { return String(a.at || "").slice(0, 10); }).filter(Boolean).sort();
       X.spread = dys.length ? A.daysBetween(dys[0], dys[dys.length - 1]) : 0;
       if (X.score != null && X.score >= 65 && X.spread < 3) X.band = "در حالِ رشد · تک‌نوبت";
+      // گرهِ بازگشته در همین بُعد ⇒ «استوار» نیست (کارزارِ آزمون sc17: پس از بازگشت «۹۸ · استوار» ماند)
+      if (X.band === "استوار" && (X.knots.returned || 0) > 0) X.band = "ورزیده · گرهِ بازگشته";
       /* روندِ ماهانه: دقت و کالیبراسیونِ هر ماه (نمونهٔ ماه ≥ ۳) */
       var bym = {}; X.ans.forEach(function (a) { var m = month(a.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).n++; if (a.ok) bym[m].ok++; });
       X.cal.forEach(function (c) { var m = month(c.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).cal.push(c); });
@@ -32436,7 +32458,7 @@ APP.goFromURL = function (q) {
   var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
   if (!AS) return;
   var R = A.REPORT = {};
-  var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet)$/;
+  var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen)$/;
   function nowIso() { return new Date().toISOString(); }
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function clip(x, n) { x = String(x || "").replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
@@ -32473,7 +32495,9 @@ APP.goFromURL = function (q) {
     return out;
   }
   R.scores = scores;
-  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
+  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt,
+    // کدام نشانه‌ها ✓ است (بی شمارهٔ پرانتزی) — تا ایمیل بگوید دقیقاً چه تازه شد یا دوباره باز شد (کارزارِ آزمون sc17: ماندگاریِ ۳۰ روزه و بازگشت گم بود)
+    ms: (function () { var o = {}; t.facets.forEach(function (f) { o[f.key] = AS.tourMilestones(f).filter(function (m) { return m.ok; }).map(function (m) { return m.t.replace(/\s*\([^)]*\)\s*$/, ""); }); }); return o; })() }; }
   function events(s, before) {
     var t = s.tour, ev = [], b = before || { st: "", done: false, m: false };
     if (!before) ev.push({ k: "plan", fa: "تورِ تازه با " + fa(t.facets.length) + " وجه: " + t.facets.map(function (f) { return "«" + f.title + "»"; }).join("، ") });
@@ -32486,7 +32510,12 @@ APP.goFromURL = function (q) {
       // موضوعِ ایمیل کوتاه و بی اصطلاحاتِ داخلی؛ دلیلِ فنی فقط در متن (کارزارِ آزمون: موضوع‌ها «deferred»، «sf_values گامِ ۰» داشتند)
       var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: c.ok ? "✅ آنچه برای «" + f.title + "» کم بود ساخته شد" : c.lag ? "⏳ ساخته‌شدنِ «" + f.title + "» هنوز دیده نمی‌شود" : "↩ ساختِ «" + f.title + "» هنوز درست نیست؛ پیگیری کردم", detail: clip(c.reason, 300) }); }
       var okN = AS.tourMilestones(f).filter(function (m) { return m.ok; }).length;
-      if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
+      // آخرین وضعِ ثبت‌شده (پس از نوبتِ پیش) — تا تغییرِ بیرون از نوبت هم (مثلاً «↩ دوباره پیش آمد») دیده شود
+      var was = (t.lastMs || b.ms || {})[f.key], now = AS.tourMilestones(f).filter(function (m) { return m.ok; }).map(function (m) { return m.t.replace(/\s*\([^)]*\)\s*$/, ""); });
+      if (o && was && f.status !== "skipped") {
+        now.filter(function (x) { return was.indexOf(x) < 0; }).forEach(function (x) { if (!(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ «" + f.title + "»: " + x, detail: "✓ " + x }); });
+        was.filter(function (x) { return now.indexOf(x) < 0; }).forEach(function (x) { ev.push({ k: "reopen", fa: "↩ «" + f.title + "»: «" + x + "» دوباره باز شد", detail: "این نشانه از روی داده‌ها دیگر برقرار نیست (مثلاً گره بازگشت) — دوباره سنجیده می‌شود" }); });
+      } else if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
     });
     if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 همهٔ وجه‌ها به ترتیب طی شد" });
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
@@ -32494,7 +32523,7 @@ APP.goFromURL = function (q) {
   }
   R.note = function (s, before, noFlush) {
     if (!s || !s.tour) return;
-    var ev = events(s, before);
+    var ev = events(s, before); try { s.tour.lastMs = snap(s.tour).ms; } catch (e) { }
     if (ev.length) { s.tour.mailq = (s.tour.mailq || []).concat(ev.map(function (e) { e.at = nowIso(); return e; })).slice(-40); S.put(s); }
     // طرحِ تور پیش از کارهای همان نوبت ساخته می‌شود ⇒ فرستادن پس از نوبت (تا گزارش وضعِ واقعیِ پس از کارها را بگوید — کارزارِ آزمون)
     if (!noFlush && (s.tour.mailq || []).length) R.flush(s, (s.tour.mailq || []).some(function (e) { return BIG.test(e.k); }));
@@ -32617,11 +32646,11 @@ APP.goFromURL = function (q) {
   };
 })(APP);
 /* ===== دو ابزارِ تازه برای کمبودهای «🗺 قلمروِ سامانه‌ها» (۲۰۲۶-۱۰-۱۴) =====
-   ۱) «⛓ زنجیرهٔ نگرانی» (کمبودِ md_catastrophizing / md_anxiety_worry / dc_career_income): ترسی مثلِ «کارم را از دست می‌دهم ⇒ هیچ‌وقت کار پیدا
+   ۱) «⛓ زنجیرهٔ نگرانی» (کمبودِ md_worry_uncertainty / md_anxiety_fear / dc_career_income): ترسی مثلِ «کارم را از دست می‌دهم ⇒ هیچ‌وقت کار پیدا
       نمی‌کنم ⇒ نابود می‌شوم» به حلقه‌ها شکسته می‌شود؛ هر حلقه احتمالی دارد. بر پایهٔ اصول: کلِ زنجیره از ضعیف‌ترین حلقه محتمل‌تر نیست (A1،
       T_weakest) و با حلقه‌های مستقل حاصل‌ضرب است (A3، T_product). کنارِ «حسِ اول» ِ خودت گذاشته می‌شود؛ حلقه‌هایی که در دستِ توست جدا می‌شوند؛
       در موعد نتیجهٔ واقعی ثبت می‌شود و به کالیبراسیونِ «ذهن و هیجان» در «🧠 کارنامهٔ ذهن» می‌رود.
-   ۲) «🎯 دفترِ پیش‌بینی» (کمبودِ dc_calibration_forecasting / pr_calibration / ln_metacognition_jol / sf_blind_spots): پیش‌بینیِ زندگی با احتمال و
+   ۲) «🎯 دفترِ پیش‌بینی» (کمبودِ dc_calibration_forecasting / pr_calibration_forecasting / ln_metacognition_jol / sf_blind_spots): پیش‌بینیِ زندگی با احتمال و
       موعد؛ در موعد «شد/نشد» ⇒ امتیازِ Brier (قضیه: میانگینِ مربعِ فاصلهٔ احتمال تا رخداد، A2/A3) و نمودارِ کالیبراسیون در کارنامه.
    هر دو رکوردِ معمولی‌اند (S.put) و در «امروز» موعدشان می‌آید. */
 (function (A) {
