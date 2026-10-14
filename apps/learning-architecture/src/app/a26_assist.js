@@ -66,6 +66,21 @@
     if (A.KF) L.push("- خانواده‌های گره: " + names(A.KF, "id", "fa"));
     if (A.MOVE_LIST) L.push("- حرکت‌های حلِ مسئله: " + names(A.MOVE_LIST, "id", "fa"));
     if (A.C && A.C.PROTOCOLS) L.push("- روال‌ها (view=proto arg=id): " + names(A.C.PROTOCOLS, "id", "fa"));
+    var LG = window.EPI_BT_LEDGER || {}, OW = LG.ownership;
+    if (OW && OW.areas) {
+      L.push("## چه کسی مسئولِ چیست (docs/supervisor/ownership.json — همان نقشه‌ای که روتین‌ها از آن پیروی می‌کنند)");
+      OW.areas.forEach(function (a) {
+        var os = [].concat(a.owner || []).map(function (o) { var r = (OW.routines || {})[o] || {}; return (r.fa || o) + (r.cadence ? " (" + r.cadence + ")" : ""); }).join(" + ");
+        L.push("- area=" + a.id + " — " + a.fa + " — مالک: " + os + (a.executor ? " — اجراکنندهٔ پس از تصمیمِ مالک: " + a.executor : "") + (a.rule ? " — " + a.rule : ""));
+      });
+    }
+    var TE = window.EPI_TERR, TL = (LG.territory || {}).areas || {};
+    if (TE && TE.groups) {
+      L.push("## قلمروِ معرفت‌شناسی — هر حوزه و گامِ پیشرفتش (۰ نقشه‌شده … ۵ تثبیت‌شده؛ روتینِ بک‌تست هر شب جلو می‌برد)");
+      TE.groups.forEach(function (g) { L.push("- " + g.fa + ": " + g.areas.map(function (a) { var st = (TL[a.id] || {}).stage || 0; return a.id + "=" + a.fa + ":" + st; }).join("، ")); });
+    }
+    var PR = ((LG.proposals || {}).proposals || []).filter(function (p) { return !p.applied && !p.withdrawn && !p.supersededBy && !S.get("ebtp_" + p.id); });
+    if (PR.length) L.push("## پیشنهادهای منتظرِ تصمیمِ مالک (view=e_bt): " + PR.map(function (p) { return p.id + " «" + clip(p.title, 60) + "»"; }).join("، "));
     var E = AS.entities();
     L.push("## دادهٔ خودِ کاربر (برای بازکردن: view و arg همین‌جا)");
     if (!E.length) L.push("- هنوز چیزی ثبت نکرده.");
@@ -215,6 +230,15 @@
     });
   };
 
+  /* ---------- برگه‌های بازِ همین صفحه (تا برگهٔ تکراری ساخته نشود و دستیار بداند چه در صف است) ---------- */
+  var sheetCache = { at: 0, list: [] };
+  AS.openSheets = function () {
+    if (!(A.HOST && A.HOST.sheets)) return Promise.resolve([]);
+    if (Date.now() - sheetCache.at < 120000) { AS._sheets = sheetCache.list; return Promise.resolve(sheetCache.list); }
+    return Promise.resolve(A.HOST.sheets()).then(function (l) { sheetCache = { at: Date.now(), list: (l || []).filter(function (x) { return x.status !== "filed"; }) }; AS._sheets = sheetCache.list; return sheetCache.list; }, function () { return []; });
+  };
+  function sheetsText(l) { return l.length ? l.slice(0, 60).map(function (x) { return "#" + x.number + " «" + clip(x.title, 90) + "» [" + x.status + (x.urgent ? "، فوری" : "") + "]"; }).join(" · ") : "(هیچ برگهٔ بازی نیست)"; }
+
   /* ---------- سشن‌ها ---------- */
   AS.sessions = function () { var c = store("cur"); return S.all(TYPE, function (x) { return (x.msgs || []).length || x.id === c; }).sort(function (a, b) { return String(b.updated || "").localeCompare(String(a.updated || "")); }); };
   AS.newSession = function () {
@@ -237,7 +261,9 @@
     "- قدم‌به‌قدم مثلِ خودِ کاربر: وقتی فیلدهای لازمِ یک فرم از حرف‌ها و فایل‌های خودِ او پر شد، دکمهٔ ثبت/ساخت/بعدیِ همان فرم را click کن و بگو چه کردی؛ اگر چیزی مانده، هایلایت کن و یک پرسشِ کوتاه بپرس. تصمیم‌های مالک (بپذیر/رد کن/تأیید/ریشه را تأیید کن) و حذف را هرگز نزن — هایلایت کن.",
     "- پیوست‌ها: متنِ کاملِ هر فایل (Word، Excel، PDF، صوت/ویدیو با رونویسیِ کامل، ZIP…) و خودِ تصویرها همراهِ همان نوبت می‌آید؛ همه‌اش را بخوان و فقط از همان‌ها نقل کن. در نوبت‌های بعد اگر دوباره به محتوای فایلی لازم داری، reread:[id] بده. اگر فایلی «خوانده نشد»، صادقانه بگو.",
     "- حرفِ نامربوط (بیرون از یادگیری، معرفت‌شناسی/سنجشِ ادعا، گره‌گشایی/حلِ مسئله و کار با همین صفحه): status=\"unrelated\" و مؤدبانه بگو به این‌جا ربطی ندارد و در یک جمله بگو چه کمکی از این‌جا برمی‌آید.",
-    "- کمبودِ سامانه: اگر خواسته در قلمروِ همین صفحه است ولی هیچ نما/فرمی آن را پوشش نمی‌دهد (یا ناقص است)، status=\"gap\" و gap را کامل پر کن: مسئلهٔ کاربر را تکرار نکن؛ نیاز را انتزاع کن (این دسته از خواسته‌ها و نمونه‌های مشابه)، دقیق بگو چه چیزی کم است، کجا (کدام نما/فایل/ثبت‌گاه)، چطور افزوده شود، و با کدام بخش‌ها پیوند دارد. به کاربر هم بگو برگهٔ فوری ثبت شد و تا آن موقع نزدیک‌ترین راهِ موجود چیست.",
+    "- **تو پزشکِ عمومیِ این سامانه‌ای: پیش از هر ارجاع تشخیصِ افتراقی کن.** (۱) خواستهٔ واقعیِ کاربر را از ظاهرِ حرفش جدا کن؛ (۲) دست‌کم دو بخش/قلمروِ نامزد را از «نقشهٔ سامانه» نام ببر و برای هر کدام شاهد بیاور که هست یا نیست (نما، فرم، قلمروِ معرفت‌شناسی با گامش، پیشنهادِ منتظر، برگهٔ باز)؛ (۳) فقط بعد تصمیم بگیر. اشتباه در ارجاع، متخصص را به بیراهه می‌برد.",
+    "- اگر بخشی هست ⇒ کاربر را همان‌جا ببر (اگر به چند بخش مربوط است، ترتیب و دلیلِ هر کدام). اگر هست ولی هنوز کامل نیست و در نقشهٔ کارِ یک روتین است (مثلاً حوزهٔ قلمرو در گامِ ۱) ⇒ صادقانه بگو کجای راه است و چه کسی و کِی جلو می‌برد؛ فقط اگر کاربر الان لازمش دارد، kind=\"priority\". اگر بخش هست ولی غلط کار می‌کند ⇒ kind=\"fix\". فقط اگر واقعاً نیست ⇒ kind=\"build\".",
+    "- کمبودِ سامانه (status=\"gap\"): خواسته در قلمروِ همین صفحه است و تشخیصِ بالا نشان داد پوشش داده نمی‌شود. gap را کامل پر کن: area دقیقاً یکی از شناسه‌های «چه کسی مسئولِ چیست»؛ kind؛ abstract (نیازِ کلی — این دسته از خواسته‌ها و نمونه‌های مشابه، نه تکرارِ مسئلهٔ کاربر)؛ missing (دقیقاً چه کم است)؛ where؛ how؛ relations؛ docs؛ why_area (چرا همین قلمرو)؛ why_not (چرا نه نامزدهای دیگر)؛ evidence (چه در نقشه نشان می‌دهد نیست)؛ confidence (۰ تا ۱). اگر confidence کمتر از ۰٫۷۵ است برگه نخواه — یک پرسشِ روشن‌کننده از کاربر بپرس. اگر برگهٔ بازی همین را می‌گوید، برگهٔ تازه نخواه و شماره‌اش را بگو. ثبتِ نهایی پس از نظرِ دوم (مشاور) است؛ به کاربر بگو «برای ثبت بررسی می‌کنم».",
     "- حافظه: memory خلاصهٔ انباشتهٔ کلِ همین سشن است از اولین پیام تا حالا (هدف، از کجا آمدیم، تصمیم‌ها، آنچه پر و ثبت شد و کجا، نکته‌های کلیدیِ فایل‌ها، آنچه مانده) — هر بار کاملش را برگردان، چیزی را نینداز.",
     "- pinned: خواستهٔ اصلیِ سشن در یک جمله (نوبتِ اول بساز؛ بعداً فقط اگر خواستهٔ اصلی واقعاً عوض شد).",
     "- steps: فهرستِ کاملِ مراحلِ رسیدن به خواستهٔ اصلی با وضعِ هر کدام (done/now/todo) و نمای هر کدام.",
@@ -245,7 +271,7 @@
     '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap",' +
     '"steps":[{"t":"…","s":"done|now|todo","view":"…"}],' +
     '"actions":[{"do":"go","view":"…","arg":"…","sub":"…"},{"do":"fill","k":"k3","value":"…"},{"do":"highlight","k":"k5","why":"…"},{"do":"click","k":"k9"},{"do":"attach","k":"k7","fileIds":[12]}],' +
-    '"reread":[12],"gap":{"title":"…","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…"}}'
+    '"reread":[12],"gap":{"title":"…","area":"…","kind":"build|priority|fix","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…","why_area":"…","why_not":"…","evidence":"…","confidence":0.9}}'
   ].join("\n");
   AS.SYS = SYS;
   /* نسخهٔ مستقل (بی میزبان): فایلِ متنی را خودِ مرورگر کامل می‌خواند. در Lifemanager سرور هر قالبی را کامل می‌خواند (app_reading). */
@@ -271,6 +297,7 @@
     if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]" + (x.view ? " (" + x.view + ")" : ""); }).join(" "));
     if (s.files && s.files.length) L.push("پیوست‌های سشن (id=نام): " + s.files.map(function (f) { return f.id + "=" + f.name; }).join("، ") + " — اگر برای پاسخ دوباره به محتوای یکی لازم داری، reread بده.");
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
+    L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
     L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
     history(s, skipLast).forEach(function (x) { L.push(x); });
     L.push("", "# نوبتِ تازه", msg);
@@ -305,21 +332,35 @@
 
   /* ---------- کمبود ⇒ برگهٔ فوری در «نظارت و سرکشی» ---------- */
   function norm(t) { return String(t || "").replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, "").slice(0, 60); }
+  function areaInfo(id) {
+    var OW = (window.EPI_BT_LEDGER || {}).ownership || { areas: [], routines: {} };
+    var ar = OW.areas.filter(function (x) { return x.id === id; })[0];
+    if (!ar) return null;
+    var who = [].concat(ar.owner || []).map(function (o) { var r = OW.routines[o] || {}; return (r.fa || o) + (r.cadence ? " — " + r.cadence : "") + (r.prompt ? " — دستور: " + r.prompt : ""); }).join(" + ");
+    return { ar: ar, who: who };
+  }
+  AS.areaInfo = areaInfo;
+  var KIND_FA = { build: "ساختنِ چیزی که نیست", priority: "جلو انداختنِ کاری که در نقشهٔ کارِ روتینِ مالک هست", fix: "اصلاحِ بخشی که هست ولی درست کار نمی‌کند" };
   AS.reportText = function (s, g) {
     var sp = (A.state.view || "") + (A.state.arg != null ? " / " + A.state.arg : "");
+    var ai = areaInfo(g.area) || areaInfo("lla-page") || { ar: { id: g.area || "?", fa: "؟" }, who: "؟" };
     return [
-      "[دستیار · کمبودِ سامانه] " + clip(g.title || s.pinned || "کمبودِ سامانه", 110),
+      "[دستیار · کمبودِ سامانه · قلمرو: " + ai.ar.id + " · " + (g.kind || "build") + "] " + clip(g.title || s.pinned || "کمبودِ سامانه", 100),
       "",
-      "ثبت‌شده توسط «💬 دستیار» (نه مستقیمِ مالک) — سشن «" + (s.title || s.id) + "» (" + s.id + ")، هنگامِ کار روی نمای " + sp + ". روال‌های دیگر: این را ببینید و اگر برداشتِ دستیار نادرست است، همین‌جا اصلاح کنید.",
+      "ثبت‌شده توسط «💬 دستیار» (نه مستقیمِ مالک) — سشن «" + (s.title || s.id) + "» (" + s.id + ")، هنگامِ کار روی نمای " + sp + ". روال‌های دیگر: برداشتِ دستیار را درست فرض نکنید؛ بسنجید و اگر نادرست است همین‌جا اصلاح کنید.",
       "",
+      "■ قلمرو و مالک: «" + ai.ar.fa + "» (`" + ai.ar.id + "`) — مالک: " + ai.who + (ai.ar.rule ? " — " + ai.ar.rule : "") + (ai.ar.procedure ? " — بخشِ دستور: " + ai.ar.procedure : ""),
+      "■ نوع: " + (KIND_FA[g.kind] || KIND_FA.build),
       "■ نیازِ انتزاعی (این دسته از خواسته‌ها، نه فقط مسئلهٔ مالک): " + (g.abstract || "—"),
       "■ دقیقاً چه کم است: " + (g.missing || "—"),
       "■ کجا افزوده شود: " + (g.where || "—"),
       "■ چطور: " + (g.how || "—"),
       "■ پیوند با بخش‌های دیگر: " + (g.relations || "—"),
+      "■ تشخیصِ افتراقیِ دستیار: چرا این قلمرو — " + (g.why_area || "—") + " · چرا نه بقیه — " + (g.why_not || "—") + " · شاهد — " + (g.evidence || "—") +
+        " · اطمینان " + (g.confidence != null ? g.confidence : "?") + " · نظرِ دوم (مدلِ استدلالی): " + (g.consult || "در دسترس نبود — با دقتِ بیشتر بسنجید"),
       "■ مستنداتی که باید به‌روز شوند: " + (g.docs || "WORKLOG، HANDBOOK، AGENTS.md") + " — به‌علاوهٔ همیشگی‌ها: ورودیِ VIEW_META/ثبت‌گاه برای هر نما یا قابلیتِ تازه (تا دستیار خودکار بشناسدش)، WORKLOG (n)، ردیفِ PROGRESS، بخش و §۱۰/§۱۲ ِ HANDBOOK، docs/overhaul/AUDIT_LOG.md.",
       "",
-      "■ هماهنگی با روال‌ها: پیش از ساختن، کارِ در جریانِ روالِ بک‌تست (docs/supervisor/BACKTEST_PROMPT.md) و برگه‌های باز را ببینید تا دوباره‌کاری یا تعارض پیش نیاید؛ اگر به قاعده/سقف/ایستگاه/وزن دست می‌زند، فقط پیشنهاد بدهید (تصمیمِ مالک). پس از انجام، در WORKLOG بنویسید «پاسخ به برگهٔ دستیار» تا روالِ عمومی و بک‌تست ببینند و اگر خطایی بود اصلاح کنند.",
+      "■ روالِ رسیدگی (بخشِ «هماهنگی میانِ روتین‌ها» در هر سه دستور): ۱) `python3 scripts/supervisor/handoff.py precheck --area " + ai.ar.id + " --sheet <شمارهٔ همین برگه>` — اگر روتینِ مالک همین را انجام داده، دوباره‌کاری نکنید؛ با ارجاع به دور/کامیتش جواب دهید و `--kind owner-did` ثبت کنید. ۲) اگر قلمرو مالِ روتینِ دیگری است: یا دقیقاً با دستورِ همان روتین (همان ابزار، همان نگهبان‌ها و بازبینیِ مستقل) و `handoff.py add --kind did`، یا اگر خط‌لولهٔ آن روتین لازم است `--kind request` تا خودش در دورِ بعدش انجام دهد و زیرِ همین برگه جواب بنویسد. ۳) قلمروِ تصمیمِ مالک (قاعده، سقف، ایستگاه، وزن، متنِ جزوه) ⇒ فقط پیشنهاد. ۴) در WORKLOG بنویسید «پاسخ به برگهٔ دستیار #n — دست‌به‌دست h…».",
       "",
       "■ حرفِ مالک در این سشن (برای زمینه): " + clip(s.pinned || "", 300)
     ].join("\n").slice(0, 7900);
@@ -332,11 +373,51 @@
     var text = AS.reportText(s, g);
     if (!A.HOST || !A.HOST.report) { s.reports.push({ key: key, title: clip(g.title, 80), at: now(), local: true, text: text }); S.put(s); return Promise.resolve({ local: true }); }
     var q = "?tab=" + encodeURIComponent(A.state.view || "") + (A.state.arg != null ? "&a=" + encodeURIComponent(A.state.arg) : "") + (A.state.sub ? "&s=" + encodeURIComponent(A.state.sub) : "");
-    var spot = { page: "/apps/learning-architecture", page_label: "معماری یادگیری عمیق", section_id: "assistant", section_label: "💬 دستیار — " + labelOf(A.state.view),
+    var spot = { page: "/apps/learning-architecture", page_label: "معماری یادگیری عمیق", section_id: "assistant:" + (g.area || "lla-page"), section_label: "💬 دستیار — " + ((areaInfo(g.area) || {}).ar || {}).fa + " — " + labelOf(A.state.view),
       reopen: "/apps/learning-architecture" + q, dom_path: ".as-root", covered_text: clip(s.pinned || g.title, 400) };
     var files = (s.files || []).map(function (f) { return blobs[f.id]; }).filter(Boolean);
     return A.HOST.report({ text: text, spot: spot, urgent: true, files: files }).then(function (r) {
-      s.reports.push({ key: key, id: r.id, number: r.number, title: clip(g.title, 80), at: now() }); S.put(s); return r;
+      s.reports.push({ key: key, id: r.id, number: r.number, title: clip(g.title, 80), area: g.area, kind: g.kind, at: now() }); S.put(s); return r;
+    });
+  };
+
+  /* ---------- نظرِ دوم پیش از ارجاع (پزشکِ عمومی ⇒ مشاورِ ارشد): مدلِ استدلالیِ خودِ صفحه، فقط وقتی دستیار می‌خواهد برگه ثبت کند ---------- */
+  var CONSULT_SYS = "تو مشاورِ ارشدِ ارجاع در سامانهٔ «معماری یادگیری عمیق و کارخانهٔ معرفت‌شناسی» هستی. دستیارِ گفت‌وگو (پزشکِ عمومی) می‌خواهد برای یک کمبود برگهٔ فوری در «نظارت و سرکشی» ثبت کند. با «نقشهٔ سامانه»، «چه کسی مسئولِ چیست»، قلمروِ معرفت‌شناسی (با گام‌ها)، پیشنهادهای منتظر و برگه‌های باز، تشخیصِ او را سخت‌گیرانه بسنج: آیا واقعاً نیست (یا بخشی هست که او ندیده)؟ آیا در نقشهٔ کارِ یک روتین است (priority) یا خراب است (fix)؟ قلمرو درست است؟ برگهٔ بازی همین را نمی‌گوید؟ ارجاعِ غلط متخصص را به بیراهه می‌برد. فقط JSON: {\"agree\":true|false,\"area\":\"…\",\"kind\":\"build|priority|fix\",\"dup_of\":null,\"reason\":\"یک تا سه جملهٔ فارسی\",\"fix\":{\"abstract\":\"…\",\"missing\":\"…\",\"where\":\"…\",\"how\":\"…\",\"relations\":\"…\"}} — در fix فقط آنچه را باید عوض شود بنویس.";
+  AS.CONSULT_SYS = CONSULT_SYS;
+  AS.consult = function (s, g) {
+    var users = s.msgs.filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return "- " + clip(m.text, 800); }).join("\n");
+    var u = "# نقشهٔ سامانه\n" + AS.manifest() + "\n\n# برگه‌های باز\n" + sheetsText(AS._sheets || []) +
+      "\n\n# سشن\nخواستهٔ اصلی: " + (s.pinned || "") + "\nحافظه: " + (s.memory || "") + "\nپیام‌های اخیرِ کاربر:\n" + users +
+      "\n\n# تشخیصِ دستیار\n" + JSON.stringify(g);
+    return A.callAI(CONSULT_SYS, u, { task: "learning_architecture", maxTokens: 3000 }).then(function (t) {
+      var o = (A.parseJSONLoose || JSON.parse)(typeof t === "object" ? t.text : t);
+      if (!o || typeof o.agree !== "boolean") throw new Error("نظرِ دوم ناخوانا بود");
+      return o;
+    });
+  };
+  function validArea(id) { return !!areaInfo(id); }
+  /* تصمیمِ نهایی برای یک «gap»: اطمینانِ کم ⇒ نه؛ برگهٔ باز ⇒ نه؛ نظرِ دوم مخالف ⇒ نه؛ موافق ⇒ با اصلاح‌های مشاور ثبت */
+  function isDup(s, g) {
+    var key = norm(g.title || s.pinned), since = Date.now() - 30 * 864e5;
+    return AS.sessions().concat([s]).some(function (x) { return (x.reports || []).some(function (r) { return r.key === key && Date.parse(r.at || 0) > since; }); });
+  }
+  AS.triage = function (s, g) {
+    if (isDup(s, g)) return Promise.resolve({ skip: "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." });
+    var conf = +g.confidence;
+    if (!(conf >= 0.75)) return Promise.resolve({ skip: "اطمینانِ دستیار کم بود (" + (isNaN(conf) ? "?" : conf) + ")؛ برگه ثبت نشد — اول باید روشن شود." });
+    return AS.consult(s, g).then(function (c) {
+      if (c.dup_of) return { skip: "نظرِ دوم: همین در برگهٔ #" + fa(c.dup_of) + " هست؛ برگهٔ تازه ثبت نشد." };
+      if (!c.agree) return { skip: "نظرِ دوم: برگه لازم نیست — " + (c.reason || "") };
+      var out = Object.assign({}, g, c.fix || {});
+      if (c.area && validArea(c.area)) out.area = c.area;
+      if (c.kind) out.kind = c.kind;
+      out.consult = "موافق" + (c.area && c.area !== g.area ? " (قلمرو اصلاح شد: " + g.area + " ⇒ " + c.area + ")" : "") + " — " + (c.reason || "");
+      if (!validArea(out.area)) out.area = "lla-page";
+      return { gap: out };
+    }, function (e) {
+      // مشاور در دسترس نیست: فقط تشخیصِ بسیار مطمئن، و با نشانِ «بی نظرِ دوم» تا روتین‌ها سخت‌گیرانه‌تر بسنجند
+      if (conf >= 0.9 && validArea(g.area)) return { gap: Object.assign({}, g, { consult: "در دسترس نبود (" + errText(e) + ")" }) };
+      return { skip: "نظرِ دوم در دسترس نبود و اطمینان برای ثبتِ بی‌مشاوره کافی نبود؛ برگه ثبت نشد (" + errText(e) + ")." };
     });
   };
 
@@ -375,7 +456,7 @@
     var auto = 0;
     function turn(msg, extra, ids, first) {
       var sc = AS.scan();
-      return ask(SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }).then(function (o) {
+      return AS.openSheets().then(function (l) { AS._sheets = l; return ask(SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
         if (o.title && !s.title) s.title = clip(o.title, 80);
         if (o.pinned && (!s.pinned || o.pinned !== s.pinned)) s.pinned = clip(o.pinned, 300);
@@ -386,7 +467,11 @@
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a); if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
         S.put(s); paint();
-        var gap = s.status === "gap" && o.gap ? AS.fileGap(s, o.gap).then(function (r) {
+        var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
+          if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
+          sheetCache.at = 0;
+          return AS.fileGap(s, t.gap);
+        }).then(function (r) {
           if (!r) return;
           s.msgs.push({ role: "sys", at: now(), text: r.dup ? "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." : r.local ? "برگه ساخته شد ولی این نسخه به «نظارت و سرکشی» وصل نیست؛ متنش در سشن ماند." : "🛎 برگهٔ فوری #" + fa(r.number) + " در «نظارت و سرکشی» ثبت شد." });
           S.put(s); paint();

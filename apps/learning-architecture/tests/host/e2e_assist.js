@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
   chk(await p.locator('.as-fab').count() === 1, 'assistant button in the host page');
   info.rep = await p.evaluate(async () => {
     const s = APP.ASSIST.newSession(); s.title = 'آزمونِ دستیار'; s.pinned = 'سنجشِ پیش‌بینیِ عددی'; APP.S.put(s);
-    const r = await APP.ASSIST.fileGap(s, { title: 'سنجشِ پیش‌بینی‌های عددی', abstract: 'الف', missing: 'ب', where: 'ج', how: 'د', relations: 'ه', docs: 'و' });
+    const r = await APP.ASSIST.fileGap(s, { title: 'سنجشِ پیش‌بینی‌های عددی', area: 'epi-territory', kind: 'build', abstract: 'الف', missing: 'ب', where: 'ج', how: 'د', relations: 'ه', docs: 'و' });
     const again = await APP.ASSIST.fileGap(s, { title: 'سنجشِ پیش‌بینی‌های عددی' });
     return { r, again, kept: APP.S.get(s.id).reports.length };
   });
@@ -25,10 +25,13 @@ const { chromium } = require('playwright');
   const R = sheet.report || sheet;
   info.sheet = { urgent: !!R.urgent_at, page: R.page, sec: R.section_id, reopen: R.reopen, title: (R.title || '').slice(0, 60) };
   chk(info.sheet.urgent, 'sheet is urgent');
-  chk(info.sheet.page === '/apps/learning-architecture' && info.sheet.sec === 'assistant' && /tab=e_home/.test(info.sheet.reopen), 'sheet points at the exact place: ' + JSON.stringify(info.sheet));
+  chk(info.sheet.page === '/apps/learning-architecture' && /^assistant:/.test(info.sheet.sec) && /tab=e_home/.test(info.sheet.reopen), 'sheet points at the exact place: ' + JSON.stringify(info.sheet));
   chk(/دستیار/.test(info.sheet.title), 'title says the assistant filed it');
   info.ai = await p.evaluate(() => APP.callAI('x', 'y', { task: 'lla_assistant', maxTokens: 64 }).then(t => 'ok:' + t, e => 'err:' + (e.response ? e.response.status : e.message)));
   chk(!/422/.test(info.ai), 'the host accepts the assistant task: ' + info.ai);
+  // the assistant sees the page's open sheets from the real server (no duplicates, knows what is pending)
+  info.sheets = await p.evaluate(() => APP.HOST.sheets().then(l => l.map(x => x.number + ':' + x.title.slice(0, 90))));
+  chk(info.sheets.some(x => /دستیار · کمبودِ سامانه · قلمرو: epi-territory/.test(x)), 'HOST.sheets lists the filed sheet with its area: ' + info.sheets);
   // attachments with no Drive: an honest message (never a silent text-only answer)
   info.files = await p.evaluate(() => APP.callAI('x', 'y', { task: 'lla_assistant', fileIds: [999], withMeta: true }).then(r => 'ok:' + JSON.stringify(r), e => 'err:' + e.message));
   chk(/err:/.test(info.files) && /پیدا نشد|درایو/.test(info.files), 'missing/undriven attachment is reported, not ignored: ' + info.files);

@@ -57,3 +57,9 @@ merged_from: []
 - **Files:** every format goes to the server reader (full text + manifest shown in chat); a `reread:[ids]` field lets the model ask for a past file again.
 - **Phone:** after marking fields, the bottom sheet steps aside so the marks are visible.
 - **Empty sessions** must not pile up from repeated «＋».
+
+## Update 2026-10-14 — the assistant as a careful general practitioner (referrals)
+- A wrong referral misleads the specialist routine. Before filing a gap: differential diagnosis (≥ 2 candidate areas with evidence from the live manifest), then classify: exists ⇒ route; exists but on an owner's roadmap ⇒ say who/when (`priority` only if needed now); exists but broken ⇒ `fix`; absent ⇒ `build`.
+- Give it the facts a GP needs: the ownership map (same file the routines follow, built into the page), each roadmap item's stage, pending owner decisions, and the page's OPEN sheets (no duplicates).
+- Confidence < 0.75 ⇒ ask the user, don't file. Every filing gets a **second opinion** from a stronger reasoning model that can veto, correct the area, or point at an open sheet; if the consultant is down, file only ≥ 0.9 and flag «no second opinion» so the routine scrutinises harder.
+- The sheet carries area + kind in its title, the owner routine and its procedure, the differential, and the hand-off procedure the handling routine must follow.

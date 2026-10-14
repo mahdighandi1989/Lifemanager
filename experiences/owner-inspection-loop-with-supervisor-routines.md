@@ -234,3 +234,11 @@ the attended session went through. The fix is to move the act to the person who 
 **Lesson:** when an automated reviewer is refused an action for safety reasons, don't look for a
 different command that does the same thing — put the action where the authority is (the owner's click)
 and give the reviewer the job of checking it.
+
+## Update 2026-10-14 — several routines on one repo: coordinate with an ownership map + a hand-off ledger, not a fourth routine
+- **Problem:** an urgent «inspection» routine fixes a content request in an area another routine owns (e.g. the epistemology territory owned by a nightly backtest) — it may bypass the owner's tool/reviewer, redo work the owner already did, and the owner never learns it happened.
+- **One map:** `ownership.json` — area (globs) ⇒ owner routine(s), the ONLY tool/procedure that may change it, the prompt section, the ledger; owner-decision areas (rules, caps) are «propose only». Prompts live in git and the routine messages are pointers, so every routine can read every other's procedure.
+- **One ledger:** `handoffs.json` (+ generated md): `did` (I worked in your area by YOUR procedure), `request` (please do it — your pipeline is needed), `owner-did` (you had already done it ⇒ no extra work); the owner closes with verified/corrected/done.
+- **Protocol in every prompt (identical text):** identity env var; `inbox` first in every run; `precheck` («already done?» — commits on the area since the sheet, owner ledger, open hand-offs) before touching an area; work in another's area only by its procedure; record; stale (owner did not close in 2 rounds) surfaced by the general round.
+- **Guard, not trust:** the ship script maps the pushed paths to areas and refuses a cross-area push with no hand-off by this routine; a merge-gate test checks the map is complete, every named procedure heading exists, and all prompts carry the protocol.
+- Bump + archive prompt versions per the repo's own procedure every time (an unversioned edit is itself a coordination failure).

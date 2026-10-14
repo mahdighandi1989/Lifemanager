@@ -123,6 +123,9 @@ export default function LearningArchitecturePage() {
         fd.append('file', file);
         return api.post(`/app-records/${APP}/files`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data.file);
       },
+      // «دستیار»: the open «نظارت و سرکشی» sheets of THIS page — so the chat never files a duplicate and knows what is already pending
+      sheets: () => api.get('/inspection', { params: { page: '/apps/learning-architecture', limit: 200 } }).then((r) => (r.data.reports || []).map((x) => ({
+        number: x.number, title: x.title, status: x.status, urgent: !!x.urgent_at, section: x.section_label || '', created: x.created_at || '' }))),
       // «دستیار»: a capability gap the chat found → a «نظارت و سرکشی» sheet (urgent when asked), with the issue's files attached
       report: async ({ text, spot, urgent, files }) => {
         const r = await api.post('/inspection', { text, spot });

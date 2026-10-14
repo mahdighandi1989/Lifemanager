@@ -79,17 +79,23 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.evaluate(() => APP.state.view) === 'e_home', 'unrelated: no action is executed');
 
   // ۵) کمبود ⇒ یک برگهٔ فوری با انتزاع و هماهنگی؛ همان کمبود بارِ دوم برگه نمی‌سازد
-  const gap = { reply: 'این را سامانه هنوز ندارد؛ برگهٔ فوری ثبت کردم.', status: 'gap', actions: [],
-    gap: { title: 'سنجشِ پیش‌بینی‌های عددی', abstract: 'ادعاهای کمّیِ آینده‌نگر با بازهٔ خطا', missing: 'ایستگاهِ برآوردِ بازه', where: 'epi_st + epi_rules', how: 'ایستگاهِ تازه در سالنِ ۴', relations: 'بک‌تست، قلمرو', docs: 'HANDBOOK §۲۹' } };
-  await p.evaluate(g => { __q.push(g); __q.push(g); }, gap);
+  const gap = { reply: 'این را سامانه هنوز ندارد؛ برای ثبت بررسی می‌کنم.', status: 'gap', actions: [],
+    gap: { title: 'سنجشِ پیش‌بینی‌های عددی', area: 'epi-rules', kind: 'build', abstract: 'ادعاهای کمّیِ آینده‌نگر با بازهٔ خطا', missing: 'ایستگاهِ برآوردِ بازه', where: 'epi_st + epi_rules', how: 'ایستگاهِ تازه در سالنِ ۴', relations: 'بک‌تست، قلمرو', docs: 'HANDBOOK §۲۹',
+      why_area: 'ایستگاه و قاعده‌ای برای بازهٔ خطا نیست', why_not: 'قلمرو: حوزهٔ پیش‌بینی هنوز نقشه نشده', evidence: 'هیچ ایستگاهی دربارهٔ بازه', confidence: 0.9 } };
+  // turn ⇒ the second opinion (reasoning model) agrees and moves it to the territory; the 2nd identical gap never reaches the consultant
+  await p.evaluate(g => { __q.push(g); __q.push({ agree: true, area: 'epi-territory', kind: 'build', reason: 'نخست باید حوزهٔ «پیش‌بینی» در قلمرو باشد', fix: {} }); __q.push(g); }, gap);
   await p.fill('.as-in', 'می‌خوام بازهٔ خطای پیش‌بینیم رو بسنجم'); await p.click('.as-send');
   await p.waitForFunction(() => __reps.length >= 1 && !document.querySelector('.as-typing')); await p.waitForTimeout(150);
   await p.fill('.as-in', 'دوباره همان'); await p.click('.as-send');
-  await p.waitForFunction(() => __calls.length >= 5 && !document.querySelector('.as-typing')); await p.waitForTimeout(150);
-  info.gap = await p.evaluate(() => ({ n: __reps.length, urgent: __reps[0].urgent, spot: __reps[0].spot, t: __reps[0].text, log: APP.ASSIST.cur().msgs.filter(m => m.role === 'sys').map(m => m.text).join(' | ') }));
+  await p.waitForFunction(() => __calls.length >= 6 && !document.querySelector('.as-typing')); await p.waitForTimeout(150);
+  info.gap = await p.evaluate(() => ({ n: __reps.length, urgent: __reps[0].urgent, spot: __reps[0].spot, t: __reps[0].text, log: APP.ASSIST.cur().msgs.filter(m => m.role === 'sys').map(m => m.text).join(' | '),
+    consultTask: __calls[4].opts.task, consultSys: __calls[4].sys.includes('مشاورِ ارشدِ ارجاع') }));
+  chk(info.gap.consultTask === 'learning_architecture' && info.gap.consultSys, 'a gap gets a second opinion from the page\'s reasoning model before any sheet');
+  chk(info.gap.spot.section_id === 'assistant:epi-territory' && /قلمرو: epi-territory/.test(info.gap.t) && /بک‌تستِ پیوسته/.test(info.gap.t), 'the consultant\'s area correction is applied and the owner routine is named');
+  chk(/handoff\.py precheck --area epi-territory/.test(info.gap.t) && /--kind did/.test(info.gap.t) && /owner-did/.test(info.gap.t), 'the sheet carries the hand-off procedure');
   chk(info.gap.n === 1, 'one urgent sheet, never a duplicate: ' + info.gap.n);
-  chk(info.gap.urgent && info.gap.spot.page === '/apps/learning-architecture' && info.gap.spot.section_id === 'assistant' && /tab=e_home/.test(info.gap.spot.reopen), 'sheet is urgent and reopens the exact place');
-  chk(['ثبت‌شده توسط «💬 دستیار»', 'نیازِ انتزاعی', 'کجا افزوده شود', 'پیوند با بخش‌های دیگر', 'هماهنگی با روال‌ها', 'VIEW_META', 'WORKLOG'].every(x => info.gap.t.includes(x)), 'sheet: abstraction, where/how, relations, routine coordination, docs');
+  chk(info.gap.urgent && info.gap.spot.page === '/apps/learning-architecture' && /tab=e_home/.test(info.gap.spot.reopen), 'sheet is urgent and reopens the exact place');
+  chk(['ثبت‌شده توسط «💬 دستیار»', 'نیازِ انتزاعی', 'کجا افزوده شود', 'پیوند با بخش‌های دیگر', 'روالِ رسیدگی', 'تشخیصِ افتراقی', 'VIEW_META', 'WORKLOG'].every(x => info.gap.t.includes(x)), 'sheet: abstraction, where/how, relations, routine coordination, docs');
   chk(/#۴۱/.test(info.gap.log) && /پیش‌تر ثبت شده/.test(info.gap.log), 'user sees the sheet number, and the duplicate notice');
 
   // ۶) فایل: به فولدرِ همین سشن، و عکس به مدلِ بینا
@@ -97,8 +103,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.setInputFiles('.as-row input[type=file]', { name: 'news.png', mimeType: 'image/png', buffer: Buffer.from([137, 80, 78, 71]) });
   chk(/news\.png/.test(await p.textContent('.as-chips')), 'attached file shows as a chip before sending');
   await p.fill('.as-in', 'این عکسِ خبره'); await p.click('.as-send');
-  await p.waitForFunction(() => __ups.length >= 1 && __calls.length >= 6 && !document.querySelector('.as-typing'));
-  info.file = await p.evaluate(() => ({ up: __ups[0], ids: __calls[5].opts.fileIds, sid: APP.ASSIST.cur().id, files: APP.ASSIST.cur().files.length }));
+  await p.waitForFunction(() => __ups.length >= 1 && __calls.length >= 7 && !document.querySelector('.as-typing'));
+  info.file = await p.evaluate(() => ({ up: __ups[0], ids: __calls[6].opts.fileIds, sid: APP.ASSIST.cur().id, files: APP.ASSIST.cur().files.length }));
   chk(info.file.up.rid === info.file.sid && info.file.up.meta.group === 'دستیار — گفت‌وگوها' && info.file.up.meta.title === 'سنجشِ خبرِ دلار', 'file goes to this session\'s Drive folder');
   chk(JSON.stringify(info.file.ids) === '[8]' && info.file.files === 1, 'image id handed to the vision model');
 

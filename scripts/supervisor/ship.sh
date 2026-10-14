@@ -49,6 +49,14 @@ gate() {
     || { tail -40 /tmp/ship-build.log; echo "❌ frontend build red — not shipping"; return 1; }
   echo "build ok"
 }
+# --- 1b. hand-off guard: a routine that changed ANOTHER routine's area must have recorded the hand-off
+#         (docs/supervisor/ownership.json + handoffs.json; owner 2026-10-14 — «کارها جزیره‌ای نشود»).
+#         Each routine prompt exports SUPERVISOR_ROUTINE=<general|urgent|backtest>; unset (a human session) ⇒ skipped.
+say "Hand-off guard (${SUPERVISOR_ROUTINE:-no routine})"
+git fetch -q origin main 2>/dev/null || true
+python3 scripts/supervisor/handoff.py guard --routine "${SUPERVISOR_ROUTINE:-}" --base origin/main || exit 1
+python3 scripts/supervisor/handoff.py check || exit 1
+
 gate || exit 1
 
 # --- 2. commit (the build rewrites frontend/dist/index.html, which is tracked) ---

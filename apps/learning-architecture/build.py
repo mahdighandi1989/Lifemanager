@@ -55,6 +55,13 @@ def ledger_js():
             "proposals": j("proposals.json", {"proposals": []}), "foundation": j("foundation.json", None), "territory": j("territory.json", {"areas": {}})}
     fnd = data["foundation"] or {}
     data["baseval"] = {k: v.get("p") for k, v in (fnd.get("base") or {}).items()}   # مقدارهای پایهٔ سنجیده ⇒ همان سقف‌های موتورِ Node
+    # «چه کسی مالکِ چیست» (docs/supervisor/ownership.json) — همان نقشه‌ای که روتین‌ها از آن پیروی می‌کنند؛ «💬 دستیار» با آن
+    # هر کمبود را به قلمرو و روتینِ درست می‌فرستد (فقط قلمروهای همین صفحه + نام و آهنگِ روتین‌ها؛ بی مسیرِ فایل). تغییرِ آن ⇒ build.py.
+    op = os.path.join(os.path.dirname(os.path.dirname(B)), "docs", "supervisor", "ownership.json")
+    if os.path.exists(op):
+        own = json.loads(rd(op))
+        data["ownership"] = {"routines": {k: {"fa": v.get("fa"), "cadence": v.get("cadence"), "prompt": v.get("prompt")} for k, v in own.get("routines", {}).items()},
+                             "areas": [{k: a.get(k) for k in ("id", "fa", "owner", "executor", "procedure", "rule")} for a in own.get("areas", []) if a.get("page")]}
     return "window.EPI_BT_LEDGER = " + json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n"
 
 

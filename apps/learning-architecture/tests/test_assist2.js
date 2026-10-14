@@ -130,6 +130,32 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.waitForFunction(() => __calls.length >= 11 && !APP.ASSIST.busy()); await p.waitForTimeout(150);
   chk(await p.evaluate(() => document.querySelector('.as-panel').hidden), 'on a phone the panel closes so the highlighted field can be seen');
   chk(await p.evaluate(() => document.documentElement.scrollWidth <= 392), 'no horizontal overflow at 390px');
+  // 10) the «general practitioner»: awareness of owners/roadmap/open sheets, and a second opinion before any referral
+  await p.setViewportSize({ width: 1280, height: 900 });
+  info.gp = await p.evaluate(async () => {
+    const m = APP.ASSIST.manifest();
+    const out = { owners: /area=epi-territory/.test(m) && /بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناسی/.test(m) && /area=epi-rules/.test(m), terr: /a_truth=صدق:\d/.test(m) };
+    APP.HOST.sheets = async () => [{ number: 12, title: 'حوزهٔ پیش‌بینی در قلمرو نیست', status: 'open', urgent: true }];
+    APP.HOST.report = async (o) => { (window.__reps2 = window.__reps2 || []).push(o); return { id: 'x', number: 50 }; };
+    const s = APP.ASSIST.newSession(); s.msgs.push({ role: 'user', text: 'x', at: '' }); s.pinned = 'سنجشِ پیش‌بینیِ عددی'; APP.S.put(s);
+    const g = (t, c) => ({ title: t, area: 'epi-territory', kind: 'build', confidence: c, abstract: 'a', missing: 'b' });
+    const run = async (gap, consult) => { __q.length = 0; if (consult !== undefined) __q.push(consult); const n0 = (window.__reps2 || []).length;
+      const r = await APP.ASSIST.triage(s, gap); if (r.gap) await APP.ASSIST.fileGap(s, r.gap); return { skip: r.skip || '', filed: (window.__reps2 || []).length - n0, text: ((window.__reps2 || []).slice(-1)[0] || {}).text || '' }; };
+    out.low = await run(g('الف', 0.6));
+    out.disagree = await run(g('ب', 0.9), { agree: false, reason: 'این در «🎯 میزِ کار» هست' });
+    out.dup = await run(g('ج', 0.9), { agree: true, dup_of: 12, reason: '' });
+    APP.callAI = async () => { throw new Error('no model'); };
+    out.down_low = await run(g('د', 0.8));
+    out.down_high = await run(g('ه', 0.95));
+    await APP.ASSIST.openSheets(); out.sheetsInPrompt = APP.ASSIST.prompt(s, 'q', APP.ASSIST.scan(), '').includes('#12');
+    return out;
+  });
+  chk(info.gp.owners && info.gp.terr, 'the assistant knows every area\'s owner routine and each territory area\'s stage');
+  chk(info.gp.low.filed === 0 && /اطمینان/.test(info.gp.low.skip), 'low confidence ⇒ no sheet, a clarifying question instead');
+  chk(info.gp.disagree.filed === 0 && /میزِ کار/.test(info.gp.disagree.skip), 'the consultant can veto a wrong referral');
+  chk(info.gp.dup.filed === 0 && /#۱۲/.test(info.gp.dup.skip), 'an already-open sheet is not duplicated');
+  chk(info.gp.down_low.filed === 0 && info.gp.down_high.filed === 1 && /در دسترس نبود/.test(info.gp.down_high.text), 'consultant down ⇒ only a very sure gap is filed, flagged for stricter review');
+  chk(info.gp.sheetsInPrompt, 'open sheets of the page travel with every turn');
   console.log(JSON.stringify(info).slice(0, 900));
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();

@@ -58,7 +58,7 @@ Treat every change as a production change.
   bundle in `frontend/public/assets/lla/`; run `python apps/learning-architecture/build.py`; add a WORKLOG
   entry (+ PROGRESS row if it moved forward/back, + handbook section). `tests/test_learning_architecture_handbook.py`
   fails the merge gate on any drift. Its «🗺 نقشه‌ها» shared graph (learning + epistemology + owner data) is DERIVED from the
-  registries — never hand-edit it; add data to its registry (contract in that `AGENTS.md`, test `tests/test_graph.js`). Its floating «💬 دستیار» chat (`a26_assist.js`) also derives its awareness from the registries: a new view needs a `VIEW_META` entry and labelled form fields; assistant-filed «[دستیار · کمبودِ سامانه]» urgent sheets follow the «💬 دستیار» contract in that `AGENTS.md`. **Scope:** nothing from the rest of Lifemanager goes into that
+  registries — never hand-edit it; add data to its registry (contract in that `AGENTS.md`, test `tests/test_graph.js`). Its floating «💬 دستیار» chat (`a26_assist.js`) also derives its awareness from the registries: a new view needs a `VIEW_META` entry and labelled form fields; assistant-filed «[دستیار · کمبودِ سامانه]» urgent sheets follow the «💬 دستیار» contract in that `AGENTS.md`. **Several routines work on this repo (urgent, general, backtest): who owns which paths is `docs/supervisor/ownership.json`; work in another routine's area only by that routine's own procedure and record it with `scripts/supervisor/handoff.py add` (a human session uses `--by session`) so the owner verifies it — `ship.sh` refuses unrecorded cross-area pushes.** **Scope:** nothing from the rest of Lifemanager goes into that
   handbook or page (the rest is still in flux); the owner will wire connections himself later.
 
 ## What this system is
