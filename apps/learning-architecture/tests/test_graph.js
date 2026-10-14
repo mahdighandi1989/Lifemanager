@@ -36,7 +36,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.cov.nmiss === 0, 'every registry member is a node: missing ' + info.cov.miss);
   chk(info.cov.dangling === 0 && info.cov.unknownType === 0, 'no dangling edges or unknown node types');
   chk(info.cov.broken === 0, 'self-check: no broken references in the shipped data');
-  chk(info.cov.dups === 'c_kezb,c_nafsolamr,c_sedq_akhlaqi', 'self-check reports double definitions (owner decides content) ' + info.cov.dups);
+  chk(info.cov.dups === '', 'no double definitions (the three found on 2026-10-14 were merged, WORKLOG 42) ' + info.cov.dups);
+  info.dupDetect = await p.evaluate(() => { EPI_CO.push({ id: 'c_kezb', fa: 'آزمونِ دوگانه' }); const d = APP.GRAPH.gaps().dups.map(x => x.id); EPI_CO.pop(); return d.indexOf('c_kezb') >= 0; });
+  chk(info.dupDetect, 'self-check still reports a new double definition');
   info.brk = await p.evaluate(() => { APP.S.put({ id: 'knot_gt0', type: 'knot', name: 'گرهِ پیوندِ شکسته', fam: 'F2', links: [{ to: 'knot_gone', rel: 'related' }], status: 'open' });
     const g = APP.GRAPH.gaps(); APP.S.del ? APP.S.del('knot_gt0') : null; return g.broken.some(b => b.missing === 'knot:knot_gone'); });
   chk(info.brk, 'a broken user link is reported, not silently dropped');
