@@ -17859,8 +17859,8 @@ var APP = window.APP = {};
     var min = f.min == null ? 0 : f.min, max = f.max == null ? 100 : f.max;
     var val = d[f.k] == null ? null : d[f.k];
     var out = h("output", { class: "sval" }, val == null ? "—" : fa(val));
-    var r = h("input", { id: id, type: "range", min: min, max: max, step: f.step || 1, value: val == null ? Math.round((min + max) / 2) : val,
-      oninput: function (e) { d[f.k] = +e.target.value; out.textContent = fa(e.target.value); ch(); } });
+    var r = h("input", { id: id, type: "range", min: min, max: max, step: f.step || 1, value: val == null ? Math.round((min + max) / 2) : val, "data-unset": val == null ? "1" : null,
+      oninput: function (e) { e.target.removeAttribute("data-unset"); d[f.k] = +e.target.value; out.textContent = fa(e.target.value); ch(); } });
     return h("div", { class: "scale" }, h("span", { class: "small muted" }, f.lo || fa(min)), r, h("span", { class: "small muted" }, f.hi || fa(max)), out);
   };
   FIELD.list = function (f, d, ch, id) {
@@ -30824,6 +30824,8 @@ APP.goFromURL = function (q) {
       var f = { k: k, type: type, label: lab, section: sec ? clip(sec.getAttribute("data-report-section-label"), 40) : "" };
       if (type === "checkbox" || type === "radio") f.value = el.checked ? "✓" : "";
       else if (type !== "file") f.value = clip(el.value, 120);
+      // لغزندهٔ دست‌نخورده «خالی» است، نه مقدارِ میانه (کارزارِ آزمونِ دوم c12: «گامِ بعد» با اطمینانِ پیش‌فرض زده شد)
+      if (type === "range" && el.getAttribute("data-unset")) { f.value = ""; f.unset = true; }
       if (tag === "select") f.options = Array.prototype.slice.call(el.options, 0, 25).map(function (o) { return o.value + "=" + clip(o.textContent, 30); }).join(" | ");
       // بازهٔ عدد/لغزنده (کارزارِ آزمون sc01: «یکی کمتر از بیشینه» با بازهٔ حدسی پر شد)
       if ((type === "range" || type === "number") && (el.min !== "" || el.max !== "")) f.range = (el.min || "?") + "…" + (el.max || "?");
@@ -30837,7 +30839,7 @@ APP.goFromURL = function (q) {
     var L = ["نما: " + A.state.view + " (" + labelOf(A.state.view) + ")" + (A.state.arg != null ? " arg=" + A.state.arg : "") + (A.state.sub ? " sub=" + A.state.sub : "")];
     if (sc.heads.length) L.push("سرتیترها: " + sc.heads.join(" | "));
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
-    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "")); });
+    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "") + (f.unset ? " | (هنوز تکان نخورده — عددش را خودِ کاربر باید بگوید)" : "")); });
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     // متنِ دیدنیِ صفحه (فشرده): پیشنهادهای هوش مصنوعی، عددها، پیام‌ها — کارزارِ آزمون (sc09/sc12): دستیار فقط فیلد و دکمه می‌دید و حدس می‌زد
     try {
@@ -33065,6 +33067,8 @@ APP.goFromURL = function (q) {
     "- پس از **هر** پیامِ کاربر غربال را با شاهدِ تازه بازبینی کن: لایه‌ای که «رد شد» بود و حالا شاهد دارد (مثلاً «همیشه دیدم برگ آروم‌تر میاد» ⇒ راهِ دانستن: تعمیمِ تجربهٔ روزمره) را با tour_diag «پیدا شد» کن.",
     "- «📧 گزارشِ تور» خودکار در حینِ تور به ایمیلِ کاربر می‌رود (و «الان بفرست» در کشوی تور هست)؛ اگر گزارش خواست، همین را بگو، نه «نمی‌توانم».",
     "- عددی یا واقعیتی را که کاربر نداده **فرض نکن** (مثلاً نرخِ مثبتِ کاذب، شیوع، اندازهٔ نمونه): بپرس «در برگهٔ آزمایش/مقاله این عدد آمده؟» و اگر نبود، صریح بگو با کدام فرض جلو می‌روی. تعریف‌ها (حساسیت، ویژگی، …) را دقیق بگو یا از دانسته‌های قلمرو بیاور.",
+    "- خطای **معرفتی** که پیدا شد (مثلاً «بدیهیه»، «حس می‌کنم کلک داره»، «همه می‌گن») ریشهٔ جداست: وجهِ خودش را بگیرد (نوع claim)، در وجهِ پیش‌نیاز حل نشود. اگر کاربر در «🧩 نقشهٔ پیش‌نیازها» «بلدم» زد ولی پاسخِ نوشته‌اش همان ادعای بی دلیل است، پیش از «گامِ بعد» بخواه همان را با دلیل بنویسد؛ سنجش را خودش عوض کند.",
+    "- لغزنده‌ای که «تکان نخورده» است مقدار ندارد: عددش را از کاربر بپرس؛ تا نگفته، «گامِ بعد»/«ثبت» نزن.",
     "- اولویت: ایمنی؛ ریشه‌ای که بقیه از آن می‌رویند (گره یا پیش‌نیاز)؛ آنچه زمان‌دار است؛ فهم پیش از تمرین.",
     "- نخستین پاسخ به هر مسئلهٔ تازه: جواب، حکم یا یافتهٔ نهایی را نگو — حتی اگر از «# دانسته‌های قلمرو» می‌دانی (کارزارِ آزمون c08: معنای درستِ p و تکرارنشدنِ پژوهش در همان پاسخِ اول لو رفت). اول یک یا دو پرسشِ دقیق برای لایه‌هایی که «باید پرسید» است (بی پیشنهادِ جواب)، بعد غربال؛ یافتهٔ قطعی را وقتی بگو که کاربر خودش به آن رسیده یا ایستگاهِ مربوط طی شده. لایهٔ «اطلاعاتِ ناموجود» را جدی بسنج: چه عددی، منبعی یا واقعیتی هنوز نیست؟",
     "- در reply هرگز کلید یا کد ننویس (f1، k12، F7، شناسهٔ حوزه یا رکورد) — نامِ فارسیِ وجه، خانواده یا حوزه را بگو."
@@ -33148,6 +33152,8 @@ APP.goFromURL = function (q) {
         h("div", { class: "row gap wrap" }, h("b", {}, fa(i + 1) + ") " + x.concept), h("span", { class: "chip" }, [x.sci, x.sub].filter(Boolean).join(" › ")), x.by === "ai" ? h("span", { class: "small muted" }, "پیشنهادِ هوش مصنوعی — وارسی‌نشده") : null),
         x.why ? h("p", { class: "small" }, "در کدام گام و چرا: " + x.why) : null,
         x.q ? h("p", {}, "پرسشِ تشخیصی: " + x.q) : null, x.q ? ans : null,
+        // «بلدم» بی دلیلِ نوشته (کارزارِ آزمونِ دوم c12: «بدیهیه» با «بلدم» پذیرفته شد و موضوعِ زوجیت ساخته نشد) — فقط هشدار؛ سنجش با خودِ کاربر می‌ماند
+        x.self === "بلدم" && x.q && String(x.ans || "").replace(/\s+/g, "").length < 15 ? h("p", { class: "small warn pr-thin" }, "«بلدم» گفتی ولی پاسخِ نوشته‌ات هنوز دلیل ندارد" + (x.ans ? " («" + clip(x.ans, 40) + "»)" : "") + ". پاسخِ مرجع را باز کن و مقایسه کن؛ اگر فقط «بدیهی است» یا «می‌دانم» بود، شاید «نیمه» درست‌تر باشد.") : null,
         h("div", { class: "row gap wrap" }, sel,
           x.self && x.ref ? h("details", { class: "small" }, h("summary", {}, "پاسخِ مرجع"), h("p", {}, x.ref)) : null,
           (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)) ? h("button", { class: "btn sm", type: "button", onclick: function () { var tp = mkTopic(p, x); A.toast("موضوعِ یادگیری ساخته شد؛ سفرِ ۱۱ گامی‌اش را از همان‌جا شروع کن."); A.go("topic", tp.id); } }, "📚 موضوعِ یادگیری بساز") : null,

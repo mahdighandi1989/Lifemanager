@@ -157,6 +157,8 @@
       var f = { k: k, type: type, label: lab, section: sec ? clip(sec.getAttribute("data-report-section-label"), 40) : "" };
       if (type === "checkbox" || type === "radio") f.value = el.checked ? "✓" : "";
       else if (type !== "file") f.value = clip(el.value, 120);
+      // لغزندهٔ دست‌نخورده «خالی» است، نه مقدارِ میانه (کارزارِ آزمونِ دوم c12: «گامِ بعد» با اطمینانِ پیش‌فرض زده شد)
+      if (type === "range" && el.getAttribute("data-unset")) { f.value = ""; f.unset = true; }
       if (tag === "select") f.options = Array.prototype.slice.call(el.options, 0, 25).map(function (o) { return o.value + "=" + clip(o.textContent, 30); }).join(" | ");
       // بازهٔ عدد/لغزنده (کارزارِ آزمون sc01: «یکی کمتر از بیشینه» با بازهٔ حدسی پر شد)
       if ((type === "range" || type === "number") && (el.min !== "" || el.max !== "")) f.range = (el.min || "?") + "…" + (el.max || "?");
@@ -170,7 +172,7 @@
     var L = ["نما: " + A.state.view + " (" + labelOf(A.state.view) + ")" + (A.state.arg != null ? " arg=" + A.state.arg : "") + (A.state.sub ? " sub=" + A.state.sub : "")];
     if (sc.heads.length) L.push("سرتیترها: " + sc.heads.join(" | "));
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
-    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "")); });
+    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "") + (f.unset ? " | (هنوز تکان نخورده — عددش را خودِ کاربر باید بگوید)" : "")); });
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     // متنِ دیدنیِ صفحه (فشرده): پیشنهادهای هوش مصنوعی، عددها، پیام‌ها — کارزارِ آزمون (sc09/sc12): دستیار فقط فیلد و دکمه می‌دید و حدس می‌زد
     try {

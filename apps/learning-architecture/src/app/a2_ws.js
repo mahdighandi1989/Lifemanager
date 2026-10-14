@@ -211,8 +211,8 @@
     var min = f.min == null ? 0 : f.min, max = f.max == null ? 100 : f.max;
     var val = d[f.k] == null ? null : d[f.k];
     var out = h("output", { class: "sval" }, val == null ? "—" : fa(val));
-    var r = h("input", { id: id, type: "range", min: min, max: max, step: f.step || 1, value: val == null ? Math.round((min + max) / 2) : val,
-      oninput: function (e) { d[f.k] = +e.target.value; out.textContent = fa(e.target.value); ch(); } });
+    var r = h("input", { id: id, type: "range", min: min, max: max, step: f.step || 1, value: val == null ? Math.round((min + max) / 2) : val, "data-unset": val == null ? "1" : null,
+      oninput: function (e) { e.target.removeAttribute("data-unset"); d[f.k] = +e.target.value; out.textContent = fa(e.target.value); ch(); } });
     return h("div", { class: "scale" }, h("span", { class: "small muted" }, f.lo || fa(min)), r, h("span", { class: "small muted" }, f.hi || fa(max)), out);
   };
   FIELD.list = function (f, d, ch, id) {
