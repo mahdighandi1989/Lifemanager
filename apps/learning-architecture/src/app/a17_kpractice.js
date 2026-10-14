@@ -1115,6 +1115,7 @@
   A._kaiGate = aiGate;
 
   /* ---------- ساختنِ نمونه‌ها (زبانهٔ «نمونه‌ها») ---------- */
+  var BUILDING = {};
   function genPanel(k) {
     var box = h("div", { class: "col gap" }), mode = A.kmode(k), fams = famsOf(k);
     var keys = []; fams.forEach(function (f) { A.kgenFor(f).forEach(function (x) { if (keys.indexOf(x) < 0) keys.push(x); }); });
@@ -1146,16 +1147,21 @@
     var out = h("div", { class: "col gap", "aria-live": "polite" });
     if (!(k.principle || k.deep)) c2.appendChild(h("p", { class: "small bad" }, "اول «ساختارِ عمیق» ِ کارتِ گره را بنویس (قدمِ ۴)؛ بی آن نمونه‌سازی معنا ندارد."));
     else if (!A.kaiAvailable()) c2.appendChild(h("p", { class: "small muted" }, "هوش مصنوعی در دسترس نیست (کلید یا میزبان). از قالبِ پایین استفاده کن."));
+    /* ساختِ در جریان از رسمِ دوبارهٔ صفحه جان به در می‌برد: دکمه تا پایانش بسته می‌ماند (تورِ زندهٔ ۲۰۲۶-۱۰-۱۴: رسمِ دوباره دکمه را
+       باز کرد و کلیکِ دوم ساختِ دوم و ۱۰ نمونهٔ تکراری داد) */
+    else if (BUILDING[k.id]) c2.appendChild(h("button", { class: "btn", type: "button", id: "kpAI", disabled: true }, "در حالِ ساخت و سه حلِ مستقل…"));
     else c2.appendChild(h("button", { class: "btn", type: "button", id: "kpAI", onclick: function (e) {
-      var b = e.target; b.disabled = true;
+      var b = e.target; if (BUILDING[k.id]) return; b.disabled = true;
       aiGate(out, k).then(function (pref) {
+        BUILDING[k.id] = true;
         b.textContent = "در حالِ ساخت و سه حلِ مستقل…";
         return A.kmakeAI(k, { names: pref.names, fileIds: pref.fileIds || [] }).then(function (rep) {
+          delete BUILDING[k.id];
           A._klastRep = rep;
           A.toast("وارسی‌شده: " + fa(rep.accepted.length) + " · وارسی‌نشده: " + fa(rep.unverified.length) + " · کنار گذاشته: " + fa(rep.rejected.length));
           A.render();
         });
-      }).catch(function (er) { b.disabled = false; b.textContent = "ساختِ نمونه با هوش مصنوعی"; if (er && er.message !== "لغو شد" && er.message !== "متوقف شد") A.toast(er.message || String(er), "bad"); });
+      }).catch(function (er) { var was = BUILDING[k.id]; delete BUILDING[k.id]; b.disabled = false; b.textContent = "ساختِ نمونه با هوش مصنوعی"; if (was) A.render(); if (er && er.message !== "لغو شد" && er.message !== "متوقف شد") A.toast(er.message || String(er), "bad"); });
     } }, "ساختِ نمونه با هوش مصنوعی"));
     if (A._klastRep && A._klastRep.rejected.length) out.appendChild(h("details", { class: "small" }, h("summary", {}, "کنار گذاشته‌شده‌های آخرین ساخت (" + fa(A._klastRep.rejected.length) + ")"),
       h("ul", {}, A._klastRep.rejected.map(function (x) { return h("li", {}, x.why + (x.prompt ? " — «" + String(x.prompt).slice(0, 80) + "…»" : "")); }))));

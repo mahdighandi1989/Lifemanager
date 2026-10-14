@@ -705,7 +705,9 @@
     return h("ol", { class: "kn-strip", "aria-label": "قدم‌های تونل" }, ORDER.map(function (s, i) {
       var lock = lockReason(kc, s), here = s === cur, done = i < fi && !here;
       return h("li", { class: "kn-st" + (here ? " here" : "") + (done ? " done" : "") + (lock ? " lock" : "") },
-        h("button", { type: "button", disabled: !!lock && !here, "aria-current": here ? "step" : null, title: lock || SNAME[s], onclick: function () { if (!here) goStep(H, s); } },
+        h("button", { type: "button", disabled: !!lock && !here, "aria-current": here ? "step" : null, title: lock || SNAME[s],
+          // برچسبِ دسترس‌پذیر: این‌ها «رفتن به قدم» اند، نه دکمهٔ ذخیره (دستیار «✓ثبت» را با «ثبت کن» اشتباه می‌گرفت)
+          "aria-label": "رفتن به قدمِ «" + SNAME[s] + "»" + (here ? " — همین‌جا" : lock ? " — قفل" : done ? " — گذشته" : ""), onclick: function () { if (!here) goStep(H, s); } },
           h("span", { class: "n", "aria-hidden": "true" }, here ? "📍" : lock ? "🔒" : done ? "✓" : "○"), h("span", { class: "t" }, SNAME[s])));
     }));
   }

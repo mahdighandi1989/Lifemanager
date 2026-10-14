@@ -1,0 +1,16 @@
+{
+ "id": "h20261014171527019548-session-8a78",
+ "at": "2026-10-14T17:15:27Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "«🧭 تور» ِ دستیار (a27_tour.js) + پنجرهٔ کشیدنی + ۱۷ رفعِ یافته‌های تورِ زنده در a26/a16(aria-label)/a17(قفلِ ساخت) — WORKLOG 47",
+ "procedure": "apps/learning-architecture/AGENTS.md: فقط src، build.py، WORKLOG/PROGRESS/HANDBOOK، همهٔ آزمون‌های مرورگر + host e2e + pytest + npm build",
+ "commit": "",
+ "status": "open"
+}

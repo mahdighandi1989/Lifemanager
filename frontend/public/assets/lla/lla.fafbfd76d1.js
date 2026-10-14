@@ -25556,7 +25556,9 @@ APP.goFromURL = function (q) {
     return h("ol", { class: "kn-strip", "aria-label": "قدم‌های تونل" }, ORDER.map(function (s, i) {
       var lock = lockReason(kc, s), here = s === cur, done = i < fi && !here;
       return h("li", { class: "kn-st" + (here ? " here" : "") + (done ? " done" : "") + (lock ? " lock" : "") },
-        h("button", { type: "button", disabled: !!lock && !here, "aria-current": here ? "step" : null, title: lock || SNAME[s], onclick: function () { if (!here) goStep(H, s); } },
+        h("button", { type: "button", disabled: !!lock && !here, "aria-current": here ? "step" : null, title: lock || SNAME[s],
+          // برچسبِ دسترس‌پذیر: این‌ها «رفتن به قدم» اند، نه دکمهٔ ذخیره (دستیار «✓ثبت» را با «ثبت کن» اشتباه می‌گرفت)
+          "aria-label": "رفتن به قدمِ «" + SNAME[s] + "»" + (here ? " — همین‌جا" : lock ? " — قفل" : done ? " — گذشته" : ""), onclick: function () { if (!here) goStep(H, s); } },
           h("span", { class: "n", "aria-hidden": "true" }, here ? "📍" : lock ? "🔒" : done ? "✓" : "○"), h("span", { class: "t" }, SNAME[s])));
     }));
   }
@@ -27603,6 +27605,7 @@ APP.goFromURL = function (q) {
   A._kaiGate = aiGate;
 
   /* ---------- ساختنِ نمونه‌ها (زبانهٔ «نمونه‌ها») ---------- */
+  var BUILDING = {};
   function genPanel(k) {
     var box = h("div", { class: "col gap" }), mode = A.kmode(k), fams = famsOf(k);
     var keys = []; fams.forEach(function (f) { A.kgenFor(f).forEach(function (x) { if (keys.indexOf(x) < 0) keys.push(x); }); });
@@ -27634,16 +27637,21 @@ APP.goFromURL = function (q) {
     var out = h("div", { class: "col gap", "aria-live": "polite" });
     if (!(k.principle || k.deep)) c2.appendChild(h("p", { class: "small bad" }, "اول «ساختارِ عمیق» ِ کارتِ گره را بنویس (قدمِ ۴)؛ بی آن نمونه‌سازی معنا ندارد."));
     else if (!A.kaiAvailable()) c2.appendChild(h("p", { class: "small muted" }, "هوش مصنوعی در دسترس نیست (کلید یا میزبان). از قالبِ پایین استفاده کن."));
+    /* ساختِ در جریان از رسمِ دوبارهٔ صفحه جان به در می‌برد: دکمه تا پایانش بسته می‌ماند (تورِ زندهٔ ۲۰۲۶-۱۰-۱۴: رسمِ دوباره دکمه را
+       باز کرد و کلیکِ دوم ساختِ دوم و ۱۰ نمونهٔ تکراری داد) */
+    else if (BUILDING[k.id]) c2.appendChild(h("button", { class: "btn", type: "button", id: "kpAI", disabled: true }, "در حالِ ساخت و سه حلِ مستقل…"));
     else c2.appendChild(h("button", { class: "btn", type: "button", id: "kpAI", onclick: function (e) {
-      var b = e.target; b.disabled = true;
+      var b = e.target; if (BUILDING[k.id]) return; b.disabled = true;
       aiGate(out, k).then(function (pref) {
+        BUILDING[k.id] = true;
         b.textContent = "در حالِ ساخت و سه حلِ مستقل…";
         return A.kmakeAI(k, { names: pref.names, fileIds: pref.fileIds || [] }).then(function (rep) {
+          delete BUILDING[k.id];
           A._klastRep = rep;
           A.toast("وارسی‌شده: " + fa(rep.accepted.length) + " · وارسی‌نشده: " + fa(rep.unverified.length) + " · کنار گذاشته: " + fa(rep.rejected.length));
           A.render();
         });
-      }).catch(function (er) { b.disabled = false; b.textContent = "ساختِ نمونه با هوش مصنوعی"; if (er && er.message !== "لغو شد" && er.message !== "متوقف شد") A.toast(er.message || String(er), "bad"); });
+      }).catch(function (er) { var was = BUILDING[k.id]; delete BUILDING[k.id]; b.disabled = false; b.textContent = "ساختِ نمونه با هوش مصنوعی"; if (was) A.render(); if (er && er.message !== "لغو شد" && er.message !== "متوقف شد") A.toast(er.message || String(er), "bad"); });
     } }, "ساختِ نمونه با هوش مصنوعی"));
     if (A._klastRep && A._klastRep.rejected.length) out.appendChild(h("details", { class: "small" }, h("summary", {}, "کنار گذاشته‌شده‌های آخرین ساخت (" + fa(A._klastRep.rejected.length) + ")"),
       h("ul", {}, A._klastRep.rejected.map(function (x) { return h("li", {}, x.why + (x.prompt ? " — «" + String(x.prompt).slice(0, 80) + "…»" : "")); }))));
@@ -30730,31 +30738,42 @@ APP.goFromURL = function (q) {
     return clip(t, 90);
   }
   var SCAN = {};
-  AS.scan = function () {
-    var main = document.getElementById("main"), fields = [], buttons = [], heads = [];
-    SCAN = {};
-    if (!main) return { fields: fields, buttons: buttons, heads: heads };
-    main.querySelectorAll("h1,h2,h3").forEach(function (x, i) { if (i < 12) heads.push(clip(x.textContent, 70)); });
-    var n = 0, seen = {};
+  /* همان پیمایش و همان پالایه برای «پویش» و برای «دوباره‌یابیِ کلیدِ کهنه» — تا امضاها (نوع|برچسب|چندمین) یکی باشند */
+  function walk() {
+    var main = document.getElementById("main"), out = [], seen = {}, nb = 0, nf = 0;
+    if (!main) return out;
     main.querySelectorAll("input,textarea,select,button").forEach(function (el) {
       if (el.closest(".as-root")) return;
       // newer Chrome keeps a closed <details>' content laid out (content-visibility), so «closed» is asked directly
       var hid = inClosed(el) && !el.disabled && el.type !== "hidden";
       if (!visible(el) && !hid) return;
       var tag = el.tagName.toLowerCase(), type = tag === "input" ? (el.type || "text") : tag, lab = labelFor(el);
-      if (tag === "button" && (!lab || hid || buttons.length >= 80)) return;
-      if (tag !== "button" && fields.length >= 150) return;
+      if (tag === "button" && (!lab || hid || nb >= 80)) return;
+      if (tag !== "button" && nf >= 150) return;
+      if (tag === "button") nb++; else nf++;
+      var sig = tag + "|" + lab; seen[sig] = (seen[sig] || 0) + 1;
+      out.push({ el: el, tag: tag, type: type, label: lab, nth: seen[sig], hid: hid });
+    });
+    return out;
+  }
+  AS.scan = function () {
+    var main = document.getElementById("main"), fields = [], buttons = [], heads = [];
+    SCAN = {};
+    if (!main) return { fields: fields, buttons: buttons, heads: heads };
+    main.querySelectorAll("h1,h2,h3").forEach(function (x, i) { if (i < 12) heads.push(clip(x.textContent, 70)); });
+    var n = 0;
+    walk().forEach(function (w) {
+      var el = w.el, tag = w.tag, type = w.type, lab = w.label;
       var k = "k" + (++n); el.setAttribute("data-ai-k", k);
       var sec = el.closest("[data-report-section-label]");
-      var sig = tag + "|" + lab; seen[sig] = (seen[sig] || 0) + 1;
-      SCAN[k] = { tag: tag, type: type, label: lab, nth: seen[sig] };
+      SCAN[k] = { tag: tag, type: type, label: lab, nth: w.nth, node: el };
       if (tag === "button") { buttons.push({ k: k, label: lab }); return; }
       var f = { k: k, type: type, label: lab, section: sec ? clip(sec.getAttribute("data-report-section-label"), 40) : "" };
       if (type === "checkbox" || type === "radio") f.value = el.checked ? "✓" : "";
       else if (type !== "file") f.value = clip(el.value, 120);
       if (tag === "select") f.options = Array.prototype.slice.call(el.options, 0, 25).map(function (o) { return o.value + "=" + clip(o.textContent, 30); }).join(" | ");
       if (el.required || el.getAttribute("aria-required") === "true") f.required = true;
-      if (hid) f.closed = true;
+      if (w.hid) f.closed = true;
       fields.push(f);
     });
     return { fields: fields, buttons: buttons, heads: heads };
@@ -30767,21 +30786,26 @@ APP.goFromURL = function (q) {
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     return L.join("\n");
   }
-  /* کلیدِ کهنه (نما دوباره رسم شد) ⇒ با همان برچسب و نوع دوباره پیدا کن */
+  /* کلیدِ کهنه (نما دوباره رسم شد) ⇒ با همان برچسب و نوع و «چندمین» دوباره پیدا کن.
+     نقشهٔ کلیدهای این نوبت (SCAN) هرگز بازنویسی نمی‌شود: پویشِ دوباره کلیدهای تازه نمی‌دهد، وگرنه «k40» ِ کهنه
+     به فیلدِ دیگری می‌خورد (باگِ اجرای واقعی: پس از انتخابِ خانواده فرم جابه‌جا شد و دو فیلد اشتباه پر شد) */
   function el(k) {
-    var x = document.querySelector('[data-ai-k="' + k + '"]'); if (x && document.contains(x)) return x;
     var sig = SCAN[k]; if (!sig) return null;
-    AS.scan();
-    // همان نوع + همان برچسب + همان «چندمین» (چند فیلد با برچسبِ «پاسخ» در یک صفحه ⇒ هرگز فیلدِ اشتباه)
-    var hit = Object.keys(SCAN).filter(function (j) { return SCAN[j].tag === sig.tag && SCAN[j].label === sig.label && SCAN[j].nth === sig.nth; })[0];
-    return hit ? document.querySelector('[data-ai-k="' + hit + '"]') : null;
+    if (sig.node && document.contains(sig.node)) return sig.node;
+    var hit = walk().filter(function (w) { return w.tag === sig.tag && w.label === sig.label && w.nth === sig.nth; })[0];
+    if (!hit) return null;
+    sig.node = hit.el; return hit.el;
   }
-
   /* ---------- کارها روی صفحه ---------- */
   var DANGER = /حذف|پاک|برداشتن|بایگانی|delete|remove|reset|بازنشانی|ریختن|خروج/i;
   /* تصمیم‌هایی که فقط با خودِ مالک است (پذیرش/ردِ پیشنهادِ قاعده و سقف، تأییدِ مسئله یا واقعه برای ورود به آزمون‌ها):
      دستیار هرگز نمی‌زندشان — هایلایت می‌کند و می‌گوید «این تصمیم با خودت است» */
   var OWNER = /بپذیر|پذیرفتم|رد کن|ردّ|نپذیر|تأیید|تایید|قبول|approve|accept|reject/i;
+  /* گزینه/جوابِ تمرین (شبیه‌ساز، ورزشِ گره، مسئلهٔ هم‌ساختار، دوره): دستیار نه پر می‌کند، نه می‌زند، نه زردش می‌کند —
+     زردکردنِ یک گزینه خودش پاسخ را لو می‌دهد یا کاربر را به آن می‌کشد (تورِ زنده: گزینهٔ غلطِ «۱/۲» زرد شد) */
+  var ANSWER = ".dopt, .dopts button, .pbs-ans input, .pbs-ans textarea, .pbs-ans button, .kp-opt, .kp-choices input, .kp-choices button, .kp-ans, .kp-ans input, .kp-ans textarea";
+  function isAnswer(x) { try { return !!(x && x.closest && x.closest(ANSWER)); } catch (e) { return false; } }
+  var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
   function fire(x, ev) { x.dispatchEvent(new Event(ev, { bubbles: true })); }
   function setVal(x, v) {
     var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -30801,6 +30825,7 @@ APP.goFromURL = function (q) {
     },
     fill: function (a) {
       var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
+      if (isAnswer(x)) return ANSWER_NOTE;
       if (x.type === "file") return "پیوست با attach";
       reveal(x);
       if (x.tagName === "SELECT") {
@@ -30815,10 +30840,13 @@ APP.goFromURL = function (q) {
       mark(x, a.why || "دستیار از حرفِ تو پر کرد — اگر درست نیست عوضش کن", "fill");
       return "";
     },
-    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
+    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; if (isAnswer(x)) return ANSWER_NOTE; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
     click: function (a) {
       var x = el(a.k); if (!x) return "دکمهٔ " + a.k + " پیدا نشد";
+      if (isAnswer(x)) return ANSWER_NOTE;
       var bt = (x.textContent || "") + " " + (x.getAttribute("aria-label") || "");
+      // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
+      if (x.getAttribute("role") === "tab") bt = "";
       if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
       if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
       var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
@@ -30837,24 +30865,30 @@ APP.goFromURL = function (q) {
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
-    var notes = [], moved = false, chain = Promise.resolve(), skipped = 0;
+    var notes = [], moved = false, chain = Promise.resolve(), skipped = 0, toasts = [];
     clicked = { n: 0, changed: false };
+    // پیامی که صفحه پس از کارهای دستیار نشان داد (مثلاً «اول خودارزیابی را بزن») به خودِ دستیار هم می‌رسد — وگرنه حدس می‌زد
+    var rawToast = A.toast;
+    A.toast = function (m) { try { if (m) toasts.push(clip(String(m), 200)); } catch (e) { } return rawToast.apply(this, arguments); };
     (actions || []).slice(0, 40).forEach(function (a) {
       chain = chain.then(function () {
         if (!a || !DO[a.do]) return;
         // کلیدهای k… مالِ صفحهٔ پیشین‌اند: پس از رفتن به نمای تازه هرگز به کار نمی‌روند (پرکردنِ فیلدِ اشتباه) —
         // نوبتِ خودکارِ بعدی با فیلدهای همین صفحه پر می‌کند
         if (moved && /^(fill|highlight|click|attach)$/.test(a.do)) { skipped++; return; }
+        var at = A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "");
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         if (r) notes.push(r);
         if (a.do === "go" && !r) { moved = true; return wait(350); }
-        if (a.do === "click") return wait(250);
+        // کلیکی که نما/قدم را عوض کرد هم «رفتن» است: کلیدهای بعدیِ همین نوبت مالِ صفحهٔ پیشین‌اند
+        if (a.do === "click") return wait(250).then(function () { if (!r && A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "") !== at) moved = true; });
       });
     });
-    return chain.then(function () {
+    return chain.then(function () { return wait(150); }).then(function () {
+      if (A.toast !== rawToast) A.toast = rawToast;
       var first = document.querySelector(".as-hl") || document.querySelector(".as-filled");
       if (first && first.scrollIntoView) try { first.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { }
-      return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed };
+      return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
     });
   };
 
@@ -30882,7 +30916,7 @@ APP.goFromURL = function (q) {
     "کارت: (۱) بفهمی کاربر چه می‌خواهد؛ (۲) او را به نما/بخش/فرمِ درست ببری (یک یا چند بخش، به ترتیب)؛ (۳) فرم را فقط از حرف‌ها و فایل‌های خودِ او پر کنی و باقیِ فیلدهای لازم را هایلایت کنی با یک جملهٔ کوتاه که چه بنویسد — یا اگر خواست، یکی‌یکی بپرسی و خودت پر کنی؛ (۴) فایل/عکس را کوتاه بخوانی و اگر فرم جای پیوست دارد پیوستش کنی؛ (۵) قدم‌به‌قدم مثلِ خودِ او با فرم جلو بروی.",
     "قاعده‌های سخت:",
     "- کوتاه: پاسخ حداکثر ۳ جمله (حدود ۶۰ واژه)، فارسیِ ساده، بی تعارف، در هر نوبت حداکثر یک پرسش.",
-    "- چیزی از خودت نساز: فیلدی را که کاربر چیزی برایش نگفته پر نکن؛ هایلایتش کن. در کاربرگِ تمرینِ تکنیک‌ها پاسخِ تمرین را ننویس (اثرِ تولید) — فقط جای نوشتن را نشان بده.",
+    "- چیزی از خودت نساز: فیلدی را که کاربر چیزی برایش نگفته پر نکن؛ هایلایتش کن. در کاربرگِ تمرینِ تکنیک‌ها پاسخِ تمرین را ننویس (اثرِ تولید) — فقط جای نوشتن را نشان بده. در شبیه‌ساز، ورزشِ گره، مسئلهٔ هم‌ساختار، کارتِ مرور و دوره هیچ گزینه یا جوابی را پر، کلیک یا هایلایت نکن (زردکردنِ یک گزینه یعنی لو دادنش)؛ فقط بگو کجای صفحه است.",
     "- داوری نکن: حکم، نمره و سقفِ اطمینان کارِ خودِ صفحه و کاربر است؛ برای کارِ عمیق دکمهٔ هوشِ همان بخش را (با click) بزن یا نشانش بده.",
     "- فقط کلیدهایی (k…) را به کار ببر که در «صفحهٔ فعلی» آمده و فقط نماهایی که در «نقشهٔ سامانه» هست. دکمهٔ حذف/پاک‌کردن را هرگز نزن.",
     "- وقتی کاربر را به نمای دیگری می‌بری و هنوز فیلدهایش را نمی‌بینی، فقط go بده؛ سامانه پس از بازشدن فیلدها را برایت می‌فرستد تا پر کنی.",
@@ -30894,9 +30928,10 @@ APP.goFromURL = function (q) {
     "- کمبودِ سامانه (status=\"gap\"): خواسته در قلمروِ همین صفحه است و تشخیصِ بالا نشان داد پوشش داده نمی‌شود. gap را کامل پر کن: area دقیقاً یکی از شناسه‌های «چه کسی مسئولِ چیست»؛ kind؛ abstract (نیازِ کلی — این دسته از خواسته‌ها و نمونه‌های مشابه، نه تکرارِ مسئلهٔ کاربر)؛ missing (دقیقاً چه کم است)؛ where؛ how؛ relations؛ docs؛ why_area (چرا همین قلمرو)؛ why_not (چرا نه نامزدهای دیگر)؛ evidence (چه در نقشه نشان می‌دهد نیست)؛ confidence (۰ تا ۱). اگر confidence کمتر از ۰٫۷۵ است برگه نخواه — یک پرسشِ روشن‌کننده از کاربر بپرس. اگر برگهٔ بازی همین را می‌گوید، برگهٔ تازه نخواه و شماره‌اش را بگو. ثبتِ نهایی پس از نظرِ دوم (مشاور) است؛ به کاربر بگو «برای ثبت بررسی می‌کنم».",
     "- حافظه: memory خلاصهٔ انباشتهٔ کلِ همین سشن است از اولین پیام تا حالا (هدف، از کجا آمدیم، تصمیم‌ها، آنچه پر و ثبت شد و کجا، نکته‌های کلیدیِ فایل‌ها، آنچه مانده) — هر بار کاملش را برگردان، چیزی را نینداز.",
     "- pinned: خواستهٔ اصلیِ سشن در یک جمله (نوبتِ اول بساز؛ بعداً فقط اگر خواستهٔ اصلی واقعاً عوض شد).",
+    "- next: اگر در همین پاسخ گفتی «بعدش فلان دکمه را می‌زنم» و آن کار پس از کلیک‌های همین نوبت شدنی می‌شود، next:true بده تا سامانه صفحهٔ تازه را بفرستد و همان را انجام دهی؛ قولی نده که بی‌پیامِ کاربر عملی نشود.",
     "- steps: فهرستِ کاملِ مراحلِ رسیدن به خواستهٔ اصلی با وضعِ هر کدام (done/now/todo) و نمای هر کدام.",
     "خروجی فقط یک JSON (بی متنِ دیگر):",
-    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap",' +
+    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap","next":false,' +
     '"steps":[{"t":"…","s":"done|now|todo","view":"…"}],' +
     '"actions":[{"do":"go","view":"…","arg":"…","sub":"…"},{"do":"fill","k":"k3","value":"…"},{"do":"highlight","k":"k5","why":"…"},{"do":"click","k":"k9"},{"do":"attach","k":"k7","fileIds":[12]}],' +
     '"reread":[12],"gap":{"title":"…","area":"…","kind":"build|priority|fix","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…","why_area":"…","why_not":"…","evidence":"…","confidence":0.9}}'
@@ -31095,6 +31130,9 @@ APP.goFromURL = function (q) {
     });
     var auto = 0;
     function turn(msg, extra, ids, first) {
+      // تور پیش از ساختنِ پرامپت هم هم‌گام می‌شود: کاری که کاربر بیرون از گفت‌وگو تمام کرد (مثلاً ایستگاهِ پایانی) همین نوبت دیده شود —
+      // وگرنه مدل روی وضعِ کهنه جواب می‌داد (تورِ زندهٔ ۲۰۲۶-۱۰-۱۴)
+      if (AS.tourAfterTurn && s.tour) { try { AS.tourAfterTurn(s); } catch (e) { console.error(e); } }
       var sc = AS.scan();
       return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; return ask(AS.SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
@@ -31137,9 +31175,14 @@ APP.goFromURL = function (q) {
           var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
           var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
           if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
-          if (auto < MAX_AUTO && (res.moved || res.changed)) {
+          // «next»: مدل گفته کارِ بعدی را در همین رشته انجام می‌دهد (مثلاً پس از «ثبتِ کارت»، دکمهٔ «ساختِ نمونه‌ها») —
+          // بی آن، قولِ «بعدش می‌زنم» تا پیامِ بعدیِ کاربر معطل می‌ماند (یافتهٔ تورِ زنده)
+          var promised = o.next === true && res.clicks > 0 && !res.notes.length, said = res.clicks > 0 && res.toasts && res.toasts.length;
+          if (auto < MAX_AUTO && (res.moved || res.changed || promised || said)) {
             auto++;
-            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "» باز شد" : "فرم تغییر کرد (فیلدهای تازه)") +
+            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "»" + (A.state.sub ? " (قدم/برگهٔ " + A.state.sub + ")" : "") + " باز شد" : res.changed ? "فرم تغییر کرد (فیلدهای تازه)" : "کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده") +
+              (said ? "؛ پیامِ صفحه پس از کارهایت: «" + res.toasts.join("» · «") + "» — بر پایهٔ همین پیام ادامه بده (حدس نزن)" : "") +
+              (res.skipped ? "؛ " + res.skipped + " کارِ بعدیِ نوبتِ پیش اجرا نشد چون کلیدهایش مالِ صفحهٔ قبل بود — اگر هنوز لازم است با کلیدهای تازهٔ همین صفحه انجامش بده" : "") +
               ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]");
           }
           // موبایل: پنجره روی فرم است ⇒ کنار برود تا زردها و سبزها دیده شوند
@@ -31330,10 +31373,10 @@ APP.goFromURL = function (q) {
     claim: { fa: "سنجشِ ادعا/باور", ic: "⚖️", view: "e_home" },
     problem: { fa: "مسئلهٔ بزرگ و شبیه‌ساز", ic: "🧩", view: "e_prob" },
     learn: { fa: "فهمیدنِ عمیق", ic: "🌱", view: "topics" },
-    territory: { fa: "حوزه‌ای که هنوز نیست", ic: "🗺", view: "maps" },
+    territory: { fa: "حوزه‌ای که هنوز نیست", ic: "🗺", view: "e_bt", sub: "terr" },
     other: { fa: "گامِ دیگر", ic: "•", view: "" }
   };
-  var ROOT_TYPE = { knot: "kcase", claim: "case", problem: "eprob", learn: "topic" };
+  var ROOT_TYPE = { knot: ["kcase"], claim: ["case"], problem: ["eprob"], learn: ["topic"], territory: ["topic", "case"] };
   var ST_FA = { todo: "مانده", now: "در جریان", done: "انجام شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
   function nowIso() { return new Date().toISOString(); }
   function get(id) { return id ? S.get(id) : null; }
@@ -31387,17 +31430,24 @@ APP.goFromURL = function (q) {
     } else if (f.kind === "learn") {
       var tp = c.topic[0], jp = tp && A.journeyProgress ? A.journeyProgress(tp) : null;
       add("موضوع ساخته شد", tp);
-      add("سفرِ گام‌به‌گام" + (jp ? " (" + fa(jp.done) + " از " + fa(jp.all) + ")" : ""), jp && jp.done >= Math.min(4, jp.all), false);
+      add("سفرِ گام‌به‌گام تا آخر" + (jp ? " (" + fa(jp.done) + " از " + fa(jp.all) + ")" : ""), jp && jp.all && jp.done >= jp.all, false);
       add("کارت‌های مرور یا چرخهٔ ۱-۳-۷ زمان‌بندی شد", c.card.length || c.sched.length);
     } else if (f.kind === "territory") {
       var b = f.blocked || {};
       add("برگهٔ ساختِ حوزه ثبت شد" + (b.number ? " (#" + fa(b.number) + ")" : ""), b.number);
       add("روتینِ مسئول ساخت و دستیار درستیِ آن را وارسی کرد", b.verified);
+      // تورِ خودِ حوزهٔ تازه (خواستهٔ مالک: «بعد مرا از همان وجه هم عبور دهد، با برنامه‌ریزی و پیگیری»): دست‌کم یک موضوع/پرونده در آن، با تمرینِ زمان‌بندی‌شده
+      add("گشت در حوزهٔ تازه و یک تمرینِ ماندگار از آن (موضوع یا پروندهٔ وصل‌شده با تمرینِ زمان‌بندی‌شده)", b.verified && (c.topic.length || c["case"].length) && practice(f).length);
     }
     // گام‌های نوشتهٔ مدل فقط برای وجه‌هایی که نشانهٔ داده‌محور ندارند (وگرنه تکرارِ همان نشانه‌ها می‌شد — شبیه‌سازیِ ۲۰۲۶-۱۰-۱۴)
     if (f.kind === "other") (f.steps || []).forEach(function (s) { add(s.t, s.done, false); });
     return m;
   }
+  /* «تا تسلطِ کامل» (خواستهٔ مالک): «انجام شد» یعنی پایه و تمرینِ فاصله‌دارِ این وجه برپاست و تور به وجهِ بعد می‌رود؛
+     نشانه‌های پیگیری (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز…) باز می‌مانند و تور تا ✓ شدنِ همه در «امروز» و یادآور دنبالشان می‌کند */
+  function followups(f) { return f.status === "skipped" ? [] : milestones(f).filter(function (m) { return !m.ok; }); }
+  function mastered(t) { return t.facets.every(function (f) { return !followups(f).length; }); }
+  AS.tourFollowups = followups;
   function coreDone(f) { var m = milestones(f).filter(function (x) { return x.core; }); return m.length > 0 && m.every(function (x) { return x.ok; }); }
   /* تمرین‌های آینده‌ای که همین بخش‌ها زمان‌بندی کرده‌اند */
   function practice(f) {
@@ -31429,7 +31479,7 @@ APP.goFromURL = function (q) {
   function normFacet(x, i) {
     var k = KIND[x.kind] ? x.kind : "other";
     return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, title: clip(x.title || KIND[k].fa, 120), why: clip(x.why || "", 300),
-      view: A.V[x.view] ? x.view : KIND[k].view, arg: x.arg == null ? "" : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : "",
+      view: A.V[x.view] ? x.view : KIND[k].view, arg: x.arg == null ? "" : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : (A.V[x.view] ? "" : KIND[k].sub || ""),
       steps: (x.steps || []).slice(0, 12).map(function (st) { return { t: clip(typeof st === "string" ? st : st.t, 140), done: false }; }),
       status: "todo", refs: [], createdAt: nowIso() };
   }
@@ -31439,9 +31489,21 @@ APP.goFromURL = function (q) {
     var fs = a.facets.slice(0, 10).map(normFacet);
     if (!s.tour) {
       s.tour = { goal: clip(a.goal || s.pinned || "", 300), createdAt: nowIso(), facets: fs };
-    } else {   // طرحِ تازه چیزی را بی‌صدا پاک نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
-      var have = {}; s.tour.facets.forEach(function (f) { have[f.key] = f; });
-      fs.forEach(function (f) { if (!have[f.key]) s.tour.facets.push(f); else { have[f.key].title = f.title; have[f.key].why = f.why || have[f.key].why; } });
+    } else {   // طرحِ تازه چیزی را بی‌صدا پاک یا بازنویسی نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
+      // (تورِ زنده: موضوعِ تازه در همان سشن با کلیدهای f1…f3 آمد و عنوانِ وجه‌های «انجام‌شده» را بازنویسی کرد — تاریخچه دروغ می‌شد)
+      var t = s.tour, have = {}, added = 0;
+      t.facets.forEach(function (f) { have[f.key] = f; });
+      function freeKey() { var n = t.facets.length + 1; while (have["f" + n]) n++; return "f" + n; }
+      fs.forEach(function (f) {
+        var o = have[f.key];
+        if (o && (o.status === "todo" || o.status === "now") && (o.kind === f.kind || o.title === f.title)) { o.title = f.title; o.why = f.why || o.why; if ((f.steps || []).length) o.steps = f.steps; return; }   // پالایشِ همان وجهِ باز
+        if (o) f.key = freeKey();
+        have[f.key] = f; t.facets.push(f); added++;
+      });
+      if (added) {
+        var g = clip(a.goal || "", 300); if (g && (t.goal || "").indexOf(g) < 0) t.goal = clip((t.goal ? t.goal + " · " : "") + g, 600);
+        if (t.doneAt) { delete t.doneAt; delete t.doneSaid; delete t.masteredAt; }   // تورِ تمام‌شده با وجهِ تازه دوباره باز است
+      }
     }
     advance(s); return "";
   };
@@ -31485,21 +31547,27 @@ APP.goFromURL = function (q) {
     });
     var c = current(s), msgs = [];
     if (c && ROOT_TYPE[c.kind]) {   // رکوردِ اصلیِ تازه‌ای که از آغازِ این وجه ساخته شد ⇒ به همین وجه
-      var since = c.startedAt || c.createdAt, typ = ROOT_TYPE[c.kind];
-      S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
+      var since = c.startedAt || c.createdAt;
+      ROOT_TYPE[c.kind].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
         var taken = t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === r.id; }); });
         if (!taken) { c.refs.push({ id: r.id, type: r.type }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
-      });
+      }); });
     }
     t.facets.forEach(function (f) {
-      if ((f.status === "now" || f.status === "todo") && f.kind !== "territory" && f.kind !== "other" && coreDone(f)) {
+      if ((f.status === "now" || f.status === "todo") && f.kind !== "other" && coreDone(f)) {
         f.status = "done"; f.doneAt = nowIso(); f.doneBy = "evidence";
         msgs.push("✓ وجهِ «" + f.title + "» کامل شد (از روی خودِ داده‌ها)" + (practice(f).length ? "؛ تمرین‌هایش زمان‌بندی شده و در «امروز» می‌آید" : ""));
       }
     });
     var n = advance(s);
     if (msgs.length) s.msgs.push({ role: "sys", at: nowIso(), text: msgs.join(" · ") + (n && msgs.some(function (x) { return /^✓/.test(x); }) ? " — بعدی: «" + n.title + "»" : "") });
-    if (t.doneAt && !t.doneSaid) { t.doneSaid = true; s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 همهٔ وجه‌های تور تمام شد. تمرین‌های آینده در «امروز» می‌آیند؛ اگر وجهی منتظرِ برگه بود، پس از ساختش دوباره خبرت می‌کنم." }); }
+    if (t.doneAt && !t.doneSaid) {
+      t.doneSaid = true;
+      var fu = t.facets.filter(function (f) { return followups(f).length; });
+      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 همهٔ وجه‌های تور به ترتیب طی شد و تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
+        (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
+    }
+    if (t.doneAt && !t.masteredAt && mastered(t)) { t.masteredAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "🏁 همهٔ نشانه‌های همهٔ وجه‌ها ✓ شد — تور کامل شد. مرورهای فاصله‌دار همچنان در «امروز» می‌آید." }); }
     syncReminder(s);
   };
 
@@ -31514,6 +31582,7 @@ APP.goFromURL = function (q) {
         " — نشانه‌ها: " + ms.map(function (m) { return (m.ok ? "✓" : "○") + m.t + (m.mine ? " (کارِ کاربر)" : ""); }).join("؛ ") +
         ((f.refs || []).length ? " — رکوردها: " + f.refs.map(function (r) { return r.type + ":" + r.id; }).join("، ") : "") +
         (pr.length ? " — تمرینِ زمان‌بندی‌شده: " + pr.map(function (p) { return p.t + " " + p.due; }).join("، ") : "") +
+        (f.status === "done" && followups(f).length ? " — پیگیریِ باز: " + followups(f).map(function (m) { return m.t; }).join("؛ ") : "") +
         (f.blocked ? " — برگهٔ #" + f.blocked.number + (f.blocked.verified ? " (ساخته و وارسی شد)" : " (منتظر)") : "") + (f.why ? " — چرا: " + f.why : ""));
     });
     return L.join("\n");
@@ -31522,11 +31591,13 @@ APP.goFromURL = function (q) {
   /* ---------- قاعده‌های تور برای مدل ---------- */
   AS.SYS += "\n" + [
     "# تور: مسئلهٔ چندوجهی",
-    "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود.",
+    "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود. اگر «# تور» از پیش هست و موضوعِ تازه‌ای آمد، فقط وجه‌های تازه را با کلیدهای تازه (پس از آخرین کلید) بده — وجهِ انجام‌شده هرگز عوض نمی‌شود.",
     "- ترتیب: (۱) وجهی که نتیجه‌اش ورودیِ وجهِ دیگر است اول (مثلاً ریشهٔ گیر پیش از ساختنِ شبیه‌سازِ همان مسئله؛ سنجشِ باوری که تصمیم بر آن بنا شده پیش از عمل)؛ (۲) آنچه زمان‌دار است زودتر؛ (۳) فهمیدنِ عمیقِ مفهومی که در همه مشترک است پیش از تمرینِ تخصصی؛ (۴) وجهِ «territory» (حوزه‌ای که نیست) جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و با بقیه ادامه بده.",
     "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",
     "- تمرین برای روزهای آینده را خودِ بخش‌ها می‌سازند — مطمئن شو ساخته شود: گره ⇒ «ساختِ ۴ نمونه» یا «ساختِ نمونه با هوش مصنوعی» و یک آزمایشِ واقعی؛ مسئلهٔ بزرگ ⇒ «ساختِ ۴ مسئلهٔ هم‌ساختار + ۱ بدلی» و شبیه‌ساز؛ یادگیری ⇒ کارتِ مرور و «شروع چرخه از امروز»؛ ادعا ⇒ تاریخِ بازبینی در ایستگاهِ پایانی. شبیه‌سازِ مسئلهٔ خودش از موقعیتِ گره با «ساختنِ شبیه‌سازِ همین مسئله».",
     "- تصمیم‌های کاربر (ریشه را تأیید کن، تأییدِ مسئله، بپذیر/رد کن) را نزن: هایلایت کن و یک جمله بگو چرا تصمیم با خودِ اوست.",
+    "- وجهِ territory پس از «ساخته و وارسی شد»: کاربر را به همان حوزه ببر (view=e_bt sub=terr) و یک جمله بگو چه ساخته شد و به کارِ او چه ربطی دارد؛ بعد یک موضوعِ یادگیری (topics) یا پروندهٔ سنجش (e_home) در همان حوزه بساز تا تمرینِ فاصله‌دار بگیرد — تا آن نشود وجه تمام نیست.",
+    "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
     "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
   ].join("\n");
 
@@ -31552,12 +31623,12 @@ APP.goFromURL = function (q) {
           f.view && f.status !== "skipped" ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go(f.view, f.arg || null, f.sub || null); } }, "↗ رفتن به این بخش") : null)));
     });
     box.appendChild(ol);
-    if (!t.doneAt) box.appendChild(h("button", { class: "btn sm", type: "button", onclick: function () { AS.send("[ادامهٔ تور]"); } }, "▶ ادامهٔ تور"));
+    if (!t.masteredAt) box.appendChild(h("button", { class: "btn sm", type: "button", onclick: function () { AS.send("[ادامهٔ تور]"); } }, t.doneAt ? "▶ پیگیری تا تسلط" : "▶ ادامهٔ تور"));
     return box;
   };
 
   /* ---------- پیگیریِ برگه‌ها: تا درست‌ساختن، بعد بازکردنِ همان وجه ---------- */
-  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ فقط JSON: {\"ok\":true|false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
+  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ اگر روتین می‌گوید ساخته و کامیت داده ولی در نقشه هیچ اثری نیست، شاید نسخهٔ تازه هنوز منتشر نشده: lag=true. فقط JSON: {\"ok\":true|false,\"lag\":false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
   AS.VERIFY_SYS = VERIFY_SYS;
   var MAX_FOLLOW = 4, lastSweep = 0;
   function reviewerNotes(rep) { return (rep.notes || []).filter(function (n) { return n.by === "reviewer"; }); }
@@ -31573,6 +31644,7 @@ APP.goFromURL = function (q) {
           var rv = reviewerNotes(rep), last = rv[rv.length - 1];
           if (!last || !(rep.status === "answered" || rep.status === "approved")) return;   // هنوز جوابی نیامده
           if (!force && last.id === f.blocked.seenNote) return;                            // همین جواب را دیده‌ایم
+          if (!force && f.blocked.lagAt && A._loadedAt && A._loadedAt <= f.blocked.lagAt) return;     // «شاید منتشر نشده»: پس از تازه‌کردن
           if (A._loadedAt && Date.parse(last.at || 0) > A._loadedAt) {
             if (f.blocked.reloadAsked !== last.id) { f.blocked.reloadAsked = last.id; s.msgs.push({ role: "sys", at: nowIso(), text: "🛎 روتین زیرِ برگهٔ #" + fa(f.blocked.number) + " جواب داد. صفحه را یک بار تازه کن (نسخهٔ تازهٔ سامانه) تا ساخته‌شده را با خودِ سامانه بسنجم." }); S.put(s); }
             return;
@@ -31583,12 +31655,23 @@ APP.goFromURL = function (q) {
             "\n\n# پیگیری‌های قبلیِ دستیار\n" + (f.blocked.checks || []).map(function (c) { return "- " + c.at.slice(0, 10) + " " + (c.ok ? "درست" : "ناقص") + ": " + clip(c.reason, 300); }).join("\n");
           return A.callAI(VERIFY_SYS, u, { task: "learning_architecture", maxTokens: 3000 }).then(function (txt) {
             var o = (A.parseJSONLoose || JSON.parse)(typeof txt === "object" ? txt.text : txt);
+            var lagN = f.blocked.checks.filter(function (c) { return c.lag && c.note === last.id; }).length;
+            if (!o.ok && o.lag === true && lagN < 2) {
+              // شاید هنوز منتشر نشده: برگه را بی‌جهت دوباره باز نکن — دفعهٔ بعد (پس از تازه‌کردن) دوباره بسنج؛ حداکثر دو بار
+              f.blocked.checks.push({ at: nowIso(), ok: false, lag: true, reason: clip(o.reason, 500), note: last.id });
+              f.blocked.seenNote = ""; f.blocked.reloadAsked = "";
+              s.msgs.push({ role: "sys", at: nowIso(), text: "⏳ روتین برای برگهٔ #" + fa(f.blocked.number) + " جواب داده ولی ساخته‌اش هنوز در سامانه دیده نمی‌شود — شاید نسخهٔ تازه هنوز منتشر نشده. کمی بعد صفحه را تازه کن؛ دوباره می‌سنجم." });
+              f.blocked.lagAt = Date.now();   // تا تازه‌کردنِ بعدیِ صفحه دوباره نسنج
+              return;
+            }
             f.blocked.checks.push({ at: nowIso(), ok: !!o.ok, reason: clip(o.reason, 500), note: last.id });
             if (o.ok) {
               f.blocked.verified = true; f.status = f.status === "blocked" ? "todo" : f.status;
-              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) + " — حالا وجهِ «" + f.title + "» را با هم طی می‌کنیم." });
+              var cur0 = current(s);
+              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) +
+                (cur0 && cur0 !== f ? " — وجهِ «" + f.title + "» دوباره در صفِ تور است و پس از «" + cur0.title + "» طی می‌شود؛ اگر می‌خواهی همین حالا، بگو «اول حوزهٔ تازه»." : " — حالا وجهِ «" + f.title + "» را با هم طی می‌کنیم.") });
               advance(s);
-            } else if (f.blocked.checks.filter(function (c) { return !c.ok; }).length > MAX_FOLLOW) {
+            } else if (f.blocked.checks.filter(function (c) { return !c.ok && !c.lag; }).length > MAX_FOLLOW) {
               s.msgs.push({ role: "sys", at: nowIso(), text: "⚠️ برگهٔ #" + fa(f.blocked.number) + " پس از " + fa(MAX_FOLLOW) + " بار پیگیری هنوز درست نشده — این را خودت ببین (" + clip(o.reason, 200) + ")." });
             } else {
               var note = "[دستیار · پیگیریِ برگه — بار " + fa(f.blocked.checks.length) + "]\nآنچه ساخته شد با خواسته و وجهِ کاربر نمی‌خواند:\n" + clip(o.reason, 1500) + "\n\n" + clip(o.followup || "", 4000) +
@@ -31621,8 +31704,13 @@ APP.goFromURL = function (q) {
       S.all("achat", function (x) { return x.tour && !x.tour.doneAt; }).forEach(function (s) {
         var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
         var ready = s.tour.facets.filter(function (x) { return x.blocked && x.blocked.verified && x.status === "todo"; })[0];
-        if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned, 40) + "»", go: function () { openTour(s, ready); } });
-        else if (f && A.localDay(s.updated) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned, 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+        if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", go: function () { openTour(s, ready); } });
+        else if (f && A.localDay(s.updated) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+      });
+      // پس از طیِ ترتیب: پیگیری تا تسلطِ کامل (نخستین نشانهٔ باز)
+      S.all("achat", function (x) { return x.tour && x.tour.doneAt && !x.tour.masteredAt; }).forEach(function (s) {
+        var f = s.tour.facets.filter(function (x) { return followups(x).length; })[0]; if (!f || A.localDay(s.updated) === A.today()) return;
+        items.push({ k: "p", txt: "🧭 پیگیریِ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "» تا تسلط", sub: "«" + clip(f.title, 40) + "»: " + clip(followups(f)[0].t, 60), go: function () { openTour(s, f); } });
       });
       return items;
     };
@@ -31632,15 +31720,16 @@ APP.goFromURL = function (q) {
   function syncReminder(s) {
     if (!(A.HOST && A.HOST.remind)) return;
     var n = ((S.settings().knots || {}).notify) || {}, key = "tour:" + s.id;
-    var open = s.tour && !s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; });
+    var open = s.tour && ((!s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; })) || (s.tour.doneAt && !s.tour.masteredAt && !mastered(s.tour)));
     try {
       if (!open || (!n.telegram && !n.email)) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
-      var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
+      var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0] || s.tour.facets.filter(function (x) { return followups(x).length; })[0];
       var due = A.addDays(A.today(), 1); if (s._rem === due) return;
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
-        body: "تورِ «" + clip(s.title || s.pinned, 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده.",
-        link: "?tab=" + encodeURIComponent((f && f.view) || "home"), channels: { telegram: !!n.telegram, email: !!n.email } });
+        body: s.tour.doneAt ? "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» تا تسلطِ کامل پیگیری دارد" + (f && followups(f).length ? ": «" + clip(f.title, 50) + "» — " + clip(followups(f)[0].t, 60) : "") + ". با «💬 دستیار» ادامه بده." :
+          "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده.",
+        link: "?tab=" + encodeURIComponent((f && f.view) || "home") + (f && f.arg ? "&a=" + encodeURIComponent(f.arg) : ""), channels: { telegram: !!n.telegram, email: !!n.email } });
       if (pr && pr.catch) pr.catch(function () { });
       s._rem = due;
     } catch (e) { }

@@ -106,31 +106,42 @@
     return clip(t, 90);
   }
   var SCAN = {};
-  AS.scan = function () {
-    var main = document.getElementById("main"), fields = [], buttons = [], heads = [];
-    SCAN = {};
-    if (!main) return { fields: fields, buttons: buttons, heads: heads };
-    main.querySelectorAll("h1,h2,h3").forEach(function (x, i) { if (i < 12) heads.push(clip(x.textContent, 70)); });
-    var n = 0, seen = {};
+  /* همان پیمایش و همان پالایه برای «پویش» و برای «دوباره‌یابیِ کلیدِ کهنه» — تا امضاها (نوع|برچسب|چندمین) یکی باشند */
+  function walk() {
+    var main = document.getElementById("main"), out = [], seen = {}, nb = 0, nf = 0;
+    if (!main) return out;
     main.querySelectorAll("input,textarea,select,button").forEach(function (el) {
       if (el.closest(".as-root")) return;
       // newer Chrome keeps a closed <details>' content laid out (content-visibility), so «closed» is asked directly
       var hid = inClosed(el) && !el.disabled && el.type !== "hidden";
       if (!visible(el) && !hid) return;
       var tag = el.tagName.toLowerCase(), type = tag === "input" ? (el.type || "text") : tag, lab = labelFor(el);
-      if (tag === "button" && (!lab || hid || buttons.length >= 80)) return;
-      if (tag !== "button" && fields.length >= 150) return;
+      if (tag === "button" && (!lab || hid || nb >= 80)) return;
+      if (tag !== "button" && nf >= 150) return;
+      if (tag === "button") nb++; else nf++;
+      var sig = tag + "|" + lab; seen[sig] = (seen[sig] || 0) + 1;
+      out.push({ el: el, tag: tag, type: type, label: lab, nth: seen[sig], hid: hid });
+    });
+    return out;
+  }
+  AS.scan = function () {
+    var main = document.getElementById("main"), fields = [], buttons = [], heads = [];
+    SCAN = {};
+    if (!main) return { fields: fields, buttons: buttons, heads: heads };
+    main.querySelectorAll("h1,h2,h3").forEach(function (x, i) { if (i < 12) heads.push(clip(x.textContent, 70)); });
+    var n = 0;
+    walk().forEach(function (w) {
+      var el = w.el, tag = w.tag, type = w.type, lab = w.label;
       var k = "k" + (++n); el.setAttribute("data-ai-k", k);
       var sec = el.closest("[data-report-section-label]");
-      var sig = tag + "|" + lab; seen[sig] = (seen[sig] || 0) + 1;
-      SCAN[k] = { tag: tag, type: type, label: lab, nth: seen[sig] };
+      SCAN[k] = { tag: tag, type: type, label: lab, nth: w.nth, node: el };
       if (tag === "button") { buttons.push({ k: k, label: lab }); return; }
       var f = { k: k, type: type, label: lab, section: sec ? clip(sec.getAttribute("data-report-section-label"), 40) : "" };
       if (type === "checkbox" || type === "radio") f.value = el.checked ? "✓" : "";
       else if (type !== "file") f.value = clip(el.value, 120);
       if (tag === "select") f.options = Array.prototype.slice.call(el.options, 0, 25).map(function (o) { return o.value + "=" + clip(o.textContent, 30); }).join(" | ");
       if (el.required || el.getAttribute("aria-required") === "true") f.required = true;
-      if (hid) f.closed = true;
+      if (w.hid) f.closed = true;
       fields.push(f);
     });
     return { fields: fields, buttons: buttons, heads: heads };
@@ -143,21 +154,26 @@
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     return L.join("\n");
   }
-  /* کلیدِ کهنه (نما دوباره رسم شد) ⇒ با همان برچسب و نوع دوباره پیدا کن */
+  /* کلیدِ کهنه (نما دوباره رسم شد) ⇒ با همان برچسب و نوع و «چندمین» دوباره پیدا کن.
+     نقشهٔ کلیدهای این نوبت (SCAN) هرگز بازنویسی نمی‌شود: پویشِ دوباره کلیدهای تازه نمی‌دهد، وگرنه «k40» ِ کهنه
+     به فیلدِ دیگری می‌خورد (باگِ اجرای واقعی: پس از انتخابِ خانواده فرم جابه‌جا شد و دو فیلد اشتباه پر شد) */
   function el(k) {
-    var x = document.querySelector('[data-ai-k="' + k + '"]'); if (x && document.contains(x)) return x;
     var sig = SCAN[k]; if (!sig) return null;
-    AS.scan();
-    // همان نوع + همان برچسب + همان «چندمین» (چند فیلد با برچسبِ «پاسخ» در یک صفحه ⇒ هرگز فیلدِ اشتباه)
-    var hit = Object.keys(SCAN).filter(function (j) { return SCAN[j].tag === sig.tag && SCAN[j].label === sig.label && SCAN[j].nth === sig.nth; })[0];
-    return hit ? document.querySelector('[data-ai-k="' + hit + '"]') : null;
+    if (sig.node && document.contains(sig.node)) return sig.node;
+    var hit = walk().filter(function (w) { return w.tag === sig.tag && w.label === sig.label && w.nth === sig.nth; })[0];
+    if (!hit) return null;
+    sig.node = hit.el; return hit.el;
   }
-
   /* ---------- کارها روی صفحه ---------- */
   var DANGER = /حذف|پاک|برداشتن|بایگانی|delete|remove|reset|بازنشانی|ریختن|خروج/i;
   /* تصمیم‌هایی که فقط با خودِ مالک است (پذیرش/ردِ پیشنهادِ قاعده و سقف، تأییدِ مسئله یا واقعه برای ورود به آزمون‌ها):
      دستیار هرگز نمی‌زندشان — هایلایت می‌کند و می‌گوید «این تصمیم با خودت است» */
   var OWNER = /بپذیر|پذیرفتم|رد کن|ردّ|نپذیر|تأیید|تایید|قبول|approve|accept|reject/i;
+  /* گزینه/جوابِ تمرین (شبیه‌ساز، ورزشِ گره، مسئلهٔ هم‌ساختار، دوره): دستیار نه پر می‌کند، نه می‌زند، نه زردش می‌کند —
+     زردکردنِ یک گزینه خودش پاسخ را لو می‌دهد یا کاربر را به آن می‌کشد (تورِ زنده: گزینهٔ غلطِ «۱/۲» زرد شد) */
+  var ANSWER = ".dopt, .dopts button, .pbs-ans input, .pbs-ans textarea, .pbs-ans button, .kp-opt, .kp-choices input, .kp-choices button, .kp-ans, .kp-ans input, .kp-ans textarea";
+  function isAnswer(x) { try { return !!(x && x.closest && x.closest(ANSWER)); } catch (e) { return false; } }
+  var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
   function fire(x, ev) { x.dispatchEvent(new Event(ev, { bubbles: true })); }
   function setVal(x, v) {
     var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -177,6 +193,7 @@
     },
     fill: function (a) {
       var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
+      if (isAnswer(x)) return ANSWER_NOTE;
       if (x.type === "file") return "پیوست با attach";
       reveal(x);
       if (x.tagName === "SELECT") {
@@ -191,10 +208,13 @@
       mark(x, a.why || "دستیار از حرفِ تو پر کرد — اگر درست نیست عوضش کن", "fill");
       return "";
     },
-    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
+    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; if (isAnswer(x)) return ANSWER_NOTE; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
     click: function (a) {
       var x = el(a.k); if (!x) return "دکمهٔ " + a.k + " پیدا نشد";
+      if (isAnswer(x)) return ANSWER_NOTE;
       var bt = (x.textContent || "") + " " + (x.getAttribute("aria-label") || "");
+      // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
+      if (x.getAttribute("role") === "tab") bt = "";
       if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
       if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
       var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
@@ -213,24 +233,30 @@
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
-    var notes = [], moved = false, chain = Promise.resolve(), skipped = 0;
+    var notes = [], moved = false, chain = Promise.resolve(), skipped = 0, toasts = [];
     clicked = { n: 0, changed: false };
+    // پیامی که صفحه پس از کارهای دستیار نشان داد (مثلاً «اول خودارزیابی را بزن») به خودِ دستیار هم می‌رسد — وگرنه حدس می‌زد
+    var rawToast = A.toast;
+    A.toast = function (m) { try { if (m) toasts.push(clip(String(m), 200)); } catch (e) { } return rawToast.apply(this, arguments); };
     (actions || []).slice(0, 40).forEach(function (a) {
       chain = chain.then(function () {
         if (!a || !DO[a.do]) return;
         // کلیدهای k… مالِ صفحهٔ پیشین‌اند: پس از رفتن به نمای تازه هرگز به کار نمی‌روند (پرکردنِ فیلدِ اشتباه) —
         // نوبتِ خودکارِ بعدی با فیلدهای همین صفحه پر می‌کند
         if (moved && /^(fill|highlight|click|attach)$/.test(a.do)) { skipped++; return; }
+        var at = A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "");
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         if (r) notes.push(r);
         if (a.do === "go" && !r) { moved = true; return wait(350); }
-        if (a.do === "click") return wait(250);
+        // کلیکی که نما/قدم را عوض کرد هم «رفتن» است: کلیدهای بعدیِ همین نوبت مالِ صفحهٔ پیشین‌اند
+        if (a.do === "click") return wait(250).then(function () { if (!r && A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "") !== at) moved = true; });
       });
     });
-    return chain.then(function () {
+    return chain.then(function () { return wait(150); }).then(function () {
+      if (A.toast !== rawToast) A.toast = rawToast;
       var first = document.querySelector(".as-hl") || document.querySelector(".as-filled");
       if (first && first.scrollIntoView) try { first.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { }
-      return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed };
+      return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
     });
   };
 
@@ -258,7 +284,7 @@
     "کارت: (۱) بفهمی کاربر چه می‌خواهد؛ (۲) او را به نما/بخش/فرمِ درست ببری (یک یا چند بخش، به ترتیب)؛ (۳) فرم را فقط از حرف‌ها و فایل‌های خودِ او پر کنی و باقیِ فیلدهای لازم را هایلایت کنی با یک جملهٔ کوتاه که چه بنویسد — یا اگر خواست، یکی‌یکی بپرسی و خودت پر کنی؛ (۴) فایل/عکس را کوتاه بخوانی و اگر فرم جای پیوست دارد پیوستش کنی؛ (۵) قدم‌به‌قدم مثلِ خودِ او با فرم جلو بروی.",
     "قاعده‌های سخت:",
     "- کوتاه: پاسخ حداکثر ۳ جمله (حدود ۶۰ واژه)، فارسیِ ساده، بی تعارف، در هر نوبت حداکثر یک پرسش.",
-    "- چیزی از خودت نساز: فیلدی را که کاربر چیزی برایش نگفته پر نکن؛ هایلایتش کن. در کاربرگِ تمرینِ تکنیک‌ها پاسخِ تمرین را ننویس (اثرِ تولید) — فقط جای نوشتن را نشان بده.",
+    "- چیزی از خودت نساز: فیلدی را که کاربر چیزی برایش نگفته پر نکن؛ هایلایتش کن. در کاربرگِ تمرینِ تکنیک‌ها پاسخِ تمرین را ننویس (اثرِ تولید) — فقط جای نوشتن را نشان بده. در شبیه‌ساز، ورزشِ گره، مسئلهٔ هم‌ساختار، کارتِ مرور و دوره هیچ گزینه یا جوابی را پر، کلیک یا هایلایت نکن (زردکردنِ یک گزینه یعنی لو دادنش)؛ فقط بگو کجای صفحه است.",
     "- داوری نکن: حکم، نمره و سقفِ اطمینان کارِ خودِ صفحه و کاربر است؛ برای کارِ عمیق دکمهٔ هوشِ همان بخش را (با click) بزن یا نشانش بده.",
     "- فقط کلیدهایی (k…) را به کار ببر که در «صفحهٔ فعلی» آمده و فقط نماهایی که در «نقشهٔ سامانه» هست. دکمهٔ حذف/پاک‌کردن را هرگز نزن.",
     "- وقتی کاربر را به نمای دیگری می‌بری و هنوز فیلدهایش را نمی‌بینی، فقط go بده؛ سامانه پس از بازشدن فیلدها را برایت می‌فرستد تا پر کنی.",
@@ -270,9 +296,10 @@
     "- کمبودِ سامانه (status=\"gap\"): خواسته در قلمروِ همین صفحه است و تشخیصِ بالا نشان داد پوشش داده نمی‌شود. gap را کامل پر کن: area دقیقاً یکی از شناسه‌های «چه کسی مسئولِ چیست»؛ kind؛ abstract (نیازِ کلی — این دسته از خواسته‌ها و نمونه‌های مشابه، نه تکرارِ مسئلهٔ کاربر)؛ missing (دقیقاً چه کم است)؛ where؛ how؛ relations؛ docs؛ why_area (چرا همین قلمرو)؛ why_not (چرا نه نامزدهای دیگر)؛ evidence (چه در نقشه نشان می‌دهد نیست)؛ confidence (۰ تا ۱). اگر confidence کمتر از ۰٫۷۵ است برگه نخواه — یک پرسشِ روشن‌کننده از کاربر بپرس. اگر برگهٔ بازی همین را می‌گوید، برگهٔ تازه نخواه و شماره‌اش را بگو. ثبتِ نهایی پس از نظرِ دوم (مشاور) است؛ به کاربر بگو «برای ثبت بررسی می‌کنم».",
     "- حافظه: memory خلاصهٔ انباشتهٔ کلِ همین سشن است از اولین پیام تا حالا (هدف، از کجا آمدیم، تصمیم‌ها، آنچه پر و ثبت شد و کجا، نکته‌های کلیدیِ فایل‌ها، آنچه مانده) — هر بار کاملش را برگردان، چیزی را نینداز.",
     "- pinned: خواستهٔ اصلیِ سشن در یک جمله (نوبتِ اول بساز؛ بعداً فقط اگر خواستهٔ اصلی واقعاً عوض شد).",
+    "- next: اگر در همین پاسخ گفتی «بعدش فلان دکمه را می‌زنم» و آن کار پس از کلیک‌های همین نوبت شدنی می‌شود، next:true بده تا سامانه صفحهٔ تازه را بفرستد و همان را انجام دهی؛ قولی نده که بی‌پیامِ کاربر عملی نشود.",
     "- steps: فهرستِ کاملِ مراحلِ رسیدن به خواستهٔ اصلی با وضعِ هر کدام (done/now/todo) و نمای هر کدام.",
     "خروجی فقط یک JSON (بی متنِ دیگر):",
-    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap",' +
+    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap","next":false,' +
     '"steps":[{"t":"…","s":"done|now|todo","view":"…"}],' +
     '"actions":[{"do":"go","view":"…","arg":"…","sub":"…"},{"do":"fill","k":"k3","value":"…"},{"do":"highlight","k":"k5","why":"…"},{"do":"click","k":"k9"},{"do":"attach","k":"k7","fileIds":[12]}],' +
     '"reread":[12],"gap":{"title":"…","area":"…","kind":"build|priority|fix","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…","why_area":"…","why_not":"…","evidence":"…","confidence":0.9}}'
@@ -471,6 +498,9 @@
     });
     var auto = 0;
     function turn(msg, extra, ids, first) {
+      // تور پیش از ساختنِ پرامپت هم هم‌گام می‌شود: کاری که کاربر بیرون از گفت‌وگو تمام کرد (مثلاً ایستگاهِ پایانی) همین نوبت دیده شود —
+      // وگرنه مدل روی وضعِ کهنه جواب می‌داد (تورِ زندهٔ ۲۰۲۶-۱۰-۱۴)
+      if (AS.tourAfterTurn && s.tour) { try { AS.tourAfterTurn(s); } catch (e) { console.error(e); } }
       var sc = AS.scan();
       return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; return ask(AS.SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
@@ -513,9 +543,14 @@
           var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
           var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
           if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
-          if (auto < MAX_AUTO && (res.moved || res.changed)) {
+          // «next»: مدل گفته کارِ بعدی را در همین رشته انجام می‌دهد (مثلاً پس از «ثبتِ کارت»، دکمهٔ «ساختِ نمونه‌ها») —
+          // بی آن، قولِ «بعدش می‌زنم» تا پیامِ بعدیِ کاربر معطل می‌ماند (یافتهٔ تورِ زنده)
+          var promised = o.next === true && res.clicks > 0 && !res.notes.length, said = res.clicks > 0 && res.toasts && res.toasts.length;
+          if (auto < MAX_AUTO && (res.moved || res.changed || promised || said)) {
             auto++;
-            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "» باز شد" : "فرم تغییر کرد (فیلدهای تازه)") +
+            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "»" + (A.state.sub ? " (قدم/برگهٔ " + A.state.sub + ")" : "") + " باز شد" : res.changed ? "فرم تغییر کرد (فیلدهای تازه)" : "کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده") +
+              (said ? "؛ پیامِ صفحه پس از کارهایت: «" + res.toasts.join("» · «") + "» — بر پایهٔ همین پیام ادامه بده (حدس نزن)" : "") +
+              (res.skipped ? "؛ " + res.skipped + " کارِ بعدیِ نوبتِ پیش اجرا نشد چون کلیدهایش مالِ صفحهٔ قبل بود — اگر هنوز لازم است با کلیدهای تازهٔ همین صفحه انجامش بده" : "") +
               ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]");
           }
           // موبایل: پنجره روی فرم است ⇒ کنار برود تا زردها و سبزها دیده شوند

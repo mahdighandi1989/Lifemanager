@@ -17,10 +17,10 @@
     claim: { fa: "سنجشِ ادعا/باور", ic: "⚖️", view: "e_home" },
     problem: { fa: "مسئلهٔ بزرگ و شبیه‌ساز", ic: "🧩", view: "e_prob" },
     learn: { fa: "فهمیدنِ عمیق", ic: "🌱", view: "topics" },
-    territory: { fa: "حوزه‌ای که هنوز نیست", ic: "🗺", view: "maps" },
+    territory: { fa: "حوزه‌ای که هنوز نیست", ic: "🗺", view: "e_bt", sub: "terr" },
     other: { fa: "گامِ دیگر", ic: "•", view: "" }
   };
-  var ROOT_TYPE = { knot: "kcase", claim: "case", problem: "eprob", learn: "topic" };
+  var ROOT_TYPE = { knot: ["kcase"], claim: ["case"], problem: ["eprob"], learn: ["topic"], territory: ["topic", "case"] };
   var ST_FA = { todo: "مانده", now: "در جریان", done: "انجام شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
   function nowIso() { return new Date().toISOString(); }
   function get(id) { return id ? S.get(id) : null; }
@@ -74,17 +74,24 @@
     } else if (f.kind === "learn") {
       var tp = c.topic[0], jp = tp && A.journeyProgress ? A.journeyProgress(tp) : null;
       add("موضوع ساخته شد", tp);
-      add("سفرِ گام‌به‌گام" + (jp ? " (" + fa(jp.done) + " از " + fa(jp.all) + ")" : ""), jp && jp.done >= Math.min(4, jp.all), false);
+      add("سفرِ گام‌به‌گام تا آخر" + (jp ? " (" + fa(jp.done) + " از " + fa(jp.all) + ")" : ""), jp && jp.all && jp.done >= jp.all, false);
       add("کارت‌های مرور یا چرخهٔ ۱-۳-۷ زمان‌بندی شد", c.card.length || c.sched.length);
     } else if (f.kind === "territory") {
       var b = f.blocked || {};
       add("برگهٔ ساختِ حوزه ثبت شد" + (b.number ? " (#" + fa(b.number) + ")" : ""), b.number);
       add("روتینِ مسئول ساخت و دستیار درستیِ آن را وارسی کرد", b.verified);
+      // تورِ خودِ حوزهٔ تازه (خواستهٔ مالک: «بعد مرا از همان وجه هم عبور دهد، با برنامه‌ریزی و پیگیری»): دست‌کم یک موضوع/پرونده در آن، با تمرینِ زمان‌بندی‌شده
+      add("گشت در حوزهٔ تازه و یک تمرینِ ماندگار از آن (موضوع یا پروندهٔ وصل‌شده با تمرینِ زمان‌بندی‌شده)", b.verified && (c.topic.length || c["case"].length) && practice(f).length);
     }
     // گام‌های نوشتهٔ مدل فقط برای وجه‌هایی که نشانهٔ داده‌محور ندارند (وگرنه تکرارِ همان نشانه‌ها می‌شد — شبیه‌سازیِ ۲۰۲۶-۱۰-۱۴)
     if (f.kind === "other") (f.steps || []).forEach(function (s) { add(s.t, s.done, false); });
     return m;
   }
+  /* «تا تسلطِ کامل» (خواستهٔ مالک): «انجام شد» یعنی پایه و تمرینِ فاصله‌دارِ این وجه برپاست و تور به وجهِ بعد می‌رود؛
+     نشانه‌های پیگیری (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز…) باز می‌مانند و تور تا ✓ شدنِ همه در «امروز» و یادآور دنبالشان می‌کند */
+  function followups(f) { return f.status === "skipped" ? [] : milestones(f).filter(function (m) { return !m.ok; }); }
+  function mastered(t) { return t.facets.every(function (f) { return !followups(f).length; }); }
+  AS.tourFollowups = followups;
   function coreDone(f) { var m = milestones(f).filter(function (x) { return x.core; }); return m.length > 0 && m.every(function (x) { return x.ok; }); }
   /* تمرین‌های آینده‌ای که همین بخش‌ها زمان‌بندی کرده‌اند */
   function practice(f) {
@@ -116,7 +123,7 @@
   function normFacet(x, i) {
     var k = KIND[x.kind] ? x.kind : "other";
     return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, title: clip(x.title || KIND[k].fa, 120), why: clip(x.why || "", 300),
-      view: A.V[x.view] ? x.view : KIND[k].view, arg: x.arg == null ? "" : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : "",
+      view: A.V[x.view] ? x.view : KIND[k].view, arg: x.arg == null ? "" : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : (A.V[x.view] ? "" : KIND[k].sub || ""),
       steps: (x.steps || []).slice(0, 12).map(function (st) { return { t: clip(typeof st === "string" ? st : st.t, 140), done: false }; }),
       status: "todo", refs: [], createdAt: nowIso() };
   }
@@ -126,9 +133,21 @@
     var fs = a.facets.slice(0, 10).map(normFacet);
     if (!s.tour) {
       s.tour = { goal: clip(a.goal || s.pinned || "", 300), createdAt: nowIso(), facets: fs };
-    } else {   // طرحِ تازه چیزی را بی‌صدا پاک نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
-      var have = {}; s.tour.facets.forEach(function (f) { have[f.key] = f; });
-      fs.forEach(function (f) { if (!have[f.key]) s.tour.facets.push(f); else { have[f.key].title = f.title; have[f.key].why = f.why || have[f.key].why; } });
+    } else {   // طرحِ تازه چیزی را بی‌صدا پاک یا بازنویسی نمی‌کند: وجه‌های موجود می‌مانند، تازه‌ها افزوده می‌شوند
+      // (تورِ زنده: موضوعِ تازه در همان سشن با کلیدهای f1…f3 آمد و عنوانِ وجه‌های «انجام‌شده» را بازنویسی کرد — تاریخچه دروغ می‌شد)
+      var t = s.tour, have = {}, added = 0;
+      t.facets.forEach(function (f) { have[f.key] = f; });
+      function freeKey() { var n = t.facets.length + 1; while (have["f" + n]) n++; return "f" + n; }
+      fs.forEach(function (f) {
+        var o = have[f.key];
+        if (o && (o.status === "todo" || o.status === "now") && (o.kind === f.kind || o.title === f.title)) { o.title = f.title; o.why = f.why || o.why; if ((f.steps || []).length) o.steps = f.steps; return; }   // پالایشِ همان وجهِ باز
+        if (o) f.key = freeKey();
+        have[f.key] = f; t.facets.push(f); added++;
+      });
+      if (added) {
+        var g = clip(a.goal || "", 300); if (g && (t.goal || "").indexOf(g) < 0) t.goal = clip((t.goal ? t.goal + " · " : "") + g, 600);
+        if (t.doneAt) { delete t.doneAt; delete t.doneSaid; delete t.masteredAt; }   // تورِ تمام‌شده با وجهِ تازه دوباره باز است
+      }
     }
     advance(s); return "";
   };
@@ -172,21 +191,27 @@
     });
     var c = current(s), msgs = [];
     if (c && ROOT_TYPE[c.kind]) {   // رکوردِ اصلیِ تازه‌ای که از آغازِ این وجه ساخته شد ⇒ به همین وجه
-      var since = c.startedAt || c.createdAt, typ = ROOT_TYPE[c.kind];
-      S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
+      var since = c.startedAt || c.createdAt;
+      ROOT_TYPE[c.kind].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
         var taken = t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === r.id; }); });
         if (!taken) { c.refs.push({ id: r.id, type: r.type }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
-      });
+      }); });
     }
     t.facets.forEach(function (f) {
-      if ((f.status === "now" || f.status === "todo") && f.kind !== "territory" && f.kind !== "other" && coreDone(f)) {
+      if ((f.status === "now" || f.status === "todo") && f.kind !== "other" && coreDone(f)) {
         f.status = "done"; f.doneAt = nowIso(); f.doneBy = "evidence";
         msgs.push("✓ وجهِ «" + f.title + "» کامل شد (از روی خودِ داده‌ها)" + (practice(f).length ? "؛ تمرین‌هایش زمان‌بندی شده و در «امروز» می‌آید" : ""));
       }
     });
     var n = advance(s);
     if (msgs.length) s.msgs.push({ role: "sys", at: nowIso(), text: msgs.join(" · ") + (n && msgs.some(function (x) { return /^✓/.test(x); }) ? " — بعدی: «" + n.title + "»" : "") });
-    if (t.doneAt && !t.doneSaid) { t.doneSaid = true; s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 همهٔ وجه‌های تور تمام شد. تمرین‌های آینده در «امروز» می‌آیند؛ اگر وجهی منتظرِ برگه بود، پس از ساختش دوباره خبرت می‌کنم." }); }
+    if (t.doneAt && !t.doneSaid) {
+      t.doneSaid = true;
+      var fu = t.facets.filter(function (f) { return followups(f).length; });
+      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 همهٔ وجه‌های تور به ترتیب طی شد و تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
+        (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
+    }
+    if (t.doneAt && !t.masteredAt && mastered(t)) { t.masteredAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "🏁 همهٔ نشانه‌های همهٔ وجه‌ها ✓ شد — تور کامل شد. مرورهای فاصله‌دار همچنان در «امروز» می‌آید." }); }
     syncReminder(s);
   };
 
@@ -201,6 +226,7 @@
         " — نشانه‌ها: " + ms.map(function (m) { return (m.ok ? "✓" : "○") + m.t + (m.mine ? " (کارِ کاربر)" : ""); }).join("؛ ") +
         ((f.refs || []).length ? " — رکوردها: " + f.refs.map(function (r) { return r.type + ":" + r.id; }).join("، ") : "") +
         (pr.length ? " — تمرینِ زمان‌بندی‌شده: " + pr.map(function (p) { return p.t + " " + p.due; }).join("، ") : "") +
+        (f.status === "done" && followups(f).length ? " — پیگیریِ باز: " + followups(f).map(function (m) { return m.t; }).join("؛ ") : "") +
         (f.blocked ? " — برگهٔ #" + f.blocked.number + (f.blocked.verified ? " (ساخته و وارسی شد)" : " (منتظر)") : "") + (f.why ? " — چرا: " + f.why : ""));
     });
     return L.join("\n");
@@ -209,11 +235,13 @@
   /* ---------- قاعده‌های تور برای مدل ---------- */
   AS.SYS += "\n" + [
     "# تور: مسئلهٔ چندوجهی",
-    "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود.",
+    "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود. اگر «# تور» از پیش هست و موضوعِ تازه‌ای آمد، فقط وجه‌های تازه را با کلیدهای تازه (پس از آخرین کلید) بده — وجهِ انجام‌شده هرگز عوض نمی‌شود.",
     "- ترتیب: (۱) وجهی که نتیجه‌اش ورودیِ وجهِ دیگر است اول (مثلاً ریشهٔ گیر پیش از ساختنِ شبیه‌سازِ همان مسئله؛ سنجشِ باوری که تصمیم بر آن بنا شده پیش از عمل)؛ (۲) آنچه زمان‌دار است زودتر؛ (۳) فهمیدنِ عمیقِ مفهومی که در همه مشترک است پیش از تمرینِ تخصصی؛ (۴) وجهِ «territory» (حوزه‌ای که نیست) جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و با بقیه ادامه بده.",
     "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",
     "- تمرین برای روزهای آینده را خودِ بخش‌ها می‌سازند — مطمئن شو ساخته شود: گره ⇒ «ساختِ ۴ نمونه» یا «ساختِ نمونه با هوش مصنوعی» و یک آزمایشِ واقعی؛ مسئلهٔ بزرگ ⇒ «ساختِ ۴ مسئلهٔ هم‌ساختار + ۱ بدلی» و شبیه‌ساز؛ یادگیری ⇒ کارتِ مرور و «شروع چرخه از امروز»؛ ادعا ⇒ تاریخِ بازبینی در ایستگاهِ پایانی. شبیه‌سازِ مسئلهٔ خودش از موقعیتِ گره با «ساختنِ شبیه‌سازِ همین مسئله».",
     "- تصمیم‌های کاربر (ریشه را تأیید کن، تأییدِ مسئله، بپذیر/رد کن) را نزن: هایلایت کن و یک جمله بگو چرا تصمیم با خودِ اوست.",
+    "- وجهِ territory پس از «ساخته و وارسی شد»: کاربر را به همان حوزه ببر (view=e_bt sub=terr) و یک جمله بگو چه ساخته شد و به کارِ او چه ربطی دارد؛ بعد یک موضوعِ یادگیری (topics) یا پروندهٔ سنجش (e_home) در همان حوزه بساز تا تمرینِ فاصله‌دار بگیرد — تا آن نشود وجه تمام نیست.",
+    "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
     "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
   ].join("\n");
 
@@ -239,12 +267,12 @@
           f.view && f.status !== "skipped" ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go(f.view, f.arg || null, f.sub || null); } }, "↗ رفتن به این بخش") : null)));
     });
     box.appendChild(ol);
-    if (!t.doneAt) box.appendChild(h("button", { class: "btn sm", type: "button", onclick: function () { AS.send("[ادامهٔ تور]"); } }, "▶ ادامهٔ تور"));
+    if (!t.masteredAt) box.appendChild(h("button", { class: "btn sm", type: "button", onclick: function () { AS.send("[ادامهٔ تور]"); } }, t.doneAt ? "▶ پیگیری تا تسلط" : "▶ ادامهٔ تور"));
     return box;
   };
 
   /* ---------- پیگیریِ برگه‌ها: تا درست‌ساختن، بعد بازکردنِ همان وجه ---------- */
-  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ فقط JSON: {\"ok\":true|false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
+  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ اگر روتین می‌گوید ساخته و کامیت داده ولی در نقشه هیچ اثری نیست، شاید نسخهٔ تازه هنوز منتشر نشده: lag=true. فقط JSON: {\"ok\":true|false,\"lag\":false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
   AS.VERIFY_SYS = VERIFY_SYS;
   var MAX_FOLLOW = 4, lastSweep = 0;
   function reviewerNotes(rep) { return (rep.notes || []).filter(function (n) { return n.by === "reviewer"; }); }
@@ -260,6 +288,7 @@
           var rv = reviewerNotes(rep), last = rv[rv.length - 1];
           if (!last || !(rep.status === "answered" || rep.status === "approved")) return;   // هنوز جوابی نیامده
           if (!force && last.id === f.blocked.seenNote) return;                            // همین جواب را دیده‌ایم
+          if (!force && f.blocked.lagAt && A._loadedAt && A._loadedAt <= f.blocked.lagAt) return;     // «شاید منتشر نشده»: پس از تازه‌کردن
           if (A._loadedAt && Date.parse(last.at || 0) > A._loadedAt) {
             if (f.blocked.reloadAsked !== last.id) { f.blocked.reloadAsked = last.id; s.msgs.push({ role: "sys", at: nowIso(), text: "🛎 روتین زیرِ برگهٔ #" + fa(f.blocked.number) + " جواب داد. صفحه را یک بار تازه کن (نسخهٔ تازهٔ سامانه) تا ساخته‌شده را با خودِ سامانه بسنجم." }); S.put(s); }
             return;
@@ -270,12 +299,23 @@
             "\n\n# پیگیری‌های قبلیِ دستیار\n" + (f.blocked.checks || []).map(function (c) { return "- " + c.at.slice(0, 10) + " " + (c.ok ? "درست" : "ناقص") + ": " + clip(c.reason, 300); }).join("\n");
           return A.callAI(VERIFY_SYS, u, { task: "learning_architecture", maxTokens: 3000 }).then(function (txt) {
             var o = (A.parseJSONLoose || JSON.parse)(typeof txt === "object" ? txt.text : txt);
+            var lagN = f.blocked.checks.filter(function (c) { return c.lag && c.note === last.id; }).length;
+            if (!o.ok && o.lag === true && lagN < 2) {
+              // شاید هنوز منتشر نشده: برگه را بی‌جهت دوباره باز نکن — دفعهٔ بعد (پس از تازه‌کردن) دوباره بسنج؛ حداکثر دو بار
+              f.blocked.checks.push({ at: nowIso(), ok: false, lag: true, reason: clip(o.reason, 500), note: last.id });
+              f.blocked.seenNote = ""; f.blocked.reloadAsked = "";
+              s.msgs.push({ role: "sys", at: nowIso(), text: "⏳ روتین برای برگهٔ #" + fa(f.blocked.number) + " جواب داده ولی ساخته‌اش هنوز در سامانه دیده نمی‌شود — شاید نسخهٔ تازه هنوز منتشر نشده. کمی بعد صفحه را تازه کن؛ دوباره می‌سنجم." });
+              f.blocked.lagAt = Date.now();   // تا تازه‌کردنِ بعدیِ صفحه دوباره نسنج
+              return;
+            }
             f.blocked.checks.push({ at: nowIso(), ok: !!o.ok, reason: clip(o.reason, 500), note: last.id });
             if (o.ok) {
               f.blocked.verified = true; f.status = f.status === "blocked" ? "todo" : f.status;
-              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) + " — حالا وجهِ «" + f.title + "» را با هم طی می‌کنیم." });
+              var cur0 = current(s);
+              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) +
+                (cur0 && cur0 !== f ? " — وجهِ «" + f.title + "» دوباره در صفِ تور است و پس از «" + cur0.title + "» طی می‌شود؛ اگر می‌خواهی همین حالا، بگو «اول حوزهٔ تازه»." : " — حالا وجهِ «" + f.title + "» را با هم طی می‌کنیم.") });
               advance(s);
-            } else if (f.blocked.checks.filter(function (c) { return !c.ok; }).length > MAX_FOLLOW) {
+            } else if (f.blocked.checks.filter(function (c) { return !c.ok && !c.lag; }).length > MAX_FOLLOW) {
               s.msgs.push({ role: "sys", at: nowIso(), text: "⚠️ برگهٔ #" + fa(f.blocked.number) + " پس از " + fa(MAX_FOLLOW) + " بار پیگیری هنوز درست نشده — این را خودت ببین (" + clip(o.reason, 200) + ")." });
             } else {
               var note = "[دستیار · پیگیریِ برگه — بار " + fa(f.blocked.checks.length) + "]\nآنچه ساخته شد با خواسته و وجهِ کاربر نمی‌خواند:\n" + clip(o.reason, 1500) + "\n\n" + clip(o.followup || "", 4000) +
@@ -308,8 +348,13 @@
       S.all("achat", function (x) { return x.tour && !x.tour.doneAt; }).forEach(function (s) {
         var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
         var ready = s.tour.facets.filter(function (x) { return x.blocked && x.blocked.verified && x.status === "todo"; })[0];
-        if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned, 40) + "»", go: function () { openTour(s, ready); } });
-        else if (f && A.localDay(s.updated) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned, 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+        if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", go: function () { openTour(s, ready); } });
+        else if (f && A.localDay(s.updated) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+      });
+      // پس از طیِ ترتیب: پیگیری تا تسلطِ کامل (نخستین نشانهٔ باز)
+      S.all("achat", function (x) { return x.tour && x.tour.doneAt && !x.tour.masteredAt; }).forEach(function (s) {
+        var f = s.tour.facets.filter(function (x) { return followups(x).length; })[0]; if (!f || A.localDay(s.updated) === A.today()) return;
+        items.push({ k: "p", txt: "🧭 پیگیریِ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "» تا تسلط", sub: "«" + clip(f.title, 40) + "»: " + clip(followups(f)[0].t, 60), go: function () { openTour(s, f); } });
       });
       return items;
     };
@@ -319,15 +364,16 @@
   function syncReminder(s) {
     if (!(A.HOST && A.HOST.remind)) return;
     var n = ((S.settings().knots || {}).notify) || {}, key = "tour:" + s.id;
-    var open = s.tour && !s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; });
+    var open = s.tour && ((!s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; })) || (s.tour.doneAt && !s.tour.masteredAt && !mastered(s.tour)));
     try {
       if (!open || (!n.telegram && !n.email)) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
-      var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
+      var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0] || s.tour.facets.filter(function (x) { return followups(x).length; })[0];
       var due = A.addDays(A.today(), 1); if (s._rem === due) return;
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
-        body: "تورِ «" + clip(s.title || s.pinned, 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده.",
-        link: "?tab=" + encodeURIComponent((f && f.view) || "home"), channels: { telegram: !!n.telegram, email: !!n.email } });
+        body: s.tour.doneAt ? "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» تا تسلطِ کامل پیگیری دارد" + (f && followups(f).length ? ": «" + clip(f.title, 50) + "» — " + clip(followups(f)[0].t, 60) : "") + ". با «💬 دستیار» ادامه بده." :
+          "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده.",
+        link: "?tab=" + encodeURIComponent((f && f.view) || "home") + (f && f.arg ? "&a=" + encodeURIComponent(f.arg) : ""), channels: { telegram: !!n.telegram, email: !!n.email } });
       if (pr && pr.catch) pr.catch(function () { });
       s._rem = due;
     } catch (e) { }

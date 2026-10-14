@@ -68,3 +68,14 @@ merged_from: []
 - Export the exact system prompt and the exact user message the page builds for realistic scenarios and have an independent model answer them (assistant + consultant roles). 7/8 were right; the 8th (statistical errors) was referred as «build a new rule» by BOTH models although the specialist routine already had it on its agenda.
 - Owners are not enough: give the GP each routine's **current agenda** (one line per track, each pointing at a real prompt section, checked by a test). After that the same scenario became «already in progress — who, when; priority only if needed now».
 - Prompt budget: the new message and attached text are never cut; history takes what remains; any unavoidable cut is announced in the prompt.
+
+
+## Update 2026-10-14 (c) — multi-facet "tours" and a live end-to-end run
+- **Keep the plan in data, not in the model.** A persistent `tour` (facets with kind/status/refs) on the session; progress is computed from the records the sections themselves create (case → knot → practice items…), never from the model's own "steps". Sync it **before** building the prompt too, or the model answers on stale state.
+- **Don't build a parallel scheduler.** "Practice for the coming months" = the sections' own spaced items; the tour only links and lists them. Separate "done for ordering" from "mastered" (open follow-ups stay in Today/reminders).
+- **A key map is per turn and immutable.** Re-scanning mid-turn and re-issuing `k1…kn` made stale keys hit other fields after a re-render. Keep a node ref per key; re-find by tag+label+ordinal with the same walker, without touching the map.
+- **Feed the page's own reactions back:** capture toasts during the actions and send them in the auto turn; treat a click that changes view/step as navigation; let the model say `next:true` when it promised a follow-up click.
+- **Exercise answers are off-limits in code**, not only in the prompt — highlighting one option is a leak (the live run highlighted the wrong one).
+- **A re-plan only appends** (fresh keys); never rewrite finished facets.
+- **Following a ticket to done:** verify the routine's answer against the *current* system map; an answer newer than the loaded page ⇒ reload first; "maybe not deployed yet" ⇒ wait, don't reopen; inadequate ⇒ reasoned note under the same ticket (it reopens), capped.
+- **Test it live:** real page + a real model answering every AI request + a scripted user/routine found 17 defects that unit tests had not.
