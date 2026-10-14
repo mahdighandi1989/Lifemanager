@@ -30984,6 +30984,7 @@ APP.goFromURL = function (q) {
     "- پرسشی که دربارهٔ خودِ کاربر است (پاسخ را دیده‌ای؟ چقدر مطمئن بودی؟ دیگران هم؟ چند بار؟) را فقط از حرفِ صریحِ خودش پر کن؛ وگرنه بپرس. برای تصمیمِ کاربر یک گزینه را زرد نکن (جهت‌دادن است) — یا همهٔ گزینه‌ها را زرد کن یا فقط بپرس.",
     "- ساختنِ رکوردِ تازه تصمیم نیست: در نمای فهرستی (مثلاً kcases ⇐ «+ موقعیتِ تازه»، topics، e_prob ⇐ «افزودنِ مسئلهٔ تو») دکمهٔ ساختن را همان نوبت بزن و next:true بده.",
     "- حرفِ نامربوط (بیرون از یادگیری، معرفت‌شناسی/سنجشِ ادعا، گره‌گشایی/حلِ مسئله و کار با همین صفحه): status=\"unrelated\" و مؤدبانه بگو به این‌جا ربطی ندارد و در یک جمله بگو چه کمکی از این‌جا برمی‌آید.",
+    "- کاربرِ تازه («چی کار می‌تونه بکنه؟»): کوتاه و از روی همین نقشه بگو و جای شروع را نشان بده — «از اینجا شروع کن» در منو، «🗺 نقشه‌ها» (قلمروِ سامانه‌ها، گرافِ مشترک)، «🧠 کارنامهٔ ذهن» و این‌که تور با خودِ تو مسئله را تا تسلط پیگیری می‌کند؛ بعد سرِ هدفِ خودش برو.",
     "- **تو پزشکِ عمومیِ این سامانه‌ای: پیش از هر ارجاع تشخیصِ افتراقی کن.** (۱) خواستهٔ واقعیِ کاربر را از ظاهرِ حرفش جدا کن؛ (۲) دست‌کم دو بخش/قلمروِ نامزد را از «نقشهٔ سامانه» نام ببر و برای هر کدام شاهد بیاور که هست یا نیست (نما، فرم، قلمروِ معرفت‌شناسی با گامش، پیشنهادِ منتظر، برگهٔ باز)؛ (۳) فقط بعد تصمیم بگیر. اشتباه در ارجاع، متخصص را به بیراهه می‌برد. پیش از هر gap از نوعِ fix («فلان کار نمی‌شود»): در پویشِ همین صفحه دنبالِ دکمه‌ای بگرد که همان کار را می‌کند (مثلاً در کارخانه ایستگاه فقط با «ثبت و ایستگاه بعد» ثبت می‌شود، نه با نوارِ مسیر) و اول آن را امتحان کن؛ اگر برگه‌ای را به‌اشتباه ثبت کردی، صریح بگو و شماره‌اش را بگو تا کاربر در «نظارت و سرکشی» ببندد.",
     "- اگر بخشی هست ⇒ کاربر را همان‌جا ببر (اگر به چند بخش مربوط است، ترتیب و دلیلِ هر کدام). اگر هست ولی هنوز کامل نیست یا در «کارِ جاریِ هر روتین» آمده است (مثلاً حوزهٔ قلمرو در گامِ ۱، یا خطایی که در مسیرِ ۲ ِ بک‌تست است) ⇒ صادقانه بگو کجای راه است و چه کسی و کِی جلو می‌برد؛ فقط اگر کاربر الان لازمش دارد، kind=\"priority\". اگر بخش هست ولی غلط کار می‌کند ⇒ kind=\"fix\". فقط اگر واقعاً نیست ⇒ kind=\"build\".",
     "- کمبودِ سامانه (status=\"gap\"): خواسته در قلمروِ همین صفحه است و تشخیصِ بالا نشان داد پوشش داده نمی‌شود. gap را کامل پر کن: area دقیقاً یکی از شناسه‌های «چه کسی مسئولِ چیست»؛ kind؛ abstract (نیازِ کلی — این دسته از خواسته‌ها و نمونه‌های مشابه، نه تکرارِ مسئلهٔ کاربر)؛ missing (دقیقاً چه کم است)؛ where؛ how؛ relations؛ docs؛ why_area (چرا همین قلمرو)؛ why_not (چرا نه نامزدهای دیگر)؛ evidence (چه در نقشه نشان می‌دهد نیست)؛ confidence (۰ تا ۱). اگر confidence کمتر از ۰٫۷۵ است برگه نخواه — یک پرسشِ روشن‌کننده از کاربر بپرس. اگر برگهٔ بازی همین را می‌گوید، برگهٔ تازه نخواه و شماره‌اش را بگو. ثبتِ نهایی پس از نظرِ دوم (مشاور) است؛ به کاربر بگو «برای ثبت بررسی می‌کنم».",
@@ -31620,7 +31621,8 @@ APP.goFromURL = function (q) {
     var ar = x.area && A.SYST ? (A.SYST.byId ? A.SYST.byId(String(x.area)) : A.SYST.find(String(x.area))) : null, epi = ar && ar.epi;
     if (x.area && !ar) BAD_AREA.push(String(x.area));
     if (ar && k === "other") k = "area";
-    var dv = epi ? "e_bt" : KIND[k].view, ds = epi ? "terr" : KIND[k].sub || "";
+    // حوزهٔ سامانه‌ها (نه معرفت‌شناسی) ⇒ نمای «🗺 قلمروِ سامانه‌ها»، حتی برای وجهِ territory (کارزارِ آزمون sc16: dc_* به قلمروِ معرفت‌شناسی می‌رفت)
+    var dv = epi ? "e_bt" : ar ? "sterr" : KIND[k].view, ds = epi ? "terr" : ar ? "" : KIND[k].sub || "";
     return { key: String(x.key || "f" + (i + 1)).slice(0, 12), kind: k, area: ar ? ar.a.id : "", title: clip(x.title || x.name || x.t || (ar ? ar.a.fa : "") || KIND[k].fa, 120), why: clip(x.why || "", 300),
       view: A.V[x.view] ? x.view : dv, arg: x.arg == null || x.arg === "" ? (ar && !epi ? ar.sys.id : "") : String(x.arg).slice(0, 80), sub: x.sub ? String(x.sub).slice(0, 40) : (A.V[x.view] ? "" : ds),
       steps: (x.steps || []).slice(0, 12).map(function (st) { return { t: clip(typeof st === "string" ? st : st.t, 140), done: false }; }),
@@ -31706,6 +31708,14 @@ APP.goFromURL = function (q) {
   };
 
   /* ---------- پس از هر نوبت: پیوندِ خودکار، پیشرفت، رفتن به وجهِ بعد ---------- */
+  var VIEW_TYPES = { chain: ["wchain"], fcast: ["fcast"], vals: ["value", "meaning"] };
+  function areaTypes(id) { var x = A.SYST && A.SYST.find ? A.SYST.find(id) : null, out = []; ((x && x.a.tools) || []).forEach(function (tl) { var m = /^view:(\w+)$/.exec(tl); if (m && VIEW_TYPES[m[1]]) out = out.concat(VIEW_TYPES[m[1]]); }); return out.length ? out : null; }
+  // رکوردی که به ابزارِ همین حوزه می‌خورد (کارزارِ آزمون sc16: کاربرگِ یادگیریِ پایتون به وجهِ «تصمیمِ شغلی» چسبید و آن را «برپا» کرد)
+  function fitsArea(r, id) {
+    var x = A.SYST && A.SYST.find ? A.SYST.find(id) : null, tl = (x && x.a.tools) || [];
+    if (r.type === "ex") return tl.indexOf("tech:" + r.tid) >= 0;
+    var ty = areaTypes(id) || []; return ty.indexOf(r.type) >= 0;
+  }
   AS.tourAfterTurn = function (s) {
     var t = T(s); if (!t) return;
     // خوداصلاحی: برگه‌ای که برای وجهی ثبت شده ولی وجه به آن وصل نشده (مثلاً برگه پیش از ساختِ تور) ⇒ همان وجه منتظرِ همان برگه
@@ -31718,14 +31728,13 @@ APP.goFromURL = function (q) {
       var since = c.startedAt || c.createdAt;
       ROOT_TYPE[c.kind].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
         var taken = t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === r.id; }); });
+        if (!taken && c.kind === "area" && !(c.area && fitsArea(r, c.area))) return;   // موضوع/پرونده/کاربرگِ نامربوط ⇒ مدل با tour_link وصل کند
         if (!taken) { c.refs.push({ id: r.id, type: r.type, auto: true }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
       }); });
     }
     // وجهِ «حوزه» رکوردِ ابزارِ خودِ همان حوزه را می‌گیرد، حتی اگر وقتی ساخته شد وجه منتظرِ برگه یا در صف بود (کارزارِ آزمون sc14:
     // ارزش‌ها ساخته شد ولی وجهِ ارزش‌ها ۰ از ۳ ماند) — فقط رکوردهای پس از آغازِ تور و هنوز بی‌وجه
     // نوعِ رکورد از ابزارهای خودِ حوزه در ثبت‌گاه می‌آید (view:chain ⇒ زنجیره، view:fcast ⇒ پیش‌بینی، view:vals ⇒ ارزش/معنا) — نه فهرستِ دستی
-    var VIEW_TYPES = { chain: ["wchain"], fcast: ["fcast"], vals: ["value", "meaning"] };
-    function areaTypes(id) { var x = A.SYST && A.SYST.find ? A.SYST.find(id) : null, out = []; ((x && x.a.tools) || []).forEach(function (tl) { var m = /^view:(\w+)$/.exec(tl); if (m && VIEW_TYPES[m[1]]) out = out.concat(VIEW_TYPES[m[1]]); }); return out.length ? out : null; }
     var t0 = t.createdAt || (t.facets[0] || {}).createdAt || "";
     t.facets.forEach(function (f) {
       var typs = f.kind === "area" && f.status !== "done" && f.status !== "skipped" && f.area && areaTypes(f.area); if (!typs) return;

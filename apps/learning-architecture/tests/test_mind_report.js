@@ -119,6 +119,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.S.put({ id: 'wc_t1', type: 'wchain', title: 'بیکار می‌شوم', feel: 80, links: [{ text: 'تعدیل', p: 30 }, { text: 'کار پیدا نکنم', p: 20 }], due: APP.addDays(APP.today(), 30) });
     AS.tourAfterTurn(s);
     out.areaMs = AS.tourMilestones(f).map(m => m.ok ? 1 : 0).join('');
+    // کاربرگِ نامربوط (فنی که در ابزارهای همین حوزه نیست) به وجهِ حوزه نمی‌چسبد (کارزارِ آزمون sc16)
+    APP.S.put({ id: 'ex_py', type: 'ex', tid: 999, topic: 'tp_py', status: 'draft', data: {} }); AS.tourAfterTurn(s);
+    out.noMislink = !f.refs.some(r => r.id === 'ex_py');
     out.chainCalc = JSON.stringify(APP.chainCalc(APP.S.get('wc_t1')));
     // کارِ «انجام‌شده» که نشد ⇒ نوبتِ اصلاح
     const m = document.getElementById('main'); m.innerHTML = '<button id="zz" type="button">ریشه را تأیید کن</button>';
@@ -173,7 +176,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.camp.chainCalc === '{"prod":6,"min":20,"n":2}', 'worry chain: ceiling = weakest link, independent = product: ' + info.camp.chainCalc);
   chk(info.camp.correct && info.camp.toast, 'a claimed-but-failed action triggers a correction turn; page messages reach the next prompt');
   chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
-  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook && info.camp.valsLinked && info.camp.badArea && info.camp.ret, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
+  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook && info.camp.valsLinked && info.camp.badArea && info.camp.ret && info.camp.noMislink, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
