@@ -71,7 +71,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.found && S.noEvidence && S.unknown, '"found" needs the user\'s own words (else "ask"); unknown layer ids are reported');
   chk(S.prompt && S.drawer, 'the model sees prior knots and the sieve state; the drawer shows the sieve');
   chk(S.made && S.gate && S.items && S.refShown && S.topic, 'prerequisite map: AI only after «بفرست», marked unverified; user self-rates; missing ⇒ learning topic with science › branch');
-  chk(/^10000>111/.test(S.ms), 'prereq facet milestones come from the map, the self-ratings and the topics: ' + S.ms);
+  chk(/^100000>111/.test(S.ms), 'prereq facet milestones come from the map, the self-ratings and the topics: ' + S.ms);
   chk(S.today && S.nav, 'Today stops nagging once rated; menu entry');
   chk(S.noCodes && S.humanized, 'the e-mail carries no internal codes (facet keys, family codes, area/record ids, sheet jargon) — names instead');
   console.log(JSON.stringify(info).slice(0, 2500));

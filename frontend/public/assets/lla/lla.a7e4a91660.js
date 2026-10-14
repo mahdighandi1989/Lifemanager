@@ -31534,7 +31534,11 @@ APP.goFromURL = function (q) {
     } else if (f.kind === "claim") {
       var cs = c["case"][0], fin = cs && cs.st && cs.st.st_final;
       add("پروندهٔ سنجش در کارخانه ساخته شد", cs);
-      add("ایستگاه‌ها گذرانده شد" + (cs ? " (" + fa(Object.keys(cs.st || {}).filter(function (k) { return (cs.st[k] || {}).done; }).length) + ")" : ""), fin && fin.done);
+      // «گذرانده شد» یعنی همهٔ ایستگاه‌های مسیرِ همین پرونده، نه فقط حکمِ نهایی (کارزارِ آزمون c08: سه ایستگاهِ میانی جا ماند و ✓ خورد)
+      var rt = cs && A.routeOf ? A.routeOf(cs).filter(function (o) { return o.inRoute; }).map(function (o) { return o.s.id; }) : [];
+      var stDone = cs ? Object.keys(cs.st || {}).filter(function (k) { return (cs.st[k] || {}).done; }) : [];
+      var left = rt.filter(function (id) { return stDone.indexOf(id) < 0; });
+      add("ایستگاه‌ها گذرانده شد" + (cs ? " (" + fa(rt.length ? rt.length - left.length : stDone.length) + (rt.length ? " از " + fa(rt.length) : "") + ")" : ""), fin && fin.done && !left.length);
       add("تاریخِ بازبینی گذاشته شد (پیگیریِ نتیجهٔ واقعی)", fin && fin.data && fin.data.revdate);
       var rows = ((fin && fin.data && fin.data.final) || []).filter(function (r) { return r.c; });
       add("نتیجهٔ واقعی در بازبینی ثبت شد (درست بود یا نه)", cs && rows.length && rows.every(function (r) { return (cs.outcome || {})[r.c]; }), false);
@@ -31567,7 +31571,8 @@ APP.goFromURL = function (q) {
       var pq = c.prereq[0], pk = pq && A.prereqState ? A.prereqState(pq) : null;
       add("نقشهٔ پیش‌نیازها ساخته شد" + (pk ? " (" + fa(pk.n) + " مفهوم از " + fa(pk.sci) + " علم)" : ""), pk && pk.n);
       add("هر پیش‌نیاز را خودت سنجیدی (پرسشِ تشخیصی)", pk && pk.n && pk.rated === pk.n, true, true);
-      add("برای هر پیش‌نیازِ نبوده یک موضوعِ یادگیری ساخته شد", pk && pk.rated === pk.n && pk.topics.length === pk.miss.length);
+      add("برای هر پیش‌نیازِ نبوده یک موضوعِ یادگیری ساخته شد", pk && pk.n && pk.rated === pk.n && pk.topics.length === pk.miss.length);
+      add("مرورِ فاصله‌دار (کارت یا چرخهٔ ۱-۳-۷) برای هر موضوعِ پیش‌نیاز", pk && pk.topics.length && pk.topics.every(function (x) { return S.all("card", function (c) { return c.topic === x.topic; }).length || S.all("sched", function (c) { return c.topic === x.topic; }).length; }), false);
       var jt = c.topic.map(function (tp) { return A.journeyProgress ? A.journeyProgress(tp) : null; }).filter(Boolean);
       add("سفرِ موضوع‌های پیش‌نیاز تا آخر", jt.length && jt.every(function (j) { return j.all && j.done >= j.all; }), false);
       add("بازگشت به خودِ مسئله: دوباره امتحان شد و حل شد", pq && pq.back === "حل شد", false);
@@ -32265,6 +32270,8 @@ APP.goFromURL = function (q) {
     S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) {
       var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
     });
+    // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
+    S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + it.filter(function (x) { return x.self === "بلد نیستم" || x.self === "نیمه"; }).length + " از " + it.length + " نبود", st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
     S.all("eprob", function (p) { return !p.sample; }).forEach(function (p) { D.s_problem.items.push({ t: "prob", id: p.id, fa: (p.p && p.p.title) || "مسئله", st: p.status, at: p.created }); });
     /* شاخص‌ها */
     dims.forEach(function (dd) {
@@ -32317,6 +32324,7 @@ APP.goFromURL = function (q) {
     knots.forEach(function (k) { if (k.created) ev.push({ at: k.created, fa: "گرهٔ تازه: «" + (k.name || "گره") + "»" }); (k.hist || []).forEach(function (x) { if (x.status === "practised") ev.push({ at: x.at, fa: "✓ ورزیده: «" + (k.name || "گره") + "»" }); if (x.status === "returned") ev.push({ at: x.at, fa: "↩ بازگشت: «" + (k.name || "گره") + "»" }); }); });
     cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); var fn = c.st && c.st.st_final; if (fn && fn.done) ev.push({ at: fn.at || c.updated || c.created, fa: "⚖️ حکمِ پایانیِ پرونده: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });
     S.all("kcase", function (c) { return !c.sample && c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "🪢 موقعیتِ گره‌گشا: «" + (c.title || "") + "»" }); });
+    S.all("prereq", function (p) { return p.created; }).forEach(function (p) { ev.push({ at: p.created, fa: "🧩 نقشهٔ پیش‌نیازها: «" + (p.title || "") + "»" }); if (p.backAt && p.back) ev.push({ at: p.backAt, fa: "🧩 بازگشت به مسئله: " + p.back }); });
     S.all("wchain", function (c) { return c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "⛓ زنجیرهٔ نگرانی: «" + c.title + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "⛓ نتیجهٔ «" + c.title + "»: " + c.outcome }); });
     S.all("achat", function (s) { return s.tour; }).forEach(function (s) { ev.push({ at: s.tour.createdAt, fa: "🧭 تورِ تازه: «" + (s.title || s.pinned || "") + "»" }); if (s.tour.doneAt) ev.push({ at: s.tour.doneAt, fa: "🧭 ترتیبِ تور طی شد: «" + (s.title || "") + "»" }); if (s.tour.masteredAt) ev.push({ at: s.tour.masteredAt, fa: "🏁 تور تا تسلط کامل شد: «" + (s.title || "") + "»" }); });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
@@ -32504,14 +32512,14 @@ APP.goFromURL = function (q) {
   /* ایمیل بی کد (مالک ۲۰۲۶-۱۰-۱۴: «جاهایی کدگذاری‌شده حرف می‌زند — f7 و … — نباید باشد»): کلیدِ وجه ⇒ نامِ وجه، خانوادهٔ گره ⇒ نامش،
      شناسهٔ حوزه ⇒ نامِ حوزه، کلید/شناسهٔ رکورد ⇒ حذف، واژه‌های فنیِ برگه ⇒ فارسی */
   var CUR = null, WORDS = { "sys-territory": "قلمروِ سامانه‌ها", "epi-territory": "قلمروِ معرفت‌شناسی", "epi-backtest": "بک‌تستِ معرفت‌شناسی", "epi-engine": "موتورِ داوری", "lla-page": "خودِ صفحه",
-    deferred: "به بعد موکول شد", priority: "اولویت‌دار", fix: "رفعِ خطا", done: "انجام شد", answered: "پاسخ داده شد", supervisor: "نظارت" };
+    deferred: "به بعد موکول شد", priority: "اولویت‌دار", prereq: "دانشِ پیش‌نیاز", knot: "گرهِ ذهنی", claim: "سنجشِ ادعا", area: "حوزهٔ قلمرو", learn: "فهمیدنِ عمیق", problem: "مسئلهٔ بزرگ", territory: "حوزهٔ نبوده", fix: "رفعِ خطا", done: "انجام شد", answered: "پاسخ داده شد", supervisor: "نظارت" };
   function human(x) {
     var t = String(x == null ? "" : x);
     if (CUR && CUR.tour) t = t.replace(/\[?\b(f\d{1,2})\b\]?/g, function (m0, k) { var f = CUR.tour.facets.filter(function (z) { return z.key === k; })[0]; return f ? "«" + f.title + "»" : ""; });
     t = t.replace(/\b(F\d{1,2})(?:\.[a-z]+)?\b/g, function (m0, k) { var F = (A.KF || []).filter(function (z) { return z.id === k; })[0]; return F ? "«" + F.fa + "»" : m0; });
     t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
     t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "");
-    t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor)\b/g, function (w) { return WORDS[w] || w; });
+    t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
     return t.replace(/\s{2,}/g, " ");
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };
@@ -32648,6 +32656,7 @@ APP.goFromURL = function (q) {
         var ms = AS.tourMilestones(f), ok = ms.filter(function (x) { return x.ok; }).length, col = f.status === "done" ? C.ok : f.status === "blocked" ? C.warn : f.status === "now" ? C.head : C.mute;
         return '<tr><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + fa(i + 1) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + '<div style="color:' + C.mute + ';font-size:12px">' + esc((KIND[f.kind] || {}).fa || "") + '</div></td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';color:' + col + ';white-space:nowrap">' + esc(ST_FA[f.status] || f.status) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';white-space:nowrap">' + fa(ok) + "/" + fa(ms.length) + "</td></tr>";
       }).join("");
+      H.push('<tr><td style="padding:10px 22px;font-size:12px;line-height:1.9;color:' + C.mute + '">واژه‌ها: <b>وجه</b> = یکی از بخش‌های مسئله‌ات که جدا پیگیری می‌شود · <b>پایه برپا شد</b> = ابزار و تمرینش ساخته شد، ولی هنوز «حل‌شده» نیست · <b>غربال</b> = لایه‌هایی که دستیار برای پیدا کردنِ ریشه سنجید · <b>ماندگاری</b> = پاسخِ درستِ دوباره پس از ۳۰ و ۹۰ روز.</td></tr>');
       H.push(sec("🗺 نقشهٔ راه و ترتیب", '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse"><tr style="color:' + C.mute + ';font-size:12px"><td style="padding:6px">#</td><td style="padding:6px">وجه</td><td style="padding:6px">وضع</td><td style="padding:6px">نشانه‌ها</td></tr>' + rows + "</table>"));
       /* غربالِ لایه‌ها: کدام لایه‌ها سنجیده شد و چه پیدا شد — فقط یافته‌ها، «باید پرسید» و «بیرون»؛ «رد شد» ها شمرده می‌شوند (مالک ۲۰۲۶-۱۰-۱۴) */
       if (AS.sieveRows) { var sr = AS.sieveRows(s), sn = sr.filter(function (r) { return r.st; }).length;
@@ -32976,8 +32985,10 @@ APP.goFromURL = function (q) {
     "- حرفِ کاربر را — حتی اگر به‌ظاهر بی‌ربط است (خرید، رابطه، کار، پول، سرگرمی) — نه سریع رد کن، نه پخش کن: لایه‌به‌لایه بشکاف. برای هر لایهٔ فهرستِ «# غربالِ لایه‌ها» پرسشِ همان لایه را از خودت بپرس و با {\"do\":\"tour_diag\",\"layers\":[{\"id\":\"F7\",\"st\":\"found|no|ask|out\",\"why\":\"شاهد با واژه‌های خودِ کاربر\",\"facet\":\"fN\"}]} حکم بده. found فقط با شاهد از حرفِ خودش؛ ask یعنی برای تشخیص باید چیزی را از او بپرسی (یکی‌یکی، دقیق، بی پیشنهادِ جواب)؛ out فقط برای همان بخشی که کارِ این صفحه نیست. هر ۱۲ خانوادهٔ گره را جدا بسنج.",
     "- وجه‌های تور فقط از لایه‌های found ساخته می‌شوند و به **ریشه** می‌روند، نه به سطح: چند یافته با یک ریشه = یک وجه؛ خودِ تصمیم یا موضوعِ بیرونی (ماشین، سرمایه‌گذاری، دعوا) وجه نیست — گره، خطای معرفتی، مسئلهٔ سخت، دانشِ پیش‌نیاز یا حوزه‌ای که پشتِ آن است وجه است. در why ِ هر وجه بگو از کدام یافته‌ها آمده.",
     "- ریشهٔ مشترک: «# گره‌های پیشینِ کاربر» را ببین؛ اگر همان خانواده و همان ساختارِ عمیق است، موقعیتِ تازه را به همان گره وصل کن (بازگشت/تکرار) نه گرهِ تازه، و این را صریح بگو — هنرِ این صفحه دیدنِ ریشهٔ ثابت در ظاهرهای متفاوت است.",
+    "- برداشتِ خودِ کاربر دربارهٔ مسئله («باورش درست بود، دلیل هم داشت»، «سنگین‌تر یعنی زودتر») خودش یک **ادعا** است و راهِ دانستنش (شهود، تجربهٔ روزمره، نقل) لایهٔ **راه** — این دو را برای بدفهمیِ علمی رد نکن (کارزارِ آزمون c07).",
     "- مسئلهٔ علمی/هوشی/فلسفی که فهمیده یا حل نشده: دست‌کم سه لایه را جدا بسنج — گرهِ ذهنی (کدام خانواده: بازنمایی، راهبرد، پایش، …)، خطای معرفتی، و **دانشِ پیش‌نیاز** (کدام مفهوم، از کدام علم و شاخه، در کدام گامِ حل) ⇒ وجهِ kind=prereq با «🧩 نقشهٔ پیش‌نیازها» (نمای prereq). جوابِ مسئله را نگو؛ کاربر را تا خودِ حل ببر.",
     "- اولویت: ایمنی؛ ریشه‌ای که بقیه از آن می‌رویند (گره یا پیش‌نیاز)؛ آنچه زمان‌دار است؛ فهم پیش از تمرین.",
+    "- نخستین پاسخ به هر مسئلهٔ تازه: جواب، حکم یا یافتهٔ نهایی را نگو — حتی اگر از «# دانسته‌های قلمرو» می‌دانی (کارزارِ آزمون c08: معنای درستِ p و تکرارنشدنِ پژوهش در همان پاسخِ اول لو رفت). اول یک یا دو پرسشِ دقیق برای لایه‌هایی که «باید پرسید» است (بی پیشنهادِ جواب)، بعد غربال؛ یافتهٔ قطعی را وقتی بگو که کاربر خودش به آن رسیده یا ایستگاهِ مربوط طی شده. لایهٔ «اطلاعاتِ ناموجود» را جدی بسنج: چه عددی، منبعی یا واقعیتی هنوز نیست؟",
     "- در reply هرگز کلید یا کد ننویس (f1، k12، F7، شناسهٔ حوزه یا رکورد) — نامِ فارسیِ وجه، خانواده یا حوزه را بگو."
   ].join("\n");
 
@@ -33013,7 +33024,7 @@ APP.goFromURL = function (q) {
     var it = (p && p.items) || [], rated = it.filter(function (x) { return x.self; }), miss = it.filter(function (x) { return x.self === "نیمه" || x.self === "بلد نیستم"; });
     return { n: it.length, sci: it.map(function (x) { return x.sci; }).filter(function (v, i, a) { return v && a.indexOf(v) === i; }).length, rated: rated.length, miss: miss, topics: miss.filter(function (x) { return x.topic && S.get(x.topic); }) };
   };
-  var SYS_PRE = "تو سازندهٔ «نقشهٔ پیش‌نیازها» هستی. مسئله یا مطلبی که کاربر نفهمیده یا حل نکرده را می‌گیری و فهرستِ **مفهوم‌های پیش‌نیاز** را می‌دهی که برای فهمیدن/حلِ همان لازم است — از پایه‌ای‌ترین تا نزدیک‌ترین به مسئله. برای هر کدام: علم (ریاضی، فیزیک، منطق، آمار، فلسفه، روان‌شناسی، …)، شاخه، نامِ دقیقِ مفهوم، «در کدام گامِ حل و چرا لازم است»، یک پرسشِ تشخیصیِ کوتاه که نشان دهد کاربر آن را دارد یا نه (پاسخِ خودِ مسئلهٔ اصلی را لو نده)، و پاسخِ مرجعِ همان پرسش. ۴ تا ۱۰ مورد، بی تکرار، فقط آنچه واقعاً لازم است. فقط JSON: [{\"sci\":\"…\",\"sub\":\"…\",\"concept\":\"…\",\"why\":\"…\",\"q\":\"…\",\"ref\":\"…\"}]";
+  var SYS_PRE = "تو سازندهٔ «نقشهٔ پیش‌نیازها» هستی. مسئله یا مطلبی که کاربر نفهمیده یا حل نکرده را می‌گیری و فهرستِ **مفهوم‌های پیش‌نیاز** را می‌دهی که برای فهمیدن/حلِ همان لازم است — از پایه‌ای‌ترین تا نزدیک‌ترین به مسئله. برای هر کدام: علم (ریاضی، فیزیک، منطق، آمار، فلسفه، روان‌شناسی، …)، شاخه، نامِ دقیقِ مفهوم، «در کدام گامِ حل و چرا لازم است»، یک پرسشِ تشخیصیِ کوتاه که نشان دهد کاربر آن را دارد یا نه (پاسخِ خودِ مسئلهٔ اصلی را لو نده)، و پاسخِ مرجعِ همان پرسش. ۴ تا ۱۰ مورد، بی تکرار، فقط آنچه واقعاً لازم است — و حتماً **خودِ مفهومِ محوریِ مسئله** (مثلاً «بختِ معرفتی» برای گتیه) و اصطلاح‌ها/پاسخ‌های استانداردِ آن رشته به همان مسئله. فقط JSON: [{\"sci\":\"…\",\"sub\":\"…\",\"concept\":\"…\",\"why\":\"…\",\"q\":\"…\",\"ref\":\"…\"}]";
   function parseArr(t) { try { var m = String(t || "").match(/\[[\s\S]*\]/); var a = JSON.parse(m ? m[0] : t); return Array.isArray(a) ? a : null; } catch (e) { return null; } }
   function mkTopic(p, x) {
     var tp = S.put({ id: A.uid("tp"), type: "topic", title: "«" + x.concept + "» (" + [x.sci, x.sub].filter(Boolean).join(" › ") + ") — پیش‌نیازِ «" + clip(p.title, 50) + "»", dom: x.sci || "", src: "🧩 نقشهٔ پیش‌نیازها", kind: "", prereq: p.id });
@@ -33069,6 +33080,7 @@ APP.goFromURL = function (q) {
       h("button", { class: "btn sm", type: "button", onclick: function () { if (!c1.value.trim()) return; var sp = c2.value.split("›"); p.items.push({ concept: c1.value.trim(), sci: (sp[0] || "").trim(), sub: (sp[1] || "").trim(), why: c3.value.trim(), q: "", ref: "", by: "user", self: "" }); save(); } }, "+ افزودن")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "بازگشت به خودِ مسئله"),
       h("p", { class: "small muted" }, "پس از پیش‌نیازها، مسئلهٔ اصلی را دوباره، بی نگاه به راه‌حل، امتحان کن."),
+      h("label", { for: "prBack" }, "پاسخ یا راهِ حلِ خودت (پس از پیش‌نیازها)"), h("textarea", { id: "prBack", rows: 3, onchange: function (e) { p.backAns = e.target.value; S.put(p); } }, p.backAns || ""),
       h("select", { "aria-label": "مسئلهٔ اصلی را دوباره امتحان کردی؟", onchange: function (e) { p.back = e.target.value; p.backAt = nowIso(); save(); } }, ["", "حل شد", "هنوز نه"].map(function (o) { return h("option", { value: o, selected: (p.back || "") === o ? true : null }, o || "— هنوز امتحان نکرده‌ام —"); }))));
     root.appendChild(h("button", { class: "linkish", type: "button", onclick: function () { A.go("prereq"); } }, "← همهٔ نقشه‌ها"));
     return root;
