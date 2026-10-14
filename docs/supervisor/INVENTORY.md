@@ -6,16 +6,16 @@
 
 | سنجه | تعداد |
 |---|---|
-| صفحه‌ها | 43 |
+| صفحه‌ها | 44 |
 | زیرصفحه‌ها (تب‌ها) | 29 |
-| دکمه‌ها | 172 |
-| ورودی‌ها | 85 |
+| دکمه‌ها | 180 |
+| ورودی‌ها | 87 |
 | فرم‌ها | 15 |
 | لینک‌ها | 59 |
-| فراخوانی‌های API در صفحه‌ها | 80 |
-| مسیرهای API | 411 |
-| سرویس‌ها | 152 |
-| مدل‌ها | 65 |
+| فراخوانی‌های API در صفحه‌ها | 94 |
+| مسیرهای API | 428 |
+| سرویس‌ها | 156 |
+| مدل‌ها | 69 |
 
 ## صفحه‌ها و زیرصفحه‌ها
 
@@ -54,13 +54,14 @@
 | `/import` | داده (ایمپورت و ادغام) | tools | `?tab=import`، `?tab=files`، `?tab=merge` | 1 | 0 | 0 |
 | `/drive-files` | فایل‌های درایو | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
 | `/merge` | ادغام | tools | درِ دیگرِ `/import` | 1 | 0 | 0 |
+| `/apps/learning-architecture` | معماری یادگیری عمیق | tools | — | 7 | 0 | 14 |
 | `/apps/:slug` | صفحهٔ افزوده | tools | — | 1 | 0 | 0 |
 | `/settings` | تنظیمات | tools | `?tab=ai`، `?tab=notifications`، `?tab=drive`، `?tab=dev`، `?tab=attention`، `?tab=safety` | 1 | 0 | 0 |
 | `/settings/notifications` | تنظیمات اعلان | tools | درِ دیگرِ `/settings` | 1 | 0 | 0 |
 | `/settings/ai-models` | تنظیمات مدل‌ها | tools | درِ دیگرِ `/settings` | 1 | 0 | 0 |
-| `/ai-settings` | تنظیمات AI | tools | — | 9 | 8 | 0 |
+| `/ai-settings` | تنظیمات AI | tools | — | 9 | 10 | 0 |
 | `/notifications` | اعلان‌ها | tools | — | 4 | 1 | 2 |
-| `/inspection` | نظارت و سرکشی | system | `?tab=board`، `?tab=pages`، `?tab=binders`، `?tab=how` | 27 | 10 | 0 |
+| `/inspection` | نظارت و سرکشی | system | `?tab=board`، `?tab=pages`، `?tab=binders`، `?tab=how` | 28 | 10 | 0 |
 | `/system-map` | نقشهٔ سیستم | system | — | 2 | 0 | 0 |
 | `/activity-log` | لاگ فعالیت‌ها | system | — | 5 | 5 | 0 |
 | `/admin/users` | مدیریت کاربران | system | — | 4 | 2 | 0 |
@@ -122,6 +123,20 @@
 | POST | `/api/ai/sentiment/analyze` |
 | GET | `/api/ai/sentiment/profile` |
 | GET | `/api/ai/user_data_context` |
+| GET | `/api/app-records/{app}` |
+| POST | `/api/app-records/{app}/ai` |
+| POST | `/api/app-records/{app}/bulk` |
+| GET | `/api/app-records/{app}/files` |
+| POST | `/api/app-records/{app}/files` |
+| DELETE | `/api/app-records/{app}/files/{file_id}` |
+| GET | `/api/app-records/{app}/mirror` |
+| POST | `/api/app-records/{app}/mirror` |
+| POST | `/api/app-records/{app}/mirror/sync` |
+| GET | `/api/app-records/{app}/reminders` |
+| POST | `/api/app-records/{app}/reminders` |
+| DELETE | `/api/app-records/{app}/reminders/{key}` |
+| GET | `/api/app-records/{app}/usage` |
+| DELETE | `/api/app-records/{app}/{rec_id}` |
 | GET | `/api/assets` |
 | GET | `/api/assets/external-drives` |
 | POST | `/api/assets/scan` |
@@ -293,6 +308,9 @@
 | POST | `/api/inbox/{item_id}/unfile` |
 | GET | `/api/inspection` |
 | POST | `/api/inspection` |
+| POST | `/api/inspection/audit/ai` |
+| GET | `/api/inspection/audit/epi-decisions` |
+| GET | `/api/inspection/audit/finance` |
 | GET | `/api/inspection/binders` |
 | POST | `/api/inspection/file` |
 | DELETE | `/api/inspection/files/{file_id}` |

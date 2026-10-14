@@ -981,6 +981,25 @@
    "reports": {}
   },
   {
+   "path": "/apps/learning-architecture",
+   "page": "LearningArchitecturePage",
+   "label": "معماری یادگیری عمیق",
+   "group": "tools",
+   "file": "frontend/src/pages/LearningArchitecturePage.jsx",
+   "parametric": false,
+   "alias_of": "",
+   "lines": 226,
+   "buttons": 7,
+   "inputs": 0,
+   "forms": 0,
+   "links": 0,
+   "api_calls": 14,
+   "testids": 1,
+   "tabs": [],
+   "subpages": [],
+   "reports": {}
+  },
+  {
    "path": "/apps/:slug",
    "page": "MiniAppPage",
    "label": "صفحهٔ افزوده",
@@ -988,7 +1007,7 @@
    "file": "frontend/src/pages/MiniAppPage.jsx",
    "parametric": true,
    "alias_of": "",
-   "lines": 69,
+   "lines": 70,
    "buttons": 1,
    "inputs": 0,
    "forms": 0,
@@ -1188,9 +1207,9 @@
    "file": "frontend/src/pages/AISettings.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 445,
+   "lines": 477,
    "buttons": 9,
-   "inputs": 8,
+   "inputs": 10,
    "forms": 0,
    "links": 0,
    "api_calls": 0,
@@ -1226,8 +1245,8 @@
    "file": "frontend/src/pages/InspectionPage.jsx",
    "parametric": false,
    "alias_of": "",
-   "lines": 1020,
-   "buttons": 27,
+   "lines": 1037,
+   "buttons": 28,
    "inputs": 10,
    "forms": 0,
    "links": 8,
@@ -1655,6 +1674,90 @@
     "path": "/api/ai/user_data_context",
     "methods": [
      "GET"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/ai",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/bulk",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/files",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/files",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/files/{file_id}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/mirror",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/mirror",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/mirror/sync",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/reminders",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/reminders",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/reminders/{key}",
+    "methods": [
+     "DELETE"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/usage",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/app-records/{app}/{rec_id}",
+    "methods": [
+     "DELETE"
     ]
    },
    {
@@ -2679,6 +2782,24 @@
     "path": "/api/inspection",
     "methods": [
      "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/audit/ai",
+    "methods": [
+     "POST"
+    ]
+   },
+   {
+    "path": "/api/inspection/audit/epi-decisions",
+    "methods": [
+     "GET"
+    ]
+   },
+   {
+    "path": "/api/inspection/audit/finance",
+    "methods": [
+     "GET"
     ]
    },
    {
@@ -3825,6 +3946,7 @@
    "ai/interest_identification_service",
    "ai/manager",
    "ai/metrics",
+   "ai/model_discovery",
    "ai/model_service",
    "ai/nlp_service",
    "ai/performance_service",
@@ -3837,6 +3959,8 @@
    "ai/task_feedback",
    "ai_ingestion_service",
    "ai_service",
+   "app_mirror_service",
+   "app_reminder_service",
    "asset_scan_service",
    "asset_to_task_linker",
    "assistant_chat_service",
@@ -3873,6 +3997,7 @@
    "email_parser_service",
    "event_publisher",
    "external_project_service",
+   "finance_account_identity",
    "finance_ai_service",
    "finance_email_scan_service",
    "finance_imap_service",
@@ -3967,6 +4092,10 @@
    "ai_provider",
    "ai_usage",
    "analysis_prompt",
+   "app_file",
+   "app_mirror",
+   "app_record",
+   "app_reminder",
    "asset",
    "attention_mark",
    "bank_account",
@@ -4028,16 +4157,16 @@
   "errors": []
  },
  "totals": {
-  "pages": 43,
+  "pages": 44,
   "subpages": 29,
-  "buttons": 172,
-  "inputs": 85,
+  "buttons": 180,
+  "inputs": 87,
   "forms": 15,
   "links": 59,
-  "api_calls": 80,
-  "api_routes": 411,
-  "services": 152,
-  "models": 65
+  "api_calls": 94,
+  "api_routes": 428,
+  "services": 156,
+  "models": 69
  },
  "errors": [],
  "alarms": []
