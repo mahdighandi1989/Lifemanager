@@ -182,7 +182,11 @@
         h("div", { class: "row gap wrap" }, sel,
           x.self && x.ref ? h("details", { class: "small" }, h("summary", {}, "پاسخِ مرجع"), h("p", {}, x.ref)) : null,
           (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)) ? h("button", { class: "btn sm", type: "button", onclick: function () { var tp = mkTopic(p, x); A.toast("موضوعِ یادگیری ساخته شد؛ سفرِ ۱۱ گامی‌اش را از همان‌جا شروع کن."); A.go("topic", tp.id); } }, "📚 موضوعِ یادگیری بساز") : null,
-          x.topic && S.get(x.topic) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("topic", x.topic); } }, "↗ موضوعِ یادگیری") : null));
+          x.topic && S.get(x.topic) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("topic", x.topic); } }, "↗ موضوعِ یادگیری") : null,
+          // زیرِ موضوعِ دیگرِ همین نقشه (کارزارِ آزمونِ دوم c02: ۶ موضوع برای یک معما زیاد بود؛ ادغامِ توافقی ثبت‌شدنی نبود)
+          (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)) && p.items.some(function (y) { return y !== x && y.topic && S.get(y.topic); }) ?
+            h("select", { "aria-label": "زیرِ موضوعِ دیگر (برای «" + clip(x.concept, 30) + "»)", onchange: function (e) { if (e.target.value) { x.topic = e.target.value; x.merged = true; save(); } } },
+              [h("option", { value: "" }, "— یا زیرِ موضوعِ دیگر —")].concat(p.items.filter(function (y) { return y !== x && y.topic && S.get(y.topic); }).map(function (y) { return h("option", { value: y.topic }, "زیرِ «" + clip(y.concept, 30) + "»"); }))) : null));
     });
     // یک‌جا برای همهٔ نبوده‌ها (کارزارِ آزمون c06/c07: ساختنِ یکی‌یکی چند نوبت می‌برد و کلیکِ اول صفحه را عوض می‌کرد)
     var todo = p.items.filter(function (x) { return (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)); });

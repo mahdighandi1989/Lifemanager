@@ -25837,16 +25837,32 @@ APP.goFromURL = function (q) {
         L.steps = { 4: vals[0], 5: vals[1], 6: vals[2] }; L.by = g ? (same ? "ai" : "ai+user") : "user"; L.at = now(); L.cur = cur; kc.ladder = L; H.put(); redraw();
       } }, "ذخیرهٔ پله‌ها");
       var aib = h("button", { class: "btn ghost sm", onclick: function () {
-        if (!String(it.statement || "").trim() || !String(it.answer || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» و «پاسخِ درست» لازم است (برای کنترلِ نشت).", "bad"); return; }
+        if (!String(it.statement || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» ِ مسئله لازم است.", "bad"); return; }
+        /* مسئلهٔ حل‌نشده (پاسخ را نمی‌دانی — کارزارِ آزمونِ دوم c01: نردبان می‌ایستاد): هوش مصنوعی پاسخ را **پنهان** حل می‌کند، یک حل‌کنندهٔ
+           مستقلِ دوم باید به همان برسد، و همان پاسخِ پنهان برای کنترلِ نشت به کار می‌رود — هرگز به تو نشان داده نمی‌شود تا خودت برسی */
+        var known = !!String(it.answer || "").trim();
         aib.disabled = true;
-        aiGate({ purpose: "ساختنِ پله‌های ۴ تا ۶ ِ نردبان", system: SYS_LAD, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
+        aiGate({ purpose: known ? "ساختنِ پله‌های ۴ تا ۶ ِ نردبان" : "ساختنِ پله‌های ۴ تا ۶ برای مسئلهٔ حل‌نشده (پاسخ پنهان می‌ماند)", system: known ? SYS_LAD : SYS_LAD_HID, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
           maskPreview: it.seen === "yes" ? null : function (t) { var a = String(it.answer || ""); return a ? t.split(a).join("•••• (پاسخ — این‌جا پنهان، چون هنوز ندیده‌ای؛ فقط برای این‌که هوش مصنوعی آن را لو ندهد فرستاده می‌شود)") : t; },
           more: "پس از ساخت، یک درخواستِ دومِ مستقل فقط با خودِ سه پله (بی صورتِ مسئله، بی پاسخ و بی تصویرِ پیوست) فرستاده می‌شود تا ببیند آیا پاسخِ نهایی از خودِ پله‌ها درمی‌آید؛ اگر درآمد، پله‌ها کنار می‌روند.",
-          build: function () { return "صورتِ مسئله: " + it.statement + "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
+          build: function () { return "صورتِ مسئله: " + it.statement + (known ? "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer : "") + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
           onResult: function (t, m) {
             var o = parseJSON(t); var v = o && [o.s4, o.s5, o.s6].map(function (x) { return String(x || "").trim(); });
             if (!v || v.some(function (x) { return !x; })) { A.toast("پاسخِ هوش مصنوعی قالبِ درستی نداشت.", "bad"); return; }
-            var bad = A.knotLeaks(it.answer, v);
+            var ansRef = known ? it.answer : String((o && o.answer) || "").trim();
+            if (!known) {
+              if (!ansRef) { A.toast("هوش مصنوعی پاسخِ پنهانی نداد؛ پله‌ها ساخته نشد.", "bad"); return; }
+              var nrm = function (x) { return String(x || "").replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[\s«»"'.,،]/g, "").toLowerCase(); };
+              return Promise.resolve(A.callAI(SYS_SOLVE_IND, "صورتِ مسئله: " + (m && m.names && m.names.length ? A.kRedact(it.statement, m.names) : it.statement))).then(function (t3) {
+                var r3 = parseJSON(t3), a2 = r3 && r3.answer != null ? String(r3.answer).trim() : "";
+                if (!a2 || nrm(a2) !== nrm(ansRef)) { A.toast("دو حلِ مستقلِ پنهان به یک پاسخ نرسیدند؛ پله‌ها ساخته نشد (پاسخِ نامطمئن راهنمای نادرست می‌سازد). دوباره بخواه یا دستی بنویس.", "bad"); return; }
+                it.aiAnswer = ansRef; it.aiAnswerBy = "ai×2"; it.aiAnswerAt = now(); H.put();
+                return finish();
+              });
+            }
+            return finish();
+            function finish() {
+            var bad = A.knotLeaks(ansRef, v);
             if (bad.length) { A.toast("پله‌های ساخته‌شده پاسخ را لو می‌دادند (پلهٔ " + bad.map(function (i) { return fa(i + 4); }).join("، ") + ")؛ کنار گذاشته شد. دستی بنویس یا دوباره بخواه.", "bad"); return; }
             /* §۱۲.۵-د + ممیزی: نشتِ غیرمتنی (مثلاً «۶ × ۷» یا «۳۰ + ۱۲») با کنترلِ رشته‌ای دیده نمی‌شود ⇒ یک حل‌کنندهٔ مستقل
                فقط از روی خودِ پله‌ها پاسخِ نهایی را درمی‌آورد؛ اگر درآورد، پله‌ها کنار می‌روند. */
@@ -25854,7 +25870,7 @@ APP.goFromURL = function (q) {
             if (m && m.names && m.names.length) hint = A.kRedact(hint, m.names);
             return Promise.resolve(A.callAI(SYS_LADCHK, hint)).then(function (t2) {
               var r = parseJSON(t2), got = r && r.answer != null ? String(r.answer).trim() : "";
-              if (got && got !== "null" && A.knotLeaks(it.answer, [got]).length) {
+              if (got && got !== "null" && A.knotLeaks(ansRef, [got]).length) {
                 A.toast("یک حل‌کنندهٔ مستقل از خودِ این پله‌ها (بی صورتِ مسئله) به پاسخِ نهایی رسید؛ پله‌ها کنار گذاشته شد. دستی بنویس یا دوباره بخواه.", "bad"); return;
               }
               [4, 5, 6].forEach(function (n, i) { ins[n].value = v[i]; });
@@ -25863,6 +25879,7 @@ APP.goFromURL = function (q) {
             }, function () {
               A.toast("وارسیِ دوم (آیا پاسخ از خودِ پله‌ها درمی‌آید؟) انجام نشد؛ پله‌ها گذاشته نشد. دوباره بخواه یا دستی بنویس.", "bad");
             });
+            }
           }, onDone: function () { aib.disabled = false; } });
       } }, "🤖 بساز با هوش مصنوعی");
       sec.appendChild(h("div", { class: "card soft col gap" }, h("p", { class: "small" }, "پله‌های ۴ تا ۶ از متنِ همین مسئله ساخته می‌شوند: دستی بنویس، یا هوش مصنوعی بسازد (هیچ پله‌ای نباید پاسخِ نهایی را داشته باشد — بررسی می‌شود)."), gen, h("div", { class: "row gap wrap" }, save, aib)));
@@ -25873,6 +25890,8 @@ APP.goFromURL = function (q) {
       h("button", { class: "btn ghost sm kn-lad-next", onclick: function () { if (cur >= 6) { L.opened = -1; } else L.cur = cur + 1; kc.ladder = L; H.put(); redraw(); } }, cur >= 6 ? "باز نشد (پایانِ نردبان)" : "باز نشد ⇐ پلهٔ بعد")));
     return sec;
   }
+  var SYS_LAD_HID = "تو سازندهٔ راهنمایی‌های پله‌ای برای مسئله‌ای هستی که کاربر پاسخش را نمی‌داند. اول خودت مسئله را دقیق و گام‌به‌گام (در ذهن) حل کن؛ پاسخ فقط در فیلدِ answer می‌آید و **هرگز** به کاربر نشان داده نمی‌شود. راهنمایی‌ها هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ندارند. فقط JSON: {\"answer\":\"پاسخِ نهایی (کوتاه)\",\"s4\":\"یک راهنماییِ راهبرد بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهوم یا بازنماییِ کلیدی\",\"s6\":\"نخستین گامِ راه، نه بیشتر\"}";
+  var SYS_SOLVE_IND = "این مسئله را مستقل، دقیق و گام‌به‌گام حل کن. فقط JSON: {\"answer\":\"پاسخِ نهایی کوتاه\"}";
   var SYS_LAD = "تو سازندهٔ راهنمایی‌های پله‌ای برای یک مسئله هستی. هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ننویس. خروجی فقط JSON: {\"s4\":\"یک راهنماییِ راهبرد (از آخر/حالتِ خاص/قرینه) بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهومِ کلیدی\",\"s6\":\"گامِ کلیدی بدونِ پاسخِ نهایی\"}. فارسی، کوتاه.";
   var SYS_LADCHK = "تو حل‌کننده‌ای هستی که فقط سه «راهنمایی» از یک مسئلهٔ پنهان را می‌بینی، نه خودِ مسئله را. بگو آیا پاسخِ نهاییِ مسئله را فقط از روی همین راهنمایی‌ها می‌شود دقیق به دست آورد. اگر می‌شود، آن را بنویس؛ اگر نمی‌شود، null. خروجی فقط JSON: {\"answer\": \"…\" | null}.";
   A.KSYS_LADCHK = SYS_LADCHK;
@@ -31715,6 +31734,19 @@ APP.goFromURL = function (q) {
     if (!coreDone(f) && !a.why) return "«" + f.title + "» هنوز نشانه‌های پایانش کامل نیست — اگر واقعاً تمام است، دلیل بنویس";
     f.status = "done"; f.doneAt = nowIso(); f.doneBy = coreDone(f) ? "evidence" : "assistant: " + clip(a.why, 200); advance(s); return "";
   };
+  /* «دیدم درست نشده»: برگه‌ای که «ساخته و وارسی شد» ولی دستیار بعداً در صفحه می‌بیند کار نمی‌کند ⇒ وارسی پس گرفته، برگه با دلیل
+     دوباره باز و وجه دوباره منتظر (کارزارِ آزمونِ دوم c01: ایمیل‌ها تا آخر «ساخته و وارسی شد» گفتند، پس از آن‌که دستیار پس گرفته بود) */
+  DO.tour_unverify = function (a) {
+    var s = AS._turnSession, f = s && fac(s, a.facet); if (!f || !f.blocked) return "این وجه برگه‌ای ندارد";
+    if (!String(a.why || "").trim()) return "پس‌گرفتنِ وارسی بی دلیل ممکن نیست";
+    f.blocked.verified = false; f.status = "blocked"; delete f.doneAt;
+    if (s.tour.doneAt) { delete s.tour.doneAt; delete s.tour.doneSaid; delete s.tour.masteredAt; }
+    f.blocked.checks = f.blocked.checks || []; f.blocked.checks.push({ at: nowIso(), ok: false, reason: clip("پس از ✅ در صفحه دیده شد هنوز کار نمی‌کند: " + a.why, 500) });
+    var note = "[دستیار · وارسیِ پس‌گرفته]\nپس از پذیرشِ قبلی، در خودِ صفحه دیده شد هنوز درست نشده:\n" + clip(a.why, 1500) + "\n\nاین یادداشت برگه را دوباره باز کرد.";
+    if (A.HOST && A.HOST.note && f.blocked.id) Promise.resolve(A.HOST.note(f.blocked.id, note)).then(null, function () { });
+    s.msgs.push({ role: "sys", at: nowIso(), text: "↩ وارسیِ برگهٔ #" + fa(f.blocked.number) + " پس گرفته شد و برگه دوباره باز شد: " + clip(a.why, 200) });
+    return "";
+  };
   DO.tour_skip = function (a) {
     var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست";
     if (!a.why) return "کنار گذاشتنِ وجه بی دلیل ممکن نیست";
@@ -31726,7 +31758,9 @@ APP.goFromURL = function (q) {
   AS.tourAdoptSheet = function (s, r, g) {
     if (!s || !s.tour || !r || !r.id) return;
     if (s.tour.facets.some(function (f) { return f.blocked && f.blocked.id === r.id; })) return;
-    var f = normFacet({ kind: "territory", title: clip((g && g.title) || r.title || "حوزه‌ای که نیست", 100), why: "برگهٔ #" + r.number + " — تا روتینِ مسئول بسازد و دستیار وارسی کند" }, s.tour.facets.length);
+    // خطای خودِ صفحه «حوزهٔ نبوده» نیست (کارزارِ آزمونِ دوم c01)
+    var isFix = g && (g.kind === "fix" || /lla-page|engine|supervisor/.test(String(g.area || "")));
+    var f = normFacet({ kind: isFix ? "other" : "territory", title: clip((isFix ? "🔧 رفعِ خطای صفحه: " : "") + ((g && g.title) || r.title || "حوزه‌ای که نیست"), 100), why: "برگهٔ #" + r.number + " — تا روتینِ مسئول بسازد و دستیار وارسی کند" }, s.tour.facets.length);
     var have = {}; s.tour.facets.forEach(function (x) { have[x.key] = 1; }); var n = s.tour.facets.length + 1; while (have["f" + n]) n++; f.key = "f" + n;
     s.tour.facets.push(f); if (s.tour.doneAt) { delete s.tour.doneAt; delete s.tour.doneSaid; delete s.tour.masteredAt; }
     AS.tourBlock(s, f.key, r, g || {});
@@ -31858,6 +31892,7 @@ APP.goFromURL = function (q) {
     "- «حل شد» را هرگز خودت یا از حرفِ کاربر اعلام نکن: فقط وقتی نشانه‌های «ورزیده شد» و «ماندگاری ۳۰/۹۰ روز» ✓ است. تا آن وقت بگو «در راهِ حل‌شدن» و آزمونِ بعدی کِی است.",
     "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
     "- شکلِ عملیات: {\"do\":\"tour_add\",\"facet\":{\"key\":\"f4\",\"kind\":\"area\",\"area\":\"sf_values\",\"title\":\"…\",\"why\":\"…\"}} · {\"do\":\"tour_skip\",\"facet\":\"f1\",\"why\":\"…\"} · {\"do\":\"tour_focus\",\"facet\":\"f2\"} · {\"do\":\"tour_done\",\"facet\":\"f2\",\"why\":\"…\"} · {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"<شناسهٔ رکورد>\"} · {\"do\":\"tour_goal\",\"goal\":\"…\"}. هر وجه title ِ گویا دارد (هرگز «گامِ دیگر»).",
+    "- اگر برگه‌ای «ساخته و وارسی شد» ولی بعداً در خودِ صفحه می‌بینی هنوز کار نمی‌کند: {\"do\":\"tour_unverify\",\"facet\":\"fN\",\"why\":\"…\"} — وارسی پس گرفته و برگه دوباره باز می‌شود؛ برگهٔ تکراری نساز. پیش از پذیرفتنِ «انجام شد» ِ روتین برای خطای خودِ صفحه، اگر می‌توانی همان کار را در صفحه امتحان کن.",
     "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
   ].join("\n");
 
@@ -32514,14 +32549,14 @@ APP.goFromURL = function (q) {
   /* ایمیل بی کد (مالک ۲۰۲۶-۱۰-۱۴: «جاهایی کدگذاری‌شده حرف می‌زند — f7 و … — نباید باشد»): کلیدِ وجه ⇒ نامِ وجه، خانوادهٔ گره ⇒ نامش،
      شناسهٔ حوزه ⇒ نامِ حوزه، کلید/شناسهٔ رکورد ⇒ حذف، واژه‌های فنیِ برگه ⇒ فارسی */
   var CUR = null, WORDS = { "sys-territory": "قلمروِ سامانه‌ها", "epi-territory": "قلمروِ معرفت‌شناسی", "epi-backtest": "بک‌تستِ معرفت‌شناسی", "epi-engine": "موتورِ داوری", "lla-page": "خودِ صفحه",
-    deferred: "به بعد موکول شد", priority: "اولویت‌دار", prereq: "دانشِ پیش‌نیاز", knot: "گرهِ ذهنی", claim: "سنجشِ ادعا", area: "حوزهٔ قلمرو", learn: "فهمیدنِ عمیق", problem: "مسئلهٔ بزرگ", territory: "حوزهٔ نبوده", fix: "رفعِ خطا", done: "انجام شد", answered: "پاسخ داده شد", supervisor: "نظارت" };
+    deferred: "به بعد موکول شد", priority: "اولویت‌دار", prereq: "دانشِ پیش‌نیاز", kcase: "موقعیتِ گره‌گشا", eprob: "مسئلهٔ بزرگ", wchain: "زنجیرهٔ نگرانی", fcast: "پیش‌بینی", kexp: "آزمایشِ واقعی", kitem: "ورزشِ گره", pbitem: "مسئلهٔ هم‌ساختار", knot: "گرهِ ذهنی", claim: "سنجشِ ادعا", area: "حوزهٔ قلمرو", learn: "فهمیدنِ عمیق", problem: "مسئلهٔ بزرگ", territory: "حوزهٔ نبوده", fix: "رفعِ خطا", done: "انجام شد", answered: "پاسخ داده شد", supervisor: "نظارت" };
   function human(x) {
     var t = String(x == null ? "" : x);
     if (CUR && CUR.tour) t = t.replace(/\[?\b(f\d{1,2})\b\]?/g, function (m0, k) { var f = CUR.tour.facets.filter(function (z) { return z.key === k; })[0]; return f ? "«" + f.title + "»" : ""; });
     t = t.replace(/\b(F\d{1,2})(?:\.[a-z]+)?\b/g, function (m0, k) { var F = (A.KF || []).filter(function (z) { return z.id === k; })[0]; return F ? "«" + F.fa + "»" : m0; });
     t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
     t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "");
-    t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
+    t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|kcase|eprob|wchain|fcast|kexp|kitem|pbitem|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
     return t.replace(/\s{2,}/g, " ");
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };
@@ -32665,7 +32700,7 @@ APP.goFromURL = function (q) {
       /* غربالِ لایه‌ها: کدام لایه‌ها سنجیده شد و چه پیدا شد — فقط یافته‌ها، «باید پرسید» و «بیرون»؛ «رد شد» ها شمرده می‌شوند (مالک ۲۰۲۶-۱۰-۱۴) */
       if (AS.sieveRows) { var sr = AS.sieveRows(s), sn = sr.filter(function (r) { return r.st; }).length;
         if (sn) H.push(sec("🔍 غربالِ لایه‌ها (" + fa(sn) + " از " + fa(sr.length) + " لایه سنجیده شد)", sr.filter(function (r) { return r.st === "found" || r.st === "ask" || r.st === "out"; }).map(function (r) {
-          return '<div style="margin:3px 0"><b style="color:' + (r.st === "found" ? C.ok : r.st === "ask" ? C.warn : C.mute) + '">' + (r.st === "found" ? "● پیدا شد" : r.st === "ask" ? "？ باید پرسید" : "↗ بیرون از صفحه") + "</b> — " + esc(r.fa) + (r.why ? ": «" + esc(clip(r.why, 200)) + "»" : "") + (r.facet ? " ⇒ وجهِ «" + esc(r.facet) + "»" : "") + "</div>";
+          return '<div style="margin:3px 0"><b style="color:' + (r.st === "found" ? C.ok : r.st === "ask" ? C.warn : C.mute) + '">' + (r.st === "found" ? "● پیدا شد" : r.st === "ask" ? "？ باید پرسید" : "↗ بیرون از صفحه") + "</b> — " + esc(r.fa) + (r.why ? ": «" + esc(clip(String(r.why).replace(/^[«"\s]+|[»"\s]+$/g, ""), 200)) + "»" : "") + (r.facet ? " ⇒ وجهِ «" + esc(r.facet) + "»" : "") + "</div>";
         }).join("") + '<div style="color:' + C.mute + ';font-size:12px">' + fa(sr.filter(function (r) { return r.st === "no"; }).length) + " لایه سنجیده و رد شد؛ " + fa(sr.length - sn) + " لایه هنوز سنجیده نشده.</div>")); }
       /* جزئیاتِ هر وجه */
       t.facets.forEach(function (f, i) {
@@ -33098,7 +33133,11 @@ APP.goFromURL = function (q) {
         h("div", { class: "row gap wrap" }, sel,
           x.self && x.ref ? h("details", { class: "small" }, h("summary", {}, "پاسخِ مرجع"), h("p", {}, x.ref)) : null,
           (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)) ? h("button", { class: "btn sm", type: "button", onclick: function () { var tp = mkTopic(p, x); A.toast("موضوعِ یادگیری ساخته شد؛ سفرِ ۱۱ گامی‌اش را از همان‌جا شروع کن."); A.go("topic", tp.id); } }, "📚 موضوعِ یادگیری بساز") : null,
-          x.topic && S.get(x.topic) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("topic", x.topic); } }, "↗ موضوعِ یادگیری") : null));
+          x.topic && S.get(x.topic) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("topic", x.topic); } }, "↗ موضوعِ یادگیری") : null,
+          // زیرِ موضوعِ دیگرِ همین نقشه (کارزارِ آزمونِ دوم c02: ۶ موضوع برای یک معما زیاد بود؛ ادغامِ توافقی ثبت‌شدنی نبود)
+          (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)) && p.items.some(function (y) { return y !== x && y.topic && S.get(y.topic); }) ?
+            h("select", { "aria-label": "زیرِ موضوعِ دیگر (برای «" + clip(x.concept, 30) + "»)", onchange: function (e) { if (e.target.value) { x.topic = e.target.value; x.merged = true; save(); } } },
+              [h("option", { value: "" }, "— یا زیرِ موضوعِ دیگر —")].concat(p.items.filter(function (y) { return y !== x && y.topic && S.get(y.topic); }).map(function (y) { return h("option", { value: y.topic }, "زیرِ «" + clip(y.concept, 30) + "»"); }))) : null));
     });
     // یک‌جا برای همهٔ نبوده‌ها (کارزارِ آزمون c06/c07: ساختنِ یکی‌یکی چند نوبت می‌برد و کلیکِ اول صفحه را عوض می‌کرد)
     var todo = p.items.filter(function (x) { return (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)); });

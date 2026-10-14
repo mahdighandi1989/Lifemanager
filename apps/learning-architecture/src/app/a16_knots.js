@@ -984,16 +984,32 @@
         L.steps = { 4: vals[0], 5: vals[1], 6: vals[2] }; L.by = g ? (same ? "ai" : "ai+user") : "user"; L.at = now(); L.cur = cur; kc.ladder = L; H.put(); redraw();
       } }, "ذخیرهٔ پله‌ها");
       var aib = h("button", { class: "btn ghost sm", onclick: function () {
-        if (!String(it.statement || "").trim() || !String(it.answer || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» و «پاسخِ درست» لازم است (برای کنترلِ نشت).", "bad"); return; }
+        if (!String(it.statement || "").trim()) { A.toast("برای ساختنِ پله‌ها «صورتِ کامل» ِ مسئله لازم است.", "bad"); return; }
+        /* مسئلهٔ حل‌نشده (پاسخ را نمی‌دانی — کارزارِ آزمونِ دوم c01: نردبان می‌ایستاد): هوش مصنوعی پاسخ را **پنهان** حل می‌کند، یک حل‌کنندهٔ
+           مستقلِ دوم باید به همان برسد، و همان پاسخِ پنهان برای کنترلِ نشت به کار می‌رود — هرگز به تو نشان داده نمی‌شود تا خودت برسی */
+        var known = !!String(it.answer || "").trim();
         aib.disabled = true;
-        aiGate({ purpose: "ساختنِ پله‌های ۴ تا ۶ ِ نردبان", system: SYS_LAD, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
+        aiGate({ purpose: known ? "ساختنِ پله‌های ۴ تا ۶ ِ نردبان" : "ساختنِ پله‌های ۴ تا ۶ برای مسئلهٔ حل‌نشده (پاسخ پنهان می‌ماند)", system: known ? SYS_LAD : SYS_LAD_HID, people: it.people, noPriv: true, attach: { recIds: [kc.id] },
           maskPreview: it.seen === "yes" ? null : function (t) { var a = String(it.answer || ""); return a ? t.split(a).join("•••• (پاسخ — این‌جا پنهان، چون هنوز ندیده‌ای؛ فقط برای این‌که هوش مصنوعی آن را لو ندهد فرستاده می‌شود)") : t; },
           more: "پس از ساخت، یک درخواستِ دومِ مستقل فقط با خودِ سه پله (بی صورتِ مسئله، بی پاسخ و بی تصویرِ پیوست) فرستاده می‌شود تا ببیند آیا پاسخِ نهایی از خودِ پله‌ها درمی‌آید؛ اگر درآمد، پله‌ها کنار می‌روند.",
-          build: function () { return "صورتِ مسئله: " + it.statement + "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
+          build: function () { return "صورتِ مسئله: " + it.statement + (known ? "\nپاسخِ درست (فقط برای این‌که لو نرود): " + it.answer : "") + (it.stuckAt ? "\nکجا گیر کرده: " + it.stuckAt : ""); },
           onResult: function (t, m) {
             var o = parseJSON(t); var v = o && [o.s4, o.s5, o.s6].map(function (x) { return String(x || "").trim(); });
             if (!v || v.some(function (x) { return !x; })) { A.toast("پاسخِ هوش مصنوعی قالبِ درستی نداشت.", "bad"); return; }
-            var bad = A.knotLeaks(it.answer, v);
+            var ansRef = known ? it.answer : String((o && o.answer) || "").trim();
+            if (!known) {
+              if (!ansRef) { A.toast("هوش مصنوعی پاسخِ پنهانی نداد؛ پله‌ها ساخته نشد.", "bad"); return; }
+              var nrm = function (x) { return String(x || "").replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[\s«»"'.,،]/g, "").toLowerCase(); };
+              return Promise.resolve(A.callAI(SYS_SOLVE_IND, "صورتِ مسئله: " + (m && m.names && m.names.length ? A.kRedact(it.statement, m.names) : it.statement))).then(function (t3) {
+                var r3 = parseJSON(t3), a2 = r3 && r3.answer != null ? String(r3.answer).trim() : "";
+                if (!a2 || nrm(a2) !== nrm(ansRef)) { A.toast("دو حلِ مستقلِ پنهان به یک پاسخ نرسیدند؛ پله‌ها ساخته نشد (پاسخِ نامطمئن راهنمای نادرست می‌سازد). دوباره بخواه یا دستی بنویس.", "bad"); return; }
+                it.aiAnswer = ansRef; it.aiAnswerBy = "ai×2"; it.aiAnswerAt = now(); H.put();
+                return finish();
+              });
+            }
+            return finish();
+            function finish() {
+            var bad = A.knotLeaks(ansRef, v);
             if (bad.length) { A.toast("پله‌های ساخته‌شده پاسخ را لو می‌دادند (پلهٔ " + bad.map(function (i) { return fa(i + 4); }).join("، ") + ")؛ کنار گذاشته شد. دستی بنویس یا دوباره بخواه.", "bad"); return; }
             /* §۱۲.۵-د + ممیزی: نشتِ غیرمتنی (مثلاً «۶ × ۷» یا «۳۰ + ۱۲») با کنترلِ رشته‌ای دیده نمی‌شود ⇒ یک حل‌کنندهٔ مستقل
                فقط از روی خودِ پله‌ها پاسخِ نهایی را درمی‌آورد؛ اگر درآورد، پله‌ها کنار می‌روند. */
@@ -1001,7 +1017,7 @@
             if (m && m.names && m.names.length) hint = A.kRedact(hint, m.names);
             return Promise.resolve(A.callAI(SYS_LADCHK, hint)).then(function (t2) {
               var r = parseJSON(t2), got = r && r.answer != null ? String(r.answer).trim() : "";
-              if (got && got !== "null" && A.knotLeaks(it.answer, [got]).length) {
+              if (got && got !== "null" && A.knotLeaks(ansRef, [got]).length) {
                 A.toast("یک حل‌کنندهٔ مستقل از خودِ این پله‌ها (بی صورتِ مسئله) به پاسخِ نهایی رسید؛ پله‌ها کنار گذاشته شد. دستی بنویس یا دوباره بخواه.", "bad"); return;
               }
               [4, 5, 6].forEach(function (n, i) { ins[n].value = v[i]; });
@@ -1010,6 +1026,7 @@
             }, function () {
               A.toast("وارسیِ دوم (آیا پاسخ از خودِ پله‌ها درمی‌آید؟) انجام نشد؛ پله‌ها گذاشته نشد. دوباره بخواه یا دستی بنویس.", "bad");
             });
+            }
           }, onDone: function () { aib.disabled = false; } });
       } }, "🤖 بساز با هوش مصنوعی");
       sec.appendChild(h("div", { class: "card soft col gap" }, h("p", { class: "small" }, "پله‌های ۴ تا ۶ از متنِ همین مسئله ساخته می‌شوند: دستی بنویس، یا هوش مصنوعی بسازد (هیچ پله‌ای نباید پاسخِ نهایی را داشته باشد — بررسی می‌شود)."), gen, h("div", { class: "row gap wrap" }, save, aib)));
@@ -1020,6 +1037,8 @@
       h("button", { class: "btn ghost sm kn-lad-next", onclick: function () { if (cur >= 6) { L.opened = -1; } else L.cur = cur + 1; kc.ladder = L; H.put(); redraw(); } }, cur >= 6 ? "باز نشد (پایانِ نردبان)" : "باز نشد ⇐ پلهٔ بعد")));
     return sec;
   }
+  var SYS_LAD_HID = "تو سازندهٔ راهنمایی‌های پله‌ای برای مسئله‌ای هستی که کاربر پاسخش را نمی‌داند. اول خودت مسئله را دقیق و گام‌به‌گام (در ذهن) حل کن؛ پاسخ فقط در فیلدِ answer می‌آید و **هرگز** به کاربر نشان داده نمی‌شود. راهنمایی‌ها هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ندارند. فقط JSON: {\"answer\":\"پاسخِ نهایی (کوتاه)\",\"s4\":\"یک راهنماییِ راهبرد بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهوم یا بازنماییِ کلیدی\",\"s6\":\"نخستین گامِ راه، نه بیشتر\"}";
+  var SYS_SOLVE_IND = "این مسئله را مستقل، دقیق و گام‌به‌گام حل کن. فقط JSON: {\"answer\":\"پاسخِ نهایی کوتاه\"}";
   var SYS_LAD = "تو سازندهٔ راهنمایی‌های پله‌ای برای یک مسئله هستی. هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ننویس. خروجی فقط JSON: {\"s4\":\"یک راهنماییِ راهبرد (از آخر/حالتِ خاص/قرینه) بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهومِ کلیدی\",\"s6\":\"گامِ کلیدی بدونِ پاسخِ نهایی\"}. فارسی، کوتاه.";
   var SYS_LADCHK = "تو حل‌کننده‌ای هستی که فقط سه «راهنمایی» از یک مسئلهٔ پنهان را می‌بینی، نه خودِ مسئله را. بگو آیا پاسخِ نهاییِ مسئله را فقط از روی همین راهنمایی‌ها می‌شود دقیق به دست آورد. اگر می‌شود، آن را بنویس؛ اگر نمی‌شود، null. خروجی فقط JSON: {\"answer\": \"…\" | null}.";
   A.KSYS_LADCHK = SYS_LADCHK;
