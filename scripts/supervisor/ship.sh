@@ -79,7 +79,7 @@ if ! git merge-base --is-ancestor origin/main HEAD; then
   python3 scripts/supervisor/handoff.py check --fix >/dev/null || true
   python3 scripts/supervisor/handoff.py guard --routine "${SUPERVISOR_ROUTINE:-}" --base origin/main || exit 1
   gate || exit 1
-  if [ -n "$(git status --porcelain)" ]; then git add -A && git commit -q -m "build: frontend/dist after rebase"; fi
+  if [ -n "$(git status --porcelain)" ]; then git add -A && git commit -q -m "build: frontend/dist after rebase" ${SUPERVISOR_ROUTINE:+-m "Routine: ${SUPERVISOR_ROUTINE}"}; fi
 fi
 if out="$(retry git push origin HEAD:main 2>&1)"; then
   echo "$out" | tail -3
