@@ -32951,8 +32951,10 @@ APP.goFromURL = function (q) {
 
   var DO = AS.DO;
   DO.tour_diag = function (a) {
-    var s = AS._turnSession; if (!s || !s.tour) return "اول طرحِ تور (tour_plan) بعد غربال";
+    var s = AS._turnSession; if (!s) return "سشن نیست";
     var list = Array.isArray(a.layers) ? a.layers : Array.isArray(a.diag) ? a.diag : a.id ? [a] : [], bad = [];
+    // غربال پیش از طرحِ تور (در همان نوبت) نگه داشته و پس از tour_plan اعمال می‌شود (کارزارِ آزمون c03/c06: گم می‌شد)
+    if (!s.tour) { s._diagPending = (s._diagPending || []).concat(list); return ""; }
     var d = s.tour.diag = s.tour.diag || {};
     list.forEach(function (x) {
       var L = x && layerOf(x.id); if (!L) { bad.push(String(x && x.id)); return; }
@@ -32964,7 +32966,12 @@ APP.goFromURL = function (q) {
   };
   // tour_plan می‌تواند غربال را هم‌زمان بیاورد
   var rawPlan = DO.tour_plan;
-  DO.tour_plan = function (a) { var r = rawPlan.apply(this, arguments); if (a && (a.diag || a.layers)) { var r2 = DO.tour_diag(a); if (r2) r = (r ? r + " · " : "") + r2; } return r; };
+  DO.tour_plan = function (a) {
+    var r = rawPlan.apply(this, arguments), s = AS._turnSession;
+    if (a && (a.diag || a.layers)) { var r2 = DO.tour_diag(a); if (r2) r = (r ? r + " · " : "") + r2; }
+    if (s && s.tour && s._diagPending) { var pend = s._diagPending; delete s._diagPending; var r3 = DO.tour_diag({ layers: pend }); if (r3) r = (r ? r + " · " : "") + r3; }
+    return r;
+  };
 
   /* ---------- برای مدل: وضعِ غربال + گره‌های پیشینِ کاربر ---------- */
   var rawText = AS.tourText;

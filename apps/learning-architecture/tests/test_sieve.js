@@ -20,7 +20,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     window.__q = []; window.__calls = []; window.__mails = [];
     APP.callAI = async (sys, user) => { __calls.push({ sys, user }); return JSON.stringify(__q.shift()); };
     APP.HOST = { mail: async (r) => { __mails.push(r); return { status: 'sent' }; }, sheets: async () => [] };
-    const L = AS.sieveLayers(); out.n = L.length; out.fams = L.filter(x => /^F\d+$/.test(x.id)).length;
+    { const s0 = AS.newSession(); APP.S.put(s0); AS._turnSession = s0; AS.DO.tour_diag({ layers: [{ id: 'F2', st: 'found', why: 'عددها را عدد خواندم' }] }); AS.DO.tour_plan({ facets: [{ key: 'f1', kind: 'knot', title: 'x' }] });
+      window.__pend = !!(s0.tour.diag && s0.tour.diag.F2 && s0.tour.diag.F2.st === 'found'); }
+    const L = AS.sieveLayers(); out.n = L.length; out.pend = window.__pend; out.fams = L.filter(x => /^F\d+$/.test(x.id)).length;
     out.rules = /غربالِ لایه‌ها/.test(AS.SYS) && /نه سریع رد کن، نه پخش کن/.test(AS.SYS) && /دانشِ پیش‌نیاز/.test(AS.SYS) && !/هر جنبه‌ای که حرفِ کاربر دارد یک وجه شود/.test(AS.SYS);
     // گرهٔ پیشین ⇒ در پرامپت برای ریشهٔ مشترک
     APP.S.put({ id: 'kn_old', type: 'knot', name: 'برچسب را حکم گرفتن', fam: 'F11', status: 'practised' });
@@ -66,7 +68,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     return out;
   });
   const S = info.sieve;
-  chk(S.fams === 12 && S.n >= 22, 'layers = base + all 12 knot families from the registry: ' + S.n + '/' + S.fams);
+  chk(S.pend && S.fams === 12 && S.n >= 22, 'layers = base + all 12 knot families from the registry: ' + S.n + '/' + S.fams);
   chk(S.rules, 'root-first sieve rules replace "every aspect = a facet"');
   chk(S.found && S.noEvidence && S.unknown, '"found" needs the user\'s own words (else "ask"); unknown layer ids are reported');
   chk(S.prompt && S.drawer, 'the model sees prior knots and the sieve state; the drawer shows the sieve');
