@@ -92,6 +92,10 @@
       X.ix = ix; X.n = { acc: X.ans.length, cal: X.cal.length, ret: X.ret.n, knot: X.knots.all };
       X.score = vals.length ? Math.round(vals.reduce(function (s, v) { return s + v; }, 0) / vals.length) : null;
       X.band = X.score == null ? "دادهٔ کم" : BANDS.filter(function (b2) { return X.score < b2[0]; })[0][1];
+      // «ورزیده/استوار» همان معیارِ «حل‌شدن» را می‌خواهد: دست‌کم ۲ نوبت با ≥ ۳ روز فاصله؛ یک نشستِ پرامتیاز «در حالِ رشد» می‌ماند (کارزارِ آزمون sc04)
+      var dys = X.ans.concat(X.cal).map(function (a) { return String(a.at || "").slice(0, 10); }).filter(Boolean).sort();
+      X.spread = dys.length ? A.daysBetween(dys[0], dys[dys.length - 1]) : 0;
+      if (X.score != null && X.score >= 65 && X.spread < 3) X.band = "در حالِ رشد · تک‌نوبت";
       /* روندِ ماهانه: دقت و کالیبراسیونِ هر ماه (نمونهٔ ماه ≥ ۳) */
       var bym = {}; X.ans.forEach(function (a) { var m = month(a.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).n++; if (a.ok) bym[m].ok++; });
       X.cal.forEach(function (c) { var m = month(c.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).cal.push(c); });

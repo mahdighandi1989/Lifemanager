@@ -86,9 +86,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     document.getElementById('stp').onclick = () => { APP.state.sub = 'in-' + Date.now(); };
     const sc = APP.ASSIST.scan(), k = l => (sc.fields.find(f => f.label === l) || sc.buttons.find(x => x.label === l)).k;
     const r = await APP.ASSIST.run([{ do: 'click', k: k('رفتن به قدمِ «ثبت»') }, { do: 'fill', k: k('متن'), value: 'x' }]);
-    return { moved: r.moved, skipped: r.skipped, val: document.getElementById('t1').value };
+    const v1 = document.getElementById('t1').value;
+    // کلیکی که در همان نما فیلد می‌افزاید (افزودنِ سطر): کلیدهای بعدی جابه‌جا شده‌اند ⇒ رد و «فرم تغییر کرد» (کارزارِ آزمون sc04)
+    m.innerHTML = '<button id="add" type="button">+ سطر</button><div id="rows"></div><label>متن <input id="t2"></label>';
+    document.getElementById('add').onclick = () => { document.getElementById('rows').insertAdjacentHTML('beforeend', '<label>سطر <input></label>'); };
+    const sc2 = APP.ASSIST.scan(), k2 = l => (sc2.fields.find(f => f.label === l) || sc2.buttons.find(x => x.label === l)).k;
+    const r2 = await APP.ASSIST.run([{ do: 'click', k: k2('+ سطر') }, { do: 'fill', k: k2('متن'), value: 'y' }]);
+    return { moved: r.moved, skipped: r.skipped, val: v1, grew: !r2.moved && r2.changed && r2.skipped === 1 && document.getElementById('t2').value === '' };
   });
-  chk(info.nav.moved && info.nav.skipped === 1 && info.nav.val === '', 'a click that changes the step counts as moving; later stale actions are skipped: ' + JSON.stringify(info.nav));
+  chk(info.nav.moved && info.nav.skipped === 1 && info.nav.val === '' && info.nav.grew, 'a click that changes the step counts as moving; later stale actions are skipped: ' + JSON.stringify(info.nav));
 
   // 5) پیامِ صفحه (toast) پس از کلیک به خودِ دستیار می‌رسد و نوبتِ خودکار می‌گیرد؛ 6) next:true قولِ «بعدش می‌زنم» را عملی می‌کند
   info.toast = await p.evaluate(async () => {
