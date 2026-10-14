@@ -305,6 +305,20 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.ladIso = await p.locator('main .kn-iso').count(); // opened by the ladder ⇒ contrast probes need an isomorph
   info.leaksFn = await p.evaluate(() => [APP.knotLeaks('42', ['جواب 42 است']).length, APP.knotLeaks('42', ['۴۲ را ببین']).length, APP.knotLeaks('42', ['ضربِ ۸']).length, APP.knotLeaks('x = 5', ['پس x=5']).length].join(','));
 
+  /* ۱۰-ب) مسئلهٔ حل‌نشده (پاسخ را نمی‌داند — کارزارِ آزمونِ دوم c01): پاسخِ پنهانِ هوش + حلِ مستقلِ دوم ⇒ پله‌ها؛ ناهمخوانی ⇒ رد؛ پاسخ هرگز در خانه‌ها نیست */
+  await intake({ kinds: ['problem'], what: 'یک معمای دنباله را حل نکردم', seen: 'no', statement: 'دنبالهٔ ۱، ۱۱، ۲۱، ۱۲۱۱، ۱۱۱۲۲۱، ؟', answer: '' });
+  const hidId = await p.evaluate(() => APP.state.arg);
+  await next(); await p.check('#knVerdict_2'); await p.waitForTimeout(80); await next(); await next();
+  for (let i = 0; i < 4; i++) { await p.click('main .kn-lad-next'); await p.waitForTimeout(150); }
+  await p.evaluate(() => { window.__hid = []; APP.callAI = (sys, user) => { window.__hid.push(sys.slice(0, 40)); return Promise.resolve(/پاسخش را نمی‌داند/.test(sys) ? '{"answer":"312211","s4":"هر جمله را بلند بخوان","s5":"توصیفِ جملهٔ قبل","s6":"جملهٔ دوم را با واژه بگو"}' : /^این مسئله را مستقل/.test(sys) ? '{"answer":"999"}' : '{"answer":null}'); }; });
+  await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(400);
+  info.hidMismatch = (await p.inputValue('#knLad4')) === '';
+  await p.evaluate(() => { APP.callAI = (sys) => Promise.resolve(/پاسخش را نمی‌داند/.test(sys) ? '{"answer":"312211","s4":"هر جمله را بلند بخوان","s5":"توصیفِ جملهٔ قبل","s6":"جملهٔ دوم را با واژه بگو"}' : /^این مسئله را مستقل/.test(sys) ? '{"answer":"۳۱۲۲۱۱"}' : '{"answer":null}'); });
+  await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(400);
+  info.hidOk = (await p.inputValue('#knLad4')) !== '' && await p.evaluate(id => APP.S.get(id).intake.aiAnswer === '312211', hidId) && !(await p.evaluate(() => /312211|۳۱۲۲۱۱/.test(document.getElementById('main').innerText)));
+
   /* ۱۱) «امروز»: یک سطرِ ترکیبی برای ورزش‌های موعد (اگر a17 هست) */
   info.dueNo = await p.evaluate(() => APP.dueList().filter(d => /ورزشِ گره/.test(d.txt)).length);
   info.dueYes = await p.evaluate(() => { APP.kpracticeDue = () => [1, 2, 3]; const n = APP.dueList().filter(d => /ورزشِ گره/.test(d.txt)).length; delete APP.kpracticeDue; return n; });
@@ -487,6 +501,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.safeCard === 1 && info.safeText, 'safety card'); E(info.safeGate, 'safety gate'); E(/:s0$/.test(info.safeAfterAck), 'after ack: ' + info.safeAfterAck);
   E(info.aiSafeFirst && info.aiNotCalled, 'safety before AI');
   E(info.ladGen === 1 && info.leakRejected, 'ladder leak check');
+  E(info.hidMismatch && info.hidOk, 'unsolved problem: hidden AI answer confirmed by an independent solve builds the ladder; a mismatch is rejected; the answer never shows: ' + JSON.stringify([info.hidMismatch, info.hidOk]));
   E(info.ladEv === 'F3:1:ladder' && info.ladIso === 1, 'ladder evidence: ' + info.ladEv);
   E(info.leaksFn === '1,1,0,1', 'leak fn: ' + info.leaksFn);
   E(info.dueNo === 0 && info.dueYes === 1, 'today row');
