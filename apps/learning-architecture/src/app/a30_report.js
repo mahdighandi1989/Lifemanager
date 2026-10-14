@@ -24,7 +24,8 @@
       var s = AS.cur(); if (!s || !s.tour || s.tour.masteredAt) return;
       var tr = s.trail = s.trail || [], v = A.state.view, key = v + "|" + (A.state.arg || "") + "|" + (A.state.sub || "");
       if (tr.length && tr[tr.length - 1].k === key) return;
-      tr.push({ k: key, at: nowIso(), v: v, label: (AS.labelOf ? AS.labelOf(v) : v) + (A.state.sub ? " · " + A.state.sub : "") });
+      var sf = subFa(A.state.sub);
+      tr.push({ k: key, at: nowIso(), v: v, label: (AS.labelOf ? AS.labelOf(v) : v) + (sf ? " · " + sf : "") });
       if (tr.length > 300) s.trail = tr.slice(-300);
     } catch (e) { }
   };
@@ -46,6 +47,12 @@
     return out;
   }
   R.scores = scores;
+  function subFa(sub) {
+    sub = String(sub || ""); if (!sub) return "";
+    var m = /^s(\d+)$/.exec(sub); if (m) return "قدمِ " + fa(+m[1]);
+    if (sub === "in") return "ثبتِ موقعیت"; if (/^ws:/.test(sub)) return "کاربرگ"; if (/^st_/.test(sub)) return "ایستگاه";
+    return /[A-Za-z_:]/.test(sub) ? "" : sub;
+  }
   function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt,
     // کدام نشانه‌ها ✓ است (بی شمارهٔ پرانتزی) — تا ایمیل بگوید دقیقاً چه تازه شد یا دوباره باز شد (کارزارِ آزمون sc17: ماندگاریِ ۳۰ روزه و بازگشت گم بود)
     ms: (function () { var o = {}; t.facets.forEach(function (f) { o[f.key] = AS.tourMilestones(f).filter(function (m) { return m.ok; }).map(function (m) { return m.t.replace(/\s*\([^)]*\)\s*$/, ""); }); }); return o; })() }; }
@@ -147,6 +154,8 @@
       });
       /* مسیرِ عبور */
       var tr = (s.trail || []).slice(-60);
+      // کدهای خامِ قدم (in/s0/s1/ws:…) به فارسی یا حذف (کارزارِ آزمون sc16) — برای مسیرهای قدیمیِ ذخیره‌شده هم
+      tr = tr.map(function (x) { var p = String(x.label || "").split(" · "); return { label: p[0] + (p[1] ? (subFa(p[1]) ? " · " + subFa(p[1]) : "") : "") }; }).filter(function (x, i, a) { return !i || a[i - 1].label !== x.label; });
       if (tr.length) H.push(sec("🚶 از کجا عبور کرد", tr.map(function (x) { return '<span style="white-space:nowrap">' + esc(x.label) + "</span>"; }).join(' <span style="color:' + C.mute + '">←</span> ')));
       /* گفت‌وگو */
       var msgs = (s.msgs || []).filter(function (x) { return x.role !== "sys" || /✓|🛎|✅|↩|🎉|🏁|⏳|↗|🤝/.test(x.text); }).slice(-40);
