@@ -63,7 +63,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   chk(info.prog.refs === 'kc_t1', 'only the root record created after the facet started is linked (not an old one): ' + info.prog.refs);
   chk(info.prog.st === 'f1:done,f2:now,f3:blocked' && info.prog.sawDone && info.prog.sawF2, 'facet done from the data and the model already sees it in the same turn: ' + JSON.stringify(info.prog));
-  chk(/ورزشِ گره/.test(info.prog.pr) && /کامل شد \(از روی خودِ داده‌ها\)/.test(info.prog.msg), 'practice of the facet is listed and the completion is announced');
+  chk(/ورزشِ گره/.test(info.prog.pr) && /پایهٔ وجهِ .* برپا شد \(از روی خودِ داده‌ها\)/.test(info.prog.msg), 'practice of the facet is listed and the completion is announced');
   chk(await p.evaluate(() => APP.ASSIST.DO.tour_done({ facet: 'f2' })).then(r => /دلیل/.test(r)), 'tour_done without evidence or a reason is refused');
   chk(await p.evaluate(() => APP.ASSIST.DO.tour_skip({ facet: 'f2' })).then(r => /دلیل/.test(r)), 'tour_skip without a reason is refused');
 

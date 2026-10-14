@@ -118,6 +118,41 @@
     L.push("(∅ = هنوز هیچ ابزاری در صفحه برای آن حوزه نیست)");
     return L.join("\n");
   };
+  /* «# دانسته‌های قلمرو»: حوزه‌های مرتبط با پیام (از هر شش سامانه و قلمروِ معرفت‌شناسی) با گزاره‌ها و رده‌شان — دستیار یافتهٔ
+     تثبیت‌شده را از همین‌جا می‌گوید، نه از حافظهٔ خودش، و «حکم نمی‌کنم» را با «یافته چیست» اشتباه نمی‌گیرد (کارزارِ آزمون) */
+  var STOP = /^(که|را|از|به|با|در|این|آن|برای|است|هست|نیست|می|من|تو|یه|یک|هم|اگر|چرا|چه|چطور|کنم|کنی|کند|بود|شد|شده|دارم|داره|دیگه|خیلی|همه|ولی|اما|تا|رو|اون|این‌ها|باید)$/;
+  function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return w.replace(/(ها|های|هایی|ی|ام|ات|اش)$/, ""); }); }
+  SYS.related = function (text, n) {
+    var q = toks(text); if (!q.length) return [];
+    var qs = {}; q.forEach(function (w) { qs[w] = 1; });
+    function score(blob) { var b = toks(blob), hit = 0, seen = {}; b.forEach(function (w) { if (qs[w] && !seen[w]) { seen[w] = 1; hit++; } else if (w.length >= 4) Object.keys(qs).forEach(function (k) { if (k.length >= 4 && !seen[k] && (w.indexOf(k) === 0 || k.indexOf(w) === 0)) { seen[k] = 1; hit += 0.5; } }); }); return hit; }
+    var out = [];
+    SYS.areas().forEach(function (x) { var a = x.a, sc = 2 * score(a.fa + " " + (a.en || "")) + score((a.desc_fa || "") + " " + (a.key_questions_fa || []).join(" ") + " " + (a.claims || []).map(function (c) { return c.fa; }).join(" ")); if (sc >= 2) out.push({ sc: sc + 0.5, sys: x.sys, a: a, epi: false }); });
+    var T = window.EPI_TERR || {}, EL = ((window.EPI_BT_LEDGER || {}).territory || {}).areas || {};
+    (T.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { var sc = 2 * score(a.fa + " " + (a.en || "")) + score((a.desc_fa || "") + " " + (a.key_questions_fa || []).join(" ")); if (sc >= 2) out.push({ sc: sc, a: a, epi: true, st: (EL[a.id] || {}).stage || 0 }); }); });
+    return out.sort(function (a, b) { return b.sc - a.sc; }).slice(0, n || 4);
+  };
+  /* حوزه با شناسه (برای know ِ مدل): هم سامانه‌ها هم معرفت‌شناسی */
+  SYS.byId = function (id) {
+    var x = SYS.find(id); if (x) return { sys: x.sys, a: x.a, epi: false };
+    var T = window.EPI_TERR || {}, EL = ((window.EPI_BT_LEDGER || {}).territory || {}).areas || {}, hit = null;
+    (T.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { if (a.id === id) hit = { a: a, epi: true, st: (EL[a.id] || {}).stage || 0 }; }); });
+    return hit;
+  };
+  SYS.knowledge = function (s, msg) {
+    var want = ((s && s.know) || []).map(SYS.byId).filter(Boolean);
+    var rel = want.concat(SYS.related((msg || "") + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
+    if (!rel.length) return "";
+    var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل)"];
+    rel.forEach(function (r) {
+      var a = r.a;
+      if (r.epi) { L.push("- [معرفت‌شناسی] " + a.id + " «" + a.fa + "» گامِ " + r.st + (r.st <= 1 ? " (هنوز محتوای سنجیده ندارد)" : "") + ": " + (a.desc_fa || "") + (a.key_questions_fa ? " — پرسش‌ها: " + a.key_questions_fa.slice(0, 2).join(" / ") : "")); return; }
+      L.push("- [" + r.sys.fa + "] " + a.id + " «" + a.fa + "» گامِ " + SYS.stage(a) + (a.tools && a.tools.length ? " — ابزارها: " + a.tools.slice(0, 5).join("، ") : "") + (a.gap_fa ? " — کمبودِ صفحه: " + a.gap_fa.slice(0, 160) : ""));
+      (a.claims || []).slice(0, 3).forEach(function (c) { L.push("   · " + (KIND[c.kind] || c.kind) + ": " + c.fa + " — " + String(c.basis_fa || "").slice(0, 140)); });
+    });
+    return L.join("\n").slice(0, 4000);
+  };
+  if (A.ASSIST) (A.ASSIST.promptHooks = A.ASSIST.promptHooks || []).push(SYS.knowledge);
   if (A.ASSIST && A.ASSIST.manifest && !A.ASSIST.manifest._sys) {
     var rawM = A.ASSIST.manifest;
     A.ASSIST.manifest = function () { var t = rawM.apply(this, arguments); try { return t + "\n" + SYS.manifest(); } catch (e) { return t; } };

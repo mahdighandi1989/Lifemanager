@@ -100,7 +100,16 @@
     var t = el.getAttribute("aria-label") || "";
     if (!t && el.id) { var lb = document.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(el.id) : el.id) + '"]'); if (lb) { var lc = lb.cloneNode(true); lc.querySelectorAll("select,textarea,input,option,button").forEach(function (x) { x.remove(); }); t = lc.textContent; } }
     if (!t) { var pl = el.closest("label"); if (pl) { var c = pl.cloneNode(true); c.querySelectorAll("select,textarea,input,option,button").forEach(function (x) { x.remove(); }); t = c.textContent; } }
-    if (!t && el.tagName === "BUTTON") t = el.textContent;
+    if (!t && el.tagName === "BUTTON") {
+      t = el.textContent;
+      // دکمه‌ای که پاسخِ یک «پرسش» است (آزمون‌های گره‌گشا، ایستگاه‌ها): متنِ خودِ پرسش هم دیده شود — بی آن دستیار پرسش را حدس می‌زد (کارزارِ آزمون)
+      var grp = el.closest("[role=group], fieldset, .kn-probe, .kn-q, .dopts, .row");
+      if (grp && grp.parentElement) {
+        var q = grp.querySelector("legend") || grp.previousElementSibling;
+        var qt = q && !q.contains(el) && !/BUTTON|INPUT|SELECT|TEXTAREA/.test(q.tagName) ? clip(q.textContent, 90) : "";
+        if (qt && qt.indexOf(clip(t, 30)) < 0) t = t + " ⟵ پرسش: " + qt;
+      }
+    }
     if (!t) t = el.getAttribute("placeholder") || el.getAttribute("title") || "";
     if (!t) { var p = el.parentElement, i = 0; while (p && i < 3 && !t) { var lab = p.querySelector("label,.fl,.lbl,h3,h4,b,strong"); if (lab && !lab.contains(el)) t = lab.textContent; p = p.parentElement; i++; } }
     return clip(t, 90);
@@ -173,6 +182,10 @@
      زردکردنِ یک گزینه خودش پاسخ را لو می‌دهد یا کاربر را به آن می‌کشد (تورِ زنده: گزینهٔ غلطِ «۱/۲» زرد شد) */
   var ANSWER = ".dopt, .dopts button, .pbs-ans input, .pbs-ans textarea, .pbs-ans button, .kp-opt, .kp-choices input, .kp-choices button, .kp-ans, .kp-ans input, .kp-ans textarea";
   function isAnswer(x) { try { return !!(x && x.closest && x.closest(ANSWER)); } catch (e) { return false; } }
+  /* پیام‌های اخیرِ صفحه (toast) — حتی وقتی خودِ کاربر دکمه را زد — تا دستیار علتِ «نشد» را بداند و کاربر را مقصر نکند */
+  var RECENT_TOASTS = [];
+  (function () { var raw0 = A.toast; A.toast = function (m) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200) }); if (RECENT_TOASTS.length > 8) RECENT_TOASTS.shift(); } } catch (e) { } return raw0.apply(this, arguments); }; })();
+  AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000; return RECENT_TOASTS.filter(function (x) { return x.at >= t0; }).map(function (x) { return x.t; }); };
   var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
   function fire(x, ev) { x.dispatchEvent(new Event(ev, { bubbles: true })); }
   function setVal(x, v) {
@@ -291,6 +304,10 @@
     "- قدم‌به‌قدم مثلِ خودِ کاربر: وقتی فیلدهای لازمِ یک فرم از حرف‌ها و فایل‌های خودِ او پر شد، دکمهٔ ثبت/ساخت/بعدیِ همان فرم را click کن و بگو چه کردی؛ اگر چیزی مانده، هایلایت کن و یک پرسشِ کوتاه بپرس. تصمیم‌های مالک (بپذیر/رد کن/تأیید/ریشه را تأیید کن) و حذف را هرگز نزن — هایلایت کن.",
     "- پیوست‌ها: متنِ کاملِ هر فایل (Word، Excel، PDF، صوت/ویدیو با رونویسیِ کامل، ZIP…) و خودِ تصویرها همراهِ همان نوبت می‌آید؛ همه‌اش را بخوان و فقط از همان‌ها نقل کن. در نوبت‌های بعد اگر دوباره به محتوای فایلی لازم داری، reread:[id] بده. اگر فایلی «خوانده نشد»، صادقانه بگو.",
     "- حالِ کاربر: اگر از ترس، اضطراب، غم، شرم یا فشار گفت، در یک عبارتِ کوتاه و صادق به رسمیتش بشناس (بی تعارف و بی دلداریِ کلیشه‌ای)، بعد کار. اگر سامانه نوشت «نشانهٔ پریشانیِ جدی»، اول همان راهِ کمکِ انسانی را بگو و کاری را تحمیل نکن.",
+    "- سوگ، فقدان، بیماریِ عزیز، تروما و غمِ تازه «مسئله‌ای برای حل» یا «گره‌ای برای ورزیدن» نیست: اول بشنو و بپرس چه می‌خواهد (فقط شنیده شدن؟ معنا و ارزش‌ها؟ گیرِ مشخصی که دوست دارد باز شود؟). گره‌گشا را فقط اگر خودش گیرِ مشخص و تکراری‌ای گفت پیشنهاد کن؛ برای معنا و ارزش‌ها وجهِ area در «خودشناسی، ارزش‌ها و معنا». حمایتِ سوگ/درمان را «بیرون از این صفحه» بگو.",
+    "- know: اگر برای پاسخ به گزاره‌های یک حوزه از قلمروها (شناسه‌ها در «نقشهٔ سامانه»، مثلاً sc_negotiation یا a_disagreement) لازم داری، know:[شناسه‌ها] بده و در reply فعلاً فقط بگو «نگاه می‌کنم»؛ سامانه همان نوبت آن‌ها را در «# دانسته‌های قلمرو» می‌فرستد.",
+    "- «داوری نکن» یعنی دربارهٔ پرونده و ادعای کاربر حکم نده؛ نه این‌که یافتهٔ تثبیت‌شدهٔ علمی را نگویی. وقتی کاربر دربارهٔ چیزی می‌پرسد که در «# دانسته‌های قلمرو» آمده، همان گزاره را با رده‌اش (قضیه / تجربی / بیرون) و حوزه‌اش بگو و به نمای همان حوزه یا ابزارش ببر.",
+    "- از کاری که در همین پاسخ انجام می‌دهی به آینده بگو («می‌زنم»، «پر می‌کنم»)؛ سامانه نتیجه را می‌گوید. پیش از «همه پر است / کامل است»، فیلدهای خالیِ لازم و «# پیام‌های اخیرِ صفحه» را ببین؛ اگر صفحه خطا داد، علتش را از همان پیام بگو و کاربر را مقصر نکن.",
     "- نیمی مربوط: اگر بخشی از خواسته بیرون از این صفحه است (کاریابی، پول و بودجه، درمانِ پزشکی/روان‌پزشکی، کارهای حقوقی، …)، آن بخش را در outside بنویس و در reply یک جمله صادقانه بگو که این‌جا جایش نیست؛ برایش gap نزن. بقیه را مثلِ همیشه ببر.",
     "- چیزی که رویدادِ مشخص ندارد (نگرانیِ آینده، ترسِ کلی): یک بار بپرس «آخرین بار کِی و کجا آمد؟»؛ اگر نبود یا نگفت، همان جملهٔ خودش را موقعیت بگیر («احساس یا حالتی که مانع شد») و جلو برو.",
     "- ساختنِ رکوردِ تازه تصمیم نیست: در نمای فهرستی (مثلاً kcases ⇐ «+ موقعیتِ تازه»، topics، e_prob ⇐ «افزودنِ مسئلهٔ تو») دکمهٔ ساختن را همان نوبت بزن و next:true بده.",
@@ -303,7 +320,7 @@
     "- next: اگر در همین پاسخ گفتی «بعدش فلان دکمه را می‌زنم» و آن کار پس از کلیک‌های همین نوبت شدنی می‌شود، next:true بده تا سامانه صفحهٔ تازه را بفرستد و همان را انجام دهی؛ قولی نده که بی‌پیامِ کاربر عملی نشود.",
     "- steps: فهرستِ کاملِ مراحلِ رسیدن به خواستهٔ اصلی با وضعِ هر کدام (done/now/todo) و نمای هر کدام.",
     "خروجی فقط یک JSON (بی متنِ دیگر):",
-    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap","next":false,"outside":"",' +
+    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap","next":false,"outside":"","know":[],' +
     '"steps":[{"t":"…","s":"done|now|todo","view":"…"}],' +
     '"actions":[{"do":"go","view":"…","arg":"…","sub":"…"},{"do":"fill","k":"k3","value":"…"},{"do":"highlight","k":"k5","why":"…"},{"do":"click","k":"k9"},{"do":"attach","k":"k7","fileIds":[12]}],' +
     '"reread":[12],"gap":{"title":"…","area":"…","kind":"build|priority|fix","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…","why_area":"…","why_not":"…","evidence":"…","confidence":0.9}}'
@@ -334,6 +351,8 @@
     if (AS.tourText) { var tt = AS.tourText(s); if (tt) L.push(tt); }
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
     L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
+    (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) L.push("", x); } catch (e) { } });
+    var rt = AS.recentToasts(); if (rt.length) L.push("", "# پیام‌های اخیرِ صفحه (۴ دقیقهٔ گذشته؛ مثلاً پس از دکمه‌ای که خودِ کاربر زد)", rt.map(function (x) { return "- " + x; }).join("\n"));
     L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
     var HP = L.length;
     L.push("", "# نوبتِ تازه", msg);
@@ -508,7 +527,8 @@
       var sc = AS.scan();
       return AS.openSheets().then(function (l) { AS._sheets = l; AS._turnSession = s; return ask(AS.SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }); }).then(function (o) {
         if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
-        if (o.title && !s.title) s.title = clip(o.title, 80);
+        // نامِ سشن: اگر پیامِ اول نامربوط بود (مثلاً «دستورِ پخت»)، با نخستین خواستهٔ مربوط دوباره ساخته می‌شود (کارزارِ آزمون)
+        if (o.title && (!s.title || (s.titleUnrelated && o.status !== "unrelated"))) { s.title = clip(o.title, 80); s.titleUnrelated = o.status === "unrelated"; }
         if (o.pinned && (!s.pinned || o.pinned !== s.pinned)) s.pinned = clip(o.pinned, 300);
         if (o.memory) s.memory = clip(o.memory, 6000);
         if (Array.isArray(o.steps) && o.steps.length) s.steps = o.steps.slice(0, 20).map(function (x) { return { t: clip(x.t, 140), s: /^(done|now|todo)$/.test(x.s) ? x.s : "todo", view: A.V[x.view] ? x.view : "" }; });
@@ -547,10 +567,19 @@
             return;
           }
           var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
+          // know: حوزه‌هایی که مدل خواست ⇒ در سشن می‌ماند و همین حالا یک نوبت با «# دانسته‌های قلمرو»
+          var know = (Array.isArray(o.know) ? o.know : []).map(String).filter(function (id) { return A.SYST && A.SYST.byId && A.SYST.byId(id) && (s.know || []).indexOf(id) < 0; }).slice(0, 4);
+          if (know.length) { s.know = (s.know || []).concat(know).slice(-6); S.put(s); if (auto < MAX_AUTO) { auto++; return turn("[سامانه: گزاره‌های حوزه‌هایی که خواستی در «# دانسته‌های قلمرو» آمد؛ حالا پاسخ بده.]"); } }
           var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
           if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
           // «next»: مدل گفته کارِ بعدی را در همین رشته انجام می‌دهد (مثلاً پس از «ثبتِ کارت»، دکمهٔ «ساختِ نمونه‌ها») —
           // بی آن، قولِ «بعدش می‌زنم» تا پیامِ بعدیِ کاربر معطل می‌ماند (یافتهٔ تورِ زنده)
+          // کاری که مدل «انجام‌شده» گفت ولی نشد (کلید پیدا نشد، تصمیمِ مالک، جوابِ تمرین، …) ⇒ یک نوبتِ اصلاح تا پاسخ دروغ نماند
+          var failed = res.notes.filter(function (n) { return !/^«.*» تصمیمِ خودت است؛ زردش کردم/.test(n) || /زدم|افزودم|پر کردم/.test(o.reply || ""); });
+          if (auto < MAX_AUTO && failed.length && /زدم|افزودم|پر کردم|ثبت کردم|نوشتم|گذاشتم/.test(o.reply || "")) {
+            auto++;
+            return turn("[سامانه: این کارهای نوبتِ پیش انجام نشد: «" + res.notes.join("» · «") + "». پاسخِ قبلی‌ات گفته بود انجام شده — به کاربر کوتاه و درست بگو چه شد و چه نشد، و اگر راهِ درستی هست همین حالا انجام بده (کارِ تصمیمِ مالک را فقط زرد کن). reply خیلی کوتاه.]");
+          }
           var promised = o.next === true && res.clicks > 0 && !res.notes.length, said = res.clicks > 0 && res.toasts && res.toasts.length;
           if (auto < MAX_AUTO && (res.moved || res.changed || promised || said)) {
             auto++;
@@ -566,7 +595,7 @@
     }
     // نشانهٔ پریشانیِ جدی (همان واژه‌نامهٔ ایمنیِ گره‌گشا): راهِ کمکِ انسانی پیش از هر کار، و مدل هم می‌داند
     var safe = "";
-    try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
+    try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
     return ups.then(function () { S.put(s); return turn(text || "(فقط فایل فرستادم)", (texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "") + safe, aiIds, true); })
       .catch(function (e) {
         var fl = e && e.files && e.files.length ? " " + manifestNote(e.files) : "";

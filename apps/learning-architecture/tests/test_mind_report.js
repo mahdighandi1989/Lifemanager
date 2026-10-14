@@ -82,7 +82,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const before = { st: s.tour.facets.map(f => f.key + ':' + f.status + ':0').join(','), done: false, m: false };
     s.tour.facets[0].status = 'done'; s.tour.facets[1].status = 'now';
     APP.REPORT.note(s, before); await new Promise(r => setTimeout(r, 300));
-    out.facetMail = __mails.length === 2 && /کامل شد/.test(__mails[1].subject) && /ریز/.test(__mails[1].html);
+    out.facetMail = __mails.length === 2 && /برپا شد/.test(__mails[1].subject) && /ریز/.test(__mails[1].html);
     // خاموش ⇒ نه
     APP.REPORT.setEnabled(false); s.tour.mailq = [{ k: 'done', fa: 'تمام', at: '' }]; await APP.REPORT.flush(s, true); out.off = __mails.length === 2;
     APP.REPORT.setEnabled(true);
@@ -97,6 +97,57 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.rep.imgs >= 5, 'charts travel as inline PNGs: ' + info.rep.imgs);
   chk(info.rep.coalesced && info.rep.facetMail, 'small events wait and ride along with the next important one');
   chk(info.rep.off && info.rep.failKept && info.rep.retry && info.rep.drawer, 'off ⇒ nothing sent; failure keeps the events; retry sends; the drawer has the 📧 control');
+
+  // ---------- اصلاح‌های کارزارِ آزمون ----------
+  info.camp = await p.evaluate(async () => {
+    const AS = APP.ASSIST, out = {}; window.__q = []; window.__calls = [];
+    APP.callAI = async (sys, user) => { __calls.push({ sys, user }); return JSON.stringify(__q.shift()); };
+    // نامِ سشن پس از پیامِ نامربوط دوباره ساخته می‌شود
+    const s = AS.newSession(); APP.S.put(s);
+    __q.push({ reply: 'این‌جا جایش نیست.', status: 'unrelated', title: 'درخواستِ نامربوط', memory: 'm', actions: [] });
+    await AS.send('دستور لازانیا بده');
+    __q.push({ reply: 'باشه.', status: 'related', title: 'مذاکرهٔ حقوق', memory: 'm', actions: [{ do: 'tour_plan', facets: [{ key: 'f1', kind: 'other', area: 'dc_career_income', title: '' }] }] });
+    await AS.send('می‌خوام سرِ حقوقم مذاکره کنم و از بیکاری می‌ترسم');
+    out.title = s.title; const f = s.tour.facets[0];
+    out.area = [f.kind, f.area, f.title, f.view, f.arg].join('|');
+    out.knowledge = /# دانسته‌های قلمرو/.test(__calls[1].user) && /sc_negotiation/.test(__calls[1].user);
+    __calls.length = 0; __q.push({ reply: 'نگاه می‌کنم.', status: 'related', memory: 'm', know: ['a_disagreement'], actions: [] }); __q.push({ reply: 'دو دیدگاه هست.', status: 'related', memory: 'm', actions: [] });
+    await AS.send('دو آدمِ هم‌سطح مخالفن؛ نظرم رو عوض کنم؟');
+    out.know = __calls.length === 2 && /a_disagreement/.test(__calls[1].user) && (s.know || []).indexOf('a_disagreement') >= 0;
+    // وجهِ area: زنجیرهٔ نگرانی که از آغازِ وجه ساخته شد خودکار وصل و نشانه‌ها از داده
+    await new Promise(r => setTimeout(r, 5));
+    APP.S.put({ id: 'wc_t1', type: 'wchain', title: 'بیکار می‌شوم', feel: 80, links: [{ text: 'تعدیل', p: 30 }, { text: 'کار پیدا نکنم', p: 20 }], due: APP.addDays(APP.today(), 30) });
+    AS.tourAfterTurn(s);
+    out.areaMs = AS.tourMilestones(f).map(m => m.ok ? 1 : 0).join('');
+    out.chainCalc = JSON.stringify(APP.chainCalc(APP.S.get('wc_t1')));
+    // کارِ «انجام‌شده» که نشد ⇒ نوبتِ اصلاح
+    const m = document.getElementById('main'); m.innerHTML = '<button id="zz" type="button">ریشه را تأیید کن</button>';
+    __calls.length = 0; __q.push((u => ({ reply: 'تأیید را زدم.', status: 'related', memory: 'm', actions: [{ do: 'click', k: 'k1' }] }))());
+    __q.push({ reply: 'نزدم — تصمیمِ توست؛ زردش کردم.', status: 'related', memory: 'm', actions: [] });
+    await AS.send('بزن');
+    out.correct = __calls.length === 2 && /انجام نشد/.test(__calls[1].user);
+    // پیامِ صفحه پس از کلیکِ خودِ کاربر به پرامپتِ بعد می‌رسد
+    APP.toast('این‌ها هنوز کامل نیستند: چرای ۱'); __calls.length = 0; __q.push({ reply: 'چرای ۱ کامل نیست.', status: 'related', memory: 'm', actions: [] });
+    await AS.send('زدم ولی نشد'); out.toast = /پیام‌های اخیرِ صفحه[\s\S]*چرای ۱/.test(__calls[0].user);
+    // ایمنی ⇒ ایمیل بی متنِ گفت‌وگو، با کادرِ کمک
+    window.__mails = []; APP.HOST.mail = async (r) => { __mails.push(r); return { status: 'sent' }; };
+    s.safetyAt = new Date().toISOString(); s.msgs.push({ role: 'user', text: 'متنِ حساس', at: '' });
+    const rep = await APP.REPORT.build(s, []); out.privacy = !/متنِ حساس/.test(rep.html) && /حریمِ خصوصی/.test(rep.html) && !/بازی کارآگاهی/.test(rep.html);
+    // دفترِ پیش‌بینی ⇒ Brier و کالیبراسیون
+    APP.S.put({ id: 'fc_t1', type: 'fcast', q: 'تعدیل می‌شوم', p: 80, due: APP.today(), dim: 's_decision', outcome: 'نشد' });
+    out.brier = JSON.stringify(APP.fcastBrier()); out.calDec = APP.MIND.model().dims.find(d => d.id === 's_decision').n.cal >= 1;
+    APP.go('chain', 'wc_t1'); await new Promise(r => setTimeout(r, 150)); out.chainView = /سقفِ کلِ زنجیره/.test(document.getElementById('main').innerText) && /فاجعه‌سازی/.test(document.getElementById('main').innerText);
+    out.nav = (APP.NAV || []).some(n => Array.isArray(n) && n[0] === 'chain') && (APP.NAV || []).some(n => Array.isArray(n) && n[0] === 'mind');
+    return out;
+  });
+  chk(info.camp.title === 'مذاکرهٔ حقوق', 'session title is re-derived after an unrelated opener: ' + info.camp.title);
+  chk(/^area\|dc_career_income\|.+\|sterr\|s_decision$/.test(info.camp.area), 'an area facet gets its area, a real title and the territory view: ' + info.camp.area);
+  chk(info.camp.knowledge && info.camp.know, 'related territory knowledge goes into the prompt; the model can ask for areas (know) and gets them the same turn: ' + JSON.stringify([info.camp.knowledge, info.camp.know]));
+  chk(info.camp.areaMs === '110', 'area facet milestones come from linked records (chain linked, follow-up scheduled, no outcome yet): ' + info.camp.areaMs);
+  chk(info.camp.chainCalc === '{"prod":6,"min":20,"n":2}', 'worry chain: ceiling = weakest link, independent = product: ' + info.camp.chainCalc);
+  chk(info.camp.correct && info.camp.toast, 'a claimed-but-failed action triggers a correction turn; page messages reach the next prompt');
+  chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
+  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');

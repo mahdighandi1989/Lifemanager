@@ -38,7 +38,7 @@
     t.facets.forEach(function (f) {
       var o = old[f.key];
       if (before && !o) ev.push({ k: "plan", fa: "وجهِ تازه: «" + f.title + "»" });
-      if (o && o.st !== "done" && f.status === "done") ev.push({ k: "facet", fa: "✓ وجهِ «" + f.title + "» کامل شد" });
+      if (o && o.st !== "done" && f.status === "done") ev.push({ k: "facet", fa: "✓ پایهٔ وجهِ «" + f.title + "» برپا شد" });
       if (o && o.st !== "blocked" && f.status === "blocked") ev.push({ k: "sheet", fa: "🛎 برای وجهِ «" + f.title + "» برگهٔ فوری #" + fa((f.blocked || {}).number) + " ثبت شد" });
       var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: (c.ok ? "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " درست ساخته شد" : c.lag ? "⏳ برگهٔ #" + fa(f.blocked.number) + ": شاید هنوز منتشر نشده" : "↩ برگهٔ #" + fa(f.blocked.number) + " با دلیل دوباره باز شد") + " — " + clip(c.reason, 160) }); }
     });
@@ -46,12 +46,12 @@
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
     return ev;
   }
-  R.note = function (s, before) {
+  R.note = function (s, before, noFlush) {
     if (!s || !s.tour) return;
-    var ev = events(s, before); if (!ev.length) return;
-    var q = s.tour.mailq = (s.tour.mailq || []).concat(ev.map(function (e) { e.at = nowIso(); return e; })).slice(-40);
-    S.put(s);
-    R.flush(s, ev.some(function (e) { return BIG.test(e.k); }));
+    var ev = events(s, before);
+    if (ev.length) { s.tour.mailq = (s.tour.mailq || []).concat(ev.map(function (e) { e.at = nowIso(); return e; })).slice(-40); S.put(s); }
+    // طرحِ تور پیش از کارهای همان نوبت ساخته می‌شود ⇒ فرستادن پس از نوبت (تا گزارش وضعِ واقعیِ پس از کارها را بگوید — کارزارِ آزمون)
+    if (!noFlush && (s.tour.mailq || []).length) R.flush(s, (s.tour.mailq || []).some(function (e) { return BIG.test(e.k); }));
   };
   R.flush = function (s, urgent, force) {
     var t = s && s.tour; if (!t || !(t.mailq || []).length && !force) return Promise.resolve(null);
@@ -76,7 +76,7 @@
   AS.tourCheckSheets = function (s) { var b = s && s.tour ? snap(s.tour) : null; return rawCheck.apply(this, arguments).then(function (x) { try { if (b) R.note(s, b); } catch (e) { } return x; }); };
   /* طرحِ نخستِ تور (پیش از tourAfterTurn ساخته می‌شود) */
   var rawPlan = AS.DO.tour_plan;
-  AS.DO.tour_plan = function (a) { var s = AS._turnSession, had = !!(s && s.tour), b = had ? snap(s.tour) : null; var r = rawPlan.apply(this, arguments); try { if (s && s.tour) R.note(s, b); } catch (e) { } return r; };
+  AS.DO.tour_plan = function (a) { var s = AS._turnSession, had = !!(s && s.tour), b = had ? snap(s.tour) : null; var r = rawPlan.apply(this, arguments); try { if (s && s.tour) R.note(s, b, true); } catch (e) { } return r; };
 
   /* ---------- ساختنِ گزارش ---------- */
   var KIND = AS.tourKinds || {};
@@ -97,6 +97,7 @@
       H.push('<!doctype html><html dir="rtl" lang="fa"><head><meta charset="utf-8"></head><body style="margin:0;background:#f3f4f6"><table role="presentation" dir="rtl" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;font-family:Tahoma,Vazirmatn,Arial,sans-serif"><tr><td align="center" style="padding:16px">');
       H.push('<table role="presentation" width="680" cellpadding="0" cellspacing="0" dir="rtl" style="max-width:680px;width:100%;background:#fff;border-radius:12px;overflow:hidden;text-align:right">');
       H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پیشرفت: ' + fa(done) + " از " + fa(t.facets.length) + " وجه" + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
+      if (s.safetyAt) H.push('<tr><td style="padding:14px 22px;background:#fff7ed;font-size:14px;line-height:1.9;color:' + C.ink + '"><b>🤝 پیش از هر چیز</b><br>در این گفت‌وگو از حالِ سختی گفتی. اگر امروز هم سخت است، همین حالا با یک نفرِ نزدیک یا یک متخصص حرف بزن.<br><span style="color:' + C.mute + '">' + esc(A.KHELP || "") + "</span><br>(به خاطرِ حریمِ خصوصی، متنِ گفت‌وگو در این ایمیل نمی‌آید.)</td></tr>");
       if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + "</li>"; }).join("") + "</ul>"));
       /* نقشهٔ راه */
       var rows = t.facets.map(function (f, i) {
@@ -121,8 +122,8 @@
       if (tr.length) H.push(sec("🚶 از کجا عبور کرد", tr.map(function (x) { return '<span style="white-space:nowrap">' + esc(x.label) + "</span>"; }).join(' <span style="color:' + C.mute + '">←</span> ')));
       /* گفت‌وگو */
       var msgs = (s.msgs || []).filter(function (x) { return x.role !== "sys" || /✓|🛎|✅|↩|🎉|🏁|⏳|↗|🤝/.test(x.text); }).slice(-40);
-      if (msgs.length) H.push(sec("💬 گفت‌وگو (فشرده)", msgs.map(function (x) { return '<div style="margin:4px 0"><b style="color:' + (x.role === "user" ? C.head : x.role === "ai" ? C.ink : C.warn) + '">' + (x.role === "user" ? "تو" : x.role === "ai" ? "دستیار" : "سامانه") + ":</b> " + esc(clip(x.text, 400)) + "</div>"; }).join("")));
-      if ((s.outside || []).length) H.push(sec("↗ بیرون از این صفحه", s.outside.map(function (o) { return "<div>" + esc(o.text) + "</div>"; }).join("")));
+      if (msgs.length && !s.safetyAt) H.push(sec("💬 گفت‌وگو (فشرده)", msgs.map(function (x) { return '<div style="margin:4px 0"><b style="color:' + (x.role === "user" ? C.head : x.role === "ai" ? C.ink : C.warn) + '">' + (x.role === "user" ? "تو" : x.role === "ai" ? "دستیار" : "سامانه") + ":</b> " + esc(clip(x.text, 400)) + "</div>"; }).join("")));
+      if ((s.outside || []).length && !s.safetyAt) H.push(sec("↗ بیرون از این صفحه", s.outside.map(function (o) { return "<div>" + esc(o.text) + "</div>"; }).join("")));
       /* کارنامهٔ ذهن */
       if (m) {
         var tb = '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;border-collapse:collapse"><tr style="color:' + C.mute + '"><td style="padding:5px">بُعد</td><td>دقت</td><td>کالیبراسیون</td><td>ماندگاری</td><td>گره‌ها</td><td>نمره</td><td>مرحله</td><td>روند</td></tr>' +
@@ -130,7 +131,10 @@
             return '<tr><td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + esc(d.fa) + "</td>" + c(d.ix.acc, d.n.acc) + c(d.ix.cal, d.n.cal) + c(d.ix.ret, d.n.ret) + c(d.ix.knot, d.n.knot) + '<td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + (d.score == null ? "—" : fa(d.score)) + '</td><td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + esc(d.band) + '</td><td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + (d.trend == null ? "—" : (d.trend >= 0 ? "▲" : "▼") + fa(Math.abs(d.trend))) + "</td></tr>"; }).join("") + "</table>";
         var black = m.black.length ? '<ul style="margin:6px 0;padding-right:18px">' + m.black.slice(0, 12).map(function (b) { return "<li>" + esc(b.fa) + "</li>"; }).join("") + "</ul>" : '<div style="color:' + C.mute + '">نقطهٔ سیاهی دیده نشد.</div>';
         var pics = imgs.map(function (im) { return '<div style="margin:12px 0;text-align:center"><div style="font-weight:700;margin-bottom:4px">' + esc(im.fa) + '</div><img src="cid:' + im.cid + '" alt="' + esc(im.fa) + '" style="max-width:100%;border:1px solid ' + C.line + ';border-radius:8px"></div>'; }).join("");
-        var ahead = (m.ahead || []).concat(m.due || []).slice(0, 10);
+        /* فقط پیگیری‌های همین تور — نه همهٔ کارهای «امروز» ِ صفحه (بازیِ کارآگاهی و … ربطی به این گزارش ندارد) */
+        var ahead = [];
+        t.facets.forEach(function (f) { (AS.tourFollowups ? AS.tourFollowups(f) : []).slice(0, 2).forEach(function (x) { ahead.push({ fa: "«" + f.title + "»: " + x.t }); }); AS.tourPractice(f).forEach(function (p) { ahead.push({ fa: p.t + " — " + (A.fdate ? A.fdate(p.due) : p.due) }); }); });
+        ahead = ahead.slice(0, 12);
         H.push(sec("🧠 کارنامهٔ ذهن", '<div style="color:' + C.mute + ';font-size:12px">شاخص‌ها از دادهٔ خودِ تو، هر کدام با اندازهٔ نمونه؛ زیرِ ' + fa(A.MIND.MIN_N) + ' نمونه عدد داده نمی‌شود. «ضریبِ هوشی» نیست و با «مردم» مقایسه نمی‌کند.</div>' + tb +
           '<div style="margin-top:10px"><b>⚫ نقطه‌های سیاه</b></div>' + black + pics +
           (ahead.length ? '<div style="margin-top:8px"><b>🛤 مسیرهای پیشِ رو</b><ul style="margin:4px 0;padding-right:18px">' + ahead.map(function (x) { return "<li>" + esc(x.fa) + "</li>"; }).join("") + "</ul></div>" : "")));
