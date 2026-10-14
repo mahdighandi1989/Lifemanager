@@ -11,7 +11,21 @@
   var R = A.REPORT = {}; R.URGENT_MS = 90000; R._pend = {};
   var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen)$/;
   function nowIso() { return new Date().toISOString(); }
-  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  /* ایمیل بی کد (مالک ۲۰۲۶-۱۰-۱۴: «جاهایی کدگذاری‌شده حرف می‌زند — f7 و … — نباید باشد»): کلیدِ وجه ⇒ نامِ وجه، خانوادهٔ گره ⇒ نامش،
+     شناسهٔ حوزه ⇒ نامِ حوزه، کلید/شناسهٔ رکورد ⇒ حذف، واژه‌های فنیِ برگه ⇒ فارسی */
+  var CUR = null, WORDS = { "sys-territory": "قلمروِ سامانه‌ها", "epi-territory": "قلمروِ معرفت‌شناسی", "epi-backtest": "بک‌تستِ معرفت‌شناسی", "epi-engine": "موتورِ داوری", "lla-page": "خودِ صفحه",
+    deferred: "به بعد موکول شد", priority: "اولویت‌دار", fix: "رفعِ خطا", done: "انجام شد", answered: "پاسخ داده شد", supervisor: "نظارت" };
+  function human(x) {
+    var t = String(x == null ? "" : x);
+    if (CUR && CUR.tour) t = t.replace(/\[?\b(f\d{1,2})\b\]?/g, function (m0, k) { var f = CUR.tour.facets.filter(function (z) { return z.key === k; })[0]; return f ? "«" + f.title + "»" : ""; });
+    t = t.replace(/\b(F\d{1,2})(?:\.[a-z]+)?\b/g, function (m0, k) { var F = (A.KF || []).filter(function (z) { return z.id === k; })[0]; return F ? "«" + F.fa + "»" : m0; });
+    t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
+    t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "");
+    t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor)\b/g, function (w) { return WORDS[w] || w; });
+    return t.replace(/\s{2,}/g, " ");
+  }
+  R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };
+  function esc(x) { return human(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function clip(x, n) { x = String(x || "").replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
   R.enabled = function () { var t = (S.settings().tour || {}); return t.mail == null ? !!(A.HOST && A.HOST.mail) : !!t.mail; };
   R.setEnabled = function (on) { var st = S.settings(); st.tour = st.tour || {}; st.tour.mail = !!on; if (S.saveSettings) S.saveSettings(st); else S.put && S.put(st); };
@@ -124,6 +138,7 @@
   function recTitle(r) { var x = S.get(r.id); if (!x) return r.type + ":" + r.id; return x.title || x.name || (x.p && x.p.title) || r.id; }
   var TYPE_FA = { kcase: "موقعیتِ گره‌گشا", knot: "گره", "case": "پروندهٔ سنجش", eprob: "مسئلهٔ بزرگ", topic: "موضوع" };
   R.build = function (s, evs) {
+    CUR = s;
     var t = s.tour, title = s.title || s.pinned || t.goal || "تور", m = A.MIND ? A.MIND.model() : null;
     var charts = m ? A.MIND.charts(m) : {}, names = [["radar", "نیم‌رخِ هفت بُعد"], ["trend", "روندِ ماهانه"], ["calib", "کالیبراسیون"], ["mindmap", "نقشهٔ کاملِ ذهن"], ["neural", "شبکهٔ ذهن"]];
     var imgs = [];
@@ -144,6 +159,11 @@
         return '<tr><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + fa(i + 1) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + '<div style="color:' + C.mute + ';font-size:12px">' + esc((KIND[f.kind] || {}).fa || "") + '</div></td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';color:' + col + ';white-space:nowrap">' + esc(ST_FA[f.status] || f.status) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';white-space:nowrap">' + fa(ok) + "/" + fa(ms.length) + "</td></tr>";
       }).join("");
       H.push(sec("🗺 نقشهٔ راه و ترتیب", '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse"><tr style="color:' + C.mute + ';font-size:12px"><td style="padding:6px">#</td><td style="padding:6px">وجه</td><td style="padding:6px">وضع</td><td style="padding:6px">نشانه‌ها</td></tr>' + rows + "</table>"));
+      /* غربالِ لایه‌ها: کدام لایه‌ها سنجیده شد و چه پیدا شد — فقط یافته‌ها، «باید پرسید» و «بیرون»؛ «رد شد» ها شمرده می‌شوند (مالک ۲۰۲۶-۱۰-۱۴) */
+      if (AS.sieveRows) { var sr = AS.sieveRows(s), sn = sr.filter(function (r) { return r.st; }).length;
+        if (sn) H.push(sec("🔍 غربالِ لایه‌ها (" + fa(sn) + " از " + fa(sr.length) + " لایه سنجیده شد)", sr.filter(function (r) { return r.st === "found" || r.st === "ask" || r.st === "out"; }).map(function (r) {
+          return '<div style="margin:3px 0"><b style="color:' + (r.st === "found" ? C.ok : r.st === "ask" ? C.warn : C.mute) + '">' + (r.st === "found" ? "● پیدا شد" : r.st === "ask" ? "？ باید پرسید" : "↗ بیرون از صفحه") + "</b> — " + esc(r.fa) + (r.why ? ": «" + esc(clip(r.why, 200)) + "»" : "") + (r.facet ? " ⇒ وجهِ «" + esc(r.facet) + "»" : "") + "</div>";
+        }).join("") + '<div style="color:' + C.mute + ';font-size:12px">' + fa(sr.filter(function (r) { return r.st === "no"; }).length) + " لایه سنجیده و رد شد؛ " + fa(sr.length - sn) + " لایه هنوز سنجیده نشده.</div>")); }
       /* جزئیاتِ هر وجه */
       t.facets.forEach(function (f, i) {
         var ms = f.status === "skipped" ? [] : AS.tourMilestones(f), pr = f.status === "skipped" ? [] : AS.tourPractice(f), b = f.blocked;
@@ -186,7 +206,7 @@
       var text = "گزارشِ تور: " + title + "\n" + (t.goal || "") + "\n\n" + (evs || []).map(function (e) { return "- " + e.fa; }).join("\n") + "\n\n" +
         t.facets.map(function (f, i) { return (i + 1) + ") " + f.title + " — " + (ST_FA[f.status] || f.status) + "\n" + AS.tourMilestones(f).map(function (x) { return "   " + (x.ok ? "✓ " : "○ ") + x.t; }).join("\n"); }).join("\n");
       var head = (evs || []).filter(function (e) { return BIG.test(e.k); })[0] || (evs || [])[0];
-      return { subject: clip("🧭 تور «" + title + "»" + (head ? " — " + head.fa : ""), 190), html: H.join(""), text: text, images: imgs.map(function (im) { return { cid: im.cid, data: im.data }; }) };
+      return { subject: clip(human("🧭 تور «" + title + "»" + (head ? " — " + head.fa : "")), 190), html: H.join(""), text: human(text), images: imgs.map(function (im) { return { cid: im.cid, data: im.data }; }) };
     });
   };
 
