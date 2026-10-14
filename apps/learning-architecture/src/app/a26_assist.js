@@ -574,7 +574,7 @@
         var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
           if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
           sheetCache.at = 0;
-          return AS.fileGap(s, t.gap).then(function (r) { if (r && !r.dup && AS.tourBlock && t.gap.facet) AS.tourBlock(s, t.gap.facet, r, t.gap); return r; });
+          return AS.fileGap(s, t.gap).then(function (r) { if (r && !r.dup && AS.tourBlock && t.gap.facet) AS.tourBlock(s, t.gap.facet, r, t.gap); else if (r && !r.dup && s.tour && AS.tourAdoptSheet) AS.tourAdoptSheet(s, r, t.gap); return r; });
         }).then(function (r) {
           if (!r) return;
           s.msgs.push({ role: "sys", at: now(), text: r.dup ? "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." : r.local ? "برگه ساخته شد ولی این نسخه به «نظارت و سرکشی» وصل نیست؛ متنش در سشن ماند." : "🛎 برگهٔ فوری #" + fa(r.number) + " در «نظارت و سرکشی» ثبت شد." });

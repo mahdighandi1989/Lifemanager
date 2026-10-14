@@ -265,6 +265,16 @@
     f.status = "skipped"; f.skipWhy = clip(a.why, 300); advance(s); return "";
   };
 
+  /* برگه‌ای که در میانهٔ تور بی «facet» ثبت شد ⇒ وجهِ «حوزه‌ای که نیست» ِ خودش، تا پاسخِ روتین هم سنجیده شود
+     (کارزارِ آزمون sc13/sc08: برگه به هیچ وجهی وصل نبود و پیگیری‌اش هرگز اجرا نشد) */
+  AS.tourAdoptSheet = function (s, r, g) {
+    if (!s || !s.tour || !r || !r.id) return;
+    if (s.tour.facets.some(function (f) { return f.blocked && f.blocked.id === r.id; })) return;
+    var f = normFacet({ kind: "territory", title: clip((g && g.title) || r.title || "حوزه‌ای که نیست", 100), why: "برگهٔ #" + r.number + " — تا روتینِ مسئول بسازد و دستیار وارسی کند" }, s.tour.facets.length);
+    var have = {}; s.tour.facets.forEach(function (x) { have[x.key] = 1; }); var n = s.tour.facets.length + 1; while (have["f" + n]) n++; f.key = "f" + n;
+    s.tour.facets.push(f); if (s.tour.doneAt) { delete s.tour.doneAt; delete s.tour.doneSaid; delete s.tour.masteredAt; }
+    AS.tourBlock(s, f.key, r, g || {});
+  };
   /* برگهٔ «حوزه‌ای که نیست» ⇒ همان وجه منتظر می‌ماند؛ بقیهٔ تور ادامه دارد */
   AS.tourBlock = function (s, key, r, g) {
     var f = fac(s, key); if (!f || !r || !r.id) return;
@@ -324,6 +334,13 @@
       if (t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === cs.id; }); })) return;
       if (claimF.refs.some(function (r) { return r.type === "case"; })) return;
       claimF.refs.push({ id: cs.id, type: "case" }); msgs.push("پروندهٔ «" + clip(cs.title, 50) + "» (از ریشهٔ گره) به وجهِ «" + claimF.title + "» وصل شد");
+    });
+    // وجهی که «از روی داده» برپا شده بود ولی شاهدش رفت (پیوندِ نادرست جابه‌جا شد) ⇒ صادقانه دوباره باز (کارزارِ آزمون sc13/sc15)
+    t.facets.forEach(function (f) {
+      if (f.status === "done" && f.doneBy === "evidence" && f.kind !== "other" && !coreDone(f)) {
+        f.status = "todo"; delete f.doneAt; delete f.doneBy; if (t.doneAt) { delete t.doneAt; delete t.doneSaid; delete t.masteredAt; }
+        msgs.push("↩ وجهِ «" + f.title + "» دوباره باز شد — شاهدی که آن را برپا کرده بود مالِ وجهِ دیگری بود");
+      }
     });
     t.facets.forEach(function (f) {
       if ((f.status === "now" || f.status === "todo") && f.kind !== "other" && coreDone(f)) {
@@ -534,7 +551,7 @@
       var tom = A.addDays(A.today(), 1), nx = [];
       s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due >= tom) nx.push(p); }); });
       nx.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
-      var due = s.tour.doneAt && nx[0] ? nx[0].due : tom; if (s._rem === due) return;
+      var due = s.tour.doneAt && nx[0] ? nx[0].due : tom, remKey = due + "|" + (f ? f.key : "") + "|" + (nx[0] ? nx[0].t : ""); if (s._rem === remKey) return;   // متنِ کهنه هم بازنویسی می‌شود (کارزارِ آزمون sc13)
       var nextTxt = nx[0] ? " نزدیک‌ترین موعد: «" + clip(nx[0].t, 60) + "» (" + (A.fdate ? A.fdate(nx[0].due) : nx[0].due) + ")." : "";
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
@@ -543,7 +560,7 @@
         // پیوند به خودِ رکوردِ وجه (پرونده، گره، …)، نه نمای عمومی (کارزارِ آزمون sc18: ?tab=e_home)
         link: (function () { var vv = f ? viewOf(f) : { v: "home" }; return "?tab=" + encodeURIComponent(vv.v || "home") + (vv.a ? "&a=" + encodeURIComponent(vv.a) : "") + (vv.s ? "&sub=" + encodeURIComponent(vv.s) : ""); })(), channels: { telegram: !!n.telegram, email: !!n.email } });
       if (pr && pr.catch) pr.catch(function () { });
-      s._rem = due;
+      s._rem = remKey;
     } catch (e) { }
   }
   var rawRenderT = A.render;

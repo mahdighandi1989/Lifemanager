@@ -65,6 +65,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // ---------- گزارشِ تور ----------
   info.rep = await p.evaluate(async () => {
     const AS = APP.ASSIST; window.__mails = [];
+    // مهلتِ ایمیل‌های مهمِ پشتِ‌هم: دومی تا مهلت صبر می‌کند و بعد خودش می‌رود (کارزارِ آزمون sc15)
+    { APP.REPORT.URGENT_MS = 300; const s0 = { id: 'thr', tour: { facets: [], mailq: [{ k: 'facet', fa: 'a' }], mailAt: new Date().toISOString() } }; const hm = APP.HOST; let n = 0;
+      APP.HOST = Object.assign({}, hm, { mail: async () => { n++; return { status: 'sent' }; } }); const first = await APP.REPORT.flush(s0, true);
+      await new Promise(r => setTimeout(r, 450)); window.__thr = first === null && n === 1; APP.HOST = hm; APP.REPORT.URGENT_MS = 0; }
     APP.HOST = { mail: async (r) => { __mails.push(r); return { status: window.__mailStatus || 'sent' }; }, sheets: async () => [] };
     window.__q = []; APP.callAI = async () => JSON.stringify(__q.shift());
     const s = AS.newSession(); s.msgs.push({ role: 'user', text: 'x', at: '' }); APP.S.put(s); AS.toggle(true);
@@ -96,7 +100,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.rep.facets && info.rep.map && info.rep.trail && info.rep.chat && info.rep.mind && info.rep.rtl && info.rep.text, 'the report has the facets, the road map, the trail, the conversation, the mind report card (RTL, plain-text twin)');
   chk(info.rep.imgs >= 5, 'charts travel as inline PNGs: ' + info.rep.imgs);
   chk(info.rep.coalesced && info.rep.facetMail, 'small events wait and ride along with the next important one');
-  chk(info.rep.off && info.rep.failKept && info.rep.retry && info.rep.drawer, 'off ⇒ nothing sent; failure keeps the events; retry sends; the drawer has the 📧 control');
+  info.thr = await p.evaluate(() => window.__thr);
+  chk(info.thr && info.rep.off && info.rep.failKept && info.rep.retry && info.rep.drawer, 'off ⇒ nothing sent; failure keeps the events; retry sends; the drawer has the 📧 control; urgent mails coalesce then send: ' + info.thr);
 
   // ---------- اصلاح‌های کارزارِ آزمون ----------
   info.camp = await p.evaluate(async () => {

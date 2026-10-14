@@ -31221,7 +31221,7 @@ APP.goFromURL = function (q) {
         var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
           if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
           sheetCache.at = 0;
-          return AS.fileGap(s, t.gap).then(function (r) { if (r && !r.dup && AS.tourBlock && t.gap.facet) AS.tourBlock(s, t.gap.facet, r, t.gap); return r; });
+          return AS.fileGap(s, t.gap).then(function (r) { if (r && !r.dup && AS.tourBlock && t.gap.facet) AS.tourBlock(s, t.gap.facet, r, t.gap); else if (r && !r.dup && s.tour && AS.tourAdoptSheet) AS.tourAdoptSheet(s, r, t.gap); return r; });
         }).then(function (r) {
           if (!r) return;
           s.msgs.push({ role: "sys", at: now(), text: r.dup ? "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." : r.local ? "برگه ساخته شد ولی این نسخه به «نظارت و سرکشی» وصل نیست؛ متنش در سشن ماند." : "🛎 برگهٔ فوری #" + fa(r.number) + " در «نظارت و سرکشی» ثبت شد." });
@@ -31700,6 +31700,16 @@ APP.goFromURL = function (q) {
     f.status = "skipped"; f.skipWhy = clip(a.why, 300); advance(s); return "";
   };
 
+  /* برگه‌ای که در میانهٔ تور بی «facet» ثبت شد ⇒ وجهِ «حوزه‌ای که نیست» ِ خودش، تا پاسخِ روتین هم سنجیده شود
+     (کارزارِ آزمون sc13/sc08: برگه به هیچ وجهی وصل نبود و پیگیری‌اش هرگز اجرا نشد) */
+  AS.tourAdoptSheet = function (s, r, g) {
+    if (!s || !s.tour || !r || !r.id) return;
+    if (s.tour.facets.some(function (f) { return f.blocked && f.blocked.id === r.id; })) return;
+    var f = normFacet({ kind: "territory", title: clip((g && g.title) || r.title || "حوزه‌ای که نیست", 100), why: "برگهٔ #" + r.number + " — تا روتینِ مسئول بسازد و دستیار وارسی کند" }, s.tour.facets.length);
+    var have = {}; s.tour.facets.forEach(function (x) { have[x.key] = 1; }); var n = s.tour.facets.length + 1; while (have["f" + n]) n++; f.key = "f" + n;
+    s.tour.facets.push(f); if (s.tour.doneAt) { delete s.tour.doneAt; delete s.tour.doneSaid; delete s.tour.masteredAt; }
+    AS.tourBlock(s, f.key, r, g || {});
+  };
   /* برگهٔ «حوزه‌ای که نیست» ⇒ همان وجه منتظر می‌ماند؛ بقیهٔ تور ادامه دارد */
   AS.tourBlock = function (s, key, r, g) {
     var f = fac(s, key); if (!f || !r || !r.id) return;
@@ -31759,6 +31769,13 @@ APP.goFromURL = function (q) {
       if (t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === cs.id; }); })) return;
       if (claimF.refs.some(function (r) { return r.type === "case"; })) return;
       claimF.refs.push({ id: cs.id, type: "case" }); msgs.push("پروندهٔ «" + clip(cs.title, 50) + "» (از ریشهٔ گره) به وجهِ «" + claimF.title + "» وصل شد");
+    });
+    // وجهی که «از روی داده» برپا شده بود ولی شاهدش رفت (پیوندِ نادرست جابه‌جا شد) ⇒ صادقانه دوباره باز (کارزارِ آزمون sc13/sc15)
+    t.facets.forEach(function (f) {
+      if (f.status === "done" && f.doneBy === "evidence" && f.kind !== "other" && !coreDone(f)) {
+        f.status = "todo"; delete f.doneAt; delete f.doneBy; if (t.doneAt) { delete t.doneAt; delete t.doneSaid; delete t.masteredAt; }
+        msgs.push("↩ وجهِ «" + f.title + "» دوباره باز شد — شاهدی که آن را برپا کرده بود مالِ وجهِ دیگری بود");
+      }
     });
     t.facets.forEach(function (f) {
       if ((f.status === "now" || f.status === "todo") && f.kind !== "other" && coreDone(f)) {
@@ -31969,7 +31986,7 @@ APP.goFromURL = function (q) {
       var tom = A.addDays(A.today(), 1), nx = [];
       s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due >= tom) nx.push(p); }); });
       nx.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
-      var due = s.tour.doneAt && nx[0] ? nx[0].due : tom; if (s._rem === due) return;
+      var due = s.tour.doneAt && nx[0] ? nx[0].due : tom, remKey = due + "|" + (f ? f.key : "") + "|" + (nx[0] ? nx[0].t : ""); if (s._rem === remKey) return;   // متنِ کهنه هم بازنویسی می‌شود (کارزارِ آزمون sc13)
       var nextTxt = nx[0] ? " نزدیک‌ترین موعد: «" + clip(nx[0].t, 60) + "» (" + (A.fdate ? A.fdate(nx[0].due) : nx[0].due) + ")." : "";
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
@@ -31978,7 +31995,7 @@ APP.goFromURL = function (q) {
         // پیوند به خودِ رکوردِ وجه (پرونده، گره، …)، نه نمای عمومی (کارزارِ آزمون sc18: ?tab=e_home)
         link: (function () { var vv = f ? viewOf(f) : { v: "home" }; return "?tab=" + encodeURIComponent(vv.v || "home") + (vv.a ? "&a=" + encodeURIComponent(vv.a) : "") + (vv.s ? "&sub=" + encodeURIComponent(vv.s) : ""); })(), channels: { telegram: !!n.telegram, email: !!n.email } });
       if (pr && pr.catch) pr.catch(function () { });
-      s._rem = due;
+      s._rem = remKey;
     } catch (e) { }
   }
   var rawRenderT = A.render;
@@ -32467,7 +32484,7 @@ APP.goFromURL = function (q) {
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
   if (!AS) return;
-  var R = A.REPORT = {};
+  var R = A.REPORT = {}; R.URGENT_MS = 90000; R._pend = {};
   var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen)$/;
   function nowIso() { return new Date().toISOString(); }
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -32550,7 +32567,12 @@ APP.goFromURL = function (q) {
     if (!force && !R.enabled()) return Promise.resolve(null);
     if (!(A.HOST && A.HOST.mail)) return Promise.resolve(null);
     var last = Date.parse(t.mailAt || 0) || 0;
-    if (!force && !urgent && Date.now() - last < GAP_MS) return Promise.resolve(null);   // رویدادهای ریز جمع می‌شوند
+    if (!force && !urgent && Date.now() - last < GAP_MS) return Promise.resolve(null);
+    // رویدادهای مهمِ پشتِ‌هم یک ایمیل می‌شوند (کارزارِ آزمون sc15: ۱۳ ایمیل در یک ساعت) — و جا نمی‌مانند: پس از مهلت خودش می‌فرستد
+    if (!force && urgent && Date.now() - last < R.URGENT_MS) {
+      if (!R._pend[s.id]) R._pend[s.id] = setTimeout(function () { delete R._pend[s.id]; R.flush(s, true); }, R.URGENT_MS - (Date.now() - last) + 50);
+      return Promise.resolve(null);
+    }   // رویدادهای ریز جمع می‌شوند
     if (R._busy) return Promise.resolve(null); R._busy = true;
     var evs = (t.mailq || []).slice(); t.mailq = [];
     return R.build(s, evs).then(function (rep) { return Promise.resolve(A.HOST.mail(rep)).then(function (r) { return { r: r, rep: rep }; }); })

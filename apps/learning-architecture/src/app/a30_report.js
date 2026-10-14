@@ -8,7 +8,7 @@
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
   if (!AS) return;
-  var R = A.REPORT = {};
+  var R = A.REPORT = {}; R.URGENT_MS = 90000; R._pend = {};
   var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen)$/;
   function nowIso() { return new Date().toISOString(); }
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -91,7 +91,12 @@
     if (!force && !R.enabled()) return Promise.resolve(null);
     if (!(A.HOST && A.HOST.mail)) return Promise.resolve(null);
     var last = Date.parse(t.mailAt || 0) || 0;
-    if (!force && !urgent && Date.now() - last < GAP_MS) return Promise.resolve(null);   // رویدادهای ریز جمع می‌شوند
+    if (!force && !urgent && Date.now() - last < GAP_MS) return Promise.resolve(null);
+    // رویدادهای مهمِ پشتِ‌هم یک ایمیل می‌شوند (کارزارِ آزمون sc15: ۱۳ ایمیل در یک ساعت) — و جا نمی‌مانند: پس از مهلت خودش می‌فرستد
+    if (!force && urgent && Date.now() - last < R.URGENT_MS) {
+      if (!R._pend[s.id]) R._pend[s.id] = setTimeout(function () { delete R._pend[s.id]; R.flush(s, true); }, R.URGENT_MS - (Date.now() - last) + 50);
+      return Promise.resolve(null);
+    }   // رویدادهای ریز جمع می‌شوند
     if (R._busy) return Promise.resolve(null); R._busy = true;
     var evs = (t.mailq || []).slice(); t.mailq = [];
     return R.build(s, evs).then(function (rep) { return Promise.resolve(A.HOST.mail(rep)).then(function (r) { return { r: r, rep: rep }; }); })
