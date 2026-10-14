@@ -26,7 +26,13 @@
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };
   function esc(x) { return human(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function clip(x, n) { x = String(x || "").replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
+  // بُرش پیش از پرانتز/گیومهٔ نیمه‌باز، تا «… (فیزیک › نسبی…» نشود (کارزارِ آزمونِ دوم c14)
+  function clip(x, n) {
+    x = String(x || "").replace(/\s+/g, " ").trim(); if (x.length <= n) return x;
+    var c = x.slice(0, n - 1), o = Math.max(c.lastIndexOf("("), c.lastIndexOf("«"));
+    if (o > n / 3 && c.indexOf(c.charAt(o) === "(" ? ")" : "»", o) < 0) c = c.slice(0, o);
+    return c.replace(/[\s،,—\-–]+$/, "") + "…";
+  }
   R.enabled = function () { var t = (S.settings().tour || {}); return t.mail == null ? !!(A.HOST && A.HOST.mail) : !!t.mail; };
   R.setEnabled = function (on) { var st = S.settings(); st.tour = st.tour || {}; st.tour.mail = !!on; if (S.saveSettings) S.saveSettings(st); else S.put && S.put(st); };
 
@@ -89,7 +95,7 @@
         was.filter(function (x) { return now.indexOf(x) < 0; }).forEach(function (x) { ev.push({ k: "reopen", fa: "↩ «" + f.title + "»: «" + x + "» دوباره باز شد", detail: "این نشانه از روی داده‌ها دیگر برقرار نیست (مثلاً گره بازگشت) — دوباره سنجیده می‌شود" }); });
       } else if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
     });
-    if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 همهٔ وجه‌ها به ترتیب طی شد" });
+    if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 پایهٔ همهٔ وجه‌ها به ترتیب برپا شد (نشانه‌های مانده تا تسلط پیگیری می‌شوند)" });
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
     return ev;
   }
@@ -133,6 +139,12 @@
   /* ---------- ساختنِ گزارش ---------- */
   var KIND = AS.tourKinds || {};
   var ST_FA = { todo: "مانده", now: "در جریان", done: "انجام شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
+  // «انجام شد» فقط وقتی همهٔ نشانه‌ها ✓ است؛ وگرنه «پایه برپا شد · x از y» (کارزارِ آزمونِ دوم c14: «انجام شد» با ۴ از ۸ نشانه)
+  function stFa(f) {
+    if (f.status !== "done") return ST_FA[f.status] || f.status;
+    var ms = AS.tourMilestones(f), ok = ms.filter(function (x) { return x.ok; }).length;
+    return ok === ms.length ? "انجام شد" : "پایه برپا شد · " + fa(ok) + " از " + fa(ms.length) + " نشانه";
+  }
   var C = { ink: "#1f2937", mute: "#6b7280", line: "#e5e7eb", ok: "#047857", warn: "#b45309", bad: "#b91c1c", head: "#0f766e", soft: "#f0fdfa" };
   function sec(title, inner) { return '<tr><td style="padding:18px 22px 6px;font-size:17px;font-weight:700;color:' + C.head + ';border-top:1px solid ' + C.line + '">' + title + '</td></tr><tr><td style="padding:4px 22px 14px;font-size:14px;line-height:1.9;color:' + C.ink + '">' + inner + "</td></tr>"; }
   function recTitle(r) { var x = S.get(r.id); if (!x) return ""; return x.title || x.name || x.q || x.note || (x.p && x.p.title) || ""; }
@@ -158,7 +170,7 @@
       /* نقشهٔ راه */
       var rows = t.facets.map(function (f, i) {
         var ms = AS.tourMilestones(f), ok = ms.filter(function (x) { return x.ok; }).length, col = f.status === "done" ? C.ok : f.status === "blocked" ? C.warn : f.status === "now" ? C.head : C.mute;
-        return '<tr><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + fa(i + 1) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + '<div style="color:' + C.mute + ';font-size:12px">' + esc((KIND[f.kind] || {}).fa || "") + '</div></td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';color:' + col + ';white-space:nowrap">' + esc(ST_FA[f.status] || f.status) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';white-space:nowrap">' + fa(ok) + "/" + fa(ms.length) + "</td></tr>";
+        return '<tr><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + fa(i + 1) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + '<div style="color:' + C.mute + ';font-size:12px">' + esc((KIND[f.kind] || {}).fa || "") + '</div></td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';color:' + col + ';white-space:nowrap">' + esc(stFa(f)) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';white-space:nowrap">' + fa(ok) + "/" + fa(ms.length) + "</td></tr>";
       }).join("");
       H.push('<tr><td style="padding:10px 22px;font-size:12px;line-height:1.9;color:' + C.mute + '">واژه‌ها: <b>وجه</b> = یکی از بخش‌های مسئله‌ات که جدا پیگیری می‌شود · <b>پایه برپا شد</b> = ابزار و تمرینش ساخته شد، ولی هنوز «حل‌شده» نیست · <b>غربال</b> = لایه‌هایی که دستیار برای پیدا کردنِ ریشه سنجید · <b>ماندگاری</b> = پاسخِ درستِ دوباره پس از ۳۰ و ۹۰ روز.</td></tr>');
       H.push(sec("🗺 نقشهٔ راه و ترتیب", '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse"><tr style="color:' + C.mute + ';font-size:12px"><td style="padding:6px">#</td><td style="padding:6px">وجه</td><td style="padding:6px">وضع</td><td style="padding:6px">نشانه‌ها</td></tr>' + rows + "</table>"));
@@ -178,7 +190,7 @@
           (b ? '<div style="margin-top:6px;padding:8px;background:' + C.soft + ';border-radius:8px"><b>🛎 برگهٔ #' + fa(b.number) + "</b> (" + esc(b.area || "") + ") — " + (b.verified ? "ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
             ((b.checks || []).length ? '<ol style="margin:4px 0;padding-right:18px">' + b.checks.map(function (c) { return "<li>" + esc((c.at || "").slice(0, 10)) + " — " + (c.ok ? "✅ درست: " : c.lag ? "⏳ شاید منتشر نشده: " : "↩ ناقص، با دلیل دوباره باز شد: ") + esc(clip(c.reason, 300)) + "</li>"; }).join("") + "</ol>" : "") + "</div>" : "") +
           (f.skipWhy ? "<div>کنار گذاشته شد: " + esc(f.skipWhy) + "</div>" : "");
-        H.push(sec(fa(i + 1) + ") " + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + ' <span style="font-size:13px;color:' + C.mute + '">— ' + esc(ST_FA[f.status] || f.status) + "</span>", inner));
+        H.push(sec(fa(i + 1) + ") " + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + ' <span style="font-size:13px;color:' + C.mute + '">— ' + esc(stFa(f)) + "</span>", inner));
       });
       /* مسیرِ عبور */
       var tr = (s.trail || []).slice(-60);
@@ -210,7 +222,7 @@
       var link = (location.protocol === "http:" || location.protocol === "https:") ? location.origin + "/apps/learning-architecture" : "";
       H.push('<tr><td style="padding:16px 22px;font-size:12px;color:' + C.mute + ';border-top:1px solid ' + C.line + '">این گزارش را «💬 دستیار» در حینِ تور خودکار ساخت.' + (link ? ' <a href="' + esc(link) + '" style="color:' + C.head + '">باز کردنِ صفحه</a>.' : "") + " برای خاموش‌کردن: «📧» در کشوی تور.</td></tr></table></td></tr></table></body></html>");
       var text = "گزارشِ تور: " + title + "\n" + (t.goal || "") + "\n\n" + (evs || []).map(function (e) { return "- " + e.fa; }).join("\n") + "\n\n" +
-        t.facets.map(function (f, i) { return (i + 1) + ") " + f.title + " — " + (ST_FA[f.status] || f.status) + "\n" + AS.tourMilestones(f).map(function (x) { return "   " + (x.ok ? "✓ " : "○ ") + x.t; }).join("\n"); }).join("\n");
+        t.facets.map(function (f, i) { return (i + 1) + ") " + f.title + " — " + stFa(f) + "\n" + AS.tourMilestones(f).map(function (x) { return "   " + (x.ok ? "✓ " : "○ ") + x.t; }).join("\n"); }).join("\n");
       var head = (evs || []).filter(function (e) { return BIG.test(e.k); })[0] || (evs || [])[0];
       return { subject: clip(human("🧭 تور «" + title + "»" + (head ? " — " + head.fa : "")), 190), html: H.join(""), text: human(text), images: imgs.map(function (im) { return { cid: im.cid, data: im.data }; }) };
     });

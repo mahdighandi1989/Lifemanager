@@ -69,7 +69,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.nav = (APP.NAV || []).some(n => Array.isArray(n) && n[0] === 'prereq');
     // ایمیل بی کد
     s.msgs.push({ role: 'ai', text: 'وجهِ f2 و خانوادهٔ F11 و حوزهٔ dc_career_income و رکوردِ kc_abc123 و برگهٔ sys-territory deferred', at: '' });
+    s.tour.facets[0].status = 'done';
     const rep = await APP.REPORT.build(s, [{ k: 'facet', fa: '✓ پایهٔ f1 برپا شد' }]);
+    out.honest = /پایه برپا شد · /.test(rep.text) && !/— انجام شد/.test(rep.text);
     const all = rep.subject + rep.html + rep.text;
     out.noCodes = !/\bf\d{1,2}\b/.test(all) && !/\bF\d{1,2}\b/.test(all) && !/\b(?:dc|sc|sf|md|ln|pr)_[a-z_]+/.test(all) && !/kc_abc123/.test(all) && !/sys-territory|deferred/.test(all);
     out.humanized = /«برداشت و نتیجه‌گیری/.test(rep.html) && /قلمروِ سامانه‌ها/.test(rep.html) && /غربالِ لایه‌ها/.test(rep.html);
@@ -85,6 +87,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.thin && S.unset, 'bare «بلدم» is flagged; an untouched slider is reported empty to the model');
   chk(S.ownClick, 'the assistant never presses an owner-only button (e.g. sending the problem to the AI)');
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');
+  chk(S.honest, 'a facet with open milestones is never reported as «انجام شد»');
   chk(S.noCodes && S.humanized, 'the e-mail carries no internal codes (facet keys, family codes, area/record ids, sheet jargon) — names instead');
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');

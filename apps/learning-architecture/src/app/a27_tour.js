@@ -389,7 +389,7 @@
     if (t.doneAt && !t.doneSaid) {
       t.doneSaid = true;
       var fu = t.facets.filter(function (f) { return followups(f).length; });
-      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 همهٔ وجه‌های تور به ترتیب طی شد و تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
+      s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 پایهٔ همهٔ وجه‌های تور به ترتیب برپا شد" + (mastered(t) ? "" : " — هنوز تمام نیست: نشانه‌های مانده تا تسلط پیگیری می‌شوند") + "؛ تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
         (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
     }
     if (t.doneAt && !t.masteredAt && mastered(t)) { t.masteredAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "🏁 همهٔ نشانه‌های همهٔ وجه‌ها ✓ شد — تور کامل شد. مرورهای فاصله‌دار همچنان در «امروز» می‌آید." }); }
