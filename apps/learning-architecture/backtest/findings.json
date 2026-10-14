@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-14",
- "round": 8,
+ "round": 10,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -16,7 +16,7 @@
    "case": "bk_russell_chicken",
    "opened": "2026-10-13",
    "openedRound": 5,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": "دورِ ۵، پس از قضیه‌ای شدنِ سقفِ استقراء: «فردا هم دانه می‌دهد» پیش‌بینیِ «موردِ بعدی» است (رمزگذارِ کور) و قضیهٔ T_next از شمار، سقفِ (n+1)/(n+2) می‌دهد — با صدها روز ≈ ۹۹٫۷؛ پس اطمینانِ ۹۹ ٪ جوجه از راهِ «شمار» بیش‌اطمینانی نیست. درسِ جزوه این‌جا شمار نیست، علت است: «تکرارِ داده‌های حسی به‌تنهایی … باید علت … کشف شود» و «مشروط به عدمِ دخالتِ عواملِ پنهان» (s51) — و خودِ «چرا» ی این پرونده همین را می‌گوید. ملاکِ s51 در کارخانه فقط روی «تجربه» (hidden_ctrl) نشسته، نه روی «استقراء». ⇒ پیشنهادِ p_case_chicken برای مالک.",
    "fix": {
@@ -25,9 +25,13 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 3,
+    "freshOk": 3,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
+     "r4_abs_survivor_shops"
+    ]
    },
    "kind": "missed",
    "title": "جوجه راسل",
@@ -48,7 +52,8 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 6
+   "lastSeenRound": 6,
+   "verified": "2026-10-14"
   },
   {
    "id": "f_cs_b_dewey1948",
@@ -65,15 +70,21 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 6,
-    "freshOk": 6,
+    "fresh": 13,
+    "freshOk": 13,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
      "r2_chamberlain_hitler_face",
      "r2_nyt_goddard_1920",
      "r2_abs_startup_loi",
-     "r2_abs_desk_stablecoin"
+     "r2_abs_desk_stablecoin",
+     "r4_wald_survivorship",
+     "r4_kahneman_instructors",
+     "r4_columbia_foam",
+     "r4_bre_x_busang",
+     "r4_yom_kippur_concept",
+     "r4_willingham_fire"
     ]
    },
    "kind": "mislocated",
@@ -108,7 +119,7 @@
    "case": "cs_b_literarydigest",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "برچسب حقیقت پرونده نادرست است",
    "note": "همان سازوکار دیویی: با conf=90 فقط سقف r_tajrobe_hidden (۷۰) شکسته می‌شود؛ سقف استقراء ناقص ۸۰ است و s50 فقط می‌گوید ناقص «به مرز یقین نمی‌رسد»، پس در عدد ۹۰ خطای استقرایی محض دیده نمی‌شود. truth.why خودش علت را «عامل پنهان … کنترل نشده بود (s51)» می‌داند و hidden_ctrl:false رمز کرده، اما st_tajrobe را در fail نگذاشته؛ برچسب ناقص است (هم‌زاد سالمش cs_b_gallup1936 هم hidden_ctrl را برای همین استقراء رمز می‌کند).",
    "fix": {
@@ -118,9 +129,15 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 5,
+    "freshOk": 5,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_kahneman_instructors",
+     "r4_columbia_foam",
+     "r4_willingham_fire",
+     "r4_abs_survivor_shops"
+    ]
    },
    "kind": "mislocated",
    "title": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
@@ -140,14 +157,15 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 1,
+   "verified": "2026-10-14"
   },
   {
    "id": "f_cs_hrt_observational",
    "case": "cs_hrt_observational",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": "s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است. — به‌روز (دورِ ۴): پیشنهادِ p_found_vazraf همین را با قضیهٔ T_null (حداکثر ½) بی عددِ قراردادیِ ۴۵ حل می‌کند و جایگزینِ p_tajrobe_none است.",
    "fix": {
@@ -156,9 +174,16 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 6,
+    "freshOk": 6,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_kahneman_instructors",
+     "r4_columbia_foam",
+     "r4_willingham_fire",
+     "r4_abs_survivor_shops",
+     "r4_abs_lab_claim_replic"
+    ]
    },
    "kind": "missed",
    "title": "باور به اثر محافظتی درمان هورمونی بر قلب از روی مطالعات مشاهده‌ای",
@@ -177,14 +202,15 @@
     "s51"
    ],
    "lastSeenRound": 4,
-   "proposal": "p_tajrobe_none"
+   "proposal": "p_tajrobe_none",
+   "verified": "2026-10-14"
   },
   {
    "id": "f_cs_lavoisier_acids",
    "case": "cs_lavoisier_acids",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "داستان و actor صریحاً می‌گویند حکم «از شمار محدودی اسید» (گوگردی، فسفری، نیتریک و…) گرفته شد، ولی ind_n رمز نشده؛ پس فقط r_istiqra_incomplete (۸۰؛ s50: «ارزش معرفتی استقراء ناقص حتی با افزایش شواهد به مرز یقین نمی‌رسد») فعال می‌شود و conf=85 زیر ۸۰+۱۰ می‌ماند. ویژگی ind_n دقیقاً برای همین بخش از s50 (ارزش استقراء «از منظر حساب احتمالات» با شمار موارد) ساخته شده است.",
    "fix": {
@@ -194,9 +220,13 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 3,
+    "freshOk": 3,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
+     "r4_abs_survivor_shops"
+    ]
    },
    "kind": "missed",
    "title": "لاووازیه: «همه اسیدها اکسیژن دارند»",
@@ -214,14 +244,15 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 1,
+   "verified": "2026-10-14"
   },
   {
    "id": "f_cs_pb_flt_numeric",
    "case": "cs_pb_flt_numeric",
    "opened": "2026-10-13",
    "openedRound": 5,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "حل شد با خواندنِ کاملِ s50/s51 و پانوشت‌ها (۲۰۲۶-۱۰-۱۴): تناقضی در جزوه نبود. s50 فقط می‌گوید استقراءِ ناقص «حتی با افزایشِ شواهد به مرزِ یقین نمی‌رسد» و «به‌تنهایی نمی‌تواند ضرورت و قطعیتِ کلی را اثبات کند»؛ عبارتِ «با شواهد بالا می‌رود» برداشتِ سازنده بود (یادداشتِ r_istiqra_small_n). s51 علتش را می‌گوید: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر». پانوشتِ s50 (استنفورد) هم صریح است: حسابِ احتمالات دربارهٔ «مشاهده‌های آینده» است نه حکمِ کلی. پس دربارهٔ حکمِ کلیِ فرما، شمارِ چهار میلیون به‌تنهایی اطمینانِ معنادار نمی‌دهد. «۶۰٪» را خودِ پرونده «تقریبِ سامانه، نه ادعای پژوهشگران» می‌نامد؛ رفتارِ مستند (ثابت‌شده اعلام نکردند) همان سالم است. ⇒ عدد برداشته شد؛ متنِ دو قاعده با لفظِ جزوه درست شد.",
    "fix": {
@@ -230,9 +261,13 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 3,
+    "freshOk": 3,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
+     "r4_abs_survivor_shops"
+    ]
    },
    "kind": "health_alarm",
    "title": "تأیید عددی قضیه فرما تا چهار میلیون (۱۹۹۳)",
@@ -248,7 +283,8 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 5
+   "lastSeenRound": 5,
+   "verified": "2026-10-14"
   },
   {
    "id": "f_cs_pb_greek_indiana",
@@ -265,14 +301,17 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 5,
-    "freshOk": 5,
+    "fresh": 8,
+    "freshOk": 8,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
      "r2_nyt_goddard_1920",
-     "r2_abs_desk_stablecoin"
+     "r2_abs_desk_stablecoin",
+     "r4_bre_x_busang",
+     "r4_yom_kippur_concept",
+     "r4_willingham_fire"
     ]
    },
    "kind": "missed",
@@ -307,7 +346,7 @@
    "case": "cs_pb_long_h4",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "هشدار سلامت مشروع نیست: r_istiqra_small_n (ind_n=2 < 10، vazraf نامعلوم) روی k1 سقف ۷۰ گذاشت و conf=90 ⇒ پرچم over در st_istiqra. اما حکم، به تصریح truth.why، «درباره همین دستگاه در همین آزمون‌ها بود (نه تعمیم به روش)»؛ مجموعه محدود و همه اعضایش بررسی شده، یعنی استقراء تام که طبق s50 «نتیجه آن قطعی و دارای اعتبار صددرصدی است» (مثال ایستگاه: «۲۴ قسط گذشته … استقراء تام»). رمزگذار ind_n را گذاشت ولی ind_complete:true را جا انداخت.",
    "fix": {
@@ -317,9 +356,13 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 3,
+    "freshOk": 3,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
+     "r4_abs_survivor_shops"
+    ]
    },
    "kind": "health_alarm",
    "title": "آزمون‌های دریایی H4 (۱۷۶۱–۱۷۶۴)",
@@ -334,7 +377,8 @@
    "secs": [
     "s50"
    ],
-   "lastSeenRound": 1
+   "lastSeenRound": 1,
+   "verified": "2026-10-14"
   },
   {
    "id": "f_cs_pb_poinc_1900",
@@ -351,13 +395,14 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 4,
-    "freshOk": 4,
+    "fresh": 5,
+    "freshOk": 5,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
      "r2_nyt_goddard_1920",
-     "r2_abs_desk_stablecoin"
+     "r2_abs_desk_stablecoin",
+     "r4_yom_kippur_concept"
     ]
    },
    "kind": "missed",
@@ -386,7 +431,7 @@
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
    "openedRound": 3,
-   "status": "fixed",
+   "status": "verified",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": " — دورِ ۵: فقط کمینهٔ سقف‌ها مقصر شمرده می‌شد و حکمِ کلی از استقراء سقفِ قضیه‌ای نداشت (s51).",
    "fix": {
@@ -395,9 +440,15 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 5,
+    "freshOk": 5,
+    "ids": [
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
+     "r4_bre_x_busang",
+     "r4_yom_kippur_concept",
+     "r4_willingham_fire"
+    ]
    },
    "kind": "mislocated",
    "title": "سرمقاله نیویورک تایمز علیه موشک گادرد (۱۹۲۰) و «تصحیح» ۱۹۶۹",
@@ -427,7 +478,40 @@
     "s80",
     "s86"
    ],
-   "lastSeenRound": 4
+   "lastSeenRound": 4,
+   "verified": "2026-10-14"
+  },
+  {
+   "id": "f_r4_redfield_arsenic",
+   "case": "r4_redfield_arsenic",
+   "opened": "2026-10-14",
+   "openedRound": 9,
+   "status": "resolved",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور «کارشناسِ ذی‌اعتبار با روشِ ضعیف» (x_method=ضعیف) را به مسیرِ خودِ کنشگر نسبت داده بود؛ ولی در داستان، کنشگر (ردفیلد) به رأی کارشناسی اتکا نکرد بلکه خودش روشِ مقاله را نقد و بازآزمایی کرد؛ «روشِ ضعیف» ویژگیِ مقالهٔ مورد نقد است نه راهِ معرفتِ کنشگر. راه ⇒ عقل (s49: اعتبارِ استناد به کارشناس فقط وقتی مطرح است که به او اتکا شود).",
+   "fix": null,
+   "retest": {
+    "since": 9,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "health_alarm",
+   "title": "میکروب «آرسنیک‌زی» GFAJ-1 و نقد و بازآزمایی ردفیلد (۲۰۱۰–۲۰۱۲)",
+   "tier": "real",
+   "expected": [],
+   "flagged": [
+    "st_expert"
+   ],
+   "rules": [
+    "r_expert_method_weak"
+   ],
+   "secs": [
+    "s49"
+   ],
+   "lastSeenRound": 9,
+   "resolved": "2026-10-14",
+   "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
   }
  ]
 }
