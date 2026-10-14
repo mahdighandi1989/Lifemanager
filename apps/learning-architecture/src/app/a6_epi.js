@@ -466,8 +466,12 @@
   }
 
   /* ---------- نقشه کارخانه ---------- */
-  A.V.e_map = function () {
+  A.V.e_map = function (arg, sub) {
     var root = h("div", { class: "page" });
+    if (A.graphPanel) {
+      root.appendChild(A.tabs([["halls", "سالن‌ها و ایستگاه‌ها"], ["graph", "🕸 گرافِ کاملِ معرفت‌شناسی"]], sub || "halls", function (k) { A.go("e_map", null, k); }));
+      if (sub === "graph") { root.appendChild(A.graphPanel({ ctx: "epi", sys: { learn: 0, mine: 1, epi: 1 } })); return root; }
+    }
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "نقشه کارخانه", "هر پرونده سالن‌ها را به ترتیب شماره (از راست به چپ) طی می‌کند و «حکم نهایی» همیشه آخرین ایستگاه است. پررنگ: همیشه در مسیر. خط‌چین: فقط وقتی لازم شود. نشان «س»: در مسیر سریع هم هست."));
     if (A.GRAPH) root.appendChild(h("p", { class: "small" }, "این نقشه ترتیبِ سالن‌ها و ایستگاه‌هاست. ", h("button", { class: "linkish", onclick: function () { A.GRAPH.open(null); } }, "🕸 گرافِ مشترک"), " ایستگاه‌ها را با قاعده‌ها، بخش‌های جزوه، اصول و قضیه‌ها، حوزه‌های قلمرو و پل‌هایشان به سامانهٔ یادگیری نشان می‌دهد."));
     root.appendChild(h("div", { class: "hallflow" }, E.HALLS.map(function (H) {

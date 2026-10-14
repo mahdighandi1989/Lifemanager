@@ -22,16 +22,24 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       ['hall', EPI.HALLS.map(x => x.n)], ['station', EPI_ST.map(x => x.id)], ['rule', EPI_RULES.map(x => x.id)], ['chapter', EPI_BOOK.ch.map(x => x.id)],
       ['section', Object.keys(EPI_BOOK.sec)], ['axiom', EPI_FOUND.AX.map(x => x.id)], ['theorem', Object.keys(EPI_FOUND.TH)], ['base', Object.keys(EPI_FOUND.BASE)],
       ['tgroup', EPI_TERR.groups.map(g => g.id)], ['area', [].concat(...EPI_TERR.groups.map(g => g.areas.map(a => a.id)))],
-      ['finding', EPI_BT_LEDGER.findings.findings.map(f => f.id)], ['proposal', EPI_BT_LEDGER.proposals.proposals.map(x => x.id)]];
+      ['finding', EPI_BT_LEDGER.findings.findings.map(f => f.id)], ['proposal', EPI_BT_LEDGER.proposals.proposals.map(x => x.id)],
+      ['lesson', APP.COURSE_LESSONS.map(l => (l.pid || l.tid) + '@' + l.w)], ['struct', C.STRUCTURES.map(x => x.id)], ['concept', EPI_CO.map(x => x.id)],
+      ['drill', EPI_DR.map(x => x.id)], ['dossier', EPI_DOS.map(x => x.id)], ['event', EPI_BT_LEDGER.results.cases.map(x => x.id)], ['tool', ['FARM', 'ATLAS']]];
     reg.forEach(([t, ids]) => ids.forEach(id => { if (!has(t, id)) miss.push(t + ':' + id); }));
     const dangling = M.edges.filter(e => !M.nodes[e.a] || !M.nodes[e.b]).length;
     const stTech = EPI_ST.reduce((n, s) => n + (s.tech || []).length, 0), famSt = APP.KF.reduce((n, f) => n + (f.epi || []).length, 0);
     const br = M.edges.filter(e => e.rel === 'bridge').length;
     const unknownType = Object.values(M.nodes).filter(n => !APP.GRAPH.TM[n.t]).length;
-    return { n: Object.keys(M.nodes).length, e: M.edges.length, miss: miss.slice(0, 10), nmiss: miss.length, dangling, stTech, famSt, br, unknownType, ruleAt: M.edges.filter(e => e.rel === 'at').length };
+    const G2 = APP.GRAPH.gaps(M);
+    return { broken: G2.broken.length, dups: G2.dups.map(d => d.id).sort().join(), n: Object.keys(M.nodes).length, e: M.edges.length, miss: miss.slice(0, 10), nmiss: miss.length, dangling, stTech, famSt, br, unknownType, ruleAt: M.edges.filter(e => e.rel === 'at' && M.nodes[e.a].t === 'rule').length };
   });
   chk(info.cov.nmiss === 0, 'every registry member is a node: missing ' + info.cov.miss);
   chk(info.cov.dangling === 0 && info.cov.unknownType === 0, 'no dangling edges or unknown node types');
+  chk(info.cov.broken === 0, 'self-check: no broken references in the shipped data');
+  chk(info.cov.dups === 'c_kezb,c_nafsolamr,c_sedq_akhlaqi', 'self-check reports double definitions (owner decides content) ' + info.cov.dups);
+  info.brk = await p.evaluate(() => { APP.S.put({ id: 'knot_gt0', type: 'knot', name: 'گرهِ پیوندِ شکسته', fam: 'F2', links: [{ to: 'knot_gone', rel: 'related' }], status: 'open' });
+    const g = APP.GRAPH.gaps(); APP.S.del ? APP.S.del('knot_gt0') : null; return g.broken.some(b => b.missing === 'knot:knot_gone'); });
+  chk(info.brk, 'a broken user link is reported, not silently dropped');
   chk(info.cov.br >= info.cov.stTech && info.cov.famSt > 0, 'all recorded bridges present ' + JSON.stringify(info.cov));
   chk(info.cov.ruleAt === await p.evaluate(() => EPI_RULES.length), 'every rule tied to its station');
   // ۲) زنده: گرهِ تازه + موقعیت + قاعدهٔ تازه
@@ -47,8 +55,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   chk(info.live.grew === 3 && info.live.knotFam && info.live.caseKnot && info.live.famStation && info.live.rule, 'new data appears instantly with its links ' + JSON.stringify(info.live));
   // ۳) نما و منو
-  info.nav = await p.evaluate(() => ({ maps: document.querySelectorAll('.nav[data-v="maps"]').length, groups: [...document.querySelectorAll('.navg')].filter(g => /نقشه‌ها/.test(g.textContent)).length,
+  info.nav = await p.evaluate(() => ({ kmapEpi: !!document.querySelector('.navlist[data-sys="epi"] .nav[data-v="kmap"]'), maps: document.querySelectorAll('.nav[data-v="maps"]').length, groups: [...document.querySelectorAll('.navg')].filter(g => /نقشه‌ها/.test(g.textContent)).length,
     old: ['map', 'kmap', 'e_map', 'whole', 'farm'].every(v => document.querySelector('.nav[data-v="' + v + '"]')) }));
+  chk(info.nav.kmapEpi, 'mind map also in the epistemology menu');
+  await p.evaluate(() => APP.go('map', null, 'graph')); await p.waitForTimeout(250);
+  chk(await p.locator('main .gr-box.gr-epi').count() === 0 && await p.locator('main .gr-box.gr-learn').count() >= 8, 'learning map has its complete learning graph tab');
+  await p.evaluate(() => APP.go('e_map', null, 'graph')); await p.waitForTimeout(250);
+  chk(await p.locator('main .gr-box.gr-learn').count() === 0 && await p.locator('main .gr-box.gr-epi').count() >= 12, 'factory map has its complete epistemology graph tab');
+  await p.evaluate(() => APP.go('e_map')); await p.waitForTimeout(150);
+  chk(await p.locator('main .hallflow').count() === 1, 'factory halls view unchanged');
   chk(info.nav.maps === 1 && info.nav.groups === 2 && info.nav.old, 'one hub, «🗺 نقشه‌ها» group in each system, no map removed ' + JSON.stringify(info.nav));
   await p.evaluate(() => APP.go('maps')); await p.waitForTimeout(300);
   chk(await p.locator('main .gr-mapcard').count() >= 8 && await p.locator('main .gr-box').count() >= 15, 'hub cards and overview boxes');
@@ -58,7 +73,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.locator('main .gr-focus .gr-node').count() >= 5 && await p.locator('main .gr-focus line.cross').count() >= 1, 'focus view with cross-system links');
   await p.fill('main .gr-q', 'آگاهی فراشناختی'); await p.waitForTimeout(150);
   chk(await p.locator('main .gr-hit').count() >= 1, 'search');
-  chk(await p.locator('main .gr-gaps details').count() === 4, 'gaps listed');
+  chk(await p.locator('main .gr-gaps details').count() === 5 && await p.locator('main .gr-broken').count() === 1, 'gaps and self-check listed');
   // نقشهٔ ذهن ⇄ معرفت‌شناسی
   await p.evaluate(() => APP.go('kmap')); await p.waitForTimeout(250);
   await p.locator('main .km-n[data-id="knot_gt1"]').focus(); await p.keyboard.press('Enter'); await p.waitForTimeout(200);

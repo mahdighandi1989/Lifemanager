@@ -236,6 +236,32 @@ function addReview(file) {
   wr(reviewPath(r.round), r); return { ok: true, round: r.round, problems: (r.problems || []).length, unfixed: (r.problems || []).filter((p) => !p.fixed).length };
 }
 
+/* ---------- خوداصلاحیِ پیوندها: هر ارجاعِ میانِ ثبت‌گاه‌های کارخانه/جزوه/قلمرو/تکنیک‌ها باید به چیزِ موجود برسد ----------
+   (همان پیوندهایی که گرافِ مشترکِ «🗺 نقشه‌ها» از آن‌ها ساخته می‌شود؛ ارجاعِ شکسته = تخلف ⇒ دروازهٔ ادغام سرخ) */
+let TECH_IDS = null;
+function techIds() {
+  if (TECH_IDS) return TECH_IDS;
+  const dir = path.join(ROOT, "src", "tech"); global.T = global.T || [];
+  try { fs.readdirSync(dir).filter((f) => /^t_.*\.js$/.test(f)).forEach((f) => require(path.join(dir, f))); } catch (e) { }
+  TECH_IDS = new Set((global.T || []).map((t) => t.id)); return TECH_IDS;
+}
+function integrity() {
+  const v = [], w = [], STS = new Set((global.EPI_ST || []).map((s) => s.id)), SEC = new Set(Object.keys(BOOK.sec || {})), RID = new Set(RULES.map((r) => r.id)), TI = techIds();
+  RULES.forEach((r) => { if (!STS.has(r.st)) v.push("قاعده به ایستگاهِ ناموجود: " + r.id + " ⇒ " + r.st); (r.sec || []).forEach((x) => { if (!SEC.has(x)) v.push("قاعده به بخشِ ناموجود: " + r.id + " ⇒ " + x); }); });
+  (global.EPI_ST || []).forEach((s) => { (s.basis || []).forEach((b) => { if (!SEC.has(b.sec)) v.push("ایستگاه به بخشِ ناموجود: " + s.id + " ⇒ " + b.sec); });
+    (s.tech || []).forEach((x) => { if (TI.size && !TI.has(x.id)) v.push("ایستگاه به تکنیکِ ناموجود: " + s.id + " ⇒ " + x.id); }); });
+  const co = {}; (global.EPI_CO || []).forEach((c) => { if (co[c.id]) w.push("تعریفِ دوگانهٔ مفهوم: " + c.id); co[c.id] = 1;
+    (c.st || []).forEach((x) => { if (!STS.has(x)) v.push("مفهوم به ایستگاهِ ناموجود: " + c.id + " ⇒ " + x); }); (c.secs || []).forEach((x) => { if (!SEC.has(x)) v.push("مفهوم به بخشِ ناموجود: " + c.id + " ⇒ " + x); }); });
+  (global.EPI_DR || []).forEach((d) => { if (!STS.has(d.st)) v.push("تمرین به ایستگاهِ ناموجود: " + d.id); });
+  (global.EPI_DOS || []).forEach((d) => (d.secs || []).forEach((x) => { if (!SEC.has(x)) v.push("پروندهٔ پشتوانه به بخشِ ناموجود: " + d.id + " ⇒ " + x); }));
+  terrAreas().forEach((a) => (a.book || []).forEach((x) => { if (!SEC.has(x)) v.push("حوزهٔ قلمرو به بخشِ ناموجود: " + a.id + " ⇒ " + x); }));
+  const TS = terrState().areas || {}; Object.keys(TS).forEach((id) => (TS[id].rules || []).forEach((r) => { if (!RID.has(r) && !((rd(P.proposals, { proposals: [] }).proposals || []).some((p) => p.id === r))) v.push("حوزهٔ قلمرو به قاعدهٔ ناموجود: " + id + " ⇒ " + r); }));
+  (global.EPI_PROBLEMS || []).concat(global.EPI_PROBLEMS_B || []).forEach((p) => (p.stages || []).forEach((s) => { (s.st || []).forEach((x) => { if (!STS.has(x)) v.push("مرحلهٔ مسئله به ایستگاهِ ناموجود: " + p.id + "/" + s.id + " ⇒ " + x); });
+    (s.tech || []).forEach((x) => { if (TI.size && !TI.has(x)) v.push("مرحلهٔ مسئله به تکنیکِ ناموجود: " + p.id + "/" + s.id + " ⇒ " + x); }); }));
+  (rd(P.findings, { findings: [] }).findings || []).forEach((f) => (f.rules || []).forEach((r) => { if (!RID.has(r)) w.push("یافته به قاعدهٔ ناموجود (تاریخی): " + f.id + " ⇒ " + r); }));
+  return { violations: v, warnings: w };
+}
+
 /* ---------- نگهبانِ مبنا: هر سقف به قضیه‌ای از اصولِ ثابت برمی‌گردد؛ هیچ عددِ قراردادی؛ هیچ قضیهٔ بی‌برهان ---------- */
 function axiomAudit() {
   const FD = global.EPI_FOUND, v = [], AX = new Set(FD.AX.map((a) => a.id)), TH = FD.TH;
@@ -247,7 +273,7 @@ function axiomAudit() {
     if (d && d.base && !FD.BASE[d.base]) v.push("پایهٔ ناشناخته در " + r.id); });
   FD.report(RULES).filter((r) => r.conventional).forEach((r) => v.push("عددِ قراردادی: " + r.id + " = " + r.cap));
   RULES.filter((r) => r.basis === "beyond" && !(r.proof && TH[r.proof])).forEach((r) => v.push("قاعدهٔ فراتر از جزوه بی قضیه: " + r.id));
-  return v;
+  return v.concat(integrity().violations);
 }
 
 /* ---------- اعتبارسنجیِ واقعهٔ تازه ---------- */
@@ -587,9 +613,9 @@ if (require.main === module) {
   else if (cmd === "sample") console.log(JSON.stringify(addSamples(a1), null, 1));
   else if (cmd === "territory") console.log(JSON.stringify(applyTerritory(a1), null, 1));
   else if (cmd === "review") { const r = addReview(a1); console.log(JSON.stringify(r, null, 1)); if (!r.ok) process.exit(3); }
-  else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v }, null, 1)); if (v.length) process.exit(3); }
+  else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v, warnings: integrity().warnings }, null, 1)); if (v.length) process.exit(3); }
   else if (cmd === "run") { const args = process.argv.slice(3), ni = args.indexOf("--note"); console.log(JSON.stringify(run(ni >= 0 ? args[ni + 1] : "", args.indexOf("--rerun") >= 0), null, 1)); }
   else { console.log("usage: status | add <file.json> | sample <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
 }
-module.exports = { validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples,
+module.exports = { integrity, validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples,
   applyTerritory, validateTerr, terrAreas, terrState, addReview, territoryMd };

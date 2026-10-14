@@ -14,7 +14,8 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
   const chk = (cond, msg) => { if (!cond) errors.push(msg); };
 
   // منو
-  chk(await p.locator('.nav[data-v="kmap"]').count() === 1, 'nav kmap missing');
+  // از ۲۰۲۶-۱۰-۱۴ (WORKLOG 40) نقشهٔ ذهن در گروهِ «🗺 نقشه‌ها» ِ هر دو منوست (همان نما)
+  chk(await p.locator('.navlist[data-sys="learn"] .nav[data-v="kmap"]').count() === 1 && await p.locator('.navlist[data-sys="epi"] .nav[data-v="kmap"]').count() === 1, 'nav kmap missing');
   // ۲۰۲۶-۱۰-۱۳: شش شبیه‌سازِ نمایشی «نمونهٔ آمادهٔ سازنده»اند — در منو نیستند و پیش‌فرض پنهان‌اند
   chk(await p.locator('.nav[data-v="ksims"]').count() === 0, 'nav ksims should be gone');
 
