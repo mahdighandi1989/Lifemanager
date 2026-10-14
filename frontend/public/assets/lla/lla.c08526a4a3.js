@@ -32680,6 +32680,9 @@ APP.goFromURL = function (q) {
       var tr = (s.trail || []).slice(-60);
       // کدهای خامِ قدم (in/s0/s1/ws:…) به فارسی یا حذف (کارزارِ آزمون sc16) — برای مسیرهای قدیمیِ ذخیره‌شده هم
       tr = tr.map(function (x) { var p = String(x.label || "").split(" · "); return { label: p[0] + (p[1] ? (subFa(p[1]) ? " · " + subFa(p[1]) : "") : "") }; }).filter(function (x, i, a) { return !i || a[i - 1].label !== x.label; });
+      // رفت‌وبرگشتِ تکراری (الف ← ب ← الف ← ب …) یک بار با شمار (کارزارِ آزمون c06: همان دو قدم ۶ بار)
+      var seen = {}, uniq = []; tr.forEach(function (x) { if (seen[x.label]) seen[x.label].n++; else { seen[x.label] = { label: x.label, n: 1 }; uniq.push(seen[x.label]); } });
+      tr = uniq.map(function (x) { return { label: x.label + (x.n > 1 ? " (×" + fa(x.n) + ")" : "") }; });
       if (tr.length) H.push(sec("🚶 از کجا عبور کرد", tr.map(function (x) { return '<span style="white-space:nowrap">' + esc(x.label) + "</span>"; }).join(' <span style="color:' + C.mute + '">←</span> ')));
       /* گفت‌وگو */
       var msgs = (s.msgs || []).filter(function (x) { return x.role !== "sys" || /✓|🛎|✅|↩|🎉|🏁|⏳|↗|🤝/.test(x.text); }).slice(-40);
@@ -33074,6 +33077,9 @@ APP.goFromURL = function (q) {
           (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)) ? h("button", { class: "btn sm", type: "button", onclick: function () { var tp = mkTopic(p, x); A.toast("موضوعِ یادگیری ساخته شد؛ سفرِ ۱۱ گامی‌اش را از همان‌جا شروع کن."); A.go("topic", tp.id); } }, "📚 موضوعِ یادگیری بساز") : null,
           x.topic && S.get(x.topic) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("topic", x.topic); } }, "↗ موضوعِ یادگیری") : null));
     });
+    // یک‌جا برای همهٔ نبوده‌ها (کارزارِ آزمون c06/c07: ساختنِ یکی‌یکی چند نوبت می‌برد و کلیکِ اول صفحه را عوض می‌کرد)
+    var todo = p.items.filter(function (x) { return (x.self === "نیمه" || x.self === "بلد نیستم") && !(x.topic && S.get(x.topic)); });
+    if (todo.length > 1) root.appendChild(h("button", { class: "btn", type: "button", onclick: function () { todo.forEach(function (x) { mkTopic(p, x); }); A.toast(fa(todo.length) + " موضوعِ یادگیری ساخته شد؛ سفرِ هر کدام را از «موضوع‌ها» شروع کن."); A.render(); } }, "📚 برای همهٔ " + fa(todo.length) + " پیش‌نیازِ نبوده موضوع بساز"));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "مفهوم‌های پیش‌نیاز"), rows.length ? h("div", { class: "col gap" }, rows) : h("p", { class: "small muted" }, "هنوز موردی نیست — «🤖 پیشنهادِ پیش‌نیازها» یا پایین خودت بیفزا.")));
     var c1 = h("input", { type: "text", id: "prC", placeholder: "مفهوم" }), c2 = h("input", { type: "text", id: "prSci", placeholder: "علم › شاخه" }), c3 = h("input", { type: "text", id: "prW", placeholder: "در کدام گامِ حل لازم بود" });
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "افزودنِ دستی"), h("label", { for: "prC" }, "مفهوم"), c1, h("label", { for: "prSci" }, "علم › شاخه"), c2, h("label", { for: "prW" }, "در کدام گام"), c3,

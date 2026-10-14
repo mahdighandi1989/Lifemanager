@@ -182,6 +182,9 @@
       var tr = (s.trail || []).slice(-60);
       // کدهای خامِ قدم (in/s0/s1/ws:…) به فارسی یا حذف (کارزارِ آزمون sc16) — برای مسیرهای قدیمیِ ذخیره‌شده هم
       tr = tr.map(function (x) { var p = String(x.label || "").split(" · "); return { label: p[0] + (p[1] ? (subFa(p[1]) ? " · " + subFa(p[1]) : "") : "") }; }).filter(function (x, i, a) { return !i || a[i - 1].label !== x.label; });
+      // رفت‌وبرگشتِ تکراری (الف ← ب ← الف ← ب …) یک بار با شمار (کارزارِ آزمون c06: همان دو قدم ۶ بار)
+      var seen = {}, uniq = []; tr.forEach(function (x) { if (seen[x.label]) seen[x.label].n++; else { seen[x.label] = { label: x.label, n: 1 }; uniq.push(seen[x.label]); } });
+      tr = uniq.map(function (x) { return { label: x.label + (x.n > 1 ? " (×" + fa(x.n) + ")" : "") }; });
       if (tr.length) H.push(sec("🚶 از کجا عبور کرد", tr.map(function (x) { return '<span style="white-space:nowrap">' + esc(x.label) + "</span>"; }).join(' <span style="color:' + C.mute + '">←</span> ')));
       /* گفت‌وگو */
       var msgs = (s.msgs || []).filter(function (x) { return x.role !== "sys" || /✓|🛎|✅|↩|🎉|🏁|⏳|↗|🤝/.test(x.text); }).slice(-40);
