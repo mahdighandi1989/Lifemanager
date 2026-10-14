@@ -171,7 +171,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const st = APP.S.settings(); st.knots = st.knots || {}; st.knots.notify = { telegram: true, email: false, hour: 8 };
     const tp = { id: 'tp_t2', type: 'topic', title: 'احتمالِ شرطی' }; APP.S.put(tp); APP.S.put({ id: 'sc_t2', type: 'sched', topic: 'tp_t2', due: APP.addDays(APP.today(), 1) });
     AS._turnSession = s; AS.DO.tour_link({ facet: 'f2', id: 'tp_t2' });
-    s.updated = new Date(Date.now() - 2 * 864e5).toISOString(); s._rem = null; __rem.length = 0;
+    s.msgs.forEach(m => { if (m.role === 'user') m.at = new Date(Date.now() - 2 * 864e5).toISOString(); }); s._rem = null; __rem.length = 0;
     AS.tourAfterTurn(s);
     const fu = AS.tourFollowups(t.facets[1]).map(m => m.t).join('|');
     const out = { done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),

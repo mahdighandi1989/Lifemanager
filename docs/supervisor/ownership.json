@@ -12,6 +12,10 @@
         {
           "what": "دو بار در هفته: همهٔ برگه‌های عادی، بازرسیِ کلِ سامانه، گیت، دست‌به‌دست‌های کهنه",
           "procedure": "docs/supervisor/PROMPT.md#۰-ب) کارتابلِ «نظارت و سرکشی» — **اولین کارِ هر دور**"
+        },
+        {
+          "what": "دو بار در هفته: «🗺 قلمروِ سامانه‌ها» — ۲ تا ۴ حوزهٔ کم‌گام را با شاهد (منبعِ معتبر، گزاره، رده بر پایهٔ اصول، ابزارِ صفحه) یک گام جلو ببر؛ برگه‌های دستیار با area=sys-territory",
+          "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها"
         }
       ]
     },
@@ -161,6 +165,23 @@
       "tool": "node apps/learning-architecture/tools/epi_backtest.js add|run",
       "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
       "ledger": "apps/learning-architecture/backtest/ledger.json"
+    },
+    {
+      "id": "sys-territory",
+      "fa": "قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها",
+      "page": true,
+      "owner": [
+        "general",
+        "urgent"
+      ],
+      "paths": [
+        "apps/learning-architecture/territory/*",
+        "apps/learning-architecture/tools/sys_territory.py",
+        "apps/learning-architecture/src/app/a28_systerr.js"
+      ],
+      "tool": "python3 apps/learning-architecture/tools/sys_territory.py",
+      "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
+      "ledger": "apps/learning-architecture/territory/ledger.json"
     },
     {
       "id": "lla-page",

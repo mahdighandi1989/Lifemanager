@@ -12,6 +12,7 @@ What one run does (deterministic — same sources ⇒ same bytes):
   4. frontend/src/lib/llaBundle.js: the manifest the page imports (names only).
 --check performs 1–4 in memory and lists every difference instead of writing.
 """
+import glob
 import hashlib
 import json
 import os
@@ -66,17 +67,29 @@ def ledger_js():
     return "window.EPI_BT_LEDGER = " + json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n"
 
 
+def systerr_js():
+    """«🗺 قلمروِ سامانه‌ها» (territory/maps/*.json + territory/ledger.json — tools/sys_territory.py) ⇒ پیش از کدِ صفحه."""
+    td = os.path.join(B, "territory")
+    maps = []
+    for p in sorted(glob.glob(os.path.join(td, "maps", "*.json"))):
+        maps.append(json.loads(rd(p)))
+    lp = os.path.join(td, "ledger.json")
+    led = json.loads(rd(lp)) if os.path.exists(lp) else {"areas": {}}
+    return ("window.SYS_TERR = " + json.dumps({"systems": maps}, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n" +
+            "window.SYS_TERR_LEDGER = " + json.dumps(led, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n")
+
+
 def sources():
     css = rd(os.path.join(A, "style.css"))
     core = "\n".join(rd(os.path.join(A, f)) for f in ["core.js", "core2.js", "core3.js"])
     techs = [rd(os.path.join(TD, "t_%s.js" % x)) for x in "abcde"]
     techs[0] += "\n" + rd(os.path.join(TD, "src_a.js"))
     techs[1] += "\n" + rd(os.path.join(TD, "src_b.js"))
-    app = "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
+    app = systerr_js() + "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
                                                    "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js", "a10_nav.js", "a11_course.js",
                                                    "a12_mirror.js", "a13_epi_course.js", "a14_sims.js", "a15_journey.js",
                                                    "a16_knots.js", "a17_kpractice.js", "a18_kmap.js", "a19_moves.js", "a20_similar.js",
-                                                   "a21_orient.js", "a22_btlive.js", "a23_found.js", "a24_territory.js", "a25_graph.js", "a26_assist.js", "a27_tour.js"]
+                                                   "a21_orient.js", "a22_btlive.js", "a23_found.js", "a24_territory.js", "a25_graph.js", "a26_assist.js", "a27_tour.js", "a28_systerr.js", "a29_mind.js", "a30_report.js"]
                                                   if os.path.exists(os.path.join(A, f)))
     epibook = rd(os.path.join(A, "epi_book.js"))
     epidata = rd(os.path.join(A, "epi_core.js")) + "\n" + "".join(rd(os.path.join(A, "epi_st_%s.js" % x)) + "\n" for x in "abcd")

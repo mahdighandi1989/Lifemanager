@@ -23,7 +23,7 @@
     { t: "dossier", fa: "پروندهٔ پشتوانه", sys: "epi" }, { t: "event", fa: "واقعهٔ بک‌تست", sys: "epi" }, { t: "station", fa: "ایستگاه", sys: "epi" }, { t: "rule", fa: "قاعده", sys: "epi" },
     { t: "chapter", fa: "فصلِ جزوه", sys: "epi" }, { t: "section", fa: "بخشِ جزوه", sys: "epi" }, { t: "axiom", fa: "اصلِ بدیهی", sys: "epi" },
     { t: "theorem", fa: "قضیه", sys: "epi" }, { t: "base", fa: "مقدارِ پایه", sys: "epi" }, { t: "tgroup", fa: "گروهِ قلمرو", sys: "epi" },
-    { t: "area", fa: "حوزهٔ قلمرو", sys: "epi" }, { t: "finding", fa: "یافتهٔ بک‌تست", sys: "epi" }, { t: "proposal", fa: "پیشنهادِ تغییر", sys: "epi" }
+    { t: "area", fa: "حوزهٔ قلمرو", sys: "epi" }, { t: "ssys", fa: "سامانهٔ قلمرو", sys: "learn" }, { t: "sarea", fa: "حوزهٔ قلمروِ سامانه", sys: "learn" }, { t: "finding", fa: "یافتهٔ بک‌تست", sys: "epi" }, { t: "proposal", fa: "پیشنهادِ تغییر", sys: "epi" }
   ];
   G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
   G.REL = { in: "عضوِ", req: "پیش‌نیازِ", feeds: "تغذیه می‌کند", pairs: "مکمل", uses: "به کار می‌برد", serves: "پاسخ به دغدغه", core: "تکنیکِ اصلیِ گام",
@@ -106,6 +106,14 @@
     Object.keys(TS).forEach(function (aid) { (TS[aid].rules || []).forEach(function (r) { edge(ref("area", aid), ref("rule", r), "covers"); }); });
     ((L.findings || {}).findings || []).forEach(function (f) { node("finding", f.id, f.title + " — " + f.status, { go: ["e_bt", null, "live"] }); (f.rules || []).forEach(function (r) { edge(ref("finding", f.id), ref("rule", r), "about"); }); });
     ((L.proposals || {}).proposals || []).forEach(function (p) { node("proposal", p.id, p.title, { go: ["e_bt", null, "live"] }); if (p.finding) edge(ref("proposal", p.id), ref("finding", p.finding), "about"); });
+    /* «🗺 قلمروِ سامانه‌ها» (a28): سامانه ⇐ حوزه ⇐ ابزارهای صفحه (فقط ارجاع‌های ثبت‌شده در نقشه) */
+    ((W.SYS_TERR || {}).systems || []).forEach(function (m) {
+      node("ssys", m.id, m.fa, { go: ["sterr", m.id] });
+      (m.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) {
+        node("sarea", a.id, a.fa, { go: ["sterr", m.id] }); edge(ref("sarea", a.id), ref("ssys", m.id), "in");
+        (a.tools || []).forEach(function (t) { var mm = /^([a-z]+):(.+)$/.exec(t); if (!mm || mm[1] === "view") return; var tt = mm[1] === "kfam" ? "kfam" : mm[1]; if (N[ref(tt, mm[2])]) edge(ref("sarea", a.id), ref(tt, mm[2]), "uses"); });
+      }); });
+    });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
     (W.EPI_ST || []).forEach(function (s) { (s.tech || []).forEach(function (x) { edge(ref("station", s.id), ref("tech", x.id), "bridge", x.why); }); });
     (A.KF || []).forEach(function (f) { (f.epi || []).forEach(function (x) { edge(ref("kfam", f.id), ref("station", x.st), "bridge", x.why); }); });

@@ -14,6 +14,7 @@
     GET    /api/app-records/{app}/reminders     the caller's reminders + which channels this server can deliver on
     POST   /api/app-records/{app}/reminders     upsert one {key, due_date, hour, tz, title, body, detail?, detail_channels?, link, channels}
     DELETE /api/app-records/{app}/reminders/{key}  cancel
+    POST   /api/app-records/{app}/report-email  the page's HTML report (+ inline chart PNGs) to the owner now (tour reports)
 
 First tenant: «معماری یادگیری عمیق و کارخانه معرفت‌شناسی» (`/apps/learning-architecture`).
 Records are the app's own JSON documents; the server only scopes them by user,
@@ -431,6 +432,26 @@ async def reminders_upsert(app: str, payload: ReminderIn, db: AsyncSession = Dep
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return {"ok": True, "success": True, **res}
+
+
+class ReportMailIn(BaseModel):
+    subject: str = Field(..., max_length=200)
+    text: str = Field("", max_length=100_000)
+    html: str = Field("", max_length=800_000)
+    images: Any = None   # [{cid, data: base64 PNG}] ⇒ inline in the HTML (≤ 8, ≤ 1.5 MB each)
+
+
+@router.post("/api/app-records/{app}/report-email", tags=["app-records"])
+async def report_email(app: str, payload: ReportMailIn, db: AsyncSession = Depends(get_db),
+                       user_id: int = Depends(_owner_channels)):
+    """«📧 گزارشِ تور»: the page's HTML report (+ chart PNGs) to the owner's e-mail, now. Honest status:
+    sent | failed | skipped_unconfigured | capped (app_report_mail.DAILY_CAP)."""
+    _check_app(app)
+    from app.services.app_report_mail import send_report
+
+    res = await send_report(db, user_id=user_id, app=app, subject=payload.subject, text=payload.text or payload.subject,
+                            html=payload.html, images=payload.images if isinstance(payload.images, list) else [])
+    return {"ok": res.get("status") == "sent", "success": res.get("status") == "sent", **res}
 
 
 @router.delete("/api/app-records/{app}/reminders/{key}", tags=["app-records"])

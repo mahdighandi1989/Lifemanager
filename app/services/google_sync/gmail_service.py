@@ -361,10 +361,12 @@ async def send_email_gmail(
     fetcher: Optional[Callable] = None,
     access_token: Optional[str] = None,
     html: Optional[str] = None,
+    images: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Send an email AS the connected account (gmail.send scope). ``html``
-    adds a rich alternative part (the plain body stays the fallback).
-    Never raises."""
+    adds a rich alternative part (the plain body stays the fallback);
+    ``images`` = [{"cid", "data": bytes, "subtype": "png"}] are attached
+    inline to the HTML part (``<img src="cid:…">``). Never raises."""
     token = access_token or await get_access_token(db)
     if not token:
         return {"ok": False, "error": "not_connected"}
@@ -377,6 +379,10 @@ async def send_email_gmail(
         msg.set_content(body)
         if html:
             msg.add_alternative(html, subtype="html")
+            if images:
+                hp = msg.get_payload()[-1]
+                for im in images:
+                    hp.add_related(im["data"], "image", im.get("subtype", "png"), cid="<" + im["cid"] + ">")
         raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
         fetch = fetcher or _default_fetcher
         result = await fetch(

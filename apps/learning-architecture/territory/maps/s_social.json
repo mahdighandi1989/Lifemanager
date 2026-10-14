@@ -1,0 +1,1318 @@
+{
+ "id": "s_social",
+ "fa": "ارتباط، گفت‌وگو و استدلال با دیگران",
+ "en": "Communication, dialogue and reasoning with others",
+ "about_fa": "این سامانه هر چیزی را در بر می‌گیرد که فکر و یادگیریِ تو در تماس با دیگران از آن عبور می‌کند: گفتن یا نگفتنِ نظرت، شنیدن، استدلال و اختلاف، اقناع، اعتماد، بازخورد، تعارض و شبکهٔ حمایت. چون بخشِ بزرگی از گیرهای واقعی (مثلاً سکوت وقتی مدیر نظرت را رد می‌کند) اجتماعی‌اند نه فردی، این قلمرو مکملِ گره‌گشا و کارخانهٔ معرفت است.",
+ "axioms": [
+  "A0",
+  "A1",
+  "A2",
+  "A3",
+  "A4"
+ ],
+ "bridge_fa": "ادعاهای تجربیِ این حوزه با نرخ‌های پایهٔ اندازه‌گیری‌شده (فراتحلیل‌ها، با برچسبِ نمونه‌ای که از آن آمده‌اند، اغلب غربی) به اصول وصل می‌شوند و وزنشان با T_below1 کمتر از یک و با تکرار و استقلالِ مطالعات (T_tawatur) بالا می‌رود. قضیه‌ها فقط آن‌جا گفته شده‌اند که از تعریف و اصولِ A0–A4 درمی‌آیند: استقلالِ گواهی‌ها، ضعیف‌ترین حلقهٔ زنجیرِ نقل، بی‌مرجح‌بودنِ تعبیرِ سکوت، و بی‌اثریِ ردِ نسخهٔ ضعیف بر نسخهٔ قوی.",
+ "sources": [
+  {
+   "tag": "edmondson1999",
+   "title": "Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. Administrative Science Quarterly 44(2)",
+   "url": "https://doi.org/10.2307/2666999"
+  },
+  {
+   "tag": "frazier2017",
+   "title": "Frazier, M. L., Fainshmidt, S., Klinger, R. L., Pezeshkan, A., & Vracheva, V. (2017). Psychological Safety: A Meta-Analytic Review and Extension. Personnel Psychology 70(1)",
+   "url": "https://doi.org/10.1111/peps.12183"
+  },
+  {
+   "tag": "morrison2014",
+   "title": "Morrison, E. W. (2014). Employee Voice and Silence. Annual Review of Organizational Psychology and Organizational Behavior 1",
+   "url": "https://doi.org/10.1146/annurev-orgpsych-031413-091328"
+  },
+  {
+   "tag": "mercier_sperber2011",
+   "title": "Mercier, H., & Sperber, D. (2011). Why do humans reason? Arguments for an argumentative theory. Behavioral and Brain Sciences 34(2)",
+   "url": "https://doi.org/10.1017/S0140525X10000968"
+  },
+  {
+   "tag": "sep_informal",
+   "title": "Stanford Encyclopedia of Philosophy: Informal Logic",
+   "url": "https://plato.stanford.edu/entries/logic-informal/"
+  },
+  {
+   "tag": "sep_social_epi",
+   "title": "Stanford Encyclopedia of Philosophy: Social Epistemology",
+   "url": "https://plato.stanford.edu/entries/epistemology-social/"
+  },
+  {
+   "tag": "cialdini_goldstein2004",
+   "title": "Cialdini, R. B., & Goldstein, N. J. (2004). Social Influence: Compliance and Conformity. Annual Review of Psychology 55",
+   "url": "https://doi.org/10.1146/annurev.psych.55.090902.142015"
+  },
+  {
+   "tag": "bond_smith1996",
+   "title": "Bond, R., & Smith, P. B. (1996). Culture and conformity: A meta-analysis of studies using Asch's line judgment task. Psychological Bulletin 119(1)",
+   "url": "https://doi.org/10.1037/0033-2909.119.1.111"
+  },
+  {
+   "tag": "nemeth2001",
+   "title": "Nemeth, C., Brown, K., & Rogers, J. (2001). Devil's advocate versus authentic dissent: stimulating quantity and quality. European Journal of Social Psychology 31(6)",
+   "url": "https://doi.org/10.1002/ejsp.58"
+  },
+  {
+   "tag": "petty_cacioppo1986",
+   "title": "Petty, R. E., & Cacioppo, J. T. (1986). The Elaboration Likelihood Model of Persuasion. Advances in Experimental Social Psychology 19",
+   "url": "https://doi.org/10.1016/S0065-2601(08)60214-2"
+  },
+  {
+   "tag": "pornpitakpan2004",
+   "title": "Pornpitakpan, C. (2004). The Persuasiveness of Source Credibility: A Critical Review of Five Decades' Evidence. Journal of Applied Social Psychology 34(2)",
+   "url": "https://doi.org/10.1111/j.1559-1816.2004.tb02547.x"
+  },
+  {
+   "tag": "mayer1995",
+   "title": "Mayer, R. C., Davis, J. H., & Schoorman, F. D. (1995). An Integrative Model of Organizational Trust. Academy of Management Review 20(3)",
+   "url": "https://doi.org/10.2307/258792"
+  },
+  {
+   "tag": "kalla_broockman2020",
+   "title": "Kalla, J. L., & Broockman, D. E. (2020). Reducing Exclusionary Attitudes through Interpersonal Conversation: Evidence from Three Field Experiments. American Political Science Review 114(2)",
+   "url": "https://doi.org/10.1017/S0003055419000923"
+  },
+  {
+   "tag": "kluger_denisi1996",
+   "title": "Kluger, A. N., & DeNisi, A. (1996). The effects of feedback interventions on performance: A historical review, a meta-analysis, and a preliminary feedback intervention theory. Psychological Bulletin 119(2)",
+   "url": "https://doi.org/10.1037/0033-2909.119.2.254"
+  },
+  {
+   "tag": "hattie_timperley2007",
+   "title": "Hattie, J., & Timperley, H. (2007). The Power of Feedback. Review of Educational Research 77(1)",
+   "url": "https://doi.org/10.3102/003465430298487"
+  },
+  {
+   "tag": "dewit2012",
+   "title": "de Wit, F. R. C., Greer, L. L., & Jehn, K. A. (2012). The paradox of intragroup conflict: A meta-analysis. Journal of Applied Psychology 97(2)",
+   "url": "https://doi.org/10.1037/a0024844"
+  },
+  {
+   "tag": "thompson2010",
+   "title": "Thompson, L. L., Wang, J., & Gunia, B. C. (2010). Negotiation. Annual Review of Psychology 61",
+   "url": "https://doi.org/10.1146/annurev.psych.093008.100458"
+  },
+  {
+   "tag": "mayowilson2014",
+   "title": "Mayo-Wilson, E., et al. (2014). Psychological and pharmacological interventions for social anxiety disorder in adults: a systematic review and network meta-analysis. Lancet Psychiatry 1(5)",
+   "url": "https://doi.org/10.1016/S2215-0366(14)70329-3"
+  },
+  {
+   "tag": "gilovich2000",
+   "title": "Gilovich, T., Medvec, V. H., & Savitsky, K. (2000). The spotlight effect in social judgment: An egocentric bias in estimates of the salience of one's own actions and appearance. Journal of Personality and Social Psychology 78(2)",
+   "url": "https://doi.org/10.1037/0022-3514.78.2.211"
+  },
+  {
+   "tag": "gilovich1998",
+   "title": "Gilovich, T., Savitsky, K., & Medvec, V. H. (1998). The illusion of transparency: Biased assessments of others' ability to read one's emotional states. Journal of Personality and Social Psychology 75(2)",
+   "url": "https://doi.org/10.1037/0022-3514.75.2.332"
+  },
+  {
+   "tag": "camerer1989",
+   "title": "Camerer, C., Loewenstein, G., & Weber, M. (1989). The Curse of Knowledge in Economic Settings: An Experimental Analysis. Journal of Political Economy 97(5)",
+   "url": "https://doi.org/10.1086/261651"
+  },
+  {
+   "tag": "eyal2018",
+   "title": "Eyal, T., Steffel, M., & Epley, N. (2018). Perspective mistaking: Accurately understanding the mind of another requires getting perspective, not taking perspective. Journal of Personality and Social Psychology 114(4)",
+   "url": "https://doi.org/10.1037/pspa0000115"
+  },
+  {
+   "tag": "kluger_itzchakov2022",
+   "title": "Kluger, A. N., & Itzchakov, G. (2022). The Power of Listening at Work. Annual Review of Organizational Psychology and Organizational Behavior 9",
+   "url": "https://doi.org/10.1146/annurev-orgpsych-012420-091013"
+  },
+  {
+   "tag": "rosenberg_nvc",
+   "title": "Rosenberg, M. B. Nonviolent Communication: A Language of Life (2nd ed., 2003). PuddleDancer Press"
+  },
+  {
+   "tag": "taras2010",
+   "title": "Taras, V., Kirkman, B. L., & Steel, P. (2010). Examining the impact of Culture's consequences: A three-decade, multilevel, meta-analytic review of Hofstede's cultural value dimensions. Journal of Applied Psychology 95(3)",
+   "url": "https://doi.org/10.1037/a0018938"
+  },
+  {
+   "tag": "henrich2010",
+   "title": "Henrich, J., Heine, S. J., & Norenzayan, A. (2010). The weirdest people in the world? Behavioral and Brain Sciences 33(2-3)",
+   "url": "https://doi.org/10.1017/S0140525X0999152X"
+  },
+  {
+   "tag": "fiorella_mayer2013",
+   "title": "Fiorella, L., & Mayer, R. E. (2013). The relative benefits of learning by teaching and teaching expectancy. Contemporary Educational Psychology 38(4)",
+   "url": "https://doi.org/10.1016/j.cedpsych.2013.06.001"
+  },
+  {
+   "tag": "roscoe_chi2007",
+   "title": "Roscoe, R. D., & Chi, M. T. H. (2007). Understanding Tutor Learning: Knowledge-Building and Knowledge-Telling in Peer Tutors' Explanations and Questions. Review of Educational Research 77(4)",
+   "url": "https://doi.org/10.3102/0034654307309920"
+  },
+  {
+   "tag": "holtlunstad2010",
+   "title": "Holt-Lunstad, J., Smith, T. B., & Layton, J. B. (2010). Social Relationships and Mortality Risk: A Meta-analytic Review. PLoS Medicine 7(7)",
+   "url": "https://doi.org/10.1371/journal.pmed.1000316"
+  },
+  {
+   "tag": "flynn_lake2008",
+   "title": "Flynn, F. J., & Lake, V. K. B. (2008). If you need help, just ask: Underestimating compliance with direct requests for help. Journal of Personality and Social Psychology 95(1)",
+   "url": "https://doi.org/10.1037/0022-3514.95.1.128"
+  },
+  {
+   "tag": "brooks2015",
+   "title": "Brooks, A. W., Gino, F., & Schweitzer, M. E. (2015). Smart People Ask for (My) Advice: Seeking Advice Boosts Perceptions of Competence. Management Science 61(6)",
+   "url": "https://doi.org/10.1287/mnsc.2014.2054"
+  },
+  {
+   "tag": "magee_galinsky2008",
+   "title": "Magee, J. C., & Galinsky, A. D. (2008). Social Hierarchy: The Self-Reinforcing Nature of Power and Status. Academy of Management Annals 2(1)",
+   "url": "https://doi.org/10.5465/19416520802211628"
+  },
+  {
+   "tag": "keltner2003",
+   "title": "Keltner, D., Gruenfeld, D. H., & Anderson, C. (2003). Power, approach, and inhibition. Psychological Review 110(2)",
+   "url": "https://doi.org/10.1037/0033-295X.110.2.265"
+  },
+  {
+   "tag": "isenberg1986",
+   "title": "Isenberg, D. J. (1986). Group polarization: A critical review and meta-analysis. Journal of Personality and Social Psychology 50(6)",
+   "url": "https://doi.org/10.1037/0022-3514.50.6.1141"
+  },
+  {
+   "tag": "sunstein2002",
+   "title": "Sunstein, C. R. (2002). The Law of Group Polarization. Journal of Political Philosophy 10(2)",
+   "url": "https://doi.org/10.1111/1467-9760.00148"
+  },
+  {
+   "tag": "stasser_titus1985",
+   "title": "Stasser, G., & Titus, W. (1985). Pooling of unshared information in group decision making: Biased information sampling during discussion. Journal of Personality and Social Psychology 48(6)",
+   "url": "https://doi.org/10.1037/0022-3514.48.6.1467"
+  },
+  {
+   "tag": "woolley2010",
+   "title": "Woolley, A. W., Chabris, C. F., Pentland, A., Hashmi, N., & Malone, T. W. (2010). Evidence for a Collective Intelligence Factor in the Performance of Human Groups. Science 330",
+   "url": "https://doi.org/10.1126/science.1193147"
+  },
+  {
+   "tag": "vosoughi2018",
+   "title": "Vosoughi, S., Roy, D., & Aral, S. (2018). The spread of true and false news online. Science 359",
+   "url": "https://doi.org/10.1126/science.aap9559"
+  },
+  {
+   "tag": "lewandowsky2012",
+   "title": "Lewandowsky, S., Ecker, U. K. H., Seifert, C. M., Schwarz, N., & Cook, J. (2012). Misinformation and Its Correction: Continued Influence and Successful Debiasing. Psychological Science in the Public Interest 13(3)",
+   "url": "https://doi.org/10.1177/1529100612451018"
+  },
+  {
+   "tag": "pennycook_rand2021",
+   "title": "Pennycook, G., & Rand, D. G. (2021). The Psychology of Fake News. Trends in Cognitive Sciences 25(5)",
+   "url": "https://doi.org/10.1016/j.tics.2021.02.007"
+  }
+ ],
+ "groups": [
+  {
+   "id": "g_s_social_voice",
+   "fa": "صدا، ابراز و ایمنی",
+   "en": "Voice, assertiveness and safety",
+   "areas": [
+    {
+     "id": "sc_assertiveness_voice",
+     "fa": "ابرازگری و گفتنِ مخالفت",
+     "en": "Assertiveness and voicing disagreement",
+     "desc_fa": "این‌که کی و چطور نظرِ مخالف را بگویی (مثلاً وقتی مدیر نظرت را رد می‌کند و ساکت می‌مانی) و هزینه‌وفایدهٔ سکوت در برابرِ صدا.",
+     "key_questions_fa": [
+      "وقتی مدیر نظرم را رد کرد، سکوتم از ترس بود یا از سنجش؟",
+      "چه اطلاعاتی با سکوتِ من از تصمیم حذف شد؟",
+      "چطور مخالفت را بگویم که هم شنیده شود و هم رابطه آسیب نبیند؟"
+     ],
+     "src": [
+      "morrison2014",
+      "frazier2017",
+      "edmondson1999"
+     ],
+     "tools": [
+      "kfam:F8",
+      "kfam:F7",
+      "kfam:F10",
+      "view:kcase",
+      "view:kcases",
+      "view:kpractice"
+     ],
+     "gap_fa": "ابزاری برای ثبتِ «لحظه‌های سکوت» (چه می‌خواستم بگویم، چرا نگفتم، چه شد) و تمرینِ فیلم‌نامهٔ ابرازِ مخالفت نیست؛ گره‌گشا فقط خانوادهٔ F8/F10 را نام می‌برد.",
+     "claims": [
+      {
+       "fa": "کارکنان در محیطِ کار به‌طورِ گسترده نظرها و نگرانی‌هایشان را نمی‌گویند و دلیلِ غالب ترس از پیامدِ منفی و حسِ بی‌فایدگی است، نه نبودنِ ایده.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ سالانهٔ Morrison بر پایهٔ پژوهش‌های پیمایشی و کیفیِ متعدد؛ یافته در نمونه‌های مختلف تکرار شده ولی بیشتر همبستگی و خوداظهاری است.",
+       "src": [
+        "morrison2014"
+       ]
+      },
+      {
+       "fa": "رفتارِ رهبر (گشودگی و واکنش به پیشنهادها) صدای کارکنان را پیش‌بینی می‌کند و این اثر از راهِ «ایمنیِ روانیِ ادراک‌شده» می‌گذرد.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Morrison (۲۰۱۴) بر مطالعاتِ میدانی؛ فراتحلیلِ Frazier و همکاران (۲۰۱۷) رابطهٔ رهبریِ حمایتگر با ایمنیِ روانی را تأیید می‌کند؛ پایه: نمونه‌های سازمانیِ عمدتاً غربی.",
+       "src": [
+        "morrison2014",
+        "frazier2017"
+       ]
+      },
+      {
+       "fa": "اگر اطلاعاتی که فقط من دارم نگفته بماند، تصمیمِ گروه نمی‌تواند به آن مشروط باشد؛ پس احتمالِ این‌که تصمیم آن اطلاعات را لحاظ کرده باشد صفر است.",
+       "kind": "theorem",
+       "basis_fa": "تعریفِ «مشروط‌شدن به قرینه» + A0: تصمیمی که قرینه را دریافت نکرده نمی‌تواند هم آن را لحاظ کرده باشد و هم نکرده باشد؛ هزینهٔ معرفتیِ سکوت از همین‌جا تعریف‌پذیر است.",
+       "src": [
+        "stasser_titus1985"
+       ]
+      },
+      {
+       "fa": "این‌که در یک موقعیتِ مشخص گفتنِ مخالفت «درست» است یا نه، فقط از داده‌ها درنمی‌آید.",
+       "kind": "outside",
+       "basis_fa": "به ارزش‌ها (وفاداری، صداقت، هزینهٔ شخصی) و اطلاعاتِ محلی وابسته است؛ علم فقط هزینه‌ها و احتمال‌ها را روشن می‌کند، داوری هنجاری بیرون از این دستگاه است.",
+       "src": [
+        "morrison2014"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_psych_safety",
+     "fa": "ایمنیِ روانی در تیم",
+     "en": "Psychological safety in teams",
+     "desc_fa": "باورِ مشترکِ اعضای تیم که خطرکردنِ میان‌فردی (پرسیدن، اعترافِ خطا، مخالفت) تنبیه نمی‌شود، و اثرش بر یادگیری و عملکرد.",
+     "key_questions_fa": [
+      "در تیمم آیا می‌شود اشتباه را گفت؟ از کجا می‌دانم؟",
+      "کدام رفتارِ من ایمنیِ دیگران را بالا یا پایین می‌برد؟",
+      "ایمنیِ روانی با استانداردِ پایین چه فرقی دارد؟"
+     ],
+     "src": [
+      "edmondson1999",
+      "frazier2017"
+     ],
+     "tools": [
+      "kfam:F10",
+      "kfam:F7"
+     ],
+     "gap_fa": "سطحِ تیم در اپ مدل نشده: نه سنجهٔ ایمنیِ روانی (مثلاً هفت گویهٔ Edmondson) و نه ثبتِ رفتارهای تیمی؛ همه‌چیز فردی است.",
+     "claims": [
+      {
+       "fa": "ایمنیِ روانیِ تیم رفتارِ یادگیری (پرسیدن، گزارشِ خطا، طلبِ بازخورد) را پیش‌بینی می‌کند و از این راه با عملکرد مرتبط است.",
+       "kind": "empirical",
+       "basis_fa": "Edmondson (۱۹۹۹)، ۵۱ تیمِ یک کارخانه؛ فراتحلیلِ Frazier و همکاران (۲۰۱۷، بیش از ۱۳۶ مطالعه) رابطه با عملکرد، تعهد و یادگیری را تأیید کرد؛ عمدتاً همبستگی و مقطعی.",
+       "src": [
+        "edmondson1999",
+        "frazier2017"
+       ]
+      },
+      {
+       "fa": "ایمنیِ روانی سازه‌ای در سطحِ گروه است و اعضای یک تیم دربارهٔ آن به هم‌گرایی نسبی می‌رسند.",
+       "kind": "empirical",
+       "basis_fa": "توافقِ درون‌گروهی در داده‌های Edmondson (۱۹۹۹) و تحلیل‌های سطحِ تیم در فراتحلیلِ Frazier؛ پایه: تیم‌های سازمانی.",
+       "src": [
+        "edmondson1999",
+        "frazier2017"
+       ]
+      },
+      {
+       "fa": "ایمنیِ روانی به معنای کاهشِ استانداردِ عملکرد نیست؛ بالاترین یادگیری وقتی است که هم ایمنی بالا باشد و هم پاسخ‌گویی.",
+       "kind": "outside",
+       "basis_fa": "چارچوبِ دوبعدیِ Edmondson مفهومی است و آزمونِ مستقیمِ اثرِ تعاملیِ ایمنی و پاسخ‌گویی محدود است؛ شواهد قانع‌کننده ولی ناقص.",
+       "src": [
+        "edmondson1999"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_social_anxiety",
+     "fa": "اضطرابِ اجتماعی و ترس از ارزیابی",
+     "en": "Social anxiety and evaluation fear",
+     "desc_fa": "ترس از قضاوت‌شدن که ابراز، پرسیدن و دیده‌شدن را مهار می‌کند؛ از نگرانیِ عادی تا اختلالِ اضطرابِ اجتماعی.",
+     "key_questions_fa": [
+      "چقدر فکر می‌کنم دیگران متوجهِ اضطراب یا خطایم می‌شوند و این برآورد چقدر درست است؟",
+      "کدام رفتارِ ایمنی‌جویانه ترسم را نگه می‌دارد؟",
+      "کی نیاز به ارجاع به متخصص است؟"
+     ],
+     "src": [
+      "gilovich2000",
+      "gilovich1998",
+      "mayowilson2014"
+     ],
+     "tools": [
+      "kfam:F7",
+      "kfam:F5",
+      "tech:21",
+      "view:kcase"
+     ],
+     "gap_fa": "پلکانِ مواجهه و «آزمایشِ رفتاری» (پیش‌بینیِ ثبت‌شده در برابرِ نتیجه) برای ترسِ ارزیابی وجود ندارد؛ مسیرِ ارجاع برای موارد شدید هم تعریف نشده.",
+     "claims": [
+      {
+       "fa": "مردم برجستگیِ ظاهر و خطاهای خودشان را در چشمِ دیگران بیش از واقع برآورد می‌کنند (اثرِ نورافکن).",
+       "kind": "empirical",
+       "basis_fa": "Gilovich و همکاران (۲۰۰۰)، چند آزمایش؛ پدیدهٔ تکرارشده ولی اندازهٔ اثر در موقعیت‌ها متغیر است.",
+       "src": [
+        "gilovich2000"
+       ]
+      },
+      {
+       "fa": "مردم برآورد می‌کنند حالتِ درونی‌شان (اضطراب، دروغ) برای دیگران بیش از واقع پیداست (توهمِ شفافیت).",
+       "kind": "empirical",
+       "basis_fa": "Gilovich و همکاران (۱۹۹۸)، آزمایش‌های کنترل‌شده؛ در پژوهش‌های بعدی دربارهٔ سخنرانی هم دیده شده.",
+       "src": [
+        "gilovich1998"
+       ]
+      },
+      {
+       "fa": "برای اختلالِ اضطرابِ اجتماعی در بزرگسالان، درمانِ شناختی‌ـ‌رفتاریِ فردی از مؤثرترین مداخله‌های روانی است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ شبکه‌ای Mayo-Wilson و همکاران (۲۰۱۴)، بیش از ۱۰۰ کارآزماییِ تصادفی؛ پایه: نمونه‌های بالینی.",
+       "src": [
+        "mayowilson2014"
+       ]
+      },
+      {
+       "fa": "یک تجربهٔ تحقیرآمیز به‌تنهایی نشان نمی‌دهد «همه مرا قضاوت می‌کنند»؛ حکمِ کلی از استقراءِ ناقص بر دامنهٔ باز به صفر نزدیک است.",
+       "kind": "theorem",
+       "basis_fa": "قضیهٔ T_universal (بر پایهٔ A3): حکمِ کلی از تعدادِ محدود مورد بر دامنهٔ نامحدود احتمالی نزدیک به صفر دارد؛ همان گرهِ F11 onecase.",
+       "src": []
+      }
+     ]
+    },
+    {
+     "id": "sc_power_status",
+     "fa": "قدرت و منزلت",
+     "en": "Power and status dynamics",
+     "desc_fa": "این‌که قدرت (کنترلِ منابع) و منزلت (احترامِ دیگران) چطور گفت‌وگو، شنیدن و صدا را شکل می‌دهند.",
+     "key_questions_fa": [
+      "در این گفت‌وگو چه کسی قدرت یا منزلتِ بیشتری دارد و این چه چیزی را ناگفته نگه می‌دارد؟",
+      "اطمینانِ گوینده را با شایستگی‌اش اشتباه گرفته‌ام؟",
+      "وقتی خودم بالادستم، چطور صدای پایین‌دست را باز کنم؟"
+     ],
+     "src": [
+      "magee_galinsky2008",
+      "keltner2003"
+     ],
+     "tools": [
+      "kfam:F10",
+      "kfam:F8"
+     ],
+     "gap_fa": "نقشه‌ای از روابطِ قدرت در گفت‌وگوهای واقعیِ کاربر نیست؛ گرهِ status فقط برچسب است و تمرینِ جبرانی ندارد.",
+     "claims": [
+      {
+       "fa": "قدرت با گرایشِ رویکردی (اقدام، بیانِ نظر) و کاهشِ بازداری همراه است، و بی‌قدرتی با بازداری و حساسیت به تهدید.",
+       "kind": "empirical",
+       "basis_fa": "نظریهٔ Keltner و همکاران (۲۰۰۳) با شواهدِ آزمایشی و همبستگی؛ برخی اثرهای «القای قدرت» (مثل ژستِ قدرت) در تکرار ضعیف شده‌اند.",
+       "src": [
+        "keltner2003"
+       ]
+      },
+      {
+       "fa": "سلسله‌مراتبِ اجتماعی خودتقویت‌گر است: قدرت و منزلت منابع و فرصت‌هایی می‌آورند که موقعیت را حفظ می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Magee & Galinsky (۲۰۰۸) بر پایهٔ پژوهش‌های سازمانی و آزمایشگاهی؛ عمدتاً ترکیبِ شواهد، نه یک فراتحلیل.",
+       "src": [
+        "magee_galinsky2008"
+       ]
+      },
+      {
+       "fa": "اگر اطمینان و قاطعیتِ گوینده را بدونِ وارسی به‌جای شایستگی بگیرم، حکمم دربارهٔ درستیِ حرفش به قرینه‌ای وابسته است که با درستی فقط همبستگیِ ضعیف دارد.",
+       "kind": "outside",
+       "basis_fa": "میزانِ همبستگیِ اطمینان و درستی بسته به حوزه فرق دارد و این‌جا اندازه‌گیری نشده؛ گزاره به‌صورتِ کلی قابلِ داوری نیست.",
+       "src": [
+        "pornpitakpan2004"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_social_understanding",
+   "fa": "فهمِ دیگری و رساندنِ منظور",
+   "en": "Understanding others and being understood",
+   "areas": [
+    {
+     "id": "sc_listening_empathy",
+     "fa": "گوش‌دادنِ فعال و همدلی",
+     "en": "Active listening and empathy",
+     "desc_fa": "شنیدنِ واقعیِ دیگری (توجه، فهم، بازتاب) و همدلی؛ و مرزِ میانِ «حدس‌زدنِ ذهنِ دیگری» و «پرسیدن از او».",
+     "key_questions_fa": [
+      "آیا منظورِ او را با کلماتِ خودم بازگفتم و تأیید گرفتم؟",
+      "حدسم از احساس یا نیتش را پرسیدم یا فرض کردم؟",
+      "وقتی گوش می‌دهم، در حالِ آماده‌کردنِ جوابم هستم؟"
+     ],
+     "src": [
+      "kluger_itzchakov2022",
+      "eyal2018"
+     ],
+     "tools": [
+      "tech:13",
+      "tech:20",
+      "station:st_herm"
+     ],
+     "gap_fa": "تمرینِ «بازگوییِ تأییدشده» و سنجشِ کیفیتِ شنیدن (مثلاً ثبتِ این‌که برداشتم را طرف تأیید کرد یا نه) در اپ نیست؛ ایستگاهِ فهمِ متن و گوینده به متن می‌پردازد نه گفت‌وگوی زنده.",
+     "claims": [
+      {
+       "fa": "شنیده‌شدنِ باکیفیت در محیطِ کار با پیامدهای مثبت مانند کاهشِ دفاعی‌بودن، اندیشیدنِ پیچیده‌تر و رابطهٔ بهتر همراه است.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Kluger & Itzchakov (۲۰۲۲) شاملِ آزمایش‌ها و فراتحلیل‌های اولیه؛ بخشی از شواهد آزمایشگاهی و کوتاه‌مدت است.",
+       "src": [
+        "kluger_itzchakov2022"
+       ]
+      },
+      {
+       "fa": "«دیدگاه‌گیری» (تصورِ خود به‌جای دیگری) دقتِ فهمِ ذهنِ دیگری را بالا نمی‌برد، ولی «دیدگاه‌گرفتن» (پرسیدن و شنیدن از خودش) می‌برد.",
+       "kind": "empirical",
+       "basis_fa": "Eyal، Steffel و Epley (۲۰۱۸)، ۲۵ آزمایش؛ پایه: نمونه‌های آمریکایی و آزمون‌های قضاوتِ میان‌فردی.",
+       "src": [
+        "eyal2018"
+       ]
+      },
+      {
+       "fa": "برداشتِ من از منظورِ گوینده، تا وقتی با خودِ او وارسی نشده و قرینهٔ دیگری هم جهتش را معلوم نکرده، برای هر یک از دو تعبیرِ ممکن حداکثر ½ است.",
+       "kind": "theorem",
+       "basis_fa": "قضیهٔ T_ambig / T_unknown (از A4 و A2): لفظِ چندمعنا بی‌قرینه هیچ تعبیری را بر دیگری مرجح نمی‌کند؛ پرسیدن همان افزودنِ قرینه است.",
+       "src": []
+      }
+     ]
+    },
+    {
+     "id": "sc_clear_communication",
+     "fa": "ارتباطِ روشن و بدونِ خشونت",
+     "en": "Clear and nonviolent communication",
+     "desc_fa": "گفتنِ مشاهده، احساس، نیاز و درخواست به‌روشنی؛ و غلبه بر نفرینِ دانش و توهمِ شفافیت هنگامِ رساندنِ منظور.",
+     "key_questions_fa": [
+      "آیا مشاهده را از داوری جدا گفتم؟",
+      "مخاطب برای فهمِ حرفم چه چیزی را باید از قبل بداند که شاید نداند؟",
+      "درخواستم مشخص و قابلِ اجراست یا مبهم؟"
+     ],
+     "src": [
+      "camerer1989",
+      "gilovich1998",
+      "rosenberg_nvc"
+     ],
+     "tools": [
+      "kfam:F8",
+      "tech:28",
+      "tech:5",
+      "tech:14"
+     ],
+     "gap_fa": "قالبِ «پیش‌نویسِ پیام» با وارسیِ مشاهده/داوری و آزمونِ نفرینِ دانش (بازگفتنِ پیام از زبانِ مخاطب) وجود ندارد.",
+     "claims": [
+      {
+       "fa": "کسی که اطلاعاتی را دارد نمی‌تواند به‌خوبی تصور کند کسی که آن را ندارد چه می‌فهمد (نفرینِ دانش).",
+       "kind": "empirical",
+       "basis_fa": "Camerer، Loewenstein و Weber (۱۹۸۹)، آزمایش‌های بازار با پاداشِ واقعی؛ در حوزه‌های دیگر (ارتباط، آموزش) تکرار شده است.",
+       "src": [
+        "camerer1989"
+       ]
+      },
+      {
+       "fa": "گوینده برآورد می‌کند مخاطب منظور و حالِ درونی‌اش را بهتر از واقع درمی‌یابد.",
+       "kind": "empirical",
+       "basis_fa": "Gilovich و همکاران (۱۹۹۸)؛ هم‌خانواده با نفرینِ دانش و گرهِ F8 transp.",
+       "src": [
+        "gilovich1998"
+       ]
+      },
+      {
+       "fa": "روشِ «ارتباطِ بدونِ خشونت» (Rosenberg) تعارض را در عمل کاهش می‌دهد.",
+       "kind": "outside",
+       "basis_fa": "چارچوبِ پرکاربرد است ولی کارآزماییِ کنترل‌شدهٔ باکیفیت و تکرارشده برای اثرش کم است؛ اجزایش (تفکیکِ مشاهده از داوری، درخواستِ مشخص) با یافته‌های دیگر هم‌خوانند ولی خودِ بسته آزموده نشده.",
+       "src": [
+        "rosenberg_nvc"
+       ]
+      },
+      {
+       "fa": "پیامی که فهمش به چند پیش‌فرضِ مستقلِ ناگفته نیاز دارد، احتمالِ درست‌فهمیده‌شدنش از احتمالِ برقراریِ هر یک از آن پیش‌فرض‌ها بیشتر نیست.",
+       "kind": "theorem",
+       "basis_fa": "A1 و A3 (قضیهٔ T_product): فهمِ درست مستلزمِ برقراریِ همهٔ پیش‌فرض‌هاست؛ کل از جزء محتمل‌تر نیست و برای شرط‌های مستقل حاصل‌ضرب است.",
+       "src": []
+      }
+     ]
+    },
+    {
+     "id": "sc_cross_cultural",
+     "fa": "ارتباطِ میان‌فرهنگی",
+     "en": "Cross-cultural communication",
+     "desc_fa": "تفاوت‌های فرهنگی در صراحت، آبرو، فاصلهٔ قدرت و فردگرایی، و این‌که چقدر می‌شود یافته‌های غربی را به بافتِ دیگر (از جمله ایران) برد.",
+     "key_questions_fa": [
+      "این برداشت از رفتارِ او از فرهنگِ من می‌آید یا از خودِ رفتار؟",
+      "در این بافت «نه»، مخالفت و انتقاد چطور گفته می‌شود؟",
+      "یافته‌ای که می‌خوانم روی چه نمونه‌ای به دست آمده؟"
+     ],
+     "src": [
+      "taras2010",
+      "henrich2010",
+      "bond_smith1996"
+     ],
+     "tools": [
+      "kfam:F10",
+      "station:st_herm",
+      "tech:20"
+     ],
+     "gap_fa": "برچسبِ «نمونهٔ پایه» (غربی/ایرانی) روی ادعاهای تجربیِ اپ نیست، پس تعمیم‌پذیری به بافتِ کاربر سنجیده نمی‌شود؛ هیچ تمرینِ میان‌فرهنگی هم وجود ندارد.",
+     "claims": [
+      {
+       "fa": "بیشترِ یافته‌های روان‌شناسیِ رفتاری از نمونه‌های «غربی، تحصیل‌کرده، صنعتی، ثروتمند، دموکراتیک» آمده و این نمونه‌ها در بسیاری سنجه‌ها غیرمعمول‌اند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Henrich و همکاران (۲۰۱۰) با مقایسهٔ میان‌فرهنگیِ ده‌ها حوزه؛ مرجعِ پایه برای «نرخ پایه‌ای که ادعا بر آن تکیه دارد».",
+       "src": [
+        "henrich2010"
+       ]
+      },
+      {
+       "fa": "ابعادِ فرهنگیِ Hofstede با پیامدهای سازمانی و فردی رابطه دارند ولی در سطحِ فرد قدرتِ پیش‌بینیِ آن‌ها کم است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Taras و همکاران (۲۰۱۰)، حدودِ ۶۰۰ مطالعه؛ اثرها در سطحِ گروه/کشور قوی‌ترند تا فرد.",
+       "src": [
+        "taras2010"
+       ]
+      },
+      {
+       "fa": "هم‌نوایی در فرهنگ‌های جمع‌گرا بیشتر از فرهنگ‌های فردگراست.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Bond & Smith (۱۹۹۶)، ۱۳۳ مطالعهٔ آزمونِ خطِ Asch در ۱۷ کشور.",
+       "src": [
+        "bond_smith1996"
+       ]
+      },
+      {
+       "fa": "این‌که ابعادِ فرهنگیِ ملی برای توصیفِ یک فرد مشخص معتبر باشد.",
+       "kind": "outside",
+       "basis_fa": "کلیشه‌سازی از میانگینِ کشور به فرد (خطای سطحِ تحلیل) پذیرفتنی نیست و اعتبارِ خودِ ابعاد هم محلِ بحث است.",
+       "src": [
+        "taras2010"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_social_argument",
+   "fa": "استدلال و گفت‌وگوی معرفتی",
+   "en": "Argumentation and epistemic dialogue",
+   "areas": [
+    {
+     "id": "sc_argumentation",
+     "fa": "استدلال در گفت‌وگو",
+     "en": "Argumentation in dialogue",
+     "desc_fa": "ساختنِ استدلالِ خوب، سنجیدنِ استدلالِ دیگری، و این‌که استدلال‌کردن در جمع با استدلال‌کردنِ تنها چه فرقی دارد.",
+     "key_questions_fa": [
+      "مقدماتِ استدلالم کدام‌اند و کدام ناگفته مانده؟",
+      "اگر یک مقدمه بیفتد، نتیجه چه می‌شود؟",
+      "این مغالطه است یا فقط استدلالِ ضعیف؟"
+     ],
+     "src": [
+      "mercier_sperber2011",
+      "sep_informal"
+     ],
+     "tools": [
+      "station:st_aql",
+      "station:st_grade",
+      "station:st_conflict",
+      "tech:13",
+      "tech:15",
+      "move:mv_assume",
+      "view:e_case"
+     ],
+     "gap_fa": "ایستگاه‌ها یک ادعا را تک‌نفره می‌سنجند؛ قالبی برای گفت‌وگوی دوطرفه (ثبتِ استدلالِ من، استدلالِ طرف، نقطهٔ اختلاف) وجود ندارد.",
+     "claims": [
+      {
+       "fa": "مردم در تولیدِ استدلال برای نظرِ خودشان سوگیری دارند ولی در ارزیابیِ استدلالِ دیگران نسبتاً خوب‌اند؛ پس استدلال در گفت‌وگو بهتر از تنهایی کار می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "نظریهٔ استدلالیِ Mercier & Sperber (۲۰۱۱) با جمع‌بندیِ شواهد؛ از جمله شواهدی که حلِ گروهیِ مسئلهٔ انتخابِ Wason را بسیار بهتر از حلِ فردی نشان می‌دهند.",
+       "src": [
+        "mercier_sperber2011"
+       ]
+      },
+      {
+       "fa": "نتیجهٔ استدلالی که چند مقدمهٔ لازم دارد، از ضعیف‌ترین مقدمه‌اش محتمل‌تر نیست.",
+       "kind": "theorem",
+       "basis_fa": "قضیهٔ T_weakest از A1: نتیجه (از راهِ همین استدلال) مستلزمِ برقراریِ هر مقدمه است، پس احتمالش از احتمالِ هر مقدمه بیشتر نیست.",
+       "src": []
+      },
+      {
+       "fa": "رد کردنِ یک استدلال برای نتیجه، نتیجه را رد نمی‌کند.",
+       "kind": "theorem",
+       "basis_fa": "A0 و تعریفِ استلزام: نادرستیِ یک مقدمه فقط نشان می‌دهد آن راه نتیجه را ثابت نمی‌کند؛ نتیجه ممکن است از راهِ دیگری صادق باشد (پرهیز از «مغالطهٔ مغالطه»).",
+       "src": [
+        "sep_informal"
+       ]
+      },
+      {
+       "fa": "فهرستِ کلاسیکِ مغالطه‌ها معیارِ کافی برای تشخیصِ استدلالِ بد در گفت‌وگوی واقعی است.",
+       "kind": "outside",
+       "basis_fa": "در منطقِ غیرصوری بحث است که بسیاری «مغالطه‌ها» در بافت‌هایی استدلالِ موجهِ احتمالی‌اند (مثلاً استناد به متخصص)؛ داوری به بافت وابسته است.",
+       "src": [
+        "sep_informal"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_steelman_disagreement",
+     "fa": "قوی‌سازیِ دیدگاهِ مخالف و اختلافِ نظرِ سازنده",
+     "en": "Steelmanning and productive disagreement",
+     "desc_fa": "بازسازیِ قوی‌ترین شکلِ دیدگاهِ مخالف پیش از نقد، جدا کردنِ اختلافِ واقعی از اختلافِ لفظی، و مخالفتِ صادقانه در برابرِ وکیلِ مدافعِ شیطان.",
+     "key_questions_fa": [
+      "قوی‌ترین نسخهٔ حرفِ او چیست، طوری که خودش بپذیرد؟",
+      "اختلافمان در واقعیت است، در ارزش، یا در معنای کلمه؟",
+      "چه شاهدی نظرم را عوض می‌کند؟"
+     ],
+     "src": [
+      "nemeth2001",
+      "sep_social_epi",
+      "mercier_sperber2011"
+     ],
+     "tools": [
+      "tech:20",
+      "tech:22",
+      "tech:25",
+      "tech:34",
+      "station:st_conflict",
+      "move:mv_assume"
+     ],
+     "gap_fa": "تمرینِ «بازگوییِ دیدگاهِ مخالف تا تأییدِ خودِ او» و ثبتِ «شاهدی که نظرم را عوض می‌کند» برای اختلاف‌های شخصی وجود ندارد.",
+     "claims": [
+      {
+       "fa": "ابطالِ نسخهٔ ضعیف‌شده‌ای که نسخهٔ قوی مستلزمِ آن نیست، احتمالِ نسخهٔ قوی را کم نمی‌کند.",
+       "kind": "theorem",
+       "basis_fa": "A1 و A0: نقیضِ W فقط گزاره‌هایی را رد می‌کند که مستلزمِ W باشند؛ اگر S مستلزمِ W نیست، رد کردنِ W دربارهٔ S چیزی نمی‌گوید (همان T_null).",
+       "src": []
+      },
+      {
+       "fa": "مخالفتِ اصیل (کسی که واقعاً مخالف است) بیشتر از «وکیلِ مدافعِ شیطان»ِ نقشی، اندیشهٔ واگرا و راه‌حل‌های باکیفیت‌تر تولید می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "Nemeth و همکاران (۲۰۰۱)، آزمایشِ گروهی؛ تکرارِ مستقیم محدود.",
+       "src": [
+        "nemeth2001"
+       ]
+      },
+      {
+       "fa": "وقتی دو نفرِ هم‌سطح با قرینهٔ یکسان اختلاف دارند، هر دو باید اطمینانشان را کم کنند.",
+       "kind": "outside",
+       "basis_fa": "مسئلهٔ «اختلافِ همتایان» در معرفت‌شناسیِ اجتماعی محلِ مناقشه است (دیدگاهِ وزنِ برابر در برابرِ دیدگاهِ پافشاری)؛ این‌جا داوری نمی‌شود — پیوند به g_social در قلمروِ معرفت‌شناسی.",
+       "src": [
+        "sep_social_epi"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_explaining_teaching",
+     "fa": "توضیح‌دادن و یادگیری با آموزش",
+     "en": "Explaining and learning by teaching",
+     "desc_fa": "آموزش‌دادن و توضیح‌دادن به دیگری به‌عنوانِ راهِ عمیق‌ترشدنِ فهمِ خود، و مهارتِ توضیحِ قابلِ‌فهم برای مخاطب.",
+     "key_questions_fa": [
+      "اگر این را به یک تازه‌کار توضیح دهم کجا گیر می‌کنم؟",
+      "توضیحم دانش‌سازی است یا فقط بازگوییِ متن؟",
+      "پرسشِ مخاطب چه شکافی را در فهمم نشان داد؟"
+     ],
+     "src": [
+      "fiorella_mayer2013",
+      "roscoe_chi2007",
+      "camerer1989"
+     ],
+     "tools": [
+      "tech:28",
+      "tech:29",
+      "tech:45",
+      "tech:40",
+      "kfam:F8",
+      "proto:P11"
+     ],
+     "gap_fa": "",
+     "claims": [
+      {
+       "fa": "آماده‌شدن برای آموزش کمی یادگیری را بهتر می‌کند ولی خودِ آموزش‌دادن (توضیحِ واقعی) سودِ پایدارتری دارد.",
+       "kind": "empirical",
+       "basis_fa": "Fiorella & Mayer (۲۰۱۳)، دو آزمایش با آزمونِ تأخیری؛ اندازهٔ اثر متوسط؛ نمونهٔ دانشجویی.",
+       "src": [
+        "fiorella_mayer2013"
+       ]
+      },
+      {
+       "fa": "سودِ یادگیریِ مدرس وقتی است که توضیح «دانش‌ساز» باشد (استنتاج، ربط‌دادن، پاسخ به پرسشِ عمیق) نه «دانش‌گو» (بازخوانیِ مطلب).",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Roscoe & Chi (۲۰۰۷) بر پژوهش‌های تدریسِ همتا؛ شواهدِ ترکیبیِ همبستگی و آزمایشی.",
+       "src": [
+        "roscoe_chi2007"
+       ]
+      },
+      {
+       "fa": "کارشناس معمولاً دشواریِ مطلب برای تازه‌کار را دست‌کم می‌گیرد؛ پس توضیحِ خوب نیازمندِ وارسی با خودِ مخاطب است.",
+       "kind": "empirical",
+       "basis_fa": "نفرینِ دانش (Camerer و همکاران ۱۹۸۹) و یافته‌های بعدی در آموزش.",
+       "src": [
+        "camerer1989"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_social_influence",
+   "fa": "نفوذ، اعتماد و جریانِ اطلاعات",
+   "en": "Influence, trust and information flow",
+   "areas": [
+    {
+     "id": "sc_persuasion",
+     "fa": "اقناع و نفوذ",
+     "en": "Persuasion and influence",
+     "desc_fa": "سازوکارهای اقناع (مسیرِ مرکزی و پیرامونی، اصولِ نفوذ) هم برای اقناعِ درستِ دیگران و هم برای ایمن‌ماندن از اقناعِ نادرست.",
+     "key_questions_fa": [
+      "قانع شدم به‌خاطرِ کیفیتِ استدلال یا نشانه‌های پیرامونی (اعتبار، تکرار، جمع)؟",
+      "مخاطبم چقدر انگیزه و توان برای پردازشِ استدلال دارد؟",
+      "کدام اصلِ نفوذ این‌جا دارد روی من کار می‌کند؟"
+     ],
+     "src": [
+      "petty_cacioppo1986",
+      "cialdini_goldstein2004",
+      "kalla_broockman2020"
+     ],
+     "tools": [
+      "kfam:F8",
+      "kfam:F10",
+      "station:st_resp",
+      "tech:10"
+     ],
+     "gap_fa": "وارسی‌گرِ «چرا قانع شدم؟» (استدلال یا نشانهٔ پیرامونی) روی تصمیم‌ها و پرونده‌ها نیست؛ ایستگاه‌ها به‌صراحت تکنیک‌های نفوذ را برچسب نمی‌زنند.",
+     "claims": [
+      {
+       "fa": "وقتی انگیزه و توانِ پردازش بالاست، کیفیتِ استدلال تعیین‌کنندهٔ تغییرِ نگرش است؛ وقتی پایین است، نشانه‌های پیرامونی مثلِ جذابیت و اعتبارِ منبع.",
+       "kind": "empirical",
+       "basis_fa": "مدلِ احتمالِ پردازش (Petty & Cacioppo ۱۹۸۶) با ده‌ها آزمایش؛ پرکاربرد ولی منتقدان بر آزمون‌ناپذیریِ بخش‌هایی از آن تأکید دارند.",
+       "src": [
+        "petty_cacioppo1986"
+       ]
+      },
+      {
+       "fa": "هنجارهای اجتماعی، تعهد و هم‌سانی، و علاقه، پیروی از درخواست را افزایش می‌دهند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Annual Review از Cialdini & Goldstein (۲۰۰۴)؛ شواهدِ آزمایشیِ میدانی و آزمایشگاهی؛ برخی اثرها (مانند پاگذاشتن در در) در فراتحلیل‌ها کوچک‌اند.",
+       "src": [
+        "cialdini_goldstein2004"
+       ]
+      },
+      {
+       "fa": "گفت‌وگوی رودررو و غیرقضاوتی با تبادلِ روایت می‌تواند نگرش‌های طردکننده را به‌طورِ پایدار (ماه‌ها) کاهش دهد.",
+       "kind": "empirical",
+       "basis_fa": "Kalla & Broockman (۲۰۲۰)، سه آزمایشِ میدانیِ تصادفی و پیش‌ثبت‌شده؛ اثر معنادار ولی کوچک؛ پایه: آمریکا.",
+       "src": [
+        "kalla_broockman2020"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_credibility_trust",
+     "fa": "اعتماد و اعتبار",
+     "en": "Trust and credibility",
+     "desc_fa": "این‌که اعتماد چگونه ساخته، سنجیده و از دست می‌رود و اعتبارِ منبع چه وزنی در پذیرشِ حرف دارد.",
+     "key_questions_fa": [
+      "به او در کدام حوزه اعتماد دارم: توانایی، خیرخواهی یا درستکاری؟",
+      "اعتبارِ او در این موضوعِ خاص از کجا می‌آید؟",
+      "زنجیرهٔ نقلِ این خبر تا منبعِ اصلی چند حلقه است؟"
+     ],
+     "src": [
+      "mayer1995",
+      "pornpitakpan2004"
+     ],
+     "tools": [
+      "station:st_expert",
+      "station:st_naql",
+      "station:st_grade",
+      "kfam:F8"
+     ],
+     "gap_fa": "سرمایهٔ اعتمادِ افراد (چه کسی در کدام حوزه حرفش درست درآمد) ثبت و کالیبره نمی‌شود؛ ایستگاهِ استناد به تخصص وزن را تک‌موردی می‌دهد، بدونِ کارنامه.",
+     "claims": [
+      {
+       "fa": "اعتماد به دیگری به سه برداشت تجزیه می‌شود: توانایی، خیرخواهی و درستکاری.",
+       "kind": "outside",
+       "basis_fa": "مدلِ Mayer و همکاران (۱۹۹۵) چارچوبی مفهومی است (تعریف)، نه ادعای تجربیِ ابطال‌پذیر؛ سودمندیِ آن تجربی است ولی خودِ تقسیم قرارداد است.",
+       "src": [
+        "mayer1995"
+       ]
+      },
+      {
+       "fa": "منبعِ معتبرتر معمولاً اقناع‌کننده‌تر است، ولی این اثر بسته به درگیریِ مخاطب و زمان تغییر می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ پنج دهه شواهد توسطِ Pornpitakpan (۲۰۰۴)؛ ناهمگونیِ زیاد میان مطالعات.",
+       "src": [
+        "pornpitakpan2004"
+       ]
+      },
+      {
+       "fa": "اعتبارِ خبری که از چند واسطه گذشته از اعتبارِ ضعیف‌ترین واسطه بیشتر نیست.",
+       "kind": "theorem",
+       "basis_fa": "قضیهٔ T_weakest (از A1): صدقِ خبر از راهِ این زنجیره مستلزمِ درستیِ همهٔ حلقه‌هاست؛ برای واسطه‌های مستقل حاصل‌ضرب (T_product، A3).",
+       "src": []
+      }
+     ]
+    },
+    {
+     "id": "sc_online_discourse",
+     "fa": "گفت‌وگوی برخط و انتشارِ اطلاعاتِ نادرست",
+     "en": "Online discourse and misinformation spread",
+     "desc_fa": "پویاییِ اجتماعیِ انتشارِ شایعه و خبرِ نادرست در شبکه‌ها و گفت‌وگوی برخط؛ سنجشِ معرفتیِ خودِ ادعا به قلمروِ معرفت‌شناسی (g_applied، g_social) سپرده می‌شود.",
+     "key_questions_fa": [
+      "چرا این را می‌خواهم بازنشر کنم: درستی یا جذابیت؟",
+      "تعدادِ بازنشرها قرینهٔ مستقل است یا تکرارِ یک منبع؟",
+      "اگر اشتباه کردم، اصلاحیه را چطور منتشر کنم؟"
+     ],
+     "src": [
+      "vosoughi2018",
+      "pennycook_rand2021",
+      "lewandowsky2012"
+     ],
+     "tools": [
+      "proto:P1",
+      "tech:10",
+      "station:st_naql",
+      "station:st_expert",
+      "view:e_home",
+      "view:e_lib"
+     ],
+     "gap_fa": "سنجش پس از برخورد است؛ ابزاری برای مکثِ پیش از بازنشر («درستی‌اش را سنجیدم؟») و تمرینِ پیش‌مایه‌کوبی (شناختِ تکنیک‌های فریب) در اپ نیست.",
+     "claims": [
+      {
+       "fa": "در توییتر خبرهای نادرست دورتر، سریع‌تر و گسترده‌تر از خبرهای درست پخش شدند و انسان‌ها، نه ربات‌ها، عاملِ اصلیِ این تفاوت بودند.",
+       "kind": "empirical",
+       "basis_fa": "Vosoughi، Roy و Aral (۲۰۱۸)، حدود ۱۲۶ هزار آبشارِ خبری ۲۰۰۶–۲۰۱۷؛ پایه: یک سکو و خبرهای راستی‌آزمایی‌شده.",
+       "src": [
+        "vosoughi2018"
+       ]
+      },
+      {
+       "fa": "بخشِ بزرگی از بازنشرِ خبرِ نادرست از بی‌توجهی به درستی است، نه از باورِ حزبی؛ یادآوریِ ساده‌ی «درستی» کیفیتِ بازنشر را بهتر می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Pennycook & Rand (۲۰۲۱) با چند آزمایش و یک آزمایشِ میدانی؛ اندازهٔ اثر کوچک و بحث بر سرِ تعمیم.",
+       "src": [
+        "pennycook_rand2021"
+       ]
+      },
+      {
+       "fa": "اطلاعاتِ نادرست پس از اصلاح هم تا حدی بر استدلال اثر می‌گذارد (اثرِ نفوذِ ادامه‌دار)؛ اصلاح با توضیحِ جایگزین مؤثرتر است.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ PSPI از Lewandowsky و همکاران (۲۰۱۲)؛ آزمایش‌های تکرارشده.",
+       "src": [
+        "lewandowsky2012"
+       ]
+      },
+      {
+       "fa": "تعدادِ بازنشرهای یک خبر، اگر همه از یک منبع آمده باشند، قرینه‌ای بیش از همان منبع نیست.",
+       "kind": "theorem",
+       "basis_fa": "T_tawatur فقط برای گزارش‌های مستقل است؛ اگر همه به یک منبع مشروط‌اند، احتمالِ صدق به شرطِ منبع با افزودنِ رونوشت‌ها تغییر نمی‌کند (A3، T_null).",
+       "src": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_social_group",
+   "fa": "گروه به‌عنوانِ ذهن",
+   "en": "The group as a mind",
+   "areas": [
+    {
+     "id": "sc_conformity",
+     "fa": "هم‌نوایی و گواهِ اجتماعی",
+     "en": "Conformity and social proof",
+     "desc_fa": "تمایل به هم‌رنگ‌شدن با جمع در داوری و رفتار، و تفکیکِ هم‌نواییِ اطلاعاتی (جمع احتمالاً می‌داند) از هنجاری (ترس از طرد).",
+     "key_questions_fa": [
+      "نظرم را عوض کردم چون قرینه دیدم یا چون تنها بودم؟",
+      "این جمع چقدر مستقل به این نظر رسیده‌اند؟",
+      "اگر تنها مخالف باشم چه هزینه‌ای دارد؟"
+     ],
+     "src": [
+      "bond_smith1996",
+      "cialdini_goldstein2004",
+      "sep_social_epi"
+     ],
+     "tools": [
+      "station:st_expert",
+      "tech:24",
+      "tech:20",
+      "kfam:F10"
+     ],
+     "gap_fa": "ثبتِ «نظرِ من پیش از شنیدنِ جمع» (برای جدا کردنِ قرینه از فشار) در پرونده‌ها نیست.",
+     "claims": [
+      {
+       "fa": "در آزمونِ خطِ Asch، هم‌نوایی واقعی است و در آمریکا از دههٔ ۱۹۵۰ به بعد کاهش یافته و در فرهنگ‌های جمع‌گرا بیشتر است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Bond & Smith (۱۹۹۶)، ۱۳۳ مطالعه در ۱۷ کشور.",
+       "src": [
+        "bond_smith1996"
+       ]
+      },
+      {
+       "fa": "هرچه موقعیت مبهم‌تر باشد، مردم بیشتر رفتار و داوریِ دیگران را به‌عنوانِ اطلاعات (گواهِ اجتماعی) دنبال می‌کنند؛ هنجارِ توصیفی («دیگران چه می‌کنند») رفتار را تغییر می‌دهد.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Annual Review از Cialdini & Goldstein (۲۰۰۴) دربارهٔ نفوذِ اطلاعاتی و هنجاری، با آزمایش‌های میدانیِ متعدد (مثلاً پیام‌های هنجاری در هتل و مصرفِ انرژی).",
+       "src": [
+        "cialdini_goldstein2004"
+       ]
+      },
+      {
+       "fa": "توافقِ n نفر قرینهٔ قوی‌تری از یک نفر است فقط به اندازه‌ای که داوری‌هایشان مستقل باشد.",
+       "kind": "theorem",
+       "basis_fa": "T_tawatur (از A3): برای گزارش‌های مستقل احتمالِ خطای همه حاصل‌ضرب است؛ با وابستگی، حاصل‌ضرب برقرار نیست و در حدِ وابستگیِ کامل به قرینهٔ یک نفر برمی‌گردد.",
+       "src": [
+        "sep_social_epi"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_group_polarization",
+     "fa": "قطبی‌شدنِ گروهی و تفکرِ گروهی",
+     "en": "Group polarization and groupthink",
+     "desc_fa": "گرایشِ گروهِ هم‌فکر به رسیدن به موضعی افراطی‌تر از میانگینِ اعضا پس از گفت‌وگو، و حذفِ مخالفت در گروه‌های منسجم.",
+     "key_questions_fa": [
+      "گروهم پس از گفت‌وگو افراطی‌تر شد یا دقیق‌تر؟",
+      "چه کسی در گروه نقشِ مخالف را بازی می‌کند؟",
+      "آیا همه فقط استدلال‌های یک‌طرفه می‌شنوند؟"
+     ],
+     "src": [
+      "isenberg1986",
+      "sunstein2002",
+      "nemeth2001"
+     ],
+     "tools": [
+      "tech:25",
+      "tech:20",
+      "tech:34"
+     ],
+     "gap_fa": "اپ تک‌کاربره است و گفت‌وگوی گروهی را ثبت نمی‌کند؛ ابزاری برای سنجشِ تغییرِ نظرِ گروه پیش و پس از بحث یا برای نقشِ «تیمِ قرمز» در تصمیم‌های جمعی نیست.",
+     "claims": [
+      {
+       "fa": "پس از گفت‌وگو، نظرِ گروهِ هم‌جهت معمولاً در همان جهتِ اولیه افراطی‌تر می‌شود.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Isenberg (۱۹۸۶)؛ هر دو سازوکارِ «مقایسهٔ اجتماعی» و «استدلال‌های قانع‌کننده» تأیید شدند؛ اثرِ استدلال‌ها بزرگ‌تر بود.",
+       "src": [
+        "isenberg1986"
+       ]
+      },
+      {
+       "fa": "گروه‌هایی که فقط با هم‌فکرانشان گفت‌وگو می‌کنند (اتاقِ پژواک) قطبی‌شدنِ قوی‌تری نشان می‌دهند.",
+       "kind": "empirical",
+       "basis_fa": "جمع‌بندیِ Sunstein (۲۰۰۲) بر شواهدِ آزمایشی و میدانی؛ پیوند به اتاق‌های پژواکِ برخط بحث‌برانگیز است.",
+       "src": [
+        "sunstein2002"
+       ]
+      },
+      {
+       "fa": "«تفکرِ گروهی» (Janis) به‌عنوانِ یک نشانگانِ واحد علتِ تصمیم‌های فاجعه‌بارِ گروهی است.",
+       "kind": "outside",
+       "basis_fa": "شواهدِ تجربیِ مدلِ کاملِ Janis ضعیف و عمدتاً مطالعهٔ موردیِ گذشته‌نگر است؛ اجزای جداگانه (فشارِ هم‌نوایی، حذفِ مخالف) شواهدِ بهتری دارند.",
+       "src": [
+        "sunstein2002"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_collective_reasoning",
+     "fa": "استدلالِ جمعی و اطلاعاتِ پنهان",
+     "en": "Collective reasoning and hidden profiles",
+     "desc_fa": "چه چیزی گروه را از تک‌تکِ اعضا باهوش‌تر یا کم‌هوش‌تر می‌کند: تجمیعِ اطلاعاتِ خصوصی، نوبت‌گیری در گفت‌وگو و تنوع.",
+     "key_questions_fa": [
+      "آیا اطلاعاتی که فقط من دارم گفته شد؟",
+      "در بحث بیشتر چیزهایی تکرار شد که همه از قبل می‌دانستند؟",
+      "چه کسی کمتر حرف زد و چرا؟"
+     ],
+     "src": [
+      "stasser_titus1985",
+      "woolley2010",
+      "mercier_sperber2011"
+     ],
+     "tools": [
+      "tech:25",
+      "tech:19",
+      "tech:20"
+     ],
+     "gap_fa": "هیچ ساختاری برای «گزارشِ اطلاعاتِ خصوصی پیش از بحث» یا جمع‌آوریِ برآوردهای مستقل از دیگران (خرد جمعی) در اپ نیست.",
+     "claims": [
+      {
+       "fa": "گروه‌ها در بحث بیشتر اطلاعاتی را مطرح می‌کنند که همه از قبل دارند و اطلاعاتِ خصوصیِ تک‌نفره کمتر گفته می‌شود (نیم‌رخِ پنهان).",
+       "kind": "empirical",
+       "basis_fa": "Stasser & Titus (۱۹۸۵) و ده‌ها مطالعهٔ بعدی؛ یکی از یافته‌های پایدارِ تصمیم‌گیریِ گروهی.",
+       "src": [
+        "stasser_titus1985"
+       ]
+      },
+      {
+       "fa": "گروه‌ها عاملِ «هوشِ جمعی» دارند که با برابریِ نوبتِ صحبت و حساسیتِ اجتماعیِ اعضا بیشتر مرتبط است تا با هوشِ میانگینِ اعضا.",
+       "kind": "empirical",
+       "basis_fa": "Woolley و همکاران (۲۰۱۰)؛ تکرارهای بعدی نتایجِ مختلطی داشته‌اند، پس اثر را باید محتاط خواند.",
+       "src": [
+        "woolley2010"
+       ]
+      },
+      {
+       "fa": "در مسائلی که پاسخِ قابلِ‌اثبات دارند، گفت‌وگوی گروهی عملکرد را از میانگینِ افراد و گاه از بهترین فرد بالاتر می‌برد.",
+       "kind": "empirical",
+       "basis_fa": "جمع‌بندیِ Mercier & Sperber (۲۰۱۱) از آزمایش‌های حلِ گروهیِ مسئله (از جمله مسئلهٔ انتخابِ Wason).",
+       "src": [
+        "mercier_sperber2011"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_social_repair",
+   "fa": "بازخورد، تعارض و مذاکره",
+   "en": "Feedback, conflict and negotiation",
+   "areas": [
+    {
+     "id": "sc_feedback",
+     "fa": "دادن و گرفتنِ بازخورد",
+     "en": "Giving and receiving feedback",
+     "desc_fa": "این‌که بازخورد کی به یادگیری و عملکرد کمک می‌کند و کی آسیب می‌زند، و چطور بازخورد را بی‌دفاع بشنویم.",
+     "key_questions_fa": [
+      "این بازخورد دربارهٔ کار است یا دربارهٔ من؟",
+      "پاسخِ «کجا می‌روم، کجا هستم، قدمِ بعد چیست» را دارد؟",
+      "سکوتِ دیگران را بازخوردِ مثبت حساب کرده‌ام؟"
+     ],
+     "src": [
+      "kluger_denisi1996",
+      "hattie_timperley2007"
+     ],
+     "tools": [
+      "tech:23",
+      "tech:39",
+      "tech:31",
+      "proto:P9",
+      "kfam:F9"
+     ],
+     "gap_fa": "ثبتِ بازخوردهای دریافتیِ واقعی از دیگران و پیگیریِ این‌که به کدام عمل شد نیست؛ حلقه‌های بازخوردِ اپ همه خودسنجی‌اند.",
+     "claims": [
+      {
+       "fa": "بازخورد به‌طورِ میانگین عملکرد را بهتر می‌کند ولی در حدودِ یک‌سومِ موارد آن را بدتر کرده است؛ بازخوردی که توجه را به «خود» می‌برد زیان‌بارتر است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Kluger & DeNisi (۱۹۹۶)، ۶۰۷ اندازهٔ اثر؛ میانگینِ d حدودِ ۰٫۴۱ با پراکندگیِ زیاد.",
+       "src": [
+        "kluger_denisi1996"
+       ]
+      },
+      {
+       "fa": "بازخوردِ مؤثر به سه پرسش پاسخ می‌دهد (هدف چیست، کجا هستم، قدمِ بعد) و در سطحِ تکلیف/فرایند مؤثرتر از سطحِ خود (تعریف و تمجید) است.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Hattie & Timperley (۲۰۰۷) بر پایهٔ فراتحلیل‌های آموزشی؛ مدل مفهومی است ولی بر داده‌های گسترده تکیه دارد.",
+       "src": [
+        "hattie_timperley2007"
+       ]
+      },
+      {
+       "fa": "سکوتِ مدیر یا همکار، وقتی هیچ قرینه‌ای جهتش را معلوم نمی‌کند، نه تأیید است نه رد؛ احتمالِ هر کدام حداکثر ½.",
+       "kind": "theorem",
+       "basis_fa": "T_unknown از A4 و A2: بی‌مرجح بودنِ دو تعبیر هیچ‌کدام را محتمل‌تر نمی‌کند؛ برای دانستن باید بازخورد را صریحاً خواست.",
+       "src": []
+      }
+     ]
+    },
+    {
+     "id": "sc_conflict",
+     "fa": "حلِ تعارض",
+     "en": "Conflict resolution",
+     "desc_fa": "تمییزِ تعارضِ تکلیفی (سرِ کار) از تعارضِ رابطه‌ای (سرِ آدم‌ها) و راه‌های حلِ اختلاف بی‌آن‌که رابطه یا کیفیتِ تصمیم قربانی شود.",
+     "key_questions_fa": [
+      "این دعوا سرِ چیست: موضوع، روش یا رابطه؟",
+      "نیازِ پشتِ موضعِ هر طرف چیست؟",
+      "چطور مسئله را دوباره قاب‌بندی کنم که هر دو در یک سمت باشیم؟"
+     ],
+     "src": [
+      "dewit2012",
+      "thompson2010"
+     ],
+     "tools": [
+      "kfam:F8",
+      "tech:14",
+      "tech:12",
+      "tech:20"
+     ],
+     "gap_fa": "ثبتِ ساختاریافتهٔ یک تعارضِ واقعی (موضع‌ها، نیازها، نوعِ تعارض، نتیجه) و یادگیری از تکرارِ الگوها وجود ندارد.",
+     "claims": [
+      {
+       "fa": "تعارضِ رابطه‌ای با عملکرد و رضایتِ تیم رابطهٔ منفی دارد.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ de Wit و همکاران (۲۰۱۲) و فراتحلیل‌های پیشین که در آن جمع‌بندی شده‌اند؛ یافتهٔ پایدار.",
+       "src": [
+        "dewit2012"
+       ]
+      },
+      {
+       "fa": "این‌که تعارضِ تکلیفی به عملکرد کمک کند به شرایط وابسته است: میانگینش نزدیک به صفر است و وقتی با تعارضِ رابطه‌ای همراه نباشد مثبت‌تر است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیل‌های پیشین رابطهٔ منفی یافته بودند؛ de Wit و همکاران (۲۰۱۲) با داده‌های بیشتر رابطهٔ میانگینِ نزدیکِ صفر و نقشِ تعدیل‌کننده‌ها را نشان دادند.",
+       "src": [
+        "dewit2012"
+       ]
+      },
+      {
+       "fa": "تمرکز بر منافع به‌جای مواضع (رویکردِ هاروارد، Fisher & Ury) به توافق‌های بهتر می‌انجامد.",
+       "kind": "outside",
+       "basis_fa": "توصیهٔ کتابِ Getting to Yes بیشتر تجویزی است؛ شواهدِ تجربیِ پراکنده (مثلاً دربارهٔ مذاکرهٔ تلفیقی) هم‌سویند ولی خودِ روش به‌صورتِ کامل آزموده نشده.",
+       "src": [
+        "thompson2010"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_negotiation",
+     "fa": "مذاکره",
+     "en": "Negotiation",
+     "desc_fa": "رسیدن به توافق با منافعِ متفاوت: بهترین گزینهٔ جایگزین، محدودهٔ توافقِ ممکن، پیشنهادِ اول و ارزش‌آفرینی در برابرِ تقسیمِ ارزش.",
+     "key_questions_fa": [
+      "اگر توافق نشود بهترین گزینه‌ام چیست؟",
+      "آیا محدوده‌ای وجود دارد که هر دو طرف آن را بپذیرند؟",
+      "آیا مسئله را تک‌موضوعی دیده‌ام در حالی که چند موضوع برای معامله هست؟"
+     ],
+     "src": [
+      "thompson2010"
+     ],
+     "tools": [
+      "kfam:F8",
+      "kfam:F12",
+      "tech:20",
+      "tech:4"
+     ],
+     "gap_fa": "هیچ کاربرگِ مذاکره (BATNA، نقطهٔ مقاومت، محدودهٔ توافق، فهرستِ موضوع‌ها) در اپ نیست.",
+     "claims": [
+      {
+       "fa": "توافقی که برای هر دو طرف عقلانی باشد فقط وقتی ممکن است که محدودهٔ پذیرشِ دو طرف هم‌پوشانی داشته باشد (بهتر از گزینهٔ جایگزینِ هر کدام).",
+       "kind": "theorem",
+       "basis_fa": "تعریفِ «عقلانی» (پذیرفتنِ گزینه‌ای که بهتر از جایگزین است) + A0: گزینه‌ای که برای یک طرف بدتر از جایگزینش است نمی‌تواند هم‌زمان برای او پذیرفتنی باشد.",
+       "src": [
+        "thompson2010"
+       ]
+      },
+      {
+       "fa": "پیشنهادِ اول مثلِ لنگر عمل می‌کند و نتیجهٔ نهایی را به سمتِ خودش می‌کشد.",
+       "kind": "empirical",
+       "basis_fa": "جمع‌بندیِ Thompson و همکاران (۲۰۱۰) از آزمایش‌های مذاکره؛ هم‌سو با پژوهشِ گستردهٔ لنگراندازی.",
+       "src": [
+        "thompson2010"
+       ]
+      },
+      {
+       "fa": "مذاکره‌کنندگان اغلب «کیکِ ثابت» فرض می‌کنند و فرصت‌های ارزش‌آفرینی را از دست می‌دهند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Annual Review از Thompson و همکاران (۲۰۱۰) بر پایهٔ پژوهش‌های آزمایشیِ متعدد.",
+       "src": [
+        "thompson2010"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_social_bonds",
+   "fa": "رابطه و شبکهٔ حمایت",
+   "en": "Relationships and support networks",
+   "areas": [
+    {
+     "id": "sc_relationships_support",
+     "fa": "روابط و شبکهٔ حمایت",
+     "en": "Relationships and support networks",
+     "desc_fa": "روابطِ نزدیک و شبکهٔ حمایتِ اجتماعی به‌عنوانِ پشتوانهٔ سلامت، یادگیری و تاب‌آوری.",
+     "key_questions_fa": [
+      "در هر حوزه (کار، فکر، احساس) به چه کسی می‌توانم تکیه کنم؟",
+      "کدام رابطه را مدتی است نگه‌داری نکرده‌ام؟",
+      "شبکه‌ام چقدر متنوع است و چقدر فقط هم‌فکر؟"
+     ],
+     "src": [
+      "holtlunstad2010"
+     ],
+     "tools": [
+      "kfam:F8"
+     ],
+     "gap_fa": "این صفحه هیچ مدلِ رابطه یا شبکهٔ حمایت ندارد (طبقِ قاعدهٔ دامنه، CRMِ بقیهٔ اپ هم به این صفحه وصل نیست)؛ حتی نقشه‌ای از «چه کسی در کدام حوزه پشتیبانِ یادگیری من است» وجود ندارد.",
+     "claims": [
+      {
+       "fa": "یکپارچگیِ اجتماعیِ قوی‌تر با احتمالِ بقای بالاتر همراه است و اندازهٔ این اثر با عواملِ خطرِ شناخته‌شده‌ای چون سیگار قابلِ مقایسه است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Holt-Lunstad و همکاران (۲۰۱۰)، ۱۴۸ مطالعه و بیش از ۳۰۰ هزار نفر؛ نسبتِ شانس حدودِ ۱٫۵؛ مطالعاتِ همگروهی، نه آزمایشی.",
+       "src": [
+        "holtlunstad2010"
+       ]
+      },
+      {
+       "fa": "رابطه‌ی میانِ حمایتِ اجتماعی و سلامت عمدتاً علّی است.",
+       "kind": "outside",
+       "basis_fa": "داده‌ها همبستگی و طولی‌اند؛ علیت‌گرفتن نیازمندِ کنترلِ مخدوش‌کننده‌هاست که کامل نیست.",
+       "src": [
+        "holtlunstad2010"
+       ]
+      },
+      {
+       "fa": "شبکه‌ای که فقط از هم‌فکران تشکیل شده، دامنهٔ قرینه‌های تازه‌ای را که به من می‌رسد محدود می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "هم‌سو با یافته‌های قطبی‌شدنِ گروهی و اتاقِ پژواک (Sunstein ۲۰۰۲)؛ شواهدِ مستقیم در سطحِ شبکهٔ شخصی محدود است.",
+       "src": [
+        "sunstein2002"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sc_help_advice_seeking",
+     "fa": "کمک‌خواستن و مشورت‌گرفتن",
+     "en": "Help- and advice-seeking",
+     "desc_fa": "پرسیدن و کمک‌خواستن از دیگران به‌عنوانِ مهارتی یادگیری‌محور، و ترس‌های نادرستی که ما را از آن بازمی‌دارد.",
+     "key_questions_fa": [
+      "چه چیزی مانعِ پرسیدنم شد: ترس از نادان‌دیده‌شدن یا تخمینِ «نه» شنیدن؟",
+      "از چه کسی دقیقاً چه بپرسم؟",
+      "آخرین بار کی به جای گیرکردنِ طولانی کمک خواستم؟"
+     ],
+     "src": [
+      "flynn_lake2008",
+      "brooks2015",
+      "edmondson1999"
+     ],
+     "tools": [
+      "kfam:F7",
+      "kfam:F8",
+      "tech:25",
+      "view:kcase"
+     ],
+     "gap_fa": "در گره‌گشا قاعده‌ای برای «اکنون از کسی بپرس» (قاعدهٔ توقف + فردِ مشخص) نیست؛ گرهِ F4 stop به کمک‌خواستن وصل نشده است.",
+     "claims": [
+      {
+       "fa": "مردم احتمالِ پذیرشِ درخواستِ کمکِ مستقیم را تقریباً به اندازهٔ نصف دست‌کم می‌گیرند.",
+       "kind": "empirical",
+       "basis_fa": "Flynn & Lake (۲۰۰۸)، چند مطالعهٔ میدانی؛ یافته در پژوهش‌های بعدی تکرار شده است.",
+       "src": [
+        "flynn_lake2008"
+       ]
+      },
+      {
+       "fa": "مشورت‌خواستن (به‌ویژه در کارِ دشوار و از کسی که خودش دخیل است) برداشتِ دیگران از شایستگیِ مشورت‌خواه را بالا می‌برد، نه پایین.",
+       "kind": "empirical",
+       "basis_fa": "Brooks، Gino و Schweitzer (۲۰۱۵)، پنج آزمایش؛ پایه: نمونه‌های آمریکایی.",
+       "src": [
+        "brooks2015"
+       ]
+      },
+      {
+       "fa": "هزینهٔ نپرسیدن را نمی‌شود صفر فرض کرد: وقتی احتمالِ پاسخِ مثبت مجهول است و دلیلی بر ترجیحِ «نه» ندارم، آن را بیش از ½ نمی‌توانم گرفت.",
+       "kind": "theorem",
+       "basis_fa": "A4 (بی‌مرجح) و T_unknown: بدونِ قرینه، «نه شنیدن» بر «بله شنیدن» ترجیح ندارد؛ پیش‌فرضِ بدبینانه بی‌دلیل است.",
+       "src": []
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1380 @@
+{
+ "id": "s_mind",
+ "fa": "ذهن، هیجان و گره‌های روانی",
+ "en": "Mind, Emotion and Psychological Knots",
+ "about_fa": "این سامانه هیجان‌ها، اضطراب و نگرانی، باورهای فرد دربارهٔ خودش، عادت‌ها و اهمال‌کاری، فشار روانی و ظرفیت ذهنی را پوشش می‌دهد؛ همان چیزهایی که پشت بیشترِ «گره‌»های تکرارشوندهٔ یادگیری و زندگی هستند. هدف این است که کاربر الگوی گیرِ خود را با شواهدِ سنجیده بشناسد و با ابزارهای آزمون‌پذیر (بازارزیابی، آزمایشِ رفتاری، کالیبراسیون) روی آن کار کند، و مرزِ خودیاری با درمان را هم بداند.",
+ "axioms": [
+  "A0",
+  "A1",
+  "A2",
+  "A3",
+  "A4"
+ ],
+ "bridge_fa": "بیشترِ ادعاهای این حوزه تجربی‌اند و اعتبارشان به نرخ‌های پایهٔ اندازه‌گیری‌شده، فراتحلیل‌ها و تکرارپذیری بستگی دارد؛ بنابراین طبقِ اصل A3 درجهٔ اعتمادِ هر ادعا باید به اندازهٔ اثر، اندازهٔ نمونه و موفقیت در تکرار گره بخورد، نه به شهرتِ آن. جاهایی که خودِ فکرِ مضطرب یا خودانتقادگر یک استدلالِ احتمالاتی می‌سازد (زنجیرهٔ فاجعه، تعمیم از یک شکست، «حتماً»)، اصول A1 تا A3 و قضیه‌های T_product، T_universal و T_below1 مستقیماً قابل اعمال‌اند.",
+ "sources": [
+  {
+   "tag": "gross2015",
+   "title": "Gross, J. J. (2015). Emotion regulation: Current status and future prospects. Psychological Inquiry, 26(1), 1–26.",
+   "url": "https://doi.org/10.1080/1047840X.2014.940781"
+  },
+  {
+   "tag": "webb2012",
+   "title": "Webb, T. L., Miles, E., & Sheeran, P. (2012). Dealing with feeling: A meta-analysis of the effectiveness of strategies derived from the process model of emotion regulation. Psychological Bulletin, 138(4), 775–808.",
+   "url": "https://doi.org/10.1037/a0027600"
+  },
+  {
+   "tag": "aldao2010",
+   "title": "Aldao, A., Nolen-Hoeksema, S., & Schweizer, S. (2010). Emotion-regulation strategies across psychopathology: A meta-analytic review. Clinical Psychology Review, 30(2), 217–237.",
+   "url": "https://doi.org/10.1016/j.cpr.2009.11.004"
+  },
+  {
+   "tag": "sep_emotion",
+   "title": "Scarantino, A., & de Sousa, R. Emotion. Stanford Encyclopedia of Philosophy.",
+   "url": "https://plato.stanford.edu/entries/emotion/"
+  },
+  {
+   "tag": "tangney2007",
+   "title": "Tangney, J. P., Stuewig, J., & Mashek, D. J. (2007). Moral emotions and moral behavior. Annual Review of Psychology, 58, 345–372.",
+   "url": "https://doi.org/10.1146/annurev.psych.56.091103.070145"
+  },
+  {
+   "tag": "ferrari2019",
+   "title": "Ferrari, M., Hunt, C., Harrysunker, A., et al. (2019). Self-compassion interventions and psychosocial outcomes: A meta-analysis of RCTs. Mindfulness, 10, 1455–1473.",
+   "url": "https://doi.org/10.1007/s12671-019-01134-6"
+  },
+  {
+   "tag": "grupe2013",
+   "title": "Grupe, D. W., & Nitschke, J. B. (2013). Uncertainty and anticipation in anxiety: An integrated neurobiological and psychological perspective. Nature Reviews Neuroscience, 14(7), 488–501.",
+   "url": "https://doi.org/10.1038/nrn3524"
+  },
+  {
+   "tag": "carleton2016",
+   "title": "Carleton, R. N. (2016). Into the unknown: A review and synthesis of contemporary models involving uncertainty. Journal of Anxiety Disorders, 39, 30–43.",
+   "url": "https://doi.org/10.1016/j.janxdis.2016.02.007"
+  },
+  {
+   "tag": "hirsch2012",
+   "title": "Hirsch, C. R., & Mathews, A. (2012). A cognitive model of pathological worry. Behaviour Research and Therapy, 50(10), 636–646.",
+   "url": "https://doi.org/10.1016/j.brat.2012.06.007"
+  },
+  {
+   "tag": "sverke2002",
+   "title": "Sverke, M., Hellgren, J., & Näswall, K. (2002). No security: A meta-analysis and review of job insecurity and its consequences. Journal of Occupational Health Psychology, 7(3), 242–264.",
+   "url": "https://doi.org/10.1037/1076-8998.7.3.242"
+  },
+  {
+   "tag": "paul2009",
+   "title": "Paul, K. I., & Moser, K. (2009). Unemployment impairs mental health: Meta-analyses. Journal of Vocational Behavior, 74(3), 264–282.",
+   "url": "https://doi.org/10.1016/j.jvb.2009.01.001"
+  },
+  {
+   "tag": "wilson2005",
+   "title": "Wilson, T. D., & Gilbert, D. T. (2005). Affective forecasting: Knowing what to want. Current Directions in Psychological Science, 14(3), 131–134.",
+   "url": "https://doi.org/10.1111/j.0963-7214.2005.00355.x"
+  },
+  {
+   "tag": "watkins2008",
+   "title": "Watkins, E. R. (2008). Constructive and unconstructive repetitive thought. Psychological Bulletin, 134(2), 163–206.",
+   "url": "https://doi.org/10.1037/0033-2909.134.2.163"
+  },
+  {
+   "tag": "nolen2008",
+   "title": "Nolen-Hoeksema, S., Wisco, B. E., & Lyubomirsky, S. (2008). Rethinking rumination. Perspectives on Psychological Science, 3(5), 400–424.",
+   "url": "https://doi.org/10.1111/j.1745-6924.2008.00088.x"
+  },
+  {
+   "tag": "bandura1977",
+   "title": "Bandura, A. (1977). Self-efficacy: Toward a unifying theory of behavioral change. Psychological Review, 84(2), 191–215.",
+   "url": "https://doi.org/10.1037/0033-295X.84.2.191"
+  },
+  {
+   "tag": "sisk2018",
+   "title": "Sisk, V. F., Burgoyne, A. P., Sun, J., Butler, J. L., & Macnamara, B. N. (2018). To what extent and under which circumstances are growth mind-sets important to academic achievement? Two meta-analyses. Psychological Science, 29(4), 549–571.",
+   "url": "https://doi.org/10.1177/0956797617739704"
+  },
+  {
+   "tag": "burnette2023",
+   "title": "Burnette, J. L., Billingsley, J., Banks, G. C., et al. (2023). A systematic review and meta-analysis of growth mindset interventions: For whom, how, and why might such interventions work? Psychological Bulletin, 149(3–4), 174–205.",
+   "url": "https://doi.org/10.1037/bul0000368"
+  },
+  {
+   "tag": "macnamara2023",
+   "title": "Macnamara, B. N., & Burgoyne, A. P. (2023). Do growth mindset interventions impact students' academic achievement? A systematic review and meta-analysis with recommendations for best practices. Psychological Bulletin, 149(3–4), 133–173.",
+   "url": "https://doi.org/10.1037/bul0000352"
+  },
+  {
+   "tag": "yeager_dweck2020",
+   "title": "Yeager, D. S., & Dweck, C. S. (2020). What can be learned from growth mindset controversies? American Psychologist, 75(9), 1269–1284.",
+   "url": "https://doi.org/10.1037/amp0000794"
+  },
+  {
+   "tag": "sweeney1986",
+   "title": "Sweeney, P. D., Anderson, K., & Bailey, S. (1986). Attributional style in depression: A meta-analytic review. Journal of Personality and Social Psychology, 50(5), 974–991.",
+   "url": "https://doi.org/10.1037/0022-3514.50.5.974"
+  },
+  {
+   "tag": "curran2019",
+   "title": "Curran, T., & Hill, A. P. (2019). Perfectionism is increasing over time: A meta-analysis of birth cohort differences from 1989 to 2016. Psychological Bulletin, 145(4), 410–429.",
+   "url": "https://doi.org/10.1037/bul0000138"
+  },
+  {
+   "tag": "steel2007",
+   "title": "Steel, P. (2007). The nature of procrastination: A meta-analytic and theoretical review of quintessential self-regulatory failure. Psychological Bulletin, 133(1), 65–94.",
+   "url": "https://doi.org/10.1037/0033-2909.133.1.65"
+  },
+  {
+   "tag": "sirois2013",
+   "title": "Sirois, F., & Pychyl, T. (2013). Procrastination and the priority of short-term mood regulation: Consequences for future self. Social and Personality Psychology Compass, 7(2), 115–127.",
+   "url": "https://doi.org/10.1111/spc3.12011"
+  },
+  {
+   "tag": "gollwitzer2006",
+   "title": "Gollwitzer, P. M., & Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis of effects and processes. Advances in Experimental Social Psychology, 38, 69–119.",
+   "url": "https://doi.org/10.1016/S0065-2601(06)38002-1"
+  },
+  {
+   "tag": "wood2016",
+   "title": "Wood, W., & Rünger, D. (2016). Psychology of habit. Annual Review of Psychology, 67, 289–314.",
+   "url": "https://doi.org/10.1146/annurev-psych-122414-033417"
+  },
+  {
+   "tag": "lally2009",
+   "title": "Lally, P., van Jaarsveld, C. H. M., Potts, H. W. W., & Wardle, J. (2010; online 2009). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology, 40(6), 998–1009.",
+   "url": "https://doi.org/10.1002/ejsp.674"
+  },
+  {
+   "tag": "lazarus1984",
+   "title": "Lazarus, R. S., & Folkman, S. (1984). Stress, Appraisal, and Coping. New York: Springer."
+  },
+  {
+   "tag": "mcewen1998",
+   "title": "McEwen, B. S. (1998). Protective and damaging effects of stress mediators. New England Journal of Medicine, 338(3), 171–179.",
+   "url": "https://doi.org/10.1056/NEJM199801153380307"
+  },
+  {
+   "tag": "bonanno2004",
+   "title": "Bonanno, G. A. (2004). Loss, trauma, and human resilience: Have we underestimated the human capacity to thrive after extremely aversive events? American Psychologist, 59(1), 20–28.",
+   "url": "https://doi.org/10.1037/0003-066X.59.1.20"
+  },
+  {
+   "tag": "lim2010",
+   "title": "Lim, J., & Dinges, D. F. (2010). A meta-analysis of the impact of short-term sleep deprivation on cognitive variables. Psychological Bulletin, 136(3), 375–389.",
+   "url": "https://doi.org/10.1037/a0018883"
+  },
+  {
+   "tag": "sweller1988",
+   "title": "Sweller, J. (1988). Cognitive load during problem solving: Effects on learning. Cognitive Science, 12(2), 257–285.",
+   "url": "https://doi.org/10.1207/s15516709cog1202_4"
+  },
+  {
+   "tag": "hagger2016",
+   "title": "Hagger, M. S., Chatzisarantis, N. L. D., Alberts, H., et al. (2016). A multilab preregistered replication of the ego-depletion effect. Perspectives on Psychological Science, 11(4), 546–573.",
+   "url": "https://doi.org/10.1177/1745691616652873"
+  },
+  {
+   "tag": "tversky1974",
+   "title": "Tversky, A., & Kahneman, D. (1974). Judgment under uncertainty: Heuristics and biases. Science, 185(4157), 1124–1131.",
+   "url": "https://doi.org/10.1126/science.185.4157.1124"
+  },
+  {
+   "tag": "morewedge2015",
+   "title": "Morewedge, C. K., Yoon, H., Scopelliti, I., Symborski, C. W., Korris, J. H., & Kassam, K. S. (2015). Debiasing decisions: Improved decision making with a single training intervention. Policy Insights from the Behavioral and Brain Sciences, 2(1), 129–140.",
+   "url": "https://doi.org/10.1177/2372732215600886"
+  },
+  {
+   "tag": "hofmann2012",
+   "title": "Hofmann, S. G., Asnaani, A., Vonk, I. J. J., Sawyer, A. T., & Fang, A. (2012). The efficacy of cognitive behavioral therapy: A review of meta-analyses. Cognitive Therapy and Research, 36(5), 427–440.",
+   "url": "https://doi.org/10.1007/s10608-012-9476-1"
+  },
+  {
+   "tag": "craske2014",
+   "title": "Craske, M. G., Treanor, M., Conway, C. C., Zbozinek, T., & Vervliet, B. (2014). Maximizing exposure therapy: An inhibitory learning approach. Behaviour Research and Therapy, 58, 10–23.",
+   "url": "https://doi.org/10.1016/j.brat.2014.04.006"
+  },
+  {
+   "tag": "atjak2015",
+   "title": "A-Tjak, J. G. L., Davis, M. L., Morina, N., Powers, M. B., Smits, J. A. J., & Emmelkamp, P. M. G. (2015). A meta-analysis of the efficacy of acceptance and commitment therapy for clinically relevant mental and physical health problems. Psychotherapy and Psychosomatics, 84(1), 30–36.",
+   "url": "https://doi.org/10.1159/000365764"
+  },
+  {
+   "tag": "khoury2013",
+   "title": "Khoury, B., Lecomte, T., Fortin, G., et al. (2013). Mindfulness-based therapy: A comprehensive meta-analysis. Clinical Psychology Review, 33(6), 763–771.",
+   "url": "https://doi.org/10.1016/j.cpr.2013.05.005"
+  },
+  {
+   "tag": "spitzer2006",
+   "title": "Spitzer, R. L., Kroenke, K., Williams, J. B. W., & Löwe, B. (2006). A brief measure for assessing generalized anxiety disorder: The GAD-7. Archives of Internal Medicine, 166(10), 1092–1097.",
+   "url": "https://doi.org/10.1001/archinte.166.10.1092"
+  },
+  {
+   "tag": "nice_cg123",
+   "title": "NICE (2011). Common mental health problems: identification and pathways to care (Clinical guideline CG123). National Institute for Health and Care Excellence.",
+   "url": "https://www.nice.org.uk/guidance/cg123"
+  }
+ ],
+ "groups": [
+  {
+   "id": "g_s_mind_emotion",
+   "fa": "هیجان و تنظیمِ هیجان",
+   "en": "Emotion and emotion regulation",
+   "areas": [
+    {
+     "id": "md_emotion_nature",
+     "fa": "ماهیتِ هیجان و ارزیابی",
+     "en": "Nature of emotion and appraisal",
+     "desc_fa": "هیجان چیست، از کجا می‌آید و چه کاری انجام می‌دهد: ارزیابیِ موقعیت نسبت به هدف‌ها، تمایلِ عمل و تجربهٔ ذهنی.",
+     "key_questions_fa": [
+      "این هیجان دربارهٔ کدام هدف یا ارزشِ من است؟",
+      "چه ارزیابی‌ای از موقعیت پشتِ این احساس نشسته است؟",
+      "این هیجان مرا به چه کاری می‌کشاند و آیا آن کار به نفعم است؟"
+     ],
+     "src": [
+      "gross2015",
+      "sep_emotion"
+     ],
+     "tools": [
+      "tech:32",
+      "kfam:F7"
+     ],
+     "gap_fa": "برنامه ثبتِ ساختارمندِ هیجان (موقعیت ← ارزیابی ← هیجان ← تمایلِ عمل) ندارد؛ فرمِ «گیر» در گره‌گشا هیجان را فقط ضمنی می‌پرسد.",
+     "claims": [
+      {
+       "fa": "هیجان در یک توالیِ موقعیت ← توجه ← ارزیابی ← پاسخ پدید می‌آید و هر حلقه نقطه‌ای برای مداخله است (مدلِ فرایندی).",
+       "kind": "empirical",
+       "basis_fa": "مدلِ فرایندیِ گراس پایهٔ صدها آزمایش است و فراتحلیلِ Webb و همکاران راهبردهای برخاسته از هر مرحله را جداگانه سنجیده؛ خودِ مدل چارچوبِ سازمان‌دهنده است، نه یک اثرِ واحدِ اندازه‌گیری‌شده.",
+       "src": [
+        "gross2015",
+        "webb2012"
+       ]
+      },
+      {
+       "fa": "هیجان‌ها تمایلِ عمل می‌سازند و اطلاعاتی دربارهٔ ارزیابیِ ما از ربطِ موقعیت به هدف‌هایمان می‌دهند، نه لزوماً دربارهٔ خودِ جهان.",
+       "kind": "empirical",
+       "basis_fa": "نظریه‌های ارزیابی و کارکردیِ هیجان در روان‌شناسی و فلسفه گستردگی دارند؛ پشتوانه بیشتر هم‌گراییِ نظری و آزمایش‌های ارزیابی است تا یک فراتحلیلِ واحد.",
+       "src": [
+        "sep_emotion",
+        "gross2015"
+       ]
+      },
+      {
+       "fa": "آیا هیجان‌های پایه، طبیعیِ و جهان‌شمول‌اند یا هیجان‌ها در لحظه از مفهوم‌سازی ساخته می‌شوند؟",
+       "kind": "outside",
+       "basis_fa": "بحثِ میان نظریه‌های هیجانِ پایه و نظریه‌های برساخت‌گرا هنوز باز است و با داده‌های موجود قطعی نمی‌شود؛ برای کاربردِ شخصی هم لازم نیست حل شود.",
+       "src": [
+        "sep_emotion"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_emotion_regulation",
+     "fa": "تنظیمِ هیجان: بازارزیابی، سرکوب و انعطاف",
+     "en": "Emotion regulation: reappraisal, suppression, flexibility",
+     "desc_fa": "راهبردهایی که برای تغییرِ شدت، مدت یا نوعِ هیجان به کار می‌بریم و اینکه کدام کار می‌کند و کجا.",
+     "key_questions_fa": [
+      "الان دارم موقعیت را دوباره ارزیابی می‌کنم یا فقط ابرازش را پنهان می‌کنم؟",
+      "آیا این راهبرد در این موقعیتِ خاص مناسب است؟",
+      "اگر دوستم همین موقعیت را داشت، آن را چطور قاب‌بندی می‌کردم؟"
+     ],
+     "src": [
+      "gross2015",
+      "webb2012",
+      "aldao2010"
+     ],
+     "tools": [
+      "tech:14",
+      "tech:20",
+      "tech:32",
+      "kfam:F7",
+      "kfam:F5"
+     ],
+     "gap_fa": "کاربرگِ بازارزیابی (فکر/تعبیرِ اول ← تعبیرهای جایگزین ← شدتِ هیجان پیش و پس) و ثبتِ اینکه کدام راهبرد در کدام موقعیت کمک کرد وجود ندارد.",
+     "claims": [
+      {
+       "fa": "بازارزیابیِ شناختی اثرِ کوچک تا متوسطی بر کاهشِ پیامدهای هیجانی دارد.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Webb و همکاران (۲۰۱۲، بیش از ۱۹۰ آزمایش): بازارزیابی اثرِ کوچک‌تا‌متوسط (حدود d≈0.36) داشت؛ بازارزیابیِ پیامدها از بازارزیابیِ صرفِ محرک قوی‌تر بود.",
+       "src": [
+        "webb2012"
+       ]
+      },
+      {
+       "fa": "سرکوبِ ابرازِ هیجان، ابرازِ بیرونی را کم می‌کند اما تجربهٔ درونیِ هیجان را چندان کم نمی‌کند.",
+       "kind": "empirical",
+       "basis_fa": "همان فراتحلیل: سرکوبِ ابراز بر رفتارِ بیرونی اثر داشت ولی بر تجربهٔ هیجانی اثرِ ناچیز؛ سرکوبِ فکر نیز نتیجهٔ ضعیف داشت.",
+       "src": [
+        "webb2012",
+        "gross2015"
+       ]
+      },
+      {
+       "fa": "نشخوار، اجتناب و سرکوب با نشانه‌های اختلال‌های روانی هم‌بستگیِ بیشتری دارند تا بازارزیابی و پذیرش با سلامت.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Aldao و همکاران (۲۰۱۰، ۱۱۴ مطالعه): نشخوار بزرگ‌ترین هم‌بستگی را داشت؛ اجتناب و سرکوب متوسط تا بزرگ؛ بازارزیابی و پذیرش کوچک. داده‌ها بیشتر مقطعی‌اند، پس علیت ثابت نشده.",
+       "src": [
+        "aldao2010"
+       ]
+      },
+      {
+       "fa": "هیچ راهبردی همیشه سازگار نیست؛ سودمندیِ راهبرد به موقعیت و هدف بستگی دارد.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ گراس (۲۰۱۵) شواهدِ وابستگی به بافت را جمع کرده؛ پژوهشِ «انعطافِ تنظیم» هنوز در حالِ رشد است و اندازه‌گیری‌اش یکدست نیست.",
+       "src": [
+        "gross2015"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_shame_guilt",
+     "fa": "شرم، احساسِ گناه و خودانتقادی",
+     "en": "Shame, guilt and self-criticism",
+     "desc_fa": "هیجان‌های خودآگاه پس از خطا: احساسِ گناه دربارهٔ «کارم»، شرم دربارهٔ «خودم»، و صدای خودانتقادگر که از یک خطا حکمی دربارهٔ کلِ خود می‌سازد.",
+     "key_questions_fa": [
+      "این احساس دربارهٔ کاری است که کردم یا دربارهٔ اینکه چه کسی هستم؟",
+      "این احساس مرا به جبران می‌کشاند یا به پنهان شدن و دفاع؟",
+      "اگر با دوستی همین خطا را کرده بود حرف می‌زدم، چه می‌گفتم؟"
+     ],
+     "src": [
+      "tangney2007",
+      "ferrari2019"
+     ],
+     "tools": [
+      "kfam:F7",
+      "kfam:F9",
+      "kfam:F11"
+     ],
+     "gap_fa": "تمایزِ شرم/گناه و تمرینِ خودشفقتی در برنامه نیست؛ گرهٔ «محافظت از خود» ثبت می‌شود اما مسیرِ کار روی آن تعریف نشده.",
+     "claims": [
+      {
+       "fa": "احساسِ گناه (متمرکز بر رفتار) بیشتر با جبران و پذیرشِ مسئولیت همراه است و شرم (متمرکز بر خود) بیشتر با پنهان‌کاری، کناره‌گیری و دفاع.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Annual Review (Tangney و همکاران ۲۰۰۷) بر پایهٔ مطالعاتِ متعدد؛ بیشترِ داده‌ها هم‌بستگی و خودگزارشی‌اند.",
+       "src": [
+        "tangney2007"
+       ]
+      },
+      {
+       "fa": "مداخله‌های خودشفقتی خودانتقادی و نشخوار را کاهش و بهزیستی را افزایش می‌دهند.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ ۲۷ کارآزماییِ تصادفی (Ferrari و همکاران ۲۰۱۹): اثرهای کوچک تا متوسط بر چند پیامد؛ بیشترِ نمونه‌ها کوچک‌اند و گروهِ کنترل اغلب لیستِ انتظار.",
+       "src": [
+        "ferrari2019"
+       ]
+      },
+      {
+       "fa": "حکمِ «من آدمِ بی‌ارزشی هستم» که از یک خطا ساخته شود، احتمالی بیشتر از هر حکمِ جزئیِ «در این کار خطا کردم» ندارد و در واقع بسیار کمتر دارد.",
+       "kind": "theorem",
+       "basis_fa": "حکمِ کلی دربارهٔ خود مستلزمِ صدقِ حکم‌های جزئی در همهٔ حوزه‌هاست؛ طبقِ A1 احتمالش از هر جزء بیشتر نیست، و طبقِ T_universal حکمِ کلی از استقراءِ ناقص روی دامنهٔ باز نزدیک به صفر است.",
+       "src": [
+        "tangney2007"
+       ]
+      },
+      {
+       "fa": "آیا خودانتقادیِ شدید عملکرد را بهتر می‌کند؟",
+       "kind": "outside",
+       "basis_fa": "شواهدِ مستقیم و آزمایشیِ کافی در منابعِ وارسی‌شدهٔ این نقشه نیست؛ داده‌ها بیشتر هم‌بستگی‌اند و جهتِ علیت روشن نیست. تا شواهدِ آزمایشی نیاید، این‌جا قابلِ داوری نیست.",
+       "src": [
+        "tangney2007",
+        "ferrari2019"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_mind_anxiety",
+   "fa": "اضطراب، نگرانی و عدم قطعیت",
+   "en": "Anxiety, worry and uncertainty",
+   "areas": [
+    {
+     "id": "md_anxiety_fear",
+     "fa": "ترس و اضطراب (از جمله اضطرابِ پیش‌دستانه)",
+     "en": "Fear and anxiety, including anticipatory anxiety",
+     "desc_fa": "ترس پاسخ به خطرِ حاضر است و اضطراب پاسخ به تهدیدِ مبهم و آینده؛ اضطرابِ پیش‌دستانه پیش از رویداد (امتحان، جلسه، خبر) اوج می‌گیرد.",
+     "key_questions_fa": [
+      "این ترس از خطری حاضر است یا از پیش‌بینیِ آینده؟",
+      "احتمال و هزینهٔ آن پیش‌بینی را چقدر برآورد می‌کنم و بر چه پایه‌ای؟",
+      "اضطراب دارد مرا از چه کاری دور می‌کند؟"
+     ],
+     "src": [
+      "grupe2013",
+      "craske2014",
+      "carleton2016"
+     ],
+     "tools": [
+      "kfam:F5",
+      "kfam:F7",
+      "tech:24"
+     ],
+     "gap_fa": "برنامه برای اضطرابِ پیش از کار (آزمون، ارائه، تصمیم) پیش‌بینیِ مکتوب با احتمال و مقایسه با نتیجهٔ واقعی را ثبت نمی‌کند.",
+     "claims": [
+      {
+       "fa": "اضطراب با برآوردِ بیش‌ازحدِ احتمال و هزینهٔ تهدید و واکنشِ پیش‌دستانهٔ شدیدتر به رویدادهای نامطمئن همراه است.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ یکپارچهٔ Grupe و Nitschke (۲۰۱۳) شواهدِ رفتاری و عصبی را برای پنج فرایند (ارزیابیِ تهدید، توجه، پیش‌بینی، رفتار، واکنش) جمع کرده است؛ اندازهٔ اثرِ واحدی گزارش نمی‌شود.",
+       "src": [
+        "grupe2013"
+       ]
+      },
+      {
+       "fa": "اجتناب و رفتارهای ایمنی اضطراب را در کوتاه‌مدت کم و در درازمدت حفظ می‌کنند، چون فرصتِ ابطالِ پیش‌بینیِ ترسناک را از بین می‌برند.",
+       "kind": "empirical",
+       "basis_fa": "مدلِ یادگیریِ بازدارنده (Craske و همکاران ۲۰۱۴) بر پایهٔ آزمایش‌های شرطی‌سازی و کارآزمایی‌های مواجهه؛ اثربخشیِ مواجهه در فراتحلیل‌ها تکرار شده است.",
+       "src": [
+        "craske2014",
+        "hofmann2012"
+       ]
+      },
+      {
+       "fa": "پیش‌بینیِ «حتماً بد می‌شود» که از راهِ برهان نیامده، ارزشِ صدقی کمتر از یک دارد؛ پس هیچ آیندهٔ نامطلوبی از این راه یقینی نیست.",
+       "kind": "theorem",
+       "basis_fa": "طبقِ T_below1 (راهِ غیرِ برهانی ⇒ کمتر از یک) و A2، احتمالِ پیش‌بینی و نقیضش جمعاً یک است؛ پس اگر احتمالِ پیش‌بینی کمتر از یک است، احتمالِ «رخ ندادن» بزرگ‌تر از صفر است.",
+       "src": [
+        "grupe2013"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_worry_uncertainty",
+     "fa": "نگرانی، تحمل‌ناپذیریِ عدم قطعیت و فاجعه‌سازی",
+     "en": "Worry, intolerance of uncertainty and catastrophizing",
+     "desc_fa": "زنجیره‌های کلامیِ «اگر…چه؟» دربارهٔ آینده، ناتوانی در تحملِ نادانستن، و تبدیلِ یک احتمال به فاجعه؛ مثالِ رایج: ترس از دست دادنِ شغل و درآمد.",
+     "key_questions_fa": [
+      "زنجیرهٔ فاجعه از چند حلقه ساخته شده و احتمالِ هر حلقه چقدر است؟",
+      "نرخِ پایهٔ واقعی برای کسی در موقعیتِ من چیست (کلاسِ مرجع)؟",
+      "این نگرانی به یک گامِ عملیِ مشخص رسیده یا فقط در حالِ چرخیدن است؟"
+     ],
+     "src": [
+      "carleton2016",
+      "hirsch2012",
+      "sverke2002",
+      "paul2009",
+      "tversky1974"
+     ],
+     "tools": [
+      "tech:9",
+      "tech:11",
+      "tech:24",
+      "tech:21",
+      "tech:35",
+      "kfam:F5",
+      "kfam:F12"
+     ],
+     "gap_fa": "ابزارِ «زنجیرهٔ فاجعه» (شکستنِ سناریو به حلقه‌ها، احتمال‌گذاری برای هر حلقه، محاسبهٔ حاصل‌ضرب، و برنامهٔ اقدام برای حلقهٔ قابلِ کنترل) و ثبتِ نرخِ پایه برای ترس‌های مالی/شغلی وجود ندارد.",
+     "claims": [
+      {
+       "fa": "احتمالِ یک سناریوی فاجعه‌آمیز چندحلقه‌ای (مثلاً «اخراج می‌شوم ← کار پیدا نمی‌کنم ← پس‌انداز تمام می‌شود ← همه چیز از دست می‌رود») از احتمالِ هر حلقه کمتر یا مساوی است و برای حلقه‌های مستقل برابرِ حاصل‌ضربِ آن‌هاست.",
+       "kind": "theorem",
+       "basis_fa": "رخدادِ کلِ زنجیره مستلزمِ رخدادِ هر حلقه است؛ طبقِ A1 احتمالش از هر حلقه بیشتر نیست. برای حلقه‌های مستقل طبقِ A3/T_product برابرِ حاصل‌ضرب است (مثلاً ۰٫۳×۰٫۴×۰٫۵=۰٫۰۶). احساسِ قوی‌ترِ سناریوی پرجزئیات خطای عطف است.",
+       "src": [
+        "tversky1974"
+       ]
+      },
+      {
+       "fa": "تحمل‌ناپذیریِ عدم قطعیت عاملی فراتشخیصی است که با نگرانی، اضطرابِ فراگیر و چند اختلالِ دیگر پیوند دارد.",
+       "kind": "empirical",
+       "basis_fa": "مرور و ترکیبِ Carleton (۲۰۱۶) بر پایهٔ مطالعاتِ متعدد با مقیاسِ IUS؛ شواهد قوی اما بیشتر هم‌بستگی‌اند و مداخله‌های هدفمند هنوز در حالِ آزمون.",
+       "src": [
+        "carleton2016"
+       ]
+      },
+      {
+       "fa": "نگرانیِ آسیب‌زا به شکلِ فکرِ کلامی و انتزاعی جریان دارد و سوگیریِ تفسیرِ تهدیدآمیز و کنترلِ ضعیفِ توجه آن را ادامه می‌دهد.",
+       "kind": "empirical",
+       "basis_fa": "مدلِ شناختیِ Hirsch و Mathews (۲۰۱۲) بر پایهٔ آزمایش‌های آزمایشگاهی؛ برخی اجزا با تکرارِ متوسط پشتیبانی شده‌اند.",
+       "src": [
+        "hirsch2012"
+       ]
+      },
+      {
+       "fa": "ناامنیِ شغلیِ ادراک‌شده، حتی بدون از دست دادنِ واقعیِ کار، با بهزیستیِ روانی و سلامتِ پایین‌تر همراه است؛ و بیکاریِ واقعی نیز سلامتِ روان را به‌طورِ معنادار کاهش می‌دهد.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Sverke و همکاران (۲۰۰۲) دربارهٔ ناامنیِ شغلی؛ فراتحلیلِ Paul و Moser (۲۰۰۹) دربارهٔ بیکاری (اثرِ متوسط، حدود d≈0.5، با شواهدِ طولی برای جهتِ علّی). یعنی ترس هم هزینه دارد و هم واقعیت؛ هر دو باید با نرخِ پایه سنجیده شوند.",
+       "src": [
+        "sverke2002",
+        "paul2009"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_rumination",
+     "fa": "نشخوارِ فکری",
+     "en": "Rumination and repetitive thought",
+     "desc_fa": "چرخیدنِ تکراری و منفعل دور یک ناراحتی، علت‌ها و پیامدهایش؛ تفاوتِ فکرِ تکراریِ سازنده (ملموس) با ناسازنده (انتزاعی و ارزیابانه).",
+     "key_questions_fa": [
+      "این فکر به یک گامِ بعدیِ مشخص رسیده یا فقط «چرا»ی انتزاعی است؟",
+      "چند دقیقه است که روی همین موضوع می‌چرخم؟",
+      "سؤالِ «چطور؟» به‌جای «چرا من؟» چه شکلی دارد؟"
+     ],
+     "src": [
+      "watkins2008",
+      "nolen2008",
+      "aldao2010"
+     ],
+     "tools": [
+      "tech:32",
+      "tech:2",
+      "kfam:F4",
+      "kfam:F5"
+     ],
+     "gap_fa": "تشخیص و قطعِ نشخوار (مثلاً یک «سوئیچ» از چرایی انتزاعی به گامِ ملموس، یا زمانِ محدودِ نگرانی) در برنامه نیست.",
+     "claims": [
+      {
+       "fa": "فکرِ تکراریِ انتزاعی و ارزیابانه پیامدهای بدی دارد، اما فکرِ تکراریِ ملموس و فرایندمحور می‌تواند سازنده باشد.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ گستردهٔ Watkins (۲۰۰۸) در Psychological Bulletin با آزمایش‌های دست‌کاریِ سطحِ انتزاع؛ تمایز چند بار تکرار شده است.",
+       "src": [
+        "watkins2008"
+       ]
+      },
+      {
+       "fa": "نشخوار شروع و طولانی‌شدنِ دوره‌های افسردگی را پیش‌بینی می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "مطالعاتِ طولی و آزمایشیِ مرورشده در Nolen-Hoeksema و همکاران (۲۰۰۸)؛ شواهدِ آینده‌نگر نسبتاً پایدارند.",
+       "src": [
+        "nolen2008"
+       ]
+      },
+      {
+       "fa": "در میانِ راهبردهای تنظیمِ هیجان، نشخوار قوی‌ترین پیوند را با نشانه‌های روانی دارد.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Aldao و همکاران (۲۰۱۰): اثرِ بزرگ برای نشخوار، بزرگ‌تر از سایر راهبردها.",
+       "src": [
+        "aldao2010"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_mind_beliefs",
+   "fa": "باور دربارهٔ خود و داوری‌های روزمره",
+   "en": "Self-beliefs and everyday judgment",
+   "areas": [
+    {
+     "id": "md_self_efficacy",
+     "fa": "خودکارآمدی",
+     "en": "Self-efficacy",
+     "desc_fa": "باورِ فرد به توانِ انجامِ یک کارِ مشخص در یک موقعیتِ مشخص، و منابعی که این باور را می‌سازند.",
+     "key_questions_fa": [
+      "دقیقاً به انجامِ کدام کار مطمئن نیستم؟",
+      "آخرین تجربهٔ موفقیتِ کوچک در همین کار کی بود؟",
+      "چه گامِ کوچکی می‌تواند یک تجربهٔ تسلطِ تازه بسازد؟"
+     ],
+     "src": [
+      "bandura1977",
+      "steel2007"
+     ],
+     "tools": [
+      "tech:31",
+      "tech:23",
+      "kfam:F9",
+      "view:kpractice"
+     ],
+     "gap_fa": "برنامه تجربه‌های تسلطِ کوچک را به‌عنوانِ شواهدِ خودکارآمدی ثبت و دیداری نمی‌کند.",
+     "claims": [
+      {
+       "fa": "تجربهٔ تسلط (موفقیتِ خودِ فرد) قوی‌ترین منبعِ خودکارآمدی است؛ پس از آن تجربهٔ جانشینی، ترغیبِ کلامی و حالتِ بدنی.",
+       "kind": "empirical",
+       "basis_fa": "نظریهٔ Bandura (۱۹۷۷) با آزمایش‌های اولیه؛ ترتیبِ منابع در پژوهش‌های بعدی عموماً تأیید شده اما ترتیبِ دقیق به حوزه بستگی دارد.",
+       "src": [
+        "bandura1977"
+       ]
+      },
+      {
+       "fa": "خودکارآمدیِ پایین از پیش‌بینی‌کننده‌های اهمال‌کاری است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Steel (۲۰۰۷): رابطهٔ منفیِ متوسط میانِ خودکارآمدی و اهمال‌کاری.",
+       "src": [
+        "steel2007"
+       ]
+      },
+      {
+       "fa": "خودکارآمدی جدا از عملکردِ گذشته چقدر عملکردِ آینده را علت می‌شود؟",
+       "kind": "outside",
+       "basis_fa": "بیشترِ داده‌ها هم‌بستگی‌اند و خودکارآمدی خود از عملکردِ گذشته می‌آید؛ جداسازیِ سهمِ علّی با داده‌های این نقشه ممکن نیست.",
+       "src": [
+        "bandura1977"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_mindset",
+     "fa": "ذهنیتِ رشد و بحثِ تکرارپذیری",
+     "en": "Growth mindset and the replication debate",
+     "desc_fa": "باور به اینکه توانایی قابلِ رشد است، و اینکه شواهد دربارهٔ اثرِ آن واقعاً چه می‌گویند.",
+     "key_questions_fa": [
+      "اثرِ ذهنیت در فراتحلیل‌ها چقدر است، نه در کتاب‌های عامه‌پسند؟",
+      "برای چه کسانی و در چه شرایطی اثر دارد؟",
+      "آیا من آن را به‌جای راهبرد و تمرینِ واقعی گذاشته‌ام؟"
+     ],
+     "src": [
+      "sisk2018",
+      "burnette2023",
+      "macnamara2023",
+      "yeager_dweck2020"
+     ],
+     "tools": [
+      "tech:31",
+      "kfam:F9"
+     ],
+     "gap_fa": "صفحهٔ تکنیکِ ذهنیتِ رشد (tech:31) باید اندازهٔ اثرِ کوچک و بحثِ تکرار را صریحاً نشان دهد؛ وضعیتِ «اصلاحیه» برای آن در پشتوانهٔ علمی باید بازبینی شود.",
+     "claims": [
+      {
+       "fa": "هم‌بستگیِ ذهنیتِ رشد با پیشرفتِ تحصیلی ضعیف است و میانگینِ اثرِ مداخله‌ها بسیار کوچک.",
+       "kind": "empirical",
+       "basis_fa": "دو فراتحلیلِ Sisk و همکاران (۲۰۱۸): هم‌بستگیِ حدود r≈0.10 و اثرِ مداخله حدود d≈0.08، با اثرِ بیشتر برای دانش‌آموزانِ کم‌درآمد یا در معرضِ خطر.",
+       "src": [
+        "sisk2018"
+       ]
+      },
+      {
+       "fa": "اثرِ مداخله‌های ذهنیت ناهمگن است و به گروهِ هدف و کیفیتِ اجرا بستگی دارد.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Burnette و همکاران (۲۰۲۳): اثرهای کوچک و ناهمگن، با اثرِ بیشتر در گروه‌های پرخطر.",
+       "src": [
+        "burnette2023"
+       ]
+      },
+      {
+       "fa": "آیا پس از کنترلِ کیفیتِ مطالعه و سوگیریِ انتشار، اثرِ مداخله‌های ذهنیت بر پیشرفت از صفر متمایز است؟",
+       "kind": "outside",
+       "basis_fa": "Macnamara و Burgoyne (۲۰۲۳) پس از محدودکردن به مطالعاتِ باکیفیت اثری نزدیک به صفر یافتند؛ Yeager و Dweck (۲۰۲۰) و Burnette (۲۰۲۳) بر ناهمگنی و مکانیزم تأکید دارند. اختلاف هنوز حل نشده است.",
+       "src": [
+        "macnamara2023",
+        "yeager_dweck2020",
+        "burnette2023"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_attribution",
+     "fa": "اسناد و سبکِ تبیین",
+     "en": "Attribution and explanatory style",
+     "desc_fa": "اینکه علتِ موفقیت و شکست را به کجا نسبت می‌دهیم: درونی/بیرونی، پایدار/موقت، فراگیر/خاص؛ و پیوندش با درماندگی.",
+     "key_questions_fa": [
+      "این شکست را به چیزی پایدار و فراگیر نسبت داده‌ام یا به عاملی موقت و خاص؟",
+      "چه شواهدی برای تبیینِ رقیب وجود دارد؟",
+      "چند مورد پشتِ این حکمِ «همیشه» است؟"
+     ],
+     "src": [
+      "sweeney1986",
+      "tversky1974"
+     ],
+     "tools": [
+      "tech:12",
+      "tech:15",
+      "tech:20",
+      "kfam:F9",
+      "kfam:F11"
+     ],
+     "gap_fa": "در گره‌گشا تبیین‌های کاربر برای یک شکست در سه بُعد (درونی/پایدار/فراگیر) ثبت نمی‌شود تا الگوی سبکِ تبیین در طولِ زمان دیده شود.",
+     "claims": [
+      {
+       "fa": "نسبت‌دادنِ رویدادهای بد به علت‌های درونی، پایدار و فراگیر با نشانه‌های افسردگی همراه است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Sweeney و همکاران (۱۹۸۶، ۱۰۴ مطالعه): رابطهٔ معنادار در هر سه بُعد با اندازهٔ اثرِ متوسط؛ داده‌ها بیشتر مقطعی‌اند.",
+       "src": [
+        "sweeney1986"
+       ]
+      },
+      {
+       "fa": "حکمِ «من همیشه در همه چیز شکست می‌خورم» که از چند تجربه ساخته شده، احتمالی نزدیک به صفر دارد.",
+       "kind": "theorem",
+       "basis_fa": "حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص طبقِ T_universal نزدیک به صفر است؛ حتی برای موردِ بعدی طبقِ T_next احتمال (n+1)/(n+2) است، نه یک.",
+       "src": [
+        "tversky1974"
+       ]
+      },
+      {
+       "fa": "تبیینِ «فراگیر» (ناتوانی در همهٔ حوزه‌ها) از تبیینِ «خاص» (ناتوانی در این حوزه) محتمل‌تر نیست.",
+       "kind": "theorem",
+       "basis_fa": "تبیینِ فراگیر مستلزمِ تبیینِ خاص است (هر جا فراگیر صادق باشد، خاص هم صادق است)؛ طبقِ A1 احتمالش بیشتر نیست.",
+       "src": [
+        "sweeney1986"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_perfectionism",
+     "fa": "کمال‌گرایی",
+     "en": "Perfectionism",
+     "desc_fa": "معیارهای بسیار بالا همراه با ارزیابیِ سختگیرانهٔ خود و نگرانی از خطا، و پیوندش با فشار و اهمال.",
+     "key_questions_fa": [
+      "معیارِ «کافی» برای این کار چیست؟",
+      "این معیار را خودم گذاشته‌ام یا فکر می‌کنم دیگران از من انتظار دارند؟",
+      "هزینهٔ بیست درصدِ آخرِ کیفیت چقدر است؟"
+     ],
+     "src": [
+      "curran2019",
+      "steel2007"
+     ],
+     "tools": [
+      "tech:3",
+      "kfam:F4",
+      "kfam:F12",
+      "kfam:F10"
+     ],
+     "gap_fa": "برنامه برای هر کار «معیارِ کافی» و قاعدهٔ توقف ثبت نمی‌کند؛ گرهٔ «قاعدهٔ توقفِ بد» هست اما به کمال‌گرایی وصل نشده است.",
+     "claims": [
+      {
+       "fa": "کمال‌گرایی در نسل‌های جوان‌تر افزایش یافته و بیشترین افزایش در کمال‌گراییِ «تحمیل‌شده از سوی جامعه» بوده است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ هم‌گروهیِ Curran و Hill (۲۰۱۹)، ۱۶۴ نمونه از دانشجویان آمریکا، کانادا و بریتانیا ۱۹۸۹–۲۰۱۶؛ تعمیم به فرهنگ‌های دیگر نیاز به داده دارد.",
+       "src": [
+        "curran2019"
+       ]
+      },
+      {
+       "fa": "برخلافِ تصورِ رایج، کمال‌گرایی در فراتحلیل پیش‌بینی‌کنندهٔ قوی اهمال‌کاری نیست.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Steel (۲۰۰۷): رابطهٔ کمال‌گرایی با اهمال‌کاری ضعیف و نزدیک به صفر بود، در حالی که آزاردهندگیِ کار و تکانشگری قوی بودند.",
+       "src": [
+        "steel2007"
+       ]
+      },
+      {
+       "fa": "معیارِ «بدونِ هیچ خطا» در کاری با گام‌های زیاد، با افزایشِ تعدادِ گام‌ها به‌سرعت ناممکن می‌شود.",
+       "kind": "theorem",
+       "basis_fa": "اگر هر گام مستقلاً با احتمالِ p بی‌خطا باشد، احتمالِ بی‌خطاییِ n گام طبقِ A3/T_product برابرِ pⁿ است؛ مثلاً ۰٫۹۹ به توانِ ۱۰۰ حدودِ ۰٫۳۷ است.",
+       "src": [
+        "curran2019"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_affective_forecasting",
+     "fa": "پیش‌بینیِ هیجانی و خطاهایش",
+     "en": "Affective forecasting errors",
+     "desc_fa": "پیش‌بینیِ اینکه یک رویدادِ آینده چه حسی به ما می‌دهد و چه مدت؛ خطای اثر (شدت و مدت را بیش‌برآورد می‌کنیم) و غفلت از سیستمِ ایمنیِ روانی.",
+     "key_questions_fa": [
+      "پیش‌بینی می‌کنم این رویداد چقدر و تا کی حالم را بد/خوب می‌کند؟",
+      "دفعهٔ قبل که چیزی شبیه این رخ داد، واقعاً چقدر طول کشید؟",
+      "در آن روز چه چیزهای دیگری هم بر حالم اثر می‌گذارند؟"
+     ],
+     "src": [
+      "wilson2005",
+      "paul2009"
+     ],
+     "tools": [
+      "tech:24",
+      "tech:9",
+      "tech:23",
+      "kfam:F12",
+      "kfam:F7"
+     ],
+     "gap_fa": "پیش‌بینیِ هیجانیِ مکتوب (شدت/مدت) و مقایسه با گزارشِ واقعی پس از رویداد ثبت نمی‌شود؛ کالیبراسیون فقط برای کارت‌های مرور وجود دارد.",
+     "claims": [
+      {
+       "fa": "مردم شدت و مدتِ واکنشِ هیجانی به رویدادهای آینده را بیش‌برآورد می‌کنند (خطای اثر).",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Wilson و Gilbert (۲۰۰۵) بر پایهٔ ده‌ها آزمایشِ میدانی و آزمایشگاهی؛ اثر بارها تکرار شده، هرچند اندازه‌اش به نوعِ رویداد و روشِ اندازه‌گیری بستگی دارد.",
+       "src": [
+        "wilson2005"
+       ]
+      },
+      {
+       "fa": "یکی از علت‌های خطای مدت، غفلت از سازوکارهای روانیِ کنار آمدن (غفلتِ ایمنی) است.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Wilson و Gilbert (۲۰۰۵) آزمایش‌های «غفلتِ ایمنی» و تکرارهای آن را جمع‌بندی می‌کند؛ اثر در چند آزمایش دیده شده اما اندازه‌اش به نوعِ رویداد بستگی دارد.",
+       "src": [
+        "wilson2005"
+       ]
+      },
+      {
+       "fa": "خطای اثر یکنواخت نیست: برخی رویدادها مانند بیکاری اثرِ ماندگارِ واقعی دارند؛ پس پیش‌بینی باید با نرخِ پایهٔ همان نوعِ رویداد کالیبره شود، نه با قاعدهٔ کلیِ «زود فراموش می‌کنی».",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Paul و Moser (۲۰۰۹): بیکاری اثرِ متوسط و پایدار بر سلامتِ روان دارد، که با فرضِ سازگاریِ سریع در همه‌جا ناسازگار است.",
+       "src": [
+        "paul2009",
+        "wilson2005"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_cognitive_biases",
+     "fa": "سوگیری‌های شناختی در داوریِ روزمره",
+     "en": "Cognitive biases in everyday judgment",
+     "desc_fa": "میان‌برهای ذهنی (دسترس‌پذیری، نمایندگی، لنگر) که در شرایطِ عدم قطعیت خطاهای نظام‌مند می‌سازند، و آنچه واقعاً آن‌ها را کم می‌کند.",
+     "key_questions_fa": [
+      "نرخِ پایهٔ این پیشامد چیست و آیا آن را در نظر گرفته‌ام؟",
+      "آیا سناریوی پرجزئیات را محتمل‌تر از جزءِ خودش حس می‌کنم؟",
+      "آیا عددِ اول (لنگر) داوریِ من را کشیده است؟"
+     ],
+     "src": [
+      "tversky1974",
+      "morewedge2015"
+     ],
+     "tools": [
+      "tech:9",
+      "tech:24",
+      "tech:25",
+      "tech:11",
+      "tech:15",
+      "kfam:F11",
+      "kfam:F12",
+      "kfam:F4",
+      "view:e_home"
+     ],
+     "gap_fa": "کارخانهٔ سنجش ادعاهای بیرونی را می‌سنجد، اما داوری‌های روزمرهٔ خودِ کاربر (دربارهٔ آینده، دیگران، خطر) را با فهرستِ سوگیری‌ها وارسی نمی‌کند؛ آموزشِ بازخورددارِ ضدسوگیری هم نیست.",
+     "claims": [
+      {
+       "fa": "احتمالِ «الف و ب» هرگز از احتمالِ «الف» بیشتر نیست؛ پس داوریِ خلافِ آن (خطای عطف) خطاست.",
+       "kind": "theorem",
+       "basis_fa": "رخدادِ «الف و ب» مستلزمِ رخدادِ «الف» است؛ طبقِ A1 احتمالش بیشتر نیست.",
+       "src": [
+        "tversky1974"
+       ]
+      },
+      {
+       "fa": "بی‌توجهی به نرخِ پایه در ارزیابیِ یک شاهد، احتمالِ پسین را نادرست می‌کند.",
+       "kind": "theorem",
+       "basis_fa": "طبقِ حسابِ احتمالات (A3) احتمالِ پسین برابرِ حاصل‌ضربِ نرخِ پایه در درست‌نماییِ شاهد، تقسیم بر احتمالِ کلِ شاهد است؛ حذفِ نرخِ پایه یعنی فرضِ نادرستِ برابریِ پیشین‌ها.",
+       "src": [
+        "tversky1974"
+       ]
+      },
+      {
+       "fa": "میان‌برهای نمایندگی، دسترس‌پذیری و لنگر خطاهای نظام‌مند و قابلِ پیش‌بینی تولید می‌کنند.",
+       "kind": "empirical",
+       "basis_fa": "Tversky و Kahneman (۱۹۷۴) و دهه‌ها تکرار؛ بیشترِ این اثرها در پروژه‌های تکرار پایدار ماندند، هرچند اندازه‌شان به صورت‌بندیِ مسئله حساس است.",
+       "src": [
+        "tversky1974"
+       ]
+      },
+      {
+       "fa": "یک جلسهٔ آموزشِ ضدسوگیری با بازخورد می‌تواند چند سوگیری را کاهش دهد و اثرش تا چند هفته بماند.",
+       "kind": "empirical",
+       "basis_fa": "دو آزمایشِ Morewedge و همکاران (۲۰۱۵): کاهشِ قابل‌توجه با ماندگاری ۲ تا ۳ ماه؛ انتقال به تصمیم‌های واقعی هنوز کمتر آزموده شده است.",
+       "src": [
+        "morewedge2015"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_mind_behavior",
+   "fa": "رفتار: اهمال، عادت و اجتناب",
+   "en": "Behavior: procrastination, habit and avoidance",
+   "areas": [
+    {
+     "id": "md_procrastination",
+     "fa": "اهمال‌کاری",
+     "en": "Procrastination",
+     "desc_fa": "به تعویق انداختنِ داوطلبانهٔ کاری با وجودِ آگاهی از بدتر شدنِ وضع؛ معمولاً تنظیمِ کوتاه‌مدتِ حال به قیمتِ خودِ آینده.",
+     "key_questions_fa": [
+      "کدام جنبهٔ این کار ناخوشایند است: ابهام، دشواری، کسالت یا ترس از قضاوت؟",
+      "کوچک‌ترین گامِ بعدی که در ۱۰ دقیقه انجام شود چیست؟",
+      "«اگر … آنگاه …»ِ من برای شروع چیست؟"
+     ],
+     "src": [
+      "steel2007",
+      "sirois2013",
+      "gollwitzer2006"
+     ],
+     "tools": [
+      "tech:2",
+      "tech:23",
+      "kfam:F12",
+      "kfam:F7",
+      "view:protos"
+     ],
+     "gap_fa": "برنامه برای کارهای عقب‌افتاده «قصدِ اجرایی» (اگر/آنگاه) و شکستن به گامِ ۱۰ دقیقه‌ای را ثبت و پیگیری نمی‌کند.",
+     "claims": [
+      {
+       "fa": "آزاردهندگیِ کار، تأخیر تا پاداش، خودکارآمدیِ پایین، تکانشگری و وظیفه‌شناسیِ پایین قوی‌ترین پیش‌بینی‌کننده‌های اهمال‌کاری‌اند.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Steel (۲۰۰۷، ۶۹۱ هم‌بستگی): وظیفه‌شناسی و تکانشگری قوی‌ترین هم‌بستگی‌ها را داشتند.",
+       "src": [
+        "steel2007"
+       ]
+      },
+      {
+       "fa": "اهمال‌کاری اساساً شکلی از اولویت‌دادن به تنظیمِ کوتاه‌مدتِ حال است.",
+       "kind": "empirical",
+       "basis_fa": "مدلِ Sirois و Pychyl (۲۰۱۳) بر پایهٔ شواهدِ هم‌بستگی و برخی آزمایش‌ها؛ پیش‌بینی‌های آن نیازمندِ آزمونِ بیشتر است.",
+       "src": [
+        "sirois2013"
+       ]
+      },
+      {
+       "fa": "قصدِ اجرایی («اگر موقعیتِ X پیش آمد، کارِ Y را می‌کنم») رسیدن به هدف را بهبود می‌دهد.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Gollwitzer و Sheeran (۲۰۰۶، ۹۴ آزمون): اثرِ متوسط تا بزرگ (حدود d≈0.65)؛ احتمالِ سوگیریِ انتشار اندازهٔ واقعی را شاید کوچک‌تر کند.",
+       "src": [
+        "gollwitzer2006"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_habits",
+     "fa": "عادت و خودکاری",
+     "en": "Habits and automaticity",
+     "desc_fa": "رفتارهایی که با تکرار در یک بافتِ ثابت به نشانهٔ محیطی گره می‌خورند و بدونِ تصمیمِ آگاهانه اجرا می‌شوند.",
+     "key_questions_fa": [
+      "نشانهٔ محیطیِ این رفتار (زمان، مکان، کارِ قبلی) چیست؟",
+      "چه بافتی را می‌توانم تغییر دهم تا عادتِ قدیمی بی‌نشانه بماند؟",
+      "این رفتارِ تازه را به کدام کارِ روزانهٔ موجود وصل کنم؟"
+     ],
+     "src": [
+      "wood2016",
+      "lally2009",
+      "gollwitzer2006"
+     ],
+     "tools": [
+      "kfam:F6",
+      "tech:42",
+      "view:protos",
+      "view:home"
+     ],
+     "gap_fa": "روال‌های برنامه (پروتکل‌ها) تکرار را می‌سنجند اما نشانهٔ محیطی، بافتِ ثابت و منحنیِ خودکارشدن را ثبت نمی‌کنند.",
+     "claims": [
+      {
+       "fa": "عادت‌ها با نشانهٔ بافتی فعال می‌شوند و نسبت به تغییرِ هدف یا ارزشِ پاداش نسبتاً بی‌حساس‌اند.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Annual Review (Wood و Rünger ۲۰۱۶) بر پایهٔ آزمایش‌های کاهشِ ارزشِ پاداش و مطالعاتِ میدانی.",
+       "src": [
+        "wood2016"
+       ]
+      },
+      {
+       "fa": "خودکار شدنِ یک رفتارِ تازه به‌طورِ میانه حدودِ ۶۶ روز طول کشید، با دامنهٔ بسیار گسترده (۱۸ تا ۲۵۴ روز).",
+       "kind": "empirical",
+       "basis_fa": "مطالعهٔ Lally و همکاران با ۹۶ نفر (۸۲ نفر در تحلیل)؛ نمونهٔ کوچک و یک مطالعه، پس عددِ ۶۶ برآوردی تقریبی است نه قانون.",
+       "src": [
+        "lally2009"
+       ]
+      },
+      {
+       "fa": "تغییرِ بافت (جابه‌جایی، شغلِ تازه) فرصتی برای شکستنِ عادتِ قدیم و ساختنِ عادتِ تازه است.",
+       "kind": "empirical",
+       "basis_fa": "شواهدِ میدانیِ مرورشده در Wood و Rünger (۲۰۱۶)؛ بیشتر شبه‌آزمایشی.",
+       "src": [
+        "wood2016"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_avoidance",
+     "fa": "اجتناب و رفتارهای ایمنی",
+     "en": "Avoidance and safety behaviors",
+     "desc_fa": "دوری از موقعیت، فکر یا احساسِ ناخوشایند و کارهای کوچکی که برای «امن ماندن» می‌کنیم؛ آرامشِ امروز به قیمتِ ماندگاریِ ترس.",
+     "key_questions_fa": [
+      "از چه چیزی دوری می‌کنم و این دوری چه پیش‌بینی‌ای را آزموده‌نشده نگه می‌دارد؟",
+      "اگر رفتارِ ایمنی را کنار بگذارم، دقیقاً پیش‌بینی می‌کنم چه شود؟",
+      "اجتناب در این هفته چه هزینه‌ای برایم داشته است؟"
+     ],
+     "src": [
+      "craske2014",
+      "aldao2010",
+      "atjak2015"
+     ],
+     "tools": [
+      "kfam:F7",
+      "tech:21",
+      "tech:22",
+      "move:mv_control"
+     ],
+     "gap_fa": "زیرگونهٔ «اجتناب» در گره‌ها هست، اما فهرستِ موقعیت‌های اجتنابی با درجهٔ دشواری (نردبانِ مواجهه) وجود ندارد.",
+     "claims": [
+      {
+       "fa": "اجتناب با تسکینِ فوری تقویت می‌شود و ترس را در درازمدت حفظ می‌کند.",
+       "kind": "empirical",
+       "basis_fa": "مدل‌های یادگیری (Craske و همکاران ۲۰۱۴) و هم‌بستگیِ متوسط تا بزرگِ اجتناب با نشانه‌ها در فراتحلیلِ Aldao (۲۰۱۰).",
+       "src": [
+        "craske2014",
+        "aldao2010"
+       ]
+      },
+      {
+       "fa": "پیش‌بینی‌ای که هرگز آزموده نشود، هیچ شاهدی به سود یا زیانِ خود نمی‌گیرد؛ پس اجتناب باورِ ترسناک را در همان درجهٔ اولیه منجمد می‌کند.",
+       "kind": "theorem",
+       "basis_fa": "بدونِ مشاهدهٔ تازه، طبقِ A3 احتمالِ پسین همان احتمالِ پیشین است و طبقِ T_null استدلالِ بی‌پشتوانه چیزی نمی‌افزاید (و چیزی هم نمی‌کاهد).",
+       "src": [
+        "craske2014"
+       ]
+      },
+      {
+       "fa": "رویکردهای مبتنی بر پذیرش که اجتنابِ تجربی را هدف می‌گیرند، در کارآزمایی‌ها اثربخش‌اند.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ A-Tjak و همکاران (۲۰۱۵، ۳۹ کارآزمایی) برای ACT.",
+       "src": [
+        "atjak2015"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_mind_capacity",
+   "fa": "فشار، تاب‌آوری و ظرفیتِ ذهنی",
+   "en": "Stress, resilience and mental capacity",
+   "areas": [
+    {
+     "id": "md_stress_coping",
+     "fa": "فشارِ روانی و مقابله",
+     "en": "Stress and coping",
+     "desc_fa": "فشار حاصلِ ارزیابیِ این است که خواسته‌ها از منابع بیشترند؛ مقابله یعنی کارهایی که برای حلِ مسئله یا تنظیمِ هیجان می‌کنیم.",
+     "key_questions_fa": [
+      "کدام بخشِ این موقعیت در کنترلِ من است و کدام نیست؟",
+      "برای بخشِ قابلِ کنترل چه گامِ مسئله‌محوری دارم؟",
+      "برای بخشِ غیرقابلِ کنترل چه راهِ هیجان‌محوری (پذیرش، حمایت) دارم؟"
+     ],
+     "src": [
+      "lazarus1984",
+      "mcewen1998",
+      "sverke2002"
+     ],
+     "tools": [
+      "kfam:F5",
+      "kfam:F10",
+      "tech:2",
+      "tech:35"
+     ],
+     "gap_fa": "برنامه بارِ فشار (رویدادها، فشارهای مزمن) و تفکیکِ قابلِ کنترل/غیرقابلِ کنترل را ثبت نمی‌کند؛ گرهِ «فشار» فقط در لحظهٔ گیر ثبت می‌شود.",
+     "claims": [
+      {
+       "fa": "شدتِ فشار به ارزیابیِ فرد از خواسته‌ها و منابع بستگی دارد، نه فقط به خودِ رویداد.",
+       "kind": "empirical",
+       "basis_fa": "مدلِ تعاملیِ Lazarus و Folkman (۱۹۸۴)، پایهٔ دهه‌ها پژوهش؛ چارچوبی گسترده که اجزایش در مطالعاتِ متعدد پشتیبانی شده است.",
+       "src": [
+        "lazarus1984"
+       ]
+      },
+      {
+       "fa": "فعال‌شدنِ مکرر و مزمنِ پاسخِ فشار بارِ فرسایشی (بارِ آلوستاتیک) بر بدن می‌گذارد.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ McEwen (۱۹۹۸) در NEJM بر پایهٔ شواهدِ زیستی و بالینی.",
+       "src": [
+        "mcewen1998"
+       ]
+      },
+      {
+       "fa": "سودمندیِ مقابلهٔ مسئله‌محور در برابرِ هیجان‌محور به میزانِ قابلِ کنترل بودنِ موقعیت بستگی دارد.",
+       "kind": "empirical",
+       "basis_fa": "پیش‌بینیِ نظریهٔ Lazarus و Folkman؛ شواهد هم‌سو اما ناهمگن و بیشتر هم‌بستگی‌اند.",
+       "src": [
+        "lazarus1984"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_resilience",
+     "fa": "تاب‌آوری",
+     "en": "Resilience",
+     "desc_fa": "حفظِ کارکردِ نسبتاً پایدار پس از فقدان یا رویدادِ سخت؛ رایج‌تر از آنچه تصور می‌شود.",
+     "key_questions_fa": [
+      "در سختی‌های گذشته چه چیزی کمکم کرد سرپا بمانم؟",
+      "منابعِ حمایتیِ من (آدم‌ها، روال‌ها، پس‌انداز) کدام‌اند؟",
+      "تصویرم از «بعد از اتفاق» بر پایهٔ تجربه است یا تخیل؟"
+     ],
+     "src": [
+      "bonanno2004",
+      "wilson2005"
+     ],
+     "tools": [
+      "tech:9",
+      "kfam:F12"
+     ],
+     "gap_fa": "برنامه تجربه‌های گذشتهٔ کاربر در عبور از سختی را به‌عنوانِ «نرخِ پایهٔ شخصی» برای پیش‌بینی‌های اضطرابی ذخیره و یادآوری نمی‌کند.",
+     "claims": [
+      {
+       "fa": "پس از فقدان یا رویدادِ آسیب‌زا، شایع‌ترین مسیر تاب‌آوری است (کارکردِ پایدار)، نه آسیبِ طولانی.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ Bonanno (۲۰۰۴) بر پایهٔ مطالعاتِ طولیِ سوگ و آسیب؛ نسبتِ دقیق به نوعِ رویداد و روشِ تعریفِ مسیرها بستگی دارد.",
+       "src": [
+        "bonanno2004"
+       ]
+      },
+      {
+       "fa": "تاب‌آوری چند مسیر دارد و یک ویژگیِ ثابتِ واحد نیست.",
+       "kind": "empirical",
+       "basis_fa": "Bonanno (۲۰۰۴) عوامل و مسیرهای متعدد را گزارش می‌کند؛ پیش‌بینی‌کننده‌ها اندازهٔ اثرِ کوچک دارند.",
+       "src": [
+        "bonanno2004"
+       ]
+      },
+      {
+       "fa": "آیا تاب‌آوری را می‌توان به‌عنوانِ مهارت آموزش داد؟",
+       "kind": "outside",
+       "basis_fa": "تعریف‌ها و سنجه‌های تاب‌آوری یکدست نیستند و در منابعِ وارسی‌شدهٔ این نقشه فراتحلیلِ قاطعی برای آموزش‌پذیری نیامده؛ فعلاً قابلِ داوری نیست.",
+       "src": [
+        "bonanno2004"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_capacity_states",
+     "fa": "حالت‌های ظرفیتِ ذهنی: خستگی، خواب و بارِ شناختی",
+     "en": "Mental capacity states: fatigue, sleep, cognitive load",
+     "desc_fa": "ظرفیتِ ذهنی ثابت نیست: کم‌خوابی، خستگی، گرسنگی و بارِ حافظهٔ کاری کیفیتِ فکر و تنظیمِ هیجان را تغییر می‌دهند.",
+     "key_questions_fa": [
+      "دیشب چند ساعت خوابیدم و الان چقدر هوشیارم؟",
+      "چند چیز را هم‌زمان در ذهن نگه داشته‌ام؟",
+      "آیا این تصمیمِ مهم را باید به وقتِ بهتری موکول کنم؟"
+     ],
+     "src": [
+      "lim2010",
+      "sweller1988",
+      "hagger2016"
+     ],
+     "tools": [
+      "kfam:F5",
+      "tech:37",
+      "tech:2",
+      "tech:26"
+     ],
+     "gap_fa": "خواب و خستگی فقط به‌عنوانِ زیرگونهٔ گره پرسیده می‌شوند؛ ثبتِ روزانهٔ خواب/انرژی و ربطش با کیفیتِ جلسه‌ها و گیرها وجود ندارد.",
+     "claims": [
+      {
+       "fa": "کم‌خوابیِ کوتاه‌مدت بیشترین آسیب را به توجهِ ساده و هوشیاری می‌زند و آسیبش به استدلالِ پیچیده کمتر است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Lim و Dinges (۲۰۱۰، ۷۰ مقاله): اثرِ بزرگ بر توجهِ ساده، متوسط بر حافظهٔ کاری و کوچک/نامعنادار بر استدلال.",
+       "src": [
+        "lim2010"
+       ]
+      },
+      {
+       "fa": "حافظهٔ کاری محدود است و بارِ اضافی (مثلاً جستجوی کور در مسئله) یادگیری را کاهش می‌دهد.",
+       "kind": "empirical",
+       "basis_fa": "Sweller (۱۹۸۸) و برنامهٔ پژوهشیِ نظریهٔ بارِ شناختی با آزمایش‌های متعدد.",
+       "src": [
+        "sweller1988"
+       ]
+      },
+      {
+       "fa": "آیا اراده منبعی تمام‌شدنی است (خودتهی‌شدگی)؟",
+       "kind": "outside",
+       "basis_fa": "تکرارِ چندآزمایشگاهیِ ثبت‌شده (Hagger و همکاران ۲۰۱۶، ۲۳ آزمایشگاه، بیش از ۲۰۰۰ نفر) اثری نزدیک به صفر یافت؛ مدافعان به روشِ آزمون ایراد دارند. پس این ادعا مورد مناقشه است و نباید مبنای برنامه‌ریزی شود.",
+       "src": [
+        "hagger2016"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "g_s_mind_change",
+   "fa": "روش‌های تغییر و مرزِ خودیاری",
+   "en": "Methods of change and the self-help boundary",
+   "areas": [
+    {
+     "id": "md_cbt_model",
+     "fa": "مدلِ شناختی‌رفتاری: فکر، احساس، رفتار",
+     "en": "Cognitive-behavioral model (thought–feeling–behavior)",
+     "desc_fa": "موقعیت به‌خودیِ خود احساس نمی‌سازد؛ تعبیرِ ما از آن احساس و رفتار را شکل می‌دهد و رفتار به نوبهٔ خود تعبیر را تقویت یا اصلاح می‌کند.",
+     "key_questions_fa": [
+      "در این موقعیت چه فکری از ذهنم گذشت؟",
+      "شواهدِ موافق و مخالفِ این فکر چیست؟",
+      "چه رفتاری این فکر را تقویت کرد و چه رفتاری می‌تواند آن را بیازماید؟"
+     ],
+     "src": [
+      "hofmann2012",
+      "webb2012"
+     ],
+     "tools": [
+      "tech:13",
+      "tech:15",
+      "tech:21",
+      "tech:20",
+      "kfam:F11",
+      "kfam:F7",
+      "view:kcase",
+      "view:kcases"
+     ],
+     "gap_fa": "گره‌گشا (موقعیتِ گیر ← ریشه) به ثبتِ فکر نزدیک است، اما جدولِ «موقعیت/فکرِ خودآیند/هیجان و شدت/شواهد/فکرِ متوازن/شدتِ پس» را ندارد.",
+     "claims": [
+      {
+       "fa": "درمانِ شناختی‌رفتاری برای اختلال‌های اضطرابی، فشار و چند مشکلِ دیگر اثربخش است.",
+       "kind": "empirical",
+       "basis_fa": "مرورِ ۲۶۹ فراتحلیل (Hofmann و همکاران ۲۰۱۲): قوی‌ترین شواهد برای اضطراب، اختلال‌های جسمانی‌سازی، پرخوری عصبی، خشم و فشارِ کلی؛ کیفیتِ برخی کارآزمایی‌ها محدود است.",
+       "src": [
+        "hofmann2012"
+       ]
+      },
+      {
+       "fa": "دو فکرِ متناقض دربارهٔ یک موقعیت نمی‌توانند هر دو صادق باشند؛ پس وقتی شواهدِ یقینی یکی را رد کند، آن فکر کنار می‌رود.",
+       "kind": "theorem",
+       "basis_fa": "A0 (امتناعِ تناقض) و T_conflict (تعارض با یقینی ⇒ صفر)؛ این مبنای منطقیِ وارسیِ شواهد در ثبتِ فکر است، نه ادعایی دربارهٔ اثربخشیِ درمان.",
+       "src": [
+        "hofmann2012"
+       ]
+      },
+      {
+       "fa": "آیا تغییرِ شناختی سازوکارِ اصلیِ بهبود در درمانِ شناختی‌رفتاری است؟",
+       "kind": "outside",
+       "basis_fa": "اثربخشی ثابت شده اما سازوکار مورد مناقشه است؛ مؤلفه‌های رفتاری به‌تنهایی هم اثر دارند. با شواهدِ این نقشه قابلِ داوری نیست.",
+       "src": [
+        "hofmann2012"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_exposure_experiments",
+     "fa": "مواجهه و آزمایشِ رفتاری",
+     "en": "Exposure and behavioral experiments",
+     "desc_fa": "نزدیک شدنِ برنامه‌ریزی‌شده و تدریجی به موقعیتِ ترسناک، با پیش‌بینیِ مکتوب، تا انتظار با واقعیت روبه‌رو شود.",
+     "key_questions_fa": [
+      "دقیقاً پیش‌بینی می‌کنم چه اتفاقی بیفتد و با چه احتمالی؟",
+      "چه آزمایشِ کوچکی این پیش‌بینی را می‌آزماید؟",
+      "پس از آزمایش، چه چیزی با انتظارم فرق داشت؟"
+     ],
+     "src": [
+      "craske2014",
+      "hofmann2012"
+     ],
+     "tools": [
+      "tech:21",
+      "tech:22",
+      "tech:23",
+      "tech:24",
+      "move:mv_control",
+      "kfam:F7"
+     ],
+     "gap_fa": "قالبِ «آزمایشِ رفتاری» (پیش‌بینی + احتمال ← آزمایش ← نتیجه ← بازنگریِ باور) و نردبانِ مواجهه در برنامه نیست؛ آزمونِ فرضیه فقط برای مسئله‌های علمی تعریف شده است.",
+     "claims": [
+      {
+       "fa": "مواجهه بیشتر از راهِ نقضِ انتظار (یادگیریِ بازدارندهٔ تازه) کار می‌کند تا صرفاً کاهشِ ترس در طولِ جلسه.",
+       "kind": "empirical",
+       "basis_fa": "مدل و شواهدِ Craske و همکاران (۲۰۱۴) از آزمایش‌های شرطی‌سازی و کارآزمایی‌ها؛ برخی پیش‌بینی‌های بهینه‌سازی هنوز در حالِ آزمون‌اند.",
+       "src": [
+        "craske2014"
+       ]
+      },
+      {
+       "fa": "یک مشاهدهٔ صریحاً مخالف، پیش‌بینیِ یقینیِ «حتماً رخ می‌دهد» را ابطال می‌کند.",
+       "kind": "theorem",
+       "basis_fa": "اگر باورِ «در موقعیتِ X حتماً Y» صادق بود، در موقعیتِ X نبودنِ Y ممکن نبود؛ مشاهدهٔ نبودنِ Y با A0 آن باورِ کلیِ یقینی را رد می‌کند (رفعِ تالی).",
+       "src": [
+        "craske2014"
+       ]
+      },
+      {
+       "fa": "درمان‌های مبتنی بر مواجهه از اثربخش‌ترین مداخله‌ها برای اختلال‌های اضطرابی‌اند.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیل‌های مرورشده در Hofmann و همکاران (۲۰۱۲)؛ نتایج بارها تکرار شده‌اند.",
+       "src": [
+        "hofmann2012",
+        "craske2014"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_acceptance",
+     "fa": "رویکردهای مبتنی بر پذیرش و ذهن‌آگاهی",
+     "en": "Acceptance- and mindfulness-based approaches",
+     "desc_fa": "به‌جای جنگیدن با فکر و احساس، دیدنِ آن‌ها به‌عنوانِ رویدادهای ذهنی و حرکت به سمتِ ارزش‌ها؛ تحملِ ابهام به‌جای کنترلِ آن.",
+     "key_questions_fa": [
+      "آیا دارم با این احساس می‌جنگم یا اجازه می‌دهم باشد و کارم را می‌کنم؟",
+      "این کار در خدمتِ کدام ارزشِ من است؟",
+      "می‌توانم این فکر را «یک فکر» ببینم، نه یک واقعیت؟"
+     ],
+     "src": [
+      "atjak2015",
+      "khoury2013",
+      "webb2012"
+     ],
+     "tools": [
+      "tech:35",
+      "tech:32",
+      "kfam:F7",
+      "kfam:F5"
+     ],
+     "gap_fa": "تمرینِ ذهن‌آگاهی یا گسلشِ شناختی و ثبتِ ارزش‌ها در برنامه نیست؛ tech:35 فقط ابهامِ معرفتی را پوشش می‌دهد نه پذیرشِ هیجانی.",
+     "claims": [
+      {
+       "fa": "درمانِ پذیرش و تعهد (ACT) از گروهِ انتظار و درمانِ معمول بهتر است و با درمان‌های شناختی‌رفتاری مقایسه‌پذیر است.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ A-Tjak و همکاران (۲۰۱۵، ۳۹ کارآزمایی، ۱۸۲۱ بیمار): اثرِ متوسط در برابرِ کنترل‌ها؛ تفاوتِ معنادار با CBT دیده نشد.",
+       "src": [
+        "atjak2015"
+       ]
+      },
+      {
+       "fa": "درمان‌های مبتنی بر ذهن‌آگاهی اثرِ متوسطی بر اضطراب، افسردگی و فشار دارند.",
+       "kind": "empirical",
+       "basis_fa": "فراتحلیلِ Khoury و همکاران (۲۰۱۳، ۲۰۹ مطالعه): اثرِ متوسط پیش‌وپس و در برابرِ کنترل‌های غیرفعال؛ در برابرِ درمان‌های فعالِ دیگر برتری نداشت.",
+       "src": [
+        "khoury2013"
+       ]
+      },
+      {
+       "fa": "آیا سازوکارِ پذیرش واقعاً از بازارزیابیِ شناختی متمایز است؟",
+       "kind": "outside",
+       "basis_fa": "شواهدِ مقایسه‌ایِ مستقیم کم است و فراتحلیل‌ها تفاوتِ اثربخشی نیافته‌اند؛ تمایزِ نظری با داده‌های موجود قطعی نمی‌شود.",
+       "src": [
+        "atjak2015",
+        "webb2012"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "md_help_boundary",
+     "fa": "چه وقت کمکِ تخصصی لازم است (مرز: برنامه درمان نیست)",
+     "en": "When to seek professional help (the app is not therapy)",
+     "desc_fa": "برنامه ابزارِ خودشناسی و یادگیری است، نه تشخیص یا درمان؛ این بخش نشانه‌هایی را مشخص می‌کند که باید کار را به متخصص یا خدماتِ اورژانس سپرد.",
+     "key_questions_fa": [
+      "آیا این حالت بیش از دو هفته ادامه داشته و کار، خواب یا رابطه‌هایم را مختل کرده است؟",
+      "آیا فکرِ آسیب به خود یا ناامیدیِ شدید دارم؟",
+      "آیا خودیاری چند هفته امتحان شده و بهتر نشده‌ام؟"
+     ],
+     "src": [
+      "nice_cg123",
+      "spitzer2006"
+     ],
+     "tools": [
+      "kfam:F5"
+     ],
+     "gap_fa": "برنامه هیچ مرزِ صریح، پرسش‌نامهٔ غربالگری (مثلاً GAD-7) یا مسیرِ ارجاع ندارد؛ تنها اشاره، یادداشتِ «فقط پرسش و ارجاع» در زیرگونهٔ بدنِ F5 است. باید پیامِ ثابتِ مرز و شماره‌های کمکِ فوری (اورژانسِ اجتماعی ۱۲۳ و صدای مشاور ۱۴۸۰ در ایران) دیده شود.",
+     "claims": [
+      {
+       "fa": "در مراقبتِ پله‌ای، خودیاریِ کم‌شدت برای نشانه‌های خفیف مناسب است و نشانه‌های متوسط تا شدید یا خطر باید به ارزیابی و درمانِ تخصصی ارجاع شوند.",
+       "kind": "empirical",
+       "basis_fa": "راهنمای بالینیِ NICE CG123 (۲۰۱۱) بر پایهٔ مرورِ نظام‌مندِ شواهد و اجماعِ متخصصان.",
+       "src": [
+        "nice_cg123"
+       ]
+      },
+      {
+       "fa": "پرسش‌نامهٔ کوتاهی مانند GAD-7 با برشِ ۱۰ اضطرابِ فراگیر را با حساسیت و ویژگیِ خوب غربال می‌کند، اما تشخیص نیست.",
+       "kind": "empirical",
+       "basis_fa": "اعتبارسنجیِ Spitzer و همکاران (۲۰۰۶، حدود ۲۷۰۰ بیمارِ مراقبتِ اولیه): در برشِ ۱۰ حساسیت حدود ۸۹٪ و ویژگی حدود ۸۲٪؛ پس درصدی مثبتِ کاذب و منفیِ کاذب همیشه هست.",
+       "src": [
+        "spitzer2006"
+       ]
+      },
+      {
+       "fa": "اینکه حالِ یک کاربرِ مشخص اختلالِ روانی است یا نه، و اینکه خطرِ آسیب به خود وجود دارد یا نه، در این برنامه قابلِ داوری نیست.",
+       "kind": "outside",
+       "basis_fa": "تشخیص و ارزیابیِ خطر نیازمندِ مصاحبهٔ بالینی است؛ برنامه فقط می‌تواند بپرسد و ارجاع دهد. هر نشانهٔ خطر یعنی ارجاعِ فوری.",
+       "src": [
+        "nice_cg123"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

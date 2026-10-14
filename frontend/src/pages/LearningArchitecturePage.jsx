@@ -145,6 +145,8 @@ export default function LearningArchitecturePage() {
       // «گره‌گشا» follow-ups: the page decides what is due; the server delivers by Telegram / e-mail
       remind: (payload) => api.post(`/app-records/${APP}/reminders`, payload).then((r) => r.data),
       unremind: (key) => api.delete(`/app-records/${APP}/reminders/${encodeURIComponent(key)}`).then((r) => r.data),
+      // «📧 گزارشِ تور»: گزارشِ HTML با نمودارهای PNG به ایمیلِ مالک (Gmail ِ متصل یا SMTP) — وضعِ صادقانه برمی‌گردد
+      mail: (payload) => api.post(`/app-records/${APP}/report-email`, payload, { timeout: 60000 }).then((r) => r.data),
       remindStatus: () => api.get(`/app-records/${APP}/reminders`).then((r) => ({ ...(r.data.channels || {}), items: r.data.items || [] })),
     };
     loadBundle()
