@@ -63,3 +63,8 @@ merged_from: []
 - Give it the facts a GP needs: the ownership map (same file the routines follow, built into the page), each roadmap item's stage, pending owner decisions, and the page's OPEN sheets (no duplicates).
 - Confidence < 0.75 ⇒ ask the user, don't file. Every filing gets a **second opinion** from a stronger reasoning model that can veto, correct the area, or point at an open sheet; if the consultant is down, file only ≥ 0.9 and flag «no second opinion» so the routine scrutinises harder.
 - The sheet carries area + kind in its title, the owner routine and its procedure, the differential, and the hand-off procedure the handling routine must follow.
+
+## Update 2026-10-14 (b) — test the referral prompt with a real model, not canned answers
+- Export the exact system prompt and the exact user message the page builds for realistic scenarios and have an independent model answer them (assistant + consultant roles). 7/8 were right; the 8th (statistical errors) was referred as «build a new rule» by BOTH models although the specialist routine already had it on its agenda.
+- Owners are not enough: give the GP each routine's **current agenda** (one line per track, each pointing at a real prompt section, checked by a test). After that the same scenario became «already in progress — who, when; priority only if needed now».
+- Prompt budget: the new message and attached text are never cut; history takes what remains; any unavoidable cut is announced in the prompt.

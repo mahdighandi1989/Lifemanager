@@ -242,3 +242,9 @@ and give the reviewer the job of checking it.
 - **Protocol in every prompt (identical text):** identity env var; `inbox` first in every run; `precheck` («already done?» — commits on the area since the sheet, owner ledger, open hand-offs) before touching an area; work in another's area only by its procedure; record; stale (owner did not close in 2 rounds) surfaced by the general round.
 - **Guard, not trust:** the ship script maps the pushed paths to areas and refuses a cross-area push with no hand-off by this routine; a merge-gate test checks the map is complete, every named procedure heading exists, and all prompts carry the protocol.
 - Bump + archive prompt versions per the repo's own procedure every time (an unversioned edit is itself a coordination failure).
+
+## Update 2026-10-14 (b) — what only EXECUTING the coordination revealed
+- **One file per hand-off.** Two routines appending to one JSON ledger at the same time ⇒ rebase conflict and duplicate sequential ids. Use one file per entry (id = timestamp µs + routine + random) and a generated view merged with `merge=union`, regenerated after every rebase.
+- **`git log --since=YYYY-MM-DD` means «that day at the current time»**, not midnight — an «already done?» check missed the owner's work from the same morning. Pass `YYYY-MM-DD 00:00:00` and start a day early.
+- **Name the actor in the commit.** When every commit is authored by the same bot, add a `Routine: <name>` trailer in the ship script and show it in the precheck.
+- **Replay real history through the guard** before trusting it: the map wrongly made engine code «owner-decision only» and would have blocked a real crash fix — split «engine (fix with hand-off)» from «rules (owner decision)».
