@@ -16,6 +16,7 @@ export const DOCS = [
   { key: 'PROGRESS', label: 'دفترِ پیشرفت' },
   { key: 'WORKLOG', label: 'دفترِ کار' },
   { key: 'VERIFIED_BOOKLET', label: 'جزوهٔ متقن (بک‌تست)' },
+  { key: 'TERRITORY', label: 'قلمروِ معرفت‌شناسی' },
 ];
 
 export function slug(text) {
@@ -37,7 +38,7 @@ export function assignHeadingIds(root, seen = {}) {
   });
 }
 
-const DOC_FILE = /^(HANDBOOK|PROGRESS|WORKLOG)\.md(?:#(.*))?$/;
+const DOC_FILE = /^(HANDBOOK|PROGRESS|WORKLOG|VERIFIED_BOOKLET|TERRITORY)\.md(?:#(.*))?$/;
 const REPO_DOCS_DIR = 'apps/learning-architecture/docs/';
 
 /**

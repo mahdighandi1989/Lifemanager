@@ -28,13 +28,14 @@ const BT = process.env.EPI_BT_DIR ? path.resolve(process.env.EPI_BT_DIR) : path.
 const CORPUS = path.join(BT, "corpus");
 const SAMPLES = path.join(BT, "samples");   // نمونه‌های بی‌گزینش برای سنجشِ مقدارهای پایه (گامِ ۲)
 const P = { ledger: path.join(BT, "ledger.json"), findings: path.join(BT, "findings.json"), results: path.join(BT, "results.json"),
-  foundation: path.join(BT, "foundation.json"), proposals: path.join(BT, "proposals.json"),
+  foundation: path.join(BT, "foundation.json"), proposals: path.join(BT, "proposals.json"), territory: path.join(BT, "territory.json"),
+  reviews: path.join(BT, "reviews"), territoryDoc: process.env.EPI_BT_DIR ? path.join(BT, "TERRITORY.md") : path.join(ROOT, "docs", "TERRITORY.md"),
   verified: process.env.EPI_BT_DIR ? path.join(BT, "VERIFIED_BOOKLET.md") : path.join(ROOT, "docs", "VERIFIED_BOOKLET.md") };
 
 /* ---------- موتور (همان فایل‌هایی که صفحه اجرا می‌کند) ---------- */
 global.window = global;
 for (const f of ["epi_feat", "epi_rules", "epi_cases_a", "epi_cases_b", "epi_problems", "epi_problems_b", "epi_field", "epi_blind",
-  "epi_engine", "epi_found", "epi_bt_core", "epi_book", "epi_core", "epi_st_a", "epi_st_b", "epi_st_c", "epi_st_d"]) require(path.join(APP, f + ".js"));
+  "epi_engine", "epi_found", "epi_territory", "epi_bt_core", "epi_book", "epi_core", "epi_st_a", "epi_st_b", "epi_st_c", "epi_st_d"]) require(path.join(APP, f + ".js"));
 const X = global.EPIX, FM = global.EPI_FM, PIPE = global.EPI_PIPE, BOOK = global.EPI_BOOK, RULES = global.EPI_RULES;
 const ST = {}; (global.EPI_ST || []).forEach((s) => { ST[s.id] = s; });
 const BOOKS = (global.EPI_BT.BOOKS || []).map((b) => b.id);
@@ -92,6 +93,124 @@ function addSamples(file) {
   if (ok.length) { const out = path.join(SAMPLES, "round-" + String(round).padStart(4, "0") + ".json"); wr(out, rd(out, []).concat(ok)); }
   return { round, added: ok.length, rejected: bad };
 }
+/* ---------- قلمرو: نقشهٔ کاملِ معرفت‌شناسی و پیشرفتِ گام‌به‌گامِ هر حوزه (مالک ۲۰۲۶-۱۰-۱۴) ----------
+   گام‌ها (EPI_TERR.STAGES): ۰ نقشه‌شده ⇒ ۱ منابع ⇒ ۲ گزاره‌ها ⇒ ۳ رده‌بندی بر پایهٔ بدیهیات ⇒ ۴ قاعده یا مرز ⇒ ۵ تثبیت (فقط ابزار).
+   هر به‌روزرسانی فقط یک گام جلو، با شاهد؛ اعتبارسنجی قطعی است و تاریخچه هرگز پاک نمی‌شود. */
+function terrAreas() { const T = global.EPI_TERR || {}, out = []; (T.groups || []).forEach((g) => (g.areas || []).forEach((a) => out.push(Object.assign({ group: g.id, groupFa: g.fa }, a)))); return out; }
+function terrState() { return rd(P.territory, { areas: {} }); }
+/* حوزه‌هایی که جزوه پوشش داده: قاعده‌هایشان (روی همان بخش‌ها) و رده‌بندیِ قضیه‌ایِ هر قاعده (EPI_FOUND.DER) خودبه‌خود گامِ ۴ را می‌سازد */
+function bookSeed(a) {
+  const FD = global.EPI_FOUND, secs = a.book || []; if (!secs.length) return null;
+  const rules = RULES.filter((r) => (r.sec || []).some((x) => secs.indexOf(x) >= 0));
+  if (!rules.length) return null;
+  const claims = rules.map((r) => { const d = FD.DER[r.id] || {};
+    return { txt: r.fa, rule: r.id, kind: r.eff === "flag" ? "theorem" : d.k === "S" ? "base" : "theorem", th: r.eff === "flag" ? "A0" : d.th, base: d.base || undefined, src: "جزوه " + (r.sec || []).join(",") }; });
+  return { stage: 4, claims, rules: rules.map((r) => r.id), sources: ["جزوهٔ معرفت‌شناسی (مصباح) " + secs.join("، ")], seeded: true };
+}
+function validateTerr(u, cur, round) {
+  const e = [], FD = global.EPI_FOUND, T = global.EPI_TERR, area = terrAreas().find((a) => a.id === u.area);
+  if (!area) return ["حوزهٔ ناشناخته: " + u.area];
+  const st = (cur && cur.stage) || 0, to = u.stage;
+  if (to !== st + 1) e.push("فقط یک گام جلو: اکنون " + st + "، درخواست " + to);
+  if (to >= 5) e.push("گامِ ۵ (تثبیت) را فقط خودِ ابزار با وقایعِ تازه می‌دهد");
+  if (!u.what || String(u.what).length < 15) e.push("what: چه کردی، دقیق");
+  if (to === 1 && !((u.sources || []).length >= 2 && u.sources.every((x) => /\S{6,}/.test(String(x))))) e.push("گامِ ۱: دست‌کم دو منبعِ واقعی (عنوان و پیوند/ارجاع)");
+  if (to === 2 && !((u.claims || []).length >= 3 && u.claims.every((c) => c.txt && c.txt.length >= 10 && c.src))) e.push("گامِ ۲: دست‌کم سه گزارهٔ محوری، هر کدام با منبع (src)");
+  if (to === 3) {
+    const cl = u.claims || (cur && cur.claims) || [];
+    if (!cl.length) e.push("گامِ ۳: گزاره‌ها لازم‌اند");
+    cl.forEach((c, i) => {
+      if (["theorem", "base", "outside"].indexOf(c.kind) < 0) e.push("گزارهٔ " + i + ": kind باید theorem|base|outside باشد");
+      if (c.kind === "theorem" && !(FD.TH[c.th] || FD.AX.some((a) => a.id === c.th) || (c.proof && c.proof.from && c.proof.from.length && c.proof.text))) e.push("گزارهٔ " + i + ": قضیه باید یکی از EPI_FOUND.TH/AX باشد یا proof {text, from:[اصول/قضیه‌های موجود]} داشته باشد");
+      if (c.kind === "theorem" && c.proof && (c.proof.from || []).some((x) => !FD.TH[x] && !FD.AX.some((a) => a.id === x))) e.push("گزارهٔ " + i + ": برهان فقط از اصول/قضیه‌های موجود");
+      if (c.kind === "base" && !(FD.BASE[c.base] || (c.base_new && c.base_new.fa && c.base_new.select))) e.push("گزارهٔ " + i + ": مقدارِ پایه باید موجود باشد یا base_new {fa, select} بیاید");
+      if (c.kind === "outside" && !(c.why && c.why.length >= 25)) e.push("گزارهٔ " + i + ": «بیرون از قلمروِ قطعی» دلیلِ روشن می‌خواهد (چرا به اصول برنمی‌گردد)");
+    });
+  }
+  if (to === 4) {
+    const cl = (cur && cur.claims) || [], th = cl.filter((c) => c.kind !== "outside");
+    const P0 = rd(P.proposals, { proposals: [] }).proposals || [];
+    const ok = (u.rules || []).every((id) => X.RM[id] || P0.some((p) => p.id === id));
+    if (th.length && !(u.rules || []).length) e.push("گامِ ۴: برای گزاره‌های قضیه‌ای قاعده (موجود) یا شناسهٔ پیشنهادِ ثبت‌شده در proposals.json لازم است");
+    if (!ok) e.push("گامِ ۴: هر شناسه باید قاعدهٔ موجود یا پیشنهادِ ثبت‌شده باشد");
+    if (!th.length && !(u.boundary && u.boundary.length >= 30)) e.push("گامِ ۴: همهٔ گزاره‌ها بیرون‌اند ⇒ مرز (boundary) را روشن بنویس");
+  }
+  return e;
+}
+function applyTerritory(file) {
+  const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
+  const S0 = terrState(), ledger = rd(P.ledger, { rounds: [] }), round = (ledger.rounds.length ? ledger.rounds[ledger.rounds.length - 1].round : 0) + 1;
+  const today = new Date().toISOString().slice(0, 10), ok = [], bad = [];
+  items.forEach((u) => {
+    const cur = S0.areas[u.area] || { stage: 0, history: [] }, e = validateTerr(u, cur, round);
+    if (e.length) { bad.push({ area: u.area, errors: e }); return; }
+    const nx = Object.assign({}, cur, { stage: u.stage });
+    if (u.sources) nx.sources = u.sources; if (u.claims) nx.claims = u.claims; if (u.rules) nx.rules = u.rules; if (u.boundary) nx.boundary = u.boundary;
+    nx.history = (cur.history || []).concat([{ round, at: today, stage: u.stage, what: u.what, by: u.by || "ناظرِ بک‌تست" }]);
+    S0.areas[u.area] = nx; ok.push(u.area);
+  });
+  wr(P.territory, S0);
+  return { round, advanced: ok, rejected: bad };
+}
+/* هر دور: بذرِ حوزه‌های جزوه، تثبیتِ خودکار (گامِ ۵)، آمار، و سندِ زندهٔ TERRITORY.md */
+function territoryRound(byCase, round, today) {
+  const S0 = terrState(), areas = terrAreas(), advanced = [];
+  areas.forEach((a) => {
+    let cur = S0.areas[a.id];
+    if (!cur) { const sd = bookSeed(a); cur = sd ? Object.assign(sd, { history: [{ round, at: today, stage: 4, what: "پوششِ جزوه: " + sd.rules.length + " قاعدهٔ کارخانه روی بخش‌های " + (a.book || []).join("، ") + "؛ رده‌بندیِ هر قاعده از «مبنای درجه‌ها»", by: "ابزار" }] }) : { stage: 0, history: [] }; S0.areas[a.id] = cur; }
+    if (cur.stage === 4 && (cur.rules || []).length) {
+      const since = (cur.history.filter((h) => h.stage === 4).slice(-1)[0] || {}).round || 0;
+      const fresh = Object.values(byCase).filter((v) => v.round > since && v.round > 0 && v.fired.some((r) => cur.rules.indexOf(r) >= 0));
+      cur.verify = { since, fresh: fresh.length, ok: fresh.filter((v) => v.kind === "ok").length, ids: fresh.slice(0, 10).map((v) => v.id) };
+      if (fresh.length >= 3 && cur.verify.ok === fresh.length) { cur.stage = 5; cur.history.push({ round, at: today, stage: 5, what: "تثبیت: " + fresh.length + " واقعهٔ تازه قاعده‌های این حوزه را به کار انداختند، همه درست", by: "ابزار" }); advanced.push(a.id); }
+    }
+  });
+  S0.round = round; S0.updated = today; wr(P.territory, S0);
+  const byStage = [0, 0, 0, 0, 0, 0]; areas.forEach((a) => { byStage[(S0.areas[a.id] || {}).stage || 0]++; });
+  const movedThisRound = areas.filter((a) => ((S0.areas[a.id] || {}).history || []).some((h) => h.round === round && h.by !== "ابزار" || (h.round === round && h.stage === 5))).map((a) => a.id);
+  fs.writeFileSync(P.territoryDoc, territoryMd(S0, areas, round, today));
+  return { areas: areas.length, groups: (global.EPI_TERR.groups || []).length, byStage, score: areas.reduce((t, a) => t + ((S0.areas[a.id] || {}).stage || 0), 0), max: areas.length * 5, moved: movedThisRound };
+}
+function territoryMd(S0, areas, round, today) {
+  const T = global.EPI_TERR, L = [], ST = T.STAGES;
+  L.push("# قلمروِ معرفت‌شناسی — نقشهٔ کامل و پیشرفتِ هر حوزه", "");
+  L.push("> این سند را `tools/epi_backtest.js` بعد از هر دور می‌سازد؛ دستی ویرایش نکن. نقشه: `src/app/epi_territory.js`؛ پیشرفت: `backtest/territory.json`.", "");
+  const byStage = ST.map((s) => areas.filter((a) => ((S0.areas[a.id] || {}).stage || 0) === s.n).length);
+  L.push("**دورِ " + round + " (" + today + "):** " + areas.length + " حوزه در " + (T.groups || []).length + " گروه · " + ST.map((s, i) => s.fa + " " + byStage[i]).join(" · "), "");
+  L.push("**گام‌ها:** " + ST.map((s) => s.n + ") " + s.fa + " — " + s.need).join("؛ "), "");
+  L.push("**مرزِ ثابت:** هر گسترش فقط با قضیه‌ای از پنج اصلِ ثابتِ «مبنای درجه‌ها»، یا مقدارِ پایه‌ای که با قابِ بی‌گزینش سنجیده می‌شود؛ آنچه به این‌ها برنمی‌گردد «بیرون از قلمروِ قطعی» علامت می‌خورد، نه ساخته.", "");
+  if ((T.sources || []).length) L.push("**منابعِ نقشه:** " + T.sources.map((x) => x.title + (x.url ? " (" + x.url + ")" : "")).join("؛ "), "");
+  (T.groups || []).forEach((g) => {
+    L.push("## " + g.fa + (g.en ? " — " + g.en : ""), "");
+    g.areas.forEach((a) => {
+      const c = S0.areas[a.id] || { stage: 0 }, s = ST[c.stage || 0];
+      L.push("### " + "▰".repeat(c.stage || 0) + "▱".repeat(5 - (c.stage || 0)) + " " + a.fa + (a.en ? " (" + a.en + ")" : "") + " — " + s.fa, "");
+      if (a.desc_fa) L.push(a.desc_fa, "");
+      if ((a.book || []).length) L.push("- جزوه: " + a.book.join("، "));
+      if ((c.sources || []).length && !c.seeded) L.push("- منابع: " + c.sources.join("؛ "));
+      (c.claims || []).forEach((x) => L.push("- " + ({ theorem: "قضیه", base: "قضیه × پایه", outside: "بیرون از قلمروِ قطعی" }[x.kind] || "گزاره") + ": " + x.txt + (x.th ? " — `" + x.th + "`" : "") + (x.base ? " — پایهٔ `" + x.base + "`" : "") + (x.why ? " — " + x.why : "")));
+      if (c.boundary) L.push("- **مرز:** " + c.boundary);
+      if (c.verify) L.push("- تثبیت: " + c.verify.ok + " از " + c.verify.fresh + " واقعهٔ تازه درست (لازم: ≥۳، همه درست)");
+      (c.history || []).forEach((h) => L.push("- دورِ " + h.round + " (" + h.at + ") ⇒ گامِ " + h.stage + ": " + h.what + " — " + h.by));
+      L.push("");
+    });
+  });
+  return L.join("\n") + "\n";
+}
+/* ---------- ناظرِ ناظر: بازبینیِ مستقلِ هر دور (زیرعاملِ جدا) — ابزار نبودن یا ناتمامیِ آن را هشدار می‌دهد ---------- */
+function reviewPath(round) { return path.join(P.reviews, "round-" + String(round).padStart(4, "0") + ".json"); }
+function addReview(file) {
+  const r = rd(file, null), e = [];
+  if (!r || typeof r !== "object") { console.error("فایلِ بازبینی نامعتبر"); process.exit(2); }
+  if (!(r.round > 0)) e.push("round");
+  if (!r.reviewer || !/زیرعامل|subagent/i.test(r.reviewer)) e.push("reviewer: باید زیرعاملِ جدا باشد (نه خودِ ناظر)");
+  const need = ["events_real", "encoding_blind", "frames_unselected", "verified_by_real", "proofs_from_axioms", "no_conventional", "territory_evidence", "findings_diagnosed"];
+  need.forEach((k) => { if (!r.checked || typeof r.checked[k] !== "boolean") e.push("checked." + k + " (true/false) لازم است"); });
+  (r.problems || []).forEach((p, i) => { if (!p.what || typeof p.fixed !== "boolean") e.push("problems[" + i + "]: {what, fix, fixed}"); });
+  if (e.length) return { ok: false, errors: e };
+  wr(reviewPath(r.round), r); return { ok: true, round: r.round, problems: (r.problems || []).length, unfixed: (r.problems || []).filter((p) => !p.fixed).length };
+}
+
 /* ---------- نگهبانِ مبنا: هر سقف به قضیه‌ای از اصولِ ثابت برمی‌گردد؛ هیچ عددِ قراردادی؛ هیچ قضیهٔ بی‌برهان ---------- */
 function axiomAudit() {
   const FD = global.EPI_FOUND, v = [], AX = new Set(FD.AX.map((a) => a.id)), TH = FD.TH;
@@ -280,6 +399,7 @@ function run(note) {
   /* خودبهبودی، ثبت‌شده: هر جابه‌جاییِ مقدارِ پایه (از دادهٔ تازه) با شاهدش در دفتر */
   row.foundation.baseChanges = Object.keys(row.foundation.baseval).filter((k) => prevBase[k] != null && prevBase[k] !== row.foundation.baseval[k])
     .map((k) => ({ base: k, from: prevBase[k], to: row.foundation.baseval[k], n: fnd.base[k].n, ok: fnd.base[k].ok }));
+  row.territory = territoryRound(byCase, round, today);
   /* سلامتِ کارِ ناظر (قطعی، بی هوش مصنوعی): دورِ بی ماده، یافتهٔ بی‌تشخیص، تخلف از مبنا ⇒ هشدار در دفتر و صفحه */
   const newSamples = loadSamples().filter((x) => x.round === round).length;
   const stale = findings.filter((f) => f.status === "open" && (f.openedRound || round) < round - 1).map((f) => f.id);
@@ -289,6 +409,10 @@ function run(note) {
   if (fnd.audit.length) alarms.push("تخلف از مبنا: " + fnd.audit.join("؛ "));
   if (!b0.controls.negOk) alarms.push("کنترلِ منفی: آزمون به برچسب حساس نیست");
   if (!b0.controls.posOk) alarms.push("کنترلِ مثبت: خطای کاشته دیده نشد");
+  if (!row.territory.moved.length) alarms.push("در این دور هیچ حوزه‌ای از نقشهٔ قلمرو یک گام جلو نرفت");
+  const prevRound = round - 1, rv = prevRound > 0 ? rd(reviewPath(prevRound), null) : null;
+  if (prevRound > 0 && (ledger.rounds[ledger.rounds.length - 1] || {}).routine && !rv) alarms.push("بازبینیِ مستقلِ دورِ " + prevRound + " (ناظرِ ناظر) ثبت نشده");
+  if (rv && (rv.problems || []).some((p) => !p.fixed)) alarms.push("بازبینیِ دورِ " + prevRound + " مشکلِ اصلاح‌نشده دارد");
   row.routine = { newEvents: newCount, newSamples, staleFindings: stale, alarms };
   wr(P.foundation, Object.assign({ round, at: today }, fnd));
   syncProposals(fnd, cases.length);
@@ -407,7 +531,8 @@ function status() {
     weakDomains: Object.entries(doms).sort((a, b) => a[1] - b[1]).slice(0, 6).map((x) => x[0]), untestedRules: untested,
     soundShare: +(sound / cases.length).toFixed(2), samples: loadSamples().length,
     baseNeeds: Object.entries(base).sort((a, b) => a[1].n - b[1].n).map(([k, v]) => k + " (" + v.fa + "): " + v.n + " موردِ سنجیده، مقدار " + v.p),
-    audit: axiomAudit(), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
+    audit: axiomAudit(),
+    territoryFrontier: (() => { const S0 = terrState(); return terrAreas().map((a) => ({ id: a.id, fa: a.fa, stage: (S0.areas[a.id] || {}).stage || 0 })).sort((x, y) => x.stage - y.stage).slice(0, 12); })(), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
 }
 
 function add(file) {
@@ -432,8 +557,11 @@ if (require.main === module) {
   if (cmd === "status") console.log(JSON.stringify(status(), null, 1));
   else if (cmd === "add") console.log(JSON.stringify(add(a1), null, 1));
   else if (cmd === "sample") console.log(JSON.stringify(addSamples(a1), null, 1));
+  else if (cmd === "territory") console.log(JSON.stringify(applyTerritory(a1), null, 1));
+  else if (cmd === "review") { const r = addReview(a1); console.log(JSON.stringify(r, null, 1)); if (!r.ok) process.exit(3); }
   else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v }, null, 1)); if (v.length) process.exit(3); }
   else if (cmd === "run") console.log(JSON.stringify(run(a1 === "--note" ? a2 : ""), null, 1));
-  else { console.log("usage: status | add <file.json> | sample <file.json> | audit | run [--note text]"); process.exit(1); }
+  else { console.log("usage: status | add <file.json> | sample <file.json> | territory <file.json> | review <file.json> | audit | run [--note text]"); process.exit(1); }
 }
-module.exports = { validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples };
+module.exports = { validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples,
+  applyTerritory, validateTerr, terrAreas, terrState, addReview, territoryMd };

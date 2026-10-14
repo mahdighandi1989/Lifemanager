@@ -1070,3 +1070,9 @@ button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
 .found-rules td:first-child{min-width:12em}
 .found-ax{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.5rem}
 .bt-proposal.superseded{opacity:.7}
+/* «🗺 قلمروِ معرفت‌شناسی» */
+.terr-bar{display:inline-flex;gap:2px;vertical-align:middle}
+.terr-bar i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--line,#ddd)}
+.terr-bar i.on{background:var(--accent,#2f7d6d)}
+.terr-area summary{cursor:pointer;line-height:1.9}
+.terr-area .chip{margin-inline-start:.4rem}
