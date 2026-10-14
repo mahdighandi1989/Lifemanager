@@ -26,6 +26,7 @@ const ROOT = path.resolve(__dirname, "..");
 const APP = path.join(ROOT, "src", "app");
 const BT = process.env.EPI_BT_DIR ? path.resolve(process.env.EPI_BT_DIR) : path.join(ROOT, "backtest");
 const CORPUS = path.join(BT, "corpus");
+const SAMPLES = path.join(BT, "samples");   // نمونه‌های بی‌گزینش برای سنجشِ مقدارهای پایه (گامِ ۲)
 const P = { ledger: path.join(BT, "ledger.json"), findings: path.join(BT, "findings.json"), results: path.join(BT, "results.json"),
   foundation: path.join(BT, "foundation.json"), proposals: path.join(BT, "proposals.json"),
   verified: process.env.EPI_BT_DIR ? path.join(BT, "VERIFIED_BOOKLET.md") : path.join(ROOT, "docs", "VERIFIED_BOOKLET.md") };
@@ -52,6 +53,57 @@ function loadCorpus() {
   // مالک واقعه‌ای را «رد» کرده (excluded) ⇒ از هر دورِ بعد بیرون؛ خودِ مورد با دلیلش در فایل می‌ماند (تاریخچه)
   for (const f of corpusFiles()) for (const c of rd(path.join(CORPUS, f), [])) if (!c.excluded) added.push(c);
   return seed.concat(added);
+}
+
+/* ---------- نمونه‌های بی‌گزینش (گامِ ۲): هر «قاب» = یک مجموعهٔ از پیش معین، همه‌اش، بی‌توجه به سرانجام ---------- */
+function sampleFiles() { try { return fs.readdirSync(SAMPLES).filter((f) => /\.json$/.test(f)).sort(); } catch (e) { return []; } }
+function loadSamples() { const out = []; for (const f of sampleFiles()) for (const sm of rd(path.join(SAMPLES, f), [])) if (!sm.excluded) out.push(sm); return out; }
+/* مقدارهای پایه را از نمونه‌ها می‌سازد و در موتور می‌گذارد (پیش از هر داوری) — فرمول قضیه است، داده واقعیت */
+function applyBase() {
+  const FD = global.EPI_FOUND, m = FD.measure(loadSamples()), v = {};
+  Object.keys(m).forEach((b) => { v[b] = m[b].p; });
+  FD.BASEVAL = v; return m;
+}
+function validateFrame(sm, seen) {
+  const e = [];
+  if (!sm || typeof sm !== "object") return ["ساختار نادرست"];
+  if (!sm.id) e.push("id لازم است");
+  if (!sm.frame || String(sm.frame).length < 20) e.push("frame: قابِ از پیش معین را دقیق بنویس (چه مجموعه‌ای، چه بازه‌ای، چرا همه‌اش)");
+  if (!Array.isArray(sm.src) || !sm.src.length) e.push("src: منبعِ خودِ قاب لازم است");
+  if (sm.selected_by_outcome !== false) e.push("selected_by_outcome باید صریحاً false باشد (قاب بی‌توجه به سرانجام برداشته شده)");
+  if (!Array.isArray(sm.items) || !sm.items.length) e.push("دست‌کم یک مورد");
+  const ids = new Set();
+  (sm.items || []).forEach((it, i) => {
+    if (!it.id || ids.has(it.id)) e.push("موردِ " + i + ": id یکتا لازم است"); ids.add(it.id);
+    if (!it.txt) e.push("موردِ " + it.id + ": متن");
+    if (typeof it.truth !== "boolean") e.push("موردِ " + it.id + ": truth باید true/false باشد (نامعلوم ⇒ کلاً کنار بگذار، نه حدس)");
+    if (!Array.isArray(it.verified_by) || !it.verified_by.length) e.push("موردِ " + it.id + ": verified_by (سند/تواتر/حسِ کنترل‌شده‌ای که درستی را احراز کرد)");
+    Object.keys(it.f || {}).forEach((key) => { const d = FM[key], v = it.f[key];
+      if (!d) e.push("ویژگیِ ناشناخته: " + key); else if (d.t === "enum" && d.v.indexOf(v) < 0) e.push("مقدارِ نادرست " + key + "=" + v); });
+  });
+  if (seen && seen.has(sm.id)) e.push("قابِ تکراری: " + sm.id);
+  return e;
+}
+function addSamples(file) {
+  const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
+  const seen = new Set(loadSamples().map((s) => s.id)), ok = [], bad = [];
+  const ledger = rd(P.ledger, { rounds: [] }); const round = (ledger.rounds.length ? ledger.rounds[ledger.rounds.length - 1].round : 0) + 1;
+  items.forEach((sm) => { const e = validateFrame(sm, seen); if (e.length) bad.push({ id: sm && sm.id, errors: e }); else { sm.round = round; ok.push(sm); seen.add(sm.id); } });
+  if (ok.length) { const out = path.join(SAMPLES, "round-" + String(round).padStart(4, "0") + ".json"); wr(out, rd(out, []).concat(ok)); }
+  return { round, added: ok.length, rejected: bad };
+}
+/* ---------- نگهبانِ مبنا: هر سقف به قضیه‌ای از اصولِ ثابت برمی‌گردد؛ هیچ عددِ قراردادی؛ هیچ قضیهٔ بی‌برهان ---------- */
+function axiomAudit() {
+  const FD = global.EPI_FOUND, v = [], AX = new Set(FD.AX.map((a) => a.id)), TH = FD.TH;
+  Object.keys(TH).forEach((id) => { const t = TH[id];
+    if (!t.proof || !(t.from || []).length) v.push("قضیهٔ بی‌برهان: " + id);
+    (t.from || []).forEach((x) => { if (!AX.has(x) && !TH[x]) v.push("قضیهٔ " + id + " بر پایهٔ ناشناختهٔ " + x); }); });
+  RULES.filter((r) => r.eff === "cap").forEach((r) => { const d = FD.DER[r.id];
+    if (!d) v.push("سقفِ بی‌اشتقاق: " + r.id); else if (!TH[d.th]) v.push("اشتقاقِ " + r.id + " قضیهٔ ناشناخته دارد: " + d.th);
+    if (d && d.base && !FD.BASE[d.base]) v.push("پایهٔ ناشناخته در " + r.id); });
+  FD.report(RULES).filter((r) => r.conventional).forEach((r) => v.push("عددِ قراردادی: " + r.id + " = " + r.cap));
+  RULES.filter((r) => r.basis === "beyond" && !(r.proof && TH[r.proof])).forEach((r) => v.push("قاعدهٔ فراتر از جزوه بی قضیه: " + r.id));
+  return v;
 }
 
 /* ---------- اعتبارسنجیِ واقعهٔ تازه ---------- */
@@ -152,12 +204,15 @@ function foundation(cases) {
     });
     impacts[p.id] = o;
   });
-  return { classes: FD.SUMMARY(rep), rules: rep, modes: M, base: FD.measure(cases), suff: FD.SUFF, impacts };
+  return { classes: FD.SUMMARY(rep), rules: rep, modes: M, base: FD.measure(loadSamples()), suff: FD.SUFF, impacts,
+    conventional: rep.filter((r) => r.conventional).length, audit: axiomAudit(), samples: loadSamples().length };
 }
 
 function run(note) {
   const cases = loadCorpus();
   const ledger = rd(P.ledger, { rounds: [] });
+  const prevBase = ((ledger.rounds[ledger.rounds.length - 1] || {}).foundation || {}).baseval || {};
+  applyBase();
   const old = rd(P.findings, { findings: [] });
   const round = (ledger.rounds.length ? ledger.rounds[ledger.rounds.length - 1].round : 0) + 1;
   const per = {}, books = {};
@@ -218,9 +273,23 @@ function run(note) {
       resolved: findings.filter((f) => f.status === "resolved").length, verified: findings.filter((f) => f.status === "verified").length },
     coverage: { rulesTested: tested, rules: RULES.length, sectionsTested: secs.size, sections: Object.keys(BOOK.sec).length, domains: Object.keys(doms).length,
       untested: RULES.filter((r) => !firedAll.has(r.id)).map((r) => r.id), byDomain: doms } };
-  const fnd = foundation(cases);
+  const fnd = foundation(cases), b0 = books.mesbah || Object.values(books)[0] || { controls: {} };
   row.foundation = { classes: fnd.classes, modes: Object.fromEntries(Object.entries(fnd.modes).map(([k, v]) => [k, Object.assign({}, v.kinds, { changed: v.changed.length })])),
-    baseSufficient: Object.values(fnd.base).filter((b) => b.sufficient).length, baseTotal: Object.keys(fnd.base).length };
+    baseMeasured: Object.values(fnd.base).filter((b) => b.measured).length, baseTotal: Object.keys(fnd.base).length,
+    baseval: Object.fromEntries(Object.entries(fnd.base).map(([k, v]) => [k, v.p])), samples: fnd.samples, conventional: fnd.conventional, audit: fnd.audit.length };
+  /* خودبهبودی، ثبت‌شده: هر جابه‌جاییِ مقدارِ پایه (از دادهٔ تازه) با شاهدش در دفتر */
+  row.foundation.baseChanges = Object.keys(row.foundation.baseval).filter((k) => prevBase[k] != null && prevBase[k] !== row.foundation.baseval[k])
+    .map((k) => ({ base: k, from: prevBase[k], to: row.foundation.baseval[k], n: fnd.base[k].n, ok: fnd.base[k].ok }));
+  /* سلامتِ کارِ ناظر (قطعی، بی هوش مصنوعی): دورِ بی ماده، یافتهٔ بی‌تشخیص، تخلف از مبنا ⇒ هشدار در دفتر و صفحه */
+  const newSamples = loadSamples().filter((x) => x.round === round).length;
+  const stale = findings.filter((f) => f.status === "open" && (f.openedRound || round) < round - 1).map((f) => f.id);
+  const alarms = [];
+  if (!newCount && !newSamples) alarms.push("این دور نه واقعهٔ تازه داشت نه نمونهٔ بی‌گزینشِ تازه");
+  if (stale.length) alarms.push("یافته‌های باز بی‌تشخیص بیش از یک دور: " + stale.join("، "));
+  if (fnd.audit.length) alarms.push("تخلف از مبنا: " + fnd.audit.join("؛ "));
+  if (!b0.controls.negOk) alarms.push("کنترلِ منفی: آزمون به برچسب حساس نیست");
+  if (!b0.controls.posOk) alarms.push("کنترلِ مثبت: خطای کاشته دیده نشد");
+  row.routine = { newEvents: newCount, newSamples, staleFindings: stale, alarms };
   wr(P.foundation, Object.assign({ round, at: today }, fnd));
   syncProposals(fnd, cases.length);
   ledger.rounds.push(row);
@@ -304,29 +373,30 @@ function syncProposals(fnd, n) {
 }
 
 function foundationMd(fnd) {
-  const FD = global.EPI_FOUND, L = [], K = { B: "بدیهی‌پایه (قضیه)", S: "ساختارِ بدیهی، مقدارِ پایهٔ اندازه‌گیری‌نشده", O: "ترتیبی (فقط «کمتر از یقین»)", X: "ناسازگار با قضیه" };
+  const FD = global.EPI_FOUND, L = [], K = { B: "بدیهی‌پایه (قضیه)", S: "قضیه × مقدارِ پایهٔ سنجیده (بی‌داده = ۵۰)", O: "ترتیبی (فقط «کمتر از یقین»)", X: "ناسازگار با قضیه" };
   const DG = {}; FD.DEG.forEach((d) => { DG[d.id] = d.fa; });
   L.push("## مبنای عددها — بازگشت به بدیهیات", "");
   L.push("جزوه (s40): تصدیقِ نظریِ غیرمنتهی به بدیهیات «مراتب‌دار و تشکیکی است که بر اساسِ حسابِ احتمالات تعیین می‌شود … بازه‌ای میانِ صفر تا یک». " +
     "پس هر عدد باید قضیه‌ای از حسابِ احتمالات باشد که اصولش به اولیات برمی‌گردد. اصول: " + FD.AX.map((a) => a.id + " " + a.fa + " (" + a.sec.join(",") + ")").join("؛ ") + ".", "");
-  L.push("**۴۲ سقفِ عددی:** " + Object.keys(K).map((k) => K[k] + " " + (fnd.classes[k] || 0)).join(" · ") + ".", "");
+  L.push("**" + fnd.rules.length + " سقفِ عددی:** " + Object.keys(K).map((k) => K[k] + " " + (fnd.classes[k] || 0)).join(" · ") + " · **عددِ قراردادی: " + fnd.conventional + "** · نگهبانِ مبنا: " + (fnd.audit.length ? "⚠ " + fnd.audit.join("؛ ") : "✓ بی‌تخلف") + ".", "");
   L.push("| قاعده | سقفِ فعلی | درجه | گونه | قضیه | کرانِ قضیه | توضیح |", "|---|---|---|---|---|---|---|");
-  fnd.rules.forEach((r) => L.push("| `" + r.id + "` | " + r.cap + " | " + (DG[r.capDeg] || "") + " | " + r.k + (r.stricterThanTheorem ? " (سخت‌گیرتر از قضیه، بی‌برهان)" : "") + " | " + r.th + " " + r.thFa +
+  fnd.rules.forEach((r) => L.push("| `" + r.id + "` | " + (r.capText || r.cap) + " | " + (DG[r.capDeg] || "") + " | " + r.k + (r.stricterThanTheorem ? " (سخت‌گیرتر از قضیه، بی‌برهان)" : "") + " | " + r.th + " " + r.thFa +
     " | " + (r.bound == null ? (r.baseFa ? "پایه: " + r.baseFa : "") : r.bound) + " | " + String(r.note || "").replace(/\|/g, "/") + " |"));
   L.push("");
   const m = fnd.modes, line = (k, fa) => "- " + fa + ": درست " + m[k].kinds.ok + "، شکستِ دیده‌نشده " + m[k].kinds.missed + "، جای نادرست " + m[k].kinds.mislocated + "، هشدارِ کاذب " + m[k].kinds.health_alarm +
     (k === "num" ? "" : " — " + m[k].changed.length + " حکم عوض شد" + (m[k].changed.length ? " (" + m[k].changed.slice(0, 10).map((c) => c.t).join("، ") + ")" : ""));
-  L.push("**اثرِ حالت‌های آزمایشی روی کلِ پیکره (در حافظه؛ پیش‌فرض عوض نشده):**", "", line("num", "عدد + تحملِ ۱۰ (فعلی)"), line("deg", "مقایسهٔ درجه‌ها (یقین/ظن/شک/وهم)"),
+  L.push("**اثرِ حالت‌های آزمایشی روی کلِ پیکره (در حافظه؛ پیش‌فرض عوض نشده):**", "", line("num", "فعلی"), line("deg", "مقایسهٔ درجه‌ها (یقین/ظن/شک/وهم)"),
     line("derived", "کرانِ قضیه به‌جای سقفِ قراردادی"), line("both", "هر دو"), "");
-  L.push("**مقدارهای پایه** (شرطِ کفایت: نمونهٔ بی‌گزینش، ≥" + fnd.suff.groups + " گروهِ مستقل، نیم‌پهنای ویلسونِ ۹۵٪ ≤ " + Math.round(fnd.suff.hw * 100) + " واحد):", "");
+  L.push("**مقدارهای پایه** — از نمونه‌های بی‌گزینش با قضیهٔ (k+1)/(n+2)؛ بی‌داده = ۵۰ (T_unknown) · " + fnd.samples + " قاب:", "");
   Object.keys(fnd.base).forEach((b) => { const x = fnd.base[b];
-    L.push("- `" + b + "` " + x.fa + ": " + (x.sufficient ? x.p + "٪ [" + x.lo + "–" + x.hi + "] از " + x.groups + " گروه" : "ناکافی — اندازه‌گیری نشده (" + x.groups + " گروهِ بی‌گزینش؛ " + x.curated + " موردِ گزینش‌شده شمرده نمی‌شود)")); });
+    L.push("- `" + b + "` " + x.fa + ": **" + x.p + "**" + (x.measured ? " — " + x.ok + " درست از " + x.n + " موردِ احرازشده در " + x.frames + " قاب" : " — هنوز هیچ نمونهٔ بی‌گزینش (۵۰ = «نمی‌دانیم»)")); });
   L.push("");
   return L;
 }
 
 /* ---------- وضع و شکاف‌ها (راهنمای گردآوری) ---------- */
 function status() {
+  const base = applyBase();
   const cases = loadCorpus(), cfg = X.DEFAULT_CFG("mesbah");
   const vs = cases.map((c) => verdict(c, cfg));
   const fired = {}; vs.forEach((v) => v.fired.forEach((r) => { fired[r] = (fired[r] || 0) + 1; }));
@@ -335,7 +405,9 @@ function status() {
   const sound = cases.filter((c) => c.truth && c.truth.ok === true).length;
   return { corpus: cases.length, files: corpusFiles(), sound, failures: cases.length - sound, domains: doms,
     weakDomains: Object.entries(doms).sort((a, b) => a[1] - b[1]).slice(0, 6).map((x) => x[0]), untestedRules: untested,
-    soundShare: +(sound / cases.length).toFixed(2), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
+    soundShare: +(sound / cases.length).toFixed(2), samples: loadSamples().length,
+    baseNeeds: Object.entries(base).sort((a, b) => a[1].n - b[1].n).map(([k, v]) => k + " (" + v.fa + "): " + v.n + " موردِ سنجیده، مقدار " + v.p),
+    audit: axiomAudit(), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
 }
 
 function add(file) {
@@ -359,7 +431,9 @@ if (require.main === module) {
   const [cmd, a1, a2] = process.argv.slice(2);
   if (cmd === "status") console.log(JSON.stringify(status(), null, 1));
   else if (cmd === "add") console.log(JSON.stringify(add(a1), null, 1));
+  else if (cmd === "sample") console.log(JSON.stringify(addSamples(a1), null, 1));
+  else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v }, null, 1)); if (v.length) process.exit(3); }
   else if (cmd === "run") console.log(JSON.stringify(run(a1 === "--note" ? a2 : ""), null, 1));
-  else { console.log("usage: status | add <file.json> | run [--note text]"); process.exit(1); }
+  else { console.log("usage: status | add <file.json> | sample <file.json> | audit | run [--note text]"); process.exit(1); }
 }
-module.exports = { validate, verdict, loadCorpus, status, run, add, sigOf, foundation };
+module.exports = { validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples };

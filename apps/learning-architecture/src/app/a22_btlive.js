@@ -42,6 +42,11 @@
         stat("کنترلِ منفی", pct(c.negAgree), "باید زیرِ " + pct(c.agree) + " باشد " + (c.negOk ? "✓" : "⚠"), !c.negOk),
         stat("کنترلِ مثبت", pct(c.posDetect), "خطای کاشته‌شده دیده شد " + (c.posOk ? "✓" : "⚠"), !c.posOk),
         stat("پوشش", fa(last.coverage.rulesTested) + " از " + fa(last.coverage.rules) + " قاعده", fa(last.coverage.sectionsTested) + " از " + fa(last.coverage.sections) + " بخشِ جزوه"))));
+    /* سلامتِ کارِ ناظر — قطعی (دورِ بی ماده، یافتهٔ بی‌تشخیص، تخلف از مبنا، کنترل‌ها) */
+    var RT = last.routine;
+    if (RT) box.appendChild(h("section", { class: "card bt-routine" + (RT.alarms.length ? " bad" : "") }, h("h3", {}, RT.alarms.length ? "⚠ سلامتِ کارِ ناظر در این دور" : "✓ سلامتِ کارِ ناظر در این دور"),
+      h("p", { class: "small" }, "واقعهٔ تازه: " + fa(RT.newEvents) + " · نمونهٔ بی‌گزینشِ تازه: " + fa(RT.newSamples) + (last.foundation ? " · عددِ قراردادی: " + fa(last.foundation.conventional || 0) + " · تخلف از مبنا: " + fa(last.foundation.audit || 0) : "")),
+      RT.alarms.length ? h("ul", { class: "small" }, RT.alarms.map(function (a) { return h("li", {}, a); })) : h("p", { class: "small muted" }, "هیچ هشداری نیست.")));
     /* روند */
     if (rounds.length) box.appendChild(h("section", { class: "card" }, h("h3", {}, "روندِ دورها"),
       h("div", { class: "row gap wrap small" }, h("span", {}, "پیکره: "), spark(rounds.map(function (r) { return r.corpus.n; })), h("span", {}, " قاعده‌های آزموده: "), spark(rounds.map(function (r) { return r.coverage.rulesTested; }))),

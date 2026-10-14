@@ -419,7 +419,7 @@
         rs.forEach(function (r) {
           var stt = ruleStatus(r, t.sens);
           sec.appendChild(h("div", { class: "lrule" + (focus === r.id ? " focus" : ""), id: "lr-" + r.id }, h("div", { class: "row between wrap" }, h("strong", {}, r.fa), h("span", { class: "pill " + stt.c }, stt.t)),
-            h("p", {}, r.stmt), h("p", { class: "small" }, r.eff === "cap" ? "اثر: اعتبار ادعا حداکثر " + fa(r.cap) + "٪" : "اثر: خطا در این ایستگاه", " ", r.basis === "system" ? h("span", { class: "chip" }, "عدد یا صورت‌بندی از سامانه") : h("span", { class: "chip good" }, "حکم جزوه")),
+            h("p", {}, r.stmt), h("p", { class: "small" }, r.eff === "cap" ? "اثر: اعتبار ادعا حداکثر " + (window.EPI_FOUND && window.EPI_FOUND.capText ? window.EPI_FOUND.capText(r).replace(/\d+(\.\d+)?/g, function (n) { return fa(+n); }) : fa(r.cap) + "٪") : "اثر: خطا در این ایستگاه", " ", r.basis === "system" ? h("span", { class: "chip" }, "عدد یا صورت‌بندی از سامانه") : h("span", { class: "chip good" }, "حکم جزوه")),
             r.note ? h("p", { class: "small muted" }, r.note) : null, r.fix ? h("p", { class: "small" }, h("strong", {}, "مسیر درست: "), r.fix) : null,
             h("div", { class: "row gap wrap" }, (r.sec || []).map(function (sc) { return h("button", { class: "tlink sec", onclick: function () { A.go("e_book", sc); } }, "§" + fa(sc.slice(1))); })),
             stt.err.length ? h("div", { class: "errata" }, h("strong", {}, "علت‌های ثبت‌شده:"), stt.err.map(autRow)) : null));

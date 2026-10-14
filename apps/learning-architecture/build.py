@@ -53,6 +53,8 @@ def ledger_js():
         return json.loads(rd(p)) if os.path.exists(p) else d
     data = {"ledger": j("ledger.json", {"rounds": []}), "findings": j("findings.json", {"findings": []}), "results": j("results.json", {"cases": []}),
             "proposals": j("proposals.json", {"proposals": []}), "foundation": j("foundation.json", None)}
+    fnd = data["foundation"] or {}
+    data["baseval"] = {k: v.get("p") for k, v in (fnd.get("base") or {}).items()}   # مقدارهای پایهٔ سنجیده ⇒ همان سقف‌های موتورِ Node
     return "window.EPI_BT_LEDGER = " + json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n"
 
 

@@ -1,11 +1,11 @@
 {
- "round": 7,
+ "round": 8,
  "at": "2026-10-14",
  "classes": {
   "B": 25,
   "S": 15,
-  "O": 4,
-  "X": 2,
+  "O": 6,
+  "X": 0,
   "?": 0
  },
  "rules": [
@@ -13,7 +13,7 @@
    "id": "r_core_interp_notcert",
    "fa": "تصدیقِ دارای لایه تفسیر، اعتبار مطلق ندارد",
    "st": "st_core",
-   "cap": 95,
+   "cap": 99.9,
    "capDeg": "zann",
    "sec": [
     "s42",
@@ -27,14 +27,16 @@
    "baseFa": "",
    "note": "لایهٔ تفسیرِ حصولی «اعتبارِ مطلق ندارد» (s42)",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_hiss_uncontrolled",
    "fa": "حس بدون کنترل شرایط",
    "st": "st_hiss",
-   "cap": 80,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s43",
     "s46"
@@ -45,15 +47,17 @@
    "base": "p_sense_unctrl",
    "baseFa": "درستیِ حکمِ حسی در شرایطِ کنترل‌نشده",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ حکمِ حسی در شرایطِ کنترل‌نشده» = 50"
   },
   {
    "id": "r_hiss_hidden_inf",
    "fa": "استنتاج پنهان عادتی بی‌آزمون",
    "st": "st_hiss",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s43",
     "s46",
@@ -65,8 +69,10 @@
    "base": "p_hidden_inf",
    "baseFa": "درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده» = 50"
   },
   {
    "id": "r_aql_invalid_form",
@@ -86,13 +92,15 @@
    "baseFa": "",
    "note": "صورتِ نامعتبر چیزی نمی‌افزاید؛ «لزوماً کاذب نیست» (s40)",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_aql_nondeductive",
    "fa": "قالب غیرقیاسی یقین‌آور نیست",
    "st": "st_aql",
-   "cap": 80,
+   "cap": 99.9,
    "capDeg": "zann",
    "sec": [
     "s40",
@@ -106,7 +114,9 @@
    "baseFa": "",
    "note": "قالبِ غیرقیاسی «یقین‌آور نیست» (s40) — برای حکمِ کلی بر دامنهٔ نامحدود ر.ک. T_universal",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_aql_matter_unproven",
@@ -126,7 +136,9 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_aql_matter_false",
@@ -145,7 +157,9 @@
    "baseFa": "",
    "note": "مادهٔ کاذب این استدلال را بی‌اثر می‌کند، نه نتیجه را کاذب",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_not_issued",
@@ -164,7 +178,9 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_unreliable",
@@ -184,7 +200,9 @@
    "baseFa": "",
    "note": "گزارشِ ناموثق پشتوانه نیست؛ نتیجه به حالِ بی‌دلیل برمی‌گردد",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_unreliable_corrob",
@@ -204,7 +222,9 @@
    "baseFa": "",
    "note": "قرینهٔ همسو گزارشِ ناموثق را ثقه نمی‌کند؛ بی‌دلیلِ مستقل، تقارن",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_narrator_unknown",
@@ -223,7 +243,9 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_chain_broken",
@@ -242,14 +264,16 @@
    "baseFa": "",
    "note": "حلقهٔ نامعلوم ≤ ½ (T_unknown) و زنجیره ≤ ضعیف‌ترین حلقه — «اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌سازد» (s47)",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_ahad",
    "fa": "خبر واحد یقین‌آور نیست",
    "st": "st_naql",
-   "cap": 80,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s48",
     "s47"
@@ -260,15 +284,17 @@
    "base": "p_thiqa",
    "baseFa": "صدقِ گزارشِ یک ناقلِ ثقه",
    "note": "خبرِ واحد < ۱؛ مقدارش وثاقتِ ناقل",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50"
   },
   {
    "id": "r_naql_no_qarina",
    "fa": "خبر واحد بی‌قرینه",
    "st": "st_naql",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s47",
     "s48"
@@ -279,14 +305,16 @@
    "base": "p_thiqa",
    "baseFa": "صدقِ گزارشِ یک ناقلِ ثقه",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50"
   },
   {
    "id": "r_naql_contra_qarina",
    "fa": "قرینه خلاف",
    "st": "st_naql",
-   "cap": 45,
+   "cap": 49.9,
    "capDeg": "wahm",
    "sec": [
     "s47",
@@ -298,15 +326,17 @@
    "bound": "<50",
    "base": null,
    "baseFa": "",
-   "note": "",
+   "note": "کمتر از ½ (قرینه به سودِ نقیض)؛ کوچک‌ترین گامِ زیرِ ½",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۵۰"
   },
   {
    "id": "r_naql_nonnass",
    "fa": "دلالت غیرنص یقین‌آور نیست",
    "st": "st_naql",
-   "cap": 80,
+   "cap": 99.9,
    "capDeg": "zann",
    "sec": [
     "s48"
@@ -319,14 +349,16 @@
    "baseFa": "",
    "note": "غیرنص «احتمالِ خلاف» دارد (s48)",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_naql_zahir_noq",
    "fa": "ظاهر بدون قرینه همسو",
    "st": "st_naql",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s48"
    ],
@@ -336,8 +368,10 @@
    "base": "p_zahir",
    "baseFa": "درستیِ معنای ظاهر بی‌قرینهٔ همسو",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ معنای ظاهر بی‌قرینهٔ همسو» = 50"
   },
   {
    "id": "r_naql_mubham_noq",
@@ -356,14 +390,16 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_naql_mubham_q",
    "fa": "دلالت مبهم با قرینه همسو",
    "st": "st_naql",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s48"
    ],
@@ -373,8 +409,10 @@
    "base": "p_mubham_q",
    "baseFa": "درستیِ معنای مبهم با قرینهٔ همسو",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ معنای مبهم با قرینهٔ همسو» = 50"
   },
   {
    "id": "r_expert_method_weak",
@@ -393,7 +431,9 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_expert_out_of_field",
@@ -412,7 +452,9 @@
    "baseFa": "",
    "note": "تخصص در حوزهٔ دیگر برای این حکم پشتوانه نیست",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_expert_comp_unknown",
@@ -431,14 +473,16 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_expert_bias",
    "fa": "تعارض منافع یا ناپایبندی کارشناس",
    "st": "st_expert",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s49"
    ],
@@ -448,35 +492,39 @@
    "base": "p_expert_bias",
    "baseFa": "درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند",
    "note": "اعتبار = اعتبارِ روش × پایبندیِ کارشناس (s49)",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند» = 50"
   },
   {
    "id": "r_istiqra_incomplete",
    "fa": "استقراء ناقص هرگز یقینی نیست",
    "st": "st_istiqra",
-   "cap": 80,
+   "cap": 99.9,
    "capDeg": "zann",
    "sec": [
     "s50",
     "s40",
     "s51"
    ],
-   "k": "X",
-   "th": "T_universal",
-   "thFa": "حکمِ کلی از استقراءِ ناقص بر دامنهٔ نامحدود ⇒ نزدیک به صفر",
-   "bound": "≈0 (حکمِ کلی) / (n+1)/(n+2) (موردِ بعدی)",
+   "k": "O",
+   "th": "T_below1",
+   "thFa": "راهِ غیرِ برهانی ⇒ کمتر از یک",
+   "bound": "<100",
    "base": null,
    "baseFa": "",
-   "note": "گذرا: فقط تصدیق‌های بی «گستره». سقفِ ۸۰ برای حکمِ کلیِ استقراییِ ناقص با قضیهٔ خودِ جزوه (s51: نسبت «نزدیک به صفر») نمی‌خواند؛ برای پیش‌بینیِ موردِ بعدی عدد از n می‌آید. کارخانه میانِ «حکمِ کلی» و «موردِ بعدی» فرق نمی‌گذارد (ویژگی‌اش نیست).",
-   "consistent": false,
-   "stricterThanTheorem": false
+   "note": "گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — بی‌دانستنِ گستره (کلی یا موردِ بعدی) قضیه فقط «کمتر از یقین» می‌گوید (s50)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_istiqra_universal",
    "fa": "حکمِ کلی بر دامنهٔ نامحدود از استقراءِ ناقص",
    "st": "st_istiqra",
-   "cap": 1,
+   "cap": 0.1,
    "capDeg": "wahm",
    "sec": [
     "s51",
@@ -485,12 +533,14 @@
    "k": "B",
    "th": "T_universal",
    "thFa": "حکمِ کلی از استقراءِ ناقص بر دامنهٔ نامحدود ⇒ نزدیک به صفر",
-   "bound": 1,
+   "bound": "→0",
    "base": null,
    "baseFa": "",
-   "note": "صفرِ حدی؛ ۱ کوچک‌ترین واحدِ مقیاس — «لزوماً کاذب نیست» (s40)",
+   "note": "صفرِ حدی (کوچک‌ترین مقدارِ مثبت) — «لزوماً کاذب نیست» (s40)؛ هر اطمینانِ مثبتی بیش از توجیه است",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "→۰ (صفرِ حدی)"
   },
   {
    "id": "r_istiqra_finite",
@@ -509,7 +559,9 @@
    "baseFa": "",
    "note": "عدد از n و M ِ همان تصدیق",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "۱۰۰×(n+1)/(M+1)"
   },
   {
    "id": "r_istiqra_next",
@@ -528,32 +580,36 @@
    "baseFa": "",
    "note": "عدد از n ِ همان تصدیق",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "۱۰۰×(n+1)/(n+2)"
   },
   {
    "id": "r_istiqra_small_n",
    "fa": "استقراء ناقص با موارد اندک",
    "st": "st_istiqra",
-   "cap": 70,
+   "cap": 99.9,
    "capDeg": "zann",
    "sec": [
     "s50"
    ],
-   "k": "X",
-   "th": "T_next",
-   "thFa": "موردِ بعدی پس از n موردِ موافق ⇒ (n+1)/(n+2)",
-   "bound": "(n+1)/(n+2)",
+   "k": "O",
+   "th": "T_below1",
+   "thFa": "راهِ غیرِ برهانی ⇒ کمتر از یک",
+   "bound": "<100",
    "base": null,
    "baseFa": "",
-   "note": "گذرا: فقط تصدیق‌های بی «گستره». برای موردِ بعدی قضیه عددِ دقیق می‌دهد (n=۲ ⇒ ۷۵، n=۵ ⇒ ۸۶، n=۹ ⇒ ۹۱)؛ سقفِ ثابتِ ۷۰ قراردادی است؛ برای حکمِ کلی ≈ ۰.",
-   "consistent": false,
-   "stricterThanTheorem": false
+   "note": "گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — «کمتر از یقین» (s50)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_tajrobe_ceiling",
    "fa": "تجربه به پای برهان و شهود نمی‌رسد",
    "st": "st_tajrobe",
-   "cap": 95,
+   "cap": 99.9,
    "capDeg": "zann",
    "sec": [
     "s51"
@@ -566,7 +622,9 @@
    "baseFa": "",
    "note": "«به پای براهینِ محضِ عقلی یا شهود نمی‌رسد» (s51)",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_tajrobe_no_vazraf",
@@ -586,14 +644,16 @@
    "baseFa": "",
    "note": "جزوه تجربهٔ بی وضع‌ورفع را «تکرارِ داده‌های حسی» می‌داند که «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» (s51) ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر شک (½). سقفِ قبلی ۸۰ (ظن) ناسازگار بود؛ مالک ۲۰۲۶-۱۰-۱۳ پیشنهادِ p_found_vazraf را پذیرفت.",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_tajrobe_hidden",
    "fa": "عوامل پنهان کنترل نشده",
    "st": "st_tajrobe",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s51"
    ],
@@ -603,15 +663,17 @@
    "base": "p_hidden_factor",
    "baseFa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50"
   },
   {
    "id": "r_istiqra_hidden",
    "fa": "استقراء با علتِ ناشناخته و عاملِ پنهانِ کنترل‌نشده",
    "st": "st_istiqra",
-   "cap": 70,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s51",
     "s50"
@@ -622,8 +684,10 @@
    "base": "p_hidden_factor",
    "baseFa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
    "note": "همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50"
   },
   {
    "id": "r_yad_orig_t1",
@@ -637,12 +701,14 @@
    "k": "B",
    "th": "T_weakest",
    "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
-   "bound": 25,
+   "bound": "mem_orig",
    "base": null,
    "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52)",
+   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "≤ معرفتِ نخستین"
   },
   {
    "id": "r_yad_orig_t2",
@@ -656,12 +722,14 @@
    "k": "B",
    "th": "T_weakest",
    "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
-   "bound": 50,
+   "bound": "mem_orig",
    "base": null,
    "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52)",
+   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "≤ معرفتِ نخستین"
   },
   {
    "id": "r_yad_orig_t3",
@@ -675,12 +743,14 @@
    "k": "B",
    "th": "T_weakest",
    "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
-   "bound": 70,
+   "bound": "mem_orig",
    "base": null,
    "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52)",
+   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "≤ معرفتِ نخستین"
   },
   {
    "id": "r_yad_orig_t4",
@@ -694,12 +764,14 @@
    "k": "B",
    "th": "T_weakest",
    "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
-   "bound": 85,
+   "bound": "mem_orig",
    "base": null,
    "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52)",
+   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "≤ معرفتِ نخستین"
   },
   {
    "id": "r_yad_orig_t5",
@@ -713,19 +785,21 @@
    "k": "B",
    "th": "T_weakest",
    "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
-   "bound": "<100",
+   "bound": "mem_orig",
    "base": null,
    "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52)",
+   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "≤ معرفتِ نخستین"
   },
   {
    "id": "r_yad_undoc",
    "fa": "حافظه با سند یا واقعیت بیرونی سنجیده نشده",
    "st": "st_yad",
-   "cap": 80,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s52"
    ],
@@ -734,16 +808,18 @@
    "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t4",
    "fa": "حافظه سنجیده‌نشده × معرفت نخستین ۷۱–۸۵",
    "st": "st_yad",
-   "cap": 68,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s52"
    ],
@@ -752,16 +828,18 @@
    "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین (≤۸۵) × وثاقتِ حافظه",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t3",
    "fa": "حافظه سنجیده‌نشده × معرفت نخستین ۵۱–۷۰",
    "st": "st_yad",
-   "cap": 56,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s52"
    ],
@@ -770,16 +848,18 @@
    "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین (≤۷۰) × وثاقتِ حافظه",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t2",
    "fa": "حافظه سنجیده‌نشده × معرفت نخستین ۲۶–۵۰",
    "st": "st_yad",
-   "cap": 40,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s52"
    ],
@@ -788,16 +868,18 @@
    "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین (≤۵۰) × وثاقتِ حافظه",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t1",
    "fa": "حافظه سنجیده‌نشده × معرفت نخستین ≤۲۵",
    "st": "st_yad",
-   "cap": 20,
-   "capDeg": "wahm",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s52"
    ],
@@ -806,9 +888,11 @@
    "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین (≤۲۵) × وثاقتِ حافظه",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
   },
   {
    "id": "r_conflict_cert",
@@ -828,7 +912,9 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "0"
   },
   {
    "id": "r_bg_missing",
@@ -848,7 +934,9 @@
    "baseFa": "",
    "note": "بی پیش‌زمینهٔ بایسته فهمِ مقصود احراز نشده",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_r_sanad_weak",
@@ -869,14 +957,16 @@
    "baseFa": "",
    "note": "",
    "consistent": true,
-   "stricterThanTheorem": false
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "50"
   },
   {
    "id": "r_r_sanad_ahad",
    "fa": "خبر واحد موثق دینی یقین‌آور نیست",
    "st": "st_r_sources",
-   "cap": 80,
-   "capDeg": "zann",
+   "cap": 50,
+   "capDeg": "shakk",
    "sec": [
     "s73",
     "s48",
@@ -888,8 +978,10 @@
    "base": "p_thiqa",
    "baseFa": "صدقِ گزارشِ یک ناقلِ ثقه",
    "note": "",
-   "consistent": null,
-   "stricterThanTheorem": false
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50"
   }
  ],
  "modes": {
@@ -904,37 +996,12 @@
   },
   "deg": {
    "kinds": {
-    "ok": 181,
+    "ok": 185,
     "health_alarm": 0,
-    "missed": 4,
+    "missed": 0,
     "mislocated": 0
    },
-   "changed": [
-    {
-     "id": "bk_stick_sight",
-     "t": "چوب کج در آب: حکم باصره",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "bk_russell_chicken",
-     "t": "جوجه راسل",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_b_dewey1948",
-     "t": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_b_literarydigest",
-     "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
-     "from": "ok",
-     "to": "missed"
-    }
-   ]
+   "changed": []
   },
   "derived": {
    "kinds": {
@@ -947,140 +1014,105 @@
   },
   "both": {
    "kinds": {
-    "ok": 181,
+    "ok": 185,
     "health_alarm": 0,
-    "missed": 4,
+    "missed": 0,
     "mislocated": 0
    },
-   "changed": [
-    {
-     "id": "bk_stick_sight",
-     "t": "چوب کج در آب: حکم باصره",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "bk_russell_chicken",
-     "t": "جوجه راسل",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_b_dewey1948",
-     "t": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
-     "from": "ok",
-     "to": "missed"
-    },
-    {
-     "id": "cs_b_literarydigest",
-     "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
-     "from": "ok",
-     "to": "missed"
-    }
-   ]
+   "changed": []
   }
  },
  "base": {
   "p_thiqa": {
    "fa": "صدقِ گزارشِ یک ناقلِ ثقه",
-   "matched": 2,
-   "curated": 2,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_zahir": {
    "fa": "درستیِ معنای ظاهر بی‌قرینهٔ همسو",
-   "matched": 3,
-   "curated": 3,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_mubham_q": {
    "fa": "درستیِ معنای مبهم با قرینهٔ همسو",
-   "matched": 0,
-   "curated": 0,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_sense_unctrl": {
    "fa": "درستیِ حکمِ حسی در شرایطِ کنترل‌نشده",
-   "matched": 5,
-   "curated": 5,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_hidden_inf": {
    "fa": "درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده",
-   "matched": 5,
-   "curated": 5,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_expert_bias": {
    "fa": "درستیِ رأیِ کارشناسِ ذی‌نفع/ناپایبند",
-   "matched": 6,
-   "curated": 6,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_hidden_factor": {
    "fa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
-   "matched": 22,
-   "curated": 22,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   },
   "p_mem": {
    "fa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "matched": 1,
-   "curated": 1,
-   "groups": 0,
+   "n": 0,
    "ok": 0,
-   "sufficient": false,
-   "p": null,
+   "frames": 0,
+   "rejected": 0,
+   "p": 50,
    "lo": null,
    "hi": null,
-   "need": 30
+   "measured": false
   }
  },
  "suff": {
-  "groups": 30,
-  "hw": 0.1,
   "z": 1.96
  },
  "impacts": {
@@ -1091,8 +1123,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 103,
-   "fullAfter": 103
+   "fullBefore": 106,
+   "fullAfter": 106
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1101,9 +1133,12 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 103,
-   "fullAfter": 103
+   "fullBefore": 106,
+   "fullAfter": 106
   },
   "p_found_scope": null
- }
+ },
+ "conventional": 0,
+ "audit": [],
+ "samples": 0
 }

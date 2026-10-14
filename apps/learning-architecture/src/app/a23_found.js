@@ -5,8 +5,8 @@
    اثرِ حالت‌های آزمایشی و اندازه‌گیریِ پایه‌ها از دفترِ بک‌تست (`EPI_BT_LEDGER.foundation`) — صفحه چیزی را عوض نمی‌کند. */
 (function (A) {
   var h = A.h, fa = A.fa;
-  var K = { B: ["بدیهی‌پایه", "خودِ عدد قضیه است"], S: ["ساختار بدیهی، پایه اندازه‌گیری‌نشده", "شکلِ ترکیب قضیه است؛ مقدارِ پایه را جزوه «سنجش با واقعیت» می‌داند و هنوز با دادهٔ کافی سنجیده نشده"],
-    O: ["ترتیبی", "قضیه فقط «کمتر از یقین» می‌گوید؛ عددِ دقیق از اصول بیرون نمی‌آید"], X: ["ناسازگار با قضیه", "عددِ فعلی با قضیهٔ خودِ جزوه نمی‌خواند ⇒ پیشنهاد برای تصمیمِ تو"] };
+  var K = { B: ["بدیهی‌پایه", "خودِ عدد قضیه است (یا فرمولِ قضیه روی ویژگی‌های همان تصدیق)"], S: ["قضیه × مقدارِ پایهٔ سنجیده", "شکلِ ترکیب قضیه است؛ مقدارِ پایه از نمونه‌های بی‌گزینش با قضیهٔ (k+1)/(n+2) — بی‌داده = ۵۰ («نمی‌دانیم»)"],
+    O: ["ترتیبی", "قضیه فقط «کمتر از یقین» می‌گوید؛ سقف همین است، نه عددی دلبخواه"], X: ["ناسازگار با قضیه", "عددِ فعلی با قضیه نمی‌خواند ⇒ پیشنهاد برای تصمیمِ تو"] };
   function deg(id) { var F = window.EPI_FOUND; var d = F && F.DEG.filter(function (x) { return x.id === id; })[0]; return d ? d.fa : id; }
   function bound(b) { return b == null ? "" : typeof b === "number" ? "≤ " + fa(b) : String(b).replace(/\d+/g, function (n) { return fa(+n); }); }
 
@@ -22,7 +22,8 @@
         h("li", {}, h("b", {}, "باقی، با حسابِ احتمالات (تکمیلِ s40): "), "«اگر تصدیقِ نظری به بدیهیات ختم نشود لزوماً کاذب نیست؛ اعتبار مراتب‌دار و تشکیکی است که ", h("b", {}, "بر اساسِ حسابِ احتمالات"), " تعیین می‌شود؛ بازه‌ای میانِ صفر (کذبِ یقینی) تا یک (صدقِ یقینی) … مبناگرایانه»."
       )),
       h("p", {}, "پس هر عدد فقط وقتی اصیل است که ", h("b", {}, "قضیه‌ای از حسابِ احتمالات"), " باشد و اصولِ آن حساب خودشان به اولیات برگردند. قضیه استقراء نیست: از اصول با برهان بیرون می‌آید و با هیچ شمارشی کم و زیاد نمی‌شود."),
-      h("div", { class: "bt-stats" }, ["B", "S", "O", "X"].map(function (k) { return h("div", { class: "card soft bt-stat" + (k === "X" ? " bad" : "") }, h("div", { class: "small muted" }, K[k][0]), h("div", { class: "bt-num" }, fa(C[k] || 0)), h("div", { class: "small" }, K[k][1])); }))));
+      h("div", { class: "bt-stats" }, ["B", "S", "O", "X"].filter(function (k) { return k !== "X" || C[k]; }).map(function (k) { return h("div", { class: "card soft bt-stat" + (k === "X" ? " bad" : "") }, h("div", { class: "small muted" }, K[k][0]), h("div", { class: "bt-num" }, fa(C[k] || 0)), h("div", { class: "small" }, K[k][1])); })
+        .concat([(function () { var n = rep.filter(function (r) { return r.conventional; }).length; return h("div", { class: "card soft bt-stat found-conv" + (n ? " bad" : "") }, h("div", { class: "small muted" }, "عددِ قراردادی"), h("div", { class: "bt-num" }, fa(n)), h("div", { class: "small" }, n ? "هنوز عددی بی‌مبنا هست" : "هیچ سقفی عددِ دلبخواه ندارد")); })()]))));
 
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "اصول — فقط اولیات و آنچه جزوه صریحاً مبنا گرفته"),
       h("ul", { class: "plain found-ax" }, F.AX.map(function (a) { return h("li", { class: "card soft" }, h("strong", {}, a.id + " · " + a.fa), h("p", { class: "small" }, a.stmt), h("div", { class: "small muted" }, a.kind + " — " + a.sec.join("، "))); }))));
@@ -32,29 +33,29 @@
 
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "درجه‌های جزوه — مرزها قضیه‌اند، نه قرارداد"),
       h("ul", { class: "small" }, F.DEG.map(function (d) { return h("li", {}, h("b", {}, d.fa + ": "), d.why); })),
-      h("p", { class: "small muted" }, "مرزِ ½ از امتناعِ ترجیحِ بلامرجح (A4) و مرزهای ۰ و ۱ از بازهٔ جزوه (A2) می‌آیند. «تحملِ ۱۰ واحد» که کارخانه در مقایسه به کار می‌برد قراردادی است — اثرِ کنار گذاشتنش پایین‌تر سنجیده شده.")));
+      h("p", { class: "small muted" }, "مرزِ ½ از امتناعِ ترجیحِ بلامرجح (A4) و مرزهای ۰ و ۱ از بازهٔ جزوه (A2) می‌آیند. «تحملِ ۱۰ واحد» ِ قدیم (قراردادی) برداشته شد: اطمینانِ بیش از سقفِ قضیه، بیش‌اطمینانی است.")));
 
     /* جدولِ قاعده‌ها */
-    var sel = h("select", { "aria-label": "گونه", onchange: function () { fill(sel.value); } }, [["all", "همه"], ["X", "ناسازگار"], ["B", "بدیهی‌پایه"], ["S", "پایهٔ اندازه‌گیری‌نشده"], ["O", "ترتیبی"]].map(function (o) { return h("option", { value: o[0] }, o[1]); }));
+    var sel = h("select", { "aria-label": "گونه", onchange: function () { fill(sel.value); } }, [["all", "همه"], ["X", "ناسازگار"], ["B", "بدیهی‌پایه"], ["S", "قضیه × پایهٔ سنجیده"], ["O", "ترتیبی"]].map(function (o) { return h("option", { value: o[0] }, o[1]); }));
     var rows = h("tbody");
     function fill(m) {
       rows.innerHTML = "";
       rep.filter(function (r) { return m === "all" || r.k === m; }).forEach(function (r) {
         rows.appendChild(h("tr", { class: r.k === "X" ? "warnrow" : "", "data-k": r.k }, h("td", {}, h("div", {}, r.fa), h("div", { class: "small muted" }, r.id)),
-          h("td", {}, fa(r.cap)), h("td", { class: "small" }, deg(r.capDeg)),
+          h("td", { class: "small" }, String(r.capText || r.cap).replace(/\d+(\.\d+)?/g, function (n) { return fa(+n); })), h("td", { class: "small" }, r.k === "S" || (F.DER[r.id] || {}).f ? "—" : deg(r.capDeg)),
           h("td", { class: "small" }, K[r.k] ? K[r.k][0] : r.k, r.stricterThanTheorem ? h("div", { class: "small muted" }, "سخت‌گیرتر از قضیه، بی‌برهان") : null),
           h("td", { class: "small" }, r.thFa), h("td", { class: "small" }, r.bound != null ? bound(r.bound) : r.baseFa ? "پایه: " + r.baseFa : ""),
           h("td", { class: "small" }, r.note)));
       });
     }
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "هر سقفِ عددی و مبنایش (" + fa(rep.length) + ")"), h("div", { class: "row gap" }, sel),
-      h("div", { class: "scrollx" }, h("table", { class: "wt found-rules" }, h("thead", {}, h("tr", {}, ["قاعده", "سقفِ فعلی", "درجه", "گونه", "قضیه", "کرانِ قضیه / پایه", "توضیح"].map(function (x) { return h("th", {}, x); }))), rows))));
+      h("div", { class: "scrollx" }, h("table", { class: "wt found-rules" }, h("thead", {}, h("tr", {}, ["قاعده", "سقف", "درجه", "گونه", "قضیه", "کرانِ قضیه / پایه", "توضیح"].map(function (x) { return h("th", {}, x); }))), rows))));
     fill("all");
 
     /* سنجش‌ها (از دفترِ بک‌تست) */
     if (!D) box.appendChild(h("section", { class: "card" }, h("p", { class: "small muted" }, "اثرِ حالت‌های آزمایشی و اندازه‌گیریِ پایه‌ها پس از نخستین دورِ بک‌تست این‌جا می‌آید.")));
     else {
-      var M = D.modes || {}, NM = { num: "عدد + تحملِ ۱۰ (فعلی)", deg: "فقط درجه‌ها (یقین/ظن/شک/وهم)", derived: "کرانِ قضیه به‌جای عددِ قراردادی", both: "هر دو" };
+      var M = D.modes || {}, NM = { num: "فعلی (همه از قضیه/سنجش)", deg: "فقط درجه‌ها (یقین/ظن/شک/وهم)", derived: "کرانِ قضیه به‌جای عددِ قراردادی", both: "هر دو" };
       box.appendChild(h("section", { class: "card found-modes" }, h("h3", {}, "اگر عددهای قراردادی کنار بروند چه می‌شود؟ (دورِ " + fa(D.round) + "، کلِ پیکره، در حافظه)"),
         h("div", { class: "scrollx" }, h("table", { class: "wt" }, h("thead", {}, h("tr", {}, ["حالت", "حکمِ درست", "شکستِ دیده‌نشده", "جای نادرست", "هشدارِ کاذب", "حکم‌های عوض‌شده"].map(function (x) { return h("th", {}, x); }))),
           h("tbody", {}, ["num", "deg", "derived", "both"].filter(function (k) { return M[k]; }).map(function (k) { var m = M[k];
@@ -66,15 +67,15 @@
           return h("p", { class: "small" }, h("b", {}, "خواندنِ نتیجه: "),
             lost ? "ماندن فقط با درجه‌های کیفی " + fa(lost) + " شکستی را که امروز دیده می‌شود از دست می‌دهد — یعنی عددهای «پایه‌ای» (۷۰، ۸۰ …) اطلاعاتِ واقعی دارند ولی هنوز مبنا ندارند؛ جایشان را باید «اندازه‌گیریِ کافی» بگیرد، نه حذف و نه حدس. " : "ماندن فقط با درجه‌ها چیزی از دست نمی‌دهد. ",
             "جایگزینیِ عددها با کرانِ قضیه " + (dvLost ? fa(dvLost) + " حکمِ درست را خراب می‌کند" : "هیچ حکمِ درستی را خراب نمی‌کند") + (dvFix ? " و " + fa(dvFix) + " شکستِ دیده‌نشده را می‌بیند" : "") + ". ",
-            "پیش‌فرضِ کارخانه عوض نشده؛ پیشنهادها در «♾ بک‌تستِ پیوسته» منتظرِ تصمیمِ تو هستند.");
+            "از ۲۰۲۶-۱۰-۱۴ همهٔ سقف‌ها از قضیه یا سنجش‌اند (تصمیمِ مالک)؛ این جدول فقط حالت‌های مقایسه را نشان می‌دهد.");
         })()));
-      var BS = D.base || {}, suf = D.suff || F.SUFF;
-      box.appendChild(h("section", { class: "card found-base" }, h("h3", {}, "مقدارهای پایه — فقط با دادهٔ کافی و بی‌گزینش"),
-        h("p", { class: "small" }, "این‌ها در بدیهیات نیستند (مثلاً «یک ناقلِ ثقه چند بار درست می‌گوید»). جزوه خودش راهشان را گفته: «سنجشِ تطابق با واقعیات بیرونی و اسناد» (s52). این سنجش نوعی استقراء است و همان‌طور که گفتی معرفت‌شناسی‌اش ضعیف‌تر است؛ برای همین سه مرز دارد: (۱) فقط نمونهٔ ", h("b", {}, "بی‌گزینش"), " شمرده می‌شود — پیکرهٔ بک‌تست عمداً از شکست‌ها چیده شده و نسبتِ درستی در آن به گزینش بسته است؛ (۲) دست‌کم " + fa(suf.groups) + " گروهِ مستقل و نیم‌پهنای بازهٔ ۹۵٪ حداکثر " + fa(Math.round(suf.hw * 100)) + " واحد؛ (۳) هیچ عددِ سنجیده‌ای از کرانِ قضیه بالاتر نمی‌نشیند — قضیه بر سنجش مقدم است."),
-        h("div", { class: "scrollx" }, h("table", { class: "wt" }, h("thead", {}, h("tr", {}, ["مقدارِ پایه", "وضع", "گروهِ بی‌گزینش", "موردِ گزینش‌شده (شمرده نمی‌شود)"].map(function (x) { return h("th", {}, x); }))),
+      var BS = D.base || {};
+      box.appendChild(h("section", { class: "card found-base" }, h("h3", {}, "مقدارهای پایه — از واقعیت، با فرمولِ قضیه"),
+        h("p", { class: "small" }, "این‌ها در بدیهیات نیستند (مثلاً «یک ناقلِ ثقه چند بار درست می‌گوید»)؛ جزوه راهشان را «سنجشِ تطابق با واقعیات و اسناد» می‌داند (s52). تبدیلِ داده به عدد قضیه است: پس از k درست از n موردِ احرازشده، اعتبار = (k+1)÷(n+2) — بی‌هیچ داده درست ½ (همان «نمی‌دانیم»). شرط‌های درستیِ خودِ قضیه: (۱) نمونهٔ ", h("b", {}, "بی‌گزینش"), " از قابی از پیش معین، بی‌توجه به سرانجام؛ (۲) درستیِ هر مورد با سند/تواتر/حسِ کنترل‌شده احراز شده؛ (۳) هر ماجرا یک رأی؛ (۴) هرگز ۱۰۰ نمی‌شود. ناظرِ شبانه این نمونه‌ها را گردآوری می‌کند؛ هر جابه‌جایی با شاهدش در دفتر می‌ماند."),
+        h("div", { class: "scrollx" }, h("table", { class: "wt" }, h("thead", {}, h("tr", {}, ["مقدارِ پایه", "مقدار", "موردِ احرازشده", "قاب"].map(function (x) { return h("th", {}, x); }))),
           h("tbody", {}, Object.keys(BS).map(function (k) { var b = BS[k];
-            return h("tr", { "data-base": k }, h("td", {}, b.fa), h("td", { class: b.sufficient ? "" : "small muted" }, b.sufficient ? fa(b.p) + "٪ [" + fa(b.lo) + "–" + fa(b.hi) + "]" : "ناکافی — اندازه‌گیری نشده"),
-              h("td", {}, fa(b.groups) + " از " + fa(suf.groups)), h("td", {}, fa(b.curated))); }))))));
+            return h("tr", { "data-base": k }, h("td", {}, b.fa), h("td", {}, fa(b.p) + "٪" + (b.measured ? "" : " (نمی‌دانیم)")),
+              h("td", {}, b.measured ? fa(b.ok) + " درست از " + fa(b.n) : "۰"), h("td", {}, fa(b.frames || 0))); }))))));
     }
     return box;
   };

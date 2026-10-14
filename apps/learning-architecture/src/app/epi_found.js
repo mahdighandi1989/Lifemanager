@@ -55,8 +55,8 @@
   };
   /* ---------- اشتقاقِ هر قاعدهٔ سقف‌دار ---------- */
   function B(th, bound, note) { return { k: "B", th: th, bound: bound, note: note || "" }; }
-  function S(th, base, note) { return { k: "S", th: th, base: base, note: note || "" }; }
-  function O(th, note) { return { k: "O", th: th, bound: "<100", note: note || "" }; }
+  function S(th, base, note) { return { k: "S", th: th, base: base, cf: "base", note: note || "" }; }
+  function O(th, note) { return { k: "O", th: th, bound: "<100", cf: "below1", note: note || "" }; }
   F.DER = {
     r_conflict_cert: B("T_conflict", 0),
     r_aql_matter_unproven: B("T_unknown", 50),
@@ -66,7 +66,7 @@
     r_expert_method_weak: B("T_unknown", 50),
     r_expert_comp_unknown: B("T_unknown", 50),
     r_naql_mubham_noq: B("T_ambig", 50),
-    r_naql_contra_qarina: B("T_against", "<50"),
+    r_naql_contra_qarina: { k: "B", th: "T_against", bound: "<50", f: true, cf: "belowHalf", note: "کمتر از ½ (قرینه به سودِ نقیض)؛ کوچک‌ترین گامِ زیرِ ½" },
     r_aql_invalid_form: B("T_null", 50, "صورتِ نامعتبر چیزی نمی‌افزاید؛ «لزوماً کاذب نیست» (s40)"),
     r_aql_matter_false: B("T_null", 50, "مادهٔ کاذب این استدلال را بی‌اثر می‌کند، نه نتیجه را کاذب"),
     r_naql_unreliable: B("T_null", 50, "گزارشِ ناموثق پشتوانه نیست؛ نتیجه به حالِ بی‌دلیل برمی‌گردد"),
@@ -74,16 +74,16 @@
     r_expert_out_of_field: B("T_null", 50, "تخصص در حوزهٔ دیگر برای این حکم پشتوانه نیست"),
     r_r_sanad_weak: B("T_null", 50),
     r_bg_missing: B("T_null", 50, "بی پیش‌زمینهٔ بایسته فهمِ مقصود احراز نشده"),
-    r_yad_orig_t1: B("T_weakest", 25, "یادآوری ≤ معرفتِ نخستین (s52)"),
-    r_yad_orig_t2: B("T_weakest", 50, "یادآوری ≤ معرفتِ نخستین (s52)"),
-    r_yad_orig_t3: B("T_weakest", 70, "یادآوری ≤ معرفتِ نخستین (s52)"),
-    r_yad_orig_t4: B("T_weakest", 85, "یادآوری ≤ معرفتِ نخستین (s52)"),
-    r_yad_orig_t5: B("T_weakest", "<100", "یادآوری ≤ معرفتِ نخستین (s52)"),
-    r_yad_undoc: S("T_product", "p_mem"),
-    r_yad_undoc_t1: S("T_product", "p_mem", "= معرفتِ نخستین (≤۲۵) × وثاقتِ حافظه"),
-    r_yad_undoc_t2: S("T_product", "p_mem", "= معرفتِ نخستین (≤۵۰) × وثاقتِ حافظه"),
-    r_yad_undoc_t3: S("T_product", "p_mem", "= معرفتِ نخستین (≤۷۰) × وثاقتِ حافظه"),
-    r_yad_undoc_t4: S("T_product", "p_mem", "= معرفتِ نخستین (≤۸۵) × وثاقتِ حافظه"),
+    r_yad_orig_t1: { k: "B", th: "T_weakest", bound: "mem_orig", f: true, cf: "orig", note: "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین" },
+    r_yad_orig_t2: { k: "B", th: "T_weakest", bound: "mem_orig", f: true, cf: "orig", note: "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین" },
+    r_yad_orig_t3: { k: "B", th: "T_weakest", bound: "mem_orig", f: true, cf: "orig", note: "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین" },
+    r_yad_orig_t4: { k: "B", th: "T_weakest", bound: "mem_orig", f: true, cf: "orig", note: "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین" },
+    r_yad_orig_t5: { k: "B", th: "T_weakest", bound: "mem_orig", f: true, cf: "orig", note: "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین" },
+    r_yad_undoc: { k: "S", th: "T_product", base: "p_mem", cf: "memprod", note: "= معرفتِ نخستین × وثاقتِ حافظه (s52)" },
+    r_yad_undoc_t1: { k: "S", th: "T_product", base: "p_mem", cf: "memprod", note: "= معرفتِ نخستین × وثاقتِ حافظه (s52)" },
+    r_yad_undoc_t2: { k: "S", th: "T_product", base: "p_mem", cf: "memprod", note: "= معرفتِ نخستین × وثاقتِ حافظه (s52)" },
+    r_yad_undoc_t3: { k: "S", th: "T_product", base: "p_mem", cf: "memprod", note: "= معرفتِ نخستین × وثاقتِ حافظه (s52)" },
+    r_yad_undoc_t4: { k: "S", th: "T_product", base: "p_mem", cf: "memprod", note: "= معرفتِ نخستین × وثاقتِ حافظه (s52)" },
     r_naql_ahad: S("T_below1", "p_thiqa", "خبرِ واحد < ۱؛ مقدارش وثاقتِ ناقل"),
     r_r_sanad_ahad: S("T_below1", "p_thiqa"),
     r_naql_no_qarina: S("T_product", "p_thiqa"),
@@ -98,11 +98,11 @@
     r_aql_nondeductive: O("T_below1", "قالبِ غیرقیاسی «یقین‌آور نیست» (s40) — برای حکمِ کلی بر دامنهٔ نامحدود ر.ک. T_universal"),
     r_naql_nonnass: O("T_below1", "غیرنص «احتمالِ خلاف» دارد (s48)"),
     r_tajrobe_ceiling: O("T_below1", "«به پای براهینِ محضِ عقلی یا شهود نمی‌رسد» (s51)"),
-    r_istiqra_universal: B("T_universal", 1, "صفرِ حدی؛ ۱ کوچک‌ترین واحدِ مقیاس — «لزوماً کاذب نیست» (s40)"),
-    r_istiqra_finite: { k: "B", th: "T_finite", bound: "100(n+1)/(M+1)", f: true, note: "عدد از n و M ِ همان تصدیق" },
-    r_istiqra_next: { k: "B", th: "T_next", bound: "100(n+1)/(n+2)", f: true, note: "عدد از n ِ همان تصدیق" },
-    r_istiqra_incomplete: { k: "X", th: "T_universal", bound: "≈0 (حکمِ کلی) / (n+1)/(n+2) (موردِ بعدی)", note: "گذرا: فقط تصدیق‌های بی «گستره». سقفِ ۸۰ برای حکمِ کلیِ استقراییِ ناقص با قضیهٔ خودِ جزوه (s51: نسبت «نزدیک به صفر») نمی‌خواند؛ برای پیش‌بینیِ موردِ بعدی عدد از n می‌آید. کارخانه میانِ «حکمِ کلی» و «موردِ بعدی» فرق نمی‌گذارد (ویژگی‌اش نیست)." },
-    r_istiqra_small_n: { k: "X", th: "T_next", bound: "(n+1)/(n+2)", note: "گذرا: فقط تصدیق‌های بی «گستره». برای موردِ بعدی قضیه عددِ دقیق می‌دهد (n=۲ ⇒ ۷۵، n=۵ ⇒ ۸۶، n=۹ ⇒ ۹۱)؛ سقفِ ثابتِ ۷۰ قراردادی است؛ برای حکمِ کلی ≈ ۰." },
+    r_istiqra_universal: { k: "B", th: "T_universal", bound: "→0", f: true, cf: "universal", note: "صفرِ حدی (کوچک‌ترین مقدارِ مثبت) — «لزوماً کاذب نیست» (s40)؛ هر اطمینانِ مثبتی بیش از توجیه است" },
+    r_istiqra_finite: { k: "B", cf: "finite", th: "T_finite", bound: "100(n+1)/(M+1)", f: true, note: "عدد از n و M ِ همان تصدیق" },
+    r_istiqra_next: { k: "B", cf: "next", th: "T_next", bound: "100(n+1)/(n+2)", f: true, note: "عدد از n ِ همان تصدیق" },
+    r_istiqra_incomplete: O("T_below1", "گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — بی‌دانستنِ گستره (کلی یا موردِ بعدی) قضیه فقط «کمتر از یقین» می‌گوید (s50)"),
+    r_istiqra_small_n: O("T_below1", "گذرا: فقط تصدیقِ بی «گسترهٔ ادعا» — «کمتر از یقین» (s50)"),
     r_tajrobe_no_vazraf: B("T_null", 50, "جزوه تجربهٔ بی وضع‌ورفع را «تکرارِ داده‌های حسی» می‌داند که «قادر به تولیدِ حکمِ کلی و قانونِ علمی نیست» (s51) ⇒ این شاهد به قانون چیزی نمی‌افزاید ⇒ حداکثر شک (½). سقفِ قبلی ۸۰ (ظن) ناسازگار بود؛ مالک ۲۰۲۶-۱۰-۱۳ پیشنهادِ p_found_vazraf را پذیرفت."),
   };
   /* تحمل («۱۰ واحد») هم قراردادی بود: مقایسه باید میانِ «درجه»ها باشد، نه عددها — ر.ک. F.DEG */
@@ -113,11 +113,36 @@
     { id: "wahm", fa: "وهم (کمتر از ½)", lo: 0.0001, hi: 49.9999, why: "ترجیح به سودِ نقیض" },
     { id: "kidhb", fa: "کذبِ یقینی", lo: 0, hi: 0, why: "نقیضِ یقینی (A0)" }
   ];
-  /* سقف‌های فرمولی: عدد از ویژگی‌های همان تصدیق و قضیه (نه قرارداد) */
+  /* سقف‌های فرمولی: عدد را قضیه از ویژگی‌های همان تصدیق یا از مقدارِ پایهٔ سنجیده می‌سازد — هیچ عددِ قراردادی (۲۰۲۶-۱۰-۱۴، مالک:
+     «هیچ عددی نباید قراردادی باشد»). کوچک‌ترین گام (EPS) فقط «اکیداً کمتر» را بیان می‌کند و هیچ حکمی به اندازه‌اش بستگی ندارد
+     (اطمینان‌ها عددِ صحیح‌اند). */
+  F.EPS = 0.1;
+  F.BASEVAL = {};   // مقدارهای پایهٔ سنجیده (درصد) — اجراکنندهٔ بک‌تست از نمونه‌های بی‌گزینش پر می‌کند؛ نبودِ داده ⇒ ۵۰ (T_unknown)
+  F.baseVal = function (b) {
+    var L = W.EPI_BT_LEDGER && W.EPI_BT_LEDGER.baseval, v = (L && L[b] != null) ? L[b] : F.BASEVAL[b];
+    return v == null ? 50 : v;
+  };
   F.CAPF = {
-    universal: function () { return 1; },
+    universal: function () { return F.EPS; },
     finite: function (f) { var n = +f.ind_n, M = +f.dom_n; if (!(M > 0) || !(n >= 0)) return null; n = Math.min(n, M); return 100 * (n + 1) / (M + 1); },
-    next: function (f) { var n = +f.ind_n; if (!(n >= 0)) return null; return 100 * (n + 1) / (n + 2); }
+    next: function (f) { var n = +f.ind_n; if (!(n >= 0)) return null; return 100 * (n + 1) / (n + 2); },
+    below1: function () { return 100 - F.EPS; },                       // T_below1: فقط «کمتر از یقین»
+    belowHalf: function () { return 50 - F.EPS; },                     // T_against: «کمتر از ½»
+    orig: function (f) { var o = +f.mem_orig; return o >= 0 ? Math.min(o, 100 - F.EPS) : null; },   // یادآوری ≤ معرفتِ نخستین
+    base: function (f, d) { return Math.min(F.baseVal(d.base), 100 - F.EPS); },
+    memprod: function (f, d) { var m = F.baseVal(d.base), o = +f.mem_orig; return Math.min(100 - F.EPS, o >= 0 ? o * m / 100 : m); }
+  };
+  /* سقفِ قضیه‌ایِ یک قاعده برای یک تصدیق؛ null ⇒ همان عددِ قاعده (فقط وقتی قضیه عددِ ثابت می‌دهد، مثلِ ۰ یا ۵۰) */
+  F.capFor = function (r, f) {
+    var d = F.DER[r.id], cf = d && (d.cf || (r.capf));
+    if (!cf || !F.CAPF[cf]) return null;
+    return F.CAPF[cf](f || {}, d);
+  };
+  F.capText = function (r) {
+    var d = F.DER[r.id] || {}, cf = d.cf;
+    if (!cf) return String(r.cap);
+    return { universal: "→۰ (صفرِ حدی)", finite: "۱۰۰×(n+1)/(M+1)", next: "۱۰۰×(n+1)/(n+2)", below1: "کمتر از ۱۰۰", belowHalf: "کمتر از ۵۰", orig: "≤ معرفتِ نخستین",
+      base: "پایهٔ «" + ((F.BASE[d.base] || {}).fa || d.base) + "» = " + F.baseVal(d.base), memprod: "معرفتِ نخستین × وثاقتِ حافظه (" + F.baseVal(d.base) + ")" }[cf] || String(r.cap);
   };
   F.RANK = { kidhb: 0, wahm: 1, shakk: 2, zann: 3, yaqin: 4 };
   F.rank = function (p) { return F.RANK[F.degreeOf(p)]; };
@@ -134,45 +159,49 @@
         else if (d.bound === "<100") ok = r.cap < 100;
       } else if (d.k === "O") ok = r.cap < 100;
       else if (d.k === "X") ok = false;
-      var stricter = d.k === "B" && typeof d.bound === "number" && r.cap < d.bound;
+      if (d.cf) ok = true;                                                    // عدد را قضیه/سنجش می‌سازد
+      var stricter = d.k === "B" && !d.cf && typeof d.bound === "number" && r.cap < d.bound;
+      var conventional = !d.cf && !(d.k === "B" && typeof d.bound === "number" && r.cap === d.bound);
       return { id: r.id, fa: r.fa, st: r.st, cap: r.cap, capDeg: F.degreeOf(r.cap), sec: r.sec || [], k: d.k, th: d.th, thFa: (F.TH[d.th] || {}).fa || "", bound: d.bound, base: d.base || null,
-        baseFa: d.base && F.BASE[d.base] ? F.BASE[d.base].fa : "", note: d.note || "", consistent: ok, stricterThanTheorem: stricter };
+        baseFa: d.base && F.BASE[d.base] ? F.BASE[d.base].fa : "", note: d.note || "", consistent: ok, stricterThanTheorem: stricter, conventional: conventional, capText: F.capText(r) };
     });
   };
 
-  /* ---------- اندازه‌گیریِ مقدارهای پایه: فقط با دادهٔ کافی و نمونهٔ بی‌گزینش ----------
-     مالک: «فقط با داده‌های متقن و مقادیرِ کافی، نه تعدادِ محدود». دو شرط، هر دو لازم:
-       ۱) نمونهٔ «بی‌گزینش» (sample:"unselected"): پیکرهٔ بک‌تست عمداً از شکست‌ها و سالم‌های روشن چیده شده (برای آزمودنِ قاعده‌ها)،
-          پس نسبتِ درستی در آن به گزینش بسته است، نه به واقع — شمردنش «تعمیمِ از نمونهٔ گزینش‌شده» است (همان خطایی که جزوه در
-          s51 می‌گوید). فقط مواردی که بی‌توجه به سرانجام برداشته شده‌اند (مثلاً «هر خبرِ واحدِ ثقه در این بایگانی» و سپس سنجش با
-          اسناد، s52) شمرده می‌شوند.
-       ۲) کفایت: دست‌کم F.SUFF.groups گروهِ مستقل (هر grp یک رأی؛ گزارش‌های یک ماجرا یکی شمرده می‌شوند) و نیم‌پهنای بازهٔ ویلسونِ ۹۵٪
-          حداکثر F.SUFF.hw. کمتر از این ⇒ «ناکافی — اندازه‌گیری نشده» و هیچ عددی گزارش نمی‌شود که جای قضیه بنشیند. */
-  F.SUFF = { groups: 30, hw: 0.10, z: 1.96 };
+  /* ---------- اندازه‌گیریِ مقدارهای پایه از نمونه‌های بی‌گزینش (گامِ ۲؛ مالک ۲۰۲۶-۱۰-۱۴) ----------
+     تبدیلِ داده به عدد قضیه است، نه قرارداد: با پیشینِ یکنواخت (A4: هیچ نسبتی بر دیگری مرجح نیست) و حسابِ احتمالات (A3)، پس از k
+     درست از n موردِ بررسی‌شده، احتمالِ درستیِ موردِ تازه = (k+1)/(n+2) (T_next/لاپلاس). n = 0 ⇒ ½ (همان T_unknown). آستانهٔ «کافی»
+     (۳۰ گروه، ±۱۰) که پیش‌تر بود خودش قراردادی بود و برداشته شد: کم بودنِ داده خودبه‌خود عدد را نزدیکِ ½ نگه می‌دارد.
+     شرط‌های درستیِ همین قضیه (قرارداد نیستند؛ اگر نقض شوند قضیه به کار نمی‌آید):
+       ۱) بی‌گزینش: نمونه از یک «قابِ» از پیش معین (frame) برداشته شده، بی‌توجه به سرانجام — وگرنه موردهای آینده «هم‌سان» ِ نمونه نیستند؛
+       ۲) درستی/نادرستیِ هر مورد با راهی یقینی یا نزدیک به یقین احراز شده (verified_by: سند، تواتر، حسِ کنترل‌شده — s48، s43، s52)؛
+          وگرنه خطای احراز وارد عدد می‌شود (T_weakest)؛
+       ۳) استقلال: هر گروه (grp) یک رأی؛
+       ۴) قضیه بر سنجش مقدم: نتیجه هرگز به ۱۰۰ نمی‌رسد (T_below1). */
+  F.SUFF = { z: 1.96 };
   F.wilson = function (k, n, z) {
     z = z || F.SUFF.z; if (!n) return null;
     var p = k / n, d = 1 + z * z / n, c = (p + z * z / (2 * n)) / d, hw = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d;
     return { p: p, lo: Math.max(0, c - hw), hi: Math.min(1, c + hw), hw: hw };
   };
   function matches(sel, f) { return Object.keys(sel).every(function (k) { return f && f[k] === sel[k]; }); }
-  F.measure = function (cases) {
+  F.sampleItemOk = function (it) { return it && typeof it.truth === "boolean" && Array.isArray(it.verified_by) && it.verified_by.length > 0; };
+  /* samples: آرایهٔ «قاب»ها {id, frame, src, items:[{id, txt, f, truth, verified_by, grp?}]} (backtest/samples/*.json) */
+  F.measure = function (samples) {
     var out = {};
     Object.keys(F.BASE).forEach(function (b) {
-      var sel = F.BASE[b].select, all = 0, groups = {}, curated = 0;
-      (cases || []).forEach(function (c) {
-        (c.claims || []).forEach(function (k) {
-          if (typeof k.truth !== "boolean" || !matches(sel, k.f)) return;
-          all++;
-          if (c.sample !== "unselected") { curated++; return; }
-          var g = c.grp || c.id; if (!(g in groups)) groups[g] = k.truth;   // یک رأی برای هر گروهِ مستقل
+      var sel = F.BASE[b].select, groups = {}, frames = {}, rejected = 0;
+      (samples || []).forEach(function (sm) {
+        if (sm.excluded || !sm.frame) return;
+        (sm.items || []).forEach(function (it) {
+          if (!matches(sel, it.f)) return;
+          if (!F.sampleItemOk(it)) { rejected++; return; }
+          var g = sm.id + "/" + (it.grp || it.id); if (!(g in groups)) { groups[g] = it.truth; frames[sm.id] = 1; }
         });
       });
-      var n = Object.keys(groups).length, t = Object.keys(groups).filter(function (g) { return groups[g]; }).length, w = F.wilson(t, n);
-      var enough = n >= F.SUFF.groups && w && w.hw <= F.SUFF.hw;
-      out[b] = { fa: F.BASE[b].fa, matched: all, curated: curated, groups: n, ok: t, sufficient: !!enough,
-        // قضیه بر سنجش مقدم است: راهِ غیرِ برهانی < ۱ (T_below1) ⇒ حتی «همه درست» هم کمتر از یقین گزارش می‌شود
-        p: enough ? Math.min(99.9, +(w.p * 100).toFixed(1)) : null, lo: enough ? +(w.lo * 100).toFixed(1) : null, hi: enough ? +(w.hi * 100).toFixed(1) : null,
-        need: enough ? 0 : Math.max(0, F.SUFF.groups - n) };
+      var n = Object.keys(groups).length, k = Object.keys(groups).filter(function (g) { return groups[g]; }).length, w = F.wilson(k, n);
+      var p = Math.min(100 - F.EPS, +(100 * (k + 1) / (n + 2)).toFixed(1));
+      out[b] = { fa: F.BASE[b].fa, n: n, ok: k, frames: Object.keys(frames).length, rejected: rejected, p: p,
+        lo: w ? +(w.lo * 100).toFixed(1) : null, hi: w ? +(w.hi * 100).toFixed(1) : null, measured: n > 0 };
     });
     return out;
   };

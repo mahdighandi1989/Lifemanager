@@ -624,7 +624,8 @@
       function draw() {
         var cfg = X.DEFAULT_CFG ? X.DEFAULT_CFG() : null, r = X.runClaim({ f: f }, cfg), tol = cfg && cfg.tol != null ? cfg.tol : 10;
         out.innerHTML = "";
-        var caps = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "cap"; }).sort(function (a, b) { return a.cap - b.cap; });
+        var cv = function (x) { return Math.round(X.capOf ? X.capOf(cfg, x, f) : x.cap); };   // سقفِ قضیه‌ایِ همین تصدیق (۲۰۲۶-۱۰-۱۴)
+        var caps = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "cap"; }).sort(function (a, b) { return cv(a) - cv(b); });
         var flags = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "flag"; });
         out.appendChild(h("div", { class: "ecrs-ceilhead" }, h("span", { class: "small muted" }, "سقفِ اعتبارِ موجهِ این تصدیق"), h("b", { class: "ecrs-ceilv" }, fa(r.ceil) + "٪"),
           h("div", { class: "crs-meter" }, h("i", { style: { width: r.ceil + "%" } }))));
@@ -634,7 +635,7 @@
           out.appendChild(h("div", { class: "col" }, caps.map(function (x) {
             var bind = x.id === r.bind;
             return h("div", { class: "ecrs-cap" + (bind ? " bind" : "") },
-              h("div", { class: "ecrs-capbar" }, h("i", { style: { width: x.cap + "%" } }), h("span", {}, fa(x.cap) + "٪")),
+              h("div", { class: "ecrs-capbar" }, h("i", { style: { width: cv(x) + "%" } }), h("span", {}, fa(cv(x)) + "٪")),
               h("div", { class: "small" }, (bind ? "⛓ ضعیف‌ترین حلقه — همین سقف را تعیین می‌کند: " : "") , h("b", {}, x.fa), SM[x.st] ? h("span", { class: "muted" }, " · ایستگاهِ «" + SM[x.st].fa + "»") : null),
               h("div", { class: "row gap wrap" }, (x.sec || []).slice(0, 3).map(function (sc) { return secBtn(sc); })));
           })));
