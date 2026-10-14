@@ -229,7 +229,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const nA = t.facets.length; AS.tourAdoptSheet(s, { id: 'rep88', number: 88, title: 'گزینش و بقا' }, { area: 'epi-backtest', title: 'قاعدهٔ گزینش و بقا' });
     const adopted = t.facets.length === nA + 1 && t.facets[nA].status === 'blocked' && t.facets[nA].blocked.number === 88 && t.facets[nA].kind === 'territory';
     t.facets.pop();
-    const sheetLink = adopted && sl === '' && t.facets[4].status === 'blocked' && t.facets[4].blocked.number === 77 && s.reports[s.reports.length - 1].facet === 'f5';
+    const pref = AS.DO.tour_link({ facet: 'f5', id: 'topic:tp_t2' }); const prefOk = !/برگهٔ/.test(pref);
+    const sheetLink = prefOk && adopted && sl === '' && t.facets[4].status === 'blocked' && t.facets[4].blocked.number === 77 && s.reports[s.reports.length - 1].facet === 'f5';
     return { sheetLink, kept: t.facets.slice(0, 3).map(f => f.title).join('|') === before, keys: keys0, reopened: !t.doneAt && !t.masteredAt, goal: /جلسهٔ تیم/.test(t.goal) };
   });
   chk(info.replan.sheetLink && info.replan.kept && info.replan.keys === 'f1:done,f2:done,f3:done,f4:now,f5:todo' && info.replan.reopened && info.replan.goal,
