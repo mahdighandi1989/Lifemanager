@@ -34,6 +34,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const d = s.tour.diag || {};
     out.found = d.F11 && d.F11.st === 'found' && d.F11.facet === 'f1';
     out.noEvidence = d.F7 && d.F7.st === 'ask';
+    AS._turnSession = s; out.alias = AS.DO.tour_diag({ layers: [{ id: 'repeat', st: 'ask' }, { id: 'f3', st: 'ask' }] }) === '' && s.tour.diag.recur && s.tour.diag.F3; out.owed = /پرسش‌های بدهکار[^\n]*تکرار و ریشهٔ مشترک/.test(AS.tourText(s));
     AS._turnSession = s; AS.DO.tour_diag({ layers: [{ id: 'F5', st: 'no', why: '—' }, { id: 'F11', st: 'found', why: 'هر بار ۸۰٪ مطمئن بودم' }] });
     out.noNeedsWhy = s.tour.diag.F5.st === 'ask'; out.multi = /خسیسی/.test(s.tour.diag.F11.why) && /۸۰٪/.test(s.tour.diag.F11.why);                     // «پیدا شد» بی شاهد ⇒ «باید پرسید»
     out.prompt = /# گره‌های پیشینِ کاربر[\s\S]*برچسب را حکم گرفتن/.test(__calls[0].user) && /# غربالِ لایه‌ها/.test(AS.tourText(s)) && /سنجیده‌نشده:/.test(AS.tourText(s));
@@ -87,6 +88,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.thin && S.unset, 'bare «بلدم» is flagged; an untouched slider is reported empty to the model');
   chk(S.ownClick, 'the assistant never presses an owner-only button (e.g. sending the problem to the AI)');
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');
+  chk(S.alias && S.owed, 'near-miss layer names (repeat, f3) map to the real layer');
   chk(S.honest, 'a facet with open milestones is never reported as «انجام شد»');
   chk(S.noCodes && S.humanized, 'the e-mail carries no internal codes (facet keys, family codes, area/record ids, sheet jargon) — names instead');
   console.log(JSON.stringify(info).slice(0, 2500));

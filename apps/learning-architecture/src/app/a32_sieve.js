@@ -34,7 +34,9 @@
     var head = BASE.slice(0, 3), rest = BASE.slice(3);
     return head.concat(fam, rest);
   };
-  function layerOf(id) { id = String(id || "").replace(/^kf_/, ""); return AS.sieveLayers().filter(function (L) { return L.id === id; })[0]; }
+  // نام‌های نزدیک (کارزارِ آزمونِ دوم c16: «repeat» به جای «recur» ⇒ «لایهٔ ناشناخته» در گفت‌وگو)
+  var ALIAS = { repeat: "recur", recurrence: "recur", recurring: "recur", pattern: "recur", prerequisite: "prereq", prerequisites: "prereq", knowledge: "prereq", belief: "claim", epistemic: "route", epistemology: "route", missing_info: "info", information: "info", learning: "learn", hard_problem: "problem", goal: "want", need: "want", risk: "safety", out: "outside" };
+  function layerOf(id) { id = String(id || "").trim().replace(/^kf_/, ""); var lo = id.toLowerCase(); if (ALIAS[lo]) id = ALIAS[lo]; else if (/^f\d+$/.test(lo)) id = id.toUpperCase(); return AS.sieveLayers().filter(function (L) { return L.id === id; })[0]; }
   AS.sieveState = function (s) { return (s && s.tour && s.tour.diag) || {}; };
 
   var DO = AS.DO;
@@ -76,6 +78,8 @@
     var fams = (A.KF || []).filter(function (F) { return d[F.id] && d[F.id].st === "found"; }).map(function (F) { return F.id + " " + F.fa; });
     return t + "\n# غربالِ لایه‌ها (" + fa(done.length) + " از " + fa(Ls.length) + ")\n" + (done.join("\n") || "- هنوز هیچ لایه‌ای سنجیده نشده") +
       (open.length ? "\nسنجیده‌نشده: " + open.join("، ") : "") +
+      // پرسش‌های «باید پرسید» که هنوز پرسیده نشده‌اند، با پرسشِ خودِ لایه (کارزارِ آزمونِ دوم c12/c14/c16: «تکرار» هرگز پرسیده نشد)
+      (function () { var ow = Ls.filter(function (L) { return d[L.id] && d[L.id].st === "ask"; }); return ow.length ? "\nپرسش‌های بدهکار (یکی را در همین نوبت، اگر کاربر چیزِ فوری‌تری نخواسته، بپرس): " + ow.slice(0, 4).map(function (L) { return L.fa + (L.q ? " — «" + clip(L.q, 90) + "»" : ""); }).join("؛ ") : ""; })() +
       (fams.length ? "\nخانواده‌هایی که غربال پیدا کرد: " + fams.join("، ") + " — در گره‌گشا (قدمِ ۱ و ۲) آزمون‌های تمایزدهندهٔ همین‌ها را هایلایت کن، هرچند رتبهٔ صفحه پایین‌تر باشد؛ اگر آزمون ردشان کرد، در غربال هم «رد شد» کن." : "");
   };
   AS.promptHooks = AS.promptHooks || [];

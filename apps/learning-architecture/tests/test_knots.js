@@ -314,6 +314,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
   await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(400);
   info.hidMismatch = (await p.inputValue('#knLad4')) === '';
+  // پاسخِ غیرعددی با بیانِ دیگر ⇒ داورِ «یکی‌اند؟» (کارزارِ آزمونِ دوم c16)
+  await p.evaluate(() => { window.__same = 0; APP.callAI = (sys) => Promise.resolve(/پاسخش را نمی‌داند/.test(sys) ? '{"answer":"چهار خط که از مربع بیرون می‌زنند","s4":"مرزها را بخوان","s5":"صورت چه می‌گوید؟","s6":"خطِ اول را بلندتر بکش"}' : /^این مسئله را مستقل/.test(sys) ? '{"answer":"با ۴ خطِ صاف، بیرون رفتن از کادرِ نقطه‌ها"}' : /همان راه‌حل/.test(sys) ? (window.__same++, '{"same":true}') : '{"answer":null}'); });
+  await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
+  await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(400);
+  info.hidSame = (await p.inputValue('#knLad4')) !== '' && await p.evaluate(() => window.__same === 1);
+  info.solvedEarly = await p.locator('main .kn-ladder button:has-text("خودم حل کردم")').count();
   await p.evaluate(() => { APP.callAI = (sys) => Promise.resolve(/پاسخش را نمی‌داند/.test(sys) ? '{"answer":"312211","s4":"هر جمله را بلند بخوان","s5":"توصیفِ جملهٔ قبل","s6":"جملهٔ دوم را با واژه بگو"}' : /^این مسئله را مستقل/.test(sys) ? '{"answer":"۳۱۲۲۱۱"}' : '{"answer":null}'); });
   await p.click('main .kn-ladder button:has-text("بساز با هوش مصنوعی")'); await p.waitForTimeout(150);
   await p.click('.kn-ai .btn:has-text("بفرست")'); await p.waitForTimeout(400);
@@ -501,6 +507,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.safeCard === 1 && info.safeText, 'safety card'); E(info.safeGate, 'safety gate'); E(/:s0$/.test(info.safeAfterAck), 'after ack: ' + info.safeAfterAck);
   E(info.aiSafeFirst && info.aiNotCalled, 'safety before AI');
   E(info.ladGen === 1 && info.leakRejected, 'ladder leak check');
+  E(info.hidSame && info.solvedEarly === 1, 'non-numeric hidden answers: a same-solution judge accepts a reworded match; a solve can be recorded before the rung is written: ' + JSON.stringify([info.hidSame, info.solvedEarly]));
   E(info.hidMismatch && info.hidOk, 'unsolved problem: hidden AI answer confirmed by an independent solve builds the ladder; a mismatch is rejected; the answer never shows: ' + JSON.stringify([info.hidMismatch, info.hidOk]));
   E(info.ladEv === 'F3:1:ladder' && info.ladIso === 1, 'ladder evidence: ' + info.ladEv);
   E(info.leaksFn === '1,1,0,1', 'leak fn: ' + info.leaksFn);

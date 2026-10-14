@@ -1002,9 +1002,13 @@
               var nrm = function (x) { return String(x || "").replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[\s«»"'.,،]/g, "").toLowerCase(); };
               return Promise.resolve(A.callAI(SYS_SOLVE_IND, "صورتِ مسئله: " + (m && m.names && m.names.length ? A.kRedact(it.statement, m.names) : it.statement))).then(function (t3) {
                 var r3 = parseJSON(t3), a2 = r3 && r3.answer != null ? String(r3.answer).trim() : "";
-                if (!a2 || nrm(a2) !== nrm(ansRef)) { A.toast("دو حلِ مستقلِ پنهان به یک پاسخ نرسیدند؛ پله‌ها ساخته نشد (پاسخِ نامطمئن راهنمای نادرست می‌سازد). دوباره بخواه یا دستی بنویس.", "bad"); return; }
+                // پاسخِ غیرعددی (شکل، راهبرد — کارزارِ آزمونِ دوم c16: معمای نُه نقطه) با برابریِ رشته‌ای جور نمی‌شود ⇒ داورِ سوم فقط «یکی‌اند؟» را می‌سنجد
+                var same = !!a2 && nrm(a2) === nrm(ansRef);
+                return (same || !a2 ? Promise.resolve(same) : Promise.resolve(A.callAI(SYS_SAME, "پاسخِ الف: " + ansRef + "\nپاسخِ ب: " + a2)).then(function (t4) { var r4 = parseJSON(t4); return !!(r4 && r4.same === true); }, function () { return false; })).then(function (ok) {
+                if (!ok) { A.toast("دو حلِ مستقلِ پنهان به یک پاسخ نرسیدند؛ پله‌ها ساخته نشد (پاسخِ نامطمئن راهنمای نادرست می‌سازد). دوباره بخواه یا دستی بنویس.", "bad"); return; }
                 it.aiAnswer = ansRef; it.aiAnswerBy = "ai×2"; it.aiAnswerAt = now(); H.put();
                 return finish();
+                });
               });
             }
             return finish();
@@ -1029,6 +1033,8 @@
             }
           }, onDone: function () { aib.disabled = false; } });
       } }, "🤖 بساز با هوش مصنوعی");
+      // پیش از نوشته‌شدنِ پله‌ها هم «خودم حل کردم» ثبت‌شدنی است (کارزارِ آزمونِ دوم c16: «باز شد» نبود چون پلهٔ ۴ متن نداشت)
+      sec.appendChild(h("button", { class: "btn sm kn-lad-open", onclick: function () { var o = Math.max(0, cur - 1); L.opened = o; L.late = true; L.cur = cur; kc.ladder = L; ladderEv(kc, o); H.put(); redraw(); } }, "خودم حل کردم (پس از پلهٔ " + fa(Math.max(0, cur - 1)) + ")"));
       sec.appendChild(h("div", { class: "card soft col gap" }, h("p", { class: "small" }, "پله‌های ۴ تا ۶ از متنِ همین مسئله ساخته می‌شوند: دستی بنویس، یا هوش مصنوعی بسازد (هیچ پله‌ای نباید پاسخِ نهایی را داشته باشد — بررسی می‌شود)."), gen, h("div", { class: "row gap wrap" }, save, aib)));
       return sec;
     }
@@ -1038,6 +1044,7 @@
     return sec;
   }
   var SYS_LAD_HID = "تو سازندهٔ راهنمایی‌های پله‌ای برای مسئله‌ای هستی که کاربر پاسخش را نمی‌داند. اول خودت مسئله را دقیق و گام‌به‌گام (در ذهن) حل کن؛ پاسخ فقط در فیلدِ answer می‌آید و **هرگز** به کاربر نشان داده نمی‌شود. راهنمایی‌ها هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ندارند. فقط JSON: {\"answer\":\"پاسخِ نهایی (کوتاه)\",\"s4\":\"یک راهنماییِ راهبرد بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهوم یا بازنماییِ کلیدی\",\"s6\":\"نخستین گامِ راه، نه بیشتر\"}";
+  var SYS_SAME = "دو پاسخ به یک مسئلهٔ پنهان می‌بینی. فقط بگو آیا هر دو **همان راه‌حل یا همان پاسخ**اند (با بیانِ متفاوت)، نه این‌که کدام درست است. فقط JSON: {\"same\":true|false}";
   var SYS_SOLVE_IND = "این مسئله را مستقل، دقیق و گام‌به‌گام حل کن. فقط JSON: {\"answer\":\"پاسخِ نهایی کوتاه\"}";
   var SYS_LAD = "تو سازندهٔ راهنمایی‌های پله‌ای برای یک مسئله هستی. هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ننویس. خروجی فقط JSON: {\"s4\":\"یک راهنماییِ راهبرد (از آخر/حالتِ خاص/قرینه) بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهومِ کلیدی\",\"s6\":\"گامِ کلیدی بدونِ پاسخِ نهایی\"}. فارسی، کوتاه.";
   var SYS_LADCHK = "تو حل‌کننده‌ای هستی که فقط سه «راهنمایی» از یک مسئلهٔ پنهان را می‌بینی، نه خودِ مسئله را. بگو آیا پاسخِ نهاییِ مسئله را فقط از روی همین راهنمایی‌ها می‌شود دقیق به دست آورد. اگر می‌شود، آن را بنویس؛ اگر نمی‌شود، null. خروجی فقط JSON: {\"answer\": \"…\" | null}.";
