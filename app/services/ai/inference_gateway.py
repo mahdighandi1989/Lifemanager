@@ -321,6 +321,15 @@ async def complete_multimodal(
         need = "vision"
     if rm is None or not rm.is_usable or need not in rm.capabilities:
         capable = await ai_manager.capable_models(db, need)
+        # کارِ «سریع/ارزان» (preferred=fast) نباید بی‌صدا به گران‌ترین مدلِ توانا (کمترین priority) برود:
+        # میانِ مدل‌های توانا، آن‌هایی که قابلیتِ ترجیحیِ همین کار را هم دارند جلوتر (سایر کارها همان رفتارِ قبلی)
+        try:
+            from app.services.ai.catalog import task_preferred_capability
+            pref = task_preferred_capability(task)
+        except Exception:
+            pref = None
+        if pref == "fast" and capable:
+            capable = sorted(capable, key=lambda m: (pref not in (m.capabilities or []), m.priority))
         if not capable:
             return {"ok": False, "error": "no_capable_model", "text": "", "model": None,
                     "suggestions": []}
@@ -330,6 +339,8 @@ async def complete_multimodal(
             return {"ok": False, "error": "no_capable_model", "text": "", "model": None,
                     "suggestions": [{"id": m.id, "display_name": m.display_name} for m in capable]}
 
+    import time as _time
+    _start = _time.perf_counter()
     try:
         if _is_anthropic(rm):
             text = await _anthropic_multimodal(rm, prompt, files, system, max_tokens)
@@ -339,9 +350,15 @@ async def complete_multimodal(
             text = await _openai_multimodal(rm, prompt, files, system, max_tokens)
         if not (text or "").strip():
             raise EmptyAnswer("پاسخِ خالی از مدل")
+        # حسابداریِ مصرف برای فراخوانی‌های تصویر/سند هم (پیش‌تر ثبت نمی‌شد)
+        await _record_usage(db, task=task, rm=rm, ok=True, error=None, prompt_chars=len(prompt),
+                            output_chars=len(text or ""), latency_ms=int((_time.perf_counter() - _start) * 1000))
         return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
     except Exception as exc:
-        return {"ok": False, "error": safe_error_text(exc), "text": "", "model": rm.display_name}
+        err = safe_error_text(exc)
+        await _record_usage(db, task=task, rm=rm, ok=False, error=err, prompt_chars=len(prompt),
+                            output_chars=0, latency_ms=int((_time.perf_counter() - _start) * 1000))
+        return {"ok": False, "error": err, "text": "", "model": rm.display_name}
 
 
 def _b64(data: bytes) -> str:

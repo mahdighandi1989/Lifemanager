@@ -139,3 +139,28 @@ def test_audit_2026_10_13_owner_only_channels_ids_batches_and_body(api_client):
         yield chunk
     r2 = api_client.post(base + "/bulk", content=gen(), headers={"Content-Type": "application/json"})
     assert r2.status_code == 413
+
+
+@pytest.mark.asyncio
+async def test_assistant_task_is_selectable_and_whitelisted(api_client, monkeypatch):
+    """دستیارِ گفت‌وگوی شناور (۲۰۲۶-۱۰-۱۴): همان درِ AI با task «lla_assistant»؛ هر task ِ دیگری رد می‌شود."""
+    _signin(api_client)
+    import app.services.ai.inference_gateway as gw
+    seen = {}
+
+    async def fake_complete(db, prompt, task="general", system=None, max_tokens=2500, **kw):
+        seen["task"] = task
+        return {"ok": True, "text": "سلام", "model": "fast-model"}
+    monkeypatch.setattr(gw, "complete", fake_complete)
+    base = "/api/app-records/learning-architecture/ai"
+    r = api_client.post(base, json={"system": "s", "user": "u", "task": "lla_assistant"})
+    assert r.status_code == 200 and r.json()["ok"] and seen["task"] == "lla_assistant"
+    api_client.post(base, json={"system": "s", "user": "u"})
+    assert seen["task"] == "learning_architecture", "default unchanged"
+    assert api_client.post(base, json={"system": "s", "user": "u", "task": "general"}).status_code == 422
+
+
+def test_assistant_task_is_pinnable_and_fast():
+    from app.services.ai.catalog import TASK_TYPES
+    t = [x for x in TASK_TYPES if x["id"] == "lla_assistant"]
+    assert t and t[0]["preferred"] == "fast"

@@ -89,7 +89,7 @@ export default function LearningArchitecturePage() {
       // opts.maxTokens: answer budget. The server default (2500) cut decompositions and batches mid-JSON, and the gateway accepts a reply
       // stopped at MAX_TOKENS as success — so long critiques/«بیان دیگر» were silently truncated too. Default 6000 when the caller sets none;
       // callers ask more for big JSON (8192) or less for short checks (4000) (2026-10-13).
-      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: (opts && opts.fileIds) || [], max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000) }).then((r) => {
+      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: (opts && opts.fileIds) || [], max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000), task: (opts && opts.task) || undefined }).then((r) => {
         if (!r.data.ok) throw new Error(r.data.error || 'هوش مصنوعی پاسخ نداد');
         return r.data.text;
       }),
@@ -120,6 +120,17 @@ export default function LearningArchitecturePage() {
         fd.append('title', (meta && meta.title) || '');
         fd.append('file', file);
         return api.post(`/app-records/${APP}/files`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data.file);
+      },
+      // «دستیار»: a capability gap the chat found → a «نظارت و سرکشی» sheet (urgent when asked), with the issue's files attached
+      report: async ({ text, spot, urgent, files }) => {
+        const r = await api.post('/inspection', { text, spot });
+        const rep = r.data && r.data.report;
+        if (!rep || !rep.id) throw new Error('برگه ثبت نشد');
+        if (urgent) { try { await api.post(`/inspection/${rep.id}/urgent`); } catch (e) { /* the sheet exists; urgency can be set by hand */ } }
+        for (const f of (files || []).slice(0, 6)) {
+          try { const fd = new FormData(); fd.append('file', f); await api.post(`/inspection/${rep.id}/files`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }); } catch (e) { /* best effort */ }
+        }
+        return { id: rep.id, number: rep.number };
       },
       delFile: (id) => api.delete(`/app-records/${APP}/files/${id}`).then((r) => r.data),
       usage: () => api.get(`/app-records/${APP}/usage`).then((r) => r.data),

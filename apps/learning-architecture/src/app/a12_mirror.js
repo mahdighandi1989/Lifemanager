@@ -177,6 +177,19 @@
     tabs.push({ name: "پیشرفتِ شبیه‌ساز", rows: pr });
     return { group: "مسئله‌های من", title: p.title || "مسئله", tabs: tabs };
   };
+  /* «💬 دستیار» (۲۰۲۶-۱۰-۱۴): هر سشن = یک مسئله ⇒ یک فولدر («دستیار — گفت‌وگوها/<نام · شناسه>») که پیوست‌هایش هم همان‌جاست؛
+     شیت: خلاصه (خواستهٔ سنجاق‌شده، حافظه)، گفت‌وگوی کامل، مراحل، و برگه‌های «نظارت و سرکشی» که دستیار ثبت کرد. */
+  BUILD.achat = function (s) {
+    if (!s || !(s.msgs || []).length) return null;
+    var who = { user: "من", ai: "دستیار", sys: "سامانه" };
+    return { group: "دستیار — گفت‌وگوها", title: s.title || "گفت‌وگو", tabs: [
+      { name: "خلاصه", rows: [["فیلد", "مقدار"], ["نام", s.title || ""], ["خواستهٔ اصلی", s.pinned || ""], ["حافظهٔ سشن", s.memory || ""], ["وضع", s.status || ""],
+        ["مراحل", (s.steps || []).filter(function (x) { return x.s === "done"; }).length + " از " + (s.steps || []).length], ["ساخته‌شده", dt(s.created)], ["آخرین تغییر", dt(s.updated)]] },
+      { name: "گفت‌وگو", rows: [["زمان", "گوینده", "متن", "پیوست‌ها", "کارها روی صفحه"]].concat((s.msgs || []).map(function (m) {
+        return [dt(m.at), who[m.role] || m.role, m.text || "", (m.files || []).map(function (f) { return f.name + (f.link ? " — " + f.link : ""); }).join("\n"), (m.actions || []).join("، ")]; })) },
+      { name: "مراحل", rows: [["#", "مرحله", "وضع", "نما"]].concat((s.steps || []).map(function (x, i) { return [i + 1, x.t || "", { done: "انجام شد", now: "در جریان", todo: "مانده" }[x.s] || x.s || "", x.view ? link(x.view) : ""]; })) },
+      { name: "برگه‌های سرکشی", rows: [["شماره", "عنوان", "زمان"]].concat((s.reports || []).map(function (r) { return [r.number ? "#" + r.number : "(محلی)", r.title || "", dt(r.at)]; })) }] };
+  };
   A.MIRROR_BUILD = BUILD;
 
   /* ---------- صف: چه چیزی دوباره ساخته شود ---------- */

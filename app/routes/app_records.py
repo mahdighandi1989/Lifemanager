@@ -23,7 +23,7 @@ other AI feature (task «learning_architecture», pinnable in AISettings).
 """
 import json
 import re
-from typing import Any, Dict, List
+from typing import Optional, Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -127,6 +127,11 @@ class AIIn(BaseModel):
     # ids of this user's attachments (app_files) to show the model — e.g. the photo of an IQ item.
     # Images/PDF only; the bytes are fetched from Drive for this one call and never stored here.
     file_ids: List[int] = Field(default_factory=list, max_length=4)
+    # کدام «کار» (task route) — فقط همین دو؛ پیش‌فرض همان رفتارِ قبلی. «lla_assistant» = دستیارِ گفت‌وگوی سریع و ارزان.
+    task: Optional[str] = Field(None, max_length=40)
+
+
+_AI_TASKS = {"learning_architecture", "lla_assistant"}
 
 
 @router.get("/api/app-records/{app}", tags=["app-records"])
@@ -241,12 +246,15 @@ async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), us
     _check_app(app)
     from app.services.ai.inference_gateway import complete, complete_multimodal
 
+    task = payload.task or "learning_architecture"
+    if task not in _AI_TASKS:
+        raise HTTPException(status_code=422, detail="task نامعتبر")
     files = await _attachment_bytes(db, user_id, app, payload.file_ids) if payload.file_ids else []
     if files:
-        res = await complete_multimodal(db, payload.user, files, task="learning_architecture",
+        res = await complete_multimodal(db, payload.user, files, task=task,
                                         system=payload.system or None, max_tokens=payload.max_tokens)
     else:
-        res = await complete(db, payload.user, task="learning_architecture", system=payload.system or None,
+        res = await complete(db, payload.user, task=task, system=payload.system or None,
                              max_tokens=payload.max_tokens)
     if not res.get("ok"):
         err = res.get("error") or "no_model"
@@ -358,7 +366,7 @@ async def app_usage(app: str, db: AsyncSession = Depends(get_db), user_id: int =
             see_ai = False
     rows = (await db.execute(select(AIUsageLog.model, func.count(AIUsageLog.id), func.coalesce(func.sum(AIUsageLog.prompt_chars), 0),
                                     func.coalesce(func.sum(AIUsageLog.output_chars), 0))
-                             .where(AIUsageLog.task == "learning_architecture", AIUsageLog.created_at >= since)
+                             .where(AIUsageLog.task.in_(tuple(_AI_TASKS)), AIUsageLog.created_at >= since)
                              .group_by(AIUsageLog.model))).all() if see_ai else []
     prices = {m.display_name: m for m in (await db.execute(select(AICatalogModel))).scalars().all()}
     models, total, priced_all = [], 0.0, True

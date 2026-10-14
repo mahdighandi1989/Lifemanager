@@ -53,6 +53,9 @@ TASK_TYPES: List[Dict[str, str]] = [
     {"id": "telegram_compose", "label": "ساخت تسک از تلگرام", "description": "تبدیل پیام‌های تلگرام به تسک ساخت‌یافته.", "preferred": "fast"},
     {"id": "dev_log_summary", "label": "کارنامهٔ توسعه", "description": "خلاصهٔ فارسی لاگ‌های GitHub/Render مرکز توسعه.", "preferred": "fast"},
     {"id": "learning_architecture", "label": "معماری یادگیری و کارخانه معرفت‌شناسی", "description": "منتقدِ کارگاه‌ها و ایستگاه‌ها، پیشنهادِ وقایع برای صفِ تأیید، تجزیهٔ مسئله‌های بزرگ.", "preferred": "reasoning"},
+    # دستیارِ گفت‌وگوی شناور روی همان صفحه (مالک ۲۰۲۶-۱۰-۱۴): سریع و ارزان، با تصویر/PDF؛ کارِ عمیق را بخش‌های خودِ صفحه
+    # (task «learning_architecture») انجام می‌دهند. بهترین گزینه: مدلی با vision + documents + fast (مثلاً Gemini Flash).
+    {"id": "lla_assistant", "label": "دستیارِ گفت‌وگوی «معماری یادگیری»", "description": "چت‌بات شناورِ صفحه: راهنمایی به بخشِ درست، پرکردنِ فرم‌ها، تحلیلِ مختصرِ فایل‌ها، ثبتِ کمبودِ سامانه در «نظارت و سرکشی».", "preferred": "fast"},
 ]
 
 DEFAULT_PROVIDER_KEY = "anthropic"
