@@ -56,7 +56,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await go('e_prob', null, 'inject');
   chk(/اختیاری/.test(await p.locator('label[for="pbIn_src"]').textContent()), 'source label says optional');
   await p.fill('#pbIn_title', 'مسئلهٔ خودم: تقسیمِ ارث'); await p.fill('#pbIn_statement', 'صورت'); await p.fill('#pbIn_answer', 'پاسخ');
-  await p.click('main .pb-ai'); await p.waitForTimeout(800);
+  await p.click('main .pb-ai'); await p.waitForTimeout(200);
+  info.pbConsent = await p.locator('.overlay.pb-consent').count();
+  chk(info.pbConsent === 1, 'decompose shows «پیش از فرستادن» before anything is sent');
+  await p.click('.overlay.pb-consent button:has-text("بفرست")'); await p.waitForTimeout(800);
   info.inj = await p.evaluate(() => { const r = APP.S.all('eprob', x => x.p && x.p.title === 'مسئلهٔ خودم: تقسیمِ ارث')[0]; return { calls: window.__ai.length, nosrc: r && r.nosrc, check: r && r.check && r.check.flags.map(f => f.sid + ':' + f.state).join(), res: r && r.check && r.check.res }; });
   chk(info.inj.calls === 5 && info.inj.nosrc === true && info.inj.check === 'n2:open' && info.inj.res.n1.agree === 3 && info.inj.res['drill1'].agree === 3, 'inject + check ' + JSON.stringify(info.inj));
   // بودجهٔ پاسخ (۲۰۲۶-۱۰-۱۳، اجرای واقعی): پیش‌فرضِ ۲۵۰۰ ِ سرور تجزیهٔ کامل را وسطِ JSON می‌برید

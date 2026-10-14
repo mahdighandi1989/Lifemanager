@@ -644,6 +644,14 @@
       // فرستادنِ متنِ تو به هوش مصنوعی تصمیمِ خودِ توست: دستیار این دکمه را نمی‌زند، زردش می‌کند (کارزارِ آزمونِ دوم c12)
       h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-ai", "data-own": "1", onclick: function (e) {
         if (!f.title) { A.toast("عنوان لازم است.", "bad"); return; }
+        /* «پیش از فرستادن» مثلِ بقیهٔ درخواست‌های هوش (کارزارِ آزمونِ دوم c12/c15: این تنها دکمه‌ای بود که بی پنجرهٔ رضایت می‌فرستاد) — یک بار در هر بارگذاری */
+        if (!A._pbAIok) { var tb = e.target, ov = h("div", { class: "overlay pb-consent", "data-own": "1", role: "dialog", "aria-label": "پیش از فرستادن به هوش مصنوعی" },
+          h("div", { class: "card col gap", style: "max-width:560px;margin:10vh auto" }, h("h3", {}, "پیش از فرستادن"),
+            h("p", { class: "small" }, "این‌ها برای تجزیه به ارائه‌دهندهٔ بیرونیِ هوش مصنوعی فرستاده می‌شود: عنوان، رشته، بازه، صورت، پاسخ، منابع و یادداشت" + (attShown && attAi ? "، و پیوست‌هایی که انتخاب کرده‌ای" : "") + ". نامِ کسی را اگر نمی‌خواهی برود، پیش از فرستادن از متن بردار."),
+            h("pre", { class: "small kn-pre", style: "white-space:pre-wrap;max-height:40vh;overflow:auto" }, ["عنوان: " + f.title, f.statement ? "صورت: " + f.statement : "", f.answer ? "پاسخ: " + f.answer : ""].filter(Boolean).join("\n")),
+            h("div", { class: "row gap" }, h("button", { class: "btn", type: "button", onclick: function () { ov.remove(); A._pbAIok = true; tb.click(); } }, "بفرست"),
+              h("button", { class: "btn ghost", type: "button", onclick: function () { ov.remove(); } }, "انصراف"))));
+          document.body.appendChild(ov); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
         var b = e.target;
         attFiles().then(function (fileIds) {

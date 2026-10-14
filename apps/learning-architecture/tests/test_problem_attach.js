@@ -36,7 +36,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.locator('main section.attach').count() === 0, 'no attach box before a title');
   await p.fill('#pbIn_title', 'مسئلهٔ عکس‌دار');
   // بی متن و بی پیوست ⇒ هیچ فراخوانی
-  await p.click('main .pb-ai'); await p.waitForTimeout(200);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(200);
   chk(await p.evaluate(() => window.__ai.length) === 0, 'no statement and no attachment ⇒ refused');
   await p.click('main .pb-attbtn'); await p.waitForTimeout(150);
   chk(await p.locator('main section.attach').count() === 1 && await p.locator('#pbAttAi').isChecked(), 'attach box + send-to-AI checkbox (on)');
@@ -45,7 +45,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('x') }]);
   await p.waitForTimeout(400);
   chk(await p.locator('main section.attach li a').count() === 2, 'both files listed');
-  await p.click('main .pb-ai'); await p.waitForTimeout(900);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(900);
   info.call = await p.evaluate(() => ({ n: window.__ai.length, ids: window.__ai[0] && window.__ai[0].fileIds, inAtt: window.__ai[0] && /\(در پیوست\)/.test(window.__ai[0].user) && /پیوست همراهِ این پیام است/.test(window.__ai[0].user),
     later: window.__ai.slice(1).every(c => !c.fileIds.length) }));
   chk(info.call.n >= 1 && JSON.stringify(info.call.ids) === '[1,2]' && info.call.inAtt && info.call.later, 'decomposition reads every attachment (image AND txt, WORKLOG 44), only once ' + JSON.stringify(info.call));
@@ -58,7 +58,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main .pb-attbtn'); await p.waitForTimeout(100);
   await p.setInputFiles('main section.attach input[type=file]', { name: 'b.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1') }); await p.waitForTimeout(300);
   await p.uncheck('#pbAttAi'); const n0 = await p.evaluate(() => window.__ai.length);
-  await p.click('main .pb-ai'); await p.waitForTimeout(700);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(700);
   chk(await p.evaluate(n0 => window.__ai[n0] && window.__ai[n0].fileIds.length === 0, n0), 'unchecked ⇒ text only');
 
   // ۲) صفحهٔ مسئلهٔ خودِ مالک: کادرِ پیوست با همان فایل‌ها؛ نمونهٔ آماده: نه

@@ -191,7 +191,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const nRec0 = await p.evaluate(() => APP.S.all('eprob').length);
   // منبع از ۲۰۲۶-۱۰-۱۳ اختیاری است (مالک: «مسئله را با جوابش تزریق کنم»)؛ مسیرِ بی‌منبع در test_own_problems.js
   await p.fill('#pbIn_src', 'کتابِ تاریخِ فیزیک، فصل ۳\nhttps://example.org/source');
-  await p.click('main .pb-ai'); await p.waitForTimeout(600);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(600);
   const ai = await p.evaluate(() => window.__ai);
   if (ai.length !== 5) errors.push('ai calls ' + ai.length + ' (decomp + verifier + 3 answer checks)');
   else {
@@ -234,7 +234,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.evaluate(() => { let n = 0; APP.callAI = () => (++n === 1 ? Promise.resolve(JSON.stringify({ title: 'دومی', field: 'ف', statement: 'ص', answer: 'پ', why_hard: 'چ', stages: [{ q: 'q', ctx: 'c', opts: [{ t: 'x', ok: true, why: 'w' }, { t: 'y', ok: false, why: 'w' }], move: 'm', idea: 'i' }] })) : Promise.reject(new Error('شبکه قطع است'))); });
   await go('e_prob', null, 'inject');
   await p.fill('#pbIn_title', 'دومی'); await p.fill('#pbIn_statement', 'ص'); await p.fill('#pbIn_answer', 'پ'); await p.fill('#pbIn_src', 'منبع');
-  await p.click('main .pb-ai'); await p.waitForTimeout(400);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(400);
   await go('e_prob', null, 'pending');
   const c4 = p.locator('main section.card', { hasText: 'دومی' });
   if (!(await c4.locator('.mv-approve').isDisabled()) || !(await c4.locator('.mv-flag.open', { hasText: 'شبکه قطع است' }).count())) errors.push('verifier failure must block approval');

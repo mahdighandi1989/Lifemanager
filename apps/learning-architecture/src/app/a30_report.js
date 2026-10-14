@@ -196,7 +196,7 @@
         var ms = f.status === "skipped" ? [] : AS.tourMilestones(f), pr = f.status === "skipped" ? [] : AS.tourPractice(f), b = f.blocked;
         var inner = (f.why ? '<div style="color:' + C.mute + '">چرا این‌جای ترتیب: ' + esc(f.why) + "</div>" : "") +
           '<ul style="margin:6px 0;padding-right:18px">' + ms.map(function (x) { return '<li style="color:' + (x.ok ? C.ok : C.ink) + '">' + (x.ok ? "✓ " : "○ ") + esc(x.t) + "</li>"; }).join("") + "</ul>" +
-          ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { var tt = clip(recTitle(r), 50); return esc((TYPE_FA[r.type] || r.type) + (tt ? " «" + tt + "»" : "")); }).join("، ") + "</div>" : "") +
+          ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { var tt = clip(recTitle(r), 50); return esc((TYPE_FA[r.type] || "رکورد") + (tt ? " «" + tt + "»" : "")); }).join("، ") + "</div>" : "") +
           (scores(f).length ? "<div><b>🎯 نتیجهٔ تمرین‌ها:</b> " + esc(scores(f).join("؛ ")) + "</div>" : "") +
           (pr.length ? "<div><b>📅 تمرین‌های زمان‌بندی‌شده:</b> " + pr.map(function (p) { return esc(p.t + " — " + (A.fdate ? A.fdate(p.due) : p.due)) + (p.overdue ? ' <span style="color:' + C.bad + '">(موعد)</span>' : ""); }).join("؛ ") + "</div>" : "") +
           (b ? '<div style="margin-top:6px;padding:8px;background:' + C.soft + ';border-radius:8px"><b>🛎 برگهٔ #' + fa(b.number) + "</b> (" + esc(b.area || "") + ") — " + (b.verified ? "ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +

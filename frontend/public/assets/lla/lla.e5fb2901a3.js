@@ -21501,6 +21501,14 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       // فرستادنِ متنِ تو به هوش مصنوعی تصمیمِ خودِ توست: دستیار این دکمه را نمی‌زند، زردش می‌کند (کارزارِ آزمونِ دوم c12)
       h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-ai", "data-own": "1", onclick: function (e) {
         if (!f.title) { A.toast("عنوان لازم است.", "bad"); return; }
+        /* «پیش از فرستادن» مثلِ بقیهٔ درخواست‌های هوش (کارزارِ آزمونِ دوم c12/c15: این تنها دکمه‌ای بود که بی پنجرهٔ رضایت می‌فرستاد) — یک بار در هر بارگذاری */
+        if (!A._pbAIok) { var tb = e.target, ov = h("div", { class: "overlay pb-consent", "data-own": "1", role: "dialog", "aria-label": "پیش از فرستادن به هوش مصنوعی" },
+          h("div", { class: "card col gap", style: "max-width:560px;margin:10vh auto" }, h("h3", {}, "پیش از فرستادن"),
+            h("p", { class: "small" }, "این‌ها برای تجزیه به ارائه‌دهندهٔ بیرونیِ هوش مصنوعی فرستاده می‌شود: عنوان، رشته، بازه، صورت، پاسخ، منابع و یادداشت" + (attShown && attAi ? "، و پیوست‌هایی که انتخاب کرده‌ای" : "") + ". نامِ کسی را اگر نمی‌خواهی برود، پیش از فرستادن از متن بردار."),
+            h("pre", { class: "small kn-pre", style: "white-space:pre-wrap;max-height:40vh;overflow:auto" }, ["عنوان: " + f.title, f.statement ? "صورت: " + f.statement : "", f.answer ? "پاسخ: " + f.answer : ""].filter(Boolean).join("\n")),
+            h("div", { class: "row gap" }, h("button", { class: "btn", type: "button", onclick: function () { ov.remove(); A._pbAIok = true; tb.click(); } }, "بفرست"),
+              h("button", { class: "btn ghost", type: "button", onclick: function () { ov.remove(); } }, "انصراف"))));
+          document.body.appendChild(ov); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
         var b = e.target;
         attFiles().then(function (fileIds) {
@@ -32759,7 +32767,7 @@ APP.goFromURL = function (q) {
         var ms = f.status === "skipped" ? [] : AS.tourMilestones(f), pr = f.status === "skipped" ? [] : AS.tourPractice(f), b = f.blocked;
         var inner = (f.why ? '<div style="color:' + C.mute + '">چرا این‌جای ترتیب: ' + esc(f.why) + "</div>" : "") +
           '<ul style="margin:6px 0;padding-right:18px">' + ms.map(function (x) { return '<li style="color:' + (x.ok ? C.ok : C.ink) + '">' + (x.ok ? "✓ " : "○ ") + esc(x.t) + "</li>"; }).join("") + "</ul>" +
-          ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { var tt = clip(recTitle(r), 50); return esc((TYPE_FA[r.type] || r.type) + (tt ? " «" + tt + "»" : "")); }).join("، ") + "</div>" : "") +
+          ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { var tt = clip(recTitle(r), 50); return esc((TYPE_FA[r.type] || "رکورد") + (tt ? " «" + tt + "»" : "")); }).join("، ") + "</div>" : "") +
           (scores(f).length ? "<div><b>🎯 نتیجهٔ تمرین‌ها:</b> " + esc(scores(f).join("؛ ")) + "</div>" : "") +
           (pr.length ? "<div><b>📅 تمرین‌های زمان‌بندی‌شده:</b> " + pr.map(function (p) { return esc(p.t + " — " + (A.fdate ? A.fdate(p.due) : p.due)) + (p.overdue ? ' <span style="color:' + C.bad + '">(موعد)</span>' : ""); }).join("؛ ") + "</div>" : "") +
           (b ? '<div style="margin-top:6px;padding:8px;background:' + C.soft + ';border-radius:8px"><b>🛎 برگهٔ #' + fa(b.number) + "</b> (" + esc(b.area || "") + ") — " + (b.verified ? "ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
