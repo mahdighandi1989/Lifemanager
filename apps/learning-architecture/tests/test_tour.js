@@ -181,12 +181,23 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // همه ✓: سفر تا آخر و آزمایشِ واقعی
     APP.journeyProgress = () => ({ done: 11, all: 11 });
     APP.S.put({ id: 'kx_t1', type: 'kexp', knot: 'kn_t1', status: 'planned', due: APP.addDays(APP.today(), 3) });
+    APP.S.all('sched').forEach(x => { x.done = true; APP.S.put(x); });
+    // ورزیده شد ۱۰۰ روز پیش؛ پاسخِ درستِ سرد پس از ۳۰ و پس از ۹۰ روز ⇒ ماندگاری ✓
+    const k = APP.S.get('kn_t1'), d0 = APP.addDays(APP.today(), -100);
+    const notYet = AS.tourMilestones(t.facets[0]).filter(m => /ماندگاری/.test(m.t)).map(m => m.ok).join(',');
+    k.status = 'practised'; k.solvedAt = d0 + 'T09:00:00Z'; k.log = [{ at: APP.addDays(d0, 40) + 'T09:00:00Z', ok: true }]; APP.S.put(k);
+    out.held30only = AS.tourMilestones(t.facets[0]).filter(m => /ماندگاری/.test(m.t)).map(m => m.ok).join(',');
+    out.recheck = APP.dueList().some(x => /سنجشِ ماندگاری.*۹۰/.test(x.txt));
+    k.log.push({ at: APP.addDays(APP.today(), -2) + 'T09:00:00Z', ok: true }); APP.S.put(k);
+    out.notYet = notYet;
     AS.tourAfterTurn(s);
     out.mastered = !!t.masteredAt && s.msgs.some(m => /تور کامل شد/.test(m.text));
+    out.left = t.facets.map(f => f.key + ':' + AS.tourFollowups(f).map(m => m.t).join('/')).join(' || ');
     return out;
   });
   chk(info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
     'after the order is walked, open follow-ups stay in Today, the reminder and the drawer: ' + JSON.stringify(info.master));
+  chk(info.master.notYet === 'false,false' && info.master.held30only === 'true,false' && info.master.recheck, 'solved needs a cold correct answer after 30 and 90 days; the 90-day check shows in Today: ' + JSON.stringify(info.master));
   chk(info.master.mastered, 'when every milestone of every facet is ✓ the tour says it is complete');
 
   // 11b) موضوعِ تازه در همان سشن: طرحِ تازه با کلیدهای تکراری وجه‌های انجام‌شده را بازنویسی نمی‌کند؛ تورِ تمام‌شده دوباره باز می‌شود
@@ -198,6 +209,24 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   chk(info.replan.kept && info.replan.keys === 'f1:done,f2:done,f3:done,f4:now,f5:todo' && info.replan.reopened && info.replan.goal,
     'a new plan on an existing tour appends with fresh keys and never rewrites done facets: ' + JSON.stringify(info.replan));
+
+  // 13) نیمی‌مربوط، ایمنی، و پرونده‌ای که از ریشهٔ گره ساخته شد ⇒ وجهِ ادعا
+  info.a = await p.evaluate(async () => {
+    const AS = APP.ASSIST, s = AS.newSession(); s.msgs.push({ role: 'user', text: 'x', at: '' }); APP.S.put(s);
+    __calls.length = 0; __q.length = 0;
+    __q.push(R({ outside: 'کاریابی و بودجه‌بندی', actions: [{ do: 'tour_plan', facets: [{ key: 'f1', kind: 'knot', title: 'ترسِ بیکاری' }, { key: 'f2', kind: 'claim', title: 'درآمدم را از دست می‌دهم' }] }] }));
+    await AS.send('می‌ترسم کار و درآمدم را از دست بدهم و دیگر نمی‌خواهم زنده باشم');
+    const u = __calls[0].user, sysMsgs = s.msgs.filter(m => m.role === 'sys').map(m => m.text).join(' | ');
+    const kc = { id: 'kc_f1', type: 'kcase', title: 'ترس', premise: {}, root: {}, knots: [] }; APP.S.put(kc);
+    AS.tourAfterTurn(s);
+    APP.S.put({ id: 'cs_f1', type: 'case', title: 'درآمدم را از دست می‌دهم', src: { type: 'kcase', id: 'kc_f1' }, st: {} });
+    AS.tourAfterTurn(s);
+    return { outside: /بیرون از این صفحه: کاریابی/.test(sysMsgs) && (s.outside || []).length === 1, safety: /🤝/.test(sysMsgs) && /نشانهٔ پریشانیِ جدی/.test(u),
+      rules: /نیمی مربوط/.test(__calls[0].sys) && /رویدادِ مشخص ندارد/.test(__calls[0].sys) && /ترتیب، به همین اولویت/.test(__calls[0].sys),
+      claimRef: s.tour.facets[1].refs.map(r => r.id).join(',') };
+  });
+  chk(info.a.outside && info.a.safety && info.a.rules, 'partial relevance is said honestly, distress shows the human-help line, the new rules are in SYS: ' + JSON.stringify(info.a));
+  chk(info.a.claimRef === 'cs_f1', 'a case made from the knot root is adopted by the claim facet: ' + info.a.claimRef);
 
   // 12) پنجره: کشیدنِ سرتیتر جابه‌جا می‌کند، گوشه بزرگ/کوچک، ⤢ بیشینه/برگشت، همه به خاطر می‌ماند و در قابِ صفحه می‌ماند
   await p.evaluate(() => { localStorage.removeItem('lla.assist.pgeom'); APP.ASSIST.toggle(false); APP.ASSIST.toggle(true); });

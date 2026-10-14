@@ -30922,6 +30922,10 @@ APP.goFromURL = function (q) {
     "- وقتی کاربر را به نمای دیگری می‌بری و هنوز فیلدهایش را نمی‌بینی، فقط go بده؛ سامانه پس از بازشدن فیلدها را برایت می‌فرستد تا پر کنی.",
     "- قدم‌به‌قدم مثلِ خودِ کاربر: وقتی فیلدهای لازمِ یک فرم از حرف‌ها و فایل‌های خودِ او پر شد، دکمهٔ ثبت/ساخت/بعدیِ همان فرم را click کن و بگو چه کردی؛ اگر چیزی مانده، هایلایت کن و یک پرسشِ کوتاه بپرس. تصمیم‌های مالک (بپذیر/رد کن/تأیید/ریشه را تأیید کن) و حذف را هرگز نزن — هایلایت کن.",
     "- پیوست‌ها: متنِ کاملِ هر فایل (Word، Excel، PDF، صوت/ویدیو با رونویسیِ کامل، ZIP…) و خودِ تصویرها همراهِ همان نوبت می‌آید؛ همه‌اش را بخوان و فقط از همان‌ها نقل کن. در نوبت‌های بعد اگر دوباره به محتوای فایلی لازم داری، reread:[id] بده. اگر فایلی «خوانده نشد»، صادقانه بگو.",
+    "- حالِ کاربر: اگر از ترس، اضطراب، غم، شرم یا فشار گفت، در یک عبارتِ کوتاه و صادق به رسمیتش بشناس (بی تعارف و بی دلداریِ کلیشه‌ای)، بعد کار. اگر سامانه نوشت «نشانهٔ پریشانیِ جدی»، اول همان راهِ کمکِ انسانی را بگو و کاری را تحمیل نکن.",
+    "- نیمی مربوط: اگر بخشی از خواسته بیرون از این صفحه است (کاریابی، پول و بودجه، درمانِ پزشکی/روان‌پزشکی، کارهای حقوقی، …)، آن بخش را در outside بنویس و در reply یک جمله صادقانه بگو که این‌جا جایش نیست؛ برایش gap نزن. بقیه را مثلِ همیشه ببر.",
+    "- چیزی که رویدادِ مشخص ندارد (نگرانیِ آینده، ترسِ کلی): یک بار بپرس «آخرین بار کِی و کجا آمد؟»؛ اگر نبود یا نگفت، همان جملهٔ خودش را موقعیت بگیر («احساس یا حالتی که مانع شد») و جلو برو.",
+    "- ساختنِ رکوردِ تازه تصمیم نیست: در نمای فهرستی (مثلاً kcases ⇐ «+ موقعیتِ تازه»، topics، e_prob ⇐ «افزودنِ مسئلهٔ تو») دکمهٔ ساختن را همان نوبت بزن و next:true بده.",
     "- حرفِ نامربوط (بیرون از یادگیری، معرفت‌شناسی/سنجشِ ادعا، گره‌گشایی/حلِ مسئله و کار با همین صفحه): status=\"unrelated\" و مؤدبانه بگو به این‌جا ربطی ندارد و در یک جمله بگو چه کمکی از این‌جا برمی‌آید.",
     "- **تو پزشکِ عمومیِ این سامانه‌ای: پیش از هر ارجاع تشخیصِ افتراقی کن.** (۱) خواستهٔ واقعیِ کاربر را از ظاهرِ حرفش جدا کن؛ (۲) دست‌کم دو بخش/قلمروِ نامزد را از «نقشهٔ سامانه» نام ببر و برای هر کدام شاهد بیاور که هست یا نیست (نما، فرم، قلمروِ معرفت‌شناسی با گامش، پیشنهادِ منتظر، برگهٔ باز)؛ (۳) فقط بعد تصمیم بگیر. اشتباه در ارجاع، متخصص را به بیراهه می‌برد.",
     "- اگر بخشی هست ⇒ کاربر را همان‌جا ببر (اگر به چند بخش مربوط است، ترتیب و دلیلِ هر کدام). اگر هست ولی هنوز کامل نیست یا در «کارِ جاریِ هر روتین» آمده است (مثلاً حوزهٔ قلمرو در گامِ ۱، یا خطایی که در مسیرِ ۲ ِ بک‌تست است) ⇒ صادقانه بگو کجای راه است و چه کسی و کِی جلو می‌برد؛ فقط اگر کاربر الان لازمش دارد، kind=\"priority\". اگر بخش هست ولی غلط کار می‌کند ⇒ kind=\"fix\". فقط اگر واقعاً نیست ⇒ kind=\"build\".",
@@ -30931,7 +30935,7 @@ APP.goFromURL = function (q) {
     "- next: اگر در همین پاسخ گفتی «بعدش فلان دکمه را می‌زنم» و آن کار پس از کلیک‌های همین نوبت شدنی می‌شود، next:true بده تا سامانه صفحهٔ تازه را بفرستد و همان را انجام دهی؛ قولی نده که بی‌پیامِ کاربر عملی نشود.",
     "- steps: فهرستِ کاملِ مراحلِ رسیدن به خواستهٔ اصلی با وضعِ هر کدام (done/now/todo) و نمای هر کدام.",
     "خروجی فقط یک JSON (بی متنِ دیگر):",
-    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap","next":false,' +
+    '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap","next":false,"outside":"",' +
     '"steps":[{"t":"…","s":"done|now|todo","view":"…"}],' +
     '"actions":[{"do":"go","view":"…","arg":"…","sub":"…"},{"do":"fill","k":"k3","value":"…"},{"do":"highlight","k":"k5","why":"…"},{"do":"click","k":"k9"},{"do":"attach","k":"k7","fileIds":[12]}],' +
     '"reread":[12],"gap":{"title":"…","area":"…","kind":"build|priority|fix","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…","why_area":"…","why_not":"…","evidence":"…","confidence":0.9}}'
@@ -31149,7 +31153,9 @@ APP.goFromURL = function (q) {
         acts = acts.filter(function (x) { return !(x && /^tour_/.test(x.do)); });
         if (tnotes.length) s.msgs.push({ role: "sys", at: now(), text: tnotes.join(" · ") });
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
-        s.msgs.push(a); if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
+        s.msgs.push(a);
+        // بخشی که بیرون از این صفحه است: صادقانه و جدا گفته و در سشن نگه داشته می‌شود (نیمی‌مربوط ≠ نامربوط)
+        if (o.outside && String(o.outside).trim()) { var outT = clip(String(o.outside), 400); s.outside = (s.outside || []).concat([{ at: now(), text: outT }]).slice(-20); s.msgs.push({ role: "sys", at: now(), text: "↗ بیرون از این صفحه: " + outT }); } if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
         S.put(s); paint();
         var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
           if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
@@ -31190,7 +31196,10 @@ APP.goFromURL = function (q) {
         });
       });
     }
-    return ups.then(function () { S.put(s); return turn(text || "(فقط فایل فرستادم)", texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "", aiIds, true); })
+    // نشانهٔ پریشانیِ جدی (همان واژه‌نامهٔ ایمنیِ گره‌گشا): راهِ کمکِ انسانی پیش از هر کار، و مدل هم می‌داند
+    var safe = "";
+    try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
+    return ups.then(function () { S.put(s); return turn(text || "(فقط فایل فرستادم)", (texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "") + safe, aiIds, true); })
       .catch(function (e) {
         var fl = e && e.files && e.files.length ? " " + manifestNote(e.files) : "";
         s.msgs.push({ role: "sys", at: now(), text: "دستیار پاسخ نداد: " + errText(e) + fl + " — دوباره بفرست." }); S.put(s);
@@ -31405,6 +31414,32 @@ APP.goFromURL = function (q) {
     }
     return out;
   }
+  /* ---------- «واقعاً حل شد؟» — آزمون، نه حرفِ خودِ کاربر (مالک ۲۰۲۶-۱۰-۱۴) ----------
+     ورزیدگی با معیارِ خودِ هر بخش (گره: A.kmastery؛ هم‌ساختار: همان شکلِ معیارِ گره) و **ماندگاری**: ۳۰ و ۹۰ روز پس از ورزیدگی، دست‌کم
+     یک پاسخِ درستِ تازه (سرد) و هیچ بازگشتی. عددهای ۳۰/۹۰ و «۳ درستِ پیاپی در ۲ نوبت با ≥ ۳ روز فاصله» پیش‌فرض‌اند؛ تغییرشان تصمیمِ مالک است (HANDBOOK §۱۰). */
+  var HOLD = [30, 90];
+  function plusDays(iso, n) { return A.addDays(String(iso).slice(0, 10), n); }
+  function heldAfter(since, log, n) {   // پس از since+n روز، دست‌کم یک پاسخِ درست
+    if (!since) return false; var from = plusDays(since, n); if (A.today() < from) return false;
+    return (log || []).some(function (e) { return e.ok && String(e.at || e.d || "").slice(0, 10) >= from; });
+  }
+  function knotSolved(k) { return k && k.status === "practised" && k.solvedAt; }
+  function knotHeld(k, n) { return knotSolved(k) && !(k.returnedAt && k.returnedAt > k.solvedAt) && heldAfter(k.solvedAt, k.log, n); }
+  /* هم‌ساختارهای یک مسئله: نخستین لحظه‌ای که ۳ پاسخِ درستِ پیاپی در ۲ نوبتِ جدا با ≥ ۳ روز فاصله رسید */
+  function pbSolvedAt(items) {
+    var log = []; items.forEach(function (it) { (it.hist || []).forEach(function (e) { log.push(e); }); });
+    log.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
+    var run = [];
+    for (var i = 0; i < log.length; i++) {
+      if (!log[i].ok) { run = []; continue; }
+      run.push(log[i]); var days = run.map(function (e) { return String(e.at).slice(0, 10); });
+      var uniq = days.filter(function (d, j) { return days.indexOf(d) === j; });
+      if (run.length >= 3 && uniq.length >= 2 && A.daysBetween(uniq[0], uniq[uniq.length - 1]) >= 3) return { at: log[i].at, log: log };
+    }
+    return { at: "", log: log };
+  }
+  AS.tourHold = HOLD;
+
   /* ---------- نشانه‌های پیشرفت: از خودِ داده، نه از حرفِ مدل ---------- */
   function milestones(f) {
     var c = children(f), m = [];
@@ -31416,28 +31451,37 @@ APP.goFromURL = function (q) {
       add("گرهِ ذهنی ساخته شد", c.knot.length);
       add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.length);
       add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
+      var ks = c.knot;
+      add("ورزیده شد — با معیارِ خودِ گره‌گشا", ks.length && ks.every(knotSolved), false);
+      HOLD.forEach(function (n) { add("ماندگاری: " + fa(n) + " روز پس از ورزیدگی، بی‌بازگشت و هنوز درست", ks.length && ks.every(function (k) { return knotHeld(k, n); }), false); });
     } else if (f.kind === "claim") {
       var cs = c["case"][0], fin = cs && cs.st && cs.st.st_final;
       add("پروندهٔ سنجش در کارخانه ساخته شد", cs);
       add("ایستگاه‌ها گذرانده شد" + (cs ? " (" + fa(Object.keys(cs.st || {}).filter(function (k) { return (cs.st[k] || {}).done; }).length) + ")" : ""), fin && fin.done);
       add("تاریخِ بازبینی گذاشته شد (پیگیریِ نتیجهٔ واقعی)", fin && fin.data && fin.data.revdate);
+      var rows = ((fin && fin.data && fin.data.final) || []).filter(function (r) { return r.c; });
+      add("نتیجهٔ واقعی در بازبینی ثبت شد (درست بود یا نه)", cs && rows.length && rows.every(function (r) { return (cs.outcome || {})[r.c]; }), false);
     } else if (f.kind === "problem") {
       var pr = c.eprob[0];
       add("مسئله وارد و تجزیه شد", pr);
       add("تأییدِ مسئله پس از وارسی — تصمیمِ خودت", pr && pr.status === "approved", true, true);
       add("شبیه‌ساز تمرین شد", pr && pr.p && S.get("eprog_" + pr.p.id), false);
       add("مسئله‌های هم‌ساختارِ فاصله‌دار ساخته شد", c.pbitem.length);
+      var ps = pbSolvedAt(c.pbitem);
+      add("هم‌ساختارها ورزیده شد: ۳ درستِ پیاپی در ۲ نوبت با ≥ ۳ روز فاصله", ps.at, false);
+      HOLD.forEach(function (n) { add("ماندگاری: " + fa(n) + " روز پس از ورزیدگی هنوز درست", ps.at && heldAfter(ps.at, ps.log, n), false); });
     } else if (f.kind === "learn") {
       var tp = c.topic[0], jp = tp && A.journeyProgress ? A.journeyProgress(tp) : null;
       add("موضوع ساخته شد", tp);
       add("سفرِ گام‌به‌گام تا آخر" + (jp ? " (" + fa(jp.done) + " از " + fa(jp.all) + ")" : ""), jp && jp.all && jp.done >= jp.all, false);
       add("کارت‌های مرور یا چرخهٔ ۱-۳-۷ زمان‌بندی شد", c.card.length || c.sched.length);
+      add("چرخهٔ ۱-۳-۷ تا آخر انجام شد", c.sched.length && c.sched.every(function (x) { return x.done; }), false);
     } else if (f.kind === "territory") {
       var b = f.blocked || {};
       add("برگهٔ ساختِ حوزه ثبت شد" + (b.number ? " (#" + fa(b.number) + ")" : ""), b.number);
       add("روتینِ مسئول ساخت و دستیار درستیِ آن را وارسی کرد", b.verified);
       // تورِ خودِ حوزهٔ تازه (خواستهٔ مالک: «بعد مرا از همان وجه هم عبور دهد، با برنامه‌ریزی و پیگیری»): دست‌کم یک موضوع/پرونده در آن، با تمرینِ زمان‌بندی‌شده
-      add("گشت در حوزهٔ تازه و یک تمرینِ ماندگار از آن (موضوع یا پروندهٔ وصل‌شده با تمرینِ زمان‌بندی‌شده)", b.verified && (c.topic.length || c["case"].length) && practice(f).length);
+      add("گشت در حوزهٔ تازه و یک تمرینِ ماندگار از آن (موضوع یا پروندهٔ وصل‌شده با تمرینِ زمان‌بندی‌شده)", b.verified && (c.topic.length || c["case"].length) && (c.sched.length || c.card.length || c.ex.length || c["case"].some(function (cs) { var d = cs.st && cs.st.st_final && cs.st.st_final.data; return d && d.revdate; })));
     }
     // گام‌های نوشتهٔ مدل فقط برای وجه‌هایی که نشانهٔ داده‌محور ندارند (وگرنه تکرارِ همان نشانه‌ها می‌شد — شبیه‌سازیِ ۲۰۲۶-۱۰-۱۴)
     if (f.kind === "other") (f.steps || []).forEach(function (s) { add(s.t, s.done, false); });
@@ -31553,6 +31597,14 @@ APP.goFromURL = function (q) {
         if (!taken) { c.refs.push({ id: r.id, type: r.type }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
       }); });
     }
+    // پرونده‌ای که از دکمهٔ کارخانهٔ خودِ گره‌گشا ساخته شد (src = موقعیتِ همین تور) ⇒ به وجهِ ادعای همین تور
+    var tourKc = {}; t.facets.forEach(function (f) { (f.refs || []).forEach(function (r) { if (r.type === "kcase") tourKc[r.id] = 1; }); });
+    var claimF = t.facets.filter(function (f) { return f.kind === "claim" && f.status !== "skipped" && !(f.refs || []).some(function (r) { return r.type === "case"; }); })[0];
+    if (claimF) S.all("case", function (cs) { return cs.src && cs.src.type === "kcase" && tourKc[cs.src.id]; }).forEach(function (cs) {
+      if (t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === cs.id; }); })) return;
+      if (claimF.refs.some(function (r) { return r.type === "case"; })) return;
+      claimF.refs.push({ id: cs.id, type: "case" }); msgs.push("پروندهٔ «" + clip(cs.title, 50) + "» (از ریشهٔ گره) به وجهِ «" + claimF.title + "» وصل شد");
+    });
     t.facets.forEach(function (f) {
       if ((f.status === "now" || f.status === "todo") && f.kind !== "other" && coreDone(f)) {
         f.status = "done"; f.doneAt = nowIso(); f.doneBy = "evidence";
@@ -31592,11 +31644,12 @@ APP.goFromURL = function (q) {
   AS.SYS += "\n" + [
     "# تور: مسئلهٔ چندوجهی",
     "- اگر حرفِ کاربر به بیش از یک بخش مربوط است (مثلاً هم گرهِ ذهنی، هم ادعایی برای سنجیدن، هم مسئلهٔ بزرگ، هم یادگیری، هم حوزه‌ای که نیست)، اول وجه‌ها را از هم جدا کن و یک بار {\"do\":\"tour_plan\",\"goal\":\"…\",\"facets\":[{\"key\":\"f1\",\"kind\":\"knot|claim|problem|learn|territory|other\",\"title\":\"…\",\"why\":\"چرا این وجه و چرا این‌جای ترتیب\",\"view\":\"…\",\"arg\":\"…\",\"sub\":\"…\",\"steps\":[\"…\"]}]} بده. وجه‌ها را به همان ترتیبی بچین که باید طی شود. اگر «# تور» از پیش هست و موضوعِ تازه‌ای آمد، فقط وجه‌های تازه را با کلیدهای تازه (پس از آخرین کلید) بده — وجهِ انجام‌شده هرگز عوض نمی‌شود.",
-    "- ترتیب: (۱) وجهی که نتیجه‌اش ورودیِ وجهِ دیگر است اول (مثلاً ریشهٔ گیر پیش از ساختنِ شبیه‌سازِ همان مسئله؛ سنجشِ باوری که تصمیم بر آن بنا شده پیش از عمل)؛ (۲) آنچه زمان‌دار است زودتر؛ (۳) فهمیدنِ عمیقِ مفهومی که در همه مشترک است پیش از تمرینِ تخصصی؛ (۴) وجهِ «territory» (حوزه‌ای که نیست) جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و با بقیه ادامه بده.",
+    "- ترتیب، به همین اولویت: (۱) ایمنی و حالِ کاربر؛ (۲) وابستگی: وجهی که خروجی‌اش ورودیِ دیگری است اول (ریشهٔ گیر پیش از شبیه‌سازِ همان مسئله؛ ریشهٔ یک ترس پیش از سنجشِ پیش‌بینی‌ای که از آن برخاسته — مگر تصمیمی همین روزها به آن پیش‌بینی بند باشد، که آن‌گاه سنجشِ ادعا اول)؛ (۳) آنچه زمان‌دار است زودتر؛ (۴) فهمیدنِ عمیقِ مفهومِ مشترک پیش از تمرینِ تخصصی؛ (۵) وجهِ territory جلوی بقیه را نمی‌گیرد: برایش gap با \"facet\":\"fN\" بده و ادامه بده. اگر ادعا از ریشهٔ گره درمی‌آید، پرونده‌اش را با دکمهٔ «🏭 این برداشت را در کارخانه بسنج» ِ خودِ گره‌گشا بساز — سامانه آن را به وجهِ ادعا وصل می‌کند؛ از میزِ کار دوباره نساز.",
     "- هر نوبت «# تور» را بخوان: روی وجهِ «◀ همین حالا» کار کن (go به نمای آن، فرم را پر کن، دکمه‌های غیرِ تصمیمی را بزن). وقتی نشانه‌هایش ✓ شد سامانه خودش به بعدی می‌رود؛ اگر کاربر می‌خواهد وجهِ دیگری را جلو بیندازد tour_focus. هرگز وجهی را بی‌صدا رها نکن: کنار گذاشتن فقط با tour_skip و دلیل؛ وجهِ تازه با tour_add.",
     "- تمرین برای روزهای آینده را خودِ بخش‌ها می‌سازند — مطمئن شو ساخته شود: گره ⇒ «ساختِ ۴ نمونه» یا «ساختِ نمونه با هوش مصنوعی» و یک آزمایشِ واقعی؛ مسئلهٔ بزرگ ⇒ «ساختِ ۴ مسئلهٔ هم‌ساختار + ۱ بدلی» و شبیه‌ساز؛ یادگیری ⇒ کارتِ مرور و «شروع چرخه از امروز»؛ ادعا ⇒ تاریخِ بازبینی در ایستگاهِ پایانی. شبیه‌سازِ مسئلهٔ خودش از موقعیتِ گره با «ساختنِ شبیه‌سازِ همین مسئله».",
     "- تصمیم‌های کاربر (ریشه را تأیید کن، تأییدِ مسئله، بپذیر/رد کن) را نزن: هایلایت کن و یک جمله بگو چرا تصمیم با خودِ اوست.",
     "- وجهِ territory پس از «ساخته و وارسی شد»: کاربر را به همان حوزه ببر (view=e_bt sub=terr) و یک جمله بگو چه ساخته شد و به کارِ او چه ربطی دارد؛ بعد یک موضوعِ یادگیری (topics) یا پروندهٔ سنجش (e_home) در همان حوزه بساز تا تمرینِ فاصله‌دار بگیرد — تا آن نشود وجه تمام نیست.",
+    "- «حل شد» را هرگز خودت یا از حرفِ کاربر اعلام نکن: فقط وقتی نشانه‌های «ورزیده شد» و «ماندگاری ۳۰/۹۰ روز» ✓ است. تا آن وقت بگو «در راهِ حل‌شدن» و آزمونِ بعدی کِی است.",
     "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
     "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
   ].join("\n");
@@ -31706,6 +31759,16 @@ APP.goFromURL = function (q) {
         var ready = s.tour.facets.filter(function (x) { return x.blocked && x.blocked.verified && x.status === "todo"; })[0];
         if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", go: function () { openTour(s, ready); } });
         else if (f && A.localDay(s.updated) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+      });
+      // سنجشِ ماندگاری (۳۰ و ۹۰ روز پس از ورزیدگی): یک ورزشِ سرد؛ پاسخِ درست ⇒ ✓، بازگشت ⇒ گره دوباره باز
+      S.all("achat", function (x) { return x.tour && !x.tour.masteredAt; }).forEach(function (s) {
+        s.tour.facets.forEach(function (f) {
+          if (f.kind !== "knot" || f.status === "skipped") return;
+          children(f).knot.forEach(function (k) {
+            var n = HOLD.filter(function (d) { return knotSolved(k) && A.today() >= plusDays(k.solvedAt, d) && !knotHeld(k, d); })[0];
+            if (n) items.push({ k: "warn", txt: "🔁 سنجشِ ماندگاریِ «" + clip(k.name || k.title || "گره", 40) + "» (" + fa(n) + " روز)", sub: "یک ورزشِ سرد، بی مرور — اگر درست بود، حل‌شدن تأیید می‌شود", go: function () { A.go("kpractice", k.id, null); } });
+          });
+        });
       });
       // پس از طیِ ترتیب: پیگیری تا تسلطِ کامل (نخستین نشانهٔ باز)
       S.all("achat", function (x) { return x.tour && x.tour.doneAt && !x.tour.masteredAt; }).forEach(function (s) {
