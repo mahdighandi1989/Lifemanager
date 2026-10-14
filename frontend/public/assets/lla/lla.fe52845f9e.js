@@ -32381,6 +32381,22 @@ APP.goFromURL = function (q) {
   };
 
   /* ---------- رویدادها: از تغییرِ وضعِ تور ---------- */
+  /* نتیجهٔ واقعیِ تمرین‌ها (کارزارِ آزمون sc04: ایمیل فقط «ساخته شد» می‌گفت، نه «چقدر درست») — از تاریخچهٔ خودِ رکوردها */
+  function scores(f) {
+    if (f.status === "skipped" || !AS.tourChildren) return [];
+    var c = AS.tourChildren(f), out = [];
+    function tally(items, label) { var n = 0, ok = 0, days = {}; items.forEach(function (it) { (it.hist || []).forEach(function (e) { if (typeof e.ok !== "boolean") return; n++; if (e.ok) ok++; days[String(e.at || e.d || "").slice(0, 10)] = 1; }); }); if (n) out.push(label + ": " + fa(ok) + " درست از " + fa(n) + " پاسخ در " + fa(Object.keys(days).filter(Boolean).length) + " روز"); }
+    tally(c.kitem || [], "ورزشِ گره");
+    tally((c.pbitem || []).filter(function (x) { return A.pbServable ? A.pbServable(x) : true; }), "هم‌ساختارها");
+    (c.eprob || []).forEach(function (r) {
+      var pg = r.p && S.get("eprog_" + r.p.id), n = r.p && (r.p.stages || []).length; if (!pg || !n) return;
+      Object.keys(pg.lv || {}).sort().forEach(function (l) { var L = pg.lv[l] || {}, ks = Object.keys(L); if (!ks.length) return; var ok = ks.filter(function (k) { return L[k].first === true || L[k].self === 2; }).length;
+        out.push("شبیه‌ساز سطحِ " + fa(l) + ": " + fa(ks.length) + " از " + fa(n) + " گام، " + fa(Math.round(100 * ok / ks.length)) + "٪ درست در بارِ اول"); });
+    });
+    var ex = (c.ex || []).filter(function (x) { return x.status === "done"; }); if (ex.length) out.push("تمرین‌های موضوع: " + fa(ex.length) + " انجام‌شده");
+    return out;
+  }
+  R.scores = scores;
   function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
   function events(s, before) {
     var t = s.tour, ev = [], b = before || { st: "", done: false, m: false };
@@ -32465,6 +32481,7 @@ APP.goFromURL = function (q) {
         var inner = (f.why ? '<div style="color:' + C.mute + '">چرا این‌جای ترتیب: ' + esc(f.why) + "</div>" : "") +
           '<ul style="margin:6px 0;padding-right:18px">' + ms.map(function (x) { return '<li style="color:' + (x.ok ? C.ok : C.ink) + '">' + (x.ok ? "✓ " : "○ ") + esc(x.t) + "</li>"; }).join("") + "</ul>" +
           ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { return esc((TYPE_FA[r.type] || r.type) + " «" + clip(recTitle(r), 50) + "»"); }).join("، ") + "</div>" : "") +
+          (scores(f).length ? "<div><b>🎯 نتیجهٔ تمرین‌ها:</b> " + esc(scores(f).join("؛ ")) + "</div>" : "") +
           (pr.length ? "<div><b>📅 تمرین‌های زمان‌بندی‌شده:</b> " + pr.map(function (p) { return esc(p.t + " — " + (A.fdate ? A.fdate(p.due) : p.due)) + (p.overdue ? ' <span style="color:' + C.bad + '">(موعد)</span>' : ""); }).join("؛ ") + "</div>" : "") +
           (b ? '<div style="margin-top:6px;padding:8px;background:' + C.soft + ';border-radius:8px"><b>🛎 برگهٔ #' + fa(b.number) + "</b> (" + esc(b.area || "") + ") — " + (b.verified ? "ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
             ((b.checks || []).length ? '<ol style="margin:4px 0;padding-right:18px">' + b.checks.map(function (c) { return "<li>" + esc((c.at || "").slice(0, 10)) + " — " + (c.ok ? "✅ درست: " : c.lag ? "⏳ شاید منتشر نشده: " : "↩ ناقص، با دلیل دوباره باز شد: ") + esc(clip(c.reason, 300)) + "</li>"; }).join("") + "</ol>" : "") + "</div>" : "") +

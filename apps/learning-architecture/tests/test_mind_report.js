@@ -143,6 +143,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const vk = APP.valsCheck(); out.vals = vk.gaps.join() + '|' + vk.open.join();
     out.valsToday = APP.dueList().some(x => /وارسیِ ماهانهٔ معنا/.test(x.txt));
     APP.go('vals'); await new Promise(r => setTimeout(r, 150)); out.valsView = /کشمکش بی قاعدهٔ ترجیح/.test(document.getElementById('main').innerText);
+    // ایمیل نتیجهٔ تمرین‌ها را می‌گوید (نه فقط «ساخته شد»)
+    APP.S.put({ id: 'kc_sc', type: 'kcase', title: 'م', knots: ['kn_sc'] }); APP.S.put({ id: 'kn_sc', type: 'knot', name: 'گ' });
+    APP.S.put({ id: 'ki_sc', type: 'kitem', knot: 'kn_sc', hist: [{ at: '2026-10-01T08:00:00Z', ok: true }, { at: '2026-10-05T08:00:00Z', ok: false }] });
+    out.scores = APP.REPORT.scores({ kind: 'knot', status: 'now', refs: [{ id: 'kc_sc', type: 'kcase' }] }).join('|');
     // یادآورها خاموش ⇒ یک بار صریح گفته می‌شود (نه سکوت)
     APP.HOST.remind = APP.HOST.remind || (async () => ({ ok: true })); const st = APP.S.settings(); st.knots = st.knots || {}; st.knots.notify = { telegram: false, email: false };
     AS.tourSyncReminder(s); AS.tourSyncReminder(s); out.remOff = s.msgs.filter(x => /یادآورها خاموش/.test(x.text)).length;
@@ -155,7 +159,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.camp.chainCalc === '{"prod":6,"min":20,"n":2}', 'worry chain: ceiling = weakest link, independent = product: ' + info.camp.chainCalc);
   chk(info.camp.correct && info.camp.toast, 'a claimed-but-failed action triggers a correction turn; page messages reach the next prompt');
   chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
-  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
+  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores), 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
