@@ -177,10 +177,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const st = APP.S.settings(); st.knots = st.knots || {}; st.knots.notify = { telegram: true, email: false, hour: 8 };
     const tp = { id: 'tp_t2', type: 'topic', title: 'احتمالِ شرطی' }; APP.S.put(tp); APP.S.put({ id: 'sc_t2', type: 'sched', topic: 'tp_t2', due: APP.addDays(APP.today(), 1) });
     AS._turnSession = s; AS.DO.tour_link({ facet: 'f2', id: 'tp_t2' });
+    const dupLink = AS.DO.tour_link({ facet: 'f3', id: 'tp_t2' }); // همان کار در وجهِ دیگر دو بار شمرده نمی‌شود
     s.msgs.forEach(m => { if (m.role === 'user') m.at = new Date(Date.now() - 2 * 864e5).toISOString(); }); s._rem = null; __rem.length = 0;
     AS.tourAfterTurn(s);
     const fu = AS.tourFollowups(t.facets[1]).map(m => m.t).join('|');
-    const out = { done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),
+    const out = { dup: /دو بار شمرده نمی‌شود/.test(dupLink) && !(t.facets[2].refs || []).some(x => x.id === 'tp_t2'), done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),
       today: APP.dueList().some(x => /پیگیریِ تورِ .* تا تسلط/.test(x.txt)), rem: (__rem.slice(-1)[0] || {}).body || '', btn: !!Array.from(document.querySelectorAll('.as-tour .btn')).find(x => /پیگیری تا تسلط/.test(x.textContent)) };
     APP.ASSIST.toggle(true);
     out.btn = !!Array.from(document.querySelectorAll('.as-tour .btn')).find(x => /پیگیری تا تسلط/.test(x.textContent));
@@ -201,7 +202,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.left = t.facets.map(f => f.key + ':' + AS.tourFollowups(f).map(m => m.t).join('/')).join(' || ');
     return out;
   });
-  chk(info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
+  chk(info.master.dup && info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
     'after the order is walked, open follow-ups stay in Today, the reminder and the drawer: ' + JSON.stringify(info.master));
   chk(info.master.notYet === 'false,false' && info.master.held30only === 'true,false' && info.master.recheck, 'solved needs a cold correct answer after 30 and 90 days; the 90-day check shows in Today: ' + JSON.stringify(info.master));
   chk(info.master.mastered, 'when every milestone of every facet is ✓ the tour says it is complete');
