@@ -74,6 +74,7 @@
         function decide(d) { S.put({ id: "ebtp_" + p.id, type: "ebtp", decision: d, at: new Date().toISOString() }); A.toast(d === "yes" ? "پذیرفتی — دورِ بعد اعمال و آزموده می‌شود." : "رد شد — همین در دفتر می‌ماند."); A.render(); }
         return h("li", { class: "card soft bt-proposal" + (p.supersededBy ? " superseded" : ""), "data-id": p.id }, h("strong", {}, p.title), h("p", { class: "small" }, p.why), p.evidence ? h("p", { class: "small muted" }, p.evidence) : null,
           p.source === "foundation" ? h("button", { class: "linkish small", onclick: function () { A.go("e_bt", null, "found"); } }, "🧱 مبنایش در «مبنای درجه‌ها»") : null,
+          p.withdrawn ? h("div", { class: "small bt-withdrawn" }, "◌ پس گرفته شد: " + p.withdrawn) :
           p.applied ? h("div", { class: "small bt-applied" }, "✓ پذیرفتی و اعمال شد (" + p.applied + ")" + (p.appliedWhat ? ": " + p.appliedWhat : "")) :
           p.supersededBy && !rec.decision ? h("div", { class: "small muted" }, "پیشنهادِ «" + p.supersededBy + "» همین مشکل را بی عددِ قراردادی حل می‌کند و جای این را گرفته — تصمیم لازم نیست.") :
           rec.decision ? h("div", { class: "small" }, "تصمیمِ تو: " + (rec.decision === "yes" ? "✓ پذیرفته" : "✗ رد")) :

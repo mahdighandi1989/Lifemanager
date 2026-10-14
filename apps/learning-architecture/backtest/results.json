@@ -1,6 +1,6 @@
 {
- "round": 5,
- "at": "2026-10-13",
+ "round": 6,
+ "at": "2026-10-14",
  "cases": [
   {
    "id": "cs_semmelweis_rejection",
@@ -2335,10 +2335,8 @@
    "r": 0,
    "d": "ریاضی",
    "ok": true,
-   "k": "health_alarm",
-   "fl": [
-    "st_istiqra"
-   ],
+   "k": "ok",
+   "fl": [],
    "ex": [],
    "full": null
   },
