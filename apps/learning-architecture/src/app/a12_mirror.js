@@ -308,7 +308,7 @@
   function fsize(n) { return n >= 1048576 ? fa((n / 1048576).toFixed(1)) + " مگابایت" : fa(Math.max(1, Math.round(n / 1024))) + " کیلوبایت"; }
   function attachSection(rid, meta, note) {
     var sec = h("section", { class: "card attach", "data-report-section": "attachments", "data-report-section-label": "پیوست‌ها" },
-      h("h3", {}, "📎 پیوست‌ها"), h("p", { class: "small muted" }, "فایل (عکس، صوت، PDF، …) مستقیم در فولدرِ همین مورد در گوگل درایو نگه داشته می‌شود — نه در سرور؛ حداکثر ۲۵ مگابایت. حذف در این‌جا فایل را در درایو فقط تغییرِ نام می‌دهد."),
+      h("h3", {}, "📎 پیوست‌ها"), h("p", { class: "small muted" }, "فایل (عکس، صوت، PDF، …) مستقیم در فولدرِ همین مورد در گوگل درایو نگه داشته می‌شود — نه در سرور؛ حداکثر ۱۰۰ مگابایت؛ هر قالب (Word، Excel، PDF، صوت، ZIP…) وقتی به هوش مصنوعی داده شود کامل خوانده می‌شود. حذف در این‌جا فایل را در درایو فقط تغییرِ نام می‌دهد."),
       note ? h("p", { class: "small warnline kn-attnote" }, note) : null);
     var list = h("ul", { class: "plain small" }, h("li", { class: "muted" }, "در حالِ خواندن…"));
     var inp = h("input", { type: "file", multiple: true, "aria-label": "انتخابِ فایل", onchange: function () { up(Array.prototype.slice.call(inp.files || [])); } });
@@ -330,7 +330,7 @@
       (function next() {
         if (i >= files.length) { st.textContent = ""; inp.value = ""; load(); A._mirrorCache = null; return; }
         var f = files[i++];
-        if (f.size > 25 * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از ۲۵ مگابایت است", "bad"); return next(); }
+        if (f.size > 100 * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از ۱۰۰ مگابایت است", "bad"); return next(); }
         st.textContent = "در حالِ فرستادنِ «" + f.name + "» به درایو…";
         A.HOST.upload(rid, f, meta).then(next, function (e) { A.toast(errText(e), "bad"); next(); });
       })();

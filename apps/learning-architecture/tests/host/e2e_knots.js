@@ -70,8 +70,9 @@ const { chromium } = require('playwright');
   const pid = await p.evaluate(() => APP.state.arg);
   info.photoNothingStored = (await api('/api/app-records/learning-architecture/files?rec_id=' + encodeURIComponent(pid))).files.length === 0;
   // the AI door: file_ids reach the server; an unknown/foreign id is filtered out ⇒ a normal answer or the no-model message, never a 500
+  // since 2026-10-14 (WORKLOG 44) a foreign/missing id is REPORTED («پیوستی برای خواندن پیدا نشد») instead of being silently dropped — never another user's file either way
   info.aiForeign = await p.evaluate(() => APP.HOST.ai('سیستمِ آزمون', 'سلام', { fileIds: [999999] }).then(t => 'ok:' + typeof t, e => 'err:' + ((e && e.response && e.response.status) || '') + ':' + (e && e.message)));
-  info.aiForeignOk = /^ok:string$|^err::(مدلی برای|خطای سرویس هوش مصنوعی)/.test(info.aiForeign);
+  info.aiForeignOk = /^ok:string$|^err::(مدلی برای|خطای سرویس هوش مصنوعی|پیوستی برای خواندن پیدا نشد)/.test(info.aiForeign);
   info.aiBodyHadIds = aiBodies.some(b => JSON.stringify(b.file_ids) === '[999999]');
   info.aiPlainNoIds = await p.evaluate(() => APP.callAI('س', 'سلام').then(() => true, () => true)) && aiBodies.slice(-1).every(b => Array.isArray(b.file_ids) && !b.file_ids.length);
   // reminders: the host door reaches the server

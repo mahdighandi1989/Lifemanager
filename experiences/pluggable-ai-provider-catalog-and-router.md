@@ -196,3 +196,11 @@ sentence that pinpoints the fix — always bubble up `error.type` + `error.messa
 - **Correction (same day):** in this case the seed had NOT failed — my reading of the public status endpoint was stale (read
   before the first refresh run / from an intermediate cache). The persisted result is what proved it. Lesson on top of the lesson:
   before concluding "the deploy didn't take", read a status that carries its own timestamp (seed `at`, job `last_run`).
+
+## Update 2026-10-14 — fully automatic pick: required capabilities, newness tie-break, failover, dead pins
+- **Required vs preferred capability.** A task can need a capability on EVERY call (a chat that may receive a screenshot at any turn): `TASK_TYPES[].requires` filters the pool (if any model satisfies it) before `preferred` orders it — a text-only «fast» model no longer wins the vision chat.
+- **Ties go to the newer model.** Priorities collide across tiers/providers; the same id parser the refresh uses gives a version rank, so ties break by newness, never by DB order.
+- **Failover is part of «automatic».** The gateway asks the manager for ordered *candidates* (live pin first, then the automatic order) and moves to the next one when a call fails (retired model, 404, outage) — a model that died between two refreshes never leaves a task without an answer. An explicit `model_id` is still tried alone.
+- **Dead pins are released.** The daily refresh releases a task's pin to a model the provider stopped listing (noted on the route); a model switched off by the owner keeps its pin (owner's choice).
+- **Make the job's health honest.** A refresh where every provider failed must raise so the job stamp records an error (it used to record «ok»), and show the stamp in the settings UI.
+- **Parser pitfall:** `claude-opus-4-20250514` matched `(\d+)` as a minor version (v4.2025 outranked v4.1) — bound minor versions to 1–2 digits.

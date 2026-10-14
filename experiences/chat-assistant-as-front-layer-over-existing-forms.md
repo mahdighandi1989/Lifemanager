@@ -44,3 +44,16 @@ merged_from: []
 - فرم‌ها را برچسب‌دار و رویدادمحور نگه دار؛ همین، دستیار را بی‌کدِ اضافه به فرمِ تازه می‌رساند.
 - «نمی‌توانم» را به ورودیِ روالِ نگه‌دارنده تبدیل کن (برگه/issue با انتزاع و جای افزودن)، با نشانِ منشأ و ضدِ تکرار.
 - آزمون‌ها با هوشِ بدلیِ صف‌دار (پاسخ‌ها از پیش نوشته، یکی تابعِ متنِ پیام برای برداشتنِ کلیدهای واقعی) و یک e2e با سرورِ واقعی برای مسیرِ گزارش.
+
+## Update 2026-10-14 — second, line-by-line audit (bugs that only show in a real run)
+- **Keys die with the page.** If one answer has `go` and then `fill k…`, those keys belong to the OLD page — skip every key action after a `go` in the same batch and let the automatic next turn (fresh scan) fill the new page.
+- **Same label twice** («پاسخ», «پاسخ»): re-find a stale key by tag + label + **ordinal**, never by label alone.
+- **Label = the label's own text.** A `<select>` inside a `<label>` made the label «نوع —خبر…باور خودم» (all options) — clone the label and drop controls before reading text.
+- **Closed `<details>`:** newer Chrome lays the content out (content-visibility), so ask «inside a closed details?» directly; open it before filling.
+- **Owner decisions are not form steps:** «بپذیر / رد کن / تأیید / ریشه را تأیید کن» are highlighted, never clicked; deletes likewise.
+- **A click that grows the form** (+ row) needs a fresh scan and another turn, like a navigation.
+- **Non-JSON answers** become a plain reply after one retry — never an error the user has to retry.
+- **History by budget, not by count:** everything that fits (newest kept), the cumulative `memory` for the rest; never duplicate the new message into the history.
+- **Files:** every format goes to the server reader (full text + manifest shown in chat); a `reread:[ids]` field lets the model ask for a past file again.
+- **Phone:** after marking fields, the bottom sheet steps aside so the marks are visible.
+- **Empty sessions** must not pile up from repeated «＋».

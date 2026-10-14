@@ -557,7 +557,7 @@
   A.probOfCase = caseRec;
   A.probFromCase = function (kc, text, meta) {
     meta = meta || {};
-    var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 4);
+    var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 40);
     return A.callAIJson(sys, text, { fileIds: fids, maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); }).then(function (raw) {
       if (raw && typeof raw === "object" && !Array.isArray(raw)) {
         var it = kc.intake || {};
@@ -618,7 +618,7 @@
     function attFiles() {
       if (!attShown || !attAi || !(A.HOST && A.HOST.files)) return Promise.resolve([]);
       return Promise.resolve(A.HOST.files("eprob_" + pid)).then(function (fs) {
-        return (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); }).slice(0, 4).map(function (x) { return x.id; });
+        return (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); }).slice(0, 40).map(function (x) { return x.id; });
       }, function () { return []; });
     }
     function attBlock() {
@@ -628,8 +628,8 @@
         attShown = true; btn.remove();
         attWrap.appendChild(A.attachSection("eprob_" + pid, { group: "مسئله‌های من", title: f.title.trim() }));
         attWrap.appendChild(h("label", { class: "row gap small", for: "pbAttAi" }, h("input", { type: "checkbox", id: "pbAttAi", checked: true, onchange: function (e) { attAi = e.target.checked; } }),
-          "عکس/PDF ِ پیوست هم برای تجزیه به هوش مصنوعی فرستاده شود (تا ۴ فایل، هر کدام تا ۸ مگابایت) — همان ارائه‌دهندهٔ بیرونیِ تجزیه آن را می‌بیند"));
-      } }, "📎 صورت یا حل را عکس/PDF داری؟ پیوست کن");
+          "پیوست‌ها هم برای تجزیه به هوش مصنوعی فرستاده و کامل خوانده شوند (هر قالب، تا ۴۰ فایل، هر کدام تا ۱۰۰ مگابایت) — همان ارائه‌دهندهٔ بیرونیِ تجزیه آن را می‌بیند"));
+      } }, "📎 صورت یا حل را در فایل (عکس، PDF، Word…) داری؟ پیوست کن");
       attWrap.appendChild(h("p", { class: "small muted" }, "اگر صورتِ مسئله یا حلش روی کاغذ، در کتاب یا PDF است، لازم نیست تایپش کنی: پیوست کن تا هوش مصنوعی از خودِ تصویر بخواند (فایل در فولدرِ همین مسئله در گوگل درایو می‌ماند)."));
       attWrap.appendChild(btn);
       return attWrap;
@@ -647,9 +647,9 @@
         var b = e.target;
         attFiles().then(function (fileIds) {
         /* صورت و پاسخ لازم است — یا تایپ‌شده یا در عکس/PDF ِ پیوستی که برای هوش مصنوعی فرستاده می‌شود */
-        if ((!f.statement || !f.answer) && !fileIds.length) { A.toast(attShown && attAi ? "صورت و پاسخ لازم است — تایپ کن، یا عکس/PDF ِ آن را پیوست کن (فقط عکس و PDF خوانده می‌شود)." : "عنوان، صورت و پاسخ لازم است (یا عکس/PDF ِ آن را پیوست کن).", "bad"); return; }
+        if ((!f.statement || !f.answer) && !fileIds.length) { A.toast(attShown && attAi ? "صورت و پاسخ لازم است — تایپ کن، یا فایلِ آن (عکس، PDF، Word…) را پیوست کن." : "عنوان، صورت و پاسخ لازم است (یا عکس/PDF ِ آن را پیوست کن).", "bad"); return; }
         b.disabled = true; b.textContent = fileIds.length ? "در حال خواندنِ پیوست و تجزیه…" : "در حال تجزیه…";
-        var fromFile = fileIds.length ? "\n(" + fa(fileIds.length) + " عکس/PDF ِ پیوست همراهِ این پیام است: صورت" + (f.answer ? "" : " و پاسخ و حل") + "ِ مسئله را از آن بخوان؛ اگر چیزی در تصویر خوانا نیست، حدس نزن و در یادداشت بگو.)" : "";
+        var fromFile = fileIds.length ? "\n(" + fa(fileIds.length) + " پیوست همراهِ این پیام است (متنِ کاملش در ادامه): صورت" + (f.answer ? "" : " و پاسخ و حل") + "ِ مسئله را از آن بخوان؛ اگر چیزی در تصویر خوانا نیست، حدس نزن و در یادداشت بگو.)" : "";
         return A.callAIJson(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + (f.statement || "(در پیوست)") + "\nپاسخ: " + (f.answer || "(در پیوست)") + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes + fromFile, fileIds.length ? { maxTokens: 8192, fileIds: fileIds } : { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
           .then(function (raw) {
             if (raw && typeof raw === "object" && !Array.isArray(raw) && (raw.src == null || (Array.isArray(raw.src) && !raw.src.length))) raw.src = f.src.split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean);

@@ -14,14 +14,16 @@ pytestmark = pytest.mark.asyncio
 def _patch_capture(monkeypatch):
     captured: dict = {}
 
-    async def _resolve(db, task="general"):
-        return None  # force the capable_models fallback path
-
-    async def _capable(db, need="documents"):
+    # since 2026-10-14 the gateway asks the manager for ordered CANDIDATES that carry the needed
+    # capability (pin ⇒ automatic order, with failover) — the capability is still what is asserted
+    async def _candidates(db, task="general", need=None, limit=3):
         captured["need"] = need
         return []  # no model → returns no_capable_model, but we asserted `need`
 
-    monkeypatch.setattr(ai_manager, "resolve", _resolve)
+    async def _capable(db, need="documents"):
+        return []
+
+    monkeypatch.setattr(ai_manager, "candidates", _candidates)
     monkeypatch.setattr(ai_manager, "capable_models", _capable)
     return captured
 

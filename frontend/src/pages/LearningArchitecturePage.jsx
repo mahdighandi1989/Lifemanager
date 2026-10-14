@@ -89,9 +89,11 @@ export default function LearningArchitecturePage() {
       // opts.maxTokens: answer budget. The server default (2500) cut decompositions and batches mid-JSON, and the gateway accepts a reply
       // stopped at MAX_TOKENS as success — so long critiques/«بیان دیگر» were silently truncated too. Default 6000 when the caller sets none;
       // callers ask more for big JSON (8192) or less for short checks (4000) (2026-10-13).
-      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: (opts && opts.fileIds) || [], max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000), task: (opts && opts.task) || undefined }).then((r) => {
-        if (!r.data.ok) throw new Error(r.data.error || 'هوش مصنوعی پاسخ نداد');
-        return r.data.text;
+      // opts.fileIds: since 2026-10-14 ANY attachment (≤40, every format) — the server reads each one COMPLETELY
+      // (app_reading) and returns a per-file manifest; opts.withMeta ⇒ resolve {text, files, mode} instead of text
+      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: ((opts && opts.fileIds) || []).slice(0, 40), max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000), task: (opts && opts.task) || undefined }).then((r) => {
+        if (!r.data.ok) { const e = new Error(r.data.error || 'هوش مصنوعی پاسخ نداد'); e.files = r.data.files || []; throw e; }
+        return opts && opts.withMeta ? { text: r.data.text, files: r.data.files || [], mode: r.data.mode } : r.data.text;
       }),
       navigate: ({ tab, a, s, replace }) => {
         const q = new URLSearchParams();

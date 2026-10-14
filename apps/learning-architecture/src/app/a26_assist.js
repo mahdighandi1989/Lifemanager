@@ -14,7 +14,7 @@
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S;
   var AS = A.ASSIST = {};
-  var TYPE = "achat", GROUP = "دستیار — گفت‌وگوها", MAX_MSGS = 400, CTX_MSGS = 12, MAX_AUTO = 2;
+  var TYPE = "achat", GROUP = "دستیار — گفت‌وگوها", MAX_MSGS = 400, HIST_CHARS = 24000, MAX_AUTO = 4, MAX_FILES = 40, MAX_FILE_MB = 100;
   var blobs = {};            // شناسهٔ پیوست ⇒ File (فقط همین بارِ مرورگر؛ برای «پیوست به فرم»)
   var ui = null, busy = false;
 
@@ -75,10 +75,13 @@
 
   /* ---------- پویشِ صفحهٔ فعلی: هر فیلد/دکمهٔ دیدنی یک کلید (data-ai-k) ---------- */
   function visible(el) { if (el.type === "hidden" || el.disabled) return false; if (el.type === "file") return true; var r = el.getBoundingClientRect(); return !!(r.width || r.height || el.getClientRects().length); }
+  /* فیلدی که در یک «details» ِ بسته است دیده نمی‌شود ولی بخشی از فرم است — پویش می‌شود و پیش از پرکردن، بخشش باز می‌شود */
+  function inClosed(el) { var d = el.closest("details"); while (d) { if (!d.open) return true; d = d.parentElement && d.parentElement.closest("details"); } return false; }
+  function reveal(el) { var d = el.closest("details"); while (d) { d.open = true; d = d.parentElement && d.parentElement.closest("details"); } }
   function labelFor(el) {
     var t = el.getAttribute("aria-label") || "";
-    if (!t && el.id) { var lb = document.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(el.id) : el.id) + '"]'); if (lb) t = lb.textContent; }
-    if (!t) { var pl = el.closest("label"); if (pl) t = pl.textContent; }
+    if (!t && el.id) { var lb = document.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(el.id) : el.id) + '"]'); if (lb) { var lc = lb.cloneNode(true); lc.querySelectorAll("select,textarea,input,option,button").forEach(function (x) { x.remove(); }); t = lc.textContent; } }
+    if (!t) { var pl = el.closest("label"); if (pl) { var c = pl.cloneNode(true); c.querySelectorAll("select,textarea,input,option,button").forEach(function (x) { x.remove(); }); t = c.textContent; } }
     if (!t && el.tagName === "BUTTON") t = el.textContent;
     if (!t) t = el.getAttribute("placeholder") || el.getAttribute("title") || "";
     if (!t) { var p = el.parentElement, i = 0; while (p && i < 3 && !t) { var lab = p.querySelector("label,.fl,.lbl,h3,h4,b,strong"); if (lab && !lab.contains(el)) t = lab.textContent; p = p.parentElement; i++; } }
@@ -90,21 +93,26 @@
     SCAN = {};
     if (!main) return { fields: fields, buttons: buttons, heads: heads };
     main.querySelectorAll("h1,h2,h3").forEach(function (x, i) { if (i < 12) heads.push(clip(x.textContent, 70)); });
-    var n = 0;
+    var n = 0, seen = {};
     main.querySelectorAll("input,textarea,select,button").forEach(function (el) {
-      if (!visible(el) || el.closest(".as-root")) return;
+      if (el.closest(".as-root")) return;
+      // newer Chrome keeps a closed <details>' content laid out (content-visibility), so «closed» is asked directly
+      var hid = inClosed(el) && !el.disabled && el.type !== "hidden";
+      if (!visible(el) && !hid) return;
       var tag = el.tagName.toLowerCase(), type = tag === "input" ? (el.type || "text") : tag, lab = labelFor(el);
-      if (tag === "button" && (!lab || buttons.length >= 60)) return;
-      if (tag !== "button" && fields.length >= 80) return;
+      if (tag === "button" && (!lab || hid || buttons.length >= 80)) return;
+      if (tag !== "button" && fields.length >= 150) return;
       var k = "k" + (++n); el.setAttribute("data-ai-k", k);
       var sec = el.closest("[data-report-section-label]");
-      SCAN[k] = { tag: tag, type: type, label: lab };
+      var sig = tag + "|" + lab; seen[sig] = (seen[sig] || 0) + 1;
+      SCAN[k] = { tag: tag, type: type, label: lab, nth: seen[sig] };
       if (tag === "button") { buttons.push({ k: k, label: lab }); return; }
       var f = { k: k, type: type, label: lab, section: sec ? clip(sec.getAttribute("data-report-section-label"), 40) : "" };
       if (type === "checkbox" || type === "radio") f.value = el.checked ? "✓" : "";
       else if (type !== "file") f.value = clip(el.value, 120);
       if (tag === "select") f.options = Array.prototype.slice.call(el.options, 0, 25).map(function (o) { return o.value + "=" + clip(o.textContent, 30); }).join(" | ");
       if (el.required || el.getAttribute("aria-required") === "true") f.required = true;
+      if (hid) f.closed = true;
       fields.push(f);
     });
     return { fields: fields, buttons: buttons, heads: heads };
@@ -113,7 +121,7 @@
     var L = ["نما: " + A.state.view + " (" + labelOf(A.state.view) + ")" + (A.state.arg != null ? " arg=" + A.state.arg : "") + (A.state.sub ? " sub=" + A.state.sub : "")];
     if (sc.heads.length) L.push("سرتیترها: " + sc.heads.join(" | "));
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
-    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "")); });
+    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "")); });
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     return L.join("\n");
   }
@@ -122,12 +130,16 @@
     var x = document.querySelector('[data-ai-k="' + k + '"]'); if (x && document.contains(x)) return x;
     var sig = SCAN[k]; if (!sig) return null;
     AS.scan();
-    var hit = Object.keys(SCAN).filter(function (j) { return SCAN[j].tag === sig.tag && SCAN[j].label === sig.label; })[0];
+    // همان نوع + همان برچسب + همان «چندمین» (چند فیلد با برچسبِ «پاسخ» در یک صفحه ⇒ هرگز فیلدِ اشتباه)
+    var hit = Object.keys(SCAN).filter(function (j) { return SCAN[j].tag === sig.tag && SCAN[j].label === sig.label && SCAN[j].nth === sig.nth; })[0];
     return hit ? document.querySelector('[data-ai-k="' + hit + '"]') : null;
   }
 
   /* ---------- کارها روی صفحه ---------- */
   var DANGER = /حذف|پاک|برداشتن|بایگانی|delete|remove|reset|بازنشانی|ریختن|خروج/i;
+  /* تصمیم‌هایی که فقط با خودِ مالک است (پذیرش/ردِ پیشنهادِ قاعده و سقف، تأییدِ مسئله یا واقعه برای ورود به آزمون‌ها):
+     دستیار هرگز نمی‌زندشان — هایلایت می‌کند و می‌گوید «این تصمیم با خودت است» */
+  var OWNER = /بپذیر|پذیرفتم|رد کن|ردّ|نپذیر|تأیید|تایید|قبول|approve|accept|reject/i;
   function fire(x, ev) { x.dispatchEvent(new Event(ev, { bubbles: true })); }
   function setVal(x, v) {
     var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -148,31 +160,48 @@
     fill: function (a) {
       var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
       if (x.type === "file") return "پیوست با attach";
+      reveal(x);
+      if (x.tagName === "SELECT") {
+        var want = String(a.value == null ? "" : a.value).trim(), opts = Array.prototype.slice.call(x.options);
+        var o = opts.filter(function (op) { return op.value === want; })[0] || opts.filter(function (op) { return op.textContent.trim() === want; })[0] ||
+          opts.filter(function (op) { return want && op.textContent.indexOf(want) >= 0; })[0];
+        if (!o) return "گزینهٔ «" + clip(want, 30) + "» در «" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» نیست";
+        a = { k: a.k, value: o.value, why: a.why };
+      }
       if (x.type === "checkbox" || x.type === "radio") { var on = a.value === true || /^(1|true|بله|✓|on)$/i.test(String(a.value)); if (x.checked !== on) x.click(); }
       else { setVal(x, String(a.value == null ? "" : a.value)); fire(x, "input"); fire(x, "change"); }
       mark(x, a.why || "دستیار از حرفِ تو پر کرد — اگر درست نیست عوضش کن", "fill");
       return "";
     },
-    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
+    highlight: function (a) { var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد"; reveal(x); mark(x, a.why || "این را خودت پر کن", "hl"); return ""; },
     click: function (a) {
       var x = el(a.k); if (!x) return "دکمهٔ " + a.k + " پیدا نشد";
-      if (DANGER.test(x.textContent || "") || DANGER.test(x.getAttribute("aria-label") || "")) return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)";
-      x.click(); return "";
+      var bt = (x.textContent || "") + " " + (x.getAttribute("aria-label") || "");
+      if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
+      if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
+      var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
+      x.click(); clicked.n++; clicked.changed = clicked.changed || before !== document.querySelectorAll("#main input,#main textarea,#main select").length; return "";
     },
     attach: function (a) {
       var x = el(a.k); if (!x || x.type !== "file") return "جای پیوست پیدا نشد";
       var fs = (a.fileIds || []).map(function (id) { return blobs[id]; }).filter(Boolean);
       if (!fs.length) return "فایل در این بارِ مرورگر نیست — خودت از «انتخابِ فایل» بگذار";
+      reveal(x);
       try { var dt = new DataTransfer(); fs.forEach(function (f) { dt.items.add(f); }); x.files = dt.files; fire(x, "change"); mark(x, "دستیار پیوست کرد", "fill"); return ""; }
       catch (e) { return "مرورگر اجازهٔ پیوستِ خودکار نداد — خودت بگذار"; }
     }
   };
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
-    var notes = [], moved = false, chain = Promise.resolve();
-    (actions || []).slice(0, 30).forEach(function (a) {
+    var notes = [], moved = false, chain = Promise.resolve(), skipped = 0;
+    clicked = { n: 0, changed: false };
+    (actions || []).slice(0, 40).forEach(function (a) {
       chain = chain.then(function () {
         if (!a || !DO[a.do]) return;
+        // کلیدهای k… مالِ صفحهٔ پیشین‌اند: پس از رفتن به نمای تازه هرگز به کار نمی‌روند (پرکردنِ فیلدِ اشتباه) —
+        // نوبتِ خودکارِ بعدی با فیلدهای همین صفحه پر می‌کند
+        if (moved && a.do !== "go") { skipped++; return; }
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         if (r) notes.push(r);
         if (a.do === "go" && !r) { moved = true; return wait(350); }
@@ -182,13 +211,16 @@
     return chain.then(function () {
       var first = document.querySelector(".as-hl") || document.querySelector(".as-filled");
       if (first && first.scrollIntoView) try { first.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { }
-      return { notes: notes, moved: moved };
+      return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed };
     });
   };
 
   /* ---------- سشن‌ها ---------- */
-  AS.sessions = function () { return S.all(TYPE).sort(function (a, b) { return String(b.updated || "").localeCompare(String(a.updated || "")); }); };
-  AS.newSession = function () { var s = { id: A.uid("achat"), type: TYPE, title: "", pinned: "", status: "", memory: "", msgs: [], steps: [], files: [], reports: [] }; S.put(s); store("cur", s.id); return s; };
+  AS.sessions = function () { var c = store("cur"); return S.all(TYPE, function (x) { return (x.msgs || []).length || x.id === c; }).sort(function (a, b) { return String(b.updated || "").localeCompare(String(a.updated || "")); }); };
+  AS.newSession = function () {
+    var c = AS.cur(); if (c && !c.msgs.length) return c;   // «＋» روی سشنِ هنوز خالی ⇒ همان، نه یک سشنِ خالیِ دیگر در فهرست
+    var s = { id: A.uid("achat"), type: TYPE, title: "", pinned: "", status: "", memory: "", msgs: [], steps: [], files: [], reports: [] }; S.put(s); store("cur", s.id); return s;
+  };
   AS.cur = function () { var id = store("cur"), s = id && S.get(id); return s && s.type === TYPE ? s : null; };
   function provisional(s, text) { return s.title || clip(text, 50) || "گفت‌وگوی تازه"; }
 
@@ -202,43 +234,73 @@
     "- داوری نکن: حکم، نمره و سقفِ اطمینان کارِ خودِ صفحه و کاربر است؛ برای کارِ عمیق دکمهٔ هوشِ همان بخش را (با click) بزن یا نشانش بده.",
     "- فقط کلیدهایی (k…) را به کار ببر که در «صفحهٔ فعلی» آمده و فقط نماهایی که در «نقشهٔ سامانه» هست. دکمهٔ حذف/پاک‌کردن را هرگز نزن.",
     "- وقتی کاربر را به نمای دیگری می‌بری و هنوز فیلدهایش را نمی‌بینی، فقط go بده؛ سامانه پس از بازشدن فیلدها را برایت می‌فرستد تا پر کنی.",
+    "- قدم‌به‌قدم مثلِ خودِ کاربر: وقتی فیلدهای لازمِ یک فرم از حرف‌ها و فایل‌های خودِ او پر شد، دکمهٔ ثبت/ساخت/بعدیِ همان فرم را click کن و بگو چه کردی؛ اگر چیزی مانده، هایلایت کن و یک پرسشِ کوتاه بپرس. تصمیم‌های مالک (بپذیر/رد کن/تأیید/ریشه را تأیید کن) و حذف را هرگز نزن — هایلایت کن.",
+    "- پیوست‌ها: متنِ کاملِ هر فایل (Word، Excel، PDF، صوت/ویدیو با رونویسیِ کامل، ZIP…) و خودِ تصویرها همراهِ همان نوبت می‌آید؛ همه‌اش را بخوان و فقط از همان‌ها نقل کن. در نوبت‌های بعد اگر دوباره به محتوای فایلی لازم داری، reread:[id] بده. اگر فایلی «خوانده نشد»، صادقانه بگو.",
     "- حرفِ نامربوط (بیرون از یادگیری، معرفت‌شناسی/سنجشِ ادعا، گره‌گشایی/حلِ مسئله و کار با همین صفحه): status=\"unrelated\" و مؤدبانه بگو به این‌جا ربطی ندارد و در یک جمله بگو چه کمکی از این‌جا برمی‌آید.",
     "- کمبودِ سامانه: اگر خواسته در قلمروِ همین صفحه است ولی هیچ نما/فرمی آن را پوشش نمی‌دهد (یا ناقص است)، status=\"gap\" و gap را کامل پر کن: مسئلهٔ کاربر را تکرار نکن؛ نیاز را انتزاع کن (این دسته از خواسته‌ها و نمونه‌های مشابه)، دقیق بگو چه چیزی کم است، کجا (کدام نما/فایل/ثبت‌گاه)، چطور افزوده شود، و با کدام بخش‌ها پیوند دارد. به کاربر هم بگو برگهٔ فوری ثبت شد و تا آن موقع نزدیک‌ترین راهِ موجود چیست.",
-    "- حافظه: memory خلاصهٔ انباشتهٔ کلِ همین سشن است (هدف، تصمیم‌ها، آنچه پر شد، آنچه مانده) — هر بار کاملش را برگردان.",
+    "- حافظه: memory خلاصهٔ انباشتهٔ کلِ همین سشن است از اولین پیام تا حالا (هدف، از کجا آمدیم، تصمیم‌ها، آنچه پر و ثبت شد و کجا، نکته‌های کلیدیِ فایل‌ها، آنچه مانده) — هر بار کاملش را برگردان، چیزی را نینداز.",
     "- pinned: خواستهٔ اصلیِ سشن در یک جمله (نوبتِ اول بساز؛ بعداً فقط اگر خواستهٔ اصلی واقعاً عوض شد).",
     "- steps: فهرستِ کاملِ مراحلِ رسیدن به خواستهٔ اصلی با وضعِ هر کدام (done/now/todo) و نمای هر کدام.",
     "خروجی فقط یک JSON (بی متنِ دیگر):",
     '{"reply":"…","title":"نامِ کوتاهِ سشن (۲ تا ۶ واژه؛ نوبتِ اول)","pinned":"…","memory":"…","status":"related|unrelated|gap",' +
     '"steps":[{"t":"…","s":"done|now|todo","view":"…"}],' +
     '"actions":[{"do":"go","view":"…","arg":"…","sub":"…"},{"do":"fill","k":"k3","value":"…"},{"do":"highlight","k":"k5","why":"…"},{"do":"click","k":"k9"},{"do":"attach","k":"k7","fileIds":[12]}],' +
-    '"gap":{"title":"…","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…"}}'
+    '"reread":[12],"gap":{"title":"…","abstract":"…","missing":"…","where":"…","how":"…","relations":"…","docs":"…"}}'
   ].join("\n");
   AS.SYS = SYS;
+  /* نسخهٔ مستقل (بی میزبان): فایلِ متنی را خودِ مرورگر کامل می‌خواند. در Lifemanager سرور هر قالبی را کامل می‌خواند (app_reading). */
   function readText(f) {
-    if (!f || f.size > 300000 || !(/^text\/|json|csv|xml|markdown/.test(f.type || "") || /\.(txt|md|csv|json|tsv|xml|html?)$/i.test(f.name || ""))) return Promise.resolve("");
-    return new Promise(function (res) { try { var r = new FileReader(); r.onload = function () { res(String(r.result || "").slice(0, 6000)); }; r.onerror = function () { res(""); }; r.readAsText(f); } catch (e) { res(""); } });
+    if (!f || f.size > 2000000 || !(/^text\/|json|csv|xml|markdown/.test(f.type || "") || /\.(txt|md|csv|json|tsv|xml|html?)$/i.test(f.name || ""))) return Promise.resolve("");
+    return new Promise(function (res) { try { var r = new FileReader(); r.onload = function () { res(String(r.result || "")); }; r.onerror = function () { res(""); }; r.readAsText(f); } catch (e) { res(""); } });
   }
-  function userPrompt(s, msg, sc, extra) {
+  /* تاریخچه: هرچه از گفت‌وگو در بودجه جا شود، کامل (تازه‌ترین‌ها اول انتخاب و به ترتیبِ زمان چیده می‌شوند)؛
+     آنچه جا نشود در «حافظهٔ سشن» (خلاصهٔ انباشته‌ای که مدل هر نوبت کامل برمی‌گرداند) هست — پس هیچ‌چیز از اول تا حالا گم نمی‌شود */
+  function history(s, skipLast) {
+    var out = [], used = 0, all = skipLast ? s.msgs.slice(0, -1) : s.msgs;
+    for (var i = all.length - 1; i >= 0; i--) {
+      var m = all[i];
+      var line = (m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + String(m.text || "").slice(0, 4000) +
+        (m.files && m.files.length ? " [پیوست: " + m.files.map(function (f) { return (f.id != null ? f.id + "=" : "") + f.name; }).join("، ") + "]" : "");
+      if (used + line.length > HIST_CHARS && out.length) { out.unshift("(" + fa(i + 1) + " پیامِ قدیمی‌تر در «حافظهٔ سشن» خلاصه شده است)"); break; }
+      out.unshift(line); used += line.length;
+    }
+    return out;
+  }
+  function userPrompt(s, msg, sc, extra, skipLast) {
     var L = ["# سشن", "نام: " + (s.title || "(هنوز بی‌نام)"), "خواستهٔ اصلی (سنجاق‌شده): " + (s.pinned || "(هنوز نیست)"), "حافظهٔ سشن: " + (s.memory || "(خالی)")];
-    if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]"; }).join(" "));
-    if (s.files && s.files.length) L.push("پیوست‌های سشن (id=نام): " + s.files.map(function (f) { return f.id + "=" + f.name; }).join("، "));
+    if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]" + (x.view ? " (" + x.view + ")" : ""); }).join(" "));
+    if (s.files && s.files.length) L.push("پیوست‌های سشن (id=نام): " + s.files.map(function (f) { return f.id + "=" + f.name; }).join("، ") + " — اگر برای پاسخ دوباره به محتوای یکی لازم داری، reread بده.");
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
-    L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگوی اخیر");
-    s.msgs.slice(-CTX_MSGS).forEach(function (m) { L.push((m.role === "user" ? "کاربر: " : m.role === "sys" ? "سامانه: " : "دستیار: ") + clip(m.text, 600) + (m.files && m.files.length ? " [پیوست: " + m.files.map(function (f) { return f.name; }).join("، ") + "]" : "")); });
+    L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
+    history(s, skipLast).forEach(function (x) { L.push(x); });
     L.push("", "# نوبتِ تازه", msg);
     if (extra) L.push(extra);
     return L.join("\n");
   }
   /* نقشهٔ سامانه در بخشِ «کاربر» می‌رود (سقفِ سرور ۶۰هزار نویسه؛ پیامِ سیستم ۲۰هزار) — اشراف که بزرگ شد، تماس نمی‌شکند */
   var MAX_USER = 58000;
-  AS.prompt = function (s, msg, sc, extra) {
-    var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n", rest = userPrompt(s, msg, sc, extra);
+  AS.prompt = function (s, msg, sc, extra, skipLast) {
+    var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n", rest = userPrompt(s, msg, sc, extra, skipLast);
     if (man.length + rest.length > MAX_USER) rest = rest.slice(0, Math.max(4000, MAX_USER - man.length));
     return (man + rest).slice(0, MAX_USER);
   };
   function parse(t) { var o = A.parseJSONLoose ? A.parseJSONLoose(t) : JSON.parse(t); if (!o || typeof o.reply !== "string") throw new Error("پاسخِ دستیار ناخوانا بود"); return o; }
+  function unwrap(r) { return r && typeof r === "object" ? r : { text: r, files: [] }; }
+  /* پاسخِ غیرِ JSON دو بار پشتِ هم ⇒ همان متن به‌عنوانِ پاسخ (بی کار روی صفحه)، نه خطا */
   function ask(sys, user, opts) {
-    return A.callAI(sys, user, opts).then(function (t) { try { return parse(t); } catch (e) { return A.callAI(sys, user, opts).then(parse); } });
+    var o2 = Object.assign({}, opts, { withMeta: true });
+    return A.callAI(sys, user, o2).then(function (r1) {
+      r1 = unwrap(r1);
+      try { var o = parse(r1.text); o._files = r1.files; return o; } catch (e) {
+        return A.callAI(sys, user, o2).then(function (r2) {
+          r2 = unwrap(r2);
+          try { var o3 = parse(r2.text); o3._files = r2.files; return o3; } catch (e2) {
+            var t = String(r2.text || r1.text || "").replace(/```[a-z]*|```/g, "").trim();
+            return { reply: t.slice(0, 1200) || "پاسخ را نفهمیدم؛ دوباره بگو.", status: "related", actions: [], _files: r2.files || r1.files };
+          }
+        });
+      }
+    });
   }
 
   /* ---------- کمبود ⇒ برگهٔ فوری در «نظارت و سرکشی» ---------- */
@@ -264,7 +326,8 @@
   };
   AS.fileGap = function (s, g) {
     var key = norm(g.title || s.pinned);
-    var dup = AS.sessions().some(function (x) { return (x.reports || []).some(function (r) { return r.key === key; }); });
+    var since = Date.now() - 30 * 864e5;   // همان کمبود در ۳۰ روزِ اخیر ثبت شده ⇒ برگهٔ دوم نه (پس از آن، اگر هنوز هست، دوباره)
+    var dup = AS.sessions().some(function (x) { return (x.reports || []).some(function (r) { return r.key === key && Date.parse(r.at || 0) > since; }); });
     if (dup) return Promise.resolve({ dup: true });
     var text = AS.reportText(s, g);
     if (!A.HOST || !A.HOST.report) { s.reports.push({ key: key, title: clip(g.title, 80), at: now(), local: true, text: text }); S.put(s); return Promise.resolve({ local: true }); }
@@ -278,6 +341,15 @@
   };
 
   /* ---------- یک نوبت ---------- */
+  function manifestNote(files) {
+    if (!files || !files.length) return "";
+    return "📖 " + files.map(function (f) {
+      var ok = f.complete || f.status === "image";
+      return "«" + f.name + "»: " + (f.status === "image" ? "تصویر دیده شد" : ok ? "کامل خوانده شد" + (f.chars ? " (" + fa(f.chars) + " نویسه" + (f.pages ? "، " + fa(f.pages) + " صفحه" : "") + ")" : "") :
+        f.status === "unsupported" ? "خوانده نشد — " + (f.note || "قالب پشتیبانی نمی‌شود") : f.status === "missing" ? "پیدا نشد" : "ناقص/ناموفق — " + (f.note || f.status));
+    }).join(" · ");
+  }
+  AS.busy = function () { return busy; };
   AS.send = function (text, files) {
     if (busy) return Promise.resolve();
     text = String(text || "").trim(); files = files || [];
@@ -286,30 +358,31 @@
     busy = true; paint();
     var m = { role: "user", text: text || "(فایل)", at: now(), files: [] };
     s.msgs.push(m); S.put(s); paint();
+    if (files.length > MAX_FILES) { A.toast("در هر پیام حداکثر " + fa(MAX_FILES) + " فایل؛ بقیه را در پیامِ بعد بفرست", "bad"); files = files.slice(0, MAX_FILES); }
     var ups = Promise.resolve(), aiIds = [], texts = [];
-    files.slice(0, 8).forEach(function (f) {
+    files.forEach(function (f) {
       ups = ups.then(function () {
-        return readText(f).then(function (t) { if (t) texts.push("— متنِ «" + f.name + "»:\n" + t); }).then(function () {
-          if (!A.HOST || !A.HOST.upload) { m.files.push({ name: f.name, mime: f.type || "" }); return; }
-          if (f.size > 25 * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از ۲۵ مگابایت است", "bad"); return; }
-          return A.HOST.upload(s.id, f, { group: GROUP, title: provisional(s, text) }).then(function (r) {
-            var info = { id: r.id, name: r.name || f.name, mime: r.mime || f.type || "", link: r.link || "" };
-            blobs[r.id] = f; m.files.push(info); s.files.push(info);
-            if (/^image\/|application\/pdf/.test(info.mime) && aiIds.length < 4) aiIds.push(r.id);
-          }, function (e) { m.files.push({ name: f.name, mime: f.type || "", err: true }); A.toast("«" + f.name + "» به درایو نرفت: " + errText(e), "bad"); });
-        });
+        if (!A.HOST || !A.HOST.upload) {   // نسخهٔ مستقل: فقط متن‌ها، و صادقانه می‌گوید بقیه را نمی‌بیند
+          return readText(f).then(function (t) { m.files.push({ name: f.name, mime: f.type || "" }); if (t) texts.push("— متنِ کاملِ «" + f.name + "»:\n" + t); else texts.push("— «" + f.name + "»: این نسخه (بی Lifemanager) فقط فایلِ متنی را می‌خواند؛ این یکی خوانده نشد."); });
+        }
+        if (f.size > MAX_FILE_MB * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از " + fa(MAX_FILE_MB) + " مگابایت است", "bad"); m.files.push({ name: f.name, mime: f.type || "", err: true }); return; }
+        return A.HOST.upload(s.id, f, { group: GROUP, title: provisional(s, text) }).then(function (r) {
+          var info = { id: r.id, name: r.name || f.name, mime: r.mime || f.type || "", link: r.link || "" };
+          blobs[r.id] = f; m.files.push(info); s.files.push(info); aiIds.push(r.id);
+        }, function (e) { m.files.push({ name: f.name, mime: f.type || "", err: true }); A.toast("«" + f.name + "» به درایو نرفت: " + errText(e), "bad"); });
       });
     });
     var auto = 0;
-    function turn(msg, extra) {
+    function turn(msg, extra, ids, first) {
       var sc = AS.scan();
-      return ask(SYS, AS.prompt(s, msg, sc, extra), { task: "lla_assistant", fileIds: auto ? [] : aiIds, maxTokens: 2500 }).then(function (o) {
+      return ask(SYS, AS.prompt(s, msg, sc, extra, first), { task: "lla_assistant", fileIds: ids || [], maxTokens: 6000 }).then(function (o) {
+        if (o._files && o._files.length) { s.msgs.push({ role: "sys", at: now(), text: manifestNote(o._files) }); }
         if (o.title && !s.title) s.title = clip(o.title, 80);
         if (o.pinned && (!s.pinned || o.pinned !== s.pinned)) s.pinned = clip(o.pinned, 300);
-        if (o.memory) s.memory = clip(o.memory, 3000);
+        if (o.memory) s.memory = clip(o.memory, 6000);
         if (Array.isArray(o.steps) && o.steps.length) s.steps = o.steps.slice(0, 20).map(function (x) { return { t: clip(x.t, 140), s: /^(done|now|todo)$/.test(x.s) ? x.s : "todo", view: A.V[x.view] ? x.view : "" }; });
         s.status = o.status || "related";
-        var acts = s.status === "unrelated" ? [] : (o.actions || []);
+        var acts = s.status === "unrelated" ? [] : (Array.isArray(o.actions) ? o.actions : []);
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a); if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
         S.put(s); paint();
@@ -320,13 +393,24 @@
         }, function (e) { s.msgs.push({ role: "sys", at: now(), text: "ثبتِ برگهٔ فوری نشد: " + errText(e) }); S.put(s); paint(); }) : Promise.resolve();
         return gap.then(function () { return AS.run(acts); }).then(function (res) {
           if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
-          var filled = acts.some(function (x) { return x && /fill|highlight|attach/.test(x.do); });
-          if (res.moved && !filled && auto < MAX_AUTO) { auto++; return turn("[سامانه: «" + labelOf(A.state.view) + "» باز شد. حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ reply خیلی کوتاه.]"); }
+          var marked = !!document.querySelector("#main .as-hl, #main .as-filled");
+          var reread = (Array.isArray(o.reread) ? o.reread : []).filter(function (id) { return s.files.some(function (f) { return f.id === id; }); }).slice(0, MAX_FILES);
+          if (auto < MAX_AUTO && reread.length) { auto++; return turn("[سامانه: محتوای کاملِ پیوست‌هایی که خواستی دوباره همراه است؛ ادامه بده.]", "", reread); }
+          if (auto < MAX_AUTO && (res.moved || res.changed)) {
+            auto++;
+            return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "» باز شد" : "فرم تغییر کرد (فیلدهای تازه)") +
+              ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]");
+          }
+          // موبایل: پنجره روی فرم است ⇒ کنار برود تا زردها و سبزها دیده شوند
+          if (marked && window.innerWidth <= 600 && ui && !ui.panel.hidden) { AS.toggle(false); A.toast("پر کردم؛ زردها با تو. برای ادامه دوباره 💬 را بزن."); }
         });
       });
     }
-    return ups.then(function () { S.put(s); return turn(text || "(فقط فایل فرستادم)", texts.length ? "\n# متنِ فایل‌های متنی\n" + texts.join("\n\n") : ""); })
-      .catch(function (e) { s.msgs.push({ role: "sys", at: now(), text: "دستیار پاسخ نداد: " + errText(e) + " — دوباره بفرست." }); S.put(s); })
+    return ups.then(function () { S.put(s); return turn(text || "(فقط فایل فرستادم)", texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "", aiIds, true); })
+      .catch(function (e) {
+        var fl = e && e.files && e.files.length ? " " + manifestNote(e.files) : "";
+        s.msgs.push({ role: "sys", at: now(), text: "دستیار پاسخ نداد: " + errText(e) + fl + " — دوباره بفرست." }); S.put(s);
+      })
       .then(function () { busy = false; paint(); });
   };
   function errText(e) { var d = e && e.response && e.response.data; return (d && (d.detail || d.error)) || (e && e.message) || "خطا"; }

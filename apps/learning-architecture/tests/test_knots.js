@@ -507,9 +507,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.concernWhy && /^kcases:/.test(info.concernGo), 'concern link why/navigation: ' + info.concernGo);
   E(/دغدغهٔ شمارهٔ ۱۰/.test(info.kcConcern) && info.kcConcernGo === 'concerns:c10:null', 'kcases ⇒ concern 10: ' + info.kcConcernGo);
   E(info.attStandalone === 0 && info.optsStandalone === '[null]', 'standalone AI door has no attachments: ' + info.attStandalone + ' ' + info.optsStandalone);
-  E(/تصویرِ پیوست هم فرستاده شود \(۱\)/.test(info.attLabel) && info.attOnProblem === true && /ارائه‌دهندهٔ بیرونی/.test(info.attWarn), 'attachment checkbox (problem ⇒ on): ' + info.attLabel + ' ' + info.attOnProblem);
-  E(info.hypOpts === '[{"fileIds":[5]}]', 'hypothesis request carries only the eligible image: ' + info.hypOpts);
-  E(info.ladMoreNoImg && info.ladOpts === 'gen:{"fileIds":[5]} chk:null', 'ladder: generator gets the image, the leak solver never: ' + info.ladOpts);
+  E(/پیوست‌ها هم فرستاده و کامل خوانده شوند \(۳\)/.test(info.attLabel) && info.attOnProblem === true && /ارائه‌دهندهٔ بیرونی/.test(info.attWarn), 'attachment checkbox (problem ⇒ on): ' + info.attLabel + ' ' + info.attOnProblem);
+  // since 2026-10-14 (WORKLOG 44) EVERY attachment goes and the server reads each one completely (was: only images/PDF ≤ 8 MB)
+  E(info.hypOpts === '[{"fileIds":[5,6,7]}]', 'hypothesis request carries all the case files: ' + info.hypOpts);
+  E(info.ladMoreNoImg && info.ladOpts === 'gen:{"fileIds":[5,6,7]} chk:null', 'ladder: generator gets the files, the leak solver never: ' + info.ladOpts);
   E(info.attOffInference === false, 'attachment default off for a non-problem case: ' + info.attOffInference);
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();

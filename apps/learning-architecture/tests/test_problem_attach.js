@@ -46,9 +46,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.waitForTimeout(400);
   chk(await p.locator('main section.attach li a').count() === 2, 'both files listed');
   await p.click('main .pb-ai'); await p.waitForTimeout(900);
-  info.call = await p.evaluate(() => ({ n: window.__ai.length, ids: window.__ai[0] && window.__ai[0].fileIds, inAtt: window.__ai[0] && /\(در پیوست\)/.test(window.__ai[0].user) && /عکس\/PDF/.test(window.__ai[0].user),
+  info.call = await p.evaluate(() => ({ n: window.__ai.length, ids: window.__ai[0] && window.__ai[0].fileIds, inAtt: window.__ai[0] && /\(در پیوست\)/.test(window.__ai[0].user) && /پیوست همراهِ این پیام است/.test(window.__ai[0].user),
     later: window.__ai.slice(1).every(c => !c.fileIds.length) }));
-  chk(info.call.n >= 1 && JSON.stringify(info.call.ids) === '[1]' && info.call.inAtt && info.call.later, 'decomposition reads only the image (not the txt), only once ' + JSON.stringify(info.call));
+  chk(info.call.n >= 1 && JSON.stringify(info.call.ids) === '[1,2]' && info.call.inAtt && info.call.later, 'decomposition reads every attachment (image AND txt, WORKLOG 44), only once ' + JSON.stringify(info.call));
   info.rec = await p.evaluate(() => { const r = APP.S.all('eprob', x => x.p && x.p.title === 'مسئلهٔ عکس‌دار')[0]; return r && { id: r.id, st: r.p.statement, rids: [...new Set(window.__uploads.map(u => u.rid))], meta: window.__uploads[0].meta }; });
   chk(info.rec && info.rec.st === 'صورتِ خوانده‌شده از عکس' && info.rec.rids.length === 1 && info.rec.rids[0] === info.rec.id && info.rec.meta.group === 'مسئله‌های من',
     'files live in the folder of THE stored problem ' + JSON.stringify(info.rec));

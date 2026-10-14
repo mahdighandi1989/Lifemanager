@@ -55,7 +55,7 @@ TASK_TYPES: List[Dict[str, str]] = [
     {"id": "learning_architecture", "label": "معماری یادگیری و کارخانه معرفت‌شناسی", "description": "منتقدِ کارگاه‌ها و ایستگاه‌ها، پیشنهادِ وقایع برای صفِ تأیید، تجزیهٔ مسئله‌های بزرگ.", "preferred": "reasoning"},
     # دستیارِ گفت‌وگوی شناور روی همان صفحه (مالک ۲۰۲۶-۱۰-۱۴): سریع و ارزان، با تصویر/PDF؛ کارِ عمیق را بخش‌های خودِ صفحه
     # (task «learning_architecture») انجام می‌دهند. بهترین گزینه: مدلی با vision + documents + fast (مثلاً Gemini Flash).
-    {"id": "lla_assistant", "label": "دستیارِ گفت‌وگوی «معماری یادگیری»", "description": "چت‌بات شناورِ صفحه: راهنمایی به بخشِ درست، پرکردنِ فرم‌ها، تحلیلِ مختصرِ فایل‌ها، ثبتِ کمبودِ سامانه در «نظارت و سرکشی».", "preferred": "fast"},
+    {"id": "lla_assistant", "label": "دستیارِ گفت‌وگوی «معماری یادگیری»", "description": "چت‌بات شناورِ صفحه: راهنمایی به بخشِ درست، پرکردنِ فرم‌ها، تحلیلِ مختصرِ فایل‌ها، ثبتِ کمبودِ سامانه در «نظارت و سرکشی».", "preferred": "fast", "requires": ["vision", "documents"]},
 ]
 
 DEFAULT_PROVIDER_KEY = "anthropic"
@@ -181,6 +181,16 @@ def task_preferred_capability(task: str) -> Optional[str]:
         if t["id"] == task:
             return t.get("preferred")
     return None
+
+
+def task_required_capabilities(task: str) -> List[str]:
+    """Capabilities a task should have on EVERY call (not only when files are attached) — e.g. the
+    learning-architecture chat assistant reads pasted screenshots/PDFs at any turn, so a text-only model
+    must never be its automatic pick while a capable one exists. Empty = no requirement (old behaviour)."""
+    for t in TASK_TYPES:
+        if t["id"] == task:
+            return list(t.get("requires") or [])
+    return []
 
 
 async def seed_ai_catalog(db) -> Dict[str, int]:

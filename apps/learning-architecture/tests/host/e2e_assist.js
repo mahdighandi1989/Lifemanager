@@ -29,6 +29,9 @@ const { chromium } = require('playwright');
   chk(/دستیار/.test(info.sheet.title), 'title says the assistant filed it');
   info.ai = await p.evaluate(() => APP.callAI('x', 'y', { task: 'lla_assistant', maxTokens: 64 }).then(t => 'ok:' + t, e => 'err:' + (e.response ? e.response.status : e.message)));
   chk(!/422/.test(info.ai), 'the host accepts the assistant task: ' + info.ai);
+  // attachments with no Drive: an honest message (never a silent text-only answer)
+  info.files = await p.evaluate(() => APP.callAI('x', 'y', { task: 'lla_assistant', fileIds: [999], withMeta: true }).then(r => 'ok:' + JSON.stringify(r), e => 'err:' + e.message));
+  chk(/err:/.test(info.files) && /پیدا نشد|درایو/.test(info.files), 'missing/undriven attachment is reported, not ignored: ' + info.files);
   console.log(JSON.stringify(info).slice(0, 600));
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();

@@ -239,6 +239,15 @@ function AISettings({ embedded = false }) {
               : 'هنوز هیچ ارائه‌دهنده‌ای پیکربندی نشده — یک کلید اضافه کن.'}
           </div>
         )}
+        {/* the automatic daily model refresh — visible, so nobody has to wonder whether it ran (owner 2026-10-14) */}
+        {data?.maintenance?.model_refresh && (
+          <div data-testid="ai-refresh-status" dir="rtl"
+            className={`mb-4 rounded-xl p-3 text-xs border ${data.maintenance.model_refresh.last_error ? 'bg-red-50 border-red-100 text-red-700' : 'bg-gray-50 border-gray-100 text-gray-600'}`}>
+            به‌روزرسانیِ خودکارِ فهرستِ مدل‌ها (هر ۲۴ ساعت، برای همهٔ کارها؛ مدلِ منقضی خاموش و کنار گذاشته می‌شود، سنجاقِ کارِ آن آزاد می‌شود):
+            {' '}آخرین اجرا {data.maintenance.model_refresh.last_run ? new Date(data.maintenance.model_refresh.last_run).toLocaleString('fa-IR') : '—'}
+            {data.maintenance.model_refresh.last_error ? ` — خطا: ${data.maintenance.model_refresh.last_error}` : ' — موفق'}
+          </div>
+        )}
 
         <AIFeedbackWidget />
 

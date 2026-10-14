@@ -443,7 +443,8 @@ async def status(db: AsyncSession, *, user_id: Optional[int], app: str) -> Dict[
 # ---------------------------------------------------------------- attachments (bytes live ONLY in Drive)
 
 ATTACH_FOLDER = "پیوست‌ها"
-MAX_FILE_BYTES = 25 * 1024 * 1024
+# 100 MB like «نظارت و سرکشی» (owner 2026-10-14: «با حجم‌های مختلف … کامل بخواند»); was 25 MB
+MAX_FILE_BYTES = int(__import__("os").getenv("APP_FILE_MAX_MB", "100")) * 1024 * 1024
 
 
 class DriveUnavailable(RuntimeError):
@@ -480,7 +481,7 @@ async def upload_attachment(db: AsyncSession, *, user_id, app: str, rec_id: str,
     from app.models.app_file import AppFile
 
     if len(data) > MAX_FILE_BYTES:
-        raise ValueError("فایل بزرگ‌تر از ۲۵ مگابایت است")
+        raise ValueError(f"فایل بزرگ‌تر از {MAX_FILE_BYTES // 1048576} مگابایت است")
     drive_client, writer = clients if clients is not None else await _clients(db)
     if drive_client is None:
         raise DriveUnavailable("گوگل درایو وصل نیست — پیوست فقط در درایو نگه داشته می‌شود (نه در سرور)؛ اول در تنظیماتِ Lifemanager درایو را وصل کن.")

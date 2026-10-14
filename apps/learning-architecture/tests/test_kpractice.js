@@ -357,9 +357,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.dueRow === 1, 'today row');
   chk(info.interleavedHidesName, 'knot name visible before answer');
   chk(info.probeGate === 0 && info.probeAfter === 1 && info.probeTruth, 'probe gate ' + info.probeGate + '/' + info.probeAfter + '/' + info.probeTruth);
-  chk(/تصویرِ پیوست هم فرستاده شود \(۱\)/.test(info.imgLabel) && info.imgOn === true && info.imgWarn === 1 && /سؤالِ تصویریِ آزمونِ هوش/.test(info.imgFrom), 'knot image offer: ' + info.imgLabel + ' ' + info.imgOn + ' ' + info.imgFrom);
+  chk(/پیوست‌ها هم فرستاده و کامل خوانده شوند \(۳\)/.test(info.imgLabel) && info.imgOn === true && info.imgWarn === 1 && /سؤالِ تصویریِ آزمونِ هوش/.test(info.imgFrom), 'knot image offer: ' + info.imgLabel + ' ' + info.imgOn + ' ' + info.imgFrom);
   chk(info.imgAsked === 'kc_img2,kc_img1', 'newest case with an image first: ' + info.imgAsked);
-  chk(info.imgCalls === 'gen:[71] solve:null solve:null solve:null' && info.imgSolverText, 'generator gets the image, the three verifying solvers never: ' + info.imgCalls);
+  // all three files go to the generator since 2026-10-14 (WORKLOG 44: every format read in full); the solvers still never see them
+  chk(info.imgCalls === 'gen:[71,72,73] solve:null solve:null solve:null' && info.imgSolverText, 'generator gets the image, the three verifying solvers never: ' + info.imgCalls);
   chk(info.imgWarnOff === 0 && info.imgOffCalls, 'unticked => no fileIds: ' + info.imgOffCalls);
   console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
   await b.close();

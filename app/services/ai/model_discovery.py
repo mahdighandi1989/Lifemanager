@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import select
@@ -44,7 +45,8 @@ _GEMINI = re.compile(r"^gemini-(\d+(?:\.\d+)?)-(pro|flash-lite|flash)(?:-(\d{3})
 _GEMINI_ANY = re.compile(r"^gemini-(\d+(?:\.\d+)?)-(pro|flash-lite|flash)\b")
 _GEMINI_SKIP = ("embedding", "imagen", "veo", "tts", "aqa", "image", "live", "audio", "robotics",
                 "computer-use", "learnlm", "thinking-exp")
-_CLAUDE = re.compile(r"^claude-(opus|sonnet|haiku)-(\d+)(?:-(\d+))?(?:-(\d{8}))?$")
+# minor version is 1–2 digits: «claude-opus-4-20250514» is v4 + a date, not v4.2025 (it used to outrank 4.1)
+_CLAUDE = re.compile(r"^claude-(opus|sonnet|haiku)-(\d+)(?:-(\d{1,2}))?(?:-(\d{8}))?$")
 
 
 def _num(v: str) -> float:
@@ -297,4 +299,28 @@ async def refresh_all(db: AsyncSession) -> Dict[str, Any]:
             await db.rollback()
             logger.warning("model refresh %s failed: %s", pk, safe_error_text(exc))
             out[pk] = {"ok": False, "message": safe_error_text(exc)}
+    out["_routes"] = await release_dead_pins(db)
     return out
+
+
+async def release_dead_pins(db: AsyncSession) -> Dict[str, Any]:
+    """A task pinned to a model the provider no longer lists («[gone]», switched off) goes back to the
+    automatic pick — the pin is released (noted on the route), never left pointing at a dead model.
+    A pin to a model that is merely switched off by the owner is the owner's choice and stays."""
+    from app.models.ai_catalog import AITaskRoute
+
+    released = []
+    try:
+        routes = (await db.execute(select(AITaskRoute).where(AITaskRoute.model_id.isnot(None)))).scalars().all()
+        for r in routes:
+            m = await db.get(AICatalogModel, r.model_id)
+            if m is not None and not m.enabled and "[gone]" in (m.notes or ""):
+                r.notes = ((r.notes or "") + f" [auto-released {datetime.now(timezone.utc).date()}: «{m.api_id}» retired]").strip()[:500]
+                r.model_id = None
+                released.append(r.task)
+        if released:
+            await db.commit()
+    except Exception as exc:  # noqa: BLE001 — releasing pins must never fail the refresh
+        await db.rollback()
+        logger.warning("release_dead_pins failed: %s", exc)
+    return {"ok": True, "released": released}

@@ -396,7 +396,13 @@ async def _job_ai_model_refresh(db: AsyncSession) -> dict[str, Any]:
     from app.services.ai.model_discovery import refresh_all
 
     res = await refresh_all(db)
-    return {k: {f: v.get(f) for f in ("ok", "added", "enabled", "retired", "message")} for k, v in res.items()}
+    out = {k: {f: v.get(f) for f in ("ok", "added", "enabled", "retired", "message", "released")} for k, v in res.items()}
+    provs = {k: v for k, v in res.items() if not k.startswith("_")}
+    if provs and not any(v.get("ok") for v in provs.values()):
+        # every provider failed ⇒ the stamp must say so (it used to record «ok» with nothing refreshed)
+        raise RuntimeError("model refresh: every provider failed — " + "; ".join(
+            f"{k}: {v.get('message')}" for k, v in provs.items())[:600])
+    return out
 
 
 async def _job_app_reminders(db: AsyncSession) -> dict[str, Any]:

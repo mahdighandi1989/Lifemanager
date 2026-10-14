@@ -126,7 +126,9 @@ class AIIn(BaseModel):
     max_tokens: int = Field(2500, ge=64, le=8192)
     # ids of this user's attachments (app_files) to show the model — e.g. the photo of an IQ item.
     # Images/PDF only; the bytes are fetched from Drive for this one call and never stored here.
-    file_ids: List[int] = Field(default_factory=list, max_length=4)
+    # Since 2026-10-14 EVERY format is read in full (app_reading): up to 40 files per call, any type/size the upload
+    # allows — Word, Excel, PowerPoint, PDF (scanned pages by a vision model), e-mail, ZIP, audio/video (full transcript)…
+    file_ids: List[int] = Field(default_factory=list, max_length=40)
     # کدام «کار» (task route) — فقط همین دو؛ پیش‌فرض همان رفتارِ قبلی. «lla_assistant» = دستیارِ گفت‌وگوی سریع و ارزان.
     task: Optional[str] = Field(None, max_length=40)
 
@@ -244,18 +246,27 @@ async def _attachment_bytes(db: AsyncSession, user_id: int, app: str, ids: List[
 @router.post("/api/app-records/{app}/ai", tags=["app-records"])
 async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), user_id: int = Depends(_owner_channels)):
     _check_app(app)
-    from app.services.ai.inference_gateway import complete, complete_multimodal
+    from app.services.ai.inference_gateway import complete
 
     task = payload.task or "learning_architecture"
     if task not in _AI_TASKS:
         raise HTTPException(status_code=422, detail="task نامعتبر")
-    files = await _attachment_bytes(db, user_id, app, payload.file_ids) if payload.file_ids else []
-    if files:
-        res = await complete_multimodal(db, payload.user, files, task=task,
-                                        system=payload.system or None, max_tokens=payload.max_tokens)
-    else:
-        res = await complete(db, payload.user, task=task, system=payload.system or None,
-                             max_tokens=payload.max_tokens)
+    if payload.file_ids:
+        # read every attachment COMPLETELY first (never the old «4 images/PDF ≤ 8 MB, the rest silently dropped»);
+        # `_attachment_bytes` stays for reference (quarantine, not delete)
+        from app.services.app_reading import answer_with_files
+
+        res = await answer_with_files(db, user_id=user_id, app=app, file_ids=list(payload.file_ids), task=task,
+                                      system=payload.system or None, user=payload.user, max_tokens=payload.max_tokens)
+        if not res.get("ok"):
+            err = res.get("error") or "no_model"
+            msg = {"no_model": "مدلی برای «معماری یادگیری» تنظیم نشده؛ در تنظیمات AI مدلی برای این کار یا «عمومی» بگذار.",
+                   "no_capable_model": "هیچ مدلِ فعالی که تصویر/سند بخواند نیست (مثلاً Gemini با کلید)؛ پیوست‌ها خوانده نشدند."}.get(err, err)
+            return {"ok": False, "success": False, "error": msg, "text": "", "files": res.get("files") or []}
+        return {"ok": True, "success": True, "text": res.get("text") or "", "model": res.get("model"),
+                "files": res.get("files") or [], "mode": res.get("mode")}
+    res = await complete(db, payload.user, task=task, system=payload.system or None,
+                         max_tokens=payload.max_tokens)
     if not res.get("ok"):
         err = res.get("error") or "no_model"
         msg = "مدلی برای «معماری یادگیری» تنظیم نشده؛ در تنظیمات AI مدلی برای این کار یا «عمومی» بگذار." if err == "no_model" else f"خطای سرویس هوش مصنوعی: {err}"
@@ -323,7 +334,7 @@ async def files_upload(app: str, rec_id: str = Form(...), group: str = Form(""),
 
     data = await file.read(MAX_FILE_BYTES + 1)
     if len(data) > MAX_FILE_BYTES:
-        raise HTTPException(status_code=413, detail="فایل بزرگ‌تر از ۲۵ مگابایت است")
+        raise HTTPException(status_code=413, detail=f"فایل بزرگ‌تر از {MAX_FILE_BYTES // 1048576} مگابایت است")
     if not data:
         raise HTTPException(status_code=422, detail="فایل خالی است")
     try:

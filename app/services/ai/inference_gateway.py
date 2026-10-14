@@ -95,46 +95,52 @@ async def complete(
     temperature: Optional[float] = None,
     model_id: Optional[int] = None,
 ) -> Dict[str, Any]:
-    """Complete a text prompt with the resolved model for ``task``."""
-    rm = (
-        await ai_manager.resolve_specific(db, model_id, task)
-        if model_id is not None
-        else await ai_manager.resolve(db, task)
-    )
-    if rm is None or not rm.is_usable:
-        # one fallback: the generic task may have a model when the specific one doesn't
-        if model_id is None and task != "general":
-            rm = await ai_manager.resolve(db, "general")
-    if rm is None or not rm.is_usable:
+    """Complete a text prompt with the resolved model for ``task``.
+
+    Automatic pick (no ``model_id``): up to three candidates in order (owner's live pin, then the
+    automatic order); a failed call — retired model, 404, outage, empty answer — falls over to the
+    next one, each attempt logged. An explicit ``model_id`` is tried alone (the caller asked for it)."""
+    if model_id is not None:
+        rm = await ai_manager.resolve_specific(db, model_id, task)
+        rms = [rm] if rm is not None and rm.is_usable else []
+    else:
+        rms = await ai_manager.candidates(db, task)
+        if not rms and task != "general":
+            # one fallback: the generic task may have a model when the specific one doesn't
+            rms = await ai_manager.candidates(db, "general")
+    if not rms:
         return {"ok": False, "error": "no_model", "text": "", "model": None}
 
     import time as _time
 
-    _start = _time.perf_counter()
-    try:
-        if _is_anthropic(rm):
-            text = await _anthropic_text(rm, prompt, system, max_tokens, temperature)
-        elif _is_gemini(rm):
-            text = await _gemini_text(rm, prompt, system, max_tokens, temperature)
-        else:
-            text = await _openai_text(rm, prompt, system, max_tokens, temperature)
-        if not (text or "").strip():
-            raise EmptyAnswer("پاسخِ خالی از مدل")
-        await _record_usage(
-            db, task=task, rm=rm, ok=True, error=None,
-            prompt_chars=len(prompt), output_chars=len(text or ""),
-            latency_ms=int((_time.perf_counter() - _start) * 1000),
-        )
-        return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
-    except Exception as exc:  # transport / provider error → uniform failure
-        err = safe_error_text(exc)
-        await _record_usage(
-            db, task=task, rm=rm, ok=False,
-            error=err,
-            prompt_chars=len(prompt), output_chars=0,
-            latency_ms=int((_time.perf_counter() - _start) * 1000),
-        )
-        return {"ok": False, "error": err, "text": "", "model": rm.display_name}
+    last: Dict[str, Any] = {}
+    for rm in rms:
+        _start = _time.perf_counter()
+        try:
+            if _is_anthropic(rm):
+                text = await _anthropic_text(rm, prompt, system, max_tokens, temperature)
+            elif _is_gemini(rm):
+                text = await _gemini_text(rm, prompt, system, max_tokens, temperature)
+            else:
+                text = await _openai_text(rm, prompt, system, max_tokens, temperature)
+            if not (text or "").strip():
+                raise EmptyAnswer("پاسخِ خالی از مدل")
+            await _record_usage(
+                db, task=task, rm=rm, ok=True, error=None,
+                prompt_chars=len(prompt), output_chars=len(text or ""),
+                latency_ms=int((_time.perf_counter() - _start) * 1000),
+            )
+            return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
+        except Exception as exc:  # transport / provider error → try the next candidate
+            err = safe_error_text(exc)
+            await _record_usage(
+                db, task=task, rm=rm, ok=False,
+                error=err,
+                prompt_chars=len(prompt), output_chars=0,
+                latency_ms=int((_time.perf_counter() - _start) * 1000),
+            )
+            last = {"ok": False, "error": err, "text": "", "model": rm.display_name}
+    return last
 
 
 async def _record_usage(
@@ -303,11 +309,6 @@ async def complete_multimodal(
     documents/vision-capable model. Returns ``{ok, text, model}`` or an error
     dict with ``suggestions`` (other capable models) when the chosen model can't
     read the format."""
-    rm = (
-        await ai_manager.resolve_specific(db, model_id, task)
-        if model_id is not None
-        else await ai_manager.resolve(db, task)
-    )
     # Capability the files actually need — so resolution picks a model that can
     # really read them (audio/video ⇒ audio, PDF ⇒ documents, else ⇒ vision).
     # This is what keeps routing automatic: ANY enabled model carrying the needed
@@ -319,46 +320,47 @@ async def complete_multimodal(
         need = "audio"
     else:
         need = "vision"
-    if rm is None or not rm.is_usable or need not in rm.capabilities:
-        capable = await ai_manager.capable_models(db, need)
-        # کارِ «سریع/ارزان» (preferred=fast) نباید بی‌صدا به گران‌ترین مدلِ توانا (کمترین priority) برود:
-        # میانِ مدل‌های توانا، آن‌هایی که قابلیتِ ترجیحیِ همین کار را هم دارند جلوتر (سایر کارها همان رفتارِ قبلی)
-        try:
-            from app.services.ai.catalog import task_preferred_capability
-            pref = task_preferred_capability(task)
-        except Exception:
-            pref = None
-        if pref == "fast" and capable:
-            capable = sorted(capable, key=lambda m: (pref not in (m.capabilities or []), m.priority))
-        if not capable:
-            return {"ok": False, "error": "no_capable_model", "text": "", "model": None,
-                    "suggestions": []}
-        # pick the best capable model and resolve it
-        rm = await ai_manager.resolve_specific(db, capable[0].id, task)
-        if rm is None or not rm.is_usable:
+    if model_id is not None:
+        rm = await ai_manager.resolve_specific(db, model_id, task)
+        rms = [rm] if rm is not None and rm.is_usable and need in rm.capabilities else []
+        if not rms:
+            capable = await ai_manager.capable_models(db, need)
             return {"ok": False, "error": "no_capable_model", "text": "", "model": None,
                     "suggestions": [{"id": m.id, "display_name": m.display_name} for m in capable]}
+    else:
+        # pin (if it can read these files) ⇒ automatic order among capable models; for a «fast/cheap»
+        # task (preferred=fast) the fast capable ones come first — never silently the priciest.
+        rms = await ai_manager.candidates(db, task, need=need)
+        if not rms:
+            capable = await ai_manager.capable_models(db, need)
+            if capable:  # capable but its provider unusable (e.g. key missing) — say which ones exist
+                return {"ok": False, "error": "no_capable_model", "text": "", "model": None,
+                        "suggestions": [{"id": m.id, "display_name": m.display_name} for m in capable]}
+            return {"ok": False, "error": "no_capable_model", "text": "", "model": None, "suggestions": []}
 
     import time as _time
-    _start = _time.perf_counter()
-    try:
-        if _is_anthropic(rm):
-            text = await _anthropic_multimodal(rm, prompt, files, system, max_tokens)
-        elif _is_gemini(rm):
-            text = await _gemini_multimodal(rm, prompt, files, system, max_tokens)
-        else:
-            text = await _openai_multimodal(rm, prompt, files, system, max_tokens)
-        if not (text or "").strip():
-            raise EmptyAnswer("پاسخِ خالی از مدل")
-        # حسابداریِ مصرف برای فراخوانی‌های تصویر/سند هم (پیش‌تر ثبت نمی‌شد)
-        await _record_usage(db, task=task, rm=rm, ok=True, error=None, prompt_chars=len(prompt),
-                            output_chars=len(text or ""), latency_ms=int((_time.perf_counter() - _start) * 1000))
-        return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
-    except Exception as exc:
-        err = safe_error_text(exc)
-        await _record_usage(db, task=task, rm=rm, ok=False, error=err, prompt_chars=len(prompt),
-                            output_chars=0, latency_ms=int((_time.perf_counter() - _start) * 1000))
-        return {"ok": False, "error": err, "text": "", "model": rm.display_name}
+    last: Dict[str, Any] = {}
+    for rm in rms:
+        _start = _time.perf_counter()
+        try:
+            if _is_anthropic(rm):
+                text = await _anthropic_multimodal(rm, prompt, files, system, max_tokens)
+            elif _is_gemini(rm):
+                text = await _gemini_multimodal(rm, prompt, files, system, max_tokens)
+            else:
+                text = await _openai_multimodal(rm, prompt, files, system, max_tokens)
+            if not (text or "").strip():
+                raise EmptyAnswer("پاسخِ خالی از مدل")
+            # حسابداریِ مصرف برای فراخوانی‌های تصویر/سند هم
+            await _record_usage(db, task=task, rm=rm, ok=True, error=None, prompt_chars=len(prompt),
+                                output_chars=len(text or ""), latency_ms=int((_time.perf_counter() - _start) * 1000))
+            return {"ok": True, "text": text, "model": rm.display_name, "provider": rm.provider_key}
+        except Exception as exc:
+            err = safe_error_text(exc)
+            await _record_usage(db, task=task, rm=rm, ok=False, error=err, prompt_chars=len(prompt),
+                                output_chars=0, latency_ms=int((_time.perf_counter() - _start) * 1000))
+            last = {"ok": False, "error": err, "text": "", "model": rm.display_name}
+    return last
 
 
 def _b64(data: bytes) -> str:

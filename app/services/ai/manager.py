@@ -126,27 +126,77 @@ class AIManager:
             if model and model.enabled and model.provider_key in configured:
                 return self._build(task, model, providers[model.provider_key])
 
-        # Candidate pool: enabled models on configured, enabled providers.
+        ordered = await self._auto_order(db, task, providers, configured)
+        if not ordered:
+            return None
+        best = ordered[0]
+        return self._build(task, best, providers[best.provider_key])
+
+    @staticmethod
+    def _newness(m: AICatalogModel) -> float:
+        """Version rank from the model id (same parser the daily refresh uses) — breaks priority ties
+        toward the NEWER model instead of database order. Unknown families rank 0."""
+        try:
+            from app.services.ai.model_discovery import classify
+
+            c = classify(m.provider_key, {"id": m.api_id or "", "methods": ["generateContent"]})
+            return float((c or {}).get("rank") or 0.0)
+        except Exception:  # noqa: BLE001 — ranking is a tie-breaker, never a failure
+            return 0.0
+
+    def _sort(self, models: List[AICatalogModel]) -> List[AICatalogModel]:
+        return sorted(models, key=lambda m: ("[gone]" in (m.notes or ""), m.priority, -self._newness(m), m.id or 0))
+
+    async def _auto_order(self, db: AsyncSession, task: str, providers=None, configured=None,
+                          need: Optional[str] = None) -> List[AICatalogModel]:
+        """Automatic pick order for ``task`` (no pin): enabled models on configured providers;
+        models with every REQUIRED capability of the task (if any exists) ⇒ then those with the
+        PREFERRED capability first ⇒ then priority ⇒ newest. ``need`` (a file's capability) is a hard filter."""
+        from app.services.ai.catalog import task_required_capabilities
+
+        if providers is None:
+            providers = await self._provider_map(db)
+        if configured is None:
+            configured = {k for k, p in providers.items() if p.enabled and self.provider_configured(p)}
         models = (
-            await db.execute(
-                select(AICatalogModel).where(AICatalogModel.enabled.is_(True))
-            )
+            await db.execute(select(AICatalogModel).where(AICatalogModel.enabled.is_(True)))
         ).scalars().all()
         pool = [m for m in models if m.provider_key in configured]
-        if not pool:
-            return None
-
-        # 2) prefer a model that supports the task's preferred capability.
-        need = task_preferred_capability(task)
         if need:
-            capable = [m for m in pool if need in (m.capabilities or [])]
-            if capable:
-                best = min(capable, key=lambda m: m.priority)
-                return self._build(task, best, providers[best.provider_key])
+            pool = [m for m in pool if need in (m.capabilities or [])]
+        req = task_required_capabilities(task)
+        if req:
+            full = [m for m in pool if all(c in (m.capabilities or []) for c in req)]
+            if full:
+                pool = full
+        pref = task_preferred_capability(task)
+        preferred = self._sort([m for m in pool if pref and pref in (m.capabilities or [])])
+        rest = self._sort([m for m in pool if m not in preferred])
+        return preferred + rest
 
-        # 3) fall back to the highest-priority configured model of any kind.
-        best = min(pool, key=lambda m: m.priority)
-        return self._build(task, best, providers[best.provider_key])
+    async def candidates(self, db: AsyncSession, task: str = "general", need: Optional[str] = None,
+                         limit: int = 3) -> List[ResolvedModel]:
+        """Ordered models to TRY for one call: the owner's live pin first (if it can serve ``need``),
+        then the automatic order. The gateway falls over to the next one when a call fails (retired
+        model, 404, outage) — so a stale model never leaves a task without an answer."""
+        providers = await self._provider_map(db)
+        configured = {k for k, p in providers.items() if p.enabled and self.provider_configured(p)}
+        out: List[ResolvedModel] = []
+        seen = set()
+        route = (await db.execute(select(AITaskRoute).where(AITaskRoute.task == task))).scalar_one_or_none()
+        if route and route.enabled and route.model_id:
+            m = await db.get(AICatalogModel, route.model_id)
+            if m and m.enabled and m.provider_key in configured and (not need or need in (m.capabilities or [])):
+                out.append(self._build(task, m, providers[m.provider_key])); seen.add(m.id)
+        for m in await self._auto_order(db, task, providers, configured, need):
+            if len(out) >= limit:
+                break
+            if m.id in seen:
+                continue
+            rm = self._build(task, m, providers[m.provider_key])
+            if rm.is_usable:
+                out.append(rm); seen.add(m.id)
+        return out
 
     async def resolve_specific(
         self, db: AsyncSession, model_id: int, task: str = "general"

@@ -464,10 +464,11 @@
   }
   A.knotParseJSON = parseJSON;
   /* ---------- پیوستِ تصویری برای هوش مصنوعی («عکسِ سؤالِ آزمونِ هوش»؛ مالک ۲۰۲۶-۱۰-۱۲) ----------
-     فقط در میزبان (A.HOST.files): عکس/PDF ِ پیوست‌های یک موقعیت (≤ ۸ مگابایت، حداکثر ۴) — همان مرزی که سرور هم می‌گذارد.
+     فقط در میزبان (A.HOST.files): پیوست‌های یک موقعیت — از ۲۰۲۶-۱۰-۱۴ **هر قالب** (Word، Excel، PowerPoint، PDF ِ اسکن‌شده، صوت/ویدیو،
+     ZIP، …) تا ۴۰ فایل و ۱۰۰ مگابایت؛ سرور هر کدام را **کامل** می‌خواند (app_reading) — پیش‌تر فقط ۴ عکس/PDF ِ ≤ ۸ مگابایت.
      recIds به ترتیبِ اولویت؛ اولین موقعیتی که پیوستِ مناسب دارد برگزیده می‌شود. نسخهٔ مستقل ⇒ null (همه‌چیز بی تصویر کار می‌کند). */
-  var AI_FILE_MAX = 8 * 1024 * 1024;
-  function aiFileOk(f) { return !!f && f.id != null && (/^image\//.test(f.mime || "") || f.mime === "application/pdf") && (+f.size || 0) <= AI_FILE_MAX; }
+  var AI_FILE_MAX = 100 * 1024 * 1024;
+  function aiFileOk(f) { return !!f && f.id != null && (+f.size || 0) <= AI_FILE_MAX; }
   A.knotAIFileOk = aiFileOk;
   A.knotAttachables = function (recIds) {
     if (!(A.HOST && typeof A.HOST.files === "function")) return Promise.resolve(null);
@@ -478,7 +479,7 @@
         var rid = ids[i++], pr;
         try { pr = A.HOST.files(rid); } catch (e) { return next(); }
         Promise.resolve(pr).then(function (fs) {
-          var ok = (fs || []).filter(aiFileOk).slice(0, 4);
+          var ok = (fs || []).filter(aiFileOk).slice(0, 40);
           if (ok.length) resolve({ recId: rid, files: ok }); else next();
         }, function () { next(); });
       })();
@@ -507,16 +508,16 @@
       /* پیوستِ تصویری: فقط اگر میزبان پیوست دارد؛ تا خوانده نشده، چیزی فرستاده نمی‌شود (fileIds خالی) */
       var attBox = null;
       if (o.attach && A.HOST && typeof A.HOST.files === "function") {
-        attBox = h("div", { class: "kn-ai-att small muted", "aria-live": "polite" }, "در حالِ خواندنِ پیوست‌های تصویری…");
+        attBox = h("div", { class: "kn-ai-att small muted", "aria-live": "polite" }, "در حالِ خواندنِ فهرستِ پیوست‌ها…");
         A.knotAttachables(o.attach.recIds).then(function (r) {
           attBox.innerHTML = "";
-          if (!r) { attBox.textContent = "پیوستِ تصویری (عکس/PDF) برای این موقعیت نیست؛ فقط متن فرستاده می‌شود."; return; }
+          if (!r) { attBox.textContent = "پیوستی برای این موقعیت نیست؛ فقط متن فرستاده می‌شود."; return; }
           att = r; var rec = S.get(r.recId) || {};
           attOn = (rec.kinds || []).indexOf("problem") >= 0;
-          var warn = h("p", { class: "small warnline kn-ai-attw" + (attOn ? "" : " hidden") }, "تصویر/PDF ِ پیوست هم همراهِ همین متن برای همان ارائه‌دهندهٔ بیرونیِ هوش مصنوعی فرستاده می‌شود. «حذفِ نام‌ها» فقط روی متن اثر دارد، نه روی محتوای تصویر.");
+          var warn = h("p", { class: "small warnline kn-ai-attw" + (attOn ? "" : " hidden") }, "پیوست‌ها هم همراهِ همین متن برای همان ارائه‌دهندهٔ بیرونیِ هوش مصنوعی فرستاده و کامل خوانده می‌شوند. «حذفِ نام‌ها» فقط روی متن اثر دارد، نه روی محتوای فایل‌ها.");
           attBox.classList.remove("muted");
           attBox.appendChild(h("label", { class: "row gap", for: "knAiAtt" }, h("input", { type: "checkbox", id: "knAiAtt", checked: attOn, onchange: function (e) { attOn = e.target.checked; warn.classList.toggle("hidden", !attOn); } }),
-            "تصویرِ پیوست هم فرستاده شود (" + fa(r.files.length) + ")"));
+            "پیوست‌ها هم فرستاده و کامل خوانده شوند (" + fa(r.files.length) + ")"));
           attBox.appendChild(h("ul", { class: "plain small kn-ai-files" }, r.files.map(function (f) { return h("li", {}, "📎 ", h("bdi", {}, f.name || "پیوست")); })));
           var ids0 = o.attach.recIds || [];
           if (ids0.length > 1 || ids0[0] !== r.recId) attBox.appendChild(h("p", { class: "small muted" }, "از موقعیتِ «" + (rec.title || "موقعیت") + "»."));
@@ -722,7 +723,7 @@
         (fs || []).forEach(function (f) { list.appendChild(h("li", {}, h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📎 " + (f.name || "پیوست")))); });
       }, function () { });
     }
-    var inp = h("input", { type: "file", id: "knPhoto", accept: "image/*,application/pdf", multiple: true, onchange: function () {
+    var inp = h("input", { type: "file", id: "knPhoto", multiple: true, onchange: function () {
       var files = Array.prototype.slice.call(inp.files || []); if (!files.length) return;
       if (!H.live()) H.put(); else H.flush();   // the record must exist before its first attachment
       var i = 0, ok = 0;
@@ -733,7 +734,7 @@
           return;
         }
         var f = files[i++];
-        if (f.size > 25 * 1048576) { st.textContent = "«" + f.name + "» بزرگ‌تر از ۲۵ مگابایت است."; A.toast(st.textContent, "bad"); return next(); }
+        if (f.size > 100 * 1048576) { st.textContent = "«" + f.name + "» بزرگ‌تر از ۱۰۰ مگابایت است."; A.toast(st.textContent, "bad"); return next(); }
         st.textContent = "در حالِ فرستادنِ «" + f.name + "» به درایو…";
         Promise.resolve().then(function () { return A.HOST.upload(kc.id, f, { group: "گره‌گشا — موقعیت‌ها", title: kc.title || "موقعیت" }); })
           .then(function () { ok++; next(); }, function (e) { st.textContent = upErr(e); st.classList.remove("muted"); st.classList.add("bad"); A.toast(st.textContent, "bad"); next(); });
@@ -741,7 +742,7 @@
     } });
     load();
     return fld("عکسِ سؤال (اختیاری)", h("div", { class: "col gap kn-photo" }, h("div", { class: "row gap wrap" }, inp, st), list),
-      { hint: "عکس یا PDF ِ صورتِ مسئله؛ مستقیم در فولدرِ همین موقعیت در گوگل درایو (نه در سرور). اگر هوش مصنوعی بخواهی، پیش از هر درخواست می‌پرسیم که تصویر هم فرستاده شود یا نه." });
+      { hint: "عکس، PDF یا هر فایلِ صورتِ مسئله (Word، Excel، صوت…)؛ مستقیم در فولدرِ همین موقعیت در گوگل درایو (نه در سرور). اگر هوش مصنوعی بخواهی، پیش از هر درخواست می‌پرسیم که تصویر هم فرستاده شود یا نه." });
   }
 
   /* ---------- ثبت ---------- */
