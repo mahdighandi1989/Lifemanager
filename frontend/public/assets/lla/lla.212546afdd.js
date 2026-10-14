@@ -31867,6 +31867,7 @@ APP.goFromURL = function (q) {
     var n0 = ((S.settings().knots || {}).notify) || {}, n = { telegram: n0.telegram !== false, email: n0.email !== false, hour: n0.hour }, key = "tour:" + s.id;
     var open = s.tour && ((!s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; })) || (s.tour.doneAt && !s.tour.masteredAt && !mastered(s.tour)));
     try {
+      if (open && !n.telegram && !n.email && !s.remOffSaid) { s.remOffSaid = nowIso(); (s.msgs = s.msgs || []).push({ role: "sys", at: nowIso(), text: "🔕 یادآورها خاموش است (تلگرام و ایمیل، در تنظیماتِ گره‌گشا) — پیگیریِ این تور فقط در «امروز» می‌آید؛ اگر یادآور می‌خواهی، یکی را روشن کن." }); }
       if (!open || (!n.telegram && !n.email)) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
       var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0] || s.tour.facets.filter(function (x) { return followups(x).length; })[0];
       // یادآور برای نزدیک‌ترین تمرین/موعدِ همین تور (بازبینیِ پرونده، آزمایشِ واقعی، زنجیره، پیش‌بینی، …) — نه فقط «فردا» (کارزارِ آزمون: موعدِ بازبینی یادآور نداشت)
@@ -31890,6 +31891,7 @@ APP.goFromURL = function (q) {
     try { if (A.HOST && A.HOST.sheet && A.S.loaded) AS.tourSweep(); } catch (e) { console.error(e); }
   };
   AS.tourKinds = KIND;
+  AS.tourSyncReminder = syncReminder;
 })(APP);
 /* ===== «🗺 قلمروِ سامانه‌ها» — نقشهٔ هر سامانهٔ این صفحه بر پایهٔ اصول، با پیشرفتِ گام‌به‌گام (مالک ۲۰۲۶-۱۰-۱۴) =====
    مالک: «در هر قسمت قلمروهای جدید و منطقی بر اساسِ بدیهیاتِ قطعی بسازد، نه فقط برای معرفت‌شناسی — همه چیز».
