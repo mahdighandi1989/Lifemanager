@@ -21498,7 +21498,8 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       inp("عنوان", "title"), inp("رشته", "field"), inp("بازه حل‌نشده ماندن", "open", 0, "مثلاً ۱۶۳۷–۱۹۹۵"), inp("صورت مسئله", "statement", 4), inp("پاسخ نهایی و حل‌کننده", "answer", 3),
       inp("منابع (اختیاری، ولی بازبینیِ تاریخی را دقیق‌تر می‌کند — نامِ کتاب/مقاله یا نشانیِ اینترنتی؛ هر منبع در یک سطر)", "src", 2), inp("یادداشت (اختیاری)", "notes", 2),
       attBlock(),
-      h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-ai", onclick: function (e) {
+      // فرستادنِ متنِ تو به هوش مصنوعی تصمیمِ خودِ توست: دستیار این دکمه را نمی‌زند، زردش می‌کند (کارزارِ آزمونِ دوم c12)
+      h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-ai", "data-own": "1", onclick: function (e) {
         if (!f.title) { A.toast("عنوان لازم است.", "bad"); return; }
         var nosrc = !String(f.src || "").trim();   // منبع اختیاری شد (۲۰۲۶-۱۰-۱۳)؛ بی‌منبع ⇒ بازبین فقط با دانشِ تاریخیِ مستقر می‌سنجد و برچسبِ «بی‌منبع»
         var b = e.target;
@@ -30914,6 +30915,7 @@ APP.goFromURL = function (q) {
       // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
       if (x.getAttribute("role") === "tab") bt = "";
       if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
+      if (x.closest && x.closest("[data-own]")) { mark(x, "این را خودت بزن", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودِ توست (مثلاً فرستادنِ متنت به هوش مصنوعی)؛ زردش کردم، اگر خواستی بزن"; }
       if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
       var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
       x.click(); clicked.n++; clicked.changed = clicked.changed || before !== document.querySelectorAll("#main input,#main textarea,#main select").length; return "";

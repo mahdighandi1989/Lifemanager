@@ -248,6 +248,7 @@
       // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
       if (x.getAttribute("role") === "tab") bt = "";
       if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
+      if (x.closest && x.closest("[data-own]")) { mark(x, "این را خودت بزن", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودِ توست (مثلاً فرستادنِ متنت به هوش مصنوعی)؛ زردش کردم، اگر خواستی بزن"; }
       if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
       var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
       x.click(); clicked.n++; clicked.changed = clicked.changed || before !== document.querySelectorAll("#main input,#main textarea,#main select").length; return "";

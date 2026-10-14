@@ -56,6 +56,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     pq2.items[0].self = 'بلد نیستم'; pq2.items[1].self = 'بلدم'; APP.S.put(pq2); APP.go('prereq', pq.id); await new Promise(r => setTimeout(r, 120));
     out.refShown = /پاسخِ مرجع/.test(document.getElementById('main').innerText);
     { const sc = AS.scan(), f = sc.fields.find(x => /دوباره امتحان کردی/.test(x.label)); const r = await AS.run([{ do: 'fill', k: f.k, value: 'حل شد' }]); out.ownBack = APP.S.get(pq.id).back !== 'حل شد' && /به قلمِ خودِ توست/.test(r.notes.join()); }
+    { let hit = 0; const bt = document.createElement('button'); bt.setAttribute('data-own', '1'); bt.textContent = 'تجزیه با هوش مصنوعی'; bt.onclick = () => hit++; document.getElementById('main').appendChild(bt);
+      const sc = AS.scan(), b = sc.buttons.find(x => /تجزیه با هوش/.test(x.label)); const r = await AS.run([{ do: 'click', k: b.k }]); out.ownClick = hit === 0 && /تصمیمِ خودِ توست/.test(r.notes.join()); bt.remove(); }
     [...document.querySelectorAll('#main button')].find(x => /موضوعِ یادگیری بساز/.test(x.textContent)).click(); await new Promise(r => setTimeout(r, 150));
     const pq3 = APP.S.get(pq.id), tp = APP.S.get(pq3.items[0].topic);
     out.topic = !!tp && /سودِ مرکب/.test(tp.title) && /ریاضیِ مالی/.test(tp.title);
@@ -77,6 +79,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.prompt && S.drawer, 'the model sees prior knots and the sieve state; the drawer shows the sieve');
   chk(S.made && S.gate && S.items && S.refShown && S.topic, 'prerequisite map: AI only after «بفرست», marked unverified; user self-rates; missing ⇒ learning topic with science › branch');
   chk(/^100000>111/.test(S.ms), 'prereq facet milestones come from the map, the self-ratings and the topics: ' + S.ms);
+  chk(S.ownClick, 'the assistant never presses an owner-only button (e.g. sending the problem to the AI)');
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');
   chk(S.noCodes && S.humanized, 'the e-mail carries no internal codes (facet keys, family codes, area/record ids, sheet jargon) — names instead');
   console.log(JSON.stringify(info).slice(0, 2500));
