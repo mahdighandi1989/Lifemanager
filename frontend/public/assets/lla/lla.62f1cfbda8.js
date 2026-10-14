@@ -32279,6 +32279,12 @@ APP.goFromURL = function (q) {
     var x0 = 40, x1 = W - 20, y0 = H - 40, y1 = 40;
     s.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y1, stroke: "#ccc", "stroke-dasharray": "4 3" }));
     s.appendChild(txt((x0 + x1) / 2, H - 12, "اطمینان", { "font-size": 10 })); s.appendChild(txt(16, (y0 + y1) / 2, "درستی", { "font-size": 10 }));
+    // محورها با عدد (کارزارِ آزمون sc09: نمودار عدد نداشت)
+    s.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y0, stroke: "#999" })); s.appendChild(el("line", { x1: x0, y1: y0, x2: x0, y2: y1, stroke: "#999" }));
+    [0, 50, 100].forEach(function (v) {
+      s.appendChild(txt(x0 + (x1 - x0) * v / 100, y0 + 14, A.fa(v) + "٪", { "font-size": 9, fill: "#666" }));
+      s.appendChild(txt(x0 - 14, y0 - (y0 - y1) * v / 100 + 3, A.fa(v) + "٪", { "font-size": 9, fill: "#666" }));
+    });
     for (var i = 0; i < 10; i++) {
       var bin = all.filter(function (c) { return Math.min(9, Math.floor(c.p * 10)) === i; }); if (!bin.length) continue;
       var acc = bin.filter(function (c) { return c.ok; }).length / bin.length, cx = x0 + (x1 - x0) * (i + 0.5) / 10, cy = y0 - (y0 - y1) * acc;
