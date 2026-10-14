@@ -19,9 +19,10 @@ const sha = o => crypto.createHash('sha256').update(JSON.stringify(o)).digest('h
    pb_greek/cs_pb_greek_indiana (conf + st_conflict)، pb_longitude/cs_pb_long_h4 (ind_complete)، pb_poincare/cs_pb_poinc_1900 (conf).
    به‌روز ۲۰۲۶-۱۰-۱۳ (WORKLOG (33)، p_found_scope پذیرفتهٔ مالک): ویژگیِ «گسترهٔ ادعا» (scope) با رمزگذاریِ کور روی دو تصدیقِ استقرایی
    (cs_pb_flt_numeric/k2، cs_pb_long_generalize/k1) افزوده شد؛ هیچ مقدارِ دیگری عوض نشد.
+   به‌روز ۲۰۲۶-۱۰-۱۴ (WORKLOG (34)): «conf: 60» ِ cs_pb_flt_numeric/k2 برداشته شد — عددِ ساختهٔ سامانه بود، نه مستند (یافتهٔ f_cs_pb_flt_numeric).
    هر تغییرِ بعدیِ cases فقط از همین مسیر (یافته ⇒ تشخیص ⇒ اصلاح، با ثبت در WORKLOG) و با به‌روزکردنِ همین هش‌ها. */
-const CASES_SHA = '374ecd04841737899bd6029d0a7f7d357d859b7e8180b032f368803835bea87c';
-const PROTECTED_SHA = 'c0f463089996fa5c68c529e8a1393f5fd2347d6be97e8ceab650fec00d8b2c1d';
+const CASES_SHA = '45123c2d8bb5bd002638ad4c0c6a1e82fddfe0098e058cbf4caf8eec671eac45';
+const PROTECTED_SHA = 'eeb28698e67c10bcbfae26fd99b6ed756df067daa02e0f3cd35d1ce6215ce204';
 const IDS = 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis';
 
 function protectedView(list) {
