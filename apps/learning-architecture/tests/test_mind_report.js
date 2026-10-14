@@ -138,6 +138,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.brier = JSON.stringify(APP.fcastBrier()); out.calDec = APP.MIND.model().dims.find(d => d.id === 's_decision').n.cal >= 1;
     APP.go('chain', 'wc_t1'); await new Promise(r => setTimeout(r, 150)); out.chainView = /سقفِ کلِ زنجیره/.test(document.getElementById('main').innerText) && /فاجعه‌سازی/.test(document.getElementById('main').innerText);
     out.nav = (APP.NAV || []).some(n => Array.isArray(n) && n[0] === 'chain') && (APP.NAV || []).some(n => Array.isArray(n) && n[0] === 'mind');
+    // 🧭 ارزش‌ها و معنا: ناهم‌خوانیِ اهمیت/وقت و کشمکشِ بی‌قاعده دیده می‌شود؛ وارسیِ معنا در «امروز»
+    APP.S.put({ id: 'vl_a', type: 'value', title: 'خانواده', imp: 9, hours: 2, vs: [{ with: 'درآمد', rule: '' }] }); APP.S.put({ id: 'vl_b', type: 'value', title: 'درآمد', imp: 7, hours: 50, vs: [] });
+    const vk = APP.valsCheck(); out.vals = vk.gaps.join() + '|' + vk.open.join();
+    out.valsToday = APP.dueList().some(x => /وارسیِ ماهانهٔ معنا/.test(x.txt));
+    APP.go('vals'); await new Promise(r => setTimeout(r, 150)); out.valsView = /کشمکش بی قاعدهٔ ترجیح/.test(document.getElementById('main').innerText);
     // یادآورها خاموش ⇒ یک بار صریح گفته می‌شود (نه سکوت)
     APP.HOST.remind = APP.HOST.remind || (async () => ({ ok: true })); const st = APP.S.settings(); st.knots = st.knots || {}; st.knots.notify = { telegram: false, email: false };
     AS.tourSyncReminder(s); AS.tourSyncReminder(s); out.remOff = s.msgs.filter(x => /یادآورها خاموش/.test(x.text)).length;
@@ -150,7 +155,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.camp.chainCalc === '{"prod":6,"min":20,"n":2}', 'worry chain: ceiling = weakest link, independent = product: ' + info.camp.chainCalc);
   chk(info.camp.correct && info.camp.toast, 'a claimed-but-failed action triggers a correction turn; page messages reach the next prompt');
   chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
-  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
+  chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');

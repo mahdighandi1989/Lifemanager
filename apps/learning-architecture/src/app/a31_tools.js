@@ -91,6 +91,57 @@
     return root;
   };
 
+  /* ---------- 🧭 ارزش‌ها و معنا (کمبودِ sf_values / sf_meaning — کارزارِ آزمون: کارِ معنا جایی ثبت نمی‌شد) ----------
+     ارزش‌ها: اهمیت (۰ تا ۱۰) کنارِ ساعتِ واقعیِ هفته — ناهم‌خوانی دیده می‌شود، داوری نمی‌شود. دو ارزشِ در کشمکش بی «قاعدهٔ ترجیح»
+     ناقص‌اند (قضیه، A0: تحققِ کاملِ هر دو یعنی «الف و نه‌الف»). معنا: «حضور» و «جست‌وجو» دو بُعدِ جدا (استگر ۲۰۰۶)، هر ماه یک وارسی
+     با واژه‌های خودت — نه پرسشنامهٔ رسمی؛ کدام ارزش «درست» است بیرون از این ابزار است (st_truth). */
+  A.valsCheck = function () {
+    var vs = S.all("value"), tot = vs.reduce(function (t, v) { return t + (num(v.hours) || 0); }, 0), out = { gaps: [], open: [] };
+    vs.forEach(function (v) { var imp = num(v.imp), sh = tot ? (num(v.hours) || 0) / tot : 0; if (imp != null && imp >= 7 && tot && sh < 0.1) out.gaps.push(v.title); });
+    vs.forEach(function (v) { (v.vs || []).forEach(function (c) { if (!(c.rule || "").trim()) out.open.push(v.title + " ⟷ " + c.with); }); });
+    out.tot = tot; return out;
+  };
+  A.V.vals = function () {
+    var root = h("div", { class: "page", dir: "rtl" });
+    root.appendChild(A.head("خودشناسی، ارزش‌ها و معنا", "🧭 ارزش‌ها و معنا", "چه چیزی برایت واقعاً مهم است، وقتت واقعاً کجا می‌رود، و دو ارزشِ در کشمکش را با چه قاعده‌ای ترجیح می‌دهی. داوری نمی‌کند کدام ارزش درست است — فقط آینه است."));
+    var t = h("input", { type: "text", id: "vlT", placeholder: "مثلاً «خانواده»، «امنیتِ مالی»، «یادگیری»" });
+    var im = h("input", { type: "number", id: "vlI", min: 0, max: 10, placeholder: "۰ تا ۱۰" });
+    var hr = h("input", { type: "number", id: "vlH", min: 0, max: 100, placeholder: "ساعت در هفته" });
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "ارزشِ تازه"), h("label", { for: "vlT" }, "ارزش"), t,
+      h("div", { class: "row gap wrap" }, h("label", { for: "vlI" }, "اهمیت برای تو (۰ تا ۱۰)"), im, h("label", { for: "vlH" }, "ساعتِ واقعیِ هفتهٔ گذشته"), hr),
+      h("button", { class: "btn", type: "button", onclick: function () {
+        if (!t.value.trim()) { A.toast("اول نامِ ارزش را بنویس.", "bad"); return; }
+        S.put({ id: A.uid("vl"), type: "value", title: t.value.trim(), imp: num(im.value), hours: num(hr.value), vs: [] }); A.render();
+      } }, "افزودنِ ارزش")));
+    var vs = S.all("value").sort(function (a, b) { return (num(b.imp) || 0) - (num(a.imp) || 0); }), k = A.valsCheck();
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "ارزش‌های تو (" + fa(vs.length) + ")"),
+      vs.length ? h("div", { class: "col gap" }, vs.map(function (v) {
+        var sh = k.tot ? Math.round(100 * (num(v.hours) || 0) / k.tot) : 0;
+        var other = h("select", { "aria-label": "در کشمکش با (برای «" + v.title + "»)" }, [h("option", { value: "" }, "— در کشمکش با … —")].concat(vs.filter(function (x) { return x.id !== v.id; }).map(function (x) { return h("option", { value: x.title }, x.title); })));
+        return h("div", { class: "card soft" }, h("div", { class: "row gap wrap" }, h("b", {}, v.title),
+          h("span", { class: "small" }, "اهمیت " + (v.imp == null ? "—" : fa(v.imp)) + " · ساعت " + (v.hours == null ? "—" : fa(v.hours)) + " (" + fa(sh) + "٪ از ساعت‌های ثبت‌شده)"),
+          h("input", { type: "number", min: 0, max: 100, "aria-label": "ساعتِ این هفتهٔ «" + v.title + "»", value: v.hours == null ? "" : v.hours, style: { width: "6em" }, onchange: function (e) { v.hours = num(e.target.value); S.put(v); A.render(); } })),
+          (v.vs || []).map(function (c, i) { return h("div", { class: "row gap wrap small" }, "⟷ «" + c.with + "» — قاعدهٔ ترجیحِ تو: ",
+            h("input", { type: "text", "aria-label": "قاعدهٔ ترجیح میانِ «" + v.title + "» و «" + c.with + "»", placeholder: "مثلاً «سلامتِ خانواده پیش از درآمدِ بیشتر، مگر …»", value: c.rule || "", onchange: function (e) { c.rule = e.target.value; S.put(v); A.render(); } })); }),
+          h("div", { class: "row gap" }, other, h("button", { class: "btn sm ghost", type: "button", onclick: function () { if (!other.value) return; (v.vs = v.vs || []).push({ with: other.value, rule: "" }); S.put(v); A.render(); } }, "+ کشمکش")));
+      })) : h("p", { class: "small muted" }, "هنوز ارزشی ننوشته‌ای.")));
+    if (vs.length) root.appendChild(h("section", { class: "card", "aria-live": "polite" }, h("h2", {}, "آینه"),
+      k.gaps.length ? h("p", { class: "warnline" }, "مهم می‌دانی ولی کمتر از ۱۰٪ ِ وقتت به آن می‌رسد: " + k.gaps.map(function (x) { return "«" + x + "»"; }).join("، ") + " — داوری نیست؛ یا وقت جابه‌جا شود، یا اهمیت بازنگری شود.") : h("p", { class: "small" }, "ناهم‌خوانیِ بزرگی میانِ اهمیت و وقت دیده نشد (با همین ساعت‌هایی که نوشتی)."),
+      k.open.length ? h("p", { class: "warnline" }, "کشمکش بی قاعدهٔ ترجیح (A0: هر دو با هم کاملاً برآورده نمی‌شوند): " + k.open.map(function (x) { return "«" + x + "»"; }).join("، ")) : null));
+    var ms = S.all("meaning").sort(function (a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+    var pr = h("input", { type: "number", id: "mnP", min: 1, max: 7, placeholder: "۱ تا ۷" }), se = h("input", { type: "number", id: "mnS", min: 1, max: 7, placeholder: "۱ تا ۷" });
+    var w = h("input", { type: "text", id: "mnW", placeholder: "به چه چیزی وصل است؟ کارِ این ماه کدام هدفِ بزرگ‌ترت را جلو برد؟" });
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "وارسیِ ماهانهٔ معنا"),
+      h("p", { class: "small muted" }, "«حضورِ معنا» (زندگی‌ام برایم معنا دارد) و «جست‌وجوی معنا» (دنبالِ معنایش هستم) دو چیزِ جدایند — هر دو را جدا بنویس. این‌که زندگی معنای عینی دارد یا نه، بیرون از این ابزار است (صدقِ معرفتی)."),
+      h("div", { class: "row gap wrap" }, h("label", { for: "mnP" }, "حضورِ معنا"), pr, h("label", { for: "mnS" }, "جست‌وجوی معنا"), se), h("label", { for: "mnW" }, "با واژه‌های خودت"), w,
+      h("button", { class: "btn", type: "button", onclick: function () {
+        var a = parseInt(pr.value, 10), b = parseInt(se.value, 10); if (!(a >= 1 && a <= 7) || !(b >= 1 && b <= 7)) { A.toast("هر دو عدد ۱ تا ۷.", "bad"); return; }
+        S.put({ id: A.uid("mn"), type: "meaning", date: A.today(), presence: a, search: b, note: w.value.trim() }); A.render();
+      } }, "ثبتِ وارسی"),
+      ms.length ? h("ul", { class: "plain small" }, ms.slice(0, 12).map(function (m) { return h("li", {}, A.fdate(m.date) + " — حضور " + fa(m.presence) + "، جست‌وجو " + fa(m.search) + (m.note ? " — " + m.note : "")); })) : null));
+    return root;
+  };
+
   /* ---------- «امروز»: موعدِ زنجیره و پیش‌بینی ---------- */
   if (typeof A.dueList === "function" && !A.dueList._tools) {
     var raw = A.dueList;
@@ -99,12 +150,15 @@
       S.all("wchain", function (c) { return c.due && c.due <= t && !c.outcome; }).forEach(function (c) { items.push({ k: "p", txt: "⛓ نتیجهٔ واقعیِ «" + c.title + "» را ثبت کن", sub: "حسِ اولت " + (c.feel == null ? "—" : fa(c.feel) + "٪") + " بود", go: function () { A.go("chain", c.id); } }); });
       var fc = S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome; });
       if (fc.length) items.push({ k: "p", txt: "🎯 " + fa(fc.length) + " پیش‌بینی به موعد رسیده — شد یا نشد؟", sub: fc.slice(0, 2).map(function (x) { return x.q; }).join(" · "), go: function () { A.go("fcast"); } });
+      var lm = S.all("meaning").map(function (m) { return m.date; }).sort().pop();
+      if ((S.all("value").length || lm) && (!lm || A.daysBetween(lm, t) >= 30)) items.push({ k: "p", txt: "🧭 وارسیِ ماهانهٔ معنا", sub: lm ? "آخرین بار " + A.fdate(lm) : "نخستین وارسی", go: function () { A.go("vals"); } });
       return items;
     };
     A.dueList._tools = true;
   }
   A.VIEW_META = A.VIEW_META || {};
-  A.VIEW_META.chain = { j: "knot", what: "زنجیرهٔ نگرانی: ترس را به حلقه‌ها بشکن، احتمالِ هر حلقه، سقف و حاصل‌ضربِ زنجیره بر پایهٔ اصول، حلقه‌های در دستِ تو، و نتیجهٔ واقعی در موعد.", why: "تا حسِ قطعیِ یک ترس را با منطقِ احتمال بسنجی و بدانی کجا کاری از دستت برمی‌آید." };
+  A.VIEW_META.chain = { j: "untie", what: "زنجیرهٔ نگرانی: ترس را به حلقه‌ها بشکن، احتمالِ هر حلقه، سقف و حاصل‌ضربِ زنجیره بر پایهٔ اصول، حلقه‌های در دستِ تو، و نتیجهٔ واقعی در موعد.", why: "تا حسِ قطعیِ یک ترس را با منطقِ احتمال بسنجی و بدانی کجا کاری از دستت برمی‌آید." };
+  A.VIEW_META.vals = { j: "judge", what: "ارزش‌ها و معنا: ارزش با اهمیت و ساعتِ واقعیِ هفته، کشمکش‌ها با قاعدهٔ ترجیح، و وارسیِ ماهانهٔ حضور/جست‌وجوی معنا.", why: "تا ببینی آنچه مهم می‌دانی با وقتت می‌خواند و کشمکش‌ها قاعده دارند — بی داوری دربارهٔ درستیِ ارزش‌ها." };
   A.VIEW_META.fcast = { j: "judge", what: "دفترِ پیش‌بینی: پیش‌بینیِ زندگی با احتمال و موعد؛ نتیجه، Brier و کالیبراسیون.", why: "تا ببینی اطمینانت با واقعیت می‌خواند یا نه." };
 })(APP);
 /* منو: «🧠 کارنامهٔ ذهن» و «🗺 قلمروِ سامانه‌ها» ذیلِ «🗺 نقشه‌ها»؛ دو ابزار ذیلِ «🧰 ابزارهای ذهن» — در هر دو سامانه (افزودن، نه جابه‌جایی) */
@@ -119,6 +173,6 @@
     Array.prototype.splice.apply(arr, [end, 0].concat(fresh));
   }
   var maps = [["mind", "🧠 کارنامهٔ ذهن", "هفت بُعدِ ذهنت، نقطه‌های سیاه، روند، نقشهٔ کاملِ ذهن و شبکه"], ["sterr", "🗺 قلمروِ سامانه‌ها", "حوزه‌های هر سامانه، گام‌ها، ابزارها و کمبودها"]];
-  var tools = [["chain", "⛓ زنجیرهٔ نگرانی", "ترس را به حلقه‌ها بشکن و با منطقِ احتمال بسنج"], ["fcast", "🎯 دفترِ پیش‌بینی", "پیش‌بینی با احتمال و موعد؛ Brier و کالیبراسیون"]];
+  var tools = [["chain", "⛓ زنجیرهٔ نگرانی", "ترس را به حلقه‌ها بشکن و با منطقِ احتمال بسنج"], ["fcast", "🎯 دفترِ پیش‌بینی", "پیش‌بینی با احتمال و موعد؛ Brier و کالیبراسیون"], ["vals", "🧭 ارزش‌ها و معنا", "اهمیت در برابرِ وقت، کشمکش‌ها و قاعدهٔ ترجیح، وارسیِ معنا"]];
   [A.NAV, A.EPI_NAV].forEach(function (arr) { add(arr, maps, "🗺 نقشه‌ها"); add(arr, tools, "🧰 ابزارهای ذهن"); });
 })(APP);

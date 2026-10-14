@@ -1,0 +1,16 @@
+{
+ "id": "h20261014184705918852-session-d79d",
+ "at": "2026-10-14T18:47:05Z",
+ "by": "session",
+ "area": "sys-territory",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "ابزارِ «🧭 ارزش‌ها و معنا» (view:vals) ساخته شد؛ gap_fa ِ sf_values و sf_meaning خالی شد؛ sf_meaning ⇒ گامِ ۴ (sf_values هنوز منبعِ دوم ندارد، گامِ ۰)",
+ "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
+ "commit": "",
+ "status": "open"
+}
