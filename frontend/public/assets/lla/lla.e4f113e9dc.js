@@ -30773,6 +30773,15 @@ APP.goFromURL = function (q) {
       var sig = tag + "|" + lab; seen[sig] = (seen[sig] || 0) + 1;
       out.push({ el: el, tag: tag, type: type, label: lab, nth: seen[sig], hid: hid });
     });
+    /* دکمه‌های هم‌نام (مثلاً چند «افزودن به فرضیه‌های این خانواده» زیرِ پیشنهادهای مختلف): سرتیترِ کارتِ خودش کنارش — وگرنه دستیار
+       از روی ترتیب حدس می‌زد و ممکن بود فرضیهٔ اشتباه را بیفزاید (کارزارِ آزمون، sc02) */
+    var cnt = {}; out.forEach(function (w) { if (w.tag === "button") cnt[w.label] = (cnt[w.label] || 0) + 1; });
+    out.forEach(function (w) {
+      if (w.tag !== "button" || cnt[w.label] < 2) return;
+      var p = w.el.parentElement, ctx = "";
+      for (var i = 0; i < 5 && p && !ctx; i++, p = p.parentElement) { var hd = p.querySelector("h2,h3,h4,b,strong,legend,.kn-fam"); if (hd && !hd.contains(w.el) && (hd.compareDocumentPosition(w.el) & 4)) ctx = clip(hd.textContent, 50); }
+      if (ctx) w.label = w.label + " — «" + ctx + "»";
+    });
     return out;
   }
   AS.scan = function () {
@@ -30952,6 +30961,7 @@ APP.goFromURL = function (q) {
     "- از کاری که در همین پاسخ انجام می‌دهی به آینده بگو («می‌زنم»، «پر می‌کنم»)؛ سامانه نتیجه را می‌گوید. پیش از «همه پر است / کامل است»، فیلدهای خالیِ لازم و «# پیام‌های اخیرِ صفحه» را ببین؛ اگر صفحه خطا داد، علتش را از همان پیام بگو و کاربر را مقصر نکن.",
     "- نیمی مربوط: اگر بخشی از خواسته بیرون از این صفحه است (کاریابی، پول و بودجه، درمانِ پزشکی/روان‌پزشکی، کارهای حقوقی، …)، آن بخش را در outside بنویس و در reply یک جمله صادقانه بگو که این‌جا جایش نیست؛ برایش gap نزن. بقیه را مثلِ همیشه ببر.",
     "- چیزی که رویدادِ مشخص ندارد (نگرانیِ آینده، ترسِ کلی): یک بار بپرس «آخرین بار کِی و کجا آمد؟»؛ اگر نبود یا نگفت، همان جملهٔ خودش را موقعیت بگیر («احساس یا حالتی که مانع شد») و جلو برو.",
+    "- پرسشی که دربارهٔ خودِ کاربر است (پاسخ را دیده‌ای؟ چقدر مطمئن بودی؟ دیگران هم؟ چند بار؟) را فقط از حرفِ صریحِ خودش پر کن؛ وگرنه بپرس. برای تصمیمِ کاربر یک گزینه را زرد نکن (جهت‌دادن است) — یا همهٔ گزینه‌ها را زرد کن یا فقط بپرس.",
     "- ساختنِ رکوردِ تازه تصمیم نیست: در نمای فهرستی (مثلاً kcases ⇐ «+ موقعیتِ تازه»، topics، e_prob ⇐ «افزودنِ مسئلهٔ تو») دکمهٔ ساختن را همان نوبت بزن و next:true بده.",
     "- حرفِ نامربوط (بیرون از یادگیری، معرفت‌شناسی/سنجشِ ادعا، گره‌گشایی/حلِ مسئله و کار با همین صفحه): status=\"unrelated\" و مؤدبانه بگو به این‌جا ربطی ندارد و در یک جمله بگو چه کمکی از این‌جا برمی‌آید.",
     "- **تو پزشکِ عمومیِ این سامانه‌ای: پیش از هر ارجاع تشخیصِ افتراقی کن.** (۱) خواستهٔ واقعیِ کاربر را از ظاهرِ حرفش جدا کن؛ (۲) دست‌کم دو بخش/قلمروِ نامزد را از «نقشهٔ سامانه» نام ببر و برای هر کدام شاهد بیاور که هست یا نیست (نما، فرم، قلمروِ معرفت‌شناسی با گامش، پیشنهادِ منتظر، برگهٔ باز)؛ (۳) فقط بعد تصمیم بگیر. اشتباه در ارجاع، متخصص را به بیراهه می‌برد.",
@@ -31715,6 +31725,7 @@ APP.goFromURL = function (q) {
     "- وجهِ territory پس از «ساخته و وارسی شد»: کاربر را به همان حوزه ببر (view=e_bt sub=terr) و یک جمله بگو چه ساخته شد و به کارِ او چه ربطی دارد؛ بعد یک موضوعِ یادگیری (topics) یا پروندهٔ سنجش (e_home) در همان حوزه بساز تا تمرینِ فاصله‌دار بگیرد — تا آن نشود وجه تمام نیست.",
     "- «حل شد» را هرگز خودت یا از حرفِ کاربر اعلام نکن: فقط وقتی نشانه‌های «ورزیده شد» و «ماندگاری ۳۰/۹۰ روز» ✓ است. تا آن وقت بگو «در راهِ حل‌شدن» و آزمونِ بعدی کِی است.",
     "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
+    "- شکلِ عملیات: {\"do\":\"tour_add\",\"facet\":{\"key\":\"f4\",\"kind\":\"area\",\"area\":\"sf_values\",\"title\":\"…\",\"why\":\"…\"}} · {\"do\":\"tour_skip\",\"facet\":\"f1\",\"why\":\"…\"} · {\"do\":\"tour_focus\",\"facet\":\"f2\"} · {\"do\":\"tour_done\",\"facet\":\"f2\",\"why\":\"…\"} · {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"<شناسهٔ رکورد>\"} · {\"do\":\"tour_goal\",\"goal\":\"…\"}. هر وجه title ِ گویا دارد (هرگز «گامِ دیگر»).",
     "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
   ].join("\n");
 
@@ -31745,7 +31756,7 @@ APP.goFromURL = function (q) {
   };
 
   /* ---------- پیگیریِ برگه‌ها: تا درست‌ساختن، بعد بازکردنِ همان وجه ---------- */
-  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ اگر روتین می‌گوید ساخته و کامیت داده ولی در نقشه هیچ اثری نیست، شاید نسخهٔ تازه هنوز منتشر نشده: lag=true. فقط JSON: {\"ok\":true|false,\"lag\":false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
+  var VERIFY_SYS = "تو وارسی‌کنندهٔ دستیارِ صفحه هستی. دستیار برای حوزه/بخشی که نبود برگه‌ای ثبت کرده بود و روتینِ مسئول زیرش جواب داده است. با نقشهٔ کنونیِ سامانه (همان نسخه‌ای که الان در صفحه است) بسنج که آنچه خواسته شده **واقعاً و متناسب** ساخته شده یا نه: هست؟ جایش درست است؟ با بخش‌های مرتبط پیوند دارد؟ برای وجهِ کاربر کافی است؟ اگر برگه ابزار/نما/کاربرگِ تازه خواسته بود، فقط وقتی ok که همان ابزار واقعاً در «نقشهٔ سامانه» (نماها، VIEW_META، ابزارهای حوزه در قلمرو) دیده شود — بالا رفتنِ عددِ گام یا خالی‌شدنِ «کمبود» بی ابزارِ واقعی کافی نیست. اگر روتین می‌گوید ساخته و کامیت داده ولی در نقشه هیچ اثری نیست، شاید نسخهٔ تازه هنوز منتشر نشده: lag=true. فقط JSON: {\"ok\":true|false,\"lag\":false,\"reason\":\"یک تا سه جمله\",\"followup\":\"اگر ok=false: یادداشتِ دقیق برای روتین زیرِ همان برگه — چه کم است، کجا، چطور، با چه شاهدی؛ مؤدب و فنی\"}";
   AS.VERIFY_SYS = VERIFY_SYS;
   var MAX_FOLLOW = 4, lastSweep = 0;
   function reviewerNotes(rep) { return (rep.notes || []).filter(function (n) { return n.by === "reviewer"; }); }
@@ -31767,7 +31778,7 @@ APP.goFromURL = function (q) {
             return;
           }
           f.blocked.seenNote = last.id;
-          var u = "# نقشهٔ کنونیِ سامانه\n" + AS.manifest() + "\n\n# برگه (کمبودی که دستیار ثبت کرد)\n" + (f.blocked.title || "") + "\nقلمرو: " + (f.blocked.area || "") +
+          var u = "# نقشهٔ کنونیِ سامانه\n" + AS.manifest() + "\n\n" + (A.SYST && A.SYST.knowledge ? A.SYST.knowledge({ know: (f.area ? [f.area] : []).concat(String(f.blocked.title + " " + (rep.text || "")).match(/\b[a-z]{2}_[a-z_]+\b/g) || []).slice(0, 5) }, f.blocked.title) + "\n\n" : "") + "# برگه (کمبودی که دستیار ثبت کرد)\n" + (f.blocked.title || "") + "\nقلمرو: " + (f.blocked.area || "") +
             "\nوجهِ کاربر: " + f.title + (f.why ? " — " + f.why : "") + "\n\n# جواب‌های روتین زیرِ برگه\n" + rv.map(function (n) { return "- (" + (n.outcome || "") + ") " + clip(n.text, 2500) + ((n.commits || []).length ? " — کامیت‌ها: " + n.commits.join("، ") : ""); }).join("\n") +
             "\n\n# پیگیری‌های قبلیِ دستیار\n" + (f.blocked.checks || []).map(function (c) { return "- " + c.at.slice(0, 10) + " " + (c.ok ? "درست" : "ناقص") + ": " + clip(c.reason, 300); }).join("\n");
           return A.callAI(VERIFY_SYS, u, { task: "learning_architecture", maxTokens: 3000 }).then(function (txt) {
@@ -31852,16 +31863,22 @@ APP.goFromURL = function (q) {
   /* یادآور (همان کانال‌هایی که برای گره‌ها انتخاب کرده‌ای): فردا، اگر تور نیمه‌کاره است */
   function syncReminder(s) {
     if (!(A.HOST && A.HOST.remind)) return;
-    var n = ((S.settings().knots || {}).notify) || {}, key = "tour:" + s.id;
+    // همان پیش‌فرضِ گره‌گشا (a17 kset): هر کانال روشن است مگر صریحاً خاموش شده باشد — پیش‌تر «تعریف‌نشده» خاموش شمرده می‌شد و یادآورِ تور هرگز نمی‌رفت
+    var n0 = ((S.settings().knots || {}).notify) || {}, n = { telegram: n0.telegram !== false, email: n0.email !== false, hour: n0.hour }, key = "tour:" + s.id;
     var open = s.tour && ((!s.tour.doneAt && s.tour.facets.some(function (f) { return f.status === "now" || f.status === "todo"; })) || (s.tour.doneAt && !s.tour.masteredAt && !mastered(s.tour)));
     try {
       if (!open || (!n.telegram && !n.email)) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
       var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0] || s.tour.facets.filter(function (x) { return followups(x).length; })[0];
-      var due = A.addDays(A.today(), 1); if (s._rem === due) return;
+      // یادآور برای نزدیک‌ترین تمرین/موعدِ همین تور (بازبینیِ پرونده، آزمایشِ واقعی، زنجیره، پیش‌بینی، …) — نه فقط «فردا» (کارزارِ آزمون: موعدِ بازبینی یادآور نداشت)
+      var tom = A.addDays(A.today(), 1), nx = [];
+      s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due >= tom) nx.push(p); }); });
+      nx.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
+      var due = s.tour.doneAt && nx[0] ? nx[0].due : tom; if (s._rem === due) return;
+      var nextTxt = nx[0] ? " نزدیک‌ترین موعد: «" + clip(nx[0].t, 60) + "» (" + (A.fdate ? A.fdate(nx[0].due) : nx[0].due) + ")." : "";
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
-        body: s.tour.doneAt ? "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» تا تسلطِ کامل پیگیری دارد" + (f && followups(f).length ? ": «" + clip(f.title, 50) + "» — " + clip(followups(f)[0].t, 60) : "") + ". با «💬 دستیار» ادامه بده." :
-          "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده.",
+        body: nextTxt.replace(/^ /, "") + (nextTxt ? " " : "") + (s.tour.doneAt ? "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» تا تسلطِ کامل پیگیری دارد" + (f && followups(f).length ? ": «" + clip(f.title, 50) + "» — " + clip(followups(f)[0].t, 60) : "") + ". با «💬 دستیار» ادامه بده." :
+          "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» نیمه‌کاره است" + (f ? "؛ وجهِ بعد: «" + clip(f.title, 60) + "»" : "") + ". با «💬 دستیار» ادامه بده."),
         link: "?tab=" + encodeURIComponent((f && f.view) || "home") + (f && f.arg ? "&a=" + encodeURIComponent(f.arg) : ""), channels: { telegram: !!n.telegram, email: !!n.email } });
       if (pr && pr.catch) pr.catch(function () { });
       s._rem = due;
@@ -32160,7 +32177,9 @@ APP.goFromURL = function (q) {
     /* خطِ زمانی */
     var ev = [];
     knots.forEach(function (k) { if (k.created) ev.push({ at: k.created, fa: "گرهٔ تازه: «" + (k.name || "گره") + "»" }); (k.hist || []).forEach(function (x) { if (x.status === "practised") ev.push({ at: x.at, fa: "✓ ورزیده: «" + (k.name || "گره") + "»" }); if (x.status === "returned") ev.push({ at: x.at, fa: "↩ بازگشت: «" + (k.name || "گره") + "»" }); }); });
-    cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });
+    cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); var fn = c.st && c.st.st_final; if (fn && fn.done) ev.push({ at: fn.at || c.updated || c.created, fa: "⚖️ حکمِ پایانیِ پرونده: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });
+    S.all("kcase", function (c) { return !c.sample && c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "🪢 موقعیتِ گره‌گشا: «" + (c.title || "") + "»" }); });
+    S.all("wchain", function (c) { return c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "⛓ زنجیرهٔ نگرانی: «" + c.title + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "⛓ نتیجهٔ «" + c.title + "»: " + c.outcome }); });
     S.all("achat", function (s) { return s.tour; }).forEach(function (s) { ev.push({ at: s.tour.createdAt, fa: "🧭 تورِ تازه: «" + (s.title || s.pinned || "") + "»" }); if (s.tour.doneAt) ev.push({ at: s.tour.doneAt, fa: "🧭 ترتیبِ تور طی شد: «" + (s.title || "") + "»" }); if (s.tour.masteredAt) ev.push({ at: s.tour.masteredAt, fa: "🏁 تور تا تسلط کامل شد: «" + (s.title || "") + "»" }); });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,
@@ -32341,17 +32360,20 @@ APP.goFromURL = function (q) {
   };
 
   /* ---------- رویدادها: از تغییرِ وضعِ تور ---------- */
-  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
+  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
   function events(s, before) {
     var t = s.tour, ev = [], b = before || { st: "", done: false, m: false };
     if (!before) ev.push({ k: "plan", fa: "تورِ تازه با " + fa(t.facets.length) + " وجه: " + t.facets.map(function (f) { return "«" + f.title + "»"; }).join("، ") });
-    var old = {}; (b.st || "").split(",").forEach(function (x) { var p = x.split(":"); if (p[0]) old[p[0]] = { st: p[1], ck: +p[2] || 0 }; });
+    var old = {}; (b.st || "").split(",").forEach(function (x) { var p = x.split(":"); if (p[0]) old[p[0]] = { st: p[1], ck: +p[2] || 0, ok: +p[3] || 0 }; });
     t.facets.forEach(function (f) {
       var o = old[f.key];
       if (before && !o) ev.push({ k: "plan", fa: "وجهِ تازه: «" + f.title + "»" });
       if (o && o.st !== "done" && f.status === "done") ev.push({ k: "facet", fa: "✓ پایهٔ وجهِ «" + f.title + "» برپا شد" });
       if (o && o.st !== "blocked" && f.status === "blocked") ev.push({ k: "sheet", fa: "🛎 برای وجهِ «" + f.title + "» برگهٔ فوری #" + fa((f.blocked || {}).number) + " ثبت شد" });
-      var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: (c.ok ? "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " درست ساخته شد" : c.lag ? "⏳ برگهٔ #" + fa(f.blocked.number) + ": شاید هنوز منتشر نشده" : "↩ برگهٔ #" + fa(f.blocked.number) + " با دلیل دوباره باز شد") + " — " + clip(c.reason, 160) }); }
+      // موضوعِ ایمیل کوتاه و بی اصطلاحاتِ داخلی؛ دلیلِ فنی فقط در متن (کارزارِ آزمون: موضوع‌ها «deferred»، «sf_values گامِ ۰» داشتند)
+      var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: c.ok ? "✅ آنچه برای «" + f.title + "» کم بود ساخته شد" : c.lag ? "⏳ ساخته‌شدنِ «" + f.title + "» هنوز دیده نمی‌شود" : "↩ ساختِ «" + f.title + "» هنوز درست نیست؛ پیگیری کردم", detail: clip(c.reason, 300) }); }
+      var okN = AS.tourMilestones(f).filter(function (m) { return m.ok; }).length;
+      if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
     });
     if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 همهٔ وجه‌ها به ترتیب طی شد" });
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
@@ -32409,7 +32431,7 @@ APP.goFromURL = function (q) {
       H.push('<table role="presentation" width="680" cellpadding="0" cellspacing="0" dir="rtl" style="max-width:680px;width:100%;background:#fff;border-radius:12px;overflow:hidden;text-align:right">');
       H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پیشرفت: ' + fa(done) + " از " + fa(t.facets.length) + " وجه" + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
       if (s.safetyAt) H.push('<tr><td style="padding:14px 22px;background:#fff7ed;font-size:14px;line-height:1.9;color:' + C.ink + '"><b>🤝 پیش از هر چیز</b><br>در این گفت‌وگو از حالِ سختی گفتی. اگر امروز هم سخت است، همین حالا با یک نفرِ نزدیک یا یک متخصص حرف بزن.<br><span style="color:' + C.mute + '">' + esc(A.KHELP || "") + "</span><br>(به خاطرِ حریمِ خصوصی، متنِ گفت‌وگو در این ایمیل نمی‌آید.)</td></tr>");
-      if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + "</li>"; }).join("") + "</ul>"));
+      if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + (e.detail ? '<div style="color:' + C.mute + ';font-size:12px">' + esc(e.detail) + "</div>" : "") + "</li>"; }).join("") + "</ul>"));
       /* نقشهٔ راه */
       var rows = t.facets.map(function (f, i) {
         var ms = AS.tourMilestones(f), ok = ms.filter(function (x) { return x.ok; }).length, col = f.status === "done" ? C.ok : f.status === "blocked" ? C.warn : f.status === "now" ? C.head : C.mute;
@@ -32418,7 +32440,7 @@ APP.goFromURL = function (q) {
       H.push(sec("🗺 نقشهٔ راه و ترتیب", '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse"><tr style="color:' + C.mute + ';font-size:12px"><td style="padding:6px">#</td><td style="padding:6px">وجه</td><td style="padding:6px">وضع</td><td style="padding:6px">نشانه‌ها</td></tr>' + rows + "</table>"));
       /* جزئیاتِ هر وجه */
       t.facets.forEach(function (f, i) {
-        var ms = AS.tourMilestones(f), pr = AS.tourPractice(f), b = f.blocked;
+        var ms = f.status === "skipped" ? [] : AS.tourMilestones(f), pr = f.status === "skipped" ? [] : AS.tourPractice(f), b = f.blocked;
         var inner = (f.why ? '<div style="color:' + C.mute + '">چرا این‌جای ترتیب: ' + esc(f.why) + "</div>" : "") +
           '<ul style="margin:6px 0;padding-right:18px">' + ms.map(function (x) { return '<li style="color:' + (x.ok ? C.ok : C.ink) + '">' + (x.ok ? "✓ " : "○ ") + esc(x.t) + "</li>"; }).join("") + "</ul>" +
           ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { return esc((TYPE_FA[r.type] || r.type) + " «" + clip(recTitle(r), 50) + "»"); }).join("، ") + "</div>" : "") +

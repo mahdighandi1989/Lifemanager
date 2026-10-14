@@ -123,7 +123,9 @@
     /* خطِ زمانی */
     var ev = [];
     knots.forEach(function (k) { if (k.created) ev.push({ at: k.created, fa: "گرهٔ تازه: «" + (k.name || "گره") + "»" }); (k.hist || []).forEach(function (x) { if (x.status === "practised") ev.push({ at: x.at, fa: "✓ ورزیده: «" + (k.name || "گره") + "»" }); if (x.status === "returned") ev.push({ at: x.at, fa: "↩ بازگشت: «" + (k.name || "گره") + "»" }); }); });
-    cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });
+    cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); var fn = c.st && c.st.st_final; if (fn && fn.done) ev.push({ at: fn.at || c.updated || c.created, fa: "⚖️ حکمِ پایانیِ پرونده: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });
+    S.all("kcase", function (c) { return !c.sample && c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "🪢 موقعیتِ گره‌گشا: «" + (c.title || "") + "»" }); });
+    S.all("wchain", function (c) { return c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "⛓ زنجیرهٔ نگرانی: «" + c.title + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "⛓ نتیجهٔ «" + c.title + "»: " + c.outcome }); });
     S.all("achat", function (s) { return s.tour; }).forEach(function (s) { ev.push({ at: s.tour.createdAt, fa: "🧭 تورِ تازه: «" + (s.title || s.pinned || "") + "»" }); if (s.tour.doneAt) ev.push({ at: s.tour.doneAt, fa: "🧭 ترتیبِ تور طی شد: «" + (s.title || "") + "»" }); if (s.tour.masteredAt) ev.push({ at: s.tour.masteredAt, fa: "🏁 تور تا تسلط کامل شد: «" + (s.title || "") + "»" }); });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,

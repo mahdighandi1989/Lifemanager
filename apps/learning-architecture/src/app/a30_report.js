@@ -30,17 +30,20 @@
   };
 
   /* ---------- رویدادها: از تغییرِ وضعِ تور ---------- */
-  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
+  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt }; }
   function events(s, before) {
     var t = s.tour, ev = [], b = before || { st: "", done: false, m: false };
     if (!before) ev.push({ k: "plan", fa: "تورِ تازه با " + fa(t.facets.length) + " وجه: " + t.facets.map(function (f) { return "«" + f.title + "»"; }).join("، ") });
-    var old = {}; (b.st || "").split(",").forEach(function (x) { var p = x.split(":"); if (p[0]) old[p[0]] = { st: p[1], ck: +p[2] || 0 }; });
+    var old = {}; (b.st || "").split(",").forEach(function (x) { var p = x.split(":"); if (p[0]) old[p[0]] = { st: p[1], ck: +p[2] || 0, ok: +p[3] || 0 }; });
     t.facets.forEach(function (f) {
       var o = old[f.key];
       if (before && !o) ev.push({ k: "plan", fa: "وجهِ تازه: «" + f.title + "»" });
       if (o && o.st !== "done" && f.status === "done") ev.push({ k: "facet", fa: "✓ پایهٔ وجهِ «" + f.title + "» برپا شد" });
       if (o && o.st !== "blocked" && f.status === "blocked") ev.push({ k: "sheet", fa: "🛎 برای وجهِ «" + f.title + "» برگهٔ فوری #" + fa((f.blocked || {}).number) + " ثبت شد" });
-      var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: (c.ok ? "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " درست ساخته شد" : c.lag ? "⏳ برگهٔ #" + fa(f.blocked.number) + ": شاید هنوز منتشر نشده" : "↩ برگهٔ #" + fa(f.blocked.number) + " با دلیل دوباره باز شد") + " — " + clip(c.reason, 160) }); }
+      // موضوعِ ایمیل کوتاه و بی اصطلاحاتِ داخلی؛ دلیلِ فنی فقط در متن (کارزارِ آزمون: موضوع‌ها «deferred»، «sf_values گامِ ۰» داشتند)
+      var ck = ((f.blocked && f.blocked.checks) || []); if (o && ck.length > o.ck) { var c = ck[ck.length - 1]; ev.push({ k: "sheet", fa: c.ok ? "✅ آنچه برای «" + f.title + "» کم بود ساخته شد" : c.lag ? "⏳ ساخته‌شدنِ «" + f.title + "» هنوز دیده نمی‌شود" : "↩ ساختِ «" + f.title + "» هنوز درست نیست؛ پیگیری کردم", detail: clip(c.reason, 300) }); }
+      var okN = AS.tourMilestones(f).filter(function (m) { return m.ok; }).length;
+      if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
     });
     if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 همهٔ وجه‌ها به ترتیب طی شد" });
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
@@ -98,7 +101,7 @@
       H.push('<table role="presentation" width="680" cellpadding="0" cellspacing="0" dir="rtl" style="max-width:680px;width:100%;background:#fff;border-radius:12px;overflow:hidden;text-align:right">');
       H.push('<tr><td style="background:' + C.head + ';color:#fff;padding:20px 22px"><div style="font-size:13px;opacity:.85">معماری یادگیری عمیق · 🧭 گزارشِ تور · ' + esc(A.fdate ? A.fdate(A.today()) : A.today()) + '</div><div style="font-size:22px;font-weight:700;margin-top:6px">' + esc(title) + '</div><div style="font-size:14px;margin-top:6px;opacity:.95">' + esc(t.goal || s.pinned || "") + '</div><div style="font-size:13px;margin-top:8px">پیشرفت: ' + fa(done) + " از " + fa(t.facets.length) + " وجه" + (t.masteredAt ? " · 🏁 تا تسلط کامل شد" : t.doneAt ? " · ترتیب طی شد؛ پیگیری تا تسلط" : "") + "</div></td></tr>");
       if (s.safetyAt) H.push('<tr><td style="padding:14px 22px;background:#fff7ed;font-size:14px;line-height:1.9;color:' + C.ink + '"><b>🤝 پیش از هر چیز</b><br>در این گفت‌وگو از حالِ سختی گفتی. اگر امروز هم سخت است، همین حالا با یک نفرِ نزدیک یا یک متخصص حرف بزن.<br><span style="color:' + C.mute + '">' + esc(A.KHELP || "") + "</span><br>(به خاطرِ حریمِ خصوصی، متنِ گفت‌وگو در این ایمیل نمی‌آید.)</td></tr>");
-      if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + "</li>"; }).join("") + "</ul>"));
+      if ((evs || []).length) H.push(sec("🆕 آنچه تازه شد", "<ul style=\"margin:0;padding-right:18px\">" + evs.map(function (e) { return "<li>" + esc(e.fa) + (e.detail ? '<div style="color:' + C.mute + ';font-size:12px">' + esc(e.detail) + "</div>" : "") + "</li>"; }).join("") + "</ul>"));
       /* نقشهٔ راه */
       var rows = t.facets.map(function (f, i) {
         var ms = AS.tourMilestones(f), ok = ms.filter(function (x) { return x.ok; }).length, col = f.status === "done" ? C.ok : f.status === "blocked" ? C.warn : f.status === "now" ? C.head : C.mute;
@@ -107,7 +110,7 @@
       H.push(sec("🗺 نقشهٔ راه و ترتیب", '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse"><tr style="color:' + C.mute + ';font-size:12px"><td style="padding:6px">#</td><td style="padding:6px">وجه</td><td style="padding:6px">وضع</td><td style="padding:6px">نشانه‌ها</td></tr>' + rows + "</table>"));
       /* جزئیاتِ هر وجه */
       t.facets.forEach(function (f, i) {
-        var ms = AS.tourMilestones(f), pr = AS.tourPractice(f), b = f.blocked;
+        var ms = f.status === "skipped" ? [] : AS.tourMilestones(f), pr = f.status === "skipped" ? [] : AS.tourPractice(f), b = f.blocked;
         var inner = (f.why ? '<div style="color:' + C.mute + '">چرا این‌جای ترتیب: ' + esc(f.why) + "</div>" : "") +
           '<ul style="margin:6px 0;padding-right:18px">' + ms.map(function (x) { return '<li style="color:' + (x.ok ? C.ok : C.ink) + '">' + (x.ok ? "✓ " : "○ ") + esc(x.t) + "</li>"; }).join("") + "</ul>" +
           ((f.refs || []).length ? "<div><b>رکوردها:</b> " + f.refs.map(function (r) { return esc((TYPE_FA[r.type] || r.type) + " «" + clip(recTitle(r), 50) + "»"); }).join("، ") + "</div>" : "") +
