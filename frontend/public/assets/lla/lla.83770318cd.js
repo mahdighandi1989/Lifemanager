@@ -26308,7 +26308,7 @@ APP.goFromURL = function (q) {
   }
   function knotCardEditor(k, o) {
     o = o || {};
-    var sec = h("section", { class: "card kn-kcard" }, h("h2", {}, "کارتِ گره — به قلمِ خودت"),
+    var sec = h("section", { class: "card kn-kcard", "data-own": "1" }, h("h2", {}, "کارتِ گره — به قلمِ خودت"),
       h("p", { class: "small muted" }, "نوشتنِ کارت خودش بخشی از بازکردن است (اثرِ تولید، تکنیک ۴۴): سامانه برایت نمی‌نویسد."));
     var save = A.debounce(function () { S.put(k); }, 450);
     var F = [["name", "نامِ گره", "kn-name", 1, "یک نامِ کوتاه که خودت بشناسی"], ["principle", "ساختارِ عمیق", "kn-pr", 3, "زیرِ ظاهرِ این موقعیت، چه سازوکاری تکرار می‌شود؟"],
@@ -30867,6 +30867,8 @@ APP.goFromURL = function (q) {
     fill: function (a) {
       var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
       if (isAnswer(x)) return ANSWER_NOTE;
+      // بخشِ «به قلمِ خودت» (کارتِ گره): نوشتن خودش بخشی از یادگرفتن است — فقط زرد، نه پر (کارزارِ آزمون sc01/sc07)
+      if (x.closest && x.closest("[data-own]")) { reveal(x); mark(x, a.why || "این را با جمله‌های خودت بنویس", "hl"); return "«" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» به قلمِ خودِ توست — زردش کردم؛ می‌توانی همان جمله‌هایی را که گفتی این‌جا بنویسی"; }
       if (x.type === "file") return "پیوست با attach";
       reveal(x);
       if (x.tagName === "SELECT") {
@@ -31669,6 +31671,9 @@ APP.goFromURL = function (q) {
     if (!f || !r) return "پیوند به رکوردِ ناموجود";
     // یک کار یک بار شمرده می‌شود: رکوردی که ریشهٔ وجهِ دیگری است دوباره وصل نمی‌شود (کارزارِ آزمون sc01: وجهِ تکراری با همان ۸ نشانه)
     var dup = s.tour.facets.filter(function (g) { return g !== f && g.status !== "skipped" && (g.refs || []).some(function (x) { return x.id === r.id; }); })[0];
+    // پیوندِ خودکار (به وجهِ «همین حالا») جابه‌جا می‌شود — کارزارِ آزمون sc07: کاربرگ به وجهِ نادرست چسبیده بود؛ پیوندِ عمدی نه
+    var dref = dup && dup.refs.filter(function (x) { return x.id === r.id; })[0];
+    if (dref && dref.auto) { dup.refs = dup.refs.filter(function (x) { return x.id !== r.id; }); dup = null; }
     if (dup) return "«" + clip(r.title || r.name || r.id, 40) + "» از پیش در وجهِ «" + dup.title + "» شمرده می‌شود — یک کار دو بار شمرده نمی‌شود؛ اگر این وجه همان است، با tour_skip و دلیل کنارش بگذار";
     if (!(f.refs || []).some(function (x) { return x.id === r.id; })) f.refs.push({ id: r.id, type: r.type }); return "";
   };
@@ -31703,7 +31708,7 @@ APP.goFromURL = function (q) {
       var since = c.startedAt || c.createdAt;
       ROOT_TYPE[c.kind].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && (r.created || "") >= since; }).forEach(function (r) {
         var taken = t.facets.some(function (f) { return (f.refs || []).some(function (x) { return x.id === r.id; }); });
-        if (!taken) { c.refs.push({ id: r.id, type: r.type }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
+        if (!taken) { c.refs.push({ id: r.id, type: r.type, auto: true }); msgs.push("«" + clip(r.title || (r.p && r.p.title) || r.id, 50) + "» به وجهِ «" + c.title + "» وصل شد"); }
       }); });
     }
     // پرونده‌ای که از دکمهٔ کارخانهٔ خودِ گره‌گشا ساخته شد (src = موقعیتِ همین تور) ⇒ به وجهِ ادعای همین تور

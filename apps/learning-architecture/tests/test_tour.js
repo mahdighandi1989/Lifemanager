@@ -87,14 +87,18 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const sc = APP.ASSIST.scan(), k = l => (sc.fields.find(f => f.label === l) || sc.buttons.find(x => x.label === l)).k;
     const r = await APP.ASSIST.run([{ do: 'click', k: k('رفتن به قدمِ «ثبت»') }, { do: 'fill', k: k('متن'), value: 'x' }]);
     const v1 = document.getElementById('t1').value;
+    // بخشِ «به قلمِ خودت» پر نمی‌شود، فقط زرد
+    m.innerHTML = '<section data-own="1"><label>نامِ گره <input id="own1"></label></section>';
+    const sc3 = APP.ASSIST.scan(), r3 = await APP.ASSIST.run([{ do: 'fill', k: sc3.fields[0].k, value: 'سپرِ آبرو' }]);
+    const own = document.getElementById('own1').value === '' && document.getElementById('own1').classList.contains('as-hl') && /به قلمِ خودِ توست/.test(r3.notes.join());
     // کلیکی که در همان نما فیلد می‌افزاید (افزودنِ سطر): کلیدهای بعدی جابه‌جا شده‌اند ⇒ رد و «فرم تغییر کرد» (کارزارِ آزمون sc04)
     m.innerHTML = '<button id="add" type="button">+ سطر</button><div id="rows"></div><label>متن <input id="t2"></label>';
     document.getElementById('add').onclick = () => { document.getElementById('rows').insertAdjacentHTML('beforeend', '<label>سطر <input></label>'); };
     const sc2 = APP.ASSIST.scan(), k2 = l => (sc2.fields.find(f => f.label === l) || sc2.buttons.find(x => x.label === l)).k;
     const r2 = await APP.ASSIST.run([{ do: 'click', k: k2('+ سطر') }, { do: 'fill', k: k2('متن'), value: 'y' }]);
-    return { moved: r.moved, skipped: r.skipped, val: v1, grew: !r2.moved && r2.changed && r2.skipped === 1 && document.getElementById('t2').value === '' };
+    return { own, moved: r.moved, skipped: r.skipped, val: v1, grew: !r2.moved && r2.changed && r2.skipped === 1 && document.getElementById('t2').value === '' };
   });
-  chk(info.nav.moved && info.nav.skipped === 1 && info.nav.val === '' && info.nav.grew, 'a click that changes the step counts as moving; later stale actions are skipped: ' + JSON.stringify(info.nav));
+  chk(info.nav.own && info.nav.moved && info.nav.skipped === 1 && info.nav.val === '' && info.nav.grew, 'a click that changes the step counts as moving; later stale actions are skipped: ' + JSON.stringify(info.nav));
 
   // 5) پیامِ صفحه (toast) پس از کلیک به خودِ دستیار می‌رسد و نوبتِ خودکار می‌گیرد؛ 6) next:true قولِ «بعدش می‌زنم» را عملی می‌کند
   info.toast = await p.evaluate(async () => {
@@ -178,6 +182,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const tp = { id: 'tp_t2', type: 'topic', title: 'احتمالِ شرطی' }; APP.S.put(tp); APP.S.put({ id: 'sc_t2', type: 'sched', topic: 'tp_t2', due: APP.addDays(APP.today(), 1) });
     AS._turnSession = s; AS.DO.tour_link({ facet: 'f2', id: 'tp_t2' });
     const dupLink = AS.DO.tour_link({ facet: 'f3', id: 'tp_t2' }); // همان کار در وجهِ دیگر دو بار شمرده نمی‌شود
+    // پیوندِ خودکار جابه‌جاشدنی است
+    APP.S.put({ id: 'wc_mv', type: 'wchain', title: 'م', links: [] }); t.facets[1].refs.push({ id: 'wc_mv', type: 'wchain', auto: true });
+    const mv = AS.DO.tour_link({ facet: 'f3', id: 'wc_mv' }) === '' && !t.facets[1].refs.some(x => x.id === 'wc_mv') && t.facets[2].refs.some(x => x.id === 'wc_mv');
+    t.facets[2].refs = t.facets[2].refs.filter(x => x.id !== 'wc_mv');
     // tour_add با آرایه و بی عنوان؛ پیش‌بینیِ وصل‌نشده در متنِ تور؛ برگه با شماره به وجه وصل می‌شود (کارزارِ آزمون sc08)
     const nF0 = t.facets.length, emptyAdd = AS.DO.tour_add({ facets: [{ kind: 'other' }] }), nF1 = t.facets.length;
     APP.S.put({ id: 'fc_tt', type: 'fcast', q: 'روزه هوش را بالا می‌برد', p: 80, due: APP.addDays(APP.today(), 30) });
@@ -185,7 +193,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     s.msgs.forEach(m => { if (m.role === 'user') m.at = new Date(Date.now() - 2 * 864e5).toISOString(); }); s._rem = null; __rem.length = 0;
     AS.tourAfterTurn(s);
     const fu = AS.tourFollowups(t.facets[1]).map(m => m.t).join('|');
-    const out = { addArr: !!emptyAdd && nF1 === nF0, fcInText, dup: /دو بار شمرده نمی‌شود/.test(dupLink) && !(t.facets[2].refs || []).some(x => x.id === 'tp_t2'), done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),
+    const out = { mv, addArr: !!emptyAdd && nF1 === nF0, fcInText, dup: /دو بار شمرده نمی‌شود/.test(dupLink) && !(t.facets[2].refs || []).some(x => x.id === 'tp_t2'), done: !!t.doneAt, fu, said: s.msgs.some(m => /تا تسلطِ کامل پیگیری می‌کنم/.test(m.text)),
       today: APP.dueList().some(x => /پیگیریِ تورِ .* تا تسلط/.test(x.txt)), rem: (__rem.slice(-1)[0] || {}).body || '', btn: !!Array.from(document.querySelectorAll('.as-tour .btn')).find(x => /پیگیری تا تسلط/.test(x.textContent)) };
     APP.ASSIST.toggle(true);
     out.btn = !!Array.from(document.querySelectorAll('.as-tour .btn')).find(x => /پیگیری تا تسلط/.test(x.textContent));
@@ -206,7 +214,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.left = t.facets.map(f => f.key + ':' + AS.tourFollowups(f).map(m => m.t).join('/')).join(' || ');
     return out;
   });
-  chk(info.master.addArr && info.master.fcInText && info.master.dup && info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
+  chk(info.master.mv && info.master.addArr && info.master.fcInText && info.master.dup && info.master.done && /سفرِ گام‌به‌گام تا آخر/.test(info.master.fu) && info.master.said && info.master.today && /تا تسلطِ کامل پیگیری دارد/.test(info.master.rem) && info.master.btn,
     'after the order is walked, open follow-ups stay in Today, the reminder and the drawer: ' + JSON.stringify(info.master));
   chk(info.master.notYet === 'false,false' && info.master.held30only === 'true,false' && info.master.recheck, 'solved needs a cold correct answer after 30 and 90 days; the 90-day check shows in Today: ' + JSON.stringify(info.master));
   chk(info.master.mastered, 'when every milestone of every facet is ✓ the tour says it is complete');

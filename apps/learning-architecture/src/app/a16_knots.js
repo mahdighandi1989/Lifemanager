@@ -1455,7 +1455,7 @@
   }
   function knotCardEditor(k, o) {
     o = o || {};
-    var sec = h("section", { class: "card kn-kcard" }, h("h2", {}, "کارتِ گره — به قلمِ خودت"),
+    var sec = h("section", { class: "card kn-kcard", "data-own": "1" }, h("h2", {}, "کارتِ گره — به قلمِ خودت"),
       h("p", { class: "small muted" }, "نوشتنِ کارت خودش بخشی از بازکردن است (اثرِ تولید، تکنیک ۴۴): سامانه برایت نمی‌نویسد."));
     var save = A.debounce(function () { S.put(k); }, 450);
     var F = [["name", "نامِ گره", "kn-name", 1, "یک نامِ کوتاه که خودت بشناسی"], ["principle", "ساختارِ عمیق", "kn-pr", 3, "زیرِ ظاهرِ این موقعیت، چه سازوکاری تکرار می‌شود؟"],

@@ -224,6 +224,8 @@
     fill: function (a) {
       var x = el(a.k); if (!x) return "فیلدِ " + a.k + " پیدا نشد";
       if (isAnswer(x)) return ANSWER_NOTE;
+      // بخشِ «به قلمِ خودت» (کارتِ گره): نوشتن خودش بخشی از یادگرفتن است — فقط زرد، نه پر (کارزارِ آزمون sc01/sc07)
+      if (x.closest && x.closest("[data-own]")) { reveal(x); mark(x, a.why || "این را با جمله‌های خودت بنویس", "hl"); return "«" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» به قلمِ خودِ توست — زردش کردم؛ می‌توانی همان جمله‌هایی را که گفتی این‌جا بنویسی"; }
       if (x.type === "file") return "پیوست با attach";
       reveal(x);
       if (x.tagName === "SELECT") {
