@@ -59,6 +59,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.thin = /پاسخِ نوشته‌ات هنوز دلیل ندارد/.test(document.getElementById('main').innerText);
     { const r = document.createElement('input'); r.type = 'range'; r.setAttribute('aria-label', 'اطمینانِ آزمونی'); r.setAttribute('data-unset', '1'); document.getElementById('main').appendChild(r);
       const f = AS.scan().fields.find(x => /اطمینانِ آزمونی/.test(x.label)); out.unset = !!f && f.value === '' && f.unset === true; r.remove(); }
+    { const ta = document.createElement('textarea'); ta.setAttribute('aria-label', 'پاسخِ بلندِ آزمونی'); ta.value = 'ا'.repeat(900) + 'پایان'; document.getElementById('main').appendChild(ta);
+      const f = AS.scan().fields.find(x => /پاسخِ بلندِ آزمونی/.test(x.label)); out.longAns = !!f && /پایان/.test(f.value); ta.remove(); }
     { const sc = AS.scan(), f = sc.fields.find(x => /دوباره امتحان کردی/.test(x.label)); const r = await AS.run([{ do: 'fill', k: f.k, value: 'حل شد' }]); out.ownBack = APP.S.get(pq.id).back !== 'حل شد' && /به قلمِ خودِ توست/.test(r.notes.join()); }
     { let hit = 0; const bt = document.createElement('button'); bt.setAttribute('data-own', '1'); bt.textContent = 'تجزیه با هوش مصنوعی'; bt.onclick = () => hit++; document.getElementById('main').appendChild(bt);
       const sc = AS.scan(), b = sc.buttons.find(x => /تجزیه با هوش/.test(x.label)); const r = await AS.run([{ do: 'click', k: b.k }]); out.ownClick = hit === 0 && /تصمیمِ خودِ توست/.test(r.notes.join()); bt.remove(); }
@@ -86,6 +88,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.prompt && S.drawer, 'the model sees prior knots and the sieve state; the drawer shows the sieve');
   chk(S.made && S.gate && S.items && S.refShown && S.topic, 'prerequisite map: AI only after «بفرست», marked unverified; user self-rates; missing ⇒ learning topic with science › branch');
   chk(/^100000>111/.test(S.ms), 'prereq facet milestones come from the map, the self-ratings and the topics: ' + S.ms);
+  chk(S.longAns, 'the assistant sees a long written answer in full (to check it)');
   chk(S.thin && S.unset, 'bare «بلدم» is flagged; an untouched slider is reported empty to the model');
   chk(S.ownClick, 'the assistant never presses an owner-only button (e.g. sending the problem to the AI)');
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');

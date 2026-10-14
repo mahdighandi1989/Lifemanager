@@ -30838,7 +30838,8 @@ APP.goFromURL = function (q) {
       if (tag === "button") { buttons.push({ k: k, label: lab }); return; }
       var f = { k: k, type: type, label: lab, section: sec ? clip(sec.getAttribute("data-report-section-label"), 40) : "" };
       if (type === "checkbox" || type === "radio") f.value = el.checked ? "✓" : "";
-      else if (type !== "file") f.value = clip(el.value, 120);
+      // متنِ بلندِ کاربر (پاسخ، توضیحِ فاینمن) کامل‌تر دیده شود تا دستیار بتواند وارسی‌اش کند (کارزارِ آزمونِ دوم c20: «فقط آغازِ پاسخت پیداست»)
+      else if (type !== "file") f.value = clip(el.value, tag === "textarea" ? 1500 : 120);
       // لغزندهٔ دست‌نخورده «خالی» است، نه مقدارِ میانه (کارزارِ آزمونِ دوم c12: «گامِ بعد» با اطمینانِ پیش‌فرض زده شد)
       if (type === "range" && el.getAttribute("data-unset")) { f.value = ""; f.unset = true; }
       if (tag === "select") f.options = Array.prototype.slice.call(el.options, 0, 25).map(function (o) { return o.value + "=" + clip(o.textContent, 30); }).join(" | ");
