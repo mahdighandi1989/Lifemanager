@@ -144,7 +144,7 @@ def migrate() -> int:
 def new_id(by: str) -> str:
     import secrets
 
-    return "h" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + "-" + by + "-" + secrets.token_hex(2)
+    return "h" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f") + "-" + by + "-" + secrets.token_hex(2)
 
 
 def git(*args: str) -> str:

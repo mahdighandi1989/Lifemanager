@@ -60,7 +60,8 @@ def ledger_js():
     op = os.path.join(os.path.dirname(os.path.dirname(B)), "docs", "supervisor", "ownership.json")
     if os.path.exists(op):
         own = json.loads(rd(op))
-        data["ownership"] = {"routines": {k: {"fa": v.get("fa"), "cadence": v.get("cadence"), "prompt": v.get("prompt")} for k, v in own.get("routines", {}).items()},
+        data["ownership"] = {"routines": {k: {"fa": v.get("fa"), "cadence": v.get("cadence"), "prompt": v.get("prompt"),
+                                              "agenda": [x.get("what") for x in v.get("agenda", [])]} for k, v in own.get("routines", {}).items()},
                              "areas": [{k: a.get(k) for k in ("id", "fa", "owner", "executor", "procedure", "rule")} for a in own.get("areas", []) if a.get("page")]}
     return "window.EPI_BT_LEDGER = " + json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n"
 

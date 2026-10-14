@@ -35,6 +35,11 @@ def test_registry_is_complete_and_every_procedure_exists():
         if k != "owner":
             assert os.path.exists(os.path.join(ROOT, r["prompt"])), r["prompt"]
             assert r.get("every_hours", 0) > 0
+    for k, r in own["routines"].items():   # each routine's current agenda points at a real section of its prompt
+        for it in r.get("agenda", []):
+            f, _, anchor = it["procedure"].partition("#")
+            assert any(x.startswith(anchor) for x in _headings(f)), f"{k}: agenda section «{anchor}» missing in {f}"
+    assert own["routines"]["backtest"]["agenda"], "the assistant needs to know what the backtest routine is already doing"
     for a in own["areas"]:
         for o in h.owners(a):
             assert o in own["routines"], (a["id"], o)
@@ -66,6 +71,8 @@ def test_key_paths_map_to_the_right_owner():
         "apps/learning-architecture/src/app/epi_cases_a.js": "epi-backtest",
         "apps/learning-architecture/src/app/epi_rules.js": "epi-rules",
         "apps/learning-architecture/src/app/epi_book.js": "epi-rules",
+        "apps/learning-architecture/src/app/epi_engine.js": "epi-engine",
+        "apps/learning-architecture/src/app/epi_st_a.js": "epi-engine",
         "apps/learning-architecture/src/app/a26_assist.js": "lla-page",
         "docs/supervisor/BACKTEST_PROMPT.md": "supervisor",
         "app/main.py": "app",
@@ -113,29 +120,73 @@ def test_guard_refuses_unrecorded_work_in_another_area():
     assert h.guard("backtest", [rules], []) == []
     # the backtest routine touching the page needs a hand-off too; shared ledgers never do
     assert h.guard("backtest", ["apps/learning-architecture/src/app/a26_assist.js"], [])
+    # a genuine crash fix in the engine by the urgent routine: allowed WITH a hand-off (the backtest verifies it)
+    eng = "apps/learning-architecture/src/app/epi_engine.js"
+    assert h.guard("urgent", [eng], []) and h.guard("urgent", [eng], [{"by": "urgent", "area": "epi-engine"}]) == []
     assert h.guard("urgent", ["apps/learning-architecture/docs/WORKLOG.md", "experiences/x.md"], []) == []
 
 
 def test_add_inbox_close_and_stale(tmp_path, monkeypatch, capsys):
     h = _tool()
-    monkeypatch.setattr(h, "LEDGER", str(tmp_path / "h.json"))
+    monkeypatch.setattr(h, "LEDGER", str(tmp_path / "handoffs"))
+    monkeypatch.setattr(h, "LEGACY", str(tmp_path / "none.json"))
     monkeypatch.setattr(h, "VIEW", str(tmp_path / "H.md"))
     assert h.main(["add", "--by", "urgent", "--area", "epi-territory", "--kind", "did", "--sheet", "7",
                    "--what", "حوزهٔ «معرفت‌شناسیِ فضیلت» یک گام، طبقِ مسیرِ ۳", "--commit", "abc123"]) == 0
     assert h.main(["add", "--by", "urgent", "--area", "epi-foundation", "--kind", "request", "--sheet", "8", "--what", "قابِ تازه"]) == 0
     assert h.main(["add", "--by", "backtest", "--area", "epi-territory", "--kind", "owner-did", "--sheet", "9", "--what", "خودم کردم"]) == 0
+    ents = h.load()["entries"]
+    assert len(ents) == 3 and len({e["id"] for e in ents}) == 3 and len(os.listdir(tmp_path / "handoffs")) == 3, "one file per entry, unique ids"
+    did, req, own = ents
     capsys.readouterr()
     h.main(["inbox", "--routine", "backtest"])
     out = capsys.readouterr().out
-    assert "h1" in out and "h2" in out and "h3" not in out
-    assert h.main(["close", "h1", "--by", "urgent", "--status", "verified", "--note", "x"]) == 1, "only the owner closes"
-    assert h.main(["close", "h1", "--by", "backtest", "--status", "corrected", "--note", "گام درست نبود؛ با ابزار دوباره"]) == 0
+    assert did["id"] in out and req["id"] in out and own["id"] not in out
+    assert h.main(["close", did["id"], "--by", "urgent", "--status", "verified", "--note", "x"]) == 1, "only the owner closes"
+    assert h.main(["close", did["id"], "--by", "backtest", "--status", "corrected", "--note", "گام درست نبود؛ با ابزار دوباره"]) == 0
     data = h.load()
-    assert data["entries"][0]["status"] == "corrected" and data["entries"][2]["status"] == "done"
+    st = {e["id"]: e["status"] for e in data["entries"]}
+    assert st[did["id"]] == "corrected" and st[own["id"]] == "done"
     assert h.validate(data, h.load_own()) == []
     late = datetime.now(timezone.utc) + timedelta(hours=60)
-    assert [e["id"] for e in h.stale(data, h.load_own(), at=late)] == ["h2"], "a request the daily owner ignored for 2 rounds"
-    assert "h2" in open(h.VIEW, encoding="utf-8").read()
+    assert [e["id"] for e in h.stale(data, h.load_own(), at=late)] == [req["id"]], "a request the daily owner ignored for 2 rounds"
+    assert req["id"] in open(h.VIEW, encoding="utf-8").read()
+
+
+def test_two_routines_recording_at_once_never_conflict(tmp_path):
+    """Found by a simulation on 2026-10-14: with one JSON file, two routines appending at the same time hit a rebase
+    conflict and both wrote «h3». Now: one file per entry + a union-merged generated view."""
+    import shutil
+    import subprocess
+
+    def run(cwd, *a):
+        r = subprocess.run(list(a), cwd=cwd, capture_output=True, text=True)
+        assert r.returncode == 0, (a, r.stdout, r.stderr)
+        return r.stdout
+
+    origin = tmp_path / "origin"
+    seed = tmp_path / "seed"
+    for d in ("docs/supervisor", "scripts/supervisor"):
+        (seed / d).mkdir(parents=True)
+    shutil.copy(os.path.join(ROOT, "docs", "supervisor", "ownership.json"), seed / "docs/supervisor/ownership.json")
+    shutil.copy(os.path.join(ROOT, "scripts", "supervisor", "handoff.py"), seed / "scripts/supervisor/handoff.py")
+    shutil.copy(os.path.join(ROOT, ".gitattributes"), seed / ".gitattributes")
+    run(seed, "git", "init", "-q", "-b", "main"); run(seed, "git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "--allow-empty", "-m", "0")
+    run(seed, "git", "add", "-A"); run(seed, "git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "seed")
+    run(tmp_path, "git", "clone", "-q", "--bare", str(seed), str(origin))
+    a, b = tmp_path / "a", tmp_path / "b"
+    for d in (a, b):
+        run(tmp_path, "git", "clone", "-q", str(origin), str(d))
+    run(a, "python3", "scripts/supervisor/handoff.py", "add", "--by", "urgent", "--area", "epi-territory", "--kind", "did", "--what", "A")
+    run(a, "git", "add", "-A"); run(a, "git", "-c", "user.email=t@t", "-c", "user.name=a", "commit", "-q", "-m", "a"); run(a, "git", "push", "-q", "origin", "HEAD:main")
+    run(b, "python3", "scripts/supervisor/handoff.py", "add", "--by", "backtest", "--area", "epi-foundation", "--kind", "owner-did", "--what", "B")
+    run(b, "git", "add", "-A"); run(b, "git", "-c", "user.email=t@t", "-c", "user.name=b", "commit", "-q", "-m", "b")
+    run(b, "git", "fetch", "-q", "origin", "main")
+    run(b, "git", "-c", "user.email=t@t", "-c", "user.name=b", "rebase", "-q", "origin/main")   # must not conflict
+    run(b, "python3", "scripts/supervisor/handoff.py", "check", "--fix")
+    out = run(b, "python3", "scripts/supervisor/handoff.py", "check")
+    assert "سالم" in out
+    assert len(os.listdir(b / "docs/supervisor/handoffs")) == 2
 
 
 def test_assistant_reads_the_same_registry():
