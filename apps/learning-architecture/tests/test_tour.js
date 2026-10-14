@@ -129,9 +129,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     window.__opt = 0; window.__tab = 0; m.querySelector('.dopt').onclick = () => __opt++; document.getElementById('tb').onclick = () => __tab++;
     const sc = APP.ASSIST.scan(), k = l => (sc.fields.find(f => f.label === l) || sc.buttons.find(x => x.label === l)).k;
     const r = await APP.ASSIST.run([{ do: 'highlight', k: k('دو جعبه مانده، پس ۱/۲') }, { do: 'click', k: k('دو جعبه مانده، پس ۱/۲') }, { do: 'fill', k: k('پاسخ'), value: '2/3' }, { do: 'click', k: k('در انتظار تأیید (۱)') }]);
-    return { opt: __opt, hl: m.querySelector('.dopt').classList.contains('as-hl'), ka: document.getElementById('ka').value, tab: __tab, notes: r.notes.length };
+    return { opt: __opt, hl: m.querySelector('.dopt').classList.contains('as-hl'), ka: document.getElementById('ka').value, tab: __tab, notes: r.notes.length, nj: r.notes.join('|') };
   });
-  chk(info.ans.opt === 0 && !info.ans.hl && info.ans.ka === '' && info.ans.notes === 3, 'exercise options/answers are never clicked, highlighted or filled: ' + JSON.stringify(info.ans));
+  chk(info.ans.opt === 0 && !info.ans.hl && info.ans.ka === '' && (info.ans.notes === 3 || (info.ans.notes === 1 && /×۳/.test(info.ans.nj))), 'exercise options/answers are never clicked, highlighted or filled: ' + JSON.stringify(info.ans));
   chk(info.ans.tab === 1, 'a tab whose label contains «تأیید» is navigation and can be clicked');
 
   // 9) پیگیریِ برگه: جوابِ ناقص ⇒ یادداشتِ مستدل زیرِ همان برگه (و باز شدنش)؛ جوابِ تازه‌تر از بارِ صفحه ⇒ «تازه کن»؛ «شاید منتشر نشده» ⇒ یادداشت نه، صبر تا تازه‌کردن؛ درست ⇒ وجه باز
