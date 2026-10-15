@@ -114,7 +114,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.evaluate(() => APP.render()); await p.waitForTimeout(150);
   info.needIsoAfter = await p.locator('main [data-probe="f1_named"] .kn-neediso').count();
   await p.click('main [data-probe="f1_named"] .kn-opt:has-text("فقط با نامِ مفهوم")'); await p.waitForTimeout(250);
+  // پاسخِ آزمون مالِ کاربر است: دستیار نمی‌زند (کارزارِ سوم)
+  info.probeOwn = await p.evaluate(async id => { const AS = APP.ASSIST, b = AS.scan().buttons.find(x => /کامل و درست بود/.test(x.label)); const r = b ? await AS.run([{ do: 'click', k: b.k }]) : { notes: ['none'] }; return !(APP.S.get(id).pans || {}).f2_restate && /تصمیمِ خودِ توست|خودت بزن/.test(r.notes.join()); }, mathId);
   await p.click('main [data-probe="f2_restate"] .kn-opt:has-text("کامل و درست بود")'); await p.waitForTimeout(250);
+  info.probeEff = await p.evaluate(() => ((document.querySelector('main [data-probe="f2_restate"] .kn-eff') || {}).textContent || '') + '|' + /±/.test(document.getElementById('main').innerText));
   info.ev = await p.evaluate(id => APP.S.get(id).ev.map(e => e.fam + ':' + e.dir + ':' + e.w + ':' + e.kind).join('|'), mathId);
   info.rankAfter = await p.evaluate(id => { const r1 = JSON.stringify(APP.knotRank(APP.S.get(id))); const r2 = JSON.stringify(APP.knotRank(APP.S.get(id))); const r = APP.knotRank(APP.S.get(id)); return { same: r1 === r2, f1: r.find(x => x.fam === 'F1').score, f2: r.find(x => x.fam === 'F2').score, f2ref: r.find(x => x.fam === 'F2').refSubs.join(','), f2open: r.find(x => x.fam === 'F2').openSubs.join(','), top: r[0].fam }; }, mathId);
   // re-answering a probe replaces its evidence (no double counting)
@@ -476,6 +479,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.isoBox === 1 && info.needIso === 1 && info.needIsoAfter === 0, 'isomorph path');
   E(info.ev === 'F1:1:3:contrast|F2:-1:1:fact', 'evidence: ' + info.ev);
   // F1: kind «problem» 1÷3 + s_rule 3÷1 (its only specific signal) + contrast +3 = 6.33; F2: 1÷3 − 1 (fact) = −0.67
+  E(info.probeOwn, 'the assistant cannot answer a knot test for the user (owner-only)');
+  E(/کنار می‌گذارد/.test(info.probeEff) && /باز می‌ماند/.test(info.probeEff) && /\|false$/.test(info.probeEff), 'each answer shows what it rules out, what stays open, and no numeric weights: ' + info.probeEff);
   E(info.rankAfter.same && info.rankAfter.f1 === 1 && info.rankAfter.f2 === 0 && info.rankAfter.f2ref === 'read' && /rep/.test(info.rankAfter.f2open) && info.rankAfter.top === 'F1', 'restating correctly rules out only misreading, not a wrong model (A0, HANDBOOK row 45): ' + JSON.stringify(info.rankAfter));
   E(/:gap,inert$/.test(info.f1Reanswer), 're-answer replaces evidence; solving without the name rules out only gap/inert: ' + info.f1Reanswer);
   E(info.ledgerRows === 2, 'ledger rows: ' + info.ledgerRows);

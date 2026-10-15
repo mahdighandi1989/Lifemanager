@@ -696,8 +696,8 @@
     return h("select", { id: id, onchange: function (e) { onCh(e.target.value); } }, h("option", { value: "" }, "— انتخاب کن —"),
       opts.map(function (o) { return h("option", { value: o[0], selected: val === o[0] }, o[1]); }));
   }
-  function radios(name, val, opts, onCh) {
-    return h("div", { class: "kn-radios", role: "radiogroup" }, opts.map(function (o, i) {
+  function radios(name, val, opts, onCh, own) {
+    return h("div", { class: "kn-radios", role: "radiogroup", "data-own": own ? "1" : null }, opts.map(function (o, i) {
       var id = name + "_" + i;
       return h("label", { class: "kn-radio", for: id }, h("input", { type: "radio", id: id, name: name, value: o[0], checked: val === o[0], onchange: function () { onCh(o[0]); } }), h("span", {}, o[1]));
     }));
@@ -705,7 +705,8 @@
   function area(id, val, rows, onIn, ph) { var t = h("textarea", { id: id, rows: rows || 3, placeholder: ph || "", oninput: function (e) { onIn(e.target.value); } }); t.value = val || ""; return t; }
   function txt(id, val, onIn, ph) { return h("input", { type: "text", id: id, value: val || "", placeholder: ph || "", oninput: function (e) { onIn(e.target.value); } }); }
   function famChip(id) { var F = KFM[id]; return F ? h("span", { class: "chip kn-fam", style: { "--kc": "var(--p" + ((F.n - 1) % 9) + ")" } }, famName(id)) : null; }
-  function kchip(kind) { return h("span", { class: "chip kn-k kn-k-" + kind, title: "وزنِ این نوع شاهد: ±" + fa(String(KW[kind]).replace(".", "٫")) }, KWFA[kind] + " · ±" + fa(String(KW[kind]).replace(".", "٫"))); }
+  /* نوعِ شاهد بی عدد: رتبه دیگر وزن ندارد (مالک ۲۰۲۶-۱۰-۱۵) — فقط این‌که چه جور شاهدی است (کارزارِ سوم v05: «±۱ / ±۰٫۵» هنوز دیده می‌شد) */
+  function kchip(kind) { return h("span", { class: "chip kn-k kn-k-" + kind }, KWFA[kind]); }
 
   /* ================= نمای «موقعیت» ================= */
   A.V.kcase = function (id, step) {
@@ -826,7 +827,7 @@
       fld("چه انتظار داشتم", area("knExp", it.expected, 2, set("expected")), { req: true, k: "expected" }),
       fld("در واقع چه شد", area("knAct", it.actual, 2, set("actual")), { req: true, k: "actual" }),
       fld("چه فکرهایی کردم / چه کردم (همان‌طور که یادت هست)", area("knThk", it.thoughts, 3, set("thoughts")), { req: true, k: "thoughts" }),
-      group("پاسخ/راه‌حل را دیده‌ای؟", radios("knSeen", it.seen, [["yes", "بله، دیده‌ام"], ["no", "نه، هنوز ندیده‌ام"], ["na", "پاسخِ یکتایی در کار نیست (موقعیتِ باز)"]], function (v) { it.seen = v; ch(); }),
+      group("پاسخ/راه‌حل را دیده‌ای؟", radios("knSeen", it.seen, [["yes", "بله، دیده‌ام"], ["no", "نه، هنوز ندیده‌ام"], ["na", "پاسخِ یکتایی در کار نیست (موقعیتِ باز)"]], function (v) { it.seen = v; ch(); }, true),
         { req: true, k: "seen", hint: "اگر دیده‌ای، نردبانِ راهنمایی روی همین مسئله خاموش می‌شود و آزمون‌ها روی یک «هم‌ریخت» (همان ساختار، ظاهرِ نو) انجام می‌شوند." })));
     box.appendChild(probSec);
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "زمینه"),
@@ -900,7 +901,7 @@
     box.appendChild(h("section", { class: "card", "data-k": "verdict" }, h("h3", {}, "نتیجهٔ قدمِ ۰ ", h("span", { class: "reqmark" }, "*")),
       radios("knVerdict", pr.verdict, [["no", "احتمالاً گره نیست"], ["maybe", "شاید"], ["yes", "احتمالاً هست"]], function (v) {
         pr.verdict = v; if (kc.status === "closed" && v !== "no") { kc.status = "open"; kc.closedAt = null; } noteBox.classList.toggle("hidden", v !== "no"); H.put();
-      }), h("p", { class: "small muted" }, "هر سه گزینه اجازهٔ ادامه می‌دهند."), noteBox));
+      }, true), h("p", { class: "small muted" }, "هر سه گزینه اجازهٔ ادامه می‌دهند."), noteBox));
     return box;
   }
 
@@ -1160,10 +1161,21 @@
         var evs = p.scoreFrom(ans); if (!evs.length) { A.toast("هر دو عدد را بنویس (پیش‌بینی بزرگ‌تر از صفر).", "bad"); return; }
         record("nums", "پیش‌بینی " + fa(ans.pred) + "، واقعی " + fa(ans.real) + (evs[0].dir > 0 ? " (بیش از ۲۵٪ دیرتر)" : " (نزدیک به پیش‌بینی)"));
       } }, "ثبت")));
-    } else wrap.appendChild(h("div", { class: "kn-opts", role: "group", "aria-label": p.fa }, p.opts.map(function (o) {
+    } else wrap.appendChild(h("div", { class: "kn-opts", role: "group", "aria-label": p.fa, "data-own": "1" }, p.opts.map(function (o) {
       var on = kc.pans[p.id] && kc.pans[p.id].v === o.v;
       return h("button", { type: "button", class: "btn sm" + (on ? "" : " ghost") + " kn-opt", "aria-pressed": on ? "true" : "false", onclick: function () { if (!on) record(o.v, o.fa); } }, o.fa);
     })));
+    /* اثرِ پاسخ، با دلیل (کارزارِ سوم v05: «F10 با دو پاسخِ علیه کنار نرفت و هیچ‌جا نگفت چرا») */
+    if (kc.pans[p.id]) {
+      var F0 = KFM[F.id], eff = p.scoreFrom(kc.pans[p.id]).map(function (e) {
+        var Fx = KFM[e.fam] || F0, nm = function (id) { var x = Fx.subs.filter(function (y) { return y.id === id; })[0]; return x ? "«" + x.fa + "»" : id; };
+        if (e.dir > 0) return "شاهد برای «" + Fx.fa + "»" + (e.sub && typeof e.sub === "string" ? " — " + nm(e.sub) : "");
+        var subs = Array.isArray(e.sub) ? e.sub : [];
+        return subs.length ? "کنار می‌گذارد: " + subs.map(nm).join("، ") + " (پاسخت با آن نمی‌خواند)؛ بقیهٔ «" + Fx.fa + "» باز می‌ماند"
+          : "چیزی را کنار نمی‌گذارد — هیچ تبیینی از این خانواده لزوماً خلافِ این پاسخ را پیش‌بینی نمی‌کند" + (p.kind === "counterfactual" ? " (و حدس دربارهٔ حالتِ فرضی مشاهده نیست)" : "");
+      });
+      if (eff.length) wrap.appendChild(h("p", { class: "small muted kn-eff" }, "اثرِ این پاسخ: " + eff.join(" · ")));
+    }
     return wrap;
   }
   function simLinks(fam) {
