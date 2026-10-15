@@ -4512,3 +4512,25 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **PROPOSAL (owner):**
   - The solving tunnel should work on the user's own unsolved problems (biggest Pólya gap).
   - A `matter` encoding for «ظنی» premises.
+
+## 2026-10-15 — LLA backtest routine (run in the main session on the owner's order): inbox, frame scope, p_matter_zanni, corpus blind re-encode (WORKLOG 63)
+- **FINDING:** Frame members (OSC 2015, EERP, SSRP) were encoded with scope «کلی نامحدود». Each one states a statistical population effect, so no scope value applies. OSC members were capped at 0 by T_universal.
+- **CHANGE:** New command `epi_backtest.js recode`. It fixes or fills frame or round-corpus encodings only with a named blind encoder and reviewer. It is all-or-nothing, never overwrites silently, and keeps the history. Scope was removed from all 136 members. OSC vazraf was filled where both encoder and reviewer agreed. OSC ceilings went from 0 to 36. Bases did not change.
+- **REVERT:** The OSC `hidden_ctrl` fill moved base `p_hidden_factor` from 50 to 48 for every claim with an uncontrolled hidden factor. One population's rate was spreading to all populations, which T_pop does not allow, so the fill was undone.
+- **DECISION/CHANGE:** `p_matter_zanni` was applied under the owner's standing rule ("apply what follows strictly from the axioms"), but only its theorem part.
+  - Applied: matter value «مقدمه ظنی», `prem_p` (recorded only), and `r_aql_matter_zanni` = 99.9 (O, from T_below1).
+  - Wiring: the `a7_bt.js` premise-table mapping now sets these values.
+  - An independent proof check rejected two other caps. "cap = weakest premise" fails because A1 gives a lower bound in a deduction. "½ for an unstated degree" fails because a probable (zann) premise is above ½ by definition.
+- **PROPOSAL (owner):** `p_found_mixture`. Two incompatible readings of "unestablished link" coexist:
+  - `matter_false` = ½ comes from T_null, which is the mixture reading.
+  - `matter_unproven` = ½ comes from T_unknown + T_weakest, which is the weakest-link reading. Under the mixture reading it would be 75.
+  - The same pattern appears in relay, analogy without established relation, unestablished novelty and the unmeasured `p_thiqa`. A4 over a continuum also has a Bertrand caveat.
+- **CHANGE:** The corpus was blind re-encoded with the new features, fill-empty only.
+  - Method: two separate blind encoders, a mechanical merge and an independent reviewer.
+  - 108 values applied, 5 rejected, 4 reverted for breaking a correct verdict. The reverted ones were `chain` on sound single-source testimony, which `r_naql_ahad` with `p_thiqa` = 50 flags.
+  - `run --rerun` round 12: 203/203 correct before and after. Fully located went from 115 to 116, and claim-ceiling Brier went from 0.28755 to 0.2618 (now recorded as `row.brier` in the ledger).
+- **FINDING → FIX (independent round review):** 7 problems, all fixed and recorded with `review`.
+  - Outcome leakage check: a separate session stripped the post-judgement sentences from 34 stories, and a third blind encoder re-encoded from the stripped text. 36 of 43 values were reproduced. The 7 that were not reproduced were removed, leaving 101 applied values.
+  - Sally Clark form was removed.
+  - `recode` now rejects duplicate targets and refuses unset without replace.
+- **DID:** 17 inbox `did` handoffs verified/closed, and requests `h…070f` and `h…9cd6` done. Independent agents were separate cloud sessions, with input and output exchanged through private Artifact pages.
