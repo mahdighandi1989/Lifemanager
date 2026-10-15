@@ -4493,3 +4493,22 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
   2. Numeric worksheet fields rejected Persian digits.
 - **CHANGE:** Both bugs fixed (`a7_bt.js` prefill, `a2_ws.js` `FIELD.num`). `test_plausible.js` now walks the real user path. Sources coverage updated to round 4.
 - **FINDING (open, low):** A 🌱 step's due date ignores the user's own "when"; 🌱 lines are not grouped in «امروز»; analogy fields in the guess kit are unchecked.
+
+## 2026-10-15 — LLA: skeptical execution reviewers on recent owner requests; all fixed; Pólya strict re-grade (WORKLOG 61)
+- **FINDING (4 independent adversarial reviewers, executing the page):**
+  - **HIGH:**
+    - Anchor-puzzle images were never deployed: `build.py` `sync()` deleted them as "stale".
+    - Persian-digit answers were marked wrong.
+    - Overconfidence mixed event forecasts with answer confidence.
+    - The model alone could clear the safety flag.
+    - The assistant could write a factory verdict.
+    - An idea could show «یقین ۱۰۰٪» after its key assumption was refuted.
+    - Field caps and fallacious-form rules never fired on real user cases.
+    - Pólya "758 deep" was boilerplate-inflated.
+  - **Gate gap:** the pytest gate ran only 2 of 53 page tests, and 8 of 24 mutations survived.
+- **CHANGE:** Four fixer branches were merged. New real-path tests: `test_psy_v2`, `test_realpath_factory`, `test_idea_v2`, `test_polya_fix5` and `test_fixes_1015c`. The merge gate now runs every page test by exit code (`apps/learning-architecture/package.json` pins playwright). Engine conformance edits are recorded as handoffs `epi-rules` / `epi-engine` for backtest to verify; 0 of 203 verdicts moved.
+- **FINDING → CHANGE:** Pólya round 5 (strict, per item, 663 runtime quotes verified): 567 deep / 108 shallow / 104 absent / 33 n/a (was 758/32/0/22). The report is `docs/decisions/2026-10-15-polya-strict-regrade.md`.
+- **DECISION:** Sources live in Drive folder «منابع — کتاب‌ها و آموزش‌ها» (with an archive subfolder), never in git. Scanned PDFs get three-layer OCR; videos are read only via their transcript (`AGENTS.md`).
+- **PROPOSAL (owner):**
+  - The solving tunnel should work on the user's own unsolved problems (biggest Pólya gap).
+  - A `matter` encoding for «ظنی» premises.

@@ -94,3 +94,18 @@ const critic = await agent(`What did this audit MISS? Probe: security, backup,
 - منبع اولیه: سشن ممیزی 2026-07-20 همین مخزن؛ گزارش کامل در
   `docs/decisions/2026-07-20-life-os-holistic-audit.md` (نمونهٔ عینی خروجی سه‌لایه).
 - مرتبط: [pluggable-ai-provider-catalog-and-router]، [periodic-attention-engine-cooldown-dedup]
+
+## Update 2026-10-15 — coverage counts inflated by boilerplate; verify with quotes from the running page
+
+A per-item coverage audit (812 items of a book vs. the system) reported 758 "deep" after three
+rounds — but those 758 verdicts used only 93 distinct justification texts built from ~15
+paragraphs: an item was "deep" because a *general* tunnel existed (a question list, a simulator),
+not because that item lived anywhere. A skeptical reviewer sampling 40 items found ~a third
+inflated; a strict re-grade gave 567. The same round found new rules that were correct in unit
+tests but never fired on real user data (tests fed the engine hand-built feature objects), and a
+build step that deleted deployed images right after copying them.
+**Apply elsewhere:** (1) for any "N of M covered" claim, count distinct justifications — if they
+are far fewer than N, the count is inflated; require each positive verdict to quote text that a
+script then finds in the *executed* product (here 663 quotes, 0 misses); (2) send adversarial,
+execution-based reviewers per requirement before merging large work, with mutation testing to see
+which behaviours the suite does not actually guard; (3) let builders never grade their own work.
