@@ -1,0 +1,15 @@
+{
+ "id": "h20261015155913545350-session-342a",
+ "at": "2026-10-15T15:59:13Z",
+ "by": "session",
+ "area": "epi-foundation",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_plausible_reasoning (مالک ۲۰۲۶-۱۰-۱۵ «موافقم»): قضیهٔ T_plausible در epi_found.js (r_aql_conseq / r_aql_analogy، توابعِ conseq و analogy) و ثبتِ آن در backtest/foundation.json؛ «پیامدِ ردشده ⇒ ۰» اعمال نشد (قضیه نیست). هیچ حکمِ پیکره جابه‌جا نشد. لطفاً وارسی کنید.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱ (اعمالِ پیشنهادِ پذیرفتهٔ مالک)",
+ "commit": "",
+ "status": "open"
+}

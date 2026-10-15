@@ -3,10 +3,13 @@
 هر کاری که یک روتین در قلمروِ روتینِ دیگری کرد (یا از او خواست) این‌جاست؛ روتینِ مالک در آغازِ هر دور
 `python3 scripts/supervisor/handoff.py inbox --routine <خودش>` را می‌زند، می‌سنجد و می‌بندد. قواعد: `ownership.json`.
 
-**باز: 25** · کل: 25
+**باز: 28** · کل: 28
 
 | # | زمان | از | قلمرو | نوع | برگه | چه | وضع | بستنِ |
 |---|---|---|---|---|---|---|---|---|
+| h20261015155913661671-session-f9ce | 2026-10-15 15:59 | session | بقیهٔ Lifemanager | did | — | یادداشت‌های دست‌به‌دستِ docs/overhaul/handoff-notes/_pending_plausible_2026-10-15.md و _pending_polya_R4_2026-10-15.md (شرحِ تغییراتِ T_plausible و دورِ ۴ ِ پولیا برای ادغام‌کننده)؛ AUDIT_LOG به‌روز شد. | open |  |
+| h20261015155913597565-session-2eb9 | 2026-10-15 15:59 | session | منبع‌های بیرونی و پوششِ آن‌ها در سامانه («📚 منبع‌ها و پوشش»: کتاب‌هایی که مالک می‌فرستد) | did | — | پولیا دورِ ۴: sources/polya_how_to_solve_it/coverage.json از ممیزیِ مستقلِ اجرایی (۷۵۸ عمیق / ۳۲ سطحی / ۰ ندارد / ۲۲ نامربوط)، history دورِ ۴، beyond ۲۲ مورد؛ test_sources سبز. | open |  |
+| h20261015155913545350-session-342a | 2026-10-15 15:59 | session | مبنای عددها: مقدارهای پایه و قاب‌های بی‌گزینش | did | — | p_plausible_reasoning (مالک ۲۰۲۶-۱۰-۱۵ «موافقم»): قضیهٔ T_plausible در epi_found.js (r_aql_conseq / r_aql_analogy، توابعِ conseq و analogy) و ثبتِ آن در backtest/foundation.json؛ «پیامدِ ردشده ⇒ ۰» اعمال نشد (قضیه نیست). هیچ حکمِ پیکره جابه‌جا نشد. لطفاً وارسی کنید. | open |  |
 | h20261015150830253691-session-6683 | 2026-10-15 15:08 | session | بقیهٔ صفحهٔ «معماری یادگیری» (نماها، فرم‌ها، دستیار، سامانهٔ یادگیری، گره‌گشا، مسئله‌ها) | did | — | p_plausible_reasoning (مالک «موافقم»): a2_ws.js نوعِ عامِ تازهٔ فیلدِ «num» (عددِ صحیحِ ≥ ۰، ارقامِ فارسی، خالی ⇒ نامعلوم، با label for)؛ a7_bt.js: «داوریِ قطعی» خانه‌های خالیِ x_conseq_*/x_analog_* را از کاربرگِ «راه عقل و برهان» پر می‌کند و «جزوهٔ زنده» برای basis beyond برچسبِ «فراتر از جزوه — قض | open |  |
 | h20261015150830065118-session-4471 | 2026-10-15 15:08 | session | بک‌تستِ پیوسته: پیکرهٔ وقایع، یافته‌ها، پیشنهادها، جزوهٔ متقن، پرونده‌های بذر | did | — | p_plausible_reasoning در proposals.json: applied + appliedWhat + decision (owner «موافقم»، judged، applied، notApplied ×۳، effect). tools/epi_backtest.js: جزوهٔ متقن بخشِ «فراتر از جزوه» (قاعده‌های basis beyond با قضیه) گرفت. run --rerun دورِ ۱۲: قاعده‌ها ۷۷ ⇒ ۷۹، بدیهی‌پایه ۲۶ ⇒ ۲۸، هیچ حکمی عوض نش | open |  |
 | h20261015150829897344-session-b24c | 2026-10-15 15:08 | session | موتور و ساختارِ کارخانه (سالن‌ها، ایستگاه‌ها، ویژگی‌ها، رمزگذاریِ کور، دادگاهِ بک‌تست) | did | — | p_plausible_reasoning (مالک «موافقم»): پنج ویژگیِ تازه در epi_feat.js (st_aql): x_conseq_n، x_conseq_new، x_analog_n، x_analog_k، x_analog_rel با قاعدهٔ رمزگذاریِ کور کنارشان (فقط از لفظِ تصدیق و داستان، هرگز از سرانجام؛ نگفته ⇒ ننویس؛ ردشده ⇒ x_conseq_n ننویس / conflict_cert)؛ کاربرگِ st_aql در epi | open |  |

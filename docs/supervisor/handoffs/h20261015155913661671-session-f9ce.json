@@ -1,0 +1,16 @@
+{
+ "id": "h20261015155913661671-session-f9ce",
+ "at": "2026-10-15T15:59:13Z",
+ "by": "session",
+ "area": "app",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "یادداشت‌های دست‌به‌دستِ docs/overhaul/handoff-notes/_pending_plausible_2026-10-15.md و _pending_polya_R4_2026-10-15.md (شرحِ تغییراتِ T_plausible و دورِ ۴ ِ پولیا برای ادغام‌کننده)؛ AUDIT_LOG به‌روز شد.",
+ "procedure": "CLAUDE.md#Non-negotiable rules",
+ "commit": "",
+ "status": "open"
+}

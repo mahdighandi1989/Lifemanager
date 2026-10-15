@@ -1,0 +1,16 @@
+{
+ "id": "h20261015155913597565-session-2eb9",
+ "at": "2026-10-15T15:59:13Z",
+ "by": "session",
+ "area": "lla-sources",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "پولیا دورِ ۴: sources/polya_how_to_solve_it/coverage.json از ممیزیِ مستقلِ اجرایی (۷۵۸ عمیق / ۳۲ سطحی / ۰ ندارد / ۲۲ نامربوط)، history دورِ ۴، beyond ۲۲ مورد؛ test_sources سبز.",
+ "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
+ "commit": "",
+ "status": "open"
+}
