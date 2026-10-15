@@ -1332,7 +1332,7 @@
   },
   {
    "round": 12,
-   "at": "2026-10-14",
+   "at": "2026-10-15",
    "note": "دورِ ۱۱ پس از اصلاحِ رمزگذاری و بازبینیِ مستقل",
    "corpus": {
     "n": 203,
@@ -1371,7 +1371,7 @@
    },
    "coverage": {
     "rulesTested": 54,
-    "rules": 73,
+    "rules": 77,
     "sectionsTested": 54,
     "sections": 72,
     "domains": 12,
@@ -1394,7 +1394,11 @@
      "r_yad_undoc_t2",
      "r_yad_undoc_t1",
      "r_grade_false_zero",
-     "r_r_sanad_ahad"
+     "r_r_sanad_ahad",
+     "r_expert_pop_econ",
+     "r_expert_pop_psych",
+     "r_expert_pop_socsci",
+     "r_expert_pop_unknown"
     ],
     "byDomain": {
      "پزشکی": 22,
@@ -1413,8 +1417,8 @@
    },
    "foundation": {
     "classes": {
-     "B": 25,
-     "S": 15,
+     "B": 26,
+     "S": 18,
      "O": 6,
      "X": 0,
      "?": 0
@@ -1449,8 +1453,8 @@
       "changed": 0
      }
     },
-    "baseMeasured": 0,
-    "baseTotal": 8,
+    "baseMeasured": 3,
+    "baseTotal": 11,
     "baseval": {
      "p_thiqa": 50,
      "p_zahir": 50,
@@ -1459,9 +1463,12 @@
      "p_hidden_inf": 50,
      "p_expert_bias": 50,
      "p_hidden_factor": 50,
+     "p_expert_econ_lab": 60,
+     "p_expert_psych08": 36.4,
+     "p_expert_socsci_ns": 60.9,
      "p_mem": 50
     },
-    "samples": 0,
+    "samples": 3,
     "conventional": 0,
     "audit": 0,
     "baseChanges": []

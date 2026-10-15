@@ -617,7 +617,13 @@
   },
   "encoding": "رمزگذارِ کورِ جدا (فقط متنِ یافته و طرحِ ویژگی‌ها، بی دیدنِ سرانجام)",
   "by": "session (Claude Code) — طبقِ BACKTEST_PROMPT مسیرِ ۱؛ دست‌به‌دست برای روتینِ بک‌تست",
-  "round": 13
+  "round": 13,
+  "x_field": "اقتصادِ تجربی — آزمایش‌های آزمایشگاهیِ AER/QJE ۲۰۱۱–۲۰۱۴",
+  "x_field_set": {
+   "at": "2026-10-15",
+   "by": "session (Claude Code) — اعمالِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵",
+   "why": "تعریفِ خودِ قاب (پیش از سرانجام): «all 18 between-subject laboratory experimental papers published in the AER and QJE in 2011-2014» — نگاشتِ همین قاب در amend.feature.encode."
+  }
  },
  {
   "id": "osc2015_rpp",
@@ -3652,7 +3658,13 @@
    "problems": [],
    "note": "All 97 items checked, not a sample. Re-read rpp_data.csv (sha256 4d87a263…, OSF fgjvw, verified via the OSF API as file rpp_data.csv of node ytpuq 'Analysis' under ezcuj 'Reproducibility Project: Psychology') with a different decoder and the numeric p columns (T_pval_USE..R., fallback 'P-value (R)'; study 59 uses the fallback, p=.0001) plus 'Direction (R)': every truth value matches; 35/97 matches the abstract's 36% (Europe PMC record of doi:10.1126/science.aac4716). Membership = the project's coding T_sign_O (97). The numeric re-derivation differs on 4 studies (28, 37, 104, 129: recalculated original p 0.0503-0.0516) which the project codes significant; kept per the project's 97, all 4 are false, so including them follows the project's own denominator and does not favour a higher rate. Each txt contains the CSV's 'Description of effect (O)' verbatim and no outcome wording; f is identical for all 97 items (frame-level design encoding). Caveat: 113 replications begun, 100 completed by the deadline; completion is not shown to depend on outcome, but the 13 unfinished are outside the frame."
   },
-  "round": 13
+  "round": 13,
+  "x_field": "روان‌شناسی — مقاله‌های ۲۰۰۸ ِ PS/JPSP/JEP:LMC",
+  "x_field_set": {
+   "at": "2026-10-15",
+   "by": "session (Claude Code) — اعمالِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵",
+   "why": "تعریفِ خودِ قاب (پیش از سرانجام): replications of studies from articles published in 2008 in Psychological Science, JPSP and JEP:LMC — frame.population همین است."
+  }
  },
  {
   "id": "camerer2018_ssrp",
@@ -4373,6 +4385,12 @@
    "problems": [],
    "note": "All 21 items checked. Fresh pypdf parse of SSRP SI (OSF pfdyw, 67 pp.), page-anchored: every hypothesis sentence is verbatim in Supplementary Table 1 (pp. 48-51); truth re-derived from Table 3 (p.53, Stage 1) and Table 4 (p.54, Stage 2, used whenever a Stage 2 row has a result): every value matches; 13/21 matches the abstract (Europe PMC record of doi:10.1038/s41562-018-0399-z). Ackerman et al. (2010): Stage 1 'yes' produced by an analysis error (SI p.32), Stage 2 'no'; the paper's 13 counts it as not replicated, as here. f identical for all 21 items. Positive control: flipping one truth in each frame was caught (mismatch + count)."
   },
-  "round": 13
+  "round": 13,
+  "x_field": "علومِ اجتماعیِ تجربی — Nature/Science ۲۰۱۰–۲۰۱۵",
+  "x_field_set": {
+   "at": "2026-10-15",
+   "by": "session (Claude Code) — اعمالِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵",
+   "why": "تعریفِ خودِ قاب (پیش از سرانجام): ALL experimental social-science studies published in Nature and Science 2010-2015 meeting five pre-stated criteria — frame.population همین است."
+  }
  }
 ]
