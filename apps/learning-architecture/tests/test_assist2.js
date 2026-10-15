@@ -138,7 +138,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.HOST.sheets = async () => [{ number: 12, title: 'حوزهٔ پیش‌بینی در قلمرو نیست', status: 'open', urgent: true }];
     APP.HOST.report = async (o) => { (window.__reps2 = window.__reps2 || []).push(o); return { id: 'x', number: 50 }; };
     const s = APP.ASSIST.newSession(); s.msgs.push({ role: 'user', text: 'x', at: '' }); s.pinned = 'سنجشِ پیش‌بینیِ عددی'; APP.S.put(s);
-    const g = (t, c) => ({ title: t, area: 'epi-territory', kind: 'build', confidence: c, abstract: 'a', missing: 'b' });
+    const g = (t, c) => ({ title: t, area: 'epi-territory', kind: 'build', confidence: c, abstract: 'a', missing: 'b', where: 'c', how: 'd' });   // برگهٔ نیمه‌خالی ثبت نمی‌شود (۲۰۲۶-۱۰-۱۵)
     const run = async (gap, consult) => { __q.length = 0; if (consult !== undefined) __q.push(consult); const n0 = (window.__reps2 || []).length;
       const r = await APP.ASSIST.triage(s, gap); if (r.gap) await APP.ASSIST.fileGap(s, r.gap); return { skip: r.skip || '', filed: (window.__reps2 || []).length - n0, text: ((window.__reps2 || []).slice(-1)[0] || {}).text || '' }; };
     out.low = await run(g('الف', 0.6));

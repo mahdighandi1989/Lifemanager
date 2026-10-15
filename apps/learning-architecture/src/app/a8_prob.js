@@ -52,7 +52,7 @@
     function card(p) {
       try {
         var pg = prog(p.id), n = p.stages.length, best = 0; for (var l = 1; l <= 4; l++) if (lvStats(pg, l, n).done >= n) best = l;
-        return h("div", { class: "card" + (A.probIsSample(p) ? " pb-sample" : "") }, h("div", { class: "row between wrap" }, h("button", { class: "linkish", onclick: function () { A.go("e_prob", p.id); } }, h("strong", {}, p.title)), h("span", { class: "row gap" }, p.origin && p.origin.type === "kcase" ? h("span", { class: "chip pb-own" }, "از گره‌گشا") : null, A.probIsSample(p) ? h("span", { class: "chip" }, "نمونهٔ آمادهٔ سازنده") : null, h("span", { class: "chip" }, p.field))),
+        return h("div", { class: "card" + (A.probIsSample(p) ? " pb-sample" : "") }, h("div", { class: "row between wrap" }, h("button", { class: "linkish", onclick: function () { A.go("e_prob", p.id); } }, h("strong", {}, p.title)), h("span", { class: "row gap" }, p.origin && p.origin.type === "kcase" ? h("span", { class: "chip pb-own" }, "از گره‌گشا") : null, A.probIsSample(p) ? h("span", { class: "chip" }, "نمونهٔ آمادهٔ سازنده") : null, p.unverified ? h("span", { class: "chip pb-unver" }, "دستی · وارسی‌نشده") : null, h("span", { class: "chip" }, p.field))),
           h("p", { class: "small" }, String(p.statement).split("\n")[0].slice(0, 260)), h("div", { class: "small muted" }, "باز از " + fa(p.open || "") + " · " + fa(n) + " گام · " + fa((p.dead || []).length) + " بن‌بست · " + fa((p.drills || []).length) + " تمرین · بالاترین سطح کامل‌شده: " + (best ? LV[best].fa : "—")));
       } catch (e) { console.warn(e); var rr = S.get("eprob_" + (p && p.id)); return brokenCard(rr || { p: p }, (e && e.message) || String(e)); }
     }
@@ -318,6 +318,14 @@
     return o;
   }
   A.probValid = validP;
+  /* مسئلهٔ کمینه از فیلدهای فرم (وقتی هوش در دسترس نیست): یک گامِ پاسخِ نهایی + نشانِ «وارسی‌نشده»؛ هیچ گامی حدس زده نمی‌شود. */
+  A.probMinimal = function (f) {
+    var t = function (k) { return String(f[k] || "").trim(); }, ans = t("answer");
+    return { title: t("title"), field: t("field") || "—", open: t("open"), statement: t("statement"), answer: ans,
+      why_hard: "(ثبتِ دستی بی هوش مصنوعی — هنوز نوشته نشده)", unverified: true,
+      stages: [{ id: "n1", q: "پاسخِ نهاییِ این مسئله کدام است؟", ctx: "پیش‌نویسِ دستی: گام‌های تصمیم هنوز نوشته نشده‌اند.", opts: [{ t: ans.slice(0, 300), ok: true }, { t: "هنوز نمی‌دانم — باید گام‌ها را خودم بنویسم", ok: false }] }],
+      dead: [], drills: [], lessons: [], src: t("src").split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean), notes: t("notes") };
+  };
   /* متنِ JSON ⇒ شیء، با پیامِ فارسی برای JSON ِ خراب */
   var AI_BAD_JSON = "پاسخِ هوش مصنوعی JSON ِ معتبر نبود؛ دوباره تلاش کن یا JSON را دستی وارد کن.";
   function parseJ(txt, loose, msg) {
@@ -686,7 +694,19 @@
         });
       } }, "تجزیه با هوش مصنوعی"), h("button", { class: "btn ghost pb-manual", onclick: function () {
         try { store(validP(parseJ(jsonTa.value)), "user"); } catch (er) { var m = er.message || String(er); out.innerHTML = ""; out.appendChild(h("pre", { class: "small bad pb-err", role: "alert" }, m)); A.toast(m.split("\n")[0], "bad"); }
-      } }, "ثبت JSON دستی")),
+      } }, "ثبت JSON دستی"),
+      /* هوش در دسترس نیست (یا نمی‌خواهی بفرستی)؟ (بازبینیِ اجرا ۲۰۲۶-۱۰-۱۵): از همین فیلدها یک مسئلهٔ کمینه ساخته می‌شود —
+         یک گامِ «پاسخِ نهایی کدام است؟» — با نشانِ روشنِ «دستی · وارسی‌نشده»؛ گام‌ها را بعداً در «در انتظارِ تأیید» (ویرایش JSON) می‌نویسی. */
+      h("button", { class: "btn ghost pb-formmanual", onclick: function () {
+        var miss = [["title", "عنوان"], ["statement", "صورت مسئله"], ["answer", "پاسخ نهایی"]].filter(function (k) { return !String(f[k[0]] || "").trim(); }).map(function (k) { return k[1]; });
+        if (miss.length) { A.toast("برای ثبتِ دستی این‌ها لازم است: " + miss.join("، "), "bad"); return; }
+        try {
+          var o = validP(A.probMinimal(f));
+          var r = store(o, "user"); r.unverified = true; S.put(r);
+          out.innerHTML = ""; out.appendChild(h("p", { class: "pb-manualok" }, "به‌صورتِ دستی و «وارسی‌نشده» در صفِ تأیید ثبت شد: فقط یک گام دارد (پاسخِ نهایی). گام‌ها، بن‌بست‌ها و تمرین‌ها را در «در انتظارِ تأیید» › «ویرایش JSON» بنویس، یا هر وقت هوش در دسترس شد از نو تجزیه کن."),
+            h("button", { class: "btn sm", onclick: function () { A.go("e_prob", null, "pending"); } }, "رفتن به «در انتظارِ تأیید»"));
+        } catch (er) { var m = er.message || String(er); out.innerHTML = ""; out.appendChild(h("pre", { class: "small bad pb-err", role: "alert" }, m)); A.toast(m.split("\n")[0], "bad"); }
+      } }, "ثبتِ دستی از همین فرم (بی هوش مصنوعی)")),
       jsonTa, out);
   }
   function pending() {
@@ -740,7 +760,8 @@
           h("button", { class: "btn sm ghost pb-chaccept", onclick: function () { var np; try { np = editorP(); } catch (er) { say(er.message); return; } r.p = np; if (!itemOf(np, it.id)) { say("این قلم در JSON ِ ویرایش‌شده نیست."); return; } okSnap(it.id, np); S.put(r); A.render(); } }, "این تغییر را آگاهانه می‌پذیرم"));
       })),
       r.by === "ai" ? h("button", { class: "btn sm pb-rereview", onclick: function (e) { rereview(e.currentTarget, changed.map(function (x) { return x.id; })); } }, "بازبینیِ دوباره (فقط " + fa(changed.length) + " قلمِ تغییرکرده)") : null) : null;
-    return h("section", { class: "card pb-pending", dir: "rtl", "data-rid": r.id }, h("h3", {}, p.title + " · " + (r.personal ? "شبیه‌سازِ مسئلهٔ خودت (از گره‌گشا)" : r.by === "ai" ? "تجزیه هوش مصنوعی" : "دستی")),
+    return h("section", { class: "card pb-pending", dir: "rtl", "data-rid": r.id }, h("h3", {}, p.title + " · " + (r.personal ? "شبیه‌سازِ مسئلهٔ خودت (از گره‌گشا)" : r.by === "ai" ? "تجزیه هوش مصنوعی" : "دستی"),
+      r.unverified || (p && p.unverified) ? h("span", { class: "chip pb-unver" }, " دستی · وارسی‌نشده (بی هوش مصنوعی)") : null),
       h("p", { class: "small" }, fa(p.stages.length) + " گام · " + fa((p.dead || []).length) + " بن‌بست · " + fa((p.drills || []).length) + " تمرین", r.nosrc ? h("span", { class: "chip pb-nosrc" }, " بی‌منبع — بازبین فقط با دانشِ تاریخیِ مستقر سنجید") : null),
       r.personal ? h("p", { class: "small muted" }, "مسئلهٔ شخصی است؛ بازبینیِ تاریخی ندارد. درستیِ گزینه‌ها را «وارسیِ پاسخ‌ها» در پایین می‌سنجد.") : null,
       real ? h("p", { class: "small mv-vsum " + (open.length ? "bad" : "muted") }, "بازبینِ تاریخی: " + fa(fl.length) + " پرچم، " + fa(open.length) + " هنوز باز.") : null,

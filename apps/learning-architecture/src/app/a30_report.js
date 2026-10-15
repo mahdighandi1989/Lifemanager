@@ -9,7 +9,11 @@
   var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
   if (!AS) return;
   var R = A.REPORT = {}; R.URGENT_MS = 90000; R._pend = {};
-  var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen)$/;
+  /* آهنگِ ایمیل (کارزارِ سوم v04: ۶ ایمیل در ۲۵ دقیقه برای یک تور): ایمیلِ خودکار فقط برای رویدادِ معنادار (طرحِ تور، برپاشدنِ وجه،
+     برگه، بازشدنِ دوباره، طیِ ترتیب، تسلط) و پس از نخستین ایمیل حداکثر یکی در هر ۳ ساعت؛ رویدادهای میانه جمع می‌شوند و با بعدی می‌روند.
+     «الان بفرست» ِ مالک (force) همیشه می‌فرستد. */
+  R.MIN_GAP_MS = 3 * 3600000;
+  var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen|safety)$/;
   function nowIso() { return new Date().toISOString(); }
   /* ایمیل بی کد (مالک ۲۰۲۶-۱۰-۱۴: «جاهایی کدگذاری‌شده حرف می‌زند — f7 و … — نباید باشد»): کلیدِ وجه ⇒ نامِ وجه، خانوادهٔ گره ⇒ نامش،
      شناسهٔ حوزه ⇒ نامِ حوزه، کلید/شناسهٔ رکورد ⇒ حذف، واژه‌های فنیِ برگه ⇒ فارسی */
@@ -76,7 +80,8 @@
     if (sub === "in") return "ثبتِ موقعیت"; if (/^ws:/.test(sub)) return "کاربرگ"; if (/^st_/.test(sub)) return "ایستگاه";
     return /[A-Za-z_:]/.test(sub) ? "" : sub;
   }
-  function snap(t) { return { st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt,
+  function sfOf(t) { var d = (t.diag || {}).safety; return d ? d.st : ""; }
+  function snap(t) { return { sf: sfOf(t), st: t.facets.map(function (f) { return f.key + ":" + f.status + ":" + ((f.blocked && f.blocked.checks) || []).length + ":" + AS.tourMilestones(f).filter(function (m) { return m.ok; }).length; }).join(","), done: !!t.doneAt, m: !!t.masteredAt,
     // کدام نشانه‌ها ✓ است (بی شمارهٔ پرانتزی) — تا ایمیل بگوید دقیقاً چه تازه شد یا دوباره باز شد (کارزارِ آزمون sc17: ماندگاریِ ۳۰ روزه و بازگشت گم بود)
     ms: (function () { var o = {}; t.facets.forEach(function (f) { o[f.key] = AS.tourMilestones(f).filter(function (m) { return m.ok; }).map(function (m) { return m.t.replace(/\s*\([^)]*\)\s*$/, ""); }); }); return o; })() }; }
   function events(s, before) {
@@ -98,6 +103,8 @@
         was.filter(function (x) { return now.indexOf(x) < 0; }).forEach(function (x) { ev.push({ k: "reopen", fa: "↩ «" + f.title + "»: «" + x + "» دوباره باز شد", detail: "این نشانه از روی داده‌ها دیگر برقرار نیست (مثلاً گره بازگشت) — دوباره سنجیده می‌شود" }); });
       } else if (o && f.status !== "skipped" && okN > (o.ok || 0) && !(o.st !== "done" && f.status === "done")) ev.push({ k: "step", fa: "▲ پیشرفت در «" + f.title + "» (" + fa(okN) + " نشانه)" });
     });
+    // وضعِ لایهٔ ایمنی عوض شد (مثلاً ارجاع به پزشک ⇒ «بیرون از صفحه») ⇒ ایمیلِ تازه، تا آخرین ایمیل «باید پرسید» ِ کهنه نماند (کارزارِ سوم v03)
+    if (before && (b.sf || "") !== sfOf(t) && sfOf(t)) ev.push({ k: "safety", fa: "🤝 «ایمنی و حال»: " + ({ found: "نشانه‌ای پیدا شد", no: "نشانه‌ای نیست", ask: "هنوز باید پرسید", out: "به کمکِ بیرون از صفحه ارجاع شد" }[sfOf(t)] || sfOf(t)) });
     if (!b.done && t.doneAt) ev.push({ k: "done", fa: "🎉 پایهٔ همهٔ وجه‌ها به ترتیب برپا شد (نشانه‌های مانده تا تسلط پیگیری می‌شوند)" });
     if (!b.m && t.masteredAt) ev.push({ k: "mastered", fa: "🏁 تور تا تسلطِ کامل تمام شد" });
     return ev;
@@ -115,9 +122,13 @@
     if (!(A.HOST && A.HOST.mail)) return Promise.resolve(null);
     var last = Date.parse(t.mailAt || 0) || 0;
     if (!force && !urgent && Date.now() - last < GAP_MS) return Promise.resolve(null);
-    // رویدادهای مهمِ پشتِ‌هم یک ایمیل می‌شوند (کارزارِ آزمون sc15: ۱۳ ایمیل در یک ساعت) — و جا نمی‌مانند: پس از مهلت خودش می‌فرستد
-    if (!force && urgent && Date.now() - last < R.URGENT_MS) {
-      if (!R._pend[s.id]) R._pend[s.id] = setTimeout(function () { delete R._pend[s.id]; R.flush(s, true); }, R.URGENT_MS - (Date.now() - last) + 50);
+    var big = (t.mailq || []).some(function (e) { return BIG.test(e.k); });
+    if (!force && !big) return Promise.resolve(null);   // فقط رویدادِ ریز ⇒ با رویدادِ معنادارِ بعدی می‌رود
+    // پس از نخستین ایمیل: حداکثر یکی در هر R.MIN_GAP_MS؛ و رویدادهای مهمِ پشتِ‌هم یک ایمیل می‌شوند (کارزارِ آزمون sc15) — جا نمی‌مانند: پس از مهلت خودش می‌فرستد
+    var safety = (t.mailq || []).some(function (e) { return e.k === "safety"; });   // تغییرِ وضعِ ایمنی منتظرِ ۳ ساعت نمی‌ماند
+    var gap = last && !safety && (t.mails || []).some(function (m) { return m.status === "sent"; }) ? Math.max(R.MIN_GAP_MS, R.URGENT_MS) : last ? R.URGENT_MS : 0;
+    if (!force && Date.now() - last < gap) {
+      if (!R._pend[s.id]) R._pend[s.id] = setTimeout(function () { delete R._pend[s.id]; R.flush(s, true); }, Math.min(gap - (Date.now() - last) + 50, 2147483000));
       return Promise.resolve(null);
     }   // رویدادهای ریز جمع می‌شوند
     if (R._busy) return Promise.resolve(null); R._busy = true;
@@ -160,6 +171,9 @@
     var imgs = [];
     var chain = Promise.resolve();
     names.forEach(function (n) { chain = chain.then(function () { if (!charts[n[0]]) return; return A.MIND.png(charts[n[0]]).then(function (d) { if (d) imgs.push({ cid: "mind_" + n[0], data: d, fa: n[1] }); }); }); });
+    // نمودارِ پیشرفتِ همین تور (نشانه‌های ✓ در زمان) — همان که کشو نشان می‌دهد (کارزارِ سوم v06)
+    var tch = AS.tourChart ? AS.tourChart(s, { w: 560, h: 150 }) : null, tImg = null;
+    if (tch && A.MIND && A.MIND.png) chain = chain.then(function () { return A.MIND.png(tch).then(function (d) { if (d) { tImg = { cid: "tour_prog", data: d, fa: "پیشرفتِ تور در زمان" }; imgs.push(tImg); } }); });
     return chain.then(function () {
       // وجهِ کنارگذاشته نه «پیشرفت» است نه در مخرج (کارزارِ آزمون sc08: «۳ از ۶» با یک وجهِ تهیِ کنارگذاشته)
       var live = t.facets.filter(function (f) { return f.status !== "skipped"; }), done = live.filter(function (f) { return f.status === "done"; }).length;
@@ -207,6 +221,11 @@
           (f.skipWhy ? "<div>کنار گذاشته شد: " + esc(f.skipWhy) + "</div>" : "");
         H.push(sec(fa(i + 1) + ") " + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + ' <span style="font-size:13px;color:' + C.mute + '">— ' + esc(stFa(f)) + "</span>", inner));
       });
+      /* پیشرفت در زمان و مسیرِ واقعیِ وجه‌ها (بی کد: نامِ وجه‌ها) */
+      var pth = AS.tourPathText ? AS.tourPathText(s) : "", ser = AS.tourSeries ? AS.tourSeries(s) : [];
+      if (pth || ser.length) H.push(sec("📈 پیشرفت در زمان و مسیرِ واقعی", (tImg ? '<div style="text-align:center"><img src="cid:tour_prog" alt="پیشرفتِ تور در زمان" style="max-width:100%;border:1px solid ' + C.line + ';border-radius:8px"></div>' : "") +
+        (ser.length ? '<div style="color:' + C.mute + ';font-size:12px">' + ser.slice(-6).map(function (p) { return esc((A.fdate ? A.fdate(String(p.at).slice(0, 10)) : String(p.at).slice(0, 10)) + " " + String(p.at).slice(11, 16) + ": " + fa(p.n) + " از " + fa(p.all) + " نشانه"); }).join(" · ") + "</div>" : "") +
+        (pth ? "<div><b>🚶 ترتیبِ واقعیِ وجه‌ها:</b> " + esc(pth) + "</div>" : "")));
       /* مسیرِ عبور */
       var tr = (s.trail || []).slice(-60);
       // کدهای خامِ قدم (in/s0/s1/ws:…) به فارسی یا حذف (کارزارِ آزمون sc16) — برای مسیرهای قدیمیِ ذخیره‌شده هم
@@ -237,7 +256,7 @@
       var link = (location.protocol === "http:" || location.protocol === "https:") ? location.origin + "/apps/learning-architecture" : "";
       H.push('<tr><td style="padding:16px 22px;font-size:12px;color:' + C.mute + ';border-top:1px solid ' + C.line + '">این گزارش را «💬 دستیار» در حینِ تور خودکار ساخت.' + (link ? ' <a href="' + esc(link) + '" style="color:' + C.head + '">باز کردنِ صفحه</a>.' : "") + " برای خاموش‌کردن: «📧» در کشوی تور.</td></tr></table></td></tr></table></body></html>");
       var text = "گزارشِ تور: " + title + "\n" + (t.goal || "") + "\n\n" + (evs || []).map(function (e) { return "- " + e.fa; }).join("\n") + "\n\n" +
-        t.facets.map(function (f, i) { return (i + 1) + ") " + f.title + " — " + stFa(f) + "\n" + AS.tourMilestones(f).map(function (x) { return "   " + (x.ok ? "✓ " : "○ ") + x.t; }).join("\n"); }).join("\n");
+        (pth ? "مسیرِ واقعی: " + pth + "\n\n" : "") + t.facets.map(function (f, i) { return (i + 1) + ") " + f.title + " — " + stFa(f) + "\n" + AS.tourMilestones(f).map(function (x) { return "   " + (x.ok ? "✓ " : "○ ") + x.t; }).join("\n"); }).join("\n");
       var head = (evs || []).filter(function (e) { return BIG.test(e.k); })[0] || (evs || [])[0];
       return { subject: clip(human("🧭 تور «" + title + "»" + (head ? " — " + head.fa : "")), 190), html: H.join(""), text: human(text), images: imgs.map(function (im) { return { cid: im.cid, data: im.data }; }) };
     });

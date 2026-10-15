@@ -92,6 +92,9 @@
       add("نمونه‌های ورزشِ فاصله‌دار ساخته شد", c.kitem.filter(function (x) { return A.kservable ? A.kservable(x) : true; }).length);
       add("آزمایشِ واقعی برنامه‌ریزی شد", c.kexp.length, false);
       var ks = c.knot;
+      // بازگشت (موقعیتِ تازه پس از ورزیدگی) پایه را دوباره باز می‌کند تا گره دوباره ورزیده شود (کارزارِ سوم v04: پس از بازگشت «✓ پایه برپا شد» آمد)
+      var back = ks.filter(function (k) { return k.status === "returned" || (k.returnedAt && !(k.solvedAt && k.solvedAt > k.returnedAt)); });
+      if (back.length) add("پس از بازگشت: گره دوباره ورزیده شود", false);
       add("ورزیده شد — با معیارِ خودِ گره‌گشا", ks.length && ks.every(knotSolved), false);
       // تاریخِ هر وارسیِ ماندگاری دیده شود (کارزارِ آزمون sc17: تاریخِ ۹۰ روزه هیچ‌جا نبود)
       var sv = ks.length && ks.every(knotSolved) ? ks.map(function (k) { return String(k.solvedAt).slice(0, 10); }).sort().pop() : "";
@@ -127,7 +130,9 @@
       add("کارت‌های مرور یا چرخهٔ ۱-۳-۷ زمان‌بندی شد", c.card.length || c.sched.length);
       add("چرخهٔ ۱-۳-۷ تا آخر انجام شد", c.sched.length && c.sched.every(function (x) { return x.done; }), false);
     } else if (f.kind === "area") {
-      var ar = A.SYST && f.area ? (A.SYST.byId ? A.SYST.byId(f.area) : A.SYST.find(f.area)) : null, used = c.wchain.length + c.fcast.length + c.kexp.length + c.ex.length + c.topic.length + c["case"].length + c.value.length + c.meaning.length;
+      // زنجیرهٔ نگرانیِ بی حلقهٔ نوشته «کاربست» نیست (کارزارِ سوم v04: «پایه برپا شد» با زنجیرهٔ خالی)
+      var wcF = c.wchain.filter(function (x) { return (x.links || []).some(function (l) { return l && String(l.text || "").trim(); }); });
+      var ar = A.SYST && f.area ? (A.SYST.byId ? A.SYST.byId(f.area) : A.SYST.find(f.area)) : null, used = wcF.length + c.fcast.length + c.kexp.length + c.ex.length + c.topic.length + c["case"].length + c.value.length + c.meaning.length;
       add("کاربستی از ابزارهای حوزهٔ «" + (ar ? ar.a.fa : (f.area || "قلمرو")) + "» ساخته و وصل شد", used);
       add("پیگیری یا تمرینِ آینده زمان‌بندی شد", practice(f).length || c.ex.some(function (x) { return x.status === "done"; }));
       add("نتیجهٔ واقعی ثبت شد (رخ داد/نداد، شد/نشد، آزمایشِ کامل یا کاربرگِ تمام‌شده)", c.meaning.length || c.value.some(function (v) { return (v.vs || []).some(function (x) { return (x.rule || "").trim(); }); }) || c.wchain.some(function (x) { return x.outcome; }) || c.fcast.some(function (x) { return x.outcome; }) || c.kexp.some(function (x) { return x.status === "done" || x.doneAt; }) || c.ex.some(function (x) { return x.status === "done"; }), false);
@@ -191,11 +196,54 @@
   function T(s) { return s.tour; }
   function fac(s, key) { return T(s) && T(s).facets.filter(function (f) { return f.key === key; })[0]; }
   function current(s) { var t = T(s); return t && t.facets.filter(function (f) { return f.status === "now"; })[0]; }
+  /* رویدادهای تور با زمان (کارزارِ سوم v06: کشو نمودار و مسیرِ واقعی نداشت — «f1 ⇐ f3 ⇐ f1» هیچ ردی نمی‌گذاشت):
+     start/switch/detour/done/reopen/skip برای وجه‌ها و ms (شمارِ نشانه‌های ✓ ِ همهٔ تور) — نمودار و مسیرِ کشو و ایمیل از همین است */
+  function msTotal(t) { var ok = 0, all = 0; t.facets.forEach(function (f) { if (f.status === "skipped") return; milestones(f).forEach(function (m) { all++; if (m.ok) ok++; }); }); return { ok: ok, all: all }; }
+  function ev(s, k, f, x) {
+    var t = T(s); if (!t) return; var E = t.events = t.events || [];
+    var e = { at: nowIso(), k: k }; if (f) e.f = f.key; if (x != null) e.n = x;
+    var last = E[E.length - 1]; if (last && last.k === k && last.f === e.f && last.n === e.n && k !== "ms") return;
+    E.push(e); if (E.length > 400) t.events = E.slice(-400);
+  }
+  AS.tourEvent = ev;
+  function msMark(s) { var t = T(s); if (!t) return; var m = msTotal(t), E = (t.events || []).filter(function (e) { return e.k === "ms"; }), l = E[E.length - 1]; if (!l || l.n !== m.ok || l.all !== m.all) { ev(s, "ms", null, m.ok); t.events[t.events.length - 1].all = m.all; } }
+  /* مسیرِ واقعی: توالیِ وجه‌هایی که «همین حالا» شدند (بی تکرارِ پشتِ‌هم) */
+  AS.tourPath = function (s) {
+    var t = T(s); if (!t) return []; var out = [];
+    (t.events || []).forEach(function (e) { if (!/^(start|switch|detour)$/.test(e.k) || !e.f) return; if (out.length && out[out.length - 1].f === e.f) return; out.push({ f: e.f, at: e.at, k: e.k }); });
+    return out;
+  };
+  /* مسیرِ واقعی به زبانِ آدم: نامِ وجه‌ها (نه کلید) با ←؛ «(انحراف)» برای جابه‌جاییِ میانِ کار */
+  AS.tourPathText = function (s) {
+    var t = T(s); if (!t) return ""; var p = AS.tourPath(s); if (!p.length) return "";
+    return p.map(function (x) { var f = t.facets.filter(function (g) { return g.key === x.f; })[0]; return "«" + clip(f ? f.title : "؟", 28) + "»" + (x.k === "detour" ? " (انحراف)" : ""); }).join(" ← ");
+  };
+  /* نمودارِ کوچک: شمارِ نشانه‌های ✓ در طولِ زمان (پله‌ای)، با سقفِ همهٔ نشانه‌ها — SVG ِ خودبسنده (برای ایمیل هم PNG می‌شود) */
+  AS.tourChart = function (s, opt) {
+    var pts = AS.tourSeries(s); if (pts.length < 1) return null;
+    var W = (opt && opt.w) || 300, H = (opt && opt.h) || 90, P = 18, NS = "http://www.w3.org/2000/svg";
+    var t0 = Date.parse(pts[0].at), t1 = Math.max(Date.parse(pts[pts.length - 1].at), Date.now()), span = Math.max(1, t1 - t0), mx = Math.max.apply(null, pts.map(function (p) { return Math.max(p.all, p.n, 1); }));
+    function X(at) { return P + (W - 2 * P) * (Date.parse(at) - t0) / span; } function Y(n) { return H - P - (H - 2 * P) * n / mx; }
+    var d = "", last = null; pts.forEach(function (p) { var x = X(p.at), y = Y(p.n); d += (d ? " L" + x.toFixed(1) + " " + (last == null ? y : last).toFixed(1) + " L" : "M") + x.toFixed(1) + " " + y.toFixed(1); last = y; });
+    d += " L" + (W - P).toFixed(1) + " " + last.toFixed(1);
+    var svg = document.createElementNS(NS, "svg"); svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("role", "img");
+    function el(n, at) { var e = document.createElementNS(NS, n); Object.keys(at).forEach(function (k) { e.setAttribute(k, at[k]); }); svg.appendChild(e); return e; }
+    el("rect", { x: 0, y: 0, width: W, height: H, fill: "#ffffff" });
+    el("line", { x1: P, y1: Y(mx), x2: W - P, y2: Y(mx), stroke: "#d1d5db", "stroke-dasharray": "3 3" });
+    el("line", { x1: P, y1: H - P, x2: W - P, y2: H - P, stroke: "#9ca3af" });
+    el("path", { d: d, fill: "none", stroke: "#0f766e", "stroke-width": 2 });
+    var lp = pts[pts.length - 1]; el("circle", { cx: (W - P).toFixed(1), cy: Y(lp.n).toFixed(1), r: 3, fill: "#0f766e" });
+    var tx = el("text", { x: W - P, y: 12, "font-size": 10, "text-anchor": "end", fill: "#374151", "font-family": "Tahoma, sans-serif" }); tx.textContent = "نشانه‌های ✓: " + fa(lp.n) + " از " + fa(lp.all || mx);
+    var t2 = el("text", { x: P, y: H - 4, "font-size": 9, fill: "#6b7280", "font-family": "Tahoma, sans-serif" }); t2.textContent = (A.fdate ? A.fdate(String(pts[0].at).slice(0, 10)) : String(pts[0].at).slice(0, 10));
+    var title = document.createElementNS(NS, "title"); title.textContent = "پیشرفتِ تور در طولِ زمان"; svg.insertBefore(title, svg.firstChild);
+    return svg;
+  };
+  AS.tourSeries = function (s) { var t = T(s); return t ? (t.events || []).filter(function (e) { return e.k === "ms"; }).map(function (e) { return { at: e.at, n: e.n, all: e.all || 0 }; }) : []; };
   function advance(s) {
     var t = T(s); if (!t) return null;
     if (current(s)) return current(s);
     var n = t.facets.filter(function (f) { return f.status === "todo"; })[0];
-    if (n) { n.status = "now"; n.startedAt = n.startedAt || nowIso(); }
+    if (n) { n.status = "now"; n.startedAt = n.startedAt || nowIso(); ev(s, "start", n); }
     if (!n && t.facets.every(function (f) { return f.status === "done" || f.status === "skipped"; })) t.doneAt = t.doneAt || nowIso();
     return n || null;
   }
@@ -251,7 +299,7 @@
     var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجهِ «" + (a.facet || "") + "» در تور نیست";
     if (f.status === "blocked") return "وجهِ «" + f.title + "» منتظرِ ساختِ حوزه است";
     var c = current(s); if (c && c !== f) c.status = "todo";
-    f.status = "now"; f.startedAt = f.startedAt || nowIso(); return "";
+    f.status = "now"; f.startedAt = f.startedAt || nowIso(); ev(s, c && c !== f ? "detour" : "switch", f); return "";
   };
   DO.tour_step = function (a) { var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست"; var st = (f.steps || [])[+a.step - 1]; if (st) st.done = a.done !== false; return ""; };
   DO.tour_link = function (a) {
@@ -267,6 +315,9 @@
       rep.facet = f.key; f.status = "blocked"; f.blocked = { id: rep.id, number: rep.number, area: rep.area || "", title: rep.title || "", at: rep.at || nowIso(), checks: [], seenNote: "" };
       return "";
     }
+    // شناسهٔ حوزهٔ قلمرو (ln_retrieval، md_habits، …) ⇒ وجه به آن حوزهٔ موجود وصل می‌شود (کارزارِ سوم v03)
+    var arx = !r && f && A.SYST && (A.SYST.byId ? A.SYST.byId(rid) : A.SYST.find(rid));
+    if (arx) { if (f.area === arx.a.id || (f.areas || []).indexOf(arx.a.id) >= 0) return ""; if (f.kind === "area" && !f.area) { f.area = arx.a.id; return ""; } f.areas = (f.areas || []).concat([arx.a.id]).slice(0, 6); return ""; }
     if (!f || !r) return "پیوند به رکوردِ ناموجود";
     // یک کار یک بار شمرده می‌شود: رکوردی که ریشهٔ وجهِ دیگری است دوباره وصل نمی‌شود (کارزارِ آزمون sc01: وجهِ تکراری با همان ۸ نشانه)
     var dup = s.tour.facets.filter(function (g) { return g !== f && g.status !== "skipped" && (g.refs || []).some(function (x) { return x.id === r.id; }); })[0];
@@ -278,8 +329,10 @@
   };
   DO.tour_done = function (a) {
     var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست";
+    // وجهِ گره فقط از روی نشانه‌هایش «برپا» می‌شود، نه با دلیلِ دستیار (کارزارِ سوم v02: گره با همهٔ قدم‌های خالی «انجام شد»)
+    if (!coreDone(f) && f.kind === "knot") { ev(s, "deny", f); return "«" + f.title + "» از روی داده‌ها هنوز برپا نیست (" + milestones(f).filter(function (m) { return m.core && !m.ok; }).map(function (m) { return m.t; }).join("، ") + ") — وجهِ گره فقط با نشانه‌هایش بسته می‌شود"; }
     if (!coreDone(f) && !a.why) return "«" + f.title + "» هنوز نشانه‌های پایانش کامل نیست — اگر واقعاً تمام است، دلیل بنویس";
-    f.status = "done"; f.doneAt = nowIso(); f.doneBy = coreDone(f) ? "evidence" : "assistant: " + clip(a.why, 200); advance(s); return "";
+    f.status = "done"; f.doneAt = nowIso(); f.doneBy = coreDone(f) ? "evidence" : "assistant: " + clip(a.why, 200); ev(s, "done", f); advance(s); return "";
   };
   /* «دیدم درست نشده»: برگه‌ای که «ساخته و وارسی شد» ولی دستیار بعداً در صفحه می‌بیند کار نمی‌کند ⇒ وارسی پس گرفته، برگه با دلیل
      دوباره باز و وجه دوباره منتظر (کارزارِ آزمونِ دوم c01: ایمیل‌ها تا آخر «ساخته و وارسی شد» گفتند، پس از آن‌که دستیار پس گرفته بود) */
@@ -297,7 +350,7 @@
   DO.tour_skip = function (a) {
     var s = AS._turnSession, f = s && fac(s, a.facet); if (!f) return "وجه نیست";
     if (!a.why) return "کنار گذاشتنِ وجه بی دلیل ممکن نیست";
-    f.status = "skipped"; f.skipWhy = clip(a.why, 300); advance(s); return "";
+    f.status = "skipped"; f.skipWhy = clip(a.why, 300); ev(s, "skip", f); advance(s); return "";
   };
 
   /* برگه‌ای که در میانهٔ تور بی «facet» ثبت شد ⇒ وجهِ «حوزه‌ای که نیست» ِ خودش، تا پاسخِ روتین هم سنجیده شود
@@ -361,7 +414,9 @@
       children(f).knot.forEach(function (k) {
         if (!k.returnedAt || (f.retSeen || "") >= k.returnedAt) return;
         f.retSeen = k.returnedAt; if (t.masteredAt) { t.masteredAt = null; }
-        msgs.push("↩ گرهِ «" + clip(k.name || "گره", 40) + "» بازگشت — ورزیدگی و ماندگاری دوباره از نو سنجیده می‌شود (این شکست نیست؛ نشان می‌دهد کجا هنوز کار دارد)");
+        var reo = f.status === "done";
+        if (reo) { f.status = "todo"; delete f.doneAt; delete f.doneBy; f.reopenedAt = nowIso(); if (t.doneAt) { delete t.doneAt; delete t.doneSaid; } ev(s, "reopen", f); }
+        msgs.push("↩ گرهِ «" + clip(k.name || "گره", 40) + "» بازگشت — ورزیدگی و ماندگاری دوباره از نو سنجیده می‌شود (این شکست نیست؛ نشان می‌دهد کجا هنوز کار دارد)" + (reo ? "؛ وجهِ «" + clip(f.title, 40) + "» دوباره باز شد" : ""));
       });
     });
     // پرونده‌ای که از دکمهٔ کارخانهٔ خودِ گره‌گشا ساخته شد (src = موقعیتِ همین تور) ⇒ به وجهِ ادعای همین تور
@@ -381,9 +436,10 @@
     });
     t.facets.forEach(function (f) {
       if ((f.status === "now" || f.status === "todo") && f.kind !== "other" && coreDone(f)) {
-        f.status = "done"; f.doneAt = nowIso(); f.doneBy = "evidence";
+        f.status = "done"; f.doneAt = nowIso(); f.doneBy = "evidence"; ev(s, "done", f);
         var fu0 = followups(f);
-        msgs.push("✓ پایهٔ وجهِ «" + f.title + "» برپا شد (از روی خودِ داده‌ها)" + (practice(f).length ? "؛ تمرین‌هایش در «امروز» می‌آید" : "") + (fu0.length ? "؛ تا تسلط پیگیری می‌شود: " + fu0.slice(0, 2).map(function (m) { return m.t; }).join("، ") : ""));
+        // نشانه‌های مانده با «○ … — مانده» گفته می‌شوند؛ عنوانِ نشانه («… برنامه‌ریزی شد») به‌تنهایی «انجام‌شده» خوانده می‌شد (کارزارِ سوم v01)
+        msgs.push("✓ پایهٔ وجهِ «" + f.title + "» برپا شد (از روی خودِ داده‌ها)" + (practice(f).length ? "؛ تمرین‌هایش در «امروز» می‌آید" : "") + (fu0.length ? "؛ هنوز مانده تا تسلط: " + fu0.slice(0, 2).map(function (m) { return "○ «" + m.t + "»"; }).join("، ") : ""));
       }
     });
     var n = advance(s);
@@ -392,8 +448,9 @@
       t.doneSaid = true;
       var fu = t.facets.filter(function (f) { return followups(f).length; });
       s.msgs.push({ role: "sys", at: nowIso(), text: "🎉 پایهٔ همهٔ وجه‌های تور به ترتیب برپا شد" + (mastered(t) ? "" : " — هنوز تمام نیست: نشانه‌های مانده تا تسلط پیگیری می‌شوند") + (function () { try { var Ls = AS.sieveLayers ? AS.sieveLayers() : [], d = t.diag || {}, o = Ls.filter(function (L) { return !d[L.id] || d[L.id].st === "ask"; }); return o.length ? " — و " + A.fa(o.length) + " لایهٔ غربال هنوز سنجیده یا پرسیده نشده (" + o.slice(0, 4).map(function (L) { return L.fa; }).join("، ") + (o.length > 4 ? "، …" : "") + ")" : ""; } catch (e) { return ""; } })() + "؛ تمرین‌های فاصله‌دارشان در «امروز» می‌آید." +
-        (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
+        (fu.length ? " تا تسلطِ کامل پیگیری می‌کنم — هنوز مانده: " + fu.map(function (f) { return "«" + clip(f.title, 40) + "» (" + followups(f).map(function (m) { return "○ " + clip(m.t, 40); }).join("، ") + ")"; }).join("؛ ") + "." : "") });
     }
+    msMark(s);
     if (t.doneAt && !t.masteredAt && mastered(t)) { t.masteredAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "🏁 همهٔ نشانه‌های همهٔ وجه‌ها ✓ شد — تور کامل شد. مرورهای فاصله‌دار همچنان در «امروز» می‌آید." }); }
     syncReminder(s);
   };
@@ -406,7 +463,7 @@
     t.facets.forEach(function (f, i) {
       var ms = milestones(f), pr = practice(f);
       L.push((i + 1) + ") [" + f.key + "] " + KIND[f.kind].fa + " — «" + f.title + "» — وضع: " + f.status + (f.status === "now" ? " ◀ همین حالا" : "") +
-        (function () { var vv = viewOf(f); return " — نما: " + vv.v + (vv.a ? " arg=" + vv.a : "") + (vv.s ? " sub=" + vv.s : ""); })() + (f.area ? " — حوزه: " + f.area : "") +
+        (function () { var vv = viewOf(f); return " — نما: " + vv.v + (vv.a ? " arg=" + vv.a : "") + (vv.s ? " sub=" + vv.s : ""); })() + (f.area ? " — حوزه: " + f.area : "") + ((f.areas || []).length ? " — حوزه‌های وصل‌شده: " + f.areas.join("، ") : "") +
         " — نشانه‌ها: " + ms.map(function (m) { return (m.ok ? "✓" : "○") + m.t + (m.mine ? " (کارِ کاربر)" : ""); }).join("؛ ") +
         ((f.refs || []).length ? " — رکوردها: " + f.refs.map(function (r) { return r.type + ":" + r.id; }).join("، ") : "") +
         (pr.length ? " — تمرینِ زمان‌بندی‌شده: " + pr.map(function (p) { return p.t + " " + p.due; }).join("، ") : "") +
@@ -415,14 +472,71 @@
     });
     // رکوردهای تازهٔ کاربر که هنوز به هیچ وجهی وصل نیستند — تا مدل شناسه‌شان را برای tour_link داشته باشد (کارزارِ آزمون sc08: پیش‌بینی پیدا نمی‌شد)
     var linked = {}; t.facets.forEach(function (f) { (f.refs || []).forEach(function (r) { linked[r.id] = 1; }); });
-    var from = A.addDays(A.today(), -14), fresh = [];
+    var from = A.addDays(A.today(), -14), fresh = [], s0 = String(((s.msgs || [])[0] || {}).at || t.createdAt || "");
     ["kcase", "case", "eprob", "topic", "wchain", "fcast", "kexp", "value", "meaning"].forEach(function (typ) { S.all(typ, function (r) { return !r.sample && !linked[r.id] && String(r.created || r.date || "") >= from; }).forEach(function (r) { fresh.push(r); }); });
+    // فقط رکوردهای همین سشن؛ ساختهٔ سشنِ دیگر هرگز نامزدِ پیوند نیست؛ قدیمی‌تر از این سشن با برچسبِ «پیش از این سشن»
+    fresh = fresh.filter(function (r) { return (s.made || []).indexOf(r.id) >= 0 || !madeElsewhere(s, r.id); });
     fresh.sort(function (a, b) { return String(b.created || "").localeCompare(String(a.created || "")); });
-    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link): " + fresh.slice(0, 10).map(function (r) { return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || r.plan || r.statement || (r.intake && r.intake.what) || (r.p && r.p.title) || "", 40) + "»"; }).join("، "));
+    if (fresh.length) L.push("رکوردهای تازهٔ وصل‌نشده (برای tour_link؛ ساختهٔ سشن‌های دیگر این‌جا نیستند): " + fresh.slice(0, 10).map(function (r) { var mine = (s.made || []).indexOf(r.id) >= 0, old = !mine && s0 && String(r.created || r.date || "") < s0; return r.type + ":" + r.id + " «" + clip(r.title || r.q || r.name || r.plan || r.statement || (r.intake && r.intake.what) || (r.p && r.p.title) || "", 40) + "»" + (old ? " (پیش از این سشن — فقط اگر کاربر گفت مربوط است)" : ""); }).join("، "));
+    // ثبت‌های تازه از نوبتِ پیش (کارزارِ سوم v02: ذخیرهٔ آزمایش تأیید نشد) — مدل در یک جمله تأییدشان کند
+    var ack = [], since = t.ackAt || "";
+    t.facets.forEach(function (f) { if (f.status === "skipped") return; var c = children(f); ["kcase", "knot", "kexp", "kitem", "case", "eprob", "topic", "wchain", "fcast", "value", "meaning", "prereq"].forEach(function (ty) { (c[ty] || []).forEach(function (r) { var w = String(r.created || r.at || ""); if (since && w > since && ack.indexOf(r) < 0) ack.push(r); }); }); });
+    if (ack.length) L.push("ثبت‌های تازه از نوبتِ پیش (در پاسخ در یک جمله ببین و تأییدشان کن — بی تکرارِ متنشان): " + ack.slice(0, 8).map(function (r) { return (({ kexp: "آزمایشِ واقعی", kitem: "نمونهٔ ورزش", knot: "گره", kcase: "موقعیت", "case": "پرونده", eprob: "مسئله", topic: "موضوع", wchain: "زنجیرهٔ نگرانی", fcast: "پیش‌بینی", value: "ارزش", meaning: "وارسیِ معنا", prereq: "نقشهٔ پیش‌نیاز" })[r.type] || r.type) + " «" + clip(r.title || r.name || r.plan || r.q || r.prompt || "", 40) + "»"; }).join("، "));
+    t.ackAt = nowIso();
+    // پیگیری‌های بدهکار (سازندهٔ تمرینِ در جریان/ناموفق)
+    var owe = []; t.facets.forEach(function (f) { owedGen(f).forEach(function (x) { owe.push("[" + f.key + "] " + x); }); });
+    if (owe.length) L.push("پیگیریِ بدهکار (پیش از رفتن به وجهِ دیگر به کاربر بگو و راهش را نشان بده): " + owe.join(" · "));
+    // حوزه‌های قلمروِ هم‌خوان با هر وجه (برای {"do":"tour_link","facet":"fN","id":"<شناسهٔ حوزه>"})
+    var ma = []; t.facets.forEach(function (f) { if (f.status === "skipped") return; var m = matchAreas(f); if (m.length) ma.push("[" + f.key + "] " + m.map(function (r) { return r.a.id + " «" + clip(r.a.fa, 40) + "» گامِ " + (A.SYST.stage ? A.SYST.stage(r.a) : "?"); }).join("، ")); });
+    if (ma.length) L.push("حوزه‌های موجودِ قلمروِ سامانه‌ها که با وجه‌ها هم‌خوان‌اند (اگر واقعاً همان است با tour_link و شناسهٔ حوزه وصل کن؛ حوزهٔ تازه نساز): " + ma.join(" · "));
+    var pg = AS.progress(s); if (pg) L.push("پیشرفتِ رسمی (همان عددی که کاربر در کشو، فهرستِ سشن و «امروز» می‌بیند): " + pg.label + " " + pg.done + " از " + pg.all + " وجه — اگر از پیشرفت گفتی فقط همین عدد را بگو، نه شمارِ «مراحل».");
     var unl = (s.reports || []).filter(function (r) { return r.number && !r.facet; });
     if (unl.length) L.push("برگه‌های ثبت‌شده که به وجهی وصل نیستند: " + unl.map(function (r) { return "#" + r.number; }).join("، ") + " — با {\"do\":\"tour_link\",\"facet\":\"fN\",\"id\":\"#شماره\"} به وجهِ territory وصل کن تا پاسخِ روتین سنجیده شود.");
     return L.join("\n");
   };
+
+  /* ---------- رکوردی که در کدام سشن ساخته شد (بازبینیِ اجرا v01: تورِ سشنِ ۱ موضوعِ واژگانِ سشنِ ۲ را برای tour_link پیشنهاد کرد) ----------
+     رکوردِ تازه (نه ویرایش) از نوع‌های قابلِ پیوند ⇒ شناسه‌اش در s.made ِ سشنِ جاری؛ فهرستِ «وصل‌نشده‌ها» فقط از همین سشن است. */
+  var FRESH_T = ["kcase", "case", "eprob", "topic", "wchain", "fcast", "kexp", "value", "meaning", "prereq"];
+  AS.FRESH_TYPES = FRESH_T;
+  if (!S.put._made) {
+    var rawPutM = S.put;
+    S.put = function (r) {
+      var isNew = false; try { isNew = !!(r && r.id && FRESH_T.indexOf(r.type) >= 0 && !r.sample && !S.get(r.id)); } catch (e) { }
+      var out = rawPutM.apply(this, arguments);
+      if (isNew) try { var cs = AS.cur(); if (cs && cs.id !== r.id) { var mm = cs.made = cs.made || []; if (mm.indexOf(r.id) < 0) { mm.push(r.id); if (mm.length > 300) cs.made = mm.slice(-300); rawPutM.call(S, cs); } } } catch (e) { }
+      return out;
+    };
+    S.put._made = true;
+  }
+  function madeElsewhere(s, id) { return S.all("achat", function (x) { return x.id !== s.id && (x.made || []).indexOf(id) >= 0; })[0] || null; }
+  AS.tourMadeElsewhere = madeElsewhere;
+  /* یک منبعِ پیشرفت برای همه‌جا (کارزارِ سوم v01: گفت‌وگو «مراحل ۱ از ۴»، کشو «تور ۱ از ۳»، فهرستِ سشن «۴/۷»):
+     تور دارد ⇒ وجه‌های برپاشده از وجه‌های کنارگذاشته‌نشده؛ ندارد ⇒ مراحلِ نوشتهٔ مدل */
+  AS.progress = function (s) {
+    if (s && s.tour && (s.tour.facets || []).length) { var live = s.tour.facets.filter(function (f) { return f.status !== "skipped"; }); return { kind: "tour", done: live.filter(function (f) { return f.status === "done"; }).length, all: live.length, label: "تور" }; }
+    var st = (s && s.steps) || []; return st.length ? { kind: "steps", done: st.filter(function (x) { return x.s === "done"; }).length, all: st.length, label: "مراحل" } : null;
+  };
+  AS.progressText = function (s) { var p = AS.progress(s); return p ? p.label + " " + fa(p.done) + " از " + fa(p.all) : ""; };
+  /* حوزه‌های قلمروِ سامانه‌ها که با یک وجه هم‌خوان‌اند (کارزارِ سوم v03: وجه‌ها هرگز به حوزه‌های موجود — ln_retrieval، md_habits، … — وصل نشدند) */
+  function matchAreas(f) {
+    if (!A.SYST || !A.SYST.related) return [];
+    return A.SYST.related(f.title + " " + (f.why || ""), 6).filter(function (r) { return !r.epi && r.a.id !== f.area && (f.areas || []).indexOf(r.a.id) < 0; }).slice(0, 3);
+  }
+  AS.tourMatchAreas = matchAreas;
+  /* ساختِ نمونه‌های ورزشِ گره که در جریان است یا شکست خورد/چیزی نساخت ⇒ پیگیریِ بدهکار (کارزارِ سوم v02: خالی ماند و فراموش شد) */
+  function owedGen(f) {
+    if (f.kind !== "knot" || f.status === "skipped") return [];
+    var c = children(f), out = [];
+    c.knot.forEach(function (k) {
+      var g = k.genLast; if (!g) return;
+      var have = c.kitem.filter(function (x) { return x.knot === k.id && (A.kservable ? A.kservable(x) : true); }).length;
+      if (g.st === "pending") out.push("ساختِ نمونه‌های ورزشِ «" + clip(k.name || "گره", 30) + "» هنوز در جریان است (" + String(g.at || "").slice(0, 16).replace("T", " ") + ") — نتیجه‌اش را وارسی کن");
+      else if ((g.st === "failed" || !g.n) && !have) out.push("ساختِ نمونه‌های ورزشِ «" + clip(k.name || "گره", 30) + "» " + (g.st === "failed" ? "شکست خورد" + (g.err ? " (" + clip(g.err, 80) + ")" : "") : "هیچ نمونهٔ وارسی‌شده‌ای نساخت") + " — دوباره بساز یا «ساختِ ۴ نمونه»");
+    });
+    return out;
+  }
+  AS.tourOwedGen = owedGen;
 
   /* ---------- قاعده‌های تور برای مدل ---------- */
   AS.SYS += "\n" + [
@@ -441,13 +555,13 @@
     "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
     "- شکلِ عملیات: {\"do\":\"tour_add\",\"facet\":{\"key\":\"f4\",\"kind\":\"area\",\"area\":\"sf_values\",\"title\":\"…\",\"why\":\"…\"}} · {\"do\":\"tour_skip\",\"facet\":\"f1\",\"why\":\"…\"} · {\"do\":\"tour_focus\",\"facet\":\"f2\"} · {\"do\":\"tour_done\",\"facet\":\"f2\",\"why\":\"…\"} · {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"<شناسهٔ رکورد>\"} · {\"do\":\"tour_goal\",\"goal\":\"…\"}. هر وجه title ِ گویا دارد (هرگز «گامِ دیگر»).",
     "- اگر برگه‌ای «ساخته و وارسی شد» ولی بعداً در خودِ صفحه می‌بینی هنوز کار نمی‌کند: {\"do\":\"tour_unverify\",\"facet\":\"fN\",\"why\":\"…\"} — وارسی پس گرفته و برگه دوباره باز می‌شود؛ برگهٔ تکراری نساز. پیش از پذیرفتنِ «انجام شد» ِ روتین برای خطای خودِ صفحه، اگر می‌توانی همان کار را در صفحه امتحان کن.",
-    "- رکوردِ موجودِ کاربر را که به وجهی مربوط است با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"…\"} وصل کن تا پیشرفتش شمرده شود."
+    "- رکوردِ کاربر یا حوزهٔ موجودِ هم‌خوانِ قلمرو را با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"<شناسهٔ رکورد یا حوزه>\"} به وجه وصل کن (برای حوزهٔ موجود برگه نخواه). «ثبت‌های تازه» را در یک جمله تأیید کن؛ «پیگیریِ بدهکار» را پیش از کارِ دیگر بگو."
   ].join("\n");
 
   /* ---------- کشوی تور ---------- */
   AS.tourDrawer = function (s) {
     // همان شمارشِ ایمیل: کنارگذاشته‌ها نه پیشرفت‌اند نه در مخرج (کارزارِ آزمون sc09: «۰ از ۴» با نوارِ پر)
-    var t = T(s), live = t.facets.filter(function (f) { return f.status !== "skipped"; }), all = live.length, done = live.filter(function (f) { return f.status === "done"; }).length;
+    var t = T(s), pg = AS.progress(s) || { done: 0, all: 0 }, all = pg.all, done = pg.done;   // یک منبع با فهرستِ سشن، «امروز» و ایمیل
     var box = h("details", { class: "as-steps as-tour", open: store("tourOpen") === false ? null : true, ontoggle: function (e) { store("tourOpen", e.target.open); } },
       h("summary", {}, "🧭 تور · " + fa(done) + " از " + fa(all), h("span", { class: "as-bar" }, h("i", { style: { width: Math.round(100 * done / Math.max(1, all)) + "%" } }))));
     var ol = h("ol", { class: "as-tl" });
@@ -473,6 +587,11 @@
           f.view && f.status !== "skipped" ? h("button", { class: "linkish small", type: "button", onclick: function () { var vv = viewOf(f); A.go(vv.v, vv.a, vv.s); } }, "↗ رفتن به این بخش") : null)));
     });
     box.appendChild(ol);
+    // نمودارِ پیشرفت (نشانه‌های ✓ در طولِ زمان) و مسیرِ واقعیِ وجه‌ها (کارزارِ سوم v06)
+    var chart = AS.tourChart(s), path = AS.tourPathText(s);
+    // جمع‌شده (کشو بلند نشود و پنجره سرریز نکند)؛ باز/بسته‌بودنش به یاد می‌ماند
+    if (chart || path) box.appendChild(h("details", { class: "small as-tprog", dir: "rtl", open: store("tprogOpen") ? true : null, ontoggle: function (e) { store("tprogOpen", e.target.open); } }, h("summary", {}, "📈 پیشرفت در زمان و مسیرِ واقعی"),
+      chart ? h("div", { class: "as-tchart", "aria-label": "نمودارِ پیشرفتِ تور" }, chart) : null, path ? h("div", { class: "as-tpath" }, "🚶 مسیرِ واقعی: ", path) : null));
     if (!t.masteredAt) box.appendChild(h("button", { class: "btn sm", type: "button", onclick: function () { AS.send("[ادامهٔ تور]"); } }, t.doneAt ? "▶ پیگیری تا تسلط" : "▶ ادامهٔ تور"));
     return box;
   };
@@ -557,7 +676,7 @@
         var f = current(s) || s.tour.facets.filter(function (x) { return x.status === "todo"; })[0];
         var ready = s.tour.facets.filter(function (x) { return x.blocked && x.blocked.verified && x.status === "todo"; })[0];
         if (ready) items.unshift({ k: "warn", txt: "🛎 حوزهٔ «" + clip(ready.blocked.title || ready.title, 50) + "» ساخته شد — ادامهٔ تور", sub: "تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", go: function () { openTour(s, ready); } });
-        else if (f && A.localDay(lastUser(s)) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "»", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
+        else if (f && A.localDay(lastUser(s)) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "» (" + AS.progressText(s) + ")", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
       });
       // پس از نشانهٔ پریشانی: فردای آن (و تا ۷ روز، اگر کاربر برنگشته) یک پرسشِ آرامِ حال، با خطِ کمک
       S.all("achat", function (x) { return x.safetyAt && A.today() > String(x.safetyAt).slice(0, 10) && A.daysBetween(String(x.safetyAt).slice(0, 10), A.today()) <= 7 && A.localDay(lastUser(x)) !== A.today(); }).forEach(function (s) {
@@ -596,7 +715,13 @@
       var tom = A.addDays(A.today(), 1), nx = [];
       s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due >= tom) nx.push(p); }); });
       nx.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
-      var due = s.tour.doneAt && nx[0] ? nx[0].due : tom, remKey = due + "|" + (f ? f.key : "") + "|" + (nx[0] ? nx[0].t : ""); if (s._rem === remKey) return;   // متنِ کهنه هم بازنویسی می‌شود (کارزارِ آزمون sc13)
+      // یک یادآور در روز (کارزارِ سوم v06: «ادامهٔ تور» و «knot:…» برای همان روز): روزی که یادآورِ ورزشِ گره دارد، یادآورِ تور نمی‌گیرد —
+      // تور به نخستین موعدِ بی‌یادآورِ خودش می‌رود؛ اگر همه پوشیده‌اند، یادآورِ جدای تور برداشته می‌شود
+      var covered = {}; try { var rk = ((S.settings().knots || {}).rk) || {}; Object.keys(rk).forEach(function (id) { if (rk[id]) covered[String(rk[id]).slice(0, 10)] = 1; }); } catch (e) { }
+      var cands = (s.tour.doneAt && nx.length ? [] : [tom]).concat(nx.map(function (p) { return p.due; })).filter(function (d) { return d && !covered[d]; });
+      if (!cands.length) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
+      nx = nx.filter(function (p) { return p.due >= cands[0]; });
+      var due = cands[0], remKey = due + "|" + (f ? f.key : "") + "|" + (nx[0] ? nx[0].t : ""); if (s._rem === remKey) return;   // متنِ کهنه هم بازنویسی می‌شود (کارزارِ آزمون sc13)
       var nextTxt = nx[0] ? " نزدیک‌ترین موعد: «" + clip(nx[0].t, 60) + "» (" + (A.fdate ? A.fdate(nx[0].due) : nx[0].due) + ")." : "";
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",

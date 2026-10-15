@@ -86,9 +86,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.rep = await p.evaluate(async () => {
     const AS = APP.ASSIST; window.__mails = [];
     // مهلتِ ایمیل‌های مهمِ پشتِ‌هم: دومی تا مهلت صبر می‌کند و بعد خودش می‌رود (کارزارِ آزمون sc15)
-    { APP.REPORT.URGENT_MS = 300; const s0 = { id: 'thr', tour: { facets: [], mailq: [{ k: 'facet', fa: 'a' }], mailAt: new Date().toISOString() } }; const hm = APP.HOST; let n = 0;
+    { APP.REPORT.URGENT_MS = 300; const g0 = APP.REPORT.MIN_GAP_MS; APP.REPORT.MIN_GAP_MS = 300; const s0 = { id: 'thr', tour: { facets: [], mailq: [{ k: 'facet', fa: 'a' }], mailAt: new Date().toISOString(), mails: [{ status: 'sent' }] } }; const hm = APP.HOST; let n = 0;
       APP.HOST = Object.assign({}, hm, { mail: async () => { n++; return { status: 'sent' }; } }); const first = await APP.REPORT.flush(s0, true);
-      await new Promise(r => setTimeout(r, 450)); window.__thr = first === null && n === 1; APP.HOST = hm; APP.REPORT.URGENT_MS = 0; }
+      await new Promise(r => setTimeout(r, 1500)); window.__thr = first === null && n === 1; APP.HOST = hm; APP.REPORT.URGENT_MS = 0; APP.REPORT.MIN_GAP_MS = g0; }
     APP.HOST = { mail: async (r) => { __mails.push(r); return { status: window.__mailStatus || 'sent' }; }, sheets: async () => [] };
     window.__q = []; APP.callAI = async () => JSON.stringify(__q.shift());
     const s = AS.newSession(); s.msgs.push({ role: 'user', text: 'x', at: '' }); APP.S.put(s); AS.toggle(true);
@@ -105,8 +105,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // وجه کامل شد ⇒ فوری (همراهِ رویدادِ ریزِ مانده)
     const before = { st: s.tour.facets.map(f => f.key + ':' + f.status + ':0').join(','), done: false, m: false };
     s.tour.facets[0].status = 'done'; s.tour.facets[1].status = 'now';
+    // آهنگِ ایمیل (کارزارِ سوم v04): کمتر از ۳ ساعت پس از ایمیلِ پیشین ⇒ صبر (رویداد در صف می‌ماند)؛ پس از آن ⇒ می‌رود
     APP.REPORT.note(s, before); await new Promise(r => setTimeout(r, 300));
-    out.facetMail = __mails.length === 2 && /برپا شد/.test(__mails[1].subject) && /ریز/.test(__mails[1].html);
+    out.throttled = __mails.length === 1 && s.tour.mailq.some(e => e.k === 'facet'); clearTimeout(APP.REPORT._pend[s.id]); delete APP.REPORT._pend[s.id];
+    s.tour.mailAt = new Date(Date.now() - 4 * 3600000).toISOString(); await APP.REPORT.flush(s, true); await new Promise(r => setTimeout(r, 100));
+    out.facetMail = out.throttled && __mails.length === 2 && /برپا شد/.test(__mails[1].subject) && /ریز/.test(__mails[1].html);
     // خاموش ⇒ نه
     APP.REPORT.setEnabled(false); s.tour.mailq = [{ k: 'done', fa: 'تمام', at: '' }]; await APP.REPORT.flush(s, true); out.off = __mails.length === 2;
     APP.REPORT.setEnabled(true);

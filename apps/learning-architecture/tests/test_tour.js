@@ -38,7 +38,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     __q.push(R({ actions: [{ do: 'tour_plan', goal: 'مونتی‌هال', facets: [
       { key: 'f1', kind: 'knot', title: 'گیرِ مونتی‌هال', why: 'اول' }, { key: 'f2', kind: 'learn', title: 'احتمالِ شرطی', why: 'دوم' },
       { key: 'f3', kind: 'territory', title: 'اعتبارِ شهود', why: 'حوزه نیست' }] }],
-      status: 'gap', gap: { title: 'اعتبارِ شهود', area: 'epi-territory', kind: 'build', facet: 'f3', confidence: 0.9, abstract: 'a', missing: 'b' } }));
+      status: 'gap', gap: { title: 'اعتبارِ شهود', area: 'epi-territory', kind: 'build', facet: 'f3', confidence: 0.9, abstract: 'a', missing: 'b', where: 'c', how: 'd' } }));
     __q.push({ agree: true, reason: 'درست' });
     await APP.ASSIST.send('مونتی‌هال و شهود و احتمالِ شرطی');
     const t = APP.ASSIST.cur().tour;

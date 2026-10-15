@@ -202,10 +202,10 @@
     if (tab === "add") { body.appendChild(caseEditor(null)); return root; }
     if (tab === "harvest") { body.appendChild(harvestPanel()); return root; }
     var list = tab === "pending" ? pend : SEED.concat(userCases("approved"));
-    var fk = h("select", { id: "lbK" }, h("option", { value: "" }, "همه انواع"), [["real", "واقعی"], ["booklet", "مثال جزوه"], ["problem", "مسئله بزرگ"], ["user", "افزوده شما"], ["forward", "پیش‌رو"]].map(function (x) { return h("option", { value: x[0] }, x[1]); }));
-    var fo = h("select", { id: "lbO" }, h("option", { value: "" }, "سالم و شکست"), h("option", { value: "1" }, "فقط سالم"), h("option", { value: "0" }, "فقط شکست"));
-    var fm = h("select", { id: "lbM" }, h("option", { value: "" }, "همه داوری‌ها"), h("option", { value: "bad" }, "فقط داوری نادرست موتور"));
-    var q = h("input", { id: "lbQ", type: "search", placeholder: "جستجو در عنوان یا روایت" });
+    var fk = h("select", { id: "lbK", "aria-label": "نوعِ پرونده" }, h("option", { value: "" }, "همه انواع"), [["real", "واقعی"], ["booklet", "مثال جزوه"], ["problem", "مسئله بزرگ"], ["user", "افزوده شما"], ["forward", "پیش‌رو"]].map(function (x) { return h("option", { value: x[0] }, x[1]); }));
+    var fo = h("select", { id: "lbO", "aria-label": "سالم یا شکست" }, h("option", { value: "" }, "سالم و شکست"), h("option", { value: "1" }, "فقط سالم"), h("option", { value: "0" }, "فقط شکست"));
+    var fm = h("select", { id: "lbM", "aria-label": "داوریِ موتور" }, h("option", { value: "" }, "همه داوری‌ها"), h("option", { value: "bad" }, "فقط داوری نادرست موتور"));
+    var q = h("input", { id: "lbQ", type: "search", "aria-label": "جستجو در عنوان یا روایت", placeholder: "جستجو در عنوان یا روایت" });
     var out = h("div", { class: "col gap" });
     function draw() {
       out.innerHTML = "";

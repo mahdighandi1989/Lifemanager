@@ -31,7 +31,8 @@ const { chromium } = require('playwright');
   chk(!/422/.test(info.ai), 'the host accepts the assistant task: ' + info.ai);
   // the assistant sees the page's open sheets from the real server (no duplicates, knows what is pending)
   info.sheets = await p.evaluate(() => APP.HOST.sheets().then(l => l.map(x => x.number + ':' + x.title.slice(0, 90))));
-  chk(info.sheets.some(x => /دستیار · کمبودِ سامانه · قلمرو: epi-territory/.test(x)), 'HOST.sheets lists the filed sheet with its area: ' + info.sheets);
+  // عنوانِ برگه نزدِ مالک انسانی است (برچسب‌های ماشینیِ قلمرو/نوع در سطرِ دوم، نه در عنوان) — بازبینیِ اجرا ۲۰۲۶-۱۰-۱۵
+  chk(info.sheets.some(x => /\[دستیار · کمبودِ سامانه\] /.test(x) && !/epi-territory|· build|· priority/.test(x)), 'HOST.sheets lists the filed sheet with a human title: ' + info.sheets);
   // attachments with no Drive: an honest message (never a silent text-only answer)
   info.files = await p.evaluate(() => APP.callAI('x', 'y', { task: 'lla_assistant', fileIds: [999], withMeta: true }).then(r => 'ok:' + JSON.stringify(r), e => 'err:' + e.message));
   chk(/err:/.test(info.files) && /پیدا نشد|درایو/.test(info.files), 'missing/undriven attachment is reported, not ignored: ' + info.files);

@@ -142,6 +142,8 @@
     var pend = null;
     function savef() { if (pend) clearTimeout(pend); pend = setTimeout(function () { pend = null; hd.put(); }, 400); }
     hd.cancel = function () { var was = !!pend; if (pend) { clearTimeout(pend); pend = null; } return was; };
+    /* نوشتنِ معوق را همین حالا انجام بده (پیش از پنجره‌ای که صفحه را از نو رسم می‌کند — وگرنه آخرین نوشته‌ها گم می‌شد؛ بازبینیِ UI ۲۰۲۶-۱۰-۱۵) */
+    hd.flush = function () { if (pend) { clearTimeout(pend); pend = null; hd.put(); return true; } return false; };
     var est = A.wsMinutes ? A.wsMinutes(flds) : null;
     var title = jb.tech ? "کاربرگِ «" + TM[jb.tech].fa + "» روی همین موضوع" : "کاربرگِ روالِ «" + PM[jb.proto].fa + "»" + (jb.part ? " — بخشِ " + jb.part : "");
     var now = h("section", { class: "card jr-now" }, h("div", { class: "eyebrow" }, "کارِ همین حالا · فقط همین"), h("h2", {}, title),
@@ -171,7 +173,7 @@
             h("div", { class: "row gap wrap" },
               canChain ? h("button", { class: "btn sm jr-plantchain", type: "button", onclick: function () { A.plantP11(p11); } }, "🌱 کاشتِ زنجیرهٔ فرود در مزرعه") : null,
               A.placeDialog ? h("button", { class: "btn sm" + (canChain ? " ghost" : "") + " jr-plantone", type: "button", onclick: function () {
-                var txt = ""; flds.forEach(function (f) { if (!txt && (f.t === "text" || f.t === "area") && A.filled(rec.data[f.k])) txt = String(rec.data[f.k]).slice(0, 200); });
+                hd.flush(); var txt = ""; flds.forEach(function (f) { if (!txt && (f.t === "text" || f.t === "area") && A.filled(rec.data[f.k])) txt = String(rec.data[f.k]).slice(0, 200); });
                 A.placeDialog({ text: t.title, body: txt, src: { t: "topic", id: t.id } }, function (node) { if (node) A.render(); });
               } }, "🌱 کاشتِ همین مفهوم در مزرعه") : null,
               !canChain ? h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("journey", t.id, "S4"); } }, "← گامِ ۴ (فرود)") : null)));
