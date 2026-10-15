@@ -12,5 +12,11 @@
  "what": "یادداشت‌های دست‌به‌دستِ docs/overhaul/handoff-notes/_pending_plausible_2026-10-15.md و _pending_polya_R4_2026-10-15.md (شرحِ تغییراتِ T_plausible و دورِ ۴ ِ پولیا برای ادغام‌کننده)؛ AUDIT_LOG به‌روز شد.",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T18:57:53Z",
+  "note": "بسنجیده شد: بیلد، test_plausible/test_sources/test_graph (NO ERRORS) و تست‌های handbook/integrity/handoff-guard سبز",
+  "commit": ""
+ }
 }
