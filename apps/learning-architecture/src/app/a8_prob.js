@@ -117,6 +117,7 @@
       (p.dead || []).forEach(function (d) { body.appendChild(h("section", { class: "card" }, h("h3", {}, yrWho(d.year, d.who)), h("p", {}, h("strong", {}, "ایده: "), d.idea), h("p", {}, h("strong", {}, "شکاف: "), d.flaw), h("div", { class: "row gap wrap" }, (d.st || []).map(function (x) { return A.stLink(x); })))); });
     } else if (tab === "lessons") {
       body.appendChild(h("section", { class: "card" }, h("ul", {}, (p.lessons || []).map(function (l) { return h("li", {}, l); }))));
+      if (A.solveLessons) body.appendChild(A.solveLessons(p));
       var sts = {}; p.stages.forEach(function (s) { (s.st || []).forEach(function (x) { sts[x] = (sts[x] || 0) + 1; }); });
       body.appendChild(h("section", { class: "card" }, h("h2", {}, "ایستگاه‌های کارخانه در این مسئله"), h("div", { class: "row gap wrap" }, Object.keys(sts).map(function (x) { return h("span", {}, A.stLink(x), h("span", { class: "small muted" }, " ×" + fa(sts[x]))); }))));
     } else if (tab === "cases") {
@@ -177,7 +178,10 @@
     var idx = p.stages.map(function (_, i) { return i; });
     if (st.order === "e2h") idx.sort(function (a, b) { return p.stages[a].lvl - p.stages[b].lvl || a - b; });
     if (st.order === "h2e") idx.sort(function (a, b) { return p.stages[b].lvl - p.stages[a].lvl || a - b; });
-    if (st.i >= idx.length) { var s = lvStats(pg, st.lv, n); box.appendChild(h("section", { class: "card verdict " + (s.pct >= 0.8 ? "okv" : "badv") }, h("h2", {}, "پایان سطح: " + fa(Math.round(100 * s.pct)) + "٪ درست در بار اول"), h("p", {}, s.pct >= 0.8 ? (st.lv < 4 ? "سطح بعد باز شد." : "همه سطح‌ها را گذراندی. حالا تمرین‌های هم‌خانواده و بن‌بست‌ها را مرور کن.") : "گام‌های نادرست را در «مسیر حل» بخوان و دوباره تلاش کن."), h("button", { class: "btn", onclick: function () { st.i = 0; A.render(); } }, "از نو"))); return box; }
+    /* فهم ⇐ حدس ⇐ ایست ⇐ وارسیِ گام‌ها ⇐ بازنگری ⇐ مرورِ فاصله‌دار: در همین شبیه‌ساز (a36_solve.js) */
+    var pre = A.solvePre ? A.solvePre(p, st, pg, idx) : null; if (pre) box.appendChild(pre);
+    if (st.i >= idx.length) { var lbk = A.solveLookBack ? A.solveLookBack(p, st, pg) : null; if (lbk) box.appendChild(lbk);
+      var s = lvStats(pg, st.lv, n); box.appendChild(h("section", { class: "card verdict " + (s.pct >= 0.8 ? "okv" : "badv") }, h("h2", {}, "پایان سطح: " + fa(Math.round(100 * s.pct)) + "٪ درست در بار اول"), h("p", {}, s.pct >= 0.8 ? (st.lv < 4 ? "سطح بعد باز شد." : "همه سطح‌ها را گذراندی. حالا تمرین‌های هم‌خانواده و بن‌بست‌ها را مرور کن.") : "گام‌های نادرست را در «مسیر حل» بخوان و دوباره تلاش کن."), h("button", { class: "btn", onclick: function () { if (A.solveLeaveLevel) A.solveLeaveLevel(p, st, pg); st.i = 0; A.render(); } }, "از نو"))); return box; }
     var si = idx[st.i], s0 = p.stages[si], rec = (pg.lv[st.lv] = pg.lv[st.lv] || {})[s0.id];
     var card = h("section", { class: "card simcard" }), revealed = false, ta = null, mineTxt = null;
     card.appendChild(h("div", { class: "row between wrap" }, h("span", { class: "eyebrow", dir: "rtl" }, "گام " + fa(st.i + 1) + " از " + fa(idx.length), (s0.year != null && s0.year !== "") || s0.who ? " · " : "", yrWho(s0.year, s0.who)), h("span", { class: "chip" }, "دشواری " + fa(s0.lvl))));
@@ -193,7 +197,7 @@
       L[s0.id] = nr; S.put(pg);
       revealed = true;
       area.appendChild(h("div", { class: "card soft" }, h("p", {}, h("strong", {}, "حرکت واقعی: "), s0.move), h("p", {}, h("strong", {}, "ایده ساده: "), s0.idea), h("div", { class: "row gap wrap" }, (s0.st || []).map(function (x) { return A.stLink(x); })),
-        A.moveChips ? A.moveChips(p, s0, "حرکتِ این گام: ") : null));
+        A.moveChips ? A.moveChips(p, s0, "حرکتِ این گام: ") : null, A.solveRevealExtra ? A.solveRevealExtra(p, s0) : null));
       area.appendChild(h("button", { class: "btn", onclick: function () { st.i++; A.render(); } }, st.i + 1 < idx.length ? "گام بعد" : "پایان سطح"));
     }
     function options(firstTry) {
@@ -221,7 +225,7 @@
         else {
           revealed = true;
           area.appendChild(h("div", { class: "card soft" }, h("p", {}, h("strong", {}, "حرکت واقعی: "), s0.move), h("p", {}, h("strong", {}, "ایده: "), s0.idea), h("p", { class: "small" }, h("strong", {}, (own ? "گزینه‌ها: " : "گزینه‌هایی که آن زمان مطرح بود: ")), A.shuffle(s0.opts.slice()).map(function (o) { return (o.ok ? "✓ " : "✗ ") + o.t; }).join(" · ")),
-            A.moveChips ? A.moveChips(p, s0, "حرکتِ این گام: ") : null));
+            A.moveChips ? A.moveChips(p, s0, "حرکتِ این گام: ") : null, A.solveRevealExtra ? A.solveRevealExtra(p, s0) : null));
           area.appendChild(h("div", { class: "row gap wrap" }, h("span", { class: "small" }, "حرکت تو چقدر با حرکت واقعی (یا معادل معتبرش) می‌خواند؟"), [0, 1, 2].map(function (v) { return h("button", { class: "btn ghost sm", onclick: function () { area.lastChild.remove(); finishMaster(v); } }, ["۰ نه", "۱ تاحدی", "۲ کامل"][v]); })));
         }
       } }, st.lv === 3 ? "ثبت و دیدن گزینه‌ها" : "ثبت و مقایسه با حرکت واقعی"));
@@ -230,6 +234,7 @@
       /* بار اول: first/self همان می‌ماند؛ آخرین خودارزیابی در last؛ متنِ این بار در mine */
       var L = pg.lv[st.lv], prev = L[s0.id];
       L[s0.id] = { first: prev && prev.first != null ? prev.first : v === 2, self: prev && prev.self != null ? prev.self : v, last: v, mine: mineTxt != null ? mineTxt : (prev && prev.mine) || "", at: new Date().toISOString() }; S.put(pg); area.appendChild(h("button", { class: "btn", onclick: function () { st.i++; A.render(); } }, st.i + 1 < idx.length ? "گام بعد" : "پایان سطح")); }
+    if (A.solveStep) { try { A.solveStep(p, st, pg, s0, card, area, ta); } catch (e) { console.warn(e); } }
     /* «🪢 این‌جا گیر کردم» ⇒ یک موقعیتِ عادیِ گره‌گشا (a19 ⇒ A.probStuck؛ فقط اگر a16 بار شده) */
     if (A.probStuck) { var sb = A.probStuck(p, s0, si, function () { return { revealed: revealed, mine: (ta && ta.value) || (rec && rec.mine) || "" }; }); if (sb) card.appendChild(sb); }
     box.appendChild(card);
@@ -250,6 +255,9 @@
     if (!isObj(o)) throw new Error("JSON ِ مسئله باید یک شیء ({…}) باشد.");
     [["title", "عنوان"], ["field", "رشته"], ["statement", "صورت مسئله"], ["answer", "پاسخ نهایی"], ["why_hard", "چرا سال‌ها حل نشد"]].forEach(function (k) { if (!ne(o[k[0]])) E.push("«" + k[1] + "» (" + k[0] + ") باید متنِ ناخالی باشد"); });
     if (typeof o.open === "number") o.open = String(o.open); optS(o, "open", "مسئله");
+    /* نوعِ مسئله (یافتنی/اثباتی/اثبات یا رد) و خوانشِ مرجعِ مجهول/داده/شرط — هر دو اختیاری؛ نامعتبر ⇒ دور ریخته */
+    if (o.kind != null && ["find", "prove", "pod"].indexOf(o.kind) < 0) delete o.kind;
+    if (o.udc != null) { if (!isObj(o.udc)) delete o.udc; else { var ud = {}; ["u", "d", "c"].forEach(function (k) { if (isS(o.udc[k]) && o.udc[k].trim()) ud[k] = o.udc[k].trim(); }); if (Object.keys(ud).length) o.udc = ud; else delete o.udc; } }
     var ids = {}, PIPE = window.EPI_PIPE || [], MV = A.MOVE_IDS || [];  // فهرستِ ثابتِ حرکت‌ها (a19)؛ شناسهٔ ناشناخته دور ریخته می‌شود
     function uid(it, L) { if (!isS(it.id)) { E.push(L + ": «id» باید متن باشد"); return; } if (ids[it.id]) E.push(L + ": شناسهٔ تکراری «" + it.id + "»"); ids[it.id] = 1; }
     function sts(it, L) { if (it.st == null) { it.st = []; return; } if (!Array.isArray(it.st)) { E.push(L + ": «st» باید آرایه باشد"); return; } it.st = it.st.filter(function (x) { return PIPE.indexOf(x) >= 0; }); }
@@ -552,7 +560,7 @@
      مالک: «مسئله‌ها را من می‌دهم». پس شبیه‌ساز از مسئلهٔ خودِ او ساخته می‌شود، نه از نمونهٔ آماده. تاریخی نیست ⇒ بازبینِ تاریخی ندارد؛
      ولی وارسیِ پاسخ‌ها (سه حلِ مستقل) و تأییدِ مالک دارد. فقط پس از دیدنِ پاسخ (یا پایانِ نردبان) پیشنهاد می‌شود، چون مسیرِ حل را آشکار می‌کند. */
   A.PROB_PERSONAL_INTRO = "تو دستیارِ «شبیه‌سازِ مسئلهٔ خودم» هستی. این مسئلهٔ تاریخی نیست: مسئله‌ای است که کاربر در آن گیر کرده و پاسخِ درستش را داده است. راهِ درستِ حل را (اگر چند راه هست، فهمیدنی‌ترینش را) به گام‌های تصمیم بشکن تا کاربر از سخت به آسان، با گزینه‌های مختلف، همهٔ قسمت‌هایش را تمرین کند و بفهمد کجا و چرا گیر کرد. ";
-  A.PROB_PERSONAL_RULES = "\nقواعدِ این مسئلهٔ شخصی (برتر از هر چیزِ بالا): era ننویس؛ year و who را خالی بگذار؛ open خالی؛ src خالی. stages: ۴ تا ۱۰ گام؛ ctx = وضع تا این لحظه (چه داریم، چه به دست آمده) بی‌آنکه حرکتِ بعدی را لو بدهد؛ q = «حرکتِ بعدی چیست؟» به زبانِ همین مسئله؛ opts = ۳ یا ۴ گزینه با دقیقاً یک ok=true؛ گزینه‌های نادرست اشتباه‌های واقعی و رایج باشند (به‌ویژه همان‌جا که کاربر گیر کرد) و why بگوید چرا؛ move = حرکتِ درست به زبانِ ساده؛ idea = ایدهٔ پشتش؛ hint = سرنخی که پاسخ را لو نمی‌دهد؛ lvl از ۱ (آسان) تا ۵ (سخت). dead: راه‌های رایجِ اشتباه یا بن‌بست، با idea و flaw (who و year خالی). why_hard: چرا این مسئله گیرانداز است، به‌ویژه در همان جایی که کاربر گیر کرد. lessons: ۲ تا ۴ درسِ قابلِ انتقال. drills: ۳ تا ۵ پرسشِ چندگزینه‌ای دربارهٔ همین گام‌ها (a = شمارهٔ از صفرِ گزینهٔ درست). هر گام و هر تمرین دقیقاً یک پاسخِ قابلِ‌دفاع داشته باشد. نامِ آدمِ واقعی نیاور.";
+  A.PROB_PERSONAL_RULES = "\nقواعدِ این مسئلهٔ شخصی (برتر از هر چیزِ بالا): era ننویس؛ year و who را خالی بگذار؛ open خالی؛ src خالی. stages: ۴ تا ۱۰ گام؛ ctx = وضع تا این لحظه (چه داریم، چه به دست آمده) بی‌آنکه حرکتِ بعدی را لو بدهد؛ q = «حرکتِ بعدی چیست؟» به زبانِ همین مسئله؛ opts = ۳ یا ۴ گزینه با دقیقاً یک ok=true؛ گزینه‌های نادرست اشتباه‌های واقعی و رایج باشند (به‌ویژه همان‌جا که کاربر گیر کرد) و why بگوید چرا؛ move = حرکتِ درست به زبانِ ساده؛ idea = ایدهٔ پشتش؛ hint = سرنخی که پاسخ را لو نمی‌دهد؛ lvl از ۱ (آسان) تا ۵ (سخت). dead: راه‌های رایجِ اشتباه یا بن‌بست، با idea و flaw (who و year خالی). why_hard: چرا این مسئله گیرانداز است، به‌ویژه در همان جایی که کاربر گیر کرد. lessons: ۲ تا ۴ درسِ قابلِ انتقال. drills: ۳ تا ۵ پرسشِ چندگزینه‌ای دربارهٔ همین گام‌ها (a = شمارهٔ از صفرِ گزینهٔ درست). هر گام و هر تمرین دقیقاً یک پاسخِ قابلِ‌دفاع داشته باشد. نامِ آدمِ واقعی نیاور. kind: «find» اگر باید چیزی پیدا شود، «prove» اگر باید حکمی ثابت شود، «pod» اگر باید درستی یا نادرستیِ حکمی نشان داده شود. udc: {\"u\": مجهول یا حکم، \"d\": داده‌ها یا فرض، \"c\": شرط و بخش‌هایش} — فقط خوانشِ صورت، بی هیچ اشاره به راهِ حل.";
   function personalSys() { var ps = BT.PROB_SYS, i = ps.indexOf("خروجی فقط"); return A.PROB_PERSONAL_INTRO + (i >= 0 ? ps.slice(i) : ps) + (window.EPI_PIPE || []).join(", ") + A.PROB_PERSONAL_RULES; }
   A.probPersonalSys = personalSys;
   function caseText(kc) {
@@ -649,11 +657,12 @@
       attWrap.appendChild(btn);
       return attWrap;
     }
-    function store(o, by) { var id = pid; pid = "pb_u_" + Date.now().toString(36); o.id = id;
+    function store(o, by) { var id = pid; pid = "pb_u_" + Date.now().toString(36); o.id = id; if (A.solveInjectStore) { try { A.solveInjectStore(id, f, o); } catch (e) { console.warn(e); } }
       if (attShown) { attShown = false; attWrap.innerHTML = ""; var b2 = attBlock(); if (b2 !== attWrap && b2) attWrap.appendChild(b2); } var r = { id: "eprob_" + id, type: "eprob", status: "pending", by: by, p: o }; S.put(r); out.innerHTML = ""; out.appendChild(h("p", {}, "مسئله در صف تأیید است. پیش از تأیید، گام‌ها و درستی تاریخی‌شان را بسنج.")); return r; }
     return h("section", { class: "card col gap", dir: "rtl" }, h("h2", {}, "افزودنِ مسئلهٔ سختِ حل‌شده — مسئلهٔ تو"),
       h("p", { class: "small" }, "مسئله و پاسخ نهایی‌اش را بنویس (از هر علمی: ریاضی، فیزیک، فلسفه، روان‌شناسی…). هوش مصنوعی فقط مسیرِ حل را به گام‌های تصمیم، گزینه‌ها، بن‌بست‌ها و تمرین‌ها می‌شکند. بعد دو وارسیِ جدا: «بازبینِ تاریخی» تاریخ‌ها، اشخاص و رویدادها را می‌سنجد، و «وارسیِ پاسخ‌ها» هر گام و هر تمرین را سه بار جداگانه حل می‌کند تا گزینهٔ «درست» واقعاً درست باشد. نتیجه پیش از ورود به شبیه‌ساز به تأییدِ تو می‌رسد؛ تا هر پرچم را اصلاح یا آگاهانه نپذیری، تأیید بسته است. اگر مسئله‌ای است که خودت در آن گیر کرده‌ای، از «🪢 گره‌گشا» برو: آن‌جا هم ریشهٔ گیرکردن پیدا می‌شود و هم «شبیه‌سازِ همین مسئله» ساخته می‌شود."),
       inp("عنوان", "title"), inp("رشته", "field"), inp("بازه حل‌نشده ماندن", "open", 0, "مثلاً ۱۶۳۷–۱۹۹۵"), inp("صورت مسئله", "statement", 4), inp("پاسخ نهایی و حل‌کننده", "answer", 3),
+      A.solveInjectCard ? A.solveInjectCard(f, function () { return pid; }) : null,
       inp("منابع (اختیاری، ولی بازبینیِ تاریخی را دقیق‌تر می‌کند — نامِ کتاب/مقاله یا نشانیِ اینترنتی؛ هر منبع در یک سطر)", "src", 2), inp("یادداشت (اختیاری)", "notes", 2),
       attBlock(),
       // فرستادنِ متنِ تو به هوش مصنوعی تصمیمِ خودِ توست: دستیار این دکمه را نمی‌زند، زردش می‌کند (کارزارِ آزمونِ دوم c12)
