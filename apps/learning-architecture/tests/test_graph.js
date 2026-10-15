@@ -75,10 +75,12 @@ function sourceRecordTypes() {
     const G2 = APP.GRAPH.gaps(M);
     /* سراسری‌ها و نوع‌های رکوردِ زمانِ اجرا (برای وارسیِ «بی‌سیم» در Node) */
     const globals = Object.keys(window).filter(k => /^(EPI|SYS)_/.test(k) || k === 'EPI');
-    const claimTh = Object.keys(EPI_BT_LEDGER.territory.areas).reduce((n, a) => n + (EPI_BT_LEDGER.territory.areas[a].claims || []).filter(c => c.th).length, 0);
+    const TA = EPI_BT_LEDGER.territory.areas, thPairs = new Set();
+    Object.keys(TA).forEach(a => (TA[a].claims || []).forEach(c => { if (c.th) thPairs.add('area:' + a + '|' + (EPI_FOUND.TH[c.th] ? 'theorem:' : 'axiom:') + c.th); }));
+    const eset = new Set(M.edges.filter(e => e.rel === 'basis').map(e => e.a + '|' + e.b)), claimTh = thPairs.size, claimMissing = [...thPairs].filter(x => !eset.has(x));
     return { broken: G2.broken.length, brokenSample: G2.broken.slice(0, 5), dups: G2.dups.map(d => d.id).sort().join(), n: Object.keys(M.nodes).length, e: M.edges.length, miss: miss.slice(0, 10), nmiss: miss.length, dangling, stTech, famSt, br, gapBridges: G2.bridges, unknownType,
       ruleAt: M.edges.filter(e => e.rel === 'at' && M.nodes[e.a].t === 'rule').length, regTypes: reg.map(r => r[0]), types: APP.GRAPH.TYPES.map(x => x.t),
-      globals, recTypes: [...new Set(APP.S.all().map(r => r.type))], claimTh, areaBasis: M.edges.filter(e => e.rel === 'basis' && M.nodes[e.a].t === 'area').length,
+      globals, recTypes: [...new Set(APP.S.all().map(r => r.type))], claimTh, claimMissing, areaBasis: M.edges.filter(e => e.rel === 'basis' && M.nodes[e.a].t === 'area').length,
       sareaView: M.edges.filter(e => M.nodes[e.a].t === 'sarea' && M.nodes[e.b].t === 'view').length, hidden: G2.hiddenSamples, nProb: (window.EPI_PROBLEMS || []).length };
   });
   /* دادهٔ کاربر: یک رکورد از هر نوعِ نگاشته‌شده با ارجاع‌های درست ⇒ گره + یال‌ها، بی ارجاعِ شکسته */
@@ -103,7 +105,7 @@ function sourceRecordTypes() {
     put({ id: 'mn_gu', type: 'meaning', date: APP.today(), presence: 5, search: 4 });
     put({ id: 'kx_gu', type: 'kexp', knot: 'knot_gu', plan: 'آزمایشِ آزمون', status: 'planned' });
     put({ id: 'ex_gu', type: 'ex', tid: 5, topic: 'tp_gu', status: 'draft', data: {}, rubric: [] });
-    put({ id: 'pr_gu', type: 'pr', pid: C_P = APP.C.PROTOCOLS[0].id, topic: 'tp_gu', status: 'draft', data: {} });
+    put({ id: 'pr_gu', type: 'pr', pid: APP.C.PROTOCOLS[0].id, topic: 'tp_gu', status: 'draft', data: {} });
     put({ id: 'cd_gu', type: 'card', q: 'کارتِ آزمون', a: 'x', tid: 5, knot: 'knot_gu', hist: [] });
     put({ id: 'pbi_gu', type: 'pbitem', pid: 'pb_gu', prompt: 'هم‌ساختارِ آزمون', hist: [] });
     const M = APP.GRAPH.build(), nb = k => (M.adj[k] || []).map(i => M.edges[i]).map(e => e.a === k ? e.b : e.a);
@@ -137,7 +139,7 @@ function sourceRecordTypes() {
   chk(!info.wired.globalsUnwired.length && !info.wired.globalMapBad.length, 'every EPI_*/SYS_* global is mapped to a graph type or explicitly non-graph: ' + info.wired.globalsUnwired + ' ' + info.wired.globalMapBad);
   chk(!info.wired.recsUnwired.length && !info.wired.recMapBad.length, 'every record type is mapped to a graph type or explicitly non-graph: ' + info.wired.recsUnwired + ' ' + info.wired.recMapBad);
   chk(!info.user.absent.length && Object.values(info.user.links).every(Boolean) && !info.user.broken.length && info.user.brk2, 'user records of every mapped type are nodes with their links, no broken refs ' + JSON.stringify(info.user));
-  chk(info.cov.claimTh > 0 && info.cov.areaBasis >= info.cov.claimTh, 'territory claims tie areas to their axioms/theorems ' + JSON.stringify([info.cov.claimTh, info.cov.areaBasis]));
+  chk(info.cov.claimTh > 0 && !info.cov.claimMissing.length, 'territory claims tie areas to their axioms/theorems ' + JSON.stringify([info.cov.claimTh, info.cov.claimMissing.slice(0, 5)]));
   chk(info.cov.sareaView > 0, 'system-territory view: refs are view nodes');
   chk(info.cov.gapBridges === info.cov.br, '«پل میانِ دو سامانه» counts only recorded bridges ' + JSON.stringify([info.cov.gapBridges, info.cov.br]));
   chk(info.cov.hidden === info.cov.nProb, 'library problems hidden by default are counted in the gaps panel ' + JSON.stringify([info.cov.hidden, info.cov.nProb]));
@@ -181,6 +183,18 @@ function sourceRecordTypes() {
   chk(info.nav.maps === 1 && info.nav.groups === 2 && info.nav.old, 'one hub, «🗺 نقشه‌ها» group in each system, no map removed ' + JSON.stringify(info.nav));
   await p.evaluate(() => APP.go('maps')); await p.waitForTimeout(300);
   chk(await p.locator("main .gr-mapcard").count() >= 7 && await p.locator('main .gr-box').count() >= 15, 'hub cards and overview boxes');
+  info.hub = await p.evaluate(() => {
+    const cards = [...document.querySelectorAll('main .gr-mapcard')].map(c => c.dataset.v + '|' + c.textContent);
+    const inMaps = sys => { const L = [...document.querySelectorAll('.navlist[data-sys="' + sys + '"] > *')]; let g = null, out = [];
+      L.forEach(el => { if (el.classList.contains('navg')) g = el.textContent; else if (el.dataset && el.dataset.v === 'prereq') out.push(g); }); return out; };
+    return { prereq: cards.some(c => /^prereq\|/.test(c)), whole: cards.some(c => /^whole\|/.test(c)),
+      counts: cards.some(c => /^map\|/.test(c) && c.indexOf(APP.fa(APP.T.length) + ' تکنیک') >= 0 && c.indexOf(APP.fa(APP.C.PHASES.length) + ' فاز') >= 0) &&
+        cards.some(c => /^e_map\|/.test(c) && c.indexOf(APP.fa(EPI_ST.length) + ' ایستگاه') >= 0 && c.indexOf(APP.fa(EPI.HALLS.length) + ' سالن') >= 0),
+      navLearn: inMaps('learn'), navEpi: inMaps('epi'), hiddenNote: (document.querySelector('main .gr-hidden') || {}).textContent || '', hidN: APP.fa(EPI_PROBLEMS.length) };
+  });
+  chk(info.hub.prereq && info.hub.whole && info.hub.counts, 'hub has «🧩 نقشهٔ پیش‌نیازها» and «🧭 این برنامه چیست؟», counts derived from the registries ' + JSON.stringify(info.hub));
+  chk(['navLearn', 'navEpi'].every(k => info.hub[k].some(g => /نقشه‌ها/.test(g)) && info.hub[k].some(g => /ابزارهای ذهن/.test(g))), 'prereq under «🗺 نقشه‌ها» in both menus, «🧰 ابزارهای ذهن» entry kept ' + JSON.stringify(info.hub));
+  chk(/پنهان/.test(info.hub.hiddenNote) && info.hub.hiddenNote.indexOf(info.hub.hidN) >= 0, 'gaps panel says library problems are hidden, with the count ' + info.hub.hiddenNote);
   await p.click('main .gr-box[data-t="station"]'); await p.waitForTimeout(150);
   chk(await p.locator('main .gr-members button').count() === await p.evaluate(() => EPI_ST.length), 'type members listed');
   await p.click('main .gr-members button[data-k="station:st_grade"]'); await p.waitForTimeout(200);

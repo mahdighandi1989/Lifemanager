@@ -30508,33 +30508,6 @@ APP.goFromURL = function (q) {
     var hiddenProbs = (W.EPI_PROBLEMS || []).filter(function (p) { return p && !N[ref("prob", p.id)]; }).map(function (p) { return p.id; });
     var isHidden = function (pid) { return hiddenProbs.indexOf(pid) >= 0 || (A.getProb && !N[ref("prob", pid)] && !!A.getProb(pid)); };
     all("pbitem").forEach(function (it) { node("pbitem", it.id, "🧩 " + String(it.prompt || "تمرین").slice(0, 50), { go: ["e_prob", it.pid] }); if (it.pid && !isHidden(it.pid)) edge(ref("pbitem", it.id), ref("prob", it.pid), "practises"); });
-    /* سایرِ ثبت‌گاه‌های دادهٔ تو — هر کدام با یال به همان چیزی که ارجاع می‌دهد (همه از edge(): ارجاعِ شکسته گزارش می‌شود) */
-    var vw = function (v) { return ref("view", v); };
-    all("prereq").forEach(function (p) { node("prereq", p.id, "🧩 " + (p.title || "پیش‌نیاز"), { go: ["prereq", p.id] }); edge(ref("prereq", p.id), vw("prereq"), "in");
-      if (p.kcase) edge(ref("prereq", p.id), ref("kcase", p.kcase), "about");
-      var tseen = {}; (p.items || []).forEach(function (x) { if (x && x.topic && !tseen[x.topic]) { tseen[x.topic] = 1; edge(ref("prereq", p.id), ref("topic", x.topic), "req"); } }); });
-    all("wchain").forEach(function (c) { node("wchain", c.id, "⛓ " + (c.title || "زنجیره"), { go: ["chain"] }); edge(ref("wchain", c.id), vw("chain"), "in"); });
-    all("fcast").forEach(function (x) { node("fcast", x.id, "🎯 " + String(x.q || x.title || "پیش‌بینی").slice(0, 60), { go: ["fcast"] }); edge(ref("fcast", x.id), vw("fcast"), "in");
-      if (x.dim && x.dim !== "s_epi") edge(ref("fcast", x.id), ref("ssys", x.dim), "about"); });
-    var vByT = {}; all("value").forEach(function (v) { node("value", v.id, "🧭 " + (v.title || "ارزش"), { go: ["vals"] }); edge(ref("value", v.id), vw("vals"), "in"); if (v.title) vByT[v.title] = v.id; });
-    all("value").forEach(function (v) { (v.vs || []).forEach(function (c) { if (c && c.with) edge(ref("value", v.id), ref("value", vByT[c.with] || c.with), "vs", c.rule || ""); }); });
-    all("meaning").forEach(function (m) { node("meaning", m.id, "وارسیِ معنا · " + (m.date || ""), { go: ["vals"] }); edge(ref("meaning", m.id), vw("vals"), "in"); });
-    all("kexp").forEach(function (x) { node("kexp", x.id, "🧪 " + String(x.plan || "آزمایش").slice(0, 50), { go: ["knot", x.knot] }); if (x.knot) edge(ref("kexp", x.id), ref("knot", x.knot), "practises"); });
-    all("ex").forEach(function (x) { node("ex", x.id, "تمرینِ تکنیکِ " + fa(x.tid), { go: ["tech", x.tid] }); if (x.tid != null && x.tid !== "") edge(ref("ex", x.id), ref("tech", x.tid), "practises"); if (x.topic) edge(ref("ex", x.id), ref("topic", x.topic), "about"); });
-    all("pr").forEach(function (x) { node("prun", x.id, "اجرای پروتکلِ " + (x.pid || ""), { go: ["proto", x.pid] }); if (x.pid) edge(ref("prun", x.id), pref(x.pid), "practises"); if (x.topic) edge(ref("prun", x.id), ref("topic", x.topic), "about"); });
-    all("card").forEach(function (c) { node("card", c.id, "🃏 " + String(c.q || "کارت").slice(0, 50), { go: ["review"] }); edge(ref("card", c.id), vw("review"), "in");
-      if (c.tid != null && c.tid !== "") edge(ref("card", c.id), ref("tech", c.tid), "practises"); if (c.pid) edge(ref("card", c.id), pref(c.pid), "practises");
-      if (c.topic) edge(ref("card", c.id), ref("topic", c.topic), "about"); if (c.knot) edge(ref("card", c.id), ref("knot", c.knot), "practises"); });
-    /* تورهای دستیار (رکوردِ achat با tour): تور ⇐ وجه‌ها ⇐ ارجاع‌های هر وجه */
-    function recRef(type, id) {
-      if (type === "eprob") { var r = S && S.get ? S.get(id) : null; if (r && r.p && N[ref("prob", r.p.id)]) return ref("prob", r.p.id); return r ? null : ref("eprob", id); }   /* مسئلهٔ تأییدنشده/پنهان: نه گره، نه شکسته */
-      var gt = ({ "case": "ecase", achat: "tour", pr: "prun" })[type] || type; return ref(gt, id);
-    }
-    all("achat").filter(function (s) { return s.tour; }).forEach(function (s) {
-      node("tour", s.id, "🧭 تور: " + (s.title || s.pinned || "تور"), { go: ["home"] });
-      (s.tour.facets || []).forEach(function (f, i) { var fid = s.id + "/" + (f.key || f.id || i); node("tfacet", fid, (f.title || "وجه"), { go: [f.view || "home", f.arg || null] }); edge(ref("tfacet", fid), ref("tour", s.id), "in");
-        (f.refs || []).forEach(function (r) { if (!r || !r.id) return; var k = recRef(r.type, r.id); if (k) edge(ref("tfacet", fid), k, "about"); }); });
-    });
     /* ---------- کارخانه و جزوه ---------- */
     var E0 = W.EPI || {};
     (E0.HALLS || []).forEach(function (hl) { node("hall", hl.n, "سالنِ " + fa(hl.n) + " · " + hl.fa, { go: ["e_map"] }); });
@@ -30577,6 +30550,33 @@ APP.goFromURL = function (q) {
         /* هر ابزار (tech/proto/kfam/move/station/view) از edge() — ابزارِ ناموجود شکسته گزارش می‌شود، نه بی‌صدا رها */
         (a.tools || []).forEach(function (t) { var mm = /^([a-z]+):(.+)$/.exec(String(t)); edge(ref("sarea", a.id), mm ? ref(mm[1], mm[2]) : ref("tool", t), "uses"); });
       }); });
+    });
+    /* سایرِ ثبت‌گاه‌های دادهٔ تو (پس از کارخانه و قلمرو، چون به پرونده/سامانه هم ارجاع می‌دهند) — هر کدام با یال به همان چیزی که ارجاع می‌دهد (همه از edge(): ارجاعِ شکسته گزارش می‌شود) */
+    var vw = function (v) { return ref("view", v); };
+    all("prereq").forEach(function (p) { node("prereq", p.id, "🧩 " + (p.title || "پیش‌نیاز"), { go: ["prereq", p.id] }); edge(ref("prereq", p.id), vw("prereq"), "in");
+      if (p.kcase) edge(ref("prereq", p.id), ref("kcase", p.kcase), "about");
+      var tseen = {}; (p.items || []).forEach(function (x) { if (x && x.topic && !tseen[x.topic]) { tseen[x.topic] = 1; edge(ref("prereq", p.id), ref("topic", x.topic), "req"); } }); });
+    all("wchain").forEach(function (c) { node("wchain", c.id, "⛓ " + (c.title || "زنجیره"), { go: ["chain"] }); edge(ref("wchain", c.id), vw("chain"), "in"); });
+    all("fcast").forEach(function (x) { node("fcast", x.id, "🎯 " + String(x.q || x.title || "پیش‌بینی").slice(0, 60), { go: ["fcast"] }); edge(ref("fcast", x.id), vw("fcast"), "in");
+      if (x.dim && x.dim !== "s_epi") edge(ref("fcast", x.id), ref("ssys", x.dim), "about"); });
+    var vByT = {}; all("value").forEach(function (v) { node("value", v.id, "🧭 " + (v.title || "ارزش"), { go: ["vals"] }); edge(ref("value", v.id), vw("vals"), "in"); if (v.title) vByT[v.title] = v.id; });
+    all("value").forEach(function (v) { (v.vs || []).forEach(function (c) { if (c && c.with) edge(ref("value", v.id), ref("value", vByT[c.with] || c.with), "vs", c.rule || ""); }); });
+    all("meaning").forEach(function (m) { node("meaning", m.id, "وارسیِ معنا · " + (m.date || ""), { go: ["vals"] }); edge(ref("meaning", m.id), vw("vals"), "in"); });
+    all("kexp").forEach(function (x) { node("kexp", x.id, "🧪 " + String(x.plan || "آزمایش").slice(0, 50), { go: ["knot", x.knot] }); if (x.knot) edge(ref("kexp", x.id), ref("knot", x.knot), "practises"); });
+    all("ex").forEach(function (x) { node("ex", x.id, "تمرینِ تکنیکِ " + fa(x.tid), { go: ["tech", x.tid] }); if (x.tid != null && x.tid !== "") edge(ref("ex", x.id), ref("tech", x.tid), "practises"); if (x.topic) edge(ref("ex", x.id), ref("topic", x.topic), "about"); });
+    all("pr").forEach(function (x) { node("prun", x.id, "اجرای پروتکلِ " + (x.pid || ""), { go: ["proto", x.pid] }); if (x.pid) edge(ref("prun", x.id), pref(x.pid), "practises"); if (x.topic) edge(ref("prun", x.id), ref("topic", x.topic), "about"); });
+    all("card").forEach(function (c) { node("card", c.id, "🃏 " + String(c.q || "کارت").slice(0, 50), { go: ["review"] }); edge(ref("card", c.id), vw("review"), "in");
+      if (c.tid != null && c.tid !== "") edge(ref("card", c.id), ref("tech", c.tid), "practises"); if (c.pid) edge(ref("card", c.id), pref(c.pid), "practises");
+      if (c.topic) edge(ref("card", c.id), ref("topic", c.topic), "about"); if (c.knot) edge(ref("card", c.id), ref("knot", c.knot), "practises"); });
+    /* تورهای دستیار (رکوردِ achat با tour): تور ⇐ وجه‌ها ⇐ ارجاع‌های هر وجه */
+    function recRef(type, id) {
+      if (type === "eprob") { var r = S && S.get ? S.get(id) : null; if (r && r.p && N[ref("prob", r.p.id)]) return ref("prob", r.p.id); return r ? null : ref("eprob", id); }   /* مسئلهٔ تأییدنشده/پنهان: نه گره، نه شکسته */
+      var gt = ({ "case": "ecase", achat: "tour", pr: "prun" })[type] || type; return ref(gt, id);
+    }
+    all("achat").filter(function (s) { return s.tour; }).forEach(function (s) {
+      node("tour", s.id, "🧭 تور: " + (s.title || s.pinned || "تور"), { go: ["home"] });
+      (s.tour.facets || []).forEach(function (f, i) { var fid = s.id + "/" + (f.key || f.id || i); node("tfacet", fid, (f.title || "وجه"), { go: [f.view || "home", f.arg || null] }); edge(ref("tfacet", fid), ref("tour", s.id), "in");
+        (f.refs || []).forEach(function (r) { if (!r || !r.id) return; var k = recRef(r.type, r.id); if (k) edge(ref("tfacet", fid), k, "about"); }); });
     });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
     (W.EPI_ST || []).forEach(function (s) { (s.tech || []).forEach(function (x) { edge(ref("station", s.id), ref("tech", x.id), "bridge", x.why); }); });
