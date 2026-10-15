@@ -74,10 +74,26 @@
     S.all("wchain", function (c) { return c.feel != null && (c.outcome === "رخ داد" || c.outcome === "رخ نداد"); }).forEach(function (c) {
       var p = c.feel / 100, ok = c.outcome === "رخ داد"; add("AFF", { at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok }, "wchain"); add("META", { at: c.outcomeAt || c.due, ok: ok, conf: p }, "wchain");
     });
+    /* سنجش‌های ماندگاریِ ۳۰ و ۹۰ روزهٔ گره‌ها ⇒ یادگیری و بازیابیِ بلندمدت (کارزارِ v08: پاسِ ۳۰ روزه هیچ‌جای کارنامه نبود) */
+    P.holds().forEach(function (x) { add("Glr", { at: x.at, ok: x.ok }, "hold"); });
     S.all("psyans").forEach(function (a) { var it = P.item(a.item); if (it && R[it.construct]) add(it.construct, a, "anchor"); if (a.conf != null) add("META", a, "anchor"); });
     return R;
   };
 
+  /* ماندگاری: برای هر گرهِ ورزیده، هر موعدِ ۳۰/۹۰ روزه‌ای که رسیده — درست اگر پس از آن پاسخِ درستی بوده و پیش از آن بازگشتی نبوده */
+  P.holds = function () {
+    var out = [], HOLD = (A.ASSIST && A.ASSIST.tourHold) || [30, 90];
+    S.all("knot", function (k) { return !k.sample && k.solvedAt; }).forEach(function (k) {
+      HOLD.forEach(function (n) {
+        var from = A.addDays(String(k.solvedAt).slice(0, 10), n); if (A.today() < from) return;
+        var back = k.returnedAt && k.returnedAt > k.solvedAt && String(k.returnedAt).slice(0, 10) <= A.today();
+        var okAfter = (k.log || []).some(function (e) { return e.ok && String(e.at || e.d || "").slice(0, 10) >= from; });
+        if (!okAfter && !back) return;   // هنوز سنجیده نشده
+        out.push({ knot: k.id, n: n, at: from + "T12:00:00Z", ok: okAfter && !(back && String(k.returnedAt).slice(0, 10) <= from) });
+      });
+    });
+    return out;
+  };
   /* برآوردِ «نسبت به خودت» برای یک سازه */
   function month(x) { return String(x || "").slice(0, 7); }
   P.selfEst = function (arr, isMeta) {

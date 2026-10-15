@@ -73,6 +73,13 @@
     });
     return bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "";
   };
+  /* نشانهٔ پریشانی هنوز فعال است؟ واژه‌نامه آن را روشن می‌کند؛ فقط حرفِ خودِ کاربر (لایهٔ «ایمنی» با «رد شد» و دلیل، پس از آن لحظه) خاموشش می‌کند —
+     کارزارِ v08: کاربر دو بار صریحاً گفت آسیبی به خودش در کار نیست ولی هر ۱۷ ایمیل با بندِ بحران باز می‌شد */
+  AS.safetyActive = function (s) {
+    if (!s || !s.safetyAt) return false;
+    var L = s.tour && s.tour.diag && s.tour.diag.safety;
+    return !(L && L.st === "no" && String(L.at || "") > String(s.safetyAt));
+  };
   // tour_plan می‌تواند غربال را هم‌زمان بیاورد
   var rawPlan = DO.tour_plan;
   DO.tour_plan = function (a) {
