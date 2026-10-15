@@ -375,11 +375,17 @@
           lvU ? h("p", { class: "small muted sv-ruone" }, "کلِ مسئله که نوشته بودی: «" + (x.one || "—") + "» · چرا: «" + (x.why || "—") + "»" + (d.why ? " · حالا: «" + txt(d.why) + "»" : "")) : null]; };
       } else if (ph === "b") {
         card.appendChild(field("svRB", "از این مسئله چه درسی گرفتی و کجای دیگر به کارش می‌بری؟", "", function (v) { d.b = v; }, 3));
-        reveal = function () { return [h("ul", { class: "small" }, s.lessons.slice(-3).map(function (l) { return h("li", {}, l.use + (l.newProb ? " — مسئلهٔ تازه‌ات: " + l.newProb : "")); }))]; };
+        var bb = p.live && s.b && s.b[1] && s.b[1].done ? s.b[1] : null;
+        /* مسئلهٔ زنده: «در یک نگاه»، «راهِ دیگر» و «چه کار کرد» هم از حافظه برمی‌گردند */
+        if (bb && bb.glance) card.appendChild(field("svRBG", "کلِ حل در یک نگاه — و راهِ دیگری که به همان می‌رسید (بی‌نگاه)", "", function (v) { d.bg = v; }, 2));
+        reveal = function () { return [h("ul", { class: "small" }, s.lessons.slice(-3).map(function (l) { return h("li", {}, l.use + (l.newProb ? " — مسئلهٔ تازه‌ات: " + l.newProb : "")); })),
+          bb && bb.glance ? h("p", { class: "small muted sv-rbwas" }, "در یک نگاه: «" + bb.glance + "» · راهِ دیگر: «" + (bb.other || "—") + "» · چه کار کرد: «" + (bb.worked || "—") + "»") : null]; };
       } else if (ph === "g") {
         var g = lastG() || {};
-        card.appendChild(h("p", { class: "small" }, "حدسِ پیشینت: «" + (g.guess || "—") + "»"));
-        card.appendChild(field("svRG", "یک حالتِ خاص یا مثالِ نقضِ تازه بنویس که این حدس را بیازماید، و نتیجه‌اش را", "", function (v) { d.g = v; }, 3));
+        card.appendChild(h("p", { class: "small" }, "حدسِ پیشینت: «" + (g.guess || "—") + "»" + (p.live && g.hit ? " · داوری‌ات پس از آنچه شد: " + g.hit : "")));
+        /* مسئلهٔ زنده (a38): حدسی که واقعیت ردش کرده دوباره آزموده نمی‌شود — مرور می‌پرسد چه ردش کرد و برای حدسِ بعد چه می‌آموزد */
+        if (p.live && g.hit === "نادرست بود") card.appendChild(field("svRG", "حدست رد شد. از حافظه: چه چیزی ردش کرد، و برای حدسِ بعدی‌ات در چنین مسئله‌ای چه می‌آموزی؟", "", function (v) { d.g = v; }, 3));
+        else card.appendChild(field("svRG", "یک حالتِ خاص یا مثالِ نقضِ تازه بنویس که این حدس را بیازماید، و نتیجه‌اش را", "", function (v) { d.g = v; }, 3));
         var gk = g.kit || null, grv = gk ? (gk.rivals || []).filter(function (x) { return txt(x.t); }) : [];
         if (grv.length) card.appendChild(field("svRGR", "حدس‌های رقیبت چه بودند و کدام حالت جدایشان می‌کرد؟ (بی‌نگاه)", "", function (v) { d.gr = v; }, 2));
         var liveOut = function () { var L = s.live, b = s.b && s.b[1], st = L && (L.steps || []).filter(function (x) { return x.out && x.out.what; }).pop();

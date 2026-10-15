@@ -25,12 +25,15 @@
   function seqFix(s) {
     var L = s.live, mx = L.dSeq || 0;
     function see(id) { var m = /^d(\d+)$/.exec(String(id || "")); if (m && +m[1] > mx) mx = +m[1]; }
-    [s.u && s.u[1]].concat(L.uHist || []).concat(L.uDraft ? [L.uDraft] : []).forEach(function (u) { ((u && u.dl) || []).forEach(function (x) { see(x.id); }); });
+    [s.u && s.u[1]].concat(L.uHist || []).forEach(function (u) { ((u && u.dl) || []).forEach(function (x) { see(x.id); }); });
     L.steps.forEach(function (st) { (st.data || []).forEach(see); });
     if (L.plan) Object.keys(L.plan.unused || {}).forEach(see);
     L.dSeq = mx;
   }
-  function nid(s) { s.live.dSeq = (s.live.dSeq || 0) + 1; return "d" + s.live.dSeq; }
+  /* شناسهٔ تازه بی مصرفِ شمارنده: بیشینهٔ «ثبت‌شده» (dSeq) و آنچه در همین پیش‌نویس هست، به‌علاوهٔ یک؛ شمارنده فقط هنگامِ ثبتِ کارت جلو می‌رود
+     (باز کردنِ کارت بی تایپ هیچ شناسه‌ای مصرف نمی‌کند — بازبینیِ دورِ ۶) */
+  function idNum(id) { var m = /^d(\d+)$/.exec(String(id || "")); return m ? +m[1] : 0; }
+  function nid(s, list) { var mx = s.live.dSeq || 0; (list || []).forEach(function (x) { mx = Math.max(mx, idNum(x.id)); }); return "d" + (mx + 1); }
   function live(s) { return s.live; }
   function T0(t) { return (A.SOLVE_TYPES || {})[t] || A.SOLVE_TYPES.find; }
   function typeOf(r, s) { var t = (s && s.type) || (r && r.p && r.p.kind); return A.SOLVE_TYPES && A.SOLVE_TYPES[t] ? t : "find"; }
@@ -99,7 +102,11 @@
     });
     return box;
   }
-  function unusedMiss(list, store) { return list.filter(function (d) { var a = store[d.id]; return !a || !a.ans || (a.ans !== "use" && txt(a.why).length < 3); }).map(function (d) { return "«" + clip(d.t, 40) + "»"; }); }
+  /* «لازم نیست» دلیل می‌خواهد: دست‌کم سه واژهٔ معنادار، و یک دلیلِ یکسان برای چند داده پذیرفته نیست (بازبینیِ دورِ ۶) */
+  function unusedMiss(list, store) {
+    var seen = {}, dup = [];
+    list.forEach(function (d) { var a = store[d.id]; if (a && a.ans === "skip" && txt(a.why)) { var k = toks(a.why).join(" "); if (seen[k]) dup.push(d); seen[k] = 1; } });
+    return list.filter(function (d) { var a = store[d.id]; return !a || !a.ans || (a.ans === "skip" ? toks(a.why).length < 3 || dup.indexOf(d) >= 0 : a.ans !== "use" && txt(a.why).length < 3); }).map(function (d) { return "«" + clip(d.t, 40) + "»"; }); }
 
   /* ---------- مرحله ---------- */
   var PHN = { u: "فهمِ مسئله", p: "طرح", c: "اجرا روی واقعیت", b: "بازنگری", done: "بسته" };
@@ -171,27 +178,51 @@
   };
 
   /* ---------- فهم (کارتِ فهمِ همان تونل، با فهرستِ داده‌ها) ---------- */
+  function wholeWhy(d, r) {
+    var o = [], one = txt(d.one), st = txt(r.p.statement);
+    if (one.length < 3) o.push("«کلِ مسئله در یک جمله» را بنویس");
+    else {
+      if (A.kNearCopy && A.kNearCopy(one, st)) o.push("جملهٔ کل تقریباً رونوشتِ صورت است — آن را به زبانِ خودت و بی‌جزئیات بگو");
+      if (one.length >= st.length) o.push("جملهٔ کل باید کوتاه‌تر از صورت باشد (بی‌جزئیات)");
+      if (/[.!?؟]\s*\S/.test(one.replace(/[.!?؟\s]+$/, ""))) o.push("فقط یک جمله");
+    }
+    if (txt(d.why).length < 3) o.push("«چرا می‌خواهی حلش کنی» را بنویس");
+    return o;
+  }
   var UD = {};
   function uCard(r, pg, s) {
     var pid = r.p.id, prev = uOf(s) || {}, fresh = !s.g || !s.g[1];
     var L0 = live(s);
     /* پیش‌نویسِ کارتِ فهم با بارگذاریِ دوباره گم نمی‌شود (solve.live.uDraft؛ پس از ثبت پاک می‌شود) */
     var d = UD[pid] = UD[pid] || (L0.uDraft ? JSON.parse(JSON.stringify(L0.uDraft)) : { type: typeOf(r, s), one: prev.one || "", why: prev.why || "", u: prev.u || "", dl: (prev.dl || []).map(function (x) { return { id: x.id, t: x.t }; }), c: prev.c || "", rel: prev.rel || "", suff: prev.suff || "", suffWhy: prev.suffWhy || "", fig: prev.fig || "", dead: prev.deadTxt || "", guess: "", conf: "", test: "", testRes: "", ifRef: "" });
-    if (!d.dl.length) { d.dl = [{ id: nid(s), t: "" }, { id: nid(s), t: "" }]; S.put(pg); }
+    if (!d.dl.length) { d.dl.push({ id: nid(s, d.dl), t: "" }); d.dl.push({ id: nid(s, d.dl), t: "" }); }
+    if (d.wholeOk == null) d.wholeOk = !!prev.one;
     var dTimer = null;
     function saveDraft() { if (dTimer) clearTimeout(dTimer); dTimer = setTimeout(function () { dTimer = null; if (UD[pid] !== d) return; L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); }, 350); }
     var T = T0(d.type);
     var box = h("section", own({ class: "card lp-u" }), h("div", { class: "eyebrow" }, "فهمِ مسئله" + (live(s).reU ? " — دوباره" : "")),
       h("h3", {}, "اول کل، بعد جزءها"),
-      h("p", { class: "small" }, "پولیا: پیش از هر کاری مسئله را بفهم و بخواهی‌اش. اول کلِ مسئله را بی‌جزئیات در یک جمله ببین؛ بعد مجهول، هر داده جدا، و شرط. هر داده را جدا بنویس — بعداً صفحه دربارهٔ هر داده‌ای که به کار نبردی، با نامش، می‌پرسد."),
+      h("p", { class: "small" }, "پیش از هر کاری مسئله را بفهم و بخواهی‌اش. اول کلِ مسئله را بی‌جزئیات در یک جمله ببین؛ بعد مجهول، هر داده جدا، و شرط. هر داده را جدا بنویس — بعداً صفحه دربارهٔ هر داده‌ای که به کار نبردی، با نامش، می‌پرسد."),
       h("div", { class: "card soft small lp-stmt" }, h("strong", {}, "صورتِ خودت: "), r.p.statement));
     box.appendChild(U.typeSel("lpType", d.type, function (v) { d.type = v; A.render(); }));
     box.appendChild(field("lpOne", "۱) کلِ مسئله در یک جملهٔ کامل — بی‌جزئیات", d.one, function (v) { d.one = v; }, 0, "«می‌خواهم … ، با داشتنِ … ، به شرطِ این‌که …»"));
     box.appendChild(field("lpWhy", "۲) چرا می‌خواهی حلش کنی؟ چه چیزی در آن برایت مهم است یا کنجکاوت می‌کند؟", d.why, function (v) { d.why = v; }, 0));
+    /* «اول کل»: جزءها فقط پس از ثبتِ جملهٔ کل باز می‌شوند — جمله‌ای که رونوشتِ صورت نیست، یک جمله است و کوتاه‌تر از صورت */
+    if (!d.wholeOk) {
+      var wout = h("div", { class: "small", "aria-live": "polite" });
+      box.appendChild(h("button", { class: "btn lp-onesave", type: "button", onclick: function () {
+        var w = wholeWhy(d, r); wout.innerHTML = "";
+        if (w.length) { wout.appendChild(h("p", { class: "bad lp-onemiss" }, "هنوز نه: " + w.join("؛ ") + ".")); return; }
+        d.wholeOk = true; L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); A.render();
+      } }, "ثبتِ کل — حالا جزءها"));
+      box.appendChild(wout);
+      box.addEventListener("input", saveDraft); box.addEventListener("change", saveDraft);
+      return box;
+    }
     box.appendChild(field("lpUnk", "۳) " + T.u, d.u, function (v) { d.u = v; }, 2));
     var dbox = h("fieldset", { class: "col gap lp-dl" }, h("legend", {}, "۴) " + (d.type === "find" ? "داده‌ها" : "بخش‌های فرض") + " — هر کدام جدا (چیزی که می‌دانی یا در دست داری: عدد، منبع، محدودیت، آدم، زمان)"));
     d.dl.forEach(function (x, i) { dbox.appendChild(field("lpD_" + x.id, (d.type === "find" ? "دادهٔ " : "فرضِ ") + fa(i + 1), x.t, function (v) { x.t = v; }, 0)); });
-    dbox.appendChild(h("button", { class: "btn ghost sm lp-dadd", type: "button", onclick: function () { d.dl.push({ id: nid(s), t: "" }); L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); A.render(); } }, "+ دادهٔ دیگر"));
+    dbox.appendChild(h("button", { class: "btn ghost sm lp-dadd", type: "button", onclick: function () { d.dl.push({ id: nid(s, d.dl), t: "" }); L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); A.render(); } }, "+ دادهٔ دیگر"));
     box.appendChild(dbox);
     box.appendChild(field("lpCond", "۵) " + T.c, d.c, function (v) { d.c = v; }, 3, "هر بخش در یک سطر"));
     box.appendChild(field("lpRel", "۶) پیوندِ جزءها: کدام داده به کدام بخشِ شرط یا به مجهول ربط دارد؟ (اختیاری)", d.rel, function (v) { d.rel = v; }, 0));
@@ -213,7 +244,7 @@
     var out = h("div", { "aria-live": "polite", class: "col gap" });
     box.appendChild(h("button", { class: "btn lp-usave", type: "button", onclick: function (e) {
       var items = d.dl.filter(function (x) { return txt(x.t); });
-      var miss = [[d.one, "کلِ مسئله در یک جمله"], [d.why, "چرا می‌خواهی حلش کنی"], [d.u, T.u], [d.c, T.c]].filter(function (x) { return txt(x[0]).length < 3; }).map(function (x) { return "«" + x[1] + "»"; });
+      var miss = wholeWhy(d, r).concat([[d.u, T.u], [d.c, T.c]].filter(function (x) { return txt(x[0]).length < 3; }).map(function (x) { return "«" + x[1] + "»"; }));
       if (!items.length) miss.push("«دست‌کم یک داده»");
       if (!d.suff) miss.push("«" + T.suff + "»");
       if (fresh && !txt(d.guess)) miss.push("«حدس»");
@@ -236,6 +267,7 @@
           if (d.kit && A.solveKitEmpty && !A.solveKitEmpty(d.kit)) s.g[1].kit = U.kitCopy(d.kit);
           U.seed(s, "g");
         }
+        items.forEach(function (x) { L.dSeq = Math.max(L.dSeq || 0, idNum(x.id)); });
         L.reU = false; delete L.uDraft; if (r.dormant && !r.woke) r.woke = nowISO(); S.put(r); S.put(pg); delete UD[pid]; if (dTimer) clearTimeout(dTimer);
         A.toast("فهمت ثبت شد؛ از فردا بی‌نگاه مرور می‌شود."); A.go("lprob", pid, "plan");
       }, "فهمت با صورتی که نوشتی چقدر می‌خواند؟"));
@@ -282,7 +314,7 @@
     var d = AD[pid] = AD[pid] || { a: "", data: [] };
     box.appendChild(h("p", { class: "lp-q" }, h("strong", {}, "پرسش: "), q));
     var rung = A.qRung ? A.qRung(q) : 0, nUse = A.qUses ? A.qUses(q).length : 0;
-    box.appendChild(h("p", { class: "small muted" }, "چرا این پرسش؟ " + U.WHY.p + " اگر با وضعِ همین لحظه نمی‌خواند، نپرس — پرسشِ بعد را بگیر." + (nUse ? " این پرسش را " + fa(nUse) + " بار به کار برده‌ای (پلهٔ " + fa(rung) + " از نردبان؛ از پلهٔ " + fa(A.Q_OWN_RUNG) + " اول خودت می‌پرسی)." : "")));
+    box.appendChild(h("p", { class: "small muted" }, "چرا این پرسش؟ " + (t === "find" ? U.WHY.p : "طرحِ اثبات از پیوندِ فرض و حکم درمی‌آید؛ پرسش‌ها از آشنا به دور و از کل به جزء می‌روند.") + " اگر با وضعِ همین لحظه نمی‌خواند، نپرس — پرسشِ بعد را بگیر." + (nUse ? " این پرسش را " + fa(nUse) + " بار به کار برده‌ای (پلهٔ " + fa(rung) + " از نردبان؛ از پلهٔ " + fa(A.Q_OWN_RUNG) + " اول خودت می‌پرسی)." : "")));
     box.appendChild(field("lpAsk", "پاسخِ کوتاهِ تو (به قلمِ خودت)", d.a, function (v) { d.a = v; }, 2));
     var tk = dataTicks(s, "lpAD_", d.data); if (tk) box.appendChild(tk);
     box.appendChild(h("div", { class: "row gap wrap" },
@@ -307,12 +339,16 @@
     S.all("case", function (c) { return !c.sample; }).forEach(function (c) { var d = c.st && c.st.st_intake && c.st.st_intake.data || {}; o.push({ type: "case", id: c.id, fa: "🏭 " + (c.title || "پرونده"), t: [c.title, d.input].join(" "), go: ["e_case", c.id] }); });
     return o;
   }
+  /* شباهتِ «مسئلهٔ مرتبط»: عدد و واژه‌های عامِ مقدار و زمان («دو»، «کم»، «ماهانه»، «روز»…) شباهت نمی‌سازند؛ دست‌کم دو واژهٔ معنادارِ مشترک (بازبینیِ دورِ ۶) */
+  var SIMSTOP = " یک دو سه چهار پنج شش هفت هشت نه ده صد هزار میلیون میلیارد تومان کم زیاد بیش بیشتر کمتر خیلی کمی تا روز روزه روزانه هفته هفتگی ماه ماهانه سال سالانه ساعت دقیقه بار اول دوم آخر وقت زمان امروز فردا دیروز همیشه هرگز گاهی باید نباید خواهم خواستم کنم شد شده ";
+  function toksSim(t) { return toks(t).filter(function (w) { return !/\d/.test(w) && SIMSTOP.indexOf(" " + w + " ") < 0 && w.length >= 3 && !/^[بن][ء-يپچژکگی]{2,}(?:م|یم|ی|د|ید|ند)$/.test(w); }); }   // فعلِ التزامی/منفی («بگیرم»، «نکنیم») موضوع نیست
+  A.liveToksSim = toksSim;
   A.liveRelated = function (pid, n) {
     var r = rec(pid); if (!r) return [];
     var pg = pgOf(pid), s = solOf(pg), u = uOf(s) || {};
-    var a = toks([r.p.title, r.p.statement, u.u, u.d, u.c].join(" "));
-    return candidates(pid).map(function (c) { var b = toks(c.t), sh = a.filter(function (w) { return hit(w, b); }); return { c: c, sh: sh, s: sh.length / Math.sqrt((a.length || 1) * (b.length || 1)) }; })
-      .filter(function (x) { return x.sh.length >= 1; }).sort(function (x, y) { return y.sh.length - x.sh.length || y.s - x.s; }).slice(0, n || 3);
+    var a = toksSim([r.p.title, r.p.statement, u.u, u.d, u.c].join(" "));
+    return candidates(pid).map(function (c) { var b = toksSim(c.t), sh = a.filter(function (w) { return hit(w, b); }); return { c: c, sh: sh, s: sh.length / Math.sqrt((a.length || 1) * (b.length || 1)) }; })
+      .filter(function (x) { return x.sh.length >= 2; }).sort(function (x, y) { return y.sh.length - x.sh.length || y.s - x.s; }).slice(0, n || 3);
   };
   var RD = {};
   function relatedCard(r, pg, s) {
@@ -325,6 +361,12 @@
       box.appendChild(h("div", { class: "row between wrap lp-relrow", "data-id": x.c.id }, h("button", { class: "linkish", type: "button", onclick: function () { A.go.apply(A, x.c.go); } }, x.c.fa),
         h("span", { class: "small muted" }, "واژه‌های مشترک: " + x.sh.slice(0, 5).join("، ")),
         linked ? h("span", { class: "chip" }, "پیوند خورد") : h("button", { class: "btn ghost sm lp-rellink", type: "button", onclick: function () { L.related.push({ type: x.c.type, id: x.c.id, at: nowISO() }); S.put(pg); A.render(); } }, "مرتبط است — پیوندش بده")));
+    });
+    /* پیوند به‌تنهایی «به کار بردنِ ابزار» نیست: بنویس دقیقاً چه چیزی از آن مورد به این مسئله می‌آید (نتیجه، روش، عنصرِ کمکی) */
+    L.related.forEach(function (x, i) {
+      var c = candidates(pid).filter(function (y) { return y.id === x.id; })[0], k = "c" + i; d[k] = d[k] != null ? d[k] : x.carry || "";
+      box.appendChild(h("div", { class: "col gap lp-relcarry", "data-id": x.id }, field("lpRelC_" + i, "از «" + clip(c ? c.fa : x.id, 60) + "» دقیقاً چه چیزی به این مسئله می‌آید — نتیجه‌اش، روشش یا عنصری کمکی؟", d[k], function (v) { d[k] = v; }, 0),
+        h("button", { class: "btn ghost sm lp-relcsave", type: "button", onclick: function () { if (!spec(d[k])) { A.toast("دقیق‌تر بنویس چه چیزی به کار می‌آید (دست‌کم سه واژهٔ معنادار).", "bad"); return; } x.carry = txt(d[k]); x.carryAt = nowISO(); S.put(pg); A.render(); } }, x.carry ? "به‌روزکردن" : "ثبتِ آنچه به کار می‌آید")));
     });
     box.appendChild(selF("lpSeen", "همین مجهول (یا مجهولی شبیه) را جایی دیده‌ای — در زندگیِ خودت یا کارِ دیگران؟", [["yes", "بله"], ["no", "نه"]], d.ans, function (v) { d.ans = v; A.render(); }));
     if (d.ans === "yes") box.appendChild(field("lpSeenW", "کجا؟ چه چیزی از آن به کار می‌آید — نتیجه‌اش، روشش، یا عنصری کمکی؟", d.where, function (v) { d.where = v; }, 2));
@@ -399,7 +441,7 @@
     if (L.back && spec(L.back.solved) && spec(L.back.before1, 2) && !near(L.back.solved, st) && !near(L.back.solved, u.one)) o.push("back");
     if (L.aux.some(function (a) { return spec(a.t) && spec(a.bridge, 2) && !near(a.t, st); })) o.push("aux");
     if (L.moves.some(function (m) { var mv = A.MOVES && A.MOVES[m.mv]; return spec(m.why) && !(mv && near(m.why, mv.fa + " " + (mv.d || ""))); })) o.push("move");
-    if (L.related.length || (L.seen && spec(L.seen.ans === "yes" ? L.seen.where : L.seen.fam))) o.push("rel");
+    if (L.related.some(function (x) { return spec(x.carry) && !near(x.carry, st); }) || (L.seen && L.seen.ans === "yes" && spec(L.seen.where) && !near(L.seen.where, st))) o.push("rel");
     return o;
   }
   A.liveHeur = function (pid) { var r = rec(pid); if (!r) return []; return heurUsed(r, solOf(pgOf(pid))); };
@@ -468,10 +510,11 @@
     var box = h("section", own({ class: "card lp-stepf" }), h("h4", {}, "گامِ واقعیِ بعد"),
       h("p", { class: "small" }, "اجرا یعنی هر گام را وارسی کنی، نه فقط بنویسی؛ و پیش از انجام بدانی تقریباً به چه می‌رسی. پیش‌بینی‌ات با احتمال در «🎯 دفترِ پیش‌بینی» می‌نشیند و در موعد، خودت می‌گویی چه شد — کالیبراسیونِ پیش‌بینی‌هایت در «🧠 کارنامهٔ ذهن» از همین‌ها ساخته می‌شود."),
       field("lpStep", "گامِ بعد — یک کارِ مشخص در دنیای واقعی (چه چیزی، با چه کسی یا با چه ابزاری)", d.text, function (v) { d.text = v; }, 2),
-      selF("lpClear", "روشن می‌بینی که این گام درست است — به مجهول نزدیکت می‌کند؟", ["بله", "مطمئن نیستم", "نه"], d.clear, function (v) { d.clear = v; A.render(); }));
-    /* A130: «نه» گام را می‌بندد تا بنویسی چه چیزی روشن نیست (یا گام را کوچک‌تر کنی و دوباره بسنجی) */
-    if (d.clear === "نه") box.appendChild(h("div", { class: "col gap lp-unclear" }, h("p", { class: "small warnline" }, "روشن نمی‌بینی‌اش — پس هنوز گام نیست. بنویس دقیقاً چه چیزی روشن نیست، یا گام را به گامی کوچک‌تر بشکن که روشن می‌بینی (و «روشن می‌بینی؟» را دوباره بسنج)."),
-      field("lpUnclear", "چه چیزی در این گام روشن نیست؟", d.unclear, function (v) { d.unclear = v; }, 2)));
+      selF("lpClear", "روشن می‌بینی که این گام درست است — به مجهول نزدیکت می‌کند؟", ["بله", "مطمئن نیستم", "نه"], d.clear, function (v) { if (v === "نه") d.was = { text: txt(d.text), at: nowISO() }; d.clear = v; A.render(); }));
+    /* A130 (سنجیده، نه تیک): «نه» گام را می‌بندد. یا بنویس کدام بخش روشن نیست، یا گام را کوچک‌تر بازنویسی کن — و بعد «روشن می‌بینی؟» را دوباره
+       پاسخ بده. گامِ پیشین و تازه کنارِ هم ثبت می‌شوند */
+    if (d.was) box.appendChild(h("div", { class: "col gap lp-unclear" }, h("p", { class: "small warnline" }, "گفتی روشن نمی‌بینی‌اش: «" + clip(d.was.text, 120) + "». بنویس دقیقاً کدام بخش روشن نیست، یا گام را بالا کوچک‌تر بازنویسی کن؛ بعد «روشن می‌بینی؟» را دوباره پاسخ بده."),
+      field("lpUnclear", "کدام بخشِ این گام روشن نیست؟", d.unclear, function (v) { d.unclear = v; }, 2)));
     box.appendChild(field("lpPrem", "به کدام داده یا دلیل تکیه دارد؟", d.prem, function (v) { d.prem = v; }, 0));
     unk.forEach(function (x) { box.appendChild(selF("lpSU_" + x.id, "در طرح گفتی نمی‌دانی «" + clip(x.t, 80) + "» کجا به کار می‌آید — در این گام به کار می‌آید؟", [["use", "بله — همین گام به کارش می‌برد"], ["notyet", "هنوز نه"]], d.unk[x.id] || "", function (v) { d.unk[x.id] = v; var i = d.data.indexOf(x.id); if (v === "use" && i < 0) d.data.push(x.id); if (v !== "use" && i >= 0) d.data.splice(i, 1); })); });
     box.appendChild(field("lpPred", "پیش از انجام: فکر می‌کنی چه می‌شود؟", d.pred, function (v) { d.pred = v; }, 2, "یک نتیجهٔ مشخص که بعداً بشود گفت شد یا نشد"));
@@ -486,7 +529,8 @@
       if (!st) why.push("گامِ بعد را بنویس");
       else if (A.willConcrete && !A.willConcrete(st)) why.push("«" + st + "» گام نیست، آرزوست — یک کارِ مشخص بنویس");
       if (!d.clear) why.push("«روشن می‌بینی؟» را انتخاب کن");
-      else if (d.clear === "نه" && txt(d.unclear).length < 5) why.push("روشن نمی‌بینی‌اش: بنویس چه چیزی روشن نیست، یا گام را کوچک‌تر کن تا روشن ببینی");
+      else if (d.clear === "نه") why.push("روشن نمی‌بینی‌اش: بنویس کدام بخش روشن نیست یا گام را کوچک‌تر بازنویسی کن، و «روشن می‌بینی؟» را دوباره پاسخ بده");
+      else if (d.was && toks(d.unclear).length < 2 && !(txt(d.text) !== d.was.text && txt(d.text).length <= d.was.text.length)) why.push("پیش‌تر گفتی روشن نمی‌بینی‌اش: یا بنویس کدام بخش روشن نبود، یا گام را کوچک‌تر بازنویسی کن");
       unk.forEach(function (x) { if (!d.unk[x.id]) why.push("بگو «" + clip(x.t, 40) + "» در این گام به کار می‌آید یا نه"); });
       if (txt(d.pred).length < 3) why.push("پیش‌بینی‌ات را بنویس");
       if (!d.conf) why.push("اطمینانت را انتخاب کن");
@@ -505,7 +549,7 @@
       var fc = { id: A.uid("fc"), type: "fcast", q: clip(txt(d.pred), 200) + " — گامِ «" + clip(st, 60) + "» در «" + clip(r.p.title, 50) + "»", p: +d.conf, due: due, dim: "s_problem", live: { pid: pid, step: id } };
       S.put(fc);
       var stp = { id: id, at: nowISO(), d: A.today(), text: st, clear: d.clear, prem: txt(d.prem), pred: txt(d.pred), conf: +d.conf, when: txt(d.when), due: due, data: d.data.slice(), fc: fc.id };
-      if (d.clear === "نه") stp.unclear = txt(d.unclear);
+      if (d.was) stp.reclear = { before: d.was.text, unclear: txt(d.unclear), after: st, clear: d.clear, smaller: st !== d.was.text && st.length <= d.was.text.length };
       if (unk.length) stp.unknownAsk = JSON.parse(JSON.stringify(d.unk));
       L.steps.push(stp);
       delete SD[pid]; S.put(pg);
@@ -625,6 +669,7 @@
       if (ab) { if (txt(d.why).length < 3) miss.push("«چرا کنارش می‌گذاری؟»"); if (!d.src) miss.push("«این دلیل از کجاست؟»"); }
       else {
         if (txt(d.chkHow).length < 3) miss.push("«وارسیِ نتیجه»"); if (!d.chkRes) miss.push("«نتیجهٔ وارسی»");
+        [["other", "راهِ دیگر"], ["glance", "در یک نگاه"], ["worked", "چه کار کرد"]].forEach(function (x) { if (toks(d[x[0]]).length < 2) miss.push("«" + x[1] + "»"); });
         if (txt(d.use).length < 5) miss.push("«درسِ تو»"); if (txt(d.newProb).length < 5) miss.push("«مسئلهٔ تازه»");
         if (g && g.guess && !d.hit) miss.push("«داوریِ حدس»");
       }
@@ -632,6 +677,8 @@
       if (!d.want) miss.push("«خواستن در پایان»");
       /* A157: مسئلهٔ تازه باید تازه باشد — نه تقریباً همان صورت (همان سنجهٔ رونوشتِ ورزشِ گره‌ها، A.kNearCopy) */
       if (txt(d.newProb) && (near(d.newProb, r.p.statement) || near(d.newProb, r.p.title) || near(d.newProb, (u0 || {}).one))) miss.push("«مسئلهٔ تازه» تقریباً همان مسئلهٔ اصلی است — چیزی را عوض کن (مجهول، داده یا شرط)");
+      /* «نزدیک ولی متفاوت»: با اصلی دست‌کم یک واژهٔ معنادار (مجهول، داده یا موضوع) مشترک دارد */
+      else if (txt(d.newProb)) { var orig = toksSim([r.p.title, r.p.statement, (u0 || {}).u, (u0 || {}).one, (u0 || {}).d].join(" ")), nw = toksSim(d.newProb); if (!nw.some(function (w) { return hit(w, orig); })) miss.push("«مسئلهٔ تازه» هیچ چیزِ مشترکی با این مسئله ندارد — همان مجهول، داده یا روش را در وضعِ دیگری بگذار"); }
       unusedMiss(un, d.unused).forEach(function (x) { miss.push(x); });
       if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); return; }
       var at = nowISO(), keep = {}; un.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });

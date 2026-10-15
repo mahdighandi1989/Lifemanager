@@ -186,3 +186,29 @@ Each fix has a check in `tests/test_live_problem.js`. The ones marked † were a
 - **B089** (comes back by name);
 - **A157** (code-checked);
 - **B266 and B272** (whichever heuristic was used comes back from memory).
+
+## Round-6 audit fixes (third commit, after merging the branch at 91c46c3)
+Each fix is covered by `tests/test_live_problem.js`. The fixes marked † were also mutation-checked: undoing them made the test exit 1, and they were then reverted.
+1. **Plan gate: linking a related problem is not enough.** Clicking «مرتبط است — پیوندش بده» alone no longer counts as using a heuristic †. Each link needs a written note, «دقیقاً چه چیزی به این مسئله می‌آید» (field `lpRelC_<i>`). The note gets the same checks as the other heuristics: at least three meaningful words, and not a near-copy of the statement. A "have you seen it" answer counts only when it is «بله» with a specific "where".
+2. **Related suggestions** now need at least two meaningful shared words. Matching uses a new word filter, `toksSim`, which ignores numbers, generic quantity and time words («دو»، «کم»، «ماهانه»، «روز»…) and subjunctive or negative verbs («بگیرم»).
+3. **«کلِ مسئله در یک جمله»**
+   - The sentence must not be a near-copy of the statement (`A.kNearCopy`), must be shorter than the statement, and must be a single sentence.
+   - It is now a gate †: the unknown, data and condition open only after «ثبتِ کل — حالا جزءها».
+   - The same checks run again when the whole card is saved.
+4. **Look-back new problem must be "near but different"** †. It must share at least one meaningful word with the original (title, statement, unknown, the whole sentence or the data), and it must not be a near-copy.
+5. **«لازم نیست» reasons** need at least three meaningful words. One identical reason for several data is refused.
+6. **Prove-type live ask card:** «چرا این پرسش؟» now uses proof wording («طرحِ اثبات از پیوندِ فرض و حکم …»).
+7. **g review on a closed live problem** shows the guess verdict («داوری‌ات پس از آنچه شد»). A guess that reality rejected is not re-tested with a new special case. Instead the review asks what rejected it and what that teaches for the next guess.
+8. «پولیا:» was removed from the understanding card.
+9. **Opening the understanding card no longer consumes datum ids.** A new id is computed as the higher of `dSeq` and the draft's largest id, plus one. `dSeq` itself moves only when the card is saved. Draft ids are no longer read in `seqFix`.
+10. **A130 «روشن می‌بینی؟» is now compared, not just ticked** †.
+    - Answering «نه» records the step text and opens «کدام بخشِ این گام روشن نیست؟».
+    - The step stays blocked while the answer is «نه».
+    - Flipping the answer to «بله» or «مطمئن نیستم» is accepted only after either naming the unclear part or rewriting the step smaller.
+    - The step stores `reclear` with both versions.
+11. **Look-back fields now required:** «راهِ دیگر», «در یک نگاه» and «چه کار کرد» (at least two meaningful words each). The **b review** of a live problem asks again from memory for «کلِ حل در یک نگاه — و راهِ دیگر» and then shows what was written.
+
+**Verification for this round:**
+- Tests: all 62 page tests pass, judged by exit code with a pool of 4.
+- Build and docs: `build.py --check` is in sync; the learning-architecture pytest files pass 8/8.
+- Mutation checks: R1, R3 and R10 each made the test fail with exit 1, and each mutation was then reverted.

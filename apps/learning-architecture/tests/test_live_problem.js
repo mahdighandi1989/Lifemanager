@@ -75,12 +75,22 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ===== B) فهم ===== */
     chk(await p.locator('main .lp-u').count() === 1, 'understanding card first');
     await ownCheck('main .lp-u', 'understanding card');
+    info.gate0 = await p.evaluate(() => ({ one: !!document.getElementById('lpOne'), unk: !!document.getElementById('lpUnk'), d: !!document.querySelector('main .lp-dl'), polya: /پولیا/.test(document.querySelector('main .lp-u').textContent), seq: (APP.S.get('eprog_' + APP.state.arg) || { solve: {} }).solve }));
+    chk(info.gate0.one && !info.gate0.unk && !info.gate0.d && !info.gate0.polya, '«اول کل»: parts open only after the whole is saved; no book name in the card ' + JSON.stringify(info.gate0));
+    chk(!(info.gate0.seq && info.gate0.seq.live && (info.gate0.seq.live.dSeq || info.gate0.seq.live.uDraft)), 'opening the card without typing consumes no datum ids ' + JSON.stringify(info.gate0.seq && info.gate0.seq.live));
+    await click('main .lp-onesave');
+    chk(await p.locator('main .lp-onemiss').count() === 1, 'empty whole refused');
+    await p.fill('#lpOne', await p.evaluate(pid => APP.S.get('eprob_' + pid).p.statement, P1));
+    await p.fill('#lpWhy', 'آیندهٔ کاری‌ام و آرامشِ خانواده هر دو برایم مهم‌اند');
+    await click('main .lp-onesave');
+    info.onemiss = await p.locator('main .lp-onemiss').textContent();
+    chk(/رونوشت/.test(info.onemiss) && /کوتاه‌تر/.test(info.onemiss) && /یک جمله/.test(info.onemiss) && !(await p.locator('#lpUnk').count()), 'the whole sentence: no near-copy, shorter than the statement, one sentence ' + info.onemiss);
+    await p.fill('#lpOne', 'می‌خواهم بین رفتن به شیراز و ماندن در تهران تصمیم بگیرم، با درآمد، خانواده و مهلتی که دارم.');
+    await click('main .lp-onesave');
     info.order = await p.evaluate(() => [...document.querySelectorAll('main .lp-u label')].map(l => l.getAttribute('for')).filter(Boolean).slice(0, 4));
     chk(info.order.indexOf('lpOne') >= 0 && info.order.indexOf('lpOne') < info.order.indexOf('lpUnk'), 'whole-in-one-sentence comes before the parts ' + info.order.join(','));
     await click('main .lp-usave');
     chk(await p.locator('main .lp-umiss').count() === 1, 'empty understanding refused');
-    await p.fill('#lpOne', 'می‌خواهم بین رفتن به شیراز و ماندن در تهران تصمیم بگیرم، با درآمد، خانواده و مهلتی که دارم.');
-    await p.fill('#lpWhy', 'آیندهٔ کاری‌ام و آرامشِ خانواده هر دو برایم مهم‌اند');
     await p.fill('#lpUnk', 'تصمیم: پیشنهادِ شیراز را بپذیرم یا نه');
     await p.fill('#lpD_d1', 'حقوقِ پیشنهادی ۴۰٪ بیشتر از حقوقِ فعلی است');
     await p.fill('#lpD_d2', 'اجارهٔ خانه در شیراز تقریباً نصفِ تهران است');
@@ -117,6 +127,14 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     info.rel = await p.evaluate(kc0 => ({ rows: [...document.querySelectorAll('main .lp-relrow')].map(r => r.getAttribute('data-id')), kc: kc0 }), await p.evaluate(() => window.__kc0));
     chk(info.rel.rows.length >= 1 && info.rel.rows.length <= 3 && info.rel.rows.indexOf(info.rel.kc) >= 0 && info.rel.rows.indexOf('idea_unrel') < 0, 'related search over own records (≤3, shared words; unrelated idea out) ' + JSON.stringify(info.rel));
     await click('main .lp-relrow[data-id="' + info.rel.kc + '"] .lp-rellink');
+    chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') < 0, 'clicking «مرتبط است» alone is not a heuristic used');
+    await p.fill('#lpRelC_0', 'پ'); await click('main .lp-relcsave');
+    chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') < 0, 'a non-specific «what carries over» is refused');
+    await p.fill('#lpRelC_0', 'روشِ مذاکره برای افزایشِ حقوق را به شرطِ دورکاری منتقل می‌کنم');
+    await click('main .lp-relcsave');
+    chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') >= 0, 'a written, specific link counts as the related-problem heuristic');
+    info.relGen = await p.evaluate(() => { APP.S.put({ id: 'idea_gen', type: 'idea', what: 'دو روز در هفته ماهانه کمتر', title: 'دو روز در هفته کم', parts: [] }); const r = APP.liveRelated(APP.state.arg, 9).map(x => x.c.id); APP.S.del('idea_gen'); return r; });
+    chk(info.relGen.indexOf('idea_gen') < 0, 'numbers and generic quantity/time words do not make a «related» suggestion ' + JSON.stringify(info.relGen));
     await sel('#lpSeen', 'no');
     chk(await p.locator('#lpSeenF').count() === 1, 'a «no» to «have you seen it?» gets a follow-up (what is familiar then?)');
     await p.fill('#lpSeenF', 'سبک‌سنگین کردنِ پول و خانواده را در خریدِ خانه هم داشتیم');
@@ -167,20 +185,27 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpStep', 'با منابعِ انسانیِ شرکتِ شیراز تماس بگیرم و دربارهٔ دورکاریِ دو روز در هفته بپرسم');
     // A130: «روشن نمی‌بینی» گام را می‌بندد تا بنویسی چه روشن نیست
     await sel('#lpClear', 'نه');
+    chk(await p.locator('#lpUnclear').count() === 1, 'A130 «نه» opens «which part is unclear?»');
     await p.fill('#lpPred', 'می‌گویند دورکاری فقط پس از شش ماه ممکن است');
     await p.fill('#lpWhen', '۲۰ روزِ دیگر');
     await sel('#lpSU_d3', 'use');
     await click('main .lp-stepsave');
     info.miss2 = await p.evaluate(() => (document.querySelector('main .lp-stepmiss') || {}).textContent || '');
-    chk(/روشن نمی‌بینی/.test(info.miss2) && /مهلتِ خودِ مسئله/.test(info.miss2) && (await S(P1)).live.steps.length === 0, 'A130 «نه» blocks until you write what is unclear; a day after the problem\'s own deadline is refused: ' + info.miss2);
+    chk(/روشن نمی‌بینی/.test(info.miss2) && /مهلتِ خودِ مسئله/.test(info.miss2) && (await S(P1)).live.steps.length === 0, 'A130 «نه» blocks; a day after the problem\'s own deadline is refused: ' + info.miss2);
+    await sel('#lpClear', 'بله'); await click('main .lp-stepsave');
+    chk((await S(P1)).live.steps.length === 0 && /پیش‌تر گفتی روشن نمی‌بینی‌اش/.test(await p.locator('main .lp-stepmiss').textContent()), 'A130 compared: flipping «نه» to «بله» without naming the unclear part or rewriting the step smaller is refused');
+    await sel('#lpClear', 'نه');
     await p.fill('#lpUnclear', 'نمی‌دانم با چه کسی در شرکت باید حرف بزنم');
+    await click('main .lp-stepsave');
+    chk((await S(P1)).live.steps.length === 0, 'A130: naming the unclear part is not enough — «روشن می‌بینی؟» must be answered again');
+    await sel('#lpClear', 'مطمئن نیستم');
     await p.fill('#lpWhen', '۳ روزِ دیگر');
     await p.fill('#lpPrem', 'شرط: سر زدن به مادرم');
     await click('main .lp-stepsave');
     s1 = await S(P1);
     const st1 = s1.live.steps[0];
     info.fc = await p.evaluate(id => { const f = APP.S.get(id); return f && { p: f.p, due: f.due, dim: f.dim, live: f.live }; }, st1 && st1.fc);
-    chk(st1 && st1.due === D(3) && st1.conf === 70 && st1.data.indexOf('d3') >= 0 && st1.unclear && st1.unknownAsk.d3 === 'use' && info.fc && info.fc.p === 70 && info.fc.due === D(3) && info.fc.dim === 's_problem' && info.fc.live.pid === P1, 'step with prediction ⇒ event forecast record ' + JSON.stringify(info.fc));
+    chk(st1 && st1.due === D(3) && st1.conf === 70 && st1.data.indexOf('d3') >= 0 && st1.reclear && /چه کسی/.test(st1.reclear.unclear) && st1.reclear.clear === 'مطمئن نیستم' && st1.unknownAsk.d3 === 'use' && info.fc && info.fc.p === 70 && info.fc.due === D(3) && info.fc.dim === 's_problem' && info.fc.live.pid === P1, 'step with prediction ⇒ event forecast record ' + JSON.stringify(info.fc));
     chk(!(await todayTxt()).some(t => /🔭|🎯/.test(t)), 'nothing due on day 0');
     await day(1); chk(!(await todayTxt()).some(t => /🔭/.test(t)), 'step not due on day +1');
     info.d1rev = await todayTxt();
@@ -241,7 +266,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // ===== مسئلهٔ دوم (از کارِ دستیار، با همان فرم‌ها) =====
     const P2 = info.asNew && await p.evaluate(() => APP.S.all('eprob', x => x.live && x.by === 'assistant')[0].p.id);
     await go('lprob', P2);
-    await p.fill('#lpOne', 'می‌خواهم تصمیم بگیرم کلاسِ آلمانی را ادامه بدهم یا نه'); await p.fill('#lpWhy', 'شاید روزی برای کار به آلمان بروم'); await p.fill('#lpUnk', 'ادامه بدهم یا نه');
+    await p.fill('#lpOne', 'می‌خواهم تصمیم بگیرم کلاسِ آلمانی را ادامه بدهم یا نه'); await p.fill('#lpWhy', 'شاید روزی برای کار به آلمان بروم'); await click('main .lp-onesave'); await p.fill('#lpUnk', 'ادامه بدهم یا نه');
     await p.fill('#lpD_d1', 'سه ماه است می‌روم'); await p.fill('#lpD_d2', 'هفته‌ای شش ساعت وقت می‌گیرد');
     await p.fill('#lpCond', 'وقتِ کارم کم نشود'); await sel('#lpSuff', 'کافی است');
     await p.fill('#lpGuess', 'ادامه می‌دهم'); await sel('#lpConf', '70'); await p.fill('#lpTest', 'اگر یک ماه بی کلاس پیشرفتم نخوابد');
@@ -295,10 +320,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpBUse', 'پیش از تصمیمِ بزرگ، شرطِ پنهان (دورکاری) را مستقیم بپرس، نه حدس');
     await p.fill('#lpBNew', 'شرکتی در شیراز به من پیشنهادِ کار داده با حقوقِ ۴۰٪ بیشتر. همسرم در تهران شاغل است، مادرم بیمار است و هفته‌ای دو بار به او سر می‌زنم.');
     await p.fill('#lpBWorked', 'پرسیدنِ مستقیم از منابعِ انسانی');
+    await click('main .lp-lbsave');
+    chk(!(await S(P1)).b[1], 'look-back: «راهِ دیگر» and «در یک نگاه» are required');
+    await p.fill('#lpBOther', 'با فهرستِ هزینه‌ها و سود به همان تصمیم می‌رسیدم'); await p.fill('#lpBGlance', 'شرطِ پنهان را پرسیدم و تصمیم روشن شد');
     await sel('#lpBHit', 'نادرست بود'); await sel('#lpBBest', '0'); await sel('#lpBWant', 'same');
     await sel('#lpBU_a_d4', 'skip'); await p.fill('#lpBU_w_d4', 'تصمیم پیش از دیدنِ مشاور گرفته شد');
     await click('main .lp-lbsave');
     chk(!(await S(P1)).b[1], 'A157: an «invented» problem that is a near-copy of the original is refused');
+    await p.fill('#lpBNew', 'چطور آشپزیِ غذای ایتالیایی را یاد بگیرم؟'); await click('main .lp-lbsave');
+    chk(!(await S(P1)).b[1], 'A157: an invented problem that shares nothing with the original is refused (near but different)');
     await p.fill('#lpBNew', 'اگر همسرم پیشنهادِ کار در شهرِ دیگری بگیرد، چطور تصمیم بگیریم؟');
     await noOverflow('look-back');
     await click('main .lp-lbsave');
@@ -367,7 +397,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await click('main .dueb:has-text("خودت ساختی برگشت")');
     await click('main .lp-wakego');
     chk(await p.evaluate(pid => APP.state.view === 'lprob' && !!APP.S.get('eprob_' + pid).woke, P3), 'returned problem opens for solving');
-    await p.fill('#lpOne', 'می‌خواهیم بدانیم اگر همسرم پیشنهادِ کار در شهرِ دیگر بگیرد چطور تصمیم بگیریم'); await p.fill('#lpWhy', 'تا آن روز غافلگیر نشویم'); await p.fill('#lpUnk', 'روشِ تصمیمِ مشترک');
+    await p.fill('#lpOne', 'روشِ تصمیمِ مشترک برای کارِ همسر در شهرِ دیگر'); await p.fill('#lpWhy', 'تا آن روز غافلگیر نشویم'); await click('main .lp-onesave'); await p.fill('#lpUnk', 'روشِ تصمیمِ مشترک');
     await p.fill('#lpD_d1', 'تجربهٔ تصمیمِ شیراز'); await p.fill('#lpCond', 'هر دو راضی باشیم'); await sel('#lpSuff', 'هنوز نمی‌دانم');
     await p.fill('#lpGuess', 'همان روش جواب می‌دهد'); await sel('#lpConf', '70'); await p.fill('#lpTest', 'اگر شرطِ پنهانِ تازه‌ای پیدا شود');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
@@ -396,7 +426,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const LONG = 'https://example.org/' + 'a'.repeat(160) + '/b';
     const P4 = await p.evaluate(() => APP.liveCreate('سفرِ نوروز را با قطار برویم یا با هواپیما؟', 'برای نوروز می‌خواهیم به مشهد برویم و نمی‌دانم قطار بهتر است یا هواپیما.').p.id);
     await go('lprob', P4);
-    await p.fill('#lpOne', 'می‌خواهم بین قطار و هواپیما برای سفرِ نوروز انتخاب کنم'); await p.fill('#lpWhy', 'سفر با بچه‌ها آرام باشد'); await p.fill('#lpUnk', 'وسیلهٔ سفر');
+    await p.fill('#lpOne', 'می‌خواهم بین قطار و هواپیما برای سفرِ نوروز انتخاب کنم'); await p.fill('#lpWhy', 'سفر با بچه‌ها آرام باشد'); await click('main .lp-onesave'); await p.fill('#lpUnk', 'وسیلهٔ سفر');
     await p.fill('#lpD_d1', 'قیمتِ بلیتِ هواپیما دو میلیون است'); await p.fill('#lpD_d2', LONG);
     await p.fill('#lpCond', 'بچه‌ها خسته نشوند'); await sel('#lpSuff', 'کافی است');
     await p.fill('#lpGuess', 'قطار'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'اگر قطار جا نداشته باشد');
@@ -405,6 +435,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpBkS', 'با بچه‌ها آرام و بی‌خستگی به مشهد رسیده‌ایم'); await p.fill('#lpBk1', 'وسیلهٔ مناسب رزرو شده'); await click('main .lp-bksave');
     await noOverflow('plan with a long URL datum');
     chk(await p.locator('main .lp-plan .lp-un[data-d="d1"]').count() === 1, 'price datum unused before typing the plan');
+    // «لازم نیست» دلیل می‌خواهد: سه واژهٔ معنادار، و یک دلیلِ یکسان برای دو داده پذیرفته نیست
+    await p.fill('#lpPlan', 'نخست جای قطار را می‌پرسم، سپس تصمیم می‌گیرم'); await W(400);
+    await sel('#lpPU_a_d1', 'skip'); await p.fill('#lpPU_w_d1', 'این داده برای تصمیمِ سفر لازم نیست');
+    await sel('#lpPU_a_d2', 'skip'); await p.fill('#lpPU_w_d2', 'این داده برای تصمیمِ سفر لازم نیست');
+    await click('main .lp-plansave');
+    chk(!(await S(P4)).live.plan, 'the same «not needed» reason for two data is refused');
+    await p.fill('#lpPU_w_d2', 'ب ب'); await click('main .lp-plansave');
+    chk(!(await S(P4)).live.plan, 'a «not needed» reason of fewer than three meaningful words is refused');
+    await sel('#lpPU_a_d1', ''); await sel('#lpPU_a_d2', '');
     await p.fill('#lpPlan', 'قیمتِ بلیتِ هواپیما اصلاً مهم نیست؛ نخست جای قطار را می‌پرسم'); await W(450);
     chk(await p.locator('main .lp-plan .lp-un[data-d="d1"]').count() === 1, 'negation («اصلاً مهم نیست») does not count as using the datum');
     await p.fill('#lpPlan', 'نخست قیمتِ بلیتِ هواپیما (دو میلیون) را با قطار مقایسه می‌کنم، سپس جای قطار را می‌پرسم'); await W(450);
@@ -413,6 +452,16 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sel('#lpPU_a_d2', 'skip'); await p.fill('#lpPU_w_d2', 'فقط نشانیِ سایت است'); await click('main .lp-plansave');
     await click('main .lp-abandon');
     await noOverflow('look-back with a long URL datum');
+
+    /* ===== ۶: مسئلهٔ اثباتی ⇒ «چرا این پرسش» با زبانِ اثبات ===== */
+    const P5 = await p.evaluate(() => APP.liveCreate('ادعای همکارم دربارهٔ شیفت‌ها', 'همکارم می‌گوید هر برنامهٔ شیفتِ منصفانه دست‌کم یک نفر را دو شبِ پیاپی سرِ کار می‌گذارد؛ می‌خواهم ثابت یا رد کنم.', 'prove').p.id);
+    await go('lprob', P5);
+    await p.fill('#lpOne', 'می‌خواهم ببینم این حکم دربارهٔ شیفت‌ها درست است'); await p.fill('#lpWhy', 'برنامهٔ شیفتِ تیم را من می‌چینم'); await click('main .lp-onesave');
+    await p.fill('#lpUnk', 'هر برنامهٔ منصفانه دو شبِ پیاپی می‌خواهد'); await p.fill('#lpD_d1', 'پنج نفر و هفت شب'); await p.fill('#lpCond', 'هر نفر هفته‌ای حداکثر دو شب'); await sel('#lpSuff', 'هنوز نمی‌دانم');
+    await p.fill('#lpGuess', 'حکم نادرست است'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'یک برنامهٔ هفت‌شبه بی شبِ پیاپی بسازم');
+    await click('main .lp-usave'); await click('main .lp-u .sv-g2');
+    info.prove = await p.evaluate(() => document.querySelector('main .lp-ask').textContent);
+    chk(/طرحِ اثبات از پیوندِ فرض و حکم/.test(info.prove) && /حکم/.test(info.prove), 'prove-type live ask card uses proof wording in «چرا این پرسش؟»');
 
     /* ===== H) گراف، دستیار، نما ===== */
     info.g = await p.evaluate(([p1, p3, kc0]) => { const M = APP.GRAPH.build(), nb = k => (M.adj[k] || []).map(i => M.edges[i]).map(e => e.a === k ? e.b : e.a), k = 'lprob:' + p1, n = nb(k);
@@ -447,7 +496,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(await p.locator('main .sv-rev #svRU1').count() === 1 && await p.locator('main .sv-rev #svRUW').count() === 1, 'u review asks the whole-in-one-sentence and the «why» from memory');
     await p.fill('main .sv-rev #svRG', 'اگر دورکاری بدهند، ماندن بهتر نیست'); await click('main .sv-rph[data-ph="g"] .sv-rshow');
     info.grev = await p.evaluate(() => document.querySelector('main .sv-rph[data-ph="g"]').textContent);
+    chk(/داوری‌ات پس از آنچه شد: نادرست بود/.test(info.grev) && /حدست رد شد/.test(info.grev) && !/یک حالتِ خاص یا مثالِ نقضِ تازه/.test(info.grev), 'g review on a closed problem: shows the verdict; a rejected guess is not re-tested with a new special case');
     chk(!/پاسخِ مسئله: —/.test(info.grev) && /آنچه واقعاً شد/.test(info.grev), 'g review on a live problem shows what actually happened, not «پاسخِ مسئله: —»');
+    await p.fill('main .sv-rev #svRB', 'شرطِ پنهان را مستقیم بپرس'); await p.fill('main .sv-rev #svRBG', 'پرسیدنِ شرطِ پنهان، یا فهرستِ هزینه‌ها');
+    await click('main .sv-rph[data-ph="b"] .sv-rshow');
+    chk(/شرطِ پنهان را پرسیدم/.test(await p.locator('main .sv-rph[data-ph="b"] .sv-rbwas').textContent()), 'b review returns «در یک نگاه / راهِ دیگر / چه کار کرد» from memory');
     await p.fill('main .sv-rev #svRH', 'وضعِ حل‌شده: درآمد بیشتر و خانواده آرام'); await click('main .sv-rph[data-ph="h"] .sv-rshow');
     chk(/خانواده آرام است/.test(await p.locator('main .sv-rph[data-ph="h"] .sv-rhwas').textContent()), 'the heuristic used (work backwards) returns from memory and is compared with what you wrote');
     await day(62); await go('lprob', P4); await noOverflow('+60 with a long URL datum'); await go('home'); await noOverflow('home +60');
