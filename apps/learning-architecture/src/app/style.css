@@ -1159,3 +1159,7 @@ button, .btn, .nav, .chip, select, input { overflow-wrap: normal; }
 .as-tour .as-tl{max-height:34vh}
 .as-tour .as-facet summary{cursor:pointer;list-style:none;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
 .as-tour .as-facet summary::-webkit-details-marker{display:none}
+/* «🧠 کارنامهٔ ذهن» در گوشی (بازبینیِ ۲۰۲۶-۱۰-۱۵، M8): نمودارها خودشان را کوچک می‌کنند و جدول‌ها درونِ قابِ خودشان می‌لغزند، نه کلِ صفحه */
+.mind-svg{max-width:100%;height:auto}
+.mind-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.page.mind .row.wrap>*{min-width:0;max-width:100%}

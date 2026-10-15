@@ -19987,20 +19987,21 @@ var APP = window.APP = {};
       area.innerHTML = "";
       if (i >= cards.length) { area.appendChild(h("div", { class: "card done" }, h("h3", {}, "تمام شد"), h("p", {}, fa(cards.length) + " کارت مرور شد."), h("button", { class: "btn", onclick: function () { A.go("review", null, "calib"); } }, "دیدن کالیبراسیون"))); return; }
       var c = cards[i], tp = c.topic && S.get(c.topic);
-      var conf = 60, preConf = null;  // اطمینانِ پیش از دیدنِ پاسخ؛ پس از «نمایش پاسخ» قفل می‌شود (کالیبراسیونِ صادق)
+      var conf = 60, preConf = null, touched = false;  // اطمینانِ پیش از دیدنِ پاسخ؛ پس از «نمایش پاسخ» قفل می‌شود (کالیبراسیونِ صادق)
+      /* اسلایدرِ دست‌نخورده «اطمینانِ اعلام‌شده» نیست ⇒ null (بازبینیِ ۲۰۲۶-۱۰-۱۵، M7) */
       var att = h("textarea", { id: "rvAtt", rows: 3, placeholder: "پاسخت را از حافظه بنویس (حتی ناقص)." });
-      var co = h("output", {}, fa(conf) + "٪");
-      var slider = h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { if (preConf != null) { e.target.value = preConf; return; } conf = +e.target.value; co.textContent = fa(conf) + "٪"; } });
+      var co = h("output", {}, "— (حرکتش بده تا ثبت شود)");
+      var slider = h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { if (preConf != null || slider.disabled) { e.target.value = preConf != null ? preConf : conf; return; } touched = true; conf = +e.target.value; co.textContent = fa(conf) + "٪"; } });
       var back = h("div", { class: "back hidden" });
       var grades = h("div", { class: "grades hidden" }, [[0, "اصلاً یادم نبود"], [1, "اشتباه"], [2, "اشتباه اما آشنا"], [3, "درست، با زحمت زیاد"], [4, "درست، با کمی تردید"], [5, "آسان و کامل"]].map(function (g) {
-        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], preConf == null ? conf : preConf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
+        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], preConf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
       }));
       area.appendChild(h("div", { class: "card flash" },
         h("div", { class: "row between wrap small muted" }, h("span", {}, "کارت " + fa(i + 1) + " از " + fa(cards.length)), h("span", {}, (c.tid ? "تکنیک " + fa(c.tid) + " · " : "") + (tp ? tp.title : ""))),
         h("div", { class: "q" }, c.q),
         h("label", { for: "rvAtt", class: "small" }, "پاسخ تو"), att,
         h("div", { class: "scale" }, h("label", { for: "rvConf", class: "small" }, "اطمینان"), slider, co),
-        h("button", { class: "btn", onclick: function (e) { preConf = conf; slider.disabled = true; slider.setAttribute("aria-disabled", "true"); co.textContent = fa(preConf) + "٪ (پیش از دیدنِ پاسخ ثبت شد)"; back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
+        h("button", { class: "btn", onclick: function (e) { preConf = touched ? conf : null; slider.disabled = true; slider.setAttribute("aria-disabled", "true"); co.textContent = preConf != null ? fa(preConf) + "٪ (پیش از دیدنِ پاسخ ثبت شد)" : "اطمینانی گفته نشد (در کالیبراسیون نمی‌آید)"; back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
         back, grades));
       back.appendChild(h("div", { class: "small muted" }, "پاسخ:")); back.appendChild(h("div", { class: "a" }, c.a));
     }
@@ -35476,6 +35477,9 @@ APP.goFromURL = function (q) {
   var NS = "http://www.w3.org/2000/svg";
   var MIN_N = 5, HOLD = 30, BANDS = [[40, "در آغاز"], [65, "در حالِ رشد"], [85, "ورزیده"], [101, "استوار"]];
   M.MIN_N = MIN_N; M.BANDS = BANDS;
+  /* قرنطینه (بازبینیِ ۲۰۲۶-۱۰-۱۵، M6): نقطهٔ سیاهِ «بیش از ۳۰ روز باز» برشِ قراردادی بود؛ جایش «موعدِ ورزشِ خودِ گره گذشته».
+     برای بازگرداندن، عددِ روز را این‌جا بگذار (۰ = خاموش). حذف فقط با تأییدِ مالک (docs/overhaul/REMOVAL_CANDIDATES.md). */
+  M.LEGACY_STALE_DAYS = 0;
   /* هر خانوادهٔ گره ⇐ بُعد: اول از ارجاع‌های نقشهٔ قلمروها (همان «kfam:F7» در حوزه‌های هر سامانه)، و اگر نبود این پیش‌فرض */
   var KF_DEFAULT = { F1: "s_learn", F2: "s_problem", F3: "s_problem", F4: "s_learn", F5: "s_mind", F6: "s_decision", F7: "s_mind", F8: "s_social", F9: "s_self", F10: "s_decision", F11: "s_epi", F12: "s_decision" };
   M.dims = function () {
@@ -35496,8 +35500,9 @@ APP.goFromURL = function (q) {
     if (/^station:/.test(ref)) return "s_epi";
     return "s_learn";
   };
-  function day(x) { return String(x || "").slice(0, 10); }
-  function month(x) { return String(x || "").slice(0, 7); }
+  /* روز و ماهِ محلی (نه UTC؛ بازبینیِ ۲۰۲۶-۱۰-۱۵، M3) */
+  function day(x) { return A.localDay ? A.localDay(x) : String(x || "").slice(0, 10); }
+  function month(x) { return day(x).slice(0, 7); }
   function brier(pairs) { if (!pairs.length) return null; var s = 0; pairs.forEach(function (p) { s += Math.pow(p.p - (p.ok ? 1 : 0), 2); }); return s / pairs.length; }
   function conf01(c) { c = parseFloat(c); if (isNaN(c)) return null; return c > 1 ? c / 100 : c; }
 
@@ -35513,26 +35518,28 @@ APP.goFromURL = function (q) {
     });
     /* پاسخ‌های پاسخ‌دقیق: ورزشِ گره (وارسی‌شده/کد/خودت با عدد) و مسئله‌های هم‌ساختار */
     var countable = typeof A.kcountable === "function" ? A.kcountable : function (it) { return !it.bad; };
-    function ingest(dim, hist) {
+    /* noRet: ماندگاریِ گره‌ها فقط از A.PSY.holds (نخستین پاسخِ پس از موعد) — این‌جا دوباره شمرده نمی‌شود (M5) */
+    function ingest(dim, hist, noRet) {
       var t0 = null;
       (hist || []).forEach(function (x) {
         if (!x || x.self || x.ok == null || x.ok === "") return;
         var ok = x.ok === true || x.ok === 1 || x.ok === "1" || x.ok === "true", at = x.at || x.d || "";
         put(dim, { at: at, ok: ok });
         var c = conf01(x.conf); if (c != null) (D[dim] || D.s_mind).cal.push({ p: c, ok: ok, at: at });
-        if (t0 && day(at) >= A.addDays(day(t0), HOLD)) { var R = (D[dim] || D.s_mind).ret; R.n++; if (ok) R.ok++; }
+        if (!noRet && t0 && day(at) >= A.addDays(day(t0), HOLD)) { var R = (D[dim] || D.s_mind).ret; R.n++; if (ok) R.ok++; }
         if (ok && !t0) t0 = at;
       });
     }
-    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist); });
+    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist, !!(A.PSY && A.PSY.holds)); });
     S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist); });
     /* حدسِ پیش از حل (شبیه‌ساز، سطحِ ۳–۴): اطمینان ↔ «درست بود/نادرست بود» با پاسخِ معلومِ مسئله ⇒ فقط کالیبراسیونِ حلِ مسئله، نه دقت («تاحدی» بیرون) */
     S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
       Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
         var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at }); });
     });
-    /* کارت‌های مرور: اطمینان پیش از دیدنِ پاسخ (c) و نمرهٔ یادآوری (g ≥ ۳ = درست) ⇒ یادگیری و حافظه */
-    S.all("card", function (c) { return !c.sample; }).forEach(function (c) { ingest("s_learn", (c.hist || []).map(function (x) { return { at: x.d, conf: x.c, ok: x.g >= 3 }; })); });
+    /* کارت‌های مرور: نمره را خودِ کاربر می‌دهد ⇒ خودسنجی؛ مثلِ «خودم سنجیدم» ِ گره‌ها بیرون از دقت/اطمینان/ماندگاری، جدا شمرده می‌شود (M6) */
+    D.s_learn.cardSelf = { n: 0, k: 0 };
+    S.all("card", function (c) { return !c.sample; }).forEach(function (c) { (c.hist || []).forEach(function (x) { if (x.g == null) return; D.s_learn.cardSelf.n++; if (x.g >= 3) D.s_learn.cardSelf.k++; }); });
     /* حرکت‌ها: شمارِ پاسخ‌های درست/نادرستِ هر حرکت (دفترِ حرکت‌ها زمان و حرکت را با هم نگه نمی‌دارد ⇒ در روندِ ماهانه نمی‌آید) */
     var mp = S.get("moves_prog"); Object.keys((mp && mp.by) || {}).forEach(function (mv) { var b = mp.by[mv], d = M.dimOf("move:" + mv); for (var i = 0; i < (b.n || 0); i++) put(d, { at: "", ok: i < (b.ok || 0) }); });
     /* داوریِ معرفتی: درجهٔ نهاییِ تو ↔ نتیجهٔ واقعیِ ثبت‌شده در بازبینی */
@@ -35543,16 +35550,17 @@ APP.goFromURL = function (q) {
       fin.forEach(function (r) {
         var o = (cs.outcome || {})[r.c]; if (!r.c || r.p == null || r.p === "" || (o !== "درست" && o !== "نادرست")) return;
         var p = conf01(r.p), ok = o === "درست", at = cs.outcomeAt || cs.updated || cs.created;
-        D.s_epi.cal.push({ p: p, ok: ok, at: at });
+        D.s_epi.cal.push({ p: p, ok: ok, at: at, fc: true });
         D.s_epi.ans.push({ at: at, ok: (p >= 0.5) === ok });
       });
     });
-    /* ⛓ زنجیرهٔ نگرانی (حسِ اول ↔ رخ داد/نداد) و 🎯 دفترِ پیش‌بینی (احتمال ↔ شد/نشد) ⇒ کالیبراسیونِ همان بُعد */
+    /* ⛓ زنجیرهٔ نگرانی (حسِ اول ↔ رخ داد/نداد) و 🎯 دفترِ پیش‌بینی (احتمال ↔ شد/نشد) ⇒ کالیبراسیونِ همان بُعد.
+       «fc» = احتمالِ یک رویداد، نه اطمینان به پاسخِ خودم ⇒ با P.forecastEst سنجیده می‌شود، نه با بیش‌اطمینانی به پاسخ (H3) */
     S.all("wchain", function (c) { return c.feel != null && (c.outcome === "رخ داد" || c.outcome === "رخ نداد"); }).forEach(function (c) {
-      var p = c.feel / 100, ok = c.outcome === "رخ داد"; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok });
+      var p = c.feel / 100, ok = c.outcome === "رخ داد"; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due, fc: true }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok });
     });
     S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) {
-      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
+      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
     });
     // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
     S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + (function () { var no = it.filter(function (x) { return x.self === "بلد نیستم"; }).length, half = it.filter(function (x) { return x.self === "نیمه"; }).length; return "از " + it.length + ": " + no + " نبود" + (half ? "، " + half + " نیمه" : ""); })(), st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
@@ -35576,9 +35584,10 @@ APP.goFromURL = function (q) {
       // گرهِ بازگشته در همین بُعد ⇒ «استوار» نیست (کارزارِ آزمون sc17: پس از بازگشت «۹۸ · استوار» ماند)
       if (X.band === "استوار" && (X.knots.returned || 0) > 0) X.band = "ورزیده · گرهِ بازگشته";
       /* روندِ ماهانه: دقت و کالیبراسیونِ هر ماه (نمونهٔ ماه ≥ ۳) */
+      /* بی کفِ نمونه (M6): هر ماه با هر شمار پاسخ، و برآوردش (درست+۱)/(کل+۲) که با نمونهٔ کم خودبه‌خود به ½ نزدیک می‌ماند (A4) */
       var bym = {}; X.ans.forEach(function (a) { var m = month(a.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).n++; if (a.ok) bym[m].ok++; });
       X.cal.forEach(function (c) { var m = month(c.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).cal.push(c); });
-      X.months = Object.keys(bym).sort().map(function (m) { var r = bym[m], bb = brier(r.cal); return { m: m, acc: r.n >= 3 ? Math.round(100 * r.ok / r.n) : null, cal: r.cal.length >= 3 ? Math.round(100 * (1 - bb)) : null, n: r.n }; });
+      X.months = Object.keys(bym).sort().map(function (m) { var r = bym[m], bb = brier(r.cal); return { m: m, acc: r.n ? Math.round(100 * r.ok / r.n) : null, cal: r.cal.length ? Math.round(100 * (1 - bb)) : null, n: r.n, k: r.ok, next: r.n ? (r.ok + 1) / (r.n + 2) : null }; });
       var lm = X.months.filter(function (x) { return x.acc != null; });
       // روند = نخستین ماهِ سنجیده تا آخرین ماهِ سنجیده، با بازه‌اش (کارزارِ سوم v05: فقط دو ماهِ آخر ⇒ ۴۰→۱۰۰ «▲۰» نشان می‌داد)
       X.trend = lm.length >= 2 ? lm[lm.length - 1].acc - lm[0].acc : null;
@@ -35587,20 +35596,30 @@ APP.goFromURL = function (q) {
          (میانگینِ چهار شاخص و برش‌های ۴۰/۶۵/۸۵) قراردادی بودند: فقط برای سازگاریِ پیشین حساب می‌شوند و نمایش داده نمی‌شوند (REMOVAL_CANDIDATES). */
       if (A.PSY) {
         X.est = A.PSY.selfEst(X.ans, false);
-        var calE = A.PSY.selfEst(X.cal.map(function (c) { return { at: c.at, ok: c.ok, conf: c.p }; }), true);
+        /* اطمینان به پاسخِ خودم ⇒ P(درستیِ واقعی < میانگینِ اطمینان)؛ احتمالِ رویداد ⇒ کالیبراسیونِ پیش‌بینی (طرفِ محتمل‌تر؛ H3) — هرگز روی هم ریخته نمی‌شوند */
+        var calE = A.PSY.selfEst(X.cal.filter(function (c) { return !c.fc; }).map(function (c) { return { at: c.at, ok: c.ok, conf: c.p }; }), true);
         X.est.pOver = calE.pOver; X.est.meanConf = calE.meanConf; X.est.calN = calE.calN || 0;
+        X.est.fc = A.PSY.forecastEst ? A.PSY.forecastEst(X.cal.filter(function (c) { return c.fc; })) : { n: 0 };
       }
     });
     /* نقطه‌های سیاه */
     var black = [], today = A.today();
     knots.forEach(function (k) {
       if (k.status === "returned") black.push({ k: "returned", fa: "گرهِ بازگشته: «" + (k.name || "گره") + "»", go: ["knot", k.id], dim: kdim[k.id] });
-      else if ((k.status || "open") !== "practised" && k.created && A.daysBetween(day(k.created), today) > 30) black.push({ k: "stale", fa: "بیش از ۳۰ روز باز: «" + (k.name || "گره") + "»", go: ["kpractice", k.id], dim: kdim[k.id] });
+      else if ((k.status || "open") !== "practised") {
+        /* «گیر کرده» از برنامهٔ خودِ همان گره (موعدِ ورزشِ بعدی‌اش روی نردبانِ فاصله‌ها گذشته)، نه از برشِ قراردادیِ «۳۰ روز» (M6؛
+           برشِ پیشین قرنطینه است: M.LEGACY_STALE_DAYS، خاموش؛ docs/overhaul/REMOVAL_CANDIDATES.md) */
+        var nx = typeof A.knotNext === "function" ? A.knotNext(k) : null;
+        if (nx && nx < today) black.push({ k: "stale", fa: "ورزشِ گرهِ بازِ «" + (k.name || "گره") + "» از موعدِ خودش (" + A.fdate(nx) + ") گذشته", go: ["kpractice", k.id], dim: kdim[k.id] });
+        else if (M.LEGACY_STALE_DAYS && k.created && A.daysBetween(day(k.created), today) > M.LEGACY_STALE_DAYS) black.push({ k: "stale", fa: "بیش از " + fa(M.LEGACY_STALE_DAYS) + " روز باز: «" + (k.name || "گره") + "»", go: ["kpractice", k.id], dim: kdim[k.id] });
+      }
     });
     dims.forEach(function (dd) {
       // بیش‌اطمینانی: وقتی احتمالِ «درستیِ واقعی کمتر از میانگینِ اطمینانِ اعلام‌شده» از ½ بیشتر است (مرزِ ½ از A4، نه برشِ قراردادیِ ۸۰/۶۵)
       var X = D[dd.id], E = X.est || {};
-      if (E.pOver != null && E.pOver > 0.5) black.push({ k: "overconf", fa: "بیش‌اطمینانی در «" + dd.fa + "»: میانگینِ اطمینانت " + fa(Math.round(100 * E.meanConf)) + "٪ بوده و احتمالِ اینکه درستیِ واقعی‌ات کمتر از آن باشد " + fa(Math.round(100 * E.pOver)) + "٪ است (" + fa(E.calN) + " پاسخ)", dim: dd.id });
+      if (E.pOver != null && E.pOver > 0.5) black.push({ k: "overconf", fa: "بیش‌اطمینانی در پاسخ‌های «" + dd.fa + "»: میانگینِ اطمینانت " + fa(Math.round(100 * E.meanConf)) + "٪ بوده و احتمالِ اینکه درستیِ واقعی‌ات کمتر از آن باشد " + fa(Math.round(100 * E.pOver)) + "٪ است (" + fa(E.calN) + " پاسخ)", dim: dd.id });
+      var F = E.fc || {};
+      if (F.pOver != null && F.pOver > 0.5) black.push({ k: "overconf_fc", fa: "بیش‌اطمینانی در پیش‌بینی‌های «" + dd.fa + "»: طرفِ محتمل‌تر را به‌طورِ میانگین " + fa(Math.round(100 * F.meanQ)) + "٪ گفتی، ولی همان طرف " + fa(F.hit) + " بار از " + fa(F.dirN) + " رخ داد؛ احتمالِ اینکه بسامدِ واقعی کمتر از گفته‌ات باشد " + fa(Math.round(100 * F.pOver)) + "٪ است", dim: dd.id });
     });
     /* مسیرهای پیشِ رو و «از کجا دوری» (از قلمروِ سامانه‌ها) */
     var far = [], ahead = [];
@@ -35617,6 +35636,7 @@ APP.goFromURL = function (q) {
     var ev = [];
     knots.forEach(function (k) { if (k.created) ev.push({ at: k.created, fa: "گرهٔ تازه: «" + (k.name || "گره") + "»" }); (k.hist || []).forEach(function (x) { if (x.status === "practised") ev.push({ at: x.at, fa: "✓ ورزیده: «" + (k.name || "گره") + "»" }); if (x.status === "returned") ev.push({ at: x.at, fa: "↩ بازگشت: «" + (k.name || "گره") + "»" }); }); });
     knots.forEach(function (k) { (k.remeasures || []).forEach(function (r) { ev.push({ at: r.at, fa: "📏 دوباره‌سنجیِ «" + (k.name || "گره") + "»: " + [r.freq, r.intensity != null ? "شدت " + r.intensity : "", r.note].filter(Boolean).join(" · ") }); }); });
+    /* ماندگاریِ گره‌ها: فقط همین‌جا شمرده می‌شود (ingest پاسخ‌های گره را دوباره نمی‌شمارد؛ M5) */
     if (A.PSY && A.PSY.holds) A.PSY.holds().forEach(function (x) { var k = S.get(x.knot) || {}; ev.push({ at: x.at, fa: (x.ok ? "✓" : "✗") + " ماندگاریِ " + x.n + " روزهٔ «" + (k.name || "گره") + "»" }); var X = D[kdim[x.knot]]; if (X) { X.ret.n++; if (x.ok) X.ret.ok++; } });
     cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); var fn = c.st && c.st.st_final; if (fn && fn.done) ev.push({ at: fn.at || c.updated || c.created, fa: "⚖️ حکمِ پایانیِ پرونده: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });
     S.all("kcase", function (c) { return !c.sample && c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "🪢 موقعیتِ گره‌گشا: «" + (c.title || "") + "»" }); });
@@ -35639,7 +35659,7 @@ APP.goFromURL = function (q) {
   /* ---------- نمودارها (SVG) ---------- */
   function el(n, at, kids) { var e = document.createElementNS(NS, n); Object.keys(at || {}).forEach(function (k) { if (at[k] != null) e.setAttribute(k, at[k]); }); (kids || []).forEach(function (c) { if (c) e.appendChild(c); }); return e; }
   function txt(x, y, s, at) { var t = el("text", Object.assign({ x: x, y: y, "font-size": 11, fill: "#334", "text-anchor": "middle", direction: "rtl", "font-family": "Vazirmatn, Tahoma, sans-serif" }, at || {})); t.textContent = s; return t; }
-  function svgBox(w, hh, title) { var s = el("svg", { xmlns: NS, viewBox: "0 0 " + w + " " + hh, width: w, height: hh, role: "img", "aria-label": title, class: "mind-svg" }); s.appendChild(el("rect", { x: 0, y: 0, width: w, height: hh, fill: "#fff" })); return s; }
+  function svgBox(w, hh, title) { var s = el("svg", { xmlns: NS, viewBox: "0 0 " + w + " " + hh, width: w, height: hh, role: "img", "aria-label": title, class: "mind-svg", style: "max-width:100%;height:auto" }); s.appendChild(el("rect", { x: 0, y: 0, width: w, height: hh, fill: "#fff" })); return s; }
   /* نیم‌رخ: احتمالِ درستیِ پاسخِ بعدی در هر سازهٔ استاندارد (a34_psy) — خاکستری = هنوز پاسخی نیست؛ سازهٔ «سنجیده‌نشدنی» روی نمودار نمی‌آید */
   M.radar = function (m) {
     var cs = (m.psy || []).filter(function (c) { return !c.none; });
@@ -35663,14 +35683,14 @@ APP.goFromURL = function (q) {
     var W = 560, H = 260, s = svgBox(W, H, "روندِ ماهانهٔ دقت"), months = {};
     m.dims.forEach(function (d) { d.months.forEach(function (x) { months[x.m] = 1; }); });
     var ms = Object.keys(months).sort().slice(-12);
-    s.appendChild(txt(W / 2, 20, "روندِ ماهانهٔ دقت در هر بُعد (پیشرفت ▲ / پس‌رفت ▼)", { "font-size": 13, "font-weight": 700 }));
+    s.appendChild(txt(W / 2, 20, "روندِ ماهانه: احتمالِ درستیِ پاسخِ بعدی در هر بُعد، (درست+۱)/(کل+۲) ِ همان ماه", { "font-size": 12, "font-weight": 700 }));
     var x0 = 40, x1 = W - 20, y0 = H - 40, y1 = 64;
     [0, 50, 100].forEach(function (v) { var y = y0 - (y0 - y1) * v / 100; s.appendChild(el("line", { x1: x0, x2: x1, y1: y, y2: y, stroke: "#eee" })); s.appendChild(txt(x0 - 14, y + 4, fa(v), { "font-size": 9 })); });
     if (!ms.length) { s.appendChild(txt(W / 2, H / 2, "هنوز پاسخی برای روند نیست", { fill: "#999" })); return s; }
     ms.forEach(function (mm, i) { var x = ms.length > 1 ? x0 + (x1 - x0) * i / (ms.length - 1) : (x0 + x1) / 2; s.appendChild(txt(x, H - 20, mm.slice(2).replace("-", "/"), { "font-size": 9 })); });
     var COL = ["#0f766e", "#b45309", "#7c3aed", "#be123c", "#1d4ed8", "#4d7c0f", "#475569"];
     m.dims.forEach(function (d, k) {
-      var pts = []; d.months.forEach(function (x) { var i = ms.indexOf(x.m); if (i < 0 || x.acc == null) return; pts.push([ms.length > 1 ? x0 + (x1 - x0) * i / (ms.length - 1) : (x0 + x1) / 2, y0 - (y0 - y1) * x.acc / 100]); });
+      var pts = []; d.months.forEach(function (x) { var i = ms.indexOf(x.m); if (i < 0 || x.next == null) return; pts.push([ms.length > 1 ? x0 + (x1 - x0) * i / (ms.length - 1) : (x0 + x1) / 2, y0 - (y0 - y1) * x.next]); });
       if (!pts.length) return;
       s.appendChild(el("polyline", { points: pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), fill: "none", stroke: COL[k % COL.length], "stroke-width": 2 }));
       pts.forEach(function (p) { s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 3, fill: COL[k % COL.length] })); });
@@ -35681,7 +35701,8 @@ APP.goFromURL = function (q) {
   M.calib = function (m) {
     var W = 360, H = 300, s = svgBox(W, H, "کالیبراسیون"), all = [];
     m.dims.forEach(function (d) { all = all.concat(d.cal); });
-    s.appendChild(txt(W / 2, 20, "کالیبراسیون: اطمینانِ تو ↔ درستیِ واقعی", { "font-size": 13, "font-weight": 700 }));
+    s.appendChild(txt(W / 2, 20, "کالیبراسیون: احتمالِ گفته‌شده ↔ بسامدِ واقعی", { "font-size": 13, "font-weight": 700 }));
+    s.appendChild(txt(W / 2, 36, "● آبی: اطمینان به پاسخت · ● نارنجی: پیش‌بینیِ رویداد (اندازه = شمار)", { "font-size": 9, fill: "#555" }));
     var x0 = 40, x1 = W - 20, y0 = H - 40, y1 = 40;
     s.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y1, stroke: "#ccc", "stroke-dasharray": "4 3" }));
     s.appendChild(txt((x0 + x1) / 2, H - 12, "اطمینان", { "font-size": 10 })); s.appendChild(txt(16, (y0 + y1) / 2, "درستی", { "font-size": 10 }));
@@ -35691,11 +35712,14 @@ APP.goFromURL = function (q) {
       s.appendChild(txt(x0 + (x1 - x0) * v / 100, y0 + 14, A.fa(v) + "٪", { "font-size": 9, fill: "#666" }));
       s.appendChild(txt(x0 - 14, y0 - (y0 - y1) * v / 100 + 3, A.fa(v) + "٪", { "font-size": 9, fill: "#666" }));
     });
-    for (var i = 0; i < 10; i++) {
-      var bin = all.filter(function (c) { return Math.min(9, Math.floor(c.p * 10)) === i; }); if (!bin.length) continue;
-      var acc = bin.filter(function (c) { return c.ok; }).length / bin.length, cx = x0 + (x1 - x0) * (i + 0.5) / 10, cy = y0 - (y0 - y1) * acc;
-      s.appendChild(el("circle", { cx: cx, cy: cy, r: Math.min(14, 3 + Math.sqrt(bin.length) * 2), fill: bin.length >= MIN_N ? "rgba(29,78,216,.6)" : "rgba(148,163,184,.6)" }));
-    }
+    /* بی کفِ نمونه (M6): اندازهٔ دایره شمار را نشان می‌دهد؛ دو جنسِ اطمینان دو رنگ (H3) */
+    [[false, "rgba(29,78,216,.6)"], [true, "rgba(217,119,6,.6)"]].forEach(function (ser) {
+      for (var i = 0; i < 10; i++) {
+        var bin = all.filter(function (c) { return !!c.fc === ser[0] && Math.min(9, Math.floor(c.p * 10)) === i; }); if (!bin.length) continue;
+        var acc = bin.filter(function (c) { return c.ok; }).length / bin.length, cx = x0 + (x1 - x0) * (i + 0.5) / 10, cy = y0 - (y0 - y1) * acc;
+        s.appendChild(el("circle", { cx: cx, cy: cy, r: Math.min(14, 3 + Math.sqrt(bin.length) * 2), fill: ser[1], "data-n": bin.length, "data-fc": ser[0] ? 1 : 0 }));
+      }
+    });
     if (!all.length) s.appendChild(txt(W / 2, H / 2, "هنوز پاسخی با اطمینانِ ثبت‌شده نیست", { fill: "#999" }));
     return s;
   };
@@ -35724,7 +35748,8 @@ APP.goFromURL = function (q) {
     var kd = {}; knots.forEach(function (k) { var d = M.dimOf("kfam:" + (k.fam || "F1")); kd[k.id] = d; link("k" + k.id, "d" + d, 1 + Math.min(4, (k.cases || []).length), col[k.status || "open"]); });
     ins.forEach(function (x) { var p = P["i" + x.id]; s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 5, fill: "#64748b" })); s.appendChild(txt(p[0] + 10, p[1] + 4, String(x.fa).slice(0, 26), { "text-anchor": "start", direction: "ltr", "font-size": 9 })); });
     knots.forEach(function (k) { var p = P["k" + k.id]; s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 7, fill: col[k.status || "open"] })); s.appendChild(txt(p[0], p[1] - 10, String(k.name || "گره").slice(0, 24), { "font-size": 9 })); });
-    dims.forEach(function (d) { var p = P["d" + d.id]; s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 10 + (d.score || 0) / 12, fill: d.score == null ? "#e2e8f0" : "#0f766e" })); s.appendChild(txt(p[0] - 22, p[1] + 4, d.fa.split(/[،,]| و /)[0], { "text-anchor": "end", direction: "ltr", "font-size": 10 })); });
+    /* اندازهٔ گرهٔ بُعد = احتمالِ درستیِ پاسخِ بعدی (A3+A4)، نه «نمره» ِ قرنطینه‌شده (M6) */
+    dims.forEach(function (d) { var p = P["d" + d.id], E = d.est || { n: 0 }; s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 10 + (E.n ? 10 * E.next : 0), fill: E.n ? "#0f766e" : "#e2e8f0", "data-next": E.n ? E.next.toFixed(3) : "" })); s.appendChild(txt(p[0] - 22, p[1] + 4, d.fa.split(/[،,]| و /)[0], { "text-anchor": "end", direction: "ltr", "font-size": 10 })); });
     if (!ins.length && !knots.length) s.appendChild(txt(W / 2, H / 2, "هنوز موقعیت یا گره‌ای ثبت نشده", { fill: "#999" }));
     return s;
   };
@@ -35748,7 +35773,7 @@ APP.goFromURL = function (q) {
     outer.forEach(function (o) { var p = P[o.it.id]; if (o.d && pos[o.d]) s.appendChild(el("line", { x1: pos[o.d][0], y1: pos[o.d][1], x2: p[0], y2: p[1], stroke: "#e2e8f0" })); (o.it.refs || []).forEach(function (rid) { var q = P[rid]; if (q) s.appendChild(el("line", { x1: p[0], y1: p[1], x2: q[0], y2: q[1], stroke: "#a78bfa", "stroke-dasharray": "3 2" })); }); });
     dims.forEach(function (d) { s.appendChild(el("line", { x1: cx, y1: cy, x2: pos[d.id][0], y2: pos[d.id][1], stroke: "#99c" })); });
     s.appendChild(el("circle", { cx: cx, cy: cy, r: 22, fill: "#0f766e" })); s.appendChild(txt(cx, cy + 4, "تو", { fill: "#fff", "font-size": 12 }));
-    dims.forEach(function (d) { var p = pos[d.id]; s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 14, fill: d.score == null ? "#e2e8f0" : "#99f6e4", stroke: "#0f766e" })); s.appendChild(txt(p[0], p[1] - 18, d.fa.split(/[،,]| و /)[0], { "font-size": 10 })); });
+    dims.forEach(function (d) { var p = pos[d.id], E = d.est || { n: 0 }; s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 14, fill: E.n ? "#99f6e4" : "#e2e8f0", stroke: "#0f766e" })); s.appendChild(txt(p[0], p[1] - 18, d.fa.split(/[،,]| و /)[0], { "font-size": 10 })); });
     outer.forEach(function (o) { var p = P[o.it.id]; s.appendChild(el(o.it.t === "tour" ? "rect" : "circle", o.it.t === "tour" ? { x: p[0] - 6, y: p[1] - 6, width: 12, height: 12, fill: col[o.it.st] || "#94a3b8" } : { cx: p[0], cy: p[1], r: 6, fill: col[o.it.st] || "#94a3b8" })); s.appendChild(txt(p[0], p[1] + 16, String(o.it.fa).slice(0, 20), { "font-size": 8 })); });
     return s;
   };
@@ -35768,7 +35793,7 @@ APP.goFromURL = function (q) {
   /* ---------- نما ---------- */
   A.V.mind = function () {
     var m = M.model(), root = h("div", { class: "page mind", dir: "rtl" });
-    root.appendChild(A.head("نقشه‌ها", "🧠 کارنامهٔ ذهن", "یک نگاه به هفت بُعدِ ذهنت از روی دادهٔ خودت — دقت، کالیبراسیون، ماندگاری و بازشدنِ گره‌ها — با نقطه‌های سیاه، روند، شبکه و مسیرهای پیشِ رو. هر عدد اندازهٔ نمونه‌اش را دارد؛ زیرِ " + fa(MIN_N) + " نمونه عدد داده نمی‌شود."));
+    root.appendChild(A.head("نقشه‌ها", "🧠 کارنامهٔ ذهن", "یک نگاه به هفت بُعدِ ذهنت از روی دادهٔ خودت — دقت، کالیبراسیون، ماندگاری و بازشدنِ گره‌ها — با نقطه‌های سیاه، روند، شبکه و مسیرهای پیشِ رو. هر عدد اندازهٔ نمونه‌اش را کنارش دارد؛ با نمونهٔ کم، برآورد خودش به ½ نزدیک می‌ماند (بی کفِ قراردادی)."));
     root.appendChild(h("p", { class: "card soft small" }, "هر عددِ این کارنامه یک احتمال است که از دادهٔ خودت و اصل‌های عقلی درمی‌آید — بی‌برش و بی‌میانگینِ قراردادی. مقایسه با مردم فقط در «📐 سنجشِ استاندارد» و فقط با معماهایی که دشواری‌شان در نمونهٔ بزرگی از مردم از منبعِ معتبر سنجیده شده (چرا و چطور: ", h("button", { class: "linkish", type: "button", onclick: function () { if (A.HOST && A.HOST.openDoc) A.HOST.openDoc("HANDBOOK"); } }, "دفترچه، §۱۰"), ")."));
     if (A.PSY && A.PSY.section) root.appendChild(A.PSY.section());
     var t = m.tot;
@@ -35783,17 +35808,23 @@ APP.goFromURL = function (q) {
       h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("sterr"); } }, "🗺 قلمروِ سامانه‌ها")));
     var C = M.charts(m);
     root.appendChild(h("section", { class: "card mind-glance" }, h("h2", {}, "در یک نگاه"), h("div", { class: "row gap wrap" }, C.radar, C.calib)));
-    root.appendChild(h("section", { class: "card" }, h("h2", {}, "کارنامهٔ هر بُعد"), h("table", { class: "mind-table small" },
+    root.appendChild(h("section", { class: "card" }, h("h2", {}, "کارنامهٔ هر بُعد"), h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small" },
       h("thead", {}, h("tr", {}, ["حوزهٔ زندگی", "احتمالِ درستیِ پاسخِ بعدی", "پاسخ‌ها (درست از کل)", "احتمالِ بیش‌اطمینانی", "ماندگاری (درست از کل)", "گره‌های ورزیده", "احتمالِ پیشرفت"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, m.dims.map(function (d) {
         var E = d.est || { n: 0 };
         function cell(v, n) { return h("td", { title: "نمونه: " + fa(n) }, v == null ? "— (" + fa(n) + ")" : fa(v) + " (" + fa(n) + ")"); }
         /* بُعدِ «داوریِ معرفتی» ⇒ پرونده‌های کارخانه (همان‌جا که این عددها از آن می‌آیند) */
         return h("tr", { "data-dim": d.id }, h("td", {}, d.id === "s_epi" ? h("button", { class: "linkish mind-dim-epi", type: "button", title: "پرونده‌های سنجش در کارخانهٔ معرفت‌شناسی", onclick: function () { A.go("e_cases"); } }, d.fa + " ↗") : d.fa), h("td", {}, E.n ? A.PSY.pctFa(E.next) + " (" + fa(E.n) + ")" : "— (هنوز پاسخی نیست)"), h("td", {}, fa(E.k || 0) + " از " + fa(E.n || 0)),
-          h("td", { title: E.calN ? "میانگینِ اطمینان " + fa(Math.round(100 * E.meanConf)) + "٪" : "" }, E.calN ? A.PSY.pctFa(E.pOver) + " (" + fa(E.calN) + ")" : "— (اطمینانی ثبت نشده)"),
+          (function () {
+            /* اطمینان به پاسخ و پیش‌بینیِ رویداد جدا (H3) */
+            var F = E.fc || { n: 0 }, parts = [];
+            if (E.calN) parts.push("پاسخ‌ها: " + A.PSY.pctFa(E.pOver) + " (" + fa(E.calN) + ")");
+            if (F.dirN) parts.push("پیش‌بینی‌ها: " + A.PSY.pctFa(F.pOver) + " (" + fa(F.dirN) + ")");
+            return h("td", { title: (E.calN ? "میانگینِ اطمینان به پاسخ " + fa(Math.round(100 * E.meanConf)) + "٪" : "") + (F.dirN ? (E.calN ? " · " : "") + "میانگینِ احتمالِ طرفِ محتمل‌تر " + fa(Math.round(100 * F.meanQ)) + "٪، " + fa(F.hit) + " از " + fa(F.dirN) + " رخ داد" : "") }, parts.length ? parts.join(" · ") : "— (اطمینانی ثبت نشده)");
+          })(),
           h("td", {}, fa(d.ret.ok) + " از " + fa(d.ret.n)), h("td", {}, fa(d.knots.practised || 0) + " از " + fa(d.knots.all)),
           h("td", {}, E.progress ? A.PSY.pctFa(E.progress.p) + " (" + fa(E.progress.from) + " ← " + fa(E.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"));
-      })))));
+      })))), (function () { var cs = (m.dims.filter(function (d) { return d.id === "s_learn"; })[0] || {}).cardSelf; return cs && cs.n ? h("p", { class: "small muted mind-cards" }, "کارت‌های مرور خودسنجی‌اند (نمره را خودت می‌دهی)؛ مثلِ پاسخِ «خودم سنجیدم» در گره‌ها در این عددها نمی‌آیند: " + fa(cs.k) + " از " + fa(cs.n) + " مرور را «درست» (۳ تا ۵ ِ SM-2) نمره دادی.") : null; })()));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "🕸 نقشهٔ کاملِ ذهن"), C.mindmap));
@@ -35833,11 +35864,11 @@ APP.goFromURL = function (q) {
       if (c.none) { L.push("- " + c.fa + ": سنجیده نمی‌شود — " + c.none); return; }
       var e = c.self, p = c.pop || { n: 0 };
       L.push("- " + c.fa + ": پاسخِ بعدی " + (e.n ? pc(e.next) + " (" + e.k + "/" + e.n + ")" : "—") + (e.progress ? " · احتمالِ پیشرفت " + pc(e.progress.p) + " (" + e.progress.from + "→" + e.progress.to + ")" : "") +
-        (c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی " + pc(e.pOver) : "") + (p.n ? " · بالاتر از میانهٔ " + p.peers + ": " + pc(p.pAbove) : " · مقایسه با مردم: هنوز معمای لنگرداری جواب داده نشده"));
+        (c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌ها " + pc(e.pOver) : "") + (c.id === "META" && c.fc && c.fc.dirN ? " · پیش‌بینیِ رویدادها (جدا): " + c.fc.hit + "/" + c.fc.dirN + " طرفِ محتمل‌تر رخ داد، احتمالِ بیش‌اطمینانی در پیش‌بینی " + pc(c.fc.pOver) : "") + (p.n ? " · بالاتر از میانهٔ " + p.peers + ": " + pc(p.pAbove) : " · مقایسه با مردم: هنوز معمای لنگرداری جواب داده نشده"));
     });
     L.push("## حوزه‌های زندگی");
     M.dims.forEach(function (d) { var E = d.est || { n: 0 };
-      L.push("- " + (d.fa || d.id) + ": پاسخِ بعدی " + (E.n ? pc(E.next) + " (" + E.k + "/" + E.n + ")" : "—") + (E.calN ? " · احتمالِ بیش‌اطمینانی " + pc(E.pOver) : "") + " · ماندگاری " + d.ret.ok + "/" + d.ret.n + " · گره‌های ورزیده " + (d.knots.practised || 0) + "/" + d.knots.all + (E.progress ? " · احتمالِ پیشرفت " + pc(E.progress.p) : ""));
+      L.push("- " + (d.fa || d.id) + ": پاسخِ بعدی " + (E.n ? pc(E.next) + " (" + E.k + "/" + E.n + ")" : "—") + (E.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌ها " + pc(E.pOver) : "") + (E.fc && E.fc.dirN ? " · پیش‌بینیِ رویدادها: طرفِ محتمل‌تر میانگین " + pc(E.fc.meanQ) + "، " + E.fc.hit + "/" + E.fc.dirN + " رخ داد، احتمالِ بیش‌اطمینانی در پیش‌بینی " + pc(E.fc.pOver) : "") + " · ماندگاری " + d.ret.ok + "/" + d.ret.n + " · گره‌های ورزیده " + (d.knots.practised || 0) + "/" + d.knots.all + (E.progress ? " · احتمالِ پیشرفت " + pc(E.progress.p) : ""));
     });
     if ((M.black || []).length) L.push("نقطه‌های سیاه: " + M.black.slice(0, 6).map(function (b) { return b.fa || b.t || ""; }).join(" · "));
     return L.join("\n");
@@ -36795,9 +36826,9 @@ APP.goFromURL = function (q) {
   P.CONSTRUCTS = [
     { id: "Gf", fa: "استدلالِ سیال", en: "Fluid reasoning (CHC Gf)", from: "مسئله‌های هم‌ساختار، ورزش‌های گره در «بازنمایی» و «راهبرد»، معماهای لنگردارِ استدلال", fams: ["F2", "F3"] },
     { id: "Gc", fa: "دانش و فهمِ انباشته", en: "Comprehension-knowledge (CHC Gc)", from: "ورزش‌های گره در «دانش و مفهوم»، معماهای لنگردارِ کلامی", fams: ["F1"] },
-    { id: "Glr", fa: "یادگیری و بازیابیِ بلندمدت", en: "Learning efficiency & retrieval (CHC Gl/Gr)", from: "کارت‌های مرور، سنجش‌های ماندگاریِ ۳۰ و ۹۰ روزه", fams: [] },
+    { id: "Glr", fa: "یادگیری و بازیابیِ بلندمدت", en: "Learning efficiency & retrieval (CHC Gl/Gr)", from: "سنجش‌های ماندگاریِ ۳۰ و ۹۰ روزهٔ گره‌ها (نخستین پاسخِ پس از موعد)؛ کارت‌های مرور خودسنجی‌اند و جدا نشان داده می‌شوند", fams: [] },
     { id: "RQ", fa: "عقلانیت (تأمل، احتمال، تصمیم)", en: "Rational thinking (Stanovich, West & Toplak 2016, CART)", from: "ورزش‌های گره در «برداشت و نتیجه‌گیری» و «تصمیم»، داوریِ پرونده‌های کارخانه، معماهای لنگردارِ تأمل و احتمال", fams: ["F11", "F12"] },
-    { id: "META", fa: "فراشناخت: هم‌خوانیِ اطمینان با درستی", en: "Metacognitive calibration", from: "هر پاسخی که با درصدِ اطمینان ثبت شده", fams: ["F4"] },
+    { id: "META", fa: "فراشناخت: هم‌خوانیِ اطمینان با درستی", en: "Metacognitive calibration", from: "اطمینانی که پیش از دیدنِ جواب به پاسخِ خودت گفته‌ای (ورزشِ گره، مسئله، حدسِ پیش از حل، معما)؛ پیش‌بینیِ رویدادها جدا سنجیده می‌شود", fams: ["F4"] },
     { id: "AFF", fa: "پیش‌بینیِ هیجانی", en: "Affective forecasting (Wilson & Gilbert 2005)", from: "زنجیره‌های نگرانی: حسِ اول در برابرِ آنچه واقعاً رخ داد", fams: [] },
     { id: "Gwm", fa: "حافظهٔ کاری و سرعتِ پردازش", en: "Working memory / processing speed (CHC Gwm, Gs)", from: "", fams: [], none: "به آزمونِ زمان‌دار و کنترل‌شده نیاز دارد؛ صفحه سنجهٔ ضمنیِ معتبر برایش ندارد ⇒ سنجیده نمی‌شود" },
     { id: "EI", fa: "هوشِ هیجانی و اجتماعی", en: "Ability EI (MSCEIT) / social cognition", from: "", fams: [], none: "سنجهٔ استانداردش (MSCEIT) آزمونِ حق‌دار و کنترل‌شده است؛ رفتارِ روزمره در صفحه جای آن را نمی‌گیرد ⇒ سنجیده نمی‌شود (فعالیت‌ها در «حوزه‌های زندگی» دیده می‌شوند)" }
@@ -36806,45 +36837,72 @@ APP.goFromURL = function (q) {
   function okv(x) { return x === true || x === 1 || x === "1" || x === "true"; }
   function conf01(c) { c = parseFloat(c); if (isNaN(c)) return null; return c > 1 ? c / 100 : c; }
 
-  /* پاسخ‌های دقیقِ هر سازه (همان داده‌ای که کارنامه می‌خواند؛ پاسخِ «خودم سنجیدم» و ورزشِ نامعتبر شمرده نمی‌شود) */
+  /* روزِ محلی (نه UTC): A.today() محلی است؛ slice(0,10) روی ISO در تهران بینِ ۰۰:۰۰ تا ۰۳:۳۰ یک روز عقب است (بازبینیِ ۲۰۲۶-۱۰-۱۵، M3) */
+  function lday(x) { return A.localDay ? A.localDay(x) : String(x || "").slice(0, 10); }
+  P.day = lday;
+  /* پاسخ‌های دقیقِ هر سازه (همان داده‌ای که کارنامه می‌خواند؛ پاسخِ «خودم سنجیدم» و ورزشِ نامعتبر شمرده نمی‌شود).
+     دو جنسِ اطمینان جدا می‌مانند (بازبینیِ ۲۰۲۶-۱۰-۱۵، H3):
+       - «اطمینان به پاسخِ خودم» (ورزشِ گره، مسئلهٔ هم‌ساختار، حدسِ پیش از حل، معما) ⇒ META؛
+       - «احتمالِ یک رویداد» (حکمِ پرونده، زنجیرهٔ نگرانی، دفترِ پیش‌بینی) ⇒ R.FC، کالیبراسیونِ پیش‌بینی (P.forecastEst) — نه بیش‌اطمینانی به پاسخ.
+     کارت‌های مرور خودسنجی‌اند (نمره را خودت می‌دهی) ⇒ مثلِ «خودم سنجیدم» ِ گره‌ها بیرون از برآورد؛ جدا در P.cardSelf() (M6). */
   P.answers = function () {
-    var R = {}; P.CONSTRUCTS.forEach(function (c) { R[c.id] = []; });
+    var R = {}; P.CONSTRUCTS.forEach(function (c) { R[c.id] = []; }); R.FC = [];
     function add(cid, x, src) { if (!R[cid] || !x || x.self || x.ok == null || x.ok === "") return; R[cid].push({ at: x.at || x.d || "", ok: okv(x.ok), conf: conf01(x.conf), src: src }); }
+    function fc(p, ok, at, src) { if (p == null || isNaN(p)) return; R.FC.push({ p: p, ok: ok, at: at || "", src: src }); }
     var kfam = {}; S.all("knot", function (k) { return !k.sample; }).forEach(function (k) { kfam[k.id] = k.fam || "F1"; });
     var countable = typeof A.kcountable === "function" ? A.kcountable : function (it) { return !it.bad; };
     S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { var c = FAM2C[kfam[it.knot]]; (it.hist || []).forEach(function (x) { if (c) add(c, x, "kitem"); if (conf01(x.conf) != null) add("META", x, "kitem"); }); });
     S.all("pbitem").forEach(function (it) { (it.hist || []).forEach(function (x) { add("Gf", x, "pbitem"); if (conf01(x.conf) != null) add("META", x, "pbitem"); }); });
-    S.all("card", function (c) { return !c.sample; }).forEach(function (c) { (c.hist || []).forEach(function (x) { var y = { at: x.d, ok: x.g >= 3, conf: x.c }; add("Glr", y, "card"); if (conf01(x.c) != null) add("META", y, "card"); }); });
+    /* حدسِ پیش از حل (شبیه‌ساز): اطمینان به حدسِ خودم ↔ «درست بود/نادرست بود» — همان داده‌ای که کارنامه در کالیبراسیون می‌خواند (L7) */
+    S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
+      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || conf01(g.conf) == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;
+        add("META", { at: g.hitAt || g.at, ok: g.hit === "درست بود", conf: g.conf }, "eprog"); });
+    });
     S.all("case", function (c) { return !c.sample; }).forEach(function (cs) {
       var d = cs.st && cs.st.st_final && cs.st.st_final.data, fin = (d && d.final) || [];
       fin.forEach(function (r) { var o = (cs.outcome || {})[r.c], p = conf01(r.p); if (!r.c || p == null || (o !== "درست" && o !== "نادرست")) return;
-        var y = { at: cs.outcomeAt || cs.updated || cs.created, ok: (p >= 0.5) === (o === "درست"), conf: null }; add("RQ", y, "case"); add("META", { at: y.at, ok: o === "درست", conf: p }, "case"); });
+        var y = { at: cs.outcomeAt || cs.updated || cs.created, ok: (p >= 0.5) === (o === "درست"), conf: null }; add("RQ", y, "case"); fc(p, o === "درست", y.at, "case"); });
     });
     S.all("wchain", function (c) { return c.feel != null && (c.outcome === "رخ داد" || c.outcome === "رخ نداد"); }).forEach(function (c) {
-      var p = c.feel / 100, ok = c.outcome === "رخ داد"; add("AFF", { at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok }, "wchain"); add("META", { at: c.outcomeAt || c.due, ok: ok, conf: p }, "wchain");
+      var p = c.feel / 100, ok = c.outcome === "رخ داد"; add("AFF", { at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok }, "wchain"); fc(p, ok, c.outcomeAt || c.due, "wchain");
     });
+    S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) { fc(conf01(x.p), x.outcome === "شد", x.outcomeAt || x.due, "fcast"); });
     /* سنجش‌های ماندگاریِ ۳۰ و ۹۰ روزهٔ گره‌ها ⇒ یادگیری و بازیابیِ بلندمدت (کارزارِ v08: پاسِ ۳۰ روزه هیچ‌جای کارنامه نبود) */
     P.holds().forEach(function (x) { add("Glr", { at: x.at, ok: x.ok }, "hold"); });
-    S.all("psyans").forEach(function (a) { var it = P.item(a.item); if (it && R[it.construct]) add(it.construct, a, "anchor"); if (a.conf != null) add("META", a, "anchor"); });
+    /* معما: «دیده‌ام» ⇒ نه در مقایسه با مردم و نه در «نسبت به خودت» (پاسخِ از‌برشده درستیِ استدلال نیست)؛ ولی اطمینانش هنوز داده‌ای از فراشناخت است.
+       «وقت تمام شد» ⇒ در سازه نادرست (همان نمره‌گذاریِ منبع)، ولی در META نه: پاسخی داده نشد که به آن مطمئن باشی (L5) */
+    S.all("psyans").forEach(function (a) { var it = P.item(a.item); if (it && R[it.construct] && !a.familiar) add(it.construct, a, "anchor"); if (a.conf != null && !a.timeout) add("META", a, "anchor"); });
     return R;
   };
+  /* کارت‌های مرور: نمرهٔ SM-2 را خودِ کاربر می‌دهد (۳ تا ۵ = «درست» در تعریفِ SM-2) ⇒ خودسنجی، جدا از برآوردها */
+  P.cardSelf = function () {
+    var n = 0, k = 0; S.all("card", function (c) { return !c.sample; }).forEach(function (c) { (c.hist || []).forEach(function (x) { if (x.g == null) return; n++; if (x.g >= 3) k++; }); });
+    return { n: n, k: k };
+  };
 
-  /* ماندگاری: برای هر گرهِ ورزیده، هر موعدِ ۳۰/۹۰ روزه‌ای که رسیده — درست اگر پس از آن پاسخِ درستی بوده و پیش از آن بازگشتی نبوده */
+  /* ماندگاری: برای هر گرهِ ورزیده، هر موعدِ ۳۰/۹۰ روزه‌ای که رسیده — داوری با «نخستین» پاسخِ معتبر از روزِ موعد به بعد
+     (پاسخِ درست پس از یک بازیابیِ ناموفق، ماندگاری نیست؛ بازبینیِ ۲۰۲۶-۱۰-۱۵، M4). پاسخِ «خودم سنجیدم» یا نمونهٔ وارسی‌نشده
+     (e.el === false) هرگز شمرده نمی‌شود. بازگشتِ گره پیش از نخستین پاسخ ⇒ نادرست. */
   P.holds = function () {
-    var out = [], HOLD = (A.ASSIST && A.ASSIST.tourHold) || [30, 90];
+    var out = [], HOLD = (A.ASSIST && A.ASSIST.tourHold) || [30, 90], today = A.today();
+    function valid(e) { return e && e.ok != null && e.ok !== "" && !e.self && e.el !== false; }
     S.all("knot", function (k) { return !k.sample && k.solvedAt; }).forEach(function (k) {
+      var solvedDay = lday(k.solvedAt), backDay = k.returnedAt && k.returnedAt > k.solvedAt ? lday(k.returnedAt) : "";
+      if (backDay && backDay > today) backDay = "";
       HOLD.forEach(function (n) {
-        var from = A.addDays(String(k.solvedAt).slice(0, 10), n); if (A.today() < from) return;
-        var back = k.returnedAt && k.returnedAt > k.solvedAt && String(k.returnedAt).slice(0, 10) <= A.today();
-        var okAfter = (k.log || []).some(function (e) { return e.ok && String(e.at || e.d || "").slice(0, 10) >= from; });
-        if (!okAfter && !back) return;   // هنوز سنجیده نشده
-        out.push({ knot: k.id, n: n, at: from + "T12:00:00Z", ok: okAfter && !(back && String(k.returnedAt).slice(0, 10) <= from) });
+        var from = A.addDays(solvedDay, n); if (today < from) return;
+        var first = (k.log || []).filter(function (e) { return valid(e) && (e.d || lday(e.at)) >= from; })
+          .sort(function (a, b) { return String(a.at || a.d || "").localeCompare(String(b.at || b.d || "")); })[0];
+        var fDay = first ? (first.d || lday(first.at)) : "";
+        if (backDay && (backDay <= from || !first || backDay < fDay)) { out.push({ knot: k.id, n: n, at: (backDay > from ? backDay : from) + "T12:00:00Z", ok: false }); return; }
+        if (!first) return;   // هنوز سنجیده نشده
+        out.push({ knot: k.id, n: n, at: first.at || (fDay + "T12:00:00Z"), ok: okv(first.ok) });
       });
     });
     return out;
   };
   /* برآوردِ «نسبت به خودت» برای یک سازه */
-  function month(x) { return String(x || "").slice(0, 7); }
+  function month(x) { return lday(x).slice(0, 7); }
   P.selfEst = function (arr, isMeta) {
     var n = arr.length, k = arr.filter(function (a) { return a.ok; }).length, e = { n: n, k: k, next: P.next(k, n) };
     var bym = {}; arr.forEach(function (a) { var m = month(a.at); if (!m) return; (bym[m] = bym[m] || { n: 0, k: 0 }).n++; if (a.ok) bym[m].k++; });
@@ -36857,6 +36915,31 @@ APP.goFromURL = function (q) {
         e.meanConf = mc; e.calN = cs.length; e.pOver = P.pBelow(kk, cs.length, mc); }
     }
     return e;
+  };
+  /* کالیبراسیونِ پیش‌بینیِ رویدادها (H3): «۱۰٪ که رخ ندهد» اطمینان به درستیِ پاسخ نیست؛ احتمالِ یک رویداد است.
+     بیش‌اطمینانی در پیش‌بینی = احتمال‌هایی تندتر از بسامدِ واقعی (Lichtenstein, Fischhoff & Phillips 1982؛ Moore & Healy 2008 «overprecision»):
+     هر پیش‌بینی به «طرفِ محتمل‌تر» برگردانده می‌شود، q = max(p, 1−p)، و «درست» یعنی همان طرف رخ داد؛ پس
+     P(بیش‌اطمینانی) = P(بسامدِ واقعیِ طرفِ محتمل‌تر < میانگینِ q) با همان پسینِ بتای A4. پیش‌بینیِ ½ هیچ طرفی را مرجح نمی‌کند (A4) ⇒ ادعای جهت‌دار ندارد و
+     در این آزمون نمی‌آید. هر دهک هم جدا: احتمالِ گفته‌شده در برابرِ بسامدِ مشاهده‌شده (برای نمودار و دستیار) — بی کفِ نمونه، با اندازهٔ نمونه. */
+  P.forecastEst = function (pairs) {
+    pairs = (pairs || []).filter(function (x) { return x && x.p != null && !isNaN(x.p); });
+    var e = { n: pairs.length, bins: [] };
+    if (!pairs.length) return e;
+    var bb = {}; pairs.forEach(function (x) { var i = Math.min(9, Math.floor(x.p * 10)); (bb[i] = bb[i] || { i: i, n: 0, k: 0, s: 0 }).n++; bb[i].s += x.p; if (x.ok) bb[i].k++; });
+    e.bins = Object.keys(bb).sort(function (a, b) { return a - b; }).map(function (i) { var b = bb[i]; return { lo: b.i / 10, hi: (b.i + 1) / 10, n: b.n, k: b.k, stated: b.s / b.n, next: P.next(b.k, b.n) }; });
+    var bs = 0; pairs.forEach(function (x) { bs += Math.pow(x.p - (x.ok ? 1 : 0), 2); }); e.brier = bs / pairs.length;
+    var dir = pairs.filter(function (x) { return x.p !== 0.5; });
+    e.dirN = dir.length;
+    if (dir.length) {
+      var q = dir.reduce(function (s, x) { return s + Math.max(x.p, 1 - x.p); }, 0) / dir.length, hit = dir.filter(function (x) { return (x.p > 0.5) === !!x.ok; }).length;
+      e.meanQ = q; e.hit = hit; e.pOver = P.pBelow(hit, dir.length, q);
+    }
+    return e;
+  };
+  /* متنِ یک‌خطیِ کالیبراسیونِ پیش‌بینی (کارنامه، سنجشِ استاندارد، دستیار) */
+  P.forecastFa = function (f) {
+    if (!f || !f.dirN) return f && f.n ? "پیش‌بینی‌های رویداد: " + fa(f.n) + " (همه ۵۰٪؛ ادعای جهت‌دار نیست)" : "";
+    return "پیش‌بینی‌های رویداد (" + fa(f.dirN) + "): طرفِ محتمل‌تر را به‌طورِ میانگین " + fa(Math.round(100 * f.meanQ)) + "٪ گفتی و همان طرف " + fa(f.hit) + " بار از " + fa(f.dirN) + " رخ داد · احتمالِ بیش‌اطمینانی در پیش‌بینی " + P.pctFa(f.pOver);
   };
 
   /* ---------- لنگرها: گویه‌هایی با دشواریِ جمعیتی از منبعِ معتبر ---------- */
@@ -36929,11 +37012,26 @@ APP.goFromURL = function (q) {
 
   /* مدلِ کامل برای کارنامه، ایمیل و دستیار */
   P.model = function () {
-    var R = P.answers();
+    var R = P.answers(), cards = P.cardSelf();
     return P.CONSTRUCTS.map(function (c) {
       if (c.none) return { id: c.id, fa: c.fa, en: c.en, none: c.none };
-      return { id: c.id, fa: c.fa, en: c.en, from: c.from, self: P.selfEst(R[c.id] || [], c.id === "META"), pop: P.popEst(c.id) };
+      var o = { id: c.id, fa: c.fa, en: c.en, from: c.from, self: P.selfEst(R[c.id] || [], c.id === "META"), pop: P.popEst(c.id) };
+      if (c.id === "META") o.fc = P.forecastEst(R.FC);
+      if (c.id === "Glr") o.cards = cards;
+      return o;
     });
+  };
+  /* درصدِ درستیِ یک گویهٔ توصیفی در گروهِ هم‌سنِ تو، اگر منبع آن را به تفکیکِ سن داده (p_band؛ M9). کلیدها «30-49» یا «65+» */
+  P.bandP = function (it, age) {
+    if (!it || !it.p_band || age == null) return null;
+    var hit = null;
+    Object.keys(it.p_band).forEach(function (key) {
+      var m = /^(\d+)\s*-\s*(\d+)$/.exec(key), m2 = /^(\d+)\s*\+$/.exec(key), lo = m ? +m[1] : m2 ? +m2[1] : null, hi = m ? +m[2] : m2 ? Infinity : null;
+      if (lo == null || hit || it.p_band[key] == null || age < lo || age > hi) return;
+      var sc = P.scale(it.scale), b = sc && (sc.bands || []).filter(function (x) { return x.lo === lo && (x.hi == null ? hi === Infinity : x.hi === hi); })[0];
+      hit = { p: +it.p_band[key], lo: lo, hi: hi, label: (b && b.label) || ("بزرگسالانِ " + fa(lo) + (hi === Infinity ? " سال به بالا" : " تا " + fa(hi) + " ساله") + " در همان منبع") };
+    });
+    return hit;
   };
   P.pctFa = function (p) { return fa(Math.round(100 * p)) + "٪"; };
 
@@ -36946,30 +37044,36 @@ APP.goFromURL = function (q) {
     var bIn = h("input", { type: "date", class: "inp sm", "data-own": "1", "aria-label": "تاریخِ تولد (میلادی)", value: P.birth() });
     sec.appendChild(h("div", { class: "row gap wrap small psy-age" }, h("span", {}, age == null ? "سنت هنوز ثبت نشده؛ مقایسه با هم‌سن‌ها به آن نیاز دارد:" : "سن: " + fa(age) + " سال (از تاریخِ تولدِ ثبت‌شده)."), bIn,
       h("button", { class: "btn ghost sm", type: "button", "data-own": "1", onclick: function () { var d = bIn.value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= A.today()) { A.toast("تاریخ درست نیست."); return; } var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; S.saveSettings(st); A.render(); } }, "ثبت")));
-    sec.appendChild(h("table", { class: "mind-table small psy-table" },
+    sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small psy-table" },
       h("thead", {}, h("tr", {}, ["سازه", "از کجا سنجیده می‌شود", "احتمالِ درستیِ پاسخِ بعدی", "احتمالِ پیشرفت", "نسبت به مردم"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, md.map(function (c) {
         if (c.none) return h("tr", { "data-c": c.id, class: "muted" }, h("td", { title: c.en }, c.fa), h("td", { colspan: 4 }, c.none));
         var e = c.self, p = c.pop || { n: 0 };
-        var meta = c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی " + P.pctFa(e.pOver) + " (میانگینِ اطمینان " + fa(Math.round(100 * e.meanConf)) + "٪)" : "";
+        var meta = c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌هایت " + P.pctFa(e.pOver) + " (میانگینِ اطمینان " + fa(Math.round(100 * e.meanConf)) + "٪)" : "";
+        var extra = c.id === "META" && c.fc && c.fc.n ? h("div", { class: "small psy-fc" }, P.forecastFa(c.fc)) :
+          c.id === "Glr" && c.cards && c.cards.n ? h("div", { class: "small muted psy-cards" }, "کارت‌های مرور (خودسنجی، بیرون از این برآورد): " + fa(c.cards.k) + " از " + fa(c.cards.n) + " مرور را خودت «درست» (۳ تا ۵ ِ SM-2) نمره دادی") : null;
         return h("tr", { "data-c": c.id }, h("td", { title: c.en }, c.fa), h("td", { class: "small" }, c.from),
-          h("td", {}, e.n ? P.pctFa(e.next) + " (" + fa(e.k) + " از " + fa(e.n) + ")" + meta : "— (هنوز پاسخی نیست)"),
+          h("td", {}, e.n ? P.pctFa(e.next) + " (" + fa(e.k) + " از " + fa(e.n) + ")" + meta : "— (هنوز پاسخی نیست)", extra),
           h("td", {}, e.progress ? P.pctFa(e.progress.p) + " (" + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"),
           h("td", { class: "small" }, p.n ? (p.scales || [p]).map(function (q) { return "احتمالِ بالاتر بودن از میانهٔ " + q.peers + ": " + P.pctFa(q.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * q.pct)) + " (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار)"; }).join(" | ") :
             (N.items || []).some(function (it) { return it.construct === c.id && P.isAnchor(it); }) ? "هنوز معمای لنگرداری در این سازه جواب نداده‌ای" :
             (N.items || []).some(function (it) { return it.construct === c.id; }) ? (function () {
               /* فقط گویهٔ توصیفی (کلامی/مشهور؛ ترجمه دشواری را جابه‌جا می‌کند) ⇒ بی برآوردِ مقایسه‌ای؛ فقط درستیِ تو کنارِ درصدِ گروه */
               var da = S.all("psyans").filter(function (a) { var it = P.item(a.item); return it && it.construct === c.id && it.kind === "descriptive" && !a.familiar; });
-              var avg = da.length ? da.reduce(function (s, a) { return s + (+P.item(a.item).p || 0); }, 0) / da.length : null;
-              return "فقط معماهای توصیفی (کلامی یا مشهور) هست؛ برآوردِ مقایسه‌ای ساخته نمی‌شود چون ترجمه دشواری را عوض می‌کند." + (da.length ? " تو " + fa(da.filter(function (a) { return okv(a.ok); }).length) + " از " + fa(da.length) + " را درست گفتی؛ در گروهِ منبع به‌طورِ میانگین " + fa(Math.round(100 * avg)) + "٪ درست گفته بودند." : "");
+              /* درصدِ گروهِ هم‌سن هر جا منبع آن را داده (p_band)؛ وگرنه کلِ نمونه (M9) */
+              var nb = 0, avg = da.length ? da.reduce(function (s, a) { var it = P.item(a.item), bp = P.bandP(it, age); if (bp) nb++; return s + (bp ? bp.p : (+it.p || 0)); }, 0) / da.length : null;
+              var grp = !da.length ? "" : nb === da.length ? "در گروهِ هم‌سنِ تو در همان منبع‌ها" : nb ? "در گروهِ منبع (هم‌سن‌هایت هر جا منبع بازهٔ سنی داشت)" : "در گروهِ منبع";
+              return "فقط معماهای توصیفی (کلامی یا مشهور) هست؛ برآوردِ مقایسه‌ای ساخته نمی‌شود چون ترجمه دشواری را عوض می‌کند." + (da.length ? " تو " + fa(da.filter(function (a) { return okv(a.ok); }).length) + " از " + fa(da.length) + " را درست گفتی؛ " + grp + " به‌طورِ میانگین " + fa(Math.round(100 * avg)) + "٪ درست گفته بودند." : "");
             })() : "هنوز معمای لنگرداری با دادهٔ جمعیتیِ وارسی‌شده برای این سازه در فهرست نیست"));
-      }))));
+      })))));
     sec.appendChild(h("p", { class: "small" }, h("b", {}, "ضریبِ هوشیِ کل: "), "ساخته نمی‌شود. «ضریبِ هوشیِ کل» فقط از آزمونِ هنجاریابی‌شده و کنترل‌شده معتبر است. این صفحه آن آزمون نیست. به جایش، هر سازه جدا و با منبع با مردم مقایسه می‌شود."));
-    var src = (N.sources || []);
-    sec.appendChild(h("details", { class: "small" }, h("summary", {}, "منبع‌های دادهٔ جمعیتی (" + fa(src.length) + ") · " + fa((N.items || []).length) + " معمای لنگردار" + (N.retrieved ? " · به‌روزرسانی " + N.retrieved : "")),
+    var src = (N.sources || []), nAnch = (N.items || []).filter(P.isAnchor).length, nDesc = (N.items || []).length - nAnch;
+    sec.appendChild(h("details", { class: "small" }, h("summary", {}, "منبع‌های دادهٔ جمعیتی (" + fa(src.length) + ") · " + fa(nAnch) + " معمای لنگردار" + (nDesc ? " و " + fa(nDesc) + " معمای توصیفی" : "") + (N.retrieved ? " · به‌روزرسانی " + fa(N.retrieved) : "")),
       src.length ? h("ul", {}, src.map(function (x) { return h("li", {}, (x.cite || x.id) + (x.n ? " — N=" + fa(x.n) : "") + (x.url ? " " : ""), x.url ? h("a", { href: x.url, target: "_blank", rel: "noopener" }, "پیوند") : null); })) :
         h("p", {}, "هنوز هیچ دادهٔ جمعیتیِ وارسی‌شده‌ای نیست. ناظر آن را از منابعِ معتبر (مقاله‌های داوری‌شده، فراتحلیل‌ها، نمونه‌های هنجاریِ بزرگ) جمع می‌کند و بازبینِ مستقل وارسی‌اش می‌کند.")));
-    if (P.pending().length) sec.appendChild(h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("psy_item"); } }, "🧩 معمای امروز"));
+    /* روزی یکی (M2): دکمه فقط اگر امروز جواب نداده‌ای، یا معمایی باز و بی‌پاسخ مانده (ادامهٔ همان) */
+    if (P.canOpenToday()) sec.appendChild(h("button", { class: "btn ghost sm psy-open", type: "button", onclick: function () { A.go("psy_item"); } }, P.openItems().length ? "🧩 ادامهٔ معمای امروز" : "🧩 معمای امروز"));
+    else if (P.pending().length) sec.appendChild(h("p", { class: "small muted psy-tomorrow" }, "معمای امروز را جواب داده‌ای؛ معمای بعدی فردا."));
     return sec;
   };
 
@@ -36982,16 +37086,62 @@ APP.goFromURL = function (q) {
     var th = {};
     left.forEach(function (it) { var sid = it.scale || "_" + it.construct; if (P.isAnchor(it) && th[sid] == null) th[sid] = P.scaleEst(sid).theta; });
     function info(it) { if (!P.isAnchor(it)) return -1; var p = prc(th[it.scale || "_" + it.construct] || 0, it); return p * (1 - p); }
-    return left.sort(function (a, b) { return info(b) - info(a); });
+    /* معمای بازشده و بی‌پاسخ همیشه اول (M1): دیدن و رد شدن به معمای دیگر ممکن نیست */
+    var op = opens();
+    return left.sort(function (a, b) { return (op[b.id] ? 1 : 0) - (op[a.id] ? 1 : 0) || info(b) - info(a); });
   };
-  P.answeredToday = function () { return S.all("psyans").some(function (a) { return String(a.at).slice(0, 10) === A.today(); }); };
+  /* «امروز» به روزِ محلی (M3) */
+  P.answeredToday = function () { var t = A.today(); return S.all("psyans").some(function (a) { return lday(a.at) === t; }); };
+  /* زمانِ بازشدنِ هر معما (ماندگار در تنظیمات؛ M1): بازگشت یا بارگذاریِ دوباره همان ساعت را ادامه می‌دهد؛ زمانِ گذشته ⇒ «وقت تمام شد» (نادرست) */
+  function opens() { return (S.settings().psyOpen) || {}; }
+  P.openedAt = function (id) { return opens()[id] || null; };
+  function markOpen(id) { var st = S.settings(); st.psyOpen = st.psyOpen || {}; if (!st.psyOpen[id]) { st.psyOpen[id] = new Date().toISOString(); S.saveSettings(st); } return st.psyOpen[id]; }
+  function clearOpen(id) { var st = S.settings(); if (st.psyOpen && st.psyOpen[id]) { delete st.psyOpen[id]; S.saveSettings(st); } }
+  function answeredMap() { var d = {}; S.all("psyans").forEach(function (a) { d[a.item] = 1; }); return d; }
+  /* معماهای بازشده و هنوز بی‌پاسخ */
+  P.openItems = function () { var o = opens(), d = answeredMap(); return Object.keys(o).filter(function (id) { return !d[id] && P.item(id); }); };
+  /* معمای زمان‌داری که باز شد و زمانش گذشت ⇒ همان «وقت تمام شد» ِ اجرای مرجع، با زمانِ پایانِ واقعی */
+  P.sweep = function () {
+    var o = opens(), d = answeredMap(), now = Date.now(), n = 0;
+    Object.keys(o).forEach(function (id) {
+      var it = P.item(id), t0 = Date.parse(o[id]); if (d[id] || !it || !it.time_limit_s || isNaN(t0)) return;
+      var lim = 1000 * +it.time_limit_s; if (now - t0 < lim) return;
+      S.put({ id: A.uid("pa"), type: "psyans", item: id, ok: false, timeout: true, familiar: false, conf: null, ms: lim, at: new Date(t0 + lim).toISOString(), created: new Date().toISOString() }); n++;
+    });
+    return n;
+  };
+  /* روزی یکی (M2): امروز جواب نداده‌ای و معمایی مانده — یا معمایی باز و بی‌پاسخ است (ادامهٔ همان) */
+  P.canOpenToday = function () { P.sweep(); return P.openItems().length > 0 || (P.pending().length > 0 && !P.answeredToday()); };
+  /* پاسخِ آزاد ⇒ رقم‌های فارسی/عربی، جداکنندهٔ هزارگان و ممیزِ فارسی، ی/ک ِ عربی، نیم‌فاصله؛ و فقط وقتی کلیدِ گویه عددی است
+     عددهای نوشته‌شده با حروف (صفر تا بیست؛ «نه» نه، چون «نه» ِ منفی هم هست) — H2 */
+  var NUMW = { "صفر": 0, "یک": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "هفت": 7, "هشت": 8, "ده": 10, "یازده": 11, "دوازده": 12, "سیزده": 13, "چهارده": 14, "پانزده": 15, "پونزده": 15, "شانزده": 16, "شونزده": 16, "هفده": 17, "هجده": 18, "هیجده": 18, "نوزده": 19, "بیست": 20 };
+  P.normAns = function (v, numeric) {
+    var s = String(v == null ? "" : v).replace(/[۰-۹]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); }).replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 0x660); })
+      .replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[‌‎‏]/g, " ")
+      .replace(/(\d)[,٬'’](?=\d{3}(?!\d))/g, "$1").replace(/(\d)٫(?=\d)/g, "$1.")
+      .replace(/\s+/g, " ").trim();
+    if (numeric) s = s.split(" ").map(function (w) { return Object.prototype.hasOwnProperty.call(NUMW, w) ? String(NUMW[w]) : w; }).join(" ");
+    return s;
+  };
+  /* درصدِ اطمینان از متن (رقمِ فارسی/لاتین، با یا بی ٪)؛ نامعلوم ⇒ NaN (اطمینان گفته نشده) */
+  function confVal(c) { var s = P.normAns(c).replace(/[%٪]/g, "").trim(); return s === "" || !/^\d+(\.\d+)?$/.test(s) ? NaN : +s; }
+  P.check = function (it, v) {
+    if (it.options && it.options.length) return v !== "" && v != null && +v === +it.answer;
+    var num = /^-?\d+(\.\d+)?$/.test(String(it.answer)), s = P.normAns(v, num);
+    return (it.accept || [String(it.answer)]).some(function (re) { try { return new RegExp("^\\s*(" + re + ")\\s*$", "i").test(s); } catch (e) { return false; } });
+  };
   function optLabel(o) { return typeof o === "string" ? o : (o && o.t) || ""; }
   A.V.psy_item = function () {
-    var it = P.item(A.state.arg) || P.pending()[0], root = h("div", { class: "page psy", dir: "rtl" });
+    P.sweep();
+    var open = P.openItems(), it = P.item(A.state.arg) || P.pending()[0], root = h("div", { class: "page psy", dir: "rtl" });
     root.appendChild(A.head("نقشه‌ها", "🧩 معمای امروز", "یک معمای کوتاه. با فکرِ خودت جواب بده و بگو چقدر مطمئنی."));
     if (!it) { root.appendChild(h("p", { class: "card soft" }, (P.norms().items || []).length ? "همهٔ معماهای موجود را جواب داده‌ای." : "هنوز معمایی با دادهٔ جمعیتیِ وارسی‌شده در فهرست نیست.")); return root; }
     if (S.all("psyans").some(function (a) { return a.item === it.id; })) { root.appendChild(h("p", { class: "card soft" }, "این معما را پیش‌تر جواب داده‌ای؛ هر معما فقط یک بار شمرده می‌شود.")); return root; }
-    var st = { v: "", c: "", fam: false, done: false }, box = h("section", { class: "card psy-q" }), t0 = Date.now(), fb = h("div", { class: "small" }), timer = null;
+    /* معمای دیگری باز و بی‌پاسخ است ⇒ همان (دیدن و رد شدن ممکن نیست؛ M1) */
+    if (open.length && open.indexOf(it.id) < 0) it = P.item(open[0]);
+    /* روزی یکی (M2) */
+    if (!P.openedAt(it.id) && P.answeredToday()) { root.appendChild(h("p", { class: "card soft psy-tomorrow" }, "معمای امروز را جواب داده‌ای؛ روزی یک معما — معمای بعدی فردا.")); return root; }
+    var st = { v: "", c: "", fam: false, done: false }, box = h("section", { class: "card psy-q" }), t0 = Date.parse(markOpen(it.id)) || Date.now(), fb = h("div", { class: "small" }), timer = null;
     if (it.text) box.appendChild(h("p", { class: "psy-text" }, it.text));
     if (it.img) box.appendChild(h("img", { class: "psy-img", src: P.img(it.img), alt: "تصویرِ معما", style: "max-width:100%;height:auto" }));
     if (it.options && it.options.length) box.appendChild(h("div", { class: "pb-opts psy-opts", role: "radiogroup", "aria-label": "گزینه‌ها" }, it.options.map(function (o, i) {
@@ -36999,23 +37149,31 @@ APP.goFromURL = function (q) {
       return h("label", { class: "row gap" }, h("input", { type: "radio", name: "psy-o", "data-own": "1", "aria-label": lab, onchange: function () { st.v = String(i); } }),
         o && o.img ? h("img", { src: P.img(o.img), alt: lab, style: "max-height:90px" }) : lab); })));
     else box.appendChild(h("input", { type: "text", class: "inp", "data-own": "1", "aria-label": "پاسخِ تو", oninput: function (e) { st.v = e.target.value; } }));
-    box.appendChild(h("label", { class: "small" }, "چقدر مطمئنی؟ (۰ تا ۱۰۰) ", h("input", { type: "number", min: 0, max: 100, class: "inp sm", "data-own": "1", "aria-label": "درصدِ اطمینان", oninput: function (e) { st.c = e.target.value; } })));
+    box.appendChild(h("label", { class: "small" }, "چقدر مطمئنی؟ (۰ تا ۱۰۰) ", h("input", { type: "text", inputmode: "numeric", maxlength: 4, class: "inp sm", "data-own": "1", "aria-label": "درصدِ اطمینان", placeholder: "۰ تا ۱۰۰", oninput: function (e) { st.c = e.target.value; } })));
     /* آشنایی: معمای دیده‌شده دشواری‌اش برای تو با جمعیت یکی نیست ⇒ در مقایسه با مردم شمرده نمی‌شود (Stieger & Reips 2016: ۴۴٪ CRT را دیده بودند) */
     box.appendChild(h("label", { class: "small row gap" }, h("input", { type: "checkbox", "data-own": "1", "aria-label": "این معما یا شبیهش را پیش‌تر دیده‌ام", onchange: function (e) { st.fam = e.target.checked; } }), "این معما یا شبیهش را پیش‌تر دیده‌ام"));
     function save(timeout) {
       if (st.done) return; st.done = true; if (timer) clearInterval(timer);
-      var ok = !timeout && (it.options && it.options.length ? st.v !== "" && +st.v === +it.answer : (it.accept || [String(it.answer)]).some(function (re) { try { return new RegExp("^\\s*(" + re + ")\\s*$", "i").test(A.toEnDigits ? A.toEnDigits(st.v) : st.v); } catch (e) { return false; } }));
-      S.put({ id: A.uid("pa"), type: "psyans", item: it.id, ok: ok, timeout: !!timeout, familiar: st.fam, conf: st.c === "" ? null : Math.max(0, Math.min(100, +st.c)), ms: Date.now() - t0, at: new Date().toISOString(), created: new Date().toISOString() });
+      if (S.all("psyans").some(function (a) { return a.item === it.id; })) { A.go("mind"); return; }   // در همین فاصله ثبت شده (مثلاً پایانِ زمان در زبانه‌ای دیگر)
+      var ok = !timeout && P.check(it, st.v);
+      var cv = confVal(st.c);
+      S.put({ id: A.uid("pa"), type: "psyans", item: it.id, ok: ok, timeout: !!timeout, familiar: st.fam, conf: isNaN(cv) ? null : Math.max(0, Math.min(100, cv)), ms: Date.now() - t0, at: new Date().toISOString(), created: new Date().toISOString() });
+      clearOpen(it.id);
       var msg = timeout ? "وقت تمام شد." : ok ? "درست." : "نادرست.";
-      if (it.kind === "descriptive" && it.p != null) { var sc = P.scale(it.scale), grp = (it.group || (sc && sc.bands && sc.bands[0] && sc.bands[0].label) || "نمونهٔ منبع"); msg += " " + fa(Math.round(100 * it.p)) + "٪ ِ " + grp + " درست جواب دادند."; }
+      if (it.kind === "descriptive" && it.p != null) {
+        var bp = P.bandP(it, P.age()), sc = P.scale(it.scale), grp = (it.group || (sc && sc.bands && sc.bands[0] && sc.bands[0].label) || "نمونهٔ منبع");
+        msg += bp ? " " + fa(Math.round(100 * bp.p)) + "٪ ِ " + bp.label + " (هم‌سن‌هایت) درست جواب دادند؛ در کلِ نمونه " + fa(Math.round(100 * it.p)) + "٪." : " " + fa(Math.round(100 * it.p)) + "٪ ِ " + grp + " درست جواب دادند.";
+      }
       A.toast(msg); A.go("mind");
     }
-    box.appendChild(h("button", { class: "btn", type: "button", "data-own": "1", onclick: function () { if (st.v === "") { fb.textContent = "اول جواب بده."; return; } save(false); } }, "ثبتِ پاسخ"));
+    box.appendChild(h("button", { class: "btn", type: "button", "data-own": "1", onclick: function () { if (st.v === "") { fb.textContent = "اول جواب بده."; return; } if (String(st.c).trim() !== "" && isNaN(confVal(st.c))) { fb.textContent = "اطمینان را با یک عدد از ۰ تا ۱۰۰ بنویس (یا خالی بگذار)."; return; } save(false); } }, "ثبتِ پاسخ"));
     /* زمانِ همان اجرای مرجع (مثلاً ۳۰ ثانیهٔ MaRs-IB) — تا دشواری با دادهٔ جمعیت یکی بماند */
     if (it.time_limit_s) {
-      var left = +it.time_limit_s, tl = h("div", { class: "small psy-timer", "aria-live": "polite" }, "زمان: " + fa(left) + " ثانیه");
+      /* ساعت از لحظهٔ نخستین بازشدن می‌شمارد (ماندگار)، نه از هر بار نمایش (M1) */
+      var lim = 1000 * +it.time_limit_s, rem = function () { return Math.max(0, Math.ceil((t0 + lim - Date.now()) / 1000)); };
+      var tl = h("div", { class: "small psy-timer", "aria-live": "polite" }, "زمان: " + fa(rem()) + " ثانیه");
       box.appendChild(tl);
-      timer = setInterval(function () { if (!document.body.contains(tl)) { clearInterval(timer); return; } left--; tl.textContent = "زمان: " + fa(Math.max(0, left)) + " ثانیه"; if (left <= 0) save(true); }, 1000);
+      timer = setInterval(function () { if (!document.body.contains(tl)) { clearInterval(timer); return; } var left = rem(); tl.textContent = "زمان: " + fa(left) + " ثانیه"; if (left <= 0) save(true); }, 1000);
     }
     box.appendChild(fb);
     root.appendChild(box);
@@ -37031,7 +37189,7 @@ APP.goFromURL = function (q) {
     var raw = A.dueList;
     A.dueList = function () {
       var items = raw.apply(this, arguments) || [];
-      if (P.pending().length && !P.answeredToday()) items.push({ k: "p", txt: "🧩 معمای امروز", sub: "یک معمای کوتاه — با فکرِ خودت", go: function () { A.go("psy_item"); }, act: "باز کن" });
+      if (P.canOpenToday()) items.push({ k: "p", txt: "🧩 معمای امروز", sub: "یک معمای کوتاه — با فکرِ خودت", go: function () { A.go("psy_item"); }, act: "باز کن" });
       return items;
     };
     A.dueList._psy = true;
@@ -37053,7 +37211,23 @@ APP.goFromURL = function (q) {
     ].join("\n");
     /* فقط وقتی به کار است در پرامپت می‌آید — پرامپتِ سامانه سقفِ ۲۰ هزار نویسهٔ سرور را دارد (test_assist) */
     AS.promptHooks = AS.promptHooks || [];
-    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((A.state && /^(mind|psy_item)$/.test(A.state.view)) || /تولد|سن[ّم]? |هوش|معما|IQ|ضریب/.test(recent)) ? RULES : ""; });
+    /* قاعدهٔ «هرگز حل نکن» هر وقت معمایی باز و بی‌پاسخ است (در هر نما)، یا پیام تکه‌ای از متنِ یک معما را دارد (L6) — نه فقط با کلیدواژه */
+    function relatesToItem(text) {
+      var t = P.normAns(text).replace(/[«»"'؟?!.,،:؛()\[\]]/g, " ").replace(/\s+/g, " ");
+      if (t.length < 12) return false;
+      return (P.norms().items || []).some(function (it) {
+        if (!it.text) return false;
+        var w = P.normAns(it.text).replace(/[«»"'؟?!.,،:؛()\[\]]/g, " ").replace(/\s+/g, " ").trim().split(" ");
+        for (var i = 0; i + 4 <= w.length; i++) if (t.indexOf(w.slice(i, i + 4).join(" ")) >= 0) return true;
+        return false;
+      });
+    }
+    P.relatesToItem = relatesToItem;
+    AS.promptHooks.push(function (s, msg) {
+      var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" ");
+      var open = false; try { open = P.openItems().length > 0; } catch (e) { }
+      return ((A.state && /^(mind|psy_item)$/.test(A.state.view)) || open || /تولد|سن[ّم]? |هوش|معما|IQ|ضریب/.test(recent) || relatesToItem(recent)) ? RULES : "";
+    });
   }
 })(APP);
 /* ===== «💡 جایگاهِ ایده»: ایده خودش یک موضوع است، با قوت، فرض، مسئله، گره و آنچه بیرون است (مالک ۲۰۲۶-۱۰-۱۵) =====
