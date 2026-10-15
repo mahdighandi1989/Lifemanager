@@ -478,6 +478,51 @@
     if (r.pid === "P11" && !d.__planted) A.toast("زنجیره را با «کاشت در مزرعه» در درخت بکار.");
   };
 
+  /* ---------- «بیان دیگر» در حالتِ مسئله: وارسیِ قطعیِ زنجیرهٔ تحلیل و ترکیب (core3: pa_*) ----------
+     بازخورد نمره نیست؛ فقط آنچه از خودِ جدول برمی‌آید: حلقهٔ بی‌پیشین، گسستِ زنجیره، حلقهٔ یک‌سویه (در ترکیب رو به جلو نمی‌گذرد ⇒
+     جوابِ برآمده فقط «نامزد» است و باید در صورتِ مسئله وارسی شود)، حلقهٔ سنجیده‌نشده، و رسیدن به تناقض ⇒ برهانِ خلف. */
+  function pnorm(x) { return String(x || "").replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, ""); }
+  A.pappusRows = function (d) { return ((d && d.pa_chain) || []).filter(function (r) { return r && (String(r.now || "").trim() || String(r.prev || "").trim()); }); };
+  A.pappusCheck = function (d, part, ch) {
+    var rows = A.pappusRows(d), L = [], box = h("div", { class: "col gap pa-check", dir: "rtl" });
+    function li(cls, t) { L.push(h("li", { class: cls }, t)); }
+    if (part === "analysis") {
+      if (!rows.length) return "";
+      rows.forEach(function (r, i) {
+        if (!String(r.prev || "").trim()) li("bad", "ردیفِ " + fa(i + 1) + ": پیشینِ «" + String(r.now || "").slice(0, 60) + "» هنوز نوشته نشده.");
+        else if (!r.rev) li("warn", "ردیفِ " + fa(i + 1) + ": برگشت‌پذیریِ این حلقه را بسنج — از «" + String(r.prev).slice(0, 40) + "» رو به جلو هم به «" + String(r.now || "").slice(0, 40) + "» می‌رسی؟");
+        var nx = rows[i + 1];
+        if (nx && r.prev && nx.now) { var a = pnorm(r.prev), b = pnorm(nx.now); if (a && b && a.indexOf(b) < 0 && b.indexOf(a) < 0) li("warn", "میانِ ردیفِ " + fa(i + 1) + " و " + fa(i + 2) + " گسست است: پیشینِ یکی «این وضع» ِ بعدی نیست. اگر همان است، با همان واژه‌ها بنویس تا زنجیره پیوسته دیده شود."); }
+      });
+      var one = rows.filter(function (r) { return /^یک‌سویه/.test(r.rev || ""); }), unk = rows.filter(function (r) { return /^هنوز/.test(r.rev || ""); });
+      if (one.length) li("warn", "حلقه‌های یک‌سویه (" + one.map(function (r) { return "ردیفِ " + fa(rows.indexOf(r) + 1); }).join("، ") + "): در ترکیب از این‌ها رو به جلو نمی‌شود گذشت. در مسئلهٔ یافتنی، آنچه از این راه به دست می‌آید فقط «نامزد» است و باید در خودِ صورتِ مسئله وارسی شود؛ در اثبات، شرطِ کافیِ دیگری بجو.");
+      if (unk.length) li("warn", "حلقه‌های سنجیده‌نشده: " + unk.map(function (r) { return "ردیفِ " + fa(rows.indexOf(r) + 1); }).join("، ") + " — پیش از ترکیب بسنج.");
+      if (/^به تناقض/.test(d.pa_end || "")) li("good", "زنجیره به تناقض رسید ⇒ فرضِ «حل شده» ناممکن است: این همان برهانِ خلف است — نقیضِ آن فرض ثابت شد (اگر همهٔ حلقه‌ها از آن فرض لازم می‌آمدند). در بازنگری بپرس: می‌شود همین را مستقیم هم ثابت کرد (همان حلقه‌ها، از دانسته رو به جلو)؟");
+      else if (/^به چیزی دانسته/.test(d.pa_end || "") && !one.length && !unk.length && rows.every(function (r) { return String(r.prev || "").trim() && r.rev; })) li("good", "همهٔ حلقه‌ها برگشت‌پذیرند و زنجیره به دانسته رسید: ترکیب از «" + String(d.pa_known || "همان دانسته").slice(0, 60) + "» با برگرداندنِ حلقه‌ها به ترتیبِ عکس به خواسته می‌رسد.");
+      else if (/^هنوز/.test(d.pa_end || "")) li("warn", "هنوز به دانسته نرسیدی: مسئلهٔ کمکی بساز — بخشی از شرط را نگه دار، یا به مجهول نگاه کن و مسئلهٔ آشنایی با همین مجهول بجو.");
+      box.appendChild(h("ul", { class: "plain small" }, L));
+      box.appendChild(h("div", { class: "row gap wrap" },
+        A.MOVES && A.MOVES.mv_backward ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("move", "mv_backward"); } }, "🧗 حرکتِ «از هدف به عقب»") : null,
+        /^به تناقض/.test(d.pa_end || "") && A.MOVES && A.MOVES.mv_contra ? h("button", { class: "linkish small pa-contra", type: "button", onclick: function () { A.go("move", "mv_contra"); } }, "🧗 حرکتِ «برهانِ خلف»") : null));
+      return box;
+    }
+    var syn = (d.pa_synth || []).filter(function (x) { return String(x || "").trim(); });
+    if (!syn.length) return "";
+    var linked = rows.filter(function (r) { return String(r.prev || "").trim(); }).length;
+    if (syn.length < linked) li("warn", "ترکیب " + fa(syn.length) + " حلقه دارد و تحلیل " + fa(linked) + " — حلقه‌ای جا مانده؟ هر حلقهٔ ترکیب برگشتِ یک حلقهٔ تحلیل است.");
+    if (rows.some(function (r) { return /^یک‌سویه/.test(r.rev || ""); })) li("warn", "در تحلیل حلقهٔ یک‌سویه بود: اگر ترکیب از آن گذشت، جواب را در خودِ صورتِ مسئله وارسی کن (بازنگری).");
+    if (!L.length) li("good", "ترکیب هم‌اندازهٔ تحلیل است. حالا بی‌نگاه بازنگری کن: نتیجه را در حالتی خاص بیازما؛ می‌توانی از راهِ دیگری هم به آن برسی؟");
+    box.appendChild(h("ul", { class: "plain small" }, L));
+    // تکرارِ فاصله‌دار: همین تحلیل یک کارتِ مرور می‌شود (فردا و روزهای بعد در «مرور» و «امروز»)
+    if (d.pa_card && S.get(d.pa_card)) box.appendChild(h("p", { class: "small good" }, "کارتِ مرورِ این تحلیل ساخته شده؛ در «مرور» برمی‌گردد."));
+    else box.appendChild(h("button", { class: "btn ghost sm pa-mkcard", type: "button", onclick: function () {
+      var q = "بی‌نگاه: مسئلهٔ «" + String(d.fruit || d.pa_goal || "").slice(0, 120) + "» را از آخر تحلیل کن — فرض کن حل شده؛ زنجیره به کدام دانسته می‌رسد و کدام حلقه برگشت‌پذیر نیست؟";
+      var a = rows.map(function (r, i) { return (i + 1) + ") " + (r.now || "") + " ⇐ " + (r.prev || "") + (r.rev ? " [" + r.rev.split(":")[0] + "]" : ""); }).join("\n") + (d.pa_known ? "\nدانسته: " + d.pa_known : "") + "\nترکیب: " + syn.join(" ⇒ ");
+      var cd = A.newCard(q, a, { due: A.addDays(A.today(), 1), src: "P11:pappus" }); d.pa_card = cd && cd.id; if (ch) ch(); A.toast("کارتِ مرور ساخته شد؛ از فردا در «مرور».");
+    } }, "کارتِ مرورِ همین تحلیل بساز"));
+    return box;
+  };
+
   /* ---------- مسیر یکپارچه (روی صفحه موضوع) ---------- */
   A.pipelineStatus = function (topic) {
     var id = topic.id;
@@ -490,9 +535,10 @@
     return {
       S11: prDone("P2") || prDone("P5"),
       S1: !!topic.kind, S2: phaseDone(1) || prDone("P8"), S3: prDone("P1"),
-      S4: (d.descent || []).some(function (x) { return x && x.what; }),
+      // حالتِ «مسئله» (تحلیل و ترکیب): یک حلقهٔ تحلیل = فرود؛ ترکیب = بازسازیِ رو به بالا
+      S4: (d.descent || []).some(function (x) { return x && x.what; }) || A.pappusRows(d).some(function (x) { return String(x.prev || "").trim(); }),
       S5: planted, S6: phaseDone(4),
-      S7: A.filled(d.seed) || phaseDone(5), S8: A.filled(d.ascent) || exDone([28, 26, 27]),
+      S7: A.filled(d.seed) || phaseDone(5), S8: A.filled(d.ascent) || A.filled(d.pa_synth) || exDone([28, 26, 27]),
       S9: (d.cmp__open && A.filled(d.cmp)) || phaseDone(7), S10: prDone("P3"), p11: p11
     };
   };

@@ -154,12 +154,14 @@
       var ctl = FIELD[f.t] ? FIELD[f.t](f, data, changed, id, updaters, opts) : h("div", { class: "muted" }, "نوع فیلد ناشناخته: " + f.t);
       box.appendChild(ctl);
       if (hint && ["text", "area", "list", "chain", "tree"].indexOf(f.t) < 0) box.appendChild(h("div", { class: "fhint" }, hint));
+      // فیلدِ شرطی (when/unless): فقط وقتی دیده و «الزامی» است که شرطش برقرار باشد — مثلاً حالتِ «مسئله» ِ «بیان دیگر» (P11)
+      if (f.when || f.unless) { var vis = function () { box.style.display = A.wsShown(f, data) ? "" : "none"; }; vis(); updaters.push(vis); }
       root.appendChild(box);
     });
     root._validate = function () {
       var missing = [];
       fields.forEach(function (f) {
-        if (!f.req) return;
+        if (!f.req || !A.wsShown(f, data)) return;
         var ok = A.filled(data[f.k]);
         // data-driven table constraints (audit B27): distinct values in a column / at least one matching row
         if (ok && Array.isArray(data[f.k]) && (f.distinct || f.needOne)) {
@@ -185,7 +187,18 @@
     return root;
   };
 
+  /* شرطِ نمایشِ فیلد: when = {k, re} (فیلدِ k با الگو بخواند) و unless (نخواند). بی شرط ⇒ همیشه. */
+  A.wsShown = function (f, d) {
+    function m(c) { var v = (d || {})[c.k]; try { return new RegExp(c.re).test(String(v == null ? "" : v)); } catch (e) { return false; } }
+    return !(f.when && !m(f.when)) && !(f.unless && m(f.unless));
+  };
   var FIELD = {};
+  /* فیلدِ محاسبه‌ای: f.calc(data) ⇒ گرهٔ DOM یا متن، با هر تغییرِ همین کاربرگ تازه می‌شود (بازخوردِ قطعی، نه نمره) */
+  FIELD.calc = function (f, d, ch, id, updaters) {
+    var box = h("div", { class: "fcalc", id: id, role: "status", "aria-live": "polite" });
+    function up() { box.innerHTML = ""; var r = null; try { r = f.calc(d, ch); } catch (e) { r = null; } if (r == null || r === "") return; box.appendChild(typeof r === "string" ? h("p", { class: "small" }, r) : r); }
+    up(); updaters.push(up); return box;
+  };
   FIELD.info = function (f) { return h("div", { class: "finfo" }, h("strong", {}, f.l), f.h ? h("div", {}, f.h) : null); };
   FIELD.text = function (f, d, ch, id) {
     return h("input", { id: id, type: "text", value: d[f.k] || "", placeholder: f.h || "", oninput: function (e) { d[f.k] = e.target.value; ch(); } });
