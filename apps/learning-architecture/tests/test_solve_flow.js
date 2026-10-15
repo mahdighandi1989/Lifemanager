@@ -40,12 +40,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // ثبتِ ناقص رد می‌شود؛ کامل ⇒ مقایسه با صورت ⇒ خودداوری ⇒ ذخیره + نوبتِ فردا
     await p.click('main .sv-usave'); await p.waitForTimeout(60);
     chk(!(await p.locator('main .sv-ucmp').count()), 'incomplete understanding accepted');
-    await p.fill('#svU1', 'مربعی هم‌مساحتِ دایره با خط‌کش و پرگار'); await p.fill('#svD1', 'یک دایره با شعاعِ معلوم'); await p.fill('#svC1', 'فقط خط‌کشِ بی‌درجه و پرگار\nشمارِ گام‌ها متناهی');
+    await p.fill('#svU1', 'مربعی هم‌مساحتِ دایره با خط‌کش و پرگار'); await p.fill('#svD1', '۱۲');   /* دادهٔ عددیِ کوتاه پذیرفته می‌شود (ممیزیِ دورِ ۳) */ await p.fill('#svC1', 'فقط خط‌کشِ بی‌درجه و پرگار\nشمارِ گام‌ها متناهی');
     await p.selectOption('#svSuff1', 'هنوز نمی‌دانم'); await p.fill('#svFig1', 'r = شعاع، s = ضلعِ مربع، s² = πr²'); await p.check('#svDrawn1');
     /* R3 (۲۰۲۶-۱۰-۱۵): حدس در «نخستین برخورد» (این‌جا سطحِ ۱، پیش از دیدنِ هر گامی)، نه در سطحِ ۳ — بی حدس ثبت نمی‌شود */
     await p.click('main .sv-usave'); await p.waitForTimeout(60);
     chk(!(await p.locator('main .sv-ucmp').count()), 'first-attempt card saved without a guess');
-    await p.fill('#svGuess1', 'به نظرم ناممکن است'); await p.selectOption('#svConf1', '80'); await p.fill('#svTest1', 'حالتِ خاص: اگر π گویا بود ساختنی می‌شد؛ پس همه‌چیز به ماهیتِ π بسته است'); await p.selectOption('#svTestR1', 'حدس سالم ماند');
+    await p.fill('#svGuess1', '۶۶');   /* حدسِ عددیِ کوتاه پذیرفته می‌شود (ممیزیِ دورِ ۳: «۶۶» رد می‌شد) */ await p.selectOption('#svConf1', '80'); await p.fill('#svTest1', 'حالتِ خاص: اگر π گویا بود ساختنی می‌شد؛ پس همه‌چیز به ماهیتِ π بسته است'); await p.selectOption('#svTestR1', 'حدس سالم ماند');
     await p.click('main .sv-usave'); await p.waitForTimeout(60);
     chk(await p.locator('main .sv-ucmp').count() === 1, 'no comparison with statement after save');
     chk(await p.locator('main .sv-u .sv-grade[data-own]').count() === 1, 'self-grade not owner-only');
@@ -54,7 +54,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const tmr = await p.evaluate(() => APP.addDays(APP.today(), 1));
     chk(s && s.u[1] && s.u[1].done && s.u[1].self === 2 && s.u[1].type === 'find' && /متناهی/.test(s.u[1].c) && s.u[1].drawn === true, 'u[1] not saved ' + JSON.stringify(s && s.u));
     chk(s.rev.u && s.rev.u.due === tmr && s.rev.u.iv === 0, 'understanding not scheduled for tomorrow ' + JSON.stringify(s.rev));
-    chk(s.g[1] && s.g[1].conf === 80 && /ناممکن/.test(s.g[1].guess) && /π/.test(s.g[1].test) && s.g[1].before === true && s.rev.g && s.rev.g.due === tmr, 'first-attempt guess not saved/scheduled ' + JSON.stringify(s.g));
+    chk(s.g[1] && s.g[1].conf === 80 && s.g[1].guess === '۶۶' && s.u[1].d === '۱۲' && /π/.test(s.g[1].test) && s.g[1].before === true && s.rev.g && s.rev.g.due === tmr, 'first-attempt guess not saved/scheduled ' + JSON.stringify(s.g));
     chk(!(await p.locator('main .sv-u').count()) && await p.locator('main .simcard .sv-usum').count() === 1, 'card not replaced by summary in step');
     // گامِ n1 گامِ «وارسی/داوری» بی‌برچسب است ⇒ پس از پاسخ برچسبِ «بازنگری»
     await p.evaluate(() => { const s = window.EPI_PROBLEMS.find(x => x.id === 'pb_greek').stages[0]; [...document.querySelectorAll('.simcard .dopt')].find(b => s.opts.find(o => o.t === b.textContent).ok).click(); });

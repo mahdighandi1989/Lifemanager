@@ -154,10 +154,10 @@
     box.appendChild(planList(d.type));
     var out = h("div", { "aria-live": "polite", class: "col gap" });
     box.appendChild(h("button", { class: "btn sv-usave", type: "button", onclick: function (e) {
-      var miss = [[d.u, T.u], [d.d, T.d], [d.c, T.c]].filter(function (x) { return txt(x[0]).length < 3; }).map(function (x) { return "«" + x[1] + "»"; });
+      var miss = [[d.u, T.u], [d.d, T.d], [d.c, T.c]].filter(function (x) { return !txt(x[0]); }).map(function (x) { return "«" + x[1] + "»"; });
       if (!d.suff) miss.push("«" + T.suff + "»");
-      if (fresh && txt(d.guess).length < 3) miss.push("«حدس»");
-      if (fresh && txt(d.guess).length >= 3 && !txt(d.test)) miss.push("«آزمونِ حدس»");
+      if (fresh && !txt(d.guess)) miss.push("«حدس»");   // عددِ کوتاه («۶۶»، «۱۲») هم پاسخِ کامل است (ممیزیِ دورِ ۳)
+      if (fresh && txt(d.guess) && !txt(d.test)) miss.push("«آزمونِ حدس»");
       if (miss.length) { A.toast("اول این‌ها را بنویس: " + miss.join("، "), "bad"); return; }
       e.currentTarget.disabled = true;
       out.appendChild(h("div", { class: "card soft small sv-ucmp" }, h("strong", {}, "صورتِ مسئله:"), String(p.statement || "").split("\n").map(function (x) { return h("p", {}, x); }),
