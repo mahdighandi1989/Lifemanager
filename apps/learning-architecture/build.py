@@ -79,6 +79,19 @@ def systerr_js():
             "window.SYS_TERR_LEDGER = " + json.dumps(led, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n")
 
 
+def sources_js():
+    """«📚 منبع‌ها و پوشش»: هر کتاب/منبعِ بیرونی که مالک می‌فرستد (sources/<id>/source.json + items.json + coverage.json) ⇒ پیش از کدِ صفحه."""
+    out = []
+    for d in sorted(glob.glob(os.path.join(B, "sources", "*", "source.json"))):
+        base = os.path.dirname(d)
+        meta = json.loads(rd(d))
+        meta["items"] = json.loads(rd(os.path.join(base, "items.json")))
+        cp = os.path.join(base, "coverage.json")
+        meta["coverage"] = json.loads(rd(cp)) if os.path.exists(cp) else {"verdicts": {}, "beyond": []}
+        out.append(meta)
+    return "window.SRC_COV = " + json.dumps(out, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n"
+
+
 def copy_norm_images():
     """تصویرهای معماهای لنگردار (norms/img) ⇒ کنارِ بسته (public/assets/lla/norms/img) و کنارِ فایلِ مستقل (dist/norms/img)."""
     src = os.path.join(B, "norms", "img")
@@ -105,11 +118,11 @@ def sources():
     techs = [rd(os.path.join(TD, "t_%s.js" % x)) for x in "abcde"]
     techs[0] += "\n" + rd(os.path.join(TD, "src_a.js"))
     techs[1] += "\n" + rd(os.path.join(TD, "src_b.js"))
-    app = systerr_js() + norms_js() + "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
+    app = systerr_js() + norms_js() + sources_js() + "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
                                                    "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js", "a10_nav.js", "a11_course.js",
                                                    "a12_mirror.js", "a13_epi_course.js", "a14_sims.js", "a15_journey.js",
                                                    "a16_knots.js", "a17_kpractice.js", "a18_kmap.js", "a19_moves.js", "a20_similar.js",
-                                                   "a21_orient.js", "a22_btlive.js", "a23_found.js", "a24_territory.js", "a25_graph.js", "a26_assist.js", "a27_tour.js", "a28_systerr.js", "a29_mind.js", "a30_report.js", "a31_tools.js", "a32_sieve.js", "a33_dates.js", "a34_psy.js", "a35_idea.js"]
+                                                   "a21_orient.js", "a22_btlive.js", "a23_found.js", "a24_territory.js", "a25_graph.js", "a26_assist.js", "a27_tour.js", "a28_systerr.js", "a29_mind.js", "a30_report.js", "a31_tools.js", "a32_sieve.js", "a33_dates.js", "a34_psy.js", "a35_idea.js", "a36_sources.js"]
                                                   if os.path.exists(os.path.join(A, f)))
     epibook = rd(os.path.join(A, "epi_book.js"))
     epidata = rd(os.path.join(A, "epi_core.js")) + "\n" + "".join(rd(os.path.join(A, "epi_st_%s.js" % x)) + "\n" for x in "abcd")

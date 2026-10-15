@@ -66,7 +66,7 @@ function sourceRecordTypes() {
       ['lesson', APP.COURSE_LESSONS.map(l => (l.pid || l.tid) + '@' + l.w)], ['struct', C.STRUCTURES.map(x => x.id)], ['concept', EPI_CO.map(x => x.id)],
       ['drill', EPI_DR.map(x => x.id)], ['dossier', EPI_DOS.map(x => x.id)], ['event', EPI_BT_LEDGER.results.cases.map(x => x.id)], ['tool', ['FARM', 'ATLAS']],
       ['ssys', SYS_TERR.systems.map(m => m.id)], ['sarea', [].concat(...SYS_TERR.systems.map(m => [].concat(...m.groups.map(g => g.areas.map(a => a.id)))))],
-      ['view', Object.keys(APP.V)], ['psyc', APP.PSY.CONSTRUCTS.map(c => c.id)]];
+      ['view', Object.keys(APP.V)], ['psyc', APP.PSY.CONSTRUCTS.map(c => c.id)], ['src', (window.SRC_COV || []).map(s => s.id)], ['srcitem', [].concat(...(window.SRC_COV || []).map(s => s.items.map(i => s.id + '/' + i.id)))]];
     reg.forEach(([t, ids]) => ids.forEach(id => { if (!has(t, id)) miss.push(t + ':' + id); }));
     const dangling = M.edges.filter(e => !M.nodes[e.a] || !M.nodes[e.b]).length;
     const stTech = EPI_ST.reduce((n, s) => n + (s.tech || []).length, 0), famSt = APP.KF.reduce((n, f) => n + (f.epi || []).length, 0);

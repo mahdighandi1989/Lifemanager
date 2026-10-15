@@ -203,6 +203,21 @@
       "ledger": "apps/learning-architecture/norms/norms.json"
     },
     {
+      "id": "lla-sources",
+      "fa": "منبع‌های بیرونی و پوششِ آن‌ها در سامانه («📚 منبع‌ها و پوشش»: کتاب‌هایی که مالک می‌فرستد)",
+      "page": true,
+      "owner": [
+        "general",
+        "urgent"
+      ],
+      "paths": [
+        "apps/learning-architecture/sources/*"
+      ],
+      "tool": "خوانندگانِ مستقل + فهرستِ تونل‌ها با اجرای صفحه + داورِ پوشش ⇒ sources/<id>/; node apps/learning-architecture/tests/test_sources.js",
+      "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
+      "ledger": "apps/learning-architecture/sources/*/coverage.json"
+    },
+    {
       "id": "lla-page",
       "fa": "بقیهٔ صفحهٔ «معماری یادگیری» (نماها، فرم‌ها، دستیار، سامانهٔ یادگیری، گره‌گشا، مسئله‌ها)",
       "page": true,

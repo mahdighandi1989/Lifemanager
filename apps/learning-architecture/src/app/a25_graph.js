@@ -33,7 +33,9 @@
     { t: "prun", fa: "اجرای پروتکل", sys: "mine" }, { t: "card", fa: "کارتِ مرور", sys: "mine" }, { t: "pbitem", fa: "تمرینِ مسئلهٔ هم‌ساختار", sys: "mine" },
     /* «📐 سنجشِ استاندارد» (a34_psy): سازه‌های جهانی (ثبت‌گاه) و پاسخ‌های تو به معماهای لنگردار */
     { t: "psyc", fa: "سازهٔ روان‌سنجی", sys: "learn" }, { t: "psyans", fa: "پاسخِ معمای لنگردار", sys: "mine" },
-    { t: "idea", fa: "ایدهٔ تو", sys: "mine" }
+    { t: "idea", fa: "ایدهٔ تو", sys: "mine" },
+    /* «📚 منبع‌ها و پوشش» (a36_sources): کتاب‌های بیرونی و موردهایشان، با پیوند به تونلِ موجودی که هر مورد در آن زندگی می‌کند */
+    { t: "src", fa: "منبعِ بیرونی (کتاب)", sys: "learn" }, { t: "srcitem", fa: "موردِ منبع", sys: "learn" }
   ];
   G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
   G.REL = { in: "عضوِ", req: "پیش‌نیازِ", feeds: "تغذیه می‌کند", pairs: "مکمل", uses: "به کار می‌برد", serves: "پاسخ به دغدغه", core: "تکنیکِ اصلیِ گام",
@@ -71,6 +73,18 @@
     /* نماهای صفحه — همه از A.V (نامشان از منو/VIEW_FA)؛ ارجاعِ «view:…» به این‌ها */
     var navLab = {}; (A.NAV || []).concat(A.EPI_NAV || [], [A.NAV_WHOLE, A.NAV_MAPS, A.NAV_SETTINGS, A.NAV_START]).forEach(function (n) { if (Array.isArray(n) && n[0] && !navLab[n[0]]) navLab[n[0]] = n[1]; });
     Object.keys(A.V || {}).forEach(function (v) { node("view", v, "نما: " + ((A.VIEW_FA && A.VIEW_FA[v]) || navLab[v] || v), { go: [v] }); });
+    (W.SRC_COV || []).forEach(function (src) {
+      node("src", src.id, "📚 " + src.title, { go: ["sources", src.id] });
+      var V = (src.coverage || {}).verdicts || {};
+      (src.items || []).forEach(function (it) {
+        var v = V[it.id] || {}, k = src.id + "/" + it.id;
+        node("srcitem", k, (v.verdict ? "[" + v.verdict + "] " : "") + String(it.name_fa || it.id).slice(0, 60), { go: ["sources", src.id] });
+        edge(ref("srcitem", k), ref("src", src.id), "in");
+        /* فقط به گره‌های موجودِ گراف وصل می‌شود؛ شناسه‌های بی‌گره (گامِ گره‌گشا، کاوش، …) در خودِ نما می‌آیند */
+        (v.system || []).forEach(function (sid) { var p = String(sid).split(":"), t2 = p[0], id2 = p.slice(1).join(":"); if (t2 === "tech") id2 = String(parseInt(id2, 10));
+          if ({ tech: 1, move: 1, kfam: 1, station: 1, proto: 1 }[t2] && N[ref(t2, id2)]) edge(ref("srcitem", k), ref(t2, id2), "covers"); });
+      });
+    });
     if (A.PSY) A.PSY.CONSTRUCTS.forEach(function (c) { node("psyc", c.id, "📐 " + c.fa, { go: ["mind"] }); edge(ref("psyc", c.id), ref("view", "mind"), "in"); });
     /* ---------- دادهٔ خودِ تو ---------- */
     var all = function (t) { try { return (S && S.all) ? S.all(t) : []; } catch (e) { return []; } };
