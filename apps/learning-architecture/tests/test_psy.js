@@ -37,7 +37,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const t = APP.today(), exp = (+t.slice(0, 4) - 1989) - (t.slice(5) < '03-08' ? 1 : 0);
     out.age = P.age() === exp;
     out.today = APP.dueList().some(x => /معمای امروز/.test(x.txt));
-    APP.go('psy_item'); await new Promise(r => setTimeout(r, 150));
+    APP.go('psy_item', 'g1'); await new Promise(r => setTimeout(r, 150));
     const own = [...document.querySelectorAll('#main .psy-q input, #main .psy-q button')];
     out.ownOnly = own.length >= 3 && own.every(x => x.getAttribute('data-own') === '1');
     document.querySelectorAll('#main input[type=radio]')[[...document.querySelectorAll('#main input[type=radio]')].findIndex(x => x.getAttribute('aria-label') === '۱۶')].click();
@@ -50,6 +50,29 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // بی دادهٔ سن‌به‌سن در منبع ⇒ کلِ نمونه با اعلامِ صریح
     S.put({ id: 'pa2', type: 'psyans', item: 'g2', ok: false, at: new Date().toISOString() });
     out.popUpd = P.popEst('Gf').n === 2;
+    // نسخهٔ ۲: مقیاس‌ها جدا (هرگز روی هم نمی‌ریزند)، کفِ حدس ۱/k، معمای «دیده‌شده» در مقایسه شمرده نمی‌شود، گویهٔ توصیفی فقط درصدِ گروه
+    window.PSY_NORMS.scales = [{ id: 'sA', construct: 'Gf', bands: [{ lo: 30, hi: 39, mu: 0.3, sd: 1.1, label: 'گروهِ آزمونیِ ۳۰ تا ۳۹' }] }, { id: 'sB', construct: 'Gf', bands: [{ all: true, mu: 0, sd: 1, label: 'کلِ نمونهٔ ب' }] }];
+    window.PSY_NORMS.items.push({ id: 'a1', scale: 'sA', construct: 'Gf', text: 'الف', options: [{ t: 'x' }, { t: 'y' }, { t: 'z' }, { t: 'w' }], answer: 0, b: 0 },
+      { id: 'b1', scale: 'sB', construct: 'Gf', text: 'ب', options: [{ t: 'x' }, { t: 'y' }], answer: 0, b: 1 },
+      { id: 'd1', scale: 'sB', construct: 'RQ', kind: 'descriptive', text: 'توصیفی', options: [{ t: 'x' }, { t: 'y' }], answer: 1, p: 0.31, group: 'بزرگسالانِ ۳۰ تا ۴۹ سالهٔ نمونه' });
+    S.put({ id: 'pa3', type: 'psyans', item: 'a1', ok: true, at: new Date().toISOString() });
+    S.put({ id: 'pa4', type: 'psyans', item: 'b1', ok: true, at: new Date().toISOString(), familiar: true });
+    const pg = P.popEst('Gf');
+    out.scalesApart = pg.scales.length === 2 && pg.scales.some(s => s.scale === 'sA' && s.n === 1 && /گروهِ آزمونیِ/.test(s.peers));
+    out.famOut = !pg.scales.some(s => s.scale === 'sB');
+    // کفِ حدس: با ۴ گزینه، پاسخِ درست کمتر از ۲ گزینه‌ای خبر می‌دهد
+    S.put({ id: 'pa5', type: 'psyans', item: 'b1', ok: true, at: new Date().toISOString() });
+    out.guess = P.scaleEst('sA').theta < P.scaleEst('sB').theta + 1 && P.scaleEst('sA').sdTheta > 0;
+    out.descNoTheta = !P.isAnchor(P.item('d1'));
+    APP.go('psy_item', 'd1'); await new Promise(r => setTimeout(r, 120));
+    document.querySelectorAll('#main .psy-q input[type=radio]')[1].click();
+    let toastTxt = ''; const ot = APP.toast; APP.toast = m => { toastTxt = m; };
+    [...document.querySelectorAll('#main button')].find(x => /ثبتِ پاسخ/.test(x.textContent)).click(); APP.toast = ot;
+    out.descMsg = /۳۱٪ ِ بزرگسالانِ ۳۰ تا ۴۹ سالهٔ نمونه درست جواب دادند/.test(toastTxt);
+    // زمانِ مرجع: پایانِ زمان ⇒ «وقت تمام شد»، نادرست
+    window.PSY_NORMS.items.push({ id: 't1', scale: 'sA', construct: 'Gf', text: 'زمان‌دار', options: [{ t: 'x' }, { t: 'y' }], answer: 0, b: 0, time_limit_s: 1 });
+    APP.go('psy_item', 't1'); await new Promise(r => setTimeout(r, 1500));
+    const tr = S.all('psyans').find(a => a.item === 't1'); out.timeout = !!tr && tr.timeout === true && tr.ok === false;
     // کارنامه: بی «نمره/مرحله»؛ بخشِ استاندارد؛ ضریبِ کل ساخته نمی‌شود؛ سازه‌های سنجیده‌نشدنی صریح
     APP.go('mind'); await new Promise(r => setTimeout(r, 300));
     const main = document.getElementById('main').innerText, ths = [...document.querySelectorAll('#main th')].map(x => x.textContent);

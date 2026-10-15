@@ -33694,32 +33694,62 @@ APP.goFromURL = function (q) {
     function pr(b) { var s = 0, dz = 0.05; for (var z = -6; z <= 6; z += dz) s += sig(z - b) * phi(z) * dz; return s; }
     var lo = -8, hi = 8; for (var i = 0; i < 60; i++) { var m = (lo + hi) / 2; if (pr(m) > p) lo = m; else hi = m; } return (lo + hi) / 2;
   };
-  function bOf(it) { return it.b != null ? +it.b : it.p != null ? P.bFromP(+it.p) : null; }
+  /* گویهٔ «لنگر» (در θ به کار می‌رود) فقط با b ِ وارسی‌شده؛ گویهٔ «توصیفی» (کلامی/مشهور) فقط «X٪ ِ گروه درست جواب دادند» */
+  function bOf(it) { if (!it || it.kind === "descriptive") return null; return it.b != null ? +it.b : it.p != null ? P.bFromP(+it.p) : null; }
+  P.isAnchor = function (it) { return !!it && it.kind !== "descriptive" && bOf(it) != null; };
+  P.scale = function (id) { return (P.norms().scales || []).filter(function (s) { return s.id === id; })[0] || null; };
+  /* کفِ حدس = ۱/شمارِ گزینه‌ها: بی‌دانستن هیچ گزینه بر دیگری مرجح نیست (A4) — قرارداد نیست */
+  function cOf(it) { return it.c != null ? +it.c : (it.options && it.options.length ? 1 / it.options.length : 0); }
+  function prc(th, it) { var c = cOf(it); return c + (1 - c) * sig(th - bOf(it)); }
   /* سن از تاریخِ تولدِ ثبت‌شده در تنظیمات (خودِ کاربر یا دستیار از حرفِ کاربر) */
   P.birth = function () { var p = (S.settings().profile) || {}; return /^\d{4}-\d{2}-\d{2}$/.test(p.birth || "") ? p.birth : ""; };
   P.age = function () { var b = P.birth(); if (!b) return null; var t = A.today(), y = +t.slice(0, 4) - +b.slice(0, 4); if (t.slice(5) < b.slice(5)) y--; return y; };
-  /* گروهِ هم‌سن در منبعِ همان گویه: {mu, sd} بر مقیاسِ θ ِ کلِ نمونه؛ نبود ⇒ کلِ نمونه با اعلامِ صریح */
-  function peers(it, age) {
-    var bands = (it.age && it.age.bands) || [];
+  /* گروهِ مرجع روی مقیاسِ همان منبع: بازهٔ سنیِ شامل ِ سنِ تو؛ نبود ⇒ کلِ نمونهٔ همان مقیاس با اعلامِ صریح (نسخهٔ ۱: age.bands روی گویه) */
+  function peers(scaleOrItem, age) {
+    var bands = (scaleOrItem && (scaleOrItem.bands || (scaleOrItem.age && scaleOrItem.age.bands))) || [];
     var b = age == null ? null : bands.filter(function (x) { return age >= x.lo && age <= x.hi && x.mu != null; })[0];
-    return b ? { mu: +b.mu, sd: +(b.sd || 1), label: "هم‌سن‌ها (" + fa(b.lo) + " تا " + fa(b.hi) + " سال) در همان منبع", aged: true } : { mu: 0, sd: 1, label: "کلِ نمونهٔ همان منبع (سن‌به‌سن در منبع نیست" + (age == null ? "؛ سنت هم ثبت نشده" : "") + ")", aged: false };
+    if (b) return { mu: +b.mu, sd: +(b.sd || 1), label: b.label || "هم‌سن‌ها (" + fa(b.lo) + " تا " + fa(b.hi) + " سال) در همان منبع", aged: true };
+    var all = bands.filter(function (x) { return x.all && x.mu != null; })[0];
+    return all ? { mu: +all.mu, sd: +(all.sd || 1), label: (all.label || "کلِ نمونهٔ همان منبع") + (age == null ? " (سنت ثبت نشده)" : " (برای سنِ تو بازه‌ای در منبع نیست)"), aged: false } :
+      { mu: 0, sd: 1, label: "کلِ نمونهٔ همان منبع (سن‌به‌سن در منبع نیست" + (age == null ? "؛ سنت هم ثبت نشده" : "") + ")", aged: false };
   }
-  /* پسینِ θ روی شبکه با پیشینِ جمعیتِ هم‌سن (همان توزیعِ منبع) ⇒ P(بالاتر از میانهٔ هم‌سن‌ها)، صدکِ مورد انتظار */
-  P.popEst = function (cid) {
-    var age = P.age(), ans = S.all("psyans").filter(function (a) { var it = P.item(a.item); return it && it.construct === cid && bOf(it) != null; });
-    if (!ans.length) return { n: 0 };
-    var first = P.item(ans[0].item), pe = peers(first, age), post = [], th, sum = 0;
-    for (th = -6; th <= 6.0001; th += 0.02) {
+  /* پسینِ θ روی شبکه (هر مقیاس جدا؛ مقیاس‌های دو منبع هرگز روی هم ریخته نمی‌شوند) */
+  function posterior(ans, pe) {
+    var post = [], sum = 0;
+    for (var th = -6; th <= 6.0001; th += 0.02) {
       var ll = Math.log(phi((th - pe.mu) / pe.sd) / pe.sd);
-      ans.forEach(function (a) { var it = P.item(a.item), pr = sig(th - bOf(it)); ll += okv(a.ok) ? Math.log(pr) : Math.log(1 - pr); });
-      post.push([th, Math.exp(ll)]); sum += Math.exp(ll);
+      ans.forEach(function (a) { var it = P.item(a.item), pr = prc(th, it); ll += okv(a.ok) ? Math.log(pr) : Math.log(1 - pr); });
+      post.push([th, ll]);
     }
-    var above = 0, pct = 0;
-    post.forEach(function (q) { var w = q[1] / sum; if (q[0] > pe.mu) above += w; var z = (q[0] - pe.mu) / pe.sd, cdf = 0.5 * (1 + erf(z / Math.SQRT2)); pct += w * cdf; });
-    var srcs = {}; ans.forEach(function (a) { var it = P.item(a.item); if (it.src) srcs[it.src] = 1; });
-    return { n: ans.length, k: ans.filter(function (a) { return okv(a.ok); }).length, pAbove: above, pct: pct, peers: pe.label, aged: pe.aged, srcs: Object.keys(srcs) };
+    var mx = Math.max.apply(null, post.map(function (q) { return q[1]; }));
+    post.forEach(function (q) { q[1] = Math.exp(q[1] - mx); sum += q[1]; });
+    post.forEach(function (q) { q[1] /= sum; });
+    return post;
+  }
+  function usable(a) { var it = P.item(a.item); return P.isAnchor(it) && !a.familiar && !a.skipped; }
+  P.scaleEst = function (sid, extra) {
+    var age = P.age(), sc = P.scale(sid), ans = S.all("psyans").filter(function (a) { var it = P.item(a.item); return usable(a) && (it.scale || "_" + it.construct) === sid; }).concat(extra || []);
+    var first = ans[0] && P.item(ans[0].item), pe = peers(sc || first, age);
+    var post = posterior(ans, pe), above = 0, pct = 0, mean = 0, v = 0;
+    post.forEach(function (q) { if (q[0] > pe.mu) above += q[1]; mean += q[0] * q[1]; pct += q[1] * 0.5 * (1 + erf((q[0] - pe.mu) / pe.sd / Math.SQRT2)); });
+    post.forEach(function (q) { v += q[1] * (q[0] - mean) * (q[0] - mean); });
+    var srcs = {}; ans.forEach(function (a) { var it = P.item(a.item); if (it && it.src) srcs[it.src] = 1; });
+    return { scale: sid, n: ans.length, k: ans.filter(function (a) { return okv(a.ok); }).length, pAbove: above, pct: pct, theta: mean, sdTheta: Math.sqrt(v), peers: pe.label, aged: pe.aged, srcs: Object.keys(srcs) };
+  };
+  /* هر سازه: فهرستِ برآوردِ مقیاس‌هایش؛ برای سازگاری، نخستین مقیاس هم در خودِ شیء */
+  P.popEst = function (cid) {
+    var sids = {}; S.all("psyans").forEach(function (a) { var it = P.item(a.item); if (usable(a) && it.construct === cid) sids[it.scale || "_" + cid] = 1; });
+    var list = Object.keys(sids).map(function (sid) { return P.scaleEst(sid); });
+    if (!list.length) return { n: 0, scales: [] };
+    var o = Object.assign({}, list[0]); o.scales = list; return o;
   };
   function erf(x) { var t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; }
+  /* نشانیِ تصویرِ گویه: کنارِ بسته (/assets/lla/) یا کنارِ فایلِ مستقل (dist/) */
+  P.img = function (path) {
+    if (!path) return "";
+    var s = document.querySelector('script[src*="/assets/lla/lla."]');
+    return (s ? s.src.replace(/[^\/]*$/, "") : "") + path;
+  };
 
   /* مدلِ کامل برای کارنامه، ایمیل و دستیار */
   P.model = function () {
@@ -33749,7 +33779,7 @@ APP.goFromURL = function (q) {
         return h("tr", { "data-c": c.id }, h("td", { title: c.en }, c.fa), h("td", { class: "small" }, c.from),
           h("td", {}, e.n ? P.pctFa(e.next) + " (" + fa(e.k) + " از " + fa(e.n) + ")" + meta : "— (هنوز پاسخی نیست)"),
           h("td", {}, e.progress ? P.pctFa(e.progress.p) + " (" + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"),
-          h("td", { class: "small" }, p.n ? "احتمالِ بالاتر بودن از میانهٔ " + p.peers + ": " + P.pctFa(p.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * p.pct)) + " (" + fa(p.k) + " از " + fa(p.n) + " معمای لنگردار)" :
+          h("td", { class: "small" }, p.n ? (p.scales || [p]).map(function (q) { return "احتمالِ بالاتر بودن از میانهٔ " + q.peers + ": " + P.pctFa(q.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * q.pct)) + " (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار)"; }).join(" | ") :
             (N.items || []).some(function (it) { return it.construct === c.id; }) ? "هنوز معمای لنگرداری در این سازه جواب نداده‌ای" : "هنوز معمای لنگرداری با دادهٔ جمعیتیِ وارسی‌شده برای این سازه در فهرست نیست"));
       }))));
     sec.appendChild(h("p", { class: "small" }, h("b", {}, "ضریبِ هوشیِ کل: "), "ساخته نمی‌شود. «ضریبِ هوشیِ کل» فقط از آزمونِ هنجاریابی‌شده و کنترل‌شده معتبر است. این صفحه آن آزمون نیست. به جایش، هر سازه جدا و با منبع با مردم مقایسه می‌شود."));
@@ -33761,32 +33791,55 @@ APP.goFromURL = function (q) {
     return sec;
   };
 
-  /* ---------- معمای امروز (لنگردار) — پاسخ فقط با خودِ کاربر ---------- */
+  /* ---------- معمای امروز — پاسخ فقط با خودِ کاربر ---------- */
+  /* انتخابِ معمای بعدی: لنگری که در برآوردِ کنونی بیشترین آگاهی را می‌دهد (اطلاعِ فیشر P(1−P) در θ ِ کنونی — بیشینهٔ دانستنِ تازه،
+     نه انتخابِ دلبخواه)؛ هر گویه فقط یک بار (تکرار، دشواری را عوض می‌کند)؛ گویه‌های توصیفی پس از لنگرها */
   P.pending = function () {
     var done = {}; S.all("psyans").forEach(function (a) { done[a.item] = 1; });
-    return (P.norms().items || []).filter(function (it) { return !done[it.id] && it.text; });
+    var left = (P.norms().items || []).filter(function (it) { return !done[it.id] && (it.text || it.img); });
+    var th = {};
+    left.forEach(function (it) { var sid = it.scale || "_" + it.construct; if (P.isAnchor(it) && th[sid] == null) th[sid] = P.scaleEst(sid).theta; });
+    function info(it) { if (!P.isAnchor(it)) return -1; var p = prc(th[it.scale || "_" + it.construct] || 0, it); return p * (1 - p); }
+    return left.sort(function (a, b) { return info(b) - info(a); });
   };
   P.answeredToday = function () { return S.all("psyans").some(function (a) { return String(a.at).slice(0, 10) === A.today(); }); };
+  function optLabel(o) { return typeof o === "string" ? o : (o && o.t) || ""; }
   A.V.psy_item = function () {
     var it = P.item(A.state.arg) || P.pending()[0], root = h("div", { class: "page psy", dir: "rtl" });
     root.appendChild(A.head("نقشه‌ها", "🧩 معمای امروز", "یک معمای کوتاه. با فکرِ خودت جواب بده و بگو چقدر مطمئنی."));
     if (!it) { root.appendChild(h("p", { class: "card soft" }, (P.norms().items || []).length ? "همهٔ معماهای موجود را جواب داده‌ای." : "هنوز معمایی با دادهٔ جمعیتیِ وارسی‌شده در فهرست نیست.")); return root; }
-    var st = { v: "", c: "" }, box = h("section", { class: "card psy-q" });
-    box.appendChild(h("p", { class: "psy-text" }, it.text));
-    if (it.options && it.options.length) box.appendChild(h("div", { class: "pb-opts", role: "radiogroup", "aria-label": "گزینه‌ها" }, it.options.map(function (o, i) {
-      return h("label", { class: "row gap" }, h("input", { type: "radio", name: "psy-o", "data-own": "1", "aria-label": o, onchange: function () { st.v = String(i); } }), o); })));
+    if (S.all("psyans").some(function (a) { return a.item === it.id; })) { root.appendChild(h("p", { class: "card soft" }, "این معما را پیش‌تر جواب داده‌ای؛ هر معما فقط یک بار شمرده می‌شود.")); return root; }
+    var st = { v: "", c: "", fam: false, done: false }, box = h("section", { class: "card psy-q" }), t0 = Date.now(), fb = h("div", { class: "small" }), timer = null;
+    if (it.text) box.appendChild(h("p", { class: "psy-text" }, it.text));
+    if (it.img) box.appendChild(h("img", { class: "psy-img", src: P.img(it.img), alt: "تصویرِ معما", style: "max-width:100%;height:auto" }));
+    if (it.options && it.options.length) box.appendChild(h("div", { class: "pb-opts psy-opts", role: "radiogroup", "aria-label": "گزینه‌ها" }, it.options.map(function (o, i) {
+      var lab = optLabel(o) || "گزینهٔ " + fa(i + 1);
+      return h("label", { class: "row gap" }, h("input", { type: "radio", name: "psy-o", "data-own": "1", "aria-label": lab, onchange: function () { st.v = String(i); } }),
+        o && o.img ? h("img", { src: P.img(o.img), alt: lab, style: "max-height:90px" }) : lab); })));
     else box.appendChild(h("input", { type: "text", class: "inp", "data-own": "1", "aria-label": "پاسخِ تو", oninput: function (e) { st.v = e.target.value; } }));
     box.appendChild(h("label", { class: "small" }, "چقدر مطمئنی؟ (۰ تا ۱۰۰) ", h("input", { type: "number", min: 0, max: 100, class: "inp sm", "data-own": "1", "aria-label": "درصدِ اطمینان", oninput: function (e) { st.c = e.target.value; } })));
-    var t0 = Date.now(), fb = h("div", { class: "small" });
-    box.appendChild(h("button", { class: "btn", type: "button", "data-own": "1", onclick: function () {
-      if (st.v === "") { fb.textContent = "اول جواب بده."; return; }
-      var ok = it.options && it.options.length ? +st.v === +it.answer : (it.accept || [String(it.answer)]).some(function (re) { try { return new RegExp("^\\s*(" + re + ")\\s*$", "i").test(A.toEnDigits ? A.toEnDigits(st.v) : st.v); } catch (e) { return false; } });
-      S.put({ id: A.uid("pa"), type: "psyans", item: it.id, ok: ok, conf: st.c === "" ? null : Math.max(0, Math.min(100, +st.c)), ms: Date.now() - t0, at: new Date().toISOString(), created: new Date().toISOString() });
-      A.toast(ok ? "درست." : "نادرست."); A.go("mind");
-    } }, "ثبتِ پاسخ"));
+    /* آشنایی: معمای دیده‌شده دشواری‌اش برای تو با جمعیت یکی نیست ⇒ در مقایسه با مردم شمرده نمی‌شود (Stieger & Reips 2016: ۴۴٪ CRT را دیده بودند) */
+    box.appendChild(h("label", { class: "small row gap" }, h("input", { type: "checkbox", "data-own": "1", "aria-label": "این معما یا شبیهش را پیش‌تر دیده‌ام", onchange: function (e) { st.fam = e.target.checked; } }), "این معما یا شبیهش را پیش‌تر دیده‌ام"));
+    function save(timeout) {
+      if (st.done) return; st.done = true; if (timer) clearInterval(timer);
+      var ok = !timeout && (it.options && it.options.length ? st.v !== "" && +st.v === +it.answer : (it.accept || [String(it.answer)]).some(function (re) { try { return new RegExp("^\\s*(" + re + ")\\s*$", "i").test(A.toEnDigits ? A.toEnDigits(st.v) : st.v); } catch (e) { return false; } }));
+      S.put({ id: A.uid("pa"), type: "psyans", item: it.id, ok: ok, timeout: !!timeout, familiar: st.fam, conf: st.c === "" ? null : Math.max(0, Math.min(100, +st.c)), ms: Date.now() - t0, at: new Date().toISOString(), created: new Date().toISOString() });
+      var msg = timeout ? "وقت تمام شد." : ok ? "درست." : "نادرست.";
+      if (it.kind === "descriptive" && it.p != null) { var sc = P.scale(it.scale), grp = (it.group || (sc && sc.bands && sc.bands[0] && sc.bands[0].label) || "نمونهٔ منبع"); msg += " " + fa(Math.round(100 * it.p)) + "٪ ِ " + grp + " درست جواب دادند."; }
+      A.toast(msg); A.go("mind");
+    }
+    box.appendChild(h("button", { class: "btn", type: "button", "data-own": "1", onclick: function () { if (st.v === "") { fb.textContent = "اول جواب بده."; return; } save(false); } }, "ثبتِ پاسخ"));
+    /* زمانِ همان اجرای مرجع (مثلاً ۳۰ ثانیهٔ MaRs-IB) — تا دشواری با دادهٔ جمعیت یکی بماند */
+    if (it.time_limit_s) {
+      var left = +it.time_limit_s, tl = h("div", { class: "small psy-timer", "aria-live": "polite" }, "زمان: " + fa(left) + " ثانیه");
+      box.appendChild(tl);
+      timer = setInterval(function () { if (!document.body.contains(tl)) { clearInterval(timer); return; } left--; tl.textContent = "زمان: " + fa(Math.max(0, left)) + " ثانیه"; if (left <= 0) save(true); }, 1000);
+    }
     box.appendChild(fb);
     root.appendChild(box);
-    root.appendChild(h("p", { class: "small muted" }, "این معما از مجموعه‌ای است که درستی‌اش در نمونهٔ بزرگی از مردم سنجیده شده (منبع در «📐 سنجشِ استاندارد» ِ کارنامه)؛ پاسخت فقط برای مقایسهٔ منصفانه با آن‌ها به کار می‌رود."));
+    var src = (P.norms().sources || []).filter(function (s) { return s.id === it.src; })[0];
+    root.appendChild(h("p", { class: "small muted" }, it.kind === "descriptive" ? "این معما در نمونه‌ای از مردم پرسیده شده؛ پس از پاسخ می‌بینی چند درصدشان درست گفتند. چون کلامی یا مشهور است، در برآوردِ مقایسه‌ای شمرده نمی‌شود." :
+      "دشواریِ این معما در نمونهٔ بزرگی از مردم سنجیده شده" + (src ? " (" + (src.cite || src.id) + ")" : "") + "؛ پاسخت فقط برای مقایسهٔ منصفانه با آن‌ها به کار می‌رود."));
     return root;
   };
   A.VIEW_META = A.VIEW_META || {};

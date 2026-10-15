@@ -79,6 +79,19 @@ def systerr_js():
             "window.SYS_TERR_LEDGER = " + json.dumps(led, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + ";\n")
 
 
+def copy_norm_images():
+    """تصویرهای معماهای لنگردار (norms/img) ⇒ کنارِ بسته (public/assets/lla/norms/img) و کنارِ فایلِ مستقل (dist/norms/img)."""
+    src = os.path.join(B, "norms", "img")
+    for dst in (os.path.join(ASSETS, "norms", "img"), os.path.join(D, "norms", "img")):
+        os.makedirs(dst, exist_ok=True)
+        keep = set(os.listdir(src)) if os.path.isdir(src) else set()
+        for f in os.listdir(dst):
+            if f not in keep:
+                os.remove(os.path.join(dst, f))
+        for f in keep:
+            shutil.copyfile(os.path.join(src, f), os.path.join(dst, f))
+
+
 def norms_js():
     """«📐 سنجشِ استاندارد»: گویه‌های لنگردار با دشواریِ جمعیتی از منبعِ معتبر (norms/norms.json) ⇒ پیش از کدِ صفحه."""
     p = os.path.join(B, "norms", "norms.json")
@@ -254,6 +267,7 @@ if __name__ == "__main__":
         print("\n".join(probs) if probs else "learning-architecture: sources, bundle and handbook are in sync")
         sys.exit(1 if probs else 0)
     build_dist()
+    copy_norm_images()
     files, probs = sync()
     m = json.loads(rd(MANIFEST_JS).split("= ", 1)[1].rstrip(";\n"))
     print("bundle", m["js"], m["css"], "docs", ", ".join(m["docs"].values()))
