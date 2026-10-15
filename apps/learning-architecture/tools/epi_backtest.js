@@ -114,11 +114,13 @@ function relayErrors(sm, v) {
 const FRAME_SET = { x_field: fieldErrors, x_relay: relayErrors };
 /* `field <file.json>`: [{ "frame": "<شناسهٔ قاب>", "x_field": "<مقدار>", "why": "…", "by"? }] — جمعیتِ هر قاب را یک بار ثبت می‌کند
    (تنها راهِ نوشتنِ x_field در backtest/samples؛ بی بازنویسیِ خاموش: مقدارِ دیگرِ موجود ⇒ رد).
-   `relay <file.json>`: همان، برای x_relay (راهِ رسیدنِ یافته‌های قاب). */
+   `relay <file.json>`: همان، برای x_relay (راهِ رسیدنِ یافته‌های قاب).
+   اصلاحِ متنِ دلیل (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵؛ بازبینِ RF): { "frame", "<کلید>": <همان مقدارِ موجود>, "amend": true, "why": "متنِ درست", "amendWhy": "چرا متنِ قبلی نادرست بود" }
+   فقط متنِ why عوض می‌شود (مقدار نه — مقدارِ دیگر = قابِ تازه)؛ متنِ قبلی با تاریخ در `<کلید>_set_hist` می‌ماند؛ همه یا هیچ. */
 function setFields(file, key) {
   key = key || "x_field"; const errFn = FRAME_SET[key];
   const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
-  const today = new Date().toISOString().slice(0, 10), ok = [], bad = [], byFile = {};
+  const today = new Date().toISOString().slice(0, 10), ok = [], bad = [], byFile = {}, todo = [];
   for (const f of sampleFiles()) byFile[f] = rd(path.join(SAMPLES, f), []);
   items.forEach((u) => {
     let hit = null;
@@ -129,12 +131,19 @@ function setFields(file, key) {
     if (!u.why || String(u.why).length < 15) e.push("why: چرا این مقدار (از تعریفِ خودِ قاب، نه از سرانجام)");
     if (hit) e.push.apply(e, errFn(hit, u[key]));
     if (hit && hit[key] != null && hit[key] !== u[key]) e.push("قاب پیش‌تر مقدارِ دیگری دارد (" + hit[key] + ") — بازنویسیِ خاموش ممنوع؛ اگر خطاست، با دلیل در WORKLOG و قابِ تازه");
+    if (u.amend) {
+      if (!hit || hit[key] == null || hit[key] !== u[key]) e.push("amend فقط متنِ دلیلِ مقدارِ موجود را اصلاح می‌کند (مقدار باید همان باشد)");
+      if (!u.amendWhy || String(u.amendWhy).length < 15) e.push("amendWhy: چرا متنِ قبلی نادرست بود");
+      if (hit && hit[key + "_set"] && hit[key + "_set"].why === u.why) e.push("متنِ تازه همان متنِ قبلی است");
+    }
     if (e.length) { bad.push({ frame: u.frame, errors: e }); return; }
+    if (u.amend) { todo.push(() => { (hit[key + "_set_hist"] = hit[key + "_set_hist"] || []).push(Object.assign({ replaced: today, amendWhy: u.amendWhy }, hit[key + "_set"]));
+        hit[key + "_set"] = { at: today, by: u.by || "routine", why: u.why, amended: true }; }); ok.push({ frame: u.frame, amended: key }); return; }
     if (hit[key] === u[key]) { ok.push({ frame: u.frame, unchanged: true }); return; }
-    hit[key] = u[key]; hit[key + "_set"] = { at: today, by: u.by || "routine", why: u.why };
+    todo.push(() => { hit[key] = u[key]; hit[key + "_set"] = { at: today, by: u.by || "routine", why: u.why }; });
     ok.push({ frame: u.frame, [key]: u[key] });
   });
-  if (!bad.length) Object.keys(byFile).forEach((f) => wr(path.join(SAMPLES, f), byFile[f]));
+  if (!bad.length) { todo.forEach((fn) => fn()); Object.keys(byFile).forEach((f) => wr(path.join(SAMPLES, f), byFile[f])); }
   return { set: bad.length ? [] : ok, rejected: bad, note: bad.length ? "هیچ چیز نوشته نشد (همه یا هیچ)" : "" };
 }
 /* `recode <file.json>` (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵؛ دست‌به‌دستِ h…070f و رمزگذاریِ دوبارهٔ پیکره): اصلاح یا تکمیلِ رمزگذاریِ مواردِ یک قاب
@@ -236,6 +245,11 @@ function validateTerr(u, cur, round) {
     if (!(cur && cur.bookOnly)) return ["گسترش فقط برای حوزهٔ «فقط بخشِ جزوه»"];
     if (!u.what || String(u.what).length < 15) e.push("what: چه کردی، دقیق");
     if (!((u.sources || []).length >= 2 && u.sources.every((x) => /\S{6,}/.test(String(x))))) e.push("گسترش: دست‌کم دو منبعِ واقعیِ بیرون از جزوه");
+    /* بازبینِ دورِ ۱۱ (RV11، ۲۰۲۶-۱۰-۱۵): هر منبعِ گسترش یا برچسبِ منبعِ ثبت‌شده در EPI_TERR.sources است یا پیوند/DOI دارد، و منبعِ «بیرون از جزوه» خودِ جزوه نیست */
+    const tags = new Set(((T && T.sources) || []).map((x) => x.tag)), tagOf = (x) => String(x).trim().split(/\s+/)[0];
+    (u.sources || []).forEach((x, i) => { const v = String(x);
+      if (/جزوه|مصباح|Mesbah/i.test(v)) e.push("منبعِ " + i + ": منبعِ گسترش باید بیرون از جزوه باشد");
+      if (!tags.has(tagOf(v)) && !/https?:\/\/|doi\.org|\b10\.\d{4,}\//i.test(v)) e.push("منبعِ " + i + ": برچسبِ منبعِ ثبت‌شده (EPI_TERR.sources) یا پیوند/DOI لازم است"); });
     const cl = u.claims || [];
     if (cl.length < 3) e.push("گسترش: دست‌کم سه گزارهٔ محوریِ تازه از ادبیات");
     cl.forEach((c, i) => {
@@ -314,7 +328,9 @@ function territoryRound(byCase, round, today) {
   const byStage = [0, 0, 0, 0, 0, 0]; areas.forEach((a) => { byStage[(S0.areas[a.id] || {}).stage || 0]++; });
   const movedThisRound = areas.filter((a) => ((S0.areas[a.id] || {}).history || []).some((h) => h.round === round && h.by !== "ابزار" || (h.round === round && h.stage === 5))).map((a) => a.id);
   fs.writeFileSync(P.territoryDoc, territoryMd(S0, areas, round, today));
-  return { areas: areas.length, groups: (global.EPI_TERR.groups || []).length, byStage, bookOnly: areas.filter((a) => (S0.areas[a.id] || {}).bookOnly).length, score: areas.reduce((t, a) => t + ((S0.areas[a.id] || {}).stage || 0), 0), max: areas.length * 5, moved: movedThisRound };
+  /* scoreEvidenced (RV11): بی حوزه‌های «فقط بخشِ جزوه» که گام‌های ۱ تا ۳ را با شاهدِ بیرونی نگذرانده‌اند — تا «پیشرفتِ کل» با پوششِ جزوه باد نکند */
+  const score = areas.reduce((t, a) => t + ((S0.areas[a.id] || {}).stage || 0), 0), scoreBook = areas.reduce((t, a) => t + ((S0.areas[a.id] || {}).bookOnly ? (S0.areas[a.id].stage || 0) : 0), 0);
+  return { areas: areas.length, groups: (global.EPI_TERR.groups || []).length, byStage, bookOnly: areas.filter((a) => (S0.areas[a.id] || {}).bookOnly).length, score, scoreBookOnly: scoreBook, scoreEvidenced: score - scoreBook, max: areas.length * 5, moved: movedThisRound };
 }
 function territoryMd(S0, areas, round, today) {
   const T = global.EPI_TERR, L = [], ST = T.STAGES;
@@ -749,7 +765,7 @@ function status() {
     soundShare: +(sound / cases.length).toFixed(2), samples: loadSamples().length,
     baseNeeds: Object.entries(base).sort((a, b) => a[1].n - b[1].n).map(([k, v]) => k + " (" + v.fa + "): " + v.n + " موردِ سنجیده، مقدار " + v.p),
     audit: axiomAudit(),
-    territoryFrontier: (() => { const S0 = terrState(); return terrAreas().map((a) => { const c = S0.areas[a.id] || {}; return { id: a.id, fa: a.fa, group: a.group, stage: c.stage || 0, bookOnly: !!c.bookOnly, next: c.bookOnly ? "widen" : "stage " + ((c.stage || 0) + 1) }; })
+    territoryFrontier: (() => { const S0 = terrState(); return terrAreas().map((a) => { const c = S0.areas[a.id] || {}; return { id: a.id, fa: a.fa, group: a.group, stage: c.stage || 0, bookOnly: !!c.bookOnly, next: c.bookOnly ? "widen" : "stage " + ((c.stage || 0) + 1), needs2ndSource: (a.src || []).length < 2 || undefined }; })   /* needs2ndSource: بازبینِ دورِ ۱۱ (RV11) */
       .sort((x, y) => (x.bookOnly ? 2.5 : x.stage) - (y.bookOnly ? 2.5 : y.stage)).slice(0, 15); })(), note: "گردآوریِ دورِ بعد: اول قاعده‌های آزموده‌نشده و حوزه‌های کم‌شمار؛ وقایعِ «سالمِ کامل» کم‌اند — هر دور چندتا بیاور." };
 }
 

@@ -36,7 +36,7 @@
  {
   "tag": "Audi",
   "title": "Robert Audi, Epistemology: A Contemporary Introduction to the Theory of Knowledge (2nd/3rd ed., Routledge), chs. 1–10",
-  "url": "https://www.cs.rutgers.edu/~biglars/epis.pdf"
+  "url": "https://www.routledge.com/Epistemology-A-Contemporary-Introduction-to-the-Theory-of-Knowledge/Audi/p/book/9780415879231"
  },
  {
   "tag": "Pritchard",
@@ -61,12 +61,12 @@
  {
   "tag": "Goldman1991",
   "title": "Alvin Goldman, 'Epistemic Paternalism: Communication Control in Law and Society', Journal of Philosophy 88 (1991)",
-  "url": "https://doi.org/10.2307/2026906"
+  "url": "https://doi.org/10.2307/2026984"
  },
  {
   "tag": "Friedman2020",
   "title": "Jane Friedman, 'The Epistemic and the Zetetic', Philosophical Review 129 (2020)",
-  "url": "https://doi.org/10.1215/00318108-8311261"
+  "url": "https://doi.org/10.1215/00318108-8540918"
  },
  {
   "tag": "Mesbah",
@@ -80,7 +80,7 @@
  },
  {
   "tag": "Emadzadeh",
-  "title": "حسین عمادزاده، مقاله دربارهٔ اعتبار شهود عرفانی در معرفت‌شناسی حکمت متعالیه (ensani.ir)",
+  "title": "حسین عمادزاده، مقاله دربارهٔ اعتبار شهود عرفانی در معرفت‌شناسی حکمت متعالیه (ensani.ir) — وارسی‌نشده: پیوند صفحهٔ نویسنده است نه مقالهٔ مشخص و در بازبینیِ دورِ ۱۱ باز نشد (RV11، ۲۰۲۶-۱۰-۱۵)؛ تا ارجاعِ دقیق، منبعِ هیچ حوزه‌ای نیست",
   "url": "https://ensani.ir/fa/article/author/50703"
  },
  {
@@ -1948,7 +1948,6 @@
      "معیار سنجش کشف صحیح از ناصحیح چیست؟"
     ],
     "src": [
-     "Emadzadeh",
      "SEP mysticism",
      "SEP religious-experience"
     ],

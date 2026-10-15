@@ -1,0 +1,68 @@
+{
+ "round": 11,
+ "reviewer": "زیرعاملِ جدا (نشستِ ابریِ مستقل RV11، session_0168fTeHdJVnUT9kQXsRFpxm؛ claude.ai/artifact/N6vsoPwUgPM9wNYeDq41Fh) — بازبینیِ دیرهنگامِ دورِ ۱۱ (کامیتِ 2f4eea3)، ۲۰۲۶-۱۰-۱۵",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": false,
+  "findings_diagnosed": true
+ },
+ "checkedNote": "events_real/encoding_blind/frames_unselected/verified_by_real: دورِ ۱۱ واقعه، رمز، قاب یا سندِ تازه نداشت (درستیِ تهی). no_conventional: audit در worktree ِ 2f4eea3 تمیز. territory_evidence: ۲۰ مدخلِ SEP و فهرستِ RCE واقعی؛ دو DOI نادرست و دو منبعِ مسئله‌دار ⇒ false؛ همه پایین اصلاح شد.",
+ "problems": [
+  {
+   "what": "DOI ِ Goldman1991 (10.2307/2026906) به Hursthouse «Arational Actions» می‌رسد",
+   "fix": "epi_territory.js ⇒ 10.2307/2026984 (Crossref وارسی شد: Goldman، Epistemic Paternalism، JPhil 1991)",
+   "fixed": true
+  },
+  {
+   "what": "DOI ِ Friedman2020 (10.1215/00318108-8311261) به Srinivasan «Radical Externalism» می‌رسد",
+   "fix": "⇒ 10.1215/00318108-8540918 (Crossref وارسی شد: Friedman، The Epistemic and the Zetetic، Phil Rev 2020)",
+   "fixed": true
+  },
+  {
+   "what": "منبعِ Emadzadeh صفحهٔ نویسنده است نه مقاله، و باز نشد",
+   "fix": "برچسبِ «وارسی‌نشده» در عنوان؛ از src ِ a_mystical_intuition برداشته شد (دو منبعِ SEP می‌ماند)",
+   "fixed": true
+  },
+  {
+   "what": "منبعِ Audi به PDF ِ کاملِ کتاب روی صفحهٔ شخصی پیوند داشت",
+   "fix": "⇒ صفحهٔ ناشر (Routledge، ISBN 9780415879231، HTTP 200)",
+   "fixed": true
+  },
+  {
+   "what": "«پیشرفتِ کل» ِ قلمرو تماماً از ۳۳ حوزهٔ «فقط بخشِ جزوه» بود",
+   "fix": "territoryRound ⇒ scoreEvidenced و scoreBookOnly کنارِ score در دفتر",
+   "fixed": true
+  },
+  {
+   "what": "اعتبارسنجیِ widen هر رشتهٔ شش‌حرفی را منبع می‌پذیرفت",
+   "fix": "validateTerr: منبعِ گسترش یا برچسبِ ثبت‌شده در EPI_TERR.sources است یا پیوند/DOI؛ نامِ جزوه رد می‌شود",
+   "fixed": true
+  },
+  {
+   "what": "۱۱ حوزه فقط یک منبع دارند",
+   "fix": "status.territoryFrontier ⇒ needs2ndSource؛ دروازهٔ گامِ ۱ (≥۲ منبع) همان می‌ماند",
+   "fixed": true
+  },
+  {
+   "what": "بازبینیِ مستقلِ دورِ ۱۱ ثبت نشده بود",
+   "fix": "همین ثبت (epi_backtest.js review)",
+   "fixed": true
+  },
+  {
+   "what": "دورِ ۱۱ واقعه یا قابِ تازه نداشت",
+   "fix": "دورِ ۱۲ هشت واقعهٔ تازه افزود و سه قابِ بی‌گزینش (OSC/EERP/SSRP، backtest/samples/round-0013.json) سنجیده شد؛ گذشته عوض‌شدنی نیست",
+   "fixed": true
+  },
+  {
+   "what": "دستورِ بازبینی والدِ نادرست (bbb87c9) را نام برده بود",
+   "fix": "در دستورهای بعدیِ بازبینی بازهٔ کامل یا 2f4eea3^1 نوشته می‌شود (WORKLOG)",
+   "fixed": true
+  }
+ ],
+ "note": "ثبت در اجرای روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک، ۲۰۲۶-۱۰-۱۵"
+}
