@@ -1,0 +1,16 @@
+{
+ "id": "h20261015234608094729-backtest-ebfa",
+ "at": "2026-10-15T23:46:08Z",
+ "by": "backtest",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "tests/test_found_mixture.js: پین‌کردنِ «۲۰۳ واقعهٔ همه درست» و ردیفِ آخرِ دفتر به پیکرهٔ دورِ ≤۱۲ (دورِ ۱۳ یافتهٔ بازِ مستقل دارد)؛ فقط آزمونِ خودِ بک‌تست، بدون تغییرِ رفتارِ صفحه؛ طبقِ AGENTS.md: منبع/آزمون، build.py، WORKLOG (66)",
+ "procedure": "AGENTS.md#هر تغییر",
+ "commit": "",
+ "status": "open"
+}

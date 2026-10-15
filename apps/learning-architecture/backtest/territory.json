@@ -76,8 +76,20 @@
    ]
   },
   "a_evidence": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 13,
+     "at": "2026-10-15",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «شاهد و قرینه»",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Evidence» (first published 2006, substantive revision 2014) — https://plato.stanford.edu/entries/evidence/",
+    "Internet Encyclopedia of Philosophy, «Evidence» (Victor DiFate) — https://iep.utm.edu/evidence/"
+   ]
   },
   "a_epistemic_rationality": {
    "stage": 0,
@@ -2793,6 +2805,6 @@
    "bookOnly": true
   }
  },
- "round": 12,
+ "round": 13,
  "updated": "2026-10-15"
 }
