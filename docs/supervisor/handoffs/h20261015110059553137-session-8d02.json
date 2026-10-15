@@ -12,5 +12,11 @@
  "what": "حوزهٔ pr_polya_heuristics (territory/maps/s_problem.json): پس از یکپارچه‌سازیِ پولیا (WORKLOG 58؛ کارت‌های فهمِ مسئله و بازنگری، ۲۷ حرکت با پرسش و فاصله‌گذاری، نردبانِ چهارمرحله‌ای، دستیارِ معلم‌وار) gap_fa کهنه است. با شاهدِ ممیزیِ دورِ ۲ (sources/polya_how_to_solve_it/coverage.json) و ابزارِ sys_territory.py گام را بسنج و جلو ببر؛ گامِ ۵ فقط از دادهٔ کاربر.",
  "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
  "commit": "",
- "status": "open"
+ "status": "done",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T16:05:09Z",
+  "note": "gap_fa خالی و گامِ ۴ (WORKLOG 60)",
+  "commit": ""
+ }
 }
