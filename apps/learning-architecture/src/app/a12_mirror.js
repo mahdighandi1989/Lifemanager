@@ -129,7 +129,7 @@
     if (priv) [["emo", "شدتِ احساس"], ["emoName", "نامِ احساس"]].forEach(function (f) { if (A.filled(it[f[0]])) inRows.push([f[1], txt(it[f[0]])]); });
     tabs.push({ name: "ورودی", rows: inRows });
     var rk = []; try { rk = A.knotRank ? A.knotRank(kc) : []; } catch (e) { rk = []; }
-    tabs.push({ name: "فرضیه‌ها", rows: [["خانواده", "امتیاز (ترتیبِ بررسی)", "چرا"]].concat(rk.map(function (r) { return [famName(r.fam), String(Math.round((r.score || 0) * 100) / 100), !priv && (sens || PRIVFAM[r.fam]) ? PRIV_TXT : txt((r.why || []).map(function (w) { return typeof w === "string" ? w : (w.t || w.fa || ""); }))]; })) });
+    tabs.push({ name: "فرضیه‌ها", rows: [["خانواده", "وضع", "چرا"]].concat(rk.map(function (r) { return [famName(r.fam), r.stateFa || String(r.score), !priv && (sens || PRIVFAM[r.fam]) ? PRIV_TXT : txt((r.why || []).map(function (w) { return typeof w === "string" ? w : (w.t || w.fa || ""); }))]; })) });
     tabs.push({ name: "شواهد", rows: [["خانواده", "جهت", "شاهد", "منبع"]].concat((kc.ev || []).filter(function (e) { return priv || !PRIVFAM[e.fam]; }).map(function (e) { return [famName(e.fam), String(e.dir == null ? (e.w || "") : e.dir), e.text || "", e.src || ""]; })) });
     var why = (R.why5 || []).map(function (w, i) { return sens ? ["چرای " + (i + 1), PRIV_TXT, PRIV_TXT, PRIV_TXT] : ["چرای " + (i + 1), w.why || "", w.ev || "", w.rival || ""]; });
     tabs.push({ name: "ریشه", rows: [["", "پاسخ", "شاهد", "تبیینِ رقیبِ بیرونی"], ["گرهِ اصلی", famName(R.primary), "", ""]].concat(why).concat(R.loop2 ? [["متغیرِ حاکم", sens ? PRIV_TXT : R.loop2, "", ""]] : [])

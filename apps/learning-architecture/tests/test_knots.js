@@ -116,10 +116,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main [data-probe="f1_named"] .kn-opt:has-text("فقط با نامِ مفهوم")'); await p.waitForTimeout(250);
   await p.click('main [data-probe="f2_restate"] .kn-opt:has-text("کامل و درست بود")'); await p.waitForTimeout(250);
   info.ev = await p.evaluate(id => APP.S.get(id).ev.map(e => e.fam + ':' + e.dir + ':' + e.w + ':' + e.kind).join('|'), mathId);
-  info.rankAfter = await p.evaluate(id => { const r1 = JSON.stringify(APP.knotRank(APP.S.get(id))); const r2 = JSON.stringify(APP.knotRank(APP.S.get(id))); const r = APP.knotRank(APP.S.get(id)); return { same: r1 === r2, f1: r.find(x => x.fam === 'F1').score, f2: r.find(x => x.fam === 'F2').score, top: r[0].fam }; }, mathId);
+  info.rankAfter = await p.evaluate(id => { const r1 = JSON.stringify(APP.knotRank(APP.S.get(id))); const r2 = JSON.stringify(APP.knotRank(APP.S.get(id))); const r = APP.knotRank(APP.S.get(id)); return { same: r1 === r2, f1: r.find(x => x.fam === 'F1').score, f2: r.find(x => x.fam === 'F2').score, f2ref: r.find(x => x.fam === 'F2').refSubs.join(','), f2open: r.find(x => x.fam === 'F2').openSubs.join(','), top: r[0].fam }; }, mathId);
   // re-answering a probe replaces its evidence (no double counting)
   await p.click('main [data-probe="f1_named"] .kn-opt:has-text("بی‌نامِ مفهوم هم")'); await p.waitForTimeout(250);
-  info.f1Reanswer = await p.evaluate(id => APP.knotRank(APP.S.get(id)).find(x => x.fam === 'F1').score, mathId);
+  info.f1Reanswer = await p.evaluate(id => { const r = APP.knotRank(APP.S.get(id)).find(x => x.fam === 'F1'); return r.score + ':' + r.refSubs.join(','); }, mathId);
   info.f1Collapsed = await p.locator('main details.kn-more [data-probe="f12_zero"]').count(); // a family outside the top three is still reachable
   await p.evaluate(() => document.querySelectorAll('main details.kn-more').forEach(d => { d.open = true; }));
   await p.click('main [data-probe="f1_named"] .kn-opt:has-text("فقط با نامِ مفهوم")'); await p.waitForTimeout(250);
@@ -453,8 +453,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(!AU.fp.length, 'C2 safety false positives: ' + AU.fp);
   E(JSON.stringify(AU.red) === JSON.stringify(['وضعیتِ فعلی و [شخص]', 'رضایتِ [شخص]', '[شخص] آمد', 'علی‌رضا و [شخص]ِ ما', '[شخص] and Alibaba', '[شخص]، [شخص]', 'رضایت [شخص]']), 'C3 whole-word redaction: ' + JSON.stringify(AU.red));
   E(!AU.H.aliLikes && !AU.H.envy && !AU.H.adhd && AU.H.frame && AU.H.behav && !AU.H.byPeople && !AU.H.byNames && !AU.H.him && !AU.H.flani && !AU.H.token && !AU.H.rivalMind, 'C4 third-party mind filter: ' + JSON.stringify(AU.H));
-  E(AU.rank.A1 === 'F3,F11,F5,F1,F2' && AU.rank.A2 === 'F1,F9' && AU.rank.B === 'F8,F7,F9,F10' && AU.rank.C === 'F11,F6,F9,F7', 'Minor1 scenario orders: ' + JSON.stringify(AU.rank));
-  E(AU.rank.shared === '0.33,0.33,0.33', 'Minor1 shared kind signal must weigh the same for F1/F2/F3: ' + AU.rank.shared);
+  // رتبهٔ بی‌وزن (۲۰۲۶-۱۰-۱۵): خانواده‌های «شاهد دارد» جلوترند؛ ترتیبِ درونِ گروه داوری نیست، پس فقط مجموعه‌ها سنجیده می‌شوند
+  const set3 = x => x.split(',').slice(0, 3).sort().join(',');
+  E(set3(AU.rank.A1) === 'F11,F3,F5' && AU.rank.A2.split(',').sort().join(',') === 'F1,F9' && AU.rank.B.split(',').slice(0, 2).sort().join(',') === 'F7,F8' && AU.rank.B.split(',').includes('F9') && AU.rank.C.split(',').slice(0, 2).sort().join(',') === 'F11,F6' && AU.rank.C.split(',').includes('F9'), 'evidence-first scenario orders: ' + JSON.stringify(AU.rank));
+  E(AU.rank.shared === '0,0,0', 'a situation-type shared by several families is context, not evidence (A4): ' + AU.rank.shared);
   E(!AU.f9.length, 'Minor2 F9 patterns missed: ' + AU.f9);
   E(/Sisk 2018/.test(AU.t31) && /Yeager 2019/.test(AU.t31), 'intervention 31 label: ' + AU.t31);
   E(/پیوست‌ها/.test(info.stmtHint || '') && !/ممکن نیست/.test(info.stmtHint || ''), 'photo hint: ' + info.stmtHint);
@@ -474,8 +476,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.isoBox === 1 && info.needIso === 1 && info.needIsoAfter === 0, 'isomorph path');
   E(info.ev === 'F1:1:3:contrast|F2:-1:1:fact', 'evidence: ' + info.ev);
   // F1: kind «problem» 1÷3 + s_rule 3÷1 (its only specific signal) + contrast +3 = 6.33; F2: 1÷3 − 1 (fact) = −0.67
-  E(info.rankAfter.same && info.rankAfter.f1 === 6.33 && info.rankAfter.f2 === -0.67, 'ranking math: ' + JSON.stringify(info.rankAfter));
-  E(info.f1Reanswer === 0.33, 're-answer replaces evidence: ' + info.f1Reanswer);
+  E(info.rankAfter.same && info.rankAfter.f1 === 1 && info.rankAfter.f2 === 0 && info.rankAfter.f2ref === 'read' && /rep/.test(info.rankAfter.f2open) && info.rankAfter.top === 'F1', 'restating correctly rules out only misreading, not a wrong model (A0, HANDBOOK row 45): ' + JSON.stringify(info.rankAfter));
+  E(/:gap,inert$/.test(info.f1Reanswer), 're-answer replaces evidence; solving without the name rules out only gap/inert: ' + info.f1Reanswer);
   E(info.ledgerRows === 2, 'ledger rows: ' + info.ledgerRows);
   E(info.rootBlocked, 'root confirmed without primary');
   E(/s4$/.test(info.s4) && /^F1\|open\|kc_/.test(info.knot) && /rooted$/.test(info.knot), 'knot: ' + info.knot);
@@ -488,7 +490,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.mathStatus === 'done', 'case status: ' + info.mathStatus);
   E(info.putsView.length === 0, 'viewing wrote: ' + info.putsView.join(','));
   const sr = info.socRank.split(' ').map(x => x.split(':'));
-  E(sr[0][0] === 'F8' && sr.slice(0, 4).some(x => x[0] === 'F9') && sr.slice(0, 4).some(x => x[0] === 'F10') && sr.slice(0, 4).every(x => +x[2] > 0), 'social ranking: ' + info.socRank);
+  E(sr[0][0] === 'F8' && sr.slice(0, 4).some(x => x[0] === 'F9') && sr.filter(x => x[1] === '1').every(x => +x[2] > 0), 'social ranking: ' + info.socRank);
   E(info.socContrastNA === 1, 'contrast probe shown for a social case');
   E(info.socF10Always === '1:0', 'F10 not always examined: ' + info.socF10Always);
   E(info.f1Collapsed === 1, 'family outside top three not reachable');

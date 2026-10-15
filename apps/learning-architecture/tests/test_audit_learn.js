@@ -148,7 +148,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     if (info.noCard[0] !== 's4' || info.noCard[1] || info.noRecall !== 0 || !info.cardDue || !info.closed) errors.push('9 step-4 gate/card: ' + JSON.stringify([info.noCard, info.noRecall, info.cardDue, info.closed]));
 
     // ۷) پنهان‌کردنِ مثال‌های ساختهٔ سامانه در درس؛ وقتی دیده می‌شوند برچسبِ «ساختهٔ سامانه» دارند
-    await p.evaluate(() => APP.go('lesson', 28, 's1'));
+    // تکنیکِ ۲۸ مثالِ بازار دارد که پیش‌فرض پنهان است (۲۰۲۶-۱۰-۱۵)؛ برچسب را با تنظیمِ روشن می‌سنجیم
+    await p.evaluate(() => { const st = APP.S.settings(); st.showMarketEx = true; APP.S.saveSettings(st); APP.go('lesson', 28, 's1'); });
     const shown = await p.locator('main details.gen summary').allInnerTexts();
     if (!shown.length || shown.some(s => /نمونهٔ واقعی/.test(s) || !/ساختهٔ سامانه/.test(s))) errors.push('7 example label: ' + shown);
     await p.evaluate(() => { const s = APP.S.settings(); s.hideGen = true; APP.S.saveSettings(s); });

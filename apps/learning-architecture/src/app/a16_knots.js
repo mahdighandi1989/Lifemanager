@@ -53,6 +53,11 @@
   ];
   A.KSTMT = STMT; A.KKINDS = KINDS;
   var RE_ALWAYS = /همیشه|هیچ ?وقت|هرگز|آدم .{0,25}نیستم|هیچ ?وقت .{0,30}نمی/;
+  /* «همیشه/هیچ‌وقت» فقط وقتی شاهدِ «باور دربارهٔ خود» است که جمله دربارهٔ خودِ گوینده باشد (اول‌شخص): «آشیل هیچ‌وقت نمی‌رسد» دربارهٔ تو نیست
+     (مالک ۲۰۲۶-۱۰-۱۵: «همه چیز باید به بدیهیات برگردد» — شاهد باید دربارهٔ همان چیزی باشد که فرضیه می‌گوید؛ کارزارِ دوم c15) */
+  var RE_FP = /(^|\s)(من|خودم|مرا|منو|منم)(\s|$)|(^|\s)(ن?می ?\S+م|\S*(?:ستم|بودم|کردم|شدم|دارم|تونم|توانم|کنم|فهمم|بلدم))(\s|$)/;
+  function alwaysSelf(it) { return norm([it.claim, it.thoughts, it.what].join("\n")).split(/[.!؟?\n،;]+/).some(function (x) { return RE_ALWAYS.test(x) && RE_FP.test(x.trim()); }); }
+  A.knotAlwaysSelf = alwaysSelf;
   /* باورِ کلی دربارهٔ توانِ خود (F9): «بلد نیستم»، «نمی‌تونم/نمی‌توانم»، «استعدادش را/رو ندارم» هم (ممیزی ۲۰۲۶-۱۰-۱۲) */
   var RE_SELF = /(بیشتر|بهتر|کمتر|بدتر|برتر|باهوش ?تر|ضعیف ?تر|قوی ?تر|زرنگ ?تر) از|از .{0,25}(بیشتر|بهتر|کمتر|بدتر|برتر)|باهوش|کودن|بی ?استعداد|استعداد ندارم|استعداد ?(?:ش|اش|شو) ?(?:را |رو )?ندارم|بلد نیستم|نمی ?(?:تونم|توانم)|بی ?عرضه|احمقم|ناتوانم/;
   var RE_INFER = /نشان می ?ده|نشون می ?ده|یعنی من|پس من|ثابت می ?کن|معلوم شد که من|معلوم میشه که من/;
@@ -88,9 +93,9 @@
         { id: "F1.rule", fa: STMT[0][1], w: 3, test: function (it) { return ST(it, "s_rule"); } }],
       probes: [
         P("f1_def", "fact", "تعریف از حافظه", "مفهومِ کلیدیِ این مسئله را (اگر می‌دانی کدام است) از حافظه تعریف کن و یک مثال بزن.", [
-          O("no", "نتوانستم تعریفش کنم", [["F1", 1, "gap"]]), O("unused", "توانستم، ولی در مسئله به کارش نبردم", [["F1", 1, "inert"]]), O("used", "توانستم و به کار هم بردم", [["F1", -1]])], { need: "problem", input: "مفهوم (اختیاری)" }),
+          O("no", "نتوانستم تعریفش کنم", [["F1", 1, "gap"]]), O("unused", "توانستم، ولی در مسئله به کارش نبردم", [["F1", 1, "inert"]]), O("used", "توانستم و به کار هم بردم", [["F1", -1, ["gap", "inert"]]])], { need: "problem", input: "مفهوم (اختیاری)" }),
         P("f1_named", "contrast", "مفهوم نام‌برده/نشده", "روی هم‌ریخت (یا همین مسئله اگر هنوز بازش نکرده‌ای): اول بی‌کمک تلاش کن؛ اگر نشد، فقط «نامِ مفهومِ کلیدی» را ببین و دوباره تلاش کن.", [
-          O("only", "فقط با نامِ مفهوم حل شد", [["F1", 1]]), O("without", "بی‌نامِ مفهوم هم حل شد", [["F1", -1]]), O("neither", "با نامِ مفهوم هم حل نشد", [["F1", -1]])], { need: "problem", iso: true, note: "«با نام هم نشد» می‌تواند کمبودِ روانی (زیرنوعِ آخر) باشد، نه نبودنِ مفهوم — در ریشه سنجیده می‌شود." })],
+          O("only", "فقط با نامِ مفهوم حل شد", [["F1", 1]]), O("without", "بی‌نامِ مفهوم هم حل شد", [["F1", -1, ["gap", "inert"]]]), O("neither", "با نامِ مفهوم هم حل نشد", [["F1", -1, ["inert"]]])], { need: "problem", iso: true, note: "«با نام هم نشد» می‌تواند کمبودِ روانی (زیرنوعِ آخر) باشد، نه نبودنِ مفهوم — در ریشه سنجیده می‌شود." })],
       acts: [T(41), T(28), T(45), T(13, "برای بدفهمی", "mis"),
         X("refute", "«متنِ ردیه»", "Tippett 2010", "", "یک متنِ کوتاه بنویس که (۱) بدفهمیِ رایج را صریح بیان کند، (۲) صریح بگوید چرا نادرست است، و (۳) تبیینِ درست را با یک مثالِ آزمون‌پذیر بیاورد.", "mis"),
         T(7, "شناختِ نوعِ مسئله — برای دانشِ بی‌اثر", "inert"), T(43, "برای دانشِ بی‌اثر", "inert"), { farm: true, fa: "نهالِ «گره شخصی» در مزرعه", note: "اگر گره به یک مفهومِ علمی برمی‌گردد" }] },
@@ -104,11 +109,11 @@
         { id: "F2.cant", fa: STMT[2][1], w: 2, test: function (it) { return ST(it, "s_cant"); } }],
       probes: [
         P("f2_restate", "fact", "بازگویی بی‌نگاه", "هدف، همهٔ داده‌ها و همهٔ قیدها را بی‌نگاه به صورت بنویس؛ بعد با صورت مقایسه کن.", [
-          O("miss", "چیزی جا انداختم یا اشتباه گفتم", [["F2", 1, "read"]]), O("ok", "کامل و درست بود", [["F2", -1]])], { need: "problem" }),
+          O("miss", "چیزی جا انداختم یا اشتباه گفتم", [["F2", 1, "read"]]), O("ok", "کامل و درست بود", [["F2", -1, ["read"]]])], { need: "problem" }),
         P("f2_selfcon", "fact", "قیدِ خودساخته", "کدام قیدها را خودت فرض کردی که در صورتِ مسئله نبود؟", [
-          O("found", "دست‌کم یکی پیدا کردم", [["F2", 1, "rep"]]), O("none", "هیچ", [["F2", -1]])], { need: "problem", input: "کدام قید؟ (اختیاری)" }),
+          O("found", "دست‌کم یکی پیدا کردم", [["F2", 1, "rep"]]), O("none", "هیچ", [["F2", -1, []]])], { need: "problem", input: "کدام قید؟ (اختیاری)" }),
         P("f2_given", "contrast", "بازنمایی داده‌شده/نشده", "روی هم‌ریخت (یا همین مسئله اگر هنوز بازش نکرده‌ای): اول بی‌کمک؛ اگر نشد، یک بازنماییِ درست (رسم، جدول یا مدلِ موقعیت) را ببین و دوباره تلاش کن.", [
-          O("only", "فقط با بازنماییِ داده‌شده حل شد", [["F2", 1, "rep"]]), O("without", "بی‌آن هم حل شد", [["F2", -1]]), O("neither", "با آن هم حل نشد", [["F2", -1]])], { need: "problem", iso: true })],
+          O("only", "فقط با بازنماییِ داده‌شده حل شد", [["F2", 1, "rep"]]), O("without", "بی‌آن هم حل شد", [["F2", -1, ["rep"]]]), O("neither", "با آن هم حل نشد", [["F2", -1, ["rep"]]])], { need: "problem", iso: true })],
       acts: [T(36), T(15, "قیدهای خودساخته"), T(14), T(26), T(38), T(5)] },
     { id: "F3", fa: "راهبرد و گیرکردن", blurb: "یک راه ذهن را قفل کرده، کارکردِ آشنا راهِ دیگر را پوشانده، یا رپرتوارِ اکتشافی کم است.",
       subs: [{ id: "einst", fa: "اثرِ آمادگیِ ذهنی (Einstellung)", src: "Luchins 1942؛ Bilalić et al. 2008" }, { id: "fixed", fa: "تثبیتِ کارکردی", src: "Duncker 1945" },
@@ -119,11 +124,11 @@
         { id: "F3.cx", fa: STMT[4][1], w: 2, test: function (it) { return ST(it, "s_complex"); } }],
       probes: [
         P("f3_count", "fact", "شمارِ راه‌ها", "چند راهِ واقعاً متفاوت امتحان کردی؟ نامشان را بنویس.", [
-          O("one", "فقط یک راه", [["F3", 1, "einst"]]), O("more", "دو راه یا بیشتر", [["F3", -1]])], { need: "problem", input: "راه‌ها (اختیاری)" }),
+          O("one", "فقط یک راه", [["F3", 1, "einst"]]), O("more", "دو راه یا بیشتر", [["F3", -1, ["einst", "early"]]])], { need: "problem", input: "راه‌ها (اختیاری)" }),
         P("f3_back", "counterfactual", "اگر از آخر…", "اگر از آخر، از یک حالتِ خاص یا با رسم شروع می‌کردی، فکر می‌کنی باز می‌شد؟", [
-          O("yes", "احتمالاً بله", [["F3", 1, "heur"]]), O("no", "نه", [["F3", -1]])], { need: "problem" }),
+          O("yes", "احتمالاً بله", [["F3", 1, "heur"]]), O("no", "نه", [["F3", -1, []]])], { need: "problem" }),
         P("f3_hint", "contrast", "راهنماییِ راهبرد با/بی", "روی هم‌ریخت (یا همین مسئله اگر هنوز بازش نکرده‌ای): اول بی‌کمک؛ اگر نشد، فقط یک راهنماییِ راهبرد («از آخر»، «حالتِ خاص»، «قرینه») را ببین و دوباره تلاش کن.", [
-          O("only", "فقط با راهنماییِ راهبرد حل شد", [["F3", 1, "heur"]]), O("without", "بی‌آن هم حل شد", [["F3", -1]]), O("neither", "با آن هم حل نشد", [["F3", -1]])], { need: "problem", iso: true })],
+          O("only", "فقط با راهنماییِ راهبرد حل شد", [["F3", 1, "heur"]]), O("without", "بی‌آن هم حل شد", [["F3", -1, ["heur"]]]), O("neither", "با آن هم حل نشد", [["F3", -1, ["heur"]]])], { need: "problem", iso: true })],
       acts: [T(11), { pid: "P7", fa: "حل از ۳ مسیر" }, T(14), T(1), T(6), T(5), T(7), T(43),
         /* «مسئله‌های بزرگ» ِ کارخانه (a8_prob، نمای e_prob): پیوندِ معنایی، نه تکنیک — آخرِ فهرست */
         { prob: true, fa: "مسئله‌های بزرگ", note: "تمرینِ انتخابِ حرکتِ بعدی در گام‌به‌گامِ حلِ مسئلهٔ خودت (و مسئله‌هایی که خودت وارد کرده‌ای)؛ همان مهارتِ «عوض‌کردنِ راه»" }] },
@@ -136,9 +141,9 @@
         { id: "F4.long", fa: STMT[7][1], w: 2, test: function (it) { return ST(it, "s_long"); } }],
       probes: [
         P("f4_where", "fact", "کجا وارسی کردی؟", "پیش از اعلامِ پاسخ یا تصمیم، کجا و چطور وارسی کردی؟", [
-          O("none", "هیچ‌جا", [["F4", 1, "nocheck"]]), O("some", "دست‌کم یک وارسیِ واقعی", [["F4", -1]])]),
+          O("none", "هیچ‌جا", [["F4", 1, "nocheck"]]), O("some", "دست‌کم یک وارسیِ واقعی", [["F4", -1, ["nocheck"]]])]),
         P("f4_conf", "fact", "اطمینان پیش از نتیجه", "پیش از دیدنِ نتیجه چقدر مطمئن بودی، و نتیجه چه شد؟", [
-          O("hiwrong", "۸۰٪ یا بیشتر، و غلط بود", [["F4", 1, "over"]]), O("lowrong", "مطمئن نبودم، و غلط بود", [["F4", -1]]), O("right", "نتیجه درست بود", [])])],
+          O("hiwrong", "۸۰٪ یا بیشتر، و غلط بود", [["F4", 1, "over"]]), O("lowrong", "مطمئن نبودم، و غلط بود", [["F4", -1, ["over"]]]), O("right", "نتیجه درست بود", [])])],
       acts: [T(32), T(24), T(23), T(25), T(22)] },
     { id: "F5", fa: "ظرفیت و حالتِ ذهنی", blurb: "بارِ حافظهٔ کاری، فشارِ زمان، خستگی یا حالتِ بدن جا را برای فکر تنگ کرده.",
       subs: [{ id: "wm", fa: "بارِ حافظهٔ کاری", src: "Sweller 1988؛ Cowan 2001" }, { id: "choke", fa: "فشارِ زمان/استرس و «کم‌آوردن زیرِ فشار» در ریاضی", src: "Beilock & Carr 2005" },
@@ -151,9 +156,9 @@
         { id: "F5.later", fa: STMT[9][1], w: 3, test: function (it) { return ST(it, "s_later"); } }],
       probes: [
         P("f5_calm", "contrast", "بی‌فشار، با کاغذ", "همین را (یا هم‌ریختش را، اگر پاسخ را دیده‌ای) حالا بی‌فشارِ زمان و با کاغذ حل کن.", [
-          O("solved", "حل شد", [["F5", 1, "choke"]]), O("not", "حل نشد", [["F5", -1]])], { need: "problem", iso: true }),
+          O("solved", "حل شد", [["F5", 1, "choke"]]), O("not", "حل نشد", [["F5", -1, ["choke", "anx", "wm"]]])], { need: "problem", iso: true }),
         P("f5_items", "fact", "اقلامِ هم‌زمان", "در آن لحظه چند قلم (عدد، قید، گام) را هم‌زمان در ذهن نگه می‌داشتی؟", [
-          O("many", "زیاد — بیش از حدودِ چهار قلم", [["F5", 1, "wm"]]), O("few", "کم", [["F5", -1]])]),
+          O("many", "زیاد — بیش از حدودِ چهار قلم", [["F5", 1, "wm"]]), O("few", "کم", [["F5", -1, ["wm"]]])]),
         P("f5_body", "fact", "خواب، گرسنگی، بیماری، دارو", "خواب، گرسنگی، بیماری یا دارو در آن لحظه نقشی داشت؟", [
           O("maybe", "بله یا شاید", [["F5", 1, "body"]]), O("no", "نه", [])], { note: "این فقط ثبت می‌شود؛ ابزار دربارهٔ بدن و سلامت چیزی تشخیص نمی‌دهد. اگر تکرار می‌شود، با پزشک مطرحش کن." })],
       acts: [T(37, "بیرون‌ریزی روی کاغذ"), T(26),
@@ -167,9 +172,9 @@
         { id: "F6.al", fa: STMT[11][1], w: 2, test: function (it) { return ST(it, "s_always"); } }],
       probes: [
         P("f6_pause", "counterfactual", "یک ثانیه مکث", "اگر پیش از انجام یک ثانیه مکث می‌کردی، همان را می‌کردی؟", [
-          O("no", "احتمالاً نه", [["F6", 1, "dom"]]), O("same", "بله، همان را", [["F6", -1]])]),
+          O("no", "احتمالاً نه", [["F6", 1, "dom"]]), O("same", "بله، همان را", [["F6", -1, []]])]),
         P("f6_similar", "fact", "در موقعیت‌های مشابه", "در موقعیت‌های مشابه هم همین را می‌کنی؟ (دیده‌ای، نه حدس)", [
-          O("yes", "بله، دیده‌ام", [["F6", 1, "auto"]]), O("no", "نه", [["F6", -1]])]),
+          O("yes", "بله، دیده‌ام", [["F6", 1, "auto"]]), O("no", "نه", [["F6", -1, ["dom", "auto"]]])]),
         P("f6_motor", "fact", "کارِ بعدیِ دست", "اگر حرکتی بود: کدام شکل برای کارِ بعدیِ دست راحت‌تر بود؟", [
           O("mine", "شکلی که انتخاب کردم برای کارِ بعدی راحت‌تر بود", [["F6", 1, "motor"]]), O("same", "فرقی نداشت", [])],
           { note: "«راحتیِ وضعیتِ پایانی» دربارهٔ گرفتنِ یک شیء برای کارِ بعدی است؛ برای دیدنِ ناخن فقط قیاسی حدسی است، نه شاهد. خودِ «آزمونِ ناخن» عامیانه است (قدمِ ۰ و خانوادهٔ ۱۱)." })],
@@ -182,9 +187,9 @@
         { id: "F7.af", fa: STMT[12][1], w: 3, test: function (it) { return ST(it, "s_afraid"); } }],
       probes: [
         P("f7_unseen", "counterfactual", "اگر کسی نمی‌دید", "اگر کسی نمی‌دید یا نتیجه مهم نبود، همین را می‌کردی؟", [
-          O("diff", "نه، فرق می‌کرد", [["F7", 1, "protect"]]), O("same", "همین را می‌کردم", [["F7", -1]])]),
+          O("diff", "نه، فرق می‌کرد", [["F7", 1, "protect"]]), O("same", "همین را می‌کردم", [["F7", -1, []]])]),
         P("f7_lose", "counterfactual", "چه از دست می‌رفت؟", "چه چیزی را از دست می‌دادی اگر طورِ دیگری رفتار می‌کردی؟", [
-          O("some", "چیزی مثلِ آبرو، تأیید یا امنیت", [["F7", 1, "avoid"]]), O("nothing", "چیزی از دست نمی‌رفت", [["F7", -1]])], { input: "چه چیزی؟ (خصوصی؛ اختیاری)" })],
+          O("some", "چیزی مثلِ آبرو، تأیید یا امنیت", [["F7", 1, "avoid"]]), O("nothing", "چیزی از دست نمی‌رفت", [["F7", -1, []]])], { input: "چه چیزی؟ (خصوصی؛ اختیاری)" })],
       acts: [T(21, "آزمایشِ رفتاری با پیش‌بینیِ ثبت‌شده"), T(35),
         X("bexp", "آزمایشِ رفتاری با پیش‌بینیِ ثبت‌شده", "Bennett-Levy et al. 2004", "برگرفته از درمانِ شناختی-رفتاری — این‌جا بی هیچ ادعای درمانی",
           "پیش‌بینیِ نگران‌کننده‌ات را دقیق و با درصد بنویس، یک کارِ کوچک که آن را می‌آزماید انجام بده، و نتیجه را ثبت و با پیش‌بینی مقایسه کن.")] },
@@ -198,23 +203,23 @@
         { id: "F8.uh", fa: STMT[14][1], w: 2, test: function (it) { return ST(it, "s_unheard"); } }],
       probes: [
         P("f8_onesent", "fact", "یک جمله از زاویهٔ هدفِ او", "پیامت را در یک جمله و از زاویهٔ هدفِ مخاطب (مثلاً مدیر) بنویس — او چه چیزی را بهینه می‌کند؟", [
-          O("hard", "در آن لحظه پیامم این شکل را نداشت", [["F8", 1, "frame"]]), O("had", "همین شکل را داشت", [["F8", -1]])], { input: "جملهٔ تو (اختیاری)" }),
+          O("hard", "در آن لحظه پیامم این شکل را نداشت", [["F8", 1, "frame"]]), O("had", "همین شکل را داشت", [["F8", -1, ["frame"]]])], { input: "جملهٔ تو (اختیاری)" }),
         P("f8_diff", "fact", "رفتار، نه صفت", "طرفِ مقابل دقیقاً چه کرد که تو نکردی؟ (رفتارِ دیدنی، نه صفت یا نیت)", [
-          O("found", "یک رفتارِ مشخص پیدا کردم", [["F8", 1]]), O("none", "هیچ تفاوتِ رفتاری نمی‌بینم", [["F8", -1]])], { input: "آن رفتار (اختیاری)" }),
+          O("found", "یک رفتارِ مشخص پیدا کردم", [["F8", 1]]), O("none", "هیچ تفاوتِ رفتاری نمی‌بینم", [["F8", -1, []]])], { input: "آن رفتار (اختیاری)" }),
         P("f8_elsewhere", "fact", "ترجیح در جاهای دیگر", "آیا تصمیم‌گیرنده‌ها او را در موقعیت‌های دیگر هم ترجیح می‌دهند؟ (اگر بله ⇒ ساختار/رابطه)", [
-          O("yes", "بله", [["F10", 1, "status"], ["F8", 1, "trust"]]), O("no", "نه", [["F10", -1]]), O("unk", "نمی‌دانم", [])])],
+          O("yes", "بله", [["F10", 1, "status"], ["F8", 1, "trust"]]), O("no", "نه", [["F10", -1, ["status"]]]), O("unk", "نمی‌دانم", [])])],
       acts: [T(20, "چشمِ مدیر"), T(28, "بی‌اصطلاح"), T(3, "یک نکتهٔ اصلی"), T(11, "«چطور مطمئن شوم حرفم شنیده نمی‌شود؟»"), T(25, "تمرین با منتقد"), T(21, "جلسهٔ بعد یک قاب‌بندی را بیازما و ثبت کن")] },
     { id: "F9", fa: "باور دربارهٔ خود و اسناد", blurb: "یک باورِ کلی دربارهٔ خود (توانایی، برتری، درماندگی) تفسیرِ رخداد را رنگ زده.",
       subs: [{ id: "fixed", fa: "ذهنیتِ ثابت", src: "Dweck 2006 — اثرهای کوچک و وابسته به زمینه: Sisk et al. 2018؛ Yeager et al. 2019" },
         { id: "selfserv", fa: "اسنادِ خودخدمت", src: "Miller & Ross 1975 (تبیینِ انگیزشی‌اش را زیر سؤال برد)" },
         { id: "bta", fa: "اثرِ «بالاتر از میانگین»", src: "Alicke & Govorun 2005" }, { id: "helpless", fa: "درماندگیِ آموخته", src: "Maier & Seligman 2016" }],
-      signals: [{ id: "F9.al", fa: "در متنت «همیشه»، «هیچ‌وقت» یا «من آدمِ … نیستم» آمده", w: 2, test: function (it) { return RE_ALWAYS.test(TX(it)); } },
+      signals: [{ id: "F9.al", fa: "دربارهٔ خودت گفته‌ای «همیشه…»، «هیچ‌وقت…» یا «من آدمِ … نیستم»", w: 2, test: function (it) { return alwaysSelf(it); } },
         { id: "F9.self", fa: "جملهٔ نتیجه دربارهٔ برتری یا ضعفِ خودت است", w: 2, test: function (it) { return RE_SELF.test(CL(it)); } }],
       probes: [
         P("f9_evidence", "fact", "شاهدِ له و علیه", "شاهدِ عینیِ این باور دربارهٔ خودت چیست؟ مخالفش چیست؟", [
-          O("against", "شاهدِ مخالف هم پیدا کردم؛ باور کلی‌تر از شواهد است", [["F9", 1]]), O("solid", "شواهد واقعاً پشتش است و مخالفی نیافتم", [["F9", -1]])], { input: "شاهدها (خصوصی؛ اختیاری)" }),
+          O("against", "شاهدِ مخالف هم پیدا کردم؛ باور کلی‌تر از شواهد است", [["F9", 1]]), O("solid", "شواهد واقعاً پشتش است و مخالفی نیافتم", [["F9", -1, []]])], { input: "شاهدها (خصوصی؛ اختیاری)" }),
         P("f9_neutral", "fact", "نگاهِ بی‌طرف", "دیگرانِ بی‌طرف (کسی که سودی در نتیجه ندارد) چه می‌گویند؟", [
-          O("differ", "با برداشتِ من نمی‌خواند", [["F9", 1]]), O("agree", "می‌خواند", [["F9", -1]]), O("unasked", "نپرسیده‌ام", [])])],
+          O("differ", "با برداشتِ من نمی‌خواند", [["F9", 1]]), O("agree", "می‌خواند", [["F9", -1, ["fixed", "selfserv", "bta", "helpless"]]]), O("unasked", "نپرسیده‌ام", [])])],
       acts: [T(13), T(34), T(24), T(22), T(31, "اثرهای کوچک و وابسته به زمینه (Sisk 2018؛ Yeager 2019)")] },
     { id: "F10", fa: "موقعیت و ساختار (بیرون از ذهن)", blurb: "مشوق‌ها، سیاست، اطلاعاتِ نامتقارن، صورتِ مبهم یا معیارِ پنهانِ داور — شاید جواب «تغییرِ محیط» باشد نه «تغییرِ ذهن».",
       subs: [{ id: "incent", fa: "مشوق‌ها و سیاست", src: "" }, { id: "asym", fa: "اطلاعاتِ نامتقارن", src: "" }, { id: "ambig", fa: "صورتِ مسئلهٔ مبهم/غلط", src: "" },
@@ -224,9 +229,9 @@
         { id: "F10.dis", fa: STMT[16][1], w: 2, test: function (it) { return ST(it, "s_disputed"); } }],
       probes: [
         P("f10_swap", "counterfactual", "جابه‌جاییِ فرد", "اگر فردِ دیگری با همان توانایی جای تو بود، نتیجه فرق می‌کرد؟", [
-          O("same", "نه، همان می‌شد", [["F10", 1]]), O("diff", "بله، فرق می‌کرد", [["F10", -1]])]),
+          O("same", "نه، همان می‌شد", [["F10", 1]]), O("diff", "بله، فرق می‌کرد", [["F10", -1, []]])]),
         P("f10_benefit", "fact", "چه کسی سود می‌برد؟", "چه کسی یا چه ساختاری از نتیجهٔ فعلی سود می‌برد؟ (نقش، نه نام)", [
-          O("someone", "کسی یا ساختاری مشخص سود می‌برد", [["F10", 1, "incent"]]), O("none", "هیچ‌کس به‌طورِ خاص", [["F10", -1]])], { input: "چه کسی/چه ساختاری؟ (اختیاری)" })],
+          O("someone", "کسی یا ساختاری مشخص سود می‌برد", [["F10", 1, "incent"]]), O("none", "هیچ‌کس به‌طورِ خاص", [["F10", -1, []]])], { input: "چه کسی/چه ساختاری؟ (اختیاری)" })],
       acts: [T(20), T(8), T(3), T(9), X("env", "تصمیمِ «تغییرِ محیط/انتخاب‌ها» به‌جای «تغییرِ خود»", "", "تصمیم است، نه تکنیکِ آزموده",
         "فهرست کن چه چیزی در ساختار (معیار، مشوق، کانال، زمان، جا) قابلِ تغییر یا انتخاب است؛ بعد تصمیم بگیر کدام را به‌جای تغییرِ خودت عوض کنی.")] },
     { id: "F11", fa: "برداشت و نتیجه‌گیری (معرفتی)", blurb: "از یک تجربه قاعده ساخته شده، یا «آزمونی» عامه‌پسند و بی‌اعتبار، یا خودتشخیصی‌ای که هیچ مشاهده‌ای باطلش نمی‌کند.",
@@ -237,11 +242,11 @@
         { id: "F11.once", fa: "نتیجه‌ای دربارهٔ خود از رخدادی که یک‌بار پیش آمده", w: 1, test: function (it) { return it.freq === "once" && !!CL(it); } }],
       probes: [
         P("f11_ref", "fact", "کلاسِ مرجع", "در مواردِ مشابه، این اتفاق برای دیگران هم چقدر می‌افتد؟", [
-          O("common", "زیاد؛ عادی است", [["F11", 1, "onecase"]]), O("rare", "کم و نادر", [["F11", -1]]), O("unk", "نمی‌دانم", [])]),
+          O("common", "زیاد؛ عادی است", [["F11", 1, "onecase"]]), O("rare", "کم و نادر", [["F11", -1, []]]), O("unk", "نمی‌دانم", [])]),
         P("f11_signal", "fact", "سیگنال یا نویز", "این برداشت از چند موردِ مستقل آمده؟", [
-          O("few", "یک یا دو مورد", [["F11", 1, "onecase"]]), O("many", "موردهای مستقلِ زیاد", [["F11", -1]])]),
+          O("few", "یک یا دو مورد", [["F11", 1, "onecase"]]), O("many", "موردهای مستقلِ زیاد", [["F11", -1, ["onecase"]]])]),
         P("f11_falsify", "fact", "چه چیزی باطلش می‌کند؟", "چه مشاهده‌ای این برداشت را باطل می‌کند؟", [
-          O("none", "نمی‌توانم چنین مشاهده‌ای تصور کنم", [["F11", 1, "unfals"]]), O("can", "می‌توانم و می‌شود آزمودش", [["F11", -1]])], { input: "آن مشاهده (اختیاری)" })],
+          O("none", "نمی‌توانم چنین مشاهده‌ای تصور کنم", [["F11", 1, "unfals"]]), O("can", "می‌توانم و می‌شود آزمودش", [["F11", -1, ["unfals"]]])], { input: "آن مشاهده (اختیاری)" })],
       acts: [{ epi: true, fa: "پروندهٔ کارخانهٔ معرفت‌شناسی" }, T(10), T(9), T(22), T(21)] },
     { id: "F12", fa: "تصمیم و خودتنظیمی", blurb: "هزینهٔ ازدست‌رفته، گریز از زیان، سوگیریِ اکنون یا خطای برنامه‌ریزی تصمیم را از دانسته جدا کرده.",
       subs: [{ id: "sunk", fa: "هزینهٔ ازدست‌رفته", src: "" }, { id: "loss", fa: "گریز از زیان", src: "" }, { id: "present", fa: "سوگیریِ اکنون و اهمال‌کاری", src: "Steel 2007" },
@@ -251,10 +256,10 @@
         { id: "F12.so", fa: STMT[19][1], w: 2, test: function (it) { return ST(it, "s_sooner"); } }],
       probes: [
         P("f12_zero", "counterfactual", "از صفر", "اگر امروز از صفر تصمیم می‌گرفتی، همان را انتخاب می‌کردی؟", [
-          O("other", "کارِ دیگری می‌کردم", [["F12", 1, "sunk"]]), O("same", "همان را", [["F12", -1]])]),
+          O("other", "کارِ دیگری می‌کردم", [["F12", 1, "sunk"]]), O("same", "همان را", [["F12", -1, []]])]),
         P("f12_plan", "fact", "پیش‌بینیِ زمان", "پیش‌بینیِ قبلی‌ات از زمان چه بود و زمانِ واقعی چه شد؟ (هر واحدی، ولی هر دو یکسان)", null, {
           nums: [["pred", "پیش‌بینی"], ["real", "واقعی"]],
-          score: function (ans) { var p = N(ans && ans.pred), r = N(ans && ans.real); if (p == null || r == null || p <= 0) return []; return r > p * 1.25 ? [{ fam: "F12", dir: 1, sub: "plan" }] : [{ fam: "F12", dir: -1, sub: "" }]; } })],
+          score: function (ans) { var p = N(ans && ans.pred), r = N(ans && ans.real); if (p == null || r == null || p <= 0) return []; return r > p * 1.25 ? [{ fam: "F12", dir: 1, sub: "plan" }] : [{ fam: "F12", dir: -1, sub: ["plan"] }]; } })],
       acts: [T(9, "کلاسِ مرجع برای زمان"), T(11), T(23), X("impl2", "قصدِ اجرایی «اگر… آنگاه…»", "Gollwitzer & Sheeran 2006", "", IMPL_HOW)] }
   ];
   /* پیوندِ معناییِ هر خانواده به ایستگاه‌های کارخانهٔ معرفت‌شناسی (مالک ۲۰۲۶-۱۰-۱۲: «ارتباطِ معناییِ دقیق، نه تعارفی»).
@@ -275,38 +280,75 @@
   function subName(fam, sid) { var F = KFM[fam]; var s = F && F.subs.filter(function (x) { return x.id === sid; })[0]; return s ? s.fa : ""; }
   A.knotFamName = famName; A.knotSubName = subName;
 
-  /* ---------- رتبه (§۴ «قاعدهٔ رتبه» + §۱۲.۳) ----------
-     امتیازِ نشانه‌ها دو بخش دارد:
-     (۱) نشانه‌های ویژه (جمله‌ها، شدت‌ها، الگوهای متن): (جمعِ وزن‌های فعال) ÷ (تعدادِ نشانه‌های ویژهٔ همان خانواده) — همان قاعدهٔ §۱۲.۳
-         تا خانواده‌ای که ردیفِ بیشتری در جدول دارد خودبه‌خود جلو نیفتد؛
-     (۲) نشانهٔ «نوعِ موقعیت» (kind: 1) که میانِ چند خانواده مشترک است (مثلاً «مسئله» برای F1، F2، F3): جدا شمرده می‌شود و بر مخرجِ
-         ثابتِ KIND_DIV = ۳ (برای همهٔ خانواده‌ها یکی) تقسیم می‌شود. پیش‌تر همین نشانهٔ مشترک بر تعدادِ ردیف‌های هر خانواده تقسیم می‌شد،
-         پس F1 (دو ردیف) از «مسئله» ۰٫۵ می‌گرفت و F2/F3 (سه ردیف) ۰٫۳۳ — یعنی صرفاً به‌خاطرِ ردیفِ کمتر جلو می‌افتاد (ممیزی ۲۰۲۶-۱۰-۱۲).
-         اکنون یک نشانهٔ مشترک به همهٔ خانواده‌هایش دقیقاً یک اندازه می‌دهد (وزن ÷ ۳)، و فرق فقط از نشانه‌های ویژه و شاهدها می‌آید.
-         اثر روی سه سناریوی مرجع: دنباله (A1) F3، F11، F5، F1، F2 (پیش‌تر F1 دوم بود فقط به‌خاطرِ همان ۰٫۵)؛ مدیر (B) و ناخن (C) بی‌تغییر.
-     + جمعِ شاهدها (له +، علیه −؛ وزن بر پایهٔ نوعِ شاهد، KW). هم‌امتیازها به ترتیبِ شمارهٔ خانواده. این ترتیبِ بررسی است، نه احتمال. */
+  /* ---------- رتبه: قاعدهٔ وزن‌دارِ پیشین (§۴ + §۱۲.۳ ِ طرح) تا ۲۰۲۶-۱۰-۱۴ برقرار بود و با تصمیمِ مالک کنار رفت؛ قاعدهٔ تازه پایین‌تر.
+     KIND_DIV و KW فقط برای سازگاریِ خواندنِ داده‌های قدیمی و آزمون‌های دیگر نگه داشته شده‌اند و در رتبه به کار نمی‌روند. */
   var KIND_DIV = 3;
   A.KIND_DIV = KIND_DIV;
   function intakeOf(kc) { var it = {}, src = (kc && kc.intake) || {}; for (var k in src) it[k] = src[k]; it.kinds = (kc && kc.kinds) || []; return it; }
+  /* ---------- رتبه‌بندیِ بی‌وزن، برگشته به اصل‌ها (مالک ۲۰۲۶-۱۰-۱۵: «همه چیز باید به بدیهیاتِ یقینی برگردد»؛ HANDBOOK §۱۲ ردیفِ ۴۵) ----------
+     وزن‌های قراردادیِ پیشین (۳ / ۱ / ۰٫۵، نشانه‌ها ۱ تا ۳، ÷۳) کنار رفت. هر خانواده = چند تبیینِ فرعی (زیرنوع). سه قاعده، هر کدام از یک اصلِ کارخانه:
+     ۱) A0 (امتناعِ تناقض): پاسخی فقط تبیینی را رد می‌کند که لزوماً خلافِ آن پاسخ را پیش‌بینی کند؛ پس هر گزینهٔ «علیه» دقیقاً می‌گوید کدام
+        زیرنوع‌ها را رد می‌کند («درست بازگفتم» فقط «بدخوانی» را، نه «مدلِ غلط»). ندیدن، نبودن نیست؛ و پیش‌بینیِ تو دربارهٔ حالتِ فرضی
+        («اگر کسی نمی‌دید…») مشاهده نیست ⇒ هیچ‌کدام چیزی را رد نمی‌کنند.
+     ۲) A1 (کل از جزء کمتر نیست): خانواده فقط وقتی کنار می‌رود که **همهٔ** زیرنوع‌هایش رد شده باشند (یا خودت در دفترِ شواهد ردش کرده باشی).
+     ۳) A4 (بی‌مرجح): نشانه‌ای که برای چند خانواده به یک اندازه برقرار است («نوعِ موقعیت: مسئله») هیچ را بر دیگری ترجیح نمی‌دهد ⇒ «زمینه» است، نه شاهد.
+        شاهد = حرف یا پاسخِ خودِ تو که همین خانواده پیش‌بینی‌اش می‌کند (جمله‌های تیک‌خورده، پاسخِ آزمون، پلهٔ نردبان، یافتهٔ غربالِ تور با نقلِ حرفت).
+     خروجی: وضع = «کنار رفت» / «شاهد دارد» / «هنوز معلوم نیست» — بی هیچ عدد. ترتیب فقط برای بررسی است: اول «شاهد دارد»، بعد «معلوم نیست»، آخر
+     «کنار رفت»؛ درونِ هر گروه، آن‌که شاهدِ بیشتری دارد بعد آن‌که زیرنوعِ ردشدهٔ کمتری دارد، و بعد شمارهٔ خانواده. این ترتیب داوری نیست. */
+  var STATE_FA = { ev: "شاهد دارد", open: "هنوز معلوم نیست", out: "کنار رفت" };
+  A.KNOT_STATE_FA = STATE_FA;
+  var PROBE = {}; A.KF.forEach(function (F) { F.probes.forEach(function (p) { PROBE[p.id] = p; }); });
+  /* شاهدهای آزمون از روی تعریفِ فعلیِ آزمون و پاسخِ ثبت‌شده دوباره ساخته می‌شوند تا پرونده‌های قدیمی هم با همین منطق سنجیده شوند */
+  function liveEv(kc) {
+    var out = [];
+    (kc.ev || []).forEach(function (e) {
+      var m = /^probe:(.+)$/.exec(e.src || ""), p = m && PROBE[m[1]], a = m && kc.pans && kc.pans[m[1]];
+      if (p && a) {
+        var fresh = p.scoreFrom(a).filter(function (x) { return x.fam === e.fam && (x.dir < 0) === (e.dir < 0); })[0];
+        out.push(fresh ? Object.assign({}, e, { sub: fresh.sub }) : e);
+      } else out.push(e);
+    });
+    return out;
+  }
+  /* یافته‌های «پیدا شد» ِ غربالِ هر تورِ دستیار که این موقعیت را به وجهی وصل کرده (با نقلِ حرفِ خودِ کاربر) */
+  function sieveOf(kc) {
+    var r = {};
+    try { S.all("achat", function (x) { return x.tour && x.tour.diag && (x.tour.facets || []).some(function (f) { return (f.refs || []).some(function (z) { return z.id === kc.id; }); }); })
+      .forEach(function (x) { Object.keys(x.tour.diag).forEach(function (id) { var d = x.tour.diag[id]; if (/^F\d+$/.test(id) && d && d.st === "found" && d.why) r[id] = d.why; }); }); } catch (e) { }
+    return r;
+  }
   A.knotRank = function (kc) {
-    var it = intakeOf(kc), evs = (kc && kc.ev) || [];
+    var it = intakeOf(kc), evs = liveEv(kc), sv = sieveOf(kc);
     return A.KF.map(function (F, idx) {
-      var why = [], whyx = [], sum = 0, kindSum = 0, nSpec = 0;
-      F.signals.forEach(function (s) {
-        var on = false; try { on = !!s.test(it); } catch (e) { on = false; }
-        if (!s.kind) nSpec++;
-        if (on) { if (s.kind) kindSum += s.w; else sum += s.w; why.push("نشانه: " + s.fa + " (وزن " + fa(s.w) + (s.kind ? "؛ نشانهٔ مشترکِ نوع" : "") + ")"); whyx.push({ t: "sig", txt: s.fa, w: s.w, kind: !!s.kind }); }
+      var why = [], whyx = [], sup = [], ctx = [], ref = {}, refBy = {}, neutral = [], famOut = "", supSubs = {};
+      F.signals.forEach(function (sg) {
+        var on = false; try { on = !!sg.test(it); } catch (e) { on = false; }
+        if (!on) return;
+        if (sg.kind) { ctx.push(sg.fa); whyx.push({ t: "ctx", txt: sg.fa }); }
+        else { sup.push(sg.fa); whyx.push({ t: "sig", txt: sg.fa }); }
       });
-      var n = nSpec, sig = (n ? sum / n : 0) + kindSum / KIND_DIV, evSum = 0;
-      if (sum) why.push("نشانه‌های ویژه = " + fa(sum) + " ÷ " + fa(n) + " نشانهٔ ویژهٔ این خانواده = " + sgn(n ? sum / n : 0));
-      if (kindSum) why.push("نشانهٔ مشترکِ نوعِ موقعیت = " + fa(kindSum) + " ÷ " + fa(KIND_DIV) + " (برای همهٔ خانواده‌ها یکسان) = " + sgn(kindSum / KIND_DIV));
       evs.forEach(function (e) {
         if (e.fam !== F.id) return;
-        var w = (e.dir < 0 ? -1 : 1) * (e.w != null ? +e.w : (KW[e.kind] || 1)); evSum += w;
-        why.push("شاهد (" + (KWFA[e.kind] || e.kind) + "، " + sgn(w) + "): " + e.text); whyx.push({ t: "ev", txt: e.text, w: w, kind: e.kind });
+        if (e.dir > 0) { sup.push(e.text); if (e.sub && typeof e.sub === "string") supSubs[e.sub] = e.text; whyx.push({ t: "ev", txt: e.text, kind: e.kind }); return; }
+        if (e.kind === "manual" || e.src === "manual") { famOut = e.text; whyx.push({ t: "out", txt: e.text }); return; }
+        var subs = Array.isArray(e.sub) ? e.sub : [];
+        if (!subs.length) { neutral.push(e.text); whyx.push({ t: "neutral", txt: e.text }); return; }
+        subs.forEach(function (x) { ref[x] = 1; refBy[x] = e.text; }); whyx.push({ t: "ref", txt: e.text, subs: subs });
       });
-      return { fam: F.id, score: r2(sig + evSum), sig: r2(sig), sigSum: sum, nSig: n, kindSum: kindSum, ev: r2(evSum), why: why, whyx: whyx, ord: idx };
-    }).sort(function (a, b) { return b.score - a.score || a.ord - b.ord; });
+      if (sv[F.id]) { sup.push("غربالِ تور: «" + sv[F.id] + "»"); whyx.push({ t: "sieve", txt: sv[F.id] }); }
+      var refSubs = F.subs.filter(function (x) { return ref[x.id]; }), left = F.subs.filter(function (x) { return !ref[x.id]; });
+      var state = famOut || !left.length ? "out" : sup.length ? "ev" : "open";
+      var subFa = function (id) { var x = F.subs.filter(function (y) { return y.id === id; })[0]; return x ? x.fa : id; };
+      sup.forEach(function (t) { why.push("شاهد: " + t); });
+      refSubs.forEach(function (x) { why.push("کنار رفت — «" + x.fa + "»: پاسخت با آن نمی‌خواند (" + refBy[x.id] + ")"); });
+      Object.keys(supSubs).forEach(function (x) { if (ref[x]) why.push("⚠ ناسازگاری: برای «" + subFa(x) + "» هم شاهد هست («" + supSubs[x] + "») و هم پاسخی که با آن نمی‌خواند («" + refBy[x] + "») — یکی از این دو پاسخ را دوباره ببین"); });
+      if (famOut) why.push("خودت در دفترِ شواهد کنارش گذاشتی: " + famOut);
+      neutral.forEach(function (t) { why.push("پاسخِ «نه» که چیزی را رد نمی‌کند (ندیدن، نبودن نیست؛ یا حدس دربارهٔ حالتِ فرضی است): " + t); });
+      ctx.forEach(function (t) { why.push("زمینه، نه شاهد (برای چند خانواده یکسان است): " + t); });
+      if (refSubs.length && left.length) why.push("هنوز باز: " + left.map(function (x) { return "«" + x.fa + "»"; }).join("، "));
+      return { fam: F.id, state: state, stateFa: STATE_FA[state], score: state === "ev" ? 1 : state === "out" ? -1 : 0, n: sup.length, refSubs: refSubs.map(function (x) { return x.id; }),
+        openSubs: left.map(function (x) { return x.id; }), conflict: Object.keys(supSubs).some(function (x) { return ref[x]; }), sig: sup.length, ev: sup.length, why: why, whyx: whyx, ord: idx };
+    }).sort(function (a, b) { return b.score - a.score || b.n - a.n || a.refSubs.length - b.refSubs.length || a.ord - b.ord; });
   };
 
   /* ---------- رکوردها ---------- */
@@ -867,7 +909,7 @@
     return h("div", { class: "kn-fb" },
       h("p", { class: "small" }, F.blurb),
       h("div", { class: "kn-why" }, h("b", { class: "small" }, "چرا این‌جاست؟"),
-        r.why.length ? h("ul", { class: "small" }, r.why.map(function (w) { return h("li", {}, w); })) : h("p", { class: "small muted" }, "هیچ نشانه یا شاهدی ندارد؛ فقط چون همهٔ خانواده‌ها همیشه بررسی می‌شوند این‌جاست.")),
+        r.why.length ? h("ul", { class: "small" }, r.why.map(function (w) { return h("li", {}, w); })) : h("p", { class: "small muted" }, "هنوز نه شاهدی دارد و نه پاسخی که ردش کند؛ چون همهٔ خانواده‌ها همیشه بررسی می‌شوند این‌جاست.")),
       h("details", { class: "kn-subs" }, h("summary", { class: "small" }, "زیرنوع‌ها و منبع‌ها (" + fa(F.subs.length) + ")"),
         h("ul", { class: "small" }, F.subs.map(function (s) { return h("li", {}, s.fa, s.src ? h("span", { class: "muted", dir: "auto" }, " — " + s.src) : null); }))),
       hy.length ? h("div", { class: "small" }, h("b", {}, "فرضیه‌های فرعیِ پذیرفته‌شده:"), h("ul", {}, hy.map(function (x) { return h("li", {}, x.text, x.rival ? h("span", { class: "muted" }, " · رقیب: " + x.rival) : null, x.by === "ai" ? h("span", { class: "chip" }, "پیشنهادِ هوش مصنوعی") : null); }))) : null,
@@ -879,12 +921,12 @@
     var hs = hindsight(kc); if (hs) box.appendChild(hs);
     box.appendChild(h("section", { class: "card soft" },
       h("div", { class: "row between wrap gap" }, h("h2", {}, "همهٔ ۱۲ خانواده"), h("span", { class: "pill kn-order" }, "ترتیبِ بررسی، نه احتمال")),
-      h("p", { class: "small" }, "رتبه از قاعده‌های ثابتِ همین برنامه ساخته می‌شود: امتیازِ نشانه‌ها (جمعِ وزن‌های نشانه‌های ویژه ÷ تعدادِ نشانه‌های ویژهٔ هر خانواده، به‌علاوهٔ نشانهٔ مشترکِ «نوعِ موقعیت» ÷ ۳ که برای همهٔ خانواده‌هایش یکسان است) + شاهدهای آزمون‌ها (مقایسهٔ عملکرد ±۳، گزارشِ واقعیت ±۱، پیش‌بینیِ خلافِ واقعِ خود ±۰٫۵، پلهٔ نردبان +۱). هیچ خانواده‌ای حذف نمی‌شود؛ سه تای اول باز است و بقیه یک کلیک دورتر. ریشه را در قدمِ ۳ خودت تأیید می‌کنی.")));
+      h("p", { class: "small" }, "هیچ عددِ قراردادی‌ای در کار نیست. هر خانواده یکی از سه وضع را دارد: «شاهد دارد» (حرف یا پاسخِ خودت که همین خانواده پیش‌بینی‌اش می‌کند)، «هنوز معلوم نیست»، یا «کنار رفت» (فقط وقتی پاسخی با **همهٔ** تبیین‌های فرعیِ آن تناقض داشت — اصلِ امتناعِ تناقض؛ ردِ یک تبیینِ فرعی خانواده را کنار نمی‌گذارد). نشانه‌ای که برای چند خانواده یکسان است «زمینه» است، نه شاهد. ترتیب فقط برای بررسی است، نه داوری؛ هیچ خانواده‌ای حذف نمی‌شود و ریشه را در قدمِ ۳ خودت تأیید می‌کنی.")));
     box.appendChild(h("div", { class: "kn-ranks" }, rk.map(function (r, i) {
       var F = KFM[r.fam];
       return h("details", { class: "card kn-fam-card" + (i < 3 ? " top" : ""), open: i < 3, "data-fam": r.fam },
         h("summary", {}, h("span", { class: "kn-rn" }, fa(i + 1)), h("span", { class: "kn-fn" }, famName(r.fam)),
-          h("span", { class: "pill " + (r.score > 0 ? "good" : r.score < 0 ? "bad" : ""), title: "نشانه‌ها " + sgn(r.sig) + " · شاهدها " + sgn(r.ev) }, "امتیاز " + sgn(r.score))),
+          h("span", { class: "pill kn-state " + (r.score > 0 ? "good" : r.score < 0 ? "bad" : "") }, r.stateFa + (r.n ? " · " + fa(r.n) + " شاهد" : "") + (r.conflict ? " · ⚠ ناسازگاری" : ""))),
         famBody(kc, r, F));
     })));
     /* پیشنهادِ اختیاریِ هوش مصنوعی: فقط فرضیهٔ فرعی و تبیینِ رقیب — رتبه را عوض نمی‌کند */
@@ -1144,7 +1186,7 @@
     if (K(iv, "problem")) box.appendChild(ladderBox(H));
     function famSec(r, i) {
       var F = KFM[r.fam];
-      return h("section", { class: "card kn-pf", "data-fam": F.id }, h("div", { class: "row between wrap gap" }, h("h3", {}, fa(i + 1) + ") " + famName(F.id)), h("span", { class: "pill" }, "امتیاز " + sgn(r.score))),
+      return h("section", { class: "card kn-pf", "data-fam": F.id }, h("div", { class: "row between wrap gap" }, h("h3", {}, fa(i + 1) + ") " + famName(F.id)), h("span", { class: "pill kn-state" }, r.stateFa)),
         F.probes.map(function (p) { return probeBox(H, F, p); }), simLinks(F.id));
     }
     box.appendChild(h("h2", {}, "آزمون‌های تمایزدهنده — سه خانوادهٔ اولِ ترتیبِ بررسی"));
@@ -1166,10 +1208,11 @@
     var kc = H.kc;
     var sec = h("section", { class: "card kn-ledger" }, h("h3", {}, "دفترِ شواهد (" + fa(kc.ev.length) + ")"));
     if (!kc.ev.length) sec.appendChild(h("p", { class: "small muted" }, "هنوز شاهدی نیست. به یکی از آزمون‌ها پاسخ بده یا نردبان را برو."));
-    else sec.appendChild(h("div", { class: "scrollx" }, h("table", { class: "dt kn-evt" }, h("thead", {}, h("tr", {}, h("th", {}, "خانواده"), h("th", {}, "جهت و وزن"), h("th", {}, "نوع"), h("th", {}, "شاهد"), h("th", {}, ""))),
+    else sec.appendChild(h("div", { class: "scrollx" }, h("table", { class: "dt kn-evt" }, h("thead", {}, h("tr", {}, h("th", {}, "خانواده"), h("th", {}, "اثر"), h("th", {}, "نوع"), h("th", {}, "شاهد"), h("th", {}, ""))),
       h("tbody", {}, kc.ev.map(function (e, i) {
-        var w = (e.dir < 0 ? -1 : 1) * (e.w != null ? +e.w : KW[e.kind] || 1);
-        return h("tr", {}, h("td", {}, famName(e.fam)), h("td", {}, h("span", { class: "pill " + (w > 0 ? "good" : "bad") }, (w > 0 ? "له " : "علیه ") + sgn(w))), h("td", { class: "small" }, KWFA[e.kind] || e.kind), h("td", { class: "small" }, e.text),
+        var le = liveEv({ ev: [e], pans: kc.pans })[0], Fx = KFM[e.fam], eff = e.dir > 0 ? "شاهد" : (e.kind === "manual" || e.src === "manual") ? "کنارش گذاشتی" :
+          Array.isArray(le.sub) && le.sub.length ? "رد می‌کند: " + le.sub.map(function (id) { var x = Fx && Fx.subs.filter(function (y) { return y.id === id; })[0]; return x ? x.fa : id; }).join("، ") : "چیزی را رد نمی‌کند";
+        return h("tr", {}, h("td", {}, famName(e.fam)), h("td", {}, h("span", { class: "pill " + (e.dir > 0 ? "good" : /^رد/.test(eff) || /کنار/.test(eff) ? "bad" : "") }, eff)), h("td", { class: "small" }, KWFA[e.kind] || e.kind), h("td", { class: "small" }, e.text),
           h("td", {}, h("button", { class: "linkish small", "aria-label": "حذفِ این شاهد", onclick: function () {
             var rm = kc.ev[i]; kc.ev.splice(i, 1);
             if (rm && /^probe:/.test(rm.src || "") && !kc.ev.some(function (x) { return x.src === rm.src; })) delete kc.pans[rm.src.slice(6)];
@@ -1177,7 +1220,7 @@
             H.put(); redraw();
           } }, "حذف")));
       })))));
-    var fs = sel("knEvFam", "", A.KF.map(function (F) { return [F.id, famName(F.id)]; }), function () { }), ds = sel("knEvDir", "", [["1", "له"], ["-1", "علیه"]], function () { }),
+    var fs = sel("knEvFam", "", A.KF.map(function (F) { return [F.id, famName(F.id)]; }), function () { }), ds = sel("knEvDir", "", [["1", "شاهد (له)"], ["-1", "کنارش می‌گذارم (حکمِ خودم)"]], function () { }),
       ks = sel("knEvKind", "", [["contrast", KWFA.contrast + " (±۳)"], ["fact", KWFA.fact + " (±۱)"], ["counterfactual", KWFA.counterfactual + " (±۰٫۵)"]], function () { }),
       tx = txt("knEvTxt", "", function () { }, "شاهد در یک جمله");
     sec.appendChild(h("details", { class: "kn-addev" }, h("summary", { class: "small" }, "افزودنِ شاهدِ دستی"),
@@ -1224,7 +1267,7 @@
     var kc = H.kc, R = kc.root, rk = A.knotRank(kc), top = rk[0].fam;
     var box = h("div", { class: "col gap" });
     box.appendChild(h("section", { class: "card soft" }, h("p", {}, "ریشه را خودت تأیید می‌کنی. ترتیبِ بررسی الان با «" + famName(top) + "» شروع می‌شود؛ این پیشنهاد است، نه حکم. سه خانوادهٔ اول: ",
-      rk.slice(0, 3).map(function (r) { return famName(r.fam) + " (" + sgn(r.score) + ")"; }).join("، ") + ".")));
+      rk.slice(0, 3).map(function (r) { return famName(r.fam) + " (" + r.stateFa + ")"; }).join("، ") + ".")));
     function soon() { H.soon(); }
     var subSel = h("div", {});
     function drawSub() {
@@ -1249,7 +1292,7 @@
         area("knDisagree", R.disagree, 2, function (v) { R.disagree = v; soon(); }, "مثلاً: «آزمونِ این خانواده را نشد بدهم، ولی در سه موقعیتِ دیگر هم…»"),
         { req: !sup.length, k: "disagree", hint: sup.length ? null : "یا به قدمِ ۲ برگرد و یک آزمونِ همین خانواده را بده تا شاهد ثبت شود." })) : null;
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "گرهِ اصلی"),
-      fld("خانوادهٔ اصلی", sel("knRootFam", R.primary, rk.map(function (r) { return [r.fam, famName(r.fam) + " — امتیاز " + sgn(r.score)]; }), function (v) { R.primary = v; R.sub = ""; R.extra = R.extra.filter(function (x) { return x.fam !== v; }); H.put(); redraw(); }), { req: true, k: "primary" }),
+      fld("خانوادهٔ اصلی", sel("knRootFam", R.primary, rk.map(function (r) { return [r.fam, famName(r.fam) + " — " + r.stateFa]; }), function (v) { R.primary = v; R.sub = ""; R.extra = R.extra.filter(function (x) { return x.fam !== v; }); H.put(); redraw(); }), { req: true, k: "primary" }),
       subSel, supBox,
       fld("تبیینِ رقیبِ اصلی: اگر ریشه این نباشد، محتمل‌ترین تبیینِ دیگر چیست؟", area("knRootRival", R.rival, 2, function (v) { R.rival = v; soon(); }, "مثلاً: «شاید فقط خسته بودم» یا «شاید معیارِ داور پنهان بود»"),
         { req: true, k: "rival", hint: "هر فرضیه یک تبیینِ رقیب دارد (§۰.۱)؛ ریشه هم." }),
