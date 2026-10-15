@@ -487,9 +487,12 @@
   var TK = { u: "und", p: "plan", c: "exec", b: "back" };
   var WHY = { u: "هنوز مسئله را نفهمیده‌ای کاری نکن: بی دانستنِ مجهول، داده و شرط، هر حرکتی کورمال است.", p: "طرح از پیوندِ داده و مجهول درمی‌آید؛ پرسش‌ها از آشنا به دور و از کل به جزء می‌روند.",
     c: "اجرا یعنی هر گام را وارسی کنی، نه فقط بنویسی؛ و پیش از محاسبه بدانی تقریباً به چه می‌رسی.", b: "تا نگاهی به پشتِ سر نیندازی، از حل چیزی برای مسئلهٔ بعد نمی‌ماند." };
-  function askList(ph, lv) {
+  /* t = نوعِ مسئله: برای «اثباتی» و «اثبات یا رد کن» پرسش‌های طرح همان پرسش‌های همان نوع‌اند (حکم/فرض)، نه پرسش‌های مسئلهٔ یافتنی (مجهول/داده) —
+     بازبینیِ دورِ ۵ (۲۰۲۶-۱۰-۱۵): پیش‌تر مسئلهٔ اثباتی هم «به مجهول نگاه کن» می‌گرفت. */
+  function askList(ph, lv, t) {
     var SP = A.SOLVE_PHASES || {};
     if (ph === "u") return ((SP.u && SP.u.q) || []).concat(["چه؟ چرا؟ کجا؟ کی؟ چگونه؟ — کدام‌یک دربارهٔ این مسئله هنوز بی‌پاسخ است؟"]);
+    if (ph === "p" && (t === "prove" || t === "pod")) return TYPES[t].plan.slice();
     if (ph === "p") return (A.PLAN_QS || []).map(function (x) { return x.t; });
     if (ph === "c") {
       var q = ["پیش از اجرا: طرحت آماده است — گام‌های اصلی‌اش را می‌دانی؟ نه با عجله آغاز کن، نه با درنگِ بی‌پایان.", "پیش از محاسبه: نتیجه تقریباً چه خواهد بود (بزرگی، علامت، شکل)؟"];
@@ -503,7 +506,7 @@
   A.solveAskList = askList;
   function simEntries(pg, tk, lv, sid) { return ((pg.tut || {})[tk] || []).filter(function (e) { return e && e.src === "sim" && e.k !== "motive" && e.lv === lv && e.sid === sid; }); }
   function askCard(p, pg, st, s0) {
-    var ph = A.stagePhase ? A.stagePhase(p, s0) : "p", Q = askList(ph, st.lv); if (!Q.length) return null;
+    var ph = A.stagePhase ? A.stagePhase(p, s0) : "p", ty = typeOf(p, pg.solve), Q = askList(ph, st.lv, ty); if (!Q.length) return null;
     var tk = TK[ph] || "plan", tut = pg.tut = pg.tut || {}; tut.qi = tut.qi || {};
     var mine = simEntries(pg, tk, st.lv, s0.id).filter(function (e) { return !e.skip; }).pop();
     var L = pg.lv[st.lv] || {}, es = Object.keys(L).map(function (k) { return L[k]; }).filter(function (e) { return e && e.at; }).sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
@@ -516,7 +519,7 @@
     var u = (pg.solve && pg.solve.u && (pg.solve.u[st.lv] || pg.solve.u[1] || pg.solve.u[0])) || null;
     if (u && u.u) det.appendChild(h("p", { class: "small sv-goal" }, "🎯 هدف را گم نکن — " + (typeOf(p, pg.solve) === "find" ? "مجهول" : "حکم") + "، به زبانِ خودت: «" + clip(u.u, 140) + "»"));
     if (mine) { det.appendChild(h("p", { class: "small sv-askmine" }, "پاسخت: «" + mine.text + "»")); return det; }
-    det.appendChild(h("p", { class: "small muted" }, "چرا این پرسش؟ " + WHY[ph] + " اگر با وضعِ همین لحظه نمی‌خواند، نپرس — پرسشِ بعد را بگیر. پیش از پاسخ، از تجربهٔ خودت بپرس: آخرین بار کجا در چنین گامی گیر کردی و چه چیزی بازت کرد؟"));
+    det.appendChild(h("p", { class: "small muted" }, "چرا این پرسش؟ " + (ph === "p" && ty !== "find" ? "طرحِ اثبات از پیوندِ فرض و حکم درمی‌آید؛ پرسش‌ها از آشنا به دور و از کل به جزء می‌روند." : WHY[ph]) + " اگر با وضعِ همین لحظه نمی‌خواند، نپرس — پرسشِ بعد را بگیر. پیش از پاسخ، از تجربهٔ خودت بپرس: آخرین بار کجا در چنین گامی گیر کردی و چه چیزی بازت کرد؟"));
     var id = "svAsk_" + st.lv + "_" + String(s0.id).replace(/[^a-z0-9]/gi, "");
     det.appendChild(field(id, "پاسخِ کوتاهِ تو (به قلمِ خودت)", "", function (v) { d.a = v; }, 0));
     det.appendChild(h("div", { class: "row gap wrap" },

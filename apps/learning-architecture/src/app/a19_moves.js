@@ -932,10 +932,11 @@
       m.ph && A.SOLVE_PHASES[m.ph] ? h("p", { class: "small muted" }, "مرحله: " + A.SOLVE_PHASES[m.ph].fa + " — همین پرسش پلهٔ دومِ «سرنخِ پله‌ای» در شبیه‌ساز و یکی از پرسش‌های طرح‌ریزیِ نردبانِ گره‌گشاست.") : null));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "کِی به این حرکت شک کنی"), h("ul", {}, m.sig.map(function (x) { return h("li", {}, x); })),
       m.lit ? h("p", { class: "small muted" }, "در ادبیاتِ حلِ مسئله: " + m.lit) : null));
+    /* «از تجربهٔ خودت» پیش از نمونه و ورزش — خودِ کارت می‌گوید «تند نخوان: پیش از نمونه‌ها…» (بازبینیِ دورِ ۵، ۲۰۲۶-۱۰-۱۵) */
+    root.appendChild(expCard(m));
     if ((m.ex || []).length) root.appendChild(h("section", { class: "card mv-ex" }, h("h2", {}, "نمونهٔ کارشده"), h("ul", {}, m.ex.map(function (x) { return h("li", {}, x); }))));
     if ((m.drills || []).length || GEN_FOR[id]) root.appendChild(drillSection(m));
     if (id === "mv_equation") root.appendChild(eqTable());
-    root.appendChild(expCard(m));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "تکنیک‌های مرتبط"), h("ul", { class: "plain mv-techs" }, m.tech.map(function (t) { return h("li", {}, A.techLink(t[0]), h("span", { class: "small" }, " — " + t[1])); }))));
     var np = {}; st.forEach(function (x) { np[x.p.id] = x.p; });
     var fields = {}; st.forEach(function (x) { fields[x.p.field || "—"] = 1; });
