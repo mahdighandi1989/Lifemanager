@@ -81,7 +81,7 @@ function sourceRecordTypes() {
     return { broken: G2.broken.length, brokenSample: G2.broken.slice(0, 5), dups: G2.dups.map(d => d.id).sort().join(), n: Object.keys(M.nodes).length, e: M.edges.length, miss: miss.slice(0, 10), nmiss: miss.length, dangling, stTech, famSt, br, gapBridges: G2.bridges, unknownType,
       ruleAt: M.edges.filter(e => e.rel === 'at' && M.nodes[e.a].t === 'rule').length, regTypes: reg.map(r => r[0]), types: APP.GRAPH.TYPES.map(x => x.t),
       globals, recTypes: [...new Set(APP.S.all().map(r => r.type))], claimTh, claimMissing, areaBasis: M.edges.filter(e => e.rel === 'basis' && M.nodes[e.a].t === 'area').length,
-      sareaView: M.edges.filter(e => M.nodes[e.a].t === 'sarea' && M.nodes[e.b].t === 'view').length, hidden: G2.hiddenSamples, nProb: (window.EPI_PROBLEMS || []).length };
+      sareaView: M.edges.filter(e => M.nodes[e.a].t === 'sarea' && M.nodes[e.b].t === 'view').length, hidden: G2.hiddenSamples, nProb: (window.EPI_PROBLEMS || []).length - (APP.practiceOn && APP.practiceOn() ? APP.practiceCount() : 0) };   // تصمیمِ مالک ۲۰۲۶-۱۰-۱۵: مسئله‌های کوتاهِ تمرینی پیش‌فرض روشن‌اند و در گراف می‌آیند
   });
   /* دادهٔ کاربر: یک رکورد از هر نوعِ نگاشته‌شده با ارجاع‌های درست ⇒ گره + یال‌ها، بی ارجاعِ شکسته */
   info.user = await p.evaluate(() => {
@@ -194,7 +194,7 @@ function sourceRecordTypes() {
     return { prereq: cards.some(c => /^prereq\|/.test(c)), whole: cards.some(c => /^whole\|/.test(c)),
       counts: cards.some(c => /^map\|/.test(c) && c.indexOf(APP.fa(APP.T.length) + ' تکنیک') >= 0 && c.indexOf(APP.fa(APP.C.PHASES.length) + ' فاز') >= 0) &&
         cards.some(c => /^e_map\|/.test(c) && c.indexOf(APP.fa(EPI_ST.length) + ' ایستگاه') >= 0 && c.indexOf(APP.fa(EPI.HALLS.length) + ' سالن') >= 0),
-      navLearn: inMaps('learn'), navEpi: inMaps('epi'), hiddenNote: (document.querySelector('main .gr-hidden') || {}).textContent || '', hidN: APP.fa(EPI_PROBLEMS.length) };
+      navLearn: inMaps('learn'), navEpi: inMaps('epi'), hiddenNote: (document.querySelector('main .gr-hidden') || {}).textContent || '', hidN: APP.fa(EPI_PROBLEMS.length - (APP.practiceOn() ? APP.practiceCount() : 0)) };   // مسئله‌های تمرینی پیش‌فرض روشن (مالک ۲۰۲۶-۱۰-۱۵)
   });
   chk(info.hub.prereq && info.hub.whole && info.hub.counts, 'hub has «🧩 نقشهٔ پیش‌نیازها» and «🧭 این برنامه چیست؟», counts derived from the registries ' + JSON.stringify(info.hub));
   chk(['navLearn', 'navEpi'].every(k => info.hub[k].some(g => /نقشه‌ها/.test(g)) && info.hub[k].some(g => /ابزارهای ذهن/.test(g))), 'prereq under «🗺 نقشه‌ها» in both menus, «🧰 ابزارهای ذهن» entry kept ' + JSON.stringify(info.hub));

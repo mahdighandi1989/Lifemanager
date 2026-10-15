@@ -33,7 +33,9 @@
      حدِ گردآوریِ اطلاعات (⇐ ایستگاهِ «مسئولیتِ معرفتی» st_resp) و تقریبِ کافی. هر جزء فقط از حرفِ خودِ کاربر (tour_diag … parts). */
   var PRACT = [["unknown", "مجهول: دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است؟"], ["data", "داده: چه داری (دانسته‌ها، منابع، امکان‌ها)؟"],
     ["cond", "شرط: کدام قیدها (زمان، پول، آدم‌ها، قاعده‌ها) — و کدامش واقعی است، کدام فرضی؟"], ["vague", "کدام مفهومِ مبهم را باید پیش از هر کار روشن کنی؟"],
-    ["ignore", "کدام داده را عمداً کنار می‌گذاری و تا کجا اطلاعات جمع می‌کنی؟"], ["approx", "کدام تقریب بس است — جوابِ «به‌اندازهٔ کافی خوب» چیست؟"]];
+    ["ignore", "کدام داده را عمداً کنار می‌گذاری و تا کجا اطلاعات جمع می‌کنی؟"], ["approx", "کدام تقریب بس است — جوابِ «به‌اندازهٔ کافی خوب» چیست؟"],
+    /* R4 — تصمیمِ مالک (۲۰۲۶-۱۰-۱۵): دانشِ پیشین/تجربیِ نادقیق و ریاضی‌کردن (کمیت و رابطه؛ وارسیِ کدیِ A.measurableCheck ِ a16) */
+    ["prior", "دانشِ پیشین: از تجربهٔ خودت یا دیگران (حتی نادقیق) دربارهٔ چنین مسئله‌ای چه می‌دانی؟"], ["measure", "ریاضی‌کردن: مجهول را کمیتی با عدد/واحد و موفقیت را یک رابطه بنویس (مثلاً x ≥ …)؟"]];
   AS.practicalParts = PRACT;
   /* قابِ کامل ⇒ یک کارتِ مرور (یک بار) — با کد، چه جزءها را دستیار از حرفِ کاربر ثبت کرده باشد چه خودِ کاربر در کشوی تور نوشته باشد */
   function practicalCard(s, x) {
@@ -147,7 +149,7 @@
   /* قابِ مسئلهٔ عملی جلوی چشمِ مدل — فقط وقتی لایهٔ practical «پیدا شد» یا «باید پرسید» است (پرامپتِ سامانه دست نمی‌خورد) */
   AS.promptHooks.push(function (s) {
     var x = AS.sieveState(s).practical; if (!x || (x.st !== "found" && x.st !== "ask")) return "";
-    var pp = x.parts || {}, owed = PRACT.filter(function (q) { return !pp[q[0]]; });
+    var pp = x.parts || {}, owed = PRACT.filter(function (q) { return !pp[q[0]] || (q[0] === "measure" && A.measurableCheck && !A.measurableCheck(pp.measure).ok); });   // ریاضی‌کردنِ ناسنجیدنی هنوز بدهکار است
     return "# قابِ مسئلهٔ عملی (لایهٔ «مسئلهٔ عملی»)\n" + PRACT.map(function (q) { return "- " + q[1] + " — " + (pp[q[0]] ? "«" + clip(pp[q[0]], 120) + "»" : "هنوز نپرسیده"); }).join("\n") +
       (owed.length ? "\nپیش از هر پیشنهادِ راه‌حل، **یکی** از مانده‌ها را بپرس (به همین ترتیب؛ بی پیشنهادِ جواب): «" + owed[0][1] + "». پاسخِ خودش را با {\"do\":\"tour_diag\",\"layers\":[{\"id\":\"practical\",\"st\":\"found\",\"why\":\"…\",\"parts\":{\"" + owed[0][0] + "\":\"همان جملهٔ خودش\"}}]} ثبت کن." : "\nقاب کامل است؛ حالا وجه‌ها را از همین قاب بساز.") +
       "\nبرای «تا کجا اطلاعات جمع کنی» ایستگاهِ «مسئولیتِ معرفتی» در کارخانه جایِ سنجیدنش است (پروندهٔ سنجش ⇐ همان ایستگاه): آیا امکان و وظیفهٔ تحقیقِ بیشتر هست؟";
@@ -214,10 +216,11 @@
           (r.why ? " — «" + clip(r.why, 90) + "»" : "") + (r.facet ? " ⇒ " + r.facet : "")));
         if (r.id === "practical" && (r.st === "found" || r.st === "ask")) det.appendChild(h("ul", { class: "plain as-pract", "data-own": "1" }, PRACT.map(function (q, qi) {
           var v = (r.parts || {})[q[0]], nm = q[1].split(":")[0].split("؟")[0];
-          if (v) return h("li", { class: "ok" }, "✓ " + nm + " — «" + clip(v, 70) + "»");
+          var unm = v && q[0] === "measure" && A.measurableCheck && !A.measurableCheck(v).ok;   // ریاضی‌کردنِ ناسنجیدنی ⇒ دوباره بنویس
+          if (v && !unm) return h("li", { class: "ok" }, "✓ " + nm + " — «" + clip(v, 70) + "»");
           /* جزءِ مانده را خودت بنویس (بی‌مدل): ذخیره با change؛ قابِ کامل ⇒ کارتِ مرور با کد */
           var id = "asPract_" + q[0];
-          return h("li", {}, h("label", { for: id }, "○ " + q[1]), h("input", { id: id, type: "text", class: "as-practin", placeholder: "به زبانِ خودت", onchange: function (e) { if (AS.sievePracticalSet(s, q[0], e.target.value) && AS.paint) AS.paint(); } }));
+          return h("li", {}, h("label", { for: id }, "○ " + q[1] + (unm ? " (هنوز سنجیدنی نیست: " + A.measurableCheck(v).why.join(" و ") + ")" : "")), h("input", { id: id, type: "text", class: "as-practin", value: unm ? v : null, placeholder: "به زبانِ خودت", onchange: function (e) { if (AS.sievePracticalSet(s, q[0], e.target.value) && AS.paint) AS.paint(); } }));
         })));
       });
       box.appendChild(det);

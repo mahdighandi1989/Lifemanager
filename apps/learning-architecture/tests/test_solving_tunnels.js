@@ -135,8 +135,8 @@ const FILE = 'file://' + DIST;
     __calls.length = 0; __q.push(R({})); AS.toggle(true); await AS.send('خب');
     const u = __calls[0].user;
     o.prompt = /# قابِ مسئلهٔ عملی/.test(u) && /یکی\*\* از مانده‌ها را بپرس/.test(u) && /«داده: چه داری/.test(u) && /مسئولیتِ معرفتی/.test(u);
-    const dr = AS.tourDrawer(s); o.drawer = dr.querySelectorAll('.as-pract li').length === 6 && dr.querySelectorAll('.as-pract li.ok').length === 2;
-    AS.DO.tour_diag({ layers: [{ id: 'practical', st: 'found', why: 'همه', parts: { data: 'دو آگهی', vague: '«به‌صرفه» یعنی هزینهٔ ماهانه', ignore: 'رنگ را کنار می‌گذارم؛ تا دو بازدید', approx: 'تفاوتِ کمتر از هزینهٔ یک ماه' } }] });
+    const dr = AS.tourDrawer(s); o.drawer = dr.querySelectorAll('.as-pract li').length === 8 && dr.querySelectorAll('.as-pract li.ok').length === 2;
+    AS.DO.tour_diag({ layers: [{ id: 'practical', st: 'found', why: 'همه', parts: { data: 'دو آگهی', vague: '«به‌صرفه» یعنی هزینهٔ ماهانه', ignore: 'رنگ را کنار می‌گذارم؛ تا دو بازدید', approx: 'تفاوتِ کمتر از هزینهٔ یک ماه', prior: 'مکانیکِ آشنا: مدلِ ساده‌تر کم‌خرج‌تر است', measure: 'هزینهٔ ماهانه ≤ ۳ میلیون' } }] });   // R4 (۲۰۲۶-۱۰-۱۵): دو جزءِ تازهٔ قاب
     __calls.length = 0; __q.push(R({})); await AS.send('بقیه را هم گفتم');
     o.full = /قاب کامل است/.test(__calls[0].user);
     const pc = APP.S.get(s.tour.diag.practical.card); o.card = !!pc && pc.src === 'sieve:practical' && pc.due === APP.addDays(APP.today(), 1) && /تقریبِ کافی/.test(pc.q);
