@@ -1,22 +1,77 @@
 {
  "round": 12,
- "reviewer": "زیرعاملِ جدا (بازبین مستقل)",
+ "reviewer": "زیرعاملِ جدا (نشستِ ابریِ مستقل RR، session_01FGNVyXvKmcVJCzzWfHrpb6؛ claude.ai/artifact/6b1F6uNgeqTqo2fd6Y455U) — بازبینیِ بازاجرای ۲۰۲۶-۱۰-۱۵",
  "checked": {
   "events_real": true,
-  "encoding_blind": true,
+  "encoding_blind": false,
   "frames_unselected": true,
   "verified_by_real": true,
   "proofs_from_axioms": true,
   "no_conventional": true,
   "territory_evidence": true,
-  "findings_diagnosed": true
+  "findings_diagnosed": true,
+  "tool_safe": false,
+  "zero_broken": false
  },
+ "checkedNote": "events_real و territory_evidence از بازبینیِ اصلیِ دورِ ۱۲ (earlier) — این بازاجرا واقعه یا گامِ قلمروِ تازه نداشت. encoding_blind/tool_safe/zero_broken را بازبین false داد؛ مشکل‌ها پایین با fixed",
  "problems": [
   {
-   "what": "سه نکتهٔ جزئی: x_comp در موردِ هیتلر؛ acted در اسنو؛ فشردگیِ روایتِ سالی کلارک",
-   "fix": "روایتِ سالی کلارک اصلاح شد (دلیلِ اصلیِ لغو: یافتهٔ میکروبیولوژی). دو مورد دیگر برچسبِ حقیقت را عوض نمی‌کنند و دست‌نخورده ماندند.",
+   "what": "test_plausible فایلِ backtest/reviews/recode-2026-10-15-corpus.json را می‌خواند که در diff ِ داده‌شده نبود",
+   "fix": "فایل در کامیتِ 31b23d5 هست (از diff ِ بازبین کنار گذاشته شده بود)؛ همهٔ ۶۰ آزمون سبز",
+   "fixed": true
+  },
+  {
+   "what": "results.json و foundation.json نسبت به بازاجرا کهنه",
+   "fix": "خروجی‌های run --rerun در همان کامیت‌ها هستند (31b23d5، f66087c و بازاجرای پایانی)؛ foundation شاملِ r_aql_matter_zanni",
+   "fixed": true
+  },
+  {
+   "what": "۴ مقدارِ پذیرفته به‌خاطرِ خراب‌کردنِ حکمِ درست برگشت (گزینش با سرانجام) و نامشان در diff نبود",
+   "fix": "شرطِ «۰ حکمِ درستِ خراب» ِ دستور است؛ هر ۴ با نام و دلیل در recode-2026-10-15-corpus.json (revertedBrokeVerdict) و Brier با/بی آن‌ها ثبت شد؛ علتشان (p_thiqa ِ سنجیده‌نشده = ۵۰ روی گواهیِ تک‌منبعِ سالم) در p_found_mixture برای مالک",
+   "fixed": true
+  },
+  {
+   "what": "الگوی هم‌سو با سرانجام در مقدارهای تازه (نشتِ احتمالیِ سرانجام از داستان)",
+   "fix": "آزمونِ نشت: داستانِ ۳۴ واقعه پیراسته شد (S1) و رمزگذارِ کورِ سوم (E3) فقط از متنِ پیراسته رمز زد: ۳۶ از ۴۳ همان؛ ۷ مقدارِ بازتولیدنشده برداشته شد",
+   "fixed": true
+  },
+  {
+   "what": "form «نامعتبر» ِ r5_sally_clark_1999/k1 عیبِ ماده از سرانجام است نه صورت",
+   "fix": "با recode برداشته شد",
+   "fixed": true
+  },
+  {
+   "what": "recode: دو ورودی برای یک هدف/کلید پذیرفته می‌شد؛ unset بی replace",
+   "fix": "رد می‌شود؛ «از» در لحظهٔ اعمال؛ unset فقط با replace",
+   "fixed": true
+  },
+  {
+   "what": "Brier فقط در متنِ کامیت بود",
+   "fix": "ledger.json: row.brier (۰٫۲۶۱۸ پس از همهٔ اصلاح‌ها؛ پیش ۰٫۲۸۷۵۵)",
    "fixed": true
   }
  ],
- "note": "همهٔ منبع‌ها و حقایق راستی‌آزمایی شد؛ افزودنِ ind_complete=false به دو مورد مشروع است (داستان دادهٔ چندساله را می‌گوید)."
+ "note": "قاب‌ها با منبعِ اصلی ۱۳۶/۱۳۶؛ r_aql_matter_zanni فقط T_below1؛ audit تمیز؛ ۲۰۳/۲۰۳ درست؛ همهٔ مشکل‌ها اصلاح شد.",
+ "earlier": {
+  "round": 12,
+  "reviewer": "زیرعاملِ جدا (بازبین مستقل)",
+  "checked": {
+   "events_real": true,
+   "encoding_blind": true,
+   "frames_unselected": true,
+   "verified_by_real": true,
+   "proofs_from_axioms": true,
+   "no_conventional": true,
+   "territory_evidence": true,
+   "findings_diagnosed": true
+  },
+  "problems": [
+   {
+    "what": "سه نکتهٔ جزئی: x_comp در موردِ هیتلر؛ acted در اسنو؛ فشردگیِ روایتِ سالی کلارک",
+    "fix": "روایتِ سالی کلارک اصلاح شد (دلیلِ اصلیِ لغو: یافتهٔ میکروبیولوژی). دو مورد دیگر برچسبِ حقیقت را عوض نمی‌کنند و دست‌نخورده ماندند.",
+    "fixed": true
+   }
+  ],
+  "note": "همهٔ منبع‌ها و حقایق راستی‌آزمایی شد؛ افزودنِ ind_complete=false به دو مورد مشروع است (داستان دادهٔ چندساله را می‌گوید)."
+ }
 }

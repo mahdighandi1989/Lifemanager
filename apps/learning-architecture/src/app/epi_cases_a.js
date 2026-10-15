@@ -47,7 +47,7 @@
     actor: "زملوایس بر پایه مقایسه دو بخش، حذف فرضیه‌های رقیب و مداخله، به نقش آلودگی دست پزشکان حکم کرد و شستن دست را اجرا کرد.",
     claims: [
       { id: "k1", txt: "ماده‌ای که از کالبدشکافی بر دست پزشکان می‌ماند علت اصلی تب نفاس در بخش نخست است و شستن دست با آهک کلردار آن را کاهش می‌دهد", role: "اصلی",
-        f: { x_conseq_n: 1, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, conf: 85, acted: true, stakes: HIGH, vazraf: true, hidden_ctrl: true, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
+        f: { way: TAJ, conf: 85, acted: true, stakes: HIGH, vazraf: true, hidden_ctrl: true, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
       { id: "k2", txt: "تأثیر جوی علت تفاوت دو بخش نیست", role: "مقدمه",
         f: { way: AQL, form: F_OK, conf: 85, stakes: HIGH }, truth: true }
     ],
@@ -234,7 +234,7 @@
     actor: "دایسون و ادینگتون بر پایه سنجش‌های خورشیدگرفتگی، پیش‌بینی نسبیت عام را تأییدشده اعلام کردند.",
     claims: [
       { id: "k1", txt: "نور ستاره‌ها در کنار خورشید به اندازه پیش‌بینی نسبیت عام (حدود ۱٫۷۵ ثانیه قوس) خم می‌شود، نه به اندازه نیوتنی", role: "اصلی",
-        f: { x_conseq_n: 1, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, vazraf: true, hidden_ctrl: true, sense_ctrl: true, conf: 80, acted: true, stakes: MID, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
+        f: { way: TAJ, vazraf: true, hidden_ctrl: true, sense_ctrl: true, conf: 80, acted: true, stakes: MID, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
       { id: "k2", txt: "صفحه‌های تلسکوپ نجومی سوبرال به سبب خطای ابزاری قابل‌اتکا نیستند", role: "مقدمه",
         f: { way: TAJ, conf: 75, stakes: MID }, truth: true }
     ],

@@ -1419,7 +1419,7 @@
    },
    "brier": {
     "claims": 233,
-    "ceil": 0.25858
+    "ceil": 0.2618
    },
    "foundation": {
     "classes": {

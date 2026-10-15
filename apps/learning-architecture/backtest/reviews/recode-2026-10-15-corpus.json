@@ -29,24 +29,6 @@
  },
  "applied": [
   {
-   "n": 1,
-   "case": "cs_semmelweis_method",
-   "claim": "k1",
-   "key": "x_conseq_n",
-   "value": 1,
-   "set": "agreed",
-   "why": "intervention (handwashing → mortality drop) predicted and confirmed before judgement"
-  },
-  {
-   "n": 2,
-   "case": "cs_semmelweis_method",
-   "claim": "k1",
-   "key": "x_conseq_new",
-   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
-   "set": "agreed",
-   "why": "mortality drop unknown before intervention"
-  },
-  {
    "n": 3,
    "case": "cs_miasma_board",
    "claim": "k1",
@@ -533,15 +515,6 @@
    "why": "claim matches the taught rule"
   },
   {
-   "n": 60,
-   "case": "cs_b_holism",
-   "claim": "k1",
-   "key": "form",
-   "value": "نامعتبر",
-   "set": "agreed",
-   "why": "text shows equivocation on 'تصور'"
-  },
-  {
    "n": 61,
    "case": "cs_pb_flt_numeric",
    "claim": "k2",
@@ -630,24 +603,6 @@
    "value": "غیرقیاسی (استقرا/تمثیل)",
    "set": "agreed",
    "why": "from one instance"
-  },
-  {
-   "n": 71,
-   "case": "cs_pb_semm_handwash",
-   "claim": "k1",
-   "key": "x_conseq_n",
-   "value": 1,
-   "set": "agreed",
-   "why": "handwashing → mortality drop confirmed"
-  },
-  {
-   "n": 72,
-   "case": "cs_pb_semm_handwash",
-   "claim": "k1",
-   "key": "x_conseq_new",
-   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
-   "set": "agreed",
-   "why": "unknown before intervention"
   },
   {
    "n": 73,
@@ -855,24 +810,6 @@
    "value": "احراز شده",
    "set": "single",
    "why": "prominent physicians and obstetrics professors on this topic"
-  },
-  {
-   "n": 98,
-   "case": "cs_eddington_1919",
-   "claim": "k1",
-   "key": "x_conseq_n",
-   "value": 1,
-   "set": "single",
-   "why": "one predicted deflection confirmed"
-  },
-  {
-   "n": 99,
-   "case": "cs_eddington_1919",
-   "claim": "k1",
-   "key": "x_conseq_new",
-   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
-   "set": "single",
-   "why": "deflection value not known before"
   },
   {
    "n": 100,
@@ -1239,8 +1176,82 @@
  "effect": {
   "verdicts": "۲۰۳ از ۲۰۳ درست پیش و پس (۰ حکمِ درستِ خراب)",
   "brierBefore": 0.28755,
-  "brierAfter": 0.25858,
-  "claimsWithTruth": 233,
-  "casesWithExtraCorrectFlags": 20
- }
+  "brierAfter": 0.2618,
+  "brierIfRevertedKept": "با نگه‌داشتنِ ۴ برگشت: ۴ هشدارِ کاذب (حکمِ خراب)؛ برگشت‌ها به دستورِ «۰ حکمِ درستِ خراب» و خودشان یافته‌اند (p_found_mixture: p_thiqa ِ سنجیده‌نشده = ۵۰)",
+  "claimsWithTruth": 233
+ },
+ "leakCheck": {
+  "what": "بازبینِ مستقلِ دور (RR، claude.ai/artifact/6b1F6uNgeqTqo2fd6Y455U) الگوی هم‌سو با سرانجام دید (x_conseq_new «تازه» فقط روی درست‌ها، chain «تک‌منبع» فقط روی نادرست‌ها، form «نامعتبر» فقط روی نادرست‌ها). آزمون: نشستِ جدای S1 جمله‌های پس از داوری را از داستانِ ۳۴ واقعه برداشت (claude.ai/artifact/83AgZdf7Vgwz6ESpFxGWG9) و رمزگذارِ کورِ سومِ E3 فقط از متنِ پیراسته رمز زد (claude.ai/artifact/K9xuQ9ExW9MZ3RUifVBkUK).",
+  "result": "از ۴۳ مقدارِ الگودار ۳۶ دوباره همان درآمد، ۶ را E3 ننوشت، ۱ فرق داشت ⇒ آن ۷ مقدار (پیامدِ تازهٔ سملوایس ×۲ و ادینگتون، صورتِ cs_b_holism) برداشته شد؛ ۳۶ تای دیگر بی نشتِ سرانجام بازتولید شد",
+  "removed": [
+   {
+    "n": 1,
+    "case": "cs_semmelweis_method",
+    "claim": "k1",
+    "key": "x_conseq_n",
+    "value": 1,
+    "set": "agreed",
+    "why": "intervention (handwashing → mortality drop) predicted and confirmed before judgement"
+   },
+   {
+    "n": 2,
+    "case": "cs_semmelweis_method",
+    "claim": "k1",
+    "key": "x_conseq_new",
+    "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+    "set": "agreed",
+    "why": "mortality drop unknown before intervention"
+   },
+   {
+    "n": 60,
+    "case": "cs_b_holism",
+    "claim": "k1",
+    "key": "form",
+    "value": "نامعتبر",
+    "set": "agreed",
+    "why": "text shows equivocation on 'تصور'"
+   },
+   {
+    "n": 71,
+    "case": "cs_pb_semm_handwash",
+    "claim": "k1",
+    "key": "x_conseq_n",
+    "value": 1,
+    "set": "agreed",
+    "why": "handwashing → mortality drop confirmed"
+   },
+   {
+    "n": 72,
+    "case": "cs_pb_semm_handwash",
+    "claim": "k1",
+    "key": "x_conseq_new",
+    "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+    "set": "agreed",
+    "why": "unknown before intervention"
+   },
+   {
+    "n": 98,
+    "case": "cs_eddington_1919",
+    "claim": "k1",
+    "key": "x_conseq_n",
+    "value": 1,
+    "set": "single",
+    "why": "one predicted deflection confirmed"
+   },
+   {
+    "n": 99,
+    "case": "cs_eddington_1919",
+    "claim": "k1",
+    "key": "x_conseq_new",
+    "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+    "set": "single",
+    "why": "deflection value not known before"
+   }
+  ]
+ },
+ "rrFixes": [
+  "r5_sally_clark_1999/k1 form «نامعتبر» برداشته شد (عیبِ ماده از سرانجام، نه صورت)",
+  "recode: ورودیِ تکراری رد، «از» در لحظهٔ اعمال، unset فقط با replace",
+  "ledger.json: row.brier"
+ ]
 }
