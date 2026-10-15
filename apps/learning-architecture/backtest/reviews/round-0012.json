@@ -1,0 +1,22 @@
+{
+ "round": 12,
+ "reviewer": "زیرعاملِ جدا (بازبین مستقل)",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "problems": [
+  {
+   "what": "سه نکتهٔ جزئی: x_comp در موردِ هیتلر؛ acted در اسنو؛ فشردگیِ روایتِ سالی کلارک",
+   "fix": "روایتِ سالی کلارک اصلاح شد (دلیلِ اصلیِ لغو: یافتهٔ میکروبیولوژی). دو مورد دیگر برچسبِ حقیقت را عوض نمی‌کنند و دست‌نخورده ماندند.",
+   "fixed": true
+  }
+ ],
+ "note": "همهٔ منبع‌ها و حقایق راستی‌آزمایی شد؛ افزودنِ ind_complete=false به دو مورد مشروع است (داستان دادهٔ چندساله را می‌گوید)."
+}

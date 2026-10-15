@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-14",
- "round": 11,
+ "round": 12,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,12 +25,14 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 3,
-    "freshOk": 3,
+    "fresh": 5,
+    "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
-     "r4_abs_survivor_shops"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "missed",
@@ -70,8 +72,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 13,
-    "freshOk": 13,
+    "fresh": 18,
+    "freshOk": 18,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -129,14 +131,16 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 5,
-    "freshOk": 5,
+    "fresh": 7,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
      "r4_columbia_foam",
      "r4_willingham_fire",
-     "r4_abs_survivor_shops"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "mislocated",
@@ -174,15 +178,16 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 6,
-    "freshOk": 6,
+    "fresh": 7,
+    "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
      "r4_columbia_foam",
      "r4_willingham_fire",
      "r4_abs_survivor_shops",
-     "r4_abs_lab_claim_replic"
+     "r4_abs_lab_claim_replic",
+     "r5_snow_water_1854"
     ]
    },
    "kind": "missed",
@@ -220,12 +225,14 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 3,
-    "freshOk": 3,
+    "fresh": 5,
+    "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
-     "r4_abs_survivor_shops"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "missed",
@@ -261,12 +268,14 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 3,
-    "freshOk": 3,
+    "fresh": 5,
+    "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
-     "r4_abs_survivor_shops"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "health_alarm",
@@ -301,8 +310,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 8,
-    "freshOk": 8,
+    "fresh": 11,
+    "freshOk": 11,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -311,7 +320,10 @@
      "r2_abs_desk_stablecoin",
      "r4_bre_x_busang",
      "r4_yom_kippur_concept",
-     "r4_willingham_fire"
+     "r4_willingham_fire",
+     "r5_hitler_diaries_1983",
+     "r5_sally_clark_1999",
+     "r5_abs_family_letters"
     ]
    },
    "kind": "missed",
@@ -356,12 +368,14 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 3,
-    "freshOk": 3,
+    "fresh": 5,
+    "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
-     "r4_abs_survivor_shops"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "health_alarm",
@@ -395,14 +409,15 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 5,
-    "freshOk": 5,
+    "fresh": 6,
+    "freshOk": 6,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
      "r2_nyt_goddard_1920",
      "r2_abs_desk_stablecoin",
-     "r4_yom_kippur_concept"
+     "r4_yom_kippur_concept",
+     "r5_sally_clark_1999"
     ]
    },
    "kind": "missed",
@@ -440,14 +455,19 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 5,
-    "freshOk": 5,
+    "fresh": 10,
+    "freshOk": 10,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
      "r4_bre_x_busang",
      "r4_yom_kippur_concept",
-     "r4_willingham_fire"
+     "r4_willingham_fire",
+     "r5_ltcm_1998",
+     "r5_madoff_feeders",
+     "r5_hitler_diaries_1983",
+     "r5_sally_clark_1999",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "mislocated",
@@ -492,9 +512,12 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 0,
-    "freshOk": 0,
-    "ids": []
+    "fresh": 2,
+    "freshOk": 2,
+    "ids": [
+     "r5_hitler_diaries_1983",
+     "r5_abs_family_letters"
+    ]
    },
    "kind": "health_alarm",
    "title": "میکروب «آرسنیک‌زی» GFAJ-1 و نقد و بازآزمایی ردفیلد (۲۰۱۰–۲۰۱۲)",
@@ -512,6 +535,90 @@
    "lastSeenRound": 9,
    "resolved": "2026-10-14",
    "resolvedNote": "بدونِ اصلاحِ ثبت‌شده درست شد (احتمالاً با تغییرِ دیگری) — به آزمونِ تازه نیاز دارد"
+  },
+  {
+   "id": "f_r5_abs_lender_model",
+   "case": "r5_abs_lender_model",
+   "opened": "2026-10-14",
+   "openedRound": 12,
+   "status": "fixed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذار ind_complete را (ناگفته در داستان) خالی گذاشت؛ داده فقط چند سالِ اخیر است، نه همهٔ افراد ⇒ false (s50: استقراء ناقص). خطای رمزگذاریِ موردِ افزوده‌شده توسط خود روتین.",
+   "fix": {
+    "what": "افزودنِ ind_complete=false به تصدیق‌های استقرایی (corpus/round-0012.json)",
+    "round": 12
+   },
+   "retest": {
+    "since": 12,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "mislocated",
+   "title": "مدلِ ریسکِ یک وام‌دهندهٔ برخط با دادهٔ دو ساله",
+   "tier": "abstract",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 12
+  },
+  {
+   "id": "f_r5_ltcm_1998",
+   "case": "r5_ltcm_1998",
+   "opened": "2026-10-14",
+   "openedRound": 12,
+   "status": "fixed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذار ind_complete را (ناگفته در داستان) خالی گذاشت؛ داده فقط چند سالِ اخیر است، نه همهٔ افراد ⇒ false (s50: استقراء ناقص). خطای رمزگذاریِ موردِ افزوده‌شده توسط خود روتین.",
+   "fix": {
+    "what": "افزودنِ ind_complete=false به تصدیق‌های استقرایی (corpus/round-0012.json)",
+    "round": 12
+   },
+   "retest": {
+    "since": 12,
+    "fresh": 0,
+    "freshOk": 0,
+    "ids": []
+   },
+   "kind": "mislocated",
+   "title": "صندوق LTCM و «زیانِ ناممکن» (۱۹۹۸)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [
+    "st_resp"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 12
   }
  ]
 }

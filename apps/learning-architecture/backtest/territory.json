@@ -60,8 +60,20 @@
    "bookOnly": true
   },
   "a_belief": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 12,
+     "at": "2026-10-14",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای حوزهٔ «باور»",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Belief» (first published 2006, substantive revision 2023) — https://plato.stanford.edu/entries/belief/",
+    "Stanford Encyclopedia of Philosophy, «The Analysis of Knowledge» — https://plato.stanford.edu/entries/knowledge-analysis/"
+   ]
   },
   "a_evidence": {
    "stage": 0,
@@ -2781,6 +2793,6 @@
    "bookOnly": true
   }
  },
- "round": 11,
+ "round": 12,
  "updated": "2026-10-14"
 }
