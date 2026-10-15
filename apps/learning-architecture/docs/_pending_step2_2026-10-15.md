@@ -50,5 +50,12 @@
 
 ## اجرا و آزمون
 - `epi_backtest.js audit` ⇒ `violations: []`. فرمانِ جدای `integrity` در ابزار نیست؛ `audit` همان `integrity().violations` را در بر دارد.
-- `handoff.py check`، `pytest tests/ -q`، همهٔ `apps/learning-architecture/tests/test*.js` و `frontend npm run build` در گزارشِ نشست آمده‌اند.
+- `handoff.py check` ⇒ خروج ۰؛ فقط هشدارهای «کهنه» ِ پیشین، که از این کار نیستند.
+- `pytest tests/ -q` ⇒ ۱۹۷۱ گذشت و ۳ رد شد.
+- `frontend npm run build` ⇒ سبز.
+- `apps/learning-architecture/tests/test*.js`: از ۳۳ آزمون ۳۲ سبزند.
+- **`test_tour.js` سرخ است:** «NO ERRORS» را چاپ می‌کند، سپس بررسیِ آخرش (`info.hold`، WORKLOG 56) شکست می‌خورد و با خروج ۱ پایان می‌یابد.
+  - علت: `APP.ASSIST.SYS` واژهٔ «دوباره‌سنجی» را ندارد و این واژه در `src/app/a26_assist.js` نیست.
+  - تاریخ‌های ۳۰/۹۰ روزه درست‌اند.
+  - این شکست از پیش روی `main` (1bf71a5) بوده است، چون این شاخه به `src/` دست نزده است. قلمروِ آن `lla-page` است (فوری/عمومی)، نه بک‌تست.
 - دست‌به‌دست: `handoff.py add --by session --area epi-foundation --kind did`.
