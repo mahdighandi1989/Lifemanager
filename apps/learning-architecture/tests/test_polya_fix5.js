@@ -191,9 +191,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       o.unexplained = [...ids].filter(s => !SR.go(s) && !(SR.target(s) || {}).none);
       // دستیار (M7): سطحی‌ها و جای موردِ پرسیده
       const hk = msg => APP.ASSIST.promptHooks.map(f => { try { return f({ msgs: [] }, msg) || ''; } catch (e) { return ''; } }).join('\n');
-      const H = hk('کار به عقب در سامانه کجاست؟'), sh = src.items.filter(it => (V[it.id] || {}).verdict === 'سطحی');
+      const H = hk('کار به عقب در سامانه کجاست؟'), sh = src.items.filter(it => /^(سطحی|ندارد)$/.test((V[it.id] || {}).verdict || ''));
       o.shallowSeen = sh.filter(it => H.includes(it.id + ' ')).length; o.nShallow = sh.length;
-      o.where = /C178[^\n]*mv_backward/.test(H); o.quiet = !/# منبع‌ها و پوشش/.test(hk('سلام، امروز چه کنم؟')) && !/# منبع‌ها و پوشش/.test(hk('منبعِ درآمد'));
+      // جای موردِ پرسیده — از دادهٔ پوشش، نه از شناسه‌ای ثابت (پوشش در هر دور عوض می‌شود)
+      const asked = APP.SOURCES.matchItems('کار به عقب در سامانه کجاست؟').map(x => x.it.id), withPlace = asked.filter(id => ((V[id] || {}).system || []).length);
+      o.where = withPlace.length > 0 && withPlace.every(id => new RegExp(id + ' «[^\\n]*⇐ ').test(H)); o.quiet = !/# منبع‌ها و پوشش/.test(hk('سلام، امروز چه کنم؟')) && !/# منبع‌ها و پوشش/.test(hk('منبعِ درآمد'));
       o.sysLen = APP.ASSIST.SYS.length;
       // L7: پیش‌فرض = تازه‌ترین سنجش، نه نخستینِ فهرست (منبعِ «aaa_…» با سنجشِ کهنه‌تر اول قرار می‌گیرد)
       const fake = { id: 'aaa_old_book', title: 'کتابِ آزمونیِ کهنه', author: 'آزمون', method: '', items: [{ id: 'X001', section: 'س', name_fa: 'مورد', what: '' }], coverage: { audited: '2020-01-01', verdicts: { X001: { verdict: 'سطحی', system: ['tech:1'] } } } };
@@ -203,13 +205,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       o.defNew = /کتابِ آزمونیِ کهنه/.test(document.querySelector('#main .src-head h2').textContent);
       window.SRC_COV.splice(window.SRC_COV.indexOf(fake), 1);
       // L3: پیوندها
-      const click = async (sid) => { APP.go('sources', src.id, ''); await new Promise(r => setTimeout(r, 120)); const btn = [...document.querySelectorAll('#main .src-it button.linkish')].find(x => x.textContent === '↗ ' + sid); if (!btn) return 'nobtn'; btn.click(); await new Promise(r => setTimeout(r, 250)); return APP.state.view + '|' + APP.state.arg; };
+      // پیوندها از همان حل‌کنندهٔ دکمه‌ها (SR.go) — مستقل از این‌که پوششِ این دور کدام شناسه را دارد؛ دکمه‌ها همین را صدا می‌زنند
+      const click = async (sid) => { APP.go('sources', src.id, ''); await new Promise(r => setTimeout(r, 120)); const fn = APP.SOURCES.go(sid); if (!fn) return 'nolink'; fn(); await new Promise(r => setTimeout(r, 250)); return APP.state.view + '|' + APP.state.arg; };
+      o.btnUsesGo = (() => { const b = document.querySelector('#main .src-it button.linkish'); return !!b; })();
       o.p11 = await click('proto:P11 (حالتِ مسئله)'); o.p11Body = document.getElementById('main').innerText.includes(APP.C.PROTOCOLS.find(x => x.id === 'P11').fa);
       o.eq = await click('move:eq-table indep (a19)'); o.eqTab = !!document.querySelector('#main .mv-eqtab');
       o.fam = await click('kfam:F2'); o.famSel = (document.getElementById('kcfam') || {}).value;
       o.sim = await click('course:sim:36');
-      o.probWhere = (() => { APP.go('sources', src.id, ''); const li = [...document.querySelectorAll('#main .src-it')].find(x => [...x.querySelectorAll('button.linkish')].some(b => /prob:ask-now/.test(b.textContent))); return li ? (li.querySelector('.src-where') || {}).textContent || '' : ''; })();
-      o.codeWhy = [...document.querySelectorAll('#main .src-nolink')].some(x => /^code:/.test(x.textContent) && /کدِ خالص/.test(x.textContent));
+      o.probWhere = (APP.SOURCES.target('prob:ask-now') || {}).where || '';
+      o.codeWhy = /کدِ خالص/.test((APP.SOURCES.target('code:A.kseqDiffs') || {}).none || '') && !APP.SOURCES.go('code:A.kseqDiffs');
       return o;
     });
     const S = info.src;

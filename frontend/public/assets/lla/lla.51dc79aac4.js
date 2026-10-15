@@ -39226,11 +39226,12 @@ APP.goFromURL = function (q) {
       SR.all().forEach(function (src) {
         var C = SR.counts(src), V = (src.coverage || {}).verdicts || {};
         L.push("- «" + src.title + "» (" + (src.coverage || {}).audited + "): عمیق " + C["عمیق"] + " · سطحی " + C["سطحی"] + " · ندارد " + C["ندارد"] + " · نامربوط " + C["نامربوط"]);
-        var miss = (src.items || []).filter(function (it) { return (V[it.id] || {}).verdict === "ندارد"; }).slice(0, 15).map(function (it) { return it.name_fa; });
-        if (miss.length) L.push("  نبوده‌ها (نمونه): " + miss.join("، "));
-        /* M7: سطحی‌ها هم — نام، کمبود و جایشان (فشرده) — تا «کجا کم است؟» از دادهٔ پوشش پاسخ بگیرد */
-        var sh = (src.items || []).filter(function (it) { return (V[it.id] || {}).verdict === "سطحی"; });
-        if (sh.length) { L.push("  سطحی‌ها (" + sh.length + "؛ شناسه نام — کمبود ⇐ جا):"); sh.slice(0, 40).forEach(function (it) { var v = V[it.id] || {}; L.push("  · " + it.id + " " + clipT(it.name_fa, 50) + (v.gap ? " — " + clipT(v.gap, 80) : "") + ((v.system || []).length ? " ⇐ " + clipT(placeOf(v.system), 110) : "")); }); }
+        /* M7 + دورِ ۵ (۲۰۲۶-۱۰-۱۵): همهٔ «ندارد» و «سطحی»‌ها با شناسه و نامِ کوتاه (فشرده، بی‌سقف) تا دستیار هیچ کمبودی را نبیند-نگیرد؛
+           کمبود و جای دقیقِ هر کدام فقط برای موردهایی که پیام از آن‌ها می‌پرسد (پایین) — بودجهٔ پیامِ کاربر. */
+        ["ندارد", "سطحی"].forEach(function (vd) {
+          var xs = (src.items || []).filter(function (it) { return (V[it.id] || {}).verdict === vd; });
+          if (xs.length) L.push("  " + (vd === "ندارد" ? "نبوده‌ها" : "سطحی‌ها") + " (" + xs.length + "؛ شناسه نام — برای جزئیات و جا، شناسه را بپرس): " + xs.map(function (it) { return it.id + " " + clipT(it.name_fa, 28); }).join(" · "));
+        });
       });
       /* موردهایی که همین پیام از آن‌ها می‌پرسد: هر کدام در کدام تونل زندگی می‌کند */
       var hit = SR.matchItems(recent);
