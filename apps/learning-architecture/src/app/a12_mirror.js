@@ -6,7 +6,18 @@
    فقط در حالتِ میزبان (Lifemanager) کار می‌کند؛ در نسخهٔ مستقل بی‌اثر است. */
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S;
-  if (!A.HOST || !A.HOST.mirror) { A.mirrorInfo = function () { return null; }; return; }
+  /* میزبان را هنگامِ فراخوانی بسنج، نه فقط هنگامِ بارگذاری (بازبینیِ اجرا ۲۰۲۶-۱۰-۱۵): میزبانی که APP.HOST را پس از بارِ بسته
+     می‌گذارد (هارنس، میزبانِ دیررس) آینه را بی‌صدا خاموش می‌کرد. حالا نخستین render / S.put / mirrorInfo پس از آمدنِ میزبان نصبش می‌کند. */
+  var installed = false;
+  function tryInstall() { if (installed) return true; if (!A.HOST || !A.HOST.mirror) return false; installed = true; install(); return true; }
+  A.mirrorInstalled = function () { return tryInstall(); };
+  A.mirrorInfo = function () { return tryInstall() ? A.mirrorInfo.apply(this, arguments) : null; };
+  if (!tryInstall()) {
+    var lazyRender = A.render, lazyPut = S.put;
+    A.render = function () { tryInstall(); return lazyRender.apply(this, arguments); };
+    S.put = function () { tryInstall(); return lazyPut.apply(this, arguments); };
+  }
+  function install() {
 
   /* ---------- مقدار ⇐ متن ---------- */
   function txt(v) {
@@ -439,4 +450,5 @@
     });
     return root;
   };
+  }
 })(APP);

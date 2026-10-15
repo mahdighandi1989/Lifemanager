@@ -740,7 +740,7 @@
   /* ---------- یادآورها (§۷، §۱۲.۸–۹) ---------- */
   function tz() { var s = kset(); if (s.tz) return s.tz; try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Dubai"; } catch (e) { return "Asia/Dubai"; } }
   function hostRemind() { return A.HOST && typeof A.HOST.remind === "function"; }
-  function unremind(id) { if (A.HOST && typeof A.HOST.unremind === "function") { try { var p = A.HOST.unremind("knot:" + id); if (p && p.catch) p.catch(function () { }); } catch (e) { } } trackKey(id, null); }
+  function unremind(id) { if (typeof SENT !== "undefined") delete SENT[id]; if (A.HOST && typeof A.HOST.unremind === "function") { try { var p = A.HOST.unremind("knot:" + id); if (p && p.catch) p.catch(function () { }); } catch (e) { } } trackKey(id, null); }
   function trackKey(id, due) {
     var st = S.settings(); st.knots = st.knots || {}; var rk = st.knots.rk || {};
     if ((rk[id] || null) === (due || null)) return;
@@ -784,11 +784,13 @@
     if (k.status === "practised" || (!s.notify.telegram && !s.notify.email)) { unremind(k.id); return null; }
     var p = A.kremindPayload(k);
     if (!p) { unremind(k.id); return null; }
+    // همان یادآور (همان کلید، موعد و متن) دوباره فرستاده نمی‌شود (کارزارِ سوم v06: «knot:…» چند بار با همان کلید)
+    var sig = JSON.stringify(p); if (SENT[k.id] === sig) return p; SENT[k.id] = sig;
     try { var pr = A.HOST.remind(p); if (pr && pr.catch) pr.catch(function (e) { A.toast && A.toast("یادآور ثبت نشد: " + ((e && e.message) || e), "bad"); }); } catch (e) { }
     trackKey(k.id, p.due_date);
     return p;
   };
-  var remindT = {};
+  var remindT = {}, SENT = {};
   function remindSoon(id) { clearTimeout(remindT[id]); remindT[id] = setTimeout(function () { delete remindT[id]; var k = S.get(id); if (k) A.kremindSync(k); }, 1200); }
   /* گره‌های پاک‌شده: یادآورشان لغو می‌شود (اگر a16 خودش A.knotDeleted را صدا نزده باشد) */
   /* «امروز»: یک سطر برای آزمایش‌های واقعیِ موعد (a3 فقط نمونه‌ها را می‌شمارد) */
@@ -1116,6 +1118,8 @@
 
   /* ---------- ساختنِ نمونه‌ها (زبانهٔ «نمونه‌ها») ---------- */
   var BUILDING = {};
+  function genMark(id, g) { var kk = S.get(id); if (!kk) return; kk.genLast = g; S.put(kk); }
+  A.kgenMark = genMark;
   function genPanel(k) {
     var box = h("div", { class: "col gap" }), mode = A.kmode(k), fams = famsOf(k);
     var keys = []; fams.forEach(function (f) { A.kgenFor(f).forEach(function (x) { if (keys.indexOf(x) < 0) keys.push(x); }); });
@@ -1155,13 +1159,15 @@
       aiGate(out, k).then(function (pref) {
         BUILDING[k.id] = true;
         b.textContent = "در حالِ ساخت و سه حلِ مستقل…";
+        // وضعِ آخرین ساخت روی خودِ گره (تور آن را «پیگیریِ بدهکار» می‌کند اگر در جریان ماند، شکست خورد یا چیزی نساخت — کارزارِ سوم v02)
+        genMark(k.id, { st: "pending", at: nowISO() });
         return A.kmakeAI(k, { names: pref.names, fileIds: pref.fileIds || [] }).then(function (rep) {
-          delete BUILDING[k.id];
+          delete BUILDING[k.id]; genMark(k.id, { st: "ok", at: nowISO(), n: rep.accepted.length });
           A._klastRep = rep;
           A.toast("وارسی‌شده: " + fa(rep.accepted.length) + " · وارسی‌نشده: " + fa(rep.unverified.length) + " · کنار گذاشته: " + fa(rep.rejected.length));
           A.render();
         });
-      }).catch(function (er) { var was = BUILDING[k.id]; delete BUILDING[k.id]; b.disabled = false; b.textContent = "ساختِ نمونه با هوش مصنوعی"; if (was) A.render(); if (er && er.message !== "لغو شد" && er.message !== "متوقف شد") A.toast(er.message || String(er), "bad"); });
+      }).catch(function (er) { var was = BUILDING[k.id]; delete BUILDING[k.id]; if (was) genMark(k.id, { st: "failed", at: nowISO(), err: String((er && er.message) || er).slice(0, 200) }); b.disabled = false; b.textContent = "ساختِ نمونه با هوش مصنوعی"; if (was) A.render(); if (er && er.message !== "لغو شد" && er.message !== "متوقف شد") A.toast(er.message || String(er), "bad"); });
     } }, "ساختِ نمونه با هوش مصنوعی"));
     if (A._klastRep && A._klastRep.rejected.length) out.appendChild(h("details", { class: "small" }, h("summary", {}, "کنار گذاشته‌شده‌های آخرین ساخت (" + fa(A._klastRep.rejected.length) + ")"),
       h("ul", {}, A._klastRep.rejected.map(function (x) { return h("li", {}, x.why + (x.prompt ? " — «" + String(x.prompt).slice(0, 80) + "…»" : "")); }))));

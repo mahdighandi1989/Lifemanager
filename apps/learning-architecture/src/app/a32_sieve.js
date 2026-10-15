@@ -38,6 +38,19 @@
   var ALIAS = { repeat: "recur", recurrence: "recur", recurring: "recur", pattern: "recur", prerequisite: "prereq", prerequisites: "prereq", knowledge: "prereq", belief: "claim", epistemic: "route", epistemology: "route", missing_info: "info", information: "info", learning: "learn", hard_problem: "problem", goal: "want", need: "want", risk: "safety", out: "outside" };
   function layerOf(id) { id = String(id || "").trim().replace(/^kf_/, ""); var lo = id.toLowerCase(); if (ALIAS[lo]) id = ALIAS[lo]; else if (/^f\d+$/.test(lo)) id = id.toUpperCase(); return AS.sieveLayers().filter(function (L) { return L.id === id; })[0]; }
   AS.sieveState = function (s) { return (s && s.tour && s.tour.diag) || {}; };
+  /* شاهدِ لایه: بخش‌های «؛»‌جدا یکتا، بخشی که درونِ بخشِ دیگری هست حذف، و هر نقل‌قولِ «…» فقط بارِ اول */
+  function nrm(x) { return String(x || "").replace(/[\s\u200c«»"'.,،:؛!?؟()\-]+/g, ""); }
+  function dedupWhy(w) {
+    var parts = String(w || "").split(/\s*؛\s*/).map(function (x) { return x.trim(); }).filter(Boolean), keep = [];
+    parts.forEach(function (x) { var n = nrm(x); if (!n) return; if (keep.some(function (k) { return nrm(k).indexOf(n) >= 0; })) return; keep = keep.filter(function (k) { return n.indexOf(nrm(k)) < 0; }); keep.push(x); });
+    var seen = {};
+    return keep.join(" ؛ ").replace(/«([^«»]{2,})»/g, function (m0, q) { var k = nrm(q); if (seen[k]) return "(همان نقل)"; seen[k] = 1; return m0; }).trim();
+  }
+  AS.sieveDedupWhy = dedupWhy;
+  /* پرسش‌های بدهکاری که **پیش از رفتن به فرم** باید پرسیده شوند (کارزارِ سوم v03: ایمنی و «باور/گفت‌وگوی درونی دربارهٔ خود» پرسیده نشد و فرمِ گره باز شد):
+     ایمنی و حال، باور دربارهٔ خود (F9)، هیجان و انگیزه (F7) — اگر «باید پرسید» است */
+  var BEFORE_FORMS = ["safety", "F9", "F7"];
+  AS.owedBeforeForms = function (s) { var d = AS.sieveState(s); return AS.sieveLayers().filter(function (L) { return BEFORE_FORMS.indexOf(L.id) >= 0 && d[L.id] && d[L.id].st === "ask"; }); };
 
   var DO = AS.DO;
   DO.tour_diag = function (a) {
@@ -54,6 +67,7 @@
       var prev = d[L.id];
       // یک لایه چند یافته می‌گیرد (کارزارِ آزمون c10: کالیبراسیون زیرِ نشخوار گم شد)
       if (prev && prev.st === "found" && st === "found" && prev.why && prev.why.indexOf(why) < 0) why = prev.why + " ؛ " + why;
+      why = dedupWhy(why);   // همان نقل‌قول سه بار در فهرستِ لایه‌ها نیاید (کارزارِ سوم v03)
       if (prev && prev.st === "found" && st === "no") { (prev.hist = prev.hist || []).push({ st: prev.st, why: prev.why, at: prev.at }); }
       d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), hist: prev && prev.hist };
     });
@@ -73,7 +87,7 @@
   AS.tourText = function (s) {
     var t = rawText.apply(this, arguments); if (!t || !s || !s.tour) return t;
     var d = AS.sieveState(s), Ls = AS.sieveLayers(), done = [], open = [];
-    Ls.forEach(function (L) { var x = d[L.id]; if (x) done.push("- [" + L.id + "] " + L.fa + ": " + ST[x.st] + (x.why ? " — " + x.why : "") + (x.facet ? " ⇒ " + x.facet : "")); else open.push(L.id + " " + L.fa); });
+    Ls.forEach(function (L) { var x = d[L.id]; if (x) done.push("- [" + L.id + "] " + L.fa + ": " + ST[x.st] + (x.why ? " — " + dedupWhy(x.why) : "") + (x.facet ? " ⇒ " + x.facet : "")); else open.push(L.id + " " + L.fa); });
     // خانواده‌هایی که غربال پیدا کرد ⇒ در گره‌گشا (قدمِ ۱ و ۲) آزمون‌های همین‌ها جلو بیاید (کارزارِ آزمون c03/c06: رتبهٔ گره‌گشا یافته‌های غربال را نمی‌دید)
     var fams = (A.KF || []).filter(function (F) { return d[F.id] && d[F.id].st === "found"; }).map(function (F) { return F.id + " " + F.fa; });
     return t + "\n# غربالِ لایه‌ها (" + fa(done.length) + " از " + fa(Ls.length) + ")\n" + (done.join("\n") || "- هنوز هیچ لایه‌ای سنجیده نشده") +
@@ -92,6 +106,19 @@
     return "# گره‌های پیشینِ کاربر (برای ریشهٔ مشترک)\n" + ks.map(function (k) { return "- knot:" + k.id + " «" + clip(k.name || "گره", 50) + "» — " + (k.fam ? k.fam + " " + (KFM[k.fam] || "") : "") + " — " + (k.status || "open") + (k.deep ? " — ساختار: " + clip(k.deep, 80) : ""); }).join("\n");
   });
 
+  /* همهٔ پرسش‌های تشخیصیِ نقشهٔ پیش‌نیاز جلوی چشمِ مدل (کارزارِ سوم v01: از ۸ پرسش فقط ۵ تا پرسیده شد) — نقشهٔ همین نما یا نقشه‌های وجه‌های تور */
+  AS.promptHooks.push(function (s) {
+    var ids = []; if (A.state && A.state.view === "prereq" && A.state.arg) ids.push(A.state.arg);
+    ((s && s.tour && s.tour.facets) || []).forEach(function (f) { if (f.status !== "skipped") (f.refs || []).forEach(function (r) { if (r.type === "prereq" && ids.indexOf(r.id) < 0) ids.push(r.id); }); });
+    var L = [];
+    ids.forEach(function (id) {
+      var p = S.get(id); if (!p || p.type !== "prereq" || !(p.items || []).length) return;
+      var qs = p.items.filter(function (x) { return x.q; }), left = qs.filter(function (x) { return !String(x.ans || "").trim() && !x.self; });
+      L.push("نقشهٔ «" + clip(p.title, 60) + "»: " + fa(qs.length) + " پرسشِ تشخیصی، " + fa(left.length) + " هنوز بی پاسخ و بی سنجش. همه را بپرس (یکی‌یکی یا با هم) — هیچ‌کدام را جا نینداز:");
+      qs.forEach(function (x, i) { L.push("  " + (i + 1) + ") «" + clip(x.concept, 60) + "»: " + clip(x.q, 200) + " — " + (String(x.ans || "").trim() ? "پاسخ داده" : "هنوز بی پاسخ") + (x.self ? "، سنجش: " + x.self : "")); });
+    });
+    return L.length ? "# پرسش‌های تشخیصیِ پیش‌نیاز (همه)\n" + L.join("\n") : "";
+  });
   AS.SYS += "\n" + [
     "# غربالِ لایه‌ها (پیش از هر طرحِ تور، و هر بار که حرفِ تازه‌ای آمد)",
     "- حرفِ کاربر را — حتی اگر به‌ظاهر بی‌ربط است (خرید، رابطه، کار، پول، سرگرمی) — نه سریع رد کن، نه پخش کن: لایه‌به‌لایه بشکاف. برای هر لایهٔ فهرستِ «# غربالِ لایه‌ها» پرسشِ همان لایه را از خودت بپرس و با {\"do\":\"tour_diag\",\"layers\":[{\"id\":\"F7\",\"st\":\"found|no|ask|out\",\"why\":\"شاهد با واژه‌های خودِ کاربر\",\"facet\":\"fN\"}]} حکم بده. found فقط با شاهد از حرفِ خودش؛ ask یعنی برای تشخیص باید چیزی را از او بپرسی (یکی‌یکی، دقیق، بی پیشنهادِ جواب)؛ out فقط برای همان بخشی که کارِ این صفحه نیست. هر ۱۲ خانوادهٔ گره را جدا بسنج.",
@@ -123,7 +150,7 @@
     var d = AS.sieveState(s), facets = (s.tour && s.tour.facets) || [];
     return AS.sieveLayers().map(function (L) {
       var x = d[L.id], f = x && x.facet && facets.filter(function (z) { return z.key === x.facet; })[0];
-      return { g: L.g, id: L.id, fa: L.fa, st: x ? x.st : "", stFa: x ? ST[x.st] : "سنجیده نشده", why: x ? x.why : "", facet: f ? f.title : "" };
+      return { g: L.g, id: L.id, fa: L.fa, st: x ? x.st : "", stFa: x ? ST[x.st] : "سنجیده نشده", why: x ? dedupWhy(x.why) : "", facet: f ? f.title : "" };
     });
   }
   AS.sieveRows = sieveRows;
@@ -150,7 +177,17 @@
     var it = (p && p.items) || [], rated = it.filter(function (x) { return x.self; }), miss = it.filter(function (x) { return x.self === "نیمه" || x.self === "بلد نیستم"; });
     return { n: it.length, sci: it.map(function (x) { return x.sci; }).filter(function (v, i, a) { return v && a.indexOf(v) === i; }).length, rated: rated.length, miss: miss, topics: miss.filter(function (x) { return x.topic && S.get(x.topic); }) };
   };
-  var SYS_PRE = "تو سازندهٔ «نقشهٔ پیش‌نیازها» هستی. مسئله یا مطلبی که کاربر نفهمیده یا حل نکرده را می‌گیری و فهرستِ **مفهوم‌های پیش‌نیاز** را می‌دهی که برای فهمیدن/حلِ همان لازم است — از پایه‌ای‌ترین تا نزدیک‌ترین به مسئله. برای هر کدام: علم (ریاضی، فیزیک، منطق، آمار، فلسفه، روان‌شناسی، …)، شاخه، نامِ دقیقِ مفهوم، «در کدام گامِ حل و چرا لازم است»، یک پرسشِ تشخیصیِ کوتاه که نشان دهد کاربر آن را دارد یا نه (پاسخِ خودِ مسئلهٔ اصلی را لو نده)، و پاسخِ مرجعِ همان پرسش. «why» فقط بگوید آن مفهوم در **کدام گام** به کار می‌آید، نه این‌که چطور به جواب می‌رسد — زنجیرهٔ استدلالِ حل را در why ها لو نده. ۴ تا ۱۰ مورد، بی تکرار، فقط آنچه واقعاً لازم است — و حتماً **خودِ مفهومِ محوریِ مسئله** (مثلاً «بختِ معرفتی» برای گتیه) و اصطلاح‌ها/پاسخ‌های استانداردِ آن رشته به همان مسئله. فقط JSON: [{\"sci\":\"…\",\"sub\":\"…\",\"concept\":\"…\",\"why\":\"…\",\"q\":\"…\",\"ref\":\"…\"}]";
+  var SYS_PRE = "تو سازندهٔ «نقشهٔ پیش‌نیازها» هستی. مسئله یا مطلبی که کاربر نفهمیده یا حل نکرده را می‌گیری و فهرستِ **مفهوم‌های پیش‌نیاز** را می‌دهی که برای فهمیدن/حلِ همان لازم است — از پایه‌ای‌ترین تا نزدیک‌ترین به مسئله. برای هر کدام: علم (ریاضی، فیزیک، منطق، آمار، فلسفه، روان‌شناسی، …)، شاخه، نامِ دقیقِ مفهوم، «در کدام گامِ حل و چرا لازم است»، یک پرسشِ تشخیصیِ کوتاه که نشان دهد کاربر آن را دارد یا نه (پاسخِ خودِ مسئلهٔ اصلی را لو نده)، و پاسخِ مرجعِ همان پرسش. «why» فقط بگوید آن مفهوم در **کدام گام** به کار می‌آید، نه این‌که چطور به جواب می‌رسد — زنجیرهٔ استدلالِ حل را در why ها لو نده. «concept» فقط **نامِ** مفهوم است و هرگز پاسخِ پرسشِ تشخیصیِ خودش را در خود ندارد (نه فرمول، نه «=»، نه عدد یا نتیجه — مثلاً «معادلهٔ مکان در حرکتِ پرتابی»، نه «y = h + v₀t − ½gt²»). ۴ تا ۱۰ مورد، بی تکرار، فقط آنچه واقعاً لازم است — و حتماً **خودِ مفهومِ محوریِ مسئله** (مثلاً «بختِ معرفتی» برای گتیه) و اصطلاح‌ها/پاسخ‌های استانداردِ آن رشته به همان مسئله. فقط JSON: [{\"sci\":\"…\",\"sub\":\"…\",\"concept\":\"…\",\"why\":\"…\",\"q\":\"…\",\"ref\":\"…\"}]";
+  /* نامِ مفهوم که پاسخِ پرسشِ تشخیصیِ خودش را لو می‌دهد (کارزارِ سوم v02: عنوانِ مفهومِ ۷ خودِ فرمول بود) ⇒ فقط نام می‌ماند */
+  function pn(x) { return String(x || "").replace(/[\s\u200c«»"'.,،:؛!?؟()\-]+/g, "").toLowerCase(); }
+  A.prereqLeaks = function (concept, ref) { var c = String(concept || ""); if (/[=≈≡]/.test(c)) return true; var r = pn(ref); return r.length >= 3 && pn(c).indexOf(r) >= 0; };
+  A.prereqCleanName = function (x) {
+    if (!A.prereqLeaks(x.concept, x.ref)) return x.concept;
+    var c = String(x.concept || "").split(/[=≈≡]/)[0].replace(/[:：(（]\s*$/, "").trim();
+    if (x.ref && pn(c).indexOf(pn(x.ref)) >= 0 && pn(x.ref).length >= 3) c = "";
+    if (c.length < 3) c = "مفهومِ " + (x.sub || x.sci || "پیش‌نیاز") + " (نامِ پیشنهادی پاسخش را لو می‌داد)";
+    return c;
+  };
   function parseArr(t) { try { var m = String(t || "").match(/\[[\s\S]*\]/); var a = JSON.parse(m ? m[0] : t); return Array.isArray(a) ? a : null; } catch (e) { return null; } }
   function mkTopic(p, x) {
     var tp = S.put({ id: A.uid("tp"), type: "topic", title: "«" + x.concept + "» (" + [x.sci, x.sub].filter(Boolean).join(" › ") + ") — پیش‌نیازِ «" + clip(p.title, 50) + "»", dom: x.sci || "", src: "🧩 نقشهٔ پیش‌نیازها", kind: "", prereq: p.id });
@@ -184,7 +221,7 @@
             onResult: function (txt) {
               var arr = parseArr(txt); if (!arr) { A.toast("پاسخِ هوش مصنوعی قالبِ درستی نداشت.", "bad"); return; }
               var have = p.items.map(function (x) { return String(x.concept || "").trim(); });
-              arr.slice(0, 12).forEach(function (x) { if (!x || !x.concept || have.indexOf(String(x.concept).trim()) >= 0) return; p.items.push({ sci: clip(x.sci, 60), sub: clip(x.sub, 80), concept: clip(x.concept, 120), why: clip(x.why, 300), q: clip(x.q, 300), ref: clip(x.ref, 500), by: "ai", self: "", ans: "" }); });
+              arr.slice(0, 12).forEach(function (x) { if (!x || !x.concept || have.indexOf(String(x.concept).trim()) >= 0) return; var leak = A.prereqLeaks(x.concept, x.ref); p.items.push({ sci: clip(x.sci, 60), sub: clip(x.sub, 80), concept: clip(A.prereqCleanName(x), 120), renamed: leak || null, why: clip(x.why, 300), q: clip(x.q, 300), ref: clip(x.ref, 500), by: "ai", self: "", ans: "" }); });
               save(); A.toast("پیشنهادها افزوده شد — ساختهٔ هوش مصنوعی و وارسی‌نشده؛ سنجش با خودت است.");
             } });
         } }, "🤖 پیشنهادِ پیش‌نیازها") : null)));

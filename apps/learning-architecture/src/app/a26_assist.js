@@ -169,18 +169,23 @@
     });
     return { fields: fields, buttons: buttons, heads: heads };
   };
-  function scanText(sc) {
+  /* mode (بازبینیِ اجرا v05، ۲۰۲۶-۱۰-۱۵ — دکمه‌های پایینِ صفحه‌های بلند دیده نمی‌شد): برای جا شدن اول متنِ ساده‌ی صفحه کوتاه/حذف می‌شود
+     (۱: متن ۸۰۰ نویسه، ۲: بی متن، ۳: مقدارها و گزینه‌ها فشرده) — همهٔ فیلدها و دکمه‌های #main می‌مانند */
+  function scanText(sc, mode) {
+    mode = mode || 0;
     var L = ["نما: " + A.state.view + " (" + labelOf(A.state.view) + ")" + (A.state.arg != null ? " arg=" + A.state.arg : "") + (A.state.sub ? " sub=" + A.state.sub : "")];
     if (sc.heads.length) L.push("سرتیترها: " + sc.heads.join(" | "));
     // دکمه‌ها پیش از فیلدها: وقتی فهرستِ صفحه برای جا شدن از ته بریده می‌شود، دکمه‌ها نباید بیفتند (کارزارِ سوم v05: «موضوع بساز» دیده نشد)
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
-    sc.fields.forEach(function (f) { L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (f.value ? "«" + f.value + "»" : "خالی")) + (f.options ? " | گزینه‌ها: " + f.options : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "") + (f.unset ? " | (هنوز تکان نخورده — عددش را خودِ کاربر باید بگوید)" : "")); });
+    sc.fields.forEach(function (f) { var fv = mode >= 3 ? clip(f.value, 60) : f.value, fo = mode >= 3 && f.options ? f.options.split(" | ").slice(0, 8).join(" | ") : f.options;
+      L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (fv ? "«" + fv + "»" : "خالی")) + (fo ? " | گزینه‌ها: " + fo : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "") + (f.unset ? " | (هنوز تکان نخورده — عددش را خودِ کاربر باید بگوید)" : "")); });
     // متنِ دیدنیِ صفحه (فشرده): پیشنهادهای هوش مصنوعی، عددها، پیام‌ها — کارزارِ آزمون (sc09/sc12): دستیار فقط فیلد و دکمه می‌دید و حدس می‌زد
+    if (mode >= 2) { L.push("(متنِ سادهٔ صفحه برای جا شدنِ همهٔ فیلدها و دکمه‌ها حذف شد)"); return L.join("\n"); }
     try {
       var main = document.getElementById("main"), c = main && main.cloneNode(true);
       if (c) { c.querySelectorAll("script,style,svg,select,textarea,input,option,button,[hidden],details:not([open]) > :not(summary)").forEach(function (x) { x.remove(); });
-        var tx = String(c.textContent || "").replace(/\s+/g, " ").trim(); if (tx) L.push("متنِ صفحه (فشرده؛ فقط برای دیدن، نه کلید): " + clip(tx, 3000)); }
+        var tx = String(c.textContent || "").replace(/\s+/g, " ").trim(); if (tx) L.push("متنِ صفحه (فشرده؛ فقط برای دیدن، نه کلید): " + clip(tx, mode >= 1 ? 800 : 3000)); }
     } catch (e) { }
     return L.join("\n");
   }
@@ -261,12 +266,32 @@
       var x = el(a.k); if (!x || x.type !== "file") return "جای پیوست پیدا نشد";
       var fs = (a.fileIds || []).map(function (id) { return blobs[id]; }).filter(Boolean);
       if (!fs.length) return "فایل در این بارِ مرورگر نیست — خودت از «انتخابِ فایل» بگذار";
+      // همان فایل دو بار در یک پرونده نمی‌رود (بازبینیِ اجرا v01: نام + حجم)؛ پرونده‌ای که پیوست گرفت «پروندهٔ جاریِ سشن» می‌شود
+      var ss = AS._turnSession, vr = viewRec();
+      if (ss && vr) { var fresh = fs.filter(function (f) { return !sentTo(ss, vr.rid, fsig(f)); }); if (!fresh.length) { ss.rec = vr; return "«" + fs.map(function (f) { return f.name; }).join("، ") + "» از پیش در همین پرونده است؛ دوباره نفرستادم"; } fs = fresh; }
       reveal(x);
-      try { var dt = new DataTransfer(); fs.forEach(function (f) { dt.items.add(f); }); x.files = dt.files; fire(x, "change"); mark(x, "دستیار پیوست کرد", "fill"); return ""; }
+      try { var dt = new DataTransfer(); fs.forEach(function (f) { dt.items.add(f); }); x.files = dt.files; fire(x, "change"); mark(x, "دستیار پیوست کرد", "fill");
+        if (ss && vr) { ss.rec = vr; fs.forEach(function (f) { noteSent(ss, vr.rid, fsig(f)); }); S.put(ss); }
+        return ""; }
       catch (e) { return "مرورگر اجازهٔ پیوستِ خودکار نداد — خودت بگذار"; }
     }
   };
   AS.DO = DO;   // a27_tour.js adds the tour operations here
+  /* ---------- پروندهٔ جاریِ سشن و ضدِ تکرارِ پیوست (بازبینیِ اجرا v01، ۲۰۲۶-۱۰-۱۵) ----------
+     فقط پیوستِ نخست به پرونده می‌رفت (با attach ِ مدل)؛ PDF ِ بعدی فقط در فولدرِ سشن ماند. حالا وقتی پیوستی یک بار به پرونده‌ای رفت،
+     آن پرونده «پروندهٔ جاریِ سشن» است و پیوست‌های بعدیِ همان سشن خودکار به آن هم می‌روند؛ همان فایل (نام + حجم) دو بار به یک جا نمی‌رود. */
+  var REC_VIEWS = {
+    kcase: function (a) { var r = S.get(a); return r && r.type === "kcase" ? { rid: r.id, group: "گره‌گشا — موقعیت‌ها", title: r.title || "موقعیت" } : null; },
+    e_case: function (a) { var r = S.get(a); return r && r.type === "case" && !r.sample ? { rid: r.id, group: "پرونده‌ها", title: r.title || "پرونده" } : null; },
+    topic: function (a) { var r = S.get(a); return r && r.type === "topic" && !r.sample ? { rid: r.id, group: "موضوع‌ها", title: r.title || "موضوع" } : null; },
+    e_prob: function (a) { var r = S.get("eprob_" + a); return r && r.p && r.status !== "rejected" ? { rid: r.id, group: "مسئله‌های من", title: r.p.title || "مسئله" } : null; }
+  };
+  function viewRec() { var f = REC_VIEWS[A.state.view]; try { return f && A.state.arg != null ? f(A.state.arg) : null; } catch (e) { return null; } }
+  AS.viewRec = viewRec;
+  function fsig(f) { return String(f.name || "") + "|" + (f.size || 0); }
+  function sentTo(s, rid, sig) { return ((s.upSigs || {})[rid] || []).indexOf(sig) >= 0; }
+  function noteSent(s, rid, sig) { s.upSigs = s.upSigs || {}; var l = s.upSigs[rid] = s.upSigs[rid] || []; if (l.indexOf(sig) < 0) l.push(sig); if (l.length > 200) l.shift(); }
+  AS.fsig = fsig;
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
@@ -283,15 +308,19 @@
         if ((moved || stale) && /^(fill|highlight|click|attach)$/.test(a.do)) { skipped++; return; }
         var at = A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "");
         var nf = function () { return document.querySelectorAll("#main input,#main textarea,#main select").length; }, f0 = nf(), ch0 = clicked.changed;
+        // امضای فیلدها: کلیکی که «حالت» را عوض کرد (مثلاً مسیرِ سریعِ موقعیت) با همان شمارِ فیلد ولی فیلدهای دیگر هم «رفتن» است (کارزارِ سوم v06)
+        var fsig = function () { return Array.prototype.map.call(document.querySelectorAll("#main input,#main textarea,#main select"), function (x) { return x.tagName + ":" + (x.id || x.name || x.getAttribute("aria-label") || x.placeholder || ""); }).join("|"); }, g0 = a.do === "click" || a.do === "fill" ? fsig() : "";
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
         if (r) notes.push(r);
         // پرکردنی که فیلدِ شرطیِ تازه آورد (مثلاً «تبیینِ رقیبِ بیرونی»): کلیدهای قدیمی با برچسب/ترتیب هنوز درست می‌نشینند (آزمونِ ۳)،
         // ولی فیلدِ تازه را مدل ندیده ⇒ «فرم تغییر کرد» تا نوبتِ خودکارِ بعد آن را ببیند و پیش از تأیید پر/هایلایت کند (کارزارِ آزمون sc04)
         if (a.do === "fill" && !r && nf() !== f0) clicked.changed = true;
+        // … ولی پرکردنی که فیلدهایی را **برداشت** (عوض‌کردنِ حالت، مثلاً «مسیرِ سریع» ِ موقعیت) کلیدهای بعدی را بی‌جا می‌کند ⇒ مثلِ رفتن (کارزارِ سوم v06)
+        if (a.do === "fill" && !r) { var g1 = fsig().split("|"); if (g0.split("|").some(function (x) { return x && g1.indexOf(x) < 0; })) { stale = true; clicked.changed = true; } }
         if (a.do === "go" && !r) { moved = true; return wait(350); }
         // کلیکی که نما/قدم را عوض کرد هم «رفتن» است: کلیدهای بعدیِ همین نوبت مالِ صفحهٔ پیشین‌اند
         // … و کلیکی که فیلدها را کم/زیاد کرد هم: کلیدهای بعدی جابه‌جا شده‌اند (کارزارِ آزمون sc04: «k45 پیدا نشد» و هایلایت روی فیلدِ اشتباه) — نوبتِ خودکارِ بعد با پویشِ تازه
-        if (a.do === "click") return wait(250).then(function () { var grew = nf() !== f0; clicked.changed = ch0 || grew; if (!r && A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "") !== at) moved = true; else if (!r && grew) stale = true; });
+        if (a.do === "click") return wait(250).then(function () { var grew = nf() !== f0, swapped = !grew && !r && fsig() !== g0; clicked.changed = ch0 || grew || swapped; if (!r && A.state.view + "|" + A.state.arg + "|" + (A.state.sub || "") !== at) moved = true; else if (!r && (grew || swapped)) stale = true; });
       });
     });
     return chain.then(function () { return wait(150); }).then(function () {
@@ -348,7 +377,7 @@
     "- کاربرِ تازه («چی کار می‌تونه بکنه؟»): کوتاه و از روی همین نقشه بگو و جای شروع را نشان بده — «از اینجا شروع کن» در منو، «🗺 نقشه‌ها» (قلمروِ سامانه‌ها، گرافِ مشترک)، «🧠 کارنامهٔ ذهن» و این‌که تور با خودِ تو مسئله را تا تسلط پیگیری می‌کند؛ بعد سرِ هدفِ خودش برو.",
     "- **تو پزشکِ عمومیِ این سامانه‌ای: پیش از هر ارجاع تشخیصِ افتراقی کن.** (۱) خواستهٔ واقعیِ کاربر را از ظاهرِ حرفش جدا کن؛ (۲) دست‌کم دو بخش/قلمروِ نامزد را از «نقشهٔ سامانه» نام ببر و برای هر کدام شاهد بیاور که هست یا نیست (نما، فرم، قلمروِ معرفت‌شناسی با گامش، پیشنهادِ منتظر، برگهٔ باز)؛ (۳) فقط بعد تصمیم بگیر. اشتباه در ارجاع، متخصص را به بیراهه می‌برد. پیش از هر gap از نوعِ fix («فلان کار نمی‌شود»): در پویشِ همین صفحه دنبالِ دکمه‌ای بگرد که همان کار را می‌کند (مثلاً در کارخانه ایستگاه فقط با «ثبت و ایستگاه بعد» ثبت می‌شود، نه با نوارِ مسیر) و اول آن را امتحان کن؛ اگر برگه‌ای را به‌اشتباه ثبت کردی، صریح بگو و شماره‌اش را بگو تا کاربر در «نظارت و سرکشی» ببندد.",
     "- اگر بخشی هست ⇒ کاربر را همان‌جا ببر (اگر به چند بخش مربوط است، ترتیب و دلیلِ هر کدام). اگر هست ولی هنوز کامل نیست یا در «کارِ جاریِ هر روتین» آمده است (مثلاً حوزهٔ قلمرو در گامِ ۱، یا خطایی که در مسیرِ ۲ ِ بک‌تست است) ⇒ صادقانه بگو کجای راه است و چه کسی و کِی جلو می‌برد؛ فقط اگر کاربر الان لازمش دارد، kind=\"priority\". اگر بخش هست ولی غلط کار می‌کند ⇒ kind=\"fix\". فقط اگر واقعاً نیست ⇒ kind=\"build\".",
-    "- کمبودِ سامانه (status=\"gap\"): خواسته در قلمروِ همین صفحه است و تشخیصِ بالا نشان داد پوشش داده نمی‌شود. gap را کامل پر کن: area دقیقاً یکی از شناسه‌های «چه کسی مسئولِ چیست»؛ kind؛ abstract (نیازِ کلی — این دسته از خواسته‌ها و نمونه‌های مشابه، نه تکرارِ مسئلهٔ کاربر)؛ missing (دقیقاً چه کم است)؛ where؛ how؛ relations؛ docs؛ why_area (چرا همین قلمرو)؛ why_not (چرا نه نامزدهای دیگر)؛ evidence (چه در نقشه نشان می‌دهد نیست)؛ confidence (۰ تا ۱). اگر confidence کمتر از ۰٫۷۵ است برگه نخواه — یک پرسشِ روشن‌کننده از کاربر بپرس. اگر برگهٔ بازی همین را می‌گوید، برگهٔ تازه نخواه و شماره‌اش را بگو. ثبتِ نهایی پس از نظرِ دوم (مشاور) است؛ به کاربر بگو «برای ثبت بررسی می‌کنم».",
+    "- کمبودِ سامانه (status=\"gap\"): خواسته در قلمروِ همین صفحه است و تشخیصِ بالا نشان داد پوشش داده نمی‌شود. gap را کامل پر کن (بی abstract/missing/where/how ثبت نمی‌شود): title (عنوانِ انسانی، بی شناسه)؛ area دقیقاً یکی از شناسه‌های «چه کسی مسئولِ چیست»؛ kind؛ abstract (نیازِ کلی — این دسته از خواسته‌ها و نمونه‌های مشابه، نه تکرارِ مسئلهٔ کاربر)؛ missing (دقیقاً چه کم است)؛ where؛ how؛ relations؛ docs؛ why_area (چرا همین قلمرو)؛ why_not (چرا نه نامزدهای دیگر)؛ evidence (چه در نقشه نشان می‌دهد نیست)؛ confidence (۰ تا ۱). اگر confidence کمتر از ۰٫۷۵ است برگه نخواه — یک پرسشِ روشن‌کننده از کاربر بپرس. اگر برگهٔ بازی همین را می‌گوید، برگهٔ تازه نخواه و شماره‌اش را بگو. ثبتِ نهایی پس از نظرِ دوم (مشاور) است؛ به کاربر بگو «برای ثبت بررسی می‌کنم».",
     "- حافظه: memory خلاصهٔ انباشتهٔ کلِ همین سشن است از اولین پیام تا حالا (هدف، از کجا آمدیم، تصمیم‌ها، آنچه پر و ثبت شد و کجا، نکته‌های کلیدیِ فایل‌ها، آنچه مانده) — هر بار کاملش را برگردان، چیزی را نینداز.",
     "- pinned: خواستهٔ اصلیِ سشن در یک جمله (نوبتِ اول بساز؛ بعداً فقط اگر خواستهٔ اصلی واقعاً عوض شد).",
     "- next: اگر در همین پاسخ گفتی «بعدش فلان دکمه را می‌زنم» و آن کار پس از کلیک‌های همین نوبت شدنی می‌شود، next:true بده تا سامانه صفحهٔ تازه را بفرستد و همان را انجام دهی؛ قولی نده که بی‌پیامِ کاربر عملی نشود.",
@@ -378,7 +407,7 @@
     }
     return out;
   }
-  function userPrompt(s, msg, sc, extra, skipLast, histBudget) {
+  function userPrompt(s, msg, sc, extra, skipLast, histBudget, pageMode) {
     // امروز (شمسی و میلادی): تاریخی که کاربر می‌گوید با امروز سنجیده شود (کارزارِ سوم v06: تاریخِ گذشته ۵۲ نوبت پذیرفته شد)
     var L = ["# امروز", (A.fdate ? A.fdate(A.today()) : A.today()) + " (" + A.today() + ") — هر تاریخی که کاربر می‌گوید (آزمون، موعد، سررسید) را با امروز بسنج؛ اگر گذشته یا ناممکن است، یک بار بپرس.", "", "# سشن", "نام: " + (s.title || "(هنوز بی‌نام)"), "خواستهٔ اصلی (سنجاق‌شده): " + (s.pinned || "(هنوز نیست)"), "حافظهٔ سشن: " + (s.memory || "(خالی)")];
     if (s.steps && s.steps.length) L.push("مراحل: " + s.steps.map(function (x, i) { return (i + 1) + ") " + x.t + " [" + (x.s || "todo") + "]" + (x.view ? " (" + x.view + ")" : ""); }).join(" "));
@@ -388,7 +417,7 @@
     L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
     (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) L.push("", x); } catch (e) { } });
     var rt = AS.recentToasts(); if (rt.length) L.push("", "# پیام‌های اخیرِ صفحه (۴ دقیقهٔ گذشته؛ مثلاً پس از دکمه‌ای که خودِ کاربر زد)", rt.map(function (x) { return "- " + x; }).join("\n"));
-    L.push("", "# صفحهٔ فعلی", scanText(sc), "", "# گفت‌وگو تا این لحظه");
+    L.push("", "# صفحهٔ فعلی", scanText(sc, pageMode), "", "# گفت‌وگو تا این لحظه");
     var HP = L.length;
     L.push("", "# نوبتِ تازه", msg);
     if (extra) L.push(extra);
@@ -402,10 +431,14 @@
      اگر حتی بی تاریخچه جا نشود (فقط نسخهٔ مستقل با فایلِ متنیِ خیلی بزرگ)، متنِ فایل با **اعلامِ صریح** کوتاه می‌شود — هرگز بی‌صدا. */
   AS.prompt = function (s, msg, sc, extra, skipLast) {
     var man = "# نقشهٔ سامانه (خودکار از ثبت‌گاه‌ها)\n" + AS.manifest() + "\n\n";
-    var parts = userPrompt(s, msg, sc, extra, skipLast, -1);
+    var parts = userPrompt(s, msg, sc, extra, skipLast, -1, 0), pm = 0;
     /* پیامِ تازهٔ کاربر هرگز بریده نمی‌شود (کارزارِ آزمونِ دوم c11: در صفحه‌ای با فیلدهای بسیار، کل ورودی از ۵۸هزار گذشت و پیامِ کاربر
-       از تهِ آن افتاد — دستیار بی دیدنِ حرف جواب داد). اول فهرستِ صفحه کوتاه می‌شود (با اعلامِ صریح)، بعد نقشهٔ سامانه. */
-    var over = man.length + parts.head.length + parts.tail.length + 200 + Math.min(HIST_CHARS, 6000) - MAX_USER;
+       از تهِ آن افتاد — دستیار بی دیدنِ حرف جواب داد). ترتیبِ کوتاه‌کردن: متنِ سادهٔ صفحه ⇒ مقدارهای فشرده ⇒ نقشهٔ سامانه (تا ۸۰۰۰) ⇒
+       فقط در آخر فهرستِ فیلدها (با اعلامِ صریح) ⇒ نقشه تا ۳۰۰۰. همهٔ فیلدها و دکمه‌ها تا جای ممکن می‌مانند (کارزارِ سوم v04/v05). */
+    function overOf() { return man.length + parts.head.length + parts.tail.length + 200 + Math.min(HIST_CHARS, 6000) - MAX_USER; }
+    var over = overOf();
+    while (over > 0 && pm < 3) { pm++; parts = userPrompt(s, msg, sc, extra, skipLast, -1, pm); over = overOf(); }
+    if (over > 0 && man.length > 8000) { var mc = Math.min(over + 300, man.length - 8000); man = man.slice(0, man.length - mc) + "\n[سامانه: بقیهٔ نقشهٔ سامانه جا نشد — فهرستِ کاملِ همین صفحه مقدم بود]\n\n"; over = overOf(); }
     if (over > 0) {
       var i0 = parts.head.indexOf("# صفحهٔ فعلی"), i1 = parts.head.lastIndexOf("# گفت‌وگو تا این لحظه");
       if (i0 >= 0 && i1 > i0) {
@@ -455,19 +488,23 @@
   AS.areaInfo = areaInfo;
   var KIND_FA = { build: "ساختنِ چیزی که نیست", priority: "جلو انداختنِ کاری که در نقشهٔ کارِ روتینِ مالک هست", fix: "اصلاحِ بخشی که هست ولی درست کار نمی‌کند" };
   AS.reportText = function (s, g) {
-    var sp = (A.state.view || "") + (A.state.arg != null ? " / " + A.state.arg : "");
+    // نمای کار با نامِ فارسی‌اش (نه شناسهٔ خام «whole»)؛ شناسه فقط در پرانتز برای روتین‌ها (بازبینیِ اجرا ۲۰۲۶-۱۰-۱۵)
+    var vw = A.state.view || "", sp = (vw ? "«" + labelOf(vw) + "» (`" + vw + "`)" : "؟") + (A.state.arg != null ? " / " + A.state.arg : "");
+    var t0 = (s.msgs || []).length && s.msgs[0].at ? String(s.msgs[0].at).slice(0, 10) : now().slice(0, 10);   // از آغازِ همین سشن ⇒ precheck --since
     var ai = areaInfo(g.area) || areaInfo("lla-page") || { ar: { id: g.area || "?", fa: "؟" }, who: "؟" };
     // هر بخشِ آزاد جدا کوتاه می‌شود تا بخش‌های ثابت (روالِ رسیدگی، مستندات) هرگز با برشِ کلِ متن نیفتند (بازبینیِ اجرایی ۲۰۲۶-۱۰-۱۵)
     function F(x) { return x == null || x === "" ? "" : clip(x, 900); }
     return [
-      "[دستیار · کمبودِ سامانه · قلمرو: " + ai.ar.id + " · " + (g.kind || "build") + "] " + clip(g.title || s.pinned || "کمبودِ سامانه", 100),
+      // سطرِ اول = عنوانِ برگه نزدِ مالک (inspection._headline): فقط عنوانِ انسانی + نامِ فارسیِ قلمرو؛ برچسب‌های ماشینی در سطرِ دوم
+      "[دستیار · کمبودِ سامانه] " + clip(g.title || s.pinned || "کمبودِ سامانه", 90) + (ai.ar.fa && ai.ar.fa !== "؟" ? " — " + clip(ai.ar.fa, 40) : ""),
+      "برچسبِ ماشینی: قلمرو: " + ai.ar.id + " · نوع: " + (g.kind || "build"),
       "",
       "ثبت‌شده توسط «💬 دستیار» (نه مستقیمِ مالک) — سشن «" + (s.title || s.id) + "» (" + s.id + ")، هنگامِ کار روی نمای " + sp + ". روال‌های دیگر: برداشتِ دستیار را درست فرض نکنید؛ بسنجید و اگر نادرست است همین‌جا اصلاح کنید.",
       "",
       "■ قلمرو و مالک: «" + ai.ar.fa + "» (`" + ai.ar.id + "`) — مالک: " + ai.who + (ai.ar.rule ? " — " + ai.ar.rule : "") + (ai.ar.procedure ? " — بخشِ دستور: " + ai.ar.procedure : ""),
       "■ نوع: " + (KIND_FA[g.kind] || KIND_FA.build),
       "■ مستنداتی که باید به‌روز شوند: " + (F(g.docs) || "WORKLOG، HANDBOOK، AGENTS.md") + " — به‌علاوهٔ همیشگی‌ها: ورودیِ VIEW_META/ثبت‌گاه برای هر نما یا قابلیتِ تازه (تا دستیار خودکار بشناسدش)، WORKLOG (n)، ردیفِ PROGRESS، بخش و §۱۰/§۱۲ ِ HANDBOOK، docs/overhaul/AUDIT_LOG.md.",
-      "■ روالِ رسیدگی (بخشِ «هماهنگی میانِ روتین‌ها» در هر سه دستور): ۱) `python3 scripts/supervisor/handoff.py precheck --area " + ai.ar.id + " --sheet <شمارهٔ همین برگه>` — اگر روتینِ مالک همین را انجام داده، دوباره‌کاری نکنید؛ با ارجاع به دور/کامیتش جواب دهید و `--kind owner-did` ثبت کنید. ۲) اگر قلمرو مالِ روتینِ دیگری است: یا دقیقاً با دستورِ همان روتین (همان ابزار، همان نگهبان‌ها و بازبینیِ مستقل) و `handoff.py add --kind did`، یا اگر خط‌لولهٔ آن روتین لازم است `--kind request` تا خودش در دورِ بعدش انجام دهد و زیرِ همین برگه جواب بنویسد. ۳) قلمروِ تصمیمِ مالک (قاعده، سقف، ایستگاه، وزن، متنِ جزوه) ⇒ فقط پیشنهاد. ۴) در WORKLOG بنویسید «پاسخ به برگهٔ دستیار #n — دست‌به‌دست h…».",
+      "■ روالِ رسیدگی (بخشِ «هماهنگی میانِ روتین‌ها» در هر سه دستور): ۱) `python3 scripts/supervisor/handoff.py precheck --area " + ai.ar.id + " --since " + t0 + " --sheet <شمارهٔ همین برگه>` — اگر روتینِ مالک همین را انجام داده، دوباره‌کاری نکنید؛ با ارجاع به دور/کامیتش جواب دهید و `--kind owner-did` ثبت کنید. ۲) اگر قلمرو مالِ روتینِ دیگری است: یا دقیقاً با دستورِ همان روتین (همان ابزار، همان نگهبان‌ها و بازبینیِ مستقل) و `handoff.py add --kind did`، یا اگر خط‌لولهٔ آن روتین لازم است `--kind request` تا خودش در دورِ بعدش انجام دهد و زیرِ همین برگه جواب بنویسد. ۳) قلمروِ تصمیمِ مالک (قاعده، سقف، ایستگاه، وزن، متنِ جزوه) ⇒ فقط پیشنهاد. ۴) در WORKLOG بنویسید «پاسخ به برگهٔ دستیار #n — دست‌به‌دست h…».",
       "",
       "■ نیازِ انتزاعی (این دسته از خواسته‌ها، نه فقط مسئلهٔ مالک): " + (F(g.abstract) || "—"),
       "■ دقیقاً چه کم است: " + (F(g.missing) || "—"),
@@ -497,7 +534,7 @@
   };
 
   /* ---------- نظرِ دوم پیش از ارجاع (پزشکِ عمومی ⇒ مشاورِ ارشد): مدلِ استدلالیِ خودِ صفحه، فقط وقتی دستیار می‌خواهد برگه ثبت کند ---------- */
-  var CONSULT_SYS = "تو مشاورِ ارشدِ ارجاع در سامانهٔ «معماری یادگیری عمیق و کارخانهٔ معرفت‌شناسی» هستی. دستیارِ گفت‌وگو (پزشکِ عمومی) می‌خواهد برای یک کمبود برگهٔ فوری در «نظارت و سرکشی» ثبت کند. با «نقشهٔ سامانه»، «چه کسی مسئولِ چیست»، قلمروِ معرفت‌شناسی (با گام‌ها)، پیشنهادهای منتظر و برگه‌های باز، تشخیصِ او را سخت‌گیرانه بسنج: آیا واقعاً نیست (یا بخشی هست که او ندیده)؟ آیا در نقشهٔ کارِ یک روتین است (priority) یا خراب است (fix)؟ قلمرو درست است؟ برگهٔ بازی همین را نمی‌گوید؟ ارجاعِ غلط متخصص را به بیراهه می‌برد. فقط JSON: {\"agree\":true|false,\"area\":\"…\",\"kind\":\"build|priority|fix\",\"dup_of\":null,\"reason\":\"یک تا سه جملهٔ فارسی\",\"fix\":{\"abstract\":\"…\",\"missing\":\"…\",\"where\":\"…\",\"how\":\"…\",\"relations\":\"…\"}} — در fix فقط آنچه را باید عوض شود بنویس.";
+  var CONSULT_SYS = "تو مشاورِ ارشدِ ارجاع در سامانهٔ «معماری یادگیری عمیق و کارخانهٔ معرفت‌شناسی» هستی. دستیارِ گفت‌وگو (پزشکِ عمومی) می‌خواهد برای یک کمبود برگهٔ فوری در «نظارت و سرکشی» ثبت کند. با «نقشهٔ سامانه»، «چه کسی مسئولِ چیست»، قلمروِ معرفت‌شناسی (با گام‌ها)، پیشنهادهای منتظر و برگه‌های باز، تشخیصِ او را سخت‌گیرانه بسنج: آیا واقعاً نیست (یا بخشی هست که او ندیده)؟ آیا در نقشهٔ کارِ یک روتین است (priority) یا خراب است (fix)؟ قلمرو درست است؟ برگهٔ بازی همین را نمی‌گوید؟ ارجاعِ غلط متخصص را به بیراهه می‌برد. فقط JSON: {\"agree\":true|false,\"area\":\"…\",\"kind\":\"build|priority|fix\",\"dup_of\":null,\"reason\":\"یک تا سه جملهٔ فارسی\",\"fix\":{\"abstract\":\"…\",\"missing\":\"…\",\"where\":\"…\",\"how\":\"…\",\"relations\":\"…\"}} — در fix فقط آنچه را باید عوض شود بنویس — و اگر یکی از abstract/missing/where/how در تشخیصِ دستیار خالی است و موافقی، همان را در fix پر کن (برگهٔ نیمه‌خالی ثبت نمی‌شود).";
   AS.CONSULT_SYS = CONSULT_SYS;
   AS.consult = function (s, g) {
     var users = s.msgs.filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return "- " + clip(m.text, 800); }).join("\n");
@@ -511,6 +548,11 @@
     });
   };
   function validArea(id) { return !!areaInfo(id); }
+  /* برگهٔ نیمه‌خالی («—») متخصص را بی‌سرنخ می‌گذارد (بازبینیِ هماهنگی ۲۰۲۶-۱۰-۱۵): این چهار بخش باید پر باشند — از دستیار، یا نظرِ دوم پرشان کند */
+  var GAP_REQ = [["abstract", "نیازِ انتزاعی"], ["missing", "چه کم است"], ["where", "کجا افزوده شود"], ["how", "چطور"]];
+  function gapHoles(g) { return GAP_REQ.filter(function (k) { var v = String((g || {})[k[0]] == null ? "" : g[k[0]]).replace(/[\s—\-–.…؟?]+/g, ""); return !v; }); }
+  AS.gapHoles = function (g) { return gapHoles(g).map(function (k) { return k[0]; }); };
+  function holesSkip(g) { var hs = gapHoles(g); return hs.length ? { skip: "برگه ثبت نشد: این بخش‌های برگه خالی ماند — " + hs.map(function (k) { return "«" + k[1] + "» (" + k[0] + ")"; }).join("، ") + ". دستیار باید در نوبتِ بعد gap را با همهٔ این بخش‌ها کامل بفرستد.", holes: hs.map(function (k) { return k[0]; }) } : null; }
   /* تصمیمِ نهایی برای یک «gap»: اطمینانِ کم ⇒ نه؛ برگهٔ باز ⇒ نه؛ نظرِ دوم مخالف ⇒ نه؛ موافق ⇒ با اصلاح‌های مشاور ثبت */
   function isDup(s, g) {
     var key = norm(g.title || s.pinned), since = Date.now() - 30 * 864e5;
@@ -528,10 +570,10 @@
       if (c.kind) out.kind = c.kind;
       out.consult = "موافق" + (c.area && c.area !== g.area ? " (قلمرو اصلاح شد: " + g.area + " ⇒ " + c.area + ")" : "") + " — " + (c.reason || "");
       if (!validArea(out.area)) out.area = "lla-page";
-      return { gap: out };
+      return holesSkip(out) || { gap: out };
     }, function (e) {
       // مشاور در دسترس نیست: فقط تشخیصِ بسیار مطمئن، و با نشانِ «بی نظرِ دوم» تا روتین‌ها سخت‌گیرانه‌تر بسنجند
-      if (conf >= 0.9 && validArea(g.area)) return { gap: Object.assign({}, g, { consult: "در دسترس نبود (" + errText(e) + ")" }) };
+      if (conf >= 0.9 && validArea(g.area)) return holesSkip(g) || { gap: Object.assign({}, g, { consult: "در دسترس نبود (" + errText(e) + ")" }) };
       return { skip: "نظرِ دوم در دسترس نبود و اطمینان برای ثبتِ بی‌مشاوره کافی نبود؛ برگه ثبت نشد (" + errText(e) + ")." };
     });
   };
@@ -555,17 +597,27 @@
     var m = { role: "user", text: text || "(فایل)", at: now(), files: [] };
     s.msgs.push(m); S.put(s); paint();
     if (files.length > MAX_FILES) { A.toast("در هر پیام حداکثر " + fa(MAX_FILES) + " فایل؛ بقیه را در پیامِ بعد بفرست", "bad"); files = files.slice(0, MAX_FILES); }
-    var ups = Promise.resolve(), aiIds = [], texts = [];
+    var ups = Promise.resolve(), aiIds = [], texts = [], dupes = [], toRec = [];
     files.forEach(function (f) {
       ups = ups.then(function () {
         if (!A.HOST || !A.HOST.upload) {   // نسخهٔ مستقل: فقط متن‌ها، و صادقانه می‌گوید بقیه را نمی‌بیند
           return readText(f).then(function (t) { m.files.push({ name: f.name, mime: f.type || "" }); if (t) texts.push("— متنِ کاملِ «" + f.name + "»:\n" + t); else texts.push("— «" + f.name + "»: این نسخه (بی Lifemanager) فقط فایلِ متنی را می‌خواند؛ این یکی خوانده نشد."); });
         }
         if (f.size > MAX_FILE_MB * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از " + fa(MAX_FILE_MB) + " مگابایت است", "bad"); m.files.push({ name: f.name, mime: f.type || "", err: true }); return; }
-        return A.HOST.upload(s.id, f, { group: GROUP, title: provisional(s, text) }).then(function (r) {
-          var info = { id: r.id, name: r.name || f.name, mime: r.mime || f.type || "", link: r.link || "" };
-          blobs[r.id] = f; m.files.push(info); s.files.push(info); aiIds.push(r.id);
-        }, function (e) { m.files.push({ name: f.name, mime: f.type || "", err: true }); A.toast("«" + f.name + "» به درایو نرفت: " + errText(e), "bad"); });
+        var sig = fsig(f), had = (s.files || []).filter(function (x) { return x.sig === sig; })[0];
+        // یک فولدر برای هر سشن: نامِ نخستین بار ثابت می‌ماند (نامِ سشن بعداً عوض شود، فولدرِ دوم ساخته نمی‌شود)
+        if (!s.folderTitle) s.folderTitle = provisional(s, text);
+        var toSess = had ? Promise.resolve(had).then(function (info) { blobs[info.id] = f; m.files.push(info); aiIds.push(info.id); dupes.push(f.name); })
+          : A.HOST.upload(s.id, f, { group: GROUP, title: s.folderTitle }).then(function (r) {
+            var info = { id: r.id, name: r.name || f.name, mime: r.mime || f.type || "", link: r.link || "", sig: sig };
+            blobs[r.id] = f; m.files.push(info); s.files.push(info); aiIds.push(r.id); noteSent(s, s.id, sig);
+          }, function (e) { m.files.push({ name: f.name, mime: f.type || "", err: true }); A.toast("«" + f.name + "» به درایو نرفت: " + errText(e), "bad"); });
+        return toSess.then(function () {
+          var rc = s.rec && S.get(s.rec.rid) ? s.rec : null;
+          if (!rc || sentTo(s, rc.rid, sig)) return;
+          return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function () { noteSent(s, rc.rid, sig); toRec.push(f.name); },
+            function (e) { A.toast("«" + f.name + "» به پروندهٔ «" + rc.title + "» نرفت: " + errText(e), "bad"); });
+        });
       });
     });
     var auto = 0;
@@ -594,7 +646,9 @@
         var a = { role: "ai", text: o.reply, at: now(), actions: acts.map(function (x) { return x && x.do; }).filter(Boolean) };
         s.msgs.push(a);
         // بخشی که بیرون از این صفحه است: صادقانه و جدا گفته و در سشن نگه داشته می‌شود (نیمی‌مربوط ≠ نامربوط)
-        if (o.outside && String(o.outside).trim()) { var outT = clip(String(o.outside), 400); s.outside = (s.outside || []).concat([{ at: now(), text: outT }]).slice(-20); s.msgs.push({ role: "sys", at: now(), text: "↗ بیرون از این صفحه: " + outT }); } if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
+        // همان بخشِ بیرونی دوباره ثبت نمی‌شود (کارزارِ سوم v03: «بیرون از صفحه» دو بار) — یکسان یا درونِ یکی از پیشین‌ها
+        if (o.outside && String(o.outside).trim()) { var outT = clip(String(o.outside), 400), on = norm(outT), outDup = (s.outside || []).some(function (x) { var xn = norm(x.text); return xn === on || (on.length >= 12 && xn.indexOf(on) >= 0) || (xn.length >= 12 && on.indexOf(xn) >= 0); });
+          if (!outDup) { s.outside = (s.outside || []).concat([{ at: now(), text: outT }]).slice(-20); s.msgs.push({ role: "sys", at: now(), text: "↗ بیرون از این صفحه: " + outT }); } } if (s.msgs.length > MAX_MSGS) s.msgs = s.msgs.slice(-MAX_MSGS);
         S.put(s); paint();
         var gap = s.status === "gap" && o.gap ? AS.triage(s, o.gap).then(function (t) {
           if (t.skip) { s.msgs.push({ role: "sys", at: now(), text: t.skip }); S.put(s); paint(); return null; }
@@ -605,6 +659,17 @@
           s.msgs.push({ role: "sys", at: now(), text: r.dup ? "این کمبود پیش‌تر ثبت شده بود؛ برگهٔ تازه نساختم." : r.local ? "برگه ساخته شد ولی این نسخه به «نظارت و سرکشی» وصل نیست؛ متنش در سشن ماند." : "🛎 برگهٔ فوری #" + fa(r.number) + " در «نظارت و سرکشی» ثبت شد." });
           S.put(s); paint();
         }, function (e) { s.msgs.push({ role: "sys", at: now(), text: "ثبتِ برگهٔ فوری نشد: " + errText(e) }); S.put(s); paint(); }) : Promise.resolve();
+        // پرسشِ بدهکارِ ایمنی/باور دربارهٔ خود/هیجان پیش از رفتن به فرم (کارزارِ سوم v03): رفتن و کلیدهای بعدش اجرا نمی‌شود؛
+        // اگر پاسخ خودش پرسش نیست، یک نوبتِ خودکار تا اول همان را بپرسد. هر لایه حداکثر دو بار جلوی رفتن را می‌گیرد (کاربر حق دارد نگوید).
+        var owed = AS.owedBeforeForms ? AS.owedBeforeForms(s) : [], gi = -1;
+        acts.forEach(function (x, i) { if (gi < 0 && x && x.do === "go") gi = i; });
+        var og = s.owedGate = s.owedGate || {}, held = owed.filter(function (L) { return (og[L.id] || 0) < 2; });
+        if (gi >= 0 && held.length) {
+          held.forEach(function (L) { og[L.id] = (og[L.id] || 0) + 1; });
+          acts = acts.slice(0, gi);
+          s.msgs.push({ role: "sys", at: now(), text: "⏸ پیش از رفتن به فرم، اول پرسشِ بدهکارِ «" + held.map(function (L) { return L.fa; }).join("»، «") + "»." }); S.put(s);
+          if (!/[؟?]/.test(o.reply || "") && auto < MAX_AUTO) { auto++; return gap.then(function () { return AS.run(acts); }).then(function () { return turn("[سامانه: رفتن به فرم اجرا نشد — پرسش‌های بدهکار پیش از فرم: «" + held.map(function (L) { return L.fa + (L.q ? " — " + clip(L.q, 120) : ""); }).join("» · «") + "». در همین نوبت فقط یکی را ملایم بپرس (بی go)؛ reply کوتاه.]"); }); }
+        }
         return gap.then(function () { return AS.run(acts); }).then(function (res) {
           if (AS.tourAfterTurn) { try { AS.tourAfterTurn(s); S.put(s); paint(); } catch (e) { console.error(e); } }
           if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
@@ -626,9 +691,12 @@
           // «next»: مدل گفته کارِ بعدی را در همین رشته انجام می‌دهد (مثلاً پس از «ثبتِ کارت»، دکمهٔ «ساختِ نمونه‌ها») —
           // بی آن، قولِ «بعدش می‌زنم» تا پیامِ بعدیِ کاربر معطل می‌ماند (یافتهٔ تورِ زنده)
           // کاری که مدل «انجام‌شده» گفت ولی نشد (کلید پیدا نشد، تصمیمِ مالک، جوابِ تمرین، …) ⇒ یک نوبتِ اصلاح تا پاسخ دروغ نماند
-          var failed = res.notes.filter(function (n) { return !/^«.*» تصمیمِ خودت است؛ زردش کردم/.test(n) || /زدم|افزودم|پر کردم|می ?زنم|پر می ?کنم/.test(o.reply || ""); });
+          // نیم‌فاصله (U+200C) هم فاصله است: «می‌زنم/می‌نویسم» با نیم‌فاصله از الگوی «می ?زنم» رد می‌شد و نوبتِ اصلاح برای کارِ بستهٔ مالک
+          // (data-own، «به قلمِ خودت»، تصمیمِ مالک) هرگز اجرا نمی‌شد (بازبینیِ اجرا v01/v03، ۲۰۲۶-۱۰-۱۵)
+          var rp = String(o.reply || "").replace(/[\u200c\u200f]/g, " ");
+          var failed = res.notes.filter(function (n) { return !/^«.*» تصمیمِ خودت است؛ زردش کردم/.test(n) || /زدم|افزودم|پر کردم|می ?زنم|پر می ?کنم/.test(rp); });
           // «می‌زنم/پر می‌کنم» هم ادعاست (کارزارِ سوم v01/v03/v05: «… را می‌زنم» و صفحه نگذاشت)
-          if (auto < MAX_AUTO && failed.length && /زدم|افزودم|پر کردم|ثبت کردم|نوشتم|گذاشتم|می ?زنم|پر می ?کنم|ثبت می ?کنم|می ?نویسم|می ?گذارم|انجام (?:دادم|می ?دهم)|عوض کردم/.test(o.reply || "")) {
+          if (auto < MAX_AUTO && failed.length && /زدم|افزودم|پر کردم|ثبت کردم|نوشتم|گذاشتم|می ?زنم|پر می ?کنم|ثبت می ?کنم|می ?نویسم|می ?گذارم|انجام (?:دادم|می ?دهم)|عوض کردم|تیک (?:زدم|می ?زنم)|انتخاب (?:کردم|می ?کنم)/.test(rp)) {
             auto++;
             return turn("[سامانه: این کارهای نوبتِ پیش انجام نشد: «" + res.notes.join("» · «") + "». پاسخِ قبلی‌ات گفته بود انجام شده — به کاربر کوتاه و درست بگو چه شد و چه نشد، و اگر راهِ درستی هست همین حالا انجام بده (کارِ تصمیمِ مالک را فقط زرد کن). reply خیلی کوتاه.]");
           }
@@ -640,6 +708,8 @@
               (res.skipped ? "؛ " + res.skipped + " کارِ بعدیِ نوبتِ پیش اجرا نشد چون کلیدهایش مالِ صفحهٔ قبل بود — اگر هنوز لازم است با کلیدهای تازهٔ همین صفحه انجامش بده" : "") +
               ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]");
           }
+          // کارهای جاماندهٔ این نوبت (کلیدِ کهنه پس از کلیکِ قبلی) بی نوبتِ خودکار هم به کاربر و مدل گفته شود — نه بی‌صدا
+          if (res.skipped) { s.msgs.push({ role: "sys", at: now(), text: "⏭ " + fa(res.skipped) + " کارِ بعدیِ این نوبت اجرا نشد: صفحه پس از کارِ قبلی عوض شد و کلیدهایش کهنه بود — در پیامِ بعد با فهرستِ تازه انجام می‌شود." }); S.put(s); }
           // موبایل: پنجره روی فرم است ⇒ کنار برود تا زردها و سبزها دیده شوند
           if (marked && window.innerWidth <= 600 && ui && !ui.panel.hidden) { AS.toggle(false); A.toast("پر کردم؛ زردها با تو. برای ادامه دوباره 💬 را بزن."); }
         });
@@ -648,7 +718,10 @@
     // نشانهٔ پریشانیِ جدی (همان واژه‌نامهٔ ایمنیِ گره‌گشا): راهِ کمکِ انسانی پیش از هر کار، و مدل هم می‌داند
     var safe = "";
     try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
-    return ups.then(function () { S.put(s); return turn(text || "(فقط فایل فرستادم)", (texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "") + safe, aiIds, true); })
+    return ups.then(function () {
+      if (dupes.length) s.msgs.push({ role: "sys", at: now(), text: "♻ «" + dupes.join("»، «") + "» پیش‌تر در همین سشن فرستاده شده بود؛ دوباره بارگذاری نشد (همان پیوست به کار رفت)." });
+      if (toRec.length && s.rec) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به پروندهٔ جاریِ این سشن («" + clip(s.rec.title, 60) + "») هم پیوست شد." });
+      S.put(s); return turn(text || "(فقط فایل فرستادم)", (texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "") + safe, aiIds, true); })
       .catch(function (e) {
         var fl = e && e.files && e.files.length ? " " + manifestNote(e.files) : "";
         s.msgs.push({ role: "sys", at: now(), text: "دستیار پاسخ نداد: " + errText(e) + fl + " — دوباره بفرست." }); S.put(s);
@@ -809,10 +882,10 @@
     return h("div", { class: "as-list" },
       h("button", { class: "btn sm", type: "button", onclick: function () { AS.newSession(); ui.view = "chat"; paint(); } }, "＋ سشنِ تازه"),
       all.length ? h("ul", { class: "plain" }, all.map(function (s) {
-        var d = (s.steps || []).filter(function (x) { return x.s === "done"; }).length;
+        var pg = AS.progress ? AS.progress(s) : null;   // همان شمارِ کشوی تور و «امروز» (یک منبع)
         return h("li", { class: "as-li" + (cur && cur.id === s.id ? " on" : "") }, h("button", { class: "linkish", type: "button", onclick: function () { store("cur", s.id); ui.view = "chat"; AS.clearMarks(); paint(); } },
           h("b", {}, s.title || clip((s.msgs[0] || {}).text, 40) || "گفت‌وگوی تازه"),
-          h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (s.steps && s.steps.length ? " · " + fa(d) + "/" + fa(s.steps.length) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
+          h("span", { class: "small muted" }, " · " + A.fdate(s.updated) + (pg ? " · " + pg.label + " " + fa(pg.done) + "/" + fa(pg.all) : "") + (s.reports && s.reports.length ? " · 🛎" + fa(s.reports.length) : ""))));
       })) : h("p", { class: "small muted" }, "هنوز سشنی نیست."));
   }
 

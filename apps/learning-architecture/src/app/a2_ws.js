@@ -207,7 +207,7 @@
     return h("div", { class: "checks", id: id }, opts0.map(function (o, i) {
       var cid = id + "_" + i;
       return h("label", { class: "chk", for: cid }, h("input", { type: "checkbox", id: cid, checked: cur.indexOf(o) >= 0, onchange: function (e) {
-        var arr = (d[f.k] || []).filter(function (x) { return x !== o; }); if (e.target.checked) arr.push(o); d[f.k] = arr; ch(); } }), h("span", {}, o));
+        var arr = (d[f.k] || []).filter(function (x) { return x !== o; }); if (e.target.checked) arr.push(o); d[f.k] = arr; ch(); } }), h("span", {}, (f.opts || []).indexOf(o) < 0 ? o + " (گزینهٔ پیشین)" : o));
     }));
   };
   FIELD.scale = function (f, d, ch, id) {
@@ -226,7 +226,7 @@
       var n = Math.max(f.min || 1, arr.length);
       for (var i = 0; i < n; i++) (function (i) {
         wrap.appendChild(h("div", { class: "lrow" }, h("span", { class: "lnum" }, fa(i + 1)),
-          h("input", { type: "text", id: i === 0 ? id : id + "_" + i, value: arr[i] || "", placeholder: i === 0 ? (f.h || "") : "", oninput: function (e) { arr[i] = e.target.value; ch(); } }),
+          h("input", { type: "text", id: i === 0 ? id : id + "_" + i, "aria-label": i === 0 ? null : (f.l || "ردیف") + " — " + fa(i + 1), value: arr[i] || "", placeholder: i === 0 ? (f.h || "") : "", oninput: function (e) { arr[i] = e.target.value; ch(); } }),
           i >= (f.min || 1) ? h("button", { class: "ib", type: "button", title: "حذف", "aria-label": "حذف ردیف", onclick: function () { arr.splice(i, 1); draw(); ch(); } }, "×") : null));
       })(i);
       if (!f.max || n < f.max) wrap.appendChild(h("button", { class: "btn ghost sm", type: "button", onclick: function () { arr.length = n; arr.push(""); draw(); } }, "+ افزودن"));
@@ -240,7 +240,7 @@
     for (var i = 0; i < (f.n || 5); i++) (function (i) {
       var ctx = h("div", { class: "cctx small" });
       ctxEls.push(ctx);
-      var ta = h("textarea", { id: i === 0 ? id : id + "_" + i, rows: 2, placeholder: i === 0 ? (f.h || "") : "", oninput: function (e) { arr[i] = e.target.value; refresh(); ch(); } });
+      var ta = h("textarea", { id: i === 0 ? id : id + "_" + i, rows: 2, "aria-label": i === 0 ? null : (f.prefix || "گام") + " " + fa(i + 1) + (f.l ? " — " + f.l : ""), placeholder: i === 0 ? (f.h || "") : "", oninput: function (e) { arr[i] = e.target.value; refresh(); ch(); } });
       ta.value = arr[i] || "";
       wrap.appendChild(h("div", { class: "crow" }, h("div", { class: "cnum" }, (f.prefix || "گام") + " " + fa(i + 1)), h("div", { class: "cbody" }, ctx, ta)));
     })(i);
