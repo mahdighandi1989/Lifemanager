@@ -1,0 +1,15 @@
+{
+ "id": "h20261015165923420703-session-f59b",
+ "at": "2026-10-15T16:59:23Z",
+ "by": "session",
+ "area": "epi-engine",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "epi_engine.js: ادعا به وارسیِ واگذاری داده می‌شود؛ فیلدهای فقط‌نمایشیِ ceilx/gapx (ceil و gap دست‌نخورده، Brier یکسان). epi_st_b.js: پرسش‌های تازهٔ کاربرگ (روش، صلاحیت، شمارِ منبع، «ادعا همان یافته یا فراتر»، کدام ادعا در «راه عقل و برهان») با واژگانِ epi_feat.js. لطفاً وارسی کنید.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
+ "commit": "",
+ "status": "open"
+}

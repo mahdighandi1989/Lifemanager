@@ -1,0 +1,15 @@
+{
+ "id": "h20261015165923363760-session-0f1e",
+ "at": "2026-10-15T16:59:23Z",
+ "by": "session",
+ "area": "epi-rules",
+ "owner": [
+  "owner"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "بازبینِ بدبین ۲۰۲۶-۱۰-۱۵: epi_found.js — واگذاریِ T_measured_precedence حالا ادعا را می‌گیرد و سقفی را که از پیوندِ دیگر یا از «فراتر از یافته» آمده رها نمی‌کند (گامِ ۵ ِ متنِ پذیرفتهٔ قضیه). هیچ قاعده/سقف/ایستگاه/وزن عوض نشد؛ بک‌تستِ فقط‌خواندنی: ۰ از ۲۰۳ حکم جابه‌جا شد. لطفاً وارسی کنید (یادداشت: docs/overhaul/handoff-notes/_pending_idea_factory_fix_2026-10-15.md).",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها (هم‌خوانیِ پیاده‌سازی با قضیهٔ پذیرفته)",
+ "commit": "",
+ "status": "open"
+}
