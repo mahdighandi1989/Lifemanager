@@ -1,0 +1,16 @@
+{
+ "id": "h20261015204746011707-session-6ec4",
+ "at": "2026-10-15T20:47:46Z",
+ "by": "session",
+ "area": "lla-sources",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "پولیا دورِ ۶ (بازبینِ سخت‌گیرانهٔ مستقل، ۶۹۸ نقلِ عینی، ۰ ناموفق): ۵۸۵/۱۱۵/۷۹/۳۳؛ گزارش docs/decisions/2026-10-15-polya-round6.md.",
+ "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
+ "commit": "",
+ "status": "open"
+}
