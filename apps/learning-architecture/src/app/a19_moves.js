@@ -1062,7 +1062,12 @@
     var root = rawK.apply(this, arguments);
     try {
       var kc = id && S.get(id), src = kc && kc.src;
-      if (src && src.type === "eprob" && root && root.querySelector) {
+      /* موقعیتی که از «🔭 مسئلهٔ حل‌نشدهٔ خودم» آمده (a38_live): برگشت به همان مسئله، نه به شبیه‌ساز */
+      if (src && src.type === "eprob" && src.live && root && root.querySelector && A.liveRec && A.liveRec(src.pid)) {
+        var lr = A.liveRec(src.pid), lsec = h("section", { class: "card soft mv-kback lp-kback", dir: "rtl" }, h("p", { class: "small" }, "این موقعیت از مسئلهٔ حل‌نشدهٔ خودت آمده است: ", h("b", {}, lr.p.title)),
+          h("button", { class: "btn ghost sm", onclick: function () { A.go("lprob", src.pid, "exec"); } }, "🔭 برگشت به همان مسئله"));
+        var lhd = root.querySelector(".phead"); if (lhd && lhd.parentNode) lhd.parentNode.insertBefore(lsec, lhd.nextSibling); else root.insertBefore(lsec, root.firstChild);
+      } else if (src && src.type === "eprob" && root && root.querySelector) {
         var p = A.getProb ? A.getProb(src.pid) : null, idx = -1;
         if (p) p.stages.forEach(function (s, i) { if (s.id === src.sid) idx = i; });
         var sec = h("section", { class: "card soft mv-kback", dir: "rtl" }, h("p", { class: "small" }, "این موقعیت از «مسئله‌های بزرگ» آمده است: ", h("b", {}, p ? p.title + (idx >= 0 ? " · گامِ " + fa(idx + 1) : "") : "مسئله‌ای که دیگر در دسترس نیست"), "."),

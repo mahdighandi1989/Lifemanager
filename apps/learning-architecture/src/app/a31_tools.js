@@ -148,7 +148,8 @@
     A.dueList = function () {
       var items = raw.apply(this, arguments) || [], t = A.today();
       S.all("wchain", function (c) { return c.due && c.due <= t && !c.outcome; }).forEach(function (c) { items.push({ k: "p", txt: "⛓ نتیجهٔ واقعیِ «" + c.title + "» را ثبت کن", sub: "حسِ اولت " + (c.feel == null ? "—" : fa(c.feel) + "٪") + " بود", go: function () { A.go("chain", c.id); } }); });
-      var fc = S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome; });
+      /* پیش‌بینیِ گامِ «مسئلهٔ حل‌نشدهٔ خودم» (x.live) در سطرِ خودِ همان مسئله می‌آید و همان‌جا نتیجه می‌گیرد — دو بار پرسیده نمی‌شود */
+      var fc = S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome && !x.live; });
       if (fc.length) items.push({ k: "p", txt: "🎯 " + fa(fc.length) + " پیش‌بینی به موعد رسیده — شد یا نشد؟", sub: fc.slice(0, 2).map(function (x) { return x.q; }).join(" · "), go: function () { A.go("fcast"); } });
       var lm = S.all("meaning").map(function (m) { return m.date; }).sort().pop();
       if ((S.all("value").length || lm) && (!lm || A.daysBetween(lm, t) >= 30)) items.push({ k: "p", txt: "🧭 وارسیِ ماهانهٔ معنا", sub: lm ? "آخرین بار " + A.fdate(lm) : "نخستین وارسی", go: function () { A.go("vals"); } });

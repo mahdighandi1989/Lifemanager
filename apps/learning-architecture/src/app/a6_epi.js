@@ -317,6 +317,7 @@
         h("label", { class: "small", for: "csM" }, "مسیر: "), h("select", { id: "csM", onchange: function (e) { cs.mode = e.target.value; S.put(cs); A.render(); } }, h("option", { value: "full", selected: cs.mode !== "quick" }, "کامل"), h("option", { value: "quick", selected: cs.mode === "quick" }, "سریع")),
         h("button", { class: "btn ghost sm", onclick: function () { A.go("e_case", cs.id, "report"); } }, "گزارش کامل"),
         A.caseEngine ? h("button", { class: "btn ghost sm", title: "رمزگذاری تصدیق‌ها و عبور از قاعده‌های بک‌تست‌شده، بدون هوش مصنوعی", onclick: function () { A.go("e_case", cs.id, "engine"); } }, "داوری قطعی (خودکار)") : null,
+        cs.src && cs.src.type === "lprob" && A.V.lprob ? h("button", { class: "btn ghost sm lp-caseback", onclick: function () { A.go("lprob", cs.src.id, "plan"); } }, "← برگشت به مسئلهٔ حل‌نشدهٔ خودم") : null,
         cs.src && cs.src.t === "fnode" && S.get(cs.src.id) ? h("button", { class: "btn ghost sm", onclick: function () { A.farmSel = cs.src.id; var n = S.get(cs.src.id); A.go("farm", n.tree, "tree"); } }, "بازگشت به گره مزرعه") : null,
         cs.status === "closed" ? h("button", { class: "btn ghost sm", onclick: function () { cs.status = "open"; S.put(cs); A.render(); } }, "بازگشایی") : null)));
     var layout = h("div", { class: "caselay" });

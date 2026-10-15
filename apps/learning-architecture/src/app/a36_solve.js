@@ -504,6 +504,53 @@
     return (A.BACK_QS || []).slice();
   }
   A.solveAskList = askList;
+  /* ---------- G: درونی‌سازیِ پرسش‌ها — «الان از خودت چه می‌پرسی؟» پیش از دیدنِ پرسشِ فهرست ----------
+     پولیا: پرسش‌ها باید پرسش‌های خودت شوند. پلهٔ هر پرسش از خودِ پاسخ‌ها ساخته می‌شود (رکوردِ تازه‌ای نیست، آستانهٔ قراردادی نیست):
+     همان نردبانِ ۱/۳/۷/۲۱/۶۰ (nextIv) روی کاربست‌های همان پرسش با خودداوری («راه برد/کمک کرد» = ۲)؛ کاربستِ پیش از موعد پله را جابه‌جا
+     نمی‌کند (تکرارِ فشرده یادگیریِ فاصله‌دار نیست). پلهٔ ۳ یعنی دست‌کم دو بار، با فاصله، کمک کرد و از آن پس شکستی نبود. */
+  A.Q_OWN_RUNG = 3;
+  function qk(q) { return String(q || "").replace(/\s+/g, " ").trim(); }
+  function useDay(e) { return e.selfD || e.d || (A.localDay ? A.localDay(e.selfAt || e.at) : String(e.selfAt || e.at || "").slice(0, 10)); }
+  A.qUses = function (q) {
+    var k = qk(q), L = [];
+    S.all("eprog", function (r) { return r && r.tut; }).forEach(function (pg) { ["und", "plan", "exec", "back"].forEach(function (tk) { (pg.tut[tk] || []).forEach(function (e) {
+      if (e && !e.skip && e.k !== "motive" && (e.src === "sim" || e.src === "live") && qk(e.q) === k) L.push(e); }); }); });
+    return L.sort(function (a, b) { return String(useDay(a)).localeCompare(String(useDay(b))) || String(a.at).localeCompare(String(b.at)); });
+  };
+  A.qRung = function (q) {
+    var iv = 0, due = null;
+    A.qUses(q).forEach(function (e) {
+      if (e.self == null) return; var d = useDay(e); if (due && d < due) return;
+      iv = iv ? nextIv(iv, e.self === 2) : (e.self === 2 ? nextIv(LADDER[0], true) : LADDER[0]); due = A.addDays(d, iv);
+    });
+    return iv ? LADDER.filter(function (x) { return x <= iv; }).length : 0;
+  };
+  var SELF_D = {};
+  /* null ⇒ پرسش هنوز به آن پله نرسیده (رفتارِ پیشین)؛ {done:false, el} ⇒ اول بپرس؛ {done:true, el} ⇒ پرسیده شد و ثبت شد (یادداشتِ کوتاه) */
+  function selfAskGate(pg, q, c) {
+    var tut = pg.tut = pg.tut || {}, L = tut.selfAsk = tut.selfAsk || [];
+    var rec = L.filter(function (x) { return x && qk(x.q) === qk(q) && x.lv === c.lv && x.sid === c.sid && x.src === c.src; }).pop();
+    if (rec && rec.match != null) return { done: true, el: h("p", { class: "small sv-selfdone" }, "پرسشِ خودت: «" + rec.mine + "» · با پرسشِ فهرست " + ["نمی‌خواند", "تاحدی می‌خواند", "می‌خواند"][rec.match]) };
+    if (A.qRung(q) < A.Q_OWN_RUNG) return null;
+    var key = [pg.id, c.lv, c.sid, qk(q)].join("|"), d = SELF_D[key] = SELF_D[key] || { mine: "", shown: false };
+    var box = h("div", own({ class: "col gap sv-selfask" }),
+      h("p", { class: "small" }, "این پرسش را بارها، با فاصله، به کار برده‌ای و کمکت کرده — دیگر لازم نیست صفحه آن را بدهد. اول خودت: در همین لحظه از خودت چه می‌پرسی؟ بعد با پرسشِ فهرست مقایسه کن."));
+    var id = "svSelf_" + String(c.src) + "_" + c.lv + "_" + String(c.sid).replace(/[^a-z0-9]/gi, "");
+    box.appendChild(field(id, "الان از خودت چه می‌پرسی؟", d.mine, function (v) { d.mine = v; }, 0, "پرسشی که خودت در این لحظه از خودت می‌پرسی"));
+    var out = h("div", { class: "col gap", "aria-live": "polite" });
+    box.appendChild(h("button", { class: "btn ghost sm sv-selfshow", type: "button", onclick: function (e) {
+      if (txt(d.mine).length < 3) { A.toast("اول پرسشِ خودت را بنویس.", "bad"); return; }
+      e.currentTarget.disabled = true;
+      out.appendChild(h("p", { class: "small sv-selfq" }, h("strong", {}, "پرسشِ فهرست: "), q));
+      out.appendChild(gradeBtns(function (v) {
+        L.push({ at: nowISO(), d: A.today(), q: q, mine: txt(d.mine), match: v, lv: c.lv, sid: c.sid, ph: c.ph, src: c.src }); if (L.length > 200) tut.selfAsk = L.slice(-200);
+        delete SELF_D[key]; S.put(pg); A.render();
+      }, "پرسشِ خودت با پرسشِ فهرست می‌خواند؟"));
+    } }, "پرسشِ فهرست را نشان بده"));
+    box.appendChild(out);
+    return { done: false, el: box };
+  }
+  A.solveSelfAskGate = selfAskGate;
   function simEntries(pg, tk, lv, sid) { return ((pg.tut || {})[tk] || []).filter(function (e) { return e && e.src === "sim" && e.k !== "motive" && e.lv === lv && e.sid === sid; }); }
   function askCard(p, pg, st, s0) {
     var ph = A.stagePhase ? A.stagePhase(p, s0) : "p", ty = typeOf(p, pg.solve), Q = askList(ph, st.lv, ty); if (!Q.length) return null;
@@ -514,8 +561,12 @@
     var qi = (tut.qi[tk] || 0) % Q.length, d = { a: "" };
     var pf = (A.SOLVE_PHASES && A.SOLVE_PHASES[ph] && A.SOLVE_PHASES[ph].fa) || "";
     /* باز فقط وقتی به کار است (نخستین گام یا پس از گامِ نادرست، و هنوز پاسخی ننوشته‌ای) — کارِ درستِ پیش‌رونده را قطع نمی‌کند */
+    /* G (درونی‌سازیِ پرسش‌ها): پرسشی که پلهٔ نردبانش به A.Q_OWN_RUNG رسیده، پنهان است تا اول خودت بپرسی؛ زیرِ آن پله رفتار همان پیشین است */
+    var gate = !mine ? selfAskGate(pg, Q[qi], { lv: st.lv, sid: s0.id, ph: ph, src: "sim" }) : null;
     var det = h("details", own({ class: "card soft sv-ask", "data-ph": ph, open: !mine && (st.i === 0 || lastWrong) ? true : null }),
-      h("summary", {}, "❔ پرسشِ همین لحظه (" + pf + "): " + (mine ? mine.q : Q[qi])));
+      h("summary", {}, "❔ پرسشِ همین لحظه (" + pf + "): " + (mine ? mine.q : gate && !gate.done ? "اول خودت بپرس" : Q[qi])));
+    if (gate && !gate.done) { det.appendChild(gate.el); return det; }
+    if (gate && gate.done) det.appendChild(gate.el);
     var u = (pg.solve && pg.solve.u && (pg.solve.u[st.lv] || pg.solve.u[1] || pg.solve.u[0])) || null;
     if (u && u.u) det.appendChild(h("p", { class: "small sv-goal" }, "🎯 هدف را گم نکن — " + (typeOf(p, pg.solve) === "find" ? "مجهول" : "حکم") + "، به زبانِ خودت: «" + clip(u.u, 140) + "»"));
     if (mine) { det.appendChild(h("p", { class: "small sv-askmine" }, "پاسخت: «" + mine.text + "»")); return det; }
@@ -525,7 +576,7 @@
     det.appendChild(h("div", { class: "row gap wrap" },
       h("button", { class: "btn sm sv-askgo", type: "button", onclick: function () {
         if (!txt(d.a)) { A.toast("پاسخِ کوتاهت را بنویس — یا «پرسشِ بعد» اگر این پرسش حالا نمی‌خواند.", "bad"); return; }   // «۱۲» یا «x» هم پاسخِ کامل است
-        (tut[tk] = tut[tk] || []).push({ at: nowISO(), q: Q[qi], qi: qi, text: txt(d.a), lv: st.lv, sid: s0.id, ph: ph, src: "sim" });
+        (tut[tk] = tut[tk] || []).push({ at: nowISO(), d: A.today(), q: Q[qi], qi: qi, text: txt(d.a), lv: st.lv, sid: s0.id, ph: ph, src: "sim" });
         tut.qi[tk] = qi + 1; S.put(pg); A.toast("پاسخت ثبت شد؛ پس از دیدنِ حرکتِ واقعی با آن مقایسه‌اش می‌کنی."); A.render();
       } }, "ثبتِ پاسخ"),
       h("button", { class: "btn ghost sm sv-asknext", type: "button", onclick: function () {
@@ -535,6 +586,9 @@
     return det;
   }
   A.solveAskCard = askCard;
+  /* تکه‌های همین تونل برای «مسئلهٔ حل‌نشدهٔ خودم» (a38_live.js) — همان فیلدها، نردبان و داوری؛ نسخهٔ دوم ساخته نمی‌شود */
+  A.solveUI = { field: field, selF: selF, typeSel: typeSel, gradeBtns: gradeBtns, planList: planList, own: own, txt: txt, clip: clip, sol: sol, prog: prog,
+    seed: seed, seedAt: seedAt, grade: grade, nextIv: nextIv, LADDER: LADDER, PH: PH, WHY: WHY, reviewPanel: function (p, pg) { return reviewPanel(p, pg); }, kitCopy: kitCopy, qk: qk };
   /* پس از دیدنِ حرکتِ واقعی: انگیزهٔ گام + مقایسهٔ پاسخِ «پرسشِ همین لحظه» با حرکتِ واقعی (خودداوری ⇒ نوبتِ t) */
   function motiveCard(p, pg, st, s0) {
     var ph = A.stagePhase ? A.stagePhase(p, s0) : "p", tk = TK[ph] || "plan", s = sol(pg);
@@ -560,7 +614,7 @@
         var at = nowISO();
         s.mot.push({ at: at, lv: st.lv, sid: s0.id, ph: ph, tk: tk, motive: txt(d.m), self: v, selfAt: at });
         /* داوری روی پاسخِ «❔ پرسشِ همین لحظه» فقط وقتی پاسخی بوده؛ مرورِ «t» هم فقط همان پرسش را برمی‌گرداند (نه «انگیزهٔ گام») */
-        if (e) { e.motive = txt(d.m); e.self = v; e.selfAt = at; seedAt(s, "t", v === 2); }
+        if (e) { e.motive = txt(d.m); e.self = v; e.selfAt = at; e.selfD = A.today(); seedAt(s, "t", v === 2); }
         else seedAt(s, "m", v === 2);   // انگیزهٔ بی‌پرسش نوبتِ خودش را دارد («m»)، نه «t»
         S.put(pg);
         A.toast(v === 2 ? "ثبت شد؛ این پرسش چند روز دیگر برمی‌گردد." : "ثبت شد؛ همین پرسش فردا دوباره می‌آید."); out.innerHTML = ""; out.appendChild(h("p", { class: "small good sv-motok" }, "ثبت شد."));

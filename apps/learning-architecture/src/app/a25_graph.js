@@ -34,6 +34,8 @@
     /* «📐 سنجشِ استاندارد» (a34_psy): سازه‌های جهانی (ثبت‌گاه) و پاسخ‌های تو به معماهای لنگردار */
     { t: "psyc", fa: "سازهٔ روان‌سنجی", sys: "learn" }, { t: "psyans", fa: "پاسخِ معمای لنگردار", sys: "mine" },
     { t: "idea", fa: "ایدهٔ تو", sys: "mine" },
+    /* «🔭 مسئلهٔ حل‌نشدهٔ خودم» (a38_live): همان رکوردِ eprob با mode: "live" — پیوند به حرکت‌هایی که برگزیدی، موقعیت‌های گره‌گشا، پرونده‌های ادعاها، ایده‌ها و مسئلهٔ تازه‌ای که از آن ساختی */
+    { t: "lprob", fa: "مسئلهٔ حل‌نشدهٔ تو", sys: "mine" },
     /* «📚 منبع‌ها و پوشش» (a37_sources): کتاب‌های بیرونی و موردهایشان، با پیوند به تونلِ موجودی که هر مورد در آن زندگی می‌کند */
     { t: "src", fa: "منبعِ بیرونی (کتاب)", sys: "learn" }, { t: "srcitem", fa: "موردِ منبع", sys: "learn" }
   ];
@@ -107,6 +109,8 @@
     all("struct").forEach(function (x) { if (!N[ref("struct", String(x.id).replace(/^st_/, ""))]) node("struct", x.id, x.fa || x.title || x.id, { go: ["atlas"] }); });
     var probs = []; try { probs = A.probs ? A.probs() : []; } catch (e) { }
     probs.forEach(function (p) { node("prob", p.id, p.title, { go: ["e_prob", p.id] }); });
+    var lives = all("eprob").filter(function (r) { return r && r.live && r.p && r.status !== "rejected"; });
+    lives.forEach(function (r) { node("lprob", r.p.id, "🔭 " + String(r.p.title || "مسئله").slice(0, 50), { go: ["lprob", r.p.id] }); });
     all("eprob").forEach(function (r) { var o = r.origin || (r.p && r.p.origin); if (o && o.type === "kcase" && r.p && N[ref("prob", r.p.id)]) edge(ref("prob", r.p.id), ref("kcase", o.id), "from"); });
     /* مسئله‌های آمادهٔ سازنده (EPI_PROBLEMS) فقط با «نمونه‌های آمادهٔ سازنده» گره می‌شوند؛ شمارِ پنهان‌ها در «شکاف‌ها» گفته می‌شود */
     var hiddenProbs = (W.EPI_PROBLEMS || []).filter(function (p) { return p && !N[ref("prob", p.id)]; }).map(function (p) { return p.id; });
@@ -174,7 +178,8 @@
       if (c.topic) edge(ref("card", c.id), ref("topic", c.topic), "about"); if (c.knot) edge(ref("card", c.id), ref("knot", c.knot), "practises"); });
     /* تورهای دستیار (رکوردِ achat با tour): تور ⇐ وجه‌ها ⇐ ارجاع‌های هر وجه */
     function recRef(type, id) {
-      if (type === "eprob") { var r = S && S.get ? S.get(id) : null; if (r && r.p && N[ref("prob", r.p.id)]) return ref("prob", r.p.id); return r ? null : ref("eprob", id); }   /* مسئلهٔ تأییدنشده/پنهان: نه گره، نه شکسته */
+      if (type === "eprob") { var r = S && S.get ? S.get(id) : null; if (r && r.live && r.p && N[ref("lprob", r.p.id)]) return ref("lprob", r.p.id); if (r && r.p && N[ref("prob", r.p.id)]) return ref("prob", r.p.id); return r ? null : ref("eprob", id); }   /* مسئلهٔ تأییدنشده/پنهان: نه گره، نه شکسته */
+      if (type === "lprob") return ref("lprob", id);
       var gt = ({ "case": "ecase", achat: "tour", pr: "prun" })[type] || type; return ref(gt, id);
     }
     all("achat").filter(function (s) { return s.tour; }).forEach(function (s) {
@@ -190,6 +195,15 @@
       node("idea", x.id, "💡 " + String(x.title || "ایده").slice(0, 50), { go: ["idea", x.id] });
       if (x.sess && N[ref("tour", x.sess)]) edge(ref("idea", x.id), ref("tour", x.sess), "in");
       (x.parts || []).forEach(function (p) { var k = p.caseId ? recRef("case", p.caseId) : p.recId ? recRef((S.get(p.recId) || {}).type, p.recId) : null; if (k) edge(ref("idea", x.id), k, p.k === "assumption" ? "dep" : "has"); });
+    });
+    /* «🔭 مسئلهٔ حل‌نشدهٔ خودم»: حرکت‌های برگزیده (با دلیلِ خودت)، موقعیت‌های گره‌گشای همین مسئله، پرونده‌های ادعاها، پیوندهایی که خودت از «مسئلهٔ مرتبط» زدی، و مسئلهٔ مادر */
+    lives.forEach(function (r) {
+      var k0 = ref("lprob", r.p.id), pg = S.get("eprog_" + r.p.id), L = (pg && pg.solve && pg.solve.live) || {};
+      (L.moves || []).forEach(function (m) { if (m && m.mv) edge(k0, ref("move", m.mv), "uses", m.why || ""); });
+      (L.claims || []).forEach(function (c) { if (c && c.caseId) edge(k0, recRef("case", c.caseId), "dep", c.t || ""); });
+      (L.knots || []).forEach(function (id) { edge(k0, ref("kcase", id), "has"); });
+      (L.related || []).forEach(function (x) { if (x && x.id) { var rk = recRef(x.type, x.id); if (rk && rk !== k0) edge(k0, rk, "link"); } });
+      var o = r.origin; if (o && o.type === "lprob" && o.id) edge(k0, ref("lprob", o.id), "from");
     });
     all("deadline").forEach(function (x) { node("deadline", x.id, "⏰ " + String(x.what || "موعد").slice(0, 50), { go: ["home"] }); if (x.sess && N[ref("tour", x.sess)]) edge(ref("deadline", x.id), ref("tour", x.sess), "in"); });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */

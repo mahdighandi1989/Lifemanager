@@ -61,14 +61,18 @@
     var root = h("div", { class: "page pb-page" });
     root.appendChild(A.head("کارخانه معرفت‌شناسی", "مسئله‌های بزرگ حل‌شده", "مسئلهٔ سختی را که سال‌ها حل‌نشده ماند (یا مسئله‌ای که خودت در آن گیر کردی) همراهِ پاسخِ نهایی‌اش وارد کن. هوش مصنوعی مسیرِ حل را گام‌به‌گام با گزینه‌ها و بن‌بست‌ها می‌شکند، سه حل‌کنندهٔ مستقل گزینه‌های درست را وارسی می‌کنند، تو تأیید می‌کنی؛ بعد از سخت به آسان تمرین می‌کنی و مسئله‌های هم‌ساختارِ تازه می‌سازی.",
       A.V.moves ? h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm mv-golist", onclick: function () { A.go("moves"); } }, "🧗 حرکت‌های حلِ مسئله: یک حرکت را در مسئله‌های مختلف تمرین کن")) : null));
-    root.appendChild(A.tabs([["list", "مسئله‌های من"], ["inject", "افزودنِ مسئلهٔ تو"], ["pending", "در انتظار تأیید (" + fa(S.all("eprob", function (p) { return p.status === "pending"; }).length) + ")"]], tab || "list", function (k) { A.go("e_prob", null, k); }));
-    if (tab === "inject") { root.appendChild(inject()); return root; }
+    root.appendChild(A.tabs([["list", "مسئله‌های من"], ["live", "🔭 مسئلهٔ حل‌نشدهٔ خودم"], ["inject", "افزودنِ مسئلهٔ تو"], ["pending", "در انتظار تأیید (" + fa(S.all("eprob", function (p) { return p.status === "pending"; }).length) + ")"]], tab || "list", function (k) { A.go("e_prob", null, k); }));
+    /* «🔭 مسئلهٔ حل‌نشدهٔ خودم» (a38_live.js): همان نوعِ رکورد (eprob، mode: "live")، بی پاسخِ از پیش معلوم — تونلِ حل روی واقعیت */
+    if (tab === "live") { root.appendChild(A.liveNewPanel ? A.liveNewPanel() : A.empty("این بخش در این نسخه بار نشده.")); return root; }
+    if (tab === "inject") { if (A.liveInjectNote) root.appendChild(A.liveInjectNote()); root.appendChild(inject()); return root; }
     if (tab === "pending") { root.appendChild(pending()); return root; }
     var mine = mineP();
+    if (A.liveListSection) { var lls = A.liveListSection(); if (lls) root.appendChild(lls); }
     if (!mine.length && A.practiceCta) { var pcta = A.practiceCta(); if (pcta) root.appendChild(pcta); }
     if (!mine.length) root.appendChild(h("section", { class: "card pb-empty", dir: "rtl" }, h("h2", {}, "هنوز مسئله‌ای وارد نکرده‌ای"),
       h("p", {}, "مسئله‌ها را تو می‌آوری: صورتِ مسئله و پاسخی که سرانجام به دست آمد (از هر علمی). سیستم مسیرِ حل را ریز می‌کند و شبیه‌سازش را می‌سازد."),
       h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-goinject", onclick: function () { A.go("e_prob", null, "inject"); } }, "افزودنِ مسئلهٔ تو"),
+        A.liveNewPanel ? h("button", { class: "btn ghost pb-golive", onclick: function () { A.go("e_prob", null, "live"); } }, "🔭 مسئلهٔ حل‌نشدهٔ خودم (بی پاسخ)") : null,
         A.V.kcases ? h("button", { class: "btn ghost", onclick: function () { A.go("kcases"); } }, "🪢 مسئله‌ای که در آن گیر کردم (گره‌گشا)") : null)));
     function card(p) {
       try {

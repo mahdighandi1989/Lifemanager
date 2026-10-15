@@ -111,16 +111,20 @@ function sourceRecordTypes() {
     window.PSY_NORMS = { items: [{ id: 'it_gu', construct: 'Gf', text: 'معمای آزمون' }], sources: [] };
     put({ id: 'pa_gu', type: 'psyans', item: 'it_gu', ok: true, at: new Date().toISOString() });
     put({ id: 'id_gu', type: 'idea', what: 'ایدهٔ آزمون', title: 'ایدهٔ آزمون', sess: 'ach_gu', parts: [{ k: 'assumption', t: 'فرض', caseId: 'cs_gu' }] });
+    /* «🔭 مسئلهٔ حل‌نشدهٔ خودم» (a38_live): همان eprob با mode: live ⇒ گرهِ lprob، با یال به حرکتِ برگزیده، پروندهٔ ادعا و موقعیتِ گره‌گشا */
+    put({ id: 'eprob_pb_lgu', type: 'eprob', status: 'live', mode: 'live', live: true, p: { id: 'pb_lgu', title: 'مسئلهٔ زندهٔ آزمون', statement: 'صورت', live: true, stages: [] } });
+    put({ id: 'eprog_pb_lgu', type: 'eprog', lv: {}, solve: { live: { moves: [{ mv: 'mv_special', why: 'دلیل' }], claims: [{ t: 'ادعا', caseId: 'cs_gu' }], knots: ['kc_gu'], related: [], steps: [], aux: [] } } });
     put({ id: 'dl_gu', type: 'deadline', what: 'موعدِ آزمون', date: APP.addDays(APP.today(), 3), sess: 'ach_gu', done: false });
     const M = APP.GRAPH.build(), nb = k => (M.adj[k] || []).map(i => M.edges[i]).map(e => e.a === k ? e.b : e.a);
     const want = { topic: 'tp_gu', tree: 'tr_gu', fnode: 'fn_gu', knot: 'knot_gu', kcase: 'kc_gu', kitem: 'ki_gu', seedling: 'sd_gu', struct: 'st_gu', ecase: 'cs_gu', prob: 'pb_gu',
-      prereq: 'pq_gu', tour: 'ach_gu', tfacet: 'ach_gu/f1', wchain: 'wc_gu', fcast: 'fc_gu', value: 'vl_gu1', meaning: 'mn_gu', kexp: 'kx_gu', ex: 'ex_gu', prun: 'pr_gu', card: 'cd_gu', pbitem: 'pbi_gu', deadline: 'dl_gu', psyans: 'pa_gu', idea: 'id_gu' };
+      prereq: 'pq_gu', tour: 'ach_gu', tfacet: 'ach_gu/f1', wchain: 'wc_gu', fcast: 'fc_gu', value: 'vl_gu1', meaning: 'mn_gu', kexp: 'kx_gu', ex: 'ex_gu', prun: 'pr_gu', card: 'cd_gu', pbitem: 'pbi_gu', deadline: 'dl_gu', psyans: 'pa_gu', idea: 'id_gu', lprob: 'pb_lgu' };
     const absent = Object.keys(want).filter(t => !M.nodes[t + ':' + want[t]]);
     const links = { prereqCase: nb('prereq:pq_gu').includes('kcase:kc_gu'), prereqTopic: nb('prereq:pq_gu').includes('topic:tp_gu'),
       facet: ['kcase:kc_gu', 'prereq:pq_gu', 'ecase:cs_gu', 'prob:pb_gu', 'tour:ach_gu'].every(k => nb('tfacet:ach_gu/f1').includes(k)),
       kexp: nb('kexp:kx_gu').includes('knot:knot_gu'), ex: nb('ex:ex_gu').includes('tech:5') && nb('ex:ex_gu').includes('topic:tp_gu'),
       prun: nb('prun:pr_gu').includes('proto:' + APP.C.PROTOCOLS[0].id), card: nb('card:cd_gu').includes('tech:5') && nb('card:cd_gu').includes('knot:knot_gu'),
       pbitem: nb('pbitem:pbi_gu').includes('prob:pb_gu'), deadline: nb('deadline:dl_gu').includes('tour:ach_gu'), psyans: nb('psyans:pa_gu').includes('psyc:Gf'), idea: nb('idea:id_gu').includes('ecase:cs_gu') && nb('idea:id_gu').includes('tour:ach_gu'), value: nb('value:vl_gu1').includes('value:vl_gu2'), fcast: nb('fcast:fc_gu').includes('ssys:s_decision'),
+      lprob: ['move:mv_special', 'ecase:cs_gu', 'kcase:kc_gu'].every(k => nb('lprob:pb_lgu').includes(k)),
       views: ['wchain:wc_gu', 'meaning:mn_gu'].every(k => nb(k).some(x => /^view:/.test(x))) };
     const broken = APP.GRAPH.gaps(M).broken.map(b => b.a + '→' + b.missing);
     /* ارجاعِ شکستهٔ دادهٔ کاربر گزارش می‌شود: پیش‌نیاز به موقعیتِ پاک‌شده، وجهِ تور به گرهِ ناموجود */
