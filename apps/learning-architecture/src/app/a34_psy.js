@@ -191,7 +191,13 @@
           h("td", {}, e.n ? P.pctFa(e.next) + " (" + fa(e.k) + " از " + fa(e.n) + ")" + meta : "— (هنوز پاسخی نیست)"),
           h("td", {}, e.progress ? P.pctFa(e.progress.p) + " (" + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"),
           h("td", { class: "small" }, p.n ? (p.scales || [p]).map(function (q) { return "احتمالِ بالاتر بودن از میانهٔ " + q.peers + ": " + P.pctFa(q.pAbove) + " · صدکِ مورد انتظار: " + fa(Math.round(100 * q.pct)) + " (" + fa(q.k) + " از " + fa(q.n) + " معمای لنگردار)"; }).join(" | ") :
-            (N.items || []).some(function (it) { return it.construct === c.id; }) ? "هنوز معمای لنگرداری در این سازه جواب نداده‌ای" : "هنوز معمای لنگرداری با دادهٔ جمعیتیِ وارسی‌شده برای این سازه در فهرست نیست"));
+            (N.items || []).some(function (it) { return it.construct === c.id && P.isAnchor(it); }) ? "هنوز معمای لنگرداری در این سازه جواب نداده‌ای" :
+            (N.items || []).some(function (it) { return it.construct === c.id; }) ? (function () {
+              /* فقط گویهٔ توصیفی (کلامی/مشهور؛ ترجمه دشواری را جابه‌جا می‌کند) ⇒ بی برآوردِ مقایسه‌ای؛ فقط درستیِ تو کنارِ درصدِ گروه */
+              var da = S.all("psyans").filter(function (a) { var it = P.item(a.item); return it && it.construct === c.id && it.kind === "descriptive" && !a.familiar; });
+              var avg = da.length ? da.reduce(function (s, a) { return s + (+P.item(a.item).p || 0); }, 0) / da.length : null;
+              return "فقط معماهای توصیفی (کلامی یا مشهور) هست؛ برآوردِ مقایسه‌ای ساخته نمی‌شود چون ترجمه دشواری را عوض می‌کند." + (da.length ? " تو " + fa(da.filter(function (a) { return okv(a.ok); }).length) + " از " + fa(da.length) + " را درست گفتی؛ در گروهِ منبع به‌طورِ میانگین " + fa(Math.round(100 * avg)) + "٪ درست گفته بودند." : "");
+            })() : "هنوز معمای لنگرداری با دادهٔ جمعیتیِ وارسی‌شده برای این سازه در فهرست نیست"));
       }))));
     sec.appendChild(h("p", { class: "small" }, h("b", {}, "ضریبِ هوشیِ کل: "), "ساخته نمی‌شود. «ضریبِ هوشیِ کل» فقط از آزمونِ هنجاریابی‌شده و کنترل‌شده معتبر است. این صفحه آن آزمون نیست. به جایش، هر سازه جدا و با منبع با مردم مقایسه می‌شود."));
     var src = (N.sources || []);

@@ -1,7 +1,2190 @@
 {
-  "version": 1,
-  "about": "Anchor items for «📐 سنجشِ استاندارد»: every number here comes from a cited, reputable source (peer-reviewed / large normative sample). Contract: docs/decisions/2026-10-15-mind-card-psychometric.md. Filled only after independent verification; never invent a number.",
-  "retrieved": "",
-  "sources": [],
-  "items": []
+ "version": 2,
+ "retrieved": "2026-10-15",
+ "about": "Anchor items for «📐 سنجشِ استاندارد»: every number here comes from a cited, reputable source (peer-reviewed / large normative sample). Contract: docs/decisions/2026-10-15-mind-card-psychometric.md. Filled only after independent verification; never invent a number. | v2 (2026-10-15, independent verification): anchors = 28 MaRs-IB matrix clones (nonverbal, CC BY-NC 3.0 stimuli, 30 s, 4 options ⇒ c = 1/4), b re-estimated by the verifier from the open calibration responses (Zorowitz et al. 2024, N = 1501) with a multigroup Rasch model with fixed c (MML-EM), SEs from the cross-product information, infit/outfit checked, and agreement with the observed p-correct and with the authors' own clone-level 3PL(γ=0.25) estimates confirmed for every anchor. Descriptive items (CRT, CRT-2, syllogisms, conditionals, modus ponens, Wason, numeracy, ratio bias) carry p and n from Twin-2K-500 (CC BY 4.0) re-scored by the verifier; they never enter θ. Excluded: ICAR items (current terms: 'intended for academic use exclusively'; PsychArchives deposit under a Scientific Use License to protect the keys ⇒ no display licence for an app); Twin-2K-500 cube-rotation and matrix items (the images are not in the dataset and appear to be ICAR items ⇒ ICAR terms apply); CRT-2 'Emily' item (its trick depends on English month names); Twin overconfidence score (a 42-item total, not an item). The MaRs-IB authors state it is not an IQ test and has no population norms: percentiles here mean 'relative to US Prolific adults of the same age band in the 2021 calibration', nothing more. | v2 (2026-10-15, independent verification): anchors = 28 MaRs-IB matrix clones (nonverbal, CC BY-NC 3.0 stimuli, 30 s, 4 options ⇒ c = 1/4), b re-estimated by the verifier from the open calibration responses (Zorowitz et al. 2024, N = 1501) with a multigroup Rasch model with fixed c (MML-EM), SEs from the cross-product information, infit/outfit checked, and agreement with the observed p-correct and with the authors' own clone-level 3PL(γ=0.25) estimates confirmed for every anchor. Descriptive items (CRT, CRT-2, syllogisms, conditionals, modus ponens, Wason, numeracy, ratio bias) carry p and n from Twin-2K-500 (CC BY 4.0) re-scored by the verifier; they never enter θ. Excluded: ICAR items (current terms: 'intended for academic use exclusively'; PsychArchives deposit under a Scientific Use License to protect the keys ⇒ no display licence for an app); Twin-2K-500 cube-rotation and matrix items (the images are not in the dataset and appear to be ICAR items ⇒ ICAR terms apply); CRT-2 'Emily' item (its trick depends on English month names); Twin overconfidence score (a 42-item total, not an item). The MaRs-IB authors state it is not an IQ test and has no population norms: percentiles here mean 'relative to US Prolific adults of the same age band in the 2021 calibration', nothing more.",
+ "sources": [
+  {
+   "id": "zorowitz2024",
+   "cite": "Zorowitz, S., Chierchia, G., Blakemore, S.-J., & Daw, N. D. (2024). An item response theory analysis of the matrix reasoning item bank (MaRs-IB). Behavior Research Methods, 56, 1104–1122. doi:10.3758/s13428-023-02067-8. Data/code: github.com/ndawlab/mars-irt (03_Calibration).",
+   "url": "https://doi.org/10.3758/s13428-023-02067-8",
+   "n": 1501,
+   "license": "Article CC BY 4.0; response data and code in the GitHub repository (MIT licence file). b values in this registry are the verifier's own re-estimates from these data, not numbers printed by the authors.",
+   "population": "US adults on Prolific, July–August 2021, after exclusions (83 of 1584 excluded); 811 women, 670 men; mean age 28.7 (SD 9.9, range 18–74); 507 bachelor's, 322 master's or higher. Each person solved 16 items, 30 s each, no feedback."
+  },
+  {
+   "id": "chierchia2019",
+   "cite": "Chierchia, G., Fuhrmann, D., Knoll, L. J., Pi-Sunyer, B. P., Sakhardande, A. L., & Blakemore, S.-J. (2019). The matrix reasoning item bank (MaRs-IB): novel, open-access abstract reasoning items for adolescents and adults. Royal Society Open Science, 6(10), 190232. Stimuli: osf.io/g96f4 (Item set 3, colour-vision-friendly 'CB2', the set used in the 2021 calibration).",
+   "url": "https://osf.io/g96f4/",
+   "n": 659,
+   "license": "Stimuli: Creative Commons Attribution-NonCommercial 3.0 (OSF licence component); README: 'for academic and non-commercial purposes only', cite the paper; 'our task is not an IQ test'. Images here are lossless/q95 WebP conversions of the original PNGs (an adaptation, attributed).",
+   "population": "Source of the stimuli only (its 659 participants aged 11–33, UK, fixed-order task, are NOT used for any number in this registry)."
+  },
+  {
+   "id": "twin2k500",
+   "cite": "Toubia, O., Gui, G. Z., Peng, T., Merlau, D. J., Li, A., & Chen, H. (2025). Twin-2K-500: A dataset for building digital twins of over 2,000 people based on their answers to over 500 questions. arXiv:2505.17479. Data: huggingface.co/datasets/LLM-Digital-Twin/Twin-2K-500.",
+   "url": "https://huggingface.co/datasets/LLM-Digital-Twin/Twin-2K-500",
+   "n": 2058,
+   "license": "Dataset CC BY 4.0 (Hugging Face licence tag); paper CC BY 4.0 (arXiv). Item wording from the cited original authors (Frederick 2005; Thomson & Oppenheimer 2016; Markovits & Nantel 1989; Stanovich & West 2008; Klauer et al. 2007; Johnson et al. 2019 / Lipkus et al. 2001).",
+   "population": "US adults on Prolific, wave 1 launched 2025-01-29, sampled to be representative by age, sex and ethnicity; the 2058 who completed all four waves. Age released only in bands 18–29 (388), 30–49 (735), 50–64 (658), 65+ (277). Prolific panellists are test-experienced, so famous items are easier here than in naive samples."
+  },
+  {
+   "id": "branas_garza2019",
+   "cite": "Brañas-Garza, P., Kujal, P., & Lenkei, B. (2019). Cognitive reflection test: Whom, how, when. Journal of Behavioral and Experimental Economics, 82, 101455. Numbers checked in the open working paper MPRA 68049, Table A1.",
+   "url": "https://mpra.ub.uni-muenchen.de/68049/1/MPRA_paper_68049.pdf",
+   "n": 44558,
+   "license": "Numbers cited (no item display from this source).",
+   "population": "Meta-analysis of 118 CRT studies (2007–2015), 21 countries; per-item rates on N = 41,004. Age not modelled."
+  },
+  {
+   "id": "stieger_reips2016",
+   "cite": "Stieger, S., & Reips, U.-D. (2016). A limitation of the Cognitive Reflection Test: familiarity. PeerJ, 4, e2395.",
+   "url": "https://doi.org/10.7717/peerj.2395",
+   "n": 2272,
+   "license": "Article CC BY 4.0 (numbers cited only).",
+   "population": "German-speaking community sample, age-stratified, convenience (word of mouth); 44.9% (n = 959) had done the CRT or similar tasks before."
+  }
+ ],
+ "scales": [
+  {
+   "id": "mars_ib_rc",
+   "construct": "Gf",
+   "src": "zorowitz2024",
+   "model": "rasch_c",
+   "bands": [
+    {
+     "lo": 18,
+     "hi": 29,
+     "mu": 0.403,
+     "sd": 1.188,
+     "n": 892,
+     "label": "۸۹۲ بزرگسالِ ۱۸ تا ۲۹ سالهٔ آمریکایی در Prolific (کالیبراسیونِ MaRs-IB، ۲۰۲۱)"
+    },
+    {
+     "lo": 30,
+     "hi": 39,
+     "mu": -0.329,
+     "sd": 1.402,
+     "n": 387,
+     "label": "۳۸۷ بزرگسالِ ۳۰ تا ۳۹ سالهٔ آمریکایی در Prolific (کالیبراسیونِ MaRs-IB، ۲۰۲۱)"
+    },
+    {
+     "lo": 40,
+     "hi": 49,
+     "mu": -1.063,
+     "sd": 1.664,
+     "n": 148,
+     "label": "۱۴۸ بزرگسالِ ۴۰ تا ۴۹ سالهٔ آمریکایی در Prolific (کالیبراسیونِ MaRs-IB، ۲۰۲۱)"
+    },
+    {
+     "lo": 50,
+     "hi": 74,
+     "mu": -0.985,
+     "sd": 1.069,
+     "n": 69,
+     "label": "۶۹ بزرگسالِ ۵۰ تا ۷۴ سالهٔ آمریکایی در Prolific (کالیبراسیونِ MaRs-IB، ۲۰۲۱)"
+    }
+   ],
+   "note": "Metric: logits of a Rasch model with fixed c = 0.25, P = c + (1−c)·σ(θ−b); origin = sample-size-weighted mean of the age-band means (whole calibration sample ≈ 0). Band means/SDs estimated jointly with all 384 clone b's (multigroup MML-EM, 121-node grid, converged to ΔlogL < 1e-13 relative). SE(mu): 18–29 0.042, 30–39 0.085, 40–49 0.174, 50–74 0.195; SE(log sd): 0.051, 0.073, 0.109, 0.179. 5 participants without age formed their own group (mu −1.34, n = 5, not shipped). Finer split for age 37 (separate fit): 35–39 mu −0.543 (SE 0.161), sd 1.386, n = 138 — consistent with 30–39; 30–39 is shipped for stability. Timeouts (no answer in 30 s) were scored incorrect, exactly as the authors did (1.8% of trials). 28 anchors give test information ≈ 2.5 near the 30–39 mean ⇒ posterior SD ≈ 0.58 logit after all 28 (prior SD 1.40). Item b's carry SE 0.41–0.93 (≈62 responses per clone); the app's EAP treats b as known, so θ uncertainty is understated by roughly that much."
+  },
+  {
+   "id": "twin_rq_desc",
+   "construct": "RQ",
+   "src": "twin2k500",
+   "model": "rasch_c",
+   "bands": [
+    {
+     "lo": 18,
+     "hi": 29,
+     "mu": null,
+     "sd": null,
+     "n": 388,
+     "label": "۳۸۸ بزرگسالِ ۱۸ تا ۲۹ سالهٔ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)"
+    },
+    {
+     "lo": 30,
+     "hi": 49,
+     "mu": null,
+     "sd": null,
+     "n": 735,
+     "label": "۷۳۵ بزرگسالِ ۳۰ تا ۴۹ سالهٔ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)"
+    },
+    {
+     "lo": 50,
+     "hi": 64,
+     "mu": null,
+     "sd": null,
+     "n": 658,
+     "label": "۶۵۸ بزرگسالِ ۵۰ تا ۶۴ سالهٔ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)"
+    },
+    {
+     "lo": 65,
+     "hi": null,
+     "mu": null,
+     "sd": null,
+     "n": 277,
+     "label": "۲۷۷ بزرگسالِ ۶۵ سال به بالای آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)"
+    }
+   ],
+   "note": "DESCRIPTIVE ONLY: no θ, no b, mu/sd deliberately null. Holds the Twin-2K-500 age groups so p_band keys have Persian labels. Verbal/famous items change difficulty in translation, so only «X٪ ِ گروه درست جواب دادند» is shown."
+  }
+ ],
+ "items": [
+  {
+   "id": "mars_084",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_084_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_084_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_084_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_084_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_084_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": -2.632,
+   "se_b": 0.568,
+   "p": 0.9091,
+   "p_band": {
+    "18-29": 0.9535,
+    "30-39": 0.8,
+    "40-49": 0.6667,
+    "50-74": 1.0
+   },
+   "n": 66,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 84: template 22, test form 1, shape set 3, distractor PD, item set 3; files is3/tf1/tf1_22_M_ss3.jpeg + tf1_22_T4_ss3_pd.jpeg, tf1_22_T2_ss3_pd.jpeg, tf1_22_T3_ss3_pd.jpeg, tf1_22_T1_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.909 (n 66; timeouts 0 scored wrong) vs model-implied 0.917; infit 1.03, outfit 1.17. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -2.200, α 1.362 ⇒ model p 0.882; on this metric ≈ -2.31 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.56. p_band = observed p per age band; n per band: 18-29 43, 30-39 15, 40-49 3, 50-74 5."
+  },
+  {
+   "id": "mars_064",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_064_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_064_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_064_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_064_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_064_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": -2.437,
+   "se_b": 0.541,
+   "p": 0.8788,
+   "p_band": {
+    "18-29": 0.925,
+    "30-39": 0.9,
+    "40-49": 0.75,
+    "50-74": 0.75
+   },
+   "n": 66,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 64: template 19, test form 3, shape set 1, distractor PD, item set 3; files is3/tf3/tf3_19_M_ss1.jpeg + tf3_19_T4_ss1_pd.jpeg, tf3_19_T1_ss1_pd.jpeg, tf3_19_T3_ss1_pd.jpeg, tf3_19_T2_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.879 (n 66; timeouts 1 scored wrong) vs model-implied 0.891; infit 1.00, outfit 0.79. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -2.223, α 1.425 ⇒ model p 0.880; on this metric ≈ -2.24 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.37. p_band = observed p per age band; n per band: 18-29 40, 30-39 10, 40-49 12, 50-74 4."
+  },
+  {
+   "id": "mars_100",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_100_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_100_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_100_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_100_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_100_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": -2.207,
+   "se_b": 0.5,
+   "p": 0.8533,
+   "p_band": {
+    "18-29": 0.9268,
+    "30-39": 0.8947,
+    "40-49": 0.5455,
+    "50-74": 0.75
+   },
+   "n": 75,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 100: template 25, test form 3, shape set 1, distractor PD, item set 3; files is3/tf3/tf3_25_M_ss1.jpeg + tf3_25_T2_ss1_pd.jpeg, tf3_25_T4_ss1_pd.jpeg, tf3_25_T3_ss1_pd.jpeg, tf3_25_T1_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.853 (n 75; timeouts 2 scored wrong) vs model-implied 0.873; infit 0.91, outfit 0.64. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -2.112, α 1.227 ⇒ model p 0.882; on this metric ≈ -2.47 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.52. p_band = observed p per age band; n per band: 18-29 41, 30-39 19, 40-49 11, 50-74 4."
+  },
+  {
+   "id": "mars_089",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_089_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_089_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_089_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_089_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_089_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": -2.045,
+   "se_b": 0.502,
+   "p": 0.8636,
+   "p_band": {
+    "18-29": 0.8846,
+    "30-39": 0.88,
+    "40-49": 0.8182,
+    "50-74": 1.0
+   },
+   "n": 66,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 89: template 23, test form 3, shape set 2, distractor PD, item set 3; files is3/tf3/tf3_23_M_ss2.jpeg + tf3_23_T1_ss2_pd.jpeg, tf3_23_T4_ss2_pd.jpeg, tf3_23_T2_ss2_pd.jpeg, tf3_23_T3_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.864 (n 66; timeouts 0 scored wrong) vs model-implied 0.845; infit 1.02, outfit 0.68. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -1.794, α 1.346 ⇒ model p 0.847; on this metric ≈ -1.91 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.26. p_band = observed p per age band; n per band: 18-29 26, 30-39 25, 40-49 11, 50-74 3."
+  },
+  {
+   "id": "mars_311",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_311_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_311_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_311_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_311_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_311_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": -1.853,
+   "se_b": 0.447,
+   "p": 0.881,
+   "p_band": {
+    "18-29": 0.9643,
+    "30-39": 0.65,
+    "40-49": 0.8333,
+    "50-74": 1.0
+   },
+   "n": 84,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 311: template 67, test form 2, shape set 2, distractor PD, item set 3; files is3/tf2/tf2_67_M_ss2.jpeg + tf2_67_T1_ss2_pd.jpeg, tf2_67_T3_ss2_pd.jpeg, tf2_67_T4_ss2_pd.jpeg, tf2_67_T2_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.881 (n 84; timeouts 1 scored wrong) vs model-implied 0.861; infit 1.06, outfit 0.81. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -1.646, α 1.364 ⇒ model p 0.831; on this metric ≈ -1.73 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.27. p_band = observed p per age band; n per band: 18-29 56, 30-39 20, 40-49 6, 50-74 2."
+  },
+  {
+   "id": "mars_059",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_059_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_059_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_059_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_059_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_059_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": -1.571,
+   "se_b": 0.514,
+   "p": 0.8545,
+   "p_band": {
+    "18-29": 0.8974,
+    "30-39": 0.8182,
+    "40-49": 0.75,
+    "50-74": 0.0
+   },
+   "n": 55,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 59: template 18, test form 1, shape set 2, distractor PD, item set 3; files is3/tf1/tf1_18_M_ss2.jpeg + tf1_18_T2_ss2_pd.jpeg, tf1_18_T3_ss2_pd.jpeg, tf1_18_T4_ss2_pd.jpeg, tf1_18_T1_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.855 (n 55; timeouts 1 scored wrong) vs model-implied 0.838; infit 1.07, outfit 0.86. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -1.102, α 1.226 ⇒ model p 0.776; on this metric ≈ -1.29 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.54. p_band = observed p per age band; n per band: 18-29 39, 30-39 11, 40-49 4, 50-74 1."
+  },
+  {
+   "id": "mars_250",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_250_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_250_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_250_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_250_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_250_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": -1.406,
+   "se_b": 0.451,
+   "p": 0.8358,
+   "p_band": {
+    "18-29": 0.881,
+    "30-39": 0.7647,
+    "40-49": 0.6667,
+    "50-74": 0.8
+   },
+   "n": 67,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 250: template 56, test form 1, shape set 1, distractor PD, item set 3; files is3/tf1/tf1_56_M_ss1.jpeg + tf1_56_T3_ss1_pd.jpeg, tf1_56_T1_ss1_pd.jpeg, tf1_56_T4_ss1_pd.jpeg, tf1_56_T2_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.836 (n 67; timeouts 0 scored wrong) vs model-implied 0.813; infit 1.04, outfit 1.09. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.904, α 1.210 ⇒ model p 0.752; on this metric ≈ -1.08 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.73. p_band = observed p per age band; n per band: 18-29 42, 30-39 17, 40-49 3, 50-74 5."
+  },
+  {
+   "id": "mars_131",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_131_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_131_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_131_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_131_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_131_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": -1.225,
+   "se_b": 0.409,
+   "p": 0.7778,
+   "p_band": {
+    "18-29": 0.8125,
+    "30-39": 0.7895,
+    "40-49": 0.5556,
+    "50-74": 0.8
+   },
+   "n": 81,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 131: template 30, test form 1, shape set 2, distractor PD, item set 3; files is3/tf1/tf1_30_M_ss2.jpeg + tf1_30_T2_ss2_pd.jpeg, tf1_30_T4_ss2_pd.jpeg, tf1_30_T3_ss2_pd.jpeg, tf1_30_T1_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.778 (n 81; timeouts 0 scored wrong) vs model-implied 0.784; infit 0.94, outfit 0.99. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.973, α 1.656 ⇒ model p 0.744; on this metric ≈ -0.85 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.92. p_band = observed p per age band; n per band: 18-29 48, 30-39 19, 40-49 9, 50-74 5."
+  },
+  {
+   "id": "mars_190",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_190_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_190_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_190_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_190_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_190_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": -1.05,
+   "se_b": 0.454,
+   "p": 0.791,
+   "p_band": {
+    "18-29": 0.8085,
+    "30-39": 0.7143,
+    "40-49": 0.6667,
+    "50-74": 1.0
+   },
+   "n": 67,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 190: template 45, test form 2, shape set 1, distractor PD, item set 3; files is3/tf2/tf2_45_M_ss1.jpeg + tf2_45_T2_ss1_pd.jpeg, tf2_45_T1_ss1_pd.jpeg, tf2_45_T3_ss1_pd.jpeg, tf2_45_T4_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.791 (n 67; timeouts 0 scored wrong) vs model-implied 0.782; infit 0.98, outfit 1.03. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.976, α 1.569 ⇒ model p 0.748; on this metric ≈ -0.90 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.33. p_band = observed p per age band; n per band: 18-29 47, 30-39 14, 40-49 3, 50-74 3."
+  },
+  {
+   "id": "mars_340",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_340_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_340_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_340_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_340_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_340_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": -0.879,
+   "se_b": 0.431,
+   "p": 0.7576,
+   "p_band": {
+    "18-29": 0.8,
+    "30-39": 0.7059,
+    "40-49": 0.8182,
+    "50-74": 0.3333
+   },
+   "n": 66,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 340: template 73, test form 3, shape set 1, distractor PD, item set 3; files is3/tf3/tf3_73_M_ss1.jpeg + tf3_73_T2_ss1_pd.jpeg, tf3_73_T1_ss1_pd.jpeg, tf3_73_T4_ss1_pd.jpeg, tf3_73_T3_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.758 (n 66; timeouts 1 scored wrong) vs model-implied 0.732; infit 0.98, outfit 0.91. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.848, α 1.355 ⇒ model p 0.739; on this metric ≈ -0.90 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.06. p_band = observed p per age band; n per band: 18-29 35, 30-39 17, 40-49 11, 50-74 3."
+  },
+  {
+   "id": "mars_016",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_016_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_016_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_016_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_016_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_016_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": -0.655,
+   "se_b": 0.445,
+   "p": 0.7286,
+   "p_band": {
+    "18-29": 0.766,
+    "30-39": 0.7222,
+    "40-49": 0.3333,
+    "50-74": 0.5
+   },
+   "n": 70,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 16: template 11, test form 1, shape set 1, distractor PD, item set 3; files is3/tf1/tf1_11_M_ss1.jpeg + tf1_11_T1_ss1_pd.jpeg, tf1_11_T2_ss1_pd.jpeg, tf1_11_T4_ss1_pd.jpeg, tf1_11_T3_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.729 (n 70; timeouts 1 scored wrong) vs model-implied 0.732; infit 0.84, outfit 0.70. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.314, α 1.295 ⇒ model p 0.669; on this metric ≈ -0.36 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.67. p_band = observed p per age band; n per band: 18-29 47, 30-39 18, 40-49 3, 50-74 2."
+  },
+  {
+   "id": "mars_113",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_113_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_113_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_113_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_113_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_113_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": -0.473,
+   "se_b": 0.498,
+   "p": 0.6981,
+   "p_band": {
+    "18-29": 0.75,
+    "30-39": 0.5333,
+    "40-49": 0.7143,
+    "50-74": 1.0
+   },
+   "n": 53,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 113: template 27, test form 1, shape set 2, distractor PD, item set 3; files is3/tf1/tf1_27_M_ss2.jpeg + tf1_27_T2_ss2_pd.jpeg, tf1_27_T3_ss2_pd.jpeg, tf1_27_T4_ss2_pd.jpeg, tf1_27_T1_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.698 (n 53; timeouts 1 scored wrong) vs model-implied 0.682; infit 0.98, outfit 0.91. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.382, α 1.320 ⇒ model p 0.678; on this metric ≈ -0.43 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.09. p_band = observed p per age band; n per band: 18-29 28, 30-39 15, 40-49 7, 50-74 3."
+  },
+  {
+   "id": "mars_334",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_334_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_334_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_334_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_334_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_334_o3.webp"
+    }
+   ],
+   "answer": 2,
+   "c": 0.25,
+   "b": -0.264,
+   "se_b": 0.465,
+   "p": 0.6406,
+   "p_band": {
+    "18-29": 0.7317,
+    "30-39": 0.5455,
+    "40-49": 0.5,
+    "50-74": 0.25
+   },
+   "n": 64,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 334: template 72, test form 2, shape set 1, distractor PD, item set 3; files is3/tf2/tf2_72_M_ss1.jpeg + tf2_72_T2_ss1_pd.jpeg, tf2_72_T3_ss1_pd.jpeg, tf2_72_T1_ss1_pd.jpeg, tf2_72_T4_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.641 (n 64; timeouts 1 scored wrong) vs model-implied 0.666; infit 0.81, outfit 0.75. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β -0.134, α 1.447 ⇒ model p 0.643; on this metric ≈ -0.14 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.26. p_band = observed p per age band; n per band: 18-29 41, 30-39 11, 40-49 8, 50-74 4."
+  },
+  {
+   "id": "mars_030",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_030_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_030_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_030_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_030_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_030_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": -0.116,
+   "se_b": 0.492,
+   "p": 0.6429,
+   "p_band": {
+    "18-29": 0.6176,
+    "30-39": 0.75,
+    "40-49": 0.6667,
+    "50-74": 0.3333
+   },
+   "n": 56,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 30: template 13, test form 1, shape set 3, distractor PD, item set 3; files is3/tf1/tf1_13_M_ss3.jpeg + tf1_13_T3_ss3_pd.jpeg, tf1_13_T4_ss3_pd.jpeg, tf1_13_T2_ss3_pd.jpeg, tf1_13_T1_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.643 (n 56; timeouts 2 scored wrong) vs model-implied 0.649; infit 0.89, outfit 0.83. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.163, α 1.248 ⇒ model p 0.602; on this metric ≈ 0.17 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.59. p_band = observed p per age band; n per band: 18-29 34, 30-39 16, 40-49 3, 50-74 3."
+  },
+  {
+   "id": "mars_382",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_382_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_382_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_382_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_382_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_382_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": 0.114,
+   "se_b": 0.489,
+   "p": 0.6032,
+   "p_band": {
+    "18-29": 0.7,
+    "30-39": 0.4,
+    "40-49": 0.4,
+    "50-74": 0.6667
+   },
+   "n": 63,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 382: template 80, test form 1, shape set 1, distractor PD, item set 3; files is3/tf1/tf1_80_M_ss1.jpeg + tf1_80_T2_ss1_pd.jpeg, tf1_80_T1_ss1_pd.jpeg, tf1_80_T3_ss1_pd.jpeg, tf1_80_T4_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.603 (n 63; timeouts 2 scored wrong) vs model-implied 0.619; infit 0.92, outfit 0.85. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.397, α 1.332 ⇒ model p 0.570; on this metric ≈ 0.41 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.61. p_band = observed p per age band; n per band: 18-29 40, 30-39 15, 40-49 5, 50-74 3."
+  },
+  {
+   "id": "mars_232",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_232_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_232_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_232_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_232_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_232_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": 0.26,
+   "se_b": 0.444,
+   "p": 0.6,
+   "p_band": {
+    "18-29": 0.641,
+    "30-39": 0.7143,
+    "40-49": 0.4,
+    "50-74": 0.0
+   },
+   "n": 65,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 232: template 53, test form 1, shape set 1, distractor PD, item set 3; files is3/tf1/tf1_53_M_ss1.jpeg + tf1_53_T1_ss1_pd.jpeg, tf1_53_T4_ss1_pd.jpeg, tf1_53_T3_ss1_pd.jpeg, tf1_53_T2_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.600 (n 65; timeouts 2 scored wrong) vs model-implied 0.591; infit 0.99, outfit 0.98. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.508, α 1.247 ⇒ model p 0.553; on this metric ≈ 0.57 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.69. p_band = observed p per age band; n per band: 18-29 39, 30-39 14, 40-49 10, 50-74 2."
+  },
+  {
+   "id": "mars_294",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_294_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_294_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_294_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_294_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_294_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": 0.484,
+   "se_b": 0.434,
+   "p": 0.5833,
+   "p_band": {
+    "18-29": 0.6977,
+    "30-39": 0.5714,
+    "40-49": 0.25,
+    "50-74": 0.3333
+   },
+   "n": 72,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 294: template 64, test form 1, shape set 3, distractor PD, item set 3; files is3/tf1/tf1_64_M_ss3.jpeg + tf1_64_T2_ss3_pd.jpeg, tf1_64_T1_ss3_pd.jpeg, tf1_64_T4_ss3_pd.jpeg, tf1_64_T3_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.583 (n 72; timeouts 1 scored wrong) vs model-implied 0.558; infit 0.94, outfit 0.90. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.342, α 1.428 ⇒ model p 0.579; on this metric ≈ 0.33 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.36. p_band = observed p per age band; n per band: 18-29 43, 30-39 14, 40-49 12, 50-74 3."
+  },
+  {
+   "id": "mars_034",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_034_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_034_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_034_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_034_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_034_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": 0.683,
+   "se_b": 0.441,
+   "p": 0.5882,
+   "p_band": {
+    "18-29": 0.6,
+    "30-39": 0.5294,
+    "40-49": 0.6667,
+    "50-74": null
+   },
+   "n": 68,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 34: template 14, test form 1, shape set 1, distractor PD, item set 3; files is3/tf1/tf1_14_M_ss1.jpeg + tf1_14_T2_ss1_pd.jpeg, tf1_14_T4_ss1_pd.jpeg, tf1_14_T3_ss1_pd.jpeg, tf1_14_T1_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.588 (n 68; timeouts 0 scored wrong) vs model-implied 0.547; infit 0.98, outfit 0.97. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.782, α 1.155 ⇒ model p 0.513; on this metric ≈ 0.95 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.61. p_band = observed p per age band; n per band: 18-29 45, 30-39 17, 40-49 6, 50-74 0."
+  },
+  {
+   "id": "mars_024",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_024_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_024_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_024_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_024_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_024_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": 0.871,
+   "se_b": 0.436,
+   "p": 0.5256,
+   "p_band": {
+    "18-29": 0.4773,
+    "30-39": 0.5909,
+    "40-49": 0.6667,
+    "50-74": 0.3333
+   },
+   "n": 78,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 24: template 12, test form 3, shape set 3, distractor PD, item set 3; files is3/tf3/tf3_12_M_ss3.jpeg + tf3_12_T4_ss3_pd.jpeg, tf3_12_T3_ss3_pd.jpeg, tf3_12_T2_ss3_pd.jpeg, tf3_12_T1_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.526 (n 78; timeouts 0 scored wrong) vs model-implied 0.508; infit 1.05, outfit 1.04. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.672, α 1.350 ⇒ model p 0.533; on this metric ≈ 0.70 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.40. p_band = observed p per age band; n per band: 18-29 44, 30-39 22, 40-49 9, 50-74 3."
+  },
+  {
+   "id": "mars_077",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_077_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_077_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_077_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_077_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_077_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": 0.992,
+   "se_b": 0.468,
+   "p": 0.5588,
+   "p_band": {
+    "18-29": 0.5333,
+    "30-39": 0.6,
+    "40-49": 0.25,
+    "50-74": 1.0
+   },
+   "n": 68,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 77: template 21, test form 1, shape set 2, distractor PD, item set 3; files is3/tf1/tf1_21_M_ss2.jpeg + tf1_21_T3_ss2_pd.jpeg, tf1_21_T2_ss2_pd.jpeg, tf1_21_T4_ss2_pd.jpeg, tf1_21_T1_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.559 (n 68; timeouts 0 scored wrong) vs model-implied 0.503; infit 1.07, outfit 1.05. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 1.344, α 1.601 ⇒ model p 0.462; on this metric ≈ 1.18 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.41. p_band = observed p per age band; n per band: 18-29 45, 30-39 15, 40-49 4, 50-74 4."
+  },
+  {
+   "id": "mars_270",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_270_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_270_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_270_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_270_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_270_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": 1.253,
+   "se_b": 0.555,
+   "p": 0.4531,
+   "p_band": {
+    "18-29": 0.4857,
+    "30-39": 0.4211,
+    "40-49": 0.3333,
+    "50-74": 1.0
+   },
+   "n": 64,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 270: template 60, test form 3, shape set 3, distractor PD, item set 3; files is3/tf3/tf3_60_M_ss3.jpeg + tf3_60_T3_ss3_pd.jpeg, tf3_60_T1_ss3_pd.jpeg, tf3_60_T4_ss3_pd.jpeg, tf3_60_T2_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.453 (n 64; timeouts 2 scored wrong) vs model-implied 0.461; infit 0.97, outfit 0.98. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 0.907, α 1.210 ⇒ model p 0.498; on this metric ≈ 1.06 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.36. p_band = observed p per age band; n per band: 18-29 35, 30-39 19, 40-49 9, 50-74 1."
+  },
+  {
+   "id": "mars_167",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_167_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_167_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_167_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_167_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_167_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": 1.451,
+   "se_b": 0.557,
+   "p": 0.4688,
+   "p_band": {
+    "18-29": 0.5405,
+    "30-39": 0.5833,
+    "40-49": 0.1818,
+    "50-74": 0.25
+   },
+   "n": 64,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 167: template 39, test form 1, shape set 2, distractor PD, item set 3; files is3/tf1/tf1_39_M_ss2.jpeg + tf1_39_T3_ss2_pd.jpeg, tf1_39_T1_ss2_pd.jpeg, tf1_39_T4_ss2_pd.jpeg, tf1_39_T2_ss2_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.469 (n 64; timeouts 6 scored wrong) vs model-implied 0.436; infit 1.06, outfit 1.05. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 1.025, α 1.077 ⇒ model p 0.477; on this metric ≈ 1.34 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.19. p_band = observed p per age band; n per band: 18-29 37, 30-39 12, 40-49 11, 50-74 4."
+  },
+  {
+   "id": "mars_150",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_150_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_150_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_150_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_150_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_150_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": 1.576,
+   "se_b": 0.602,
+   "p": 0.4154,
+   "p_band": {
+    "18-29": 0.5135,
+    "30-39": 0.35,
+    "40-49": 0.25,
+    "50-74": 0.0
+   },
+   "n": 65,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 150: template 35, test form 2, shape set 3, distractor PD, item set 3; files is3/tf2/tf2_35_M_ss3.jpeg + tf2_35_T3_ss3_pd.jpeg, tf2_35_T1_ss3_pd.jpeg, tf2_35_T4_ss3_pd.jpeg, tf2_35_T2_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.415 (n 65; timeouts 1 scored wrong) vs model-implied 0.427; infit 0.88, outfit 0.86. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 1.333, α 1.528 ⇒ model p 0.460; on this metric ≈ 1.23 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.57. p_band = observed p per age band; n per band: 18-29 37, 30-39 20, 40-49 4, 50-74 4."
+  },
+  {
+   "id": "mars_264",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_264_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_264_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_264_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_264_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_264_o3.webp"
+    }
+   ],
+   "answer": 3,
+   "c": 0.25,
+   "b": 1.774,
+   "se_b": 0.749,
+   "p": 0.3559,
+   "p_band": {
+    "18-29": 0.4865,
+    "30-39": 0.1111,
+    "40-49": 0.125,
+    "50-74": 0.2
+   },
+   "n": 59,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 264: template 59, test form 2, shape set 3, distractor PD, item set 3; files is3/tf2/tf2_59_M_ss3.jpeg + tf2_59_T4_ss3_pd.jpeg, tf2_59_T3_ss3_pd.jpeg, tf2_59_T2_ss3_pd.jpeg, tf2_59_T1_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.356 (n 59; timeouts 1 scored wrong) vs model-implied 0.406; infit 0.81, outfit 0.80. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 1.794, α 1.412 ⇒ model p 0.407; on this metric ≈ 1.80 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.03. p_band = observed p per age band; n per band: 18-29 37, 30-39 9, 40-49 8, 50-74 5."
+  },
+  {
+   "id": "mars_352",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_352_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_352_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_352_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_352_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_352_o3.webp"
+    }
+   ],
+   "answer": 1,
+   "c": 0.25,
+   "b": 2.04,
+   "se_b": 0.616,
+   "p": 0.4079,
+   "p_band": {
+    "18-29": 0.4681,
+    "30-39": 0.35,
+    "40-49": 0.3333,
+    "50-74": 0.0
+   },
+   "n": 76,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 352: template 75, test form 2, shape set 1, distractor PD, item set 3; files is3/tf2/tf2_75_M_ss1.jpeg + tf2_75_T4_ss1_pd.jpeg, tf2_75_T1_ss1_pd.jpeg, tf2_75_T2_ss1_pd.jpeg, tf2_75_T3_ss1_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.408 (n 76; timeouts 1 scored wrong) vs model-implied 0.386; infit 0.96, outfit 0.97. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 1.788, α 1.398 ⇒ model p 0.407; on this metric ≈ 1.81 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.37. p_band = observed p per age band; n per band: 18-29 47, 30-39 20, 40-49 6, 50-74 2."
+  },
+  {
+   "id": "mars_108",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_108_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_108_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_108_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_108_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_108_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": 2.256,
+   "se_b": 0.71,
+   "p": 0.371,
+   "p_band": {
+    "18-29": 0.4359,
+    "30-39": 0.2143,
+    "40-49": 0.25,
+    "50-74": 1.0
+   },
+   "n": 62,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 108: template 26, test form 2, shape set 3, distractor PD, item set 3; files is3/tf2/tf2_26_M_ss3.jpeg + tf2_26_T1_ss3_pd.jpeg, tf2_26_T4_ss3_pd.jpeg, tf2_26_T3_ss3_pd.jpeg, tf2_26_T2_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.371 (n 62; timeouts 1 scored wrong) vs model-implied 0.368; infit 0.99, outfit 0.98. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 2.019, α 1.167 ⇒ model p 0.373; on this metric ≈ 2.45 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.28. p_band = observed p per age band; n per band: 18-29 39, 30-39 14, 40-49 8, 50-74 1."
+  },
+  {
+   "id": "mars_204",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_204_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_204_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_204_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_204_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_204_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": 2.349,
+   "se_b": 0.789,
+   "p": 0.3279,
+   "p_band": {
+    "18-29": 0.4359,
+    "30-39": 0.2143,
+    "40-49": 0.0,
+    "50-74": 0.0
+   },
+   "n": 61,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 204: template 47, test form 2, shape set 3, distractor PD, item set 3; files is3/tf2/tf2_47_M_ss3.jpeg + tf2_47_T1_ss3_pd.jpeg, tf2_47_T2_ss3_pd.jpeg, tf2_47_T3_ss3_pd.jpeg, tf2_47_T4_ss3_pd.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.328 (n 61; timeouts 2 scored wrong) vs model-implied 0.360; infit 0.88, outfit 0.86. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 1.514, α 1.119 ⇒ model p 0.420; on this metric ≈ 1.92 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.55. p_band = observed p per age band; n per band: 18-29 39, 30-39 14, 40-49 5, 50-74 3."
+  },
+  {
+   "id": "mars_303",
+   "scale": "mars_ib_rc",
+   "construct": "Gf",
+   "kind": "anchor",
+   "text": "کدام گزینه خانهٔ خالیِ ماتریس (گوشهٔ پایینِ سمتِ راستِ تصویر) را کامل می‌کند؟ ۳۰ ثانیه وقت داری؛ اگر مطمئن نیستی حدس بزن — جوابِ غلط جریمه ندارد.",
+   "img": "norms/img/mars_303_m.webp",
+   "options": [
+    {
+     "img": "norms/img/mars_303_o0.webp"
+    },
+    {
+     "img": "norms/img/mars_303_o1.webp"
+    },
+    {
+     "img": "norms/img/mars_303_o2.webp"
+    },
+    {
+     "img": "norms/img/mars_303_o3.webp"
+    }
+   ],
+   "answer": 0,
+   "c": 0.25,
+   "b": 2.633,
+   "se_b": 0.93,
+   "p": 0.3226,
+   "p_band": {
+    "18-29": 0.3333,
+    "30-39": 0.3333,
+    "40-49": 0.3333,
+    "50-74": 0.25
+   },
+   "n": 62,
+   "time_limit_s": 30,
+   "famous": false,
+   "verbal": false,
+   "src": "zorowitz2024",
+   "note": "MaRs-IB clone item_id 303: template 66, test form 3, shape set 3, distractor MD, item set 3; files is3/tf3/tf3_66_M_ss3.jpeg + tf3_66_T1_ss3_md.jpeg, tf3_66_T4_ss3_md.jpeg, tf3_66_T2_ss3_md.jpeg, tf3_66_T3_ss3_md.jpeg (option order fixed here by a seeded shuffle; the calibration shuffled positions on every trial). Observed p 0.323 (n 62; timeouts 3 scored wrong) vs model-implied 0.337; infit 0.91, outfit 0.91. Authors' clone estimates (tutorials/stats.csv, 3PL γ=.25): β 2.080, α 1.470 ⇒ model p 0.384; on this metric ≈ 2.00 (b ≈ 1.425·β/α − 0.013 over all clones), |z| = 0.68. p_band = observed p per age band; n per band: 18-29 36, 30-39 15, 40-49 6, 50-74 4."
+  },
+  {
+   "id": "crt_bat",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "یک راکت و یک توپ روی هم ۱۱۰ هزار تومان قیمت دارند. راکت ۱۰۰ هزار تومان از توپ گران‌تر است. توپ چند هزار تومان است؟",
+   "img": null,
+   "options": [],
+   "answer": 5,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.4145,
+   "p_band": {
+    "18-29": 0.4098,
+    "30-49": 0.4313,
+    "50-64": 0.4027,
+    "65+": 0.4043
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Frederick (2005) CRT item 1; Twin key 0.05 USD (strict; reproduces the dataset's numeracy score for 100% of people). Lenient scoring that also accepts '5' (cents) gives 0.4145. Currency changed to تومان with the same numbers (answer 5 هزار تومان). Other norms: meta-analysis 31.75% (N 41,004; Brañas-Garza et al. 2019); Stieger & Reips 2016: 28.3% (N 2,272).",
+   "accept": [
+    "5",
+    "5\\s*هزار(\\s*تومان)?",
+    "5[,٬]?000(\\s*تومان)?"
+   ]
+  },
+  {
+   "id": "crt_widgets",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "اگر ۵ دستگاه در ۵ دقیقه ۵ قطعه بسازند، ۱۰۰ دستگاه در چند دقیقه ۱۰۰ قطعه می‌سازند؟",
+   "img": null,
+   "options": [],
+   "answer": 5,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.6113,
+   "p_band": {
+    "18-29": 0.549,
+    "30-49": 0.6272,
+    "50-64": 0.6246,
+    "65+": 0.6245
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Frederick (2005) CRT item 2 (key 5 min). Meta-analysis 40.24% (N 41,004); Stieger & Reips 2016: 55.0%.",
+   "accept": [
+    "5",
+    "5\\s*دقیقه"
+   ]
+  },
+  {
+   "id": "crt_lily",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "در یک دریاچه لکه‌ای از نیلوفرهای آبی هست که هر روز دو برابر می‌شود. اگر ۴۸ روز طول بکشد تا کلِ دریاچه را بپوشاند، چند روز طول می‌کشد تا نیمی از دریاچه را بپوشاند؟",
+   "img": null,
+   "options": [],
+   "answer": 47,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.5841,
+   "p_band": {
+    "18-29": 0.549,
+    "30-49": 0.6272,
+    "50-64": 0.5745,
+    "65+": 0.5415
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Frederick (2005) CRT item 3 (key 47). Meta-analysis 47.78% (N 41,004); Stieger & Reips 2016: 53.0%.",
+   "accept": [
+    "47",
+    "47\\s*روز"
+   ]
+  },
+  {
+   "id": "crt2_dirt",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "در چاله‌ای به عمقِ ۳ متر، پهنای ۳ متر و درازای ۳ متر، چند متر مکعب خاک هست؟",
+   "img": null,
+   "options": [],
+   "answer": 0,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.19,
+   "p_band": {
+    "18-29": 0.1649,
+    "30-49": 0.1837,
+    "50-64": 0.2112,
+    "65+": 0.1913
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Thomson & Oppenheimer (2016) CRT-2 (key 0: a hole holds no dirt). Units changed feet→metres; the trick is unit-free.",
+   "accept": [
+    "0",
+    "صفر",
+    "هیچ",
+    "هیچ\\s*خاکی(\\s*نیست)?",
+    "0\\s*متر(\\s*مکعب)?"
+   ]
+  },
+  {
+   "id": "crt2_race",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "در یک مسابقهٔ دو، از نفرِ دوم سبقت می‌گیری. حالا نفرِ چندمی؟",
+   "img": null,
+   "options": [],
+   "answer": 2,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.6608,
+   "p_band": {
+    "18-29": 0.7165,
+    "30-49": 0.6503,
+    "50-64": 0.6489,
+    "65+": 0.639
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Thomson & Oppenheimer (2016) CRT-2 (key 2).",
+   "accept": [
+    "2",
+    "دوم",
+    "نفر\\s*دوم"
+   ]
+  },
+  {
+   "id": "crt2_sheep",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "کشاورزی ۱۵ گوسفند داشت و همه به‌جز ۸ تا مردند. چند گوسفند برایش مانده است؟",
+   "img": null,
+   "options": [],
+   "answer": 8,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.8377,
+   "p_band": {
+    "18-29": 0.817,
+    "30-49": 0.8544,
+    "50-64": 0.8267,
+    "65+": 0.8484
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Thomson & Oppenheimer (2016) CRT-2 (key 8). Persian «همه به‌جز ۸ تا مردند» keeps the same ambiguity trap.",
+   "accept": [
+    "8",
+    "8\\s*(تا|گوسفند)"
+   ]
+  },
+  {
+   "id": "num_die",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "یک تاسِ شش‌وجهیِ سالم را ۱۰۰۰ بار می‌اندازیم. به نظرت محتمل‌ترین تعدادِ دفعاتی که عددِ زوج می‌آید چند است؟ (عددی از ۰ تا ۱۰۰۰)",
+   "img": null,
+   "options": [],
+   "answer": 500,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.8309,
+   "p_band": {
+    "18-29": 0.8505,
+    "30-49": 0.8463,
+    "50-64": 0.8359,
+    "65+": 0.7509
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Lipkus et al. (2001)-type numeracy via Johnson et al. (2019); key 500.",
+   "accept": [
+    "500"
+   ]
+  },
+  {
+   "id": "num_lottery",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "در یک بخت‌آزمایی، شانسِ بردنِ یک جایزهٔ کوچک ۱٪ است. اگر ۱۰۰۰ نفر هر کدام یک بلیت بخرند، به نظرت چند نفر این جایزه را می‌برند؟",
+   "img": null,
+   "options": [],
+   "answer": 10,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.8027,
+   "p_band": {
+    "18-29": 0.7938,
+    "30-49": 0.8027,
+    "50-64": 0.8191,
+    "65+": 0.7762
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Numeracy; key 10. Prize amount ($10) omitted; it does not enter the calculation.",
+   "accept": [
+    "10",
+    "10\\s*نفر"
+   ]
+  },
+  {
+   "id": "num_pct20",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "اگر احتمالِ ابتلا به یک بیماری ۲۰ از ۱۰۰ باشد، این برابر با چند درصد احتمالِ ابتلاست؟",
+   "img": null,
+   "options": [],
+   "answer": 20,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.895,
+   "p_band": {
+    "18-29": 0.9046,
+    "30-49": 0.9116,
+    "50-64": 0.8906,
+    "65+": 0.8484
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Numeracy; key 20.",
+   "accept": [
+    "20",
+    "20\\s*(%|٪|درصد)"
+   ]
+  },
+  {
+   "id": "num_1in1000",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "در یک قرعه‌کشی، شانسِ بردنِ خودرو ۱ در ۱۰۰۰ است. چند درصد از بلیت‌ها خودرو می‌برند؟",
+   "img": null,
+   "options": [],
+   "answer": 0.1,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.4538,
+   "p_band": {
+    "18-29": 0.5258,
+    "30-49": 0.5061,
+    "50-64": 0.4043,
+    "65+": 0.3321
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Numeracy; key 0.1 (%). The hardest numeracy item here.",
+   "accept": [
+    "0?[.٫/]1(\\s*(%|٪|درصد))?"
+   ]
+  },
+  {
+   "id": "num_10pct",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "اگر احتمالِ ابتلا به یک بیماری ۱۰٪ باشد، از ۱۰۰۰ نفر انتظار می‌رود چند نفر مبتلا شوند؟",
+   "img": null,
+   "options": [],
+   "answer": 100,
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.8727,
+   "p_band": {
+    "18-29": 0.8918,
+    "30-49": 0.8544,
+    "50-64": 0.8784,
+    "65+": 0.8809
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Numeracy; key 100.",
+   "accept": [
+    "100",
+    "100\\s*نفر"
+   ]
+  },
+  {
+   "id": "syl_smoke",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: هر چیزی که دود می‌کنند برای سلامتی مفید است. مقدمهٔ ۲: سیگار را دود می‌کنند. نتیجه: سیگار برای سلامتی مفید است. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.8902,
+   "p_band": {
+    "18-29": 0.9046,
+    "30-49": 0.9007,
+    "50-64": 0.8891,
+    "65+": 0.8448
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Markovits & Nantel (1989) belief-bias set: valid, unbelievable (key: بله). Not included in the dataset's own syllogism score (that score = the other 7 items; reproduced 100%)."
+  },
+  {
+   "id": "syl_water",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ جانوران آب را دوست دارند. مقدمهٔ ۲: گیاهان آب را دوست ندارند. نتیجه: گیاهان جانور نیستند. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.7536,
+   "p_band": {
+    "18-29": 0.8041,
+    "30-49": 0.7497,
+    "50-64": 0.7523,
+    "65+": 0.6968
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Valid, believable (key: بله)."
+  },
+  {
+   "id": "syl_poodle",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ جانورانِ چهارپا خطرناک‌اند. مقدمهٔ ۲: سگ‌های پودل خطرناک نیستند. نتیجه: پودل‌ها چهار پا ندارند. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.5948,
+   "p_band": {
+    "18-29": 0.5979,
+    "30-49": 0.6163,
+    "50-64": 0.6003,
+    "65+": 0.5199
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Valid, unbelievable (key: بله)."
+  },
+  {
+   "id": "syl_china",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ کشورهای شرقی کمونیست‌اند. مقدمهٔ ۲: چین کشوری شرقی نیست. نتیجه: چین کمونیست نیست. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 1,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.6011,
+   "p_band": {
+    "18-29": 0.5155,
+    "30-49": 0.5986,
+    "50-64": 0.6109,
+    "65+": 0.704
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Invalid (denying the antecedent), unbelievable (key: خیر)."
+  },
+  {
+   "id": "syl_roses",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ گل‌ها گلبرگ دارند. مقدمهٔ ۲: رُزها گلبرگ دارند. نتیجه: رُزها گل‌اند. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 1,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.2857,
+   "p_band": {
+    "18-29": 0.2732,
+    "30-49": 0.3088,
+    "50-64": 0.2796,
+    "65+": 0.2563
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Invalid (affirming the consequent), believable — the classic conflict item (key: خیر)."
+  },
+  {
+   "id": "syl_whales",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ پستانداران شنا می‌کنند. مقدمهٔ ۲: نهنگ‌ها پستاندارند. نتیجه: نهنگ‌ها شنا می‌کنند. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.966,
+   "p_band": {
+    "18-29": 0.951,
+    "30-49": 0.9728,
+    "50-64": 0.9696,
+    "65+": 0.9603
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Valid, believable (key: بله)."
+  },
+  {
+   "id": "syl_rockefeller",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ بیکاران فقیرند. مقدمهٔ ۲: راکفلر بیکار نیست. نتیجه: راکفلر فقیر نیست. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 1,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.5583,
+   "p_band": {
+    "18-29": 0.5309,
+    "30-49": 0.5714,
+    "50-64": 0.5532,
+    "65+": 0.574
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Invalid, believable (key: خیر)."
+  },
+  {
+   "id": "syl_bicycle",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: همهٔ چیزهایی که موتور دارند به روغن نیاز دارند. مقدمهٔ ۲: دوچرخه‌ها به روغن نیاز دارند. نتیجه: دوچرخه‌ها موتور دارند. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 1,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.6876,
+   "p_band": {
+    "18-29": 0.6314,
+    "30-49": 0.6653,
+    "50-64": 0.7036,
+    "65+": 0.787
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Invalid, unbelievable (key: خیر)."
+  },
+  {
+   "id": "mp_strike",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: اگر اعتصابِ پست شود، بیکاری دو برابر می‌شود. مقدمهٔ ۲: اعتصابِ پست شده است. نتیجه: بیکاری دو برابر می‌شود. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.9587,
+   "p_band": {
+    "18-29": 0.9716,
+    "30-49": 0.9741,
+    "50-64": 0.9498,
+    "65+": 0.9206
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Deductive certainty of modus ponens (Stanovich & West 2008); key بله; the dataset's deductive-certainty score is reproduced for 100% of people."
+  },
+  {
+   "id": "mp_flu",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: اگر زمستان سخت باشد، آنفلوانزا همه‌گیر می‌شود. مقدمهٔ ۲: زمستان سخت است. نتیجه: آنفلوانزا همه‌گیر می‌شود. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.9558,
+   "p_band": {
+    "18-29": 0.9613,
+    "30-49": 0.9687,
+    "50-64": 0.9407,
+    "65+": 0.9495
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Modus ponens; key بله."
+  },
+  {
+   "id": "mp_honda",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: اگر خودرویی هوندا باشد، گران است. مقدمهٔ ۲: خودرویی هوندا است. نتیجه: آن خودرو گران است. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.9519,
+   "p_band": {
+    "18-29": 0.9459,
+    "30-49": 0.9619,
+    "50-64": 0.9498,
+    "65+": 0.9386
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Modus ponens; key بله."
+  },
+  {
+   "id": "mp_burger",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن هر دو مقدمه درست‌اند و فقط به همین اطلاعات تکیه کن. مقدمهٔ ۱: اگر کسی همبرگر بخورد، سرطان می‌گیرد. مقدمهٔ ۲: کسی همبرگر می‌خورد. نتیجه: او سرطان می‌گیرد. آیا نتیجه منطقاً از مقدمه‌ها برمی‌آید؟",
+   "img": null,
+   "options": [
+    {
+     "t": "بله"
+    },
+    {
+     "t": "خیر"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.8946,
+   "p_band": {
+    "18-29": 0.8892,
+    "30-49": 0.9211,
+    "50-64": 0.883,
+    "65+": 0.8592
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Modus ponens with an unbelievable conclusion; key بله."
+  },
+  {
+   "id": "cond_mp",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن این جمله درست است: «همهٔ زاک‌ها یوف‌اند.» با این فرض، اگر یک گلاک زاک باشد، می‌توان گفت:",
+   "img": null,
+   "options": [
+    {
+     "t": "قطعاً گلاک یوف است"
+    },
+    {
+     "t": "قطعاً گلاک یوف نیست"
+    },
+    {
+     "t": "معلوم نیست گلاک یوف هست یا نه"
+    }
+   ],
+   "answer": 0,
+   "c": 0.3333,
+   "b": null,
+   "se_b": null,
+   "p": 0.9227,
+   "p_band": {
+    "18-29": 0.9459,
+    "30-49": 0.9034,
+    "50-64": 0.9316,
+    "65+": 0.9206
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Abstract conditional (Markovits-type), modus ponens; key: certain it is a YOF. Nonwords XAR/YOF/glock/koy → زاک/یوف/گلاک/کوی. Keys reproduce the dataset's score_syllogism_priming for 100% of people."
+  },
+  {
+   "id": "cond_da",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن این جمله درست است: «همهٔ زاک‌ها یوف‌اند.» با این فرض، اگر یک گلاک زاک نباشد، می‌توان گفت:",
+   "img": null,
+   "options": [
+    {
+     "t": "قطعاً گلاک یوف است"
+    },
+    {
+     "t": "قطعاً گلاک یوف نیست"
+    },
+    {
+     "t": "معلوم نیست گلاک یوف هست یا نه"
+    }
+   ],
+   "answer": 2,
+   "c": 0.3333,
+   "b": null,
+   "se_b": null,
+   "p": 0.4947,
+   "p_band": {
+    "18-29": 0.451,
+    "30-49": 0.5279,
+    "50-64": 0.4802,
+    "65+": 0.5018
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Denying the antecedent; key: not certain."
+  },
+  {
+   "id": "cond_ac",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن این جمله درست است: «همهٔ زاک‌ها یوف‌اند.» با این فرض، اگر یک کوی یوف باشد، می‌توان گفت:",
+   "img": null,
+   "options": [
+    {
+     "t": "قطعاً کوی زاک است"
+    },
+    {
+     "t": "قطعاً کوی زاک نیست"
+    },
+    {
+     "t": "معلوم نیست کوی زاک هست یا نه"
+    }
+   ],
+   "answer": 2,
+   "c": 0.3333,
+   "b": null,
+   "se_b": null,
+   "p": 0.5739,
+   "p_band": {
+    "18-29": 0.5644,
+    "30-49": 0.5701,
+    "50-64": 0.5745,
+    "65+": 0.5957
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Affirming the consequent; key: not certain."
+  },
+  {
+   "id": "cond_mt",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "فرض کن این جمله درست است: «همهٔ زاک‌ها یوف‌اند.» با این فرض، اگر یک کوی یوف نباشد، می‌توان گفت:",
+   "img": null,
+   "options": [
+    {
+     "t": "قطعاً کوی زاک است"
+    },
+    {
+     "t": "قطعاً کوی زاک نیست"
+    },
+    {
+     "t": "معلوم نیست کوی زاک هست یا نه"
+    }
+   ],
+   "answer": 1,
+   "c": 0.3333,
+   "b": null,
+   "se_b": null,
+   "p": 0.5457,
+   "p_band": {
+    "18-29": 0.5979,
+    "30-49": 0.5116,
+    "50-64": 0.5745,
+    "65+": 0.4946
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Modus tollens; key: certain it is not a XAR."
+  },
+  {
+   "id": "wason_abstract",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "چند کارت داریم که یک طرفشان یک حرفِ بزرگِ لاتین و طرفِ دیگرشان یک عدد است؛ از هر کارت فقط یک طرف پیداست. قاعده: «اگر روی طرفِ حرفِ کارت A باشد، روی طرفِ عددش 3 است.» چهار کارت این‌ها را نشان می‌دهند: A ، F ، 3 ، 7. برای آزمودنِ درست یا نادرست بودنِ قاعده، کدام کارت(ها) را حتماً باید برگرداند؟ همهٔ کارت‌های لازم را بنویس (مثلاً: A و F).",
+   "img": null,
+   "options": [],
+   "answer": "A و 7",
+   "c": 0,
+   "b": null,
+   "se_b": null,
+   "p": 0.0457,
+   "p_band": {
+    "18-29": 0.0387,
+    "30-49": 0.0599,
+    "50-64": 0.041,
+    "65+": 0.0289
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": true,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Wason selection task, abstract (Klauer et al. 2007 wording). Correct = exactly A and 7. Original was multi-select checkboxes; the app takes a typed answer (format change, descriptive only). Response patterns: A+3 1074, A 610, 3 100, A+7 94, all four 51. The dataset's own score_wason counts only 86 fully-correct (8 'A+7' answers scored 3/4 — a dataset scoring error); 94/2058 = 0.0457 is the verifier's count.",
+   "accept": [
+    "A\\s*(و|،|,|\\+|-)?\\s*7",
+    "7\\s*(و|،|,|\\+|-)?\\s*A"
+   ]
+  },
+  {
+   "id": "ratio_bias",
+   "scale": "twin_rq_desc",
+   "construct": "RQ",
+   "kind": "descriptive",
+   "text": "دو سینی تیلهٔ سیاه و سفید جلوی توست: یک سینیِ بزرگ با ۱۰۰ تیله و یک سینیِ کوچک با ۱۰ تیله. بی‌آن‌که نگاه کنی یک تیله برمی‌داری و اگر سیاه باشد جایزه می‌بری. سینیِ کوچک ۱ تیلهٔ سیاه و ۹ سفید دارد؛ سینیِ بزرگ ۸ سیاه و ۹۲ سفید. در موقعیتِ واقعی ترجیح می‌دهی از کدام سینی برداری؟",
+   "img": null,
+   "options": [
+    {
+     "t": "سینیِ کوچک"
+    },
+    {
+     "t": "سینیِ بزرگ"
+    }
+   ],
+   "answer": 0,
+   "c": 0.5,
+   "b": null,
+   "se_b": null,
+   "p": 0.6395,
+   "p_band": {
+    "18-29": 0.6701,
+    "30-49": 0.6599,
+    "50-64": 0.6368,
+    "65+": 0.5487
+   },
+   "n": 2058,
+   "time_limit_s": null,
+   "famous": false,
+   "verbal": true,
+   "src": "twin2k500",
+   "group": "۲۰۵۸ بزرگسالِ آمریکایی (نمونهٔ سهمیه‌ایِ Prolific، ۲۰۲۵)",
+   "note": "Denominator neglect (Denes-Raj & Epstein 1994 via Stanovich & West 2008). 'Correct' = the normatively better small tray (10% > 8%). Paper reports P(large tray) = 0.36 ⇒ 0.64 small — matches 0.6395. Prize ($2) unnamed in Persian; it does not change the comparison."
+  }
+ ]
 }
