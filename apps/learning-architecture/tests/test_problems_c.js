@@ -13,7 +13,10 @@ const nOld = window.EPI_PROBLEMS.length, oldIds = new Set(window.EPI_PROBLEMS.ma
 load('epi_problems_c.js');
 const NEW = window.EPI_PROBLEMS.slice(nOld);
 E(nOld === 13, 'older sets changed: ' + nOld);
-E(NEW.length === 20, 'expected 20 practice problems, got ' + NEW.length);
+const BOOK = NEW.filter(p => p.set === 'book4'), EXTRA = NEW.filter(p => p.set === 'practice');
+E(BOOK.length === 20, 'expected 20 book-four practice problems, got ' + BOOK.length);
+// R3 (۲۰۲۶-۱۰-۱۵): مسئله‌های کوتاهِ نوشتهٔ سازنده برای حرکت‌هایی که در آن بیست مسئله گامی نداشتند
+E(EXTRA.length >= 6 && BOOK.length + EXTRA.length === NEW.length, 'practice set: ' + EXTRA.length + ' / ' + NEW.length);
 
 // ثبت‌گاهِ حرکت‌ها از خودِ a19 (بی DOM): فقط آرایهٔ MOVES و ASK را می‌خوانیم
 const src19 = fs.readFileSync(path.join(APPD, 'a19_moves.js'), 'utf8');
@@ -28,10 +31,10 @@ const per = {}, info = {};
 NEW.forEach(p => {
   const P = p.id + ': ';
   E(!oldIds.has(p.id), P + 'duplicate id');
-  E(p.set === 'book4' && p.neutral === true, P + 'set/neutral flags');
+  E((p.set === 'book4' || p.set === 'practice') && p.neutral === true, P + 'set/neutral flags');
   ['title', 'field', 'statement', 'answer', 'why_hard'].forEach(k => E(STR(p[k]), P + 'missing ' + k));
   E(p.udc && STR(p.udc.unknown) && STR(p.udc.data) && STR(p.udc.condition), P + 'udc {unknown, data, condition}');
-  E(Array.isArray(p.src) && p.src.length && /Pólya/.test(p.src[0]), P + 'src');
+  E(Array.isArray(p.src) && p.src.length && (p.set === 'book4' ? /Pólya/.test(p.src[0]) : /نوشتهٔ سازنده/.test(p.src[0])), P + 'src');
   E(Array.isArray(p.cases) && !p.cases.length, P + 'no backtest cases');
   E(Array.isArray(p.lessons) && p.lessons.length >= 3, P + 'lessons >= 3');
   E(Array.isArray(p.stages) && p.stages.length >= 3 && p.stages.length <= 6, P + 'stages 3..6');
@@ -52,6 +55,9 @@ NEW.forEach(p => {
 });
 // هر حرکتِ تازه دست‌کم در ۳ گام قاطع است (ت۵: «برچسب‌زدنِ دست‌کم سه گام برای هر کدام»)
 NEWMV.forEach(m => E((per[m] || 0) >= 3, 'move ' + m + ' tagged on ' + (per[m] || 0) + ' stages (< 3)'));
+// R3: هر حرکتی که در بیست مسئله گام نداشت، حالا دست‌کم یک گامِ تمرینی دارد (با گزینهٔ پیش‌فرضِ «مسئله‌های کوتاهِ تمرینی»)
+['mv_backward', 'mv_contra', 'mv_invariant', 'mv_impossible', 'mv_extend', 'mv_assume', 'mv_control', 'mv_measure', 'mv_anomaly'].forEach(m => E((per[m] || 0) >= 1, 'move ' + m + ' has no practice stage'));
+E(ids.every(m => (per[m] || 0) >= 1), 'every registry move has a practice stage: missing ' + ids.filter(m => !per[m]).join(','));
 // گام‌های بازنگری: دست‌کم در نیمی از مسئله‌ها
 E(NEW.filter(p => p.stages.some(s => s.ph === 'b')).length >= 10, 'looking-back stages in fewer than 10 problems');
 
@@ -146,6 +152,31 @@ E(15 + 20 + 25 === 60 && 15 * 15 + 20 * 20 === 625 && 15 * 20 === 12 * 25, 'p15'
 // ۲۰
 { let w = 0; for (let h = 0; h <= 2; h++) for (let q = 0; q <= 4; q++) for (let d = 0; d <= 10; d++) for (let n = 0; n <= 20; n++) { const rest = 100 - 50 * h - 25 * q - 10 * d - 5 * n; if (rest >= 0) w++; } E(w === 292, 'p20 ' + w);
   let w50 = 0; for (let h = 0; h <= 1; h++) for (let q = 0; q <= 2; q++) for (let d = 0; d <= 5; d++) for (let n = 0; n <= 10; n++) if (50 - 50 * h - 25 * q - 10 * d - 5 * n >= 0) w50++; E(w50 === 50, 'p20 E50 ' + w50); }
+
+// ---------- R3: درستیِ شش مسئلهٔ «practice» (محاسبهٔ مستقل) ----------
+// سکه‌ها: وضعِ باخت (برای نوبت‌دار) با برنامه‌ریزیِ پویا؛ مضرب‌های ۵ و نخستین حرکتِ ۳ از ۲۳
+{ const lose = [true]; for (let n = 1; n <= 40; n++) lose[n] = ![1, 2, 3, 4].some(k => k <= n && lose[n - k]);
+  E(lose.every((v, n) => v === (n % 5 === 0)), 'coins: losing positions are multiples of 5');
+  const moves = [1, 2, 3, 4].filter(k => lose[23 - k]); E(moves.length === 1 && moves[0] === 3, 'coins: unique winning first move ' + moves); }
+// ریشهٔ دو: هیچ a، b ≤ ۲۰۰۰ با a² = 2b²، و گامِ نزول: a² = 2b² ⇒ a زوج
+{ let found = 0; for (let b = 1; b <= 2000; b++) { const a = Math.round(Math.SQRT2 * b); if (a * a === 2 * b * b) found++; } E(found === 0, 'sqrt2 has a rational square root?'); }
+// شطرنجِ بریده: شمارِ رنگ‌ها پس از بریدنِ (۰،۰) و (۷،۷)
+{ let bl = 0, wh = 0; for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { if ((i === 0 && j === 0) || (i === 7 && j === 7)) continue; ((i + j) % 2 ? wh++ : bl++); } E(bl === 30 && wh === 32 && (0 + 0) % 2 === (7 + 7) % 2, 'board colours ' + bl + '/' + wh); }
+// مزدوج‌ها: x_n = (2+√3)ⁿ + (2−√3)ⁿ با بازگشتِ x_{n+1} = 4x_n − x_{n−1} صحیح است و با عددِ اعشاری هم می‌خواند
+{ let a = 2n, b = 4n; const xs = [2n, 4n]; for (let n = 2; n <= 12; n++) { const c = 4n * b - a; xs.push(c); a = b; b = c; }
+  xs.forEach((x, n) => E(Math.abs(Number(x) - (Math.pow(2 + Math.sqrt(3), n) + Math.pow(2 - Math.sqrt(3), n))) < 1e-6 * Math.max(1, Number(x)), 'conj n=' + n));
+  // a + b√3 ⇒ a − b√3: ضربِ نمادین
+  let p = [1, 0], q = [1, 0]; for (let n = 1; n <= 8; n++) { p = [2 * p[0] + 3 * p[1], p[0] + 2 * p[1]]; q = [2 * q[0] - 3 * q[1], -q[0] + 2 * q[1]]; E(q[0] === p[0] && q[1] === -p[1] && 2 * p[0] === Number(xs[n]), 'conj conjugate n=' + n); } }
+// نُه نقطه: مسیرِ چهارپاره که از هر نُه نقطه می‌گذرد (بیرون از قاب)
+{ const route = [[0, 0], [0, 3], [3, 0], [0, 0], [2, 2]];   // پیوسته: هر پاره از پایانِ قبلی؛ نقطه‌ها شبکهٔ {0,1,2}²
+  const pts = []; for (let x = 0; x <= 2; x++) for (let y = 0; y <= 2; y++) pts.push([x, y]);
+  const on = (pt, A, B) => { const cr = (B[0] - A[0]) * (pt[1] - A[1]) - (B[1] - A[1]) * (pt[0] - A[0]); if (Math.abs(cr) > 1e-9) return false; const d = (pt[0] - A[0]) * (B[0] - A[0]) + (pt[1] - A[1]) * (B[1] - A[1]); return d >= -1e-9 && d <= (B[0] - A[0]) ** 2 + (B[1] - A[1]) ** 2 + 1e-9; };
+  const nseg = route.length - 1, covered = pts.every(pt => route.slice(1).some((B, i) => on(pt, route[i], B)));
+  const outside = route.some(([x, y]) => x < 0 || x > 2 || y < 0 || y > 2);
+  E(nseg === 4 && covered && outside, 'nine dots: 4 connected segments cover all 9 points, leaving the frame'); }
+// آونگ: تنها ترکیبِ توانیِ l، g، m با بُعدِ زمان، √(l/g) است (جرم بی‌اثر)
+{ const H = [-2, -1, -0.5, 0, 0.5, 1, 2], sols = []; for (const el of H) for (const eg of H) for (const em of H) { const M = em, L = el + eg, T = -2 * eg; if (M === 0 && L === 0 && T === 1) sols.push([el, eg, em]); }
+  E(sols.length === 1 && sols[0].join() === '0.5,-0.5,0', 'pendulum dimensional form ' + JSON.stringify(sols)); }
 
 // build.py: فایل در btfiles پس از epi_problems_b.js
 const build = fs.readFileSync(path.join(__dirname, '..', 'build.py'), 'utf8');

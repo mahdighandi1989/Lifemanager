@@ -35,6 +35,25 @@
     ["cond", "شرط: کدام قیدها (زمان، پول، آدم‌ها، قاعده‌ها) — و کدامش واقعی است، کدام فرضی؟"], ["vague", "کدام مفهومِ مبهم را باید پیش از هر کار روشن کنی؟"],
     ["ignore", "کدام داده را عمداً کنار می‌گذاری و تا کجا اطلاعات جمع می‌کنی؟"], ["approx", "کدام تقریب بس است — جوابِ «به‌اندازهٔ کافی خوب» چیست؟"]];
   AS.practicalParts = PRACT;
+  /* قابِ کامل ⇒ یک کارتِ مرور (یک بار) — با کد، چه جزءها را دستیار از حرفِ کاربر ثبت کرده باشد چه خودِ کاربر در کشوی تور نوشته باشد */
+  function practicalCard(s, x) {
+    if (!x || x.card) return null; var pp = x.parts || {};
+    var chk = A.practicalFrameCheck ? A.practicalFrameCheck(pp, PRACT) : { ok: PRACT.every(function (q) { return pp[q[0]]; }) };
+    if (!chk.ok) return null;
+    var rows = PRACT.map(function (q) { return [q[1].split(/[:؟]/)[0], pp[q[0]]]; }), title = (s.tour && s.tour.goal) || s.pinned || "تصمیم";
+    var cd = A.practicalFrameCard ? A.practicalFrameCard(title, rows, "sieve:practical")
+      : A.newCard && A.newCard("قابِ مسئلهٔ عملیِ «" + clip(title, 80) + "»", rows.map(function (r) { return r[0] + ": " + r[1]; }).join("\n"), { due: A.addDays(A.today(), 1), src: "sieve:practical" });
+    if (cd) x.card = cd.id; return cd;
+  }
+  /* بی‌مدل: کاربر جزءِ مانده را خودش در کشوی تور می‌نویسد (data-own) — همان انباشت، همان کارت */
+  AS.sievePracticalSet = function (s, key, val) {
+    if (!s || !s.tour || PRACT.map(function (q) { return q[0]; }).indexOf(key) < 0) return false;
+    var v = String(val || "").trim(); if (!v) return false;
+    var d = s.tour.diag = s.tour.diag || {}, x = d.practical = d.practical || { st: "found", why: "", at: nowIso() };
+    if (x.st !== "found") { (x.hist = x.hist || []).push({ st: x.st, why: x.why, at: x.at }); x.st = "found"; }
+    x.why = x.why || "قابِ مسئلهٔ عملی را خودت نوشتی"; x.parts = x.parts || {}; x.parts[key] = clip(v, 300); x.at = nowIso();
+    practicalCard(s, x); S.put(s); return true;
+  };
   AS.sieveLayers = function () {
     var fam = (A.KF || []).map(function (F) { return { g: "ریشه‌های گره (۱۲ خانواده)", id: F.id, fa: F.fa, q: F.blurb || "" }; });
     // ترتیب: پایه‌های اول، بعد خانواده‌ها، بعد معرفت و مسئله، و پایه‌های پایانی
@@ -81,7 +100,7 @@
       if (L.id === "practical") { var pp = (prev && prev.parts) || {}; if (x.parts && typeof x.parts === "object") PRACT.forEach(function (q) { var v = x.parts[q[0]]; if (typeof v === "string" && v.trim().length >= 2) pp[q[0]] = clip(v.trim(), 300); }); if (Object.keys(pp).length) d[L.id].parts = pp;
         // قابِ کامل ⇒ یک کارتِ مرور (یک بار): همان شش پرسش برای تصمیمِ بعدی تمرین می‌شود — فاصله‌دار، در «مرور» و «امروز»
         var pcard = prev && prev.card; if (pcard) d[L.id].card = pcard;
-        if (!pcard && PRACT.every(function (q) { return pp[q[0]]; }) && A.newCard) { var cd = A.newCard("قابِ مسئلهٔ عملیِ «" + clip((s.tour && s.tour.goal) || s.pinned || "تصمیم", 80) + "»: بی‌نگاه بگو مجهول، داده، شرط، مفهومِ مبهم، دادهٔ کنارگذاشته (و حدِ اطلاعات) و تقریبِ کافی چه بود — و همین شش پرسش را برای تصمیمِ بعدی‌ات بپرس.", PRACT.map(function (q) { return q[1].split(/[:؟]/)[0] + ": " + pp[q[0]]; }).join("\n"), { due: A.addDays(A.today(), 1), src: "sieve:practical" }); if (cd) d[L.id].card = cd.id; } }
+        practicalCard(s, d[L.id]); }
     });
     return bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "";
   };
@@ -193,7 +212,13 @@
         if (r.g !== g0) { g0 = r.g; det.appendChild(h("div", { class: "muted mt" }, r.g)); }
         det.appendChild(h("div", { class: "as-sv as-sv-" + (r.st || "none") }, (r.st === "found" ? "● " : r.st === "no" ? "○ " : r.st === "ask" ? "？ " : r.st === "out" ? "↗ " : "· ") + r.fa + " — " + r.stFa +
           (r.why ? " — «" + clip(r.why, 90) + "»" : "") + (r.facet ? " ⇒ " + r.facet : "")));
-        if (r.id === "practical" && (r.st === "found" || r.st === "ask")) det.appendChild(h("ul", { class: "plain as-pract" }, PRACT.map(function (q) { var v = (r.parts || {})[q[0]]; return h("li", { class: v ? "ok" : "" }, (v ? "✓ " : "○ ") + q[1].split(":")[0].split("؟")[0] + (v ? " — «" + clip(v, 70) + "»" : "")); })));
+        if (r.id === "practical" && (r.st === "found" || r.st === "ask")) det.appendChild(h("ul", { class: "plain as-pract", "data-own": "1" }, PRACT.map(function (q, qi) {
+          var v = (r.parts || {})[q[0]], nm = q[1].split(":")[0].split("؟")[0];
+          if (v) return h("li", { class: "ok" }, "✓ " + nm + " — «" + clip(v, 70) + "»");
+          /* جزءِ مانده را خودت بنویس (بی‌مدل): ذخیره با change؛ قابِ کامل ⇒ کارتِ مرور با کد */
+          var id = "asPract_" + q[0];
+          return h("li", {}, h("label", { for: id }, "○ " + q[1]), h("input", { id: id, type: "text", class: "as-practin", placeholder: "به زبانِ خودت", onchange: function (e) { if (AS.sievePracticalSet(s, q[0], e.target.value) && AS.paint) AS.paint(); } }));
+        })));
       });
       box.appendChild(det);
     } catch (e) { }

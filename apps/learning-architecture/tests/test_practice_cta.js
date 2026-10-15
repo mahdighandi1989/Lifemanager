@@ -15,7 +15,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.go('e_prob'); await new Promise(r => setTimeout(r, 150)); out.ctaProb = !!document.querySelector('#main .practice-cta');
     APP.go('moves'); await new Promise(r => setTimeout(r, 150)); out.ctaMoves = !!document.querySelector('#main .practice-cta');
     document.querySelector('#main .practice-cta button').click(); await new Promise(r => setTimeout(r, 150));
-    out.on = APP.probs().length === 20 && APP.probs().every(p => p.neutral === true) && !document.querySelector('#main .practice-cta');
+    out.on = APP.probs().length === APP.practiceCount() && APP.practiceCount() >= 26 && APP.probs().every(p => p.neutral === true) && !document.querySelector('#main .practice-cta');
     const ps = APP.probSysText(); out.prompt = APP.MOVE_LIST.every(m => ps.indexOf(m.id) >= 0) && APP.MOVE_LIST.length >= 27;
     return out;
   });

@@ -42,6 +42,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(!(await p.locator('main .sv-ucmp').count()), 'incomplete understanding accepted');
     await p.fill('#svU1', 'مربعی هم‌مساحتِ دایره با خط‌کش و پرگار'); await p.fill('#svD1', 'یک دایره با شعاعِ معلوم'); await p.fill('#svC1', 'فقط خط‌کشِ بی‌درجه و پرگار\nشمارِ گام‌ها متناهی');
     await p.selectOption('#svSuff1', 'هنوز نمی‌دانم'); await p.fill('#svFig1', 'r = شعاع، s = ضلعِ مربع، s² = πr²'); await p.check('#svDrawn1');
+    /* R3 (۲۰۲۶-۱۰-۱۵): حدس در «نخستین برخورد» (این‌جا سطحِ ۱، پیش از دیدنِ هر گامی)، نه در سطحِ ۳ — بی حدس ثبت نمی‌شود */
+    await p.click('main .sv-usave'); await p.waitForTimeout(60);
+    chk(!(await p.locator('main .sv-ucmp').count()), 'first-attempt card saved without a guess');
+    await p.fill('#svGuess1', 'به نظرم ناممکن است'); await p.selectOption('#svConf1', '80'); await p.fill('#svTest1', 'حالتِ خاص: اگر π گویا بود ساختنی می‌شد؛ پس همه‌چیز به ماهیتِ π بسته است'); await p.selectOption('#svTestR1', 'حدس سالم ماند');
     await p.click('main .sv-usave'); await p.waitForTimeout(60);
     chk(await p.locator('main .sv-ucmp').count() === 1, 'no comparison with statement after save');
     chk(await p.locator('main .sv-u .sv-grade[data-own]').count() === 1, 'self-grade not owner-only');
@@ -50,6 +54,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const tmr = await p.evaluate(() => APP.addDays(APP.today(), 1));
     chk(s && s.u[1] && s.u[1].done && s.u[1].self === 2 && s.u[1].type === 'find' && /متناهی/.test(s.u[1].c) && s.u[1].drawn === true, 'u[1] not saved ' + JSON.stringify(s && s.u));
     chk(s.rev.u && s.rev.u.due === tmr && s.rev.u.iv === 0, 'understanding not scheduled for tomorrow ' + JSON.stringify(s.rev));
+    chk(s.g[1] && s.g[1].conf === 80 && /ناممکن/.test(s.g[1].guess) && /π/.test(s.g[1].test) && s.g[1].before === true && s.rev.g && s.rev.g.due === tmr, 'first-attempt guess not saved/scheduled ' + JSON.stringify(s.g));
     chk(!(await p.locator('main .sv-u').count()) && await p.locator('main .simcard .sv-usum').count() === 1, 'card not replaced by summary in step');
     // گامِ n1 گامِ «وارسی/داوری» بی‌برچسب است ⇒ پس از پاسخ برچسبِ «بازنگری»
     await p.evaluate(() => { const s = window.EPI_PROBLEMS.find(x => x.id === 'pb_greek').stages[0]; [...document.querySelectorAll('.simcard .dopt')].find(b => s.opts.find(o => o.t === b.textContent).ok).click(); });
@@ -85,16 +90,13 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ===== ت۱۰ + ت۸: سطحِ ۳ — حدس با اطمینان، آزمونِ حدس، وارسیِ گام‌به‌گامِ حرکتِ خودت ===== */
     await unlock(2); await open(3, 0);
     info.g = await p.evaluate(() => ['svGuess3', 'svConf3', 'svTest3', 'svTestR3'].map(id => !!document.getElementById(id)));
-    chk(info.g.every(Boolean), 'level 3 guess fields missing ' + JSON.stringify(info.g));
+    chk(!info.g.some(Boolean), 'level 3 asks for a «guess» after the way was seen twice ' + JSON.stringify(info.g));
     await ownCheck('main .sv-u', 'u-card lv3');
     chk(!(await p.isVisible('main .sv-u .sv-stmt')), 'level 3 understanding shows the statement (should be without looking)');
     await p.fill('#svU3', 'مربعِ هم‌مساحتِ دایره'); await p.fill('#svD3', 'دایرهٔ معلوم'); await p.fill('#svC3', 'فقط خط‌کش و پرگار'); await p.selectOption('#svSuff3', 'کافی است');
-    await p.click('main .sv-usave'); await p.waitForTimeout(40);
-    chk(!(await p.locator('main .sv-ucmp').count()), 'level 3 saved without a guess');
-    await p.fill('#svGuess3', 'به نظرم ناممکن است'); await p.selectOption('#svConf3', '80'); await p.fill('#svTest3', 'حالتِ خاص: اگر π گویا بود ساختنی می‌شد؛ پس همه‌چیز به ماهیتِ π بسته است'); await p.selectOption('#svTestR3', 'حدس سالم ماند');
     await p.click('main .sv-usave'); await p.waitForTimeout(40); await p.click('main .sv-u .sv-g1'); await p.waitForTimeout(80);
     s = await sv();
-    chk(s.g[3] && s.g[3].conf === 80 && /ناممکن/.test(s.g[3].guess) && /π/.test(s.g[3].test) && s.rev.g && s.rev.g.due === tmr, 'guess not saved/scheduled ' + JSON.stringify(s.g));
+    chk(s.u[3] && s.u[3].done && !s.g[3], 'level 3 understanding (no guess) not saved ' + JSON.stringify(s.u[3]));
     chk(await p.locator('main .simcard .sv-plan-step').count() === 1, 'type questions not next to «حرکتِ پیشنهادیِ تو»');
     await p.fill('.simcard #pbMine', 'اول هلال‌ها را مربع می‌کنم.\nپس دایره هم مربع می‌شود چون شبیهِ هلال است.');
     await p.click('main .simcard .sv-chkopen'); await p.waitForTimeout(60);
@@ -123,7 +125,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ===== ت۲: بازنگری پس از آخرین گام ===== */
     const nSt = await p.evaluate(pid => window.EPI_PROBLEMS.find(x => x.id === pid).stages.length, PID);
     await open(3, nSt);
-    info.lb = await p.evaluate(() => { const l = document.querySelector('main .sv-lb'), v = document.querySelector('main .verdict'); return { lb: !!l, before: !!(l && v && (l.compareDocumentPosition(v) & Node.DOCUMENT_POSITION_FOLLOWING)), hit: !!document.getElementById('svLbHit3'), chk: !!(l && l.querySelector('.sv-chk')) }; });
+    info.lb = await p.evaluate(() => { const l = document.querySelector('main .sv-lb'), v = document.querySelector('main .verdict'); return { lb: !!l, before: !!(l && v && (l.compareDocumentPosition(v) & Node.DOCUMENT_POSITION_FOLLOWING)), hit: !document.getElementById('svLbHit3'), chk: !!(l && l.querySelector('.sv-chk')) }; });
     chk(info.lb.lb && info.lb.before && info.lb.hit && info.lb.chk, 'looking-back card ' + JSON.stringify(info.lb));
     await ownCheck('main .sv-lb', 'looking-back'); await noPolya('looking back');
     await p.click('main .sv-lbsave'); await p.waitForTimeout(40);
@@ -133,10 +135,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#svLbOther3', 'از راهِ نظریهٔ گالوا هم می‌شود'); await p.fill('#svLbGlance3', 'ابزار فقط اعدادِ جبری می‌سازد و π جبری نیست');
     await p.fill('#svLbUse3', 'برای ناممکن‌بودن، نشان بده ابزار به مجموعه‌ای بسته است که جواب در آن نیست');
     await p.fill('#svLbNew3', 'آیا با خط‌کش و پرگار می‌شود زاویهٔ ۲۰ درجه ساخت؟');
-    await p.selectOption('#svLbHit3', 'درست بود');
     await p.click('main .sv-lbsave'); await p.waitForTimeout(100);
     s = await sv();
-    chk(s.b[3] && s.b[3].done && s.lessons.length === 1 && /بسته/.test(s.lessons[0].use) && s.rev.b && s.rev.b.due === tmr && s.g[3].hit === 'درست بود', 'looking-back not saved ' + JSON.stringify({ b: s.b, l: s.lessons }));
+    chk(s.b[3] && s.b[3].done && s.lessons.length === 1 && /بسته/.test(s.lessons[0].use) && s.rev.b && s.rev.b.due === tmr, 'looking-back not saved ' + JSON.stringify({ b: s.b, l: s.lessons }));
     info.card = await p.evaluate(() => APP.S.all('card', c => c.pb === 'pb_greek').map(c => ({ q: c.q, a: c.a, due: c.due })));
     chk(info.card.length === 1 && /۲۰ درجه/.test(info.card[0].a) && info.card[0].due === tmr, 'review card from the lesson ' + JSON.stringify(info.card));
     chk(!(await p.locator('main .sv-lb').count()) && await p.locator('main .verdict').count() === 1, 'looking-back still shown after save');
@@ -146,9 +147,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(/بذرهای حل‌کننده/.test(info.seed) && /۲۰ درجه/.test(info.seed), 'similar-problems request not seeded by the lesson');
     await p.evaluate(pid => APP.go('e_prob', pid, 'similar'), PID); await p.waitForTimeout(80);
     chk(await p.locator('main .pbs-seed').count() === 1, 'similar panel does not show the learner seed');
-    // کالیبراسیونِ حدس ⇒ «🧠 کارنامهٔ ذهن»
+    // حدسِ سطحِ ۱ در بازنگریِ سطحِ ۱ داوری می‌شود ⇒ کالیبراسیون در «🧠 کارنامهٔ ذهن»
+    await open(1, nSt);
+    chk(await p.locator('#svLbHit1').count() === 1, 'level-1 looking-back does not judge the first-attempt guess');
+    await p.check('#svLb_sp1'); await p.selectOption('#svLbRes1', 'نتیجه سالم ماند');
+    await p.fill('#svLbUse1', 'هر جا ابزار محدود است، مجموعهٔ بستهٔ ساختنی‌ها را بشناس'); await p.fill('#svLbNew1', 'با خط‌کش و پرگار ۷ضلعیِ منتظم ساختنی است؟');
+    await p.selectOption('#svLbHit1', 'درست بود'); await p.click('main .sv-lbsave'); await p.waitForTimeout(100);
+    s = await sv(); chk(s.g[1].hit === 'درست بود' && s.b[1] && s.b[1].done, 'first-attempt guess not judged in looking back ' + JSON.stringify(s.g));
     info.mind = await p.evaluate(() => { const m = APP.MIND.model(); const d = m.dims.find(x => x.id === 's_problem'); return { cal: d.cal.filter(c => c.p === 0.8 && c.ok === true).length, ev: m.events.filter(e => /بازنگریِ/.test(e.fa)).length }; });
-    chk(info.mind.cal === 1 && info.mind.ev === 1, 'guess calibration / looking-back event not in mind card ' + JSON.stringify(info.mind));
+    chk(info.mind.cal === 1 && info.mind.ev === 2, 'guess calibration / looking-back event not in mind card ' + JSON.stringify(info.mind));
     // «بعداً» ⇒ ناتمام ⇒ «امروز»
     await open(2, nSt);
     await p.click('main .sv-lblater'); await p.waitForTimeout(60);

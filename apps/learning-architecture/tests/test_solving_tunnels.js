@@ -202,7 +202,8 @@ const FILE = 'file://' + DIST;
     info.sims[id] = r;
   }
   const S6 = info.sims[6], S14 = info.sims[14], S17 = info.sims[17], S27 = info.sims[27];
-  chk(S6 && S6.right === 4 && S6.spots === 4 && S6.has.second, 'sim 6 (analogy: mapping, prediction, break point, heuristic not proof): ' + JSON.stringify(S6));
+  chk(S6 && S6.right === 5 && S6.spots === 4 && S6.has.second,   // ۲۰۲۶-۱۰-۱۵ (R3): گامِ ۶ ِ هم‌ریختیِ کامل/ناقص
+    'sim 6 (analogy: mapping, prediction, break point, heuristic not proof): ' + JSON.stringify(S6));
   chk(S14 && S14.right === 2 && S14.spots === 4 && S14.has.fidelity, 'sim 14 (reframing with the equivalence test): ' + JSON.stringify(S14));
   chk(S17 && S17.right === 4, 'sim 17 (special/limit case, boundary, more general easier problem): ' + JSON.stringify(S17));
   chk(S27 && S27.right === 3 && S27.has.pred, 'sim 27 (predict first, reductio, limit case): ' + JSON.stringify(S27));
