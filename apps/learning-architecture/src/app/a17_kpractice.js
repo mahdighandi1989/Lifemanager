@@ -850,10 +850,15 @@
   function numOf(v) { var s = lat(v).replace(/[\s,٬]/g, "").replace(/[−–]/g, "-").replace(/٫/g, "."); return /^-?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : null; }
   A.knumOf = numOf;
   /* فرمول بر حسبِ n (یا x): عدد، + − × ÷ ^، پرانتز، ضربِ ضمنی (۲n، n(n+1))؛ بی eval. خوانا نیست ⇒ null */
+  /* L4 (ممیزیِ ۲۰۲۶-۱۰-۱۵): فاصله میانِ دو عدد («2 3») یکی نمی‌شود؛ دو متغیرِ پیاپی («n n»، «nx») و متغیر پیش از عدد («n2») مبهم‌اند ⇒ null؛
+     n و x با هم در یک فرمول ⇒ null (یک متغیر)؛ ممیزِ فارسی «٫» پذیرفته است («۱٫۵n»). */
   function parseFormula(src) {
-    var s = lat(src).toLowerCase().replace(/[×·]/g, "*").replace(/÷/g, "/").replace(/[−–—]/g, "-").replace(/²/g, "^2").replace(/³/g, "^3").replace(/ⁿ/g, "^n").replace(/\s+/g, "");
+    var s0 = lat(src).toLowerCase().replace(/٫/g, ".").replace(/[×·]/g, "*").replace(/÷/g, "/").replace(/[−–—]/g, "-").replace(/²/g, "^2").replace(/³/g, "^3").replace(/ⁿ/g, "^n");
+    if (/[0-9.]\s+[0-9.]/.test(s0)) return null;
+    var s = s0.replace(/\s+/g, "");
     s = s.replace(/^(?:[a-z]_?n?\(n\)|[a-z]_n|[a-z]\(x\)|y)=/, "");
     if (!s || !/^[0-9n x.+\-*/^()]+$/.test(s)) return null;
+    if (/[nx][nx]|[nx][0-9.]/.test(s) || /n/.test(s) && /x/.test(s)) return null;
     var toks = [], m, re = /(\d+(?:\.\d+)?)|([nx])|([+\-*/^()])/g, pos = 0;
     while ((m = re.exec(s))) { if (m.index !== pos) return null; pos = re.lastIndex; toks.push(m[1] ? { t: "num", v: parseFloat(m[1]) } : m[2] ? { t: "var" } : { t: m[3] }); }
     if (pos !== s.length || !toks.length) return null;
@@ -876,14 +881,33 @@
   A.kformula = parseFormula;
   function close(a, b) { return isFinite(a) && isFinite(b) && Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
   /* کوچک‌ترین n ِ صحیح (از نخستین حالتِ جدول — یا ۱ — تا بیشینهٔ جدول + ۲۰) که دو فرمول در آن فرق دارند */
-  function separate(f, g, upto, from) { for (var n = from == null ? 1 : from; n <= upto; n++) { var a = f(n), b = g(n); if (isFinite(a) && isFinite(b) && !close(a, b)) return { n: n, a: a, b: b }; } return null; }
+  function separate(f, g, upto, from, skip) { for (var n = from == null ? 1 : from; n <= upto; n++) { if (skip && skip.some(function (x) { return close(x, n); })) continue; var a = f(n), b = g(n); if (isFinite(a) && isFinite(b) && !close(a, b)) return { n: n, a: a, b: b }; } return null; }
   A.kseparate = separate;
   function pn(x) { return String(x == null ? "" : x).replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, ""); }
   var WORTH_WHY = [["cheap", "آزمودنش ارزان‌تر و زودتر است"], ["bold", "اگر درست باشد بیشتر می‌گوید (جسورتر است) و آزمونش می‌تواند به‌روشنی ردش کند"], ["fits", "با حالت‌هایی که دیده‌ام بیشتر می‌خواند"], ["like", "بیشتر دوستش دارم / امیدوارم درست باشد"]];
   A.KWORTH_WHY = WORTH_WHY;
   /* وارسیِ کدیِ «ابزارهای حدس»: kit = { ana, anaGuess, rows:[{x,y}], formula, rivals:[{t,test}], worth, worthWhy } */
-  A.kguessCheck = function (kit) {
-    kit = kit || {}; var out = { table: null, formula: null, rivals: null, issues: [], notes: [] };
+  /* ctx (اختیاری): { problem: صورتِ مسئله یا عنوانِ ایده } — برای «قیاس همان خودِ مسئله نیست» */
+  function wordsOf(x) { var o = {}; String(x || "").replace(/[\u064B-\u0652ٔ]/g, "").replace(/\u200c/g, " ").toLowerCase().split(/[^a-z0-9\u0600-\u06ff]+/).forEach(function (w) { if (w.length >= 2) o[w] = 1; }); return Object.keys(o); }
+  function sameText(a, b) { var A1 = wordsOf(a), B1 = wordsOf(b); if (!A1.length || !B1.length) return false; var inB = A1.filter(function (w) { return B1.indexOf(w) >= 0; }).length; return inB / A1.length >= 0.8; }
+  A.kguessCheck = function (kit, ctx) {
+    kit = kit || {}; ctx = ctx || {}; var out = { table: null, formula: null, rivals: null, ana: null, issues: [], notes: [], refuted: false };
+    var T = function (x) { return String(x == null ? "" : x).trim(); };
+    /* M5: کیتِ خالی «وارسی شد» نیست */
+    var any = T(kit.ana) || T(kit.anaGuess) || T(kit.anaTest) || T(kit.dim) || T(kit.formula) || (kit.rows || []).some(function (r) { return r && T(r.y); }) || (kit.rivals || []).some(function (r) { return r && (T(r.t) || T(r.test)); });
+    if (!any) { out.empty = true; out.issues.push("هنوز چیزی ننوشته‌ای: دست‌کم یکی — قیاس، جدولِ حالت‌ها، فرمول یا حدس‌های رقیب."); out.ok = false; return out; }
+    /* M5: قیاس — کد فقط ساختار را می‌سنجد (نوشته شده، رونوشتِ خودِ مسئله نیست، چه منتقل می‌شود و آزمونش)، نه درستیِ قیاس را */
+    if (T(kit.ana) || T(kit.anaGuess) || T(kit.anaTest) || T(kit.dim)) {
+      var A0 = { ok: true, why: [] };
+      if (!T(kit.ana)) A0.why.push("مسئله یا نتیجهٔ آشنای مشابه را بنویس");
+      else if (ctx.problem && sameText(kit.ana, ctx.problem)) A0.why.push("قیاس همان خودِ مسئله است — مسئلهٔ دیگری بنویس (یک بُعد کمتر، شکلِ ساده‌تر، موردی که دیده‌ای)");
+      if (!T(kit.anaGuess)) A0.why.push("بگو از آن قیاس چه چیزی به این مسئله منتقل می‌شود (حدسِ قیاسی)");
+      else if (T(kit.ana) && sameText(kit.anaGuess, kit.ana) && sameText(kit.ana, kit.anaGuess)) A0.why.push("حدسِ قیاسی رونوشتِ خودِ قیاس است — بگو چه چیزی منتقل می‌شود");
+      if (kit.anaTest !== undefined && !T(kit.anaTest)) A0.why.push("آزمونی بنویس که انتقال را بسنجد (حالتِ خاصی که قیاس در آن می‌شکند یا می‌ماند)");
+      else if (T(kit.anaTest) && T(kit.anaGuess) && sameText(kit.anaTest, kit.anaGuess) && sameText(kit.anaGuess, kit.anaTest)) A0.why.push("آزمونِ قیاس همان حدس است — حالتی بنویس که بتواند ردش کند");
+      A0.ok = !A0.why.length; out.ana = A0;
+      A0.why.forEach(function (x) { out.issues.push("قیاس: " + x + "."); });
+    }
     /* حالتی «نوشته شده» است که نتیجه (y) دارد؛ x ِ پیش‌فرض بی y شمرده نمی‌شود */
     var rows = (kit.rows || []).map(function (r) { return { x: numOf(r && r.x), y: numOf(r && r.y), raw: r }; }).filter(function (r) { return r.raw && String(r.raw.y || "").trim(); });
     var numRows = rows.filter(function (r) { return r.y != null; });
@@ -904,6 +928,7 @@
       else {
         var mism = numRows.map(function (r, i) { var x = r.x != null ? r.x : i + 1, v = f(x); return close(v, r.y) ? null : { x: x, y: r.y, fx: v }; }).filter(Boolean);
         out.formula = { ok: true, fits: !mism.length, mism: mism, tested: numRows.length };
+        if (mism.length) out.refuted = true;   // M5: حدسِ ردشده «وارسی شد» نیست
         if (out.table && out.table.nextX != null) out.formula.next = f(out.table.nextX);
       }
     }
@@ -917,9 +942,14 @@
       if (noTest.length) out.issues.push("برای هر حدسِ رقیب آزمونی بنویس که می‌تواند ردش کند.");
       var fs = rv.map(function (x) { return parseFormula(x.t); });
       if (fs.length >= 2 && fs[0] && fs[1]) {
-        var hasX = out.table && out.table.xs.length, upto = (hasX ? Math.max.apply(null, out.table.xs) : 0) + 20, sep = separate(fs[0], fs[1], upto, hasX ? Math.min.apply(null, out.table.xs) : 1);
-        R.sep = sep; if (!sep) out.notes.push("دو فرمولِ رقیب در همهٔ حالت‌های آزموده برابرند — شاید یکی‌اند؛ ساده‌شان کن.");
+        var hasX = out.table && out.table.xs.length, tx = hasX ? out.table.xs : [], upto = (hasX ? Math.max.apply(null, tx) : 0) + 20, from = hasX ? Math.min.apply(null, tx) : 1;
         if (numRows.length) R.fit = fs.map(function (g) { return g ? numRows.every(function (r, i) { return close(g(r.x != null ? r.x : i + 1), r.y); }) : null; });
+        /* L4: دو فرمولِ همیشه‌برابر (n+n و 2n) رقیب نیستند */
+        if (!separate(fs[0], fs[1], Math.max(upto, 40), Math.min(from, 0))) { R.same = true; out.issues.push("دو فرمولِ رقیب یکی‌اند (در هر n برابرند) — رقیب باید چیزِ دیگری بگوید."); }
+        /* M6: حالتِ جداکننده از میانِ nهای آزموده‌نشده (نه nی که در جدول است)؛ اگر جدول خودش داوری کرده، همین گفته می‌شود */
+        else if (R.fit && R.fit[0] === false && R.fit[1] === false) { R.decided = "both"; out.refuted = true; out.notes.push("جدول هر دو حدسِ رقیب را رد کرده است — آزمونِ تازه لازم نیست؛ حدسِ تازه‌ای بساز."); }
+        else if (R.fit && R.fit[0] !== R.fit[1] && R.fit[0] != null && R.fit[1] != null) { R.decided = R.fit[0] ? "2" : "1"; out.notes.push("جدول همین حالا میانِ دو حدس داوری کرده: حدسِ " + (R.fit[0] ? "۲" : "۱") + " رد شد."); }
+        else { R.sep = separate(fs[0], fs[1], upto, from, tx); if (!R.sep) out.notes.push("دو فرمولِ رقیب در همهٔ حالت‌های آزموده‌نشده تا n = " + upto + " برابرند — شاید یکی‌اند؛ ساده‌شان کن."); }
       }
       if (kit.worth !== "" && kit.worth != null) {
         R.worth = +kit.worth; var why = kit.worthWhy || "";
@@ -928,7 +958,7 @@
       }
       out.rivals = R;
     }
-    out.ok = !out.issues.length;
+    out.ok = !out.issues.length && !out.refuted;
     return out;
   };
 

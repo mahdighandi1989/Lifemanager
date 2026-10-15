@@ -73,6 +73,7 @@
     /* نماهای صفحه — همه از A.V (نامشان از منو/VIEW_FA)؛ ارجاعِ «view:…» به این‌ها */
     var navLab = {}; (A.NAV || []).concat(A.EPI_NAV || [], [A.NAV_WHOLE, A.NAV_MAPS, A.NAV_SETTINGS, A.NAV_START]).forEach(function (n) { if (Array.isArray(n) && n[0] && !navLab[n[0]]) navLab[n[0]] = n[1]; });
     Object.keys(A.V || {}).forEach(function (v) { node("view", v, "نما: " + ((A.VIEW_FA && A.VIEW_FA[v]) || navLab[v] || v), { go: [v] }); });
+    var covLater = [];   /* یال‌های «پوشش» پس از ساختِ همهٔ گره‌ها (حوزهٔ قلمرو/مسئله دیرتر ساخته می‌شوند) */
     (W.SRC_COV || []).forEach(function (src) {
       node("src", src.id, "📚 " + src.title, { go: ["sources", src.id] });
       var V = (src.coverage || {}).verdicts || {};
@@ -80,9 +81,14 @@
         var v = V[it.id] || {}, k = src.id + "/" + it.id;
         node("srcitem", k, (v.verdict ? "[" + v.verdict + "] " : "") + String(it.name_fa || it.id).slice(0, 60), { go: ["sources", src.id] });
         edge(ref("srcitem", k), ref("src", src.id), "in");
-        /* فقط به گره‌های موجودِ گراف وصل می‌شود؛ شناسه‌های بی‌گره (گامِ گره‌گشا، کاوش، …) در خودِ نما می‌آیند */
-        (v.system || []).forEach(function (sid) { var p = String(sid).split(":"), t2 = p[0], id2 = p.slice(1).join(":"); if (t2 === "tech") id2 = String(parseInt(id2, 10));
-          if ({ tech: 1, move: 1, kfam: 1, station: 1, proto: 1 }[t2] && N[ref(t2, id2)]) edge(ref("srcitem", k), ref(t2, id2), "covers"); });
+        /* هر شناسهٔ تونل ⇒ گرهِ جایی که مورد در آن زندگی می‌کند (A.SOURCES.nodeOf، همان خوانندهٔ پیوندهای نما — ممیزیِ M1 ۲۰۲۶-۱۰-۱۵):
+           تکنیک/حرکت/خانوادهٔ گره/ایستگاه/پروتکل/حوزهٔ قلمرو اگر هست، وگرنه نمای صفحه‌ای که آن قابلیت در آن رندر می‌شود (prob:* ⇒ view:e_prob،
+           kstep:* ⇒ view:kcases، …). فقط به گره‌های موجود؛ هر یال یک بار. */
+        var seenCov = {};
+        (v.system || []).forEach(function (sid) {
+          var nk = A.SOURCES && A.SOURCES.nodeOf ? A.SOURCES.nodeOf(sid) : null;
+          if (!nk) { var p = String(sid).split(":"), t2 = p[0], id2 = p.slice(1).join(":"); if (t2 === "tech") id2 = String(parseInt(id2, 10)); if ({ tech: 1, move: 1, kfam: 1, station: 1, proto: 1 }[t2]) nk = ref(t2, id2); }
+          if (nk && !seenCov[nk]) { seenCov[nk] = 1; covLater.push([ref("srcitem", k), nk]); } });
       });
     });
     if (A.PSY) A.PSY.CONSTRUCTS.forEach(function (c) { node("psyc", c.id, "📐 " + c.fa, { go: ["mind"] }); edge(ref("psyc", c.id), ref("view", "mind"), "in"); });
@@ -194,6 +200,7 @@
       (s.tech || []).forEach(function (t) { edge(ref("prob", p.id), ref("tech", t), "uses"); });
       var mv = []; try { mv = A.stageMoves ? A.stageMoves(p, s) : (s.mv || []); } catch (e) { mv = s.mv || []; }
       (mv || []).forEach(function (m) { edge(ref("prob", p.id), ref("move", m), "tag"); }); }); });
+    covLater.forEach(function (x) { if (N[x[1]]) edge(x[0], x[1], "covers"); });
     /* یالِ تکراری یکی شود (همان دو سر و همان نوع) */
     var seen = {}, E2 = []; E.forEach(function (e) { var key = e.a + "|" + e.b + "|" + e.rel; if (!seen[key]) { seen[key] = 1; E2.push(e); } });
     var adj = {}; E2.forEach(function (e, i) { (adj[e.a] = adj[e.a] || []).push(i); (adj[e.b] = adj[e.b] || []).push(i); });

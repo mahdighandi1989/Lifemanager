@@ -807,8 +807,13 @@
   A.KPRAC_KEYS = PRAC_KEYS;
   function pnorm(x) { return String(x == null ? "" : x).replace(/[\s\u200c«»"'.,،:؛!?؟()\-]+/g, ""); }
   var REL = /[=<>≤≥≠]|بیش(?:تر)? ?از|کم(?:تر)? ?از|دست ?\u200c?کم|حد ?\u200c?اقل|حد ?\u200c?اکثر|برابر|نه بیش|نه کم|تا سقفِ?|کمینه|بیشینه/;
+  /* ممیزیِ ۲۰۲۶-۱۰-۱۵: «دست کم یک بار در روز» سنجیدنی است (عدد به واژه + شمارش)، «سال ۱۳۹۸ برابر بود» نیست (سال یا تاریخ کمیت نیست) —
+     عدد = رقم یا واژهٔ عدد (یک، دو، نیم، …) که سال/تاریخ نباشد. */
+  var NUMWORD = /(?:^|[^ء-يپچژکگی])(?:یک|یه|دو|سه|چهار|پنج|شش|هفت|هشت|ده|بیست|سی|چهل|پنجاه|صد|هزار|میلیون|نیم|نصف|ربع)(?![ء-يپچژکگی])/;
   A.measurableCheck = function (t) {
-    var x = String(t == null ? "" : t), num = /[0-9۰-۹٠-٩]/.test(x), rel = REL.test(x);
+    var x0 = String(t == null ? "" : t).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 0x660; }).replace(/‌/g, " ");
+    var x = x0.replace(/(?:سال|year)\s*\d{2,4}/gi, " ").replace(/\d{2,4}\s*[\/\-.]\s*\d{1,2}\s*[\/\-.]\s*\d{1,4}/g, " ");
+    var num = /[0-9]/.test(x) || NUMWORD.test(x), rel = REL.test(x);
     var why = []; if (!num) why.push("عدد یا مقدار (با واحد) ندارد"); if (!rel) why.push("رابطه‌ای (مثلاً ≥ ، ≤ ، = یا «دست‌کم/بیشتر از») ندارد");
     return { ok: num && rel, num: num, rel: rel, why: why };
   };
