@@ -49,7 +49,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     __seedMind();
     const m = APP.MIND.model();
     APP.go('mind'); await new Promise(r => setTimeout(r, 300));
-    const svgs = document.querySelectorAll('#main .mind-svg').length, rows = document.querySelectorAll('#main .mind-table tbody tr').length;
+    const svgs = document.querySelectorAll('#main .mind-svg').length, rows = document.querySelectorAll('#main .mind-table:not(.psy-table) tbody tr').length;
     const png = await APP.MIND.png(APP.MIND.radar(m));
     const epi = m.dims.find(d => d.id === 's_epi');
     return { emptyOk, svgs, rows, png: /^data:image\/png;base64,/.test(png) && png.length > 2000, dims: m.dims.length,
@@ -181,7 +181,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.scores = APP.REPORT.scores({ kind: 'knot', status: 'now', refs: [{ id: 'kc_sc', type: 'kcase' }] }).join('|');
     // دستیار عددهای کارنامه را می‌بیند (فقط در همان نما)
     APP.go('mind'); await new Promise(r => setTimeout(r, 150)); out.mindHook = (AS.promptHooks || []).map(f => { try { return f(s, '') || ''; } catch (e) { return ''; } }).join('\n');
-    out.mindHook = /# کارنامهٔ ذهن[\s\S]*کالیبراسیون/.test(out.mindHook);
+    out.mindHook = /# کارنامهٔ ذهن[\s\S]*سازه‌های استاندارد[\s\S]*پاسخِ بعدی/.test(out.mindHook);
     // حوزهٔ ناموجود صریح گفته می‌شود؛ بازگشتِ گره در تور و ایمیل دیده می‌شود (کارزارِ آزمون sc17)
     out.badArea = /در قلمروها نیست/.test(AS.DO.tour_plan({ facets: [{ key: 'fz', kind: 'area', area: 'md_nope', title: 'x' }] }));
     APP.S.put({ id: 'kn_rt', type: 'knot', name: 'تلفن', status: 'practised', solvedAt: '2026-09-01T08:00:00Z', fam: 'F7' }); APP.S.put({ id: 'kc_rt', type: 'kcase', title: 'ت', knots: ['kn_rt'] });

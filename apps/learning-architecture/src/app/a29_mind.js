@@ -111,6 +111,13 @@
       // روند = نخستین ماهِ سنجیده تا آخرین ماهِ سنجیده، با بازه‌اش (کارزارِ سوم v05: فقط دو ماهِ آخر ⇒ ۴۰→۱۰۰ «▲۰» نشان می‌داد)
       X.trend = lm.length >= 2 ? lm[lm.length - 1].acc - lm[0].acc : null;
       X.trendFrom = lm.length >= 2 ? lm[0].m : null; X.trendTo = lm.length >= 2 ? lm[lm.length - 1].m : null;
+      /* برآوردِ بی‌آستانه (مالک ۲۰۲۶-۱۰-۱۵: «بدونِ اعدادِ قراردادی»): هر عدد یک احتمال از A3+A4 — ر.ک. a34_psy.js. «نمره» و «مرحله» ِ بالا
+         (میانگینِ چهار شاخص و برش‌های ۴۰/۶۵/۸۵) قراردادی بودند: فقط برای سازگاریِ پیشین حساب می‌شوند و نمایش داده نمی‌شوند (REMOVAL_CANDIDATES). */
+      if (A.PSY) {
+        X.est = A.PSY.selfEst(X.ans, false);
+        var calE = A.PSY.selfEst(X.cal.map(function (c) { return { at: c.at, ok: c.ok, conf: c.p }; }), true);
+        X.est.pOver = calE.pOver; X.est.meanConf = calE.meanConf; X.est.calN = calE.calN || 0;
+      }
     });
     /* نقطه‌های سیاه */
     var black = [], today = A.today();
@@ -119,8 +126,9 @@
       else if ((k.status || "open") !== "practised" && k.created && A.daysBetween(day(k.created), today) > 30) black.push({ k: "stale", fa: "بیش از ۳۰ روز باز: «" + (k.name || "گره") + "»", go: ["kpractice", k.id], dim: kdim[k.id] });
     });
     dims.forEach(function (dd) {
-      var X = D[dd.id], hi = X.cal.filter(function (c) { return c.p >= 0.8; });
-      if (hi.length >= MIN_N) { var acc = hi.filter(function (c) { return c.ok; }).length / hi.length; if (acc < 0.65) black.push({ k: "overconf", fa: "بیش‌اطمینانی در «" + dd.fa + "»: اطمینانِ ≥ ۸۰٪ ولی فقط " + fa(Math.round(100 * acc)) + "٪ درست (" + fa(hi.length) + " پاسخ)", dim: dd.id }); }
+      // بیش‌اطمینانی: وقتی احتمالِ «درستیِ واقعی کمتر از میانگینِ اطمینانِ اعلام‌شده» از ½ بیشتر است (مرزِ ½ از A4، نه برشِ قراردادیِ ۸۰/۶۵)
+      var X = D[dd.id], E = X.est || {};
+      if (E.pOver != null && E.pOver > 0.5) black.push({ k: "overconf", fa: "بیش‌اطمینانی در «" + dd.fa + "»: میانگینِ اطمینانت " + fa(Math.round(100 * E.meanConf)) + "٪ بوده و احتمالِ اینکه درستیِ واقعی‌ات کمتر از آن باشد " + fa(Math.round(100 * E.pOver)) + "٪ است (" + fa(E.calN) + " پاسخ)", dim: dd.id });
     });
     /* مسیرهای پیشِ رو و «از کجا دوری» (از قلمروِ سامانه‌ها) */
     var far = [], ahead = [];
@@ -145,25 +153,28 @@
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,
     /* «مسئله‌ها»: مسئلهٔ خودِ کاربر در گره‌گشا و نقشهٔ پیش‌نیاز هم مسئله است (کارزارِ آزمونِ دوم c16/c17: «مسئله‌ها ۰») */
       cases: cases.length, probs: S.all("eprob", function (p) { return !p.sample; }).length + S.all("prereq").length + S.all("kcase", function (c) { return !c.sample && c.intake && (c.intake.kinds || []).indexOf("problem") >= 0; }).length, tours: S.all("achat", function (s) { return s.tour; }).length, answers: dims.reduce(function (t, d) { return t + D[d.id].ans.length; }, 0) };
-    return { at: new Date().toISOString(), dims: dims.map(function (d) { return D[d.id]; }), black: black, far: far, ahead: ahead, due: due, events: ev.slice(0, 60), tot: tot };
+    return { at: new Date().toISOString(), psy: A.PSY ? A.PSY.model() : [], dims: dims.map(function (d) { return D[d.id]; }), black: black, far: far, ahead: ahead, due: due, events: ev.slice(0, 60), tot: tot };
   };
 
   /* ---------- نمودارها (SVG) ---------- */
   function el(n, at, kids) { var e = document.createElementNS(NS, n); Object.keys(at || {}).forEach(function (k) { if (at[k] != null) e.setAttribute(k, at[k]); }); (kids || []).forEach(function (c) { if (c) e.appendChild(c); }); return e; }
   function txt(x, y, s, at) { var t = el("text", Object.assign({ x: x, y: y, "font-size": 11, fill: "#334", "text-anchor": "middle", direction: "rtl", "font-family": "Vazirmatn, Tahoma, sans-serif" }, at || {})); t.textContent = s; return t; }
   function svgBox(w, hh, title) { var s = el("svg", { xmlns: NS, viewBox: "0 0 " + w + " " + hh, width: w, height: hh, role: "img", "aria-label": title, class: "mind-svg" }); s.appendChild(el("rect", { x: 0, y: 0, width: w, height: hh, fill: "#fff" })); return s; }
+  /* نیم‌رخ: احتمالِ درستیِ پاسخِ بعدی در هر سازهٔ استاندارد (a34_psy) — خاکستری = هنوز پاسخی نیست؛ سازهٔ «سنجیده‌نشدنی» روی نمودار نمی‌آید */
   M.radar = function (m) {
-    var W = 420, H = 380, cx = 210, cy = 195, R = 130, ds = m.dims, n = ds.length, s = svgBox(W, H, "نیم‌رخِ هفت بُعد");
-    s.appendChild(txt(cx, 22, "نیم‌رخِ ذهن (۰ تا ۱۰۰؛ خاکستری = دادهٔ کم)", { "font-size": 13, "font-weight": 700 }));
-    [25, 50, 75, 100].forEach(function (v) { var pts = []; for (var i = 0; i < n; i++) { var a = -Math.PI / 2 + 2 * Math.PI * i / n; pts.push((cx + R * v / 100 * Math.cos(a)).toFixed(1) + "," + (cy + R * v / 100 * Math.sin(a)).toFixed(1)); } s.appendChild(el("polygon", { points: pts.join(" "), fill: "none", stroke: "#dde" })); });
+    var cs = (m.psy || []).filter(function (c) { return !c.none; });
+    var W = 420, H = 380, cx = 210, cy = 195, R = 130, n = Math.max(3, cs.length), s = svgBox(W, H, "نیم‌رخِ سازه‌ها");
+    s.appendChild(txt(cx, 22, "احتمالِ درستیِ پاسخِ بعدی در هر سازه (خاکستری = هنوز پاسخی نیست)", { "font-size": 12, "font-weight": 700 }));
+    [25, 50, 75, 100].forEach(function (v) { var pts = []; for (var i = 0; i < n; i++) { var a = -Math.PI / 2 + 2 * Math.PI * i / n; pts.push((cx + R * v / 100 * Math.cos(a)).toFixed(1) + "," + (cy + R * v / 100 * Math.sin(a)).toFixed(1)); } s.appendChild(el("polygon", { points: pts.join(" "), fill: "none", stroke: v === 50 ? "#94a3b8" : "#e2e8f0", "stroke-dasharray": v === 50 ? "4 3" : null })); });
     var pts = [];
-    ds.forEach(function (d, i) {
-      var a = -Math.PI / 2 + 2 * Math.PI * i / n, x = cx + (R + 28) * Math.cos(a), y = cy + (R + 28) * Math.sin(a);
+    cs.forEach(function (c, i) {
+      var a = -Math.PI / 2 + 2 * Math.PI * i / n, x = cx + (R + 30) * Math.cos(a), y = cy + (R + 30) * Math.sin(a), e = c.self || { n: 0 };
       s.appendChild(el("line", { x1: cx, y1: cy, x2: cx + R * Math.cos(a), y2: cy + R * Math.sin(a), stroke: "#dde" }));
-      s.appendChild(txt(x, y, d.fa.split(/[،,]| و /)[0] + (d.score == null ? " (—)" : " (" + fa(d.score) + ")"), { fill: d.score == null ? "#999" : "#223" }));
-      var v = d.score == null ? 0 : d.score; pts.push((cx + R * v / 100 * Math.cos(a)).toFixed(1) + "," + (cy + R * v / 100 * Math.sin(a)).toFixed(1));
+      s.appendChild(txt(x, y, c.fa.split(/[،,:(]/)[0].trim() + (e.n ? " (" + fa(Math.round(100 * e.next)) + ")" : " (—)"), { fill: e.n ? "#223" : "#999", "font-size": 10 }));
+      var v = e.n ? e.next : 0.5; pts.push((cx + R * v * Math.cos(a)).toFixed(1) + "," + (cy + R * v * Math.sin(a)).toFixed(1));
     });
-    s.appendChild(el("polygon", { points: pts.join(" "), fill: "rgba(15,118,110,.25)", stroke: "#0f766e", "stroke-width": 2 }));
+    if (cs.length) s.appendChild(el("polygon", { points: pts.join(" "), fill: "rgba(15,118,110,.25)", stroke: "#0f766e", "stroke-width": 2 }));
+    s.appendChild(txt(cx, H - 8, "خطِ‌چینِ میانی = ½ (بی‌داده، هیچ طرف مرجح نیست)", { "font-size": 9, fill: "#666" }));
     return s;
   };
   /* تازه‌ترین‌ها بر پایهٔ تاریخ، نه ترتیبِ ذخیره (کارزارِ سوم v05: پس از رکوردهای عقب‌برده، رکوردهای واقعیِ تازه از نقشه افتادند) */
@@ -278,7 +289,8 @@
   A.V.mind = function () {
     var m = M.model(), root = h("div", { class: "page mind", dir: "rtl" });
     root.appendChild(A.head("نقشه‌ها", "🧠 کارنامهٔ ذهن", "یک نگاه به هفت بُعدِ ذهنت از روی دادهٔ خودت — دقت، کالیبراسیون، ماندگاری و بازشدنِ گره‌ها — با نقطه‌های سیاه، روند، شبکه و مسیرهای پیشِ رو. هر عدد اندازهٔ نمونه‌اش را دارد؛ زیرِ " + fa(MIN_N) + " نمونه عدد داده نمی‌شود."));
-    root.appendChild(h("p", { class: "card soft small" }, "این «ضریبِ هوشی» نیست و تو را با «مردم» مقایسه نمی‌کند — با این داده‌ها هیچ‌کدام معتبر نیست (چرا: ", h("button", { class: "linkish", type: "button", onclick: function () { if (A.HOST && A.HOST.openDoc) A.HOST.openDoc("HANDBOOK"); } }, "دفترچه، §۱۰"), "). مقایسه با گذشتهٔ خودِ توست."));
+    root.appendChild(h("p", { class: "card soft small" }, "هر عددِ این کارنامه یک احتمال است که از دادهٔ خودت و اصل‌های عقلی درمی‌آید — بی‌برش و بی‌میانگینِ قراردادی. مقایسه با مردم فقط در «📐 سنجشِ استاندارد» و فقط با معماهایی که دشواری‌شان در نمونهٔ بزرگی از مردم از منبعِ معتبر سنجیده شده (چرا و چطور: ", h("button", { class: "linkish", type: "button", onclick: function () { if (A.HOST && A.HOST.openDoc) A.HOST.openDoc("HANDBOOK"); } }, "دفترچه، §۱۰"), ")."));
+    if (A.PSY && A.PSY.section) root.appendChild(A.PSY.section());
     var t = m.tot;
     root.appendChild(h("div", { class: "bt-stats" }, [["گره‌ها", t.knots], ["ورزیده", t.practised], ["بازگشته", t.returned], ["پرونده‌های سنجش", t.cases], ["مسئله‌ها", t.probs], ["تورها", t.tours], ["پاسخ‌های دقیق", t.answers]].map(function (x) {
       return h("div", { class: "card soft bt-stat" }, h("div", { class: "small muted" }, x[0]), h("div", { class: "bt-num" }, fa(x[1])));
@@ -292,12 +304,15 @@
     var C = M.charts(m);
     root.appendChild(h("section", { class: "card mind-glance" }, h("h2", {}, "در یک نگاه"), h("div", { class: "row gap wrap" }, C.radar, C.calib)));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "کارنامهٔ هر بُعد"), h("table", { class: "mind-table small" },
-      h("thead", {}, h("tr", {}, ["بُعد", "دقت", "کالیبراسیون", "ماندگاری", "بازشدنِ گره‌ها", "نمره", "مرحله", "روند"].map(function (x) { return h("th", {}, x); }))),
+      h("thead", {}, h("tr", {}, ["حوزهٔ زندگی", "احتمالِ درستیِ پاسخِ بعدی", "پاسخ‌ها (درست از کل)", "احتمالِ بیش‌اطمینانی", "ماندگاری (درست از کل)", "گره‌های ورزیده", "احتمالِ پیشرفت"].map(function (x) { return h("th", {}, x); }))),
       h("tbody", {}, m.dims.map(function (d) {
+        var E = d.est || { n: 0 };
         function cell(v, n) { return h("td", { title: "نمونه: " + fa(n) }, v == null ? "— (" + fa(n) + ")" : fa(v) + " (" + fa(n) + ")"); }
         /* بُعدِ «داوریِ معرفتی» ⇒ پرونده‌های کارخانه (همان‌جا که این عددها از آن می‌آیند) */
-        return h("tr", { "data-dim": d.id }, h("td", {}, d.id === "s_epi" ? h("button", { class: "linkish mind-dim-epi", type: "button", title: "پرونده‌های سنجش در کارخانهٔ معرفت‌شناسی", onclick: function () { A.go("e_cases"); } }, d.fa + " ↗") : d.fa), cell(d.ix.acc, d.n.acc), cell(d.ix.cal, d.n.cal), cell(d.ix.ret, d.n.ret), cell(d.ix.knot, d.n.knot),
-          h("td", {}, d.score == null ? "—" : fa(d.score)), h("td", {}, d.band), h("td", { title: d.trendFrom ? "از " + d.trendFrom + " تا " + d.trendTo : "" }, d.trend == null ? "— (کمتر از دو ماهِ سنجیده)" : (d.trend > 0 ? "▲ " : d.trend < 0 ? "▼ " : "▬ ") + fa(Math.abs(d.trend)) + (d.trendFrom ? " (" + fa(d.trendFrom) + " ← " + fa(d.trendTo) + ")" : "")));
+        return h("tr", { "data-dim": d.id }, h("td", {}, d.id === "s_epi" ? h("button", { class: "linkish mind-dim-epi", type: "button", title: "پرونده‌های سنجش در کارخانهٔ معرفت‌شناسی", onclick: function () { A.go("e_cases"); } }, d.fa + " ↗") : d.fa), h("td", {}, E.n ? A.PSY.pctFa(E.next) + " (" + fa(E.n) + ")" : "— (هنوز پاسخی نیست)"), h("td", {}, fa(E.k || 0) + " از " + fa(E.n || 0)),
+          h("td", { title: E.calN ? "میانگینِ اطمینان " + fa(Math.round(100 * E.meanConf)) + "٪" : "" }, E.calN ? A.PSY.pctFa(E.pOver) + " (" + fa(E.calN) + ")" : "— (اطمینانی ثبت نشده)"),
+          h("td", {}, fa(d.ret.ok) + " از " + fa(d.ret.n)), h("td", {}, fa(d.knots.practised || 0) + " از " + fa(d.knots.all)),
+          h("td", {}, E.progress ? A.PSY.pctFa(E.progress.p) + " (" + fa(E.progress.from) + " ← " + fa(E.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"));
       })))));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
@@ -332,11 +347,17 @@
   A.ASSIST.promptHooks = A.ASSIST.promptHooks || [];
   A.ASSIST.promptHooks.push(function () {
     if (!A.state || A.state.view !== "mind") return "";
-    var M = A.MIND.model(), L = ["# کارنامهٔ ذهن (همین عددهایی که کاربر می‌بیند؛ عدد = درصد، داخلِ پرانتز = اندازهٔ نمونه؛ زیرِ ۵ نمونه عدد نیست)"];
-    M.dims.forEach(function (d) {
-      var ix = d.ix || {}, n = d.n || {};
-      L.push("- " + (d.fa || d.id) + ": نمره " + (d.score == null ? "—" : d.score) + " · " + d.band + " · دقت " + (ix.acc == null ? "—" : ix.acc) + " (" + (n.acc || 0) + ")" + " · کالیبراسیون " + (ix.cal == null ? "—" : ix.cal) + " (" + (n.cal || 0) + ")" +
-        " · ماندگاری " + (ix.ret == null ? "—" : ix.ret) + " (" + (n.ret || 0) + ")" + " · بازشدنِ گره " + (ix.knot == null ? "—" : ix.knot) + " (" + (n.knot || 0) + ")" + (d.trend == null ? "" : " · روندِ ماهانه " + d.trend));
+    var M = A.MIND.model(), pc = function (p) { return Math.round(100 * p) + "%"; }, L = ["# کارنامهٔ ذهن (همین که کاربر می‌بیند؛ هر عدد یک احتمال از A3+A4، بی‌برشِ قراردادی؛ «ضریبِ هوشیِ کل» ساخته نمی‌شود)"];
+    L.push("## سازه‌های استاندارد (CHC و عقلانیت)");
+    (M.psy || []).forEach(function (c) {
+      if (c.none) { L.push("- " + c.fa + ": سنجیده نمی‌شود — " + c.none); return; }
+      var e = c.self, p = c.pop || { n: 0 };
+      L.push("- " + c.fa + ": پاسخِ بعدی " + (e.n ? pc(e.next) + " (" + e.k + "/" + e.n + ")" : "—") + (e.progress ? " · احتمالِ پیشرفت " + pc(e.progress.p) + " (" + e.progress.from + "→" + e.progress.to + ")" : "") +
+        (c.id === "META" && e.calN ? " · احتمالِ بیش‌اطمینانی " + pc(e.pOver) : "") + (p.n ? " · بالاتر از میانهٔ " + p.peers + ": " + pc(p.pAbove) : " · مقایسه با مردم: هنوز معمای لنگرداری جواب داده نشده"));
+    });
+    L.push("## حوزه‌های زندگی");
+    M.dims.forEach(function (d) { var E = d.est || { n: 0 };
+      L.push("- " + (d.fa || d.id) + ": پاسخِ بعدی " + (E.n ? pc(E.next) + " (" + E.k + "/" + E.n + ")" : "—") + (E.calN ? " · احتمالِ بیش‌اطمینانی " + pc(E.pOver) : "") + " · ماندگاری " + d.ret.ok + "/" + d.ret.n + " · گره‌های ورزیده " + (d.knots.practised || 0) + "/" + d.knots.all + (E.progress ? " · احتمالِ پیشرفت " + pc(E.progress.p) : ""));
     });
     if ((M.black || []).length) L.push("نقطه‌های سیاه: " + M.black.slice(0, 6).map(function (b) { return b.fa || b.t || ""; }).join(" · "));
     return L.join("\n");

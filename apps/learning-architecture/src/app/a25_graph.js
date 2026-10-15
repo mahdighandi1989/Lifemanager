@@ -30,7 +30,9 @@
     { t: "prereq", fa: "نقشهٔ پیش‌نیازها", sys: "mine" }, { t: "tour", fa: "تورِ دستیار", sys: "mine" }, { t: "tfacet", fa: "وجهِ تور", sys: "mine" },
     { t: "wchain", fa: "زنجیرهٔ نگرانی", sys: "mine" }, { t: "fcast", fa: "پیش‌بینیِ تو", sys: "mine" }, { t: "value", fa: "ارزشِ تو", sys: "mine" },
     { t: "meaning", fa: "وارسیِ معنا", sys: "mine" }, { t: "kexp", fa: "آزمایشِ گره", sys: "mine" }, { t: "deadline", fa: "موعدِ تو", sys: "mine" }, { t: "ex", fa: "تمرینِ تکنیک", sys: "mine" },
-    { t: "prun", fa: "اجرای پروتکل", sys: "mine" }, { t: "card", fa: "کارتِ مرور", sys: "mine" }, { t: "pbitem", fa: "تمرینِ مسئلهٔ هم‌ساختار", sys: "mine" }
+    { t: "prun", fa: "اجرای پروتکل", sys: "mine" }, { t: "card", fa: "کارتِ مرور", sys: "mine" }, { t: "pbitem", fa: "تمرینِ مسئلهٔ هم‌ساختار", sys: "mine" },
+    /* «📐 سنجشِ استاندارد» (a34_psy): سازه‌های جهانی (ثبت‌گاه) و پاسخ‌های تو به معماهای لنگردار */
+    { t: "psyc", fa: "سازهٔ روان‌سنجی", sys: "learn" }, { t: "psyans", fa: "پاسخِ معمای لنگردار", sys: "mine" }
   ];
   G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
   G.REL = { in: "عضوِ", req: "پیش‌نیازِ", feeds: "تغذیه می‌کند", pairs: "مکمل", uses: "به کار می‌برد", serves: "پاسخ به دغدغه", core: "تکنیکِ اصلیِ گام",
@@ -68,6 +70,7 @@
     /* نماهای صفحه — همه از A.V (نامشان از منو/VIEW_FA)؛ ارجاعِ «view:…» به این‌ها */
     var navLab = {}; (A.NAV || []).concat(A.EPI_NAV || [], [A.NAV_WHOLE, A.NAV_MAPS, A.NAV_SETTINGS, A.NAV_START]).forEach(function (n) { if (Array.isArray(n) && n[0] && !navLab[n[0]]) navLab[n[0]] = n[1]; });
     Object.keys(A.V || {}).forEach(function (v) { node("view", v, "نما: " + ((A.VIEW_FA && A.VIEW_FA[v]) || navLab[v] || v), { go: [v] }); });
+    if (A.PSY) A.PSY.CONSTRUCTS.forEach(function (c) { node("psyc", c.id, "📐 " + c.fa, { go: ["mind"] }); edge(ref("psyc", c.id), ref("view", "mind"), "in"); });
     /* ---------- دادهٔ خودِ تو ---------- */
     var all = function (t) { try { return (S && S.all) ? S.all(t) : []; } catch (e) { return []; } };
     all("topic").forEach(function (t) { node("topic", t.id, t.title, { go: ["topic", t.id] }); var st = t.journey && t.journey.step; if (st) edge(ref("topic", t.id), ref("jstep", st), "step"); });
@@ -157,6 +160,9 @@
       node("tour", s.id, "🧭 تور: " + (s.title || s.pinned || "تور"), { go: ["home"] });
       (s.tour.facets || []).forEach(function (f, i) { var fid = s.id + "/" + (f.key || f.id || i); node("tfacet", fid, (f.title || "وجه"), { go: [f.view || "home", f.arg || null] }); edge(ref("tfacet", fid), ref("tour", s.id), "in");
         (f.refs || []).forEach(function (r) { if (!r || !r.id) return; var k = recRef(r.type, r.id); if (k) edge(ref("tfacet", fid), k, "about"); }); });
+    if (A.PSY) {
+      all("psyans").forEach(function (x) { var it = A.PSY.item(x.item); node("psyans", x.id, "🧩 " + (x.ok ? "درست" : "نادرست") + (it ? " — " + String(it.text).slice(0, 40) : ""), { go: ["mind"] }); if (it && N[ref("psyc", it.construct)]) edge(ref("psyans", x.id), ref("psyc", it.construct), "measures"); });
+    }
     all("deadline").forEach(function (x) { node("deadline", x.id, "⏰ " + String(x.what || "موعد").slice(0, 50), { go: ["home"] }); if (x.sess && N[ref("tour", x.sess)]) edge(ref("deadline", x.id), ref("tour", x.sess), "in"); });
     });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */

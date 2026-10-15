@@ -221,16 +221,23 @@
       if ((s.outside || []).length && !s.safetyAt) H.push(sec("↗ بیرون از این صفحه", s.outside.map(function (o) { return "<div>" + esc(o.text) + "</div>"; }).join("")));
       /* کارنامهٔ ذهن */
       if (m) {
-        var tb = '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;border-collapse:collapse"><tr style="color:' + C.mute + '"><td style="padding:5px">بُعد</td><td>دقت</td><td>کالیبراسیون</td><td>ماندگاری</td><td>گره‌ها</td><td>نمره</td><td>مرحله</td><td>روند</td></tr>' +
-          m.dims.map(function (d) { function c(v, n) { return "<td style=\"padding:5px;border-bottom:1px solid " + C.line + "\">" + (v == null ? "—" : fa(v)) + ' <span style="color:' + C.mute + '">(' + fa(n) + ")</span></td>"; }
-            return '<tr><td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + esc(d.fa) + "</td>" + c(d.ix.acc, d.n.acc) + c(d.ix.cal, d.n.cal) + c(d.ix.ret, d.n.ret) + c(d.ix.knot, d.n.knot) + '<td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + (d.score == null ? "—" : fa(d.score)) + '</td><td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + esc(d.band) + '</td><td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + (d.trend == null ? "—" : (d.trend >= 0 ? "▲" : "▼") + fa(Math.abs(d.trend))) + "</td></tr>"; }).join("") + "</table>";
+        /* بی «نمره/مرحله» ِ قراردادی (مالک ۲۰۲۶-۱۰-۱۵): همان احتمال‌های کارنامه (a34_psy) */
+        var td = function (x) { return '<td style="padding:5px;border-bottom:1px solid ' + C.line + '">' + x + "</td>"; }, pc = function (p) { return fa(Math.round(100 * p)) + "٪"; };
+        var tb = '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;border-collapse:collapse"><tr style="color:' + C.mute + '"><td style="padding:5px">سازه</td><td>احتمالِ درستیِ پاسخِ بعدی</td><td>احتمالِ پیشرفت</td><td>نسبت به مردم</td></tr>' +
+          (m.psy || []).map(function (c) {
+            if (c.none) return "<tr>" + td(esc(c.fa)) + '<td colspan="3" style="padding:5px;border-bottom:1px solid ' + C.line + ';color:' + C.mute + '">سنجیده نمی‌شود</td></tr>';
+            var e = c.self, p = c.pop || { n: 0 };
+            return "<tr>" + td(esc(c.fa)) + td(e.n ? pc(e.next) + ' <span style="color:' + C.mute + '">(' + fa(e.k) + " از " + fa(e.n) + ")</span>" : "—") +
+              td(e.progress ? pc(e.progress.p) + ' <span style="color:' + C.mute + '">(' + fa(e.progress.from) + " ← " + fa(e.progress.to) + ")</span>" : "—") +
+              td(p.n ? "بالاتر از میانهٔ " + esc(p.peers) + ": " + pc(p.pAbove) : "—") + "</tr>";
+          }).join("") + "</table>";
         var black = m.black.length ? '<ul style="margin:6px 0;padding-right:18px">' + m.black.slice(0, 12).map(function (b) { return "<li>" + esc(b.fa) + "</li>"; }).join("") + "</ul>" : '<div style="color:' + C.mute + '">نقطهٔ سیاهی دیده نشد.</div>';
         var pics = imgs.map(function (im) { return '<div style="margin:12px 0;text-align:center"><div style="font-weight:700;margin-bottom:4px">' + esc(im.fa) + '</div><img src="cid:' + im.cid + '" alt="' + esc(im.fa) + '" style="max-width:100%;border:1px solid ' + C.line + ';border-radius:8px"></div>'; }).join("");
         /* فقط پیگیری‌های همین تور — نه همهٔ کارهای «امروز» ِ صفحه (بازیِ کارآگاهی و … ربطی به این گزارش ندارد) */
         var ahead = [];
         t.facets.forEach(function (f) { (AS.tourFollowups ? AS.tourFollowups(f) : []).slice(0, 2).forEach(function (x) { ahead.push({ fa: "«" + f.title + "»: " + x.t }); }); AS.tourPractice(f).forEach(function (p) { ahead.push({ fa: p.t + " — " + (A.fdate ? A.fdate(p.due) : p.due) }); }); });
         ahead = ahead.slice(0, 12);
-        H.push(sec("🧠 کارنامهٔ ذهن", '<div style="color:' + C.mute + ';font-size:12px">شاخص‌ها از دادهٔ خودِ تو، هر کدام با اندازهٔ نمونه؛ زیرِ ' + fa(A.MIND.MIN_N) + ' نمونه عدد داده نمی‌شود. «ضریبِ هوشی» نیست و با «مردم» مقایسه نمی‌کند.</div>' + tb +
+        H.push(sec("🧠 کارنامهٔ ذهن", '<div style="color:' + C.mute + ';font-size:12px">هر عدد یک احتمال است که از دادهٔ خودِ تو و اصل‌های عقلی درمی‌آید، بی‌برشِ قراردادی. «پاسخِ بعدی» یعنی (درست+۱)/(کل+۲). مقایسه با مردم فقط با معماهایی است که دشواری‌شان در نمونهٔ بزرگی از مردم از منبعِ معتبر سنجیده شده. «ضریبِ هوشیِ کل» ساخته نمی‌شود.</div>' + tb +
           '<div style="margin-top:10px"><b>⚫ نقطه‌های سیاه</b></div>' + black + pics +
           (ahead.length ? '<div style="margin-top:8px"><b>🛤 مسیرهای پیشِ رو</b><ul style="margin:4px 0;padding-right:18px">' + ahead.map(function (x) { return "<li>" + esc(x.fa) + "</li>"; }).join("") + "</ul></div>" : "")));
       }
