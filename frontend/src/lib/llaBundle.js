@@ -14,5 +14,5 @@ export const LLA_BUNDLE = {
     "progress": "docs/progress.5b3c682e80.json"
   },
   "github": "https://github.com/mahdighandi1989/Lifemanager/blob/main/apps/learning-architecture/docs/",
-  "js": "lla.095b01e172.js"
+  "js": "lla.7244711689.js"
 };
