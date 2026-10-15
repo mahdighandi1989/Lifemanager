@@ -19,7 +19,18 @@
   function lives() { return S.all("eprob", function (r) { return r && r.live && r.p && r.status !== "rejected"; }); }
   A.liveRec = rec; A.liveAll = lives;
   function pgOf(pid) { return U.prog(pid); }
-  function solOf(pg) { var s = U.sol(pg); var L = s.live = s.live || {}; ["steps", "claims", "moves", "related", "aux", "knots"].forEach(function (k) { L[k] = L[k] || []; }); return s; }
+  function solOf(pg) { var s = U.sol(pg); var L = s.live = s.live || {}; ["steps", "claims", "moves", "related", "aux", "knots"].forEach(function (k) { L[k] = L[k] || []; }); seqFix(s); return s; }
+  /* شناسهٔ داده‌ها هرگز دوباره به کار نمی‌رود (تیک‌ها و «به‌کارنرفته»ها به شناسه بسته‌اند): شمارندهٔ یک‌سویه روی solve.live؛ رکوردهای پیشین
+     یک بار از بیشینهٔ شناسه‌هایی که جایی آمده‌اند (کارتِ فهم، نسخه‌های پیشینِ آن، پیش‌نویس، تیکِ گام‌ها و پاسخ‌ها، «به‌کارنرفته»ها) پر می‌شوند */
+  function seqFix(s) {
+    var L = s.live, mx = L.dSeq || 0;
+    function see(id) { var m = /^d(\d+)$/.exec(String(id || "")); if (m && +m[1] > mx) mx = +m[1]; }
+    [s.u && s.u[1]].concat(L.uHist || []).concat(L.uDraft ? [L.uDraft] : []).forEach(function (u) { ((u && u.dl) || []).forEach(function (x) { see(x.id); }); });
+    L.steps.forEach(function (st) { (st.data || []).forEach(see); });
+    if (L.plan) Object.keys(L.plan.unused || {}).forEach(see);
+    L.dSeq = mx;
+  }
+  function nid(s) { s.live.dSeq = (s.live.dSeq || 0) + 1; return "d" + s.live.dSeq; }
   function live(s) { return s.live; }
   function T0(t) { return (A.SOLVE_TYPES || {})[t] || A.SOLVE_TYPES.find; }
   function typeOf(r, s) { var t = (s && s.type) || (r && r.p && r.p.kind); return A.SOLVE_TYPES && A.SOLVE_TYPES[t] ? t : "find"; }
@@ -40,7 +51,16 @@
   function toks(t) { var o = []; norm(t).split(/[^0-9a-zء-يپچژکگی]+/).forEach(function (w) { if (!w || (w.length < 2 && !/\d/.test(w)) || STOP.indexOf(" " + w + " ") >= 0) return; w = stem(w); if (o.indexOf(w) < 0) o.push(w); }); return o; }
   function hit(w, tt) { return tt.some(function (x) { return x === w || (w.length >= 4 && x.length >= 4 && (x.indexOf(w) === 0 || w.indexOf(x) === 0)); }); }
   /* دادهٔ d در متنِ t آمده؟ دست‌کم نیمی از واژه‌های معنادارِ داده */
-  function mentions(t, d) { var dt = toks(d); if (!dt.length) return false; var tt = toks(t); return dt.filter(function (w) { return hit(w, tt); }).length >= Math.ceil(dt.length / 2); }
+  /* دادهٔ d در متنِ t «به کار رفته»؟ در یک بند (جمله/سطر/پاره‌ای میانِ ، ؛ .) دست‌کم نیمی از واژه‌های معنادارِ داده آمده و همان بند آن را
+     نفی نکرده («مهم نیست»، «اصلاً»، «نه»، «ربطی ندارد»، «لازم نیست»، «به کار نمی‌آید») — نام بردنِ داده برای کنار گذاشتنش، به کار بردنش نیست */
+  var NEG = /(?:^|\s)(?:نه|اصلا|هیچ|بی‌ربط|بی ربط)(?:\s|$)|مهم\s*نیست|ربطی\s*ندار|لازم\s*نیست|اهمیتی\s*ندار|به\s*کار\s*نمی|کاری\s*ندار|نادیده/;
+  function mentions(t, d) {
+    var dt = toks(d); if (!dt.length) return false;
+    return String(t == null ? "" : t).split(/[\n.،؛!?؟:]+|\s(?:ولی|اما)\s/).some(function (cl) {
+      var tt = toks(cl); if (!tt.length) return false;
+      return dt.filter(function (w) { return hit(w, tt); }).length >= Math.ceil(dt.length / 2) && !NEG.test(norm(cl).replace(/\s+/g, " "));
+    });
+  }
   A.liveMentions = mentions; A.liveToks = toks;
 
   /* ---------- داده‌ها: کدام به کار رفت؟ (تیکِ خودت ∪ آمدنِ واژه‌هایش در طرح و گام‌ها) ---------- */
@@ -154,8 +174,12 @@
   var UD = {};
   function uCard(r, pg, s) {
     var pid = r.p.id, prev = uOf(s) || {}, fresh = !s.g || !s.g[1];
-    var d = UD[pid] = UD[pid] || { type: typeOf(r, s), one: prev.one || "", why: prev.why || "", u: prev.u || "", dl: (prev.dl || []).map(function (x) { return { id: x.id, t: x.t }; }), c: prev.c || "", rel: prev.rel || "", suff: prev.suff || "", suffWhy: prev.suffWhy || "", fig: prev.fig || "", guess: "", conf: "", test: "", testRes: "", ifRef: "" };
-    if (!d.dl.length) d.dl = [{ id: "d1", t: "" }, { id: "d2", t: "" }];
+    var L0 = live(s);
+    /* پیش‌نویسِ کارتِ فهم با بارگذاریِ دوباره گم نمی‌شود (solve.live.uDraft؛ پس از ثبت پاک می‌شود) */
+    var d = UD[pid] = UD[pid] || (L0.uDraft ? JSON.parse(JSON.stringify(L0.uDraft)) : { type: typeOf(r, s), one: prev.one || "", why: prev.why || "", u: prev.u || "", dl: (prev.dl || []).map(function (x) { return { id: x.id, t: x.t }; }), c: prev.c || "", rel: prev.rel || "", suff: prev.suff || "", suffWhy: prev.suffWhy || "", fig: prev.fig || "", dead: prev.deadTxt || "", guess: "", conf: "", test: "", testRes: "", ifRef: "" });
+    if (!d.dl.length) { d.dl = [{ id: nid(s), t: "" }, { id: nid(s), t: "" }]; S.put(pg); }
+    var dTimer = null;
+    function saveDraft() { if (dTimer) clearTimeout(dTimer); dTimer = setTimeout(function () { dTimer = null; if (UD[pid] !== d) return; L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); }, 350); }
     var T = T0(d.type);
     var box = h("section", own({ class: "card lp-u" }), h("div", { class: "eyebrow" }, "فهمِ مسئله" + (live(s).reU ? " — دوباره" : "")),
       h("h3", {}, "اول کل، بعد جزءها"),
@@ -167,12 +191,13 @@
     box.appendChild(field("lpUnk", "۳) " + T.u, d.u, function (v) { d.u = v; }, 2));
     var dbox = h("fieldset", { class: "col gap lp-dl" }, h("legend", {}, "۴) " + (d.type === "find" ? "داده‌ها" : "بخش‌های فرض") + " — هر کدام جدا (چیزی که می‌دانی یا در دست داری: عدد، منبع، محدودیت، آدم، زمان)"));
     d.dl.forEach(function (x, i) { dbox.appendChild(field("lpD_" + x.id, (d.type === "find" ? "دادهٔ " : "فرضِ ") + fa(i + 1), x.t, function (v) { x.t = v; }, 0)); });
-    dbox.appendChild(h("button", { class: "btn ghost sm lp-dadd", type: "button", onclick: function () { var n = 1; while (d.dl.some(function (x) { return x.id === "d" + n; })) n++; d.dl.push({ id: "d" + n, t: "" }); A.render(); } }, "+ دادهٔ دیگر"));
+    dbox.appendChild(h("button", { class: "btn ghost sm lp-dadd", type: "button", onclick: function () { d.dl.push({ id: nid(s), t: "" }); L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); A.render(); } }, "+ دادهٔ دیگر"));
     box.appendChild(dbox);
     box.appendChild(field("lpCond", "۵) " + T.c, d.c, function (v) { d.c = v; }, 3, "هر بخش در یک سطر"));
     box.appendChild(field("lpRel", "۶) پیوندِ جزءها: کدام داده به کدام بخشِ شرط یا به مجهول ربط دارد؟ (اختیاری)", d.rel, function (v) { d.rel = v; }, 0));
     box.appendChild(selF("lpSuff", T.suff, ["کافی است", "ناکافی است — چیزی کم است", "زائد دارد — بخشی لازم نیست", "متناقض است", "هنوز نمی‌دانم"], d.suff, function (v) { d.suff = v; }));
     box.appendChild(field("lpSuffW", "چرا؟ (یک جمله)", d.suffWhy, function (v) { d.suffWhy = v; }, 0));
+    box.appendChild(field("lpDead", "مهلتِ خودِ مسئله، اگر هست — تا کی باید حل یا تصمیم شود؟ (اختیاری؛ گام‌ها پس از آن پذیرفته نمی‌شوند)", d.dead, function (v) { d.dead = v; }, 0, "مثلاً «۱۲ آذر» یا «۱۰ روزِ دیگر»"));
     box.appendChild(field("lpFig", "شکل، جدول یا نمودار — حتی برای مسئلهٔ غیرهندسی (ستون‌های جدولت، محورهای نمودارت، نام‌هایی که می‌گذاری)", d.fig, function (v) { d.fig = v; }, 0));
     if (fresh) {
       box.appendChild(h("h4", {}, "پیش از حل: حدس بزن"));
@@ -194,6 +219,8 @@
       if (fresh && !txt(d.guess)) miss.push("«حدس»");
       if (fresh && txt(d.guess) && !txt(d.test)) miss.push("«آزمونِ حدس»");
       if (fresh && txt(d.guess) && !d.conf) miss.push("«اطمینان به حدس»");
+      var DW = !txt(d.dead) ? null : prev.deadTxt === txt(d.dead) && prev.deadline ? { date: prev.deadline } : A.willWhen(d.dead);
+      if (txt(d.dead) && !(DW && DW.date && !DW.past)) miss.push("«مهلت» (روزِ مشخص و نگذشته بنویس، یا خالی بگذار)");
       if (miss.length) { A.toast("اول این‌ها را بنویس: " + miss.join("، "), "bad"); out.innerHTML = ""; out.appendChild(h("p", { class: "bad small lp-umiss" }, "هنوز نه: " + miss.join("، "))); return; }
       e.currentTarget.disabled = true; out.innerHTML = "";
       out.appendChild(h("div", { class: "card soft small" }, h("p", {}, h("strong", {}, "صورتِ خودت: "), r.p.statement),
@@ -202,18 +229,19 @@
         var L = live(s);
         if (uOf(s)) { L.uHist = L.uHist || []; L.uHist.push(JSON.parse(JSON.stringify(s.u[1]))); }
         s.type = d.type; r.p.kind = d.type;
-        s.u[1] = { type: d.type, one: txt(d.one), why: txt(d.why), u: txt(d.u), d: items.map(function (x) { return txt(x.t); }).join(" · "), dl: items.map(function (x) { return { id: x.id, t: txt(x.t) }; }), c: txt(d.c), rel: txt(d.rel), suff: d.suff, suffWhy: txt(d.suffWhy), fig: txt(d.fig), self: v, at: nowISO(), done: true, from: "live" };
+        s.u[1] = { type: d.type, one: txt(d.one), why: txt(d.why), u: txt(d.u), d: items.map(function (x) { return txt(x.t); }).join(" · "), dl: items.map(function (x) { return { id: x.id, t: txt(x.t) }; }), c: txt(d.c), rel: txt(d.rel), suff: d.suff, suffWhy: txt(d.suffWhy), fig: txt(d.fig), deadTxt: txt(d.dead), deadline: DW && DW.date || null, self: v, at: nowISO(), done: true, from: "live" };
         U.seed(s, "u");
         if (fresh) {
           s.g[1] = { guess: txt(d.guess), conf: +d.conf || null, test: txt(d.test), testRes: "", ifRef: d.ifRef, before: true, seen: false, at: nowISO(), from: "live" };
           if (d.kit && A.solveKitEmpty && !A.solveKitEmpty(d.kit)) s.g[1].kit = U.kitCopy(d.kit);
           U.seed(s, "g");
         }
-        L.reU = false; S.put(r); S.put(pg); delete UD[pid];
+        L.reU = false; delete L.uDraft; if (r.dormant && !r.woke) r.woke = nowISO(); S.put(r); S.put(pg); delete UD[pid]; if (dTimer) clearTimeout(dTimer);
         A.toast("فهمت ثبت شد؛ از فردا بی‌نگاه مرور می‌شود."); A.go("lprob", pid, "plan");
       }, "فهمت با صورتی که نوشتی چقدر می‌خواند؟"));
     } }, "ثبتِ فهم"));
     box.appendChild(out);
+    box.addEventListener("input", saveDraft); box.addEventListener("change", saveDraft);
     return box;
   }
   function uSum(s) {
@@ -228,6 +256,9 @@
     var pid = r.p.id, t = typeOf(r, s), Q = A.solveAskList ? A.solveAskList("p", 1, t) : [];
     if (!Q.length) return null;
     var tut = pg.tut = pg.tut || {}; tut.qi = tut.qi || {};
+    /* هر مسئلهٔ تازه از پرسشی آغاز می‌کند که کمتر از همه ورزیده شده (پایین‌ترین پلهٔ نردبان؛ در برابری، کلی‌ترین) و از آن‌جا به ترتیبِ کلی ⇐ خاص
+       جلو می‌رود — نه همیشه از پرسشِ ۱؛ پرسش‌هایی که از آنِ خودت شده‌اند در چرخه با «اول خودت بپرس» می‌آیند */
+    if (tut.qi.lplan == null) { var best = 0, br = Infinity; Q.forEach(function (q, i) { var rg = A.qRung ? A.qRung(q) : 0; if (rg < br) { br = rg; best = i; } }); tut.qi.lplan = best; S.put(pg); }
     var qi = (tut.qi.lplan || 0) % Q.length, q = Q[qi], P = tut.plan = tut.plan || [];
     var cur = P.filter(function (e) { return e && e.src === "live" && e.qi === qi && e.q === q && !e.skip; }).pop();
     var box = h("section", own({ class: "card soft lp-ask", "data-qi": qi }), h("div", { class: "eyebrow" }, "❔ پرسشِ همین لحظه (طرح‌ریزی) · پرسشِ " + fa(qi + 1) + " از " + fa(Q.length) + " — از کلی به خاص"));
@@ -245,7 +276,7 @@
       box.appendChild(h("button", { class: "btn sm lp-asknext", type: "button", onclick: next }, "پرسشِ بعد (کمی خاص‌تر)"));
       return box;
     }
-    var gate = A.solveSelfAskGate ? A.solveSelfAskGate(pg, q, { lv: 1, sid: "live:" + qi, ph: "p", src: "live" }) : null;
+    var gate = A.solveSelfAskGate ? A.solveSelfAskGate(pg, q, { lv: 1, sid: "live:" + qi, ph: "p", src: "live", onSkip: function () { P.push({ at: nowISO(), d: A.today(), q: q, qi: qi, skip: true, lv: 1, sid: "live:" + qi, ph: "p", src: "live" }); next(); } }) : null;
     if (gate && !gate.done) { box.appendChild(h("h4", {}, "اول خودت بپرس")); box.appendChild(gate.el); return box; }
     if (gate) box.appendChild(gate.el);
     var d = AD[pid] = AD[pid] || { a: "", data: [] };
@@ -360,22 +391,43 @@
   }
 
   /* ---------- طرح در یک جمله + داده‌های به‌کارنرفته ---------- */
+  /* پولیا، عمق: طرح دست‌کم یک ابزارِ طرح را واقعاً به کار گرفته باشد — کد فقط می‌سنجد ناخالی، مشخص (چند واژهٔ معنادار) و رونوشتِ صورت نیست */
+  function near(a, b) { return !!(A.kNearCopy && txt(a) && txt(b) && A.kNearCopy(a, b)); }
+  function spec(t, n) { return toks(t).length >= (n || 3); }
+  function heurUsed(r, s) {
+    var L = live(s), u = uOf(s) || {}, o = [], st = r.p.statement;
+    if (L.back && spec(L.back.solved) && spec(L.back.before1, 2) && !near(L.back.solved, st) && !near(L.back.solved, u.one)) o.push("back");
+    if (L.aux.some(function (a) { return spec(a.t) && spec(a.bridge, 2) && !near(a.t, st); })) o.push("aux");
+    if (L.moves.some(function (m) { var mv = A.MOVES && A.MOVES[m.mv]; return spec(m.why) && !(mv && near(m.why, mv.fa + " " + (mv.d || ""))); })) o.push("move");
+    if (L.related.length || (L.seen && spec(L.seen.ans === "yes" ? L.seen.where : L.seen.fam))) o.push("rel");
+    return o;
+  }
+  A.liveHeur = function (pid) { var r = rec(pid); if (!r) return []; return heurUsed(r, solOf(pgOf(pid))); };
+  var HEUR_FA = { back: "از آخر به عقب", aux: "مسئلهٔ کمکی", move: "حرکت با دلیل", rel: "مسئلهٔ مرتبط" };
   var PD = {};
   function planCard(r, pg, s) {
     var pid = r.p.id, L = live(s), d = PD[pid] = PD[pid] || { t: (L.plan && L.plan.t) || "", unused: {} };
-    var un = unusedOf(s, pg);
+    function still() { return unusedOf(s, pg).filter(function (x) { return !mentions(d.t, x.t); }); }   // داده‌ای که در خودِ جملهٔ طرح آمده، به کار رفته است
+    var hu = heurUsed(r, s);
     var box = h("section", own({ class: "card lp-plan" }), h("h4", {}, "طرحت"),
       h("p", { class: "small" }, "طرح از پیوندِ داده و مجهول درمی‌آید. در یک یا دو جمله: نخست چه، سپس چه — و با کدام داده‌ها."),
-      field("lpPlan", "طرحت: نخست … ، سپس …", d.t, function (v) { d.t = v; }, 2));
-    var ua = unusedAsk(un, d.unused, "lpPU_"); if (ua) box.appendChild(ua);
-    else if (dataOf(s).length) box.appendChild(h("p", { class: "small good lp-allused" }, "همهٔ داده‌ها جایی در پاسخ‌ها یا طرحت آمده‌اند."));
+      h("p", { class: "small lp-heur " + (hu.length ? "good" : "warnline") }, hu.length ? "ابزارِ طرح که به کار بردی: " + hu.map(function (k) { return HEUR_FA[k]; }).join("، ") + "." :
+        "پیش از ثبتِ طرح، دست‌کم یکی از ابزارهای بالا را واقعاً به کار ببر: مسئلهٔ مرتبط، از آخر به عقب، مسئلهٔ کمکی، یا حرکتی با دلیلش."));
+    var hold = h("div", { class: "lp-unhold" });
+    function drawUn() { hold.innerHTML = ""; var un = still(), ua = unusedAsk(un, d.unused, "lpPU_"); if (ua) hold.appendChild(ua); else if (dataOf(s).length) hold.appendChild(h("p", { class: "small good lp-allused" }, "همهٔ داده‌ها جایی در پاسخ‌ها یا طرحت آمده‌اند.")); }
+    var tmr = null;
+    box.appendChild(field("lpPlan", "طرحت: نخست … ، سپس …", d.t, function (v) { d.t = v; if (tmr) clearTimeout(tmr); tmr = setTimeout(drawUn, 250); }, 2));
+    drawUn(); box.appendChild(hold);
     box.appendChild(h("button", { class: "btn lp-plansave", type: "button", onclick: function () {
       var miss = []; if (txt(d.t).length < 5) miss.push("«طرحت»");
-      var still = un.filter(function (x) { return !mentions(d.t, x.t); });   // داده‌ای که در خودِ جملهٔ طرح آمده، به کار رفته است
-      unusedMiss(still, d.unused).forEach(function (x) { miss.push(x); });
-      if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); return; }
-      var keep = {}; still.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });
-      L.plan = { t: txt(d.t), at: nowISO(), d: A.today(), unused: keep }; delete PD[pid]; S.put(pg);
+      if (!heurUsed(r, s).length) miss.push("«دست‌کم یک ابزارِ طرح که واقعاً به کار رفته باشد»");
+      var un = still();
+      unusedMiss(un, d.unused).forEach(function (x) { miss.push(x); });
+      if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); drawUn(); return; }
+      var keep = {}; un.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });
+      L.plan = { t: txt(d.t), at: nowISO(), d: A.today(), unused: keep, heur: heurUsed(r, s) }; delete PD[pid];
+      U.seed(s, "h");   // ابزارِ طرحی که به کار بردی از حافظه برمی‌گردد (نردبانِ همان تونل)
+      S.put(pg);
       A.toast("طرح ثبت شد؛ حالا گامِ واقعیِ بعد — با پیش‌بینی."); A.go("lprob", pid, "exec");
     } }, L.plan && L.plan.at ? "به‌روزکردنِ طرح" : "ثبتِ طرح"));
     return box;
@@ -407,40 +459,59 @@
   /* ---------- اجرا روی واقعیت: گامِ واقعی، پیش‌بینی پیش از انجام، نتیجه در موعد ---------- */
   var SD = {};
   var CONF = ["50", "60", "70", "80", "90", "95"];
+  /* B089: داده‌ای که در طرح گفتی «نمی‌دانم کجا به کار می‌آید» و هنوز به کار نرفته — در گامِ بعد و در بازنگری با نامش برمی‌گردد */
+  function unknownData(s, pg) { var L = live(s), un = (L.plan && L.plan.unused) || {}, used = usedMap(s, pg); return dataOf(s).filter(function (x) { return un[x.id] && un[x.id].ans === "unknown" && !used[x.id]; }); }
+  var WANT = [["more", "بیشتر می‌خواهم"], ["same", "همان‌قدر"], ["less", "کمتر"], ["changed", "عوض شد — حالا چیزِ دیگری می‌خواهم"]];
   function stepForm(r, pg, s) {
-    var pid = r.p.id, L = live(s), d = SD[pid] = SD[pid] || { text: "", clear: "", prem: "", pred: "", conf: "", when: "", data: [] };
+    var pid = r.p.id, L = live(s), d = SD[pid] = SD[pid] || { text: "", clear: "", unclear: "", prem: "", pred: "", conf: "", when: "", far: false, data: [], unk: {} };
+    var u = uOf(s) || {}, unk = unknownData(s, pg);
     var box = h("section", own({ class: "card lp-stepf" }), h("h4", {}, "گامِ واقعیِ بعد"),
       h("p", { class: "small" }, "اجرا یعنی هر گام را وارسی کنی، نه فقط بنویسی؛ و پیش از انجام بدانی تقریباً به چه می‌رسی. پیش‌بینی‌ات با احتمال در «🎯 دفترِ پیش‌بینی» می‌نشیند و در موعد، خودت می‌گویی چه شد — کالیبراسیونِ پیش‌بینی‌هایت در «🧠 کارنامهٔ ذهن» از همین‌ها ساخته می‌شود."),
       field("lpStep", "گامِ بعد — یک کارِ مشخص در دنیای واقعی (چه چیزی، با چه کسی یا با چه ابزاری)", d.text, function (v) { d.text = v; }, 2),
-      selF("lpClear", "روشن می‌بینی که این گام درست است — به مجهول نزدیکت می‌کند؟", ["بله", "مطمئن نیستم", "نه"], d.clear, function (v) { d.clear = v; }),
-      field("lpPrem", "به کدام داده یا دلیل تکیه دارد؟", d.prem, function (v) { d.prem = v; }, 0),
-      field("lpPred", "پیش از انجام: فکر می‌کنی چه می‌شود؟", d.pred, function (v) { d.pred = v; }, 2, "یک نتیجهٔ مشخص که بعداً بشود گفت شد یا نشد"),
-      selF("lpConf", "چقدر مطمئنی که همین می‌شود؟", CONF.map(function (x) { return [x, fa(x) + "٪"]; }), d.conf, function (v) { d.conf = v; }),
-      field("lpWhen", "کی انجامش می‌دهی؟ (روز — همان روز نتیجه را می‌پرسم)", d.when, function (v) { d.when = v; }, 0, "مثلاً «پنجشنبه»، «۳ روزِ دیگر»، «۲۵ آبان»، «فردا ساعتِ ۹»"));
+      selF("lpClear", "روشن می‌بینی که این گام درست است — به مجهول نزدیکت می‌کند؟", ["بله", "مطمئن نیستم", "نه"], d.clear, function (v) { d.clear = v; A.render(); }));
+    /* A130: «نه» گام را می‌بندد تا بنویسی چه چیزی روشن نیست (یا گام را کوچک‌تر کنی و دوباره بسنجی) */
+    if (d.clear === "نه") box.appendChild(h("div", { class: "col gap lp-unclear" }, h("p", { class: "small warnline" }, "روشن نمی‌بینی‌اش — پس هنوز گام نیست. بنویس دقیقاً چه چیزی روشن نیست، یا گام را به گامی کوچک‌تر بشکن که روشن می‌بینی (و «روشن می‌بینی؟» را دوباره بسنج)."),
+      field("lpUnclear", "چه چیزی در این گام روشن نیست؟", d.unclear, function (v) { d.unclear = v; }, 2)));
+    box.appendChild(field("lpPrem", "به کدام داده یا دلیل تکیه دارد؟", d.prem, function (v) { d.prem = v; }, 0));
+    unk.forEach(function (x) { box.appendChild(selF("lpSU_" + x.id, "در طرح گفتی نمی‌دانی «" + clip(x.t, 80) + "» کجا به کار می‌آید — در این گام به کار می‌آید؟", [["use", "بله — همین گام به کارش می‌برد"], ["notyet", "هنوز نه"]], d.unk[x.id] || "", function (v) { d.unk[x.id] = v; var i = d.data.indexOf(x.id); if (v === "use" && i < 0) d.data.push(x.id); if (v !== "use" && i >= 0) d.data.splice(i, 1); })); });
+    box.appendChild(field("lpPred", "پیش از انجام: فکر می‌کنی چه می‌شود؟", d.pred, function (v) { d.pred = v; }, 2, "یک نتیجهٔ مشخص که بعداً بشود گفت شد یا نشد"));
+    box.appendChild(selF("lpConf", "چقدر مطمئنی که همین می‌شود؟", CONF.map(function (x) { return [x, fa(x) + "٪"]; }), d.conf, function (v) { d.conf = v; }));
+    box.appendChild(field("lpWhen", "کی انجامش می‌دهی؟ (روز — همان روز نتیجه را می‌پرسم)", d.when, function (v) { d.when = v; }, 0, "مثلاً «پنجشنبه»، «۳ روزِ دیگر»، «دهم آذر»، «آخرِ هفته»"));
+    if (u.deadline) box.appendChild(h("p", { class: "small muted lp-deadnote" }, "مهلتِ خودِ مسئله: " + A.fdate(u.deadline)));
     var tk = dataTicks(s, "lpSD_", d.data); if (tk) box.appendChild(tk);
-    var out = h("div", { class: "small", "aria-live": "polite" });
+    var farBox = h("div", {}), out = h("div", { class: "small", "aria-live": "polite" });
+    box.appendChild(farBox);
     box.appendChild(h("button", { class: "btn lp-stepsave", type: "button", onclick: function () {
       var why = [], st = txt(d.text), W = txt(d.when) ? A.willWhen(d.when) : null;
       if (!st) why.push("گامِ بعد را بنویس");
       else if (A.willConcrete && !A.willConcrete(st)) why.push("«" + st + "» گام نیست، آرزوست — یک کارِ مشخص بنویس");
       if (!d.clear) why.push("«روشن می‌بینی؟» را انتخاب کن");
+      else if (d.clear === "نه" && txt(d.unclear).length < 5) why.push("روشن نمی‌بینی‌اش: بنویس چه چیزی روشن نیست، یا گام را کوچک‌تر کن تا روشن ببینی");
+      unk.forEach(function (x) { if (!d.unk[x.id]) why.push("بگو «" + clip(x.t, 40) + "» در این گام به کار می‌آید یا نه"); });
       if (txt(d.pred).length < 3) why.push("پیش‌بینی‌ات را بنویس");
       if (!d.conf) why.push("اطمینانت را انتخاب کن");
       if (!txt(d.when)) why.push("کِی؟ را بنویس");
       else if (!W) why.push("«" + d.when + "» زمان نیست — روزِ مشخص بنویس");
       else if (!W.date) why.push("روزش را هم بنویس (فقط ساعت آمده)");
       else if (W.past) why.push("«" + d.when + "» گذشته است");
+      else if (u.deadline && W.date > u.deadline) why.push("«" + d.when + "» (" + A.fdate(W.date) + ") پس از مهلتِ خودِ مسئله (" + A.fdate(u.deadline) + ") است");
+      else if (A.daysBetween(A.today(), W.date) > 365 && !d.far) {
+        why.push("«" + d.when + "» بیش از یک سال بعد است (" + A.fdate(W.date) + ") — اگر واقعاً همین است، پایین تأیید کن");
+        farBox.innerHTML = ""; farBox.appendChild(h("label", { class: "row gap small lp-farok", for: "lpFarOk" }, h("input", { type: "checkbox", id: "lpFarOk", onchange: function (e) { d.far = e.target.checked; } }), "بله، این گام واقعاً " + A.fdate(W.date) + " است"));
+      }
       out.innerHTML = "";
       if (why.length) { out.appendChild(h("p", { class: "bad lp-stepmiss" }, "هنوز نه: " + why.join("؛ ") + ".")); return; }
       var due = W.date < A.today() ? A.today() : W.date, id = "ls" + (L.steps.length + 1);
       var fc = { id: A.uid("fc"), type: "fcast", q: clip(txt(d.pred), 200) + " — گامِ «" + clip(st, 60) + "» در «" + clip(r.p.title, 50) + "»", p: +d.conf, due: due, dim: "s_problem", live: { pid: pid, step: id } };
       S.put(fc);
-      L.steps.push({ id: id, at: nowISO(), d: A.today(), text: st, clear: d.clear, prem: txt(d.prem), pred: txt(d.pred), conf: +d.conf, when: txt(d.when), due: due, data: d.data.slice(), fc: fc.id });
+      var stp = { id: id, at: nowISO(), d: A.today(), text: st, clear: d.clear, prem: txt(d.prem), pred: txt(d.pred), conf: +d.conf, when: txt(d.when), due: due, data: d.data.slice(), fc: fc.id };
+      if (d.clear === "نه") stp.unclear = txt(d.unclear);
+      if (unk.length) stp.unknownAsk = JSON.parse(JSON.stringify(d.unk));
+      L.steps.push(stp);
       delete SD[pid]; S.put(pg);
       A.toast("گام ثبت شد؛ " + (due === A.today() ? "امروز" : A.fdate(due)) + " در «امروز» می‌پرسد چه شد."); A.render();
     } }, "ثبتِ گام و پیش‌بینی"));
     box.appendChild(out);
-    if (d.clear === "نه") box.appendChild(h("p", { class: "small warnline" }, "اگر روشن نمی‌بینی که این گام درست است، پیش از انجامش طرح را دوباره ببین یا گره را بشکاف."));
     return box;
   }
   var OD = {};
@@ -448,21 +519,29 @@
   var DONE = [["yes", "کامل انجامش دادم"], ["part", "تاحدی"], ["no", "نه"]];
   function lab(L0, k) { var x = L0.filter(function (y) { return y[0] === k; })[0]; return x ? x[1] : ""; }
   function outcomeCard(r, pg, s, st) {
-    var pid = r.p.id, fc = st.fc ? S.get(st.fc) : null, d = OD[st.id + pid] = OD[st.id + pid] || { done: "", what: "", match: fc && fc.outcome === "شد" ? "yes" : fc && fc.outcome === "نشد" ? "no" : "", prog: "" };
+    var pid = r.p.id, fc = st.fc ? S.get(st.fc) : null, u = uOf(s) || {}, d = OD[st.id + pid] = OD[st.id + pid] || { done: "", what: "", match: fc && fc.outcome === "شد" ? "yes" : fc && fc.outcome === "نشد" ? "no" : "", prog: "", want: "" };
     var box = h("section", own({ class: "card lp-out", "data-step": st.id }), h("h4", {}, "🔭 گامِ واقعی: انجامش دادی؟ چه شد؟"),
       h("p", { class: "small" }, "«" + st.text + "» — " + st.when + " · پیش‌بینی‌ات: «" + st.pred + "» (" + fa(st.conf) + "٪)"),
       selF("lpODone", "انجامش دادی؟", DONE, d.done, function (v) { d.done = v; A.render(); }),
       field("lpOWhat", "چه شد؟ (واقعیت، نه تفسیر — حتی «هیچ»)", d.what, function (v) { d.what = v; }, 2));
     if (d.done && d.done !== "no") box.appendChild(selF("lpOMatch", "با پیش‌بینی‌ات می‌خواند؟ (داوریِ خودت)", MATCH, d.match, function (v) { d.match = v; }));
     box.appendChild(selF("lpOProg", "به حلِ مسئله نزدیک‌تر شدی؟", ["بله، روشن", "کمی", "نه"], d.prog, function (v) { d.prog = v; }));
+    /* خواستن در ایست‌ها: با آنچه در آغاز نوشتی */
+    if (u.why) box.appendChild(h("p", { class: "small muted lp-owhy" }, "در آغاز نوشتی چرا می‌خواهی حلش کنی: «" + u.why + "»"));
+    box.appendChild(selF("lpOWant", "حالا، پس از این گام، چقدر می‌خواهی حلش کنی — نسبت به آغاز؟", WANT, d.want, function (v) { d.want = v; }));
     box.appendChild(h("button", { class: "btn lp-outsave", type: "button", onclick: function () {
-      var miss = []; if (!d.done) miss.push("«انجامش دادی؟»"); if (txt(d.what).length < 2) miss.push("«چه شد؟»"); if (d.done && d.done !== "no" && !d.match) miss.push("«با پیش‌بینی‌ات می‌خواند؟»"); if (!d.prog) miss.push("«نزدیک‌تر شدی؟»");
+      var miss = []; if (!d.done) miss.push("«انجامش دادی؟»"); if (txt(d.what).length < 2) miss.push("«چه شد؟»"); if (d.done && d.done !== "no" && !d.match) miss.push("«با پیش‌بینی‌ات می‌خواند؟»"); if (!d.prog) miss.push("«نزدیک‌تر شدی؟»"); if (!d.want) miss.push("«چقدر می‌خواهی؟»");
       if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); return; }
-      st.out = { at: nowISO(), d: A.today(), done: d.done, what: txt(d.what), match: d.done === "no" ? "" : d.match, prog: d.prog }; st.closed = true;
+      st.out = { at: nowISO(), d: A.today(), done: d.done, what: txt(d.what), match: d.done === "no" ? "" : d.match, prog: d.prog, want: d.want }; st.closed = true;
       if (fc) { fc.outcome = d.done === "no" ? "انجام نشد" : d.match === "yes" ? "شد" : d.match === "no" ? "نشد" : "تاحدی"; fc.outcomeAt = nowISO(); S.put(fc); }
       delete OD[st.id + pid]; S.put(pg); A.render();
     } }, "ثبتِ نتیجه"));
     return box;
+  }
+  /* گامِ بازی که با «حل شد» یا «کنار گذاشتن» بسته می‌شود: پیش‌بینی‌اش هرگز آزموده نشد ⇒ «انجام نشد» (بیرون از کالیبراسیون و بی‌موعد در دفتر) */
+  function closeOpen(s, why) {
+    live(s).steps.forEach(function (st) { if (st.closed) return; st.closed = true; st.out = { at: nowISO(), d: A.today(), done: "no", what: "", match: "", prog: "", auto: why };
+      var f = st.fc && S.get(st.fc); if (f && !f.outcome) { f.outcome = "انجام نشد"; f.outcomeAt = nowISO(); f.auto = why; S.put(f); } });
   }
   /* غافلگیری ⇒ داده است: گره‌گشا یا «دوباره فهمِ مسئله»؛ پیشرفتی نبود ⇒ «🌱 کوچک‌ترین گامِ بعد» */
   function afterCard(r, pg, s) {
@@ -519,6 +598,8 @@
       h("p", { class: "small" }, ab ? "رها کردنِ آگاهانه جایز است — مثلِ «🌱»: با دلیل، و یک بار بعدتر می‌پرسد «هنوز همان دلیل را قبول داری؟». آنچه تا این‌جا به دست آمد هم درس است." :
         "حل تمام نیست تا نگاهی به پشتِ سر نینداخته‌ای. درسِ تو یک کارتِ مرور می‌سازد، و مسئلهٔ تازه‌ای که از این می‌سازی چند روز بعد برای حل برمی‌گردد."));
     var u0 = uOf(s); if (u0 && u0.why) box.appendChild(h("p", { class: "small muted lp-bwhy0" }, "در آغاز نوشتی چرا می‌خواهی حلش کنی: «" + u0.why + "»"));
+    box.appendChild(selF("lpBWant", "در پایان، آن خواستن نسبت به آغاز چطور است؟", WANT, d.want || "", function (v) { d.want = v; }));
+    var unk0 = unknownData(s, pg); if (unk0.length) box.appendChild(h("p", { class: "small warnline lp-bunk" }, "در طرح گفتی نمی‌دانی این‌ها کجا به کار می‌آیند و هنوز به کار نرفته‌اند: " + unk0.map(function (x) { return "«" + clip(x.t, 50) + "»"; }).join("، ") + " — پایین بگو چرا."));
     if (ab) {
       box.appendChild(field("lpBWhy", "چرا کنارش می‌گذاری؟ (دلیلِ خودِ مسئله)", d.why, function (v) { d.why = v; }, 2));
       box.appendChild(selF("lpBSrc", "این دلیل از کجاست؟", DROPSRC, d.src, function (v) { d.src = v; }));
@@ -548,10 +629,13 @@
         if (g && g.guess && !d.hit) miss.push("«داوریِ حدس»");
       }
       if (Qs.length && !d.best) miss.push("«کدام پرسش کمک کرد؟»");
+      if (!d.want) miss.push("«خواستن در پایان»");
+      /* A157: مسئلهٔ تازه باید تازه باشد — نه تقریباً همان صورت (همان سنجهٔ رونوشتِ ورزشِ گره‌ها، A.kNearCopy) */
+      if (txt(d.newProb) && (near(d.newProb, r.p.statement) || near(d.newProb, r.p.title) || near(d.newProb, (u0 || {}).one))) miss.push("«مسئلهٔ تازه» تقریباً همان مسئلهٔ اصلی است — چیزی را عوض کن (مجهول، داده یا شرط)");
       unusedMiss(un, d.unused).forEach(function (x) { miss.push(x); });
       if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); return; }
       var at = nowISO(), keep = {}; un.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });
-      var b = { state: L.state, chkHow: txt(d.chkHow), chkRes: d.chkRes, other: txt(d.other), glance: txt(d.glance), worked: txt(d.worked), use: txt(d.use), newProb: txt(d.newProb), unused: keep, at: at, done: true, from: "live" };
+      var b = { state: L.state, chkHow: txt(d.chkHow), chkRes: d.chkRes, other: txt(d.other), glance: txt(d.glance), worked: txt(d.worked), use: txt(d.use), newProb: txt(d.newProb), unused: keep, want: d.want, at: at, done: true, from: "live" };
       if (Qs.length) { b.bestQ = d.best === "none" ? "" : Qs[+d.best]; L.bestQ = b.bestQ; }
       if (ab) { b.why = txt(d.why); b.src = d.src; b.gain = txt(d.gain); }
       s.b[1] = b; U.seed(s, "b");
@@ -567,6 +651,7 @@
         w.drop = { at: at, why: b.why, src: b.src, trig: "live:abandon", due: A.addDays(A.today(), riv), iv: riv };
         w.log.push({ at: at, kind: "commit", trig: "live:abandon", desire: "drop", hope: "", budget: "" });
       }
+      closeOpen(s, L.state);
       L.closedAt = at; delete BKD[pid]; S.put(pg); S.put(r);
       A.toast(ab ? "کنار گذاشتنِ آگاهانه ثبت شد؛ " + A.fdate(s.will.drop.due) + " یک بار می‌پرسد." : "بازنگری ثبت شد: درس، کارتِ مرور، و مسئلهٔ تازه‌ات " + A.fdate(A.addDays(A.today(), LADDER[1])) + " برمی‌گردد.");
       A.render();
@@ -583,15 +668,20 @@
   }
 
   /* ---------- صفحهٔ یک مسئلهٔ حل‌نشده ---------- */
+  /* بخشی که خودت باز یا بسته کردی با بازسازیِ صفحه (مثلاً پس از انتخابِ یک گزینه) همان می‌ماند */
+  var SECO = {};
   function sec(key, title, open, body, cls) {
-    var det = h("details", { class: "card lp-sec " + (cls || ""), "data-sec": key, open: open ? true : null }, h("summary", {}, h("strong", {}, title)));
+    var sk = (A.state && A.state.arg) + "|" + key, op = SECO[sk] != null ? SECO[sk] : open;
+    var det = h("details", { class: "card lp-sec " + (cls || ""), "data-sec": key, open: op ? true : null }, h("summary", {}, h("strong", {}, title)));
+    det.addEventListener("toggle", function () { SECO[sk] = det.open; });
     (Array.isArray(body) ? body : [body]).forEach(function (b) { if (b) det.appendChild(b); });
     return det;
   }
+  var LAST_NAV = "";
   A.V.lprob = function (pid, sub) {
+    var nav = pid + "|" + (sub || ""); if (nav !== LAST_NAV) { LAST_NAV = nav; Object.keys(SECO).forEach(function (k) { if (k.indexOf(pid + "|") === 0) delete SECO[k]; }); }
     var r = rec(pid); if (!r) return A.empty("مسئله پیدا نشد.", h("button", { class: "btn", onclick: function () { A.go("e_prob", null, "live"); } }, "مسئله‌های حل‌نشده"));
     var pg = pgOf(pid), s = solOf(pg), L = live(s), t = A.today();
-    if (r.dormant && !r.woke && r.dormant <= t) { r.woke = nowISO(); S.put(r); }
     /* «🌱» ِ رها کردن: «نه — دوباره پیش می‌برمش» ⇒ مسئله دوباره باز */
     if (L.state === "abandoned" && s.will && !s.will.drop && (s.will.log || []).some(function (x) { return x.kind === "drop-recheck" && x.keep === "back" && String(x.at) > String(L.stateAt || ""); })) { L.state = "open"; L.backAt = nowISO(); delete s.b[1]; S.put(pg); }
     var ph = phaseOf(s), want = sub === "u" || sub === "plan" || sub === "exec" || sub === "back" ? { u: "u", plan: "p", exec: "c", back: "b" }[sub] : ph;
@@ -602,6 +692,10 @@
         ph !== "u" && ph !== "done" ? h("button", { class: "btn ghost sm lp-stuck", type: "button", onclick: function () { stuck(r, pg, s, null); } }, "🪢 گیر کرده‌ام — گره‌گشا با همین مسئله") : null,
         r.origin && r.origin.type === "lprob" && rec(r.origin.id) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("lprob", r.origin.id); } }, "از بازنگریِ «" + clip(rec(r.origin.id).p.title, 40) + "»") : null))));
     if (r.dormant && r.dormant > t && !r.woke) root.appendChild(h("p", { class: "card soft small lp-dormnote" }, "این مسئله را خودت در بازنگری ساختی؛ " + A.fdate(r.dormant) + " برای حل برمی‌گردد — می‌توانی همین حالا هم شروعش کنی."));
+    /* برگشتِ مسئلهٔ ساختهٔ خودت: «شروع می‌کنم» یا «فعلاً نه» — «فعلاً نه» یک پله دورتر روی همان نردبان (۳ ⇐ ۷ ⇐ ۲۱ ⇐ ۶۰)، نه هر روز */
+    if (r.dormant && r.dormant <= t && !r.woke) root.appendChild(h("section", { class: "card soft lp-wake" }, h("p", { class: "small" }, "مسئله‌ای که خودت در بازنگری ساختی برگشته است. حالا حلش می‌کنی؟"),
+      h("div", { class: "row gap wrap" }, h("button", { class: "btn sm lp-wakego", type: "button", onclick: function () { r.woke = nowISO(); S.put(r); A.go("lprob", pid, "u"); } }, "شروع می‌کنم"),
+        h("button", { class: "btn ghost sm lp-snooze", type: "button", onclick: function () { var iv = U.nextIv(r.dIv || LADDER[1], true); r.dIv = iv; r.snoozes = (r.snoozes || 0) + 1; r.dormant = A.addDays(t, iv); S.put(r); A.toast("باشد؛ " + A.fdate(r.dormant) + " دوباره می‌پرسد."); A.go("e_prob", null, "live"); } }, "فعلاً نه"))));
     try { var rv = U.reviewPanel(r.p, pg); if (rv) root.appendChild(rv); } catch (e) { console.warn(e); }
     try { var wd = A.willDue ? A.willDue().filter(function (x) { return x.kind === "prob" && x.id === pid; }) : []; if (wd.length) { var hs = A.willHost("prob", pid); if (hs) root.appendChild(A.willCard(hs, "due")); } } catch (e) { console.warn(e); }
     var os = openStep(s);
@@ -688,13 +782,17 @@
       AS.solvingCtx = function (s) { var c = rawCtx.apply(this, arguments); if (c && c.p && c.p.live) return null; var st = A.state || {}; if (st.view === "lprob") return null; return c; };
     }
     var RULES = "# مسئلهٔ واقعیِ حل‌نشده («🔭 مسئلهٔ حل‌نشدهٔ خودم»)\n- اگر کاربر مسئلهٔ واقعیِ بازی آورد که پاسخش را نمی‌داند (تصمیم، پروژه، پرسشِ فکری) و می‌خواهد حلش کند، با {\"do\":\"live_new\",\"title\":\"…\",\"statement\":\"عینِ حرفِ خودش\"} ثبتش کن و او را با {\"do\":\"go\",\"view\":\"lprob\",\"arg\":\"<شناسه>\"} به صفحه‌اش ببر (شناسه را در نوبتِ بعد از «مسئلهٔ زندهٔ این سشن» بخوان) — یا او را به «مسئله‌های بزرگ › 🔭 مسئلهٔ حل‌نشدهٔ خودم» ببر.\n- حلش نکن و تصمیم را جای او نگیر؛ هیچ فیلدِ فهم، داده، پیش‌بینی، نتیجه یا بازنگری را پر نکن (data-own). هر نوبت فقط یک پرسش، از کلی به خاص.";
-    var LIVE_RE = /نمی[‌\s]?دونم\s*(?:چیکار|چه\s*کار)|نمی[‌\s]?دانم\s*چه\s*کار|تصمیم\s*(?:بگیرم|گرفتن|سخت)|(?:کدوم|کدام)\s*رو\s*انتخاب|مسئله(?:‌ای)?\s*(?:دارم|که\s*حل)|مشکلی\s*دارم|حل\s*نشده/;
+    /* فقط وقتی خودِ کاربر از یک تصمیم یا مسئلهٔ بازِ زندگی‌اش می‌گوید — نه «فونتِ صفحه ریز است»، نه «کارتِ مرور حل نشده» */
+    var LIVE_RE = /نمی[‌\s]?(?:دونم|دانم)\s*(?:چی[‌\s]?کار|چه[‌\s]*کار|کدوم|کدام)\s*(?:کنم|رو|را|بکنم|انتخاب)|(?:باید|می[‌\s]?خوام|می[‌\s]?خواهم)\s*(?:یه|یک)?\s*تصمیم\s*(?:بگیرم|بگیریم)|بین\s+[^.؟?]{2,60}\s+(?:انتخاب\s*کنم|تصمیم\s*بگیرم)|(?:بپذیرم|قبول\s*کنم|برم|بمونم|بمانم)\s*یا\s*(?:نه|نپذیرم|بمونم|بمانم|برم)|مسئله(?:‌ای)?\s+(?:تو|در)\s+زندگی(?:‌ام|م)?|گیر\s*کرده‌?ام\s*(?:سرِ|سر|توی|در)\s*(?:تصمیم|انتخاب|پروژه)/;
     AS.promptHooks = AS.promptHooks || [];
-    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-4).map(function (m) { return m.text; })).join(" "); return (s && s.lprob) || LIVE_RE.test(recent) ? RULES : ""; });
+    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-4).map(function (m) { return m.text; })).join(" "); return LIVE_RE.test(recent) ? RULES : ""; });
     var EXEC_Q = ["پیش از این گام: فکر می‌کنی چه می‌شود، و چقدر مطمئنی؟", "روشن می‌بینی که این گام به مجهول نزدیکت می‌کند — به کدام داده تکیه دارد؟", "کی انجامش می‌دهی؟ روزش را بگو تا همان روز بپرسم چه شد.", "آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت از مسئله چه می‌گوید؟"];
     AS.promptHooks.push(function (s, msg) {
-      var st = A.state || {}, pid = st.view === "lprob" ? st.arg : (st.view === "e_prob" && rec(st.arg) ? st.arg : (s && s.lprob)), r = rec(pid); if (!r) return "";
+      var st = A.state || {}, onPage = st.view === "lprob" || (st.view === "e_prob" && rec(st.arg)), pid = onPage ? st.arg : (s && s.lprob), r = rec(pid); if (!r) return "";
       var pg = pgOf(pid), so = solOf(pg), ph = phaseOf(so), TQ = AS.tutorQuestions || {};
+      if (ph === "done") return "";   // مسئلهٔ بسته‌شده دیگر «مسئلهٔ زندهٔ این سشن» نیست
+      /* بیرون از صفحهٔ خودش فقط وقتی پیام دربارهٔ همین مسئله است (دست‌کم دو واژهٔ معنادارِ مشترک با عنوان/صورت/مجهول) */
+      if (!onPage) { var mt0 = toks(msg), pt = toks([r.p.title, r.p.statement, (uOf(so) || {}).u].join(" ")); if (mt0.filter(function (w) { return hit(w, pt); }).length < 2) return ""; }
       var Q = ph === "u" ? ((TQ.und && TQ.und.qs) || []) : ph === "p" ? (A.solveAskList ? A.solveAskList("p", 1, typeOf(r, so)) : []) : ph === "c" ? EXEC_Q : ((TQ.back && TQ.back.qs) || []);
       var tu = (s && (s.lpTutor = s.lpTutor || {})) || {}, k = pid + "|" + ph, mt = String(msg || "").trim();
       if (mt && !/^\[سامانه/.test(mt) && tu.last !== mt) { tu[k] = tu.last == null || tu.ph !== k ? (tu[k] || 0) : (tu[k] || 0) + 1; tu.last = mt; tu.ph = k; }

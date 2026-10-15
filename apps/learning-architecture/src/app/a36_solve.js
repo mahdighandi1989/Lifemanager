@@ -89,7 +89,7 @@
   }
 
   /* ---------- نردبانِ مرورِ فاصله‌دار (u فهم، b بازنگری، g آزمونِ حدس، c گامِ ضعیف) ---------- */
-  var PH = { u: "فهمِ مسئله (بی‌نگاه)", b: "درسِ بازنگری و کاربستش", g: "آزمودنِ حدس با حالتِ خاص یا مثالِ نقض", c: "گامِ ضعیفِ حلت", t: "پرسشی که پیش از گام از خودت پرسیدی", m: "انگیزهٔ گام: چرا همین گام، همین حالا" };
+  var PH = { u: "فهمِ مسئله (بی‌نگاه)", b: "درسِ بازنگری و کاربستش", g: "آزمودنِ حدس با حالتِ خاص یا مثالِ نقض", c: "گامِ ضعیفِ حلت", t: "پرسشی که پیش از گام از خودت پرسیدی", m: "انگیزهٔ گام: چرا همین گام، همین حالا", h: "ابزارِ طرحی که به کار بردی (از حافظه)" };
   /* L5: نوبتِ نخست فرداست، پس پله‌اش همان LADDER[0] است (نه ۰) — وگرنه نخستین «درست» دوباره «۱ روز» می‌داد (+۱، +۱، +۳ …) */
   function seed(s, ph) { if (!s.rev[ph]) s.rev[ph] = { iv: LADDER[0], due: tomorrow(), hist: [] }; }
   /* آغازِ نوبت با نتیجهٔ همین بار: نادرست/ناقص ⇒ پلهٔ اولِ نردبان (فردا)؛ درست ⇒ پلهٔ بعد از آن (همان نردبان، بی عددِ تازه).
@@ -107,7 +107,7 @@
     r.iv = nextIv(r.iv || LADDER[0], self === 2); r.due = A.addDays(d, r.iv);   // رکوردِ پیشینِ iv: 0 هم پلهٔ نخست شمرده می‌شود (L5)
   }
   A.solveGrade = grade;
-  function duePh(s, pg) { var t = A.today(); return Object.keys(PH).filter(function (k) { return s.rev[k] && s.rev[k].due && s.rev[k].due <= t && (k !== "t" || !pg || hasT(pg)) && (k !== "m" || (s.mot || []).length); }); }
+  function duePh(s, pg) { var t = A.today(); return Object.keys(PH).filter(function (k) { return s.rev[k] && s.rev[k].due && s.rev[k].due <= t && (k !== "t" || !pg || hasT(pg)) && (k !== "m" || (s.mot || []).length) && (k !== "h" || !!(s.live && s.live.plan && (s.live.plan.heur || []).length)); }); }
   /* مرورِ «t» فقط وقتی پاسخی به «❔ پرسشِ همین لحظه» هست (رکوردِ انگیزه‌ی تنها پرسش نیست — M2) */
   function hasT(pg) { var T = pg.tut || {}; return ["und", "plan", "exec", "back"].some(function (k) { return (T[k] || []).some(function (e) { return e && e.src === "sim" && !e.skip && e.q && e.k !== "motive"; }); }); }
   /* کارتِ «ناتمام»: فهم یا بازنگری‌ای که بی‌نوشتن از کنارش گذشتی */
@@ -367,8 +367,12 @@
       var d = {}, card = h("div", { class: "card soft col gap sv-rph", "data-ph": ph }, h("h4", {}, PH[ph])), out = h("div", { class: "col gap" });
       var reveal;
       if (ph === "u") {
+        var xu = lastU() || {}, lvU = xu.from === "live";
+        /* مسئلهٔ حل‌نشدهٔ خودم (a38): «کل در یک جمله» و «چرا می‌خواهی حلش کنی» هم از حافظه برمی‌گردند و با نوشتهٔ پیشین سنجیده می‌شوند */
+        if (lvU) { card.appendChild(field("svRU1", "کلِ مسئله در یک جمله (بی‌نگاه)", "", function (v) { d.one = v; }, 0)); card.appendChild(field("svRUW", "چرا می‌خواستی حلش کنی؟ هنوز همان است؟", "", function (v) { d.why = v; }, 0)); }
         card.appendChild(field("svRU", T.u, "", function (v) { d.u = v; }, 2)); card.appendChild(field("svRD", T.d, "", function (v) { d.d = v; }, 2)); card.appendChild(field("svRC", T.c, "", function (v) { d.c = v; }, 2));
-        reveal = function () { var x = lastU() || {}; return [h("p", { class: "small" }, h("strong", {}, "صورت: "), String(p.statement || "")), h("p", { class: "small muted" }, "کارتِ پیشینت: " + [x.u, x.d, x.c].filter(Boolean).join(" · "))]; };
+        reveal = function () { var x = lastU() || {}; return [h("p", { class: "small" }, h("strong", {}, "صورت: "), String(p.statement || "")), h("p", { class: "small muted" }, "کارتِ پیشینت: " + [x.u, x.d, x.c].filter(Boolean).join(" · ")),
+          lvU ? h("p", { class: "small muted sv-ruone" }, "کلِ مسئله که نوشته بودی: «" + (x.one || "—") + "» · چرا: «" + (x.why || "—") + "»" + (d.why ? " · حالا: «" + txt(d.why) + "»" : "")) : null]; };
       } else if (ph === "b") {
         card.appendChild(field("svRB", "از این مسئله چه درسی گرفتی و کجای دیگر به کارش می‌بری؟", "", function (v) { d.b = v; }, 3));
         reveal = function () { return [h("ul", { class: "small" }, s.lessons.slice(-3).map(function (l) { return h("li", {}, l.use + (l.newProb ? " — مسئلهٔ تازه‌ات: " + l.newProb : "")); }))]; };
@@ -378,7 +382,10 @@
         card.appendChild(field("svRG", "یک حالتِ خاص یا مثالِ نقضِ تازه بنویس که این حدس را بیازماید، و نتیجه‌اش را", "", function (v) { d.g = v; }, 3));
         var gk = g.kit || null, grv = gk ? (gk.rivals || []).filter(function (x) { return txt(x.t); }) : [];
         if (grv.length) card.appendChild(field("svRGR", "حدس‌های رقیبت چه بودند و کدام حالت جدایشان می‌کرد؟ (بی‌نگاه)", "", function (v) { d.gr = v; }, 2));
-        reveal = function () { return [h("p", { class: "small" }, h("strong", {}, "پاسخِ مسئله: "), String(p.answer || "—")), g.test ? h("p", { class: "small muted" }, "آزمونِ پیشینت: " + g.test) : null,
+        var liveOut = function () { var L = s.live, b = s.b && s.b[1], st = L && (L.steps || []).filter(function (x) { return x.out && x.out.what; }).pop();
+          if (b && b.done) return "در بازنگری: " + (b.state === "abandoned" ? "کنار گذاشتی — «" + (b.why || "") + "»" : (b.chkHow || b.glance || "حل شد") + (b.chkRes ? " (" + b.chkRes + ")" : ""));
+          return st ? "آخرین نتیجهٔ واقعی: «" + st.out.what + "»" : null; };
+        reveal = function () { var lo = p.live ? liveOut() : null; return [p.live ? (lo ? h("p", { class: "small sv-rgout" }, h("strong", {}, "آنچه واقعاً شد: "), lo) : null) : h("p", { class: "small" }, h("strong", {}, "پاسخِ مسئله: "), String(p.answer || "—")), g.test ? h("p", { class: "small muted" }, "آزمونِ پیشینت: " + g.test) : null,
           grv.length ? h("p", { class: "small muted" }, "رقیب‌هایت: " + grv.map(function (x) { return "«" + x.t + "»" + (x.test ? " (آزمون: " + x.test + ")" : ""); }).join("، ") + (gk.chk && gk.chk.sep ? " · حالتِ جداکننده: " + LT("n = " + gk.chk.sep.n) : gk.chk && gk.chk.decided ? " · جدولت داوری کرد: " + (gk.chk.decided === "both" ? "هر دو رد شدند" : "حدسِ " + fa(gk.chk.decided) + " رد شد") : "")) : null,
           gk && txt(gk.formula) ? h("p", { class: "small muted" }, "حدسِ دقیقت: " + gk.formula + (gk.chk && gk.chk.fits === false ? " (با جدولت نمی‌خواند)" : "")) : null]; };
       } else if (ph === "t") {
@@ -386,6 +393,12 @@
         card.appendChild(h("p", { class: "small" }, "پرسش: «" + (te.q || "—") + "»" + (ts ? " — در گامِ «" + clip(ts.q, 90) + "»" : "")));
         card.appendChild(field("svRT", "دوباره، بی‌نگاه: همین پرسش در همین گام چه پاسخی دارد و به کدام حرکت راه می‌برد؟", "", function (v) { d.t = v; }, 3));
         reveal = function () { return [h("p", { class: "small muted" }, "پاسخِ پیشینت: «" + (te.text || "—") + "»" + (te.motive ? " · انگیزه‌ای که نوشتی: «" + te.motive + "»" : "")), ts ? h("p", { class: "small" }, h("strong", {}, "حرکتِ واقعی: "), ts.move || "—") : null]; };
+      } else if (ph === "h") {
+        var LH = s.live || {}, hk = ((LH.plan && LH.plan.heur) || [])[0], hq = { back: "از آخر به عقب در این مسئله به کجا رسیدی — وضعِ حل‌شده، و گامِ پیش از آن؟", aux: "مسئلهٔ کمکی‌ات چه بود و از آن چطور به مسئلهٔ اصلی برمی‌گشتی؟", move: "کدام حرکت را برای این مسئله برگزیدی و چرا؟", rel: "کدام مسئلهٔ مرتبط (یا چه چیزِ آشنایی) را در این مسئله یافتی و چه چیزی از آن به کار آمد؟" }[hk] || "کدام ابزارِ طرح را به کار بردی؟";
+        card.appendChild(h("p", { class: "small" }, hq));
+        card.appendChild(field("svRH", "از حافظه، بی‌نگاه", "", function (v) { d.hh = v; }, 3));
+        reveal = function () { var w = hk === "back" && LH.back ? "حل‌شده: «" + LH.back.solved + "» ⇐ پیش از آن: «" + LH.back.before1 + "»" : hk === "aux" ? (LH.aux || []).map(function (a) { return "«" + a.t + "» — برگشت: " + a.bridge; }).join(" · ") : hk === "move" ? (LH.moves || []).map(function (m) { return ((A.MOVES || {})[m.mv] || {}).fa + ": " + m.why; }).join(" · ") : hk === "rel" && LH.seen ? (LH.seen.where || LH.seen.fam || "") : "";
+          return [h("p", { class: "small muted sv-rhwas" }, "آنچه نوشته بودی: " + (w || "—"))]; };
       } else if (ph === "m") {
         var mo = lastM() || {}, ms = (p.stages || []).filter(function (x) { return x.id === mo.sid; })[0];
         card.appendChild(h("p", { class: "small" }, ms ? "گام: «" + clip(ms.q, 120) + "»" : "گامی که انگیزه‌اش را نوشتی"));
@@ -398,7 +411,7 @@
         reveal = function () { return [h("ul", { class: "small muted" }, ((w.weak && w.weak.why) || []).map(function (x) { return h("li", {}, x); }))]; };
       }
       card.appendChild(h("button", { class: "btn sm sv-rshow", type: "button", onclick: function (e) {
-        var v = d.u || d.b || d.g || d.w || d.t || d.m; if (txt(v).length < 3) { A.toast("اول بی‌نگاه بنویس.", "bad"); return; }
+        var v = d.u || d.b || d.g || d.w || d.t || d.m || d.hh; if (txt(v).length < 3) { A.toast("اول بی‌نگاه بنویس.", "bad"); return; }
         e.currentTarget.disabled = true; reveal().forEach(function (x) { if (x) out.appendChild(x); });
         out.appendChild(gradeBtns(function (v2) { grade(s, ph, v2); (s.rev[ph].hist[s.rev[ph].hist.length - 1]).mine = txt(v); S.put(pg); A.toast("نوبتِ بعد: " + A.fdate(s.rev[ph].due)); A.render(); }));
       } }, "ثبت و مقایسه"));
@@ -510,7 +523,8 @@
      نمی‌کند (تکرارِ فشرده یادگیریِ فاصله‌دار نیست). پلهٔ ۳ یعنی دست‌کم دو بار، با فاصله، کمک کرد و از آن پس شکستی نبود. */
   A.Q_OWN_RUNG = 3;
   function qk(q) { return String(q || "").replace(/\s+/g, " ").trim(); }
-  function useDay(e) { return e.selfD || e.d || (A.localDay ? A.localDay(e.selfAt || e.at) : String(e.selfAt || e.at || "").slice(0, 10)); }
+  /* روزِ کاربست = روزِ پاسخ، نه روزِ داوری (داوریِ دیرتر نباید فاصله بسازد) */
+  function useDay(e) { return e.d || (A.localDay ? A.localDay(e.at) : String(e.at || "").slice(0, 10)); }
   A.qUses = function (q) {
     var k = qk(q), L = [];
     S.all("eprog", function (r) { return r && r.tut; }).forEach(function (pg) { ["und", "plan", "exec", "back"].forEach(function (tk) { (pg.tut[tk] || []).forEach(function (e) {
@@ -548,6 +562,8 @@
       }, "پرسشِ خودت با پرسشِ فهرست می‌خواند؟"));
     } }, "پرسشِ فهرست را نشان بده"));
     box.appendChild(out);
+    /* «پرسشِ بعد» در پلهٔ ۳ هم هست: پرسشی که حالا نمی‌خواند، حتی اگر از آنِ خودت شده، پرسیده نمی‌شود */
+    if (c.onSkip) box.appendChild(h("button", { class: "btn ghost sm sv-selfskip", type: "button", onclick: function () { delete SELF_D[key]; c.onSkip(); } }, "این پرسش حالا نمی‌خواند — پرسشِ بعد"));
     return { done: false, el: box };
   }
   A.solveSelfAskGate = selfAskGate;
@@ -562,7 +578,8 @@
     var pf = (A.SOLVE_PHASES && A.SOLVE_PHASES[ph] && A.SOLVE_PHASES[ph].fa) || "";
     /* باز فقط وقتی به کار است (نخستین گام یا پس از گامِ نادرست، و هنوز پاسخی ننوشته‌ای) — کارِ درستِ پیش‌رونده را قطع نمی‌کند */
     /* G (درونی‌سازیِ پرسش‌ها): پرسشی که پلهٔ نردبانش به A.Q_OWN_RUNG رسیده، پنهان است تا اول خودت بپرسی؛ زیرِ آن پله رفتار همان پیشین است */
-    var gate = !mine ? selfAskGate(pg, Q[qi], { lv: st.lv, sid: s0.id, ph: ph, src: "sim" }) : null;
+    var gate = !mine ? selfAskGate(pg, Q[qi], { lv: st.lv, sid: s0.id, ph: ph, src: "sim", onSkip: function () {
+      (tut[tk] = tut[tk] || []).push({ at: nowISO(), d: A.today(), q: Q[qi], qi: qi, skip: true, lv: st.lv, sid: s0.id, ph: ph, src: "sim" }); tut.qi[tk] = qi + 1; S.put(pg); A.render(); } }) : null;
     var det = h("details", own({ class: "card soft sv-ask", "data-ph": ph, open: !mine && (st.i === 0 || lastWrong) ? true : null }),
       h("summary", {}, "❔ پرسشِ همین لحظه (" + pf + "): " + (mine ? mine.q : gate && !gate.done ? "اول خودت بپرس" : Q[qi])));
     if (gate && !gate.done) { det.appendChild(gate.el); return det; }
@@ -844,6 +861,8 @@
      A.epiRevDate (a6). فقط ساعت/پاره‌ای از روز («ساعتِ ۷»، «صبح») ⇒ زمان هست ولی روز نه ({date: null}). هیچ‌کدام ⇒ null. */
   var JM = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
   var GM = [["january", "jan", "ژانویه"], ["february", "feb", "فوریه"], ["march", "mar", "مارس"], ["april", "apr", "آوریل"], ["may", "may", "مه"], ["june", "jun", "ژوئن"], ["july", "jul", "ژوئیه", "جولای"], ["august", "aug", "اوت", "آگوست"], ["september", "sep", "سپتامبر"], ["october", "oct", "اکتبر"], ["november", "nov", "نوامبر"], ["december", "dec", "دسامبر"]];
+  var ORD = [["یکم", 1], ["اول", 1], ["دوم", 2], ["سوم", 3], ["چهارم", 4], ["پنجم", 5], ["ششم", 6], ["هفتم", 7], ["هشتم", 8], ["نهم", 9], ["دهم", 10], ["یازدهم", 11], ["دوازدهم", 12], ["سیزدهم", 13], ["چهاردهم", 14],
+    ["پانزدهم", 15], ["پونزدهم", 15], ["شانزدهم", 16], ["هفدهم", 17], ["هجدهم", 18], ["هیجدهم", 18], ["نوزدهم", 19], ["بیستم", 20], ["سی ام", 30], ["سیام", 30]].sort(function (a, b) { return b[0].length - a[0].length; });
   var NUMW = { "یک": 1, "یه": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "شیش": 6, "هفت": 7, "هشت": 8, "نه": 9, "ده": 10, "a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5 };
   var WD = [["یکشنبه", 0], ["دوشنبه", 1], ["سهشنبه", 2], ["چهارشنبه", 3], ["پنجشنبه", 4], ["جمعه", 5], ["شنبه", 6], ["sunday", 0], ["monday", 1], ["tuesday", 2], ["wednesday", 3], ["thursday", 4], ["friday", 5], ["saturday", 6]];
   function jal2g(jy, jm, jd) { return A.epiRevDate ? A.epiRevDate(jy + "-" + jm + "-" + jd) : null; }
@@ -852,6 +871,9 @@
     var today = base || A.today(), x = String(when == null ? "" : when).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 0x660; })
       .replace(/[ً-ْٔ]/g, "").replace(/ۀ/g, "ه").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/‌/g, " ").replace(/\s+/g, " ").toLowerCase().trim();
     if (!x) return null;
+    /* «دهم آذر»، «بیست و یکم آبان»، «سی ام دی»: عددِ ترتیبیِ واژه‌ای پیش از نامِ ماهِ شمسی ⇒ رقم (بازبینیِ ۲۰۲۶-۱۰-۱۵) */
+    x = x.replace(new RegExp("(?:(بیست|سی)\\s*و\\s*)?(" + ORD.map(function (o) { return o[0]; }).join("|") + ")\\s+(?=(?:" + JM.join("|") + "))", "g"), function (all, tens, w) {
+      var n = ORD.filter(function (o) { return o[0] === w; })[0][1]; if (tens) { if (n > 9) return all; n += tens === "بیست" ? 20 : 30; } return n + " "; });
     var gy = +today.slice(0, 4), m, out = null;
     function res(d, src) { if (!d) return null; return { date: d, src: src, past: d < today }; }
     function upcoming(f) { for (var dy = -1; dy <= 2; dy++) { var d = f(dy); if (d && d >= today) return d; } return f(0); }
@@ -866,8 +888,9 @@
       var mk = function (y) { var dt = new Date(y, i, d); return dt.getMonth() === i ? y + "-" + A.pad(i + 1) + "-" + A.pad(d) : null; };
       out = res(mm[3] ? mk(+mm[3]) : upcoming(function (dy) { return mk(gy + dy); }), "date"); return !!out;
     });
-    if (!out && /پس ?فردا|day after tomorrow/.test(x)) out = res(A.addDays(today, 2), "rel");
-    if (!out && /فردا|tomorrow/.test(x)) out = res(A.addDays(today, 1), "rel");
+    if (!out && /پس ?فردا(?![ء-يپچژکگی])|day after tomorrow/.test(x)) out = res(A.addDays(today, 2), "rel");
+    if (!out && /(?:^|[^ء-يپچژکگی])فردا(?![ء-يپچژکگی])|tomorrow/.test(x)) out = res(A.addDays(today, 1), "rel");   // «فرداها» زمان نیست
+    if (!out && /آخر\s*هفته|weekend/.test(x)) { var pw = today.split("-"), dw = new Date(+pw[0], +pw[1] - 1, +pw[2]).getDay(); out = res(A.addDays(today, (5 - dw + 7) % 7), "rel"); }   // آخرِ هفتهٔ ایرانی = جمعهٔ پیشِ رو
     if (!out && (m = /(?:^|\s)(\d+|یک|یه|دو|سه|چهار|پنج|شش|شیش|هفت|هشت|نه|ده|a|one|two|three|four|five)\s*(روز|هفته|ماه|days?|weeks?|months?)(?![ء-يپچژکگی])\s*(پیش|قبل|ago)?/.exec(x))) {
       var nn = /\d/.test(m[1]) ? +m[1] : NUMW[m[1]], u = /روز|day/.test(m[2]) ? 1 : /هفته|week/.test(m[2]) ? 7 : 30;
       if (nn) out = res(A.addDays(today, (m[3] ? -1 : 1) * nn * u), "rel");   // «۲ روز پیش» ⇒ گذشته

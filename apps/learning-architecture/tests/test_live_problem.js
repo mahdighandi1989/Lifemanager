@@ -10,6 +10,9 @@
 //  F) بازنگری (حل شد / کنار گذاشتن)؛ درس ⇒ کارتِ مرور؛ مسئلهٔ تازه ⇒ برمی‌گردد؛ کنار گذاشتن ⇒ 🌱 ِ رها کردن و بازگشت.
 //  G) درونی‌سازیِ پرسش: پلهٔ ۳ ِ نردبان ⇒ «الان از خودت چه می‌پرسی؟» پیش از پرسش — در همین مسئله و در شبیه‌ساز؛ زیرِ آن پله رفتارِ پیشین.
 //  H) «امروز» یک سطر برای هر نوع؛ گراف؛ دستیار؛ VIEW_META؛ پهنای ۳۹۰ بی سرریز؛ bidi.
+//  + یافته‌های بازبینِ بدبین (۲۰۲۶-۱۰-۱۵): شناسهٔ داده هرگز دوباره نه؛ بستنِ گامِ باز با «حل شد/کنار گذاشتن»؛ پیش‌بینی و حدسِ زنده فقط مسیرِ پیش‌بینی؛
+//    گرافِ بی‌جزیره؛ نشانیِ بلند در ۳۹۰؛ روزِ پاسخ در پله؛ قلاب‌های دستیار تنگ‌تر؛ «پرسشِ بعد» در پلهٔ ۳ و آغاز از کم‌ورزیده‌ترین پرسش؛ مرورِ g؛ دفترِ 🎯؛
+//    «فعلاً نه»؛ پیش‌نویسِ فهم پس از بارگذاری؛ تاریخ‌ها؛ نفی؛ و عمقِ پولیا (ابزارِ طرح لازم و مرورش، کل/چرا در مرور و خواستن در ایست‌ها، A130، B089، A157).
 // خطا ⇒ کدِ خروجِ غیرصفر.
 const { chromium } = require('playwright');
 const path = require('path');
@@ -31,7 +34,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const click = async (s) => { await p.click(s); await W(140); };
   const ownCheck = (s, lab) => p.evaluate(s => { const els = [...document.querySelectorAll(s + ' input, ' + s + ' textarea, ' + s + ' select')]; return { n: els.length, notOwn: els.filter(e => !e.closest('[data-own]')).map(e => e.id), noLabel: els.filter(e => !(e.labels && e.labels.length) && !e.getAttribute('aria-label')).map(e => e.id) }; }, s)
     .then(r => { chk(r.n > 0, lab + ': no fields'); chk(!r.notOwn.length, lab + ': fields outside data-own ' + r.notOwn.join(',')); chk(!r.noLabel.length, lab + ': unlabelled ' + r.noLabel.join(',')); return r; });
-  const noOverflow = async (lab) => { const w = await p.evaluate(() => Math.max(document.scrollingElement.scrollWidth, document.body.scrollWidth)); chk(w <= 392, lab + ': horizontal overflow at 390px (' + w + ')'); };
+  const noOverflow = async (lab) => { const w = await p.evaluate(() => Math.max(document.scrollingElement.scrollWidth, document.body.scrollWidth)); if (w > 392) { const who = await p.evaluate(() => [...document.querySelectorAll('#main *')].filter(e => e.getBoundingClientRect().right > 392 || e.getBoundingClientRect().left < -2).slice(-3).map(e => e.tagName + '.' + e.className + ':' + (e.textContent || '').slice(0, 40))); chk(false, lab + ': horizontal overflow at 390px (' + w + ') ' + JSON.stringify(who)); } };
   const bidi = async (lab) => { const bad = await p.evaluate(() => [...document.querySelectorAll('#main .lp-page *, #main .lp-new *')].filter(e => e.childNodes.length && [...e.childNodes].some(n => n.nodeType === 3 && /[؀-ۿ]/.test(n.textContent) && /[A-Za-z0-9%]/.test(n.textContent)) && !e.closest('[dir=rtl]')).length); chk(bad === 0, lab + ': mixed Persian/Latin text without an rtl ancestor: ' + bad); };
   const S = (pid) => p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); return JSON.parse(JSON.stringify(pg && pg.solve || {})); }, pid);
   const todayTxt = () => p.evaluate(() => APP.dueList().map(x => x.txt));
@@ -85,12 +88,14 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpD_d3', 'مادرم بیمار است و هفته‌ای دو بار به او سر می‌زنم');
     await p.fill('#lpCond', 'همسرم کارش را از دست ندهد\nتا ده روزِ دیگر جواب بدهم');
     await sel('#lpSuff', 'هنوز نمی‌دانم'); await p.fill('#lpSuffW', 'نمی‌دانم دورکاری ممکن است یا نه');
+    await p.fill('#lpDead', '۱۰ روزِ دیگر');
     await p.fill('#lpGuess', 'بهتر است بمانم'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'اگر شرکت دورکاریِ دو روز در هفته بدهد، حدسم رد می‌شود');
     await noOverflow('understanding');
     await click('main .lp-usave');
     await click('main .lp-u .sv-g2');
     let s1 = await S(P1);
     chk(s1.u && s1.u[1] && s1.u[1].done && s1.u[1].dl.length === 3 && s1.u[1].dl[2].t.indexOf('مادرم') === 0 && s1.u[1].one && s1.u[1].why, 'understanding saved with a LIST of data ' + JSON.stringify(s1.u && s1.u[1] && s1.u[1].dl));
+    chk(s1.u[1].deadline === D(10) && s1.live.dSeq === 3, 'own deadline parsed; datum id counter on the record ' + JSON.stringify([s1.u[1].deadline, s1.live.dSeq]));
     chk(s1.rev && s1.rev.u && s1.rev.u.due === D(1) && s1.rev.g && s1.g[1].conf === 60 && s1.g[1].guess, 'understanding + guess go on the spaced ladder ' + JSON.stringify(s1.rev));
     chk(await p.evaluate(() => APP.state.view === 'lprob' && APP.state.sub === 'plan'), 'after understanding ⇒ plan');
 
@@ -153,20 +158,29 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ===== D) اجرا روی واقعیت ===== */
     await click('main details[data-sec="c"] > summary');   // بخشِ «اجرا» را خودت باز می‌کنی
     await ownCheck('main .lp-stepf', 'step form');
+    // B089: دادهٔ «نمی‌دانم کجا به کار می‌آید» با نامش در گامِ بعد برمی‌گردد
+    chk(/مادرم بیمار است/.test(await p.locator('label[for="lpSU_d3"]').textContent()), 'B089: the «don\'t know where it fits» datum returns BY NAME at the next step');
     await p.fill('#lpStep', 'بیشتر فکر کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'x'); await sel('#lpConf', '70'); await p.fill('#lpWhen', 'ساعت ۹');
     await click('main .lp-stepsave');
     info.miss = await p.evaluate(() => (document.querySelector('main .lp-stepmiss') || {}).textContent || '');
-    chk(/آرزوست/.test(info.miss) && /پیش‌بینی/.test(info.miss) && /روزش/.test(info.miss), 'vague step / no prediction / time-only refused by code: ' + info.miss);
+    chk(/آرزوست/.test(info.miss) && /پیش‌بینی/.test(info.miss) && /روزش/.test(info.miss) && /مادرم/.test(info.miss), 'vague step / no prediction / time-only / unanswered unknown datum refused by code: ' + info.miss);
     await p.fill('#lpStep', 'با منابعِ انسانیِ شرکتِ شیراز تماس بگیرم و دربارهٔ دورکاریِ دو روز در هفته بپرسم');
-    await p.fill('#lpPrem', 'شرط: سر زدن به مادرم');
+    // A130: «روشن نمی‌بینی» گام را می‌بندد تا بنویسی چه روشن نیست
+    await sel('#lpClear', 'نه');
     await p.fill('#lpPred', 'می‌گویند دورکاری فقط پس از شش ماه ممکن است');
+    await p.fill('#lpWhen', '۲۰ روزِ دیگر');
+    await sel('#lpSU_d3', 'use');
+    await click('main .lp-stepsave');
+    info.miss2 = await p.evaluate(() => (document.querySelector('main .lp-stepmiss') || {}).textContent || '');
+    chk(/روشن نمی‌بینی/.test(info.miss2) && /مهلتِ خودِ مسئله/.test(info.miss2) && (await S(P1)).live.steps.length === 0, 'A130 «نه» blocks until you write what is unclear; a day after the problem\'s own deadline is refused: ' + info.miss2);
+    await p.fill('#lpUnclear', 'نمی‌دانم با چه کسی در شرکت باید حرف بزنم');
     await p.fill('#lpWhen', '۳ روزِ دیگر');
-    await p.check('#lpSD_d3');
+    await p.fill('#lpPrem', 'شرط: سر زدن به مادرم');
     await click('main .lp-stepsave');
     s1 = await S(P1);
     const st1 = s1.live.steps[0];
     info.fc = await p.evaluate(id => { const f = APP.S.get(id); return f && { p: f.p, due: f.due, dim: f.dim, live: f.live }; }, st1 && st1.fc);
-    chk(st1 && st1.due === D(3) && st1.conf === 70 && st1.data.indexOf('d3') >= 0 && info.fc && info.fc.p === 70 && info.fc.due === D(3) && info.fc.dim === 's_problem' && info.fc.live.pid === P1, 'step with prediction ⇒ event forecast record ' + JSON.stringify(info.fc));
+    chk(st1 && st1.due === D(3) && st1.conf === 70 && st1.data.indexOf('d3') >= 0 && st1.unclear && st1.unknownAsk.d3 === 'use' && info.fc && info.fc.p === 70 && info.fc.due === D(3) && info.fc.dim === 's_problem' && info.fc.live.pid === P1, 'step with prediction ⇒ event forecast record ' + JSON.stringify(info.fc));
     chk(!(await todayTxt()).some(t => /🔭|🎯/.test(t)), 'nothing due on day 0');
     await day(1); chk(!(await todayTxt()).some(t => /🔭/.test(t)), 'step not due on day +1');
     info.d1rev = await todayTxt();
@@ -179,28 +193,52 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(await p.locator('main .lp-out').count() === 1, '«امروز» ⇒ «انجامش دادی؟ چه شد؟»');
     await ownCheck('main .lp-out', 'outcome card');
     await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'گفتند دورکاریِ دو روز از همان ماهِ اول ممکن است'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'کمی');
+    chk(/آینده/.test(await p.locator('main .lp-out .lp-owhy').textContent()), 'checkpoint: the initial «why» shown again');
     await click('main .lp-outsave');
-    info.out1 = await p.evaluate(([pid]) => { const pg = APP.S.get('eprog_' + pid), st = pg.solve.live.steps[0], f = APP.S.get(st.fc); const FC = APP.PSY.answers().FC.filter(x => x.src === 'fcast'); return { closed: st.closed, match: st.out.match, fco: f.outcome, fc: FC.map(x => x.p + ':' + x.ok), est: APP.PSY.forecastEst(FC).n, mind: (function () { const d = APP.MIND.model().dims.find(x => x.id === 's_problem'); return d ? { fc: d.cal.filter(c => c.fc).length, est: d.est && d.est.fc && d.est.fc.n } : null; })() }; }, [P1]);
-    chk(info.out1.closed && info.out1.match === 'no' && info.out1.fco === 'نشد' && info.out1.fc.indexOf('0.7:false') >= 0 && info.out1.est >= 1 && info.out1.mind && info.out1.mind.fc >= 1 && info.out1.mind.est >= 1, 'outcome judged by the user ⇒ forecast calibration data path (P.forecastEst), not answer-confidence ' + JSON.stringify(info.out1));
+    chk(!(await S(P1)).live.steps[0].closed, 'checkpoint asks «how much do you want it now?» (required)');
+    await sel('#lpOWant', 'more');
+    await click('main .lp-outsave');
+    info.out1 = await p.evaluate(([pid]) => { const pg = APP.S.get('eprog_' + pid), st = pg.solve.live.steps[0], f = APP.S.get(st.fc); const FC = APP.PSY.answers().FC.filter(x => x.src === 'fcast'); const d = APP.MIND.model().dims.find(x => x.id === 's_problem');
+      return { closed: st.closed, match: st.out.match, want: st.out.want, fco: f.outcome, fc: FC.map(x => x.p + ':' + x.ok), est: APP.PSY.forecastEst(FC).n, mind: d ? { fc: d.cal.filter(c => c.fc).length, est: d.est && d.est.fc && d.est.fc.n, ans: d.ans.length } : null }; }, [P1]);
+    chk(info.out1.closed && info.out1.match === 'no' && info.out1.want === 'more' && info.out1.fco === 'نشد' && info.out1.fc.indexOf('0.7:false') >= 0 && info.out1.est >= 1 && info.out1.mind && info.out1.mind.fc >= 1 && info.out1.mind.est >= 1, 'outcome judged by the user ⇒ forecast calibration data path (P.forecastEst) ' + JSON.stringify(info.out1));
+    chk(info.out1.mind.ans === 0, 'a live forecast is NOT an answer: «حلِ مسئله» accuracy list stays empty ' + JSON.stringify(info.out1.mind));
+    info.genFc = await p.evaluate(() => { const before = APP.MIND.model().dims.find(x => x.id === 's_decision'); const a0 = before.ans.length, c0 = before.cal.length;
+      APP.S.put({ id: 'fc_gen_t', type: 'fcast', q: 'آزمونِ پیش‌بینیِ عادی', p: 80, due: APP.today(), dim: 's_decision', outcome: 'شد' });
+      const d = APP.MIND.model().dims.find(x => x.id === 's_decision'); const o = { ans: d.ans.length - a0, cal: d.cal.length - c0, fc: d.cal.filter(c => c.fc).length }; APP.S.del('fc_gen_t'); return o; });
+    chk(info.genFc.ans === 0 && info.genFc.cal === 1 && info.genFc.fc >= 1, 'every «🎯» event forecast feeds forecast calibration only, not answer accuracy ' + JSON.stringify(info.genFc));
     chk(await p.locator('main .lp-surprise .lp-toknot').count() === 1 && await p.locator('main .lp-surprise .lp-reu').count() === 1, 'surprise ⇒ knot solver + «دوباره فهمِ مسئله»');
     await click('main .lp-surprise .lp-toknot');
-    info.kc = await p.evaluate(pid => { const kc = APP.S.get(APP.state.arg); const pg = APP.S.get('eprog_' + pid); return { view: APP.state.view, exp: kc.intake.expected, act: kc.intake.actual, src: kc.src, inL: pg.solve.live.knots.indexOf(kc.id) >= 0 }; }, P1);
-    chk(info.kc.view === 'kcase' && /شش ماه/.test(info.kc.exp) && /ماهِ اول/.test(info.kc.act) && info.kc.src.live && info.kc.src.pid === P1 && info.kc.inL, 'surprise ⇒ knot situation prefilled (expected vs actual) ' + JSON.stringify(info.kc));
+    info.kc = await p.evaluate(pid => { const kc = APP.S.get(APP.state.arg); const pg = APP.S.get('eprog_' + pid); return { view: APP.state.view, exp: kc.intake.expected, act: kc.intake.actual, src: kc.src, inL: pg.solve.live.knots.indexOf(kc.id) >= 0, back: !!document.querySelector('main .lp-kback') }; }, P1);
+    chk(info.kc.view === 'kcase' && /شش ماه/.test(info.kc.exp) && /ماهِ اول/.test(info.kc.act) && info.kc.src.live && info.kc.src.pid === P1 && info.kc.inL && info.kc.back, 'surprise ⇒ knot situation prefilled (expected vs actual), linked back ' + JSON.stringify(info.kc));
     await go('lprob', P1, 'exec');
-    // غافلگیری ⇒ «دوباره فهمِ مسئله»: همان کارت با نوشته‌های پیشین، نسخهٔ پیشین نگه داشته می‌شود
+    // غافلگیری ⇒ «دوباره فهمِ مسئله»: همان کارت با نوشته‌های پیشین؛ دادهٔ پاک‌شده شناسه‌اش را به دادهٔ تازه نمی‌دهد
     await click('main .lp-surprise .lp-reu');
     info.reu = await p.evaluate(() => ({ sub: APP.state.sub, one: (document.getElementById('lpOne') || {}).value, d3: (document.getElementById('lpD_d3') || {}).value }));
     chk(info.reu.sub === 'u' && /شیراز/.test(info.reu.one) && /مادرم/.test(info.reu.d3), 'surprise ⇒ re-understand with your previous card ' + JSON.stringify(info.reu));
+    await p.fill('#lpD_d1', '');   // حقوق دیگر داده نیست
     await p.fill('#lpCond', 'همسرم کارش را از دست ندهد\nتا ده روزِ دیگر جواب بدهم\nدورکاری از ماهِ اول ممکن است');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
-    chk((await S(P1)).live.uHist.length === 1 && /دورکاری/.test((await S(P1)).u[1].c), 're-understanding saved, earlier version kept');
+    s1 = await S(P1);
+    chk(s1.live.uHist.length === 1 && /دورکاری/.test(s1.u[1].c) && s1.u[1].dl.map(x => x.id).join() === 'd2,d3', 're-understanding saved, earlier version kept, removed datum gone ' + JSON.stringify(s1.u[1].dl.map(x => x.id)));
+    await go('lprob', P1, 'u'); await click('main .lp-reu2'); await click('main .lp-dadd');
+    info.newId = await p.evaluate(() => [...document.querySelectorAll('main .lp-dl input')].map(e => e.id));
+    chk(info.newId.indexOf('lpD_d4') >= 0 && info.newId.indexOf('lpD_d1') < 0, 'datum ids are never reused (new datum gets d4, not the deleted d1) ' + JSON.stringify(info.newId));
+    await p.fill('#lpD_d4', 'یک مشاورِ شغلی را می‌شناسم');
+    // پیش‌نویسِ کارتِ فهم با بارگذاریِ دوباره نمی‌رود
+    await W(600);
+    await p.reload(); await p.waitForSelector('.nav'); await W(300);
+    await p.evaluate(x => { window.__day = x; APP.today = () => window.__day; APP.S.loaded = true; }, D(3));
+    await go('lprob', P1, 'u');
+    chk(await p.evaluate(() => (document.getElementById('lpD_d4') || {}).value) === 'یک مشاورِ شغلی را می‌شناسم', 'understanding draft survives a reload');
+    await click('main .lp-usave'); await click('main .lp-u .sv-g2');
+    chk((await S(P1)).live.uDraft == null && (await S(P1)).u[1].dl.map(x => x.id).join() === 'd2,d3,d4', 'draft cleared on save');
     await go('lprob', P1, 'exec');
     // گامِ دوم، این‌بار انجام‌نشده ⇒ 🌱
     await p.fill('#lpStep', 'هزینهٔ ماهانهٔ زندگی در شیراز را با دو نفر از ساکنانش بررسی کنم');
     await sel('#lpClear', 'مطمئن نیستم'); await p.fill('#lpPred', 'هزینهٔ کل حدودِ یک‌سوم کمتر از تهران درمی‌آید'); await sel('#lpConf', '80'); await p.fill('#lpWhen', '۴ روزِ دیگر');
     await click('main .lp-stepsave');
     chk(await p.locator('main .lp-cur').count() === 1, 'current step shown with its check date');
-    // ===== A/B برای مسئلهٔ دوم (برای G و H) — از کارِ دستیار، با همان فرم‌ها =====
+    // ===== مسئلهٔ دوم (از کارِ دستیار، با همان فرم‌ها) =====
     const P2 = info.asNew && await p.evaluate(() => APP.S.all('eprob', x => x.live && x.by === 'assistant')[0].p.id);
     await go('lprob', P2);
     await p.fill('#lpOne', 'می‌خواهم تصمیم بگیرم کلاسِ آلمانی را ادامه بدهم یا نه'); await p.fill('#lpWhy', 'شاید روزی برای کار به آلمان بروم'); await p.fill('#lpUnk', 'ادامه بدهم یا نه');
@@ -208,13 +246,24 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpCond', 'وقتِ کارم کم نشود'); await sel('#lpSuff', 'کافی است');
     await p.fill('#lpGuess', 'ادامه می‌دهم'); await sel('#lpConf', '70'); await p.fill('#lpTest', 'اگر یک ماه بی کلاس پیشرفتم نخوابد');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
-    // روزِ +۳: پرسشِ نخست در مسئلهٔ دوم، باز «کمک کرد» ⇒ پلهٔ ۳
+    // G/9: مسئلهٔ تازه از کم‌ورزیده‌ترین پرسش آغاز می‌کند (نه همیشه پرسشِ ۱)
     chk(await p.evaluate(q => APP.qRung(q), Q[0]) === 2, 'G: one helpful use ⇒ rung 2');
+    info.p2start = await p.evaluate(() => document.querySelector('main .lp-ask .lp-q').textContent);
+    chk(info.p2start.indexOf(Q[1]) >= 0, 'a new problem starts at the least-practised question (Q2), not always Q1 ' + info.p2start);
+    for (let k = 0; k < Q.length && (await p.evaluate(() => document.querySelector('main .lp-ask .lp-q').textContent)).indexOf(Q[0]) < 0; k++) await click('main .lp-askskip');
     chk(await p.evaluate(() => !document.querySelector('main .lp-ask .sv-selfask')), 'G: rung 2 ⇒ still shown directly');
     await p.fill('#lpAsk', 'تصمیمِ ادامهٔ باشگاه را دیده‌ام: شش ساعت در هفته'); await click('main .lp-askgo'); await click('main .lp-ask .sv-g2');
     chk(await p.evaluate(q => APP.qRung(q), Q[0]) === 3, 'G: second helpful SPACED use ⇒ rung 3');
+    // ۷: روزِ کاربست = روزِ پاسخ، نه روزِ داوری
+    chk(await p.evaluate(() => { APP.S.put({ id: 'eprog_qtest', type: 'eprog', lv: {}, tut: { plan: [{ src: 'live', q: '__q', d: '2026-11-02', at: 'x', self: 2, selfD: '2026-11-02' }, { src: 'live', q: '__q', d: '2026-11-03', at: 'y', self: 2, selfD: '2026-11-05' }] } }); const r = APP.qRung('__q'); APP.S.del('eprog_qtest'); return r; }) === 2, 'rung counts the answer day, not a later grading day');
+    // ۱۶: طرح بی هیچ ابزارِ طرحِ به‌کاررفته پذیرفته نمی‌شود
     await p.fill('#lpPlan', 'نخست پس از سه ماه کلاس، یک ماه شش ساعت را می‌سنجم، سپس تصمیم می‌گیرم');
     await click('main .lp-plansave');
+    chk((await S(P2)).live.plan == null && await p.locator('main .lp-plan .lp-heur.warnline').count() === 1, 'plan refused until at least one heuristic card was actually used');
+    await sel('#lpMv', 'mv_special'); await p.fill('#lpMvWhy', 'یک ماه آزمایش، حالتِ ساده‌ترِ تصمیمِ همیشگی است'); await click('main .lp-mvadd');
+    await p.fill('#lpPlan', 'نخست پس از سه ماه کلاس، یک ماه شش ساعت را می‌سنجم، سپس تصمیم می‌گیرم');
+    await click('main .lp-plansave');
+    chk((await S(P2)).live.plan && (await S(P2)).live.plan.heur.indexOf('move') >= 0 && (await S(P2)).rev.h, 'plan saved with the heuristic used; it goes on the spaced ladder (h)');
     await p.fill('#lpStep', 'یک ماه بی کلاس، هر روز ۲۰ دقیقه با اپ تمرین کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'سطحم افت نمی‌کند'); await sel('#lpConf', '60'); await p.fill('#lpWhen', '۴ روزِ دیگر');
     await click('main .lp-stepsave');
 
@@ -223,65 +272,108 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     tt = await todayTxt();
     chk(tt.filter(t => /🔭/.test(t)).length === 1 && tt.some(t => /🔭 ۲ گامِ واقعی موعدِ وارسی است/.test(t)), 'H: two due steps ⇒ ONE grouped «امروز» line ' + JSON.stringify(tt.filter(t => /🔭/.test(t))));
     await go('lprob', P1, 'exec');
-    await sel('#lpODone', 'no'); await p.fill('#lpOWhat', 'وقت نشد'); await sel('#lpOProg', 'نه');
+    await sel('#lpODone', 'no'); await p.fill('#lpOWhat', 'وقت نشد'); await sel('#lpOProg', 'نه'); await sel('#lpOWant', 'same');
     await click('main .lp-outsave');
     info.noprog = await p.evaluate(pid => { const st = APP.S.get('eprog_' + pid).solve.live.steps[1]; return { fco: APP.S.get(st.fc).outcome, will: !!document.querySelector('main .lp-after .sv-will .sv-willf') }; }, P1);
     chk(info.noprog.fco === 'انجام نشد' && info.noprog.will, 'not done / no progress ⇒ 🌱 smallest-next-step card; undone forecast stays out of calibration ' + JSON.stringify(info.noprog));
-    // گیر ⇒ گره‌گشا با همین مسئله
     await click('main .lp-stuck');
     info.stuck = await p.evaluate(pid => { const kc = APP.S.get(APP.state.arg); return { v: APP.state.view, st: kc.intake.statement, src: kc.src, kinds: kc.kinds }; }, P1);
     chk(info.stuck.v === 'kcase' && /شیراز/.test(info.stuck.st) && /مادرم/.test(info.stuck.st) && info.stuck.src.live && !info.stuck.src.step && info.stuck.kinds[0] === 'problem', 'stuck ⇒ knot solver with the problem prefilled ' + JSON.stringify(info.stuck));
     await go('lprob', P1, 'exec');
+    // گامِ بازی که با «حل شد» بسته می‌شود
+    await p.fill('#lpStep', 'با همسرم یک جلسهٔ نیم‌ساعته دربارهٔ رفتن بگذاریم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'او موافقِ رفتن است'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
+    await click('main .lp-stepsave');
 
     /* ===== F) بازنگری — حل شد ===== */
     await click('main .lp-solved');
     await ownCheck('main .lp-lb', 'look-back card');
     info.lbun = await p.evaluate(() => [...document.querySelectorAll('main .lp-lb .lp-un')].map(x => x.getAttribute('data-d')));
     chk(/آینده/.test(await p.locator('main .lp-lb .lp-bwhy0').textContent()), 'look-back shows the initial «why» to compare with the end');
-    chk(info.lbun.length === 0, 'mother datum was ticked in a step ⇒ no longer unused at look-back ' + JSON.stringify(info.lbun));
+    chk(info.lbun.join() === 'd4', 'look-back asks only about data still unused (d4 added later; mother used in a step) ' + JSON.stringify(info.lbun));
     await p.fill('#lpBChk', 'با همسرم و مدیرِ شیراز جمع‌بندی را چک کردم');
     await sel('#lpBRes', 'نتیجه سالم ماند');
     await p.fill('#lpBUse', 'پیش از تصمیمِ بزرگ، شرطِ پنهان (دورکاری) را مستقیم بپرس، نه حدس');
-    await p.fill('#lpBNew', 'اگر همسرم پیشنهادِ کار در شهرِ دیگری بگیرد، چطور تصمیم بگیریم؟');
+    await p.fill('#lpBNew', 'شرکتی در شیراز به من پیشنهادِ کار داده با حقوقِ ۴۰٪ بیشتر. همسرم در تهران شاغل است، مادرم بیمار است و هفته‌ای دو بار به او سر می‌زنم.');
     await p.fill('#lpBWorked', 'پرسیدنِ مستقیم از منابعِ انسانی');
-    await sel('#lpBHit', 'نادرست بود');
-    await sel('#lpBBest', '0');
+    await sel('#lpBHit', 'نادرست بود'); await sel('#lpBBest', '0'); await sel('#lpBWant', 'same');
+    await sel('#lpBU_a_d4', 'skip'); await p.fill('#lpBU_w_d4', 'تصمیم پیش از دیدنِ مشاور گرفته شد');
+    await click('main .lp-lbsave');
+    chk(!(await S(P1)).b[1], 'A157: an «invented» problem that is a near-copy of the original is refused');
+    await p.fill('#lpBNew', 'اگر همسرم پیشنهادِ کار در شهرِ دیگری بگیرد، چطور تصمیم بگیریم؟');
     await noOverflow('look-back');
     await click('main .lp-lbsave');
     s1 = await S(P1);
-    info.lb = await p.evaluate(pid => { const made = APP.S.all('eprob', x => x.live && x.origin && x.origin.id === pid)[0]; const cards = APP.S.all('card', c => c.pb === pid); return { made: made && { dorm: made.dormant, pid: made.p.id }, cards: cards.length, meta: APP.PSY.answers().META.filter(x => x.src === 'eprog').length }; }, P1);
-    chk(s1.b[1] && s1.b[1].done && s1.b[1].bestQ === Q[0] && s1.live.bestQ === Q[0] && s1.rev.b && s1.lessons.length === 1 && info.lb.cards === 1, 'look-back: lesson ⇒ review card, most helpful question recorded ' + JSON.stringify({ b: s1.b[1] && s1.b[1].bestQ, cards: info.lb.cards }));
-    chk(s1.g[1].hit === 'نادرست بود' && info.lb.meta >= 1, 'guess judged against what happened ⇒ answer-confidence calibration (META), separate from event forecasts');
+    info.lb = await p.evaluate(pid => { const made = APP.S.all('eprob', x => x.live && x.origin && x.origin.id === pid)[0]; const cards = APP.S.all('card', c => c.pb === pid); const A2 = APP.PSY.answers(); const pg = APP.S.get('eprog_' + pid), st = pg.solve.live.steps[2];
+      return { made: made && { dorm: made.dormant, pid: made.p.id }, cards: cards.length, meta: A2.META.filter(x => x.src === 'eprog').length, fcLive: A2.FC.filter(x => x.src === 'eprog-live').map(x => x.p + ':' + x.ok), st3: st && { closed: st.closed, auto: st.out && st.out.auto, fco: APP.S.get(st.fc).outcome } }; }, P1);
+    chk(s1.b[1] && s1.b[1].done && s1.b[1].bestQ === Q[0] && s1.b[1].want === 'same' && s1.rev.b && s1.lessons.length === 1 && info.lb.cards === 1, 'look-back: lesson ⇒ review card, most helpful question, want compared ' + JSON.stringify({ b: s1.b[1] && s1.b[1].bestQ, cards: info.lb.cards }));
+    chk(s1.g[1].hit === 'نادرست بود' && info.lb.meta === 0 && info.lb.fcLive.indexOf('0.6:false') >= 0, 'live guess judged against reality ⇒ FORECAST path, not answer-confidence META ' + JSON.stringify(info.lb));
+    chk(info.lb.st3 && info.lb.st3.closed && info.lb.st3.auto === 'solved' && info.lb.st3.fco === 'انجام نشد', 'solving closes the open step and its forecast (out of calibration, not pending) ' + JSON.stringify(info.lb.st3));
     chk(info.lb.made && info.lb.made.dorm === D(10), 'invented problem saved as a live problem, dormant until the ladder rung ' + JSON.stringify(info.lb.made));
     const P3 = info.lb.made && info.lb.made.pid;
     await go('e_prob', null, 'list');
     chk(await p.locator('main .lp-list .lp-item[data-pid="' + P3 + '"] .lp-dorm').count() === 1, 'invented problem listed with «برمی‌گردد …»');
-    // مسئلهٔ دوم: آگاهانه کنار گذاشتن (بی شرم) ⇒ 🌱 ِ رها کردن
+    // مسئلهٔ دوم: نتیجهٔ «تاحدی»، گامِ بازِ دیگر، و آگاهانه کنار گذاشتن ⇒ گام و پیش‌بینی‌اش بسته
     await go('lprob', P2, 'exec');
-    await sel('#lpODone', 'part'); await p.fill('#lpOWhat', 'دو هفته تمرین کردم'); await sel('#lpOMatch', 'part'); await sel('#lpOProg', 'کمی'); await click('main .lp-outsave');
+    await sel('#lpODone', 'part'); await p.fill('#lpOWhat', 'دو هفته تمرین کردم'); await sel('#lpOMatch', 'part'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'less'); await click('main .lp-outsave');
     chk(await p.evaluate(pid => APP.S.get(APP.S.get('eprog_' + pid).solve.live.steps[0].fc).outcome, P2) === 'تاحدی', 'partial match ⇒ stays out of the binary forecast calibration');
+    await p.fill('#lpStep', 'از معلم یک آزمونِ تعیینِ سطح بگیرم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'سطحم B1 است'); await sel('#lpConf', '60'); await p.fill('#lpWhen', '۵ روزِ دیگر');
+    await click('main .lp-stepsave');
     await click('main .lp-abandon');
     await click('main .lp-lbsave');
     chk((await S(P2)).b[1] == null, 'abandon needs a reason');
-    await p.fill('#lpBWhy', 'معلمم گفت پیشرفتم کند است'); await sel('#lpBSrc', 'crit'); await sel('#lpBBest', 'none');
+    await p.fill('#lpBWhy', 'معلمم گفت پیشرفتم کند است'); await sel('#lpBSrc', 'crit'); await sel('#lpBBest', 'none'); await sel('#lpBWant', 'less');
     await click('main .lp-lbsave');
     info.ab = await S(P2);
+    info.abFc = await p.evaluate(pid => { const st = APP.S.get('eprog_' + pid).solve.live.steps[1]; return { closed: st.closed, auto: st.out && st.out.auto, fco: APP.S.get(st.fc).outcome }; }, P2);
     chk(info.ab.b[1] && info.ab.b[1].state === 'abandoned' && info.ab.will && info.ab.will.drop && info.ab.will.drop.due === D(10), 'abandon ⇒ conscious drop on the 🌱 ladder ' + JSON.stringify(info.ab.will && info.ab.will.drop));
+    chk(info.abFc.closed && info.abFc.auto === 'abandoned' && info.abFc.fco === 'انجام نشد', 'abandon closes the open step + its forecast ' + JSON.stringify(info.abFc));
+    // ۱۱: دفترِ پیش‌بینی: پیش‌بینیِ گامِ زنده با نتیجهٔ درست و پیوند به گام، بی منوی ویرایش
+    await go('fcast');
+    info.led = await p.evaluate(() => ({ outs: [...document.querySelectorAll('main .fc-live .fc-liveout')].map(e => e.textContent), sel: document.querySelectorAll('main .fc-live select').length, go: document.querySelectorAll('main .fc-live .fc-golive').length }));
+    chk(info.led.outs.indexOf('تاحدی') >= 0 && info.led.outs.indexOf('انجام نشد') >= 0 && info.led.outs.indexOf('نشد') >= 0 && info.led.sel === 0 && info.led.go === info.led.outs.length, '🎯 ledger shows live outcomes (incl. تاحدی/انجام نشد), not editable there, linked to the step ' + JSON.stringify(info.led));
+    await day(12);
+    chk(!(await todayTxt()).some(t => /🔭|🎯/.test(t)), 'closed steps of abandoned/solved problems never come back as due');
 
-    /* ===== F/G/H روزِ +۱۰: مسئلهٔ ساخته‌شده برمی‌گردد؛ رها کردن دوباره پرسیده می‌شود؛ پرسش اول از خودت ===== */
+    /* ===== روزِ +۱۰ ⇒ ۱۲: مسئلهٔ ساخته‌شده برمی‌گردد؛ «فعلاً نه» پله‌ای دورتر ===== */
     await day(10);
     tt = await todayTxt();
     chk(tt.some(t => /🧩 مسئلهٔ تازه‌ای که خودت ساختی برگشت: «اگر همسرم/.test(t)), 'day +10: invented problem RETURNS in «امروز» ' + JSON.stringify(tt));
     chk(tt.some(t => /🌱 چیزی که آگاهانه رها کردی/.test(t)), 'day +10: conscious drop re-asked');
     await go('home');
     await click('main .dueb:has-text("خودت ساختی برگشت")');
-    chk(await p.evaluate(pid => APP.state.view === 'lprob' && APP.state.arg === pid && !!APP.S.get('eprob_' + pid).woke, P3), 'returned problem opens for solving');
+    chk(await p.locator('main .lp-wake .lp-snooze').count() === 1, 'returned problem asks «شروع می‌کنم / فعلاً نه»');
+    await click('main .lp-snooze');
+    chk(await p.evaluate(pid => APP.S.get('eprob_' + pid).dormant, P3) === D(17) && !(await todayTxt()).some(t => /خودت ساختی برگشت/.test(t)), '«فعلاً نه» ⇒ next ladder rung (+7), no daily nagging');
+    // رها کردن ⇒ «هنوز همان دلیل؟» ⇒ «نه — دوباره پیش می‌برمش» ⇒ مسئله دوباره باز
+    await go('lprob', P2);
+    chk(await p.locator('main .sv-willdropchk').count() === 1, 'drop re-check card on the problem page');
+    await sel('main .sv-willdropchk select', 'back'); await click('main .sv-willdropgo');
+    await go('lprob', P2);
+    chk(await p.evaluate(pid => APP.livePhase(pid), P2) === 'c', 'brought back ⇒ the problem is open again');
+    // ۱۴: افقِ بیش از یک سال فقط با تأییدِ صریح؛ «دهم آذر»، «آخرِ هفته»، «فرداها»
+    await go('lprob', P2, 'exec');
+    await p.fill('#lpStep', 'در آزمونِ رسمیِ گوته ثبت‌نام کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'قبول می‌شوم'); await sel('#lpConf', '50'); await p.fill('#lpWhen', '۴۰۰ روزِ دیگر');
+    await click('main .lp-stepsave');
+    chk(await p.locator('#lpFarOk').count() === 1 && (await S(P2)).live.steps.length === 2, 'a day beyond one year asks for explicit confirmation');
+    await p.check('#lpFarOk'); await click('main .lp-stepsave');
+    chk((await S(P2)).live.steps.length === 3 && (await S(P2)).live.steps[2].due === D(410), 'confirmed far step saved');
+    info.when = await p.evaluate(T => ['دهم آذر', 'آخرِ هفته', 'فرداها', 'بیست و یکم آبان'].map(w => { const x = APP.willWhen(w, T); return x && x.date; }), D(10));
+    chk(info.when[0] === '2026-12-01' && info.when[1] === '2026-11-13' && info.when[2] === null && info.when[3] === '2026-11-12', 'date words: «دهم آذر», «آخرِ هفته» (coming Friday), «فرداها» rejected ' + JSON.stringify(info.when));
+
+    /* ===== روزِ +۱۷: مسئلهٔ ساخته‌شده دوباره؛ پرسشِ پلهٔ ۳ اول از خودت ===== */
+    await day(17);
+    chk((await todayTxt()).some(t => /خودت ساختی برگشت/.test(t)), 'day +17: returns again on the ladder');
+    await go('home');
+    await click('main .dueb:has-text("خودت ساختی برگشت")');
+    await click('main .lp-wakego');
+    chk(await p.evaluate(pid => APP.state.view === 'lprob' && !!APP.S.get('eprob_' + pid).woke, P3), 'returned problem opens for solving');
     await p.fill('#lpOne', 'می‌خواهیم بدانیم اگر همسرم پیشنهادِ کار در شهرِ دیگر بگیرد چطور تصمیم بگیریم'); await p.fill('#lpWhy', 'تا آن روز غافلگیر نشویم'); await p.fill('#lpUnk', 'روشِ تصمیمِ مشترک');
     await p.fill('#lpD_d1', 'تجربهٔ تصمیمِ شیراز'); await p.fill('#lpCond', 'هر دو راضی باشیم'); await sel('#lpSuff', 'هنوز نمی‌دانم');
     await p.fill('#lpGuess', 'همان روش جواب می‌دهد'); await sel('#lpConf', '70'); await p.fill('#lpTest', 'اگر شرطِ پنهانِ تازه‌ای پیدا شود');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
-    info.gate = await p.evaluate(() => ({ gate: !!document.querySelector('main .lp-ask .sv-selfask'), q: !!document.querySelector('main .lp-ask .lp-q') }));
-    chk(info.gate.gate && !info.gate.q, 'G: rung ≥ 3 ⇒ «الان از خودت چه می‌پرسی؟» BEFORE the canonical question ' + JSON.stringify(info.gate));
+    for (let k = 0; k < Q.length && !(await p.evaluate(() => !!document.querySelector('main .lp-ask .sv-selfask'))); k++) await click('main .lp-askskip');
+    info.gate = await p.evaluate(() => ({ gate: !!document.querySelector('main .lp-ask .sv-selfask'), q: !!document.querySelector('main .lp-ask .lp-q'), skip: !!document.querySelector('main .lp-ask .sv-selfskip') }));
+    chk(info.gate.gate && !info.gate.q && info.gate.skip, 'G: rung ≥ 3 ⇒ «الان از خودت چه می‌پرسی؟» BEFORE the canonical question, with «پرسشِ بعد» still available ' + JSON.stringify(info.gate));
     await ownCheck('main .lp-ask', 'self-ask gate');
     await click('main .sv-selfshow');
     chk(await p.locator('main .sv-selfq').count() === 0, 'canonical question not revealed before writing your own');
@@ -291,43 +383,74 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await click('main .lp-ask .sv-g1');
     info.self = await p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); return { rec: (pg.tut.selfAsk || [])[0], q: !!document.querySelector('main .lp-ask .lp-q'), note: !!document.querySelector('main .lp-ask .sv-selfdone') }; }, P3);
     chk(info.self.rec && info.self.rec.match === 1 && /شرطِ پنهان/.test(info.self.rec.mine) && info.self.rec.src === 'live' && info.self.q && info.self.note, 'self-judged comparison recorded, then the usual card ' + JSON.stringify(info.self));
-    // همین دروازه در شبیه‌ساز (a36) — فقط برای همین پرسشِ پلهٔ ۳؛ کارتِ پرسشِ مرحله‌ای دیگر بی‌تغییر
+    // همین دروازه در شبیه‌ساز (a36) — فقط برای پرسشِ پلهٔ ۳؛ کارتِ مرحله‌ای دیگر بی‌تغییر؛ «پرسشِ بعد» در دروازه هم هست
     const SIM = await p.evaluate(Q0 => { const all = APP.probs(); let pP = null, pO = null; all.forEach(pr => { const s0 = pr.stages[0]; if (!s0) return; const ph = APP.stagePhase(pr, s0); if (ph === 'p' && !pP) pP = pr.id; if (ph !== 'p' && !pO) pO = pr.id; }); return { pP, pO }; }, Q[0]);
     await p.evaluate(pid => { APP.simState = { pid, lv: 1, order: 'hist', i: 0 }; APP.go('e_prob', pid, 'sim'); }, SIM.pP); await W(180);
-    info.simP = await p.evaluate(() => { const a = document.querySelector('main .sv-ask'); return { gate: !!(a && a.querySelector('.sv-selfask')), sum: a && a.querySelector('summary').textContent }; });
-    chk(info.simP.gate && /اول خودت بپرس/.test(info.simP.sum), 'G in the simulator: plan-phase ask card asks you first at rung 3 ' + JSON.stringify(info.simP));
+    info.simP = await p.evaluate(() => { const a = document.querySelector('main .sv-ask'); return { gate: !!(a && a.querySelector('.sv-selfask')), sum: a && a.querySelector('summary').textContent, skip: !!(a && a.querySelector('.sv-selfskip')) }; });
+    chk(info.simP.gate && info.simP.skip && /اول خودت بپرس/.test(info.simP.sum), 'G in the simulator: plan-phase ask card asks you first at rung 3 ' + JSON.stringify(info.simP));
     await p.evaluate(pid => { APP.simState = { pid, lv: 1, order: 'hist', i: 0 }; APP.go('e_prob', pid, 'sim'); }, SIM.pO); await W(180);
     info.simO = await p.evaluate(() => { const a = document.querySelector('main .sv-ask'); return { gate: !!(a && a.querySelector('.sv-selfask')), field: !!(a && a.querySelector('input[id^="svAsk_"]')), sum: a && a.querySelector('summary').textContent }; });
     chk(!info.simO.gate && info.simO.field && /❔ پرسشِ همین لحظه \(/.test(info.simO.sum), 'G behaviour-preserving below the rung (other phases unchanged) ' + JSON.stringify(info.simO));
-    // رها کردن ⇒ «هنوز همان دلیل؟» ⇒ «نه — دوباره پیش می‌برمش» ⇒ مسئله دوباره باز
-    await go('lprob', P2);
-    chk(await p.locator('main .sv-willdropchk').count() === 1, 'drop re-check card on the problem page');
-    await sel('main .sv-willdropchk select', 'back'); await click('main .sv-willdropgo');
-    await go('lprob', P2);
-    chk(await p.evaluate(pid => APP.livePhase(pid), P2) === 'c', 'brought back ⇒ the problem is open again');
+
+    /* ===== ۶ + ۱۵: دادهٔ بسیار بلند (نشانی) در ۳۹۰px؛ نفی، به‌کاربردن نیست؛ فهرستِ «به‌کارنرفته» هنگامِ تایپ تازه می‌شود ===== */
+    const LONG = 'https://example.org/' + 'a'.repeat(160) + '/b';
+    const P4 = await p.evaluate(() => APP.liveCreate('سفرِ نوروز را با قطار برویم یا با هواپیما؟', 'برای نوروز می‌خواهیم به مشهد برویم و نمی‌دانم قطار بهتر است یا هواپیما.').p.id);
+    await go('lprob', P4);
+    await p.fill('#lpOne', 'می‌خواهم بین قطار و هواپیما برای سفرِ نوروز انتخاب کنم'); await p.fill('#lpWhy', 'سفر با بچه‌ها آرام باشد'); await p.fill('#lpUnk', 'وسیلهٔ سفر');
+    await p.fill('#lpD_d1', 'قیمتِ بلیتِ هواپیما دو میلیون است'); await p.fill('#lpD_d2', LONG);
+    await p.fill('#lpCond', 'بچه‌ها خسته نشوند'); await sel('#lpSuff', 'کافی است');
+    await p.fill('#lpGuess', 'قطار'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'اگر قطار جا نداشته باشد');
+    await noOverflow('understanding with a long URL datum');
+    await click('main .lp-usave'); await click('main .lp-u .sv-g2');
+    await p.fill('#lpBkS', 'با بچه‌ها آرام و بی‌خستگی به مشهد رسیده‌ایم'); await p.fill('#lpBk1', 'وسیلهٔ مناسب رزرو شده'); await click('main .lp-bksave');
+    await noOverflow('plan with a long URL datum');
+    chk(await p.locator('main .lp-plan .lp-un[data-d="d1"]').count() === 1, 'price datum unused before typing the plan');
+    await p.fill('#lpPlan', 'قیمتِ بلیتِ هواپیما اصلاً مهم نیست؛ نخست جای قطار را می‌پرسم'); await W(450);
+    chk(await p.locator('main .lp-plan .lp-un[data-d="d1"]').count() === 1, 'negation («اصلاً مهم نیست») does not count as using the datum');
+    await p.fill('#lpPlan', 'نخست قیمتِ بلیتِ هواپیما (دو میلیون) را با قطار مقایسه می‌کنم، سپس جای قطار را می‌پرسم'); await W(450);
+    chk(await p.locator('main .lp-plan .lp-un[data-d="d1"]').count() === 0 && await p.locator('main .lp-plan .lp-un[data-d="d2"]').count() === 1, 'the unused list updates live while typing the plan');
+    await bidi('plan long');
+    await sel('#lpPU_a_d2', 'skip'); await p.fill('#lpPU_w_d2', 'فقط نشانیِ سایت است'); await click('main .lp-plansave');
+    await click('main .lp-abandon');
+    await noOverflow('look-back with a long URL datum');
 
     /* ===== H) گراف، دستیار، نما ===== */
     info.g = await p.evaluate(([p1, p3, kc0]) => { const M = APP.GRAPH.build(), nb = k => (M.adj[k] || []).map(i => M.edges[i]).map(e => e.a === k ? e.b : e.a), k = 'lprob:' + p1, n = nb(k);
-      const pg = APP.S.get('eprog_' + p1), cs = pg.solve.live.claims[0].caseId;
-      return { node: !!M.nodes[k], move: n.indexOf('move:mv_special') >= 0, ecase: n.indexOf('ecase:' + cs) >= 0, kcase: pg.solve.live.knots.every(id => n.indexOf('kcase:' + id) >= 0), rel: n.indexOf('kcase:' + kc0) >= 0, made: nb('lprob:' + p3).indexOf(k) >= 0, broken: APP.GRAPH.gaps(M).broken.filter(x => /lprob/.test(x.a + x.missing)).length, ty: !!APP.GRAPH.TM.lprob }; }, [P1, P3, await p.evaluate(() => window.__kc0)]);
-    chk(info.g.node && info.g.move && info.g.ecase && info.g.kcase && info.g.rel && info.g.made && !info.g.broken && info.g.ty, 'graph: live problem ↔ moves, cases, knots, related, invented problem (from registries) ' + JSON.stringify(info.g));
+      const pg = APP.S.get('eprog_' + p1), cs = pg.solve.live.claims[0].caseId, fc = APP.S.get(pg.solve.live.steps[0].fc).id, card = APP.S.all('card', c => c.pb === p1)[0];
+      const lps = Object.keys(M.nodes).filter(x => /^lprob:/.test(x)), iso = lps.filter(x => nb(x).indexOf('ssys:s_problem') < 0);
+      return { node: !!M.nodes[k], move: n.indexOf('move:mv_special') >= 0, ecase: n.indexOf('ecase:' + cs) >= 0, kcase: pg.solve.live.knots.every(id => n.indexOf('kcase:' + id) >= 0), rel: n.indexOf('kcase:' + kc0) >= 0, made: nb('lprob:' + p3).indexOf(k) >= 0,
+        fcast: nb('fcast:' + fc).indexOf(k) >= 0, card: !!card && nb('card:' + card.id).indexOf(k) >= 0, ssysAll: lps.length >= 4 && !iso.length, broken: APP.GRAPH.gaps(M).broken.filter(x => /lprob/.test(x.a + x.missing)).length, ty: !!APP.GRAPH.TM.lprob }; }, [P1, P3, info.rel.kc]);
+    chk(Object.values(info.g).every(v => v === true || v === 0), 'graph: live problem ↔ s_problem, moves, cases, knots, related, invented problem, its forecasts and lesson card — no islands ' + JSON.stringify(info.g));
     await go('lprob', P2, 'exec');
-    info.as = await p.evaluate(pid => { const AS = APP.ASSIST, s = { id: 'ach_x', msgs: [{ role: 'user', text: 'کمکم کن' }] }; const t = AS.promptHooks.map(f => { try { return f(s, 'کمکم کن') || ''; } catch (e) { return 'ERR ' + e.message; } }).join('\n');
-      const r2 = AS.promptHooks.map(f => { try { return f({ id: 'z', msgs: [] }, 'نمی‌دونم چیکار کنم، باید بین دو کار تصمیم بگیرم') || ''; } catch (e) { return ''; } }).join('\n');
-      return { live: /مسئلهٔ زندهٔ این سشن \(/.test(t) && t.indexOf(pid) >= 0, one: /فقط \*\*یک\*\* پرسش/.test(t), noJudge: /داوری نکن/.test(t), phase: /مرحله: اجرا روی واقعیت/.test(t), ctxNull: AS.solvingCtx(s) === null, rules: /live_new/.test(r2), err: /ERR/.test(t), meta: !!(APP.VIEW_META.lprob && APP.VIEW_META.lprob.what && APP.VIEW_META.lprob.why), sub: APP.SUB_VIEWS.lprob === 'e_prob' }; }, P2);
-    chk(info.as.live && info.as.one && info.as.noJudge && info.as.phase && info.as.ctxNull && info.as.rules && !info.as.err && info.as.meta && info.as.sub, 'assistant: conditional hooks know the phase, one question, never judges; VIEW_META/SUB_VIEWS ' + JSON.stringify(info.as));
+    info.as = await p.evaluate(([pid, p1]) => { const AS = APP.ASSIST, s = { id: 'ach_x', msgs: [{ role: 'user', text: 'کمکم کن' }] }; const run = (ss, m) => AS.promptHooks.map(f => { try { return f(ss, m) || ''; } catch (e) { return 'ERR ' + e.message; } }).join('\n');
+      const t = run(s, 'کمکم کن'), r2 = run({ id: 'z', msgs: [] }, 'نمی‌دونم چیکار کنم، باید بین دو کار تصمیم بگیرم');
+      const o = { live: /مسئلهٔ زندهٔ این سشن \(/.test(t) && t.indexOf(pid) >= 0, one: /فقط \*\*یک\*\* پرسش/.test(t), noJudge: /داوری نکن/.test(t), phase: /مرحله: اجرا روی واقعیت/.test(t), ctxNull: AS.solvingCtx(s) === null, rules: /live_new/.test(r2), err: /ERR/.test(t), meta: !!(APP.VIEW_META.lprob && APP.VIEW_META.lprob.what && APP.VIEW_META.lprob.why), sub: APP.SUB_VIEWS.lprob === 'e_prob' };
+      APP.go('home');
+      const s2 = { id: 'y', lprob: pid, msgs: [] };
+      o.offTopic = !/مسئلهٔ زنده|🔭/.test(run(s2, 'فونتِ صفحه ریز است') + run(s2, 'کارت مرور حل نشده'));
+      o.onTopic = /مسئلهٔ زندهٔ این سشن/.test(run(s2, 'دربارهٔ کلاسِ آلمانی و ادامه دادنش یک سؤال دارم'));
+      o.closed = !/مسئلهٔ زندهٔ این سشن/.test(run({ id: 'w', lprob: p1, msgs: [] }, 'دربارهٔ پیشنهادِ کار در شیراز و تهران'));
+      return o; }, [P2, P1]);
+    chk(Object.values(info.as).every((v, i) => Object.keys(info.as)[i] === 'err' ? !v : v), 'assistant: conditional hooks (phase, one question, never judges; not for off-topic or closed problems); VIEW_META/SUB_VIEWS ' + JSON.stringify(info.as));
     info.sysLen = await p.evaluate(() => (APP.ASSIST.SYS || '').length);
     chk(info.sysLen <= 20000, 'assistant SYS ≤ 20000 chars');
-    // پهنا و bidi در همهٔ بخش‌ها
     for (const [pid, sub] of [[P1, 'plan'], [P1, 'back'], [P2, 'exec'], [P3, 'plan']]) { await go('lprob', pid, sub); await noOverflow('lprob ' + sub); await bidi('lprob ' + sub); }
     await go('e_prob', null, 'live'); await noOverflow('live tab'); await bidi('live tab');
     await go('home'); await noOverflow('home');
-    // روزِ +۲۱: مرورِ فاصله‌دارِ همین مسئله‌ها هنوز در «امروز» (نردبان) — بی خطا
+
+    /* ===== روزِ +۲۱: مرورِ فاصله‌دار — کل/چرا، حدس با آنچه شد، ابزارِ طرح از حافظه ===== */
     await day(21);
     tt = await todayTxt();
     chk(tt.some(t => /مرورِ حلِ مسئله/.test(t)), 'day +21: spaced reviews of live problems still on the ladder');
     await go('lprob', P1); await W(100);
     chk(await p.locator('main .sv-rev').count() === 1, 'review panel on the live problem page');
+    chk(await p.locator('main .sv-rev #svRU1').count() === 1 && await p.locator('main .sv-rev #svRUW').count() === 1, 'u review asks the whole-in-one-sentence and the «why» from memory');
+    await p.fill('main .sv-rev #svRG', 'اگر دورکاری بدهند، ماندن بهتر نیست'); await click('main .sv-rph[data-ph="g"] .sv-rshow');
+    info.grev = await p.evaluate(() => document.querySelector('main .sv-rph[data-ph="g"]').textContent);
+    chk(!/پاسخِ مسئله: —/.test(info.grev) && /آنچه واقعاً شد/.test(info.grev), 'g review on a live problem shows what actually happened, not «پاسخِ مسئله: —»');
+    await p.fill('main .sv-rev #svRH', 'وضعِ حل‌شده: درآمد بیشتر و خانواده آرام'); await click('main .sv-rph[data-ph="h"] .sv-rshow');
+    chk(/خانواده آرام است/.test(await p.locator('main .sv-rph[data-ph="h"] .sv-rhwas').textContent()), 'the heuristic used (work backwards) returns from memory and is compared with what you wrote');
+    await day(62); await go('lprob', P4); await noOverflow('+60 with a long URL datum'); await go('home'); await noOverflow('home +60');
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');

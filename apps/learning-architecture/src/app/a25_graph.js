@@ -166,7 +166,8 @@
       var tseen = {}; (p.items || []).forEach(function (x) { if (x && x.topic && !tseen[x.topic]) { tseen[x.topic] = 1; edge(ref("prereq", p.id), ref("topic", x.topic), "req"); } }); });
     all("wchain").forEach(function (c) { node("wchain", c.id, "⛓ " + (c.title || "زنجیره"), { go: ["chain"] }); edge(ref("wchain", c.id), vw("chain"), "in"); });
     all("fcast").forEach(function (x) { node("fcast", x.id, "🎯 " + String(x.q || x.title || "پیش‌بینی").slice(0, 60), { go: ["fcast"] }); edge(ref("fcast", x.id), vw("fcast"), "in");
-      if (x.dim && x.dim !== "s_epi") edge(ref("fcast", x.id), ref("ssys", x.dim), "about"); });
+      if (x.dim && x.dim !== "s_epi") edge(ref("fcast", x.id), ref("ssys", x.dim), "about");
+      if (x.live && x.live.pid && N[ref("lprob", x.live.pid)]) edge(ref("fcast", x.id), ref("lprob", x.live.pid), "about", "پیش‌بینیِ گامِ «" + (x.live.step || "") + "»"); });
     var vByT = {}; all("value").forEach(function (v) { node("value", v.id, "🧭 " + (v.title || "ارزش"), { go: ["vals"] }); edge(ref("value", v.id), vw("vals"), "in"); if (v.title) vByT[v.title] = v.id; });
     all("value").forEach(function (v) { (v.vs || []).forEach(function (c) { if (c && c.with) edge(ref("value", v.id), ref("value", vByT[c.with] || c.with), "vs", c.rule || ""); }); });
     all("meaning").forEach(function (m) { node("meaning", m.id, "وارسیِ معنا · " + (m.date || ""), { go: ["vals"] }); edge(ref("meaning", m.id), vw("vals"), "in"); });
@@ -175,7 +176,9 @@
     all("pr").forEach(function (x) { node("prun", x.id, "اجرای پروتکلِ " + (x.pid || ""), { go: ["proto", x.pid] }); if (x.pid) edge(ref("prun", x.id), pref(x.pid), "practises"); if (x.topic) edge(ref("prun", x.id), ref("topic", x.topic), "about"); });
     all("card").forEach(function (c) { node("card", c.id, "🃏 " + String(c.q || "کارت").slice(0, 50), { go: ["review"] }); edge(ref("card", c.id), vw("review"), "in");
       if (c.tid != null && c.tid !== "") edge(ref("card", c.id), ref("tech", c.tid), "practises"); if (c.pid) edge(ref("card", c.id), pref(c.pid), "practises");
-      if (c.topic) edge(ref("card", c.id), ref("topic", c.topic), "about"); if (c.knot) edge(ref("card", c.id), ref("knot", c.knot), "practises"); });
+      if (c.topic) edge(ref("card", c.id), ref("topic", c.topic), "about"); if (c.knot) edge(ref("card", c.id), ref("knot", c.knot), "practises");
+      /* کارتِ درسِ بازنگری (c.pb): به مسئلهٔ زنده یا مسئله‌ای که گره دارد؛ مسئلهٔ پنهان (نمونهٔ سازنده) نه گره است نه شکسته */
+      if (c.pb) { var pk = N[ref("lprob", c.pb)] ? ref("lprob", c.pb) : N[ref("prob", c.pb)] ? ref("prob", c.pb) : null; if (pk) edge(ref("card", c.id), pk, "about"); } });
     /* تورهای دستیار (رکوردِ achat با tour): تور ⇐ وجه‌ها ⇐ ارجاع‌های هر وجه */
     function recRef(type, id) {
       if (type === "eprob") { var r = S && S.get ? S.get(id) : null; if (r && r.live && r.p && N[ref("lprob", r.p.id)]) return ref("lprob", r.p.id); if (r && r.p && N[ref("prob", r.p.id)]) return ref("prob", r.p.id); return r ? null : ref("eprob", id); }   /* مسئلهٔ تأییدنشده/پنهان: نه گره، نه شکسته */
@@ -199,6 +202,7 @@
     /* «🔭 مسئلهٔ حل‌نشدهٔ خودم»: حرکت‌های برگزیده (با دلیلِ خودت)، موقعیت‌های گره‌گشای همین مسئله، پرونده‌های ادعاها، پیوندهایی که خودت از «مسئلهٔ مرتبط» زدی، و مسئلهٔ مادر */
     lives.forEach(function (r) {
       var k0 = ref("lprob", r.p.id), pg = S.get("eprog_" + r.p.id), L = (pg && pg.solve && pg.solve.live) || {};
+      edge(k0, N[ref("ssys", "s_problem")] ? ref("ssys", "s_problem") : vw("e_prob"), "in");   // هیچ مسئلهٔ زنده‌ای جزیره نیست
       (L.moves || []).forEach(function (m) { if (m && m.mv) edge(k0, ref("move", m.mv), "uses", m.why || ""); });
       (L.claims || []).forEach(function (c) { if (c && c.caseId) edge(k0, recRef("case", c.caseId), "dep", c.t || ""); });
       (L.knots || []).forEach(function (id) { edge(k0, ref("kcase", id), "has"); });

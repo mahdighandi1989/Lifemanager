@@ -141,3 +141,48 @@ Each is deep **for live problems** unless noted; the re-auditor decides.
   - **B273, C052, B127:** partial, through the card's text.
 - **Group I (auxiliary problem):** **A252** is stated (shallow). **B029:** several auxiliary problems are allowed (partial).
 - **Group J (non-mathematical examples):** **B239** (see above). **B137, B139:** an optional figure or table field, so shallow.
+
+## Fixes after the adversarial review (same day, second commit)
+Each fix has a check in `tests/test_live_problem.js`. The ones marked † were also mutation-tested: the fix was undone, the test failed, and the fix was restored.
+1. **Datum ids are never reused** †. A one-way counter `solve.live.dSeq` hands out ids. Existing records are migrated by `seqFix` from the highest id found in the card, its history, the draft, step ticks and the unused answers. Test: after deleting d1, the next datum gets `lpD_d4`.
+2. **"Solved" and "abandoned" close open steps** † (`closeOpen`). Each step gets `out.auto` set, and its forecast gets «انجام نشد», which keeps it out of calibration and stops it being due. A step reopened from 🌱 starts fresh.
+3. **Event forecasts no longer count toward answer accuracy (`X.ans`) in a29** †. This now applies to **all** «🎯» `fcast` records, not only live ones, because the same reasoning holds: "the likelier side happened" is not a correct answer to a question. They still feed `cal` with `fc: true`, which goes into `P.forecastEst`. `wchain` (worry chain) follows the same pattern but was left unchanged, as a candidate for later.
+4. **The live guess is a forecast.** In a34 it goes to `FC` (`src: "eprog-live"`), not to META. In a29 it is marked `fc: true` in `s_problem.cal`.
+5. **Graph:** every `lprob` has an edge to `ssys:s_problem` (or to `view:e_prob` if that node is missing). `fcast.live.pid` gets an edge to its `lprob`, and `card.pb` gets an edge to its `lprob` or `prob`. The `test_graph.js` fixture checks all three.
+6. **Long text at 390px:** CSS `overflow-wrap:anywhere`, plus max-width and min-width rules, on `.lp-page`, `.lp-list`, `.sv-rev` and `.fc-live`. A datum holding a 160-character URL is checked on the understanding card, the plan, the look-back and at +62 days.
+7. **A question's rung counts the day it was answered, not the day it was graded.** A later grading no longer creates the spacing.
+8. **Assistant hooks:**
+   - `LIVE_RE` is narrower. It matches "I don't know what to do / I must decide / accept or not". It does not match «فونتِ صفحه ریز است» or «کارت مرور حل نشده».
+   - `RULES` are added only on that regex.
+   - The live-problem block is added only on the problem's own page, or when the message shares at least two meaningful words with that problem.
+   - It is never added for a closed problem.
+9. **«پرسشِ بعد» (`.sv-selfskip`) now also appears in the self-ask gate at rung ≥ 3**, in both live problems and the simulator. A new live problem starts at its least-practised question (lowest rung; on a tie, the most general one) and then moves general → specific, wrapping around.
+10. **g review on a live problem** shows «آنچه واقعاً شد» (the look-back, or the last real outcome) instead of «پاسخِ مسئله: —».
+11. **🎯 ledger:** live forecasts show their actual outcome (شد/نشد/تاحدی/انجام نشد). The edit menu is removed for them and replaced by a link to the step.
+12. **Returning invented problem:** «شروع می‌کنم» or «فعلاً نه». "Not now" moves it one rung further up the ladder (3 → 7 → 21 → 60) instead of asking every day. Opening the page no longer counts as waking it.
+13. **The understanding draft survives a reload** (`solve.live.uDraft`, saved 350 ms after typing stops and cleared on save).
+14. **Dates:**
+    - «دهم آذر» and «بیست و یکم آبان» (ordinal day words) are now accepted.
+    - «آخرِ هفته» means the coming Friday.
+    - «فرداها» is rejected; this applies to 🌱 too, since both share `A.willWhen`.
+    - A new optional "deadline" field on the understanding card: steps after that date are refused.
+    - Steps more than one year away need an explicit confirmation checkbox. There is no hard cutoff.
+15. **Negation** †: «مهم نیست», «اصلاً», «نه», «ربطی ندارد», «لازم نیست» and similar words in the same clause mean the datum is not counted as used. The unused-data list on the plan card updates live while you type.
+16. **Pólya depth:**
+    - The plan needs at least one heuristic card actually used †: related problem, work backwards, auxiliary problem, or a move with a reason. The code checks it is non-empty, specific (at least three meaningful words) and not a near-copy (`A.kNearCopy`).
+    - The heuristic used comes back in the new spaced review phase **"h"**, from memory, and is then compared with what was written.
+    - The "u" review on live problems also asks for the whole problem in one sentence and «چرا».
+    - "How much do you want it now?" is required at every outcome checkpoint and at look-back, shown next to the original «why».
+    - **A130:** answering «نه» to «روشن می‌بینی؟» blocks the step until you write what is unclear.
+    - **B089:** a datum answered "don't know where it fits" comes back by name in the next step (required) and again at look-back.
+    - **A157:** an invented problem that is a near-copy of the original problem is refused.
+
+**Updated verification:** all 61 tests (pool of 4, judged by exit code) pass. `build.py --check` is in sync, and the learning-architecture pytest files pass 8/8 (handbook 6/6). Mutation runs: B1, B2, B3, B15, B16, M1, M2 and M3 each made the test exit with code 1, and each mutation was reverted.
+
+**Effect on the Pólya list above:** the deep claims now hold more strictly:
+- **A099 and B074** (the «چرا» is re-asked at checkpoints and look-back, and it comes back in the review);
+- **B048** (the whole-in-one-sentence comes back in the review);
+- **A130** (now blocking);
+- **B089** (comes back by name);
+- **A157** (code-checked);
+- **B266 and B272** (whichever heuristic was used comes back from memory).
