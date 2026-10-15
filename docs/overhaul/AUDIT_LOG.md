@@ -4475,3 +4475,12 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **FINDING → CHANGE:** 29 page tests printed ERRORS but exited 0. They now set a non-zero exit code, and the gate checks exit codes. This surfaced two hidden failures (system prompt > 20k; two views with no menu entry); both are fixed.
 - **CHANGE:** Supervisor: PROMPT v11 and ownership v3 add a `psy-norms` area (a monthly web refresh with an independent verifier; never invents numbers when the web is unavailable).
 - **PROPOSAL (owner):** Whether `r_naql_ahad` should apply to a finding read directly from the published paper.
+
+## 2026-10-15 — LLA: Pólya «How to Solve It» item-level coverage, integration, sources registry (WORKLOG 58)
+- **FINDING:** 812 items were read in full by 3 independent readers, plus 17 items taken from the original where the translation has gaps.
+  - Round 1: 24 deep / 670 shallow / 99 absent / 19 n/a.
+  - Root cause: links were data-level only (the graph), not flow-level (the solving moment).
+- **CHANGE:** Three integration packages went into the existing tunnels (solving flow, moves/ladder/spacing, assistant/course/protocols), with no parallel subsystem. Also: the `a37_sources.js` + `sources/<id>/` registry and tab, graph nodes `src`/`srcitem`, the assistant hook, the `lla-sources` ownership area, and the procedure in AGENTS.md.
+- **FINDING:** An independent round-2 audit, done by execution, gives 603 deep / 179 shallow / 11 absent. It found builder claims overstated (P1 24, P2 36, P3 85 items) and two field-name bugs. Round 3 is in progress.
+- **CHANGE:** B″ `T_measured_precedence` merged (economics 60 / socsci 61 for direct readings).
+- **PROPOSAL:** `p_plausible_reasoning` (owner); scope encoding of the psych frame (backtest routine).

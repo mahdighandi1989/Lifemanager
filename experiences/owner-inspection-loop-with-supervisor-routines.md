@@ -270,3 +270,12 @@ and give the reviewer the job of checking it.
   - Report probabilities (P(above the peers' median), the expected percentile), not an IQ.
   - Verbal or famous items are descriptive only, because translation shifts their difficulty.
 - **How to apply elsewhere:** any "norm-referenced" claim needs (1) the same task as calibrated, (2) the source's own reference group and its age band, and (3) an independently re-derived parameter. Without all three, report only self-referenced change.
+
+## Update 2026-10-15 (d) — "connected" has two meanings: data-level links vs flow-level integration
+- **Symptom:** The shared graph linked techniques ↔ moves ↔ knot families correctly, and the system was reported as "connected". An item-level audit against a canonical source (Pólya) still found 0 deep items in the solving phases. The methods existed, but they were never offered at the moment of use.
+- **Fix:**
+  - Audit against external canonical sources item by item. A verdict of "deep" requires that the method is prompted in the user's flow at the right moment AND practised or checked, spaced if it is a skill.
+  - Integrate into existing tunnels; never build a parallel subsystem.
+  - Keep a per-source registry and tab so coverage is visible and re-measured.
+- **Related:** builder agents overstated their own coverage (145 items across three packages). Only an independent auditor running the real page gives the verdict.
+- **How to apply elsewhere:** never let the builder grade its own coverage; the gate for "done" is an independent, execution-based re-audit. When someone says "everything is connected", ask whether it is connected in the data or connected in the moment of use.
