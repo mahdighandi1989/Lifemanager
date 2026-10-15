@@ -167,7 +167,7 @@
     /* خطِ زمانی */
     var ev = [];
     knots.forEach(function (k) { if (k.created) ev.push({ at: k.created, fa: "گرهٔ تازه: «" + (k.name || "گره") + "»" }); (k.hist || []).forEach(function (x) { if (x.status === "practised") ev.push({ at: x.at, fa: "✓ ورزیده: «" + (k.name || "گره") + "»" }); if (x.status === "returned") ev.push({ at: x.at, fa: "↩ بازگشت: «" + (k.name || "گره") + "»" }); }); });
-    knots.forEach(function (k) { (k.remeasures || []).forEach(function (r) { ev.push({ at: r.at, fa: "📏 دوباره‌سنجیِ «" + (k.name || "گره") + "»: " + [r.freq, r.intensity != null ? "شدت " + r.intensity : "", r.note].filter(Boolean).join(" · ") }); }); });
+    knots.forEach(function (k) { (k.remeasures || []).forEach(function (r) { ev.push({ at: r.at, fa: "📏 دوباره‌سنجیِ «" + (k.name || "گره") + "»: " + (A.knotRemeasureText ? A.knotRemeasureText(k, r) : [r.freq, r.intensity != null ? "شدت " + fa(r.intensity) : "", r.note].filter(Boolean).join(" · ")) }); }); });
     /* ماندگاریِ گره‌ها: فقط همین‌جا شمرده می‌شود (ingest پاسخ‌های گره را دوباره نمی‌شمارد؛ M5) */
     if (A.PSY && A.PSY.holds) A.PSY.holds().forEach(function (x) { var k = S.get(x.knot) || {}; ev.push({ at: x.at, fa: (x.ok ? "✓" : "✗") + " ماندگاریِ " + x.n + " روزهٔ «" + (k.name || "گره") + "»" }); var X = D[kdim[x.knot]]; if (X) { X.ret.n++; if (x.ok) X.ret.ok++; } });
     cases.forEach(function (c) { if (c.created) ev.push({ at: c.created, fa: "پروندهٔ سنجش: «" + (c.title || "") + "»" }); var fn = c.st && c.st.st_final; if (fn && fn.done) ev.push({ at: fn.at || c.updated || c.created, fa: "⚖️ حکمِ پایانیِ پرونده: «" + (c.title || "") + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "نتیجهٔ واقعی ثبت شد: «" + (c.title || "") + "»" }); });

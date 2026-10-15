@@ -16,4 +16,6 @@ const { chromium } = require('playwright'); const path = require('path');
     return out;
   });
   console.log(JSON.stringify(r)); console.log(errs.join('\n') || 'no page errors'); await b.close();
-})();
+  // داوری با کدِ خروج (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵): خطای صفحه ⇒ غیرصفر، تا دروازهٔ pytest آن را ببیند
+  process.exitCode = errs.length ? 1 : 0;
+})().catch(e => { console.error('scan_epi failed: ' + (e && e.stack || e)); process.exit(1); });

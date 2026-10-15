@@ -155,8 +155,38 @@
       if (onSave) onSave();
     }, { prefix: prefix || "e_" + s.id, claims: claims });
     a11yWS(ws);
+    ownJudge(ws, s);
     return ws;
   };
+  /* داوری فقط با خودِ کاربر (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: دستیار می‌توانست «احتمال صدق نهایی ٪»، «وضعیت» و «حکم در یک بند» ِ پرونده را بنویسد):
+     فیلدهای حکم و درجه `data-own="verdict"` می‌گیرند؛ دستیار (a26) پرشان نمی‌کند و نمی‌زندشان — فقط زرد، با یادداشتِ روشن (مثلِ معمای امروز).
+     فهرست از خودِ تعریفِ ایستگاه‌ها ساخته می‌شود (نه فهرستِ دستی):
+     - حکمِ هر ایستگاه (verdict) — جز پذیرش (st_intake) که فقط مسیر را تعیین می‌کند؛
+     - در «حکم نهایی»: جدولِ درجهٔ نهایی، مقایسه با اطمینانِ اولیه، «حکم در یک بند» و «اقدام»؛
+     - فیلدِ گزینه‌ای که درجهٔ یقین/ظن می‌دهد، «وضعِ معرفتی»، «… واقعی است؟»، و مقیاسِ اعتبار/وثاقت/صلاحیت؛
+     - در هر جدول: ستونِ درصد (احتمال صدق) و ستونِ گزینه‌ایِ همان داوری‌ها. رده‌بندیِ صرف (نوعِ ورودی، مرتبهٔ ادراک) آزاد است. */
+  var JUDGE_FINAL = ["final", "conclusion", "shift", "act"];
+  // گزینه‌ای که درجهٔ یقین/ظن می‌دهد، یا «وضعِ معرفتی» و «… واقعی است؟»؛ مقیاسِ «اعتبار/وثاقت/صلاحیت» — همه داوری‌اند (رده‌بندیِ صرف نه)
+  function judgeSel(x) { return (x.t === "sel" && (/یقین|ظن/.test((x.opts || []).join(" ")) || /وضع معرفتی|واقعی(?:\s*است)?؟/.test(x.l || ""))) || (x.t === "scale" && /اعتبار|وثاقت|صلاحیت/.test(x.l || "")); }
+  function judgeField(s, f) { return (f.k === "verdict" && s.id !== "st_intake") || (s.id === FINAL && JUDGE_FINAL.indexOf(f.k) >= 0) || judgeSel(f); }
+  function judgeCol(c) { return c.t === "pct" || judgeSel(c); }
+  A.epiJudgment = function (sid) {
+    var s = SM[sid]; if (!s) return { fields: [], cols: [] };
+    var fl = s.ws.filter(function (f) { return f.t !== "info" && judgeField(s, f); }), out = { fields: fl.map(function (f) { return f.k; }), cols: [] };
+    s.ws.forEach(function (f) { if (f.t === "table" && fl.indexOf(f) < 0) (f.cols || []).forEach(function (c) { if (judgeCol(c)) out.cols.push(f.k + "." + c.k); }); });
+    return out;
+  };
+  function ownJudge(ws, s) {
+    function fix() {
+      s.ws.forEach(function (f) {
+        var box = ws.querySelector('.fld[data-k="' + f.k + '"]'); if (!box) return;
+        if (judgeField(s, f)) { box.setAttribute("data-own", "verdict"); return; }
+        if (f.t === "table") (f.cols || []).forEach(function (c) { if (judgeCol(c)) box.querySelectorAll('td[data-l="' + c.l.replace(/"/g, '\\"') + '"]').forEach(function (td) { if (!td.getAttribute("data-own")) td.setAttribute("data-own", "verdict"); }); });
+      });
+    }
+    fix();
+    if (window.MutationObserver) new MutationObserver(fix).observe(ws, { childList: true, subtree: true });
+  }
   A.epiFields = fieldsFor;
   A.epiClaimsOf = claimsOf;
 

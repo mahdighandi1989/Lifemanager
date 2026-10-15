@@ -38,8 +38,19 @@
      (کارزارِ v08: «دو شب در ماه، شدتِ ۲۵» فقط در گفت‌وگو ماند) — روی خودِ گره ثبت می‌شود و در کارنامه و خطِ زمانی می‌آید */
   AS.DO.remeasure = function (a) {
     var k = S.get((a && a.knot) || ""); if (!k || k.type !== "knot") return "دوباره‌سنجی ثبت نشد: شناسهٔ گره (knot) لازم است";
-    var r = { at: nowIso(), freq: clip(a.freq, 120), intensity: a.intensity == null || isNaN(+a.intensity) ? null : +a.intensity, note: clip(a.note, 300) };
-    if (!r.freq && r.intensity == null && !r.note) return "دوباره‌سنجی خالی است";
+    /* بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: «همان مقیاسِ فرم» با کد — شدت عددِ درستِ ۰ تا ۱۰ (مثلِ «شدتِ احساس در لحظه»)، بسامد یکی از گزینه‌های
+       «چند بار پیش آمده؟» (A.KFREQ)؛ بیرون از مقیاس ⇒ رد با پیام (نه ثبتِ «۲۵» کنارِ «۷ از ۱۰»). خالی ⇒ رد. */
+    var FQ = A.KFREQ || [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]], MX = A.KEMO_MAX || 10, why = [];
+    var fq = String(a.freq == null ? "" : a.freq).replace(/‌/g, "").replace(/\s+/g, "").trim(), fid = "";
+    if (fq) { FQ.forEach(function (o) { if (fq === o[0] || fq === o[1].replace(/‌/g, "").replace(/\s+/g, "")) fid = o[0]; });
+      if (!fid) why.push("بسامد «" + clip(a.freq, 40) + "» در مقیاسِ فرم نیست — یکی از: " + FQ.map(function (o) { return o[1]; }).join("، ")); }
+    var it = a.intensity == null || String(a.intensity).trim() === "" ? null : String(a.intensity).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[٠-٩]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).trim();
+    var iv = it == null ? null : +it;
+    if (it != null && !(/^\d+$/.test(it) && iv >= 0 && iv <= MX)) why.push("شدت باید عددِ درستی از ۰ تا " + fa(MX) + " باشد (همان مقیاسِ «شدتِ احساس در لحظه»)، نه «" + clip(a.intensity, 12) + "» — از کاربر با همان مقیاس بپرس");
+    if (why.length) return "دوباره‌سنجی ثبت نشد: " + why.join("؛ ");
+    var r = { at: nowIso(), freq: fid ? (FQ.filter(function (o) { return o[0] === fid; })[0] || [])[1] : "", freqId: fid, intensity: iv, note: clip(a.note, 300) };
+    if (!r.freqId && r.intensity == null && !r.note) return "دوباره‌سنجی خالی است";
+    var base = A.knotIntake ? A.knotIntake(k) : null; if (base) r.base = { freq: base.freq, emo: base.emo };
     (k.remeasures = k.remeasures || []).push(r); S.put(k); return "";
   };
   function hour() { var n = ((S.settings().knots || {}).notify) || {}; return n.hour == null ? 9 : n.hour; }
@@ -78,7 +89,7 @@
     "# موعدها و ساعت",
     "- اگر کاربر تاریخ یا موعدی گفت (آزمون، تحویل، «تا جمعه»، «فردا»)، آن را با {\"do\":\"deadline\",\"what\":\"…\",\"date\":\"YYYY-MM-DD\"} (میلادی، از «# امروز» حساب کن) ثبت کن و برنامهٔ تمرین/مرور را طوری بچین که پیش از موعد تمام شود (چرخهٔ ۱-۳-۷ ای که بعد از موعد می‌افتد پیشنهاد نکن؛ برای موعدِ نزدیک مرورِ فشرده پیش از آن).",
     "- اگر کاربر گفت کی کار می‌کند یا کی پیام می‌خواهد (مثلاً «بعد از ۲۲»)، با {\"do\":\"remind_hour\",\"hour\":22} ساعتِ یادآورها را بگذار.",
-    "- پاسخِ کاربر به دوباره‌سنجیِ موقعیتِ نخست (هنوز پیش می‌آید؟ چند بار؟ شدت با همان مقیاسِ فرم) را با {\"do\":\"remeasure\",\"knot\":\"<شناسهٔ گره>\",\"freq\":\"…\",\"intensity\":عدد,\"note\":\"…\"} ثبت کن، نه فقط در گفت‌وگو.",
+    "- پاسخِ کاربر به دوباره‌سنجیِ موقعیتِ نخست (هنوز پیش می‌آید؟ چند بار؟ شدت با همان مقیاسِ فرم) را با {\"do\":\"remeasure\",\"knot\":\"<شناسهٔ گره>\",\"freq\":\"یک‌بار|گاهی|مرتب\",\"intensity\":۰ تا ۱۰,\"note\":\"…\"} ثبت کن، نه فقط در گفت‌وگو.",
     "- برنامهٔ چندهفته‌ای تا یک موعد را فقط در متنِ گفت‌وگو نگذار: هر گامِ تاریخ‌دارش یک deadline شود (حداکثر چند گامِ اصلی)."
   ].join("\n");
 })(window.APP);
