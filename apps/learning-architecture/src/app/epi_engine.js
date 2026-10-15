@@ -68,7 +68,9 @@
     var hit = R.filter(function (r) { return X.cond(r.when, f); });
     /* T_measured_precedence (p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵): برای خواندنِ مستقیمِ یافته‌ای از جمعیتِ سنجیده، سقف‌های «بی‌مرجح» که شرطشان در
        همهٔ اعضای قابِ همان جمعیت برقرار است جای خود را به نرخِ سنجیده (T_pop) می‌دهند — فهرست را ابزار از قاب‌ها ساخته (EPI_FOUND.precedeOf)، نه دست */
-    var FDy = W.EPI_FOUND, yl = FDy && FDy.yields ? FDy.yields(hit.filter(function (r) { return wOf(cfg, r) > 0; }), f) : {}, yielded = [];
+    /* k به yields هم می‌رسد (همخوانی با گامِ ۵ ِ همان قضیه، ممیزیِ ۲۰۲۶-۱۰-۱۵ B5): تصدیقی که حلقه‌ای جز خودِ یافته دارد (k.member === false)، یا ویژگی‌ای
+       که شرطِ آن سقف را برقرار کرده از حلقهٔ دیگری آمده (k.other)، مشمولِ تقدم نیست — T_weakest ½ ِ آن حلقه را نگه می‌دارد. پیکره/قاب‌ها k.member/k.other ندارند ⇒ بی‌تغییر. */
+    var FDy = W.EPI_FOUND, yl = FDy && FDy.yields ? FDy.yields(hit.filter(function (r) { return wOf(cfg, r) > 0; }), f, k) : {}, yielded = [];
     hit.forEach(function (r) {
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
@@ -83,15 +85,18 @@
     // cfg.deg (آزمایشی، پیش‌فرض خاموش): مقایسه میانِ «درجه»های جزوه (یقین/ظن/شک/وهم/کذب — EPI_FOUND.DEG) به‌جای عدد + تحملِ قراردادیِ ۱۰
     var FD = W.EPI_FOUND;
     var over = conf != null && (cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(ceil) : conf > ceil + tol);
-    if (over) flags.push({ st: bind ? bind.st : "st_grade", kind: "over", rules: bind ? [bind.id] : [], gap: Math.round(conf - ceil) });
+    /* gapx/ceilx فقط برای نمایش (ممیزی B6): gap/ceil ِ گردشده دست نخورده‌اند (Brier و بک‌تست همان را می‌خوانند)؛ ولی ۶۰٫۹ نباید «۶۱» و ۹۹٫۹ نباید «۱۰۰» دیده شود
+       و بیش‌اطمینانیِ واقعیِ ۰٫۱ واحدی نباید «۰ واحد» نوشته شود. داوری (over) همان مقایسهٔ عددِ خام است. */
+    function gx(c) { return Math.max(0.1, +(conf - c).toFixed(1)); }
+    if (over) flags.push({ st: bind ? bind.st : "st_grade", kind: "over", rules: bind ? [bind.id] : [], gap: Math.round(conf - ceil), gapx: gx(ceil) });
     // هر سقفی که اطمینان از آن گذشته، به‌تنهایی دلیلِ بیش‌اطمینانی است (شرط‌ها مستقل‌اند؛ هر کدام کرانِ خودش را دارد) ⇒ ایستگاهِ همه، نه فقط
     // کمینه. (p_found_half، مالک ۲۰۲۶-۱۰-۱۳: پیش از آن فقط «اولین» قاعدهٔ کمینه مقصر بود و مکان‌یابی به ترتیب و اندازهٔ سقف‌ها بسته بود)
     if (over) caps.forEach(function (x) {
       var r = x[0], c = x[1], past = cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(c) : conf > c + tol;
-      if (r !== bind && past && !flags.some(function (y) { return y.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - c) });
+      if (r !== bind && past && !flags.some(function (y) { return y.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - c), gapx: gx(c) });
     });
     flags.sort(function (a, b) { return (PIDX[a.st] || 0) - (PIDX[b.st] || 0); });
-    var out = { id: k.id, ceil: Math.round(ceil), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
+    var out = { id: k.id, ceil: Math.round(ceil), ceilx: ceil >= 100 ? 100 : Math.min(99.9, +ceil.toFixed(1)), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
     if (yielded.length) out.yielded = yielded;
     return out;
   };

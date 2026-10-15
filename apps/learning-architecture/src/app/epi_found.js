@@ -295,12 +295,32 @@
     return F.PRECEDE[b] || null;
   };
   /* برای یک تصدیق: کدام قاعده‌های فعال جای خود را به قاعدهٔ T_pop ِ جمعیتش می‌دهند ⇒ { قاعده: قاعدهٔ جمعیت } */
-  F.yields = function (hit, f) {
-    var out = {}, ids = {}; (hit || []).forEach(function (r) { ids[r.id] = 1; });
+  /* همخوانیِ پیاده‌سازی با متنِ پذیرفتهٔ T_measured_precedence (ممیزیِ ۲۰۲۶-۱۰-۱۵، B5 — نه قاعدهٔ تازه، نه سقفِ تازه): گامِ ۳ ردهٔ «از جمعیتِ j و دارای همین شرط»
+     است، شرطی که در اعضای قاب از «خودِ یافته» برمی‌خیزد؛ گامِ ۵ می‌گوید تصدیقی که صدقش حلقهٔ دیگری هم لازم دارد (واسطه، یا هر حلقهٔ سنجیده‌نشدهٔ دیگر)
+     مشمول نیست و T_weakest برایش ≤ ½ می‌دهد. پیاده‌سازیِ پیشین فقط x_relay را می‌دید و ½ ِ هر مقدمهٔ اثبات‌نشده یا بی‌قرینگیِ نامربوط (مثلاً «این یافته
+     دربارهٔ من هم صادق است») را هم کنار می‌گذاشت. حالا: k.member === false (کاربر گفته تصدیق فراتر از یافته است) ⇒ هیچ تقدمی؛ k.other = ویژگی‌هایی که از
+     حلقه‌ای جز خودِ یافته آمده‌اند (مسیرِ کاربر: کاربرگِ «راه عقل»، یا دستی وقتی کاربر نگفته تصدیق عیناً همان یافته است) ⇒ قاعده‌ای که شرطش بر یکی از
+     آن‌ها تکیه دارد کنار نمی‌رود. پیکره، بذر و قاب‌ها k.member/k.other ندارند ⇒ رفتارشان بی‌تغییر (بک‌تست: ۰ جابه‌جایی). */
+  function condKeys(c, out) {
+    if (!c) return out;
+    (c.all || c.any || []).forEach(function (x) { condKeys(x, out); });
+    if (c.not) condKeys(c.not, out);
+    if (c.f) out[c.f] = 1;
+    return out;
+  }
+  F.condKeys = function (c) { return Object.keys(condKeys(c, {})); };
+  F.yields = function (hit, f, k) {
+    var out = {}, ids = {}, RM = {}; (hit || []).forEach(function (r) { ids[r.id] = 1; RM[r.id] = r; });
+    if (k && k.member === false) return out;
+    var other = (k && k.other) || null;
     (hit || []).forEach(function (p) {
       var d = F.DER[p.id]; if (!d || d.th !== "T_pop") return;
       var pr = F.precedeOf(d.base); if (!pr || !pr.relay || !f || f.x_relay !== pr.relay) return;
-      (pr.rules || []).forEach(function (rid) { if (ids[rid] && rid !== p.id && !out[rid]) out[rid] = p.id; });
+      (pr.rules || []).forEach(function (rid) {
+        if (!ids[rid] || rid === p.id || out[rid]) return;
+        if (other && F.condKeys(RM[rid].when).some(function (key) { return other[key] && f[key] != null; })) return;
+        out[rid] = p.id;
+      });
     });
     return out;
   };

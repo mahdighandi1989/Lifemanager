@@ -13,7 +13,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.goto(FILE); await p.waitForSelector('.nav');
   info.idea = await p.evaluate(async () => {
     APP.S.loaded = true; const S = APP.S, AS = APP.ASSIST, DO = AS.DO, out = {};
-    const s = { id: 'ach_idea', type: 'achat', msgs: [] }; S.put(s); AS._turnSession = s;
+    const s = { id: 'ach_idea', type: 'achat', msgs: [{ role: 'user', text: 'سه شب پشت سر هم تصمیمم را مرور کردم و کمکم کرد؛ می‌خواهم برنامه‌اش را بسازم.' }] }; /* شاهدِ قوت باید از حرفِ خودِ کاربر باشد (ممیزیِ ۲۰۲۶-۱۰-۱۵ A2) */ S.put(s); AS._turnSession = s;
     out.needWhat = DO.idea_new({}) !== '';
     out.made = DO.idea_new({ what: 'برنامه‌ای که هر شب ۱۰ دقیقه دربارهٔ تصمیم‌ها حرف بزند و نشان دهد کجا خودم را گول زدم' }) === '' && !!s.idea;
     out.noEvStrength = DO.idea_add({ part: 'strength', t: 'از تجربهٔ خودم آمده' }) !== '';

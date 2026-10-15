@@ -754,6 +754,7 @@
       e.currentTarget.disabled = true;
       var at = nowISO();
       w.log.push({ at: at, kind: "commit", trig: trig || "", desire: d.desire, hope: d.hope || "", budget: d.budget || "" });
+      w.reask = null;   // تصمیمِ تازه (گام یا رها کردن) ⇒ بازپرسیِ معلق بسته شد
       if (c.drop) {
         var riv = nextIv(LADDER[0], true);
         w.drop = { at: at, why: txt(d.dropWhy), src: d.dropSrc, trig: trig || "", due: A.addDays(A.today(), riv), iv: riv };
@@ -765,6 +766,8 @@
       }
       w.drop = null;
       var stp = { id: "ws" + w.steps.length, at: at, trig: trig || "", step: txt(d.step), when: txt(d.when), desire: d.desire, hope: d.hope, curious: txt(d.curious), budget: d.budget, iv: iv, due: A.addDays(A.today(), iv), checks: [] };
+      /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (A4): گام ثبت می‌کند چه چیزی را می‌آزماید (مثلاً کدام نقد و کدام فرضِ ایده — میزبان می‌دهد) */
+      if (host.tests) stp.tests = JSON.parse(JSON.stringify(host.tests));
       w.steps.push(stp); if (w.steps.length > 60) w.steps = w.steps.slice(-60); host.put();
       out.appendChild(h("p", { class: "good sv-willok" }, "ثبت شد. " + A.fdate(stp.due) + " (" + fa(iv) + " روزِ دیگر) همین‌جا و در «امروز» برمی‌گردد و می‌پرسد انجامش دادی یا نه."));
       if (d.hope === "no" || d.desire === "unsure") out.appendChild(f7Link());
@@ -794,6 +797,8 @@
       e.currentTarget.disabled = true;
       var c = { at: nowISO(), done: d.done, what: txt(d.what), block: d.block, imm: d.imm, prop: d.prop, desire: d.desire, hope: d.hope };
       stp.checks.push(c); stp.closed = true;
+      /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (A4): «نه» یا «ترس» و گامِ تازه‌ای ثبت نشد ⇒ بی‌صدا تمام نمی‌شود: همان نردبانِ رها کردن (پلهٔ بعد از فردا) یک بار دوباره می‌پرسد */
+      if (d.done === "no" || d.block === "fear") { var riv2 = nextIv(LADDER[0], true); w.reask = { at: c.at, step: stp.id, block: d.block || "", iv: riv2, due: A.addDays(A.today(), riv2) }; }
       w.log.push({ at: c.at, kind: "check", step: stp.id, done: d.done, block: d.block || "", imm: d.imm, prop: d.prop || "", desire: d.desire || "", hope: d.hope || "" });
       host.put();
       out.appendChild(h("p", { class: d.done === "yes" ? "good" : "" }, d.done === "yes" ? "انجام شد — پیشرفتِ واقعی، کوچک ولی ثبت‌شده. گامِ کوچکِ بعد؟ (وارسی‌اش یک پله دورتر روی نردبان: " + fa(willIv(w)) + " روز)"
@@ -832,7 +837,10 @@
     else if (w.drop && !w.drop.closed) box.appendChild(h("p", { class: "small muted" }, "آگاهانه رهایش کردی؛ " + A.fdate(w.drop.due) + " یک بار دیگر می‌پرسد."));
     else if (open && open.due <= t) box.appendChild(willCheckCard(host, open, null));
     else if (open) box.appendChild(h("p", { class: "small sv-willcur" }, "گامِ جاری: «" + open.step + "» — " + open.when + " · وارسی: " + A.fdate(open.due)));
-    else box.appendChild(willForm(host, trig, null));
+    else {
+      if (w.reask && w.reask.due && w.reask.due <= t) box.appendChild(h("p", { class: "small sv-willreask" }, "دفعهٔ پیش گفتی گام انجام نشد" + (w.reask.block === "fear" ? " (ترس از اشتباه یا نقد)" : "") + " و گامِ تازه‌ای ننوشتی. دوباره می‌پرسم — نه برای سرزنش: کوچک‌ترین گامِ بعد چیست؟ یا آگاهانه رهایش کن."));
+      box.appendChild(willForm(host, trig, null));
+    }
     var lg = A.willLog(w); if (lg) box.appendChild(lg);
     return box;
   };
@@ -842,7 +850,7 @@
     return h("details", { class: "small sv-willlog" }, h("summary", {}, "دفترِ پیشرفت (" + fa(st.length) + " گام)"),
       h("ol", {}, st.map(function (x) {
         var c = (x.checks || [])[x.checks.length - 1];
-        return h("li", {}, "«" + x.step + "» — " + A.fdate(String(x.at).slice(0, 10)) + " · خواستن: " + lab(WILL_DESIRE, x.desire) + " · امید: " + lab(WILL_HOPE, x.hope) +
+        return h("li", {}, "«" + x.step + "» — " + A.fdate(String(x.at).slice(0, 10)) + (x.tests ? " · می‌آزماید: " + (x.tests.t ? "نقدِ «" + clip(x.tests.t, 50) + "»" + (x.tests.target ? " ⇐ " : "") : "") + (x.tests.target ? "فرضِ «" + clip(x.tests.target, 50) + "»" : "") : "") + " · خواستن: " + lab(WILL_DESIRE, x.desire) + " · امید: " + lab(WILL_HOPE, x.hope) +
           (c ? " ⇒ " + lab(WILL_DONE, c.done) + (c.block ? " (" + lab(WILL_BLOCK, c.block) + ")" : "") + " · " + lab(WILL_IMM, c.imm) + (c.hope ? " · امیدِ پس از آن: " + lab(WILL_HOPE, c.hope) : "") : " ⇒ وارسی: " + A.fdate(x.due)));
       })));
   };
@@ -860,6 +868,7 @@
       if (!w) return; var o = willOpen(w);
       if (o && o.due && o.due <= t) out.push({ kind: kind, id: id, what: "step", txt: o.step });
       if (w.drop && !w.drop.closed && w.drop.due && w.drop.due <= t) out.push({ kind: kind, id: id, what: "drop", txt: w.drop.why });
+      if (!o && !(w.drop && !w.drop.closed) && w.reask && w.reask.due && w.reask.due <= t) out.push({ kind: kind, id: id, what: "reask", txt: "" });
     }
     S.all("eprog", function (r) { return r && r.solve && r.solve.will; }).forEach(function (r) { scan("prob", String(r.id).replace(/^eprog_/, ""), r.solve.will); });
     S.all("idea", function (r) { return r && r.will; }).forEach(function (r) { scan("idea", r.id, r.will); });
@@ -873,7 +882,7 @@
       try {
         A.willDue().forEach(function (x) {
           var hs = A.willHost(x.kind, x.id); if (!hs) return;
-          items.push({ k: "knot", txt: x.what === "drop" ? "🌱 چیزی که آگاهانه رها کردی: هنوز همان دلیل؟" : "🌱 گامِ کوچکی که قول دادی: «" + clip(x.txt, 80) + "»", sub: "«" + clip(hs.title, 60) + "» — " + (x.what === "drop" ? "یک بار دیگر بسنج" : "انجامش دادی؟ چه دیدی؟"), go: hs.go });
+          items.push({ k: "knot", txt: x.what === "drop" ? "🌱 چیزی که آگاهانه رها کردی: هنوز همان دلیل؟" : x.what === "reask" ? "🌱 گامی که انجام نشد: کوچک‌ترین گامِ بعد؟ (دوباره می‌پرسم)" : "🌱 گامِ کوچکی که قول دادی: «" + clip(x.txt, 80) + "»", sub: "«" + clip(hs.title, 60) + "» — " + (x.what === "drop" ? "یک بار دیگر بسنج" : x.what === "reask" ? "گامِ کوچک‌تر، یا رها کردنِ آگاهانه" : "انجامش دادی؟ چه دیدی؟"), go: hs.go });
         });
       } catch (e) { console.warn(e); }
       return items;
