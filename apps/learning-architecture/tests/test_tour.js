@@ -283,6 +283,21 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.mob = await p.evaluate(() => ({ grip: getComputedStyle(document.querySelector('.as-grip.r')).display, max: getComputedStyle(document.querySelector('.as-maxb')).display, w: Math.round(document.querySelector('.as-panel').getBoundingClientRect().width) }));
   chk(info.mob.grip === 'none' && info.mob.max === 'none' && info.mob.w >= 370, 'mobile: a bottom sheet without grips or maximize: ' + JSON.stringify(info.mob));
 
+  // صفحه‌کلید: 💬 با Enter باز، Escape می‌بندد و فوکوس به 💬 برمی‌گردد؛ بیشینه و برگشت به اندازهٔ پیشین (کارزارِ سوم، بازبینِ پنجره)
+  await p.setViewportSize({ width: 1280, height: 800 }); await p.waitForTimeout(150);
+  await p.evaluate(() => APP.ASSIST.toggle(false)); await p.focus('.as-fab'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+  info.kbOpen = await p.evaluate(() => !document.querySelector('.as-panel').hidden);
+  await p.keyboard.press('Escape'); await p.waitForTimeout(150);
+  info.kbClose = await p.evaluate(() => document.querySelector('.as-panel').hidden && document.activeElement === document.querySelector('.as-fab'));
+  await p.evaluate(() => APP.ASSIST.toggle(true)); await p.waitForTimeout(100);
+  const g0 = await p.evaluate(() => { const r = document.querySelector('.as-panel').getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); });
+  await p.evaluate(() => APP.ASSIST.toggleMax()); await p.waitForTimeout(100);
+  const hb = await p.evaluate(() => { const r = document.querySelector('.as-ttl').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  await p.mouse.move(hb.x, hb.y); await p.mouse.down(); await p.mouse.up(); await p.waitForTimeout(100);
+  await p.evaluate(() => APP.ASSIST.toggleMax()); await p.waitForTimeout(100);
+  const g1 = await p.evaluate(() => { const r = document.querySelector('.as-panel').getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); });
+  chk(info.kbOpen && info.kbClose, 'keyboard: Enter opens 💬, Escape closes and returns focus: ' + [info.kbOpen, info.kbClose]);
+  chk(g0 === g1, 'maximize, click the header, restore ⇒ back to the previous size: ' + g0 + ' vs ' + g1);
   // پس از وارسیِ درست: دکمهٔ «✅ تأییدِ برگه» فقط برای مالک (data-own) و فراخوانیِ status ِ میزبان (کارزارِ سوم v02)
   info.approve = await p.evaluate(async () => {
     const AS = APP.ASSIST; let called = null; APP.HOST = Object.assign({}, APP.HOST || {}, { status: async (id, st) => { called = id + ':' + st; return { ok: true }; } });

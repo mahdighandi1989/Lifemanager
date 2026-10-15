@@ -31487,7 +31487,8 @@ APP.goFromURL = function (q) {
   function pos() { return store("pos") || null; }
   function place(box) {
     var p = pos(); if (!p) return;
-    var x = Math.min(Math.max(4, p.x), window.innerWidth - 60), y = Math.min(Math.max(4, p.y), window.innerHeight - 60);
+    // تا لبه به اندازهٔ واقعیِ دکمه (کارزارِ سوم، بازبینِ پنجره: ۳۷ پیکسل بیرون می‌زد)
+    var bw = box.offsetWidth || 60, bh = box.offsetHeight || 60, x = Math.min(Math.max(4, p.x), window.innerWidth - bw - 4), y = Math.min(Math.max(4, p.y), window.innerHeight - bh - 4);
     box.style.left = x + "px"; box.style.top = y + "px"; box.style.right = "auto"; box.style.bottom = "auto";
   }
   function draggable(handle, box, onTap) {
@@ -31496,10 +31497,12 @@ APP.goFromURL = function (q) {
     handle.addEventListener("pointermove", function (e) {
       if (!st) return; var dx = e.clientX - st.x, dy = e.clientY - st.y;
       if (!st.moved && Math.abs(dx) + Math.abs(dy) < 6) return; st.moved = true;
-      box.style.left = Math.min(Math.max(4, st.l + dx), window.innerWidth - 60) + "px"; box.style.top = Math.min(Math.max(4, st.t + dy), window.innerHeight - 60) + "px";
+      box.style.left = Math.min(Math.max(4, st.l + dx), window.innerWidth - (box.offsetWidth || 60) - 4) + "px"; box.style.top = Math.min(Math.max(4, st.t + dy), window.innerHeight - (box.offsetHeight || 60) - 4) + "px";
       box.style.right = "auto"; box.style.bottom = "auto";
     });
-    handle.addEventListener("pointerup", function () { if (!st) return; var m = st.moved; st = null; if (m) { var r = box.getBoundingClientRect(); store("pos", { x: Math.round(r.left), y: Math.round(r.top) }); placePanel(); } else if (onTap) onTap(); });
+    handle.addEventListener("pointerup", function () { if (!st) return; var m = st.moved; st = null; handle._ptr = Date.now(); if (m) { var r = box.getBoundingClientRect(); store("pos", { x: Math.round(r.left), y: Math.round(r.top) }); placePanel(); } else if (onTap) onTap(); });
+    // صفحه‌کلید (Enter/Space) و click ِ بی‌اشاره‌گر هم باز می‌کند؛ کلیکِ پس از pointerup دو بار نزند (کارزارِ سوم، بازبینِ پنجره)
+    handle.addEventListener("click", function () { if (handle._ptr && Date.now() - handle._ptr < 400) return; if (onTap) onTap(); });
   }
   /* پنجره کنارِ دکمه باز می‌شود (بالا یا پایینِ آن، هر کدام جا دارد)؛ در موبایل برگهٔ پایینِ صفحه است (CSS) */
   /* اندازه و جای پنجره (مالک ۲۰۲۶-۱۰-۱۴: «پنجره را بشود کشید و بزرگ‌تر و کوچک‌تر کرد»): با کشیدنِ سرتیتر جابه‌جا، با دو گوشهٔ پایین
@@ -31547,15 +31550,25 @@ APP.goFromURL = function (q) {
       if (mode === "l" && g.w < MINW) { g.x -= MINW - g.w; g.w = MINW; }
       setGeom(ui.panel, g);
     });
-    handle.addEventListener("pointerup", function () {
-      if (!st) return; st = null; var r = ui.panel.getBoundingClientRect();
+    handle.addEventListener("pointerup", function (e) {
+      if (!st) return; var moved = Math.abs(e.clientX - st.x) + Math.abs(e.clientY - st.y) >= 4; st = null;
+      // کلیکِ ساده روی سرتیتر (بی جابه‌جایی)، به‌ویژه در حالتِ بیشینه، اندازهٔ ذخیره را بازنویسی نمی‌کند (کارزارِ سوم: پنجره دیگر برنمی‌گشت)
+      if (!moved) return;
+      var r = ui.panel.getBoundingClientRect();
       store("pgeom", { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), max: false });
     });
   }
   AS.toggleMax = function () {
     var g = store("pgeom") || (function () { var r = ui.panel.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; })();
-    g.max = !g.max; store("pgeom", g); placePanel();
+    if (!g.max) { g.prev = { x: g.x, y: g.y, w: g.w, h: g.h }; g.max = true; } else { var pv = g.prev || {}; g = { x: pv.x, y: pv.y, w: pv.w, h: pv.h, max: false }; }
+    store("pgeom", g); placePanel();
   };
+  /* Escape می‌بندد و فوکوس به دکمهٔ 💬 برمی‌گردد (کارزارِ سوم، بازبینِ پنجره) */
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || !ui || ui.panel.hidden) return;
+    if (!ui.panel.contains(document.activeElement) && document.activeElement !== ui.fab) return;
+    AS.toggle(false);
+  });
   var pend = [];
   function build() {
     var root = h("div", { class: "as-root", dir: "rtl", "data-report-section": "assistant", "data-report-section-label": "💬 دستیار" });
@@ -31567,7 +31580,7 @@ APP.goFromURL = function (q) {
     A.layer().appendChild(root); place(root);
     return ui;
   }
-  AS.toggle = function (open) { if (!ui) build(); var o = open == null ? ui.panel.hidden : open; ui.panel.hidden = !o; ui.root.classList.toggle("open", o); store("open", o); if (o) { paint(); placePanel(); var t = ui.panel.querySelector(".as-in"); if (t) t.focus(); } };
+  AS.toggle = function (open) { if (!ui) build(); var o = open == null ? ui.panel.hidden : open; ui.panel.hidden = !o; ui.root.classList.toggle("open", o); store("open", o); if (o) { paint(); placePanel(); var t = ui.panel.querySelector(".as-in"); if (t) t.focus(); } else if (ui.panel.contains(document.activeElement) || document.activeElement === document.body) { try { ui.fab.focus(); } catch (e) { } } };
   function paint() {
     if (!ui || ui.panel.hidden) return;
     var s = AS.cur(), P = ui.panel; P.innerHTML = "";
