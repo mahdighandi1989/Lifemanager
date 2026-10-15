@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "about": "Who owns what (owner 2026-10-14: «هر روتین باید معماریِ کارِ روتینِ دیگر را بداند تا کار جزیره‌ای نشود، بی روتینِ تازه»). One source for: every routine's prompt, every area's owner, the ONLY way to change it (tool + procedure section), and its ledger. Read by scripts/supervisor/handoff.py, the merge gate (tests/test_supervisor_ownership.py) and the learning-architecture «💬 دستیار» (built into the page). Change it only together with the prompts it names, then run `python apps/learning-architecture/build.py` (the page embeds the page areas).",
+  "routines": {
+    "general": {
+      "fa": "ناظرِ خودکارِ سامانه (دورِ کامل)",
+      "trigger": "trig_01K3Hiiykg9HHApgfWa472rA",
+      "prompt": "docs/supervisor/PROMPT.md",
+      "cadence": "یکشنبه و چهارشنبه ۰۱:۴۷ UTC",
+      "every_hours": 84,
+      "agenda": [
+        {
+          "what": "دو بار در هفته: همهٔ برگه‌های عادی، بازرسیِ کلِ سامانه، گیت، دست‌به‌دست‌های کهنه",
+          "procedure": "docs/supervisor/PROMPT.md#۰-ب) کارتابلِ «نظارت و سرکشی» — **اولین کارِ هر دور**"
+        },
+        {
+          "what": "دو بار در هفته: «🗺 قلمروِ سامانه‌ها» — ۲ تا ۴ حوزهٔ کم‌گام را با شاهد (منبعِ معتبر، گزاره، رده بر پایهٔ اصول، ابزارِ صفحه) یک گام جلو ببر؛ برگه‌های دستیار با area=sys-territory",
+          "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها"
+        }
+      ]
+    },
+    "urgent": {
+      "fa": "صفِ فوریِ «نظارت و سرکشی»",
+      "trigger": "trig_01WzxkuSLGLjgLGqaVC35UsR",
+      "prompt": "docs/supervisor/URGENT_PROMPT.md",
+      "cadence": "هر ۳ ساعت، دقیقهٔ ۵۳",
+      "every_hours": 3,
+      "agenda": [
+        {
+          "what": "هر ۳ ساعت: برگه‌های فوریِ «نظارت و سرکشی» (و برگه‌های دستیار) — یکی‌یکی، با دستورِ مالکِ هر قلمرو",
+          "procedure": "docs/supervisor/URGENT_PROMPT.md#۳) اگر برگه‌ای برداشته شد"
+        }
+      ]
+    },
+    "backtest": {
+      "fa": "بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناسی",
+      "trigger": "trig_01EzVAPYi3RWJTp81aWz5hnc",
+      "prompt": "docs/supervisor/BACKTEST_PROMPT.md",
+      "cadence": "هر روز ۰۳:۲۳ دبی",
+      "every_hours": 24,
+      "agenda": [
+        {
+          "what": "هر دور ۸ تا ۱۲ واقعهٔ تازه (شکست، سالم، سناریوی انتزاعی) برای قاعده‌ها و حوزه‌های کم‌آزموده؛ هر یافته تشخیص و اصلاح یا پیشنهاد",
+          "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها"
+        },
+        {
+          "what": "مسیرِ ۱: سنجشِ هشت مقدارِ پایه از قاب‌های بی‌گزینش (عددها بی قرارداد)",
+          "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱"
+        },
+        {
+          "what": "مسیرِ ۲: خطاهای بیرون از جزوه — نادیده‌گرفتنِ نرخِ پایه، گزینش/بقا، بازگشت به میانگین، همبستگی ≠ علیت، آزمونِ چندگانه (p-hacking) — ⇒ قضیه از اصولِ موجود ⇒ پیشنهادِ قاعدهٔ «فراتر از جزوه» برای مالک",
+          "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۲"
+        },
+        {
+          "what": "مسیرِ ۳: هر شب دست‌کم یک حوزهٔ قلمرو یک گام (۰ نقشه‌شده … ۵ تثبیت‌شده) با بازبینیِ مستقل",
+          "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۳"
+        },
+        {
+          "what": "گرافِ مشترک: پلِ مستند میانِ یادگیری و معرفت‌شناسی برای شکاف‌ها",
+          "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گرافِ مشترک"
+        }
+      ]
+    },
+    "owner": {
+      "fa": "تصمیمِ مالک (نه روتین)",
+      "prompt": "",
+      "cadence": "با «بپذیر/رد کن» در صفحه",
+      "every_hours": 0
+    }
+  },
+  "shared": [
+    "apps/learning-architecture/docs/WORKLOG.md",
+    "apps/learning-architecture/docs/PROGRESS.md",
+    "apps/learning-architecture/docs/HANDBOOK.md",
+    "docs/overhaul/AUDIT_LOG.md",
+    "experiences/*",
+    "frontend/public/assets/lla/*",
+    "frontend/dist/*",
+    "frontend/src/lib/llaBundle.js",
+    "docs/supervisor/handoffs/*",
+    "docs/supervisor/handoffs.json",
+    "docs/supervisor/HANDOFFS.md",
+    ".gitattributes",
+    "docs/supervisor/RUNLOG.md",
+    "docs/supervisor/OPEN_ITEMS.md"
+  ],
+  "areas": [
+    {
+      "id": "epi-rules",
+      "fa": "قاعده‌ها، سقف‌ها، ایستگاه‌ها، وزن‌ها، اصول و متنِ جزوه",
+      "page": true,
+      "owner": "owner",
+      "executor": "backtest",
+      "paths": [
+        "apps/learning-architecture/src/app/epi_rules.js",
+        "apps/learning-architecture/src/app/epi_found.js",
+        "apps/learning-architecture/src/app/epi_book.js"
+      ],
+      "tool": "پیشنهاد در apps/learning-architecture/backtest/proposals.json (هرگز تغییرِ مستقیم)",
+      "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
+      "ledger": "apps/learning-architecture/backtest/proposals.json",
+      "rule": "هیچ روتینی مستقیم عوض نمی‌کند؛ فقط پیشنهاد. پس از «بپذیر» ِ مالک، روتینِ بک‌تست اعمال و با وقایعِ تازه تأیید می‌کند."
+    },
+    {
+      "id": "epi-engine",
+      "fa": "موتور و ساختارِ کارخانه (سالن‌ها، ایستگاه‌ها، ویژگی‌ها، رمزگذاریِ کور، دادگاهِ بک‌تست)",
+      "page": true,
+      "owner": "backtest",
+      "paths": [
+        "apps/learning-architecture/src/app/epi_core.js",
+        "apps/learning-architecture/src/app/epi_engine.js",
+        "apps/learning-architecture/src/app/epi_feat.js",
+        "apps/learning-architecture/src/app/epi_blind.js",
+        "apps/learning-architecture/src/app/epi_bt_core.js",
+        "apps/learning-architecture/src/app/epi_field.js",
+        "apps/learning-architecture/src/app/epi_st_*.js"
+      ],
+      "tool": "منبع ⇒ build.py ⇒ node apps/learning-architecture/tools/epi_backtest.js run --rerun (پیش/پس روی کلِ پیکره)",
+      "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
+      "ledger": "apps/learning-architecture/backtest/ledger.json",
+      "rule": "رفعِ خطای اجرایی (کرش، نمایش، ذخیره) با دست‌به‌دست مجاز است؛ تغییرِ رفتارِ داوری (ترتیبِ ایستگاه، معیارِ عبور، افزودن/حذفِ ایستگاه) فقط با تصمیمِ مالک — پیشنهاد در proposals.json."
+    },
+    {
+      "id": "epi-territory",
+      "fa": "قلمروِ معرفت‌شناسی (حوزه‌ها، گام‌های پیشرفت، بازبینی‌ها)",
+      "page": true,
+      "owner": "backtest",
+      "paths": [
+        "apps/learning-architecture/backtest/territory.json",
+        "apps/learning-architecture/backtest/reviews/*",
+        "apps/learning-architecture/docs/TERRITORY.md",
+        "apps/learning-architecture/src/app/epi_territory.js"
+      ],
+      "tool": "node apps/learning-architecture/tools/epi_backtest.js territory|review",
+      "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۳",
+      "ledger": "apps/learning-architecture/backtest/territory.json"
+    },
+    {
+      "id": "epi-foundation",
+      "fa": "مبنای عددها: مقدارهای پایه و قاب‌های بی‌گزینش",
+      "page": true,
+      "owner": "backtest",
+      "paths": [
+        "apps/learning-architecture/backtest/foundation.json"
+      ],
+      "tool": "node apps/learning-architecture/tools/epi_backtest.js sample|audit",
+      "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱",
+      "ledger": "apps/learning-architecture/backtest/foundation.json"
+    },
+    {
+      "id": "epi-backtest",
+      "fa": "بک‌تستِ پیوسته: پیکرهٔ وقایع، یافته‌ها، پیشنهادها، جزوهٔ متقن، پرونده‌های بذر",
+      "page": true,
+      "owner": "backtest",
+      "paths": [
+        "apps/learning-architecture/backtest/corpus/*",
+        "apps/learning-architecture/backtest/findings.json",
+        "apps/learning-architecture/backtest/ledger.json",
+        "apps/learning-architecture/backtest/results.json",
+        "apps/learning-architecture/backtest/proposals.json",
+        "apps/learning-architecture/docs/VERIFIED_BOOKLET.md",
+        "apps/learning-architecture/src/app/epi_cases_*.js",
+        "apps/learning-architecture/tools/epi_backtest.js"
+      ],
+      "tool": "node apps/learning-architecture/tools/epi_backtest.js add|run",
+      "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
+      "ledger": "apps/learning-architecture/backtest/ledger.json"
+    },
+    {
+      "id": "sys-territory",
+      "fa": "قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها",
+      "page": true,
+      "owner": [
+        "general",
+        "urgent"
+      ],
+      "paths": [
+        "apps/learning-architecture/territory/*",
+        "apps/learning-architecture/tools/sys_territory.py",
+        "apps/learning-architecture/src/app/a28_systerr.js"
+      ],
+      "tool": "python3 apps/learning-architecture/tools/sys_territory.py",
+      "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
+      "ledger": "apps/learning-architecture/territory/ledger.json"
+    },
+    {
+      "id": "lla-page",
+      "fa": "بقیهٔ صفحهٔ «معماری یادگیری» (نماها، فرم‌ها، دستیار، سامانهٔ یادگیری، گره‌گشا، مسئله‌ها)",
+      "page": true,
+      "owner": [
+        "urgent",
+        "general"
+      ],
+      "paths": [
+        "apps/learning-architecture/*"
+      ],
+      "tool": "منبع در apps/learning-architecture/src/ ⇒ python apps/learning-architecture/build.py",
+      "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+      "ledger": "apps/learning-architecture/docs/WORKLOG.md"
+    },
+    {
+      "id": "supervisor",
+      "fa": "دستورهای روتین‌ها و ابزارهای ناظر",
+      "page": false,
+      "owner": [
+        "general",
+        "urgent"
+      ],
+      "paths": [
+        "docs/supervisor/*",
+        "scripts/supervisor/*"
+      ],
+      "tool": "بایگانیِ نسخه + version در frontmatter (docs/supervisor/README.md)",
+      "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟",
+      "ledger": "docs/supervisor/archive/README.md"
+    },
+    {
+      "id": "app",
+      "fa": "بقیهٔ Lifemanager",
+      "page": false,
+      "owner": [
+        "urgent",
+        "general"
+      ],
+      "paths": [
+        "*"
+      ],
+      "tool": "قواعدِ CLAUDE.md",
+      "procedure": "CLAUDE.md#Non-negotiable rules",
+      "ledger": "docs/overhaul/AUDIT_LOG.md"
+    }
+  ]
+}

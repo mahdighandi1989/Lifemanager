@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "about": "Who owns what (owner 2026-10-14: «هر روتین باید معماریِ کارِ روتینِ دیگر را بداند تا کار جزیره‌ای نشود، بی روتینِ تازه»). One source for: every routine's prompt, every area's owner, the ONLY way to change it (tool + procedure section), and its ledger. Read by scripts/supervisor/handoff.py, the merge gate (tests/test_supervisor_ownership.py) and the learning-architecture «💬 دستیار» (built into the page). Change it only together with the prompts it names, then run `python apps/learning-architecture/build.py` (the page embeds the page areas).",
   "routines": {
     "general": {
@@ -141,7 +141,8 @@
       "page": true,
       "owner": "backtest",
       "paths": [
-        "apps/learning-architecture/backtest/foundation.json"
+        "apps/learning-architecture/backtest/foundation.json",
+        "apps/learning-architecture/backtest/samples/*"
       ],
       "tool": "node apps/learning-architecture/tools/epi_backtest.js sample|audit",
       "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱",
