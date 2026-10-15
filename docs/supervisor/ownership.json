@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "about": "Who owns what (owner 2026-10-14: «هر روتین باید معماریِ کارِ روتینِ دیگر را بداند تا کار جزیره‌ای نشود، بی روتینِ تازه»). One source for: every routine's prompt, every area's owner, the ONLY way to change it (tool + procedure section), and its ledger. Read by scripts/supervisor/handoff.py, the merge gate (tests/test_supervisor_ownership.py) and the learning-architecture «💬 دستیار» (built into the page). Change it only together with the prompts it names, then run `python apps/learning-architecture/build.py` (the page embeds the page areas).",
   "routines": {
     "general": {
@@ -16,6 +16,10 @@
         {
           "what": "دو بار در هفته: «🗺 قلمروِ سامانه‌ها» — ۲ تا ۴ حوزهٔ کم‌گام را با شاهد (منبعِ معتبر، گزاره، رده بر پایهٔ اصول، ابزارِ صفحه) یک گام جلو ببر؛ برگه‌های دستیار با area=sys-territory",
           "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها"
+        },
+        {
+          "what": "ماهی یک بار (اگر retrieved ِ norms/norms.json کهنه‌تر از ۳۰ روز است): دادهٔ جمعیتیِ «📐 سنجشِ استاندارد» را از منابعِ معتبر تازه کن — دادهٔ باز و بزرگِ تازه، گروه‌های سنیِ بیشتر، هنجارِ فارسی — با پژوهشگر و وارسی‌کنندهٔ مستقل",
+          "procedure": "apps/learning-architecture/AGENTS.md#«📐 سنجشِ استاندارد» و «💡 جایگاهِ ایده»"
         }
       ]
     },
@@ -183,6 +187,20 @@
       "tool": "python3 apps/learning-architecture/tools/sys_territory.py",
       "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
       "ledger": "apps/learning-architecture/territory/ledger.json"
+    },
+    {
+      "id": "psy-norms",
+      "fa": "دادهٔ جمعیتیِ «📐 سنجشِ استاندارد» (معماهای لنگردار، گروه‌های مرجع، منبع‌ها)",
+      "page": true,
+      "owner": [
+        "general"
+      ],
+      "paths": [
+        "apps/learning-architecture/norms/*"
+      ],
+      "tool": "پژوهشگر + وارسی‌کنندهٔ مستقل (بازبرآورد از دادهٔ خام) ⇒ norms/norms.json؛ node apps/learning-architecture/tests/test_psy.js",
+      "procedure": "apps/learning-architecture/AGENTS.md#«📐 سنجشِ استاندارد» و «💡 جایگاهِ ایده»",
+      "ledger": "apps/learning-architecture/norms/norms.json"
     },
     {
       "id": "lla-page",

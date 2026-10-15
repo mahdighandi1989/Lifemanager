@@ -4464,3 +4464,14 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **PROPOSAL:** Two owner decisions are pending:
   - E6, the overall score / population standing (needs norm data);
   - `p_base_expert_method`.
+
+## 2026-10-15 — LLA: mind card from axioms, population norms, idea standing, field-scoped step 2 (WORKLOG 57)
+- **FINDING:** The mind card's "score" (equal-weight mean) and bands (40/65/85) were conventional, and its dimensions were not psychometric constructs.
+- **CHANGE:** Probabilities from A3+A4 replace them; CHC + rationality constructs; a Rasch comparison with age peers on 28 verified MaRs-IB anchors; 29 descriptive Twin-2K-500 items. The old score/band are quarantined (`REMOVAL_CANDIDATES`).
+- **CHANGE:** New features:
+  - `a35_idea.js` (idea standing = weakest assumption);
+  - step 2: per-population expert bases — econ 60, psych 36.4, Nature/Science 60.9, unknown ½; theorem parts only;
+  - 17 queued defects fixed.
+- **FINDING → CHANGE:** 29 page tests printed ERRORS but exited 0. They now set a non-zero exit code, and the gate checks exit codes. This surfaced two hidden failures (system prompt > 20k; two views with no menu entry); both are fixed.
+- **CHANGE:** Supervisor: PROMPT v11 and ownership v3 add a `psy-norms` area (a monthly web refresh with an independent verifier; never invents numbers when the web is unavailable).
+- **PROPOSAL (owner):** Whether `r_naql_ahad` should apply to a finding read directly from the published paper.

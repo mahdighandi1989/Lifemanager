@@ -254,3 +254,19 @@ and give the reviewer the job of checking it.
 - **Fix:** move every must-run-each-round step ABOVE the first early exit, and name it in the exit row ("the archive and inbox steps are already done"). A test asserts the textual order: the inbox command appears before the queue command.
 - **Related:** a guard that runs only in the ship script is bypassed by a plain `git push`. Re-check what actually LANDED in the merge gate (scan the commit trailers since a baseline). Write the trailer with `git commit --trailer`, not with a second `-m`, so a later paragraph can't orphan it.
 - **How to apply elsewhere:** in any agent prompt, list the unconditional steps before any branch that can end the run, and pin that order with a test. Back every client-side guard with a server/gate-side re-check of what really landed.
+
+## Update 2026-10-15 (b) — a test that prints "ERRORS" but exits 0 is not a test
+- **Symptom:** 29 of 40 browser tests ended with `console.log(errors.length ? … : 'NO ERRORS')` and no exit code. The gate script looked for "NO ERRORS" on the last line. When a check was appended after that line, or a test was moved under an exit-code gate, failures passed silently. Two real failures had been hiding: a system prompt over the server's 20k limit, and two views with no menu entry.
+- **Fix:** every test sets `process.exitCode = 1` on any error, the gate judges by exit code, and a contract line was added to AGENTS.md.
+- **How to apply elsewhere:** grep the test suite for scripts that can fail without a non-zero exit, and fix them all at once. Gate on exit codes only, never on parsed output.
+
+## Update 2026-10-15 (c) — "compare me with people" without inventing norms
+- **What the owner wanted:** an IQ-like standing among people, adjusted for age, with no conventional numbers.
+- **What is honest:**
+  - Compare only on items whose population difficulty comes from an open, large, peer-reviewed dataset, re-estimated from the raw data by an independent verifier.
+  - Fix the guessing floor at 1/k (no tuning).
+  - Never pool scales from different sources.
+  - Name the reference group exactly ("387 US Prolific adults aged 30–39, 2021"), never "people".
+  - Report probabilities (P(above the peers' median), the expected percentile), not an IQ.
+  - Verbal or famous items are descriptive only, because translation shifts their difficulty.
+- **How to apply elsewhere:** any "norm-referenced" claim needs (1) the same task as calibrated, (2) the source's own reference group and its age band, and (3) an independently re-derived parameter. Without all three, report only self-referenced change.
