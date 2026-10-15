@@ -41,7 +41,9 @@ chk(/رمزگذاریِ کور: شمارها و وضع‌ها فقط از لفظ
 const RC = RULES.find(r => r.id === 'r_aql_conseq'), RA = RULES.find(r => r.id === 'r_aql_analogy');
 chk(RC && RA && RC.st === 'st_aql' && RA.st === 'st_aql' && RC.eff === 'cap' && RA.eff === 'cap', 'two cap rules in st_aql');
 chk([RC, RA].every(r => r.basis === 'beyond' && r.proof === 'T_plausible' && r.capf), 'basis beyond, proof T_plausible, formula cap');
-chk(RULES[RULES.length - 2] === RC && RULES[RULES.length - 1] === RA, 'appended at the end (earlier synthetic scenarios keep their order)');
+// بعد از این دو فقط قاعده‌هایی که بعداً افزوده شده‌اند (p_matter_zanni، ۲۰۲۶-۱۰-۱۵) — ترتیبِ سناریوهای ساختگیِ پیشین دست نخورده
+const iRC = RULES.indexOf(RC), LATER = ['r_aql_matter_zanni'];
+chk(RULES[iRC + 1] === RA && RULES.slice(iRC + 2).every(r => LATER.indexOf(r.id) >= 0), 'appended at the end (earlier synthetic scenarios keep their order)');
 chk(F.DER.r_aql_conseq.th === 'T_plausible' && F.DER.r_aql_conseq.cf === 'conseq' && F.DER.r_aql_analogy.th === 'T_plausible' && F.DER.r_aql_analogy.cf === 'analogy', 'derivations in F.DER');
 const rep = F.report(RULES).filter(r => r.id === 'r_aql_conseq' || r.id === 'r_aql_analogy');
 chk(rep.length === 2 && rep.every(r => r.consistent && !r.conventional), 'no conventional number ' + JSON.stringify(rep.map(r => [r.id, r.consistent, r.conventional])));
@@ -76,12 +78,21 @@ chk(Math.abs(A.kOver - 75) < 1e-9, 'k is clipped to n');
 chk(run({ x_analog_n: 9, x_analog_k: 9, x_analog_rel: 'فقط همانندیِ ظاهری', conf: 85 }).flags.some(f => f.st === 'st_aql'), 'superficial analogy at 85 flags st_aql');
 // ۵) پیکره
 const cs = T.loadCorpus();
-chk(cs.every(c => (c.claims || []).every(k => !FK.some(x => k.f && k.f[x] != null))), 'no corpus claim encoded with the new features yet');
+// روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵: پیکره با رمزگذارِ کورِ جدا (دو رمزگذار + بازبینِ مستقل) این ویژگی‌ها را گرفت — هر مقدارِ آن‌ها باید در دفترِ همان کار باشد
+const RCD = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'reviews', 'recode-2026-10-15-corpus.json'), 'utf8'));
+const RCK = {}; RCD.applied.forEach(a => { RCK[a.case + '/' + a.claim + '/' + a.key] = a.value; });
+chk(cs.every(c => (c.claims || []).every(k => FK.every(x => !(k.f && k.f[x] != null) || RCK[c.id + '/' + k.id + '/' + x] === k.f[x]))), 'every corpus value of the new features comes from the recorded blind re-encode');
+info.corpusPlausible = Object.keys(RCK).filter(x => FK.indexOf(x.split('/')[2]) >= 0).length;
+chk(info.corpusPlausible >= 10, 'the blind re-encode gave the corpus plausible-reasoning values ' + info.corpusPlausible);
 const without = Object.assign({}, cfg, { w: { r_aql_conseq: 0, r_aql_analogy: 0 } });
 const moved = cs.filter(c => { const a = T.verdict(c, without), b = T.verdict(c, cfg); return a.kind !== b.kind || a.flagged.join() !== b.flagged.join(); });
-chk(moved.length === 0, 'no corpus verdict moved ' + moved.map(c => c.id).join());
+// پس از رمزگذاریِ کورِ پیکره (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵) این دو قاعده روی پیکره می‌تابند: هیچ حکمی (نوع) نباید جابه‌جا شود؛ پرچمِ افزوده فقط روی واقعهٔ شکست
+const brokeKind = cs.filter(c => T.verdict(c, without).kind !== T.verdict(c, cfg).kind);
+chk(brokeKind.length === 0, 'no corpus verdict moved ' + brokeKind.map(c => c.id).join());
+chk(moved.every(c => c.truth && c.truth.ok === false), 'extra flags only on real failures ' + moved.map(c => c.id).join());
+info.plausibleFlagged = moved.map(c => c.id);
 info.nondeductiveOnly = cs.reduce((a, c) => a.concat((c.claims || []).filter(k => k.f && k.f.form === 'غیرقیاسی (استقرا/تمثیل)' && X.runClaim(k, cfg).bind === 'r_aql_nondeductive').map(k => c.id)), []);
-chk(info.nondeductiveOnly.length === 7, 'the 7 claims still capped only by r_aql_nondeductive (await blind encoding) ' + info.nondeductiveOnly.join());
+chk(info.nondeductiveOnly.indexOf('cs_leverrier_vulcan') < 0, 'Le Verrier (analogy with Neptune, relation unknown) is now capped by r_aql_analogy, not only «less than certain» ' + info.nondeductiveOnly.join());
 // ۶) پیشنهاد و جزوهٔ متقن
 const PR = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'proposals.json'))).proposals.find(p => p.id === 'p_plausible_reasoning');
 chk(PR && PR.applied && PR.appliedWhat && PR.decision && PR.decision.owner === '«موافقم»' && PR.decision.notApplied.some(x => /ردشده/.test(x.what)) && /هیچ حکم/.test(PR.decision.effect), 'proposal applied with owner word, not-applied parts and effect');
