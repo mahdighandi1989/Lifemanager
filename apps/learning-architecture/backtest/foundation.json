@@ -4,7 +4,7 @@
  "classes": {
   "B": 28,
   "S": 18,
-  "O": 6,
+  "O": 7,
   "X": 0,
   "?": 0
  },
@@ -1111,6 +1111,28 @@
    "stricterThanTheorem": false,
    "conventional": false,
    "capText": "۱۰۰×(k+1)/(n+2) — k از n موردِ همانند؛ همانندیِ احرازنشده ⇒ ۵۰"
+  },
+  {
+   "id": "r_aql_matter_zanni",
+   "fa": "مقدمهٔ ظنی: نتیجه یقینی نیست",
+   "st": "st_aql",
+   "cap": 99.9,
+   "capDeg": "zann",
+   "sec": [
+    "s40",
+    "s44"
+   ],
+   "k": "O",
+   "th": "T_below1",
+   "thFa": "راهِ غیرِ برهانی ⇒ کمتر از یک",
+   "bound": "<100",
+   "base": null,
+   "baseFa": "",
+   "note": "مقدمهٔ ظنی (s40: یقین فقط با ماده‌ای که به بدیهیات برسد). «= درجهٔ ضعیف‌ترین مقدمه» (T_weakest) قضیه نیست: در قیاس مقدمات نتیجه را لازم می‌آورند نه برعکس؛ «½ برای درجهٔ ناگفته» هم نیست: ظنی یعنی بیش از ½ (F.DEG). سقفِ (۱۰۰+prem_p)/۲ منتظرِ p_found_mixture.",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "کمتر از ۱۰۰"
   }
  ],
  "modes": {
@@ -1309,8 +1331,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 115,
-   "fullAfter": 115
+   "fullBefore": 116,
+   "fullAfter": 116
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1319,8 +1341,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 115,
-   "fullAfter": 115
+   "fullBefore": 116,
+   "fullAfter": 116
   },
   "p_found_scope": null
  },

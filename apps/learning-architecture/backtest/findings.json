@@ -310,20 +310,21 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 11,
-    "freshOk": 11,
+    "fresh": 16,
+    "freshOk": 16,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
      "r2_nyt_goddard_1920",
      "r2_abs_desk_stablecoin",
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
      "r4_bre_x_busang",
      "r4_yom_kippur_concept",
      "r4_willingham_fire",
-     "r5_hitler_diaries_1983",
-     "r5_sally_clark_1999",
-     "r5_abs_family_letters"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998"
     ]
    },
    "kind": "missed",
@@ -409,15 +410,20 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 6,
-    "freshOk": 6,
+    "fresh": 11,
+    "freshOk": 11,
     "ids": [
      "r2_chamberlain_hitler_face",
      "r2_central_park_five",
      "r2_nyt_goddard_1920",
      "r2_abs_desk_stablecoin",
+     "r4_wald_survivorship",
+     "r4_columbia_foam",
      "r4_yom_kippur_concept",
-     "r5_sally_clark_1999"
+     "r4_abs_survivor_shops",
+     "r5_ltcm_1998",
+     "r5_sally_clark_1999",
+     "r5_abs_lender_model"
     ]
    },
    "kind": "missed",
@@ -455,14 +461,15 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 10,
-    "freshOk": 10,
+    "fresh": 11,
+    "freshOk": 11,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
      "r4_bre_x_busang",
      "r4_yom_kippur_concept",
      "r4_willingham_fire",
+     "r4_abs_survivor_shops",
      "r5_ltcm_1998",
      "r5_madoff_feeders",
      "r5_hitler_diaries_1983",

@@ -549,8 +549,28 @@
      "inquiry": "ممکن بود و انجام شد",
      "conf": 80,
      "acted": true,
-     "stakes": "زیاد"
-    }
+     "stakes": "زیاد",
+     "chain": "گزارش‌های عرضی مستقل"
+    },
+    "member": true,
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "chain": [
+        null,
+        "گزارش‌های عرضی مستقل"
+       ],
+       "member": [
+        null,
+        true
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): chain: Met Office and Admiralty teams plus US team, separate؛ member: claim is Stagg's forecast",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    },
    {
     "id": "k2",
@@ -565,7 +585,22 @@
      "conf": 65,
      "acted": true,
      "stakes": "زیاد"
-    }
+    },
+    "member": true,
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "member": [
+        null,
+        true
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): member: claim is Stagg's forecast",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {
@@ -783,8 +818,23 @@
      "bg_undue": true,
      "conf": 95,
      "acted": true,
-     "stakes": "زیاد"
-    }
+     "stakes": "زیاد",
+     "chain": "تک‌منبع"
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "chain": [
+        null,
+        "تک‌منبع"
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): chain: one letter",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {

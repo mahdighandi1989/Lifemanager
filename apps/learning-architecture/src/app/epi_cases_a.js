@@ -31,8 +31,8 @@
     story: "در بیمارستان عمومی وین مرگ مادران از تب نفاس در بخش نخست (زیر نظر پزشکان و دانشجویان) چند برابر بخش دوم (قابله‌ها) بود. زملوایس در ۱۸۴۷ شستن دست با محلول آهک کلردار را پس از کالبدشکافی اجباری کرد و مرگ‌ومیر بخش نخست به‌سرعت به حدود بخش دوم فروافتاد. بسیاری از پزشکان برجسته وین و دیگر مراکز این یافته را نپذیرفتند و علت تب نفاس را همچنان به عوامل جوی یا فردی نسبت دادند؛ قرارداد زملوایس در ۱۸۴۹ تمدید نشد. یکی از دلایل گزارش‌شده این بود که پذیرش یافته به معنای پذیرش نقش دست خود پزشکان در مرگ بیماران بود. البته خود زملوایس هم تا ۱۸۶۱ شرح کامل منتشر نکرد و سازوکار را نمی‌شناخت.",
     actor: "پزشکان و استادان مامایی منتقد، بر پایه نظریه رایج علل جوی و فردی، یافته را رد کردند و شستن دست را کنار گذاشتند.",
     claims: [
-      { id: "k1", txt: "شستن دست با آهک کلردار ربطی به کاهش تب نفاس ندارد و علت آن عوامل جوی یا فردی است", role: "اصلی",
-        f: { way: TAKH, conf: 80, acted: true, stakes: HIGH, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP, hidden_ctrl: false }, truth: false }
+      { id: "k1", member: true, txt: "شستن دست با آهک کلردار ربطی به کاهش تب نفاس ندارد و علت آن عوامل جوی یا فردی است", role: "اصلی",
+        f: { x_comp: "احراز شده", way: TAKH, conf: 80, acted: true, stakes: HIGH, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP, hidden_ctrl: false }, truth: false }
     ],
     truth: { ok: false, fail: ["st_conflict", "st_background", "st_resp"],
       why: "داده مقایسه‌ای دو بخش و افت شدید مرگ‌ومیر پس از مداخله شاهدی ناسازگار با نظریه جوی بود که بی‌سنجش کنار رفت؛ نظریه جوی هم باید هر دو بخش را یکسان گرفتار می‌کرد. طبق s53 در تعارض دو شناخت غیریقینی باید با ترازوی عقل و قوت قرائن داوری کرد، نه با عادت. پیش‌زمینه نابایسته (ناخوشایندی پذیرش تقصیر پزشک، عادت نظری) در داوری اثر گذاشت (s70)؛ و آزمودن مداخله‌ای ارزان در بخش‌های دیگر ممکن بود و انجام نشد، با بهای جان مادران (s80، s6).",
@@ -47,7 +47,7 @@
     actor: "زملوایس بر پایه مقایسه دو بخش، حذف فرضیه‌های رقیب و مداخله، به نقش آلودگی دست پزشکان حکم کرد و شستن دست را اجرا کرد.",
     claims: [
       { id: "k1", txt: "ماده‌ای که از کالبدشکافی بر دست پزشکان می‌ماند علت اصلی تب نفاس در بخش نخست است و شستن دست با آهک کلردار آن را کاهش می‌دهد", role: "اصلی",
-        f: { way: TAJ, conf: 85, acted: true, stakes: HIGH, vazraf: true, hidden_ctrl: true, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
+        f: { x_conseq_n: 1, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, conf: 85, acted: true, stakes: HIGH, vazraf: true, hidden_ctrl: true, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
       { id: "k2", txt: "تأثیر جوی علت تفاوت دو بخش نیست", role: "مقدمه",
         f: { way: AQL, form: F_OK, conf: 85, stakes: HIGH }, truth: true }
     ],
@@ -80,8 +80,8 @@
     story: "پس از فروکش شیوع ۱۸۵۴، مقامات دسته پمپ برادستریت را دوباره نصب کردند. کمیته تحقیقات علمی هیئت عمومی بهداشت در گزارش خود نظریه آب اسنو را نپذیرفت و وبا را به وضع جوی و هوای فاسد (میاسما) نسبت داد. به گزارش منابع، پذیرش نظر اسنو به معنای پذیرش انتقال مدفوعی‌دهانی بود که برای عموم ناخوشایند بود. داده مقایسه دو شرکت آب در دسترس بود.",
     actor: "اعضای هیئت بهداشت و پیروان نظریه میاسما، بر پایه سنت پزشکی رایج، نظریه آب را رد کردند.",
     claims: [
-      { id: "k1", txt: "وبا از هوای فاسد (میاسما) پخش می‌شود و آب منبع اصلی آن نیست", role: "اصلی",
-        f: { way: TAKH, conf: 80, acted: true, stakes: HIGH, conflict_ignored: true, bg_undue: true, hidden_ctrl: false }, truth: false }
+      { id: "k1", member: true, txt: "وبا از هوای فاسد (میاسما) پخش می‌شود و آب منبع اصلی آن نیست", role: "اصلی",
+        f: { x_method: "ضعیف", way: TAKH, conf: 80, acted: true, stakes: HIGH, conflict_ignored: true, bg_undue: true, hidden_ctrl: false }, truth: false }
     ],
     truth: { ok: false, fail: ["st_conflict", "st_background"],
       why: "شاهد مقایسه‌ای اسنو (دو شرکت آب در یک محله، با هوای مشترک) دقیقاً همان عاملی را که نظریه میاسما علت می‌دانست ثابت نگه می‌داشت و باز تفاوت را نشان می‌داد؛ این شاهد بی‌سنجش کنار گذاشته شد (s53). پیش‌زمینه نابایسته (عادت به نظریه رایج و ناخوشایندی پذیرش انتقال مدفوعی) در داوری اثر گذاشت (s70).",
@@ -111,7 +111,7 @@
     actor: "گروننتال بر پایه آزمون‌های محدود حیوانی، دارو را برای همه، از جمله زنان باردار، ایمن اعلام کرد.",
     claims: [
       { id: "k1", txt: "تالیدومید داروی بی‌خطری است، حتی برای زنان باردار", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, conf: 90, acted: true, stakes: HIGH, hidden_ctrl: false, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, conf: 90, acted: true, stakes: HIGH, hidden_ctrl: false, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe", "st_conflict", "st_background", "st_resp"],
       why: "از نیافتن دوز کشنده در جوندگان (استقراء ناقص در جمعیتی دیگر و برای پیامدی دیگر) به ایمنی کلی، از جمله برای جنین، تعمیم داده شد (s50). اثر بر جنین اصلاً آزموده نشده بود؛ عامل پنهان کنترل نشد (s51). گزارش‌های نوریت شاهد ناسازگار بودند و کنار گذاشته شدند (s53)؛ منفعت تجاری پیش‌زمینه نابایسته بود (s70)؛ و با بهای خطای بسیار زیاد، تحقیق ممکن پیش از تبلیغ انجام نشد.",
@@ -141,9 +141,9 @@
     actor: "ویکفیلد بر پایه مجموعه‌ای کوچک از موارد، رابطه علّی را القا کرد و توصیه عملی داد؛ بخشی از رسانه‌ها و والدین به اعتبار تخصص او عمل کردند.",
     claims: [
       { id: "k1", txt: "واکسن MMR با بیماری روده‌ای و اوتیسم در کودکان مرتبط است", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 12, vazraf: false, hidden_ctrl: false, conf: 70, acted: true, stakes: HIGH, bg_undue: true }, truth: false },
-      { id: "k2", txt: "چون متخصصی در لنست چنین گفته، باید از واکسن MMR پرهیز کرد", role: "اصلی",
-        f: { way: TAKH, x_method: XM_WEAK, x_bias: true, conf: 70, acted: true, stakes: HIGH }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 12, vazraf: false, hidden_ctrl: false, conf: 70, acted: true, stakes: HIGH, bg_undue: true }, truth: false },
+      { id: "k2", member: false, txt: "چون متخصصی در لنست چنین گفته، باید از واکسن MMR پرهیز کرد", role: "اصلی",
+        f: { x_field: "نامعلوم", chain: "تک‌منبع", way: TAKH, x_method: XM_WEAK, x_bias: true, conf: 70, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_expert", "st_istiqra", "st_tajrobe", "st_background"],
       why: "دوازده مورد گزینش‌شده بدون گروه کنترل استقراء ناقصِ بسیار ضعیف است و هم‌زمانی را جای علیت نشاند؛ نه وضع و رفعی در کار بود و نه کنترل عوامل پنهان (سن تشخیص اوتیسم با سن واکسن هم‌زمان است) (s50، s51). تعارض منافع اعلام‌نشده و دستکاری داده یعنی ناپایبندی کارشناس به روش، که طبق s49 اعتبار استناد به او را فرومی‌ریزد؛ پیش‌زمینه نابایسته (منفعت در دعوا) در داوری خود او هم اثر داشت (s70).",
@@ -157,8 +157,8 @@
     story: "الیزابت هولمز ادعا کرد دستگاه ادیسون تراناس با چند قطره خون از نوک انگشت صدها آزمایش را دقیق انجام می‌دهد. شرکت داده‌ای در مجلات داوری‌شده منتشر نکرد و جزئیات را راز تجاری خواند؛ هیئت‌مدیره عمدتاً از سیاستمداران و نظامیان سرشناس بود، نه متخصصان آزمایشگاه بالینی. والگرینز در ۲۰۱۳ آزمایش‌ها را در داروخانه‌هایش عرضه کرد؛ به گزارش کارییرو، مشاور آزمایشگاهی والگرینز نگرانی داشت ولی اجازه بازدید از آزمایشگاه به او داده نشد. گزارش وال‌استریت ژورنال (۲۰۱۵) نشان داد بیشتر آزمایش‌ها با دستگاه‌های تجاری دیگر انجام می‌شد؛ هولمز بعدها به کلاهبرداری از سرمایه‌گذاران محکوم شد.",
     actor: "سرمایه‌گذاران، اعضای هیئت‌مدیره و والگرینز بر پایه ادعای بنیان‌گذار، بدون راستی‌آزمایی مستقل، سرمایه‌گذاری و همکاری کردند.",
     claims: [
-      { id: "k1", txt: "دستگاه ادیسون با چند قطره خون صدها آزمایش بالینی را دقیق انجام می‌دهد", role: "اصلی",
-        f: { way: TAKH, x_method: XM_UNK, x_comp: XC_UNK, x_bias: true, conf: 85, acted: true, stakes: HIGH, inquiry: INQ_SKIP, bg_undue: true }, truth: false }
+      { id: "k1", member: true, txt: "دستگاه ادیسون با چند قطره خون صدها آزمایش بالینی را دقیق انجام می‌دهد", role: "اصلی",
+        f: { chain: "تک‌منبع", way: TAKH, x_method: XM_UNK, x_comp: XC_UNK, x_bias: true, conf: 85, acted: true, stakes: HIGH, inquiry: INQ_SKIP, bg_undue: true }, truth: false }
     ],
     truth: { ok: false, fail: ["st_expert", "st_background", "st_resp"],
       why: "استناد به تخصص بی آنکه اعتبار روش (s49، رکن نخست) احراز شود: هیچ داده داوری‌شده یا آزمون مستقلی در کار نبود. منبع ادعا ذی‌نفع بود و صلاحیت تأییدکنندگان در همین موضوع احراز نشده بود (رکن دوم). امید سود و ترس از عقب ماندن از رقیب پیش‌زمینه نابایسته بود (s70)، و با وجود امکان بازدید و آزمون مستقل، پیش از عمل تحقیق نشد.",
@@ -173,7 +173,7 @@
     actor: "مارشال و وارن از مشاهده به فرضیه علّی رسیدند و آن را با آزمون مداخله‌ای و کارآزمایی ریشه‌کنی سنجیدند.",
     claims: [
       { id: "k1", txt: "هلیکوباکتر پیلوری علت اصلی بیشتر زخم‌های معده و اثنی‌عشر است و ریشه‌کنی آن عود زخم را کم می‌کند", role: "اصلی",
-        f: { way: TAJ, vazraf: true, hidden_ctrl: true, conf: 85, acted: true, stakes: HIGH, conflict_ignored: false, inquiry: INQ_DONE }, truth: true }
+        f: { x_conseq_n: 2, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, vazraf: true, hidden_ctrl: true, conf: 85, acted: true, stakes: HIGH, conflict_ignored: false, inquiry: INQ_DONE }, truth: true }
     ],
     truth: { ok: true, fail: [],
       why: "حکم علّی از هم‌بستگی آغاز شد ولی در آن نماند: با وضع (آلوده شدن) و رفع (ریشه‌کنی و کاهش عود) آزموده شد، همان روش s51. اینکه معده برای باکتری نازیستنی است، مقدمه‌ای اثبات‌نشده بود که با مشاهده کنترل‌شده کنار رفت (s53). اطمینان به‌تدریج و همراه با کارآزمایی‌ها بالا رفت.",
@@ -218,7 +218,7 @@
     actor: "مونیز و پیروانش بر پایه شمار کمی بیمار با پیگیری کوتاه، اثربخشی جراحی را پذیرفتند و آن را گسترده به کار بستند.",
     claims: [
       { id: "k1", txt: "لوکوتومی پیشانی بیماری‌های روانی شدید را درمان یا بهتر می‌کند و سودش بر زیانش می‌چربد", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 20, vazraf: false, hidden_ctrl: false, conf: 80, acted: true, stakes: HIGH, inquiry: INQ_SKIP }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 20, vazraf: false, hidden_ctrl: false, conf: 80, acted: true, stakes: HIGH, inquiry: INQ_SKIP }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe", "st_resp"],
       why: "تعمیم از ۲۰ مورد با پیگیری کوتاه به حکمی کلی (s50)؛ «بهبود» با معیارهای سنجش‌نشده و بی‌گروه مقایسه داوری شد، پس عوامل پنهان (سیر طبیعی بیماری، آرام‌شدن به بهای از دست رفتن کارکرد) کنترل نشد (s51). با بهای جبران‌ناپذیر جراحی مغز، پیگیری درازمدت پیش از گسترش ممکن بود و انجام نشد.",
@@ -234,7 +234,7 @@
     actor: "دایسون و ادینگتون بر پایه سنجش‌های خورشیدگرفتگی، پیش‌بینی نسبیت عام را تأییدشده اعلام کردند.",
     claims: [
       { id: "k1", txt: "نور ستاره‌ها در کنار خورشید به اندازه پیش‌بینی نسبیت عام (حدود ۱٫۷۵ ثانیه قوس) خم می‌شود، نه به اندازه نیوتنی", role: "اصلی",
-        f: { way: TAJ, vazraf: true, hidden_ctrl: true, sense_ctrl: true, conf: 80, acted: true, stakes: MID, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
+        f: { x_conseq_n: 1, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, vazraf: true, hidden_ctrl: true, sense_ctrl: true, conf: 80, acted: true, stakes: MID, conflict_ignored: false, inquiry: INQ_DONE }, truth: true },
       { id: "k2", txt: "صفحه‌های تلسکوپ نجومی سوبرال به سبب خطای ابزاری قابل‌اتکا نیستند", role: "مقدمه",
         f: { way: TAJ, conf: 75, stakes: MID }, truth: true }
     ],
@@ -268,7 +268,7 @@
     actor: "وود بر پایه آزمون کور (برداشتن عامل بی‌خبر ناظر)، اثر را برآمده از انتظار ناظر دانست.",
     claims: [
       { id: "k1", txt: "اثرهای گزارش‌شده پرتوهای N از انتظار ناظر برمی‌خیزد، نه از عاملی فیزیکی", role: "اصلی",
-        f: { way: TAJ, vazraf: true, hidden_ctrl: true, conf: 90, acted: true, stakes: MID, inquiry: INQ_DONE }, truth: true }
+        f: { x_conseq_n: 1, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, vazraf: true, hidden_ctrl: true, conf: 90, acted: true, stakes: MID, inquiry: INQ_DONE }, truth: true }
     ],
     truth: { ok: true, fail: [],
       why: "وود عامل ادعایی را بی‌خبر ناظر برداشت و دید «اثر» می‌ماند: وضع و رفع با کنترل عامل پنهان (دانستن ناظر)، همان شرط s51. با این کار، خطای استنتاج پنهان در داوری حسی (s43) آشکار شد.",
@@ -300,7 +300,7 @@
     actor: "فونگست با آزمون‌های کنترل‌شده، توانایی هانس را به خواندن نشانه‌های ناخودآگاه پرسشگر نسبت داد.",
     claims: [
       { id: "k1", txt: "هانس پاسخ را از نشانه‌های ناخودآگاه پرسشگر می‌گیرد، نه از حل مسئله", role: "اصلی",
-        f: { way: TAJ, vazraf: true, hidden_ctrl: true, conf: 90, acted: true, stakes: LOW, inquiry: INQ_DONE }, truth: true }
+        f: { x_conseq_n: 3, x_conseq_new: "تازه (پیش از پیش‌بینی دانسته نبود)", way: TAJ, vazraf: true, hidden_ctrl: true, conf: 90, acted: true, stakes: LOW, inquiry: INQ_DONE }, truth: true }
     ],
     truth: { ok: true, fail: [],
       why: "نمونه آشکار وضع و رفع (s51): عامل مشکوک (دانستن و دیده شدن پرسشگر) گذاشته و برداشته شد و اثر با آن آمد و رفت؛ با بازتولید اثر از سوی خود فونگست، علت به اصل سنخیت و معیت هم رسید.",
@@ -351,7 +351,7 @@
       { id: "k1", txt: "صفات اکتسابی گیاه (مثلاً از بهاره‌سازی) به نسل بعد به ارث می‌رسد و محصول را پایدار افزایش می‌دهد", role: "اصلی",
         f: { way: TAJ, vazraf: false, hidden_ctrl: false, conf: 95, acted: true, stakes: HIGH }, truth: false },
       { id: "k2", txt: "ژنتیک مندلی‌مورگانی چون علم بورژوایی است باطل است", role: "اصلی",
-        f: { way: AQL, truth_mix: true, bg_undue: true, conflict_ignored: true, conf: 95, acted: true, stakes: HIGH }, truth: false }
+        f: { form: "نامعتبر", way: AQL, truth_mix: true, bg_undue: true, conflict_ignored: true, conf: 95, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_truth", "st_tajrobe", "st_conflict", "st_background"],
       why: "درستی یک نظریه از روی خاستگاه طبقاتی و هم‌خوانی سیاسی گویندگانش داوری شد؛ این خلط صدق معرفتی (مطابقت با نفس‌الامر) با ارزش‌گذاری گوینده است (s38). ادعای علّی خود لیسنکو بی‌وضع و رفع و بی‌کنترل عوامل پنهان بود (s51). شواهد انبوه ژنتیک تجربی بی‌سنجش کنار رفت (s53) و ایدئولوژی و ترس پیش‌زمینه‌های نابایسته داوری بودند (s70).",
@@ -381,7 +381,7 @@
     actor: "لاووازیه از شمار محدودی اسید، حکمی کلی درباره همه اسیدها صادر کرد.",
     claims: [
       { id: "k1", txt: "اکسیژن جزء لازم هر اسید است", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 4, conf: 85, acted: true, stakes: LOW }, truth: false }  /* بک‌تستِ پیوسته، دورِ ۱ (۲۰۲۶-۱۰-۱۳): رمزگذاری — داستان «از شمارِ محدودی اسید» را می‌گوید، ind_n جا افتاده بود (s50) */
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 4, conf: 85, acted: true, stakes: LOW }, truth: false }  /* بک‌تستِ پیوسته، دورِ ۱ (۲۰۲۶-۱۰-۱۳): رمزگذاری — داستان «از شمارِ محدودی اسید» را می‌گوید، ind_n جا افتاده بود (s50) */
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "تعمیم از شمار محدودی از مصادیق به همه اسیدها، استقراء ناقص است که حتی با افزایش موارد به یقین نمی‌رسد (s50)؛ همان دانشمندی که در سوختن روشی سالم داشت، اینجا اطمینانی فراتر از شواهد نشان داد و حتی ترکیب اسید موریاتیک را بر پایه همین تعمیم پیش‌فرض گرفت.",
@@ -413,7 +413,7 @@
       { id: "k1", txt: "لسکاربو گذر سیاره‌ای درون‌عطاردی را از برابر خورشید دیده است", role: "مقدمه",
         f: { way: NAQL, issued: true, chain: CH_ONE, narrator: N_UNK, qarina: Q_CON, conf: 85, stakes: LOW }, truth: false },
       { id: "k2", txt: "سیاره‌ای به نام ولکان درون مدار عطارد وجود دارد و ناهنجاری حضیض عطارد را پدید می‌آورد", role: "اصلی",
-        f: { way: AQL, form: F_IND, conflict_ignored: true, conf: 85, acted: true, stakes: LOW }, truth: false }
+        f: { x_analog_n: 1, x_analog_k: 1, x_analog_rel: "نامعلوم", way: AQL, form: F_IND, conflict_ignored: true, conf: 85, acted: true, stakes: LOW }, truth: false }
     ],
     truth: { ok: false, fail: ["st_naql", "st_conflict"],
       why: "فرضیه ولکان به‌عنوان فرضیه موجه بود، اما پذیرش آن به‌مثابه کشف بر خبر واحدِ تک‌منبع از گزارشگری بی‌سابقه، با قرینه خلاف (رصد هم‌زمان لیه) تکیه داشت (s47، s48). استدلال اصلی تمثیل با نپتون بود که یقین‌آور نیست (s40)، و گزارش ناسازگار بی‌سنجش کافی کنار رفت (s53).",
@@ -591,7 +591,7 @@
     actor: "فرما از پنج مورد نخست، حکمی کلی درباره بی‌نهایت عدد صادر کرد.",
     claims: [
       { id: "k1", txt: "هر عدد به شکل ۲^(۲^n)+۱ اول است", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 5, conf: 85, stakes: LOW }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 5, conf: 85, stakes: LOW }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "پنج مورد از بی‌نهایت؛ استقراء ناقص حتی با موارد بیشتر به یقین نمی‌رسد (s50) و در ریاضیات حکم کلی تنها با برهان ثابت می‌شود (s40). اطمینان بالا بی‌پشتوانه بود؛ اذعان فرما به نداشتن اثبات درست بود، ولی اطمینانش متناسب با آن نبود.",
@@ -624,7 +624,7 @@
     actor: "مدیران ناسا و تیوکول بر پایه این داوری که داده‌ها خطر سرما را ثابت نمی‌کند، پرتاب را تأیید کردند.",
     claims: [
       { id: "k1", txt: "پرتاب در دمای پیش‌بینی‌شده ایمن است، چون داده‌ها پیوند دما و آسیب اورینگ را ثابت نمی‌کند", role: "اصلی",
-        f: { way: AQL, conflict_ignored: true, bg_undue: true, hidden_ctrl: false, inquiry: INQ_SKIP, conf: 75, acted: true, stakes: HIGH }, truth: false }
+        f: { form: "نامعتبر", way: AQL, conflict_ignored: true, bg_undue: true, hidden_ctrl: false, inquiry: INQ_SKIP, conf: 75, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_conflict", "st_background", "st_resp"],
       why: "داوری کارشناسان صاحب‌صلاحیت در همان موضوع و شواهد آسیب اورینگ‌ها بی‌سنجش کنار رفت (s53)؛ بار اثبات وارونه شد: به‌جای اثبات ایمنی، اثبات قطعی خطر خواسته شد. فشار برنامه پرتاب پیش‌زمینه نابایسته بود (s70). با بهای خطای جبران‌ناپذیر، به تعویق انداختن پرتاب و تحلیل کامل داده‌ها (همه پروازها، نه فقط آسیب‌دیده‌ها) ممکن بود و انجام نشد.",
@@ -638,8 +638,8 @@
     story: "نرم‌افزار زمینی پیمانکار (لاکهید مارتین) ضربه پیشرانه‌های کوچک را بر حسب پوند‌نیروـ‌ثانیه در فایلی می‌نوشت، در حالی که سند رابط و نرم‌افزار ناوبری JPL آن را نیوتن‌ثانیه می‌خواندند؛ اعداد بی‌برچسب یکای خود جابه‌جا می‌شدند. خطای انباشته مسیر را به مریخ نزدیک‌تر کرد. ناوبران در ماه‌های پایانی ناهمخوانی‌هایی را دیدند ولی نگرانی‌ها به‌طور رسمی پیگیری نشد و مانور اصلاح مسیر پنجم انجام نشد. فضاپیما در سپتامبر ۱۹۹۹ هنگام ورود به مدار از دست رفت.",
     actor: "تیم‌های ناوبری و عملیات، بی‌وارسی یکای داده‌های تیم دیگر، مسیر را درست پنداشتند و اصلاح نکردند.",
     claims: [
-      { id: "k1", txt: "اعداد فایل ضربه پیشرانه‌ها بر حسب نیوتن‌ثانیه‌اند", role: "مقدمه",
-        f: { way: TAKH, worlds_mix: true, inquiry: INQ_SKIP, conf: 95, stakes: HIGH }, truth: false },
+      { id: "k1", member: false, txt: "اعداد فایل ضربه پیشرانه‌ها بر حسب نیوتن‌ثانیه‌اند", role: "مقدمه",
+        f: { chain: "تک‌منبع", way: TAKH, worlds_mix: true, inquiry: INQ_SKIP, conf: 95, stakes: HIGH }, truth: false },
       { id: "k2", txt: "مسیر فضاپیما درست است و مانور اصلاحی لازم نیست", role: "اصلی",
         f: { way: AQL, conflict_ignored: true, inquiry: INQ_SKIP, conf: 80, acted: true, stakes: HIGH }, truth: false }
     ],
@@ -656,7 +656,7 @@
     actor: "AECL بر پایه سابقه کارکرد بی‌حادثه نرم‌افزار و تحلیل ایمنی‌ای که نرم‌افزار را تقریباً بی‌خطا فرض می‌کرد، گزارش‌های آسیب را نپذیرفت.",
     claims: [
       { id: "k1", txt: "نرم‌افزار تراک‌۲۵ ایمن است و دستگاه نمی‌تواند پرتو بیش از حد بدهد", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, conflict_ignored: true, inquiry: INQ_SKIP, conf: 95, acted: true, stakes: HIGH }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, conflict_ignored: true, inquiry: INQ_SKIP, conf: 95, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_conflict", "st_resp"],
       why: "سابقه کارکرد بی‌حادثه، استقراء ناقصی است که برای ترکیب‌های نادر ورودی و زمان‌بندی هیچ تضمینی نمی‌دهد (s50)؛ و آن سابقه در دستگاهی با قفل سخت‌افزاری به دست آمده بود، یعنی عامل پنهانی که در طرح تازه حذف شده بود. گزارش‌های آسیب بیماران شاهد ناسازگار بودند و رد شدند (s53)؛ با بهای جان انسان، بازسازی و بررسی هر گزارش ممکن بود و دیر انجام شد.",
@@ -671,7 +671,7 @@
     actor: "طراحان بر پایه نظریه و تجربه پل‌های پیشین، پایداری عرشه باریک را در برابر باد پذیرفتند.",
     claims: [
       { id: "k1", txt: "عرشه باریک با تیر ورقی کم‌عمق در برابر باد پایدار است", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 90, acted: true, stakes: HIGH }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", x_analog_rel: "فقط همانندیِ ظاهری", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 90, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe"],
       why: "تعمیم از پل‌هایی با نسبت‌های دیگر به طرحی بیرون از دامنه آزموده‌شده، استقراء ناقص بود (s50). عامل پنهان (رفتار آیرودینامیکی عرشه انعطاف‌پذیر) در «قانونی» که طرح بر آن تکیه داشت کنترل نشده بود؛ اعتبار قانون تجربی مشروط به نبود دخالت عوامل پنهان است (s51).",
@@ -718,7 +718,7 @@
     actor: "تیم توسعه بر پایه کارکرد موفق در آریان ۴، نرم‌افزار را بی‌آزمون با مسیر تازه، برای آریان ۵ ایمن دانست.",
     claims: [
       { id: "k1", txt: "نرم‌افزار سامانه مرجع اینرسی آریان ۴ در آریان ۵ هم بی‌خطر کار می‌کند", role: "اصلی",
-        f: { scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, inquiry: INQ_SKIP, conf: 90, acted: true, stakes: HIGH }, truth: false }
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", x_analog_n: 1, x_analog_k: 1, x_analog_rel: "فقط همانندیِ ظاهری", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, hidden_ctrl: false, inquiry: INQ_SKIP, conf: 90, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_istiqra", "st_tajrobe", "st_resp"],
       why: "کارکرد موفق در یک دامنه (مسیر آریان ۴) به دامنه‌ای دیگر تعمیم داده شد: استقراء ناقص (s50). شرطی که سلامت را تضمین می‌کرد (حد سرعت افقی) عاملی بود که در وضع تازه تغییر کرده بود و کنترل نشد (s51). آزمون با داده‌های مسیر آریان ۵ ممکن بود و انجام نشد.",
@@ -997,7 +997,7 @@
     actor: "ناظر درستی گزاره را از روی نیت و باور گویندگان داوری می‌کند.",
     claims: [
       { id: "k1", txt: "گزاره «پیامبر فرستاده خداست» در این شهادت کاذب است، چون گویندگانش باور ندارند", role: "اصلی",
-        f: { way: AQL, truth_mix: true, conf: 80, stakes: MID }, truth: false }
+        f: { form: "نامعتبر", way: AQL, truth_mix: true, conf: 80, stakes: MID }, truth: false }
     ],
     truth: { ok: false, fail: ["st_truth"],
       why: "s38: شهادت منافقان از نظر واقعیت صادق و از حیث اخلاقی کذب بود؛ صدق معرفتی فارغ از نیت و باور گوینده، فقط به مطابقت مفاد گزاره با نفس‌الامر نظر دارد.",
@@ -1012,9 +1012,9 @@
     actor: "گوینده کلیت مفهوم را از شمار مصداق‌های خارجی داوری می‌کند.",
     claims: [
       { id: "k1", txt: "مفهوم «خورشید» جزئی است، چون یک مصداق بیشتر ندارد", role: "اصلی",
-        f: { way: AQL, universal_by_count: true, conf: 80, stakes: LOW }, truth: false },
+        f: { form: "نامعتبر", way: AQL, universal_by_count: true, conf: 80, stakes: LOW }, truth: false },
       { id: "k2", txt: "مفهوم «شریک‌الباری» جزئی است، چون هیچ مصداقی ندارد", role: "اصلی",
-        f: { way: AQL, universal_by_count: true, conf: 80, stakes: LOW }, truth: false }
+        f: { form: "نامعتبر", way: AQL, universal_by_count: true, conf: 80, stakes: LOW }, truth: false }
     ],
     truth: { ok: false, fail: ["st_partial"],
       why: "s30: ملاک کلیت شمار مصادیق خارجی نیست، بلکه قابلیت ذهنی صدق بر کثیر است؛ خورشید، دایناسور، واجب‌الوجود و حتی شریک‌الباری کلی‌اند.",
@@ -1121,7 +1121,7 @@
     actor: "شکاک از خطاپذیری حس و عقل، نفی هر معرفت یقینی را نتیجه می‌گیرد.",
     claims: [
       { id: "k1", txt: "چون تنها راه‌های شناخت (حس و عقل) خطاپذیرند، هیچ معرفت یقینی ممکن نیست", role: "اصلی",
-        f: { way: AQL, doubt_pat: DP_EXCL, self_ref: true, matter: M_FALSE, conf: 90, stakes: MID }, truth: false }
+        f: { form: "نامعتبر", way: AQL, doubt_pat: DP_EXCL, self_ref: true, matter: M_FALSE, conf: 90, stakes: MID }, truth: false }
     ],
     truth: { ok: false, fail: ["st_aql", "st_selfref", "st_doubts"],
       why: "s59: ادعای انحصار راه‌ها و قطعیت خطا خود جزمی است (خودشکنی)؛ فهم خطا متوقف بر آگاهی پیشین از حقیقت است؛ و راه خطاناپذیر سومی هست، یعنی علم حضوری، که اعتبار حس و عقل نیز با ارجاع به آن و وجدانیات تأمین می‌شود. پس مقدمه انحصار کاذب است.",
@@ -1136,7 +1136,7 @@
     actor: "شکاک از پیوستگی عینی اشیاء، ناممکن بودن شناخت جزء را نتیجه می‌گیرد.",
     claims: [
       { id: "k1", txt: "چون همه امور به هم پیوسته‌اند و کل جهان شناختنی نیست، هیچ جزئی شناختنی نیست", role: "اصلی",
-        f: { way: AQL, doubt_pat: DP_LINK, worlds_mix: true, conf: 85, stakes: MID }, truth: false }
+        f: { form: "معتبر (قیاسی)", way: AQL, doubt_pat: DP_LINK, worlds_mix: true, conf: 85, stakes: MID }, truth: false }
     ],
     truth: { ok: false, fail: ["st_worlds", "st_doubts"],
       why: "s60: مغالطه ابهام در «امور» (معدوم و ممتنع پیوند عینی ندارند)، و نبود ملازمه میان پیوستگی عینی اشیاء در خارج و پیوستگی شناختی؛ ساحت واقع با ساحت فهم خلط شد. پیوستگی فیزیکی خورشید با دیگر پدیده‌ها مانع شناخت مستقل آن نیست.",
@@ -1151,7 +1151,7 @@
     actor: "شکاک از باواسطه بودن ادراک حسی، دست‌نیافتنی بودن واقعیت را نتیجه می‌گیرد.",
     claims: [
       { id: "k1", txt: "همه ادراکات ما باواسطه‌اند؛ پس هیچ‌گاه به خود واقعیت نمی‌رسیم", role: "اصلی",
-        f: { way: AQL, doubt_pat: DP_MED, matter: M_FALSE, conf: 85, stakes: MID }, truth: false }
+        f: { form: "نامعتبر", way: AQL, doubt_pat: DP_MED, matter: M_FALSE, conf: 85, stakes: MID }, truth: false }
     ],
     truth: { ok: false, fail: ["st_aql", "st_doubts"],
       why: "s61: همه ادراکات باواسطه نیستند؛ انسان اصل ادراک، حالات درونی و مفاهیم بدیهی را با علم حضوری بی‌واسطه می‌یابد؛ اگر همه ادراکات باواسطه بودند هیچ شناختی شکل نمی‌گرفت؛ و دستگاه ادراکی در شناخت مطابق، شیشه‌ای شفاف است. مقدمه کلی «همه باواسطه‌اند» کاذب است و تمثیل جای برهان نشسته است.",
@@ -1197,7 +1197,7 @@
     story: "به گزارش جزوه، سازمان مجاهدین خلق با انگیزه‌های مذهبی آغاز کرد اما به سبب نداشتن پایه‌های معرفتی استوار اسلامی دچار التقاط با مبانی مارکسیسم، انشعاب فکری و در نهایت تروریسم و تقابل با جامعه شد. در ۱۳۵۴ (۱۹۷۵) جناحی از سازمان آشکارا مارکسیسم را ایدئولوژی خود اعلام کرد. جزوه نتیجه می‌گیرد که ایمان متکی بر تقلید و بی‌ریشه عقلی در برابر شبهات آسیب‌پذیر است و شور اولیه بدون پشتوانه نظری مانع انحراف نمی‌شود.",
     actor: "اعضای سازمان مبانی فکری مارکسیستی را «علم مبارزه» گرفتند و با باورهای دینی خود درآمیختند.",
     claims: [
-      { id: "k1", txt: "مارکسیسم علم مبارزه است و مبانی آن با اعتقادات اسلامی جمع‌شدنی است", role: "اصلی",
+      { id: "k1", member: false, txt: "مارکسیسم علم مبارزه است و مبانی آن با اعتقادات اسلامی جمع‌شدنی است", role: "اصلی",
         f: { way: TAKH, conflict_ignored: true, conf: 85, acted: true, stakes: HIGH }, truth: false },
       { id: "k2", txt: "اصول اعتقادی اسلام درست است (پذیرفته بی‌پشتوانه برهانی، به تحلیل جزوه)", role: "مقدمه",
         f: { way: TAKH, r_route: true, conf: 85, stakes: HIGH }, truth: true }
@@ -1215,7 +1215,7 @@
     actor: "جوجه از تکرار روزانه، آینده را پیش‌بینی می‌کند.",
     claims: [
       { id: "k1", txt: "فردا هم صاحب مزرعه به من دانه می‌دهد", role: "اصلی",
-        f: { scope: "مورد بعدی", way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 99, acted: true, stakes: HIGH }, truth: false }  /* p_case_chicken (مالک ۲۰۲۶-۱۰-۱۴): hidden_ctrl=false — «چرا» ی همین پرونده: «باید علت (چرا صاحب مزرعه دانه می‌دهد) … کشف شود» (s51) */
+        f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "مورد بعدی", way: ISTQ, ind_complete: false, hidden_ctrl: false, conf: 99, acted: true, stakes: HIGH }, truth: false }  /* p_case_chicken (مالک ۲۰۲۶-۱۰-۱۴): hidden_ctrl=false — «چرا» ی همین پرونده: «باید علت (چرا صاحب مزرعه دانه می‌دهد) … کشف شود» (s51) */
     ],
     truth: { ok: false, fail: ["st_istiqra"],
       why: "s50: استقراء ناقص حتی با افزایش شواهد به یقین نمی‌رسد؛ s51: تکرار داده حسی به‌تنهایی قانون نمی‌سازد و باید علت (چرا صاحب مزرعه دانه می‌دهد) با اصول عقلی کشف شود. اطمینان تقریباً کامل از شمار تکرارها برخاست، نه از شناخت علت.",
@@ -1298,7 +1298,7 @@
       { id: "k1", txt: "بقره ۶۲ نشان می‌دهد پیروان همه ادیان، حتی پس از اسلام، بر حق‌اند", role: "اصلی",
         f: { way: NAQL, context_ignored: true, r_plural_fallacy: true, conf: 80, stakes: HIGH }, truth: false },
       { id: "k2", txt: "چون خدا هادی است، همه پیروان همه ادیان هدایت‌یافته‌اند", role: "اصلی",
-        f: { way: AQL, worlds_mix: true, conf: 70, stakes: HIGH }, truth: false }
+        f: { form: "نامعتبر", way: AQL, worlds_mix: true, conf: 70, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_worlds", "st_herm", "st_r_plural"],
       why: "s87: آیه ناظر به پیروان شرایع پیشین در زمان اعتبار همان شریعت و پیش از نسخ است (قرینه زمانی نادیده گرفته شد)؛ و هدایت الهی ارائه طریق است نه ایصال اجباری، پس «هادی» به دو معنا به کار رفت. s83 و s81: نجات و پاداش با حقانیت معرفتی خلط شد (مغالطه تلازم).",
@@ -1346,7 +1346,7 @@
     actor: "گوینده از وقوع اختلاف، اعتبار یکسان همه قرائت‌ها را نتیجه می‌گیرد.",
     claims: [
       { id: "k1", txt: "اختلاف فتواها و بطون قرآن نشان می‌دهد همه قرائت‌ها از دین به یک اندازه معتبرند", role: "اصلی",
-        f: { way: AQL, r_readings: true, readings_equal: true, conf: 80, stakes: HIGH }, truth: false }
+        f: { form: "نامعتبر", way: AQL, r_readings: true, readings_equal: true, conf: 80, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_herm", "st_r_readings"],
       why: "s78: بطون معانی طولی و منسجم‌اند، نه قرائت‌های عرضی متناقض؛ اختلاف فتوا از کاربست روش‌مند اجتهاد برای رسیدن به حقیقت واحد است و اعتبار فتوا بر مدار احتمال کشف واقع می‌چرخد، مانند اختلاف‌نظرهای تخصصی در پزشکی و مهندسی. s85: اختلاف ریشه‌های روش‌شناختی و تاریخی معین دارد و نبود حقیقت عینی را نشان نمی‌دهد.",
@@ -1425,7 +1425,7 @@
     story: "کسی که خود متخصص فقه نیست، در مسئله‌ای فرعی به فتوای مجتهدی رجوع می‌کند که اعلمیت و عدالتش را از راه معتبر (گواهی اهل خبره) احراز کرده است، و بر پایه آن عمل می‌کند.",
     actor: "مقلد بر پایه فتوای اعلم عمل می‌کند.",
     claims: [
-      { id: "k1", txt: "حکم این مسئله فرعی همان است که مرجع اعلم فتوا داده است", role: "اصلی",
+      { id: "k1", member: true, txt: "حکم این مسئله فرعی همان است که مرجع اعلم فتوا داده است", role: "اصلی",
         f: { way: TAKH, x_method: XM_OK, x_comp: XC_OK, x_bias: false, inquiry: INQ_DONE, conf: 80, acted: true, stakes: MID }, truth: null }
     ],
     truth: { ok: true, fail: [],

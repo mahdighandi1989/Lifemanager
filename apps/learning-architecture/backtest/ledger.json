@@ -1333,7 +1333,7 @@
   {
    "round": 12,
    "at": "2026-10-15",
-   "note": "دورِ ۱۱ پس از اصلاحِ رمزگذاری و بازبینیِ مستقل",
+   "note": "دورِ ۱۲ (بازاجرا ۲۰۲۶-۱۰-۱۵، روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک): قاب‌ها بی scope (h…070f)، p_matter_zanni (فقط T_below1)، رمزگذاریِ کورِ دوبارهٔ پیکره با ویژگی‌های تازه (۱۰۸ مقدار، دو رمزگذار + بازبین؛ ۴ برگشت)",
    "corpus": {
     "n": 203,
     "tiers": {
@@ -1353,7 +1353,7 @@
      "failures": 130,
      "detected": 130,
      "located": 130,
-     "fullyLocated": 115,
+     "fullyLocated": 116,
      "controls": {
       "agree": 1,
       "negAgree": 0.389,
@@ -1370,8 +1370,8 @@
     "verified": 10
    },
    "coverage": {
-    "rulesTested": 54,
-    "rules": 79,
+    "rulesTested": 55,
+    "rules": 80,
     "sectionsTested": 54,
     "sections": 72,
     "domains": 12,
@@ -1400,7 +1400,7 @@
      "r_expert_pop_socsci",
      "r_expert_pop_unknown",
      "r_aql_conseq",
-     "r_aql_analogy"
+     "r_aql_matter_zanni"
     ],
     "byDomain": {
      "پزشکی": 22,
@@ -1421,7 +1421,7 @@
     "classes": {
      "B": 28,
      "S": 18,
-     "O": 6,
+     "O": 7,
      "X": 0,
      "?": 0
     },

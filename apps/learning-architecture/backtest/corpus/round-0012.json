@@ -19,8 +19,23 @@
      "acted": true,
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
-     "ind_complete": false
-    }
+     "ind_complete": false,
+     "form": "غیرقیاسی (استقرا/تمثیل)"
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "form": [
+        null,
+        "غیرقیاسی (استقرا/تمثیل)"
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): form: from few years' data",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    },
    {
     "id": "k2",
@@ -33,8 +48,23 @@
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
      "scope": "کلی نامحدود",
-     "ind_complete": false
-    }
+     "ind_complete": false,
+     "form": "غیرقیاسی (استقرا/تمثیل)"
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "form": [
+        null,
+        "غیرقیاسی (استقرا/تمثیل)"
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): form: representativeness assumed",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {
@@ -79,7 +109,22 @@
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
      "chain": "گزارش‌های به‌ظاهر مستقل از یک منبع"
-    }
+    },
+    "member": false,
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "member": [
+        null,
+        false
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): member: claim rests on popularity/consensus premise, beyond any expert finding",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    },
    {
     "id": "k2",
@@ -92,7 +137,22 @@
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
      "chain": "گزارش‌های به‌ظاهر مستقل از یک منبع"
-    }
+    },
+    "member": false,
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "member": [
+        null,
+        false
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): member: claim about independence is the actor's premise",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {
@@ -136,8 +196,28 @@
      "acted": true,
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
-     "x_method": "ضعیف"
-    }
+     "x_method": "ضعیف",
+     "chain": "تک‌منبع"
+    },
+    "member": true,
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "chain": [
+        null,
+        "تک‌منبع"
+       ],
+       "member": [
+        null,
+        true
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): chain: single historian؛ member: claim is his authentication",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {
@@ -180,8 +260,23 @@
      "acted": true,
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
-     "matter": "مقدمه اثبات‌نشده"
-    }
+     "matter": "مقدمه اثبات‌نشده",
+     "form": "نامعتبر"
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "form": [
+        null,
+        "نامعتبر"
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): form: text shows independence assumption fails; conclusion doesn't follow",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    },
    {
     "id": "k2",
@@ -323,8 +418,23 @@
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
      "scope": "کلی نامحدود",
-     "ind_complete": false
-    }
+     "ind_complete": false,
+     "form": "غیرقیاسی (استقرا/تمثیل)"
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "form": [
+        null,
+        "غیرقیاسی (استقرا/تمثیل)"
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): form: from two years' data",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {
@@ -369,8 +479,28 @@
      "stakes": "متوسط",
      "inquiry": "ممکن بود و انجام نشد",
      "x_method": "ضعیف",
-     "x_comp": "خارج از تخصص"
-    }
+     "x_comp": "خارج از تخصص",
+     "chain": "تک‌منبع"
+    },
+    "member": true,
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "chain": [
+        null,
+        "تک‌منبع"
+       ],
+       "member": [
+        null,
+        true
+       ]
+      },
+      "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): chain: single historian؛ member: claim is his authentication",
+      "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
+      "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     }
+    ]
    }
   ],
   "truth": {

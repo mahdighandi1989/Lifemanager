@@ -1,0 +1,1246 @@
+{
+ "at": "2026-10-15",
+ "by": "روتینِ بک‌تست (اجرا در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+ "what": "رمزگذاریِ دوبارهٔ پیکره (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵) برای ویژگی‌هایی که پیکره نداشت: x_field، x_relay، x_method، x_comp، chain، member (ادعا = خودِ یافته یا فراتر)، form و ویژگی‌های استدلالِ معقول (x_conseq_*, x_analog_*). فقط خانه‌های خالی؛ مقدارِ موجود هرگز بازنویسی نشد.",
+ "method": [
+  "دو رمزگذارِ کورِ جدا (EA، EB) در نشست‌های ابریِ جدا، بی مخزن و بی truth: فقط title/story/actor/claims[].txt و way ِ رمزشده (claude.ai/artifact/YAqssx9QTVL2N6f45dsNzs = دستور و ورودی)",
+  "ادغامِ ماشینی: هم‌رأی ⇒ نامزد؛ تک‌رأی/ناهم‌رأی ⇒ نامزدِ داوری؛ کلیدِ نامجاز برای راهِ تصدیق ⇒ کنار",
+  "بازبینِ مستقلِ RC (نشستِ جدا، بی truth) هر نامزد را پذیرفت/رد کرد/مقدار داد",
+  "اجرای در حافظه روی کلِ ۲۰۳ پرونده: هر رمزی که حکمِ درستی را خراب کرد برگردانده شد (شرطِ ۰ حکمِ درستِ خراب)"
+ ],
+ "encoders": {
+  "EA": {
+   "session": "session_01VvhcwXC5SkJBQ4DD1xd2aY",
+   "artifact": "https://claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9",
+   "notes": "Blind encoding. Proof-gap cases (Kempe) encoded as deductive per actor's pre-outcome view; Lame/Ruffini marked invalid because unproven premise was explicit at the time. Eddington x_conseq_n given despite discarded Sobral astrographic plates. Meta-claims ('this argument proves X') left without form unless text flags the gap at the time. x_field omitted where no research population is described."
+  },
+  "EB": {
+   "session": "session_014YqJeQD39Y8YycgHEj6rrx",
+   "artifact": "https://claude.ai/artifact/S7qmquKN2nsgYpqaHNQ26V",
+   "notes": "Conservative encoding; omitted keys where text unclear. Eddington x_conseq omitted (discordant Sobral astrographic plates before judgment). Kempe k2 encoded as explicit deductive argument (outcome ignored); meta-claims ('this argument proves') left without form. x_field only for Wakefield (non-listed population)."
+  }
+ },
+ "reviewer": {
+  "RC": {
+   "session": "session_01QjRiwJhiaHar2fpTokyWnM",
+   "artifact": "https://claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF",
+   "notes": "Reviewed against case texts only; doubtful items rejected."
+  }
+ },
+ "applied": [
+  {
+   "n": 1,
+   "case": "cs_semmelweis_method",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 1,
+   "set": "agreed",
+   "why": "intervention (handwashing → mortality drop) predicted and confirmed before judgement"
+  },
+  {
+   "n": 2,
+   "case": "cs_semmelweis_method",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "agreed",
+   "why": "mortality drop unknown before intervention"
+  },
+  {
+   "n": 3,
+   "case": "cs_miasma_board",
+   "claim": "k1",
+   "key": "x_method",
+   "value": "ضعیف",
+   "set": "agreed",
+   "why": "committee relied on tradition, ignored available water-company data"
+  },
+  {
+   "n": 4,
+   "case": "cs_miasma_board",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the committee's stated conclusion"
+  },
+  {
+   "n": 5,
+   "case": "cs_thalidomide_grunenthal",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "generalisation from limited rodent tests"
+  },
+  {
+   "n": 6,
+   "case": "cs_wakefield_mmr",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "generalisation from 12 uncontrolled cases"
+  },
+  {
+   "n": 7,
+   "case": "cs_wakefield_mmr",
+   "claim": "k2",
+   "key": "x_field",
+   "value": "نامعلوم",
+   "set": "agreed",
+   "why": "no listed population matches; unknown"
+  },
+  {
+   "n": 9,
+   "case": "cs_wakefield_mmr",
+   "claim": "k2",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "single source: Wakefield"
+  },
+  {
+   "n": 10,
+   "case": "cs_wakefield_mmr",
+   "claim": "k2",
+   "key": "member",
+   "value": false,
+   "set": "agreed",
+   "why": "Lancet finding was an association; avoidance requires further premise"
+  },
+  {
+   "n": 11,
+   "case": "cs_theranos",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "only the founder's claim, no independent verification"
+  },
+  {
+   "n": 12,
+   "case": "cs_theranos",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is Holmes's statement verbatim"
+  },
+  {
+   "n": 13,
+   "case": "cs_hpylori",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 2,
+   "set": "agreed",
+   "why": "two confirmed tests: self-ingestion gastritis, eradication reduces recurrence"
+  },
+  {
+   "n": 14,
+   "case": "cs_hpylori",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "agreed",
+   "why": "results unknown before tests"
+  },
+  {
+   "n": 15,
+   "case": "cs_lobotomy",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "generalisation from 20 patients"
+  },
+  {
+   "n": 16,
+   "case": "cs_nrays_wood",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 1,
+   "set": "agreed",
+   "why": "prism-removal test explicitly described; others unspecified"
+  },
+  {
+   "n": 17,
+   "case": "cs_nrays_wood",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "agreed",
+   "why": "result unknown before test"
+  },
+  {
+   "n": 18,
+   "case": "cs_clever_hans_pfungst",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 3,
+   "set": "agreed",
+   "why": "knows/doesn't-know, sees/blinkered, cue-guidance confirmed"
+  },
+  {
+   "n": 19,
+   "case": "cs_clever_hans_pfungst",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "agreed",
+   "why": "results unknown before tests"
+  },
+  {
+   "n": 20,
+   "case": "cs_lysenko",
+   "claim": "k2",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "'bourgeois hence false' is a non sequitur (genetic fallacy)"
+  },
+  {
+   "n": 21,
+   "case": "cs_lavoisier_acids",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "generalisation from known acids"
+  },
+  {
+   "n": 22,
+   "case": "cs_leverrier_vulcan",
+   "claim": "k2",
+   "key": "x_analog_n",
+   "value": 1,
+   "set": "agreed",
+   "why": "one analogue: Neptune"
+  },
+  {
+   "n": 23,
+   "case": "cs_leverrier_vulcan",
+   "claim": "k2",
+   "key": "x_analog_k",
+   "value": 1,
+   "set": "agreed",
+   "why": "Neptune had the property"
+  },
+  {
+   "n": 25,
+   "case": "cs_fermat_numbers",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "generalisation from five cases"
+  },
+  {
+   "n": 26,
+   "case": "cs_challenger",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "argument from absence of proof; text shows data excluded no-damage flights"
+  },
+  {
+   "n": 27,
+   "case": "cs_mars_climate_orbiter",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "single source: contractor file/interface"
+  },
+  {
+   "n": 28,
+   "case": "cs_therac25",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "reliance on track record of operation"
+  },
+  {
+   "n": 29,
+   "case": "cs_tacoma_narrows",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "reliance on prior heavier bridges"
+  },
+  {
+   "n": 30,
+   "case": "cs_tacoma_narrows",
+   "claim": "k1",
+   "key": "x_analog_rel",
+   "value": "فقط همانندیِ ظاهری",
+   "set": "agreed",
+   "why": "aerodynamics unexamined; deck unprecedentedly narrow — relation not established"
+  },
+  {
+   "n": 31,
+   "case": "cs_ariane5_501",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "inference from Ariane 4 success"
+  },
+  {
+   "n": 32,
+   "case": "cs_ariane5_501",
+   "claim": "k1",
+   "key": "x_analog_n",
+   "value": 1,
+   "set": "agreed",
+   "why": "one analogue: Ariane 4"
+  },
+  {
+   "n": 33,
+   "case": "cs_ariane5_501",
+   "claim": "k1",
+   "key": "x_analog_k",
+   "value": 1,
+   "set": "agreed",
+   "why": "Ariane 4 had the property"
+  },
+  {
+   "n": 34,
+   "case": "cs_ariane5_501",
+   "claim": "k1",
+   "key": "x_analog_rel",
+   "value": "فقط همانندیِ ظاهری",
+   "set": "agreed",
+   "why": "Ariane 5 trajectory differed and was not tested"
+  },
+  {
+   "n": 35,
+   "case": "bk_munafiqun_testimony",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "speaker insincerity doesn't entail falsity"
+  },
+  {
+   "n": 36,
+   "case": "bk_universal_by_count",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "universality not determined by count of instances"
+  },
+  {
+   "n": 37,
+   "case": "bk_universal_by_count",
+   "claim": "k2",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "same"
+  },
+  {
+   "n": 38,
+   "case": "bk_doubt_colored_glasses",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "'may distort' doesn't entail no access"
+  },
+  {
+   "n": 39,
+   "case": "bk_russell_chicken",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "induction from repetition"
+  },
+  {
+   "n": 40,
+   "case": "bk_pluralism_quran_evidence",
+   "claim": "k2",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "'God is Guide' doesn't entail all are guided"
+  },
+  {
+   "n": 41,
+   "case": "bk_fatwa_relativism",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "disagreement doesn't entail equal validity"
+  },
+  {
+   "n": 42,
+   "case": "bk_taqlid_alam",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the fatwa itself"
+  },
+  {
+   "n": 43,
+   "case": "cs_b_ratings2008",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "AAA rating asserts negligible default risk"
+  },
+  {
+   "n": 44,
+   "case": "cs_b_enron_andersen",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "single auditor"
+  },
+  {
+   "n": 45,
+   "case": "cs_b_enron_andersen",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the audit opinion"
+  },
+  {
+   "n": 46,
+   "case": "cs_b_wirecard_ey",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the auditor's confirmation"
+  },
+  {
+   "n": 47,
+   "case": "cs_b_cuba_u2",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is NPIC's identification"
+  },
+  {
+   "n": 48,
+   "case": "cs_b_bayofpigs",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the CIA assessment"
+  },
+  {
+   "n": 49,
+   "case": "cs_b_midway_af",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 1,
+   "set": "agreed",
+   "why": "one predicted message ('AF short of water') confirmed"
+  },
+  {
+   "n": 50,
+   "case": "cs_b_midway_af",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "agreed",
+   "why": "message not known before test"
+  },
+  {
+   "n": 51,
+   "case": "cs_b_zimmermann",
+   "claim": "k1",
+   "key": "chain",
+   "value": "گزارش‌های عرضی مستقل",
+   "set": "agreed",
+   "why": "British decrypt plus Zimmermann's own admission"
+  },
+  {
+   "n": 52,
+   "case": "cs_b_dreyfus",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is Bertillon's testimony"
+  },
+  {
+   "n": 53,
+   "case": "cs_b_sallyclark",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is Meadow's figure"
+  },
+  {
+   "n": 54,
+   "case": "cs_b_pitchfork",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is Jeffreys's result"
+  },
+  {
+   "n": 55,
+   "case": "cs_b_dewey1948",
+   "claim": "k2",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from polls"
+  },
+  {
+   "n": 56,
+   "case": "cs_b_hitlerdiaries",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is experts' authentication"
+  },
+  {
+   "n": 57,
+   "case": "cs_b_tillysmith",
+   "claim": "k1",
+   "key": "x_relay",
+   "value": "از واسطه (خبر، بازگو، خلاصهٔ دیگران)",
+   "set": "agreed",
+   "why": "learned via geography teacher"
+  },
+  {
+   "n": 58,
+   "case": "cs_b_tillysmith",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim matches the taught rule"
+  },
+  {
+   "n": 60,
+   "case": "cs_b_holism",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "text shows equivocation on 'تصور'"
+  },
+  {
+   "n": 61,
+   "case": "cs_pb_flt_numeric",
+   "claim": "k2",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "generalisation from finite checks"
+  },
+  {
+   "n": 62,
+   "case": "cs_pb_flt_wiles95",
+   "claim": "k3",
+   "key": "chain",
+   "value": "گزارش‌های عرضی مستقل",
+   "set": "agreed",
+   "why": "multiple independent referees/re-readers"
+  },
+  {
+   "n": 63,
+   "case": "cs_pb_flt_wiles95",
+   "claim": "k3",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the experts' verdict"
+  },
+  {
+   "n": 64,
+   "case": "cs_pb_4c_rsst",
+   "claim": "k2",
+   "key": "chain",
+   "value": "گزارش‌های عرضی مستقل",
+   "set": "agreed",
+   "why": "independent teams + Coq"
+  },
+  {
+   "n": 65,
+   "case": "cs_pb_4c_rsst",
+   "claim": "k2",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the verification result"
+  },
+  {
+   "n": 66,
+   "case": "cs_pb_poinc_perelman",
+   "claim": "k2",
+   "key": "chain",
+   "value": "گزارش‌های عرضی مستقل",
+   "set": "agreed",
+   "why": "several independent groups"
+  },
+  {
+   "n": 67,
+   "case": "cs_pb_poinc_perelman",
+   "claim": "k2",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the groups' verdict"
+  },
+  {
+   "n": 68,
+   "case": "cs_pb_greek_indiana",
+   "claim": "k2",
+   "key": "member",
+   "value": false,
+   "set": "agreed",
+   "why": "'can be legislated' goes beyond Goodwin's claim"
+  },
+  {
+   "n": 69,
+   "case": "cs_pb_par_beltrami",
+   "claim": "k2",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from observed absence of contradiction"
+  },
+  {
+   "n": 70,
+   "case": "cs_pb_long_generalize",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from one instance"
+  },
+  {
+   "n": 71,
+   "case": "cs_pb_semm_handwash",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 1,
+   "set": "agreed",
+   "why": "handwashing → mortality drop confirmed"
+  },
+  {
+   "n": 72,
+   "case": "cs_pb_semm_handwash",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "agreed",
+   "why": "unknown before intervention"
+  },
+  {
+   "n": 73,
+   "case": "cs_pb_semm_reject",
+   "claim": "k1",
+   "key": "member",
+   "value": false,
+   "set": "agreed",
+   "why": "'so handwashing unnecessary' adds an inference"
+  },
+  {
+   "n": 74,
+   "case": "cs_pb_semm_atmos",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the prevailing expert explanation"
+  },
+  {
+   "n": 75,
+   "case": "r2_stagg_dday_forecast",
+   "claim": "k1",
+   "key": "chain",
+   "value": "گزارش‌های عرضی مستقل",
+   "set": "agreed",
+   "why": "Met Office and Admiralty teams plus US team, separate"
+  },
+  {
+   "n": 76,
+   "case": "r2_stagg_dday_forecast",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is Stagg's forecast"
+  },
+  {
+   "n": 77,
+   "case": "r2_stagg_dday_forecast",
+   "claim": "k2",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is Stagg's forecast"
+  },
+  {
+   "n": 79,
+   "case": "r4_wald_survivorship",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "inference from observed holes"
+  },
+  {
+   "n": 80,
+   "case": "r4_wald_survivorship",
+   "claim": "k2",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "representativeness assumed from sample"
+  },
+  {
+   "n": 81,
+   "case": "r4_columbia_foam",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from prior flights"
+  },
+  {
+   "n": 82,
+   "case": "r4_columbia_foam",
+   "claim": "k2",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from prior flights"
+  },
+  {
+   "n": 83,
+   "case": "r4_bre_x_busang",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "company's own cores only"
+  },
+  {
+   "n": 84,
+   "case": "r4_bre_x_busang",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is the company's result"
+  },
+  {
+   "n": 85,
+   "case": "r4_bre_x_busang",
+   "claim": "k2",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "single source"
+  },
+  {
+   "n": 86,
+   "case": "r4_bre_x_busang",
+   "claim": "k2",
+   "key": "member",
+   "value": false,
+   "set": "agreed",
+   "why": "'no need for independent drilling' goes beyond"
+  },
+  {
+   "n": 87,
+   "case": "r4_abs_survivor_shops",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from 40 survivors"
+  },
+  {
+   "n": 88,
+   "case": "r5_ltcm_1998",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from few years' data"
+  },
+  {
+   "n": 89,
+   "case": "r5_ltcm_1998",
+   "claim": "k2",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "representativeness assumed"
+  },
+  {
+   "n": 91,
+   "case": "r5_hitler_diaries_1983",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "single historian"
+  },
+  {
+   "n": 92,
+   "case": "r5_hitler_diaries_1983",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is his authentication"
+  },
+  {
+   "n": 93,
+   "case": "r5_sally_clark_1999",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "agreed",
+   "why": "text shows independence assumption fails; conclusion doesn't follow"
+  },
+  {
+   "n": 94,
+   "case": "r5_abs_lender_model",
+   "claim": "k1",
+   "key": "form",
+   "value": "غیرقیاسی (استقرا/تمثیل)",
+   "set": "agreed",
+   "why": "from two years' data"
+  },
+  {
+   "n": 95,
+   "case": "r5_abs_family_letters",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "agreed",
+   "why": "single historian"
+  },
+  {
+   "n": 96,
+   "case": "r5_abs_family_letters",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "agreed",
+   "why": "claim is his authentication"
+  },
+  {
+   "n": 97,
+   "case": "cs_semmelweis_rejection",
+   "claim": "k1",
+   "key": "x_comp",
+   "value": "احراز شده",
+   "set": "single",
+   "why": "prominent physicians and obstetrics professors on this topic"
+  },
+  {
+   "n": 98,
+   "case": "cs_eddington_1919",
+   "claim": "k1",
+   "key": "x_conseq_n",
+   "value": 1,
+   "set": "single",
+   "why": "one predicted deflection confirmed"
+  },
+  {
+   "n": 99,
+   "case": "cs_eddington_1919",
+   "claim": "k1",
+   "key": "x_conseq_new",
+   "value": "تازه (پیش از پیش‌بینی دانسته نبود)",
+   "set": "single",
+   "why": "deflection value not known before"
+  },
+  {
+   "n": 100,
+   "case": "cs_leverrier_vulcan",
+   "claim": "k2",
+   "key": "x_analog_rel",
+   "value": "نامعلوم",
+   "set": "single",
+   "why": "unknown is safe"
+  },
+  {
+   "n": 101,
+   "case": "bk_doubt_exclusive_routes",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "single",
+   "why": "some errors don't entail no certainty"
+  },
+  {
+   "n": 103,
+   "case": "cs_b_bayofpigs",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "same CIA section planned and evaluated"
+  },
+  {
+   "n": 104,
+   "case": "cs_b_sallyclark",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "single expert Meadow"
+  },
+  {
+   "n": 107,
+   "case": "cs_b_skeptic_twoways",
+   "claim": "k1",
+   "key": "form",
+   "value": "نامعتبر",
+   "set": "single",
+   "why": "some errors don't entail no certainty"
+  },
+  {
+   "n": 108,
+   "case": "cs_pb_greek_indiana",
+   "claim": "k2",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "single source Goodwin"
+  },
+  {
+   "n": 109,
+   "case": "cs_pb_semm_reject",
+   "claim": "k1",
+   "key": "x_comp",
+   "value": "احراز شده",
+   "set": "single",
+   "why": "eminent obstetricians incl. clinic head"
+  },
+  {
+   "n": 111,
+   "case": "r2_abs_father_letter",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "one letter"
+  },
+  {
+   "n": 112,
+   "case": "r5_madoff_feeders",
+   "claim": "k1",
+   "key": "member",
+   "value": false,
+   "set": "single",
+   "why": "claim rests on popularity/consensus premise, beyond any expert finding"
+  },
+  {
+   "n": 113,
+   "case": "r5_madoff_feeders",
+   "claim": "k2",
+   "key": "member",
+   "value": false,
+   "set": "single",
+   "why": "claim about independence is the actor's premise"
+  },
+  {
+   "n": 114,
+   "case": "bk_doubt_world_link",
+   "claim": "k1",
+   "key": "form",
+   "value": "معتبر (قیاسی)",
+   "set": "single",
+   "why": "premises entail conclusion; explicit deductive argument"
+  },
+  {
+   "n": 115,
+   "case": "bk_mko_eclecticism",
+   "claim": "k1",
+   "key": "member",
+   "value": false,
+   "set": "single",
+   "why": "compatibility with Islam goes beyond Marxist theory"
+  },
+  {
+   "n": 116,
+   "case": "cs_semmelweis_rejection",
+   "claim": "k1",
+   "key": "member",
+   "value": true,
+   "set": "conflict",
+   "why": "claim is exactly the critics' stated view"
+  },
+  {
+   "n": 117,
+   "case": "cs_mars_climate_orbiter",
+   "claim": "k1",
+   "key": "member",
+   "value": false,
+   "set": "conflict",
+   "why": "interface spec said N·s; applying it to the actual file needs premise that contractor complied"
+  }
+ ],
+ "rejectedByReviewer": [
+  {
+   "n": 8,
+   "set": "agreed",
+   "case": "cs_wakefield_mmr",
+   "claim": "k2",
+   "key": "x_relay",
+   "way": "تخصص دیگران",
+   "encA": "از واسطه (خبر، بازگو، خلاصهٔ دیگران)",
+   "encB": "از واسطه (خبر، بازگو، خلاصهٔ دیگران)",
+   "why": "actor mixes media (direct press conference) and parents; relay not clearly via intermediary"
+  },
+  {
+   "n": 24,
+   "set": "agreed",
+   "case": "cs_kempe_fourcolor",
+   "claim": "k2",
+   "key": "form",
+   "way": "عقل",
+   "encA": "معتبر (قیاسی)",
+   "encB": "معتبر (قیاسی)",
+   "why": "proof's validity is undermined by Heawood's later finding; valid-form label depends on outcome/doubtful"
+  },
+  {
+   "n": 78,
+   "set": "agreed",
+   "case": "r2_abs_desk_stablecoin",
+   "claim": "k2",
+   "key": "chain",
+   "way": "نقل",
+   "encA": "تک‌منبع",
+   "encB": "تک‌منبع",
+   "why": "source of the backing claim not stated in text"
+  },
+  {
+   "n": 90,
+   "set": "agreed",
+   "case": "r5_hitler_diaries_1983",
+   "claim": "k1",
+   "key": "x_comp",
+   "way": "تخصص دیگران",
+   "encA": "احراز شده",
+   "encB": "احراز شده",
+   "why": "historian's competence for forensic document authentication not established (cf. family-letters case)"
+  },
+  {
+   "n": 110,
+   "set": "single",
+   "case": "r2_stagg_dday_forecast",
+   "claim": "k2",
+   "key": "chain",
+   "way": "تخصص دیگران",
+   "encA": "گزارش‌های عرضی مستقل",
+   "encB": null,
+   "why": "window rests on new station data and Stagg's analysis; independent-team agreement not shown"
+  }
+ ],
+ "revertedBrokeVerdict": [
+  {
+   "n": 102,
+   "case": "bk_taqlid_alam",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "one mujtahid's fatwa",
+   "broke": "bk_taqlid_alam",
+   "kind": "health_alarm",
+   "flagged": "st_naql"
+  },
+  {
+   "n": 105,
+   "case": "cs_b_pitchfork",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "single expert Jeffreys",
+   "broke": "cs_b_pitchfork",
+   "kind": "health_alarm",
+   "flagged": "st_naql"
+  },
+  {
+   "n": 106,
+   "case": "cs_b_tillysmith",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "set": "single",
+   "why": "single lesson",
+   "broke": "cs_b_tillysmith",
+   "kind": "health_alarm",
+   "flagged": "st_naql"
+  },
+  {
+   "n": 59,
+   "case": "cs_b_smong",
+   "claim": "k1",
+   "key": "chain",
+   "value": "زنجیره طولی",
+   "set": "agreed",
+   "why": "oral tradition across generations",
+   "broke": "cs_b_smong",
+   "kind": "health_alarm",
+   "flagged": "st_naql"
+  }
+ ],
+ "keptExistingDisagreement": [
+  {
+   "cid": "cs_theranos",
+   "kid": "k1",
+   "key": "x_method",
+   "way": "تخصص دیگران",
+   "a": "ضعیف",
+   "b": "نامعلوم",
+   "existing": "نامعلوم",
+   "tier": "real",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_lame_flt",
+   "kid": "k2",
+   "key": "form",
+   "way": "عقل",
+   "a": "نامعتبر",
+   "existing": "معتبر (قیاسی)",
+   "tier": "real",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_hyatt_walkway",
+   "kid": "k1",
+   "key": "x_method",
+   "way": "تخصص دیگران",
+   "a": "ضعیف",
+   "b": "ضعیف",
+   "existing": "نامعلوم",
+   "tier": "real",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_b_curveball",
+   "kid": "k1",
+   "key": "chain",
+   "way": "نقل",
+   "a": "تک‌منبع",
+   "b": "زنجیره طولی",
+   "existing": "تک‌منبع",
+   "tier": "real",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_b_tulip_mackay",
+   "kid": "k1",
+   "key": "chain",
+   "way": "نقل",
+   "a": "زنجیره طولی",
+   "b": "گزارش‌های به‌ظاهر مستقل از یک منبع",
+   "existing": "زنجیره طولی",
+   "tier": "real",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_pb_flt_lame",
+   "kid": "k2",
+   "key": "form",
+   "way": "عقل",
+   "a": "نامعتبر",
+   "existing": "معتبر (قیاسی)",
+   "tier": "problem",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_pb_4c_kempe",
+   "kid": "k2",
+   "key": "form",
+   "way": "عقل",
+   "a": "معتبر (قیاسی)",
+   "b": "معتبر (قیاسی)",
+   "existing": "نامعتبر",
+   "tier": "problem",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "cs_pb_quintic_ruffini",
+   "kid": "k2",
+   "key": "form",
+   "way": "عقل",
+   "a": "نامعتبر",
+   "existing": "معتبر (قیاسی)",
+   "tier": "problem",
+   "round": 0,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "r2_schmitz_daisey",
+   "kid": "k1",
+   "key": "chain",
+   "way": "نقل",
+   "a": "گزارش‌های عرضی مستقل",
+   "b": "تک‌منبع",
+   "existing": "گزارش‌های عرضی مستقل",
+   "tier": "real",
+   "round": 3,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  },
+  {
+   "cid": "r4_bre_x_busang",
+   "kid": "k1",
+   "key": "x_method",
+   "way": "تخصص دیگران",
+   "a": "ضعیف",
+   "existing": "نامعلوم",
+   "tier": "real",
+   "round": 9,
+   "why": "existing value kept (fill-empty only)",
+   "agreesExisting": false
+  }
+ ],
+ "effect": {
+  "verdicts": "۲۰۳ از ۲۰۳ درست پیش و پس (۰ حکمِ درستِ خراب)",
+  "brierBefore": 0.28755,
+  "brierAfter": 0.25858,
+  "claimsWithTruth": 233,
+  "casesWithExtraCorrectFlags": 20
+ }
+}
