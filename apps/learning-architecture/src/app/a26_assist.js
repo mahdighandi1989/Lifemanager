@@ -213,6 +213,12 @@
   (function () { var raw0 = A.toast; A.toast = function (m) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200) }); if (RECENT_TOASTS.length > 8) RECENT_TOASTS.shift(); } } catch (e) { } return raw0.apply(this, arguments); }; })();
   AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000; return RECENT_TOASTS.filter(function (x) { return x.at >= t0; }).map(function (x) { return x.t; }); };
   var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
+  /* داوری با خودِ کاربر (data-own="verdict"، a6: حکمِ ایستگاه‌ها، درجه/احتمالِ صدق، «حکم در یک بند»): دستیار نه پر می‌کند، نه می‌زند — فقط زرد،
+     با یادداشتِ روشن؛ «هوش مصنوعی در داوری نقشی ندارد» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵) */
+  var VERDICT_HL = "داوری با خودِ توست — درجه و حکم را خودت بده";
+  function isVerdict(x) { try { var o = x && x.closest && x.closest("[data-own]"); return !!(o && o.getAttribute("data-own") === "verdict"); } catch (e) { return false; } }
+  function verdictNote(x, k) { var lb = (SCAN[k] && SCAN[k].label) || x.getAttribute("aria-label") || x.textContent || ""; return "«" + clip(lb, 40) + "» داوری است و فقط با خودِ تو — دستیار حکم و درجه نمی‌دهد؛ زردش کردم، از روی شاهدهای ایستگاه‌ها خودت پرش کن"; }
+  AS.isVerdict = isVerdict;
   function fire(x, ev) { x.dispatchEvent(new Event(ev, { bubbles: true })); }
   function setVal(x, v) {
     var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -234,6 +240,7 @@
       var x = el(a.k); if (!x) return "آن فیلد دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین";
       if (isAnswer(x)) return ANSWER_NOTE;
       // بخشِ «به قلمِ خودت» (کارتِ گره): نوشتن خودش بخشی از یادگرفتن است — فقط زرد، نه پر (کارزارِ آزمون sc01/sc07)
+      if (isVerdict(x)) { reveal(x); mark(x, VERDICT_HL, "hl"); return verdictNote(x, a.k); }
       if (x.closest && x.closest("[data-own]")) { reveal(x); mark(x, a.why || "این را با جمله‌های خودت بنویس", "hl"); return "«" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» به قلمِ خودِ توست — زردش کردم؛ می‌توانی همان جمله‌هایی را که گفتی این‌جا بنویسی"; }
       if (x.type === "file") return "پیوست با attach";
       reveal(x);
@@ -257,6 +264,7 @@
       // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
       if (x.getAttribute("role") === "tab") bt = "";
       if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
+      if (isVerdict(x)) { mark(x, VERDICT_HL, "hl"); return verdictNote(x, a.k); }
       if (x.closest && x.closest("[data-own]")) { mark(x, "این را خودت بزن", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودِ توست (مثلاً فرستادنِ متنت به هوش مصنوعی)؛ زردش کردم، اگر خواستی بزن"; }
       if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
       var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
@@ -594,7 +602,9 @@
     if (!text && !files.length) return Promise.resolve();
     var s = AS.cur() || AS.newSession();
     busy = true; paint();
-    var m = { role: "user", text: text || "(فایل)", at: now(), files: [] };
+    // شمارهٔ ترتیبِ پیام‌های کاربر (برای «پس از نشانه» بی‌وابستگی به میلی‌ثانیهٔ ساعت؛ a32 AS.safetyActive)
+    s.seq = (s.seq || 0) + 1;
+    var m = { role: "user", text: text || "(فایل)", at: now(), files: [], seq: s.seq };
     s.msgs.push(m); S.put(s); paint();
     if (files.length > MAX_FILES) { A.toast("در هر پیام حداکثر " + fa(MAX_FILES) + " فایل؛ بقیه را در پیامِ بعد بفرست", "bad"); files = files.slice(0, MAX_FILES); }
     var ups = Promise.resolve(), aiIds = [], texts = [], dupes = [], toRec = [];
@@ -717,7 +727,12 @@
     }
     // نشانهٔ پریشانیِ جدی (همان واژه‌نامهٔ ایمنیِ گره‌گشا): راهِ کمکِ انسانی پیش از هر کار، و مدل هم می‌داند
     var safe = "";
-    try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
+    // انکارِ صریحِ کاربر پس از نشانه («قصدِ خودکشی ندارم») خودش واژهٔ ایمنی دارد؛ اگر بی بخش‌های انکار چیزی نمی‌ماند، نشانهٔ تازه نیست
+    // (وگرنه همان انکار، نشانه را تازه می‌کرد و هرگز خاموش نمی‌شد) — بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵
+    var denyOnly = false;
+    try { denyOnly = !!(s.safetyAt && text && A.knotSafetyDenial && A.knotSafetyDenial(text).length && !A.knotSafetyHit(A.knotSafetyStripDenial(text))); } catch (e) { }
+    if (denyOnly) safe = "\n[سامانه: کاربر پس از نشانهٔ پریشانی صریحاً انکار کرد؛ اگر پذیرفتی، لایهٔ safety را «no» کن و جملهٔ خودش را در why با «…» نقل کن.]";
+    else try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { s.safetySeq = m.seq; safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
     return ups.then(function () {
       if (dupes.length) s.msgs.push({ role: "sys", at: now(), text: "♻ «" + dupes.join("»، «") + "» پیش‌تر در همین سشن فرستاده شده بود؛ دوباره بارگذاری نشد (همان پیوست به کار رفت)." });
       if (toRec.length && s.rec) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به پروندهٔ جاریِ این سشن («" + clip(s.rec.title, 60) + "») هم پیوست شد." });

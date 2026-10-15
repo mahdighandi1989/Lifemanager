@@ -361,6 +361,20 @@
       cases: o.cases || [], links: o.links || [], status: "open", items: [], log: [], next: null, interval: null, solvedAt: null, returnedAt: null };
     return S.put(k);
   };
+  /* مقیاسِ فرمِ موقعیت (همان گزینه‌های «چند بار پیش آمده؟» و «شدتِ احساس (۰–۱۰)») — دوباره‌سنجی (a33 DO.remeasure) با همین می‌سنجد */
+  A.KFREQ = [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]];
+  A.KEMO_MAX = 10;
+  /* ثبتِ نخست: کهنه‌ترین موقعیتِ پیوسته به گره */
+  A.knotIntake = function (k) {
+    var cs = k ? A.knotCases(k.id).slice().sort(function (a, b) { return String(a.created || "").localeCompare(String(b.created || "")); }) : [];
+    var it = (cs[0] && cs[0].intake) || {}; return { freq: it.freq || "", emo: it.emo === "" || it.emo == null || isNaN(+it.emo) ? null : +it.emo, at: cs[0] ? cs[0].created || "" : "" };
+  };
+  A.knotFreqFa = function (id) { var o = A.KFREQ.filter(function (x) { return x[0] === id; })[0]; return o ? o[1] : ""; };
+  /* «پیش‌تر ← اکنون» با همان مقیاس و رقمِ فارسی (کارنامه، صفحهٔ گره، ایمیل) */
+  A.knotRemeasureText = function (k, r) {
+    var b = A.knotIntake(k), part = function (fr, em) { return [fr ? A.knotFreqFa(fr) || fr : "", em != null ? "شدت " + fa(em) + " از " + fa(A.KEMO_MAX) : ""].filter(Boolean).join(" · ") || "نگفته"; };
+    return "ثبتِ نخست: " + part(b.freq, b.emo) + " ← اکنون: " + part(r.freqId || "", r.intensity) + (r.note ? " — " + r.note : "");
+  };
   A.knotCases = function (knotId) { return S.all("kcase", function (c) { return (c.knots || []).indexOf(knotId) >= 0; }); };
   A.knotStatus = function (k) {
     if (!k) return "open";
@@ -404,8 +418,41 @@
     /* ممیزی ۲۰۲۶-۱۰-۱۳: «یه مشت قرص بخورم و تمومش کنم» و «از پل بپرم» دیده نمی‌شد */
     ["قرص زیاد خوردن", new RegExp("(?:یه مشت|یک مشت|همه ?ی|همهٔ|کلی|یه بسته|یک بسته|بسته) ?(?:[" + FL + "]+ ){0,2}قرص(?: [" + FL + "]+){0,3} ?(?:بخورم|می ?خورم|خوردن)")],
     ["پریدن از بلندی", new RegExp("از (?:پل|بالای|پشت ?بام|ساختمان|طبقه|بلندی|کوه|صخره)(?: [" + FL + "]+){0,2} ?(?:بپرم|می ?پرم|پایین بپرم|بیفتم|خودمو پرت|خودم را پرت)")],
-    ["به زندگی‌ام پایان", new RegExp("(?:به )?زندگی ?(?:م|ام|مو|ام را|م را) ?(?:را |رو )?(?:پایان|تموم|تمام) ?(?:بدم|بدهم|کنم|می ?دم|میدم)")]
+    ["به زندگی‌ام پایان", new RegExp("(?:به )?زندگی ?(?:م|ام|مو|ام را|م را) ?(?:را |رو )?(?:پایان|تموم|تمام) ?(?:بدم|بدهم|کنم|می ?دم|میدم)")],
+    /* بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵ — اندیشهٔ منفعل («بهتره نباشم»، «همه بدونِ من راحت‌ترن»، …) دیده نمی‌شد. واژه‌های میانی محدودند
+       تا «بهتره فردا سرِ کلاس نباشم» یا «پروژه بدونِ من بهتر پیش می‌رود» برخورد نشوند (آزمون‌های منفی در tests/test_fixes_1015c.js) */
+    ["بهتره نباشم", new RegExp(WB0 + "بهتر(?: ?ه| است| اس)(?: (?:که|دیگه|دیگر|اصلا|اصلاً|کلا|کلاً|من|زنده))* (?:نباشم|نمونم|نمانم|بمیرم|زنده نمونم|زنده نمانم)" + WB1)],
+    ["همه بدونِ من راحت‌ترن", new RegExp(WB0 + "(?:همه|همه ?ی? ?شون|بقیه|دنیا|خانواده ?ام|خانواده ?م|خانواده|اونا|آنها|آن ها|مامان ?م|بابا ?م|بچه ?هام|بچه ?ها ?م)(?: (?:هم|خیلی|حتما|حتماً|قطعا|قطعاً))* (?:بدون|بی) (?:وجود )?من(?: (?:خیلی|هم|حتما|حتماً|قطعا|قطعاً))* (?:راحت ?تر|بهتر|خوشحال ?تر|خوشبخت ?تر|آسوده ?تر)")],
+    ["رگ زدن", new RegExp(WB0 + "رگ(?: ?م| ?مو| ?م را| ?م رو| ?دستم| ?دستمو| دستم را)? ?(?:زدن|بزنم|می ?زنم|رو بزنم|را بزنم)" + WB1)],
+    ["زندگی ارزشِ ادامه ندارد", new RegExp("زندگی(?: [" + FL + "]+){0,2} ارزش ?(?:ش)?(?: [" + FL + "]+){0,3} ?(?:نداره|ندارد|نداشت)" + WB1)],
+    ["نمی‌خواهم به زندگی ادامه بدهم", new RegExp("(?:نمی ?(?:خوام|خواهم)|نمی ?تونم|نمی ?توانم)(?: [" + FL + "]+){0,2} ?(?:(?:به )?زندگی(?: [" + FL + "]+){0,1} (?:را |رو )?ادامه (?:بدم|بدهم|دادن)|ادامه (?:بدم|بدهم|دادن)(?: [" + FL + "]+){0,1} (?:به )?زندگی)")]
   ];
+  /* انکارِ صریحِ خودِ کاربر (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵): فقط همین، در پیامی پس از نشانه، بندِ ایمنی را خاموش می‌کند (a32 AS.safetyActive) —
+     مدل به‌تنهایی هرگز. فهرست عمداً تنگ است: «نه» در آغازِ پیام، «قصد/فکرِ خودکشی/آسیب ندارم»، «به خودم آسیب نمی‌زنم»، «در خطر نیستم»، … */
+  var DENY_N = "(?:خود ?کشی|آسیب ?ی?|صدمه ?ای?|خود ?زنی|مرگ|مردن|کشتن ?خود ?م|بلایی)";
+  var DENY_RE = [
+    new RegExp("^(?:نه|نخیر|خیر|ابدا|ابداً|اصلا|اصلاً|هرگز|no|nope)(?=$|[^" + FL + "a-z])"),
+    new RegExp("(?:قصد|فکر|نیت|برنامه|خیال)(?: [" + FL + "]+){0,3} ?" + DENY_N + "(?: [" + FL + "]+){0,4} ?(?:ندارم|نیست|نکردم|نمی ?کنم)" + WB1),
+    new RegExp(DENY_N + "(?: [" + FL + "]+){0,3} ?(?:نمی ?(?:زنم|کنم|رسونم|رسانم)|ندارم|در کار نیست)" + WB1),
+    new RegExp("(?:به )?خود ?م(?: [" + FL + "]+){0,2} ?(?:آسیب|صدمه)(?: ?ی| ?ای)? ?نمی ?(?:زنم|رسونم|رسانم)" + WB1),
+    new RegExp(SELF + " ?نمی ?کشم" + WB1),
+    new RegExp("نمی ?(?:خوام|خواهم) (?:بمیرم|خودمو بکشم|خودم را بکشم)" + WB1),
+    new RegExp("(?:در )?خطر ?(?:ی)? (?:نیستم|نیست|ندارم)" + WB1),
+    new RegExp("منظور ?م(?: [" + FL + "]+){0,3} ?نبود" + WB1),
+    /not suicidal|no intention|i'?m safe|i am safe|won'?t hurt myself|not going to hurt myself/
+  ];
+  /* انکارهای پیام (نرمال‌شده). خالی ⇒ انکار نیست */
+  A.knotSafetyDenial = function (text) {
+    var t = safeNorm(text), out = [];
+    DENY_RE.forEach(function (re) { var m = t.match(re); if (m && m[0].trim()) out.push(m[0].trim()); });
+    return out;
+  };
+  /* پیام بی بخش‌های انکار — اگر باز هم واژهٔ ایمنی داشت، نشانهٔ تازه است («نه، دیگه نمی‌خوام زنده باشم») */
+  A.knotSafetyStripDenial = function (text) {
+    var t = safeNorm(text);
+    DENY_RE.forEach(function (re) { t = t.replace(new RegExp(re.source, "g"), " "); });
+    return t;
+  };
   /* «تمومش کنم» فقط وقتی دربارهٔ زندگی/خود است: پنجرهٔ ۴۰ نویسه در دو سو. یا واژهٔ زندگی/خود/مرگ در پنجره هست،
      یا «می‌خواهم/دلم می‌خواد/بهتره» درست پیش از آن آمده و هیچ واژهٔ کار/مسئله در پنجره نیست. */
   var END_RE = /(?:تموم ?ش|تمام ?ش|همه چی(?:ز)? ?(?:را|رو)? ?تموم) ?(?:کنم|می ?کنم|بکنم)/g;
@@ -893,7 +940,7 @@
     box.appendChild(pracSec);
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "زمینه"),
       h("div", { class: "kn-grid" },
-        fld("چند بار پیش آمده؟", sel("knFreq", it.freq, [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]], set("freq"))),
+        fld("چند بار پیش آمده؟", sel("knFreq", it.freq, A.KFREQ, set("freq"))),
         fld("چقدر پس از رخداد می‌نویسی؟", sel("knLag", it.lag, [["now", "همان روز (کمتر از ۲۴ ساعت)"], ["days", "۱ تا ۷ روز بعد"], ["weeks", "بیش از یک هفته بعد"]], set("lag")),
           { hint: "بیش از ۲۴ ساعت ⇒ حافظه با دانستنِ نتیجه بازنویسی می‌شود (سوگیریِ پس‌نگری، Fischhoff 1975)." }),
         fld("اهمیت (۰–۱۰)", scaleSel("knImp", it.imp, set("imp"))),
@@ -1742,6 +1789,9 @@
       root.appendChild(cs.length ? h("ul", { class: "plain kn-cl" }, cs.map(function (c) {
         return h("li", {}, h("button", { class: "linkish", onclick: function () { A.go("kcase", c.id, c.step || "s4"); } }, c.title || "موقعیت"), h("span", { class: "muted small" }, " · " + A.fdate(c.created) + " · " + (KCST[c.status] || "")));
       })) : A.empty("موقعیتی به این گره پیوند نخورده."));
+      // دوباره‌سنجی‌ها کنارِ ثبتِ نخست، با همان مقیاس (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
+      if ((k.remeasures || []).length) root.appendChild(h("section", { class: "card soft kn-remeasure", dir: "rtl" }, h("h3", {}, "📏 دوباره‌سنجی"),
+        h("ul", { class: "plain" }, k.remeasures.map(function (r) { return h("li", {}, h("span", { class: "muted small" }, A.fdate(r.at) + " · "), A.knotRemeasureText(k, r)); }))));
     } else if (t === "links") root.appendChild(knotLinks(k));
     else root.appendChild(knotCardEditor(k));
     return root;

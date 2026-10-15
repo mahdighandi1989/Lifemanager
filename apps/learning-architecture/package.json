@@ -1,0 +1,11 @@
+{
+  "name": "lla-page-tests",
+  "private": true,
+  "description": "Browser tests of /apps/learning-architecture (tests/*.js, Playwright on dist/learning-architecture.html). Not part of the frontend build; the merge gate runs them via tests/test_learning_architecture_graph_browser.py.",
+  "scripts": {
+    "test": "cd ../.. && python -m pytest tests/test_learning_architecture_graph_browser.py -q"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

@@ -27,7 +27,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.graph = items.length === src.items.length && M.edges.filter(e => e.rel === 'covers').length > 200;
     const hk = msg => APP.ASSIST.promptHooks.map(f => { try { return f({ msgs: [] }, msg) || ''; } catch (e) { return ''; } }).join('\n');
     out.hook = /# منبع‌ها و پوشش/.test(hk('این کتاب در سامانه هست؟')) && !/# منبع‌ها و پوشش/.test(hk('سلام')) && /lla-sources/.test(hk('کتاب'));
-    out.menu = APP.SUB_VIEWS.sources === 'mind';
+    out.menu = APP.SUB_VIEWS.sources === 'maps';   // فقط از «🗺 نقشه‌ها» باز می‌شود (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵؛ a21 SUB_VIEWS)
     return out;
   });
   chk(Object.values(info.s).every(Boolean), 'every source item with its verdict, filterable, linked to the real tunnel, in the shared graph, known to the assistant: ' + JSON.stringify(info.s));

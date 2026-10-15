@@ -50,7 +50,8 @@
    - بخشِ مربوطِ `docs/HANDBOOK.md`: تصمیم ⇒ §۱۰ (با «ردشده»)، کارِ باز ⇒ §۱۲، عددِ تازهٔ آزمون ⇒ §۶، و «به‌روزرسانی:» به امروز.
 4. دوباره `python apps/learning-architecture/build.py` (فهرست و نمودار و نسخه‌های فرانت را بازمی‌سازد).
 5. دروازه (قانونِ ۴ ِ ریپو): `python -m pytest tests/ -q` و `cd frontend && npm run build`. اگر رفتارِ برنامه عوض شد:
-   `cd apps/learning-architecture && npm i --no-save playwright@1.56 && for t in tests/*.js; do node $t; done`
+   `cd apps/learning-architecture && npm i && for t in tests/*.js; do node $t; done` (`package.json` ِ همین پوشه playwright 1.56.1 را می‌بندد؛ `npm i --no-save playwright@1.56` هم کار می‌کند).
+   **دروازهٔ pytest همهٔ آن‌ها را می‌راند** (`tests/test_learning_architecture_graph_browser.py`: هر `tests/test*.js` + `scan_epi.js`، با کدِ خروج، موازی با `LLA_BROWSER_JOBS` (پیش‌فرض ۴)، روی ساختِ تازه در پوشهٔ موقت)؛ بی node/playwright/Chromium با دلیل skip می‌شود.
    (Chromium در `/opt/pw-browsers`؛ `playwright install` نزن). هر آزمون باید «NO ERRORS» بدهد (`scan_epi.js` «no page errors» و `test3.js` «no errors» چاپ می‌کنند — همان معنا).
    اگر مسیرِ AI عوض شد، یک بار با مدلِ واقعی هم اجرا کن (`POST /api/inspection/audit/ai` با توکنِ ناظر؛ الگو: WORKLOG (22)) — هوش مصنوعیِ ساختگی بریدگیِ پاسخ و JSON ِ بدشکل را نشان نمی‌دهد.
    اگر ذخیره/ورود/تاریخچه/آینه/پیوست/میزبان عوض شد: `python apps/learning-architecture/tests/host/run_host_e2e.py`

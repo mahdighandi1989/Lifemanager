@@ -15,7 +15,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.S.loaded = true; const S = APP.S, AS = APP.ASSIST, out = {}, t0 = new Date(Date.now() - 3600e3).toISOString();
     const s = { id: 'ach_v8', type: 'achat', msgs: [], safetyAt: t0, tour: { facets: [], diag: {} } }; S.put(s);
     out.active = AS.safetyActive(s) === true;
+    // بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: «رد شد» بی پیامِ انکارِ خودِ کاربر پس از نشانه خاموش نمی‌کند
     s.tour.diag.safety = { st: 'no', why: 'کاربر گفت: «نه، فکرِ آسیب به خودم ندارم»', at: new Date().toISOString() };
+    out.notByModelAlone = AS.safetyActive(s) === true;
+    s.msgs.push({ role: 'user', text: 'نه، فکرِ آسیب به خودم ندارم؛ فقط خسته‌ام', at: new Date(Date.now() - 60e3).toISOString() });
     out.cleared = AS.safetyActive(s) === false;
     s.tour.diag.safety.at = new Date(Date.now() - 7200e3).toISOString();   // ردِ پیشین، پیش از نشانهٔ تازه ⇒ هنوز فعال
     out.stillOnIfOlder = AS.safetyActive(s) === true;
@@ -29,7 +32,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // دوباره‌سنجی روی خودِ گره
     AS._turnSession = s;
     out.reBad = AS.DO.remeasure({ knot: 'nope' }) !== '';
-    out.reOk = AS.DO.remeasure({ knot: 'kn_v8', freq: 'دو شب در ماه', intensity: 25 }) === '' && (S.get('kn_v8').remeasures || []).length === 1;
+    // همان مقیاسِ فرم (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵): شدت ۰ تا ۱۰، بسامد از گزینه‌های فرم
+    out.reScale = /۰ تا ۱۰/.test(AS.DO.remeasure({ knot: 'kn_v8', freq: 'گاهی', intensity: 25 })) && /مقیاسِ فرم/.test(AS.DO.remeasure({ knot: 'kn_v8', freq: 'دو شب در ماه' })) && !(S.get('kn_v8').remeasures || []).length;
+    out.reOk = AS.DO.remeasure({ knot: 'kn_v8', freq: 'گاهی', intensity: '۳', note: 'دو شب در ماه' }) === '' && (S.get('kn_v8').remeasures || []).length === 1 && S.get('kn_v8').remeasures[0].intensity === 3 && S.get('kn_v8').remeasures[0].freqId === 'some';
     out.reShown = APP.MIND.model().events.some(e => /📏 دوباره‌سنجی/.test(e.fa) && /دو شب در ماه/.test(e.fa));
     out.rule = /"do":"remeasure"/.test(AS.SYS) && /همان مقیاسِ فرم/.test(AS.SYS);
     return out;

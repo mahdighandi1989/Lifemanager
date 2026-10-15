@@ -83,7 +83,7 @@
   var DO = AS.DO;
   DO.tour_diag = function (a) {
     var s = AS._turnSession; if (!s) return "سشن نیست";
-    var list = Array.isArray(a.layers) ? a.layers : Array.isArray(a.diag) ? a.diag : a.id ? [a] : [], bad = [];
+    var list = Array.isArray(a.layers) ? a.layers : Array.isArray(a.diag) ? a.diag : a.id ? [a] : [], bad = [], safetyHeld = false;
     // غربال پیش از طرحِ تور (در همان نوبت) نگه داشته و پس از tour_plan اعمال می‌شود (کارزارِ آزمون c03/c06: گم می‌شد)
     if (!s.tour) { s._diagPending = (s._diagPending || []).concat(list); return ""; }
     var d = s.tour.diag = s.tour.diag || {};
@@ -97,21 +97,43 @@
       if (prev && prev.st === "found" && st === "found" && prev.why && prev.why.indexOf(why) < 0) why = prev.why + " ؛ " + why;
       why = dedupWhy(why);   // همان نقل‌قول سه بار در فهرستِ لایه‌ها نیاید (کارزارِ سوم v03)
       if (prev && prev.st === "found" && st === "no") { (prev.hist = prev.hist || []).push({ st: prev.st, why: prev.why, at: prev.at }); }
-      d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), hist: prev && prev.hist };
+      // ایمنی: «رد شد» ِ مدل فقط با انکارِ صریحِ خودِ کاربر پس از نشانه و نقلِ عینیِ آن در why؛ وگرنه «باید پرسید» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
+      if (L.id === "safety" && st === "no" && s.safetyAt && !AS.safetyClearMsg(s, { st: "no", why: why, at: nowIso(), seq: s.seq })) { st = "ask"; safetyHeld = true; }
+      d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), seq: s.seq, hist: prev && prev.hist };
       // قابِ مسئلهٔ عملی: جزءها انباشته می‌شوند (هر نوبت یکی؛ پاسخِ پیشین گم نمی‌شود)
       if (L.id === "practical") { var pp = (prev && prev.parts) || {}; if (x.parts && typeof x.parts === "object") PRACT.forEach(function (q) { var v = x.parts[q[0]]; if (typeof v === "string" && v.trim().length >= 2) pp[q[0]] = clip(v.trim(), 300); }); if (Object.keys(pp).length) d[L.id].parts = pp;
         // قابِ کامل ⇒ یک کارتِ مرور (یک بار): همان شش پرسش برای تصمیمِ بعدی تمرین می‌شود — فاصله‌دار، در «مرور» و «امروز»
         var pcard = prev && prev.card; if (pcard) d[L.id].card = pcard;
         practicalCard(s, d[L.id]); }
     });
-    return bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "";
+    var held = safetyHeld ? "ایمنی خاموش نشد (هنوز «باید پرسید»): فقط انکارِ صریحِ خودِ کاربر در پیامی پس از نشانه — با نقلِ عینیِ همان جمله در why با «…» — آن را «رد شد» می‌کند" : "";
+    return [bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "", held].filter(Boolean).join(" · ");
   };
   /* نشانهٔ پریشانی هنوز فعال است؟ واژه‌نامه آن را روشن می‌کند؛ فقط حرفِ خودِ کاربر (لایهٔ «ایمنی» با «رد شد» و دلیل، پس از آن لحظه) خاموشش می‌کند —
      کارزارِ v08: کاربر دو بار صریحاً گفت آسیبی به خودش در کار نیست ولی هر ۱۷ ایمیل با بندِ بحران باز می‌شد */
+  /* بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: مدل به‌تنهایی هرگز خاموشش نمی‌کند. خاموش فقط وقتی:
+     ۱) لایهٔ «ایمنی» «رد شد» است و پس از نشانه ثبت شده؛
+     ۲) یک پیامِ **خودِ کاربر**، پس از نشانه و نه پس از آن حکم، انکارِ صریح دارد (واژه‌نامهٔ کدیِ A.knotSafetyDenial ِ a16: «نه»، «فکرِ آسیب ندارم»، …)؛
+     ۳) why ِ همان حکم آن پیام را عیناً نقل کرده («…»، بخشی که انکار را در بر دارد) — حکمِ همان نوبتِ نشانه یا با دلیلِ ساختگی ⇒ هنوز فعال. */
+  function qn(x) { return (A.kSafeNorm ? A.kSafeNorm(x) : String(x || "")).replace(/[\s‌«»"“”'.,،:؛!?؟()\-]+/g, ""); }
+  function after(m, s) { return m.seq != null && s.safetySeq != null ? m.seq > s.safetySeq : String(m.at || "") > String(s.safetyAt); }
+  function notLater(m, L) { return m.seq != null && L.seq != null ? m.seq <= L.seq : String(m.at || "") <= String(L.at || ""); }
+  function quotes(why, u, deny) {
+    var qs = []; String(why || "").replace(/[«"“]([^«»"“”]{1,400})[»"”]/g, function (m0, q) { qs.push(q); return m0; });
+    var nu = qn(u); return qs.some(function (q) { var nq = qn(q); return nq.length >= 2 && nu.indexOf(nq) >= 0 && deny.some(function (d) { return nq.indexOf(qn(d)) >= 0; }); });
+  }
+  AS.safetyClearMsg = function (s, L) {
+    L = L || (s && s.tour && s.tour.diag && s.tour.diag.safety);
+    if (!s || !s.safetyAt || !L || L.st !== "no" || !A.knotSafetyDenial) return null;
+    if (!(L.seq != null && s.safetySeq != null ? L.seq > s.safetySeq : String(L.at || "") > String(s.safetyAt))) return null;
+    return (s.msgs || []).filter(function (m) {
+      if (!m || m.role !== "user" || !after(m, s) || !notLater(m, L)) return false;
+      var dn = A.knotSafetyDenial(m.text); return dn.length > 0 && quotes(L.why, m.text, dn);
+    }).pop() || null;
+  };
   AS.safetyActive = function (s) {
     if (!s || !s.safetyAt) return false;
-    var L = s.tour && s.tour.diag && s.tour.diag.safety;
-    return !(L && L.st === "no" && String(L.at || "") > String(s.safetyAt));
+    return !AS.safetyClearMsg(s);
   };
   // tour_plan می‌تواند غربال را هم‌زمان بیاورد
   var rawPlan = DO.tour_plan;
@@ -139,6 +161,16 @@
       (fams.length ? "\nخانواده‌هایی که غربال پیدا کرد: " + fams.join("، ") + " — در گره‌گشا (قدمِ ۱ و ۲) آزمون‌های تمایزدهندهٔ همین‌ها را هایلایت کن، هرچند رتبهٔ صفحه پایین‌تر باشد؛ اگر آزمون ردشان کرد، در غربال هم «رد شد» کن." : "");
   };
   AS.promptHooks = AS.promptHooks || [];
+  /* فقط وقتی نشانه فعال است: قاعدهٔ خاموش‌کردن (پرامپتِ سامانه دست نمی‌خورد) */
+  AS.promptHooks.push(function (s) {
+    if (!AS.safetyActive(s)) return "";
+    return "# ایمنی (فعال)\n- نشانهٔ پریشانیِ جدی در این سشن فعال است؛ تا خودِ کاربر صریحاً نگفته آسیبی در کار نیست، لایهٔ safety «باید پرسید» می‌ماند. «رد شد» فقط پس از انکارِ صریحِ خودش در پیامی بعد از نشانه، و why باید همان جمله‌اش را عیناً در «…» نقل کند — حدس یا لحنِ آرام بس نیست.";
+  });
+  /* داوری با کاربر (a6: data-own="verdict") — فقط روی پرونده/دورهٔ کارخانه */
+  AS.promptHooks.push(function () {
+    var v = A.state && A.state.view; if (v !== "e_case" && v !== "epi_course") return "";
+    return "# داوری با کاربر\n- حکمِ هر ایستگاه، درجه/احتمالِ صدق، «وضعیت»، «حکم در یک بند» و اقدامِ «حکم نهایی» را خودِ کاربر می‌دهد: پرشان نکن و نزن (صفحه نمی‌گذارد)؛ فقط زرد کن و شاهدهای ایستگاه‌ها را یادآوری کن.";
+  });
   AS.promptHooks.push(function () {
     var ks = S.all("knot").filter(function (k) { return !k.sample; }).slice(-15);
     if (!ks.length) return "";

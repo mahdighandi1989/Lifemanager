@@ -20980,8 +20980,38 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       if (onSave) onSave();
     }, { prefix: prefix || "e_" + s.id, claims: claims });
     a11yWS(ws);
+    ownJudge(ws, s);
     return ws;
   };
+  /* داوری فقط با خودِ کاربر (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: دستیار می‌توانست «احتمال صدق نهایی ٪»، «وضعیت» و «حکم در یک بند» ِ پرونده را بنویسد):
+     فیلدهای حکم و درجه `data-own="verdict"` می‌گیرند؛ دستیار (a26) پرشان نمی‌کند و نمی‌زندشان — فقط زرد، با یادداشتِ روشن (مثلِ معمای امروز).
+     فهرست از خودِ تعریفِ ایستگاه‌ها ساخته می‌شود (نه فهرستِ دستی):
+     - حکمِ هر ایستگاه (verdict) — جز پذیرش (st_intake) که فقط مسیر را تعیین می‌کند؛
+     - در «حکم نهایی»: جدولِ درجهٔ نهایی، مقایسه با اطمینانِ اولیه، «حکم در یک بند» و «اقدام»؛
+     - فیلدِ گزینه‌ای که درجهٔ یقین/ظن می‌دهد، «وضعِ معرفتی»، «… واقعی است؟»، و مقیاسِ اعتبار/وثاقت/صلاحیت؛
+     - در هر جدول: ستونِ درصد (احتمال صدق) و ستونِ گزینه‌ایِ همان داوری‌ها. رده‌بندیِ صرف (نوعِ ورودی، مرتبهٔ ادراک) آزاد است. */
+  var JUDGE_FINAL = ["final", "conclusion", "shift", "act"];
+  // گزینه‌ای که درجهٔ یقین/ظن می‌دهد، یا «وضعِ معرفتی» و «… واقعی است؟»؛ مقیاسِ «اعتبار/وثاقت/صلاحیت» — همه داوری‌اند (رده‌بندیِ صرف نه)
+  function judgeSel(x) { return (x.t === "sel" && (/یقین|ظن/.test((x.opts || []).join(" ")) || /وضع معرفتی|واقعی(?:\s*است)?؟/.test(x.l || ""))) || (x.t === "scale" && /اعتبار|وثاقت|صلاحیت/.test(x.l || "")); }
+  function judgeField(s, f) { return (f.k === "verdict" && s.id !== "st_intake") || (s.id === FINAL && JUDGE_FINAL.indexOf(f.k) >= 0) || judgeSel(f); }
+  function judgeCol(c) { return c.t === "pct" || judgeSel(c); }
+  A.epiJudgment = function (sid) {
+    var s = SM[sid]; if (!s) return { fields: [], cols: [] };
+    var fl = s.ws.filter(function (f) { return f.t !== "info" && judgeField(s, f); }), out = { fields: fl.map(function (f) { return f.k; }), cols: [] };
+    s.ws.forEach(function (f) { if (f.t === "table" && fl.indexOf(f) < 0) (f.cols || []).forEach(function (c) { if (judgeCol(c)) out.cols.push(f.k + "." + c.k); }); });
+    return out;
+  };
+  function ownJudge(ws, s) {
+    function fix() {
+      s.ws.forEach(function (f) {
+        var box = ws.querySelector('.fld[data-k="' + f.k + '"]'); if (!box) return;
+        if (judgeField(s, f)) { box.setAttribute("data-own", "verdict"); return; }
+        if (f.t === "table") (f.cols || []).forEach(function (c) { if (judgeCol(c)) box.querySelectorAll('td[data-l="' + c.l.replace(/"/g, '\\"') + '"]').forEach(function (td) { if (!td.getAttribute("data-own")) td.setAttribute("data-own", "verdict"); }); });
+      });
+    }
+    fix();
+    if (window.MutationObserver) new MutationObserver(fix).observe(ws, { childList: true, subtree: true });
+  }
   A.epiFields = fieldsFor;
   A.epiClaimsOf = claimsOf;
 
@@ -26634,6 +26664,20 @@ APP.goFromURL = function (q) {
       cases: o.cases || [], links: o.links || [], status: "open", items: [], log: [], next: null, interval: null, solvedAt: null, returnedAt: null };
     return S.put(k);
   };
+  /* مقیاسِ فرمِ موقعیت (همان گزینه‌های «چند بار پیش آمده؟» و «شدتِ احساس (۰–۱۰)») — دوباره‌سنجی (a33 DO.remeasure) با همین می‌سنجد */
+  A.KFREQ = [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]];
+  A.KEMO_MAX = 10;
+  /* ثبتِ نخست: کهنه‌ترین موقعیتِ پیوسته به گره */
+  A.knotIntake = function (k) {
+    var cs = k ? A.knotCases(k.id).slice().sort(function (a, b) { return String(a.created || "").localeCompare(String(b.created || "")); }) : [];
+    var it = (cs[0] && cs[0].intake) || {}; return { freq: it.freq || "", emo: it.emo === "" || it.emo == null || isNaN(+it.emo) ? null : +it.emo, at: cs[0] ? cs[0].created || "" : "" };
+  };
+  A.knotFreqFa = function (id) { var o = A.KFREQ.filter(function (x) { return x[0] === id; })[0]; return o ? o[1] : ""; };
+  /* «پیش‌تر ← اکنون» با همان مقیاس و رقمِ فارسی (کارنامه، صفحهٔ گره، ایمیل) */
+  A.knotRemeasureText = function (k, r) {
+    var b = A.knotIntake(k), part = function (fr, em) { return [fr ? A.knotFreqFa(fr) || fr : "", em != null ? "شدت " + fa(em) + " از " + fa(A.KEMO_MAX) : ""].filter(Boolean).join(" · ") || "نگفته"; };
+    return "ثبتِ نخست: " + part(b.freq, b.emo) + " ← اکنون: " + part(r.freqId || "", r.intensity) + (r.note ? " — " + r.note : "");
+  };
   A.knotCases = function (knotId) { return S.all("kcase", function (c) { return (c.knots || []).indexOf(knotId) >= 0; }); };
   A.knotStatus = function (k) {
     if (!k) return "open";
@@ -26677,8 +26721,41 @@ APP.goFromURL = function (q) {
     /* ممیزی ۲۰۲۶-۱۰-۱۳: «یه مشت قرص بخورم و تمومش کنم» و «از پل بپرم» دیده نمی‌شد */
     ["قرص زیاد خوردن", new RegExp("(?:یه مشت|یک مشت|همه ?ی|همهٔ|کلی|یه بسته|یک بسته|بسته) ?(?:[" + FL + "]+ ){0,2}قرص(?: [" + FL + "]+){0,3} ?(?:بخورم|می ?خورم|خوردن)")],
     ["پریدن از بلندی", new RegExp("از (?:پل|بالای|پشت ?بام|ساختمان|طبقه|بلندی|کوه|صخره)(?: [" + FL + "]+){0,2} ?(?:بپرم|می ?پرم|پایین بپرم|بیفتم|خودمو پرت|خودم را پرت)")],
-    ["به زندگی‌ام پایان", new RegExp("(?:به )?زندگی ?(?:م|ام|مو|ام را|م را) ?(?:را |رو )?(?:پایان|تموم|تمام) ?(?:بدم|بدهم|کنم|می ?دم|میدم)")]
+    ["به زندگی‌ام پایان", new RegExp("(?:به )?زندگی ?(?:م|ام|مو|ام را|م را) ?(?:را |رو )?(?:پایان|تموم|تمام) ?(?:بدم|بدهم|کنم|می ?دم|میدم)")],
+    /* بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵ — اندیشهٔ منفعل («بهتره نباشم»، «همه بدونِ من راحت‌ترن»، …) دیده نمی‌شد. واژه‌های میانی محدودند
+       تا «بهتره فردا سرِ کلاس نباشم» یا «پروژه بدونِ من بهتر پیش می‌رود» برخورد نشوند (آزمون‌های منفی در tests/test_fixes_1015c.js) */
+    ["بهتره نباشم", new RegExp(WB0 + "بهتر(?: ?ه| است| اس)(?: (?:که|دیگه|دیگر|اصلا|اصلاً|کلا|کلاً|من|زنده))* (?:نباشم|نمونم|نمانم|بمیرم|زنده نمونم|زنده نمانم)" + WB1)],
+    ["همه بدونِ من راحت‌ترن", new RegExp(WB0 + "(?:همه|همه ?ی? ?شون|بقیه|دنیا|خانواده ?ام|خانواده ?م|خانواده|اونا|آنها|آن ها|مامان ?م|بابا ?م|بچه ?هام|بچه ?ها ?م)(?: (?:هم|خیلی|حتما|حتماً|قطعا|قطعاً))* (?:بدون|بی) (?:وجود )?من(?: (?:خیلی|هم|حتما|حتماً|قطعا|قطعاً))* (?:راحت ?تر|بهتر|خوشحال ?تر|خوشبخت ?تر|آسوده ?تر)")],
+    ["رگ زدن", new RegExp(WB0 + "رگ(?: ?م| ?مو| ?م را| ?م رو| ?دستم| ?دستمو| دستم را)? ?(?:زدن|بزنم|می ?زنم|رو بزنم|را بزنم)" + WB1)],
+    ["زندگی ارزشِ ادامه ندارد", new RegExp("زندگی(?: [" + FL + "]+){0,2} ارزش ?(?:ش)?(?: [" + FL + "]+){0,3} ?(?:نداره|ندارد|نداشت)" + WB1)],
+    ["نمی‌خواهم به زندگی ادامه بدهم", new RegExp("(?:نمی ?(?:خوام|خواهم)|نمی ?تونم|نمی ?توانم)(?: [" + FL + "]+){0,2} ?(?:(?:به )?زندگی(?: [" + FL + "]+){0,1} (?:را |رو )?ادامه (?:بدم|بدهم|دادن)|ادامه (?:بدم|بدهم|دادن)(?: [" + FL + "]+){0,1} (?:به )?زندگی)")]
   ];
+  /* انکارِ صریحِ خودِ کاربر (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵): فقط همین، در پیامی پس از نشانه، بندِ ایمنی را خاموش می‌کند (a32 AS.safetyActive) —
+     مدل به‌تنهایی هرگز. فهرست عمداً تنگ است: «نه» در آغازِ پیام، «قصد/فکرِ خودکشی/آسیب ندارم»، «به خودم آسیب نمی‌زنم»، «در خطر نیستم»، … */
+  var DENY_N = "(?:خود ?کشی|آسیب ?ی?|صدمه ?ای?|خود ?زنی|مرگ|مردن|کشتن ?خود ?م|بلایی)";
+  var DENY_RE = [
+    new RegExp("^(?:نه|نخیر|خیر|ابدا|ابداً|اصلا|اصلاً|هرگز|no|nope)(?=$|[^" + FL + "a-z])"),
+    new RegExp("(?:قصد|فکر|نیت|برنامه|خیال)(?: [" + FL + "]+){0,3} ?" + DENY_N + "(?: [" + FL + "]+){0,4} ?(?:ندارم|نیست|نکردم|نمی ?کنم)" + WB1),
+    new RegExp(DENY_N + "(?: [" + FL + "]+){0,3} ?(?:نمی ?(?:زنم|کنم|رسونم|رسانم)|ندارم|در کار نیست)" + WB1),
+    new RegExp("(?:به )?خود ?م(?: [" + FL + "]+){0,2} ?(?:آسیب|صدمه)(?: ?ی| ?ای)? ?نمی ?(?:زنم|رسونم|رسانم)" + WB1),
+    new RegExp(SELF + " ?نمی ?کشم" + WB1),
+    new RegExp("نمی ?(?:خوام|خواهم) (?:بمیرم|خودمو بکشم|خودم را بکشم)" + WB1),
+    new RegExp("(?:در )?خطر ?(?:ی)? (?:نیستم|نیست|ندارم)" + WB1),
+    new RegExp("منظور ?م(?: [" + FL + "]+){0,3} ?نبود" + WB1),
+    /not suicidal|no intention|i'?m safe|i am safe|won'?t hurt myself|not going to hurt myself/
+  ];
+  /* انکارهای پیام (نرمال‌شده). خالی ⇒ انکار نیست */
+  A.knotSafetyDenial = function (text) {
+    var t = safeNorm(text), out = [];
+    DENY_RE.forEach(function (re) { var m = t.match(re); if (m && m[0].trim()) out.push(m[0].trim()); });
+    return out;
+  };
+  /* پیام بی بخش‌های انکار — اگر باز هم واژهٔ ایمنی داشت، نشانهٔ تازه است («نه، دیگه نمی‌خوام زنده باشم») */
+  A.knotSafetyStripDenial = function (text) {
+    var t = safeNorm(text);
+    DENY_RE.forEach(function (re) { t = t.replace(new RegExp(re.source, "g"), " "); });
+    return t;
+  };
   /* «تمومش کنم» فقط وقتی دربارهٔ زندگی/خود است: پنجرهٔ ۴۰ نویسه در دو سو. یا واژهٔ زندگی/خود/مرگ در پنجره هست،
      یا «می‌خواهم/دلم می‌خواد/بهتره» درست پیش از آن آمده و هیچ واژهٔ کار/مسئله در پنجره نیست. */
   var END_RE = /(?:تموم ?ش|تمام ?ش|همه چی(?:ز)? ?(?:را|رو)? ?تموم) ?(?:کنم|می ?کنم|بکنم)/g;
@@ -27166,7 +27243,7 @@ APP.goFromURL = function (q) {
     box.appendChild(pracSec);
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "زمینه"),
       h("div", { class: "kn-grid" },
-        fld("چند بار پیش آمده؟", sel("knFreq", it.freq, [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]], set("freq"))),
+        fld("چند بار پیش آمده؟", sel("knFreq", it.freq, A.KFREQ, set("freq"))),
         fld("چقدر پس از رخداد می‌نویسی؟", sel("knLag", it.lag, [["now", "همان روز (کمتر از ۲۴ ساعت)"], ["days", "۱ تا ۷ روز بعد"], ["weeks", "بیش از یک هفته بعد"]], set("lag")),
           { hint: "بیش از ۲۴ ساعت ⇒ حافظه با دانستنِ نتیجه بازنویسی می‌شود (سوگیریِ پس‌نگری، Fischhoff 1975)." }),
         fld("اهمیت (۰–۱۰)", scaleSel("knImp", it.imp, set("imp"))),
@@ -28015,6 +28092,9 @@ APP.goFromURL = function (q) {
       root.appendChild(cs.length ? h("ul", { class: "plain kn-cl" }, cs.map(function (c) {
         return h("li", {}, h("button", { class: "linkish", onclick: function () { A.go("kcase", c.id, c.step || "s4"); } }, c.title || "موقعیت"), h("span", { class: "muted small" }, " · " + A.fdate(c.created) + " · " + (KCST[c.status] || "")));
       })) : A.empty("موقعیتی به این گره پیوند نخورده."));
+      // دوباره‌سنجی‌ها کنارِ ثبتِ نخست، با همان مقیاس (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
+      if ((k.remeasures || []).length) root.appendChild(h("section", { class: "card soft kn-remeasure", dir: "rtl" }, h("h3", {}, "📏 دوباره‌سنجی"),
+        h("ul", { class: "plain" }, k.remeasures.map(function (r) { return h("li", {}, h("span", { class: "muted small" }, A.fdate(r.at) + " · "), A.knotRemeasureText(k, r)); }))));
     } else if (t === "links") root.appendChild(knotLinks(k));
     else root.appendChild(knotCardEditor(k));
     return root;
@@ -32716,7 +32796,9 @@ APP.goFromURL = function (q) {
      (A.NAV/EPI_NAV/…) یا «زیرنما»ی یک نمای منو است — صفحهٔ یک رکورد/درس که از نمای پدرش باز می‌شود. نمای تازه ⇒ ورودیِ منو، یا
      (فقط اگر واقعاً صفحهٔ یک رکورد است) یک سطر این‌جا با نمای پدرش. tests/test_fixes_1015.js بی‌استثنا می‌سنجد. */
   A.SUB_VIEWS = { tech: "lib", topic: "topics", proto: "protos", e_case: "e_cases", lesson: "course", epi_lesson: "epi_course", journey: "topics",
-    kcase: "kcases", knot: "kcases", ksims: "kcases", move: "moves", psy_item: "mind", idea: "mind" };
+    kcase: "kcases", knot: "kcases", ksims: "kcases", move: "moves", psy_item: "mind", idea: "mind",
+    // «📚 منبع‌ها و پوشش» فقط از «🗺 نقشه‌ها» (کارت و گره‌های src/srcitem ِ گراف) باز می‌شود، نه از کارنامه (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
+    sources: "maps" };
   var JOB = {}; JOBS.forEach(function (j) { JOB[j.id] = j; }); JOB.ws = WORKSHOP;
 
   /* ---------- سه مسیرِ کاری: قدم‌به‌قدم از صفحه‌های واقعی ---------- */
@@ -33706,6 +33788,12 @@ APP.goFromURL = function (q) {
   (function () { var raw0 = A.toast; A.toast = function (m) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200) }); if (RECENT_TOASTS.length > 8) RECENT_TOASTS.shift(); } } catch (e) { } return raw0.apply(this, arguments); }; })();
   AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000; return RECENT_TOASTS.filter(function (x) { return x.at >= t0; }).map(function (x) { return x.t; }); };
   var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
+  /* داوری با خودِ کاربر (data-own="verdict"، a6: حکمِ ایستگاه‌ها، درجه/احتمالِ صدق، «حکم در یک بند»): دستیار نه پر می‌کند، نه می‌زند — فقط زرد،
+     با یادداشتِ روشن؛ «هوش مصنوعی در داوری نقشی ندارد» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵) */
+  var VERDICT_HL = "داوری با خودِ توست — درجه و حکم را خودت بده";
+  function isVerdict(x) { try { var o = x && x.closest && x.closest("[data-own]"); return !!(o && o.getAttribute("data-own") === "verdict"); } catch (e) { return false; } }
+  function verdictNote(x, k) { var lb = (SCAN[k] && SCAN[k].label) || x.getAttribute("aria-label") || x.textContent || ""; return "«" + clip(lb, 40) + "» داوری است و فقط با خودِ تو — دستیار حکم و درجه نمی‌دهد؛ زردش کردم، از روی شاهدهای ایستگاه‌ها خودت پرش کن"; }
+  AS.isVerdict = isVerdict;
   function fire(x, ev) { x.dispatchEvent(new Event(ev, { bubbles: true })); }
   function setVal(x, v) {
     var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -33727,6 +33815,7 @@ APP.goFromURL = function (q) {
       var x = el(a.k); if (!x) return "آن فیلد دیگر روی صفحه نیست (صفحه پس از کارِ قبلی عوض شد) — فهرستِ تازه را ببین";
       if (isAnswer(x)) return ANSWER_NOTE;
       // بخشِ «به قلمِ خودت» (کارتِ گره): نوشتن خودش بخشی از یادگرفتن است — فقط زرد، نه پر (کارزارِ آزمون sc01/sc07)
+      if (isVerdict(x)) { reveal(x); mark(x, VERDICT_HL, "hl"); return verdictNote(x, a.k); }
       if (x.closest && x.closest("[data-own]")) { reveal(x); mark(x, a.why || "این را با جمله‌های خودت بنویس", "hl"); return "«" + clip(SCAN[a.k] && SCAN[a.k].label, 30) + "» به قلمِ خودِ توست — زردش کردم؛ می‌توانی همان جمله‌هایی را که گفتی این‌جا بنویسی"; }
       if (x.type === "file") return "پیوست با attach";
       reveal(x);
@@ -33750,6 +33839,7 @@ APP.goFromURL = function (q) {
       // زبانه (role=tab) فقط جابه‌جایی است، نه تصمیم و نه حذف: «در انتظار تأیید (۱)» را باز می‌کند، تأیید نمی‌کند (تورِ زنده)
       if (x.getAttribute("role") === "tab") bt = "";
       if (DANGER.test(bt)) { mark(x, "کارِ برگشت‌ناپذیر — اگر می‌خواهی، خودت بزن", "hl"); return "دکمهٔ «" + clip(x.textContent, 30) + "» را خودت بزن (کارِ برگشت‌ناپذیر)"; }
+      if (isVerdict(x)) { mark(x, VERDICT_HL, "hl"); return verdictNote(x, a.k); }
       if (x.closest && x.closest("[data-own]")) { mark(x, "این را خودت بزن", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودِ توست (مثلاً فرستادنِ متنت به هوش مصنوعی)؛ زردش کردم، اگر خواستی بزن"; }
       if (OWNER.test(bt) && !/صف/.test(bt)) { mark(x, "این تصمیم با خودت است", "hl"); return "«" + clip(x.textContent, 30) + "» تصمیمِ خودت است؛ زردش کردم، اگر خواستی بزن"; }
       var before = document.querySelectorAll("#main input,#main textarea,#main select").length;
@@ -34087,7 +34177,9 @@ APP.goFromURL = function (q) {
     if (!text && !files.length) return Promise.resolve();
     var s = AS.cur() || AS.newSession();
     busy = true; paint();
-    var m = { role: "user", text: text || "(فایل)", at: now(), files: [] };
+    // شمارهٔ ترتیبِ پیام‌های کاربر (برای «پس از نشانه» بی‌وابستگی به میلی‌ثانیهٔ ساعت؛ a32 AS.safetyActive)
+    s.seq = (s.seq || 0) + 1;
+    var m = { role: "user", text: text || "(فایل)", at: now(), files: [], seq: s.seq };
     s.msgs.push(m); S.put(s); paint();
     if (files.length > MAX_FILES) { A.toast("در هر پیام حداکثر " + fa(MAX_FILES) + " فایل؛ بقیه را در پیامِ بعد بفرست", "bad"); files = files.slice(0, MAX_FILES); }
     var ups = Promise.resolve(), aiIds = [], texts = [], dupes = [], toRec = [];
@@ -34210,7 +34302,12 @@ APP.goFromURL = function (q) {
     }
     // نشانهٔ پریشانیِ جدی (همان واژه‌نامهٔ ایمنیِ گره‌گشا): راهِ کمکِ انسانی پیش از هر کار، و مدل هم می‌داند
     var safe = "";
-    try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
+    // انکارِ صریحِ کاربر پس از نشانه («قصدِ خودکشی ندارم») خودش واژهٔ ایمنی دارد؛ اگر بی بخش‌های انکار چیزی نمی‌ماند، نشانهٔ تازه نیست
+    // (وگرنه همان انکار، نشانه را تازه می‌کرد و هرگز خاموش نمی‌شد) — بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵
+    var denyOnly = false;
+    try { denyOnly = !!(s.safetyAt && text && A.knotSafetyDenial && A.knotSafetyDenial(text).length && !A.knotSafetyHit(A.knotSafetyStripDenial(text))); } catch (e) { }
+    if (denyOnly) safe = "\n[سامانه: کاربر پس از نشانهٔ پریشانی صریحاً انکار کرد؛ اگر پذیرفتی، لایهٔ safety را «no» کن و جملهٔ خودش را در why با «…» نقل کن.]";
+    else try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { s.safetySeq = m.seq; safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
     return ups.then(function () {
       if (dupes.length) s.msgs.push({ role: "sys", at: now(), text: "♻ «" + dupes.join("»، «") + "» پیش‌تر در همین سشن فرستاده شده بود؛ دوباره بارگذاری نشد (همان پیوست به کار رفت)." });
       if (toRec.length && s.rec) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به پروندهٔ جاریِ این سشن («" + clip(s.rec.title, 60) + "») هم پیوست شد." });
@@ -35088,7 +35185,8 @@ APP.goFromURL = function (q) {
         else if (f && A.localDay(lastUser(s)) !== A.today()) items.push({ k: "p", txt: "🧭 ادامهٔ تورِ «" + clip(s.title || s.pinned || "دستیار", 40) + "» (" + AS.progressText(s) + ")", sub: "وجهِ بعد: " + clip(f.title, 60), go: function () { openTour(s, f); } });
       });
       // پس از نشانهٔ پریشانی: فردای آن (و تا ۷ روز، اگر کاربر برنگشته) یک پرسشِ آرامِ حال، با خطِ کمک
-      S.all("achat", function (x) { return x.safetyAt && A.today() > String(x.safetyAt).slice(0, 10) && A.daysBetween(String(x.safetyAt).slice(0, 10), A.today()) <= 7 && A.localDay(lastUser(x)) !== A.today(); }).forEach(function (s) {
+      // فقط وقتی نشانه هنوز فعال است (AS.safetyActive): پس از انکارِ صریحِ خودِ کاربر دیگر نمی‌پرسد (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
+      S.all("achat", function (x) { return (AS.safetyActive ? AS.safetyActive(x) : x.safetyAt) && A.today() > String(x.safetyAt).slice(0, 10) && A.daysBetween(String(x.safetyAt).slice(0, 10), A.today()) <= 7 && A.localDay(lastUser(x)) !== A.today(); }).forEach(function (s) {
         items.unshift({ k: "warn", txt: "🤝 حالت امروز چطور است؟", sub: "اگر سخت است، همین حالا با یک نفر حرف بزن — " + clip(A.KHELP || "", 90), go: function () { openTour(s, null); } });
       });
       // سنجشِ ماندگاری (۳۰ و ۹۰ روز پس از ورزیدگی): یک ورزشِ سرد؛ پاسخِ درست ⇒ ✓، بازگشت ⇒ گره دوباره باز
@@ -35124,16 +35222,24 @@ APP.goFromURL = function (q) {
       var tom = A.addDays(A.today(), 1), nx = [];
       s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due >= tom) nx.push(p); }); });
       // موعدِ گذشته (مثلاً بازبینیِ پرونده که رسید و ثبت نشد) جلوتر از همه یادآوری می‌شود — فردا (کارزارِ v08: بازبینیِ پرونده رسید و رها شد)
-      s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due < tom) nx.push({ t: "عقب‌افتاده: " + p.t, due: tom, view: p.view, arg: p.arg }); }); });
+      // بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: عقب‌افتاده‌ها جدا نگه داشته می‌شوند — مرتب به موعدِ اصلی (کهنه‌ترین اول)، همیشه در صدرِ متن، و وقتی
+      // «فردا» یادآورِ گره دارد گم نمی‌شوند (پیش‌تر موعدشان «فردا» گذاشته می‌شد و با پوشیده‌بودنِ فردا از فهرست بیرون می‌افتادند)
+      var od = [];
+      s.tour.facets.forEach(function (x) { if (x.status !== "skipped") practice(x).forEach(function (p) { if (p.due && p.due < tom) od.push({ t: "عقب‌افتاده: " + p.t, due: tom, was: p.due, view: p.view, arg: p.arg }); }); });
+      od.sort(function (a, b) { return String(a.was).localeCompare(String(b.was)); });
       nx.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
       // یک یادآور در روز (کارزارِ سوم v06: «ادامهٔ تور» و «knot:…» برای همان روز): روزی که یادآورِ ورزشِ گره دارد، یادآورِ تور نمی‌گیرد —
       // تور به نخستین موعدِ بی‌یادآورِ خودش می‌رود؛ اگر همه پوشیده‌اند، یادآورِ جدای تور برداشته می‌شود
       var covered = {}; try { var rk = ((S.settings().knots || {}).rk) || {}; Object.keys(rk).forEach(function (id) { if (rk[id]) covered[String(rk[id]).slice(0, 10)] = 1; }); } catch (e) { }
-      var cands = (s.tour.doneAt && nx.length ? [] : [tom]).concat(nx.map(function (p) { return p.due; })).filter(function (d) { return d && !covered[d]; });
+      // عقب‌افتاده هست ⇒ نخستین روزِ بی‌یادآور از فردا (نه موعدِ تمرینِ آیندهٔ بعدی که شاید ماه‌ها بعد باشد) — هرگز بی‌صدا نمی‌ماند
+      var cands = [];
+      if (od.length) for (var di = 1; di <= 14 && !cands.length; di++) { var dd = A.addDays(A.today(), di); if (!covered[dd]) cands.push(dd); }
+      if (!cands.length) cands = (s.tour.doneAt && nx.length ? [] : [tom]).concat(nx.map(function (p) { return p.due; })).filter(function (d) { return d && !covered[d]; });
       if (!cands.length) { if (A.HOST.unremind && s._rem) { A.HOST.unremind(key); s._rem = false; } return; }
-      nx = nx.filter(function (p) { return p.due >= cands[0]; });
+      nx = od.map(function (p) { p.due = cands[0]; return p; }).concat(nx.filter(function (p) { return p.due >= cands[0]; }));
       var due = cands[0], remKey = due + "|" + (f ? f.key : "") + "|" + (nx[0] ? nx[0].t : ""); if (s._rem === remKey) return;   // متنِ کهنه هم بازنویسی می‌شود (کارزارِ آزمون sc13)
-      var nextTxt = nx[0] ? " نزدیک‌ترین موعد: «" + clip(nx[0].t, 60) + "» (" + (A.fdate ? A.fdate(nx[0].due) : nx[0].due) + ")." : "";
+      var nextTxt = nx[0] ? (nx[0].was ? " " + (od.length > 1 ? fa(od.length) + " تمرینِ عقب‌افتاده؛ کهنه‌ترین" : "تمرینِ عقب‌افتاده") + ": «" + clip(nx[0].t.replace(/^عقب‌افتاده: /, ""), 60) + "» (موعدش " + (A.fdate ? A.fdate(nx[0].was) : nx[0].was) + " گذشت)." :
+        " نزدیک‌ترین موعد: «" + clip(nx[0].t, 60) + "» (" + (A.fdate ? A.fdate(nx[0].due) : nx[0].due) + ").") : "";
       var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
       var pr = A.HOST.remind({ key: key, due_date: due, tz: tz, hour: n.hour == null ? 9 : n.hour, title: "معماری یادگیری — ادامهٔ تور",
         body: nextTxt.replace(/^ /, "") + (nextTxt ? " " : "") + (s.tour.doneAt ? "تورِ «" + clip(s.title || s.pinned || "دستیار", 60) + "» تا تسلطِ کامل پیگیری دارد" + (f && followups(f).length ? ": «" + clip(f.title, 50) + "» — " + clip(followups(f)[0].t, 60) : "") + ". با «💬 دستیار» ادامه بده." :
@@ -35163,6 +35269,7 @@ APP.goFromURL = function (q) {
   };
   AS.tutorQuestions = TQ;
   var SOLVED_RE = /حل[\s‌]*ش?[\s‌]*(?:شد(?!ه)|کردم)|جواب(?:ش)?[\s‌]*(?:رو|را)?[\s‌]*(?:پیدا[\s‌]*کردم|گرفتم|درآوردم)|ثابت(?:ش)?[\s‌]*کردم/;
+  var UNSOLVED_RE = /حل[\s‌]*نشد|اشتباه[\s‌]*(?:بود|کردم|شد)|غلط[\s‌]*(?:بود|درآمد)|دوباره[\s‌]*(?:حل|امتحان|شروع)/;
   var EXEC_RE = /محاسبه|حساب\s*کردم|نوشتم که|گامِ?\s*بعد(?:ی)?\s*(?:اینه|این است)|دارم\s*(?:حل|ثابت)\s*می‌?کنم/;
   function pgOf(pid) { return pid ? S.get("eprog_" + pid) : null; }
   function arrN(x) { return Array.isArray(x) ? x.length : x ? 1 : 0; }
@@ -35214,9 +35321,20 @@ APP.goFromURL = function (q) {
   AS.promptHooks = AS.promptHooks || [];
   AS.promptHooks.push(function (s, msg) {
     var c = AS.solvingCtx(s); if (!c) return "";
-    var ph = tutorPhase(c, msg), T0 = TQ[ph], tu = s.tutor = s.tutor || { qi: {} };
+    // شمارهٔ پرسش و مرحله برای **هر مسئله** جدا (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: پیش‌تر برای کلِ سشن بود و مسئلهٔ دوم از وسطِ فهرست شروع می‌شد)؛
+    // نوبتِ خودکارِ «[سامانه: …]» حرفِ کاربر نیست: مرحله را عوض نمی‌کند و پرسش را جلو نمی‌برد — پس از «حل شد» بازنگری می‌ماند
+    var root = s.tutor = s.tutor || {}, by = root.by = root.by || {}, key = c.pid ? "p:" + c.pid : c.rec && c.rec.id ? "r:" + c.rec.id : "t:" + clip(c.title, 60);
+    var tu = by[key] = by[key] || { qi: {} }, mtxt = String(msg || "").trim(), auto = /^\[سامانه/.test(mtxt), ph;
+    if (auto) ph = tu.ph || tutorPhase(c, msg);
+    else {
+      ph = tutorPhase(c, msg);
+      if (UNSOLVED_RE.test(mtxt)) tu.solved = false;
+      else if (ph === "back") tu.solved = true;
+      else if (tu.solved) ph = "back";   // پس از «حل شد» تا خودش نگفته «حل نشد/اشتباه بود»، بازنگری می‌ماند
+    }
+    var T0 = TQ[ph];
     // پرسشِ این نوبت: همان فهرستِ ثابت، به ترتیب؛ فقط با پیامِ تازهٔ کاربر یک قدم جلو می‌رود (همان چند پرسش در همهٔ مسئله‌ها)
-    if (tu.lastMsg !== msg) { tu.qi[ph] = tu.lastMsg == null || tu.ph !== ph ? (tu.qi[ph] || 0) : (tu.qi[ph] || 0) + 1; tu.lastMsg = msg; tu.ph = ph; }
+    if (!auto && tu.lastMsg !== msg) { tu.qi[ph] = tu.lastMsg == null || tu.ph !== ph ? (tu.qi[ph] || 0) : (tu.qi[ph] || 0) + 1; tu.lastMsg = msg; tu.ph = ph; }
     var qi = (tu.qi[ph] || 0) % T0.qs.length;
     var L = ["# معلمِ حلِ مسئله — کاربر همین حالا دارد «" + clip(c.title, 80) + "» را حل می‌کند · مرحله: " + T0.fa,
       "- در این نوبت فقط **یک** پرسش بپرس، از همین فهرستِ ثابت و از کلی به خاص؛ پرسشِ پیشنهادیِ این نوبت: «" + T0.qs[qi] + "». فهرستِ این مرحله: " + T0.qs.map(function (q, i) { return (i + 1) + ") " + q; }).join(" "),
@@ -36006,12 +36124,14 @@ APP.goFromURL = function (q) {
         var ms = AS.tourMilestones(f), ok = ms.filter(function (x) { return x.ok; }).length, col = f.status === "done" ? C.ok : f.status === "blocked" ? C.warn : f.status === "now" ? C.head : C.mute;
         return '<tr><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + fa(i + 1) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + '">' + esc(((KIND[f.kind] || {}).ic || "") + " " + f.title) + '<div style="color:' + C.mute + ';font-size:12px">' + esc((KIND[f.kind] || {}).fa || "") + '</div></td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';color:' + col + ';white-space:nowrap">' + esc(stFa(f)) + '</td><td style="padding:6px;border-bottom:1px solid ' + C.line + ';white-space:nowrap">' + fa(ok) + "/" + fa(ms.length) + "</td></tr>";
       }).join("");
-      H.push('<tr><td style="padding:10px 22px;font-size:12px;line-height:1.9;color:' + C.mute + '">واژه‌ها: <b>وجه</b> = یکی از بخش‌های مسئله‌ات که جدا پیگیری می‌شود · <b>پایه برپا شد</b> = ابزار و تمرینش ساخته شد، ولی هنوز «حل‌شده» نیست · <b>غربال</b> = لایه‌هایی که دستیار برای پیدا کردنِ ریشه سنجید · <b>ماندگاری</b> = پاسخِ درستِ دوباره پس از ۳۰ و ۹۰ روز.</td></tr>');
+      H.push('<tr><td style="padding:10px 22px;font-size:12px;line-height:1.9;color:' + C.mute + '">واژه‌ها: <b>وجه</b> = یکی از بخش‌های مسئله‌ات که جدا پیگیری می‌شود · <b>پایه برپا شد</b> = ابزار و تمرینش ساخته شد، ولی هنوز «حل‌شده» نیست · <b>غربال</b> = لایه‌هایی که دستیار برای پیدا کردنِ ریشه سنجید · <b>لایه</b> = یک پرسشِ ثابتِ غربال (مثلاً «ایمنی و حال» یا «باور دربارهٔ خود») که جدا سنجیده می‌شود · <b>سازه</b> = یک توانِ ذهنیِ سنجیدنی در کارنامه (مثلاً استدلال یا حافظه) · <b>ماندگاری</b> = پاسخِ درستِ دوباره پس از ۳۰ و ۹۰ روز.</td></tr>');
       H.push(sec("🗺 نقشهٔ راه و ترتیب", '<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-collapse:collapse"><tr style="color:' + C.mute + ';font-size:12px"><td style="padding:6px">#</td><td style="padding:6px">وجه</td><td style="padding:6px">وضع</td><td style="padding:6px">نشانه‌ها</td></tr>' + rows + "</table>"));
       /* غربالِ لایه‌ها: کدام لایه‌ها سنجیده شد و چه پیدا شد — فقط یافته‌ها، «باید پرسید» و «بیرون»؛ «رد شد» ها شمرده می‌شوند (مالک ۲۰۲۶-۱۰-۱۴) */
+      // نشانهٔ پریشانی فعال ⇒ شاهدِ لایه‌ای که جملهٔ پریشانی را نقل می‌کند در ایمیل نمی‌آید (همان قاعدهٔ پنهان‌ماندنِ گفت‌وگو)
+      var sact = AS.safetyActive ? AS.safetyActive(s) : !!s.safetyAt;
       if (AS.sieveRows) { var sr = AS.sieveRows(s), sn = sr.filter(function (r) { return r.st; }).length;
         if (sn) H.push(sec("🔍 غربالِ لایه‌ها (" + fa(sn) + " از " + fa(sr.length) + " لایه سنجیده شد)", sr.filter(function (r) { return r.st === "found" || r.st === "ask" || r.st === "out"; }).map(function (r) {
-          return '<div style="margin:3px 0"><b style="color:' + (r.st === "found" ? C.ok : r.st === "ask" ? C.warn : C.mute) + '">' + (r.st === "found" ? "● پیدا شد" : r.st === "ask" ? "？ باید پرسید" : "↗ بیرون از صفحه") + "</b> — " + esc(r.fa) + (r.why ? ": «" + esc(clip(String(r.why).replace(/^[«"\s]+|[»"\s]+$/g, ""), 200)) + "»" : "") + (r.facet ? " ⇒ وجهِ «" + esc(r.facet) + "»" : "") + "</div>";
+          return '<div style="margin:3px 0"><b style="color:' + (r.st === "found" ? C.ok : r.st === "ask" ? C.warn : C.mute) + '">' + (r.st === "found" ? "● پیدا شد" : r.st === "ask" ? "？ باید پرسید" : "↗ بیرون از صفحه") + "</b> — " + esc(r.fa) + (r.why && !(sact && (r.id === "safety" || (A.knotSafetyHit && A.knotSafetyHit(r.why)))) ? ": «" + esc(clip(String(r.why).replace(/^[«"\s]+|[»"\s]+$/g, ""), 200)) + "»" : "") + (r.facet ? " ⇒ وجهِ «" + esc(r.facet) + "»" : "") + "</div>";
         }).join("") + '<div style="color:' + C.mute + ';font-size:12px">' + fa(sr.filter(function (r) { return r.st === "no"; }).length) + " لایه سنجیده و رد شد؛ " + fa(sr.length - sn) + " لایه هنوز سنجیده نشده.</div>")); }
       /* جزئیاتِ هر وجه */
       t.facets.forEach(function (f, i) {
@@ -36357,7 +36477,7 @@ APP.goFromURL = function (q) {
   var DO = AS.DO;
   DO.tour_diag = function (a) {
     var s = AS._turnSession; if (!s) return "سشن نیست";
-    var list = Array.isArray(a.layers) ? a.layers : Array.isArray(a.diag) ? a.diag : a.id ? [a] : [], bad = [];
+    var list = Array.isArray(a.layers) ? a.layers : Array.isArray(a.diag) ? a.diag : a.id ? [a] : [], bad = [], safetyHeld = false;
     // غربال پیش از طرحِ تور (در همان نوبت) نگه داشته و پس از tour_plan اعمال می‌شود (کارزارِ آزمون c03/c06: گم می‌شد)
     if (!s.tour) { s._diagPending = (s._diagPending || []).concat(list); return ""; }
     var d = s.tour.diag = s.tour.diag || {};
@@ -36371,21 +36491,43 @@ APP.goFromURL = function (q) {
       if (prev && prev.st === "found" && st === "found" && prev.why && prev.why.indexOf(why) < 0) why = prev.why + " ؛ " + why;
       why = dedupWhy(why);   // همان نقل‌قول سه بار در فهرستِ لایه‌ها نیاید (کارزارِ سوم v03)
       if (prev && prev.st === "found" && st === "no") { (prev.hist = prev.hist || []).push({ st: prev.st, why: prev.why, at: prev.at }); }
-      d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), hist: prev && prev.hist };
+      // ایمنی: «رد شد» ِ مدل فقط با انکارِ صریحِ خودِ کاربر پس از نشانه و نقلِ عینیِ آن در why؛ وگرنه «باید پرسید» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
+      if (L.id === "safety" && st === "no" && s.safetyAt && !AS.safetyClearMsg(s, { st: "no", why: why, at: nowIso(), seq: s.seq })) { st = "ask"; safetyHeld = true; }
+      d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), seq: s.seq, hist: prev && prev.hist };
       // قابِ مسئلهٔ عملی: جزءها انباشته می‌شوند (هر نوبت یکی؛ پاسخِ پیشین گم نمی‌شود)
       if (L.id === "practical") { var pp = (prev && prev.parts) || {}; if (x.parts && typeof x.parts === "object") PRACT.forEach(function (q) { var v = x.parts[q[0]]; if (typeof v === "string" && v.trim().length >= 2) pp[q[0]] = clip(v.trim(), 300); }); if (Object.keys(pp).length) d[L.id].parts = pp;
         // قابِ کامل ⇒ یک کارتِ مرور (یک بار): همان شش پرسش برای تصمیمِ بعدی تمرین می‌شود — فاصله‌دار، در «مرور» و «امروز»
         var pcard = prev && prev.card; if (pcard) d[L.id].card = pcard;
         practicalCard(s, d[L.id]); }
     });
-    return bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "";
+    var held = safetyHeld ? "ایمنی خاموش نشد (هنوز «باید پرسید»): فقط انکارِ صریحِ خودِ کاربر در پیامی پس از نشانه — با نقلِ عینیِ همان جمله در why با «…» — آن را «رد شد» می‌کند" : "";
+    return [bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "", held].filter(Boolean).join(" · ");
   };
   /* نشانهٔ پریشانی هنوز فعال است؟ واژه‌نامه آن را روشن می‌کند؛ فقط حرفِ خودِ کاربر (لایهٔ «ایمنی» با «رد شد» و دلیل، پس از آن لحظه) خاموشش می‌کند —
      کارزارِ v08: کاربر دو بار صریحاً گفت آسیبی به خودش در کار نیست ولی هر ۱۷ ایمیل با بندِ بحران باز می‌شد */
+  /* بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: مدل به‌تنهایی هرگز خاموشش نمی‌کند. خاموش فقط وقتی:
+     ۱) لایهٔ «ایمنی» «رد شد» است و پس از نشانه ثبت شده؛
+     ۲) یک پیامِ **خودِ کاربر**، پس از نشانه و نه پس از آن حکم، انکارِ صریح دارد (واژه‌نامهٔ کدیِ A.knotSafetyDenial ِ a16: «نه»، «فکرِ آسیب ندارم»، …)؛
+     ۳) why ِ همان حکم آن پیام را عیناً نقل کرده («…»، بخشی که انکار را در بر دارد) — حکمِ همان نوبتِ نشانه یا با دلیلِ ساختگی ⇒ هنوز فعال. */
+  function qn(x) { return (A.kSafeNorm ? A.kSafeNorm(x) : String(x || "")).replace(/[\s‌«»"“”'.,،:؛!?؟()\-]+/g, ""); }
+  function after(m, s) { return m.seq != null && s.safetySeq != null ? m.seq > s.safetySeq : String(m.at || "") > String(s.safetyAt); }
+  function notLater(m, L) { return m.seq != null && L.seq != null ? m.seq <= L.seq : String(m.at || "") <= String(L.at || ""); }
+  function quotes(why, u, deny) {
+    var qs = []; String(why || "").replace(/[«"“]([^«»"“”]{1,400})[»"”]/g, function (m0, q) { qs.push(q); return m0; });
+    var nu = qn(u); return qs.some(function (q) { var nq = qn(q); return nq.length >= 2 && nu.indexOf(nq) >= 0 && deny.some(function (d) { return nq.indexOf(qn(d)) >= 0; }); });
+  }
+  AS.safetyClearMsg = function (s, L) {
+    L = L || (s && s.tour && s.tour.diag && s.tour.diag.safety);
+    if (!s || !s.safetyAt || !L || L.st !== "no" || !A.knotSafetyDenial) return null;
+    if (!(L.seq != null && s.safetySeq != null ? L.seq > s.safetySeq : String(L.at || "") > String(s.safetyAt))) return null;
+    return (s.msgs || []).filter(function (m) {
+      if (!m || m.role !== "user" || !after(m, s) || !notLater(m, L)) return false;
+      var dn = A.knotSafetyDenial(m.text); return dn.length > 0 && quotes(L.why, m.text, dn);
+    }).pop() || null;
+  };
   AS.safetyActive = function (s) {
     if (!s || !s.safetyAt) return false;
-    var L = s.tour && s.tour.diag && s.tour.diag.safety;
-    return !(L && L.st === "no" && String(L.at || "") > String(s.safetyAt));
+    return !AS.safetyClearMsg(s);
   };
   // tour_plan می‌تواند غربال را هم‌زمان بیاورد
   var rawPlan = DO.tour_plan;
@@ -36413,6 +36555,16 @@ APP.goFromURL = function (q) {
       (fams.length ? "\nخانواده‌هایی که غربال پیدا کرد: " + fams.join("، ") + " — در گره‌گشا (قدمِ ۱ و ۲) آزمون‌های تمایزدهندهٔ همین‌ها را هایلایت کن، هرچند رتبهٔ صفحه پایین‌تر باشد؛ اگر آزمون ردشان کرد، در غربال هم «رد شد» کن." : "");
   };
   AS.promptHooks = AS.promptHooks || [];
+  /* فقط وقتی نشانه فعال است: قاعدهٔ خاموش‌کردن (پرامپتِ سامانه دست نمی‌خورد) */
+  AS.promptHooks.push(function (s) {
+    if (!AS.safetyActive(s)) return "";
+    return "# ایمنی (فعال)\n- نشانهٔ پریشانیِ جدی در این سشن فعال است؛ تا خودِ کاربر صریحاً نگفته آسیبی در کار نیست، لایهٔ safety «باید پرسید» می‌ماند. «رد شد» فقط پس از انکارِ صریحِ خودش در پیامی بعد از نشانه، و why باید همان جمله‌اش را عیناً در «…» نقل کند — حدس یا لحنِ آرام بس نیست.";
+  });
+  /* داوری با کاربر (a6: data-own="verdict") — فقط روی پرونده/دورهٔ کارخانه */
+  AS.promptHooks.push(function () {
+    var v = A.state && A.state.view; if (v !== "e_case" && v !== "epi_course") return "";
+    return "# داوری با کاربر\n- حکمِ هر ایستگاه، درجه/احتمالِ صدق، «وضعیت»، «حکم در یک بند» و اقدامِ «حکم نهایی» را خودِ کاربر می‌دهد: پرشان نکن و نزن (صفحه نمی‌گذارد)؛ فقط زرد کن و شاهدهای ایستگاه‌ها را یادآوری کن.";
+  });
   AS.promptHooks.push(function () {
     var ks = S.all("knot").filter(function (k) { return !k.sample; }).slice(-15);
     if (!ks.length) return "";
@@ -36661,8 +36813,19 @@ APP.goFromURL = function (q) {
      (کارزارِ v08: «دو شب در ماه، شدتِ ۲۵» فقط در گفت‌وگو ماند) — روی خودِ گره ثبت می‌شود و در کارنامه و خطِ زمانی می‌آید */
   AS.DO.remeasure = function (a) {
     var k = S.get((a && a.knot) || ""); if (!k || k.type !== "knot") return "دوباره‌سنجی ثبت نشد: شناسهٔ گره (knot) لازم است";
-    var r = { at: nowIso(), freq: clip(a.freq, 120), intensity: a.intensity == null || isNaN(+a.intensity) ? null : +a.intensity, note: clip(a.note, 300) };
-    if (!r.freq && r.intensity == null && !r.note) return "دوباره‌سنجی خالی است";
+    /* بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵: «همان مقیاسِ فرم» با کد — شدت عددِ درستِ ۰ تا ۱۰ (مثلِ «شدتِ احساس در لحظه»)، بسامد یکی از گزینه‌های
+       «چند بار پیش آمده؟» (A.KFREQ)؛ بیرون از مقیاس ⇒ رد با پیام (نه ثبتِ «۲۵» کنارِ «۷ از ۱۰»). خالی ⇒ رد. */
+    var FQ = A.KFREQ || [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]], MX = A.KEMO_MAX || 10, why = [];
+    var fq = String(a.freq == null ? "" : a.freq).replace(/‌/g, "").replace(/\s+/g, "").trim(), fid = "";
+    if (fq) { FQ.forEach(function (o) { if (fq === o[0] || fq === o[1].replace(/‌/g, "").replace(/\s+/g, "")) fid = o[0]; });
+      if (!fid) why.push("بسامد «" + clip(a.freq, 40) + "» در مقیاسِ فرم نیست — یکی از: " + FQ.map(function (o) { return o[1]; }).join("، ")); }
+    var it = a.intensity == null || String(a.intensity).trim() === "" ? null : String(a.intensity).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[٠-٩]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).trim();
+    var iv = it == null ? null : +it;
+    if (it != null && !(/^\d+$/.test(it) && iv >= 0 && iv <= MX)) why.push("شدت باید عددِ درستی از ۰ تا " + fa(MX) + " باشد (همان مقیاسِ «شدتِ احساس در لحظه»)، نه «" + clip(a.intensity, 12) + "» — از کاربر با همان مقیاس بپرس");
+    if (why.length) return "دوباره‌سنجی ثبت نشد: " + why.join("؛ ");
+    var r = { at: nowIso(), freq: fid ? (FQ.filter(function (o) { return o[0] === fid; })[0] || [])[1] : "", freqId: fid, intensity: iv, note: clip(a.note, 300) };
+    if (!r.freqId && r.intensity == null && !r.note) return "دوباره‌سنجی خالی است";
+    var base = A.knotIntake ? A.knotIntake(k) : null; if (base) r.base = { freq: base.freq, emo: base.emo };
     (k.remeasures = k.remeasures || []).push(r); S.put(k); return "";
   };
   function hour() { var n = ((S.settings().knots || {}).notify) || {}; return n.hour == null ? 9 : n.hour; }
@@ -36701,7 +36864,7 @@ APP.goFromURL = function (q) {
     "# موعدها و ساعت",
     "- اگر کاربر تاریخ یا موعدی گفت (آزمون، تحویل، «تا جمعه»، «فردا»)، آن را با {\"do\":\"deadline\",\"what\":\"…\",\"date\":\"YYYY-MM-DD\"} (میلادی، از «# امروز» حساب کن) ثبت کن و برنامهٔ تمرین/مرور را طوری بچین که پیش از موعد تمام شود (چرخهٔ ۱-۳-۷ ای که بعد از موعد می‌افتد پیشنهاد نکن؛ برای موعدِ نزدیک مرورِ فشرده پیش از آن).",
     "- اگر کاربر گفت کی کار می‌کند یا کی پیام می‌خواهد (مثلاً «بعد از ۲۲»)، با {\"do\":\"remind_hour\",\"hour\":22} ساعتِ یادآورها را بگذار.",
-    "- پاسخِ کاربر به دوباره‌سنجیِ موقعیتِ نخست (هنوز پیش می‌آید؟ چند بار؟ شدت با همان مقیاسِ فرم) را با {\"do\":\"remeasure\",\"knot\":\"<شناسهٔ گره>\",\"freq\":\"…\",\"intensity\":عدد,\"note\":\"…\"} ثبت کن، نه فقط در گفت‌وگو.",
+    "- پاسخِ کاربر به دوباره‌سنجیِ موقعیتِ نخست (هنوز پیش می‌آید؟ چند بار؟ شدت با همان مقیاسِ فرم) را با {\"do\":\"remeasure\",\"knot\":\"<شناسهٔ گره>\",\"freq\":\"یک‌بار|گاهی|مرتب\",\"intensity\":۰ تا ۱۰,\"note\":\"…\"} ثبت کن، نه فقط در گفت‌وگو.",
     "- برنامهٔ چندهفته‌ای تا یک موعد را فقط در متنِ گفت‌وگو نگذار: هر گامِ تاریخ‌دارش یک deadline شود (حداکثر چند گامِ اصلی)."
   ].join("\n");
 })(window.APP);
