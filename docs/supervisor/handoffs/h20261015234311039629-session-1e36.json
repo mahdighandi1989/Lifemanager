@@ -1,0 +1,15 @@
+{
+ "id": "h20261015234311039629-session-1e36",
+ "at": "2026-10-15T23:43:11Z",
+ "by": "session",
+ "area": "epi-territory",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "تورِ ۱ پولیا F3: a_abduction_ibe از گامِ ۰ به ۴، هر گام جدا با epi_backtest.js territory (دور ۱۳ در history): منابع SEP Abduction (Douven، بازبینی ۲۰۲۵-۰۶-۱۸) و IEP Theories of Explanation (Mayes) — هر دو باز و خوانده شد؛ ۴ گزاره با نقل؛ رده: T_plausible، پایهٔ p_hidden_factor، T_null، و «فضیلت‌های تبیینی» outside با دلیل؛ گامِ ۴ فقط قاعده‌های موجود (r_aql_conseq، r_istiqra_hidden، r_tajrobe_hidden، r_tajrobe_no_vazraf). TERRITORY.md با run ِ بعدیِ تو بازسازی می‌شود؛ بازبینیِ مستقل (territory_evidence) در دورِ بعدت.",
+ "procedure": "BACKTEST_PROMPT.md#مسیرِ ۳",
+ "commit": "",
+ "status": "open"
+}

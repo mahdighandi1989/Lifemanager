@@ -503,6 +503,14 @@
       return Math.min.apply(null, ps.map(function (v) { return Math.min(v, 100); }));
     };
     var num = function (v) { var n = A.parseNum ? A.parseNum(v) : +v; return n == null || isNaN(n) || n < 0 ? null : n; };
+    /* «علت یا هم‌بستگی؟» ِ کاربرگِ «راه استقراء» ⇒ hidden_ctrl ِ همان تصدیقِ استقرائی (تورِ ۱ ِ پولیا، s32) — کاربرگ یکی است؛ اگر چند تصدیقِ استقرائی هست، به هیچ‌کدام نمی‌چسبد */
+    var IS = D("st_istiqra"), isCause = String(IS.cause || ""), istTo = "";
+    var hidOf = function () { return /^کنار رفت/.test(isCause) ? true : /^کنار نرفت/.test(isCause) ? false : null; };
+    if (hidOf() != null) {
+      var icand = claims.map(function (t, i) { return String(i + 1); }).filter(function (n) { var w = cs.feat[n] && cs.feat[n].way != null ? cs.feat[n].way : wayOf(n); return w === "استقراء"; });
+      if (icand.length === 1) istTo = icand[0];
+      else if (icand.length > 1) notes.push("کاربرگِ «راه استقراء» یکی است ولی " + fa(icand.length) + " تصدیقِ استقرائی داری؛ «علت یا هم‌بستگی؟» به هیچ‌کدام نرسید — «عوامل پنهان مؤثر کنترل شده» را برای هر کدام خودت در رمزگذاری بزن.");
+    }
     claims.forEach(function (t, i) {
       var n = String(i + 1), f = cs.feat[n] = cs.feat[n] || {}, pv = A.featProv(cs, n), P = pv.pre, C = pv.clr, L = fa(i + 1) + ": ";
       function sync(key, val, src, label) {
@@ -545,6 +553,7 @@
       sync("x_analog_n", aN, "st_aql", "مواردِ همانند");
       sync("x_analog_k", aK, "st_aql", "همانندهای دارای ویژگی");
       sync("x_analog_rel", an ? AQ.analog_rel || null : null, "st_aql", "همانندی در رابطهٔ مربوط");
+      sync("hidden_ctrl", istTo === n ? hidOf() : null, "st_istiqra", "عاملِ پنهان (علت یا هم‌بستگی؟)");
     });
     return { filled: filled, notes: notes, changed: changed };
   };

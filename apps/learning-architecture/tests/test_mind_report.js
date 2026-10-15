@@ -49,7 +49,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     __seedMind();
     const m = APP.MIND.model();
     APP.go('mind'); await new Promise(r => setTimeout(r, 300));
-    const svgs = document.querySelectorAll('#main .mind-svg').length, rows = document.querySelectorAll('#main .mind-table:not(.psy-table) tbody tr').length;
+    const svgs = document.querySelectorAll('#main .mind-svg').length, rows = document.querySelectorAll('#main .mind-table:not(.psy-table):not(.mind-phtable) tbody tr').length;
     const png = await APP.MIND.png(APP.MIND.radar(m));
     const epi = m.dims.find(d => d.id === 's_epi');
     return { emptyOk, svgs, rows, png: /^data:image\/png;base64,/.test(png) && png.length > 2000, dims: m.dims.length,

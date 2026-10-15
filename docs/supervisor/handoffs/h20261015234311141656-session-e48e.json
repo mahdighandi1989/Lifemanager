@@ -1,0 +1,16 @@
+{
+ "id": "h20261015234311141656-session-e48e",
+ "at": "2026-10-15T23:43:11Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "تورِ ۱ پولیا F3: a29_mind.js — «🧩 چهار مرحلهٔ حل» (A.MIND.phases/phasesText، (k+1)/(n+2) و P(ضعیف‌ترین) از پسینِ بتا، بی آستانه) + رویدادهای خطِ زمانی «🌱 گامِ کوچکِ انجام‌شده» و «کنار گذاشتن و بازگشت» + A.MIND.csvChart/csvBlock؛ a12_mirror.js — نمودارِ CSV در کادرِ پیوست؛ a7_bt.js — همگام‌سازیِ «علت یا هم‌بستگی؟» ⇒ hidden_ctrl؛ آزمون tests/test_tour1_mind_factory.js؛ test_mind_report.js جدولِ تازه را از شمارِ بُعدها بیرون گذاشت. WORKLOG/PROGRESS/HANDBOOK را هماهنگ‌کنندهٔ تور می‌نویسد (یادداشتِ docs/overhaul/handoff-notes/_pending_tour1_F3_2026-10-15.md).",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "",
+ "status": "open"
+}

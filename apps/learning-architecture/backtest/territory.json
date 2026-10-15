@@ -1405,8 +1405,74 @@
    "bookOnly": true
   },
   "a_abduction_ibe": {
-   "stage": 0,
-   "history": []
+   "stage": 4,
+   "history": [
+    {
+     "round": 13,
+     "at": "2026-10-15",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده (۲۰۲۶-۱۰-۱۵، باز و خوانده شد): SEP «Abduction» و IEP «Theories of Explanation»",
+     "by": "نشستِ تور ۱ (پولیا) — رفع‌کنندهٔ F3، طبقِ BACKTEST_PROMPT مسیرِ ۳ (دست‌به‌دست به epi-territory)"
+    },
+    {
+     "round": 13,
+     "at": "2026-10-15",
+     "stage": 2,
+     "what": "چهار گزارهٔ محوری از همان دو منبع (تبیین‌گری نشانهٔ غیرقطعیِ صدق، بهترینِ یک دستهٔ بد، نشانگرِ هم‌بسته تبیین نیست، فضیلت‌های تبیینی سنجیده نیستند)",
+     "by": "نشستِ تور ۱ (پولیا) — رفع‌کنندهٔ F3، طبقِ BACKTEST_PROMPT مسیرِ ۳ (دست‌به‌دست به epi-territory)"
+    },
+    {
+     "round": 13,
+     "at": "2026-10-15",
+     "stage": 3,
+     "what": "رده‌بندی: T_plausible؛ پایهٔ p_hidden_factor (رقیبِ سنجیده‌نشده = عاملِ پنهانِ کنترل‌نشده)؛ T_null (هم‌بستگی بی وضع‌ورفع)؛ فضیلت‌های تبیینی بیرون (به اصول برنمی‌گردد)",
+     "by": "نشستِ تور ۱ (پولیا) — رفع‌کنندهٔ F3، طبقِ BACKTEST_PROMPT مسیرِ ۳ (دست‌به‌دست به epi-territory)"
+    },
+    {
+     "round": 13,
+     "at": "2026-10-15",
+     "stage": 4,
+     "what": "قاعده‌های موجودِ کارخانه که همین گزاره‌ها را اجرا می‌کنند (بی قاعدهٔ تازه): r_aql_conseq (پیامدهای تازه و «آیا بدیلی هم همین را پیش‌بینی می‌کند»)، r_istiqra_hidden و r_tajrobe_hidden (رقیبِ کنترل‌نشده)، r_tajrobe_no_vazraf (هم‌بستگی بی وضع‌ورفع)؛ خانهٔ «علت یا هم‌بستگی؟» در کاربرگِ «راه استقراء» به hidden_ctrl ِ همان قاعده‌ها می‌رسد",
+     "by": "نشستِ تور ۱ (پولیا) — رفع‌کنندهٔ F3، طبقِ BACKTEST_PROMPT مسیرِ ۳ (دست‌به‌دست به epi-territory)"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Abduction» (Igor Douven; first published 2011, substantive revision 2025-06-18) — https://plato.stanford.edu/entries/abduction/",
+    "Internet Encyclopedia of Philosophy, «Theories of Explanation» (G. Randolph Mayes) — https://iep.utm.edu/explanat/"
+   ],
+   "claims": [
+    {
+     "txt": "تبیین‌گری نشانهٔ صدق است ولی نه بی‌خطا: فرضیه‌ای که پدیده را تبیین می‌کند با پیامدهای تازهٔ تأییدشده‌اش معتبرتر می‌شود، نه ثابت",
+     "src": "SEP abduction («explanatory success is a (not necessarily unfailing) mark of truth»)",
+     "kind": "theorem",
+     "th": "T_plausible"
+    },
+    {
+     "txt": "«بهترینِ یک دستهٔ بد»: بهترین تبیین فقط در میانِ رقیب‌هایی بهترین است که به ذهن رسیده‌اند؛ رقیبِ سنجیده‌نشده (عاملِ پنهان، فصل/روند، گزینشِ نمونه) برتریِ آن را بی‌پشتوانه می‌گذارد",
+     "src": "SEP abduction (van Fraassen: «the best of a bad lot»)؛ IEP Theories of Explanation («We are unable to compare proposed explanations to others that no one has yet thought of»)",
+     "kind": "base",
+     "th": "T_product",
+     "base": "p_hidden_factor"
+    },
+    {
+     "txt": "نشانگرِ هم‌بسته تبیین نیست: هم‌زمانی یا مقایسهٔ قبل/بعد بی وضع‌ورفع علت را نشان نمی‌دهد (فشارسنج توفان را تبیین نمی‌کند)",
+     "src": "IEP Theories of Explanation («it is counterintuitive to say that the barometer explains the occurrence of the storm»)",
+     "kind": "theorem",
+     "th": "T_null"
+    },
+    {
+     "txt": "فضیلت‌های تبیینی (سادگی، گستره، انسجام) هنوز نشانهٔ سنجیده‌شدهٔ صدق نیستند و به‌کاربستنشان همیشه استدلال را بهتر نمی‌کند",
+     "src": "SEP abduction («none of the said virtues is presently particularly well understood»؛ «taking into account explanatory considerations … may not always be for the better»)",
+     "kind": "outside",
+     "why": "وزنِ سادگی یا گستره به‌عنوانِ نشانهٔ صدق از هیچ‌یک از اصولِ A0–A4 برنمی‌آید و نرخِ درستیِ «تبیینِ ساده‌تر» در هیچ قابِ بی‌گزینشی سنجیده نشده؛ پس کارخانه به آن وزن نمی‌دهد (نه سقف، نه پاداش) تا قابی سنجیده آن را بدهد."
+    }
+   ],
+   "rules": [
+    "r_aql_conseq",
+    "r_istiqra_hidden",
+    "r_tajrobe_hidden",
+    "r_tajrobe_no_vazraf"
+   ]
   },
   "a_confirmation": {
    "stage": 4,

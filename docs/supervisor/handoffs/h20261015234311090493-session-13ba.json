@@ -1,0 +1,16 @@
+{
+ "id": "h20261015234311090493-session-13ba",
+ "at": "2026-10-15T23:43:11Z",
+ "by": "session",
+ "area": "sys-territory",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "تورِ ۱ پولیا F3: pr_causal (s_problem) — station:st_istiqra به ابزارها افزوده و gap_fa باریک شد (کاربرگِ «راه استقراء» اکنون «علت یا هم‌بستگی؟» و رقیب‌ها را می‌پرسد؛ پیوستِ CSV نمودار می‌شود)؛ نمودارِ علّی هنوز نیست ⇒ gap باز ماند، advance نشد؛ sys_territory.py check سبز.",
+ "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
+ "commit": "",
+ "status": "open"
+}

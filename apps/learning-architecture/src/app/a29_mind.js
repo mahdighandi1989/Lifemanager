@@ -184,6 +184,23 @@
       (pg.solve.lessons || []).forEach(function (l) { ev.push({ at: l.at, fa: "🔁 بازنگریِ «" + tt + "»: " + String(l.use || "").slice(0, 60) }); });
       (pg.solve.incub || []).forEach(function (x) { ev.push({ at: x.at, fa: "↩ برگشت به «" + tt + "» پس از کنارگذاشتن: " + x.fresh }); });
     });
+    /* موفقیت‌های کوچک و نهفتگی (تورِ ۱، s34): «🌱 گامِ کوچکِ انجام‌شده» و «کنار گذاشتن و بازگشت» — فقط داده، از همان رکوردهای «🌱» (will) و گام‌های مسئلهٔ زنده؛ نمره نیست */
+    function willEv(w, tt) {
+      if (!w) return;
+      (w.steps || []).forEach(function (st) { (st.checks || []).forEach(function (c) { if (c.done === "yes") ev.push({ at: c.at, kind: "small", fa: "🌱 گامِ کوچکِ انجام‌شده در «" + tt + "»: " + String(st.step || "").slice(0, 70) }); else if (c.done === "part") ev.push({ at: c.at, kind: "small", fa: "🌱 گامِ کوچکِ نیمه‌انجام در «" + tt + "»: " + String(st.step || "").slice(0, 70) }); }); });
+      (w.log || []).forEach(function (l) {
+        if (l.kind === "commit" && l.desire === "drop") ev.push({ at: l.at, kind: "incub", fa: "⏸ کنار گذاشتن (آگاهانه): «" + tt + "»" });
+        if (l.kind === "drop-recheck") ev.push({ at: l.at, kind: "incub", fa: l.keep === "back" ? "↩ بازگشت پس از کنار گذاشتن: «" + tt + "»" : "⏸ کنار ماند (همان دلیل هنوز پذیرفته): «" + tt + "»" });
+      });
+    }
+    S.all("eprog", function (pg) { return pg.solve && (pg.solve.will || pg.solve.live); }).forEach(function (pg) {
+      var pid = String(pg.id).replace(/^eprog_/, ""), pr = A.getProb ? A.getProb(pid) : null, tt = (pr && pr.title) || "مسئله";
+      willEv(pg.solve.will, tt);
+      ((pg.solve.live && pg.solve.live.steps) || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done === "yes") ev.push({ at: o.at, kind: "small", fa: "🌱 گامِ کوچکِ انجام‌شده در «" + tt + "»: " + String(st.text || "").slice(0, 70) }); });
+    });
+    S.all("idea", function (r) { return r.will; }).forEach(function (r) { willEv(r.will, r.title || "ایده"); });
+    S.all("kcase", function (r) { return r.will && !r.sample; }).forEach(function (r) { willEv(r.will, r.title || "موقعیت"); });
+    S.all("eprob", function (r) { return r && r.live && r.p && r.dormant && r.woke; }).forEach(function (r) { ev.push({ at: r.woke, kind: "incub", fa: "↩ بازگشت به مسئلهٔ خفته پس از کنار ماندن: «" + r.p.title + "»" }); });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,
     /* «مسئله‌ها»: مسئلهٔ خودِ کاربر در گره‌گشا و نقشهٔ پیش‌نیاز هم مسئله است (کارزارِ آزمونِ دوم c16/c17: «مسئله‌ها ۰») */
@@ -312,6 +329,125 @@
     outer.forEach(function (o) { var p = P[o.it.id]; s.appendChild(el(o.it.t === "tour" ? "rect" : "circle", o.it.t === "tour" ? { x: p[0] - 6, y: p[1] - 6, width: 12, height: 12, fill: col[o.it.st] || "#94a3b8" } : { cx: p[0], cy: p[1], r: 6, fill: col[o.it.st] || "#94a3b8" })); s.appendChild(txt(p[0], p[1] + 16, String(o.it.fa).slice(0, 20), { "font-size": 8 })); });
     return s;
   };
+  /* ---------- «چهار مرحلهٔ حل» (پولیا): کدام مرحله برای تو ضعیف‌تر است — تورِ ۱، s14 D2 (۲۰۲۶-۱۰-۱۵) ----------
+     هیچ رکوردِ تازه‌ای نیست؛ همه از دادهٔ موجود، هر رویداد دوتایی (موفق/ناموفق) و منسوب به یک مرحله:
+       • «پرسشِ همین لحظه» و پاسخ‌های معلمِ حل (tut.und/plan/exec/back روی هر میزبان: مسئله، موقعیتِ گره‌گشا، پاپوس، سشنِ دستیار) با خودداوریِ
+         «کمک کرد؟» (۰/۱/۲): موفق فقط «بله» (۲) — همان معیارِ نردبانِ درونی‌سازی (qRung)؛
+       • شبیه‌ساز: درستیِ «بار اول» ِ هر گام (pg.lv[سطح][گام].first) با مرحلهٔ همان گام (A.stagePhase)؛
+       • کارتِ فهم (شبیه‌ساز و مسئلهٔ زنده، با نسخه‌های پیشین): خودسنجیِ ۰/۱/۲ در برابرِ صورت — موفق = ۲؛
+       • گام‌های واقعیِ مسئلهٔ زنده (اجرا): «انجامش دادی؟» — موفق = «کامل»؛ بسته‌شدنِ خودکار (بی پاسخ) شمرده نمی‌شود؛
+       • بازنگری (شبیه‌ساز و زنده): انجام شد و نتیجه وارسی شد = موفق؛ «بعداً» (skipped) یا «نتوانستم وارسی کنم» = ناموفق.
+     برآورد = (k+1)/(n+2) (A3 + A4 «هیچ نسبتی مرجح نیست»)؛ «احتمالِ ضعیف‌ترین بودن» = P(p_این < p_سه‌تای دیگر) از پسین‌های بتا — بی آستانه؛
+     بی‌داده هر چهار ½ و ¼ (نمی‌دانیم). خروجی برای تور/دستیار: A.MIND.phases(). */
+  var PH4 = [["und", "u", "فهمِ مسئله"], ["plan", "p", "طرح‌ریزی"], ["exec", "c", "اجرای طرح"], ["back", "b", "بازنگری"]];
+  var PH_SRC = { ask: "پرسشِ همین لحظه / معلمِ حل (خودداوریِ «کمک کرد؟»)", sim: "شبیه‌ساز (درستیِ بار اولِ گام)", ucard: "کارتِ فهم (خودسنجی در برابرِ صورت)", live: "گام‌های واقعیِ مسئلهٔ زنده", lb: "بازنگری انجام و وارسی شد" };
+  M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
+  M.phases = function () {
+    var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {} }; });
+    var byPh = { u: "und", p: "plan", c: "exec", b: "back" };
+    function add(tk, src, ok) { var X = R[tk]; if (!X) return; X.n++; if (ok) X.k++; var s = X.src[src] = X.src[src] || { k: 0, n: 0 }; s.n++; if (ok) s.k++; }
+    function tutOf(T) { if (!T) return; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; add(x[0], "ask", e.self === 2); }); }); }
+    S.all("eprog").forEach(function (pg) { tutOf(pg.tut); });
+    S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut); });
+    S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut); });
+    S.all("achat").forEach(function (s) { tutOf(s.tut); });
+    S.all("eprog").forEach(function (pg) {
+      var pid = String(pg.id).replace(/^eprog_/, ""), p = A.getProb ? A.getProb(pid) : null, sv = pg.solve || {};
+      if (p && Array.isArray(p.stages) && A.stagePhase) Object.keys(pg.lv || {}).forEach(function (lv) {
+        var L = pg.lv[lv] || {};
+        Object.keys(L).forEach(function (sid) { var e = L[sid], s0 = p.stages.filter(function (x) { return x && x.id === sid; })[0]; if (!s0 || !e || typeof e.first !== "boolean") return; add(byPh[A.stagePhase(p, s0)] || "plan", "sim", e.first); });
+      });
+      var us = []; Object.keys(sv.u || {}).forEach(function (lv) { if (sv.u[lv]) us.push(sv.u[lv]); }); us = us.concat((sv.live && sv.live.uHist) || []);
+      us.forEach(function (u) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2); });
+      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes"); });
+      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
+    });
+    var P = A.PSY, G = 241, rows = PH4.map(function (x) { return R[x[0]]; });
+    rows.forEach(function (X) { X.p = (X.k + 1) / (X.n + 2); });
+    /* P(این مرحله کمترین احتمالِ موفقیت را دارد) = ∫ f_X(x) Π_{Y≠X} P(p_Y > x) dx — روی شبکه، از همان چگالیِ پسینِ a34 */
+    if (P && P.density) {
+      var D = rows.map(function (X) { var d = P.density(X.k, X.n, G), s = 0; d.forEach(function (q) { s += q[1]; }); var c = 0; return d.map(function (q) { var w = s ? q[1] / s : 1 / G; c += w; return { w: w, cdf: c }; }); });
+      rows.forEach(function (X, i) { var t = 0; for (var g = 0; g < G; g++) { var pr = D[i][g].w; rows.forEach(function (Y, j) { if (j !== i) pr *= 1 - (D[j][g].cdf - D[j][g].w / 2); }); t += pr; } X.pWeak = t; });
+      var tot = rows.reduce(function (a, X) { return a + X.pWeak; }, 0); rows.forEach(function (X) { X.pWeak = tot ? X.pWeak / tot : 0.25; });
+    } else rows.forEach(function (X) { X.pWeak = 0.25; });
+    var n = rows.reduce(function (a, X) { return a + X.n; }, 0), weak = rows.slice().sort(function (a, b) { return b.pWeak - a.pWeak; })[0];
+    return { at: new Date().toISOString(), n: n, rows: rows, weakest: n ? { id: weak.id, fa: weak.fa, p: weak.pWeak } : null, src: PH_SRC };
+  };
+  M.phasesText = function (Q) {
+    Q = Q || M.phases(); var pc = function (p) { return Math.round(100 * p) + "%"; };
+    return "چهار مرحلهٔ حل (پولیا؛ (k+1)/(n+2)، بی آستانه): " + Q.rows.map(function (X) { return X.fa + " " + pc(X.p) + " (" + X.k + "/" + X.n + "، احتمالِ ضعیف‌ترین بودن " + pc(X.pWeak) + ")"; }).join(" · ") +
+      (Q.n ? "" : " — هنوز هیچ داده‌ای نیست؛ هر چهار «نمی‌دانیم» است.");
+  };
+  function phasesSection() {
+    var Q = M.phases(), pf = function (p) { return A.PSY && A.PSY.pctFa ? A.PSY.pctFa(p) : fa(Math.round(100 * p)) + "٪"; };
+    return h("section", { class: "card mind-phases", dir: "rtl", "data-n": String(Q.n) }, h("h2", {}, "🧩 چهار مرحلهٔ حل"),
+      h("p", { class: "small muted" }, "پولیا حل را چهار مرحله می‌داند: فهم، طرح، اجرا، بازنگری. این جدول از پاسخ‌ها و گام‌های خودت (پرسشِ همین لحظه، شبیه‌ساز، کارتِ فهم، مسئلهٔ زنده، بازنگری) می‌گوید در هر مرحله احتمالِ موفقیتِ نوبتِ بعد چقدر است و هر مرحله با چه احتمالی ضعیف‌ترینِ چهارتاست — بی برشِ «ضعیف/قوی»؛ با نمونهٔ کم، عددها نزدیکِ ½ و ¼ می‌مانند."),
+      h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small mind-phtable" },
+        h("thead", {}, h("tr", {}, ["بخشِ حل (پولیا)", "احتمالِ موفقیتِ نوبتِ بعد", "موفق از کل", "احتمالِ ضعیف‌ترین بودن", "از کجا"].map(function (x) { return h("th", {}, x); }))),
+        h("tbody", {}, Q.rows.map(function (X) {
+          return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, pf(X.pWeak)),
+            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)"));
+        })))),
+      h("p", { class: "small muted" }, Q.n ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود." : "هنوز هیچ رویدادِ سنجیده‌ای نیست — هر چهار مرحله ½ و احتمالِ ضعیف‌ترین بودنِ هر کدام ¼ (نمی‌دانیم)."));
+  }
+  M.phasesSection = phasesSection;
+
+  /* ---------- 📈 نمودارِ سادهٔ CSV (فقط داده، بی استنتاج) — تورِ ۱، s32: «حتی اگر مسئله هندسی نیست، شکل بکش» ----------
+     ستونی عددی است که همهٔ خانه‌های پرِ آن عدد باشند (بی آستانه)؛ هر ستونِ عددی یک خط، محورِ افقی ترتیبِ سطرها با برچسبِ نخستین ستونِ غیرعددی.
+     هیچ روند، میانگین یا خطِ برازشی کشیده نمی‌شود — دیدن و داوری با خودت. */
+  function csvRows(text) {
+    var t = String(text || "").replace(/^﻿/, ""), lines = t.split(/\r?\n/).filter(function (l) { return l.trim() !== ""; }); if (!lines.length) return [];
+    var cand = [",", ";", "\t", "،"], d = cand.map(function (c) { return [c, lines[0].split(c).length]; }).sort(function (a, b) { return b[1] - a[1]; })[0][0];
+    return lines.map(function (l) {
+      var out = [], cur = "", q = false;
+      for (var i = 0; i < l.length; i++) { var ch = l[i]; if (ch === '"') { if (q && l[i + 1] === '"') { cur += '"'; i++; } else q = !q; } else if (ch === d && !q) { out.push(cur.trim()); cur = ""; } else cur += ch; }
+      out.push(cur.trim()); return out;
+    });
+  }
+  function csvNum(v) { v = String(v == null ? "" : v).trim(); if (v === "") return null; var n = A.parseNum ? A.parseNum(v) : parseFloat(v); return n == null || isNaN(n) || !isFinite(n) ? NaN : +n; }
+  M.csvParse = function (text) {
+    var rows = csvRows(text); if (rows.length < 2) return null;
+    var head = rows[0], body = rows.slice(1), w = Math.max.apply(null, rows.map(function (r) { return r.length; })), cols = [];
+    var headNum = head.every(function (c) { var n = csvNum(c); return n != null && !isNaN(n); });
+    if (headNum) { body = rows; head = head.map(function (c, i) { return "ستون " + fa(i + 1); }); }
+    for (var j = 0; j < w; j++) {
+      var vals = body.map(function (r) { return csvNum(r[j]); }), filled = vals.filter(function (v) { return v != null; });
+      cols.push({ i: j, name: head[j] || ("ستون " + fa(j + 1)), num: filled.length >= 2 && filled.every(function (v) { return !isNaN(v); }), vals: vals, raw: body.map(function (r) { return r[j] || ""; }) });
+    }
+    var lab = cols.filter(function (c) { return !c.num; })[0] || null;
+    return { n: body.length, cols: cols, num: cols.filter(function (c) { return c.num; }), label: lab };
+  };
+  M.csvChart = function (text, title) {
+    var P0 = M.csvParse(text); if (!P0 || !P0.num.length) return null;
+    var W = 640, H = 300, x0 = 56, x1 = W - 16, y0 = H - 40, y1 = 24, ser = P0.num.slice(0, 6), all = [];
+    ser.forEach(function (c) { c.vals.forEach(function (v) { if (v != null && !isNaN(v)) all.push(v); }); });
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all); if (lo === hi) { lo -= 1; hi += 1; }
+    var s = svgBox(W, H, title || "نمودارِ CSV"), N = P0.n, COLS = ["#1d4ed8", "#b45309", "#0f766e", "#9333ea", "#be123c", "#4d7c0f"];
+    function X(i) { return N > 1 ? x0 + (x1 - x0) * i / (N - 1) : (x0 + x1) / 2; }
+    function Y(v) { return y0 - (y0 - y1) * (v - lo) / (hi - lo); }
+    [lo, (lo + hi) / 2, hi].forEach(function (v) { s.appendChild(el("line", { x1: x0, x2: x1, y1: Y(v), y2: Y(v), stroke: "#e5e7eb" })); s.appendChild(txt(x0 - 6, Y(v) + 4, fa(+v.toPrecision(4)), { "font-size": 9, "text-anchor": "end", direction: "ltr" })); });
+    var step = Math.max(1, Math.ceil(N / 8));
+    for (var i = 0; i < N; i += step) s.appendChild(txt(X(i), H - 22, String(P0.label ? P0.label.raw[i] : fa(i + 1)).slice(0, 10), { "font-size": 9 }));
+    ser.forEach(function (c, k) {
+      var seg = [], segs = [];
+      c.vals.forEach(function (v, i) { if (v == null || isNaN(v)) { if (seg.length) segs.push(seg); seg = []; return; } seg.push([X(i), Y(v)]); });
+      if (seg.length) segs.push(seg);
+      segs.forEach(function (sg) { s.appendChild(el("polyline", { points: sg.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), fill: "none", stroke: COLS[k], "stroke-width": 2, "data-col": c.name })); sg.forEach(function (p) { s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 2.5, fill: COLS[k] })); }); });
+      s.appendChild(el("rect", { x: x0 + 110 * k, y: H - 12, width: 10, height: 6, fill: COLS[k] })); s.appendChild(txt(x0 + 110 * k + 14, H - 6, String(c.name).slice(0, 14), { "font-size": 9, "text-anchor": "start" }));
+    });
+    return { svg: s, n: N, series: ser.map(function (c) { return c.name; }), skipped: P0.num.length - ser.length, label: P0.label ? P0.label.name : null };
+  };
+  /* بخشِ نمایش برای یک فایلِ CSV (پیوست): نمودار + یک خطِ صادقانه که چه کشیده شد و چه نه */
+  M.csvBlock = function (name, text) {
+    var C = M.csvChart(text, "نمودارِ «" + name + "»"), box = h("div", { class: "card soft csv-plot", dir: "rtl", "data-file": name });
+    box.appendChild(h("h4", {}, "📈 نمودارِ «" + name + "»"));
+    if (!C) { box.appendChild(h("p", { class: "small muted" }, "ستونِ عددی‌ای پیدا نشد که همهٔ خانه‌هایش عدد باشد — نموداری کشیده نشد.")); return box; }
+    box.appendChild(C.svg);
+    box.appendChild(h("p", { class: "small muted csv-note" }, fa(C.n) + " سطر · ستون‌ها: " + C.series.join("، ") + (C.label ? " · محورِ افقی: «" + C.label + "»" : " · محورِ افقی: شمارهٔ سطر") + (C.skipped ? " · " + fa(C.skipped) + " ستونِ عددیِ دیگر کشیده نشد" : "") +
+      " — فقط خودِ داده‌ها؛ هیچ روند، میانگین یا برازشی کشیده نشده. الگو (فصل، جهش، تکرار) را خودت ببین و داوری کن."));
+    return box;
+  };
+
   M.charts = function (m) { m = m || M.model(); return { radar: M.radar(m), trend: M.trend(m), calib: M.calib(m), neural: M.neural(m), mindmap: M.mindmap(m) }; };
   /* SVG ⇒ PNG (برای ایمیل: Gmail ِ SVG را نشان نمی‌دهد) */
   M.png = function (svg) {
@@ -360,6 +496,7 @@
           h("td", {}, fa(d.ret.ok) + " از " + fa(d.ret.n)), h("td", {}, fa(d.knots.practised || 0) + " از " + fa(d.knots.all)),
           h("td", {}, E.progress ? A.PSY.pctFa(E.progress.p) + " (" + fa(E.progress.from) + " ← " + fa(E.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"));
       })))), (function () { var cs = (m.dims.filter(function (d) { return d.id === "s_learn"; })[0] || {}).cardSelf; return cs && cs.n ? h("p", { class: "small muted mind-cards" }, "کارت‌های مرور خودسنجی‌اند (نمره را خودت می‌دهی)؛ مثلِ پاسخِ «خودم سنجیدم» در گره‌ها در این عددها نمی‌آیند: " + fa(cs.k) + " از " + fa(cs.n) + " مرور را «درست» (۳ تا ۵ ِ SM-2) نمره دادی.") : null; })()));
+    root.appendChild(phasesSection());
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "🕸 نقشهٔ کاملِ ذهن"), C.mindmap));
@@ -405,6 +542,7 @@
     M.dims.forEach(function (d) { var E = d.est || { n: 0 };
       L.push("- " + (d.fa || d.id) + ": پاسخِ بعدی " + (E.n ? pc(E.next) + " (" + E.k + "/" + E.n + ")" : "—") + (E.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌ها " + pc(E.pOver) : "") + (E.fc && E.fc.dirN ? " · پیش‌بینیِ رویدادها: طرفِ محتمل‌تر میانگین " + pc(E.fc.meanQ) + "، " + E.fc.hit + "/" + E.fc.dirN + " رخ داد، احتمالِ بیش‌اطمینانی در پیش‌بینی " + pc(E.fc.pOver) : "") + " · ماندگاری " + d.ret.ok + "/" + d.ret.n + " · گره‌های ورزیده " + (d.knots.practised || 0) + "/" + d.knots.all + (E.progress ? " · احتمالِ پیشرفت " + pc(E.progress.p) : ""));
     });
+    if (A.MIND.phasesText) L.push("## " + A.MIND.phasesText());
     if ((M.black || []).length) L.push("نقطه‌های سیاه: " + M.black.slice(0, 6).map(function (b) { return b.fa || b.t || ""; }).join(" · "));
     return L.join("\n");
   });

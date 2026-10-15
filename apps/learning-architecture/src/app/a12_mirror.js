@@ -324,6 +324,17 @@
     var list = h("ul", { class: "plain small" }, h("li", { class: "muted" }, "در حالِ خواندن…"));
     var inp = h("input", { type: "file", multiple: true, "aria-label": "انتخابِ فایل", onchange: function () { up(Array.prototype.slice.call(inp.files || [])); } });
     var st = h("span", { class: "small muted" });
+    /* 📈 نمودارِ CSV (تورِ ۱ ِ پولیا، s32: «حتی اگر مسئله هندسی نیست، شکل بکش»): از خودِ فایلِ روی رایانه‌ات، همین‌جا — فقط داده (A.MIND.csvChart)، بی روند یا برازش.
+       فایلِ درایو را صفحه دوباره نمی‌خواند (پیوست فقط برای هوش مصنوعی کامل خوانده می‌شود)، پس نمودار هنگامِ انتخابِ فایل کشیده می‌شود و ذخیره نمی‌شود. */
+    var plots = h("div", { class: "col gap csv-plots", "aria-live": "polite" });
+    function isCsv(f) { return /\.(csv|tsv)$/i.test(f.name || "") || /^text\/(csv|tab-separated-values)$/.test(f.type || ""); }
+    function plot(f) {
+      if (!(A.MIND && A.MIND.csvBlock) || !isCsv(f) || typeof FileReader === "undefined") return;
+      var rd = new FileReader();
+      rd.onload = function () { try { plots.appendChild(A.MIND.csvBlock(f.name, String(rd.result || ""))); } catch (e) { console.warn(e); } };
+      rd.readAsText(f);
+    }
+    var csvIn = h("input", { type: "file", accept: ".csv,.tsv,text/csv", class: "csv-in", "aria-label": "نمودارِ یک فایلِ CSV (فقط نمایش، بارگذاری نمی‌شود)", onchange: function () { Array.prototype.slice.call(csvIn.files || []).forEach(plot); csvIn.value = ""; } });
     function load() {
       A.HOST.files(rid).then(function (fs) {
         list.innerHTML = "";
@@ -341,6 +352,7 @@
       (function next() {
         if (i >= files.length) { st.textContent = ""; inp.value = ""; load(); A._mirrorCache = null; return; }
         var f = files[i++];
+        plot(f);
         if (f.size > 100 * 1048576) { A.toast("«" + f.name + "» بزرگ‌تر از ۱۰۰ مگابایت است", "bad"); return next(); }
         st.textContent = "در حالِ فرستادنِ «" + f.name + "» به درایو…";
         A.HOST.upload(rid, f, meta).then(next, function (e) { A.toast(errText(e), "bad"); next(); });
@@ -348,6 +360,9 @@
     }
     sec.appendChild(h("div", { class: "row gap wrap" }, inp, st));
     sec.appendChild(list);
+    if (A.MIND && A.MIND.csvBlock) sec.appendChild(h("details", { class: "small csv-plotbox" }, h("summary", {}, "📈 نمودارِ یک فایلِ CSV (فقط نمایش، بارگذاری نمی‌شود)"),
+      h("p", { class: "muted" }, "هر ستونی که همهٔ خانه‌هایش عدد است یک خط می‌شود؛ هیچ روند یا برازشی کشیده نمی‌شود. پیوستِ CSV هم هنگامِ بارگذاری همین‌جا کشیده می‌شود."), csvIn));
+    sec.appendChild(plots);
     load();
     return sec;
   }
