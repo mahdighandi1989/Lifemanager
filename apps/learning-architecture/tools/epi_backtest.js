@@ -150,7 +150,7 @@ function featValErr(key, v) {
   if (d.t === "bool" && typeof v !== "boolean") return key + ": true/false لازم است";
   return null;
 }
-function recodeOne(target, u, today) {
+function recodeOne(target, u, today, log) {
   const f = target.f = target.f || {}, ch = {}, e = [];
   Object.keys(u.set || {}).forEach((key) => {
     const err = featValErr(key, u.set[key]); if (err) { e.push(err); return; }
@@ -162,7 +162,9 @@ function recodeOne(target, u, today) {
   return { apply: () => {
     Object.keys(ch).forEach((key) => { if (ch[key][1] == null) delete f[key]; else f[key] = ch[key][1]; });
     if (u.member === true || u.member === false) { if (target.member !== u.member) ch.member = [target.member == null ? null : target.member, u.member]; target.member = u.member; }
-    if (Object.keys(ch).length) (target.recoded = target.recoded || []).push({ at: today, keys: ch, why: u.why, encoder: u.encoder, review: u.review });
+    if (!Object.keys(ch).length) return 0;
+    if (log) log[target.id] = ch;                                       // موردِ قاب: تاریخچه یک بار در خودِ قاب (نه تکرارِ دلیل در هر مورد)
+    else (target.recoded = target.recoded || []).push({ at: today, keys: ch, why: u.why, encoder: u.encoder, review: u.review });
     return Object.keys(ch).length;
   } };
 }
@@ -176,11 +178,12 @@ function recode(file) {
     if (!u.why || String(u.why).length < 15) e.push("why: چرا (از متنِ خودِ مورد/قاب، نه از سرانجام)");
     if (!u.encoder) e.push("encoder: رمزگذارِ کورِ جدا کیست");
     if (!u.review) e.push("review: بازبینِ مستقل کیست و چه گفت");
-    let targets = [];
+    let targets = [], frameLog = null, frameObj = null;
     if (u.frame) {
       let sm = null; Object.keys(sFiles).forEach((f) => sFiles[f].forEach((x) => { if (x.id === u.frame) sm = x; }));
       if (!sm) e.push("قابِ ناشناخته: " + u.frame);
-      else { targets = u.items === "all" ? sm.items : (sm.items || []).filter((it) => (u.items || []).indexOf(it.id) >= 0); Object.keys(sFiles).forEach((f) => { if (sFiles[f].indexOf(sm) >= 0) touched["s:" + f] = 1; }); }
+      else { targets = u.items === "all" ? sm.items : (sm.items || []).filter((it) => (u.items || []).indexOf(it.id) >= 0); Object.keys(sFiles).forEach((f) => { if (sFiles[f].indexOf(sm) >= 0) touched["s:" + f] = 1; });
+        frameLog = {}; frameObj = sm; }
       if (sm && u.items !== "all" && targets.length !== (u.items || []).length) e.push("موردِ ناشناخته در قاب " + u.frame);
       if (u.member != null) e.push("member فقط برای تصدیقِ پیکره");
     } else if (u.case) {
@@ -189,7 +192,8 @@ function recode(file) {
       else { const k = (c.claims || []).filter((x) => x.id === u.claim)[0]; if (!k) e.push("تصدیقِ ناشناخته: " + u.case + "/" + u.claim); else targets = [k];
         Object.keys(cFiles).forEach((f) => { if (cFiles[f].indexOf(c) >= 0) touched["c:" + f] = 1; }); }
     } else e.push("frame یا case لازم است");
-    targets.forEach((t) => { const r = recodeOne(t, u, today); if (r.e) e.push.apply(e, r.e); else todo.push(r.apply); });
+    targets.forEach((t) => { const r = recodeOne(t, u, today, frameLog); if (r.e) e.push.apply(e, r.e); else todo.push(r.apply); });
+    if (frameObj && !e.length) todo.push(() => { if (Object.keys(frameLog).length) (frameObj.recoded = frameObj.recoded || []).push({ at: today, items: frameLog, why: u.why, encoder: u.encoder, review: u.review }); return 0; });
     if (e.length) bad.push({ i, frame: u.frame, case: u.case, claim: u.claim, errors: e });
   });
   if (bad.length) return { changed: 0, rejected: bad, note: "هیچ چیز نوشته نشد (همه یا هیچ)" };
