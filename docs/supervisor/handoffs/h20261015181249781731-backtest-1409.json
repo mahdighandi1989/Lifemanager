@@ -1,0 +1,15 @@
+{
+ "id": "h20261015181249781731-backtest-1409",
+ "at": "2026-10-15T18:12:49Z",
+ "by": "backtest",
+ "area": "epi-rules",
+ "owner": [
+  "owner"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_matter_zanni به قاعدهٔ ثابتِ مالک («اگر بر اساسِ بدیهیاتِ قطعی است … اعمال کن») و دستورِ امروزِ مالک به نشستِ اصلی («انجامش بده»)، فقط بخشِ قضیه‌ای پس از بازبینِ مستقلِ برهان: مقدارِ «مقدمه ظنی» و prem_p (فقط ثبت) در epi_feat.js، قاعدهٔ r_aql_matter_zanni = ۹۹٫۹ (O از T_below1) در epi_rules.js و F.DER. اعمال‌نشده: min(prem_p)، ½ و (۱۰۰+prem_p)/۲ — منتظرِ p_found_mixture. پیکره ۰ از ۲۰۳ حکم.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۲",
+ "commit": "d0a09ab",
+ "status": "open"
+}
