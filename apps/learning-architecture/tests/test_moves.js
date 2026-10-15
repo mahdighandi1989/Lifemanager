@@ -37,8 +37,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.ids = P.map(x => x.id).join(',');
     return out;
   });
-  if (info.data.moves !== 16 || info.data.badTech.length || info.data.badTag.length || info.data.missing.length || info.data.both.length || info.data.unknownSid.length) errors.push('data: ' + JSON.stringify(info.data));
+  // ۲۰۲۶-۱۰-۱۵: ۱۱ حرکتِ افزوده (۲۷ روی هم). قرارداد: شناسه‌های ۱۶ حرکتِ نخست تغییر نمی‌کنند و به همان ترتیب اول‌اند؛ افزودن مجاز است.
+  info.data.first16 = await p.evaluate(() => APP.MOVE_IDS.slice(0, 16).join());
+  if (info.data.first16 !== 'mv_special,mv_general,mv_extend,mv_represent,mv_invariant,mv_backward,mv_contra,mv_descent,mv_decompose,mv_analogy,mv_assume,mv_control,mv_measure,mv_anomaly,mv_impossible,mv_compute') errors.push('first 16 move ids changed: ' + info.data.first16);
+  if (info.data.moves !== 27 || info.data.badTech.length || info.data.badTag.length || info.data.missing.length || info.data.both.length || info.data.unknownSid.length) errors.push('data: ' + JSON.stringify(info.data));
   if (info.data.ids !== 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis') errors.push('problem set changed: ' + info.data.ids);
+  // ۸ مسئلهٔ نخست همهٔ ۱۶ حرکتِ نخست را می‌پوشانند (حرکت‌های افزوده در epi_problems_c برچسب خورده‌اند — tests/test_problems_c.js)
   if (Object.keys(info.data.perMove).length !== 16) errors.push('some move has no stage: ' + JSON.stringify(info.data.perMove));
 
   /* ۲) نمای حرکت‌ها: ۱۶ کارت با شمارشِ درست */
@@ -47,7 +51,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const counts = await p.evaluate(() => Array.from(document.querySelectorAll('main .mv-card')).map(c => [c.dataset.mv, c.querySelector('.mv-count').textContent, APP.moveStages(c.dataset.mv).length]));
   counts.forEach(([id, txt, n]) => { if (!txt.startsWith(APP_fa(n))) errors.push('count ' + id + ' ' + txt + ' vs ' + n); });
   function APP_fa(n) { return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]); }
-  if (info.cards !== 16) errors.push('moves cards ' + info.cards);
+  if (info.cards !== 27) errors.push('moves cards ' + info.cards);
   info.untaggedList = await p.locator('main .mv-untagged li').count();
   if (info.untaggedList !== info.data.untagged) errors.push('untagged list ' + info.untaggedList + ' vs ' + info.data.untagged);
   info.transfer = await p.locator('main .mv-transfer').count();

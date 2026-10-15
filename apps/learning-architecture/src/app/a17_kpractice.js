@@ -130,7 +130,8 @@
 
   /* ================= ۲) سازنده‌های برنامه‌وار ================= */
   var LADDER = [1, 3, 7, 21, 60];
-  A.KLADDER = LADDER;
+  /* فاصله‌های تکرار (روز). نامش A.KSPACING است: A.KLADDER نامِ «نردبانِ راهنمایی» ِ a16 است و پیش‌تر این‌جا رونویسی می‌شد (۲۰۲۶-۱۰-۱۵). */
+  A.KSPACING = LADDER;
 
   /* ---------- (الف) کوزه‌های آب ---------- */
   var JN = ["A", "B", "C"];
@@ -539,6 +540,163 @@
     throw new Error("reread: no problem");
   }
 
+  /* ---------- (ح) نمادگذاری: نام‌گذاریِ خوب (F2 ‹ بازنمایی) ----------
+     هر نام = [نشانِ نوع، نشانِ موجود، متن]. قاعده‌ها (پولیا، «نمادگذاری»؛ قابلِ وارسیِ مستقل در آزمون):
+     (۱) بی‌ابهام: هیچ دو چیزی یک نام ندارند؛ (۲) نامِ رزرو‌شده (π، e) برای کمیتِ مسئله نیست؛ (۳) اگر چیزها مرتبط‌اند: هم‌نوع ⇔ نشانِ نوعِ یکسان،
+     هم‌موجود (رأسِ A و ضلعِ روبه‌رویش) ⇔ نشانِ موجودِ یکسان. دقیقاً یک گزینه هر سه را دارد. بدلی: چیزها مرتبط نیستند ⇒ نام‌های عامِ x، y، z بس است. */
+  var GREEK = { a: "α", b: "β", c: "γ" }, SUB = { 1: "₁", 2: "₂" }, ORD = { a: "اول", b: "دوم", c: "سوم" };
+  function notationMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["abstract", "real"]), objs, related = !decoy;
+    if (decoy) objs = form === "abstract" ? [{ n: "طولِ یک پاره‌خط", g: "len", i: "1" }, { n: "مساحتِ یک دایرهٔ جدا", g: "area", i: "2" }, { n: "اندازهٔ یک زاویهٔ دیگر", g: "ang", i: "3" }]
+      : [{ n: "قیمتِ یک کتاب", g: "price", i: "1" }, { n: "شمارِ صفحه‌های یک دفترِ دیگر", g: "pages", i: "2" }, { n: "زمانِ رفتن تا کتابخانه", g: "time", i: "3" }];
+    else if (form === "abstract") {
+      objs = []; ["a", "b", "c"].forEach(function (e) { objs.push({ n: "رأسِ " + ORD[e], g: "V", i: e }); });
+      ["a", "b", "c"].forEach(function (e) { objs.push({ n: "ضلعِ روبه‌روی رأسِ " + ORD[e], g: "S", i: e }); });
+      if (level >= 2) ["a", "b", "c"].forEach(function (e) { objs.push({ n: "زاویهٔ رأسِ " + ORD[e], g: "G", i: e }); });
+    } else {
+      objs = []; var kinds = level >= 2 ? [["v", "سرعتِ"], ["t", "زمانِ حرکتِ"], ["d", "مسافتِ"]] : [["v", "سرعتِ"], ["t", "زمانِ حرکتِ"]];
+      ["1", "2"].forEach(function (e) { kinds.forEach(function (k) { objs.push({ n: k[1] + " قطارِ " + (e === "1" ? "اول" : "دوم"), g: k[0], i: e }); }); });
+    }
+    function good() {   // نام‌گذاریِ درست
+      return objs.map(function (x) {
+        if (decoy) return ["g" + x.i, x.i, ({ 1: "x", 2: "y", 3: "z" })[x.i]];
+        if (form === "abstract") return [x.g, x.i, x.g === "V" ? x.i.toUpperCase() : x.g === "S" ? x.i : GREEK[x.i]];
+        return [x.g, x.i, x.g + SUB[x.i]];
+      });
+    }
+    var GEN = ["x", "y", "z", "u", "w", "s", "p", "q", "m"];
+    function generic() { var g = shuf(r, GEN); return objs.map(function (x, k) { return ["k" + k, "e" + k, g[k]]; }); }
+    function ambiguous() { var m = good().map(function (s) { return s.slice(); }), j = ri(r, 1, m.length - 1), i0 = ri(r, 0, j - 1); m[j] = [m[j][0], m[j][1], m[i0][2]]; return m; }
+    function reserved() { var m = good().map(function (s) { return s.slice(); }), j = ri(r, 0, m.length - 1); m[j] = [m[j][0], m[j][1], pick(r, ["π", "e"])]; return m; }
+    function mismatch() {   // دو موجود در یک نوع جابه‌جا: مثلاً ضلعِ روبه‌روی رأسِ اول «b» نامیده شود
+      var m = good().map(function (s) { return s.slice(); }), g2 = objs.map(function (x, k) { return k; }).filter(function (k) { return objs[k].g !== objs[0].g; });
+      var gg = objs[g2[0]].g, ks = g2.filter(function (k) { return objs[k].g === gg; }), a = ks[0], b = ks[1];
+      var ta = m[a], tb = m[b]; m[a] = [ta[0], tb[1], tb[2]]; m[b] = [tb[0], ta[1], ta[2]]; return m;
+    }
+    var cands = decoy ? [good(), ambiguous(), reserved(), ambiguous()] : [good(), generic(), ambiguous(), mismatch()];
+    function txtOf(m) { return objs.map(function (x, k) { return x.n + ": " + m[k][2]; }).join("؛ "); }
+    var texts = cands.map(txtOf);
+    for (var t = 0; t < 30 && new Set(texts).size < texts.length; t++) { cands[3] = decoy ? (t % 2 ? reserved() : ambiguous()) : generic(); texts = cands.map(txtOf); }
+    if (new Set(texts).size < texts.length) throw new Error("notation: duplicate choices");
+    var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice", answer: ids[0] };
+    it.choices = cands.map(function (m, k) { return { id: ids[k], t: texts[k] }; }).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+    it.params = { related: related, objs: objs.map(function (x) { return { g: x.g, i: x.i }; }), cands: {} };
+    cands.forEach(function (m, k) { it.params.cands[ids[k]] = m; });
+    it.prompt = (decoy ? "در یک مسئله سه کمیتِ نامرتبط هست: " : form === "abstract" ? "در یک مسئلهٔ هندسه مثلثی داری و این‌ها را نام می‌گذاری: " : "در یک مسئلهٔ حرکت دو قطار داری و این‌ها را نام می‌گذاری: ") +
+      objs.map(function (x) { return x.n; }).join("، ") + ".\nکدام نام‌گذاری برای این مسئله درست‌تر است؟";
+    it.explain = decoy ? "این‌جا چیزها به هم مرتبط نیستند؛ کافی است نام‌ها یکتا باشند و با نمادهای ثابت (π، e) قاطی نشوند. گزینه‌های دیگر یا یک نام را برای دو چیز به کار برده‌اند یا نمادِ ثابتی را."
+      : "نام‌گذاریِ خوب بی‌ابهام است و چیزهای مرتبط را با نام‌های مرتبط نشان می‌دهد: " + (form === "abstract" ? "رأسِ A روبه‌روی ضلعِ a (و زاویهٔ α)" : "کمیت‌های هر قطار با همان اندیس") + ". نام‌های عامِ x، y، z… بی‌ابهام‌اند ولی این پیوند را پنهان می‌کنند.";
+    it.deep = "نماد را چنان بگذار که بی‌ابهام و به‌یادماندنی باشد و ترتیب و پیوندِ چیزها را بازتاب دهد؛ نمادِ خوب نیمی از ترجمهٔ شرط به معادله است (Pólya 1945).";
+    it.trap = decoy ? "این‌جا تله‌ای نیست: نام‌های عام بس است. «همیشه نام‌های هم‌خانواده بگذار» هم وقتی چیزی به هم مرتبط نیست قاعدهٔ کور است."
+      : "نام‌گذاریِ عامِ x، y، z… که بی‌ابهام است ولی پیوندِ رأس و ضلع یا اندیسِ هر قطار را گم می‌کند؛ یا جابه‌جاییِ یک حرف.";
+    return it;
+  }
+
+  /* ---------- (ط) ترجمهٔ شرط به رابطه (F2 ‹ بازنمایی؛ خطای وارونه‌نویسی — Clement 1982) ----------
+     جدولِ دوستونی «بیانِ کلامی ⇐ رابطه» با یک سطرِ خالی. رابطه‌ها = [p، q، c] برای p·X + q·Y = c ⇐ وارسیِ مستقل با جای‌گذاری.
+     غیربدلی: جمله‌بندیِ «به‌ازای هر …، k …» (ترتیبِ واژه‌ها به رابطهٔ وارونه می‌کشد)؛ بدلی: «… k برابرِ … است» (ترتیبِ واژه همان رابطهٔ درست است). سطحِ ۳: عددِ صحیحِ مجهول. */
+  var EQS = {
+    verbal: { X: "S", Y: "P", xn: "دانشجو", yn: "استاد", place: "در یک دانشکده", per: function (k) { return "به‌ازای هر استاد " + fa(k) + " دانشجو هست"; }, times: function (k) { return "شمارِ دانشجوها " + fa(k) + " برابرِ شمارِ استادهاست"; } },
+    real: { X: "A", Y: "B", xn: "سیب", yn: "جعبه", place: "در یک انبار", per: function (k) { return "در هر جعبه " + fa(k) + " سیب هست"; }, times: function (k) { return "شمارِ سیب‌ها " + fa(k) + " برابرِ شمارِ جعبه‌هاست"; } },
+    abstract: { X: "x", Y: "y", xn: "x", yn: "y", place: "دربارهٔ دو عددِ مثبت", per: function (k) { return "نسبتِ x به y مثلِ " + fa(k) + " به ۱ است"; }, times: function (k) { return "x، " + fa(k) + " برابرِ y است"; } }
+  };
+  function relTxt(E, v) {   // [p, q, c] ⇐ متنِ ساده (p·X + q·Y = c)
+    var p = v[0], q = v[1], c = v[2];
+    if (p === 1 && q < 0 && c === 0) return E.X + " = " + (-q) + E.Y;
+    if (q === 1 && p < 0 && c === 0) return E.Y + " = " + (-p) + E.X;
+    if (p === 1 && q === -1 && c > 0) return E.X + " = " + E.Y + " + " + c;
+    if (p === 1 && q === 1) return E.X + " + " + E.Y + " = " + c;
+    return p + "·" + E.X + " + " + q + "·" + E.Y + " = " + c;
+  }
+  A.krelTxt = relTxt;
+  function eqtransMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["verbal", "real", "abstract"]), E = EQS[form];
+    var k = ri(r, 2, level === 1 ? 6 : 12), clause = decoy ? E.times(k) : E.per(k);
+    var it = { form: form, level: level, decoy: decoy, params: { form: form, k: k, X: E.X, Y: E.Y } };
+    if (level >= 3) {
+      var y = ri(r, 3, 40); if (y === k) y++;   // پاسخ نباید عددی از صورت باشد (k یا N؛ N = y(k + 1) هرگز برابرِ y نیست)
+      var N = y * (k + 1);
+      it.atype = "int"; it.answer = String(y); it.params.N = N;
+      var row2 = form === "abstract" ? "«مجموعشان " + fa(N) + " است» ⇐ " + ltr(E.X + " + " + E.Y + " = " + N) : "«روی هم " + fa(N) + " تا» ⇐ " + ltr(E.X + " + " + E.Y + " = " + N);
+      it.prompt = (form === "abstract" ? E.place + ": " + clause + "، و مجموعشان " + fa(N) + " است. جدولِ ترجمه را کامل کن و y را بیاب." :
+        E.place + " " + clause + " و روی هم " + fa(N) + " " + E.xn + " و " + E.yn + " هست. جدولِ ترجمه را کامل کن و شمارِ " + E.yn + "‌ها را بیاب.") + "\n«" + clause + "» ⇐ ؟\n" + row2;
+      it.explain = "سطرِ اول: " + ltr(E.X + " = " + k + E.Y) + " (با یک " + E.yn + " باید " + fa(k) + " " + E.xn + " باشد). جای‌گذاری در سطرِ دوم: " + ltr((k + 1) + E.Y + " = " + N) + " ⇒ " + fa(y) + ".";
+    } else {
+      var right = [1, -k, 0], cands = [right, [-k, 1, 0], [1, -1, k], [1, 1, k]];
+      var ids = shuf(r, ["a", "b", "c", "d"]);
+      it.atype = "choice"; it.answer = ids[0]; it.params.rels = {};
+      it.choices = cands.map(function (v, j) { it.params.rels[ids[j]] = v; return { id: ids[j], t: ltr(relTxt(E, v)) }; }).sort(function (x, y2) { return x.id < y2.id ? -1 : 1; });
+      var other = level === 2 ? "\n«" + (form === "abstract" ? "هر دو عدد مثبت‌اند" : "هیچ‌کدام صفر نیست") + "» ⇐ " + ltr(E.X + " > 0, " + E.Y + " > 0") : "";
+      it.prompt = E.place + " " + clause + ". جدولِ ترجمه (بیانِ کلامی ⇐ رابطه) را کامل کن" + (form === "abstract" ? "." : "؛ " + ltr(E.X) + " برای شمارِ " + E.xn + "‌ها و " + ltr(E.Y) + " برای شمارِ " + E.yn + "‌ها.") + other + "\n«" + clause + "» ⇐ ؟";
+      it.explain = "درست: " + ltr(relTxt(E, right)) + ". آزمونِ ساده: با یک " + E.yn + " (" + ltr(E.Y + " = 1") + ") باید " + fa(k) + " " + E.xn + " باشد. " + (decoy ? "این بار ترتیبِ واژه‌ها هم همین رابطه را می‌داد." : "رابطهٔ وارونه (" + ltr(relTxt(E, [-k, 1, 0])) + ") ترتیبِ واژه‌ها را دنبال می‌کند، نه موقعیت را.");
+    }
+    it.deep = "هر سطرِ شرط را جدا ترجمه کن و رابطه را با یک عددِ ساده بیازما (یک استاد ⇐ چند دانشجو؟)؛ جهتِ رابطه را موقعیت تعیین می‌کند، نه ترتیبِ واژه‌ها (Clement 1982؛ Pólya 1945).";
+    it.trap = decoy ? "این‌جا تله‌ای نیست: ترتیبِ واژه‌ها و رابطهٔ درست یکی‌اند." : "نوشتنِ رابطه به ترتیبِ واژه‌ها (" + ltr(relTxt(E, [-k, 1, 0])) + ") به‌جای آزمودنش با یک عددِ ساده.";
+    return it;
+  }
+
+  /* ---------- (ی) آزمونِ ابعاد (F4 ‹ پایش؛ وارسیِ نتیجه) ----------
+     هر فرمول = جمعِ تک‌جمله‌ها؛ هر تک‌جمله = ضریب + توانِ نمادها. بُعد = Σ توان × بُعدِ نماد ([طول، زمان]). غیربدلی: دقیقاً یک فرمول ناهم‌بُعد است؛
+     بدلی: همه هم‌بُعدند و پاسخ «هیچ‌کدام» است (آزمونِ ابعاد شرطِ لازم است نه کافی — گذشتن از آن درستی را ثابت نمی‌کند). */
+  var DIMS = {
+    abstract: { syms: { a: [1, 0], b: [1, 0], h: [1, 0] }, targets: [["مساحت", [2, 0], "S"], ["حجم", [3, 0], "V"]], intro: "a، b و h طول‌اند (مثلاً به متر)." },
+    real: { syms: { v: [1, -1], t: [0, 1], g: [1, -2], d: [1, 0] }, targets: [["مسافت", [1, 0], "x"], ["زمان", [0, 1], "T"]], intro: "v سرعت است، t زمان، g شتاب و d طول." }
+  };
+  A.KDIMS = DIMS;
+  function monoDim(D, m) { var L = 0, T = 0; Object.keys(m.p).forEach(function (s) { L += m.p[s] * D.syms[s][0]; T += m.p[s] * D.syms[s][1]; }); return [L, T]; }
+  function monoTxt(m) {
+    var num = [], den = [];
+    Object.keys(m.p).sort().forEach(function (s) { var e = m.p[s]; if (!e) return; var t = s + (Math.abs(e) === 2 ? "²" : Math.abs(e) === 3 ? "³" : ""); (e > 0 ? num : den).push(t); });
+    var head = (m.c || "") + num.join(""); if (!head) head = "1";
+    return den.length ? head + "/" + den.join("") : head;
+  }
+  function randMono(D, r, want) {
+    var ss = Object.keys(D.syms);
+    for (var t = 0; t < 400; t++) {
+      var m = { c: pick(r, ["", "", "2", "3", "½", "π"]), p: {} };
+      ss.forEach(function (s) { var e = ri(r, -2, 3); if (r() < 0.45) e = 0; if (e) m.p[s] = e; });
+      if (!Object.keys(m.p).length) continue;
+      var d = monoDim(D, m);
+      if (d[0] === want[0] && d[1] === want[1]) return m;
+    }
+    return null;
+  }
+  function dimtestMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["abstract", "real"]), D = DIMS[form], tg = pick(r, D.targets), nm = level;
+    var NONE = "هیچ‌کدام از آزمونِ ابعاد رد نمی‌شود";
+    for (var tries = 0; tries < 80; tries++) {
+      var forms = [], bad = decoy ? -1 : ri(r, 0, 2), fail = false;
+      for (var f = 0; f < 3 && !fail; f++) {
+        var ms = [];
+        for (var j = 0; j < nm; j++) { var m = null; for (var u = 0; u < 20 && !m; u++) { m = randMono(D, r, tg[1]); if (m && ms.some(function (x) { return monoTxt(x) === monoTxt(m) || JSON.stringify(x.p) === JSON.stringify(m.p); })) m = null; } if (!m) { fail = true; break; } ms.push(m); }
+        if (fail) break;
+        if (f === bad) {   // یک تک‌جمله را ناهم‌بُعد کن: توانِ یک نماد را یکی بالا یا پایین ببر
+          var mi = ri(r, 0, ms.length - 1), s = pick(r, Object.keys(D.syms)), m2 = { c: ms[mi].c, p: {} };
+          Object.keys(ms[mi].p).forEach(function (x) { m2.p[x] = ms[mi].p[x]; });
+          m2.p[s] = (m2.p[s] || 0) + (r() < 0.5 ? 1 : -1); if (!m2.p[s]) delete m2.p[s];
+          if (!Object.keys(m2.p).length) { fail = true; break; }
+          var d2 = monoDim(D, m2); if (d2[0] === tg[1][0] && d2[1] === tg[1][1]) { fail = true; break; }
+          ms[mi] = m2;
+        }
+        forms.push(ms);
+      }
+      if (fail || forms.length < 3) continue;
+      var texts = forms.map(function (ms2) { return tg[2] + " = " + ms2.map(monoTxt).join(" + "); });
+      if (new Set(texts).size < 3) continue;
+      var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice" };
+      it.params = { form: form, target: tg[1], name: tg[0], forms: {}, none: ids[3] };
+      it.choices = texts.map(function (t2, j2) { it.params.forms[ids[j2]] = forms[j2]; return { id: ids[j2], t: ltr(t2) }; }).concat([{ id: ids[3], t: NONE }]).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+      it.answer = decoy ? ids[3] : ids[bad];
+      it.prompt = D.intro + " کدام فرمول برای «" + tg[0] + "» (" + ltr(tg[2]) + ") از آزمونِ ابعاد رد می‌شود — یعنی دو سوی برابری یا جمله‌هایش هم‌بُعد نیستند؟ (ضریب‌های عددی مثلِ ½ و π بی‌بُعدند.)";
+      it.explain = decoy ? "هر سه فرمول هم‌بُعدند؛ آزمونِ ابعاد هیچ‌کدام را رد نمی‌کند. این یعنی هیچ‌کدام خطای ابعادی ندارد، نه این‌که درست‌اند."
+        : "در «" + ltr(texts[bad]) + "» دست‌کم یک جمله بُعدِ «" + tg[0] + "» را ندارد؛ جمع یا برابریِ کمیت‌های ناهم‌بُعد بی‌معناست.";
+      it.deep = "پیش از پذیرفتنِ هر فرمول، بُعدِ هر جمله را بسنج؛ آزمونِ ابعاد خطا را می‌گیرد ولی درستی را ثابت نمی‌کند — بعد سراغِ حالت‌های حدی برو (Pólya 1945).";
+      it.trap = decoy ? "این‌جا تله‌ای نیست؛ وسوسهٔ «حتماً یکی غلط است» خودش پیش‌داوری است." : "پذیرفتنِ فرمولی که شکلِ آشنا دارد، بی‌سنجیدنِ بُعدِ تک‌تکِ جمله‌ها.";
+      return it;
+    }
+    throw new Error("dimtest: no problem");
+  }
+
   A.KGEN = {
     jars: { fa: "کوزه‌های آب", src: "Luchins 1942", fams: ["F3"], forms: ["numeric", "real", "visual"], what: "اثرِ آمادگیِ ذهنی: پس از گرم‌کردن با یک فرمول، آیا راهِ کوتاه‌تر را می‌بینی؟ کدام راه را رفتی ثبت می‌شود.", make: jarsMake },
     rule246: { fa: "قاعدهٔ پنهانِ ۲-۴-۶", src: "Wason 1960؛ Klayman & Ha 1987", fams: ["F4", "F11"], forms: ["abstract", "real"], what: "کشفِ قاعده با آزمودن: پیش از اعلام باید آزمون بدهی؛ شمارِ آزمون‌های ابطالی ثبت می‌شود.", make: r246Make },
@@ -546,7 +704,10 @@
     bayes: { fa: "نرخِ پایه", src: "Tversky & Kahneman 1982؛ Gigerenzer & Hoffrage 1995", fams: ["F11", "F4"], forms: ["real", "verbal", "abstract"], what: "به حساب آوردنِ رایج‌بودنِ یک حالت پیش از نتیجه گرفتن از یک نشانه.", make: bayesMake },
     wmchain: { fa: "زنجیرهٔ حافظهٔ کاری", src: "Cowan 2001؛ Sweller 1988", fams: ["F5"], forms: ["numeric", "real", "visual"], what: "بارِ حافظهٔ کاری و بیرون‌ریزی: چرک‌نویس در دسترس است؛ استفاده‌کردن یا نکردنت ثبت می‌شود.", make: wmMake },
     hidden24: { fa: "حساب با قیدِ خودساخته", src: "Kershaw & Ohlsson 2004", fams: ["F2", "F3"], forms: ["abstract", "verbal", "visual"], what: "پیدا کردنِ قیدی که در صورت نبود و خودت فرض کردی (این‌جا: «حاصلِ میانی صحیح باشد»).", make: h24Make },
-    reread: { fa: "بازخوانیِ صورت (مرزها)", src: "Kintsch 1998 (مدلِ موقعیت)", fams: ["F2"], forms: ["numeric", "verbal", "real"], what: "جزئیِ کوچکی در صورت («هر دو سر»، «شامل»، «اولی همین حالا») پاسخ را عوض می‌کند؛ پاسخِ عددیِ دقیق، با نسخهٔ بدلی که در آن حسابِ ساده درست است.", make: rereadMake }
+    reread: { fa: "بازخوانیِ صورت (مرزها)", src: "Kintsch 1998 (مدلِ موقعیت)", fams: ["F2"], forms: ["numeric", "verbal", "real"], what: "جزئیِ کوچکی در صورت («هر دو سر»، «شامل»، «اولی همین حالا») پاسخ را عوض می‌کند؛ پاسخِ عددیِ دقیق، با نسخهٔ بدلی که در آن حسابِ ساده درست است.", make: rereadMake },
+    notation: { fa: "نمادگذاری (نام‌گذاریِ خوب)", src: "Pólya 1945 (Notation)", fams: ["F2"], forms: ["abstract", "real"], mv: ["mv_equation"], what: "نامی بی‌ابهام و به‌یادماندنی که پیوندِ چیزهای مرتبط (رأس و ضلعِ روبه‌رو، اندیسِ هر قطار) را نشان دهد.", make: notationMake },
+    eqtrans: { fa: "ترجمهٔ شرط به رابطه (جدولِ دوستونی)", src: "Pólya 1945 (Setting up equations)؛ Clement 1982", fams: ["F2"], forms: ["verbal", "real", "abstract"], mv: ["mv_equation"], what: "سطرِ «بیانِ کلامی ⇐ رابطه» را کامل کن و جهتِ رابطه را با یک عددِ ساده بیازما (خطای وارونه‌نویسی).", make: eqtransMake },
+    dimtest: { fa: "آزمونِ ابعاد", src: "Pólya 1945 (Test by dimension)", fams: ["F4"], forms: ["abstract", "real"], mv: ["mv_dimcheck"], what: "کدام فرمول ناهم‌بُعد است؟ — و این‌که گذشتن از آزمون درستی را ثابت نمی‌کند.", make: dimtestMake }
   };
   /* ساختِ تکرارپذیر از روی دانه؛ اگر نمونه‌ای نشت داشت، با ادامهٔ همان دنباله دوباره می‌سازد */
   A.kgenMake = function (key, seed, level, decoy, form) {

@@ -54,7 +54,7 @@ function indep24(nums, T) {
 }
 function evalAscii(s) { if (!/^[0-9+\-*/() ]+$/.test(s)) throw new Error('bad expr'); return Function('return (' + s + ')')(); }
 
-const SEEDS = { jars: 70, rule246: 50, wason: 70, bayes: 70, wmchain: 70, hidden24: 20, reread: 70 };
+const SEEDS = { jars: 70, rule246: 50, wason: 70, bayes: 70, wmchain: 70, hidden24: 20, reread: 70, notation: 40, eqtrans: 40, dimtest: 40 };   // سه سازندهٔ آخر: بازمحاسبهٔ مستقل در tests/test_kgen_rep.js
 const jarsL3 = { answers: {}, n: 0 };
 for (const key of Object.keys(A.KGEN)) {
   const G = A.KGEN[key]; info.byKey[key] = { n: 0, decoys: 0, forms: {} };

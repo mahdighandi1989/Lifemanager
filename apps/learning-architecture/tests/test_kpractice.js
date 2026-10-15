@@ -329,7 +329,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.remAfterReturn >= 1 && info.histAfterReturn === 'working>practised>returned', 'I2 returned ⇒ follow-up reminder + hist: ' + info.remAfterReturn + ' ' + info.histAfterReturn);
   chk(info.knotReturned === 'true|returned|false', 'A.knotReturned: ' + info.knotReturned);
   chk(info.badExcluded, 'bad item not excluded');
-  chk(info.codeGensF4 === 3, 'F4 code generators: ' + info.codeGensF4);
+  // ۲۰۲۶-۱۰-۱۵: «آزمونِ ابعاد» (dimtest) سازندهٔ کدیِ تازهٔ F4 است — شمار از ثبت‌گاه (A.kgenFor) می‌آید
+  chk(info.codeGensF4 === 4 && info.codeGensF4 === await p.evaluate(() => APP.kgenFor('F4').length), 'F4 code generators: ' + info.codeGensF4);
   chk(info.gate === 1 && info.aiCallsBeforeOk === 0, 'provider notice before AI call');
   chk(info.previewExact && info.previewHadName, 'Minor5 preview is exactly what is sent: ' + info.previewExact + ' ' + info.previewHadName);
   chk(info.ai === '7:ok:3:deep b:unv:2:deep', 'AI verify outcome: ' + info.ai);
@@ -350,7 +351,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.f7NoDetail, 'F7 detail must be null');
   chk(info.privExtra === 'true,true,true', 'I5 F7/F9 in extras or linked roots: ' + info.privExtra);
   chk(info.f1Gap === '1:true' && info.f1GapKnot === 1, 'I4c F1 notice: ' + info.f1Gap + ' ' + info.f1GapKnot);
-  chk(info.f2Gens === 'hidden24,reread' && info.f2Forms.split(',').length >= 3, 'I4b F2 code forms: ' + info.f2Gens + ' / ' + info.f2Forms);
+  // ۲۰۲۶-۱۰-۱۵: نمادگذاری و ترجمهٔ شرط (notation، eqtrans) سازنده‌های تازهٔ F2‌اند
+  chk(info.f2Gens === 'hidden24,reread,notation,eqtrans' && info.f2Forms.split(',').length >= 3, 'I4b F2 code forms: ' + info.f2Gens + ' / ' + info.f2Forms);
   chk(info.bothOffUnremind, 'channels off ⇒ unremind');
   chk(info.detCh === 'telegram,email' && info.detTgOnly === 'telegram:true' && info.detNone === true && info.detSubDisabled === true, 'per-channel detail: ' + [info.detCh, info.detTgOnly, info.detNone, info.detSubDisabled].join(' | '));
   chk(info.sweep, 'deleted knot sweep');
