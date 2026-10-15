@@ -20,7 +20,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const sendGate = async () => { await p.waitForSelector('.kn-ai button:has-text("بفرست")'); await p.click('.kn-ai button:has-text("بفرست")'); };
   await p.evaluate(() => { const st = APP.S.settings(); st.ai = { provider: 'gemini', model: 'm', key: 'test-key' }; APP.S.saveSettings(st); });
 
-  // ---------- ۱) پیش‌فرض: هیچ مسئلهٔ آماده‌ای دیده نمی‌شود ----------
+  // ---------- ۱) پیش‌فرض: هیچ نمونهٔ تاریخیِ سازنده دیده نمی‌شود ----------
+  // تصمیمِ مالک (۲۰۲۶-۱۰-۱۵، «موافقم»): مسئله‌های کوتاهِ تمرینیِ خنثی پیش‌فرض روشن‌اند (test_practice_cta.js، test_solve_r4.js)؛ این بخش
+  // قاعدهٔ پیشینِ مالک را برای نمونه‌های تاریخی/بازاری می‌سنجد، پس تمرینی‌ها را این‌جا خاموش می‌کنیم.
+  await p.evaluate(() => { const st = APP.S.settings(); st.practiceProbs = false; APP.S.saveSettings(st); });
   await go('e_prob');
   info.d = { empty: await p.locator('main .pb-empty').count(), samples: await p.locator('main .pb-sample').count(), note: await p.locator('main .samples-note').count(), probs: await p.evaluate(() => APP.probs().length), getSample: await p.evaluate(() => !!APP.getProb('pb_flt')) };
   chk(info.d.empty === 1 && info.d.samples === 0 && info.d.note === 1 && info.d.probs === 0 && info.d.getSample, 'default problem list ' + JSON.stringify(info.d));

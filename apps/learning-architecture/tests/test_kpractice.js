@@ -331,7 +331,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.badExcluded, 'bad item not excluded');
   // ۲۰۲۶-۱۰-۱۵: «آزمونِ ابعاد» (dimtest) سازندهٔ کدیِ تازهٔ F4 است — شمار از ثبت‌گاه (A.kgenFor) می‌آید
   // R3 (۲۰۲۶-۱۰-۱۵): «حدس را بیازما» (guesstest) و «شکلِ قانون از ابعاد» (dimform) هم سازندهٔ کدیِ F4 اند
-  chk(info.codeGensF4 === 6 && info.codeGensF4 === await p.evaluate(() => APP.kgenFor('F4').length), 'F4 code generators: ' + info.codeGensF4);
+  // R4 (تصمیمِ مالک ۲۰۲۶-۱۰-۱۵): «تفاضل‌های پیاپی»، «حدس‌های رقیب» و «حدس با قیاس» هم سازندهٔ کدیِ F4 اند (tests/test_kgen_r4.js)
+  chk(info.codeGensF4 === 9 && info.codeGensF4 === await p.evaluate(() => APP.kgenFor('F4').length), 'F4 code generators: ' + info.codeGensF4);
   chk(info.gate === 1 && info.aiCallsBeforeOk === 0, 'provider notice before AI call');
   chk(info.previewExact && info.previewHadName, 'Minor5 preview is exactly what is sent: ' + info.previewExact + ' ' + info.previewHadName);
   chk(info.ai === '7:ok:3:deep b:unv:2:deep', 'AI verify outcome: ' + info.ai);

@@ -15,13 +15,23 @@
   /* مسئله‌های کوتاهِ تمرینیِ خنثی (ریاضی، بی موضوعِ بازار؛ set=book4) با یک کلیک (تنظیمات یا دکمهٔ «فهرست خالی است») روشن می‌شوند — پیش‌فرض پنهان، طبقِ قاعدهٔ مالک (WORKLOG 21)
      (ممیزیِ پوشش ۲۰۲۶-۱۰-۱۵: «صفحهٔ حرکت‌ها و فهرستِ مسئله پیش‌فرض خالی است»)؛ 
      نمونه‌های تاریخیِ سازنده مثلِ پیش فقط با «نمونه‌های آمادهٔ سازنده». */
-  function practiceOn() { try { return S.settings().practiceProbs === true; } catch (e) { return false; } }
+  /* تصمیمِ مالک (۲۰۲۶-۱۰-۱۵، «موافقم» به پیشنهادِ نشست): مسئله‌های کوتاهِ تمرینیِ خنثی **پیش‌فرض روشن**‌اند — فقط با تیک‌برداشتن در
+     تنظیمات خاموش می‌شوند (settings.practiceProbs === false). قاعدهٔ پیشینِ مالک دربارهٔ نمونه‌های گمراه‌کننده/بازاری سر جایش است:
+     نمونه‌های تاریخیِ سازنده (EPI_PROBLEMS ِ بی set=book4|practice) هنوز پیش‌فرض پنهان‌اند و فقط با «نمونه‌های آمادهٔ سازنده». */
+  function practiceOn() { try { return S.settings().practiceProbs !== false; } catch (e) { return true; } }
   /* مسئله‌های کوتاهِ تمرینی: «book4» (ریاضیِ بخشِ چهارمِ کتابِ حلِ مسئله) و «practice» (مسئله‌های کوتاهِ نوشتهٔ سازنده برای حرکت‌هایی که
      در آن بیست مسئله گامی نداشتند — از آخر به عقب، برهانِ خلف، ناوردا، ناممکنی، …) — هر دو خنثی و با همان گزینه */
   function practiceP() { return sampleP().filter(function (p) { return (p.set === "book4" || p.set === "practice") && p.neutral === true; }); }
   A.practiceCount = function () { return practiceP().length; };
   A.practiceOn = practiceOn; A.practiceEnable = function () { var st = S.settings(); st.practiceProbs = true; S.saveSettings(st); A.toast(fa(practiceP().length) + " مسئلهٔ کوتاهِ تمرینی روشن شد."); A.render(); };
-  A.practiceCta = function () { return practiceOn() || samplesOn() ? null : h("p", { class: "card soft small practice-cta" }, "مسئله‌ای برای تمرین نیست. ", h("button", { class: "btn sm", type: "button", onclick: A.practiceEnable }, fa(practiceP().length) + " مسئلهٔ کوتاهِ تمرینی را روشن کن"), " (خنثی؛ در تنظیمات هم خاموش و روشن می‌شود)"); };
+  /* فقط وقتی خودت در تنظیمات خاموششان کرده‌ای و فهرست خالی است (پیش‌فرض روشن‌اند) */
+  A.practiceCta = function () { return practiceOn() || samplesOn() ? null : h("p", { class: "card soft small practice-cta" }, "مسئله‌های کوتاهِ تمرینی را خاموش کرده‌ای و مسئله‌ای برای تمرین نیست. ", h("button", { class: "btn sm", type: "button", onclick: A.practiceEnable }, fa(practiceP().length) + " مسئلهٔ کوتاهِ تمرینی را روشن کن"), " (خنثی؛ در تنظیمات هم خاموش و روشن می‌شود)"); };
+  /* فهرستِ مسئله‌های کوتاهِ تمرینی در «مسئله‌های من» (پیش‌تر روشن بودند ولی در فهرست دیده نمی‌شدند — فقط در شبیه‌ساز/حرکت‌ها) */
+  A.practiceListNote = function (card) {
+    if (!practiceOn() || samplesOn()) return null;
+    return h("details", { class: "card soft pb-practice", dir: "rtl" }, h("summary", {}, "مسئله‌های کوتاهِ تمرینی (" + fa(practiceP().length) + " مسئلهٔ خنثی — سازنده نوشته، نه تو؛ در تنظیمات خاموش می‌شوند)"),
+      h("div", { class: "col gap" }, practiceP().map(card)));
+  };
   function probs() { return mineP().concat(samplesOn() ? sampleP() : practiceOn() ? practiceP() : []); }
   function allP() { return mineP().concat(sampleP()); }
   A.probsMine = mineP; A.probIsSample = function (p) { return sampleP().indexOf(p) >= 0; };
@@ -70,7 +80,7 @@
     root.appendChild(h("div", { class: "col gap" }, mine.map(card), brokenRecs().map(function (x) { return brokenCard(x.r, x.err); })));
     if (samplesOn()) root.appendChild(h("details", { class: "card soft pb-samples", dir: "rtl", open: true }, h("summary", {}, "نمونه‌های آمادهٔ سازنده (" + fa(sampleP().length) + " مسئله — سازنده نوشته، نه تو)"),
       h("div", { class: "col gap" }, sampleP().map(card))));
-    else if (A.samplesNote) root.appendChild(A.samplesNote("«" + fa(sampleP().length) + " مسئلهٔ آماده»ای که سازنده نوشته"));
+    else { var pln = A.practiceListNote(card); if (pln) root.appendChild(pln); if (A.samplesNote) root.appendChild(A.samplesNote("«" + fa(sampleP().length) + " مسئلهٔ آماده»ای که سازنده نوشته")); }
     return root;
   };
 

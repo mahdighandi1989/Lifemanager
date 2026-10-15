@@ -832,6 +832,245 @@
     return it;
   }
 
+  /* ---------- (م) ابزارهای خالصِ حدس (بی DOM): جدولِ تفاضل‌ها، فرمولِ n، جداکردنِ حدس‌های رقیب ----------
+     «ابزارهای حدس» در کارتِ حدس/بازنگریِ شبیه‌ساز، «💡 جایگاهِ ایده» و قابِ مسئلهٔ عملی (a36) همین‌ها را صدا می‌زنند؛ سه سازندهٔ زیر هم.
+     تصمیمِ مالک (۲۰۲۶-۱۰-۱۵): «حدس را بیازما، نه تأیید» — جدولِ حالت‌ها را خودِ کاربر می‌سازد، حدس را دقیق (فرمول) می‌نویسد، حدس‌های رقیب
+     را کنارِ هم می‌گذارد و کد می‌گوید کدام با کدام حالت نمی‌خواند و کدام حالت دو رقیب را از هم جدا می‌کند. عددِ قراردادی ندارد. */
+  function seqDiffs(ys) {
+    var rows = [ys.slice()];
+    while (rows[rows.length - 1].length > 1) { var r0 = rows[rows.length - 1], nx = []; for (var i = 1; i < r0.length; i++) nx.push(r0[i] - r0[i - 1]); rows.push(nx); }
+    var order = -1;
+    for (var k = 0; k < rows.length; k++) { var rr = rows[k]; if (rr.length >= 2 && rr.every(function (v) { return Math.abs(v - rr[0]) < 1e-9; })) { order = k; break; } }
+    var next = null;
+    if (order >= 0) { var add = rows[order][0]; for (var k2 = order - 1; k2 >= 0; k2--) add = rows[k2][rows[k2].length - 1] + add; next = add; }
+    /* «ثابت» فقط با دو مقدار دیده شد ⇒ شاهدِ ضعیف (حالتِ دیگری لازم است) */
+    return { rows: rows, order: order, next: next, thin: order >= 0 && rows[order].length === 2 };
+  }
+  A.kseqDiffs = seqDiffs;
+  function numOf(v) { var s = lat(v).replace(/[\s,٬]/g, "").replace(/[−–]/g, "-").replace(/٫/g, "."); return /^-?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : null; }
+  A.knumOf = numOf;
+  /* فرمول بر حسبِ n (یا x): عدد، + − × ÷ ^، پرانتز، ضربِ ضمنی (۲n، n(n+1))؛ بی eval. خوانا نیست ⇒ null */
+  function parseFormula(src) {
+    var s = lat(src).toLowerCase().replace(/[×·]/g, "*").replace(/÷/g, "/").replace(/[−–—]/g, "-").replace(/²/g, "^2").replace(/³/g, "^3").replace(/ⁿ/g, "^n").replace(/\s+/g, "");
+    s = s.replace(/^(?:[a-z]_?n?\(n\)|[a-z]_n|[a-z]\(x\)|y)=/, "");
+    if (!s || !/^[0-9n x.+\-*/^()]+$/.test(s)) return null;
+    var toks = [], m, re = /(\d+(?:\.\d+)?)|([nx])|([+\-*/^()])/g, pos = 0;
+    while ((m = re.exec(s))) { if (m.index !== pos) return null; pos = re.lastIndex; toks.push(m[1] ? { t: "num", v: parseFloat(m[1]) } : m[2] ? { t: "var" } : { t: m[3] }); }
+    if (pos !== s.length || !toks.length) return null;
+    var tk = []; toks.forEach(function (x, i) { var pv = tk[tk.length - 1]; if (pv && (pv.t === "num" || pv.t === "var" || pv.t === ")") && (x.t === "num" || x.t === "var" || x.t === "(")) tk.push({ t: "*" }); tk.push(x); });
+    var i = 0;
+    function peek() { return tk[i] && tk[i].t; }
+    function expr() { var a = term(); while (peek() === "+" || peek() === "-") { var op = tk[i++].t, b = term(); a = (function (a, b, op) { return function (n) { return op === "+" ? a(n) + b(n) : a(n) - b(n); }; })(a, b, op); } return a; }
+    function term() { var a = unary(); while (peek() === "*" || peek() === "/") { var op = tk[i++].t, b = unary(); a = (function (a, b, op) { return function (n) { return op === "*" ? a(n) * b(n) : a(n) / b(n); }; })(a, b, op); } return a; }
+    function unary() { if (peek() === "-") { i++; var u = unary(); return function (n) { return -u(n); }; } if (peek() === "+") { i++; return unary(); } return pow(); }
+    function pow() { var a = atom(); if (peek() === "^") { i++; var b = unary(); return function (n) { return Math.pow(a(n), b(n)); }; } return a; }
+    function atom() {
+      var x = tk[i]; if (!x) throw new Error("end");
+      if (x.t === "num") { i++; return function () { return x.v; }; }
+      if (x.t === "var") { i++; return function (n) { return n; }; }
+      if (x.t === "(") { i++; var e = expr(); if (peek() !== ")") throw new Error(")"); i++; return e; }
+      throw new Error("token");
+    }
+    try { var f = expr(); if (i !== tk.length) return null; return f; } catch (e) { return null; }
+  }
+  A.kformula = parseFormula;
+  function close(a, b) { return isFinite(a) && isFinite(b) && Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
+  /* کوچک‌ترین n ِ صحیح (از نخستین حالتِ جدول — یا ۱ — تا بیشینهٔ جدول + ۲۰) که دو فرمول در آن فرق دارند */
+  function separate(f, g, upto, from) { for (var n = from == null ? 1 : from; n <= upto; n++) { var a = f(n), b = g(n); if (isFinite(a) && isFinite(b) && !close(a, b)) return { n: n, a: a, b: b }; } return null; }
+  A.kseparate = separate;
+  function pn(x) { return String(x == null ? "" : x).replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, ""); }
+  var WORTH_WHY = [["cheap", "آزمودنش ارزان‌تر و زودتر است"], ["bold", "اگر درست باشد بیشتر می‌گوید (جسورتر است) و آزمونش می‌تواند به‌روشنی ردش کند"], ["fits", "با حالت‌هایی که دیده‌ام بیشتر می‌خواند"], ["like", "بیشتر دوستش دارم / امیدوارم درست باشد"]];
+  A.KWORTH_WHY = WORTH_WHY;
+  /* وارسیِ کدیِ «ابزارهای حدس»: kit = { ana, anaGuess, rows:[{x,y}], formula, rivals:[{t,test}], worth, worthWhy } */
+  A.kguessCheck = function (kit) {
+    kit = kit || {}; var out = { table: null, formula: null, rivals: null, issues: [], notes: [] };
+    /* حالتی «نوشته شده» است که نتیجه (y) دارد؛ x ِ پیش‌فرض بی y شمرده نمی‌شود */
+    var rows = (kit.rows || []).map(function (r) { return { x: numOf(r && r.x), y: numOf(r && r.y), raw: r }; }).filter(function (r) { return r.raw && String(r.raw.y || "").trim(); });
+    var numRows = rows.filter(function (r) { return r.y != null; });
+    if (rows.length) {
+      var xs = numRows.map(function (r, i) { return r.x != null ? r.x : i + 1; }), step = xs.length >= 2 ? xs[1] - xs[0] : 1;
+      var even = xs.every(function (x, i) { return i === 0 || close(x - xs[i - 1], step); }) && step !== 0;
+      out.table = { n: rows.length, numeric: numRows.length, even: even, xs: xs };
+      if (numRows.length < rows.length) out.notes.push("برخی حالت‌ها عددی نیستند؛ تفاضل‌ها فقط روی حالت‌های عددی ساخته می‌شوند.");
+      if (numRows.length >= 2 && even) {
+        var D = seqDiffs(numRows.map(function (r) { return r.y; }));
+        out.table.diffs = D.rows; out.table.order = D.order; out.table.next = D.next; out.table.nextX = xs[xs.length - 1] + step; out.table.thin = D.thin;
+      } else if (numRows.length >= 2 && !even) out.issues.push("فاصلهٔ حالت‌ها (x) یکسان نیست؛ برای تفاضل‌های پیاپی، x را با گامِ ثابت بچین.");
+      else out.issues.push("برای تفاضل‌ها دست‌کم دو حالتِ عددی لازم است.");
+    }
+    if (String(kit.formula || "").trim()) {
+      var f = parseFormula(kit.formula);
+      if (!f) { out.formula = { ok: false }; out.issues.push("فرمول خوانا نیست: فقط n، عدد، + − × ÷ ^ و پرانتز (مثلاً n(n+1)/2 یا 2^n − 1)."); }
+      else {
+        var mism = numRows.map(function (r, i) { var x = r.x != null ? r.x : i + 1, v = f(x); return close(v, r.y) ? null : { x: x, y: r.y, fx: v }; }).filter(Boolean);
+        out.formula = { ok: true, fits: !mism.length, mism: mism, tested: numRows.length };
+        if (out.table && out.table.nextX != null) out.formula.next = f(out.table.nextX);
+      }
+    }
+    var rv = (kit.rivals || []).filter(function (x) { return x && String(x.t || "").trim(); });
+    if (rv.length || (kit.rivals || []).some(function (x) { return x && String(x.test || "").trim(); })) {
+      var seen = {}, dup = false, noTest = [];
+      rv.forEach(function (x, i) { var k = pn(x.t); if (seen[k]) dup = true; seen[k] = 1; if (!String(x.test || "").trim()) noTest.push(i); });
+      var R = { n: rv.length, dup: dup, noTest: noTest, ok: rv.length >= 2 && !dup && !noTest.length };
+      if (rv.length < 2) out.issues.push("حدسِ رقیب لازم است: دست‌کم یک حدسِ دیگر کنارِ حدسِ اصلی بنویس.");
+      if (dup) out.issues.push("دو حدسِ رقیب یکی‌اند؛ رقیب باید چیزِ دیگری بگوید.");
+      if (noTest.length) out.issues.push("برای هر حدسِ رقیب آزمونی بنویس که می‌تواند ردش کند.");
+      var fs = rv.map(function (x) { return parseFormula(x.t); });
+      if (fs.length >= 2 && fs[0] && fs[1]) {
+        var hasX = out.table && out.table.xs.length, upto = (hasX ? Math.max.apply(null, out.table.xs) : 0) + 20, sep = separate(fs[0], fs[1], upto, hasX ? Math.min.apply(null, out.table.xs) : 1);
+        R.sep = sep; if (!sep) out.notes.push("دو فرمولِ رقیب در همهٔ حالت‌های آزموده برابرند — شاید یکی‌اند؛ ساده‌شان کن.");
+        if (numRows.length) R.fit = fs.map(function (g) { return g ? numRows.every(function (r, i) { return close(g(r.x != null ? r.x : i + 1), r.y); }) : null; });
+      }
+      if (kit.worth !== "" && kit.worth != null) {
+        R.worth = +kit.worth; var why = kit.worthWhy || "";
+        if (!why) out.issues.push("بگو چرا همین حدس شایستهٔ آزمودنِ نخست است.");
+        else if (why === "like") out.issues.push("دلبستگی دلیلِ آزمودن نیست: حدسی را اول بیازما که آزمونش ارزان است یا اگر درست باشد بیشتر می‌گوید — و حدسِ دوست‌داشتنی را دقیقاً با آزمونی که می‌تواند ردش کند.");
+      }
+      out.rivals = R;
+    }
+    out.ok = !out.issues.length;
+    return out;
+  };
+
+  /* ---------- (ن) تفاضل‌های پیاپی (F4؛ جدولِ حالت‌ها ⇐ حدسِ دقیق‌تر) ----------
+     مقدارهای جملهٔ ۱ تا m از یک چندجمله‌ایِ درجهٔ d (ضریب‌های صحیح)؛ پرسش: جملهٔ بعد. پاسخ با کد (همان چندجمله‌ای). گزینه‌های نادرست: تکرارِ
+     آخرین تفاضل (مرتبهٔ اول را ثابت گرفتن)، افزودنِ دوبارهٔ ثابتِ مرتبهٔ آخر یا کم‌کردنش، و نسبتِ ثابت. بدلی: دنبالهٔ نمایی (b·qⁿ) که تفاضل‌هایش
+     هرگز ثابت نمی‌شوند؛ پاسخ از نسبتِ ثابت است و برون‌یابیِ چندجمله‌ایِ درجهٔ m−1 (که همیشه ممکن است) غلط. */
+  function polyVal(c, n) { var v = 0; for (var i = c.length - 1; i >= 0; i--) v = v * n + c[i]; return v; }
+  function fact(k) { var f = 1; for (var i = 2; i <= k; i++) f *= i; return f; }
+  function polyTxt(c, pow2) {
+    var parts = [];
+    if (pow2) parts.push({ s: 1, t: "2ⁿ" });
+    for (var i = c.length - 1; i >= 0; i--) { var a = c[i]; if (!a) continue; var v = Math.abs(a), mon = i === 0 ? String(v) : (v === 1 ? "" : String(v)) + "n" + (i === 2 ? "²" : i === 3 ? "³" : ""); parts.push({ s: a > 0 ? 1 : -1, t: mon }); }
+    if (!parts.length) return "0";
+    return parts.map(function (p, j) { return (j === 0 ? (p.s < 0 ? "−" : "") : (p.s < 0 ? " − " : " + ")) + p.t; }).join("");
+  }
+  A.kpolyTxt = polyTxt;
+  function pickWrong(right, cands, k) { var out = [], seen = {}; seen[right] = 1; cands.forEach(function (c) { if (out.length < k && isFinite(c[0]) && Math.round(c[0]) === c[0] && !seen[c[0]]) { seen[c[0]] = 1; out.push(c); } }); return out; }
+  function diffsMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["numeric", "counting"]), params = { decoy: decoy };
+    var vals = [], m, right, wrongs, explain, lead;
+    var noun = form === "counting" ? "شمارِ چوب‌کبریت‌ها در شکلِ شمارهٔ n" : "جملهٔ nام";
+    if (!decoy) {
+      var d = level === 1 ? pick(r, [1, 2]) : level === 2 ? 2 : 3, c = [];
+      for (var i = 0; i <= d; i++) c.push(form === "counting" ? ri(r, 0, 4) : ri(r, -3, 5));
+      c[d] = ri(r, 1, 3); m = d + 3;
+      for (var n = 1; n <= m; n++) vals.push(polyVal(c, n));
+      right = polyVal(c, m + 1); var K = c[d] * fact(d), D1 = vals[m - 1] - vals[m - 2];
+      params.c = c; params.d = d;
+      wrongs = pickWrong(right, [[vals[m - 1] + D1, "lin"], [right + K, "twice"], [right - K, "skip"], [Math.round(vals[m - 1] * vals[m - 1] / (vals[m - 2] || 1)), "ratio"], [right + 1, "off"], [right - 1, "off"], [right + 2 * K, "twice"]], 3);
+      explain = "تفاضل‌های مرتبهٔ " + fa(d) + " همه " + fa(K) + " اند (ضریبِ جملهٔ اصلی × " + fa(d) + "!). هر سطرِ تفاضل را یک خانه جلو ببر و از پایین بالا بیا: جملهٔ " + fa(m + 1) + " = " + fa(right) + ". تکرارِ آخرین تفاضل فقط وقتی درست است که خودِ تفاضل‌های مرتبهٔ اول ثابت باشند.";
+      lead = "تفاضل‌های پیاپی را بساز تا به سطری برسی که ثابت است.";
+    } else {
+      var q = pick(r, [2, 3]), b = ri(r, 1, 3); m = 5;
+      for (var n2 = 1; n2 <= m; n2++) vals.push(b * Math.pow(q, n2));
+      right = b * Math.pow(q, m + 1); params.q = q; params.b = b;
+      var Dd = seqDiffs(vals), poly = (function () { var R = Dd.rows, add = R[R.length - 1][0]; for (var k = R.length - 2; k >= 0; k--) add = R[k][R[k].length - 1] + add; return add; })();
+      params.poly = poly;
+      wrongs = pickWrong(right, [[poly, "poly"], [vals[m - 1] + (vals[m - 1] - vals[m - 2]), "lin"], [right - b, "off"], [right + vals[0], "off"]], 3);
+      explain = "تفاضل‌ها هرگز ثابت نمی‌شوند: هر سطرِ تفاضل همان دنباله ضربدرِ " + fa(q - 1) + " است (Δ(b·qⁿ) = (q−1)·b·qⁿ)؛ پس الگو چندجمله‌ای نیست. نسبتِ هر جمله به قبلی " + fa(q) + " است ⇒ جملهٔ " + fa(m + 1) + " = " + fa(right) + ". برون‌یابیِ چندجمله‌ای از " + fa(m) + " نقطه همیشه شدنی است و این‌جا " + fa(poly) + " می‌دهد — غلط.";
+      lead = "تفاضل‌های پیاپی را بساز؛ اگر هیچ سطری ثابت نشد، الگوی دیگری بجوی.";
+    }
+    if (wrongs.length < 3) throw new Error("diffs: not enough distinct choices");
+    params.m = m; params.vals = vals;
+    var lab = function (v) { return ltr("f(" + (m + 1) + ") = " + v); };
+    var texts = [lab(right)].concat(wrongs.map(function (w) { return lab(w[0]); }));
+    var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice", answer: ids[0], params: params };
+    it.choices = texts.map(function (t, j) { return { id: ids[j], t: t }; }).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+    it.prompt = noun + " برای n = ۱ تا " + fa(m) + ": " + vals.map(fa).join("، ") + ".\n" + lead + " جملهٔ بعد (n = " + fa(m + 1) + ") چیست؟";
+    it.explain = explain;
+    it.deep = "جدولِ حالت‌ها را خودت بساز و تفاضل‌های پیاپی بگیر: سطرِ ثابتِ مرتبهٔ d یعنی چندجمله‌ایِ درجهٔ d، و همان جدول حدس را دقیق‌تر می‌کند (Pólya 1945، «استقرا»؛ روشِ تفاضل‌ها). ولی جدول حدس است، نه برهان؛ و اگر هیچ سطری ثابت نشد، الگو از این نوع نیست.";
+    it.trap = decoy ? "پافشاری بر روشِ تفاضل‌ها وقتی هیچ سطری ثابت نمی‌شود (برون‌یابیِ چندجمله‌ای همیشه «جوابی» می‌دهد)." : "تکرارِ آخرین تفاضل به‌جای رفتن تا سطری که واقعاً ثابت است، یا افزودنِ دوبارهٔ ثابت.";
+    return it;
+  }
+
+  /* ---------- (س) حدس‌های رقیب (F4؛ آزمودنِ نظام‌مندِ چند حدس و این‌که کدام آزمون شایسته است) ----------
+     سه فرمولِ رقیب برای جملهٔ nام: درست (T)، رقیبی که با سه حالتِ نخست می‌خواند (T + k(n−1)(n−2)(n−3)) و رقیبی که با دو حالت می‌خواند
+     (T + k(n−1)(n−2)). غیربدلی: جدولِ n = ۱ تا ۴ ⇒ فقط T می‌ماند — «پشتیبانی شد، برهان می‌خواهد». بدلی: جدولِ n = ۱ تا ۳ ⇒ دو رقیب هر دو
+     می‌خوانند و پاسخ «حالتِ جداکننده را بیازما» با مقدارِ هر دو در n = ۴ است. پاسخ و مقدارها با کد. */
+  function rivalsMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["numeric", "everyday"]);
+    var T = level === 1 ? { c: [ri(r, 0, 5), ri(r, 2, 5)] } : level === 2 ? { c: [ri(r, 0, 4), ri(r, 0, 3), ri(r, 1, 2)] } : { c: [ri(r, -1, 3)], pow2: true };
+    var k2 = ri(r, 1, 2), k3 = ri(r, 1, 2);
+    function addPoly(c, add) { var o2 = c.slice(); while (o2.length < add.length) o2.push(0); add.forEach(function (a, i) { o2[i] += a; }); return o2; }
+    var R2 = { c: addPoly(T.c, [-6 * k2, 11 * k2, -6 * k2, k2]), pow2: T.pow2 }, R3 = { c: addPoly(T.c, [2 * k3, -3 * k3, k3]), pow2: T.pow2 };
+    function val(F, n) { return polyVal(F.c, n) + (F.pow2 ? Math.pow(2, n) : 0); }
+    var L = ["«الف»", "«ب»", "«پ»"], ord = shuf(r, [0, 1, 2]), F = [T, R2, R3], lab = {};
+    ord.forEach(function (fi, j) { lab[fi] = L[j]; });
+    var N = decoy ? 3 : 4, table = []; for (var n = 1; n <= N; n++) table.push(val(T, n));
+    var noun = form === "everyday" ? "شمارِ مراجعانِ روزِ nام (سه همکار هر کدام قاعده‌ای حدس زده‌اند)" : "جملهٔ nام";
+    var prompt = "سه حدسِ رقیب برای " + noun + ": " + ord.map(function (fi, j) { return L[j] + ": " + ltr(polyTxt(F[fi].c, F[fi].pow2)); }).join("؛ ") +
+      ".\nحالت‌هایی که دیده‌ای: " + table.map(function (v, i) { return "n = " + fa(i + 1) + " ⇒ " + fa(v); }).join("، ") + ". کدام داوری درست است؟";
+    var right, wrongs, explain;
+    if (!decoy) {
+      right = "فقط " + lab[0] + " با همهٔ حالت‌ها می‌خواند؛ پشتیبانی شد ولی هنوز برهان می‌خواهد";
+      wrongs = [lab[1] + " هم پذیرفتنی است — با سه حالتِ نخست می‌خواند", "هر سه پذیرفتنی‌اند — همه با حالتِ n = ۱ می‌خوانند", "فقط " + lab[0] + " با همهٔ حالت‌ها می‌خواند؛ پس ثابت شد"];
+      explain = lab[2] + " در n = ۳ (" + fa(val(R3, 3)) + " به‌جای " + fa(table[2]) + ") و " + lab[1] + " در n = ۴ (" + fa(val(R2, 4)) + " به‌جای " + fa(table[3]) + ") رد می‌شوند. حدسی که از همهٔ حالت‌ها گذشت جدی‌تر شد، ولی چند حالت برهان نیست.";
+    } else {
+      right = lab[0] + " و " + lab[1] + " هر دو با جدول می‌خوانند؛ حالتِ n = ۴ جدایشان می‌کند (" + lab[0] + " ⇒ " + fa(val(T, 4)) + "، " + lab[1] + " ⇒ " + fa(val(R2, 4)) + ") — همان را بیازما";
+      wrongs = ["فقط " + lab[0] + " درست است چون ساده‌تر است — آزمونِ دیگری لازم نیست", lab[0] + " و " + lab[1] + " هر دو ثابت شدند — با هر سه حالت می‌خوانند", lab[2] + " هم پذیرفتنی است — با دو حالتِ نخست می‌خواند"];
+      explain = lab[2] + " در n = ۳ رد می‌شود؛ دو رقیبِ دیگر با هر سه حالت می‌خوانند. آزمونِ شایسته آن است که رقیب‌ها را از هم جدا کند: در n = ۴ یکی " + fa(val(T, 4)) + " و دیگری " + fa(val(R2, 4)) + " می‌دهد. سادگی دلیلی برای ترجیح است، نه جای آزمون.";
+    }
+    var texts = [right].concat(wrongs);
+    if (new Set(texts).size < 4) throw new Error("rivals: duplicate choices");
+    var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice", answer: ids[0] };
+    it.params = { T: T, R2: R2, R3: R3, lab: [lab[0], lab[1], lab[2]], table: table, k2: k2, k3: k3 };
+    it.choices = texts.map(function (t, j) { return { id: ids[j], t: t }; }).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+    it.prompt = prompt; it.explain = explain;
+    it.deep = "چند حدسِ رقیب را با هم نگه دار و نظام‌مند بیازما: هر حالت یکی‌دو رقیب را حذف می‌کند و آزمونِ شایسته آن است که رقیب‌های مانده را از هم جدا کند (Pólya 1945، «استدلالِ معقول»). حدسی که ماند، پشتیبانی شد — نه ثابت.";
+    it.trap = decoy ? "ترجیحِ یک حدس (ساده‌تر/دوست‌داشتنی‌تر) به‌جای آزمودنِ حالتی که رقیب‌ها را جدا می‌کند." : "پذیرفتنِ رقیبی که با چند حالتِ نخست می‌خواند، یا «ثابت شد» از روی چند حالت.";
+    return it;
+  }
+
+  /* ---------- (ع) حدس با قیاس و استقرا با قیاس (F4؛ ۱ ، ۲ ، ۳ بُعد ⇐ d بُعد؛ بیشینه با قیاس) ----------
+     شکلِ «هندسی»: شمارِ رأس/یال/وجهِ مکعب در بُعدهای ۱ تا ۳ ⇐ بُعدِ d (۲^d، d·۲^(d−1)، ۲d — با قیاسِ ساختن: مکعبِ d‌بعدی = دو نسخهٔ (d−1)‌بعدی
+     + پیوندِ رأس‌های متناظر). بدلی: سادک (۲، ۳، ۴ رأس) که ادامهٔ سادهٔ الگو درست است. شکلِ «بیشینه»: پاره‌خط ⇐ مربع ⇐ مکعب (جعبه با مجموعِ
+     یال‌های ثابت؛ سطحِ ۳: جعبهٔ چهاربعدی با ۳۲ یال)؛ بدلی: خودِ حالتِ دوبعدی. پاسخ با کد. */
+  function cubeCount(f, d) { return f === "v" ? Math.pow(2, d) : f === "e" ? d * Math.pow(2, d - 1) : 2 * d; }
+  function simplexCount(f, d) { return f === "e" ? chooseN(d + 1, 2) : d + 1; }
+  A.kcubeCount = cubeCount;
+  function analogyMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["geometric", "extremal"]), right, wrongs, prompt, explain, unit, params = { decoy: decoy };
+    if (form === "geometric") {
+      var f = decoy ? pick(r, ["v", "f"]) : level === 1 ? pick(r, ["v", "f"]) : "e", d = level === 1 ? 4 : level === 2 ? pick(r, [4, 5]) : pick(r, [5, 6]);
+      var cnt = decoy ? simplexCount : cubeCount, other = decoy ? cubeCount : simplexCount, v3 = [1, 2, 3].map(function (k) { return cnt(f, k); });
+      unit = { v: "رأس", e: "یال", f: "وجهِ مرزی" }[f]; right = cnt(f, d);
+      var names = decoy ? ["پاره‌خط", "مثلث", "چهاروجهی"] : ["پاره‌خط", "مربع", "مکعب"];
+      var lin = v3[2] + (v3[2] - v3[1]) * (d - 3), Dq = seqDiffs(v3), quad = (function () { var R = [v3.slice()]; for (var s = 3; s < d; s++) { var D2 = seqDiffs(R[0]); R[0].push(D2.next != null ? D2.next : R[0][R[0].length - 1]); } return R[0][R[0].length - 1]; })();
+      wrongs = pickWrong(right, [[lin, "lin"], [quad, "quad"], [v3[2] * Math.pow(2, d - 3), "double"], [other(f, d), "other"], [right + d, "off"], [right - 1, "off"], [right + 1, "off"]], 3);
+      params.f = f; params.d = d; params.obj = decoy ? "simplex" : "cube"; params.v3 = v3; params.Dq = Dq.order;
+      prompt = "شمارِ «" + unit + "»ها: " + names.map(function (nm, i) { return nm + " (بُعدِ " + fa(i + 1) + ") ⇒ " + fa(v3[i]); }).join("، ") + ".\nبا قیاس، همتای " + fa(d) + "‌بعدیِ همین شکل چند " + unit + " دارد؟ (اول بپرس هر بُعدِ تازه چطور از قبلی ساخته می‌شود.)";
+      explain = decoy ? "سادکِ d‌بعدی از سادکِ (d−1)‌بعدی با افزودنِ یک رأسِ تازه (و وصلش به همه) ساخته می‌شود؛ پس رأس‌ها و وجه‌ها d + 1 اند و ادامهٔ سادهٔ الگو همین‌جا درست است: " + fa(right) + "."
+        : "مکعبِ d‌بعدی = دو نسخهٔ مکعبِ (d−1)‌بعدی + پیوندِ هر رأس با همتایش ⇒ رأس‌ها ۲^d، یال‌ها d·۲^(d−1) و وجه‌های مرزی ۲d. در بُعدِ " + fa(d) + ": " + fa(right) + ". ادامهٔ خطیِ سه عدد قیاسِ ساختن نیست.";
+    } else {
+      var k = ri(r, 2, 6);
+      if (!decoy) {
+        var four = level === 3, nE = four ? 32 : 12, L = nE * k; right = Math.pow(k, four ? 4 : 3); unit = "واحدِ " + (four ? "ابرحجم" : "حجم");
+        params.k = k; params.dims = four ? 4 : 3; params.L = L;
+        prompt = "پاره‌خطی به طولِ " + fa(2 * k) + " را دو تکه کن: حاصل‌ضربِ دو تکه وقتی بیشینه است که تکه‌ها برابر باشند. مستطیلی با محیطِ " + fa(4 * k) + ": بیشینهٔ مساحت در مربع است.\nبا قیاس: " +
+          (four ? "جعبه‌ای چهاربعدی (۳۲ یال، ۸ یال در هر جهت)" : "جعبه‌ای (مکعب‌مستطیل) که") + " مجموعِ طولِ همهٔ یال‌هایش " + fa(L) + " است، بیشترین " + (four ? "ابرحجمش" : "حجمش") + " چند است؟";
+        wrongs = pickWrong(right, [[Math.pow(L / 4, 2), "area"], [Math.pow(2 * k, 3), "half"], [Math.pow(k, 2) * (L / 4), "mix"], [Math.pow(k + 1, four ? 4 : 3), "off"], [Math.pow(k, four ? 3 : 2), "dim"], [Math.pow(k - 1, four ? 4 : 3) * 2, "off"]], 3);
+        explain = "قیاس: در هر بُعد، تقسیمِ برابر بیشینه می‌دهد ⇒ همهٔ یال‌ها برابر (مکعب). مجموعِ یال‌ها " + fa(nE) + " × ضلع = " + fa(L) + " ⇒ ضلع " + fa(k) + " ⇒ " + fa(right) + ". قیاس حدس است؛ برهانش نابرابریِ میانگین‌هاست.";
+      } else {
+        right = k * k; unit = "واحدِ مساحت"; params.k = k; params.dims = 2;
+        prompt = "پاره‌خطی به طولِ " + fa(2 * k) + " را دو تکه کن: حاصل‌ضربِ دو تکه وقتی بیشینه است که تکه‌ها برابر باشند.\nمستطیلی که محیطش " + fa(4 * k) + " است، بیشترین مساحتش چند است؟";
+        wrongs = pickWrong(right, [[2 * k * k, "dbl"], [4 * k * k, "full"], [k * k * k, "cube"], [k * (k + 1), "off"], [k * k - 1, "off"], [(k + 1) * (k + 1), "off"]], 3);
+        explain = "همان حالتِ دوبعدی: دو بُعدِ برابر (مربع) ⇒ ضلع " + fa(k) + " ⇒ " + fa(right) + ". این‌جا قیاس با پاره‌خط مستقیم کار می‌کند و دامی نیست.";
+      }
+    }
+    if (wrongs.length < 3) throw new Error("analogy: not enough distinct choices");
+    var tx = function (v) { return fa(v) + " " + unit; };
+    var texts = [tx(right)].concat(wrongs.map(function (w) { return tx(w[0]); }));
+    if (new Set(texts).size < 4) throw new Error("analogy: duplicate choices");
+    params.right = right;
+    var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice", answer: ids[0], params: params };
+    it.choices = texts.map(function (t, j) { return { id: ids[j], t: t }; }).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+    it.prompt = prompt; it.explain = explain;
+    it.deep = "حدس با قیاس: نتیجهٔ آشنای مشابه (یک بُعد کمتر، شکلِ ساده‌تر) را پیدا کن و بپرس چه چیزی از آن «به همان شیوه» به این‌جا می‌آید؛ استقرا با قیاس: ۱، ۲، ۳ بُعد ⇐ n بُعد (Pólya 1945، «قیاس»؛ «استقرا»). قیاس حدس می‌دهد، نه برهان — و باید پرسید کجا می‌شکند.";
+    it.trap = decoy ? "پیچیده‌کردنِ قیاسی که مستقیم کار می‌کند." : "ادامهٔ عددیِ سه حالت (خطی یا دوبرابر) به‌جای قیاسِ ساختن، یا بردنِ پاسخِ دوبعدی بی‌تغییر به سه‌بعدی.";
+    return it;
+  }
+
   A.KGEN = {
     jars: { fa: "کوزه‌های آب", src: "Luchins 1942", fams: ["F3"], forms: ["numeric", "real", "visual"], what: "اثرِ آمادگیِ ذهنی: پس از گرم‌کردن با یک فرمول، آیا راهِ کوتاه‌تر را می‌بینی؟ کدام راه را رفتی ثبت می‌شود.", make: jarsMake },
     rule246: { fa: "قاعدهٔ پنهانِ ۲-۴-۶", src: "Wason 1960؛ Klayman & Ha 1987", fams: ["F4", "F11"], forms: ["abstract", "real"], what: "کشفِ قاعده با آزمودن: پیش از اعلام باید آزمون بدهی؛ شمارِ آزمون‌های ابطالی ثبت می‌شود.", make: r246Make },
@@ -844,7 +1083,11 @@
     eqtrans: { fa: "ترجمهٔ شرط به رابطه (جدولِ دوستونی)", src: "Pólya 1945 (Setting up equations)؛ Clement 1982", fams: ["F2"], forms: ["verbal", "real", "abstract"], mv: ["mv_equation"], what: "سطرِ «بیانِ کلامی ⇐ رابطه» را کامل کن و جهتِ رابطه را با یک عددِ ساده بیازما (خطای وارونه‌نویسی).", make: eqtransMake },
     dimtest: { fa: "آزمونِ ابعاد", src: "Pólya 1945 (Test by dimension)", fams: ["F4"], forms: ["abstract", "real"], mv: ["mv_dimcheck"], what: "کدام فرمول ناهم‌بُعد است؟ — و این‌که گذشتن از آزمون درستی را ثابت نمی‌کند.", make: dimtestMake },
     guesstest: { fa: "حدس را بیازما", src: "Pólya 1945 (Guess and test؛ Induction)", fams: ["F4"], forms: ["numeric", "geometric"], mv: ["mv_special"], what: "حدسی صریح؛ کدام حالتِ خاص، مثالِ نقض یا حالتِ حدی ردش می‌کند — یا اگر از همهٔ آزمون‌ها گذشت، هنوز برهان می‌خواهد.", make: guessMake },
-    dimform: { fa: "شکلِ قانون از ابعاد", src: "Pólya 1945 (Test by dimension)؛ Rayleigh 1915", fams: ["F4"], forms: ["mechanics", "everyday"], mv: ["mv_dimcheck"], what: "پیش از فرمول، شکلِ قانون را با ابعاد حدس بزن (آونگ: T = c·√(l/g))؛ ضریب و وابستگی به کمیتِ بی‌بُعد را ابعاد نمی‌دهد.", make: dimformMake }
+    dimform: { fa: "شکلِ قانون از ابعاد", src: "Pólya 1945 (Test by dimension)؛ Rayleigh 1915", fams: ["F4"], forms: ["mechanics", "everyday"], mv: ["mv_dimcheck"], what: "پیش از فرمول، شکلِ قانون را با ابعاد حدس بزن (آونگ: T = c·√(l/g))؛ ضریب و وابستگی به کمیتِ بی‌بُعد را ابعاد نمی‌دهد.", make: dimformMake },
+    /* R4 (تصمیمِ مالک ۲۰۲۶-۱۰-۱۵): فنون حدس — جدولِ حالت‌ها و تفاضل‌ها، حدس‌های رقیب، قیاس */
+    diffs: { fa: "تفاضل‌های پیاپی", src: "Pólya 1945 (Induction؛ Pattern of plausible inference)؛ روشِ تفاضل‌ها", fams: ["F4"], forms: ["numeric", "counting"], mv: ["mv_special", "mv_general"], what: "جدولِ حالت‌ها ⇐ تفاضل‌های پیاپی ⇐ سطرِ ثابت ⇐ جملهٔ بعد؛ و این‌که اگر هیچ سطری ثابت نشد، الگو چندجمله‌ای نیست.", make: diffsMake },
+    rivals: { fa: "حدس‌های رقیب", src: "Pólya 1945 (Guess and test)؛ Pólya 1954 (Plausible reasoning)", fams: ["F4"], forms: ["numeric", "everyday"], mv: ["mv_special"], what: "چند حدسِ رقیب با یک جدول: کدام می‌ماند، و کدام حالت رقیب‌های مانده را از هم جدا می‌کند — ماندن یعنی پشتیبانی، نه برهان.", make: rivalsMake },
+    analogy: { fa: "حدس با قیاس", src: "Pólya 1945 (Analogy؛ Induction)", fams: ["F4"], forms: ["geometric", "extremal"], mv: ["mv_analogy"], what: "از ۱، ۲، ۳ بُعد به d بُعد و از مربع به مکعب: قیاسِ ساختن، نه ادامهٔ عددی — و حالتی که قیاسِ ساده خودش درست است.", make: analogyMake }
   };
   /* ساختِ تکرارپذیر از روی دانه؛ اگر نمونه‌ای نشت داشت، با ادامهٔ همان دنباله دوباره می‌سازد */
   A.kgenMake = function (key, seed, level, decoy, form) {

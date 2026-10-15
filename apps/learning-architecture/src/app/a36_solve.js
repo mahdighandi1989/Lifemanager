@@ -64,7 +64,7 @@
     return h("div", { class: "col" }, h("label", { for: id }, label), el);
   }
   function selF(id, label, opts, val, onPick) {
-    return h("div", { class: "col" }, h("label", { for: id }, label), h("select", { id: id, onchange: function (e) { onPick(e.target.value); } }, h("option", { value: "" }, "—"), opts.map(function (o) { var v = Array.isArray(o) ? o[0] : o; return h("option", { value: v, selected: val === v }, Array.isArray(o) ? o[1] : o); })));
+    return h("div", { class: "col", style: { minWidth: "0", maxWidth: "100%" } }, h("label", { for: id }, label), h("select", { id: id, style: { maxWidth: "100%" }, onchange: function (e) { onPick(e.target.value); } }, h("option", { value: "" }, "—"), opts.map(function (o) { var v = Array.isArray(o) ? o[0] : o; return h("option", { value: v, selected: val === v }, Array.isArray(o) ? o[1] : o); })));
   }
   function planList(t, cls) {
     return h("details", { class: "small sv-plan " + (cls || ""), dir: "rtl" }, h("summary", {}, "پرسش‌هایی که در این مسئلهٔ " + (t === "find" ? "یافتنی" : t === "prove" ? "اثباتی" : "«اثبات یا رد کن»") + " از خودت می‌پرسی"),
@@ -109,8 +109,10 @@
   /* تمرینِ «حدس را بیازما» — نمونهٔ ساختهٔ کد (A.KGEN.guesstest ِ a17) روی صفحهٔ حرکتِ «حالتِ خاص»؛ پاسخ به موعدِ همان حرکت می‌رود */
   function guessDrill() {
     if (!A.moveGenDrill || !(A.KGEN && A.KGEN.guesstest)) return null;
-    var det = h("details", { class: "small sv-gdrill" }, h("summary", {}, "تمرینِ آزمودنِ حدس: یک نمونهٔ تازه (حالتِ خاص، مثالِ نقض، حالتِ حدی)"));
-    det.addEventListener("toggle", function () { if (det.open && !det.querySelector(".mv-gen")) det.appendChild(A.moveGenDrill("mv_special", "guesstest")); });
+    var det = h("details", { class: "small sv-gdrill" }, h("summary", {}, "تمرینِ آزمودنِ حدس: یک نمونهٔ تازه (حالتِ خاص، مثالِ نقض، حالتِ حدی؛ تفاضل‌ها، حدس‌های رقیب، قیاس)"));
+    det.addEventListener("toggle", function () { if (det.open && !det.querySelector(".mv-gen")) { det.appendChild(A.moveGenDrill("mv_special", "guesstest"));
+      /* R4: جدولِ حالت‌ها/تفاضل‌ها، حدس‌های رقیب، حدس با قیاس — هر کدام به موعدِ حرکتِ خودش */
+      [["mv_special", "diffs"], ["mv_special", "rivals"], ["mv_analogy", "analogy"]].forEach(function (x) { if (A.KGEN[x[1]]) { var g = A.moveGenDrill(x[0], x[1]); if (g) det.appendChild(g); } }); } });
     return det;
   }
   A.solveGuessDrill = guessDrill;
@@ -149,6 +151,9 @@
       box.appendChild(field("svTest" + lv, "حدست را بیازما: یک حالتِ خاص، حالتِ حدی یا مثالِ نقض بنویس که می‌تواند ردش کند", d.test, function (v) { d.test = v; }, 2));
       box.appendChild(selF("svTestR" + lv, "این آزمون چه نشان داد؟", ["حدس سالم ماند", "حدس رد شد — حدسِ تازه لازم است", "نتوانستم بیازمایم"], d.testRes, function (v) { d.testRes = v; }));
       box.appendChild(selF("svIfRef" + lv, "اگر آزمونی حدس را رد کند، چه می‌کنی؟", ["حدس را کنار می‌گذارم یا اصلاحش می‌کنم", "آزمون را نادیده می‌گیرم چون حدسم قوی است", "حدس را بی‌تغییر نگه می‌دارم و دیگر نمی‌آزمایم"], d.ifRef, function (v) { d.ifRef = v; }));
+      d.kit = d.kit || blankKit();
+      box.appendChild(kitUI(d.kit, { idp: "svGK" + lv, open: true, drills: false, title: "ابزارهای حدس — پیش از آزمودن: قیاس، جدولِ حالت‌ها، حدسِ دقیق، حدس‌های رقیب",
+        intro: "حدس را از کجا آوردی؟ یک نتیجهٔ آشنای مشابه (قیاس)، چند حالتِ خاص که خودت حساب کنی (جدول)، حدس به زبانِ دقیق (فرمول)، و دست‌کم یک حدسِ رقیب با آزمونش. کد جدول و فرمول و رقیب‌ها را می‌سنجد." }));
       box.appendChild(guessDrill());
     }
     box.appendChild(planList(d.type));
@@ -170,6 +175,7 @@
         if (fresh) {
           var seen = !guessFresh(pg);   // اگر در همین فاصله گامی دیده شد، حدس دیگر پیش‌بینی نیست ⇒ بیرون از کالیبراسیون
           s.g[lv] = { guess: txt(d.guess), conf: +d.conf || null, test: txt(d.test), testRes: d.testRes, ifRef: d.ifRef, before: !seen, seen: seen, at: nowISO() };
+          if (!kitEmpty(d.kit)) { s.g[lv].kit = kitCopy(d.kit); if (!d.kit.chk && A.kguessCheck) { var kr = A.kguessCheck(d.kit); s.g[lv].kit.chk = { at: nowISO(), ok: kr.ok, issues: kr.issues, order: kr.table ? kr.table.order : null, fits: kr.formula ? kr.formula.fits : null, sep: kr.rivals && kr.rivals.sep ? kr.rivals.sep : null }; } }
           if (txt(d.test)) seed(s, "g");
         }
         S.put(pg); delete DRAFT[key]; A.toast("فهمِ تو ثبت شد؛ از فردا بی‌نگاه مرور می‌شود."); A.render();
@@ -282,10 +288,10 @@
   A.SOLVE_CP_MIN = 10;   // پس از چند دقیقه روی یک گام کارتِ ایست خودش پیشنهاد می‌شود؛ دکمه‌اش همیشه هست
   var cpTimer = null;
   function cpCard(p, pg, st, s0) {
-    var s = sol(pg), d = { prog: "", gain: "" };
+    var s = sol(pg), d = { prog: "", gain: "" }, willSlot = h("div", { class: "sv-cpwill" });
     var box = h("section", own({ class: "card soft sv-cp", role: "group", "aria-label": "ایستِ پیشرفت" }), h("h4", {}, "⏸ ایست: نشانه‌های پیشرفت"),
       h("p", { class: "small" }, "مدتی است روی همین گامی. پیش از ادامه: پیشرفتی داشته‌ای؟ تا این‌جا چه به دست آمده؟ گاهی ادامه درست است، گاهی تغییرِ مسئله (حالتِ خاص، بخشی از شرط، مسئلهٔ کمکی)، و گاهی کنار گذاشتن تا فردا — ذهن در فاصله کار می‌کند."),
-      selF("svCpP", "پیشرفتی داشته‌ای؟", ["بله، روشن", "کمی", "نه"], "", function (v) { d.prog = v; }),
+      selF("svCpP", "پیشرفتی داشته‌ای؟", ["بله، روشن", "کمی", "نه"], "", function (v) { d.prog = v; willSlot.innerHTML = ""; if (v === "نه") { var hs = A.willHost("prob", p.id); if (hs) willSlot.appendChild(A.willCard(hs, "stuck", "پیشرفتی نبود: پیش از ادامه، تغییر یا کنار گذاشتن — کوچک‌ترین گامی که تا وارسیِ بعد برمی‌داری چیست؟ (اختیاری؛ روزِ موعد برمی‌گردد)")); } }),
       field("svCpG", "دستاوردِ اصلی تا این‌جا چه بود؟ (حتی «فهمیدم کدام راه کار نمی‌کند»)", "", function (v) { d.gain = v; }, 2),
       selF("svCpFeel", "راهِ فعلی چه حسی می‌دهد؟ (نشانهٔ پیشرفت: هماهنگ و متعادل شدنِ تکه‌ها)", ["متعادل و هماهنگ — تکه‌ها جا می‌افتند", "ناهماهنگ — چیزی جا نمی‌افتد", "هنوز حسی ندارم"], "", function (v) { d.feel = v; }));
     function rec(choice) {
@@ -303,6 +309,7 @@
       h("button", { class: "btn ghost sm sv-cpaside", type: "button", onclick: function () { var e = rec("کنار گذاشتن"); if (!e) return;
         s.aside = { lv: st.lv, i: st.i, sid: s0.id, order: st.order, gain: e.gain, at: e.at, due: tomorrow() }; S.put(pg);
         A.toast("کنار گذاشتی؛ فردا در «امروز» برمی‌گردد."); A.go("e_prob"); } }, "کنار می‌گذارم تا فردا")));
+    box.appendChild(willSlot);
     box.appendChild(more);   // پیش‌تر به‌عنوانِ آرگومانِ دومِ appendChild گم می‌شد: پیشنهادهای «تغییرِ مسئله» هرگز دیده نمی‌شدند
     return box;
   }
@@ -348,7 +355,11 @@
         var g = lastG() || {};
         card.appendChild(h("p", { class: "small" }, "حدسِ پیشینت: «" + (g.guess || "—") + "»"));
         card.appendChild(field("svRG", "یک حالتِ خاص یا مثالِ نقضِ تازه بنویس که این حدس را بیازماید، و نتیجه‌اش را", "", function (v) { d.g = v; }, 3));
-        reveal = function () { return [h("p", { class: "small" }, h("strong", {}, "پاسخِ مسئله: "), String(p.answer || "—")), g.test ? h("p", { class: "small muted" }, "آزمونِ پیشینت: " + g.test) : null]; };
+        var gk = g.kit || null, grv = gk ? (gk.rivals || []).filter(function (x) { return txt(x.t); }) : [];
+        if (grv.length) card.appendChild(field("svRGR", "حدس‌های رقیبت چه بودند و کدام حالت جدایشان می‌کرد؟ (بی‌نگاه)", "", function (v) { d.gr = v; }, 2));
+        reveal = function () { return [h("p", { class: "small" }, h("strong", {}, "پاسخِ مسئله: "), String(p.answer || "—")), g.test ? h("p", { class: "small muted" }, "آزمونِ پیشینت: " + g.test) : null,
+          grv.length ? h("p", { class: "small muted" }, "رقیب‌هایت: " + grv.map(function (x) { return "«" + x.t + "»" + (x.test ? " (آزمون: " + x.test + ")" : ""); }).join("، ") + (gk.chk && gk.chk.sep ? " · حالتِ جداکننده: " + LT("n = " + gk.chk.sep.n) : "")) : null,
+          gk && txt(gk.formula) ? h("p", { class: "small muted" }, "حدسِ دقیقت: " + gk.formula + (gk.chk && gk.chk.fits === false ? " (با جدولت نمی‌خواند)" : "")) : null]; };
       } else if (ph === "t") {
         var te = lastT() || {}, ts = (p.stages || []).filter(function (x) { return x.id === te.sid; })[0];
         card.appendChild(h("p", { class: "small" }, "پرسش: «" + (te.q || "—") + "»" + (ts ? " — در گامِ «" + clip(ts.q, 90) + "»" : "")));
@@ -409,6 +420,9 @@
     box.appendChild(h("h4", {}, "۵) نتیجه یا روش را کجای دیگر به کار می‌بری؟"));
     box.appendChild(field("svLbUse" + lv, "درسِ تو: این روش یا نتیجه کجای دیگر به کار می‌آید؟", d.use, function (v) { d.use = v; }, 2));
     box.appendChild(field("svLbNew" + lv, "یک مسئلهٔ تازه بساز که با همین روش (یا با همین نتیجه) حل شود", d.newProb, function (v) { d.newProb = v; }, 2));
+    d.kit = d.kit || blankKit();
+    box.appendChild(kitUI(d.kit, { idp: "svLK" + lv, parts: ["table", "formula", "rivals", "ana"], title: "تعمیم با جدول: یک داده را n بگیر — حالت‌ها، تفاضل‌ها، حکمِ دقیق، و رقیبِ آن",
+      intro: "مسئله را کلی کن: یکی از داده‌ها را n بگیر و نتیجه را برای n = ۱، ۲، ۳ … خودت حساب کن. کد تفاضل‌های پیاپی را می‌سازد؛ حکمِ کلی را دقیق (فرمول) بنویس تا با هر حالت سنجیده شود. یک حکمِ رقیب هم بنویس و بگو کدام حالت جدایشان می‌کند. قیاس: همین نتیجه در یک بُعد کمتر یا بیشتر چه می‌شود؟" }));
     if (g && g.guess) {
       box.appendChild(h("h4", {}, "حدست پیش از حل"));
       box.appendChild(h("p", { class: "small" }, "حدست: «" + g.guess + "»" + (g.conf ? " با اطمینانِ " + fa(g.conf) + "٪" : "") + " · پاسخ: «" + String(p.answer || "—") + "»"));
@@ -423,7 +437,9 @@
       var rec = { chk: d.chk, chkHow: txt(d.chkHow), chkRes: d.chkRes, arg: txt(d.arg), other: txt(d.other), glance: txt(d.glance), use: txt(d.use), newProb: txt(d.newProb), at: nowISO(), done: true };
       var EXTRA = [["short", "ساده‌تر/کوتاه‌تر"], ["better", "بهتر کردنِ راه"], ["crit", "مقدارهای بحرانی"], ["clumsy", "تلاشِ ناشیانه و چرایش"], ["main", "ایدهٔ اصلیِ برهان"], ["intu", "گامِ شهودیِ پذیرفته"], ["pic", "تصویرِ شهودی"], ["taste", "سلیقه"]];
       EXTRA.forEach(function (x) { if (txt(d[x[0]])) rec[x[0]] = txt(d[x[0]]); });
+      if (!kitEmpty(d.kit)) rec.kit = kitCopy(d.kit);
       var extraTxt = EXTRA.filter(function (x) { return rec[x[0]]; }).map(function (x) { return x[1] + ": " + rec[x[0]]; }).join("\n");
+      if (rec.kit && txt(rec.kit.formula)) extraTxt += (extraTxt ? "\n" : "") + "حکمِ کلیِ دقیق (فرمولِ n): " + txt(rec.kit.formula) + (rec.kit.rivals || []).filter(function (x) { return txt(x.t); }).slice(1).map(function (x) { return " · رقیب: " + txt(x.t) + (txt(x.test) ? " (آزمون: " + txt(x.test) + ")" : ""); }).join("");
       s.b[lv] = rec;
       var les = { lv: lv, use: rec.use, newProb: rec.newProb, glance: rec.glance, at: rec.at };
       if (A.newCard) { var cd = A.newCard("در مسئلهٔ «" + p.title + "» چه درسی گرفتی و کجای دیگر به کارش می‌بری؟ (بی‌نگاه)", rec.use + "\nمسئلهٔ تازه‌ای که ساختی: " + rec.newProb + (extraTxt ? "\n" + extraTxt : ""), { pb: p.id, due: tomorrow() }); les.card = cd && cd.id; }
@@ -573,11 +589,304 @@
       s.moods = s.moods || []; s.moods.push({ at: nowISO(), lv: st.lv, sid: s0.id, v: v }); if (s.moods.length > 60) s.moods = s.moods.slice(-60); S.put(pg);
       var kn = links.querySelector(".sv-winknot"); if (kn) kn.remove();
       if (/دلسرد|نگران|خسته/.test(v) && A.V.kcases) links.appendChild(h("button", { class: "linkish sv-winknot", type: "button", onclick: function () { A.go("kcases"); } }, " · 🪢 اگر این حس جاهای دیگر هم هست: گره‌گشا (هیجان و انگیزه)"));
+      /* R4: پس از گامِ نادرست با حالِ دلسرد/نگران/خسته — خواستن یک گزینهٔ حال نیست: کوچک‌ترین گامِ بعد، زمان‌دار، که برمی‌گردد و وارسی می‌شود */
+      wslot.innerHTML = "";
+      if (/دلسرد|نگران|خسته/.test(v)) { var hs = A.willHost("prob", p.id); if (hs) wslot.appendChild(A.willCard(hs, "mood:" + v, "پس از گامِ نادرست، " + v.replace(/م$/, "ی") + ". نه دلداری: چقدر می‌خواهی حلش کنی، چه کنجکاوت می‌کند، و کوچک‌ترین گامِ بعد (کی، چند دقیقه، بی‌وقفه) چیست؟ روزِ موعد برمی‌گردد.")); }
     }));
     box.appendChild(links);
+    var wslot = h("div", { class: "sv-winwill" }); box.appendChild(wslot);
     return box;
   }
   A.solveWinCard = winCard;
+
+  /* ---------- «ابزارهای حدس» (بی‌مدل؛ وارسی با کد: A.kguessCheck ِ a17) ----------
+     تصمیمِ مالک (۲۰۲۶-۱۰-۱۵؛ «حدس‌ها و ایده‌ها و تصمیم‌ها را بیازما، تأیید نکن»): در لحظهٔ حدس (نخستین برخورد)، در بازنگری (تعمیم)، در
+     «💡 جایگاهِ ایده» و در قابِ مسئلهٔ عملی همین تکه پیش می‌آید: حدس با قیاس (نتیجهٔ آشنای مشابه؛ ۱، ۲، ۳ ⇐ n)، جدولِ حالت‌ها که خودت
+     می‌سازی ⇐ تفاضل‌های پیاپی (کد)، حدسِ دقیق (فرمولِ n؛ کد با هر حالت می‌سنجد)، حدس‌های رقیب هر کدام با آزمون (کد: کدام حالت جدایشان می‌کند)
+     و «کدام شایستهٔ آزمودنِ نخست است — چرا؟». تمرینِ فاصله‌دارش سازنده‌های کدیِ «تفاضل‌های پیاپی»، «حدس‌های رقیب» و «حدس با قیاس» اند
+     (a17، روی صفحهٔ حرکت‌ها و همین‌جا؛ پاسخ ⇐ موعدِ همان حرکت). */
+  var KIT_N = 0;
+  function LT(x) { return A.kltr ? A.kltr(x) : String(x); }   // عبارتِ ریاضی درونِ جملهٔ فارسی: جداسازِ چپ‌به‌راست (قاعدهٔ bidi)
+  function ltrIn(div) { var el = div.querySelector("input,textarea"); if (el) el.setAttribute("dir", "auto"); return div; }
+  function blankKit() { return { ana: "", anaGuess: "", dim: "", rows: [{ x: "1", y: "" }, { x: "2", y: "" }, { x: "3", y: "" }], formula: "", rivals: [{ t: "", test: "" }, { t: "", test: "" }], worth: "", worthWhy: "" }; }
+  A.solveBlankKit = blankKit;
+  function kitEmpty(k) { if (!k) return true; return !txt(k.ana) && !txt(k.anaGuess) && !txt(k.dim) && !txt(k.formula) && !(k.rows || []).some(function (r) { return txt(r.y); }) && !(k.rivals || []).some(function (r) { return txt(r.t) || txt(r.test); }); }
+  A.solveKitEmpty = kitEmpty;
+  function kitCopy(k) { return JSON.parse(JSON.stringify(k || {})); }
+  function kitUI(kit, o) {
+    o = o || {}; var P = o.parts || ["ana", "table", "formula", "rivals"], idp = (o.idp || "svK") + (++KIT_N) + "_";
+    var det = h("details", own({ class: "card soft sv-kit", open: o.open ? true : null }), h("summary", {}, o.title || "ابزارهای حدس: قیاس، جدولِ حالت‌ها، بیانِ دقیق، حدس‌های رقیب"));
+    if (o.intro) det.appendChild(h("p", { class: "small" }, o.intro));
+    if (P.indexOf("ana") >= 0) {
+      det.appendChild(h("h5", {}, "حدس با قیاس"));
+      det.appendChild(field(idp + "ana", o.anaLabel || "نتیجه یا مسئلهٔ آشنای مشابه چیست (یک بُعد کمتر، شکلِ ساده‌تر، موردی که دیده‌ای)؟", kit.ana, function (v) { kit.ana = v; }, 0));
+      det.appendChild(field(idp + "anag", "قیاس چه حدسی دربارهٔ این یکی می‌دهد — و کجا ممکن است بشکند؟", kit.anaGuess, function (v) { kit.anaGuess = v; }, 0));
+      if (!o.noDim) det.appendChild(field(idp + "dim", "استقرا با قیاس: اگر اندازه یا بُعد را ۱، ۲، ۳ … بگیری، الگو در n چه می‌گوید؟", kit.dim, function (v) { kit.dim = v; }, 0));
+    }
+    if (P.indexOf("table") >= 0) {
+      det.appendChild(h("h5", {}, o.tableTitle || "جدولِ حالت‌ها (خودت بساز)"));
+      det.appendChild(h("p", { class: "small muted" }, o.tableHint || "چند حالتِ خاص را خودت حساب کن یا بسنج و بنویس (x = اندازه یا شمارهٔ حالت، y = نتیجه). کد تفاضل‌های پیاپی را می‌سازد."));
+      var tb = h("tbody", {});
+      var drawRows = function () {
+        tb.innerHTML = "";
+        kit.rows.forEach(function (r, i) {
+          tb.appendChild(h("tr", {}, h("td", {}, h("input", { type: "text", id: idp + "x" + i, class: "sv-kx", dir: "ltr", "aria-label": "حالتِ " + fa(i + 1) + ": x", value: r.x || "", oninput: function (e) { r.x = e.target.value; } })),
+            h("td", {}, h("input", { type: "text", id: idp + "y" + i, class: "sv-ky", dir: "ltr", "aria-label": "حالتِ " + fa(i + 1) + ": نتیجه (y)", value: r.y || "", oninput: function (e) { r.y = e.target.value; } }))));
+        });
+      };
+      drawRows();
+      det.appendChild(h("table", { class: "sv-ktab small" }, h("thead", {}, h("tr", {}, h("th", {}, "x"), h("th", {}, "y"))), tb));
+      det.appendChild(h("button", { class: "btn ghost sm sv-kaddrow", type: "button", onclick: function () { var last = kit.rows[kit.rows.length - 1], nx = A.knumOf && last ? A.knumOf(last.x) : null; kit.rows.push({ x: nx != null ? String(nx + 1) : "", y: "" }); drawRows(); } }, "+ حالتِ دیگر"));
+    }
+    if (P.indexOf("formula") >= 0) det.appendChild(ltrIn(field(idp + "f", "حدست را دقیق بنویس — به صورتِ فرمولِ n (مثلاً " + LT("n(n+1)/2") + " یا " + LT("2^n − 1") + ")", kit.formula, function (v) { kit.formula = v; }, 0, "فرمول بر حسبِ n")));
+    if (P.indexOf("rivals") >= 0) {
+      det.appendChild(h("h5", {}, o.rivTitle || "حدس‌های رقیب"));
+      det.appendChild(h("p", { class: "small muted" }, o.rivHint || "دست‌کم دو حدس که هر دو با آنچه می‌دانی جور درمی‌آیند؛ برای هر کدام آزمونی که می‌تواند ردش کند. اگر حدس‌ها فرمول‌اند، کد حالتی را می‌یابد که جدایشان می‌کند."));
+      var rv = h("div", { class: "col gap sv-krivals" });
+      var drawRiv = function () {
+        rv.innerHTML = "";
+        kit.rivals.forEach(function (x, i) {
+          rv.appendChild(h("div", { class: "row gap wrap sv-kriv" }, ltrIn(field(idp + "r" + i, "حدسِ " + fa(i + 1), x.t, function (v) { x.t = v; }, 0)), field(idp + "rt" + i, "آزمونی که می‌تواند حدسِ " + fa(i + 1) + " را رد کند", x.test, function (v) { x.test = v; }, 0)));
+        });
+      };
+      drawRiv(); det.appendChild(rv);
+      det.appendChild(h("button", { class: "btn ghost sm sv-kaddriv", type: "button", onclick: function () { kit.rivals.push({ t: "", test: "" }); drawRiv(); wsel(); } }, "+ حدسِ رقیبِ دیگر"));
+      var wslot = h("div", { class: "row gap wrap" });
+      var wsel = function () {
+        wslot.innerHTML = "";
+        wslot.appendChild(selF(idp + "w", "کدام حدس شایستهٔ آزمودنِ نخست است؟", kit.rivals.map(function (x, i) { return [String(i), "حدسِ " + fa(i + 1)]; }), kit.worth === "" || kit.worth == null ? "" : String(kit.worth), function (v) { kit.worth = v; }));
+        wslot.appendChild(selF(idp + "ww", "چرا همان؟", (A.KWORTH_WHY || []).map(function (x) { return [x[0], x[1]]; }), kit.worthWhy, function (v) { kit.worthWhy = v; }));
+      };
+      wsel(); det.appendChild(wslot);
+    }
+    var out = h("div", { class: "small sv-kout", "aria-live": "polite" });
+    det.appendChild(h("button", { class: "btn ghost sm sv-kchk", type: "button", onclick: function () {
+      var r = A.kguessCheck ? A.kguessCheck(kit) : null; out.innerHTML = ""; if (!r) return;
+      kit.chk = { at: nowISO(), ok: r.ok, issues: r.issues.slice(), order: r.table ? r.table.order : null, fits: r.formula ? r.formula.fits : null, sep: r.rivals && r.rivals.sep ? r.rivals.sep : null };
+      if (r.table && r.table.diffs) {
+        out.appendChild(h("div", { class: "sv-kdiffs", dir: "ltr" }, r.table.diffs.slice(0, 6).map(function (row, k) { return h("div", {}, (k ? "Δ" + (k > 1 ? "^" + k : "") : "y") + ": " + row.map(function (v) { return fa(Math.round(v * 1000) / 1000); }).join("  ")); })));
+        out.appendChild(h("p", { class: r.table.order >= 0 ? "good" : "" }, r.table.order >= 0 ? "تفاضل‌های مرتبهٔ " + fa(r.table.order) + " ثابت‌اند ⇒ حالتِ بعد (" + LT("x = " + r.table.nextX) + ") احتمالاً " + fa(Math.round(r.table.next * 1000) / 1000) + (r.table.thin ? " — ولی «ثابت» فقط با دو مقدار دیده شد؛ یک حالتِ دیگر بساز و بیازما." : ". این حدس است، نه برهان.")
+          : "هیچ مرتبه‌ای از تفاضل‌ها ثابت نشد — یا حالت‌های بیشتری لازم است یا الگو چندجمله‌ای نیست (نسبت یا الگوی دیگری بجوی)."));
+      }
+      if (r.formula && r.formula.ok) out.appendChild(h("p", { class: r.formula.fits ? "good" : "bad" }, r.formula.fits ? "فرمولت با هر " + fa(r.formula.tested) + " حالتِ جدول می‌خواند" + (r.formula.next != null ? "؛ در حالتِ بعد " + fa(Math.round(r.formula.next * 1000) / 1000) + " پیش‌بینی می‌کند — همان را بیازما." : ".") + " پشتیبانی شد، نه ثابت."
+        : "فرمولت با این حالت‌ها نمی‌خواند: " + r.formula.mism.slice(0, 3).map(function (m) { return LT("x = " + m.x) + " ⇒ فرمول " + fa(Math.round(m.fx * 1000) / 1000) + "، جدول " + fa(m.y); }).join("؛ ") + " — حدس را اصلاح کن یا کنار بگذار."));
+      if (r.rivals && r.rivals.sep) out.appendChild(h("p", {}, "حالتی که دو حدسِ نخست را جدا می‌کند: " + LT("n = " + r.rivals.sep.n) + " (حدسِ ۱ ⇒ " + fa(r.rivals.sep.a) + "، حدسِ ۲ ⇒ " + fa(r.rivals.sep.b) + ") — آزمونِ شایسته همین است."));
+      if (r.rivals && r.rivals.fit) out.appendChild(h("p", {}, r.rivals.fit.map(function (f, i) { return "حدسِ " + fa(i + 1) + (f === true ? " با جدول می‌خواند" : f === false ? " با جدول نمی‌خواند (رد شد)" : " فرمول نیست"); }).join("؛ ") + "."));
+      r.issues.forEach(function (x) { out.appendChild(h("p", { class: "bad" }, x)); });
+      r.notes.forEach(function (x) { out.appendChild(h("p", { class: "muted" }, x)); });
+      if (r.ok && !r.issues.length) out.appendChild(h("p", { class: "good sv-kok" }, "ابزارهای حدس وارسی شد."));
+      if (o.onCheck) o.onCheck(r);
+    } }, "بسنج (با کد)")); det.appendChild(out);
+    if (o.drills !== false && A.moveGenDrill && A.KGEN) {
+      var dd = h("details", { class: "small sv-kdrills" }, h("summary", {}, "تمرینِ فاصله‌دار: نمونهٔ تازهٔ ساختهٔ کد (تفاضل‌ها، حدس‌های رقیب، قیاس)"));
+      dd.addEventListener("toggle", function () { if (dd.open && !dd.querySelector(".mv-gen")) [["mv_special", "diffs"], ["mv_special", "rivals"], ["mv_analogy", "analogy"]].forEach(function (x) { if (A.KGEN[x[1]]) { var g = A.moveGenDrill(x[0], x[1]); if (g) dd.appendChild(g); } }); });
+      det.appendChild(dd);
+    }
+    return det;
+  }
+  A.solveKitUI = kitUI;
+
+  /* ---------- «🌱 کوچک‌ترین گامِ بعد»: اراده و امید پس از شکست یا نقد (بی‌مدل) ----------
+     تصمیمِ مالک (۲۰۲۶-۱۰-۱۵؛ «موافقم»): برای کسی که پس از نخستین نقد ایده را رها می‌کرد و ترسِ از دست دادنِ کار دارد، «خواستن» نه یک
+     گزینهٔ حال، بلکه یک تعهدِ کوچکِ مشخص است که برمی‌گردد و وارسی می‌شود. هر جا شکست یا نقد پیش آمد (گامِ نادرست و حالِ دلسرد در شبیه‌ساز،
+     «پیشرفت: نه» در ایستِ پیشرفت، نقد در «💡 جایگاهِ ایده»، گرهِ «هیجان و انگیزه» در گره‌گشا) صفحه می‌پرسد: چقدر می‌خواهی؟ امید داری؟ چه
+     کنجکاوت می‌کند؟ کوچک‌ترین گامِ بعد چیست و کِی، چند دقیقه و بی‌وقفه؟ این کار برایت چقدر می‌ارزد (اراده متناسب با مسئله)؟ — و روزِ موعد
+     (نردبانِ همیشگی: نخستین وارسی فردا؛ هر گامِ انجام‌شده ⇒ وارسیِ گامِ بعد یک پله دورتر؛ انجام‌نشده ⇒ گامِ کوچک‌تر و فردا) برمی‌گردد:
+     انجامش دادی؟ چه دیدی؟ چه جلویت را گرفت؟ غرق شدی یا پراکنده؟ تلاش با ارزشش جور بود؟ خواستن و امید هر بار «داده»اند (دفترِ پیشرفت)،
+     نه نمره. رها کردنِ آگاهانه هم مجاز است — با دلیل، و یک بار بعدتر می‌پرسد «هنوز همان دلیل را قبول داری؟». داده در خودِ رکوردِ میزبان:
+     eprog.solve.will / idea.will / kcase.will (نوعِ رکوردِ تازه نیست؛ زمان‌بندِ موازی نیست — موعد در A.dueList ِ همین پرونده). */
+  var WILL_DESIRE = [["want", "می‌خواهم — برایم مهم است"], ["some", "کمی"], ["unsure", "نمی‌دانم"], ["drop", "نه — می‌خواهم آگاهانه رهایش کنم"]];
+  var WILL_HOPE = [["yes", "امید دارم که راهی هست"], ["unsure", "مطمئن نیستم"], ["no", "نه، ناامیدم"]];
+  var WILL_BUDGET = [["one", "یک گامِ کوچک و بعد بازبینی"], ["week", "چند جلسهٔ کوتاه در هفته"], ["much", "هر چه لازم باشد — بسیار مهم است"], ["easy", "فقط اگر آسان پیش برود"]];
+  var WILL_DONE = [["yes", "کامل انجامش دادم"], ["part", "تاحدی"], ["no", "نه"]];
+  var WILL_BLOCK = [["fear", "ترس از اشتباه یا نقد"], ["time", "وقت نشد یا حواسم پرت شد"], ["big", "گام بزرگ بود"], ["nowant", "دیگر نمی‌خواهم"], ["other", "چیزِ دیگر"]];
+  var WILL_IMM = [["deep", "غرق در کار شدم"], ["mid", "بین این دو"], ["scat", "حواسم پراکنده بود"], ["none", "شروع نکردم"]];
+  var WILL_PROP = [["less", "کمتر از ارزشش وقت گذاشتم"], ["fit", "با ارزشش جور بود"], ["more", "بیش از ارزشش وقت گذاشتم"]];
+  var WILL_DROPSRC = [["thing", "از خودِ مسئله/ایده — دلیلش را دیده‌ام و سنجیده‌ام"], ["crit", "از حسِ پس از نقد یا شکست"], ["tired", "از خستگی"]];
+  A.WILL = { DESIRE: WILL_DESIRE, HOPE: WILL_HOPE, BUDGET: WILL_BUDGET, DONE: WILL_DONE, BLOCK: WILL_BLOCK, IMM: WILL_IMM, PROP: WILL_PROP, DROPSRC: WILL_DROPSRC };
+  function lab(list, k) { var x = list.filter(function (y) { return y[0] === k; })[0]; return x ? x[1] : ""; }
+  function willBox(box) { var w = box.will = box.will || {}; w.steps = w.steps || []; w.log = w.log || []; return w; }
+  function willOpen(w) { var st = (w.steps || []).filter(function (x) { return !x.closed; }); return st[st.length - 1] || null; }
+  function willLast(w) { var st = (w.steps || []).filter(function (x) { return x.closed; }); return st[st.length - 1] || null; }
+  A.willOf = function (box) { return box && box.will ? box.will : null; };
+  /* وارسیِ کدیِ گامِ تازه: مشخص (نه «بیشتر تلاش کنم»)، زمان‌دار، نه رونوشتِ خودِ هدف، و پس از گامِ انجام‌نشده، گامی دیگر (کوچک‌تر) */
+  var VAGUE = /^(?:من\s*)?(?:بیشتر\s*|باز\s*|دوباره\s*)?(?:تلاش|سعی|فکر|کار|ادامه|تمرکز)\s*(?:کنم|می‌کنم|می کنم|بکنم|بدهم|می‌دهم|بدم|میکنم|میدم)?$/;
+  A.willStepCheck = function (d, w, title) {
+    var why = [];
+    if (!d.desire) why.push("«چقدر می‌خواهی؟» را انتخاب کن");
+    if (d.desire === "drop") {
+      if (!txt(d.dropWhy)) why.push("دلیلِ رها کردن را بنویس");
+      if (!d.dropSrc) why.push("بگو این دلیل از کجاست");
+      return { ok: !why.length, why: why, drop: true };
+    }
+    if (!d.hope) why.push("«امید داری؟» را انتخاب کن");
+    var st = txt(d.step), n = st.replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, "");
+    if (!st) why.push("کوچک‌ترین گامِ بعد را بنویس");
+    else if (VAGUE.test(st.replace(/\s+/g, " "))) why.push("«" + st + "» گام نیست، آرزوست — یک کارِ مشخص بنویس (چه چیزی را، با چه کسی یا با چه ابزاری)");
+    else if (title && n === String(title).replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, "")) why.push("این خودِ هدف است، نه گامِ بعد — کوچک‌ترش کن");
+    var last = w && willLast(w), lc = last && last.checks && last.checks[last.checks.length - 1];
+    if (st && lc && lc.done !== "yes" && n === String(last.step || "").replace(/[\s‌«»"'.,،:؛!?؟()\-]+/g, "")) why.push("همان گامِ انجام‌نشدهٔ قبلی است — کوچک‌ترش کن (نصفش، یا فقط نخستین دقیقه‌اش)");
+    if (!txt(d.when)) why.push("کِی، چند دقیقه و بی‌وقفه؟ را بنویس");
+    return { ok: !why.length, why: why };
+  };
+  function willIv(w) { var last = willLast(w), lc = last && last.checks && last.checks[last.checks.length - 1]; return lc && lc.done === "yes" ? nextIv(last.iv || LADDER[0], true) : LADDER[0]; }
+  A.willNextIv = willIv;
+  var WILL_N = 0;
+  function willForm(host, trig, after) {
+    var w = willBox(host.box), uid = "wl" + (++WILL_N) + "_", d = { desire: "", hope: "", curious: "", step: "", when: "", budget: "", dropWhy: "", dropSrc: "" };
+    var f = h("div", { class: "col gap sv-willf" });
+    var iv = willIv(w);
+    f.appendChild(selF(uid + "des", "چقدر می‌خواهی این را پیش ببری؟", WILL_DESIRE, "", function (v) { d.desire = v; drop.classList.toggle("hidden", v !== "drop"); go.classList.toggle("hidden", v === "drop"); }));
+    var go = h("div", { class: "col gap" });
+    go.appendChild(selF(uid + "hope", "امید داری که راهی هست؟", WILL_HOPE, "", function (v) { d.hope = v; }));
+    go.appendChild(field(uid + "cur", "چه چیزی در آن کنجکاوت می‌کند (یا روزی کنجکاوت کرد)؟", "", function (v) { d.curious = v; }, 0));
+    go.appendChild(field(uid + "step", "کوچک‌ترین گامِ بعد — آن‌قدر کوچک که مطمئنی انجامش می‌دهی (یک کارِ مشخص)", "", function (v) { d.step = v; }, 0, "مثلاً «فردا ۲۰ دقیقه: دو نفر را پیدا کنم که این مشکل را دارند و یک پرسش از هر کدام بپرسم»"));
+    go.appendChild(field(uid + "when", "کِی، چند دقیقه، بی‌وقفه؟ (زمانِ متمرکز)", "", function (v) { d.when = v; }, 0, "مثلاً «پنجشنبه ساعتِ ۷ صبح، ۲۰ دقیقه، گوشی دور»"));
+    go.appendChild(selF(uid + "bud", "این کار برایت چقدر می‌ارزد — چقدر وقت و تلاش برایش کنار می‌گذاری؟", WILL_BUDGET, "", function (v) { d.budget = v; }));
+    var drop = h("div", { class: "col gap hidden sv-willdrop" });
+    drop.appendChild(field(uid + "dw", "چرا رهایش می‌کنی؟ (دلیلِ خودِ مسئله یا ایده)", "", function (v) { d.dropWhy = v; }, 0));
+    drop.appendChild(selF(uid + "ds", "این دلیل از کجاست؟", WILL_DROPSRC, "", function (v) { d.dropSrc = v; }));
+    f.appendChild(go); f.appendChild(drop);
+    var out = h("div", { class: "small", "aria-live": "polite" });
+    f.appendChild(h("button", { class: "btn sm sv-willsave", type: "button", onclick: function (e) {
+      var c = A.willStepCheck(d, w, host.title); out.innerHTML = "";
+      if (!c.ok) { out.appendChild(h("p", { class: "bad" }, "هنوز نه: " + c.why.join("؛ ") + ".")); return; }
+      e.currentTarget.disabled = true;
+      var at = nowISO();
+      w.log.push({ at: at, kind: "commit", trig: trig || "", desire: d.desire, hope: d.hope || "", budget: d.budget || "" });
+      if (c.drop) {
+        var riv = nextIv(LADDER[0], true);
+        w.drop = { at: at, why: txt(d.dropWhy), src: d.dropSrc, trig: trig || "", due: A.addDays(A.today(), riv), iv: riv };
+        host.put();
+        out.appendChild(h("p", { class: d.dropSrc === "thing" ? "good" : "warnline" }, d.dropSrc === "thing" ? "رها کردنِ آگاهانه ثبت شد؛ " + A.fdate(w.drop.due) + " یک بار می‌پرسد که هنوز همان دلیل را قبول داری یا نه."
+          : "ثبت شد — ولی دلیلی که از حسِ پس از نقد یا خستگی می‌آید، دلیلِ خودِ ایده نیست. پیش از رها کردن، نقد را بیازما: کدام فرض را می‌زند و کوچک‌ترین آزمونش چیست؟ " + A.fdate(w.drop.due) + " دوباره می‌پرسد."));
+        if (d.dropSrc !== "thing") out.appendChild(f7Link());
+        if (after) after(); return;
+      }
+      w.drop = null;
+      var stp = { id: "ws" + w.steps.length, at: at, trig: trig || "", step: txt(d.step), when: txt(d.when), desire: d.desire, hope: d.hope, curious: txt(d.curious), budget: d.budget, iv: iv, due: A.addDays(A.today(), iv), checks: [] };
+      w.steps.push(stp); if (w.steps.length > 60) w.steps = w.steps.slice(-60); host.put();
+      out.appendChild(h("p", { class: "good sv-willok" }, "ثبت شد. " + A.fdate(stp.due) + " (" + fa(iv) + " روزِ دیگر) همین‌جا و در «امروز» برمی‌گردد و می‌پرسد انجامش دادی یا نه."));
+      if (d.hope === "no" || d.desire === "unsure") out.appendChild(f7Link());
+      if (after) after();
+    } }, "ثبتِ گامِ کوچک")); f.appendChild(out);
+    return f;
+  }
+  function f7Link() {
+    return A.V.kcases ? h("p", { class: "small sv-willf7" }, h("button", { class: "linkish", type: "button", onclick: function () { A.go("kcases"); } }, "🪢 اگر ترس، ناامیدی یا رها کردن تکرار می‌شود: گره‌گشا — خانوادهٔ «هیجان و انگیزه»")) : null;
+  }
+  function willCheckCard(host, stp, after) {
+    var w = willBox(host.box), uid = "wc" + (++WILL_N) + "_", d = { done: "", what: "", block: "", imm: "", prop: "", desire: "", hope: "" };
+    var box = h("section", own({ class: "card sv-willchk", role: "group", "aria-label": "وارسیِ گامِ کوچک" }), h("h4", {}, "🌱 گامِ کوچکی که قول دادی"),
+      h("p", { class: "small" }, "«" + stp.step + "» — " + stp.when + " (ثبت: " + A.fdate(String(stp.at).slice(0, 10)) + ")"));
+    box.appendChild(selF(uid + "done", "انجامش دادی؟", WILL_DONE, "", function (v) { d.done = v; blk.classList.toggle("hidden", v === "yes" || !v); }));
+    box.appendChild(field(uid + "what", "چه کردی و چه دیدی؟ (حتی «هیچ»)", "", function (v) { d.what = v; }, 0));
+    var blk = h("div", { class: "hidden" }, selF(uid + "blk", "چه چیزی جلویت را گرفت؟", WILL_BLOCK, "", function (v) { d.block = v; }));
+    box.appendChild(blk);
+    box.appendChild(selF(uid + "imm", "در آن زمان غرق در کار بودی یا پراکنده؟", WILL_IMM, "", function (v) { d.imm = v; }));
+    box.appendChild(selF(uid + "prop", "تلاشت با ارزشِ این کار جور بود؟", WILL_PROP, "", function (v) { d.prop = v; }));
+    box.appendChild(selF(uid + "des", "حالا چقدر می‌خواهی پیش ببری‌اش؟", WILL_DESIRE.slice(0, 3), "", function (v) { d.desire = v; }));
+    box.appendChild(selF(uid + "hope", "حالا امید داری؟", WILL_HOPE, "", function (v) { d.hope = v; }));
+    var out = h("div", { class: "col gap", "aria-live": "polite" });
+    box.appendChild(h("button", { class: "btn sm sv-willchkgo", type: "button", onclick: function (e) {
+      var miss = []; if (!d.done) miss.push("«انجامش دادی؟»"); if (d.done && d.done !== "yes" && !d.block) miss.push("«چه جلویت را گرفت؟»"); if (!d.imm) miss.push("«غرق یا پراکنده؟»");
+      if (miss.length) { A.toast("اول این‌ها را بگو: " + miss.join("، "), "bad"); return; }
+      e.currentTarget.disabled = true;
+      var c = { at: nowISO(), done: d.done, what: txt(d.what), block: d.block, imm: d.imm, prop: d.prop, desire: d.desire, hope: d.hope };
+      stp.checks.push(c); stp.closed = true;
+      w.log.push({ at: c.at, kind: "check", step: stp.id, done: d.done, block: d.block || "", imm: d.imm, prop: d.prop || "", desire: d.desire || "", hope: d.hope || "" });
+      host.put();
+      out.appendChild(h("p", { class: d.done === "yes" ? "good" : "" }, d.done === "yes" ? "انجام شد — پیشرفتِ واقعی، کوچک ولی ثبت‌شده. گامِ کوچکِ بعد؟ (وارسی‌اش یک پله دورتر روی نردبان: " + fa(willIv(w)) + " روز)"
+        : "اشکالی ندارد؛ داده است، نه شکست. گام را کوچک‌تر کن — نصفش، یا فقط نخستین دقیقه‌اش — و فردا دوباره."));
+      if (d.block === "fear") out.appendChild(h("p", { class: "small" }, "ترس از اشتباه یا نقد: نقد را رها نکن و کورکورانه هم نپذیر — بپرس کدام فرض را می‌زند و کوچک‌ترین آزمونش چیست."));
+      if (d.block === "fear" || d.hope === "no") out.appendChild(f7Link());
+      if (d.prop === "more") out.appendChild(h("p", { class: "small muted" }, "بیش از ارزشش وقت گذاشتی: اراده باید با اندازهٔ مسئله جور باشد — گامِ بعد را کوتاه‌تر بگیر یا بپرس ارزشش را دوباره بسنجی."));
+      out.appendChild(willForm(host, "check:" + d.done, after));
+    } }, "ثبتِ وارسی"));
+    box.appendChild(out);
+    return box;
+  }
+  function willDropCard(host, after) {
+    var w = willBox(host.box), dr = w.drop, uid = "wd" + (++WILL_N) + "_", d = { keep: "" };
+    var box = h("section", own({ class: "card soft sv-willdropchk" }), h("h4", {}, "🌱 چیزی که آگاهانه رها کردی"),
+      h("p", { class: "small" }, "روزِ " + A.fdate(String(dr.at).slice(0, 10)) + " نوشتی: «" + dr.why + "» (" + lab(WILL_DROPSRC, dr.src) + ")."));
+    box.appendChild(selF(uid + "k", "هنوز همان دلیل را قبول داری؟", [["keep", "بله — رها می‌ماند"], ["back", "نه — دوباره پیش می‌برمش"]], "", function (v) { d.keep = v; }));
+    var out = h("div", { class: "col gap" });
+    box.appendChild(h("button", { class: "btn sm sv-willdropgo", type: "button", onclick: function (e) {
+      if (!d.keep) { A.toast("اول بگو.", "bad"); return; }
+      e.currentTarget.disabled = true; dr.rechecked = nowISO(); dr.keep = d.keep;
+      w.log.push({ at: dr.rechecked, kind: "drop-recheck", keep: d.keep });
+      if (d.keep === "keep") { dr.closed = true; host.put(); out.appendChild(h("p", { class: "small good" }, "رها کردنِ آگاهانه — با دلیل، نه از ترس. ثبت شد.")); }
+      else { w.drop = null; host.put(); out.appendChild(willForm(host, "drop-back", after)); }
+    } }, "ثبت"));
+    box.appendChild(out);
+    return box;
+  }
+  /* کارتِ کامل برای یک میزبان: وارسیِ موعد، یا گامِ جاری، یا فرمِ گامِ تازه؛ و دفترِ پیشرفت */
+  A.willCard = function (host, trig, intro) {
+    var w = willBox(host.box), t = A.today(), open = willOpen(w);
+    var box = h("section", own({ class: "card sv-will", "data-host": host.kind }), h("h3", {}, "🌱 کوچک‌ترین گامِ بعد"),
+      h("p", { class: "small" }, intro || "پس از شکست یا نقد، نه رها کن نه وانمود کن چیزی نشده: کوچک‌ترین گامِ مشخص را بنویس؛ روزِ موعد برمی‌گردد و می‌پرسد."));
+    function redraw() { var nb = A.willCard(host, trig, intro); if (box.parentNode) box.replaceWith(nb); }
+    if (w.drop && !w.drop.closed && w.drop.due && w.drop.due <= t) box.appendChild(willDropCard(host, redraw));
+    else if (w.drop && !w.drop.closed) box.appendChild(h("p", { class: "small muted" }, "آگاهانه رهایش کردی؛ " + A.fdate(w.drop.due) + " یک بار دیگر می‌پرسد."));
+    else if (open && open.due <= t) box.appendChild(willCheckCard(host, open, null));
+    else if (open) box.appendChild(h("p", { class: "small sv-willcur" }, "گامِ جاری: «" + open.step + "» — " + open.when + " · وارسی: " + A.fdate(open.due)));
+    else box.appendChild(willForm(host, trig, null));
+    var lg = A.willLog(w); if (lg) box.appendChild(lg);
+    return box;
+  };
+  /* دفترِ پیشرفت: هر گام و وارسی‌اش، و خواستن/امید/غرق‌شدن به‌صورتِ داده (بی نمره) */
+  A.willLog = function (w) {
+    var st = (w && w.steps) || []; if (!st.length && !(w && w.drop)) return null;
+    return h("details", { class: "small sv-willlog" }, h("summary", {}, "دفترِ پیشرفت (" + fa(st.length) + " گام)"),
+      h("ol", {}, st.map(function (x) {
+        var c = (x.checks || [])[x.checks.length - 1];
+        return h("li", {}, "«" + x.step + "» — " + A.fdate(String(x.at).slice(0, 10)) + " · خواستن: " + lab(WILL_DESIRE, x.desire) + " · امید: " + lab(WILL_HOPE, x.hope) +
+          (c ? " ⇒ " + lab(WILL_DONE, c.done) + (c.block ? " (" + lab(WILL_BLOCK, c.block) + ")" : "") + " · " + lab(WILL_IMM, c.imm) + (c.hope ? " · امیدِ پس از آن: " + lab(WILL_HOPE, c.hope) : "") : " ⇒ وارسی: " + A.fdate(x.due)));
+      })));
+  };
+  /* میزبان‌ها: مسئله (eprog.solve)، ایده (رکوردِ idea)، گره‌گشا (رکوردِ kcase) */
+  A.willHost = function (kind, id) {
+    if (kind === "prob") { var p = A.getProb ? A.getProb(id) : null; if (!p) return null; var pg = prog(id), s = sol(pg); return { kind: kind, id: id, title: p.title, box: s, put: function () { S.put(pg); }, go: function () { A.go("e_prob", id, "sim"); } }; }
+    var r = S.get(id); if (!r) return null;
+    if (kind === "idea" && r.type === "idea") return { kind: kind, id: id, title: r.title, box: r, put: function () { S.put(r); }, go: function () { A.go("idea", id); } };
+    if (kind === "knot" && r.type === "kcase") return { kind: kind, id: id, title: r.title, box: r, put: function () { S.put(r); }, go: function () { A.go("kcase", id, "s4"); } };
+    return null;
+  };
+  A.willDue = function () {
+    var t = A.today(), out = [];
+    function scan(kind, id, w) {
+      if (!w) return; var o = willOpen(w);
+      if (o && o.due && o.due <= t) out.push({ kind: kind, id: id, what: "step", txt: o.step });
+      if (w.drop && !w.drop.closed && w.drop.due && w.drop.due <= t) out.push({ kind: kind, id: id, what: "drop", txt: w.drop.why });
+    }
+    S.all("eprog", function (r) { return r && r.solve && r.solve.will; }).forEach(function (r) { scan("prob", String(r.id).replace(/^eprog_/, ""), r.solve.will); });
+    S.all("idea", function (r) { return r && r.will; }).forEach(function (r) { scan("idea", r.id, r.will); });
+    S.all("kcase", function (r) { return r && r.will; }).forEach(function (r) { scan("knot", r.id, r.will); });
+    return out;
+  };
+  if (typeof A.dueList === "function" && !A.dueList._will) {
+    var rawDueW = A.dueList;
+    A.dueList = function () {
+      var items = rawDueW.apply(this, arguments) || [];
+      try {
+        A.willDue().forEach(function (x) {
+          var hs = A.willHost(x.kind, x.id); if (!hs) return;
+          items.push({ k: "knot", txt: x.what === "drop" ? "🌱 چیزی که آگاهانه رها کردی: هنوز همان دلیل؟" : "🌱 گامِ کوچکی که قول دادی: «" + clip(x.txt, 80) + "»", sub: "«" + clip(hs.title, 60) + "» — " + (x.what === "drop" ? "یک بار دیگر بسنج" : "انجامش دادی؟ چه دیدی؟"), go: hs.go });
+        });
+      } catch (e) { console.warn(e); }
+      return items;
+    };
+    A.dueList._will = true;
+  }
+  /* قلابِ دستیار (پرامپتِ سامانه دست نمی‌خورد؛ فقط وقتی حرف از شکست/نقد/رها کردن است) */
+  if (A.ASSIST) {
+    var WILL_RULES = "# پس از شکست، نقد یا میلِ رها کردن («🌱 کوچک‌ترین گامِ بعد»)\n- تعارف و دلداری نکن؛ نقد را کورکورانه نپذیر و ایده را هم رها نکن: بپرس نقد کدام فرض را می‌زند و کوچک‌ترین آزمونش چیست. کارتِ «🌱 کوچک‌ترین گامِ بعد» (💡 جایگاهِ ایده، گره‌گشای «هیجان و انگیزه»، شبیه‌ساز) گامِ مشخص و زمان‌دار را ثبت و روزِ موعد وارسی می‌کند — به قلمِ خودِ کاربر است (data-own)؛ پرش نکن، فقط او را به آن ببر. خواستن، امید و غرق‌شدن داده‌اند، نه نمره.\n- حدس یا تصمیم را با «حدس‌های رقیب» بسنج (هر کدام با آزمونی که می‌تواند ردش کند؛ کدام اول — نه آن‌که دوستش دارد).";
+    A.ASSIST.promptHooks = A.ASSIST.promptHooks || [];
+    A.ASSIST.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" ");
+      return /ناامید|دلسرد|رها ?کرد|رهاش|ول ?کرد|بی‌خیال|نقد|انتقاد|ایراد گرفت|شکست|اخراج|از دست دادنِ? ?کار|ترس/.test(recent) ? WILL_RULES : ""; });
+  }
 
   /* ---------- قلاب‌های شبیه‌ساز (a8_prob.js صدا می‌زند) ---------- */
   /* بالای شبیه‌ساز: مرورِ موعد، برگشتِ کنارگذاشته، و پیش از گامِ ۱ کارتِ فهم. شبیه‌ساز بسته نمی‌شود؛ اگر بی کارت جلو بروی «ناتمام» ثبت می‌شود. */
@@ -585,6 +894,7 @@
     var s = sol(pg), col = h("div", { class: "col gap sv-pre" }), t = A.today();
     if (cpTimer) { clearTimeout(cpTimer); cpTimer = null; }
     if (s.aside && s.aside.due && s.aside.due <= t) { col.appendChild(backCard(p, pg)); return col; }
+    try { var wl = s.will, wo = wl && willOpen(wl); if (wl && ((wo && wo.due <= t) || (wl.drop && !wl.drop.closed && wl.drop.due <= t))) { var hs = A.willHost("prob", p.id); if (hs) col.appendChild(A.willCard(hs, "due")); } } catch (e) { console.warn(e); }
     var rv = reviewPanel(p, pg); if (rv) col.appendChild(rv);
     if (st.i >= idx.length) return col.children.length ? col : null;
     var u = s.u[st.lv];

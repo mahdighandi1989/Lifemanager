@@ -118,9 +118,43 @@
           x.recId ? h("button", { class: "linkish small", type: "button", onclick: function () { var q = S.get(x.recId); if (q && q.type === "eprob") A.go("e_prob", q.p && q.p.id); else if (q) A.go("prereq", q.id); } }, "↗ " + (S.get(x.recId) || {}).type) : null);
       })) : h("p", { class: "small muted" }, "—")));
     });
+    /* R4 — تصمیمِ مالک (۲۰۲۶-۱۰-۱۵؛ «موافقم»): ایده پس از نخستین نقد رها نمی‌شود و کورکورانه هم تأیید نمی‌شود. نقد ⇐ کدام فرض را می‌زند ⇐
+       «🌱 کوچک‌ترین گامِ بعد» که نقد را می‌آزماید (روزِ موعد برمی‌گردد؛ a36) ⇐ «حدس‌های رقیب» دربارهٔ سرنوشتِ ایده، هر کدام با آزمونش (کد). */
+    root.appendChild(critSec(r));
+    if (A.willCard) { var hs = A.willHost && A.willHost("idea", r.id); if (hs) root.appendChild(A.willCard(hs, (r.crits || []).length ? "crit" : "idea",
+      (r.crits || []).length ? "نقد را شنیدی. رها کردن و پذیرفتنِ کور هر دو آسان‌اند؛ کوچک‌ترین گامی که همین نقد را می‌آزماید چیست؟" : "ایده با فکر کردن جلو نمی‌رود؛ کوچک‌ترین گامی که ضعیف‌ترین فرضش را می‌آزماید چیست؟")); }
+    if (A.solveKitUI) {
+      r.kit = r.kit || A.solveBlankKit();
+      root.appendChild(A.solveKitUI(r.kit, { idp: "ideaK", parts: ["rivals", "table", "ana"], noDim: true, title: "حدس‌های رقیب دربارهٔ این ایده (و نقدش)",
+        intro: "دست‌کم دو حدس دربارهٔ این‌که چه پیش می‌آید یا چرا نقد درست/نادرست است — هر کدام با آزمونی که می‌تواند ردش کند — و این‌که کدام را اول بیازمایی. موردهایی که دیده‌ای (مثلاً هر گفت‌وگو و نتیجه‌اش) را در جدول بنویس.",
+        rivTitle: "حدس‌های رقیب", rivHint: "مثلاً «مشتری برای این پول می‌دهد» در برابرِ «فقط تعریف می‌کنند و پول نمی‌دهند» — آزمونِ هر کدام چیست؟",
+        tableTitle: "موردهایی که دیده‌ای", tableHint: "x = شمارهٔ مورد (۱، ۲، ۳ …)، y = نتیجه به عدد اگر هست (مثلاً «حاضر است بپردازد؟» ۱/۰، یا مبلغ). کد الگو و تفاضل‌ها را نشان می‌دهد.",
+        anaLabel: "ایدهٔ آشنای مشابهی (از کارِ خودت یا دیگران) سراغ داری؟ چه شد؟",
+        onCheck: function () { S.put(r); } }));
+      root.lastChild.addEventListener("change", function () { S.put(r); });
+    }
     return root;
   };
+  /* نقد یا ایرادی که شنیدی ⇒ کدام فرض را می‌زند ⇒ اگر درست باشد چه چیزِ ایده عوض می‌شود (به قلمِ خودت) */
+  function critSec(r) {
+    var as = (r.parts || []).filter(function (x) { return x.k === "assumption"; }), d = { t: "", target: "", change: "" };
+    var sec = h("section", { class: "card idea-crit", dir: "rtl", "data-own": "1" }, h("h2", {}, "نقد و ایراد (" + fa((r.crits || []).length) + ")"),
+      h("p", { class: "small" }, "نقدی که شنیدی یا ایرادی که خودت دیدی را بنویس. نقد نه حکمِ پایان است نه حمله؛ داده‌ای است دربارهٔ یکی از فرض‌ها — آن فرض را پیدا کن و بیازما."));
+    (r.crits || []).forEach(function (c) { sec.appendChild(h("div", { class: "small idea-critrow" }, "«" + c.t + "» ⇐ " + (c.target === "new" ? "فرضی که هنوز ننوشته بودی" : c.target !== "" && as[+c.target] ? "فرضِ «" + as[+c.target].t + "»" : "—") + (c.change ? " · اگر درست باشد: " + c.change : "") + " · " + A.fdate(String(c.at).slice(0, 10)))); });
+    var t = h("textarea", { id: "ideaCritT", rows: 2, placeholder: "مثلاً «کسی برای این پول نمی‌دهد»", oninput: function (e) { d.t = e.target.value; } });
+    var sel = h("select", { id: "ideaCritA", style: { maxWidth: "100%" }, onchange: function (e) { d.target = e.target.value; } }, h("option", { value: "" }, "—"), as.map(function (a, i) { return h("option", { value: String(i) }, a.t); }), h("option", { value: "new" }, "فرضی که هنوز ننوشته‌ام"));
+    var ch = h("input", { id: "ideaCritC", type: "text", placeholder: "چه چیزِ ایده باید عوض شود؟", oninput: function (e) { d.change = e.target.value; } });
+    sec.appendChild(h("div", { class: "col" }, h("label", { for: "ideaCritT" }, "نقد یا ایرادی که شنیدی (یا دیدی)"), t));
+    sec.appendChild(h("div", { class: "col" }, h("label", { for: "ideaCritA" }, "این نقد کدام فرضِ لازمِ ایده را می‌زند؟"), sel));
+    sec.appendChild(h("div", { class: "col" }, h("label", { for: "ideaCritC" }, "اگر نقد درست باشد، چه چیزِ ایده عوض می‌شود؟ (نه «همه‌اش»)"), ch));
+    sec.appendChild(h("button", { class: "btn sm idea-critsave", type: "button", onclick: function () {
+      if (!String(d.t).trim()) { A.toast("نقد را بنویس.", "bad"); return; }
+      if (!d.target) { A.toast("بگو کدام فرض را می‌زند (یا «فرضی که هنوز ننوشته‌ام»).", "bad"); return; }
+      (r.crits = r.crits || []).push({ t: clip(d.t, 400), target: d.target, change: clip(d.change, 300), at: nowIso() }); S.put(r); A.render();
+    } }, "ثبتِ نقد"));
+    return sec;
+  }
   A.VIEW_META = A.VIEW_META || {};
-  A.VIEW_META.idea = { j: "ws", what: "جایگاهِ ایده: قوت‌ها با شاهد، فرض‌های لازم (هر کدام با پروندهٔ سنجش و درجه‌اش)، مسئله‌های طراحی، بیرون از صفحه؛ سقفِ اعتبار = ضعیف‌ترین فرض (A1). نمره ندارد." };
+  A.VIEW_META.idea = { j: "ws", what: "جایگاهِ ایده: قوت‌ها با شاهد، فرض‌های لازم (هر کدام با پروندهٔ سنجش و درجه‌اش)، مسئله‌های طراحی، بیرون از صفحه؛ سقفِ اعتبار = ضعیف‌ترین فرض (A1). نمره ندارد. نقد ⇐ فرضی که می‌زند ⇐ «🌱 کوچک‌ترین گامِ بعد» (وارسی در روزِ موعد) و «حدس‌های رقیب» با آزمون (کد)." };
   if (A.GRAPH && A.GRAPH.MAPS && !A.GRAPH.MAPS.some(function (x) { return x.v === "idea"; })) A.GRAPH.MAPS.push({ v: "idea", fa: "💡 جایگاهِ ایده", what: "ایده‌هایت تکه‌تکه، با سقفِ اعتبار از ضعیف‌ترین فرض" });
 })(APP);

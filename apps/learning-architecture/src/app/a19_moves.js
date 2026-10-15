@@ -794,7 +794,7 @@
       h("div", { class: "row gap wrap" }, h("button", { class: "btn", onclick: function () { A.go("e_prob", null, "inject"); } }, "افزودنِ مسئلهٔ تو")),
       A.samplesNote ? A.samplesNote("گام‌های «" + fa((window.EPI_PROBLEMS || []).length) + " مسئلهٔ آماده»ای که سازنده نوشته") : null));
     if (!tagged.length && A.practiceCta) { var cta = A.practiceCta(); if (cta) root.appendChild(cta); }
-    root.appendChild(h("p", { class: "small muted" }, fa(tagged.length) + " گام از " + fa(ps.length) + " مسئله برچسبِ حرکت دارند" + (A.showSamples && A.showSamples() ? " (با نمونه‌های آمادهٔ سازنده)" : " (فقط مسئله‌های خودت)") + "."));
+    root.appendChild(h("p", { class: "small muted" }, fa(tagged.length) + " گام از " + fa(ps.length) + " مسئله برچسبِ حرکت دارند" + (A.showSamples && A.showSamples() ? " (با نمونه‌های آمادهٔ سازنده)" : A.practiceOn && A.practiceOn() ? " (مسئله‌های خودت و مسئله‌های کوتاهِ تمرینی)" : " (فقط مسئله‌های خودت)") + "."));
     root.appendChild(h("div", { class: "mv-grid" }, MOVES.map(function (m) {
       var st = A.moveStages(m.id), np = {}; st.forEach(function (x) { np[x.p.id] = 1; });
       return h("section", { class: "card mv-card", style: { "--pc": "var(--p" + (m.n % 9) + ")" }, "data-mv": m.id },
@@ -825,7 +825,7 @@
   /* ---------- ورزشِ خودِ حرکت ----------
      drills ِ ثبت‌گاه (نوشتهٔ سازنده، محتوای خنثی) + برای چند حرکت، نمونهٔ تازهٔ ساختهٔ کد از سازنده‌های گره‌گشا (A.KGEN؛ پاسخ با کد محاسبه
      می‌شود). هر پاسخ «دقتِ ورزش» و موعدِ همان حرکت را می‌چیند (A.moveDrillAnswer ⇐ نردبانِ ۱/۳/۷/۲۱/۶۰). */
-  var GEN_FOR = { mv_dimcheck: ["dimtest", "dimform"], mv_equation: ["eqtrans", "notation"], mv_special: ["guesstest"] };
+  var GEN_FOR = { mv_dimcheck: ["dimtest", "dimform"], mv_equation: ["eqtrans", "notation"], mv_special: ["guesstest", "diffs", "rivals"], mv_general: ["diffs"], mv_analogy: ["analogy"] };
   A.MOVE_GEN = GEN_FOR;
   function drillItem(mv, q, opts, a, why, key) {
     var ord = A.shuffle(opts.map(function (_, j) { return j; })), fb = h("div", { class: "dfb" }), done = false;

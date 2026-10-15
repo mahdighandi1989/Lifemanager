@@ -198,7 +198,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const kid = await p.evaluate(() => { const kc = APP.knotNewCase(); kc.kinds = ['behavior']; kc.title = 'تصمیمِ تغییرِ شغل'; APP.S.put(kc); APP.go('kcase', kc.id, 'in'); return kc.id; }); await W(200);
     chk(await p.locator('main .kn-prac[data-own]:not(.hidden)').count() === 1, 'practical frame not owner-only/visible for a behaviour situation');
     await ownCheck('main .kn-prac', 'practical frame');
-    for (const [id, v] of [['knPWant', 'شغلی که با دو فرزند جور شود'], ['knPHave', 'دو پیشنهادِ کار، پس‌اندازِ شش ماه'], ['knPCond', 'رفت‌وآمد کمتر از یک ساعت'], ['knPVague', '«جور شدن» یعنی ساعتِ ۵ خانه باشم'], ['knPIgnore', 'شایعه‌های شرکت را کنار می‌گذارم؛ تا دو گفت‌وگو']]) await p.fill('#' + id, v);
+    for (const [id, v] of [['knPWant', 'شغلی که با دو فرزند جور شود'], ['knPHave', 'دو پیشنهادِ کار، پس‌اندازِ شش ماه'], ['knPCond', 'رفت‌وآمد کمتر از یک ساعت'], ['knPVague', '«جور شدن» یعنی ساعتِ ۵ خانه باشم'], ['knPIgnore', 'شایعه‌های شرکت را کنار می‌گذارم؛ تا دو گفت‌وگو'],
+      // R4 (تصمیمِ مالک ۲۰۲۶-۱۰-۱۵): دو جزءِ تازهٔ قاب — دانشِ پیشین و ریاضی‌کردن (tests/test_solve_r4.js)
+      ['knPPrior', 'دو دوستم که جابه‌جا شدند می‌گویند ماهِ اول سخت است'], ['knPMeasure', 'ساعتِ رسیدن به خانه ≤ ۱۷']]) await p.fill('#' + id, v);
     await W(300); await p.click('main .kn-pracchk'); await W(150);
     info.pr1 = await p.evaluate(id => ({ chk: APP.S.get(id).intake.prac.chk, out: document.querySelector('main .kn-pracout').textContent, cards: APP.S.all('card', c => c.src === 'knot:practical').length }), kid);
     chk(info.pr1.chk && !info.pr1.chk.ok && info.pr1.chk.missing.join() === 'approx' && /تقریبِ کافی/.test(info.pr1.out) && info.pr1.cards === 0, 'incomplete practical frame not caught by code ' + JSON.stringify(info.pr1));
@@ -214,13 +216,13 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       AS.DO.tour_diag({ layers: [{ id: 'practical', st: 'ask', why: '' }] }); APP.S.put(s);
       const dr = AS.tourDrawer(s), ins = [...dr.querySelectorAll('.as-practin')];
       const o = { inputs: ins.length, own: ins.every(x => x.closest('[data-own]')), labels: ins.every(x => dr.querySelector('label[for="' + x.id + '"]')) };
-      [['unknown', 'کدام ماشین'], ['data', 'دو آگهی'], ['cond', 'بودجه'], ['vague', 'به‌صرفه یعنی هزینهٔ ماهانه'], ['ignore', 'رنگ؛ تا دو بازدید']].forEach(([k, v]) => AS.sievePracticalSet(s, k, v));
+      [['unknown', 'کدام ماشین'], ['data', 'دو آگهی'], ['cond', 'بودجه'], ['vague', 'به‌صرفه یعنی هزینهٔ ماهانه'], ['ignore', 'رنگ؛ تا دو بازدید'], ['prior', 'مکانیکِ آشنا می‌گوید مدلِ قدیمی کم‌خرج‌تر است'], ['measure', 'هزینهٔ ماهانه ≤ ۳ میلیون']].forEach(([k, v]) => AS.sievePracticalSet(s, k, v));
       o.before = !s.tour.diag.practical.card;
       AS.sievePracticalSet(s, 'approx', 'تفاوتِ کمتر از هزینهٔ یک ماه');
       const c = APP.S.get(s.tour.diag.practical.card); o.card = !!c && c.src === 'sieve:practical' && c.due === APP.addDays(APP.today(), 1); o.st = s.tour.diag.practical.st;
       AS.sievePracticalSet(s, 'approx', 'دوباره'); o.once = APP.S.all('card', x => x.src === 'sieve:practical').length === 1;
       return o; });
-    chk(info.sieve.inputs === 6 && info.sieve.own && info.sieve.labels && info.sieve.before && info.sieve.card && info.sieve.st === 'found' && info.sieve.once, 'sieve practical frame without the model ' + JSON.stringify(info.sieve));
+    chk(info.sieve.inputs === 8 && info.sieve.own && info.sieve.labels && info.sieve.before && info.sieve.card && info.sieve.st === 'found' && info.sieve.once, 'sieve practical frame without the model ' + JSON.stringify(info.sieve));
 
     /* ===== ۶) محتوای دیگرِ ممیزی در تونل‌های موجود ===== */
     // کارتِ فهمِ اثباتی: پرسش‌های تازهٔ طرح‌ریزی و «حکمی که به فرض/حکم شکسته نمی‌شود»

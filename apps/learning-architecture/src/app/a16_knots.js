@@ -799,17 +799,28 @@
   var SHOWN_SAFE = {};
   /* قابِ مسئلهٔ عملی — یک وارسیِ کدی برای دو جا (ثبتِ موقعیت در گره‌گشا، و لایهٔ «مسئلهٔ عملی» ِ غربالِ دستیار): هر جزء نوشته شده و
      هیچ جزئی رونوشتِ جزءِ دیگر نیست. عددِ قراردادی (کمینهٔ واژه) ندارد: «نوشته» یعنی ناخالی. */
-  var PRAC_KEYS = [["want", "مجهول (چه می‌خواهی)"], ["have", "داده‌ها"], ["cond", "شرط (قیدها)"], ["vague", "مفهومِ مبهم"], ["ignore", "دادهٔ کنارگذاشته و حدِ جست‌وجو"], ["approx", "تقریبِ کافی"]];
+  /* R4 — تصمیمِ مالک (۲۰۲۶-۱۰-۱۵؛ «موافقم»): دو جزءِ تازه برای تصمیم‌ها و ایده‌ها: «دانشِ پیشین و تجربیِ نادقیق» (آنچه از تجربهٔ خودت
+     یا دیگران، حتی تقریبی، دربارهٔ چنین مسئله‌ای می‌دانی) و «ریاضی‌کردن» (مجهول ⇐ کمیتی با عدد/واحد، موفقیت ⇐ یک رابطه). وارسیِ کدیِ
+     «ریاضی‌کردن»: دست‌کم یک عدد و یک رابطه (= ، ≥ ، ≤ ، < ، > ، «بیشتر/کمتر از»، «دست‌کم/حداکثر»…) — ساختار، نه آستانه. */
+  var PRAC_KEYS = [["want", "مجهول (چه می‌خواهی)"], ["have", "داده‌ها"], ["cond", "شرط (قیدها)"], ["vague", "مفهومِ مبهم"], ["ignore", "دادهٔ کنارگذاشته و حدِ جست‌وجو"], ["approx", "تقریبِ کافی"],
+    ["prior", "دانشِ پیشین و تجربیِ نادقیق"], ["measure", "ریاضی‌کردن (کمیت و رابطه)"]];
   A.KPRAC_KEYS = PRAC_KEYS;
   function pnorm(x) { return String(x == null ? "" : x).replace(/[\s\u200c«»"'.,،:؛!?؟()\-]+/g, ""); }
+  var REL = /[=<>≤≥≠]|بیش(?:تر)? ?از|کم(?:تر)? ?از|دست ?\u200c?کم|حد ?\u200c?اقل|حد ?\u200c?اکثر|برابر|نه بیش|نه کم|تا سقفِ?|کمینه|بیشینه/;
+  A.measurableCheck = function (t) {
+    var x = String(t == null ? "" : t), num = /[0-9۰-۹٠-٩]/.test(x), rel = REL.test(x);
+    var why = []; if (!num) why.push("عدد یا مقدار (با واحد) ندارد"); if (!rel) why.push("رابطه‌ای (مثلاً ≥ ، ≤ ، = یا «دست‌کم/بیشتر از») ندارد");
+    return { ok: num && rel, num: num, rel: rel, why: why };
+  };
   A.practicalFrameCheck = function (parts, keys) {
     parts = parts || {}; var missing = keys.filter(function (k) { return !pnorm(parts[k[0]]); }), seen = {}, dup = [];
     keys.forEach(function (k) { var n = pnorm(parts[k[0]]); if (!n) return; if (seen[n]) dup.push(k[1]); else seen[n] = 1; });
-    return { ok: !missing.length && !dup.length, missing: missing, dup: dup };
+    var mk = keys.filter(function (k) { return k[0] === "measure"; })[0], meas = mk && pnorm(parts.measure) ? A.measurableCheck(parts.measure) : null;
+    return { ok: !missing.length && !dup.length && !(meas && !meas.ok), missing: missing, dup: dup, unmeasured: meas && !meas.ok ? meas.why : null };
   };
   A.practicalFrameCard = function (title, rows, src) {
     if (!A.newCard) return null;
-    return A.newCard("قابِ مسئلهٔ عملیِ «" + String(title).slice(0, 80) + "»: بی‌نگاه بگو مجهول، داده، شرط، مفهومِ مبهم، دادهٔ کنارگذاشته (و حدِ اطلاعات) و تقریبِ کافی چه بود — و همین شش پرسش را برای تصمیمِ بعدی‌ات بپرس.",
+    return A.newCard("قابِ مسئلهٔ عملیِ «" + String(title).slice(0, 80) + "»: بی‌نگاه بگو مجهول، داده، شرط، مفهومِ مبهم، دادهٔ کنارگذاشته (و حدِ اطلاعات)، تقریبِ کافی، دانشِ پیشین و صورتِ ریاضی‌اش (کمیت و رابطه) چه بود — و همین پرسش‌ها را برای تصمیمِ بعدی‌ات بپرس.",
       rows.map(function (r) { return r[0] + ": " + r[1]; }).join("\n"), { due: A.addDays(A.today(), 1), src: src });
   };
   function intakeStep(H) {
@@ -838,9 +849,9 @@
       var r = A.practicalFrameCheck(pr, PRAC_KEYS);
       pr.chk = { at: now(), ok: r.ok, missing: r.missing.map(function (x) { return x[0]; }), dup: r.dup };
       pracOut.innerHTML = "";
-      if (!r.ok) { pracOut.appendChild(h("p", { class: "bad" }, "قاب هنوز کامل نیست: " + r.missing.map(function (x) { return "«" + x[1] + "»"; }).concat(r.dup.map(function (d) { return "«" + d + "» همان جزءِ دیگری را تکرار می‌کند"; })).join("، ") + ".")); ch(); return; }
+      if (!r.ok) { pracOut.appendChild(h("p", { class: "bad" }, "قاب هنوز کامل نیست: " + r.missing.map(function (x) { return "«" + x[1] + "»"; }).concat(r.dup.map(function (d) { return "«" + d + "» همان جزءِ دیگری را تکرار می‌کند"; })).concat(r.unmeasured ? ["«ریاضی‌کردن» هنوز سنجیدنی نیست: " + r.unmeasured.join(" و ")] : []).join("، ") + ".")); ch(); return; }
       if (!pr.card) { var cd = A.practicalFrameCard(kc.title || it.what || "تصمیم", PRAC_KEYS.map(function (x) { return [x[1], pr[x[0]]]; }), "knot:practical"); if (cd) pr.card = cd.id; }
-      pracOut.appendChild(h("p", { class: "good" }, "قاب کامل است: هر شش جزء از نوشتهٔ خودت. یک کارتِ مرور ساخته شد (فردا، و بعد با فاصلهٔ بیشتر) تا همین شش پرسش را برای تصمیمِ بعدی‌ات بی‌نگاه بپرسی."));
+      pracOut.appendChild(h("p", { class: "good" }, "قاب کامل است: هر " + fa(PRAC_KEYS.length) + " جزء از نوشتهٔ خودت، و صورتِ ریاضی‌اش سنجیدنی است. یک کارتِ مرور ساخته شد (فردا، و بعد با فاصلهٔ بیشتر) تا همین پرسش‌ها را برای تصمیمِ بعدی‌ات بی‌نگاه بپرسی."));
       ch();
     }
     var pracSec = h("section", { class: "card kn-prac" + (isPractical(kc) ? "" : " hidden"), dir: "rtl", "data-own": "1" },
@@ -852,9 +863,14 @@
         fld("چه قیدهایی هست؟ (شرط)", area("knPCond", pr.cond, 2, setP("cond"), "مهلت، بودجه، قاعده، آنچه نباید از دست برود")),
         fld("کدام مفهومِ مبهم را باید روشن کنی؟", area("knPVague", pr.vague, 2, setP("vague"), "مثلاً «موفق»، «به‌موقع»، «کافی» یعنی دقیقاً چه؟")),
         fld("کدام داده را آگاهانه کنار می‌گذاری، و تا کجا اطلاعات جمع می‌کنی؟", area("knPIgnore", pr.ignore, 2, setP("ignore"), "چه چیزی را نمی‌پرسی و چرا؛ کِی دست از جست‌وجو می‌کشی")),
-        fld("کدام تقریب بس است؟", area("knPApprox", pr.approx, 2, setP("approx"), "چه دقتی برای این تصمیم کافی است؟"))),
+        fld("کدام تقریب بس است؟", area("knPApprox", pr.approx, 2, setP("approx"), "چه دقتی برای این تصمیم کافی است؟")),
+        fld("از تجربهٔ خودت یا دیگران دربارهٔ چنین مسئله‌ای چه می‌دانی — حتی نادقیق؟ (دانشِ پیشین)", area("knPPrior", pr.prior, 2, setP("prior"), "قاعدهٔ سرانگشتی، موردِ مشابهی که دیده‌ای، حرفِ کسی که این کار را کرده — و چقدر به آن اعتماد داری")),
+        fld("ریاضی‌اش کن: مجهول را یک کمیت (با عدد/واحد) و موفقیت را یک رابطه بنویس", area("knPMeasure", pr.measure, 2, setP("measure"), "مثلاً «x = درآمدِ ماهانه؛ موفقیت: x ≥ ۲۵ میلیون تا شش ماهِ دیگر، رفت‌وآمد ≤ ۴۵ دقیقه»"))),
+      A.solveKitUI ? (function () { pr.kit = pr.kit || A.solveBlankKit(); var kd = A.solveKitUI(pr.kit, { idp: "knPK", parts: ["rivals", "table"], drills: false, title: "گزینه‌ها و حدس‌های رقیب (اختیاری؛ وارسی با کد)",
+        rivTitle: "گزینه‌ها یا حدس‌های رقیب", rivHint: "دست‌کم دو گزینه یا دو حدس دربارهٔ نتیجه (مثلاً «جابه‌جایی درآمد را بالا می‌برد» در برابرِ «فقط هزینهٔ رفت‌وآمد را جابه‌جا می‌کند») — هر کدام با آزمونی که می‌تواند ردش کند.",
+        tableTitle: "موردهایی که دیده‌ای یا حساب کرده‌ای", onCheck: function () { it.prac = pr; ch(); } }); kd.addEventListener("change", function () { it.prac = pr; ch(); }); return kd; })() : null,
       A.stLink && A.EST && A.EST.st_resp ? h("div", { class: "row gap wrap small" }, h("span", { class: "muted" }, "برای «تا کجا اطلاعات جمع کنم؟»: "), A.stLink("st_resp")) : null,
-      h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm kn-pracchk", type: "button", onclick: pracRun }, "وارسیِ قاب (هر شش جزء)"),
+      h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm kn-pracchk", type: "button", onclick: pracRun }, "وارسیِ قاب (همهٔ جزءها)"),
         pr.card ? h("span", { class: "small muted" }, "کارتِ مرورِ این قاب ساخته شده است.") : null), pracOut);
     box.appendChild(h("section", { class: "card" },
       h("p", { class: "small muted" }, "واقعیت را بی‌تفسیر بنویس. اگر از کسی نام می‌بری، فقط نقش یا نامِ مستعار بنویس (مثلاً «مدیرِ بخش»، «همکارِ الف»). فیلدهای ستاره‌دار لازم‌اند؛ بقیه اختیاری. هر چه بنویسی خودکار ذخیره می‌شود."),
@@ -1495,6 +1511,12 @@
     var acts = A.knotActs(kc);
     box.appendChild(h("section", { class: "card" }, h("h2", {}, "مداخله‌ها"), h("ol", { class: "kn-acts" }, acts.map(function (x, i) { return actRow(H, k, x, i); }))));
     var el = epiLinksSec(kc); if (el) box.appendChild(el);
+    /* R4 — تصمیمِ مالک (۲۰۲۶-۱۰-۱۵): گرهِ «هیجان و انگیزه» (F7: اجتناب، ترس از قضاوت، رها کردن پس از نقد) ⇒ «🌱 کوچک‌ترین گامِ بعد»
+       (a36): خواستن و امید به‌صورتِ داده، گامِ کوچکِ زمان‌دار که روزِ موعد وارسی می‌شود — تمرینِ همین گره در زندگیِ واقعی */
+    if (A.willCard && ([].concat(k.fam || []).indexOf("F7") >= 0 || (kc.root && kc.root.primary === "F7"))) {
+      box.appendChild(A.willCard({ kind: "knot", id: kc.id, title: kc.title || k.name || "", box: kc, put: function () { H.put(); }, go: function () { A.go("kcase", kc.id, "s4"); } }, "knot:F7",
+        "این گره در «هیجان و انگیزه» است: ترس یا ناامیدی مسیر را کج می‌کند. پادزهرش تعهدِ کوچکِ مشخص است، نه تصمیمِ بزرگ — کوچک‌ترین گامِ بعد چیست و کِی؟ روزِ موعد همین‌جا و در «امروز» برمی‌گردد."));
+    }
     box.appendChild(knotCardEditor(k, { kc: kc, H: H }));
     if (A.V.kpractice) box.appendChild(h("section", { class: "card kn-close" }, h("h3", {}, "بعد: ورزیدگی"),
       h("p", { class: "small" }, "ورزش یعنی شناختنِ همین ساختار در ظاهرهای تازه (و نمونه‌های بدلی که گره در آن‌ها نیست) — نه حفظِ یک راه‌حل. تمرینِ سؤال‌های شبیهِ آزمونِ هوش نمرهٔ همان نوع آزمون را با آشنایی بالا می‌برد، نه توانِ کلی را."),
