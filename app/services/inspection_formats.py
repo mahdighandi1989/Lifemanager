@@ -33,6 +33,9 @@ from typing import Callable
 ZIP_MAX_MEMBERS = 3000
 ZIP_MAX_TOTAL_BYTES = 600 * 1024 * 1024
 ZIP_MAX_DEPTH = 4
+#: the «نظارت و سرکشی» hint on an archive with images/media inside; app_reading (which sends those images to the
+#: vision model itself) removes it — it means nothing to the page's AI door
+ZIP_PULL_HINT = "؛ تصویر/صوت/ویدیوی داخلش را `inspection.py pull` جدا باز می‌کند"
 
 MEDIA_EXT = (".mp3", ".wav", ".m4a", ".ogg", ".oga", ".opus", ".flac", ".aac", ".amr", ".wma",
              ".aif", ".aiff", ".weba", ".mp4", ".mov", ".mkv", ".webm", ".avi", ".3gp", ".m4v",
@@ -257,6 +260,49 @@ def zip_text(data: bytes, read: Callable[[bytes, str, str, int], dict], depth: i
             parts.append(f"===== {info.filename} ({sub['status']}) =====\n{body}")
     note = (f"آرشیو: {sum(counts.values())} فایل، هر کدام با خوانندهٔ خودش — "
             + "، ".join(f"{k}: {v}" for k, v in sorted(counts.items()))
-            + ("؛ تصویر/صوت/ویدیوی داخلش را `inspection.py pull` جدا باز می‌کند" if
-               counts.get("image") or counts.get("pending") else ""))
+            + (ZIP_PULL_HINT if counts.get("image") or counts.get("pending") else ""))
     return "\n\n".join(parts), truncated, note, counts.get("pending", 0)
+
+
+# ---------------------------------------------------------------------------
+# images INSIDE a container (zip, docx/pptx/xlsx, OpenDocument, epub) — review 2026-10-15
+# ---------------------------------------------------------------------------
+#: what the vision models take as-is (same set as app_reading.is_image)
+VISION_IMAGE_EXT = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp",
+                    ".gif": "image/gif", ".heic": "image/heic", ".heif": "image/heif"}
+#: images the vision models do NOT take — reported by name, never guessed (SVG is read as text by `extract`)
+OTHER_IMAGE_EXT = (".bmp", ".tif", ".tiff", ".emf", ".wmf", ".emz", ".wmz", ".avif", ".ico", ".pict", ".pct")
+_CONTAINER_EXT = (".zip", ".docx", ".docm", ".dotx", ".pptx", ".pptm", ".xlsx", ".xlsm", ".odt", ".ods", ".odp", ".epub")
+_OFFICE_MEDIA = re.compile(r"^(word|ppt|xl)/media/|^Pictures/|^(OEBPS|OPS)?/?(images?|Images?)/")
+
+
+def embedded_images(data: bytes, name: str = "", _depth: int = 0, _prefix: str = "") -> list[dict]:
+    """Every image inside a container, in order: ``[{path, mime, data, vision}]`` (``vision=False`` ⇒ a format the
+    vision models do not read: BMP/TIFF/EMF/WMF…). A plain zip is walked recursively (a .docx in a .zip in a .zip);
+    an Office/OpenDocument/EPUB file contributes its media folder. The same zip-bomb caps as `zip_text` apply."""
+    if _depth > ZIP_MAX_DEPTH:
+        return []
+    try:
+        z = zipfile.ZipFile(io.BytesIO(data))
+    except Exception:  # noqa: BLE001 — not a container
+        return []
+    out: list[dict] = []
+    with z:
+        names = z.namelist()
+        office = "[Content_Types].xml" in names or "mimetype" in names
+        total = 0
+        for info in [i for i in z.infolist() if not i.is_dir()][:ZIP_MAX_MEMBERS]:
+            n = info.filename
+            ext = Path(n.lower()).suffix
+            if office and not _OFFICE_MEDIA.search(n):
+                continue
+            total += info.file_size
+            if total > ZIP_MAX_TOTAL_BYTES:
+                break
+            if ext in VISION_IMAGE_EXT:
+                out.append({"path": _prefix + n, "mime": VISION_IMAGE_EXT[ext], "data": z.read(info), "vision": True})
+            elif ext in OTHER_IMAGE_EXT:
+                out.append({"path": _prefix + n, "mime": guess_mime(n), "data": b"", "vision": False})
+            elif not office and ext in _CONTAINER_EXT:
+                out.extend(embedded_images(z.read(info), n, _depth + 1, _prefix + n + " › "))
+    return out

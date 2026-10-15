@@ -23,7 +23,14 @@
     { t: "dossier", fa: "پروندهٔ پشتوانه", sys: "epi" }, { t: "event", fa: "واقعهٔ بک‌تست", sys: "epi" }, { t: "station", fa: "ایستگاه", sys: "epi" }, { t: "rule", fa: "قاعده", sys: "epi" },
     { t: "chapter", fa: "فصلِ جزوه", sys: "epi" }, { t: "section", fa: "بخشِ جزوه", sys: "epi" }, { t: "axiom", fa: "اصلِ بدیهی", sys: "epi" },
     { t: "theorem", fa: "قضیه", sys: "epi" }, { t: "base", fa: "مقدارِ پایه", sys: "epi" }, { t: "tgroup", fa: "گروهِ قلمرو", sys: "epi" },
-    { t: "area", fa: "حوزهٔ قلمرو", sys: "epi" }, { t: "ssys", fa: "سامانهٔ قلمرو", sys: "learn" }, { t: "sarea", fa: "حوزهٔ قلمروِ سامانه", sys: "learn" }, { t: "finding", fa: "یافتهٔ بک‌تست", sys: "epi" }, { t: "proposal", fa: "پیشنهادِ تغییر", sys: "epi" }
+    { t: "area", fa: "حوزهٔ قلمرو", sys: "epi" }, { t: "ssys", fa: "سامانهٔ قلمرو", sys: "learn" }, { t: "sarea", fa: "حوزهٔ قلمروِ سامانه", sys: "learn" }, { t: "finding", fa: "یافتهٔ بک‌تست", sys: "epi" }, { t: "proposal", fa: "پیشنهادِ تغییر", sys: "epi" },
+    /* نماهای صفحه (A.V): ارجاعِ «view:…» ِ قلمروِ سامانه‌ها به این‌ها می‌رسد — نمای ناموجود ⇒ ارجاعِ شکسته (نه حذفِ بی‌صدا) */
+    { t: "view", fa: "نمای صفحه", sys: "learn" },
+    /* ثبت‌گاه‌های دیگرِ دادهٔ تو (مالک ۲۰۲۶-۱۰-۱۴ «هر چیزی… باید در آن بیاید»؛ ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵) */
+    { t: "prereq", fa: "نقشهٔ پیش‌نیازها", sys: "mine" }, { t: "tour", fa: "تورِ دستیار", sys: "mine" }, { t: "tfacet", fa: "وجهِ تور", sys: "mine" },
+    { t: "wchain", fa: "زنجیرهٔ نگرانی", sys: "mine" }, { t: "fcast", fa: "پیش‌بینیِ تو", sys: "mine" }, { t: "value", fa: "ارزشِ تو", sys: "mine" },
+    { t: "meaning", fa: "وارسیِ معنا", sys: "mine" }, { t: "kexp", fa: "آزمایشِ گره", sys: "mine" }, { t: "ex", fa: "تمرینِ تکنیک", sys: "mine" },
+    { t: "prun", fa: "اجرای پروتکل", sys: "mine" }, { t: "card", fa: "کارتِ مرور", sys: "mine" }, { t: "pbitem", fa: "تمرینِ مسئلهٔ هم‌ساختار", sys: "mine" }
   ];
   G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
   G.REL = { in: "عضوِ", req: "پیش‌نیازِ", feeds: "تغذیه می‌کند", pairs: "مکمل", uses: "به کار می‌برد", serves: "پاسخ به دغدغه", core: "تکنیکِ اصلیِ گام",
@@ -58,6 +65,9 @@
     (A.COURSE_LESSONS || []).forEach(function (l, i) { var id = (l.pid || l.tid) + "@" + l.w; node("lesson", id, "درسِ هفتهٔ " + fa(l.w) + " · " + (l.fa || id), { go: ["course"] });
       if (l.pid) edge(ref("lesson", id), ref("proto", l.pid), "practises"); else edge(ref("lesson", id), ref("tech", l.tid), "practises"); edge(ref("lesson", id), ref("week", l.w), "in"); });
     (C.STRUCTURES || []).forEach(function (x) { node("struct", x.id, x.fa, { go: ["atlas"] }); edge(ref("struct", x.id), ref("tool", "ATLAS"), "in"); });
+    /* نماهای صفحه — همه از A.V (نامشان از منو/VIEW_FA)؛ ارجاعِ «view:…» به این‌ها */
+    var navLab = {}; (A.NAV || []).concat(A.EPI_NAV || [], [A.NAV_WHOLE, A.NAV_MAPS, A.NAV_SETTINGS, A.NAV_START]).forEach(function (n) { if (Array.isArray(n) && n[0] && !navLab[n[0]]) navLab[n[0]] = n[1]; });
+    Object.keys(A.V || {}).forEach(function (v) { node("view", v, "نما: " + ((A.VIEW_FA && A.VIEW_FA[v]) || navLab[v] || v), { go: [v] }); });
     /* ---------- دادهٔ خودِ تو ---------- */
     var all = function (t) { try { return (S && S.all) ? S.all(t) : []; } catch (e) { return []; } };
     all("topic").forEach(function (t) { node("topic", t.id, t.title, { go: ["topic", t.id] }); var st = t.journey && t.journey.step; if (st) edge(ref("topic", t.id), ref("jstep", st), "step"); });
@@ -74,6 +84,37 @@
     var probs = []; try { probs = A.probs ? A.probs() : []; } catch (e) { }
     probs.forEach(function (p) { node("prob", p.id, p.title, { go: ["e_prob", p.id] }); });
     all("eprob").forEach(function (r) { var o = r.origin || (r.p && r.p.origin); if (o && o.type === "kcase" && r.p && N[ref("prob", r.p.id)]) edge(ref("prob", r.p.id), ref("kcase", o.id), "from"); });
+    /* مسئله‌های آمادهٔ سازنده (EPI_PROBLEMS) فقط با «نمونه‌های آمادهٔ سازنده» گره می‌شوند؛ شمارِ پنهان‌ها در «شکاف‌ها» گفته می‌شود */
+    var hiddenProbs = (W.EPI_PROBLEMS || []).filter(function (p) { return p && !N[ref("prob", p.id)]; }).map(function (p) { return p.id; });
+    var isHidden = function (pid) { return hiddenProbs.indexOf(pid) >= 0 || (A.getProb && !N[ref("prob", pid)] && !!A.getProb(pid)); };
+    all("pbitem").forEach(function (it) { node("pbitem", it.id, "🧩 " + String(it.prompt || "تمرین").slice(0, 50), { go: ["e_prob", it.pid] }); if (it.pid && !isHidden(it.pid)) edge(ref("pbitem", it.id), ref("prob", it.pid), "practises"); });
+    /* سایرِ ثبت‌گاه‌های دادهٔ تو — هر کدام با یال به همان چیزی که ارجاع می‌دهد (همه از edge(): ارجاعِ شکسته گزارش می‌شود) */
+    var vw = function (v) { return ref("view", v); };
+    all("prereq").forEach(function (p) { node("prereq", p.id, "🧩 " + (p.title || "پیش‌نیاز"), { go: ["prereq", p.id] }); edge(ref("prereq", p.id), vw("prereq"), "in");
+      if (p.kcase) edge(ref("prereq", p.id), ref("kcase", p.kcase), "about");
+      var tseen = {}; (p.items || []).forEach(function (x) { if (x && x.topic && !tseen[x.topic]) { tseen[x.topic] = 1; edge(ref("prereq", p.id), ref("topic", x.topic), "req"); } }); });
+    all("wchain").forEach(function (c) { node("wchain", c.id, "⛓ " + (c.title || "زنجیره"), { go: ["chain"] }); edge(ref("wchain", c.id), vw("chain"), "in"); });
+    all("fcast").forEach(function (x) { node("fcast", x.id, "🎯 " + String(x.q || x.title || "پیش‌بینی").slice(0, 60), { go: ["fcast"] }); edge(ref("fcast", x.id), vw("fcast"), "in");
+      if (x.dim && x.dim !== "s_epi") edge(ref("fcast", x.id), ref("ssys", x.dim), "about"); });
+    var vByT = {}; all("value").forEach(function (v) { node("value", v.id, "🧭 " + (v.title || "ارزش"), { go: ["vals"] }); edge(ref("value", v.id), vw("vals"), "in"); if (v.title) vByT[v.title] = v.id; });
+    all("value").forEach(function (v) { (v.vs || []).forEach(function (c) { if (c && c.with) edge(ref("value", v.id), ref("value", vByT[c.with] || c.with), "vs", c.rule || ""); }); });
+    all("meaning").forEach(function (m) { node("meaning", m.id, "وارسیِ معنا · " + (m.date || ""), { go: ["vals"] }); edge(ref("meaning", m.id), vw("vals"), "in"); });
+    all("kexp").forEach(function (x) { node("kexp", x.id, "🧪 " + String(x.plan || "آزمایش").slice(0, 50), { go: ["knot", x.knot] }); if (x.knot) edge(ref("kexp", x.id), ref("knot", x.knot), "practises"); });
+    all("ex").forEach(function (x) { node("ex", x.id, "تمرینِ تکنیکِ " + fa(x.tid), { go: ["tech", x.tid] }); if (x.tid != null && x.tid !== "") edge(ref("ex", x.id), ref("tech", x.tid), "practises"); if (x.topic) edge(ref("ex", x.id), ref("topic", x.topic), "about"); });
+    all("pr").forEach(function (x) { node("prun", x.id, "اجرای پروتکلِ " + (x.pid || ""), { go: ["proto", x.pid] }); if (x.pid) edge(ref("prun", x.id), pref(x.pid), "practises"); if (x.topic) edge(ref("prun", x.id), ref("topic", x.topic), "about"); });
+    all("card").forEach(function (c) { node("card", c.id, "🃏 " + String(c.q || "کارت").slice(0, 50), { go: ["review"] }); edge(ref("card", c.id), vw("review"), "in");
+      if (c.tid != null && c.tid !== "") edge(ref("card", c.id), ref("tech", c.tid), "practises"); if (c.pid) edge(ref("card", c.id), pref(c.pid), "practises");
+      if (c.topic) edge(ref("card", c.id), ref("topic", c.topic), "about"); if (c.knot) edge(ref("card", c.id), ref("knot", c.knot), "practises"); });
+    /* تورهای دستیار (رکوردِ achat با tour): تور ⇐ وجه‌ها ⇐ ارجاع‌های هر وجه */
+    function recRef(type, id) {
+      if (type === "eprob") { var r = S && S.get ? S.get(id) : null; if (r && r.p && N[ref("prob", r.p.id)]) return ref("prob", r.p.id); return r ? null : ref("eprob", id); }   /* مسئلهٔ تأییدنشده/پنهان: نه گره، نه شکسته */
+      var gt = ({ "case": "ecase", achat: "tour", pr: "prun" })[type] || type; return ref(gt, id);
+    }
+    all("achat").filter(function (s) { return s.tour; }).forEach(function (s) {
+      node("tour", s.id, "🧭 تور: " + (s.title || s.pinned || "تور"), { go: ["home"] });
+      (s.tour.facets || []).forEach(function (f, i) { var fid = s.id + "/" + (f.key || f.id || i); node("tfacet", fid, (f.title || "وجه"), { go: [f.view || "home", f.arg || null] }); edge(ref("tfacet", fid), ref("tour", s.id), "in");
+        (f.refs || []).forEach(function (r) { if (!r || !r.id) return; var k = recRef(r.type, r.id); if (k) edge(ref("tfacet", fid), k, "about"); }); });
+    });
     /* ---------- کارخانه و جزوه ---------- */
     var E0 = W.EPI || {};
     (E0.HALLS || []).forEach(function (hl) { node("hall", hl.n, "سالنِ " + fa(hl.n) + " · " + hl.fa, { go: ["e_map"] }); });
@@ -93,7 +134,7 @@
     var dups = [], seenCo = {};
     (W.EPI_CO || []).forEach(function (c) { if (seenCo[c.id]) dups.push({ t: "concept", id: c.id, a: seenCo[c.id], b: c.fa }); else seenCo[c.id] = c.fa; node("concept", c.id, c.fa, { go: ["e_concepts", c.id] }); });
     (W.EPI_CO || []).forEach(function (c) { (c.secs || []).forEach(function (x) { edge(ref("concept", c.id), ref("section", x), "basis"); }); (c.st || []).forEach(function (x) { edge(ref("concept", c.id), ref("station", x), "at"); });
-      (c.vs || []).forEach(function (x) { var id = typeof x === "string" ? x : (x && x.id); if (id && N[ref("concept", id)]) edge(ref("concept", c.id), ref("concept", id), "vs"); }); });
+      (c.vs || []).forEach(function (x) { var id = typeof x === "string" ? x : (x && x.id); if (id) edge(ref("concept", c.id), ref("concept", id), "vs"); }); });
     (W.EPI_DR || []).forEach(function (d) { node("drill", d.id, d.title || d.id, { go: ["e_st", d.st] }); edge(ref("drill", d.id), ref("station", d.st), "practises"); });
     (W.EPI_DOS || []).forEach(function (d) { node("dossier", d.id, d.fa, { go: ["e_dos"] }); (d.secs || []).forEach(function (x) { edge(ref("dossier", d.id), ref("section", x), "basis"); }); });
     /* واقعه‌های بک‌تست (بذر + افزوده‌های هر دورِ ناظر) از دفترِ همان دور — هر دورِ تازه خودکار */
@@ -103,7 +144,9 @@
     var T = W.EPI_TERR || {};
     (T.groups || []).forEach(function (g) { node("tgroup", g.id, g.fa, { go: ["e_bt", null, "terr"] }); (g.areas || []).forEach(function (a) { node("area", a.id, a.fa, { go: ["e_bt", null, "terr"] }); edge(ref("area", a.id), ref("tgroup", g.id), "in"); (a.book || []).forEach(function (s) { edge(ref("area", a.id), ref("section", s), "covers"); }); }); });
     var L = W.EPI_BT_LEDGER || {}, TS = (L.territory || {}).areas || {};
-    Object.keys(TS).forEach(function (aid) { (TS[aid].rules || []).forEach(function (r) { edge(ref("area", aid), ref("rule", r), "covers"); }); });
+    Object.keys(TS).forEach(function (aid) { (TS[aid].rules || []).forEach(function (r) { edge(ref("area", aid), ref("rule", r), "covers"); });
+      /* گزاره‌های حوزه بر پایهٔ کدام اصل/قضیه (claims[].th) — از edge() تا اصل/قضیهٔ ناموجود شکسته گزارش شود */
+      (TS[aid].claims || []).forEach(function (c) { if (c && c.th) edge(ref("area", aid), F.TH && F.TH[c.th] ? ref("theorem", c.th) : ref("axiom", c.th), "basis", String(c.txt || "").slice(0, 90)); }); });
     ((L.findings || {}).findings || []).forEach(function (f) { node("finding", f.id, f.title + " — " + f.status, { go: ["e_bt", null, "live"] }); (f.rules || []).forEach(function (r) { edge(ref("finding", f.id), ref("rule", r), "about"); }); });
     ((L.proposals || {}).proposals || []).forEach(function (p) { node("proposal", p.id, p.title, { go: ["e_bt", null, "live"] }); if (p.finding) edge(ref("proposal", p.id), ref("finding", p.finding), "about"); });
     /* «🗺 قلمروِ سامانه‌ها» (a28): سامانه ⇐ حوزه ⇐ ابزارهای صفحه (فقط ارجاع‌های ثبت‌شده در نقشه) */
@@ -111,7 +154,8 @@
       node("ssys", m.id, m.fa, { go: ["sterr", m.id] });
       (m.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) {
         node("sarea", a.id, a.fa, { go: ["sterr", m.id] }); edge(ref("sarea", a.id), ref("ssys", m.id), "in");
-        (a.tools || []).forEach(function (t) { var mm = /^([a-z]+):(.+)$/.exec(t); if (!mm || mm[1] === "view") return; var tt = mm[1] === "kfam" ? "kfam" : mm[1]; if (N[ref(tt, mm[2])]) edge(ref("sarea", a.id), ref(tt, mm[2]), "uses"); });
+        /* هر ابزار (tech/proto/kfam/move/station/view) از edge() — ابزارِ ناموجود شکسته گزارش می‌شود، نه بی‌صدا رها */
+        (a.tools || []).forEach(function (t) { var mm = /^([a-z]+):(.+)$/.exec(String(t)); edge(ref("sarea", a.id), mm ? ref(mm[1], mm[2]) : ref("tool", t), "uses"); });
       }); });
     });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
@@ -125,14 +169,16 @@
     /* یالِ تکراری یکی شود (همان دو سر و همان نوع) */
     var seen = {}, E2 = []; E.forEach(function (e) { var key = e.a + "|" + e.b + "|" + e.rel; if (!seen[key]) { seen[key] = 1; E2.push(e); } });
     var adj = {}; E2.forEach(function (e, i) { (adj[e.a] = adj[e.a] || []).push(i); (adj[e.b] = adj[e.b] || []).push(i); });
-    return { nodes: N, edges: E2, adj: adj, broken: broken, dups: dups };
+    return { nodes: N, edges: E2, adj: adj, broken: broken, dups: dups, hiddenProbs: hiddenProbs };
   };
   G.model = function () { return G.build(); };
   /* شکاف‌ها: کجا میانِ دو سامانه پل نیست — فقط گزارش، نه ساختنِ پیوند */
   G.gaps = function (M) {
     M = M || G.build();
     function deg(k, pred) { return (M.adj[k] || []).filter(function (i) { return pred(M.edges[i]); }).length; }
-    var isBridge = function (e) { return M.nodes[e.a] && M.nodes[e.b] && M.nodes[e.a].sys !== M.nodes[e.b].sys && (M.nodes[e.a].sys === "epi" || M.nodes[e.b].sys === "epi"); };
+    /* «پل» فقط پیوندِ ثبت‌شدهٔ rel=bridge است (ایستگاه⇄تکنیک، خانواده⇄ایستگاه، مسئله⇄ایستگاه) — نه هر یالِ میانِ دو رنگ
+       (ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵: ارجاع‌های ابزارِ «قلمروِ سامانه‌ها» به ایستگاه‌ها شمارِ پل را ~۲۶ تا باد کرده بود و شکافِ ایستگاه‌ها را می‌پوشاند) */
+    var isBridge = function (e) { return e.rel === "bridge" && M.nodes[e.a] && M.nodes[e.b] && M.nodes[e.a].sys !== M.nodes[e.b].sys && (M.nodes[e.a].sys === "epi" || M.nodes[e.b].sys === "epi"); };
     var list = function (t) { return Object.keys(M.nodes).filter(function (k) { return M.nodes[k].t === t; }); };
     return {
       bridges: M.edges.filter(isBridge).length,
@@ -141,7 +187,8 @@
       famNoStation: list("kfam").filter(function (k) { return !deg(k, isBridge); }),
       areasNoRule: list("area").filter(function (k) { return !deg(k, function (e) { return M.nodes[e.a].t === "rule" || M.nodes[e.b].t === "rule"; }); }),
       /* واقعهٔ سالم (بی ایستگاهِ شکست) طبیعتاً پیوندِ «شکست در» ندارد؛ جزوِ شکاف نیست */
-      isolated: Object.keys(M.nodes).filter(function (k) { return !(M.adj[k] || []).length && M.nodes[k].t !== "event"; }),
+      isolated: Object.keys(M.nodes).filter(function (k) { return !(M.adj[k] || []).length && M.nodes[k].t !== "event" && M.nodes[k].t !== "view"; }),   /* نمای بی‌ارجاع شکاف نیست */
+      hiddenSamples: (M.hiddenProbs || []).length,
       dups: M.dups || [],
       broken: M.broken || []
     };
@@ -266,7 +313,8 @@
       gapRow("تکنیک‌هایی که به هیچ ایستگاهی وصل نیستند", gp.techNoStation),
       gapRow("خانواده‌های گره بی پیوند به ایستگاه", gp.famNoStation),
       gapRow("حوزه‌های قلمرو بی قاعده", gp.areasNoRule),
-      gapRow("گره‌های بی هیچ پیوند", gp.isolated)));
+      gapRow("گره‌های بی هیچ پیوند", gp.isolated),
+      gp.hiddenSamples ? h("p", { class: "small muted gr-hidden" }, "پنهان: " + fa(gp.hiddenSamples) + " مسئلهٔ آمادهٔ سازنده (کتابخانهٔ مسئله‌ها) در گراف نیامده‌اند، چون «نمونه‌های آمادهٔ سازنده» در تنظیمات خاموش است — با روشن کردنش همراهِ پل‌هایشان به ایستگاه‌ها می‌آیند.") : null));
     /* خوداصلاحی: ارجاعِ شکسته در داده (مثلاً پیوند به گرهِ پاک‌شده، ایستگاه/بخشِ ناموجود) — پنهان نمی‌شود */
     box.appendChild(h("section", { class: "card gr-broken" + (gp.broken.length ? " bad" : "") }, h("h3", {}, (gp.broken.length ? "⚠ " : "✓ ") + "ارجاع‌های شکسته: " + fa(gp.broken.length)),
       h("p", { class: "small muted" }, "هر پیوندی که یک سرش در داده نیست این‌جا می‌آید، نه این‌که بی‌صدا حذف شود. برای ثبت‌گاه‌های کارخانه و جزوه، دروازهٔ ادغام (`epi_backtest.js audit`) همین را نگه می‌دارد؛ برای داده‌های خودت، این‌جا ببین و اصلاح کن."),
@@ -279,19 +327,20 @@
   /* ======================= «🗺 نقشه‌ها»: همهٔ نقشه‌ها ذیلِ یک قسمت (هیچ‌کدام حذف نشد) ======================= */
   G.MAPS = [
     { v: "maps", fa: "🕸 گرافِ مشترک", what: "یادگیری + دادهٔ تو + معرفت‌شناسی در یک شبکهٔ زنده؛ پل‌ها و شکاف‌ها" },
-    { v: "map", fa: "🧩 نقشهٔ مسیرِ یادگیری", what: "۹ فاز، شبکهٔ ۴۵ تکنیک، برنامهٔ ۸ هفته‌ای" },
+    { v: "map", fa: "🧩 نقشهٔ مسیرِ یادگیری", what: function () { var C = A.C || {}; return fa((C.PHASES || []).length) + " فاز، شبکهٔ " + fa((A.T || []).length) + " تکنیک، برنامهٔ " + fa((C.CURRICULUM || []).length) + " هفته‌ای"; } },
     { v: "kmap", fa: "🗺️ نقشهٔ ذهنِ تو", what: "گره‌های ذهنیِ تو، پیوندهایشان، روندِ باز شدن (از موقعیت‌هایی که خودت ثبت می‌کنی)" },
     { v: "farm", fa: "🌳 مزرعه", what: "درختِ مفهوم‌هایی که فهمیده‌ای" },
-    { v: "e_map", fa: "🏭 نقشهٔ کارخانه", what: "۶ سالن و ۳۱ ایستگاهِ سنجشِ معرفتی" },
+    { v: "e_map", fa: "🏭 نقشهٔ کارخانه", what: function () { return fa(((window.EPI || {}).HALLS || []).length) + " سالن و " + fa((window.EPI_ST || []).length) + " ایستگاهِ سنجشِ معرفتی"; } },
     { v: "e_bt", s: "terr", fa: "🗺 قلمروِ معرفت‌شناسی", what: "همهٔ حوزه‌های این علم و پیشرفتِ هر کدام" },
-    { v: "e_bt", s: "found", fa: "🧱 مبنای درجه‌ها", what: "اصولِ بدیهی، قضیه‌ها، مبنای هر عدد" }
+    { v: "e_bt", s: "found", fa: "🧱 مبنای درجه‌ها", what: "اصولِ بدیهی، قضیه‌ها، مبنای هر عدد" },
+    { v: "whole", fa: "🧭 این برنامه چیست؟", what: "نقشهٔ کلِ برنامه: از چه ساخته شده، سه کارِ اصلی، و تو کجای آنی" }
   ];
   A.V.maps = function () {
     var root = h("div", { class: "page", dir: "rtl" });
     root.appendChild(A.head("نقشه‌ها", "🗺 همهٔ نقشه‌ها در یک جا", "هر نقشه یک لایه از همین برنامه است؛ «گرافِ مشترک» همه را به هم وصل می‌کند. هیچ‌کدام حذف نشده — از همین‌جا یا از منوی هر سامانه باز می‌شوند."));
     root.appendChild(h("div", { class: "gr-maps" }, G.MAPS.map(function (m) {
       return h("button", { class: "card soft gr-mapcard" + (m.v === "maps" ? " on" : ""), "data-v": m.v + (m.s ? ":" + m.s : ""), onclick: function () { if (m.v !== "maps") A.go(m.v, null, m.s || null); } },
-        h("b", {}, m.fa), h("div", { class: "small muted" }, m.what)); })));
+        h("b", {}, m.fa), h("div", { class: "small muted" }, typeof m.what === "function" ? m.what() : m.what)); })));
     root.appendChild(A.graphPanel());
     return root;
   };

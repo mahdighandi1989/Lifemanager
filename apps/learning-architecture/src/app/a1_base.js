@@ -208,13 +208,17 @@ var APP = window.APP = {};
     S.recs[r.id] = r;
     if (S.mode === "host") { delete hostDel[r.id]; hostPending[r.id] = r; flushHost(); }
     else if (S.mode === "gas") { pending[r.id] = r; flushGAS(); } else flushLocal();
+    notify(r, "put");
     return r;
   };
+  /* شنونده‌های نوشتن (S.listeners): نمای باز می‌تواند پس از S.put/S.del خودش را تازه کند — خطای شنونده هرگز ذخیره را نمی‌شکند */
+  function notify(r, op) { (S.listeners || []).forEach(function (fn) { try { fn(r, op); } catch (e) { console.warn(e); } }); }
   S.del = function (id) {
     delete S.recs[id];
-    if (S.mode === "host") { delete hostPending[id]; hostDel[id] = 1; flushHost(); return; }  // a queued save must not resurrect it
+    if (S.mode === "host") { delete hostPending[id]; hostDel[id] = 1; flushHost(); notify({ id: id }, "del"); return; }  // a queued save must not resurrect it
     if (S.mode === "gas") { google.script.run.withFailureHandler(function () { A.toast("حذف در Sheets ناموفق بود", "bad"); }).api_delete(id); }
     else flushLocal();
+    notify({ id: id }, "del");
   };
   S.get = function (id) { return S.recs[id]; };
   S.all = function (type, pred) {

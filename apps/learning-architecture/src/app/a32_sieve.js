@@ -235,4 +235,15 @@
     var end = gi + 1; while (end < arr.length && Array.isArray(arr[end])) end++;
     arr.splice(end, 0, ["prereq", "🧩 نقشهٔ پیش‌نیازها", "کدام دانشِ مقدماتی را برای این مسئله نداشتی"]);
   });
+  /* «🧩 نقشهٔ پیش‌نیازها» یک نقشه است ⇒ ذیلِ «🗺 نقشه‌ها» هم (هر دو منو) و کارتی در هابِ نقشه‌ها — افزودن، نه جابه‌جایی:
+     همان ورودیِ «🧰 ابزارهای ذهن» سرِ جایش می‌ماند (ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵) */
+  [A.NAV, A.EPI_NAV].forEach(function (arr) {
+    if (!Array.isArray(arr)) return;
+    var gi = arr.findIndex(function (n) { return n && n.g === "🗺 نقشه‌ها"; }); if (gi < 0) return;
+    var end = gi + 1; while (end < arr.length && Array.isArray(arr[end])) end++;
+    if (arr.slice(gi + 1, end).some(function (n) { return n[0] === "prereq"; })) return;
+    arr.splice(end, 0, ["prereq", "🧩 نقشهٔ پیش‌نیازها", "دانشِ مقدماتیِ هر مسئله و جایی که نبود"]);
+  });
+  if (A.GRAPH && A.GRAPH.MAPS && !A.GRAPH.MAPS.some(function (m) { return m.v === "prereq"; }))
+    A.GRAPH.MAPS.push({ v: "prereq", fa: "🧩 نقشهٔ پیش‌نیازها", what: "برای هر مسئله: کدام دانشِ مقدماتی نبود، از کدام علم، و موضوعِ یادگیریِ هر کدام" });
 })(APP);

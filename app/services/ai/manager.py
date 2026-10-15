@@ -7,6 +7,7 @@ adapted to Lifemanager's encrypted-at-rest key storage + env-var fallback.
 """
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass, field
 from typing import List, Optional
@@ -16,6 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ai_catalog import AICatalogModel, AICatalogProvider, AITaskRoute
 from app.services.ai.catalog import task_preferred_capability
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -144,8 +147,61 @@ class AIManager:
         except Exception:  # noqa: BLE001 — ranking is a tie-breaker, never a failure
             return 0.0
 
-    def _sort(self, models: List[AICatalogModel]) -> List[AICatalogModel]:
-        return sorted(models, key=lambda m: ("[gone]" in (m.notes or ""), m.priority, -self._newness(m), m.id or 0))
+    @staticmethod
+    def _cost(m: AICatalogModel) -> Optional[float]:
+        """Blended price per 1M tokens (input + output) when the catalog knows it, else None."""
+        i, o = getattr(m, "input_cost_per_1m", None), getattr(m, "output_cost_per_1m", None)
+        if i is None and o is None:
+            return None
+        return float(i or 0.0) + float(o or 0.0)
+
+    def _tie_cmp(self, a: AICatalogModel, b: AICatalogModel) -> int:
+        """Inside one (gone, priority) tier (review 2026-10-15): the CHEAPER model first when both prices are known;
+        then the newer version — but only between models of the SAME provider (a Gemini «4.0» and a Claude «4.6» are
+        not versions of one thing); otherwise database order."""
+        ca, cb = self._cost(a), self._cost(b)
+        if ca is not None and cb is not None and ca != cb:
+            return -1 if ca < cb else 1
+        if a.provider_key == b.provider_key:
+            na, nb = self._newness(a), self._newness(b)
+            if na != nb:
+                return -1 if na > nb else 1
+        ia, ib = a.id or 0, b.id or 0
+        return (ia > ib) - (ia < ib)
+
+    def _fallback_cmp(self, a: AICatalogModel, b: AICatalogModel) -> int:
+        """No-capable-model fallback: a known cheaper price beats priority; with no price, the catalog's own tiering
+        decides — a fast model WITHOUT «reasoning» is the light/cheap tier (Flash-Lite, GPT-4o mini, seeded Haiku);
+        otherwise the usual order."""
+        ca, cb = self._cost(a), self._cost(b)
+        if ca is not None and cb is not None and ca != cb:
+            return -1 if ca < cb else 1
+        la = "reasoning" not in (a.capabilities or [])
+        lb = "reasoning" not in (b.capabilities or [])
+        if la != lb:
+            return -1 if la else 1
+        pa, pb = (a.priority if a.priority is not None else 9), (b.priority if b.priority is not None else 9)
+        if pa != pb:
+            return -1 if pa < pb else 1
+        return self._tie_cmp(a, b)
+
+    def _sort(self, models: List[AICatalogModel], cost_first: bool = False) -> List[AICatalogModel]:
+        """``(gone, priority)`` tiers, ties broken by :meth:`_tie_cmp`. ``cost_first`` (the no-capable-model fallback):
+        a known cheaper price outranks priority too (:meth:`_fallback_cmp`)."""
+        import functools
+
+        if cost_first:
+            live = [m for m in models if "[gone]" not in (m.notes or "")]
+            gone = [m for m in models if m not in live]
+            cmp = functools.cmp_to_key(self._fallback_cmp)
+            return sorted(live, key=cmp) + sorted(gone, key=cmp)
+        tiers: dict = {}
+        for m in models:
+            tiers.setdefault(("[gone]" in (m.notes or ""), m.priority if m.priority is not None else 9), []).append(m)
+        out: List[AICatalogModel] = []
+        for k in sorted(tiers):
+            out.extend(sorted(tiers[k], key=functools.cmp_to_key(self._tie_cmp)))
+        return out
 
     async def _auto_order(self, db: AsyncSession, task: str, providers=None, configured=None,
                           need: Optional[str] = None) -> List[AICatalogModel]:
@@ -165,11 +221,20 @@ class AIManager:
         if need:
             pool = [m for m in pool if need in (m.capabilities or [])]
         req = task_required_capabilities(task)
+        pref = task_preferred_capability(task)
         if req:
             full = [m for m in pool if all(c in (m.capabilities or []) for c in req)]
             if full:
                 pool = full
-        pref = task_preferred_capability(task)
+            elif pool:
+                # no model has every required capability: prefer the CHEAPER FAST model (review 2026-10-15) — a
+                # capability gap must never quietly route the task to the priciest model — and say so in the log
+                fast = self._sort([m for m in pool if "fast" in (m.capabilities or [])], cost_first=True)
+                rest = self._sort([m for m in pool if m not in fast])
+                ordered = fast + rest
+                logger.warning("AI task %s: no enabled model has %s — falling back to %s (cheaper fast model first)",
+                               task, "+".join(req), ordered[0].api_id if ordered else "nothing")
+                return ordered
         preferred = self._sort([m for m in pool if pref and pref in (m.capabilities or [])])
         rest = self._sort([m for m in pool if m not in preferred])
         return preferred + rest

@@ -1,14 +1,14 @@
 ---
 name: ناظرِ خودکارِ Lifemanager (Automated Supervisor)
-version: 8
+version: 9
 created: 2026-10-08
-updated: 2026-10-14
-supersedes: docs/supervisor/archive/PROMPT-v7-2026-10-14.md
+updated: 2026-10-15
+supersedes: docs/supervisor/archive/PROMPT-v8-2026-10-15.md
 archive: docs/supervisor/archive/
 routine: «ناظرِ خودکارِ سامانه — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۸
+# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۹
 
 > **این فایل تنها مرجعِ رفتارِ ناظر است.** پرامپتِ خودِ Routine فقط یک اشاره به
 > این آدرس است. هر تغییری در وظایفِ ناظر **این‌جا** نوشته می‌شود؛ نسخهٔ قبلی
@@ -385,6 +385,10 @@ python3 scripts/supervisor/page_map.py    # هر صفحه و هر تب در Chro
 هر دور پس از کارتابل: `python3 apps/learning-architecture/tools/sys_territory.py status` ⇒ ۲ تا ۴ حوزهٔ کم‌گام (و برگه‌های دستیار با
 `area=sys-territory`) را **با شاهد** یک گام جلو ببر — منبعِ واقعیِ وارسی‌شده، گزاره و ردهٔ آن بر پایهٔ اصول، یا بستنِ کمبودِ صفحه با ساختنِ
 ابزارِ واقعی — دقیقاً طبقِ بخشِ «🗺 قلمروِ سامانه‌ها» در `apps/learning-architecture/AGENTS.md` (گامِ ۵ را هرگز ننویس؛ `check` باید سبز بماند).
+
+**گرافِ مشترک و کارنامهٔ ذهن (v9، ۲۰۲۶-۱۰-۱۵):** هر چیزی که در این صفحه می‌افزایی (حوزه، ابزار، ثبت‌گاه، نوعِ رکورد) خودکار در «🗺 نقشه‌ها» و «🧠 کارنامهٔ ذهن» می‌آید — **دستی چیزی نکش**.
+`node apps/learning-architecture/tests/test_graph.js` و `node apps/learning-architecture/tests/test_mind_report.js` سبز بمانند (هر دو «NO ERRORS»؛ در pytest ِ اجباری هم هستند: `tests/test_learning_architecture_graph_browser.py`).
+ثبت‌گاه یا نوعِ رکوردِ تازه ⇒ در `G.TYPES`/`G.build` ِ `a25_graph.js` و فهرستِ پوششِ `tests/test_graph.js` — قراردادِ «نقشه‌ها و گرافِ مشترک» در `apps/learning-architecture/AGENTS.md`.
 
 **دیاگرامِ زندهٔ `/system-map`** از روی همین قراردادها خودش را می‌سازد (CLAUDE.md). اگر چیزی که
 اضافه شده در آن نیست، کسی قرارداد را دور زده — ثبتِ درست را اصلاح کن، **نه نقشه را**.

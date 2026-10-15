@@ -210,6 +210,27 @@ async def reconcile(db: AsyncSession, provider: AICatalogProvider, live: List[Di
     assign_priorities(entries)
     live_ids = {i["id"] for i in live}  # ANY live id (text or not) keeps its row alive
 
+    # Degraded-answer guard (review 2026-10-15): a 200 that lists ZERO text models, or that would switch off more than
+    # half of this provider's enabled text models in one go, is a partial/broken answer, not a mass retirement —
+    # retire NOTHING (same as the empty-list guard) and report it. Only rows a previous live list confirmed count
+    # (``source == "live"``): the first sync must still be able to retire the static seed's guesses.
+    if not entries:
+        logger.warning("model refresh %s: the live list has no text models — nothing retired", provider.key)
+        return {"ok": False, "provider": provider.key, "live": len(live), "text_models": 0, "added": 0, "enabled": 0,
+                "retired": 0, "updated": 0, "guard": "no_text_models",
+                "message": f"فهرستِ ارائه‌دهنده هیچ مدلِ متنی نداشت ({len(live)} مدلِ غیرِمتنی) — پاسخِ ناقص؛ چیزی خاموش نشد"}
+    confirmed = [m for m in mine if m.enabled and (m.source or "") == "live" and GONE_MARK not in (m.notes or "")]
+    would_retire = [m for m in confirmed if m.api_id not in live_ids]
+    if confirmed and len(would_retire) * 2 > len(confirmed):
+        names = "، ".join(m.api_id for m in would_retire[:8])
+        logger.warning("model refresh %s: would retire %d of %d enabled text models at once — nothing retired",
+                       provider.key, len(would_retire), len(confirmed))
+        return {"ok": False, "provider": provider.key, "live": len(live), "text_models": len(entries), "added": 0,
+                "enabled": 0, "retired": 0, "updated": 0, "guard": "mass_retire",
+                "would_retire": [m.api_id for m in would_retire],
+                "message": (f"این فهرست {len(would_retire)} از {len(confirmed)} مدلِ روشنِ متنی را یک‌جا خاموش می‌کرد ({names}) — "
+                            "احتمالاً پاسخِ ناقص؛ چیزی خاموش نشد. اگر واقعاً بازنشسته شده‌اند، دستی خاموششان کن.")}
+
     added = enabled = gone = updated = 0
     for e in entries:
         mid, c = e["info"]["id"], e["cls"]
@@ -276,6 +297,8 @@ async def refresh_provider(db: AsyncSession, provider_key: str) -> Dict[str, Any
     if not live:
         return {"ok": False, "provider": provider_key, "message": "فهرست مدلی برنگشت (چیزی خاموش نشد)"}
     res = await reconcile(db, provider, live)
+    if res.get("guard"):  # degraded answer refused — keep the guard's own explanation
+        return res
     res["message"] = (f"همگام شد · {res['live']} مدل · {res['added']} تازه · {res['enabled']} روشن · "
                       f"{res['retired']} خاموش (دیگر در فهرست نیست)")
     return res

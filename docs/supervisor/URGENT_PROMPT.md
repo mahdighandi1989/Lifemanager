@@ -1,14 +1,14 @@
 ---
 name: صفِ فوریِ «نظارت و سرکشی» — Lifemanager
-version: 7
+version: 8
 created: 2026-10-08
-updated: 2026-10-14
-supersedes: docs/supervisor/archive/URGENT_PROMPT-v6-2026-10-11.md
+updated: 2026-10-15
+supersedes: docs/supervisor/archive/URGENT_PROMPT-v7-2026-10-15.md
 archive: docs/supervisor/archive/
 routine: «صفِ فوریِ نظارت و سرکشی — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ روتینِ «صفِ فوری» — نسخهٔ ۷
+# دستورِ روتینِ «صفِ فوری» — نسخهٔ ۸
 
 > **این فایل تنها مرجعِ رفتارِ روتینِ صفِ فوری است.** پرامپتِ خودِ Routine عمداً
 > کوتاه و ثابت است و فقط به این آدرس اشاره می‌کند. هر تغییری **این‌جا** نوشته
@@ -196,6 +196,10 @@ python3 scripts/supervisor/inspection.py urgent
 اول بسنج کمبود واقعی است و انتزاعش درست؛ با کارِ جاریِ روالِ بک‌تست (`docs/supervisor/BACKTEST_PROMPT.md`، WORKLOG ِ اخیر) و برگه‌های باز
 هماهنگ کن تا تعارض و دوباره‌کاری پیش نیاید؛ قابلیتِ تازه را در ثبت‌گاه و `VIEW_META` ثبت کن تا دستیار خودش یاد بگیرد؛ در WORKLOG بنویس
 «پاسخ به برگهٔ دستیار #n». قاعدهٔ کامل: بخشِ «💬 دستیار» در `apps/learning-architecture/AGENTS.md`.
+
+**گرافِ مشترک و کارنامهٔ ذهن** (v8، ۲۰۲۶-۱۰-۱۵): برگه‌ای که روی این صفحه چیزی می‌افزاید یا عوض می‌کند — `node apps/learning-architecture/tests/test_graph.js`
+و `node apps/learning-architecture/tests/test_mind_report.js` سبز بمانند (هر دو «NO ERRORS»؛ در pytest ِ اجباری: `tests/test_learning_architecture_graph_browser.py`).
+گراف را دستی نکش؛ ثبت‌گاه/نوعِ رکوردِ تازه ⇒ `G.TYPES`/`G.build` و فهرستِ پوششِ `tests/test_graph.js` (قرارداد: «نقشه‌ها و گرافِ مشترک» در `AGENTS.md`).
 
 ## ۴) بعد از جواب
 

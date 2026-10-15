@@ -265,7 +265,9 @@ async def app_ai(app: str, payload: AIIn, db: AsyncSession = Depends(get_db), us
                    "no_capable_model": "هیچ مدلِ فعالی که تصویر/سند بخواند نیست (مثلاً Gemini با کلید)؛ پیوست‌ها خوانده نشدند."}.get(err, err)
             return {"ok": False, "success": False, "error": msg, "text": "", "files": res.get("files") or []}
         return {"ok": True, "success": True, "text": res.get("text") or "", "model": res.get("model"),
-                "files": res.get("files") or [], "mode": res.get("mode")}
+                "files": res.get("files") or [], "mode": res.get("mode"),
+                # «chunked» ⇒ answered chunk by chunk (bigger than the model's window); reading_note is the line to show
+                "reading": res.get("reading") or "single", "reading_note": res.get("reading_note") or ""}
     res = await complete(db, payload.user, task=task, system=payload.system or None,
                          max_tokens=payload.max_tokens)
     if not res.get("ok"):

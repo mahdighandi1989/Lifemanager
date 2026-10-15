@@ -61,6 +61,10 @@ _TEXTY_EXT = (".txt", ".md", ".markdown", ".tsv", ".json", ".yaml", ".yml", ".xm
               ".jsx", ".css", ".sh", ".bat", ".rst", ".kt", ".java", ".srt", ".vtt")
 _HTML_EXT = (".html", ".htm")
 
+#: an image's note in «نظارت و سرکشی» (`inspection.py pull` opens it); app_reading swaps it for its own
+IMAGE_NOTE = ("تصویر است — ناظر باید بازش کند و نگاه کند "
+              "(`pull` قالب‌های غیرِ png/jpg/gif/webp را به PNG تبدیل می‌کند)")
+
 
 def safe_filename(name: str) -> str:
     """Safe for Drive and a URL, still recognisable — Persian names are KEPT."""
@@ -142,29 +146,109 @@ def _docx_text(data: bytes) -> str:
     return "\n".join(out)
 
 
+def _rels_targets(z: zipfile.ZipFile, part: str) -> list[str]:
+    """Absolute zip paths a part's ``_rels`` file points at (``../notesSlides/x.xml`` ⇒ ``ppt/notesSlides/x.xml``)."""
+    folder, base = part.rsplit("/", 1)
+    rels = f"{folder}/_rels/{base}.rels"
+    if rels not in z.namelist():
+        return []
+    out = []
+    for t in re.findall(r'Target="([^"]+)"', z.read(rels).decode("utf-8", "ignore")):
+        parts = (t.lstrip("/").split("/") if t.startswith("/") else folder.split("/") + t.split("/"))
+        stack: list[str] = []
+        for x in parts:
+            if x == "..":
+                if stack:
+                    stack.pop()
+            elif x and x != ".":
+                stack.append(x)
+        out.append("/".join(stack))
+    return out
+
+
+def _pptx_comment_text(xml: str) -> str:
+    # legacy ``<p:cm><p:text>…</p:text></p:cm>`` and modern ``<p188:cm>…<a:p>…</a:p>…</p188:cm>``
+    return _xml_text(xml, para=r"</a:p>|</p:cm>|</p188:cm>|</p:text>").strip()
+
+
 def _pptx_text(data: bytes) -> str:
+    """Every slide's text AND its speaker notes AND its comments (review 2026-10-15: notes/comments were dropped —
+    the presenter's real explanation often lives only in the notes). Notes/comments no slide points at are kept at the end."""
     with zipfile.ZipFile(io.BytesIO(data)) as z:
+        names = z.namelist()
         slides = sorted(
-            (n for n in z.namelist() if re.match(r"ppt/slides/slide\d+\.xml$", n)),
+            (n for n in names if re.match(r"ppt/slides/slide\d+\.xml$", n)),
             key=lambda n: int(re.search(r"(\d+)", n.rsplit("/", 1)[-1]).group(1)))
+        extra = sorted(n for n in names if re.match(r"ppt/(notesSlides/notesSlide|comments/(modern)?[cC]omment)[^/]*\.xml$", n))
+        used: set[str] = set()
         out = []
         for i, n in enumerate(slides, start=1):
             xml = z.read(n).decode("utf-8", "ignore")
-            out.append(f"\n--- اسلایدِ {i} ---\n" + _xml_text(xml, para=r"</a:p>"))
+            block = f"\n--- اسلایدِ {i} ---\n" + _xml_text(xml, para=r"</a:p>")
+            for t in _rels_targets(z, n):
+                if t not in names or t in used:
+                    continue
+                if "/notesSlides/" in t:
+                    used.add(t)
+                    notes = _xml_text(z.read(t).decode("utf-8", "ignore"), para=r"</a:p>").strip()
+                    if notes:
+                        block += f"\n[یادداشتِ سخنران — اسلایدِ {i}]\n{notes}"
+                elif "/comments/" in t:
+                    used.add(t)
+                    com = _pptx_comment_text(z.read(t).decode("utf-8", "ignore"))
+                    if com:
+                        block += f"\n[نظرها — اسلایدِ {i}]\n{com}"
+            out.append(block)
+        for t in extra:
+            if t in used:
+                continue
+            body = z.read(t).decode("utf-8", "ignore")
+            txt = _pptx_comment_text(body) if "/comments/" in t else _xml_text(body, para=r"</a:p>").strip()
+            if txt:
+                out.append(f"\n[{'نظر' if '/comments/' in t else 'یادداشتِ سخنران'} — {t.rsplit('/', 1)[-1]}]\n{txt}")
     return "\n".join(out)
 
 
+def _xlsx_has_formulas(data: bytes) -> bool:
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for n in z.namelist():
+                if n.startswith("xl/worksheets/") and n.endswith(".xml") and b"<f" in z.read(n):
+                    return True
+    except Exception:  # noqa: BLE001
+        return False
+    return False
+
+
+def _cell_formula(v) -> str:
+    """A formula cell of the ``data_only=False`` workbook — plain «=SUM(A1:A3)» or an ArrayFormula object."""
+    text = getattr(v, "text", v)
+    return text if isinstance(text, str) and text.startswith("=") else ""
+
+
 def _xlsx_text(data: bytes) -> str:
+    """Every non-empty cell of every sheet: the cached VALUE, or — for a formula cell the file has no cached value
+    for (written by a library, never opened in Excel) — the FORMULA itself («=SUM(A1:A3)»), never a silent blank."""
+    import itertools
+
     import openpyxl
 
     wb = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+    fwb = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=False) if _xlsx_has_formulas(data) else None
     lines: list[str] = []
     size = 0
     try:
-        for ws in wb.worksheets:
+        for si, ws in enumerate(wb.worksheets):
             lines.append(f"\n--- کاربرگِ «{ws.title}» ---")
-            for row in ws.iter_rows(values_only=True):
-                cells = ["" if c is None else str(c) for c in row]
+            frows = fwb.worksheets[si].iter_rows(values_only=True) if fwb is not None else iter(())
+            for row, frow in itertools.zip_longest(ws.iter_rows(values_only=True), frows):
+                row, frow = row or (), frow or ()
+                cells = []
+                for k, c in enumerate(row):
+                    if c is None and k < len(frow):
+                        cells.append(_cell_formula(frow[k]))
+                    else:
+                        cells.append("" if c is None else str(c))
                 if any(cells):
                     line = " | ".join(cells).rstrip(" |")
                     lines.append(line)
@@ -173,16 +257,80 @@ def _xlsx_text(data: bytes) -> str:
                     break
     finally:
         wb.close()
+        if fwb is not None:
+            fwb.close()
     return "\n".join(lines)
 
 
-def _decode(data: bytes) -> str:
-    for enc in ("utf-8-sig", "utf-8", "cp1256", "windows-1256"):
+def _utf16_guess(data: bytes) -> str:
+    """``utf-16`` (BOM), ``utf-16-le``/``-be`` (BOM-less but NUL-heavy, or Persian/Arabic text whose high byte is 0x06), or ""."""
+    if data[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return "utf-16"
+    if len(data) < 4 or len(data) % 2:
+        return ""
+    sample = data[:8192]
+    sample = sample[: len(sample) - len(sample) % 2]
+    half = len(sample) // 2
+    even, odd = sample[0::2], sample[1::2]
+    ez, oz = even.count(0), odd.count(0)
+    if (ez + oz) > 0.1 * half:  # a text in one of the 8-bit encodings practically never has NUL bytes
+        if oz > 2 * ez:
+            return "utf-16-le"
+        if ez > 2 * oz:
+            return "utf-16-be"
+    # Persian/Arabic without spaces: the high byte is almost always 0x06 (U+0600–U+06FF) or 0x00/0x20
+    hi_le = sum(1 for b in odd if b in (0x00, 0x06, 0x20)) / max(1, half)
+    hi_be = sum(1 for b in even if b in (0x00, 0x06, 0x20)) / max(1, half)
+    if hi_le > 0.9 and odd.count(6) > 0.3 * half:
+        return "utf-16-le"
+    if hi_be > 0.9 and even.count(6) > 0.3 * half:
+        return "utf-16-be"
+    return ""
+
+
+def _looks_garbled(text: str) -> bool:
+    """Control characters / U+FFFD in a «text» ⇒ the bytes were not decoded right (or are not text)."""
+    if not text:
+        return False
+    sample = text[:200_000]
+    bad = sum(1 for ch in sample if ch == "\ufffd" or (ord(ch) < 32 and ch not in "\t\n\r\f\v") or ch == "\x00")
+    return bad > 0.02 * len(sample)
+
+
+def _decode_ex(data: bytes) -> tuple[str, bool]:
+    """``(text, trustworthy)``. UTF-8 (with/without BOM) ⇒ UTF-16 (BOM, or BOM-less detected) ⇒ cp1256; a result
+    that is still full of control characters is returned with ``trustworthy=False`` — never reported as complete
+    (review 2026-10-15: a UTF-16 Persian file came back «ok» as cp1256 garbage)."""
+    if data[:3] == b"\xef\xbb\xbf":
         try:
-            return data.decode(enc)
+            return data.decode("utf-8-sig"), True
+        except Exception:  # noqa: BLE001
+            pass
+    enc16 = _utf16_guess(data)
+    if enc16:
+        try:
+            t = data.decode(enc16)
+            if not _looks_garbled(t):
+                return t.lstrip("\ufeff"), True
+        except Exception:  # noqa: BLE001
+            pass
+    for enc in ("utf-8", "cp1256", "windows-1256"):
+        try:
+            t = data.decode(enc)
         except Exception:  # noqa: BLE001
             continue
-    return data.decode("utf-8", "replace")
+        return t, not _looks_garbled(t)
+    t = data.decode("utf-8", "replace")
+    return t, not _looks_garbled(t)
+
+
+#: note added when the decoded text is not trustworthy (the reader must open the file itself)
+GARBLED_NOTE = ("رمزگذاریِ این متن با اطمینان شناخته نشد (نویسه‌های کنترلی/ناخوانا دارد) — متن ممکن است درست نباشد؛ "
+                "خودِ فایل را باید دید یا با UTF-8 دوباره ذخیره کرد")
+
+
+def _decode(data: bytes) -> str:
+    return _decode_ex(data)[0]
 
 
 def _csv_text(data: bytes) -> str:
@@ -236,8 +384,7 @@ def extract(data: bytes, filename: str, mime: str = "", _depth: int = 0) -> dict
             return text_or_empty(_decode(data), "منبعِ کاملِ SVG (متن)", "SVG خالی است")
 
         if mime.startswith("image/") or ext in _IMAGE_EXT:
-            return done("image", "", "تصویر است — ناظر باید بازش کند و نگاه کند "
-                                     "(`pull` قالب‌های غیرِ png/jpg/gif/webp را به PNG تبدیل می‌کند)")
+            return done("image", "", IMAGE_NOTE)
 
         if fmt.is_media(name, mime):
             # transcribed IN FULL by inspection_media (POST /files/{id}/extract,
@@ -294,6 +441,8 @@ def extract(data: bytes, filename: str, mime: str = "", _depth: int = 0) -> dict
                                  "ایمیلِ Outlook — متن و همهٔ پیوست‌ها", "ایمیل خالی است")
 
         if ext == ".csv" or mime == "text/csv":
+            if not _decode_ex(data)[1]:
+                return done("ok", _csv_text(data), GARBLED_NOTE, truncated=True)
             return text_or_empty(_csv_text(data), "از CSV", "فایلِ CSV خالی است")
 
         if ext in _HTML_EXT or mime == "text/html":
@@ -306,7 +455,10 @@ def extract(data: bytes, filename: str, mime: str = "", _depth: int = 0) -> dict
 
         if ext in _TEXTY_EXT or mime.startswith("text/") or mime in (
                 "application/json", "application/xml"):
-            return text_or_empty(_decode(data), "متنِ ساده", "فایل خالی است")
+            txt, trusted = _decode_ex(data)
+            if txt.strip() and not trusted:
+                return done("ok", txt, GARBLED_NOTE, truncated=True)
+            return text_or_empty(txt, "متنِ ساده", "فایل خالی است")
 
         if ext == ".zip" or mime in ("application/zip", "application/x-zip-compressed") or (
                 ext not in _TEXTY_EXT and zipfile.is_zipfile(io.BytesIO(data))):
