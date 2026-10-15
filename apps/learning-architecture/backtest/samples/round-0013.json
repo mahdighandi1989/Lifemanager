@@ -1185,8 +1185,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -1230,6 +1229,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -1812,8 +1823,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -1857,6 +1867,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -1939,8 +1961,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -1984,6 +2005,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2123,8 +2156,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -2168,6 +2200,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2420,8 +2464,7 @@
      "sense_ctrl": true,
      "stakes": "کم",
      "doubt_pat": "ندارد",
-     "self_ref": false,
-     "hidden_ctrl": false
+     "self_ref": false
     },
     "truth": false,
     "verified_by": [
@@ -2453,6 +2496,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2478,8 +2533,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -2523,6 +2577,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2548,8 +2614,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -2593,6 +2658,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2618,8 +2695,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -2663,6 +2739,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2688,8 +2776,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -2733,6 +2820,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2758,8 +2857,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -2803,6 +2901,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2828,8 +2938,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -2873,6 +2982,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2898,8 +3019,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -2943,6 +3063,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -2968,8 +3100,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -3013,6 +3144,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3038,8 +3181,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3083,6 +3225,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3108,8 +3262,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3153,6 +3306,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3178,8 +3343,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3223,6 +3387,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3248,8 +3424,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -3293,6 +3468,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3318,8 +3505,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3363,6 +3549,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3388,8 +3586,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3433,6 +3630,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3458,8 +3667,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3503,6 +3711,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3528,8 +3748,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3573,6 +3792,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3598,8 +3829,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3643,6 +3873,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3668,8 +3910,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -3713,6 +3954,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3738,8 +3991,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -3783,6 +4035,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3808,8 +4072,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3853,6 +4116,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3922,8 +4197,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -3967,6 +4241,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -3992,8 +4278,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4037,6 +4322,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4062,8 +4359,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4107,6 +4403,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4132,8 +4440,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -4177,6 +4484,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4316,8 +4635,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4361,6 +4679,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4386,8 +4716,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4431,6 +4760,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4456,8 +4797,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": true,
     "verified_by": [
@@ -4501,6 +4841,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4526,8 +4878,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4571,6 +4922,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4596,8 +4959,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4641,6 +5003,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4666,8 +5040,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4711,6 +5084,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4736,8 +5121,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -4781,6 +5165,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4806,8 +5202,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -4851,6 +5246,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -4876,8 +5283,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": true,
     "verified_by": [
@@ -4921,6 +5327,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5047,8 +5465,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -5092,6 +5509,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5117,8 +5546,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -5162,6 +5590,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5288,8 +5728,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -5333,6 +5772,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5358,8 +5809,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -5403,6 +5853,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5529,8 +5991,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -5574,6 +6035,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5713,8 +6186,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -5758,6 +6230,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5840,8 +6324,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": true,
     "verified_by": [
@@ -5885,6 +6368,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -5910,8 +6405,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -5955,6 +6449,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -6037,8 +6543,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -6082,6 +6587,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -6107,8 +6624,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": true,
     "verified_by": [
@@ -6152,6 +6668,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -6519,8 +7047,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": true,
-     "hidden_ctrl": true
+     "vazraf": true
     },
     "truth": false,
     "verified_by": [
@@ -6564,6 +7091,18 @@
       "why": "عاملِ پنهان کنترل‌شده: دست‌کاریِ میان‌آزمودنی با شرطِ مقایسه در متنِ مورد پیداست؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        true,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -6646,8 +7185,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -6691,6 +7229,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
@@ -6716,8 +7266,7 @@
      "stakes": "کم",
      "doubt_pat": "ندارد",
      "self_ref": false,
-     "vazraf": false,
-     "hidden_ctrl": false
+     "vazraf": false
     },
     "truth": false,
     "verified_by": [
@@ -6761,6 +7310,18 @@
       "why": "عاملِ پنهان کنترل‌نشده: بی گمارشِ تصادفی (گروهِ طبیعی/همبستگی)؛ مقدارِ پیشین «نامعلوم» بود",
       "encoder": "زیرعاملِ جدای کورِ FE (نشستِ ابریِ جدا session_01UtmQHDvm5px8SPdtat3YnR؛ فقط متنِ موردها و تعریفِ قاب بی هیچ سرانجام؛ خروجی: claude.ai/artifact/GUGCGMpYz6JZMQgcQnaBhi)",
       "review": "بازبینِ مستقلِ RS (نشستِ ابریِ جدا session_01XjjXX5Up3r2EWvkYy6NYf5؛ بی سرانجام؛ claude.ai/artifact/YbFZxoVkgzvmBXz1m6uvFu): scope_omit_ok=true، outcome_leak=false؛ فقط مقدارهایی اعمال شد که رمزگذار و بازبین هر دو گفتند"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "hidden_ctrl": [
+        false,
+        null
+       ]
+      },
+      "why": "برگرداندنِ hidden_ctrl ِ همین دور: با آن ۱۹ موردِ «false» در select ِ پایهٔ p_hidden_factor ({hidden_ctrl:false}) می‌افتادند و پایه از ۵۰ به ۴۸ می‌رفت — یعنی نرخِ یک جمعیتِ خاص (روان‌شناسیِ ۲۰۰۸) بی شرطِ جمعیت (x_field) به همهٔ قانون‌های تجربیِ با عاملِ پنهان سرایت می‌کرد، که به قضیهٔ T_pop قضیه نیست. hidden_ctrl ِ اعضای OSC نامعلوم می‌ماند تا مالک دربارهٔ جمعیتِ p_hidden_factor تصمیم بگیرد.",
+      "encoder": "همان FE (برگرداندن، نه رمزگذاریِ تازه)",
+      "review": "روتینِ بک‌تست: اثرِ پایه پیش از پوش دیده شد (ceil ِ ۲۲ تصدیق ۵۰ ⇒ ۴۸)؛ حکمی جابه‌جا نشده بود"
      }
     ]
    },
