@@ -1,19 +1,20 @@
 {
  "round": 12,
- "reviewer": "زیرعاملِ جدا (نشستِ ابریِ مستقل RR، session_01FGNVyXvKmcVJCzzWfHrpb6؛ claude.ai/artifact/6b1F6uNgeqTqo2fd6Y455U) — بازبینیِ بازاجرای ۲۰۲۶-۱۰-۱۵",
+ "reviewer": "زیرعاملِ جدا — دو بازبینِ مستقل: RR (session_01FGNVyXvKmcVJCzzWfHrpb6، بازاجرای نخست) و RR2 (session_01JvwXHLMn2hz5PT57Jb9dUB؛ claude.ai/artifact/Ghh3AHtSDpTzfdk45DB8rk، بازاجرای دوم پس از p_found_mixture، ۲۰۲۶-۱۰-۱۵)",
  "checked": {
   "events_real": true,
-  "encoding_blind": false,
+  "encoding_blind": true,
   "frames_unselected": true,
   "verified_by_real": true,
   "proofs_from_axioms": true,
   "no_conventional": true,
   "territory_evidence": true,
   "findings_diagnosed": true,
-  "tool_safe": false,
-  "zero_broken": false
+  "tool_safe": true,
+  "zero_broken": true,
+  "code_matches_derivation": true
  },
- "checkedNote": "events_real و territory_evidence از بازبینیِ اصلیِ دورِ ۱۲ (earlier) — این بازاجرا واقعه یا گامِ قلمروِ تازه نداشت. encoding_blind/tool_safe/zero_broken را بازبین false داد؛ مشکل‌ها پایین با fixed",
+ "checkedNote": "events_real و territory_evidence از بازبینیِ اصلیِ دورِ ۱۲ (earlier) — این بازاجرا واقعه یا گامِ قلمروِ تازه نداشت. encoding_blind/tool_safe/zero_broken را بازبین false داد؛ مشکل‌ها پایین با fixed | RR2: code_matches_derivation و zero_broken_plausible را false داد (دروازهٔ p_thiqa، پاسبانِ کمینه، اعضای قاب)؛ همه پایین اصلاح شد و بازاجرا ۲۰۳ از ۲۰۳ درست است؛ encoding_blind: E3/E4 ِ نشت‌دار کنار رفتند و فقط E5/E6 از متنِ پاک اعمال شد.",
  "problems": [
   {
    "what": "test_plausible فایلِ backtest/reviews/recode-2026-10-15-corpus.json را می‌خواند که در diff ِ داده‌شده نبود",
@@ -49,29 +50,32 @@
    "what": "Brier فقط در متنِ کامیت بود",
    "fix": "ledger.json: row.brier (۰٫۲۶۱۸ پس از همهٔ اصلاح‌ها؛ پیش ۰٫۲۸۷۵۵)",
    "fixed": true
+  },
+  {
+   "what": "RR2: پایهٔ مساعدِ p_thiqa (۹۹٫۹) روی r_naql_ahad/r_r_sanad_ahad/r_naql_no_qarina بی آن‌که ناقل «موثق» باشد",
+   "fix": "CAPF.thiqa: «موثق» یا ننوشته (زبرین) ⇒ پایه؛ «نامعلوم» ⇒ آمیزه؛ «غیرموثق» ⇒ ½؛ گزارش‌های عرضی ⇒ T_below1. مریخ و مدوف با رمزِ کورِ narrator «نامعلوم» دوباره پرچم می‌خورند",
+   "fixed": true
+  },
+  {
+   "what": "RR2: routeGuard هر سقفِ T_support زیرِ ½ را بالا می‌برد، حتی شرطِ احرازشده یا شرطِ صدق؛ وزنِ قاعده را نادیده می‌گرفت؛ تمثیل/پیامد را نمی‌دید",
+   "fix": "هر شاخهٔ «شرطِ راهِ احرازنشده با A4» در CAPF نشان می‌خورد (F.R) و پاسبان فقط همان‌ها را، با حفظِ وزن، بالا می‌برد؛ آزمون در test_found_mixture",
+   "fixed": true
+  },
+  {
+   "what": "RR2: اعضای قاب (بی member) نرخِ جمعیت و تقدم را از دست می‌دادند",
+   "fix": "قراردادِ epi_feat: ویژگیِ ننوشته ⇒ زبرینِ همهٔ مقدارهایش؛ member ِ ننوشته ⇒ max(p، آمیزه) و تقدم می‌ماند؛ «فراتر»/راهِ دیگر/«نامعلوم» ⇒ آمیزه. همین قرارداد برای تازگی، همانندی و mem_doc ِ ننوشته؛ اثر روی پیکره صفر",
+   "fixed": true
+  },
+  {
+   "what": "RR2: bk_yadollah (ظاهرِ متعارض با برهانِ قطعی) پرچمِ st_naql را از دست داد؛ bk_khalaqa_adam و bk_turuq_saying/k2 بی x_about_route به ¾ رسیدند",
+   "fix": "حکم‌ها درست می‌مانند و ایستگاه‌های مورد انتظارشان پرچم دارند (کاملاً در جای درست ۱۱۶)؛ درستیِ پرچمِ st_naql آن‌جا از p_zahir ِ ½ ِ قراردادی بود؛ رمزِ x_about_route برای naql های جزوه در فهرستِ کارِ بعدیِ رمزگذاریِ کور (WORKLOG 64)",
+   "fixed": true
+  },
+  {
+   "what": "RR2: capText هر قاعده ثابت است؛ فهرستِ blind ِ تقدم پایهٔ مساعد را هم شامل می‌شود؛ ردِ «جزوه» در منبعِ گسترش گشاد است",
+   "fix": "کم‌اثر و بی اثر بر حکم؛ ثبت در WORKLOG 64 برای دورِ بعد",
+   "fixed": true
   }
  ],
- "note": "قاب‌ها با منبعِ اصلی ۱۳۶/۱۳۶؛ r_aql_matter_zanni فقط T_below1؛ audit تمیز؛ ۲۰۳/۲۰۳ درست؛ همهٔ مشکل‌ها اصلاح شد.",
- "earlier": {
-  "round": 12,
-  "reviewer": "زیرعاملِ جدا (بازبین مستقل)",
-  "checked": {
-   "events_real": true,
-   "encoding_blind": true,
-   "frames_unselected": true,
-   "verified_by_real": true,
-   "proofs_from_axioms": true,
-   "no_conventional": true,
-   "territory_evidence": true,
-   "findings_diagnosed": true
-  },
-  "problems": [
-   {
-    "what": "سه نکتهٔ جزئی: x_comp در موردِ هیتلر؛ acted در اسنو؛ فشردگیِ روایتِ سالی کلارک",
-    "fix": "روایتِ سالی کلارک اصلاح شد (دلیلِ اصلیِ لغو: یافتهٔ میکروبیولوژی). دو مورد دیگر برچسبِ حقیقت را عوض نمی‌کنند و دست‌نخورده ماندند.",
-    "fixed": true
-   }
-  ],
-  "note": "همهٔ منبع‌ها و حقایق راستی‌آزمایی شد؛ افزودنِ ind_complete=false به دو مورد مشروع است (داستان دادهٔ چندساله را می‌گوید)."
- }
+ "note": "بازبینیِ دوم پس از تصمیمِ p_found_mixture و رمزگذاریِ کورِ narrator/x_about_route؛ ثبت در اجرای روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک"
 }
