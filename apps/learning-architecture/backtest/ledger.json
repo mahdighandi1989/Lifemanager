@@ -1333,7 +1333,7 @@
   {
    "round": 12,
    "at": "2026-10-15",
-   "note": "دورِ ۱۲ (بازاجرا ۲۰۲۶-۱۰-۱۵، روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک): قاب‌ها بی scope (h…070f)، p_matter_zanni (فقط T_below1)، رمزگذاریِ کورِ دوبارهٔ پیکره با ویژگی‌های تازه (۱۰۸ مقدار، دو رمزگذار + بازبین؛ ۴ برگشت)",
+   "note": "دورِ ۱۲ (بازاجرای دوم ۲۰۲۶-۱۰-۱۵، روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک): p_found_mixture تصمیم و اعمال شد (T_support، T_favour، پایه‌های مساعد، x_about_route، routeGuard)؛ رمزگذاریِ کورِ narrator/x_about_route و داوریِ ده اختلاف (E5، E6، RV)؛ ۴ chain ِ برگشته بازگشت؛ بازبینیِ دورِ ۱۱ ثبت شد",
    "corpus": {
     "n": 203,
     "tiers": {
@@ -1419,13 +1419,13 @@
    },
    "brier": {
     "claims": 233,
-    "ceil": 0.2618
+    "ceil": 0.29731
    },
    "foundation": {
     "classes": {
-     "B": 28,
-     "S": 18,
-     "O": 7,
+     "B": 25,
+     "S": 20,
+     "O": 8,
      "X": 0,
      "?": 0
     },
@@ -1438,11 +1438,11 @@
       "changed": 0
      },
      "deg": {
-      "ok": 203,
+      "ok": 193,
       "health_alarm": 0,
-      "missed": 0,
-      "mislocated": 0,
-      "changed": 0
+      "missed": 7,
+      "mislocated": 3,
+      "changed": 10
      },
      "derived": {
       "ok": 203,
@@ -1452,23 +1452,23 @@
       "changed": 0
      },
      "both": {
-      "ok": 203,
+      "ok": 193,
       "health_alarm": 0,
-      "missed": 0,
-      "mislocated": 0,
-      "changed": 0
+      "missed": 7,
+      "mislocated": 3,
+      "changed": 10
      }
     },
     "baseMeasured": 3,
     "baseTotal": 11,
     "baseval": {
-     "p_thiqa": 50,
-     "p_zahir": 50,
-     "p_mubham_q": 50,
-     "p_sense_unctrl": 50,
-     "p_hidden_inf": 50,
+     "p_thiqa": 99.9,
+     "p_zahir": 99.9,
+     "p_mubham_q": 99.9,
+     "p_sense_unctrl": 74.95,
+     "p_hidden_inf": 74.95,
      "p_expert_bias": 50,
-     "p_hidden_factor": 50,
+     "p_hidden_factor": 74.95,
      "p_expert_econ_lab": 60,
      "p_expert_psych08": 36.4,
      "p_expert_socsci_ns": 60.9,
@@ -1477,7 +1477,50 @@
     "samples": 3,
     "conventional": 0,
     "audit": 0,
-    "baseChanges": []
+    "baseChanges": [
+     {
+      "base": "p_thiqa",
+      "from": 50,
+      "to": 99.9,
+      "n": 0,
+      "ok": 0
+     },
+     {
+      "base": "p_zahir",
+      "from": 50,
+      "to": 99.9,
+      "n": 0,
+      "ok": 0
+     },
+     {
+      "base": "p_mubham_q",
+      "from": 50,
+      "to": 99.9,
+      "n": 0,
+      "ok": 0
+     },
+     {
+      "base": "p_sense_unctrl",
+      "from": 50,
+      "to": 74.95,
+      "n": 0,
+      "ok": 0
+     },
+     {
+      "base": "p_hidden_inf",
+      "from": 50,
+      "to": 74.95,
+      "n": 0,
+      "ok": 0
+     },
+     {
+      "base": "p_hidden_factor",
+      "from": 50,
+      "to": 74.95,
+      "n": 0,
+      "ok": 0
+     }
+    ]
    },
    "territory": {
     "areas": 108,
@@ -1492,6 +1535,8 @@
     ],
     "bookOnly": 33,
     "score": 133,
+    "scoreBookOnly": 132,
+    "scoreEvidenced": 1,
     "max": 540,
     "moved": [
      "a_belief"
@@ -1501,9 +1546,7 @@
     "newEvents": 8,
     "newSamples": 0,
     "staleFindings": [],
-    "alarms": [
-     "بازبینیِ مستقلِ دورِ 11 (ناظرِ ناظر) ثبت نشده"
-    ]
+    "alarms": []
    }
   }
  ]

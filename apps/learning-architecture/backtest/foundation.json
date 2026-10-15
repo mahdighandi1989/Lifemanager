@@ -2,9 +2,9 @@
  "round": 12,
  "at": "2026-10-15",
  "classes": {
-  "B": 28,
-  "S": 18,
-  "O": 7,
+  "B": 25,
+  "S": 20,
+  "O": 8,
   "X": 0,
   "?": 0
  },
@@ -42,15 +42,15 @@
     "s46"
    ],
    "k": "S",
-   "th": "T_below1",
-   "thFa": "راهِ غیرِ برهانی ⇒ کمتر از یک",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_sense_unctrl",
    "baseFa": "درستیِ حکمِ حسی در شرایطِ کنترل‌نشده",
-   "note": "",
+   "note": "بسندگیِ شرایط شرطِ راه است (s43)؛ تا سنجیده نشده زبرینِ T_support (PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ حکمِ حسی در شرایطِ کنترل‌نشده» = 50"
+   "capText": "پایهٔ «درستیِ حکمِ حسی در شرایطِ کنترل‌نشده» = 74.95"
   },
   {
    "id": "r_hiss_hidden_inf",
@@ -64,15 +64,15 @@
     "s19"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_hidden_inf",
    "baseFa": "درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده",
-   "note": "",
+   "note": "درستیِ استنتاجِ عادتی شرطِ راه است (s43)؛ تا سنجیده نشده زبرینِ T_support (PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده» = 50"
+   "capText": "پایهٔ «درستیِ استنتاجِ پنهانِ عادتیِ آزموده‌نشده» = 74.95"
   },
   {
    "id": "r_aql_invalid_form",
@@ -129,16 +129,16 @@
     "s44"
    ],
    "k": "B",
-   "th": "T_unknown",
-   "thFa": "شرطِ احرازنشده ⇒ حداکثر ½",
-   "bound": 50,
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "bound": "75",
    "base": null,
    "baseFa": "",
-   "note": "",
+   "note": "مقدمهٔ احرازنشده شرطِ راه است نه شرطِ صدقِ نتیجه: ½·۱ + ½·½ = ¾ (همان قضیه با q = ۰ ⇒ ½ = r_aql_matter_false)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "½ + q(r − ½) = 75"
   },
   {
    "id": "r_aql_matter_false",
@@ -171,16 +171,16 @@
     "s47"
    ],
    "k": "B",
-   "th": "T_unknown",
-   "thFa": "شرطِ احرازنشده ⇒ حداکثر ½",
-   "bound": 50,
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "bound": "75",
    "base": null,
    "baseFa": "",
-   "note": "",
+   "note": "صدورِ احرازنشده شرطِ راه است؛ r را قاعده‌های دیگر کران می‌زنند (کمینه)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "½ + q(r − ½) = 75"
   },
   {
    "id": "r_naql_unreliable",
@@ -214,17 +214,17 @@
     "s47",
     "s48"
    ],
-   "k": "B",
-   "th": "T_unknown",
-   "thFa": "شرطِ احرازنشده ⇒ حداکثر ½",
-   "bound": 50,
+   "k": "O",
+   "th": "T_favour",
+   "thFa": "دلیل به سودِ گزاره ⇒ بیش از ½",
+   "bound": "<100",
    "base": null,
    "baseFa": "",
-   "note": "قرینهٔ همسو گزارشِ ناموثق را ثقه نمی‌کند؛ بی‌دلیلِ مستقل، تقارن",
+   "note": "گزارشِ ناموثق چیزی نمی‌افزاید (T_null)؛ ولی «قرینهٔ همسو» به تعریفِ s48 «شاهدِ تأییدکنندهٔ خارجی» است ⇒ T_favour؛ قوتش رمز نشده ⇒ فقط «کمتر از یقین» (بازبینِ PC2: ½ و ¾ هر دو سخت‌گیریِ بی‌برهان بودند)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "کمتر از ۱۰۰"
   },
   {
    "id": "r_naql_narrator_unknown",
@@ -235,17 +235,16 @@
    "sec": [
     "s47"
    ],
-   "k": "B",
-   "th": "T_unknown",
-   "thFa": "شرطِ احرازنشده ⇒ حداکثر ½",
-   "bound": 50,
-   "base": null,
-   "baseFa": "",
-   "note": "",
+   "k": "S",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "base": "p_thiqa",
+   "baseFa": "صدقِ گزارشِ یک ناقلِ ثقه",
+   "note": "وثاقتِ احرازنشده (q = ½) × صدقِ گزارشِ ثقه (p_thiqa): ½ + ½(p_thiqa − ½)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "½ + ½(پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» − ½)"
   },
   {
    "id": "r_naql_chain_broken",
@@ -256,17 +255,16 @@
    "sec": [
     "s47"
    ],
-   "k": "B",
-   "th": "T_weakest",
-   "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
-   "bound": 50,
-   "base": null,
-   "baseFa": "",
-   "note": "حلقهٔ نامعلوم ≤ ½ (T_unknown) و زنجیره ≤ ضعیف‌ترین حلقه — «اختلال در یک حلقه کل زنجیره را بی‌اعتبار می‌سازد» (s47)",
+   "k": "S",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "base": "p_thiqa",
+   "baseFa": "صدقِ گزارشِ یک ناقلِ ثقه",
+   "note": "وثاقتِ همهٔ حلقه‌ها ≤ وثاقتِ حلقهٔ نامعلوم = ½ (A1، شرطِ راه)؛ زنجیرهٔ بی‌اعتبار محتوا را کاذب نمی‌کند ⇒ ½ + ½(p_thiqa − ½) (s47 «بی‌اعتبار» = راه چیزی نمی‌دهد، T_null)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "½ + ½(پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» − ½)"
   },
   {
    "id": "r_naql_ahad",
@@ -283,11 +281,11 @@
    "thFa": "راهِ غیرِ برهانی ⇒ کمتر از یک",
    "base": "p_thiqa",
    "baseFa": "صدقِ گزارشِ یک ناقلِ ثقه",
-   "note": "خبرِ واحد < ۱؛ مقدارش وثاقتِ ناقل",
+   "note": "خبرِ واحد < ۱؛ مقدارش وثاقتِ ناقل؛ گزارش‌های عرضیِ مستقل ⇒ T_tawatur بیش از p_thiqa می‌دهد ⇒ فقط T_below1 (PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50"
+   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 99.9 (گزارش‌های عرضیِ مستقل ⇒ کمتر از ۱۰۰)"
   },
   {
    "id": "r_naql_no_qarina",
@@ -308,7 +306,7 @@
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50"
+   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 99.9 (گزارش‌های عرضیِ مستقل ⇒ کمتر از ۱۰۰)"
   },
   {
    "id": "r_naql_contra_qarina",
@@ -371,7 +369,7 @@
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ معنای ظاهر بی‌قرینهٔ همسو» = 50"
+   "capText": "پایهٔ «درستیِ معنای ظاهر بی‌قرینهٔ همسو» = 99.9"
   },
   {
    "id": "r_naql_mubham_noq",
@@ -383,16 +381,16 @@
     "s48"
    ],
    "k": "B",
-   "th": "T_ambig",
-   "thFa": "لفظِ چندمعنا بی‌قرینه ⇒ حداکثر ½",
-   "bound": 50,
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "bound": "50 یا آمیزه",
    "base": null,
    "baseFa": "",
-   "note": "",
+   "note": "اگر تصدیق خودِ معنای متن است (x_about_route)، T_ambig ⇒ ½؛ اگر محتوایی است که از آن معنا گرفته شده، «معنا = X» شرطِ راه است ⇒ T_support ¾ (PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "½ + q(r − ½) = 75"
   },
   {
    "id": "r_naql_mubham_q",
@@ -412,7 +410,7 @@
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ معنای مبهم با قرینهٔ همسو» = 50"
+   "capText": "پایهٔ «درستیِ معنای مبهم با قرینهٔ همسو» = 99.9"
   },
   {
    "id": "r_expert_method_weak",
@@ -424,16 +422,16 @@
     "s49"
    ],
    "k": "B",
-   "th": "T_unknown",
-   "thFa": "شرطِ احرازنشده ⇒ حداکثر ½",
-   "bound": 50,
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "bound": "50 یا آمیزه",
    "base": null,
    "baseFa": "",
-   "note": "",
+   "note": "«ضعیف» ⇒ q = ۰ ⇒ ½ (T_null)؛ «نامعلوم» ⇒ q = ½، r = پایهٔ جمعیتِ سنجیده یا ½",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "ضعیف ⇒ ۵۰؛ نامعلوم ⇒ ½ + ½(پایهٔ جمعیت − ½)"
   },
   {
    "id": "r_expert_out_of_field",
@@ -466,16 +464,16 @@
     "s49"
    ],
    "k": "B",
-   "th": "T_unknown",
-   "thFa": "شرطِ احرازنشده ⇒ حداکثر ½",
-   "bound": 50,
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
+   "bound": "50 یا آمیزه",
    "base": null,
    "baseFa": "",
-   "note": "",
+   "note": "صلاحیتِ احرازنشده ⇒ q = ½، r = پایهٔ جمعیتِ سنجیده یا ½",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "50"
+   "capText": "ضعیف ⇒ ۵۰؛ نامعلوم ⇒ ½ + ½(پایهٔ جمعیت − ½)"
   },
   {
    "id": "r_expert_bias",
@@ -658,15 +656,15 @@
     "s51"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_hidden_factor",
    "baseFa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
-   "note": "",
+   "note": "«عدمِ دخالتِ عواملِ پنهان» شرطِ راه است (s51)؛ تا سنجیده نشده زبرینِ T_support (PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50"
+   "capText": "پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 74.95"
   },
   {
    "id": "r_istiqra_hidden",
@@ -679,15 +677,15 @@
     "s50"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_hidden_factor",
    "baseFa": "درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده",
-   "note": "همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)",
+   "note": "همان ملاکِ s51 در ایستگاهِ استقراء (p_case_chicken، پذیرفتهٔ مالک)؛ شرطِ راه ⇒ T_support (PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 50"
+   "capText": "پایهٔ «درستیِ قانونِ تجربی با عاملِ پنهانِ کنترل‌نشده» = 74.95"
   },
   {
    "id": "r_yad_orig_t1",
@@ -699,16 +697,16 @@
     "s52"
    ],
    "k": "B",
-   "th": "T_weakest",
-   "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "bound": "mem_orig",
-   "base": null,
-   "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
+   "base": "p_mem",
+   "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
+   "note": "یادآوری «تابعِ» معرفتِ نخستین است (s52): با سند (q = ۱) همان o؛ وگرنه q = وثاقتِ حافظه ⇒ q·o + (1−q)·½ — برای o < ½ بالاتر از o (حافظهٔ نادرست شاهدِ خلاف را هم پاک می‌کند؛ p_found_mixture، PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "≤ معرفتِ نخستین"
+   "capText": "معرفتِ نخستین (با سند)، وگرنه آمیزه با وثاقتِ حافظه"
   },
   {
    "id": "r_yad_orig_t2",
@@ -720,16 +718,16 @@
     "s52"
    ],
    "k": "B",
-   "th": "T_weakest",
-   "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "bound": "mem_orig",
-   "base": null,
-   "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
+   "base": "p_mem",
+   "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
+   "note": "یادآوری «تابعِ» معرفتِ نخستین است (s52): با سند (q = ۱) همان o؛ وگرنه q = وثاقتِ حافظه ⇒ q·o + (1−q)·½ — برای o < ½ بالاتر از o (حافظهٔ نادرست شاهدِ خلاف را هم پاک می‌کند؛ p_found_mixture، PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "≤ معرفتِ نخستین"
+   "capText": "معرفتِ نخستین (با سند)، وگرنه آمیزه با وثاقتِ حافظه"
   },
   {
    "id": "r_yad_orig_t3",
@@ -741,16 +739,16 @@
     "s52"
    ],
    "k": "B",
-   "th": "T_weakest",
-   "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "bound": "mem_orig",
-   "base": null,
-   "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
+   "base": "p_mem",
+   "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
+   "note": "یادآوری «تابعِ» معرفتِ نخستین است (s52): با سند (q = ۱) همان o؛ وگرنه q = وثاقتِ حافظه ⇒ q·o + (1−q)·½ — برای o < ½ بالاتر از o (حافظهٔ نادرست شاهدِ خلاف را هم پاک می‌کند؛ p_found_mixture، PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "≤ معرفتِ نخستین"
+   "capText": "معرفتِ نخستین (با سند)، وگرنه آمیزه با وثاقتِ حافظه"
   },
   {
    "id": "r_yad_orig_t4",
@@ -762,16 +760,16 @@
     "s52"
    ],
    "k": "B",
-   "th": "T_weakest",
-   "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "bound": "mem_orig",
-   "base": null,
-   "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
+   "base": "p_mem",
+   "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
+   "note": "یادآوری «تابعِ» معرفتِ نخستین است (s52): با سند (q = ۱) همان o؛ وگرنه q = وثاقتِ حافظه ⇒ q·o + (1−q)·½ — برای o < ½ بالاتر از o (حافظهٔ نادرست شاهدِ خلاف را هم پاک می‌کند؛ p_found_mixture، PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "≤ معرفتِ نخستین"
+   "capText": "معرفتِ نخستین (با سند)، وگرنه آمیزه با وثاقتِ حافظه"
   },
   {
    "id": "r_yad_orig_t5",
@@ -783,16 +781,16 @@
     "s52"
    ],
    "k": "B",
-   "th": "T_weakest",
-   "thFa": "زنجیره از ضعیف‌ترین حلقه قوی‌تر نیست",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "bound": "mem_orig",
-   "base": null,
-   "baseFa": "",
-   "note": "یادآوری ≤ معرفتِ نخستین (s52): سقف = خودِ درجهٔ معرفتِ نخستین",
+   "base": "p_mem",
+   "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
+   "note": "یادآوری «تابعِ» معرفتِ نخستین است (s52): با سند (q = ۱) همان o؛ وگرنه q = وثاقتِ حافظه ⇒ q·o + (1−q)·½ — برای o < ½ بالاتر از o (حافظهٔ نادرست شاهدِ خلاف را هم پاک می‌کند؛ p_found_mixture، PC2)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "≤ معرفتِ نخستین"
+   "capText": "معرفتِ نخستین (با سند)، وگرنه آمیزه با وثاقتِ حافظه"
   },
   {
    "id": "r_yad_undoc",
@@ -804,15 +802,15 @@
     "s52"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "note": "q = وثاقتِ حافظه (s52): q·معرفتِ نخستین + (1−q)·½ — نه حاصل‌ضرب (صدقِ یادآمده وثاقتِ حافظه را لازم ندارد؛ p_found_mixture)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
+   "capText": "آمیزهٔ معرفتِ نخستین و ½ با وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t4",
@@ -824,15 +822,15 @@
     "s52"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "note": "q·معرفتِ نخستین + (1−q)·½ (q = وثاقتِ حافظه، s52؛ p_found_mixture)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
+   "capText": "آمیزهٔ معرفتِ نخستین و ½ با وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t3",
@@ -844,15 +842,15 @@
     "s52"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "note": "q·معرفتِ نخستین + (1−q)·½ (q = وثاقتِ حافظه، s52؛ p_found_mixture)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
+   "capText": "آمیزهٔ معرفتِ نخستین و ½ با وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t2",
@@ -864,15 +862,15 @@
     "s52"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "note": "q·معرفتِ نخستین + (1−q)·½ (q = وثاقتِ حافظه، s52؛ p_found_mixture)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
+   "capText": "آمیزهٔ معرفتِ نخستین و ½ با وثاقتِ حافظه (50)"
   },
   {
    "id": "r_yad_undoc_t1",
@@ -884,15 +882,15 @@
     "s52"
    ],
    "k": "S",
-   "th": "T_product",
-   "thFa": "شرط‌های مستقل ⇒ حاصل‌ضرب",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "base": "p_mem",
    "baseFa": "وثاقتِ حافظهٔ سنجیده‌نشده",
-   "note": "= معرفتِ نخستین × وثاقتِ حافظه (s52)",
+   "note": "q·معرفتِ نخستین + (1−q)·½ (q = وثاقتِ حافظه، s52؛ p_found_mixture)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "معرفتِ نخستین × وثاقتِ حافظه (50)"
+   "capText": "آمیزهٔ معرفتِ نخستین و ½ با وثاقتِ حافظه (50)"
   },
   {
    "id": "r_conflict_cert",
@@ -981,7 +979,7 @@
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 50"
+   "capText": "پایهٔ «صدقِ گزارشِ یک ناقلِ ثقه» = 99.9 (گزارش‌های عرضیِ مستقل ⇒ کمتر از ۱۰۰)"
   },
   {
    "id": "r_expert_pop_econ",
@@ -998,11 +996,11 @@
    "thFa": "تصدیقی از جمعیتِ سنجیدهٔ j ⇒ (k_j+1)/(n_j+2) ِ همان جمعیت",
    "base": "p_expert_econ_lab",
    "baseFa": "درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — اقتصادِ تجربی، آزمایش‌های آزمایشگاهیِ AER/QJE ۲۰۱۱–۲۰۱۴",
-   "note": "سقف = پایهٔ همان جمعیت (T_pop) — فقط برای پژوهشی از همین جمعیت",
+   "note": "سقف = پایهٔ همان جمعیت (T_pop) وقتی عضویت احراز شده؛ وگرنه T_support ½ + ½(p − ½)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — اقتصادِ تجربی، آزمایش‌های آزمایشگاهیِ AER/QJE ۲۰۱۱–۲۰۱۴» = 60"
+   "capText": "پایهٔ جمعیت (عضویتِ احرازشده) وگرنه آمیزه"
   },
   {
    "id": "r_expert_pop_psych",
@@ -1019,11 +1017,11 @@
    "thFa": "تصدیقی از جمعیتِ سنجیدهٔ j ⇒ (k_j+1)/(n_j+2) ِ همان جمعیت",
    "base": "p_expert_psych08",
    "baseFa": "درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — روان‌شناسی، مقاله‌های ۲۰۰۸ ِ PS/JPSP/JEP:LMC",
-   "note": "سقف = پایهٔ همان جمعیت (T_pop) — فقط برای پژوهشی از همین جمعیت",
+   "note": "سقف = پایهٔ همان جمعیت (T_pop) وقتی عضویت احراز شده؛ وگرنه T_support ½ + ½(p − ½)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — روان‌شناسی، مقاله‌های ۲۰۰۸ ِ PS/JPSP/JEP:LMC» = 36.4"
+   "capText": "پایهٔ جمعیت (عضویتِ احرازشده) وگرنه آمیزه"
   },
   {
    "id": "r_expert_pop_socsci",
@@ -1040,11 +1038,11 @@
    "thFa": "تصدیقی از جمعیتِ سنجیدهٔ j ⇒ (k_j+1)/(n_j+2) ِ همان جمعیت",
    "base": "p_expert_socsci_ns",
    "baseFa": "درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — علومِ اجتماعیِ تجربی، Nature/Science ۲۰۱۰–۲۰۱۵",
-   "note": "سقف = پایهٔ همان جمعیت (T_pop) — فقط برای پژوهشی از همین جمعیت",
+   "note": "سقف = پایهٔ همان جمعیت (T_pop) وقتی عضویت احراز شده؛ وگرنه T_support ½ + ½(p − ½)",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "پایهٔ «درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — علومِ اجتماعیِ تجربی، Nature/Science ۲۰۱۰–۲۰۱۵» = 60.9"
+   "capText": "پایهٔ جمعیت (عضویتِ احرازشده) وگرنه آمیزه"
   },
   {
    "id": "r_expert_pop_unknown",
@@ -1080,15 +1078,15 @@
    ],
    "k": "B",
    "th": "T_plausible",
-   "thFa": "استدلالِ معقول: n پیامدِ تازهٔ تأییدشده ⇒ (n+1)/(n+2)؛ تمثیل با k موافق از n موردِ همانند در رابطهٔ مربوط ⇒ (k+1)/(n+2)؛ همانندیِ احرازنشده ⇒ ≤ ½؛ هرگز ۱",
+   "thFa": "استدلالِ معقول: n پیامدِ تازهٔ تأییدشده ⇒ (n+1)/(n+2)؛ تمثیل با k موافق از n موردِ همانند در رابطهٔ مربوط ⇒ (k+1)/(n+2)؛ تازگی یا همانندیِ احرازنشده ⇒ آمیزه (T_support)؛ هرگز ۱",
    "bound": "100(n+1)/(n+2)",
    "base": null,
    "baseFa": "",
-   "note": "n = پیامدهای تازهٔ جدای تأییدشده (x_conseq_n) فقط اگر تازگی احراز شده (x_conseq_new)؛ وگرنه n = 0 ⇒ ½ (T_null / T_unknown)؛ هرگز ۱",
+   "note": "n = پیامدهای تازهٔ جدای تأییدشده (x_conseq_n) اگر تازگی احراز شده؛ ازپیش‌دانسته ⇒ ½ (T_null)؛ تازگیِ احرازنشده ⇒ ½·(n+1)/(n+2) + ¼ (T_support)؛ هرگز ۱",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "۱۰۰×(n+1)/(n+2) — n پیامدِ تازهٔ تأییدشده"
+   "capText": "۱۰۰×(n+1)/(n+2) — n پیامدِ تازهٔ تأییدشده؛ تازگیِ احرازنشده ⇒ آمیزه"
   },
   {
    "id": "r_aql_analogy",
@@ -1102,15 +1100,15 @@
    ],
    "k": "B",
    "th": "T_plausible",
-   "thFa": "استدلالِ معقول: n پیامدِ تازهٔ تأییدشده ⇒ (n+1)/(n+2)؛ تمثیل با k موافق از n موردِ همانند در رابطهٔ مربوط ⇒ (k+1)/(n+2)؛ همانندیِ احرازنشده ⇒ ≤ ½؛ هرگز ۱",
-   "bound": "100(k+1)/(n+2) یا ≤ ½",
+   "thFa": "استدلالِ معقول: n پیامدِ تازهٔ تأییدشده ⇒ (n+1)/(n+2)؛ تمثیل با k موافق از n موردِ همانند در رابطهٔ مربوط ⇒ (k+1)/(n+2)؛ تازگی یا همانندیِ احرازنشده ⇒ آمیزه (T_support)؛ هرگز ۱",
+   "bound": "100(k+1)/(n+2) یا آمیزه",
    "base": null,
    "baseFa": "",
-   "note": "k از n موردِ همانند (x_analog_k، x_analog_n) فقط اگر همانندی در رابطهٔ مربوط احراز شده (x_analog_rel)؛ وگرنه ½ (T_unknown + T_weakest)؛ k نامعلوم ⇒ میانگینِ A4 = ½",
+   "note": "k از n موردِ همانند (x_analog_k، x_analog_n) اگر همانندی در رابطهٔ مربوط احراز شده؛ وگرنه ½·(k+1)/(n+2) + ¼ (T_support)؛ k یا n نامعلوم ⇒ میانگینِ A4 = ½",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "۱۰۰×(k+1)/(n+2) — k از n موردِ همانند؛ همانندیِ احرازنشده ⇒ ۵۰"
+   "capText": "۱۰۰×(k+1)/(n+2) — k از n موردِ همانند؛ همانندیِ احرازنشده ⇒ آمیزه"
   },
   {
    "id": "r_aql_matter_zanni",
@@ -1123,16 +1121,16 @@
     "s44"
    ],
    "k": "O",
-   "th": "T_below1",
-   "thFa": "راهِ غیرِ برهانی ⇒ کمتر از یک",
+   "th": "T_support",
+   "thFa": "پشتوانهٔ مشروط: شرطِ راه با احتمالِ q ⇒ q·r + (1−q)·½؛ شرطِ احرازنشده ⇒ ½ + (r − ½)/2",
    "bound": "<100",
    "base": null,
    "baseFa": "",
-   "note": "مقدمهٔ ظنی (s40: یقین فقط با ماده‌ای که به بدیهیات برسد). «= درجهٔ ضعیف‌ترین مقدمه» (T_weakest) قضیه نیست: در قیاس مقدمات نتیجه را لازم می‌آورند نه برعکس؛ «½ برای درجهٔ ناگفته» هم نیست: ظنی یعنی بیش از ½ (F.DEG). سقفِ (۱۰۰+prem_p)/۲ منتظرِ p_found_mixture.",
+   "note": "مقدمهٔ ظنی (s40) ⇒ < ۱ (T_below1)؛ با درجهٔ ضعیف‌ترین مقدمه (prem_p): عطفِ مقدمات ≤ prem_p (A1) و T_support با r = ۱ ⇒ (۱۰۰ + prem_p)/۲ (p_found_mixture). «= prem_p» (T_weakest) قضیه نیست؛ «½ برای درجهٔ ناگفته» هم نه (ظنی > ½).",
    "consistent": true,
    "stricterThanTheorem": false,
    "conventional": false,
-   "capText": "کمتر از ۱۰۰"
+   "capText": "(۱۰۰ + prem_p)/۲؛ بی‌درجه کمتر از ۱۰۰"
   }
  ],
  "modes": {
@@ -1147,12 +1145,73 @@
   },
   "deg": {
    "kinds": {
-    "ok": 203,
+    "ok": 193,
     "health_alarm": 0,
-    "missed": 0,
-    "mislocated": 0
+    "missed": 7,
+    "mislocated": 3
    },
-   "changed": []
+   "changed": [
+    {
+     "id": "bk_stick_sight",
+     "t": "چوب کج در آب: حکم باصره",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "bk_russell_chicken",
+     "t": "جوجه راسل",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_b_dewey1948",
+     "t": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_b_literarydigest",
+     "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_b_millerites",
+     "t": "میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_pb_poinc_1900",
+     "t": "ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_pb_par_legendre",
+     "t": "اثبات‌های لژاندر برای اصل توازی (از ۱۷۹۴)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r4_wald_survivorship",
+     "t": "ارمور هواپیماهای جنگی و تحلیل آبراهام والد (جنگ جهانی دوم)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r5_madoff_feeders",
+     "t": "مدوف و صندوق‌های واسطه (تا ۲۰۰۸)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r5_sally_clark_1999",
+     "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
+     "from": "ok",
+     "to": "mislocated"
+    }
+   ]
   },
   "derived": {
    "kinds": {
@@ -1165,12 +1224,73 @@
   },
   "both": {
    "kinds": {
-    "ok": 203,
+    "ok": 193,
     "health_alarm": 0,
-    "missed": 0,
-    "mislocated": 0
+    "missed": 7,
+    "mislocated": 3
    },
-   "changed": []
+   "changed": [
+    {
+     "id": "bk_stick_sight",
+     "t": "چوب کج در آب: حکم باصره",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "bk_russell_chicken",
+     "t": "جوجه راسل",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_b_dewey1948",
+     "t": "«دیویی ترومن را شکست داد» (۱۹۴۸)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_b_literarydigest",
+     "t": "نظرسنجی لیتررِی دایجست ۱۹۳۶: ۲٫۴ میلیون پاسخ و پیش‌بینی نادرست",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_b_millerites",
+     "t": "میلری‌ها و تاریخ ۲۲ اکتبر ۱۸۴۴",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_pb_poinc_1900",
+     "t": "ادعای پوانکاره درباره کافی بودن همولوژی (۱۹۰۰)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "cs_pb_par_legendre",
+     "t": "اثبات‌های لژاندر برای اصل توازی (از ۱۷۹۴)",
+     "from": "ok",
+     "to": "missed"
+    },
+    {
+     "id": "r4_wald_survivorship",
+     "t": "ارمور هواپیماهای جنگی و تحلیل آبراهام والد (جنگ جهانی دوم)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r5_madoff_feeders",
+     "t": "مدوف و صندوق‌های واسطه (تا ۲۰۰۸)",
+     "from": "ok",
+     "to": "mislocated"
+    },
+    {
+     "id": "r5_sally_clark_1999",
+     "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
+     "from": "ok",
+     "to": "mislocated"
+    }
+   ]
   }
  },
  "base": {
@@ -1180,7 +1300,7 @@
    "ok": 0,
    "frames": 0,
    "rejected": 0,
-   "p": 50,
+   "p": 99.9,
    "lo": null,
    "hi": null,
    "measured": false
@@ -1191,7 +1311,7 @@
    "ok": 0,
    "frames": 0,
    "rejected": 0,
-   "p": 50,
+   "p": 99.9,
    "lo": null,
    "hi": null,
    "measured": false
@@ -1202,7 +1322,7 @@
    "ok": 0,
    "frames": 0,
    "rejected": 0,
-   "p": 50,
+   "p": 99.9,
    "lo": null,
    "hi": null,
    "measured": false
@@ -1213,7 +1333,7 @@
    "ok": 0,
    "frames": 0,
    "rejected": 0,
-   "p": 50,
+   "p": 74.95,
    "lo": null,
    "hi": null,
    "measured": false
@@ -1224,7 +1344,7 @@
    "ok": 0,
    "frames": 0,
    "rejected": 0,
-   "p": 50,
+   "p": 74.95,
    "lo": null,
    "hi": null,
    "measured": false
@@ -1246,7 +1366,7 @@
    "ok": 0,
    "frames": 0,
    "rejected": 0,
-   "p": 50,
+   "p": 74.95,
    "lo": null,
    "hi": null,
    "measured": false
@@ -1325,7 +1445,7 @@
  },
  "impacts": {
   "p_found_half": {
-   "rules": 28,
+   "rules": 25,
    "ceilings": 0,
    "fixed": [],
    "broken": [],

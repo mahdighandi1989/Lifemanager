@@ -1,0 +1,16 @@
+{
+ "id": "h20261015200859055327-backtest-69b0",
+ "at": "2026-10-15T20:08:59Z",
+ "by": "backtest",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "روتینِ بک‌تست (اجرا در نشستِ اصلی به دستورِ مالک، ۲۰۲۶-۱۰-۱۵؛ WORKLOG 64): پیامدهای تصمیمِ p_found_mixture در قلمروِ صفحه — a23_found.js (متنِ «بی‌داده ½» حالا رده‌ی مساعد را جدا می‌گوید)؛ epi_problems.js (رمزهای کورِ narrator/x_about_route/form-اختلاف فقط با دو رمزگذارِ کورِ هم‌رأی + بازبین؛ دفتر: backtest/reviews/recode-2026-10-15b-mixture.json)؛ آزمون‌های test_expert_field، test_found، test_matter_zanni، test_measured_precedence، test_plausible، test_realpath_factory به معنای تازه (آمیزه، عضویت با member، amend ِ x_relay_set) و آزمونِ تازهٔ test_found_mixture. لطفاً وارسی کنید.",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "",
+ "status": "open"
+}

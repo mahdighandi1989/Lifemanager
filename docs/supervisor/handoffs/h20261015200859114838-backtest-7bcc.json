@@ -1,0 +1,15 @@
+{
+ "id": "h20261015200859114838-backtest-7bcc",
+ "at": "2026-10-15T20:08:59Z",
+ "by": "backtest",
+ "area": "epi-rules",
+ "owner": [
+  "owner"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_found_mixture به دستورِ ثابتِ مالک («بر اساسِ دغدغه‌های من موارد باز را انجام بده و نپرس») تصمیم و اعمال شد: epi_found.js (T_support، T_favour، دامنهٔ T_unknown/T_weakest/T_product، راهِ شمارهای متناهی، گام‌های ۳–۵ ِ T_measured_precedence، F.BASE.fav، DER ِ قاعده‌های هم‌الگو، routeGuard، x_about_route)؛ epi_rules.js (فقط متنِ fix ِ r_aql_matter_unproven). برهان را بازبینِ مستقلِ PC2 وارسید؛ ۰ حکمِ درستِ خراب؛ تصمیم در proposals.json (decision) و WORKLOG 64.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها + AGENTS.md «مواردِ منتظرِ تصمیمِ مالک — خودت تصمیم بگیر»",
+ "commit": "",
+ "status": "open"
+}
