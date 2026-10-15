@@ -66,7 +66,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
             const cells = rows.nth(r).locator('textarea, input, select');
             const cc = await cells.count();
             for (let c = 0; c < cc; c++) {
-              const el = cells.nth(c); const tag = await el.evaluate(e => e.tagName + ':' + (e.type || ''));
+              const el = cells.nth(c); const tag = await el.evaluate(e => e.tagName + ':' + (e.inputMode === 'decimal' || e.inputMode === 'numeric' ? 'number' : (e.type || '')));   // خانهٔ عددی = type=text + inputmode (رقمِ فارسی؛ ممیزیِ ۲۰۲۶-۱۰-۱۵ B7)
               if (tag.startsWith('SELECT')) { const opts = await el.locator('option').allTextContents(); await el.selectOption({ index: r % 2 === 0 ? 1 : Math.min(2, opts.length - 1) }); }
               else if (tag.includes('number')) await el.fill(String(40 + r * 15));
               else await el.fill('ردیف ' + r + ' ستون ' + c);

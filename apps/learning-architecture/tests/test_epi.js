@@ -56,7 +56,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     } else if (name === 'حکم نهایی و پیگیری') {
       await fillStation();
       await page.fill('[data-k="revdate"] input', await page.evaluate(() => APP.today()));
-      await page.locator('[data-k="final"] tbody tr').first().locator('input[type=number]').fill('65');
+      await page.locator('[data-k="final"] tbody tr').first().locator('input[inputmode=decimal]').fill('65');
     } else await fillStation();
     const btn = page.locator('.strun > .row .btn').filter({ hasText: 'ثبت' }).first(); const label = await btn.textContent();
     await btn.click(); await page.waitForTimeout(80);

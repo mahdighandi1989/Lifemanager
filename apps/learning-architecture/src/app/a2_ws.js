@@ -216,11 +216,50 @@
     return sel;
   };
   /* عددِ شمارشی (≥ ۰، صحیح) — مثلاً شمارِ پیامدهای تأییدشده یا مواردِ همانند (p_plausible_reasoning، ۲۰۲۶-۱۰-۱۵)؛ خالی ⇒ null («نامعلوم») */
+  /* عددِ ورودیِ کاربر: رقمِ فارسی/عربی، «٫» ِ اعشار و «٬» ِ هزارگان پذیرفته؛ ناعدد یا نامتناهی (۱e400 ⇒ Infinity) ⇒ NaN — هرگز به موتور نمی‌رسد
+     (ممیزیِ ایده/کارخانه B7، ۲۰۲۶-۱۰-۱۵). خالی ⇒ null. */
+  A.parseNum = function (x) {
+    if (x == null) return null;
+    if (typeof x === "number") return isFinite(x) ? x : NaN;
+    var v = String(x).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return "٠١٢٣٤٥٦٧٨٩".indexOf(c); })
+      .replace(/[٬,\s\u200c]/g, "").replace(/٫/g, ".").replace(/[٪%]/g, "").trim();
+    if (v === "") return null;
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(v)) return NaN;
+    var n = +v; return isFinite(n) ? n : NaN;
+  };
+  /* عددِ فارسی با «٫» ِ اعشار (۶۰٫۹) */
+  A.faNum = function (x) { return A.fa(String(x)).replace(/\./g, "٫"); };
+  /* پیامِ ردِ ورودی کنارِ همان خانه (aria-live) — مقدارِ نادرست ذخیره نمی‌شود */
+  function numMsg(el, msg) {
+    var box = el.parentNode && el.parentNode.querySelector(".numerr");
+    el.setAttribute("aria-invalid", msg ? "true" : "false");
+    if (!msg) { if (box) box.remove(); return; }
+    if (!box && el.parentNode) { box = h("div", { class: "small bad numerr", role: "status", "aria-live": "polite" }); el.parentNode.insertBefore(box, el.nextSibling); }
+    if (box) box.textContent = msg;
+  }
+  A.numMsg = numMsg;
   FIELD.num = function (f, d, ch, id) {
     /* type=text + inputmode=numeric: در «type=number» رقمِ فارسی («۳») در کروم خالی می‌ماند و هرگز به این تبدیل نمی‌رسید (ممیزیِ دورِ ۴، ۲۰۲۶-۱۰-۱۵) */
     return h("input", { id: id, type: "text", inputmode: "numeric", dir: "ltr", value: d[f.k] == null ? "" : d[f.k], placeholder: f.ph || "",
-      oninput: function (e) { var v = String(e.target.value).replace(/[۰-۹]/g, function (x) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(x); }).replace(/[٠-٩]/g, function (x) { return "٠١٢٣٤٥٦٧٨٩".indexOf(x); }).trim();
-        d[f.k] = v === "" || isNaN(+v) ? null : Math.max(f.min == null ? 0 : f.min, Math.round(+v)); ch(); } });
+      oninput: function (e) {
+        var n = A.parseNum(e.target.value), el = e.target, msg = "";
+        if (n == null) d[f.k] = null;
+        else if (isNaN(n)) { d[f.k] = null; msg = "عدد نیست (یا بی‌نهایت است) — ذخیره نشد"; }
+        else {
+          n = Math.max(f.min == null ? 0 : f.min, Math.round(n));
+          /* شمارِ «از n» از خودِ n بیشتر نمی‌شود (k ≤ n): مقدارِ ناسازگار ذخیره نمی‌شود (ممیزی B7) */
+          var lo = f.lte && d[f.lte] != null && n > d[f.lte], hi = f.gte && d[f.gte] != null && n < d[f.gte];
+          if (lo || hi) { d[f.k] = null; msg = f.cmpMsg || "این عدد با خانهٔ همراهش نمی‌خواند — ذخیره نشد"; }
+          else d[f.k] = n;
+        }
+        numMsg(el, msg); ch();
+      } });
+  };
+  /* انتخابِ یکی از تصدیق‌های پرونده (برای کاربرگی که یک استدلال/یافته دارد ولی پرونده چند تصدیق) — ممیزی B4 */
+  FIELD.claim = function (f, d, ch, id, updaters, opts) {
+    var cl = (opts && opts.claims) || [];
+    return h("select", { id: id, onchange: function (e) { d[f.k] = e.target.value; ch(); } }, h("option", { value: "" }, cl.length ? "— کدام تصدیق؟ —" : "اول در ایستگاه «تصور یا تصدیق» ادعاها را ثبت کن"),
+      cl.map(function (t, i) { var v = String(i + 1); return h("option", { value: v, selected: String(d[f.k]) === v }, A.fa(i + 1) + ". " + (t || "").slice(0, 70)); }));
   };
   FIELD.checks = function (f, d, ch, id) {
     var cur = d[f.k] || [];
@@ -285,7 +324,8 @@
           if (frozen) return h("td", { "data-l": c.l }, h("span", { class: "frozen", title: "پس از ثبت نتیجه قفل شد تا اطمینان پیشین دست نخورد" }, String(row[c.k])));
           if (c.t === "claim") { var cl = (opts && opts.claims) || []; input = h("select", { id: cid, "aria-label": c.l, onchange: function (e) { row[c.k] = e.target.value; ch(); } }, h("option", { value: "" }, cl.length ? "— ادعا —" : "اول در ایستگاه «تصور یا تصدیق» ادعاها را ثبت کن"), cl.map(function (t, i) { var v = String(i + 1); return h("option", { value: v, selected: String(row[c.k]) === v }, fa(i + 1) + ". " + (t || "").slice(0, 70)); })); }
           else if (c.t === "sel") input = h("select", { id: cid, "aria-label": c.l, onchange: function (e) { row[c.k] = e.target.value; ch(); } }, h("option", { value: "" }, "—"), (c.opts || []).map(function (o) { return h("option", { value: o, selected: row[c.k] === o }, o); }));
-          else if (c.t === "num" || c.t === "pct") input = h("input", { id: cid, "aria-label": c.l, type: "number", step: "any", min: c.t === "pct" ? 0 : null, max: c.t === "pct" ? 100 : null, value: row[c.k] == null ? "" : row[c.k], oninput: function (e) { var v = e.target.value === "" ? null : +e.target.value; if (v != null && c.t === "pct") v = Math.max(0, Math.min(100, v)); row[c.k] = v; ch(); }, onblur: function (e) { if (row[c.k] != null) e.target.value = row[c.k]; } });
+          /* type=text + inputmode: رقمِ فارسی («۸۵») در «type=number» خالی می‌ماند (ممیزی B7: درصدِ «حکم نهایی» ذخیره نمی‌شد) */
+          else if (c.t === "num" || c.t === "pct") input = h("input", { id: cid, "aria-label": c.l, type: "text", inputmode: "decimal", dir: "ltr", value: row[c.k] == null ? "" : row[c.k], oninput: function (e) { var v = A.parseNum(e.target.value), msg = ""; if (v != null && isNaN(v)) { v = null; msg = "عدد نیست (یا بی‌نهایت است) — ذخیره نشد"; } if (v != null && c.t === "pct") v = Math.max(0, Math.min(100, v)); row[c.k] = v; numMsg(e.target, msg); ch(); }, onblur: function (e) { if (row[c.k] != null) e.target.value = row[c.k]; } });
           else { input = h("textarea", { id: cid, "aria-label": c.l, rows: 1, oninput: function (e) { row[c.k] = e.target.value; ch(); } }); input.value = row[c.k] || ""; }
           return h("td", { "data-l": c.l }, input);
         }), h("td", {}, ri >= (f.min || 1) ? h("button", { class: "ib", type: "button", "aria-label": "حذف ردیف", onclick: function () { rows.splice(ri, 1); draw(); ch(); } }, "×") : null)));

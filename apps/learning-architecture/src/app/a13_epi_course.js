@@ -627,7 +627,7 @@
         var cv = function (x) { return Math.round(X.capOf ? X.capOf(cfg, x, f) : x.cap); };   // سقفِ قضیه‌ایِ همین تصدیق (۲۰۲۶-۱۰-۱۴)
         var caps = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "cap"; }).sort(function (a, b) { return cv(a) - cv(b); });
         var flags = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "flag"; });
-        out.appendChild(h("div", { class: "ecrs-ceilhead" }, h("span", { class: "small muted" }, "سقفِ اعتبارِ موجهِ این تصدیق"), h("b", { class: "ecrs-ceilv" }, fa(r.ceil) + "٪"),
+        out.appendChild(h("div", { class: "ecrs-ceilhead" }, h("span", { class: "small muted" }, "سقفِ اعتبارِ موجهِ این تصدیق"), h("b", { class: "ecrs-ceilv" }, (A.ceilText ? A.ceilText(r) : fa(r.ceil)) + "٪"),
           h("div", { class: "crs-meter" }, h("i", { style: { width: r.ceil + "%" } }))));
         if (!caps.length) out.appendChild(h("p", { class: "small" }, "با این ویژگی‌ها هیچ ملاکی سقف نگذاشته (سقف ۱۰۰). اگر ویژگی‌ای «نامعلوم» است، یعنی هنوز سنجیده نشده — نه این‌که برقرار است."));
         else {
@@ -642,8 +642,8 @@
         }
         if (flags.length) out.appendChild(h("div", { class: "col" }, flags.map(function (x) { return h("p", { class: "small bad" }, "⚑ پرچمِ خطا (مستقل از درجه)" + (SM[x.st] ? " در «" + SM[x.st].fa + "»" : "") + ": " + (x.err || x.fa)); })));
         if (o.conf) out.appendChild(r.conf == null ? h("p", { class: "small muted" }, "اطمینانت را وارد کن تا ببینی با سقف می‌خواند یا نه.")
-          : r.over ? h("p", { class: "small bad" }, "بیش‌اطمینانی: اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + fa(r.ceil) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بیشتر است. موتور این را در ایستگاهِ «" + ((SM[(X.RM[r.bind] || {}).st] || SM.st_grade || {}).fa || "") + "» پرچم می‌زند.")
-          : h("p", { class: "small good" }, "اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + fa(r.ceil) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بالاتر نیست."));
+          : r.over ? h("p", { class: "small bad" }, "بیش‌اطمینانی: اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + (A.ceilText ? A.ceilText(r) : fa(r.ceil)) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بیشتر است. موتور این را در ایستگاهِ «" + ((SM[(X.RM[r.bind] || {}).st] || SM.st_grade || {}).fa || "") + "» پرچم می‌زند.")
+          : h("p", { class: "small good" }, "اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + (A.ceilText ? A.ceilText(r) : fa(r.ceil)) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بالاتر نیست."));
       }
       var box = h("div", { class: "col gap" }, h("div", { class: "ecrs-feats" }, keys.map(function (k) { return featCtl(FM[k], f, function () { if (!touched) { touched = true; markTry(o.sid, "sim"); } draw(); }); })), out);
       draw();

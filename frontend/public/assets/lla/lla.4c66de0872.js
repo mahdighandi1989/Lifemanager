@@ -5611,6 +5611,8 @@ window.EPI_ST.push({
   ],
   ws: [
     { k: "func", t: "sel", l: "کارکرد عقل در این تصدیق (s44)", opts: ["ادراک مفهوم کلی (تصوری — صدق و کذب ندارد)", "تجزیه و ترکیب مفاهیم / تعریف (تصوری — صدق و کذب ندارد)", "تصدیق بی‌واسطه (بدیهی)", "استدلال و ترکیب قضایا"], req: true, qk: true },
+    /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (B4): کاربرگ یکی است ولی پرونده چند تصدیق دارد — بی این خانه، «رمزگذاری» فقط وقتی پر می‌شود که تنها یک تصدیقِ عقلی باشد */
+    { k: "c", t: "claim", l: "این استدلال پشتوانهٔ کدام تصدیقِ پرونده است؟", h: "اگر پرونده چند تصدیق دارد، بگو این کاربرگ دربارهٔ کدام است؛ وگرنه «داوری قطعی» صورت و ماده را به هیچ‌کدام نمی‌چسباند (نمی‌داند کدام)." },
     { k: "arg", t: "chain", l: "استدلال کامل (مقدمات، از جمله مقدمهٔ پنهان، و نتیجه)", n: 4, prefix: "گام" },
     { k: "form", t: "sel", l: "صورت استدلال (s40)", opts: ["قیاس معتبر — نتیجه ضرورتاً لازم می‌آید", "استقرائی (از جزئی به کلی)", "تمثیلی (از شباهت)", "مغالطه‌آمیز / نتیجه لازم نمی‌آید"], qk: true },
     { k: "prem", t: "table", l: "مادهٔ استدلال: وضعیت هر مقدمه", min: 1, cols: [
@@ -5624,9 +5626,9 @@ window.EPI_ST.push({
       h: "فقط پیامدهایی را بشمار که از فرضیه پیش‌بینی شد و جدا از هم‌اند (تکرارِ یک مشاهده یکی است). اگر حتی یک پیامد رد شد، خالی بگذار — فرضیه را با همان رد بسنج. هر پیامدِ تأییدشده فرضیه را معتبرتر می‌کند، نه ثابت: پس از n پیامدِ تازه، حداکثر (n+1)÷(n+2) (۱ ⇒ ۶۷٪، ۳ ⇒ ۸۰٪، ۹ ⇒ ۹۱٪)، هرگز ۱۰۰." },
     { k: "conseq_new", t: "sel", feat: "x_conseq_new", opts: [], when: { k: "form", re: "استقرائی|تمثیلی" }, l: "آن پیامدها پیش از پیش‌بینی دانسته بودند؟",
       h: "«تازه» یعنی پیش از آن‌که فرضیه پیش‌بینی‌اش کند نمی‌دانستی؛ پیامدی که فرضیه را با آن ساختی چیزی نمی‌افزاید (همان ½). اگر مطمئن نیستی، «نامعلوم» ⇒ ½. از آنچه آن وقت می‌دانستی بنویس، نه از این‌که بعداً درست درآمد." },
-    { k: "analog_n", t: "num", feat: "x_analog_n", when: { k: "form", re: "تمثیلی" }, l: "تمثیل: چند موردِ همانند را سنجیدی؟ (همه — موافق و مخالف)",
+    { k: "analog_n", t: "num", feat: "x_analog_n", gte: "analog_k", cmpMsg: "شمارِ همهٔ موارد از شمارِ دارای ویژگی کمتر نمی‌شود — ذخیره نشد", when: { k: "form", re: "تمثیلی" }, l: "تمثیل: چند موردِ همانند را سنجیدی؟ (همه — موافق و مخالف)",
       h: "همهٔ مواردِ همانندی را بشمار که به آن‌ها تکیه کردی، نه فقط آن‌هایی که با نتیجه می‌خوانند — گزیدنِ موافق‌ها حساب را باطل می‌کند." },
-    { k: "analog_k", t: "num", feat: "x_analog_k", when: { k: "form", re: "تمثیلی" }, l: "تمثیل: چند تا از آن‌ها همان ویژگیِ مدعا را داشتند؟",
+    { k: "analog_k", t: "num", feat: "x_analog_k", lte: "analog_n", cmpMsg: "از n موردِ سنجیده بیش از n تا نمی‌توانند ویژگی را داشته باشند — ذخیره نشد", when: { k: "form", re: "تمثیلی" }, l: "تمثیل: چند تا از آن‌ها همان ویژگیِ مدعا را داشتند؟",
       h: "اگر k از n موردِ همانند ویژگی را داشتند، احتمالِ آن برای موردِ تازه حداکثر (k+1)÷(n+2) است — به شرطِ همانندی در رابطهٔ مربوط (خانهٔ بعد)." },
     { k: "analog_rel", t: "sel", feat: "x_analog_rel", opts: [], when: { k: "form", re: "تمثیلی" }, l: "تمثیل: موردِ تازه در همان چیزی که ویژگی را پدید می‌آورد با آن‌ها یکی است؟",
       h: "«احراز شد» فقط وقتی که نشان داده‌ای علت یا ساختارِ پدیدآورندهٔ ویژگی در موردِ تازه هم هست. شباهتِ ظاهری (شکل، نام، حال‌وهوا) یا ندانستن ⇒ حداکثر ½، هر چه شمارِ موارد باشد." },
@@ -5795,7 +5797,19 @@ window.EPI_ST.push({
     /* p_measured_precedence (مالک ۲۰۲۶-۱۰-۱۵): گزینه‌ها همان طرحِ x_relay (epi_feat.js پرشان می‌کند)؛ در «رمزگذاری» به x_relay ِ تصدیق‌های «تخصص دیگران» می‌رود */
     { k: "relay", t: "sel", feat: "x_relay", opts: [], l: "این یافته را از کجا خوانده‌ای؟ (خودِ منتشرشده یا واسطه)",
       h: "«مستقیم» فقط وقتی که یافته را از خودِ مقاله یا گزارشِ منتشرشده خوانده‌ای، همان‌گونه که پژوهش‌های قابِ سنجیده‌اند؛ آن‌وقت نرخِ سنجیدهٔ همان جمعیت بر سقف‌های «بی‌دلیل» (½) مقدم است. اگر از خبر، بازگو یا خلاصهٔ دیگری رسیده، درستیِ بازگویی سنجیده نشده ⇒ حداکثر ½. اگر نمی‌دانی، «نامعلوم» بگذار. از راهِ رسیدن بنویس، نه از این‌که بعداً درست درآمد." },
-    { k: "grades", t: "table", l: "درجهٔ اعتبار", qk: true, min: 1, cols: [
+        /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (B1): قاعده‌های r_expert_pop_* افزون بر x_field این سه را هم می‌خواهند (x_method، x_comp، chain) — کاربرگ نمی‌پرسید ⇒ سقفِ جمعیت
+       روی پروندهٔ واقعی هرگز نمی‌تابید. گزینه‌ها همان طرحِ ویژگی‌ها (epi_feat.js پرشان می‌کند)؛ در «رمزگذاری» فقط به خانهٔ خالیِ تصدیق‌های «تخصص دیگران» می‌روند */
+    { k: "xmethod", t: "sel", feat: "x_method", opts: [], l: "روشِ کارشناس (رکن ۱) برای همین پرسش معتبر است؟",
+      h: "«معتبر» فقط وقتی که روش (آزمایش، اندازه‌گیری، استدلال) خودش برای این نوع پرسش پشتوانه دارد؛ اگر نمی‌دانی، «نامعلوم»." },
+    { k: "xcomp", t: "sel", feat: "x_comp", opts: [], l: "صلاحیتِ کارشناس در همین موضوع (رکن ۲)",
+      h: "«احراز شده» فقط وقتی که تبحر و صلاحیتش در همین زیرحوزه را دیده‌ای، نه در حوزهٔ دیگر یا از شهرتش." },
+    { k: "xchain", t: "sel", feat: "chain", opts: [], l: "این یافته بر چند منبع تکیه دارد؟ (ساختارِ گزارش‌ها)",
+      h: "«تک‌منبع» = یک پژوهش یا گزارشِ تنها (حتی اگر جاهای زیادی بازنشرش کرده باشند)؛ «گزارش‌های عرضی مستقل» = چند پژوهشِ جدا که هر کدام خودشان به همین رسیدند." },
+    /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (B5): قضیهٔ T_measured_precedence (گامِ ۵) فقط برای تصدیقی است که «خودش موردی از همان جمعیت» است؛ تصدیقی که یافته را به
+       خودِ کاربر یا موردِ دیگری سرایت می‌دهد، حلقهٔ سنجیده‌نشدهٔ دیگری دارد (T_unknown + T_weakest ⇒ ≤ ½) */
+    { k: "xsame", t: "sel", opts: ["عیناً همان یافتهٔ منتشرشده است", "فراتر از یافته است — آن را به خودم یا موردِ دیگری سرایت داده‌ام، یا مقدمهٔ دیگری لازم دارد"], l: "تصدیقِ تو عیناً همان یافته است یا فراتر از آن؟",
+      h: "«پژوهش نشان داد X» عیناً همان یافته است. «پس برای من هم X» یا «پس در این شرکت هم X» حلقهٔ دیگری دارد (این‌که دربارهٔ تو یا آن مورد هم صادق است) که آن پژوهش نسنجیده؛ آن حلقه جدا سنجیده می‌شود و تا سنجیده نشده حداکثر ½ است." },
+{ k: "grades", t: "table", l: "درجهٔ اعتبار", qk: true, min: 1, cols: [
       { k: "c", l: "ادعا", t: "claim" },
       { k: "p", l: "احتمال صدق ٪", t: "pct" },
       { k: "why", l: "دلیل" }
@@ -15573,7 +15587,9 @@ window.EPI_PROBLEMS = window.EPI_PROBLEMS || [];
     var hit = R.filter(function (r) { return X.cond(r.when, f); });
     /* T_measured_precedence (p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵): برای خواندنِ مستقیمِ یافته‌ای از جمعیتِ سنجیده، سقف‌های «بی‌مرجح» که شرطشان در
        همهٔ اعضای قابِ همان جمعیت برقرار است جای خود را به نرخِ سنجیده (T_pop) می‌دهند — فهرست را ابزار از قاب‌ها ساخته (EPI_FOUND.precedeOf)، نه دست */
-    var FDy = W.EPI_FOUND, yl = FDy && FDy.yields ? FDy.yields(hit.filter(function (r) { return wOf(cfg, r) > 0; }), f) : {}, yielded = [];
+    /* k به yields هم می‌رسد (همخوانی با گامِ ۵ ِ همان قضیه، ممیزیِ ۲۰۲۶-۱۰-۱۵ B5): تصدیقی که حلقه‌ای جز خودِ یافته دارد (k.member === false)، یا ویژگی‌ای
+       که شرطِ آن سقف را برقرار کرده از حلقهٔ دیگری آمده (k.other)، مشمولِ تقدم نیست — T_weakest ½ ِ آن حلقه را نگه می‌دارد. پیکره/قاب‌ها k.member/k.other ندارند ⇒ بی‌تغییر. */
+    var FDy = W.EPI_FOUND, yl = FDy && FDy.yields ? FDy.yields(hit.filter(function (r) { return wOf(cfg, r) > 0; }), f, k) : {}, yielded = [];
     hit.forEach(function (r) {
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
@@ -15588,15 +15604,18 @@ window.EPI_PROBLEMS = window.EPI_PROBLEMS || [];
     // cfg.deg (آزمایشی، پیش‌فرض خاموش): مقایسه میانِ «درجه»های جزوه (یقین/ظن/شک/وهم/کذب — EPI_FOUND.DEG) به‌جای عدد + تحملِ قراردادیِ ۱۰
     var FD = W.EPI_FOUND;
     var over = conf != null && (cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(ceil) : conf > ceil + tol);
-    if (over) flags.push({ st: bind ? bind.st : "st_grade", kind: "over", rules: bind ? [bind.id] : [], gap: Math.round(conf - ceil) });
+    /* gapx/ceilx فقط برای نمایش (ممیزی B6): gap/ceil ِ گردشده دست نخورده‌اند (Brier و بک‌تست همان را می‌خوانند)؛ ولی ۶۰٫۹ نباید «۶۱» و ۹۹٫۹ نباید «۱۰۰» دیده شود
+       و بیش‌اطمینانیِ واقعیِ ۰٫۱ واحدی نباید «۰ واحد» نوشته شود. داوری (over) همان مقایسهٔ عددِ خام است. */
+    function gx(c) { return Math.max(0.1, +(conf - c).toFixed(1)); }
+    if (over) flags.push({ st: bind ? bind.st : "st_grade", kind: "over", rules: bind ? [bind.id] : [], gap: Math.round(conf - ceil), gapx: gx(ceil) });
     // هر سقفی که اطمینان از آن گذشته، به‌تنهایی دلیلِ بیش‌اطمینانی است (شرط‌ها مستقل‌اند؛ هر کدام کرانِ خودش را دارد) ⇒ ایستگاهِ همه، نه فقط
     // کمینه. (p_found_half، مالک ۲۰۲۶-۱۰-۱۳: پیش از آن فقط «اولین» قاعدهٔ کمینه مقصر بود و مکان‌یابی به ترتیب و اندازهٔ سقف‌ها بسته بود)
     if (over) caps.forEach(function (x) {
       var r = x[0], c = x[1], past = cfg && cfg.deg && FD ? FD.rank(conf) > FD.rank(c) : conf > c + tol;
-      if (r !== bind && past && !flags.some(function (y) { return y.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - c) });
+      if (r !== bind && past && !flags.some(function (y) { return y.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - c), gapx: gx(c) });
     });
     flags.sort(function (a, b) { return (PIDX[a.st] || 0) - (PIDX[b.st] || 0); });
-    var out = { id: k.id, ceil: Math.round(ceil), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
+    var out = { id: k.id, ceil: Math.round(ceil), ceilx: ceil >= 100 ? 100 : Math.min(99.9, +ceil.toFixed(1)), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
     if (yielded.length) out.yielded = yielded;
     return out;
   };
@@ -16268,12 +16287,32 @@ window.EPI_PROBLEMS = window.EPI_PROBLEMS || [];
     return F.PRECEDE[b] || null;
   };
   /* برای یک تصدیق: کدام قاعده‌های فعال جای خود را به قاعدهٔ T_pop ِ جمعیتش می‌دهند ⇒ { قاعده: قاعدهٔ جمعیت } */
-  F.yields = function (hit, f) {
-    var out = {}, ids = {}; (hit || []).forEach(function (r) { ids[r.id] = 1; });
+  /* همخوانیِ پیاده‌سازی با متنِ پذیرفتهٔ T_measured_precedence (ممیزیِ ۲۰۲۶-۱۰-۱۵، B5 — نه قاعدهٔ تازه، نه سقفِ تازه): گامِ ۳ ردهٔ «از جمعیتِ j و دارای همین شرط»
+     است، شرطی که در اعضای قاب از «خودِ یافته» برمی‌خیزد؛ گامِ ۵ می‌گوید تصدیقی که صدقش حلقهٔ دیگری هم لازم دارد (واسطه، یا هر حلقهٔ سنجیده‌نشدهٔ دیگر)
+     مشمول نیست و T_weakest برایش ≤ ½ می‌دهد. پیاده‌سازیِ پیشین فقط x_relay را می‌دید و ½ ِ هر مقدمهٔ اثبات‌نشده یا بی‌قرینگیِ نامربوط (مثلاً «این یافته
+     دربارهٔ من هم صادق است») را هم کنار می‌گذاشت. حالا: k.member === false (کاربر گفته تصدیق فراتر از یافته است) ⇒ هیچ تقدمی؛ k.other = ویژگی‌هایی که از
+     حلقه‌ای جز خودِ یافته آمده‌اند (مسیرِ کاربر: کاربرگِ «راه عقل»، یا دستی وقتی کاربر نگفته تصدیق عیناً همان یافته است) ⇒ قاعده‌ای که شرطش بر یکی از
+     آن‌ها تکیه دارد کنار نمی‌رود. پیکره، بذر و قاب‌ها k.member/k.other ندارند ⇒ رفتارشان بی‌تغییر (بک‌تست: ۰ جابه‌جایی). */
+  function condKeys(c, out) {
+    if (!c) return out;
+    (c.all || c.any || []).forEach(function (x) { condKeys(x, out); });
+    if (c.not) condKeys(c.not, out);
+    if (c.f) out[c.f] = 1;
+    return out;
+  }
+  F.condKeys = function (c) { return Object.keys(condKeys(c, {})); };
+  F.yields = function (hit, f, k) {
+    var out = {}, ids = {}, RM = {}; (hit || []).forEach(function (r) { ids[r.id] = 1; RM[r.id] = r; });
+    if (k && k.member === false) return out;
+    var other = (k && k.other) || null;
     (hit || []).forEach(function (p) {
       var d = F.DER[p.id]; if (!d || d.th !== "T_pop") return;
       var pr = F.precedeOf(d.base); if (!pr || !pr.relay || !f || f.x_relay !== pr.relay) return;
-      (pr.rules || []).forEach(function (rid) { if (ids[rid] && rid !== p.id && !out[rid]) out[rid] = p.id; });
+      (pr.rules || []).forEach(function (rid) {
+        if (!ids[rid] || rid === p.id || out[rid]) return;
+        if (other && F.condKeys(RM[rid].when).some(function (key) { return other[key] && f[key] != null; })) return;
+        out[rid] = p.id;
+      });
     });
     return out;
   };
@@ -18930,11 +18969,50 @@ var APP = window.APP = {};
     return sel;
   };
   /* عددِ شمارشی (≥ ۰، صحیح) — مثلاً شمارِ پیامدهای تأییدشده یا مواردِ همانند (p_plausible_reasoning، ۲۰۲۶-۱۰-۱۵)؛ خالی ⇒ null («نامعلوم») */
+  /* عددِ ورودیِ کاربر: رقمِ فارسی/عربی، «٫» ِ اعشار و «٬» ِ هزارگان پذیرفته؛ ناعدد یا نامتناهی (۱e400 ⇒ Infinity) ⇒ NaN — هرگز به موتور نمی‌رسد
+     (ممیزیِ ایده/کارخانه B7، ۲۰۲۶-۱۰-۱۵). خالی ⇒ null. */
+  A.parseNum = function (x) {
+    if (x == null) return null;
+    if (typeof x === "number") return isFinite(x) ? x : NaN;
+    var v = String(x).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return "٠١٢٣٤٥٦٧٨٩".indexOf(c); })
+      .replace(/[٬,\s\u200c]/g, "").replace(/٫/g, ".").replace(/[٪%]/g, "").trim();
+    if (v === "") return null;
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(v)) return NaN;
+    var n = +v; return isFinite(n) ? n : NaN;
+  };
+  /* عددِ فارسی با «٫» ِ اعشار (۶۰٫۹) */
+  A.faNum = function (x) { return A.fa(String(x)).replace(/\./g, "٫"); };
+  /* پیامِ ردِ ورودی کنارِ همان خانه (aria-live) — مقدارِ نادرست ذخیره نمی‌شود */
+  function numMsg(el, msg) {
+    var box = el.parentNode && el.parentNode.querySelector(".numerr");
+    el.setAttribute("aria-invalid", msg ? "true" : "false");
+    if (!msg) { if (box) box.remove(); return; }
+    if (!box && el.parentNode) { box = h("div", { class: "small bad numerr", role: "status", "aria-live": "polite" }); el.parentNode.insertBefore(box, el.nextSibling); }
+    if (box) box.textContent = msg;
+  }
+  A.numMsg = numMsg;
   FIELD.num = function (f, d, ch, id) {
     /* type=text + inputmode=numeric: در «type=number» رقمِ فارسی («۳») در کروم خالی می‌ماند و هرگز به این تبدیل نمی‌رسید (ممیزیِ دورِ ۴، ۲۰۲۶-۱۰-۱۵) */
     return h("input", { id: id, type: "text", inputmode: "numeric", dir: "ltr", value: d[f.k] == null ? "" : d[f.k], placeholder: f.ph || "",
-      oninput: function (e) { var v = String(e.target.value).replace(/[۰-۹]/g, function (x) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(x); }).replace(/[٠-٩]/g, function (x) { return "٠١٢٣٤٥٦٧٨٩".indexOf(x); }).trim();
-        d[f.k] = v === "" || isNaN(+v) ? null : Math.max(f.min == null ? 0 : f.min, Math.round(+v)); ch(); } });
+      oninput: function (e) {
+        var n = A.parseNum(e.target.value), el = e.target, msg = "";
+        if (n == null) d[f.k] = null;
+        else if (isNaN(n)) { d[f.k] = null; msg = "عدد نیست (یا بی‌نهایت است) — ذخیره نشد"; }
+        else {
+          n = Math.max(f.min == null ? 0 : f.min, Math.round(n));
+          /* شمارِ «از n» از خودِ n بیشتر نمی‌شود (k ≤ n): مقدارِ ناسازگار ذخیره نمی‌شود (ممیزی B7) */
+          var lo = f.lte && d[f.lte] != null && n > d[f.lte], hi = f.gte && d[f.gte] != null && n < d[f.gte];
+          if (lo || hi) { d[f.k] = null; msg = f.cmpMsg || "این عدد با خانهٔ همراهش نمی‌خواند — ذخیره نشد"; }
+          else d[f.k] = n;
+        }
+        numMsg(el, msg); ch();
+      } });
+  };
+  /* انتخابِ یکی از تصدیق‌های پرونده (برای کاربرگی که یک استدلال/یافته دارد ولی پرونده چند تصدیق) — ممیزی B4 */
+  FIELD.claim = function (f, d, ch, id, updaters, opts) {
+    var cl = (opts && opts.claims) || [];
+    return h("select", { id: id, onchange: function (e) { d[f.k] = e.target.value; ch(); } }, h("option", { value: "" }, cl.length ? "— کدام تصدیق؟ —" : "اول در ایستگاه «تصور یا تصدیق» ادعاها را ثبت کن"),
+      cl.map(function (t, i) { var v = String(i + 1); return h("option", { value: v, selected: String(d[f.k]) === v }, A.fa(i + 1) + ". " + (t || "").slice(0, 70)); }));
   };
   FIELD.checks = function (f, d, ch, id) {
     var cur = d[f.k] || [];
@@ -18999,7 +19077,8 @@ var APP = window.APP = {};
           if (frozen) return h("td", { "data-l": c.l }, h("span", { class: "frozen", title: "پس از ثبت نتیجه قفل شد تا اطمینان پیشین دست نخورد" }, String(row[c.k])));
           if (c.t === "claim") { var cl = (opts && opts.claims) || []; input = h("select", { id: cid, "aria-label": c.l, onchange: function (e) { row[c.k] = e.target.value; ch(); } }, h("option", { value: "" }, cl.length ? "— ادعا —" : "اول در ایستگاه «تصور یا تصدیق» ادعاها را ثبت کن"), cl.map(function (t, i) { var v = String(i + 1); return h("option", { value: v, selected: String(row[c.k]) === v }, fa(i + 1) + ". " + (t || "").slice(0, 70)); })); }
           else if (c.t === "sel") input = h("select", { id: cid, "aria-label": c.l, onchange: function (e) { row[c.k] = e.target.value; ch(); } }, h("option", { value: "" }, "—"), (c.opts || []).map(function (o) { return h("option", { value: o, selected: row[c.k] === o }, o); }));
-          else if (c.t === "num" || c.t === "pct") input = h("input", { id: cid, "aria-label": c.l, type: "number", step: "any", min: c.t === "pct" ? 0 : null, max: c.t === "pct" ? 100 : null, value: row[c.k] == null ? "" : row[c.k], oninput: function (e) { var v = e.target.value === "" ? null : +e.target.value; if (v != null && c.t === "pct") v = Math.max(0, Math.min(100, v)); row[c.k] = v; ch(); }, onblur: function (e) { if (row[c.k] != null) e.target.value = row[c.k]; } });
+          /* type=text + inputmode: رقمِ فارسی («۸۵») در «type=number» خالی می‌ماند (ممیزی B7: درصدِ «حکم نهایی» ذخیره نمی‌شد) */
+          else if (c.t === "num" || c.t === "pct") input = h("input", { id: cid, "aria-label": c.l, type: "text", inputmode: "decimal", dir: "ltr", value: row[c.k] == null ? "" : row[c.k], oninput: function (e) { var v = A.parseNum(e.target.value), msg = ""; if (v != null && isNaN(v)) { v = null; msg = "عدد نیست (یا بی‌نهایت است) — ذخیره نشد"; } if (v != null && c.t === "pct") v = Math.max(0, Math.min(100, v)); row[c.k] = v; numMsg(e.target, msg); ch(); }, onblur: function (e) { if (row[c.k] != null) e.target.value = row[c.k]; } });
           else { input = h("textarea", { id: cid, "aria-label": c.l, rows: 1, oninput: function (e) { row[c.k] = e.target.value; ch(); } }); input.value = row[c.k] || ""; }
           return h("td", { "data-l": c.l }, input);
         }), h("td", {}, ri >= (f.min || 1) ? h("button", { class: "ib", type: "button", "aria-label": "حذف ردیف", onclick: function () { rows.splice(ri, 1); draw(); ch(); } }, "×") : null)));
@@ -21766,9 +21845,11 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     body.appendChild(h("div", { class: "row gap wrap" }, fk, fo, fm, q)); body.appendChild(out); draw();
     return root;
   };
+  /* سقف برای نمایش (ممیزی B6): عددِ خام با یک رقمِ اعشار، و هرگز «۱۰۰» برای سقفِ کمتر از ۱۰۰ (۹۹٫۹ ⇒ «۹۹٫۹»، نه «۱۰۰») */
+  A.ceilText = function (r) { var c = r && r.ceilx != null ? r.ceilx : r && r.ceil; if (c == null) return "—"; if (c < 100 && Math.round(c) >= 100) c = 99.9; return A.faNum(c); };
   function claimEngine(k, r) {
-    return h("div", { class: "eng" }, h("div", {}, h("strong", {}, "سقف اعتبار موجه: " + fa(r.ceil) + "٪"), r.bind ? h("span", { class: "small" }, " — قاعده تعیین‌کننده: ", ruleChip(r.bind)) : null, r.conf != null ? h("span", { class: "small" }, " · اطمینان کنشگر: " + fa(r.conf) + "٪") : null),
-      r.flags.length ? h("ul", { class: "small" }, r.flags.map(function (fl) { return h("li", {}, h("strong", {}, stName(fl.st) + ": "), fl.kind === "over" ? "بیش‌اطمینانی (" + fa(fl.gap) + " واحد بالاتر از سقف)" : "خطا", " ", fl.rules.map(ruleChip)); })) : h("div", { class: "small good" }, "بی‌پرچم"),
+    return h("div", { class: "eng" }, h("div", {}, h("strong", {}, "سقف اعتبار موجه: " + A.ceilText(r) + "٪"), r.bind ? h("span", { class: "small" }, " — قاعده تعیین‌کننده: ", ruleChip(r.bind)) : null, r.conf != null ? h("span", { class: "small" }, " · اطمینان کنشگر: " + fa(r.conf) + "٪") : null),
+      r.flags.length ? h("ul", { class: "small" }, r.flags.map(function (fl) { return h("li", {}, h("strong", {}, stName(fl.st) + ": "), fl.kind === "over" ? "بیش‌اطمینانی (" + A.faNum(fl.gapx != null ? fl.gapx : fl.gap) + " واحد بالاتر از سقف)" : "خطا", " ", fl.rules.map(ruleChip)); })) : h("div", { class: "small good" }, "بی‌پرچم"),
       r.fired.length ? h("div", { class: "small muted" }, "قاعده‌های فعال: ", r.fired.map(ruleChip)) : null);
   }
   function featList(f) { var ks = Object.keys(f || {}); return ks.length ? h("ul", { class: "small featl" }, ks.map(function (k) { return h("li", { class: FM[k] && FM[k].dx ? "dx" : "" }, featText(k, f[k])); })) : h("p", { class: "small muted" }, "بدون ویژگی"); }
@@ -21801,16 +21882,32 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   }
 
   /* ---------- ویرایشگر ویژگی‌ها (مشترک: پرونده بک‌تست و پرونده انسانی) ---------- */
-  A.featEditor = function (f, onCh, pre) {
+  /* prov (فقط پروندهٔ انسانی؛ ممیزیِ ۲۰۲۶-۱۰-۱۵ B3): {pre, clr} — کلیدهایی که کاربرگ پر کرده (pre؛ با تغییرِ کاربرگ دنبالش می‌روند) و کلیدهایی که کاربر
+     خودش «تعیین نشده» کرده (clr؛ دیگر از کاربرگ پر نمی‌شوند). هر انتخابِ دستی کلید را از pre بیرون می‌برد (دستی شد). */
+  var PCT_K = { conf: 1, mem_orig: 1 };   // ویژگی‌های درصدی (۰–۱۰۰)؛ بقیهٔ عددها شمارند و سقفِ ۱۰۰ ندارند
+  A.featEditor = function (f, onCh, pre, prov) {
     var box = h("div", { class: "feated" }), last = -1;
+    function mark(k, cleared) { if (!prov) return; if (prov.pre) delete prov.pre[k]; if (prov.clr) { if (cleared) prov.clr[k] = 1; else delete prov.clr[k]; } }
     FEAT.forEach(function (d) {
       var st = A.EST && A.EST[d.st], hall = st ? st.hall : 0;
       if (hall !== last) { last = hall; box.appendChild(h("div", { class: "rhall" }, (E && E.HALLS[hall] ? "سالن " + fa(hall) + " · " + E.HALLS[hall].fa : ""))); }
       var id = "fe_" + (pre ? pre + "_" : "") + d.k, ctl;   // پیشوند برای هر تصدیق ⇒ شناسه‌ها و برچسب‌ها یکتا (ممیزی ۲۰۲۶-۱۰-۱۳)
-      if (d.t === "enum") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value; onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), d.v.map(function (v) { return h("option", { value: v, selected: f[d.k] === v }, v); }));
-      else if (d.t === "bool") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value === "1"; onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), h("option", { value: "1", selected: f[d.k] === true }, "بله"), h("option", { value: "0", selected: f[d.k] === false }, "خیر"));
-      else ctl = h("input", { id: id, type: "number", min: 0, max: 100, value: f[d.k] == null ? "" : f[d.k], oninput: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = Math.max(0, Math.min(100, +e.target.value)); onCh && onCh(); } });
-      box.appendChild(h("div", { class: "ferow" + (d.dx ? " dx" : "") }, h("label", { for: id, class: "small" }, d.fa, d.dx ? h("span", { class: "chip", title: "ویژگی تشخیصی: خودش داوری است" }, "تشخیصی") : null), ctl));
+      if (d.t === "enum") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value; mark(d.k, e.target.value === ""); onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), d.v.map(function (v) { return h("option", { value: v, selected: f[d.k] === v }, v); }));
+      else if (d.t === "bool") ctl = h("select", { id: id, onchange: function (e) { if (e.target.value === "") delete f[d.k]; else f[d.k] = e.target.value === "1"; mark(d.k, e.target.value === ""); onCh && onCh(); } }, h("option", { value: "" }, "— تعیین نشده —"), h("option", { value: "1", selected: f[d.k] === true }, "بله"), h("option", { value: "0", selected: f[d.k] === false }, "خیر"));
+      /* type=text + inputmode (ممیزی B7): رقمِ فارسی در «type=number» خالی می‌ماند؛ ناعدد/بی‌نهایت ذخیره نمی‌شود؛ شمارها سقفِ ۱۰۰ ندارند؛ k ≤ n ِ تمثیل */
+      else ctl = h("input", { id: id, type: "text", inputmode: "decimal", dir: "ltr", value: f[d.k] == null ? "" : f[d.k], oninput: function (e) {
+        var v = A.parseNum ? A.parseNum(e.target.value) : (e.target.value === "" ? null : +e.target.value), msg = "";
+        if (v == null) { delete f[d.k]; mark(d.k, true); }
+        else if (isNaN(v)) msg = "عدد نیست (یا بی‌نهایت است) — ذخیره نشد";
+        else {
+          v = PCT_K[d.k] ? Math.max(0, Math.min(100, v)) : Math.max(0, v);
+          if ((d.k === "x_analog_k" && f.x_analog_n != null && v > +f.x_analog_n) || (d.k === "x_analog_n" && f.x_analog_k != null && v < +f.x_analog_k)) msg = "تمثیل: شمارِ دارای ویژگی (k) از شمارِ همهٔ موارد (n) بیشتر نمی‌شود — ذخیره نشد";
+          else { f[d.k] = v; mark(d.k, false); }
+        }
+        if (A.numMsg) A.numMsg(e.target, msg); onCh && onCh();
+      } });
+      var src = prov && prov.pre && prov.pre[d.k] && f[d.k] != null ? h("span", { class: "chip", title: "خودِ کاربرگ این را پر کرده؛ اگر کاربرگ را عوض کنی، این هم عوض می‌شود" }, "از کاربرگ") : prov && prov.clr && prov.clr[d.k] ? h("span", { class: "chip", title: "خودت خالی‌اش کردی؛ دیگر از کاربرگ پر نمی‌شود — برای برگرداندن، یک مقدار انتخاب کن" }, "خالی به دستِ تو") : null;
+      box.appendChild(h("div", { class: "ferow" + (d.dx ? " dx" : "") }, h("label", { for: id, class: "small" }, d.fa, d.dx ? h("span", { class: "chip", title: "ویژگی تشخیصی: خودش داوری است" }, "تشخیصی") : null, src), ctl));
     });
     return box;
   };
@@ -21974,6 +22071,111 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     return root;
   };
 
+  /* ---------- کاربرگ ⇒ رمزگذاری (پرونده انسانی) ----------
+     ممیزی ۲۰۲۶-۱۰-۱۳: موتور کاربرگ‌ها را نمی‌دید. ممیزیِ ۲۰۲۶-۱۰-۱۵ (ایده/کارخانه):
+     - B1: «استناد به تخصص» x_method / x_comp / chain را هم می‌دهد (قاعده‌های r_expert_pop_* بی آن‌ها هرگز روی پروندهٔ واقعی نمی‌تابیدند).
+     - B2: صورتِ «مغالطه‌آمیز» ⇒ «نامعتبر»، «قیاس معتبر» ⇒ «معتبر (قیاسی)»؛ مادهٔ استدلال از جدولِ مقدمات فقط وقتی نگاشتِ وفادار هست:
+       همهٔ مقدمه‌ها بدیهی یا منتهی به بدیهی ⇒ «منتهی به بدیهی»؛ مقدمه‌ای «نامعلوم» ⇒ «مقدمه اثبات‌نشده». «ظنی» نگاشت ندارد: طرح مقدارِ «مقدمهٔ ظنیِ موجه»
+       ندارد و یادداشتِ r_aql_matter_unproven صریحاً می‌گوید ظنیِ موجه (مثلاً خبرِ موثق) را «اثبات‌نشده» رمز نکنید — پیشنهادش با مالک است.
+     - B3: هر کلیدی که کاربرگ پر کرده (cs.featPre) با تغییر یا خالی‌شدنِ کاربرگ دنبالش می‌رود؛ کلیدی که کاربر خودش «تعیین نشده» کرده (cs.featClr) دوباره پر نمی‌شود؛
+       انتخابِ دستی هرگز بازنویسی نمی‌شود — اگر با کاربرگ نمی‌خواند، فقط گفته می‌شود.
+     - B4: کاربرگِ یگانهٔ «راه عقل و برهان» فقط به یک تصدیق می‌رسد: همان که کاربرگ می‌گوید (خانهٔ «کدام تصدیق»)، یا تنها تصدیقِ عقلی/استقرائی، یا تنها تصدیقِ پرونده.
+     - B5: k.member (تصدیق عیناً همان یافته است؟) و k.other (ویژگی‌هایی که از حلقه‌ای جز خودِ یافته آمده‌اند) به موتور می‌رسند (T_measured_precedence، گامِ ۵). */
+  var AQL_SELF = { "بدیهی اولی": 1, "بدیهی وجدانی": 1, "نظریِ منتهی به بدیهی (زنجیره روشن)": 1 };
+  var XSAME_YES = "عیناً همان یافتهٔ منتشرشده است";
+  function caseClaimTexts(cs) { return ((cs.st && cs.st.st_tasdiq && cs.st.st_tasdiq.data && cs.st.st_tasdiq.data.claims) || []).map(function (r) { return (r.txt || "").trim(); }); }
+  A.featProv = function (cs, i) {
+    cs.featPre = cs.featPre || {}; cs.featClr = cs.featClr || {};
+    return { pre: cs.featPre[i] = cs.featPre[i] || {}, clr: cs.featClr[i] = cs.featClr[i] || {} };
+  };
+  A.casePrefill = function (cs) {
+    var claims = caseClaimTexts(cs), filled = [], notes = [], changed = false, FMk = window.EPI_FM;
+    cs.feat = cs.feat || {};
+    var D = function (sid) { return (cs.st && cs.st[sid] && cs.st[sid].data) || {}; };
+    var ways = (D("st_route").ways || []).filter(function (r) { return r && r.c && r.w; }).sort(function (a, b) { return (+a.ord || 99) - (+b.ord || 99); });
+    var fin = (D("st_final").final || []).filter(function (r) { return r && r.c; }), stk = +D("st_intake").stakes;
+    var EX = D("st_expert"), AQ = D("st_aql"), fm = String(AQ.form || "");
+    var wayOf = function (n) { var w = ways.filter(function (r) { return String(r.c) === n; })[0]; return w ? w.w : null; };
+    /* B4: تصدیقِ هدفِ کاربرگِ «راه عقل» */
+    var aqlTo = AQ.c ? String(AQ.c) : "";
+    if (!aqlTo && fm) {
+      var cand = claims.map(function (t, i) { return String(i + 1); }).filter(function (n) { var w = cs.feat[n] && cs.feat[n].way != null ? cs.feat[n].way : wayOf(n); return w === "عقل" || w === "استقراء"; });
+      if (cand.length === 1) aqlTo = cand[0];
+      else if (!cand.length && claims.length === 1) aqlTo = "1";
+      else if (cand.length > 1) notes.push("کاربرگِ «راه عقل و برهان» یکی است ولی " + fa(cand.length) + " تصدیقِ عقلی/استقرائی داری؛ صورت و ماده به هیچ‌کدام نرسید — در همان کاربرگ بگو «این استدلال پشتوانهٔ کدام تصدیق است».");
+    }
+    var formOf = function () {
+      if (/^قیاس معتبر/.test(fm)) return "معتبر (قیاسی)";
+      if (/^مغالطه/.test(fm)) return "نامعتبر";
+      if (/استقرائی|تمثیلی/.test(fm)) return "غیرقیاسی (استقرا/تمثیل)";
+      return null;
+    };
+    var matterOfPrem = function () {
+      var rows = (AQ.prem || []).filter(function (r) { return r && r.st; }); if (!rows.length) return null;
+      if (rows.some(function (r) { return r.st === "نامعلوم"; })) return "مقدمه اثبات‌نشده";
+      if (rows.every(function (r) { return AQL_SELF[r.st]; })) return "منتهی به بدیهی";
+      return null;   // «ظنی»: نگاشتِ وفادار ندارد (بالا)
+    };
+    var num = function (v) { var n = A.parseNum ? A.parseNum(v) : +v; return n == null || isNaN(n) || n < 0 ? null : n; };
+    claims.forEach(function (t, i) {
+      var n = String(i + 1), f = cs.feat[n] = cs.feat[n] || {}, pv = A.featProv(cs, n), P = pv.pre, C = pv.clr, L = fa(i + 1) + ": ";
+      function sync(key, val, src, label) {
+        var d = FMk[key]; if (!d) return;
+        if (val != null && d.t === "enum" && d.v.indexOf(val) < 0) val = null;
+        if (val != null && d.t === "num" && !(isFinite(+val) && +val >= 0)) val = null;
+        var show = function (v) { return d.t === "num" ? A.faNum(v) : String(v); };
+        if (C[key]) return;                                                // خودت خالی‌اش کردی
+        if (f[key] == null) { if (val != null) { f[key] = val; P[key] = src; changed = true; filled.push(L + label + " ← " + show(val)); } else if (P[key]) { delete P[key]; changed = true; } return; }
+        if (P[key]) {                                                      // کاربرگ پرش کرده بود ⇒ دنبالِ کاربرگ
+          if (val == null) { delete f[key]; delete P[key]; changed = true; filled.push(L + label + " ← (کاربرگ خالی شد؛ برداشته شد)"); }
+          else if (f[key] !== val) { f[key] = val; P[key] = src; changed = true; filled.push(L + label + " ← " + show(val) + " (کاربرگ عوض شد)"); }
+          return;
+        }
+        if (val != null && f[key] !== val) notes.push(L + label + ": کاربرگ می‌گوید «" + show(val) + "» ولی رمزگذاری «" + show(f[key]) + "» است (انتخابِ دستیِ تو؛ دست نخورد).");
+      }
+      sync("way", wayOf(n), "st_route", "راه");
+      var fr = fin.filter(function (r) { return String(r.c) === n; })[0], cv = fr ? num(fr.p) : null;
+      sync("conf", cv == null ? null : Math.min(100, cv), "st_final", "اطمینان");
+      sync("stakes", stk >= 1 ? (stk <= 2 ? "کم" : stk === 3 ? "متوسط" : "زیاد") : null, "st_intake", "بهای خطا");
+      /* «استناد به تخصص» ⇒ فقط تصدیق‌های «تخصص دیگران» (x_field، x_relay: مالک ۲۰۲۶-۱۰-۱۵؛ x_method، x_comp، chain: B1) */
+      var isX = f.way === "تخصص دیگران", extra = isX && /^فراتر/.test(String(EX.xsame || ""));
+      sync("x_field", isX ? EX.field || null : null, "st_expert", "جمعیتِ پژوهش");
+      sync("x_relay", isX ? EX.relay || null : null, "st_expert", "راهِ رسیدنِ یافته");
+      sync("x_method", isX ? EX.xmethod || null : null, "st_expert", "اعتبارِ روش");
+      sync("x_comp", isX ? EX.xcomp || null : null, "st_expert", "صلاحیتِ کارشناس");
+      sync("chain", isX ? EX.xchain || null : null, "st_expert", "ساختارِ گزارش‌ها");
+      /* «راه عقل و برهان» ⇒ فقط تصدیقِ هدف (B4)؛ صورت و ماده (B2)؛ استدلالِ معقول (p_plausible_reasoning) */
+      var isA = aqlTo === n, form = isA ? formOf() : null;
+      if (form && form !== "غیرقیاسی (استقرا/تمثیل)" && !(f.way === "عقل" || f.way == null || AQ.c)) form = null;   // قیاس/مغالطه فقط برای تصدیقِ عقلی (یا بی‌راهِ تنها، یا انتخابِ صریحِ کاربرگ)
+      sync("form", form, "st_aql", "صورتِ استدلال");
+      /* ماده: «فراتر از یافته» ⇒ همان حلقهٔ افزوده مقدمهٔ اثبات‌نشده است (B5)؛ وگرنه از جدولِ مقدماتِ تصدیقِ هدف */
+      sync("matter", extra ? "مقدمه اثبات‌نشده" : isA ? matterOfPrem() : null, extra ? "st_expert:extra" : "st_aql", "مادهٔ استدلال");
+      var pl = isA && /استقرائی|تمثیلی/.test(fm), an = pl && fm.indexOf("تمثیلی") >= 0;
+      var aN = an ? num(AQ.analog_n) : null, aK = an ? num(AQ.analog_k) : null;
+      if (aN != null && aK != null && aK > aN) { notes.push(L + "تمثیل: «دارای ویژگی» (" + A.faNum(aK) + ") از «همهٔ موارد» (" + A.faNum(aN) + ") بیشتر است — هیچ‌کدام رمز نشد؛ کاربرگ را درست کن."); aN = aK = null; }
+      sync("x_conseq_n", pl ? num(AQ.conseq_n) : null, "st_aql", "پیامدِ تأییدشده");
+      sync("x_conseq_new", pl ? AQ.conseq_new || null : null, "st_aql", "تازگیِ پیامدها");
+      sync("x_analog_n", aN, "st_aql", "مواردِ همانند");
+      sync("x_analog_k", aK, "st_aql", "همانندهای دارای ویژگی");
+      sync("x_analog_rel", an ? AQ.analog_rel || null : null, "st_aql", "همانندی در رابطهٔ مربوط");
+    });
+    return { filled: filled, notes: notes, changed: changed };
+  };
+  /* تصدیق‌های پرونده برای موتور، با پیوندِ هر ویژگی به حلقه‌اش (B5): member از «تصدیقِ تو عیناً همان یافته است؟»؛ other = ویژگی‌هایی که از کاربرگِ «راه عقل»
+     یا از «فراتر از یافته» آمده‌اند، و — تا کاربر نگفته تصدیق عیناً همان یافته است — ویژگی‌های دستی (معلوم نیست حلقهٔ خودِ یافته‌اند) */
+  A.caseClaims = function (cs) {
+    var EX = (cs.st && cs.st.st_expert && cs.st.st_expert.data) || {}, xs = String(EX.xsame || "");
+    return caseClaimTexts(cs).map(function (t, i) {
+      var n = String(i + 1), f = (cs.feat && cs.feat[n]) || {}, P = (cs.featPre && cs.featPre[n]) || {}, k = { id: "k" + n, txt: t, f: f };
+      if (f.way !== "تخصص دیگران") return k;
+      k.member = xs === XSAME_YES ? true : /^فراتر/.test(xs) ? false : undefined;
+      var other = {};
+      Object.keys(f).forEach(function (key) { var s = P[key]; if (s ? !/^st_expert$|^st_route$|^st_final$|^st_intake$/.test(s) : k.member !== true) other[key] = 1; });
+      k.other = other;
+      return k;
+    });
+  };
+
   /* ---------- داوری قطعی برای پرونده انسانی کارخانه ---------- */
   A.caseEngine = function (cs) {
     var claims = ((cs.st && cs.st.st_tasdiq && cs.st.st_tasdiq.data && cs.st.st_tasdiq.data.claims) || []).map(function (r) { return (r.txt || "").trim(); });
@@ -21984,48 +22186,17 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     var out = h("div", { class: "col gap" });
     function calc() {
       out.innerHTML = "";
-      var tmp = { claims: claims.map(function (t, i) { return { id: "k" + (i + 1), txt: t, f: cs.feat[i + 1] || {} }; }) };
+      var tmp = { claims: A.caseClaims(cs) };
       var r = X.runCase(tmp, A.btCfg());
       out.appendChild(h("section", { class: "card verdict " + (r.healthy ? "okv" : "badv") }, h("h2", {}, r.healthy ? "داوری قطعی خطایی ندید" : "نخستین نقطه خطا: " + stName(r.first)), r.fixes.length ? h("ul", {}, r.fixes.map(function (x) { return h("li", {}, x); })) : null));
       tmp.claims.forEach(function (k, i) { out.appendChild(h("section", { class: "card" }, h("h3", {}, fa(i + 1) + ". " + k.txt), claimEngine(k, r.claims[i]))); });
     }
     var save = A.debounce(function () { S.put(cs); calc(); }, 300);
-    /* کاربرگ ⇒ رمزگذاری (ممیزی ۲۰۲۶-۱۰-۱۳: موتور کاربرگ‌ها را نمی‌دید؛ «نقل» با اطمینانِ ۹۵ «خطایی ندید» می‌گفت).
-       فقط خانه‌های خالی پر می‌شوند — انتخابِ دستیِ تو دست نمی‌خورد: راه از «راه معرفت هر تصدیق»، اطمینان از «درجهٔ نهایی» ِ «حکم نهایی»،
-       بهای خطا از «هزینه خطا» ِ پذیرش (۱–۲ کم، ۳ متوسط، ۴–۵ زیاد). */
-    var filled = [];
-    (function prefill() {
-      var D = function (sid) { return (cs.st && cs.st[sid] && cs.st[sid].data) || {}; };
-      var ways = (D("st_route").ways || []).filter(function (r) { return r && r.c && r.w; }).sort(function (a, b) { return (+a.ord || 99) - (+b.ord || 99); });
-      var fin = (D("st_final").final || []).filter(function (r) { return r && r.c; }), stk = +D("st_intake").stakes;
-      claims.forEach(function (t, i) {
-        var f = cs.feat[i + 1] = cs.feat[i + 1] || {}, n = String(i + 1), w = ways.filter(function (r) { return String(r.c) === n; })[0], fr = fin.filter(function (r) { return String(r.c) === n; })[0];
-        if (f.way == null && w) { f.way = w.w; filled.push(fa(i + 1) + ": راه ← " + w.w); }
-        if (f.conf == null && fr && fr.p !== "" && fr.p != null && !isNaN(+String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))) { f.conf = Math.max(0, Math.min(100, +String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))); filled.push(fa(i + 1) + ": اطمینان ← " + fa(f.conf) + "٪"); }
-        if (f.stakes == null && stk >= 1) { f.stakes = stk <= 2 ? "کم" : stk === 3 ? "متوسط" : "زیاد"; filled.push(fa(i + 1) + ": بهای خطا ← " + f.stakes); }
-        /* جمعیتِ پژوهش از کاربرگِ «استناد به تخصص» (x_field؛ مالک ۲۰۲۶-۱۰-۱۵) — فقط برای تصدیقِ «تخصص دیگران» و فقط اگر خالی است */
-        var xf = D("st_expert").field; if (f.x_field == null && xf && f.way === "تخصص دیگران" && window.EPI_FM.x_field && window.EPI_FM.x_field.v.indexOf(xf) >= 0) { f.x_field = xf; filled.push(fa(i + 1) + ": جمعیتِ پژوهش ← " + xf); }
-        /* راهِ رسیدنِ یافته (x_relay؛ p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵) — همان شرط‌ها */
-        var xr = D("st_expert").relay; if (f.x_relay == null && xr && f.way === "تخصص دیگران" && window.EPI_FM.x_relay && window.EPI_FM.x_relay.v.indexOf(xr) >= 0) { f.x_relay = xr; filled.push(fa(i + 1) + ": راهِ رسیدنِ یافته ← " + xr); }
-        /* استدلالِ معقول از کاربرگِ «راه عقل و برهان» (x_conseq_* / x_analog_*؛ p_plausible_reasoning، مالک ۲۰۲۶-۱۰-۱۵) — فقط برای تصدیقی که راهش عقل/استقراء است
-           یا صورتش غیرقیاسی، فقط اگر خالی است و فقط وقتی صورتِ کاربرگ استقرائی/تمثیلی است (همان شرطِ دیده‌شدنِ فیلدها) */
-        /* صورتِ استدلال از کاربرگِ «راه عقل و برهان» (ممیزیِ دورِ ۴: پیش‌پر نمی‌شد ⇒ r_aql_conseq / r_aql_analogy / r_aql_nondeductive روی پروندهٔ واقعی هرگز نمی‌تابیدند).
-           فقط «استقرائی/تمثیلی» ⇒ «غیرقیاسی»، فقط اگر خالی است و فقط برای تصدیقی که راهش عقل/استقراء است (یا تنها تصدیقِ پرونده و راهش ثبت نشده) */
-        var fmw = String(D("st_aql").form || "");
-        if (f.form == null && /استقرائی|تمثیلی/.test(fmw) && (f.way === "عقل" || f.way === "استقراء" || (f.way == null && claims.length === 1))) { f.form = "غیرقیاسی (استقرا/تمثیل)"; filled.push(fa(i + 1) + ": صورتِ استدلال ← " + f.form); }
-        var DA = D("st_aql"), FMk = window.EPI_FM, isPl = f.form === "غیرقیاسی (استقرا/تمثیل)" || f.way === "عقل" || f.way === "استقراء", fm = String(DA.form || "");
-        if (isPl && /استقرائی|تمثیلی/.test(fm)) [["conseq_n", "x_conseq_n", "پیامدِ تأییدشده"], ["conseq_new", "x_conseq_new", "تازگیِ پیامدها"], ["analog_n", "x_analog_n", "مواردِ همانند", "تمثیلی"],
-          ["analog_k", "x_analog_k", "همانندهای دارای ویژگی", "تمثیلی"], ["analog_rel", "x_analog_rel", "همانندی در رابطهٔ مربوط", "تمثیلی"]].forEach(function (m) {
-          var v = DA[m[0]], d = FMk[m[1]]; if (m[3] && fm.indexOf(m[3]) < 0) return;
-          if (f[m[1]] != null || v == null || v === "" || !d) return;
-          if (d.t === "num") { v = +v; if (!(v >= 0)) return; } else if (d.v.indexOf(v) < 0) return;
-          f[m[1]] = v; filled.push(fa(i + 1) + ": " + m[2] + " ← " + (d.t === "num" ? fa(v) : v));
-        });
-      });
-      if (filled.length && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
-    })();
-    if (filled.length) root.appendChild(h("p", { class: "small card soft feat-prefill", dir: "rtl" }, "از کاربرگ‌های همین پرونده پر شد (فقط خانه‌های خالی؛ قابلِ تغییر): " + filled.join(" · ")));
-    claims.forEach(function (t, i) { cs.feat[i + 1] = cs.feat[i + 1] || {}; root.appendChild(h("details", { class: "card", open: i === 0 || null }, h("summary", {}, h("strong", {}, "رمزگذاری تصدیق " + fa(i + 1) + ": "), t), A.featEditor(cs.feat[i + 1], save, "c" + (i + 1)))); });
+    var pre = A.casePrefill(cs), filled = pre.filled;
+    if (pre.changed && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
+    if (filled.length) root.appendChild(h("p", { class: "small card soft feat-prefill", dir: "rtl" }, "از کاربرگ‌های همین پرونده (فقط خانه‌هایی که خالی بودند یا خودِ کاربرگ پرشان کرده بود؛ قابلِ تغییر): " + filled.join(" · ")));
+    if (pre.notes.length) root.appendChild(h("ul", { class: "small card soft feat-prefill-notes", dir: "rtl" }, pre.notes.map(function (x) { return h("li", {}, x); })));
+    claims.forEach(function (t, i) { cs.feat[i + 1] = cs.feat[i + 1] || {}; root.appendChild(h("details", { class: "card", open: i === 0 || null }, h("summary", {}, h("strong", {}, "رمزگذاری تصدیق " + fa(i + 1) + ": "), t), A.featEditor(cs.feat[i + 1], save, "c" + (i + 1), A.featProv(cs, i + 1)))); });
     root.appendChild(out); calc();
     /* اگر نتیجه پیش از اولین رمزگذاری ثبت شده، این پرونده «پس‌نگر» است و به دفترِ پیش‌رو نمی‌رود (ممیزی ۲۰۲۶-۱۰-۱۳) */
     if (!cs.fwdAt) { cs.fwdAt = new Date().toISOString(); if (cs.outcomeAt || Object.keys(cs.outcome || {}).some(function (k) { return cs.outcome[k]; })) cs.fwdLate = true; S.put(cs); }
@@ -25282,7 +25453,7 @@ APP.goFromURL = function (q) {
         var cv = function (x) { return Math.round(X.capOf ? X.capOf(cfg, x, f) : x.cap); };   // سقفِ قضیه‌ایِ همین تصدیق (۲۰۲۶-۱۰-۱۴)
         var caps = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "cap"; }).sort(function (a, b) { return cv(a) - cv(b); });
         var flags = r.fired.map(function (id) { return X.RM[id]; }).filter(function (x) { return x && x.eff === "flag"; });
-        out.appendChild(h("div", { class: "ecrs-ceilhead" }, h("span", { class: "small muted" }, "سقفِ اعتبارِ موجهِ این تصدیق"), h("b", { class: "ecrs-ceilv" }, fa(r.ceil) + "٪"),
+        out.appendChild(h("div", { class: "ecrs-ceilhead" }, h("span", { class: "small muted" }, "سقفِ اعتبارِ موجهِ این تصدیق"), h("b", { class: "ecrs-ceilv" }, (A.ceilText ? A.ceilText(r) : fa(r.ceil)) + "٪"),
           h("div", { class: "crs-meter" }, h("i", { style: { width: r.ceil + "%" } }))));
         if (!caps.length) out.appendChild(h("p", { class: "small" }, "با این ویژگی‌ها هیچ ملاکی سقف نگذاشته (سقف ۱۰۰). اگر ویژگی‌ای «نامعلوم» است، یعنی هنوز سنجیده نشده — نه این‌که برقرار است."));
         else {
@@ -25297,8 +25468,8 @@ APP.goFromURL = function (q) {
         }
         if (flags.length) out.appendChild(h("div", { class: "col" }, flags.map(function (x) { return h("p", { class: "small bad" }, "⚑ پرچمِ خطا (مستقل از درجه)" + (SM[x.st] ? " در «" + SM[x.st].fa + "»" : "") + ": " + (x.err || x.fa)); })));
         if (o.conf) out.appendChild(r.conf == null ? h("p", { class: "small muted" }, "اطمینانت را وارد کن تا ببینی با سقف می‌خواند یا نه.")
-          : r.over ? h("p", { class: "small bad" }, "بیش‌اطمینانی: اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + fa(r.ceil) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بیشتر است. موتور این را در ایستگاهِ «" + ((SM[(X.RM[r.bind] || {}).st] || SM.st_grade || {}).fa || "") + "» پرچم می‌زند.")
-          : h("p", { class: "small good" }, "اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + fa(r.ceil) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بالاتر نیست."));
+          : r.over ? h("p", { class: "small bad" }, "بیش‌اطمینانی: اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + (A.ceilText ? A.ceilText(r) : fa(r.ceil)) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بیشتر است. موتور این را در ایستگاهِ «" + ((SM[(X.RM[r.bind] || {}).st] || SM.st_grade || {}).fa || "") + "» پرچم می‌زند.")
+          : h("p", { class: "small good" }, "اطمینانِ تو (" + fa(r.conf) + "٪) از سقف (" + (A.ceilText ? A.ceilText(r) : fa(r.ceil)) + "٪) به‌اضافهٔ تحملِ " + fa(tol) + " واحد بالاتر نیست."));
       }
       var box = h("div", { class: "col gap" }, h("div", { class: "ecrs-feats" }, keys.map(function (k) { return featCtl(FM[k], f, function () { if (!touched) { touched = true; markTry(o.sid, "sim"); } draw(); }); })), out);
       draw();
@@ -37411,32 +37582,103 @@ APP.goFromURL = function (q) {
   var PARTS = { strength: "قوت", assumption: "فرضِ لازم", problem: "مسئلهٔ طراحی", outside: "بیرون از این صفحه" };
   I.PARTS = PARTS;
 
-  /* درجهٔ یک ادعا در پروندهٔ کارخانه (همان درجه‌های جزوه — مرزها قضیه‌اند: ½ از A4 و ۱ از A2) */
-  function degOf(p) {
-    if (p == null || p === "" || isNaN(+p)) return null;
-    p = +p; if (p <= 1 && String(p).indexOf(".") >= 0) p = p * 100;
-    var D = (window.EPI_FOUND && window.EPI_FOUND.DEG) || [];
-    var d = D.filter(function (x) { return p >= x.lo && p <= x.hi; })[0];
-    return { p: p, fa: d ? d.fa : fa(Math.round(p)) + "٪" };
+  /* درجهٔ یک ادعا در پروندهٔ کارخانه (همان درجه‌های جزوه — مرزها قضیه‌اند: ½ از A4 و ۱ از A2).
+     ممیزیِ ۲۰۲۶-۱۰-۱۵ (A3): رقمِ فارسی/عربی خوانده می‌شود؛ ستونِ «احتمال صدق نهایی ٪» درصد است، پس ۰٫۵ یعنی نیم درصد — کسرِ ۰..۱ فقط وقتی که
+     فیلد خودش کسری اعلام شده (frac)؛ ناعدد ⇒ null (هرگز TypeError). */
+  function degNum(p, frac) {
+    var n = A.parseNum ? A.parseNum(p) : (p == null || p === "" ? null : +p);
+    if (n == null || isNaN(n)) return null;
+    if (frac && n <= 1) n = n * 100;
+    return Math.max(0, Math.min(100, n));
   }
-  /* درجهٔ فرض از پرونده‌اش: نخستین سطرِ ادعا در حکمِ پایانی؛ پروندهٔ نیمه‌کاره ⇒ «هنوز سنجیده نشده» */
-  I.assumptionGrade = function (a) {
-    var cs = a && a.caseId ? S.get(a.caseId) : null;
-    if (!cs) return { p: 50, fa: "شک (درست ½) — هنوز پرونده‌ای ندارد", open: true, why: "بی‌دلیل هیچ طرف مرجح نیست (A4)" };
-    var fin = cs.st && cs.st.st_final, rows = ((fin && fin.data && fin.data.final) || []).filter(function (r) { return r.c && r.p != null && r.p !== ""; });
-    if (!fin || !fin.done || !rows.length) return { p: 50, fa: "شک (درست ½) — پرونده هنوز به حکم نرسیده", open: true, why: "تا حکم، بی‌دلیل هیچ طرف مرجح نیست (A4)", caseId: cs.id };
-    var d = degOf(rows[0].p), out = (cs.outcome || {})[rows[0].c];
-    return { p: d.p, fa: d.fa + " (" + fa(Math.round(d.p)) + "٪)" + (out ? " · نتیجهٔ واقعی: " + out : ""), open: false, caseId: cs.id };
+  function degOf(p, frac) {
+    var n = degNum(p, frac); if (n == null) return null;
+    var D = (window.EPI_FOUND && window.EPI_FOUND.DEG) || [];
+    var d = D.filter(function (x) { return n >= x.lo && n <= x.hi; })[0];
+    return { p: n, fa: d ? d.fa : fa(Math.round(n)) + "٪" };
+  }
+  I.degOf = degOf;
+  /* عددِ درصد برای نمایش: یک رقمِ اعشار، و هرگز «۱۰۰» برای کمتر از ۱۰۰ */
+  function pctTxt(c, latin) { if (c == null) return "—"; if (c < 100 && Math.round(c) >= 100) c = 99.9; else c = Math.round(c * 10) / 10; return latin ? String(c) : A.faNum ? A.faNum(c) : fa(c); }
+  I.pctTxt = pctTxt;
+  function caseClaims(cs) { return ((cs.st && cs.st.st_tasdiq && cs.st.st_tasdiq.data && cs.st.st_tasdiq.data.claims) || []).map(function (r) { return (r.txt || "").trim(); }); }
+  /* سقفِ موتورِ قطعیِ کارخانه برای همین تصدیق (کاربرگ‌ها ⇒ رمزگذاری روی رونوشت؛ چیزی ذخیره نمی‌شود) */
+  function engineOf(cs, n) {
+    var X = window.EPIX; if (!X || !A.casePrefill || !A.caseClaims) return null;
+    try {
+      var cp = JSON.parse(JSON.stringify(cs)); A.casePrefill(cp);
+      var k = A.caseClaims(cp)[+n - 1]; if (!k) return null;
+      var r = X.runClaim(k, A.btCfg ? A.btCfg() : X.DEFAULT_CFG());
+      return { ceil: r.ceilx != null ? r.ceilx : r.ceil, bind: r.bind, f: k.f };
+    } catch (e) { console.warn(e); return null; }
+  }
+  /* یقین (۱۰۰) فقط از برهان یا بدیهی/حضوری (s40؛ T_below1 برای بقیه) — اگر موتور سقفی نگذاشته ولی راه برهانی/بدیهی نیست، «کمتر از یقین» */
+  function certainOk(f) {
+    f = f || {};
+    return f.way === "بدیهی (بی‌نیاز از راه)" || f.badihi === "اولی" || f.badihi === "وجدانی" || f.core === "هسته حضوری ناب" || (f.form === "معتبر (قیاسی)" && f.matter === "منتهی به بدیهی");
+  }
+  /* نقدهای بازی که این فرض را می‌زنند (هنوز با شاهد جواب نگرفته‌اند) */
+  function openCrits(r, a) {
+    if (!r || !a) return [];
+    var as = (r.parts || []).filter(function (x) { return x.k === "assumption"; }), pi = (r.parts || []).indexOf(a), ai = as.indexOf(a);
+    return (r.crits || []).filter(function (c) { return !(c.ans && c.ans.ev) && ((c.pi != null && +c.pi === pi) || (c.pi == null && c.target !== "" && c.target !== "new" && +c.target === ai)); });
+  }
+  I.openCrits = openCrits;
+  /* درجهٔ فرض (ممیزیِ ۲۰۲۶-۱۰-۱۵، A1): (۱) همان تصدیقی از پرونده که فرض است (a.claim؛ پرونده با چند تصدیق ⇒ می‌پرسد)، و درجه = کمینهٔ «سقفِ موتورِ قطعی»
+     و «درجهٔ نهاییِ خودِ تو» (T_weakest)؛ (۲) نتیجهٔ واقعیِ «نادرست» ⇒ فرض با مشاهده رد شده (امتناعِ تناقض، A0) ⇒ ۰؛ (۳) ۱۰۰ فقط با برهان/بدیهی؛
+     (۴) نقدِ بازی که این فرض را می‌زند ⇒ «زیرِ نقد» و حداکثر ½ (A4) تا با شاهد جواب بگیرد. */
+  I.assumptionGrade = function (a, r) {
+    var cs = a && a.caseId ? S.get(a.caseId) : null, crit = openCrits(r, a);
+    var g = gradeOf(a, cs);
+    if (crit.length && !g.refuted && g.p > 50) { g.p = 50; g.fa = "شک (½) — زیرِ نقد: «" + clip(crit[crit.length - 1].t, 60) + "» (تا با شاهد جواب بگیرد، بی‌مرجح — A4)"; g.crit = true; }
+    else if (crit.length && !g.refuted) { g.fa += " · زیرِ نقد: «" + clip(crit[crit.length - 1].t, 60) + "»"; g.crit = true; }
+    return g;
   };
+  function gradeOf(a, cs) {
+    if (!cs) return { p: 50, fa: "شک (درست ½) — هنوز پرونده‌ای ندارد", open: true, why: "بی‌دلیل هیچ طرف مرجح نیست (A4)" };
+    var claims = caseClaims(cs), fin = cs.st && cs.st.st_final;
+    var rows = ((fin && fin.data && fin.data.final) || []).filter(function (x) { return x && x.c && x.p != null && x.p !== ""; });
+    var cs0 = rows.map(function (x) { return String(x.c); }).filter(function (v, i, arr) { return arr.indexOf(v) === i; });
+    var n = a.claim ? String(a.claim) : claims.length === 1 ? "1" : !claims.length && cs0.length === 1 ? cs0[0] : "";
+    if (!n && claims.length > 1) return { p: 50, fa: "شک (½) — پرونده " + fa(claims.length) + " تصدیق دارد؛ بگو کدام همین فرض است", open: true, ask: true, claims: claims, caseId: cs.id };
+    var outc = n ? (cs.outcome || {})[n] : null;
+    if (outc === "نادرست") return { p: 0, fa: "رد شد با مشاهده — نتیجهٔ واقعیِ ثبت‌شده «نادرست» (فرض و نقیضِ مشاهده‌شده‌اش با هم درست نیستند — A0)", open: false, refuted: true, caseId: cs.id, claim: n };
+    if (!fin || !fin.done || !rows.length) return { p: 50, fa: "شک (درست ½) — پرونده هنوز به حکم نرسیده", open: true, why: "تا حکم، بی‌دلیل هیچ طرف مرجح نیست (A4)", caseId: cs.id, claim: n };
+    var row = rows.filter(function (x) { return String(x.c) === n; })[0];
+    if (!row) return { p: 50, fa: "شک (½) — «حکم نهایی» برای این تصدیق درجه ندارد", open: true, caseId: cs.id, claim: n };
+    var own = degNum(row.p);
+    if (own == null) return { p: 50, fa: "شک (½) — درجهٔ «حکم نهایی» عدد نیست («" + clip(row.p, 20) + "»)", open: true, caseId: cs.id, claim: n };
+    var eng = engineOf(cs, n), p = own, why = [];
+    if (eng && eng.ceil < p) { p = eng.ceil; why.push("سقفِ موتورِ قطعی " + pctTxt(eng.ceil) + "٪ (درجهٔ خودت " + pctTxt(own) + "٪)"); }
+    if (p >= 100 && !certainOk(eng && eng.f)) { p = 100 - ((window.EPI_FOUND && window.EPI_FOUND.EPS) || 0.1); why.push("یقین فقط از برهان یا بدیهی — این راه «کمتر از یقین» است (T_below1)"); }
+    var d = degOf(p) || { fa: "" };
+    return { p: p, fa: d.fa + " (" + pctTxt(p) + "٪)" + (why.length ? " — " + why.join("؛ ") : "") + (outc ? " · نتیجهٔ واقعی: " + outc : ""), open: false, caseId: cs.id, claim: n, own: own, engine: eng && eng.ceil };
+  }
   /* سقفِ اعتبارِ ایده = کمینهٔ درجهٔ فرض‌های لازم (T_weakest) */
   I.standing = function (r) {
     var as = (r.parts || []).filter(function (x) { return x.k === "assumption"; });
     if (!as.length) return { cap: null, why: "هنوز هیچ فرضِ لازمی ثبت نشده؛ بی فرضِ روشن، جایگاه معلوم نیست" };
-    var g = as.map(function (a) { return { a: a, g: I.assumptionGrade(a) }; }), w = g.slice().sort(function (x, y) { return x.g.p - y.g.p; })[0];
-    return { cap: w.g.p, weakest: w.a, grades: g, open: g.filter(function (x) { return x.g.open; }).length,
+    var g = as.map(function (a) { return { a: a, g: I.assumptionGrade(a, r) }; }), w = g.slice().sort(function (x, y) { return x.g.p - y.g.p; })[0];
+    return { cap: w.g.p, weakest: w.a, weakG: w.g, refuted: !!w.g.refuted, grades: g, open: g.filter(function (x) { return x.g.open; }).length, crit: g.filter(function (x) { return x.g.crit; }).length,
       why: "ایده فقط وقتی کار می‌کند که همهٔ فرض‌های لازمش درست باشد؛ پس اعتبارش از ضعیف‌ترینِ آن‌ها بیشتر نیست (کل از جزء بیشتر نیست — A1)" };
   };
 
+  /* A2: آیا شاهد از حرف‌های خودِ کاربر در سشن برآمده؟ نقلِ مستقیم، یا دست‌کم سه‌چهارمِ واژه‌هایش در حرفِ کاربر و هیچ عددی که کاربر نگفته */
+  function norm(t) { return String(t || "").replace(/[‌‎‏]/g, " ").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[«»"'.,،:؛!?؟()\[\]\-—…]/g, " ").replace(/\s+/g, " ").trim(); }
+  function digits(t) { return String(t).replace(/[۰-۹]/g, function (c) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(c); }).replace(/[٠-٩]/g, function (c) { return "٠١٢٣٤٥٦٧٨٩".indexOf(c); }); }
+  I.evFromUser = function (ev, s) {
+    var U = norm(digits(((s && s.msgs) || []).filter(function (m) { return m && m.role === "user"; }).map(function (m) { return m.text; }).join(" \n "))), E = norm(digits(ev));
+    if (!E || !U) return false;
+    if (U.indexOf(E) >= 0) return true;
+    var nums = E.match(/\d+/g) || [];
+    if (nums.some(function (d) { return !new RegExp("(^|\\D)" + d + "(\\D|$)").test(U); })) return false;
+    var toks = E.split(" ").filter(function (w) { return w.length >= 2; }); if (!toks.length) return false;
+    var Us = " " + U + " ", hit = toks.filter(function (w) { return Us.indexOf(" " + w + " ") >= 0; }).length;
+    return hit / toks.length >= 0.75;
+  };
+  /* A5: قلّابِ پرامپت فقط برای حرفی که واقعاً ایده است — «مطرح کردم»، «محصولات لبنی»، «برنامه‌ای که دکتر داد»، «طرحِ درس» نه؛
+     «راه بیندازم»، «کانال بزنم»، «یک فکری دارم» آری (واژه با مرزِ حرفِ فارسی، نه زیررشته) */
+  I.ideaRe = /(?:^|[^؀-ۿ‌])(?:ایده|استارت[\s‌]?(?:آپ|اپ)|کسب[\s‌]?و[\s‌]?کار|اپلیکیشن)|راه[\s‌]?(?:بیندازم|بندازم|اندازی کنم)|(?:کانال|پیج|سایت|فروشگاه|کارگاه|مغازه|شرکت)[^.؟!?\n]{0,40}?(?:بزنم|بسازم|باز کنم|تأسیس کنم)|(?:یک|یه)?[\s‌]?فکری (?:دارم|به سرم زده)|طرحی دارم|(?:یک|یه) طرح(?:ی)? (?:دارم|برای کسب)|محصولی (?:بسازم|بفروشم|تولید کنم)/;
   /* ---------- کارهای دستیار (فقط از حرفِ خودِ کاربر) ---------- */
   if (AS && AS.DO) {
     AS.DO.idea_new = function (a) {
@@ -37453,7 +37695,12 @@ APP.goFromURL = function (q) {
       if (!PARTS[k] || !t) return "بخشِ ایده باید strength، assumption، problem یا outside باشد و متن داشته باشد";
       if (k === "strength" && !clip(a.ev, 300)) return "قوت بی شاهد ثبت نمی‌شود: «ev» = شاهد از حرفِ خودِ کاربر";
       if ((r.parts || []).some(function (x) { return x.k === k && x.t === t; })) return "";
-      (r.parts = r.parts || []).push({ k: k, t: t, ev: clip(a.ev, 300), test: clip(a.test, 300), at: nowIso() }); S.put(r); return "";
+      var part = { k: k, t: t, ev: clip(a.ev, 300), test: clip(a.test, 300), at: nowIso(), by: "assistant" };
+      /* A2 (ممیزیِ ۲۰۲۶-۱۰-۱۵): شاهدِ قوت باید از حرف‌های خودِ کاربر در همین سشن برآمده باشد (نقل یا هم‌پوشانیِ واژه‌ها، و هیچ عددی که کاربر نگفته)؛
+         وگرنه «از دستیار — تأییدِ تو لازم» تا خودِ کاربر تأیید کند */
+      if (k === "strength") part.evSt = I.evFromUser(part.ev, s) ? "user" : "unconfirmed";
+      (r.parts = r.parts || []).push(part); S.put(r);
+      return part.evSt === "unconfirmed" ? "قوت ثبت شد ولی شاهدش در حرف‌های کاربر پیدا نشد؛ «از دستیار — تأییدِ تو لازم» ماند تا خودش تأیید کند (عینِ جملهٔ کاربر را در ev بیاور)" : "";
     };
     /* فرض ⇐ پروندهٔ کارخانه؛ مسئلهٔ طراحی ⇐ مسئله */
     AS.DO.idea_link = function (a) {
@@ -37461,7 +37708,13 @@ APP.goFromURL = function (q) {
       if (!r || r.type !== "idea" || !(r.parts || [])[i]) return "پیوند ثبت نشد: شمارهٔ بخش (i) نادرست است";
       var x = r.parts[i], rec = S.get((a && a.rec) || "");
       if (!rec) return "پیوند ثبت نشد: رکورد پیدا نشد";
-      if (x.k === "assumption" && rec.type === "case") x.caseId = rec.id;
+      if (x.k === "assumption" && rec.type === "case") {
+        /* A1: کدام تصدیقِ پرونده همین فرض است (claim = شمارهٔ تصدیق، از ۱)؛ پروندهٔ چندتصدیقی بی آن ⇒ پیوند ثبت می‌شود ولی درجه «شک» می‌ماند تا کاربر بگوید */
+        var cl = caseClaims(rec), cn = a && a.claim != null && a.claim !== "" ? (A.parseNum ? A.parseNum(a.claim) : +a.claim) : null, ci = cn == null ? "" : String(cn);
+        if (ci && !(cn >= 1 && cn <= cl.length && cn === Math.round(cn))) return "پیوند ثبت نشد: پرونده تصدیقِ شمارهٔ " + ci + " ندارد";
+        x.caseId = rec.id; if (ci) x.claim = ci; else delete x.claim;
+        if (!ci && cl.length > 1) { S.put(r); return "پیوند ثبت شد، ولی پرونده " + cl.length + " تصدیق دارد؛ با «claim» بگو کدام همین فرض است (تا آن وقت درجه‌اش «شک» می‌ماند و صفحه از کاربر می‌پرسد)"; }
+      }
       else if (x.k === "problem" && (rec.type === "eprob" || rec.type === "prereq")) x.recId = rec.id;
       else return "فرض فقط به پروندهٔ سنجش و مسئلهٔ طراحی فقط به مسئله یا نقشهٔ پیش‌نیاز وصل می‌شود";
       S.put(r); return "";
@@ -37469,8 +37722,8 @@ APP.goFromURL = function (q) {
     var RULES = [
       "# ایده («💡 جایگاهِ ایده»)",
       "- اگر کاربر «ایده» آورد (نه فقط گیر یا مسئله) و می‌خواهد بداند کجا ایستاده، آن را رد نکن و تأییدِ کور هم نکن: با {\"do\":\"idea_new\",\"what\":\"عینِ حرفش\"} ثبتش کن و بعد بخش‌هایش را یکی‌یکی با idea_add بگذار:",
-      "  · strength (قوت) فقط با «ev» = شاهد از حرفِ خودِ کاربر؛ تعریفِ خالی قوت نیست.",
-      "  · assumption = هر چیزی که باید درست باشد تا ایده کار کند («همه نیاز دارند»، «پول می‌دهند»، «بقیه مثلِ من‌اند») — هر فرضِ اصلی یک پروندهٔ سنجش در کارخانه می‌گیرد (وجهِ claim ِ تور) و با idea_link وصل می‌شود.",
+      "  · strength (قوت) فقط با «ev» = عینِ جملهٔ خودِ کاربر در همین گفت‌وگو؛ تعریفِ خالی یا شاهدِ ساختگی قوت نیست (شاهدی که در حرفش نیست «تأییدنشده» می‌ماند).",
+      "  · assumption = هر چیزی که باید درست باشد تا ایده کار کند («همه نیاز دارند»، «پول می‌دهند»، «بقیه مثلِ من‌اند») — هر فرضِ اصلی یک پروندهٔ سنجش در کارخانه می‌گیرد (وجهِ claim ِ تور) و با idea_link وصل می‌شود (اگر پرونده چند تصدیق دارد، «claim» = شمارهٔ همان تصدیق).",
       "  · problem = پرسشِ طراحیِ «چطور کار می‌کند / چطور سنجیده می‌شود / چطور ساخته می‌شود» — این «یادگیری» نیست، مسئله است: وجهِ problem (بخشِ مسئله) و اگر دانشی کم است، نقشهٔ پیش‌نیاز؛ با idea_link وصلش کن.",
       "  · outside = بازار، قانون، سرمایه، … — یک بار نام ببر، هر نوبت تکرار نکن.",
       "- گره‌هایی که جلوی ایده را می‌گیرند (مثلاً رها کردن پس از ایراد) وجهِ knot ِ تورند، مثلِ همیشه.",
@@ -37478,13 +37731,13 @@ APP.goFromURL = function (q) {
     ].join("\n");
     /* فقط وقتی به کار است در پرامپت می‌آید — پرامپتِ سامانه سقفِ ۲۰ هزار نویسهٔ سرور را دارد (test_assist) */
     AS.promptHooks = AS.promptHooks || [];
-    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((s && s.idea) || /ایده|طرح|استارتاپ|کسب ?و ?کار|اپلیکیشن|برنامه‌ای که|محصول/.test(recent)) ? RULES : ""; });
+    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((s && s.idea) || I.ideaRe.test(recent)) ? RULES : ""; });
     AS.promptHooks = AS.promptHooks || [];
     AS.promptHooks.push(function (s) {
       var r = s && s.idea ? S.get(s.idea) : null; if (!r) return "";
       var st = I.standing(r);
-      return "# ایدهٔ این سشن (" + r.id + ")\n«" + clip(r.what, 200) + "»\n" + (r.parts || []).map(function (x, i) { return i + ") [" + x.k + "] " + clip(x.t, 120) + (x.ev ? " — شاهد: " + clip(x.ev, 80) : "") + (x.caseId ? " — پرونده: " + x.caseId + " (" + I.assumptionGrade(x).fa + ")" : "") + (x.recId ? " — رکورد: " + x.recId : ""); }).join("\n") +
-        "\nسقفِ اعتبار: " + (st.cap == null ? "— (" + st.why + ")" : Math.round(st.cap) + "٪ (ضعیف‌ترین فرض: «" + clip(st.weakest.t, 60) + "»)");
+      return "# ایدهٔ این سشن (" + r.id + ")\n«" + clip(r.what, 200) + "»\n" + (r.parts || []).map(function (x, i) { return i + ") [" + x.k + "] " + clip(x.t, 120) + (x.ev ? " — شاهد: " + clip(x.ev, 80) + (x.evSt === "unconfirmed" ? " (تأییدنشده)" : x.evSt === "rejected" ? " (کاربر رد کرد)" : "") : "") + (x.caseId ? " — پرونده: " + x.caseId + (x.claim ? "/تصدیقِ " + x.claim : "") + " (" + I.assumptionGrade(x, r).fa + ")" : "") + (x.recId ? " — رکورد: " + x.recId : ""); }).join("\n") +
+        "\nسقفِ اعتبار: " + (st.cap == null ? "— (" + st.why + ")" : pctTxt(st.cap, true) + "٪ (ضعیف‌ترین فرض: «" + clip(st.weakest.t, 60) + "»" + (st.refuted ? " — با مشاهده رد شد" : "") + ")");
     });
   }
 
@@ -37502,22 +37755,34 @@ APP.goFromURL = function (q) {
     var st = I.standing(r);
     root.appendChild(h("section", { class: "card idea-standing" }, h("h2", {}, "جایگاه"),
       st.cap == null ? h("p", { class: "muted" }, st.why) : h("div", {},
-        h("p", {}, h("b", {}, "سقفِ اعتبارِ ایده: "), (degOf(st.cap) || {}).fa + " (" + fa(Math.round(st.cap)) + "٪) — از ضعیف‌ترین فرض: «" + st.weakest.t + "»."),
-        h("p", { class: "small muted" }, st.why + ". " + (st.open ? fa(st.open) + " فرض هنوز سنجیده نشده و تا سنجیده نشود «شک» (½) شمرده می‌شود. " : "") + "قوت‌ها این سقف را بالا نمی‌برند؛ می‌گویند چه چیزی ارزشِ آزمودن دارد."))));
+        st.refuted ? h("p", { class: "bad idea-refuted" }, h("b", {}, "سقفِ اعتبارِ ایده: ۰ — "), "فرضِ لازمِ «" + st.weakest.t + "» با مشاهده رد شد (نتیجهٔ واقعیِ پرونده‌اش «نادرست» است). ایده به این شکل کار نمی‌کند؛ بپرس کدام تکه‌اش باید عوض شود.")
+          : h("p", {}, h("b", {}, "سقفِ اعتبارِ ایده: "), (degOf(st.cap) || {}).fa + " (" + pctTxt(st.cap) + "٪) — از ضعیف‌ترین فرض: «" + st.weakest.t + "»."),
+        h("p", { class: "small muted" }, st.why + ". " + (st.open ? fa(st.open) + " فرض هنوز سنجیده نشده و تا سنجیده نشود «شک» (½) شمرده می‌شود. " : "") + (st.crit ? fa(st.crit) + " فرض زیرِ نقد است و تا نقد با شاهد جواب نگیرد بیش از «شک» (½) شمرده نمی‌شود. " : "") + "درجهٔ هر فرض = کمینهٔ «سقفِ موتورِ قطعیِ کارخانه» و «درجهٔ نهاییِ خودت» برای همان تصدیق. قوت‌ها این سقف را بالا نمی‌برند؛ می‌گویند چه چیزی ارزشِ آزمودن دارد."))));
     Object.keys(PARTS).forEach(function (k) {
       var xs = (r.parts || []).map(function (x, i) { return { x: x, i: i }; }).filter(function (o) { return o.x.k === k; });
       root.appendChild(h("section", { class: "card idea-" + k }, h("h2", {}, PARTS[k] + " (" + fa(xs.length) + ")"), xs.length ? h("ul", {}, xs.map(function (o) {
-        var x = o.x, g = k === "assumption" ? I.assumptionGrade(x) : null;
-        return h("li", {}, x.t, x.ev ? h("div", { class: "small muted" }, "شاهد: «" + x.ev + "»") : null, x.test ? h("div", { class: "small" }, "چه آن را می‌آزماید: " + x.test) : null,
-          g ? h("div", { class: "small" }, "درجه: " + g.fa, g.caseId ? h("button", { class: "linkish", type: "button", onclick: function () { A.go("e_case", g.caseId); } }, " ↗ پرونده") : null) : null,
+        var x = o.x, g = k === "assumption" ? I.assumptionGrade(x, r) : null;
+        return h("li", { class: x.evSt === "rejected" ? "muted idea-evrej" : null }, x.evSt === "rejected" ? h("s", {}, x.t) : x.t, x.ev ? h("div", { class: "small muted" }, "شاهد: «" + x.ev + "»") : null, k === "strength" ? evConfirm(r, x, o.i) : null, x.test ? h("div", { class: "small" }, "چه آن را می‌آزماید: " + x.test) : null,
+          g ? h("div", { class: "small idea-grade" + (g.refuted ? " bad" : "") }, "درجه: " + g.fa, g.caseId ? h("button", { class: "linkish", type: "button", onclick: function () { A.go("e_case", g.caseId); } }, " ↗ پرونده") : null) : null,
+          g && x.caseId && S.get(x.caseId) && caseClaims(S.get(x.caseId)).length > 1 ? claimPick(r, x, o.i, caseClaims(S.get(x.caseId)), g.ask) : null,
           x.recId ? h("button", { class: "linkish small", type: "button", onclick: function () { var q = S.get(x.recId); if (q && q.type === "eprob") A.go("e_prob", q.p && q.p.id); else if (q) A.go("prereq", q.id); } }, "↗ " + (S.get(x.recId) || {}).type) : null);
       })) : h("p", { class: "small muted" }, "—")));
     });
     /* R4 — تصمیمِ مالک (۲۰۲۶-۱۰-۱۵؛ «موافقم»): ایده پس از نخستین نقد رها نمی‌شود و کورکورانه هم تأیید نمی‌شود. نقد ⇐ کدام فرض را می‌زند ⇐
        «🌱 کوچک‌ترین گامِ بعد» که نقد را می‌آزماید (روزِ موعد برمی‌گردد؛ a36) ⇐ «حدس‌های رقیب» دربارهٔ سرنوشتِ ایده، هر کدام با آزمونش (کد). */
     root.appendChild(critSec(r));
-    if (A.willCard) { var hs = A.willHost && A.willHost("idea", r.id); if (hs) root.appendChild(A.willCard(hs, (r.crits || []).length ? "crit" : "idea",
-      (r.crits || []).length ? "نقد را شنیدی. رها کردن و پذیرفتنِ کور هر دو آسان‌اند؛ کوچک‌ترین گامی که همین نقد را می‌آزماید چیست؟" : "ایده با فکر کردن جلو نمی‌رود؛ کوچک‌ترین گامی که ضعیف‌ترین فرضش را می‌آزماید چیست؟")); }
+    if (A.willCard) {
+      var hs = A.willHost && A.willHost("idea", r.id);
+      if (hs) {
+        /* A4: گامِ 🌱 ثبت می‌کند کدام نقد/فرض را می‌آزماید (آخرین نقدِ بی‌پاسخ؛ وگرنه ضعیف‌ترین فرض) */
+        var cr = (r.crits || []), ci = -1; for (var q = cr.length - 1; q >= 0; q--) if (!(cr[q].ans && cr[q].ans.ev)) { ci = q; break; }
+        var c0 = ci >= 0 ? cr[ci] : null, ta = c0 ? critTarget(r, c0) : st.weakest;
+        hs.tests = c0 ? { crit: ci, t: c0.t, target: ta ? ta.t : "", change: c0.change || "" } : ta ? { target: ta.t } : null;
+        root.appendChild(A.willCard(hs, cr.length ? "crit" : "idea",
+          c0 ? "نقد را شنیدی («" + clip(c0.t, 80) + "»" + (ta ? " ⇐ فرضِ «" + clip(ta.t, 60) + "»" : "") + "). رها کردن و پذیرفتنِ کور هر دو آسان‌اند؛ کوچک‌ترین گامی که همین نقد را می‌آزماید چیست؟"
+            : cr.length ? "نقدها با شاهد جواب گرفته‌اند؛ کوچک‌ترین گامی که ضعیف‌ترین فرضِ مانده را می‌آزماید چیست؟" : "ایده با فکر کردن جلو نمی‌رود؛ کوچک‌ترین گامی که ضعیف‌ترین فرضش را می‌آزماید چیست؟"));
+      }
+    }
     if (A.solveKitUI) {
       r.kit = r.kit || A.solveBlankKit();
       root.appendChild(A.solveKitUI(r.kit, { idp: "ideaK", parts: ["rivals", "table", "ana"], noDim: true, title: "حدس‌های رقیب دربارهٔ این ایده (و نقدش)",
@@ -37530,22 +37795,68 @@ APP.goFromURL = function (q) {
     }
     return root;
   };
-  /* نقد یا ایرادی که شنیدی ⇒ کدام فرض را می‌زند ⇒ اگر درست باشد چه چیزِ ایده عوض می‌شود (به قلمِ خودت) */
+  /* فرضی که یک نقد می‌زند (پیوندِ تازه با شمارهٔ بخش pi؛ نقدهای پیشین با شمارهٔ فرض در فهرستِ فرض‌ها) */
+  function critTarget(r, c) {
+    var as = (r.parts || []).filter(function (x) { return x.k === "assumption"; });
+    if (c.pi != null && (r.parts || [])[+c.pi] && r.parts[+c.pi].k === "assumption") return r.parts[+c.pi];
+    return c.target !== "" && c.target !== "new" && as[+c.target] ? as[+c.target] : null;
+  }
+  /* A2: قوتی که دستیار ثبت کرده و شاهدش در حرفِ کاربر پیدا نشد — فقط خودِ کاربر تأییدش می‌کند (data-own: دستیار نمی‌زندش) */
+  function evConfirm(r, x, i) {
+    if (x.evSt !== "unconfirmed") return x.evSt === "rejected" ? h("div", { class: "small muted" }, "این شاهد را تو حرفِ خودت ندانستی (کنار رفت؛ در ایده نمی‌آید).") : null;
+    return h("div", { class: "small idea-evask", "data-own": "1", dir: "rtl" }, h("span", { class: "chip warn" }, "از دستیار — تأییدِ تو لازم"), " ",
+      h("button", { class: "btn sm idea-evok", type: "button", onclick: function () { x.evSt = "user"; x.evOkAt = nowIso(); S.put(r); A.render(); } }, "تأیید: این را خودم گفته‌ام"), " ",
+      h("button", { class: "btn ghost sm idea-evno", type: "button", onclick: function () { x.evSt = "rejected"; x.evNoAt = nowIso(); S.put(r); A.render(); } }, "نه، این حرفِ من نیست"));
+  }
+  /* A1: پروندهٔ چندتصدیقی ⇒ کاربر می‌گوید کدام تصدیق همین فرض است */
+  function claimPick(r, x, i, claims, ask) {
+    var id = "ideaClaim_" + i;
+    return h("div", { class: "col idea-claimpick", "data-own": "1", dir: "rtl" }, h("label", { for: id, class: "small" + (ask ? " bad" : "") }, "این فرض کدام تصدیقِ پرونده است؟"),
+      h("select", { id: id, style: { maxWidth: "100%" }, onchange: function (e) { if (e.target.value) x.claim = e.target.value; else delete x.claim; S.put(r); A.render(); } }, h("option", { value: "" }, "— انتخاب کن —"),
+        claims.map(function (t, j) { var v = String(j + 1); return h("option", { value: v, selected: String(x.claim || "") === v }, fa(j + 1) + ". " + clip(t, 70)); })));
+  }
+  /* نقد یا ایرادی که شنیدی ⇒ کدام فرض را می‌زند ⇒ اگر درست باشد چه چیزِ ایده عوض می‌شود (به قلمِ خودت).
+     A4 (ممیزیِ ۲۰۲۶-۱۰-۱۵): «فرضی که هنوز ننوشته‌ام» همان فرض را می‌سازد (به قلمِ خودت)؛ نقدِ بی‌پاسخ فرضش را «زیرِ نقد» (حداکثر ½) نگه می‌دارد تا با شاهد جواب بگیرد. */
   function critSec(r) {
-    var as = (r.parts || []).filter(function (x) { return x.k === "assumption"; }), d = { t: "", target: "", change: "" };
+    var as = (r.parts || []).filter(function (x) { return x.k === "assumption"; }), d = { t: "", target: "", change: "", nt: "" };
     var sec = h("section", { class: "card idea-crit", dir: "rtl", "data-own": "1" }, h("h2", {}, "نقد و ایراد (" + fa((r.crits || []).length) + ")"),
-      h("p", { class: "small" }, "نقدی که شنیدی یا ایرادی که خودت دیدی را بنویس. نقد نه حکمِ پایان است نه حمله؛ داده‌ای است دربارهٔ یکی از فرض‌ها — آن فرض را پیدا کن و بیازما."));
-    (r.crits || []).forEach(function (c) { sec.appendChild(h("div", { class: "small idea-critrow" }, "«" + c.t + "» ⇐ " + (c.target === "new" ? "فرضی که هنوز ننوشته بودی" : c.target !== "" && as[+c.target] ? "فرضِ «" + as[+c.target].t + "»" : "—") + (c.change ? " · اگر درست باشد: " + c.change : "") + " · " + A.fdate(String(c.at).slice(0, 10)))); });
+      h("p", { class: "small" }, "نقدی که شنیدی یا ایرادی که خودت دیدی را بنویس. نقد نه حکمِ پایان است نه حمله؛ داده‌ای است دربارهٔ یکی از فرض‌ها — آن فرض را پیدا کن و بیازما. تا نقد با شاهد جواب نگرفته، فرضش «زیرِ نقد» است."));
+    (r.crits || []).forEach(function (c, ci) {
+      var ta = critTarget(r, c), row = h("div", { class: "small idea-critrow" }, "«" + c.t + "» ⇐ " + (ta ? "فرضِ «" + ta.t + "»" : c.target === "new" ? "فرضی که هنوز ننوشته بودی" : "—") + (c.change ? " · اگر درست باشد: " + c.change : "") + " · " + A.fdate(String(c.at).slice(0, 10)));
+      if (c.ans && c.ans.ev) row.appendChild(h("div", { class: "good idea-critans" }, "جواب با شاهد: «" + c.ans.ev + "» (" + A.fdate(String(c.ans.at).slice(0, 10)) + ")"));
+      else if (ta) {
+        var aid = "ideaCritAns_" + ci, av = { ev: "" };
+        row.appendChild(h("div", { class: "col idea-critansf" }, h("span", { class: "chip warn" }, "زیرِ نقد"),
+          h("label", { for: aid }, "جوابِ این نقد با شاهد: چه دیدی یا آزمودی که آن را جواب داد؟"),
+          h("input", { id: aid, type: "text", placeholder: "مثلاً «۳ نفر از ۵ نفر پیش‌پرداخت دادند»", oninput: function (e) { av.ev = e.target.value; } }),
+          h("button", { class: "btn sm idea-critanssave", type: "button", onclick: function () {
+            if (!String(av.ev).trim()) { A.toast("شاهد را بنویس — جوابِ بی‌شاهد نقد را نمی‌بندد.", "bad"); return; }
+            c.ans = { ev: clip(av.ev, 300), at: nowIso() }; S.put(r); A.render();
+          } }, "ثبتِ جواب")));
+      }
+      sec.appendChild(row);
+    });
     var t = h("textarea", { id: "ideaCritT", rows: 2, placeholder: "مثلاً «کسی برای این پول نمی‌دهد»", oninput: function (e) { d.t = e.target.value; } });
-    var sel = h("select", { id: "ideaCritA", style: { maxWidth: "100%" }, onchange: function (e) { d.target = e.target.value; } }, h("option", { value: "" }, "—"), as.map(function (a, i) { return h("option", { value: String(i) }, a.t); }), h("option", { value: "new" }, "فرضی که هنوز ننوشته‌ام"));
+    var nw = h("div", { class: "col hidden idea-critnew" });
+    var sel = h("select", { id: "ideaCritA", style: { maxWidth: "100%" }, onchange: function (e) { d.target = e.target.value; nw.classList.toggle("hidden", d.target !== "new"); } }, h("option", { value: "" }, "—"), as.map(function (a, i) { return h("option", { value: String(i) }, a.t); }), h("option", { value: "new" }, "فرضی که هنوز ننوشته‌ام"));
+    var ntI = h("input", { id: "ideaCritNew", type: "text", placeholder: "مثلاً «مشتری‌ها هر هفته وقتِ تحویل گرفتن دارند»", oninput: function (e) { d.nt = e.target.value; } });
+    nw.appendChild(h("label", { for: "ideaCritNew" }, "آن فرض را بنویس (چه چیزی باید درست باشد تا ایده کار کند؟)")); nw.appendChild(ntI);
     var ch = h("input", { id: "ideaCritC", type: "text", placeholder: "چه چیزِ ایده باید عوض شود؟", oninput: function (e) { d.change = e.target.value; } });
     sec.appendChild(h("div", { class: "col" }, h("label", { for: "ideaCritT" }, "نقد یا ایرادی که شنیدی (یا دیدی)"), t));
     sec.appendChild(h("div", { class: "col" }, h("label", { for: "ideaCritA" }, "این نقد کدام فرضِ لازمِ ایده را می‌زند؟"), sel));
+    sec.appendChild(nw);
     sec.appendChild(h("div", { class: "col" }, h("label", { for: "ideaCritC" }, "اگر نقد درست باشد، چه چیزِ ایده عوض می‌شود؟ (نه «همه‌اش»)"), ch));
     sec.appendChild(h("button", { class: "btn sm idea-critsave", type: "button", onclick: function () {
       if (!String(d.t).trim()) { A.toast("نقد را بنویس.", "bad"); return; }
       if (!d.target) { A.toast("بگو کدام فرض را می‌زند (یا «فرضی که هنوز ننوشته‌ام»).", "bad"); return; }
-      (r.crits = r.crits || []).push({ t: clip(d.t, 400), target: d.target, change: clip(d.change, 300), at: nowIso() }); S.put(r); A.render();
+      if (d.target === "new" && !String(d.nt).trim()) { A.toast("فرضِ تازه را بنویس — نقد باید به فرضی برسد.", "bad"); return; }
+      var c = { t: clip(d.t, 400), target: d.target, change: clip(d.change, 300), at: nowIso() };
+      r.parts = r.parts || [];
+      if (d.target === "new") {
+        r.parts.push({ k: "assumption", t: clip(d.nt, 300), at: nowIso(), by: "user", from: "crit" });
+        c.pi = r.parts.length - 1; c.target = String(r.parts.filter(function (x) { return x.k === "assumption"; }).length - 1); c.made = true;
+      } else { var ta = as[+d.target]; if (ta) c.pi = r.parts.indexOf(ta); }
+      (r.crits = r.crits || []).push(c); S.put(r); A.render();
     } }, "ثبتِ نقد"));
     return sec;
   }
@@ -38418,6 +38729,7 @@ APP.goFromURL = function (q) {
       e.currentTarget.disabled = true;
       var at = nowISO();
       w.log.push({ at: at, kind: "commit", trig: trig || "", desire: d.desire, hope: d.hope || "", budget: d.budget || "" });
+      w.reask = null;   // تصمیمِ تازه (گام یا رها کردن) ⇒ بازپرسیِ معلق بسته شد
       if (c.drop) {
         var riv = nextIv(LADDER[0], true);
         w.drop = { at: at, why: txt(d.dropWhy), src: d.dropSrc, trig: trig || "", due: A.addDays(A.today(), riv), iv: riv };
@@ -38430,6 +38742,8 @@ APP.goFromURL = function (q) {
       w.drop = null;
       var dd = willDueOf(c.when, iv);   // M3: روزِ خودِ کاربر اگر خوانا است؛ وگرنه پلهٔ نردبان — و همین را می‌گوید
       var stp = { id: "ws" + w.steps.length, at: at, trig: trig || "", step: txt(d.step), when: txt(d.when), desire: d.desire, hope: d.hope, curious: txt(d.curious), budget: d.budget, iv: iv, due: dd.due, dueFrom: dd.from, checks: [] };
+      /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (A4): گام ثبت می‌کند چه چیزی را می‌آزماید (مثلاً کدام نقد و کدام فرضِ ایده — میزبان می‌دهد) */
+      if (host.tests) stp.tests = JSON.parse(JSON.stringify(host.tests));
       w.steps.push(stp); if (w.steps.length > 60) w.steps = w.steps.slice(-60); host.put();
       var left = A.daysBetween(A.today(), stp.due);
       out.appendChild(h("p", { class: "good sv-willok" }, "ثبت شد. " + (dd.from === "when" ? "وارسی: " + A.fdate(stp.due) + " (" + fa(left) + " روزِ دیگر — از همان «کِی» که نوشتی" + (c.when && c.when.date && c.when.date < stp.due ? "؛ گامِ امروز فردا وارسی می‌شود" : "") + ")"
@@ -38461,6 +38775,8 @@ APP.goFromURL = function (q) {
       e.currentTarget.disabled = true;
       var c = { at: nowISO(), done: d.done, what: txt(d.what), block: d.block, imm: d.imm, prop: d.prop, desire: d.desire, hope: d.hope };
       stp.checks.push(c); stp.closed = true;
+      /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (A4): «نه» یا «ترس» و گامِ تازه‌ای ثبت نشد ⇒ بی‌صدا تمام نمی‌شود: همان نردبانِ رها کردن (پلهٔ بعد از فردا) یک بار دوباره می‌پرسد */
+      if (d.done === "no" || d.block === "fear") { var riv2 = nextIv(LADDER[0], true); w.reask = { at: c.at, step: stp.id, block: d.block || "", iv: riv2, due: A.addDays(A.today(), riv2) }; }
       w.log.push({ at: c.at, kind: "check", step: stp.id, done: d.done, block: d.block || "", imm: d.imm, prop: d.prop || "", desire: d.desire || "", hope: d.hope || "" });
       host.put();
       out.appendChild(h("p", { class: d.done === "yes" ? "good" : "" }, d.done === "yes" ? "انجام شد — پیشرفتِ واقعی، کوچک ولی ثبت‌شده. گامِ کوچکِ بعد؟ (وارسی‌اش یک پله دورتر روی نردبان: " + fa(willIv(w)) + " روز)"
@@ -38499,7 +38815,10 @@ APP.goFromURL = function (q) {
     else if (w.drop && !w.drop.closed) box.appendChild(h("p", { class: "small muted" }, "آگاهانه رهایش کردی؛ " + A.fdate(w.drop.due) + " یک بار دیگر می‌پرسد."));
     else if (open && open.due <= t) box.appendChild(willCheckCard(host, open, null));
     else if (open) box.appendChild(h("p", { class: "small sv-willcur" }, "گامِ جاری: «" + open.step + "» — زمانِ تو: «" + open.when + "» · " + (open.dueFrom === "when" ? "همان روز" : "روزی در آن نیست؛") + " وارسی: " + A.fdate(open.due)));   // یک تاریخ (M3)
-    else box.appendChild(willForm(host, trig, null));
+    else {
+      if (w.reask && w.reask.due && w.reask.due <= t) box.appendChild(h("p", { class: "small sv-willreask" }, "دفعهٔ پیش گفتی گام انجام نشد" + (w.reask.block === "fear" ? " (ترس از اشتباه یا نقد)" : "") + " و گامِ تازه‌ای ننوشتی. دوباره می‌پرسم — نه برای سرزنش: کوچک‌ترین گامِ بعد چیست؟ یا آگاهانه رهایش کن."));
+      box.appendChild(willForm(host, trig, null));
+    }
     var lg = A.willLog(w); if (lg) box.appendChild(lg);
     return box;
   };
@@ -38509,7 +38828,7 @@ APP.goFromURL = function (q) {
     return h("details", { class: "small sv-willlog" }, h("summary", {}, "دفترِ پیشرفت (" + fa(st.length) + " گام)"),
       h("ol", {}, st.map(function (x) {
         var c = (x.checks || [])[x.checks.length - 1];
-        return h("li", {}, "«" + x.step + "» — " + A.fdate(String(x.at).slice(0, 10)) + " · خواستن: " + lab(WILL_DESIRE, x.desire) + " · امید: " + lab(WILL_HOPE, x.hope) +
+        return h("li", {}, "«" + x.step + "» — " + A.fdate(String(x.at).slice(0, 10)) + (x.tests ? " · می‌آزماید: " + (x.tests.t ? "نقدِ «" + clip(x.tests.t, 50) + "»" + (x.tests.target ? " ⇐ " : "") : "") + (x.tests.target ? "فرضِ «" + clip(x.tests.target, 50) + "»" : "") : "") + " · خواستن: " + lab(WILL_DESIRE, x.desire) + " · امید: " + lab(WILL_HOPE, x.hope) +
           (c ? " ⇒ " + lab(WILL_DONE, c.done) + (c.block ? " (" + lab(WILL_BLOCK, c.block) + ")" : "") + " · " + lab(WILL_IMM, c.imm) + (c.hope ? " · امیدِ پس از آن: " + lab(WILL_HOPE, c.hope) : "") : " ⇒ وارسی: " + A.fdate(x.due)));
       })));
   };
@@ -38527,6 +38846,7 @@ APP.goFromURL = function (q) {
       if (!w) return; willFix(w); var o = willOpen(w);
       if (o && o.due && o.due <= t) out.push({ kind: kind, id: id, what: "step", txt: o.step });
       if (w.drop && !w.drop.closed && w.drop.due && w.drop.due <= t) out.push({ kind: kind, id: id, what: "drop", txt: w.drop.why });
+      if (!o && !(w.drop && !w.drop.closed) && w.reask && w.reask.due && w.reask.due <= t) out.push({ kind: kind, id: id, what: "reask", txt: "" });
     }
     S.all("eprog", function (r) { return r && r.solve && r.solve.will; }).forEach(function (r) { scan("prob", String(r.id).replace(/^eprog_/, ""), r.solve.will); });
     S.all("idea", function (r) { return r && r.will; }).forEach(function (r) { scan("idea", r.id, r.will); });
@@ -38538,10 +38858,12 @@ APP.goFromURL = function (q) {
     A.dueList = function () {
       var items = rawDueW.apply(this, arguments) || [];
       try {
-        /* M4: همهٔ گام‌های 🌱 ِ موعد یک سطر (مثلِ «n مرورِ حلِ مسئله»)؛ یکی ⇒ همان سطرِ پیشین */
+        /* M4: همهٔ گام‌های 🌱 ِ موعد یک سطر (مثلِ «n مرورِ حلِ مسئله»)؛ یکی ⇒ همان سطرِ پیشین (با «دوباره می‌پرسم» ِ A4) */
         var WD0 = A.willDue().map(function (x) { return { x: x, hs: A.willHost(x.kind, x.id) }; }).filter(function (o) { return o.hs; });
-        if (WD0.length === 1) { var o1 = WD0[0], x1 = o1.x; items.push({ k: "knot", will: 1, txt: x1.what === "drop" ? "🌱 چیزی که آگاهانه رها کردی: هنوز همان دلیل؟" : "🌱 گامِ کوچکی که قول دادی: «" + clip(x1.txt, 80) + "»", sub: "«" + clip(o1.hs.title, 60) + "» — " + (x1.what === "drop" ? "یک بار دیگر بسنج" : "انجامش دادی؟ چه دیدی؟"), go: o1.hs.go }); }
-        else if (WD0.length > 1) items.push({ k: "knot", will: WD0.length, txt: "🌱 " + fa(WD0.length) + " گامِ کوچک موعدِ وارسی است", sub: WD0.slice(0, 3).map(function (o) { return "«" + clip(o.hs.title, 40) + "»: " + (o.x.what === "drop" ? "رها کردی — هنوز همان دلیل؟" : clip(o.x.txt, 50)); }).join(" · ") + (WD0.length > 3 ? " · …" : ""), go: WD0[0].hs.go });
+        var wTxt = function (x) { return x.what === "drop" ? "🌱 چیزی که آگاهانه رها کردی: هنوز همان دلیل؟" : x.what === "reask" ? "🌱 گامی که انجام نشد: کوچک‌ترین گامِ بعد؟ (دوباره می‌پرسم)" : "🌱 گامِ کوچکی که قول دادی: «" + clip(x.txt, 80) + "»"; };
+        var wSub = function (x) { return x.what === "drop" ? "یک بار دیگر بسنج" : x.what === "reask" ? "گامِ کوچک‌تر، یا رها کردنِ آگاهانه" : "انجامش دادی؟ چه دیدی؟"; };
+        if (WD0.length === 1) { var o1 = WD0[0]; items.push({ k: "knot", will: 1, txt: wTxt(o1.x), sub: "«" + clip(o1.hs.title, 60) + "» — " + wSub(o1.x), go: o1.hs.go }); }
+        else if (WD0.length > 1) items.push({ k: "knot", will: WD0.length, txt: "🌱 " + fa(WD0.length) + " گامِ کوچک موعدِ وارسی است", sub: WD0.slice(0, 3).map(function (o) { return "«" + clip(o.hs.title, 40) + "»: " + (o.x.what === "drop" ? "رها کردی — هنوز همان دلیل؟" : o.x.what === "reask" ? "گامِ تازه؟" : clip(o.x.txt, 50)); }).join(" · ") + (WD0.length > 3 ? " · …" : ""), go: WD0[0].hs.go });
       } catch (e) { console.warn(e); }
       return items;
     };
