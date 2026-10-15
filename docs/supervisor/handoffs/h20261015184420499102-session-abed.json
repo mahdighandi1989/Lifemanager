@@ -12,5 +12,11 @@
  "what": "روتینِ بک‌تست (اجرا در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵): آزمونِ نشتِ سرانجام x_conseq_* ِ cs_pb_semm_handwash/k1 را از epi_problems.js برداشت (از داستانِ پیراسته بازتولید نشد)؛ هشِ test_problems_a با دلیلِ مستند. لطفاً بسنجید.",
  "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
  "commit": "49f32e5",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T21:56:27Z",
+  "note": "کامیت روی main است و آزمون‌های صفحه (matter_zanni، plausible، expert_field، measured_precedence، problems_a، found، found_mixture، realpath_factory، graph) پس از build.py همه NO ERRORS؛ دورِ فوری ۲۰۲۶-۱۰-۱۵",
+  "commit": ""
+ }
 }
