@@ -112,17 +112,18 @@ def test_guard_refuses_unrecorded_work_in_another_area():
     terr = "apps/learning-architecture/backtest/territory.json"
     bad = h.guard("urgent", [terr], [])
     assert bad and "قلمرو" in bad[0]
-    assert h.guard("urgent", [terr], [{"by": "urgent", "area": "epi-territory"}]) == []
+    assert h.guard("urgent", [terr], [{"by": "urgent", "area": "epi-territory", "kind": "did"}]) == []
+    assert h.guard("urgent", [terr], [{"by": "urgent", "area": "epi-territory", "kind": "request"}]), "a request does not make the edit legal"
     assert h.guard("backtest", [terr], []) == [], "the owner needs no hand-off"
     # owner-decision area: nobody but the executor (after the owner's yes) — a hand-off does not make it legal
     rules = "apps/learning-architecture/src/app/epi_rules.js"
-    assert h.guard("urgent", [rules], [{"by": "urgent", "area": "epi-rules"}])
+    assert h.guard("urgent", [rules], [{"by": "urgent", "area": "epi-rules", "kind": "did"}])
     assert h.guard("backtest", [rules], []) == []
     # the backtest routine touching the page needs a hand-off too; shared ledgers never do
     assert h.guard("backtest", ["apps/learning-architecture/src/app/a26_assist.js"], [])
     # a genuine crash fix in the engine by the urgent routine: allowed WITH a hand-off (the backtest verifies it)
     eng = "apps/learning-architecture/src/app/epi_engine.js"
-    assert h.guard("urgent", [eng], []) and h.guard("urgent", [eng], [{"by": "urgent", "area": "epi-engine"}]) == []
+    assert h.guard("urgent", [eng], []) and h.guard("urgent", [eng], [{"by": "urgent", "area": "epi-engine", "kind": "did"}]) == []
     assert h.guard("urgent", ["apps/learning-architecture/docs/WORKLOG.md", "experiences/x.md"], []) == []
 
 

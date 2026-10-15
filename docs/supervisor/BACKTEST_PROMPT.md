@@ -1,9 +1,9 @@
 ---
 name: بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناسی — Lifemanager
-version: 2
+version: 3
 created: 2026-10-13
-updated: 2026-10-14
-supersedes: docs/supervisor/archive/BACKTEST_PROMPT-v1-2026-10-14.md
+updated: 2026-10-15
+supersedes: docs/supervisor/archive/BACKTEST_PROMPT-v2-2026-10-15.md
 archive: docs/supervisor/archive/
 routine: «بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناسی — Lifemanager» (trig_01EzVAPYi3RWJTp81aWz5hnc)
 ---
@@ -158,6 +158,8 @@ routine: «بک‌تستِ پیوستهٔ کارخانهٔ معرفت‌شناس
 
 **هویت:** اولِ هر اجرا `export SUPERVISOR_ROUTINE=backtest` — `ship.sh` با آن نگهبانِ دست‌به‌دست را اجرا می‌کند و پوشی را که به قلمروِ
 روتینِ دیگری دست زده ولی دست‌به‌دستش را ثبت نکرده **رد می‌کند**.
+
+> **فقط با `ship.sh`** (v3، ۲۰۲۶-۱۰-۱۵، بازبینیِ اجرایی): هرگز `git push` ِ خام و هرگز `git commit` بی `ship.sh` برای کارِ روتین. `ship.sh` نگهبانِ دست‌به‌دست، گیتِ قانونِ ۴ و سطرِ `Routine: <نام>` را (با `--trailer`، در بلوکِ trailer کنارِ Co-Authored-By) می‌گذارد؛ پوشِ خام همهٔ این‌ها را دور می‌زند و گیتِ ادغام (`tests/test_supervisor_handoff_guard.py` ⇐ `handoff.py audit`) کامیتی را که «Routine:» دارد و بی `did` به قلمروِ روتینِ دیگری دست زده رد می‌کند.
 
 **۱. صندوقِ تو، اولِ هر دور:** `handoff.py inbox --routine backtest`. هر `did` (کارِ دیگری در قلمروِ تو) را **با دستورِ خودت** بسنج:
 درست ⇒ `close <id> --by backtest --status verified --note "…"`؛ نادرست ⇒ اصلاح با روشِ خودت، `--status corrected --note "چه بود، چه شد"`

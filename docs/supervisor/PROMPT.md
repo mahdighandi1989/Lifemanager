@@ -1,14 +1,14 @@
 ---
 name: ناظرِ خودکارِ Lifemanager (Automated Supervisor)
-version: 9
+version: 10
 created: 2026-10-08
 updated: 2026-10-15
-supersedes: docs/supervisor/archive/PROMPT-v8-2026-10-15.md
+supersedes: docs/supervisor/archive/PROMPT-v9-2026-10-15.md
 archive: docs/supervisor/archive/
 routine: «ناظرِ خودکارِ سامانه — Lifemanager» (شناسه در docs/supervisor/README.md)
 ---
 
-# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۹
+# دستورِ کاملِ ناظرِ خودکار — نسخهٔ ۱۰
 
 > **این فایل تنها مرجعِ رفتارِ ناظر است.** پرامپتِ خودِ Routine فقط یک اشاره به
 > این آدرس است. هر تغییری در وظایفِ ناظر **این‌جا** نوشته می‌شود؛ نسخهٔ قبلی
@@ -317,6 +317,8 @@ print(json.dumps(api('/api/inspection/audit/finance?days=30'), ensure_ascii=Fals
 
 **هویت:** اولِ هر اجرا `export SUPERVISOR_ROUTINE=general` — `ship.sh` با آن نگهبانِ دست‌به‌دست را اجرا می‌کند و پوشی را که به قلمروِ
 روتینِ دیگری دست زده ولی دست‌به‌دستش را ثبت نکرده **رد می‌کند**.
+
+> **فقط با `ship.sh`** (v10، ۲۰۲۶-۱۰-۱۵، بازبینیِ اجرایی): هرگز `git push` ِ خام و هرگز `git commit` بی `ship.sh` برای کارِ روتین. `ship.sh` نگهبانِ دست‌به‌دست، گیتِ قانونِ ۴ و سطرِ `Routine: <نام>` را (با `--trailer`، در بلوکِ trailer کنارِ Co-Authored-By) می‌گذارد؛ پوشِ خام همهٔ این‌ها را دور می‌زند و گیتِ ادغام (`tests/test_supervisor_handoff_guard.py` ⇐ `handoff.py audit`) کامیتی را که «Routine:» دارد و بی `did` به قلمروِ روتینِ دیگری دست زده رد می‌کند.
 
 **۱. صندوقِ تو، اولِ هر دور:** `handoff.py inbox --routine general`. هر `did` (کارِ دیگری در قلمروِ تو) را **با دستورِ خودت** بسنج:
 درست ⇒ `close <id> --by general --status verified --note "…"`؛ نادرست ⇒ اصلاح با روشِ خودت، `--status corrected --note "چه بود، چه شد"`
