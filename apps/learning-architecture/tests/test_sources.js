@@ -26,7 +26,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const M = APP.GRAPH.build(); const items = Object.keys(M.nodes).filter(k => /^srcitem:/.test(k));
     out.graph = items.length === src.items.length && M.edges.filter(e => e.rel === 'covers').length > 200;
     const hk = msg => APP.ASSIST.promptHooks.map(f => { try { return f({ msgs: [] }, msg) || ''; } catch (e) { return ''; } }).join('\n');
-    out.hook = /# منبع‌ها و پوشش/.test(hk('این کتاب در سامانه هست؟')) && !/# منبع‌ها و پوشش/.test(hk('سلام')) && /منبعِ تازه/.test(hk('کتاب'));
+    out.hook = /# منبع‌ها و پوشش/.test(hk('این کتاب در سامانه هست؟')) && !/# منبع‌ها و پوشش/.test(hk('سلام')) && /lla-sources/.test(hk('کتاب'));
     out.menu = APP.SUB_VIEWS.sources === 'mind';
     return out;
   });
