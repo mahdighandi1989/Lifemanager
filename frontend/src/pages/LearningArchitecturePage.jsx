@@ -139,6 +139,8 @@ export default function LearningArchitecturePage() {
       // «🧭 تور»: one sheet with its notes (to verify a routine's answer) and an owner note under it (reopens an answered sheet)
       sheet: (id) => api.get(`/inspection/${encodeURIComponent(id)}`).then((r) => r.data.report || null),
       note: (id, text) => api.post(`/inspection/${encodeURIComponent(id)}/notes`, { text }).then((r) => r.data),
+      // the owner's own «✅ تأیید» of a sheet the assistant verified (owner-only button in the tour drawer; the server refuses reviewers)
+      status: (id, status) => api.post(`/inspection/${encodeURIComponent(id)}/status`, { status }).then((r) => r.data),
       // «دستیار»: a capability gap the chat found → a «نظارت و سرکشی» sheet (urgent when asked), with the issue's files attached
       report: async ({ text, spot, urgent, files }) => {
         const r = await api.post('/inspection', { text, spot });

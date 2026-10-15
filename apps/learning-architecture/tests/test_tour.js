@@ -283,6 +283,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.mob = await p.evaluate(() => ({ grip: getComputedStyle(document.querySelector('.as-grip.r')).display, max: getComputedStyle(document.querySelector('.as-maxb')).display, w: Math.round(document.querySelector('.as-panel').getBoundingClientRect().width) }));
   chk(info.mob.grip === 'none' && info.mob.max === 'none' && info.mob.w >= 370, 'mobile: a bottom sheet without grips or maximize: ' + JSON.stringify(info.mob));
 
+  // پس از وارسیِ درست: دکمهٔ «✅ تأییدِ برگه» فقط برای مالک (data-own) و فراخوانیِ status ِ میزبان (کارزارِ سوم v02)
+  info.approve = await p.evaluate(async () => {
+    const AS = APP.ASSIST; let called = null; APP.HOST = Object.assign({}, APP.HOST || {}, { status: async (id, st) => { called = id + ':' + st; return { ok: true }; } });
+    const s = AS.newSession(); s.tour = { goal: 'g', facets: [{ key: 'f1', kind: 'territory', title: 'حوزهٔ تازه', status: 'todo', blocked: { id: 'sh9', number: 9, verified: true, checks: [{ ok: true }] } }] }; APP.S.put(s);
+    const d = AS.tourDrawer(s), b = [...d.querySelectorAll('button')].find(x => /تأییدِ برگهٔ/.test(x.textContent));
+    if (!b) return 'no-button'; const own = b.getAttribute('data-own') === '1'; b.click(); await new Promise(r => setTimeout(r, 80));
+    return own + '|' + called + '|' + !!s.tour.facets[0].blocked.approvedAt;
+  });
+  chk(info.approve === 'true|sh9:approved|true', 'after a verified sheet the owner (only) can tick «✅ تأیید»: ' + info.approve);
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);

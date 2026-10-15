@@ -32099,7 +32099,13 @@ APP.goFromURL = function (q) {
           pr.length ? h("div", { class: "small as-pr" }, "📅 ", pr.map(function (p) { return h("button", { class: "linkish" + (p.overdue ? " bad" : ""), type: "button", onclick: function () { A.go(p.view, p.arg || null, p.sub || null); } }, p.t + " · " + A.fdate(p.due)); })) : null,
           f.blocked ? h("div", { class: "small as-blk" }, "🛎 برگهٔ #" + fa(f.blocked.number) + " — " + (f.blocked.verified ? "حوزه ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
             (f.blocked.checks && f.blocked.checks.length ? " · " + fa(f.blocked.checks.length) + " بار پیگیری" : ""),
-            !f.blocked.verified ? h("button", { class: "linkish", type: "button", onclick: function () { AS.tourCheckSheets(s, true).then(function () { AS.paint(); }); } }, " بررسیِ دوباره") : null) : null,
+            !f.blocked.verified ? h("button", { class: "linkish", type: "button", onclick: function () { AS.tourCheckSheets(s, true).then(function () { AS.paint(); }); } }, " بررسیِ دوباره") : null,
+            /* پس از وارسیِ درست: تیکِ تأییدِ برگه تصمیمِ خودِ مالک است (دستیار نمی‌زند؛ data-own) — تا روتینِ مسئول بفهمد جوابش پذیرفته شد
+               (کارزارِ سوم v02: پس از ✅ برگه «پاسخ‌داده» می‌ماند و روتین خبردار نمی‌شد). یادداشتِ مالک برگه را دوباره باز می‌کند، پس یادداشت نه، تیک. */
+            f.blocked.verified && !f.blocked.approvedAt && A.HOST && A.HOST.status ? h("button", { class: "btn sm", type: "button", "data-own": "1", onclick: function () {
+              Promise.resolve(A.HOST.status(f.blocked.id, "approved")).then(function () { f.blocked.approvedAt = nowIso(); s.msgs.push({ role: "sys", at: nowIso(), text: "✔ برگهٔ #" + fa(f.blocked.number) + " را تأیید کردی؛ روتینِ مسئول در دورِ بعدش می‌بیند که پذیرفته شد." }); S.put(s); AS.paint(); },
+                function (e) { A.toast("تأیید نشد: " + (AS.errText ? AS.errText(e) : e), "bad"); });
+            } }, "✅ تأییدِ برگهٔ #" + fa(f.blocked.number)) : null) : null,
           f.view && f.status !== "skipped" ? h("button", { class: "linkish small", type: "button", onclick: function () { var vv = viewOf(f); A.go(vv.v, vv.a, vv.s); } }, "↗ رفتن به این بخش") : null)));
     });
     box.appendChild(ol);
@@ -32148,7 +32154,7 @@ APP.goFromURL = function (q) {
             if (o.ok) {
               f.blocked.verified = true; f.status = f.status === "blocked" ? "todo" : f.status;
               var cur0 = current(s);
-              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) +
+              s.msgs.push({ role: "sys", at: nowIso(), text: "✅ حوزهٔ برگهٔ #" + fa(f.blocked.number) + " ساخته شد و درستی‌اش را سنجیدم: " + clip(o.reason, 300) + (A.HOST && A.HOST.status ? " — اگر تو هم قبول داری، در کشوی تور «✅ تأییدِ برگه» را بزن تا روتینِ مسئول بداند پذیرفته شد." : "") +
                 (cur0 && cur0 !== f ? " — وجهِ «" + f.title + "» دوباره در صفِ تور است و پس از «" + cur0.title + "» طی می‌شود؛ اگر می‌خواهی همین حالا، بگو «اول حوزهٔ تازه»." : " — حالا وجهِ «" + f.title + "» را با هم طی می‌کنیم.") });
               advance(s);
             } else if (f.blocked.checks.filter(function (c) { return !c.ok && !c.lag; }).length > MAX_FOLLOW) {
@@ -32771,6 +32777,9 @@ APP.goFromURL = function (q) {
     t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
     t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep|pq)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "").replace(/\(?\b(?:sub|view|arg|tab)=[A-Za-z0-9_:.-]+\)?/g, "");
     t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|kcase|eprob|wchain|fcast|kexp|kitem|pbitem|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
+    // متنِ وارسی‌کنندهٔ برگه شناسهٔ نما و اصطلاحِ فنی دارد (کارزارِ سوم v02: «view:negprep»، «VIEW_META»، «رجیستریِ حوزه» در ایمیل)
+    t = t.replace(/\bview:([a-z][a-z0-9_]*)\b/g, function (m0, v) { var M = A.VIEW_META && A.VIEW_META[v], nv = (A.NAV || []).concat(A.EPI_NAV || []).filter(function (n) { return Array.isArray(n) && n[0] === v; })[0]; return nv ? "نمای «" + nv[1] + "»" : M ? "نمای «" + String(M.what || "").split(/[:،.]/)[0] + "»" : "یک نمای صفحه"; });
+    t = t.replace(/\bVIEW_META\b/g, "توضیحِ نما برای دستیار").replace(/رجیستری(?:ِ)?/g, "فهرستِ ثبتِ").replace(/\b(?:APP|A)\.[A-Za-z_.]+/g, "").replace(/\b[a-z]+_[a-z0-9_]+\.js\b/g, "کدِ صفحه");
     return t.replace(/\s{2,}/g, " ");
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };

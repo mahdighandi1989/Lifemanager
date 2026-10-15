@@ -22,6 +22,9 @@
     t = t.replace(/\b(?:ln|md|pr|dc|sc|sf|a)_[a-z0-9_]+\b/g, function (m0) { var x0 = A.SYST && (A.SYST.byId ? A.SYST.byId(m0) : A.SYST.find(m0)); return x0 ? "«" + x0.a.fa + "»" : m0; });
     t = t.replace(/\b(?:kc|kcase|knot|case|kexp|kitem|pbitem|fc|wc|vl|mn|tp|ex|eprob|achat|rep|pq)_[A-Za-z0-9]+\b/g, "").replace(/\bk\d{1,3}\b/g, "").replace(/\(?\b(?:sub|view|arg|tab)=[A-Za-z0-9_:.-]+\)?/g, "");
     t = t.replace(/\b(sys-territory|epi-territory|epi-backtest|epi-engine|lla-page|deferred|priority|answered|supervisor|prereq|kcase|eprob|wchain|fcast|kexp|kitem|pbitem|knot|claim|area|learn|problem|territory)\b/g, function (w) { return WORDS[w] || w; });
+    // متنِ وارسی‌کنندهٔ برگه شناسهٔ نما و اصطلاحِ فنی دارد (کارزارِ سوم v02: «view:negprep»، «VIEW_META»، «رجیستریِ حوزه» در ایمیل)
+    t = t.replace(/\bview:([a-z][a-z0-9_]*)\b/g, function (m0, v) { var M = A.VIEW_META && A.VIEW_META[v], nv = (A.NAV || []).concat(A.EPI_NAV || []).filter(function (n) { return Array.isArray(n) && n[0] === v; })[0]; return nv ? "نمای «" + nv[1] + "»" : M ? "نمای «" + String(M.what || "").split(/[:،.]/)[0] + "»" : "یک نمای صفحه"; });
+    t = t.replace(/\bVIEW_META\b/g, "توضیحِ نما برای دستیار").replace(/رجیستری(?:ِ)?/g, "فهرستِ ثبتِ").replace(/\b(?:APP|A)\.[A-Za-z_.]+/g, "").replace(/\b[a-z]+_[a-z0-9_]+\.js\b/g, "کدِ صفحه");
     return t.replace(/\s{2,}/g, " ");
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };

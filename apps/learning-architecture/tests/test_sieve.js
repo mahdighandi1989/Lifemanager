@@ -71,13 +71,13 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.today = APP.dueList().some(x => /پیش‌نیازهای/.test(x.txt)) === false;   // همه سنجیده ⇒ دیگر در «امروز» نیست
     out.nav = (APP.NAV || []).some(n => Array.isArray(n) && n[0] === 'prereq');
     // ایمیل بی کد
-    s.msgs.push({ role: 'ai', text: 'وجهِ f2 و خانوادهٔ F11 و حوزهٔ dc_career_income و رکوردِ kc_abc123 و برگهٔ sys-territory deferred', at: '' });
+    s.msgs.push({ role: 'ai', text: 'وجهِ f2 و خانوادهٔ F11 و حوزهٔ dc_career_income و رکوردِ kc_abc123 و برگهٔ sys-territory deferred', at: '' }); s.msgs.push({ role: 'sys', text: 'وارسی: view:prereq ساخته شد ولی VIEW_META و رجیستریِ حوزه ناقص است (a32_sieve.js)', at: '' });
     s.tour.facets[0].status = 'done';
     const rep = await APP.REPORT.build(s, [{ k: 'facet', fa: '✓ پایهٔ f1 برپا شد' }]);
     out.outcome = /نتیجه در یک نگاه[\s\S]*نقشهٔ پیش‌نیازها: ۲ مفهوم/.test(rep.html);
     out.honest = /پایه برپا شد · /.test(rep.text) && !/— انجام شد/.test(rep.text);
     const all = rep.subject + rep.html + rep.text;
-    out.noCodes = !/\bf\d{1,2}\b/.test(all) && !/\bF\d{1,2}\b/.test(all) && !/\b(?:dc|sc|sf|md|ln|pr)_[a-z_]+/.test(all) && !/kc_abc123/.test(all) && !/sys-territory|deferred/.test(all);
+    out.noCodes = !/\bf\d{1,2}\b/.test(all) && !/\bF\d{1,2}\b/.test(all) && !/\b(?:dc|sc|sf|md|ln|pr)_[a-z_]+/.test(all) && !/kc_abc123/.test(all) && !/sys-territory|deferred/.test(all) && !/view:|VIEW_META|رجیستری|\.js\b/.test(all);
     out.humanized = /«برداشت و نتیجه‌گیری/.test(rep.html) && /قلمروِ سامانه‌ها/.test(rep.html) && /غربالِ لایه‌ها/.test(rep.html);
     return out;
   });
