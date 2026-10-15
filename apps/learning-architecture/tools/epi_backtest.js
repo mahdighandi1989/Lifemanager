@@ -168,7 +168,7 @@ function recodeOne(target, u, today) {
 }
 function recode(file) {
   const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
-  const today = new Date().toISOString().slice(0, 10), bad = [], todo = [], sFiles = {}, cFiles = {};
+  const today = new Date().toISOString().slice(0, 10), bad = [], todo = [], sFiles = {}, cFiles = {}, touched = {};
   for (const f of sampleFiles()) sFiles[f] = rd(path.join(SAMPLES, f), []);
   for (const f of corpusFiles()) cFiles[f] = rd(path.join(CORPUS, f), []);
   items.forEach((u, i) => {
@@ -180,21 +180,22 @@ function recode(file) {
     if (u.frame) {
       let sm = null; Object.keys(sFiles).forEach((f) => sFiles[f].forEach((x) => { if (x.id === u.frame) sm = x; }));
       if (!sm) e.push("قابِ ناشناخته: " + u.frame);
-      else targets = u.items === "all" ? sm.items : (sm.items || []).filter((it) => (u.items || []).indexOf(it.id) >= 0);
+      else { targets = u.items === "all" ? sm.items : (sm.items || []).filter((it) => (u.items || []).indexOf(it.id) >= 0); Object.keys(sFiles).forEach((f) => { if (sFiles[f].indexOf(sm) >= 0) touched["s:" + f] = 1; }); }
       if (sm && u.items !== "all" && targets.length !== (u.items || []).length) e.push("موردِ ناشناخته در قاب " + u.frame);
       if (u.member != null) e.push("member فقط برای تصدیقِ پیکره");
     } else if (u.case) {
       let c = null; Object.keys(cFiles).forEach((f) => cFiles[f].forEach((x) => { if (x.id === u.case) c = x; }));
       if (!c) e.push("واقعهٔ ناشناخته در backtest/corpus (بذرها با این فرمان نیستند): " + u.case);
-      else { const k = (c.claims || []).filter((x) => x.id === u.claim)[0]; if (!k) e.push("تصدیقِ ناشناخته: " + u.case + "/" + u.claim); else targets = [k]; }
+      else { const k = (c.claims || []).filter((x) => x.id === u.claim)[0]; if (!k) e.push("تصدیقِ ناشناخته: " + u.case + "/" + u.claim); else targets = [k];
+        Object.keys(cFiles).forEach((f) => { if (cFiles[f].indexOf(c) >= 0) touched["c:" + f] = 1; }); }
     } else e.push("frame یا case لازم است");
     targets.forEach((t) => { const r = recodeOne(t, u, today); if (r.e) e.push.apply(e, r.e); else todo.push(r.apply); });
     if (e.length) bad.push({ i, frame: u.frame, case: u.case, claim: u.claim, errors: e });
   });
   if (bad.length) return { changed: 0, rejected: bad, note: "هیچ چیز نوشته نشد (همه یا هیچ)" };
   let n = 0; todo.forEach((fn) => { n += fn(); });
-  Object.keys(sFiles).forEach((f) => wr(path.join(SAMPLES, f), sFiles[f]));
-  Object.keys(cFiles).forEach((f) => wr(path.join(CORPUS, f), cFiles[f]));
+  Object.keys(sFiles).forEach((f) => { if (touched["s:" + f]) wr(path.join(SAMPLES, f), sFiles[f]); });   // فقط فایل‌هایی که موردی از آن‌ها عوض شد
+  Object.keys(cFiles).forEach((f) => { if (touched["c:" + f]) wr(path.join(CORPUS, f), cFiles[f]); });
   return { changed: n, rejected: [] };
 }
 function addSamples(file) {
