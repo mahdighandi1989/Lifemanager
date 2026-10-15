@@ -224,6 +224,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   if (info.p3Sched !== 3) errors.push('P3 1-3-7 not scheduled: ' + info.p3Sched);
   if (info.p10Queue !== 1) errors.push('P10 queue not inline');
   if (info.prDots !== info.protoLessons.split(',').length) errors.push('proto dots on map: ' + info.prDots);
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

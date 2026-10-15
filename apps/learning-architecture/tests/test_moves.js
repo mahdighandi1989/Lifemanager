@@ -271,6 +271,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await go('move', 'mv_invariant'); await p.screenshot({ path: __dirname + '/../dist/shot_moves.png', fullPage: true });
 
   console.log(JSON.stringify(info, null, 1));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

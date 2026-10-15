@@ -541,6 +541,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   E(info.hypOpts === '[{"fileIds":[5,6,7]}]', 'hypothesis request carries all the case files: ' + info.hypOpts);
   E(info.ladMoreNoImg && info.ladOpts === 'gen:{"fileIds":[5,6,7]} chk:null', 'ladder: generator gets the files, the leak solver never: ' + info.ladOpts);
   E(info.attOffInference === false, 'attachment default off for a non-problem case: ' + info.attOffInference);
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

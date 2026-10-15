@@ -83,7 +83,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.radar = /احتمالِ درستیِ پاسخِ بعدی/.test(document.querySelector('#main .mind-svg').textContent);
     out.ageShown = /سن: /.test(document.querySelector('#main .psy-age').textContent);
     // دستیار جوابِ معما را نمی‌دهد (قاعده) و تاریخِ تولد را فقط از حرفِ کاربر ثبت می‌کند
-    out.rule = /معمای امروز» را هرگز حل نکن/.test(APP.ASSIST.SYS) && /"do":"birth"/.test(APP.ASSIST.SYS);
+    // قواعدِ این بخش فقط وقتی به کار است در پرامپت می‌آید (سقفِ ۲۰ هزار نویسهٔ پرامپتِ سامانه)
+    const hk = (msg) => APP.ASSIST.promptHooks.map(f => { try { return f({ msgs: [] }, msg) || ''; } catch (e) { return ''; } }).join('\n');
+    out.rule = /معمای امروز» را هرگز حل نکن/.test(hk('')) && /"do":"birth"/.test(hk('')) && !/معمای امروز» را هرگز حل نکن/.test(APP.ASSIST.SYS);
+    APP.go('home'); await new Promise(r => setTimeout(r, 100));
+    out.ruleOff = !/"do":"birth"/.test(hk('سلام')) && /"do":"birth"/.test(hk('من متولد ۱۹۸۹ هستم'));
     return out;
   });
   chk(Object.values(info.ui).every(Boolean), 'birth/age, daily anchor item answered only by the owner, Rasch comparison with age peers, mind card without conventional bands: ' + JSON.stringify(info.ui));

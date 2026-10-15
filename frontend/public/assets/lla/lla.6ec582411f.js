@@ -30196,7 +30196,7 @@ APP.goFromURL = function (q) {
      (A.NAV/EPI_NAV/…) یا «زیرنما»ی یک نمای منو است — صفحهٔ یک رکورد/درس که از نمای پدرش باز می‌شود. نمای تازه ⇒ ورودیِ منو، یا
      (فقط اگر واقعاً صفحهٔ یک رکورد است) یک سطر این‌جا با نمای پدرش. tests/test_fixes_1015.js بی‌استثنا می‌سنجد. */
   A.SUB_VIEWS = { tech: "lib", topic: "topics", proto: "protos", e_case: "e_cases", lesson: "course", epi_lesson: "epi_course", journey: "topics",
-    kcase: "kcases", knot: "kcases", ksims: "kcases", move: "moves" };
+    kcase: "kcases", knot: "kcases", ksims: "kcases", move: "moves", psy_item: "mind", idea: "mind" };
   var JOB = {}; JOBS.forEach(function (j) { JOB[j.id] = j; }); JOB.ws = WORKSHOP;
 
   /* ---------- سه مسیرِ کاری: قدم‌به‌قدم از صفحه‌های واقعی ---------- */
@@ -34279,13 +34279,16 @@ APP.goFromURL = function (q) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= A.today() || d < "1900-01-01") return "تاریخِ تولد ثبت نشد: YYYY-MM-DD میلادی لازم است";
       var st = S.settings(); st.profile = st.profile || {}; st.profile.birth = d; S.saveSettings(st); return "";
     };
-    AS.SYS += "\n" + [
+    var RULES = [
       "# سنجشِ استاندارد",
       "- اگر کاربر تاریخِ تولدش را گفت، با {\"do\":\"birth\",\"date\":\"YYYY-MM-DD\"} (میلادی) ثبت کن — فقط از حرفِ خودش.",
       "- اگر «🧩 معمای امروز» مانده و کاربر آرام است (نه وسطِ پریشانی یا کارِ فوری)، روزی یک بار با یک جمله پیشنهادش کن («یک معمای کوتاه برای امروز هست»)؛ آن را «آزمونِ هوش» نخوان و نتیجه‌اش را پیش‌بینی نکن.",
       "- «🧩 معمای امروز» را هرگز حل نکن، راهنمایی نکن و جوابش را نگو؛ اگر کاربر پرسید، بگو این یکی باید با فکرِ خودش باشد تا مقایسه منصفانه بماند.",
       "- دربارهٔ «هوش» فقط همان سازه‌ها و احتمال‌هایی را بگو که کارنامه نشان می‌دهد؛ «ضریبِ هوشیِ کل» یا رتبه‌ای را که کارنامه نمی‌دهد نساز."
     ].join("\n");
+    /* فقط وقتی به کار است در پرامپت می‌آید — پرامپتِ سامانه سقفِ ۲۰ هزار نویسهٔ سرور را دارد (test_assist) */
+    AS.promptHooks = AS.promptHooks || [];
+    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((A.state && /^(mind|psy_item)$/.test(A.state.view)) || /تولد|سن[ّم]? |هوش|معما|IQ|ضریب/.test(recent)) ? RULES : ""; });
   }
 })(APP);
 /* ===== «💡 جایگاهِ ایده»: ایده خودش یک موضوع است، با قوت، فرض، مسئله، گره و آنچه بیرون است (مالک ۲۰۲۶-۱۰-۱۵) =====
@@ -34361,7 +34364,7 @@ APP.goFromURL = function (q) {
       else return "فرض فقط به پروندهٔ سنجش و مسئلهٔ طراحی فقط به مسئله یا نقشهٔ پیش‌نیاز وصل می‌شود";
       S.put(r); return "";
     };
-    AS.SYS += "\n" + [
+    var RULES = [
       "# ایده («💡 جایگاهِ ایده»)",
       "- اگر کاربر «ایده» آورد (نه فقط گیر یا مسئله) و می‌خواهد بداند کجا ایستاده، آن را رد نکن و تأییدِ کور هم نکن: با {\"do\":\"idea_new\",\"what\":\"عینِ حرفش\"} ثبتش کن و بعد بخش‌هایش را یکی‌یکی با idea_add بگذار:",
       "  · strength (قوت) فقط با «ev» = شاهد از حرفِ خودِ کاربر؛ تعریفِ خالی قوت نیست.",
@@ -34371,6 +34374,9 @@ APP.goFromURL = function (q) {
       "- گره‌هایی که جلوی ایده را می‌گیرند (مثلاً رها کردن پس از ایراد) وجهِ knot ِ تورند، مثلِ همیشه.",
       "- به ایده نمره نده. جایگاهش را صفحه از درجهٔ فرض‌ها می‌سازد: سقفِ اعتبار = ضعیف‌ترین فرضِ لازم؛ فرضِ سنجیده‌نشده = شک (½). اگر کاربر نمره خواست، همین را بگو و او را به «💡 جایگاهِ ایده» ببر."
     ].join("\n");
+    /* فقط وقتی به کار است در پرامپت می‌آید — پرامپتِ سامانه سقفِ ۲۰ هزار نویسهٔ سرور را دارد (test_assist) */
+    AS.promptHooks = AS.promptHooks || [];
+    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((s && s.idea) || /ایده|طرح|استارتاپ|کسب ?و ?کار|اپلیکیشن|برنامه‌ای که|محصول/.test(recent)) ? RULES : ""; });
     AS.promptHooks = AS.promptHooks || [];
     AS.promptHooks.push(function (s) {
       var r = s && s.idea ? S.get(s.idea) : null; if (!r) return "";

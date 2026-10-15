@@ -39,4 +39,4 @@ const cf = path.join(dir, 'corpus', fs.readdirSync(path.join(dir, 'corpus'))[0])
 const r4 = run('run');
 chk(r4.corpus.n === 170 && JSON.parse(fs.readFileSync(cf)).length === 2, 'an excluded event leaves the corpus but stays on file');
 fs.rmSync(dir, { recursive: true, force: true });
-console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;

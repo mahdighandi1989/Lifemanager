@@ -207,6 +207,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(ov <= 2, 'overflow ' + v + ' ' + (s || '') + ': ' + ov);
   }
   console.log(JSON.stringify(info, null, 1).slice(0, 1500));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

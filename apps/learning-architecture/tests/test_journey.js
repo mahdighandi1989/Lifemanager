@@ -114,6 +114,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   if (info.s4 !== '1,0,0' || info.s8 !== '0,1,1' || info.s7 !== '0,1') errors.push('P11 parts wrong: ' + info.s4 + ' / ' + info.s8 + ' / ' + info.s7);
   if (info.peek !== 1 || info.viewAfterPeek !== 'journey') errors.push('peek navigated away');
   if (info.courseHint !== 1) errors.push('course step 3 does not mention the journey');
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

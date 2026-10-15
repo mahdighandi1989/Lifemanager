@@ -86,7 +86,7 @@
      (A.NAV/EPI_NAV/…) یا «زیرنما»ی یک نمای منو است — صفحهٔ یک رکورد/درس که از نمای پدرش باز می‌شود. نمای تازه ⇒ ورودیِ منو، یا
      (فقط اگر واقعاً صفحهٔ یک رکورد است) یک سطر این‌جا با نمای پدرش. tests/test_fixes_1015.js بی‌استثنا می‌سنجد. */
   A.SUB_VIEWS = { tech: "lib", topic: "topics", proto: "protos", e_case: "e_cases", lesson: "course", epi_lesson: "epi_course", journey: "topics",
-    kcase: "kcases", knot: "kcases", ksims: "kcases", move: "moves" };
+    kcase: "kcases", knot: "kcases", ksims: "kcases", move: "moves", psy_item: "mind", idea: "mind" };
   var JOB = {}; JOBS.forEach(function (j) { JOB[j.id] = j; }); JOB.ws = WORKSHOP;
 
   /* ---------- سه مسیرِ کاری: قدم‌به‌قدم از صفحه‌های واقعی ---------- */

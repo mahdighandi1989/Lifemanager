@@ -168,6 +168,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.budget.big <= 58000 && info.budget.bigNew && info.budget.said, 'over budget: new message kept, the cut file text is announced');
   chk(info.budget.smallNew && info.budget.hist, 'normal: new message, file text and history all present');
   console.log(JSON.stringify(info).slice(0, 900));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

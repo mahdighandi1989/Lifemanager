@@ -37,7 +37,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.view = /سقفِ اعتبارِ ایده/.test(main) && /وهم/.test(main) && /شاهد: «سه شب/.test(main) && /مسئلهٔ طراحی/.test(main) && /بیرون از این صفحه/.test(main) && !/نمره/.test(main.replace(/نمره (نده|ندارد)/g, ''));
     out.hook = AS.promptHooks.map(f => { try { return f(s, '') || ''; } catch (e) { return ''; } }).join('\n');
     out.hook = /# ایدهٔ این سشن/.test(out.hook) && /سقفِ اعتبار: 30٪/.test(out.hook);
-    out.rules = /وجهِ problem/.test(AS.SYS) && /به ایده نمره نده/.test(AS.SYS);
+    const hk = (ss, msg) => AS.promptHooks.map(f => { try { return f(ss, msg) || ''; } catch (e) { return ''; } }).join('\n');
+    out.rules = /وجهِ problem/.test(hk(s, '')) && /به ایده نمره نده/.test(hk({ msgs: [] }, 'یه ایده دارم')) && !/به ایده نمره نده/.test(hk({ msgs: [] }, 'سلام'));
     out.graph = (() => { const M = APP.GRAPH.build(); return !!M.nodes['idea:' + s.idea]; })();
     return out;
   });

@@ -362,6 +362,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // all three files go to the generator since 2026-10-14 (WORKLOG 44: every format read in full); the solvers still never see them
   chk(info.imgCalls === 'gen:[71,72,73] solve:null solve:null solve:null' && info.imgSolverText, 'generator gets the image, the three verifying solvers never: ' + info.imgCalls);
   chk(info.imgWarnOff === 0 && info.imgOffCalls, 'unticked => no fileIds: ' + info.imgOffCalls);
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

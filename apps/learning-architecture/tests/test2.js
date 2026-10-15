@@ -76,5 +76,5 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.evaluate(() => APP.go('farm', null, 'logic')); await page.screenshot({ path: __dirname + '/../dist/shot_logic.png' });
   await page.setViewportSize({ width: 400, height: 800 }); await page.evaluate(() => APP.go('farm'));
   const ow = await page.evaluate(() => document.documentElement.scrollWidth); if (ow > 402) errors.push('mobile overflow farm ' + ow);
-  await browser.close(); console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  await browser.close(); console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
 })();

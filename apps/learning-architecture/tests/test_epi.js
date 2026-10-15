@@ -128,6 +128,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.evaluate(() => APP.go('e_case', APP.S.all('case').filter(c => c.title === 'وثیقه ملک')[0].id, 'st_final')); await page.screenshot({ path: __dirname + '/../dist/shot_epi_case.png' });
   await page.evaluate(() => APP.go('e_book', 's11')); await page.waitForTimeout(200); await page.screenshot({ path: __dirname + '/../dist/shot_epi_book.png' });
   console.log(JSON.stringify(info));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await browser.close();
 })();

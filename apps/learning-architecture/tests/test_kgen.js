@@ -217,4 +217,4 @@ info.jarsL3 = { n: jarsL3.n, distinct: Object.keys(jarsL3.answers).length };
 if (jarsL3.n && Object.keys(jarsL3.answers).filter(x => x[0] === 'N').length < 4) fail('jars L3 non-decoy answers barely vary: ' + Object.keys(jarsL3.answers));
 if (jarsL3.n && Object.keys(jarsL3.answers).filter(x => x[0] === 'D').length < 3) fail('jars L3 decoy answers barely vary: ' + Object.keys(jarsL3.answers));
 console.log(JSON.stringify(info, null, 1));
-console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;

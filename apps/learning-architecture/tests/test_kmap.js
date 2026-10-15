@@ -263,6 +263,6 @@ const EN = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexO
   chk(info.dark && info.dark !== info.fills.practised, 'dark theme ' + info.dark);
 
   console.log(JSON.stringify(info, null, 1).slice(0, 4000));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

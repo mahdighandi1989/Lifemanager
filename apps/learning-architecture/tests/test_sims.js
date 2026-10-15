@@ -104,6 +104,6 @@ const IDS = [36, 28, 45, 2, 4, 1, 3, 5];
   if (I[1] && !(I[1].right === 3 && I[1].test >= 1)) errors.push('1 flow ' + I[1].right);
   if (I[3] && !(I[3].top === 3 && /^۳/.test(I[3].k || '') && /رایانه/.test(I[3].tail || ''))) errors.push('3 flow');
   if (I[5] && !(I[5].rungs === 4)) errors.push('5 flow');
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

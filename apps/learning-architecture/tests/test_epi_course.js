@@ -220,6 +220,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.waySim >= 2 && info.simLabel === 1, 'way simulator');
   chk(info.homeCard === 1 && /ادامه/.test(info.homeBtn), 'factory home card');
   chk(info.mapDotsOn === 2 && info.mapNow === 1 && info.caseLinkOnMap >= 1, 'course map ' + info.mapDotsOn);
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

@@ -84,6 +84,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.evaluate(() => APP.go('e_living')); await page.screenshot({ path: __dirname + '/../dist/shot_living.png' });
   console.log(JSON.stringify(info, null, 1));
   if (info.tests !== 3 || info.added < 1 || info.approved !== 'approved' || !info.lrules || !info.simDone || !info.master || info.probsAfter !== 1 || !/خطا/.test(info.engineVerdict)) errors.push('flow check failed');
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await browser.close();
 })();

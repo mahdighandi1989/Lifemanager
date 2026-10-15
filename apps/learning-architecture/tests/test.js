@@ -179,5 +179,5 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await page.close();
   }
   await browser.close();
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
 })();

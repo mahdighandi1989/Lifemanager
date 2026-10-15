@@ -16,4 +16,4 @@ const r=await p.evaluate(()=>{
  const hasLesson=!!document.querySelector('[data-k="lesson"]'), hasSplit=!!document.querySelector('[data-k="knotSplit"]');
  return {stExtra:st&&st.extra.length, stQ:st&&st.q, ns, ph, tr, qbtn, hasLesson, hasSplit};
 });
-console.log(JSON.stringify(r)); console.log(errs.join('\n')||'no errors'); await b.close();})();
+console.log(JSON.stringify(r)); console.log(errs.join('\n')||'no errors'); if (errs.length) process.exitCode = 1; await b.close();})();

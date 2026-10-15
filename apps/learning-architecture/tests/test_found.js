@@ -78,6 +78,6 @@ chk(T.validate(Object.assign({}, cs.find(c => c.tier === 'real' && c.src), { sam
   await p.setViewportSize({ width: 390, height: 800 }); await p.waitForTimeout(150);
   chk(await p.evaluate(() => document.documentElement.scrollWidth <= 392), 'no horizontal overflow at 390px');
   console.log(JSON.stringify(info));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

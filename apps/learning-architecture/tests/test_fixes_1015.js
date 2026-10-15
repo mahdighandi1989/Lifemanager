@@ -157,6 +157,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.evaluate(() => { APP.ASSIST.toggle(false); });
 
   console.log(JSON.stringify(info, null, 1).slice(0, 3000));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

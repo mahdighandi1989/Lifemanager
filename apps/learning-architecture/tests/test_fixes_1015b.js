@@ -186,6 +186,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.mirror.before === null && info.mirror.b0 === 'undefined' && info.mirror.inst && info.mirror.promise && info.mirror.build === 'object' && info.mirror.sent >= 1, '8: a host that appears after load still gets the Drive mirror (decided at call time) ' + JSON.stringify(info.mirror));
 
   console.log(JSON.stringify(info, null, 1).slice(0, 2500));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();

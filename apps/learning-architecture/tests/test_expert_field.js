@@ -101,7 +101,7 @@ const au = tool('audit'); chk(au.code === 3 && au.out.violations.some(v => /xf_b
   await p.setViewportSize({ width: 390, height: 800 }); await p.evaluate(i => APP.go('e_case', i, 'st_expert'), id); await p.waitForTimeout(200);
   chk(await p.evaluate(() => document.documentElement.scrollWidth <= 392), 'no horizontal overflow at 390px');
   console.log(JSON.stringify(info));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
   process.exit(errors.length ? 1 : 0);
 })();

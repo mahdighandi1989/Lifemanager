@@ -34,6 +34,6 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.click('main button:has-text("اجرای دوباره")'); await p.waitForTimeout(400);
   chk(await p.evaluate(() => APP.S.all('ebt').length) === n0 + 1, 'the explicit re-run records one row');
   console.log(JSON.stringify(info));
-  console.log(errors.length ? errors.join('\n') : 'NO ERRORS');
+  console.log(errors.length ? errors.join('\n') : 'NO ERRORS'); if (errors.length) process.exitCode = 1;
   await b.close();
 })();
