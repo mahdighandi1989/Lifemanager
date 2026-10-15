@@ -73,6 +73,8 @@
     if (k === "ksim") { if ((A.KSIM || {})[v]) return view("ksims", v); T.where = "شبیه‌سازِ گره «" + v + "»"; return view("ksims"); }
     if ((k === "station" || k === "ws") && (window.EPI_ST || []).some(function (x) { return x.id === v; })) { T.node = "station:" + v; if (k === "ws") T.where = "کاربرگِ ایستگاه: " + bare(P); return view("e_st", v); }
     if (k === "factory" || k === "encode") { T.where = "کارخانه: " + bare(P); return view("e_home"); }
+    /* «🔭 مسئلهٔ حل‌نشدهٔ خودم» (a38_live.js؛ دورِ ۶ ِ پوشش): همان نمای مسئله‌ها، زبانهٔ «live» — گرهِ گراف: نمای مسئله‌ها (بی جزیره) */
+    if (k === "live") { T.where = "🔭 مسئلهٔ حل‌نشدهٔ خودم («مسئله‌های من» ⇐ زبانهٔ 🔭): " + bare(P); return view("e_prob", null, "live"); }
     if (k === "prob" || k === "problem") {
       if (A.getProb && A.getProb(v)) { T.node = "prob:" + v; return view("e_prob", v); }
       if (k === "prob") { T.where = "شبیه‌سازِ هر مسئله («🧗 مسئله‌های بزرگ» ⇐ یک مسئله ⇐ شبیه‌ساز): " + (PROBF[v] || v) + (P.note ? " — " + P.note : ""); if (v === "practice-cta") T.sel = ".practice-cta, .pb-practice"; }
