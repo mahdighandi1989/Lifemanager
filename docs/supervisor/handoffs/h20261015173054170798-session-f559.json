@@ -1,0 +1,16 @@
+{
+ "id": "h20261015173054170798-session-f559",
+ "at": "2026-10-15T17:30:54Z",
+ "by": "session",
+ "area": "lla-sources",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "پولیا دورِ ۵ (بازبینیِ سخت‌گیرانهٔ مورد‌به‌مورد با ۶۶۳ نقلِ عینی از صفحهٔ اجراشده): ۵۶۷/۱۰۸/۱۰۴/۳۳؛ گزارش docs/decisions/2026-10-15-polya-strict-regrade.md؛ beyond ۱۴ مورد.",
+ "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
+ "commit": "",
+ "status": "open"
+}
