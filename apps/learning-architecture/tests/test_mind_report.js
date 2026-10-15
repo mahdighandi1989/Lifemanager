@@ -203,6 +203,20 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.camp.privacy, 'after a distress signal the e-mail carries no conversation text and has a help box; no unrelated Today items');
   chk(info.camp.brier === '{"n":1,"brier":0.64}' && info.camp.calDec && info.camp.chainView && info.camp.nav && info.camp.remOff === 1 && info.camp.vals === 'خانواده|خانواده ⟷ درآمد' && info.camp.valsToday && info.camp.valsView && /ورزشِ گره: ۱ درست از ۲ پاسخ در ۲ روز/.test(info.camp.scores) && info.camp.mindHook && info.camp.valsLinked && info.camp.badArea && info.camp.ret && info.camp.noMislink, 'forecast log scores Brier and feeds calibration; chain view; menu entries: ' + JSON.stringify(info.camp));
 
+  // روند = نخستین تا آخرین ماهِ سنجیده (نه فقط دو ماهِ آخر)؛ تازه‌ترین رکوردها بر پایهٔ تاریخ در نقشه می‌مانند (کارزارِ سوم v05)
+  info.trend2 = await p.evaluate(() => {
+    const mk = (id, at, ok) => ({ id, type: 'kitem', knot: 'kn_tr', q: 'x', hist: [{ at, ok }] });
+    APP.S.put({ id: 'kn_tr', type: 'knot', name: 'روند', fam: 'F4', status: 'practised', cases: [] });
+    const rows = [['2026-07', [0, 0, 1]], ['2026-08', [1, 1, 0]], ['2026-09', [1, 1, 1]]];
+    rows.forEach(([m, oks]) => oks.forEach((ok, i) => APP.S.put(Object.assign(mk('ki_tr_' + m + i, m + '-1' + i + 'T10:00:00Z', !!ok)))));
+    const dims = APP.MIND.model().dims.filter(d => d.trend != null);
+    APP.S.put({ id: 'kc_new_tr', type: 'kcase', kinds: ['problem'], intake: { what: 'تازه‌ترین موقعیت' }, created: '2099-01-01T10:00:00Z', updated: '2099-01-01T10:00:00Z', knots: [] });
+    for (let i = 0; i < 20; i++) APP.S.put({ id: 'kc_old_tr' + i, type: 'kcase', kinds: ['problem'], intake: { what: 'قدیمی ' + i }, created: '2026-05-0' + (i % 9 + 1) + 'T10:00:00Z', updated: '2026-05-0' + (i % 9 + 1) + 'T10:00:00Z', knots: [] });
+    const mm = APP.MIND.charts(APP.MIND.model()).mindmap; const svg = mm && (mm.outerHTML || String(mm));
+    return { trendOk: dims.some(d => d.trendFrom && d.trendFrom < d.trendTo), newestKept: /تازه‌ترین موقعیت/.test(svg || '') };
+  });
+  chk(info.trend2.trendOk, 'trend runs from the first to the last measured month: ' + JSON.stringify(info.trend2));
+  chk(info.trend2.newestKept, 'the newest record by date stays on the mind map even after many back-dated ones');
   console.log(JSON.stringify(info).slice(0, 2500));
   console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);

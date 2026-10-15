@@ -32523,7 +32523,9 @@ APP.goFromURL = function (q) {
       X.cal.forEach(function (c) { var m = month(c.at); if (!m) return; (bym[m] = bym[m] || { n: 0, ok: 0, cal: [] }).cal.push(c); });
       X.months = Object.keys(bym).sort().map(function (m) { var r = bym[m], bb = brier(r.cal); return { m: m, acc: r.n >= 3 ? Math.round(100 * r.ok / r.n) : null, cal: r.cal.length >= 3 ? Math.round(100 * (1 - bb)) : null, n: r.n }; });
       var lm = X.months.filter(function (x) { return x.acc != null; });
-      X.trend = lm.length >= 2 ? lm[lm.length - 1].acc - lm[lm.length - 2].acc : null;
+      // روند = نخستین ماهِ سنجیده تا آخرین ماهِ سنجیده، با بازه‌اش (کارزارِ سوم v05: فقط دو ماهِ آخر ⇒ ۴۰→۱۰۰ «▲۰» نشان می‌داد)
+      X.trend = lm.length >= 2 ? lm[lm.length - 1].acc - lm[0].acc : null;
+      X.trendFrom = lm.length >= 2 ? lm[0].m : null; X.trendTo = lm.length >= 2 ? lm[lm.length - 1].m : null;
     });
     /* نقطه‌های سیاه */
     var black = [], today = A.today();
@@ -32579,6 +32581,8 @@ APP.goFromURL = function (q) {
     s.appendChild(el("polygon", { points: pts.join(" "), fill: "rgba(15,118,110,.25)", stroke: "#0f766e", "stroke-width": 2 }));
     return s;
   };
+  /* تازه‌ترین‌ها بر پایهٔ تاریخ، نه ترتیبِ ذخیره (کارزارِ سوم v05: پس از رکوردهای عقب‌برده، رکوردهای واقعیِ تازه از نقشه افتادند) */
+  function newest(arr, n) { var d = function (x) { return String((x && (x.created || x.at || x.date || x.updated)) || ""); }; return arr.slice().sort(function (a, b) { return d(a).localeCompare(d(b)); }).slice(-n); }
   M.trend = function (m) {
     var W = 560, H = 260, s = svgBox(W, H, "روندِ ماهانهٔ دقت"), months = {};
     m.dims.forEach(function (d) { d.months.forEach(function (x) { months[x.m] = 1; }); });
@@ -32623,16 +32627,16 @@ APP.goFromURL = function (q) {
   M.neural = function (m) {
     var W = 640, H = 420, s = svgBox(W, H, "شبکهٔ ذهن");
     s.appendChild(txt(W / 2, 20, "شبکهٔ ذهن: موقعیت‌ها ⇐ گره‌ها ⇐ بُعدها (ضخامت = شمارِ پیوند؛ رنگ = وضع)", { "font-size": 12, "font-weight": 700 }));
-    var kcs = S.all("kcase", function (c) { return !c.sample; }).slice(-14), cases = S.all("case", function (c) { return !c.sample; }).slice(-6), probs = S.all("eprob", function (p) { return !p.sample; }).slice(-4);
+    var kcs = newest(S.all("kcase", function (c) { return !c.sample; }), 14), cases = newest(S.all("case", function (c) { return !c.sample; }), 6), probs = newest(S.all("eprob", function (p) { return !p.sample; }), 4);
     var ins = kcs.map(function (c) { return { id: c.id, fa: c.title || "موقعیت", kn: c.knots || [] }; })
       .concat(cases.map(function (c) { return { id: c.id, fa: c.title || "پرونده", kn: c.src && c.src.type === "kcase" ? ((S.get(c.src.id) || {}).knots || []) : [], dim: "s_epi" }; }))
       .concat(probs.map(function (p) { return { id: p.id, fa: (p.p && p.p.title) || "مسئله", kn: [], dim: "s_problem" }; }))
       /* نقشهٔ پیش‌نیاز (گره‌های موقعیتِ خودش) و تورهای دستیار (گره‌ها و گره‌های موقعیت‌هایی که هر وجه ارجاع می‌دهد) — ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵ */
-      .concat(S.all("prereq").slice(-4).map(function (p) { var kc = p.kcase ? S.get(p.kcase) : null; return { id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز"), kn: (kc && kc.knots) || [], dim: "s_learn" }; }))
-      .concat(S.all("achat", function (x) { return x.tour; }).slice(-3).map(function (x) {
+      .concat(newest(S.all("prereq"), 4).map(function (p) { var kc = p.kcase ? S.get(p.kcase) : null; return { id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز"), kn: (kc && kc.knots) || [], dim: "s_learn" }; }))
+      .concat(newest(S.all("achat", function (x) { return x.tour; }), 3).map(function (x) {
         var kn = []; (x.tour.facets || []).forEach(function (f) { (f.refs || []).forEach(function (r) { if (!r) return; if (r.type === "knot") kn.push(r.id); else if (r.type === "kcase") kn = kn.concat((S.get(r.id) || {}).knots || []); }); });
         return { id: x.id, fa: "🧭 " + (x.title || "تور"), kn: kn.filter(function (v, i, a) { return a.indexOf(v) === i; }), dim: null }; }));
-    var knots = S.all("knot", function (k) { return !k.sample; }).slice(-16), dims = m.dims;
+    var knots = newest(S.all("knot", function (k) { return !k.sample; }), 16), dims = m.dims;
     var col = { open: "#94a3b8", working: "#f59e0b", practised: "#10b981", returned: "#ef4444" };
     function ys(n, i) { return 50 + (H - 80) * (n === 1 ? 0.5 : i / (n - 1)); }
     var P = {};
@@ -32655,13 +32659,13 @@ APP.goFromURL = function (q) {
     var dims = m.dims, R1 = 110, R2 = 215, pos = {};
     dims.forEach(function (d, i) { var a = -Math.PI / 2 + 2 * Math.PI * i / dims.length; pos[d.id] = [cx + R1 * Math.cos(a), cy + R1 * Math.sin(a), a]; });
     var outer = [];
-    dims.forEach(function (d) { d.items.slice(-8).forEach(function (it) { outer.push({ d: d.id, it: it }); }); });
+    dims.forEach(function (d) { newest(d.items, 8).forEach(function (it) { outer.push({ d: d.id, it: it }); }); });
     /* موقعیت‌های گره‌گشا (در d.items نیستند) — با خطِ واقعی به گره‌هایشان (ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵) */
-    S.all("kcase", function (c) { return !c.sample; }).slice(-6).forEach(function (c) { var k0 = (c.knots || []).map(function (id) { return S.get(id); }).filter(Boolean)[0];
+    newest(S.all("kcase", function (c) { return !c.sample; }), 6).forEach(function (c) { var k0 = (c.knots || []).map(function (id) { return S.get(id); }).filter(Boolean)[0];
       var dd = (c.root && c.root.primary) ? M.dimOf("kfam:" + c.root.primary) : k0 ? M.dimOf("kfam:" + (k0.fam || "F1")) : "s_mind";
-      outer.push({ d: dd, it: { t: "kcase", id: c.id, fa: "🪢 " + (c.title || "موقعیت"), st: c.status === "done" || c.resolved ? "practised" : "open", refs: (c.knots || []).slice() } }); });
-    S.all("topic", function (t) { return !t.sample; }).slice(-6).forEach(function (t) { outer.push({ d: "s_learn", it: { t: "topic", id: t.id, fa: t.title || "موضوع", st: "open" } }); });
-    S.all("achat", function (x) { return x.tour; }).slice(-4).forEach(function (x) { outer.push({ d: null, it: { t: "tour", id: x.id, fa: "🧭 " + (x.title || "تور"), st: x.tour.masteredAt ? "practised" : x.tour.doneAt ? "working" : "open", refs: [].concat.apply([], x.tour.facets.map(function (f) { return (f.refs || []).map(function (r) { return r.id; }); })) } }); });
+      outer.push({ d: dd, it: { t: "kcase", id: c.id, fa: "🪢 " + (c.title || (c.intake && c.intake.what) || "موقعیت"), st: c.status === "done" || c.resolved ? "practised" : "open", refs: (c.knots || []).slice() } }); });
+    newest(S.all("topic", function (t) { return !t.sample; }), 6).forEach(function (t) { outer.push({ d: "s_learn", it: { t: "topic", id: t.id, fa: t.title || "موضوع", st: "open" } }); });
+    newest(S.all("achat", function (x) { return x.tour; }), 4).forEach(function (x) { outer.push({ d: null, it: { t: "tour", id: x.id, fa: "🧭 " + (x.title || "تور"), st: x.tour.masteredAt ? "practised" : x.tour.doneAt ? "working" : "open", refs: [].concat.apply([], x.tour.facets.map(function (f) { return (f.refs || []).map(function (r) { return r.id; }); })) } }); });
     var col = { open: "#94a3b8", working: "#f59e0b", practised: "#10b981", returned: "#ef4444", done: "#10b981", approved: "#10b981", pending: "#f59e0b" };
     var P = {};
     outer.forEach(function (o, i) { var a = -Math.PI / 2 + 2 * Math.PI * i / Math.max(1, outer.length); P[o.it.id] = [cx + R2 * Math.cos(a), cy + R2 * Math.sin(a)]; });
@@ -32708,7 +32712,7 @@ APP.goFromURL = function (q) {
         function cell(v, n) { return h("td", { title: "نمونه: " + fa(n) }, v == null ? "— (" + fa(n) + ")" : fa(v) + " (" + fa(n) + ")"); }
         /* بُعدِ «داوریِ معرفتی» ⇒ پرونده‌های کارخانه (همان‌جا که این عددها از آن می‌آیند) */
         return h("tr", { "data-dim": d.id }, h("td", {}, d.id === "s_epi" ? h("button", { class: "linkish mind-dim-epi", type: "button", title: "پرونده‌های سنجش در کارخانهٔ معرفت‌شناسی", onclick: function () { A.go("e_cases"); } }, d.fa + " ↗") : d.fa), cell(d.ix.acc, d.n.acc), cell(d.ix.cal, d.n.cal), cell(d.ix.ret, d.n.ret), cell(d.ix.knot, d.n.knot),
-          h("td", {}, d.score == null ? "—" : fa(d.score)), h("td", {}, d.band), h("td", {}, d.trend == null ? "—" : (d.trend >= 0 ? "▲ " : "▼ ") + fa(Math.abs(d.trend))));
+          h("td", {}, d.score == null ? "—" : fa(d.score)), h("td", {}, d.band), h("td", { title: d.trendFrom ? "از " + d.trendFrom + " تا " + d.trendTo : "" }, d.trend == null ? "— (کمتر از دو ماهِ سنجیده)" : (d.trend > 0 ? "▲ " : d.trend < 0 ? "▼ " : "▬ ") + fa(Math.abs(d.trend)) + (d.trendFrom ? " (" + fa(d.trendFrom) + " ← " + fa(d.trendTo) + ")" : "")));
       })))));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
