@@ -19926,7 +19926,8 @@ var APP = window.APP = {};
         h("li", {}, "سازنده‌های برنامه‌وارِ نمونه در ورزشِ گره (کوزهٔ آب، قاعدهٔ پنهان، کارت‌های واسون، نرخِ پایه، زنجیرهٔ حافظه، قیدِ پنهان، نمادگذاری، ترجمهٔ شرط به رابطه، آزمونِ ابعاد)"),
         h("li", {}, "۱۳ مسئلهٔ بزرگِ آماده و ۲۰ مسئلهٔ کوتاهِ تمرینیِ ریاضی (و حرکت‌ها و تمرین‌هایی که از آن‌ها ساخته می‌شود)")),
       h("p", { class: "small muted" }, "پنهان‌بودن چیزی را پاک نمی‌کند: نمونه‌هایی که قبلاً ساخته‌ای و پیشرفتت می‌مانند، و پرونده‌های بک‌تستِ کارخانه همیشه سر جایشان‌اند."),
-      h("label", { class: "chk", for: "showSamples" }, h("input", { type: "checkbox", id: "showSamples", checked: st.samples === true, onchange: function (e) { st.samples = e.target.checked; S.saveSettings(st); A.toast(e.target.checked ? "نمونه‌های آماده نشان داده می‌شوند." : "نمونه‌های آماده پنهان شدند."); } }), "نمونه‌های آمادهٔ سازنده را هم نشان بده")));
+      h("label", { class: "chk", for: "showSamples" }, h("input", { type: "checkbox", id: "showSamples", checked: st.samples === true, onchange: function (e) { st.samples = e.target.checked; S.saveSettings(st); A.toast(e.target.checked ? "نمونه‌های آماده نشان داده می‌شوند." : "نمونه‌های آماده پنهان شدند."); } }), "نمونه‌های آمادهٔ سازنده را هم نشان بده")),
+      h("p", {}, h("label", { class: "chk", for: "practiceProbs" }, h("input", { type: "checkbox", id: "practiceProbs", checked: st.practiceProbs === true, onchange: function (e) { st.practiceProbs = e.target.checked; S.saveSettings(st); A.toast(e.target.checked ? "مسئله‌های کوتاهِ تمرینی نشان داده می‌شوند." : "مسئله‌های کوتاهِ تمرینی پنهان شدند."); } }), "مسئله‌های کوتاهِ تمرینی (ریاضیِ خنثی، برای تمرینِ حرکت‌ها و شبیه‌ساز) را نشان بده")));
     var jg = h("textarea", { id: "jg", rows: 3, "aria-label": "واژه‌های تخصصی (با ویرگول جدا کن)" }); jg.value = (st.jargon || []).join("، ");
     root.appendChild(h("div", { class: "card" }, h("h3", {}, "فهرست اصطلاحات شخصی برای تحلیلگر فاینمن"), h("p", { class: "small muted" }, "واژه‌هایی که در حوزه خودت اصطلاح فنی محسوب می‌شوند (با «،» جدا کن). فهرست پایه: " + C.JARGON_SEED.slice(0, 18).join("، ") + "…"),
       jg, h("button", { class: "btn", onclick: function () { st.jargon = jg.value.split(/[،,\n]/).map(function (x) { return x.trim(); }).filter(Boolean); S.saveSettings(st); A.toast("ذخیره شد."); } }, "ذخیره")));
@@ -21745,7 +21746,14 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   function samplesOn() { return !!(A.showSamples && A.showSamples()); }
   function mineP() { return approvedRecs().filter(function (r) { return !recErr(r); }).map(function (r) { return r.p; }); }
   function sampleP() { return window.EPI_PROBLEMS || []; }
-  function probs() { return mineP().concat(samplesOn() ? sampleP() : []); }
+  /* مسئله‌های کوتاهِ تمرینیِ خنثی (ریاضی، بی موضوعِ بازار؛ set=book4) با یک کلیک (تنظیمات یا دکمهٔ «فهرست خالی است») روشن می‌شوند — پیش‌فرض پنهان، طبقِ قاعدهٔ مالک (WORKLOG 21)
+     (ممیزیِ پوشش ۲۰۲۶-۱۰-۱۵: «صفحهٔ حرکت‌ها و فهرستِ مسئله پیش‌فرض خالی است»)؛ 
+     نمونه‌های تاریخیِ سازنده مثلِ پیش فقط با «نمونه‌های آمادهٔ سازنده». */
+  function practiceOn() { try { return S.settings().practiceProbs === true; } catch (e) { return false; } }
+  function practiceP() { return sampleP().filter(function (p) { return p.set === "book4" && p.neutral === true; }); }
+  A.practiceOn = practiceOn; A.practiceEnable = function () { var st = S.settings(); st.practiceProbs = true; S.saveSettings(st); A.toast("۲۰ مسئلهٔ کوتاهِ تمرینی روشن شد."); A.render(); };
+  A.practiceCta = function () { return practiceOn() || samplesOn() ? null : h("p", { class: "card soft small practice-cta" }, "مسئله‌ای برای تمرین نیست. ", h("button", { class: "btn sm", type: "button", onclick: A.practiceEnable }, "۲۰ مسئلهٔ کوتاهِ تمرینی را روشن کن"), " (ریاضیِ خنثی؛ در تنظیمات هم خاموش و روشن می‌شود)"); };
+  function probs() { return mineP().concat(samplesOn() ? sampleP() : practiceOn() ? practiceP() : []); }
   function allP() { return mineP().concat(sampleP()); }
   A.probsMine = mineP; A.probIsSample = function (p) { return sampleP().indexOf(p) >= 0; };
   function brokenRecs() { return approvedRecs().map(function (r) { return { r: r, err: recErr(r) }; }).filter(function (x) { return x.err; }); }
@@ -21778,6 +21786,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     if (tab === "inject") { root.appendChild(inject()); return root; }
     if (tab === "pending") { root.appendChild(pending()); return root; }
     var mine = mineP();
+    if (!mine.length && A.practiceCta) { var pcta = A.practiceCta(); if (pcta) root.appendChild(pcta); }
     if (!mine.length) root.appendChild(h("section", { class: "card pb-empty", dir: "rtl" }, h("h2", {}, "هنوز مسئله‌ای وارد نکرده‌ای"),
       h("p", {}, "مسئله‌ها را تو می‌آوری: صورتِ مسئله و پاسخی که سرانجام به دست آمد (از هر علمی). سیستم مسیرِ حل را ریز می‌کند و شبیه‌سازش را می‌سازد."),
       h("div", { class: "row gap wrap" }, h("button", { class: "btn pb-goinject", onclick: function () { A.go("e_prob", null, "inject"); } }, "افزودنِ مسئلهٔ تو"),
@@ -22294,7 +22303,15 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
      ولی وارسیِ پاسخ‌ها (سه حلِ مستقل) و تأییدِ مالک دارد. فقط پس از دیدنِ پاسخ (یا پایانِ نردبان) پیشنهاد می‌شود، چون مسیرِ حل را آشکار می‌کند. */
   A.PROB_PERSONAL_INTRO = "تو دستیارِ «شبیه‌سازِ مسئلهٔ خودم» هستی. این مسئلهٔ تاریخی نیست: مسئله‌ای است که کاربر در آن گیر کرده و پاسخِ درستش را داده است. راهِ درستِ حل را (اگر چند راه هست، فهمیدنی‌ترینش را) به گام‌های تصمیم بشکن تا کاربر از سخت به آسان، با گزینه‌های مختلف، همهٔ قسمت‌هایش را تمرین کند و بفهمد کجا و چرا گیر کرد. ";
   A.PROB_PERSONAL_RULES = "\nقواعدِ این مسئلهٔ شخصی (برتر از هر چیزِ بالا): era ننویس؛ year و who را خالی بگذار؛ open خالی؛ src خالی. stages: ۴ تا ۱۰ گام؛ ctx = وضع تا این لحظه (چه داریم، چه به دست آمده) بی‌آنکه حرکتِ بعدی را لو بدهد؛ q = «حرکتِ بعدی چیست؟» به زبانِ همین مسئله؛ opts = ۳ یا ۴ گزینه با دقیقاً یک ok=true؛ گزینه‌های نادرست اشتباه‌های واقعی و رایج باشند (به‌ویژه همان‌جا که کاربر گیر کرد) و why بگوید چرا؛ move = حرکتِ درست به زبانِ ساده؛ idea = ایدهٔ پشتش؛ hint = سرنخی که پاسخ را لو نمی‌دهد؛ lvl از ۱ (آسان) تا ۵ (سخت). dead: راه‌های رایجِ اشتباه یا بن‌بست، با idea و flaw (who و year خالی). why_hard: چرا این مسئله گیرانداز است، به‌ویژه در همان جایی که کاربر گیر کرد. lessons: ۲ تا ۴ درسِ قابلِ انتقال. drills: ۳ تا ۵ پرسشِ چندگزینه‌ای دربارهٔ همین گام‌ها (a = شمارهٔ از صفرِ گزینهٔ درست). هر گام و هر تمرین دقیقاً یک پاسخِ قابلِ‌دفاع داشته باشد. نامِ آدمِ واقعی نیاور. kind: «find» اگر باید چیزی پیدا شود، «prove» اگر باید حکمی ثابت شود، «pod» اگر باید درستی یا نادرستیِ حکمی نشان داده شود. udc: {\"u\": مجهول یا حکم، \"d\": داده‌ها یا فرض، \"c\": شرط و بخش‌هایش} — فقط خوانشِ صورت، بی هیچ اشاره به راهِ حل.";
-  function personalSys() { var ps = BT.PROB_SYS, i = ps.indexOf("خروجی فقط"); return A.PROB_PERSONAL_INTRO + (i >= 0 ? ps.slice(i) : ps) + (window.EPI_PIPE || []).join(", ") + A.PROB_PERSONAL_RULES; }
+  /* فهرستِ حرکت‌ها در پرامپتِ تجزیه از خودِ ثبت‌گاهِ حرکت‌ها (a19) ساخته می‌شود، نه فهرستِ دستیِ ثابت — حرکتِ تازه خودکار پیشنهاد می‌شود (قراردادِ AGENTS.md) */
+  function probSysText() {
+    var ps = BT.PROB_SYS, L = A.MOVE_LIST || [];
+    if (!L.length) return ps;
+    var i = ps.indexOf("mv_special ("), j = i >= 0 ? ps.indexOf("\n", i) : -1;
+    return i >= 0 && j > i ? ps.slice(0, i) + L.map(function (m) { return m.id + " (" + (m.fa || m.id) + ")"; }).join(", ") + ps.slice(j) : ps;
+  }
+  A.probSysText = probSysText;
+  function personalSys() { var ps = probSysText(), i = ps.indexOf("خروجی فقط"); return A.PROB_PERSONAL_INTRO + (i >= 0 ? ps.slice(i) : ps) + (window.EPI_PIPE || []).join(", ") + A.PROB_PERSONAL_RULES; }
   A.probPersonalSys = personalSys;
   function caseText(kc) {
     var it = kc.intake || {}, L = ["مسئله: " + (kc.title || "مسئلهٔ من")];
@@ -22416,7 +22433,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
         if ((!f.statement || !f.answer) && !fileIds.length) { A.toast(attShown && attAi ? "صورت و پاسخ لازم است — تایپ کن، یا فایلِ آن (عکس، PDF، Word…) را پیوست کن." : "عنوان، صورت و پاسخ لازم است (یا عکس/PDF ِ آن را پیوست کن).", "bad"); return; }
         b.disabled = true; b.textContent = fileIds.length ? "در حال خواندنِ پیوست و تجزیه…" : "در حال تجزیه…";
         var fromFile = fileIds.length ? "\n(" + fa(fileIds.length) + " پیوست همراهِ این پیام است (متنِ کاملش در ادامه): صورت" + (f.answer ? "" : " و پاسخ و حل") + "ِ مسئله را از آن بخوان؛ اگر چیزی در تصویر خوانا نیست، حدس نزن و در یادداشت بگو.)" : "";
-        return A.callAIJson(BT.PROB_SYS + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + (f.statement || "(در پیوست)") + "\nپاسخ: " + (f.answer || "(در پیوست)") + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes + fromFile, fileIds.length ? { maxTokens: 8192, fileIds: fileIds } : { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
+        return A.callAIJson(probSysText() + window.EPI_PIPE.join(", "), "مسئله: " + f.title + "\nرشته: " + f.field + "\nبازه: " + f.open + "\nصورت: " + (f.statement || "(در پیوست)") + "\nپاسخ: " + (f.answer || "(در پیوست)") + "\nمنابع: " + f.src + "\nیادداشت: " + f.notes + fromFile, fileIds.length ? { maxTokens: 8192, fileIds: fileIds } : { maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); })
           .then(function (raw) {
             if (raw && typeof raw === "object" && !Array.isArray(raw) && (raw.src == null || (Array.isArray(raw.src) && !raw.src.length))) raw.src = f.src.split(/\n|\|/).map(function (x) { return x.trim(); }).filter(Boolean);
             var o = validP(raw);
@@ -31165,6 +31182,7 @@ APP.goFromURL = function (q) {
       h("p", {}, "این صفحه گام‌های مسئله‌هایی را که خودت آورده‌ای بر اساسِ «حرکتِ قاطعِ» هر گام کنار هم می‌گذارد و تمرینِ درهم را از همان‌ها می‌سازد. با اولین مسئلهٔ تأییدشده (از «مسئله‌های بزرگ» یا «شبیه‌سازِ همین مسئله» در گره‌گشا) پر می‌شود."),
       h("div", { class: "row gap wrap" }, h("button", { class: "btn", onclick: function () { A.go("e_prob", null, "inject"); } }, "افزودنِ مسئلهٔ تو")),
       A.samplesNote ? A.samplesNote("گام‌های «" + fa((window.EPI_PROBLEMS || []).length) + " مسئلهٔ آماده»ای که سازنده نوشته") : null));
+    if (!tagged.length && A.practiceCta) { var cta = A.practiceCta(); if (cta) root.appendChild(cta); }
     root.appendChild(h("p", { class: "small muted" }, fa(tagged.length) + " گام از " + fa(ps.length) + " مسئله برچسبِ حرکت دارند" + (A.showSamples && A.showSamples() ? " (با نمونه‌های آمادهٔ سازنده)" : " (فقط مسئله‌های خودت)") + "."));
     root.appendChild(h("div", { class: "mv-grid" }, MOVES.map(function (m) {
       var st = A.moveStages(m.id), np = {}; st.forEach(function (x) { np[x.p.id] = 1; });

@@ -600,6 +600,7 @@
       h("p", {}, "این صفحه گام‌های مسئله‌هایی را که خودت آورده‌ای بر اساسِ «حرکتِ قاطعِ» هر گام کنار هم می‌گذارد و تمرینِ درهم را از همان‌ها می‌سازد. با اولین مسئلهٔ تأییدشده (از «مسئله‌های بزرگ» یا «شبیه‌سازِ همین مسئله» در گره‌گشا) پر می‌شود."),
       h("div", { class: "row gap wrap" }, h("button", { class: "btn", onclick: function () { A.go("e_prob", null, "inject"); } }, "افزودنِ مسئلهٔ تو")),
       A.samplesNote ? A.samplesNote("گام‌های «" + fa((window.EPI_PROBLEMS || []).length) + " مسئلهٔ آماده»ای که سازنده نوشته") : null));
+    if (!tagged.length && A.practiceCta) { var cta = A.practiceCta(); if (cta) root.appendChild(cta); }
     root.appendChild(h("p", { class: "small muted" }, fa(tagged.length) + " گام از " + fa(ps.length) + " مسئله برچسبِ حرکت دارند" + (A.showSamples && A.showSamples() ? " (با نمونه‌های آمادهٔ سازنده)" : " (فقط مسئله‌های خودت)") + "."));
     root.appendChild(h("div", { class: "mv-grid" }, MOVES.map(function (m) {
       var st = A.moveStages(m.id), np = {}; st.forEach(function (x) { np[x.p.id] = 1; });
