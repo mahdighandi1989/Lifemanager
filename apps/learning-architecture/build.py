@@ -243,7 +243,10 @@ def plan():
 
 def existing_generated():
     out = set()
+    norms = os.path.join(ASSETS, "norms")
     for root, _, names in os.walk(ASSETS):
+        if root == norms or root.startswith(norms + os.sep):
+            continue   # تصویرهای معماها را copy_norm_images می‌گرداند؛ پیش‌تر sync آن‌ها را «کهنه» می‌دید و پاک می‌کرد (بازبینِ بدبین ۲۰۲۶-۱۰-۱۵: معماها روی Render بی‌تصویر بودند)
         for n in names:
             out.add(os.path.join(root, n))
     return out
@@ -259,6 +262,17 @@ def check():
             problems.append("out of date: %s — run: python apps/learning-architecture/build.py" % rel)
     for p in sorted(existing_generated() - set(files)):
         problems.append("stale file %s (not produced by the current sources) — run the build" % os.path.relpath(p, REPO))
+    src, dst = os.path.join(B, "norms", "img"), os.path.join(ASSETS, "norms", "img")
+    want = set(os.listdir(src)) if os.path.isdir(src) else set()
+    have = set(os.listdir(dst)) if os.path.isdir(dst) else set()
+    for f in sorted(want - have):
+        problems.append("missing puzzle image frontend/public/assets/lla/norms/img/%s — run: python apps/learning-architecture/build.py" % f)
+    for f in sorted(have - want):
+        problems.append("stale puzzle image frontend/public/assets/lla/norms/img/%s — run the build" % f)
+    for f in sorted(want & have):
+        with open(os.path.join(src, f), "rb") as a, open(os.path.join(dst, f), "rb") as b:
+            if a.read() != b.read():
+                problems.append("out of date puzzle image frontend/public/assets/lla/norms/img/%s — run the build" % f)
     return problems
 
 
