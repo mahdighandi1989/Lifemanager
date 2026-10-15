@@ -1,0 +1,16 @@
+{
+ "id": "h20261015184447447811-backtest-1b57",
+ "at": "2026-10-15T18:44:47Z",
+ "by": "backtest",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "روتینِ بک‌تست (اجرا در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵) در قلمروِ صفحه: a7_bt.js (نگاشتِ «ظنی» ⇒ matter «مقدمه ظنی» + prem_p؛ 18412ef)، epi_problems.js (رمزگذاریِ کورِ دوبارهٔ تصدیق‌های مسئله‌ها، فقط خانهٔ خالی؛ 8057443، 49f32e5)، آزمون‌ها: test_matter_zanni.js (تازه)، test_plausible/test_expert_field/test_measured_precedence (هماهنگ با پیکرهٔ رمزگذاری‌شده و قاب‌های بی scope)، test_problems_a (هش با دلیل). هم‌ارزِ دست‌به‌دست‌های session ِ همین کارها (…796f، …8200، …ec59، …abed). همهٔ ۶۰ آزمونِ صفحه سبز.",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "49f32e5",
+ "status": "open"
+}
