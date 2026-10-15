@@ -60,7 +60,7 @@ const capOf = (id, f) => X.capOf(cfg, RULES.find(r => r.id === id), Object.assig
 info.conseq = [0, 1, 3, 9].map(n => run({ x_conseq_n: n, x_conseq_new: NEW, conf: 99 }).ceil);
 chk(JSON.stringify(info.conseq) === '[50,67,80,91]', 'novel consequences: 0 ⇒ 50, 1 ⇒ 67, 3 ⇒ 80, 9 ⇒ 91 ' + JSON.stringify(info.conseq));
 chk(run({ x_conseq_n: 3, x_conseq_new: NEW, conf: 99 }).bind === 'r_aql_conseq' && run({ x_conseq_n: 3, x_conseq_new: NEW, conf: 99 }).fired.indexOf('r_aql_nondeductive') >= 0, 'binds while r_aql_nondeductive still fires (T_weakest)');
-chk(capOf('r_aql_conseq', { x_conseq_n: 9, x_conseq_new: OLD }) === 50 && ['نامعلوم', undefined].every(v => Math.abs(capOf('r_aql_conseq', { x_conseq_n: 9, x_conseq_new: v }) - (50 + 0.5 * (1000 / 11 - 50))) < 1e-9), 'known-before novelty ⇒ n = 0 ⇒ 50 (T_null); unknown / missing novelty ⇒ T_support ½·(n+1)/(n+2) + ¼ (p_found_mixture)');
+chk(capOf('r_aql_conseq', { x_conseq_n: 9, x_conseq_new: OLD }) === 50 && Math.abs(capOf('r_aql_conseq', { x_conseq_n: 9, x_conseq_new: 'نامعلوم' }) - (50 + 0.5 * (1000 / 11 - 50))) < 1e-9 && Math.abs(capOf('r_aql_conseq', { x_conseq_n: 9 }) - 1000 / 11) < 1e-9, 'known-before novelty ⇒ 50 (T_null); «نامعلوم» ⇒ T_support ½·(n+1)/(n+2) + ¼; unwritten ⇒ sup over its values (epi_feat convention)');
 chk(capOf('r_aql_conseq', { x_conseq_n: 100000, x_conseq_new: NEW }) < 100, 'never 100');
 let mono = true; for (let n = 0; n < 50; n++) if (capOf('r_aql_conseq', { x_conseq_n: n + 1, x_conseq_new: NEW }) < capOf('r_aql_conseq', { x_conseq_n: n, x_conseq_new: NEW })) mono = false;
 chk(mono, 'a confirmed new consequence never lowers the ceiling (A1+A3)');
@@ -74,7 +74,7 @@ info.analogy = { k3n4: capOf('r_aql_analogy', { x_analog_n: 4, x_analog_k: 3, x_
 const A = info.analogy;
 chk(Math.abs(A.k3n4 - 400 / 6) < 1e-9 && Math.abs(A.k0n4 - 100 / 6) < 1e-9 && Math.abs(A.k9n9 - 1000 / 11) < 1e-9, 'analogy (k+1)/(n+2) ' + JSON.stringify(A));
 const MIX9 = 50 + 0.5 * (1000 / 11 - 50);
-chk([A.sup, A.unk, A.noRel].every(x => Math.abs(x - MIX9) < 1e-9) && A.noK === 50, 'relation not shown (superficial / unknown / missing) ⇒ T_support ½·(k+1)/(n+2) + ¼; unknown k ⇒ ½ (A4 average) ' + JSON.stringify(A));
+chk([A.sup, A.unk].every(x => Math.abs(x - MIX9) < 1e-9) && Math.abs(A.noRel - 1000 / 11) < 1e-9 && A.noK === 50, 'relation not shown (superficial / unknown) ⇒ T_support ½·(k+1)/(n+2) + ¼; unwritten ⇒ sup; unknown k ⇒ ½ (A4 average) ' + JSON.stringify(A));
 chk(Math.abs(A.kOver - 75) < 1e-9, 'k is clipped to n');
 chk(run({ x_analog_n: 9, x_analog_k: 9, x_analog_rel: 'فقط همانندیِ ظاهری', conf: 85 }).flags.some(f => f.st === 'st_aql'), 'superficial analogy at 85 flags st_aql');
 // ۵) پیکره

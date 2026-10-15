@@ -75,7 +75,7 @@
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
       if (r.eff === "cap" && yl[r.id]) { yielded.push({ rule: r.id, to: yl[r.id] }); return; }
-      if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r, f, k)); caps.push([r, c]); if (c < ceil) { ceil = c; bind = r; } }
+      if (r.eff === "cap") { var raw = capOf(cfg, r, f, k), c = 100 - w * (100 - raw), e = [r, c]; e.raw = raw; e.route = !!(FDy && FDy.lastRoute); if (FDy) FDy.lastRoute = false; caps.push(e); if (c < ceil) { ceil = c; bind = r; } }
       else if (r.eff === "flag") stScore[r.st] = (stScore[r.st] || 0) + w;
     });
     if (FDy && FDy.routeGuard && caps.length > 1) { var g2 = FDy.routeGuard(caps); if (g2 !== caps) { caps = g2; ceil = 100; bind = null; caps.forEach(function (x) { if (x[1] < ceil) { ceil = x[1]; bind = x[0]; } }); } }   // p_found_mixture D4

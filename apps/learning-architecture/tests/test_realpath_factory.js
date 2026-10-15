@@ -72,7 +72,7 @@ const W = ms => new Promise(r => setTimeout(r, ms));
   await p.locator('#fe_c1_qarina').selectOption('بی‌قرینه'); await W(700);
   e = await U.read();
   info.b5a = e.engs[0];
-  chk(/سقف اعتبار موجه: ۵۵[٫.][۴۵]٪/.test(e.engs[0]), 'B5: hand-set unproven premise/no corroboration, membership not stated ⇒ T_support ½ + ½(60.9 − ½) ≈ 55.5, not 61 and not ½: ' + e.engs[0]);
+  chk(/سقف اعتبار موجه: ۶۰٫۹٪/.test(e.engs[0]), 'B5: membership not stated ⇒ sup of both states (unwritten feature convention, RR2): max(60.9, mixture) = 60.9 — the hand-set unproven premise (¾) does not bind: ' + e.engs[0]);
   await U.st(cid, 'st_expert'); await U.sel('xsame', 'عیناً همان یافتهٔ منتشرشده است');
   e = await U.engine(cid); info.b5b = e.engs[0];
   chk(/سقف اعتبار موجه: ۶۰٫۹٪/.test(e.engs[0]), 'B5/B6: claim = the finding itself ⇒ the frame\'s own unproven premise yields to the measured 60.9 (shown «۶۰٫۹», not «۶۱»): ' + e.engs[0]);

@@ -41,8 +41,12 @@ chk(['p_sense_unctrl', 'p_hidden_inf', 'p_hidden_factor'].every(b => near(m[b].p
 chk(['p_expert_bias', 'p_mem'].every(b => m[b].p === 50 && !F.BASE[b].fav), 'neutral bases unmeasured ⇒ ½');
 // ۴) routeGuard
 const R1 = X.RM.r_yad_orig_t1, R2 = X.RM.r_yad_undoc, R3 = X.RM.r_aql_matter_unproven;
-chk(F.routeGuard([[R1, 35], [R2, 35]]).every(x => x[1] === 35), 'one condition (memory) with two rules is not two conditions');
-chk(F.routeGuard([[R1, 35], [R3, 75]]).map(x => x[1]).join() === '50,75', 'two unestablished route conditions and r < ½ ⇒ the low cap rises to ½');
+const E = (r, c, route) => { const e = [r, c]; e.raw = c; e.route = route; return e; };
+chk(F.routeGuard([E(R1, 35, true), E(R2, 35, true)]).every(x => x[1] === 35), 'one condition (memory) with two rules is not two conditions');
+chk(F.routeGuard([E(R1, 35, true), E(R3, 75, true)]).map(x => x[1]).join() === '50,75', 'two unestablished route conditions and r < ½ ⇒ the low cap rises to ½');
+chk(F.routeGuard([E(R1, 35, false), E(R3, 75, true)]).map(x => x[1]).join() === '35,75', 'an established or truth-condition cap is never lifted (RR2)');
+chk(cap('r_naql_ahad', { chain: 'تک‌منبع', narrator: 'نامعلوم' }) > 74 && cap('r_naql_ahad', { chain: 'تک‌منبع', narrator: 'نامعلوم' }) < 75 && cap('r_naql_ahad', { chain: 'تک‌منبع', narrator: 'غیرموثق' }) === 50, 'the trusted-narrator base applies only to a trusted or unwritten narrator (RR2)');
+chk(cap('r_yad_orig_t1', { mem_orig: 20 }) === 50 && cap('r_aql_conseq', { x_conseq_n: 1 }) > 66 && cap('r_aql_analogy', { x_analog_n: 1, x_analog_k: 1 }) > 66, 'unwritten feature ⇒ sup over its values (epi_feat convention)');
 const k2 = X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 20, mem_doc: false, matter: 'مقدمه اثبات‌نشده', conf: 45 } }, cfg);
 chk(k2.ceil === 50 && !k2.over, 'engine applies the guard ' + JSON.stringify([k2.ceil, k2.bind]));
 // ۵) پیکره و دفتر

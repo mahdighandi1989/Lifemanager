@@ -49,17 +49,20 @@ const ceilings = (frame, relay) => { const s = S.find(x => x.id === frame), out 
 const one = (o) => Object.keys(o).length === 1 ? Object.keys(o)[0] : JSON.stringify(o);
 const N = { camerer2016_eerp: 18, osc2015_rpp: 97, camerer2018_ssrp: 21 };
 // p_found_mixture (۲۰۲۶-۱۰-۱۵): راهِ رسیدنِ دیگر ⇒ حلقهٔ بازگویی شرطِ راه است ⇒ T_support ½ + ½(p − ½): ۵۵ / ۵۵٫۴ / ۴۳٫۲ (نه ½ ِ T_weakest)
-const EXP = { camerer2016_eerp: ['60 r_expert_pop_econ', '55 r_expert_pop_econ'], camerer2018_ssrp: ['61 r_expert_pop_socsci', '55 r_expert_pop_socsci'], osc2015_rpp: ['36 r_expert_pop_psych', '43 r_expert_pop_psych'] };   // h…070f (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵): اعضای قاب دیگر scope «کلی نامحدود» ندارند ⇒ نه ۰ ِ T_universal، بلکه ۳۶٫۴ ِ جمعیت (کمینه در هر دو راه)
+const EXP = { camerer2016_eerp: ['60 r_expert_pop_econ', '55 r_expert_pop_econ', '60 r_expert_pop_econ'], camerer2018_ssrp: ['61 r_expert_pop_socsci', '55 r_expert_pop_socsci', '61 r_expert_pop_socsci'], osc2015_rpp: ['36 r_expert_pop_psych', '50', '43 r_expert_pop_psych'] };   // h…070f (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵): اعضای قاب دیگر scope «کلی نامحدود» ندارند ⇒ نه ۰ ِ T_universal، بلکه ۳۶٫۴ ِ جمعیت (کمینه در هر دو راه)
 const info = { engine: {} };
 Object.keys(EXP).forEach(fr => { const d = ceilings(fr, DIRECT), rl = ceilings(fr, RELAYED), u = ceilings(fr, 'نامعلوم'), no = ceilings(fr, undefined);
   info.engine[fr] = { direct: one(d), relayed: one(rl), unknown: one(u), none: one(no) };
   chk(one(d) === EXP[fr][0] && d[EXP[fr][0]] === N[fr], fr + ' direct ⇒ ' + EXP[fr][0] + ' ' + JSON.stringify(d));
-  [rl, u, no].forEach((o, i) => chk(one(o) === EXP[fr][1] && o[EXP[fr][1]] === N[fr], fr + ' ' + ['relayed', 'unknown', 'no x_relay'][i] + ' ⇒ ' + EXP[fr][1] + ' ' + JSON.stringify(o))); });
+  // روان‌شناسی با راهِ دیگر: آمیزهٔ ۴۳٫۲ زیرِ ½ است و کنارِ مقدمهٔ احرازنشدهٔ اعضای قاب دو شرطِ راهِ احرازنشده‌اند ⇒ پاسبانِ D4 ⇒ ½ (F.routeGuard)
+  const all50 = (o) => Object.keys(o).every(key => /^50 /.test(key)) && Object.values(o).reduce((a, b) => a + b, 0) === N[fr];
+  [rl, u].forEach((o, i) => chk(EXP[fr][1] === '50' ? all50(o) : (one(o) === EXP[fr][1] && o[EXP[fr][1]] === N[fr]), fr + ' ' + ['relayed', 'unknown'][i] + ' ⇒ ' + EXP[fr][1] + ' ' + JSON.stringify(o)));
+  chk(one(no) === EXP[fr][2] && no[EXP[fr][2]] === N[fr], fr + ' no x_relay (unwritten ⇒ sup of both states, no precedence) ⇒ ' + EXP[fr][2] + ' ' + JSON.stringify(no)); });
 const fx = (relay, conf, extra, member) => X.runClaim({ id: 'k', member: member === undefined ? true : member, f: Object.assign({ way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', qarina: 'بی‌قرینه', matter: 'مقدمه اثبات‌نشده',
   x_field: FM.x_field.v[0], conf }, relay ? { x_relay: relay } : {}, extra || {}) }, base);
 chk(!fx(DIRECT, 60).over && fx(DIRECT, 61).over && fx(DIRECT, 61).flags.every(f => f.st === 'st_expert') && fx(DIRECT, 61).yielded.length === 3, 'direct econ: over 60 flags only st_expert; three caps yielded');
 chk(!fx(RELAYED, 55).over && fx(RELAYED, 56).over && fx(RELAYED, 56).bind === 'r_expert_pop_econ' && !fx(RELAYED, 56).yielded, 'relayed econ: no precedence; population cap becomes T_support 55 (relay link unestablished)');
-chk(!fx(DIRECT, 55, {}, null).over && fx(DIRECT, 56, {}, null).over && !fx(DIRECT, 56, {}, null).yielded && fx(DIRECT, 56, {}, false).over, 'direct but member unknown or «beyond» ⇒ no precedence, T_support 55 (membership not established)');
+chk(!fx(DIRECT, 60, {}, null).over && fx(DIRECT, 61, {}, null).over && fx(DIRECT, 56, {}, false).over && !fx(DIRECT, 56, {}, false).yielded, 'direct, member unwritten ⇒ sup of both states (60); «beyond» ⇒ no precedence, T_support 55');
 chk(fx(DIRECT, 51, { x_bias: true }).ceil === 50 && fx(DIRECT, 51, { x_bias: true }).bind === 'r_expert_bias', 'a cap outside the frame condition (bias) still binds');
 chk(fx(DIRECT, 99, { x_field: 'نامعلوم' }).ceil === 50 && !fx(DIRECT, 99, { x_field: 'نامعلوم' }).yielded, 'unknown population ⇒ no precedence (½)');
 const w0 = Object.assign({}, base, { w: { r_expert_pop_econ: 0 } });

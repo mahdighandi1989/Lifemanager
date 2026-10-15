@@ -51,7 +51,7 @@
         "(T_conflict، T_universal، T_against، T_null) کرانِ C‌اند و کمینه با آن‌ها درست می‌ماند. ولی وقتی دو شرطِ راهِ احرازنشده با هم‌اند و r < ½، همبستگی می‌تواند P(همه) را به ۰ برساند ⇒ زبرین ½؛ " +
         "پس سقف‌های راهیِ زیرِ ½ در کنارِ شرطِ راهیِ احرازنشدهٔ دیگر به ½ می‌رسند (F.routeGuard). " +
         "۷) پیش‌فرض‌های صریح (نه پنهان؛ بازبینِ PC2): A4 در همان سطحی به کار می‌رود که رمزگذاری نادانی را می‌گوید (S، و C با فرضِ ¬S؛ و روی شمارها، نه پیکربندی‌ها — همان انتخابِ T_next/T_pop)؛ " +
-        "ویژگیِ ننوشته = این راه دلیلی نداده؛ «ضعیف» (روش، سند) و «غیرموثق» = راهی که خودش دلیلی نمی‌دهد (q = ۰، تعریفِ سامانه هم‌ساز با r_expert_out_of_field). ∎",
+        "ویژگیِ ننوشته ⇒ زبرین روی همهٔ مقدارهایش (قراردادِ epi_feat: روی مقدارِ ننوشته هیچ قاعده‌ای ادعا نمی‌کند؛ بازبینِ RR2)، و «نامعلوم» ِ نوشته = این راه دلیلی نداده (A4)؛ «ضعیف» (روش، سند) و «غیرموثق» = راهی که خودش دلیلی نمی‌دهد (q = ۰، تعریفِ سامانه هم‌ساز با r_expert_out_of_field). ∎",
       from: ["A1", "A2", "A3", "A4"] },
     T_against: { fa: "قرینهٔ خلاف ⇒ کمتر از ½", proof: "قرینه‌ای که حالتِ مقابل را ترجیح می‌دهد، تقارنِ A4 را به سودِ نقیض می‌شکند؛ A2 ⇒ احتمالِ خودِ گزاره < ½.", from: ["A4", "A2"] },
     /* بازبینِ مستقلِ برهان (PC2، ۲۰۲۶-۱۰-۱۵): قرینهٔ T_against که تا امروز فقط در نثرِ F.DEG بود */
@@ -70,7 +70,7 @@
         "۳) پس (k_j+1)/(n_j+2) ِ T_pop (از A3 و A4، راهِ شمارهای متناهی) مستقیماً روی همان رده سنجیده شده است: «از جمعیتِ j و دارای همین شرط» — همان رده‌ای که قاعده دربارهٔ آن حکم می‌کند. " +
         "پس برای این رده دلیل هست و مقدمهٔ A4 ِ گامِ ۱ («هیچ دلیلی») کاذب است؛ T_unknown به این رده نمی‌رسد. (نه از راهِ کرانِ پایینِ A1 — آن فقط وقتی است که تصدیق شرط را لازم آورد، p_found_mixture.) " +
         "۴) نتیجهٔ گامِ ۳: برای این رده آن قاعده دیگر دلیلِ بیش‌اطمینانی نیست و ایستگاهش پرچم نمی‌خورد؛ سقف همان T_pop است — چه (k_j+1)/(n_j+2) بیش از ½ باشد چه نه (وقتی ≤ ½ است عدد همان کمینه است و فقط نسبت‌دادنِ ایستگاه از گامِ ۳ می‌آید). " +
-        "۵) شرطِ عضویت: تصدیق خودش موردی از همان جمعیت است — به همان راهی به کنشگر رسیده که اعضای قاب (x_relay برابرِ قاب و نه «نامعلوم»؛ پس حلقهٔ بازگویی درونِ نرخِ سنجیده است) و کاربر گفته تصدیق عیناً همان یافته است (member === true؛ نامعلوم ⇒ عضویت احراز نشده). " +
+        "۵) شرطِ عضویت: تصدیق خودش موردی از همان جمعیت است — به همان راهی به کنشگر رسیده که اعضای قاب (x_relay برابرِ قاب و نه «نامعلوم»؛ پس حلقهٔ بازگویی درونِ نرخِ سنجیده است) و کاربر گفته تصدیق عیناً همان یافته است (member === true). راهِ دیگر، «نامعلوم» یا «فراتر» ⇒ عضویت احراز نشده؛ ننوشته ⇒ زبرینِ هر دو حالت: max(p_j، آمیزه) (قراردادِ epi_feat؛ بازبینِ RR2). " +
         "اگر یکی از این دو احراز نشده، صدقِ تصدیق از این راه حلقهٔ دیگری هم دارد (درستیِ بازگویی، یا رسیدن از یافته به تصدیق) که شرطِ راه است نه شرطِ صدق ⇒ تقدم نیست و سقفِ جمعیت به T_support می‌رود: ½ + ½·(p_j − ½). " +
         "۶) دو دسته سقف با این قضیه کنار نمی‌روند و کمینه (T_weakest) برایشان می‌ماند: " +
         "(الف) سقف‌هایی که موضوعِ دیگری دارند، مثلِ T_universal (حکمِ کلی بر دامنهٔ نامحدود)، T_against، T_conflict، T_null و T_ambig؛ برهانِ آن‌ها بر نبودِ دلیل نیست، یا گزارهٔ دیگری را می‌سنجد. " +
@@ -208,34 +208,46 @@
     next: function (f) { var n = +f.ind_n; if (!(n >= 0)) return null; return 100 * (n + 1) / (n + 2); },
     below1: function () { return 100 - F.EPS; },                       // T_below1: فقط «کمتر از یقین»
     belowHalf: function () { return 50 - F.EPS; },                     // T_against: «کمتر از ½»
-    orig: function (f, d) { var o = +f.mem_orig; if (!(o >= 0)) return null; var q = f.mem_doc === true ? 1 : F.baseVal(d.base || "p_mem") / 100; return Math.min(100 - F.EPS, F.mix(q, o)); },   // یادآوری: q·o + (1−q)·½ (سند ⇒ q = ۱ ⇒ o)
+    orig: function (f, d) { var o = +f.mem_orig; if (!(o >= 0)) return null;   // یادآوری: q·o + (1−q)·½ (سند ⇒ q = ۱ ⇒ o)
+      if (f.mem_doc === true) return Math.min(100 - F.EPS, o);
+      if (f.mem_doc !== false) return Math.min(100 - F.EPS, Math.max(o, 50));               // ویژگیِ ننوشته ⇒ زبرین روی همهٔ مقدارها (قراردادِ epi_feat: روی مقدارِ ننوشته هیچ ادعایی نیست)
+      var q = F.baseVal(d.base || "p_mem") / 100; return F.R(Math.min(100 - F.EPS, F.mix(q, o)), q === 0.5); },
     base: function (f, d) { return Math.min(F.baseVal(d.base), 100 - F.EPS); },
     /* T_plausible (p_plausible_reasoning): شمارِ ثبت‌نشده یا شرطِ احرازنشده ⇒ ½ — خودِ قضیه، نه عددِ جدا */
     conseq: function (f) { var n = +f.x_conseq_n; if (!(n >= 0)) return 50; var r = 100 * (n + 1) / (n + 2);
-      if (f.x_conseq_new === "تازه (پیش از پیش‌بینی دانسته نبود)") return Math.min(100 - F.EPS, r);
       if (f.x_conseq_new === "از پیش دانسته (فرضیه با آن ساخته شد)") return 50;                 // T_null
-      return Math.min(100 - F.EPS, F.mix(0.5, r)); },                                           // تازگیِ احرازنشده ⇒ T_support
+      if (f.x_conseq_new === "نامعلوم") return F.R(Math.min(100 - F.EPS, F.mix(0.5, r)), true);  // تازگیِ احرازنشده ⇒ T_support
+      return Math.min(100 - F.EPS, r); },                                                        // «تازه»، یا ننوشته ⇒ زبرین
     analogy: function (f) { var n = +f.x_analog_n, k = +f.x_analog_k; if (!(n >= 0) || !(k >= 0)) return 50;   // k یا n نامعلوم ⇒ میانگینِ A4 = ½
       k = Math.min(k, n); var r = 100 * (k + 1) / (n + 2);
-      return Math.min(100 - F.EPS, f.x_analog_rel === "احراز شد" ? r : F.mix(0.5, r)); },
+      if (f.x_analog_rel == null || f.x_analog_rel === "احراز شد") return Math.min(100 - F.EPS, r);   // ننوشته ⇒ زبرین
+      return F.R(Math.min(100 - F.EPS, F.mix(0.5, r)), true); },
     /* p_found_mixture — T_support: ½ + q(r − ½)؛ عدد را قضیه از ویژگی‌های همان تصدیق و پایه‌های سنجیده می‌سازد */
-    memprod: function (f, d) { var q = F.baseVal(d.base) / 100, o = +f.mem_orig; return Math.min(100 - F.EPS, F.mix(q, o >= 0 ? o : 100)); },
-    support: function (f, d) { if (f.x_about_route === true) return Math.min(100 - F.EPS, 100 * d.q); return Math.min(100 - F.EPS, F.mix(d.q, d.r)); },   // تصدیق دربارهٔ خودِ راه ⇒ C ⊨ S ⇒ T_weakest
+    memprod: function (f, d) { var q = F.baseVal(d.base) / 100, o = +f.mem_orig; return F.R(Math.min(100 - F.EPS, F.mix(q, o >= 0 ? o : 100)), q === 0.5); },
+    support: function (f, d) { if (f.x_about_route === true) return Math.min(100 - F.EPS, 100 * d.q); return F.R(Math.min(100 - F.EPS, F.mix(d.q, d.r)), d.q === 0.5); },   // تصدیق دربارهٔ خودِ راه ⇒ C ⊨ S ⇒ T_weakest
     supportBase: function (f, d) { if (f.x_about_route === true) return 50;
       if (f.chain === "گزارش‌های عرضی مستقل") return 100 - F.EPS;   // چند گزارشِ مستقل با وثاقتِ نامعلوم: P(دست‌کم یکی موثق) = ۱ − ½^m، m ناگفته ⇒ زبرین ۱ (T_tawatur) ⇒ فقط T_below1
-      return Math.min(100 - F.EPS, F.mix(0.5, F.baseVal(d.base))); },
+      return F.R(Math.min(100 - F.EPS, F.mix(0.5, F.baseVal(d.base))), true); },
     zanni: function (f) { var p = +f.prem_p; if (!(p >= 0 && p < 100)) return 100 - F.EPS; return Math.min(100 - F.EPS, f.x_about_route === true ? p : F.mix(p / 100, 100)); },
-    expertMix: function (f, d) { var v = f[d.key]; if (v === "ضعیف" || v === "خارج از تخصص") return 50; return Math.min(100 - F.EPS, F.mix(0.5, F.popOf(f))); },
-    thiqa: function (f, d) { if (f.chain === "گزارش‌های عرضی مستقل") return 100 - F.EPS; return Math.min(F.baseVal(d.base), 100 - F.EPS); },
-    pop: function (f, d, k) { var p = Math.min(F.baseVal(d.base), 100 - F.EPS); return F.memberOk(d.base, f, k) ? p : Math.min(100 - F.EPS, F.mix(0.5, p)); }
+    expertMix: function (f, d) { var v = f[d.key]; if (v === "ضعیف" || v === "خارج از تخصص") return 50; return F.R(Math.min(100 - F.EPS, F.mix(0.5, F.popOf(f))), true); },
+    /* بازبینِ RR2: پایهٔ «ناقلِ ثقه» فقط برای گزارشی که ناقلش «موثق» است یا ننوشته (زبرین)؛ «نامعلوم» ⇒ آمیزه؛ «غیرموثق» ⇒ T_null */
+    thiqa: function (f, d) { if (f.chain === "گزارش‌های عرضی مستقل") return 100 - F.EPS;
+      if (f.narrator === "غیرموثق") return 50;
+      if (f.narrator === "نامعلوم") return F.R(Math.min(100 - F.EPS, F.mix(0.5, F.baseVal(d.base))), true);
+      return Math.min(F.baseVal(d.base), 100 - F.EPS); },
+    pop: function (f, d, k) { var p = Math.min(F.baseVal(d.base), 100 - F.EPS), m = F.memberState(d.base, f, k), mx = Math.min(100 - F.EPS, F.mix(0.5, p));
+      return m === 1 ? p : m === 0 ? F.R(mx, true) : Math.max(p, mx); }   // عضویت: احرازشده ⇒ p؛ نه ⇒ آمیزه؛ ننوشته ⇒ زبرینِ هر دو
   };
   F.mix = function (q, r) { return 50 + q * (r - 50); };
   /* D4 ِ T_support (بازبینِ PC2): دو شرطِ راهِ احرازنشده با هم و r < ½ ⇒ زبرین ½ (همبستگی می‌تواند P(همه) را ۰ کند) — سقف‌های راهیِ زیرِ ½ به ½ می‌رسند؛ سقف‌هایی که خودِ C را می‌سنجند دست نمی‌خورند */
+  /* هر شاخه‌ای که از «شرطِ راهِ احرازنشده با A4» (q = ½) آمده نشان می‌خورد؛ پاسبان فقط همین‌ها را می‌بیند (بازبینِ RR2) */
+  F._route = false; F.R = function (v, isRoute) { if (isRoute) F._route = true; return v; };
   F.routeGuard = function (caps) {
-    var route = caps.filter(function (x) { var d = F.DER[x[0].id]; return d && d.th === "T_support"; });
-    var conds = {}; route.forEach(function (x) { conds[F.DER[x[0].id].cond || x[0].id] = 1; });   // یک شرط با چند قاعده (مثلاً «حافظه درست است» در r_yad_orig_* و r_yad_undoc_*) یک شرط است
-    if (Object.keys(conds).length < 2 || !route.some(function (x) { return x[1] < 50; })) return caps;
-    return caps.map(function (x) { return route.indexOf(x) >= 0 && x[1] < 50 ? [x[0], 50] : x; });
+    var route = caps.filter(function (x) { return x.route; });
+    var conds = {}; route.forEach(function (x) { conds[(F.DER[x[0].id] || {}).cond || x[0].id] = 1; });   // یک شرط با چند قاعده (مثلاً «حافظه درست است» در r_yad_orig_* و r_yad_undoc_*) یک شرط است
+    if (Object.keys(conds).length < 2 || !route.some(function (x) { return x.raw < 50; })) return caps;
+    return caps.map(function (x) { if (route.indexOf(x) < 0 || x.raw >= 50) return x;
+      var w = x.raw < 100 ? (100 - x[1]) / (100 - x.raw) : 1, y = [x[0], 100 - w * 50]; y.raw = 50; y.route = true; return y; });   // وزنِ قاعده حفظ می‌شود
   };
   /* پایهٔ جمعیتِ سنجیدهٔ همان تصدیق (x_field)، وگرنه ½ (T_pop با n = ۰ روی رده‌ای که تعریفش مساعد نیست) */
   F.popOf = function (f) {
@@ -244,15 +256,19 @@
     return b ? F.baseVal(b) : 50;
   };
   /* عضویتِ احرازشده در جمعیتِ قاب (گامِ ۵ ِ T_measured_precedence): همان راهِ رسیدنِ اعضای قاب (x_relay، نه «نامعلوم») و member === true */
-  F.memberOk = function (b, f, k) {
-    var pr = F.precedeOf(b), rel = pr && pr.relay;
-    return !!(rel && rel !== "نامعلوم" && f && f.x_relay === rel && k && k.member === true);
+  F.memberOk = function (b, f, k) { return F.memberState(b, f, k) === 1; };
+  /* ۱ = احرازشده (همان راهِ رسیدنِ قاب و member === true)؛ ۰ = نه (راهِ دیگر یا «نامعلوم»، یا member === false)؛ null = ننوشته (زبرین) */
+  F.memberState = function (b, f, k) {
+    var pr = F.precedeOf(b), rel = pr && pr.relay; f = f || {};
+    if ((k && k.member === false) || (f.x_relay != null && f.x_relay !== rel) || f.x_relay === "نامعلوم" || !rel) return 0;
+    if (f.x_relay === rel && k && k.member === true) return 1;
+    return null;
   };
   /* سقفِ قضیه‌ایِ یک قاعده برای یک تصدیق؛ null ⇒ همان عددِ قاعده (فقط وقتی قضیه عددِ ثابت می‌دهد، مثلِ ۰ یا ۵۰) */
   F.capFor = function (r, f, k) {
     var d = F.DER[r.id], cf = d && (d.cf || (r.capf));
     if (!cf || !F.CAPF[cf]) return null;
-    return F.CAPF[cf](f || {}, d, k);
+    F._route = false; var v = F.CAPF[cf](f || {}, d, k); F.lastRoute = F._route; F._route = false; return v;
   };
   F.capText = function (r) {
     var d = F.DER[r.id] || {}, cf = d.cf;
@@ -373,7 +389,7 @@
   F.condKeys = function (c) { return Object.keys(condKeys(c, {})); };
   F.yields = function (hit, f, k) {
     var out = {}, ids = {}, RM = {}; (hit || []).forEach(function (r) { ids[r.id] = 1; RM[r.id] = r; });
-    if (!k || k.member !== true) return out;   // عضویتِ نامعلوم ⇒ تقدم نیست (گامِ ۵؛ بازبینِ برهان ۲۰۲۶-۱۰-۱۵)
+    if (k && k.member === false) return out;   // member ِ ننوشته ⇒ زبرینِ هر دو حالت (سقفِ جمعیت max(p، آمیزه))، پس تقدم می‌ماند؛ «فراتر» ⇒ هیچ (بازبینِ RR2)
     var other = (k && k.other) || null;
     (hit || []).forEach(function (p) {
       var d = F.DER[p.id]; if (!d || d.th !== "T_pop") return;
