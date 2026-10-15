@@ -260,8 +260,7 @@
      "acted": true,
      "stakes": "زیاد",
      "inquiry": "ممکن بود و انجام نشد",
-     "matter": "مقدمه اثبات‌نشده",
-     "form": "نامعتبر"
+     "matter": "مقدمه اثبات‌نشده"
     },
     "recoded": [
      {
@@ -275,6 +274,18 @@
       "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): form: text shows independence assumption fails; conclusion doesn't follow",
       "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
       "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "form": [
+        "نامعتبر",
+        null
+       ]
+      },
+      "why": "بازبینِ مستقلِ دور (RR): دلیلِ «نامعتبر» (فرضِ استقلال نادرست بود) عیبِ ماده است و از سرانجامِ داستان (بیانیهٔ RSS، تجدیدنظر) آمده، نه عیبِ صورتی که در خودِ تصدیق پیداست ⇒ form خالی (نامعلوم) می‌ماند",
+      "encoder": "EA و EB (هم‌رأی: نامعتبر)",
+      "review": "RC پذیرفت؛ RR (بازبینِ مستقلِ دور، claude.ai/artifact/6b1F6uNgeqTqo2fd6Y455U) رد کرد ⇒ برداشته شد"
      }
     ]
    },

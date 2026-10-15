@@ -157,10 +157,10 @@ function recodeOne(target, u, today, log) {
     if (f[key] != null && f[key] !== u.set[key] && !u.replace) { e.push(key + ": مقدارِ دیگری دارد (" + f[key] + ") — بازنویسی فقط با replace و دلیل"); return; }
     if (f[key] !== u.set[key]) ch[key] = [f[key] == null ? null : f[key], u.set[key]];
   });
-  (u.unset || []).forEach((key) => { if (!FM[key]) e.push("کلیدِ ناشناخته: " + key); else if (f[key] != null) ch[key] = [f[key], null]; });
+  (u.unset || []).forEach((key) => { if (!FM[key]) e.push("کلیدِ ناشناخته: " + key); else if (f[key] != null) { if (!u.replace) e.push(key + ": برداشتنِ مقدارِ موجود (" + f[key] + ") فقط با replace و دلیل"); else ch[key] = [f[key], null]; } });
   if (e.length) return { e };
   return { apply: () => {
-    Object.keys(ch).forEach((key) => { if (ch[key][1] == null) delete f[key]; else f[key] = ch[key][1]; });
+    Object.keys(ch).forEach((key) => { ch[key][0] = f[key] == null ? null : f[key]; if (ch[key][1] == null) delete f[key]; else f[key] = ch[key][1]; });   // «از» در لحظهٔ اعمال
     if (u.member === true || u.member === false) { if (target.member !== u.member) ch.member = [target.member == null ? null : target.member, u.member]; target.member = u.member; }
     if (!Object.keys(ch).length) return 0;
     if (log) log[target.id] = ch;                                       // موردِ قاب: تاریخچه یک بار در خودِ قاب (نه تکرارِ دلیل در هر مورد)
@@ -170,7 +170,7 @@ function recodeOne(target, u, today, log) {
 }
 function recode(file) {
   const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
-  const today = new Date().toISOString().slice(0, 10), bad = [], todo = [], sFiles = {}, cFiles = {}, touched = {};
+  const today = new Date().toISOString().slice(0, 10), bad = [], todo = [], sFiles = {}, cFiles = {}, touched = {}, seenKey = {};
   for (const f of sampleFiles()) sFiles[f] = rd(path.join(SAMPLES, f), []);
   for (const f of corpusFiles()) cFiles[f] = rd(path.join(CORPUS, f), []);
   items.forEach((u, i) => {
@@ -192,7 +192,10 @@ function recode(file) {
       else { const k = (c.claims || []).filter((x) => x.id === u.claim)[0]; if (!k) e.push("تصدیقِ ناشناخته: " + u.case + "/" + u.claim); else targets = [k];
         Object.keys(cFiles).forEach((f) => { if (cFiles[f].indexOf(c) >= 0) touched["c:" + f] = 1; }); }
     } else e.push("frame یا case لازم است");
-    targets.forEach((t) => { const r = recodeOne(t, u, today, frameLog); if (r.e) e.push.apply(e, r.e); else todo.push(r.apply); });
+    targets.forEach((t) => {   // یک هدف و یک کلید دو بار در یک فایل ⇒ رد (وگرنه دومی بی‌صدا اولی را بازنویسی می‌کرد)
+      Object.keys(u.set || {}).concat(u.unset || [], u.member != null ? ["member"] : []).forEach((key) => {
+        const sig = (u.frame ? "s:" + u.frame : "c:" + u.case) + "/" + t.id + "/" + key; if (seenKey[sig]) e.push("دو ورودی برای یک هدف و یک کلید: " + sig); seenKey[sig] = 1; });
+      const r = recodeOne(t, u, today, frameLog); if (r.e) e.push.apply(e, r.e); else todo.push(r.apply); });
     if (frameObj && !e.length) todo.push(() => { if (Object.keys(frameLog).length) (frameObj.recoded = frameObj.recoded || []).push({ at: today, items: frameLog, why: u.why, encoder: u.encoder, review: u.review }); return 0; });
     if (e.length) bad.push({ i, frame: u.frame, case: u.case, claim: u.claim, errors: e });
   });
@@ -590,6 +593,10 @@ function run(note, rerun) {
       resolved: findings.filter((f) => f.status === "resolved").length, verified: findings.filter((f) => f.status === "verified").length },
     coverage: { rulesTested: tested, rules: RULES.length, sectionsTested: secs.size, sections: Object.keys(BOOK.sec).length, domains: Object.keys(doms).length,
       untested: RULES.filter((r) => !firedAll.has(r.id)).map((r) => r.id), byDomain: doms } };
+  /* Brier ِ سقف‌ها روی تصدیق‌های دارای سرانجام (k.truth) — همان عددی که پیش/پسِ هر اصلاح گزارش می‌شود؛ در دفتر تا قابلِ وارسی باشد */
+  { const cfgM = X.DEFAULT_CFG("mesbah"); let bs = 0, bn = 0;
+    cases.forEach((c) => { const r = X.runCase(c, cfgM); (c.claims || []).forEach((k, i) => { if (k.truth === true || k.truth === false) { const q = r.claims[i].ceil / 100 - (k.truth ? 1 : 0); bs += q * q; bn++; } }); });
+    row.brier = { claims: bn, ceil: bn ? +(bs / bn).toFixed(5) : null }; }
   const fnd = foundation(cases), b0 = books.mesbah || Object.values(books)[0] || { controls: {} };
   row.foundation = { classes: fnd.classes, modes: Object.fromEntries(Object.entries(fnd.modes).map(([k, v]) => [k, Object.assign({}, v.kinds, { changed: v.changed.length })])),
     baseMeasured: Object.values(fnd.base).filter((b) => b.measured).length, baseTotal: Object.keys(fnd.base).length,
