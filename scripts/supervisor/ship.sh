@@ -50,8 +50,11 @@ gate() {
   echo "build ok"
 }
 # --- 1b. hand-off guard: a routine that changed ANOTHER routine's area must have recorded the hand-off
-#         (docs/supervisor/ownership.json + handoffs.json; owner 2026-10-14 — «کارها جزیره‌ای نشود»).
-#         Each routine prompt exports SUPERVISOR_ROUTINE=<general|urgent|backtest>; unset (a human session) ⇒ skipped.
+#         (docs/supervisor/ownership.json + docs/supervisor/handoffs/<id>.json, one file per entry; owner 2026-10-14 —
+#         «کارها جزیره‌ای نشود»). Each routine prompt exports SUPERVISOR_ROUTINE=<general|urgent|backtest>; unset (a human
+#         session) ⇒ skipped. A plain `git push` skips all of this — so every prompt says «ship.sh only», and the merge gate
+#         re-checks what actually landed: `handoff.py audit` (tests/test_supervisor_handoff_guard.py) reads the «Routine:»
+#         line of every commit since the baseline and fails on a cross-area commit without that routine's `did`.
 say "Hand-off guard (${SUPERVISOR_ROUTINE:-no routine})"
 git fetch -q origin main 2>/dev/null || true
 python3 scripts/supervisor/handoff.py guard --routine "${SUPERVISOR_ROUTINE:-}" --base origin/main || exit 1
@@ -65,21 +68,28 @@ if [ -n "$(git status --porcelain)" ]; then
   [ -n "$MSG" ] || { echo "❌ uncommitted changes: pass a commit message"; exit 1; }
   say "Commit"
   git add -A
-  # «Routine: <name>» trailer — `handoff.py precheck` shows WHICH routine made each commit on an area
-  if [ -n "${SUPERVISOR_ROUTINE:-}" ]; then git commit -q -m "$MSG" -m "Routine: ${SUPERVISOR_ROUTINE}"; else git commit -q -m "$MSG"; fi
+  # «Routine: <name>» trailer — `handoff.py precheck`/`audit` see WHICH routine made each commit on an area. `--trailer` puts
+  # it into the message's trailer block (next to any Co-Authored-By), so a later paragraph can never orphan it (review
+  # 2026-10-15: `-m "Routine: …"` followed by an attribution paragraph lost the trailer).
+  if [ -n "${SUPERVISOR_ROUTINE:-}" ]; then git commit -q -m "$MSG" --trailer "Routine: ${SUPERVISOR_ROUTINE}"; else git commit -q -m "$MSG"; fi
 fi
 
 # --- 3. push to main ----------------------------------------------------------
 say "Push to main"
 retry git fetch -q origin main
 if ! git merge-base --is-ancestor origin/main HEAD; then
-  echo "main has moved — rebasing onto origin/main and running the gate again"
+  echo "main has moved — rebasing onto origin/main and running the hand-off checks and the gate again"
+  old_base="$(git merge-base HEAD origin/main)"
   git rebase -q origin/main || { git rebase --abort; echo "❌ rebase conflict — resolve it, nothing was pushed"; exit 1; }
-  # another routine's hand-offs arrived: the view (merge=union) is regenerated, the guard runs again on the rebased work
+  # another routine's work/hand-offs arrived: regenerate the view (merge=union), say which arrived commits touched the same
+  # files (the other routine may have done this very work — then it is an owner-did, not a second copy), and run the guard and
+  # the strict ledger check again on the REBASED work, exactly as before the first commit (review 2026-10-15, #12).
   python3 scripts/supervisor/handoff.py check --fix >/dev/null || true
+  python3 scripts/supervisor/handoff.py overlap --old "$old_base" --new origin/main --base origin/main || true
   python3 scripts/supervisor/handoff.py guard --routine "${SUPERVISOR_ROUTINE:-}" --base origin/main || exit 1
+  python3 scripts/supervisor/handoff.py check || exit 1
   gate || exit 1
-  if [ -n "$(git status --porcelain)" ]; then git add -A && git commit -q -m "build: frontend/dist after rebase" ${SUPERVISOR_ROUTINE:+-m "Routine: ${SUPERVISOR_ROUTINE}"}; fi
+  if [ -n "$(git status --porcelain)" ]; then git add -A && git commit -q -m "build: frontend/dist after rebase" ${SUPERVISOR_ROUTINE:+--trailer "Routine: ${SUPERVISOR_ROUTINE}"}; fi
 fi
 if out="$(retry git push origin HEAD:main 2>&1)"; then
   echo "$out" | tail -3

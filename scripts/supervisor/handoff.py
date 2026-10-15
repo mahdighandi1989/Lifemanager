@@ -17,6 +17,12 @@ them, the ledger). The ledger of cross-routine work is ``docs/supervisor/handoff
     handoff.py check                           ledger valid + stale entries (an owner that did not look in time)
     handoff.py guard --routine R [--base origin/main]
                                                refuse a push that changes another routine's area without a hand-off
+    handoff.py audit [--since ISO] [--rev HEAD]
+                                               the same rule over HISTORY: every commit carrying a «Routine:» line that touched
+                                               another routine's area needs that routine's `did` for the area (catches a plain
+                                               `git push` that bypassed ship.sh; merge gate: tests/test_supervisor_handoff_guard.py)
+    handoff.py overlap --old SHA [--new origin/main] [--base origin/main]
+                                               after a rebase: commits that arrived on main touching the same files as this push
 Exit codes: 0 ok · 1 refused/invalid · 2 usage.
 """
 from __future__ import annotations
@@ -25,6 +31,7 @@ import argparse
 import fnmatch
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -170,6 +177,75 @@ def cmd_owner(a) -> int:
     return 0
 
 
+ROUTINE_RE = re.compile(r"^Routine:\s*(\S+)", re.M)
+
+
+def routine_of(body: str) -> str:
+    """«Routine: <name>» anywhere in the message body — a real git trailer OR a line that git does not parse as one
+    (found 2026-10-15: an attribution paragraph after «Routine:» made `%(trailers)` empty, so precheck showed «[]»)."""
+    m = ROUTINE_RE.search(body or "")
+    return m.group(1) if m else ""
+
+
+def log_commits(*args: str) -> List[Dict[str, str]]:
+    """git log ⇒ [{sha, date, subject, body, routine}] (body read in full, so the Routine line is found wherever it is)."""
+    out = git("log", "--format=%h%x1f%aI%x1f%s%x1f%B%x1e", *args)
+    res = []
+    for rec in out.split("\x1e"):
+        rec = rec.strip("\n")
+        if not rec.strip():
+            continue
+        parts = rec.split("\x1f")
+        if len(parts) < 4:
+            continue
+        sha, date, subj, body = parts[0].strip(), parts[1], parts[2], parts[3]
+        res.append({"sha": sha, "date": date, "subject": subj, "body": body, "routine": routine_of(body)})
+    return res
+
+
+def commit_of(e: Dict[str, Any]) -> str:
+    """The commit of a hand-off: the recorded one, else the commit that ADDED its file (resolved at read time, so it survives
+    the rebase in ship.sh — `add` runs before the commit exists, which is why `did` entries never carried a SHA)."""
+    if e.get("commit"):
+        return e["commit"]
+    rel = os.path.relpath(os.path.join(LEDGER, e["id"] + ".json"), ROOT).replace(os.sep, "/")
+    return git("log", "--diff-filter=A", "--format=%h", "-1", "--", rel).strip()
+
+
+def ledger_section(ar: Dict[str, Any], since: str, sheet: Optional[int], per: int = 12) -> List[str]:
+    """The owner's ledger (`ar["ledger"]`): what changed in it since `since` (trimmed diff) + lines that name the sheet."""
+    led = ar.get("ledger") or ""
+    out = [f"== دفترِ مالک ({led or '—'}):"]
+    if not led:
+        return out + ["  (این قلمرو دفتر ندارد)"]
+    diff = git("log", f"--since={since}", "--format=commit %h %ad %s", "--date=short", "-p", "--unified=0", "--", led)
+    blocks: List[List[str]] = []
+    for x in diff.splitlines():
+        if x.startswith("commit "):
+            blocks.append([x])
+        elif blocks and x.startswith("+") and not x.startswith("+++"):
+            blocks[-1].append(x)
+    for b in blocks[:8]:   # newest first; each commit trimmed to `per` added lines so one big round cannot hide the others
+        out.append("  " + b[0][:220])
+        out += ["    " + x[:200] for x in b[1:1 + per]]
+        if len(b) - 1 > per:
+            out.append(f"    … {len(b) - 1 - per} سطرِ افزوده‌شدهٔ دیگر")
+    if len(blocks) > 8:
+        out.append(f"  … {len(blocks) - 8} کامیتِ دیگر — `git log -p --since='{since}' -- {led}`")
+    if not blocks:
+        out.append("  (از این تاریخ تغییری در دفتر نیست)")
+    if sheet:
+        path = os.path.join(ROOT, led)
+        pat = re.compile(r"(#|برگهٔ\s*|برگه\s*|sheet\D{0,4})" + re.escape(str(sheet)) + r"(?!\d)")
+        hits = []
+        if os.path.isfile(path):
+            with open(path, encoding="utf-8", errors="replace") as f:
+                hits = [f"  {i}: {ln.strip()[:220]}" for i, ln in enumerate(f, 1) if pat.search(ln)]
+        out.append(f"== سطرهای دفتر که برگهٔ #{sheet} را نام می‌برند:")
+        out += hits[:20] or ["  (هیچ)"]
+    return out
+
+
 def cmd_precheck(a) -> int:
     own = load_own()
     ar = next((x for x in own["areas"] if x["id"] == a.area), None)
@@ -182,14 +258,21 @@ def cmd_precheck(a) -> int:
         since = (datetime.strptime(since, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d") + " 00:00:00"
     print(f"== قلمرو {ar['id']} — مالک: {','.join(owners(ar))} — دستور: {ar['procedure']}")
     pats = [p.rstrip("*") or "." for p in ar["paths"]]
-    log = git("log", f"--since={since}", "--format=%h %ad [%(trailers:key=Routine,valueonly,separator=%x2C)] %s", "--date=iso", "--", *pats)
+    commits = log_commits(f"--since={since}", "--", *pats)
     print(f"== کامیت‌ها روی این قلمرو از {since}:")
-    print(log.strip() or "(هیچ)")
+    for c in commits:
+        print(f"{c['sha']} {c['date'][:16].replace('T', ' ')} [{c['routine'] or 'بی Routine'}] {c['subject']}")
+    if not commits:
+        print("(هیچ)")
+    for ln in ledger_section(ar, since, a.sheet):
+        print(ln)
     data = load()
     rel = [e for e in data["entries"] if e["area"] == ar["id"] and (not a.sheet or e.get("sheet") == a.sheet or e["status"] == "open")]
     print("== دست‌به‌دست‌های مرتبط:")
     for e in rel:
-        print(f"  {e['id']} [{e['status']}] {e['kind']} از {e['by']}" + (f" برگهٔ #{e['sheet']}" if e.get('sheet') else "") + f": {e['what'][:160]}")
+        sha = commit_of(e)
+        print(f"  {e['id']} [{e['status']}] {e['kind']} از {e['by']}" + (f" برگهٔ #{e['sheet']}" if e.get('sheet') else "")
+              + (f" (کامیت {sha})" if sha else "") + f": {e['what'][:160]}")
     if not rel:
         print("  (هیچ)")
     print("== حالا: اگر کامیت/دفترِ بالا همان کار را کرده ⇒ دوباره‌کاری نکن؛ جوابِ برگه را با ارجاع به همان کامیت/دور بنویس و "
@@ -227,7 +310,7 @@ def cmd_inbox(a) -> int:
     for e in todo:
         verb = "بسنج (با دستورِ خودت) و بستش: verified یا corrected" if e["kind"] == "did" else "انجامش بده (اولویت) و بستش: done"
         print(f"{e['id']} [{e['kind']}] از {e['by']} در {e['area']}" + (f" برگهٔ #{e['sheet']}" if e.get("sheet") else "")
-              + f" — {e['what']}\n    کامیت: {e.get('commit') or '—'} · ⇒ {verb}")
+              + f" — {e['what']}\n    کامیت: {commit_of(e) or '—'} · ⇒ {verb}")
     return 0
 
 
@@ -242,8 +325,13 @@ def cmd_close(a) -> int:
         print(f"{e['id']} پیش‌تر بسته شده ({e['status']})"); return 1
     own = load_own()
     ar = next((x for x in own["areas"] if x["id"] == e["area"]), {})
-    if a.by not in owners(ar) and a.by != ar.get("executor") and a.by != "general":
-        print("فقط روتینِ مالکِ این قلمرو (یا ناظرِ عمومی برای کهنه‌ها) می‌بندد"); return 1
+    is_owner = a.by in owners(ar) or a.by == ar.get("executor")
+    if not is_owner:
+        # the general supervisor is the safety net for STALE entries only (PROMPT §۰-د ۳) — never a shortcut past the owner
+        if a.by != "general":
+            print("فقط روتینِ مالکِ این قلمرو (یا ناظرِ عمومی برای کهنه‌ها) می‌بندد"); return 1
+        if e["id"] not in {x["id"] for x in stale(data, own)}:
+            print(f"{e['id']} هنوز کهنه نیست — مالک ({','.join(owners(ar))}) خودش می‌سنجد؛ ناظرِ عمومی فقط کهنه‌ها را می‌بندد"); return 1
     e["status"] = a.status
     e["closed"] = {"by": a.by, "at": now(), "note": a.note.strip(), "commit": a.commit or ""}
     save_entry(e)
@@ -257,7 +345,9 @@ def stale(data: Dict[str, Any], own: Dict[str, Any], at: Optional[datetime] = No
     for e in data["entries"]:
         if e["status"] != "open":
             continue
-        hrs = max([own["routines"].get(o, {}).get("every_hours", 0) for o in e.get("owner", [])] or [0]) or 24
+        # the FASTEST owner sets the clock: with owners [urgent (3h), general (84h)] the inbox is looked at every 3 hours,
+        # so «two rounds missed» is ~12h, not a week (review 2026-10-15). An owner-decision area (every_hours 0) ⇒ 24h.
+        hrs = min([h for h in (own["routines"].get(o, {}).get("every_hours", 0) for o in e.get("owner", [])) if h > 0] or [24])
         t = datetime.strptime(e["at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
         if at - t > timedelta(hours=2 * hrs + 6):
             out.append(e)
@@ -313,10 +403,14 @@ def changed_paths(base: str) -> List[str]:
     return sorted(out)
 
 
-def guard(routine: str, paths: List[str], new_entries: List[Dict[str, Any]], own: Optional[Dict[str, Any]] = None) -> List[str]:
-    """Paths in an area the routine does not own, with no hand-off by this routine for that area in this push."""
+def guard(routine: str, paths: List[str], new_entries: List[Dict[str, Any]], own: Optional[Dict[str, Any]] = None,
+          require_open: bool = True) -> List[str]:
+    """Paths in an area the routine does not own, with no hand-off by this routine for that area in this push.
+    Only an OPEN `did` covers a change: a `request` asks the owner to do it and an `owner-did` says the owner already did —
+    neither makes this routine's edit legal (review 2026-10-15: any kind used to count)."""
     own = own or load_own()
-    covered = {e["area"] for e in new_entries if e.get("by") == routine}
+    covered = {e["area"] for e in new_entries
+               if e.get("by") == routine and e.get("kind") == "did" and (not require_open or e.get("status", "open") == "open")}
     bad = []
     for p in paths:
         if is_shared(p, own):
@@ -356,6 +450,82 @@ def cmd_guard(a) -> int:
     return 0
 
 
+# --------------------------------------------------------------------------- history audit (a plain `git push` bypasses ship.sh)
+AUDIT_SINCE = "2026-10-15T00:00:00Z"   # the protocol fixes of the 2026-10-15 review; older commits predate the rule as written now
+AUDIT_WINDOW = (timedelta(hours=24), timedelta(hours=2))   # a `did` counts if recorded ≤24h before / ≤2h after the commit (author time)
+
+
+def _ts(s: str) -> Optional[datetime]:
+    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S%z"):
+        try:
+            t = datetime.strptime(s.strip(), fmt)
+            return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+    try:
+        return datetime.fromisoformat(s.strip())
+    except ValueError:
+        return None
+
+
+def history_available(rev: str = "HEAD") -> bool:
+    return bool(git("rev-parse", "--verify", "-q", rev).strip())
+
+
+def audit_history(since: str = AUDIT_SINCE, rev: str = "HEAD", own: Optional[Dict[str, Any]] = None,
+                  entries: Optional[List[Dict[str, Any]]] = None) -> List[str]:
+    """Every non-merge commit since `since` that carries «Routine: <r>» and touched another routine's area must have a `did`
+    by <r> for that area recorded around the commit time — the guard of ship.sh, re-checked on what actually landed."""
+    own = own or load_own()
+    ents = entries if entries is not None else load()["entries"]
+    bad: List[str] = []
+    for c in log_commits("--no-merges", f"--since={since}", rev):
+        r = c["routine"]
+        if not r or r not in own["routines"] or r == "owner":
+            continue
+        paths = [x for x in git("diff-tree", "--no-commit-id", "--name-only", "-r", "--root", c["sha"]).splitlines() if x.strip()]
+        t = _ts(c["date"])
+        near = [e for e in ents if e.get("by") == r and e.get("kind") == "did" and t and _ts(e.get("at", "")) and
+                t - AUDIT_WINDOW[0] <= _ts(e["at"]) <= t + AUDIT_WINDOW[1]]
+        for b in guard(r, paths, near, own, require_open=False):
+            bad.append(f"{c['sha']} ({r}, {c['subject'][:80]}): {b}")
+    return bad
+
+
+def cmd_audit(a) -> int:
+    if not history_available(a.rev):
+        print("(تاریخچهٔ git در دسترس نیست — بازرسیِ تاریخچه اجرا نشد)"); return 0
+    bad = audit_history(a.since, a.rev)
+    if bad:
+        print("❌ کامیت‌هایی با «Routine:» که به قلمروِ روتینِ دیگری دست زده‌اند و `did` ِ آن قلمرو را ندارند (احتمالاً `git push` ِ خام، بی ship.sh):")
+        for b in bad:
+            print("   - " + b)
+        return 1
+    print(f"بازرسیِ تاریخچه از {a.since}: سالم")
+    return 0
+
+
+def cmd_overlap(a) -> int:
+    """After ship.sh rebased onto a newer main: which of the commits that just arrived touched the files of this push —
+    another routine may have done the same work meanwhile (then: owner-did, not a second copy)."""
+    mine = set(x for x in git("diff", "--name-only", f"{a.base}...HEAD").splitlines() if x.strip())
+    if not mine or not a.old:
+        print("هم‌پوشانی: چیزی برای سنجیدن نیست"); return 0
+    own = load_own()
+    hits = 0
+    for c in log_commits("--no-merges", f"{a.old}..{a.new}"):
+        files = set(x for x in git("diff-tree", "--no-commit-id", "--name-only", "-r", c["sha"]).splitlines() if x.strip())
+        both = sorted(p for p in files & mine if not is_shared(p, own))
+        if both:
+            hits += 1
+            print(f"⚠️ {c['sha']} [{c['routine'] or 'بی Routine'}] {c['subject'][:100]} — همان فایل‌ها: {', '.join(both[:8])}")
+    if hits:
+        print("⇒ پیش از پوش ببین کارِ تو با آن‌ها دوباره‌کاری/تعارض نیست (precheck --area …)؛ نگهبان و check دوباره اجرا می‌شوند.")
+    else:
+        print("هم‌پوشانی: هیچ کامیتِ تازه‌ای روی همان فایل‌ها نیست")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="دست‌به‌دستِ کار میانِ روتین‌ها")
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -369,6 +539,8 @@ def main(argv=None) -> int:
     p = sp.add_parser("check"); p.add_argument("--fix", action="store_true"); p.set_defaults(f=cmd_check)
     p = sp.add_parser("migrate"); p.set_defaults(f=lambda a: print(f"{migrate()} مورد منتقل شد") or 0)
     p = sp.add_parser("guard"); p.add_argument("--routine", default=os.environ.get("SUPERVISOR_ROUTINE", "")); p.add_argument("--base", default="origin/main"); p.set_defaults(f=cmd_guard)
+    p = sp.add_parser("audit"); p.add_argument("--since", default=AUDIT_SINCE); p.add_argument("--rev", default="HEAD"); p.set_defaults(f=cmd_audit)
+    p = sp.add_parser("overlap"); p.add_argument("--old", required=True); p.add_argument("--new", default="origin/main"); p.add_argument("--base", default="origin/main"); p.set_defaults(f=cmd_overlap)
     a = ap.parse_args(argv)
     return a.f(a)
 
