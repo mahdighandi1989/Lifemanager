@@ -61,6 +61,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#' + K('ana'), 'در مسئلهٔ «خط‌های میانِ n نقطه» هم هر جفت یک بار شمرده می‌شود');
     await p.fill('#' + K('anag'), 'پس جواب مثلِ تعدادِ جفت‌ها باید باشد؛ اگر کسی با خودش دست بدهد قیاس می‌شکند');
     await p.fill('#' + K('dim'), 'برای ۲، ۳، ۴ نفر: ۱، ۳، ۶ ⇒ n(n−1)/2');
+    await p.fill('#' + K('anat'), 'برای ۲ نفر بشمارم: باید ۱ دست‌دادن باشد');   // M5: قیاس آزمونِ انتقال می‌خواهد
     for (const [i, y] of [[0, '0'], [1, '1'], [2, '3']]) await p.fill('#' + K('y' + i), y);
     await p.click('main .sv-u .sv-kaddrow'); await W(40);
     const y3 = await p.evaluate(() => [...document.querySelectorAll('main .sv-u .sv-ky')].pop().id); await p.fill('#' + y3, '6');
@@ -70,7 +71,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sel('#' + K('w'), '1'); await sel('#' + K('ww'), 'like');
     await p.click('main .sv-u .sv-kchk'); await W(60);
     info.kit1 = await p.locator('main .sv-u .sv-kout').innerText();
-    chk(/مرتبهٔ ۲ ثابت/.test(info.kit1) && /نمی‌خواند/.test(info.kit1) && /n = (۴|4)/.test(info.kit1.replace(/[\u2066-\u2069]/g, '').replace(/\u00a0/g, ' ')) && /دلبستگی/.test(info.kit1), 'kit check by code: diffs order 2, formula mismatch, separating case, liking is no reason :: ' + info.kit1);
+    chk(/مرتبهٔ ۲ ثابت/.test(info.kit1) && /نمی‌خواند/.test(info.kit1) && /حدسِ ۲ رد شد/.test(info.kit1) && !/n = (۳|3)/.test(info.kit1.replace(/[\u2066-\u2069]/g, '')) && /دلبستگی/.test(info.kit1), 'kit check by code: diffs order 2, formula mismatch, separating case, liking is no reason :: ' + info.kit1);
     await p.fill('#' + K('f'), 'n(n-1)/2'); await sel('#' + K('ww'), 'bold'); await p.click('main .sv-u .sv-kchk'); await W(60);
     info.kit2 = await p.locator('main .sv-u .sv-kout').innerText();
     chk(/با هر ۴ حالتِ جدول می‌خواند/.test(info.kit2) && /پشتیبانی شد، نه ثابت/.test(info.kit2) && !/دلبستگی/.test(info.kit2) && /حدسِ ۲ با جدول نمی‌خواند/.test(info.kit2), 'kit check after fixing :: ' + info.kit2);
@@ -90,12 +91,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sel('#svSuff1', 'کافی است'); await p.fill('#svGuess1', 'n(n-1)/2'); await p.fill('#svTest1', 'برای ۳ نفر: ۳');
     await p.click('main .sv-usave'); await W(60); await p.click('main .sv-u .sv-g2'); await W(120);
     info.gk = await p.evaluate(pid => { const g = APP.S.get('eprog_' + pid).solve.g[1]; return g && g.kit ? { f: g.kit.formula, r: g.kit.rivals.map(x => x.t), chk: g.kit.chk } : null; }, PID);
-    chk(info.gk && info.gk.f === 'n(n-1)/2' && info.gk.r.length === 2 && info.gk.chk && info.gk.chk.sep && info.gk.chk.sep.n === 4, 'guess kit saved with the guess ' + JSON.stringify(info.gk));
+    chk(info.gk && info.gk.f === 'n(n-1)/2' && info.gk.r.length === 2 && info.gk.chk && info.gk.chk.ok && !info.gk.chk.sep && info.gk.chk.decided === '2', 'guess kit saved with the guess (M6: the table already decided between the rivals) ' + JSON.stringify(info.gk));
     // مرورِ حدس: رقیب‌ها بی‌نگاه
     await p.evaluate(pid => { const g = APP.S.get('eprog_' + pid); g.solve.rev.g.due = APP.today(); APP.S.put(g); }, PID); await open(PID, 1, 0);
     chk(await p.locator('#svRGR').count() === 1, 'guess review asks for the rival guesses and the separating case');
     await p.fill('#svRG', 'برای ۴ نفر ۶ شد'); await p.click('main .sv-rph[data-ph="g"] .sv-rshow'); await W(60);
-    chk(/رقیب‌هایت/.test(await p.locator('main .sv-rph[data-ph="g"]').innerText()) && /حالتِ جداکننده: n = (۴|4)/.test((await p.locator('main .sv-rph[data-ph="g"]').innerText()).replace(/[\u2066-\u2069]/g, '').replace(/\u00a0/g, ' ')), 'guess review reveals the rivals and the separating case');
+    chk(/رقیب‌هایت/.test(await p.locator('main .sv-rph[data-ph="g"]').innerText()) && /جدولت داوری کرد: حدسِ ۲ رد شد/.test(await p.locator('main .sv-rph[data-ph="g"]').innerText()), 'guess review reveals the rivals and what the table decided');
     // بازنگری: تعمیم با جدول ⇒ در درس و کارتِ مرور
     info.lb = await p.evaluate(async pid => {
       const P = APP.getProb(pid), pg = APP.S.get('eprog_' + pid), box = APP.solveLookBackCard(P, pg, 1); document.querySelector('main').appendChild(box);
@@ -171,7 +172,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sel('#' + N2('des'), 'want'); await sel('#' + N2('hope'), 'yes'); await p.fill('#' + N2('step'), 'یک‌نهم را هم بیفزایم و ببینم چه کم می‌ماند'); await p.fill('#' + N2('when'), 'فردا صبح، ده دقیقه');
     await p.click('main .sv-willchk .sv-willsave'); await W(60);
     info.w3 = await p.evaluate(() => { const w = APP.S.get('eprog_pb_w_r4').solve.will; return { s: w.steps[2], log: w.log.length, logUI: !!document.querySelector('main .sv-willlog') }; });
-    chk(info.w3.s && info.w3.s.iv === 3 && info.w3.s.due === T.d3 && info.w3.logUI, 'done ⇒ next step checked one rung later on the same ladder ' + JSON.stringify(info.w3));
+    chk(info.w3.s && info.w3.s.iv === 3 && info.w3.s.due === T.d1 && info.w3.s.dueFrom === 'when' && info.w3.logUI, 'done ⇒ next step one rung later on the ladder (iv 3), checked on the user\'s own «فردا» (M3) ' + JSON.stringify(info.w3));
     // ایستِ پیشرفت: «پیشرفت: نه» ⇒ همان کارت
     await open('pb_p4_invoice', 1, 1); await p.click('main .simcard .sv-cpbtn'); await W(60);
     await sel('#svCpP', 'نه');
@@ -221,7 +222,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       await sel('#' + Q('des'), 'want'); await sel('#' + Q('hope'), 'unsure'); await p.fill('#' + Q('step'), 'در جلسهٔ دوشنبه یک جمله دربارهٔ ایده بگویم'); await p.fill('#' + Q('when'), 'دوشنبه، جلسهٔ ساعتِ ۱۰');
       await p.click('main .sv-will[data-host="knot"] .sv-willsave'); await W(400);
       info.f7s = await p.evaluate(id => { const kc = APP.S.get(id); return kc.will && kc.will.steps[0]; }, info.f7.id);
-      chk(info.f7s && info.f7s.due === T.d1, 'knot commitment stored on the situation ' + JSON.stringify(info.f7s));
+      const mon = await p.evaluate(() => { for (let i = 1; i <= 7; i++) { const d = APP.addDays(APP.today(), i), q = d.split('-'); if (new Date(+q[0], +q[1] - 1, +q[2]).getDay() === 1) return d; } });
+      chk(info.f7s && info.f7s.due === mon && info.f7s.dueFrom === 'when', 'knot commitment stored on the situation, checked on the user\'s «دوشنبه» (M3) ' + JSON.stringify(info.f7s));
       await p.evaluate(id => { const kc = APP.S.get(id); kc.will.steps[0].due = APP.today(); APP.S.put(kc); }, info.f7.id);
       chk(await p.evaluate(() => APP.dueList().some(x => /در جلسهٔ دوشنبه/.test(x.txt))), 'knot commitment due in Today');
     }

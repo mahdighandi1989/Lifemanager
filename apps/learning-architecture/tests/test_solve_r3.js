@@ -134,7 +134,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(info.askP.ph === 'p' && info.askP.sum.includes(info.askP.plan0), 'planning question card from PLAN_QS ' + JSON.stringify(info.askP));
     await pick(PID, 1, false); await W(40); await pick(PID, 1, true); await W();
     await p.fill('main .simcard .sv-mot input[type=text]', 'مدلِ کره تا جهت‌ها تعریف شوند'); await p.click('main .simcard .sv-motgo'); await W(40); await p.click('main .simcard .sv-mot .sv-g0'); await W();
-    s = await sv(); chk(s.rev.t.due === T.d1, 'weak motive not back tomorrow ' + JSON.stringify(s.rev.t));
+    // M2 (ممیزیِ ۲۰۲۶-۱۰-۱۵): انگیزهٔ بی پاسخِ «پرسشِ همین لحظه» نوبتِ خودش را دارد («m»)، نه «t»
+    s = await sv(); chk(s.rev.m && s.rev.m.due === T.d1, 'weak motive not back tomorrow ' + JSON.stringify(s.rev.m));
     // اجرا: «ثابت کن» فقط از سطحِ ۳ (برهانِ صوری برای آماده)
     info.execQ = await p.evaluate(() => ({ l1: APP.solveAskList('c', 1), l3: APP.solveAskList('c', 3), prove: APP.SOLVE_PHASES.c.q[1] }));
     chk(!info.execQ.l1.includes(info.execQ.prove) && info.execQ.l3.includes(info.execQ.prove) && /پیش از اجرا/.test(info.execQ.l1[0]) && /پیش از محاسبه/.test(info.execQ.l1[1]), 'execution questions ' + JSON.stringify(info.execQ));

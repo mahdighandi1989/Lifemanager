@@ -53,7 +53,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     let s = await sv();
     const tmr = await p.evaluate(() => APP.addDays(APP.today(), 1));
     chk(s && s.u[1] && s.u[1].done && s.u[1].self === 2 && s.u[1].type === 'find' && /متناهی/.test(s.u[1].c) && s.u[1].drawn === true, 'u[1] not saved ' + JSON.stringify(s && s.u));
-    chk(s.rev.u && s.rev.u.due === tmr && s.rev.u.iv === 0, 'understanding not scheduled for tomorrow ' + JSON.stringify(s.rev));
+    chk(s.rev.u && s.rev.u.due === tmr && s.rev.u.iv === 1, 'understanding not scheduled for tomorrow (rung 1 of the ladder — L5 of the 2026-10-15 audit) ' + JSON.stringify(s.rev));
     chk(s.g[1] && s.g[1].conf === 80 && s.g[1].guess === '۶۶' && s.u[1].d === '۱۲' && /π/.test(s.g[1].test) && s.g[1].before === true && s.rev.g && s.rev.g.due === tmr, 'first-attempt guess not saved/scheduled ' + JSON.stringify(s.g));
     chk(!(await p.locator('main .sv-u').count()) && await p.locator('main .simcard .sv-usum').count() === 1, 'card not replaced by summary in step');
     // گامِ n1 گامِ «وارسی/داوری» بی‌برچسب است ⇒ پس از پاسخ برچسبِ «بازنگری»
@@ -176,11 +176,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.click('main .sv-rph[data-ph="u"] .sv-rshow'); await p.waitForTimeout(40);
     chk(/کارتِ پیشینت: .*دایرهٔ معلوم/.test(await p.locator('main .sv-rph[data-ph="u"]').innerText()), 'review does not reveal the earlier card after recall');
     await p.click('main .sv-rph[data-ph="u"] .sv-g2'); await p.waitForTimeout(60);
-    s = await sv(); const d1 = await p.evaluate(() => APP.addDays(APP.today(), 1)), d3 = await p.evaluate(() => APP.addDays(APP.today(), 3));
-    chk(s.rev.u.iv === 1 && s.rev.u.due === d1 && s.rev.u.hist.length === 1 && s.rev.u.hist[0].self === 2, 'ladder step 1 ' + JSON.stringify(s.rev.u));
+    s = await sv(); const d1 = await p.evaluate(() => APP.addDays(APP.today(), 1)), d3 = await p.evaluate(() => APP.addDays(APP.today(), 3)), d7 = await p.evaluate(() => APP.addDays(APP.today(), 7));
+    // L5 (ممیزیِ ۲۰۲۶-۱۰-۱۵): نوبتِ نخست (فردا) پلهٔ ۱ است ⇒ نخستین «درست» ⇒ ۳ روز (نه دوباره ۱)
+    chk(s.rev.u.iv === 3 && s.rev.u.due === d3 && s.rev.u.hist.length === 1 && s.rev.u.hist[0].self === 2, 'ladder step 1 ' + JSON.stringify(s.rev.u));
     await p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); pg.solve.rev.u.due = APP.today(); APP.S.put(pg); }, PID); await open(1, 2);
     await p.fill('#svRU', 'مربع'); await p.fill('#svRD', 'دایره'); await p.fill('#svRC', 'ابزار'); await p.click('main .sv-rph[data-ph="u"] .sv-rshow'); await p.click('main .sv-rph[data-ph="u"] .sv-g2'); await p.waitForTimeout(60);
-    s = await sv(); chk(s.rev.u.iv === 3 && s.rev.u.due === d3, 'ladder step 3 ' + JSON.stringify(s.rev.u));
+    s = await sv(); chk(s.rev.u.iv === 7 && s.rev.u.due === d7, 'ladder step 3 ⇒ 7 ' + JSON.stringify(s.rev.u));
     await p.fill('#svRW', 'به‌جای «شبیه است»: قضیهٔ لیندمان که π متعالی است'); await p.click('main .sv-rph[data-ph="c"] .sv-rshow'); await p.click('main .sv-rph[data-ph="c"] .sv-g0'); await p.waitForTimeout(60);
     s = await sv(); chk(s.rev.c.iv === 1 && s.rev.c.due === d1, 'failed review not back to 1 day ' + JSON.stringify(s.rev.c));
 

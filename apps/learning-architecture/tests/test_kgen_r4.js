@@ -95,7 +95,8 @@ const sep = A.kseparate(A.kformula('n(n+1)/2'), A.kformula('2^n-1'), 20); if (!s
 const K = A.kguessCheck({ rows: [{ x: '1', y: '1' }, { x: '2', y: '3' }, { x: '3', y: '6' }, { x: '4', y: '10' }], formula: 'n^2', rivals: [{ t: 'n(n+1)/2', test: 'n = 5' }, { t: '2^n - 1', test: 'n = 4' }], worth: '1', worthWhy: 'like' });
 if (!K.table || K.table.order !== 2 || K.table.next !== 15) fail('kit table ' + JSON.stringify(K.table));
 if (!K.formula || K.formula.fits !== false || K.formula.mism.length !== 3) fail('kit formula mismatch ' + JSON.stringify(K.formula));
-if (!K.rivals || !K.rivals.sep || K.rivals.sep.n !== 3 || JSON.stringify(K.rivals.fit) !== '[true,false]') fail('kit rivals ' + JSON.stringify(K.rivals));
+// M6 (ممیزیِ ۲۰۲۶-۱۰-۱۵): جدول (۱..۴) خودش میانِ دو رقیب داوری کرده ⇒ حالتِ جداکنندهٔ درونِ جدول (n = 3) پیشنهاد نمی‌شود
+if (!K.rivals || K.rivals.sep || K.rivals.decided !== '2' || JSON.stringify(K.rivals.fit) !== '[true,false]') fail('kit rivals ' + JSON.stringify(K.rivals));
 if (K.ok || !K.issues.some(x => /دلبستگی/.test(x))) fail('liking a guess is not a reason to test it first ' + JSON.stringify(K.issues));
 const K2 = A.kguessCheck({ rows: [], formula: '', rivals: [{ t: 'مشتری پول می‌دهد', test: 'از ده نفر پیش‌خرید بخواهم' }, { t: 'فقط تعریف می‌کنند', test: '' }], worth: '0', worthWhy: 'bold' });
 if (K2.ok || !K2.issues.some(x => /آزمونی بنویس/.test(x))) fail('rival without a test accepted ' + JSON.stringify(K2));
