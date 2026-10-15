@@ -420,7 +420,7 @@
         rs.forEach(function (r) {
           var stt = ruleStatus(r, t.sens);
           sec.appendChild(h("div", { class: "lrule" + (focus === r.id ? " focus" : ""), id: "lr-" + r.id }, h("div", { class: "row between wrap" }, h("strong", {}, r.fa), h("span", { class: "pill " + stt.c }, stt.t)),
-            h("p", {}, r.stmt), h("p", { class: "small" }, r.eff === "cap" ? "اثر: اعتبار ادعا حداکثر " + (window.EPI_FOUND && window.EPI_FOUND.capText ? window.EPI_FOUND.capText(r).replace(/\d+(\.\d+)?/g, function (n) { return fa(+n); }) : fa(r.cap) + "٪") : "اثر: خطا در این ایستگاه", " ", r.basis === "system" ? h("span", { class: "chip" }, "عدد یا صورت‌بندی از سامانه") : h("span", { class: "chip good" }, "حکم جزوه")),
+            h("p", {}, r.stmt), h("p", { class: "small" }, r.eff === "cap" ? "اثر: اعتبار ادعا حداکثر " + (window.EPI_FOUND && window.EPI_FOUND.capText ? window.EPI_FOUND.capText(r).replace(/\d+(\.\d+)?/g, function (n) { return fa(+n); }) : fa(r.cap) + "٪") : "اثر: خطا در این ایستگاه", " ", r.basis === "system" ? h("span", { class: "chip" }, "عدد یا صورت‌بندی از سامانه") : r.basis === "beyond" ? h("span", { class: "chip beyond", dir: "rtl" }, "فراتر از جزوه — قضیهٔ " + (r.proof || "")) : h("span", { class: "chip good" }, "حکم جزوه")),
             r.note ? h("p", { class: "small muted" }, r.note) : null, r.fix ? h("p", { class: "small" }, h("strong", {}, "مسیر درست: "), r.fix) : null,
             h("div", { class: "row gap wrap" }, (r.sec || []).map(function (sc) { return h("button", { class: "tlink sec", onclick: function () { A.go("e_book", sc); } }, "§" + fa(sc.slice(1))); })),
             stt.err.length ? h("div", { class: "errata" }, h("strong", {}, "علت‌های ثبت‌شده:"), stt.err.map(autRow)) : null));
@@ -465,6 +465,16 @@
         var xf = D("st_expert").field; if (f.x_field == null && xf && f.way === "تخصص دیگران" && window.EPI_FM.x_field && window.EPI_FM.x_field.v.indexOf(xf) >= 0) { f.x_field = xf; filled.push(fa(i + 1) + ": جمعیتِ پژوهش ← " + xf); }
         /* راهِ رسیدنِ یافته (x_relay؛ p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵) — همان شرط‌ها */
         var xr = D("st_expert").relay; if (f.x_relay == null && xr && f.way === "تخصص دیگران" && window.EPI_FM.x_relay && window.EPI_FM.x_relay.v.indexOf(xr) >= 0) { f.x_relay = xr; filled.push(fa(i + 1) + ": راهِ رسیدنِ یافته ← " + xr); }
+        /* استدلالِ معقول از کاربرگِ «راه عقل و برهان» (x_conseq_* / x_analog_*؛ p_plausible_reasoning، مالک ۲۰۲۶-۱۰-۱۵) — فقط برای تصدیقی که راهش عقل/استقراء است
+           یا صورتش غیرقیاسی، فقط اگر خالی است و فقط وقتی صورتِ کاربرگ استقرائی/تمثیلی است (همان شرطِ دیده‌شدنِ فیلدها) */
+        var DA = D("st_aql"), FMk = window.EPI_FM, isPl = f.form === "غیرقیاسی (استقرا/تمثیل)" || f.way === "عقل" || f.way === "استقراء", fm = String(DA.form || "");
+        if (isPl && /استقرائی|تمثیلی/.test(fm)) [["conseq_n", "x_conseq_n", "پیامدِ تأییدشده"], ["conseq_new", "x_conseq_new", "تازگیِ پیامدها"], ["analog_n", "x_analog_n", "مواردِ همانند", "تمثیلی"],
+          ["analog_k", "x_analog_k", "همانندهای دارای ویژگی", "تمثیلی"], ["analog_rel", "x_analog_rel", "همانندی در رابطهٔ مربوط", "تمثیلی"]].forEach(function (m) {
+          var v = DA[m[0]], d = FMk[m[1]]; if (m[3] && fm.indexOf(m[3]) < 0) return;
+          if (f[m[1]] != null || v == null || v === "" || !d) return;
+          if (d.t === "num") { v = +v; if (!(v >= 0)) return; } else if (d.v.indexOf(v) < 0) return;
+          f[m[1]] = v; filled.push(fa(i + 1) + ": " + m[2] + " ← " + (d.t === "num" ? fa(v) : v));
+        });
       });
       if (filled.length && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
     })();

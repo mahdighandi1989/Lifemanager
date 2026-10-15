@@ -577,6 +577,18 @@ function verifiedBooklet(byCase, findings, row, fnd) {
     "، خطای کاشته‌شده " + b.controls.posDetect + (b.controls.posOk ? " ✓" : " ⚠"), "");
   L.push("**معنای وضع‌ها:** ✅ آزموده و درست (دست‌کم یک واقعه قاعده‌اش را به کار انداخت و یافتهٔ بازی ندارد) · ⚠ یافتهٔ باز · 🔧 اصلاح‌شده، در انتظارِ آزمونِ تازه · ⬜ هنوز هیچ واقعه‌ای این بخش را نیازموده.", "");
   if (fnd) L.push.apply(L, foundationMd(fnd));
+  /* «فراتر از جزوه» (BACKTEST_PROMPT، مسیرِ ۲): قاعده‌هایی که جزوه عددشان را نمی‌دهد و قضیه‌ای از اصول می‌دهد — جدا از حکم‌های خودِ جزوه */
+  const beyond = RULES.filter((r) => r.basis === "beyond");
+  if (beyond.length) {
+    const TH = (global.EPI_FOUND || {}).TH || {};
+    L.push("## فراتر از جزوه — قاعده‌های قضیه‌ای که جزوه عددشان را نمی‌دهد", "");
+    beyond.forEach((r) => {
+      const used = Object.values(byCase).filter((v) => v.fired.indexOf(r.id) >= 0);
+      L.push("- `" + r.id + "` " + r.fa + " — قضیهٔ `" + r.proof + "` (" + ((TH[r.proof] || {}).fa || "") + "؛ از " + ((TH[r.proof] || {}).from || []).join("، ") + ")؛ بخش‌های پیوسته: " + (r.sec || []).join("، ") +
+        "؛ وقایعی که به کارش انداختند: " + used.length + (used.length ? " (" + used.slice(0, 6).map((v) => v.title).join("، ") + ")" : ""));
+    });
+    L.push("");
+  }
   const chapters = {}; Object.keys(BOOK.sec).forEach((s) => { const c = BOOK.sec[s].ch || "?"; (chapters[c] = chapters[c] || []).push(s); });
   const chOrder = (BOOK.ch || []).map((x) => x.id).filter((id) => chapters[id]).concat(Object.keys(chapters).filter((id) => !(BOOK.ch || []).some((x) => x.id === id)));
   chOrder.forEach((ch) => {

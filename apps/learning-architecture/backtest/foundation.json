@@ -2,7 +2,7 @@
  "round": 12,
  "at": "2026-10-15",
  "classes": {
-  "B": 26,
+  "B": 28,
   "S": 18,
   "O": 6,
   "X": 0,
@@ -1067,6 +1067,50 @@
    "stricterThanTheorem": false,
    "conventional": false,
    "capText": "50"
+  },
+  {
+   "id": "r_aql_conseq",
+   "fa": "فرضیه با پیامدهای تأییدشده: معتبرتر، نه اثبات‌شده",
+   "st": "st_aql",
+   "cap": 50,
+   "capDeg": "shakk",
+   "sec": [
+    "s40",
+    "s50"
+   ],
+   "k": "B",
+   "th": "T_plausible",
+   "thFa": "استدلالِ معقول: n پیامدِ تازهٔ تأییدشده ⇒ (n+1)/(n+2)؛ تمثیل با k موافق از n موردِ همانند در رابطهٔ مربوط ⇒ (k+1)/(n+2)؛ همانندیِ احرازنشده ⇒ ≤ ½؛ هرگز ۱",
+   "bound": "100(n+1)/(n+2)",
+   "base": null,
+   "baseFa": "",
+   "note": "n = پیامدهای تازهٔ جدای تأییدشده (x_conseq_n) فقط اگر تازگی احراز شده (x_conseq_new)؛ وگرنه n = 0 ⇒ ½ (T_null / T_unknown)؛ هرگز ۱",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "۱۰۰×(n+1)/(n+2) — n پیامدِ تازهٔ تأییدشده"
+  },
+  {
+   "id": "r_aql_analogy",
+   "fa": "تمثیل: وزن به شمار و نزدیکیِ مواردِ همانند",
+   "st": "st_aql",
+   "cap": 50,
+   "capDeg": "shakk",
+   "sec": [
+    "s40",
+    "s50"
+   ],
+   "k": "B",
+   "th": "T_plausible",
+   "thFa": "استدلالِ معقول: n پیامدِ تازهٔ تأییدشده ⇒ (n+1)/(n+2)؛ تمثیل با k موافق از n موردِ همانند در رابطهٔ مربوط ⇒ (k+1)/(n+2)؛ همانندیِ احرازنشده ⇒ ≤ ½؛ هرگز ۱",
+   "bound": "100(k+1)/(n+2) یا ≤ ½",
+   "base": null,
+   "baseFa": "",
+   "note": "k از n موردِ همانند (x_analog_k، x_analog_n) فقط اگر همانندی در رابطهٔ مربوط احراز شده (x_analog_rel)؛ وگرنه ½ (T_unknown + T_weakest)؛ k نامعلوم ⇒ میانگینِ A4 = ½",
+   "consistent": true,
+   "stricterThanTheorem": false,
+   "conventional": false,
+   "capText": "۱۰۰×(k+1)/(n+2) — k از n موردِ همانند؛ همانندیِ احرازنشده ⇒ ۵۰"
   }
  ],
  "modes": {
@@ -1259,7 +1303,7 @@
  },
  "impacts": {
   "p_found_half": {
-   "rules": 26,
+   "rules": 28,
    "ceilings": 0,
    "fixed": [],
    "broken": [],

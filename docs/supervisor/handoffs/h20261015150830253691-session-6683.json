@@ -1,0 +1,16 @@
+{
+ "id": "h20261015150830253691-session-6683",
+ "at": "2026-10-15T15:08:30Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_plausible_reasoning (مالک «موافقم»): a2_ws.js نوعِ عامِ تازهٔ فیلدِ «num» (عددِ صحیحِ ≥ ۰، ارقامِ فارسی، خالی ⇒ نامعلوم، با label for)؛ a7_bt.js: «داوریِ قطعی» خانه‌های خالیِ x_conseq_*/x_analog_* را از کاربرگِ «راه عقل و برهان» پر می‌کند و «جزوهٔ زنده» برای basis beyond برچسبِ «فراتر از جزوه — قضیهٔ …» می‌زند؛ آزمونِ tests/test_plausible.js (کدِ خروج).",
+ "procedure": "apps/learning-architecture/AGENTS.md («هر تغییر»؛ فرمِ برچسب‌دار برای دستیار)",
+ "commit": "",
+ "status": "open"
+}

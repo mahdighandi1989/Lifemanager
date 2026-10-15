@@ -215,6 +215,12 @@
     if (d[f.k] && (f.opts || []).indexOf(d[f.k]) < 0) sel.appendChild(h("option", { value: d[f.k], selected: true }, d[f.k] + " (گزینهٔ پیشین)"));
     return sel;
   };
+  /* عددِ شمارشی (≥ ۰، صحیح) — مثلاً شمارِ پیامدهای تأییدشده یا مواردِ همانند (p_plausible_reasoning، ۲۰۲۶-۱۰-۱۵)؛ خالی ⇒ null («نامعلوم») */
+  FIELD.num = function (f, d, ch, id) {
+    return h("input", { id: id, type: "number", min: f.min == null ? 0 : f.min, step: 1, inputmode: "numeric", value: d[f.k] == null ? "" : d[f.k], placeholder: f.ph || "",
+      oninput: function (e) { var v = String(e.target.value).replace(/[۰-۹]/g, function (x) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(x); }).trim();
+        d[f.k] = v === "" || isNaN(+v) ? null : Math.max(f.min == null ? 0 : f.min, Math.round(+v)); ch(); } });
+  };
   FIELD.checks = function (f, d, ch, id) {
     var cur = d[f.k] || [];
     var opts0 = (f.opts || []).concat(cur.filter(function (x) { return x && (f.opts || []).indexOf(x) < 0; }));   // گزینهٔ پیشینِ تیک‌خورده هم دیده شود

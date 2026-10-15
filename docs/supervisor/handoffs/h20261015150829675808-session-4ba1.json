@@ -1,0 +1,15 @@
+{
+ "id": "h20261015150829675808-session-4ba1",
+ "at": "2026-10-15T15:08:29Z",
+ "by": "session",
+ "area": "epi-rules",
+ "owner": [
+  "owner"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_plausible_reasoning به دستورِ مالک ۲۰۲۶-۱۰-۱۵ («موافقم»): قضیهٔ F.TH.T_plausible (from A0–A4؛ برهان مستقل وارسی و با «سقف با لزومِ ناقص» و «n همهٔ موارد نه فقط موافق‌ها» کامل شد) و دو قاعدهٔ beyond در st_aql: r_aql_conseq = ۱۰۰(n+1)/(n+2) (تازگیِ احرازنشده ⇒ ۵۰) و r_aql_analogy = ۱۰۰(k+1)/(n+2) (همانندیِ احرازنشده یا k نامعلوم ⇒ ۵۰)، اشتقاق در F.DER (B، cf conseq/analogy)، در انتهای فهرست. اعمال‌نشده: قاعدهٔ جدای «پیامدِ ردشده ⇒ ۰» (فقط با لزوم و ردِ یقینی قضیه است = conflict_cert موجود). هیچ حکمی عوض نشد. یادداشت: docs/overhaul/handoff-notes/_pending_plausible_2026-10-15.md",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md (اعمالِ پیشنهادِ پذیرفتهٔ مالک؛ مسیرِ ۲: قضیه از اصولِ موجود، basis beyond)",
+ "commit": "",
+ "status": "open"
+}

@@ -1,0 +1,15 @@
+{
+ "id": "h20261015150830065118-session-4471",
+ "at": "2026-10-15T15:08:30Z",
+ "by": "session",
+ "area": "epi-backtest",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_plausible_reasoning در proposals.json: applied + appliedWhat + decision (owner «موافقم»، judged، applied، notApplied ×۳، effect). tools/epi_backtest.js: جزوهٔ متقن بخشِ «فراتر از جزوه» (قاعده‌های basis beyond با قضیه) گرفت. run --rerun دورِ ۱۲: قاعده‌ها ۷۷ ⇒ ۷۹، بدیهی‌پایه ۲۶ ⇒ ۲۸، هیچ حکمی عوض نشد (۲۰۳ پرونده، مقایسهٔ کاملِ پیش/پس)، کنترل‌ها ✓، audit تمیز. آزمونِ تازه tests/test_plausible.js.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md (گامِ ۶–۷: پیشنهادِ پذیرفته ⇒ اعمال، run --rerun؛ مسیرِ ۲: «فراتر از جزوه» در جزوهٔ متقن)",
+ "commit": "",
+ "status": "open"
+}

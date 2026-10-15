@@ -1371,7 +1371,7 @@
    },
    "coverage": {
     "rulesTested": 54,
-    "rules": 77,
+    "rules": 79,
     "sectionsTested": 54,
     "sections": 72,
     "domains": 12,
@@ -1398,7 +1398,9 @@
      "r_expert_pop_econ",
      "r_expert_pop_psych",
      "r_expert_pop_socsci",
-     "r_expert_pop_unknown"
+     "r_expert_pop_unknown",
+     "r_aql_conseq",
+     "r_aql_analogy"
     ],
     "byDomain": {
      "پزشکی": 22,
@@ -1417,7 +1419,7 @@
    },
    "foundation": {
     "classes": {
-     "B": 26,
+     "B": 28,
      "S": 18,
      "O": 6,
      "X": 0,
