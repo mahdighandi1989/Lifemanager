@@ -4542,3 +4542,15 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **CHANGE (blind re-encode):** encoders E3/E4 were discarded because their input page leaked the removed outcome sentences. E5/E6 encoded from a clean copy and reviewer RV checked them. Applied: 84 fill-empty values and 2 corrections (Hyatt method, Schmitz chain); 4 reverted chains were restored. Split readings were not applied (3 narrators on sound cases — recorded).
 - **Result:** 203/203 verdicts correct (0 broken); fully located 116 → 116; audit clean; no health alarms. Brier over 233 claims 0.2618 → 0.2973. It is worse, reported as is: the caps are now provable suprema, not frequency forecasts.
 - **CHANGE:** round-11 independent review (separate session RV11) recorded. Two wrong DOIs were fixed (verified via Crossref), the Audi link now points to the publisher, the Emadzadeh source is marked unverified, `scoreEvidenced` was added, the widen source check was tightened, and `needs2ndSource` was added. `relay|field --amend` (all-or-nothing, history) was added and the three frames' reason text was corrected.
+
+## 2026-10-15 — LLA: live unsolved-problem tunnel; open items decided without asking; Pólya round 6 (WORKLOG 63–65)
+- **DECISION (owner, standing):** Open items are decided from the owner's recorded concerns, without asking (`CLAUDE.md`, `AGENTS.md`).
+- **CHANGE:** Backtest backlog closed (WORKLOG 63–64).
+  - `p_found_mixture`: the mixture reading (`T_support`) applied.
+  - `p_matter_zanni` applied.
+  - `p_thiqa` unmeasured ⇒ «less than certain» only.
+  - Round-11 review recorded.
+  - Verdicts: 203/203 correct.
+- **CHANGE:** «🔭 مسئلهٔ حل‌نشدهٔ خودم» (`a38_live.js`; same record type and cards, live mode): understanding, plan with a mandatory specific heuristic, real steps with predictions checked against reality, look-back, question internalisation. Event forecasts were removed from answer accuracy (all 🎯).
+- **FINDING → CHANGE:** Skeptic (16 findings) and round-6 auditor (9 bugs) issues all fixed.
+- **FINDING:** Pólya round 6 is 585 / 115 / 79 / 33 (`docs/decisions/2026-10-15-polya-round6.md`).

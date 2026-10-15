@@ -109,3 +109,18 @@ are far fewer than N, the count is inflated; require each positive verdict to qu
 script then finds in the *executed* product (here 663 quotes, 0 misses); (2) send adversarial,
 execution-based reviewers per requirement before merging large work, with mutation testing to see
 which behaviours the suite does not actually guard; (3) let builders never grade their own work.
+
+## Update 2026-10-15 (b) — a tool that only works on solved problems, and gates that open with one click
+
+The strict coverage audit's biggest gap was structural: the whole solving tunnel ran only on
+problems whose answer was stored (it compared each step to a stored step), so it could not serve
+the owner's real, unsolved problems. The fix was a *mode* of the same tunnel that checks against
+reality instead (prediction before each real step, outcome on its due day). Two review passes
+then found gates that were real in the UI but trivially satisfiable: one click on «related» counted
+as a heuristic; a verbatim copy passed as the "whole in one sentence"; a deleted datum's id was
+reused so a new datum inherited "used".
+**Apply elsewhere:** when a learning/checking flow depends on a known answer, ask whether the
+user's real cases have one — if not, build the same flow with reality as the judge (prediction +
+dated outcome). For every "required" gate, try the cheapest input that passes it (one click, a copy,
+three characters) and make the gate check substance (specificity, near-copy, identity that is never
+reused).
