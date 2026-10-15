@@ -1001,6 +1001,18 @@ table.kp-log th,table.kp-log td{padding:4px 6px;border-bottom:1px solid var(--li
 .mv-stuckrow{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
 .mv-stuckrow .small{flex:1 1 220px;min-width:0}
 .mv-era-list{padding-inline-start:1.2em}
+.mv-askq{font-weight:700;font-size:1.02rem;margin:.2em 0}
+.mv-ask{margin:.1em 0;border-right:3px solid var(--pc,var(--accent));padding-right:6px}
+.mv-hl-list{padding-inline-start:1.2em;margin:.3em 0}
+.mv-hl-list li{margin:.3em 0;line-height:1.7}
+.mv-hlbox summary{cursor:pointer}
+.mv-drill{border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;margin:0 0 8px;min-width:0}
+.mv-drill legend{font-weight:700;padding:0 6px;white-space:normal}
+.mv-eqt{width:100%;border-collapse:collapse;table-layout:fixed}
+.mv-eqt th,.mv-eqt td{border:1px solid var(--line);padding:4px}
+.mv-eqt input{width:100%;box-sizing:border-box}
+.kn-planq{border-right:3px solid var(--accent);padding-right:8px}
+.kn-prac textarea{width:100%}
 .mv-era-list li{margin:.4em 0}
 .mv-era-list p{margin:.1em 0 .3em}
 .mv-plist li{margin:.35em 0}

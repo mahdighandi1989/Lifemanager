@@ -126,7 +126,7 @@ def sources():
                                                   if os.path.exists(os.path.join(A, f)))
     epibook = rd(os.path.join(A, "epi_book.js"))
     epidata = rd(os.path.join(A, "epi_core.js")) + "\n" + "".join(rd(os.path.join(A, "epi_st_%s.js" % x)) + "\n" for x in "abcd")
-    btfiles = ["epi_feat.js", "epi_rules.js", "epi_cases_a.js", "epi_cases_b.js", "epi_problems.js", "epi_problems_b.js", "epi_field.js",
+    btfiles = ["epi_feat.js", "epi_rules.js", "epi_cases_a.js", "epi_cases_b.js", "epi_problems.js", "epi_problems_b.js", "epi_problems_c.js", "epi_field.js",
                "epi_blind.js", "epi_engine.js", "epi_found.js", "epi_territory.js", "epi_bt_core.js"]
     epibt = "".join(rd(os.path.join(A, f)) + "\n" for f in btfiles) + ledger_js()
     for name, s in [("core", core), ("app", app), ("epibook", epibook), ("epidata", epidata), ("epibt", epibt)] + \

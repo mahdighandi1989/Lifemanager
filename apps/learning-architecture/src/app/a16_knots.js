@@ -429,7 +429,7 @@
     return out;
   };
   A.knotSafetyHit = function (text) { return A.knotSafetyMatch(text).length > 0; };
-  function kcText(kc) { var it = kc.intake || {}; return [kc.title, it.what, it.expected, it.actual, it.thoughts, it.claim, it.context, it.emoName, it.statement, it.stuckAt].join(" \n "); }
+  function kcText(kc) { var it = kc.intake || {}, pr = it.prac || {}; return [kc.title, it.what, it.expected, it.actual, it.thoughts, it.claim, it.context, it.emoName, it.statement, it.stuckAt, pr.want, pr.have, pr.cond, pr.vague, pr.ignore, pr.approx].join(" \n "); }
   function safetyPending(kc) { return A.knotSafetyHit(kcText(kc)) && !kc.safetyAck; }
   A.knotSafetyCard = function (onAck, onStop) {
     var ov = h("div", { class: "overlay kn-safe", role: "alertdialog", "aria-modal": "true", "aria-labelledby": "knSafeT" });
@@ -647,6 +647,7 @@
   function redraw() { var y = window.scrollY; A.render(); try { window.scrollTo(0, y); } catch (e) { } }
   function seenIso(kc) { return kc.intake.seen === "yes" || (kc.ladder.opened != null && kc.ladder.opened >= 0); }
   function isProblem(kc) { return kc.kinds.indexOf("problem") >= 0; }
+  function isPractical(kc) { return ["behavior", "social", "inference"].some(function (k) { return kc.kinds.indexOf(k) >= 0; }); }
   function recurring(kc) { return kc.intake.freq === "some" || kc.intake.freq === "often" || kc.kinds.indexOf("repeat") >= 0; }
   var REQ = [["kinds", "نوعِ موقعیت"], ["what", "چه شد"], ["expected", "چه انتظار داشتم"], ["actual", "در واقع چه شد"], ["thoughts", "چه فکرهایی کردم/چه کردم"], ["seen", "پاسخ/راه‌حل را دیده‌ای؟"]];
   function intakeMissing(kc) {
@@ -812,6 +813,21 @@
       fld("از کجا معلوم است که این پاسخ درست است؟", txt("knAnsHow", it.answerHow, set("answerHow"))),
       fld("کجا دقیقاً گیر کردم؟", area("knStuck", it.stuckAt, 2, set("stuckAt"))),
       fld("چقدر وقت گذاشتم؟ (دقیقه)", h("input", { type: "number", id: "knMin", min: "0", value: it.minutes == null ? "" : it.minutes, oninput: function (e) { it.minutes = e.target.value; ch(); } })));
+    /* مسئلهٔ عملی (تصمیم، کار، رابطه): همان قالبِ «مجهول / داده / شرط» ِ مسئله‌های ذهنی، به‌اضافهٔ مفهومِ مبهم، داده‌ای که آگاهانه کنار می‌گذاری
+       و این‌که تا کجا اطلاعات جمع می‌کنی (⇐ ایستگاهِ «مسئولیتِ معرفتی»)، و تقریبی که بس است. اختیاری؛ در intake.prac ذخیره می‌شود. */
+    var pr = it.prac = it.prac || {};
+    function setP(k) { return function (v) { pr[k] = v; it.prac = pr; ch(); }; }
+    var pracSec = h("section", { class: "card kn-prac" + (isPractical(kc) ? "" : " hidden"), dir: "rtl" },
+      h("h3", {}, "اگر مسئلهٔ عملی است (تصمیم، کار، رابطه)"),
+      h("p", { class: "small muted" }, "همان پرسش‌هایی که در هر مسئله می‌پرسی؛ اختیاری‌اند ولی گره‌یابی و گام‌های بعد را دقیق‌تر می‌کنند."),
+      h("div", { class: "kn-grid" },
+        fld("چه می‌خواهی؟ (مجهول)", area("knPWant", pr.want, 2, setP("want"), "دقیقاً چه چیزی باید روشن یا انجام شود؟")),
+        fld("چه داری؟ (داده‌ها)", area("knPHave", pr.have, 2, setP("have"), "واقعیت‌ها، منابع، زمان، کسانی که می‌توانند کمک کنند")),
+        fld("چه قیدهایی هست؟ (شرط)", area("knPCond", pr.cond, 2, setP("cond"), "مهلت، بودجه، قاعده، آنچه نباید از دست برود")),
+        fld("کدام مفهومِ مبهم را باید روشن کنی؟", area("knPVague", pr.vague, 2, setP("vague"), "مثلاً «موفق»، «به‌موقع»، «کافی» یعنی دقیقاً چه؟")),
+        fld("کدام داده را آگاهانه کنار می‌گذاری، و تا کجا اطلاعات جمع می‌کنی؟", area("knPIgnore", pr.ignore, 2, setP("ignore"), "چه چیزی را نمی‌پرسی و چرا؛ کِی دست از جست‌وجو می‌کشی")),
+        fld("کدام تقریب بس است؟", area("knPApprox", pr.approx, 2, setP("approx"), "چه دقتی برای این تصمیم کافی است؟"))),
+      A.stLink && A.EST && A.EST.st_resp ? h("div", { class: "row gap wrap small" }, h("span", { class: "muted" }, "برای «تا کجا اطلاعات جمع کنم؟»: "), A.stLink("st_resp")) : null);
     box.appendChild(h("section", { class: "card" },
       h("p", { class: "small muted" }, "واقعیت را بی‌تفسیر بنویس. اگر از کسی نام می‌بری، فقط نقش یا نامِ مستعار بنویس (مثلاً «مدیرِ بخش»، «همکارِ الف»). فیلدهای ستاره‌دار لازم‌اند؛ بقیه اختیاری. هر چه بنویسی خودکار ذخیره می‌شود."),
       group("نوعِ موقعیت (هر ترکیبی مجاز است)", h("div", { class: "kn-checks" }, KINDS.map(function (k, i) {
@@ -819,7 +835,7 @@
         return h("label", { class: "kn-check", for: id }, h("input", { type: "checkbox", id: id, checked: kc.kinds.indexOf(k[0]) >= 0, onchange: function (e) {
           var a = kc.kinds.filter(function (x) { return x !== k[0]; }); if (e.target.checked) a.push(k[0]);
           kc.kinds = KINDS.map(function (x) { return x[0]; }).filter(function (x) { return a.indexOf(x) >= 0; });
-          probSec.classList.toggle("hidden", !isProblem(kc)); ch();
+          probSec.classList.toggle("hidden", !isProblem(kc)); pracSec.classList.toggle("hidden", !isPractical(kc)); ch();
         } }), h("span", {}, k[1]));
       })), { req: true, k: "kinds" }),
       fld("عنوانِ کوتاه (اختیاری)", txt("knTitle", kc.titleSet ? kc.title : "", function (v) { kc.title = v.trim(); kc.titleSet = !!v.trim(); ch(); }, "اگر خالی بماند، از «چه شد» ساخته می‌شود")),
@@ -830,6 +846,7 @@
       group("پاسخ/راه‌حل را دیده‌ای؟", radios("knSeen", it.seen, [["yes", "بله، دیده‌ام"], ["no", "نه، هنوز ندیده‌ام"], ["na", "پاسخِ یکتایی در کار نیست (موقعیتِ باز)"]], function (v) { it.seen = v; ch(); }, true),
         { req: true, k: "seen", hint: "اگر دیده‌ای، نردبانِ راهنمایی روی همین مسئله خاموش می‌شود و آزمون‌ها روی یک «هم‌ریخت» (همان ساختار، ظاهرِ نو) انجام می‌شوند." })));
     box.appendChild(probSec);
+    box.appendChild(pracSec);
     box.appendChild(h("section", { class: "card" }, h("h3", {}, "زمینه"),
       h("div", { class: "kn-grid" },
         fld("چند بار پیش آمده؟", sel("knFreq", it.freq, [["once", "یک‌بار"], ["some", "گاهی"], ["often", "مرتب"]], set("freq"))),
@@ -960,6 +977,7 @@
     var it = kc.intake, L = [];
     L.push("نوعِ موقعیت: " + kc.kinds.map(function (k) { return KINDFA[k]; }).join("، "));
     [["what", "چه شد"], ["expected", "انتظار"], ["actual", "در واقع"], ["thoughts", "فکرها/کارها"], ["statement", "صورتِ مسئله"], ["stuckAt", "کجا گیر کرد"], ["context", "زمینه"], ["claim", "نتیجه‌ای که دربارهٔ خودش گرفت"]].forEach(function (f) { if (String(it[f[0]] || "").trim()) L.push(f[1] + ": " + it[f[0]]); });
+    var prc = it.prac || {}; [["want", "مجهول (چه می‌خواهد)"], ["have", "داده‌ها"], ["cond", "قیدها"], ["vague", "مفهومِ مبهم"], ["ignore", "دادهٔ کنارگذاشته/حدِ جست‌وجو"], ["approx", "تقریبِ کافی"]].forEach(function (x) { if (String(prc[x[0]] || "").trim()) L.push(x[1] + ": " + prc[x[0]]); });
     L.push("فشارِ زمان: " + (it.pressure === "" || it.pressure == null ? "؟" : it.pressure) + "/10 · خستگی: " + (it.fatigue === "" || it.fatigue == null ? "؟" : it.fatigue) + "/10 · حضورِ دیگران: " + (it.others || "؟"));
     if (priv) L.push("احساس: " + (it.emoName || "؟") + " · شدت: " + (it.emo === "" || it.emo == null ? "؟" : it.emo) + "/10");
     L.push("جمله‌هایی که کاربر درست دانسته: " + (it.stmts || []).map(function (s) { var x = STMT.filter(function (y) { return y[0] === s; })[0]; return x ? x[1] : s; }).join(" · "));
@@ -991,9 +1009,9 @@
   var LAD = [
     { n: 0, fa: "۲ تا ۵ دقیقهٔ دیگر بی‌هیچ راهنمایی تلاش کن.", tag: "پلهٔ کنترل" },
     { n: 1, fa: "صورت را دوباره و کلمه‌به‌کلمه بخوان.", fam: "F2", sub: "read" },
-    { n: 2, fa: "هدف و همهٔ قیدها را بازگو کن؛ کدام را خودت فرض کردی؟", fam: "F2", sub: "rep" },
-    { n: 3, fa: "روی کاغذ رسم یا جدول کن.", fam: "F5", sub: "wm" },
-    { n: 4, gen: true, label: "راهنماییِ راهبرد («از آخر»، «حالتِ خاص»، «قرینه»)", fam: "F3", sub: "heur" },
+    { n: 2, fa: "مجهول چیست؟ داده‌ها چیست؟ شرط چیست؟ هدف و همهٔ قیدها را بازگو کن؛ کدام را خودت فرض کردی؟ همهٔ داده‌ها، کلِ شرط و همهٔ مفهوم‌های اساسیِ مسئله را به کار برده‌ای؟", fam: "F2", sub: "rep" },
+    { n: 3, fa: "روی کاغذ شکل بکش یا جدول کن و نمادِ مناسب بگذار.", fam: "F5", sub: "wm" },
+    { n: 4, gen: true, label: "راهنماییِ راهبرد (از پرسش‌های طرح‌ریزی: مسئلهٔ مرتبط ⇐ به مجهول نگاه کن ⇐ عنصرِ کمکی ⇐ خاص/کلی/مشابه ⇐ بخشی از شرط)", fam: "F3", sub: "heur" },
     { n: 5, gen: true, label: "نامِ مفهومِ کلیدی", fam: "F1" },
     { n: 6, gen: true, label: "گامِ کلیدی (بدونِ پاسخِ نهایی)", tag: "تشخیصی نیست" }
   ];
@@ -1013,6 +1031,7 @@
     sec.appendChild(h("p", { class: "small" }, "پس از هر پله دوباره تلاش کن و بگو «باز شد» یا «نشد». پله‌ای که در آن باز شد فقط شاهدِ ضعیف (+۱) است؛ پلهٔ ۰ کنترل است و پلهٔ ۶ تشخیصی نیست. قدرتِ تمایز در آزمون‌های مقایسه‌ایِ پایین‌تر است."));
     var cur = L.cur || 0, steps = L.steps || {};
     if (L.opened != null) {
+      if (L.opened >= 0) sec.appendChild(backBox(H));
       sec.appendChild(h("p", { class: "kn-ladres" }, L.opened >= 0 ? "در پلهٔ " + fa(L.opened) + " باز شد" + (L.opened === 6 ? " — پلهٔ ۶ تشخیصی نیست؛ شاهدی ثبت نشد." : L.opened === 0 ? " — فقط با زمانِ بیشتر (پلهٔ کنترل)." : ".") : "تا پلهٔ ۶ هم باز نشد — شاهدی ثبت نشد؛ با آزمون‌ها ادامه بده."));
       sec.appendChild(h("button", { class: "btn ghost sm", onclick: function () { kc.ladder = {}; kc.ev = kc.ev.filter(function (e) { return e.src !== "ladder"; }); H.put(); redraw(); } }, "از نو"));
       return sec;
@@ -1022,6 +1041,7 @@
       return h("li", { class: s.n < cur ? "past" : s.n === cur ? "now" : "next" }, h("b", {}, "پلهٔ " + fa(s.n) + (s.tag ? " (" + s.tag + ")" : "") + ": "),
         s.n <= cur ? (t || h("span", { class: "muted" }, s.label + " — هنوز نوشته نشده")) : h("span", { class: "muted" }, s.gen ? s.label : "…"));
     })));
+    if (cur === 4) sec.appendChild(planBox(H));
     var S0 = LAD[cur];
     if (S0.gen && !steps[cur]) {
       var ins = {}; var gen = h("div", { class: "col gap" });
@@ -1093,6 +1113,23 @@
       h("button", { class: "btn sm kn-lad-open", onclick: function () { L.opened = cur; L.cur = cur; kc.ladder = L; ladderEv(kc, cur); H.put(); redraw(); } }, "باز شد"),
       h("button", { class: "btn ghost sm kn-lad-next", onclick: function () { if (cur >= 6) { L.opened = -1; } else L.cur = cur + 1; kc.ladder = L; H.put(); redraw(); } }, cur >= 6 ? "باز نشد (پایانِ نردبان)" : "باز نشد ⇐ پلهٔ بعد")));
     return sec;
+  }
+  /* پلهٔ ۴: پرسش‌های طرح‌ریزی به ترتیبِ فهرست (A.PLAN_QS ِ ثبت‌گاهِ حرکت‌ها، a19) — یکی‌یکی، با «پرسشِ بعدی»؛ جای پرسش در kc.ladder.pq.
+     پس از «باز شد»: یک پرسشِ بازنگری (A.BACK_QS) با پاسخِ کوتاهِ خودت (kc.ladder.back) — بازنگری بی‌درنگ پس از حل معنا دارد. */
+  function planBox(H) {
+    var kc = H.kc, L = kc.ladder = kc.ladder || {}, Q = A.PLAN_QS || [];
+    if (!Q.length) return h("span", {});
+    var i = (L.pq || 0) % Q.length, q = Q[i];
+    return h("div", { class: "card soft kn-planq", dir: "rtl" }, h("div", { class: "small muted" }, "پرسشِ طرح‌ریزی " + fa(i + 1) + " از " + fa(Q.length) + " — پیش از راهنماییِ اختصاصیِ پلهٔ ۴ از خودت بپرس:"),
+      h("p", { class: "kn-planq-t" }, q.t), q.mv && q.mv.length && A.moveLink ? h("div", { class: "row gap wrap small" }, q.mv.map(function (m) { return A.moveLink(m); })) : null,
+      h("button", { class: "btn ghost sm kn-planq-next", type: "button", onclick: function () { L.pq = (i + 1) % Q.length; kc.ladder = L; H.put(); redraw(); } }, "پرسشِ بعدی"));
+  }
+  function backBox(H) {
+    var kc = H.kc, L = kc.ladder || {}, Q = A.BACK_QS || [];
+    if (!Q.length) return h("span", {});
+    var b = L.back || {}, q = b.q || Q[(String(kc.id).length + (L.opened || 0)) % Q.length];
+    var ta = area("knBack", b.a || "", 2, function (v) { L.back = { q: q, a: v, at: now() }; kc.ladder = L; H.soon(); }, "پاسخِ کوتاهِ خودت");
+    return h("div", { class: "card soft kn-back", dir: "rtl" }, h("div", { class: "small muted" }, "بازنگری — حالا که باز شد:"), h("p", { class: "kn-back-q" }, q), fld("پاسخِ بازنگری", ta));
   }
   var SYS_LAD_HID = "تو سازندهٔ راهنمایی‌های پله‌ای برای مسئله‌ای هستی که کاربر پاسخش را نمی‌داند. اول خودت مسئله را دقیق و گام‌به‌گام (در ذهن) حل کن؛ پاسخ فقط در فیلدِ answer می‌آید و **هرگز** به کاربر نشان داده نمی‌شود. راهنمایی‌ها هرگز پاسخِ نهایی، عددِ پاسخ یا عبارتِ پاسخ را ندارند. فقط JSON: {\"answer\":\"پاسخِ نهایی (کوتاه)\",\"s4\":\"یک راهنماییِ راهبرد بی‌آن‌که راه را کامل کند\",\"s5\":\"فقط نامِ مفهوم یا بازنماییِ کلیدی\",\"s6\":\"نخستین گامِ راه، نه بیشتر\"}";
   var SYS_SAME = "دو پاسخ به یک مسئلهٔ پنهان می‌بینی. فقط بگو آیا هر دو **همان راه‌حل یا همان پاسخ**اند (با بیانِ متفاوت)، نه این‌که کدام درست است. فقط JSON: {\"same\":true|false}";

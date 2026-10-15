@@ -31,7 +31,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.locator('#showSamples').count() === 1 && !(await p.locator('#showSamples').isChecked()), 'samples toggle present and off');
   await p.check('#showSamples'); await go('e_prob');
   info.on = { samples: await p.locator('main .pb-sample').count(), stages: await p.evaluate(() => APP.moveStages('mv_represent').length) };
-  chk(info.on.samples === 13 && info.on.stages > 0, 'samples back with toggle ' + JSON.stringify(info.on));
+  // ۱۳ مسئلهٔ بزرگ + ۲۰ مسئلهٔ کوتاهِ تمرینی (epi_problems_c.js، ۲۰۲۶-۱۰-۱۵) — همه زیرِ همان گزینهٔ «نمونه‌های آمادهٔ سازنده»
+  chk(info.on.samples === 33 && info.on.stages > 0, 'samples back with toggle ' + JSON.stringify(info.on));
   await go('settings'); await p.uncheck('#showSamples');
   chk(await p.evaluate(() => APP.probs().length) === 0, 'samples hidden again');
 
