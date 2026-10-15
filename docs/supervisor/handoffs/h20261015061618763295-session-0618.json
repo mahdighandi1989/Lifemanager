@@ -11,5 +11,11 @@
  "what": "پیشنهادِ p_base_expert_method در proposals.json (فقط پیشنهاد؛ هیچ قاعده/سقف/قضیه‌ای عوض نشد). پس از «بپذیر» ِ مالک، روتینِ بک‌تست مقدارِ پایهٔ تازه را در epi_found.js اعمال و با قاب تأیید کند.",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:33Z",
+  "note": "پیشنهادِ p_base_expert_method در proposals.json هست و بعداً با تصمیمِ مالک فقط بخشِ قضیه‌ای اعمال شد (۱۷۸۳dff)؛ هیچ قاعده‌ای بی تصمیم عوض نشده بود. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "f66087c"
+ }
 }

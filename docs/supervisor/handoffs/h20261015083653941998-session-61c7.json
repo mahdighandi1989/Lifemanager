@@ -11,5 +11,11 @@
  "what": "اعمالِ بخش‌های قضیه‌ایِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵: ویژگیِ x_field (st_expert)، قضیهٔ T_pop، پایه‌های p_expert_econ_lab=60 / p_expert_psych08=36.4 / p_expert_socsci_ns=60.9 (ابزار، از قاب‌ها)، قاعده‌های r_expert_pop_econ/psych/socsci (=پایه) و r_expert_pop_unknown (50، T_unknown)؛ فرمانِ epi_backtest.js field + fieldAudit؛ فیلدِ جمعیت در کاربرگِ استناد به تخصص؛ run --rerun ِ دورِ ۱۲؛ «۶۰ برای همه» و T_mix اعمال نشد. هیچ حکمی عوض نشد. یادداشت: apps/learning-architecture/docs/_pending_step2_apply_2026-10-15.md — WORKLOG/PROGRESS/HANDBOOK/AUDIT_LOG با روتینِ بک‌تست.",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md (اعمالِ پیشنهادِ پذیرفته، بندِ ۶)",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:33Z",
+  "note": "دوباره ساخته شد: پایه‌ها (k+1)/(n+2) از قاب‌ها = ۱۲/۲۰ = ۶۰٫۰، ۳۶/۹۹ = ۳۶٫۴، ۱۴/۲۳ = ۶۰٫۹؛ r_expert_pop_* و r_expert_pop_unknown (۵۰، T_unknown) اجرا شد؛ T_mix و «۶۰ برای همه» اعمال نشده. بازبینِ مستقلِ برهان (claude.ai/artifact/L6aJyrUe1K817LZ9jN8LbK): برهانِ T_pop درست ولی A4 روی پیوستار (برتران) و تساوی‌به‌جای‌سقف پیش‌فرضِ نهفته دارد ⇒ در p_found_mixture برای مالک ثبت شد (تغییرِ قضیه با مالک). run --rerun: ۲۰۳/۲۰۳. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "f66087c"
+ }
 }

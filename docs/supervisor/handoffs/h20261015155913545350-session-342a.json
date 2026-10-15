@@ -11,5 +11,11 @@
  "what": "p_plausible_reasoning (مالک ۲۰۲۶-۱۰-۱۵ «موافقم»): قضیهٔ T_plausible در epi_found.js (r_aql_conseq / r_aql_analogy، توابعِ conseq و analogy) و ثبتِ آن در backtest/foundation.json؛ «پیامدِ ردشده ⇒ ۰» اعمال نشد (قضیه نیست). هیچ حکمِ پیکره جابه‌جا نشد. لطفاً وارسی کنید.",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱ (اعمالِ پیشنهادِ پذیرفتهٔ مالک)",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:33Z",
+  "note": "حساب دوباره: (n+1)/(n+2) و سقف‌بودن با لزومِ ناقص، (k+1)/(n+2)، k نامعلوم ⇒ ½ (بازبینِ مستقلِ برهان claude.ai/artifact/L6aJyrUe1K817LZ9jN8LbK تأیید کرد)؛ CAPF.conseq/analogy و شرط‌های قاعده با متنِ پذیرفته می‌خوانند. هشدارِ بازبین: «تازگیِ احرازنشده ⇒ ½» و «همانندیِ احرازنشده ⇒ ≤ ½» سخت‌گیرتر از قضیه‌اند (خوانشِ آمیزه ½·(k+1)/(n+2)+¼ می‌دهد) ⇒ p_found_mixture برای مالک. پیکره با رمزگذارِ کور این ویژگی‌ها را گرفت (لوریه ⇒ r_aql_analogy)؛ ۰ حکمِ خراب. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "f66087c"
+ }
 }

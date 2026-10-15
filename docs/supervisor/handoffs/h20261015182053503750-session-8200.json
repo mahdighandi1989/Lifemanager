@@ -1,0 +1,16 @@
+{
+ "id": "h20261015182053503750-session-8200",
+ "at": "2026-10-15T18:20:53Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "روتینِ بک‌تست (اجرا در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵): رمزگذاریِ کورِ دوبارهٔ تصدیق‌های مسئله‌ها در epi_problems.js (فقط خانهٔ خالی، دو رمزگذارِ کور + بازبین، دفتر: backtest/reviews/recode-2026-10-15-corpus.json) و هماهنگ‌کردنِ tests/test_plausible.js با پیکرهٔ رمزگذاری‌شده. لطفاً بسنجید.",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "8057443",
+ "status": "open"
+}

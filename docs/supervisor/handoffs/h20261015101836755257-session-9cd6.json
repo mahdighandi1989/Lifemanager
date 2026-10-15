@@ -11,5 +11,11 @@
  "what": "پیشنهادِ p_plausible_reasoning (beyond، قضیهٔ T_plausible از A0–A4) در backtest/proposals.json افزوده شد — فقط پیشنهاد؛ هیچ قاعده/سقف/ویژگی‌ای عوض نشد (تصمیمِ مالک). درخواست از روتینِ بک‌تست: (۱) برهانِ T_plausible را وارسی کن (جهت از A1+A3، مقدارِ (n+1)/(n+2) و (k+1)/(n+2) همان برهانِ T_next/T_pop، عضویتِ احرازنشده ⇒ T_unknown+T_weakest ≤ ½)؛ (۲) اگر مالک «بپذیر» زد: ویژگی‌های x_conseq و x_analog در epi_feat، قاعده‌های r_aql_conseq و r_aql_analogy در st_aql با سقفِ قضیه‌ای (capf مثلِ r_istiqra_next)، قضیه در F.TH؛ رمزگذاریِ ۷ تصدیقی که امروز فقط r_aql_nondeductive سقفشان است (cs_piltdown، cs_leverrier_vulcan، cs_b_markopolos، cs_b_wotw_panic، cs_b_gallup1936، cs_b_harrytruman_sthelens، cs_b_hick_elephant) و run --rerun با شرطِ ۰ حکمِ درستِ خراب. شاهد: scratchpad nd2.js (runClaim روی ۲۰۳ پرونده).",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
  "commit": "",
- "status": "open"
+ "status": "done",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:45Z",
+  "note": "(۱) برهانِ T_plausible را بازبینِ مستقل وارسی کرد: حساب درست؛ «تازگی/همانندیِ احرازنشده ⇒ ½» سخت‌گیرتر از قضیه است ⇒ p_found_mixture. (۲) مالک پذیرفته بود و اعمال شده بود؛ رمزگذاریِ ۷ تصدیق با دو رمزگذارِ کورِ جدا + بازبین (۳۱b23d5): فقط لوریه (تمثیل با نپتون n=1، k=1، همانندی نامعلوم) ⇒ r_aql_analogy = ۵۰ و پرچمِ st_aql؛ پیلت‌داون k1 ⇒ chain تک‌منبع؛ متنِ پنج تای دیگر شمارِ پیامد/تمثیل نمی‌گوید و form شان از پیش بود. همراهِ آن کلِ پیکره رمزگذاری شد (۱۰۸ مقدار). run --rerun: ۲۰۳/۲۰۳ درست (۰ خراب)، Brier ۰٫۲۸۷۵۵ ⇒ ۰٫۲۵۸۵۸. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "f66087c"
+ }
 }

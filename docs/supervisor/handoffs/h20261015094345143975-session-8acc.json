@@ -11,5 +11,11 @@
  "what": "p_measured_precedence: ویژگیِ x_relay (st_expert؛ «مستقیم از خودِ منتشرشده» / «از واسطه (خبر، بازگو، خلاصهٔ دیگران)» / «نامعلوم») در epi_feat.js؛ فیلدِ relay با راهنما در کاربرگِ st_expert (epi_st_b.js)؛ runClaim (epi_engine.js) برای تصدیقی با x_relay ِ همان قاب، سقف‌های فهرستِ precede ِ پایهٔ جمعیتش را کنار می‌گذارد (yielded) — فهرست از EPI_FOUND.precedeOf (ساختهٔ ابزار)، بی فهرستِ دستی. run --rerun ِ دورِ ۱۲: هیچ حکمی عوض نشد (هیچ تصدیقی x_field/x_relay ندارد).",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها (منبع ⇒ build.py ⇒ run --rerun، پیش/پس روی کلِ پیکره)",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:33Z",
+  "note": "اجرا دوباره سنجیده شد: precede = {r_aql_matter_unproven، r_naql_ahad، r_naql_no_qarina} برای هر سه پایه (از قاب‌ها، بی فهرستِ دستی)؛ مستقیم ⇒ ۶۰/۳۶٫۴/۶۰٫۹، واسطه/نامعلوم ⇒ کمینه؛ relay با ابزار؛ test_measured_precedence سبز (OSC اکنون ۳۶ نه ۰، پس از اصلاحِ scope). بازبینِ مستقلِ برهان: نتیجه درست؛ گامِ ۳ (A1 برای شرطی که ادعا لازمش ندارد) و گامِ ۴ (≤½) عبارت‌بندیِ نادقیق دارند و گامِ ۵ در کد «همان x_relay ِ قاب» است نه «مستقیم» ⇒ در p_found_mixture برای مالک. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "f66087c"
+ }
 }

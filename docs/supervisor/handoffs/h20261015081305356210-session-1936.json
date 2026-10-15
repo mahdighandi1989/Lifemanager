@@ -11,5 +11,11 @@
  "what": "Two complete unselected frames added with epi_backtest.js sample (round-0013.json): osc2015_rpp (OSC 2015, psychology PS/JPSP/JEP:LMC 2008; 35/97, truth = replication p<.05 same direction, project's own 97-study denominator) and camerer2018_ssrp (SSRP 2018, Nature/Science 2010-15; 13/21, final stage criterion). Each frame records field/population. Separate scripts for outcome gatherer / text extractor / frame-level blind encoder, and an independent mechanical reviewer re-derived all 118 items from the sources (0 problems). NO separate LLM subagent was available: re-review both frames with your own independent subagent and mark excluded if it fails. Also designed (not applied) amend of p_base_expert_method in proposals.json: x_field, per-field bases 60.0/36.4/60.9, T_mix 52.4 for unknown-among-measured; never-measured field is not a theorem (½). Summary: apps/learning-architecture/docs/_pending_step2_2026-10-15.md",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱",
  "commit": "ca5fecf",
- "status": "open"
+ "status": "corrected",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:33Z",
+  "note": "بازبینِ مستقلِ جدا (claude.ai/artifact/BQtR2pEkEcF1PVbZ9argrn) هر دو قاب را با منبعِ اصلی سنجید: OSC ۹۷/۹۷ (rpp_data.csv، sha256 همان)، SSRP ۲۱/۲۱ — بی خطای truth یا عضویت ⇒ excluded نشد. اصلاح: scope «کلی نامحدود» ِ همهٔ اعضا نادرست بود (اثرِ آماری) ⇒ با recode برداشته شد (رمزگذارِ کورِ FE + بازبینِ RS)؛ vazraf ِ OSC فقط با هم‌رأیی پر شد؛ hidden_ctrl برگشت (پایهٔ p_hidden_factor را بی شرطِ جمعیت جابه‌جا می‌کرد). نکتهٔ غیرمسدود: x_relay_set.why باید بگوید متن «بازگوییِ پیش‌ثبت‌شدهٔ خودِ پروژه» است. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "a4c6aa2"
+ }
 }

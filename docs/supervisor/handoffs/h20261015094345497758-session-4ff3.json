@@ -11,5 +11,11 @@
  "what": "p_measured_precedence: ورودی در proposals.json (سخنِ مالک، تحلیلِ جواب‌های A، B و B″، عددهای موتور روی ۱۳۶ عضوِ قاب‌ها، applied و decision). epi_backtest.js: فرمانِ relay (setFields عمومی برای x_field/x_relay، relayErrors در validateFrame)، و applyBase که EPI_FOUND.PRECEDE را پر می‌کند. foundation.json با run --rerun (precede برای هر پایهٔ جمعیتی). آزمونِ تازه: tests/test_measured_precedence.js. test_found.js: شمارِ پیشنهادهای اعمال‌شده از proposals.json خوانده می‌شود.",
  "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها (بندِ ۶: پیشنهاد/تصمیمِ مالک)",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-15T18:37:33Z",
+  "note": "اجرا دوباره سنجیده شد: precede = {r_aql_matter_unproven، r_naql_ahad، r_naql_no_qarina} برای هر سه پایه (از قاب‌ها، بی فهرستِ دستی)؛ مستقیم ⇒ ۶۰/۳۶٫۴/۶۰٫۹، واسطه/نامعلوم ⇒ کمینه؛ relay با ابزار؛ test_measured_precedence سبز (OSC اکنون ۳۶ نه ۰، پس از اصلاحِ scope). بازبینِ مستقلِ برهان: نتیجه درست؛ گامِ ۳ (A1 برای شرطی که ادعا لازمش ندارد) و گامِ ۴ (≤½) عبارت‌بندیِ نادقیق دارند و گامِ ۵ در کد «همان x_relay ِ قاب» است نه «مستقیم» ⇒ در p_found_mixture برای مالک. (اجرای روالِ بک‌تست در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+  "commit": "f66087c"
+ }
 }
