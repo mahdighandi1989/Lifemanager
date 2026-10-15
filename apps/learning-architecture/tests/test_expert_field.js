@@ -41,7 +41,9 @@ global.EPI_BT_LEDGER = saved;
 chk(F.DER.r_expert_pop_unknown && F.DER.r_expert_pop_unknown.th === 'T_unknown' && F.DER.r_expert_pop_unknown.bound === 50, 'derivation unknown ⇒ T_unknown 50');
 chk(T.axiomAudit().length === 0, 'audit clean ' + JSON.stringify(T.axiomAudit()));
 // پیکره: هیچ تصدیقی x_field ندارد ⇒ هیچ حکمی عوض نشده
-chk(T.loadCorpus().every(c => (c.claims || []).every(k => !(k.f && k.f.x_field))), 'no corpus claim encoded with x_field yet');
+// روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵: x_field ِ پیکره فقط از رمزگذاریِ کورِ ثبت‌شده (دو رمزگذار + بازبین؛ backtest/reviews/recode-2026-10-15-corpus.json)
+const RCX = {}; JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'backtest', 'reviews', 'recode-2026-10-15-corpus.json'), 'utf8')).applied.forEach(a => { RCX[a.case + '/' + a.claim + '/' + a.key] = a.value; });
+chk(T.loadCorpus().every(c => (c.claims || []).every(k => !(k.f && k.f.x_field) || RCX[c.id + '/' + k.id + '/x_field'] === k.f.x_field)), 'corpus x_field only from the recorded blind re-encode');
 // تصمیمِ مالک در proposals.json
 const PR = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'proposals.json'))).proposals.find(p => p.id === 'p_base_expert_method');
 chk(PR && PR.applied === '2026-10-15' && PR.appliedWhat && PR.decision && /بدیهیاتِ قطعی/.test(PR.decision.owner) && PR.decision.notApplied.length >= 2 && PR.decision.notApplied.some(x => /T_mix/.test(x.what)), 'proposal marked applied with the owner decision');

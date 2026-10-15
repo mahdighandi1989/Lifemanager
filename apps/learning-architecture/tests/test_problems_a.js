@@ -20,9 +20,12 @@ const sha = o => crypto.createHash('sha256').update(JSON.stringify(o)).digest('h
    به‌روز ۲۰۲۶-۱۰-۱۳ (WORKLOG (33)، p_found_scope پذیرفتهٔ مالک): ویژگیِ «گسترهٔ ادعا» (scope) با رمزگذاریِ کور روی دو تصدیقِ استقرایی
    (cs_pb_flt_numeric/k2، cs_pb_long_generalize/k1) افزوده شد؛ هیچ مقدارِ دیگری عوض نشد.
    به‌روز ۲۰۲۶-۱۰-۱۴ (WORKLOG (34)): «conf: 60» ِ cs_pb_flt_numeric/k2 برداشته شد — عددِ ساختهٔ سامانه بود، نه مستند (یافتهٔ f_cs_pb_flt_numeric).
+   به‌روز ۲۰۲۶-۱۰-۱۵ (روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک؛ WORKLOG ِ صفحه (63)): رمزگذاریِ کورِ دوبارهٔ پیکره با ویژگی‌های تازه (form، chain، member،
+   x_method/x_comp، x_conseq_*، فقط خانهٔ خالی؛ دو رمزگذارِ کورِ جدا + بازبینِ مستقل؛ دفتر: backtest/reviews/recode-2026-10-15-corpus.json) روی تصدیق‌های cases؛
+   هیچ مقدارِ موجودی عوض نشد. PROTECTED_SHA هم فقط به‌خاطرِ همین cases (که در نمای محافظت‌شده هست) عوض شد.
    هر تغییرِ بعدیِ cases فقط از همین مسیر (یافته ⇒ تشخیص ⇒ اصلاح، با ثبت در WORKLOG) و با به‌روزکردنِ همین هش‌ها. */
-const CASES_SHA = '45123c2d8bb5bd002638ad4c0c6a1e82fddfe0098e058cbf4caf8eec671eac45';
-const PROTECTED_SHA = 'eeb28698e67c10bcbfae26fd99b6ed756df067daa02e0f3cd35d1ce6215ce204';
+const CASES_SHA = 'eec2ff6611993a701bec4ea2b5d6e1f5968506bcf1f3f97adfbf8db0a6c89e41';
+const PROTECTED_SHA = 'be33774a7ca90d2196e14242112a151f85864edd0c4da0293ce596126b303878';
 const IDS = 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis';
 
 function protectedView(list) {

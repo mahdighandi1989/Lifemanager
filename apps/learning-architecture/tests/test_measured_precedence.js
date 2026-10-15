@@ -48,7 +48,7 @@ const ceilings = (frame, relay) => { const s = S.find(x => x.id === frame), out 
   return out; };
 const one = (o) => Object.keys(o).length === 1 ? Object.keys(o)[0] : JSON.stringify(o);
 const N = { camerer2016_eerp: 18, osc2015_rpp: 97, camerer2018_ssrp: 21 };
-const EXP = { camerer2016_eerp: ['60 r_expert_pop_econ', '50 r_aql_matter_unproven'], camerer2018_ssrp: ['61 r_expert_pop_socsci', '50 r_aql_matter_unproven'], osc2015_rpp: ['0 r_istiqra_universal', '0 r_istiqra_universal'] };
+const EXP = { camerer2016_eerp: ['60 r_expert_pop_econ', '50 r_aql_matter_unproven'], camerer2018_ssrp: ['61 r_expert_pop_socsci', '50 r_aql_matter_unproven'], osc2015_rpp: ['36 r_expert_pop_psych', '36 r_expert_pop_psych'] };   // h…070f (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵): اعضای قاب دیگر scope «کلی نامحدود» ندارند ⇒ نه ۰ ِ T_universal، بلکه ۳۶٫۴ ِ جمعیت (کمینه در هر دو راه)
 const info = { engine: {} };
 Object.keys(EXP).forEach(fr => { const d = ceilings(fr, DIRECT), rl = ceilings(fr, RELAYED), u = ceilings(fr, 'نامعلوم'), no = ceilings(fr, undefined);
   info.engine[fr] = { direct: one(d), relayed: one(rl), unknown: one(u), none: one(no) };
@@ -64,7 +64,8 @@ const w0 = Object.assign({}, base, { w: { r_expert_pop_econ: 0 } });
 chk(X.runClaim({ id: 'k', f: { way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', matter: 'مقدمه اثبات‌نشده', x_field: FM.x_field.v[0], x_relay: DIRECT, conf: 70 } }, w0).ceil === 50, 'population rule switched off ⇒ no precedence');
 // ۴) پیکره
 const cs = T.loadCorpus();
-chk(cs.every(c => (c.claims || []).every(k => !(k.f && (k.f.x_relay || k.f.x_field)))), 'no corpus claim encoded with x_relay/x_field');
+const RCX = {}; JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'backtest', 'reviews', 'recode-2026-10-15-corpus.json'), 'utf8')).applied.forEach(a => { RCX[a.case + '/' + a.claim + '/' + a.key] = a.value; });
+chk(cs.every(c => (c.claims || []).every(k => ['x_relay', 'x_field'].every(x => !(k.f && k.f[x]) || RCX[c.id + '/' + k.id + '/' + x] === k.f[x]))), 'corpus x_relay/x_field only from the recorded blind re-encode');
 const saved = F.PRECEDE; F.PRECEDE = {}; const before = cs.map(c => T.verdict(c, base)); F.PRECEDE = saved; const after = cs.map(c => T.verdict(c, base));
 chk(before.every((v, i) => v.kind === after[i].kind && v.flagged.join() === after[i].flagged.join()), 'no corpus verdict moved');
 chk(T.axiomAudit().length === 0, 'audit clean ' + JSON.stringify(T.axiomAudit()));
