@@ -61,6 +61,26 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.mind.someScore && info.mind.epiLow, 'scores only where ≥5 samples exist (epistemic has 2 ⇒ none): ' + JSON.stringify(info.mind));
   chk(/returned/.test(info.mind.black) && /stale/.test(info.mind.black), 'black spots: returned and long-open knots: ' + info.mind.black);
   chk(info.mind.png && info.mind.events > 5 && info.mind.noIQ, 'PNG for e-mail, a timeline, and no IQ number');
+  // ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵: موقعیت‌ها در نقشهٔ کامل، پیش‌نیاز و تور در شبکه، راه به معرفت‌شناسی و گرافِ مشترک، و تازه‌شدنِ زنده
+  info.mind2 = await p.evaluate(async () => {
+    const S = APP.S;
+    S.put({ id: 'pq_mr', type: 'prereq', title: 'پیش‌نیازِ کارنامه', items: [], kcase: 'kc_s0' });
+    S.put({ id: 'ach_mr', type: 'achat', title: 'تورِ کارنامه', msgs: [], tour: { createdAt: new Date().toISOString(), facets: [{ key: 'f1', title: 'و', refs: [{ id: 'kc_s1', type: 'kcase' }] }] } });
+    const C = APP.MIND.charts(APP.MIND.model());
+    const out = { mmCase: /🪢 موقعیتِ/.test(C.mindmap.textContent), nnPre: /پیش‌نیازِ کارنامه/.test(C.neural.textContent), nnTour: /تورِ کارنامه/.test(C.neural.textContent) };
+    APP.go('mind'); await new Promise(r => setTimeout(r, 150));
+    out.links = !!document.querySelector('#main .mind-graph') && !!document.querySelector('#main .mind-epi') && !!document.querySelector('#main tr[data-dim="s_epi"] .mind-dim-epi');
+    S.put({ id: 'kn_mr_live', type: 'knot', fam: 'F2', name: 'گرهِ زندهٔ کارنامه', status: 'open', created: new Date().toISOString() });
+    await new Promise(r => setTimeout(r, 500));
+    out.live = /گرهِ زندهٔ کارنامه/.test(document.getElementById('main').textContent);
+    document.querySelector('#main .mind-graph').click(); await new Promise(r => setTimeout(r, 200));
+    out.toGraph = APP.state.view === 'maps';
+    APP.go('mind'); await new Promise(r => setTimeout(r, 150)); document.querySelector('#main .mind-dim-epi').click(); await new Promise(r => setTimeout(r, 150));
+    out.toEpi = APP.state.view === 'e_cases';
+    ['pq_mr', 'ach_mr', 'kn_mr_live'].forEach(id => S.del(id));
+    return out;
+  });
+  chk(Object.values(info.mind2).every(Boolean), 'mind map shows situations; network shows prerequisite maps and tours; links to the shared graph and the factory cases; live refresh after a save ' + JSON.stringify(info.mind2));
 
   // ---------- گزارشِ تور ----------
   info.rep = await p.evaluate(async () => {

@@ -245,11 +245,23 @@ function techIds() {
   try { fs.readdirSync(dir).filter((f) => /^t_.*\.js$/.test(f)).forEach((f) => require(path.join(dir, f))); } catch (e) { }
   TECH_IDS = new Set((global.T || []).map((t) => t.id)); return TECH_IDS;
 }
+/* پل‌های خانوادهٔ گره ⇄ ایستگاه (EPI_LINKS ِ a16_knots.js — فایلِ صفحه، در Node اجرا نمی‌شود) — همان بلوکِ شیءِ ساده خوانده می‌شود */
+function knotLinks() {
+  try { const m = /var EPI_LINKS = (\{[\s\S]*?\n  \});/.exec(fs.readFileSync(path.join(APP, "a16_knots.js"), "utf8")); return m ? (new Function("return " + m[1]))() : null; } catch (e) { return null; }
+}
 function integrity() {
   const v = [], w = [], STS = new Set((global.EPI_ST || []).map((s) => s.id)), SEC = new Set(Object.keys(BOOK.sec || {})), RID = new Set(RULES.map((r) => r.id)), TI = techIds();
   RULES.forEach((r) => { if (!STS.has(r.st)) v.push("قاعده به ایستگاهِ ناموجود: " + r.id + " ⇒ " + r.st); (r.sec || []).forEach((x) => { if (!SEC.has(x)) v.push("قاعده به بخشِ ناموجود: " + r.id + " ⇒ " + x); }); });
   (global.EPI_ST || []).forEach((s) => { (s.basis || []).forEach((b) => { if (!SEC.has(b.sec)) v.push("ایستگاه به بخشِ ناموجود: " + s.id + " ⇒ " + b.sec); });
     (s.tech || []).forEach((x) => { if (TI.size && !TI.has(x.id)) v.push("ایستگاه به تکنیکِ ناموجود: " + s.id + " ⇒ " + x.id); }); });
+  /* ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵: سه دستهٔ ارجاعی که گراف می‌کشد ولی این‌جا سنجیده نمی‌شد — فقط گزارش؛ هیچ قاعده/سقف/قضیه‌ای عوض نمی‌شود */
+  const KL = knotLinks();
+  if (!KL) v.push("پل‌های خانوادهٔ گره خوانده نشد (EPI_LINKS در a16_knots.js) — سنجشِ آن‌ها نباید بی‌صدا حذف شود");
+  else Object.keys(KL).forEach((f) => (KL[f] || []).forEach((x) => { if (!STS.has(x && x.st)) v.push("پلِ خانوادهٔ گره به ایستگاهِ ناموجود: " + f + " ⇒ " + (x && x.st)); }));
+  const COID = new Set((global.EPI_CO || []).map((c) => c.id));
+  (global.EPI_CO || []).forEach((c) => (c.vs || []).forEach((x) => { const id = typeof x === "string" ? x : (x && x.id); if (id && !COID.has(id)) v.push("مفهوم در برابرِ مفهومِ ناموجود: " + c.id + " ⇒ " + id); }));
+  const FD0 = global.EPI_FOUND || {}, AXID = new Set((FD0.AX || []).map((a) => a.id)), TH0 = FD0.TH || {};
+  { const TS0 = terrState().areas || {}; Object.keys(TS0).forEach((id) => (TS0[id].claims || []).forEach((c) => { if (c && c.th && !AXID.has(c.th) && !TH0[c.th]) v.push("گزارهٔ حوزهٔ قلمرو بر پایهٔ اصل/قضیهٔ ناموجود: " + id + " ⇒ " + c.th); })); }
   const co = {}; (global.EPI_CO || []).forEach((c) => { if (co[c.id]) w.push("تعریفِ دوگانهٔ مفهوم: " + c.id); co[c.id] = 1;
     (c.st || []).forEach((x) => { if (!STS.has(x)) v.push("مفهوم به ایستگاهِ ناموجود: " + c.id + " ⇒ " + x); }); (c.secs || []).forEach((x) => { if (!SEC.has(x)) v.push("مفهوم به بخشِ ناموجود: " + c.id + " ⇒ " + x); }); });
   (global.EPI_DR || []).forEach((d) => { if (!STS.has(d.st)) v.push("تمرین به ایستگاهِ ناموجود: " + d.id); });

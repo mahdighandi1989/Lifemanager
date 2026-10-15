@@ -17375,13 +17375,32 @@ var APP = window.APP = {};
   };
   A.debounce = function (fn, ms) { var t; return function () { var a = arguments, s = this; clearTimeout(t); t = setTimeout(function () { fn.apply(s, a); }, ms); }; };
   A.shuffle = function (arr) { for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = arr[i]; arr[i] = arr[j]; arr[j] = x; } return arr; };
-  A.toast = function (msg, kind) {
+  A.toast = function (msg, kind, ms) {
     var box = document.getElementById("toasts");
     if (!box) { box = h("div", { id: "toasts", "aria-live": "polite" }); A.layer().appendChild(box); }
     var el = h("div", { class: "toast " + (kind || ""), role: "status" }, msg);
     box.appendChild(el);
-    setTimeout(function () { el.classList.add("out"); }, 2600);
-    setTimeout(function () { el.remove(); }, 3100);
+    var stay = +ms > 2600 ? +ms : 2600;  /* ms: پیامِ بلند (مثلاً فهرستِ پیوست‌های نفرستاده) بیشتر بماند */
+    setTimeout(function () { el.classList.add("out"); }, stay);
+    setTimeout(function () { el.remove(); }, stay + 500);
+  };
+  /* سقفِ ۴۰ پیوست در هر درخواستِ هوش مصنوعی (بازبینی ۲۰۲۶-۱۰-۱۵): سقف همان می‌ماند، ولی بیش از آن هرگز بی‌صدا کنار نمی‌رود —
+     هشدارِ فارسی با نامِ فایل‌های نفرستاده (toast ِ ماندگار + A.aiFileDrop برای کادرِ همان‌جا و آزمون). items: شناسه یا {id, name}. */
+  A.AI_FILE_MAX = 40;
+  A.fileNames = A.fileNames || {};
+  A.aiFileName = function (x) { if (x && typeof x === "object") return x.name || ("پیوستِ #" + x.id); return A.fileNames[x] || ("پیوستِ #" + x); };
+  A.aiFileDropMsg = function (names, total) {
+    return "از " + A.fa(total) + " پیوست فقط " + A.fa(A.AI_FILE_MAX) + " تای اول برای هوش مصنوعی فرستاده و خوانده می‌شود (سقفِ هر درخواست). این " +
+      A.fa(names.length) + " فایل فرستاده نشد: " + names.map(function (n) { return "«" + n + "»"; }).join("، ") + " — اگر لازم‌اند، در درخواستی جدا بفرست.";
+  };
+  A.aiFileCap = function (items, where) {
+    items = (items || []).slice();
+    if (items.length <= A.AI_FILE_MAX) return items;
+    var dropped = items.slice(A.AI_FILE_MAX).map(A.aiFileName);
+    var msg = A.aiFileDropMsg(dropped, items.length);
+    A.aiFileDrop = { where: where || "", total: items.length, names: dropped, msg: msg };
+    try { A.toast(msg, "bad", 15000); } catch (e) { }
+    return items.slice(0, A.AI_FILE_MAX);
   };
   A.copy = function (text, btn) {
     function ok() { A.toast("کپی شد"); }
@@ -21422,7 +21441,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
   A.probOfCase = caseRec;
   A.probFromCase = function (kc, text, meta) {
     meta = meta || {};
-    var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 40);
+    var sys = personalSys(), fids = A.aiFileCap(meta.fileIds || [], "شبیه‌سازِ همین مسئله");
     return A.callAIJson(sys, text, { fileIds: fids, maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); }).then(function (raw) {
       if (raw && typeof raw === "object" && !Array.isArray(raw)) {
         var it = kc.intake || {};
@@ -21483,7 +21502,14 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     function attFiles() {
       if (!attShown || !attAi || !(A.HOST && A.HOST.files)) return Promise.resolve([]);
       return Promise.resolve(A.HOST.files("eprob_" + pid)).then(function (fs) {
-        return (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); }).slice(0, 40).map(function (x) { return x.id; });
+        var ok = (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); });
+        ok.forEach(function (x) { A.fileNames[x.id] = x.name; });
+        var sent = A.aiFileCap(ok, "تجزیهٔ مسئله");
+        if (sent.length < ok.length) {  /* کنارِ همان کادرِ پیوست هم بماند، نه فقط toast */
+          var w0 = attWrap.querySelector(".pb-attdrop"); if (w0) w0.remove();
+          attWrap.appendChild(h("p", { class: "small warnline pb-attdrop", role: "alert" }, A.aiFileDrop.msg));
+        }
+        return sent.map(function (x) { return x.id; });
       }, function () { return []; });
     }
     function attBlock() {
@@ -25394,8 +25420,10 @@ APP.goFromURL = function (q) {
         var rid = ids[i++], pr;
         try { pr = A.HOST.files(rid); } catch (e) { return next(); }
         Promise.resolve(pr).then(function (fs) {
-          var ok = (fs || []).filter(aiFileOk).slice(0, 40);
-          if (ok.length) resolve({ recId: rid, files: ok }); else next();
+          var all = (fs || []).filter(aiFileOk);
+          all.forEach(function (x) { A.fileNames[x.id] = x.name; });
+          var ok = all.slice(0, A.AI_FILE_MAX || 40);  /* سقف همان ۴۰؛ بقیه با نام در کادر گفته می‌شود (dropped) */
+          if (ok.length) resolve({ recId: rid, files: ok, dropped: all.slice(ok.length) }); else next();
         }, function () { next(); });
       })();
     });
@@ -25434,6 +25462,8 @@ APP.goFromURL = function (q) {
           attBox.appendChild(h("label", { class: "row gap", for: "knAiAtt" }, h("input", { type: "checkbox", id: "knAiAtt", checked: attOn, onchange: function (e) { attOn = e.target.checked; warn.classList.toggle("hidden", !attOn); } }),
             "پیوست‌ها هم فرستاده و کامل خوانده شوند (" + fa(r.files.length) + ")"));
           attBox.appendChild(h("ul", { class: "plain small kn-ai-files" }, r.files.map(function (f) { return h("li", {}, "📎 ", h("bdi", {}, f.name || "پیوست")); })));
+          if (r.dropped && r.dropped.length) attBox.appendChild(h("p", { class: "small warnline kn-ai-attdrop", role: "alert" },
+            A.aiFileDropMsg(r.dropped.map(A.aiFileName), r.files.length + r.dropped.length)));
           var ids0 = o.attach.recIds || [];
           if (ids0.length > 1 || ids0[0] !== r.recId) attBox.appendChild(h("p", { class: "small muted" }, "از موقعیتِ «" + (rec.title || "موقعیت") + "»."));
           attBox.appendChild(warn);
@@ -27552,7 +27582,7 @@ APP.goFromURL = function (q) {
     var ask = strip(A.kAsk(k, n));
     var rep = { accepted: [], unverified: [], rejected: [] };
     /* تصویرِ پیوستِ موقعیت (اگر کاربر در دروازه پذیرفت) فقط به **سازنده** می‌رود؛ سه حلِ وارسی (A.kverify) فقط متنِ نمونه را می‌بینند */
-    var fids = (opts.fileIds || []).slice(0, 40);
+    var fids = A.aiFileCap(opts.fileIds || [], "ساختِ نمونه‌های گره");
     var call = A.callAIJson ? A.callAIJson(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }, function (t) { try { return parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } })
       : A.callAI(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }).then(function (t) { try { return parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } });
     return call.then(function (o) {

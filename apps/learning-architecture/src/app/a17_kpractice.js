@@ -966,7 +966,7 @@
     var ask = strip(A.kAsk(k, n));
     var rep = { accepted: [], unverified: [], rejected: [] };
     /* تصویرِ پیوستِ موقعیت (اگر کاربر در دروازه پذیرفت) فقط به **سازنده** می‌رود؛ سه حلِ وارسی (A.kverify) فقط متنِ نمونه را می‌بینند */
-    var fids = (opts.fileIds || []).slice(0, 40);
+    var fids = A.aiFileCap(opts.fileIds || [], "ساختِ نمونه‌های گره");
     var call = A.callAIJson ? A.callAIJson(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }, function (t) { try { return parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } })
       : A.callAI(A.KGEN_SYS, ask, { fileIds: fids, maxTokens: 8192 }).then(function (t) { try { return parseLoose(t); } catch (e) { throw new Error("پاسخِ سازنده JSON ِ معتبر نبود"); } });
     return call.then(function (o) {

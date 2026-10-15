@@ -37,6 +37,29 @@ STAGES = ["نقشه‌شده", "منابع ثبت شد", "گزاره‌ها فه
 KINDS = ("theorem", "empirical", "outside")
 AXIOMS = ("A0", "A1", "A2", "A3", "A4")
 TOOL_RE = re.compile(r"^(tech|proto|kfam|move|station|view):[A-Za-z0-9_.-]+$")
+APP_DIR = os.path.join(B, "src", "app")
+# ابزارها با ثبت‌گاه‌های واقعیِ صفحه سنجیده می‌شوند، نه فقط با شکلِ شناسه (ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵: «tech:999» از regex می‌گذشت).
+# هر ثبت‌گاه: (فایل‌ها، الگوی شناسه). اگر ثبت‌گاهی تهی خوانده شد، خودش خطاست — سنجش بی‌صدا خاموش نمی‌شود.
+REGISTRIES = {
+    "tech": (["../tech/t_*.js"], r"^  id: (\d+),"),
+    "proto": (["core*.js"], r'\bid: "(P\d+)"'),
+    "kfam": (["a16_knots.js"], r'\{ id: "(F\d+)"'),
+    "move": (["a19_moves.js"], r'\bid: "(mv_[a-z0-9_]+)"'),
+    "station": (["epi_st_*.js", "epi_core.js"], r'\bid: "(st_[a-z0-9_]+)"'),
+    "view": (["a*.js"], r"\bV\.([a-z_0-9]+) *= *function"),
+}
+
+
+def registry_ids():
+    out = {}
+    for kind, (globs, pat) in REGISTRIES.items():
+        ids, rx = set(), re.compile(pat, re.M)
+        for g in globs:
+            for p in sorted(glob.glob(os.path.normpath(os.path.join(APP_DIR, g)))):
+                with open(p, encoding="utf-8") as f:
+                    ids.update(rx.findall(f.read()))
+        out[kind] = ids
+    return out
 
 
 def load_maps():
@@ -92,6 +115,8 @@ def justified(a, tags):
 
 def problems(maps, L):
     errs, ids = [], {}
+    REG = registry_ids()
+    errs += [f"registry {k!r} read empty from the page source (pattern in REGISTRIES out of date?)" for k, v in REG.items() if not v]
     for m, g, a, tags in areas(maps):
         aid = a.get("id", "")
         if not re.match(r"^[a-z]{2}_[a-z0-9_]+$", aid):
@@ -105,6 +130,8 @@ def problems(maps, L):
         for t in a.get("tools", []):
             if not TOOL_RE.match(t):
                 errs.append(f"{aid}: bad tool ref {t!r}")
+            elif t.split(":", 1)[1] not in REG.get(t.split(":", 1)[0], ()):
+                errs.append(f"{aid}: tool {t!r} is not in the page's {t.split(':', 1)[0]} registry")
         for c in a.get("claims", []):
             if c.get("kind") not in KINDS:
                 errs.append(f"{aid}: claim kind {c.get('kind')!r}")

@@ -493,13 +493,15 @@ async def answer_with_files(db, *, user_id: int, app: str, file_ids: List[int], 
     # ---- how much ONE request may carry: the real window of the serving model(s), minus the answer and the images
     final_need = "vision" if inline else None
     final_chars, window = await window_chars(db, task, max_tokens, need=final_need, images=len(inline))
-    map_chars, _ = await window_chars(db, task, MAP_ANSWER_TOKENS)
+    map_chars, map_window = await window_chars(db, task, MAP_ANSWER_TOKENS)
     status_reserve = 400 * max(1, len(manifest)) + 2000
     body_budget = final_chars - len(user) - len(system or "") - status_reserve
     # the question asked of every chunk is the user's own request; a request bigger than a quarter of the chunk
     # budget is cut in the CHUNK calls only (the final call always gets it whole)
     req = user if len(user) <= map_chars // 4 else user[: map_chars // 4] + "\n[… ادامهٔ درخواست در این فراخوانِ بخشی نیامد]"
-    chunk_size = max(8000, map_chars - len(_MAP_SYS) - len(req) - 1000)
+    # a known window ⇒ chunks as large as one call can take (fewer, fuller chunks); unknown ⇒ the old CHUNK_CHARS
+    chunk_size = (max(8000, map_chars - len(_MAP_SYS) - len(req) - 1000) if map_window is not None
+                  else min(CHUNK_CHARS, max(8000, map_chars - len(_MAP_SYS) - len(req) - 1000)))
 
     total = sum(len(t) for _, t, _e in texts)
     mode, reading = "single", "single"

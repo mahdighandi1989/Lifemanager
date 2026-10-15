@@ -557,7 +557,7 @@
   A.probOfCase = caseRec;
   A.probFromCase = function (kc, text, meta) {
     meta = meta || {};
-    var sys = personalSys(), fids = (meta.fileIds || []).slice(0, 40);
+    var sys = personalSys(), fids = A.aiFileCap(meta.fileIds || [], "شبیه‌سازِ همین مسئله");
     return A.callAIJson(sys, text, { fileIds: fids, maxTokens: 8192 }, function (txt) { return parseJ(txt, true, AI_BAD_JSON); }).then(function (raw) {
       if (raw && typeof raw === "object" && !Array.isArray(raw)) {
         var it = kc.intake || {};
@@ -618,7 +618,14 @@
     function attFiles() {
       if (!attShown || !attAi || !(A.HOST && A.HOST.files)) return Promise.resolve([]);
       return Promise.resolve(A.HOST.files("eprob_" + pid)).then(function (fs) {
-        return (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); }).slice(0, 40).map(function (x) { return x.id; });
+        var ok = (fs || []).filter(function (x) { return A.knotAIFileOk ? A.knotAIFileOk(x) : /^image\/|pdf$/.test(x.mime || ""); });
+        ok.forEach(function (x) { A.fileNames[x.id] = x.name; });
+        var sent = A.aiFileCap(ok, "تجزیهٔ مسئله");
+        if (sent.length < ok.length) {  /* کنارِ همان کادرِ پیوست هم بماند، نه فقط toast */
+          var w0 = attWrap.querySelector(".pb-attdrop"); if (w0) w0.remove();
+          attWrap.appendChild(h("p", { class: "small warnline pb-attdrop", role: "alert" }, A.aiFileDrop.msg));
+        }
+        return sent.map(function (x) { return x.id; });
       }, function () { return []; });
     }
     function attBlock() {

@@ -71,13 +71,32 @@ var APP = window.APP = {};
   };
   A.debounce = function (fn, ms) { var t; return function () { var a = arguments, s = this; clearTimeout(t); t = setTimeout(function () { fn.apply(s, a); }, ms); }; };
   A.shuffle = function (arr) { for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = arr[i]; arr[i] = arr[j]; arr[j] = x; } return arr; };
-  A.toast = function (msg, kind) {
+  A.toast = function (msg, kind, ms) {
     var box = document.getElementById("toasts");
     if (!box) { box = h("div", { id: "toasts", "aria-live": "polite" }); A.layer().appendChild(box); }
     var el = h("div", { class: "toast " + (kind || ""), role: "status" }, msg);
     box.appendChild(el);
-    setTimeout(function () { el.classList.add("out"); }, 2600);
-    setTimeout(function () { el.remove(); }, 3100);
+    var stay = +ms > 2600 ? +ms : 2600;  /* ms: پیامِ بلند (مثلاً فهرستِ پیوست‌های نفرستاده) بیشتر بماند */
+    setTimeout(function () { el.classList.add("out"); }, stay);
+    setTimeout(function () { el.remove(); }, stay + 500);
+  };
+  /* سقفِ ۴۰ پیوست در هر درخواستِ هوش مصنوعی (بازبینی ۲۰۲۶-۱۰-۱۵): سقف همان می‌ماند، ولی بیش از آن هرگز بی‌صدا کنار نمی‌رود —
+     هشدارِ فارسی با نامِ فایل‌های نفرستاده (toast ِ ماندگار + A.aiFileDrop برای کادرِ همان‌جا و آزمون). items: شناسه یا {id, name}. */
+  A.AI_FILE_MAX = 40;
+  A.fileNames = A.fileNames || {};
+  A.aiFileName = function (x) { if (x && typeof x === "object") return x.name || ("پیوستِ #" + x.id); return A.fileNames[x] || ("پیوستِ #" + x); };
+  A.aiFileDropMsg = function (names, total) {
+    return "از " + A.fa(total) + " پیوست فقط " + A.fa(A.AI_FILE_MAX) + " تای اول برای هوش مصنوعی فرستاده و خوانده می‌شود (سقفِ هر درخواست). این " +
+      A.fa(names.length) + " فایل فرستاده نشد: " + names.map(function (n) { return "«" + n + "»"; }).join("، ") + " — اگر لازم‌اند، در درخواستی جدا بفرست.";
+  };
+  A.aiFileCap = function (items, where) {
+    items = (items || []).slice();
+    if (items.length <= A.AI_FILE_MAX) return items;
+    var dropped = items.slice(A.AI_FILE_MAX).map(A.aiFileName);
+    var msg = A.aiFileDropMsg(dropped, items.length);
+    A.aiFileDrop = { where: where || "", total: items.length, names: dropped, msg: msg };
+    try { A.toast(msg, "bad", 15000); } catch (e) { }
+    return items.slice(0, A.AI_FILE_MAX);
   };
   A.copy = function (text, btn) {
     function ok() { A.toast("کپی شد"); }

@@ -155,53 +155,29 @@ class AIManager:
             return None
         return float(i or 0.0) + float(o or 0.0)
 
-    def _tie_cmp(self, a: AICatalogModel, b: AICatalogModel) -> int:
-        """Inside one (gone, priority) tier (review 2026-10-15): the CHEAPER model first when both prices are known;
-        then the newer version — but only between models of the SAME provider (a Gemini «4.0» and a Claude «4.6» are
-        not versions of one thing); otherwise database order."""
-        ca, cb = self._cost(a), self._cost(b)
-        if ca is not None and cb is not None and ca != cb:
-            return -1 if ca < cb else 1
-        if a.provider_key == b.provider_key:
-            na, nb = self._newness(a), self._newness(b)
-            if na != nb:
-                return -1 if na > nb else 1
-        ia, ib = a.id or 0, b.id or 0
-        return (ia > ib) - (ia < ib)
-
-    def _fallback_cmp(self, a: AICatalogModel, b: AICatalogModel) -> int:
-        """No-capable-model fallback: a known cheaper price beats priority; with no price, the catalog's own tiering
-        decides — a fast model WITHOUT «reasoning» is the light/cheap tier (Flash-Lite, GPT-4o mini, seeded Haiku);
-        otherwise the usual order."""
-        ca, cb = self._cost(a), self._cost(b)
-        if ca is not None and cb is not None and ca != cb:
-            return -1 if ca < cb else 1
-        la = "reasoning" not in (a.capabilities or [])
-        lb = "reasoning" not in (b.capabilities or [])
-        if la != lb:
-            return -1 if la else 1
-        pa, pb = (a.priority if a.priority is not None else 9), (b.priority if b.priority is not None else 9)
-        if pa != pb:
-            return -1 if pa < pb else 1
-        return self._tie_cmp(a, b)
-
     def _sort(self, models: List[AICatalogModel], cost_first: bool = False) -> List[AICatalogModel]:
-        """``(gone, priority)`` tiers, ties broken by :meth:`_tie_cmp`. ``cost_first`` (the no-capable-model fallback):
-        a known cheaper price outranks priority too (:meth:`_fallback_cmp`)."""
-        import functools
+        """``(gone, priority)`` tiers; inside a tier (review 2026-10-15) a KNOWN price decides first (cheaper first; a
+        priced model before an unpriced one), then the newer version — compared only within the SAME provider (a Gemini
+        «4.0» and a Claude «4.6» are not versions of one thing): providers keep their database order (first row), and
+        each provider's models are ordered newest first. A transitive key, so the order never depends on input order.
 
-        if cost_first:
-            live = [m for m in models if "[gone]" not in (m.notes or "")]
-            gone = [m for m in models if m not in live]
-            cmp = functools.cmp_to_key(self._fallback_cmp)
-            return sorted(live, key=cmp) + sorted(gone, key=cmp)
-        tiers: dict = {}
-        for m in models:
-            tiers.setdefault(("[gone]" in (m.notes or ""), m.priority if m.priority is not None else 9), []).append(m)
-        out: List[AICatalogModel] = []
-        for k in sorted(tiers):
-            out.extend(sorted(tiers[k], key=functools.cmp_to_key(self._tie_cmp)))
-        return out
+        ``cost_first`` (the no-capable-model fallback): a known cheaper price outranks priority too, and with no price
+        the light tier — a fast model WITHOUT «reasoning» (Flash-Lite, GPT-4o mini, seeded Haiku) — comes first."""
+        slot: dict = {}
+        for m in sorted(models, key=lambda m: m.id or 0):
+            slot.setdefault(m.provider_key, len(slot))
+
+        def key(m: AICatalogModel):
+            c = self._cost(m)
+            gone = "[gone]" in (m.notes or "")
+            pri = m.priority if m.priority is not None else 9
+            price = (0, c) if c is not None else (1, 0.0)
+            tail = (slot.get(m.provider_key, 99), -self._newness(m), m.id or 0)
+            if cost_first:
+                return (gone, price, "reasoning" in (m.capabilities or []), pri) + tail
+            return (gone, pri, price) + tail
+
+        return sorted(models, key=key)
 
     async def _auto_order(self, db: AsyncSession, task: str, providers=None, configured=None,
                           need: Optional[str] = None) -> List[AICatalogModel]:

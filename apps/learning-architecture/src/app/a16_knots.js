@@ -521,8 +521,10 @@
         var rid = ids[i++], pr;
         try { pr = A.HOST.files(rid); } catch (e) { return next(); }
         Promise.resolve(pr).then(function (fs) {
-          var ok = (fs || []).filter(aiFileOk).slice(0, 40);
-          if (ok.length) resolve({ recId: rid, files: ok }); else next();
+          var all = (fs || []).filter(aiFileOk);
+          all.forEach(function (x) { A.fileNames[x.id] = x.name; });
+          var ok = all.slice(0, A.AI_FILE_MAX || 40);  /* سقف همان ۴۰؛ بقیه با نام در کادر گفته می‌شود (dropped) */
+          if (ok.length) resolve({ recId: rid, files: ok, dropped: all.slice(ok.length) }); else next();
         }, function () { next(); });
       })();
     });
@@ -561,6 +563,8 @@
           attBox.appendChild(h("label", { class: "row gap", for: "knAiAtt" }, h("input", { type: "checkbox", id: "knAiAtt", checked: attOn, onchange: function (e) { attOn = e.target.checked; warn.classList.toggle("hidden", !attOn); } }),
             "پیوست‌ها هم فرستاده و کامل خوانده شوند (" + fa(r.files.length) + ")"));
           attBox.appendChild(h("ul", { class: "plain small kn-ai-files" }, r.files.map(function (f) { return h("li", {}, "📎 ", h("bdi", {}, f.name || "پیوست")); })));
+          if (r.dropped && r.dropped.length) attBox.appendChild(h("p", { class: "small warnline kn-ai-attdrop", role: "alert" },
+            A.aiFileDropMsg(r.dropped.map(A.aiFileName), r.files.length + r.dropped.length)));
           var ids0 = o.attach.recIds || [];
           if (ids0.length > 1 || ids0[0] !== r.recId) attBox.appendChild(h("p", { class: "small muted" }, "از موقعیتِ «" + (rec.title || "موقعیت") + "»."));
           attBox.appendChild(warn);

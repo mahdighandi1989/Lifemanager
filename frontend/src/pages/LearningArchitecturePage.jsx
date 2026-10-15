@@ -91,10 +91,20 @@ export default function LearningArchitecturePage() {
       // callers ask more for big JSON (8192) or less for short checks (4000) (2026-10-13).
       // opts.fileIds: since 2026-10-14 ANY attachment (≤40, every format) — the server reads each one COMPLETELY
       // (app_reading) and returns a per-file manifest; opts.withMeta ⇒ resolve {text, files, mode} instead of text
-      ai: (system, user, opts) => api.post(`/app-records/${APP}/ai`, { system, user, file_ids: ((opts && opts.fileIds) || []).slice(0, 40), max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000), task: (opts && opts.task) || undefined }).then((r) => {
-        if (!r.data.ok) { const e = new Error(r.data.error || 'هوش مصنوعی پاسخ نداد'); e.files = r.data.files || []; throw e; }
-        return opts && opts.withMeta ? { text: r.data.text, files: r.data.files || [], mode: r.data.mode } : r.data.text;
-      }),
+      // ≤40 per request (the server's limit) — never dropped silently: beyond 40 the page shows a Persian warning naming
+      // the files not sent (APP.aiFileCap in the bundle; this host-side check is the last line, review 2026-10-15).
+      // withMeta also carries reading/reading_note («chunked» ⇒ answered chunk by chunk) and files_not_sent.
+      ai: (system, user, opts) => {
+        const all = (opts && opts.fileIds) || [];
+        const app = typeof window !== 'undefined' ? window.APP : null;
+        const ids = app && typeof app.aiFileCap === 'function' ? app.aiFileCap(all, 'میزبان') : all.slice(0, 40);
+        const notSent = all.slice(ids.length);
+        if (notSent.length && !(app && typeof app.aiFileCap === 'function')) console.warn(`از ${all.length} پیوست فقط ۴۰ تای اول فرستاده شد؛ فرستاده‌نشده: ${notSent.join('، ')}`);
+        return api.post(`/app-records/${APP}/ai`, { system, user, file_ids: ids, max_tokens: Math.min(8192, (opts && opts.maxTokens) || 6000), task: (opts && opts.task) || undefined }).then((r) => {
+          if (!r.data.ok) { const e = new Error(r.data.error || 'هوش مصنوعی پاسخ نداد'); e.files = r.data.files || []; throw e; }
+          return opts && opts.withMeta ? { text: r.data.text, files: r.data.files || [], mode: r.data.mode, reading: r.data.reading || 'single', reading_note: r.data.reading_note || '', files_not_sent: notSent } : r.data.text;
+        });
+      },
       navigate: ({ tab, a, s, replace }) => {
         const q = new URLSearchParams();
         if (tab) q.set('tab', tab);
