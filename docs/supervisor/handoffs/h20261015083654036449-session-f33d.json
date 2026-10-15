@@ -1,0 +1,15 @@
+{
+ "id": "h20261015083654036449-session-f33d",
+ "at": "2026-10-15T08:36:54Z",
+ "by": "session",
+ "area": "epi-backtest",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "اعمالِ بخش‌های قضیه‌ایِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵: ویژگیِ x_field (st_expert)، قضیهٔ T_pop، پایه‌های p_expert_econ_lab=60 / p_expert_psych08=36.4 / p_expert_socsci_ns=60.9 (ابزار، از قاب‌ها)، قاعده‌های r_expert_pop_econ/psych/socsci (=پایه) و r_expert_pop_unknown (50، T_unknown)؛ فرمانِ epi_backtest.js field + fieldAudit؛ فیلدِ جمعیت در کاربرگِ استناد به تخصص؛ run --rerun ِ دورِ ۱۲؛ «۶۰ برای همه» و T_mix اعمال نشد. هیچ حکمی عوض نشد. یادداشت: apps/learning-architecture/docs/_pending_step2_apply_2026-10-15.md — WORKLOG/PROGRESS/HANDBOOK/AUDIT_LOG با روتینِ بک‌تست.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md (اعمالِ پیشنهادِ پذیرفته، بندِ ۶)",
+ "commit": "",
+ "status": "open"
+}

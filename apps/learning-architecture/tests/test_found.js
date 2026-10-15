@@ -66,13 +66,13 @@ chk(T.validate(Object.assign({}, cs.find(c => c.tier === 'real' && c.src), { sam
   info.page = await p.evaluate(() => ({ ax: document.querySelectorAll('main .found-ax li').length, rows: document.querySelectorAll('main .found-rules tbody tr').length,
     x: document.querySelectorAll('main .found-rules tbody tr[data-k="X"]').length, modes: document.querySelectorAll('main .found-modes tbody tr').length,
     base: document.querySelectorAll('main .found-base tbody tr').length, th: document.querySelectorAll('main .found-th li').length }));
-  chk(info.page.ax === 5 && info.page.rows === caps.length && info.page.x === 0 && info.page.modes === 4 && info.page.base === 8 && info.page.th >= 10, 'found tab content ' + JSON.stringify(info.page));
+  chk(info.page.ax === 5 && info.page.rows === caps.length && info.page.x === 0 && info.page.modes === 4 && info.page.base === Object.keys(F.BASE).length && info.page.th >= 10, 'found tab content ' + JSON.stringify(info.page));
   await p.selectOption('main .card select', 'O'); await p.waitForTimeout(80);
   chk(await p.locator('main .found-rules tbody tr').count() === rep.filter(r => r.k === 'O').length, 'filter by class');
   chk(/۰/.test(await p.locator('main .found-conv .bt-num').innerText()), 'page shows zero conventional numbers');
   await p.evaluate(() => APP.go('e_bt', null, 'live')); await p.waitForTimeout(200);
   info.props = await p.evaluate(() => [...document.querySelectorAll('main .bt-proposal')].map(x => x.dataset.id + (x.classList.contains('superseded') ? '*' : '')));
-  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === 4, 'superseded proposal marked, foundation proposals listed ' + info.props);
+  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === 5, 'superseded proposal marked, foundation proposals listed ' + info.props);
   await p.click('main .bt-proposal[data-id="p_found_half"] button:has-text("مبنایش")'); await p.waitForTimeout(150);
   chk(await p.locator('main .found-rules').count() === 1, 'proposal links to its foundation');
   await p.setViewportSize({ width: 390, height: 800 }); await p.waitForTimeout(150);

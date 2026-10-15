@@ -461,6 +461,8 @@
         if (f.way == null && w) { f.way = w.w; filled.push(fa(i + 1) + ": راه ← " + w.w); }
         if (f.conf == null && fr && fr.p !== "" && fr.p != null && !isNaN(+String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))) { f.conf = Math.max(0, Math.min(100, +String(fr.p).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }))); filled.push(fa(i + 1) + ": اطمینان ← " + fa(f.conf) + "٪"); }
         if (f.stakes == null && stk >= 1) { f.stakes = stk <= 2 ? "کم" : stk === 3 ? "متوسط" : "زیاد"; filled.push(fa(i + 1) + ": بهای خطا ← " + f.stakes); }
+        /* جمعیتِ پژوهش از کاربرگِ «استناد به تخصص» (x_field؛ مالک ۲۰۲۶-۱۰-۱۵) — فقط برای تصدیقِ «تخصص دیگران» و فقط اگر خالی است */
+        var xf = D("st_expert").field; if (f.x_field == null && xf && f.way === "تخصص دیگران" && window.EPI_FM.x_field && window.EPI_FM.x_field.v.indexOf(xf) >= 0) { f.x_field = xf; filled.push(fa(i + 1) + ": جمعیتِ پژوهش ← " + xf); }
       });
       if (filled.length && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
     })();

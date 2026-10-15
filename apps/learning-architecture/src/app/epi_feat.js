@@ -36,6 +36,11 @@
     { k: "x_method", st: "st_expert", fa: "اعتبار روش کارشناس", t: "enum", v: ["معتبر", "ضعیف", "نامعلوم"] },
     { k: "x_comp", st: "st_expert", fa: "صلاحیت کارشناس در همین موضوع", t: "enum", v: ["احراز شده", "خارج از تخصص", "نامعلوم"] },
     { k: "x_bias", st: "st_expert", fa: "تعارض منافع یا ناپایبندی کارشناس به روش", t: "bool" },
+    /* جمعیتِ پژوهش (p_base_expert_method/amend-field، پذیرفتهٔ مالک ۲۰۲۶-۱۰-۱۵ — فقط بخش‌های قضیه‌ای): هر مقدار یک جمعیتِ سنجیده با قابِ بی‌گزینش است؛
+       رمزگذار آن را از منبعِ خودِ تصدیق (مجله، رشته، سال) می‌نویسد، هرگز از سرانجام؛ جمعیتِ سنجیده‌نشده یا منبعِ ناروشن ⇒ «نامعلوم» (⇒ ½، T_unknown).
+       مقدارِ تازه فقط همراهِ قابِ بی‌گزینشِ همان جمعیت (backtest/samples + `epi_backtest.js field`)؛ ممیزی (audit) مقدارِ بی‌قاب را رد می‌کند. */
+    { k: "x_field", st: "st_expert", fa: "جمعیتِ پژوهشی که یافتهٔ کارشناس از آن برآمده (رشته + مجله‌ها + دوره)", t: "enum",
+      v: ["اقتصادِ تجربی — آزمایش‌های آزمایشگاهیِ AER/QJE ۲۰۱۱–۲۰۱۴", "روان‌شناسی — مقاله‌های ۲۰۰۸ ِ PS/JPSP/JEP:LMC", "علومِ اجتماعیِ تجربی — Nature/Science ۲۰۱۰–۲۰۱۵", "نامعلوم"] },
     { k: "ind_complete", st: "st_istiqra", fa: "استقراء تام است (همه افراد بررسی شده)", t: "bool" },
     { k: "ind_n", st: "st_istiqra", fa: "شمار موارد مشاهده‌شده", t: "num" },
     // گسترهٔ ادعای استقرایی (p_found_scope، مالک ۲۰۲۶-۱۰-۱۳): حسابِ احتمالات برای این سه، سه جوابِ متفاوت دارد (epi_found.js: T_universal/T_finite/T_next)
@@ -67,6 +72,8 @@
   /* dx:1 = «ویژگی تشخیصی»: خودش داوری معرفتی است (مثلاً «پیش‌زمینه نابایسته فعال بود») نه واقعیت مشاهده‌پذیر.
      دادگاه یک بار هم بدون این ویژگی‌ها اجرا می‌شود تا معلوم شود موتور از روی واقعیت‌ها به تنهایی چقدر می‌بیند (ضد نشت برچسب). */
   W.EPI_FM = {}; W.EPI_FEAT.forEach(function (f) { W.EPI_FM[f.k] = f; });
+  /* فیلدِ کاربرگِ ایستگاه که گزینه‌هایش همین طرح است (`feat: "<کلید>"`) — گزینه‌ها از همین‌جا، تا دو فهرست هرگز از هم جدا نشوند */
+  (W.EPI_ST || []).forEach(function (s) { (s.ws || []).forEach(function (f) { if (f.feat && W.EPI_FM[f.feat] && W.EPI_FM[f.feat].v) f.opts = W.EPI_FM[f.feat].v.slice(); }); });
   /* ترتیب خط تولید برای تعیین «نخستین نقطه شکست» */
   W.EPI_PIPE = ["st_intake", "st_worlds", "st_tasdiq", "st_core", "st_partial", "st_ctype", "st_truth", "st_badihi", "st_route", "st_shohud", "st_hiss", "st_aql", "st_naql", "st_expert", "st_istiqra", "st_tajrobe", "st_yad", "st_grade", "st_conflict", "st_background", "st_resp", "st_selfref", "st_doubts", "st_herm", "st_r_struct", "st_r_sources", "st_r_conflict", "st_r_readings", "st_r_disagree", "st_r_plural", "st_final"];
 })(typeof window !== "undefined" ? window : globalThis);

@@ -195,6 +195,7 @@
     ta.value = d[f.k] || ""; return ta;
   };
   FIELD.sel = function (f, d, ch, id) {
+    if (f.feat && !(f.opts || []).length && window.EPI_FM && window.EPI_FM[f.feat]) f.opts = window.EPI_FM[f.feat].v.slice();   // گزینه‌ها از طرحِ ویژگی‌های کارخانه
     var sel = h("select", { id: id, onchange: function (e) { d[f.k] = e.target.value; ch(); } }, h("option", { value: "" }, "— انتخاب کن —"),
       (f.opts || []).map(function (o) { return h("option", { value: o, selected: d[f.k] === o }, o); }));
     // مقدارِ ذخیره‌شده‌ای که دیگر در گزینه‌ها نیست (گزینه بازنویسی شد) گم نمی‌شود (۲۰۲۶-۱۰-۱۵: پاک‌کردنِ مثال‌های بازار از کاربرگ‌ها)

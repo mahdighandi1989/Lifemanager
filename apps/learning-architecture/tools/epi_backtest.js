@@ -10,6 +10,7 @@
      node tools/epi_backtest.js add <file.json>   # افزودنِ وقایعِ تازه (اعتبارسنجی + ردِ تکراری) به پیکره
      node tools/epi_backtest.js run [--note "…"]  # یک دور: اجرا، دفتر، یافته‌ها، جزوهٔ متقن
      node tools/epi_backtest.js check             # فقط می‌سنجد که خروجی‌ها با پیکره هم‌خوان‌اند (دروازهٔ ادغام)
+     node tools/epi_backtest.js field <file.json> # جمعیتِ پژوهشِ هر قاب (x_field) — تنها راهِ نوشتنش در backtest/samples
 
    فایل‌ها (همه در git — تاریخچهٔ کامل):
      backtest/corpus/*.json    پیکرهٔ افزوده‌شده در دورها (وقایعِ واقعی و سناریوهای انتزاعیِ هم‌ریختِ آن‌ها)
@@ -82,8 +83,41 @@ function validateFrame(sm, seen) {
     Object.keys(it.f || {}).forEach((key) => { const d = FM[key], v = it.f[key];
       if (!d) e.push("ویژگیِ ناشناخته: " + key); else if (d.t === "enum" && d.v.indexOf(v) < 0) e.push("مقدارِ نادرست " + key + "=" + v); });
   });
+  if (sm.x_field != null) e.push.apply(e, fieldErrors(sm, sm.x_field));
   if (seen && seen.has(sm.id)) e.push("قابِ تکراری: " + sm.id);
   return e;
+}
+/* جمعیتِ قاب (x_field؛ p_base_expert_method/amend-field، مالک ۲۰۲۶-۱۰-۱۵): قاب خودش یک جمعیتِ معین است (تعریفش پیش از سرانجام)، پس
+   «نامعلوم» برایش معنا ندارد؛ موردی که خودش x_field ِ دیگری دارد با قاب ناسازگار است. */
+function fieldErrors(sm, v) {
+  const e = [], d = FM.x_field;
+  if (!d || d.v.indexOf(v) < 0) e.push("x_field ِ قاب باید یکی از مقدارهای طرح باشد: " + v);
+  else if (v === "نامعلوم") e.push("x_field ِ قاب نمی‌تواند «نامعلوم» باشد — قاب خودش یک جمعیتِ معین است");
+  (sm.items || []).forEach((it) => { if (it.f && it.f.x_field != null && it.f.x_field !== v) e.push("موردِ " + it.id + ": x_field ِ مورد (" + it.f.x_field + ") با قاب (" + v + ") نمی‌خواند"); });
+  return e;
+}
+/* `field <file.json>`: [{ "frame": "<شناسهٔ قاب>", "x_field": "<مقدار>", "why": "…", "by"? }] — جمعیتِ هر قاب را یک بار ثبت می‌کند
+   (تنها راهِ نوشتنِ x_field در backtest/samples؛ بی بازنویسیِ خاموش: مقدارِ دیگرِ موجود ⇒ رد). */
+function setFields(file) {
+  const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
+  const today = new Date().toISOString().slice(0, 10), ok = [], bad = [], byFile = {};
+  for (const f of sampleFiles()) byFile[f] = rd(path.join(SAMPLES, f), []);
+  items.forEach((u) => {
+    let hit = null;
+    Object.keys(byFile).forEach((f) => byFile[f].forEach((sm) => { if (sm.id === u.frame) hit = sm; }));
+    const e = [];
+    if (!hit) e.push("قابِ ناشناخته: " + u.frame);
+    else if (hit.excluded) e.push("قابِ ردشده (excluded): " + u.frame);
+    if (!u.why || String(u.why).length < 15) e.push("why: چرا این جمعیت (از تعریفِ خودِ قاب، نه از سرانجام)");
+    if (hit) e.push.apply(e, fieldErrors(hit, u.x_field));
+    if (hit && hit.x_field != null && hit.x_field !== u.x_field) e.push("قاب پیش‌تر جمعیتِ دیگری دارد (" + hit.x_field + ") — بازنویسیِ خاموش ممنوع؛ اگر خطاست، با دلیل در WORKLOG و قابِ تازه");
+    if (e.length) { bad.push({ frame: u.frame, errors: e }); return; }
+    if (hit.x_field === u.x_field) { ok.push({ frame: u.frame, unchanged: true }); return; }
+    hit.x_field = u.x_field; hit.x_field_set = { at: today, by: u.by || "routine", why: u.why };
+    ok.push({ frame: u.frame, x_field: u.x_field });
+  });
+  if (!bad.length) Object.keys(byFile).forEach((f) => wr(path.join(SAMPLES, f), byFile[f]));
+  return { set: bad.length ? [] : ok, rejected: bad, note: bad.length ? "هیچ چیز نوشته نشد (همه یا هیچ)" : "" };
 }
 function addSamples(file) {
   const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
@@ -285,7 +319,23 @@ function axiomAudit() {
     if (d && d.base && !FD.BASE[d.base]) v.push("پایهٔ ناشناخته در " + r.id); });
   FD.report(RULES).filter((r) => r.conventional).forEach((r) => v.push("عددِ قراردادی: " + r.id + " = " + r.cap));
   RULES.filter((r) => r.basis === "beyond" && !(r.proof && TH[r.proof])).forEach((r) => v.push("قاعدهٔ فراتر از جزوه بی قضیه: " + r.id));
+  v.push.apply(v, fieldAudit());
   return v.concat(integrity().violations);
+}
+
+/* جمعیتِ پژوهش (x_field): هر مقدارِ طرح جز «نامعلوم» پایه‌ای دارد که همان جمعیت را می‌سنجد و قاعده‌ای که سقفش همان پایه است؛
+   هر تصدیقِ پیکره که x_field ِ غیرِ «نامعلوم» دارد، باید جمعیتش دست‌کم یک قابِ بی‌گزینش داشته باشد — وگرنه عدد قضیه نیست (فقط T_unknown). */
+function fieldAudit() {
+  const FD = global.EPI_FOUND, v = [], d = FM.x_field; if (!d) return v;
+  const framed = new Set(loadSamples().filter((sm) => sm.x_field).map((sm) => sm.x_field));
+  d.v.filter((x) => x !== "نامعلوم").forEach((x) => {
+    const b = Object.keys(FD.BASE).filter((k) => FD.BASE[k].select && FD.BASE[k].select.x_field === x);
+    if (b.length !== 1) v.push("جمعیتِ x_field بی پایهٔ یکتا: " + x);
+    else if (!RULES.some((r) => r.eff === "cap" && (FD.DER[r.id] || {}).base === b[0])) v.push("پایهٔ جمعیت بی قاعده: " + b[0]);
+  });
+  loadCorpus().forEach((c) => (c.claims || []).forEach((k) => { const x = k.f && k.f.x_field;
+    if (x && x !== "نامعلوم" && !framed.has(x)) v.push("تصدیقِ " + c.id + "/" + k.id + " جمعیتی دارد که هیچ قابِ سنجیده‌ای ندارد: " + x + " (⇒ «نامعلوم»)"); }));
+  return v;
 }
 
 /* ---------- اعتبارسنجیِ واقعهٔ تازه ---------- */
@@ -623,11 +673,12 @@ if (require.main === module) {
   if (cmd === "status") console.log(JSON.stringify(status(), null, 1));
   else if (cmd === "add") console.log(JSON.stringify(add(a1), null, 1));
   else if (cmd === "sample") console.log(JSON.stringify(addSamples(a1), null, 1));
+  else if (cmd === "field") { const r = setFields(a1); console.log(JSON.stringify(r, null, 1)); if (r.rejected.length) process.exit(3); }
   else if (cmd === "territory") console.log(JSON.stringify(applyTerritory(a1), null, 1));
   else if (cmd === "review") { const r = addReview(a1); console.log(JSON.stringify(r, null, 1)); if (!r.ok) process.exit(3); }
   else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v, warnings: integrity().warnings }, null, 1)); if (v.length) process.exit(3); }
   else if (cmd === "run") { const args = process.argv.slice(3), ni = args.indexOf("--note"); console.log(JSON.stringify(run(ni >= 0 ? args[ni + 1] : "", args.indexOf("--rerun") >= 0), null, 1)); }
-  else { console.log("usage: status | add <file.json> | sample <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
+  else { console.log("usage: status | add <file.json> | sample <file.json> | field <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
 }
-module.exports = { integrity, validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples,
+module.exports = { integrity, validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples, setFields, fieldAudit,
   applyTerritory, validateTerr, terrAreas, terrState, addReview, territoryMd };
