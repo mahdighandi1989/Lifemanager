@@ -29,7 +29,7 @@
     /* ثبت‌گاه‌های دیگرِ دادهٔ تو (مالک ۲۰۲۶-۱۰-۱۴ «هر چیزی… باید در آن بیاید»؛ ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵) */
     { t: "prereq", fa: "نقشهٔ پیش‌نیازها", sys: "mine" }, { t: "tour", fa: "تورِ دستیار", sys: "mine" }, { t: "tfacet", fa: "وجهِ تور", sys: "mine" },
     { t: "wchain", fa: "زنجیرهٔ نگرانی", sys: "mine" }, { t: "fcast", fa: "پیش‌بینیِ تو", sys: "mine" }, { t: "value", fa: "ارزشِ تو", sys: "mine" },
-    { t: "meaning", fa: "وارسیِ معنا", sys: "mine" }, { t: "kexp", fa: "آزمایشِ گره", sys: "mine" }, { t: "ex", fa: "تمرینِ تکنیک", sys: "mine" },
+    { t: "meaning", fa: "وارسیِ معنا", sys: "mine" }, { t: "kexp", fa: "آزمایشِ گره", sys: "mine" }, { t: "deadline", fa: "موعدِ تو", sys: "mine" }, { t: "ex", fa: "تمرینِ تکنیک", sys: "mine" },
     { t: "prun", fa: "اجرای پروتکل", sys: "mine" }, { t: "card", fa: "کارتِ مرور", sys: "mine" }, { t: "pbitem", fa: "تمرینِ مسئلهٔ هم‌ساختار", sys: "mine" }
   ];
   G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
@@ -157,6 +157,7 @@
       node("tour", s.id, "🧭 تور: " + (s.title || s.pinned || "تور"), { go: ["home"] });
       (s.tour.facets || []).forEach(function (f, i) { var fid = s.id + "/" + (f.key || f.id || i); node("tfacet", fid, (f.title || "وجه"), { go: [f.view || "home", f.arg || null] }); edge(ref("tfacet", fid), ref("tour", s.id), "in");
         (f.refs || []).forEach(function (r) { if (!r || !r.id) return; var k = recRef(r.type, r.id); if (k) edge(ref("tfacet", fid), k, "about"); }); });
+    all("deadline").forEach(function (x) { node("deadline", x.id, "⏰ " + String(x.what || "موعد").slice(0, 50), { go: ["home"] }); if (x.sess && N[ref("tour", x.sess)]) edge(ref("deadline", x.id), ref("tour", x.sess), "in"); });
     });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
     (W.EPI_ST || []).forEach(function (s) { (s.tech || []).forEach(function (x) { edge(ref("station", s.id), ref("tech", x.id), "bridge", x.why); }); });

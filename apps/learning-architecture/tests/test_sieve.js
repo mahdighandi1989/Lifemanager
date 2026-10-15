@@ -81,6 +81,18 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     out.humanized = /«برداشت و نتیجه‌گیری/.test(rep.html) && /قلمروِ سامانه‌ها/.test(rep.html) && /غربالِ لایه‌ها/.test(rep.html);
     return out;
   });
+  // ⏰ موعدها و ساعتِ یادآور از حرفِ کاربر (کارزارِ سوم v01/v02/v06)
+  info.dl = await p.evaluate(async () => {
+    const AS = APP.ASSIST, rem = []; APP.HOST = Object.assign({}, APP.HOST || {}, { remind: async (x) => { rem.push(x); return { ok: true }; } });
+    const s = AS.newSession(); APP.S.put(s); AS._turnSession = s;
+    const past = AS.DO.deadline({ what: 'امتحانِ گذشته', date: APP.addDays(APP.today(), -3) });
+    AS.DO.remind_hour({ hour: 22 });
+    AS.DO.deadline({ what: 'تحویلِ تمرینِ فیزیک', date: APP.addDays(APP.today(), 2) });
+    const d = APP.S.all('deadline'), today = APP.dueList().some(x => /تحویلِ تمرینِ فیزیک/.test(x.txt));
+    const r = rem.filter(x => /^deadline:/.test(x.key)).slice(-1)[0] || {};
+    const prompt = AS.prompt(s, 'x', AS.scan());
+    return { pastRefused: /گذشته است/.test(past) && !d.some(x => /گذشته/.test(x.what)), one: d.length === 1, today, hour: r.hour, due: r.due_date === APP.addDays(APP.today(), 1), inPrompt: /# موعدهای کاربر[\s\S]*تحویلِ تمرینِ فیزیک/.test(prompt) && /ساعتِ یادآورها: ۲۲/.test(prompt), rule: /remind_hour/.test(AS.SYS) };
+  });
   const S = info.sieve;
   chk(S.pend && S.fams === 12 && S.n >= 22, 'layers = base + all 12 knot families from the registry: ' + S.n + '/' + S.fams);
   chk(S.rules, 'root-first sieve rules replace "every aspect = a facet"');
@@ -93,6 +105,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.ownClick, 'the assistant never presses an owner-only button (e.g. sending the problem to the AI)');
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');
   chk(S.safeFirst && S.today && S.btnFirst, 'safety is the first owed question; the prompt carries today; buttons come before fields: ' + [S.safeFirst, S.today, S.btnFirst]);
+  chk(info.dl.pastRefused && info.dl.one && info.dl.today && info.dl.hour === 22 && info.dl.due && info.dl.inPrompt && info.dl.rule, 'deadlines from the user\'s words: past dates refused, Today item, reminder a day before at the user\'s hour, visible to the model: ' + JSON.stringify(info.dl));
   chk(S.alias && S.owed, 'near-miss layer names (repeat, f3) map to the real layer');
   chk(S.outcome, 'the e-mail opens with the outcome in plain words, derived from the data');
   chk(S.honest, 'a facet with open milestones is never reported as «انجام شد»');

@@ -30491,7 +30491,7 @@ APP.goFromURL = function (q) {
     /* ثبت‌گاه‌های دیگرِ دادهٔ تو (مالک ۲۰۲۶-۱۰-۱۴ «هر چیزی… باید در آن بیاید»؛ ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵) */
     { t: "prereq", fa: "نقشهٔ پیش‌نیازها", sys: "mine" }, { t: "tour", fa: "تورِ دستیار", sys: "mine" }, { t: "tfacet", fa: "وجهِ تور", sys: "mine" },
     { t: "wchain", fa: "زنجیرهٔ نگرانی", sys: "mine" }, { t: "fcast", fa: "پیش‌بینیِ تو", sys: "mine" }, { t: "value", fa: "ارزشِ تو", sys: "mine" },
-    { t: "meaning", fa: "وارسیِ معنا", sys: "mine" }, { t: "kexp", fa: "آزمایشِ گره", sys: "mine" }, { t: "ex", fa: "تمرینِ تکنیک", sys: "mine" },
+    { t: "meaning", fa: "وارسیِ معنا", sys: "mine" }, { t: "kexp", fa: "آزمایشِ گره", sys: "mine" }, { t: "deadline", fa: "موعدِ تو", sys: "mine" }, { t: "ex", fa: "تمرینِ تکنیک", sys: "mine" },
     { t: "prun", fa: "اجرای پروتکل", sys: "mine" }, { t: "card", fa: "کارتِ مرور", sys: "mine" }, { t: "pbitem", fa: "تمرینِ مسئلهٔ هم‌ساختار", sys: "mine" }
   ];
   G.TM = {}; G.TYPES.forEach(function (x) { G.TM[x.t] = x; });
@@ -30619,6 +30619,7 @@ APP.goFromURL = function (q) {
       node("tour", s.id, "🧭 تور: " + (s.title || s.pinned || "تور"), { go: ["home"] });
       (s.tour.facets || []).forEach(function (f, i) { var fid = s.id + "/" + (f.key || f.id || i); node("tfacet", fid, (f.title || "وجه"), { go: [f.view || "home", f.arg || null] }); edge(ref("tfacet", fid), ref("tour", s.id), "in");
         (f.refs || []).forEach(function (r) { if (!r || !r.id) return; var k = recRef(r.type, r.id); if (k) edge(ref("tfacet", fid), k, "about"); }); });
+    all("deadline").forEach(function (x) { node("deadline", x.id, "⏰ " + String(x.what || "موعد").slice(0, 50), { go: ["home"] }); if (x.sess && N[ref("tour", x.sess)]) edge(ref("deadline", x.id), ref("tour", x.sess), "in"); });
     });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
     (W.EPI_ST || []).forEach(function (s) { (s.tech || []).forEach(function (x) { edge(ref("station", s.id), ref("tech", x.id), "bridge", x.why); }); });
@@ -33455,3 +33456,78 @@ APP.goFromURL = function (q) {
   if (A.GRAPH && A.GRAPH.MAPS && !A.GRAPH.MAPS.some(function (m) { return m.v === "prereq"; }))
     A.GRAPH.MAPS.push({ v: "prereq", fa: "🧩 نقشهٔ پیش‌نیازها", what: "برای هر مسئله: کدام دانشِ مقدماتی نبود، از کدام علم، و موضوعِ یادگیریِ هر کدام" });
 })(APP);
+/* ===== «⏰ موعدها»: تاریخی که کاربر در گفت‌وگو می‌گوید (آزمون، تحویل، «تا جمعه»)، رکوردِ تاریخ‌دار می‌شود =====
+   کارزارِ آزمونِ سوم (v01، v02، v06):
+   - «فردا امتحان دارم» ⇒ چرخهٔ ۱-۳-۷ پس از امتحان می‌افتاد؛
+   - «تا جمعه دوباره حل کن» ⇒ هیچ کارِ تاریخ‌دار یا یادآوری ساخته نشد؛
+   - «بعد از ساعتِ ۲۲ درس می‌خوانم» ⇒ همهٔ یادآورها ساعتِ ۹ می‌آمدند؛
+   - برنامهٔ ماه تا آزمون فقط متنِ گفت‌وگو بود.
+   این بخش فقط چیزی را که خودِ کاربر گفته ثبت می‌کند:
+   - رکوردِ «deadline» که در «امروز» و یادآور و تور دیده می‌شود؛
+   - ساعتِ دلخواهِ یادآور (همان تنظیمِ یادآورهای گره‌گشا). */
+(function (A) {
+  var S = A.S, fa = A.fa, AS = A.ASSIST;
+  if (!AS || !AS.DO) return;
+  function nowIso() { return new Date().toISOString(); }
+  function clip(x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
+  var RE_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+  /* {"do":"deadline","what":"…","date":"YYYY-MM-DD" (میلادی)} — فقط از حرفِ خودِ کاربر */
+  AS.DO.deadline = function (a) {
+    var s = AS._turnSession, what = clip(a && a.what, 120), date = String((a && a.date) || "").trim();
+    if (!what || !RE_DATE.test(date)) return "موعد ثبت نشد: «what» و «date» (YYYY-MM-DD میلادی) لازم است";
+    if (date < A.today()) return "موعد ثبت نشد: " + date + " گذشته است — از کاربر بپرس تاریخِ درست چیست";
+    var same = S.all("deadline", function (x) { return !x.done && x.what === what; })[0];
+    var r = same || { id: A.uid("dl"), type: "deadline", what: what, done: false };
+    r.date = date; r.sess = r.sess || (s && s.id) || ""; S.put(r); sync(r);
+    var left = A.daysBetween(A.today(), date);
+    return "";   // پیامِ سامانه پایین‌تر (msgs) — بی کلید و بی شناسه
+  };
+  /* {"do":"remind_hour","hour":22} — ساعتِ یادآورها (۰ تا ۲۳)، وقتی کاربر خودش گفته کی کار می‌کند */
+  AS.DO.remind_hour = function (a) {
+    var hr = Math.round(+((a && a.hour) != null ? a.hour : NaN));
+    if (!(hr >= 0 && hr <= 23)) return "ساعتِ یادآور باید عددی از ۰ تا ۲۳ باشد";
+    var st = S.settings(); st.knots = st.knots || {}; st.knots.notify = st.knots.notify || {}; st.knots.notify.hour = hr; S.saveSettings(st);
+    S.all("deadline", function (x) { return !x.done; }).forEach(sync);
+    S.all("achat", function (x) { return x.tour; }).forEach(function (x) { x._rem = ""; });   // یادآورِ تورها با ساعتِ تازه دوباره نوشته می‌شود
+    return "";
+  };
+  function hour() { var n = ((S.settings().knots || {}).notify) || {}; return n.hour == null ? 9 : n.hour; }
+  /* یادآور: یک روز پیش از موعد (اگر هنوز فرصت هست) و خودِ روز */
+  function sync(r) {
+    if (!(A.HOST && A.HOST.remind) || !r || r.done) return;
+    var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
+    var pre = A.addDays(r.date, -1), due = pre > A.today() ? pre : r.date;
+    try { Promise.resolve(A.HOST.remind({ key: "deadline:" + r.id, due_date: due, tz: tz, hour: hour(), title: "معماری یادگیری — موعد",
+      body: "«" + r.what + "» — " + (A.fdate ? A.fdate(r.date) : r.date) + (due === pre ? " (فردا)" : " (امروز)"), link: "" })).catch(function () { }); } catch (e) { }
+  }
+  /* «امروز»: موعدهای ۷ روزِ آینده */
+  if (typeof A.dueList === "function" && !A.dueList._dl) {
+    var raw = A.dueList;
+    A.dueList = function () {
+      var items = raw.apply(this, arguments) || [];
+      S.all("deadline", function (x) { return !x.done && x.date >= A.today() && A.daysBetween(A.today(), x.date) <= 7; })
+        .sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }).forEach(function (r) {
+          var left = A.daysBetween(A.today(), r.date);
+          items.unshift({ k: left <= 1 ? "warn" : "p", txt: "⏰ " + clip(r.what, 60), sub: left === 0 ? "موعد: امروز" : left === 1 ? "موعد: فردا" : "موعد: " + fa(left) + " روز دیگر (" + (A.fdate ? A.fdate(r.date) : r.date) + ")",
+            go: function () { r.done = true; r.doneAt = nowIso(); S.put(r); A.toast("«" + clip(r.what, 40) + "» انجام‌شده علامت خورد."); A.render(); }, act: "انجام شد" });
+        });
+      return items;
+    };
+    A.dueList._dl = true;
+  }
+  /* مدل موعدهای همین سشن را می‌بیند تا برنامهٔ تمرین را پیش از آن بچیند */
+  AS.promptHooks = AS.promptHooks || [];
+  AS.promptHooks.push(function (s) {
+    var L = S.all("deadline", function (x) { return !x.done && x.date >= A.today(); }).sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }).slice(0, 8);
+    var hr = (((S.settings().knots || {}).notify) || {}).hour;
+    return (L.length ? "# موعدهای کاربر (هر برنامهٔ تمرین و مرور پیش از این‌ها تمام شود)\n" + L.map(function (r) { return "- " + r.date + " (" + (A.fdate ? A.fdate(r.date) : "") + ", " + fa(A.daysBetween(A.today(), r.date)) + " روز دیگر): " + r.what; }).join("\n") + "\n" : "") +
+      "ساعتِ یادآورها: " + (hr == null ? "۹ (پیش‌فرض)" : fa(hr));
+  });
+  AS.SYS += "\n" + [
+    "# موعدها و ساعت",
+    "- اگر کاربر تاریخ یا موعدی گفت (آزمون، تحویل، «تا جمعه»، «فردا»)، آن را با {\"do\":\"deadline\",\"what\":\"…\",\"date\":\"YYYY-MM-DD\"} (میلادی، از «# امروز» حساب کن) ثبت کن و برنامهٔ تمرین/مرور را طوری بچین که پیش از موعد تمام شود (چرخهٔ ۱-۳-۷ ای که بعد از موعد می‌افتد پیشنهاد نکن؛ برای موعدِ نزدیک مرورِ فشرده پیش از آن).",
+    "- اگر کاربر گفت کی کار می‌کند یا کی پیام می‌خواهد (مثلاً «بعد از ۲۲»)، با {\"do\":\"remind_hour\",\"hour\":22} ساعتِ یادآورها را بگذار.",
+    "- برنامهٔ چندهفته‌ای تا یک موعد را فقط در متنِ گفت‌وگو نگذار: هر گامِ تاریخ‌دارش یک deadline شود (حداکثر چند گامِ اصلی)."
+  ].join("\n");
+})(window.APP);
