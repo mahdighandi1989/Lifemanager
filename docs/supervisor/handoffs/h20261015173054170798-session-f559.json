@@ -12,5 +12,11 @@
  "what": "پولیا دورِ ۵ (بازبینیِ سخت‌گیرانهٔ مورد‌به‌مورد با ۶۶۳ نقلِ عینی از صفحهٔ اجراشده): ۵۶۷/۱۰۸/۱۰۴/۳۳؛ گزارش docs/decisions/2026-10-15-polya-strict-regrade.md؛ beyond ۱۴ مورد.",
  "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T18:57:53Z",
+  "note": "بسنجیده شد: بیلد، test_plausible/test_sources/test_graph (NO ERRORS) و تست‌های handbook/integrity/handoff-guard سبز",
+  "commit": ""
+ }
 }

@@ -12,5 +12,11 @@
  "what": "p_plausible_reasoning (مالک «موافقم»): a2_ws.js نوعِ عامِ تازهٔ فیلدِ «num» (عددِ صحیحِ ≥ ۰، ارقامِ فارسی، خالی ⇒ نامعلوم، با label for)؛ a7_bt.js: «داوریِ قطعی» خانه‌های خالیِ x_conseq_*/x_analog_* را از کاربرگِ «راه عقل و برهان» پر می‌کند و «جزوهٔ زنده» برای basis beyond برچسبِ «فراتر از جزوه — قضیهٔ …» می‌زند؛ آزمونِ tests/test_plausible.js (کدِ خروج).",
  "procedure": "apps/learning-architecture/AGENTS.md («هر تغییر»؛ فرمِ برچسب‌دار برای دستیار)",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T18:57:53Z",
+  "note": "بسنجیده شد: بیلد، test_plausible/test_sources/test_graph (NO ERRORS) و تست‌های handbook/integrity/handoff-guard سبز",
+  "commit": ""
+ }
 }

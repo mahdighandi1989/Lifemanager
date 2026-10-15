@@ -12,5 +12,11 @@
  "what": "پولیا دورِ ۴: sources/polya_how_to_solve_it/coverage.json از ممیزیِ مستقلِ اجرایی (۷۵۸ عمیق / ۳۲ سطحی / ۰ ندارد / ۲۲ نامربوط)، history دورِ ۴، beyond ۲۲ مورد؛ test_sources سبز.",
  "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T18:57:53Z",
+  "note": "بسنجیده شد: بیلد، test_plausible/test_sources/test_graph (NO ERRORS) و تست‌های handbook/integrity/handoff-guard سبز",
+  "commit": ""
+ }
 }
