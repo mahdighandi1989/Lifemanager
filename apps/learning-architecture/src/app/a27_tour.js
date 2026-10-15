@@ -114,9 +114,13 @@
       var pr = c.eprob[0];
       add("مسئله وارد و تجزیه شد", pr);
       add("تأییدِ مسئله پس از وارسی — تصمیمِ خودت", pr && pr.status === "approved", true, true);
+      // فهم پیش از نخستین حرکت، و بازنگری پس از حل — هر دو از رکوردِ خودِ مسئله (AS.probPhaseOf)، نه از حرفِ مدل
+      var pph = pr && pr.p && AS.probPhaseOf ? AS.probPhaseOf(pr.p.id) : {};
+      add("فهمِ مسئله: مجهول، داده و شرط را به زبانِ خودت نوشتی", pph.und, false, true);
       // «تمرین شد» یعنی دست‌کم یک سطحِ کامل (همهٔ گام‌ها)، نه یک گام (کارزارِ آزمون sc04: پس از ۱ از ۶ گام تیک می‌خورد)
       var pg = pr && pr.p && S.get("eprog_" + pr.p.id), nst = pr && pr.p && (pr.p.stages || []).length;
       add("شبیه‌ساز تمرین شد (یک سطحِ کامل)", pg && nst && Object.keys(pg.lv || {}).some(function (l) { return Object.keys(pg.lv[l] || {}).length >= nst; }), false);
+      add("بازنگری پس از حل: نتیجه یا روش را وارسی کردی (یک پرسشِ بازنگری، با کارتِ مرور)", pph.back, false, true);
       // فقط هم‌ساختارهای وارسی‌شده (همان که زبانهٔ هم‌ساختار نشان می‌دهد) — نه پیش‌نویس‌های ردشده
       var pbv = c.pbitem.filter(function (x) { return A.pbServable ? A.pbServable(x) : x.ver && x.ver.ok && !x.bad; });
       add("مسئله‌های هم‌ساختارِ فاصله‌دار ساخته شد" + (c.pbitem.length > pbv.length ? " (" + fa(pbv.length) + " وارسی‌شده از " + fa(c.pbitem.length) + ")" : ""), pbv.length);
@@ -558,6 +562,17 @@
     "- رکوردِ کاربر یا حوزهٔ موجودِ هم‌خوانِ قلمرو را با {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"<شناسهٔ رکورد یا حوزه>\"} به وجه وصل کن (برای حوزهٔ موجود برگه نخواه). «ثبت‌های تازه» را در یک جمله تأیید کن؛ «پیگیریِ بدهکار» را پیش از کارِ دیگر بگو."
   ].join("\n");
 
+  /* «موفقیتِ کوچک» در کشوی تور (وجهِ مسئله): وقتی در سطحِ کنونی شکست بر موفقیت پیشی گرفت (AS.smallWin) — یک گامِ آسان‌ترِ واقعی، و پیوند به
+     گره‌گشا اگر حسِ دلسردی/ترس تکرار می‌شود (خانوادهٔ «هیجان و انگیزه»). بی آستانهٔ قراردادی؛ پایین‌تر در همین فایل. */
+  function smallWinRow(f) {
+    if (f.kind !== "problem" || f.status === "skipped" || !AS.smallWin) return null;
+    var ep = children(f).eprob[0], pid = ep && ep.p && ep.p.id, sw = pid && AS.smallWin(pid); if (!sw) return null;
+    return h("div", { class: "small as-win", dir: "rtl" }, "🌱 در این سطح " + fa(sw.n - sw.k) + " گام از " + fa(sw.n) + " نشد؛ پیش از گامِ بعد یک موفقیتِ کوچک: ",
+      h("button", { class: "linkish", type: "button", onclick: function () { A.go("e_prob", pid, "drills"); } }, "تمرین‌های هم‌خانواده"), " · ",
+      h("button", { class: "linkish", type: "button", onclick: function () { A.simState = { pid: pid, lv: 1, order: "e2h", i: 0 }; A.go("e_prob", pid, "sim"); } }, "سطحِ آسان، از آسان‌ترین گام"), " · ",
+      A.V.kcases ? h("button", { class: "linkish", type: "button", onclick: function () { A.go("kcases"); } }, "🪢 اگر این دلسردی تکرار می‌شود: گره‌گشا (هیجان و انگیزه)") : null);
+  }
+
   /* ---------- کشوی تور ---------- */
   AS.tourDrawer = function (s) {
     // همان شمارشِ ایمیل: کنارگذاشته‌ها نه پیشرفت‌اند نه در مخرج (کارزارِ آزمون sc09: «۰ از ۴» با نوارِ پر)
@@ -574,6 +589,7 @@
             h("span", { class: "as-dot", "aria-hidden": "true" }, f.status === "done" ? "✓" : f.status === "now" ? "●" : f.status === "blocked" ? "⏳" : f.status === "skipped" ? "–" : "○"),
             h("b", {}, K.ic + " " + f.title), " ", h("span", { class: "small muted" }, (ST_FA[f.status] || f.status) + (ms.length ? " · " + fa(okN) + "/" + fa(ms.length) : ""))),
           h("ul", { class: "plain small as-ms" }, ms.map(function (m) { return h("li", { class: m.ok ? "ok" : "" }, (m.ok ? "✓ " : "○ ") + m.t); })),
+          smallWinRow(f),
           pr.length ? h("div", { class: "small as-pr" }, "📅 ", pr.map(function (p) { return h("button", { class: "linkish" + (p.overdue ? " bad" : ""), type: "button", onclick: function () { A.go(p.view, p.arg || null, p.sub || null); } }, p.t + " · " + A.fdate(p.due)); })) : null,
           f.blocked ? h("div", { class: "small as-blk" }, "🛎 برگهٔ #" + fa(f.blocked.number) + " — " + (f.blocked.verified ? "حوزه ساخته و وارسی شد" : "منتظرِ روتینِ مسئول") +
             (f.blocked.checks && f.blocked.checks.length ? " · " + fa(f.blocked.checks.length) + " بار پیگیری" : ""),
@@ -740,6 +756,107 @@
     rawRenderT.apply(this, arguments);
     try { if (A.HOST && A.HOST.sheet && A.S.loaded) AS.tourSweep(); } catch (e) { console.error(e); }
   };
+
+  /* ---------- معلمِ حلِ مسئله: یک پرسش در هر نوبت، متناسب با مرحله، بی لودادن؛ بازنگری پس از «حل شد»؛ موفقیتِ کوچک ----------
+     مالک (۲۰۲۶-۱۰-۱۵): «سیستم … حسبِ آن مسئله خودش از دلِ تونل‌های لازم بگذرد» — این بخش زیرسامانهٔ جدا نیست: فقط وقتی کاربر واقعاً
+     دارد مسئله‌ای حل می‌کند (شبیه‌ساز/صفحهٔ یک مسئله، موقعیتِ گره‌گشا از نوعِ مسئله، «بیان دیگر» در حالتِ مسئله، یا وجهِ «مسئله» ِ تور
+     همین حالا) قاعده‌ها را به نوبتِ دستیار می‌افزاید (AS.promptHooks؛ پرامپتِ سامانه دست نمی‌خورد). داده: فهم و بازنگری روی رکوردِ همان
+     مسئله (eprog_<pid>.tut | kcase.tut | داده‌های «بیان دیگر») ثبت می‌شود و پاسخِ بازنگری یک کارتِ مرور می‌سازد (تکرارِ فاصله‌دار). */
+  var TQ = {
+    und: { fa: "فهمِ مسئله", qs: ["مجهول (یا حکمی که باید ثابت شود) چیست؟", "داده‌ها (یا فرض) چیست؟", "شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟", "آیا شرط برای تعیینِ مجهول کافی است؟ زائد است؟ متناقض است؟", "شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو.", "چه؟ چرا؟ کجا؟ کی؟ چگونه؟ — کدام‌یک دربارهٔ این مسئله هنوز بی‌پاسخ است؟"] },
+    plan: { fa: "طرح‌ریزی", qs: ["پیش‌تر همین را — یا همین را به شکلِ کمی دیگر — دیده‌ای؟", "به مجهول نگاه کن: مسئلهٔ آشنایی با همین مجهول، یا مجهولِ مشابه، می‌شناسی؟", "می‌توانی مسئله را به شکلِ دیگری بیان کنی؟ به تعریف‌ها برگرد.", "اگر نمی‌توانی همین را حل کنی، مسئلهٔ مرتبطِ ساده‌تری را حل کن: حالتِ خاص‌تر؟ کلی‌تر؟ فقط بخشی از شرط را نگه دار.", "همهٔ داده‌ها و کلِ شرط را به کار بردی؟ همهٔ مفهوم‌های اساسیِ مسئله را در نظر گرفتی؟"] },
+    exec: { fa: "اجرای طرح", qs: ["هر گام را وارسی کن: روشن می‌بینی که این گام درست است؟", "می‌توانی ثابت کنی که درست است (کدام مقدمه آن را لازم می‌آورد)؟"] },
+    back: { fa: "بازنگری", qs: ["می‌توانی نتیجه را وارسی کنی — در حالتی خاص یا حدی، با ابعاد یا تقارن؟ همهٔ داده‌ها در جواب آمده‌اند؟", "می‌توانی استدلال را در نقطه‌های حساسش وارسی کنی؟", "می‌توانی نتیجه را از راهِ دیگری به دست آوری؟ می‌توانی آن را در یک نگاه ببینی؟", "می‌توانی نتیجه یا روش را در مسئلهٔ دیگری به کار ببری؟ یک مسئلهٔ تازه بساز.", "این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟ (شناختنِ نوعِ مسئله‌هایی که با سلیقه و توانت می‌خواند)"] }
+  };
+  AS.tutorQuestions = TQ;
+  var SOLVED_RE = /حل[\s‌]*ش?[\s‌]*(?:شد(?!ه)|کردم)|جواب(?:ش)?[\s‌]*(?:رو|را)?[\s‌]*(?:پیدا[\s‌]*کردم|گرفتم|درآوردم)|ثابت(?:ش)?[\s‌]*کردم/;
+  var EXEC_RE = /محاسبه|حساب\s*کردم|نوشتم که|گامِ?\s*بعد(?:ی)?\s*(?:اینه|این است)|دارم\s*(?:حل|ثابت)\s*می‌?کنم/;
+  function pgOf(pid) { return pid ? S.get("eprog_" + pid) : null; }
+  function arrN(x) { return Array.isArray(x) ? x.length : x ? 1 : 0; }
+  /* شاهدِ فهم و بازنگری برای یک مسئله — هر شکلی که بخش‌های دیگر ثبت کنند (کارتِ فهم/بازنگریِ شبیه‌ساز) یا همین دستیار (tut) */
+  AS.probPhaseOf = function (pid) {
+    var pg = pgOf(pid) || {}, t = pg.tut || {};
+    return { und: !!(arrN(pg.und) || arrN(pg.understand) || arrN(t.und)), back: !!(arrN(pg.lb) || arrN(pg.lookback) || arrN(pg.review) || arrN(t.back)) };
+  };
+  /* «موفقیتِ کوچک» — بی آستانهٔ قراردادی: در سطحِ کنونیِ شبیه‌ساز، با k درست از n تلاش، احتمالِ درستیِ گامِ بعد (k+1)/(n+2) است
+     (T_next/T_pop، از A3+A4 — همان «سنجشِ استاندارد»)؛ وقتی این از ½ ِ «نمی‌دانیم» (A4) کمتر شد و آخرین تلاش هم غلط بود، یعنی شکست
+     بر موفقیت پیشی گرفته ⇒ پیش از گامِ بعد، یک موفقیتِ کوچک (حالتِ خاص یا بخشی از مسئله) و یک پرسشِ هیجان/انگیزه یا باور دربارهٔ خود. */
+  AS.levelOdds = function (pid) {
+    var pg = pgOf(pid); if (!pg || !pg.lv) return null;
+    var lv = A.simState && A.simState.pid === pid ? A.simState.lv : Object.keys(pg.lv).sort(function (a, b) {
+      var la = Object.keys(pg.lv[a] || {}).map(function (k) { return String(pg.lv[a][k].at || ""); }).sort().pop() || "", lb = Object.keys(pg.lv[b] || {}).map(function (k) { return String(pg.lv[b][k].at || ""); }).sort().pop() || "";
+      return la.localeCompare(lb); }).pop();
+    var L = pg.lv[lv] || {}, es = Object.keys(L).map(function (k) { return L[k]; }).filter(function (e) { return e && e.at; }).sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
+    if (!es.length) return null;
+    var okOf = function (e) { return e.first === true || e.self === 2; }, k = es.filter(okOf).length, n = es.length;
+    return { lv: +lv, k: k, n: n, p: (k + 1) / (n + 2), last: okOf(es[es.length - 1]) };
+  };
+  AS.smallWin = function (pid) { var o = AS.levelOdds(pid); return o && o.p < 0.5 && !o.last ? o : null; };
+  /* آیا کاربر همین حالا دارد مسئله‌ای حل می‌کند؟ (null ⇒ قلاب خاموش است) */
+  AS.solvingCtx = function (s) {
+    var st = A.state || {}, v = st.view, arg = st.arg;
+    if (v === "e_prob" && arg && A.getProb) { var p = A.getProb(arg); if (p && !/^(era|cases|path|dead|lessons)$/.test(st.sub || "")) return { kind: "prob", pid: p.id, title: p.title, p: p }; }
+    if (v === "kcase" && arg) { var kc = S.get(arg); if (kc && kc.type === "kcase" && ((kc.kinds || []).indexOf("problem") >= 0 || (kc.src && kc.src.type === "eprob"))) return { kind: "kcase", rec: kc, title: kc.title || "موقعیت" }; }
+    if (v === "journey" && arg && /^S(4|8)$/.test(st.sub || "")) { var pr = S.all("pr", function (r) { return r.pid === "P11" && r.topic === arg; })[0]; if (pr && /^مسئله/.test((pr.data || {}).pmode || "")) return { kind: "pappus", rec: pr, title: pr.data.fruit || "مسئله" }; }
+    var cur = s && s.tour && s.tour.facets.filter(function (f) { return f.status === "now" && f.kind === "problem"; })[0];
+    if (cur) { var ep = children(cur).eprob[0]; if (ep && ep.p) return { kind: "prob", pid: ep.p.id, title: ep.p.title, p: ep.p, facet: cur.key }; }
+    return null;
+  };
+  function tutorPhase(c, msg) {
+    if (SOLVED_RE.test(String(msg || ""))) return "back";
+    if (c.kind === "prob") {
+      var pg = pgOf(c.pid), ph = AS.probPhaseOf(c.pid), stx = A.simState && A.simState.pid === c.pid ? A.simState : null;
+      if (stx && c.p && stx.i >= (c.p.stages || []).length) return "back";
+      var tried = pg && pg.lv && Object.keys(pg.lv).some(function (l) { return Object.keys(pg.lv[l] || {}).length; });
+      if (!ph.und && !tried) return "und";
+    }
+    if (c.kind === "kcase" && !arrN((c.rec.tut || {}).und)) return "und";
+    if (EXEC_RE.test(String(msg || ""))) return "exec";
+    return "plan";
+  }
+  AS.tutorPhase = tutorPhase;
+  AS.promptHooks = AS.promptHooks || [];
+  AS.promptHooks.push(function (s, msg) {
+    var c = AS.solvingCtx(s); if (!c) return "";
+    var ph = tutorPhase(c, msg), T0 = TQ[ph], tu = s.tutor = s.tutor || { qi: {} };
+    // پرسشِ این نوبت: همان فهرستِ ثابت، به ترتیب؛ فقط با پیامِ تازهٔ کاربر یک قدم جلو می‌رود (همان چند پرسش در همهٔ مسئله‌ها)
+    if (tu.lastMsg !== msg) { tu.qi[ph] = tu.lastMsg == null || tu.ph !== ph ? (tu.qi[ph] || 0) : (tu.qi[ph] || 0) + 1; tu.lastMsg = msg; tu.ph = ph; }
+    var qi = (tu.qi[ph] || 0) % T0.qs.length;
+    var L = ["# معلمِ حلِ مسئله — کاربر همین حالا دارد «" + clip(c.title, 80) + "» را حل می‌کند · مرحله: " + T0.fa,
+      "- در این نوبت فقط **یک** پرسش بپرس، از همین فهرستِ ثابت و از کلی به خاص؛ پرسشِ پیشنهادیِ این نوبت: «" + T0.qs[qi] + "». فهرستِ این مرحله: " + T0.qs.map(function (q, i) { return (i + 1) + ") " + q; }).join(" "),
+      "- پرسشِ لودهنده ممنوع: نامِ قضیه، حرکت، گزینهٔ درست یا گامِ بعد را نگو («فلان قضیه را به کار ببر» نه؛ «مسئلهٔ آشنایی با همین مجهول می‌شناسی؟» آری). اگر جواب خواست، یک پله کلی‌تر بپرس؛ فقط پس از تلاشِ خودش یک پله خاص‌تر.",
+      "- هر جا چیزی توضیح دادی، انگیزهٔ همان گام را هم بگو: چرا حالا این کار، و به کدام بخشِ مجهول نزدیکمان می‌کند. سکوت و درنگ را تحمل کن؛ پرسش را کوتاه‌تر تکرار کن، جوابش را نده.",
+      "- نه مکانیکی: پرسشِ پیشنهادی را فقط اگر با وضعِ همین لحظه می‌خواند بپرس؛ وگرنه پرسشِ دیگری از همین فهرست که می‌خواند — هیچ پرسشی بی‌دلیل یا از روی عادت. هدف را جلوی چشمش نگه دار (به پایان بنگر): اگر مسئلهٔ کمکی ساخت یا مجهول و داده هر دو عوض شد، بپرس از آن چطور به مسئلهٔ اصلی برمی‌گردد."];
+    if (ph === "exec") L.push("- راه‌حل را یکی‌یکی بنویسد: هر گام فقط آنچه برای گفتن دارد، به ترتیب؛ گامی که «روشن» نمی‌بیند علامت بزند.");
+    if (ph === "und") L.push("- وقتی مجهول، داده و شرط را به زبانِ خودش گفت، ثبت کن: {\"do\":\"tutor_mark\",\"phase\":\"und\",\"q\":\"…\",\"text\":\"همان جمله‌های خودش\",\"self\":0|1|2} — self فقط اگر خودش گفت (۰ نه، ۱ تا حدی، ۲ کامل)؛ وگرنه بپرس.");
+    if (ph === "back") L.push("- «حل شد» پایان نیست: **همیشه** یک پرسشِ بازنگری بپرس (همان پرسشِ پیشنهادی)؛ «حل شد» را تأیید یا رد نکن. پاسخش را با {\"do\":\"tutor_mark\",\"phase\":\"back\",\"q\":\"پرسش\",\"text\":\"پاسخِ خودش\",\"self\":0|1|2} ثبت کن (self فقط از خودارزیابیِ صریحِ خودش) — یک کارتِ مرور می‌سازد که روزهای بعد برمی‌گردد.");
+    var od = c.kind === "prob" ? AS.levelOdds(c.pid) : null, sw = od && od.p < 0.5 && !od.last ? od : null;
+    // دشواریِ متناسب و لذتِ کشف — از دادهٔ همین سطح، با همان (k+1)/(n+2) و ½ ِ «نمی‌دانیم» (بی آستانهٔ قراردادی)
+    if (od && od.last) L.push("- همین حالا گامی را خودش درست زد: لذتِ کشف را کوتاه و دقیق نام ببر (چه چیزی را خودش دید)، بی تعارف." + (od.p > 0.5 ? " در این سطح موفقیت بر شکست می‌چربد؛ اگر سطح را تمام کرد، سطحِ دشوارترِ بعد را پیشنهاد کن — مسئله نه خیلی آسان باشد نه خیلی سخت." : ""));
+    if (sw) L.push("- در همین سطح شکست‌ها از موفقیت‌ها بیشترند (" + fa(sw.k) + " درست از " + fa(sw.n) + " تلاش؛ احتمالِ درستیِ گامِ بعد (k+1)/(n+2) = " + fa(Math.round(100 * sw.p)) + "٪، کمتر از ½ ِ «نمی‌دانیم»): پیش از گامِ بعد یک «موفقیتِ کوچک» پیشنهاد کن — حالتِ خاص‌تر یا بخشی از مسئله، «تمرین‌های هم‌خانواده» یا سطحِ آسان با سرنخ — و یک پرسش دربارهٔ حالش (هیجان و انگیزه: دلسردی، ترس از اشتباه، کنجکاوی؟) یا باورش دربارهٔ خودش. امید را بی‌دلداریِ کلیشه‌ای به رسمیت بشناس: فقط به موفقیتِ واقعیِ خودش اشاره کن. اگر این حس در جاهای دیگر هم تکرار می‌شود، جایش گره‌گشاست (خانوادهٔ «هیجان و انگیزه»).");
+    return L.join("\n");
+  });
+  /* ثبتِ فهم/بازنگری از حرفِ خودِ کاربر روی رکوردِ همان مسئله؛ بازنگری ⇒ کارتِ مرور (فردا و بعد، در «مرور» و «امروز») */
+  AS.DO.tutor_mark = function (a) {
+    var s = AS._turnSession; if (!s) return "سشن نیست";
+    var ph = a && a.phase === "back" ? "back" : a && a.phase === "und" ? "und" : ""; if (!ph) return "مرحله باید und یا back باشد";
+    var text = clip(String(a.text || "").trim(), 1200); if (text.length < 3) return "متنِ پاسخِ خودِ کاربر لازم است";
+    var self = a.self === 0 || a.self === 1 || a.self === 2 ? a.self : /^[012]$/.test(String(a.self)) ? +a.self : null;
+    var c = AS.solvingCtx(s), rec = null;
+    if (c && c.kind === "prob") rec = pgOf(c.pid) || { id: "eprog_" + c.pid, type: "eprog", lv: {} };
+    else if (c && c.rec) rec = c.kind === "pappus" ? (c.rec.data = c.rec.data || {}) && c.rec : c.rec;
+    var host = rec ? (rec.type === "pr" ? rec.data : rec) : s;
+    var tut = host.tut = host.tut || {}, e = { at: nowIso(), q: clip(String(a.q || TQ[ph].qs[0]), 300), text: text };
+    if (self != null) e.self = self;
+    (tut[ph] = tut[ph] || []).push(e);
+    if (ph === "back" && A.newCard) {
+      var cd = A.newCard("بازنگری — «" + clip(c ? c.title : s.title || "مسئله", 80) + "»: " + e.q, text, { due: A.addDays(A.today(), 1), src: "tutor:back" + (c && c.pid ? ":" + c.pid : "") });
+      if (cd) e.card = cd.id;
+    }
+    if (rec) S.put(rec); S.put(s);
+    return "";
+  };
+
   AS.tourKinds = KIND;
   AS.tourSyncReminder = syncReminder;
 })(APP);
