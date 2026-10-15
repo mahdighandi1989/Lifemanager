@@ -49,7 +49,9 @@ const W = ms => new Promise(r => setTimeout(r, ms));
   }
 
   // ---------- B1: سقفِ جمعیتِ پژوهش روی پروندهٔ واقعی (x_method/x_comp/chain از کاربرگِ «استناد به تخصص») ----------
-  let cid = await expert('اقتصاد', FLD[0], REL[0], '۸۰');
+  // p_found_mixture (۲۰۲۶-۱۰-۱۵): نرخِ جمعیت فقط با عضویتِ احرازشده (همان راهِ رسیدن + «عیناً همان یافته»)؛ وگرنه آمیزه ½ + ½(p − ½)
+  const SAME = [['xsame', 'عیناً همان یافتهٔ منتشرشده است']];
+  let cid = await expert('اقتصاد', FLD[0], REL[0], '۸۰', SAME);
   let e = await U.engine(cid), f = await U.feat(cid);
   info.b1 = { prefill: e.prefill.slice(0, 400), eng: e.engs[0], f: f[1] };
   chk(f[1].x_method === 'معتبر' && f[1].x_comp === 'احراز شده' && f[1].chain === 'تک‌منبع' && f[1].x_field === FLD[0] && f[1].x_relay === REL[0] && f[1].conf === 80,
@@ -58,8 +60,10 @@ const W = ms => new Promise(r => setTimeout(r, ms));
   info.b1r = await p.evaluate(i => { const k = APP.caseClaims(APP.S.get(i))[0]; return EPIX.runClaim(k, APP.btCfg()); }, cid);
   chk(info.b1r.bind === 'r_expert_pop_econ' && (info.b1r.yielded || []).some(y => y.rule === 'r_naql_ahad'), 'B1: binding r_expert_pop_econ and the finding\'s own single-source cap yields: ' + JSON.stringify(info.b1r));
   // روان‌شناسی ⇒ ۳۶٫۴ (نه ۳۶)
-  cid = await expert('روان', FLD[1], REL[0], '۴۰'); e = await U.engine(cid);
+  cid = await expert('روان', FLD[1], REL[0], '۴۰', SAME); e = await U.engine(cid);
   chk(/سقف اعتبار موجه: ۳۶٫۴٪/.test(e.engs[0]), 'B1/B6: psych population ⇒ «۳۶٫۴٪»: ' + e.engs[0]);
+  cid = await expert('روان-نامعلوم', FLD[1], REL[0], '۴۰'); e = await U.engine(cid);
+  chk(/سقف اعتبار موجه: ۴۳٫۲٪/.test(e.engs[0]) && !/بیش‌اطمینانی/.test(e.engs[0]), 'membership not stated ⇒ T_support ½ + ½(36.4 − ½) = 43.2 (the unestablished link pulls toward ½): ' + e.engs[0]);
 
   // ---------- B5: حلقهٔ دیگر (مقدمهٔ اثبات‌نشدهٔ دستی، «فراتر از یافته») ½ را نگه می‌دارد ----------
   cid = await expert('اجتماعی', FLD[2], REL[0], '۶۰');
@@ -68,17 +72,17 @@ const W = ms => new Promise(r => setTimeout(r, ms));
   await p.locator('#fe_c1_qarina').selectOption('بی‌قرینه'); await W(700);
   e = await U.read();
   info.b5a = e.engs[0];
-  chk(/سقف اعتبار موجه: ۵۰٪/.test(e.engs[0]), 'B5: hand-set unproven premise/no corroboration, membership not stated ⇒ keeps ½ (T_weakest), not 61: ' + e.engs[0]);
+  chk(/سقف اعتبار موجه: ۵۵[٫.][۴۵]٪/.test(e.engs[0]), 'B5: hand-set unproven premise/no corroboration, membership not stated ⇒ T_support ½ + ½(60.9 − ½) ≈ 55.5, not 61 and not ½: ' + e.engs[0]);
   await U.st(cid, 'st_expert'); await U.sel('xsame', 'عیناً همان یافتهٔ منتشرشده است');
   e = await U.engine(cid); info.b5b = e.engs[0];
   chk(/سقف اعتبار موجه: ۶۰٫۹٪/.test(e.engs[0]), 'B5/B6: claim = the finding itself ⇒ the frame\'s own unproven premise yields to the measured 60.9 (shown «۶۰٫۹», not «۶۱»): ' + e.engs[0]);
   await U.st(cid, 'st_expert'); await U.sel('xsame', 'فراتر از یافته است — آن را به خودم یا موردِ دیگری سرایت داده‌ام، یا مقدمهٔ دیگری لازم دارد');
   e = await U.engine(cid); info.b5c = e.engs[0];
-  chk(/سقف اعتبار موجه: ۵۰٪/.test(e.engs[0]), 'B5: a claim that extends the finding to me keeps ½ for the extra link: ' + e.engs[0]);
+  chk(/سقف اعتبار موجه: ۵۵[٫.][۴۵]٪/.test(e.engs[0]), 'B5: a claim that extends the finding to me: the extra link is a route condition ⇒ T_support ≈ 55.5: ' + e.engs[0]);
   // «فراتر» بی مقدمهٔ دستی ⇒ همان حلقه «مقدمه اثبات‌نشده» پیش‌پر می‌شود ⇒ ½
   cid = await expert('اقتصاد-فراتر', FLD[0], REL[0], '۵۵', [['xsame', 'فراتر از یافته است — آن را به خودم یا موردِ دیگری سرایت داده‌ام، یا مقدمهٔ دیگری لازم دارد']]);
   e = await U.engine(cid); f = await U.feat(cid);
-  chk(f[1].matter === 'مقدمه اثبات‌نشده' && /سقف اعتبار موجه: ۵۰٪/.test(e.engs[0]), 'B5: «فراتر از یافته» ⇒ matter prefilled and cap ½: ' + JSON.stringify(f[1]) + ' ' + e.engs[0]);
+  chk(f[1].matter === 'مقدمه اثبات‌نشده' && /سقف اعتبار موجه: ۵۵٪/.test(e.engs[0]), 'B5: «فراتر از یافته» ⇒ matter prefilled; cap T_support ½ + ½(60 − ½) = 55: ' + JSON.stringify(f[1]) + ' ' + e.engs[0]);
 
   // ---------- B6: سقف/فاصلهٔ ۶۰٫۹ با اطمینانِ ۶۱ ----------
   cid = await expert('اجتماعی-۶۱', FLD[2], REL[0], '۶۱', [['xsame', 'عیناً همان یافتهٔ منتشرشده است']]);
@@ -97,7 +101,7 @@ const W = ms => new Promise(r => setTimeout(r, ms));
   await U.rows('prem', 2); await U.cell('prem', 0, 'select').first().selectOption('نظریِ منتهی به بدیهی (زنجیره روشن)'); await U.cell('prem', 1, 'select').first().selectOption('نامعلوم'); await W(400);
   await U.final(cid, [[1, '۹۹']]);
   e = await U.engine(cid); f = await U.feat(cid);
-  chk(f[1].form === 'معتبر (قیاسی)' && f[1].matter === 'مقدمه اثبات‌نشده' && /سقف اعتبار موجه: ۵۰٪/.test(e.engs[0]), 'B2: valid deductive form + an «نامعلوم» premise ⇒ matter «مقدمه اثبات‌نشده» ⇒ ½: ' + JSON.stringify(f[1]) + ' ' + e.engs[0]);
+  chk(f[1].form === 'معتبر (قیاسی)' && f[1].matter === 'مقدمه اثبات‌نشده' && /سقف اعتبار موجه: ۷۵٪/.test(e.engs[0]), 'B2: valid deductive form + an «نامعلوم» premise ⇒ matter «مقدمه اثبات‌نشده» ⇒ ¾ (T_support): ' + JSON.stringify(f[1]) + ' ' + e.engs[0]);
   await U.st(cid, 'st_aql'); await U.cell('prem', 1, 'select').first().selectOption('بدیهی اولی'); await W(400);
   e = await U.engine(cid); f = await U.feat(cid);
   chk(f[1].matter === 'منتهی به بدیهی' && /سقف اعتبار موجه: ۱۰۰٪/.test(e.engs[0]), 'B2/B3: premises corrected to self-evident ⇒ the PREFILLED matter follows the worksheet: ' + JSON.stringify(f[1]));

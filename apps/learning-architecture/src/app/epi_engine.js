@@ -50,9 +50,9 @@
   function wOf(cfg, r) { var w = cfg && cfg.w && cfg.w[r.id]; return w == null ? 1 : w; }
   /* سقفِ یک قاعده: پیش‌فرض همان عددِ جزوه/سامانه؛ cfg.derived (آزمایشی، پیش‌فرض خاموش) ⇒ برای قاعده‌های «بدیهی‌پایه» کرانِ قضیه
      (EPI_FOUND.DER) — فقط برای سنجیدنِ اثر در حافظه؛ هیچ سقفی خودکار عوض نمی‌شود (تصمیم با مالک) */
-  function capOf(cfg, r, f) {
+  function capOf(cfg, r, f, k) {
     // سقفِ قضیه‌ای (EPI_FOUND.capFor): از ویژگی‌های همان تصدیق یا مقدارِ پایهٔ سنجیده — هیچ عددِ قراردادی (۲۰۲۶-۱۰-۱۴)
-    var FDc = W.EPI_FOUND, tc = FDc && FDc.capFor ? FDc.capFor(r, f) : null; if (tc != null) return tc;
+    var FDc = W.EPI_FOUND, tc = FDc && FDc.capFor ? FDc.capFor(r, f, k) : null; if (tc != null) return tc;   // k: عضویتِ تصدیق (member) برای T_pop/T_support (p_found_mixture)
     if (r.capf) return r.cap;
     var dv = cfg && cfg.derived, FD = W.EPI_FOUND;   // true ⇒ همه؛ آرایه ⇒ فقط همین قاعده‌ها (برای سنجیدنِ اثرِ تک‌تکِ پیشنهادها)
     var d = dv && (dv === true || dv.indexOf(r.id) >= 0) && FD && FD.DER[r.id];
@@ -75,9 +75,10 @@
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
       if (r.eff === "cap" && yl[r.id]) { yielded.push({ rule: r.id, to: yl[r.id] }); return; }
-      if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r, f)); caps.push([r, c]); if (c < ceil) { ceil = c; bind = r; } }
+      if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r, f, k)); caps.push([r, c]); if (c < ceil) { ceil = c; bind = r; } }
       else if (r.eff === "flag") stScore[r.st] = (stScore[r.st] || 0) + w;
     });
+    if (FDy && FDy.routeGuard && caps.length > 1) { var g2 = FDy.routeGuard(caps); if (g2 !== caps) { caps = g2; ceil = 100; bind = null; caps.forEach(function (x) { if (x[1] < ceil) { ceil = x[1]; bind = x[0]; } }); } }   // p_found_mixture D4
     var flags = [];
     Object.keys(stScore).forEach(function (st) { if (stScore[st] >= ((cfg && cfg.th) || X.COURT.th)) flags.push({ st: st, kind: "flag", rules: fired.filter(function (id) { var r = X.RM[id]; return r.eff === "flag" && r.st === st && wOf(cfg, r) > 0; }) }); });
     var tol = cfg && cfg.tol != null ? cfg.tol : X.COURT.tol;

@@ -38,11 +38,14 @@ chk(run1({ scope: 'کلی نامحدود', ind_n: 4000 }).bind === 'r_istiqra_un
 chk(run1({ scope: 'مورد بعدی', ind_n: 9, conf: 90 }).ceil === 91 && !run1({ scope: 'مورد بعدی', ind_n: 9, conf: 90 }).over && run1({ scope: 'مورد بعدی', ind_n: 9, conf: 92 }).over, 'next case ⇒ (n+1)/(n+2)');
 chk(run1({ ind_n: 5 }).fired.indexOf('r_istiqra_small_n') >= 0 && run1({ scope: 'مورد بعدی', ind_n: 5 }).fired.indexOf('r_istiqra_small_n') < 0, 'transitional rules only for claims without scope');
 chk(run1({ ind_n: 5, conf: 100 }).over && !run1({ ind_n: 5, conf: 99 }).over, 'unscoped induction ⇒ only «less than certainty»');
-chk(X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 40, conf: 45 } }, base).over && X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 40, mem_doc: false, conf: 21 } }, base).over, 'memory ≤ original; undocumented memory = original × measured reliability (½ without data)');
+chk(X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 40, mem_doc: true, conf: 45 } }, base).over && X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 40, mem_doc: false, conf: 46 } }, base).over
+  && !X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 40, mem_doc: false, conf: 45 } }, base).over && !X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 100, mem_doc: false, conf: 75 } }, base).over
+  && X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 100, mem_doc: false, conf: 76 } }, base).over,
+  'memory (p_found_mixture, T_support): documented ⇒ ≤ original; undocumented ⇒ q·original + (1−q)·½ with q = measured reliability (½ without data)');
 // ۳) پایه‌ها: قضیهٔ (k+1)/(n+2) روی نمونه‌های بی‌گزینش؛ بی‌داده ½؛ موردِ احرازنشده شمرده نمی‌شود؛ قاب بی «frame» رد
 const fr = (n, t, extra) => [{ id: 'fr1', frame: 'همهٔ خبرهای واحدِ ثقهٔ یک بایگانیِ معین در یک بازهٔ معین', src: ['s'], selected_by_outcome: false,
   items: Array.from({ length: n }, (_, i) => Object.assign({ id: 'i' + i, txt: 't', f: { way: 'نقل', narrator: 'موثق' }, truth: t(i), verified_by: ['سند'] }, extra ? extra(i) : {})) }];
-chk(F.measure([]).p_thiqa.p === 50 && !F.measure([]).p_thiqa.measured, 'no data ⇒ ½ (T_unknown)');
+chk(F.measure([]).p_mem.p === 50 && !F.measure([]).p_mem.measured && F.measure([]).p_thiqa.p === 99.9 && !F.measure([]).p_thiqa.measured, 'no data ⇒ ½ (T_pop n = 0) for a neutral class; favourable class (p_thiqa: s47 + s80 + T_null) ⇒ only T_below1');
 chk(F.measure(fr(20, i => i < 18)).p_thiqa.p === +(100 * 19 / 22).toFixed(1), '18 of 20 ⇒ (k+1)/(n+2)');
 chk(F.measure(fr(500, () => true)).p_thiqa.p < 100, 'never certainty');
 chk(F.measure(fr(10, () => true, () => ({ verified_by: [] }))).p_thiqa.n === 0, 'unverified items are not counted');

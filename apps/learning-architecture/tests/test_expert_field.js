@@ -21,16 +21,21 @@ Object.keys(BASES).forEach(b => { const [v, k, n, p] = BASES[b];
 chk(m.p_thiqa.n === 0, 'other bases untouched by the expert frames');
 // قاعده‌ها
 const base = X.DEFAULT_CFG('mesbah');
-const saved = global.EPI_BT_LEDGER; global.EPI_BT_LEDGER = { baseval: { p_expert_econ_lab: 60, p_expert_psych08: 36.4, p_expert_socsci_ns: 60.9 } };
-const ex = (xf, conf, extra) => X.runClaim({ id: 'k', f: Object.assign({ way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', conf }, xf == null ? {} : { x_field: xf }, extra || {}) }, base);
-const capOf = (id, xf) => X.capOf(base, X.RM[id], { way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', x_field: xf });
+// p_found_mixture (۲۰۲۶-۱۰-۱۵): نرخِ جمعیت فقط با عضویتِ احرازشده (همان راهِ رسیدنِ قاب + member === true)؛ وگرنه T_support ½ + ½(p − ½)
+const DIRECT = FM.x_relay.v[0], PRE = { relay: DIRECT, rules: ['r_aql_matter_unproven', 'r_naql_ahad', 'r_naql_no_qarina'] };
+const saved = global.EPI_BT_LEDGER; global.EPI_BT_LEDGER = { baseval: { p_expert_econ_lab: 60, p_expert_psych08: 36.4, p_expert_socsci_ns: 60.9 },
+  foundation: { base: { p_expert_econ_lab: { precede: PRE }, p_expert_psych08: { precede: PRE }, p_expert_socsci_ns: { precede: PRE } } } };
+const ex = (xf, conf, extra, member) => X.runClaim({ id: 'k', member: member === undefined ? true : member, f: Object.assign({ way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', x_relay: DIRECT, conf }, xf == null ? {} : { x_field: xf }, extra || {}) }, base);
+const capOf = (id, xf, extra, member) => X.capOf(base, X.RM[id], Object.assign({ way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', x_relay: DIRECT, x_field: xf }, extra || {}), { member: member === undefined ? true : member });
 chk(capOf('r_expert_pop_econ', V[0]) === 60 && capOf('r_expert_pop_psych', V[1]) === 36.4 && capOf('r_expert_pop_socsci', V[2]) === 60.9 && capOf('r_expert_pop_unknown', V[3]) === 50, 'each population rule caps at its measured base');
 V.forEach((v, i) => chk(ex(v, 70).fired.filter(r => /^r_expert_pop_/.test(r)).join() === ['r_expert_pop_econ', 'r_expert_pop_psych', 'r_expert_pop_socsci', 'r_expert_pop_unknown'][i], 'exactly its population rule fires ' + v));
-// تک‌منبع ⇒ r_naql_ahad هم فعال است (سقفش پایهٔ سنجیده‌نشدهٔ p_thiqa = ½)؛ کمینه (T_weakest) ⇒ فعلاً فقط جمعیتِ زیرِ ½ (روان‌شناسی) سقف را پایین می‌آورد
+// تک‌منبع ⇒ r_naql_ahad هم فعال است؛ سقفش تا سنجشِ p_thiqa فقط T_below1 است (رده مساعد؛ p_found_mixture) ⇒ نرخِ جمعیت سقف را می‌سازد
 chk(ex(V[1], 36).ceil === 36 && ex(V[1], 40).over && ex(V[1], 40).bind === 'r_expert_pop_psych', 'psychology ⇒ cap 36.4 (below ½) binds');
-chk(ex(V[0], 50).ceil === 50 && ex(V[0], 51).over && ex(V[0], 51).fired.indexOf('r_naql_ahad') >= 0, 'econ: single-report cap (unmeasured p_thiqa = ½) is the weaker link today');
+chk(ex(V[0], 51).fired.indexOf('r_naql_ahad') >= 0 && X.capOf(base, X.RM.r_naql_ahad, {}) === 99.9 && !ex(V[0], 60).over, 'econ: single-report cap is only T_below1 while p_thiqa is unmeasured (favourable class) — the population rate binds');
+// عضویتِ احرازنشده (بازگو، نامعلوم، یا member نامعلوم/فراتر) ⇒ T_support: ½ + ½(p − ½)
+chk(capOf('r_expert_pop_econ', V[0], { x_relay: FM.x_relay.v[1] }) === 55 && Math.abs(capOf('r_expert_pop_psych', V[1], {}, null) - 43.2) < 1e-9 && capOf('r_expert_pop_socsci', V[2], {}, false) === 55.45, 'membership not established ⇒ mixture with ½ (relay, unknown or «beyond» member)');
 chk(ex(V[3], 50).ceil === 50 && !ex(V[3], 50).over && ex(V[3], 51).over && ex(V[3], 51).flags.some(f => f.st === 'st_expert'), 'unknown population ⇒ ½ (T_unknown), flagged at st_expert');
-global.EPI_BT_LEDGER = { baseval: { p_expert_econ_lab: 60, p_expert_psych08: 36.4, p_expert_socsci_ns: 60.9, p_thiqa: 90 } };   // فرضی: اگر وثاقتِ ناقل روزی سنجیده و بالاتر شود
+global.EPI_BT_LEDGER = { baseval: { p_expert_econ_lab: 60, p_expert_psych08: 36.4, p_expert_socsci_ns: 60.9, p_thiqa: 90 }, foundation: global.EPI_BT_LEDGER.foundation };   // فرضی: اگر وثاقتِ ناقل روزی سنجیده و بالاتر شود
 chk(ex(V[0], 60).ceil === 60 && !ex(V[0], 60).over && ex(V[0], 61).over && ex(V[0], 61).bind === 'r_expert_pop_econ', 'econ ⇒ cap 60 once it is the weakest link');
 chk(!ex(V[2], 60).over && ex(V[2], 61).over && ex(V[2], 61).bind === 'r_expert_pop_socsci', 'Nature/Science ⇒ cap 60.9 once it is the weakest link');
 chk(ex(null, 95).fired.every(r => !/^r_expert_pop_/.test(r)), 'no x_field ⇒ no new rule fires (previous behaviour)');
@@ -92,11 +97,11 @@ const au = tool('audit'); chk(au.code === 3 && au.out.violations.some(v => /xf_b
   info.feat = await p.evaluate(i => (APP.S.get(i).feat || {})[1], id);
   chk(info.feat && info.feat.x_field === V[0] && info.feat.way === 'تخصص دیگران', 'encoding prefilled from the worksheet ' + JSON.stringify(info.feat));
   chk(await p.locator('#fe_c1_x_field').count() === 1 && await p.locator('#fe_c1_x_field').inputValue() === V[0], 'feature editor shows x_field');
-  info.ceil = await p.evaluate(() => { const f = { way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', conf: 70 }, cfg = EPIX.DEFAULT_CFG('mesbah');
+  info.ceil = await p.evaluate(() => { const f = { way: 'تخصص دیگران', x_method: 'معتبر', x_comp: 'احراز شده', chain: 'تک‌منبع', x_relay: EPI_FM.x_relay.v[0], conf: 70 }, cfg = EPIX.DEFAULT_CFG('mesbah');
     const ids = ['r_expert_pop_econ', 'r_expert_pop_psych', 'r_expert_pop_socsci', 'r_expert_pop_unknown'];
-    return { cap: ids.map((id, i) => EPIX.capOf(cfg, EPIX.RM[id], Object.assign({ x_field: EPI_FM.x_field.v[i] }, f))),
-      ceil: [0, 1, 2, 3].map(i => EPIX.runClaim({ id: 'k', f: Object.assign({ x_field: EPI_FM.x_field.v[i] }, f) }, cfg).ceil) }; });
-  chk(JSON.stringify(info.ceil.cap) === JSON.stringify([60, 36.4, 60.9, 50]) && JSON.stringify(info.ceil.ceil) === JSON.stringify([50, 36, 50, 50]), 'page caps = measured population bases (bundle ledger) ' + JSON.stringify(info.ceil));
+    return { cap: ids.map((id, i) => EPIX.capOf(cfg, EPIX.RM[id], Object.assign({ x_field: EPI_FM.x_field.v[i] }, f), { member: true })),
+      ceil: [0, 1, 2, 3].map(i => EPIX.runClaim({ id: 'k', member: true, f: Object.assign({ x_field: EPI_FM.x_field.v[i] }, f) }, cfg).ceil) }; });
+  chk(JSON.stringify(info.ceil.cap) === JSON.stringify([60, 36.4, 60.9, 50]) && JSON.stringify(info.ceil.ceil) === JSON.stringify([60, 36, 61, 50]), 'page caps = measured population bases (bundle ledger), membership established ' + JSON.stringify(info.ceil));
   await p.evaluate(() => APP.go('e_bt', null, 'found')); await p.waitForTimeout(300);
   info.found = await p.evaluate(() => ({ base: document.querySelectorAll('main .found-base tbody tr').length, txt: (document.querySelector('main .found-base') || {}).innerText || '' }));
   chk(info.found.base === Object.keys(F.BASE).length && /۶۰/.test(info.found.txt) && /۳۶/.test(info.found.txt), 'foundation tab lists the measured population bases ' + info.found.base);
