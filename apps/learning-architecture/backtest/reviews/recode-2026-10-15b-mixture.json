@@ -1,0 +1,1065 @@
+{
+ "at": "2026-10-15",
+ "by": "روتینِ بک‌تست (اجرا در نشستِ اصلی به دستورِ مالک ۲۰۲۶-۱۰-۱۵)",
+ "what": "(۱) داوریِ ده اختلافِ رمزِ موجود با رمزگذارهای پیشین (keptExistingDisagreement ِ recode-2026-10-15-corpus.json) با دو رمزگذارِ کورِ تازه و بازبین؛ (۲) رمزِ narrator و x_about_route که تصمیمِ p_found_mixture لازم کرد (شرطِ راه در برابرِ شرطِ صدق)، فقط خانهٔ خالی؛ (۳) بازگرداندنِ ۴ مقدارِ chain که دورِ پیش برگشته بود.",
+ "selection": "بی‌توجه به سرانجام: narrator برای هر تصدیقِ پیکره که chain/tawatur=false دارد و narrator ندارد (۲۷) + ۴ تصدیقِ chain ِ بازگشته؛ x_about_route برای همان‌ها و هر تصدیقی که یکی از قاعده‌های T_support ِ تازه (matter_unproven، not_issued، narrator_unknown، chain_broken، unreliable_corrob، matter_zanni) بر آن فعال است.",
+ "method": [
+  "پیراستنِ داستان از سرانجام در نشست‌های جدا: S2 (claude.ai/artifact/PRx968QBbN7ttUYKzFbupx) و S3 (claude.ai/artifact/GjWN2xZoPTQRw4qMgARPAb)؛ نسخهٔ پاکِ بی فهرستِ «حذف‌شده‌ها» S4 (claude.ai/artifact/XLkwQu1dT3bfrCDgR4H2dT)",
+  "رمزگذارهای کورِ E3 و E4 (claude.ai/artifact/PUogin3CUEP1cSwvuVRr3w، claude.ai/artifact/KEZ3HbnCvgu1cZ8yyM3PTV) کنار گذاشته شدند: صفحهٔ ورودیِ S2/S3 فهرستِ جمله‌های حذف‌شده (سرانجام) را هم داشت و هر دو خودشان گزارش دادند که دیده‌اند — نشتِ سرانجام",
+  "رمزگذارهای کورِ E5 (session_01XFpiig8c96FA8RPERfJT9U، claude.ai/artifact/2s8gXcBUBkyTfwgjbrfp9n) و E6 (session_01Xd7FTZtXZcXuP5jvuiQaeM، claude.ai/artifact/5qBFjQTaTBvkanQnigoWVi) فقط از S4؛ هر دو clean_input = true",
+  "بازبینِ مستقلِ RV (session_01GD91y57ErrSdzxYwANEiqz، claude.ai/artifact/6nAA9K59TsofzjdHLT47Er) هر مقدار را از متن پذیرفت/رد کرد",
+  "قاعدهٔ اعمال: خانهٔ خالی فقط با هم‌رأییِ دو رمزگذارِ کور + پذیرشِ بازبین؛ اصلاحِ مقدارِ موجود فقط وقتی دست‌کم دو خوانشِ کورِ مستقل بر مقدارِ دیگر هم‌رأی‌اند و از رأیِ مقدارِ موجود بیشترند + پذیرشِ بازبین؛ اختلافِ دو رمزگذار ⇒ اعمال نشد (حتی اگر بازبین یکی را برگزید)"
+ ],
+ "disagreements": [
+  {
+   "q": "Q3",
+   "case": "cs_pb_4c_kempe",
+   "claim": "k2",
+   "key": "form",
+   "existing": "نامعتبر",
+   "reads": {
+    "EA": "معتبر (قیاسی)",
+    "EB": "معتبر (قیاسی)",
+    "E5": "نامعتبر",
+    "E6": "نامعتبر"
+   },
+   "votes": {
+    "معتبر (قیاسی)": 2,
+    "نامعتبر": 2
+   },
+   "change": null,
+   "why5": "The two simultaneous Kempe-chain swaps are an inferential step that does not follow, even granting the premises.",
+   "why6": "The step with two simultaneous Kempe-chain swaps does not follow as presented."
+  },
+  {
+   "q": "Q6",
+   "case": "cs_hyatt_walkway",
+   "claim": "k1",
+   "key": "x_method",
+   "existing": "نامعلوم",
+   "reads": {
+    "EA": "ضعیف",
+    "EB": "ضعیف",
+    "E5": "ضعیف",
+    "E6": "ضعیف"
+   },
+   "votes": {
+    "ضعیف": 4
+   },
+   "change": "ضعیف",
+   "why5": "The engineering office approved the changed connection without recalculating.",
+   "why6": "The engineering office approved the change without recalculating."
+  },
+  {
+   "q": "Q20",
+   "case": "cs_b_tulip_mackay",
+   "claim": "k1",
+   "key": "chain",
+   "existing": "زنجیره طولی",
+   "reads": {
+    "EA": "زنجیره طولی",
+    "EB": "گزارش‌های به‌ظاهر مستقل از یک منبع",
+    "E5": "گزارش‌های به‌ظاهر مستقل از یک منبع",
+    "E6": "گزارش‌های به‌ظاهر مستقل از یک منبع"
+   },
+   "votes": {
+    "زنجیره طولی": 1,
+    "گزارش‌های به‌ظاهر مستقل از یک منبع": 3
+   },
+   "change": "گزارش‌های به‌ظاهر مستقل از یک منبع",
+   "why5": "Later writers retold Mackay, whose own sources were moralising pamphlets.",
+   "why6": "Later writers retold Mackay, who drew on moralizing pamphlets."
+  },
+  {
+   "q": "Q22",
+   "case": "r2_schmitz_daisey",
+   "claim": "k1",
+   "key": "chain",
+   "existing": "گزارش‌های عرضی مستقل",
+   "reads": {
+    "EA": "گزارش‌های عرضی مستقل",
+    "EB": "تک‌منبع",
+    "E5": "تک‌منبع",
+    "E6": "تک‌منبع"
+   },
+   "votes": {
+    "گزارش‌های عرضی مستقل": 1,
+    "تک‌منبع": 3
+   },
+   "change": "تک‌منبع",
+   "why5": "Rests mainly on one firsthand witness, the translator Cathy Lee.",
+   "why6": "Rests on the firsthand testimony of Daisey's interpreter."
+  },
+  {
+   "q": "Q25",
+   "case": "r4_bre_x_busang",
+   "claim": "k1",
+   "key": "x_method",
+   "existing": "نامعلوم",
+   "reads": {
+    "EA": "ضعیف",
+    "EB": null,
+    "E5": "ضعیف",
+    "E6": "ضعیف"
+   },
+   "votes": {
+    "ضعیف": 3
+   },
+   "change": "ضعیف",
+   "why5": "Results came from cores the company prepared and supplied itself.",
+   "why6": "Only the company's own core results, with no independent sampling."
+  },
+  {
+   "q": "Q27",
+   "case": "cs_b_curveball",
+   "claim": "k1",
+   "key": "chain",
+   "existing": "تک‌منبع",
+   "reads": {
+    "EA": "تک‌منبع",
+    "EB": "زنجیره طولی",
+    "E5": "تک‌منبع",
+    "E6": "تک‌منبع"
+   },
+   "votes": {
+    "تک‌منبع": 3,
+    "زنجیره طولی": 1
+   },
+   "change": null,
+   "why5": "Rested mainly on Curveball via the BND; analysts never interviewed him.",
+   "why6": "Mainly Curveball, never interviewed directly; another corroborator had been flagged as a fabricator."
+  },
+  {
+   "q": "Q29",
+   "case": "cs_pb_flt_lame",
+   "claim": "k2",
+   "key": "form",
+   "existing": "معتبر (قیاسی)",
+   "reads": {
+    "EA": "نامعتبر",
+    "EB": null,
+    "E5": "معتبر (قیاسی)",
+    "E6": "معتبر (قیاسی)"
+   },
+   "votes": {
+    "نامعتبر": 1,
+    "معتبر (قیاسی)": 2
+   },
+   "change": null,
+   "why5": "Deductive and follows if its (unproven) premise of integer-like factorisation holds.",
+   "why6": "Deductive and follows if the integer-like (unique) factorization premise holds."
+  },
+  {
+   "q": "Q31",
+   "case": "cs_pb_quintic_ruffini",
+   "claim": "k2",
+   "key": "form",
+   "existing": "معتبر (قیاسی)",
+   "reads": {
+    "EA": "نامعتبر",
+    "EB": null,
+    "E5": "معتبر (قیاسی)",
+    "E6": "معتبر (قیاسی)"
+   },
+   "votes": {
+    "نامعتبر": 1,
+    "معتبر (قیاسی)": 2
+   },
+   "change": null,
+   "why5": "Deductive and follows given its unproven assumption about the radicals.",
+   "why6": "Follows given the unproved premise about radicals."
+  },
+  {
+   "q": "Q38",
+   "case": "cs_lame_flt",
+   "claim": "k2",
+   "key": "form",
+   "existing": "معتبر (قیاسی)",
+   "reads": {
+    "EA": "نامعتبر",
+    "EB": null,
+    "E5": "معتبر (قیاسی)",
+    "E6": "معتبر (قیاسی)"
+   },
+   "votes": {
+    "نامعتبر": 1,
+    "معتبر (قیاسی)": 2
+   },
+   "change": null,
+   "why5": "Deductive and follows given its unstated unique-factorisation premise.",
+   "why6": "Deductive with an unstated premise (unique factorization); valid if that premise holds."
+  },
+  {
+   "q": "Q42",
+   "case": "cs_theranos",
+   "claim": "k1",
+   "key": "x_method",
+   "existing": "نامعلوم",
+   "reads": {
+    "EA": "ضعیف",
+    "EB": "نامعلوم",
+    "E5": "نامعلوم",
+    "E6": "ضعیف"
+   },
+   "votes": {
+    "ضعیف": 2,
+    "نامعلوم": 2
+   },
+   "change": null,
+   "why5": "No published data; the details were kept as trade secrets.",
+   "why6": "No peer-reviewed data; details kept as trade secrets."
+  }
+ ],
+ "applied": [
+  {
+   "case": "cs_b_wirecard_ey",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_wirecard_ey",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_mars_climate_orbiter",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_mars_climate_orbiter",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_abs_father_letter",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_abs_father_letter",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_tawatur_ghadir",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_madoff_feeders",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_madoff_feeders",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_madoff_feeders",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_enron_andersen",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_enron_andersen",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_spotlight_geoghan",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_spotlight_geoghan",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_sallyclark",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_sallyclark",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_smong",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_4c_rsst",
+   "claim": "k2",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_4c_rsst",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_bellingcat_mh17",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_poinc_perelman",
+   "claim": "k2",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_poinc_perelman",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_reckard_wells_fargo",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_reckard_wells_fargo",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_hitlerdiaries",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_hitlerdiaries",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_pitchfork",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_flt_wiles95",
+   "claim": "k3",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_flt_wiles95",
+   "claim": "k3",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_taqlid_alam",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "موثق",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_taqlid_alam",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_greek_indiana",
+   "claim": "k2",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_greek_indiana",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_abs_family_letters",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_abs_family_letters",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r4_bre_x_busang",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r4_bre_x_busang",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r4_bre_x_busang",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_bayofpigs",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_bayofpigs",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_flt_lame",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_flt_lame",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_quintic_ruffini",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_quintic_ruffini",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_hitler_diaries_1983",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_hitler_diaries_1983",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_thorp_madoff",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_tillysmith",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_madoff_sec",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_madoff_sec",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_stagg_dday_forecast",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_stagg_dday_forecast",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_lame_flt",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_wakefield_mmr",
+   "claim": "k2",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_wakefield_mmr",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_barings",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_barings",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_theranos",
+   "claim": "k1",
+   "key": "narrator",
+   "value": "نامعلوم",
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_theranos",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_piltdown",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_leverrier_vulcan",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_wegener_rejection",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_boeing_737max",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_hume_causality",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_turuq_saying",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_turuq_saying",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_ltcm",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_millerites",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_b_millerites",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_flt_wiles93",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_flt_wiles93",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_poinc_1900",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_par_saccheri",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_par_saccheri",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_par_legendre",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_pb_par_legendre",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_cbs_killian_memos",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_chamberlain_hitler_face",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_abs_startup_loi",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": true,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_abs_desk_stablecoin",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r4_yom_kippur_concept",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r4_yom_kippur_concept",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_sally_clark_1999",
+   "claim": "k1",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "r5_sally_clark_1999",
+   "claim": "k2",
+   "key": "x_about_route",
+   "value": false,
+   "replace": false,
+   "rv": "accept"
+  },
+  {
+   "case": "cs_hyatt_walkway",
+   "claim": "k1",
+   "key": "x_method",
+   "value": "ضعیف",
+   "replace": true,
+   "rv": "accept"
+  },
+  {
+   "case": "r2_schmitz_daisey",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "replace": true,
+   "rv": "accept"
+  },
+  {
+   "case": "bk_taqlid_alam",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "restored": true,
+   "why": "برگشتِ دورِ پیش فقط از p_thiqa ِ سنجیده‌نشده = ۵۰ بود؛ با تصمیمِ p_found_mixture (پایهٔ مساعد ⇒ فقط T_below1) هیچ حکمی را خراب نمی‌کند"
+  },
+  {
+   "case": "cs_b_pitchfork",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "restored": true,
+   "why": "برگشتِ دورِ پیش فقط از p_thiqa ِ سنجیده‌نشده = ۵۰ بود؛ با تصمیمِ p_found_mixture (پایهٔ مساعد ⇒ فقط T_below1) هیچ حکمی را خراب نمی‌کند"
+  },
+  {
+   "case": "cs_b_tillysmith",
+   "claim": "k1",
+   "key": "chain",
+   "value": "تک‌منبع",
+   "restored": true,
+   "why": "برگشتِ دورِ پیش فقط از p_thiqa ِ سنجیده‌نشده = ۵۰ بود؛ با تصمیمِ p_found_mixture (پایهٔ مساعد ⇒ فقط T_below1) هیچ حکمی را خراب نمی‌کند"
+  },
+  {
+   "case": "cs_b_smong",
+   "claim": "k1",
+   "key": "chain",
+   "value": "زنجیره طولی",
+   "restored": true,
+   "why": "برگشتِ دورِ پیش فقط از p_thiqa ِ سنجیده‌نشده = ۵۰ بود؛ با تصمیمِ p_found_mixture (پایهٔ مساعد ⇒ فقط T_below1) هیچ حکمی را خراب نمی‌کند"
+  }
+ ],
+ "notApplied": {
+  "reviewerRejectedOrChanged": [
+   {
+    "case": "bk_tawatur_ghadir",
+    "claim": "k1",
+    "key": "narrator",
+    "encoders": "موثق",
+    "rv": {
+     "id": "Q5/narrator",
+     "decision": "value",
+     "value": "نامعلوم",
+     "why": "The text gives the number and independence of the reporters (from the booklet's footnote) but does not establish any individual reporter's reliability, which is a chain property and not a narrator status."
+    }
+   },
+   {
+    "case": "r5_madoff_feeders",
+    "claim": "k2",
+    "key": "narrator",
+    "encoders": "نامعلوم",
+    "rv": {
+     "id": "Q8/narrator",
+     "decision": "value",
+     "value": null,
+     "why": "The belief that the reports are independent is the investors' own inference from how many reputable participants there were, not anyone's report."
+    }
+   },
+   {
+    "case": "cs_b_bellingcat_mh17",
+    "claim": "k1",
+    "key": "narrator",
+    "encoders": "موثق",
+    "rv": {
+     "id": "Q14/narrator",
+     "decision": "value",
+     "value": null,
+     "why": "The attribution rests on Bellingcat's own geolocation and comparison of images, not on anyone's say-so."
+    }
+   },
+   {
+    "case": "r4_bre_x_busang",
+    "claim": "k2",
+    "key": "narrator",
+    "encoders": "نامعلوم",
+    "rv": {
+     "id": "Q26/narrator",
+     "decision": "value",
+     "value": null,
+     "why": "That no verification is needed is the investors' own judgment, not a report from someone."
+    }
+   },
+   {
+    "case": "cs_b_thorp_madoff",
+    "claim": "k1",
+    "key": "narrator",
+    "encoders": "موثق",
+    "rv": {
+     "id": "Q34/narrator",
+     "decision": "value",
+     "value": null,
+     "why": "The conclusion rests on Thorp's own comparison against exchange records, not on anyone's say-so."
+    }
+   },
+   {
+    "case": "cs_b_tulip_mackay",
+    "claim": "k1",
+    "key": "chain",
+    "encoders": "گزارش‌های به‌ظاهر مستقل از یک منبع",
+    "rv": {
+     "id": "Q20/chain",
+     "decision": "reject",
+     "why": "The text describes Mackay drawing on contemporary pamphlets and secondary writers and others retelling him, which is a longitudinal chain, and it does not say the retellings were taken as independent."
+    }
+   },
+   {
+    "case": "r4_bre_x_busang",
+    "claim": "k1",
+    "key": "x_method",
+    "encoders": "ضعیف",
+    "rv": {
+     "id": "Q25/x_method",
+     "decision": "reject",
+     "why": "The text does not describe how the assays were done, only that the company supplied them, so the method stays unknown (نامعلوم)."
+    }
+   }
+  ],
+  "encodersSplit": [
+   {
+    "case": "cs_b_smong",
+    "claim": "k1",
+    "key": "narrator",
+    "E5": "موثق",
+    "E6": "نامعلوم",
+    "rvChose": "نامعلوم"
+   },
+   {
+    "case": "cs_b_pitchfork",
+    "claim": "k1",
+    "key": "narrator",
+    "E5": "نامعلوم",
+    "E6": "موثق",
+    "rvChose": "نامعلوم"
+   },
+   {
+    "case": "cs_b_tillysmith",
+    "claim": "k1",
+    "key": "narrator",
+    "E5": "موثق",
+    "E6": "نامعلوم",
+    "rvChose": "نامعلوم"
+   },
+   {
+    "case": "r2_abs_startup_loi",
+    "claim": "k1",
+    "key": "x_about_route",
+    "E5": false,
+    "E6": true,
+    "rvChose": true
+   }
+  ],
+  "splitNote": "سه narrator ِ دودستگی (cs_b_smong، cs_b_pitchfork، cs_b_tillysmith؛ بازبین «نامعلوم» برگزید) اعمال نشد چون دو خوانشِ کور هم‌رأی نبودند. اگر «نامعلوم» اعمال می‌شد، هر سه واقعهٔ سالم (اطمینانِ ۸۰–۹۰) زیرِ سقفِ ¾ ِ T_support پرچم می‌خوردند — یعنی یا وثاقتِ منبعشان در متن احراز شده (درسِ جغرافیا، روایتِ نسل‌ها، آزمونِ DNA ِ جفریز) یا برچسبِ «سالم» با اطمینانِ ۸۰–۹۰ بیش از آن است که خودِ راه توجیه می‌کند. داوریِ آن به یک خوانشِ کورِ چهارم یا شاهدِ مستندِ وثاقتِ همان منبع نیاز دارد؛ تا آن وقت narrator خالی است (هیچ قاعده‌ای بر نامعلومِ ننوشته فعال نیست)."
+ },
+ "effect": {
+  "verdicts": "۲۰۳ از ۲۰۳ درست (پیش و پس؛ ۰ حکمِ درستِ خراب)",
+  "fullyLocated": "116 ⇒ 116",
+  "brierClaims": 233,
+  "brierBefore": 0.2618,
+  "brierAfterDerivationOnly": 0.30321,
+  "brierAfter": 0.29731,
+  "brierNote": "Brier ِ سقف‌ها بدتر شد: سقف‌ها حالا زبرینِ اثبات‌پذیرند (مثلاً ¾ برای مقدمهٔ احرازنشده)، نه پیش‌بینیِ فراوانی؛ بیشترِ تصدیق‌های پیکره که سقفشان بالا رفت نادرست‌اند. عدد را برای بهترشدنِ Brier عوض نکردیم (دستورِ «بی عددِ قراردادی»)."
+ }
+}

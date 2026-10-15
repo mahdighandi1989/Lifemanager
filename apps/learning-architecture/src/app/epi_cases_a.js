@@ -143,7 +143,7 @@
       { id: "k1", txt: "واکسن MMR با بیماری روده‌ای و اوتیسم در کودکان مرتبط است", role: "اصلی",
         f: { form: "غیرقیاسی (استقرا/تمثیل)", scope: "کلی نامحدود", way: ISTQ, ind_complete: false, ind_n: 12, vazraf: false, hidden_ctrl: false, conf: 70, acted: true, stakes: HIGH, bg_undue: true }, truth: false },
       { id: "k2", member: false, txt: "چون متخصصی در لنست چنین گفته، باید از واکسن MMR پرهیز کرد", role: "اصلی",
-        f: { x_field: "نامعلوم", chain: "تک‌منبع", way: TAKH, x_method: XM_WEAK, x_bias: true, conf: 70, acted: true, stakes: HIGH }, truth: false }
+        f: { x_about_route: false, narrator: "نامعلوم", x_field: "نامعلوم", chain: "تک‌منبع", way: TAKH, x_method: XM_WEAK, x_bias: true, conf: 70, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_expert", "st_istiqra", "st_tajrobe", "st_background"],
       why: "دوازده مورد گزینش‌شده بدون گروه کنترل استقراء ناقصِ بسیار ضعیف است و هم‌زمانی را جای علیت نشاند؛ نه وضع و رفعی در کار بود و نه کنترل عوامل پنهان (سن تشخیص اوتیسم با سن واکسن هم‌زمان است) (s50، s51). تعارض منافع اعلام‌نشده و دستکاری داده یعنی ناپایبندی کارشناس به روش، که طبق s49 اعتبار استناد به او را فرومی‌ریزد؛ پیش‌زمینه نابایسته (منفعت در دعوا) در داوری خود او هم اثر داشت (s70).",
@@ -158,7 +158,7 @@
     actor: "سرمایه‌گذاران، اعضای هیئت‌مدیره و والگرینز بر پایه ادعای بنیان‌گذار، بدون راستی‌آزمایی مستقل، سرمایه‌گذاری و همکاری کردند.",
     claims: [
       { id: "k1", member: true, txt: "دستگاه ادیسون با چند قطره خون صدها آزمایش بالینی را دقیق انجام می‌دهد", role: "اصلی",
-        f: { chain: "تک‌منبع", way: TAKH, x_method: XM_UNK, x_comp: XC_UNK, x_bias: true, conf: 85, acted: true, stakes: HIGH, inquiry: INQ_SKIP, bg_undue: true }, truth: false }
+        f: { x_about_route: false, narrator: "نامعلوم", chain: "تک‌منبع", way: TAKH, x_method: XM_UNK, x_comp: XC_UNK, x_bias: true, conf: 85, acted: true, stakes: HIGH, inquiry: INQ_SKIP, bg_undue: true }, truth: false }
     ],
     truth: { ok: false, fail: ["st_expert", "st_background", "st_resp"],
       why: "استناد به تخصص بی آنکه اعتبار روش (s49، رکن نخست) احراز شود: هیچ داده داوری‌شده یا آزمون مستقلی در کار نبود. منبع ادعا ذی‌نفع بود و صلاحیت تأییدکنندگان در همین موضوع احراز نشده بود (رکن دوم). امید سود و ترس از عقب ماندن از رقیب پیش‌زمینه نابایسته بود (s70)، و با وجود امکان بازدید و آزمون مستقل، پیش از عمل تحقیق نشد.",
@@ -332,7 +332,7 @@
     actor: "وودوارد و بخش بزرگی از جامعه دیرین‌انسان‌شناسی بریتانیا بر پایه گزارش داوسون و تفسیر کالبدشناختی، یافته را پذیرفتند.",
     claims: [
       { id: "k1", txt: "این جمجمه و آرواره در همان لایه کهن گراول پیلت‌داون یافت شده‌اند", role: "مقدمه",
-        f: { way: NAQL, issued: true, narrator: N_UNK, chain: CH_ONE, qarina: Q_NONE, conf: 90, stakes: MID }, truth: false },
+        f: { x_about_route: false, way: NAQL, issued: true, narrator: N_UNK, chain: CH_ONE, qarina: Q_NONE, conf: 90, stakes: MID }, truth: false },
       { id: "k2", txt: "جمجمه و آرواره از یک موجود واحدند: نیای انسانی با مغز بزرگ و آرواره میمون‌مانند", role: "اصلی",
         f: { way: AQL, form: F_IND, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP, conf: 85, acted: true, stakes: MID }, truth: false }
     ],
@@ -411,7 +411,7 @@
     actor: "لووریه بر پایه تمثیل با نپتون و گزارش یک رصدگر آماتور، وجود ولکان را پذیرفت و اعلام کرد.",
     claims: [
       { id: "k1", txt: "لسکاربو گذر سیاره‌ای درون‌عطاردی را از برابر خورشید دیده است", role: "مقدمه",
-        f: { way: NAQL, issued: true, chain: CH_ONE, narrator: N_UNK, qarina: Q_CON, conf: 85, stakes: LOW }, truth: false },
+        f: { x_about_route: true, way: NAQL, issued: true, chain: CH_ONE, narrator: N_UNK, qarina: Q_CON, conf: 85, stakes: LOW }, truth: false },
       { id: "k2", txt: "سیاره‌ای به نام ولکان درون مدار عطارد وجود دارد و ناهنجاری حضیض عطارد را پدید می‌آورد", role: "اصلی",
         f: { x_analog_n: 1, x_analog_k: 1, x_analog_rel: "نامعلوم", way: AQL, form: F_IND, conflict_ignored: true, conf: 85, acted: true, stakes: LOW }, truth: false }
     ],
@@ -475,7 +475,7 @@
     actor: "مخالفان رانش، از نبود سازوکار پذیرفتنی و فرض سختی زمین، نبودِ جابه‌جایی را نتیجه گرفتند.",
     claims: [
       { id: "k1", txt: "قاره‌ها جابه‌جا نمی‌شوند، چون هیچ سازوکار فیزیکی ممکنی برای آن نیست", role: "اصلی",
-        f: { way: AQL, form: F_BAD, matter: M_UNP, conflict_ignored: true, conf: 85, acted: true, stakes: LOW }, truth: false },
+        f: { x_about_route: false, way: AQL, form: F_BAD, matter: M_UNP, conflict_ignored: true, conf: 85, acted: true, stakes: LOW }, truth: false },
       { id: "k2", txt: "سازوکارهای پیشنهادی وگنر برای جابه‌جا کردن قاره‌ها کافی نیستند", role: "مقدمه",
         f: { way: AQL, conf: 85, stakes: LOW }, truth: true }
     ],
@@ -527,7 +527,7 @@
     actor: "لامه بر پایه استدلالی با مقدمه‌ای ناگفته و نادرست، اثبات قضیه را اعلام کرد.",
     claims: [
       { id: "k1", txt: "تجزیه به عوامل اول در حلقه اعداد دایره‌بر (سیکلوتومیک) یکتاست", role: "مقدمه",
-        f: { way: AQL, matter: M_UNP, conf: 90, stakes: LOW }, truth: false },
+        f: { x_about_route: false, way: AQL, matter: M_UNP, conf: 90, stakes: LOW }, truth: false },
       { id: "k2", txt: "قضیه آخر فرما با این استدلال اثبات شده است", role: "اصلی",
         f: { way: AQL, form: F_OK, matter: M_FALSE, conf: 90, acted: true, stakes: LOW }, truth: false }
     ],
@@ -639,7 +639,7 @@
     actor: "تیم‌های ناوبری و عملیات، بی‌وارسی یکای داده‌های تیم دیگر، مسیر را درست پنداشتند و اصلاح نکردند.",
     claims: [
       { id: "k1", member: false, txt: "اعداد فایل ضربه پیشرانه‌ها بر حسب نیوتن‌ثانیه‌اند", role: "مقدمه",
-        f: { chain: "تک‌منبع", way: TAKH, worlds_mix: true, inquiry: INQ_SKIP, conf: 95, stakes: HIGH }, truth: false },
+        f: { x_about_route: false, narrator: "نامعلوم", chain: "تک‌منبع", way: TAKH, worlds_mix: true, inquiry: INQ_SKIP, conf: 95, stakes: HIGH }, truth: false },
       { id: "k2", txt: "مسیر فضاپیما درست است و مانور اصلاحی لازم نیست", role: "اصلی",
         f: { way: AQL, conflict_ignored: true, inquiry: INQ_SKIP, conf: 80, acted: true, stakes: HIGH }, truth: false }
     ],
@@ -701,7 +701,7 @@
     actor: "بوئینگ و FAA بر پایه فرض واکنش سریع خلبان و کفایت یک حسگر، طرح را گواهی کردند و پس از سقوط نخست پرواز را ادامه دادند.",
     claims: [
       { id: "k1", txt: "MCAS با یک حسگر ایمن است، چون خلبانان در چند ثانیه هر فعال‌شدن نادرست را تشخیص می‌دهند و خنثی می‌کنند", role: "مقدمه",
-        f: { way: AQL, matter: M_UNP, hidden_ctrl: false, bg_undue: true, conf: 90, acted: true, stakes: HIGH }, truth: false },
+        f: { x_about_route: false, way: AQL, matter: M_UNP, hidden_ctrl: false, bg_undue: true, conf: 90, acted: true, stakes: HIGH }, truth: false },
       { id: "k2", txt: "پس از سقوط لاین ایر، ادامه پرواز ۷۳۷ مکس با ابلاغیه به خلبانان ایمن است", role: "اصلی",
         f: { way: AQL, conflict_ignored: true, bg_undue: true, inquiry: INQ_SKIP, conf: 80, acted: true, stakes: HIGH }, truth: false }
     ],
@@ -748,7 +748,7 @@
     actor: "مهندسان سازه بر پایه این فرض که تغییر وارسی شده است، نقشه‌های کارگاهی را تأیید کردند.",
     claims: [
       { id: "k1", txt: "تغییر اتصال از یک میله پیوسته به دو میله جداگانه، ظرفیت اتصال را به خطر نمی‌اندازد", role: "اصلی",
-        f: { way: TAKH, x_method: XM_UNK, inquiry: INQ_SKIP, conf: 80, acted: true, stakes: HIGH }, truth: false }
+        f: { way: TAKH, x_method: "ضعیف", inquiry: INQ_SKIP, conf: 80, acted: true, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_expert", "st_resp"],
       why: "تأیید بر تکیه به وارسیِ فرضیِ طرف دیگر استوار بود، بی‌آنکه روش و انجام آن وارسی احراز شود (s49: اعتبار استناد به اعتبار روش و پایبندی کارشناس بسته است). محاسبه ساده بار اتصال ممکن بود و با بهای جان انسان انجام نشد؛ جهل در جایی که راه تحقیق باز است عذر نیست (s80، تعمیم سامانه در st_resp).",
@@ -1059,7 +1059,7 @@
     actor: "هیوم بر پایه این مقدمه که هر مفهوم معتبر باید از انطباعی حسی برآید، درباره علیت حکم کرد.",
     claims: [
       { id: "k1", txt: "ضرورت علّی در خارج نیست و تنها عادت ذهن است، چون هیچ انطباع حسی از آن نداریم", role: "اصلی",
-        f: { way: AQL, ctype_mix: true, matter: M_UNP, conf: 85, stakes: MID }, truth: false }
+        f: { x_about_route: false, way: AQL, ctype_mix: true, matter: M_UNP, conf: 85, stakes: MID }, truth: false }
     ],
     truth: { ok: false, fail: ["st_ctype"],
       why: "s34 و s36: علیت مفهومی فلسفی است که از مقایسه روابط و تحلیل ذهنی به دست می‌آید و چیستی شیء را نشان نمی‌دهد، پس انتظار دیدن آن چون یک ماهیت حسی، خلط اقسام مفاهیم است؛ جزوه همین را سرچشمه خطای هیوم می‌داند. مقدمه «همه مفاهیم حسی‌اند» نیز اثبات نشده است. (موضع جزوه؛ هیوم و پیروانش آن را نمی‌پذیرند.)",
@@ -1313,10 +1313,10 @@
     actor: "مدعی پلورالیسم عبارتی بی‌سند را دلیل نقلی گرفت و معنای آن را به حقانیت شرایع گوناگون برگرداند.",
     claims: [
       { id: "k1", txt: "این عبارت سخن معصوم است", role: "مقدمه",
-        f: { way: NAQL, issued: false, r_sanad: RS_WEAK, conf: 70, stakes: MID }, truth: false },
+        f: { x_about_route: true, way: NAQL, issued: false, r_sanad: RS_WEAK, conf: 70, stakes: MID }, truth: false },
       { id: "k2", txt: "همه شریعت‌ها، حتی منسوخ، به یک اندازه راه حق‌اند", role: "اصلی",
         /* داوریِ جزوه ۲۰۲۶-۱۰-۱۳: s87.3 «فاقد هرگونه سند روایی» — k2 هم بر همین گفتهٔ بی‌سند تکیه دارد ⇒ issued: false (s47: اصلِ صدور) */
-        f: { way: NAQL, context_ignored: true, r_plural_fallacy: true, issued: false, conf: 75, stakes: HIGH }, truth: false }
+        f: { x_about_route: false, way: NAQL, context_ignored: true, r_plural_fallacy: true, issued: false, conf: 75, stakes: HIGH }, truth: false }
     ],
     truth: { ok: false, fail: ["st_naql", "st_herm", "st_r_sources", "st_r_plural"],
       why: "صدور خبر احراز نشده و عبارت بی‌سند است (s47، s73)؛ مراد گویندگانش (کثرت راه‌های خداشناسی به حقیقت واحد) نادیده گرفته شد (s87)؛ و تکثر شیوه‌ها با حقانیت یکسان شرایع خلط شد (s81، s83).",
@@ -1411,7 +1411,7 @@
     actor: "شنونده بر پایه گزارش‌های مستقل و فراوان، به صدور خبر حکم می‌کند.",
     claims: [
       { id: "k1", txt: "پیامبر در غدیر خم سخن «من کنت مولاه فعلی مولاه» را گفته است", role: "اصلی",
-        f: { way: NAQL, tawatur: true, chain: CH_IND, issued: true, conf: 100, stakes: HIGH }, truth: true }
+        f: { x_about_route: true, way: NAQL, tawatur: true, chain: CH_IND, issued: true, conf: 100, stakes: HIGH }, truth: true }
     ],
     truth: { ok: true, fail: [],
       why: "s48: خبری که شمار ناقلانش چنان است که تبانی‌شان بر کذب عقلاً محال است، متواتر و یقین‌آور است؛ s47: در نقل‌های عرضی مستقل، افزایش راویان احتمال انطباق با واقع را تقویت می‌کند. اطمینان کامل به صدور موجه است.",
@@ -1426,7 +1426,7 @@
     actor: "مقلد بر پایه فتوای اعلم عمل می‌کند.",
     claims: [
       { id: "k1", member: true, txt: "حکم این مسئله فرعی همان است که مرجع اعلم فتوا داده است", role: "اصلی",
-        f: { way: TAKH, x_method: XM_OK, x_comp: XC_OK, x_bias: false, inquiry: INQ_DONE, conf: 80, acted: true, stakes: MID }, truth: null }
+        f: { chain: "تک‌منبع", x_about_route: false, narrator: "موثق", way: TAKH, x_method: XM_OK, x_comp: XC_OK, x_bias: false, inquiry: INQ_DONE, conf: 80, acted: true, stakes: MID }, truth: null }
     ],
     truth: { ok: true, fail: [],
       why: "s74: رجوع به کارشناسان دینی به حکم عقل، تقلید از اعلم را در فروع ایجاب می‌کند؛ s49: اعتبار استناد به روش معتبر (اجتهاد) و صلاحیت کارشناس بسته است که هر دو احراز شد. اطمینان در حد احتمال کشف واقع است (s78)، نه یقین. درستی فرایند به رعایت این ملاک‌هاست، فارغ از اینکه فتوا در واقع مطابق باشد.",

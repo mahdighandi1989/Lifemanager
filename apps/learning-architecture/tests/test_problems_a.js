@@ -23,9 +23,11 @@ const sha = o => crypto.createHash('sha256').update(JSON.stringify(o)).digest('h
    به‌روز ۲۰۲۶-۱۰-۱۵ (روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک؛ WORKLOG ِ صفحه (63)): رمزگذاریِ کورِ دوبارهٔ پیکره با ویژگی‌های تازه (form، chain، member،
    x_method/x_comp، x_conseq_*، فقط خانهٔ خالی؛ دو رمزگذارِ کورِ جدا + بازبینِ مستقل؛ دفتر: backtest/reviews/recode-2026-10-15-corpus.json) روی تصدیق‌های cases؛
    هیچ مقدارِ موجودی عوض نشد؛ آزمونِ نشت (داستانِ پیراسته) سپس x_conseq_* ِ cs_pb_semm_handwash را برداشت. PROTECTED_SHA هم فقط به‌خاطرِ همین cases (که در نمای محافظت‌شده هست) عوض شد.
+   به‌روز ۲۰۲۶-۱۰-۱۵ (روتینِ بک‌تست، WORKLOG ِ صفحه (64)، تصمیمِ p_found_mixture): narrator و x_about_route فقط در خانهٔ خالی، با دو رمزگذارِ کورِ هم‌رأی (E5، E6) + بازبینِ RV؛
+   دفتر: backtest/reviews/recode-2026-10-15b-mixture.json؛ هیچ مقدارِ موجودی در cases ِ مسئله‌ها عوض نشد.
    هر تغییرِ بعدیِ cases فقط از همین مسیر (یافته ⇒ تشخیص ⇒ اصلاح، با ثبت در WORKLOG) و با به‌روزکردنِ همین هش‌ها. */
-const CASES_SHA = '09895a3120c58bfce4a0007077f6bcdafb4adc5f916bd70aeab8f3d1ac558d12';
-const PROTECTED_SHA = '37004a1c19199284c7a5692eb69359d3786405da351452a60fbee698d346022d';
+const CASES_SHA = '5b9e0446b28e834622954624b3605e495c1ef154761b2a224bf5229c21eaee7a';
+const PROTECTED_SHA = 'fcbdfd5c151c1a8f20e5ef846793bcd0096a32be0959178d1a9668a9e82dbe08';
 const IDS = 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis';
 
 function protectedView(list) {

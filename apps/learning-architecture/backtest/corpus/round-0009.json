@@ -268,7 +268,9 @@
      "x_comp": "نامعلوم",
      "x_bias": true,
      "inquiry": "ممکن بود و انجام نشد",
-     "chain": "تک‌منبع"
+     "chain": "تک‌منبع",
+     "narrator": "نامعلوم",
+     "x_about_route": true
     },
     "member": true,
     "recoded": [
@@ -287,6 +289,22 @@
       "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): chain: company's own cores only؛ member: claim is the company's result",
       "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
       "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "narrator": [
+        null,
+        "نامعلوم"
+       ],
+       "x_about_route": [
+        null,
+        true
+       ]
+      },
+      "why": "رمزگذاریِ کورِ دوگانه (E5، E6؛ فقط از متنِ پیراستهٔ بی‌سرانجام، claude.ai/artifact/XLkwQu1dT3bfrCDgR4H2dT) هم‌رأی؛ بازبینِ مستقل RV پذیرفت (p_found_mixture، ۲۰۲۶-۱۰-۱۵)",
+      "encoder": "E5 session_01XFpiig8c96FA8RPERfJT9U (claude.ai/artifact/2s8gXcBUBkyTfwgjbrfp9n) + E6 session_01Xd7FTZtXZcXuP5jvuiQaeM (claude.ai/artifact/5qBFjQTaTBvkanQnigoWVi)",
+      "review": "RV session_01GD91y57ErrSdzxYwANEiqz (claude.ai/artifact/6nAA9K59TsofzjdHLT47Er): accept"
      }
     ]
    },
@@ -303,7 +321,8 @@
      "x_comp": "نامعلوم",
      "x_bias": true,
      "inquiry": "ممکن بود و انجام نشد",
-     "chain": "تک‌منبع"
+     "chain": "تک‌منبع",
+     "x_about_route": true
     },
     "member": false,
     "recoded": [
@@ -322,6 +341,18 @@
       "why": "رمزگذاریِ دوبارهٔ پیکره با ویژگی‌های تازه (B8 ِ بازبینیِ ۲۰۲۶-۱۰-۱۵؛ فقط خانهٔ خالی): chain: single source؛ member: 'no need for independent drilling' goes beyond",
       "encoder": "دو رمزگذارِ کورِ جدا EA و EB (نشست‌های ابریِ جدا، فقط title/story/actor/claims.txt و way، بی truth؛ claude.ai/artifact/H7Jbh2VX9z253CHJy6MYy9 و S7qmquKN2nsgYpqaHNQ26V)",
       "review": "بازبینِ مستقلِ RC (نشستِ ابریِ جدا session_01QjRiwJhiaHar2fpTokyWnM، بی truth؛ claude.ai/artifact/MJbzUQyT3gzWqdU6kw3woF): پذیرفت"
+     },
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "x_about_route": [
+        null,
+        true
+       ]
+      },
+      "why": "رمزگذاریِ کورِ دوگانه (E5، E6؛ فقط از متنِ پیراستهٔ بی‌سرانجام، claude.ai/artifact/XLkwQu1dT3bfrCDgR4H2dT) هم‌رأی؛ بازبینِ مستقل RV پذیرفت (p_found_mixture، ۲۰۲۶-۱۰-۱۵)",
+      "encoder": "E5 session_01XFpiig8c96FA8RPERfJT9U (claude.ai/artifact/2s8gXcBUBkyTfwgjbrfp9n) + E6 session_01Xd7FTZtXZcXuP5jvuiQaeM (claude.ai/artifact/5qBFjQTaTBvkanQnigoWVi)",
+      "review": "RV session_01GD91y57ErrSdzxYwANEiqz (claude.ai/artifact/6nAA9K59TsofzjdHLT47Er): accept"
      }
     ]
    }
@@ -368,8 +399,23 @@
      "stakes": "زیاد",
      "matter": "مقدمه اثبات‌نشده",
      "conflict_ignored": true,
-     "inquiry": "ممکن بود و انجام نشد"
-    }
+     "inquiry": "ممکن بود و انجام نشد",
+     "x_about_route": false
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "x_about_route": [
+        null,
+        false
+       ]
+      },
+      "why": "رمزگذاریِ کورِ دوگانه (E5، E6؛ فقط از متنِ پیراستهٔ بی‌سرانجام، claude.ai/artifact/XLkwQu1dT3bfrCDgR4H2dT) هم‌رأی؛ بازبینِ مستقل RV پذیرفت (p_found_mixture، ۲۰۲۶-۱۰-۱۵)",
+      "encoder": "E5 session_01XFpiig8c96FA8RPERfJT9U (claude.ai/artifact/2s8gXcBUBkyTfwgjbrfp9n) + E6 session_01Xd7FTZtXZcXuP5jvuiQaeM (claude.ai/artifact/5qBFjQTaTBvkanQnigoWVi)",
+      "review": "RV session_01GD91y57ErrSdzxYwANEiqz (claude.ai/artifact/6nAA9K59TsofzjdHLT47Er): accept"
+     }
+    ]
    },
    {
     "id": "k2",
@@ -382,8 +428,23 @@
      "stakes": "زیاد",
      "matter": "مقدمه اثبات‌نشده",
      "conflict_ignored": true,
-     "inquiry": "ممکن بود و انجام نشد"
-    }
+     "inquiry": "ممکن بود و انجام نشد",
+     "x_about_route": false
+    },
+    "recoded": [
+     {
+      "at": "2026-10-15",
+      "keys": {
+       "x_about_route": [
+        null,
+        false
+       ]
+      },
+      "why": "رمزگذاریِ کورِ دوگانه (E5، E6؛ فقط از متنِ پیراستهٔ بی‌سرانجام، claude.ai/artifact/XLkwQu1dT3bfrCDgR4H2dT) هم‌رأی؛ بازبینِ مستقل RV پذیرفت (p_found_mixture، ۲۰۲۶-۱۰-۱۵)",
+      "encoder": "E5 session_01XFpiig8c96FA8RPERfJT9U (claude.ai/artifact/2s8gXcBUBkyTfwgjbrfp9n) + E6 session_01Xd7FTZtXZcXuP5jvuiQaeM (claude.ai/artifact/5qBFjQTaTBvkanQnigoWVi)",
+      "review": "RV session_01GD91y57ErrSdzxYwANEiqz (claude.ai/artifact/6nAA9K59TsofzjdHLT47Er): accept"
+     }
+    ]
    }
   ],
   "truth": {
