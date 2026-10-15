@@ -11,5 +11,11 @@
  "what": "دستورها: PROMPT/URGENT_PROMPT v7 و BACKTEST_PROMPT v2 (بخشِ «هماهنگی میانِ روتین‌ها»)، ownership.json، handoffs.json، handoff.py، نگهبانِ ship.sh — WORKLOG 45. ناظرِ عمومی: روال را با یک برگهٔ واقعی بیازما و اگر جایی گنگ است اصلاح کن.",
  "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T16:04:25Z",
+  "note": "سنجشِ سطحیِ دورِ فوری ۲۰۲۶-۱۰-۱۵: کامیت روی main هست و گیتِ قانونِ ۴ (pytest: ۱۹۷۲ سبز) رد شد؛ بازبینیِ عمیقِ محتوا با روتینِ مالکِ قلمرو.",
+  "commit": ""
+ }
 }

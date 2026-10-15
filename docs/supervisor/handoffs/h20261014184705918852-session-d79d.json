@@ -12,5 +12,11 @@
  "what": "ابزارِ «🧭 ارزش‌ها و معنا» (view:vals) ساخته شد؛ gap_fa ِ sf_values و sf_meaning خالی شد؛ sf_meaning ⇒ گامِ ۴ (sf_values هنوز منبعِ دوم ندارد، گامِ ۰)",
  "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T16:04:25Z",
+  "note": "سنجشِ سطحیِ دورِ فوری ۲۰۲۶-۱۰-۱۵: کامیت روی main هست و گیتِ قانونِ ۴ (pytest: ۱۹۷۲ سبز) رد شد؛ بازبینیِ عمیقِ محتوا با روتینِ مالکِ قلمرو.",
+  "commit": ""
+ }
 }

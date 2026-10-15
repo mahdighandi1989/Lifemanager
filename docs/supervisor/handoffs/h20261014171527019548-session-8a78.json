@@ -12,5 +12,11 @@
  "what": "«🧭 تور» ِ دستیار (a27_tour.js) + پنجرهٔ کشیدنی + ۱۷ رفعِ یافته‌های تورِ زنده در a26/a16(aria-label)/a17(قفلِ ساخت) — WORKLOG 47",
  "procedure": "apps/learning-architecture/AGENTS.md: فقط src، build.py، WORKLOG/PROGRESS/HANDBOOK، همهٔ آزمون‌های مرورگر + host e2e + pytest + npm build",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T16:04:25Z",
+  "note": "سنجشِ سطحیِ دورِ فوری ۲۰۲۶-۱۰-۱۵: کامیت روی main هست و گیتِ قانونِ ۴ (pytest: ۱۹۷۲ سبز) رد شد؛ بازبینیِ عمیقِ محتوا با روتینِ مالکِ قلمرو.",
+  "commit": ""
+ }
 }
