@@ -454,8 +454,8 @@
      ممیزی ۲۰۲۶-۱۰-۱۳: موتور کاربرگ‌ها را نمی‌دید. ممیزیِ ۲۰۲۶-۱۰-۱۵ (ایده/کارخانه):
      - B1: «استناد به تخصص» x_method / x_comp / chain را هم می‌دهد (قاعده‌های r_expert_pop_* بی آن‌ها هرگز روی پروندهٔ واقعی نمی‌تابیدند).
      - B2: صورتِ «مغالطه‌آمیز» ⇒ «نامعتبر»، «قیاس معتبر» ⇒ «معتبر (قیاسی)»؛ مادهٔ استدلال از جدولِ مقدمات فقط وقتی نگاشتِ وفادار هست:
-       همهٔ مقدمه‌ها بدیهی یا منتهی به بدیهی ⇒ «منتهی به بدیهی»؛ مقدمه‌ای «نامعلوم» ⇒ «مقدمه اثبات‌نشده». «ظنی» نگاشت ندارد: طرح مقدارِ «مقدمهٔ ظنیِ موجه»
-       ندارد و یادداشتِ r_aql_matter_unproven صریحاً می‌گوید ظنیِ موجه (مثلاً خبرِ موثق) را «اثبات‌نشده» رمز نکنید — پیشنهادش با مالک است.
+       همهٔ مقدمه‌ها بدیهی یا منتهی به بدیهی ⇒ «منتهی به بدیهی»؛ مقدمه‌ای «نامعلوم» ⇒ «مقدمه اثبات‌نشده»؛ وگرنه مقدمه‌ای «ظنی» ⇒ «مقدمه ظنی» (p_matter_zanni،
+       روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵ ⇒ r_aql_matter_zanni: کمتر از یقین) و prem_p = درجهٔ ضعیف‌ترین مقدمهٔ ظنی وقتی درجهٔ همه گفته شده (فقط ثبت؛ سقف نمی‌سازد).
      - B3: هر کلیدی که کاربرگ پر کرده (cs.featPre) با تغییر یا خالی‌شدنِ کاربرگ دنبالش می‌رود؛ کلیدی که کاربر خودش «تعیین نشده» کرده (cs.featClr) دوباره پر نمی‌شود؛
        انتخابِ دستی هرگز بازنویسی نمی‌شود — اگر با کاربرگ نمی‌خواند، فقط گفته می‌شود.
      - B4: کاربرگِ یگانهٔ «راه عقل و برهان» فقط به یک تصدیق می‌رسد: همان که کاربرگ می‌گوید (خانهٔ «کدام تصدیق»)، یا تنها تصدیقِ عقلی/استقرائی، یا تنها تصدیقِ پرونده.
@@ -493,7 +493,14 @@
       var rows = (AQ.prem || []).filter(function (r) { return r && r.st; }); if (!rows.length) return null;
       if (rows.some(function (r) { return r.st === "نامعلوم"; })) return "مقدمه اثبات‌نشده";
       if (rows.every(function (r) { return AQL_SELF[r.st]; })) return "منتهی به بدیهی";
-      return null;   // «ظنی»: نگاشتِ وفادار ندارد (بالا)
+      if (rows.some(function (r) { return /^ظنی/.test(r.st); })) return "مقدمه ظنی";   // p_matter_zanni (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵)
+      return null;
+    };
+    /* درجهٔ ضعیف‌ترین مقدمهٔ ظنی — فقط وقتی درجهٔ «همهٔ» مقدمه‌های ظنی گفته شده (وگرنه ضعیف‌ترین نامعلوم است) */
+    var premPOf = function () {
+      var z = (AQ.prem || []).filter(function (r) { return r && /^ظنی/.test(r.st || ""); }); if (!z.length) return null;
+      var ps = z.map(function (r) { return num(r.p); }); if (ps.some(function (v) { return v == null; })) return null;
+      return Math.min.apply(null, ps.map(function (v) { return Math.min(v, 100); }));
     };
     var num = function (v) { var n = A.parseNum ? A.parseNum(v) : +v; return n == null || isNaN(n) || n < 0 ? null : n; };
     claims.forEach(function (t, i) {
@@ -529,6 +536,7 @@
       sync("form", form, "st_aql", "صورتِ استدلال");
       /* ماده: «فراتر از یافته» ⇒ همان حلقهٔ افزوده مقدمهٔ اثبات‌نشده است (B5)؛ وگرنه از جدولِ مقدماتِ تصدیقِ هدف */
       sync("matter", extra ? "مقدمه اثبات‌نشده" : isA ? matterOfPrem() : null, extra ? "st_expert:extra" : "st_aql", "مادهٔ استدلال");
+      sync("prem_p", isA && !extra && f.matter === "مقدمه ظنی" ? premPOf() : null, "st_aql", "درجهٔ ضعیف‌ترین مقدمهٔ ظنی");
       var pl = isA && /استقرائی|تمثیلی/.test(fm), an = pl && fm.indexOf("تمثیلی") >= 0;
       var aN = an ? num(AQ.analog_n) : null, aK = an ? num(AQ.analog_k) : null;
       if (aN != null && aK != null && aK > aN) { notes.push(L + "تمثیل: «دارای ویژگی» (" + A.faNum(aK) + ") از «همهٔ موارد» (" + A.faNum(aN) + ") بیشتر است — هیچ‌کدام رمز نشد؛ کاربرگ را درست کن."); aN = aK = null; }
