@@ -177,3 +177,17 @@ to patch five files but to pin the suite's clock zone once in `tests/conftest.py
 **Apply elsewhere:** when a failure appears/disappears with wall-clock time, compare the
 service's notion of "today" with the fixture's before touching either; pin the test process to
 the production timezone centrally rather than sprinkling conversions.
+
+## Update 2026-10-15 — a unit test that feeds the engine its own premises
+
+`test_plausible.js` proved the new rules capped claims at 67/80 — by handing the engine a
+feature set that already contained the argument form the rules require. On the real page
+nothing ever filled that form from the user's worksheet, so on every user case the rules (and an
+older sibling rule) stayed silent: "no error · ceiling 100". An independent auditor found it only
+by walking the actual flow (worksheet → encoding → verdict) with its own case. A second bug in
+the same round: an `<input type=number>` silently drops Persian digits, so the digit-normalising
+handler behind it never ran — again invisible to any test that typed Latin digits.
+**Apply elsewhere:** for every rule/feature, keep at least one test that starts from the user's
+input surface and reaches the verdict through the real prefill/encoding path, never from a
+hand-built feature object; and type the user's actual script (here Persian digits) into numeric
+fields — prefer `type=text` + `inputmode=numeric` + explicit normalisation over `type=number`.

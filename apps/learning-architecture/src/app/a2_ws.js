@@ -217,8 +217,9 @@
   };
   /* عددِ شمارشی (≥ ۰، صحیح) — مثلاً شمارِ پیامدهای تأییدشده یا مواردِ همانند (p_plausible_reasoning، ۲۰۲۶-۱۰-۱۵)؛ خالی ⇒ null («نامعلوم») */
   FIELD.num = function (f, d, ch, id) {
-    return h("input", { id: id, type: "number", min: f.min == null ? 0 : f.min, step: 1, inputmode: "numeric", value: d[f.k] == null ? "" : d[f.k], placeholder: f.ph || "",
-      oninput: function (e) { var v = String(e.target.value).replace(/[۰-۹]/g, function (x) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(x); }).trim();
+    /* type=text + inputmode=numeric: در «type=number» رقمِ فارسی («۳») در کروم خالی می‌ماند و هرگز به این تبدیل نمی‌رسید (ممیزیِ دورِ ۴، ۲۰۲۶-۱۰-۱۵) */
+    return h("input", { id: id, type: "text", inputmode: "numeric", dir: "ltr", value: d[f.k] == null ? "" : d[f.k], placeholder: f.ph || "",
+      oninput: function (e) { var v = String(e.target.value).replace(/[۰-۹]/g, function (x) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(x); }).replace(/[٠-٩]/g, function (x) { return "٠١٢٣٤٥٦٧٨٩".indexOf(x); }).trim();
         d[f.k] = v === "" || isNaN(+v) ? null : Math.max(f.min == null ? 0 : f.min, Math.round(+v)); ch(); } });
   };
   FIELD.checks = function (f, d, ch, id) {

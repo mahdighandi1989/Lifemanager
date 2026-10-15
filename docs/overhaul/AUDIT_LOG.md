@@ -4484,3 +4484,12 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **FINDING:** An independent round-2 audit, done by execution, gives 603 deep / 179 shallow / 11 absent. It found builder claims overstated (P1 24, P2 36, P3 85 items) and two field-name bugs. Round 3 is in progress.
 - **CHANGE:** B″ `T_measured_precedence` merged (economics 60 / socsci 61 for direct readings).
 - **PROPOSAL:** `p_plausible_reasoning` (owner); scope encoding of the psych frame (backtest routine).
+
+## 2026-10-15 — LLA: owner «موافقم» — T_plausible, practice on by default, will/practical/guessing; Pólya round 4 (WORKLOG 60)
+- **DECISION (owner):** apply `p_plausible_reasoning`; practice problems on by default; deepen will (7), practical problems (4), guessing techniques (9). Low-relevance group C (15) stays shallow.
+- **CHANGE:** T_plausible (`r_aql_conseq`, `r_aql_analogy`; "refuted ⇒ 0" not applied — not a theorem). R4 adds the «🌱 کوچک‌ترین گامِ بعد» card, an 8-part practical frame, a guess kit and three generators. It also fixes a practice-problems settings checkbox that never rendered.
+- **FINDING:** Independent round-4 audit (by execution): 758 deep / 32 shallow / 0 absent / 22 n/a, with no regression. The audit also found two bugs:
+  1. The «داوری قطعی» prefill never set the argument form, so T_plausible and `r_aql_nondeductive` never fired on user cases.
+  2. Numeric worksheet fields rejected Persian digits.
+- **CHANGE:** Both bugs fixed (`a7_bt.js` prefill, `a2_ws.js` `FIELD.num`). `test_plausible.js` now walks the real user path. Sources coverage updated to round 4.
+- **FINDING (open, low):** A 🌱 step's due date ignores the user's own "when"; 🌱 lines are not grouped in «امروز»; analogy fields in the guess kit are unchecked.

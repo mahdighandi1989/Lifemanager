@@ -112,7 +112,7 @@ chk(/## فراتر از جزوه/.test(VB) && /`r_aql_conseq`/.test(VB) && /`r_a
   chk(info.ws.every(x => x.ctl && /[؀-ۿ]/.test(x.label) && /[؀-ۿ]/.test(x.hint)), 'labelled fields with Persian hints');
   chk(info.ws[1].opts === 4 && info.ws[4].opts === 4, 'selects carry the feature schema options');
   chk(/\(n\+1\)÷\(n\+2\)/.test(info.ws[0].hint) && /رد شد/.test(info.ws[0].hint) && /ظاهری/.test(info.ws[4].hint) && /موافق‌ها/.test(info.ws[2].hint), 'hints state the theorem and the encoding rule');
-  await p.locator('main [data-k="analog_n"] input').fill('4'); await p.locator('main [data-k="analog_k"] input').fill('3');
+  await p.locator('main [data-k="analog_n"] input').fill('۴'); /* رقمِ فارسی (ممیزیِ دورِ ۴: type=number آن را خالی می‌گذاشت) */ await p.locator('main [data-k="analog_k"] input').fill('3');
   await p.locator('main [data-k="analog_rel"] select').selectOption('احراز شد'); await p.waitForTimeout(450);
   info.data = await p.evaluate(i => { const d = (APP.S.get(i).st.st_aql || {}).data || {}; return { n: d.analog_n, k: d.analog_k, rel: d.analog_rel }; }, id);
   chk(info.data.n === 4 && info.data.k === 3 && info.data.rel === 'احراز شد', 'worksheet values stored as numbers ' + JSON.stringify(info.data));
@@ -122,6 +122,11 @@ chk(/## فراتر از جزوه/.test(VB) && /`r_aql_conseq`/.test(VB) && /`r_a
   await p.evaluate(i => APP.go('e_case', i, 'engine'), id); await p.waitForTimeout(300);
   info.feat = await p.evaluate(i => (APP.S.get(i).feat || {})[1], id);
   chk(info.feat && info.feat.x_analog_n === 4 && info.feat.x_analog_k === 3 && info.feat.x_analog_rel === 'احراز شد' && info.feat.x_conseq_n == null, 'encoding prefilled from the worksheet ' + JSON.stringify(info.feat));
+  // ممیزیِ دورِ ۴: «صورتِ استدلال» هم از کاربرگ پیش‌پر می‌شود ⇒ قاعده روی پروندهٔ واقعیِ کاربر می‌تابد (نه فقط با رمزگذاریِ دستی)
+  chk(info.feat && info.feat.form === 'غیرقیاسی (استقرا/تمثیل)', 'argument form prefilled from the worksheet ' + JSON.stringify(info.feat));
+  info.flow = await p.evaluate(i => { const f = Object.assign({ conf: 95 }, APP.S.get(i).feat[1]); return EPIX.runClaim({ id: 'k', f: f }, APP.btCfg()).ceil; }, id);
+  chk(info.flow === 67, 'the user case itself is capped by T_plausible (67), not «no error · 100» ' + info.flow);
+  chk(await p.evaluate(() => /صورتِ استدلال ← غیرقیاسی/.test((document.querySelector('main .feat-prefill') || {}).textContent || '')), 'prefill note names the argument form');
   chk(await p.locator('#fe_c1_x_analog_rel').count() === 1 && await p.locator('#fe_c1_x_conseq_n').count() === 1, 'feature editor shows the new features');
   info.page = await p.evaluate(() => { const cfg = EPIX.DEFAULT_CFG('mesbah'), f = { form: 'غیرقیاسی (استقرا/تمثیل)', conf: 99 };
     return [EPIX.runClaim({ id: 'k', f: Object.assign({ x_analog_n: 4, x_analog_k: 3, x_analog_rel: 'احراز شد' }, f) }, cfg).ceil, EPIX.runClaim({ id: 'k', f: Object.assign({ x_conseq_n: 3, x_conseq_new: EPI_FM.x_conseq_new.v[0] }, f) }, cfg).ceil]; });

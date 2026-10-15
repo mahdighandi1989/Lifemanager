@@ -467,6 +467,10 @@
         var xr = D("st_expert").relay; if (f.x_relay == null && xr && f.way === "تخصص دیگران" && window.EPI_FM.x_relay && window.EPI_FM.x_relay.v.indexOf(xr) >= 0) { f.x_relay = xr; filled.push(fa(i + 1) + ": راهِ رسیدنِ یافته ← " + xr); }
         /* استدلالِ معقول از کاربرگِ «راه عقل و برهان» (x_conseq_* / x_analog_*؛ p_plausible_reasoning، مالک ۲۰۲۶-۱۰-۱۵) — فقط برای تصدیقی که راهش عقل/استقراء است
            یا صورتش غیرقیاسی، فقط اگر خالی است و فقط وقتی صورتِ کاربرگ استقرائی/تمثیلی است (همان شرطِ دیده‌شدنِ فیلدها) */
+        /* صورتِ استدلال از کاربرگِ «راه عقل و برهان» (ممیزیِ دورِ ۴: پیش‌پر نمی‌شد ⇒ r_aql_conseq / r_aql_analogy / r_aql_nondeductive روی پروندهٔ واقعی هرگز نمی‌تابیدند).
+           فقط «استقرائی/تمثیلی» ⇒ «غیرقیاسی»، فقط اگر خالی است و فقط برای تصدیقی که راهش عقل/استقراء است (یا تنها تصدیقِ پرونده و راهش ثبت نشده) */
+        var fmw = String(D("st_aql").form || "");
+        if (f.form == null && /استقرائی|تمثیلی/.test(fmw) && (f.way === "عقل" || f.way === "استقراء" || (f.way == null && claims.length === 1))) { f.form = "غیرقیاسی (استقرا/تمثیل)"; filled.push(fa(i + 1) + ": صورتِ استدلال ← " + f.form); }
         var DA = D("st_aql"), FMk = window.EPI_FM, isPl = f.form === "غیرقیاسی (استقرا/تمثیل)" || f.way === "عقل" || f.way === "استقراء", fm = String(DA.form || "");
         if (isPl && /استقرائی|تمثیلی/.test(fm)) [["conseq_n", "x_conseq_n", "پیامدِ تأییدشده"], ["conseq_new", "x_conseq_new", "تازگیِ پیامدها"], ["analog_n", "x_analog_n", "مواردِ همانند", "تمثیلی"],
           ["analog_k", "x_analog_k", "همانندهای دارای ویژگی", "تمثیلی"], ["analog_rel", "x_analog_rel", "همانندی در رابطهٔ مربوط", "تمثیلی"]].forEach(function (m) {
