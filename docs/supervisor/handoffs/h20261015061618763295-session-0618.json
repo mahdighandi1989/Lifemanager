@@ -1,0 +1,15 @@
+{
+ "id": "h20261015061618763295-session-0618",
+ "at": "2026-10-15T06:16:18Z",
+ "by": "session",
+ "area": "epi-backtest",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "پیشنهادِ p_base_expert_method در proposals.json (فقط پیشنهاد؛ هیچ قاعده/سقف/قضیه‌ای عوض نشد). پس از «بپذیر» ِ مالک، روتینِ بک‌تست مقدارِ پایهٔ تازه را در epi_found.js اعمال و با قاب تأیید کند.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها",
+ "commit": "",
+ "status": "open"
+}
