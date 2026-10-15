@@ -12,6 +12,7 @@
      node tools/epi_backtest.js check             # فقط می‌سنجد که خروجی‌ها با پیکره هم‌خوان‌اند (دروازهٔ ادغام)
      node tools/epi_backtest.js field <file.json> # جمعیتِ پژوهشِ هر قاب (x_field) — تنها راهِ نوشتنش در backtest/samples
      node tools/epi_backtest.js relay <file.json> # راهِ رسیدنِ یافته‌های هر قاب (x_relay) — همان قاعده‌ها
+     node tools/epi_backtest.js recode <file.json> # اصلاح/تکمیلِ رمزگذاریِ مواردِ قاب یا تصدیق‌های پیکرهٔ دورها (رمزگذارِ کورِ جدا + بازبین؛ تاریخچه)
 
    فایل‌ها (همه در git — تاریخچهٔ کامل):
      backtest/corpus/*.json    پیکرهٔ افزوده‌شده در دورها (وقایعِ واقعی و سناریوهای انتزاعیِ هم‌ریختِ آن‌ها)
@@ -135,6 +136,66 @@ function setFields(file, key) {
   });
   if (!bad.length) Object.keys(byFile).forEach((f) => wr(path.join(SAMPLES, f), byFile[f]));
   return { set: bad.length ? [] : ok, rejected: bad, note: bad.length ? "هیچ چیز نوشته نشد (همه یا هیچ)" : "" };
+}
+/* `recode <file.json>` (روتینِ بک‌تست ۲۰۲۶-۱۰-۱۵؛ دست‌به‌دستِ h…070f و رمزگذاریِ دوبارهٔ پیکره): اصلاح یا تکمیلِ رمزگذاریِ مواردِ یک قاب
+   (backtest/samples) یا تصدیق‌های پیکرهٔ دورها (backtest/corpus) — فقط با رمزگذارِ کورِ جدا و بازبینِ مستقل، هرگز از سرانجام. هر ورودی:
+     { "frame": "<قاب>", "items": "all" | ["<مورد>", …], "set": {کلید: مقدار}, "unset": ["کلید"], "replace"?: true, "why", "encoder", "review" }
+     { "case": "<واقعهٔ دور>", "claim": "k1", "set": {…}, "unset"?: […], "member"?: true|false, "replace"?: true, "why", "encoder", "review" }
+   کلید و مقدار باید در طرحِ epi_feat.js باشند؛ بازنویسیِ مقدارِ موجودِ دیگر فقط با "replace": true (اصلاحِ خطای رمزگذاری)؛ تاریخچه در `recoded` ِ همان
+   مورد/تصدیق می‌ماند (از ⇒ به). همه یا هیچ. بذرها (src/app/epi_cases_*.js) با این فرمان نیستند — اصلاحشان در کد با WORKLOG. */
+function featValErr(key, v) {
+  const d = FM[key]; if (!d) return "کلیدِ ناشناخته در طرح: " + key;
+  if (d.t === "enum" && d.v.indexOf(v) < 0) return key + ": مقدارِ بیرون از طرح: " + v;
+  if (d.t === "num" && !(typeof v === "number" && isFinite(v) && v >= 0)) return key + ": عددِ نامنفی لازم است";
+  if (d.t === "bool" && typeof v !== "boolean") return key + ": true/false لازم است";
+  return null;
+}
+function recodeOne(target, u, today) {
+  const f = target.f = target.f || {}, ch = {}, e = [];
+  Object.keys(u.set || {}).forEach((key) => {
+    const err = featValErr(key, u.set[key]); if (err) { e.push(err); return; }
+    if (f[key] != null && f[key] !== u.set[key] && !u.replace) { e.push(key + ": مقدارِ دیگری دارد (" + f[key] + ") — بازنویسی فقط با replace و دلیل"); return; }
+    if (f[key] !== u.set[key]) ch[key] = [f[key] == null ? null : f[key], u.set[key]];
+  });
+  (u.unset || []).forEach((key) => { if (!FM[key]) e.push("کلیدِ ناشناخته: " + key); else if (f[key] != null) ch[key] = [f[key], null]; });
+  if (e.length) return { e };
+  return { apply: () => {
+    Object.keys(ch).forEach((key) => { if (ch[key][1] == null) delete f[key]; else f[key] = ch[key][1]; });
+    if (u.member === true || u.member === false) { if (target.member !== u.member) ch.member = [target.member == null ? null : target.member, u.member]; target.member = u.member; }
+    if (Object.keys(ch).length) (target.recoded = target.recoded || []).push({ at: today, keys: ch, why: u.why, encoder: u.encoder, review: u.review });
+    return Object.keys(ch).length;
+  } };
+}
+function recode(file) {
+  const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
+  const today = new Date().toISOString().slice(0, 10), bad = [], todo = [], sFiles = {}, cFiles = {};
+  for (const f of sampleFiles()) sFiles[f] = rd(path.join(SAMPLES, f), []);
+  for (const f of corpusFiles()) cFiles[f] = rd(path.join(CORPUS, f), []);
+  items.forEach((u, i) => {
+    const e = [];
+    if (!u.why || String(u.why).length < 15) e.push("why: چرا (از متنِ خودِ مورد/قاب، نه از سرانجام)");
+    if (!u.encoder) e.push("encoder: رمزگذارِ کورِ جدا کیست");
+    if (!u.review) e.push("review: بازبینِ مستقل کیست و چه گفت");
+    let targets = [];
+    if (u.frame) {
+      let sm = null; Object.keys(sFiles).forEach((f) => sFiles[f].forEach((x) => { if (x.id === u.frame) sm = x; }));
+      if (!sm) e.push("قابِ ناشناخته: " + u.frame);
+      else targets = u.items === "all" ? sm.items : (sm.items || []).filter((it) => (u.items || []).indexOf(it.id) >= 0);
+      if (sm && u.items !== "all" && targets.length !== (u.items || []).length) e.push("موردِ ناشناخته در قاب " + u.frame);
+      if (u.member != null) e.push("member فقط برای تصدیقِ پیکره");
+    } else if (u.case) {
+      let c = null; Object.keys(cFiles).forEach((f) => cFiles[f].forEach((x) => { if (x.id === u.case) c = x; }));
+      if (!c) e.push("واقعهٔ ناشناخته در backtest/corpus (بذرها با این فرمان نیستند): " + u.case);
+      else { const k = (c.claims || []).filter((x) => x.id === u.claim)[0]; if (!k) e.push("تصدیقِ ناشناخته: " + u.case + "/" + u.claim); else targets = [k]; }
+    } else e.push("frame یا case لازم است");
+    targets.forEach((t) => { const r = recodeOne(t, u, today); if (r.e) e.push.apply(e, r.e); else todo.push(r.apply); });
+    if (e.length) bad.push({ i, frame: u.frame, case: u.case, claim: u.claim, errors: e });
+  });
+  if (bad.length) return { changed: 0, rejected: bad, note: "هیچ چیز نوشته نشد (همه یا هیچ)" };
+  let n = 0; todo.forEach((fn) => { n += fn(); });
+  Object.keys(sFiles).forEach((f) => wr(path.join(SAMPLES, f), sFiles[f]));
+  Object.keys(cFiles).forEach((f) => wr(path.join(CORPUS, f), cFiles[f]));
+  return { changed: n, rejected: [] };
 }
 function addSamples(file) {
   const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
@@ -703,12 +764,13 @@ if (require.main === module) {
   else if (cmd === "add") console.log(JSON.stringify(add(a1), null, 1));
   else if (cmd === "sample") console.log(JSON.stringify(addSamples(a1), null, 1));
   else if (cmd === "field") { const r = setFields(a1); console.log(JSON.stringify(r, null, 1)); if (r.rejected.length) process.exit(3); }
+  else if (cmd === "recode") { const r = recode(a1); console.log(JSON.stringify(r, null, 1)); if (r.rejected.length) process.exit(3); }
   else if (cmd === "relay") { const r = setFields(a1, "x_relay"); console.log(JSON.stringify(r, null, 1)); if (r.rejected.length) process.exit(3); }
   else if (cmd === "territory") console.log(JSON.stringify(applyTerritory(a1), null, 1));
   else if (cmd === "review") { const r = addReview(a1); console.log(JSON.stringify(r, null, 1)); if (!r.ok) process.exit(3); }
   else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v, warnings: integrity().warnings }, null, 1)); if (v.length) process.exit(3); }
   else if (cmd === "run") { const args = process.argv.slice(3), ni = args.indexOf("--note"); console.log(JSON.stringify(run(ni >= 0 ? args[ni + 1] : "", args.indexOf("--rerun") >= 0), null, 1)); }
-  else { console.log("usage: status | add <file.json> | sample <file.json> | field <file.json> | relay <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
+  else { console.log("usage: status | add <file.json> | sample <file.json> | field <file.json> | relay <file.json> | recode <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
 }
 module.exports = { integrity, validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples, setFields, fieldAudit,
   applyTerritory, validateTerr, terrAreas, terrState, addReview, territoryMd };
