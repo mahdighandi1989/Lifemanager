@@ -1,0 +1,15 @@
+{
+ "id": "h20261015094345337115-session-737f",
+ "at": "2026-10-15T09:43:45Z",
+ "by": "session",
+ "area": "epi-foundation",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_measured_precedence: x_relay = «مستقیم از خودِ منتشرشده» برای سه قابِ round-0013 (camerer2016_eerp، osc2015_rpp، camerer2018_ssrp) با فرمانِ تازهٔ epi_backtest.js relay (از تعریفِ خودِ قاب، با why؛ همه یا هیچ؛ بی بازنویسیِ خاموش). F.measure اکنون x_field/x_relay ِ قاب را به ارث می‌دهد (F.FRAME_KEYS) و برای هر پایهٔ جمعیتیِ سنجیده precede = {relay, rules} می‌سازد: امروز برای هر سه r_aql_matter_unproven، r_naql_ahad، r_naql_no_qarina. مقدارهای پایه بی‌تغییر (60.0 / 36.4 / 60.9).",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#مسیرِ ۱ (قاب‌ها فقط با ابزار)",
+ "commit": "",
+ "status": "open"
+}

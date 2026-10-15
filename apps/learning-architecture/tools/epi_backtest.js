@@ -11,6 +11,7 @@
      node tools/epi_backtest.js run [--note "…"]  # یک دور: اجرا، دفتر، یافته‌ها، جزوهٔ متقن
      node tools/epi_backtest.js check             # فقط می‌سنجد که خروجی‌ها با پیکره هم‌خوان‌اند (دروازهٔ ادغام)
      node tools/epi_backtest.js field <file.json> # جمعیتِ پژوهشِ هر قاب (x_field) — تنها راهِ نوشتنش در backtest/samples
+     node tools/epi_backtest.js relay <file.json> # راهِ رسیدنِ یافته‌های هر قاب (x_relay) — همان قاعده‌ها
 
    فایل‌ها (همه در git — تاریخچهٔ کامل):
      backtest/corpus/*.json    پیکرهٔ افزوده‌شده در دورها (وقایعِ واقعی و سناریوهای انتزاعیِ هم‌ریختِ آن‌ها)
@@ -64,7 +65,10 @@ function loadSamples() { const out = []; for (const f of sampleFiles()) for (con
 function applyBase() {
   const FD = global.EPI_FOUND, m = FD.measure(loadSamples()), v = {};
   Object.keys(m).forEach((b) => { v[b] = m[b].p; });
-  FD.BASEVAL = v; return m;
+  FD.BASEVAL = v;
+  /* T_measured_precedence: کدام سقف‌های «بی‌مرجح» جای خود را به نرخِ سنجیدهٔ هر جمعیت می‌دهند — از خودِ قاب‌ها، هنگامِ سنجش (بی فهرستِ دستی) */
+  FD.PRECEDE = {}; Object.keys(m).forEach((b) => { if (m[b].precede) FD.PRECEDE[b] = m[b].precede; });
+  return m;
 }
 function validateFrame(sm, seen) {
   const e = [];
@@ -84,6 +88,7 @@ function validateFrame(sm, seen) {
       if (!d) e.push("ویژگیِ ناشناخته: " + key); else if (d.t === "enum" && d.v.indexOf(v) < 0) e.push("مقدارِ نادرست " + key + "=" + v); });
   });
   if (sm.x_field != null) e.push.apply(e, fieldErrors(sm, sm.x_field));
+  if (sm.x_relay != null) e.push.apply(e, relayErrors(sm, sm.x_relay));
   if (seen && seen.has(sm.id)) e.push("قابِ تکراری: " + sm.id);
   return e;
 }
@@ -96,9 +101,21 @@ function fieldErrors(sm, v) {
   (sm.items || []).forEach((it) => { if (it.f && it.f.x_field != null && it.f.x_field !== v) e.push("موردِ " + it.id + ": x_field ِ مورد (" + it.f.x_field + ") با قاب (" + v + ") نمی‌خواند"); });
   return e;
 }
+/* راهِ رسیدنِ یافته‌های قاب (x_relay؛ p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵): قاب خودش تعریف می‌کند اعضایش چه‌اند (مثلاً «یافته‌های اصلیِ
+   همان مقاله‌ها، همان‌گونه که منتشر شده‌اند») — پس «نامعلوم» برایش معنا ندارد؛ موردی که خودش x_relay ِ دیگری دارد با قاب ناسازگار است. */
+function relayErrors(sm, v) {
+  const e = [], d = FM.x_relay;
+  if (!d || d.v.indexOf(v) < 0) e.push("x_relay ِ قاب باید یکی از مقدارهای طرح باشد: " + v);
+  else if (v === "نامعلوم") e.push("x_relay ِ قاب نمی‌تواند «نامعلوم» باشد — قاب خودش تعریف می‌کند اعضایش چه‌اند");
+  (sm.items || []).forEach((it) => { if (it.f && it.f.x_relay != null && it.f.x_relay !== v) e.push("موردِ " + it.id + ": x_relay ِ مورد (" + it.f.x_relay + ") با قاب (" + v + ") نمی‌خواند"); });
+  return e;
+}
+const FRAME_SET = { x_field: fieldErrors, x_relay: relayErrors };
 /* `field <file.json>`: [{ "frame": "<شناسهٔ قاب>", "x_field": "<مقدار>", "why": "…", "by"? }] — جمعیتِ هر قاب را یک بار ثبت می‌کند
-   (تنها راهِ نوشتنِ x_field در backtest/samples؛ بی بازنویسیِ خاموش: مقدارِ دیگرِ موجود ⇒ رد). */
-function setFields(file) {
+   (تنها راهِ نوشتنِ x_field در backtest/samples؛ بی بازنویسیِ خاموش: مقدارِ دیگرِ موجود ⇒ رد).
+   `relay <file.json>`: همان، برای x_relay (راهِ رسیدنِ یافته‌های قاب). */
+function setFields(file, key) {
+  key = key || "x_field"; const errFn = FRAME_SET[key];
   const items = rd(file, null); if (!Array.isArray(items)) { console.error("فایل باید آرایهٔ JSON باشد"); process.exit(2); }
   const today = new Date().toISOString().slice(0, 10), ok = [], bad = [], byFile = {};
   for (const f of sampleFiles()) byFile[f] = rd(path.join(SAMPLES, f), []);
@@ -108,13 +125,13 @@ function setFields(file) {
     const e = [];
     if (!hit) e.push("قابِ ناشناخته: " + u.frame);
     else if (hit.excluded) e.push("قابِ ردشده (excluded): " + u.frame);
-    if (!u.why || String(u.why).length < 15) e.push("why: چرا این جمعیت (از تعریفِ خودِ قاب، نه از سرانجام)");
-    if (hit) e.push.apply(e, fieldErrors(hit, u.x_field));
-    if (hit && hit.x_field != null && hit.x_field !== u.x_field) e.push("قاب پیش‌تر جمعیتِ دیگری دارد (" + hit.x_field + ") — بازنویسیِ خاموش ممنوع؛ اگر خطاست، با دلیل در WORKLOG و قابِ تازه");
+    if (!u.why || String(u.why).length < 15) e.push("why: چرا این مقدار (از تعریفِ خودِ قاب، نه از سرانجام)");
+    if (hit) e.push.apply(e, errFn(hit, u[key]));
+    if (hit && hit[key] != null && hit[key] !== u[key]) e.push("قاب پیش‌تر مقدارِ دیگری دارد (" + hit[key] + ") — بازنویسیِ خاموش ممنوع؛ اگر خطاست، با دلیل در WORKLOG و قابِ تازه");
     if (e.length) { bad.push({ frame: u.frame, errors: e }); return; }
-    if (hit.x_field === u.x_field) { ok.push({ frame: u.frame, unchanged: true }); return; }
-    hit.x_field = u.x_field; hit.x_field_set = { at: today, by: u.by || "routine", why: u.why };
-    ok.push({ frame: u.frame, x_field: u.x_field });
+    if (hit[key] === u[key]) { ok.push({ frame: u.frame, unchanged: true }); return; }
+    hit[key] = u[key]; hit[key + "_set"] = { at: today, by: u.by || "routine", why: u.why };
+    ok.push({ frame: u.frame, [key]: u[key] });
   });
   if (!bad.length) Object.keys(byFile).forEach((f) => wr(path.join(SAMPLES, f), byFile[f]));
   return { set: bad.length ? [] : ok, rejected: bad, note: bad.length ? "هیچ چیز نوشته نشد (همه یا هیچ)" : "" };
@@ -674,11 +691,12 @@ if (require.main === module) {
   else if (cmd === "add") console.log(JSON.stringify(add(a1), null, 1));
   else if (cmd === "sample") console.log(JSON.stringify(addSamples(a1), null, 1));
   else if (cmd === "field") { const r = setFields(a1); console.log(JSON.stringify(r, null, 1)); if (r.rejected.length) process.exit(3); }
+  else if (cmd === "relay") { const r = setFields(a1, "x_relay"); console.log(JSON.stringify(r, null, 1)); if (r.rejected.length) process.exit(3); }
   else if (cmd === "territory") console.log(JSON.stringify(applyTerritory(a1), null, 1));
   else if (cmd === "review") { const r = addReview(a1); console.log(JSON.stringify(r, null, 1)); if (!r.ok) process.exit(3); }
   else if (cmd === "audit") { const v = axiomAudit(); console.log(JSON.stringify({ violations: v, warnings: integrity().warnings }, null, 1)); if (v.length) process.exit(3); }
   else if (cmd === "run") { const args = process.argv.slice(3), ni = args.indexOf("--note"); console.log(JSON.stringify(run(ni >= 0 ? args[ni + 1] : "", args.indexOf("--rerun") >= 0), null, 1)); }
-  else { console.log("usage: status | add <file.json> | sample <file.json> | field <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
+  else { console.log("usage: status | add <file.json> | sample <file.json> | field <file.json> | relay <file.json> | territory <file.json> | review <file.json> | audit | run [--note text] [--rerun]"); process.exit(1); }
 }
 module.exports = { integrity, validate, verdict, loadCorpus, status, run, add, sigOf, foundation, addSamples, validateFrame, axiomAudit, applyBase, loadSamples, setFields, fieldAudit,
   applyTerritory, validateTerr, terrAreas, terrState, addReview, territoryMd };

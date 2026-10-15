@@ -1,0 +1,16 @@
+{
+ "id": "h20261015094345680328-session-06c1",
+ "at": "2026-10-15T09:43:45Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_measured_precedence: a7_bt.js — «داوریِ قطعی» x_relay ِ تصدیقِ «تخصص دیگران» را از فیلدِ relay ِ کاربرگِ «استناد به تخصص» پر می‌کند، فقط اگر خالی باشد؛ a23_found.js — زبانهٔ «🧱 مبنای درجه‌ها» زیرِ هر پایهٔ جمعیتی فهرستِ تقدم (ساختهٔ ابزار) را نشان می‌دهد (.found-precede)؛ tests/test_measured_precedence.js تازه؛ test_found.js شمارِ applied از داده. WORKLOG/PROGRESS/HANDBOOK/AUDIT_LOG دست نخورد (یادداشت: docs/overhaul/handoff-notes/_pending_measured_precedence_2026-10-15.md).",
+ "procedure": "apps/learning-architecture/AGENTS.md#هر تغییر — به همین ترتیب",
+ "commit": "",
+ "status": "open"
+}

@@ -1194,7 +1194,15 @@
    "p": 60,
    "lo": 38.6,
    "hi": 79.7,
-   "measured": true
+   "measured": true,
+   "precede": {
+    "relay": "مستقیم از خودِ منتشرشده",
+    "rules": [
+     "r_aql_matter_unproven",
+     "r_naql_ahad",
+     "r_naql_no_qarina"
+    ]
+   }
   },
   "p_expert_psych08": {
    "fa": "درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — روان‌شناسی، مقاله‌های ۲۰۰۸ ِ PS/JPSP/JEP:LMC",
@@ -1205,7 +1213,15 @@
    "p": 36.4,
    "lo": 27.2,
    "hi": 46,
-   "measured": true
+   "measured": true,
+   "precede": {
+    "relay": "مستقیم از خودِ منتشرشده",
+    "rules": [
+     "r_aql_matter_unproven",
+     "r_naql_ahad",
+     "r_naql_no_qarina"
+    ]
+   }
   },
   "p_expert_socsci_ns": {
    "fa": "درستیِ یافتهٔ تک‌پژوهشِ کارشناس (روشِ معتبر، صلاحیتِ احرازشده) — علومِ اجتماعیِ تجربی، Nature/Science ۲۰۱۰–۲۰۱۵",
@@ -1216,7 +1232,15 @@
    "p": 60.9,
    "lo": 40.9,
    "hi": 79.2,
-   "measured": true
+   "measured": true,
+   "precede": {
+    "relay": "مستقیم از خودِ منتشرشده",
+    "rules": [
+     "r_aql_matter_unproven",
+     "r_naql_ahad",
+     "r_naql_no_qarina"
+    ]
+   }
   },
   "p_mem": {
    "fa": "وثاقتِ حافظهٔ سنجیده‌نشده",

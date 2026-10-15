@@ -463,6 +463,8 @@
         if (f.stakes == null && stk >= 1) { f.stakes = stk <= 2 ? "کم" : stk === 3 ? "متوسط" : "زیاد"; filled.push(fa(i + 1) + ": بهای خطا ← " + f.stakes); }
         /* جمعیتِ پژوهش از کاربرگِ «استناد به تخصص» (x_field؛ مالک ۲۰۲۶-۱۰-۱۵) — فقط برای تصدیقِ «تخصص دیگران» و فقط اگر خالی است */
         var xf = D("st_expert").field; if (f.x_field == null && xf && f.way === "تخصص دیگران" && window.EPI_FM.x_field && window.EPI_FM.x_field.v.indexOf(xf) >= 0) { f.x_field = xf; filled.push(fa(i + 1) + ": جمعیتِ پژوهش ← " + xf); }
+        /* راهِ رسیدنِ یافته (x_relay؛ p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵) — همان شرط‌ها */
+        var xr = D("st_expert").relay; if (f.x_relay == null && xr && f.way === "تخصص دیگران" && window.EPI_FM.x_relay && window.EPI_FM.x_relay.v.indexOf(xr) >= 0) { f.x_relay = xr; filled.push(fa(i + 1) + ": راهِ رسیدنِ یافته ← " + xr); }
       });
       if (filled.length && !(cs.outcomeAt && cs.fwdAt)) S.put(cs);
     })();

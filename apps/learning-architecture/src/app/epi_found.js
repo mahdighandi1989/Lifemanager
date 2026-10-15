@@ -41,6 +41,22 @@
     T_finite: { fa: "حکمِ کلی بر مجموعهٔ معینِ M عضوی پس از n موافق ⇒ (n+1)/(M+1)", proof: "A4: هیچ شمارِ موافق‌ها (۰ تا M) بر دیگری مرجح نیست؛ A3: پس از دیدنِ n موافقِ بی مخالف، احتمالِ اینکه همهٔ M موافق باشند = (n+1)/(M+1). n = M ⇒ ۱ (همان T_complete).", from: ["A3", "A4", "A2"] },
     T_tawatur: { fa: "گزارش‌های مستقل ⇒ ۱ − Πِ احتمالِ خطا", proof: "A3: کذبِ همهٔ n گزارشِ مستقل = حاصل‌ضربِ احتمالِ خطای هر کدام؛ با افزایشِ n به صفر میل می‌کند ⇒ تواتر یقین‌آور (s48: «تبانیِ بر کذب عقلاً محال»).", from: ["A3", "A0"] },
     T_pop: { fa: "تصدیقی از جمعیتِ سنجیدهٔ j ⇒ (k_j+1)/(n_j+2) ِ همان جمعیت", proof: "A4 روی نرخِ ناشناختهٔ درستی θ_j در جمعیتِ j (هیچ نرخی بر دیگری مرجح نیست) + A3 (احتمالِ k درست و n−k نادرستِ مستقل) ⇒ احتمالِ درستیِ موردِ تازه‌ای از همان جمعیت پس از k درست از n = (k+1)/(n+2) (قاعدهٔ توالیِ لاپلاس؛ T_next حالتِ k = n ِ همین است؛ همان دو اصلِ برهانِ T_next). شرط‌ها همان چهار شرطِ F.measure‌اند (قابِ بی‌گزینش، درستیِ احرازشده، استقلالِ گروه‌ها، هرگز ۱) به‌اضافهٔ این‌که تصدیقِ زیرِ داوری واقعاً از همان جمعیت باشد (x_field، از منبعِ خودِ تصدیق): جمعیتِ دیگر نرخِ دیگری (θ دیگر) دارد و عددِ j برایش قضیه نیست — برای آن، بی‌قابِ خودش، فقط T_unknown (½). (p_base_expert_method/amend-field، مالک ۲۰۲۶-۱۰-۱۵)", from: ["A3", "A4"] },
+    T_measured_precedence: { fa: "نرخِ سنجیدهٔ جمعیت بر سقفِ «بی‌مرجح» مقدم است — وقتی شرطِ آن سقف در همهٔ اعضای قابِ همان جمعیت برقرار است و تصدیق خواندنِ مستقیمِ یافته‌ای از همان جمعیت است",
+      uses: ["T_pop", "T_unknown", "T_complete", "T_weakest"],
+      proof: "۱) سقفی که از T_unknown می‌آید، یا از مقدارِ پایه‌ای که هنوز سنجیده نشده (پس عددش همان ½ ِ T_unknown است)، فقط با یک مقدمه برقرار است: " +
+        "A4 — «هیچ دلیلی هیچ‌یک از دو طرفِ شرط را ترجیح نمی‌دهد». " +
+        "۲) قابِ جمعیتِ j بی‌گزینش و کامل است و شرطِ آن قاعده (when) در همهٔ اعضای قاب برقرار است. این خود شمارشِ همهٔ اعضای مجموعه‌ای معین است (T_complete، از A1 و A2): «هر عضوِ سنجیدهٔ j این شرط را دارد». " +
+        "۳) پس (k_j+1)/(n_j+2) ِ T_pop (از A3 و A4) احتمالِ درستی است برای ردهٔ «از جمعیتِ j و دارای همین شرط»، یعنی همان رده‌ای که قاعده دربارهٔ آن حکم می‌کند. " +
+        "صدقِ تصدیق مستلزمِ برقراریِ شرطِ لازمِ قاعده است؛ پس A1 می‌دهد: احتمالِ آن شرط دست‌کم (k_j+1)/(n_j+2). یعنی برای این رده دلیلی هست و مقدمهٔ A4 ِ گامِ ۱ کاذب است. پس T_unknown به این رده نمی‌رسد. " +
+        "۴) وقتی (k_j+1)/(n_j+2) > ½ است، نشاندنِ هر دو به یک گزاره با یک شاهد دو احتمالِ ناسازگار می‌دهد: «≤ ½» و «= (k_j+1)/(n_j+2)». این خلافِ A2 است (احتمالِ هر گزاره یک عدد است) و خلافِ A0. " +
+        "وقتی ≤ ½ است، تناقضِ عددی نیست، ولی گامِ ۳ همچنان مقدمهٔ T_unknown را برداشته است. آن قاعده دیگر دلیلِ بیش‌اطمینانی نیست و ایستگاهش پرچم نمی‌خورد؛ سقف همان T_pop است. پس در هر دو حالت برای این رده فقط T_pop می‌ماند. " +
+        "۵) شرطِ عضویت: تصدیق باید خودش موردی از همان جمعیت باشد، یعنی خواندنِ مستقیمِ یافته از خودِ منتشرشده، همان‌گونه که اعضای قاب‌اند (x_relay). " +
+        "اگر یافته از واسطه رسیده، صدقِ تصدیق حلقهٔ دیگری هم لازم دارد: درستیِ بازگوییِ واسطه. آن حلقه در هیچ قابی سنجیده نشده، پس T_unknown برایش درست است و T_weakest می‌دهد ≤ ½. اگر راهِ رسیدن نامعلوم است، عضویت احراز نشده و تقدم نیست. " +
+        "۶) دو دسته سقف با این قضیه کنار نمی‌روند و کمینه (T_weakest) برایشان می‌ماند: " +
+        "(الف) سقف‌هایی که موضوعِ دیگری دارند، مثلِ T_universal (حکمِ کلی بر دامنهٔ نامحدود)، T_against، T_conflict، T_null و T_ambig؛ برهانِ آن‌ها بر نبودِ دلیل نیست، یا گزارهٔ دیگری را می‌سنجد. " +
+        "(ب) سقف‌هایی که پایه‌شان خودش سنجیده است؛ آن‌جا دو ردهٔ سنجیده داریم و از اصول برنمی‌آید کدام مقدم است. ∎ " +
+        "(p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵؛ فهرستِ قاعده‌ها را ابزار هنگامِ سنجش از خودِ قاب‌ها می‌سازد: F.measure ⇒ precede؛ هیچ فهرستِ دستی)",
+      from: ["A0", "A1", "A2", "A3", "A4"] },
     T_below1: { fa: "راهِ غیرِ برهانی ⇒ کمتر از یک", proof: "جزوه صریحاً یقین را منحصر به ارجاع به بدیهیات با صورتِ معتبر می‌داند (s40)؛ راهی که چنین نیست «به پای برهان نمی‌رسد» (s51) ⇒ < ۱. عددِ دقیقِ زیرِ یک از اصول بیرون نمی‌آید.", from: ["A2"] }
   };
   /* انتخابِ «همین گونه تصدیق در همین جمعیت» — همان شرط‌های قاعده‌های r_expert_pop_* (epi_rules.js)؛ یک جا، تا سنجش و سقف از هم جدا نشوند */
@@ -200,17 +216,24 @@
   function matches(sel, f) { return Object.keys(sel).every(function (k) { return f && f[k] === sel[k]; }); }
   F.sampleItemOk = function (it) { return it && typeof it.truth === "boolean" && Array.isArray(it.verified_by) && it.verified_by.length > 0; };
   /* samples: آرایهٔ «قاب»ها {id, frame, src, items:[{id, txt, f, truth, verified_by, grp?}]} (backtest/samples/*.json) */
-  F.measure = function (samples) {
-    var out = {};
+  /* ویژگی‌هایی که تعریفِ خودِ قاب‌اند و هر موردِ قاب به ارث می‌برد (با `epi_backtest.js field|relay`؛ پیش از سرانجام، نه داوریِ موردی) */
+  F.FRAME_KEYS = ["x_field", "x_relay"];
+  F.frameItemF = function (sm, it) {
+    var f = it.f;
+    F.FRAME_KEYS.forEach(function (key) { if (sm[key] && !(f && f[key] != null)) { f = Object.assign({}, f || {}); f[key] = sm[key]; } });
+    return f || {};
+  };
+  F.measure = function (samples, rules) {
+    var out = {}, seen = {};
     Object.keys(F.BASE).forEach(function (b) {
-      var sel = F.BASE[b].select, groups = {}, frames = {}, rejected = 0;
+      var sel = F.BASE[b].select, groups = {}, frames = {}, rejected = 0, items = [];
       (samples || []).forEach(function (sm) {
         if (sm.excluded || !sm.frame) return;
         (sm.items || []).forEach(function (it) {
-          /* جمعیتِ قاب (frame.x_field، با `epi_backtest.js field`) جمعیتِ هر موردِ آن است — تعریفِ قاب پیش از سرانجام است، نه داوریِ موردی */
-          var f = it.f; if (sm.x_field && !(f && f.x_field)) { f = Object.assign({}, f || {}); f.x_field = sm.x_field; }
+          var f = F.frameItemF(sm, it);
           if (!matches(sel, f)) return;
           if (!F.sampleItemOk(it)) { rejected++; return; }
+          items.push(f);
           var g = sm.id + "/" + (it.grp || it.id); if (!(g in groups)) { groups[g] = it.truth; frames[sm.id] = 1; }
         });
       });
@@ -218,6 +241,41 @@
       var p = Math.min(100 - F.EPS, +(100 * (k + 1) / (n + 2)).toFixed(1));
       out[b] = { fa: F.BASE[b].fa, n: n, ok: k, frames: Object.keys(frames).length, rejected: rejected, p: p,
         lo: w ? +(w.lo * 100).toFixed(1) : null, hi: w ? +(w.hi * 100).toFixed(1) : null, measured: n > 0 };
+      seen[b] = items;
+    });
+    Object.keys(out).forEach(function (b) { var pr = F.precedence(b, seen[b], out, rules); if (pr) out[b].precede = pr; });
+    return out;
+  };
+  /* T_measured_precedence — ماشینی، بی فهرستِ دستی: برای پایهٔ جمعیتیِ سنجیدهٔ b (پایهٔ قاعده‌ای با قضیهٔ T_pop)، قاعده‌های سقفیِ «بی‌مرجح»
+     (قضیهٔ T_unknown، یا گونهٔ S با پایه‌ای که سنجیده نشده) که شرطشان (when) در «همهٔ» مواردِ شمرده‌شدهٔ قاب‌های b برقرار است. تقدم فقط برای
+     تصدیقی که راهِ رسیدنش (x_relay) همان راهِ همهٔ مواردِ قاب است و «نامعلوم» نیست. هر قاعدهٔ دیگر (موضوعِ دیگر، پایهٔ سنجیده) کنار نمی‌رود. */
+  F.precedence = function (b, items, measured, rules) {
+    var X = W.EPIX, R = rules || W.EPI_RULES || [];
+    if (!X || !X.cond || !measured[b] || !measured[b].measured || !items || !items.length) return null;
+    var isPop = Object.keys(F.DER).some(function (id) { return F.DER[id].th === "T_pop" && F.DER[id].base === b; });
+    if (!isPop) return null;
+    var rel = items[0].x_relay, relOk = items.every(function (f) { return f.x_relay === rel; }) && rel != null && rel !== "نامعلوم";
+    if (!relOk) return { relay: null, rules: [], why: "راهِ رسیدنِ مواردِ قاب (x_relay) یکسان و معلوم نیست ⇒ تقدم نیست" };
+    var list = R.filter(function (r) {
+      var d = F.DER[r.id]; if (r.eff !== "cap" || !d || d.th === "T_pop") return false;
+      var blind = d.th === "T_unknown" || (d.k === "S" && d.base && !(measured[d.base] && measured[d.base].measured));
+      return blind && items.every(function (f) { return X.cond(r.when, f); });
+    }).map(function (r) { return r.id; });
+    return { relay: rel, rules: list };
+  };
+  F.PRECEDE = {};   // b ⇒ {relay, rules} — اجراکنندهٔ بک‌تست هنگامِ سنجش پر می‌کند؛ صفحه از دفتر (foundation.base[b].precede) می‌خواند
+  F.precedeOf = function (b) {
+    var L = W.EPI_BT_LEDGER, B0 = L && L.foundation && L.foundation.base;
+    if (B0 && B0[b]) return B0[b].precede || null;
+    return F.PRECEDE[b] || null;
+  };
+  /* برای یک تصدیق: کدام قاعده‌های فعال جای خود را به قاعدهٔ T_pop ِ جمعیتش می‌دهند ⇒ { قاعده: قاعدهٔ جمعیت } */
+  F.yields = function (hit, f) {
+    var out = {}, ids = {}; (hit || []).forEach(function (r) { ids[r.id] = 1; });
+    (hit || []).forEach(function (p) {
+      var d = F.DER[p.id]; if (!d || d.th !== "T_pop") return;
+      var pr = F.precedeOf(d.base); if (!pr || !pr.relay || !f || f.x_relay !== pr.relay) return;
+      (pr.rules || []).forEach(function (rid) { if (ids[rid] && rid !== p.id && !out[rid]) out[rid] = p.id; });
     });
     return out;
   };

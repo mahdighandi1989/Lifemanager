@@ -65,10 +65,14 @@
   X.runClaim = function (k, cfg, R) {
     R = R || rulesFor(cfg); var f = k.f || {};
     var ceil = 100, bind = null, caps = [], fired = [], stScore = {};
-    R.forEach(function (r) {
-      if (!X.cond(r.when, f)) return;
+    var hit = R.filter(function (r) { return X.cond(r.when, f); });
+    /* T_measured_precedence (p_measured_precedence، مالک ۲۰۲۶-۱۰-۱۵): برای خواندنِ مستقیمِ یافته‌ای از جمعیتِ سنجیده، سقف‌های «بی‌مرجح» که شرطشان در
+       همهٔ اعضای قابِ همان جمعیت برقرار است جای خود را به نرخِ سنجیده (T_pop) می‌دهند — فهرست را ابزار از قاب‌ها ساخته (EPI_FOUND.precedeOf)، نه دست */
+    var FDy = W.EPI_FOUND, yl = FDy && FDy.yields ? FDy.yields(hit.filter(function (r) { return wOf(cfg, r) > 0; }), f) : {}, yielded = [];
+    hit.forEach(function (r) {
       var w = wOf(cfg, r); fired.push(r.id);
       if (w <= 0) return;
+      if (r.eff === "cap" && yl[r.id]) { yielded.push({ rule: r.id, to: yl[r.id] }); return; }
       if (r.eff === "cap") { var c = 100 - w * (100 - capOf(cfg, r, f)); caps.push([r, c]); if (c < ceil) { ceil = c; bind = r; } }
       else if (r.eff === "flag") stScore[r.st] = (stScore[r.st] || 0) + w;
     });
@@ -87,7 +91,9 @@
       if (r !== bind && past && !flags.some(function (y) { return y.st === r.st; })) flags.push({ st: r.st, kind: "over", rules: [r.id], gap: Math.round(conf - c) });
     });
     flags.sort(function (a, b) { return (PIDX[a.st] || 0) - (PIDX[b.st] || 0); });
-    return { id: k.id, ceil: Math.round(ceil), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
+    var out = { id: k.id, ceil: Math.round(ceil), bind: bind ? bind.id : null, fired: fired, flags: flags, over: over, conf: conf };
+    if (yielded.length) out.yielded = yielded;
+    return out;
   };
   X.runCase = function (cs, cfg) {
     var R = rulesFor(cfg);

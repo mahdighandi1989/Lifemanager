@@ -74,7 +74,9 @@
         h("p", { class: "small" }, "این‌ها در بدیهیات نیستند (مثلاً «یک ناقلِ ثقه چند بار درست می‌گوید»)؛ جزوه راهشان را «سنجشِ تطابق با واقعیات و اسناد» می‌داند (s52). تبدیلِ داده به عدد قضیه است: پس از k درست از n موردِ احرازشده، اعتبار = (k+1)÷(n+2) — بی‌هیچ داده درست ½ (همان «نمی‌دانیم»). شرط‌های درستیِ خودِ قضیه: (۱) نمونهٔ ", h("b", {}, "بی‌گزینش"), " از قابی از پیش معین، بی‌توجه به سرانجام؛ (۲) درستیِ هر مورد با سند/تواتر/حسِ کنترل‌شده احراز شده؛ (۳) هر ماجرا یک رأی؛ (۴) هرگز ۱۰۰ نمی‌شود. ناظرِ شبانه این نمونه‌ها را گردآوری می‌کند؛ هر جابه‌جایی با شاهدش در دفتر می‌ماند."),
         h("div", { class: "scrollx" }, h("table", { class: "wt" }, h("thead", {}, h("tr", {}, ["مقدارِ پایه", "مقدار", "موردِ احرازشده", "قاب"].map(function (x) { return h("th", {}, x); }))),
           h("tbody", {}, Object.keys(BS).map(function (k) { var b = BS[k];
-            return h("tr", { "data-base": k }, h("td", {}, b.fa), h("td", {}, fa(b.p) + "٪" + (b.measured ? "" : " (نمی‌دانیم)")),
+            var pr = b.precede && b.precede.rules && b.precede.rules.length ? b.precede : null;   // T_measured_precedence (ساختهٔ ابزار از قاب‌ها)
+            return h("tr", { "data-base": k }, h("td", {}, b.fa, pr ? h("div", { class: "small found-precede", dir: "rtl" }, "مقدم بر سقف‌های «بی‌مرجح»: " + pr.rules.join("، ") + " — فقط برای یافته‌ای که «" + pr.relay + "» خوانده شده (قضیهٔ T_measured_precedence)") : null),
+              h("td", {}, fa(b.p) + "٪" + (b.measured ? "" : " (نمی‌دانیم)")),
               h("td", {}, b.measured ? fa(b.ok) + " درست از " + fa(b.n) : "۰"), h("td", {}, fa(b.frames || 0))); }))))));
     }
     return box;

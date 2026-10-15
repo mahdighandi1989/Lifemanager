@@ -1,0 +1,15 @@
+{
+ "id": "h20261015094344966920-session-0468",
+ "at": "2026-10-15T09:43:44Z",
+ "by": "session",
+ "area": "epi-rules",
+ "owner": [
+  "owner"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_measured_precedence به دستورِ مالک ۲۰۲۶-۱۰-۱۵ («آره اثر هر دو جواب بررسی کن و ببین کدوم از بدیهیات اون مد نظر باشه»؛ قاعدهٔ ثابت: آنچه از بدیهیات برمی‌آید اعمال): قضیهٔ F.TH.T_measured_precedence (from A0–A4؛ uses T_pop/T_unknown/T_complete/T_weakest) در epi_found.js. هیچ قاعده، سقف یا DER عوض نشد. جوابِ A (ماندنِ سقف‌ها) تناقض است و جوابِ B (فقط r_naql_ahad) بی‌اثر؛ B″ قضیه است. یادداشت: docs/overhaul/handoff-notes/_pending_measured_precedence_2026-10-15.md — WORKLOG/PROGRESS/HANDBOOK(§10)/AUDIT_LOG با روتینِ بک‌تست.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md (اعمالِ قضیه به دستورِ مالک؛ مسیرِ ۲: برهان از اصولِ موجود)",
+ "commit": "",
+ "status": "open"
+}

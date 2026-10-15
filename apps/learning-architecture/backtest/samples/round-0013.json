@@ -623,6 +623,12 @@
    "at": "2026-10-15",
    "by": "session (Claude Code) — اعمالِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵",
    "why": "تعریفِ خودِ قاب (پیش از سرانجام): «all 18 between-subject laboratory experimental papers published in the AER and QJE in 2011-2014» — نگاشتِ همین قاب در amend.feature.encode."
+  },
+  "x_relay": "مستقیم از خودِ منتشرشده",
+  "x_relay_set": {
+   "at": "2026-10-15",
+   "by": "session",
+   "why": "تعریفِ قاب (پیش از سرانجام): «the most important statistically significant finding as emphasized by the original authors» ِ هر ۱۸ مقالهٔ AER/QJE — عضوِ قاب خودِ یافتهٔ منتشرشدهٔ مقاله است، نه بازگوییِ واسطه‌ای از آن؛ درستی (تکرار) دربارهٔ همان یافته سنجیده شده."
   }
  },
  {
@@ -3664,6 +3670,12 @@
    "at": "2026-10-15",
    "by": "session (Claude Code) — اعمالِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵",
    "why": "تعریفِ خودِ قاب (پیش از سرانجام): replications of studies from articles published in 2008 in Psychological Science, JPSP and JEP:LMC — frame.population همین است."
+  },
+  "x_relay": "مستقیم از خودِ منتشرشده",
+  "x_relay_set": {
+   "at": "2026-10-15",
+   "by": "session",
+   "why": "تعریفِ قاب (پیش از سرانجام): «the key effect of each [2008 PS/JPSP/JEP:LMC article] was fixed in a pre-registered protocol» — عضوِ قاب اثرِ کلیدیِ خودِ مقالهٔ منتشرشده است؛ درستی (تکرار) دربارهٔ همان اثر سنجیده شده، نه دربارهٔ بازگوییِ کسی از آن."
   }
  },
  {
@@ -4391,6 +4403,12 @@
    "at": "2026-10-15",
    "by": "session (Claude Code) — اعمالِ p_base_expert_method/amend-field به دستورِ مالک ۲۰۲۶-۱۰-۱۵",
    "why": "تعریفِ خودِ قاب (پیش از سرانجام): ALL experimental social-science studies published in Nature and Science 2010-2015 meeting five pre-stated criteria — frame.population همین است."
+  },
+  "x_relay": "مستقیم از خودِ منتشرشده",
+  "x_relay_set": {
+   "at": "2026-10-15",
+   "by": "session",
+   "why": "تعریفِ قاب (پیش از سرانجام): همهٔ آزمایش‌های علومِ اجتماعیِ Nature/Science ۲۰۱۰–۲۰۱۵ با «a reported significant effect» — عضوِ قاب اثرِ گزارش‌شده در خودِ مقالهٔ منتشرشده است؛ درستی (تکرار) دربارهٔ همان اثر سنجیده شده."
   }
  }
 ]

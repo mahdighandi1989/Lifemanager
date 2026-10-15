@@ -72,7 +72,7 @@ chk(T.validate(Object.assign({}, cs.find(c => c.tier === 'real' && c.src), { sam
   chk(/۰/.test(await p.locator('main .found-conv .bt-num').innerText()), 'page shows zero conventional numbers');
   await p.evaluate(() => APP.go('e_bt', null, 'live')); await p.waitForTimeout(200);
   info.props = await p.evaluate(() => [...document.querySelectorAll('main .bt-proposal')].map(x => x.dataset.id + (x.classList.contains('superseded') ? '*' : '')));
-  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === 5, 'superseded proposal marked, foundation proposals listed ' + info.props);
+  chk(info.props.indexOf('p_tajrobe_none*') >= 0 && info.props.indexOf('p_found_vazraf') >= 0 && await p.locator('main .bt-applied').count() === require(path.join(__dirname, '..', 'backtest', 'proposals.json')).proposals.filter(x => x.applied).length, 'superseded proposal marked, foundation proposals listed ' + info.props);
   await p.click('main .bt-proposal[data-id="p_found_half"] button:has-text("مبنایش")'); await p.waitForTimeout(150);
   chk(await p.locator('main .found-rules').count() === 1, 'proposal links to its foundation');
   await p.setViewportSize({ width: 390, height: 800 }); await p.waitForTimeout(150);

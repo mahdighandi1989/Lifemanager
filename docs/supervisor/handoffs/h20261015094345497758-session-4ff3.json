@@ -1,0 +1,15 @@
+{
+ "id": "h20261015094345497758-session-4ff3",
+ "at": "2026-10-15T09:43:45Z",
+ "by": "session",
+ "area": "epi-backtest",
+ "owner": [
+  "backtest"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "p_measured_precedence: ورودی در proposals.json (سخنِ مالک، تحلیلِ جواب‌های A، B و B″، عددهای موتور روی ۱۳۶ عضوِ قاب‌ها، applied و decision). epi_backtest.js: فرمانِ relay (setFields عمومی برای x_field/x_relay، relayErrors در validateFrame)، و applyBase که EPI_FOUND.PRECEDE را پر می‌کند. foundation.json با run --rerun (precede برای هر پایهٔ جمعیتی). آزمونِ تازه: tests/test_measured_precedence.js. test_found.js: شمارِ پیشنهادهای اعمال‌شده از proposals.json خوانده می‌شود.",
+ "procedure": "docs/supervisor/BACKTEST_PROMPT.md#گام‌ها (بندِ ۶: پیشنهاد/تصمیمِ مالک)",
+ "commit": "",
+ "status": "open"
+}
