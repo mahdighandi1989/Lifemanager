@@ -76,6 +76,7 @@
     /* حدسِ پیش از حل (شبیه‌ساز): اطمینان به حدسِ خودم ↔ «درست بود/نادرست بود» — همان داده‌ای که کارنامه در کالیبراسیون می‌خواند (L7) */
     S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
       Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || conf01(g.conf) == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;
+        if (g.from === "live") { fc(conf01(g.conf), g.hit === "درست بود", g.hitAt || g.at, "eprog-live"); return; }   // حدسِ مسئلهٔ زنده با واقعیت داوری می‌شود ⇒ پیش‌بینیِ رویداد
         add("META", { at: g.hitAt || g.at, ok: g.hit === "درست بود", conf: g.conf }, "eprog"); });
     });
     S.all("case", function (c) { return !c.sample; }).forEach(function (cs) {

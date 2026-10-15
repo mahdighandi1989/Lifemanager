@@ -85,6 +85,9 @@
     var all = S.all("fcast").sort(function (a, b) { return String(a.due || "").localeCompare(String(b.due || "")); }), br = A.fcastBrier(all);
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "پیش‌بینی‌ها (" + fa(all.length) + ")" + (br ? " · Brier = " + fa(br.brier) + " از " + fa(br.n) + " نتیجه" : "")),
       all.length ? h("ul", { class: "plain" }, all.map(function (x) {
+        /* پیش‌بینیِ گامِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»: نتیجه را خودِ گام ثبت می‌کند (شد/نشد/تاحدی/انجام نشد) — این‌جا فقط نشان داده و به گام پیوند داده می‌شود تا دو جا ناهم‌خوان نشوند */
+        if (x.live && x.live.pid) return h("li", { class: "row gap wrap fc-live", dir: "rtl" }, h("span", {}, x.q + " — " + fa(x.p) + "٪ · موعد " + A.fdate(x.due)),
+          h("span", { class: "chip fc-liveout" }, x.outcome || "— هنوز —"), h("button", { class: "btn ghost sm fc-golive", type: "button", onclick: function () { A.go("lprob", x.live.pid, "exec"); } }, "🔭 نتیجه در گامِ همان مسئله"));
         return h("li", { class: "row gap wrap" }, h("span", {}, x.q + " — " + fa(x.p) + "٪ · موعد " + A.fdate(x.due)),
           h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = new Date().toISOString(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || "— هنوز —"); })));
       })) : h("p", { class: "small muted" }, "هنوز پیش‌بینی‌ای ثبت نشده.")));
@@ -148,7 +151,8 @@
     A.dueList = function () {
       var items = raw.apply(this, arguments) || [], t = A.today();
       S.all("wchain", function (c) { return c.due && c.due <= t && !c.outcome; }).forEach(function (c) { items.push({ k: "p", txt: "⛓ نتیجهٔ واقعیِ «" + c.title + "» را ثبت کن", sub: "حسِ اولت " + (c.feel == null ? "—" : fa(c.feel) + "٪") + " بود", go: function () { A.go("chain", c.id); } }); });
-      var fc = S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome; });
+      /* پیش‌بینیِ گامِ «مسئلهٔ حل‌نشدهٔ خودم» (x.live) در سطرِ خودِ همان مسئله می‌آید و همان‌جا نتیجه می‌گیرد — دو بار پرسیده نمی‌شود */
+      var fc = S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome && !x.live; });
       if (fc.length) items.push({ k: "p", txt: "🎯 " + fa(fc.length) + " پیش‌بینی به موعد رسیده — شد یا نشد؟", sub: fc.slice(0, 2).map(function (x) { return x.q; }).join(" · "), go: function () { A.go("fcast"); } });
       var lm = S.all("meaning").map(function (m) { return m.date; }).sort().pop();
       if ((S.all("value").length || lm) && (!lm || A.daysBetween(lm, t) >= 30)) items.push({ k: "p", txt: "🧭 وارسیِ ماهانهٔ معنا", sub: lm ? "آخرین بار " + A.fdate(lm) : "نخستین وارسی", go: function () { A.go("vals"); } });

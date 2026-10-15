@@ -67,7 +67,8 @@
     /* حدسِ پیش از حل (شبیه‌ساز، سطحِ ۳–۴): اطمینان ↔ «درست بود/نادرست بود» با پاسخِ معلومِ مسئله ⇒ فقط کالیبراسیونِ حلِ مسئله، نه دقت («تاحدی» بیرون) */
     S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
       Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
-        var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at }); });
+        /* حدسِ «🔭 مسئلهٔ حل‌نشدهٔ خودم» با واقعیت داوری می‌شود، نه با پاسخِ معلوم ⇒ پیش‌بینیِ رویداد (fc)، نه اطمینان به پاسخ */
+        var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at, fc: g.from === "live" || undefined }); });
     });
     /* کارت‌های مرور: نمره را خودِ کاربر می‌دهد ⇒ خودسنجی؛ مثلِ «خودم سنجیدم» ِ گره‌ها بیرون از دقت/اطمینان/ماندگاری، جدا شمرده می‌شود (M6) */
     D.s_learn.cardSelf = { n: 0, k: 0 };
@@ -92,7 +93,9 @@
       var p = c.feel / 100, ok = c.outcome === "رخ داد"; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due, fc: true }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok });
     });
     S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) {
-      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
+      /* پیش‌بینیِ رویداد فقط کالیبراسیونِ پیش‌بینی است، نه «دقتِ پاسخ» (بازبینیِ ۲۰۲۶-۱۰-۱۵ ِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»): «طرفِ محتمل‌تر رخ داد» پاسخِ
+         درست به پرسشی نیست؛ همین برای همهٔ دفترِ پیش‌بینی برقرار است، پس دیگر به X.ans نمی‌رود */
+      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true });
     });
     // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
     S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + (function () { var no = it.filter(function (x) { return x.self === "بلد نیستم"; }).length, half = it.filter(function (x) { return x.self === "نیمه"; }).length; return "از " + it.length + ": " + no + " نبود" + (half ? "، " + half + " نیمه" : ""); })(), st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
