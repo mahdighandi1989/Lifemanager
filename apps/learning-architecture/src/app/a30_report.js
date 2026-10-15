@@ -25,6 +25,8 @@
     // متنِ وارسی‌کنندهٔ برگه شناسهٔ نما و اصطلاحِ فنی دارد (کارزارِ سوم v02: «view:negprep»، «VIEW_META»، «رجیستریِ حوزه» در ایمیل)
     t = t.replace(/\bview:([a-z][a-z0-9_]*)\b/g, function (m0, v) { var M = A.VIEW_META && A.VIEW_META[v], nv = (A.NAV || []).concat(A.EPI_NAV || []).filter(function (n) { return Array.isArray(n) && n[0] === v; })[0]; return nv ? "نمای «" + nv[1] + "»" : M ? "نمای «" + String(M.what || "").split(/[:،.]/)[0] + "»" : "یک نمای صفحه"; });
     t = t.replace(/\bVIEW_META\b/g, "توضیحِ نما برای دستیار").replace(/رجیستری(?:ِ)?/g, "فهرستِ ثبتِ").replace(/\b(?:APP|A)\.[A-Za-z_.]+/g, "").replace(/\b[a-z]+_[a-z0-9_]+\.js\b/g, "کدِ صفحه");
+    // شمارهٔ بخشِ جزوه یا دفترچه («(§۸)»، «§6») برای مالک معنا ندارد (کارزارِ v07: «قلمرو معرفت‌شناسی (§۸)» در ایمیل)
+    t = t.replace(/\s*\(?§\s*[0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?\)?/g, "");
     return t.replace(/\s{2,}/g, " ");
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };

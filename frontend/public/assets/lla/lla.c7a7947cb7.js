@@ -32534,7 +32534,7 @@ APP.goFromURL = function (q) {
       var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
     });
     // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
-    S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + it.filter(function (x) { return x.self === "بلد نیستم" || x.self === "نیمه"; }).length + " از " + it.length + " نبود", st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
+    S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + (function () { var no = it.filter(function (x) { return x.self === "بلد نیستم"; }).length, half = it.filter(function (x) { return x.self === "نیمه"; }).length; return "از " + it.length + ": " + no + " نبود" + (half ? "، " + half + " نیمه" : ""); })(), st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
     S.all("eprob", function (p) { return !p.sample; }).forEach(function (p) { D.s_problem.items.push({ t: "prob", id: p.id, fa: (p.p && p.p.title) || "مسئله", st: p.status, at: p.created }); });
     /* شاخص‌ها */
     dims.forEach(function (dd) {
@@ -32841,6 +32841,8 @@ APP.goFromURL = function (q) {
     // متنِ وارسی‌کنندهٔ برگه شناسهٔ نما و اصطلاحِ فنی دارد (کارزارِ سوم v02: «view:negprep»، «VIEW_META»، «رجیستریِ حوزه» در ایمیل)
     t = t.replace(/\bview:([a-z][a-z0-9_]*)\b/g, function (m0, v) { var M = A.VIEW_META && A.VIEW_META[v], nv = (A.NAV || []).concat(A.EPI_NAV || []).filter(function (n) { return Array.isArray(n) && n[0] === v; })[0]; return nv ? "نمای «" + nv[1] + "»" : M ? "نمای «" + String(M.what || "").split(/[:،.]/)[0] + "»" : "یک نمای صفحه"; });
     t = t.replace(/\bVIEW_META\b/g, "توضیحِ نما برای دستیار").replace(/رجیستری(?:ِ)?/g, "فهرستِ ثبتِ").replace(/\b(?:APP|A)\.[A-Za-z_.]+/g, "").replace(/\b[a-z]+_[a-z0-9_]+\.js\b/g, "کدِ صفحه");
+    // شمارهٔ بخشِ جزوه یا دفترچه («(§۸)»، «§6») برای مالک معنا ندارد (کارزارِ v07: «قلمرو معرفت‌شناسی (§۸)» در ایمیل)
+    t = t.replace(/\s*\(?§\s*[0-9۰-۹]+(?:[.٫][0-9۰-۹]+)?\)?/g, "");
     return t.replace(/\s{2,}/g, " ");
   }
   R.human = function (s, x) { var o = CUR; CUR = s; try { return human(x); } finally { CUR = o; } };

@@ -83,7 +83,7 @@
       var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due }); X.ans.push({ at: x.outcomeAt || x.due, ok: (p >= 0.5) === ok });
     });
     // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
-    S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + it.filter(function (x) { return x.self === "بلد نیستم" || x.self === "نیمه"; }).length + " از " + it.length + " نبود", st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
+    S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + (function () { var no = it.filter(function (x) { return x.self === "بلد نیستم"; }).length, half = it.filter(function (x) { return x.self === "نیمه"; }).length; return "از " + it.length + ": " + no + " نبود" + (half ? "، " + half + " نیمه" : ""); })(), st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
     S.all("eprob", function (p) { return !p.sample; }).forEach(function (p) { D.s_problem.items.push({ t: "prob", id: p.id, fa: (p.p && p.p.title) || "مسئله", st: p.status, at: p.created }); });
     /* شاخص‌ها */
     dims.forEach(function (dd) {
