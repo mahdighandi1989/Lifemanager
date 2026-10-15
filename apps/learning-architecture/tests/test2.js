@@ -60,7 +60,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // concerns & map flow & technique source
   await page.evaluate(() => APP.go('concerns', 'c21')); if (!(await page.locator('#cc_c24').count())) errors.push('new concerns missing');
   await page.evaluate(() => APP.go('map'));
-  await page.evaluate(() => APP.go('tech', 28, 'do')); if (!(await page.locator('.srcsec').count())) errors.push('source section missing'); if (!(await page.locator('details.gen').count())) errors.push('gen example missing');
+  await page.evaluate(() => APP.go('tech', 28, 'do')); if (!(await page.locator('.srcsec').count())) errors.push('source section missing'); if (await page.locator('details.gen').count()) errors.push('market/bank example should be hidden by default');
+  await page.evaluate(() => { const st = APP.S.settings(); st.showMarketEx = true; APP.S.saveSettings(st); APP.go('tech', 28, 'do'); }); if (!(await page.locator('details.gen').count())) errors.push('gen example missing (setting on)');
+  await page.evaluate(() => { const st = APP.S.settings(); st.showMarketEx = false; APP.S.saveSettings(st); });
   await page.evaluate(() => APP.go('tech', 40, 'und'));
   // pipeline status
   const ps = await page.evaluate(() => { const t = APP.S.all('topic', x => !x.sample)[0]; const s = APP.pipelineStatus(t); return ['S1','S4','S5','S7','S8','S9'].map(k => k + ':' + s[k]).join(' '); });

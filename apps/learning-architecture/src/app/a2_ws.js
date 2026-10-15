@@ -285,7 +285,7 @@
   };
   FIELD.graph = function (f, d, ch, id) {
     var prev = h("div", { class: "gprev" });
-    var ta = h("textarea", { id: id, rows: 7, class: "mono", placeholder: f.h || "قیمت -> فاصله استاپ : ATR\nنوسان +> فاصله استاپ\nفاصله استاپ !> تعداد خروج زودهنگام", oninput: function (e) { d[f.k] = e.target.value; up(); ch(); } });
+    var ta = h("textarea", { id: id, rows: 7, class: "mono", placeholder: f.h || "دما -> حجمِ آب : انبساط\nیخ زدن +> حجم\nحجم !> چگالی", oninput: function (e) { d[f.k] = e.target.value; up(); ch(); } });
     ta.value = d[f.k] || "";
     var up = A.debounce(function () { prev.innerHTML = ""; prev.appendChild(A.renderGraph(ta.value)); }, 250);
     prev.appendChild(A.renderGraph(ta.value));
