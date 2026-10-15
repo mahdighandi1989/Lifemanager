@@ -22,10 +22,10 @@ const sha = o => crypto.createHash('sha256').update(JSON.stringify(o)).digest('h
    به‌روز ۲۰۲۶-۱۰-۱۴ (WORKLOG (34)): «conf: 60» ِ cs_pb_flt_numeric/k2 برداشته شد — عددِ ساختهٔ سامانه بود، نه مستند (یافتهٔ f_cs_pb_flt_numeric).
    به‌روز ۲۰۲۶-۱۰-۱۵ (روتینِ بک‌تست در نشستِ اصلی به دستورِ مالک؛ WORKLOG ِ صفحه (63)): رمزگذاریِ کورِ دوبارهٔ پیکره با ویژگی‌های تازه (form، chain، member،
    x_method/x_comp، x_conseq_*، فقط خانهٔ خالی؛ دو رمزگذارِ کورِ جدا + بازبینِ مستقل؛ دفتر: backtest/reviews/recode-2026-10-15-corpus.json) روی تصدیق‌های cases؛
-   هیچ مقدارِ موجودی عوض نشد. PROTECTED_SHA هم فقط به‌خاطرِ همین cases (که در نمای محافظت‌شده هست) عوض شد.
+   هیچ مقدارِ موجودی عوض نشد؛ آزمونِ نشت (داستانِ پیراسته) سپس x_conseq_* ِ cs_pb_semm_handwash را برداشت. PROTECTED_SHA هم فقط به‌خاطرِ همین cases (که در نمای محافظت‌شده هست) عوض شد.
    هر تغییرِ بعدیِ cases فقط از همین مسیر (یافته ⇒ تشخیص ⇒ اصلاح، با ثبت در WORKLOG) و با به‌روزکردنِ همین هش‌ها. */
-const CASES_SHA = 'eec2ff6611993a701bec4ea2b5d6e1f5968506bcf1f3f97adfbf8db0a6c89e41';
-const PROTECTED_SHA = 'be33774a7ca90d2196e14242112a151f85864edd0c4da0293ce596126b303878';
+const CASES_SHA = '09895a3120c58bfce4a0007077f6bcdafb4adc5f916bd70aeab8f3d1ac558d12';
+const PROTECTED_SHA = '37004a1c19199284c7a5692eb69359d3786405da351452a60fbee698d346022d';
 const IDS = 'pb_flt,pb_fourcolor,pb_poincare,pb_quintic,pb_greek,pb_parallel,pb_longitude,pb_semmelweis';
 
 function protectedView(list) {
