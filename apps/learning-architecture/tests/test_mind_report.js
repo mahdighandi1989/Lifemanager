@@ -59,7 +59,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.mind.emptyOk, 'no data ⇒ no score anywhere («دادهٔ کم»)');
   chk(info.mind.dims === 7 && info.mind.rows === 7 && info.mind.svgs >= 5, 'seven dimensions, a report row each, five charts: ' + JSON.stringify(info.mind));
   chk(info.mind.someScore && info.mind.epiLow, 'scores only where ≥5 samples exist (epistemic has 2 ⇒ none): ' + JSON.stringify(info.mind));
-  chk(/returned/.test(info.mind.black) && /stale/.test(info.mind.black), 'black spots: returned and long-open knots: ' + info.mind.black);
+  chk(/returned/.test(info.mind.black) && /stale/.test(info.mind.black), 'black spots: returned knots and open knots whose own practice is overdue: ' + info.mind.black);
   chk(info.mind.png && info.mind.events > 5 && info.mind.noIQ, 'PNG for e-mail, a timeline, and no IQ number');
   // ممیزیِ اجرا ۲۰۲۶-۱۰-۱۵: موقعیت‌ها در نقشهٔ کامل، پیش‌نیاز و تور در شبکه، راه به معرفت‌شناسی و گرافِ مشترک، و تازه‌شدنِ زنده
   info.mind2 = await p.evaluate(async () => {

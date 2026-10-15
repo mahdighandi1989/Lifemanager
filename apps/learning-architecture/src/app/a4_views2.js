@@ -340,20 +340,21 @@
       area.innerHTML = "";
       if (i >= cards.length) { area.appendChild(h("div", { class: "card done" }, h("h3", {}, "تمام شد"), h("p", {}, fa(cards.length) + " کارت مرور شد."), h("button", { class: "btn", onclick: function () { A.go("review", null, "calib"); } }, "دیدن کالیبراسیون"))); return; }
       var c = cards[i], tp = c.topic && S.get(c.topic);
-      var conf = 60, preConf = null;  // اطمینانِ پیش از دیدنِ پاسخ؛ پس از «نمایش پاسخ» قفل می‌شود (کالیبراسیونِ صادق)
+      var conf = 60, preConf = null, touched = false;  // اطمینانِ پیش از دیدنِ پاسخ؛ پس از «نمایش پاسخ» قفل می‌شود (کالیبراسیونِ صادق)
+      /* اسلایدرِ دست‌نخورده «اطمینانِ اعلام‌شده» نیست ⇒ null (بازبینیِ ۲۰۲۶-۱۰-۱۵، M7) */
       var att = h("textarea", { id: "rvAtt", rows: 3, placeholder: "پاسخت را از حافظه بنویس (حتی ناقص)." });
-      var co = h("output", {}, fa(conf) + "٪");
-      var slider = h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { if (preConf != null) { e.target.value = preConf; return; } conf = +e.target.value; co.textContent = fa(conf) + "٪"; } });
+      var co = h("output", {}, "— (حرکتش بده تا ثبت شود)");
+      var slider = h("input", { id: "rvConf", type: "range", min: 0, max: 100, step: 10, value: conf, oninput: function (e) { if (preConf != null || slider.disabled) { e.target.value = preConf != null ? preConf : conf; return; } touched = true; conf = +e.target.value; co.textContent = fa(conf) + "٪"; } });
       var back = h("div", { class: "back hidden" });
       var grades = h("div", { class: "grades hidden" }, [[0, "اصلاً یادم نبود"], [1, "اشتباه"], [2, "اشتباه اما آشنا"], [3, "درست، با زحمت زیاد"], [4, "درست، با کمی تردید"], [5, "آسان و کامل"]].map(function (g) {
-        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], preConf == null ? conf : preConf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
+        return h("button", { class: "btn g" + g[0], onclick: function () { A.srsGrade(c, g[0], preConf); c.lastAtt = att.value; S.put(c); i++; show(); } }, fa(g[0]) + " · " + g[1]);
       }));
       area.appendChild(h("div", { class: "card flash" },
         h("div", { class: "row between wrap small muted" }, h("span", {}, "کارت " + fa(i + 1) + " از " + fa(cards.length)), h("span", {}, (c.tid ? "تکنیک " + fa(c.tid) + " · " : "") + (tp ? tp.title : ""))),
         h("div", { class: "q" }, c.q),
         h("label", { for: "rvAtt", class: "small" }, "پاسخ تو"), att,
         h("div", { class: "scale" }, h("label", { for: "rvConf", class: "small" }, "اطمینان"), slider, co),
-        h("button", { class: "btn", onclick: function (e) { preConf = conf; slider.disabled = true; slider.setAttribute("aria-disabled", "true"); co.textContent = fa(preConf) + "٪ (پیش از دیدنِ پاسخ ثبت شد)"; back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
+        h("button", { class: "btn", onclick: function (e) { preConf = touched ? conf : null; slider.disabled = true; slider.setAttribute("aria-disabled", "true"); co.textContent = preConf != null ? fa(preConf) + "٪ (پیش از دیدنِ پاسخ ثبت شد)" : "اطمینانی گفته نشد (در کالیبراسیون نمی‌آید)"; back.classList.remove("hidden"); grades.classList.remove("hidden"); e.target.remove(); } }, "نمایش پاسخ"),
         back, grades));
       back.appendChild(h("div", { class: "small muted" }, "پاسخ:")); back.appendChild(h("div", { class: "a" }, c.a));
     }

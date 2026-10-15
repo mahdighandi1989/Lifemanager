@@ -41,7 +41,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const own = [...document.querySelectorAll('#main .psy-q input, #main .psy-q button')];
     out.ownOnly = own.length >= 3 && own.every(x => x.getAttribute('data-own') === '1');
     document.querySelectorAll('#main input[type=radio]')[[...document.querySelectorAll('#main input[type=radio]')].findIndex(x => x.getAttribute('aria-label') === '۱۶')].click();
-    const ci = document.querySelector('#main input[type=number]'); ci.value = '90'; ci.dispatchEvent(new Event('input', { bubbles: true }));
+    const ci = document.querySelector('#main input[aria-label="درصدِ اطمینان"]'); ci.value = '90'; ci.dispatchEvent(new Event('input', { bubbles: true }));
     [...document.querySelectorAll('#main button')].find(x => /ثبتِ پاسخ/.test(x.textContent)).click();
     await new Promise(r => setTimeout(r, 200));
     const a = S.all('psyans'); out.saved = a.length === 1 && a[0].ok === true && a[0].conf === 90;
@@ -64,14 +64,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     S.put({ id: 'pa5', type: 'psyans', item: 'b1', ok: true, at: new Date().toISOString() });
     out.guess = P.scaleEst('sA').theta < P.scaleEst('sB').theta + 1 && P.scaleEst('sA').sdTheta > 0;
     out.descNoTheta = !P.isAnchor(P.item('d1'));
-    APP.go('psy_item', 'd1'); await new Promise(r => setTimeout(r, 120));
+    const yday = () => S.all('psyans').forEach(a => { a.at = APP.addDays(APP.today(), -1) + 'T12:00:00'; S.put(a); });   // روزی یک معما (بازبینیِ ۲۰۲۶-۱۰-۱۵، M2): پاسخ‌های پیشین به دیروز
+    yday(); APP.go('psy_item', 'd1'); await new Promise(r => setTimeout(r, 120));
     document.querySelectorAll('#main .psy-q input[type=radio]')[1].click();
     let toastTxt = ''; const ot = APP.toast; APP.toast = m => { toastTxt = m; };
     [...document.querySelectorAll('#main button')].find(x => /ثبتِ پاسخ/.test(x.textContent)).click(); APP.toast = ot;
     out.descMsg = /۳۱٪ ِ بزرگسالانِ ۳۰ تا ۴۹ سالهٔ نمونه درست جواب دادند/.test(toastTxt);
     // زمانِ مرجع: پایانِ زمان ⇒ «وقت تمام شد»، نادرست
     window.PSY_NORMS.items.push({ id: 't1', scale: 'sA', construct: 'Gf', text: 'زمان‌دار', options: [{ t: 'x' }, { t: 'y' }], answer: 0, b: 0, time_limit_s: 1 });
-    APP.go('psy_item', 't1'); await new Promise(r => setTimeout(r, 1500));
+    yday(); APP.go('psy_item', 't1'); await new Promise(r => setTimeout(r, 1500));
     const tr = S.all('psyans').find(a => a.item === 't1'); out.timeout = !!tr && tr.timeout === true && tr.ok === false;
     // کارنامه: بی «نمره/مرحله»؛ بخشِ استاندارد؛ ضریبِ کل ساخته نمی‌شود؛ سازه‌های سنجیده‌نشدنی صریح
     APP.go('mind'); await new Promise(r => setTimeout(r, 300));
