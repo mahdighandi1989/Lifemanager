@@ -81,8 +81,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ۵) نمونه‌ها روشن ⇒ ۲۰ مسئلهٔ کوتاه در شبیه‌ساز و هر حرکتِ تازه در ≥ ۳ گام */
     await p.evaluate(() => { const st = APP.S.settings(); st.samples = true; APP.S.saveSettings(st); });
     info.stages = await p.evaluate(NEWMV => { const o = {}; NEWMV.forEach(m => { o[m] = APP.moveStages(m).length; }); return { per: o, book: APP.probs().filter(x => x.set === 'book4').length, neutral: APP.probs().filter(APP.probNeutralSample).length }; }, NEWMV);
-    chk(info.stages.book === 20 && info.stages.neutral === 20 && NEWMV.every(m => info.stages.per[m] >= 3), 'practice problems / tags ' + JSON.stringify(info.stages));
-    info.valid = await p.evaluate(() => APP.probs().filter(x => x.set === 'book4').map(x => { try { APP.probValid(JSON.parse(JSON.stringify(x))); return null; } catch (e) { return x.id + ': ' + e.message.slice(0, 120); } }).filter(Boolean));
+    chk(info.stages.book === 20 && info.stages.neutral === 26 && NEWMV   /* R3: + ۶ مسئلهٔ «practice» ِ خنثی */.every(m => info.stages.per[m] >= 3), 'practice problems / tags ' + JSON.stringify(info.stages));
+    info.valid = await p.evaluate(() => APP.probs().filter(x => x.set === 'book4' || x.set === 'practice').map(x => { try { APP.probValid(JSON.parse(JSON.stringify(x))); return null; } catch (e) { return x.id + ': ' + e.message.slice(0, 120); } }).filter(Boolean));
     chk(!info.valid.length, 'validP rejects practice problems: ' + JSON.stringify(info.valid));
     // تمرینِ درهم: پس از پاسخ، پرسشِ همان حرکت
     await go('move', 'mv_symmetry'); await p.click('main .mv-start'); await p.waitForTimeout(80);
@@ -127,8 +127,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(info.due2 === 1, 'sim step due in today');
     await go('home'); await p.click('main .duel .dueb:has-text("گامِ شبیه‌ساز")'); await p.waitForTimeout(150);
     chk(await p.evaluate(() => APP.state.view + ':' + APP.state.arg) === 'e_prob:pb_p4_invoice', 'today row opens the simulator step');
-    info.rec = await p.evaluate(() => { const b = APP.simSpaceRecord('pb_p4_invoice', 'udc', true).iv; const c = APP.simSpaceRecord('pb_p4_invoice', 'udc', true).iv; return [b, c]; });
-    chk(info.rec.join() === '1,3', 'simSpaceRecord ladder ' + info.rec);
+    // R3 (۲۰۲۶-۱۰-۱۵): پاسخِ درست از پلهٔ بعد از «فردا» آغاز می‌شود (گامِ درست فردا برنمی‌گردد)؛ نادرست ⇒ فردا
+    info.rec = await p.evaluate(() => { const b = APP.simSpaceRecord('pb_p4_invoice', 'udc', true).iv; const c = APP.simSpaceRecord('pb_p4_invoice', 'udc', true).iv; const d = APP.simSpaceRecord('pb_p4_invoice', 'udc', false).iv; return [b, c, d]; });
+    chk(info.rec.join() === '3,7,1', 'simSpaceRecord ladder ' + info.rec);
 
     /* ۸) ت۶: «گیر کردم» ِ شبیه‌ساز ⇐ موقعیت ⇐ نردبانِ گره‌گشا؛ پلهٔ ۴ با پرسش‌های طرح‌ریزیِ چرخان؛ بازنگری پس از «باز شد» */
     await p.evaluate(() => { APP.simState = { pid: 'pb_p4_roots', lv: 1, order: 'hist', i: 0 }; APP.go('e_prob', 'pb_p4_roots', 'sim'); }); await p.waitForTimeout(100);

@@ -61,7 +61,7 @@
     S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist); });
     /* حدسِ پیش از حل (شبیه‌ساز، سطحِ ۳–۴): اطمینان ↔ «درست بود/نادرست بود» با پاسخِ معلومِ مسئله ⇒ فقط کالیبراسیونِ حلِ مسئله، نه دقت («تاحدی» بیرون) */
     S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
-      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;
+      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
         var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at }); });
     });
     /* کارت‌های مرور: اطمینان پیش از دیدنِ پاسخ (c) و نمرهٔ یادآوری (g ≥ ۳ = درست) ⇒ یادگیری و حافظه */

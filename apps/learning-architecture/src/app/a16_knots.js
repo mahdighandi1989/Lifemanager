@@ -797,6 +797,21 @@
 
   /* ---------- ثبت ---------- */
   var SHOWN_SAFE = {};
+  /* قابِ مسئلهٔ عملی — یک وارسیِ کدی برای دو جا (ثبتِ موقعیت در گره‌گشا، و لایهٔ «مسئلهٔ عملی» ِ غربالِ دستیار): هر جزء نوشته شده و
+     هیچ جزئی رونوشتِ جزءِ دیگر نیست. عددِ قراردادی (کمینهٔ واژه) ندارد: «نوشته» یعنی ناخالی. */
+  var PRAC_KEYS = [["want", "مجهول (چه می‌خواهی)"], ["have", "داده‌ها"], ["cond", "شرط (قیدها)"], ["vague", "مفهومِ مبهم"], ["ignore", "دادهٔ کنارگذاشته و حدِ جست‌وجو"], ["approx", "تقریبِ کافی"]];
+  A.KPRAC_KEYS = PRAC_KEYS;
+  function pnorm(x) { return String(x == null ? "" : x).replace(/[\s\u200c«»"'.,،:؛!?؟()\-]+/g, ""); }
+  A.practicalFrameCheck = function (parts, keys) {
+    parts = parts || {}; var missing = keys.filter(function (k) { return !pnorm(parts[k[0]]); }), seen = {}, dup = [];
+    keys.forEach(function (k) { var n = pnorm(parts[k[0]]); if (!n) return; if (seen[n]) dup.push(k[1]); else seen[n] = 1; });
+    return { ok: !missing.length && !dup.length, missing: missing, dup: dup };
+  };
+  A.practicalFrameCard = function (title, rows, src) {
+    if (!A.newCard) return null;
+    return A.newCard("قابِ مسئلهٔ عملیِ «" + String(title).slice(0, 80) + "»: بی‌نگاه بگو مجهول، داده، شرط، مفهومِ مبهم، دادهٔ کنارگذاشته (و حدِ اطلاعات) و تقریبِ کافی چه بود — و همین شش پرسش را برای تصمیمِ بعدی‌ات بپرس.",
+      rows.map(function (r) { return r[0] + ": " + r[1]; }).join("\n"), { due: A.addDays(A.today(), 1), src: src });
+  };
   function intakeStep(H) {
     var kc = H.kc, it = kc.intake;
     var box = h("div", { class: "col gap kn-intake" });
@@ -817,7 +832,18 @@
        و این‌که تا کجا اطلاعات جمع می‌کنی (⇐ ایستگاهِ «مسئولیتِ معرفتی»)، و تقریبی که بس است. اختیاری؛ در intake.prac ذخیره می‌شود. */
     var pr = it.prac = it.prac || {};
     function setP(k) { return function (v) { pr[k] = v; it.prac = pr; ch(); }; }
-    var pracSec = h("section", { class: "card kn-prac" + (isPractical(kc) ? "" : " hidden"), dir: "rtl" },
+    /* وارسیِ قاب با کد (بی‌مدل): هر شش جزء، از قلمِ خودت؛ قابِ کامل ⇒ یک کارتِ مرور (فردا و بعد روی نردبانِ مرور) — همان کارتی که غربالِ دستیار هم می‌سازد */
+    var pracOut = h("div", { class: "small kn-pracout", "aria-live": "polite" });
+    function pracRun() {
+      var r = A.practicalFrameCheck(pr, PRAC_KEYS);
+      pr.chk = { at: now(), ok: r.ok, missing: r.missing.map(function (x) { return x[0]; }), dup: r.dup };
+      pracOut.innerHTML = "";
+      if (!r.ok) { pracOut.appendChild(h("p", { class: "bad" }, "قاب هنوز کامل نیست: " + r.missing.map(function (x) { return "«" + x[1] + "»"; }).concat(r.dup.map(function (d) { return "«" + d + "» همان جزءِ دیگری را تکرار می‌کند"; })).join("، ") + ".")); ch(); return; }
+      if (!pr.card) { var cd = A.practicalFrameCard(kc.title || it.what || "تصمیم", PRAC_KEYS.map(function (x) { return [x[1], pr[x[0]]]; }), "knot:practical"); if (cd) pr.card = cd.id; }
+      pracOut.appendChild(h("p", { class: "good" }, "قاب کامل است: هر شش جزء از نوشتهٔ خودت. یک کارتِ مرور ساخته شد (فردا، و بعد با فاصلهٔ بیشتر) تا همین شش پرسش را برای تصمیمِ بعدی‌ات بی‌نگاه بپرسی."));
+      ch();
+    }
+    var pracSec = h("section", { class: "card kn-prac" + (isPractical(kc) ? "" : " hidden"), dir: "rtl", "data-own": "1" },
       h("h3", {}, "اگر مسئلهٔ عملی است (تصمیم، کار، رابطه)"),
       h("p", { class: "small muted" }, "همان پرسش‌هایی که در هر مسئله می‌پرسی؛ اختیاری‌اند ولی گره‌یابی و گام‌های بعد را دقیق‌تر می‌کنند."),
       h("div", { class: "kn-grid" },
@@ -827,7 +853,9 @@
         fld("کدام مفهومِ مبهم را باید روشن کنی؟", area("knPVague", pr.vague, 2, setP("vague"), "مثلاً «موفق»، «به‌موقع»، «کافی» یعنی دقیقاً چه؟")),
         fld("کدام داده را آگاهانه کنار می‌گذاری، و تا کجا اطلاعات جمع می‌کنی؟", area("knPIgnore", pr.ignore, 2, setP("ignore"), "چه چیزی را نمی‌پرسی و چرا؛ کِی دست از جست‌وجو می‌کشی")),
         fld("کدام تقریب بس است؟", area("knPApprox", pr.approx, 2, setP("approx"), "چه دقتی برای این تصمیم کافی است؟"))),
-      A.stLink && A.EST && A.EST.st_resp ? h("div", { class: "row gap wrap small" }, h("span", { class: "muted" }, "برای «تا کجا اطلاعات جمع کنم؟»: "), A.stLink("st_resp")) : null);
+      A.stLink && A.EST && A.EST.st_resp ? h("div", { class: "row gap wrap small" }, h("span", { class: "muted" }, "برای «تا کجا اطلاعات جمع کنم؟»: "), A.stLink("st_resp")) : null,
+      h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm kn-pracchk", type: "button", onclick: pracRun }, "وارسیِ قاب (هر شش جزء)"),
+        pr.card ? h("span", { class: "small muted" }, "کارتِ مرورِ این قاب ساخته شده است.") : null), pracOut);
     box.appendChild(h("section", { class: "card" },
       h("p", { class: "small muted" }, "واقعیت را بی‌تفسیر بنویس. اگر از کسی نام می‌بری، فقط نقش یا نامِ مستعار بنویس (مثلاً «مدیرِ بخش»، «همکارِ الف»). فیلدهای ستاره‌دار لازم‌اند؛ بقیه اختیاری. هر چه بنویسی خودکار ذخیره می‌شود."),
       group("نوعِ موقعیت (هر ترکیبی مجاز است)", h("div", { class: "kn-checks" }, KINDS.map(function (k, i) {

@@ -16,9 +16,12 @@
      (ممیزیِ پوشش ۲۰۲۶-۱۰-۱۵: «صفحهٔ حرکت‌ها و فهرستِ مسئله پیش‌فرض خالی است»)؛ 
      نمونه‌های تاریخیِ سازنده مثلِ پیش فقط با «نمونه‌های آمادهٔ سازنده». */
   function practiceOn() { try { return S.settings().practiceProbs === true; } catch (e) { return false; } }
-  function practiceP() { return sampleP().filter(function (p) { return p.set === "book4" && p.neutral === true; }); }
-  A.practiceOn = practiceOn; A.practiceEnable = function () { var st = S.settings(); st.practiceProbs = true; S.saveSettings(st); A.toast("۲۰ مسئلهٔ کوتاهِ تمرینی روشن شد."); A.render(); };
-  A.practiceCta = function () { return practiceOn() || samplesOn() ? null : h("p", { class: "card soft small practice-cta" }, "مسئله‌ای برای تمرین نیست. ", h("button", { class: "btn sm", type: "button", onclick: A.practiceEnable }, "۲۰ مسئلهٔ کوتاهِ تمرینی را روشن کن"), " (ریاضیِ خنثی؛ در تنظیمات هم خاموش و روشن می‌شود)"); };
+  /* مسئله‌های کوتاهِ تمرینی: «book4» (ریاضیِ بخشِ چهارمِ کتابِ حلِ مسئله) و «practice» (مسئله‌های کوتاهِ نوشتهٔ سازنده برای حرکت‌هایی که
+     در آن بیست مسئله گامی نداشتند — از آخر به عقب، برهانِ خلف، ناوردا، ناممکنی، …) — هر دو خنثی و با همان گزینه */
+  function practiceP() { return sampleP().filter(function (p) { return (p.set === "book4" || p.set === "practice") && p.neutral === true; }); }
+  A.practiceCount = function () { return practiceP().length; };
+  A.practiceOn = practiceOn; A.practiceEnable = function () { var st = S.settings(); st.practiceProbs = true; S.saveSettings(st); A.toast(fa(practiceP().length) + " مسئلهٔ کوتاهِ تمرینی روشن شد."); A.render(); };
+  A.practiceCta = function () { return practiceOn() || samplesOn() ? null : h("p", { class: "card soft small practice-cta" }, "مسئله‌ای برای تمرین نیست. ", h("button", { class: "btn sm", type: "button", onclick: A.practiceEnable }, fa(practiceP().length) + " مسئلهٔ کوتاهِ تمرینی را روشن کن"), " (خنثی؛ در تنظیمات هم خاموش و روشن می‌شود)"); };
   function probs() { return mineP().concat(samplesOn() ? sampleP() : practiceOn() ? practiceP() : []); }
   function allP() { return mineP().concat(sampleP()); }
   A.probsMine = mineP; A.probIsSample = function (p) { return sampleP().indexOf(p) >= 0; };
@@ -199,6 +202,7 @@
     function finish(first, self) {
       /* نمرهٔ بار اول هرگز بازنویسی نمی‌شود؛ پاسخِ نوشته‌شدهٔ سطحِ ۳ (mine) هم نگه داشته می‌شود */
       var L = pg.lv[st.lv]; var prev = L[s0.id];
+      if (first && A.solveHelped && A.solveHelped(p.id, st.lv, s0.id)) first = false;   // «موفقیتِ کوچک» با یک گزینهٔ کمتر هزینهٔ سرنخ را دارد (a36)
       var nr = { first: prev && prev.first != null ? prev.first : first, at: new Date().toISOString() };
       var sf = prev && prev.self != null ? prev.self : self; if (sf != null) nr.self = sf;
       var mn = mineTxt != null ? mineTxt : prev && prev.mine; if (mn) nr.mine = mn;
@@ -249,6 +253,14 @@
     return box;
   }
 
+  /* خوانشِ مرجعِ «مجهول / داده / شرط» ِ یک مسئله — یک خواننده برای هر دو شکل: {u, d, c} (تجزیهٔ هوش مصنوعی، validP) و
+     {unknown, data, condition} (مسئله‌های کوتاهِ تمرینی، epi_problems_c.js). کارتِ فهم (a36) و validP هر دو همین را می‌خوانند. */
+  A.udcOf = function (p) {
+    var x = p && p.udc; if (!x || typeof x !== "object" || Array.isArray(x)) return null;
+    var o = {}, M = { u: ["u", "unknown"], d: ["d", "data"], c: ["c", "condition"] };
+    Object.keys(M).forEach(function (k) { for (var i = 0; i < M[k].length; i++) { var v = x[M[k][i]]; if (typeof v === "string" && v.trim()) { o[k] = v.trim(); break; } } });
+    return Object.keys(o).length ? o : null;
+  };
   /* ---------- تزریق مسئله تازه (هوش مصنوعی فقط تجزیه‌گر؛ با تأیید شما) ---------- */
   /* validP: ساختار را سخت‌گیرانه می‌سنجد و همهٔ ایرادها را یک‌جا به فارسی برمی‌گرداند (نه فقط اولی). فقط چیزهای بی‌خطر را
      خودش درست می‌کند: شناسهٔ خالی ⇒ n1/d1…، سطح ⇒ ۱..۵، st/tech/mv ِ ناشناخته ⇒ دور ریخته، era ِ خالی ⇒ حذف. */
@@ -265,7 +277,7 @@
     if (typeof o.open === "number") o.open = String(o.open); optS(o, "open", "مسئله");
     /* نوعِ مسئله (یافتنی/اثباتی/اثبات یا رد) و خوانشِ مرجعِ مجهول/داده/شرط — هر دو اختیاری؛ نامعتبر ⇒ دور ریخته */
     if (o.kind != null && ["find", "prove", "pod"].indexOf(o.kind) < 0) delete o.kind;
-    if (o.udc != null) { if (!isObj(o.udc)) delete o.udc; else { var ud = {}; ["u", "d", "c"].forEach(function (k) { if (isS(o.udc[k]) && o.udc[k].trim()) ud[k] = o.udc[k].trim(); }); if (Object.keys(ud).length) o.udc = ud; else delete o.udc; } }
+    if (o.udc != null) { var ud = A.udcOf(o); if (ud) o.udc = ud; else delete o.udc; }
     var ids = {}, PIPE = window.EPI_PIPE || [], MV = A.MOVE_IDS || [];  // فهرستِ ثابتِ حرکت‌ها (a19)؛ شناسهٔ ناشناخته دور ریخته می‌شود
     function uid(it, L) { if (!isS(it.id)) { E.push(L + ": «id» باید متن باشد"); return; } if (ids[it.id]) E.push(L + ": شناسهٔ تکراری «" + it.id + "»"); ids[it.id] = 1; }
     function sts(it, L) { if (it.st == null) { it.st = []; return; } if (!Array.isArray(it.st)) { E.push(L + ": «st» باید آرایه باشد"); return; } it.st = it.st.filter(function (x) { return PIPE.indexOf(x) >= 0; }); }

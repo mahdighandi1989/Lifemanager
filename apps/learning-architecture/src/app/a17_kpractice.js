@@ -697,6 +697,141 @@
     throw new Error("dimtest: no problem");
   }
 
+  /* ---------- (ک) حدس را بیازما (F4 ‹ پایش؛ حدس و آزمونش) ----------
+     یک حدسِ صریح + چهار «آزمون و نتیجه». پاسخ با کد حساب می‌شود (اول بودن، شمارِ ناحیه‌ها، توان‌ها، طولِ ضلع‌ها). غیربدلی: حدس نادرست است و
+     درست‌ترین آزمون یک حالتِ خاص، مثالِ نقض یا حالتِ حدیِ مشخص با نتیجهٔ محاسبه‌شده است. بدلی: حدس درست است و پاسخ «هیچ حالتِ آزموده ردش
+     نکرد — پشتیبانی شد ولی هنوز برهان می‌خواهد». درس: حدس را نه بی‌آزمون بپذیر، نه بی‌آزمون کنار بگذار؛ آزمونِ ابطالی بجوی. */
+  function isPrime(n) { if (n < 2) return false; for (var d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }
+  function chooseN(n, k) { if (k < 0 || k > n) return 0; var r = 1; for (var i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
+  function circleRegions(n) { return chooseN(n, 4) + chooseN(n, 2) + 1; }
+  A.kCircleRegions = circleRegions;
+  function guessMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["numeric", "geometric"]);
+    var tpl = form === "numeric" ? pick(r, ["poly", "pow"]) : pick(r, ["circle", "tri"]);
+    var prompt, right, wrongs, explain, params = { tpl: tpl };
+    if (tpl === "poly") {
+      var Q = level === 1 ? [5, 11] : [11, 17, 41], q = pick(r, Q); params.q = q;
+      var small = [0, 1, 2, 3].map(function (n) { return n * n + n + q; });
+      if (!decoy) {
+        prompt = "حدس: «برای هر عددِ صحیحِ n ≥ ۰، عددِ " + ltr("n² + n + " + q) + " اول است.» کدام آزمون و نتیجه درست است؟";
+        right = "n = " + fa(q - 1) + ": مقدار " + fa(q * q) + " = " + fa(q) + " × " + fa(q) + " است — مثالِ نقض؛ حدس نادرست است";
+        wrongs = ["n = ۰ تا ۳: مقدارها " + small.map(fa).join("، ") + " همه اول‌اند — پس حدس ثابت شد", "n = " + fa(q - 1) + ": مقدار عددی اول است — حدس تقویت شد", "هیچ حالتِ تکی نمی‌تواند حکمی کلی دربارهٔ همهٔ n را رد کند"];
+        explain = "با n = " + fa(q - 1) + " هر سه جمله مضربِ " + fa(q) + " می‌شوند: " + ltr("(q−1)² + (q−1) + q = q²") + ". چند حالتِ درست اثبات نیست؛ یک مثالِ نقض بس است.";
+        params.claim = "prime"; params.n = q - 1;
+      } else {
+        prompt = "حدس: «برای هر عددِ صحیحِ n ≥ ۰، عددِ " + ltr("n² + n + " + q) + " فرد است.» کدام آزمون و نتیجه درست است؟";
+        right = "n = ۰ تا ۳ و n = " + fa(q - 1) + " همه فردند — هیچ مثالِ نقضی نیست؛ حدس پشتیبانی شد ولی هنوز برهان می‌خواهد";
+        wrongs = ["n = " + fa(q - 1) + ": مقدار " + fa(q * q) + " اول نیست — پس حدس رد شد", "n = ۰ تا ۳ همه فردند — پس حدس ثابت شد", "هیچ حالتِ تکی دربارهٔ حکمِ کلی خبری نمی‌دهد؛ آزمودن بی‌فایده است"];
+        explain = "برهان: n² + n = n(n + 1) حاصل‌ضربِ دو عددِ پیاپی و زوج است، پس با " + fa(q) + " ِ فرد، فرد می‌شود. «اول نبودن» مثالِ نقضِ «فرد بودن» نیست.";
+        params.claim = "odd"; params.n = q - 1;
+      }
+    } else if (tpl === "pow") {
+      var k = level === 1 ? 2 : pick(r, [2, 3]), th = k === 2 ? 5 : 10;   // از th به بعد 2ⁿ > nᵏ (وارسیِ مستقل در آزمون)
+      var n0 = decoy ? th : ri(r, k === 2 ? 2 : 2, th - 1);
+      params.k = k; params.n0 = n0;
+      prompt = "حدس: «برای هر عددِ صحیحِ n ≥ " + fa(n0) + "، " + ltr("2ⁿ > n" + (k === 2 ? "²" : "³")) + ".» کدام آزمون و نتیجه درست است؟";
+      if (!decoy) {
+        var bad = -1; for (var n = n0; n < th; n++) if (Math.pow(2, n) <= Math.pow(n, k)) { bad = n; break; }
+        params.n = bad;
+        right = "n = " + fa(bad) + ": " + ltr("2^" + bad) + " = " + fa(Math.pow(2, bad)) + " و " + ltr(bad + "^" + k) + " = " + fa(Math.pow(bad, k)) + " — نابرابری برقرار نیست؛ حدس نادرست است";
+        wrongs = ["n = " + fa(th + 2) + ": " + fa(Math.pow(2, th + 2)) + " > " + fa(Math.pow(th + 2, k)) + " — پس حدس ثابت شد", "n = " + fa(bad) + ": نابرابری برقرار است — حدس تقویت شد", "حالت‌های کوچک مهم نیستند؛ فقط رفتارِ n بزرگ معنا دارد"];
+        explain = "کوچک‌ترین حالت‌های بازه را بیازما: در n = " + fa(bad) + " دو طرف " + fa(Math.pow(2, bad)) + " و " + fa(Math.pow(bad, k)) + " است. درستی برای nِ بزرگ، حکمِ «برای هر n ≥ " + fa(n0) + "» را نجات نمی‌دهد.";
+      } else {
+        params.n = th;
+        right = "n = " + fa(th) + " (کوچک‌ترین حالت) و چند n ِ بعدی همه برقرارند — مثالِ نقضی نیست؛ پشتیبانی شد ولی هنوز برهان (مثلاً استقرا) می‌خواهد";
+        wrongs = ["n = " + fa(th - 1) + ": نابرابری برقرار نیست — پس حدس رد شد", "n = " + fa(th) + " تا " + fa(th + 3) + " برقرارند — پس حدس ثابت شد", "با چند حالت هیچ چیزی دربارهٔ حدس نمی‌شود گفت"];
+        explain = "n = " + fa(th - 1) + " بیرون از گسترهٔ حدس (n ≥ " + fa(th) + ") است، پس آن را رد نمی‌کند. آزمون‌های درون گستره حدس را جدی‌تر می‌کنند؛ برهان با استقرا: اگر 2ⁿ > nᵏ آن‌گاه 2ⁿ⁺¹ > 2nᵏ ≥ (n + 1)ᵏ برای این nها.";
+      }
+    } else if (tpl === "circle") {
+      params.R = [1, 2, 3, 4, 5, 6, 7].map(circleRegions);
+      prompt = "n نقطه روی یک دایره (هیچ سه وتری از یک نقطهٔ درونی نمی‌گذرند) و همهٔ وترها را می‌کشی. برای n = ۱ تا ۵ شمارِ ناحیه‌ها " + [1, 2, 3, 4, 5].map(function (n) { return fa(circleRegions(n)); }).join("، ") + " است.\n" +
+        (decoy ? "حدس: «شمارِ ناحیه‌ها برای هر n بیشتر از " + ltr("2^(n−1)") + " نیست.»" : "حدس: «شمارِ ناحیه‌ها برای هر n برابرِ " + ltr("2^(n−1)") + " است.»") + " کدام آزمون و نتیجه درست است؟";
+      if (!decoy) {
+        right = "n = ۶ را بشمار (یا با " + ltr("C(n,4) + C(n,2) + 1") + "): " + fa(circleRegions(6)) + " ناحیه، نه " + fa(32) + " — حدس نادرست است";
+        wrongs = ["n = ۱ تا ۵ همه با الگو می‌خوانند — پس حدس ثابت شد", "n = ۶ را بشمار: " + fa(32) + " ناحیه — حدس تقویت شد", "حالتِ n = ۱ حالتِ حدی است و درباره‌اش چیزی نمی‌گوید"];
+        explain = "شمارشِ دقیق " + ltr("C(n,4) + C(n,2) + 1") + " برای n = ۶ می‌دهد " + fa(circleRegions(6)) + ". پنج حالتِ جور با الگو، حدس را ثابت نکرده بود.";
+      } else {
+        right = "n = ۶ و ۷: " + fa(circleRegions(6)) + " ≤ " + fa(32) + " و " + fa(circleRegions(7)) + " ≤ " + fa(64) + " — مثالِ نقضی نیست؛ پشتیبانی شد ولی برهان می‌خواهد";
+        wrongs = ["n = ۶: " + fa(circleRegions(6)) + " ناحیه، نه " + fa(32) + " — پس حدس رد شد", "n = ۱ تا ۵ برابرِ " + ltr("2^(n−1)") + " اند — پس حدس ثابت شد", "شمارش برای n بزرگ ممکن نیست؛ پس حدس را نمی‌شود آزمود"];
+        explain = "کمتر بودن مثالِ نقضِ «بیشتر نبودن» نیست. برهان: شمار = " + ltr("C(n−1,0) + … + C(n−1,4)") + " که بخشی از جمعِ همهٔ " + ltr("C(n−1,j) = 2^(n−1)") + " است.";
+      }
+    } else {
+      var a = ri(r, 3, 9);   // مثلث با ضلع‌های a، a و تقریباً 2a — حالتِ حدی (تقریباً تخت)
+      params.a = a;
+      if (!decoy) {
+        prompt = "حدس: «در هر مثلث، بلندترین ضلع از یک‌سومِ محیط کوتاه‌تر است.» کدام آزمون و نتیجه درست است؟";
+        var c = 2 * a - 1, P = 2 * a + c; params.sides = [a, a, c];
+        right = "حالتِ حدیِ تقریباً تخت: ضلع‌های " + fa(a) + "، " + fa(a) + "، " + fa(c) + " (محیط " + fa(P) + ") — بلندترین ضلع از یک‌سومِ محیط بلندتر است؛ حدس نادرست است";
+        wrongs = ["مثلثِ متساوی‌الاضلاع با ضلعِ " + fa(a) + ": بلندترین ضلع از یک‌سومِ محیط کوتاه‌تر است — حدس تقویت شد", "چند مثلثِ معمولی را آزمودم و برقرار بود — پس حدس ثابت شد", "مثلثِ تقریباً تخت مثلث نیست؛ پس آزمونِ حدی معنا ندارد"];
+        explain = "در " + fa(a) + "، " + fa(a) + "، " + fa(c) + " (که مثلث است چون " + fa(a + a) + " > " + fa(c) + ") بلندترین ضلع " + fa(c) + " و یک‌سومِ محیط " + fa(P) + "/۳ است. حتی متساوی‌الاضلاع هم «برابر» است نه «کوتاه‌تر». حالتِ حدی جایی است که حدس می‌شکند.";
+      } else {
+        prompt = "حدس: «در هر مثلث، بلندترین ضلع از نصفِ محیط کوتاه‌تر است.» کدام آزمون و نتیجه درست است؟";
+        var c2 = 2 * a - 1, P2 = 2 * a + c2; params.sides = [a, a, c2];
+        right = "حالتِ حدیِ تقریباً تخت: ضلع‌های " + fa(a) + "، " + fa(a) + "، " + fa(c2) + " — بلندترین ضلع هنوز از نصفِ محیط (" + fa(P2) + "/۲) کوتاه‌تر است؛ مثالِ نقضی نیست، ولی برهان (نابرابریِ مثلث) لازم است";
+        wrongs = ["حالتِ حدیِ تقریباً تخت: بلندترین ضلع از نصفِ محیط بلندتر می‌شود — حدس رد شد", "مثلثِ متساوی‌الاضلاع برقرار است — پس حدس ثابت شد", "حالتِ حدی را نمی‌شود آزمود چون مثلث نیست"];
+        explain = "بلندترین ضلع < مجموعِ دو ضلعِ دیگر ⇔ از نصفِ محیط کوتاه‌تر — همان نابرابریِ مثلث. آزمونِ حدی سخت‌ترین آزمون بود و حدس از آن گذشت؛ برهانش همین نابرابری است.";
+      }
+    }
+    var texts = [right].concat(wrongs);
+    if (new Set(texts).size < 4) throw new Error("guesstest: duplicate choices");
+    var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice", answer: ids[0], params: params };
+    it.choices = texts.map(function (t, j) { return { id: ids[j], t: t }; }).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+    it.prompt = prompt; it.explain = explain;
+    it.deep = "حدس را صریح بگو و بیازمای: حالتِ خاصِ هوشمند، مثالِ نقض و حالتِ حدی. پذیرفتنِ حدس بی‌آزمون ابلهانه است و نادیده گرفتنش هم؛ حدسی که از آزمون گذشت جدی‌تر شد ولی هنوز برهان می‌خواهد (Pólya 1945، «حدس بزن ولی بیازما»).";
+    it.trap = decoy ? "مثالِ نقضِ ظاهری که بیرون از گسترهٔ حدس است یا ویژگیِ دیگری را می‌سنجد؛ یا «ثابت شد» از روی چند حالت." : "پذیرفتنِ حدس از روی چند حالتِ جور (یا «تقویت» با محاسبهٔ نادرست)، به‌جای جست‌وجوی آزمونی که می‌تواند ردش کند.";
+    return it;
+  }
+
+  /* ---------- (ل) شکلِ قانون از تحلیلِ ابعادی (F4) ----------
+     کمیتِ خواسته به چند کمیتِ داده بستگی دارد؛ فقط یک ترکیبِ توانی هم‌بُعد است (پاسخ با حلِ دستگاهِ توان‌ها در کد). بدلی: یکی از کمیت‌ها
+     بی‌بُعد است (زاویه)، پس تحلیلِ ابعادی وابستگی به آن را تعیین نمی‌کند — پاسخ «c·…·f(θ)». درس: ابعاد شکلِ قانون را حدس می‌زند، نه ضریب
+     و نه وابستگی به کمیت‌های بی‌بُعد. ابعاد = [جرم، طول، زمان]. */
+  var LAWS = [
+    { tgt: ["T", "دورهٔ تناوبِ آونگ", [0, 0, 1]], vars: [["l", "طولِ نخ", [0, 1, 0]], ["g", "شتابِ گرانش", [0, 1, -2]], ["m", "جرمِ وزنه", [1, 0, 0]]] },
+    { tgt: ["t", "زمانِ سقوطِ آزاد", [0, 0, 1]], vars: [["h", "ارتفاع", [0, 1, 0]], ["g", "شتابِ گرانش", [0, 1, -2]]] },
+    { tgt: ["v", "سرعتِ رسیدن به زمین", [0, 1, -1]], vars: [["h", "ارتفاع", [0, 1, 0]], ["g", "شتابِ گرانش", [0, 1, -2]]] },
+    { tgt: ["a", "شتابِ مرکزگرا", [0, 1, -2]], vars: [["v", "سرعت", [0, 1, -1]], ["r", "شعاعِ مسیر", [0, 1, 0]]] },
+    { tgt: ["T", "دورهٔ تناوبِ وزنه و فنر", [0, 0, 1]], vars: [["m", "جرم", [1, 0, 0]], ["k", "سختیِ فنر (نیرو بر طول)", [1, 0, -2]]] }
+  ];
+  A.KLAWS = LAWS;
+  var HALF = [-2, -1, -0.5, 0, 0.5, 1, 2];
+  function dimOf(vars, ex) { var d = [0, 0, 0]; vars.forEach(function (v, i) { for (var j = 0; j < 3; j++) d[j] += ex[i] * v[2][j]; }); return d; }
+  function sameDim(a, b) { return a[0] === b[0] && a[1] === b[1] && a[2] === b[2]; }
+  function allEx(n) { var out = [[]]; for (var i = 0; i < n; i++) { var nx = []; out.forEach(function (e) { HALF.forEach(function (x) { nx.push(e.concat([x])); }); }); out = nx; } return out; }
+  function lawTxt(L, ex, extra) {
+    var num = [], den = [], rn = [], rd = [];
+    L.vars.forEach(function (v, i) {
+      var e = ex[i]; if (!e) return; var a = Math.abs(e), s = v[0];
+      if (a === 0.5) (e > 0 ? rn : rd).push(s); else (e > 0 ? num : den).push(s + (a === 2 ? "²" : ""));
+    });
+    var rTop = rn.length && rd.length ? "√(" + rn.join("") + "/" + rd.join("") + ")" : rn.length ? "√(" + rn.join("") + ")" : "", rBot = !rn.length && rd.length ? "√(" + rd.join("") + ")" : "";
+    var top = num.join("") + rTop || "1", bot = den.join("") + rBot;
+    return L.tgt[0] + " = c·" + (bot ? (top.length > 1 && /^[^√]/.test(top) && num.length + (rTop ? 1 : 0) > 1 ? "(" + top + ")" : top) + "/" + (den.length + (rBot ? 1 : 0) > 1 ? "(" + bot + ")" : bot) : top) + (extra || "");
+  }
+  A.klawTxt = lawTxt;
+  function dimformMake(level, r, o) {
+    var decoy = !!o.decoy, form = o.form || pick(r, ["mechanics", "everyday"]);
+    var pool = level === 1 ? LAWS.slice(1, 4) : LAWS, L = pick(r, pool);
+    var sols = allEx(L.vars.length).filter(function (ex) { return sameDim(dimOf(L.vars, ex), L.tgt[2]); });
+    if (sols.length !== 1) throw new Error("dimform: law not unique");
+    var good = sols[0], bads = shuf(r, allEx(L.vars.length).filter(function (ex) { return ex.some(Boolean) && !sameDim(dimOf(L.vars, ex), L.tgt[2]) && ex.every(function (x) { return Math.abs(x) <= 1; }); }));
+    var cands = [good], texts = [lawTxt(L, good, decoy ? "·f(θ)" : "")];
+    for (var i = 0; i < bads.length && cands.length < 4; i++) { var t = lawTxt(L, bads[i], ""); if (texts.indexOf(t) < 0) { cands.push(bads[i]); texts.push(t); } }
+    if (decoy) texts[1] = lawTxt(L, good, "");   // همان شکل بی f(θ): ادعای بی‌پایه که زاویه اثری ندارد
+    if (new Set(texts).size < 4) throw new Error("dimform: duplicate choices");
+    var ids = shuf(r, ["a", "b", "c", "d"]), it = { form: form, level: level, decoy: decoy, atype: "choice", answer: ids[0] };
+    it.params = { law: LAWS.indexOf(L), ex: {}, decoy: decoy };
+    it.choices = texts.map(function (t2, j) { it.params.ex[ids[j]] = cands[j] || good; return { id: ids[j], t: ltr(t2) }; }).sort(function (x, y) { return x.id < y.id ? -1 : 1; });
+    var names = L.vars.map(function (v) { return v[0] + " (" + v[1] + ")"; });
+    it.prompt = (form === "everyday" ? "بی‌آن‌که فرمولی به یاد داشته باشی، " : "") + L.tgt[1] + " (" + ltr(L.tgt[0]) + ") فقط به " + names.join("، ") + (decoy ? " و زاویهٔ آغازِ حرکت θ (بی‌بُعد)" : "") +
+      " بستگی دارد. با تحلیلِ ابعاد (جرم، طول، زمان) شکلِ قانون کدام است؟ (c عددی بی‌بُعد است.)";
+    it.explain = decoy ? "توان‌ها را فقط ابعاد تعیین می‌کند؛ θ بی‌بُعد است و هر تابعی از آن هم‌بُعد می‌ماند، پس تحلیلِ ابعادی وابستگی به θ را تعیین نمی‌کند: " + lawTxt(L, good, "·f(θ)") + "."
+      : "توانِ هر کمیت را با برابر کردنِ ابعادِ دو طرف بیاب؛ فقط " + lawTxt(L, good, "") + " هم‌بُعد است. ضریبِ c را ابعاد نمی‌دهد.";
+    it.deep = "تحلیلِ ابعادی شکلِ قانون را حدس می‌زند (آونگ: T ∝ √(l/g)، و جرم بی‌اثر)؛ ضریب و وابستگی به کمیت‌های بی‌بُعد را نه. حدس است تا آزمایش یا استدلال تأییدش کند (Pólya 1945).";
+    it.trap = decoy ? "پنداشتنِ این‌که ابعاد همه‌چیز را تعیین می‌کند و زاویه بی‌اثر است." : "نوشتنِ شکلِ آشنا یا افزودنِ کمیتی که ابعاد کنارش می‌گذارد (مثلاً جرم در دورهٔ آونگ).";
+    return it;
+  }
+
   A.KGEN = {
     jars: { fa: "کوزه‌های آب", src: "Luchins 1942", fams: ["F3"], forms: ["numeric", "real", "visual"], what: "اثرِ آمادگیِ ذهنی: پس از گرم‌کردن با یک فرمول، آیا راهِ کوتاه‌تر را می‌بینی؟ کدام راه را رفتی ثبت می‌شود.", make: jarsMake },
     rule246: { fa: "قاعدهٔ پنهانِ ۲-۴-۶", src: "Wason 1960؛ Klayman & Ha 1987", fams: ["F4", "F11"], forms: ["abstract", "real"], what: "کشفِ قاعده با آزمودن: پیش از اعلام باید آزمون بدهی؛ شمارِ آزمون‌های ابطالی ثبت می‌شود.", make: r246Make },
@@ -707,7 +842,9 @@
     reread: { fa: "بازخوانیِ صورت (مرزها)", src: "Kintsch 1998 (مدلِ موقعیت)", fams: ["F2"], forms: ["numeric", "verbal", "real"], what: "جزئیِ کوچکی در صورت («هر دو سر»، «شامل»، «اولی همین حالا») پاسخ را عوض می‌کند؛ پاسخِ عددیِ دقیق، با نسخهٔ بدلی که در آن حسابِ ساده درست است.", make: rereadMake },
     notation: { fa: "نمادگذاری (نام‌گذاریِ خوب)", src: "Pólya 1945 (Notation)", fams: ["F2"], forms: ["abstract", "real"], mv: ["mv_equation"], what: "نامی بی‌ابهام و به‌یادماندنی که پیوندِ چیزهای مرتبط (رأس و ضلعِ روبه‌رو، اندیسِ هر قطار) را نشان دهد.", make: notationMake },
     eqtrans: { fa: "ترجمهٔ شرط به رابطه (جدولِ دوستونی)", src: "Pólya 1945 (Setting up equations)؛ Clement 1982", fams: ["F2"], forms: ["verbal", "real", "abstract"], mv: ["mv_equation"], what: "سطرِ «بیانِ کلامی ⇐ رابطه» را کامل کن و جهتِ رابطه را با یک عددِ ساده بیازما (خطای وارونه‌نویسی).", make: eqtransMake },
-    dimtest: { fa: "آزمونِ ابعاد", src: "Pólya 1945 (Test by dimension)", fams: ["F4"], forms: ["abstract", "real"], mv: ["mv_dimcheck"], what: "کدام فرمول ناهم‌بُعد است؟ — و این‌که گذشتن از آزمون درستی را ثابت نمی‌کند.", make: dimtestMake }
+    dimtest: { fa: "آزمونِ ابعاد", src: "Pólya 1945 (Test by dimension)", fams: ["F4"], forms: ["abstract", "real"], mv: ["mv_dimcheck"], what: "کدام فرمول ناهم‌بُعد است؟ — و این‌که گذشتن از آزمون درستی را ثابت نمی‌کند.", make: dimtestMake },
+    guesstest: { fa: "حدس را بیازما", src: "Pólya 1945 (Guess and test؛ Induction)", fams: ["F4"], forms: ["numeric", "geometric"], mv: ["mv_special"], what: "حدسی صریح؛ کدام حالتِ خاص، مثالِ نقض یا حالتِ حدی ردش می‌کند — یا اگر از همهٔ آزمون‌ها گذشت، هنوز برهان می‌خواهد.", make: guessMake },
+    dimform: { fa: "شکلِ قانون از ابعاد", src: "Pólya 1945 (Test by dimension)؛ Rayleigh 1915", fams: ["F4"], forms: ["mechanics", "everyday"], mv: ["mv_dimcheck"], what: "پیش از فرمول، شکلِ قانون را با ابعاد حدس بزن (آونگ: T = c·√(l/g))؛ ضریب و وابستگی به کمیتِ بی‌بُعد را ابعاد نمی‌دهد.", make: dimformMake }
   };
   /* ساختِ تکرارپذیر از روی دانه؛ اگر نمونه‌ای نشت داشت، با ادامهٔ همان دنباله دوباره می‌سازد */
   A.kgenMake = function (key, seed, level, decoy, form) {
