@@ -304,7 +304,7 @@
       h("div", { class: "colmain" },
         sec("روش اجرا گام‌به‌گام", h("ol", { class: "steps" }, t.steps.map(function (s) { return h("li", {}, s); }))),
         window.SRCX && SRCX[t.id] ? sec("کاربرد عملی در متن منبع (PDF ص " + fa(SRCX[t.id].page) + ")", h("div", {}, SRCX[t.id].app.split("\n").map(function (x) { return h("p", { class: "srcq" }, x); })), "srcsec") : null,
-        S.settings().hideGen ? null : h("details", { class: "tsec exsec gen" }, h("summary", {}, "مثال کارشده ساخته سامانه · " + (dn[ex.d] || ex.d || "") + " — در منابع شما نیست"), h("p", { class: "small muted" }, "این مثال را سامانه نوشته تا ببینی اجرای کامل تکنیک روی یک موضوع واقعی چه شکلی است. حوزه‌ها از «قلاب‌های تجربی» سند Word تو آمده‌اند؛ نکته‌های فنی داخل مثال توصیه نیستند. همه مثال‌ها را می‌توانی از «تنظیمات» پنهان کنی."), h("h4", {}, ex.title), para(ex.text)),
+        S.settings().hideGen || (A.genExampleHidden && A.genExampleHidden(t)) ? null : h("details", { class: "tsec exsec gen" }, h("summary", {}, "مثال کارشده ساخته سامانه · " + (dn[ex.d] || ex.d || "") + " — در منابع شما نیست"), h("p", { class: "small muted" }, "این مثال را سامانه نوشته تا ببینی اجرای کامل تکنیک روی یک موضوع واقعی چه شکلی است. حوزه‌ها از «قلاب‌های تجربی» سند Word تو آمده‌اند؛ نکته‌های فنی داخل مثال توصیه نیستند. همه مثال‌ها را می‌توانی از «تنظیمات» پنهان کنی."), h("h4", {}, ex.title), para(ex.text)),
         sec("سطح‌بندی مهارت", h("ol", { class: "levels" }, t.levels.map(function (s) { return h("li", {}, s); })))),
       h("aside", { class: "colside" },
         sec("دوز و زمان", para(t.dose)),

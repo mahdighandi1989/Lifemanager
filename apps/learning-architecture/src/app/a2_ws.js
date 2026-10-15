@@ -197,11 +197,14 @@
   FIELD.sel = function (f, d, ch, id) {
     var sel = h("select", { id: id, onchange: function (e) { d[f.k] = e.target.value; ch(); } }, h("option", { value: "" }, "— انتخاب کن —"),
       (f.opts || []).map(function (o) { return h("option", { value: o, selected: d[f.k] === o }, o); }));
+    // مقدارِ ذخیره‌شده‌ای که دیگر در گزینه‌ها نیست (گزینه بازنویسی شد) گم نمی‌شود (۲۰۲۶-۱۰-۱۵: پاک‌کردنِ مثال‌های بازار از کاربرگ‌ها)
+    if (d[f.k] && (f.opts || []).indexOf(d[f.k]) < 0) sel.appendChild(h("option", { value: d[f.k], selected: true }, d[f.k] + " (گزینهٔ پیشین)"));
     return sel;
   };
   FIELD.checks = function (f, d, ch, id) {
     var cur = d[f.k] || [];
-    return h("div", { class: "checks", id: id }, (f.opts || []).map(function (o, i) {
+    var opts0 = (f.opts || []).concat(cur.filter(function (x) { return x && (f.opts || []).indexOf(x) < 0; }));   // گزینهٔ پیشینِ تیک‌خورده هم دیده شود
+    return h("div", { class: "checks", id: id }, opts0.map(function (o, i) {
       var cid = id + "_" + i;
       return h("label", { class: "chk", for: cid }, h("input", { type: "checkbox", id: cid, checked: cur.indexOf(o) >= 0, onchange: function (e) {
         var arr = (d[f.k] || []).filter(function (x) { return x !== o; }); if (e.target.checked) arr.push(o); d[f.k] = arr; ch(); } }), h("span", {}, o));

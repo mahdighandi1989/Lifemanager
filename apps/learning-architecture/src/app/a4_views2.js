@@ -536,8 +536,9 @@
         h("div", { class: "frow" }, h("label", { for: "lP" }, "سرویس"), lp), h("div", { class: "frow" }, h("label", { for: "lM" }, "مدل"), lm), h("div", { class: "frow" }, h("label", { for: "lK" }, "کلید"), lk),
         h("button", { class: "btn", onclick: function () { st.ai = { provider: lp.value, model: lm.value.trim(), key: lk.value.trim() }; S.saveSettings(st); A.toast("ذخیره شد."); } }, "ذخیره")));
     }
-    root.appendChild(h("div", { class: "card" }, h("h3", {}, "مثال‌های کارشده ساخته سامانه"), h("p", { class: "small" }, "مثال‌های ترید، بانک، بازی و سینما در بخش «اجرا» را سامانه نوشته است و در منابع شما نیست. متن «کاربرد عملی» PDF همیشه نمایش داده می‌شود."),
-      h("label", { class: "chk", for: "hideGen" }, h("input", { type: "checkbox", id: "hideGen", checked: !!st.hideGen, onchange: function (e) { st.hideGen = e.target.checked; S.saveSettings(st); } }), "پنهان کردن مثال‌های ساخته سامانه")));
+    root.appendChild(h("div", { class: "card" }, h("h3", {}, "مثال‌های کارشده ساخته سامانه"), h("p", { class: "small" }, "مثال‌های بخشِ «اجرا» (علم، بازی، سینما، …) را سامانه نوشته است و در منابع شما نیست. متن «کاربرد عملی» PDF همیشه نمایش داده می‌شود. مثال‌های بازارِ مالی و بانک به‌طورِ پیش‌فرض پنهان‌اند."),
+      h("label", { class: "chk", for: "hideGen" }, h("input", { type: "checkbox", id: "hideGen", checked: !!st.hideGen, onchange: function (e) { st.hideGen = e.target.checked; S.saveSettings(st); } }), "پنهان کردن مثال‌های ساخته سامانه"),
+      h("label", { class: "chk", for: "showMarketEx" }, h("input", { type: "checkbox", id: "showMarketEx", checked: !!st.showMarketEx, onchange: function (e) { st.showMarketEx = e.target.checked; S.saveSettings(st); } }), "مثال‌های بازارِ مالی و بانک را هم نشان بده")));
     root.appendChild(h("div", { class: "card samples-card", dir: "rtl" }, h("h3", {}, "نمونه‌های آمادهٔ سازنده (نه مسئله‌های تو)"),
       h("p", { class: "small" }, "مسئله‌ها را تو می‌دهی؛ گره‌گشا و «مسئله‌های بزرگ» از مسئله‌های خودت کار می‌کنند. این‌ها را سازنده از پیش نوشته و به‌طورِ پیش‌فرض پنهان‌اند:"),
       h("ul", { class: "small" }, h("li", {}, "۶ شبیه‌سازِ نمایشیِ گره (کوزه‌های آب، ۲-۴-۶، نفرینِ دانش، حافظهٔ کاری، وضعیتِ پایانی، نردبان)"),

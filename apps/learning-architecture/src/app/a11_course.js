@@ -348,7 +348,10 @@
 
   /* مثالِ هر تکنیک (t.example) را سامانه نوشته، نه منبعِ مالک ⇒ همیشه «تولیدی/ساختهٔ سامانه» برچسب می‌خورد و تنظیمِ
      «پنهان کردن مثال‌های ساخته سامانه» (hideGen) در درس‌ها هم اعمال می‌شود، نه فقط در صفحهٔ تکنیک (ممیزی ۲۰۲۶-۱۰-۱۳). */
-  function showGen(t) { return !!(t && t.example) && !S.settings().hideGen; }
+  /* مثال‌های بازارِ مالی و بانک (ترید، اکسپرت، وثیقه) برای کاربرِ عام شلوغ و گمراه‌کننده بود (مالک ۲۰۲۶-۱۰-۱۵) ⇒ به‌طورِ پیش‌فرض پنهان؛
+     حذف نشده‌اند و از «تنظیمات» با «مثال‌های بازارِ مالی و بانک را هم نشان بده» برمی‌گردند (قرنطینه، نه حذف) */
+  A.genExampleHidden = function (t) { var d = t && t.example && t.example.d; return (d === "trading" || d === "banking") && !S.settings().showMarketEx; };
+  function showGen(t) { return !!(t && t.example) && !S.settings().hideGen && !A.genExampleHidden(t); }
   A.showGenExample = showGen;
   function genNote() { return h("p", { class: "small muted" }, "این مثال را سامانه نوشته تا شکلِ اجرای کامل را ببینی؛ نمونهٔ واقعی یا توصیه نیست. از «تنظیمات» می‌توانی همهٔ مثال‌های ساختهٔ سامانه را پنهان کنی."); }
   A.genExampleNote = genNote;
