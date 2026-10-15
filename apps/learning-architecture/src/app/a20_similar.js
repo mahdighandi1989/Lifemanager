@@ -60,7 +60,7 @@
     n = n || 4;
     var mvList = A.MOVES ? Object.keys(A.MOVES).map(function (m) { return m + " (" + A.MOVES[m].fa + ")"; }).join("، ") : "";
     return "مسئلهٔ اصلی: " + p.title + "\nرشته: " + (p.field || "") + "\nصورت: " + p.statement + "\nپاسخ: " + p.answer + "\n" + principle(p) +
-      ((p.lessons || []).length ? "\nدرس‌ها: " + p.lessons.slice(0, 4).join("؛ ") : "") +
+      ((p.lessons || []).length ? "\nدرس‌ها: " + p.lessons.slice(0, 4).join("؛ ") : "") + (A.solveSeed ? A.solveSeed(p) : "") +
       "\n\nفهرستِ شناسه‌های حرکت: " + mvList +
       "\n\nخواسته: " + fa(n) + " مسئلهٔ تازهٔ هم‌ساختار در شکل‌های متفاوت (" + Object.keys(FORMS).map(function (f) { return f + "=" + FORMS[f]; }).join("، ") + ") + یک بدلی (decoy=true). سطحِ دشواری را از ۱ تا ۳ متنوع کن.";
   };
@@ -134,6 +134,7 @@
     box.appendChild(h("section", { class: "card" }, h("h2", {}, "مسئله‌های هم‌ساختار — حل‌کنندهٔ «موارد مشابه» شدن"),
       h("p", { class: "small" }, "مسئله‌های تازه‌ای که با همان حرکت‌های قاطعِ این مسئله حل می‌شوند، در ظاهر و زمینهٔ دیگر (و یک «بدلی» که ظاهرش شبیه است ولی آن حرکت در آن کار نمی‌کند). هدف بازشناختنِ ساختار در لباسِ تازه است، نه حفظِ راه‌حلِ همین مسئله."),
       h("p", { class: "small muted" }, "حرکت‌های قاطعِ این مسئله: ", movesOf(p).length && A.moveLink ? movesOf(p).map(function (m) { return h("span", {}, A.moveLink(m), " "); }) : "هنوز هیچ گامی برچسبِ حرکت ندارد — سازنده از خودِ گام‌ها ساختار را می‌گیرد."),
+      (function () { var sv = A.solveOf ? A.solveOf(p.id) : null, L = (sv && sv.lessons) || []; return L.length ? h("p", { class: "small pbs-seed" }, "بذرهای تو از بازنگری (سازنده از این‌ها هم ساختار می‌گیرد): " + L.slice(-4).map(function (l) { return "«" + l.use + "»"; }).join("، ")) : null; })(),
       h("p", { class: "small" }, fa(serv.length) + " مسئلهٔ آمادهٔ تمرین · " + fa(due.length) + " موعدِ امروز" + (hidden ? " · " + fa(hidden) + " وارسی‌نشده (پنهان)" : ""))));
 
     /* ساخت */

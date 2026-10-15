@@ -59,6 +59,11 @@
     }
     S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist); });
     S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist); });
+    /* حدسِ پیش از حل (شبیه‌ساز، سطحِ ۳–۴): اطمینان ↔ «درست بود/نادرست بود» با پاسخِ معلومِ مسئله ⇒ فقط کالیبراسیونِ حلِ مسئله، نه دقت («تاحدی» بیرون) */
+    S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
+      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;
+        var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at }); });
+    });
     /* کارت‌های مرور: اطمینان پیش از دیدنِ پاسخ (c) و نمرهٔ یادآوری (g ≥ ۳ = درست) ⇒ یادگیری و حافظه */
     S.all("card", function (c) { return !c.sample; }).forEach(function (c) { ingest("s_learn", (c.hist || []).map(function (x) { return { at: x.d, conf: x.c, ok: x.g >= 3 }; })); });
     /* حرکت‌ها: شمارِ پاسخ‌های درست/نادرستِ هر حرکت (دفترِ حرکت‌ها زمان و حرکت را با هم نگه نمی‌دارد ⇒ در روندِ ماهانه نمی‌آید) */
@@ -151,6 +156,12 @@
     S.all("prereq", function (p) { return p.created; }).forEach(function (p) { ev.push({ at: p.created, fa: "🧩 نقشهٔ پیش‌نیازها: «" + (p.title || "") + "»" }); if (p.backAt && p.back) ev.push({ at: p.backAt, fa: "🧩 بازگشت به مسئله: " + p.back }); });
     S.all("wchain", function (c) { return c.created; }).forEach(function (c) { ev.push({ at: c.created, fa: "⛓ زنجیرهٔ نگرانی: «" + c.title + "»" }); if (c.outcomeAt) ev.push({ at: c.outcomeAt, fa: "⛓ نتیجهٔ «" + c.title + "»: " + c.outcome }); });
     S.all("achat", function (s) { return s.tour; }).forEach(function (s) { ev.push({ at: s.tour.createdAt, fa: "🧭 تورِ تازه: «" + (s.title || s.pinned || "") + "»" }); if (s.tour.doneAt) ev.push({ at: s.tour.doneAt, fa: "🧭 ترتیبِ تور طی شد: «" + (s.title || "") + "»" }); if (s.tour.masteredAt) ev.push({ at: s.tour.masteredAt, fa: "🏁 تور تا تسلط کامل شد: «" + (s.title || "") + "»" }); });
+    /* حلِ مسئله (شبیه‌ساز): بازنگری‌ها و برگشت پس از کنارگذاشتن — رویداد، نه نمره */
+    S.all("eprog", function (pg) { return pg.solve; }).forEach(function (pg) {
+      var pid = String(pg.id).replace(/^eprog_/, ""), pr = A.getProb ? A.getProb(pid) : null, tt = (pr && pr.title) || "مسئله";
+      (pg.solve.lessons || []).forEach(function (l) { ev.push({ at: l.at, fa: "🔁 بازنگریِ «" + tt + "»: " + String(l.use || "").slice(0, 60) }); });
+      (pg.solve.incub || []).forEach(function (x) { ev.push({ at: x.at, fa: "↩ برگشت به «" + tt + "» پس از کنارگذاشتن: " + x.fresh }); });
+    });
     ev = ev.filter(function (e) { return e.at; }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
     var tot = { knots: knots.length, practised: knots.filter(function (k) { return k.status === "practised"; }).length, returned: knots.filter(function (k) { return k.status === "returned"; }).length,
     /* «مسئله‌ها»: مسئلهٔ خودِ کاربر در گره‌گشا و نقشهٔ پیش‌نیاز هم مسئله است (کارزارِ آزمونِ دوم c16/c17: «مسئله‌ها ۰») */
