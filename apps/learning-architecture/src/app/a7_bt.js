@@ -327,7 +327,7 @@
   A.parseJSONLoose = function (txt) { var s = String(txt || ""); var i = Math.min.apply(null, ["[", "{"].map(function (ch) { var p = s.indexOf(ch); return p < 0 ? 1e9 : p; })); var j = Math.max(s.lastIndexOf("]"), s.lastIndexOf("}")); return JSON.parse(s.slice(i, j + 1)); };
   function harvestPanel() {
     var n = h("input", { type: "number", min: 1, max: 8, value: 4, id: "hvN" });
-    var dom = h("input", { type: "text", id: "hvD", placeholder: "حوزه یا موضوع (اختیاری)، مثلاً «بانکداری و وثیقه» یا «پزشکی»" });
+    var dom = h("input", { type: "text", id: "hvD", placeholder: "حوزه یا موضوع (اختیاری)، مثلاً «پزشکی» یا «آموزش»" });
     var out = h("div", { class: "col gap" });
     return h("section", { class: "card col gap" }, h("h2", {}, "گردآوری پرونده با هوش مصنوعی"),
       h("p", { class: "small" }, "هوش مصنوعی فقط پیشنهاد می‌دهد. هر پرونده با ویژگی‌ها و برچسب پیشنهادی‌اش به صف تأیید می‌رود و فقط با تأیید تو وارد آزمون‌ها (بک‌تست) می‌شود. پیش از تأیید، منبع و برچسب را خودت بررسی کن."),

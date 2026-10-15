@@ -63,6 +63,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await page.evaluate(() => APP.go('tech', 28, 'do')); if (!(await page.locator('.srcsec').count())) errors.push('source section missing'); if (await page.locator('details.gen').count()) errors.push('market/bank example should be hidden by default');
   await page.evaluate(() => { const st = APP.S.settings(); st.showMarketEx = true; APP.S.saveSettings(st); APP.go('tech', 28, 'do'); }); if (!(await page.locator('details.gen').count())) errors.push('gen example missing (setting on)');
   await page.evaluate(() => { const st = APP.S.settings(); st.showMarketEx = false; APP.S.saveSettings(st); });
+  if (await page.evaluate(() => /حد ضرر|اکسپرت/.test(APP.topicSelect('', () => {}).textContent))) errors.push('market sample topic still offered in topic selects');
+  if (await page.evaluate(() => [3, 4, 5].some(() => false) || /ترید، پرونده وثیقه/.test(document.body.innerHTML))) errors.push('worksheet start card still mentions trading');
   await page.evaluate(() => APP.go('tech', 40, 'und'));
   // pipeline status
   const ps = await page.evaluate(() => { const t = APP.S.all('topic', x => !x.sample)[0]; const s = APP.pipelineStatus(t); return ['S1','S4','S5','S7','S8','S9'].map(k => k + ':' + s[k]).join(' '); });

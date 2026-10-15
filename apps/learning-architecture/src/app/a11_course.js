@@ -350,6 +350,8 @@
      «پنهان کردن مثال‌های ساخته سامانه» (hideGen) در درس‌ها هم اعمال می‌شود، نه فقط در صفحهٔ تکنیک (ممیزی ۲۰۲۶-۱۰-۱۳). */
   /* مثال‌های بازارِ مالی و بانک (ترید، اکسپرت، وثیقه) برای کاربرِ عام شلوغ و گمراه‌کننده بود (مالک ۲۰۲۶-۱۰-۱۵) ⇒ به‌طورِ پیش‌فرض پنهان؛
      حذف نشده‌اند و از «تنظیمات» با «مثال‌های بازارِ مالی و بانک را هم نشان بده» برمی‌گردند (قرنطینه، نه حذف) */
+  /* نمونهٔ ساختهٔ سامانه با حوزهٔ بازار/بانک (مثلاً «نمونه: چرا حد ضرر متحرک…») هم با همان تنظیم پنهان است */
+  A.marketSample = function (r) { return !!(r && r.sample && /تریدینگ|اکسپرت|بانک|وثیقه/.test(String(r.dom || "") + " " + String(r.title || ""))) && !S.settings().showMarketEx; };
   A.genExampleHidden = function (t) { var d = t && t.example && t.example.d; return (d === "trading" || d === "banking") && !S.settings().showMarketEx; };
   function showGen(t) { return !!(t && t.example) && !S.settings().hideGen && !A.genExampleHidden(t); }
   A.showGenExample = showGen;

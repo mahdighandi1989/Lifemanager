@@ -117,7 +117,8 @@
     }));
   };
   A.topicSelect = function (val, onPick, id) {
-    var topics = S.all("topic");
+    // نمونهٔ ساختهٔ سامانه با موضوعِ بازارِ مالی فقط وقتی «مثال‌های بازار» روشن است (مالک ۲۰۲۶-۱۰-۱۵؛ کارزارِ سوم، بازبینِ پنجره)
+    var topics = S.all("topic", function (t) { return !(A.marketSample && A.marketSample(t)) || t.id === val; });
     return h("select", { id: id || "topicSel", onchange: function (e) { onPick(e.target.value); } }, h("option", { value: "" }, "— بدون موضوع —"),
       topics.map(function (t) { return h("option", { value: t.id, selected: val === t.id }, t.title); }));
   };
@@ -369,7 +370,7 @@
       var pickTopic = A.pendingTopic || "";
       wrap.appendChild(h("div", { class: "card start" },
         h("h2", {}, "تمرین جدید: " + t.fa),
-        h("p", { class: "small" }, "تمرین را روی یک موضوع واقعی که الان درگیرش هستی انجام بده (ترید، پرونده وثیقه، مرحله بازی، فیلم، یا درسی که می‌خوانی). تمرین روی موضوع ساختگی، مهارت انتقال‌پذیر نمی‌سازد."),
+        h("p", { class: "small" }, "تمرین را روی یک موضوع واقعی که الان درگیرش هستی انجام بده (درسی که می‌خوانی، مسئله‌ای که حلش نکردی، مرحله بازی، فیلم، یا کارت). تمرین روی موضوع ساختگی، مهارت انتقال‌پذیر نمی‌سازد."),
         h("div", { class: "row gap wrap" }, h("label", { for: "wsTopic", class: "small" }, "موضوع:"), A.topicSelect(pickTopic, function (v) { pickTopic = v; }, "wsTopic"),
           h("button", { class: "btn", onclick: function () { var e = A.newEx(t.id, pickTopic); A.pendingTopic = null; A.go("tech", t.id, "ws:" + e.id); } }, "شروع تمرین"),
           h("button", { class: "btn ghost", onclick: function () { A.go("topics"); } }, "ساخت موضوع جدید")),

@@ -120,13 +120,13 @@
   A.V.topics = function () {
     var root = h("div", { class: "page" });
     root.appendChild(A.head("موضوع‌ها", "یک موضوع، ۹ فاز", "موضوع یعنی چیزی که می‌خواهی عمیق بفهمی: یک مفهوم، فصل یا مسئله. از همین‌جا شروع کن: عنوانش را بنویس؛ تمرین‌ها و روال‌های تکرار به آن وصل می‌شوند تا مسیر فهمت دیده شود."));
-    var ti = h("input", { id: "ntTitle", type: "text", placeholder: "مثلاً: چرا حد ضرر متحرک ثابت در طلا زود فعال می‌شود" });
+    var ti = h("input", { id: "ntTitle", type: "text", placeholder: "مثلاً: چرا یخ روی آب شناور می‌ماند؟" });
     var tk = h("select", { id: "ntKind", "aria-label": "نوع" }, h("option", { value: "" }, "این برای تو چیست؟"), A.FTYPES.map(function (f) { return h("option", { value: f }, f.split(":")[0]); }));
     var td = h("select", { id: "ntDom", "aria-label": "حوزه" }, h("option", { value: "" }, "حوزه"), C.DOMAIN_OPTS.map(function (o) { return h("option", { value: o }, o); }));
     var ts = h("input", { id: "ntSrc", type: "text", "aria-label": "منبع موضوع", placeholder: "منبع (دوره، کتاب، فصل) — اختیاری" });
     root.appendChild(h("div", { class: "card" }, h("h2", {}, "موضوع تازه"), h("div", { class: "frow" }, h("label", { for: "ntTitle" }, "عنوان (بهتر است به شکل پرسش)"), ti), h("div", { class: "row gap wrap" }, tk, td, ts,
       h("button", { class: "btn", onclick: function () { if (!ti.value.trim()) { A.toast("عنوان موضوع را بنویس.", "bad"); return; } var t = S.put({ id: A.uid("tp"), type: "topic", title: ti.value.trim(), dom: td.value, src: ts.value.trim(), kind: tk.value }); A.toNursery(t.title, tk.value.indexOf("گره") === 0 ? "knot" : tk.value ? "fruit" : "concept", { t: "topic", id: t.id }, tk.value.indexOf("مرزی") >= 0 ? "science" : tk.value.indexOf("گره") === 0 ? "me" : ""); A.go("topic", t.id); } }, "ساخت و شروع"))));
-    var tops = S.all("topic");
+    var tops = S.all("topic", function (t) { return !(A.marketSample && A.marketSample(t)); });
     if (!tops.length) root.appendChild(A.empty("هنوز موضوعی نساخته‌ای. عنوان اولین موضوع را در کادر بالا بنویس."));
     root.appendChild(h("div", { class: "tgrid" }, tops.map(function (t) {
       var pr = topicProgress(t.id);
