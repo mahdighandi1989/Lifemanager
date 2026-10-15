@@ -6,7 +6,7 @@
 export const LLA_BUNDLE = {
   "css": "lla.87f2dd4dee.css",
   "docs": {
-    "HANDBOOK": "docs/HANDBOOK.ca692b32e5.md",
+    "HANDBOOK": "docs/HANDBOOK.c2fe65bd98.md",
     "PROGRESS": "docs/PROGRESS.5e7f9d2052.md",
     "TERRITORY": "docs/TERRITORY.23b193f1b5.md",
     "VERIFIED_BOOKLET": "docs/VERIFIED_BOOKLET.712e77dfc9.md",
