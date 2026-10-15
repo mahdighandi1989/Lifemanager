@@ -307,12 +307,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     return own + '|' + called + '|' + !!s.tour.facets[0].blocked.approvedAt;
   });
   chk(info.approve === 'true|sh9:approved|true', 'after a verified sheet the owner (only) can tick «✅ تأیید»: ' + info.approve);
-  console.log(JSON.stringify(info).slice(0, 2500));
-  console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
   info.hold = await p.evaluate(() => { const S = APP.S, d = APP.addDays(APP.today(), -10);
     S.put({ id: 'kh1', type: 'knot', name: 'گ', status: 'practised', solvedAt: d + 'T10:00:00Z', log: [] });
     const pr = APP.ASSIST.tourPractice({ kind: 'knot', refs: [{ type: 'knot', id: 'kh1' }] });
-    const it = pr.filter(x => /ماندگاری/.test(x.t)); return it.map(x => x.due).join(',') === [APP.addDays(d, 30), APP.addDays(d, 90)].join(',') && /دوباره‌سنجی/.test(APP.ASSIST.SYS); });
+    const it = pr.filter(x => /ماندگاری/.test(x.t)); return it.map(x => x.due).join(',') === [APP.addDays(d, 30), APP.addDays(d, 90)].join(',') && /دوباره بسنج/.test(APP.ASSIST.SYS); });
   chk(info.hold, 'the 30/90-day retention checks are practice dates (so the reminder and e-mail name them) and the model re-measures the first situation');
+  console.log(JSON.stringify(info).slice(0, 2500));
+  console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
   await b.close(); process.exit(errors.length ? 1 : 0);
 })();
