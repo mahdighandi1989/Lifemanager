@@ -248,3 +248,9 @@ and give the reviewer the job of checking it.
 - **`git log --since=YYYY-MM-DD` means «that day at the current time»**, not midnight — an «already done?» check missed the owner's work from the same morning. Pass `YYYY-MM-DD 00:00:00` and start a day early.
 - **Name the actor in the commit.** When every commit is authored by the same bot, add a `Routine: <name>` trailer in the ship script and show it in the precheck.
 - **Replay real history through the guard** before trusting it: the map wrongly made engine code «owner-decision only» and would have blocked a real crash fix — split «engine (fix with hand-off)» from «rules (owner decision)».
+
+## Update 2026-10-15 — an "exit early when idle" step silently skips every "do X first, every round" step placed after it
+- **Symptom:** the urgent routine's prompt said "inbox first, every round", but that section came AFTER "queue empty ⇒ exit 0, write nothing". On idle days, the hand-offs in its area were never verified.
+- **Fix:** move every must-run-each-round step ABOVE the first early exit, and name it in the exit row ("the archive and inbox steps are already done"). A test asserts the textual order: the inbox command appears before the queue command.
+- **Related:** a guard that runs only in the ship script is bypassed by a plain `git push`. Re-check what actually LANDED in the merge gate (scan the commit trailers since a baseline). Write the trailer with `git commit --trailer`, not with a second `-m`, so a later paragraph can't orphan it.
+- **How to apply elsewhere:** in any agent prompt, list the unconditional steps before any branch that can end the run, and pin that order with a test. Back every client-side guard with a server/gate-side re-check of what really landed.

@@ -93,6 +93,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const prompt = AS.prompt(s, 'x', AS.scan());
     return { pastRefused: /گذشته است/.test(past) && !d.some(x => /گذشته/.test(x.what)), one: d.length === 1, today, hour: r.hour, due: r.due_date === APP.addDays(APP.today(), 1), inPrompt: /# موعدهای کاربر[\s\S]*تحویلِ تمرینِ فیزیک/.test(prompt) && /ساعتِ یادآورها: ۲۲/.test(prompt), rule: /remind_hour/.test(AS.SYS) };
   });
+  info.sheet = await p.evaluate(() => { const big = 'ب'.repeat(5000); const tx = APP.ASSIST.reportText({ id: 's1', title: 't', pinned: 'x' },
+    { area: 'lla-page', title: 'کمبود', abstract: big, missing: big, where: big, how: big, relations: big, why_area: big, why_not: big, evidence: big });
+    return { len: tx.length, proc: tx.indexOf('روالِ رسیدگی') > 0, docs: tx.indexOf('مستنداتی که باید') > 0, noUndef: tx.indexOf('undefined') < 0 }; });
   const S = info.sieve;
   chk(S.pend && S.fams === 12 && S.n >= 22, 'layers = base + all 12 knot families from the registry: ' + S.n + '/' + S.fams);
   chk(S.rules, 'root-first sieve rules replace "every aspect = a facet"');
@@ -106,6 +109,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(S.ownBack && S.today && S.nav, 'Today stops nagging once rated; menu entry');
   chk(S.safeFirst && S.today && S.btnFirst, 'safety is the first owed question; the prompt carries today; buttons come before fields: ' + [S.safeFirst, S.today, S.btnFirst]);
   chk(info.dl.pastRefused && info.dl.one && info.dl.today && info.dl.hour === 22 && info.dl.due && info.dl.inPrompt && info.dl.rule, 'deadlines from the user\'s words: past dates refused, Today item, reminder a day before at the user\'s hour, visible to the model: ' + JSON.stringify(info.dl));
+  chk(info.sheet.proc && info.sheet.docs && info.sheet.noUndef, 'a gap sheet with long free text keeps its procedure and docs sections: ' + JSON.stringify(info.sheet));
   chk(S.alias && S.owed, 'near-miss layer names (repeat, f3) map to the real layer');
   chk(S.outcome, 'the e-mail opens with the outcome in plain words, derived from the data');
   chk(S.honest, 'a facet with open milestones is never reported as «انجام شد»');

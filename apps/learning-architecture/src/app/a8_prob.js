@@ -200,7 +200,7 @@
       var ord = A.shuffle(s0.opts.map(function (_, i) { return i; })), tried = 0;
       var opts = h("div", { class: "dopts pb-opts" }, ord.map(function (k) { var o = s0.opts[k]; return h("button", { class: "dopt", onclick: function (e) {
         if (e.target.disabled) return; tried++; e.target.disabled = true; e.target.classList.add(o.ok ? "right" : "wrong");
-        area.insertBefore(h("div", { class: "small " + (o.ok ? "good" : "bad") }, (o.ok ? "درست: " : "نه: ") + o.why + (o.hist ? " — " + o.hist : "")), opts.nextSibling);
+        area.insertBefore(h("div", { class: "small " + (o.ok ? "good" : "bad") }, (o.ok ? "درست" : "نه") + (o.why ? ": " + o.why : ".") + (o.hist ? " — " + o.hist : "")), opts.nextSibling);
         if (o.ok) { Array.prototype.forEach.call(opts.children, function (b) { b.disabled = true; }); finish(firstTry && tried === 1); }
       } }, o.t); }));
       area.appendChild(opts);

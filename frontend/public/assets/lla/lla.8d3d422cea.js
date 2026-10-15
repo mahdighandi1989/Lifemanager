@@ -21085,7 +21085,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
       var ord = A.shuffle(s0.opts.map(function (_, i) { return i; })), tried = 0;
       var opts = h("div", { class: "dopts pb-opts" }, ord.map(function (k) { var o = s0.opts[k]; return h("button", { class: "dopt", onclick: function (e) {
         if (e.target.disabled) return; tried++; e.target.disabled = true; e.target.classList.add(o.ok ? "right" : "wrong");
-        area.insertBefore(h("div", { class: "small " + (o.ok ? "good" : "bad") }, (o.ok ? "درست: " : "نه: ") + o.why + (o.hist ? " — " + o.hist : "")), opts.nextSibling);
+        area.insertBefore(h("div", { class: "small " + (o.ok ? "good" : "bad") }, (o.ok ? "درست" : "نه") + (o.why ? ": " + o.why : ".") + (o.hist ? " — " + o.hist : "")), opts.nextSibling);
         if (o.ok) { Array.prototype.forEach.call(opts.children, function (b) { b.disabled = true; }); finish(firstTry && tried === 1); }
       } }, o.t); }));
       area.appendChild(opts);
@@ -31288,6 +31288,8 @@ APP.goFromURL = function (q) {
   AS.reportText = function (s, g) {
     var sp = (A.state.view || "") + (A.state.arg != null ? " / " + A.state.arg : "");
     var ai = areaInfo(g.area) || areaInfo("lla-page") || { ar: { id: g.area || "?", fa: "؟" }, who: "؟" };
+    // هر بخشِ آزاد جدا کوتاه می‌شود تا بخش‌های ثابت (روالِ رسیدگی، مستندات) هرگز با برشِ کلِ متن نیفتند (بازبینیِ اجرایی ۲۰۲۶-۱۰-۱۵)
+    function F(x) { return x == null || x === "" ? "" : clip(x, 900); }
     return [
       "[دستیار · کمبودِ سامانه · قلمرو: " + ai.ar.id + " · " + (g.kind || "build") + "] " + clip(g.title || s.pinned || "کمبودِ سامانه", 100),
       "",
@@ -31295,16 +31297,16 @@ APP.goFromURL = function (q) {
       "",
       "■ قلمرو و مالک: «" + ai.ar.fa + "» (`" + ai.ar.id + "`) — مالک: " + ai.who + (ai.ar.rule ? " — " + ai.ar.rule : "") + (ai.ar.procedure ? " — بخشِ دستور: " + ai.ar.procedure : ""),
       "■ نوع: " + (KIND_FA[g.kind] || KIND_FA.build),
-      "■ نیازِ انتزاعی (این دسته از خواسته‌ها، نه فقط مسئلهٔ مالک): " + (g.abstract || "—"),
-      "■ دقیقاً چه کم است: " + (g.missing || "—"),
-      "■ کجا افزوده شود: " + (g.where || "—"),
-      "■ چطور: " + (g.how || "—"),
-      "■ پیوند با بخش‌های دیگر: " + (g.relations || "—"),
-      "■ تشخیصِ افتراقیِ دستیار: چرا این قلمرو — " + (g.why_area || "—") + " · چرا نه بقیه — " + (g.why_not || "—") + " · شاهد — " + (g.evidence || "—") +
-        " · اطمینان " + (g.confidence != null ? g.confidence : "?") + " · نظرِ دوم (مدلِ استدلالی): " + (g.consult || "در دسترس نبود — با دقتِ بیشتر بسنجید"),
-      "■ مستنداتی که باید به‌روز شوند: " + (g.docs || "WORKLOG، HANDBOOK، AGENTS.md") + " — به‌علاوهٔ همیشگی‌ها: ورودیِ VIEW_META/ثبت‌گاه برای هر نما یا قابلیتِ تازه (تا دستیار خودکار بشناسدش)، WORKLOG (n)، ردیفِ PROGRESS، بخش و §۱۰/§۱۲ ِ HANDBOOK، docs/overhaul/AUDIT_LOG.md.",
-      "",
+      "■ مستنداتی که باید به‌روز شوند: " + (F(g.docs) || "WORKLOG، HANDBOOK، AGENTS.md") + " — به‌علاوهٔ همیشگی‌ها: ورودیِ VIEW_META/ثبت‌گاه برای هر نما یا قابلیتِ تازه (تا دستیار خودکار بشناسدش)، WORKLOG (n)، ردیفِ PROGRESS، بخش و §۱۰/§۱۲ ِ HANDBOOK، docs/overhaul/AUDIT_LOG.md.",
       "■ روالِ رسیدگی (بخشِ «هماهنگی میانِ روتین‌ها» در هر سه دستور): ۱) `python3 scripts/supervisor/handoff.py precheck --area " + ai.ar.id + " --sheet <شمارهٔ همین برگه>` — اگر روتینِ مالک همین را انجام داده، دوباره‌کاری نکنید؛ با ارجاع به دور/کامیتش جواب دهید و `--kind owner-did` ثبت کنید. ۲) اگر قلمرو مالِ روتینِ دیگری است: یا دقیقاً با دستورِ همان روتین (همان ابزار، همان نگهبان‌ها و بازبینیِ مستقل) و `handoff.py add --kind did`، یا اگر خط‌لولهٔ آن روتین لازم است `--kind request` تا خودش در دورِ بعدش انجام دهد و زیرِ همین برگه جواب بنویسد. ۳) قلمروِ تصمیمِ مالک (قاعده، سقف، ایستگاه، وزن، متنِ جزوه) ⇒ فقط پیشنهاد. ۴) در WORKLOG بنویسید «پاسخ به برگهٔ دستیار #n — دست‌به‌دست h…».",
+      "",
+      "■ نیازِ انتزاعی (این دسته از خواسته‌ها، نه فقط مسئلهٔ مالک): " + (F(g.abstract) || "—"),
+      "■ دقیقاً چه کم است: " + (F(g.missing) || "—"),
+      "■ کجا افزوده شود: " + (F(g.where) || "—"),
+      "■ چطور: " + (F(g.how) || "—"),
+      "■ پیوند با بخش‌های دیگر: " + (F(g.relations) || "—"),
+      "■ تشخیصِ افتراقیِ دستیار: چرا این قلمرو — " + (F(g.why_area) || "—") + " · چرا نه بقیه — " + (F(g.why_not) || "—") + " · شاهد — " + (F(g.evidence) || "—") +
+        " · اطمینان " + (g.confidence != null ? g.confidence : "?") + " · نظرِ دوم (مدلِ استدلالی): " + (F(g.consult) || "در دسترس نبود — با دقتِ بیشتر بسنجید"),
       "",
       "■ حرفِ مالک در این سشن (برای زمینه): " + clip(s.pinned || "", 300)
     ].join("\n").slice(0, 7900);
@@ -31827,6 +31829,8 @@ APP.goFromURL = function (q) {
     c.wchain.filter(function (x) { return !x.outcome && x.due; }).forEach(function (x) { out.push({ t: "⛓ نتیجهٔ واقعیِ «" + clip(x.title, 30) + "»", due: x.due, view: "chain", arg: x.id }); });
     var fo = c.fcast.filter(function (x) { return !x.outcome && x.due; }); if (fo.length) out.push({ t: "🎯 " + fa(fo.length) + " پیش‌بینی", due: first(fo, "due"), view: "fcast" });
     var sc = c.sched.filter(function (x) { return !x.done; }); if (sc.length) out.push({ t: "چرخهٔ ۱-۳-۷ (برگهٔ سفید)", due: first(sc, "due"), view: "topic", arg: sc[0].topic });
+    // سنجشِ ماندگاریِ ۳۰/۹۰ روزه هم موعدِ تمرین است تا یادآور و ایمیل تاریخش را بگویند (کارزارِ سوم v04: یادآورِ تور به بازبینیِ پرونده در اسفند رفت و آزمونِ ۳۰ روزه یادآور نداشت)
+    if (f.kind === "knot") c.knot.forEach(function (k) { HOLD.forEach(function (n) { if (knotSolved(k) && !knotHeld(k, n)) out.push({ t: "🔁 سنجشِ ماندگاری (" + fa(n) + " روز) و دوباره‌سنجیِ همان موقعیتِ نخست", due: plusDays(k.solvedAt, n), view: "kpractice", arg: k.id }); }); });
     c["case"].forEach(function (cs) { var d = cs.st && cs.st.st_final && cs.st.st_final.data; var rd = d && d.revdate && A.epiRevDate ? A.epiRevDate(d.revdate) : ""; if (rd) out.push({ t: "بازبینیِ نتیجهٔ واقعیِ «" + clip(cs.title, 40) + "»", due: rd, view: "e_case", arg: cs.id }); });
     out.forEach(function (p) { p.overdue = p.due && p.due <= t; });
     return out.sort(function (a, b) { return String(a.due).localeCompare(String(b.due)); });
@@ -32090,6 +32094,7 @@ APP.goFromURL = function (q) {
     "- تمرین برای روزهای آینده را خودِ بخش‌ها می‌سازند — مطمئن شو ساخته شود: گره ⇒ «ساختِ ۴ نمونه» یا «ساختِ نمونه با هوش مصنوعی» و یک آزمایشِ واقعی؛ مسئلهٔ بزرگ ⇒ «ساختِ ۴ مسئلهٔ هم‌ساختار + ۱ بدلی» و شبیه‌ساز؛ یادگیری ⇒ کارتِ مرور و «شروع چرخه از امروز»؛ ادعا ⇒ تاریخِ بازبینی در ایستگاهِ پایانی. شبیه‌سازِ مسئلهٔ خودش از موقعیتِ گره با «ساختنِ شبیه‌سازِ همین مسئله». ترس یا نگرانی از آینده ⇒ «⛓ زنجیرهٔ نگرانی» (view=chain؛ حلقه‌ها، احتمال‌ها، حلقه‌های در دستِ کاربر، موعدِ نتیجه)؛ پیش‌بینیِ زندگی ⇒ «🎯 دفترِ پیش‌بینی» (view=fcast)؛ رکوردِ ساخته‌شده را با tour_link به وجه وصل کن.",
     "- تصمیم‌های کاربر (ریشه را تأیید کن، تأییدِ مسئله، بپذیر/رد کن) را نزن: هایلایت کن و یک جمله بگو چرا تصمیم با خودِ اوست.",
     "- وجهِ territory پس از «ساخته و وارسی شد»: کاربر را به همان حوزه ببر (view=e_bt sub=terr) و یک جمله بگو چه ساخته شد و به کارِ او چه ربطی دارد؛ بعد یک موضوعِ یادگیری (topics) یا پروندهٔ سنجش (e_home) در همان حوزه بساز تا تمرینِ فاصله‌دار بگیرد — تا آن نشود وجه تمام نیست.",
+    "- در سنجشِ ماندگاری (۳۰/۹۰ روز) فقط به ورزش بسنده نکن: همان موقعیتِ نخستِ کاربر را دوباره بسنج (همان پرسش‌های آغاز: هنوز پیش می‌آید؟ چند بار؟ شدتِ احساس از ۰ تا ۱۰۰ چند است؟) و اگر زنجیرهٔ نگرانی دارد، احتمال‌های آن را با او دوباره پر کن. اگر موقعیت برگشته، آن را موقعیتِ تازهٔ همان گره ثبت کن (بازگشت)، حتی اگر ورزش درست بود.",
     "- «حل شد» را هرگز خودت یا از حرفِ کاربر اعلام نکن: فقط وقتی نشانه‌های «ورزیده شد» و «ماندگاری ۳۰/۹۰ روز» ✓ است. تا آن وقت بگو «در راهِ حل‌شدن» و آزمونِ بعدی کِی است.",
     "- وجهِ done با «پیگیریِ باز» یعنی پایه‌اش برپاست ولی تسلط کامل نیست: وقتی وجهِ «◀ همین حالا» نیست یا کاربر «[ادامهٔ تور]» گفت، او را سرِ نخستین پیگیریِ باز ببر (سفر تا آخر، آزمایشِ واقعی، شبیه‌ساز) تا همه ✓ شود.",
     "- شکلِ عملیات: {\"do\":\"tour_add\",\"facet\":{\"key\":\"f4\",\"kind\":\"area\",\"area\":\"sf_values\",\"title\":\"…\",\"why\":\"…\"}} · {\"do\":\"tour_skip\",\"facet\":\"f1\",\"why\":\"…\"} · {\"do\":\"tour_focus\",\"facet\":\"f2\"} · {\"do\":\"tour_done\",\"facet\":\"f2\",\"why\":\"…\"} · {\"do\":\"tour_link\",\"facet\":\"f2\",\"id\":\"<شناسهٔ رکورد>\"} · {\"do\":\"tour_goal\",\"goal\":\"…\"}. هر وجه title ِ گویا دارد (هرگز «گامِ دیگر»).",

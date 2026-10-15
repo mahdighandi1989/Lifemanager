@@ -4442,3 +4442,25 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **CHANGE:** `A.knotRank` سه‌وضعی شد، از اصل‌های A0، A1 و A4 ِ کارخانه. گزینه‌های «علیه» تبیین‌های ردشده را صریح دارند. شرح در WORKLOG 54 ِ صفحه و `docs/specs/KNOTS.md` §۱۶.
 - **VERIFY:** `tests/test_knot_axioms.js`، `test_knots.js` و دروازهٔ کامل.
 
+
+## 2026-10-15 — LLA execution review of all recent owner requests (WORKLOG 56)
+- **FINDING:** Campaign 3 and the execution reviewers checked requirements A1–H2 (`docs/decisions/2026-10-15-lla-requirements-verification.md`).
+- **CHANGE:** Several fixes:
+  - knot probe ownership and effects;
+  - safety first;
+  - today's date in the prompt;
+  - deadlines (`a33_dates.js`);
+  - owner-only sheet approval;
+  - code-free e-mails;
+  - mind trend;
+  - window keyboard handling;
+  - gap sheet clipping;
+  - file reading by window.
+- **CHANGE:** Supervisor prompts bumped to v10/v9/v3 (archived):
+  - the urgent routine reads its inbox before the queue;
+  - "ship.sh only";
+  - `handoff.py audit` added to the merge gate (`tests/test_supervisor_handoff_guard.py`);
+  - the guard accepts only open `did` entries.
+- **PROPOSAL:** Two owner decisions are pending:
+  - E6, the overall score / population standing (needs norm data);
+  - `p_base_expert_method`.
