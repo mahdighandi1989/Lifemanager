@@ -1367,7 +1367,9 @@
   var OPTCHK_RE = /مطمئن(?:ی|ید|\s*(?:هستی|هستید|باشم))\s*(?:که\s*)?(?:این|اون|همین)?\s*(?:کار\s*)?(?:درسته|درست\s*(?:است|ه)|جواب\s*می[‌\s]?ده|کار\s*می[‌\s]?کنه)|(?:این|همین)\s*(?:گزینه|انتخاب|راه)\s*(?:درسته|درست\s*است)\s*[؟?]/,
     OPT_RE = /گزینه|انتخاب|تصمیم|راه[‌\s]?حل|(?:یه|یک)\s*راه/;
   function optCheck(t) { t = ownText(t); return OPTCHK_RE.test(t) && OPT_RE.test(t); }
-  function attemptIn(t, teach) { var w = ownText(t); return formulas(w).length > 0 || varEq(w) || PLAN_RE.test(w) || GUESS_REF_RE.test(w) || FOUND_RE.test(w) || AHA_RE.test(w) || guessNow(t, teach); }
+  /* دورِ ۱۰ (ادغام): کارِ خودش به اول‌شخص — «تا اینجا … حساب کردم/گرفتم/نوشتم/کشیدم/امتحان کردم/به دست آوردم» — تلاشِ دیدنی است */
+  var OWNWORK_RE = /(?:تا\s*(?:این\s*جا|اینجا)[^.؟?!\n]{0,80})?(?:حساب|امتحان|رسم|فرض|جایگذاری|جای‌گذاری)\s*کردم|(?:^|[\s،؛])(?:گرفتم|نوشتم|کشیدم|به\s*دست\s*آوردم|بدست\s*آوردم|رسیدم)(?=$|[\s.،؛!؟])/;
+  function attemptIn(t, teach) { var w = ownText(t); return formulas(w).length > 0 || OWNWORK_RE.test(w) || varEq(w) || PLAN_RE.test(w) || GUESS_REF_RE.test(w) || FOUND_RE.test(w) || AHA_RE.test(w) || guessNow(t, teach); }
   /* پیامِ معرفیِ مسئله فقط خودش؛ وگرنه پیام‌های پیشینِ همین سشن هم (تلاشی که پیش‌تر گفت) */
   function attemptSeen(s, mt, teach, intro) {
     if (attemptIn(mt, teach)) return true; if (intro) return false;
