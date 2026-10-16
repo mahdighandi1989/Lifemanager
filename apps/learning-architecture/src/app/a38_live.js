@@ -49,7 +49,8 @@
     objective: { fa: "مسئلهٔ کامل‌بیان‌شده با پاسخِ عینی (ریاضی، اثبات، معما، تمرین) — هنوز حلش نکرده‌ای", note: "مسئلهٔ کامل‌بیان‌شده: همهٔ داده‌ها و شرط داده شده و پاسخ عینی است؛ هر داده معمولاً به کار می‌آید (دادهٔ بی‌کار یعنی چیزی را ندیده‌ای) و داورِ هر گام برهان است، نه پیش‌بینیِ رویداد." }
   };
   A.LIVE_NAT = NAT;
-  function natOf(s, r) { var u = uOf(s), n = (u && u.nat) || (r && r.p && r.p.nat); return NAT[n] ? n : "life"; }
+  /* بی انتخابِ صریح: مسئلهٔ «اثباتی» یا «اثبات یا رد کن» ذاتاً پاسخِ عینی دارد (حکم یا درست است یا نه) ⇒ objective؛ وگرنه life (ادغامِ تورِ ۱، ۲۰۲۶-۱۰-۱۶) */
+  function natOf(s, r) { var u = uOf(s), n = (u && u.nat) || (r && r.p && r.p.nat); if (NAT[n]) return n; var ty = (u && u.type) || (s && s.type) || (r && r.p && (r.p.kind || r.p.ptype)); return (ty === "prove" || ty === "pod") && NAT.objective ? "objective" : "life"; }
   A.liveNature = function (pid) { var r = rec(pid); if (!r) return null; return natOf(solOf(pgOf(pid)), r); };
   /* نامِ صادرشده برای قلاب‌های بیرونی (تور، دستیار): «life» | «practical» | «objective» — همان data-lp-kind ِ صفحه */
   A.liveKind = A.liveNature;
@@ -448,7 +449,8 @@
         field("lpGChal", "یک مشاهده یا حالتِ مشخص که اگر رخ دهد حدست رد می‌شود — و کِی آن را می‌آزمایی", d.gChal, function (v) { d.gChal = v; }, 0)));
       box.appendChild(selF("lpIfRef", "اگر آزمون حدس را رد کند، چه می‌کنی؟", ["حدس را کنار می‌گذارم یا اصلاحش می‌کنم", "آزمون را نادیده می‌گیرم چون حدسم قوی است", "حدس را بی‌تغییر نگه می‌دارم و دیگر نمی‌آزمایم"], d.ifRef, function (v) { d.ifRef = v; }));
       box.appendChild(selF("lpGWant", "دوست داری حدست درست باشد؟", GWANT, d.gWant, function (v) { d.gWant = v; rerender(); }));
-      if (d.gWant === "yes" && +d.conf >= 80) box.appendChild(h("div", { class: "card soft col gap lp-gwant" }, prov("want"),
+      /* آستانهٔ بی‌قرارداد (۲۰۲۶-۱۰-۱۶): بی شاهد، درجهٔ معقول ½ است (A4)؛ خواستنِ درستی + اطمینانِ بیش از ½ همان خطرِ «دلخواه‌اندیشی» است ⇒ چالش. (پیش‌تر ۸۰٪ ِ قراردادی بود.) */
+      if (d.gWant === "yes" && +d.conf > 50) box.appendChild(h("div", { class: "card soft col gap lp-gwant" }, prov("want"),
         h("p", { class: "small" }, "حدسی که دوستش داری و به آن مطمئنی «اثبات یا رد کن» می‌شود: قوی‌ترین شاهدِ خلافش را بنویس؛ با ثبتِ فهم، یک پروندهٔ سنجش در کارخانه می‌گیرد."),
         field("lpGContra", "قوی‌ترین شاهدِ خلاف: چه چیزی، اگر درست باشد، این حدس را رد می‌کند؟", d.gContra, function (v) { d.gContra = v; }, 0)));
       if (A.solveKitUI) { d.kit = d.kit || A.solveBlankKit(); box.appendChild(A.solveKitUI(d.kit, { idp: "lpGK", problem: r.p.statement, parts: ["table", "formula", "rivals", "ana"], noDim: true, drills: false, title: "ابزارهای حدس: جدولِ حالت‌ها، تفاضل‌ها، حدسِ دقیق، حدس‌های رقیب و قیاس",
@@ -477,7 +479,7 @@
       if (fresh && txt(d.guess) && !txt(d.test)) miss.push("«آزمونِ حدس»");
       if (fresh && txt(d.guess) && !d.conf) miss.push("«اطمینان به حدس»");
       if (fresh && txt(d.guess) && (d.conf === "100" || NOREF.test(norm(d.test))) && (toks(d.gChal).length < 3 || NOREF.test(norm(d.gChal)))) { d.showGChal = true; miss.push("«چه چیزی حدست را رد می‌کند؟»"); }
-      if (fresh && txt(d.guess) && d.gWant === "yes" && +d.conf >= 80 && toks(d.gContra).length < 2) miss.push("«قوی‌ترین شاهدِ خلافِ حدس»");
+      if (fresh && txt(d.guess) && d.gWant === "yes" && +d.conf > 50 && toks(d.gContra).length < 2) miss.push("«قوی‌ترین شاهدِ خلافِ حدس»");
       var DW = !txt(d.dead) ? null : prev.deadTxt === txt(d.dead) && prev.deadline ? { date: prev.deadline } : A.willWhen(d.dead);
       if (txt(d.dead) && !(DW && DW.date && !DW.past)) miss.push("«مهلت» (روزِ مشخص و نگذشته بنویس، یا خالی بگذار)");
       return { miss: miss, warn: warn, items: items, DW: DW };
@@ -507,7 +509,7 @@
         if (d.kit && A.solveKitEmpty && !A.solveKitEmpty(d.kit)) s.g[1].kit = U.kitCopy(d.kit);
         U.seed(s, "g");
         /* حدسِ دلخواهِ مطمئن ⇒ «اثبات یا رد کن» در کارخانه (همان مسیرِ ادعا ⇐ پرونده) */
-        if (d.gWant === "yes" && +d.conf >= 80 && txt(d.gContra) && A.newCase) {
+        if (d.gWant === "yes" && +d.conf > 50 && txt(d.gContra) && A.newCase) {
           s.g[1].contra = txt(d.gContra);
           var cs = A.newCase({ title: clip("اثبات یا رد کن: " + txt(d.guess), 70), input: "اثبات یا رد کن: " + txt(d.guess) + "\nقوی‌ترین شاهدِ خلاف: " + txt(d.gContra), src: { type: "lprob", id: pid } });
           if (cs) { L.claims.push({ t: txt(d.guess), caseId: cs.id, at: at, pod: true, contra: txt(d.gContra), from: "guess" }); s.g[1].caseId = cs.id; }
@@ -1015,7 +1017,7 @@
     box.appendChild(field("lpClaim", "ادعای تازه: فکر می‌کنم … درست است", d.t, function (v) { d.t = v; }, 0));
     box.appendChild(h("div", { class: "row gap wrap" }, selF("lpClaimWant", "دوست داری این ادعا درست باشد؟", GWANT, d.want, function (v) { d.want = v; A.render(); }),
       selF("lpClaimConf", "چقدر به آن مطمئنی؟", ["50", "60", "70", "80", "90", "100"].map(function (x) { return [x, fa(x) + "٪"]; }), d.conf, function (v) { d.conf = v; A.render(); })));
-    var podC = d.want === "yes" && +d.conf >= 80;
+    var podC = d.want === "yes" && +d.conf > 50;
     if (podC) box.appendChild(h("div", { class: "card soft col gap lp-claimpod" }, prov("want"),
       h("p", { class: "small" }, "ادعایی که دوستش داری و به آن مطمئنی، «اثبات یا رد کن» می‌شود: پیش از پرونده، قوی‌ترین شاهدِ خلافش را بنویس — همان را اول بیازما."),
       field("lpClaimContra", "قوی‌ترین شاهدِ خلاف: چه چیزی، اگر درست باشد، این ادعا را رد می‌کند؟", d.contra, function (v) { d.contra = v; }, 0)));
