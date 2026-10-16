@@ -250,11 +250,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     APP.liveBindSession(pid, s, { force: true }); APP.go('home');
     const un0 = APP.liveUnused(pid).map(d => d.t);
     __calls.length = 0; await AS.send('پنکهٔ سقفی به نظرم بی‌فایده‌ست؛ رنگِ پرده هم');
-    const u = __calls[0].user, lines = u.match(/^- داده‌هایی که هنوز [^\n]*/mg) || [];
+    // دورِ ۱۱ (K1): سطرِ a38 «زمینه (نه پرسشِ دوم)» است
+    const u = __calls[0].user, lines = u.match(/^- (?:زمینه \(نه پرسشِ دوم\): )?داده‌هایی که هنوز [^\n]*/mg) || [];
     // گامی که «پنکهٔ سقفی» را به کار می‌برد ⇒ از فهرست بیرون می‌رود (همان A.liveUnused)
     pg.solve.live.steps = [{ id: 'ls1', text: 'ارتفاعِ پنکهٔ سقفی را می‌سنجم', data: ['d2'], closed: true, out: { done: 'yes', match: 'yes' } }]; S.put(pg);
     __calls.length = 0; await AS.send('بعدش چی');
-    const u2 = __calls[0].user, lines2 = u2.match(/^- داده‌هایی که هنوز [^\n]*/mg) || [];
+    const u2 = __calls[0].user, lines2 = u2.match(/^- (?:زمینه \(نه پرسشِ دوم\): )?داده‌هایی که هنوز [^\n]*/mg) || [];
     return { un0, one: lines.length === 1, exact: lines.length === 1 && un0.every(t => lines[0].indexOf('«' + t + '»') >= 0) && lines[0].indexOf('«طولِ میز ۱۴۰ سانت»') < 0,
       after: APP.liveUnused(pid).map(d => d.t), one2: lines2.length === 1, gone: lines2.length === 1 && lines2[0].indexOf('«پنکهٔ سقفی»') < 0 && lines2[0].indexOf('«رنگِ پرده»') >= 0 };
   });

@@ -534,6 +534,9 @@
     soft.forEach(function (x) { if (d.softSeen.indexOf(x[0]) < 0) d.softSeen.push(x[0]); miss.push(x[1]); });
     d.softShow = true; return null;
   }
+  /* پیامِ کوتاهِ toast: سخت‌ها و هشدارهای حدسی جدا و با نامِ خودشان (هرگز یک فهرستِ آمیخته زیرِ «اول این‌ها») */
+  function missToast(d, miss, where) { var hd = hardOf(d, miss), sm = d.softShow ? (d.softMsgs || []) : [];
+    return (hd.length ? "اول این‌ها: " + hd.join("، ") : "") + (sm.length ? (hd.length ? " — جدا از آن، " : "") + "هشدارهای حدسی (" + where + "؛ ثبت با همین — دلیل): " + sm.join("، ") : ""); }
   function hardOf(d, miss) { var sm = d.softShow ? (d.softMsgs || []) : []; return (miss || []).filter(function (m) { return sm.indexOf(m) < 0; }); }
   function softField(id, d, fn) {
     var hard = (d.softHard || []).length, msgs = d.softMsgs || [];
@@ -870,7 +873,7 @@
       /* دورِ ۲ (s02): جملهٔ کلی که پس از «ثبتِ کل» دوباره رونوشت شد ⇒ دروازهٔ «اول کل» دوباره جلوی چشم (نه پیامی دربارهٔ فیلدی که دیده نمی‌شود) */
       var ww = wholeWhy(d, r); if (ww.length) { d.wholeOk = false; d.lastMiss = null; rerender(); A.toast("هنوز نه: " + ww.join("؛ "), "bad"); return; }
       var V = vald();
-      if (V.miss.length) { d.gradePending = false; d.lastMiss = V.miss; var hdU = hardOf(d, V.miss); A.toast(hdU.length ? "اول این‌ها را بنویس: " + hdU.join("، ") + (d.softShow ? " — و هشدارهای حدسیِ زیرِ دکمه" : "") : "پیش از ثبت، هشدارهای حدسیِ زیرِ دکمه را ببین (ثبت با همین — دلیل)", "bad"); if ((d.showChal && !box.querySelector(".lp-suffchal")) || (d.showGChal && !box.querySelector(".lp-gchal")) || (d.showCirc && !box.querySelector(".lp-suffcirc"))) { rerender(); return; } out.innerHTML = ""; out.appendChild(missBox("lp-umiss", "lpSoftWhy", d, V.miss)); return; }
+      if (V.miss.length) { d.gradePending = false; d.lastMiss = V.miss; A.toast(missToast(d, V.miss, "زیرِ دکمه"), "bad"); if ((d.showChal && !box.querySelector(".lp-suffchal")) || (d.showGChal && !box.querySelector(".lp-gchal")) || (d.showCirc && !box.querySelector(".lp-suffcirc"))) { rerender(); return; } out.innerHTML = ""; out.appendChild(missBox("lp-umiss", "lpSoftWhy", d, V.miss)); return; }
       d.lastMiss = null; d.gradePending = true; saveNow(); saveBtn.disabled = true; showGrade(V);
     } }, "ثبتِ فهم");
     box.appendChild(saveBtn);
@@ -1240,7 +1243,7 @@
       unAns.forEach(function (x) { soft.push(["unused:" + x.id, "«" + clip(x.t, 40) + "» را در طرحت نیافتم — به کارش بردی؟ (حدسی از واژه‌ها: اگر به نامِ دیگری آمده، همان را در دلیل بگو)"]); });
       unusedMiss(un.filter(function (x) { return unAns.indexOf(x) < 0; }), d.unused).forEach(function (x) { miss.push(x); });
       var sg = softGate(d, soft, miss);
-      if (miss.length) { d.planMissL = miss.slice(); drawMiss(); var hdP = hardOf(d, miss); A.toast(hdP.length ? "اول این‌ها: " + hdP.join("، ") + (d.softShow ? " — و هشدارهای حدسیِ زیرِ دکمه" : "") : "پیش از ثبت، هشدارهای حدسیِ زیرِ دکمه را ببین (ثبت با همین — دلیل)", "bad"); drawUn(); return; }
+      if (miss.length) { d.planMissL = miss.slice(); drawMiss(); A.toast(missToast(d, miss, "زیرِ دکمه"), "bad"); drawUn(); return; }
       var keep = JSON.parse(JSON.stringify((L.plan && L.plan.unused) || {})); un.forEach(function (x) { var a = d.unused[x.id] || {}; keep[x.id] = unAns.indexOf(x) >= 0 && sg ? { ans: "soft", why: sg.why, t: x.t } : { ans: a.ans, why: txt(a.why), t: x.t }; });
       if (L.plan && L.plan.at && txt(L.plan.t) !== txt(d.t)) (L.planHist = L.planHist || []).push({ t: L.plan.t, t2: L.plan.t2 || "", at: L.plan.at });
       L.plan = { t: txt(d.t), at: nowISO(), d: A.today(), unused: keep, heur: heurUsed(r, s) }; if (txt(d.t2)) L.plan.t2 = txt(d.t2);
@@ -2716,7 +2719,7 @@
       }
       unusedMiss(un, d.unused).forEach(function (x) { miss.push(x); });
       var sg = softGate(d, soft, miss);
-      if (miss.length) { var hdB = hardOf(d, miss); A.toast(hdB.length ? "اول این‌ها: " + hdB.join("، ") + (d.softShow ? " — و هشدارهای حدسیِ بالای دکمه" : "") : "پیش از ثبت، هشدارهای حدسیِ بالای دکمه را ببین (ثبت با همین — دلیل)", "bad"); var sgB = box.querySelector(".lp-softgate"); if (d.softShow && !sgB) rer(); else if (d.softShow && sgB) sgB.replaceWith(softField("lpBSoftWhy", d)); return; }
+      if (miss.length) { A.toast(missToast(d, miss, "بالای دکمه"), "bad"); var sgB = box.querySelector(".lp-softgate"); if (d.softShow && !sgB) rer(); else if (d.softShow && sgB) sgB.replaceWith(softField("lpBSoftWhy", d)); return; }
       var at = nowISO(), keep = {}; un.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });
       var b = { state: L.state, chkHow: txt(d.chkHow), chkRes: d.chkRes, other: txt(d.other), glance: txt(d.glance), worked: txt(d.worked), use: txt(d.use), newProb: txt(d.newProb), unused: keep, want: d.want, at: at, done: true, from: "live" };
       if (txt(d.newProb)) { b.newShare = d.newShare; b.newWhy = txt(d.newWhy); if (d.newShare === "form") b.newMap = txt(d.newMap); }
