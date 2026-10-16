@@ -140,7 +140,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(/پیش از رها کردن/.test(a.s04.one), 'abandon: from chat, «ولش کنم … راهی نیست» gives the a38 abandon question «پیش از رها کردن…» as the ONE turn question, not «از خواسته به عقب» (s04, s06) ' + JSON.stringify(a.s04));
     await say('مدیرم گفت «کل این طرح رو بنداز دور». ولی من فقط گیر کردم.');
     const t2 = await lastTurn(); a.quoted = { abandon: t2 && t2.abandon, stuck: t2 && t2.stuck };
-    chk(a.quoted.abandon === false && a.quoted.stuck === true, 'abandon: a QUOTED «بنداز دور» (someone else\'s words) is no abandon signal by the user ' + JSON.stringify(a.quoted));
+    await say('نمی‌خوام کل این طرح رو بندازم دور؛ فقط یه حلقه‌اش مشکل داره.');
+    const t3 = await lastTurn(); a.quoted.neg = t3 && t3.abandon;
+    chk(a.quoted.abandon === false && a.quoted.stuck === true && a.quoted.neg === false, 'abandon: a QUOTED «بنداز دور» (someone else\'s words) or a negated «نمی‌خوام … بندازم دور» is no abandon signal by the user ' + JSON.stringify(a.quoted));
   });
   await section('fresh', async () => {
     const f = info.fresh = {};
