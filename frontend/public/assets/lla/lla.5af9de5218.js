@@ -42730,6 +42730,9 @@ APP.goFromURL = function (q) {
      هرگز شمارِ پیام؛ پرسشِ پاسخ‌گرفته (در صفحه یا گفت‌وگو — opts.asked) دوباره پیشنهاد نمی‌شود. تمام شدنِ نردبان ⇒ ladderEnd (قاعدهٔ C188، D3). */
   /* بی واژهٔ پرسشی، فقط وقتی «بیش از نیم» ِ واژه‌های هر دو سو مشترک است (A4 از هر دو سو — «خیلی خوب؟» پرسشِ فهرست نیست) */
   function sameQBoth(a, b) { var x = toks(a), y = toks(b); if (!x.length || !y.length) return false; var sh = x.filter(function (w) { return y.indexOf(w) >= 0; }).length; return sh / Math.max(x.length, y.length) > 0.5; }
+  /* دورِ ۹ (E5 در برابرِ s28): تکهٔ عینیِ یک پرسشِ فهرست (پیامِ دستیار در «؟» شکسته شد: «برای به‌کار بردنش عنصرِ کمکی لازم است؟») همان پرسش است —
+     نه پرسشی که فقط چند واژه با آن شریک است */
+  function fragOf(t, q) { var a = norm(t).replace(/[؟?]\s*$/, "").trim(); return a.length >= 8 && norm(q).indexOf(a) >= 0; }
   function sameQ(a, b) { var x = toks(a), y = toks(b); if (!x.length || !y.length) return false; var sh = x.filter(function (w) { return y.indexOf(w) >= 0; }).length; return sh / Math.min(x.length, y.length) > 0.5; }   // A4: «بیش از نیم» ِ واژه‌های پرسشِ کوتاه‌تر
   /* F2 (دورِ ۵): یک پرسش در هر نوبت، یک منبع — همین تابع پرسشِ بازِ کارتِ صفحه را هم تعیین می‌کند (pageQ) و پرسشِ نوبت را با این ترتیب (پولیا: اول
      دشواریِ واقعیِ همین لحظهٔ یادگیرنده):
@@ -43575,7 +43578,7 @@ APP.goFromURL = function (q) {
         /* E5: تکهٔ یک پرسشِ شناخته‌شده («از آن چه به کار می‌آید؟») ⇒ همان پرسشِ کامل — H3 (دورِ ۷، s02): پرسشِ شناخته‌شدهٔ فهرست («همهٔ داده‌ها را به کار برده‌ای؟»)
            واژهٔ پرسشی نمی‌خواهد */
         var isQ = /[؟?]$/.test(t) && QWORD.test(t) && t.length >= 8 && t.length <= 220;
-        var kq = /[؟?]$/.test(t) && t.length >= 8 ? (known.filter(function (q) { return sameQBoth(t, q); /* دورِ ۹ (s28): نگاشتِ پرسشِ گفت‌وگو به پرسشِ فهرست در «کدام پرسش کمک کرد؟» دوسویه است (بیش از نیمِ واژه‌های هر دو، A4) — وگرنه پرسشی که پرسیده نشد جای پرسشِ پرسیده‌شده می‌نشست */ })[0] || (!isQ && B3_RE.test(norm(t)) ? t : "")) : "";
+        var kq = /[؟?]$/.test(t) && t.length >= 8 ? (known.filter(function (q) { return sameQBoth(t, q) || fragOf(t, q); /* دورِ ۹ (s28): نگاشتِ پرسشِ گفت‌وگو به پرسشِ فهرست در «کدام پرسش کمک کرد؟» دوسویه است (بیش از نیمِ واژه‌های هر دو، A4) — وگرنه پرسشی که پرسیده نشد جای پرسشِ پرسیده‌شده می‌نشست */ })[0] || (!isQ && B3_RE.test(norm(t)) ? t : "")) : "";
         if (!kq && !isQ) return;
         if (kq) t = kq;
         var ix = -1; o.forEach(function (e, i) { if (e.t === t) ix = i; });
