@@ -84,7 +84,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.back.ph && info.back.c115 && info.back.taste && info.back.hyp, 'R1: after «حل شد» the coach moves to look-back (most important, never finished, taste, good authors) with proof look-back questions ' + JSON.stringify(info.back));
   // نوعِ عملی ⇒ پرسش‌های داوری با واقعیت
   await newSess(); await say('می‌خوام برای مغازه‌ام تصمیم بگیرم که شنبه‌ها باز باشم یا نه');
-  info.pract = await p.evaluate(() => { const u = __calls[__calls.length - 1].user; return { pract: /تصمیم\/کارِ واقعی/.test(u) && /دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است/.test(u), notProve: !/فرض چیست؟ حکم/.test(u) }; });
+  info.pract = await p.evaluate(() => { const u = __calls[__calls.length - 1].user; return { pract: /مرحلهٔ محتمل: [^·\n]*· (?:تصمیم\/کارِ واقعی|تصمیمِ زندگی)/.test(u) && /دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است/.test(u), notProve: !/فرض چیست؟ حکم/.test(u) }; });   // R5 F4: تصمیمِ زندگی ردهٔ «life» خودش را دارد، نه «pract»
   chk(info.pract.pract && info.pract.notProve, 'R1/R2: a life/practical problem gets the practical question list, not the proof list ' + JSON.stringify(info.pract));
 
   // ---------- R1c) دلسردی: واژه‌نامهٔ گسترده؛ منفی ----------

@@ -995,6 +995,7 @@
     // نوبتِ خودکارِ «[سامانه: …]» حرفِ کاربر نیست: مرحله را عوض نمی‌کند و پرسش را جلو نمی‌برد — پس از «حل شد» بازنگری می‌ماند
     var root = s.tutor = s.tutor || {}, by = root.by = root.by || {}, key = c.pid ? "p:" + c.pid : c.rec && c.rec.id ? "r:" + c.rec.id : "t:" + clip(c.title, 60);
     var tu = by[key] = by[key] || { qi: {} }, mtxt = String(msg || "").trim(), auto = /^\[سامانه/.test(mtxt), ph;
+    var Ct = s.coach = s.coach || {}; Ct.pk = "t:" + key;   // F3 (دورِ ۵): دفترِ پاسخِ همین مسئلهٔ شبیه‌ساز
     if (auto) ph = tu.ph || tutorPhase(c, msg);
     else {
       ph = tutorPhase(c, msg);

@@ -258,7 +258,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sayQ('نمی‌دونم، گیر کردم');
     info.e3live.dataStuck = /^- داده‌هایی که هنوز/m.test(await q.evaluate(() => __calls[__calls.length - 1].user));
     chk(info.e3live.full, 'E3: the live block lists the WHOLE phase list (not cut at 7, no clipped question), with ids ' + JSON.stringify(info.e3live) + ' ' + line.slice(0, 300));
-    chk(!info.e3live.dataLine && info.e3live.dataStuck, 'E3: «have you used all the data?» is not raised at the start of planning (no plan, not stuck) — only when stuck or once a plan exists ' + JSON.stringify(info.e3live));
+    // DECISIONS_R5 F2: «همهٔ داده‌ها؟» هرگز پیش از طرح — حتی با «گیر کردم» (پیش‌تر گیر آن را زودتر می‌آورد)
+    chk(!info.e3live.dataLine && !info.e3live.dataStuck, 'E3/R5-F2: «have you used all the data?» is not raised before a plan exists, stuck or not ' + JSON.stringify(info.e3live));
     chk(info.e3live.p1Marked, 'E1: the model\'s «ans: p1» on the live problem\'s list marks that page question answered in chat ' + JSON.stringify(info.e3live));
     await ctx.close();
   }
