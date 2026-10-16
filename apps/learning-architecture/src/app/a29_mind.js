@@ -363,7 +363,9 @@
       });
       var us = []; Object.keys(sv.u || {}).forEach(function (lv) { if (sv.u[lv]) us.push(sv.u[lv]); }); us = us.concat((sv.live && sv.live.uHist) || []);
       us.forEach(function (u) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2); });
-      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes"); });
+      /* تورِ پولیا دورِ ۳ (A12/R7، s04): گامی که انجام شد ولی به حل نزدیک نکرد («پیشرفت: نه») شکستِ اجراست، نه موفقیت — موفق = کامل انجام شد و
+         دست‌کم کمی پیش برد (پیش‌بینیِ نادرست به‌تنهایی داده است، نه شکست: «غافلگیر شدی — این داده است»). گامِ برهانی «پیشرفت» ندارد و همان رفتارِ پیشین را دارد. */
+      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes" && o.prog !== "نه"); });
       /* بازنگری‌ای که دستیار از گفت‌وگو ثبت کرد (chat_solved) فقط وقتی شمرده می‌شود که درسش به قلمِ خودِ کاربر باشد (b.own) — R7 */
       Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own) return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
     });
@@ -447,7 +449,10 @@
     var C = M.csvChart(text, "نمودارِ «" + name + "»"), box = h("div", { class: "card soft csv-plot", dir: "rtl", "data-file": name });
     box.appendChild(h("h4", {}, "📈 نمودارِ «" + name + "»"));
     if (!C) { box.appendChild(h("p", { class: "small muted" }, "ستونِ عددی‌ای پیدا نشد که همهٔ خانه‌هایش عدد باشد — نموداری کشیده نشد.")); return box; }
-    box.appendChild(C.svg);
+    /* تورِ پولیا دورِ ۳ (A13، s32): در حبابِ باریکِ گفت‌وگو SVG ِ ۶۴۰ پیکسلی کوچک می‌شد و برچسب‌های محورِ ۱۱px چند پیکسل می‌شدند —
+       نمودار در اندازهٔ خودش می‌ماند (برچسب‌ها واقعاً ۱۱px) و قابش افقی می‌لغزد؛ صفحه سرریز نمی‌کند */
+    C.svg.setAttribute("style", "max-width:none;height:auto;display:block");
+    box.appendChild(h("div", { class: "csv-scroll", dir: "ltr", style: "overflow-x:auto;max-width:100%" }, C.svg));
     box.appendChild(h("p", { class: "small muted csv-note" }, fa(C.n) + " سطر · ستون‌ها: " + C.series.join("، ") + (C.label ? " · محورِ افقی: «" + C.label + "»" : " · محورِ افقی: شمارهٔ سطر") + (C.skipped ? " · " + fa(C.skipped) + " ستونِ عددیِ دیگر کشیده نشد" : "") +
       " — فقط خودِ داده‌ها؛ هیچ روند، میانگین یا برازشی کشیده نشده. الگو (فصل، جهش، تکرار) را خودت ببین و داوری کن."));
     return box;

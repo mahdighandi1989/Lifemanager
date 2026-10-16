@@ -96,7 +96,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk((await R(P1)).p.nat === 'objective' && await p.evaluate(pid => APP.liveKind(pid), P1) === 'objective', 'R2: prove ⇒ objective stored on the record');
     await p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); pg.solve.live.uDraft = { type: 'prove', nat: 'life', one: '', why: '', u: '', dl: [], c: '' }; APP.S.put(pg); }, P1);
     await go('lprob', P1, 'u');
-    chk(await p.evaluate(() => document.getElementById('lpNat').value) === 'objective' && await p.evaluate(() => document.getElementById('lpNat').disabled) && await has('main .lp-natobj') === 1, 'R2: a stale draft «life» never overrides the stored kind; proof ⇒ objective, select locked');
+    // دورِ ۳ (D1): پیش‌فرضِ «اثباتی» کامل‌بیان‌شده است ولی قفل نیست (فرضیهٔ زندگی می‌تواند «زندگی» باشد)
+    chk(await p.evaluate(() => document.getElementById('lpNat').value) === 'objective' && !(await p.evaluate(() => document.getElementById('lpNat').disabled)) && await has('main .lp-natobj') === 1, 'R2/D1: a stale draft «life» never overrides the stored kind; proof ⇒ objective by default (select not locked)');
     // برچسب‌های «اثباتی» بی واژه‌های یافتنی (R8، s33)
     await whole('می‌خواهم نشان دهم دو نقطه به هم نزدیک‌اند', 'هندسه را دوست دارم');
     info.labels = await p.evaluate(() => ({ dl: document.querySelector('main .lp-dl legend').textContent, c: document.querySelector('label[for="lpCond"]').textContent, rel: document.querySelector('label[for="lpRel"]').textContent }));
@@ -174,6 +175,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(s1.live.state === 'solved' && s1.live.steps[0].intuitive === false && /لانهٔ کبوتر/.test(s1.live.steps[0].proof), 'R5: the intuitive step proved at closing; then solved');
     // بازنگریِ برهان: پاسکال، همهٔ فرض، نتیجه = حکم؛ بخشِ شرطِ به‌کارنرفته
     chk(await has('#lpBDef') === 1 && await has('#lpBHyp') === 1 && await has('#lpBConcl') === 1 && await has('#lpBLimit') === 1, 'kind: proof look-back asks Pascal\'s rule, all hypotheses, conclusion = claim; spatial ⇒ limiting case');
+    chk(await has('#lpBLetter') === 1 && await has('main .lp-btransfer') === 1, 'A13 (دورِ ۳): spatial look-back offers the letter form and the transfer (angle/volume) prompt');
     // ایراد ⇒ نمی‌بندد
     await p.fill('#lpBChk', 'حالتِ نقطه‌های روی مرز را جدا وارسی کردم'); await sel('#lpBRes', 'نتیجه سالم ماند');
     await sel('#lpBHyp', 'notall');
@@ -287,9 +289,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpBase', 'برای n = ۴: ۱۶ > ۱۶ نیست؛ پس پایه را n = ۵ می‌گیرم: ۳۲ > ۲۵');
     await click('main .lp-stepsave');
     chk((await S(P4)).live.steps.length === 1 && /۳۲/.test((await S(P4)).live.steps[0].base), 'kind: base case recorded with the step');
-    chk(await has('main .lp-eqs') === 1, 'R3: equations written in steps are counted');
-    await p.fill('#lpEqUnk', '۹'); await click('main .lp-eqsave');
-    chk(/کم است/.test(await txt('main .lp-eqmsg')), 'R3: fewer equations than unknowns ⇒ «which part of the condition is not an equation yet?» ' + await txt('main .lp-eqmsg'));
+    // دورِ ۳ (A9): برهان مجهول ندارد — کارتِ «معادله‌ها در برابرِ مجهول‌ها» برای «اثباتی» نمی‌آید (شمارش و «معادله کم است» در test_tour1_r3_live.js روی مسئلهٔ یافتنی)
+    chk(await has('main .lp-eqs') === 0, 'A9: the equations-vs-unknowns card is hidden for proofs');
     await objStep('در گامِ استقرا دو طرف را به توانِ دو رساندم و مقایسه کردم', 'طرفین مثبت‌اند؛ اگر نبودند به تناقض می‌رسیدیم');
     chk((await S(P4)).live.steps.length === 2 && !(await S(P4)).live.switches, 'R4: a second induction step needs neither a new base nor a plan switch');
     await click('main .lp-solved');

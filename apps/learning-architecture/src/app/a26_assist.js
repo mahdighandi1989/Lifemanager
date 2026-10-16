@@ -960,14 +960,15 @@
   /* فرمول و عبارتِ لاتین درونِ جملهٔ فارسی (تورِ پولیا s18: «dV/dt = (πy²/9)·dy/dt» در حبابِ راست‌به‌چپ جابه‌جا خوانده می‌شد):
      هر دنبالهٔ پیوستهٔ نشانه‌های لاتین/عدد/عملگر (با فاصله‌های میانش) جدا در <bdi dir="ltr"> می‌نشیند؛ نشانه‌گذاریِ فارسیِ دو سرش بیرون می‌ماند */
   /* تورِ پولیا دورِ ۲ (rerunB s18): پیکان‌ها (→ ⇒ ←)، ≈ ≠ ± ∈، توان‌ها و درصد هم عملگرند — «y→0» و «cm³/s ÷ cm² = cm/s» یک تکهٔ چپ‌به‌راست‌اند */
-  var RTL_CH = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9π√∑∞=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ()\[\]→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/,
+  /* تورِ پولیا دورِ ۳ (A13، s18): رقمِ فارسی/عربی خنثی است، نه راست‌به‌چپ — «= ۲۴ cm/s» و «y→۰» در همان تکهٔ چپ‌به‌راست می‌مانند (پیش‌تر نتیجه بیرونِ <bdi> بود) */
+  var RTL_CH = /[\u0590-\u065F\u066A-\u06EF\u06FA-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9\u0660-\u0669\u06F0-\u06F9π√∑∞=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ()\[\]→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/,
     LTR_OP = /[=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ√∑π→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/;
   function bidiNodes(t) {
     var parts = String(t == null ? "" : t).split(/(\s+)/), out = [], buf = "", run = [];
     function flush() {
       if (!run.length) return; var tx = run.join(""); run = [];
       var lead = (tx.match(/^[«"'“]+/) || [""])[0], trail = (tx.match(/[.,،:؛!?؟»"'”…]+$/) || [""])[0], core = tx.slice(lead.length, tx.length - trail.length);
-      if (core && /[A-Za-z0-9]/.test(core) && (LTR_OP.test(core) || /\s/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr", style: "unicode-bidi:isolate;direction:ltr" }, core)); }
+      if (core && /[A-Za-z0-9]/.test(core) && (LTR_OP.test(core) || /\s/.test(core) || /[\u0660-\u0669\u06F0-\u06F9]/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr", style: "unicode-bidi:isolate;direction:ltr" }, core)); }
       else buf += tx;
     }
     parts.forEach(function (p) {
