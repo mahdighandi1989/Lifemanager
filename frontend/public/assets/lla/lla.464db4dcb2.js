@@ -36382,7 +36382,10 @@ APP.goFromURL = function (q) {
     /* G4 (دورِ ۶، s28): سرواژه با پرسشِ نوبت هم‌خوان — وقتی پرسشِ نوبت پرسشِ بازنگریِ «نتیجه‌ای گفتی» است (src turn-result ِ بخشِ مسئله) ⇒ «بازنگری»، با یادِ مرحلهٔ صفحه؛ ادعای «حل شد» که صفحه پرسشِ دیگری برایش دارد مرحله را عوض نمی‌کند (W3) */
     /* H3 (دورِ ۷، s22؛ سهمِ «live»): نامِ مرحلهٔ اجرا هم‌خوان با بلوکِ مسئله — عملی/زندگی «اجرا روی واقعیت» */
     var phF = function (k) { return k === "c" && (cls === "pract" || cls === "life") ? "اجرا روی واقعیت" : PH_FA[k]; };
-    var L = ["# مربیِ حل (روحِ «چگونه آن را حل کنیم») — کمک نه خیلی کم، نه خیلی زیاد · مرحلهٔ محتمل: " + phF(o.phShow || ph) + (o.phShow ? " (نتیجه‌ای گفت؛ صفحه هنوز «" + phF(ph) + "»)" : "") + (podLife ? " · فرضیه (داور: واقعیت و داوریِ خودش، نه برهان)" : cls === "prove" ? (o.ptype === "pod" ? " · اثبات یا رد (حدس)" : " · اثباتی") : cls === "obj" ? " · پاسخِ عینی" : cls === "pract" ? " · تصمیم/کارِ واقعی (داور واقعیت)" : cls === "life" ? " · تصمیمِ زندگی (داور: واقعیت و داوریِ خودش)" : "") + (o.teach ? " · کاربر مربیِ یادگیرنده است" : "") +
+    /* H3 (دورِ ۷، s25/s12؛ سهمِ «live»): حدسِ تازه پس از مسئلهٔ بسته‌شده مسئلهٔ تازه است (سرواژه «فهم»)؛ نوبتِ ردِ حدس بازنگری نیست — کار ادامه دارد («طرح») */
+    var phHead = o.phShow || ph;
+    if (ph === "b" && !o.phShow && !o.live) { if (o.closed && (o.guess || /حدس(?:م|\s*می[‌\s]?زنم)|فکر\s*(?:کنم|می[‌\s]?کنم)/.test(mt))) phHead = "u"; else if (o.refuted || GUESS_REF_RE.test(mt)) phHead = "p"; }
+    var L = ["# مربیِ حل (روحِ «چگونه آن را حل کنیم») — کمک نه خیلی کم، نه خیلی زیاد · مرحلهٔ محتمل: " + phF(phHead) + (o.phShow ? " (نتیجه‌ای گفت؛ صفحه هنوز «" + phF(ph) + "»)" : "") + (podLife ? " · فرضیه (داور: واقعیت و داوریِ خودش، نه برهان)" : cls === "prove" ? (o.ptype === "pod" ? " · اثبات یا رد (حدس)" : " · اثباتی") : cls === "obj" ? " · پاسخِ عینی" : cls === "pract" ? " · تصمیم/کارِ واقعی (داور واقعیت)" : cls === "life" ? " · تصمیمِ زندگی (داور: واقعیت و داوریِ خودش)" : "") + (o.teach ? " · کاربر مربیِ یادگیرنده است" : "") +
       " — اگر این نوبت دربارهٔ حلِ مسئله، حدس یا ادعایی نیست، این بلوک را نادیده بگیر."];
     L.push("- قاعدهٔ سبک: هر پیام فقط **یک ایده** و حداکثر **یک پرسش**، از کلی به خاص؛ کوتاه. جواب، نامِ قضیه، گزینهٔ درست یا گامِ بعد را لو نده.");
     if (o.teach) L.push("- **قابِ مربی (B10):** کاربر می‌خواهد به یادگیرنده‌اش (فرزند/شاگرد) یاد بدهد — او حل‌کننده نیست. پرسش‌هایی پیشنهاد کن که **او از یادگیرنده بپرسد** (کلی ⇐ خاص، یکی‌یکی، با درنگ)، هرگز پاسخ یا راه‌حل برای گفتن به یادگیرنده؛ مرحله مرحلهٔ یادگیرنده است. «خودم حلش کردم» یعنی خودِ او — بپرس یادگیرنده کجاست و کدام پرسش را از او پرسید.");
@@ -42691,7 +42694,7 @@ APP.goFromURL = function (q) {
     /* «نمی‌دونم چطور از X استفاده کنم» با مسئلهٔ مرتبطِ حل‌شده — دشواریِ واقعی به‌کار بردنِ آن است، نه گیرِ عام (s35) */
     if (act && (T.related || (REL_USE_RE.test(tx) && (L.related.length || (L.seen && L.seen.ans === "yes") || REL_EVID_RE.test(tx))))) pick(Q.filter(function (x) { return /نتیجه[\s\S]{0,40}روش[\s\S]{0,80}کمکی/.test(x); })[0] || Q_RELUSE, "turn-related");
     /* میلِ رها کردن: در زنجیرهٔ «از آخر به عقب» ⇒ کدام حلقه شکست (C095/C096)؛ وگرنه مسئلهٔ کمکیِ کوچک‌تر (بخشی از شرط/حالتِ خاص) — همان که 🌱 می‌خواهد (s04/s06) */
-    if ((ph === "p" || ph === "c") && (T.abandon || ABANDON_L.test(tx))) { var ch = chosenChain(L); pick(ch && (ch.links || []).some(function (x) { return txt(x); }) ? Q_LINK : Q_PARTAUX, "turn-abandon"); }
+    if ((ph === "p" || ph === "c") && (typeof T.abandon === "boolean" ? T.abandon : ABANDON_L.test(tx))) { var ch = chosenChain(L); pick(ch && (ch.links || []).some(function (x) { return txt(x); }) ? Q_LINK : Q_PARTAUX, "turn-abandon"); }
     /* H3 (دورِ ۷، s10): در بازنگریِ برهان، «چطوری بگم/توضیح بدم؟» همان پرسشِ «از راهِ دیگر؟ مستقیمش می‌کنی؟» (C064) است — ارائهٔ برهان برای دیگری */
     if (ph === "b" && proofLike(r, s) && PRESENT_RE.test(tx)) pick(Q.filter(function (x) { return /مستقیم/.test(x); })[0] || "", "turn-present");
     /* H2 (دورِ ۷، s01): گردآوریِ بی‌پایان در مسئلهٔ عملی ⇒ «کجا خط می‌کشی؟»، هرگز «همهٔ داده‌ها؟» */
@@ -43974,6 +43977,9 @@ APP.goFromURL = function (q) {
       /* هماهنگ با مربی (دورِ ۶): سطرِ «حدسِ ردشده — بپرس از ردش چه آموخت» فقط در نخستین نوبت پس از رد (و تکرارِ همان پیام)، نه هر نوبت */
       var refK = refT ? pid + "|" + refT : "", refFirst = false;
       if (refK) { if (tu.refK !== refK) { tu.refK = refK; tu.refMsg = mt; refFirst = true; } else refFirst = tu.refMsg === mt; }
+      /* H3 (دورِ ۷، s19): «بپرس از ردش چه آموخت» فقط در روزِ خودِ رد — نه نخستین نوبتی که شش هفته بعد می‌آید */
+      var refSt = refT ? L0.steps.filter(function (x) { return x.out && x.out.guess && x.out.guess.rel === "refute"; }).pop() : null, refD = refSt ? refSt.out.d || String(refSt.out.at || "").slice(0, 10) : "";
+      if (refD) refFirst = refD === A.today();
       var pv = provOf(ph === "u" ? "u" : ph === "p" ? "p" : ph === "c" ? (nat === "objective" ? "cobj" : "c") : "b", proofLike(r, so)), rt = ph === "p" && Q.length ? roteState(pg, so, Q) : null;
       var cu = condUsed(so).filter(function (x) { return !x.used; });
       return ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + phName(ph, r, so) + " · داور: " + (ki.set ? NAT[nat].fa.split(" — ")[0] : "هنوز انتخاب نشده") + (ki.type !== "find" ? " · نوع: " + (nat !== "objective" ? "فرضیه — درست یا نادرست؟ (داور واقعیت است، نه برهان)" : ki.type === "prove" ? "اثباتی" : "اثبات یا رد کن") : "") + (ki.spatial ? " · فضایی" : "") + " · وضع: " + cl.label,

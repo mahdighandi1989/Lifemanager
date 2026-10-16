@@ -1563,7 +1563,7 @@
     /* «نمی‌دونم چطور از X استفاده کنم» با مسئلهٔ مرتبطِ حل‌شده — دشواریِ واقعی به‌کار بردنِ آن است، نه گیرِ عام (s35) */
     if (act && (T.related || (REL_USE_RE.test(tx) && (L.related.length || (L.seen && L.seen.ans === "yes") || REL_EVID_RE.test(tx))))) pick(Q.filter(function (x) { return /نتیجه[\s\S]{0,40}روش[\s\S]{0,80}کمکی/.test(x); })[0] || Q_RELUSE, "turn-related");
     /* میلِ رها کردن: در زنجیرهٔ «از آخر به عقب» ⇒ کدام حلقه شکست (C095/C096)؛ وگرنه مسئلهٔ کمکیِ کوچک‌تر (بخشی از شرط/حالتِ خاص) — همان که 🌱 می‌خواهد (s04/s06) */
-    if ((ph === "p" || ph === "c") && (T.abandon || ABANDON_L.test(tx))) { var ch = chosenChain(L); pick(ch && (ch.links || []).some(function (x) { return txt(x); }) ? Q_LINK : Q_PARTAUX, "turn-abandon"); }
+    if ((ph === "p" || ph === "c") && (typeof T.abandon === "boolean" ? T.abandon : ABANDON_L.test(tx))) { var ch = chosenChain(L); pick(ch && (ch.links || []).some(function (x) { return txt(x); }) ? Q_LINK : Q_PARTAUX, "turn-abandon"); }
     /* H3 (دورِ ۷، s10): در بازنگریِ برهان، «چطوری بگم/توضیح بدم؟» همان پرسشِ «از راهِ دیگر؟ مستقیمش می‌کنی؟» (C064) است — ارائهٔ برهان برای دیگری */
     if (ph === "b" && proofLike(r, s) && PRESENT_RE.test(tx)) pick(Q.filter(function (x) { return /مستقیم/.test(x); })[0] || "", "turn-present");
     /* H2 (دورِ ۷، s01): گردآوریِ بی‌پایان در مسئلهٔ عملی ⇒ «کجا خط می‌کشی؟»، هرگز «همهٔ داده‌ها؟» */
@@ -2846,6 +2846,9 @@
       /* هماهنگ با مربی (دورِ ۶): سطرِ «حدسِ ردشده — بپرس از ردش چه آموخت» فقط در نخستین نوبت پس از رد (و تکرارِ همان پیام)، نه هر نوبت */
       var refK = refT ? pid + "|" + refT : "", refFirst = false;
       if (refK) { if (tu.refK !== refK) { tu.refK = refK; tu.refMsg = mt; refFirst = true; } else refFirst = tu.refMsg === mt; }
+      /* H3 (دورِ ۷، s19): «بپرس از ردش چه آموخت» فقط در روزِ خودِ رد — نه نخستین نوبتی که شش هفته بعد می‌آید */
+      var refSt = refT ? L0.steps.filter(function (x) { return x.out && x.out.guess && x.out.guess.rel === "refute"; }).pop() : null, refD = refSt ? refSt.out.d || String(refSt.out.at || "").slice(0, 10) : "";
+      if (refD) refFirst = refD === A.today();
       var pv = provOf(ph === "u" ? "u" : ph === "p" ? "p" : ph === "c" ? (nat === "objective" ? "cobj" : "c") : "b", proofLike(r, so)), rt = ph === "p" && Q.length ? roteState(pg, so, Q) : null;
       var cu = condUsed(so).filter(function (x) { return !x.used; });
       return ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + phName(ph, r, so) + " · داور: " + (ki.set ? NAT[nat].fa.split(" — ")[0] : "هنوز انتخاب نشده") + (ki.type !== "find" ? " · نوع: " + (nat !== "objective" ? "فرضیه — درست یا نادرست؟ (داور واقعیت است، نه برهان)" : ki.type === "prove" ? "اثباتی" : "اثبات یا رد کن") : "") + (ki.spatial ? " · فضایی" : "") + " · وضع: " + cl.label,

@@ -267,6 +267,52 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       }
     });
 
+    await section('H2-abandonbool', async () => {
+      await day(0);
+      // پیامِ هماهنگ‌کننده (R7): turn.abandon ِ بولیِ مربی بر آزمونِ دوبارهٔ ABANDON_L روی متن مقدم است — «ولش نمی‌کنم»/«کنار بذارم» (درنگ) رها کردن نیست
+      const PB = await lifeSetup({ title: 'کتاب', st: 'می‌خواهم کتابم را تا آخرِ سال تمام کنم؛ دو فصل مانده و گیرم.', noPlan: true });
+      info.ab = await p.evaluate(pid => { const f = (t, a) => APP.liveCoach(pid, { turn: { text: t, abandon: a } }).src;
+        return { neg: f('ولش نمی‌کنم، فقط امروز خسته‌ام', false), inc: f('می‌خوام یه هفته کنار بذارم ببینم چی به ذهنم می‌رسه', false), yes: f('دیگه می‌خوام بی‌خیالش بشم', true), legacy: f('پس راهی نیست، ولش کنم') }; }, PB);
+      chk(info.ab.neg !== 'turn-abandon' && info.ab.inc !== 'turn-abandon' && info.ab.yes === 'turn-abandon' && info.ab.legacy === 'turn-abandon', 'H2: a boolean turn.abandon from the coach is used as is (negated «ولش نمی‌کنم» / incubation «کنار بذارم» ⇒ no turn-abandon); without it the text rule still works ' + JSON.stringify(info.ab));
+    });
+
+    await section('H3-reffresh', async () => {
+      await day(0);
+      // s19: سطرِ a38 «بپرس از ردش چه آموخت» فقط در روزِ خودِ رد — نه در نخستین نوبتِ شش هفته بعد
+      const PR = await lifeSetup({ title: 'وزن', st: 'می‌خواهم ۸ کیلو کم کنم؛ فکر می‌کنم شام دیروقت علت است.', u: { one: 'می‌خواهم ۸ کیلو کم کنم', unk: 'راهِ کم کردنِ ۸ کیلو', data: ['شام ساعتِ ۱۱ می‌خورم', 'هفته‌ای یک بار ورزش'], cond: 'بی رژیمِ سخت', guess: 'شامِ دیروقت علتِ اضافه‌وزن است', test: 'دو هفته شام را ساعتِ ۸ می‌خورم' } });
+      await realStep('دو هفته شام را ساعتِ ۸ بخورم', 'یک کیلو کم می‌شود', 'فردا');
+      await day(1); await go('lprob', PR, 'exec');
+      await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'وزنم تغییری نکرد'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'نه'); await sel('#lpOWant', 'same');
+      await sel('#lpOGuess', 'refute'); await p.fill('#lpOReflect', 'شام علت نبود؛ شاید میان‌وعده‌ها علت است'); await selIf('#lpONewG', 'no');
+      await click('main .lp-outsave');
+      const line = (u) => /حدسی که خودش با آزمون رد کرد: «[^\n]*بپرس از ردش چه آموخت/.test(block(u, '# مسئلهٔ زندهٔ این سشن'));   // سطرِ خودِ a38 (با متنِ حدس)؛ سطرِ شمارشیِ مربی (a27) جداست
+      await newSess(); await say('دیدی؟ شام علت نبود.');
+      const same = line(await lastUser());
+      await day(43); await go('lprob', PR, 'exec'); await newSess(); await say('شش هفته گذشت، ۴ کیلو کم کردم با حذفِ میان‌وعده.');
+      info.rf = { same, late: line(await lastUser()) };
+      chk(info.rf.same, 'H3: on the day of the refutation the line is there ' + JSON.stringify(info.rf));
+      chk(!info.rf.late, 'H3: the refuted-guess «بپرس از ردش چه آموخت» line is not fresh six weeks after the refutation (s19) ' + JSON.stringify(info.rf));
+    });
+
+    await section('H3-headnew', async () => {
+      await day(0);
+      // s25/s12: حدسِ تازه پس از مسئلهٔ بسته‌شده ⇒ سرواژه «فهم» (مسئلهٔ تازه)، نه «بازنگری»؛ نوبتِ ردِ حدس هم «بازنگری» نیست
+      const phOf = (c) => (/مرحلهٔ محتمل: ([^·—(]+?)\s*(?:·|—|\()/.exec(c) || [])[1] || '';
+      await newSess();
+      await p.evaluate(() => __q.push({ reply: 'ثبت شد.', status: 'related', memory: 'm', actions: [{ do: 'chat_solved', title: 'جمعِ تلسکوپیِ دوتایی', statement: 'جمعِ ۱/(1·2) + ۱/(2·3) + … تا n جمله را پیدا کن', kind: 'find', lesson: 'هر جمله را به تفاضلِ دو کسر شکستم', check: 'برای n = ۳ حساب کردم' }] }));
+      await say('حلش کردم: هر جمله را به تفاضلِ دو کسر شکستم؛ برای n = ۳ حساب کردم');
+      await say('خودم الگوی ۱/(1·2·3) + ۱/(2·3·4) + … رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)). سه تاشو چک کردم.');
+      info.hn = { g: phOf(coachOf(await lastUser())) };
+      await say('حدسم غلط بود؛ برای n = ۴ جور درنیومد.');
+      info.hn.r = phOf(coachOf(await lastUser()));
+      // همان تابعِ سرواژهٔ مربی (AS.coachLines) در وضعِ گزارش‌شده: سشنِ سوم که مرحلهٔ «بازنگری» را از مسئلهٔ بسته‌شده به ارث برده (s25 p8) و نوبتِ رد (s12 p5)
+      info.hn.cl = await p.evaluate(() => { const AS = APP.ASSIST, hd = (o) => (AS.coachLines(Object.assign({ ph: 'b', cls: 'obj', qs: [], dry: true }, o)).split('\n')[0] || '');
+        return { g: hd({ closed: 'جمعِ تلسکوپیِ دوتایی', mt: 'جلسه سوم: خودم الگوی ۱/(1·2·3) + … رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)). سه تاشو چک کردم.' }), r: hd({ mt: 'سبزیجات؟ نه. اشتباه بود؛ حدسم غلط درآمد.', refuted: true }) }; });
+      chk(/مرحلهٔ محتمل: فهم/.test(info.hn.cl.g) && !/مرحلهٔ محتمل: بازنگری/.test(info.hn.cl.r), 'H3: coach header — new guess after a closed problem ⇒ «فهم»; refutation turn ⇒ not «بازنگری» (s25/s12) ' + JSON.stringify(info.hn.cl).slice(0, 400));
+      chk(info.hn.g && !/بازنگری/.test(info.hn.g) && /فهم/.test(info.hn.g), 'H3: a new guess starting a new problem has header «فهم», not «بازنگری» (s25) ' + JSON.stringify(info.hn));
+      chk(info.hn.r && !/بازنگری/.test(info.hn.r), 'H3: the refutation turn is not headed «بازنگری» (s12 p5) ' + JSON.stringify(info.hn));
+    });
+
     /* ===================== H3 — واژه‌ها و پرچم‌ها ===================== */
     await section('H3-proverb', async () => {
       await day(0);
