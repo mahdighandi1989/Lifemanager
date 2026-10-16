@@ -201,7 +201,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       chk((await S(PF)).live.plan, 'E5 setup: plan saved with the decorative datum set aside');
       // گیر ⇒ دادهٔ کنارگذاشته دوباره پیش کشیده می‌شود
       info.e5aside = await hookText({ id: 'ach_e5a', lprob: PF, msgs: [] }, 'گیر کردم، نمی‌دونم چی کار کنم');
-      chk(/کنار گذاشته بود: «مثلث روی کاغذِ آبی/.test(info.e5aside), 'E5: a datum set aside («تزئینی») is raised again when the user is stuck ' + (info.e5aside.match(/- کاربر گیر کرده[^\n]*/) || ['—'])[0]);
+      // دورِ ۶ (G2): یک پرسش در هر بلوک — دادهٔ کنارگذاشته خودش پرسشِ این نوبت است (نه سطرِ دومِ «بپرس…»)
+      chk(/کنار گذاشته بودی?:? \(?«مثلث روی کاغذِ آبی/.test(info.e5aside), 'E5: a datum set aside («تزئینی») is raised again when the user is stuck ' + (info.e5aside.match(/پرسشِ پیشنهادیِ این نوبت: «[^\n]{0,90}/) || ['—'])[0]);
       await objStep('هر ضلع برحسبِ b: a = 2b و c = b + 2', 'از داده‌های دوم و سوم');
       // معادله کم است ⇒ پرسشِ پیشنهادیِ مربی
       await fillIf('#lpEqUnk', '۳'); await clickIf('main .lp-eqsave');
@@ -257,7 +258,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       chk((await S(PT)).u[1] && (await S(PT)).u[1].presup, 'E5 setup: presupposition saved');
       // گیر در طرح ⇒ «از خواسته به عقب» نخست
       info.e5stuck = await p.evaluate(pid => ({ a: APP.liveCoach(pid).q, b: APP.liveCoach(pid, { stuck: true }).q }), PT);
-      chk(/به\s*عقب/.test(info.e5stuck.b) && !/به\s*عقب/.test(info.e5stuck.a), 'E5/E3: stuck going forward in plan ⇒ «از خواسته به عقب» is suggested first ' + JSON.stringify(info.e5stuck));
+      // دورِ ۶ (G2 ۳): گیر در طرح با دادهٔ به‌کارنرفته ⇒ «همهٔ داده‌ها؟» (لحظهٔ پولیا)؛ «از خواسته به عقب» وقتی همه به کار رفته‌اند (test_tour1_r6_live)
+      chk(/همه.{0,6}داده|به\s*عقب/.test(info.e5stuck.b) && !/همه.{0,6}داده|به\s*عقب/.test(info.e5stuck.a), 'E5/E3: stuck going forward in plan ⇒ the stuck question (all data / backward), not the start-of-plan one ' + JSON.stringify(info.e5stuck));
       await addMove('mv_special', 'اول فقط شیفتِ عصر را بررسی می‌کنم تا دامنه تنگ شود');
       await savePlan('نخست دوربینِ مغازه را نگاه می‌کنم سپس با هر سه نفر جدا حرف می‌زنم');
       await p.fill('#lpStep', 'فیلمِ دوربینِ عصر را نگاه کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'یکی از سه نفر را سرِ صندوق می‌بینم'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
