@@ -351,7 +351,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       // زندگی: ابزارِ x/n و فرمول نه (s13)؛ حدسِ تازه پس از رد ⇒ «ثبت به‌عنوانِ حدس» (s22)
       const PL = await mk({ title: 'باشگاه', st: 'عضوِ باشگاهِ نزدیک بشوم یا باشگاهِ ارزان؟', nat: 'life' });
       await whole('می‌خواهم باشگاهِ مناسبِ خودم را برگزینم', 'سلامتی');
-      chk(await has('#lpGKx0') === 0 && await has('#lpGKf') === 0, 'F7: a life decision\'s guess kit has no x/n table or formula');
+      chk(await has('main [id^="lpGK"][id$="_x0"]') === 0 && await has('main [id^="lpGK"][id$="_f"]') === 0 && await has('main [id^="lpGK"][id$="_r0"]') === 1, 'F7: a life decision\'s guess kit has no x/n table or formula');
       const PG = await mk({ title: 'خواب', st: 'چرا شب‌ها دیر خوابم می‌برد؟ می‌خواهم علتش را بفهمم.', nat: 'life' });
       await understand({ one: 'دنبالِ علتِ دیر خوابیدنم هستم', unk: 'علتِ دیر خوابیدن', data: ['شب‌ها قهوه نمی‌خورم', 'تا دیروقت با گوشی‌ام'], cond: 'علت را با آزمون بیابم', guess: 'گوشیِ دیروقت علت است' });
       await addMove('mv_special', 'اول فقط یک هفته گوشی را کنار می‌گذارم تا ببینم');
