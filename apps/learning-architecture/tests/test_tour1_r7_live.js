@@ -285,7 +285,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'وزنم تغییری نکرد'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'نه'); await sel('#lpOWant', 'same');
       await sel('#lpOGuess', 'refute'); await p.fill('#lpOReflect', 'شام علت نبود؛ شاید میان‌وعده‌ها علت است'); await selIf('#lpONewG', 'no');
       await click('main .lp-outsave');
-      const line = (u) => /حدسی که خودش با آزمون رد کرد: «[^\n]*بپرس از ردش چه آموخت/.test(block(u, '# مسئلهٔ زندهٔ این سشن'));   // سطرِ خودِ a38 (با متنِ حدس)؛ سطرِ شمارشیِ مربی (a27) جداست
+      const line = (u) => /حدسی که خودش با آزمون رد کرد: «[^\n]*از ردش چه آموخت/.test(block(u, '# مسئلهٔ زندهٔ این سشن'));   // دورِ ۸ (I-coach 2): کنارِ پرسشِ نوبتِ دیگر همین سطر «زمینه (نه پرسشِ دوم)» است   // سطرِ خودِ a38 (با متنِ حدس)؛ سطرِ شمارشیِ مربی (a27) جداست
       await newSess(); await say('دیدی؟ شام علت نبود.');
       const same = line(await lastUser());
       await day(43); await go('lprob', PR, 'exec'); await newSess(); await say('شش هفته گذشت، ۴ کیلو کم کردم با حذفِ میان‌وعده.');
