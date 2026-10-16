@@ -414,6 +414,14 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await click('main .lp-outsave');
       await click('main .lp-solved');
       chk(await has('#lpBUnits') === 1 && await has('#lpBApprox') === 1, 'E8: the practical look-back asks units/dimensions too (A152)');
+      // E4: «±۱۰٪» پاسخِ کوتاه ولی درستِ «تقریبت بس بود؟» است
+      await fillBack({ newProb: 'رنگِ سقف با همان روش: مساحت ÷ پوششِ هر لیتر' }); await fillIf('#lpBApprox', '±۱۰٪'); await fillIf('#lpBUnits', 'مترمربع ÷ مترمربع بر لیتر = لیتر'); await fillIf('#lpBLaw', 'برای اتاق‌های تا ۵۰ مترمربع آزموده شد؛ اگر مساحت صفر شود رنگ هم صفر می‌شود');
+      for (const id of await p.evaluate(() => [...document.querySelectorAll('select[id^="lpBCP_"]')].map(x => x.id))) await sel('#' + id, 'yes');
+      await click('main .lp-lbsave');
+      info.e8pr = (await S(PR)).b[1];
+      info.e8prT = await toasts();
+      chk(info.e8pr && info.e8pr.done && info.e8pr.approx === '±۱۰٪' && info.e8pr.units, 'E4/E8: «±۱۰٪» is accepted as the approximation answer; units stored ' + JSON.stringify(info.e8pr && { a: info.e8pr.approx, u: info.e8pr.units }) + ' ' + info.e8prT.slice(-300));
+      chk((await p.evaluate(() => { const r = APP.liveAll().find(x => x.p.title === 'باغچه'); return r ? APP.livePhaseQs(r.p.id, 'b') : []; })).some(q => /نقطه‌های حساس/.test(q)), 'E3: the objective find look-back list keeps «نقطه‌های حساس»');
     });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
