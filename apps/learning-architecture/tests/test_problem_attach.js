@@ -4,6 +4,7 @@
 // مالک کادرِ «📎 پیوست‌ها» دارد؛ نمونه‌های آمادهٔ سازنده ندارند.
 const { chromium } = require('playwright');
 const path = require('path');
+const { until } = require('./page_sync');
 const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architecture.html');
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = {};
@@ -43,9 +44,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.setInputFiles('main section.attach input[type=file]', [
     { name: 'soorat.png', mimeType: 'image/png', buffer: Buffer.from('89504e47', 'hex') },
     { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('x') }]);
-  await p.waitForTimeout(400);
+  await until(p, () => document.querySelectorAll('main section.attach li a').length >= 2);   // the (async) uploads are listed
   chk(await p.locator('main section.attach li a').count() === 2, 'both files listed');
-  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(900);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai');
+  // the decomposition chain is over when the problem is stored and the form is reset for the next one
+  await until(p, () => APP.S.all('eprob', x => x.p && x.p.title === 'مسئلهٔ عکس‌دار' && x.p.statement).length > 0 && !document.querySelector('main section.attach'));
   info.call = await p.evaluate(() => ({ n: window.__ai.length, ids: window.__ai[0] && window.__ai[0].fileIds, inAtt: window.__ai[0] && /\(در پیوست\)/.test(window.__ai[0].user) && /پیوست همراهِ این پیام است/.test(window.__ai[0].user),
     later: window.__ai.slice(1).every(c => !c.fileIds.length) }));
   chk(info.call.n >= 1 && JSON.stringify(info.call.ids) === '[1,2]' && info.call.inAtt && info.call.later, 'decomposition reads every attachment (image AND txt, WORKLOG 44), only once ' + JSON.stringify(info.call));
@@ -56,9 +59,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // تیکِ «فرستادن به هوش مصنوعی» برداشته ⇒ پیوست نمی‌رود
   await p.fill('#pbIn_title', 'دومی'); await p.fill('#pbIn_statement', 'ص'); await p.fill('#pbIn_answer', 'پ');
   await p.click('main .pb-attbtn'); await p.waitForTimeout(100);
-  await p.setInputFiles('main section.attach input[type=file]', { name: 'b.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1') }); await p.waitForTimeout(300);
+  await p.setInputFiles('main section.attach input[type=file]', { name: 'b.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1') }); await until(p, () => document.querySelectorAll('main section.attach li a').length >= 1);
   await p.uncheck('#pbAttAi'); const n0 = await p.evaluate(() => window.__ai.length);
-  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(700);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await until(p, n0 => window.__ai.length > n0, n0);
   chk(await p.evaluate(n0 => window.__ai[n0] && window.__ai[n0].fileIds.length === 0, n0), 'unchecked ⇒ text only');
 
   // ۲) صفحهٔ مسئلهٔ خودِ مالک: کادرِ پیوست با همان فایل‌ها؛ نمونهٔ آماده: نه
@@ -75,9 +78,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.fill('#pbIn_title', 'چهل‌ودو پیوست'); await p.fill('#pbIn_statement', 'ص'); await p.fill('#pbIn_answer', 'پ');
   await p.click('main .pb-attbtn'); await p.waitForTimeout(150);
   await p.setInputFiles('main section.attach input[type=file]', Array.from({ length: 42 }, (_, i) => ({ name: 'page' + String(i + 1).padStart(2, '0') + '.png', mimeType: 'image/png', buffer: Buffer.from('89504e47', 'hex') })));
-  await p.waitForTimeout(600);
+  await until(p, () => document.querySelectorAll('main section.attach li a').length >= 42);
   const n42 = await p.evaluate(() => window.__ai.length);
-  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai'); await p.waitForTimeout(900);
+  await p.evaluate(() => { APP._pbAIok = true; }); await p.click('main .pb-ai');
+  await until(p, n => window.__ai.length > n && !!document.querySelector('main .pb-attdrop') && [...document.querySelectorAll('#toasts .toast')].some(t => /فرستاده نشد/.test(t.textContent)), n42);
   info.cap = await p.evaluate(n => ({ sent: window.__ai[n] && window.__ai[n].fileIds.length, drop: APP.aiFileDrop && APP.aiFileDrop.names,
     inline: (document.querySelector('main .pb-attdrop') || {}).textContent || '', toast: [...document.querySelectorAll('#toasts .toast')].map(t => t.textContent).join(' | ') }), n42);
   chk(info.cap.sent === 40, '42 attachments ⇒ exactly 40 sent (limit unchanged) ' + JSON.stringify(info.cap.sent));
