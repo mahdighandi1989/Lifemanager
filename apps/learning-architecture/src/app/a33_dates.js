@@ -14,17 +14,38 @@
   function clip(x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
   var RE_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-  /* {"do":"deadline","what":"…","date":"YYYY-MM-DD" (میلادی)} — فقط از حرفِ خودِ کاربر */
+  /* ساعتِ روز از حرفِ کاربر: «08:00»، «۸ صبح»، «ساعت ۱۶»، «۴ عصر» ⇒ "HH:MM" (تورِ پولیا s38: «فردا ۸ صبح» ⇒ یادآورِ ۹ صبح، پس از موعد) */
+  function parseTime(t) {
+    var x = String(t == null ? "" : t).replace(/[۰-۹]/g, function (d) { return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[٠-٩]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); });
+    var m = /(\d{1,2})(?:\s*[:٫.]\s*(\d{2}))?/.exec(x); if (!m) return "";
+    var hh = +m[1], mm = m[2] ? +m[2] : 0;
+    if (/(عصر|بعد\s*از\s*ظهر|بعدازظهر|شب|pm)/i.test(x) && hh < 12) hh += 12;
+    if (/(صبح|am)/i.test(x) && hh === 12) hh = 0;
+    if (!(hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59)) return "";
+    return (hh < 10 ? "0" : "") + hh + ":" + (mm < 10 ? "0" : "") + mm;
+  }
+  AS.parseTime = parseTime;
+  /* {"do":"deadline","what":"…","date":"YYYY-MM-DD" (میلادی),"time":"HH:MM" (اگر کاربر ساعت گفت)} — فقط از حرفِ خودِ کاربر */
   AS.DO.deadline = function (a) {
     var s = AS._turnSession, what = clip(a && a.what, 120), date = String((a && a.date) || "").trim();
     if (!what || !RE_DATE.test(date)) return "موعد ثبت نشد: «what» و «date» (YYYY-MM-DD میلادی) لازم است";
     if (date < A.today()) return "موعد ثبت نشد: " + date + " گذشته است — از کاربر بپرس تاریخِ درست چیست";
+    var tm = a && a.time != null && String(a.time).trim() ? parseTime(a.time) : "";
+    if (a && a.time != null && String(a.time).trim() && !tm) return "موعد ثبت نشد: ساعتِ «" + clip(a.time, 20) + "» خوانا نیست — HH:MM بده";
     var same = S.all("deadline", function (x) { return !x.done && x.what === what; })[0];
     var r = same || { id: A.uid("dl"), type: "deadline", what: what, done: false };
-    r.date = date; r.sess = r.sess || (s && s.id) || ""; S.put(r); sync(r);
+    r.date = date; if (tm) r.time = tm; r.sess = r.sess || (s && s.id) || ""; S.put(r); sync(r);
     var left = A.daysBetween(A.today(), date);
     return "";   // پیامِ سامانه پایین‌تر (msgs) — بی کلید و بی شناسه
   };
+  /* {"do":"deadline_done","what":"…"} — کاربر خودش گفت انجام شد (همان کارِ دکمهٔ «انجام شد» در «امروز»)؛ یادآورهایش برداشته می‌شود */
+  AS.DO.deadline_done = function (a) {
+    var w = String((a && (a.what || a.id)) || "").trim(); if (!w) return "«what» (همان عنوانِ موعد) لازم است";
+    var open = S.all("deadline", function (x) { return !x.done; }), r = open.filter(function (x) { return x.id === w || x.what === w; })[0] || open.filter(function (x) { return x.what.indexOf(w) >= 0 || w.indexOf(x.what) >= 0; })[0];
+    if (!r) return "موعدِ «" + clip(w, 40) + "» در موعدهای باز نیست";
+    markDone(r); return "";
+  };
+  function markDone(r) { r.done = true; r.doneAt = nowIso(); S.put(r); unsync(r); }
   /* {"do":"remind_hour","hour":22} — ساعتِ یادآورها (۰ تا ۲۳)، وقتی کاربر خودش گفته کی کار می‌کند */
   AS.DO.remind_hour = function (a) {
     var hr = Math.round(+((a && a.hour) != null ? a.hour : NaN));
@@ -54,14 +75,46 @@
     (k.remeasures = k.remeasures || []).push(r); S.put(k); return "";
   };
   function hour() { var n = ((S.settings().knots || {}).notify) || {}; return n.hour == null ? 9 : n.hour; }
-  /* یادآور: یک روز پیش از موعد (اگر هنوز فرصت هست) و خودِ روز */
+  function tzOf() { var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { } return tz; }
+  function unsync(r) { if (A.HOST && A.HOST.unremind) ["deadline:" + r.id, "deadline:" + r.id + ":t"].forEach(function (k) { try { Promise.resolve(A.HOST.unremind(k)).catch(function () { }); } catch (e) { } }); }
+  /* یادآور: یک روز پیش از موعد (اگر هنوز فرصت هست) و خودِ روز. موعدِ ساعت‌دار (r.time): یادآورِ همان روز یک ساعت **پیش از** آن ساعت —
+     «ساعتِ یادآورها» (remind_hour) آن را هرگز از خودِ موعد جلوتر نمی‌برد؛ یادآورِ روزِ پیش با ساعتِ یادآورها می‌ماند (تورِ پولیا s38) */
   function sync(r) {
     if (!(A.HOST && A.HOST.remind) || !r || r.done) return;
-    var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
-    var pre = A.addDays(r.date, -1), due = pre > A.today() ? pre : r.date;
-    try { Promise.resolve(A.HOST.remind({ key: "deadline:" + r.id, due_date: due, tz: tz, hour: hour(), title: "معماری یادگیری — موعد",
-      body: "«" + r.what + "» — " + (A.fdate ? A.fdate(r.date) : r.date) + (due === pre ? " (فردا)" : " (امروز)"), link: "" })).catch(function () { }); } catch (e) { }
+    var tz = tzOf(), pre = A.addDays(r.date, -1), hh = r.time ? +String(r.time).slice(0, 2) : null, when = A.fdate ? A.fdate(r.date) : r.date;
+    try {
+      if (hh == null) {
+        var due = pre > A.today() ? pre : r.date;
+        Promise.resolve(A.HOST.remind({ key: "deadline:" + r.id, due_date: due, tz: tz, hour: hour(), title: "معماری یادگیری — موعد",
+          body: "«" + r.what + "» — " + when + (due === pre ? " (فردا)" : " (امروز)"), link: "" })).catch(function () { });
+      } else {
+        var h0 = Math.max(0, hh - 1);
+        if (pre >= A.today()) Promise.resolve(A.HOST.remind({ key: "deadline:" + r.id, due_date: pre, tz: tz, hour: Math.min(hour(), 23), title: "معماری یادگیری — موعد", body: "«" + r.what + "» — فردا ساعتِ " + fa(r.time), link: "" })).catch(function () { });
+        else if (A.HOST.unremind) Promise.resolve(A.HOST.unremind("deadline:" + r.id)).catch(function () { });
+        Promise.resolve(A.HOST.remind({ key: "deadline:" + r.id + ":t", due_date: hh >= 1 ? r.date : pre, tz: tz, hour: hh >= 1 ? h0 : 23, title: "معماری یادگیری — موعد",
+          body: "«" + r.what + "» — " + (hh >= 1 ? "امروز" : when) + " ساعتِ " + fa(r.time) + " (یادآور پیش از همان ساعت)", link: "" })).catch(function () { });
+      }
+    } catch (e) { }
   }
+  AS.deadlineSync = sync;
+  /* کارتِ مرور ⇒ یادآور (تورِ پولیا s38: کارت‌های مرور یادآور نداشتند). یک یادآور برای نزدیک‌ترین روزِ موعدِ کارت‌ها؛ اگر یکی از آن‌ها «بازسازی» است
+     (درسِ بازنگریِ یک حل — tutor:back، chat:solved، درسِ مسئلهٔ زنده)، متن می‌گوید اول بی‌نگاه دوباره بسازد، بعد ببیند. */
+  var cardsSig = "";
+  function reconstruct(c) { return /^(tutor:back|chat:solved)/.test(String(c.src || "")) || !!c.pb || /بی‌نگاه|بازسازی/.test(String(c.q || "")); }
+  AS.cardsPushSync = function (force) {
+    if (!(A.HOST && A.HOST.remind)) return null;
+    var t = A.today(), cs = S.all("card", function (c) { return !c.susp && c.due; }); if (!cs.length) return null;
+    var day = cs.map(function (c) { return c.due < t ? t : c.due; }).sort()[0], on = cs.filter(function (c) { return (c.due < t ? t : c.due) === day; }), rc = on.filter(reconstruct)[0];
+    var n0 = ((S.settings().knots || {}).notify) || {}, ch = { telegram: n0.telegram !== false, email: n0.email !== false };
+    if (!ch.telegram && !ch.email) return null;
+    var body = fa(on.length) + " کارتِ مرور " + (day === t ? "امروز" : (A.fdate ? A.fdate(day) : day)) + " موعد است." + (rc ? " یکی بازسازی است: «" + clip(rc.q, 90) + "» — اول بی‌نگاه دوباره بسازش، بعد پاسخ را ببین." : "");
+    var sig = day + "|" + on.length + "|" + (rc ? rc.id : ""); if (!force && sig === cardsSig) return null; cardsSig = sig;
+    try { Promise.resolve(A.HOST.remind({ key: "cards:review", due_date: day, tz: tzOf(), hour: hour(), title: "معماری یادگیری — مرور", body: body, link: "?tab=review", channels: ch })).catch(function () { }); } catch (e) { }
+    return { day: day, n: on.length, body: body };
+  };
+  if (A.newCard && !A.newCard._push) { var rawNC = A.newCard; A.newCard = function () { var c = rawNC.apply(this, arguments); try { AS.cardsPushSync(); } catch (e) { } return c; }; A.newCard._push = true; }
+  var lastCP = 0, rawRenderD = A.render;
+  A.render = function () { rawRenderD.apply(this, arguments); try { if (A.S.loaded && Date.now() - lastCP > 600e3) { lastCP = Date.now(); AS.cardsPushSync(); } } catch (e) { } };
   /* «امروز»: موعدهای ۷ روزِ آینده */
   if (typeof A.dueList === "function" && !A.dueList._dl) {
     var raw = A.dueList;
@@ -71,7 +124,7 @@
         .sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }).forEach(function (r) {
           var left = A.daysBetween(A.today(), r.date);
           items.unshift({ k: left <= 1 ? "warn" : "p", txt: "⏰ " + clip(r.what, 60), sub: left === 0 ? "موعد: امروز" : left === 1 ? "موعد: فردا" : "موعد: " + fa(left) + " روز دیگر (" + (A.fdate ? A.fdate(r.date) : r.date) + ")",
-            go: function () { r.done = true; r.doneAt = nowIso(); S.put(r); A.toast("«" + clip(r.what, 40) + "» انجام‌شده علامت خورد."); A.render(); }, act: "انجام شد" });
+            go: function () { markDone(r); A.toast("«" + clip(r.what, 40) + "» انجام‌شده علامت خورد."); A.render(); }, act: "انجام شد" });
         });
       return items;
     };
@@ -82,8 +135,9 @@
   AS.promptHooks.push(function (s) {
     var L = S.all("deadline", function (x) { return !x.done && x.date >= A.today(); }).sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }).slice(0, 8);
     var hr = (((S.settings().knots || {}).notify) || {}).hour;
-    return (L.length ? "# موعدهای کاربر (هر برنامهٔ تمرین و مرور پیش از این‌ها تمام شود)\n" + L.map(function (r) { return "- " + r.date + " (" + (A.fdate ? A.fdate(r.date) : "") + ", " + fa(A.daysBetween(A.today(), r.date)) + " روز دیگر): " + r.what; }).join("\n") + "\n" : "") +
-      "ساعتِ یادآورها: " + (hr == null ? "۹ (پیش‌فرض)" : fa(hr));
+    return (L.length ? "# موعدهای کاربر (هر برنامهٔ تمرین و مرور پیش از این‌ها تمام شود)\n" + L.map(function (r) { return "- " + r.date + (r.time ? " ساعتِ " + r.time : "") + " (" + (A.fdate ? A.fdate(r.date) : "") + ", " + fa(A.daysBetween(A.today(), r.date)) + " روز دیگر): " + r.what; }).join("\n") + "\n" : "") +
+      "ساعتِ یادآورها: " + (hr == null ? "۹ (پیش‌فرض)" : fa(hr)) +
+      "\n- اگر کاربر برای موعد ساعت هم گفت («فردا ۸ صبح»)، \"time\":\"08:00\" را هم در deadline بده — یادآورِ همان روز پیش از همان ساعت می‌آید و «ساعتِ یادآورها» جابه‌جایش نمی‌کند. اگر کاربر گفت کاری انجام شد: {\"do\":\"deadline_done\",\"what\":\"همان عنوانِ موعد\"}.";
   });
   AS.SYS += "\n" + [
     "# موعدها و ساعت",

@@ -20,9 +20,13 @@
   /* نامِ فارسیِ نماهایی که در منو نیستند — «↩ برگرد به …» هرگز شناسهٔ خامِ نما (e_case، kcase…) نشان نمی‌دهد (ممیزی ۲۰۲۶-۱۰-۱۳) */
   var VIEW_FA = A.VIEW_FA = { tech: "صفحهٔ تکنیک", lesson: "درسِ دوره", topic: "موضوع", journey: "سفرِ گام‌به‌گام", proto: "پروتکل", e_case: "پروندهٔ کارخانه",
     kcase: "موقعیتِ گره‌گشا", knot: "گرهِ ذهنی", kpractice: "ورزشِ گره‌ها", kmap: "نقشهٔ ذهنِ تو", maps: "نقشه‌ها", ksims: "شبیه‌سازهای گره", move: "حرکتِ حلِ مسئله", moves: "حرکت‌های حلِ مسئله",
-    epi_course: "دورهٔ کارخانه", epi_lesson: "درسِ دورهٔ کارخانه", course: "دورهٔ گام‌به‌گام", home: "امروز", start: "از اینجا شروع کن", settings: "تنظیمات" };
+    epi_course: "دورهٔ کارخانه", epi_lesson: "درسِ دورهٔ کارخانه", course: "دورهٔ گام‌به‌گام", home: "امروز", start: "از اینجا شروع کن", settings: "تنظیمات",
+    /* تورِ پولیا (دستهٔ ۱، ۲۰۲۶-۱۰-۱۵): «صفحهٔ قبلی» برای این چهار نما در نقشهٔ سامانه و یادداشت‌های دستیار */
+    lprob: "مسئلهٔ حل‌نشدهٔ خودم", idea: "جایگاهِ ایده", sources: "منبع‌ها و پوشش", psy_item: "معمای امروز" };
   function recTitle(view, arg) {
     var r = arg != null && A.S && A.S.get ? A.S.get(arg) : null;
+    // مسئله با شناسهٔ مسئله (نه رکورد) باز می‌شود: e_prob/lprob ⇐ رکوردِ eprob_<pid>
+    if (!r && arg != null && A.S && A.S.get && (view === "lprob" || view === "e_prob")) { var ep = A.S.get("eprob_" + arg); if (ep && ep.p) r = { title: ep.p.title }; }
     if (!r || typeof r !== "object") return "";
     var t = r.title || r.fa || r.name || r.q || "";
     return typeof t === "string" ? t.replace(/\s+/g, " ").trim().slice(0, 60) : "";
@@ -30,7 +34,12 @@
   function viewLabel(view, arg) {
     var base = navLabel(view) || VIEW_FA[view] || "", rt = recTitle(view, arg);
     if (rt) return (VIEW_FA[view] && !navLabel(view) ? VIEW_FA[view] + ": " : "") + rt;
-    return base || "صفحهٔ قبلی";
+    if (base) return base;
+    // نمای بی‌نام: از VIEW_META ِ خودِ نما (fa)، یا پدرش در SUB_VIEWS («پدر › …») — نه «صفحهٔ قبلی»
+    var vm = (A.VIEW_META || {})[view], par = (A.SUB_VIEWS || {})[view];
+    if (vm && vm.fa) return vm.fa;
+    if (par && par !== view) { var pl = navLabel(par) || VIEW_FA[par]; if (pl) return pl + " ›"; }
+    return "صفحهٔ قبلی";
   }
   A.viewLabel = viewLabel;
   function pageTitle() {

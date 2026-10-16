@@ -14,7 +14,7 @@
 (function (A) {
   var h = A.h, fa = A.fa, S = A.S;
   var AS = A.ASSIST = {};
-  var TYPE = "achat", GROUP = "دستیار — گفت‌وگوها", MAX_MSGS = 400, HIST_CHARS = 24000, MAX_AUTO = 4, MAX_FILES = 40, MAX_FILE_MB = 100;
+  var TYPE = "achat", GROUP = "دستیار — گفت‌وگوها", MAX_MSGS = 400, HIST_CHARS = 24000, MAX_AUTO = 4, NEXT_EXTRA = 3, MAX_FILES = 40, MAX_FILE_MB = 100;
   var blobs = {};            // شناسهٔ پیوست ⇒ File (فقط همین بارِ مرورگر؛ برای «پیوست به فرم»)
   var ui = null, busy = false;
 
@@ -165,6 +165,8 @@
       if ((type === "range" || type === "number") && (el.min !== "" || el.max !== "")) f.range = (el.min || "?") + "…" + (el.max || "?");
       if (el.required || el.getAttribute("aria-required") === "true") f.required = true;
       if (w.hid) f.closed = true;
+      // بخشِ «به قلمِ خودِ کاربر» (data-own): مدل از همان فهرست ببیند که این فیلد را پر نمی‌کند (تورِ پولیا: «پر کن» در برابرِ data-own)
+      try { var ow = el.closest("[data-own]"); if (ow) f.own = ow.getAttribute("data-own") === "verdict" ? "verdict" : "own"; } catch (e) { }
       fields.push(f);
     });
     return { fields: fields, buttons: buttons, heads: heads };
@@ -179,7 +181,7 @@
     L.push("دکمه‌ها: " + (sc.buttons.map(function (b) { return b.k + "=«" + b.label + "»"; }).join("، ") || "—"));
     L.push("فیلدها:"); if (!sc.fields.length) L.push("- (این صفحه فیلدی ندارد)");
     sc.fields.forEach(function (f) { var fv = mode >= 3 ? clip(f.value, 60) : f.value, fo = mode >= 3 && f.options ? f.options.split(" | ").slice(0, 8).join(" | ") : f.options;
-      L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (fv ? "«" + fv + "»" : "خالی")) + (fo ? " | گزینه‌ها: " + fo : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "") + (f.unset ? " | (هنوز تکان نخورده — عددش را خودِ کاربر باید بگوید)" : "")); });
+      L.push("- " + f.k + " | " + f.type + " | «" + f.label + "»" + (f.section ? " | بخش: " + f.section : "") + (f.range ? " | بازه: " + f.range : "") + (f.type === "file" ? " | (پیوست)" : " | مقدار: " + (fv ? "«" + fv + "»" : "خالی")) + (fo ? " | گزینه‌ها: " + fo : "") + (f.required ? " | لازم" : "") + (f.closed ? " | (در بخشِ بسته؛ با پرکردن باز می‌شود)" : "") + (f.unset ? " | (هنوز تکان نخورده — عددش را خودِ کاربر باید بگوید)" : "") + (f.own ? " | به قلمِ خودِ کاربر — پر نکن" : "")); });
     // متنِ دیدنیِ صفحه (فشرده): پیشنهادهای هوش مصنوعی، عددها، پیام‌ها — کارزارِ آزمون (sc09/sc12): دستیار فقط فیلد و دکمه می‌دید و حدس می‌زد
     if (mode >= 2) { L.push("(متنِ سادهٔ صفحه برای جا شدنِ همهٔ فیلدها و دکمه‌ها حذف شد)"); return L.join("\n"); }
     try {
@@ -229,11 +231,26 @@
     if (why) { x.setAttribute("data-as-why", why); if (!x.title) x.title = why; }
     if (kind !== "fill") x.addEventListener("input", function off() { x.classList.remove("as-hl"); x.removeEventListener("input", off); });
   }
+  /* قدم‌های معتبرِ نماهایی که sub می‌گیرند — برای go (فقط آنچه از ثبت‌گاه درمی‌آید) */
+  function caseStations(cs) { try { return A.routeOf ? A.routeOf(cs).filter(function (x) { return x.inRoute; }) : []; } catch (e) { return []; } }
+  var SUB_OK = AS.SUB_OK = {
+    e_case: function (arg, sub) {
+      var cs = arg && S.get(arg), ids = (A.ESTL || []).map(function (x) { return x.id; }), fa0 = function (id) { var x = (A.ESTL || []).filter(function (y) { return y.id === id; })[0]; return x ? x.fa : id; };
+      if (sub) return { ok: sub === "report" || sub === "engine" || ids.indexOf(sub) >= 0, valid: "report، engine یا شناسهٔ یکی از ایستگاه‌های «نقشهٔ سامانه»" };
+      var inR = cs ? caseStations(cs) : [], cur = inR.filter(function (x) { return !((cs.st || {})[x.s.id] || {}).done; })[0] || inR[0];
+      return { ok: true, label: cur ? "ایستگاهِ «" + fa0(cur.s.id) + "»" : "" };
+    },
+    lprob: function (arg, sub) { if (sub) return { ok: /^(u|plan|exec|back)$/.test(sub), valid: "u، plan، exec، back" }; return { ok: true, label: "" }; }
+  };
   AS.clearMarks = function () { document.querySelectorAll(".as-hl,.as-filled").forEach(function (x) { x.classList.remove("as-hl", "as-filled"); }); };
   var DO = {
     go: function (a) {
       if (!a.view || !A.V[a.view]) return "نمای «" + (a.view || "") + "» نیست";
-      (A.goRoot && !a.arg ? A.goRoot : A.go)(a.view, a.arg == null || a.arg === "" ? null : a.arg, a.sub || null);
+      var arg = a.arg == null || a.arg === "" ? null : a.arg, sub = a.sub || null, ck = sub && SUB_OK[a.view] ? SUB_OK[a.view](arg, sub) : null;
+      /* قدم/برگهٔ ناموجود بی‌صدا جای دیگری را باز نمی‌کند و پیامِ سامانه هم نمی‌گوید «همان باز شد» (تورِ پولیا s32: st_verdict ⇒ st_truth) */
+      if (ck && !ck.ok) sub = null;
+      (A.goRoot && !arg ? A.goRoot : A.go)(a.view, arg, sub);
+      if (ck && !ck.ok) { var op = SUB_OK[a.view](arg, null); AS._goNote = "قدم/برگهٔ «" + a.sub + "» در «" + labelOf(a.view) + "» نیست؛ آنچه باز شد: «" + ((op && op.label) || labelOf(a.view)) + "»" + (ck.valid ? " (قدم‌های درست: " + ck.valid + ")" : ""); }
       return "";
     },
     fill: function (a) {
@@ -402,6 +419,19 @@
     if (!f || f.size > 2000000 || !(/^text\/|json|csv|xml|markdown/.test(f.type || "") || /\.(txt|md|csv|json|tsv|xml|html?)$/i.test(f.name || ""))) return Promise.resolve("");
     return new Promise(function (res) { try { var r = new FileReader(); r.onload = function () { res(String(r.result || "")); }; r.onerror = function () { res(""); }; r.readAsText(f); } catch (e) { res(""); } });
   }
+  /* پیوستِ CSV/TSV ِ گفت‌وگو ⇒ نمودارِ خودِ داده‌ها در حبابِ پیام (A.MIND.csvBlock ِ کارنامهٔ ذهن؛ تورِ پولیا ۱، بندِ ۲۰): متن در خودِ پیام می‌ماند
+     (تا ۲۰۰هزار نویسه) تا پس از بارگذاریِ دوباره هم کشیده شود؛ بی A.MIND هیچ نمی‌کشد — پیوست مثلِ همیشه می‌رود. */
+  var CSV_MAX = 200000;
+  function isCsv(f) { return !!f && (/\.(csv|tsv)$/i.test(f.name || "") || /csv|tab-separated/.test(f.type || "")); }
+  function csvGrab(f, m) {
+    if (!isCsv(f) || f.size > 2000000) return Promise.resolve();
+    return readText(f).then(function (t) { if (!t) return; (m.csv = m.csv || []).push({ name: f.name, text: String(t).slice(0, CSV_MAX) }); }, function () { });
+  }
+  function csvNodes(m) {
+    if (!m || !m.csv || !m.csv.length || !A.MIND || typeof A.MIND.csvBlock !== "function") return null;
+    return h("div", { class: "as-csv" }, m.csv.map(function (c) { try { return A.MIND.csvBlock(c.name, String(c.text || "")); } catch (e) { return null; } }));
+  }
+  AS.csvNodes = csvNodes;
   /* تاریخچه: هرچه از گفت‌وگو در بودجه جا شود، کامل (تازه‌ترین‌ها اول انتخاب و به ترتیبِ زمان چیده می‌شوند)؛
      آنچه جا نشود در «حافظهٔ سشن» (خلاصهٔ انباشته‌ای که مدل هر نوبت کامل برمی‌گرداند) هست — پس هیچ‌چیز از اول تا حالا گم نمی‌شود */
   function history(s, skipLast, budget) {
@@ -423,7 +453,12 @@
     if (AS.tourText) { var tt = AS.tourText(s); if (tt) L.push(tt); }
     if (s.reports && s.reports.length) L.push("برگه‌های ثبت‌شده در این سشن: " + s.reports.map(function (r) { return "#" + r.number + " " + r.title; }).join("، "));
     L.push("", "# برگه‌های بازِ «نظارت و سرکشی» روی همین صفحه", sheetsText(AS._sheets || []));
-    (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) L.push("", x); } catch (e) { } });
+    /* قلاب‌ها با زمینهٔ همین نوبت (AS._hookCtx) اجرا می‌شوند و بعد «پالایه‌ها» (AS.promptFilters) روی خروجیِ همه — تا بخشی که مالکش دیگری است
+       (مثلاً قلابِ مسئلهٔ زنده) بی ویرایشِ پروندهٔ خودش با دادهٔ صفحه هم‌گام شود و دو قاعدهٔ ناسازگار کنارِ هم نیاید (تورِ پولیا، دستهٔ ۱) */
+    var hookOut = []; AS._hookCtx = { s: s, msg: msg };
+    try { (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) hookOut.push(x); } catch (e) { } });
+      (AS.promptFilters || []).forEach(function (fn) { try { var y = fn(hookOut, s, msg); if (Array.isArray(y)) hookOut = y; } catch (e) { } }); } finally { AS._hookCtx = null; }
+    hookOut.forEach(function (x) { if (x) L.push("", x); });
     var rt = AS.recentToasts(); if (rt.length) L.push("", "# پیام‌های اخیرِ صفحه (۴ دقیقهٔ گذشته؛ مثلاً پس از دکمه‌ای که خودِ کاربر زد)", rt.map(function (x) { return "- " + x; }).join("\n"));
     L.push("", "# صفحهٔ فعلی", scanText(sc, pageMode), "", "# گفت‌وگو تا این لحظه");
     var HP = L.length;
@@ -609,6 +644,7 @@
     if (files.length > MAX_FILES) { A.toast("در هر پیام حداکثر " + fa(MAX_FILES) + " فایل؛ بقیه را در پیامِ بعد بفرست", "bad"); files = files.slice(0, MAX_FILES); }
     var ups = Promise.resolve(), aiIds = [], texts = [], dupes = [], toRec = [];
     files.forEach(function (f) {
+      ups = ups.then(function () { return csvGrab(f, m); });
       ups = ups.then(function () {
         if (!A.HOST || !A.HOST.upload) {   // نسخهٔ مستقل: فقط متن‌ها، و صادقانه می‌گوید بقیه را نمی‌بیند
           return readText(f).then(function (t) { m.files.push({ name: f.name, mime: f.type || "" }); if (t) texts.push("— متنِ کاملِ «" + f.name + "»:\n" + t); else texts.push("— «" + f.name + "»: این نسخه (بی Lifemanager) فقط فایلِ متنی را می‌خواند؛ این یکی خوانده نشد."); });
@@ -630,7 +666,7 @@
         });
       });
     });
-    var auto = 0;
+    var auto = 0, nextX = 0;
     function turn(msg, extra, ids, first) {
       // تور پیش از ساختنِ پرامپت هم هم‌گام می‌شود: کاری که کاربر بیرون از گفت‌وگو تمام کرد (مثلاً ایستگاهِ پایانی) همین نوبت دیده شود —
       // وگرنه مدل روی وضعِ کهنه جواب می‌داد (تورِ زندهٔ ۲۰۲۶-۱۰-۱۴)
@@ -711,13 +747,25 @@
             return turn("[سامانه: این کارهای نوبتِ پیش انجام نشد: «" + res.notes.join("» · «") + "». پاسخِ قبلی‌ات گفته بود انجام شده — به کاربر کوتاه و درست بگو چه شد و چه نشد، و اگر راهِ درستی هست همین حالا انجام بده (کارِ تصمیمِ مالک را فقط زرد کن). reply خیلی کوتاه.]");
           }
           var promised = o.next === true && res.clicks > 0 && !res.notes.length, said = res.clicks > 0 && res.toasts && res.toasts.length;
-          if (auto < MAX_AUTO && (res.moved || res.changed || promised || said)) {
-            auto++;
+          /* next:true پس از رفتن (go) یا کاری بی‌خطا هم قول است؛ سقفِ نوبت‌های خودکار آن را بی‌صدا نمی‌اندازد (تورِ پولیا s31: «حالا (ج)» و هیچ نوبتی نیامد) —
+             قولِ پیش‌رونده (کاری انجام شد، بی خطا) تا NEXT_EXTRA نوبتِ بیشتر می‌گیرد؛ پس از آن صریح به کاربر گفته می‌شود */
+          var nextOn = o.next === true && !res.notes.length && (res.clicks > 0 || res.moved || res.changed || acts.length > 0);
+          var goNote = AS._goNote || ""; AS._goNote = "";
+          var room = auto < MAX_AUTO || (nextOn && nextX < NEXT_EXTRA);
+          if (goNote) { s.msgs.push({ role: "sys", at: now(), text: "↪ " + goNote }); S.put(s); }
+          if (room && (res.moved || res.changed || promised || said || nextOn)) {
+            if (auto < MAX_AUTO) auto++; else nextX++;
+            var ownN = document.querySelectorAll("#main [data-own] input:not([type=hidden]), #main [data-own] textarea, #main [data-own] select").length, allN = document.querySelectorAll("#main input:not([type=hidden]), #main textarea, #main select").length;
+            var fillTxt = ownN && ownN >= allN ? ". فیلدهای این صفحه همه «به قلمِ خودِ کاربر»اند (data-own): هیچ‌کدام را پر نکن — بگو خودش می‌نویسد و فقط جای نوشتن را نشان بده (هایلایت)؛ اگر دکمهٔ غیرِ تصمیمیِ لازمی هست بزن؛ reply خیلی کوتاه.]"
+              : ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن" + (ownN ? " — فقط فیلدهایی که «به قلمِ خودِ کاربر — پر نکن» نیستند؛ آن‌ها را فقط هایلایت کن و بگو خودش می‌نویسد" : "") + " و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]";
             return turn("[سامانه: " + (res.moved ? "«" + labelOf(A.state.view) + "»" + (A.state.sub ? " (قدم/برگهٔ " + A.state.sub + ")" : "") + " باز شد" : res.changed ? "فرم تغییر کرد (فیلدهای تازه)" : "کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده") +
+              (goNote ? "؛ ⚠ " + goNote : "") +
+              (nextOn && !res.moved && !res.changed && !promised && !said ? "؛ گفتی کارِ بعدی را انجام می‌دهی (next:true) — همین حالا انجامش بده" : "") +
               (said ? "؛ پیامِ صفحه پس از کارهایت: «" + res.toasts.join("» · «") + "» — بر پایهٔ همین پیام ادامه بده (حدس نزن)" : "") +
               (res.skipped ? "؛ " + res.skipped + " کارِ بعدیِ نوبتِ پیش اجرا نشد چون کلیدهایش مالِ صفحهٔ قبل بود — اگر هنوز لازم است با کلیدهای تازهٔ همین صفحه انجامش بده" : "") +
-              ". حالا از روی همین گفت‌وگو فیلدهای این صفحه را پر کن و باقیِ لازم‌ها را هایلایت کن؛ اگر همه‌چیزِ لازم از حرف‌های کاربر پر شد، دکمهٔ ثبت/ساخت/بعدی را بزن؛ reply خیلی کوتاه.]");
+              fillTxt);
           }
+          if (o.next === true && !room) { s.msgs.push({ role: "sys", at: now(), text: "⏭ دستیار گفت کارِ بعدی را انجام می‌دهد، ولی سقفِ نوبت‌های خودکارِ این پیام پر شد — بنویس «ادامه» تا همان را انجام دهد." }); S.put(s); }
           // کارهای جاماندهٔ این نوبت (کلیدِ کهنه پس از کلیکِ قبلی) بی نوبتِ خودکار هم به کاربر و مدل گفته شود — نه بی‌صدا
           if (res.skipped) { s.msgs.push({ role: "sys", at: now(), text: "⏭ " + fa(res.skipped) + " کارِ بعدیِ این نوبت اجرا نشد: صفحه پس از کارِ قبلی عوض شد و کلیدهایش کهنه بود — در پیامِ بعد با فهرستِ تازه انجام می‌شود." }); S.put(s); }
           // موبایل: پنجره روی فرم است ⇒ کنار برود تا زردها و سبزها دیده شوند
@@ -875,8 +923,9 @@
       h("p", {}, "سلام. بگو چه می‌خواهی — یک موضوع برای فهمیدن، ادعایی برای سنجیدن، یا جایی که گیر کرده‌ای."),
       h("p", { class: "small muted" }, "می‌برمت به جای درست، فرم را از حرف‌هایت پر می‌کنم و باقی را نشانت می‌دهم. عکس و فایل هم می‌خوانم (بچسبان یا 📎).")));
     (s ? s.msgs : []).forEach(function (m) {
-      log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx" }, m.text),
-        m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null));
+      log.appendChild(h("div", { class: "as-msg " + m.role }, h("div", { class: "as-tx", dir: "rtl" }, bidiNodes(m.text)),
+        m.files && m.files.length ? h("div", { class: "as-fl" }, m.files.map(function (f) { return f.link ? h("a", { href: f.link, target: "_blank", rel: "noopener" }, "📄 " + f.name) : h("span", { class: f.err ? "bad" : "" }, "📄 " + f.name); })) : null,
+        csvNodes(m)));
     });
     if (busy) log.appendChild(h("div", { class: "as-msg ai as-typing" }, h("div", { class: "as-tx" }, "…")));
     P.appendChild(log);
@@ -892,6 +941,29 @@
       ta, h("button", { class: "btn sm as-send", type: "button", disabled: busy, onclick: go }, "بفرست"))));
     log.scrollTop = log.scrollHeight;
   }
+  /* فرمول و عبارتِ لاتین درونِ جملهٔ فارسی (تورِ پولیا s18: «dV/dt = (πy²/9)·dy/dt» در حبابِ راست‌به‌چپ جابه‌جا خوانده می‌شد):
+     هر دنبالهٔ پیوستهٔ نشانه‌های لاتین/عدد/عملگر (با فاصله‌های میانش) جدا در <bdi dir="ltr"> می‌نشیند؛ نشانه‌گذاریِ فارسیِ دو سرش بیرون می‌ماند */
+  var RTL_CH = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9π√∑∞=+\-−×÷·\/^<>≤≥²³()\[\]]/;
+  function bidiNodes(t) {
+    var parts = String(t == null ? "" : t).split(/(\s+)/), out = [], buf = "", run = [];
+    function flush() {
+      if (!run.length) return; var tx = run.join(""); run = [];
+      var lead = (tx.match(/^[«"'“]+/) || [""])[0], trail = (tx.match(/[.,،:؛!?؟»"'”…]+$/) || [""])[0], core = tx.slice(lead.length, tx.length - trail.length);
+      if (core && /[A-Za-z0-9]/.test(core) && (/[=+\-−×÷·\/^<>≤≥²³√∑π]/.test(core) || /\s/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr" }, core)); }
+      else buf += tx;
+    }
+    parts.forEach(function (p) {
+      if (!p) return;
+      if (/^\s+$/.test(p)) { if (run.length) run.push(p); else buf += p; return; }
+      // نشانه‌گذاریِ پایانِ جمله («12:»، «dy/dt.») دنباله را می‌بندد: «y = 12: dy/dt» دو فرمولِ جداست
+      if (!RTL_CH.test(p) && LTR_TOK.test(p)) { run.push(p); if (/[.,،:؛!?؟…]$/.test(p)) flush(); return; }
+      var ws = run.length && /^\s+$/.test(run[run.length - 1]) ? run.pop() : ""; flush(); buf += ws + p;
+    });
+    var ws2 = run.length && /^\s+$/.test(run[run.length - 1]) ? run.pop() : ""; flush(); buf += ws2;
+    if (buf) out.push(buf);
+    return out;
+  }
+  AS.bidiNodes = bidiNodes;
   function listView() {
     var all = AS.sessions(), cur = AS.cur();
     return h("div", { class: "as-list" },

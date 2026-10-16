@@ -122,14 +122,37 @@
      تثبیت‌شده را از همین‌جا می‌گوید، نه از حافظهٔ خودش، و «حکم نمی‌کنم» را با «یافته چیست» اشتباه نمی‌گیرد (کارزارِ آزمون) */
   var STOP = /^(که|را|از|به|با|در|این|آن|برای|است|هست|نیست|می|من|تو|یه|یک|هم|اگر|چرا|چه|چطور|کنم|کنی|کند|بود|شد|شده|دارم|داره|دیگه|خیلی|همه|ولی|اما|تا|رو|اون|این‌ها|باید)$/;
   function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return w.replace(/(ها|های|هایی|ی|ام|ات|اش)$/, ""); }); }
+  /* ربطِ واقعی، نه هم‌واژگیِ تصادفی (تورِ پولیا s11/s13/s16/s32: «مسئله» ⇐ «مثالِ حل‌شده»، «رشد» ⇐ «رشد پس از سختی»): حوزه فقط وقتی می‌آید که
+     دست‌کم **دو** واژهٔ معنادارِ متفاوتِ پیام در آن باشد و یکی‌شان در نامِ حوزه (یا سه واژه در هر جای آن)، یا نامِ کاملِ حوزه در پیام آمده باشد
+     (پیوندِ صریح؛ know ِ مدل هم صریح است). «معنادار» = نه واژهٔ ایست، و نه واژه‌ای که در بیش از یک‌شانزدهمِ حوزه‌ها هست — چنین واژه‌ای
+     («مسئله»، «فقط»، «بیشتر»، «خودم») نمی‌گوید کدام حوزه (بسامدِ همان نقشه‌ها). هم‌ریشه فقط با پیشوندِ دست‌کم ۵ حرف. */
+  function areaBlob(a, epi) { return epi ? [a.fa, a.en || "", a.desc_fa || "", (a.key_questions_fa || []).join(" ")].join(" ") : [a.fa, a.en || "", a.desc_fa || "", (a.key_questions_fa || []).join(" "), (a.claims || []).map(function (c) { return c.fa; }).join(" ")].join(" "); }
+  var DF = null;
+  function dfOf() {
+    if (DF) return DF; var d = {}, n = 0;
+    function see(b) { n++; var seen = {}; toks(b).forEach(function (w) { if (!seen[w]) { seen[w] = 1; d[w] = (d[w] || 0) + 1; } }); }
+    SYS.areas().forEach(function (x) { see(areaBlob(x.a, false)); });
+    ((window.EPI_TERR || {}).groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { see(areaBlob(a, true)); }); });
+    DF = { d: d, n: n }; return DF;
+  }
+  function meaningful(w) { var D0 = dfOf(); return (D0.d[w] || 0) * 16 <= D0.n; }
+  SYS.relatedMin = 2;
   SYS.related = function (text, n) {
-    var q = toks(text); if (!q.length) return [];
+    var allq = {}; toks(text).forEach(function (w) { allq[w] = 1; });
+    var q = toks(text).filter(meaningful); if (!q.length) return [];
     var qs = {}; q.forEach(function (w) { qs[w] = 1; });
-    function score(blob) { var b = toks(blob), hit = 0, seen = {}; b.forEach(function (w) { if (qs[w] && !seen[w]) { seen[w] = 1; hit++; } else if (w.length >= 4) Object.keys(qs).forEach(function (k) { if (k.length >= 4 && !seen[k] && (w.indexOf(k) === 0 || k.indexOf(w) === 0)) { seen[k] = 1; hit += 0.5; } }); }); return hit; }
+    /* { hits: شمارِ واژه‌های متفاوتِ پیام که در متن آمده، title: چندتا در عنوان } */
+    function match(blob) { var seen = {}; toks(blob).forEach(function (w) { if (qs[w]) { seen[w] = 1; return; } if (w.length >= 5) Object.keys(qs).forEach(function (k) { if (k.length >= 5 && !seen[k] && (w.indexOf(k) === 0 || k.indexOf(w) === 0)) seen[k] = 1; }); }); return Object.keys(seen); }
     var out = [];
-    SYS.areas().forEach(function (x) { var a = x.a, sc = 2 * score(a.fa + " " + (a.en || "")) + score((a.desc_fa || "") + " " + (a.key_questions_fa || []).join(" ") + " " + (a.claims || []).map(function (c) { return c.fa; }).join(" ")); if (sc >= 2) out.push({ sc: sc + 0.5, sys: x.sys, a: a, epi: false }); });
+    function consider(a, rest) {
+      var tw = match(a.fa + " " + (a.en || "")), all = match(areaBlob(a, rest.epi)), uniq = {}; tw.concat(all).forEach(function (w) { uniq[w] = 1; });
+      var hits = Object.keys(uniq).length, ft = toks(a.fa), named = ft.length && ft.every(function (w) { return allq[w]; });
+      if (!named && !(hits >= SYS.relatedMin && (tw.length || hits > SYS.relatedMin))) return;
+      out.push(Object.assign({ sc: hits + tw.length + (rest.epi ? 0 : 0.5), hits: hits, words: Object.keys(uniq), a: a }, rest));
+    }
+    SYS.areas().forEach(function (x) { consider(x.a, { sys: x.sys, epi: false }); });
     var T = window.EPI_TERR || {}, EL = ((window.EPI_BT_LEDGER || {}).territory || {}).areas || {};
-    (T.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { var sc = 2 * score(a.fa + " " + (a.en || "")) + score((a.desc_fa || "") + " " + (a.key_questions_fa || []).join(" ")); if (sc >= 2) out.push({ sc: sc, a: a, epi: true, st: (EL[a.id] || {}).stage || 0 }); }); });
+    (T.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { consider(a, { epi: true, st: (EL[a.id] || {}).stage || 0 }); }); });
     return out.sort(function (a, b) { return b.sc - a.sc; }).slice(0, n || 4);
   };
   /* حوزه با شناسه (برای know ِ مدل): هم سامانه‌ها هم معرفت‌شناسی */
@@ -143,7 +166,8 @@
     var want = ((s && s.know) || []).map(SYS.byId).filter(Boolean);
     var rel = want.concat(SYS.related((msg || "") + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
     if (!rel.length) return "";
-    var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل)"];
+    var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل؛ هر کدام دست‌کم دو واژهٔ معنادارِ مشترک با پیام یا خواستهٔ خودِ تو دارد)",
+      "- یافته‌اند، نه دستور: هیچ‌کدام مجوزِ گفتنِ جواب یا حلِ آماده پیش از تلاشِ خودِ او نیست (کمک نه خیلی کم، نه خیلی زیاد)؛ اگر حوزه‌ای به گفت‌وگو نمی‌خورد، نادیده‌اش بگیر."];
     rel.forEach(function (r) {
       var a = r.a;
       if (r.epi) { L.push("- [معرفت‌شناسی] " + a.id + " «" + a.fa + "» گامِ " + r.st + (r.st <= 1 ? " (هنوز محتوای سنجیده ندارد)" : "") + ": " + (a.desc_fa || "") + (a.key_questions_fa ? " — پرسش‌ها: " + a.key_questions_fa.slice(0, 2).join(" / ") : "")); return; }
