@@ -1,0 +1,16 @@
+{
+ "id": "h20261016093158382058-session-b437",
+ "at": "2026-10-16T09:31:58Z",
+ "by": "session",
+ "area": "lla-page",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "تورِ دستهٔ ۱ ِ پولیا دورهای ۳ تا ۶: مربیِ حل با گزارشِ مدل (coach_state) و سنجشِ صفحه، یک پرسش در هر نوبت (A.liveCoach)، دروازه‌های حدسی هشدار، بازنگری با هر بخشِ شرط؛ a27/a28/a35/a36/a38/a26/a29 + آزمون‌های test_tour1_r3..r5",
+ "procedure": "AGENTS.md: فقط src، build.py، WORKLOG 66 + PROGRESS 84 + HANDBOOK",
+ "commit": "71fd0a4",
+ "status": "open"
+}
