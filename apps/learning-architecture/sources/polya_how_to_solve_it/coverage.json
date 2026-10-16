@@ -4125,7 +4125,9 @@
 "system": [
 "prob:guess-first (a36 guessFresh)",
 "srs:solve-review g",
-"kgen:guesstest"
+"kgen:guesstest",
+"terr:md_cognitive_biases",
+"terr:a_confirmation"
 ],
 "experience": "حدسِ بی‌اثبات پذیرفته نمی‌شود: در کارتِ فهم گزینهٔ «آزمون را نادیده می‌گیرم چون حدسم قوی است» پیش روی توست، آزمونِ حدس اجباری است و حدس فردا با «حالتِ خاص یا مثالِ نقضِ تازه» برمی‌گردد.",
 "gap": "",
@@ -4645,7 +4647,8 @@
 "system": [
 "prob:stepcheck",
 "kgen:guesstest",
-"station:st_aql"
+"station:st_aql",
+"terr:a_induction"
 ],
 "experience": "خلطِ اکتشاف با برهان گرفته می‌شود: گزینهٔ «همه با الگو می‌خوانند — پس حدس ثابت شد» در سازنده نادرست است و وارسیِ گام صورتِ استقرایی/تمثیلی را برهان نمی‌شمارد.",
 "gap": "",
@@ -4709,7 +4712,8 @@
 "system": [
 "prob:guess kit (a36 kitUI) در نخستین برخورد / بازنگری / ایده / قابِ عملی",
 "kgen:diffs",
-"srs:moves"
+"srs:moves",
+"terr:a_induction"
 ],
 "experience": "استقرا (کشفِ قانون از موردهای خاص): جدولِ حالت‌ها و سازندهٔ «تفاضل‌های پیاپی» که جملهٔ بعد را از الگو می‌خواهد.",
 "gap": "",
@@ -4720,7 +4724,8 @@
 "system": [
 "move:mv_descent",
 "kgen:guesstest",
-"problem:book4 (۲۰)"
+"problem:book4 (۲۰)",
+"terr:a_induction"
 ],
 "experience": "تمایزِ استقرای تجربی و استقرای ریاضی ورزیده می‌شود: سازنده «همه با الگو می‌خوانند — پس حدس ثابت شد» را رد می‌کند، و «جمعِ کسرهای فاکتوریلی» گامِ ۳ اثباتِ گذر از n به n + 1 را می‌خواهد.",
 "gap": "",
@@ -5296,7 +5301,8 @@
 "verdict": "عمیق",
 "system": [
 "prob:guess-first (a36 guessFresh)",
-"srs:solve-review g"
+"srs:solve-review g",
+"terr:pr_hypothesis_testing"
 ],
 "experience": "حدس بزن ولی بیازما: حدس و آزمونش هر دو اجباری و حدس فاصله‌دار با حالتِ خاصِ تازه برمی‌گردد.",
 "gap": "",
@@ -6811,7 +6817,8 @@
 "system": [
 "move:mv_special",
 "kgen:guesstest",
-"move:drills"
+"move:drills",
+"terr:pr_hypothesis_testing"
 ],
 "experience": "یک استثنا برای رد بس است: ورزشِ «n² − n + 41 … ⇐ n = 41 … حکم را رد می‌کند».",
 "gap": "",
@@ -7159,7 +7166,8 @@
 "verdict": "عمیق",
 "system": [
 "prob:stepcheck",
-"prob:lookback"
+"prob:lookback",
+"terr:a_induction"
 ],
 "experience": "ناقص را کامل نگیر: وارسیِ گام گامِ «فقط شهودی» را ضعیف می‌شمارد و برای اثبات برمی‌گرداند.",
 "gap": "",

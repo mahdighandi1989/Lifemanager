@@ -187,19 +187,39 @@
     return M.length ? String(M[M.length - 1].text || "") : "";
   }
   SYS.userText = userText; SYS.toks = toks;
-  SYS.knowledge = function (s, msg) {
-    /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است */
+  /* دورِ ۱۱ تورِ پولیا (K8): پیوندِ صریح از **خودِ مسئله** — عبارت‌های نشانهٔ حوزه (cues_fa در نقشهٔ قلمرو، مثلِ «همه راضی» ⇐ مذاکره) فقط روی
+     صورت/مجهولِ گفته‌شدهٔ مسئله (نه هر پیام) و فقط عبارتِ کامل؛ تک‌واژهٔ پیام هرگز (E6 می‌ماند) */
+  function cueNorm(t) { return " " + String(t || "").replace(/[\u064B-\u065F\u0670\u0654]/g, "").replace(/\u200c/g, " ").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9]+/g, " ").replace(/\s+/g, " ") + " "; }
+  SYS.cueAreas = function (text) {
+    var t = cueNorm(text), out = []; if (!String(text || "").trim()) return out;
+    SYS.areas().forEach(function (x) { if ((x.a.cues_fa || []).some(function (c) { var k = cueNorm(c); return k.trim().length > 0 && t.indexOf(k) >= 0; })) out.push(x.a.id); });
+    return out;
+  };
+  function problemText(s, msg) {
+    var T = [], lr = null;
+    try { var blr = A.ASSIST && A.ASSIST.boundLive ? A.ASSIST.boundLive(s) : null; lr = blr && blr.r; if (lr && lr.p) { var pg = S.get("eprog_" + lr.p.id) || {}, u = (pg.solve && pg.solve.u && pg.solve.u[1]) || {}; T.push(lr.p.statement || "", u.u || "", u.one || ""); } } catch (e) { }
+    var C = (s && s.coach) || {}; T.push(C.stmt || ""); if (C.unkBy && C.pk && C.unkBy[C.pk]) T.push(C.unkBy[C.pk]);
+    /* نخستین پیامِ مسئله خودِ صورت است (مربی پس از قلاب‌ها C.stmt را می‌نویسد) */
+    if (!C.stmt && !(lr && lr.p) && !(A.ASSIST && A.ASSIST.notProblem && A.ASSIST.notProblem(msg))) T.push(userText(s, msg));
+    return T.join(" \n ");
+  }
+  SYS.problemText = problemText;
+  SYS.knowledge = function (s, msg, extra) {
+    /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است؛ دورِ ۱۱ (K8): حوزه‌های لحظهٔ پولیای همین نوبت
+       (extra، از ثبت‌گاهِ پوششِ منبع — «terr:» در coverage.json) و نشانه‌های خودِ مسئله (cueAreas) */
     var ids = ((s && s.know) || []).slice();
+    (extra || []).concat(SYS.cueAreas(problemText(s, msg))).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); });
     ((s && s.tour && s.tour.facets) || []).forEach(function (f) { if (f.area && f.status !== "skipped" && ids.indexOf(f.area) < 0) ids.push(f.area); });
     try { var blr = A.ASSIST && A.ASSIST.boundLive ? A.ASSIST.boundLive(s) : null, lr = blr && blr.r; [].concat((lr && (lr.areas || lr.p.areas || (lr.area ? [lr.area] : []))) || []).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); } catch (e) { }
     var want = ids.map(SYS.byId).filter(Boolean);
     var rel = want.concat(SYS.related(userText(s, msg) + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
     if (!rel.length) return "";
-    var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل؛ هر کدام دست‌کم دو واژهٔ معنادارِ مشترک با پیام یا خواستهٔ خودِ تو دارد)",
+    var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل؛ هر کدام با پیوندِ صریح — لحظهٔ پولیای همین نوبت، خودِ مسئله، مسئلهٔ زنده — یا دست‌کم دو واژهٔ معنادارِ مشترک با پیام)",
       "- یافته‌اند، نه دستور: هیچ‌کدام مجوزِ گفتنِ جواب یا حلِ آماده پیش از تلاشِ خودِ او نیست (کمک نه خیلی کم، نه خیلی زیاد)؛ اگر حوزه‌ای به گفت‌وگو نمی‌خورد، نادیده‌اش بگیر."];
     rel.forEach(function (r) {
       var a = r.a;
-      if (r.epi) { L.push("- [معرفت‌شناسی] " + a.id + " «" + a.fa + "» گامِ " + r.st + (r.st <= 1 ? " (هنوز محتوای سنجیده ندارد)" : "") + ": " + (a.desc_fa || "") + (a.key_questions_fa ? " — پرسش‌ها: " + a.key_questions_fa.slice(0, 2).join(" / ") : "")); return; }
+      /* دورِ ۱۱ (K1): پرسش‌های حوزه دانسته‌اند، نه پرسشِ این نوبت — پیش از توضیح و درونِ «…»، تا سطر به پرسش ختم نشود */
+      if (r.epi) { L.push("- [معرفت‌شناسی] " + a.id + " «" + a.fa + "» گامِ " + r.st + (r.st <= 1 ? " (هنوز محتوای سنجیده ندارد)" : "") + (a.key_questions_fa ? " — پرسش‌های حوزه (دانسته، نه پرسشِ این نوبت): " + a.key_questions_fa.slice(0, 2).map(function (q) { return "«" + q + "»"; }).join(" / ") : "") + " — " + (a.desc_fa || "")); return; }
       L.push("- [" + r.sys.fa + "] " + a.id + " «" + a.fa + "» گامِ " + SYS.stage(a) + (a.tools && a.tools.length ? " — ابزارها: " + a.tools.join("، ") : "") + (a.gap_fa ? " — کمبودِ صفحه: " + a.gap_fa.slice(0, 160) : ""));
       (a.claims || []).slice(0, 3).forEach(function (c) { L.push("   · " + (KIND[c.kind] || c.kind) + ": " + c.fa + " — " + String(c.basis_fa || "").slice(0, 140)); });
     });

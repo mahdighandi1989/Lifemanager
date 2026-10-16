@@ -309,9 +309,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await q.evaluate(() => { localStorage.removeItem('lla.assist.cur'); APP.ASSIST.newSession(); });
     await sayQ('سلام، امروز دوباره اومدم');
     { const u = await lastQ(), sess = await q.evaluate(() => APP.ASSIST.cur().lprob || '');
-      info.f3open = { line: /مسئلهٔ بازِ تو: «لوله در بار» — همین را ادامه می‌دهی؟/.test(u), bound: sess };
+      // R11 (K1): «ادامه می‌دهی؟» لحظه‌ای در تابعِ اولویتِ مربی است (پرسشِ نوبت در «مربیِ حل»)، نه سطرِ «بپرس» ِ بلوکِ جدا
+      info.f3open = { line: /# مسئلهٔ بازِ تو/.test(u) && /همان مسئلهٔ بازت \(لوله در بار\) را ادامه می‌دهی؟/.test(u), bound: sess };
       await sayQ('نه، یه سؤالِ دیگه دارم دربارهٔ کتاب');
-      info.f3open.twice = /مسئلهٔ بازِ تو:/.test(await lastQ());
+      info.f3open.twice = /# مسئلهٔ بازِ تو/.test(await lastQ());
       chk(info.f3open.line && !info.f3open.bound && !info.f3open.twice, 'F3: a new session with exactly one open live problem gets ONE suggestion line «مسئلهٔ بازِ تو: «…» — همین را ادامه می‌دهی؟» and is never auto-bound (s34) ' + JSON.stringify(info.f3open)); }
     // F2: «همهٔ داده‌ها؟» هرگز پیش از طرح، حتی با «گیر کردم» (s30، s33، s35)
     await go('lprob', P1);
