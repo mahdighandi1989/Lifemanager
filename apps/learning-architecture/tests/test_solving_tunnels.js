@@ -59,8 +59,12 @@ const FILE = 'file://' + DIST;
     // پرسشِ پاسخ‌گرفته ⇒ پرسشِ بعدیِ همان فهرست (همان چند پرسش، به ترتیب؛ D2: به پلهٔ کاربر، نه شمارِ پیام) — مرحله حالا «طرح»
     __calls.length = 0; __q.push(R({ reply: 'پیش‌تر همین را — یا همین را به شکلِ کمی دیگر — دیده‌ای؟' })); await AS.send('خب داده‌ها را نوشتم');
     o.plan = /مرحله: طرح‌ریزی/.test(__calls[0].user) && /پرسشِ پیشنهادیِ این نوبت: «پیش‌تر همین را/.test(__calls[0].user);
-    __calls.length = 0; __q.push(R({})); await AS.send('هنوز هیچ ایده‌ای ندارم');
-    o.plan2 = /پرسشِ پیشنهادیِ این نوبت: «به مجهول نگاه کن/.test(__calls[0].user);
+    // DECISIONS_R5 F1: پرسش فقط با پاسخِ واقعی و گزارشِ سنجیدهٔ مدل (coach_state) «پاسخ‌گرفته» می‌شود — «هیچ ایده‌ای ندارم» پاسخ نیست
+    __calls.length = 0; __q.push(R({ actions: [{ do: 'coach_state', ph: 'p', said: [], ans: ['p1'], stuck: false, fail: false, role: 'self', nat: 'objective' }] })); await AS.send('هنوز هیچ ایده‌ای ندارم');
+    o.plan2no = /پرسشِ پیشنهادیِ این نوبت: «پیش‌تر همین را/.test(__calls[0].user);
+    __calls.length = 0; __q.push(R({ actions: [{ do: 'coach_state', ph: 'p', said: [], ans: ['p1'], stuck: false, fail: false, role: 'self', nat: 'objective' }] })); await AS.send('آره، شبیهش رو توی یه مسئلهٔ دیگه دیده‌ام');
+    __calls.length = 0; __q.push(R({})); await AS.send('خب بعدی');
+    o.plan2 = o.plan2no && /پرسشِ پیشنهادیِ این نوبت: «به مجهول نگاه کن/.test(__calls[0].user);
     // «حل شد» ⇒ همیشه یک پرسشِ بازنگری؛ پاسخ ⇒ کارتِ مرورِ فردا
     const nCards = APP.S.all('card').length;
     __calls.length = 0; __q.push(R({ actions: [{ do: 'tutor_mark', phase: 'back', q: 'می‌توانی نتیجه را وارسی کنی؟', text: 'در حالتِ خاصِ n=1 هم درست درآمد.', self: 1 }] }));

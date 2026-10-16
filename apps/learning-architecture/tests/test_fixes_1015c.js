@@ -166,7 +166,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // D2 (تورِ پولیا دورِ ۳): پرسشِ بعد به پلهٔ کاربر در همین مسئله (پرسیده و پاسخ‌گرفته)، نه به شمارِ پیام
     const said = (role, text) => { s.msgs.push({ role, text, at: new Date(Date.now() + s.msgs.length).toISOString() }); };
     await at(P1.id); ask('الف'); const a2 = ask('ب'); o.noCount = a2.q === TQ.und.qs[0];
-    said('ai', TQ.und.qs[0]); said('user', 'الف'); said('ai', TQ.und.qs[1]); said('user', 'ب');
+    // DECISIONS_R5 F1: «پاسخ‌گرفته» فقط از گزارشِ سنجیدهٔ مدل (coach_state)، نه از «پیامِ بعدی» — گزارشِ مدل پس از هر پاسخِ کاربر
+    const rep = (id) => { AS._turnSession = s; AS.DO.coach_state({ ph: 'u', said: [], ans: [id], stuck: false, fail: false, role: 'self', nat: 'objective' }); };
+    said('ai', TQ.und.qs[0]); said('user', 'الف'); rep('u1'); said('ai', TQ.und.qs[1]); said('user', 'ب'); rep('u2');
     const a3 = ask('ج'); o.p1 = a3.q === TQ.und.qs[2];
     await at(P2.id); const b1 = ask('مسئلهٔ دوم را شروع کنم'); o.p2fresh = b1.q === TQ.und.qs[0];
     await at(P1.id); const a4 = ask('حلش کردم!'); o.back = /بازنگری/.test(a4.ph);
