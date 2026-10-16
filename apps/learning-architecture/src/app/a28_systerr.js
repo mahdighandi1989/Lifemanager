@@ -123,7 +123,9 @@
   var STOP = /^(که|را|از|به|با|در|این|آن|برای|است|هست|نیست|می|من|تو|یه|یک|هم|اگر|چرا|چه|چطور|کنم|کنی|کند|بود|شد|شده|دارم|داره|دیگه|خیلی|همه|ولی|اما|تا|رو|اون|این‌ها|باید)$/;
   function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return stem(w); }).filter(function (w) { return w.length >= 2; }); }
   /* ریخت‌شناسیِ کوچک (تورِ پولیا دورِ ۲، R6): پسوندهای جمع/ضمیر/«ای» برداشته می‌شوند؛ «ـه» برداشته نمی‌شود («مقابله» ≠ «مقابل») و تطبیقِ پیشوندی نیست */
-  function stem(w) { var o = w.replace(/(?:هایی|های|ها|ای|ی|ام|ات|اش)$/, ""); return o.length >= 2 ? o : w; }
+  /* B8 (تورِ پولیا دورِ ۳): «ـات» فقط جمعِ عربی است وقتی ریشه دست‌کم سه حرف بماند و واژه از جملهٔ مفردهای «ـات»‌دار نباشد — «اثبات» ≠ «اثب»، «ثبات»، «نجات»، «حیات» */
+  var AT_KEEP = /^(?:اثبات|ثبات|نجات|حیات|زکات|ملاقات|مساوات|صلوات|ممات|برات|نبات|سادات)$/;
+  function stem(w) { var o = /ات$/.test(w) && (AT_KEEP.test(w) || w.length - 2 < 3) ? w.replace(/(?:هایی|های|ها)$/, "") : w.replace(/(?:هایی|های|ها|ای|ی|ام|ات|اش)$/, ""); return o.length >= 2 ? o : w; }
   /* ربطِ واقعی، نه هم‌واژگیِ تصادفی (تورِ پولیا s11/s13/s16/s32: «مسئله» ⇐ «مثالِ حل‌شده»، «رشد» ⇐ «رشد پس از سختی»): حوزه فقط وقتی می‌آید که
      دست‌کم **دو** واژهٔ معنادارِ متفاوتِ پیام در آن باشد و یکی‌شان در نامِ حوزه (یا سه واژه در هر جای آن)، یا نامِ کاملِ حوزه در پیام آمده باشد
      (پیوندِ صریح؛ know ِ مدل هم صریح است). «معنادار» = نه واژهٔ ایست، و نه واژه‌ای که در بیش از یک‌شانزدهمِ حوزه‌ها هست — چنین واژه‌ای
@@ -167,13 +169,20 @@
     (T.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { if (a.id === id) hit = { a: a, epi: true, st: (EL[a.id] || {}).stage || 0 }; }); });
     return hit;
   };
+  /* B8: ربط فقط از حرفِ خودِ کاربر — نوبتِ خودکارِ «[سامانه: …]» متنِ دستورِ خودِ سامانه است («لازم، کوتاه، کاربر…»)، نه پیام؛ آن‌جا آخرین پیامِ واقعیِ کاربر */
+  function userText(s, msg) {
+    var t = String(msg || "").trim(); if (!/^\[سامانه/.test(t)) return t;
+    var M = ((s && s.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\[سامانه/.test(String(m.text || "").trim()); });
+    return M.length ? String(M[M.length - 1].text || "") : "";
+  }
+  SYS.userText = userText;
   SYS.knowledge = function (s, msg) {
     /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است */
     var ids = ((s && s.know) || []).slice();
     ((s && s.tour && s.tour.facets) || []).forEach(function (f) { if (f.area && f.status !== "skipped" && ids.indexOf(f.area) < 0) ids.push(f.area); });
     try { var blr = A.ASSIST && A.ASSIST.boundLive ? A.ASSIST.boundLive(s) : null, lr = blr && blr.r; [].concat((lr && (lr.areas || lr.p.areas || (lr.area ? [lr.area] : []))) || []).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); } catch (e) { }
     var want = ids.map(SYS.byId).filter(Boolean);
-    var rel = want.concat(SYS.related((msg || "") + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
+    var rel = want.concat(SYS.related(userText(s, msg) + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
     if (!rel.length) return "";
     var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل؛ هر کدام دست‌کم دو واژهٔ معنادارِ مشترک با پیام یا خواستهٔ خودِ تو دارد)",
       "- یافته‌اند، نه دستور: هیچ‌کدام مجوزِ گفتنِ جواب یا حلِ آماده پیش از تلاشِ خودِ او نیست (کمک نه خیلی کم، نه خیلی زیاد)؛ اگر حوزه‌ای به گفت‌وگو نمی‌خورد، نادیده‌اش بگیر."];
