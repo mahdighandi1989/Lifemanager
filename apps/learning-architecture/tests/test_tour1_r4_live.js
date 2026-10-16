@@ -394,6 +394,27 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       info.e8ifref = await txt('main .lp-umiss');
       chk(/هزینه یا خطرِ خودِ آزمون/.test(info.e8ifref), 'E8: «آزمون را نادیده می‌گیرم» needs a reason that names a cost/risk of the test ' + info.e8ifref);
     });
+
+    await section('E8-prac', async () => {
+      await day(0);
+      // شمارش: «به چند روش …؟» ابزارِ شمارش را در جعبهٔ حدس می‌آورد
+      const PK = await mk({ title: 'پله', st: 'به چند روش می‌شود از ۱۰ پله بالا رفت اگر هر گام ۱ یا ۲ پله باشد؟', nat: 'objective' });
+      await whole('می‌خواهم شمارِ روش‌های بالا رفتن را بیابم', 'کنجکاوم');
+      chk(await p.evaluate(() => APP.kCountRe.test('به چند روش می‌شود بالا رفت؟')) && await has('main [id^="lpGK"][id$="_cnt"]') === 1, 'E8: «به چند روش» is a counting problem (kCountRe) — the guess kit asks «did you count every case once?»');
+      // بازنگریِ مسئلهٔ عملی واحد و بُعد را می‌پرسد
+      const PR = await mk({ title: 'رنگ', st: 'برای رنگ‌کردنِ دیوارهای اتاقم چند لیتر رنگ بخرم؟ هر لیتر ۱۰ مترمربع را می‌پوشاند.', nat: 'practical' });
+      await understand({ one: 'می‌خواهم بدانم چند لیتر رنگ بخرم', unk: 'لیترهای رنگ', data: ['هر لیتر ۱۰ مترمربع می‌پوشاند', 'دیوارها حدودِ ۴۰ مترمربع است'], cond: 'کم نیاید', prac: true, measure: 'لیتر = ۴۰ مترمربع ÷ ۱۰ مترمربع × ۱ لیتر' });
+      await addMove('mv_special', 'اول یک دیوار را حساب می‌کنم تا کل را ببینم');
+      await p.fill('#lpPlan2', 'اگر نشد از فروشندهٔ رنگ می‌پرسم معمولاً چقدر لازم است');
+      await savePlan('نخست مساحتِ دیوارها را اندازه می‌گیرم سپس بر پوششِ هر لیتر تقسیم می‌کنم');
+      await p.fill('#lpStep', 'فردا دیوارها را با متر اندازه بگیرم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'حدودِ ۴۰ مترمربع می‌شود'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
+      await click('main .lp-stepsave');
+      await day(1); await go('lprob', PR, 'exec');
+      await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', '۴۲ مترمربع شد'); await sel('#lpOMatch', 'yes'); await sel('#lpOProg', 'بله، روشن'); await sel('#lpOWant', 'same'); await selIf('#lpOGuess', 'none');
+      await click('main .lp-outsave');
+      await click('main .lp-solved');
+      chk(await has('#lpBUnits') === 1 && await has('#lpBApprox') === 1, 'E8: the practical look-back asks units/dimensions too (A152)');
+    });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');

@@ -921,7 +921,8 @@
   /* ctx (اختیاری): { problem: صورتِ مسئله یا عنوانِ ایده } — برای «قیاس همان خودِ مسئله نیست» */
   function wordsOf(x) { var o = {}; String(x || "").replace(/[\u064B-\u0652ٔ]/g, "").replace(/\u200c/g, " ").toLowerCase().split(/[^a-z0-9\u0600-\u06ff]+/).forEach(function (w) { if (w.length >= 2) o[w] = 1; }); return Object.keys(o); }
   function sameText(a, b) { var A1 = wordsOf(a), B1 = wordsOf(b); if (!A1.length || !B1.length) return false; var inB = A1.filter(function (w) { return B1.indexOf(w) >= 0; }).length; return inB / A1.length >= 0.8; }
-  var COUNT_RE = /چند\s*(?:راه|طریق|حالت|جور|ترتیب|مسیر|ناحیه|زیرمجموعه|جایگشت)|تعداد\s*(?:راه|حالت|ترتیب|مسیر|ناحیه|زیرمجموعه|جایگشت)|شمارش|بشمار/;
+  /* تورِ پولیا دورِ ۴ (s24): «به چند روش …؟» هم شمارش است */
+  var COUNT_RE = /چند\s*(?:راه|روش|طریق|حالت|جور|ترتیب|مسیر|ناحیه|زیرمجموعه|جایگشت)|تعداد\s*(?:راه|روش|حالت|ترتیب|مسیر|ناحیه|زیرمجموعه|جایگشت)|شمارش|بشمار/;
   A.kCountRe = COUNT_RE;
   A.kguessCheck = function (kit, ctx) {
     kit = kit || {}; ctx = ctx || {}; var out = { table: null, formula: null, rivals: null, ana: null, issues: [], notes: [], refuted: false };
