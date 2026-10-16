@@ -35968,7 +35968,7 @@ APP.goFromURL = function (q) {
   var NOTKNOW_RE = /نمی[‌\s]?(?:دونم|دانم)|نمیدونم|ایده(?:‌ای)?\s*ندارم|هیچ\s*ایده(?:‌ای)?/;
   /* B1: آنچه کاربر با حرفِ خودش از فهمِ مسئله گفته (بی آن‌که پرسیده شود): مجهول (پرسش/خواسته)، داده (عدد یا «داریم»)، شرط (قید) */
   var ST_U = /مجهول|حکم|خواسته(?:‌ی|ِ)?\s*مسئله|[؟?]|پیدا\s*کن|بیاب|حساب\s*کن|ثابت\s*کن|اثبات\s*کن|نشان\s*بده|می[‌\s]?خوا(?:م|یم)\s*(?:بدونم|بفهمم|پیدا\s*کنم|حساب\s*کنم|ثابت\s*کنم)/;
-  var ST_D = /[0-9]|داده|داریم|دارم|داره|معلوم|می[‌\s]?دونیم|می[‌\s]?دانیم|فرض/;
+  var ST_D = /[0-9]|داده|داریم|معلوم|می[‌\s]?دونیم|می[‌\s]?دانیم|فرض/;
   var ST_C = /شرط|باید|نباید|(?:^|[\s،])فقط|دقیقا|به\s*شرطی|طوری\s*که|به[‌\s]?طوری|بدون|حداکثر|حداقل|نه\s*بیشتر|هیچ\s*دو|قید/;
   function statedParts(t) { t = faDigits(String(t || "")); return { u: ST_U.test(t), d: ST_D.test(t), c: ST_C.test(t) }; }
   /* B10: کاربرِ مربی/پدر/مادر (نه حل‌کننده) — قابِ «از یادگیرنده بپرس، حل نکن» */
@@ -36099,12 +36099,13 @@ APP.goFromURL = function (q) {
      نه در آغازِ طرح؛ «سخت‌کوشی مادرِ خوش‌شانسی» (incub) وقتی خسته/گیر است و کنار می‌گذارد؛ «جایی که اراده هست» (will) پس از دلسردی. */
   function provKeys(ph, cls, mt) {
     mt = String(mt || "");
-    var k = ph === "c" ? (cls === "obj" || cls === "prove" ? ["cobj", "c"] : cls === "pract" ? ["c", "want"] : ["c", "cobj"]) : (PROV_PH[ph] || [ph]).slice();
-    if (ph === "p" && !/عوض|طرحِ?\s*(?:دیگه|دیگر|تازه|دوم)|دوباره\s*طرح|کنار\s*بذارم\s*این\s*طرح/.test(mt)) k = k.filter(function (x) { return x !== "switch"; });
-    if (ph === "c" && /(?:از|به)\s*(?:آخر|جواب|خواسته)\s*(?:به\s*)?عقب|برعکس/.test(mt)) k.unshift("back");
-    if (STUCK_RE.test(mt) || /خسته|کنار\s*(?:بذارم|بگذارم|گذاشتم)|ذهنم\s*کار\s*نمی/.test(mt)) k.unshift("incub");
-    if (FAIL_ME.test(mt) && !STUCK_RE.test(mt)) k.unshift("will");
-    return k;
+    var k = ph === "c" ? (cls === "obj" || cls === "prove" ? ["cobj", "c"] : cls === "pract" ? ["c", "want"] : ["c", "cobj"]) : (PROV_PH[ph] || [ph]).slice(), front = [];
+    k = k.filter(function (x) { return x !== "switch"; });
+    if (ph === "p" && /عوض|طرحِ?\s*(?:دیگه|دیگر|تازه|دوم)|دوباره\s*طرح|کنار\s*بذارم\s*این\s*طرح/.test(mt)) front.push("switch");
+    if (ph === "c" && /(?:از|به)\s*(?:آخر|جواب|خواسته)\s*(?:به\s*)?عقب|برعکس/.test(mt)) front.push("back");
+    if (STUCK_RE.test(mt) || /خسته|کنار\s*(?:بذارم|بگذارم|گذاشتم)|ذهنم\s*کار\s*نمی/.test(mt)) front.push("incub");
+    else if (FAIL_ME.test(mt)) front.push("will");
+    return front.concat(k.filter(function (x) { return front.indexOf(x) < 0; }));
   }
   function proverbs(ph, keys0) {
     var L = null, R = A.POLYA_PROVERBS || A.HEUR_WISDOM || A.PROVERBS, keys = keys0 || PROV_PH[ph] || [ph];
@@ -36263,7 +36264,7 @@ APP.goFromURL = function (q) {
       L.push("- سطحِ استقلالِ کاربر در پرسش‌های همین مرحله (پلهٔ نردبانِ ۱/۳/۷/۲۱/۶۰ از کاربست‌های خودش): " + rg.map(function (x) { return "«" + clip(x.q, 40) + "» پلهٔ " + fa(x.n); }).join("؛ ") +
         ". کمک را به همین اندازه کم کن: پلهٔ ۰ ⇐ پرسش را کامل بپرس؛ پلهٔ ۱ تا " + fa(own - 1) + " ⇐ کوتاه‌تر و کلی‌تر؛ پلهٔ " + fa(own) + " به بالا ⇐ نپرس، بپرس «الان از خودت چه می‌پرسی؟».");
     }
-    L.push("- پایانِ نردبانِ سرنخ (" + (srcQ("C188") || "C188") + "): اگر جدی تلاش کرده" + (o.tries ? " (تا حالا " + fa(o.tries) + " پیام)" : "") + " و خاص‌ترین سرنخ را هم گرفته و هنوز گیر است — اگر نردبان تمام شد: **ایدهٔ کلیدی** را جدا کن و فقط گامِ بعد را بگو، سپس «کتاب را ببند و خودت دوباره حل کن»؛ و پس از بازسازیِ خودش، بازنگری.");
+    L.push("- پایانِ نردبانِ سرنخ (" + (srcQ("C188") || "C188") + "): اگر جدی تلاش کرده" + (o.tries ? " (تا حالا " + fa(o.tries) + " پیام)" : "") + " و خاص‌ترین سرنخ را هم گرفته و هنوز گیر است — اگر نردبان تمام شد: ایدهٔ کلیدی را جدا کن و فقط گامِ بعد را بگو، سپس «کتاب را ببند و خودت دوباره حل کن»؛ و پس از بازسازیِ خودش، بازنگری.");
     L.push("- گامِ کوچک ارزش دارد " + (srcQ("B076") || "") + (srcQ("C153") ? " " + srcQ("C153") : "") + ": اگر گامش را ناچیز شمرد، دقیق بگو همان گام چه چیزی را جلو برد (بی تعارف). دلسردی، شرم، خشم، «وقتم هدر رفت»، «استعدادشو ندارم» یا میلِ رها کردن ⇒ 🌱 کوچک‌ترین گامِ بعد (حالتِ خاص، بخشی از شرط)، بی دلداریِ کلیشه‌ای و بی حکم دربارهٔ او.");
     L.push("- ادعای محلِ بحث («حق داره؟»، «درسته؟»، «همیشه برقراره؟») یا حدسِ تازه ⇒ داوری نکن: «ثابتش کن یا با مثالِ نقض ردش کن — کدام را اول امتحان می‌کنی؟»." + (/حق\s*(?:داره|دارد|با\s*(?:اون|او|کیه))|راست\s*می[‌\s]?گ|درسته\s*[؟?]|درست\s*می[‌\s]?گه/.test(mt) ? " **همین پیام چنین ادعایی است.**" : ""));
     if (ph === "u" || ph === "p") L.push("- شکل " + (srcQ("B139") || "") + ": اگر به کار می‌آید، بخواه شکل یا جدولی بکشد و در گفت‌وگو توصیفش کند (یا عکسش را پیوست کند) — حتی اگر مسئله هندسی نیست.");
@@ -36450,7 +36451,7 @@ APP.goFromURL = function (q) {
     /* مسئلهٔ زندهٔ باز ⇒ مرحله فقط از صفحه (A.liveCoach): «حل شد» ِ گفت‌وگو مرحله را عوض نمی‌کند (R5 — بستن فقط با «✅ حل شد» و بازنگریِ صفحه) */
     if (b && !b.done) { var co = null; try { co = A.liveCoach ? A.liveCoach(b.pid) : null; } catch (e) { } var p0 = co ? co.ph : b.ph; return p0 === "done" ? "b" : (PH_OF[p0] || "u"); }
     if (b && b.done && C.closedPid !== b.pid) { C.closedPid = b.pid; C.ph = ""; C.st = {}; C.stmt = ""; }   // مسئله بسته شد ⇒ حرفِ تازه از «فهم» (حدسِ تازه = مسئلهٔ تازه)
-    if (!C.ph && !C.inh && !(b && b.done)) { var x0 = inheritPhase(s, mt); if (x0) { C.ph = x0.coach.ph; C.st = Object.assign({}, x0.coach.st || {}); C.stmt = x0.coach.stmt; C.cls = x0.coach.cls; C.inh = x0.id; } }
+    if (!C.ph && !C.inh && !(b && b.done)) { var x0 = inheritPhase(s, mt); if (x0) { C.ph = x0.coach.ph; C.st = Object.assign({}, x0.coach.st || {}); C.cls = x0.coach.cls; C.inh = x0.id; } }
     var ph = C.ph || "", st = C.st = C.st || {}, sp = statedParts(mt), teach = teachMode(s, mt);
     if (sp.u) st.u = 1; if (sp.d) st.d = 1; if (sp.c) st.c = 1;
     if (!C.stmt && !AS.notProblem(mt)) C.stmt = clip(mt, 400);
@@ -36802,7 +36803,7 @@ APP.goFromURL = function (q) {
     var M = ((s && s.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\[سامانه/.test(String(m.text || "").trim()); });
     return M.length ? String(M[M.length - 1].text || "") : "";
   }
-  SYS.userText = userText;
+  SYS.userText = userText; SYS.toks = toks;
   SYS.knowledge = function (s, msg) {
     /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است */
     var ids = ((s && s.know) || []).slice();

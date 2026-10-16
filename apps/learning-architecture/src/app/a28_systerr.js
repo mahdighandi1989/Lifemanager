@@ -175,7 +175,7 @@
     var M = ((s && s.msgs) || []).filter(function (m) { return m && m.role === "user" && !/^\[سامانه/.test(String(m.text || "").trim()); });
     return M.length ? String(M[M.length - 1].text || "") : "";
   }
-  SYS.userText = userText;
+  SYS.userText = userText; SYS.toks = toks;
   SYS.knowledge = function (s, msg) {
     /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است */
     var ids = ((s && s.know) || []).slice();
