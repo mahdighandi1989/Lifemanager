@@ -47,6 +47,7 @@
     "isomorph-ladder": ["e_prob", "نردبانِ مسئله‌های هم‌ساختار"], cards: ["review", "کارت‌های مرور"], "review-cards": ["review", "کارت‌های مرور"], "knot-ladder": ["kpractice", "نردبانِ ورزشِ گره‌ها"], "epi-warm": ["epi_course", "گرم‌کردنِ دورهٔ سنجش"] };
   function famOf(v) { var m = /^f(\d+)/i.exec(String(v || "")); return m ? "F" + (+m[1]) : null; }
   function kfamId(F) { return F && A.KF && A.KF.some(function (x) { return x.id === F; }) ? F : null; }
+  function epiArea(aid) { return ((window.EPI_TERR || {}).groups || []).some(function (g) { return (g.areas || []).some(function (a) { return a.id === aid; }); }); }
   function terrSys(aid) { var out = null; ((window.SYS_TERR || {}).systems || []).forEach(function (m) { (m.groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { if (a.id === aid) out = m.id; }); }); }); return out; }
   /* ⇒ { view, arg, sub, sel, fam, node, where, none, assist } — node کلیدِ گرهِ گرافِ «🗺 نقشه‌ها» است */
   SR.target = function (sid) {
@@ -82,7 +83,10 @@
       return view("e_prob");
     }
     if (k === "journey") { T.where = "گامِ " + v + " ِ سفرِ هر موضوع"; return view("topics"); }
-    if (k === "terr") { var sy = terrSys(v); if (sy) { T.node = "sarea:" + v; return view("sterr", sy); } T.where = "حوزهٔ قلمرو: " + v; return view("sterr"); }
+    /* دورِ ۱۱ تورِ پولیا (K8): حوزهٔ قلمروِ معرفت‌شناسی (EPI_TERR، مثلِ a_induction) هم — گرهِ «area» ِ گراف و نمای قلمرو */
+    if (k === "terr") { var sy = terrSys(v); if (sy) { T.node = "sarea:" + v; return view("sterr", sy); }
+      if (epiArea(v)) { T.node = "area:" + v; T.where = "قلمروِ معرفت‌شناسی: " + v; return view("e_bt", null, "terr"); }
+      T.where = "حوزهٔ قلمرو: " + v; return view("sterr"); }
     if (k === "course") {
       var sm = /^sim:(\d+)/.exec(bare(P)), ct = null; try { ct = A.courseState ? A.courseState() : null; } catch (e) { }
       if (sm) { var n = +sm[1]; T.where = "شبیه‌سازِ درسِ تکنیکِ " + fa(n) + " (دوره، قدمِ ۲ «امتحان کن»)"; T.sel = ".crs-sim"; if (A.T && A.T.some(function (t) { return t.id === n; })) T.node = "tech:" + n; return ct && ct.topic ? view("lesson", n, "s2") : view("tech", n); }
