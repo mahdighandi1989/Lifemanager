@@ -861,7 +861,7 @@
   /* فرمول بر حسبِ n (یا x): عدد، + − × ÷ ^، پرانتز، ضربِ ضمنی (۲n، n(n+1))؛ بی eval. خوانا نیست ⇒ null */
   /* L4 (ممیزیِ ۲۰۲۶-۱۰-۱۵): فاصله میانِ دو عدد («2 3») یکی نمی‌شود؛ دو متغیرِ پیاپی («n n»، «nx») و متغیر پیش از عدد («n2») مبهم‌اند ⇒ null؛
      n و x با هم در یک فرمول ⇒ null (یک متغیر)؛ ممیزِ فارسی «٫» پذیرفته است («۱٫۵n»). */
-  function parseFormula(src) {
+  function parseFormula(src, refs) {
     var s0 = lat(src).toLowerCase().replace(/[‌‏‎]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/٫/g, ".").replace(/[×·]/g, "*").replace(/[÷⁄∕]/g, "/").replace(/[−–—]/g, "-").replace(/²/g, "^2").replace(/³/g, "^3").replace(/ⁿ/g, "^n");
     if (/[0-9.]\s+[0-9.]/.test(s0)) return null;
     var s = s0.replace(/\s+/g, "");
@@ -871,28 +871,44 @@
     s = s.replace(/^(?:[ء-یپچژکگ](?:_?\([ء-یپچژکگnx]\))?)=/, "");
     var fv = s.match(/[ء-یپچژکگ]/g);
     if (fv) { if (fv.some(function (c) { return c !== fv[0]; }) || /[nx]/.test(s)) return null; s = s.replace(/[ء-یپچژکگ]/g, "n"); }
-    if (!s || !/^[0-9n x.+\-*/^()]+$/.test(s)) return null;
+    if (!s || !(refs ? /^[0-9n x.+\-*/^()#]+$/ : /^[0-9n x.+\-*/^()]+$/).test(s)) return null;
     if (/[nx][nx]|[nx][0-9.]/.test(s) || /n/.test(s) && /x/.test(s)) return null;
-    var toks = [], m, re = /(\d+(?:\.\d+)?)|([nx])|([+\-*/^()])/g, pos = 0;
-    while ((m = re.exec(s))) { if (m.index !== pos) return null; pos = re.lastIndex; toks.push(m[1] ? { t: "num", v: parseFloat(m[1]) } : m[2] ? { t: "var" } : { t: m[3] }); }
+    var toks = [], m, re = refs ? /#(\d)|(\d+(?:\.\d+)?)|([nx])|([+\-*/^()])/g : /()(\d+(?:\.\d+)?)|([nx])|([+\-*/^()])/g, pos = 0;
+    while ((m = re.exec(s))) { if (m.index !== pos) return null; pos = re.lastIndex; toks.push(m[1] ? { t: "ref", k: +m[1] } : m[2] ? { t: "num", v: parseFloat(m[2]) } : m[3] ? { t: "var" } : { t: m[4] }); }
     if (pos !== s.length || !toks.length) return null;
-    var tk = []; toks.forEach(function (x, i) { var pv = tk[tk.length - 1]; if (pv && (pv.t === "num" || pv.t === "var" || pv.t === ")") && (x.t === "num" || x.t === "var" || x.t === "(")) tk.push({ t: "*" }); tk.push(x); });
+    var tk = []; toks.forEach(function (x, i) { var pv = tk[tk.length - 1]; if (pv && (pv.t === "num" || pv.t === "var" || pv.t === "ref" || pv.t === ")") && (x.t === "num" || x.t === "var" || x.t === "ref" || x.t === "(")) tk.push({ t: "*" }); tk.push(x); });
     var i = 0;
     function peek() { return tk[i] && tk[i].t; }
-    function expr() { var a = term(); while (peek() === "+" || peek() === "-") { var op = tk[i++].t, b = term(); a = (function (a, b, op) { return function (n) { return op === "+" ? a(n) + b(n) : a(n) - b(n); }; })(a, b, op); } return a; }
-    function term() { var a = unary(); while (peek() === "*" || peek() === "/") { var op = tk[i++].t, b = unary(); a = (function (a, b, op) { return function (n) { return op === "*" ? a(n) * b(n) : a(n) / b(n); }; })(a, b, op); } return a; }
-    function unary() { if (peek() === "-") { i++; var u = unary(); return function (n) { return -u(n); }; } if (peek() === "+") { i++; return unary(); } return pow(); }
-    function pow() { var a = atom(); if (peek() === "^") { i++; var b = unary(); return function (n) { return Math.pow(a(n), b(n)); }; } return a; }
+    /* P (اختیاری): برای رابطهٔ بازگشتی، P(k) = مقدارِ k حالت پیش‌تر */
+    function expr() { var a = term(); while (peek() === "+" || peek() === "-") { var op = tk[i++].t, b = term(); a = (function (a, b, op) { return function (n, P) { return op === "+" ? a(n, P) + b(n, P) : a(n, P) - b(n, P); }; })(a, b, op); } return a; }
+    function term() { var a = unary(); while (peek() === "*" || peek() === "/") { var op = tk[i++].t, b = unary(); a = (function (a, b, op) { return function (n, P) { return op === "*" ? a(n, P) * b(n, P) : a(n, P) / b(n, P); }; })(a, b, op); } return a; }
+    function unary() { if (peek() === "-") { i++; var u = unary(); return function (n, P) { return -u(n, P); }; } if (peek() === "+") { i++; return unary(); } return pow(); }
+    function pow() { var a = atom(); if (peek() === "^") { i++; var b = unary(); return function (n, P) { return Math.pow(a(n, P), b(n, P)); }; } return a; }
     function atom() {
       var x = tk[i]; if (!x) throw new Error("end");
       if (x.t === "num") { i++; return function () { return x.v; }; }
       if (x.t === "var") { i++; return function (n) { return n; }; }
+      if (x.t === "ref") { i++; return function (n, P) { return P ? P(x.k) : NaN; }; }
       if (x.t === "(") { i++; var e = expr(); if (peek() !== ")") throw new Error(")"); i++; return e; }
       throw new Error("token");
     }
     try { var f = expr(); if (i !== tk.length) return null; return f; } catch (e) { return null; }
   }
-  A.kformula = parseFormula;
+  A.kformula = function (src) { return parseFormula(src); };
+  /* رابطهٔ بازگشتی (دورِ ۲ ِ تورِ پولیا، s24): «a(n) = a(n−1) + a(n−2)»، «y_n = 2y_(n-1) + 1»، «ج(ن) = ج(ن−۱) + ن» — کد آن را روی جدولِ خودِ کاربر
+     می‌آزماید: هر حالت از حالت‌های پیشینِ همان جدول؛ ناسازگاری یعنی یا رابطه نادرست است یا شمارشِ همان حالت (خطای n = 4 ِ s24 همین‌جا پیدا می‌شد). */
+  function parseRec(src) {
+    var s0 = lat(src).toLowerCase().replace(/[‌‏‎\s]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[−–—]/g, "-").replace(/[×·]/g, "*").replace(/[{}\[\]]/g, function (c) { return c === "{" || c === "[" ? "(" : ")"; });
+    var m = /^([a-zء-یپچژکگ])(?:_?\(([nxء-یپچژکگ])\)|_([nxء-یپچژکگ]))=(.+)$/.exec(s0); if (!m) return null;
+    var name = m[1], v = m[2] || m[3], rhs = m[4], esc = function (c) { return c.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"); };
+    var re = new RegExp(esc(name) + "_?\\(" + esc(v) + "-(\\d)\\)", "g"), lag = 0, any = false;
+    rhs = rhs.replace(re, function (all, a) { var k = +a; if (!k) return all; any = true; lag = Math.max(lag, k); return "#" + k; });
+    if (!any) return null;
+    if (v !== "n" && v !== "x") rhs = rhs.split(v).join("n");
+    if (/[ء-یپچژکگ]/.test(rhs)) return null;
+    var f = parseFormula(rhs, true); return f ? { f: f, lag: lag } : null;
+  }
+  A.krecurrence = parseRec;
   function close(a, b, tol) { return isFinite(a) && isFinite(b) && Math.abs(a - b) <= Math.max(tol > 0 ? tol : 0, 1e-9 * Math.max(1, Math.abs(a), Math.abs(b))); }
   A.kclose = close;
   /* کوچک‌ترین n ِ صحیح (از نخستین حالتِ جدول — یا ۱ — تا بیشینهٔ جدول + ۲۰) که دو فرمول در آن فرق دارند */
@@ -905,6 +921,8 @@
   /* ctx (اختیاری): { problem: صورتِ مسئله یا عنوانِ ایده } — برای «قیاس همان خودِ مسئله نیست» */
   function wordsOf(x) { var o = {}; String(x || "").replace(/[\u064B-\u0652ٔ]/g, "").replace(/\u200c/g, " ").toLowerCase().split(/[^a-z0-9\u0600-\u06ff]+/).forEach(function (w) { if (w.length >= 2) o[w] = 1; }); return Object.keys(o); }
   function sameText(a, b) { var A1 = wordsOf(a), B1 = wordsOf(b); if (!A1.length || !B1.length) return false; var inB = A1.filter(function (w) { return B1.indexOf(w) >= 0; }).length; return inB / A1.length >= 0.8; }
+  var COUNT_RE = /چند\s*(?:راه|طریق|حالت|جور|ترتیب|مسیر|ناحیه|زیرمجموعه|جایگشت)|تعداد\s*(?:راه|حالت|ترتیب|مسیر|ناحیه|زیرمجموعه|جایگشت)|شمارش|بشمار/;
+  A.kCountRe = COUNT_RE;
   A.kguessCheck = function (kit, ctx) {
     kit = kit || {}; ctx = ctx || {}; var out = { table: null, formula: null, rivals: null, ana: null, issues: [], notes: [], refuted: false };
     var T = function (x) { return String(x == null ? "" : x).trim(); };
@@ -941,8 +959,19 @@
       else out.issues.push("برای تفاضل‌ها دست‌کم دو حالتِ عددی لازم است.");
     }
     if (String(kit.formula || "").trim()) {
-      var f = parseFormula(kit.formula);
-      if (!f) { out.formula = { ok: false }; out.issues.push("فرمول خوانا نیست: فقط یک متغیر (n، x یا یک حرفِ فارسی مثلِ ن یا ح)، عدد، کسر، + − × ÷ ^ و پرانتز (مثلاً n(n+1)/2، 2^n − 1 یا (10/ن)^ن)."); }
+      var f = parseFormula(kit.formula), rc = f ? null : parseRec(kit.formula);
+      if (!f && rc) {
+        /* رابطهٔ بازگشتی روی جدولِ خودت: حالتِ i از حالت‌های i−1 … i−lag ِ همان جدول (فقط با گامِ ثابتِ x) */
+        var ys = numRows.map(function (r) { return r.y; }), xr = numRows.map(function (r, i) { return r.x != null ? r.x : i + 1; }), evenR = xr.every(function (x, i) { return i === 0 || close(x - xr[i - 1], xr[1] - xr[0]); });
+        var mismR = [], testedR = 0;
+        if (evenR) for (var ii = rc.lag; ii < ys.length; ii++) { var vv = rc.f(xr[ii], function (k) { return ys[ii - k]; }); testedR++; if (!close(vv, ys[ii], numRows[ii].tol)) mismR.push({ x: xr[ii], y: ys[ii], fx: vv, raw: String(numRows[ii].raw.y) }); }
+        out.formula = { ok: true, rec: true, lag: rc.lag, fits: !mismR.length && testedR > 0, mism: mismR, tested: testedR };
+        if (!evenR) out.issues.push("برای سنجیدنِ رابطهٔ بازگشتی، x ِ حالت‌ها را با گامِ ثابت بچین.");
+        else if (!testedR) out.issues.push("رابطهٔ بازگشتی‌ات به " + fa(rc.lag) + " حالتِ پیشین نیاز دارد: دست‌کم " + fa(rc.lag + 1) + " حالت در جدول بنویس تا کد بتواند آن را با جدولت بسنجد.");
+        if (mismR.length) { out.refuted = true; out.issues.push("رابطهٔ بازگشتی‌ات جدولِ خودت را بازتولید نمی‌کند: " + mismR.slice(0, 3).map(function (m0) { return "در x = " + fa(m0.x) + " رابطه " + fa(Math.round(m0.fx * 1000) / 1000) + " می‌دهد، جدول " + fa(m0.y); }).join("؛ ") + " — یا رابطه نادرست است یا شمارشِ همان حالت؛ هر دو را وارسی کن."); }
+        else if (testedR) { out.notes.push("رابطهٔ بازگشتی با " + fa(testedR) + " حالتِ جدولت می‌خواند (با مقدارهای آغازِ همان جدول) — پشتیبانی شد، نه ثابت؛ برهانش (چرا هر حالت از حالت‌های پیشین می‌آید) جداست."); out.formula.next = rc.f(xr[xr.length - 1] + (xr.length > 1 ? xr[1] - xr[0] : 1), function (k) { return ys[ys.length - k]; }); }
+      }
+      else if (!f) { out.formula = { ok: false }; out.issues.push("فرمول خوانا نیست: فقط یک متغیر (n، x یا یک حرفِ فارسی مثلِ ن یا ح)، عدد، کسر، + − × ÷ ^ و پرانتز (مثلاً n(n+1)/2، 2^n − 1 یا (10/ن)^ن)."); }
       else {
         /* تحمل = دقتِ همان خانه (رقم‌هایی که خودت نوشتی)؛ عددِ صحیح دقیق خوانده می‌شود — اگر گردش کرده‌ای، رقم‌ها یا کسر را بنویس */
         var mism = numRows.map(function (r, i) { var x = r.x != null ? r.x : i + 1, v = f(x); return close(v, r.y, r.tol) ? null : { x: x, y: r.y, fx: v, raw: String(r.raw.y), rounded: !r.tol && Math.abs(v - r.y) < 0.5 }; }).filter(Boolean);
@@ -952,6 +981,8 @@
         if (out.table && out.table.nextX != null) out.formula.next = f(out.table.nextX);
       }
     }
+    /* شمارش (دورِ ۲، s24): جدولِ یک مسئلهٔ شمارشی فقط وقتی شاهد است که هر حالت کامل شمرده شده باشد — «چطور مطمئنی همه را شمردی؟» */
+    if (rows.length && (ctx.counting || COUNT_RE.test(String(ctx.problem || ""))) && T(kit.countHow).split(/\s+/).filter(function (w) { return w.length >= 2; }).length < 3) out.issues.push("شمارش: بگو چطور مطمئنی در هر حالت همه را شمردی — فهرستِ منظم، بی موردِ جاافتاده و بی دوباره‌شماری (خطای یک حالت کلِ الگو را می‌شکند).");
     var rv = (kit.rivals || []).filter(function (x) { return x && String(x.t || "").trim(); });
     if (rv.length || (kit.rivals || []).some(function (x) { return x && String(x.test || "").trim(); })) {
       var seen = {}, dup = false, noTest = [];

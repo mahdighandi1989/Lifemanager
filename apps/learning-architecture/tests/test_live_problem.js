@@ -86,7 +86,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpWhy', 'آیندهٔ کاری‌ام و آرامشِ خانواده هر دو برایم مهم‌اند');
     await click('main .lp-onesave');
     info.onemiss = await p.locator('main .lp-onemiss').textContent();
-    chk(/رونوشت/.test(info.onemiss) && /کوتاه‌تر/.test(info.onemiss) && /یک جمله/.test(info.onemiss) && !(await p.locator('#lpUnk').count()), 'the whole sentence: no near-copy, shorter than the statement, one sentence ' + info.onemiss);
+    // دورِ ۲ ِ تور (R4): «کوتاه‌تر از صورت» برداشته شد — فقط رونوشت و «یک جمله»
+    chk(/رونوشت/.test(info.onemiss) && !/کوتاه‌تر/.test(info.onemiss) && /یک جمله/.test(info.onemiss) && !(await p.locator('#lpUnk').count()), 'the whole sentence: no near-copy, one sentence (no «shorter than the statement» rule) ' + info.onemiss);
     await p.fill('#lpOne', 'می‌خواهم بین رفتن به شیراز و ماندن در تهران تصمیم بگیرم، با درآمد، خانواده و مهلتی که دارم.');
     await click('main .lp-onesave');
     info.order = await p.evaluate(() => [...document.querySelectorAll('main .lp-u label')].map(l => l.getAttribute('for')).filter(Boolean).slice(0, 8));
@@ -133,6 +134,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') < 0, 'clicking «مرتبط است» alone is not a heuristic used');
     await p.fill('#lpRelC_0', 'پ'); await click('main .lp-relcsave');
     chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') < 0, 'a non-specific «what carries over» is refused');
+    await p.fill('#lpRelC_0', 'روشِ مذاکره برای افزایشِ حقوق را به شرطِ دورکاری منتقل می‌کنم');
+    await click('main .lp-relcsave');
+    chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') < 0, 'R4: «what is shared» must be declared (method/unknown/data/condition/form/result)');
+    await sel('#lpRelS_0', 'method');
     await p.fill('#lpRelC_0', 'روشِ مذاکره برای افزایشِ حقوق را به شرطِ دورکاری منتقل می‌کنم');
     await click('main .lp-relcsave');
     chk((await p.evaluate(pid => APP.liveHeur(pid), P1)).indexOf('rel') >= 0, 'a written, specific link counts as the related-problem heuristic');
@@ -325,6 +330,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
 
     /* ===== F) بازنگری — حل شد ===== */
     await click('main .lp-solved');
+    // دورِ ۲ (R5): مسئلهٔ کمکی ≠ مسئلهٔ اصلی — پیش از «حل شد» پلِ برگشت
+    chk(await p.locator('main .lp-close .lp-closeaux').count() === 1 && !(await S(P1)).live.state, 'R5: «✅ حل شد» with an auxiliary problem asks for the bridge back first');
+    await sel('#lpXC_0', 'crossed'); await p.fill('#lpXCW_0', 'نتیجهٔ سه ماهِ آزمایشی نشان داد دورکاری شدنی است و تصمیمِ دائمی همین شد');
+    await click('main .lp-closego');
     await ownCheck('main .lp-lb', 'look-back card');
     info.lbun = await p.evaluate(() => [...document.querySelectorAll('main .lp-lb .lp-un')].map(x => x.getAttribute('data-d')));
     chk(/آینده/.test(await p.locator('main .lp-lb .lp-bwhy0').textContent()), 'look-back shows the initial «why» to compare with the end');
@@ -338,12 +347,14 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(!(await S(P1)).b[1], 'look-back: «راهِ دیگر» and «در یک نگاه» are required');
     await p.fill('#lpBOther', 'با فهرستِ هزینه‌ها و سود به همان تصمیم می‌رسیدم'); await p.fill('#lpBGlance', 'شرطِ پنهان را پرسیدم و تصمیم روشن شد');
     await sel('#lpBHit', 'نادرست بود'); await sel('#lpBBest', '0'); await sel('#lpBWant', 'same');
+    await p.fill('#lpBHitW', 'فکر می‌کردم شرکت دورکاری نمی‌دهد چون پرسیده بودم');
+    await p.fill('#lpBTaste', 'بخشِ پرسیدن را دوست داشتم، فهرست‌نویسی را نه');
     await sel('#lpBU_a_d4', 'skip'); await p.fill('#lpBU_w_d4', 'تصمیم پیش از دیدنِ مشاور گرفته شد');
     await click('main .lp-lbsave');
     chk(!(await S(P1)).b[1], 'A157: an «invented» problem that is a near-copy of the original is refused');
-    await p.fill('#lpBNew', 'چطور آشپزیِ غذای ایتالیایی را یاد بگیرم؟'); await click('main .lp-lbsave');
-    chk(!(await S(P1)).b[1], 'A157: an invented problem that shares nothing with the original is refused (near but different)');
-    await p.fill('#lpBNew', 'اگر همسرم پیشنهادِ کار در شهرِ دیگری بگیرد، چطور تصمیم بگیریم؟');
+    await p.fill('#lpBNew', 'اگر همسرم پیشنهادِ کار در شهرِ دیگری بگیرد، چطور تصمیم بگیریم؟'); await p.fill('#lpBNewW', 'همان روشِ پرسیدنِ شرطِ پنهان پیش از تصمیمِ جابه‌جایی'); await click('main .lp-lbsave');
+    chk(!(await S(P1)).b[1], 'R4: the invented problem must declare WHAT it shares with the original (not judged by shared words)');
+    await sel('#lpBNewS', 'method');
     await noOverflow('look-back');
     await click('main .lp-lbsave');
     s1 = await S(P1);
@@ -447,6 +458,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpD_d1', 'قیمتِ بلیتِ هواپیما دو میلیون است'); await p.fill('#lpD_d2', LONG);
     await p.fill('#lpCond', 'بچه‌ها خسته نشوند'); await sel('#lpSat', 'yes'); await sel('#lpSuff', 'کافی است');
     await p.fill('#lpGuess', 'قطار'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'اگر قطار جا نداشته باشد');
+    await sel('#lpNat', 'life');   // دورِ ۲ (R2): کد از این صورت پیشنهادی نداد ⇒ داور را کاربر برمی‌گزیند (پیش‌فرضِ بی‌صدا نیست)
     await noOverflow('understanding with a long URL datum');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
     await p.fill('#lpBkS', 'با بچه‌ها آرام و بی‌خستگی به مشهد رسیده‌ایم'); await p.fill('#lpBk1', 'وسیلهٔ مناسب رزرو شده'); await click('main .lp-bksave');
@@ -489,11 +501,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(Object.values(info.g).every(v => v === true || v === 0), 'graph: live problem ↔ s_problem, moves, cases, knots, related, invented problem, its forecasts and lesson card — no islands ' + JSON.stringify(info.g));
     await go('lprob', P2, 'exec');
     info.as = await p.evaluate(([pid, p1]) => { const AS = APP.ASSIST, s = { id: 'ach_x', msgs: [{ role: 'user', text: 'کمکم کن' }] }; const run = (ss, m) => AS.promptHooks.map(f => { try { return f(ss, m) || ''; } catch (e) { return 'ERR ' + e.message; } }).join('\n');
-      const t = run(s, 'کمکم کن'), r2 = run({ id: 'z', msgs: [] }, 'نمی‌دونم چیکار کنم، باید بین دو کار تصمیم بگیرم');
-      const o = { live: /مسئلهٔ زندهٔ این سشن \(/.test(t) && t.indexOf(pid) >= 0, one: /فقط \*\*یک\*\* پرسش/.test(t), noJudge: /داوری نکن/.test(t), phase: /مرحله: اجرا روی واقعیت/.test(t), ctxNull: AS.solvingCtx(s) === null, rules: /live_new/.test(r2), err: /ERR/.test(t), meta: !!(APP.VIEW_META.lprob && APP.VIEW_META.lprob.what && APP.VIEW_META.lprob.why), sub: APP.SUB_VIEWS.lprob === 'e_prob' };
+      const t = run(s, 'کمکم کن');
+      const o = { live: /مسئلهٔ زندهٔ این سشن \(/.test(t) && t.indexOf(pid) >= 0, one: /فقط \*\*یک\*\* پرسش/.test(t), noJudge: /داوری نکن/.test(t), phase: /مرحله: اجرا روی واقعیت/.test(t), ctxNull: AS.solvingCtx(s) === null, err: /ERR/.test(t), meta: !!(APP.VIEW_META.lprob && APP.VIEW_META.lprob.what && APP.VIEW_META.lprob.why), sub: APP.SUB_VIEWS.lprob === 'e_prob' };
       APP.go('home');
+      const r2 = run({ id: 'z', msgs: [] }, 'نمی‌دونم چیکار کنم، باید بین دو کار تصمیم بگیرم');
+      o.rules = /live_new/.test(r2);
       const s2 = { id: 'y', lprob: pid, msgs: [] };
-      o.offTopic = !/مسئلهٔ زنده|🔭/.test(run(s2, 'فونتِ صفحه ریز است') + run(s2, 'کارت مرور حل نشده'));
+      // دورِ ۲ (R1): سشنِ بسته به مسئلهٔ باز همیشه بلوکش را دارد (بی شرطِ واژهٔ مشترک) و قاعدهٔ «بساز» را دوباره نمی‌گیرد؛ سشنِ نابسته با پیامِ رابط هیچ
+      o.boundAlways = /مسئلهٔ زندهٔ این سشن/.test(run(s2, 'فونتِ صفحه ریز است')) && !/live_new/.test(run(s2, 'نمی‌دونم چیکار کنم، باید بین دو کار تصمیم بگیرم'));
+      o.offTopic = !/مسئلهٔ زنده|🔭/.test(run({ id: 'v', msgs: [] }, 'فونتِ صفحه ریز است') + run({ id: 'v2', msgs: [] }, 'کارت مرور حل نشده'));
       o.onTopic = /مسئلهٔ زندهٔ این سشن/.test(run(s2, 'دربارهٔ کلاسِ آلمانی و ادامه دادنش یک سؤال دارم'));
       o.closed = !/مسئلهٔ زندهٔ این سشن/.test(run({ id: 'w', lprob: p1, msgs: [] }, 'دربارهٔ پیشنهادِ کار در شیراز و تهران'));
       return o; }, [P2, P1]);

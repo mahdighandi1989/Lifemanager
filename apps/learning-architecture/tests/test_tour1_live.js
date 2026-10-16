@@ -78,6 +78,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpD_d2', 'ابعادِ داخلیِ بار ۲۰۰ در ۱۲۰ در ۱۱۰ سانتی‌متر است');
     await click('main .lp-dadd'); await p.fill('#lpD_d3', 'رنگِ لوله سفید است');
     chk(/اثرِ محسوس/.test(await txt('main .lp-effq')) && await has('#lpDE_d1') === 1 && await has('#lpPrLine') === 1 && await has('#lpPrApprox') === 1 && await has('#lpPrPrior') === 1 && await has('#lpPrMeasure') === 1 && await has('#lpPrVague') === 1, '1a: practical frame inside the tunnel: noticeable-effect data, where to draw the line, approximation, prior knowledge, mathematising');
+    // دورِ ۲ (R2): «فضایی» با انتخابِ صریح — واژه‌ها فقط پیشنهاد می‌دهند
+    chk(!(await p.evaluate(() => document.getElementById('lpSpatial').checked)) && await has('main .lp-spathint') === 1, 'R2: spatial is suggested, not forced');
+    await p.check('#lpSpatial'); await W(160);
     chk(await p.evaluate(() => document.getElementById('lpSpatial').checked) && await has('main .lp-figc .lp-figwarn') === 1, '9: spatial problem ⇒ figure card with the general-figure warning');
     await p.fill('#lpCond', 'لوله خم نشود\nدرِ ون بسته شود');
     await sel('#lpSat', 'unknown'); await sel('#lpSuff', 'کافی است');
@@ -194,18 +197,22 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // ۱۲) بازنگری: فضایی + عملی + «کدام پرسش/ابزار/پرسشِ دستیار»
     await p.evaluate(pid => APP.S.put({ id: 'ach_t1', type: 'achat', lprob: pid, msgs: [{ role: 'user', text: 'کمک' }, { role: 'ai', text: 'خوب است. آیا از قطرِ فضای بار استفاده کردی؟' }] }), PA);
     await click('main .lp-solved');
-    info.lbA = await p.evaluate(() => ({ sym: !!document.getElementById('lpBSym'), units: !!document.getElementById('lpBUnits'), approx: !!document.getElementById('lpBApprox'), aside: (document.querySelector('main .lp-basides') || {}).textContent || '', opts: [...document.querySelectorAll('#lpBBest option')].map(o => o.value) }));
+    info.lbA = await p.evaluate(() => ({ sym: !!document.getElementById('lpBSym'), units: !!document.getElementById('lpBUnits'), approx: !!document.getElementById('lpBApprox'), aside: (document.querySelector('main .lp-basides') || {}).textContent || '', opts: [...document.querySelectorAll('#lpBBest option')].map(o => o.value), tools: [...document.querySelectorAll('#lpBTool option')].map(o => o.value) }));
     chk(info.lbA.sym && info.lbA.units, '12: spatial look-back asks symmetry and units/dimensions explicitly');
     chk(info.lbA.approx && /رنگِ لوله/.test(info.lbA.aside), '12: practical look-back asks about approximation and what was left out');
-    chk(info.lbA.opts.includes('card:back') && info.lbA.opts.includes('chat:0'), '12: «which helped most» lists the cards used and the assistant\'s chat questions ' + JSON.stringify(info.lbA.opts));
+    // دورِ ۲ (R8): «کدام پرسش کمک کرد؟» فقط پرسش‌ها؛ ابزارها در فهرستِ جدا
+    chk(info.lbA.opts.includes('chat:0') && !info.lbA.opts.some(o => /^card:/.test(o)) && info.lbA.tools.includes('back'), '12: «which question helped most» lists only questions (chat questions included); tools are a separate list ' + JSON.stringify(info.lbA));
     await p.fill('#lpBChk', 'لوله را واقعاً گذاشتم و در بسته شد'); await sel('#lpBRes', 'نتیجه سالم ماند');
     await p.fill('#lpBOther', 'با قضیهٔ فیثاغورس در سه بعد'); await p.fill('#lpBGlance', 'قطرِ جعبه از طولِ لوله بیشتر بود'); await p.fill('#lpBWorked', 'اندازه‌گیریِ دقیقِ سه بعد');
     await p.fill('#lpBUse', 'برای جا دادنِ هر بارِ بلند، قطرِ جعبه را بسنج'); await p.fill('#lpBNew', 'یک لولهٔ سه‌متری در صندوقِ ماشینِ سواری جا می‌شود؟');
-    await sel('#lpBHit', 'درست بود'); await sel('#lpBBest', 'chat:0'); await sel('#lpBWant', 'same'); await sel('#lpBMulti', 'one');
+    await sel('#lpBHit', 'درست بود'); await sel('#lpBBest', 'chat:0'); await sel('#lpBWant', 'same');
+    await p.fill('#lpBTaste', 'اندازه‌گیری را دوست داشتم، حسابِ قطر را کمتر');
+    await sel('#lpBNewS', 'method'); await p.fill('#lpBNewW', 'همان سنجیدنِ قطرِ جعبه برای بارِ بلند');
     await click('main .lp-lbsave');
     chk(!(await S(PA)).b[1], '12: symmetry/units/approximation are required');
     await p.fill('#lpBSym', 'سه بعد نقشِ یکسان دارند و جابه‌جایی‌شان قطر را عوض نمی‌کند'); await p.fill('#lpBUnits', 'با متر هم همان درمی‌آید و دو طرف طول‌اند');
     await p.fill('#lpBApprox', 'یک سانتی‌متر بس بود و رنگ اثری نداشت');
+    await p.fill('#lpBLimit', 'اگر ارتفاع صفر شود قطر همان قطرِ کف می‌شود که درست است');
     await click('main .lp-lbsave');
     sA = await S(PA);
     chk(sA.b[1] && sA.b[1].bestKind === 'chat' && /قطرِ فضای بار/.test(sA.b[1].bestQ) && sA.b[1].sym && sA.b[1].units && sA.b[1].approx, '12: look-back saved with the chosen chat question and type-specific checks ' + JSON.stringify(sA.b[1] && { k: sA.b[1].bestKind, q: sA.b[1].bestQ }));
@@ -362,10 +369,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     sD0 = await S(PD);
     chk(sD0.live.steps[0].out.guess.rel === 'refute' && /آنلاین/.test(sD0.live.steps[0].out.guess.reflect), '6: refutation + reflection recorded');
     chk(await has('main .lp-multi .lp-multigo') === 1, '3: multiple answers in an outcome ⇒ link to the sufficiency question');
-    // ۲) نام بردنِ داده در گفت‌وگوی همین مسئله با دستیار (پیامِ خودِ کاربر) = به کار بردن
+    // دورِ ۲ (R3): نام بردنِ داده در گفت‌وگو با دستیار «به کار بردن» نیست (اغلب برای کنار گذاشتنش است) — فقط کارِ خودِ حل
     chk(!(await p.evaluate(pid => APP.liveUsed(pid).d2, PD)), '2: «شهریه» not yet used');
     await p.evaluate(pid => APP.S.put({ id: 'ach_pd', type: 'achat', lprob: pid, msgs: [{ role: 'ai', text: 'شهریه چقدر است؟' }, { role: 'user', text: 'شهریهٔ کلاس را پرسیدم، سه میلیون است' }] }), PD);
-    chk(await p.evaluate(pid => APP.liveUsed(pid).d2, PD) === 'chat', '2: a datum named by the user in the linked assistant chat is credited (not the assistant\'s own words)');
+    chk(!(await p.evaluate(pid => APP.liveUsed(pid).d2, PD)), 'R3: a datum named in the linked assistant chat is NOT credited as used');
     chk(await has('main .lp-suffq[data-ph="c"]') === 0, '3: after-first-step follow-up only while still «هنوز نمی‌دانم» (answered «ناکافی» at plan)');
     await noOverflow('life exec'); await bidi('life exec');
 
