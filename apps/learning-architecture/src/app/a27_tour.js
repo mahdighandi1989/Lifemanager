@@ -922,9 +922,11 @@
   var CLAIM_RE = /ثابت\s*شد|اثبات\s*شد|اثباته|ثابت(?:ش)?\s*کردم|پس\s*(?:درسته|درست\s*است|همیشه)/, ARG_RE = /چون|زیرا|بنابراین|به\s*دلیلِ?|طبقِ?\s|برهان|استقرا|خلف|لانه[‌\s]?کبوتر|اصلِ?\s/;
   function heurClaim(t) { t = faDigits(String(t || "")); return EVID_RE.test(t) && CLAIM_RE.test(t) && !ARG_RE.test(t); }
   AS.coachHeurClaim = heurClaim;
-  /* ph: مرحلهٔ پیش از این پیام ("" یا "u" ⇒ «پس + عدد» نتیجه نیست — دورِ ۷، s28)؛ بی ph همان رفتارِ پیشین */
-  function weakOk(ph) { return ph == null || /^(?:p|c|b|done)$/.test(String(ph)); }
-  function solvedSaid(t, ph) { return (SOLVED_RE.test(t) || resultNow(t, weakOk(ph))) && !heurClaim(t); }
+  /* ctx = {intro}: «پس + عدد» نتیجه نیست در پیامی که مسئله را می‌سازد — گشایش (intro) یا «… ثبتش کن» (s28 «… پس ۱/۲. باشه ثبتش کن» — ادعای او
+     پیش از فهمِ مسئله)؛ پس از آن، حاصلِ کارِ خودش نتیجه است (s37 «پس قیمت یا ۱۸۰۲ یا ۶۹۱ ریاله»، «پس x = ۱۰ لیتر»). بی ctx همان رفتارِ پیشین */
+  var CREATE_RE = /ثبت(?:ش)?\s*(?:کن|کنیم|می[‌\s]?کنم)(?![آ-ی])/;
+  function weakOk(t, ctx) { return !ctx || !(ctx.intro || CREATE_RE.test(String(t || ""))); }
+  function solvedSaid(t, ctx) { return (SOLVED_RE.test(t) || resultNow(t, weakOk(t, ctx))) && !heurClaim(t); }
   function lastAt(re, t) { var g = new RegExp(re.source, "g"), m, i = -1; while ((m = g.exec(t))) { i = m.index; if (!m[0].length) g.lastIndex++; } return i; }
   /* B7: «غلط بود» فقط وقتی «حل نشد» است که (۱) دربارهٔ حدس نباشد — حدسِ ردشده داده است، نه شکست، (۲) پس از آن نتیجه‌ای نیامده باشد
      (تلاشِ کنارگذاشته‌ای که بعدش به جواب رسید)، و (۳) پس از حل (بازنگری) فقط اگر خودِ جواب/برهان را غلط بخواند */
@@ -1620,15 +1622,15 @@
     var C = (s && s.coach) || {}, M = ((s && s.msgs) || []).filter(isUser), cur = M.length && mkey(M[M.length - 1].text) === mkey(mt) ? M.length - 1 : M.length, pv = M[cur - 1];
     return C.rep && pv && C.rep.key === mkey(pv.text) && C.rep.pk === pk ? C.rep : null;
   }
-  function turnSig(rep, mt, auto, teach, ph) {
+  function turnSig(rep, mt, auto, teach, ctx) {
     var t = String(mt || ""), now = !auto, stuckNow = now && (STUCK_RE.test(t) || NOTKNOW_RE.test(t)), guess = now && guessNow(t, teach), related = now && RELATED_RE.test(t), asks = now && /[؟?]/.test(t);
     var found = now && !FAIL_ME.test(t) && !stuckNow && FOUND_RE.test(ownText(t));
-    var resNow = now && !guess && solvedSaid(t, ph) && !unsolvedNow(t, ""), fresh = resNow || guess || found || (now && AHA_RE.test(t));
+    var resNow = now && !guess && solvedSaid(t, ctx) && !unsolvedNow(t, ""), fresh = resNow || guess || found || (now && AHA_RE.test(t));
     return { analogy: now && CARRY_RE.test(faDigits(t).replace(/‌/g, " ")), result: resNow || !!(rep && rep.result && !stuckNow && !asks && !guess),
       stuck: !related && (stuckNow || !!(rep && rep.stuck && !fresh)), fail: (now && unsolvedNow(t, "")) || !!(rep && rep.fail && !fresh), guess: guess, related: related,
       abandon: now && abandonNow(t), text: now ? ownText(t) : "" };   // دورِ ۷ (H1): a38 «turn-abandon» و الگوهای متنیِ خودش از حرفِ خودِ کاربر
   }
-  function turnOf(s, pid, mt, auto) { var ph = ""; try { ph = A.livePhase ? A.livePhase(pid) || "" : ""; } catch (e) { } return turnSig(carried(s, mt, "l:" + pid), mt, auto, !!s && !auto && teachMode(s, mt), ph); }
+  function turnOf(s, pid, mt, auto) { var st = ""; try { var r0 = A.liveRec(pid); st = (r0 && r0.p && r0.p.statement) || ""; } catch (e) { } return turnSig(carried(s, mt, "l:" + pid), mt, auto, !!s && !auto && teachMode(s, mt), { stmt: st }); }
   AS.coachTurn = turnOf;
   function nextQFor(s, pid, mt, auto) {
     if (!s) return AS.liveNextQ(pid);
@@ -1698,7 +1700,7 @@
     var ph0 = C.ph || "", st0 = Object.assign({}, C.st || {}), teach = teachMode(s, mt);
     /* دورِ ۵ (F1، s31، s37): پیامِ نخستی که نتیجهٔ خودش را می‌گوید («حلش کردم! … ۵×۵=۲۵») صورتِ چسبانده نیست — said:result ِ آن می‌ماند */
     var intro = !C.stmt && !AS.notProblem(mt);
-    var said = solvedSaid(mt, intro ? "u" : ph0 || "u") && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
+    var said = solvedSaid(mt, { intro: intro, stmt: C.stmt }) && !guessNow(mt, teach) && !(teach && SELF_SOLVED_RE.test(mt)), uns = unsolvedNow(mt, ph0), stuck = STUCK_RE.test(mt) || NOTKNOW_RE.test(mt);
     var pasted = (intro || pastedOf(mt, C.stmt)) && !(said && !uns);
     var ph = ph0, st = C.st = C.st || {}, sp = statedParts(mt, pasted);
     if (sp.u) st.u = 1; if (sp.d) st.d = 1; if (sp.c) st.c = 1;
@@ -1758,7 +1760,7 @@
     /* F2: گیرِ این نوبت = گیرِ همین پیام یا گیرِ گزارش‌شده و سنجیدهٔ پیامِ پیشین (یک نوبت) */
     /* G1 (دورِ ۶): بی مسئلهٔ زنده، نشانهٔ پیامِ پیشین فقط برای همان مسئلهٔ گفت‌وگو (pk ِ این پیام، پس از coachPhase) */
     var sigOf = function () { if (nq && nq.turn) return nq.turn; var C1 = (s && s.coach) || {}, P1 = C1.prev && C1.prev.key === mkey(mt) ? C1.prev : null;
-      return turnSig(auto ? null : carried(s, mt, C1.pk || ""), auto ? "" : mt, auto, !!s && !auto && teachMode(s, mt), P1 ? (P1.intro ? "u" : P1.ph0) : C1.ph || "u"); };
+      return turnSig(auto ? null : carried(s, mt, C1.pk || ""), auto ? "" : mt, auto, !!s && !auto && teachMode(s, mt), { intro: !!(P1 && P1.intro), stmt: C1.stmt }); };
     var refNew = pid && !auto ? refFresh(s, pid, mt) : false;
     if (i >= 0 && pid) {
       var kind = liveKind(pid), asked0 = [];
@@ -1796,7 +1798,7 @@
       if (!cpid && !auto) { var C = s.coach = s.coach || {}; C.ph = ph; C.cls = cls; C.at = nowIso(); }
       /* R7/B7: رویدادِ «ناموفق» فقط گیرِ خودِ حل یا «حل نشد» ِ واقعی — نه خشم/شرم، نه حدسِ ردشده، نه تلاشِ کنارگذاشته‌ای که به جواب رسید */
       if (!auto && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt);
-      var sig = sigOf(), claim = cpid && !auto && solvedSaid(mt, bb.ph) && !unsolvedNow(mt, ph) && !sig.guess ? ((nq && nq.coach && nq.coach.closure && nq.coach.closure.label) || true) : "";
+      var sig = sigOf(), claim = cpid && !auto && solvedSaid(mt, { stmt: bb.r && bb.r.p && bb.r.p.statement }) && !unsolvedNow(mt, ph) && !sig.guess ? ((nq && nq.coach && nq.coach.closure && nq.coach.closure.label) || true) : "";
       /* G4 (دورِ ۶، s18): مسئلهٔ فقط‌درگفت‌وگو در میانهٔ کار (رابطهٔ تازه با متغیرها) ⇒ پرسشِ هدف — همتای «🎯 هدف را گم نکن» ِ صفحه؛ مجهول به حرفِ خودش، وگرنه بندِ پرسشیِ صورت */
       var Cg = s.coach || {}, goal = !cpid && !auto && ph === "c" && varEq(mt) && !solvedSaid(mt) ? clip((Cg.unkBy && Cg.unkBy[Cg.pk]) || (String(Cg.stmt || "").match(/[^.!؟?\n]*[؟?]/g) || []).pop() || "", 110).trim() : "";
       /* G3 (دورِ ۶): A191 یک بار برای هر مسئله و فقط در لحظهٔ معرفی */
@@ -1935,8 +1937,8 @@
     said = said.filter(function (k) { return real && (!pasted || (k in lab && lab[k])); });
     if (teach && SELF_SOLVED_RE.test(ut)) said = said.filter(function (k) { return k !== "result"; });   // مربی خودش حل کرد؛ یادگیرنده نه
     if (heurClaim(ut) || guessNow(ut, teach)) said = said.filter(function (k) { return k !== "result"; });
-    var phB = P ? (P.intro ? "u" : P.ph0 || "u") : C.ph || "u";   // دورِ ۷ (H1، s28): تنها شاهدِ «نتیجه» «پس + عدد» است و مسئله هنوز فهمیده نشده ⇒ ادعا، نه نتیجه
-    if (!weakOk(phB) && !SOLVED_RE.test(ut) && !resultNow(ut, false)) said = said.filter(function (k) { return k !== "result"; });   // دورِ ۵ (F1، s03): «ثابت شد» از چند شکل ادعاست، نه نتیجه؛ دورِ ۶ (G1): «…درسته؟» حدس است
+    var stB = ""; try { stB = P && P.live ? (A.liveRec(P.live) || { p: {} }).p.statement : C.stmt; } catch (e) { }   // دورِ ۷ (H1، s28): تنها شاهدِ «نتیجه» «پس + عدد» ِ سازندهٔ مسئله/بازگوییِ ادعا ⇒ ادعا، نه نتیجه
+    if (resultNow(ut) && !resultNow(ut, false) && !SOLVED_RE.test(ut) && !weakOk(ut, { intro: !!(P && P.intro), stmt: stB })) said = said.filter(function (k) { return k !== "result"; });   // دورِ ۵ (F1، s03): «ثابت شد» از چند شکل ادعاست، نه نتیجه؛ دورِ ۶ (G1): «…درسته؟» حدس است
     /* نقش */
     if (a.role === "teacher") { var rec = M.filter(isUser).slice(-4).map(function (m) { return m.text; }).join(" "); if (LEARNER_RE.test(rec)) { C.teach = true; C.teachBy = "model"; } }
     else if (a.role === "self" && C.teach && C.teachBy === "re" && C.teachKey === key) { C.teach = false; C.teachBy = "model"; }
