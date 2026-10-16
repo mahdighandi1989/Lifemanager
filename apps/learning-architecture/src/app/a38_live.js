@@ -1016,7 +1016,7 @@
       rc.appendChild(h("button", { class: "btn ghost sm lp-relcsave", type: "button", onclick: function () { var ms = shareMiss(d[ks], d[k], d[km], r.p.statement); if (ms.length) { A.toast("هنوز نه: " + ms.join("؛ ") + ".", "bad"); return; } x.carry = txt(d[k]); x.share = d[ks]; if (d[ks] === "form") x.map = txt(d[km]); else delete x.map; x.carryAt = nowISO(); S.put(pg); A.render(); } }, x.carry ? "به‌روزکردن" : "ثبتِ آنچه به کار می‌آید"));
       box.appendChild(rc);
     });
-    box.appendChild(selF("lpSeen", prR ? "همین حکم (یا حکمی شبیه) را جایی دیده‌ای — قضیه‌ای که همین را نتیجه می‌دهد؟" : "همین مجهول (یا مجهولی شبیه) را جایی دیده‌ای — در زندگیِ خودت یا کارِ دیگران؟", [["yes", "بله"], ["no", "نه"]], d.ans, function (v) { d.ans = v; A.render(); }));
+    box.appendChild(selF("lpSeen", prR ? "همین حکم (یا حکمی شبیه) را جایی دیده‌ای — قضیه‌ای که همین را نتیجه می‌دهد؟" : lpR ? "همین فرضیه (یا فرضیه‌ای شبیه) را جایی دیده‌ای — در زندگیِ خودت یا کارِ دیگران؟" : "همین مجهول (یا مجهولی شبیه) را جایی دیده‌ای — در زندگیِ خودت یا کارِ دیگران؟", [["yes", "بله"], ["no", "نه"]], d.ans, function (v) { d.ans = v; A.render(); }));
     if (d.ans === "yes") { box.appendChild(selF("lpSeenS", "با آن چه چیزی مشترک است؟", SHARE, d.share, function (v) { d.share = v; A.render(); }));
       box.appendChild(field("lpSeenW", "کجا؟ چه چیزی از آن به کار می‌آید — نتیجه‌اش، روشش، یا عنصری کمکی؟", d.where, function (v) { d.where = v; }, 2));
       if (d.share === "form") box.appendChild(field("lpSeenM", "نگاشت: هر جزءِ آن ⇐ کدام جزءِ این مسئله؟", d.map, function (v) { d.map = v; }, 0)); }
@@ -1536,6 +1536,9 @@
   function coachCore(r, pg, s, opts) {
     var L = live(s), ph = phaseOf(s), key = ph === "done" ? "b" : ph, Q = phaseQs(r, s, key), q = "", tut = pg.tut || {}, o = opts || {}, T = o.turn || {};
     var asked = (o.asked || []).filter(Boolean), isAsked = function (x) { return asked.some(function (a) { return sameQ(a, x); }); };
+    /* H2 (دورِ ۷): متنِ همین نوبت — اگر نشانه‌های نوبت متن نیاوردند، همان پیامِ کاربر در زمینهٔ قلاب (نه پیامِ سامانه) */
+    var hc0 = o.turn && !T.text && A.ASSIST && A.ASSIST._hookCtx, hm0 = hc0 && !/^\s*\[سامانه/.test(String(hc0.msg || "")) ? String(hc0.msg || "") : "";
+    if (hm0) T = Object.assign({}, T, { text: hm0 });
     var stuckT = !!(T.stuck || o.stuck), tx = norm(T.text || ""), ok = function (x) { return x && !isAsked(x) && qOk(s, x, stuckT); };
     /* (۴) پرسشِ بازِ کارتِ طرح/اجرا */
     var pageQ = "";
@@ -1569,7 +1572,8 @@
     /* H2 (دورِ ۷): نوبتِ گفت‌وگو و شمارِ گیرهای پیاپی — حالتِ کوچکِ همین مسئله (L.stk)؛ فقط فراخوانی که نشانه‌های نوبت (turn) دارد آن را جلو می‌برد */
     var K = o.turn ? turnKey(tx) : "", R = L.stk || null, R0 = JSON.stringify([L.stk || null, L.ckHold || null]);
     if (K) {
-      if (!R || R.k !== K) R = L.stk = { k: K, pst: !!(R && R.st), pn: R ? R.n || 0 : 0, pq: R ? R.q || "" : "", st: false, n: 0, q: "" };
+      /* گیرهای «پیاپی» در همان گفت‌وگو — سشنِ تازه (روزی دیگر) دنباله را از کلی‌ترین پرسش آغاز می‌کند */
+      if (!R || R.k !== K) { var same = !!R && String(R.k).split("#")[0] === String(K).split("#")[0]; R = L.stk = { k: K, pst: same && !!R.st, pn: same ? R.n || 0 : 0, pq: same ? R.q || "" : "", st: false, n: 0, q: "" }; }
       if (stuckT && !R.st) { R.st = true; R.n = R.pst ? R.pn + 1 : 1; }
     }
     var stuckN = K && R ? R.n : stuckT ? 1 : 0, prevQ = K && R && R.pst ? R.pq : "";

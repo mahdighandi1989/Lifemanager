@@ -407,10 +407,13 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       const PN = await lifeSetup({ title: 'تمیزیِ محله', st: 'می‌خواهم طرحِ تمیزیِ محله این بار پایدار بماند.', u: { one: 'می‌خواهم طرح پایدار بماند', unk: 'پایداریِ طرحِ تمیزی', data: ['داوطلب‌ها خسته شدند', 'پیمانکار گران است'], cond: 'بی پولِ زیاد' },
         plan: 'نخست جمعه‌ها با داوطلب‌ها زباله جمع می‌کنیم سپس پیمانکار را امتحان می‌کنیم', beforePlan: async () => { await p.fill('#lpPlanRot', 'هر هفته یکی از دو مسیر (داوطلبِ جمعه یا پیمانکار) را عوض می‌کنیم'); } });
       chk(!!((await S(PN)).live.plan || {}).rot, 'G6 setup: plan with a declared rotation');
+      // R7 H2 (s35): نخستین گامِ کار خودِ طرح است و دروازهٔ هدف ندارد — دروازه از وقتی است که چرخش راه افتاده
+      await realStep('جمعه با داوطلب‌ها زباله جمع می‌کنیم', 'کوچه‌ها تمیز می‌ماند', 'فردا');
+      await day(1); await go('lprob', PN, 'exec'); await outcome({ what: 'کوچه‌ها تمیز شد', match: 'yes', prog: 'کمی' });
       await p.fill('#lpStep', 'این هفته مسیر را عوض می‌کنیم: پیمانکار جمع می‌کند و جایزهٔ ماهانه می‌گذاریم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'کوچه‌ها تمیز می‌ماند'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
       await click('main .lp-stepsave');
       info.g6goal = { tag: await p.evaluate(pid => APP.liveStepFollowsTag(pid, 'این هفته مسیر را عوض می‌کنیم: پیمانکار جمع می‌کند و جایزهٔ ماهانه می‌گذاریم'), PN), goal: await has('#lpGoalW'), steps: (await S(PN)).live.steps.length };
-      chk(info.g6goal.goal === 1 && info.g6goal.steps === 0, 'G6: under a declared rotation a step that does not reach the goal asks «🎯 هدف را گم نکن» whatever its plan tag (s35) ' + JSON.stringify(info.g6goal));
+      chk(info.g6goal.goal === 1 && info.g6goal.steps === 1, 'G6: under a declared rotation a step that does not reach the goal asks «🎯 هدف را گم نکن» whatever its plan tag (s35) ' + JSON.stringify(info.g6goal));
       // s25: «۱/((n+1)(n+2))» نمونهٔ دادهٔ «۱/(k(k+1))» است ⇒ داده به کار رفته
       const PI = await mk({ title: 'جمعِ کسرها ۲', st: 'ثابت کنید برای هر n ≥ 1 جمعِ ۱/(k(k+1)) از k=1 تا n برابرِ n/(n+1) است.', kind: 'prove' });
       await understand({ one: 'می‌خواهم فرمولِ جمع را ثابت کنم', unk: 'جمع برابرِ n/(n+1) است', data: ['جملهٔ k ام برابرِ ۱/(k(k+1)) است', 'n عددی طبیعی است'], cond: 'جمع = n/(n+1)', guess: 'درست است' });
