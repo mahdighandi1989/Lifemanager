@@ -335,7 +335,8 @@
         if (!subs.length) { neutral.push(e.text); whyx.push({ t: "neutral", txt: e.text }); return; }
         subs.forEach(function (x) { ref[x] = 1; refBy[x] = e.text; }); whyx.push({ t: "ref", txt: e.text, subs: subs });
       });
-      if (sv[F.id]) { sup.push("غربالِ تور: «" + sv[F.id] + "»"); whyx.push({ t: "sieve", txt: sv[F.id] }); }
+      // شاهدِ غربال که در دفترِ شواهد نشسته (src = sieve:F، a32 AS.sieveToKnots) دوباره شمرده نمی‌شود؛ حذفِ کاربر (sieveOff) هم محترم است
+      if (sv[F.id] && !(kc.ev || []).some(function (e) { return e.src === "sieve:" + F.id; }) && !(kc.sieveOff || {})[F.id]) { sup.push("غربالِ تور: «" + sv[F.id] + "»"); whyx.push({ t: "sieve", txt: sv[F.id] }); }
       var refSubs = F.subs.filter(function (x) { return ref[x.id]; }), left = F.subs.filter(function (x) { return !ref[x.id]; });
       var state = famOut || !left.length ? "out" : sup.length ? "ev" : "open";
       var subFa = function (id) { var x = F.subs.filter(function (y) { return y.id === id; })[0]; return x ? x.fa : id; };
@@ -1370,6 +1371,7 @@
             var rm = kc.ev[i]; kc.ev.splice(i, 1);
             if (rm && /^probe:/.test(rm.src || "") && !kc.ev.some(function (x) { return x.src === rm.src; })) delete kc.pans[rm.src.slice(6)];
             if (rm && rm.src === "ladder" && !kc.ev.some(function (x) { return x.src === "ladder"; })) kc.ladder = {};
+            if (rm && /^sieve:/.test(rm.src || "")) { kc.sieveOff = kc.sieveOff || {}; kc.sieveOff[rm.fam] = new Date().toISOString(); }
             H.put(); redraw();
           } }, "حذف")));
       })))));

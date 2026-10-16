@@ -65,7 +65,8 @@
   // نام‌های نزدیک (کارزارِ آزمونِ دوم c16: «repeat» به جای «recur» ⇒ «لایهٔ ناشناخته» در گفت‌وگو)
   var ALIAS = { repeat: "recur", recurrence: "recur", recurring: "recur", pattern: "recur", prerequisite: "prereq", prerequisites: "prereq", knowledge: "prereq", belief: "claim", epistemic: "route", epistemology: "route", missing_info: "info", information: "info", learning: "learn", hard_problem: "problem", goal: "want", need: "want", risk: "safety", out: "outside" };
   function layerOf(id) { id = String(id || "").trim().replace(/^kf_/, ""); var lo = id.toLowerCase(); if (ALIAS[lo]) id = ALIAS[lo]; else if (/^f\d+$/.test(lo)) id = id.toUpperCase(); return AS.sieveLayers().filter(function (L) { return L.id === id; })[0]; }
-  AS.sieveState = function (s) { return (s && s.tour && s.tour.diag) || {}; };
+  /* بی تور هم غربال در سشن می‌ماند (s.diag) و به مدل می‌رسد — تورِ پولیا (دستهٔ ۱): tour_diag ِ بی‌تور فقط «در انتظار» می‌ماند و قابِ مسئلهٔ عملی هرگز به مدل نمی‌رسید */
+  AS.sieveState = function (s) { return (s && s.tour && s.tour.diag) || (s && s.diag) || {}; };
   /* شاهدِ لایه: بخش‌های «؛»‌جدا یکتا، بخشی که درونِ بخشِ دیگری هست حذف، و هر نقل‌قولِ «…» فقط بارِ اول */
   function nrm(x) { return String(x || "").replace(/[\s\u200c«»"'.,،:؛!?؟()\-]+/g, ""); }
   function dedupWhy(w) {
@@ -85,8 +86,9 @@
     var s = AS._turnSession; if (!s) return "سشن نیست";
     var list = Array.isArray(a.layers) ? a.layers : Array.isArray(a.diag) ? a.diag : a.id ? [a] : [], bad = [], safetyHeld = false;
     // غربال پیش از طرحِ تور (در همان نوبت) نگه داشته و پس از tour_plan اعمال می‌شود (کارزارِ آزمون c03/c06: گم می‌شد)
-    if (!s.tour) { s._diagPending = (s._diagPending || []).concat(list); return ""; }
-    var d = s.tour.diag = s.tour.diag || {};
+    // و بی تور در غربالِ خودِ سشن (s.diag) هم همین حالا ثبت می‌شود تا همین نوبت به مدل برسد (تورِ پولیا، دستهٔ ۱)
+    if (!s.tour) s._diagPending = (s._diagPending || []).concat(list);
+    var d = s.tour ? (s.tour.diag = s.tour.diag || {}) : (s.diag = s.diag || {});
     list.forEach(function (x) {
       var L = x && layerOf(x.id); if (!L) { bad.push(String(x && x.id)); return; }
       var st = ST[x.st] ? x.st : "ask", why = String(x.why || "").replace(/^[\s—\-–.]+$/, "").trim();
@@ -106,6 +108,7 @@
         var pcard = prev && prev.card; if (pcard) d[L.id].card = pcard;
         practicalCard(s, d[L.id]); }
     });
+    try { if (s.tour) AS.sieveToKnots(s); } catch (e) { console.error(e); }
     var held = safetyHeld ? "ایمنی خاموش نشد (هنوز «باید پرسید»): فقط انکارِ صریحِ خودِ کاربر در پیامی پس از نشانه — با نقلِ عینیِ همان جمله در why با «…» — آن را «رد شد» می‌کند" : "";
     return [bad.length ? "لایهٔ ناشناخته: " + bad.join("، ") : "", held].filter(Boolean).join(" · ");
   };
@@ -135,12 +138,42 @@
     if (!s || !s.safetyAt) return false;
     return !AS.safetyClearMsg(s);
   };
+  /* یافته‌های «پیدا شد» ِ خانواده‌های گره (F1…F12، با نقلِ حرفِ کاربر) ⇒ شاهد (ev) در دفترِ شواهدِ موقعیتِ گرهِ همین تور — تا رتبه‌ها جابه‌جا شوند و
+     وعدهٔ پرامپت («یافته‌های غربال شاهدِ همان خانواده‌اند») راست باشد (تورِ پولیا s14: ev: [] و همهٔ رتبه‌ها ۰). یک شاهد برای هر خانواده (src = sieve:F)؛
+     شاهدی که کاربر در دفترِ شواهد حذف کرد (kc.sieveOff) برنمی‌گردد. موقعیت‌هایی که به وجهی از تور وصل‌اند یا در همین سشن ساخته شده‌اند. */
+  AS.sieveToKnots = function (s) {
+    var d = AS.sieveState(s), fams = (A.KF || []).filter(function (F) { return d[F.id] && d[F.id].st === "found" && d[F.id].why; }); if (!s) return 0;
+    var ids = []; ((s.tour && s.tour.facets) || []).forEach(function (f) { if (f.status !== "skipped") (f.refs || []).forEach(function (r) { if (r.type === "kcase" && ids.indexOf(r.id) < 0) ids.push(r.id); }); });
+    (s.made || []).forEach(function (id) { var r = S.get(id); if (r && r.type === "kcase" && ids.indexOf(id) < 0) ids.push(id); });
+    var n = 0;
+    ids.forEach(function (id) {
+      var kc = S.get(id); if (!kc || kc.type !== "kcase") return; kc.ev = kc.ev || []; var ch = false, off = kc.sieveOff || {};
+      fams.forEach(function (F) {
+        if (off[F.id]) return;
+        var txt = "غربالِ گفت‌وگو: «" + clip(dedupWhy(d[F.id].why), 280) + "»", ex = kc.ev.filter(function (e) { return e.src === "sieve:" + F.id; })[0];
+        if (ex) { if (ex.text !== txt) { ex.text = txt; ex.at = nowIso(); ch = true; } return; }
+        kc.ev.push({ fam: F.id, dir: 1, sub: "", w: 1, kind: "fact", text: txt, src: "sieve:" + F.id, at: nowIso() }); ch = true; n++;
+      });
+      // لایه‌ای که بعداً «رد شد»: شاهدِ غربالیِ همان خانواده برداشته می‌شود
+      var gone = kc.ev.filter(function (e) { var m = /^sieve:(F\d+)$/.exec(e.src || ""); return m && !(d[m[1]] && d[m[1]].st === "found"); });
+      if (gone.length) { kc.ev = kc.ev.filter(function (e) { return gone.indexOf(e) < 0; }); ch = true; }
+      if (ch) S.put(kc);
+    });
+    if (n && A.state && A.state.view === "kcase" && ids.indexOf(A.state.arg) >= 0) try { A.render(); } catch (e) { }
+    return n;
+  };
+  var rawAfter = AS.tourAfterTurn;
+  AS.tourAfterTurn = function (s) { var r = rawAfter.apply(this, arguments); try { AS.sieveToKnots(s); } catch (e) { console.error(e); } return r; };
+  var rawLink = DO.tour_link;
+  DO.tour_link = function (a) { var r = rawLink.apply(this, arguments); try { if (AS._turnSession) AS.sieveToKnots(AS._turnSession); } catch (e) { } return r; };
   // tour_plan می‌تواند غربال را هم‌زمان بیاورد
   var rawPlan = DO.tour_plan;
   DO.tour_plan = function (a) {
     var r = rawPlan.apply(this, arguments), s = AS._turnSession;
     if (a && (a.diag || a.layers)) { var r2 = DO.tour_diag(a); if (r2) r = (r ? r + " · " : "") + r2; }
     if (s && s.tour && s._diagPending) { var pend = s._diagPending; delete s._diagPending; var r3 = DO.tour_diag({ layers: pend }); if (r3) r = (r ? r + " · " : "") + r3; }
+    // غربالِ پیش از تور (s.diag) هم به تور می‌رود — آنچه در پیش‌انتظار نبود (مثلاً جزءهای قابِ عملی) گم نشود
+    if (s && s.tour && s.diag) { var dg = s.tour.diag = s.tour.diag || {}; Object.keys(s.diag).forEach(function (k) { if (!dg[k]) dg[k] = s.diag[k]; else if (k === "practical" && s.diag[k].parts) { dg[k].parts = Object.assign({}, s.diag[k].parts, dg[k].parts || {}); } }); delete s.diag; }
     return r;
   };
 
