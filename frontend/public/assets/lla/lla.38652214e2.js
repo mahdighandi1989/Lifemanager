@@ -42759,11 +42759,11 @@ APP.goFromURL = function (q) {
     L.steps.forEach(function (x) { o.push(x.text, x.prem, x.proof); });
     return o.filter(Boolean).join("\n");
   }
-  function numsOf(t) { return (norm(t).match(/\d+(?:[.٫/]\d+)?/g) || []).map(function (n) { return n.replace(/[٫/]/, "."); }); }
+  function numTok(t) { return (norm(t).match(/\d+(?:[.٫/]\d+)?/g) || []).map(function (n) { return n.replace(/[٫/]/, "."); }); }
   /* داده «دیده‌شده» است اگر عددی که فقط مالِ همین داده است، یا دست‌کم نیمی از واژه‌های متمایزش (نه در داده‌های دیگر، نه در مجهول/عنوان) در متنِ کاربر آمده باشد */
   function datumSeen(d, others, ctx, T) {
-    var oT = others.join(" "), oN = numsOf(oT), nT = numsOf(T);
-    if (numsOf(d).some(function (n) { return oN.indexOf(n) < 0 && nT.indexOf(n) >= 0; })) return true;
+    var oT = others.join(" "), oN = numTok(oT), nT = numTok(T);
+    if (numTok(d).some(function (n) { return oN.indexOf(n) < 0 && nT.indexOf(n) >= 0; })) return true;
     var ot = toks(oT + " " + ctx), tt = toksM(T), dist = toksM(d).filter(function (w) { return !/^\d/.test(w) && !hit(w, ot); });
     return dist.length > 0 && dist.filter(function (w) { return hit(w, tt); }).length >= Math.ceil(dist.length / 2);
   }
@@ -42833,7 +42833,8 @@ APP.goFromURL = function (q) {
       if (c.why === "refuse" && c.fresh === false && o.turn) return;
       /* R8 (I-live 3، s26): «هرگز همان پرسش دو بار پیاپی» کارتِ خاص را هم می‌گیرد — گیرِ دومِ پیاپی روی همان کارت ⇒ پلهٔ خاص‌ترِ درونِ همان کارت
          (نامِ بخشِ شرطی که هنوز به معادله درنیامده)؛ کارتی که پلهٔ خاص‌تر ندارد کنار می‌رود تا دنبالهٔ گیر پلهٔ بعد را بدهد */
-      if (stuckT && prevQ && c.q === prevQ) { var e0 = cardEsc(r, s, c); if (e0 && e0 !== prevQ) pick(e0, "card-" + c.why + "-more"); return; }
+      var e0 = stuckT && prevQ ? cardEsc(r, s, c) : "";
+      if (stuckT && prevQ && (c.q === prevQ || (e0 && e0 === prevQ))) { if (c.q === prevQ && e0) pick(e0, "card-" + c.why + "-more"); return; }   // پس از پلهٔ خاص‌تر، گیرِ بعدی به کلی‌ترِ همان کارت برنمی‌گردد
       pick(c.q, c.why === "presup" ? "fail-presup" : c.why === "aside" ? "fail-aside" : "card-" + c.why);
     });
     /* (۳) گیر — دشواریِ همین مرحله. H2 (دورِ ۷، s02): پولیا از کلی به خاص — هر گیرِ پیاپی یک پلهٔ خاص‌تر (پلهٔ این دنباله = شمارِ گیرهای پیاپیِ همین مسئله)،
@@ -43542,7 +43543,7 @@ APP.goFromURL = function (q) {
     var w = String(stmt || "").split(/\s+/).filter(Boolean), o = [], seen = {};
     w.forEach(function (x, i) {
       if (!/^[0-9۰-۹]+(?:[.٫/][0-9۰-۹]+)?[^0-9۰-۹]{0,3}$/.test(x) || OPR.test(x) || OPR.test(w[i - 1] || "") || OPR.test(w[i + 1] || "")) return;
-      var n = numsOf(x)[0]; if (!n || seen[n]) return; seen[n] = 1;
+      var n = numTok(x)[0]; if (!n || seen[n]) return; seen[n] = 1;
       o.push({ n: n, t: [w[i - 1] || "", x, (w[i + 1] || "").replace(/[،,.؛:؟?!]+$/, "")].join(" ").replace(/[،,.؛:؟?!]+(?=\s|$)/g, "").trim() });
     });
     return o;
@@ -43550,7 +43551,7 @@ APP.goFromURL = function (q) {
   A.liveChatStuckQ = function (stmt, texts, lastAi) {
     var D = stmtData(stmt); if (!D.length) return "";
     var st = toks(stmt), isStmt = function (t) { var tt = toks(t); return st.length >= 4 && st.filter(function (x) { return hit(x, tt); }).length >= Math.ceil(st.length * 0.6); };
-    var T = (texts || []).filter(function (t) { return t && !/^\s*\[سامانه/.test(String(t)) && !isStmt(t); }).join("\n"), N = numsOf(T);
+    var T = (texts || []).filter(function (t) { return t && !/^\s*\[سامانه/.test(String(t)) && !isStmt(t); }).join("\n"), N = numTok(T);
     var un = D.filter(function (d) { return N.indexOf(d.n) < 0; }); if (!un.length) return "";
     return B3_RE.test(norm(lastAi || "")) ? "دادهٔ «" + clip(un[0].t, 60) + "» را کجا به کار برده‌ای؟ اگر هنوز نه، در کدام گام جا دارد؟" : Q_ALLD;
   };
