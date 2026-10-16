@@ -46,3 +46,7 @@
 - **فلسفه:** دورِ بی‌برگه؛ آزمونِ فلسفه برای این دور: «دیپلویِ زنده = آخرین main» ⇒ برقرار (sha برابر). مورد‌های ۳–۶ OPEN_ITEMS تغییری نکردند.
 
 ناظرِ خودکار (Claude Code routine)
+
+- **فوری ۲۰۲۶-۱۰-۱۶:** صف خالی. سه دست‌به‌دستِ `did` در قلمروِ lla-page/sys-territory (۱۷۳b5e5، ۷۱fd0a4) بسنجیده و `verified` شد (build.py بی‌تغییر؛ آزمون‌های mind_report/graph/tour1 همه NO ERRORS). `origin/main` بازنویسی/فورس‌شده بود (تاریخچهٔ نامرتبط با main محلی)؛ main محلی به origin/main بازهم‌تراز شد (پشتیبان: شاخهٔ محلیِ backup/pre-rewrite-main). `supervisor-pending/run-2026-10-11` با main تاریخچهٔ مشترک ندارد ⇒ ریبیس شدنی نیست؛ دست نخورد و حذف نشد.
+
+ناظرِ خودکار (Claude Code routine)
