@@ -10,8 +10,19 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
   // شمارشِ نوشتن‌ها (S.put) برای آزمونِ «دیدن ≠ ذخیره» و «یک تغییر = یک نوشتن»
-  await p.evaluate(() => { window.__puts = []; const o = APP.S.put; APP.S.put = function (r) { window.__puts.push(r.type + ':' + r.id); return o.apply(this, arguments); }; });
-  const putsDuring = async (fn) => { await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); return p.evaluate(() => window.__puts.slice()); };
+  // __courseDirty: the in-memory course record carries a change (step/ex/recall/warm) that its debounced saveSoon (400 ms) has
+  // not written yet. putsDuring waits for that to settle BEFORE resetting the counter (else a late write of the previous
+  // step lands inside the window under load) and AFTER the action (the write it must count may land past the 700 ms window).
+  await p.evaluate(() => {
+    window.__puts = []; const o = APP.S.put; const snap = r => JSON.stringify([r.step, r.ex, r.recall, r.warm]);
+    window.__courseSnap = APP.S.get('course') ? snap(APP.S.get('course')) : null;
+    window.__courseDirty = () => { const c = APP.S.get('course'); return !!c && snap(c) !== window.__courseSnap; };
+    APP.S.put = function (r) { window.__puts.push(r.type + ':' + r.id); if (r.type === 'course') window.__courseSnap = snap(r); return o.apply(this, arguments); };
+  });
+  // until: wait for the condition the next read asserts (a debounced write, a rendered element); on timeout the assertion reports
+  const until = (fn, arg) => p.waitForFunction(fn, arg, { timeout: 15000 }).catch(() => {});
+  const settle = () => until(() => !window.__courseDirty());
+  const putsDuring = async (fn) => { await settle(); await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); await settle(); return p.evaluate(() => window.__puts.slice()); };
   const bad = async (lab) => { if (await p.locator('main .card.bad').count()) errors.push('render ' + lab); };
 
   // ۱) راه‌یابی: از «دغدغه‌ها» روی یک تکنیک ⇒ «برگرد» همان‌جا
@@ -57,7 +68,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   for (const rd of await p.locator('main .wsform input[type=radio]').all()) { if (await rd.isVisible()) await rd.check(); }
   for (const add of await p.locator('main .wsform button:has-text("افزودن")').all()) { if (await add.isVisible()) { await add.click(); } }
   for (const el of await p.locator('main .wsform textarea, main .wsform input[type=text]').all()) { if (await el.isVisible() && await el.isEditable() && !(await el.inputValue())) await el.fill('پاسخِ آزمایشی'); }
-  await p.waitForTimeout(700); info.exAfterInput = await p.evaluate(() => APP.S.all('ex', e => e.tid === 37).length);
+  await until(() => APP.S.all('ex', e => e.tid === 37).length >= 1); await settle(); info.exAfterInput = await p.evaluate(() => APP.S.all('ex', e => e.tid === 37).length);
   await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(200);
   info.atCheck = await p.evaluate(() => APP.state.sub);
   if (info.atCheck !== 's4') info.missing = await p.locator('.toast').allTextContents();
@@ -150,7 +161,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.p1Blocked = await p.evaluate(() => APP.state.sub) === 's3';
   for (const el of await p.locator('main .wsform textarea, main .wsform input[type=text]').all()) { if (await el.isVisible() && await el.isEditable()) await el.fill('اجرای آزمایشیِ روال'); }
   for (const sel of await p.locator('main .wsform select').all()) { const opts = await sel.locator('option').allTextContents(); if (opts.length > 1) await sel.selectOption({ index: 1 }); }
-  await p.waitForTimeout(700);
+  await until(() => APP.S.all('pr', r => r.pid === 'P1').length >= 1); await settle();
   info.prRun = await p.evaluate(() => { const rs = APP.S.all('pr', r => r.pid === 'P1'); return rs.length + '|' + (rs[0] && rs[0].topic === APP.courseState().topic) + '|' + (rs[0] && rs[0].course); });
   await p.click('main .crs-nav .btn:has-text("قدمِ بعد")'); await p.waitForTimeout(150);
   info.p1AtS4 = await p.evaluate(() => APP.state.sub);
