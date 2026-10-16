@@ -352,6 +352,13 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       info.bidi = await p.evaluate(() => { const f = (t) => APP.ASSIST.bidiNodes(t).filter(x => x && x.tagName === 'BDI').map(x => x.textContent); return { u: f('واحدش: cm³/s ÷ cm² = ۲۴ cm/s است'), y: f('وقتی y→۰ می‌رود چه می‌شود؟') }; });
       chk(info.bidi.u.length === 1 && /cm³\/s ÷ cm² = ۲۴ cm\/s/.test(info.bidi.u[0]) && info.bidi.y.length === 1 && info.bidi.y[0] === 'y→۰', 'A13: a formula with Persian digits stays in ONE isolate (result and arrow included) ' + JSON.stringify(info.bidi));
     });
+    /* ===================== A13(k) — برچسب‌های محورِ نمودار دست‌کم ۱۱px واقعی، در قابِ باریک ===================== */
+    await section('A13k', async () => {
+      info.chart = await p.evaluate(() => { const box = APP.MIND.csvBlock('sales.csv', 'ماه,فروش\nفروردین,12\nاردیبهشت,15\nخرداد,9'); const w = document.createElement('div'); w.style.width = '260px'; w.appendChild(box); document.body.appendChild(w);
+        const sv = box.querySelector('svg'), sc = sv.getBoundingClientRect().width / 640, over = Math.max(document.scrollingElement.scrollWidth, document.body.scrollWidth);
+        w.remove(); return { scale: +sc.toFixed(2), minFont: 11 * sc, over }; });
+      chk(info.chart.minFont >= 11 && info.chart.over <= 392, 'A13: chart axis labels render at ≥ 11px inside a narrow bubble (scrolls inside its frame, no page overflow) ' + JSON.stringify(info.chart));
+    });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');

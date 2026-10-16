@@ -37113,7 +37113,10 @@ APP.goFromURL = function (q) {
     var C = M.csvChart(text, "نمودارِ «" + name + "»"), box = h("div", { class: "card soft csv-plot", dir: "rtl", "data-file": name });
     box.appendChild(h("h4", {}, "📈 نمودارِ «" + name + "»"));
     if (!C) { box.appendChild(h("p", { class: "small muted" }, "ستونِ عددی‌ای پیدا نشد که همهٔ خانه‌هایش عدد باشد — نموداری کشیده نشد.")); return box; }
-    box.appendChild(C.svg);
+    /* تورِ پولیا دورِ ۳ (A13، s32): در حبابِ باریکِ گفت‌وگو SVG ِ ۶۴۰ پیکسلی کوچک می‌شد و برچسب‌های محورِ ۱۱px چند پیکسل می‌شدند —
+       نمودار در اندازهٔ خودش می‌ماند (برچسب‌ها واقعاً ۱۱px) و قابش افقی می‌لغزد؛ صفحه سرریز نمی‌کند */
+    C.svg.setAttribute("style", "max-width:none;height:auto;display:block");
+    box.appendChild(h("div", { class: "csv-scroll", dir: "ltr", style: "overflow-x:auto;max-width:100%" }, C.svg));
     box.appendChild(h("p", { class: "small muted csv-note" }, fa(C.n) + " سطر · ستون‌ها: " + C.series.join("، ") + (C.label ? " · محورِ افقی: «" + C.label + "»" : " · محورِ افقی: شمارهٔ سطر") + (C.skipped ? " · " + fa(C.skipped) + " ستونِ عددیِ دیگر کشیده نشد" : "") +
       " — فقط خودِ داده‌ها؛ هیچ روند، میانگین یا برازشی کشیده نشده. الگو (فصل، جهش، تکرار) را خودت ببین و داوری کن."));
     return box;
