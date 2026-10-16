@@ -12,5 +12,11 @@
  "what": "tests/test_found_mixture.js: پین‌کردنِ «۲۰۳ واقعهٔ همه درست» و ردیفِ آخرِ دفتر به پیکرهٔ دورِ ≤۱۲ (دورِ ۱۳ یافتهٔ بازِ مستقل دارد)؛ فقط آزمونِ خودِ بک‌تست، بدون تغییرِ رفتارِ صفحه؛ طبقِ AGENTS.md: منبع/آزمون، build.py، WORKLOG (66)",
  "procedure": "AGENTS.md#هر تغییر",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-16T00:54:22Z",
+  "note": "آزمونِ test_found_mixture.js اجرا شد: NO ERRORS؛ تغییر فقط پین‌کردنِ پیکرهٔ دورِ ≤۱۲ است و رفتارِ صفحه را عوض نمی‌کند.",
+  "commit": ""
+ }
 }
