@@ -52,8 +52,8 @@ Red baseline: `LLA_FILE=<e52aae7 dist html> node tests/test_tour1_r8_live.js` ex
 
 ## Verification
 - `python apps/learning-architecture/build.py`
-- All page node tests through the pytest browser wrapper (see the final report for counts).
-- `pytest tests/ -k "learning_architecture and not graph_browser"`.
+- All page node tests through the pytest browser wrapper: 82 passed (default jobs). With `LLA_BROWSER_JOBS=8 -x`, `test_course.js` failed once under load; it passes alone and in the default-jobs run.
+- `pytest tests/ -k "learning_architecture and not graph_browser"`: 8 passed.
 
 ## For the coach
 - s19: once a stale refusal is context, the mid-course card is the live turn question, which matches the coach's mid-course line. Coach I-7 (suppressing the coach line when the live question is a fresh card or refusal) still applies to fresh ones.
