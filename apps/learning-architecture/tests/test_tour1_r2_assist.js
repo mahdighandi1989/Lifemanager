@@ -63,7 +63,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.rules = await p.evaluate(() => (__calls[__calls.length - 1] || {}).user);
   {
     const c = coachOf(info.rules);
-    info.rulesR = { prove: /اثباتی/.test(c) && /فرض چیست؟ حکم/.test(c), silence: /تغییرِ کوچک/.test(c), c188: /ایدهٔ کلیدی/.test(c) && /کتاب را ببندد/.test(c) && /هرگز کلِ حل/.test(c),
+    info.rulesR = { prove: /اثباتی/.test(c) && /فرض چیست؟ حکم/.test(c), silence: /تغییرِ کوچک/.test(c), c188: /ایدهٔ کلیدی/.test(c) && /کتاب را ببند و خودت دوباره حل کن/.test(c) && !/هرگز کلِ حل/.test(c),
       small: /گامِ کوچک ارزش دارد/.test(c), aloud: /الگو کن/.test(c) && /گفت‌وگوی درونی/.test(c), teacher: /معلمِ خیالی/.test(c), opp: /ضدی هم دارد/.test(c), figure: /شکل/.test(c) && /حتی اگر مسئله هندسی نیست/.test(c),
       dispute: /ثابتش کن یا با مثالِ نقض ردش کن/.test(c), will: /🌱/.test(c), phase: /مرحلهٔ محتمل: فهمِ مسئله/.test(c), oneIdea: /یک ایده/.test(c), size: c.length };
     info.rulesR.ok = Object.keys(info.rulesR).every(k => k === 'size' || info.rulesR[k]);
