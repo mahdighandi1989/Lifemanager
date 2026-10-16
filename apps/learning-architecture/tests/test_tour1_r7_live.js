@@ -310,6 +310,11 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       info.hn.cl = await p.evaluate(() => { const AS = APP.ASSIST, hd = (o) => (AS.coachLines(Object.assign({ ph: 'b', cls: 'obj', qs: [], dry: true }, o)).split('\n')[0] || '');
         return { g: hd({ closed: 'جمعِ تلسکوپیِ دوتایی', mt: 'جلسه سوم: خودم الگوی ۱/(1·2·3) + … رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)). سه تاشو چک کردم.' }), r: hd({ mt: 'سبزیجات؟ نه. اشتباه بود؛ حدسم غلط درآمد.', refuted: true }) }; });
       chk(/مرحلهٔ محتمل: فهم/.test(info.hn.cl.g) && !/مرحلهٔ محتمل: بازنگری/.test(info.hn.cl.r), 'H3: coach header — new guess after a closed problem ⇒ «فهم»; refutation turn ⇒ not «بازنگری» (s25/s12) ' + JSON.stringify(info.hn.cl).slice(0, 400));
+      // دورِ ۷ (پیگیریِ نشستِ اصلی): فهرستِ پرسش‌ها هم از همان مرحلهٔ سرواژه — نه فهرستِ بازنگری (b1…) زیرِ سرواژهٔ «فهم»/«طرح»
+      info.hn.ls = await p.evaluate(() => { const AS = APP.ASSIST, all = (o) => AS.coachLines(Object.assign({ ph: 'b', cls: 'obj', qs: [], dry: true }, o));
+        return { g: all({ closed: 'جمعِ تلسکوپیِ دوتایی', mt: 'خودم الگو رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)).' }), r: all({ mt: 'حدسم غلط بود؛ برای n = ۴ جور درنیومد.', refuted: 1 }) }; });
+      chk(/(?:^|\s)u1\) /.test(info.hn.ls.g) && !/(?:^|\s)b1\) /.test(info.hn.ls.g), 'H3: the question list follows the «فهم» header for a new guess (u1…, not b1…) (s25) ' + info.hn.ls.g.slice(0, 200));
+      chk(/(?:^|\s)p1\) /.test(info.hn.ls.r) && !/(?:^|\s)b1\) /.test(info.hn.ls.r), 'H3: the question list follows the «طرح» header on the refutation turn (p1…, not b1…) (s12) ' + info.hn.ls.r.slice(0, 200));
       chk(info.hn.g && !/بازنگری/.test(info.hn.g) && /فهم/.test(info.hn.g), 'H3: a new guess starting a new problem has header «فهم», not «بازنگری» (s25) ' + JSON.stringify(info.hn));
       chk(info.hn.r && !/بازنگری/.test(info.hn.r), 'H3: the refutation turn is not headed «بازنگری» (s12 p5) ' + JSON.stringify(info.hn));
     });
