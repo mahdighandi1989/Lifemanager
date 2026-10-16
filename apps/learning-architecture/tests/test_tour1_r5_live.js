@@ -366,6 +366,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       info.f7g = await p.evaluate(pid => { const s = APP.S.get('eprog_' + pid).solve; return { g: s.g[1].guess, hist: (s.live.guessHist || []).length, plaus: APP.livePlausible(pid) }; }, PG);
       chk(info.f7g.g === 'چرتِ عصر علتِ دیر خوابیدن است' && info.f7g.hist === 1 && info.f7g.plaus.refuted === 0, 'F7: the new guess becomes the problem\'s guess (old one kept in history; its tally starts fresh) ' + JSON.stringify(info.f7g));
     });
+    await section('F7-pod', async () => {
+      info.f7pod = await p.evaluate(() => { const r = APP.liveCreate('فرد', 'اثبات یا رد کن: هر عددِ فرد اول است.', 'pod'); return APP.livePhaseQs(r.p.id, 'p').filter(q => /مجهول/.test(q)); });
+      chk(!info.f7pod.length, 'F7: the pod plan list speaks of the hypothesis/claim, never «مجهول» (s33 p9) ' + JSON.stringify(info.f7pod));
+    });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
