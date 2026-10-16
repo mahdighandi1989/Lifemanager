@@ -259,7 +259,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     info.b3.one = (/در این نوبت فقط \*\*یک\*\* پرسش[^«]*«([^»]+)»/.exec(u3) || [])[1] || ''; info.b3.one0 = one0;
     info.b3.order = /اگر گیر است، اول کلی بپرس «همهٔ داده‌ها را به کار بردی؟»/.test(u3);
     // DECISIONS_R5 F2 (s30، s33، s35): «همهٔ داده‌ها؟» هرگز پیش از طرح — گیرِ بی‌طرح ⇒ «از خواسته به عقب» (E3 ِ دورِ ۴)؛ B3 پس از طرح در test_tour1_r5_coach.js
-    chk(info.b3.ph === 'p' && info.b3.unused === 3 && !/همهٔ داده‌ها/.test(info.b3.one) && /به عقب/.test(info.b3.one) && !/همهٔ داده‌ها/.test(one0) && !info.b3.order, 'B3 (as revised by R5 F2): stuck before any plan ⇒ «از خواسته به عقب», not «have you used all the data?» (that only once a plan exists) ' + JSON.stringify(info.b3));
+    // DECISIONS_R6 G2(3): گیر در ساختنِ طرح با دادهٔ به‌کارنرفته همان لحظهٔ پولیاست ⇒ «همهٔ داده‌ها؟»؛ آغازِ طرح بی گیر ⇒ نه
+    chk(info.b3.ph === 'p' && info.b3.unused === 3 && /همهٔ داده‌ها/.test(info.b3.one) && !/همهٔ داده‌ها/.test(one0), 'B3 (as revised by R6 G2): stuck devising the plan with unused data ⇒ «have you used all the data?»; not at the start of planning without being stuck ' + JSON.stringify(info.b3));
 
     // B9 — مسئلهٔ زندگی: گامِ واقعی، نتیجه «کمی» و «کمتر می‌خواهم» ⇒ کارتِ «🌱»؛ ثبتِ گامِ کوچک ⇒ یادآور
     const P2 = await mk({ title: 'کلاسِ شبانه', st: 'نمی‌دانم کلاسِ شبانهٔ زبان را ثبت‌نام کنم یا نه؛ بعد از کار خیلی خسته‌ام.', nat: 'life' });

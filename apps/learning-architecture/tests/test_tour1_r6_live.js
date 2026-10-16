@@ -124,6 +124,27 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       chk(/نتیجه/.test(info.g2rel.q) && /روش/.test(info.g2rel.q) && /کمکی/.test(info.g2rel.q) && !/به\s*عقب/.test(info.g2rel.q) && info.g2rel.co.src === 'turn-related', 'G2: «I don\'t know how to use the related solved problem» ⇒ the turn question is «its result or its method? an auxiliary element?» (s35), not «work backwards» ' + JSON.stringify(info.g2rel));
     });
 
+    await section('G2-turnfields', async () => {
+      await day(0);
+      // فیلدهای تازهٔ نوبت از مربی: turn.guess («…درسته؟» پس از مقدار) ⇒ «چطور می‌آزمایی‌اش؟»؛ turn.related (بی گیر) ⇒ «نتیجه یا روشش؟»
+      const PT = await lifeSetup({ title: 'کابینت', st: 'می‌خواهم کابینتِ آشپزخانه را خودم بسازم؛ نمی‌دانم چند ورق تخته لازم است.', noPlan: true });
+      info.g2tf = await p.evaluate(pid => { const a = APP.liveCoach(pid, { turn: { guess: true, text: 'پس ۶ ورق؛ درسته؟' } }), b = APP.liveCoach(pid, { turn: { related: true, stuck: false, text: 'یادم اومد کمدِ اتاق رو همین‌جوری ساختم' } }); return { a: a.q, as: a.src, b: b.q, bs: b.src }; }, PT);
+      chk(info.g2tf.as === 'turn-guess' && /چطور می‌آزمایی/.test(info.g2tf.a) && info.g2tf.bs === 'turn-related' && /روش/.test(info.g2tf.b), 'G2: turn.guess ⇒ «how will you test it?»; turn.related ⇒ «its result or method? auxiliary element?» (coach fields) ' + JSON.stringify(info.g2tf));
+      // سطرِ «حدسی که خودش با آزمون رد کرد» فقط در نخستین نوبت پس از رد
+      const PR2 = await mk({ title: 'خوابِ کودک', st: 'بچه‌ام شب‌ها دیر می‌خوابد؛ می‌خواهم علتش را بفهمم.', nat: 'life' });
+      await understand({ one: 'دنبالِ علتِ دیر خوابیدنِ بچه‌ام هستم', unk: 'علتِ دیر خوابیدن', data: ['عصرها چرت می‌زند', 'شب کارتون می‌بیند'], cond: 'علت را با آزمون بیابم', guess: 'کارتونِ شب علت است', test: 'یک هفته بی کارتون' });
+      await addMove('mv_special', 'اول فقط یک هفته کارتون را حذف می‌کنم');
+      await savePlan('نخست یک هفته کارتونِ شب را حذف می‌کنم سپس ساعتِ خواب را می‌نویسم');
+      await realStep('از امشب یک هفته کارتونِ شب را حذف کنم', 'زودتر می‌خوابد', 'امشب');
+      await day(1); await go('lprob', PR2, 'exec');
+      await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'باز هم دیر خوابید'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'same');
+      await sel('#lpOGuess', 'refute'); await p.fill('#lpOReflect', 'کارتون علت نبود؛ شاید چرتِ عصر است'); await selIf('#lpONewG', 'no');
+      await click('main .lp-outsave');
+      info.g2ref = await p.evaluate(pid => { const se = { id: 'ach_g2ref', lprob: pid, msgs: [] }, run = (m) => APP.ASSIST.promptHooks.map(f => { try { return f(se, m) || ''; } catch (e) { return ''; } }).join('\n');
+        return [run('حدسم غلط بود'), run('حدسم غلط بود'), run('حالا چی کار کنم؟')].map(t => /حدسی که خودش با آزمون رد کرد/.test(t)); }, PR2);
+      chk(info.g2ref[0] === true && info.g2ref[1] === true && info.g2ref[2] === false, 'G2: the refuted-guess line appears in the first turn after the refutation (and its re-prompt), not on every later turn ' + JSON.stringify(info.g2ref));
+    });
+
     await section('G2-cards', async () => {
       await day(0);
       // s26: حکمِ کارتِ معادله‌ها (کارتِ خاص) بر «به شکلِ دیگری بیان کن» ِ عام مقدم است
