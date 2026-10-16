@@ -12,5 +12,11 @@
  "what": "تورِ ۱ پولیا F3: pr_causal (s_problem) — station:st_istiqra به ابزارها افزوده و gap_fa باریک شد (کاربرگِ «راه استقراء» اکنون «علت یا هم‌بستگی؟» و رقیب‌ها را می‌پرسد؛ پیوستِ CSV نمودار می‌شود)؛ نمودارِ علّی هنوز نیست ⇒ gap باز ماند، advance نشد؛ sys_territory.py check سبز.",
  "procedure": "apps/learning-architecture/AGENTS.md#🗺 قلمروِ سامانه‌ها",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-16T13:01:33Z",
+  "note": "بازبینیِ دورِ فوریِ ۲۰۲۶-۱۰-۱۶: build.py بدونِ تغییر، test_mind_report / test_graph / test_tour1_mind_factory همه NO ERRORS",
+  "commit": ""
+ }
 }
