@@ -301,6 +301,71 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await p.fill('#lpStep', 'وزیر را به b7 می‌برم؛ کیش نیست'); await sel('#lpClear', 'بله'); await fillIf('#lpProof', 'حسابِ مستقیم'); await click('main .lp-stepsave');
       chk(/کنشِ طرح/.test(await txt('main .lp-switch')), 'F5: the «not from the plan» message names the real reason (the plan\'s action is negated) ' + (await txt('main .lp-switch')).slice(0, 160));
     });
+
+    /* ===================== F7 — بندهای کوچکِ «live» ===================== */
+    await section('F7-plan', async () => {
+      await day(0);
+      // «فقط بخشی از شرط» و کارتِ شل کردن ⇒ «مجهول چگونه تغییر می‌کند؟» (s04)
+      const PX = await mk({ title: 'چیدمانِ مهمان‌ها', st: 'شش مهمان دورِ یک میز؛ هیچ دو دوستی کنارِ هم ننشینند و هر زوجی کنارِ هم باشد. چند چیدمان هست؟', nat: 'objective' });
+      await understand({ one: 'می‌خواهم شمارِ چیدمان‌ها را بیابم', unk: 'شمارِ چیدمان‌ها', data: ['شش مهمان', 'یک میزِ گرد'], cond: 'هیچ دو دوستی کنارِ هم نباشند\nهر زوجی کنارِ هم باشد', sat: 'no', depNo: true });
+      chk(await has('main .lp-relax') === 1 && await has('#lpRelaxVary') === 1, 'F7: the relax card asks «مجهول چگونه تغییر می‌کند؟»');
+      await sel('#lpAuxK', 'part');
+      chk(await has('#lpAuxVary') === 1, 'F7: the «فقط بخشی از شرط را نگه دار» aux box asks how the unknown varies');
+      await fillIf('#lpAuxT', 'فقط شرطِ زوج‌ها را نگه می‌دارم'); await fillIf('#lpAuxB', 'بعد شرطِ دوستان را برمی‌گردانم');
+      await click('main .lp-auxsave');
+      chk(await p.evaluate(pid => (APP.S.get('eprog_' + pid).solve.live.aux || []).length, PX) === 0, 'F7: the part-only aux problem is not saved without «مجهول چگونه تغییر می‌کند؟»');
+      await fillIf('#lpAuxVary', 'بی شرطِ دوستان چیدمان‌ها ۴۸ تاست و با برگرداندنش کم می‌شود');
+      await click('main .lp-auxsave');
+      chk(await p.evaluate(pid => ((APP.S.get('eprog_' + pid).solve.live.aux || [])[0] || {}).vary || '', PX), 'F7: the aux problem stores how the unknown varies');
+      // lpBBest: پرسشِ طرح که در کارتِ خودش («پیش‌تر دیده‌ای؟») پاسخ گرفت؛ پیش‌درآمدِ پیامِ دستیار جدا (s01/s23)
+      await selIf('#lpSeen', 'no'); await fillIf('#lpSeenF', 'مسئلهٔ نشستنِ دورِ میز در کتاب'); await clickIf('main .lp-seensave');
+      info.f7seen = await p.evaluate(pid => ({ seen: !!APP.S.get('eprog_' + pid).solve.live.seen, qs: APP.livePageQs ? APP.livePageQs(pid) : [] }), PX);
+      chk(info.f7seen.seen && info.f7seen.qs.some(q => /پیش‌تر[^؟]*دیده/.test(q)), 'F7: «کدام پرسش کمک کرد؟» lists the plan question answered on its own card («پیش‌تر … دیده‌ای؟») ' + JSON.stringify(info.f7seen));
+      await p.evaluate(pid => { const se = APP.ASSIST.newSession(); APP.liveBindSession(pid, se, { force: true }); se.msgs.push({ role: 'ai', text: 'ولی بار فقط یک میز نیست — از «یک میزِ گرد» هم استفاده کردی؟', at: new Date().toISOString() }); APP.S.put(se); }, PX);
+      info.f7chat = await p.evaluate(pid => APP.liveChatQs(pid), PX);
+      chk(info.f7chat.includes('از «یک میزِ گرد» هم استفاده کردی؟') && !info.f7chat.some(q => /^ولی/.test(q)), 'F7: a chat question is listed without its preamble ' + JSON.stringify(info.f7chat));
+      // mentions: برچسبِ فهرست، عدد کنارِ اسم، نامِ تک‌حرفی (s23/s24/s29)
+      info.f7m = await p.evaluate(() => [APP.liveMentions('همهٔ موادِ دستور را دو برابر می‌کنم', 'دستور: ۳ تخم‌مرغ، ۱ پیمانه شکر'), APP.liveMentions('گامِ اول یک یا دو پله، بعد پله‌های باقی‌مانده', '۳۰ پله', ['هر گام ۱، ۲ یا ۳ پله است']), APP.liveMentions('دایره‌ای مماس بر A و B', 'مسیرِ A/B/C'), APP.liveMentions('هیچ ربطی ندارد', 'دستور: ۳ تخم‌مرغ')]);
+      chk(info.f7m[0] && info.f7m[1] && info.f7m[2] && !info.f7m[3], 'F7: mentions() matches a list label, number+noun and single-letter names (negation still excluded) ' + JSON.stringify(info.f7m));
+    });
+    await section('F7-prac', async () => {
+      await day(0);
+      // تقریبِ بس در برابرِ فاصلهٔ واقعی (s02)
+      info.f7avm = await p.evaluate(() => [APP.liveApproxMargin('تا یک سانتی‌متر', ['نیم سانت جا کم بود']), APP.liveApproxMargin('تا یک سانتی‌متر', ['سه سانت جا اضافه بود'])]);
+      chk(info.f7avm[0] && !info.f7avm[1], 'F7: an approximation coarser than the actual margin is detected (1 cm vs 0.5 cm), a finer one is not ' + JSON.stringify(info.f7avm));
+      const PK = await mk({ title: 'کمد', st: 'کمدی که می‌خواهم بخرم در اتاقم جا می‌شود؟ دیوار ۲۴۰ سانت است.', nat: 'practical' });
+      await understand({ one: 'می‌خواهم بدانم کمد در اتاقم جا می‌شود', unk: 'جا شدنِ کمد', data: ['دیوار ۲۴۰ سانت است', 'کمد ۲۳۹٫۵ سانت است'], cond: 'کمد کنارِ دیوار جا شود', prac: true, prApprox: 'تا یک سانتی‌متر', measure: 'پهنای کمد ≤ ۲۴۰ سانتی‌متر' });
+      await addMove('mv_special', 'اول فقط پهنای دیوار را دوباره می‌سنجم تا دامنه تنگ شود');
+      await p.fill('#lpPlan2', 'اگر نشد از فروشنده اندازهٔ دقیق را می‌پرسم');
+      await savePlan('نخست دیوار را با متر می‌سنجم سپس با پهنای کمد مقایسه می‌کنم');
+      await realStep('فردا دیوار را با متر بسنجم', 'جا می‌شود');
+      await day(1); await go('lprob', PK, 'exec');
+      await outcome({ what: 'دیوار ۲۴۰ سانت بود؛ فقط نیم سانت جا اضافه بود' });
+      await click('main .lp-solved');
+      chk(await has('main .lp-bapproxm') === 1, 'F7: the look-back says the 1 cm approximation is coarser than the 0.5 cm actual margin');
+      info.f7date = await p.evaluate(pid => APP.liveClosure(pid).date, PK);
+      chk(info.f7date === await p.evaluate(() => APP.today()), 'F7: the closure date follows APP.today (simulated day), not the wall clock ' + info.f7date);
+    });
+    await section('F7-life', async () => {
+      await day(0);
+      // زندگی: ابزارِ x/n و فرمول نه (s13)؛ حدسِ تازه پس از رد ⇒ «ثبت به‌عنوانِ حدس» (s22)
+      const PL = await mk({ title: 'باشگاه', st: 'عضوِ باشگاهِ نزدیک بشوم یا باشگاهِ ارزان؟', nat: 'life' });
+      await whole('می‌خواهم باشگاهِ مناسبِ خودم را برگزینم', 'سلامتی');
+      chk(await has('#lpGKx0') === 0 && await has('#lpGKf') === 0, 'F7: a life decision\'s guess kit has no x/n table or formula');
+      const PG = await mk({ title: 'خواب', st: 'چرا شب‌ها دیر خوابم می‌برد؟ می‌خواهم علتش را بفهمم.', nat: 'life' });
+      await understand({ one: 'دنبالِ علتِ دیر خوابیدنم هستم', unk: 'علتِ دیر خوابیدن', data: ['شب‌ها قهوه نمی‌خورم', 'تا دیروقت با گوشی‌ام'], cond: 'علت را با آزمون بیابم', guess: 'گوشیِ دیروقت علت است' });
+      await addMove('mv_special', 'اول فقط یک هفته گوشی را کنار می‌گذارم تا ببینم');
+      await savePlan('نخست یک هفته گوشی را ساعتِ ده کنار می‌گذارم سپس ساعتِ خوابم را می‌نویسم');
+      await realStep('از امشب گوشی را ساعتِ ده کنار بگذارم', 'زودتر خوابم می‌برد', 'امشب');
+      await day(1); await go('lprob', PG, 'exec');
+      await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'باز هم تا یک دیر خوابم برد'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'same');
+      await sel('#lpOGuess', 'refute'); await p.fill('#lpOReflect', 'گوشی علت نبود؛ شاید چرتِ عصر علت است');
+      chk(await has('#lpONewG') === 1, 'F7: a refuted guess\'s reflection offers «ثبت به‌عنوانِ حدس»');
+      await selIf('#lpONewG', 'yes'); await fillIf('#lpONewGT', 'چرتِ عصر علتِ دیر خوابیدن است');
+      await click('main .lp-outsave');
+      info.f7g = await p.evaluate(pid => { const s = APP.S.get('eprog_' + pid).solve; return { g: s.g[1].guess, hist: (s.live.guessHist || []).length, plaus: APP.livePlausible(pid) }; }, PG);
+      chk(info.f7g.g === 'چرتِ عصر علتِ دیر خوابیدن است' && info.f7g.hist === 1 && info.f7g.plaus.refuted === 0, 'F7: the new guess becomes the problem\'s guess (old one kept in history; its tally starts fresh) ' + JSON.stringify(info.f7g));
+    });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
