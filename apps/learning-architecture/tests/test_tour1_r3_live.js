@@ -18,7 +18,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   const day = async (n) => { await p.evaluate(x => { window.__day = x; }, D(n)); };
   const go = async (v, a, s) => { await p.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await W(140); };
   const sel = async (s, v) => { await p.selectOption(s, v); await W(120); };
-  const click = async (s) => { await p.click(s); await W(160); };
+  /* E5 (دورِ ۴): بازنگری هر بخشِ ثبت‌شدهٔ شرط را جدا می‌پرسد (lpBCP_*) — این جریان‌ها نتیجه‌ای می‌سازند که شرط را برآورده می‌کند؛ پیش از ثبتِ بازنگری «بله» */ const click = async (s) => { if (/lp-lbsave/.test(s)) await p.evaluate(() => document.querySelectorAll('select[id^="lpBCP_"]').forEach(x => { if (!x.value) { x.value = 'yes'; x.dispatchEvent(new Event('change', { bubbles: true })); } })); await p.click(s); await W(160); };
   const txt = (s) => p.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent : ''; }, s);
   const has = (s) => p.locator(s).count();
   const S = (pid) => p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); return JSON.parse(JSON.stringify(pg && pg.solve || {})); }, pid);
@@ -133,7 +133,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await section('A11/A2/A13c', async () => {
       PR = await mk({ title: 'کف‌سازی', st: 'برای کفِ حیاطِ خانه‌ام بتن بخرم؛ چقدر سفارش بدهم که کم نیاید و زیاد هم نماند؟', nat: 'practical' });
       info.a11 = await p.evaluate(pid => ({ u: APP.livePhaseQs(pid, 'u'), p: APP.livePhaseQs(pid, 'p') }), PR);
-      chk(info.a11.u.some(q => /اثرِ محسوس/.test(q)) && !info.a11.u.concat(info.a11.p).some(q => /قضیه|عنصرِ کمکی/.test(q)), 'A11: practical ⇒ the practical (QK.pract) understand/plan lists, not the math list ' + JSON.stringify(info.a11));
+      chk(info.a11.u.some(q => /اثرِ محسوس/.test(q)) && !info.a11.u.concat(info.a11.p).some(q => /قضیه/.test(q)), 'A11: practical ⇒ the practical (QK.pract) understand/plan lists, not the math list ' + JSON.stringify(info.a11));
       // A13c: قابِ عملی پاسخِ تهی نمی‌پذیرد
       const miss = await understand({ one: 'می‌خواهم بدانم چند مترمکعب بتن سفارش بدهم', unk: 'حجمِ بتن', data: ['حیاط ۲۰۰ مترمربع است', 'ضخامتِ کف ۱۲ سانت است'], cond: 'کم نیاید', prac: true,
         prLine: 'هیچی رو بیرون نمی‌ذارم', prApprox: 'نمی‌دونم، دلم می‌خواد دقیق باشه', measure: '۲۰۰ مترمربع × ۰.۱۲ متر = ۲۴ مترمکعب', expectMiss: true });
@@ -318,7 +318,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       const PL = await mk({ title: 'ویولن', st: 'هر روز ویولن تمرین کنم یا یک روز در میان؟ نمی‌دانم کدام بهتر است.', nat: 'life' });
       await understand({ one: 'می‌خواهم بهترین بسامدِ تمرین را بیابم', unk: 'هر روز یا یک روز در میان', data: ['روزی نیم ساعت وقت دارم', 'سه ماه است می‌نوازم'], cond: 'خسته نشوم', guess: 'هر روز تمرین بهتر است' });
       info.lifeQ = await p.evaluate(pid => ({ u: APP.livePhaseQs(pid, 'u'), p: APP.livePhaseQs(pid, 'p') }), PL);
-      chk(!info.lifeQ.u.concat(info.lifeQ.p).some(q => /قضیه|عنصرِ کمکی|اثرِ محسوس|تقریب/.test(q)) && info.lifeQ.p.some(q => /قیدهای واقعی/.test(q)), 'A11: life ⇒ the life list (no math, no quantity-only questions) ' + JSON.stringify(info.lifeQ));
+      chk(!info.lifeQ.u.concat(info.lifeQ.p).some(q => /قضیه|اثرِ محسوس|تقریب/.test(q)) && info.lifeQ.p.some(q => /قیدهای واقعی/.test(q)), 'A11: life ⇒ the life list (no math, no quantity-only questions) ' + JSON.stringify(info.lifeQ));
       // D2: ترتیب بر پایهٔ پله؛ پرسیده‌شده دوباره نه؛ پایانِ نردبان ⇒ C188
       info.d2 = await p.evaluate(pid => { const Q = APP.livePhaseQs(pid, 'p'); const a = APP.liveCoach(pid), b = APP.liveCoach(pid, { asked: [Q[0]] }), c = APP.liveCoach(pid, { asked: Q.slice() }); return { Q, a: a.q, b: b.q, br: b.rung, c: c.q, end: c.ladderEnd }; }, PL);
       chk(info.d2.a === info.d2.Q[0] && info.d2.b === info.d2.Q[1] && info.d2.br === 1 && !info.d2.c && info.d2.end, 'D2: coach order by rung — asked questions skipped, ladder end flagged ' + JSON.stringify(info.d2));

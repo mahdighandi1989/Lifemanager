@@ -1142,7 +1142,10 @@
   /* پرسش‌های مرحله: مسئلهٔ زندهٔ بسته‌شده ⇒ فقط فهرستِ نوع‌دارِ خودِ بخشِ مسئله (A.livePhaseQs) — یک منبع؛ QK فقط برای مسئلهٔ فقط‌درگفت‌وگو */
   function phaseQs(ph, cls, pid) {
     if (pid && A.liveRec && A.liveRec(pid) && typeof A.livePhaseQs === "function") { try { var L0 = A.livePhaseQs(pid, ph); if (Array.isArray(L0) && L0.length) return L0.slice(); } catch (e) { } }
-    return ((QK[cls] || QK.any)[ph] || QK.any[ph] || []).slice();
+    var L1 = ((QK[cls] || QK.any)[ph] || QK.any[ph] || []).slice();
+    /* E3 (دورِ ۴): محتوای فهرستِ هر داور از a38 (A.liveKindQs — بازنویسیِ کاملِ فهرستِ پولیا، نه زیرمجموعه)؛ ترتیب و پیشنهاد همین‌جا */
+    if (typeof A.liveKindQs === "function") { try { var K1 = A.liveKindQs(cls, ph, L1); if (Array.isArray(K1) && K1.length) return K1; } catch (e) { } }
+    return L1;
   }
   AS.coachQs = phaseQs; AS.coachClass = qClass;
   /* E1: حدسِ نوعِ مدل (coach_state.nat) برای مربیِ فقط‌درگفت‌وگو — فقط پیشنهاد (روی مسئلهٔ ثبت‌شده انتخابِ صریحِ کاربر برنده است) و بر حدسِ الگو مقدم */

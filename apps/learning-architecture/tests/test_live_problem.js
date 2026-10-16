@@ -31,7 +31,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const day = async (n) => { await p.evaluate(x => { window.__day = x; }, D(n)); };
   const go = async (v, a, s) => { await p.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await W(140); };
   const sel = async (s, v) => { await p.selectOption(s, v); await W(60); };
-  const click = async (s) => { await p.click(s); await W(140); };
+  /* E5 (دورِ ۴): بازنگری هر بخشِ ثبت‌شدهٔ شرط را جدا می‌پرسد (lpBCP_*) — این جریان‌ها نتیجه‌ای می‌سازند که شرط را برآورده می‌کند؛ پیش از ثبتِ بازنگری «بله» */ const click = async (s) => { if (/lp-lbsave/.test(s)) await p.evaluate(() => document.querySelectorAll('select[id^="lpBCP_"]').forEach(x => { if (!x.value) { x.value = 'yes'; x.dispatchEvent(new Event('change', { bubbles: true })); } })); await p.click(s); await W(140); };
   const ownCheck = (s, lab) => p.evaluate(s => { const els = [...document.querySelectorAll(s + ' input, ' + s + ' textarea, ' + s + ' select')]; return { n: els.length, notOwn: els.filter(e => !e.closest('[data-own]')).map(e => e.id), noLabel: els.filter(e => !(e.labels && e.labels.length) && !e.getAttribute('aria-label')).map(e => e.id) }; }, s)
     .then(r => { chk(r.n > 0, lab + ': no fields'); chk(!r.notOwn.length, lab + ': fields outside data-own ' + r.notOwn.join(',')); chk(!r.noLabel.length, lab + ': unlabelled ' + r.noLabel.join(',')); return r; });
   const noOverflow = async (lab) => { const w = await p.evaluate(() => Math.max(document.scrollingElement.scrollWidth, document.body.scrollWidth)); if (w > 392) { const who = await p.evaluate(() => [...document.querySelectorAll('#main *')].filter(e => e.getBoundingClientRect().right > 392 || e.getBoundingClientRect().left < -2).slice(-3).map(e => e.tagName + '.' + e.className + ':' + (e.textContent || '').slice(0, 40))); chk(false, lab + ': horizontal overflow at 390px (' + w + ') ' + JSON.stringify(who)); } };
@@ -116,7 +116,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ===== C) طرح ===== */
     // تورِ پولیا دورِ ۳ (A11): پرسش‌های طرح نوع‌دارند — همان فهرستِ A.livePhaseQs (تصمیمِ زندگی ⇒ فهرستِ زندگی، نه «قضیه‌ای…؟» ِ ریاضی)
     const Q = await p.evaluate(pid => APP.livePhaseQs(pid, 'p'), P1);
-    chk(Q.length > 2 && !Q.some(q => /قضیه|عنصرِ کمکی/.test(q)), 'A11: a life decision gets the life plan list, not the math list ' + JSON.stringify(Q));
+    // E3 (دورِ ۴): «عنصرِ کمکی» در فهرستِ هر داور هست (بازنویسیِ کامل، نه زیرمجموعه) — «قضیه‌ای…؟» ِ ریاضی نه
+    chk(Q.length > 2 && !Q.some(q => /قضیه/.test(q)), 'A11: a life decision gets the life plan list, not the math list ' + JSON.stringify(Q));
     await ownCheck('main .lp-ask', 'ask-now card');
     info.ask0 = await p.evaluate(() => ({ q: document.querySelector('main .lp-ask .lp-q').textContent, why: /چرا این پرسش/.test(document.querySelector('main .lp-ask').textContent), one: document.querySelectorAll('main .lp-ask').length }));
     chk(info.ask0.one === 1 && info.ask0.q.indexOf(Q[0]) >= 0 && info.ask0.why, 'one question at a time, first (most general) from PLAN_QS, with «چرا این پرسش» ' + JSON.stringify(info.ask0));
