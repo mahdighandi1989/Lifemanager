@@ -41610,7 +41610,10 @@ APP.goFromURL = function (q) {
     "اوقات": "وقت", "منابع": "منبع", "اموال": "مال", "اسناد": "سند", "دلایل": "دلیل", "عوامل": "عامل", "نتایج": "نتیجه", "مراحل": "مرحله", "وسایل": "وسیله", "قوانین": "قانون", "خطوط": "خط", "سطوح": "سطح", "اقوام": "قوم", "مشتریان": "مشتری", "کتب": "کتاب", "دروس": "درس", "علائم": "علامت", "مقادیر": "مقدار" };
   /* «بُعد» (اندازه) با «بعد» (سپس، واژهٔ ایست) یکی نوشته می‌شود: با ضمه، یا پس از عدد («سه بعد»)، همان «ابعاد» است */
   function dimFix(t) { return String(t == null ? "" : t).replace(/بُعد|(?:یک|دو|سه|چهار|[0-9۰-۹])\s*بعد(?![ء-یپچژکگ])/g, function (m) { return m.replace(/بُ?عد$/, "ابعاد"); }); }
-  function toks(t) { var o = []; norm(dimFix(t)).split(/[^0-9a-zء-يپچژکگی]+/).forEach(function (w) { if (!w || (w.length < 2 && !/\d/.test(w)) || STOP.indexOf(" " + w + " ") >= 0) return; w = stem(BROKEN[w] || w); if (o.indexOf(w) < 0) o.push(w); }); return o; }
+  /* دورِ ۱۰ (D5، s28): عددِ چسبیده به اسمِ شمردنی («دوفرزندی» = «دو فرزند») و «بچه» ⇄ «فرزند» یک اسم‌اند — «دو بچه» در «خانواده‌های دوفرزندی» به کار رفته است */
+  function numNoun(t) { return String(t == null ? "" : t).replace(/(^|[^ء-یپچژکگ])(یک|دو|سه|چهار|پنج|تک)(فرزند|بچه)/g, "$1$2 $3"); }
+  var SYN = { "بچه": "فرزند", "فرز": "فرزند", "فرزندان": "فرزند" };   // پس از ریشه‌یابی («فرزند» ⇐ «فرز»)
+  function toks(t) { var o = []; norm(numNoun(dimFix(t))).split(/[^0-9a-zء-يپچژکگی]+/).forEach(function (w) { if (!w || (w.length < 2 && !/\d/.test(w)) || STOP.indexOf(" " + w + " ") >= 0) return; w = stem(BROKEN[w] || w); w = SYN[w] || w; if (o.indexOf(w) < 0) o.push(w); }); return o; }
   function hit(w, tt) { return tt.some(function (x) { return x === w || (w.length >= 4 && x.length >= 4 && (x.indexOf(w) === 0 || w.indexOf(x) === 0)); }); }
   /* دادهٔ d در متنِ t «به کار رفته»؟ در یک بند (جمله/سطر/پاره‌ای میانِ ، ؛ .) دست‌کم نیمی از واژه‌های معنادارِ داده آمده و همان بند آن را
      نفی یا کوچک نکرده — نام بردنِ داده برای کنار گذاشتنش («بی‌فایده است»، «تزئینی است»، «به درد نمی‌خورد»، «مهم نیست»…) به کار بردنش نیست.
@@ -41695,7 +41698,7 @@ APP.goFromURL = function (q) {
     if (L.seen) texts.push(L.seen.where);
     (u.nota || []).forEach(function (x) { texts.push(x.m); });
     texts.push(L.planDraft);
-    if (L.plan) { texts.push(L.plan.t, L.plan.t2, L.plan.rot); Object.keys(L.plan.unused || {}).forEach(function (k) { if (L.plan.unused[k].ans === "use") used[k] = used[k] || "plan"; }); }
+    if (L.plan) { texts.push(L.plan.t, L.plan.t2, L.plan.rot); Object.keys(L.plan.unused || {}).forEach(function (k) { if (L.plan.unused[k].ans === "use" || L.plan.unused[k].ans === "soft") used[k] = used[k] || "plan"; }); }   // «soft»: هشدارِ واژه‌ای دیده شد و با دلیلِ خودش گذشت (D5)
     var all = texts.filter(Boolean).join("\n");
     dl.forEach(function (d) { if (!used[d.id] && mentions(all, d.t, dl.filter(function (y) { return y !== d; }).map(function (y) { return y.t; }))) used[d.id] = "text"; });
     var as = asideMap(s); dl.forEach(function (d) { if (!used[d.id] && as[d.id]) used[d.id] = "aside"; });
@@ -42622,6 +42625,7 @@ APP.goFromURL = function (q) {
         field("lpRelaxW", "چرا همین؟ (با شل کردنش چه چیزی را از دست می‌دهی — یا ناممکن بودن را از کجا ثابت می‌کنی؟)", d.relaxWhy, function (v) { d.relaxWhy = v; }, 0),
         field("lpRelaxVary", "مجهول چگونه تغییر می‌کند؟ — با شل کردنِ همان بخش، مجهول تا کجا معین می‌شود و چطور تغییر می‌کند؟ (اگر ناممکن بودن را ثابت می‌کنی، لازم نیست)", d.relaxVary || "", function (v) { d.relaxVary = v; }, 0)));
     }
+    if (d.softShow) box.appendChild(softField("lpPSoftWhy", d));
     box.appendChild(h("button", { class: "btn lp-plansave", type: "button", onclick: function () {
       var miss = []; if (txt(d.t).length < 5) miss.push("«طرحت»");
       if (contra && (!d.relax || toks(d.relaxWhy).length < 2)) miss.push("«کدام بخشِ شرط را شل می‌کنی (یا ناممکن بودن را ثابت می‌کنی)؟» با دلیل");
@@ -42630,18 +42634,25 @@ APP.goFromURL = function (q) {
       if (!heurUsed(r, s).length) miss.push("«دست‌کم یک ابزارِ طرح که واقعاً به کار رفته باشد»");
       if (suffDue(s, "p")) miss.push("«کافی است؟» را دوباره پاسخ بده (کارتِ بالای طرح)");
       var bk = L.back && backFix(L); if (bk && liveChains(bk).length > 1 && !chosenChain(L)) miss.push("«از آخر به عقب»: از شاخه‌های رقیب یکی را برگزین");
-      var un = still();
-      unusedMiss(un, d.unused).forEach(function (x) { miss.push(x); });
-      if (miss.length) { pout.textContent = "هنوز نه: " + miss.join("، ") + "."; A.toast("اول این‌ها: " + miss.join("، "), "bad"); drawUn(); return; }
-      var keep = JSON.parse(JSON.stringify((L.plan && L.plan.unused) || {})); un.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });
+      var un = still(), soft = [];
+      /* دورِ ۱۰ (D5، s28؛ E4): «به‌کارنرفته» حدسی از واژه‌هاست («دوفرزندی» به‌جای «دو بچه») — دادهٔ بی‌پاسخ یک بار هشدار می‌گیرد و «ثبت با همین — دلیل»
+         را می‌پذیرد؛ پاسخِ خودِ کاربر («لازم نیست» بی دلیل، «نمی‌دانم» بی جمله) وارسیِ محتوایی است و سد می‌کند */
+      var unAns = un.filter(function (x) { var a = d.unused[x.id]; return !a || !a.ans; });
+      unAns.forEach(function (x) { soft.push(["unused:" + x.id, "«" + clip(x.t, 40) + "» را در طرحت نیافتم — به کارش بردی؟ (حدسی از واژه‌ها: اگر به نامِ دیگری آمده، همان را در دلیل بگو)"]); });
+      unusedMiss(un.filter(function (x) { return unAns.indexOf(x) < 0; }), d.unused).forEach(function (x) { miss.push(x); });
+      var sg = softGate(d, soft, miss);
+      if (miss.length) { d.planMiss = "هنوز نه: " + miss.join("، ") + "."; pout.textContent = d.planMiss; A.toast("اول این‌ها: " + miss.join("، "), "bad"); if (d.softShow && !box.querySelector("#lpPSoftWhy")) { A.render(); return; } drawUn(); return; }
+      var keep = JSON.parse(JSON.stringify((L.plan && L.plan.unused) || {})); un.forEach(function (x) { var a = d.unused[x.id] || {}; keep[x.id] = unAns.indexOf(x) >= 0 && sg ? { ans: "soft", why: sg.why, t: x.t } : { ans: a.ans, why: txt(a.why), t: x.t }; });
       if (L.plan && L.plan.at && txt(L.plan.t) !== txt(d.t)) (L.planHist = L.planHist || []).push({ t: L.plan.t, t2: L.plan.t2 || "", at: L.plan.at });
       L.plan = { t: txt(d.t), at: nowISO(), d: A.today(), unused: keep, heur: heurUsed(r, s) }; if (txt(d.t2)) L.plan.t2 = txt(d.t2);
       if (txt(d.rot)) L.plan.rot = txt(d.rot); if (d.cparts.length) L.plan.cparts = d.cparts.slice();
+      if (sg) { L.plan.soft = sg; (L.softLog = L.softLog || []).push({ where: "p", keys: sg.keys, why: sg.why, at: sg.at }); }
       if (contra) { var podH2 = typeOf(r, s) === "pod"; L.plan.relax = { part: d.relax === "prove" ? "prove" : +d.relax, why: txt(d.relaxWhy), vary: d.relax === "prove" ? "" : txt(d.relaxVary), t: d.relax === "prove" ? "" : ((podH2 ? dataOf(s).map(function (x) { return x.t; }) : condParts(s))[+d.relax] || "") }; if (podH2) L.plan.relax.on = "hyp"; } delete L.planDraft; delete PD[pid];
       U.seed(s, "h");   // ابزارِ طرحی که به کار بردی از حافظه برمی‌گردد (نردبانِ همان تونل)
       S.put(pg); clearBad();
       A.toast(natOf(s, r) === "objective" ? "طرح ثبت شد؛ حالا گامِ اول — هر گام را وارسی کن: روشن می‌بینی که درست است؟ می‌توانی ثابت کنی؟" : "طرح ثبت شد؛ حالا گامِ واقعیِ بعد — با پیش‌بینی."); A.go("lprob", pid, "exec");
     } }, L.plan && L.plan.at ? "به‌روزکردنِ طرح" : "ثبتِ طرح"));
+    if (d.planMiss) pout.textContent = d.planMiss;
     box.appendChild(pout);
     return box;
   }
@@ -42890,6 +42901,10 @@ APP.goFromURL = function (q) {
   function sameQBoth(a, b) { var x = toks(a), y = toks(b); if (!x.length || !y.length) return false; var sh = x.filter(function (w) { return y.indexOf(w) >= 0; }).length; return sh / Math.max(x.length, y.length) > 0.5; }
   /* دورِ ۹ (E5 در برابرِ s28): تکهٔ عینیِ یک پرسشِ فهرست (پیامِ دستیار در «؟» شکسته شد: «برای به‌کار بردنش عنصرِ کمکی لازم است؟») همان پرسش است —
      نه پرسشی که فقط چند واژه با آن شریک است */
+  /* دورِ ۱۰ (J3، s05): پرسشِ صفحه و بازگفتنش در گفت‌وگو یک گزینه‌اند — بدنهٔ پرسش (بی برچسبِ «به مجهول نگاه کن:») در هر دو سو بیش از نیمِ واژه‌هایش
+     در دیگری است (A4 از هر دو سو؛ واژه با ریشه: «می‌فهمی» ⇄ «می‌فهمیدی») — پرسشی که فقط چند واژه با پرسشِ صفحه شریک است گزینهٔ خودش را دارد */
+  function qBody(t) { return String(t || "").replace(/^[^:：؟?«»\n]{2,40}[:：]\s*/, ""); }
+  function sameQPair(a, b) { var x = toks(qBody(a)), y = toks(qBody(b)); if (!x.length || !y.length) return false; return x.filter(function (w) { return hit(w, y); }).length / x.length > 0.5 && y.filter(function (w) { return hit(w, x); }).length / y.length > 0.5; }
   function fragOf(t, q) { var a = norm(t).replace(/[؟?]\s*$/, "").trim(); return a.length >= 8 && norm(q).indexOf(a) >= 0; }
   function sameQ(a, b) { var x = toks(a), y = toks(b); if (!x.length || !y.length) return false; var sh = x.filter(function (w) { return y.indexOf(w) >= 0; }).length; return sh / Math.min(x.length, y.length) > 0.5; }   // A4: «بیش از نیم» ِ واژه‌های پرسشِ کوتاه‌تر
   /* F2 (دورِ ۵): یک پرسش در هر نوبت، یک منبع — همین تابع پرسشِ بازِ کارتِ صفحه را هم تعیین می‌کند (pageQ) و پرسشِ نوبت را با این ترتیب (پولیا: اول
@@ -43022,6 +43037,7 @@ APP.goFromURL = function (q) {
     var act = ph === "u" || ph === "p" || ph === "c";
     /* (۱) کارِ همین نوبت */
     /* «…درسته؟» پس از یک مقدار حدس است، نه نتیجه (G1/G2 دورِ ۶، s02/s07/s09 — turn.guess از مربی) ⇒ «چطور می‌آزمایی‌اش؟» */
+    if (act && onlyAnsNow(r, s, T, tx)) pick(Q_ONLYANS, "turn-onlyans");
     if (act && T.guess) pick(Q_GUESST, "turn-guess");
     if (ph !== "done" && ph !== "b" && T.result) pick(resultQ(r, s), "turn-result");
     if ((ph === "c" || ph === "p") && (T.analogy || (tx && CARRY_RE.test(tx)))) pick(Q_ANALIM, "turn-analogy");
@@ -43090,6 +43106,18 @@ APP.goFromURL = function (q) {
     if (K && JSON.stringify([L.stk || null, L.ckHold || null]) !== R0) { try { S.put(pg); } catch (e) { } }
     return { ph: ph, Q: Q, q: q, src: src, pageQ: pageQ, card: card, cardWhy: SC[0] ? SC[0].why : pageQ ? "page" : "", rung: rung, ladderEnd: !!Q.length && !q, stuckN: stuckN };
   }
+  /* دورِ ۱۰ (J1، s38 p1): «فقط جواب رو بگو» بی تلاشِ دیدنی (نه در همین پیام، نه طرح/گامی در صفحه) ⇒ کارِ همین نوبت با بالاترین اولویت (پولیا: پیش از
+     نخستین سرنخ، تلاشِ خودش را بشنو) — opts.turn.onlyAns (بولی، از مربی) بر الگوی متنیِ همین‌جا مقدم است؛ امضای پیشین بی آن هم کار می‌کند */
+  var Q_ONLYANS = "پیش از هر سرنخ: خودت تا کجا رفتی و کجا ماندی؟";
+  var ONLY_ANS_L = /فقط\s*(?:جواب|پاسخ)|جواب(?:ش|شو)?\s*(?:رو|را)?\s*(?:فقط\s*)?بگو|جوابِ?\s*آخر(?:ش)?\s*(?:رو|را)?\s*بده|(?:تو|شما)\s*(?:خودت\s*|خودتون\s*)?که\s*(?:ماشینی|ماشین\s*هستی|هوش\s*مصنوعی|کامپیوتری)[^.؟?]{0,25}?بگو|خودت\s*بگو/;
+  var ATTEMPT_L = /(?:امتحان|سعی|حساب|جای\s*گذاری|فرض|رسم|ضرب|جمع|تقسیم)\s*کردم|رسیدم|به\s*دست\s*آوردم|نوشتم|کشیدم|شمردم|ساختم|تا\s*(?:این\s*جا|اینجا)|حدس(?:م|\s*می\s*زنم)|به\s*نظرم|فکر\s*(?:کنم|می\s*کنم|کردم)|راه(?:م|ِ?\s*من)\s|اول(?:ش)?\s+[^.؟?!\n]{2,40}\s(?:کردم|گرفتم|زدم)|[=＝]/;
+  function onlyAnsNow(r, s, T, tx) {
+    if (typeof T.onlyAns === "boolean") return T.onlyAns;
+    var own = norm(String(T.text || "").replace(/«[^»]*»|"[^"\n]*"|“[^”]*”/g, " "));
+    if (!ONLY_ANS_L.test(own) || ATTEMPT_L.test(own)) return false;
+    var L = live(s); return !(L.plan && L.plan.at) && !L.steps.length && !L.planDraft;
+  }
+  A.liveOnlyAns = function (t) { return ONLY_ANS_L.test(norm(String(t || ""))); };
   A.liveCoach = function (pid, opts) {
     var r = rec(pid); if (!r) return null; var pg = pgOf(pid), s = solOf(pg), C = coachCore(r, pg, s, opts), ph = C.ph;
     var ki = A.liveKindInfo(pid), aside = asideList(s);
@@ -43717,7 +43745,12 @@ APP.goFromURL = function (q) {
   }
   /* «کدام پرسش کمک کرد؟» فقط پرسش است (دورِ ۲، s37): جملهٔ دستیار وقتی پرسش است که به «؟» ختم شود و واژهٔ پرسشی داشته باشد (نه «آفرین، ادامه بده؟») */
   var QWORD = /(?:^|[\s«(])(?:چه|چی|چیه|چرا|کدام|کدوم|آیا|چطور|چطوری|چگونه|کجا|کجای|کی|چند|چقدر|می[‌\s]?توانی|می[‌\s]?تونی|میتونی|می[‌\s]?شود|میشه|می[‌\s]?شه|هست|داری|دیده‌ای|دیدی|بود|است|کرده‌ای|کردی|گرفتی|برده‌ای|بردی)(?=[\s؟?،]|$)/;
-  var HEADQ_RE = /(?:^|\s)(?:یا|آیا)\s|(?:^|\s)می\s*[ء-یپچژکگ]+ی(?=$|[\s،,؟?])|[؟?]|(?:^|\s)(?:چیست|چیه|کدام|کدوم|چطور|چطوری|چگونه|کجا|چرا|چند|چقدر)(?=$|[\s،,])/, TAILREF_RE = /^\s*(?:کدام|کدوم|کدامش|کدومش)\s*(?:را|رو)?\s|^\s*(?:آن|این|اون|همین)\s*(?:را|رو)\s|^\s*و\s*(?:آن|این|اون|اینم|اونم)(?:\s|$)/;   // R8 (I-live 9، s25/s29): سرِ پرسشیِ بی «؟» («مجهول دقیقاً چیست —») و دنبالهٔ «و آن از چه…» می‌مانند
+  var HEADQ_RE = /(?:^|\s)(?:یا|آیا)\s|(?:^|\s)می\s*[ء-یپچژکگ]+ی(?=$|[\s،,؟?])|[؟?]|(?:^|\s)(?:چیست|چیه|کدام|کدوم|چطور|چطوری|چگونه|کجا|چرا|چند|چقدر)(?=$|[\s،,])/, TAILREF_RE = /^\s*(?:کدام|کدوم|کدامش|کدومش)\s*(?:را|رو)?\s|^\s*(?:آن|این|اون|همین)\s*(?:را|رو)\s|^\s*و\s+\S|^\s*و(?:آن|این|اون|اینم|اونم)(?:\s|$)/;
+  /* دورِ ۱۰ (J3، s25 c16): سرِ پرسشیِ بی «؟» با فعلِ ماضیِ نقلیِ دوم‌شخص («حالتِ پایه را جدا وارسی کرده‌ای —») هم بخشی از پرسش است (پرسشِ آری/نه در فارسی
+     نشانه‌ای جز آهنگ ندارد)؛ فقط سرِ ستایشی («آفرین، … پیش رفته‌ای —») پیش‌درآمد می‌ماند. دنباله‌ای که با «و» آغاز می‌شود («— و در گامِ استقرا کجا…؟»)
+     هم‌پایهٔ سر است، نه پرسشی جدا — بی سرش نیمی از پرسش است. */
+  var HEADPERF_RE = /(?:^|\s)ن?(?:کرده|دیده|رفته|گرفته|داشته|نوشته|گذاشته|برده|آورده|رسیده|شنیده|یافته|سنجیده|آزموده|خوانده|زده|فهمیده|ساخته|شمرده|پرسیده|دانسته|توانسته|خواسته|بوده|شده|کشیده|گفته|اندیشیده|بسته|آزمایش\s*کرده)\s*ای(?=$|[\s،,؟?])/, PRAISE_HEAD = /^\s*(?:آفرین|عالی|احسنت|درسته|باشه|خوبه|دمت\s*گرم|بارک\s*الله)(?![آ-ی])/;
+  function headQ(h0) { return HEADQ_RE.test(h0) || (HEADPERF_RE.test(h0) && !PRAISE_HEAD.test(h0)); }   // R8 (I-live 9، s25/s29): سرِ پرسشیِ بی «؟» («مجهول دقیقاً چیست —») و دنبالهٔ «و آن از چه…» می‌مانند
   function chatQs(r) {
     var pid = r.p.id, o = [], s0 = solOf(pgOf(pid)), known = [];
     ["u", "p", "c", "b"].forEach(function (k) { try { phaseQs(r, s0, k).forEach(function (q) { if (known.indexOf(q) < 0) known.push(q); }); } catch (e) { } });
@@ -43731,7 +43764,7 @@ APP.goFromURL = function (q) {
         /* G5 (دورِ ۶، s23/s29): فقط پیش‌درآمدِ خبری بریده می‌شود — بخشِ پیش از «—» که خودش بخشی از پرسش است (فعلِ دوم‌شخص، «یا …»، «آیا»)، یا دنباله‌ای
            که بی آن بی‌مرجع است («کدام را اول…؟»)، می‌ماند */
         var tail = /\s[—–]\s([^—–]+[؟?])$/.exec(t), head0 = tail ? norm(t.slice(0, tail.index)) : "";
-        if (tail && QWORD.test(tail[1]) && txt(tail[1]).length >= 8 && !HEADQ_RE.test(head0) && !TAILREF_RE.test(norm(tail[1]))) t = txt(tail[1]);
+        if (tail && QWORD.test(tail[1]) && txt(tail[1]).length >= 8 && !headQ(head0) && !TAILREF_RE.test(norm(tail[1]))) t = txt(tail[1]);
         t = t.replace(/^(?:ولی|اما|خب|خوب|آفرین|عالی|باشه|درسته)[،,!.\s]+/, "");
         /* E5: تکهٔ یک پرسشِ شناخته‌شده («از آن چه به کار می‌آید؟») ⇒ همان پرسشِ کامل — H3 (دورِ ۷، s02): پرسشِ شناخته‌شدهٔ فهرست («همهٔ داده‌ها را به کار برده‌ای؟»)
            واژهٔ پرسشی نمی‌خواهد */
@@ -43984,7 +44017,7 @@ APP.goFromURL = function (q) {
       selF("lpBDefTo", "به کدام مرحله برمی‌گردی؟", BACK_TO, d.defTo || "", function (v) { d.defTo = v; })));
     /* «کدام پرسش کمک کرد؟» فقط پرسش‌ها (پرسش‌های طرح که پاسخشان دادی + پرسش‌های واقعیِ دستیار)؛ ابزارها جدا */
     /* E5 (دورِ ۴، s23/s29): «کدام پرسش کمک کرد؟» همیشه هست — پرسش‌هایی که در صفحه پاسخ دادی (کارتِ فهم، پرسش‌های طرح) و پرسش‌های دستیار، هر کدام کامل */
-    var Qs = pageQs(r, s, pg), Cs = cardsUsed(r, s), Ch = chatQs(r).filter(function (q) { return Qs.indexOf(q) < 0; });
+    var Qs = pageQs(r, s, pg), Cs = cardsUsed(r, s), Ch = chatQs(r).filter(function (q) { return Qs.indexOf(q) < 0 && !Qs.some(function (Q) { return sameQPair(q, Q); }); });
     var bestOpts = Qs.map(function (q, i) { return [String(i), q]; }).concat(Ch.map(function (q, i) { return ["chat:" + i, "💬 " + q]; }));   // A13: کلِ پرسش، نه تکهٔ آغازش
     if (!defect && bestOpts.length) box.appendChild(selF("lpBBest", "کدام پرسش بیشتر از همه کمک کرد؟ (پرسش‌هایی که در صفحه پاسخ دادی، و پرسش‌های دستیار در گفت‌وگوی همین مسئله)", bestOpts.concat([["none", "هیچ‌کدام"]]), d.best, function (v) { d.best = v; }));
     if (!defect && Cs.length) box.appendChild(selF("lpBTool", "و کدام ابزار؟ (اختیاری)", Cs.map(function (c) { return [c[0], "🧰 " + c[1]]; }).concat([["none", "هیچ‌کدام"]]), d.tool || "", function (v) { d.tool = v; }));
@@ -44352,31 +44385,36 @@ APP.goFromURL = function (q) {
       if (refD && refD !== A.today()) refFirst = false;
       var pv = provOf(ph === "u" ? "u" : ph === "p" ? "p" : ph === "c" ? (nat === "objective" ? "cobj" : "c") : "b", proofLike(r, so)), rt = ph === "p" && Q.length ? roteState(pg, so, Q) : null;
       var cu = condUsed(so).filter(function (x) { return !x.used; });
+      /* دورِ ۱۰ (J1، سویِ بلوکِ زنده): یک پرسش در هر بلوک — پرسشِ نوبت یا پرسشِ «داور؟» (D4؛ مگر کارِ همین نوبت پرسشِ نوبت باشد) است یا سطرِ «فقط یک پرسش»؛
+         هر سطرِ دیگرِ همین بلوک که پرسشی پیشنهاد می‌کند (عملی، مکانیکی، ردِ حدس، شرطِ متناقض، پیش‌فرض، ضرب‌المثل، نگاشت) «زمینه (نه پرسشِ دوم)» است و «بپرس» ندارد */
+      var kindTurn = !ki.set && !/^turn-/.test(String(co.src || "")), qTurn = !!(Q.length && qNow) && !kindTurn, TQ = kindTurn || qTurn, CTX = "- زمینه (نه پرسشِ دوم): ";
       return ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + phName(ph, r, so) + " · داور: " + (ki.set ? NAT[nat].fa.split(" — ")[0] : "هنوز انتخاب نشده") + (ki.type !== "find" ? " · نوع: " + (nat !== "objective" ? "فرضیه — درست یا نادرست؟ (داور واقعیت است، نه برهان)" : ki.type === "prove" ? "اثباتی" : "اثبات یا رد کن") : "") + (ki.spatial ? " · فضایی" : "") + " · وضع: " + cl.label,
         /* D4: داورِ انتخاب‌نشده ⇒ قابِ خنثی (اول نوع را بپرس)، نه قابِ «زندگی — هیچ‌کس نمی‌داند» */
-        !ki.set ? "- داورِ این مسئله هنوز انتخاب نشده: پیش از هر پرسشِ دیگر بپرس پاسخش عینی است (ریاضی، اثبات، معما)، مسئلهٔ عملی با کمیت است (خرید، ساخت، پول، زمانِ خودش)، یا تصمیم/پرسشِ زندگی — قابِ همهٔ پرسش‌های بعد از همین می‌آید. تا آن وقت نه حلش کن، نه دربارهٔ درستیِ چیزی داوری کن؛ فیلدهای صفحه را پر نکن (data-own)."
+        !ki.set && !kindTurn ? CTX + "داورِ این مسئله هنوز انتخاب نشده: پس از پرسشِ این نوبت، نوعش را روشن کن — پاسخش عینی است (ریاضی، اثبات، معما)، مسئلهٔ عملی با کمیت است، یا تصمیم/پرسشِ زندگی. تا آن وقت نه حلش کن، نه دربارهٔ درستیِ چیزی داوری کن؛ فیلدهای صفحه را پر نکن (data-own)."
+          : !ki.set ? "- داورِ این مسئله هنوز انتخاب نشده: پیش از هر پرسشِ دیگر بپرس پاسخش عینی است (ریاضی، اثبات، معما)، مسئلهٔ عملی با کمیت است (خرید، ساخت، پول، زمانِ خودش)، یا تصمیم/پرسشِ زندگی — قابِ همهٔ پرسش‌های بعد از همین می‌آید. تا آن وقت نه حلش کن، نه دربارهٔ درستیِ چیزی داوری کن؛ فیلدهای صفحه را پر نکن (data-own)."
           : nat === "objective" ? "- این مسئله پاسخِ عینی دارد (ریاضی، اثبات، معما) ولی کاربر هنوز حلش نکرده: پاسخ یا راه را لو نده و گامی را جای او برندار. هر گامش را با «روشن می‌بینی که این گام درست است؟ می‌توانی ثابت کنی؟» بسنجد؛ اگر گامی نادرست است، با پرسشی که او را به دیدنش برساند کمک کن، نه با گفتنِ جواب. فیلدهای صفحه را پر نکن (data-own)."
           : "- پاسخِ این مسئله را هیچ‌کس نمی‌داند — نه تو نه صفحه. حلش نکن، تصمیم را جای او نگیر، و دربارهٔ درستیِ گام‌ها یا تصمیمش داوری نکن (داور واقعیت و داوریِ خودِ اوست). فیلدهای صفحه را پر نکن (data-own).",
-        nat === "practical" ? "- مسئلهٔ عملی: داده‌ها بی‌شمار و نادقیق‌اند — بپرس کدام داده‌ها اثرِ محسوس دارند، کجا خط می‌کشد و کدام تقریب بس است؛ داده‌ای که با دلیل کنار گذاشته شده رسیدگی‌شده است." : "",
+        nat === "practical" ? (TQ ? CTX + "مسئلهٔ عملی: داده‌ها بی‌شمار و نادقیق‌اند — آنچه به کار می‌آید: کدام داده‌ها اثرِ محسوس دارند، کجا خط می‌کشد و کدام تقریب بس است (هر کدام پرسشِ نوبتی دیگر)؛ داده‌ای که با دلیل کنار گذاشته شده رسیدگی‌شده است." : "- مسئلهٔ عملی: داده‌ها بی‌شمار و نادقیق‌اند — بپرس کدام داده‌ها اثرِ محسوس دارند، کجا خط می‌کشد و کدام تقریب بس است؛ داده‌ای که با دلیل کنار گذاشته شده رسیدگی‌شده است.") : "",
         r.coach ? "- کاربر مربیِ «" + clip(r.coach.who, 30) + "» است، نه حل‌کننده: پرسش‌هایی برای پرسیدن از یادگیرنده پیشنهاد کن (کلی ⇐ خاص)، هرگز پاسخ؛ یک پرسش یا یک ایده در هر پیام." : "",
-        rt ? "- کاربر پرسش‌ها را مکانیکی پاسخ داده (" + rt.why + "): بگو «پرسش‌ها را مکانیکی نخوان» و بپرس کدام پرسش واقعاً با وضعِ همین لحظه می‌خواند." : "",
-        Q.length && qNow ? "- در این نوبت فقط **یک** پرسش، از همین فهرست و از کلی به خاص (پلهٔ " + fa((co.rung || 0) + 1) + " از " + fa(Q.length) + "؛ پرسش‌هایی که پرسیده یا پاسخ گرفته‌ای دوباره نه)؛ پرسشِ پیشنهادیِ این نوبت: «" + qNow + "». اگر با وضعِ همین لحظه نمی‌خواند، پرسشِ بعدیِ همین فهرست." : "",
+        rt ? (TQ ? CTX + "کاربر پرسش‌ها را مکانیکی پاسخ داده (" + rt.why + "): «پرسش‌ها را مکانیکی نخوان» را یادآوری کن — پرسشِ این نوبت همان یکی است که با وضعِ همین لحظه می‌خواند." : "- کاربر پرسش‌ها را مکانیکی پاسخ داده (" + rt.why + "): بگو «پرسش‌ها را مکانیکی نخوان» و بپرس کدام پرسش واقعاً با وضعِ همین لحظه می‌خواند.") : "",
+        Q.length && qNow && kindTurn ? CTX + "پرسشِ بعد از روشن شدنِ داور، از همین فهرست (پلهٔ " + fa((co.rung || 0) + 1) + " از " + fa(Q.length) + "): «" + qNow + "» — نه در همین نوبت." : "",
+        qTurn ? "- در این نوبت فقط **یک** پرسش، از همین فهرست و از کلی به خاص (پلهٔ " + fa((co.rung || 0) + 1) + " از " + fa(Q.length) + "؛ پرسش‌هایی که پرسیده یا پاسخ گرفته‌ای دوباره نه)؛ پرسشِ پیشنهادیِ این نوبت: «" + qNow + "». اگر با وضعِ همین لحظه نمی‌خواند، پرسشِ بعدیِ همین فهرست." : "",
         Q.length && co.ladderEnd ? "- نردبانِ پرسش‌های این مرحله تمام شد: اگر نردبان تمام شد: ایدهٔ کلیدی را جدا کن و فقط گامِ بعد را بگو، سپس «کتاب را ببند و خودت دوباره حل کن»." : "",
-        refT && refFirst ? "- حدسی که خودش با آزمون رد کرد: «" + clip(refT, 100) + "» — آن را دوباره پیشنهاد نکن؛ بپرس از ردش چه آموخت و کدام فرضِ پنهان شکست." : "",
+        refT && refFirst ? (TQ ? CTX + "حدسی که خودش با آزمون رد کرد: «" + clip(refT, 100) + "» — آن را دوباره پیشنهاد نکن؛ «از ردش چه آموخت و کدام فرضِ پنهان شکست؟» برای پس از پرسشِ این نوبت است، اگر خودش به آن نرسید." : "- حدسی که خودش با آزمون رد کرد: «" + clip(refT, 100) + "» — آن را دوباره پیشنهاد نکن؛ بپرس از ردش چه آموخت و کدام فرضِ پنهان شکست.") : "",
         /* E3/E8 (دورِ ۴، s11/s25): فهرست کامل و هر پرسش کامل — پرسشِ پیشنهادیِ هشتم یا پرسشِ بلندِ استقرا دیگر بریده نمی‌شود */
         Q.length > 1 ? "- پرسش‌های همین مرحله (برای همین نوعِ مسئله): " + Q.map(function (x) { return "«" + x + "»"; }).join(" · ") : "",
         pv ? "- حکمتِ ضرب‌المثل‌ها برای همین مرحله (فقط اگر به کار آمد، همراهِ پرسشی که پشتیبانی می‌کند؛ قاعدهٔ قطعی نیست): «" + pv.t + "» ⇐ «" + pv.q + "»" : "",
         /* E3 (دورِ ۴، s30/s33/s35): «همهٔ داده‌ها؟» پس از وجودِ طرح یا وقتی کاربر گیر کرده — نه در آغازِ طرح‌ریزی که هر داده‌ای هنوز «به‌کارنرفته» است */
         un.length && (ph === "c" || ph === "b" || (ph === "p" && stuckNow)) ? "- داده‌هایی که هنوز در کارِ حل نیامده‌اند (اگر به کار آمد، یکی را با نامش بپرس: «از … استفاده کردی؟»؛ نام بردنش در گفت‌وگو به کار بردن نیست): " + un.map(function (d) { return "«" + clip(d.t, 50) + "»"; }).join("، ") : "",
         cu.length && (ph === "c" || ph === "b") && nat === "objective" ? "- بخش‌هایی از شرط که هنوز در هیچ گامی نیامده‌اند: " + cu.map(function (x) { return "«" + clip(x.t, 50) + "»"; }).join("، ") : "",
-        (suffNow(so) === "متناقض است" || u0.sat === "no") && ph === "p" ? "- کاربر گفته شرط متناقض است یا برآوردنی نیست: بپرس کدام بخشِ شرط را شل کند (فقط بخشی از شرط را نگه دار) — یا ثابت کند که برآوردنِ هم‌زمانِ بخش‌ها ناممکن است." : "",
+        (suffNow(so) === "متناقض است" || u0.sat === "no") && ph === "p" ? (TQ ? CTX + "کاربر گفته شرط متناقض است یا برآوردنی نیست: راهِ پیشِ رو شل کردنِ یک بخشِ شرط است (فقط بخشی از شرط را نگه دار) — یا اثباتِ این‌که برآوردنِ هم‌زمانِ بخش‌ها ناممکن است." : "- کاربر گفته شرط متناقض است یا برآوردنی نیست: بپرس کدام بخشِ شرط را شل کند (فقط بخشی از شرط را نگه دار) — یا ثابت کند که برآوردنِ هم‌زمانِ بخش‌ها ناممکن است.") : "",
         cl.state === "incomplete" ? "- بازنگری ایراد یافت و مسئله ناتمام است (" + cl.label + "): «حل شد» نگو و جشن نگیر؛ کمک کن همان ایراد را خودش درست کند." : cl.gate.length ? "- پیش از «حل شد» باز مانده: " + cl.gate.map(function (x) { return (x.k === "aux" ? "پلِ برگشت از مسئلهٔ کمکیِ «" : "گامِ شهودیِ ثابت‌نشدهٔ «") + clip(x.t, 50) + "»"; }).join("، ") + " — مسئلهٔ کمکی حل شد ≠ مسئلهٔ اصلی حل شد." : "",
         o ? "- گامِ واقعیِ باز: «" + clip(o.text, 80) + "» · پیش‌بینی‌اش «" + clip(o.pred, 80) + "» · وارسی " + o.due + " — نتیجه را خودش در صفحه ثبت می‌کند." : "",
         /* G2 (دورِ ۶، s21): یک پرسش در هر بلوک — دادهٔ کنارگذاشته وقتی گیر است خودش پرسشِ نوبت است (stuck-aside)؛ وگرنه فقط زمینه، نه پرسشِ دوم */
         stuckNow && (co.aside || []).length && !/aside/.test(co.src || "") ? "- زمینه (نه پرسشِ دوم): کاربر داده‌ای را پیش‌تر کنار گذاشته بود: " + co.aside.map(function (x) { return "«" + clip(x.t, 50) + "» (دلیلش: «" + clip(x.why, 50) + "»)"; }).join("، ") + " — اگر پرسشِ این نوبت راه نبرد، همین داده نامزدِ بعدی است." : "",
-        r.origin && r.origin.type === "lprob" && txt(r.origin.map) ? "- این مسئله با نگاشتِ هم‌ریختیِ خودِ کاربر از مسئلهٔ «" + clip((rec(r.origin.id) || { p: { title: "" } }).p.title, 40) + "» ساخته شد: «" + clip(r.origin.map, 160) + "» — زمینه (نه پرسشِ دوم): وقتی به گام رسید، هر گام از راهِ همین نگاشت به کدام گامِ حلِ آن برمی‌گردد." : "",
-        u0.presup && txt(u0.suffCirc) && (ph === "c" || ph === "b") ? "- پیش‌فرضی که کاربر نگه داشت تا بیازماید: «" + clip(u0.suffCirc, 100) + "» — اگر نتیجه‌ای با آن نخواند، همین را بپرس." : "",
-        provM ? "- کاربر ضرب‌المثلِ خودش را آورد («" + clip(provM[0], 80) + "»): " + PROV_LIMIT + " — بپرس در همین موقعیت درست است یا ضدش، و کدام داده آن را می‌گوید؛ نه تأییدش کن نه ردش." : "",
+        r.origin && r.origin.type === "lprob" && txt(r.origin.map) ? CTX + "این مسئله با نگاشتِ هم‌ریختیِ خودِ کاربر از مسئلهٔ «" + clip((rec(r.origin.id) || { p: { title: "" } }).p.title, 40) + "» ساخته شد: «" + clip(r.origin.map, 160) + "» — وقتی به گام رسید، هر گام از راهِ همین نگاشت به کدام گامِ حلِ آن برمی‌گردد." : "",
+        u0.presup && txt(u0.suffCirc) && (ph === "c" || ph === "b") ? (TQ ? CTX + "پیش‌فرضی که کاربر نگه داشت تا بیازماید: «" + clip(u0.suffCirc, 100) + "» — اگر نتیجه‌ای با آن نخواند، همین نامزدِ پرسشِ نوبتِ بعد است." : "- پیش‌فرضی که کاربر نگه داشت تا بیازماید: «" + clip(u0.suffCirc, 100) + "» — اگر نتیجه‌ای با آن نخواند، همین را بپرس.") : "",
+        provM ? (TQ ? CTX + "کاربر ضرب‌المثلِ خودش را آورد («" + clip(provM[0], 80) + "»): " + PROV_LIMIT + " — نه تأییدش کن نه ردش؛ «در همین موقعیت درست است یا ضدش، و کدام داده آن را می‌گوید؟» برای پس از پرسشِ این نوبت است." : "- کاربر ضرب‌المثلِ خودش را آورد («" + clip(provM[0], 80) + "»): " + PROV_LIMIT + " — بپرس در همین موقعیت درست است یا ضدش، و کدام داده آن را می‌گوید؛ نه تأییدش کن نه ردش.") : "",
         bookL ? "- از کتاب برای همین مرحله (فقط اگر به کار آمد): " + bookL : "",
         bp === pid ? "- این گفت‌وگو به همین مسئله بسته است؛ اگر کاربر مسئلهٔ تازهٔ دیگری آورد، اول بپرس می‌خواهد این را کنار بگذارد یا آن را جدا بسازد." : ""].filter(Boolean).join("\n");
     });
