@@ -1571,8 +1571,14 @@
   }
   AS.sessLink = sessLink;
   function nrmSt(t) { return String(t || "").replace(/[ً-ٰٟ‌\s«»"'.,،:؛!?؟()\-]+/g, ""); }
+  /* E7 (دورِ ۴، s31): «دادهٔ عوض‌شده مسئلهٔ تازه است» (پولیا) — عددِ داده (نه عددِ درونِ فرمول مثلِ «۱/(1·2·3)») که در هر دو سو عددی دارد که دیگری ندارد */
+  var FORM_ADJ = /[()\/·*^+\-−=×÷<>≤≥a-zA-Z]/;
+  function dataNums(t) { t = faDigits(String(t || "")).replace(/٫/g, "."); var out = [], re = /\d+(?:\.\d+)?/g, m; while ((m = re.exec(t))) { var b0 = t.charAt(m.index - 1), a0 = t.charAt(m.index + m[0].length); if ((b0 && FORM_ADJ.test(b0)) || (a0 && FORM_ADJ.test(a0))) continue; out.push(m[0]); } return out; }
+  function numConflict(a, b) { var A0 = dataNums(a), B0 = dataNums(b); return A0.some(function (x) { return B0.indexOf(x) < 0; }) && B0.some(function (x) { return A0.indexOf(x) < 0; }); }
+  AS.numConflict = numConflict;
   function sameProblem(r, st, ti) {
-    if (!r || !r.p) return false; var a = nrmSt(st), b0 = nrmSt(r.p.statement);
+    if (!r || !r.p) return false; if (numConflict(st, r.p.statement)) return false;
+    var a = nrmSt(st), b0 = nrmSt(r.p.statement);
     if (a && b0 && (a === b0 || (a.length >= 12 && b0.indexOf(a) >= 0) || (b0.length >= 12 && a.indexOf(b0) >= 0))) return true;
     var ta = qToks(st), tb = qToks(r.p.statement); if (ta.length >= 3 && tb.length >= 3) { var n = ta.filter(function (w) { return tb.indexOf(w) >= 0; }).length; if (n * 5 >= Math.max(ta.length, tb.length) * 4) return true; }
     return !!ti && nrmSt(ti) === nrmSt(r.p.title) && nrmSt(ti).length >= 6;
@@ -1617,6 +1623,12 @@
     if (g) return g; var c = s && s.coach && s.coach.cls; if (!c) try { c = qClass("", st); } catch (e) { }
     return c === "prove" || c === "obj" ? "objective" : "";
   }
+  /* فرمولِ مشترک (همان شیءِ ریاضی: «۱/(1·2·3) + …» در هر دو) — بی فاصله و با رقمِ لاتین؛ فرمول باید عملگر و رقم داشته باشد */
+  function formulas(t) { return (faDigits(String(t || "")).replace(/…|\.\.\./g, "~").match(/[0-9a-zA-Z()\/·*^+\-−=×÷~ ]{3,}/g) || []).map(function (x) { return x.replace(/\s+/g, "").replace(/~/g, "").replace(/^[+\-−·*×÷=]+|[+\-−·*×÷=]+$/g, ""); }).filter(function (x) { return /[\/·*^+\-−=×÷]/.test(x) && /\d/.test(x) && /[()\/·*^+\-−=×÷]\d|\d[()\/·*^+\-−=×÷]/.test(x); }); }
+  function sameFormula(a, b) { var A0 = formulas(a), B0 = formulas(b); return A0.some(function (x) { return B0.some(function (y) { return x.indexOf(y) >= 0 || y.indexOf(x) >= 0; }); }); }
+  function nTok(t) { return tokN(t).map(function (w) { return /^می(?:شه|شود|شد)$/.test(w) ? "میشود" : w; }); }
+  function paraphraseOf(t, x) { var a0 = nTok(t), b0 = nTok(x.p.title + " " + x.p.statement + " " + ((x.p.restated || []).join(" "))), uniq = a0.filter(function (w, i) { return a0.indexOf(w) === i; });
+    if (uniq.length < 2) return false; var n = uniq.filter(function (w) { return b0.indexOf(w) >= 0; }).length; return n >= 2 && n * 2 > uniq.length; }
   AS.DO.chat_invent = function (a) {
     var s = AS._turnSession; if (!A.liveCreate) return "این نسخه «🔭 مسئلهٔ حل‌نشدهٔ خودم» را ندارد";
     var st = clip(a && a.statement, 1500); if (st.length < 10) return "ثبت نشد: «statement» (مسئلهٔ تازه به حرفِ خودِ کاربر) لازم است";
@@ -1626,7 +1638,14 @@
     /* B13 (s25): مسئلهٔ تازهٔ بازنگری (فرزندِ همان پدر) و chat_invent ِ همان حدس دو مسئله نمی‌شوند — هم‌خانواده (فرزندِ همان پدر یا ساختهٔ همین سشن) با عنوانِ
        نزدیک‌به‌رونوشت یا سه‌پنجمِ واژه‌های صورت ⇒ همان مسئله؛ صورتِ تازه کنارش می‌ماند (r.p.restated)، نه مسئلهٔ دوم */
     var kin = A.liveAll ? A.liveAll().filter(function (x) { return x && x.p && ((from.type === "lprob" && x.origin && x.origin.id === from.id) || (s && (x.sess === s.id || (s.invented || []).indexOf(x.p.id) >= 0))); }) : [];
-    var ti0 = clip((a && a.title) || st, 80), twin = kin.filter(function (x) { var t1 = nrmSt(ti0), t2 = nrmSt(x.p.title); return (t1.length >= 6 && t2.length >= 6 && (t1 === t2 || t1.indexOf(t2) >= 0 || t2.indexOf(t1) >= 0)) || sameStmt(st, x.p.statement); })[0];
+    /* E7 (دورِ ۴، s11، s25، s31): هم‌خانواده‌ای که دادهٔ دیگری دارد («جمعِ ۱۰۰۰» در برابرِ «جمعِ ۱۰») مسئلهٔ تازه است؛ بازگفتِ فرزندِ بازنگری (همان پدر،
+       بی دادهٔ ناسازگار) با بیش از نیمِ واژه‌های معنادارِ عنوان یا صورتِ تازه در آن (A4 > ½؛ دست‌کم دو واژه)، یا با همان فرمول («۱/(1·2·3) + …»)، همان مسئله است */
+    var ti0 = clip((a && a.title) || st, 80), twin = kin.filter(function (x) {
+      if (from.type === "lprob" && x.p.id === from.id) return false;   // خودِ پدر هرگز «همان مسئلهٔ تازه» نیست
+      if (numConflict(ti0 + " " + st, x.p.title + " " + x.p.statement)) return false;
+      var t1 = nrmSt(ti0), t2 = nrmSt(x.p.title), sib = from.type === "lprob" && x.origin && x.origin.id === from.id;
+      return (t1.length >= 6 && t2.length >= 6 && (t1 === t2 || t1.indexOf(t2) >= 0 || t2.indexOf(t1) >= 0)) || sameStmt(st, x.p.statement) ||
+        (sib && (paraphraseOf(ti0, x) || paraphraseOf(st, x) || sameFormula(ti0 + " " + st, x.p.title + " " + x.p.statement))); })[0];   // بازگفت فقط برای فرزندِ همان پدر
     if (twin) { var rs = twin.p.restated = (twin.p.restated || []); if (rs.indexOf(st) < 0 && nrmSt(st) !== nrmSt(twin.p.statement)) { rs.push(st); if (rs.length > 5) twin.p.restated = rs.slice(-5); S.put(twin); }
       return "✓ همین مسئلهٔ تازه پیش‌تر ثبت شده بود («" + clip(twin.p.title, 60) + "»)؛ دوباره نساختم — صورتِ تازه‌ات کنارش ماند."; }
     var LAD = (A.solveUI && A.solveUI.LADDER) || [1, 3, 7, 21, 60], due = A.addDays(A.today(), LAD[1]);

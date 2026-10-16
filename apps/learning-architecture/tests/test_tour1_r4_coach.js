@@ -178,6 +178,31 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(!info.e6.bad.length && !info.e6.one.length, 'E6: no territory from single words or non-distinctive shared words (the round-4 noisy pairs) ' + JSON.stringify(info.e6));
   chk(info.e6.pos.coll && info.e6.pos.neg && info.e6.pos.ret && info.e6.link, 'E6: a full multi-word area name, two distinctive shared words, or an explicit link still bring the area ' + JSON.stringify(info.e6));
 
+  // ---------- E7) chat_invent: دادهٔ دیگر = مسئلهٔ دیگر (s31)؛ بازگفتِ فرزندِ بازنگری = همان مسئله (s11، s25) ----------
+  const nLive = () => p.evaluate(() => APP.liveAll().length);
+  const act = (o) => p.evaluate(o => __q.push(R(o)), o);
+  await newSess();
+  { const n0 = await nLive();
+    await act({ reply: 'هر دو را نگه داشتم.', actions: [{ do: 'chat_invent', title: 'صحیح‌های متمایز با جمعِ ۱۰', statement: 'بیشترین حاصل‌ضربِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰ چیست؟', nat: 'objective' }, { do: 'chat_invent', title: 'صحیح‌های متمایز با جمعِ ۱۰۰۰', statement: 'بیشترین حاصل‌ضربِ صحیح‌های مثبتِ متمایز با جمعِ ۱۰۰۰ چیست؟', nat: 'objective' }] });
+    await say('دو تا مسئله ساختم: یکی با جمعِ ۱۰ و یکی سخت‌ترش با جمعِ ۱۰۰۰');
+    info.e7 = { s31: (await nLive()) - n0 }; }
+  await newSess();
+  await act({ reply: 'ثبت شد.', actions: [{ do: 'chat_solved', title: 'پوشش با دومینو', statement: 'صفحهٔ شطرنجِ ۸×۸ که دو گوشهٔ مقابلش برداشته شده را می‌شود با دومینو پوشاند؟', kind: 'pod', lesson: 'رنگ‌آمیزی نشان داد دو گوشهٔ هم‌رنگ برداشته شده', check: 'شمردم: ۳۲ سفید و ۳۰ سیاه', newProb: 'کدام دو خانه را از صفحهٔ ۱۰×۱۰ بردارم که پوشش با دومینو ممکن شود؟' }] });
+  await say('حلش کردم: رنگ‌آمیزی نشان داد دو گوشهٔ هم‌رنگ برداشته شده؛ شمردم: ۳۲ سفید و ۳۰ سیاه');
+  { const par = await p.evaluate(() => APP.ASSIST.cur().lprob), n0 = await nLive();
+    await act({ reply: 'نگهش داشتم.', actions: [{ do: 'chat_invent', statement: 'کدوم دو خونه رو بردارم که بشه پوشوند؟ فکر کنم هر دو خونه‌ای که رنگشون فرق داره کافیه.', title: 'کدام دو خانه را بردارم که پوشش ممکن شود', from: par, nat: 'objective' }] });
+    await say('کدوم دو خونه رو بردارم که بشه پوشوند؟ فکر کنم هر دو خونه‌ای که رنگشون فرق داره کافیه.');
+    info.e7.s11 = (await nLive()) - n0; }
+  await newSess();
+  await act({ reply: 'ثبت شد.', actions: [{ do: 'chat_solved', title: 'جمعِ تلسکوپیِ دوتایی', statement: 'جمعِ ۱/(1·2) + ۱/(2·3) + … تا n جمله را پیدا کن', kind: 'find', lesson: 'هر جمله را به تفاضلِ دو کسر شکستم', check: 'برای n = ۳ حساب کردم', newProb: 'جمعِ ۱/(1·2·3) + … تا n جمله چند می‌شود؟' }] });
+  await say('حلش کردم: هر جمله را به تفاضلِ دو کسر شکستم؛ برای n = ۳ حساب کردم');
+  { const par = await p.evaluate(() => APP.ASSIST.cur().lprob), n0 = await nLive();
+    await act({ reply: 'نگهش داشتم.', actions: [{ do: 'chat_invent', statement: 'خودم الگوی ۱/(1·2·3) + ۱/(2·3·4) + … رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)). سه تاشو چک کردم.', title: 'جمعِ ۱/(k(k+1)(k+2))', from: par }] });
+    await say('خودم الگوی ۱/(1·2·3) + ۱/(2·3·4) + … رو ساختم. حدسم اینه که میشه ۱/۴ − ۱/(2(n+1)(n+2)). سه تاشو چک کردم.');
+    info.e7.s25 = (await nLive()) - n0; }
+  chk(info.e7.s31 === 2, 'E7: «… جمعِ ۱۰۰۰» is a different problem from «… جمعِ ۱۰» (changed data) — two records (s31) ' + JSON.stringify(info.e7));
+  chk(info.e7.s11 === 0 && info.e7.s25 === 0, 'E7: a paraphrase of the look-back child (same parent, no conflicting data; shared words or the same formula) updates it instead of a second record (s11, s25) ' + JSON.stringify(info.e7));
+
   info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);
   chk(info.sys2 <= 20000, 'SYS ≤ 20000 at the end: ' + info.sys2);
   console.log(JSON.stringify(info).slice(0, 8000));
