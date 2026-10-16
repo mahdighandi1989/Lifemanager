@@ -37,7 +37,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('.as-panel .as-in', text); await p.click('.as-panel .as-send');
     await p.waitForFunction(() => !APP.ASSIST.busy(), null, { timeout: 15000 });
   };
-  const newSess = () => p.evaluate(() => { localStorage.removeItem('lla.assist.cur'); const s = APP.ASSIST.newSession(); __calls.length = 0; __q.length = 0; return s.id; });
+  // دورِ ۱۰ (J4): live_new ِ گفت‌وگو اکنون به صفحهٔ مسئله می‌رود — سشنِ تازهٔ آزمون از جایی شروع می‌شود که کاربرِ تازه است (نه صفحهٔ مسئلهٔ سشنِ پیشین)
+  const newSess = () => p.evaluate(() => { if (APP.state.view === 'lprob') APP.go('home'); localStorage.removeItem('lla.assist.cur'); const s = APP.ASSIST.newSession(); __calls.length = 0; __q.length = 0; return s.id; });
   const lastUser = () => p.evaluate(() => (__calls[__calls.length - 1] || {}).user || '');
   const block = (u, head) => { const i = u.indexOf(head); if (i < 0) return ''; const j = u.indexOf('\n# ', i + 5); return u.slice(i, j < 0 ? u.length : j); };
   const coachOf = (u) => block(u, '# مربیِ حل');

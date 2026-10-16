@@ -156,9 +156,13 @@
     function match(blob, terr) { var seen = {}; toks(blob).forEach(function (w) { if (qs[w] && distinctFor(w, terr)) seen[w] = 1; }); return Object.keys(seen); }
     var out = [];
     function consider(a, rest) {
-      var terr = rest.epi ? "epi" : terrOf(rest.sys), words = match(areaBlob(a, rest.epi), terr), tw = match(a.fa + " " + (a.en || ""), terr);
+      /* دورِ ۱۰ (J4، s18): نامِ جایگزینِ درونِ پرانتز («(معقولات اولی و ثانیه)») خودش «نامِ» حوزه نیست — واژه‌ای از آن («ثانیه» ِ زمان) به‌تنهایی شاهدِ نام
+         نمی‌شود؛ شاهدِ نام از نامِ اصلی (بیرونِ پرانتز) یا انگلیسی است، و نامِ جایگزین فقط وقتی کاملِ کامل در پیام آمد پیوندِ صریح است (مثلِ نامِ اصلی) */
+      var mainFa = String(a.fa || "").replace(/\([^)]*\)/g, " "), altFa = (String(a.fa || "").match(/\(([^)]*)\)/g) || []).map(function (x) { return x.slice(1, -1); });
+      var terr = rest.epi ? "epi" : terrOf(rest.sys), words = match(areaBlob(a, rest.epi), terr), tw = match(mainFa + " " + (a.en || ""), terr);
       /* نامِ کاملِ چندواژه‌ایِ حوزه در پیام («استدلالِ جمعی») پیوندِ صریح است؛ نامِ تک‌واژه‌ای («رشد») نه — همان قاعدهٔ «تک‌واژه هرگز» */
-      var ft = toks(a.fa), named = ft.length >= SYS.relatedMin && ft.every(function (w) { return allq[w]; });
+      var fullIn = function (nm) { var ft0 = toks(nm); return ft0.length >= SYS.relatedMin && ft0.every(function (w) { return allq[w]; }) ? ft0 : null; };
+      var ft = fullIn(mainFa) || altFa.map(fullIn).filter(Boolean)[0] || [], named = ft.length > 0;
       if (named) ft.forEach(function (w) { if (words.indexOf(w) < 0) words.push(w); });
       /* دست‌کم دو واژهٔ متمایزِ متفاوت، و یکی‌شان از **نامِ** خودِ حوزه (آنچه حوزه را تعریف می‌کند)؛ دو واژهٔ هم‌زمان در توضیح/گزاره‌ها («گزارش/ثبت» ⇐ هیجانِ مثبت) ربط نیست */
       if (!named && (words.length < SYS.relatedMin || !tw.length)) return;
