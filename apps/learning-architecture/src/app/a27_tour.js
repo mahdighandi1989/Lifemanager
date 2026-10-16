@@ -1661,7 +1661,7 @@
       var t1 = nrmSt(ti0), t2 = nrmSt(x.p.title), sib = from.type === "lprob" && x.origin && x.origin.id === from.id;
       return (t1.length >= 6 && t2.length >= 6 && (t1 === t2 || t1.indexOf(t2) >= 0 || t2.indexOf(t1) >= 0)) || sameStmt(st, x.p.statement) ||
         (sib && (paraphraseOf(ti0, x) || paraphraseOf(st, x) || sameFormula(ti0 + " " + st, x.p.title + " " + x.p.statement))); })[0];   // بازگفت فقط برای فرزندِ همان پدر
-    if (twin) { var rs = twin.p.restated = (twin.p.restated || []); if (rs.indexOf(st) < 0 && nrmSt(st) !== nrmSt(twin.p.statement)) { rs.push(st); if (rs.length > 5) twin.p.restated = rs.slice(-5); S.put(twin); }
+    if (twin) { var rs = twin.p.restated = (twin.p.restated || []); if (rs.indexOf(st) < 0 && nrmSt(st) !== nrmSt(twin.p.statement)) { rs.push(st); if (rs.length > 5) twin.p.restated = rs.slice(-5); S.put(twin); } if (A.liveRetype) A.liveRetype(twin.p.id, st);   // F4 (دورِ ۵، s25 — یک خطِ «live»): صورتِ تازه نوع را دوباره حدس می‌زند
       return "✓ همین مسئلهٔ تازه پیش‌تر ثبت شده بود («" + clip(twin.p.title, 60) + "»)؛ دوباره نساختم — صورتِ تازه‌ات کنارش ماند."; }
     var LAD = (A.solveUI && A.solveUI.LADDER) || [1, 3, 7, 21, 60], due = A.addDays(A.today(), LAD[1]);
     /* فرزند داور، نوع و فضایی بودنِ پدر را به ارث می‌برد (R2) — درونِ خودِ A.liveCreate از origin {type:"lprob", id} (ادغامِ G1/G2: یک منطقِ ارث؛ این‌جا حدسی نیست).
