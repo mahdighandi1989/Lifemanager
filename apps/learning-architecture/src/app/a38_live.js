@@ -16,7 +16,8 @@
   var field = U.field, selF = U.selF, own = U.own, txt = U.txt, clip = U.clip, LADDER = U.LADDER;
   function nowISO() { return new Date().toISOString(); }
   /* A13 (s30/s34/s35): پیامِ «اول این‌ها: …» ِ کهنه پس از ثبتِ موفق یا رفتن به نمای دیگر پاک می‌شود — وگرنه کاربر نمی‌داند ثبت شد یا نه */
-  function clearBad() { try { var tb = document.getElementById("toasts"); if (tb) Array.prototype.slice.call(tb.querySelectorAll(".toast.bad")).forEach(function (e) { e.remove(); }); } catch (e) { } }
+  function clearBad() { try { var tb = document.getElementById("toasts"); if (tb) Array.prototype.slice.call(tb.querySelectorAll(".toast.bad")).forEach(function (e) { e.remove(); }); } catch (e) { }
+    try { if (A.ASSIST && typeof A.ASSIST.dropBadToasts === "function") A.ASSIST.dropBadToasts(); } catch (e) { } }   // E8 (دورِ ۴): ردِ کهنه از «پیام‌های اخیرِ صفحه» ِ دستیار هم می‌رود
   A.liveClearBad = clearBad;
   function rec(pid) { var r = pid ? S.get("eprob_" + pid) : null; return r && r.live && r.p && r.status !== "rejected" ? r : null; }
   function lives() { return S.all("eprob", function (r) { return r && r.live && r.p && r.status !== "rejected"; }); }
@@ -280,6 +281,9 @@
     if (!uOf(s) || L.reU) return "u";
     if (L.state === "solved" || L.state === "abandoned") return s.b && s.b[1] && s.b[1].done ? "done" : "b";
     if (!(L.plan && L.plan.at)) return "p";
+    /* E8 (دورِ ۴، s27): بازنگری‌ای که ایراد یافت و «برگرد به طرح» گفت ⇒ مرحله «طرح» است تا طرح دوباره ثبت شود (livePhase، closure.back و نما یکی) */
+    var df = (L.defects || []).filter(function (y) { return !y.resolvedAt; }).pop();
+    if (df && df.to === "p" && !(String(L.plan.at) > String(df.at))) return "p";
     return "c";
   }
   A.livePhase = function (pid) { var pg = pgOf(pid); return phaseOf(solOf(pg)); };
@@ -433,6 +437,7 @@
   function satLabel(ty, nat) { return ty === "pod" ? (nat === "objective" ? SAT_POD : SAT_POD_LIFE) : SAT_L; }
   var EFF = [["big", "اثرِ محسوس دارد"], ["small", "اثرش ناچیز است — با دلیل کنارش می‌گذارم"]];
   var RESTATE = [["eq", "هم‌ارز — همان مسئله به بیانِ دیگر"], ["wider", "گسترده‌تر — مسئلهٔ کلی‌تر (شرط یا قیدی کمتر)"], ["narrower", "باریک‌تر — مسئلهٔ خاص‌تر (شرط یا قیدی بیشتر)"], ["other", "مسئلهٔ دیگری شد"]];
+  var TEST_COST = /هزینه|گران|خطر|ریسک|وقت|زمان|پول|آسیب|ضرر|برگشت\s*ناپذیر|جبران\s*ناپذیر|در\s*دسترس|دسترسی|ناممکن|غیرممکن|نمی\s*شود\s*(?:آزمود|امتحان)|اخلاقی|قیمت|سلامت|جان/;
   var IFREF = ["حدس را کنار می‌گذارم یا اصلاحش می‌کنم", "آزمون را نادیده می‌گیرم چون حدسم قوی است", "حدس را بی‌تغییر نگه می‌دارم و دیگر نمی‌آزمایم"];
   var GWANT = [["yes", "بله — دوست دارم درست باشد"], ["no", "نه"], ["neutral", "فرقی نمی‌کند"]];
   var FIGGEN = [["general", "عمومی — ویژگیِ اضافه‌ای (تساوی، قائمه، تقارن) که شرط نگفته ندارد"], ["special", "خاص — ویژگی‌ای دارد که شرط نگفته"]];
@@ -442,12 +447,30 @@
   var SPATIAL = /(?:^|[^ء-یپچژکگ])(?:شکل|مثلث|دایره|زاویه|مساحت|حجم|مکعب|استوانه|کره|قطر|ضلع|ارتفاع|نقشه|اتاق|ابعاد|چیدمان|فضای|مماس|مسیر|حوض)|(?:^|\s)جا\s*(?:می|نمی)?\s*(?:شه|شود|بشه|گیرد|بگیرد)(?![ء-یپچژکگ])/;
   /* A6 (دورِ ۳، s22): «برآوردنی؟ بله / کافی است» با دلیلی که خودِ مجهول را پیش‌فرض می‌گیرد («فقط سه نفر کلید داشتند پس کارِ یکی از آن‌هاست») —
      دلیلی که نتیجه‌ای دربارهٔ مجهول اعلام می‌کند (پس، بنابراین، حتماً، معلوم است…) یا خودِ مجهول را نام می‌برد، دوری است مگر داده‌ای آن را بگوید */
-  var CIRC_RE = /(?:^|\s)(?:پس|بنابراین|بنابرین|لابد|حتما|حتماً|قطعا|قطعاً|مسلما|مسلماً)(?=\s)|معلوم\s*است|معلومه|مشخص\s*است|مشخصه|واضح\s*است|واضحه|معلوم\s*می\s*شود|کار\s*(?:یکی|خود)/;
-  function circular(why, unk) { var w = txt(why); if (!w) return false; return CIRC_RE.test(norm(w)) || (toks(unk).length > 0 && mentions(w, unk)); }
+  /* E4 (دورِ ۴، s19/s24/s29): «معلوم است/مشخص است» در فارسی بیشتر یعنی «داده شده» («تعدادِ پله‌ها معلوم است»)، نه «پیداست که» — از نشانه‌های نتیجه‌گیری
+     بیرون رفت. دوری یعنی دلیل مقدار یا هویتِ مجهول را اعلام کند («پس کارِ یکی از آن‌هاست»، «جواب همان ۵ است»)، نه این‌که فقط واژهٔ مجهول را بیاورد
+     («سه شرطِ مماس برای مرکز و شعاع» دوری نیست). */
+  var CIRC_RE = /(?:^|\s)(?:پس|بنابراین|بنابرین|لابد|حتما|حتماً|قطعا|قطعاً|مسلما|مسلماً)(?=\s)|واضح\s*است|واضحه|کار\s*(?:یکی|خود)/;
+  var ASSERT_RE = /(?:^|\s)(?:همان|همون|خود)(?=\s)|=|(?:^|\s)(?:جواب|پاسخ|مجهول)(?:ش|اش)?\s*(?:همان|است|هست|=|می\s*شود|میشه|می\s*شه)|(?:کار|تقصیر|گناه)\s*[ء-یپچژکگ]+\s*(?:است|ه|بود)(?=$|\s|[.,،؛])/;
+  function circular(why, unk) { var w = txt(why); if (!w) return false; var x = norm(w); return CIRC_RE.test(x) || (toks(unk).length > 0 && mentions(w, unk) && ASSERT_RE.test(x)); }
   var EMPTY_W = " هیچ هیچی چیز چیزی نمی دانم دونم ندارم نه نیست بیرون نمی ذارم گذارم دلم خواد خواهد دقیق باشه باشد کاملا همه همش ";
-  var NOLINE_RE = /هیچ|همه\s*(?:را|رو)?\s*نگه|نمی\s*(?:ذارم|گذارم)/, APPROX_RE = /[0-9]|٪|درصد|±|حدود|تقریب|کمتر|بیشتر|تا\s|خطا|اختلاف|بس\s*است/;
+  var NOLINE_RE = /هیچ|همه\s*(?:را|رو)?\s*نگه|نمی\s*(?:ذارم|گذارم)/, APPROX_RE = /[0-9]|٪|درصد|±|حدود|تقریب|کمتر|بیشتر|تا\s|خطا|اختلاف|بس\s*است|بسه|(?:^|\s)(?:یک|یه|دو|سه|چهار|پنج|شش|هفت|هشت|ده|بیست|سی|صد|هزار|نیم|نصف|ربع|ثلث)(?=\s|$)|لازم\s*نیست|کیفی/;   // E4: «ده سانت»، «نصف خانوارها»، «±۱۰٪»
+  /* E4 (دورِ ۴، s22): مجهولِ کیفی (چه کسی؟ کدام؟) تقریبِ عددی ندارد — «تقریب لازم نیست — مجهول کیفی است» پاسخِ درست است */
+  var QUAL_UNK = /(?:^|\s)(?:چه\s*کسی|کی|کسی\s*که|کدام|کدوم|کدامیک|چه\s*چیزی|چرا|آیا)(?=\s|$)|مقصر|متهم|فاعل|هویت/;
   function suffShaky(items) { return items.length === 1 || items.some(function (x) { return UNKNOWNISH.test(norm(x.t)); }); }
   function suffChalQ(items) { var un = items.filter(function (x) { return UNKNOWNISH.test(norm(x.t)); }); return items.length === 1 ? "با همین یک داده مجهول معین می‌شود؟ چطور؟" : "گفتی کافی است، ولی «" + clip(un[0] ? un[0].t : "", 50) + "» هنوز معلوم نیست — بی آن مجهول معین می‌شود؟ چطور؟"; }
+  /* E4 (دورِ ۴ ِ تور، تصمیمِ R4): وارسی‌ای که ممکن است از واژه‌ها اشتباه کند (دوری، تقریب، «کجا خط می‌کشی»، واحدها، «کافی است» با دادهٔ نامعلوم، حالتِ حدی،
+     نزدیک‌به‌رونوشت) هشدار می‌دهد، سد نمی‌کند: یک بار چالشش را نشان می‌دهد و «ثبت با همین — دلیل» (یک خط، ذخیره‌شده) پیشنهاد می‌کند؛ فقط وارسیِ محتوایی
+     (فیلدِ خالی، یک نماد برای دو چیز، داوریِ صریحِ خودِ کاربر) سد می‌کند. soft = [[کلید، پیام]]؛ گذر ⇒ {keys, why}. */
+  function softGate(d, soft, miss) {
+    if (!soft.length) { d.softShow = false; return null; }
+    d.softSeen = d.softSeen || []; var seen = soft.every(function (x) { return d.softSeen.indexOf(x[0]) >= 0; });
+    if (seen && toks(d.softWhy).length >= 2) return { keys: soft.map(function (x) { return x[0]; }), why: txt(d.softWhy), at: nowISO() };
+    soft.forEach(function (x) { if (d.softSeen.indexOf(x[0]) < 0) d.softSeen.push(x[0]); miss.push(x[1]); });
+    d.softShow = true; return null;
+  }
+  function softField(id, d, fn) { return h("div", { class: "card soft col gap lp-softgate" }, h("p", { class: "small" }, "این هشدارها از واژه‌ها حدس زده شده‌اند و ممکن است این‌جا به جا نباشند. اگر پس از دیدنشان همین را می‌خواهی، یک خط دلیل بنویس و ثبت کن (دلیلت ذخیره می‌شود)."),
+    field(id, "ثبت با همین — دلیل:", d.softWhy || "", function (v) { d.softWhy = v; if (fn) fn(v); }, 0)); }
   function pracParts(d, items) { var P = d.prac || {}; return { want: d.u, have: items.map(function (x) { return txt(x.t); }).join(" · "), cond: d.c, vague: P.vague, ignore: P.ignore, approx: P.approx, prior: P.prior, measure: P.measure }; }
   /* ---------- واحدها در «ریاضی‌کردن» (دورِ ۲ ِ تور، s16؛ A152 «اگر همهٔ اندازه‌ها را به واحدِ دیگری ببری، رابطه باید درست بماند») ----------
      «۲۰۰ × ۱۲۰ × ۱۰۰ لیتر» پذیرفته می‌شد: سه عددِ بی‌واحد و «لیتر» فقط کنارِ آخری. کد فقط حاصل‌ضرب/خارج‌قسمتِ عددها را می‌سنجد: هر عامل واحد دارد؟
@@ -463,7 +486,14 @@
   function unitOf(t) { var m = UNIT_RE.exec(t); if (!m) return null; var w = m[1]; for (var i = 0; i < UNIT_T.length; i++) if (new RegExp("^(?:" + UNIT_T[i][0] + ")$").test(w)) return { w: w, dim: UNIT_T[i][1], k: UNIT_T[i][2] }; return null; }
   function dimAdd(a, b, sg) { var o = {}; Object.keys(a).concat(Object.keys(b)).forEach(function (k) { o[k] = (a[k] || 0) + sg * (b[k] || 0); if (!o[k]) delete o[k]; }); return o; }
   function dimFa(dm) { var F = { L: "طول", M: "جرم", T: "زمان", C: "پول (ریال/تومان)", D: "دلار" }, ks = Object.keys(dm); return ks.length ? ks.map(function (k) { return F[k] + (dm[k] !== 1 ? "^" + dm[k] : ""); }).join("·") : "بی‌بُعد"; }
+  /* E4 (دورِ ۴، s17): «۰٫۱۲ متر ⇒ ۲۰۰ مترمربع × ۰٫۱۲ متر = ۲۴ مترمکعب» رد می‌شد چون فقط «=» جدا می‌کرد و تبدیلِ پیشین به حاصل‌ضرب چسبید —
+     هر گزاره (جداشده با ⇒ / → / ؛ / «پس» / سطرِ تازه) جدا سنجیده می‌شود؛ پیامِ تکراری یک بار. */
   function unitsCheck(text) {
+    var st = norm(text).split(/⇒|⟹|→|=>|->|؛|;|\n|(?:^|\s)پس(?=\s)/).filter(function (x) { return /\d/.test(x); }), why = [], dims = [];
+    if (st.length > 1) { st.forEach(function (x) { var r0 = unitsCheck1(x); r0.why.forEach(function (w) { if (why.indexOf(w) < 0) why.push(w); }); dims = dims.concat(r0.dims); }); return { ok: !why.length, why: why, dims: dims }; }
+    return unitsCheck1(text);
+  }
+  function unitsCheck1(text) {
     var x = norm(text).replace(/٫/g, ".").replace(/[×✕✖·*]/g, " * ").replace(/[÷⁄∕]/g, " / ").replace(/(\d)\s*x\s*(?=\d)/g, "$1 * ").replace(/(\d[^\d*\/=<>≤≥]{0,25}?)\s+در\s+(?=\d)/g, "$1 * ");
     var why = [], sides = x.split(/[=≤≥<>]|برابر|کمتر\s*از|بیشتر\s*از/), info = [];
     var sd = sides.map(function (sd0) {
@@ -496,6 +526,7 @@
         if (!conv) why.push("دو طرف هم‌بُعدند (" + dimFa(a.dim) + ") ولی واحدشان هم‌اندازه نیست — ضریبِ تبدیل را بنویس (مثلاً ۱۰۰۰ سانتی‌متر³ = ۱ لیتر)");
       }
     }
+    why = why.filter(function (w, i) { return why.indexOf(w) === i; });
     return { ok: !why.length, why: why, dims: info };
   }
   A.liveUnitsCheck = unitsCheck;
@@ -583,7 +614,7 @@
     }
     /* A13 (s10): «برآوردنی؟» برای «اثبات یا رد کن» هم — فرضی که هیچ موردی برآوردش نمی‌کند حکم را تهی می‌کند؛ «نه» ⇒ کارتِ شل کردنِ بخشی از شرط در طرح */
     if (d.type === "find" || d.type === "pod") box.appendChild(selF("lpSat", satLabel(d.type, d.nat), d.type === "pod" ? SAT_POD_OPTS : SAT, d.sat, function (v) { d.sat = v; rerender(); }));
-    box.appendChild(selF("lpSuff", prac ? "در مسئلهٔ عملی داده‌ها هرگز کامل و دقیق نیستند: با داده‌هایی که اثرِ محسوس دارند، مجهول به‌قدرِ تقریبِ کافی معین می‌شود؟" : T.suff, ["کافی است", "ناکافی است — چیزی کم است", "زائد دارد — بخشی لازم نیست", "متناقض است", "هنوز نمی‌دانم"], d.suff, function (v) { d.suff = v; rerender(); }));
+    box.appendChild(selF("lpSuff", prac ? "در مسئلهٔ عملی داده‌ها هرگز کامل و دقیق نیستند: با داده‌هایی که اثرِ محسوس دارند، مجهول به‌قدرِ تقریبِ کافی معین می‌شود؟" : T.suff, suffOpts(d.type), d.suff, function (v) { d.suff = v; rerender(); }));
     box.appendChild(field("lpSuffW", "چرا؟ (یک جمله)", d.suffWhy, function (v) { d.suffWhy = v; }, 0));
     var items0 = d.dl.filter(function (x) { return txt(x.t); });
     if ((d.suff === "کافی است" || d.sat === "yes") && (d.showCirc || circular(d.suffWhy, d.u))) box.appendChild(h("div", { class: "card soft col gap lp-suffcirc" }, h("p", { class: "small warnline" }, "دلیلت («" + clip(d.suffWhy, 100) + "») نتیجه‌ای دربارهٔ خودِ مجهول می‌گیرد — این را از داده‌ها داری یا پیش‌فرض است؟ پاسخِ «برآوردنی/کافی است» نباید جوابِ مسئله را از پیش بداند."),
@@ -659,27 +690,29 @@
     box.appendChild(U.planList(d.type));
     var out = h("div", { "aria-live": "polite", class: "col gap lp-uout" });
     function vald() {
-      var items = d.dl.filter(function (x) { return txt(x.t); }), miss = wholeWhy(d, r).concat([[d.u, T.u], [d.c, T.c]].filter(function (x) { return txt(x[0]).length < 3; }).map(function (x) { return "«" + x[1] + "»"; })), warn = [];
+      var items = d.dl.filter(function (x) { return txt(x.t); }), miss = wholeWhy(d, r).concat([[d.u, T.u], [d.c, T.c]].filter(function (x) { return txt(x[0]).length < 3; }).map(function (x) { return "«" + x[1] + "»"; })), warn = [], soft = [];
       if (!NAT[d.nat]) miss.push("«داورِ این مسئله» (زندگی، عملی یا کامل‌بیان‌شده)");
       if (!items.length) miss.push(d.type === "find" ? "«دست‌کم یک داده»" : "«دست‌کم یک بخشِ فرض»");
       if (d.type === "find" && d.dep === "yes" && toks(d.depWhy).length < 2) miss.push("«کدام داده به مجهول وابسته است و چطور»");
+      /* E8 (دورِ ۴، s28): «آزمون را نادیده می‌گیرم» دلیلی می‌خواهد که هزینه یا خطرِ خودِ آزمون را بگوید — «حدسم قوی است» دلیل نیست (B111) */
+      if (fresh && txt(d.guess) && d.ifRef && d.ifRef !== IFREF[0] && toks(d.ifRefWhy).length >= 3 && !TEST_COST.test(norm(d.ifRefWhy))) soft.push(["ifref", "«چرا ردِ آزمون نباید حدست را عوض کند؟» — دلیلت هزینه یا خطرِ خودِ آزمون را نمی‌گوید (گران، خطرناک، برگشت‌ناپذیر، در دسترس نیست…)؛ «حدسم قوی است» دلیل نیست"]);
       if (fresh && txt(d.guess) && d.ifRef && d.ifRef !== IFREF[0] && toks(d.ifRefWhy).length < 3) miss.push("«چرا ردِ آزمون نباید حدست را عوض کند؟» (یا گزینهٔ اول)");
       if ((d.type === "find" || d.type === "pod") && !d.sat) miss.push("«" + satLabel(d.type, d.nat) + "»");
       if (!d.suff) miss.push("«" + T.suff + "»");
-      if (d.suff === "کافی است" && items.length && suffShaky(items) && toks(d.suffChal).length < 3) { d.showChal = true; miss.push("پاسخ به «" + suffChalQ(items) + "»"); }
+      if (d.suff === "کافی است" && items.length && suffShaky(items) && toks(d.suffChal).length < 3) { d.showChal = true; soft.push(["chal", "پاسخ به «" + suffChalQ(items) + "»"]); }
       if ((d.suff === "کافی است" || d.sat === "yes") && circular(d.suffWhy, d.u)) {
         var cw = txt(d.suffCirc), okC = toks(cw).length >= 3 && (/پیش\s*فرض|فرض\s*کرد/.test(norm(cw)) || items.some(function (x) { return mentions(cw, x.t); }));
-        if (!okC) { d.showCirc = true; miss.push("«دلیلت مجهول را پیش‌فرض می‌گیرد؟» — بگو کدام داده آن را می‌گوید، یا که پیش‌فرض است"); }
+        if (!okC) { d.showCirc = true; soft.push(["circ", "«دلیلت مجهول را پیش‌فرض می‌گیرد؟» — بگو کدام داده آن را می‌گوید، یا که پیش‌فرض است"]); }
       }
       if (prac) {
         items.forEach(function (x) { if (!x.eff) miss.push("اثرِ «" + clip(x.t, 30) + "» (محسوس یا ناچیز)"); else if (x.eff === "small" && toks(x.effWhy).length < 2) miss.push("دلیلِ کنار گذاشتنِ «" + clip(x.t, 30) + "»"); });
         var fr = A.practicalFrameCheck && A.KPRAC_KEYS ? A.practicalFrameCheck(pracParts(d, items), A.KPRAC_KEYS) : null;
         if (fr && !fr.ok) { fr.missing.forEach(function (k) { if (["want", "have", "cond"].indexOf(k[0]) < 0) miss.push("«" + k[1] + "»"); }); fr.dup.forEach(function (x) { miss.push("«" + x + "» تکرارِ جزءِ دیگری است"); }); if (fr.unmeasured) miss.push("«ریاضی‌کردن» هنوز سنجیدنی نیست: " + fr.unmeasured.join(" و ")); }
         /* A13 (s01/s09): قابِ عملی پاسخِ تهی نمی‌پذیرد — «هیچی رو بیرون نمی‌ذارم» خط کشیدن نیست (داده‌ها بی‌شمارند)، «نمی‌دونم، دلم می‌خواد دقیق باشه» تقریب نیست */
-        if (txt(d.prac.ignore) && NOLINE_RE.test(norm(d.prac.ignore)) && toks(d.prac.ignore).filter(function (w) { return EMPTY_W.indexOf(" " + w + " ") < 0; }).length < 2) miss.push("«کجا خط می‌کشی؟» — در مسئلهٔ عملی همه چیز را نمی‌شود نگه داشت؛ دست‌کم یک چیز را با دلیل بیرون بگذار");
-        if (txt(d.prac.approx) && !APPROX_RE.test(norm(d.prac.approx))) miss.push("«کدام تقریب بس است؟» — حدی بگو (مثلاً «±۱۰٪»، «تا نیم متر»، «حدودِ …»)؛ «کاملاً دقیق» در مسئلهٔ عملی تقریب نیست");
-        [["vague", "کدام مفهومِ مبهم"], ["prior", "دانشِ پیشین"]].forEach(function (k) { var v0 = d.prac[k[0]]; if (txt(v0) && toks(v0).filter(function (w) { return EMPTY_W.indexOf(" " + w + " ") < 0; }).length < 2) miss.push("«" + k[1] + "» — «نمی‌دانم/هیچ» پاسخ نیست؛ حتی حدسی یا تجربهٔ کسِ دیگری را بنویس"); });
-        var ucm = txt(d.prac.measure) ? unitsCheck(d.prac.measure) : null; if (ucm && !ucm.ok) miss.push("«ریاضی‌کردن» — واحدها: " + ucm.why.join("؛ "));
+        if (txt(d.prac.ignore) && NOLINE_RE.test(norm(d.prac.ignore)) && toks(d.prac.ignore).filter(function (w) { return EMPTY_W.indexOf(" " + w + " ") < 0; }).length < 2) soft.push(["line", "«کجا خط می‌کشی؟» — در مسئلهٔ عملی همه چیز را نمی‌شود نگه داشت؛ دست‌کم یک چیز را با دلیل بیرون بگذار"]);
+        if (txt(d.prac.approx) && !APPROX_RE.test(norm(d.prac.approx)) && !QUAL_UNK.test(norm(d.u))) soft.push(["approx", "«کدام تقریب بس است؟» — حدی بگو (مثلاً «±۱۰٪»، «تا نیم متر»، «حدودِ …»)؛ «کاملاً دقیق» در مسئلهٔ عملی تقریب نیست" + (QUAL_UNK.test(norm(d.u)) ? "" : " (اگر مجهول کیفی است — چه کسی، کدام — بنویس «تقریب لازم نیست — مجهول کیفی است»)")]);
+        [["vague", "کدام مفهومِ مبهم"], ["prior", "دانشِ پیشین"]].forEach(function (k) { var v0 = d.prac[k[0]]; if (txt(v0) && toks(v0).filter(function (w) { return EMPTY_W.indexOf(" " + w + " ") < 0; }).length < 2) soft.push([k[0], "«" + k[1] + "» — «نمی‌دانم/هیچ» پاسخ نیست؛ حتی حدسی یا تجربهٔ کسِ دیگری را بنویس"]); });
+        var ucm = txt(d.prac.measure) ? unitsCheck(d.prac.measure) : null; if (ucm && !ucm.ok) soft.push(["units", "«ریاضی‌کردن» — واحدها: " + ucm.why.join("؛ ")]);
       }
       var nc = notaCheck(d.nota);
       nc.half.forEach(function (x) { miss.push("نمادگذاری: «" + x + "» نماد یا معنایش را کم دارد"); });
@@ -694,7 +727,8 @@
       if (fresh && txt(d.guess) && d.gWant === "yes" && +d.conf > 50 && toks(d.gContra).length < 2) miss.push("«قوی‌ترین شاهدِ خلافِ حدس»");
       var DW = !txt(d.dead) ? null : prev.deadTxt === txt(d.dead) && prev.deadline ? { date: prev.deadline } : A.willWhen(d.dead);
       if (txt(d.dead) && !(DW && DW.date && !DW.past)) miss.push("«مهلت» (روزِ مشخص و نگذشته بنویس، یا خالی بگذار)");
-      return { miss: miss, warn: warn, items: items, DW: DW };
+      var sg = softGate(d, soft, miss);   // هشدارها پس از فیلدهای واقعاً خالی
+      return { miss: miss, warn: warn, items: items, DW: DW, soft: sg };
     }
     function commit(v, V) {
       var L = live(s), items = V.items, DW = V.DW, at = nowISO();
@@ -709,6 +743,7 @@
       var U1 = s.u[1];
       if ((d.type === "find" || d.type === "pod") && d.sat) U1.sat = d.sat;
       if (txt(d.suffChal) && d.suff === "کافی است") U1.suffChal = txt(d.suffChal);
+      if (V.soft) { U1.soft = V.soft; (L.softLog = L.softLog || []).push({ where: "u", keys: V.soft.keys, why: V.soft.why, at: V.soft.at }); }
       if (txt(d.suffCirc) && circular(d.suffWhy, d.u)) { U1.suffCirc = txt(d.suffCirc); if (/پیش\s*فرض|فرض\s*کرد/.test(norm(d.suffCirc))) U1.presup = true; }
       if (d.nat === "practical") { U1.prac = { vague: txt(d.prac.vague), ignore: txt(d.prac.ignore), approx: txt(d.prac.approx), prior: txt(d.prac.prior), measure: txt(d.prac.measure) };
         U1.pracCard = prev.pracCard || null;
@@ -745,11 +780,12 @@
         h("p", { class: "muted" }, "ثبتِ فهم تا این داوری را نکنی تمام نمی‌شود — با بازسازیِ صفحه هم همین‌جا می‌ماند.")));
       out.appendChild(U.gradeBtns(function (v) { var V2 = vald(); if (V2.miss.length) { d.gradePending = false; saveNow(); A.toast("اول این‌ها را بنویس: " + V2.miss.join("، "), "bad"); A.render(); return; } commit(v, V2); }, "فهمت با صورتی که نوشتی چقدر می‌خواند؟"));
     }
+    if (d.softShow) box.appendChild(softField("lpSoftWhy", d));
     var saveBtn = h("button", { class: "btn lp-usave", type: "button", onclick: function () {
       /* دورِ ۲ (s02): جملهٔ کلی که پس از «ثبتِ کل» دوباره رونوشت شد ⇒ دروازهٔ «اول کل» دوباره جلوی چشم (نه پیامی دربارهٔ فیلدی که دیده نمی‌شود) */
       var ww = wholeWhy(d, r); if (ww.length) { d.wholeOk = false; d.lastMiss = null; rerender(); A.toast("هنوز نه: " + ww.join("؛ "), "bad"); return; }
       var V = vald();
-      if (V.miss.length) { d.gradePending = false; d.lastMiss = V.miss; A.toast("اول این‌ها را بنویس: " + V.miss.join("، "), "bad"); if ((d.showChal && !box.querySelector(".lp-suffchal")) || (d.showGChal && !box.querySelector(".lp-gchal"))) { rerender(); return; } out.innerHTML = ""; out.appendChild(h("p", { class: "bad small lp-umiss" }, "هنوز نه: " + V.miss.join("، "))); return; }
+      if (V.miss.length) { d.gradePending = false; d.lastMiss = V.miss; A.toast("اول این‌ها را بنویس: " + V.miss.join("، "), "bad"); if ((d.showChal && !box.querySelector(".lp-suffchal")) || (d.showGChal && !box.querySelector(".lp-gchal")) || (d.showCirc && !box.querySelector(".lp-suffcirc")) || (d.softShow && !box.querySelector("#lpSoftWhy"))) { rerender(); return; } out.innerHTML = ""; out.appendChild(h("p", { class: "bad small lp-umiss" }, "هنوز نه: " + V.miss.join("، "))); return; }
       d.lastMiss = null; d.gradePending = true; saveNow(); saveBtn.disabled = true; showGrade(V);
     } }, "ثبتِ فهم");
     box.appendChild(saveBtn);
@@ -1110,7 +1146,7 @@
       if (contra) { var podH2 = typeOf(r, s) === "pod"; L.plan.relax = { part: d.relax === "prove" ? "prove" : +d.relax, why: txt(d.relaxWhy), t: d.relax === "prove" ? "" : ((podH2 ? dataOf(s).map(function (x) { return x.t; }) : condParts(s))[+d.relax] || "") }; if (podH2) L.plan.relax.on = "hyp"; } delete L.planDraft; delete PD[pid];
       U.seed(s, "h");   // ابزارِ طرحی که به کار بردی از حافظه برمی‌گردد (نردبانِ همان تونل)
       S.put(pg); clearBad();
-      A.toast("طرح ثبت شد؛ حالا گامِ واقعیِ بعد — با پیش‌بینی."); A.go("lprob", pid, "exec");
+      A.toast(natOf(s, r) === "objective" ? "طرح ثبت شد؛ حالا گامِ اول — هر گام را وارسی کن: روشن می‌بینی که درست است؟ می‌توانی ثابت کنی؟" : "طرح ثبت شد؛ حالا گامِ واقعیِ بعد — با پیش‌بینی."); A.go("lprob", pid, "exec");
     } }, L.plan && L.plan.at ? "به‌روزکردنِ طرح" : "ثبتِ طرح"));
     box.appendChild(pout);
     return box;
@@ -1119,6 +1155,10 @@
   /* ---------- کفایت: «هنوز نمی‌دانم» پیگیری می‌شود (تور ۱، s01/s17/s37) ----------
      در طرح (پیش از ثبتِ طرح، لازم) و پس از نخستین گامِ بسته (پیشنهاد) دوباره می‌پرسد؛ هر پاسخ در L.suffLog می‌ماند (فهمِ ثبت‌شده دست نمی‌خورد). */
   var SUFF_OPTS = ["کافی است", "ناکافی است — چیزی کم است", "زائد دارد — بخشی لازم نیست", "متناقض است", "هنوز نمی‌دانم"];
+  /* E8 (دورِ ۴، s25): برچسبِ گزینه‌ها با نوع — «اثباتی/اثبات یا رد کن» از فرض و حکم می‌پرسد، نه از «مجهول»؛ مقدارها همان (suffNow و دوری با همان می‌خوانند) */
+  var SUFF_FA = { prove: ["همهٔ فرض لازم است و برای حکم بس است", "فرض برای حکم کم است — چیزی کم است", "بخشی از فرض زائد است", "فرض‌ها با هم ناسازگارند", "هنوز نمی‌دانم"],
+    pod: ["فرض برای داوری بس است", "فرض برای داوری کم است — چیزی کم است", "بخشی از فرض زائد است", "فرض‌ها با هم ناسازگارند", "هنوز نمی‌دانم"] };
+  function suffOpts(ty) { var F0 = SUFF_FA[ty]; return F0 ? SUFF_OPTS.map(function (v, i) { return [v, F0[i]]; }) : SUFF_OPTS.slice(); }
   function suffNow(s) { var lg = live(s).suffLog || [], u = uOf(s) || {}; return lg.length ? lg[lg.length - 1].ans : u.suff; }
   function suffDue(s, where) {
     var u = uOf(s); if (!u || u.suff !== "هنوز نمی‌دانم") return false;
@@ -1134,7 +1174,7 @@
     var pid = r.p.id, L = live(s), u = uOf(s), d = SQD[pid + where] = SQD[pid + where] || { ans: "", why: "" }, T = T0(u.type);
     var box = h("section", own({ class: "card soft lp-suffq", "data-ph": where }), h("h4", {}, "دوباره: آیا شرط برای تعیینِ مجهول کافی است؟"),
       h("p", { class: "small" }, "در فهم گفتی «هنوز نمی‌دانم»" + (u.suffWhy ? " («" + clip(u.suffWhy, 100) + "»)" : "") + ". " + (where === "p" ? "حالا که داده‌ها و شرط را جدا نوشته‌ای، پیش از طرح دوباره بسنج — پاسخِ «نمی‌دانم» هم پذیرفته است، با دلیلِ تازه." : "حالا که نخستین گام را برداشتی و دیدی چه شد، دوباره بسنج.")),
-      selF("lpSuffQ_" + where, T.suff, SUFF_OPTS, d.ans, function (v) { d.ans = v; }),
+      selF("lpSuffQ_" + where, T.suff, suffOpts(u.type), d.ans, function (v) { d.ans = v; }),
       field("lpSuffQW_" + where, "چرا؟ (یک جمله)", d.why, function (v) { d.why = v; }, 0));
     box.appendChild(h("button", { class: "btn ghost sm lp-suffqgo", type: "button", onclick: function () {
       if (!d.ans || toks(d.why).length < 2) { A.toast("پاسخ و دلیلش را بنویس.", "bad"); return; }
@@ -1175,7 +1215,9 @@
     var L = live(s), x = L.incub; if (!x || x.back) return null;
     if (x.due > A.today()) return h("p", { class: "card soft small lp-incubwait" }, "پس از تلاشِ جدی کنارش گذاشتی؛ " + A.fdate(x.due) + " می‌پرسد چه چیزی به ذهنت رسید. اگر زودتر رسید، همین حالا هم ادامه بده.");
     var pid = r.p.id, d = ID[pid] = ID[pid] || { t: "" };
-    var box = h("section", own({ class: "card lp-incubback" }), h("h4", {}, "دیروز کنارش گذاشتی — چه چیزی به ذهنت رسید؟"),
+    /* E8 (دورِ ۴، s-D): «دیروز» فقط اگر دیروز بود — شمارِ واقعیِ روزها */
+    var nD = x.d && A.daysBetween ? A.daysBetween(x.d, A.today()) : 1;
+    var box = h("section", own({ class: "card lp-incubback" }), h("h4", {}, (nD > 1 ? fa(nD) + " روز پیش" : "دیروز") + " کنارش گذاشتی — چه چیزی به ذهنت رسید؟"),
       h("p", { class: "small" }, "کار پس از تلاشِ جدی گاهی در غیابِ تو ادامه پیدا می‌کند: ایده‌ای، پرسشی، شکِ تازه‌ای — حتی «هیچ». همان را بنویس."),
       field("lpIncubT", "چه چیزی به ذهنت رسید؟", d.t, function (v) { d.t = v; }, 2));
     box.appendChild(h("button", { class: "btn sm lp-incubgo", type: "button", onclick: function () {
@@ -1256,7 +1298,16 @@
   var Q_BASE = "استقرا یا «برای هر n ≥ k»: حالتِ پایه (کوچک‌ترین n) را جدا وارسی کردی؟ گامِ استقرا دقیقاً کجا از فرضِ استقرا استفاده کرد؟";
   var Q_EQUIV = "شرط یا معادله را تبدیل کردی (توانِ دو، ضرب یا تقسیم در عبارتِ متغیر)؟ شرطِ تازه هم‌ارزِ شرطِ اصلی است — جوابی زائد نیامد و جوابی گم نشد؟";
   var Q_ANALIM = "قیاس را به کار بردی: کجا این شباهت می‌شکند — کدام جزءِ آن مورد این‌جا متناظری ندارد، و همین گام به آن جزء تکیه دارد؟";
-  function usesAnalogy(s) { var L = live(s), g = s.g && s.g[1]; return L.aux.some(function (a) { return a.k === "analog"; }) || L.moves.some(function (m) { return m.mv === "mv_analogy"; }) || !!(g && g.kit && txt(g.kit.ana)); }
+  /* E5 (دورِ ۴، s23): نسبت یا رابطه‌ای که به کمیتِ تازه برده می‌شود («زمان هم ۲٫۸ برابر؟»، «به همان نسبت») هم قیاس است — در گام یا در گفت‌وگوی همین مسئله */
+  var CARRY_RE = /(?:^|\s)(?:هم|نیز)\s+(?:[^.؟?!\n]{0,30}\s)?(?:برابر|نسبت|متناسب)|به\s*همان\s*نسبت|همان\s*نسبت|همین\s*نسبت|متناسب\s*(?:با|است|ه)|(?:[0-9]+(?:\.[0-9]+)?|دو|سه|چند)\s*برابر\s*(?:می\s*شه|می\s*شود|میشه|بشه)?\s*[?؟]/;
+  function usesAnalogy(s, r) {
+    var L = live(s), g = s.g && s.g[1];
+    if (L.aux.some(function (a) { return a.k === "analog"; }) || L.moves.some(function (m) { return m.mv === "mv_analogy"; }) || !!(g && g.kit && txt(g.kit.ana))) return true;
+    if (L.steps.some(function (x) { return CARRY_RE.test(norm([x.text, x.proof, x.pred].join(" "))); })) return true;
+    if (!r) return false; var pid = r.p.id;
+    return S.all("achat", function (x) { return x && (x.lprob === pid || (r.sess && x.id === r.sess)); }).some(function (se) { return (se.msgs || []).some(function (m) { return m && m.role === "user" && CARRY_RE.test(norm(m.text)); }); });
+  }
+  var Q_PASCAL_C = "قاعدهٔ پاسکال در همین گام: به‌جای هر واژهٔ کلیدی تعریفش را بگذار — گام هنوز درست است و از کدام بخشِ تعریف استفاده می‌کند؟";
   var Q_TASTE = "این نوع مسئله برایت چطور بود — کدام بخشش را دوست داشتی و کدامش را نه؟";
   var BACK_PROVE = ["همهٔ فرض به کار رفت — هر بخشِ فرض کجای برهان آمد؟", "قاعدهٔ پاسکال: هر واژهٔ اصلیِ حکم را با تعریفش جایگزین کن — برهان کجا از تعریفِ هر کدام استفاده کرد؟", "نتیجه‌ای که برهان می‌دهد دقیقاً همان حکم است — نه ضعیف‌تر، نه قوی‌تر، نه عکسش؟", "استدلال را در نقطه‌های حساسش وارسی می‌کنی — حالت‌های پایه و مرزی جدا؟", Q_EQUIV, "از راهِ دیگری هم ثابتش می‌کنی؟ اگر غیرمستقیم (خلف) بود، مستقیمش می‌کنی؟", Q_TASTE];
   var BACK_FIND = ["جواب را در شرط جای‌گذاری کن — همهٔ شرط برقرار است؟", "حالتِ خاص یا حدی، واحد و بُعد، و یکنوایی (اگر داده‌ای بیشتر شود، جواب در جهتِ درست عوض می‌شود؟) را می‌آزمایی؟", "چند جواب دارد — همه را یافتی؟ شرط برای تعیینِ مجهول کافی بود؟", Q_EQUIV, "همهٔ داده‌ها و کلِ شرط در حل آمده‌اند؟", "نتیجه را از راهِ دیگری به دست می‌آوری؟ در یک نگاه می‌بینی‌اش؟", Q_TASTE];
@@ -1265,7 +1316,7 @@
      فهرستِ «عملی/زندگی» چهار پرسش بود و «به تعریف‌ها برگرد» (s13)، «نتیجه یا روشِ مسئلهٔ مرتبط؟ عنصرِ کمکی» (s35)، «به مجهول نگاه کن» (s38) و
      «دادهٔ دیگری لازم است؟» (s37) را نداشت. منبعِ یکتای محتوا همین‌جاست (A.LIVE_QK)؛ مربیِ گفت‌وگو (a27) همین را می‌خواند (A.liveKindQs) — ترتیب و
      پیشنهاد با مربی است. پرسش‌های ویژهٔ کمیت (اثرِ محسوس، تقریب) فقط در «عملی». */
-  var Q_UNK = { practical: "به مجهول نگاه کن: دقیقاً چه چیزی را باید تعیین کنی — «حل‌شدن» چه شکلی است و با چه عدد یا واحدی سنجیده می‌شود؟", life: "به مجهول نگاه کن: دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است و از کجا می‌فهمی رسیده‌ای؟" };
+  var Q_UNK = { practical: "به مجهول نگاه کن: دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است و با چه عدد یا واحدی سنجیده می‌شود؟", life: "به مجهول نگاه کن: دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است و از کجا می‌فهمی رسیده‌ای؟" };
   var Q_DEF = "مسئله را به شکلِ دیگری بیان کن — به تعریف‌ها برگرد: هر واژهٔ کلیدیِ خواسته و قیدها دقیقاً یعنی چه؟";
   var Q_REL = "مسئلهٔ مرتبطی که پیش‌تر حل شده (در زندگیِ خودت یا دیگران): نتیجه‌اش را به کار می‌بری یا روشش را؟ برای به‌کار بردنش عنصرِ کمکی‌ای (کار، آدم، ابزار، گامِ میانی) لازم است؟";
   var Q_MORE = "دادهٔ دیگری لازم است — چه چیزی را باید بپرسی، بسنجی یا پیدا کنی تا خواسته معین شود؟";
@@ -1318,11 +1369,12 @@
     if (ph === "u") return ((TQ.und && TQ.und.qs) || (A.solveAskList ? A.solveAskList("u", 1, ty) : [])).slice();
     if (ph === "p") return withCore(A.solveAskList ? A.solveAskList("p", 1, ty) : [], "p", ty);
     if (ph === "c") {
-      if (nat !== "objective") return (kindQs(r, s, "c") || EXEC_LIFE.slice()).concat(usesAnalogy(s) ? [Q_ANALIM] : []);
+      if (nat !== "objective") return (kindQs(r, s, "c") || EXEC_LIFE.slice()).concat(usesAnalogy(s, r) ? [Q_ANALIM] : []);
       var q = withCore(EXEC_OBJ.slice(), "c", ty), all = [r.p.statement, (uOf(s) || {}).u, L.plan && L.plan.t].concat(L.steps.map(function (x) { return x.text + " " + (x.proof || ""); })).join(" ");
       if (IND_RE.test(norm(all))) q.splice(2, 0, Q_BASE);
       if (TRANSF_RE.test(norm(all))) q.push(Q_EQUIV);
-      if (usesAnalogy(s)) q.push(Q_ANALIM);
+      if (ty === "prove" || ty === "pod") q.push(Q_PASCAL_C);
+      if (usesAnalogy(s, r)) q.push(Q_ANALIM);
       return q;
     }
     if (nat === "objective") return (ty === "prove" || ty === "pod" ? BACK_PROVE : BACK_FIND).slice();
@@ -1344,10 +1396,25 @@
     /* پله: نخستین پرسشِ همین مرحله (به ترتیبِ کلی ⇐ خاص) که نه در صفحه پاسخ گرفته و نه در گفت‌وگو پرسیده شده */
     if (q && isAsked(q) && ph !== "c") q = "";
     if (!q || (ph === "c" && !openStep(s))) { var open0 = Q.filter(function (x) { return !isAsked(x) && !(ph === "p" && (tut.plan || []).some(function (e) { return e && e.src === "live" && e.q === x && (e.text || e.skip); })); }); q = open0[0] || ""; }
+    /* E5 (دورِ ۴): پرسشِ اجرا پس از ثبتِ نتیجهٔ گام — (۱) معادله کم است ⇒ «کدام بخشِ شرط هنوز معادله نشده؟» (s26)؛ (۲) نتیجه‌ای که پیش‌فرضِ نگه‌داشته را
+       می‌شکند ⇒ همان پیش‌فرض دوباره (s22)؛ (۳) زندگی/عملی ⇒ «فاصله با پیش‌بینی…» (s04/s07)؛ (۴) گامِ ناکام ⇒ «مسئله را به شکلِ دیگری بیان کن» (E3) */
+    var special = "";
+    if (ph === "c" && !openStep(s)) {
+      var lc = lastClosed(s), lo = lc && lc.out, u1 = uOf(s) || {}, failed = !!(lo && (lo.done === "no" || lo.prog === "نه" || lo.match === "no")), cands = [], ty1 = typeOf(r, s);
+      if (L.eqUnk && ty1 !== "prove" && ty1 !== "pod" && eqsOf(s).length < L.eqUnk) cands.push(EQ_FEW);
+      if (lo && u1.presup && txt(u1.suffCirc) && (failed || partNegated(lo.what, u1.suffCirc))) cands.push("پیش‌فرضی که نگه داشتی تا بیازمایی‌اش («" + clip(u1.suffCirc, 80) + "») — این نتیجه با آن می‌خواند؟ اگر نه، کنارش بگذار و به «کافی است؟» ِ فهم برگرد.");
+      if (lo && lo.kind !== "proof") cands = cands.concat(Q.filter(function (x) { return /فاصله/.test(x); }));
+      if (failed) cands = cands.concat(Q.filter(function (x) { return /شکلِ?\s*دیگری\s*بیان/.test(x); }));
+      special = cands.filter(function (x) { return x && !isAsked(x); })[0] || "";
+    }
+    /* گیر در طرح (s08): رفتن به جلو گیر کرده ⇒ «از خواسته به عقب» پیشنهادِ نخست */
+    if (ph === "p" && opts && opts.stuck) special = Q.filter(function (x) { return /به\s*عقب/.test(x) && !isAsked(x); })[0] || "";
+    if (special) q = special;
     rung = Q.length ? Q.indexOf(q) : 0; if (rung < 0) rung = Q.filter(isAsked).length;
     ladderEnd = !!Q.length && !q;
     var ki = A.liveKindInfo(pid);
-    return { pid: pid, ph: ph, phFa: PHN[ph], kind: ki.kind, type: ki.type, spatial: ki.spatial, kindSet: ki.set, q: q, rung: rung, ladderEnd: ladderEnd, list: Q, closure: A.liveClosure(pid), unused: unusedOf(s, pg).map(function (x) { return x.t; }), condUnused: condUsed(s).filter(function (x) { return !x.used; }).map(function (x) { return x.t; }) };
+    var asd = asideMap(s), aside = dataOf(s).filter(function (x) { return asd[x.id]; }).map(function (x) { return { t: x.t, why: asd[x.id] }; });
+    return { pid: pid, ph: ph, phFa: PHN[ph], kind: ki.kind, type: ki.type, spatial: ki.spatial, kindSet: ki.set, q: q, rung: rung, ladderEnd: ladderEnd, list: Q, closure: A.liveClosure(pid), unused: unusedOf(s, pg).map(function (x) { return x.t; }), condUnused: condUsed(s).filter(function (x) { return !x.used; }).map(function (x) { return x.t; }), aside: aside };
   };
   A.livePhaseQs = function (pid, ph) { var r = rec(pid); if (!r) return []; var s = solOf(pgOf(pid)); return phaseQs(r, s, ph || phaseOf(s)); };
   var COACH_BACK = [["alone", "خودش رسید — بی آن پرسش، یا با پرسشی کلی‌تر"], ["same", "باز همان پرسش لازم شد"], ["more", "پرسشِ خاص‌تری لازم شد"]];
@@ -1444,7 +1511,7 @@
      • طرحِ استقرایی بی واژهٔ «استقرا» هم استقرایی است: «برای n=1 وارسی … فرض می‌کنم برای n … برای n+1»، یا حرکتِ «نزول یا استقراء» (s25)؛
      • گامِ وارسی یا دادهٔ تازه («درستیِ گامِ پیش را دوباره وارسی کردم»، «اندازه گرفتم») بخشی از هر طرح است، نه عوض کردنِ آن (s36) ⇒ "check"؛
      • هم‌واژگی با پاره‌ای از طرح که گام همان واژه را نفی می‌کند («کیش نیست» در برابرِ «با وزیر کیش می‌دهم»، s21) پیروی نیست. */
-  var CHECK_STEP = /وارسی|بررسی|چک\s*(?:کرد|می|کن)|امتحان\s*کرد|آزمود|دوباره\s*(?:حساب|شمرد)|داده\s*(?:ی|ای)?\s*(?:تازه|جدید)|اطلاعات\s*(?:تازه|جدید)|اندازه\s*گرفت|پرسیدم|فهمیدم\s*که/;
+  var CHECK_STEP = /وارسی|بررسی|چک\s*(?:کرد|می|کن)|امتحان\s*کرد|آزمود|دوباره\s*(?:حساب|شمرد)|داده\s*(?:ی|ای)?\s*(?:تازه|جدید)|اطلاعات\s*(?:تازه|جدید)|اندازه\s*گرفت|پرسیدم|فهمیدم\s*که|جای?\s*گذاری|جایگذاری|جا\s*گذاشتم|(?:در|تو|توی)\s*شرط\s*(?:اصلی\s*)?(?:گذاشتم|قرار\s*دادم)|گذاشتم\s*(?:در|تو|توی)\s*شرط/;   // E8 (s36): جای‌گذاری در شرط وارسی است
   var NEG_AFTER = /^(?:نیست|نیستند|نبود|نشد|نمی|نه|ندارد|ندارند|نداد|نمی\s*دهد|نمیده|نمیدهد)$/;
   function negatedIn(text, w) {
     var ws = norm(text).split(/[^0-9a-zء-یپچژکگ]+/).filter(Boolean);
@@ -1460,6 +1527,9 @@
     if (CHECK_STEP.test(nm)) return "check";
     if (st.length < 2) return "short";
     if (!toksSim([L.plan.t, L.plan.t2, L.plan.rot].join(" ")).length) return "p1";
+    /* E8 (دورِ ۴، s21): گامی که کنشِ اصلیِ طرح را نفی می‌کند («کیش نیست» برای طرحِ «با وزیر کیش می‌دهم») پیروِ طرح نیست، هرچند «وزیر/مات» مشترک باشد */
+    var planAll = toksSim([L.plan.t, L.plan.t2, L.plan.rot].join(" "));
+    if (st.some(function (w) { return hit(w, planAll) && negatedIn(text, w); })) return "";
     var any = function (t) { var pt = toksSim(t), sh = st.filter(function (w) { return hit(w, pt); }); return pt.length && sh.length && !sh.some(function (w) { return negatedIn(text, w); }); };
     if (planPieces(L.plan.t).some(any) || any(L.plan.t)) return "p1";
     if (txt(L.plan.rot) && (planPieces(L.plan.rot).some(any) || any(L.plan.rot))) return "rot";
@@ -1602,7 +1672,7 @@
       if (!withReal && !stp.intuitive) win(L, "proof", st);
       if (withReal) remindStep(r, stp);
       delete SD[pid]; S.put(pg); clearBad();
-      A.toast(withReal ? "گام ثبت شد؛ " + (stp.due === A.today() ? "امروز" : A.fdate(stp.due)) + " در «امروز» می‌پرسد چه شد." : stp.intuitive ? "گام شهودی ثبت شد — بعداً ثابتش کن." : "گام با برهانش ثبت شد."); A.render();
+      clearBad(); A.toast(withReal ? "گام ثبت شد؛ " + (stp.due === A.today() ? "امروز" : A.fdate(stp.due)) + " در «امروز» می‌پرسد چه شد." : stp.intuitive ? "گام شهودی ثبت شد — بعداً ثابتش کن." : "گام با برهانش ثبت شد."); A.render();
     } }, withReal ? "ثبتِ گام و پیش‌بینی" : "ثبتِ گام (وارسی‌شده)"));
     box.appendChild(out);
     return box;
@@ -1782,6 +1852,7 @@
 
   /* ---------- معادله‌ها در برابرِ مجهول‌ها (دورِ ۲، R3) ---------- */
   var EQD = {};
+  var EQ_FEW = "معادله کم است: کدام بخشِ شرط هنوز به معادله درنیامده؟ (برای n مجهول دست‌کم n معادلهٔ مستقل لازم است)";
   function eqCard(r, pg, s) {
     var E = eqsOf(s); if (!E.length) return null;
     var ty0 = typeOf(r, s); if (ty0 === "prove" || ty0 === "pod") return null;   // A9: برهان مجهول ندارد — شمارِ معادله‌ها در برابرِ مجهول‌ها بی‌معناست
@@ -1803,6 +1874,8 @@
     var L = live(s), ph = phaseOf(s); if (ph === "done" || ph === "b" || !uOf(s)) return null;
     var u0 = uOf(s) || {}, start = L.startD || (u0.at ? (A.localDay ? A.localDay(u0.at) : String(u0.at).slice(0, 10)) : ""); if (!start) return null;
     var n = (L.checkins || []).length, rung = LADDER[Math.min(n + 1, LADDER.length - 1)], due = A.addDays(start, LADDER.slice(1, n + 2).reduce(function (a, b) { return a + b; }, 0) || rung);
+    /* E8 (دورِ ۴، s34): مرورِ دیرتر از موعد ثبت شد ⇒ پلهٔ بعد از روزِ همان مرور شمرده می‌شود (پیش‌تر کارت و «امروز» همان روز دوباره خالی برمی‌گشت) */
+    var lastCk = n ? L.checkins[n - 1] : null; if (lastCk && lastCk.d) { var d2 = A.addDays(lastCk.d, rung); if (d2 > due) due = d2; }
     return due <= A.today() ? due : null;
   }
   var CKD = {};
@@ -1816,7 +1889,7 @@
       selF("lpCkW", "حالا چقدر می‌خواهی حلش کنی — نسبت به آغاز؟", WANT, d.want, function (v) { d.want = v; }));
     box.appendChild(h("button", { class: "btn sm lp-ckgo", type: "button", onclick: function () {
       if (toks(d.prob).length < 2 || toks(d.self).length < 2 || !d.want) { A.toast("هر سه را بنویس — حتی کوتاه.", "bad"); return; }
-      (L.checkins = L.checkins || []).push({ at: nowISO(), d: A.today(), prob: txt(d.prob), self: txt(d.self), want: d.want }); delete CKD[pid]; S.put(pg); A.toast("ثبت شد."); A.render();
+      (L.checkins = L.checkins || []).push({ at: nowISO(), d: A.today(), prob: txt(d.prob), self: txt(d.self), want: d.want }); delete CKD[pid]; S.put(pg); clearBad(); A.toast("مرورِ میانهٔ راه ثبت شد."); A.render();
     } }, "ثبت و ادامه"));
     return box;
   }
@@ -1856,11 +1929,24 @@
   /* «کدام پرسش کمک کرد؟» فقط پرسش است (دورِ ۲، s37): جملهٔ دستیار وقتی پرسش است که به «؟» ختم شود و واژهٔ پرسشی داشته باشد (نه «آفرین، ادامه بده؟») */
   var QWORD = /(?:^|[\s«(])(?:چه|چی|چیه|چرا|کدام|کدوم|آیا|چطور|چطوری|چگونه|کجا|کجای|کی|چند|چقدر|می[‌\s]?توانی|می[‌\s]?تونی|میتونی|می[‌\s]?شود|میشه|می[‌\s]?شه|هست|داری|دیده‌ای|دیدی|بود|است|کرده‌ای|کردی|گرفتی|برده‌ای|بردی)(?=[\s؟?،]|$)/;
   function chatQs(r) {
-    var pid = r.p.id, o = [];
+    var pid = r.p.id, o = [], s0 = solOf(pgOf(pid)), known = [];
+    ["u", "p", "c", "b"].forEach(function (k) { try { phaseQs(r, s0, k).forEach(function (q) { if (known.indexOf(q) < 0) known.push(q); }); } catch (e) { } });
     S.all("achat", function (x) { return x && (x.lprob === pid || (r.sess && x.id === r.sess)); }).forEach(function (se) {
-      (se.msgs || []).forEach(function (m) { if (!m || m.role !== "ai") return; String(m.text || "").split(/(?<=[؟?])\s+|\n+/).forEach(function (t) { t = txt(t).replace(/^[-•*\d.)\s]+/, ""); if (/[؟?]$/.test(t) && QWORD.test(t) && t.length >= 8 && t.length <= 220 && o.indexOf(t) < 0) o.push(t); }); });
+      (se.msgs || []).forEach(function (m) { if (!m || m.role !== "ai") return; String(m.text || "").split(/(?<=[؟?])\s+|\n+|(?<=[.!:])\s+/).forEach(function (t) { t = txt(t).replace(/^[-•*\d.)\s]+/, "");
+        if (!(/[؟?]$/.test(t) && QWORD.test(t) && t.length >= 8 && t.length <= 220)) return;
+        /* E5: تکهٔ یک پرسشِ شناخته‌شده («از آن چه به کار می‌آید؟») ⇒ همان پرسشِ کامل */
+        var kq = known.filter(function (q) { return sameQ(t, q); })[0]; if (kq) t = kq;
+        if (o.indexOf(t) < 0) o.push(t); }); });
     });
     return o.slice(-8);
+  }
+  /* پرسش‌هایی که در صفحه پاسخ گرفتند: پرسش‌های کارتِ فهم (مجهول، داده‌ها، شرط، «کافی است؟» — کارت بی آن‌ها ثبت نمی‌شود) + پرسش‌های طرح که پاسخ دادی */
+  function pageQs(r, s, pg) {
+    var o = [], u = uOf(s), U0 = [];
+    try { U0 = phaseQs(r, s, "u"); } catch (e) { U0 = []; }
+    usedQs(pg).forEach(function (q) { if (o.indexOf(q) < 0) o.push(q); });
+    if (u) U0.slice(0, 4).forEach(function (q) { if (o.indexOf(q) < 0) o.push(q); });
+    return o;
   }
   A.liveChatQs = function (pid) { var r = rec(pid); return r ? chatQs(r) : []; };
   /* ---------- بازنگری بر حسبِ نوع (دورِ ۲ ِ تور؛ R2/R5/R8) ----------
@@ -1882,13 +1968,22 @@
     /* D1: وارسیِ برهان (همهٔ فرض، نتیجه = حکم) فقط برای حکمی که داورش برهان است — «اثبات یا رد کن» ِ زندگی برهان ندارد */
     var prf = (ty === "prove" || ty === "pod") && nat === "objective";
     return { nat: nat, ty: ty, obj: nat === "objective", proof: prf, pod: ty === "pod" && prf, spatial: spatialOf(s, r), dep: u.dep || "",
-      law: (nat === "practical" || nat === "life") && LAW_RE.test(all), transf: nat === "objective" && TRANSF_RE.test(all), indirect: prf && INDIRECT_RE.test(all),
+      law: (nat === "practical" || nat === "life") && LAW_RE.test(all), transf: nat === "objective" && TRANSF_RE.test(all),
+      /* E5 (دورِ ۴، s11): «غیرمستقیم ⇐ مستقیم» برای هر گامِ برهان‌شکل در مسئلهٔ کامل‌بیان‌شده، نه فقط «اثباتی/اثبات یا رد کن» */
+      indirect: nat === "objective" && INDIRECT_RE.test(all),
+      /* E5 (دورِ ۴، s01/s09): نتیجه با تک‌تکِ بخش‌های ثبت‌شدهٔ شرط سنجیده می‌شود («اثبات یا رد کن» سرانجامِ خودش را دارد) */
+      parts: ty === "pod" ? [] : condParts(s),
       cond: nat === "objective" ? condUsed(s).filter(function (x) { return !x.used; }) : [],
       /* A5: «داده بازه دارد» = دادهٔ عددی یا نمادی (کمیتی که می‌تواند به صفر یا بی‌نهایت برود)، یا مسئلهٔ فضایی؛ برای برهانِ «اثباتی» حالت‌های پایه/مرزی در خودِ BACK_PROVE است */
-      limit: spatialOf(s, r) || (ty === "find" && dataOf(s).concat([{ t: u.u }]).some(function (x) { return /[0-9]|(?:^|[^a-z])[a-z](?:$|[^a-z])/.test(norm(x.t)); })),
+      /* E4 (دورِ ۴، s21): حالتِ حدی فقط برای یافتنیِ کامل‌بیان‌شده با دادهٔ عددی/نمادی (یا فضایی) — نامِ خانه‌های شطرنج («f6»، «b1») داده نیست */
+      limit: spatialOf(s, r) || (ty === "find" && nat === "objective" && dataOf(s).concat([{ t: u.u }]).some(function (x) { var t0 = norm(x.t).replace(/(?:^|[^a-z0-9])[a-z]{1,2}[0-9]{1,2}(?=$|[^a-z0-9])/g, " "); return /[0-9]|(?:^|[^a-z])[a-z](?:$|[^a-z])/.test(t0); })),
       depNo: ty === "find" && u.dep === "" };
   }
-  function lbDefect(d, F) { return d.chkRes === "ایرادی یافتم" || (F.proof && (d.hyp === "notall" || d.concl === "diff")) || (F.transf && d.equiv === "no"); }
+  function lbDefect(d, F) { return d.chkRes === "ایرادی یافتم" || (F.proof && (d.hyp === "notall" || d.concl === "diff")) || (F.transf && d.equiv === "no") || (F.pod && d.pod === "gap") || cpNo(d, F); }
+  /* E5: هر «نه» در سنجشِ بخش‌های شرط ⇒ ناتمام (هرگز «سالم») */
+  function cpNo(d, F) { return (F.parts || []).some(function (x, i) { return d.cp && d.cp[i] === "no"; }); }
+  var NEG_PART = /(?:^|\s)(?:نه|نیست|نبود|نشد|نرسید|نمی\s*رسد|نمی\s*رسه|نرسیده|برقرار\s*نیست|نقض|کمتر\s*از|بیشتر\s*از|نه\s*[0-9])(?=\s|$|[.,،؛])/;
+  function partNegated(chk, part) { var c = String(chk || "").split(/[.؛;\n،]/).filter(function (x) { return mentions(x, part); }); return c.some(function (x) { return NEG_PART.test(norm(x)); }); }
   A.liveLookFlags = function (pid) { var r = rec(pid); return r ? lbFlags(r, solOf(pgOf(pid))) : null; };
   function lookBack(r, pg, s) {
     var pid = r.p.id, L = live(s), ab = L.state === "abandoned", g = s.g && s.g[1], F = lbFlags(r, s);
@@ -1913,6 +2008,15 @@
     } else {
       box.appendChild(field("lpBChk", "نتیجه را وارسی می‌کنی؟ چطور — با یک واقعیت، عدد، نظرِ کسی، یا حالتِ خاص؟", d.chkHow, function (v) { d.chkHow = v; }, 2));
       box.appendChild(selF("lpBRes", "نتیجهٔ وارسی", ["نتیجه سالم ماند", "ایرادی یافتم", "نتوانستم وارسی کنم"], d.chkRes, function (v) { d.chkRes = v; rer(); }));
+      if (F.parts.length) {
+        d.cp = d.cp || {};
+        var cpf = h("fieldset", { class: "col gap lp-bparts" }, h("legend", {}, F.ty === "prove" ? "برهانت هر بخشِ حکم را نشان می‌دهد؟" : "نتیجه را با هر بخشِ شرطی که در فهم نوشتی بسنج"));
+        F.parts.forEach(function (pt, i) {
+          cpf.appendChild(selF("lpBCP_" + i, "«" + clip(pt, 90) + "» — " + (F.ty === "prove" ? "برهانت این بخش را نشان می‌دهد؟" : "نتیجه این بخش را برآورده می‌کند؟"), [["yes", "بله"], ["no", "نه — برآورده نمی‌کند"]], d.cp[i] || "", function (v) { d.cp[i] = v; rer(); }));
+          if (d.cp[i] !== "no" && partNegated(d.chkHow, pt)) cpf.appendChild(h("p", { class: "small warnline lp-bpneg", "data-part": i }, "وارسی‌ات دربارهٔ همین بخش «نه/نرسید» می‌گوید — نتیجه آن را برآورده می‌کند؟"));
+        });
+        box.appendChild(cpf);
+      }
       box.appendChild(prov("b"));
       box.appendChild(field("lpBOther", "از راهِ دیگری هم به همین می‌رسیدی؟ چطور؟", d.other, function (v) { d.other = v; }, 0));
       box.appendChild(field("lpBGlance", "کلِ حل را در یک نگاه (یک جمله) ببین", d.glance, function (v) { d.glance = v; }, 0));
@@ -1930,7 +2034,8 @@
     if (!ab && F.limit) box.appendChild(field("lpBLimit", "حالتِ حدی (A150): اگر یکی از اندازه‌ها به صفر برسد یا خیلی بزرگ شود (یا دو داده برابر شوند)، نتیجه‌ات همان را می‌گوید که باید؟", d.limit || "", function (v) { d.limit = v; }, 0));
     /* A13 (s07): «نه — داده‌ها ثابت‌اند» ِ فهم پس از حل دوباره سنجیده می‌شود؛ اگر حالا وابسته است، یکنوایی پرسیده می‌شود */
     if (!ab && F.depNo) {
-      box.appendChild(selF("lpBDep", "در فهم گفتی هیچ داده‌ای با مجهول عوض نمی‌شود — حالا که نتیجه را دیدی، هنوز همین است؟", [["no", "بله — داده‌ها ثابت ماندند"], ["yes", "نه — داده‌ای با مجهول عوض شد"]], d.depAgain || "", function (v) { d.depAgain = v; rer(); }));
+      /* E8 (s-B، ردهٔ d): پرسش و گزینه‌ها هم‌جهت — «بله» یعنی بله (پیش‌تر «نه» با مقدارِ yes گیج می‌کرد) */
+      box.appendChild(selF("lpBDep", "در فهم گفتی هیچ داده‌ای با مجهول عوض نمی‌شود. حالا که نتیجه را دیدی: داده‌ای هست که با مجهول عوض شود؟", [["no", "نه — داده‌ها ثابت ماندند"], ["yes", "بله — داده‌ای با مجهول عوض شد"]], d.depAgain || "", function (v) { d.depAgain = v; rer(); }));
       if (d.depAgain === "yes") box.appendChild(field("lpBMono", "کدام داده، و وقتی آن بیشتر شود نتیجه‌ات در جهتِ درست عوض می‌شود؟ (یکنوایی، A151)", d.mono || "", function (v) { d.mono = v; }, 0));
     }
     if (!ab && F.dep) box.appendChild(field("lpBMono", "یکنوایی (A151): گفتی «" + clip(F.dep, 80) + "» — وقتی آن بیشتر شود، نتیجه‌ات در جهتِ درست عوض می‌شود؟", d.mono || "", function (v) { d.mono = v; }, 0));
@@ -1941,6 +2046,8 @@
       if (asl.length) box.appendChild(h("p", { class: "small lp-basides" }, "آنچه با دلیل بیرون گذاشتی: " + asl.map(function (x) { return "«" + clip(x.t, 50) + "» (" + clip(asd[x.id], 60) + ")"; }).join("، ")));
       if (u0 && u0.prac && u0.prac.approx) box.appendChild(h("p", { class: "small muted" }, "تقریبی که بس دانستی: «" + u0.prac.approx + "»"));
       box.appendChild(field("lpBApprox", "تقریبت بس بود؟ آنچه بیرون گذاشتی اثرِ محسوسی نشان داد؟ (در واقعیت چه دیدی)", d.approx || "", function (v) { d.approx = v; }, 2));
+      /* E8 (s23): واحد و بُعد در بازنگریِ مسئلهٔ عملی هم (A152) */
+      if (!F.spatial) box.appendChild(field("lpBUnits", "واحد و بُعد: دو سوی هر رابطه‌ات هم‌واحدند؟ اگر همه را با واحدِ دیگری بسنجی، نتیجه درست می‌ماند؟", d.units || "", function (v) { d.units = v; }, 0));
     }
     if (!ab && F.cond.length) box.appendChild(h("div", { class: "card soft col gap lp-bcond" }, h("p", { class: "small warnline" }, "از کلِ شرط استفاده کردی؟ (B086) این بخش‌ها در هیچ گام یا طرحی نیامدند: " + F.cond.map(function (x) { return "«" + clip(x.t, 60) + "»"; }).join("، ")),
       field("lpBCond", "هر کدام کجا به کار رفت — یا چرا لازم نبود؟", d.cond || "", function (v) { d.cond = v; }, 0)));
@@ -1950,15 +2057,20 @@
       /* A10 (دورِ ۳، s03/s38): در «اثبات یا رد کن» دو چیز هست — حکمی که سنجیده شد و ردِ تو. پرسش‌ها اول می‌پرسند کدام شد، بعد دربارهٔ همان می‌پرسند
          (پیش‌تر «همهٔ فرض به کار رفت؟» دربارهٔ حکمِ ردشده پرسیده می‌شد و پاسخِ راست «ایراد» ثبت می‌کرد) */
       var podR = F.pod && d.pod === "refuted";
-      if (F.pod) box.appendChild(selF("lpBPod", "سرانجامِ «اثبات یا رد کن»: حکم را ثابت کردی یا رد کردی؟", [["proved", "ثابت کردم — حکم درست است"], ["refuted", "رد کردم — حکم نادرست است (مثالِ نقض یا برهانِ خلاف)"]], d.pod || "", function (v) { d.pod = v; rer(); }));
+      /* E5 (دورِ ۴، s27): گزینهٔ سوم — «هیچ‌کدام: استدلالم شکاف دارد» ⇒ ناتمام (پیش‌تر برای ثبتِ ایراد باید «ثابت/رد کردم» برگزیده می‌شد) */
+      if (F.pod) box.appendChild(selF("lpBPod", "سرانجامِ «اثبات یا رد کن»: حکم را ثابت کردی یا رد کردی؟", [["proved", "ثابت کردم — حکم درست است"], ["refuted", "رد کردم — حکم نادرست است (مثالِ نقض یا برهانِ خلاف)"], ["gap", "هیچ‌کدام — استدلالم شکاف دارد"]], d.pod || "", function (v) { d.pod = v; rer(); }));
+      if (!(F.pod && d.pod === "gap")) {
       box.appendChild(selF("lpBHyp", podR ? "ردِ تو (مثالِ نقض) همهٔ فرضِ حکم را برآورده می‌کند؟ (مثالی که بخشی از فرض را ندارد، حکم را رد نمی‌کند)" : "همهٔ فرض به کار رفت؟ (B095: هر بندِ فرض باید برای حکم لازم باشد)", podR ? [["all", "بله — همهٔ فرض در مثالم برقرار است و حکم نه"], ["notall", "نه — بخشی از فرض در مثالم برقرار نیست (پس رد نمی‌کند)"]] : [["all", "بله — هر بخشِ فرض جایی در برهان آمد"], ["notall", "نه — بخشی به کار نرفت (پس یا زائد است یا برهان ناقص)"]], d.hyp || "", function (v) { d.hyp = v; rer(); }));
       box.appendChild(selF("lpBConcl", podR ? "ردت دقیقاً خلافِ همان حکم را نشان می‌دهد (نه حکمی دیگر یا ضعیف‌تر)؟" : "نتیجه‌ای که برهانت واقعاً می‌دهد، با حکمی که ادعا شده بود یکی است؟", podR ? [["same", "بله — دقیقاً نقیضِ همان حکم"], ["diff", "نه — چیزِ دیگری را رد می‌کند"]] : [["same", "یکی است"], ["diff", "یکی نیست — برهان چیزِ دیگری (ضعیف‌تر/قوی‌تر/عکسش) را نشان می‌دهد"]], d.concl || "", function (v) { d.concl = v; rer(); }));
       box.appendChild(field("lpBDef", "قاعدهٔ پاسکال (B060): هر واژهٔ اصلیِ حکم را با تعریفش جایگزین کن — برهانت کجا از تعریفِ هر کدام استفاده کرد؟", d.def || "", function (v) { d.def = v; }, 0));
-      if (F.indirect) box.appendChild(field("lpBDirect", "برهانت غیرمستقیم (خلف) بود: می‌توانی مستقیمش کنی؟ کدام بخشش به فرضِ نادرست بسته نیست و جدا می‌ماند (C064/C067)؟", d.direct || "", function (v) { d.direct = v; }, 0));
+      }
     }
+    if (!ab && F.indirect) box.appendChild(field("lpBDirect", "استدلالت غیرمستقیم (خلف) بود: می‌توانی مستقیمش کنی؟ کدام بخشش به فرضِ نادرست بسته نیست و جدا می‌ماند (C064/C067)؟", d.direct || "", function (v) { d.direct = v; }, 0));
     if (!ab && F.ty === "find" && F.obj) {
       box.appendChild(selF("lpBMulti", "چند جواب پیدا شد؟", [["one", "یکی"], ["many", "بیش از یکی"], ["none", "هیچ — شرط برآوردنی نبود"]], d.multi || "", function (v) { d.multi = v; rer(); }));
       if (d.multi === "many" || d.multi === "none") box.appendChild(multiCard(r, pg, s, d.multi === "many" ? "گفتی بیش از یک جواب پیدا شد." : "گفتی هیچ جوابی نبود."));
+      /* E8 (s29): «بیش از یکی» ⇒ همه را یافتی؟ و شرط را با نام‌ها/خط‌های تازه دوباره بیان کن */
+      if (d.multi === "many") box.appendChild(field("lpBMultiW", "همه را یافتی؟ کدام بخشِ شرط آن‌ها را از هم جدا نمی‌کند — شرط را با نام‌ها یا خط‌های تازه دوباره بیان کن.", d.multiW || "", function (v) { d.multiW = v; }, 0));
     }
     var defect = !ab && lbDefect(d, F);
     if (defect) box.appendChild(h("div", { class: "card soft col gap lp-bdefect" }, h("h4", {}, "وارسی ایراد یافت — هنوز حل نشده"),
@@ -1966,9 +2078,10 @@
       field("lpBDefW", "ایراد دقیقاً چیست؟", d.defWhy || "", function (v) { d.defWhy = v; }, 0),
       selF("lpBDefTo", "به کدام مرحله برمی‌گردی؟", BACK_TO, d.defTo || "", function (v) { d.defTo = v; })));
     /* «کدام پرسش کمک کرد؟» فقط پرسش‌ها (پرسش‌های طرح که پاسخشان دادی + پرسش‌های واقعیِ دستیار)؛ ابزارها جدا */
-    var Qs = usedQs(pg), Cs = cardsUsed(r, s), Ch = chatQs(r);
+    /* E5 (دورِ ۴، s23/s29): «کدام پرسش کمک کرد؟» همیشه هست — پرسش‌هایی که در صفحه پاسخ دادی (کارتِ فهم، پرسش‌های طرح) و پرسش‌های دستیار، هر کدام کامل */
+    var Qs = pageQs(r, s, pg), Cs = cardsUsed(r, s), Ch = chatQs(r).filter(function (q) { return Qs.indexOf(q) < 0; });
     var bestOpts = Qs.map(function (q, i) { return [String(i), q]; }).concat(Ch.map(function (q, i) { return ["chat:" + i, "💬 " + q]; }));   // A13: کلِ پرسش، نه تکهٔ آغازش
-    if (!defect && bestOpts.length) box.appendChild(selF("lpBBest", "کدام پرسش بیشتر از همه کمک کرد؟ (پرسش‌های طرح که پاسخ دادی، و پرسش‌های دستیار در گفت‌وگوی همین مسئله)", bestOpts.concat([["none", "هیچ‌کدام"]]), d.best, function (v) { d.best = v; }));
+    if (!defect && bestOpts.length) box.appendChild(selF("lpBBest", "کدام پرسش بیشتر از همه کمک کرد؟ (پرسش‌هایی که در صفحه پاسخ دادی، و پرسش‌های دستیار در گفت‌وگوی همین مسئله)", bestOpts.concat([["none", "هیچ‌کدام"]]), d.best, function (v) { d.best = v; }));
     if (!defect && Cs.length) box.appendChild(selF("lpBTool", "و کدام ابزار؟ (اختیاری)", Cs.map(function (c) { return [c[0], "🧰 " + c[1]]; }).concat([["none", "هیچ‌کدام"]]), d.tool || "", function (v) { d.tool = v; }));
     if (!defect) {
       box.appendChild(field("lpBUse", ab ? "درسِ تو به قلمِ خودت (اختیاری): کجای دیگر به کار می‌آید؟" : "درسِ تو به قلمِ خودت: این روش یا نتیجه کجای دیگر به کار می‌آید؟", d.use, function (v) { d.use = v; }, 2));
@@ -1986,19 +2099,23 @@
       if (d.hit === "نادرست بود" || d.hit === "تاحدی") box.appendChild(field("lpBHitW", d.hit === "نادرست بود" ? "چرا شهودت خطا رفت — کدام فرضِ پنهان یا نشانهٔ فریبنده تو را به آن حدس برد؟" : "کدام بخشِ حدس نادرست بود و چرا؟ (اختیاری)", d.hitWhy || "", function (v) { d.hitWhy = v; }, 0));
     }
     var ua = defect ? null : unusedAsk(un, d.unused, "lpBU_"); if (ua) box.appendChild(ua);
+    if (d.softShow) box.appendChild(softField("lpBSoftWhy", d));
     box.appendChild(h("div", { class: "row gap wrap" }, h("button", { class: "btn lp-lbsave", type: "button", onclick: function () {
-      var miss = [];
+      var miss = [], soft = [];
       if (ab) { if (txt(d.why).length < 3) miss.push("«چرا کنارش می‌گذاری؟»"); if (!d.src) miss.push("«این دلیل از کجاست؟»"); }
       else {
         if (txt(d.chkHow).length < 3) miss.push("«وارسیِ نتیجه»"); if (!d.chkRes) miss.push("«نتیجهٔ وارسی»");
         if (F.pod && !d.pod) miss.push("«سرانجام: ثابت کردی یا رد کردی؟»");
-        if (F.proof) { if (!d.hyp) miss.push("«همهٔ فرض به کار رفت؟»"); if (!d.concl) miss.push("«نتیجه با حکم یکی است؟»"); }
+        if (F.proof && !(F.pod && d.pod === "gap")) { if (!d.hyp) miss.push("«همهٔ فرض به کار رفت؟»"); if (!d.concl) miss.push("«نتیجه با حکم یکی است؟»"); }
+        F.parts.forEach(function (pt, i) { if (!(d.cp && d.cp[i])) miss.push("«" + clip(pt, 40) + "» — نتیجه این بخش را برآورده می‌کند؟"); });
         if (F.transf && !d.equiv) miss.push("«تبدیل‌ها هم‌ارز بودند؟»");
       }
       if (defect) {
         if (toks(d.defWhy).length < 2) miss.push("«ایراد دقیقاً چیست؟»"); if (!d.defTo) miss.push("«به کدام مرحله برمی‌گردی؟»");
         if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); return; }
         var atD = nowISO(), dfx = { at: atD, d: A.today(), why: txt(d.defWhy), to: d.defTo, chkHow: txt(d.chkHow), chkRes: d.chkRes, hyp: d.hyp || "", concl: d.concl || "", equiv: d.equiv || "" };
+        if (cpNo(d, F)) dfx.parts = F.parts.filter(function (x, i) { return d.cp[i] === "no"; });
+        if (F.pod && d.pod === "gap") dfx.pod = "gap";
         (L.defects = L.defects || []).push(dfx); L.state = "open"; L.reopenAt = atD; if (d.defTo === "u") L.reU = true;
         delete BKD[pid]; delete L.bDraft; if (dTimer) clearTimeout(dTimer); S.put(pg);
         A.toast("ناتمام — برگرد به «" + BACK_TO_FA[d.defTo] + "». ایراد ثبت شد؛ پس از درست کردن دوباره «✅ حل شد»."); A.go("lprob", pid, d.defTo === "u" ? "u" : d.defTo === "p" ? "plan" : "exec");
@@ -2011,29 +2128,33 @@
         if (g && g.guess && !d.hit) miss.push("«داوریِ حدس»");
         if (g && g.guess && d.hit === "نادرست بود" && toks(d.hitWhy).length < 3) miss.push("«چرا شهودت خطا رفت؟»");
         if (F.spatial) { if (toks(d.sym).length < 2) miss.push("«تقارن»"); if (toks(d.units).length < 2) miss.push("«واحد و بُعد»"); }
-        if (F.limit && toks(d.limit).length < 2) miss.push("«حالتِ حدی»");
+        if (F.limit && !txt(d.limit)) miss.push("«حالتِ حدی»"); else if (F.limit && toks(d.limit).length < 2) soft.push(["limit", "«حالتِ حدی» — اگر یکی از اندازه‌ها به صفر یا بی‌نهایت برود، نتیجه‌ات چه می‌گوید؟"]);
         if (F.depNo && !d.depAgain) miss.push("«داده‌ها هنوز ثابت‌اند؟»");
         if ((F.dep || (F.depNo && d.depAgain === "yes")) && toks(d.mono).length < 2) miss.push("«یکنوایی»");
         if (F.law && toks(d.law).length < 3) miss.push("«دامنه و حالتِ حدیِ قانونت»");
-        if (F.nat === "practical" && toks(d.approx).length < 2) miss.push("«تقریبت بس بود؟»");
+        if (F.nat === "practical" && !txt(d.approx)) miss.push("«تقریبت بس بود؟»"); else if (F.nat === "practical" && toks(d.approx).length < 2 && !APPROX_RE.test(norm(d.approx))) soft.push(["approx", "«تقریبت بس بود؟» — در واقعیت چه دیدی؟ (مثلاً «±۱۰٪ بس بود»)"]);
+        if (F.nat === "practical" && !F.spatial && toks(d.units).length < 2) miss.push("«واحد و بُعد»");
+        if (F.ty === "find" && F.obj && d.multi === "many" && toks(d.multiW).length < 2) miss.push("«همه را یافتی؟ شرط را دوباره بیان کن»");
+        F.parts.forEach(function (pt, i) { if (d.cp && d.cp[i] === "yes" && partNegated(d.chkHow, pt)) soft.push(["cpneg" + i, "وارسی‌ات دربارهٔ «" + clip(pt, 40) + "» «نه/نرسید» می‌گوید ولی گفتی برآورده می‌کند — کدام درست است؟"]); });
         if (F.cond.length && toks(d.cond).length < 2) miss.push("«بخش‌های شرط که به کار نرفتند»");
         if (F.proof && toks(d.def).length < 2) miss.push("«قاعدهٔ پاسکال: برهان کجا از تعریف استفاده کرد؟»");
-        if (F.proof && F.indirect && toks(d.direct).length < 2) miss.push("«برهانِ غیرمستقیم ⇐ مستقیم»");
+        if (F.indirect && toks(d.direct).length < 2) miss.push("«برهانِ غیرمستقیم ⇐ مستقیم»");
         if (F.ty === "find" && F.obj && !d.multi) miss.push("«چند جواب پیدا شد؟»");
       }
-      if (bestOpts.length && !d.best) miss.push("«کدام پرسش کمک کرد؟»");
+      if (bestOpts.length && !d.best && !defect) miss.push("«کدام پرسش کمک کرد؟»");
       if (!d.want) miss.push("«خواستن در پایان»");
       /* A157: مسئلهٔ تازه باید تازه باشد — نه تقریباً همان صورت (A.kNearCopy). دورِ ۲ (R4): «چه چیزی مشترک است» را خودت اعلام می‌کنی (روش، مجهول، داده، شرط،
          ساختار، نتیجه) با یک خطِ مشخص — کد دیگر با واژه‌های مشترک «هیچ چیزِ مشترکی ندارد» نمی‌گوید (مسئلهٔ تازه با همان روش اغلب هیچ واژهٔ مشترکی ندارد) */
       if (txt(d.newProb)) {
-        if (sameText(d.newProb, r.p.statement) || sameText(d.newProb, r.p.title) || sameText(d.newProb, (u0 || {}).one)) miss.push("«مسئلهٔ تازه» همان مسئلهٔ اصلی است — چیزی را عوض کن (مجهول، داده یا شرط)");
+        if (sameText(d.newProb, r.p.statement) || sameText(d.newProb, r.p.title) || sameText(d.newProb, (u0 || {}).one)) soft.push(["copy", "«مسئلهٔ تازه» همان مسئلهٔ اصلی است — چیزی را عوض کن (مجهول، داده یا شرط)"]);
         if (!d.newShare) miss.push("«مسئلهٔ تازه چه چیزی با این مشترک دارد؟»");
         else if (d.newShare === "form" && !mapOk(d.newMap)) miss.push("«ساختار — هم‌ریخت» نگاشت می‌خواهد: هر جزءِ این مسئله ⇐ جزءِ متناظر در تازه (مثلاً «شهرها ⇐ رأس‌ها»)");
         if (!spec(d.newWhy)) miss.push("«در یک خط: چه چیزی از این مسئله در آن هست؟» (دست‌کم سه واژهٔ معنادار)");
-        else if (near(d.newWhy, d.newProb) || near(d.newWhy, r.p.statement)) miss.push("خطِ «چه چیزی مشترک است» رونوشتِ صورت است — بگو دقیقاً چه چیزی");
+        else if (near(d.newWhy, d.newProb) || near(d.newWhy, r.p.statement)) soft.push(["copywhy", "خطِ «چه چیزی مشترک است» رونوشتِ صورت است — بگو دقیقاً چه چیزی"]);
       }
       unusedMiss(un, d.unused).forEach(function (x) { miss.push(x); });
-      if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); return; }
+      var sg = softGate(d, soft, miss);
+      if (miss.length) { A.toast("اول این‌ها: " + miss.join("، "), "bad"); if (d.softShow && !box.querySelector("#lpBSoftWhy")) rer(); return; }
       var at = nowISO(), keep = {}; un.forEach(function (x) { keep[x.id] = { ans: d.unused[x.id].ans, why: txt(d.unused[x.id].why), t: x.t }; });
       var b = { state: L.state, chkHow: txt(d.chkHow), chkRes: d.chkRes, other: txt(d.other), glance: txt(d.glance), worked: txt(d.worked), use: txt(d.use), newProb: txt(d.newProb), unused: keep, want: d.want, at: at, done: true, from: "live" };
       if (txt(d.newProb)) { b.newShare = d.newShare; b.newWhy = txt(d.newWhy); if (d.newShare === "form") b.newMap = txt(d.newMap); }
@@ -2050,10 +2171,14 @@
         if (F.depNo) b.depAgain = d.depAgain;
         if (F.dep || (F.depNo && d.depAgain === "yes")) b.mono = txt(d.mono);
         if (F.law) b.law = txt(d.law);
-        if (F.nat === "practical") b.approx = txt(d.approx);
+        if (F.nat === "practical") { b.approx = txt(d.approx); if (!F.spatial) b.units = txt(d.units); }
+        if (F.parts.length) b.parts = F.parts.map(function (x, i) { return { t: x, ok: d.cp[i] }; });
+        if (d.multi === "many") b.multiW = txt(d.multiW);
         if (F.cond.length) b.cond = txt(d.cond);
         if (F.transf) b.equiv = d.equiv;
-        if (F.proof) { b.hyp = d.hyp; b.concl = d.concl; b.def = txt(d.def); if (F.indirect) b.direct = txt(d.direct); }
+        if (F.proof) { b.hyp = d.hyp; b.concl = d.concl; b.def = txt(d.def); }
+        if (F.indirect) b.direct = txt(d.direct);
+        if (sg) { b.soft = sg; (L.softLog = L.softLog || []).push({ where: "b", keys: sg.keys, why: sg.why, at: sg.at }); }
         if (F.ty === "find" && F.obj && d.multi) b.multi = d.multi;
         /* حکمِ صادقانهٔ بستن: «اثبات شد» فقط برای برهانِ کاملِ وارسی‌شده؛ گامِ شهودیِ ثابت‌نشده ⇒ «با گامِ شهودی»؛ «نتوانستم وارسی کنم» ⇒ «وارسی نشد» */
         var pfSteps = L.steps.filter(function (x) { return x.out && x.out.kind === "proof"; }), intu = L.steps.filter(function (x) { return x.intuitive; });
@@ -2073,7 +2198,7 @@
       if (b.use && A.newCard) { var cd = A.newCard("در مسئلهٔ «" + r.p.title + "» چه درسی گرفتی و کجای دیگر به کارش می‌بری؟ (بی‌نگاه)", b.use + (b.newProb ? "\nمسئلهٔ تازه‌ای که ساختی: " + b.newProb : "") + (b.worked ? "\nچه خوب کار کرد: " + b.worked : ""), { pb: pid, due: A.addDays(A.today(), 1) }); les.card = cd && cd.id; }
       if (b.use) s.lessons.push(les);
       /* «مسئلهٔ تازه‌ای که خودت ساختی» ⇒ مسئلهٔ حل‌نشدهٔ تازه، خفته تا پلهٔ دومِ نردبان؛ داور، نوع و فضایی بودن را از همین مسئله ارث می‌برد (R2) */
-      if (b.newProb) { var nr = create(clip(b.newProb, 80), b.newProb, "", { origin: { type: "lprob", id: pid, share: b.newShare || "" }, dormant: A.addDays(A.today(), LADDER[1]) }); b.newPid = nr.p.id; L.made = (L.made || []).concat([nr.p.id]); }
+      if (b.newProb) { var nr = create(clip(b.newProb, 80), b.newProb, "", { origin: { type: "lprob", id: pid, share: b.newShare || "", map: b.newMap || "", why: b.newWhy || "" }, dormant: A.addDays(A.today(), LADDER[1]) }); b.newPid = nr.p.id; L.made = (L.made || []).concat([nr.p.id]); }
       if (ab) {
         var w = s.will = s.will || {}; w.steps = w.steps || []; w.log = w.log || [];
         var riv = U.nextIv(LADDER[0], true);
@@ -2082,7 +2207,7 @@
       }
       closeOpen(s, L.state);
       L.closedAt = at; delete BKD[pid]; delete L.bDraft; if (dTimer) clearTimeout(dTimer); S.put(pg); S.put(r);
-      A.toast(ab ? "کنار گذاشتنِ آگاهانه ثبت شد؛ " + A.fdate(s.will.drop.due) + " یک بار می‌پرسد." : (b.verdict === "proved" ? "اثبات شد. " : b.verdict === "refuted" ? "رد شد (حکم نادرست است). " : "") + (guessFate(g) === "refuted" ? "حدسِ پیش از حلت رد شد. " : "") + "بازنگری ثبت شد: درس، کارتِ مرور، و مسئلهٔ تازه‌ات " + A.fdate(A.addDays(A.today(), LADDER[1])) + " برمی‌گردد.");
+      clearBad(); A.toast(ab ? "کنار گذاشتنِ آگاهانه ثبت شد؛ " + A.fdate(s.will.drop.due) + " یک بار می‌پرسد." : (b.verdict === "proved" ? "اثبات شد. " : b.verdict === "refuted" ? "رد شد (حکم نادرست است). " : "") + (guessFate(g) === "refuted" ? "حدسِ پیش از حلت رد شد. " : "") + "بازنگری ثبت شد: درس، کارتِ مرور، و مسئلهٔ تازه‌ات " + A.fdate(A.addDays(A.today(), LADDER[1])) + " برمی‌گردد.");
       A.render();
     } }, ab ? "ثبتِ کنار گذاشتن" : defect ? "ثبتِ ایراد — برگرد (ناتمام)" : "ثبتِ بازنگری"),
       h("button", { class: "btn ghost sm lp-reopen", type: "button", onclick: function () { saveNow(); L.state = "open"; S.put(pg); A.go("lprob", pid, "exec"); } }, "برگرد — هنوز حل نشده")));
@@ -2130,6 +2255,8 @@
       h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("e_prob", null, "live"); } }, "← مسئله‌های حل‌نشده"),
         ph !== "u" && ph !== "done" ? h("button", { class: "btn ghost sm lp-stuck", type: "button", onclick: function () { stuck(r, pg, s, null); } }, "🪢 گیر کرده‌ام — گره‌گشا با همین مسئله") : null,
         r.origin && r.origin.type === "lprob" && rec(r.origin.id) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("lprob", r.origin.id); } }, backFrom(r)) : null))));
+    /* E5 (دورِ ۴، s24): مسئلهٔ «ساختار — هم‌ریخت» نگاشتِ خودِ کاربر را با خود می‌آورد */
+    if (r.origin && r.origin.type === "lprob" && txt(r.origin.map)) root.appendChild(h("p", { class: "card soft small lp-childmap" }, "نگاشتی که در بازنگریِ «" + clip((rec(r.origin.id) || { p: { title: "" } }).p.title, 40) + "» نوشتی: «" + r.origin.map + "» — هر گامِ این را از راهِ همین نگاشت با حلِ آن مقایسه کن."));
     if (r.dormant && r.dormant > t && !r.woke) root.appendChild(h("p", { class: "card soft small lp-dormnote" }, "این مسئله را خودت در بازنگری ساختی؛ " + A.fdate(r.dormant) + " برای حل برمی‌گردد — می‌توانی همین حالا هم شروعش کنی."));
     /* برگشتِ مسئلهٔ ساختهٔ خودت: «شروع می‌کنم» یا «فعلاً نه» — «فعلاً نه» یک پله دورتر روی همان نردبان (۳ ⇐ ۷ ⇐ ۲۱ ⇐ ۶۰)، نه هر روز */
     if (r.dormant && r.dormant <= t && !r.woke) root.appendChild(h("section", { class: "card soft lp-wake" }, h("p", { class: "small" }, "مسئله‌ای که خودت در بازنگری ساختی برگشته است. حالا حلش می‌کنی؟"),
@@ -2232,7 +2359,7 @@
 
   /* ---------- نما و منو ---------- */
   A.VIEW_META = A.VIEW_META || {};
-  A.VIEW_META.lprob = { j: "untie", what: "یک مسئلهٔ حل‌نشدهٔ خودت (تصمیم، پروژه، پرسشِ فکری) در همان تونلِ حل: فهم با فهرستِ داده‌ها، طرح با یک پرسش در هر نوبت، گام‌های واقعی با پیش‌بینی و نتیجه در موعد، بازنگری.",
+  A.VIEW_META.lprob = { j: "untie", what: "یک مسئلهٔ حل‌نشدهٔ خودت (تصمیم، پروژه، پرسشِ فکری) در همان تونلِ حل: فهم با فهرستِ داده‌ها، طرح با یک پرسش در هر نوبت، گام‌ها — در تصمیم یا مسئلهٔ عملی با پیش‌بینی و نتیجه در موعد، در مسئلهٔ کامل‌بیان‌شده با وارسی و برهانِ هر گام — و بازنگری.",
     why: "تا روشِ حلِ مسئله روی زندگیِ واقعی‌ات کار کند — داور واقعیت است، نه پاسخِ ذخیره‌شده؛ پیش‌بینی‌هایت کالیبره می‌شوند و درس‌ها برمی‌گردند.", next: [["e_prob", "مسئله‌های من"]] };
   A.SUB_VIEWS = A.SUB_VIEWS || {}; if (!A.SUB_VIEWS.lprob) A.SUB_VIEWS.lprob = "e_prob";
 
@@ -2261,6 +2388,13 @@
     /* فقط وقتی خودِ کاربر از یک تصمیم یا مسئلهٔ بازِ زندگی‌اش می‌گوید — نه «فونتِ صفحه ریز است»، نه «کارتِ مرور حل نشده» */
     var LIVE_RE = /نمی[‌\s]?(?:دونم|دانم)\s*(?:چی[‌\s]?کار|چه[‌\s]*کار|کدوم|کدام)\s*(?:کنم|رو|را|بکنم|انتخاب)|(?:باید|می[‌\s]?خوام|می[‌\s]?خواهم)\s*(?:یه|یک)?\s*تصمیم\s*(?:بگیرم|بگیریم)|بین\s+[^.؟?]{2,60}\s+(?:انتخاب\s*کنم|تصمیم\s*بگیرم)|(?:بپذیرم|قبول\s*کنم|برم|بمونم|بمانم)\s*یا\s*(?:نه|نپذیرم|بمونم|بمانم|برم)|مسئله(?:‌ای)?\s+(?:تو|در)\s+زندگی(?:‌ام|م)?|گیر\s*کرده‌?ام\s*(?:سرِ|سر|توی|در)\s*(?:تصمیم|انتخاب|پروژه)|(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+(?:نه|[بن]?[ء-یپچژکگ]{1,12}م)(?![ء-یپچژکگ])|جا\s*(?:می[‌\s]?شه|می[‌\s]?شود|می[‌\s]?گیره)\s*یا\s*نه|(?:چند|چقدر|چه\s*قدر)\s*(?:تا\s*)?ب[ء-یپچژکگ]{2,12}م(?![ء-یپچژکگ])/;
     AS.promptHooks = AS.promptHooks || [];
+    /* E5/E8 (دورِ ۴): گیرِ کاربر در همین نوبت؛ ضرب‌المثلِ خودِ کاربر (s35)؛ سطرهای کتاب برای هر مرحله از پوششِ تور (coverage: A263/B188 پارادوکسِ مخترع،
+       A038/B051 به تعریف برگرد، C145/B162/A269 اکتشافی را ناتمام برچسب بزن، C168 قارچ‌ها خوشه‌ای) — فقط در قلاب، پرامپتِ سامانه دست نمی‌خورد */
+    var STUCK_L = /گیر\s*کرد|گیر\s*کردم|نمی\s*دونم\s*(?:چی|چه|از\s*کجا)|نمی\s*دانم\s*(?:چه|از\s*کجا)|جلو\s*نمی\s*(?:رم|روم|ره)|به\s*جایی\s*نمی|راهی\s*نیست|هیچ\s*کاری\s*نمی|جور\s*نمی\s*(?:شه|شود)|نمی\s*تونم\s*ادامه/;
+    var OWN_PROV = /(?:می\s*گن|میگن|گفته\s*اند|گفتن|به\s*قولِ?|ضرب\s*المثل|مثلِ?\s*معروف)[^.؟?!\n]{3,80}|آب\s*که\s*از\s*سر\s*گذشت[^.؟?!\n]{0,40}|کار\s*از\s*کار\s*گذشت[^.؟?!\n]{0,30}/;
+    var BOOK_L = { p: "پارادوکسِ مخترع — گاهی مسئلهٔ کلی‌تر (طرحِ بلندپروازانه‌تر) آسان‌تر است؛ اگر همین را نمی‌توانی، کلی‌ترش را بیازما · به تعریف‌ها برگرد — واژهٔ کلیدیِ مبهم را با تعریفش جایگزین کن؛ عنصرهای تازه از همان می‌آیند.",
+      c: "استدلالِ اکتشافی (شهود، قیاس، استقرا) داربست است، نه برهان — هنگامِ اجرا فقط گامِ قطعی را بپذیر و هر گامِ اکتشافی را «ناتمام» برچسب بزن؛ هرگز آن را برهانِ کامل نفروش.",
+      b: "قارچ‌ها خوشه‌ای می‌رویند — پس از حل، دنبالِ مسئله‌های همسایه بگرد · استدلالی که فقط اکتشافی بود را «ناتمام» نام ببر، نه «اثبات شد»." };
     /* سشنی که مسئلهٔ زندهٔ باز دارد، قاعدهٔ «بساز» را دوباره نمی‌گیرد (دورِ ۲، s26: قاعده‌ها دوباره تزریق می‌شد و مسئلهٔ تکراری ساخته می‌شد) */
     AS.promptHooks.push(function (s, msg) { if (A.liveSessionPid(s)) return ""; var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-4).map(function (m) { return m.text; })).join(" "); return LIVE_RE.test(recent) ? RULES : ""; });
     AS.promptHooks.push(function (s, msg) {
@@ -2276,7 +2410,8 @@
       if (mt && !/^\[سامانه/.test(mt) && tu.last !== mt) { tu[k] = tu.last == null || tu.ph !== k ? (tu[k] || 0) : (tu[k] || 0) + 1; tu.last = mt; tu.ph = k; }
       /* پرسشِ پیشنهادی: همان که A.liveCoach می‌دهد (هم‌گام با صفحه؛ پرسشِ پاسخ‌گرفته در صفحه نه) */
       var askedS = ((s && s.msgs) || []).filter(function (m) { return m && m.role === "ai"; }).map(function (m) { return String(m.text || ""); }), askedQ = Q.filter(function (x) { return askedS.some(function (t) { return t.split(/(?<=[؟?])\s+|\n+/).some(function (y) { return /[؟?]/.test(y) && sameQ(y, x); }); }); });
-      var co = A.liveCoach(pid, { asked: askedQ }) || {}, qNow = co.q || "", un = unusedOf(so, pg), o = openStep(so);
+      var stuckNow = STUCK_L.test(norm(msg)), co = A.liveCoach(pid, { asked: askedQ, stuck: stuckNow }) || {}, qNow = co.q || "", un = unusedOf(so, pg), o = openStep(so);
+      var provM = OWN_PROV.exec(String(msg || "")), bookL = BOOK_L[ph] || "";
       var gg = so.g && so.g[1], refT = gg && gg.guess && (gg.hit === "نادرست بود" || guessCons(so).no) ? gg.guess : "";
       var pv = provOf(ph === "u" ? "u" : ph === "p" ? "p" : ph === "c" ? (nat === "objective" ? "cobj" : "c") : "b"), rt = ph === "p" && Q.length ? roteState(pg, so, Q) : null;
       var cu = condUsed(so).filter(function (x) { return !x.used; });
@@ -2299,6 +2434,11 @@
         (suffNow(so) === "متناقض است" || u0.sat === "no") && ph === "p" ? "- کاربر گفته شرط متناقض است یا برآوردنی نیست: بپرس کدام بخشِ شرط را شل کند (فقط بخشی از شرط را نگه دار) — یا ثابت کند که برآوردنِ هم‌زمانِ بخش‌ها ناممکن است." : "",
         cl.state === "incomplete" ? "- بازنگری ایراد یافت و مسئله ناتمام است (" + cl.label + "): «حل شد» نگو و جشن نگیر؛ کمک کن همان ایراد را خودش درست کند." : cl.gate.length ? "- پیش از «حل شد» باز مانده: " + cl.gate.map(function (x) { return (x.k === "aux" ? "پلِ برگشت از مسئلهٔ کمکیِ «" : "گامِ شهودیِ ثابت‌نشدهٔ «") + clip(x.t, 50) + "»"; }).join("، ") + " — مسئلهٔ کمکی حل شد ≠ مسئلهٔ اصلی حل شد." : "",
         o ? "- گامِ واقعیِ باز: «" + clip(o.text, 80) + "» · پیش‌بینی‌اش «" + clip(o.pred, 80) + "» · وارسی " + o.due + " — نتیجه را خودش در صفحه ثبت می‌کند." : "",
+        stuckNow && (co.aside || []).length ? "- کاربر گیر کرده و داده‌ای را پیش‌تر کنار گذاشته بود: " + co.aside.map(function (x) { return "«" + clip(x.t, 50) + "» (دلیلش: «" + clip(x.why, 50) + "»)"; }).join("، ") + " — بپرس هنوز بی‌ربط است؟ (دادهٔ کنارگذاشته گاهی همان عنصرِ غایب است)" : "",
+        r.origin && r.origin.type === "lprob" && txt(r.origin.map) ? "- این مسئله با نگاشتِ هم‌ریختیِ خودِ کاربر از مسئلهٔ «" + clip((rec(r.origin.id) || { p: { title: "" } }).p.title, 40) + "» ساخته شد: «" + clip(r.origin.map, 160) + "» — بپرس هر گام از راهِ همین نگاشت به کدام گامِ حلِ آن برمی‌گردد." : "",
+        u0.presup && txt(u0.suffCirc) && (ph === "c" || ph === "b") ? "- پیش‌فرضی که کاربر نگه داشت تا بیازماید: «" + clip(u0.suffCirc, 100) + "» — اگر نتیجه‌ای با آن نخواند، همین را بپرس." : "",
+        provM ? "- کاربر ضرب‌المثلِ خودش را آورد («" + clip(provM[0], 80) + "»): " + PROV_LIMIT + " — بپرس در همین موقعیت درست است یا ضدش، و کدام داده آن را می‌گوید؛ نه تأییدش کن نه ردش." : "",
+        bookL ? "- از کتاب برای همین مرحله (فقط اگر به کار آمد): " + bookL : "",
         bp === pid ? "- این گفت‌وگو به همین مسئله بسته است؛ اگر کاربر مسئلهٔ تازهٔ دیگری آورد، اول بپرس می‌خواهد این را کنار بگذارد یا آن را جدا بسازد." : ""].filter(Boolean).join("\n");
     });
   }

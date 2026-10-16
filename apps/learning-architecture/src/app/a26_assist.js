@@ -212,8 +212,10 @@
   function isAnswer(x) { try { return !!(x && x.closest && x.closest(ANSWER)); } catch (e) { return false; } }
   /* پیام‌های اخیرِ صفحه (toast) — حتی وقتی خودِ کاربر دکمه را زد — تا دستیار علتِ «نشد» را بداند و کاربر را مقصر نکند */
   var RECENT_TOASTS = [];
-  (function () { var raw0 = A.toast; A.toast = function (m) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200) }); if (RECENT_TOASTS.length > 8) RECENT_TOASTS.shift(); } } catch (e) { } return raw0.apply(this, arguments); }; })();
-  AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000; return RECENT_TOASTS.filter(function (x) { return x.at >= t0; }).map(function (x) { return x.t; }); };
+  (function () { var raw0 = A.toast; A.toast = function (m, kind) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200), bad: kind === "bad" }); if (RECENT_TOASTS.length > 8) RECENT_TOASTS.shift(); } } catch (e) { } return raw0.apply(this, arguments); }; })();
+  /* تورِ پولیا دورِ ۴ (s01/s30): پیامِ ردِ کهنه («اول این‌ها…») پس از ثبتِ موفق دیگر «پیامِ اخیر» نیست — صفحه با AS.dropBadToasts کنارش می‌گذارد؛ تکراری‌ها یک بار */
+  AS.dropBadToasts = function () { for (var i = RECENT_TOASTS.length - 1; i >= 0; i--) if (RECENT_TOASTS[i].bad) RECENT_TOASTS.splice(i, 1); };
+  AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000, o = []; RECENT_TOASTS.forEach(function (x) { if (x.at >= t0 && o.indexOf(x.t) < 0) o.push(x.t); }); return o; };
   var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
   /* داوری با خودِ کاربر (data-own="verdict"، a6: حکمِ ایستگاه‌ها، درجه/احتمالِ صدق، «حکم در یک بند»): دستیار نه پر می‌کند، نه می‌زند — فقط زرد،
      با یادداشتِ روشن؛ «هوش مصنوعی در داوری نقشی ندارد» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵) */
@@ -975,7 +977,10 @@
       if (!p) return;
       if (/^\s+$/.test(p)) { if (run.length) run.push(p); else buf += p; return; }
       // نشانه‌گذاریِ پایانِ جمله («12:»، «dy/dt.») دنباله را می‌بندد: «y = 12: dy/dt» دو فرمولِ جداست
-      if (!RTL_CH.test(p) && LTR_TOK.test(p)) { run.push(p); if (/[.,،:؛!?؟…]$/.test(p)) flush(); return; }
+      /* تورِ پولیا دورِ ۴ (s18): «cm/s،» و «y→0،» — ویرگول/نقطه‌ویرگول/پرسشِ فارسی در دو سرِ تکه نویسهٔ راست‌به‌چپ است و تکه را از فرمول جدا می‌کرد؛
+         داوری روی خودِ تکه بی نشانه‌گذاریِ دو سرش است (نشانه‌گذاری در flush بیرونِ <bdi> می‌ماند) */
+      var pc = p.replace(/^[«"'“(]+|[.,،:؛!?؟…»"'”)]+$/g, "");
+      if (pc && !RTL_CH.test(pc) && LTR_TOK.test(pc)) { run.push(p); if (/[.,،:؛!?؟…]$/.test(p)) flush(); return; }
       var ws = run.length && /^\s+$/.test(run[run.length - 1]) ? run.pop() : ""; flush(); buf += ws + p;
     });
     var ws2 = run.length && /^\s+$/.test(run[run.length - 1]) ? run.pop() : ""; flush(); buf += ws2;

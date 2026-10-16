@@ -222,7 +222,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const Wq = (ms) => q.waitForTimeout(ms || 90);
     const go = async (v, a, s) => { await q.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await Wq(140); };
     const sel = async (s, v) => { await q.selectOption(s, v); await Wq(120); };
-    const click = async (s) => { await q.click(s); await Wq(160); };
+    /* E5 (دورِ ۴): بازنگری هر بخشِ ثبت‌شدهٔ شرط را جدا می‌پرسد (lpBCP_*) — این جریان‌ها نتیجه‌ای می‌سازند که شرط را برآورده می‌کند؛ پیش از ثبتِ بازنگری «بله» */ const click = async (s) => { if (/lp-lbsave/.test(s)) await q.evaluate(() => document.querySelectorAll('select[id^="lpBCP_"]').forEach(x => { if (!x.value) { x.value = 'yes'; x.dispatchEvent(new Event('change', { bubbles: true })); } })); await q.click(s); await Wq(160); };
     const has = (s) => q.locator(s).count();
     const txt = (s) => q.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent : ''; }, s);
     const D = (n) => { const d = new Date(2026, 10, 2 + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
