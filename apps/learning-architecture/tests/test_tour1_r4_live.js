@@ -183,6 +183,104 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       info.e4l = await p.evaluate(pid => APP.liveLookFlags(pid).limit, PC);
       chk(info.e4l === false && info.e4c1.pid && (await p.evaluate(pid => APP.liveLookFlags(pid).limit, info.e4c1.pid)) === true, 'E4: the limiting case is required for objective find problems with numeric data, not for chess square names');
     });
+
+    /* ===================== E5 — بازنگری با تک‌تکِ بخش‌های شرط؛ پرسشِ اجرا پس از نتیجه؛ قیاس؛ نگاشت؛ داده‌های کنارگذاشته ===================== */
+    await section('E5a', async () => {
+      const PF = await mk({ title: 'ضلع‌ها', st: 'محیطِ مثلثی ۳۰ است؛ a دو برابرِ b و c دو واحد بیشتر از b است. ضلع‌ها چقدرند؟', nat: 'objective' });
+      await understand({ one: 'می‌خواهم سه ضلعِ مثلث را بیابم', unk: 'طولِ ضلع‌های a و b و c', data: ['محیط ۳۰ است', 'a دو برابرِ b است', 'c دو واحد بیشتر از b است', 'مثلث روی کاغذِ آبی کشیده شده'], cond: 'a + b + c = 30\nهر سه ضلع مثبت‌اند', depNo: true, guess: 'هر سه ضلع برابرند' });
+      await addMove('mv_equation', 'هر ضلع را با نماد می‌نویسم تا شرطِ محیط معادله شود');
+      await p.fill('#lpPlan', 'نخست هر ضلع را برحسبِ b می‌نویسم سپس در محیط جای‌گذاری می‌کنم'); await W(350);
+      for (const id of await p.evaluate(() => [...document.querySelectorAll('main .lp-plan .lp-un')].map(x => x.getAttribute('data-d')))) {
+        const t = await p.evaluate(id => (document.querySelector('main .lp-plan .lp-un[data-d="' + id + '"]') || {}).textContent || '', id);
+        if (/آبی/.test(t)) { await sel('#lpPU_a_' + id, 'skip'); await p.fill('#lpPU_w_' + id, 'رنگِ کاغذ تزئینی است و در طولِ ضلع‌ها اثری ندارد'); } else { await sel('#lpPU_a_' + id, 'use'); await p.fill('#lpPU_w_' + id, 'در گامِ بعد به کار می‌رود'); }
+      }
+      await click('main .lp-plansave');
+      chk((await S(PF)).live.plan, 'E5 setup: plan saved with the decorative datum set aside');
+      // گیر ⇒ دادهٔ کنارگذاشته دوباره پیش کشیده می‌شود
+      info.e5aside = await hookText({ id: 'ach_e5a', lprob: PF, msgs: [] }, 'گیر کردم، نمی‌دونم چی کار کنم');
+      chk(/کنار گذاشته بود: «مثلث روی کاغذِ آبی/.test(info.e5aside), 'E5: a datum set aside («تزئینی») is raised again when the user is stuck ' + (info.e5aside.match(/- کاربر گیر کرده[^\n]*/) || ['—'])[0]);
+      await objStep('هر ضلع برحسبِ b: a = 2b و c = b + 2', 'از داده‌های دوم و سوم');
+      // معادله کم است ⇒ پرسشِ پیشنهادیِ مربی
+      await fillIf('#lpEqUnk', '۳'); await clickIf('main .lp-eqsave');
+      info.e5eq = await p.evaluate(pid => APP.liveCoach(pid).q, PF);
+      chk(/کدام بخشِ شرط هنوز به معادله/.test(info.e5eq), 'E5: the equations verdict («معادله کم است») reaches the coach question ' + info.e5eq);
+      await objStep('فرض کنیم b عددی نباشد که محیط را ۳۰ کند؛ آن‌گاه 2b + b + b + 2 = 30 تناقض می‌دهد، پس 4b + 2 = 30 و b = 7', 'از جای‌گذاری در محیط');
+      chk((await p.evaluate(pid => APP.liveLookFlags(pid).indirect, PF)) === true, 'E5: indirect ⇒ direct is offered for a proof-shaped step of an objective FIND problem');
+      await click('main .lp-solved');
+      // هر بخشِ شرط جدا؛ وارسی‌ای که بخشی را نفی می‌کند ⇒ هشدار؛ «نه» ⇒ ناتمام
+      chk(await has('#lpBCP_0') === 1 && await has('#lpBCP_1') === 1, 'E5: look-back asks each recorded condition part «نتیجه این بخش را برآورده می‌کند؟»');
+      chk(await has('#lpBBest') === 1 && await p.evaluate(() => [...document.querySelectorAll('#lpBBest option')].some(o => /^مجهول \(یا حکمی که باید ثابت شود\) چیست؟$/.test(o.textContent))), 'E5: «کدام پرسش کمک کرد؟» is always present and lists page-answered questions whole');
+      await p.fill('#lpBChk', 'a = 14 و b = 7 و c = 9؛ ولی a + b + c = 30 برقرار نیست چون جمع ۳۰ نشد و ۳۰ نیست'); await sel('#lpBRes', 'نتیجه سالم ماند');
+      chk(await has('main .lp-bpneg[data-part="0"]') === 1, 'E5: a check text that negates a part is pointed out next to that part');
+      await sel('#lpBCP_0', 'no'); await sel('#lpBCP_1', 'yes');
+      chk(await has('main .lp-bdefect') === 1, 'E5: any «نه» on a condition part ⇒ the defect card («هنوز حل نشده»), never «سالم»');
+      await p.fill('#lpBDefW', 'جمعِ ضلع‌ها ۳۰ نشد — گامِ جای‌گذاری را دوباره حساب می‌کنم'); await sel('#lpBDefTo', 'c'); await sel('#lpBWant', 'same');
+      await click('main .lp-lbsave');
+      info.e5cl = await p.evaluate(pid => APP.liveClosure(pid), PF);
+      chk(info.e5cl.state === 'incomplete' && /ناتمام — برگرد به «اجرا»/.test(info.e5cl.label) && !(await S(PF)).b[1], 'E5: the problem stays «ناتمام — برگرد به …» ' + JSON.stringify({ st: info.e5cl.state, l: info.e5cl.label }));
+      // دوباره «حل شد» ⇒ بازنگریِ کامل با «ساختار — هم‌ریخت» ⇒ نگاشت به فرزند و قلابش می‌رسد
+      await go('lprob', PF, 'exec'); await click('main .lp-solved');
+      await fillBack({ newProb: 'چهارضلعی‌ای با محیطِ ۴۰ که هر ضلعش برحسبِ یک ضلع داده شده', share: 'form', map: 'ضلع‌های مثلث ⇐ ضلع‌های چهارضلعی، محیطِ ۳۰ ⇐ محیطِ ۴۰' });
+      await sel('#lpBCP_0', 'yes'); await sel('#lpBCP_1', 'yes'); await selIf('#lpBDefTo', 'c');
+      await click('main .lp-lbsave');
+      info.e5b = (await S(PF)).b[1];
+      chk(info.e5b && info.e5b.done && info.e5b.parts && info.e5b.parts.every(x => x.ok === 'yes') && info.e5b.direct, 'E5: look-back saved with each condition part and the direct-proof answer ' + JSON.stringify(info.e5b && { parts: info.e5b.parts, d: !!info.e5b.direct }));
+      const CH = info.e5b && info.e5b.newPid;
+      if (CH) {
+        await go('lprob', CH);
+        info.e5map = { page: await txt('main .lp-childmap'), hook: await hookText({ id: 'ach_e5m', lprob: CH, msgs: [] }, 'شروع کنیم') };
+        chk(/محیطِ ۳۰ ⇐ محیطِ ۴۰/.test(info.e5map.page) && /نگاشتِ هم‌ریختیِ خودِ کاربر/.test(info.e5map.hook) && /محیطِ ۳۰ ⇐ محیطِ ۴۰/.test(info.e5map.hook), 'E5: the isomorphism mapping is carried to the child page and its hook ' + JSON.stringify({ p: info.e5map.page.slice(0, 80) }));
+      } else chk(false, 'E5: no child problem was made');
+    });
+
+    await section('E5b', async () => {
+      const PP = await mk({ title: 'فرد و اول', st: 'اثبات یا رد کن: هر عددِ فردِ بزرگ‌تر از ۱ اول است.', kind: 'pod' });
+      await understand({ one: 'می‌خواهم ببینم هر فردی اول است یا نه', unk: 'هر عددِ فردِ بزرگ‌تر از ۱ اول است', data: ['عدد فرد است', 'عدد بزرگ‌تر از ۱ است'], cond: 'عدد اول است', suff: 'کافی است', suffW: 'همهٔ فرض داده شده' });
+      await addMove('mv_special', 'چند عددِ فردِ کوچک را یکی‌یکی می‌آزمایم تا مثالِ نقض پیدا شود');
+      await savePlan('نخست چند عددِ فرد را می‌آزمایم سپس مثالِ نقض می‌یابم');
+      await objStep('۳ و ۵ و ۷ اول‌اند؛ برای ۹ هنوز مطمئن نیستم', 'حسابِ مستقیم');
+      await click('main .lp-solved');
+      info.e5pod = await p.evaluate(() => [...document.querySelectorAll('#lpBPod option')].map(o => o.value));
+      chk(info.e5pod.includes('gap'), 'E5: the pod look-back offers «هیچ‌کدام — استدلالم شکاف دارد» ' + JSON.stringify(info.e5pod));
+      await selIf('#lpBPod', 'gap');
+      chk(await has('main .lp-bdefect') === 1 && await has('#lpBHyp') === 0, 'E5: «استدلالم شکاف دارد» ⇒ the defect card directly (no «ثابت/رد کردم» needed)');
+    });
+
+    await section('E5c', async () => {
+      const PT = await mk({ title: 'صندوق', st: 'پولِ صندوقِ مغازه کم شده؛ می‌خواهم بفهمم چه کسی برداشته.', nat: 'life' });
+      await understand({ one: 'می‌خواهم بفهمم چه کسی پول را برداشته', unk: 'کسی که پول را برداشته', data: ['صبح صندوق را شمردم', 'عصر کمتر بود'], cond: 'بی‌گناهی را متهم نکنم', sat: 'yes', suff: 'کافی است', suffW: 'فقط سه نفر کلید داشتند پس کارِ یکی از آن‌هاست', expectMiss: true });
+      await fillIf('#lpSuffCirc', 'هیچ داده‌ای نمی‌گوید؛ پیش‌فرض است که کسِ دیگری کلید نداشت');
+      if (!(await has('main .lp-u .sv-g2'))) await click('main .lp-usave'); await clickIf('main .lp-u .sv-g2');
+      chk((await S(PT)).u[1] && (await S(PT)).u[1].presup, 'E5 setup: presupposition saved');
+      // گیر در طرح ⇒ «از خواسته به عقب» نخست
+      info.e5stuck = await p.evaluate(pid => ({ a: APP.liveCoach(pid).q, b: APP.liveCoach(pid, { stuck: true }).q }), PT);
+      chk(/به\s*عقب/.test(info.e5stuck.b) && !/به\s*عقب/.test(info.e5stuck.a), 'E5/E3: stuck going forward in plan ⇒ «از خواسته به عقب» is suggested first ' + JSON.stringify(info.e5stuck));
+      await addMove('mv_special', 'اول فقط شیفتِ عصر را بررسی می‌کنم تا دامنه تنگ شود');
+      await savePlan('نخست دوربینِ مغازه را نگاه می‌کنم سپس با هر سه نفر جدا حرف می‌زنم');
+      await p.fill('#lpStep', 'فیلمِ دوربینِ عصر را نگاه کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'یکی از سه نفر را سرِ صندوق می‌بینم'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
+      await click('main .lp-stepsave');
+      await day(1); await go('lprob', PT, 'exec');
+      await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'نفرِ چهارمی که کلید نداشت سرِ صندوق رفت'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'same'); await selIf('#lpOGuess', 'none');
+      await click('main .lp-outsave');
+      info.e5c = await p.evaluate(pid => { const a = APP.liveCoach(pid).q, b = APP.liveCoach(pid, { asked: [a] }).q, c = APP.liveCoach(pid, { asked: [a, b] }).q; return { a, b, c }; }, PT);
+      chk(/پیش‌فرضی که نگه داشتی/.test(info.e5c.a) && /کسِ دیگری کلید نداشت/.test(info.e5c.a), 'E5: a step result that breaks the saved presupposition raises it again ' + info.e5c.a);
+      chk(/فاصله/.test(info.e5c.b) && !/پیش از این گام/.test(info.e5c.b), 'E5: after an outcome the exec question moves to «فاصله با پیش‌بینی…» ' + info.e5c.b);
+      chk(/شکلِ دیگری بیان/.test(info.e5c.c), 'E5/E3: after a failed step ⇒ «مسئله را به شکلِ دیگری بیان کن» ' + info.e5c.c);
+      // قیاس: نسبتی که در گفت‌وگو به کمیتِ تازه برده شد ⇒ «کجا این شباهت می‌شکند؟»
+      const q0 = await p.evaluate(pid => APP.livePhaseQs(pid, 'c'), PT);
+      await p.evaluate(pid => { const se = APP.ASSIST.newSession(); APP.liveBindSession(pid, se, { force: true }); se.msgs.push({ role: 'user', text: 'مساحت ۲٫۸ برابر شد؛ پس زمانِ پختن هم ۲٫۸ برابر می‌شه؟', at: new Date().toISOString() }); APP.S.put(se); }, PT);
+      const q1 = await p.evaluate(pid => APP.livePhaseQs(pid, 'c'), PT);
+      chk(!q0.some(q => /شباهت می‌شکند/.test(q)) && q1.some(q => /شباهت می‌شکند/.test(q)), 'E5: a ratio carried to a new quantity in chat («زمان هم ۲٫۸ برابر؟») asks where the analogy breaks');
+    });
+
+    await section('E5d', async () => {
+      // «کدام پرسش کمک کرد؟»: تکهٔ یک پرسشِ دستیار ⇒ همان پرسشِ کامل؛ پیش‌درآمدِ پیام بیرون
+      const PB = await mk({ title: 'پنج نقطه', st: 'پنج نقطه در مربعِ واحد؛ ثابت کن دو تا فاصله‌ای کمتر از ۰٫۷۵ دارند.', kind: 'prove' });
+      const full = await p.evaluate(pid => APP.livePhaseQs(pid, 'p').find(q => /عنصرِ کمکی لازم است/.test(q)) || '', PB);
+      await p.evaluate(([pid, full]) => { const se = APP.ASSIST.newSession(); APP.liveBindSession(pid, se, { force: true }); const parts = full.split(/(?<=[؟?])\s+/); se.msgs.push({ role: 'ai', text: 'خوب شروع کردی. ' + full, at: new Date().toISOString() }); APP.S.put(se); }, [PB, full]);
+      info.e5chat = await p.evaluate(pid => APP.liveChatQs(pid), PB);
+      chk(full && info.e5chat.includes(full) && !info.e5chat.some(q => q !== full && /عنصرِ کمکی لازم است|^خوب شروع کردی/.test(q)), 'E5: chat questions are listed whole (no preamble, a fragment maps to the whole question) ' + JSON.stringify(info.e5chat));
+    });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
