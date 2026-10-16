@@ -1324,7 +1324,7 @@
     if (s && !o.live) { var C1 = s.coach = s.coach || {}; C1.qmap = {}; qs.forEach(function (q, i) { C1.qmap[QID[ph] + (i + 1)] = q; }); }
     /* F4 (دورِ ۵): سرواژه از نوع × داور — اثباتیِ عینی «اثباتی»، pod ِ عینی «اثبات یا رد (حدس)»، pod ِ زندگی/عملی «فرضیه»، زندگی «تصمیمِ زندگی» */
     var podLife = o.ptype === "pod" && (cls === "life" || cls === "pract");
-    /* G4 (دورِ ۶، s28): سرواژه با پرسشِ نوبت هم‌خوان — نتیجه‌ای که همین نوبت (یا نوبتِ پیش) گفت ⇒ «بازنگری»، با یادِ مرحلهٔ صفحه */
+    /* G4 (دورِ ۶، s28): سرواژه با پرسشِ نوبت هم‌خوان — وقتی پرسشِ نوبت پرسشِ بازنگریِ «نتیجه‌ای گفتی» است (src turn-result ِ بخشِ مسئله) ⇒ «بازنگری»، با یادِ مرحلهٔ صفحه؛ ادعای «حل شد» که صفحه پرسشِ دیگری برایش دارد مرحله را عوض نمی‌کند (W3) */
     var L = ["# مربیِ حل (روحِ «چگونه آن را حل کنیم») — کمک نه خیلی کم، نه خیلی زیاد · مرحلهٔ محتمل: " + PH_FA[o.phShow || ph] + (o.phShow ? " (نتیجه‌ای گفت؛ صفحه هنوز «" + PH_FA[ph] + "»)" : "") + (podLife ? " · فرضیه (داور: واقعیت و داوریِ خودش، نه برهان)" : cls === "prove" ? (o.ptype === "pod" ? " · اثبات یا رد (حدس)" : " · اثباتی") : cls === "obj" ? " · پاسخِ عینی" : cls === "pract" ? " · تصمیم/کارِ واقعی (داور واقعیت)" : cls === "life" ? " · تصمیمِ زندگی (داور: واقعیت و داوریِ خودش)" : "") + (o.teach ? " · کاربر مربیِ یادگیرنده است" : "") +
       " — اگر این نوبت دربارهٔ حلِ مسئله، حدس یا ادعایی نیست، این بلوک را نادیده بگیر."];
     L.push("- قاعدهٔ سبک: هر پیام فقط **یک ایده** و حداکثر **یک پرسش**، از کلی به خاص؛ کوتاه. جواب، نامِ قضیه، گزینهٔ درست یا گامِ بعد را لو نده.");
@@ -1743,7 +1743,7 @@
       out.push(coachLines({ ph: ph, qs: qs, cls: cls, ptype: ptype, s: s, pid: cpid, mt: mt, dry: auto, stuck: sig.stuck, live: !!cpid && liveBlock, claim: claim, teach: teachMode(s, auto ? "" : mt),
         sug: cpid && nq ? nq.q : !auto && sig.guess ? GUESS_Q : goal ? "🎯 مجهول هنوز «" + goal + "» است — این گام به آن نزدیک‌ترت کرد؟" : "", tries: cpid ? userTries(s, bb.r.created || "") : userTries(s), seed: userTries(s),
         closed: !cpid && b && b.done ? b.r.p.title : "", mid: cpid && !auto ? midCheck(s, bb) : "", intro: a191, refuted: !!refNew, guess: !auto && sig.guess, goal: goal, made: !auto && !!(Pv && Pv.made),
-        phShow: cpid && sig.result && ph !== "b" ? "b" : "" }));
+        phShow: cpid && nq && nq.coach && nq.coach.src === "turn-result" && ph !== "b" ? "b" : "" }));
     }
     return out;
   });
