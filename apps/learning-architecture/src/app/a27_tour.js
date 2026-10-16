@@ -1378,7 +1378,8 @@
     if (TASTE_RE.test(mt)) L.push("- از سلیقه‌اش گفت: جدی بگیرش — شناختنِ علایق، بیزاری‌ها و سلیقهٔ خود نخستین کشفِ مهم است " + cite("C120") + "؛ پیشنهاد کن حلِ نویسندگانِ خوب در همان خط را بخواند و تقلید و تمرین کند " + cite("C117") + ".");
     if (NOTATION_AV_RE.test(mt)) L.push("- از نماد/حروف بیزار است: تحمیل نکن و سرزنش نکن؛ بگذار سودش را خودش تجربه کند — مثلاً جمعِ دو عدد با ارقامِ رومی را با ارقامِ معمولی مقایسه کند " + cite("B241") + "؛ معادله‌نویسی ترجمه از زبانِ عادی به زبانِ نماد است " + cite("B243") + " — ستونِ «واژه | نماد» با واژه‌های خودش.");
     if (BACKWARD_RE.test(mt)) L.push("- کار به عقب شاخه می‌دهد: بخواه هر شاخه را جدا بنویسد و نشانه‌های هر کدام را نگه دارد؛ نبودِ نشانه هشدارِ بن‌بست است " + cite("C094") + " — شاخهٔ رقیب را پیش از رها کردنِ این یکی نام ببرد (" + "C169" + ").");
-    if (ABANDON_RE.test(mt)) L.push("- می‌خواهد کلِ راه را دور بریزد: نشانه‌ها گاهی فریب می‌دهند " + cite("C095") + " — شاید فقط یک حلقه باید عوض شود؛ پیش از رها کردنِ مسیر کمی بیشتر پافشاری کن " + cite("C096") + ": بپرس کدام حلقه دقیقاً شکست.");
+    if (ABANDON_RE.test(mt)) L.push("- می‌خواهد کلِ راه را دور بریزد: نشانه‌ها گاهی فریب می‌دهند " + cite("C095") + " — شاید فقط یک حلقه باید عوض شود؛ پیش از رها کردنِ مسیر کمی بیشتر پافشاری کن " + cite("C096") +
+      (o.live ? " (زمینه، نه پرسشِ دوم: پرسشِ این نوبت همان یکیِ «مسئلهٔ زندهٔ این سشن» است — یک پرسش در هر بلوک)." : ": بپرس کدام حلقه دقیقاً شکست."));
     if (COUNTER_RE.test(mt) || o.refuted) L.push("- مثالِ نقض آمد: یک استثنا برای ردِ گزارهٔ کلی بس است " + cite("C107") + " — ولی ادعا را دور نینداز: **دامنه‌اش را تنگ کن** (برای کجا هنوز درست است؟) و حدسِ تنگ‌شده را دوباره بیازما.");
     if (ph === "b" && cls === "prove") L.push("- فرع " + cite("A284") + ": از همین نتیجه چه نتیجهٔ آسانِ دیگری بی‌درنگ درمی‌آید (مثلاً n ⇐ ∞، یا حالتِ خاصِ مهم)؟ همین بازنگری است.");
     if (INDIRECT_RE.test(mt)) L.push("- «چرا فرض کنم همه برقرارند؟» (اثباتِ غیرمستقیم): رویهٔ ذهن‌باز — همهٔ بخش‌های شرط را **فرضاً** برقرار می‌گیریم تا ببینیم به کجا می‌رسد، نه چون باورشان داریم " + cite("C055") + "؛ با وضعِ فرضی ذهن‌باز روبه‌رو شو " + cite("C052") + " — اگر به تناقض رسید، همان فرض نادرست است.");
@@ -1391,9 +1392,9 @@
       L.push("- ضرب‌المثلِ همین مرحله (پولیا، «حکمتِ ضرب‌المثل‌ها»): «" + clip(pv.q, 140) + "»" + (pv.ask ? " ⇐ همان پرسش: «" + clip(pv.ask, 120) + "»" : pv.n ? " — " + clip(pv.n, 60) : "") + ". فقط اگر به حالِ همین لحظه می‌خورد، یک بار و کوتاه؛ هر ضرب‌المثلی ضدی هم دارد" + (opp ? " («" + clip(opp, 90) + "»)" : "") + " و ضرب‌المثل‌ها قاعدهٔ خطاناپذیر نیستند (C150).");
       if (s && !o.dry) { var C0 = s.coach = s.coach || {}; C0.prov = (C0.prov || []).concat([pv.id || pv.q]).slice(-30); }
     }
-    if (o.closed) L.push("- مسئلهٔ «" + clip(o.closed, 60) + "» بسته شده است؛ حدس یا ادعای تازه‌اش مسئلهٔ تازه است: همین مربی، از «فهم» — اثبات یا رد؛ اگر می‌خواهد نگهش دارد {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\"}.");
+    if (o.closed) L.push("- مسئلهٔ «" + clip(o.closed, 60) + "» بسته شده است؛ حدس یا ادعای تازه‌اش مسئلهٔ تازه است: همین مربی، از «فهم» — اثبات یا رد؛ اگر می‌خواهد نگهش دارد {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\",\"kind\":\"find|prove|pod\"}.");
     if (o.mid) L.push(o.mid);
-    L.push("- حلی که در همین گفت‌وگو تمام شد بی بازنگری رها نشود: پس از بازنگریِ خودش {\"do\":\"chat_solved\",\"title\":\"…\",\"statement\":\"عینِ صورتِ مسئله\",\"kind\":\"find|prove|pod\",\"lesson\":\"درسِ خودش به قلمِ خودش\",\"check\":\"وارسیِ خودش\"} (همان مسئله دوباره ساخته نمی‌شود؛ به‌روز می‌شود). مسئلهٔ تازه‌ای که خودش ساخت و هنوز حل نکرده: {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\",\"title\":\"…\",\"nat\":\"objective|practical|life\"} (nat: پاسخِ عینی ⇐ objective، کارِ واقعی با کمیت ⇐ practical، تصمیمِ زندگی ⇐ life)؛ اگر همین‌جا حلش کرد، chat_solved.");
+    L.push("- حلی که در همین گفت‌وگو تمام شد بی بازنگری رها نشود: پس از بازنگریِ خودش {\"do\":\"chat_solved\",\"title\":\"…\",\"statement\":\"عینِ صورتِ مسئله\",\"kind\":\"find|prove|pod\",\"lesson\":\"درسِ خودش به قلمِ خودش\",\"check\":\"وارسیِ خودش\"} (همان مسئله دوباره ساخته نمی‌شود؛ به‌روز می‌شود). مسئلهٔ تازه‌ای که خودش ساخت و هنوز حل نکرده: {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\",\"title\":\"…\",\"nat\":\"objective|practical|life\",\"kind\":\"find|prove|pod\"} (nat: پاسخِ عینی ⇐ objective، کارِ واقعی با کمیت ⇐ practical، تصمیمِ زندگی ⇐ life؛ kind: یافتنی ⇐ find، اثباتِ حکمِ داده‌شده ⇐ prove، حدس/«درسته؟» ⇐ pod)؛ اگر همین‌جا حلش کرد، chat_solved.");
     return L.join("\n");
   }
   AS.coachLines = coachLines;
@@ -1446,8 +1447,12 @@
   AS.willSignal = function (s, msg) {
     /* F3 (دورِ ۵، s28): «# پس از شکست» فقط در نوبتِ شکست و نوبتِ بعد — پیامِ همین نوبت و پیامِ پیش از آن (نه سه پیامِ آخر)؛ گامِ ناکامِ صفحه فقط اگر از نوبتِ پیش به این سو ثبت شد */
     var UM = ((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }), cur = UM.length && mkey(UM[UM.length - 1].text) === mkey(msg) ? UM.length - 1 : UM.length, pv = UM[cur - 1];
-    if (FAIL_ME.test([String(msg || ""), pv ? pv.text : ""].join(" \n "))) return "word";
-    var since = UM[cur - 2] ? String(UM[cur - 2].at || "") : "";
+    /* پیگیریِ دورِ ۶ (s19 هفتهٔ ۸): شکستِ پیامِ پیشین فقط اگر همان روز است (پیامِ هفته‌ها پیش «نوبتِ پیش» نیست) و دربارهٔ همان مسئله (گزارشِ سنجیدهٔ آن پیام، اگر هست)؛
+       گامِ ناکامِ صفحه فقط اگر از پیامِ پیش‌ازپیشینِ **همان روز** به این سو ثبت شد — پس از یک نوبت و میانِ روزها منقضی */
+    var curAt = UM[cur] && UM[cur].at ? String(UM[cur].at) : nowIso(), today = dayOf(curAt), sameDay = function (m) { return !!m && (!m.at || dayOf(m.at) === today); };
+    var C0 = (s && s.coach) || {}, lp0 = (liveCtx(s, msg) || {}).pid || (s && s.lprob) || "", pvOk = pv && sameDay(pv) && !(C0.rep && C0.rep.key === mkey(pv.text) && C0.rep.pk && lp0 && C0.rep.pk !== "l:" + lp0);
+    if (FAIL_ME.test([String(msg || ""), pvOk ? pv.text : ""].join(" \n "))) return "word";
+    var since = UM[cur - 2] && sameDay(UM[cur - 2]) ? String(UM[cur - 2].at || "") : pv && sameDay(pv) ? String(pv.at || "") : curAt.slice(0, 10);
     try { var lp = (liveCtx(s, msg) || {}).pid || (s && s.lprob), lr = lp && A.liveRec && A.liveRec(lp);
       if (lr && AS.tourLiveParts) { var x = AS.tourLiveParts(lr), last = x.steps.filter(function (st) { return st.closed && st.out && !st.out.auto; }).pop(); if (last && (last.out.prog === "نه" || last.out.done === "no") && (!since || !last.out.at || String(last.out.at) >= since)) return "data"; } } catch (e) { }
     try { var c = AS.solvingCtx && AS.solvingCtx(s); if (c && c.pid && AS.smallWin && AS.smallWin(c.pid)) return "data"; } catch (e) { }
@@ -1512,7 +1517,7 @@
     if (L.plan && L.plan.t) out.push("- روش (طرحِ خودش): «" + clip(L.plan.t, 140) + "»");
     if (res) out.push("- نتیجه: «" + clip(res, 160) + "»");
     if (bk.use || bk.chkHow) out.push("- بازنگریِ " + (bk.own === false ? "ثبت‌شده (به قلمِ دستیار، نه خودش)" : "خودش") + ": " + (bk.use ? "درس «" + clip(bk.use, 120) + "»" : "") + (bk.chkHow ? (bk.use ? " · " : "") + "وارسی «" + clip(bk.chkHow, 100) + "»" : ""));
-    out.push("- اگر حرفِ تازه‌اش مسئلهٔ تازه است، از «فهم» شروع کن (همین مربی)؛ نگه داشتنش: {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\",\"from\":\"" + pid + "\"}.");
+    out.push("- اگر حرفِ تازه‌اش مسئلهٔ تازه است، از «فهم» شروع کن (همین مربی)؛ نگه داشتنش: {\"do\":\"chat_invent\",\"statement\":\"عینِ حرفش\",\"from\":\"" + pid + "\",\"kind\":\"find|prove|pod\"}.");
     return out.join("\n");
   }
   AS.solvedBlock = solvedBlock; AS.relatedDone = relatedDone;
@@ -1577,7 +1582,8 @@
     if (!s) return AS.liveNextQ(pid);
     var turn = turnOf(s, pid, mt, auto), askedL = AS.coachLedger(s, "l:" + pid);
     var nq = AS.liveNextQ(pid, { asked: askedL, stuck: turn.stuck, turn: turn }); if (!nq) return nq; nq.turn = turn;
-    if ((nq.ph === "p" || nq.ph === "c") && nq.coach && (nq.coach.unused || []).length && turn.stuck && dataLineOk(pid)) {
+    /* پیگیریِ دورِ ۶ (s26): فقط روی منبعِ گیرِ عامِ بخشِ مسئله (stuck-…) — هرگز روی کارتِ خاصِ صفحه (card-… یا fail-…) یا کارِ همین نوبت (turn-…) */
+    if ((nq.ph === "p" || nq.ph === "c") && nq.coach && /^stuck-/.test(String(nq.coach.src || "")) && (nq.coach.unused || []).length && turn.stuck && dataLineOk(pid)) {
       var qa = (nq.list || []).filter(function (q) { return ALLDATA_RE.test(q); })[0] || ALLDATA_Q;
       if (!ledgerAns(s, qa, "l:" + pid)) return Object.assign({}, nq, { q: qa, stuckData: true });
     }
@@ -1745,6 +1751,8 @@
         closed: !cpid && b && b.done ? b.r.p.title : "", mid: cpid && !auto ? midCheck(s, bb) : "", intro: a191, refuted: !!refNew, guess: !auto && sig.guess, goal: goal, made: !auto && !!(Pv && Pv.made),
         phShow: cpid && nq && nq.coach && nq.coach.src === "turn-result" && ph !== "b" ? "b" : "" }));
     }
+    /* پیگیریِ دورِ ۶ (یک پرسش در هر بلوک، s04، s06، s21): وقتی بلوکِ زنده پرسشِ نوبت را می‌دهد، «🌱 # پس از شکست» زمینه است — «بپرس…» ِ آن پرسشِ رقیب نمی‌شود */
+    if (liveBlock && nq && nq.q) out = out.map(function (x) { return /^# پس از شکست، نقد یا میلِ رها کردن/.test(x) ? x.replace(/^([^\n]*)/, "$1\n- (زمینه، نه پرسشِ دوم: پرسشِ این نوبت همان یکیِ «مسئلهٔ زندهٔ این سشن» است؛ این‌ها را در نظر داشته باش، جدا نپرس.)").replace(/بپرس(?![آ-ی])/g, "در نظر داشته باش") : x; });
     return out;
   });
 
