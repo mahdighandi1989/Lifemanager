@@ -123,7 +123,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     pg.solve.live.plan = { t: 'طولِ میز ۱۲۰ سانت را با دیوار مقایسه می‌کنم', at: new Date().toISOString(), heur: ['move'], unused: {} }; S.put(pg);
     const s = AS.cur(); s.lprob = pid; S.put(s); APP.go('home');
     __calls.length = 0; await AS.send('اون کمدِ کنارِ دیوار به نظرم بی‌فایده‌ست؛ کمد مهم نیست');
-    const u = __calls[0].user; const UN = /^- داده‌هایی که هنوز (?:در کارِ حل نیامده‌اند|در طرح\/گام‌ها به کار نرفته)[^\n]*/mg, lines = u.match(UN) || [];   // سطرِ a38 از A.liveUnused (ادغامِ G1/G2: یک سطر)
+    const u = __calls[0].user; const UN = /^- (?:زمینه \(نه پرسشِ دوم\): )?داده‌هایی که هنوز (?:در کارِ حل نیامده‌اند|در طرح\/گام‌ها به کار نرفته)[^\n]*/mg, lines = u.match(UN) || [];   // سطرِ a38 از A.liveUnused (ادغامِ G1/G2: یک سطر) — دورِ ۱۱ (K1): سطرِ a38 «زمینه (نه پرسشِ دوم)» است
     return { unusedKmd: lines.some(l => /«کمدِ کنارِ دیوار»/.test(l)), notDesk: !lines.some(l => /«طولِ میز ۱۲۰ سانت»/.test(l)), one: lines.length === 1 };
   });
   chk(info.used.unusedKmd && info.used.notDesk && info.used.one, 'R3: a datum only named/dismissed in chat is still «not used» in the live block; a datum used in the plan is not listed ' + JSON.stringify(info.used));
