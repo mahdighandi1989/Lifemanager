@@ -114,7 +114,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(await p.evaluate(() => APP.state.view === 'lprob' && APP.state.sub === 'plan'), 'after understanding ⇒ plan');
 
     /* ===== C) طرح ===== */
-    const Q = await p.evaluate(() => APP.solveAskList('p', 1, 'find'));
+    // تورِ پولیا دورِ ۳ (A11): پرسش‌های طرح نوع‌دارند — همان فهرستِ A.livePhaseQs (تصمیمِ زندگی ⇒ فهرستِ زندگی، نه «قضیه‌ای…؟» ِ ریاضی)
+    const Q = await p.evaluate(pid => APP.livePhaseQs(pid, 'p'), P1);
+    chk(Q.length > 2 && !Q.some(q => /قضیه|عنصرِ کمکی/.test(q)), 'A11: a life decision gets the life plan list, not the math list ' + JSON.stringify(Q));
     await ownCheck('main .lp-ask', 'ask-now card');
     info.ask0 = await p.evaluate(() => ({ q: document.querySelector('main .lp-ask .lp-q').textContent, why: /چرا این پرسش/.test(document.querySelector('main .lp-ask').textContent), one: document.querySelectorAll('main .lp-ask').length }));
     chk(info.ask0.one === 1 && info.ask0.q.indexOf(Q[0]) >= 0 && info.ask0.why, 'one question at a time, first (most general) from PLAN_QS, with «چرا این پرسش» ' + JSON.stringify(info.ask0));
@@ -298,14 +300,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(await p.evaluate(q => APP.qRung(q), Q[0]) === 3, 'G: second helpful SPACED use ⇒ rung 3');
     // ۷: روزِ کاربست = روزِ پاسخ، نه روزِ داوری
     chk(await p.evaluate(() => { APP.S.put({ id: 'eprog_qtest', type: 'eprog', lv: {}, tut: { plan: [{ src: 'live', q: '__q', d: '2026-11-02', at: 'x', self: 2, selfD: '2026-11-02' }, { src: 'live', q: '__q', d: '2026-11-03', at: 'y', self: 2, selfD: '2026-11-05' }] } }); const r = APP.qRung('__q'); APP.S.del('eprog_qtest'); return r; }) === 2, 'rung counts the answer day, not a later grading day');
-    // ۱۶: طرح بی هیچ ابزارِ طرحِ به‌کاررفته پذیرفته نمی‌شود
-    await p.fill('#lpPlan', 'نخست پس از سه ماه کلاس، یک ماه شش ساعت را می‌سنجم، سپس تصمیم می‌گیرم');
-    await click('main .lp-plansave');
-    chk((await S(P2)).live.plan == null && await p.locator('main .lp-plan .lp-heur.warnline').count() === 1, 'plan refused until at least one heuristic card was actually used');
+    // ۱۶ + تورِ پولیا دورِ ۳ (A13): پاسخِ مشخص به «پرسشِ همین لحظه» ِ طرح خودش ابزارِ طرح است (ردِ «بی ابزار» در test_tour1_r3_live.js، با پیامِ دیدنی)
+    chk((await p.evaluate(pid => APP.liveHeur(pid), P2)).includes('ask'), 'A13: an answered plan question counts as a plan tool');
     await sel('#lpMv', 'mv_special'); await p.fill('#lpMvWhy', 'یک ماه آزمایش، حالتِ ساده‌ترِ تصمیمِ همیشگی است'); await click('main .lp-mvadd');
     await p.fill('#lpPlan', 'نخست پس از سه ماه کلاس، یک ماه شش ساعت را می‌سنجم، سپس تصمیم می‌گیرم');
     await click('main .lp-plansave');
-    chk((await S(P2)).live.plan && (await S(P2)).live.plan.heur.indexOf('move') >= 0 && (await S(P2)).rev.h, 'plan saved with the heuristic used; it goes on the spaced ladder (h)');
+    chk((await S(P2)).live.plan && (await S(P2)).live.plan.heur.indexOf('move') >= 0 && (await S(P2)).live.plan.heur.indexOf('ask') >= 0 && (await S(P2)).rev.h, 'plan saved with the heuristic used; it goes on the spaced ladder (h)');
     await p.fill('#lpStep', 'یک ماه بی کلاس، هر روز ۲۰ دقیقه با اپ تمرین کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'سطحم افت نمی‌کند'); await sel('#lpConf', '60'); await p.fill('#lpWhen', '۴ روزِ دیگر');
     await click('main .lp-stepsave');
 
@@ -442,6 +442,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     info.self = await p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); return { rec: (pg.tut.selfAsk || [])[0], q: !!document.querySelector('main .lp-ask .lp-q'), note: !!document.querySelector('main .lp-ask .sv-selfdone') }; }, P3);
     chk(info.self.rec && info.self.rec.match === 1 && /شرطِ پنهان/.test(info.self.rec.mine) && info.self.rec.src === 'live' && info.self.q && info.self.note, 'self-judged comparison recorded, then the usual card ' + JSON.stringify(info.self));
     // همین دروازه در شبیه‌ساز (a36) — فقط برای پرسشِ پلهٔ ۳؛ کارتِ مرحله‌ای دیگر بی‌تغییر؛ «پرسشِ بعد» در دروازه هم هست
+    // دورِ ۳ (A11): پرسش‌های طرحِ تصمیمِ زندگی دیگر همان فهرستِ ریاضیِ شبیه‌ساز نیستند؛ پلهٔ ۳ ِ پرسشِ شبیه‌ساز با دو کاربستِ فاصله‌دارِ واقعی (همان شکلِ رکورد) ساخته می‌شود
+    const QM = await p.evaluate(() => APP.solveAskList('p', 1, 'find'));
+    await p.evaluate(q => APP.S.put({ id: 'eprog_simseed', type: 'eprog', lv: {}, tut: { plan: [{ src: 'live', q, d: '2026-10-01', at: 'a', self: 2, selfD: '2026-10-01' }, { src: 'live', q, d: '2026-10-05', at: 'b', self: 2, selfD: '2026-10-05' }] } }), QM[0]);
+    chk(await p.evaluate(q => APP.qRung(q), QM[0]) >= 3, 'simulator question seeded to rung 3 by spaced helpful uses');
     const SIM = await p.evaluate(Q0 => { const all = APP.probs(); let pP = null, pO = null; all.forEach(pr => { const s0 = pr.stages[0]; if (!s0) return; const ph = APP.stagePhase(pr, s0); if (ph === 'p' && !pP) pP = pr.id; if (ph !== 'p' && !pO) pO = pr.id; }); return { pP, pO }; }, Q[0]);
     await p.evaluate(pid => { APP.simState = { pid, lv: 1, order: 'hist', i: 0 }; APP.go('e_prob', pid, 'sim'); }, SIM.pP); await W(180);
     info.simP = await p.evaluate(() => { const a = document.querySelector('main .sv-ask'); return { gate: !!(a && a.querySelector('.sv-selfask')), sum: a && a.querySelector('summary').textContent, skip: !!(a && a.querySelector('.sv-selfskip')) }; });
