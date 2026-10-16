@@ -313,7 +313,10 @@
   };
   /* تورِ پولیا دورِ ۲ (rerunC): صفحهٔ «🔭» همان رکوردِ مسئله است؛ و مسئلهٔ زنده‌ای که سشن به آن بسته است، پروندهٔ پیش‌فرضِ پیوست‌های همان سشن */
   REC_VIEWS.lprob = REC_VIEWS.e_prob;
-  function boundRec(s) { try { var pid = s && s.lprob, r = pid && A.liveRec && A.liveRec(pid); var o = r ? REC_VIEWS.e_prob(pid) : null; if (o) o.pid = pid; return o; } catch (e) { return null; } }
+  /* پیوند فقط از بخشِ مسئله (A.liveSessionPid — ادغامِ G1/G2) */
+  function boundRec(s) { try { var pid = A.liveSessionPid ? A.liveSessionPid(s) : null, r = pid && A.liveRec && A.liveRec(pid); var o = r ? REC_VIEWS.e_prob(pid) : null; if (o) o.pid = pid; return o; } catch (e) { return null; } }
+  /* شناسهٔ مسئلهٔ زنده‌ای که این پرونده همان رکوردش است (صفحهٔ «🔭» یا پیوندِ سشن) — تا پیوست در فهرستِ خودِ مسئله هم بیاید */
+  function recLive(rc) { if (!rc) return ""; if (rc.pid) return rc.pid; var m = /^eprob_(.+)$/.exec(String(rc.rid || "")); return m && A.liveRec && A.liveRec(m[1]) ? m[1] : ""; }
   AS.boundRec = boundRec;
   function viewRec() { var f = REC_VIEWS[A.state.view]; try { return f && A.state.arg != null ? f(A.state.arg) : null; } catch (e) { return null; } }
   AS.viewRec = viewRec;
@@ -667,11 +670,12 @@
             blobs[r.id] = f; m.files.push(info); s.files.push(info); aiIds.push(r.id); noteSent(s, s.id, sig);
           }, function (e) { m.files.push({ name: f.name, mime: f.type || "", err: true }); A.toast("«" + f.name + "» به درایو نرفت: " + errText(e), "bad"); });
         return toSess.then(function () {
-          var rc = s.rec && S.get(s.rec.rid) ? s.rec : boundRec(s);
-          if (!rc || sentTo(s, rc.rid, sig)) return;
-          return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function (up) { noteSent(s, rc.rid, sig); toRec.push(f.name);
-              // پیوندِ پیوست به مسئلهٔ زندهٔ بسته‌شده به سشن — با تابعِ خودِ بخشِ مسئله اگر صادر شده باشد (نام‌های نامزد؛ بی آن فقط پوشهٔ همان رکورد)
-              if (rc.pid) { m.lprob = rc.pid; var lf = A.liveAttach || A.liveLinkFile || A.liveAddFile; if (typeof lf === "function") try { lf(rc.pid, { id: (up && up.id) || "", name: f.name, mime: f.type || "", sess: s.id, at: now() }); } catch (e) { } } },
+          var rc = s.rec && S.get(s.rec.rid) ? s.rec : boundRec(s), lpid = recLive(rc);
+          // پیوندِ پیوست به مسئلهٔ زنده — فقط با A.liveAttach ِ بخشِ مسئله (ادغامِ G1/G2؛ بی تکرار، حتی اگر فایل پیش‌تر به پوشه رفته باشد)
+          var att = function (up) { if (!lpid || typeof A.liveAttach !== "function") return; m.lprob = lpid; try { A.liveAttach(lpid, { name: f.name, id: (up && up.id) || "", url: (up && up.link) || "", mime: (up && up.mime) || f.type || "", sess: s.id }); } catch (e) { } };
+          if (!rc) return;
+          if (sentTo(s, rc.rid, sig)) { att(null); return; }
+          return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function (up) { noteSent(s, rc.rid, sig); toRec.push(f.name); att(up); },
             function (e) { A.toast("«" + f.name + "» به پروندهٔ «" + rc.title + "» نرفت: " + errText(e), "bad"); });
         });
       });
@@ -795,7 +799,7 @@
     return ups.then(function () {
       if (dupes.length) s.msgs.push({ role: "sys", at: now(), text: "♻ «" + dupes.join("»، «") + "» پیش‌تر در همین سشن فرستاده شده بود؛ دوباره بارگذاری نشد (همان پیوست به کار رفت)." });
       var rcN = s.rec && S.get(s.rec.rid) ? s.rec : boundRec(s);
-      if (toRec.length && rcN) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به " + (rcN.pid ? "مسئلهٔ زندهٔ این سشن" : "پروندهٔ جاریِ این سشن") + " («" + clip(rcN.title, 60) + "») هم پیوست شد." });
+      if (toRec.length && rcN) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به " + (recLive(rcN) ? "مسئلهٔ زندهٔ این سشن" : "پروندهٔ جاریِ این سشن") + " («" + clip(rcN.title, 60) + "») هم پیوست شد." });
       S.put(s); return turn(text || "(فقط فایل فرستادم)", (texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "") + safe, aiIds, true); })
       .catch(function (e) {
         var fl = e && e.files && e.files.length ? " " + manifestNote(e.files) : "";

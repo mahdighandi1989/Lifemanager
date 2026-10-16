@@ -102,7 +102,7 @@
       // ایمنی: «رد شد» ِ مدل فقط با انکارِ صریحِ خودِ کاربر پس از نشانه و نقلِ عینیِ آن در why؛ وگرنه «باید پرسید» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
       if (L.id === "safety" && st === "no" && s.safetyAt && !AS.safetyClearMsg(s, { st: "no", why: why, at: nowIso(), seq: s.seq })) { st = "ask"; safetyHeld = true; }
       /* گره‌ای (یکی از ۱۲ خانواده) که در میانهٔ حلِ مسئله پیدا شد ⇒ رویدادِ ناموفقِ همان مرحله در «🧩 چهار مرحلهٔ حل» (R7) — فقط بارِ نخست */
-      if (st === "found" && !(prev && prev.st === "found") && /^F\d+$/.test(L.id) && AS.coachEvent) { var cph = (AS.boundLive && AS.boundLive(s) && !AS.boundLive(s).done && A.livePhase) ? A.livePhase(s.lprob) : (s.coach && s.coach.ph); if (cph && cph !== "done") try { AS.coachEvent(s, cph, "knot", L.id + ":" + why); } catch (e) { } }
+      if (st === "found" && !(prev && prev.st === "found") && /^F\d+$/.test(L.id) && AS.coachEvent) { var blk = AS.boundLive ? AS.boundLive(s) : null, cph = blk && !blk.done ? blk.ph : (s.coach && s.coach.ph); if (cph && cph !== "done") try { AS.coachEvent(s, cph, "knot", L.id + ":" + why); } catch (e) { } }
       d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), seq: s.seq, hist: prev && prev.hist };
       // قابِ مسئلهٔ عملی: جزءها انباشته می‌شوند (هر نوبت یکی؛ پاسخِ پیشین گم نمی‌شود)
       if (L.id === "practical") { var pp = (prev && prev.parts) || {}; if (x.parts && typeof x.parts === "object") PRACT.forEach(function (q) { var v = x.parts[q[0]]; if (typeof v === "string" && v.trim().length >= 2) pp[q[0]] = clip(v.trim(), 300); }); if (Object.keys(pp).length) d[L.id].parts = pp;

@@ -1903,7 +1903,7 @@
     root.appendChild(A.head("🔭 مسئلهٔ حل‌نشدهٔ خودم · " + PHN[ph], r.p.title, r.p.statement, h("div", { class: "col gap" }, strip,
       h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm", type: "button", onclick: function () { A.go("e_prob", null, "live"); } }, "← مسئله‌های حل‌نشده"),
         ph !== "u" && ph !== "done" ? h("button", { class: "btn ghost sm lp-stuck", type: "button", onclick: function () { stuck(r, pg, s, null); } }, "🪢 گیر کرده‌ام — گره‌گشا با همین مسئله") : null,
-        r.origin && r.origin.type === "lprob" && rec(r.origin.id) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("lprob", r.origin.id); } }, "از بازنگریِ «" + clip(rec(r.origin.id).p.title, 40) + "»") : null))));
+        r.origin && r.origin.type === "lprob" && rec(r.origin.id) ? h("button", { class: "linkish small", type: "button", onclick: function () { A.go("lprob", r.origin.id); } }, backFrom(r)) : null))));
     if (r.dormant && r.dormant > t && !r.woke) root.appendChild(h("p", { class: "card soft small lp-dormnote" }, "این مسئله را خودت در بازنگری ساختی؛ " + A.fdate(r.dormant) + " برای حل برمی‌گردد — می‌توانی همین حالا هم شروعش کنی."));
     /* برگشتِ مسئلهٔ ساختهٔ خودت: «شروع می‌کنم» یا «فعلاً نه» — «فعلاً نه» یک پله دورتر روی همان نردبان (۳ ⇐ ۷ ⇐ ۲۱ ⇐ ۶۰)، نه هر روز */
     if (r.dormant && r.dormant <= t && !r.woke) root.appendChild(h("section", { class: "card soft lp-wake" }, h("p", { class: "small" }, "مسئله‌ای که خودت در بازنگری ساختی برگشته است. حالا حلش می‌کنی؟"),
@@ -1974,6 +1974,13 @@
     });
     return { steps: steps, back: back, incub: incub, coach: coach, checkin: checkin };
   };
+  function backFrom(r) {
+    var o = r.origin || {}, pr = o.type === "lprob" ? rec(o.id) : null;
+    if (o.type === "chat") return "ساخته‌شده در گفت‌وگو با دستیار";
+    if (pr && o.via === "chat") return "ساخته از «" + clip(pr.p.title, 40) + "» در گفت‌وگو با دستیار";
+    if (pr) return "از بازنگریِ «" + clip(pr.p.title, 40) + "»";
+    return "از بازنگریِ یک مسئلهٔ دیگر";
+  }
   if (typeof A.dueList === "function" && !A.dueList._live) {
     var rawDue = A.dueList;
     A.dueList = function () {
@@ -1982,9 +1989,12 @@
         var D = A.liveDue();
         if (D.steps.length === 1) { var x = D.steps[0]; items.push({ k: "knot", live: 1, txt: "🔭 گامِ واقعی: «" + clip(x.st.text, 70) + "» — انجامش دادی؟ چه شد؟", sub: "«" + clip(x.r.p.title, 50) + "» · پیش‌بینی‌ات: «" + clip(x.st.pred, 60) + "»", go: function () { A.go("lprob", x.r.p.id, "exec"); } }); }
         else if (D.steps.length > 1) items.push({ k: "knot", live: D.steps.length, txt: "🔭 " + fa(D.steps.length) + " گامِ واقعی موعدِ وارسی است — انجامش دادی؟ چه شد؟", sub: D.steps.slice(0, 3).map(function (y) { return "«" + clip(y.r.p.title, 40) + "»"; }).join(" · "), go: function () { A.go("lprob", D.steps[0].r.p.id, "exec"); } });
-        if (D.back.length === 1) { var b = D.back[0]; items.push({ k: "knot", live: 1, txt: "🧩 مسئلهٔ تازه‌ای که خودت ساختی برگشت: «" + clip(b.p.title, 70) + "»", sub: "از بازنگریِ یک مسئلهٔ دیگر — حالا حلش کن", go: function () { A.go("lprob", b.p.id, "u"); } }); }
-        else if (D.back.length > 1) items.push({ k: "knot", live: D.back.length, txt: "🧩 " + fa(D.back.length) + " مسئلهٔ تازه‌ای که خودت ساختی برگشت", sub: D.back.slice(0, 3).map(function (y) { return "«" + clip(y.p.title, 40) + "»"; }).join(" · "), go: function () { A.go("lprob", D.back[0].p.id, "u"); } });
-        D.incub.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "😴 دیروز «" + clip(y.p.title, 60) + "» را کنار گذاشتی — چه چیزی به ذهنت رسید؟", sub: "پس از تلاشِ جدی؛ همان را بنویس، حتی «هیچ»", go: function () { A.go("lprob", y.p.id); } }); });
+        /* متنِ «امروز» (تورِ پولیا دورِ ۲، rerunD s31/s34؛ ادغامِ G1/G2 — یک منبع، لایهٔ رونویسِ a27 برداشته شد): شمار با فهرست می‌خواند («و k تای دیگر»)،
+           «دیروز» فقط اگر دیروز بود (وگرنه «n روز پیش»)، و برچسب از خاستگاهِ واقعی: بازنگریِ همین صفحه، گفت‌وگو با دستیار، یا ساخته از مسئلهٔ دیگری در گفت‌وگو */
+        if (D.back.length === 1) { var b = D.back[0]; items.push({ k: "knot", live: 1, txt: "🧩 مسئلهٔ تازه‌ای که خودت ساختی برگشت: «" + clip(b.p.title, 70) + "»", sub: backFrom(b) + " — حالا حلش کن", go: function () { A.go("lprob", b.p.id, "u"); } }); }
+        else if (D.back.length > 1) items.push({ k: "knot", live: D.back.length, txt: "🧩 " + fa(D.back.length) + " مسئلهٔ تازه‌ای که خودت ساختی برگشت", sub: D.back.slice(0, 3).map(function (y) { return "«" + clip(y.p.title, 40) + "»"; }).join(" · ") + (D.back.length > 3 ? " و " + fa(D.back.length - 3) + " تای دیگر" : ""), go: function () { A.go("lprob", D.back[0].p.id, "u"); } });
+        D.incub.forEach(function (y) { var ic = live(solOf(pgOf(y.p.id))).incub || {}, d0 = ic.d || String(ic.at || "").slice(0, 10), n = d0 && A.daysBetween ? A.daysBetween(d0, A.today()) : 1;
+          items.push({ k: "knot", live: 1, txt: "😴 " + (n > 1 ? fa(n) + " روز پیش" : "دیروز") + " «" + clip(y.p.title, 60) + "» را کنار گذاشتی — چه چیزی به ذهنت رسید؟", sub: "پس از تلاشِ جدی؛ همان را بنویس، حتی «هیچ»", go: function () { A.go("lprob", y.p.id); } }); });
         D.checkin.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🔭 میانهٔ راهِ «" + clip(y.p.title, 60) + "»: چه آموختی؟", sub: "دربارهٔ مسئله و دربارهٔ خودت — هنوز همان را می‌خواهی؟", go: function () { A.go("lprob", y.p.id); } }); });
         D.coach.forEach(function (y) { items.push({ k: "knot", live: 1, txt: "🧑‍🏫 پیگیریِ مربیگری: «" + clip((y.coach && y.coach.who) || "", 30) + "» — «" + clip(y.p.title, 50) + "»", sub: "این بار بی همان پرسش (یا با پرسشی کلی‌تر) می‌رسد؟", go: function () { A.go("lprob", y.p.id); } }); });
       } catch (e) { console.warn(e); }

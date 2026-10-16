@@ -214,7 +214,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const u3 = __calls[0].user; out.lifeFrame = /هیچ‌کس از پیش نمی‌داند/.test(u3) && !/پاسخ وجود دارد ولی تو نمی‌دانی/.test(u3); out.dueQ = /موعدِ گامِ «با مدیرِ شرکتِ تازه حرف بزنم» رسیده/.test(u3);
     pg2.solve.live.steps[0].closed = true; pg2.solve.live.steps[0].out = { done: 'yes', what: 'پیشنهاد داد', match: 'yes', prog: 'کمی', want: 'same' }; S.put(pg2);
     __calls.length = 0; __q.push(R({ reply: 'بعد؟' })); await AS.send('ثبتش کردم');
-    const u4 = __calls[0].user; out.staleGone = !/موعدِ گامِ «با مدیرِ شرکتِ تازه حرف بزنم»/.test(u4) && /پیش از گامِ واقعیِ بعد/.test(u4);
+    const u4 = __calls[0].user; out.staleGone = !/موعدِ گامِ «با مدیرِ شرکتِ تازه حرف بزنم»/.test(u4) && /پیش از (?:گامِ واقعیِ بعد|این گام)/.test(u4);   // ادغامِ G1/G2: پرسشِ اجرای زندگی از A.liveCoach ِ بخشِ مسئله
     return out;
   });
   chk(info.hook.objFrame && info.hook.noOld, '6: an objective (proof) live problem gets «پاسخ وجود دارد ولی تو نمی‌دانی؛ داوری با برهان», not «هیچ‌کس نمی‌داند» ' + JSON.stringify(info.hook));

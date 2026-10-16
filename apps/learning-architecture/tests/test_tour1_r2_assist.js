@@ -120,9 +120,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     pg.solve.live.plan = { t: 'طولِ میز ۱۲۰ سانت را با دیوار مقایسه می‌کنم', at: new Date().toISOString(), heur: ['move'], unused: {} }; S.put(pg);
     const s = AS.cur(); s.lprob = pid; S.put(s); APP.go('home');
     __calls.length = 0; await AS.send('اون کمدِ کنارِ دیوار به نظرم بی‌فایده‌ست؛ کمد مهم نیست');
-    const u = __calls[0].user; return { unusedKmd: /به کار نرفته[^\n]*«کمدِ کنارِ دیوار»/.test(u), notDesk: !/به کار نرفته[^\n]*«طولِ میز ۱۲۰ سانت»/.test(u) };
+    const u = __calls[0].user; const UN = /^- داده‌هایی که هنوز (?:در کارِ حل نیامده‌اند|در طرح\/گام‌ها به کار نرفته)[^\n]*/mg, lines = u.match(UN) || [];   // سطرِ a38 از A.liveUnused (ادغامِ G1/G2: یک سطر)
+    return { unusedKmd: lines.some(l => /«کمدِ کنارِ دیوار»/.test(l)), notDesk: !lines.some(l => /«طولِ میز ۱۲۰ سانت»/.test(l)), one: lines.length === 1 };
   });
-  chk(info.used.unusedKmd && info.used.notDesk, 'R3: a datum only named/dismissed in chat is still «not used» in the live block; a datum used in the plan is not listed ' + JSON.stringify(info.used));
+  chk(info.used.unusedKmd && info.used.notDesk && info.used.one, 'R3: a datum only named/dismissed in chat is still «not used» in the live block; a datum used in the plan is not listed ' + JSON.stringify(info.used));
 
   // ---------- R1e) پس از بستنِ مسئله: مربی برای حدسِ تازه؛ میانهٔ راه روی نردبان ----------
   info.closed = await p.evaluate(async () => {

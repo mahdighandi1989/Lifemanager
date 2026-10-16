@@ -171,7 +171,7 @@
     /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است */
     var ids = ((s && s.know) || []).slice();
     ((s && s.tour && s.tour.facets) || []).forEach(function (f) { if (f.area && f.status !== "skipped" && ids.indexOf(f.area) < 0) ids.push(f.area); });
-    try { var lr = s && s.lprob && A.liveRec && A.liveRec(s.lprob); [].concat((lr && (lr.areas || lr.p.areas || (lr.area ? [lr.area] : []))) || []).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); } catch (e) { }
+    try { var blr = A.ASSIST && A.ASSIST.boundLive ? A.ASSIST.boundLive(s) : null, lr = blr && blr.r; [].concat((lr && (lr.areas || lr.p.areas || (lr.area ? [lr.area] : []))) || []).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); } catch (e) { }
     var want = ids.map(SYS.byId).filter(Boolean);
     var rel = want.concat(SYS.related((msg || "") + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
     if (!rel.length) return "";
