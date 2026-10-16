@@ -346,7 +346,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const u2 = await lastQ();
     const cA = coachOf(u1), cB = coachOf(u2);
     info.pageRef = { ref, c107: has(cA, ['C107']), b231: has(cA, ['B231']) || /B231/.test(liveOf(u1)), again: has(cB, ['C107']) || has(cB, ['B231']) || /B231/.test(liveOf(u2)), keep: /دوباره پیشنهاد نکن/.test(u2) };
-    chk(ref > 0 && info.pageRef.c107 && info.pageRef.b231, 'G3: a refutation recorded on the page triggers C107 (narrow the domain) and B231 in the next chat turn (s07, s20) ' + JSON.stringify(info.pageRef));
+    // دورِ ۷ (DECISIONS_R7 H1، s05): این‌جا فرضیهٔ یک‌بارهٔ زندگی است (nat=life) — «دامنه‌اش را تنگ کن» (C107) برای گزارهٔ کلی است، نه این؛ B231 می‌ماند
+    chk(ref > 0 && !info.pageRef.c107 && info.pageRef.b231, 'G3: a refutation recorded on the page triggers B231 in the next chat turn (s07, s20) — and, for a one-off LIFE hypothesis, not C107 (R7 H1, s05) ' + JSON.stringify(info.pageRef));
     chk(!info.pageRef.again && info.pageRef.keep, 'G3/G1: those moment lines fire once per refutation (not on every later turn), while «don\'t re-propose it» stays as context (s19) ' + JSON.stringify(info.pageRef));
     // G7: «🌱 ثبتِ گامِ کوچک» ⇒ تأییدِ درجا و فرمِ پاک
     await realStep('فردا از سه مشتری بپرسم چرا کمتر خریدند', 'قیمت‌ها را گران می‌دانند');
