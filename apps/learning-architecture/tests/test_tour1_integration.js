@@ -117,7 +117,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const u2 = __calls[0].user, coach2 = u2.slice(u2.indexOf('# مربیِ حل'));
     return { ph: co.ph, coQ: co.q, q, one, objQ: !/پیش‌بینی/.test(co.q), coachPointer: /پرسشِ این نوبت: \*\*فقط\*\* همان یک پرسشی که «مسئلهٔ زندهٔ این سشن»/.test(coach), noSecond: !/پیشنهادِ این نوبت/.test(coach) && !/^- پرسش‌های «/m.test(coach),
       prove: /مرحلهٔ محتمل: اجرای طرح · اثباتی/.test(coach), list: co.list.slice(0, 7).every(x => list.indexOf(x.slice(0, 40)) >= 0), sameList: JSON.stringify(APP.livePhaseQs(pid)) === JSON.stringify(co.list),
-      claimStays: /مرحلهٔ محتمل: اجرای طرح/.test(coach2) && /می‌گوید حل شد، ولی صفحه هنوز «اجرای طرح» است/.test(coach2) && APP.livePhase(pid) === 'c', one2: (u2.match(/در این نوبت فقط \*\*یک\*\* پرسش/g) || []).length };
+      claimStays: /مرحلهٔ محتمل: (?:اجرای طرح|بازنگری \(نتیجه‌ای گفت؛ صفحه هنوز «اجرای طرح»\))/.test(coach2) /* تورِ ۱ دورِ ۶ (G4): سرواژه با پرسشِ نوبت، با یادِ مرحلهٔ صفحه */ && /می‌گوید حل شد، ولی صفحه هنوز «اجرای طرح» است/.test(coach2) && APP.livePhase(pid) === 'c', one2: (u2.match(/در این نوبت فقط \*\*یک\*\* پرسش/g) || []).length };
   });
   // منفی: مسئلهٔ فقط‌درگفت‌وگو ⇒ فهرستِ خودِ مربی با «پیشنهادِ این نوبت»، بی بلوکِ زنده
   await newSess(); await say('یه معما: با سه بار وزن کردن سکهٔ تقلبی رو از ۱۲ سکه پیدا کنم');

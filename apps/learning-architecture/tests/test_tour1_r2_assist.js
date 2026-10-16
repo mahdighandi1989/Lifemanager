@@ -72,8 +72,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // «حق داره؟» ⇒ همین پیام ادعاست؛ پاسخِ پیشین در گفت‌وگو دوباره پرسیده نمی‌شود
   await p.evaluate(() => { __q.push(R({ reply: 'فرض چیست؟ حکم (آنچه باید ثابت شود) چیست؟' })); });
   await say('معلمم می‌گه همیشه ۱۸۰ ـه؛ حق داره؟');
+  // تورِ ۱ دورِ ۶ (G1): «پاسخ‌گرفته» فقط از گزارشِ سنجیدهٔ مدل (coach_state)، نه از برچسبِ الگو — پس مدل گزارش می‌دهد و نشان در نوبتِ بعد است
+  await p.evaluate(() => { __q.push(R({ reply: 'خوب.', actions: [{ do: 'coach_state', ph: 'u', said: ['u', 'd'], ans: ['u1'], stuck: false, fail: false, role: 'self', nat: '?' }] })); });
   await say('فرض اینه که سه ضلع داریم و حکم اینه که جمعِ زاویه‌ها ۱۸۰ است');
-  info.chatAns = await p.evaluate(() => { const u = __calls[__calls.length - 1].user, d = __calls[__calls.length - 2].user; return { answered: /فرض چیست؟ حکم \(آنچه باید ثابت شود\) چیست؟ \[در گفت‌وگو پاسخ گرفته — دوباره نپرس\]/.test(u), dispute: /همین پیام چنین ادعایی است/.test(d), notBefore: !/همین پیام چنین ادعایی است/.test(u) }; });
+  await say('خب، حالا باید ثابت کنم.');   // پیامِ میانی هنوز از «اثبات» می‌گوید (پنجرهٔ ۴ پیامِ ردهٔ مربی)
+  info.chatAns = await p.evaluate(() => { const u = __calls[__calls.length - 1].user, d = __calls[__calls.length - 3].user; return { answered: /فرض چیست؟ حکم \(آنچه باید ثابت شود\) چیست؟ \[در گفت‌وگو پاسخ گرفته — دوباره نپرس\]/.test(u), dispute: /همین پیام چنین ادعایی است/.test(d), notBefore: !/همین پیام چنین ادعایی است/.test(u) }; });
   chk(info.chatAns.answered && info.chatAns.dispute && info.chatAns.notBefore, 'R1: «حق داره؟» is flagged as a claim to prove or refute; a question the user already answered in chat is not re-asked ' + JSON.stringify(info.chatAns));
   // ضرب‌المثل بی تکرار در سشن
   info.prov = await p.evaluate(() => { const L = __calls.slice(-3).map(c => (/ضرب‌المثلِ همین مرحله \(پولیا، «حکمتِ ضرب‌المثل‌ها»\): «([^»]+)»/.exec(c.user) || [])[1]).filter(Boolean); return { L, uniq: new Set(L).size === L.length }; });

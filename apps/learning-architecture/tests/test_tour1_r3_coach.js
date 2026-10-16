@@ -64,8 +64,13 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const d2a = sugOf(coachOf(await lastUser()));
   await ask('مجهول (یا حکمی که باید ثابت شود) چیست؟');
   await say('خب اول اینو بگو: این معما سخته؟');           // پیامِ پاسخ‌نگرفتهٔ دیگری — با شمارِ پیام پیشنهاد نباید بچرخد
+  // تورِ ۱ دورِ ۶ (G1): پرسش فقط با گزارشِ سنجیدهٔ مدل «پاسخ‌گرفته» می‌شود (نه با بیانِ ضعیفِ الگو) — مدل گزارش می‌دهد، پیشنهاد در نوبتِ بعد جلو می‌رود
+  await p.evaluate(() => { __q.push(R({ reply: 'خوب.', actions: [{ do: 'coach_state', ph: 'u', said: ['u'], ans: ['u1'], stuck: false, fail: false, role: 'self', nat: 'objective' }] })); });
   await say('می‌خوام بفهمم کدوم جعبه کدوم میوه رو داره');
+  const d2fb = sugOf(coachOf(await lastUser()));
+  await say('خب');
   const d2c = sugOf(coachOf(await lastUser()));
+  chk(/^مجهول/.test(d2fb), 'G1 (R6): the regex «stated» fallback alone never skips the question (re-ask is harmless) ' + d2fb);
   info.d2 = { first: d2a, after: d2c };
   chk(/^مجهول/.test(d2a), 'D2: the first suggestion is the most general question of the phase (the unknown), not chosen by message count ' + JSON.stringify(info.d2));
   chk(/^داده‌ها/.test(d2c), 'D2/B2: after the unknown was answered in chat, the next suggestion is the next question in order (data) ' + JSON.stringify(info.d2));

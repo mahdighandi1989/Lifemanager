@@ -971,10 +971,12 @@
     drop.appendChild(selF(uid + "ds", "این دلیل از کجاست؟", WILL_DROPSRC, "", function (v) { d.dropSrc = v; }));
     f.appendChild(go); f.appendChild(drop);
     var out = h("div", { class: "small", "aria-live": "polite" });
+    /* تورِ پولیا دورِ ۶ (G7، s19، s34): پس از ثبت، فرم در جا پاک می‌شود و فقط تأیید (و پیوندها) می‌ماند — نه فرمِ پُر با دکمهٔ خاموش تا رندرِ بعد */
+    function settle() { [].slice.call(f.childNodes).forEach(function (n) { if (n !== out) f.removeChild(n); }); }
     f.appendChild(h("button", { class: "btn sm sv-willsave", type: "button", onclick: function (e) {
       var c = A.willStepCheck(d, w, host.title); out.innerHTML = "";
       if (!c.ok) { out.appendChild(h("p", { class: "bad" }, "هنوز نه: " + c.why.join("؛ ") + ".")); return; }
-      e.currentTarget.disabled = true;
+      e.currentTarget.disabled = true; settle();
       var at = nowISO();
       w.log.push({ at: at, kind: "commit", trig: trig || "", desire: d.desire, hope: d.hope || "", budget: d.budget || "" });
       w.reask = null;   // تصمیمِ تازه (گام یا رها کردن) ⇒ بازپرسیِ معلق بسته شد
