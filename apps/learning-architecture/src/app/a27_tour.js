@@ -1126,7 +1126,8 @@
     t = t.replace(new RegExp("[؟?](?=" + dg + ")|(" + dg + ")[؟?](?=" + dg + "|[؟?])", "g"), function (m, d) { return (d || "") + "#"; });
     return t.split(/([.!؛\n…])/).map(function (cl) { return /رقم|ارقام/.test(cl) ? cl.replace(new RegExp("(" + dg + ")[؟?]", "g"), "$1#") : cl; }).join("");
   }
-  function manyUnknowns(t) {
+  /* دورِ ۹ (s17 در برابرِ s23، s29): open ⇒ فقط مجهول‌های **باز** (واژهٔ پرسشیِ چقدر/کجا/چطور…) — پرسشِ بله/نهِ مقدارِ خودش («یعنی ۱۰۰ دقیقه؟») مجهولِ باز نیست، پیشنهادِ خودش است */
+  function manyUnknowns(t, open) {
     t = qMarksOnly(t); var seen = [];
     t.split(/[؟?]/).slice(0, -1).forEach(function (seg) {
       var cl = seg.split(/[.!؛\n…]/).pop(), m, w = ""; QW_RE.lastIndex = 0; while ((m = QW_RE.exec(cl))) w = m[1];
@@ -1137,8 +1138,11 @@
       if (!seen.some(function (x) { return x.w === w && tk.filter(function (y) { return x.tk.indexOf(y) >= 0; }).length * 2 >= Math.min(tk.length, x.tk.length); })) seen.push({ w: w, tk: tk });
     });
     var req = /هر\s*(?:دو|سه|چهار|پنج)\s*(?:تا\s*)?(?:رو|را)?\s*(?:با\s*هم|یکجا|یک[‌\s]?جا)\s*(?:بگو|بده|حساب\s*کن|حل\s*کن|جواب\s*بده)/.test(t);
+    if (open) seen = seen.filter(function (x) { return x.w !== "qty"; });
     return seen.length > 1 || (req && seen.length > 0);
   }
+  /* دورِ ۹ (s29): خودش ترتیب را گذاشته («اول باغچه …»، «بعد هم …») یا برای یکی حدس زده («به نظرم …») ⇒ پرسشِ A044 («کدام را اول؟») پاسخ گرفته است */
+  var OWN_ORDER_RE = /(?:^|[\s.،؛!…])(?:اول|نخست|سپس|بعدش|بعد\s*هم)(?![آ-ی‌])|به\s*نظرم|فکر\s*(?:کنم|می[‌\s]?کنم)|حدس(?:م|\s*می[‌\s]?زنم)/;
   /* «صورتِ بلند»: بیش از یک جملهٔ معنادار (کل بیش از یک جزء دارد که پیش از جزئیات باید با هم دیده شود) — بی آستانهٔ طول */
   function longStmt(t) { return String(t || "").split(/[.!؟?؛\n]+/).filter(function (x) { return qToks(x).length >= 2; }).length > 1; }
   /* دورِ ۶ (G3): «اول کل را ببین» (A191) فقط پیامی که مسئله را **معرفی** می‌کند و هنوز کل را ندیده: نه گشایشِ نتیجه («حلش کردم!»)، نه دلسردی/رها کردن،
@@ -1367,7 +1371,7 @@
     var sug = back ? back : o.sug && open.indexOf(o.sug) >= 0 ? o.sug : o.sug && !answeredQ(s, o.sug, asked) ? o.sug : open.length ? open[0] : "";
     /* دورِ ۹ (s17): وقتی **همین پیام** چند مجهول را با هم خواسته (لحظهٔ A044) و بلوکِ زنده یا آزمودنِ حدس پرسشِ نوبت را نمی‌دهد، پرسشِ نوبت همان A044 است
        (زیرمسئله‌ها و ترتیبشان را خودش بگوید) — نه پرسشِ عمومیِ فهرست؛ وگرنه A044 هرگز به نوبت نمی‌رسید */
-    var multiNow = !o.live && !o.guess && !o.dry && manyUnknowns(mt);
+    var multiNow = !o.live && !o.guess && !o.dry && manyUnknowns(mt, true) && !OWN_ORDER_RE.test(ownText(mt));
     if (multiNow) sug = "چند چیز را با هم خواستی — آن‌ها را زیرمسئله‌های جدا کن: کدام را اول می‌گشایی و چرا؟";
     /* E1: شناسهٔ هر پرسش (u1، p3، e2، b1 …) — مدل در گزارشِ وضع با همین شناسه می‌گوید کدام پرسش پاسخ گرفت */
     if (s && !o.live) { var C1 = s.coach = s.coach || {}; C1.qmap = {}; qs.forEach(function (q, i) { C1.qmap[QID[ph] + (i + 1)] = q; }); }
@@ -1607,7 +1611,8 @@
   var GENCLAIM_RE = /همیشه|همه|(?:^|[\s«،(])هر(?=[\s‌])|(?:^|[\s«،(])(?:قانون|قاعده)(?=$|[\s.،؛!؟»)])|هیچ[‌\s]?(?:وقت|کس|کدام|جا)|هرگز|برای\s*هر/;
   function refGeneral(pid) { try { var so = ((S.get("eprog_" + pid) || {}).solve) || {}, g = so.g && so.g[1], pl = A.livePlausible ? A.livePlausible(pid) : null;
     /* دورِ ۹ (s22): فقط حدس‌های **ردشده** (refutedG) — حدسِ کنونی پس از رد، حدسِ تازه است نه آنچه رد شد */
-    var T = ((pl && pl.refutedG) || []).slice(); if (!T.length && g && g.prev) T = [].concat(g.prev).map(function (x) { return x && (x.guess || x); }); T = T.filter(function (t) { return typeof t === "string" && t; }); return T.some(function (t) { return GENCLAIM_RE.test(String(t)); }); } catch (e) { return false; } }
+    /* … و حدسِ کنونی وقتی خودش (پس از ثبتش) رد شده و حدسِ تازه‌ای جایش ننشسته (refutedNow ِ a38) */
+    var T = ((pl && pl.refutedG) || []).slice(); if (g && g.prev) T = T.concat([].concat(g.prev).map(function (x) { return x && (x.guess || x); })); if (g && g.guess && pl && pl.refutedNow > 0) T.push(g.guess); T = T.filter(function (t) { return typeof t === "string" && t; }); return T.some(function (t) { return GENCLAIM_RE.test(String(t)); }); } catch (e) { return false; } }
   /* هم‌توان در یک نوبت: پرامپت ممکن است برای بودجه چند بار ساخته شود (AS.prompt ⇒ userPrompt تا ۴ بار) — همان پیام همان پاسخ را می‌گیرد */
   /* دورِ ۷ (H1، s19): «تازه» فقط در همان روزِ رد — نخستین گفت‌وگو شش هفته پس از رد لحظهٔ «از ردش چه آموختی؟» نیست (روزِ ردِ گام: out.d ِ صفحه) */
   function refDay(pid) { try { var L = ((S.get("eprog_" + pid) || {}).solve || {}).live || {}; return (L.steps || []).filter(function (x) { return x && x.out && x.out.guess && x.out.guess.rel === "refute"; }).map(function (x) { return String(x.out.d || dayOf(x.out.at) || ""); }).sort().pop() || ""; } catch (e) { return ""; } }
