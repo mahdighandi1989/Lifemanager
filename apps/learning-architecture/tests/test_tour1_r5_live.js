@@ -362,6 +362,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await sel('#lpOGuess', 'refute'); await p.fill('#lpOReflect', 'گوشی علت نبود؛ شاید چرتِ عصر علت است');
       chk(await has('#lpONewG') === 1, 'F7: a refuted guess\'s reflection offers «ثبت به‌عنوانِ حدس»');
       await selIf('#lpONewG', 'yes'); await fillIf('#lpONewGT', 'چرتِ عصر علتِ دیر خوابیدن است');
+      // دورِ ۶ (G5): حدسِ تازه اطمینان و آزمونِ خودش را می‌خواهد (ارث نمی‌برد)
+      await selIf('#lpONewGC', '60'); await fillIf('#lpONewGTest', 'یک هفته بی چرتِ عصر ساعتِ خواب را می‌نویسم');
       await click('main .lp-outsave');
       info.f7g = await p.evaluate(pid => { const s = APP.S.get('eprog_' + pid).solve; return { g: s.g[1].guess, hist: (s.live.guessHist || []).length, plaus: APP.livePlausible(pid) }; }, PG);
       chk(info.f7g.g === 'چرتِ عصر علتِ دیر خوابیدن است' && info.f7g.hist === 1 && info.f7g.plaus.refuted === 0, 'F7: the new guess becomes the problem\'s guess (old one kept in history; its tally starts fresh) ' + JSON.stringify(info.f7g));

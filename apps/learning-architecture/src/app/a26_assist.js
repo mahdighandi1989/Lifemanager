@@ -212,10 +212,12 @@
   function isAnswer(x) { try { return !!(x && x.closest && x.closest(ANSWER)); } catch (e) { return false; } }
   /* پیام‌های اخیرِ صفحه (toast) — حتی وقتی خودِ کاربر دکمه را زد — تا دستیار علتِ «نشد» را بداند و کاربر را مقصر نکند */
   var RECENT_TOASTS = [];
-  (function () { var raw0 = A.toast; A.toast = function (m, kind) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200), bad: kind === "bad" }); if (RECENT_TOASTS.length > 8) RECENT_TOASTS.shift(); } } catch (e) { } return raw0.apply(this, arguments); }; })();
+  (function () { var raw0 = A.toast; A.toast = function (m, kind) { try { if (m) { RECENT_TOASTS.push({ at: Date.now(), t: clip(String(m), 200), bad: kind === "bad" }); if (RECENT_TOASTS.length > 8) { var j0 = 0; while (j0 < RECENT_TOASTS.length - 1 && RECENT_TOASTS[j0].bad) j0++; RECENT_TOASTS.splice(j0, 1); } } } catch (e) { } return raw0.apply(this, arguments); }; })();
   /* تورِ پولیا دورِ ۴ (s01/s30): پیامِ ردِ کهنه («اول این‌ها…») پس از ثبتِ موفق دیگر «پیامِ اخیر» نیست — صفحه با AS.dropBadToasts کنارش می‌گذارد؛ تکراری‌ها یک بار */
   AS.dropBadToasts = function () { for (var i = RECENT_TOASTS.length - 1; i >= 0; i--) if (RECENT_TOASTS[i].bad) RECENT_TOASTS.splice(i, 1); };
-  AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000, o = []; RECENT_TOASTS.forEach(function (x) { if (x.at >= t0 && o.indexOf(x.t) < 0) o.push(x.t); }); return o; };
+  /* G6 (تورِ پولیا دورِ ۶، s17): ردِ صفحه («اول این‌ها…»، «هنوز نه…») تا رفع نشده — یعنی تا ثبتِ موفقی آن را با dropBadToasts کنار بگذارد — به هر سنی
+     «پیامِ اخیر» است (روزِ بعد هم کاربر می‌پرسد «چرا نشد؟»)؛ پیامِ عادی فقط ۴ دقیقه؛ هنگامِ پُر شدن، اول پیامِ عادیِ کهنه می‌رود */
+  AS.recentToasts = function () { var t0 = Date.now() - 4 * 60000, o = []; RECENT_TOASTS.forEach(function (x) { if ((x.bad || x.at >= t0) && o.indexOf(x.t) < 0) o.push(x.t); }); return o; };
   var ANSWER_NOTE = "جوابِ تمرین با خودِ توست — دستیار آن را نه پر می‌کند، نه نشان می‌دهد";
   /* داوری با خودِ کاربر (data-own="verdict"، a6: حکمِ ایستگاه‌ها، درجه/احتمالِ صدق، «حکم در یک بند»): دستیار نه پر می‌کند، نه می‌زند — فقط زرد،
      با یادداشتِ روشن؛ «هوش مصنوعی در داوری نقشی ندارد» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵) */
@@ -472,7 +474,7 @@
     try { (AS.promptHooks || []).forEach(function (fn) { try { var x = fn(s, msg); if (x) hookOut.push(x); } catch (e) { } });
       (AS.promptFilters || []).forEach(function (fn) { try { var y = fn(hookOut, s, msg); if (Array.isArray(y)) hookOut = y; } catch (e) { } }); } finally { AS._hookCtx = null; }
     hookOut.forEach(function (x) { if (x) L.push("", x); });
-    var rt = AS.recentToasts(); if (rt.length) L.push("", "# پیام‌های اخیرِ صفحه (۴ دقیقهٔ گذشته؛ مثلاً پس از دکمه‌ای که خودِ کاربر زد)", rt.map(function (x) { return "- " + x; }).join("\n"));
+    var rt = AS.recentToasts(); if (rt.length) L.push("", "# پیام‌های اخیرِ صفحه (ردهایی که هنوز رفع نشده‌اند، و پیام‌های ۴ دقیقهٔ گذشته؛ مثلاً پس از دکمه‌ای که خودِ کاربر زد)", rt.map(function (x) { return "- " + x; }).join("\n"));
     L.push("", "# صفحهٔ فعلی", scanText(sc, pageMode), "", "# گفت‌وگو تا این لحظه");
     var HP = L.length;
     L.push("", "# نوبتِ تازه", msg);

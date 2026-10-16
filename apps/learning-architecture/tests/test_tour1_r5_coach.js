@@ -319,7 +319,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sayQ('نمی‌دونم، گیر کردم');
     { const u = await lastQ(), L = block(u, '# مسئلهٔ زندهٔ این سشن'), one = (/^- در این نوبت فقط \*\*یک\*\* پرسش[^\n]*$/m.exec(L) || [''])[0];
       info.f2b3 = { allData: /همهٔ داده‌ها|داده‌هایی که اثرِ محسوس/.test(one), dataLine: /^- داده‌هایی که هنوز/m.test(L), one: one.slice(0, 160) };
-      chk(!info.f2b3.allData && !info.f2b3.dataLine, 'F2: «همهٔ داده‌ها را به کار بردی؟» is never asked before a plan exists, even when the user is stuck (s30, s33, s35) ' + JSON.stringify(info.f2b3)); }
+      // DECISIONS_R6 G2(3) جای R5 F2 را گرفت: گیر در طرح با دادهٔ به‌کارنرفته ⇒ «همهٔ داده‌ها؟» (فقط آغازِ طرحِ بی‌گیر بی آن است — test_tour1_r6_live G2-stuck)
+      chk(info.f2b3.allData, 'F2/G2: stuck before a plan with unused data ⇒ «همهٔ داده‌ها را به کار بردی؟» is the one question (R6 G2(3)) ' + JSON.stringify(info.f2b3)); }
     await ctx.close();
   }
 

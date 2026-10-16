@@ -1505,7 +1505,7 @@
     var pg = S.get("eprog_" + pid) || {}, so = pg.solve || {}, L = so.live || {}, u = (so.u && so.u[1] && so.u[1].done) ? so.u[1] : {}, bk = (so.b && so.b[1] && so.b[1].done) ? so.b[1] : {};
     var cl = null; try { cl = A.liveClosure ? A.liveClosure(pid) : null; } catch (e) { }
     var last = (L.steps || []).filter(function (x) { return x.closed && x.out && !x.out.auto; }).pop();
-    var res = bk.glance || (L.chat && L.chat.solution) || (last ? clip(last.text, 80) + (last.out.what ? " ⇒ " + clip(last.out.what, 80) : "") : "");
+    var res = (A.liveResult && A.liveResult(pid)) || bk.glance || (L.chat && L.chat.solution) || (last ? clip(last.text, 80) + (last.out.what ? " ⇒ " + clip(last.out.what, 80) : "") : "");   // G5 (دورِ ۶، s01): جوابِ خودِ مسئله (a38)، نه «در یک نگاه»
     var out = ["# مسئلهٔ حل‌شدهٔ مرتبط (" + pid + "): «" + clip(r.p.title, 80) + "» · " + (cl && cl.label ? cl.label : "بسته شده") + (L.stateAt ? " · " + (L.stateD || String(L.stateAt).slice(0, 10)) : "")];
     if (blind) out.push("- اول مرورِ بی‌نگاه: پیش از یادآوری بپرس «یادت هست مجهول و راهت چه بود؟» — بعد از این‌ها برای پیوند استفاده کن (مسئلهٔ مرتبطِ حل‌شده: «نتیجه‌اش را به کار می‌بری؟ روشش را؟»).");
     if (u.u || u.c) out.push("- مجهول «" + clip(u.u || u.one || "", 100) + "»" + (u.c ? " · شرط «" + clip(u.c, 100) + "»" : ""));
