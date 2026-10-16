@@ -252,13 +252,22 @@ function strictScan(user) {
   // ================= prov — K7 =================
   await section('prov', async () => {
     const r = info.prov = { cases: [] };
-    const provQ = (c) => { const l = lineOf(c, /^- ضرب‌المثلِ همین مرحله/); const m = /«([^»]+)»/.exec(l); return m ? m[1] : ''; };
+    const provQ = (c) => { const l = lineOf(c, /^- ضرب‌المثلِ همین مرحله/); const m = /\): «([^»]+)»/.exec(l); return m ? m[1] : ''; };
     const norm = (t) => String(t || '').replace(/[\s‌«»"'.،,؛:!…—\-()]+/g, '');
-    const msgs = ['حلش کردم! بیشترین حاصل‌ضرب اعداد مثبتی که جمعشون ۱۰ ه وقتیه که همه‌شون مساوی‌ان، ۵×۵=۲۵.', 'حلش کردم. مجموع زاویه‌های خارجی ۳۶۰ درجه‌ست چون دور کامل می‌زنیم.',
-      'دیگه ولش کنم، این مسئلهٔ جدول رو نمی‌تونم. خسته شدم.', 'نتونستم. این معما رو ول می‌کنم، دیگه نمی‌خوام ادامه بدم.', 'سه ماهه پروژه رو شروع نکردم، ناامیدم.'];
-    for (const m of msgs) {
-      const c = coachOf(await first(m)), q = provQ(c), rest = c.split('\n').filter(l => !/^- ضرب‌المثلِ همین مرحله/.test(l)).join('\n'), k = norm(q).slice(0, 18);
-      r.cases.push({ m: m.slice(0, 24), q: q.slice(0, 40), dup: !!k && norm(rest).indexOf(k) >= 0 });
+    /* همان وضعِ سشن‌های تور: ضرب‌المثل‌های پیشینِ همان مرحله در همین سشن مصرف شده‌اند و نوبت به همان نقلی می‌رسد که سطرِ دیگرِ بلوک هم دارد
+       (s12 p7، s14 p6، s16 p4، s18 p6، s20 p6: قارچ‌ها؛ s12 p5، s14 p1، s19 p1/p2: «جایی که اراده‌ای هست…») */
+    const seedExcept = (ph, keys, re) => p.evaluate(([ph, keys, re]) => { const AS = APP.ASSIST, s = AS.cur(), K = ['u', 'goal', 'five', 'p', 'rel', 'p2', 'switch', 'c', 'cobj', 'back', 'want', 'b', 'new', 'will', 'incub'];
+      const L = [].concat.apply([], ['u', 'p', 'c', 'b'].map(x => AS.polyaProverbsFor(x, K) || []).concat([AS.polyaProverbsFor(ph, keys) || []])); s.coach = s.coach || {};
+      s.coach.prov = L.filter(x => !new RegExp(re).test(String(x.q) + ' ' + String(x.n || ''))).map(x => x.id || x.q); APP.S.put(s); return L.filter(x => new RegExp(re).test(String(x.q) + ' ' + String(x.n || ''))).map(x => (x.id || '') + ':' + String(x.q).slice(0, 24)); }, [ph, keys, re]);
+    const cases = [
+      ['b', ['b', 'new'], 'قارچ', 'حلش کردم! بیشترین حاصل‌ضرب اعداد مثبتی که جمعشون ۱۰ ه وقتیه که همه‌شون مساوی‌ان، ۵×۵=۲۵.'],
+      ['u', ['will', 'u', 'goal', 'five'], 'اراده', 'دیگه ولش کنم، این مسئلهٔ جدول رو نمی‌تونم. خسته شدم.'],
+      ['p', ['will', 'p', 'rel', 'p2'], 'اراده', 'طرحم اینه که اول جدول بکشم. ولی نتونستم، ولش می‌کنم.'],
+    ];
+    for (const [ph, keys, re, m] of cases) {
+      await newSess(); const seeded = await seedExcept(ph, keys, re); await say(m);
+      const c = coachOf(await lastUser()), q = provQ(c), rest = c.split('\n').filter(l => !/^- ضرب‌المثلِ همین مرحله/.test(l)).join('\n'), k = norm(q).slice(0, 18);
+      r.cases.push({ m: m.slice(0, 24), seeded, q: q.slice(0, 40), dup: !!k && norm(rest).indexOf(k) >= 0 });
     }
     chk(r.cases.some(x => x.q) && !r.cases.some(x => x.dup), 'prov: the stage proverb never repeats a quote already in the same block (mushrooms, «جایی که اراده‌ای هست…») ' + JSON.stringify(r.cases));
   });
