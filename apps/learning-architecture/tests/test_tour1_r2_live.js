@@ -175,6 +175,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(s1.live.state === 'solved' && s1.live.steps[0].intuitive === false && /لانهٔ کبوتر/.test(s1.live.steps[0].proof), 'R5: the intuitive step proved at closing; then solved');
     // بازنگریِ برهان: پاسکال، همهٔ فرض، نتیجه = حکم؛ بخشِ شرطِ به‌کارنرفته
     chk(await has('#lpBDef') === 1 && await has('#lpBHyp') === 1 && await has('#lpBConcl') === 1 && await has('#lpBLimit') === 1, 'kind: proof look-back asks Pascal\'s rule, all hypotheses, conclusion = claim; spatial ⇒ limiting case');
+    chk(await has('#lpBLetter') === 1 && await has('main .lp-btransfer') === 1, 'A13 (دورِ ۳): spatial look-back offers the letter form and the transfer (angle/volume) prompt');
     // ایراد ⇒ نمی‌بندد
     await p.fill('#lpBChk', 'حالتِ نقطه‌های روی مرز را جدا وارسی کردم'); await sel('#lpBRes', 'نتیجه سالم ماند');
     await sel('#lpBHyp', 'notall');
