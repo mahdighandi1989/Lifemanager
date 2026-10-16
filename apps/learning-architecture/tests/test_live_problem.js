@@ -38,6 +38,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const bidi = async (lab) => { const bad = await p.evaluate(() => [...document.querySelectorAll('#main .lp-page *, #main .lp-new *')].filter(e => e.childNodes.length && [...e.childNodes].some(n => n.nodeType === 3 && /[؀-ۿ]/.test(n.textContent) && /[A-Za-z0-9%]/.test(n.textContent)) && !e.closest('[dir=rtl]')).length); chk(bad === 0, lab + ': mixed Persian/Latin text without an rtl ancestor: ' + bad); };
   const S = (pid) => p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); return JSON.parse(JSON.stringify(pg && pg.solve || {})); }, pid);
   const todayTxt = () => p.evaluate(() => APP.dueList().map(x => x.txt));
+  // «پرسشِ بعد»؛ اگر به تهِ فهرست رسید، «کدام پرسش واقعاً حالا می‌خواند؟» (تور ۱) ⇒ پرسشِ شمارهٔ i
+  const skipOrPick = async (i) => { if (await p.locator('main .lp-rote').count()) { await sel('#lpRotePick', String(i)); await p.fill('#lpRoteWhy', 'این پرسش با وضعِ همین لحظه می‌خواند'); await click('main .lp-rotego'); } else await click('main .lp-askskip'); };
   try {
     await p.goto(FILE); await p.waitForSelector('.nav'); await W(300);
     await p.evaluate(T0 => { window.__day = T0; APP.today = () => window.__day; APP.S.loaded = true; }, T0);
@@ -87,7 +89,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(/رونوشت/.test(info.onemiss) && /کوتاه‌تر/.test(info.onemiss) && /یک جمله/.test(info.onemiss) && !(await p.locator('#lpUnk').count()), 'the whole sentence: no near-copy, shorter than the statement, one sentence ' + info.onemiss);
     await p.fill('#lpOne', 'می‌خواهم بین رفتن به شیراز و ماندن در تهران تصمیم بگیرم، با درآمد، خانواده و مهلتی که دارم.');
     await click('main .lp-onesave');
-    info.order = await p.evaluate(() => [...document.querySelectorAll('main .lp-u label')].map(l => l.getAttribute('for')).filter(Boolean).slice(0, 4));
+    info.order = await p.evaluate(() => [...document.querySelectorAll('main .lp-u label')].map(l => l.getAttribute('for')).filter(Boolean).slice(0, 8));
     chk(info.order.indexOf('lpOne') >= 0 && info.order.indexOf('lpOne') < info.order.indexOf('lpUnk'), 'whole-in-one-sentence comes before the parts ' + info.order.join(','));
     await click('main .lp-usave');
     chk(await p.locator('main .lp-umiss').count() === 1, 'empty understanding refused');
@@ -97,6 +99,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await click('main .lp-dadd');
     await p.fill('#lpD_d3', 'مادرم بیمار است و هفته‌ای دو بار به او سر می‌زنم');
     await p.fill('#lpCond', 'همسرم کارش را از دست ندهد\nتا ده روزِ دیگر جواب بدهم');
+    await sel('#lpSat', 'yes');   // تور ۱: «آیا شرط برآوردنی است؟»
     await sel('#lpSuff', 'هنوز نمی‌دانم'); await p.fill('#lpSuffW', 'نمی‌دانم دورکاری ممکن است یا نه');
     await p.fill('#lpDead', '۱۰ روزِ دیگر');
     await p.fill('#lpGuess', 'بهتر است بمانم'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'اگر شرکت دورکاریِ دو روز در هفته بدهد، حدسم رد می‌شود');
@@ -159,6 +162,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk((await S(P1)).live.plan == null, 'plan refused while an unused datum is unanswered');
     await sel('#lpPU_a_d3', 'unknown'); await p.fill('#lpPU_w_d3', 'نمی‌دانم سر زدن به مادرم را چطور در طرح بگذارم');
     await noOverflow('plan');
+    // تور ۱: «هنوز نمی‌دانم» ِ کفایت پیش از طرح دوباره پرسیده می‌شود
+    await click('main .lp-plansave');
+    chk((await S(P1)).live.plan == null, 'plan refused while «هنوز نمی‌دانم» sufficiency is not re-asked');
+    await sel('#lpSuffQ_p', 'هنوز نمی‌دانم'); await p.fill('#lpSuffQW_p', 'تا شرطِ دورکاری را نپرسم معلوم نیست'); await click('main .lp-suffqgo');
     await click('main .lp-plansave');
     s1 = await S(P1);
     chk(s1.live.plan && s1.live.plan.unused.d3 && s1.live.plan.unused.d3.ans === 'unknown' && s1.live.related.some(x => x.id === info.rel.kc) && s1.live.back && s1.live.aux.length === 1 && s1.live.moves[0].mv === 'mv_special', 'plan record ' + JSON.stringify(s1.live.plan));
@@ -201,6 +208,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await sel('#lpClear', 'مطمئن نیستم');
     await p.fill('#lpWhen', '۳ روزِ دیگر');
     await p.fill('#lpPrem', 'شرط: سر زدن به مادرم');
+    await sel('#lpBkMatch', 'yes');   // تور ۱: نخستین گام ⇐ آخرین حلقهٔ «از آخر به عقب»
     await click('main .lp-stepsave');
     s1 = await S(P1);
     const st1 = s1.live.steps[0];
@@ -222,6 +230,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await click('main .lp-outsave');
     chk(!(await S(P1)).live.steps[0].closed, 'checkpoint asks «how much do you want it now?» (required)');
     await sel('#lpOWant', 'more');
+    await sel('#lpOGuess', 'refute'); await p.fill('#lpOReflect', 'حدسِ ماندن را کنار می‌گذارم چون شرطِ اصلی‌اش دورکاری بود');   // تور ۱: نتیجه دربارهٔ حدس
     await click('main .lp-outsave');
     info.out1 = await p.evaluate(([pid]) => { const pg = APP.S.get('eprog_' + pid), st = pg.solve.live.steps[0], f = APP.S.get(st.fc); const FC = APP.PSY.answers().FC.filter(x => x.src === 'fcast'); const d = APP.MIND.model().dims.find(x => x.id === 's_problem');
       return { closed: st.closed, match: st.out.match, want: st.out.want, fco: f.outcome, fc: FC.map(x => x.p + ':' + x.ok), est: APP.PSY.forecastEst(FC).n, mind: d ? { fc: d.cal.filter(c => c.fc).length, est: d.est && d.est.fc && d.est.fc.n, ans: d.ans.length } : null }; }, [P1]);
@@ -242,6 +251,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(info.reu.sub === 'u' && /شیراز/.test(info.reu.one) && /مادرم/.test(info.reu.d3), 'surprise ⇒ re-understand with your previous card ' + JSON.stringify(info.reu));
     await p.fill('#lpD_d1', '');   // حقوق دیگر داده نیست
     await p.fill('#lpCond', 'همسرم کارش را از دست ندهد\nتا ده روزِ دیگر جواب بدهم\nدورکاری از ماهِ اول ممکن است');
+    await sel('#lpRestate', 'narrower'); await p.fill('#lpRestateW', 'شرطِ دورکاری افزوده شد و حقوق دیگر داده نیست');   // تور ۱: مقایسهٔ بیان‌ها
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
     s1 = await S(P1);
     chk(s1.live.uHist.length === 1 && /دورکاری/.test(s1.u[1].c) && s1.u[1].dl.map(x => x.id).join() === 'd2,d3', 're-understanding saved, earlier version kept, removed datum gone ' + JSON.stringify(s1.u[1].dl.map(x => x.id)));
@@ -255,6 +265,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.evaluate(x => { window.__day = x; APP.today = () => window.__day; APP.S.loaded = true; }, D(3));
     await go('lprob', P1, 'u');
     chk(await p.evaluate(() => (document.getElementById('lpD_d4') || {}).value) === 'یک مشاورِ شغلی را می‌شناسم', 'understanding draft survives a reload');
+    await sel('#lpRestate', 'eq'); await p.fill('#lpRestateW', 'فقط یک دادهٔ تازه افزوده شد');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
     chk((await S(P1)).live.uDraft == null && (await S(P1)).u[1].dl.map(x => x.id).join() === 'd2,d3,d4', 'draft cleared on save');
     await go('lprob', P1, 'exec');
@@ -268,14 +279,15 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await go('lprob', P2);
     await p.fill('#lpOne', 'می‌خواهم تصمیم بگیرم کلاسِ آلمانی را ادامه بدهم یا نه'); await p.fill('#lpWhy', 'شاید روزی برای کار به آلمان بروم'); await click('main .lp-onesave'); await p.fill('#lpUnk', 'ادامه بدهم یا نه');
     await p.fill('#lpD_d1', 'سه ماه است می‌روم'); await p.fill('#lpD_d2', 'هفته‌ای شش ساعت وقت می‌گیرد');
-    await p.fill('#lpCond', 'وقتِ کارم کم نشود'); await sel('#lpSuff', 'کافی است');
+    await p.fill('#lpCond', 'وقتِ کارم کم نشود'); await sel('#lpSat', 'yes'); await sel('#lpSuff', 'کافی است');
     await p.fill('#lpGuess', 'ادامه می‌دهم'); await sel('#lpConf', '70'); await p.fill('#lpTest', 'اگر یک ماه بی کلاس پیشرفتم نخوابد');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
     // G/9: مسئلهٔ تازه از کم‌ورزیده‌ترین پرسش آغاز می‌کند (نه همیشه پرسشِ ۱)
     chk(await p.evaluate(q => APP.qRung(q), Q[0]) === 2, 'G: one helpful use ⇒ rung 2');
     info.p2start = await p.evaluate(() => document.querySelector('main .lp-ask .lp-q').textContent);
     chk(info.p2start.indexOf(Q[1]) >= 0, 'a new problem starts at the least-practised question (Q2), not always Q1 ' + info.p2start);
-    for (let k = 0; k < Q.length && (await p.evaluate(() => document.querySelector('main .lp-ask .lp-q').textContent)).indexOf(Q[0]) < 0; k++) await click('main .lp-askskip');
+    // تور ۱: رسیدن به تهِ فهرست بی‌صدا دوباره آغاز نمی‌شود — «کدام پرسش واقعاً حالا می‌خواند؟»
+    for (let k = 0; k < Q.length + 2 && !(await p.evaluate(q0 => { const e = document.querySelector('main .lp-ask .lp-q'); return e && e.textContent.indexOf(q0) >= 0; }, Q[0])); k++) await skipOrPick(0);
     chk(await p.evaluate(() => !document.querySelector('main .lp-ask .sv-selfask')), 'G: rung 2 ⇒ still shown directly');
     await p.fill('#lpAsk', 'تصمیمِ ادامهٔ باشگاه را دیده‌ام: شش ساعت در هفته'); await click('main .lp-askgo'); await click('main .lp-ask .sv-g2');
     chk(await p.evaluate(q => APP.qRung(q), Q[0]) === 3, 'G: second helpful SPACED use ⇒ rung 3');
@@ -307,6 +319,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await go('lprob', P1, 'exec');
     // گامِ بازی که با «حل شد» بسته می‌شود
     await p.fill('#lpStep', 'با همسرم یک جلسهٔ نیم‌ساعته دربارهٔ رفتن بگذاریم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'او موافقِ رفتن است'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
+    await click('main .lp-stepsave');
+    await sel('#lpSwitch', 'same');   // تور ۱: گامی که واژه‌ای با طرح ندارد ⇒ «طرح را عوض کردی؟»
     await click('main .lp-stepsave');
 
     /* ===== F) بازنگری — حل شد ===== */
@@ -344,9 +358,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(await p.locator('main .lp-list .lp-item[data-pid="' + P3 + '"] .lp-dorm').count() === 1, 'invented problem listed with «برمی‌گردد …»');
     // مسئلهٔ دوم: نتیجهٔ «تاحدی»، گامِ بازِ دیگر، و آگاهانه کنار گذاشتن ⇒ گام و پیش‌بینی‌اش بسته
     await go('lprob', P2, 'exec');
-    await sel('#lpODone', 'part'); await p.fill('#lpOWhat', 'دو هفته تمرین کردم'); await sel('#lpOMatch', 'part'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'less'); await click('main .lp-outsave');
+    await sel('#lpODone', 'part'); await p.fill('#lpOWhat', 'دو هفته تمرین کردم'); await sel('#lpOMatch', 'part'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'less'); await sel('#lpOGuess', 'none'); await click('main .lp-outsave');
     chk(await p.evaluate(pid => APP.S.get(APP.S.get('eprog_' + pid).solve.live.steps[0].fc).outcome, P2) === 'تاحدی', 'partial match ⇒ stays out of the binary forecast calibration');
     await p.fill('#lpStep', 'از معلم یک آزمونِ تعیینِ سطح بگیرم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'سطحم B1 است'); await sel('#lpConf', '60'); await p.fill('#lpWhen', '۵ روزِ دیگر');
+    await click('main .lp-stepsave');
+    await sel('#lpSwitch', 'new'); await p.fill('#lpSwitchW', 'به جای یک ماه آزمایش، سطحم را مستقیم می‌سنجم');
     await click('main .lp-stepsave');
     await click('main .lp-abandon');
     await click('main .lp-lbsave');
@@ -384,6 +400,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await go('lprob', P2, 'exec');
     await p.fill('#lpStep', 'در آزمونِ رسمیِ گوته ثبت‌نام کنم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'قبول می‌شوم'); await sel('#lpConf', '50'); await p.fill('#lpWhen', '۴۰۰ روزِ دیگر');
     await click('main .lp-stepsave');
+    if (await p.locator('#lpSwitch').count()) { await sel('#lpSwitch', 'same'); await click('main .lp-stepsave'); }
     chk(await p.locator('#lpFarOk').count() === 1 && (await S(P2)).live.steps.length === 2, 'a day beyond one year asks for explicit confirmation');
     await p.check('#lpFarOk'); await click('main .lp-stepsave');
     chk((await S(P2)).live.steps.length === 3 && (await S(P2)).live.steps[2].due === D(410), 'confirmed far step saved');
@@ -398,10 +415,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await click('main .lp-wakego');
     chk(await p.evaluate(pid => APP.state.view === 'lprob' && !!APP.S.get('eprob_' + pid).woke, P3), 'returned problem opens for solving');
     await p.fill('#lpOne', 'روشِ تصمیمِ مشترک برای کارِ همسر در شهرِ دیگر'); await p.fill('#lpWhy', 'تا آن روز غافلگیر نشویم'); await click('main .lp-onesave'); await p.fill('#lpUnk', 'روشِ تصمیمِ مشترک');
-    await p.fill('#lpD_d1', 'تجربهٔ تصمیمِ شیراز'); await p.fill('#lpCond', 'هر دو راضی باشیم'); await sel('#lpSuff', 'هنوز نمی‌دانم');
+    await p.fill('#lpD_d1', 'تجربهٔ تصمیمِ شیراز'); await p.fill('#lpCond', 'هر دو راضی باشیم'); await sel('#lpSat', 'unknown'); await sel('#lpSuff', 'هنوز نمی‌دانم');
     await p.fill('#lpGuess', 'همان روش جواب می‌دهد'); await sel('#lpConf', '70'); await p.fill('#lpTest', 'اگر شرطِ پنهانِ تازه‌ای پیدا شود');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');
-    for (let k = 0; k < Q.length && !(await p.evaluate(() => !!document.querySelector('main .lp-ask .sv-selfask'))); k++) await click('main .lp-askskip');
+    for (let k = 0; k < Q.length + 2 && !(await p.evaluate(() => !!document.querySelector('main .lp-ask .sv-selfask'))); k++) await skipOrPick(0);
     info.gate = await p.evaluate(() => ({ gate: !!document.querySelector('main .lp-ask .sv-selfask'), q: !!document.querySelector('main .lp-ask .lp-q'), skip: !!document.querySelector('main .lp-ask .sv-selfskip') }));
     chk(info.gate.gate && !info.gate.q && info.gate.skip, 'G: rung ≥ 3 ⇒ «الان از خودت چه می‌پرسی؟» BEFORE the canonical question, with «پرسشِ بعد» still available ' + JSON.stringify(info.gate));
     await ownCheck('main .lp-ask', 'self-ask gate');
@@ -428,7 +445,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await go('lprob', P4);
     await p.fill('#lpOne', 'می‌خواهم بین قطار و هواپیما برای سفرِ نوروز انتخاب کنم'); await p.fill('#lpWhy', 'سفر با بچه‌ها آرام باشد'); await click('main .lp-onesave'); await p.fill('#lpUnk', 'وسیلهٔ سفر');
     await p.fill('#lpD_d1', 'قیمتِ بلیتِ هواپیما دو میلیون است'); await p.fill('#lpD_d2', LONG);
-    await p.fill('#lpCond', 'بچه‌ها خسته نشوند'); await sel('#lpSuff', 'کافی است');
+    await p.fill('#lpCond', 'بچه‌ها خسته نشوند'); await sel('#lpSat', 'yes'); await sel('#lpSuff', 'کافی است');
     await p.fill('#lpGuess', 'قطار'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'اگر قطار جا نداشته باشد');
     await noOverflow('understanding with a long URL datum');
     await click('main .lp-usave'); await click('main .lp-u .sv-g2');

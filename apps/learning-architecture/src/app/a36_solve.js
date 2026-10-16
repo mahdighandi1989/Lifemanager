@@ -749,7 +749,7 @@
       det.appendChild(h("table", { class: "sv-ktab small" }, h("thead", {}, h("tr", {}, h("th", {}, "x"), h("th", {}, "y"))), tb));
       det.appendChild(h("button", { class: "btn ghost sm sv-kaddrow", type: "button", onclick: function () { var last = kit.rows[kit.rows.length - 1], nx = A.knumOf && last ? A.knumOf(last.x) : null; kit.rows.push({ x: nx != null ? String(nx + 1) : "", y: "" }); drawRows(); } }, "+ حالتِ دیگر"));
     }
-    if (P.indexOf("formula") >= 0) det.appendChild(ltrIn(field(idp + "f", "حدست را دقیق بنویس — به صورتِ فرمولِ n (مثلاً " + LT("n(n+1)/2") + " یا " + LT("2^n − 1") + ")", kit.formula, function (v) { kit.formula = v; }, 0, "فرمول بر حسبِ n")));
+    if (P.indexOf("formula") >= 0) det.appendChild(ltrIn(field(idp + "f", "حدست را دقیق بنویس — به صورتِ فرمولِ n (مثلاً " + LT("n(n+1)/2") + " یا " + LT("2^n − 1") + "؛ حرفِ فارسی مثلِ «ن» یا «ح» هم همان متغیر است، و کسر مثلِ " + LT("1000/27") + " در جدول خوانده می‌شود)", kit.formula, function (v) { kit.formula = v; }, 0, "فرمول بر حسبِ n")));
     if (P.indexOf("rivals") >= 0) {
       det.appendChild(h("h5", {}, o.rivTitle || "حدس‌های رقیب"));
       det.appendChild(h("p", { class: "small muted" }, o.rivHint || "دست‌کم دو حدس که هر دو با آنچه می‌دانی جور درمی‌آیند؛ برای هر کدام آزمونی که می‌تواند ردش کند. اگر حدس‌ها فرمول‌اند، کد حالتی را می‌یابد که جدایشان می‌کند."));

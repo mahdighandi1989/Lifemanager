@@ -836,27 +836,41 @@
      «ابزارهای حدس» در کارتِ حدس/بازنگریِ شبیه‌ساز، «💡 جایگاهِ ایده» و قابِ مسئلهٔ عملی (a36) همین‌ها را صدا می‌زنند؛ سه سازندهٔ زیر هم.
      تصمیمِ مالک (۲۰۲۶-۱۰-۱۵): «حدس را بیازما، نه تأیید» — جدولِ حالت‌ها را خودِ کاربر می‌سازد، حدس را دقیق (فرمول) می‌نویسد، حدس‌های رقیب
      را کنارِ هم می‌گذارد و کد می‌گوید کدام با کدام حالت نمی‌خواند و کدام حالت دو رقیب را از هم جدا می‌کند. عددِ قراردادی ندارد. */
-  function seqDiffs(ys) {
-    var rows = [ys.slice()];
+  /* tol (اختیاری): دقتِ خودِ جدول (نیمِ واحدِ آخرین رقمِ نوشته‌شده)؛ خطای گردکردن در هر مرتبهٔ تفاضل حداکثر دو برابر می‌شود (|a−b| ≤ |a|+|b|) */
+  function seqDiffs(ys, tol) {
+    var rows = [ys.slice()], t0 = tol > 0 ? tol : 0;
     while (rows[rows.length - 1].length > 1) { var r0 = rows[rows.length - 1], nx = []; for (var i = 1; i < r0.length; i++) nx.push(r0[i] - r0[i - 1]); rows.push(nx); }
     var order = -1;
-    for (var k = 0; k < rows.length; k++) { var rr = rows[k]; if (rr.length >= 2 && rr.every(function (v) { return Math.abs(v - rr[0]) < 1e-9; })) { order = k; break; } }
+    for (var k = 0; k < rows.length; k++) { var rr = rows[k], tk = Math.max(1e-9, t0 * Math.pow(2, k + 1)); if (rr.length >= 2 && rr.every(function (v) { return Math.abs(v - rr[0]) <= tk; })) { order = k; break; } }
     var next = null;
     if (order >= 0) { var add = rows[order][0]; for (var k2 = order - 1; k2 >= 0; k2--) add = rows[k2][rows[k2].length - 1] + add; next = add; }
     /* «ثابت» فقط با دو مقدار دیده شد ⇒ شاهدِ ضعیف (حالتِ دیگری لازم است) */
     return { rows: rows, order: order, next: next, thin: order >= 0 && rows[order].length === 2 };
   }
   A.kseqDiffs = seqDiffs;
-  function numOf(v) { var s = lat(v).replace(/[\s,٬]/g, "").replace(/[−–]/g, "-").replace(/٫/g, "."); return /^-?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : null; }
+  /* عدد: رقمِ لاتین/فارسی/عربی، ممیزِ «.» یا «٫»، جداکنندهٔ هزارگان، و کسرِ a/b («1000/27»، «۱۰۰۰/۲۷») — تور ۱ ِ پولیا (s31): کسر بی‌صدا حذف می‌شد */
+  function numClean(v) { return lat(v).replace(/[\s,٬‌‏‎]/g, "").replace(/[−–—]/g, "-").replace(/٫/g, ".").replace(/[÷⁄∕]/g, "/"); }
+  function numOf(v) { var s = numClean(v), m;
+    if (/^-?\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+    if ((m = /^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/.exec(s)) && +m[2] !== 0) return parseFloat(m[1]) / parseFloat(m[2]);
+    return null; }
   A.knumOf = numOf;
+  /* دقتِ یک خانهٔ جدول از رقم‌هایی که خودِ کاربر نوشته (نه عددِ قراردادی): «۳۷٫۰۴» ⇒ ±۰٫۰۰۵ (نیمِ واحدِ آخرین رقم)؛ عددِ صحیح و کسر ⇒ دقیق (۰) */
+  function precOf(v) { var s = numClean(v), m = /^-?\d+\.(\d+)$/.exec(s); return m ? 0.5 * Math.pow(10, -m[1].length) : 0; }
+  A.kprecOf = precOf;
   /* فرمول بر حسبِ n (یا x): عدد، + − × ÷ ^، پرانتز، ضربِ ضمنی (۲n، n(n+1))؛ بی eval. خوانا نیست ⇒ null */
   /* L4 (ممیزیِ ۲۰۲۶-۱۰-۱۵): فاصله میانِ دو عدد («2 3») یکی نمی‌شود؛ دو متغیرِ پیاپی («n n»، «nx») و متغیر پیش از عدد («n2») مبهم‌اند ⇒ null؛
      n و x با هم در یک فرمول ⇒ null (یک متغیر)؛ ممیزِ فارسی «٫» پذیرفته است («۱٫۵n»). */
   function parseFormula(src) {
-    var s0 = lat(src).toLowerCase().replace(/٫/g, ".").replace(/[×·]/g, "*").replace(/÷/g, "/").replace(/[−–—]/g, "-").replace(/²/g, "^2").replace(/³/g, "^3").replace(/ⁿ/g, "^n");
+    var s0 = lat(src).toLowerCase().replace(/[‌‏‎]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/٫/g, ".").replace(/[×·]/g, "*").replace(/[÷⁄∕]/g, "/").replace(/[−–—]/g, "-").replace(/²/g, "^2").replace(/³/g, "^3").replace(/ⁿ/g, "^n");
     if (/[0-9.]\s+[0-9.]/.test(s0)) return null;
     var s = s0.replace(/\s+/g, "");
     s = s.replace(/^(?:[a-z]_?n?\(n\)|[a-z]_n|[a-z]\(x\)|y)=/, "");
+    /* تور ۱ ِ پولیا (s36): متغیرِ فارسی (ن، ح، …) — هر تک‌حرفِ فارسی همان متغیرِ جدول است (یک متغیر، یکسان در هر فرمول)؛ نامِ تابع پیش از «=»
+       («ی=»، «ج(ن)=») برداشته می‌شود. لاتین فقط n و x (بقیه رد، مثلِ پیش). دو حرفِ فارسیِ متفاوت، یا فارسی همراهِ n/x ⇒ null (یک متغیر). */
+    s = s.replace(/^(?:[ء-یپچژکگ](?:_?\([ء-یپچژکگnx]\))?)=/, "");
+    var fv = s.match(/[ء-یپچژکگ]/g);
+    if (fv) { if (fv.some(function (c) { return c !== fv[0]; }) || /[nx]/.test(s)) return null; s = s.replace(/[ء-یپچژکگ]/g, "n"); }
     if (!s || !/^[0-9n x.+\-*/^()]+$/.test(s)) return null;
     if (/[nx][nx]|[nx][0-9.]/.test(s) || /n/.test(s) && /x/.test(s)) return null;
     var toks = [], m, re = /(\d+(?:\.\d+)?)|([nx])|([+\-*/^()])/g, pos = 0;
@@ -879,7 +893,8 @@
     try { var f = expr(); if (i !== tk.length) return null; return f; } catch (e) { return null; }
   }
   A.kformula = parseFormula;
-  function close(a, b) { return isFinite(a) && isFinite(b) && Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
+  function close(a, b, tol) { return isFinite(a) && isFinite(b) && Math.abs(a - b) <= Math.max(tol > 0 ? tol : 0, 1e-9 * Math.max(1, Math.abs(a), Math.abs(b))); }
+  A.kclose = close;
   /* کوچک‌ترین n ِ صحیح (از نخستین حالتِ جدول — یا ۱ — تا بیشینهٔ جدول + ۲۰) که دو فرمول در آن فرق دارند */
   function separate(f, g, upto, from, skip) { for (var n = from == null ? 1 : from; n <= upto; n++) { if (skip && skip.some(function (x) { return close(x, n); })) continue; var a = f(n), b = g(n); if (isFinite(a) && isFinite(b) && !close(a, b)) return { n: n, a: a, b: b }; } return null; }
   A.kseparate = separate;
@@ -909,25 +924,30 @@
       A0.why.forEach(function (x) { out.issues.push("قیاس: " + x + "."); });
     }
     /* حالتی «نوشته شده» است که نتیجه (y) دارد؛ x ِ پیش‌فرض بی y شمرده نمی‌شود */
-    var rows = (kit.rows || []).map(function (r) { return { x: numOf(r && r.x), y: numOf(r && r.y), raw: r }; }).filter(function (r) { return r.raw && String(r.raw.y || "").trim(); });
+    var rows = (kit.rows || []).map(function (r, i) { return { x: numOf(r && r.x), y: numOf(r && r.y), tol: precOf(r && r.y), raw: r, i: i }; }).filter(function (r) { return r.raw && String(r.raw.y || "").trim(); });
     var numRows = rows.filter(function (r) { return r.y != null; });
     if (rows.length) {
       var xs = numRows.map(function (r, i) { return r.x != null ? r.x : i + 1; }), step = xs.length >= 2 ? xs[1] - xs[0] : 1;
       var even = xs.every(function (x, i) { return i === 0 || close(x - xs[i - 1], step); }) && step !== 0;
-      out.table = { n: rows.length, numeric: numRows.length, even: even, xs: xs };
-      if (numRows.length < rows.length) out.notes.push("برخی حالت‌ها عددی نیستند؛ تفاضل‌ها فقط روی حالت‌های عددی ساخته می‌شوند.");
+      var tmax = numRows.reduce(function (m, r) { return Math.max(m, r.tol); }, 0);
+      out.table = { n: rows.length, numeric: numRows.length, even: even, xs: xs, tol: tmax };
+      /* هیچ خانه‌ای بی‌صدا کنار نمی‌رود (تور ۱ ِ پولیا، s31): خانهٔ ناخوانا با شماره و متنش گفته می‌شود و «وارسی شد» نمی‌دهد */
+      out.unread = rows.filter(function (r) { return r.y == null; }).map(function (r) { return { i: r.i, raw: String(r.raw.y) }; });
+      out.unread.forEach(function (u) { out.issues.push("حالتِ " + fa(u.i + 1) + ": «" + u.raw + "» خوانده نشد — عدد یا کسر بنویس (مثلاً 37.04 یا 1000/27)؛ در تفاضل‌ها و سنجشِ فرمول نیامد."); });
       if (numRows.length >= 2 && even) {
-        var D = seqDiffs(numRows.map(function (r) { return r.y; }));
+        var D = seqDiffs(numRows.map(function (r) { return r.y; }), tmax);
         out.table.diffs = D.rows; out.table.order = D.order; out.table.next = D.next; out.table.nextX = xs[xs.length - 1] + step; out.table.thin = D.thin;
       } else if (numRows.length >= 2 && !even) out.issues.push("فاصلهٔ حالت‌ها (x) یکسان نیست؛ برای تفاضل‌های پیاپی، x را با گامِ ثابت بچین.");
       else out.issues.push("برای تفاضل‌ها دست‌کم دو حالتِ عددی لازم است.");
     }
     if (String(kit.formula || "").trim()) {
       var f = parseFormula(kit.formula);
-      if (!f) { out.formula = { ok: false }; out.issues.push("فرمول خوانا نیست: فقط n، عدد، + − × ÷ ^ و پرانتز (مثلاً n(n+1)/2 یا 2^n − 1)."); }
+      if (!f) { out.formula = { ok: false }; out.issues.push("فرمول خوانا نیست: فقط یک متغیر (n، x یا یک حرفِ فارسی مثلِ ن یا ح)، عدد، کسر، + − × ÷ ^ و پرانتز (مثلاً n(n+1)/2، 2^n − 1 یا (10/ن)^ن)."); }
       else {
-        var mism = numRows.map(function (r, i) { var x = r.x != null ? r.x : i + 1, v = f(x); return close(v, r.y) ? null : { x: x, y: r.y, fx: v }; }).filter(Boolean);
+        /* تحمل = دقتِ همان خانه (رقم‌هایی که خودت نوشتی)؛ عددِ صحیح دقیق خوانده می‌شود — اگر گردش کرده‌ای، رقم‌ها یا کسر را بنویس */
+        var mism = numRows.map(function (r, i) { var x = r.x != null ? r.x : i + 1, v = f(x); return close(v, r.y, r.tol) ? null : { x: x, y: r.y, fx: v, raw: String(r.raw.y), rounded: !r.tol && Math.abs(v - r.y) < 0.5 }; }).filter(Boolean);
         out.formula = { ok: true, fits: !mism.length, mism: mism, tested: numRows.length };
+        if (mism.some(function (m) { return m.rounded; })) out.notes.push("اگر عددی را گرد نوشته‌ای، رقم‌های اعشارش (یا کسرش) را بنویس؛ عددِ صحیح دقیق خوانده می‌شود.");
         if (mism.length) out.refuted = true;   // M5: حدسِ ردشده «وارسی شد» نیست
         if (out.table && out.table.nextX != null) out.formula.next = f(out.table.nextX);
       }
@@ -943,7 +963,7 @@
       var fs = rv.map(function (x) { return parseFormula(x.t); });
       if (fs.length >= 2 && fs[0] && fs[1]) {
         var hasX = out.table && out.table.xs.length, tx = hasX ? out.table.xs : [], upto = (hasX ? Math.max.apply(null, tx) : 0) + 20, from = hasX ? Math.min.apply(null, tx) : 1;
-        if (numRows.length) R.fit = fs.map(function (g) { return g ? numRows.every(function (r, i) { return close(g(r.x != null ? r.x : i + 1), r.y); }) : null; });
+        if (numRows.length) R.fit = fs.map(function (g) { return g ? numRows.every(function (r, i) { return close(g(r.x != null ? r.x : i + 1), r.y, r.tol); }) : null; });
         /* L4: دو فرمولِ همیشه‌برابر (n+n و 2n) رقیب نیستند */
         if (!separate(fs[0], fs[1], Math.max(upto, 40), Math.min(from, 0))) { R.same = true; out.issues.push("دو فرمولِ رقیب یکی‌اند (در هر n برابرند) — رقیب باید چیزِ دیگری بگوید."); }
         /* M6: حالتِ جداکننده از میانِ nهای آزموده‌نشده (نه nی که در جدول است)؛ اگر جدول خودش داوری کرده، همین گفته می‌شود */
