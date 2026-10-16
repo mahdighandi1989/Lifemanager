@@ -121,7 +121,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   // منفی: مسئلهٔ فقط‌درگفت‌وگو ⇒ فهرستِ خودِ مربی با «پیشنهادِ این نوبت»، بی بلوکِ زنده
   await newSess(); await say('یه معما: با سه بار وزن کردن سکهٔ تقلبی رو از ۱۲ سکه پیدا کنم');
-  info.w3.chat = await p.evaluate(() => { const u = __calls[__calls.length - 1].user, c = u.slice(u.indexOf('# مربیِ حل')); return { list: /^- پرسش‌های «[^»]+» \(کلی ⇐ خاص\): 1\) \S/m.test(c) && /پیشنهادِ این نوبت: «/.test(c), noLive: u.indexOf('# مسئلهٔ زندهٔ این سشن (') < 0, noPointer: !/«مسئلهٔ زندهٔ این سشن» \(بالا\)/.test(c) }; });
+  info.w3.chat = await p.evaluate(() => { const u = __calls[__calls.length - 1].user, c = u.slice(u.indexOf('# مربیِ حل')); return { list: /^- پرسش‌های «[^»]+» \(کلی ⇐ خاص\): [upeb]?1\) \S/m.test(c) && /پیشنهادِ این نوبت: «/.test(c), noLive: u.indexOf('# مسئلهٔ زندهٔ این سشن (') < 0, noPointer: !/«مسئلهٔ زندهٔ این سشن» \(بالا\)/.test(c) }; });
   {
     const w = info.w3;
     chk(w.ph === 'c' && w.q === w.coQ && w.one === 1 && w.objQ, 'W3: the one-question line carries exactly A.liveCoach(pid).q (objective exec: no prediction question), once per turn ' + JSON.stringify(w));

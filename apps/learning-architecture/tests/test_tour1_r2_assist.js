@@ -52,7 +52,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const POS = ['کجای کدم اشتباهه؟ خروجی همیشه یکی کم میاد', 'یه راه‌حل بده که همه راضی باشن', 'نمی‌دونم چی رو امتحان کنم', 'قانونش چیه؟ فکر کنم خطیه', 'حجمِ مخروط رو پیدا کنید', 'چه کنیم که بمونه؟', 'دخترم تو تمرینِ کسرها گیر کرده'];
   const NEG = ['سلام', 'مرسی خیلی', 'این دکمه چیکار می‌کنه؟', 'فونتِ صفحه ریزه', 'یادآورها رو خاموش کن', 'برو به صفحهٔ امروز'];
   info.gate = { pos: [], neg: [] };
-  for (const t of POS) { await newSess(); await say(t); const u = await lastUser(), c = coachOf(u); info.gate.pos.push([t, !!c, /پرسش‌های «[^»]+» \(کلی ⇐ خاص\): 1\) \S/.test(c)]); }
+  for (const t of POS) { await newSess(); await say(t); const u = await lastUser(), c = coachOf(u); info.gate.pos.push([t, !!c, /پرسش‌های «[^»]+» \(کلی ⇐ خاص\): [upeb]?1\) \S/.test(c)]); }
   for (const t of NEG) { await newSess(); await say(t); const u = await lastUser(); info.gate.neg.push([t, !!coachOf(u)]); }
   chk(info.gate.pos.every(x => x[1] && x[2]), 'R1: the coach (with a non-empty phase question list) comes on every non-help turn, whatever the phrasing ' + JSON.stringify(info.gate.pos));
   chk(info.gate.neg.every(x => !x[1]), 'R1: greetings, thanks, page-help, settings and navigation get no coach ' + JSON.stringify(info.gate.neg));

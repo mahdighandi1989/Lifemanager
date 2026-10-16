@@ -82,13 +82,14 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.s08 = { p1: phOf(c1), back: /از خواسته به عقب/.test(c1), will: /# پس از شکست، نقد یا میلِ رها کردن/.test(u1) };
   await ask('با همین دو ساعت‌شنی، چه زمان‌هایی را — جز ۷ و ۱۱ — می‌توانی دقیق اندازه بگیری؟');
   await say('خب... ۴ دقیقه رو میشه! وقتی ۷ تموم شد، ۱۱ هنوز ۴ دقیقه داره. ۱۵ = ۱۱ + ۴! پس اول هر دو رو برمی‌گردونم، ۷ که تموم شد تخم‌مرغ رو می‌ذارم.');
-  info.s08.p2 = phOf(coachOf(await lastUser()));
+  { const c2 = coachOf(await lastUser()); info.s08.p2 = phOf(c2); info.s08.back2 = /از خواسته به عقب/.test(c2); }
   await say('نوشتم: هر دو رو با هم برمی‌گردونم؛ ۷ که تموم شد تخم‌مرغ رو می‌ذارم؛ ۱۱ که تموم شد برش می‌گردونم؛ وقتی دوباره تموم شد ۴+۱۱=۱۵.');
   info.s08.p3 = phOf(coachOf(await lastUser()));
   await say('درسم اینه: وقتی رو به جلو گیر کردم، از جواب شروع کنم و برگردم عقب. وارسی هم کردم: ۴ + ۱۱ = ۱۵.');
   info.s08.p4 = phOf(coachOf(await lastUser()));
-  chk(info.s08.p1 === 'طرح‌ریزی' && info.s08.back, 'B1: a full statement (unknown, data, condition in his own words) moves the chat-only coach to planning; the plan list has «working backwards» ' + JSON.stringify(info.s08));
-  chk(info.s08.p2 === 'اجرای طرح' && info.s08.p3 === 'اجرای طرح' && info.s08.p4 === 'بازنگری', 'B1: stated plan ⇒ execution; written steps stay in execution; his own lesson/check ⇒ look-back ' + JSON.stringify(info.s08));
+  // دورِ ۴ (E1): پیامِ نخست خودِ صورتِ مسئله است (بی برچسبِ «مجهول/داده/شرط») ⇒ هنوز «فهم»؛ طرحی که بعد گفت ⇒ طرح (پشتیبانِ محتاط؛ گزارشِ مدل اجرا را می‌دهد)
+  chk(info.s08.p1 === 'فهمِ مسئله' && info.s08.p2 === 'طرح‌ریزی' && info.s08.back2, 'B1/E1: the pasted opening keeps the chat-only coach in understanding; the stated idea moves it to planning, whose list has «working backwards» ' + JSON.stringify(info.s08));
+  chk(info.s08.p3 === 'اجرای طرح' && info.s08.p4 === 'بازنگری', 'B1: written steps ⇒ execution; his own lesson/check ⇒ look-back ' + JSON.stringify(info.s08));
   chk(info.s08.will, 'B9: «اعصابم خورده» in the first message brings the «after failure» block (shared lexicon in willHookOn) ' + JSON.stringify(info.s08));
 
   // ---------- B6/B7) نتیجه در شکل‌های گفتاری ⇒ بازنگری؛ «غلط بود» ِ حدس یا تلاشِ کنارگذاشته شکست نیست ----------

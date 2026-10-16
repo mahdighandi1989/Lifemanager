@@ -1,0 +1,163 @@
+// تورِ پولیا (دستهٔ ۱، دورِ ۴ ِ اصلاح، ۲۰۲۶-۱۰-۱۶) — سهمِ «coach» از DECISIONS_R4:
+//  E1  مدل وضعِ نوبت را گزارش می‌کند ({"do":"coach_state",…})، صفحه آن را با حرفِ خودِ کاربر می‌سنجد و دفتر را نگه می‌دارد؛
+//      الگوهای متنی فقط پشتیبان‌اند (وقتی گزارش نیامد) و سخت‌تر شدند. دو مدلِ بدلیِ «میانگینِ لفظی»: یکی گزارش می‌دهد، یکی نه.
+//  E3  ترتیب/پیشنهاد/برش: «از خواسته به عقب» نخست وقتی در طرح رو به جلو گیر است؛ فهرستِ قلاب بریده نمی‌شود؛ «همهٔ داده‌ها؟» نه در آغازِ طرح
+// همه از رابطِ واقعی (پنجرهٔ دستیار، فرم‌های صفحه) با مدلِ بدلی. خروج با کدِ غیرصفر در خطا.
+const { chromium } = require('playwright');
+const path = require('path');
+const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architecture.html');
+(async () => {
+  const b = await chromium.launch(); const errors = []; const info = {};
+  const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
+  p.on('pageerror', e => errors.push('pageerror: ' + e.message));
+  p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
+  p.on('dialog', d => { errors.push('dialog ' + d.message()); d.dismiss(); });
+  await p.route('**/fonts.googleapis.com/**', r => r.abort());
+  const chk = (c, m) => { if (!c) errors.push(m); };
+  await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(200);
+  await p.evaluate(() => {
+    APP.S.loaded = true; window.__calls = []; window.__q = []; window.__day = APP.today();
+    APP.today = () => window.__day;
+    APP.HOST = { report: async () => ({ id: 'sh1', number: 1 }), sheets: async () => [], sheet: async () => null, note: async () => ({ ok: true }),
+      remind: async () => ({ ok: true }), unremind: async () => ({ ok: true }), mail: async () => ({ status: 'sent' }) };
+    APP.callAI = async (sys, user, opts) => {
+      __calls.push({ sys, user, opts }); const r = __q.shift(); const t = typeof r === 'function' ? r(user) : r === undefined ? { reply: 'باشه.', status: 'related', memory: 'm', actions: [] } : r;
+      const text = typeof t === 'string' ? t : JSON.stringify(t);
+      return opts && opts.withMeta ? { text, files: [] } : text;
+    };
+    window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);
+  });
+  const say = async (text) => {
+    await p.evaluate(() => APP.ASSIST.toggle(true));
+    await p.fill('.as-panel .as-in', text); await p.click('.as-panel .as-send');
+    await p.waitForFunction(() => !APP.ASSIST.busy(), null, { timeout: 15000 });
+  };
+  const newSess = () => p.evaluate(() => { localStorage.removeItem('lla.assist.cur'); const s = APP.ASSIST.newSession(); __calls.length = 0; __q.length = 0; return s.id; });
+  const lastUser = () => p.evaluate(() => (__calls[__calls.length - 1] || {}).user || '');
+  const block = (u, head) => { const i = u.indexOf(head); if (i < 0) return ''; const j = u.indexOf('\n# ', i + 5); return u.slice(i, j < 0 ? u.length : j); };
+  const coachOf = (u) => block(u, '# مربیِ حل');
+  const phOf = (c) => (/مرحلهٔ محتمل: ([^·—]+?)\s*(?:·|—)/.exec(c) || [])[1] || '';
+  const sugOf = (c) => (/پیشنهادِ این نوبت: «([^»]+)»/.exec(c) || [])[1] || '';
+  // مدلِ بدلیِ «میانگینِ لفظی»: پاسخ با یک پرسش؛ اگر st داده شد، گزارشِ وضع را هم می‌فرستد (همان شکلی که قلاب گفته)
+  const next = (reply, st) => p.evaluate(([reply, st]) => __q.push(R({ reply, actions: st ? [Object.assign({ do: 'coach_state' }, st)] : [] })), [reply, st || null]);
+  const ev = () => p.evaluate(() => ((APP.ASSIST.cur() || {}).coachEv || []).length);
+  const mind = () => p.evaluate(() => { const Q = APP.MIND.phases(); return Q ? Q.n : 0; });
+
+  info.sys = await p.evaluate(() => APP.ASSIST.SYS.length);
+  chk(info.sys <= 20000, 'SYS ≤ 20000: ' + info.sys);
+
+  // ---------- E1-0) قلاب کنشِ گزارش را به زبانی می‌گوید که مدلِ لفظی بفرستدش؛ پرسش‌ها شناسه دارند ----------
+  await newSess();
+  await say('یه معما دارم: سه جعبه با برچسبِ غلط، یکی سیب یکی پرتقال یکی قاطی');
+  { const c = coachOf(await lastUser());
+    info.hook = { act: /"do":"coach_state"/.test(c), ids: /\bu1\) /.test(c) && /\bu2\) /.test(c), user: /فقط دربارهٔ \*\*آخرین پیامِ کاربر\*\*/.test(c) };
+    chk(info.hook.act && info.hook.ids && info.hook.user, 'E1: the coach hook tells the model to end every coaching reply with a coach_state action about the USER\'s last message, and lists question ids ' + JSON.stringify(info.hook)); }
+
+  // ---------- E1-a) پشتیبان (بی گزارش): صورتِ چسبانده با «؟»، رقم و «فقط» فهمِ گفته‌شده نیست ----------
+  await newSess();
+  await say('یه زمین دارم که دورش ۴۷ تا ستون لازم داره، هر ستون ۱۲۰ هزار تومن. فقط بگو بخرم یا نه؟');
+  { const c = coachOf(await lastUser());
+    info.e1a = { ph: phOf(c), marked: /\[در گفت‌وگو پاسخ گرفته/.test(c), sug: sugOf(c), rung: await p.evaluate(() => APP.qRung(APP.ASSIST.tutorQuestions.und.qs[0])) };
+    chk(info.e1a.ph === 'فهمِ مسئله' && !info.e1a.marked, 'E1 fallback: a pasted opening with «؟», digits and «فقط» is not «unknown/data/condition stated» — the coach stays in understanding and marks nothing answered (s01) ' + JSON.stringify(info.e1a));
+    chk(info.e1a.rung === 0, 'E1 fallback: the opening statement credits no rung on a fresh profile (s16) ' + JSON.stringify(info.e1a)); }
+
+  // ---------- E1-b) پشتیبان: «نمی‌دونم» پاسخِ پرسش نیست ----------
+  await newSess();
+  await next('شرط چیست؟ می‌توانی بخش‌هایش را جدا بنویسی؟');
+  await say('معما: سه جعبه با برچسبِ غلط داریم؛ یکی سیب، یکی پرتقال، یکی قاطی.');
+  await say('نه… نمی‌دونم');
+  { const c = coachOf(await lastUser());
+    info.e1b = { marked: /شرط چیست؟[^\n]*?\[در گفت‌وگو پاسخ گرفته/.test(c), rung: await p.evaluate(() => APP.qRung(APP.ASSIST.tutorQuestions.und.qs[2])) };
+    chk(!info.e1b.marked && info.e1b.rung === 0, 'E1 fallback: a «نمی‌دونم» reply does not mark the asked question answered nor raise its rung (s01/s02/s08) ' + JSON.stringify(info.e1b)); }
+
+  // ---------- E1-c) مسیرِ گزارش: مدل وضع را می‌گوید، صفحه می‌سنجد (گزارشِ هر پاسخ دربارهٔ پیامی است که پاسخ به آن است) ----------
+  const cph = () => p.evaluate(() => (APP.ASSIST.cur().coach || {}).ph || '');
+  await newSess();
+  await next('دقیقاً دنبالِ چه هستی؟', { ph: 'u', said: ['u', 'd', 'c'], ans: [], stuck: false, fail: false, role: 'self', nat: 'objective' });
+  await say('۲۰ لیتر آب‌نمک ۱۰٪ داریم. چند لیتر آب‌نمک ۲۵٪ اضافه کنیم تا ۱۵٪ بشه؟');
+  info.e1c = { ph0: await cph() };
+  await next('حالا داده‌ها چیست؟', { ph: 'u', said: ['u'], ans: ['u1'], stuck: false, fail: false, role: 'self', nat: 'objective' });
+  await say('حجمِ آب‌نمکِ ۲۵ درصدی که اضافه می‌شه');
+  let c2 = coachOf(await lastUser());
+  info.e1c.ph1 = phOf(c2); info.e1c.frame = /پاسخِ عینی/.test(c2);
+  await next('بگو.', { ph: 'u', said: [], ans: ['u2'], stuck: true, fail: false, role: 'self', nat: 'objective' });
+  await say('نمی‌دونم');
+  c2 = coachOf(await lastUser());
+  info.e1c.uMarked = /u1\) [^\n]*?\[در گفت‌وگو پاسخ گرفته/.test(c2); info.e1c.sug1 = sugOf(c2);
+  await next('خب.', { ph: 'b', said: [], ans: [], stuck: false, fail: false, role: 'self', nat: 'objective' });
+  await say('باشه بذار فکر کنم');
+  c2 = coachOf(await lastUser());
+  info.e1c.dkMarked = /u2\) [^\n]*?\[در گفت‌وگو پاسخ گرفته/.test(c2); info.e1c.sug2 = sugOf(c2);
+  info.e1c.jump = await cph();
+  await next('خب.', { ph: 'e', said: ['plan'], ans: [], stuck: false, fail: false, role: 'self', nat: 'objective' });
+  await say('مجهول مقدارِ آب‌نمکِ اضافه است؛ طرحم اینه که مقدارِ نمکِ دو طرف رو برابر بذارم');
+  info.e1c.ph2 = await cph();
+  const ev0 = await ev(), m0 = await mind();
+  await next('جوابت را وارسی کن.', { ph: 'b', said: ['result'], ans: [], stuck: false, fail: false, role: 'self', nat: 'objective' });
+  await say('پس x = ۱۰ لیتر');
+  info.e1c.ph3 = await cph();
+  await next('کجا؟', { ph: 'e', said: [], ans: [], stuck: false, fail: true, role: 'self', nat: 'objective' });
+  await say('اوه ۱۰ نمی‌شه! کلاً اشتباهه');
+  info.e1c.ph4 = await cph();
+  info.e1c.ev = (await ev()) - ev0; info.e1c.mind = (await mind()) - m0;
+  chk(info.e1c.ph0 === 'u' && info.e1c.ph1 === 'فهمِ مسئله', 'E1: the model\'s «said u,d,c» about the pasted opening is rejected by the page (a pasted statement before any problem is not the user stating the parts) ' + JSON.stringify(info.e1c));
+  chk(info.e1c.frame, 'E1: the model\'s nat (objective) is used as the chat-only coach\'s kind suggestion ' + JSON.stringify(info.e1c));
+  chk(info.e1c.uMarked && /^داده‌ها/.test(info.e1c.sug1), 'E1: the model\'s «ans: u1» on a real answer marks the unknown question answered by id and moves the suggestion on ' + JSON.stringify(info.e1c));
+  chk(!info.e1c.dkMarked && /^داده‌ها/.test(info.e1c.sug2), 'E1: the model\'s «ans: u2» on a «نمی‌دونم» reply is rejected — the question stays the suggestion ' + JSON.stringify(info.e1c));
+  chk(info.e1c.jump === 'u', 'E1: a claimed jump to look-back without a stated result is not accepted ' + JSON.stringify(info.e1c));
+  chk(info.e1c.ph2 === 'c', 'E1: the user\'s stated plan (claimed by the model, validated against his text) moves the coach to execution ' + JSON.stringify(info.e1c));
+  chk(info.e1c.ph3 === 'b' && info.e1c.ph4 === 'c' && info.e1c.ev === 1 && info.e1c.mind === 1, 'E1: result ⇒ look-back, then the model\'s «fail» ⇒ back to execution and ONE failure in A.MIND.phases (R7) ' + JSON.stringify(info.e1c));
+  // ادعای نقشِ مربی بی یادگیرنده‌ای در حرفِ کاربر پذیرفته نیست؛ با یادگیرنده پذیرفته است
+  await newSess();
+  await next('بگو.', { ph: 'u', said: [], ans: [], stuck: false, fail: false, role: 'teacher', nat: '?' });
+  await say('یه معما دارم دربارهٔ سه جعبه');
+  await say('خب ادامه');
+  info.e1c.teachNo = !/کاربر مربیِ یادگیرنده است/.test(coachOf(await lastUser()));
+  await newSess();
+  await next('بگو.', { ph: 'u', said: [], ans: [], stuck: false, fail: false, role: 'teacher', nat: '?' });
+  await say('کلاسم سرِ این معمای سه جعبه هیچ‌کدوم جواب نمیدن، چیکار کنم');
+  await say('خب ادامه');
+  info.e1c.teachYes = /کاربر مربیِ یادگیرنده است/.test(coachOf(await lastUser()));
+  chk(info.e1c.teachNo && info.e1c.teachYes, 'E1: the model\'s «role: teacher» counts only when the user\'s own words name a learner ' + JSON.stringify(info.e1c));
+
+  // ---------- E1-d) پشتیبان (بی گزارش): الگوهای سخت‌تر و کامل‌تر ----------
+  info.e1d = [];
+  for (const said of ['جواب ۱.۳', 'پس حجم = ۵۰۰ سی‌سی', 'رسید به عرض ۴', 'تموم شد دیگه!', 'اثر هست… پرونده رو بستم', 'خودم ساختمش']) {
+    await newSess(); await say('معما: مجموعِ دو عدد ۱۰ است و تفاضلشان ۲؛ آن دو عدد کدام‌اند؟'); await say(said);
+    info.e1d.push([said, phOf(coachOf(await lastUser()))]);
+  }
+  chk(info.e1d.every(x => x[1] === 'بازنگری'), 'E1 fallback: RESULT_RE catches «جواب X», «پس X = …», «رسید به …», «تموم شد دیگه», «پرونده رو بستم», «خودم ساختمش» ' + JSON.stringify(info.e1d));
+  await newSess(); await say('معما: آهنگِ رشدِ یه جمعیت رو حساب کن'); await say('جواب ۱.۳');
+  { const e0 = await ev(), q0 = await mind(); await say('۱.۳ نمی‌شه! کلاً غلطه'); info.e1d14 = { ev: (await ev()) - e0, mind: (await mind()) - q0 };
+    chk(info.e1d14.ev === 1 && info.e1d14.mind === 1, 'E1 fallback: «نمی‌شه! کلاً غلطه» after a stated result is a failure recorded in A.MIND.phases (s14) ' + JSON.stringify(info.e1d14)); }
+  info.e1stuck = [];
+  for (const t of ['پس راهی نیست', 'هیچ کاری نمیشه کرد']) { await newSess(); await say('معما: با دو ساعت‌شنیِ ۷ و ۱۱ دقیقه، ۱۵ دقیقه را اندازه بگیر'); const e0 = await ev(); await say(t); info.e1stuck.push([t, (await ev()) - e0]); }
+  chk(info.e1stuck.every(x => x[1] === 1), 'E1 fallback: STUCK_RE catches «پس راهی نیست», «هیچ کاری نمیشه کرد» ' + JSON.stringify(info.e1stuck));
+  info.e1teach = [];
+  for (const t of ['شاگردام وقتی ازشون می‌پرسم مجهول چیه ساکت می‌مونن', 'تو شاگرد باش من معلم؛ این معما رو ازت می‌پرسم', 'دخترم یه مسئله داره دربارهٔ کسرها، چطوری بهش بگم که خودش بفهمه؟']) {
+    await newSess(); await say(t); info.e1teach.push([t, /کاربر مربیِ یادگیرنده است/.test(coachOf(await lastUser()))]);
+  }
+  chk(info.e1teach.every(x => x[1]), 'E1 fallback: TEACH_RE catches «شاگردام…», «تو شاگرد باش من معلم», «دخترم یه مسئله داره… چطوری بهش بگم» ' + JSON.stringify(info.e1teach));
+  info.e1live = [];
+  for (const t of ['یه مسئلهٔ واقعی دارم، با هم حلش کنیم', 'می‌خوام اینو مسئله‌ی حل‌نشده‌ی خودم کنم', 'یه برنامه‌ی دقیق می‌خوام برای ورزشِ صبح']) {
+    await newSess(); await say(t); info.e1live.push([t, /# مسئلهٔ واقعیِ حل‌نشده/.test(await lastUser())]);
+  }
+  chk(info.e1live.every(x => x[1]), 'E1 fallback: LIVE_ASK catches «یه مسئلهٔ واقعی دارم… با هم حلش کنیم», «مسئلهٔ حل‌نشدهٔ خودم», «یه برنامهٔ دقیق می‌خوام» ' + JSON.stringify(info.e1live));
+  info.e1will = await p.evaluate(() => ({ tired: APP.willHookOn('خیلی خسته‌ام… تو رو خدا یه راهِ ساده بگو'), neutral: APP.willHookOn('یه معمای ساده دارم') }));
+  chk(info.e1will.tired && !info.e1will.neutral, 'E1 fallback: the will hook catches the fatigue plea «خیلی خسته‌ام… تو رو خدا» ' + JSON.stringify(info.e1will));
+
+  // ---------- E3) گیر در طرح رو به جلو ⇒ «از خواسته به عقب» نخست (s08)؛ فهرستِ قلاب بریده نمی‌شود ----------
+  await newSess();
+  await say('معما: فقط دو ساعت‌شنیِ ۷ و ۱۱ دقیقه‌ای داریم؛ تخم‌مرغ باید دقیقاً ۱۵ دقیقه بپزد.');
+  await next('مجهول چیست؟');
+  await say('مجهول اینه که چطور ۱۵ دقیقه رو اندازه بگیرم؛ داده‌ها دو ساعت‌شنیِ ۷ و ۱۱ دقیقه است؛ شرط اینه که فقط همین دو تا رو داریم');
+  await say('از اول شروع کردم: ۷+۷=۱۴، ۱۱+۷=۱۸ … گیر کردم، رو به جلو هیچی جور نمی‌شه');
+  { const c = coachOf(await lastUser()); info.e3 = { ph: phOf(c), sug: sugOf(c) };
+    chk(info.e3.ph === 'طرح‌ریزی' && /به عقب/.test(info.e3.sug), 'E3: stuck going forward in planning ⇒ «از خواسته به عقب» is the suggested question (s08) ' + JSON.stringify(info.e3)); }
+
+  info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);
+  chk(info.sys2 <= 20000, 'SYS ≤ 20000 at the end: ' + info.sys2);
+  console.log(JSON.stringify(info).slice(0, 8000));
+  if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
+  await b.close();
+})().catch(e => { console.error(e); process.exitCode = 1; });
