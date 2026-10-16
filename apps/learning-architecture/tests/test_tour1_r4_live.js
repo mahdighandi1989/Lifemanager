@@ -151,6 +151,38 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       const line = (info.e3hook.match(/- پرسش‌های همین مرحله[^\n]*/) || [''])[0], Q = await p.evaluate(pid => APP.livePhaseQs(pid, 'p'), PI);
       chk(Q.length > 7 && Q.every(q => line.indexOf('«' + q + '»') >= 0), 'E3: the hook lists the WHOLE phase list, every question whole (no cut at 7, no clip) ' + Q.length + ' ' + line.slice(0, 120));
     });
+
+    /* ===================== E4 — وارسی‌های واژه‌محور هشدار می‌دهند، سد نمی‌کنند؛ و مثبتِ کاذب‌ها ===================== */
+    await section('E4', async () => {
+      // واحدها: هر گزاره جدا (⇒ / پس)
+      info.e4u = await p.evaluate(() => [APP.liveUnitsCheck('۰.۱۲ متر ⇒ ۲۰۰ مترمربع × ۰.۱۲ متر = ۲۴ مترمکعب'), APP.liveUnitsCheck('ضخامت ۱۲ سانتی‌متر است پس ۲۰۰ مترمربع × ۰.۱۲ متر = ۲۴ مترمکعب'), APP.liveUnitsCheck('۲۰۰ متر مربع × ۱۲ = ۲۴ متر مکعب')].map(x => x.ok));
+      chk(info.e4u[0] && info.e4u[1] && !info.e4u[2], 'E4: the units checker splits on ⇒ / «پس» (a conversion before the product no longer glues to it); a bare factor is still asked ' + JSON.stringify(info.e4u));
+      // دوری: «معلوم است» = داده شده؛ واژهٔ مجهول بی ادعای مقدار دوری نیست؛ «پس کارِ یکی از آن‌هاست» هنوز دوری است
+      const circ = async (title, st, o) => { const pid = await mk({ title, st, nat: o.nat || 'objective' }); await understand(Object.assign({ expectMiss: true }, o)); const o2 = { pid, card: await has('main .lp-suffcirc'), miss: await txt('main .lp-umiss') }; if (!o2.miss) { await clickIf('main .lp-u .sv-g2'); } return o2; };
+      info.e4c1 = await circ('پله‌ها', 'به چند راه می‌شود از ۳۰ پله بالا رفت اگر هر گام ۱، ۲ یا ۳ پله باشد؟', { one: 'می‌خواهم شمارِ راه‌ها را بیابم', unk: 'شمارِ راه‌های بالا رفتن', data: ['۳۰ پله', 'هر گام ۱، ۲ یا ۳ پله'], cond: 'هر گام ۱ یا ۲ یا ۳ پله', sat: 'yes', suff: 'کافی است', suffW: 'تعدادِ پله و گام‌های مجاز معلوم است' });
+      info.e4c2 = await circ('دایره', 'دایره‌ای بیابید که بر سه خطِ داده‌شده مماس باشد.', { one: 'می‌خواهم دایرهٔ مماس بر سه خط را بیابم', unk: 'مرکز و شعاعِ دایره', data: ['سه خطِ داده‌شده', 'خط‌ها موازی نیستند'], cond: 'دایره بر هر سه خط مماس است', sat: 'yes', suff: 'کافی است', suffW: 'سه شرطِ مماس برای مرکز و شعاع' });
+      chk(!info.e4c1.card && !/پیش‌فرض/.test(info.e4c1.miss) && !info.e4c2.card && !/پیش‌فرض/.test(info.e4c2.miss), 'E4: «… معلوم است» (given) and a reason that only names the unknown are not «circular» ' + JSON.stringify([info.e4c1.miss, info.e4c2.miss]));
+      // تقریب با واژه و مجهولِ کیفی
+      const PQ = await mk({ title: 'صندوق', st: 'پولِ صندوقِ مغازه‌ام ۲ میلیون تومن کم شده؛ می‌خواهم بفهمم چه کسی برداشته.', nat: 'practical' });
+      const mq = await understand({ one: 'می‌خواهم بفهمم چه کسی پول را برداشته', unk: 'چه کسی پول را برداشته', data: ['۲ میلیون تومن کم است', 'سه نفر کلید دارند'], cond: 'بی‌گناهی را متهم نکنم', prac: true, prApprox: 'فقط اسمِ همان آدم را می‌خواهم', measure: 'کسری = ۲ میلیون تومن', expectMiss: true });
+      chk(!/کدام تقریب بس است/.test(mq), 'E4: a qualitative unknown (who?) needs no numeric approximation ' + mq);
+      const PH = await mk({ title: 'خانوارها', st: 'برای نظرسنجیِ محله‌ام چند خانوار را بپرسم که بس باشد؟ ۴۰۰ خانوار داریم.', nat: 'practical' });
+      const mh = await understand({ one: 'می‌خواهم بدانم چند خانوار بپرسم', unk: 'شمارِ خانوارهای لازم', data: ['۴۰۰ خانوار', 'یک هفته وقت دارم'], cond: 'نتیجه نمایندهٔ محله باشد', prac: true, prApprox: 'نصف خانوارها بسه', measure: 'شمار ≤ ۴۰۰ خانوار', expectMiss: true });
+      chk(!/کدام تقریب بس است/.test(mh), 'E4: a word quantity («نصف خانوارها بسه») is an approximation ' + mh);
+      // هشدار، نه سد: «هیچی رو بیرون نمی‌ذارم» یک بار چالش + «ثبت با همین — دلیل»؛ با دلیل ثبت می‌شود و دلیل ذخیره
+      const PS = await mk({ title: 'اسباب‌کشی', st: 'وسایلِ خانه‌ام را با یک وانت ۱۲ مترمکعبی ببرم؛ چند سرویس لازم است؟', nat: 'practical' });
+      const ms = await understand({ one: 'می‌خواهم بدانم چند سرویس وانت لازم است', unk: 'شمارِ سرویس‌ها', data: ['وانت ۱۲ مترمکعب است', 'وسایل حدودِ ۳۰ مترمکعب است'], cond: 'هیچ وسیله‌ای جا نماند', prac: true, prLine: 'هیچی رو بیرون نمی‌ذارم', measure: 'سرویس‌ها × ۱۲ مترمکعب ≥ ۳۰ مترمکعب', expectMiss: true });
+      chk(/کجا خط می‌کشی/.test(ms) && await has('#lpSoftWhy') === 1, 'E4: a wording heuristic shows its challenge once and offers «ثبت با همین — دلیل» ' + ms);
+      await fillIf('#lpSoftWhy', 'همهٔ وسایل شکستنی‌اند و هیچ‌کدام را نمی‌شود جا گذاشت');
+      await click('main .lp-usave'); await clickIf('main .lp-u .sv-g2');
+      info.e4s = (await S(PS)).u[1];
+      chk(info.e4s && info.e4s.done && info.e4s.soft && /شکستنی/.test(info.e4s.soft.why) && info.e4s.soft.keys.includes('line'), 'E4: «ثبت با همین — دلیل» saves the understanding and stores the reason ' + JSON.stringify(info.e4s && info.e4s.soft));
+      // حالتِ حدی: نامِ خانه‌های شطرنج داده نیست؛ مسئلهٔ عددیِ کامل‌بیان‌شده هنوز می‌پرسد
+      const PC = await mk({ title: 'مات', st: 'سفید در دو حرکت مات می‌کند؛ حرکتِ اول چیست؟', nat: 'objective' });
+      await understand({ one: 'می‌خواهم حرکتِ اولِ مات را بیابم', unk: 'حرکتِ اولِ سفید', data: ['شاهِ سیاه روی h8', 'وزیرِ سفید روی d1 و رخ روی a1'], cond: 'مات در دو حرکت' });
+      info.e4l = await p.evaluate(pid => APP.liveLookFlags(pid).limit, PC);
+      chk(info.e4l === false && info.e4c1.pid && (await p.evaluate(pid => APP.liveLookFlags(pid).limit, info.e4c1.pid)) === true, 'E4: the limiting case is required for objective find problems with numeric data, not for chess square names');
+    });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
   if (errors.length) { console.log('ERRORS:\n' + errors.join('\n')); process.exitCode = 1; } else console.log('NO ERRORS');
