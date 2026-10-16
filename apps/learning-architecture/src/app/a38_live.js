@@ -1465,6 +1465,8 @@
      همان که صفحه می‌پرسد؛ پرسشِ پاسخ‌گرفته در صفحه دوباره پیشنهاد نمی‌شود. */
   /* D2 (دورِ ۳): ترتیبِ پرسش = کلی ⇐ خاص بر پایهٔ «پله»ٔ کاربر در همین مرحله (چند پرسشِ همین مرحله در همین مسئله پرسیده یا پاسخ داده شد)،
      هرگز شمارِ پیام؛ پرسشِ پاسخ‌گرفته (در صفحه یا گفت‌وگو — opts.asked) دوباره پیشنهاد نمی‌شود. تمام شدنِ نردبان ⇒ ladderEnd (قاعدهٔ C188، D3). */
+  /* بی واژهٔ پرسشی، فقط وقتی «بیش از نیم» ِ واژه‌های هر دو سو مشترک است (A4 از هر دو سو — «خیلی خوب؟» پرسشِ فهرست نیست) */
+  function sameQBoth(a, b) { var x = toks(a), y = toks(b); if (!x.length || !y.length) return false; var sh = x.filter(function (w) { return y.indexOf(w) >= 0; }).length; return sh / Math.max(x.length, y.length) > 0.5; }
   function sameQ(a, b) { var x = toks(a), y = toks(b); if (!x.length || !y.length) return false; var sh = x.filter(function (w) { return y.indexOf(w) >= 0; }).length; return sh / Math.min(x.length, y.length) > 0.5; }   // A4: «بیش از نیم» ِ واژه‌های پرسشِ کوتاه‌تر
   /* F2 (دورِ ۵): یک پرسش در هر نوبت، یک منبع — همین تابع پرسشِ بازِ کارتِ صفحه را هم تعیین می‌کند (pageQ) و پرسشِ نوبت را با این ترتیب (پولیا: اول
      دشواریِ واقعیِ همین لحظهٔ یادگیرنده):
@@ -2256,8 +2258,9 @@
         t = t.replace(/^(?:ولی|اما|خب|خوب|آفرین|عالی|باشه|درسته)[،,!.\s]+/, "");
         /* E5: تکهٔ یک پرسشِ شناخته‌شده («از آن چه به کار می‌آید؟») ⇒ همان پرسشِ کامل — H3 (دورِ ۷، s02): پرسشِ شناخته‌شدهٔ فهرست («همهٔ داده‌ها را به کار برده‌ای؟»)
            واژهٔ پرسشی نمی‌خواهد */
-        var kq = /[؟?]$/.test(t) && t.length >= 8 ? (known.filter(function (q) { return sameQ(t, q); })[0] || (B3_RE.test(norm(t)) ? t : "")) : "";
-        if (!kq && !(/[؟?]$/.test(t) && QWORD.test(t) && t.length >= 8 && t.length <= 220)) return;
+        var isQ = /[؟?]$/.test(t) && QWORD.test(t) && t.length >= 8 && t.length <= 220;
+        var kq = /[؟?]$/.test(t) && t.length >= 8 ? (known.filter(function (q) { return isQ ? sameQ(t, q) : sameQBoth(t, q); })[0] || (!isQ && B3_RE.test(norm(t)) ? t : "")) : "";
+        if (!kq && !isQ) return;
         if (kq) t = kq;
         var ix = -1; o.forEach(function (e, i) { if (e.t === t) ix = i; });
         if (ix < 0) o.push({ t: t, a: ansd }); else if (ansd) o[ix].a = true; }); });
@@ -2848,7 +2851,7 @@
       if (refK) { if (tu.refK !== refK) { tu.refK = refK; tu.refMsg = mt; refFirst = true; } else refFirst = tu.refMsg === mt; }
       /* H3 (دورِ ۷، s19): «بپرس از ردش چه آموخت» فقط در روزِ خودِ رد — نه نخستین نوبتی که شش هفته بعد می‌آید */
       var refSt = refT ? L0.steps.filter(function (x) { return x.out && x.out.guess && x.out.guess.rel === "refute"; }).pop() : null, refD = refSt ? refSt.out.d || String(refSt.out.at || "").slice(0, 10) : "";
-      if (refD) refFirst = refD === A.today();
+      if (refD && refD !== A.today()) refFirst = false;
       var pv = provOf(ph === "u" ? "u" : ph === "p" ? "p" : ph === "c" ? (nat === "objective" ? "cobj" : "c") : "b", proofLike(r, so)), rt = ph === "p" && Q.length ? roteState(pg, so, Q) : null;
       var cu = condUsed(so).filter(function (x) { return !x.used; });
       return ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + phName(ph, r, so) + " · داور: " + (ki.set ? NAT[nat].fa.split(" — ")[0] : "هنوز انتخاب نشده") + (ki.type !== "find" ? " · نوع: " + (nat !== "objective" ? "فرضیه — درست یا نادرست؟ (داور واقعیت است، نه برهان)" : ki.type === "prove" ? "اثباتی" : "اثبات یا رد کن") : "") + (ki.spatial ? " · فضایی" : "") + " · وضع: " + cl.label,

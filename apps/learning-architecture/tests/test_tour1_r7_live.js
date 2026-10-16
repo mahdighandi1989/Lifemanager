@@ -298,6 +298,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await day(0);
       // s25/s12: حدسِ تازه پس از مسئلهٔ بسته‌شده ⇒ سرواژه «فهم» (مسئلهٔ تازه)، نه «بازنگری»؛ نوبتِ ردِ حدس هم «بازنگری» نیست
       const phOf = (c) => (/مرحلهٔ محتمل: ([^·—(]+?)\s*(?:·|—|\()/.exec(c) || [])[1] || '';
+      await go('e_home');   // نه روی صفحهٔ مسئلهٔ زندهٔ بندِ پیشین
       await newSess();
       await p.evaluate(() => __q.push({ reply: 'ثبت شد.', status: 'related', memory: 'm', actions: [{ do: 'chat_solved', title: 'جمعِ تلسکوپیِ دوتایی', statement: 'جمعِ ۱/(1·2) + ۱/(2·3) + … تا n جمله را پیدا کن', kind: 'find', lesson: 'هر جمله را به تفاضلِ دو کسر شکستم', check: 'برای n = ۳ حساب کردم' }] }));
       await say('حلش کردم: هر جمله را به تفاضلِ دو کسر شکستم؛ برای n = ۳ حساب کردم');
