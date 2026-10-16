@@ -21398,7 +21398,9 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
     var save = A.debounce(function () { S.put(cs); }, 400);
     function nextOf() { var r = routeList(cs).map(function (x) { return x.id; }); var i = r.indexOf(s.id); return i >= 0 && r[i + 1] ? SM[r[i + 1]] : null; }
     var goBtn = h("button", { class: "btn" });
-    function lbl() { var n = nextOf(); goBtn.textContent = n ? "ثبت و ایستگاه بعد: " + n.fa : "ثبت و گزارش"; }
+    /* ایستگاهِ بیرون از مسیر (تورِ پولیا دورِ ۲، s32): اجرای آن یعنی همان «+» — ثبت آن را به مسیر می‌افزاید تا شمرده شود و «ثبت و ایستگاه بعد» داشته باشد */
+    function offPath() { return routeList(cs).map(function (x) { return x.id; }).indexOf(s.id) < 0; }
+    function lbl() { if (offPath()) { goBtn.textContent = "ثبت و افزودن به مسیر"; return; } var n = nextOf(); goBtn.textContent = n ? "ثبت و ایستگاه بعد: " + n.fa : "ثبت و گزارش"; }
     var ws = A.epiStationWS(cs, s.id, function () { save(); lbl(); });
     wrap.appendChild(ws);
     if (s.id === "st_final") wrap.appendChild(outcomes(cs));
@@ -21418,6 +21420,7 @@ if (!window.LLA_HOST) document.addEventListener("DOMContentLoaded", function () 
         if (/مبهم یا ناقص/.test(vd)) { A.toast("حکمِ این ایستگاه می‌گوید ورودی مبهم یا ناقص است؛ اول ورودی را کامل کن و حکم را عوض کن.", "bad"); return; }
         if (/دین/.test(vd) !== /^دین/.test(sp)) { A.toast("«قلمرو» و «حکمِ این ایستگاه» با هم نمی‌خوانند (یکی دین، دیگری عام). یکی را اصلاح کن.", "bad"); return; }
       }
+      if (offPath()) { cs.inc = cs.inc || {}; cs.inc[s.id] = true; }
       st.done = true;
       if (s.id === "st_final" && /بسته شد|نداشت/.test(st.data.verdict || "")) cs.status = "closed";
       S.put(cs);
