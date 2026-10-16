@@ -2312,7 +2312,7 @@
         /* E5: تکهٔ یک پرسشِ شناخته‌شده («از آن چه به کار می‌آید؟») ⇒ همان پرسشِ کامل — H3 (دورِ ۷، s02): پرسشِ شناخته‌شدهٔ فهرست («همهٔ داده‌ها را به کار برده‌ای؟»)
            واژهٔ پرسشی نمی‌خواهد */
         var isQ = /[؟?]$/.test(t) && QWORD.test(t) && t.length >= 8 && t.length <= 220;
-        var kq = /[؟?]$/.test(t) && t.length >= 8 ? (known.filter(function (q) { return isQ ? sameQ(t, q) : sameQBoth(t, q); })[0] || (!isQ && B3_RE.test(norm(t)) ? t : "")) : "";
+        var kq = /[؟?]$/.test(t) && t.length >= 8 ? (known.filter(function (q) { return sameQBoth(t, q); /* دورِ ۹ (s28): نگاشتِ پرسشِ گفت‌وگو به پرسشِ فهرست در «کدام پرسش کمک کرد؟» دوسویه است (بیش از نیمِ واژه‌های هر دو، A4) — وگرنه پرسشی که پرسیده نشد جای پرسشِ پرسیده‌شده می‌نشست */ })[0] || (!isQ && B3_RE.test(norm(t)) ? t : "")) : "";
         if (!kq && !isQ) return;
         if (kq) t = kq;
         var ix = -1; o.forEach(function (e, i) { if (e.t === t) ix = i; });

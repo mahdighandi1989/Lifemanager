@@ -1603,9 +1603,11 @@
     if (fresh && tq) return "- زمینه (نه پرسشِ دوم): حدسی که خودش با آزمون رد کرد: " + fa(pl.refuted) + " — آن را دوباره پیشنهاد نکن؛ کارِ درستش را اصلِ عامِ «حدس بزن، ولی حدست را بیازما» بنام (B231)؛ «از ردش چه آموخت و کدام فرضِ پنهان شکست؟» برای پس از پرسشِ این نوبت است، اگر خودش به آن نرسید.";
     return "- حدسی که خودش با آزمون رد کرد: " + fa(pl.refuted) + " — آن را دوباره پیشنهاد نکن" + (fresh ? "؛ بپرس از ردش چه آموخت و کدام فرضِ پنهان شکست؛ و همان را اصلِ عامِ «حدس بزن، ولی حدست را بیازما» بنام (B231) — کاری که همین حالا خودش کرد." : "."); } catch (e) { return ""; } }
   /* دورِ ۸ (I-coach 2): حدسِ ردشده‌ای که خودش گزاره‌ای کلی است (همیشه/هر/همه/قانون…) — فقط آن «دامنه‌اش را تنگ کن» (C107) دارد */
-  var GENCLAIM_RE = /همیشه|همه|(?:^|[\s«،(])هر(?=[\s‌])|قانون|قاعده|هیچ[‌\s]?(?:وقت|کس|کدام|جا)|هرگز|برای\s*هر/;
+  /* دورِ ۹ (s22): «قانون/قاعده» فقط واژهٔ کامل («قانونیِ» صفت است، ادعای کلی نیست) */
+  var GENCLAIM_RE = /همیشه|همه|(?:^|[\s«،(])هر(?=[\s‌])|(?:^|[\s«،(])(?:قانون|قاعده)(?=$|[\s.،؛!؟»)])|هیچ[‌\s]?(?:وقت|کس|کدام|جا)|هرگز|برای\s*هر/;
   function refGeneral(pid) { try { var so = ((S.get("eprog_" + pid) || {}).solve) || {}, g = so.g && so.g[1], pl = A.livePlausible ? A.livePlausible(pid) : null;
-    var T = [(g && g.guess) || ""].concat((pl && pl.refutedG) || []).filter(Boolean); return T.some(function (t) { return GENCLAIM_RE.test(String(t)); }); } catch (e) { return false; } }
+    /* دورِ ۹ (s22): فقط حدس‌های **ردشده** (refutedG) — حدسِ کنونی پس از رد، حدسِ تازه است نه آنچه رد شد */
+    var T = ((pl && pl.refutedG) || []).slice(); if (!T.length && g && g.prev) T = [].concat(g.prev).map(function (x) { return x && (x.guess || x); }); T = T.filter(function (t) { return typeof t === "string" && t; }); return T.some(function (t) { return GENCLAIM_RE.test(String(t)); }); } catch (e) { return false; } }
   /* هم‌توان در یک نوبت: پرامپت ممکن است برای بودجه چند بار ساخته شود (AS.prompt ⇒ userPrompt تا ۴ بار) — همان پیام همان پاسخ را می‌گیرد */
   /* دورِ ۷ (H1، s19): «تازه» فقط در همان روزِ رد — نخستین گفت‌وگو شش هفته پس از رد لحظهٔ «از ردش چه آموختی؟» نیست (روزِ ردِ گام: out.d ِ صفحه) */
   function refDay(pid) { try { var L = ((S.get("eprog_" + pid) || {}).solve || {}).live || {}; return (L.steps || []).filter(function (x) { return x && x.out && x.out.guess && x.out.guess.rel === "refute"; }).map(function (x) { return String(x.out.d || dayOf(x.out.at) || ""); }).sort().pop() || ""; } catch (e) { return ""; } }
