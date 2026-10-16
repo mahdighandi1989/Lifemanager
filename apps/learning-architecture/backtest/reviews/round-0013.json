@@ -1,0 +1,38 @@
+{
+ "round": 13,
+ "reviewer": "زیرعاملِ جدا (بازبین مستقل، وب‌جستجو)",
+ "checked": {
+  "events_real": true,
+  "encoding_blind": true,
+  "frames_unselected": true,
+  "verified_by_real": true,
+  "proofs_from_axioms": true,
+  "no_conventional": true,
+  "territory_evidence": true,
+  "findings_diagnosed": true
+ },
+ "checkedNote": "encoding_blind: «تقریباً درست» — داستان‌های ویلینگهام/چلنجر پسایندِ واقعه را دارند (نشتِ ملایم). frames_unselected/proofs_from_axioms: این دور قاب و برهان نداشت.",
+ "problems": [
+  {
+   "what": "عنوان/نامِ مارشال نادرست (ارسطو–مارشال؛ هلیکوباکتر در ۱۹۸۴ هنوز کمپیلوباکتر پیلوریدیس بود؛ n=1)",
+   "fix": "عنوان و متن اصلاح و محدودیتِ n=۱ در truth.why آمد",
+   "fixed": true
+  },
+  {
+   "what": "«دمای نزدیکِ صفر» برای چلنجر",
+   "fix": "به «نزدیکِ نقطهٔ انجماد» اصلاح شد",
+   "fixed": true
+  },
+  {
+   "what": "نشتِ پسایند در story",
+   "fix": "از دورِ بعد story دو بخش (آن‌زمان/پسایند) و رمزگذار فقط بخشِ اول را می‌بیند؛ این دور «کورِ همراهِ پسایند» است",
+   "fixed": false
+  },
+  {
+   "what": "۳ از ۵ مورد فقط به‌خاطرِ نبودِ conf شکست خوردند",
+   "fix": "قاعدهٔ رمزگذاری دورِ بعد روی وقایعِ تازه سنجیده شود؛ یافته‌ها باز می‌مانند",
+   "fixed": false
+  }
+ ],
+ "note": "منبع‌ها و وقایع واقعی‌اند؛ موتور و قاعده‌ها برای قبولی دست نخوردند."
+}

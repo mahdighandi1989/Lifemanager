@@ -1,6 +1,6 @@
 {
  "updated": "2026-10-15",
- "round": 12,
+ "round": 13,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -16,7 +16,7 @@
    "case": "bk_russell_chicken",
    "opened": "2026-10-13",
    "openedRound": 5,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": "دورِ ۵، پس از قضیه‌ای شدنِ سقفِ استقراء: «فردا هم دانه می‌دهد» پیش‌بینیِ «موردِ بعدی» است (رمزگذارِ کور) و قضیهٔ T_next از شمار، سقفِ (n+1)/(n+2) می‌دهد — با صدها روز ≈ ۹۹٫۷؛ پس اطمینانِ ۹۹ ٪ جوجه از راهِ «شمار» بیش‌اطمینانی نیست. درسِ جزوه این‌جا شمار نیست، علت است: «تکرارِ داده‌های حسی به‌تنهایی … باید علت … کشف شود» و «مشروط به عدمِ دخالتِ عواملِ پنهان» (s51) — و خودِ «چرا» ی این پرونده همین را می‌گوید. ملاکِ s51 در کارخانه فقط روی «تجربه» (hidden_ctrl) نشسته، نه روی «استقراء». ⇒ پیشنهادِ p_case_chicken برای مالک.",
    "fix": {
@@ -25,14 +25,17 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 5,
+    "fresh": 8,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
      "r4_abs_survivor_shops",
      "r5_ltcm_1998",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
     ]
    },
    "kind": "missed",
@@ -62,7 +65,7 @@
    "case": "cs_b_dewey1948",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "برچسب حقیقت پرونده نادرست است",
    "note": "موتور درست کار کرده: تنها سقفی که شکسته شده r_tajrobe_hidden (۷۰، شرط s51: «اعتبار قوانین تجربی همواره مشروط به عدم دخالت عوامل پنهان») است و سقف استقراء ناقص (۸۰، s50: «حتی با افزایش شواهد به مرز یقین نمی‌رسد») با conf=90 و تحمل ۱۰ شکسته نمی‌شود. خودِ truth.why به همین عامل پنهانِ کنترل‌نشده با استناد به s51 تکیه می‌کند و رمزگذاری hidden_ctrl:false دارد، ولی st_tajrobe را در fail نیاورده؛ این با قرارداد پیکره (تالیدومید، تاکوما، آریان ۵، لوبوتومی: استقراء + hidden_ctrl:false ⇒ st_tajrobe در fail) ناسازگار است.",
    "fix": {
@@ -72,7 +75,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 18,
+    "fresh": 21,
     "freshOk": 18,
     "ids": [
      "r2_cbs_killian_memos",
@@ -121,7 +124,7 @@
    "case": "cs_b_literarydigest",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "برچسب حقیقت پرونده نادرست است",
    "note": "همان سازوکار دیویی: با conf=90 فقط سقف r_tajrobe_hidden (۷۰) شکسته می‌شود؛ سقف استقراء ناقص ۸۰ است و s50 فقط می‌گوید ناقص «به مرز یقین نمی‌رسد»، پس در عدد ۹۰ خطای استقرایی محض دیده نمی‌شود. truth.why خودش علت را «عامل پنهان … کنترل نشده بود (s51)» می‌داند و hidden_ctrl:false رمز کرده، اما st_tajrobe را در fail نگذاشته؛ برچسب ناقص است (هم‌زاد سالمش cs_b_gallup1936 هم hidden_ctrl را برای همین استقراء رمز می‌کند).",
    "fix": {
@@ -131,7 +134,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 7,
+    "fresh": 10,
     "freshOk": 7,
     "ids": [
      "r4_wald_survivorship",
@@ -140,7 +143,10 @@
      "r4_willingham_fire",
      "r4_abs_survivor_shops",
      "r5_ltcm_1998",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
     ]
    },
    "kind": "mislocated",
@@ -178,8 +184,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 7,
-    "freshOk": 7,
+    "fresh": 8,
+    "freshOk": 8,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -187,7 +193,8 @@
      "r4_willingham_fire",
      "r4_abs_survivor_shops",
      "r4_abs_lab_claim_replic",
-     "r5_snow_water_1854"
+     "r5_snow_water_1854",
+     "r13_marshall_pylori_1984"
     ]
    },
    "kind": "missed",
@@ -215,7 +222,7 @@
    "case": "cs_lavoisier_acids",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "داستان و actor صریحاً می‌گویند حکم «از شمار محدودی اسید» (گوگردی، فسفری، نیتریک و…) گرفته شد، ولی ind_n رمز نشده؛ پس فقط r_istiqra_incomplete (۸۰؛ s50: «ارزش معرفتی استقراء ناقص حتی با افزایش شواهد به مرز یقین نمی‌رسد») فعال می‌شود و conf=85 زیر ۸۰+۱۰ می‌ماند. ویژگی ind_n دقیقاً برای همین بخش از s50 (ارزش استقراء «از منظر حساب احتمالات» با شمار موارد) ساخته شده است.",
    "fix": {
@@ -225,14 +232,17 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 5,
+    "fresh": 8,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
      "r4_abs_survivor_shops",
      "r5_ltcm_1998",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
     ]
    },
    "kind": "missed",
@@ -259,7 +269,7 @@
    "case": "cs_pb_flt_numeric",
    "opened": "2026-10-13",
    "openedRound": 5,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "حل شد با خواندنِ کاملِ s50/s51 و پانوشت‌ها (۲۰۲۶-۱۰-۱۴): تناقضی در جزوه نبود. s50 فقط می‌گوید استقراءِ ناقص «حتی با افزایشِ شواهد به مرزِ یقین نمی‌رسد» و «به‌تنهایی نمی‌تواند ضرورت و قطعیتِ کلی را اثبات کند»؛ عبارتِ «با شواهد بالا می‌رود» برداشتِ سازنده بود (یادداشتِ r_istiqra_small_n). s51 علتش را می‌گوید: «نسبتِ شمارش‌های محدود به کلِ حالات همواره نزدیک به صفر». پانوشتِ s50 (استنفورد) هم صریح است: حسابِ احتمالات دربارهٔ «مشاهده‌های آینده» است نه حکمِ کلی. پس دربارهٔ حکمِ کلیِ فرما، شمارِ چهار میلیون به‌تنهایی اطمینانِ معنادار نمی‌دهد. «۶۰٪» را خودِ پرونده «تقریبِ سامانه، نه ادعای پژوهشگران» می‌نامد؛ رفتارِ مستند (ثابت‌شده اعلام نکردند) همان سالم است. ⇒ عدد برداشته شد؛ متنِ دو قاعده با لفظِ جزوه درست شد.",
    "fix": {
@@ -268,14 +278,17 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 5,
+    "fresh": 8,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
      "r4_abs_survivor_shops",
      "r5_ltcm_1998",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
     ]
    },
    "kind": "health_alarm",
@@ -300,7 +313,7 @@
    "case": "cs_pb_greek_indiana",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "هیچ‌یک از دو تصدیق conf ندارد و سقف‌ها فقط از راه «conf > سقف + تحمل» به پرچم بدل می‌شوند؛ پس با وجود سقف ۰ (r_conflict_cert)، ۲۵ (r_aql_matter_false، s40: «یقین … تنها زمانی حاصل می‌شود که هم مادهٔ استدلال صادق … باشد») و ۲۵ (r_expert_out_of_field، s49: «درجه تبحر، صلاحیت…») موتور کور است. پیکرهٔ مسائل ریاضی (روفینی، لژاندر، وایتهد) برای ادعای منتشر/عمل‌شده conf تقریبی ۹۰ می‌گذارد؛ مجلس با تصویب لایحه‌ای که روش را «حقیقت ریاضی» می‌خواند بر k2 عمل کرد (acted:true). با conf، سخت‌ترین سقف r_conflict_cert است و پرچم در st_conflict می‌نشیند — که خود truth.why («با برهان قطعی (لیندمان) ناسازگار بود",
    "fix": {
@@ -310,7 +323,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 16,
+    "fresh": 17,
     "freshOk": 16,
     "ids": [
      "r2_cbs_killian_memos",
@@ -359,7 +372,7 @@
    "case": "cs_pb_long_h4",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خطای رمزگذاری پرونده",
    "note": "هشدار سلامت مشروع نیست: r_istiqra_small_n (ind_n=2 < 10، vazraf نامعلوم) روی k1 سقف ۷۰ گذاشت و conf=90 ⇒ پرچم over در st_istiqra. اما حکم، به تصریح truth.why، «درباره همین دستگاه در همین آزمون‌ها بود (نه تعمیم به روش)»؛ مجموعه محدود و همه اعضایش بررسی شده، یعنی استقراء تام که طبق s50 «نتیجه آن قطعی و دارای اعتبار صددرصدی است» (مثال ایستگاه: «۲۴ قسط گذشته … استقراء تام»). رمزگذار ind_n را گذاشت ولی ind_complete:true را جا انداخت.",
    "fix": {
@@ -369,14 +382,17 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 5,
+    "fresh": 8,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
      "r4_abs_survivor_shops",
      "r5_ltcm_1998",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
     ]
    },
    "kind": "health_alarm",
@@ -446,6 +462,137 @@
    ],
    "lastSeenRound": 1,
    "verified": "2026-10-13"
+  },
+  {
+   "id": "f_r13_abs_store_survey",
+   "case": "r13_abs_store_survey",
+   "opened": "2026-10-15",
+   "openedRound": 13,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "همان علتِ literary_digest: conf نوشته نشد؛ سناریوی انتزاعی هم‌ساختار است. دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "نظرسنجی از مشتریانِ یک فروشگاهِ زنجیره‌ای",
+   "tier": "abstract",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 13
+  },
+  {
+   "id": "f_r13_challenger_1986",
+   "case": "r13_challenger_1986",
+   "opened": "2026-10-15",
+   "openedRound": 13,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "موتور st_conflict را پرچم زد (رمزگذار هشدارِ مهندسان را «conflict_ignored» نوشت — با متنِ داستان سازگار است: s40 ردِ تعارض با یقینیِ مستند)، ولی st_istiqra را نه، چون «conf» نیامده. برچسبِ پرونده فقط st_istiqra را دارد و st_conflict هم راستا با داستان است؛ پس بخشی خطای برچسبِ ناقص و بخشی همان نبودِ conf. دست نخورد؛ مالک/دورِ بعد.",
+   "fix": null,
+   "retest": null,
+   "kind": "mislocated",
+   "title": "تصمیمِ پرتابِ چلنجر در سرما (۱۹۸۶)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [
+    "st_conflict"
+   ],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 13
+  },
+  {
+   "id": "f_r13_literary_digest_1936",
+   "case": "r13_literary_digest_1936",
+   "opened": "2026-10-15",
+   "openedRound": 13,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "رمزگذارِ کور برای «conf» عددی ننوشت (متن عدد نمی‌دهد، هرچند لفظِ «روشن است/با اختلاف برنده می‌شود» یقین را می‌رساند)؛ موتور بی «conf» هیچ سقفی را نمی‌سنجد. قاعده‌های r_istiqra_* (s50) سالم‌اند. اصلاحِ پرونده پس از دیدنِ حکم، کورِ رمزگذاری را می‌شکست؛ پس دست نخورد و باز می‌ماند تا دورِ بعد قاعدهٔ رمزگذاری (نوشتنِ conf وقتی لفظ یقین می‌رساند) روی وقایعِ تازه سنجیده شود.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "نظرسنجیِ لیتریری دایجست و انتخاباتِ ۱۹۳۶",
+   "tier": "real",
+   "expected": [
+    "st_istiqra"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 13
+  },
+  {
+   "id": "f_r13_willingham_arson_1991",
+   "case": "r13_willingham_arson_1991",
+   "opened": "2026-10-15",
+   "openedRound": 13,
+   "status": "diagnosed",
+   "attribution": "خطای رمزگذاری پرونده",
+   "note": "x_method=ضعیف درست رمزگذاری شد ولی conf و x_comp نوشته نشد؛ r_expert_method_weak سقف را فقط وقتی می‌سنجد که اطمینانِ کنشگر معلوم باشد. قاعده سالم است (s49). دست نخورد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "پروندهٔ آتش‌سوزیِ ویلینگهام و «نشانه‌های آتش‌افروزی» (۱۹۹۱–۲۰۰۴)",
+   "tier": "real",
+   "expected": [
+    "st_expert"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49"
+   ],
+   "lastSeenRound": 13
   },
   {
    "id": "f_r2_nyt_goddard_1920",
@@ -519,11 +666,12 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 2,
+    "fresh": 3,
     "freshOk": 2,
     "ids": [
      "r5_hitler_diaries_1983",
-     "r5_abs_family_letters"
+     "r5_abs_family_letters",
+     "r13_willingham_arson_1991"
     ]
    },
    "kind": "health_alarm",
@@ -557,9 +705,13 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 0,
+    "fresh": 3,
     "freshOk": 0,
-    "ids": []
+    "ids": [
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
+    ]
    },
    "kind": "mislocated",
    "title": "مدلِ ریسکِ یک وام‌دهندهٔ برخط با دادهٔ دو ساله",
@@ -599,9 +751,13 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 0,
+    "fresh": 3,
     "freshOk": 0,
-    "ids": []
+    "ids": [
+     "r13_challenger_1986",
+     "r13_literary_digest_1936",
+     "r13_abs_store_survey"
+    ]
    },
    "kind": "mislocated",
    "title": "صندوق LTCM و «زیانِ ناممکن» (۱۹۹۸)",

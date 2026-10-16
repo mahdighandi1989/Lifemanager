@@ -12,5 +12,11 @@
  "what": "پولیا دورِ ۶ (بازبینِ سخت‌گیرانهٔ مستقل، ۶۹۸ نقلِ عینی، ۰ ناموفق): ۵۸۵/۱۱۵/۷۹/۳۳؛ گزارش docs/decisions/2026-10-15-polya-round6.md.",
  "procedure": "apps/learning-architecture/AGENTS.md#📚 منبع‌ها و پوشش",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T21:56:27Z",
+  "note": "کامیت روی main است و آزمون‌های صفحه (matter_zanni، plausible، expert_field، measured_precedence، problems_a، found، found_mixture، realpath_factory، graph) پس از build.py همه NO ERRORS؛ دورِ فوری ۲۰۲۶-۱۰-۱۵",
+  "commit": ""
+ }
 }

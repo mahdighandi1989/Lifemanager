@@ -12,5 +12,11 @@
  "what": "CLAUDE.md: دستورِ همیشگیِ مالک (۲۰۲۶-۱۰-۱۵) ثبت شد — مواردِ باز را از دغدغه‌های ثبت‌شدهٔ مالک خودت تصمیم بگیر و انجام بده، نپرس (جز کارِ برگشت‌ناپذیر).",
  "procedure": "CLAUDE.md#Owner standing directives",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-15T21:56:27Z",
+  "note": "کامیت روی main است و آزمون‌های صفحه (matter_zanni، plausible، expert_field، measured_precedence، problems_a، found، found_mixture، realpath_factory، graph) پس از build.py همه NO ERRORS؛ دورِ فوری ۲۰۲۶-۱۰-۱۵",
+  "commit": ""
+ }
 }

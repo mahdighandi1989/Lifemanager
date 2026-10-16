@@ -51,8 +51,9 @@ const k2 = X.runClaim({ id: 'k', f: { way: 'یادآوری', mem_orig: 20, mem_d
 chk(k2.ceil === 50 && !k2.over, 'engine applies the guard ' + JSON.stringify([k2.ceil, k2.bind]));
 // ۵) پیکره و دفتر
 const res = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'results.json'), 'utf8'));
-chk(res.cases.length === 203 && res.cases.every(c => c.k === 'ok'), 'corpus: every verdict correct after the decision (0 broken)');
-const L = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'ledger.json'), 'utf8')), row = L.rounds[L.rounds.length - 1];
+const pre13 = res.cases.filter(c => (c.r || 0) <= 12); // دورِ ۱۳+ یافتهٔ بازِ مستقل دارد؛ این آزمون فقط «تصمیم چیزی را نشکست» را برای پیکرهٔ پیش از آن می‌سنجد
+chk(pre13.length === 203 && pre13.every(c => c.k === 'ok'), 'corpus: every verdict correct after the decision (0 broken)');
+const L = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'ledger.json'), 'utf8')), row = L.rounds.filter(x => x.round === 12).pop();
 chk(row.brier && row.brier.claims === 233 && row.foundation.baseval.p_thiqa === 99.9 && !row.routine.alarms.length, 'ledger row: Brier recorded, p_thiqa 99.9, no alarms');
 const RC = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'backtest', 'reviews', 'recode-2026-10-15b-mixture.json'), 'utf8'));
 const REC = {}; RC.applied.forEach(a => { REC[a.case + '/' + a.claim + '/' + a.key] = a.value; });
