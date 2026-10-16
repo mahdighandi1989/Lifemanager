@@ -36518,7 +36518,7 @@ APP.goFromURL = function (q) {
     var pg = S.get("eprog_" + pid) || {}, so = pg.solve || {}, L = so.live || {}, u = (so.u && so.u[1] && so.u[1].done) ? so.u[1] : {}, bk = (so.b && so.b[1] && so.b[1].done) ? so.b[1] : {};
     var cl = null; try { cl = A.liveClosure ? A.liveClosure(pid) : null; } catch (e) { }
     var last = (L.steps || []).filter(function (x) { return x.closed && x.out && !x.out.auto; }).pop();
-    var res = bk.glance || (L.chat && L.chat.solution) || (last ? clip(last.text, 80) + (last.out.what ? " ⇒ " + clip(last.out.what, 80) : "") : "");
+    var res = (A.liveResult && A.liveResult(pid)) || bk.glance || (L.chat && L.chat.solution) || (last ? clip(last.text, 80) + (last.out.what ? " ⇒ " + clip(last.out.what, 80) : "") : "");   // G5 (دورِ ۶، s01): جوابِ خودِ مسئله (a38)، نه «در یک نگاه»
     var out = ["# مسئلهٔ حل‌شدهٔ مرتبط (" + pid + "): «" + clip(r.p.title, 80) + "» · " + (cl && cl.label ? cl.label : "بسته شده") + (L.stateAt ? " · " + (L.stateD || String(L.stateAt).slice(0, 10)) : "")];
     if (blind) out.push("- اول مرورِ بی‌نگاه: پیش از یادآوری بپرس «یادت هست مجهول و راهت چه بود؟» — بعد از این‌ها برای پیوند استفاده کن (مسئلهٔ مرتبطِ حل‌شده: «نتیجه‌اش را به کار می‌بری؟ روشش را؟»).");
     if (u.u || u.c) out.push("- مجهول «" + clip(u.u || u.one || "", 100) + "»" + (u.c ? " · شرط «" + clip(u.c, 100) + "»" : ""));
@@ -42915,6 +42915,15 @@ APP.goFromURL = function (q) {
     return true;
   }
   A.liveCloseGuessCase = closeGuessCase;
+  /* G5 (دورِ ۶، s01): «نتیجه» ِ مسئلهٔ بسته برای «مسئلهٔ حل‌شدهٔ مرتبط» — همان جوابی که به آن رسید (جوابِ بازه‌ای؛ آنچه آخرین گامِ واقعی نشان داد؛ گامِ آخرِ
+     برهان)، نه جملهٔ «در یک نگاه» ِ بازنگری (که روش است، نه جواب) */
+  A.liveResult = function (pid) {
+    var r = rec(pid); if (!r) return ""; var s = solOf(pgOf(pid)), L = live(s), b = s.b && s.b[1];
+    if (b && b.verdict === "range" && txt(b.rangeW)) return txt(b.rangeW);
+    var last = L.steps.filter(function (x) { return x.closed && x.out && !x.out.auto; }).pop();
+    if (last) return last.out.kind === "proof" ? txt(last.text) : txt(last.out.what) || txt(last.text);
+    return txt(L.chat && L.chat.solution) || "";
+  };
   function outcomeCard(r, pg, s, st) {
     var pid = r.p.id, fc = st.fc ? S.get(st.fc) : null, u = uOf(s) || {}, g = s.g && s.g[1], gAsk = !!(g && g.guess && !g.hit);
     var d = OD[st.id + pid] = OD[st.id + pid] || { done: "", what: "", match: fc && fc.outcome === "شد" ? "yes" : fc && fc.outcome === "نشد" ? "no" : "", prog: "", want: "", grel: "", reflect: "" };
@@ -43587,7 +43596,7 @@ APP.goFromURL = function (q) {
   function backSummary(s) {
     var b = s.b && s.b[1]; if (!b || !b.done) return null; var g = s.g && s.g[1], L = live(s), gf = guessFate(g);
     return h("div", { class: "small lp-lbsum", "data-verdict": b.verdict || "" }, h("p", {}, b.state === "abandoned" ? "کنار گذاشته شد: «" + (b.why || "") + "»" : vLabel(b.verdict, typeOf(null, s), b) || "حل شد — وارسی: " + (b.chkRes || "")),
-      gf === "ok" && (b.verdict === "proved" || b.verdict === "refuted") ? h("p", { class: "good lp-proved" }, "حدسِ پیش از حلت «" + clip(g.guess, 100) + "» — " + (b.verdict === "refuted" ? "درست درآمد: برهان (ردِ حکم) یقین می‌دهد." : "اثبات شد (نه «احتمالاً»: برهان یقین می‌دهد).")) : null,
+      gf === "ok" && (b.verdict === "proved" || b.verdict === "refuted") ? h("p", { class: "good lp-proved" }, "حدسِ پیش از حلت «" + clip(g.guess, 100) + "» — " + (b.verdict === "refuted" ? "درست درآمد: برهان (ردِ حکم) یقین می‌دهد." : typeOf(null, s) === "find" ? "درست درآمد: حلی با گام‌های ثابت‌شده یقین می‌دهد (نه «احتمالاً»)." : "اثبات شد (نه «احتمالاً»: برهان یقین می‌دهد).")) : null,
       gf === "refuted" ? h("p", { class: "warnline lp-guessrefuted" }, "حدسِ پیش از حلت «" + clip(g.guess, 100) + "» — رد شد: آنچه حل نشان داد خلافِ آن بود." + (g.hitWhy ? " چرا شهودت خطا رفت (نوشتهٔ خودت): «" + clip(g.hitWhy, 160) + "»" : "")) : null,
       gf === "part" ? h("p", { class: "muted lp-guesspart" }, "حدسِ پیش از حلت «" + clip(g.guess, 100) + "» — فقط تاحدی درست بود" + (g.hitWhy ? ": «" + clip(g.hitWhy, 160) + "»" : ".")) : null,
       (L.aux || []).some(function (a) { return a.crossed && a.crossed.gen === false; }) ? h("p", { class: "warnline lp-nogen" }, "از حالت خاص به عام بدون استدلال: نتیجهٔ مسئلهٔ کمکیِ خاص بی استدلالِ تعمیم (استقرا، «برای هر …» با دلیل، تقارن) به حکمِ کلی رسید — حالتِ خاص چیزی کلی را ثابت نمی‌کند.") : null,
