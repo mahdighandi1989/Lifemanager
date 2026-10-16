@@ -674,7 +674,7 @@
           // پیوندِ پیوست به مسئلهٔ زنده — فقط با A.liveAttach ِ بخشِ مسئله (ادغامِ G1/G2؛ بی تکرار، حتی اگر فایل پیش‌تر به پوشه رفته باشد)
           var att = function (up) { if (!lpid || typeof A.liveAttach !== "function") return; m.lprob = lpid; try { A.liveAttach(lpid, { name: f.name, id: (up && up.id) || "", url: (up && up.link) || "", mime: (up && up.mime) || f.type || "", sess: s.id }); } catch (e) { } };
           if (!rc) return;
-          if (sentTo(s, rc.rid, sig)) { att(null); return; }
+          if (sentTo(s, rc.rid, sig)) { if (lpid && A.liveAttachments && !A.liveAttachments(lpid).some(function (x) { return x.name === f.name; })) att(null); return; }   // پیش‌تر رفته: فقط اگر هنوز در فهرستِ مسئله نیست
           return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function (up) { noteSent(s, rc.rid, sig); toRec.push(f.name); att(up); },
             function (e) { A.toast("«" + f.name + "» به پروندهٔ «" + rc.title + "» نرفت: " + errText(e), "bad"); });
         });

@@ -34715,7 +34715,7 @@ APP.goFromURL = function (q) {
           // پیوندِ پیوست به مسئلهٔ زنده — فقط با A.liveAttach ِ بخشِ مسئله (ادغامِ G1/G2؛ بی تکرار، حتی اگر فایل پیش‌تر به پوشه رفته باشد)
           var att = function (up) { if (!lpid || typeof A.liveAttach !== "function") return; m.lprob = lpid; try { A.liveAttach(lpid, { name: f.name, id: (up && up.id) || "", url: (up && up.link) || "", mime: (up && up.mime) || f.type || "", sess: s.id }); } catch (e) { } };
           if (!rc) return;
-          if (sentTo(s, rc.rid, sig)) { att(null); return; }
+          if (sentTo(s, rc.rid, sig)) { if (lpid && A.liveAttachments && !A.liveAttachments(lpid).some(function (x) { return x.name === f.name; })) att(null); return; }   // پیش‌تر رفته: فقط اگر هنوز در فهرستِ مسئله نیست
           return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function (up) { noteSent(s, rc.rid, sig); toRec.push(f.name); att(up); },
             function (e) { A.toast("«" + f.name + "» به پروندهٔ «" + rc.title + "» نرفت: " + errText(e), "bad"); });
         });
@@ -42453,7 +42453,8 @@ APP.goFromURL = function (q) {
     /* فهم */
     root.appendChild(sec("u", "۱) فهمِ مسئله" + (uOf(s) && ph !== "u" ? " ✓" : ""), want === "u" && !lowStart, ph === "u" ? uCard(r, pg, s) : [uSum(s),
       ph !== "done" ? h("button", { class: "btn ghost sm lp-reu2", type: "button", onclick: function () { L.reU = true; S.put(pg); A.go("lprob", pid, "u"); } }, "↺ دوباره فهمِ مسئله") : null]));
-    if (ph === "u") return root;
+    /* پیوستِ گفت‌وگو (A.liveAttach) از همان آغاز دیده شود — عکسی که هنگامِ گفتنِ صورت فرستاده شد، در مرحلهٔ فهم هم (ادغامِ G1/G2) */
+    if (ph === "u") { try { var al0 = attachList(s); if (al0) root.appendChild(al0); } catch (e) { console.warn(e); } return root; }
     /* طرح */
     var planBody = [suffCard(r, pg, s, "p"), askCard(r, pg, s), relatedCard(r, pg, s), backCard(r, pg, s), auxCard(r, pg, s), movesCard(r, pg, s), planCard(r, pg, s), ph === "p" ? incubBtn(r, pg, s, "p") : null];
     root.appendChild(sec("p", "۲) طرح" + (L.plan && L.plan.at ? " ✓" : ""), want === "p", planBody));

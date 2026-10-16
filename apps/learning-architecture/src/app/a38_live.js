@@ -1926,7 +1926,8 @@
     /* فهم */
     root.appendChild(sec("u", "۱) فهمِ مسئله" + (uOf(s) && ph !== "u" ? " ✓" : ""), want === "u" && !lowStart, ph === "u" ? uCard(r, pg, s) : [uSum(s),
       ph !== "done" ? h("button", { class: "btn ghost sm lp-reu2", type: "button", onclick: function () { L.reU = true; S.put(pg); A.go("lprob", pid, "u"); } }, "↺ دوباره فهمِ مسئله") : null]));
-    if (ph === "u") return root;
+    /* پیوستِ گفت‌وگو (A.liveAttach) از همان آغاز دیده شود — عکسی که هنگامِ گفتنِ صورت فرستاده شد، در مرحلهٔ فهم هم (ادغامِ G1/G2) */
+    if (ph === "u") { try { var al0 = attachList(s); if (al0) root.appendChild(al0); } catch (e) { console.warn(e); } return root; }
     /* طرح */
     var planBody = [suffCard(r, pg, s, "p"), askCard(r, pg, s), relatedCard(r, pg, s), backCard(r, pg, s), auxCard(r, pg, s), movesCard(r, pg, s), planCard(r, pg, s), ph === "p" ? incubBtn(r, pg, s, "p") : null];
     root.appendChild(sec("p", "۲) طرح" + (L.plan && L.plan.at ? " ✓" : ""), want === "p", planBody));
