@@ -36180,7 +36180,10 @@ APP.goFromURL = function (q) {
   /* پرسش‌های مرحله: مسئلهٔ زندهٔ بسته‌شده ⇒ فقط فهرستِ نوع‌دارِ خودِ بخشِ مسئله (A.livePhaseQs) — یک منبع؛ QK فقط برای مسئلهٔ فقط‌درگفت‌وگو */
   function phaseQs(ph, cls, pid) {
     if (pid && A.liveRec && A.liveRec(pid) && typeof A.livePhaseQs === "function") { try { var L0 = A.livePhaseQs(pid, ph); if (Array.isArray(L0) && L0.length) return L0.slice(); } catch (e) { } }
-    return ((QK[cls] || QK.any)[ph] || QK.any[ph] || []).slice();
+    var L1 = ((QK[cls] || QK.any)[ph] || QK.any[ph] || []).slice();
+    /* E3 (دورِ ۴): محتوای فهرستِ هر داور از a38 (A.liveKindQs — بازنویسیِ کاملِ فهرستِ پولیا، نه زیرمجموعه)؛ ترتیب و پیشنهاد همین‌جا */
+    if (typeof A.liveKindQs === "function") { try { var K1 = A.liveKindQs(cls, ph, L1); if (Array.isArray(K1) && K1.length) return K1; } catch (e) { } }
+    return L1;
   }
   AS.coachQs = phaseQs; AS.coachClass = qClass;
   /* پرسشی که دستیار در همین سشن پرسید و کاربر پس از آن پاسخ داد ⇒ «پاسخ‌گرفته در گفت‌وگو» — دوباره پیشنهاد نمی‌شود (rerunC/D) */
@@ -40831,16 +40834,35 @@ APP.goFromURL = function (q) {
   var PRAC_W = wordsRe("کیلومتر|سانتی\\s*متر|میلی\\s*متر|متر\\s*مربع|متر\\s*مکعب|متر|سانت|کیلوگرم|کیلو|گرم|لیتر|تومان|تومن|ریال|دلار|یورو|قسط|وام|اجاره|حجم|مساحت|ظرفیت|میلیون|میلیارد");
   /* «مسئلهٔ عملی» یعنی قید یا منبعِ واقعیِ خودِ کاربر، نه صرفِ واحد (D4): مسئلهٔ کتابیِ سوم‌شخص با واحد («مخزنی ۳۰۰ لیتری … در چند دقیقه پر می‌شود؟»)
      کامل‌بیان‌شده است؛ «… بخرم»، «… دارم»، «خانه‌ام» نشانهٔ موقعیتِ خودِ اوست. */
-  var FIRST_P = /(?:^|\s)(?:من|ما|خودم|خودمان|خودمون|ام|مان|مون)(?=$|[\s.,،؛:!?؟])|(?:^|\s)(?:می\s*|نمی\s*|ب|ن)[ء-یپچژکگ]{2,12}(?:م|یم)(?=$|[\s.,،؛:!?؟])|(?:^|\s)(?:دارم|داریم|ندارم|هستم|هستیم|برم|بریم|کنم|کنیم|باشم|خواهم)(?=$|[\s.,،؛:!?؟])/;
-  var QUEST_RE = /[?؟]|(?:^|\s)(?:چند|چقدر|چه\s*قدر|چه\s*مقدار|کدام|بیابید|بیاب|حساب\s*کنید)(?=$|[\s.,،؛:!?؟])/;
+  /* E2 (دورِ ۴ ِ تور، s36/s37/s38/s13/s01): «عملی» = سهمِ واقعیِ خودِ کاربر — اول‌شخصِ مفرد همراهِ منبع/پیامدی که مالِ اوست (بخرم، بفروشم، سود کنم،
+     پولم، خانه‌ام، دارم)؛ صدای کتابِ درسی با اول‌شخصِ جمع («۲۰ لیتر آب‌نمک داریم … چند لیتر اضافه کنیم؟»، «قیفی داریم») با داده‌های عددیِ کامل و یک
+     مجهولِ محاسبه‌ای ⇒ کامل‌بیان‌شده. فعلِ دانستن/یافتن ِ مفرد («می‌خوام بدونم»، «چطور پیدا کنم»، «امتحان کنم») سهم نیست. صورتِ نقل‌شده در «…» (تکلیفِ
+     دخترم: «…») خودش مسئله است — پیشنهاد اول از همان. دوراهیِ اخلاقی («گزارش بدم یا نه؟ درستش چیه؟») زندگی است، حتی با «هزار تومن». */
+  var STAKE_RE = /(?:^|\s)(?:می\s*|نمی\s*|ب|ن)?(?:خرم|فروشم|فروشمش|پردازم|سازم|کارم|چینم)(?=$|[\s.,،؛:!?؟]|ش)|(?:خرج|سود|ضرر|پس\s*انداز|اجاره|قرض|سرمایه\s*گذاری|هزینه|سفارش)\s*(?:کنم|بکنم|می\s*کنم|نکنم|بدم|بدهم)(?=$|[\s.,،؛:!?؟])|(?:وام|قرض|خانه|خونه|ماشین)\s*(?:بگیرم|نگیرم|می\s*گیرم)(?=$|[\s.,،؛:!?؟])|(?:^|\s)جا\s*(?:بدم|بدهم|بدیم)(?=$|[\s.,،؛:!?؟])|(?:^|\s)(?:دارم|ندارم)(?=$|[\s.,،؛:!?؟])|(?:پول|حقوق|درآمد|بودجه|پس\s*انداز|خانه|خونه|باغ|باغچه|حیاط|ماشین|مغازه|وام|قسط|اجاره|کیک)\s*(?:ام|م|مان|مون)(?=$|[\s.,،؛:!?؟])/;
+  var FIRST_S = /(?:^|\s)(?:من|خودم)(?=$|[\s.,،؛:!?؟])|(?:^|\s)(?:می\s*|نمی\s*|ب|ن)[ء-یپچژکگ]{2,12}م(?=$|[\s.,،؛:!?؟])|(?:^|\s)(?:دارم|ندارم|هستم|برم|کنم|باشم|خواهم|بگم)(?=$|[\s.,،؛:!?؟])|(?:^|\s)(?:مجهول|پسر|دختر|همکار|همسر|راه)(?:م|ام)(?=$|[\s.,،؛:!?؟])/;
+  var QUEST_RE = /[?؟]|(?:^|\s)(?:چند|چقدر|چه\s*قدر|چه\s*مقدار|کدام|بیابید|بیاب|حساب\s*کنید|پیدا\s*کنید)(?=$|[\s.,،؛:!?؟])/;
+  var TEXT_IMP = /(?:^|\s)(?:پیدا\s*کنید|بیابید|حساب\s*کنید|به\s*دست\s*آورید|نشان\s*دهید|ثابت\s*کنید)(?=$|[\s.,،؛:!?؟])/;
+  var ETHIC_RE = /درستش\s*(?:چیه|چیست)|کار\s*(?:ِ\s*)?درست\s*(?:چیه|چیست|کدام)|اخلاق|وجدان|شریک\s*(?:ِ\s*)?جرم|گزارش\s*(?:بدم|ندم|بدهم)|لو\s*(?:بدم|بدهم)|دروغ\s*(?:بگم|بگویم)|خیانت|قانون\s*چی\s*می\s*گه/;
   var LIFE_RE = /(?:^|\s)[بن][ء-یپچژکگ]{1,12}م\s+یا\s+\S|[ء-یپچژکگ]{1,12}(?:م|یم)\s+یا\s+نه(?![ء-یپچژکگ])|تصمیم|شغل|ازدواج|مهاجرت|همسر|رابطه|پیشنهادِ?\s*کار|بمونم|بمانم/;
-  function natGuess(t) {
-    var x = norm(t);
+  function natGuess0(x) {
     if (OBJ_W.test(x) || OBJ_SYM.test(x)) return "objective";
-    if (/\d/.test(x) && PRAC_W.test(x)) { if (FIRST_P.test(x)) return "practical"; if (QUEST_RE.test(x)) return "objective"; }
+    if (ETHIC_RE.test(x)) return "life";
+    if (/\d/.test(x) && PRAC_W.test(x)) { if (STAKE_RE.test(x)) return "practical"; if (QUEST_RE.test(x) && !FIRST_S.test(x)) return "objective"; }
+    if (TEXT_IMP.test(x) && !FIRST_S.test(x)) return "objective";
     if (LIFE_RE.test(x)) return "life";
     return "";
   }
+  function natGuess(t) {
+    var x = norm(t), qs = [], m, QRE = /«([^«»]{12,})»/g;
+    while ((m = QRE.exec(x))) qs.push(m[1]);
+    if (qs.length) { var gq = natGuess0(qs.join(" ")); if (gq) return gq; }
+    return natGuess0(x);
+  }
+  /* E2: نوعِ پیشنهادی از صورت (پیش‌انتخاب، نه حکم) — «ثابت کنید/نشان دهید که» ⇒ اثباتی؛ «آیا …؟» یا «… هنوز درست است؟» ⇒ اثبات یا رد کن */
+  var PROVE_W = /ثابت\s*(?:کن|کنید|کنیم)|اثبات\s*کن|نشان\s*(?:بده|دهید|بدهید)\s*که|برهان\s*بیاور/;
+  var POD_W = /اثبات\s*یا\s*رد|(?:^|[\s«(])آیا\s|(?:درست|برقرار|صادق|صحیح)\s*(?:است|هست|ه|می\s*ماند|میمونه|می\s*مونه)?\s*[?؟]/;
+  function typeGuess(t) { var x = norm(t); if (/اثبات\s*یا\s*رد/.test(x)) return "pod"; if (LIFE_RE.test(x) || ETHIC_RE.test(x)) return ""; return POD_W.test(x) ? "pod" : PROVE_W.test(x) ? "prove" : ""; }
+  A.liveTypeGuess = typeGuess;
   A.liveNatGuess = natGuess;
 
   /* ---------- «حکمتِ ضرب‌المثل‌ها» (تور ۱ ِ پولیا، s35): ثبت‌گاهِ کوچکِ گفته‌های اکتشافیِ خودِ کتاب — نقلِ ترجمه (sources/polya_how_to_solve_it/items.json،
@@ -41015,8 +41037,9 @@ APP.goFromURL = function (q) {
   function create(title, statement, kind, extra) {
     extra = extra || {};
     var pid = "pb_l_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-    var k0 = A.SOLVE_TYPES && A.SOLVE_TYPES[kind] ? kind : (extra.origin && extra.origin.type === "lprob" && rec(extra.origin.id) ? typeOf(rec(extra.origin.id), solOf(pgOf(extra.origin.id))) : "find");
-    var k = A.SOLVE_TYPES && A.SOLVE_TYPES[k0] ? k0 : "find", st0 = String(statement || "").trim();
+    /* E2 (دورِ ۴، s03/s27): نوع از خودِ صورت (پیشنهاد) — فرزندِ بازنگری نوعِ خودش را دارد، نه نوعِ پدر («اگر ۴ نقطه باشد، حکم هنوز درست است؟» ⇒ اثبات یا رد کن) */
+    var st0 = String(statement || "").trim(), k0 = A.SOLVE_TYPES && A.SOLVE_TYPES[kind] ? kind : typeGuess(st0) || "find";
+    var k = A.SOLVE_TYPES && A.SOLVE_TYPES[k0] ? k0 : "find";
     var ti = clip(txt(title) || firstSentence(st0) || "مسئلهٔ بی‌نام", 120);   // عنوان هرگز خالی نیست (تور ۱، s21)
     var r = { id: "eprob_" + pid, type: "eprob", status: "live", mode: "live", live: true, by: extra.by || "user", title: ti,
       p: { id: pid, title: ti, statement: st0, kind: k, field: "مسئلهٔ زندهٔ من", live: true, stages: [], dead: [], drills: [], lessons: [] } };
@@ -41069,13 +41092,15 @@ APP.goFromURL = function (q) {
     var natHint = h("p", { class: "small muted lp-newnathint", "aria-live": "polite" });
     function natSync() {
       var sel0 = box.querySelector("#lpNewNat"); if (!sel0) return;
+      /* E2: نوعِ پیشنهادی از صورت (تا کاربر خودش نوع را برنگزیده) — «آیا…؟» ⇒ اثبات یا رد کن، «ثابت کنید» ⇒ اثباتی */
+      if (!NEW.kindSet) { NEW.kind = typeGuess(NEW.statement + " " + NEW.title) || "find"; var ts0 = box.querySelector("#lpNewType"); if (ts0) ts0.value = NEW.kind; }
       if ((NEW.kind === "prove" || NEW.kind === "pod") && !NEW.natSet) { NEW.nat = "objective"; NEW.natAuto = true; }   // D1: پیش‌فرض، نه قفل
       else if (!NEW.natSet) { NEW.nat = natGuess(NEW.statement + " " + NEW.title); NEW.natAuto = !!NEW.nat; }
       sel0.value = NEW.nat || "";
       natHint.textContent = NEW.natAuto && NEW.nat && (NEW.kind === "prove" || NEW.kind === "pod") ? "پیش‌انتخاب: «" + NAT[NEW.nat].fa.split(" — ")[0] + "» (داورِ حکم برهان است) — اگر فرضیه‌ای دربارهٔ زندگیِ خودت است که برهان ندارد («… برای من درست است؟»)، «زندگی» را برگزین." : NEW.natAuto && NEW.nat ? "پیش‌انتخابِ کد از صورتت: «" + NAT[NEW.nat].fa.split(" — ")[0] + "» — اگر نیست، عوضش کن." : !NEW.nat ? "داور را خودت برگزین (کد از صورت چیزی پیشنهاد نکرد)." : "";
     }
     box.appendChild(field("lpNewS", "مسئله را همان‌طور که هست بنویس: چه می‌خواهی و چه چیزی آن را سخت می‌کند (پاسخ لازم نیست)", NEW.statement, function (v) { NEW.statement = v; natSync(); }, 4));
-    box.appendChild(U.typeSel("lpNewType", NEW.kind, function (v) { NEW.kind = v; natSync(); }));
+    box.appendChild(U.typeSel("lpNewType", NEW.kind, function (v) { NEW.kind = v; NEW.kindSet = true; natSync(); }));
     box.appendChild(selF("lpNewNat", "داورِ این مسئله کیست؟", Object.keys(NAT).map(function (k) { return [k, NAT[k].fa]; }), NEW.nat, function (v) { NEW.nat = v; NEW.natSet = !!v; NEW.natAuto = false; natSync(); }));
     box.appendChild(natHint);
     box.appendChild(selF("lpNewHope", "الان چقدر امید یا میل داری که پیشش ببری؟ (اختیاری)", HOPE, NEW.hope, function (v) { NEW.hope = v; }));
@@ -41148,6 +41173,10 @@ APP.goFromURL = function (q) {
   var SAT = [["yes", "بله — دست‌کم یک پاسخ هست"], ["no", "نه — شرط برآوردنی نیست (مسئله پاسخ ندارد)"], ["unknown", "هنوز نمی‌دانم"]];
   var SAT_L = "آیا شرط برآوردنی است — اصلاً مجهولی هست که همهٔ شرط را برآورد؟";
   var SAT_POD = "آیا فرض برآوردنی است — اصلاً موردی هست که همهٔ فرض را برآورد (وگرنه حکم تهی است)؟";
+  /* E3 (دورِ ۴، s05): «اثبات یا رد کن» ِ زندگی برهان ندارد — «حکم تهی» و «اثباتی» واژهٔ ریاضی‌اند؛ فرضیهٔ زندگی با موقعیت‌های واقعی سنجیده می‌شود */
+  var SAT_POD_LIFE = "آیا موقعیتی واقعی هست که همهٔ فرضت در آن برقرار باشد — وگرنه فرضیه چیزی را نمی‌سنجد؟";
+  var SAT_POD_OPTS = [["yes", "بله — دست‌کم یک مورد همهٔ فرض را دارد"], ["no", "نه — هیچ موردی همهٔ فرض را ندارد"], ["unknown", "هنوز نمی‌دانم"]];
+  function satLabel(ty, nat) { return ty === "pod" ? (nat === "objective" ? SAT_POD : SAT_POD_LIFE) : SAT_L; }
   var EFF = [["big", "اثرِ محسوس دارد"], ["small", "اثرش ناچیز است — با دلیل کنارش می‌گذارم"]];
   var RESTATE = [["eq", "هم‌ارز — همان مسئله به بیانِ دیگر"], ["wider", "گسترده‌تر — مسئلهٔ کلی‌تر (شرط یا قیدی کمتر)"], ["narrower", "باریک‌تر — مسئلهٔ خاص‌تر (شرط یا قیدی بیشتر)"], ["other", "مسئلهٔ دیگری شد"]];
   var IFREF = ["حدس را کنار می‌گذارم یا اصلاحش می‌کنم", "آزمون را نادیده می‌گیرم چون حدسم قوی است", "حدس را بی‌تغییر نگه می‌دارم و دیگر نمی‌آزمایم"];
@@ -41250,7 +41279,7 @@ APP.goFromURL = function (q) {
     var T = T0(d.type), prac = d.nat === "practical";
     var box = h("section", own({ class: "card lp-u", "data-nat": d.nat || "none" }), h("div", { class: "eyebrow" }, "فهمِ مسئله" + (live(s).reU ? " — دوباره" : "")),
       h("h3", {}, "اول کل، بعد جزءها"),
-      h("p", { class: "small" }, "پیش از هر کاری مسئله را بفهم و بخواهی‌اش. اول کلِ مسئله را بی‌جزئیات در یک جمله ببین؛ بعد مجهول، هر داده جدا، و شرط. هر داده را جدا بنویس — بعداً صفحه دربارهٔ هر داده‌ای که به کار نبردی، با نامش، می‌پرسد."),
+      h("p", { class: "small" }, d.type !== "find" ? "پیش از هر کاری مسئله را بفهم و بخواهی‌اش. اول کلِ مسئله را بی‌جزئیات در یک جمله ببین؛ بعد حکم، هر بخشِ فرض جدا، و بخش‌های حکم. هر بخشِ فرض را جدا بنویس — بعداً صفحه دربارهٔ هر بخشی که به کار نبردی، با نامش، می‌پرسد." : "پیش از هر کاری مسئله را بفهم و بخواهی‌اش. اول کلِ مسئله را بی‌جزئیات در یک جمله ببین؛ بعد مجهول، هر داده جدا، و شرط. هر داده را جدا بنویس — بعداً صفحه دربارهٔ هر داده‌ای که به کار نبردی، با نامش، می‌پرسد."),
       prov("u"),
       h("div", { class: "card soft small lp-stmt" }, h("strong", {}, "صورتِ خودت: "), r.p.statement));
     /* داور: کامل‌بیان‌شده / عملی / زندگی — تمایز دیده و به کار گرفته می‌شود (قابِ عملی، اجرای برهانی، پرسش‌های بازنگری) */
@@ -41289,7 +41318,7 @@ APP.goFromURL = function (q) {
         if (x.eff === "small") dbox.appendChild(field("lpDW_" + x.id, "چرا اثرش ناچیز است؟ (دلیلِ کنار گذاشتن)", x.effWhy || "", function (v) { x.effWhy = v; }, 0));
       }
     });
-    dbox.appendChild(h("button", { class: "btn ghost sm lp-dadd", type: "button", onclick: function () { d.dl.push({ id: nid(s, d.dl), t: "" }); L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); A.render(); } }, "+ دادهٔ دیگر"));
+    dbox.appendChild(h("button", { class: "btn ghost sm lp-dadd", type: "button", onclick: function () { d.dl.push({ id: nid(s, d.dl), t: "" }); L0.uDraft = JSON.parse(JSON.stringify(d)); S.put(pg); A.render(); } }, d.type === "find" ? "+ دادهٔ دیگر" : "+ فرضِ دیگر"));
     box.appendChild(dbox);
     box.appendChild(field("lpCond", "۵) " + T.c, d.c, function (v) { d.c = v; }, 3, "هر بخش در یک سطر"));
     box.appendChild(field("lpRel", d.type === "find" ? "۶) پیوندِ جزءها: کدام داده به کدام بخشِ شرط یا به مجهول ربط دارد؟ (اختیاری)" : "۶) پیوندِ جزءها: کدام بخشِ فرض به کدام بخشِ حکم ربط دارد؟ (اختیاری)", d.rel, function (v) { d.rel = v; }, 0));
@@ -41299,7 +41328,7 @@ APP.goFromURL = function (q) {
       if (d.dep === "yes") box.appendChild(field("lpDepW", "کدام داده، و وقتی مجهول بزرگ‌تر می‌شود آن بیشتر می‌شود یا کمتر؟", d.depWhy || "", function (v) { d.depWhy = v; }, 0));
     }
     /* A13 (s10): «برآوردنی؟» برای «اثبات یا رد کن» هم — فرضی که هیچ موردی برآوردش نمی‌کند حکم را تهی می‌کند؛ «نه» ⇒ کارتِ شل کردنِ بخشی از شرط در طرح */
-    if (d.type === "find" || d.type === "pod") box.appendChild(selF("lpSat", d.type === "pod" ? SAT_POD : SAT_L, SAT, d.sat, function (v) { d.sat = v; rerender(); }));
+    if (d.type === "find" || d.type === "pod") box.appendChild(selF("lpSat", satLabel(d.type, d.nat), d.type === "pod" ? SAT_POD_OPTS : SAT, d.sat, function (v) { d.sat = v; rerender(); }));
     box.appendChild(selF("lpSuff", prac ? "در مسئلهٔ عملی داده‌ها هرگز کامل و دقیق نیستند: با داده‌هایی که اثرِ محسوس دارند، مجهول به‌قدرِ تقریبِ کافی معین می‌شود؟" : T.suff, ["کافی است", "ناکافی است — چیزی کم است", "زائد دارد — بخشی لازم نیست", "متناقض است", "هنوز نمی‌دانم"], d.suff, function (v) { d.suff = v; rerender(); }));
     box.appendChild(field("lpSuffW", "چرا؟ (یک جمله)", d.suffWhy, function (v) { d.suffWhy = v; }, 0));
     var items0 = d.dl.filter(function (x) { return txt(x.t); });
@@ -41378,10 +41407,10 @@ APP.goFromURL = function (q) {
     function vald() {
       var items = d.dl.filter(function (x) { return txt(x.t); }), miss = wholeWhy(d, r).concat([[d.u, T.u], [d.c, T.c]].filter(function (x) { return txt(x[0]).length < 3; }).map(function (x) { return "«" + x[1] + "»"; })), warn = [];
       if (!NAT[d.nat]) miss.push("«داورِ این مسئله» (زندگی، عملی یا کامل‌بیان‌شده)");
-      if (!items.length) miss.push("«دست‌کم یک داده»");
+      if (!items.length) miss.push(d.type === "find" ? "«دست‌کم یک داده»" : "«دست‌کم یک بخشِ فرض»");
       if (d.type === "find" && d.dep === "yes" && toks(d.depWhy).length < 2) miss.push("«کدام داده به مجهول وابسته است و چطور»");
       if (fresh && txt(d.guess) && d.ifRef && d.ifRef !== IFREF[0] && toks(d.ifRefWhy).length < 3) miss.push("«چرا ردِ آزمون نباید حدست را عوض کند؟» (یا گزینهٔ اول)");
-      if ((d.type === "find" || d.type === "pod") && !d.sat) miss.push("«" + (d.type === "pod" ? SAT_POD : SAT_L) + "»");
+      if ((d.type === "find" || d.type === "pod") && !d.sat) miss.push("«" + satLabel(d.type, d.nat) + "»");
       if (!d.suff) miss.push("«" + T.suff + "»");
       if (d.suff === "کافی است" && items.length && suffShaky(items) && toks(d.suffChal).length < 3) { d.showChal = true; miss.push("پاسخ به «" + suffChalQ(items) + "»"); }
       if ((d.suff === "کافی است" || d.sat === "yes") && circular(d.suffWhy, d.u)) {
@@ -41978,26 +42007,65 @@ APP.goFromURL = function (q) {
   var BACK_PROVE = ["همهٔ فرض به کار رفت — هر بخشِ فرض کجای برهان آمد؟", "قاعدهٔ پاسکال: هر واژهٔ اصلیِ حکم را با تعریفش جایگزین کن — برهان کجا از تعریفِ هر کدام استفاده کرد؟", "نتیجه‌ای که برهان می‌دهد دقیقاً همان حکم است — نه ضعیف‌تر، نه قوی‌تر، نه عکسش؟", "استدلال را در نقطه‌های حساسش وارسی می‌کنی — حالت‌های پایه و مرزی جدا؟", Q_EQUIV, "از راهِ دیگری هم ثابتش می‌کنی؟ اگر غیرمستقیم (خلف) بود، مستقیمش می‌کنی؟", Q_TASTE];
   var BACK_FIND = ["جواب را در شرط جای‌گذاری کن — همهٔ شرط برقرار است؟", "حالتِ خاص یا حدی، واحد و بُعد، و یکنوایی (اگر داده‌ای بیشتر شود، جواب در جهتِ درست عوض می‌شود؟) را می‌آزمایی؟", "چند جواب دارد — همه را یافتی؟ شرط برای تعیینِ مجهول کافی بود؟", Q_EQUIV, "همهٔ داده‌ها و کلِ شرط در حل آمده‌اند؟", "نتیجه را از راهِ دیگری به دست می‌آوری؟ در یک نگاه می‌بینی‌اش؟", Q_TASTE];
   var BACK_PRAC = ["تقریبت بس بود — آنچه با دلیل بیرون گذاشتی اثرِ محسوسی نشان داد؟", "واحدها و ابعاد درست‌اند؟ اگر همه را با واحدِ دیگری بسنجی، رابطه درست می‌ماند؟", "قانون یا رابطه‌ای که یافتی در کدام دامنه آزموده شد — و در حالتِ حدی (صفر، خیلی بزرگ) چه می‌گوید؟"];
-  /* A11 (دورِ ۳): فهم و طرح هم نوع‌دارند — عملی ⇐ فهرستِ «کارِ واقعی» ِ مربی (AS.coachQs(ph, "pract") بی pid: همان QK.pract، یک منبع)؛ زندگی ⇐ همان
-     فهرست بی پرسش‌های ویژهٔ کمیت (اثرِ محسوس، تقریب)؛ کامل‌بیان‌شده ⇐ فهرستِ ریاضیِ کتاب؛ داورِ انتخاب‌نشده ⇐ فهرستِ عامِ کتاب. پیش‌تر «قضیه‌ای…؟» و
-     «عنصرِ کمکی (خطی، نقطه‌ای)» برای تصمیمِ مسکن پرسیده می‌شد (s01). */
-  var PRAC_ONLY = /اثرِ\s*محسوس|تقریب/;
-  var LIFE_P_ALL = "همهٔ داده‌ها و قیدهای واقعی‌ات (زمان، پول، آدم‌ها) در طرح آمده‌اند؟";
+  /* E3 (دورِ ۴ ِ تور، s13/s35/s37/s38/s08/s04): فهرستِ هر داور همان فهرستِ اصلیِ پولیاست با واژه‌های همان داور — بازنویسی، هرگز زیرمجموعه. پیش‌تر
+     فهرستِ «عملی/زندگی» چهار پرسش بود و «به تعریف‌ها برگرد» (s13)، «نتیجه یا روشِ مسئلهٔ مرتبط؟ عنصرِ کمکی» (s35)، «به مجهول نگاه کن» (s38) و
+     «دادهٔ دیگری لازم است؟» (s37) را نداشت. منبعِ یکتای محتوا همین‌جاست (A.LIVE_QK)؛ مربیِ گفت‌وگو (a27) همین را می‌خواند (A.liveKindQs) — ترتیب و
+     پیشنهاد با مربی است. پرسش‌های ویژهٔ کمیت (اثرِ محسوس، تقریب) فقط در «عملی». */
+  var Q_UNK = { practical: "به مجهول نگاه کن: دقیقاً چه چیزی را باید تعیین کنی — «حل‌شدن» چه شکلی است و با چه عدد یا واحدی سنجیده می‌شود؟", life: "به مجهول نگاه کن: دقیقاً چه می‌خواهی — «حل‌شدن» چه شکلی است و از کجا می‌فهمی رسیده‌ای؟" };
+  var Q_DEF = "مسئله را به شکلِ دیگری بیان کن — به تعریف‌ها برگرد: هر واژهٔ کلیدیِ خواسته و قیدها دقیقاً یعنی چه؟";
+  var Q_REL = "مسئلهٔ مرتبطی که پیش‌تر حل شده (در زندگیِ خودت یا دیگران): نتیجه‌اش را به کار می‌بری یا روشش را؟ برای به‌کار بردنش عنصرِ کمکی‌ای (کار، آدم، ابزار، گامِ میانی) لازم است؟";
+  var Q_MORE = "دادهٔ دیگری لازم است — چه چیزی را باید بپرسی، بسنجی یا پیدا کنی تا خواسته معین شود؟";
+  var Q_BACKW = "از خواسته به عقب: فرض کن حل شده — یک گام مانده به آخر چه وضعی بود که از آن به خواسته می‌رسیدی؟ و آن وضع از کجا؟";
+  var Q_RESTATE_C = "این گام جواب نداد؟ مسئله را به شکلِ دیگری بیان کن — کدام قید یا واژه را می‌شود جورِ دیگری دید (به تعریف برگرد)؟";
+  var LIVE_QK = {
+    practical: {
+      u: [Q_UNK.practical, "چه داری — دانسته‌ها، منابع، امکان‌ها (داده‌ها)؟ کدام اثرِ محسوس دارد و کدام را با دلیل کنار می‌گذاری؟", "شرط چیست — کدام قیدها (زمان، پول، آدم‌ها، اندازه) واقعی‌اند و کدام فرضی؟ بخش‌هایش را جدا بنویس.",
+        "آیا این داده‌ها و قیدها برای تعیینِ خواسته کافی‌اند؟ زائد؟ متناقض؟", "کدام تقریب بس است — جوابِ «به‌اندازهٔ کافی خوب» چیست؟", "شکل، جدول یا فهرستی بکش؛ مسئله را به زبانِ خودت دوباره بگو.", "چه؟ چرا؟ کجا؟ کی؟ چگونه؟ — کدام‌یک دربارهٔ این مسئله هنوز بی‌پاسخ است؟"],
+      p: ["پیش‌تر مسئله‌ای شبیه این — در کارِ خودت یا دیگران — دیده‌ای؟ از آن چه به کار می‌آید؟", "به مجهول نگاه کن: مسئلهٔ آشنایی با همین خواسته (یا خواستهٔ مشابه) می‌شناسی — خرید، ساخت، جا دادن، بودجه‌ای که پیش‌تر حساب کردی؟", Q_REL, Q_DEF, Q_BACKW,
+        "اگر همین را نمی‌توانی، مسئلهٔ ساده‌ترِ مرتبط: کوچک‌ترین نسخه (فقط بخشی از قیدها) که همین هفته بیازمایی — خواسته با آن تا کجا معین می‌شود و چطور تغییر می‌کند؟", Q_MORE, "داده‌هایی که اثرِ محسوس دارند همه در طرح آمده‌اند؟ کلِ قیدها را؟"],
+      c: ["پیش از گامِ واقعی: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟", "روشن می‌بینی که این گام به خواسته نزدیکت می‌کند — به کدام داده تکیه دارد؟ واحدها در دو سوی حساب یکی است؟", "کی انجامش می‌دهی؟ روزش را بگو.", "آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت چه می‌گوید؟", Q_RESTATE_C, Q_MORE] },
+    life: {
+      u: [Q_UNK.life, "چه داری — دانسته‌ها، منابع، امکان‌ها، آدم‌ها (داده‌ها)؟", "شرط چیست — کدام قیدها (زمان، پول، آدم‌ها، ارزش‌هایت) واقعی‌اند و کدام فرضی؟ بخش‌هایش را جدا بنویس.",
+        "آیا آنچه داری برای تصمیم کافی است؟ چیزی زائد یا متناقض نیست؟", "شکل، جدول یا فهرستی بکش؛ مسئله را به زبانِ خودت دوباره بگو.", "چه؟ چرا؟ کجا؟ کی؟ چگونه؟ — کدام‌یک دربارهٔ این مسئله هنوز بی‌پاسخ است؟"],
+      p: ["پیش‌تر مسئله‌ای شبیه این — در زندگیِ خودت یا دیگران — دیده‌ای؟ از آن چه به کار می‌آید؟", "به مجهول نگاه کن: موقعیتِ آشنایی با همین خواسته (یا خواستهٔ مشابه) می‌شناسی؟", Q_REL, Q_DEF, Q_BACKW,
+        "اگر همین را نمی‌توانی، مسئلهٔ ساده‌ترِ مرتبط: کوچک‌ترین نسخه (فقط بخشی از شرط) که همین هفته بیازمایی؟", Q_MORE, "همهٔ داده‌ها و قیدهای واقعی‌ات (زمان، پول، آدم‌ها) در طرح آمده‌اند؟ کلِ شرط را؟"],
+      c: ["پیش از این گام: فکر می‌کنی چه می‌شود، و چقدر مطمئنی؟", "روشن می‌بینی که این گام به مجهول نزدیکت می‌کند — به کدام داده تکیه دارد؟", "کی انجامش می‌دهی؟ روزش را بگو تا همان روز بپرسم چه شد.", "آنچه شد با پیش‌بینی‌ات چه فاصله‌ای داشت — و این فاصله دربارهٔ فهمت از مسئله چه می‌گوید؟", Q_RESTATE_C, Q_MORE] }
+  };
+  A.LIVE_QK = LIVE_QK;
+  /* هستهٔ پولیا که هیچ فهرستی (حتی فهرستِ ریاضیِ کتاب یا اثباتی) نباید کم داشته باشد — اگر نبود، با واژهٔ همان نوع افزوده می‌شود */
+  var CORE = {
+    p: [[/به\s*(?:مجهول|حکم|خواسته)\s*نگاه/, function (pr) { return pr ? "به حکم نگاه کن: قضیه‌ای با همین حکم (یا حکمِ مشابه) می‌شناسی؟" : "به مجهول نگاه کن: مسئلهٔ آشنایی با همین مجهول یا مجهولِ مشابه می‌شناسی؟"; }],
+      [/تعریف/, function (pr) { return pr ? "به تعریف‌ها برگرد: هر واژهٔ حکم را با تعریفش جایگزین کن (پاسکال) — چه می‌شود؟" : "مسئله را به شکلِ دیگری بیان می‌کنی؟ به تعریف‌ها برگرد."; }],
+      [/نتیجه[\s\S]{0,40}روش[\s\S]{0,80}کمکی/, function () { return "اگر مسئلهٔ مرتبطِ حل‌شده‌ای داری: نتیجه‌اش را به کار می‌بری؟ روشش را؟ برای به‌کار بردنش عنصرِ کمکی لازم است؟"; }],
+      [/به\s*عقب/, function (pr) { return pr ? "از حکم به عقب: حکم از چه چیزی نتیجه می‌شد — و آن از چه؟ تا به فرض برسی." : Q_BACKW; }],
+      [/داده[ٔ‌\s]*(?:ها|های|ی)?\s*دیگر/, function () { return "از داده‌ها چیزی سودمند بیرون می‌کشی؟ داده‌های دیگری به ذهنت می‌رسد که برای یافتنِ مجهول مناسب باشد؟"; }]],
+    c: [[/شکلِ?\s*دیگری\s*بیان/, function () { return Q_RESTATE_C; }], [/داده[ٔ‌\s]*(?:ها|های|ی)?\s*دیگر/, function () { return Q_MORE; }]]
+  };
+  function withCore(q, ph, ty) {
+    var C = CORE[ph]; if (!C) return q; var pr = ty === "prove" || ty === "pod", o = q.slice();
+    C.forEach(function (c) { if (!o.some(function (x) { return c[0].test(x); })) o.push(c[1](pr)); });
+    return o;
+  }
+  /* برای مربیِ گفت‌وگو (مسئلهٔ فقط‌درگفت‌وگو): ردهٔ مربی ⇒ فهرستِ همین‌جا. «pract» (تصمیم/کارِ واقعی) همان فهرستِ «عملی» است (رفتارِ پیشین)؛
+     ردهٔ دیگر ⇒ فهرستِ خودِ مربی با هستهٔ پولیا تکمیل‌شده (fallback = همان فهرستِ مربی) */
+  A.liveKindQs = function (cls, ph, fallback) {
+    var K = cls === "pract" || cls === "practical" ? LIVE_QK.practical : cls === "life" ? LIVE_QK.life : null;
+    if (K && K[ph]) return K[ph].slice();
+    return withCore((fallback || []).slice(), ph, cls === "prove" ? "prove" : "find");
+  };
   function kindQs(r, s, ph) {
-    var nat = natOf(s, r), CQ = A.ASSIST && typeof A.ASSIST.coachQs === "function" ? A.ASSIST.coachQs : null;
-    if (!natSet(s, r) || nat === "objective" || !CQ) return null;
-    var q = []; try { q = CQ(ph, "pract") || []; } catch (e) { q = []; }
-    if (!q.length) return null;
-    return nat === "practical" ? q.slice() : q.filter(function (x) { return !PRAC_ONLY.test(x); }).concat(ph === "p" ? [LIFE_P_ALL] : []);
+    var nat = natOf(s, r);
+    if (!natSet(s, r) || nat === "objective" || !LIVE_QK[nat] || !LIVE_QK[nat][ph]) return null;
+    return LIVE_QK[nat][ph].slice();
   }
   function phaseQs(r, s, ph) {
     var TQ = (A.ASSIST && A.ASSIST.tutorQuestions) || {}, nat = natOf(s, r), ty = typeOf(r, s), L = live(s);
     if (ph === "u" || ph === "p") { var kq = kindQs(r, s, ph); if (kq) return kq; }
     if (ph === "u") return ((TQ.und && TQ.und.qs) || (A.solveAskList ? A.solveAskList("u", 1, ty) : [])).slice();
-    if (ph === "p") return A.solveAskList ? A.solveAskList("p", 1, ty) : [];
+    if (ph === "p") return withCore(A.solveAskList ? A.solveAskList("p", 1, ty) : [], "p", ty);
     if (ph === "c") {
-      if (nat !== "objective") return EXEC_LIFE.concat(usesAnalogy(s) ? [Q_ANALIM] : []);
-      var q = EXEC_OBJ.slice(), all = [r.p.statement, (uOf(s) || {}).u, L.plan && L.plan.t].concat(L.steps.map(function (x) { return x.text + " " + (x.proof || ""); })).join(" ");
+      if (nat !== "objective") return (kindQs(r, s, "c") || EXEC_LIFE.slice()).concat(usesAnalogy(s) ? [Q_ANALIM] : []);
+      var q = withCore(EXEC_OBJ.slice(), "c", ty), all = [r.p.statement, (uOf(s) || {}).u, L.plan && L.plan.t].concat(L.steps.map(function (x) { return x.text + " " + (x.proof || ""); })).join(" ");
       if (IND_RE.test(norm(all))) q.splice(2, 0, Q_BASE);
       if (TRANSF_RE.test(norm(all))) q.push(Q_EQUIV);
       if (usesAnalogy(s)) q.push(Q_ANALIM);
@@ -42751,7 +42819,7 @@ APP.goFromURL = function (q) {
       if (b.use && A.newCard) { var cd = A.newCard("در مسئلهٔ «" + r.p.title + "» چه درسی گرفتی و کجای دیگر به کارش می‌بری؟ (بی‌نگاه)", b.use + (b.newProb ? "\nمسئلهٔ تازه‌ای که ساختی: " + b.newProb : "") + (b.worked ? "\nچه خوب کار کرد: " + b.worked : ""), { pb: pid, due: A.addDays(A.today(), 1) }); les.card = cd && cd.id; }
       if (b.use) s.lessons.push(les);
       /* «مسئلهٔ تازه‌ای که خودت ساختی» ⇒ مسئلهٔ حل‌نشدهٔ تازه، خفته تا پلهٔ دومِ نردبان؛ داور، نوع و فضایی بودن را از همین مسئله ارث می‌برد (R2) */
-      if (b.newProb) { var nr = create(clip(b.newProb, 80), b.newProb, typeOf(r, s), { origin: { type: "lprob", id: pid, share: b.newShare || "" }, dormant: A.addDays(A.today(), LADDER[1]) }); b.newPid = nr.p.id; L.made = (L.made || []).concat([nr.p.id]); }
+      if (b.newProb) { var nr = create(clip(b.newProb, 80), b.newProb, "", { origin: { type: "lprob", id: pid, share: b.newShare || "" }, dormant: A.addDays(A.today(), LADDER[1]) }); b.newPid = nr.p.id; L.made = (L.made || []).concat([nr.p.id]); }
       if (ab) {
         var w = s.will = s.will || {}; w.steps = w.steps || []; w.log = w.log || [];
         var riv = U.nextIv(LADDER[0], true);
@@ -42958,7 +43026,7 @@ APP.goFromURL = function (q) {
       var gg = so.g && so.g[1], refT = gg && gg.guess && (gg.hit === "نادرست بود" || guessCons(so).no) ? gg.guess : "";
       var pv = provOf(ph === "u" ? "u" : ph === "p" ? "p" : ph === "c" ? (nat === "objective" ? "cobj" : "c") : "b"), rt = ph === "p" && Q.length ? roteState(pg, so, Q) : null;
       var cu = condUsed(so).filter(function (x) { return !x.used; });
-      return ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + PHN[ph] + " · داور: " + (ki.set ? NAT[nat].fa.split(" — ")[0] : "هنوز انتخاب نشده") + (ki.type !== "find" ? " · نوع: " + (ki.type === "prove" ? "اثباتی" : "اثبات یا رد کن") : "") + (ki.spatial ? " · فضایی" : "") + " · وضع: " + cl.label,
+      return ["# مسئلهٔ زندهٔ این سشن (" + pid + "): «" + clip(r.p.title, 80) + "» · مرحله: " + PHN[ph] + " · داور: " + (ki.set ? NAT[nat].fa.split(" — ")[0] : "هنوز انتخاب نشده") + (ki.type !== "find" ? " · نوع: " + (nat !== "objective" ? "فرضیه — درست یا نادرست؟ (داور واقعیت است، نه برهان)" : ki.type === "prove" ? "اثباتی" : "اثبات یا رد کن") : "") + (ki.spatial ? " · فضایی" : "") + " · وضع: " + cl.label,
         /* D4: داورِ انتخاب‌نشده ⇒ قابِ خنثی (اول نوع را بپرس)، نه قابِ «زندگی — هیچ‌کس نمی‌داند» */
         !ki.set ? "- داورِ این مسئله هنوز انتخاب نشده: پیش از هر پرسشِ دیگر بپرس پاسخش عینی است (ریاضی، اثبات، معما)، مسئلهٔ عملی با کمیت است (خرید، ساخت، پول، زمانِ خودش)، یا تصمیم/پرسشِ زندگی — قابِ همهٔ پرسش‌های بعد از همین می‌آید. تا آن وقت نه حلش کن، نه دربارهٔ درستیِ چیزی داوری کن؛ فیلدهای صفحه را پر نکن (data-own)."
           : nat === "objective" ? "- این مسئله پاسخِ عینی دارد (ریاضی، اثبات، معما) ولی کاربر هنوز حلش نکرده: پاسخ یا راه را لو نده و گامی را جای او برندار. هر گامش را با «روشن می‌بینی که این گام درست است؟ می‌توانی ثابت کنی؟» بسنجد؛ اگر گامی نادرست است، با پرسشی که او را به دیدنش برساند کمک کن، نه با گفتنِ جواب. فیلدهای صفحه را پر نکن (data-own)."
@@ -42969,7 +43037,8 @@ APP.goFromURL = function (q) {
         Q.length && qNow ? "- در این نوبت فقط **یک** پرسش، از همین فهرست و از کلی به خاص (پلهٔ " + fa((co.rung || 0) + 1) + " از " + fa(Q.length) + "؛ پرسش‌هایی که پرسیده یا پاسخ گرفته‌ای دوباره نه)؛ پرسشِ پیشنهادیِ این نوبت: «" + qNow + "». اگر با وضعِ همین لحظه نمی‌خواند، پرسشِ بعدیِ همین فهرست." : "",
         Q.length && co.ladderEnd ? "- نردبانِ پرسش‌های این مرحله تمام شد: اگر نردبان تمام شد: ایدهٔ کلیدی را جدا کن و فقط گامِ بعد را بگو، سپس «کتاب را ببند و خودت دوباره حل کن»." : "",
         refT ? "- حدسی که خودش با آزمون رد کرد: «" + clip(refT, 100) + "» — آن را دوباره پیشنهاد نکن؛ بپرس از ردش چه آموخت و کدام فرضِ پنهان شکست." : "",
-        Q.length > 1 ? "- پرسش‌های همین مرحله (برای همین نوعِ مسئله): " + Q.slice(0, 7).map(function (x) { return "«" + clip(x, 90) + "»"; }).join(" · ") : "",
+        /* E3/E8 (دورِ ۴، s11/s25): فهرست کامل و هر پرسش کامل — پرسشِ پیشنهادیِ هشتم یا پرسشِ بلندِ استقرا دیگر بریده نمی‌شود */
+        Q.length > 1 ? "- پرسش‌های همین مرحله (برای همین نوعِ مسئله): " + Q.map(function (x) { return "«" + x + "»"; }).join(" · ") : "",
         pv ? "- حکمتِ ضرب‌المثل‌ها برای همین مرحله (فقط اگر به کار آمد، همراهِ پرسشی که پشتیبانی می‌کند؛ قاعدهٔ قطعی نیست): «" + pv.t + "» ⇐ «" + pv.q + "»" : "",
         un.length && ph !== "u" ? "- داده‌هایی که هنوز در کارِ حل نیامده‌اند (اگر به کار آمد، یکی را با نامش بپرس: «از … استفاده کردی؟»؛ نام بردنش در گفت‌وگو به کار بردن نیست): " + un.map(function (d) { return "«" + clip(d.t, 50) + "»"; }).join("، ") : "",
         cu.length && (ph === "c" || ph === "b") && nat === "objective" ? "- بخش‌هایی از شرط که هنوز در هیچ گامی نیامده‌اند: " + cu.map(function (x) { return "«" + clip(x.t, 50) + "»"; }).join("، ") : "",

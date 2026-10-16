@@ -116,7 +116,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     /* ===== C) طرح ===== */
     // تورِ پولیا دورِ ۳ (A11): پرسش‌های طرح نوع‌دارند — همان فهرستِ A.livePhaseQs (تصمیمِ زندگی ⇒ فهرستِ زندگی، نه «قضیه‌ای…؟» ِ ریاضی)
     const Q = await p.evaluate(pid => APP.livePhaseQs(pid, 'p'), P1);
-    chk(Q.length > 2 && !Q.some(q => /قضیه|عنصرِ کمکی/.test(q)), 'A11: a life decision gets the life plan list, not the math list ' + JSON.stringify(Q));
+    // E3 (دورِ ۴): «عنصرِ کمکی» در فهرستِ هر داور هست (بازنویسیِ کامل، نه زیرمجموعه) — «قضیه‌ای…؟» ِ ریاضی نه
+    chk(Q.length > 2 && !Q.some(q => /قضیه/.test(q)), 'A11: a life decision gets the life plan list, not the math list ' + JSON.stringify(Q));
     await ownCheck('main .lp-ask', 'ask-now card');
     info.ask0 = await p.evaluate(() => ({ q: document.querySelector('main .lp-ask .lp-q').textContent, why: /چرا این پرسش/.test(document.querySelector('main .lp-ask').textContent), one: document.querySelectorAll('main .lp-ask').length }));
     chk(info.ask0.one === 1 && info.ask0.q.indexOf(Q[0]) >= 0 && info.ask0.why, 'one question at a time, first (most general) from PLAN_QS, with «چرا این پرسش» ' + JSON.stringify(info.ask0));

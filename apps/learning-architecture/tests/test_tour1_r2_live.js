@@ -211,9 +211,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(/اثبات شد/.test(await txt('main .lp-lbsum')) && !/هرگز یقین/.test(await txt('main .lp-lbsum')), 'R5: after a full proof the page says «اثبات شد»');
     // ارث: مسئلهٔ تازه داور و فضایی بودن و نوع را از پدر می‌گیرد
     info.child = await p.evaluate(pid => { const r = APP.S.all('eprob', x => x.live && x.origin && x.origin.id === pid)[0]; return r && { nat: r.p.nat, by: r.p.natBy, sp: r.p.spatial, kind: r.p.kind, k: APP.liveKind(r.p.id) }; }, P1);
-    chk(info.child && info.child.nat === 'objective' && info.child.sp === true && info.child.kind === 'prove' && info.child.k === 'objective', 'R2: the look-back child inherits kind, judge and spatial flag ' + JSON.stringify(info.child));
+    chk(info.child && info.child.nat === 'objective' && info.child.sp === true && info.child.kind === 'find' && info.child.k === 'objective', 'R2: the look-back child inherits judge and spatial flag; its TYPE is its own (E2, round 4: «… کمترین شمار؟» ⇒ find, not the parent\'s prove) ' + JSON.stringify(info.child));
     info.chat = await p.evaluate(pid => { const r = APP.liveCreate('', 'یک مسئلهٔ تازهٔ ساختهٔ گفت‌وگو دربارهٔ لانه‌ها و کبوترها', '', { origin: { type: 'lprob', id: pid } }); return { nat: r.p.nat, sp: r.p.spatial, kind: r.p.kind }; }, P1);
-    chk(info.chat.nat === 'objective' && info.chat.sp === true && info.chat.kind === 'prove', 'R2: a problem made in chat from a live problem (origin lprob) inherits too ' + JSON.stringify(info.chat));
+    chk(info.chat.nat === 'objective' && info.chat.sp === true && info.chat.kind === 'find', 'R2: a problem made in chat from a live problem (origin lprob) inherits judge/spatial; type its own (E2) ' + JSON.stringify(info.chat));
 
     /* ===================== R5 — مسئلهٔ کمکی ≠ اصلی؛ ادعای ۱۰۰٪ ===================== */
     const P2 = await mk({ title: 'باغچه', st: 'برای باغچهٔ ۱۲ متری چند کیسه کود بخرم که بس باشد؟', nat: 'practical' });
