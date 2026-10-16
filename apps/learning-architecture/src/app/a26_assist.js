@@ -311,6 +311,10 @@
     topic: function (a) { var r = S.get(a); return r && r.type === "topic" && !r.sample ? { rid: r.id, group: "موضوع‌ها", title: r.title || "موضوع" } : null; },
     e_prob: function (a) { var r = S.get("eprob_" + a); return r && r.p && r.status !== "rejected" ? { rid: r.id, group: "مسئله‌های من", title: r.p.title || "مسئله" } : null; }
   };
+  /* تورِ پولیا دورِ ۲ (rerunC): صفحهٔ «🔭» همان رکوردِ مسئله است؛ و مسئلهٔ زنده‌ای که سشن به آن بسته است، پروندهٔ پیش‌فرضِ پیوست‌های همان سشن */
+  REC_VIEWS.lprob = REC_VIEWS.e_prob;
+  function boundRec(s) { try { var pid = s && s.lprob, r = pid && A.liveRec && A.liveRec(pid); var o = r ? REC_VIEWS.e_prob(pid) : null; if (o) o.pid = pid; return o; } catch (e) { return null; } }
+  AS.boundRec = boundRec;
   function viewRec() { var f = REC_VIEWS[A.state.view]; try { return f && A.state.arg != null ? f(A.state.arg) : null; } catch (e) { return null; } }
   AS.viewRec = viewRec;
   function fsig(f) { return String(f.name || "") + "|" + (f.size || 0); }
@@ -320,7 +324,7 @@
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var clicked = { n: 0, changed: false };
   AS.run = function (actions) {
-    var notes = [], moved = false, stale = false, chain = Promise.resolve(), skipped = 0, toasts = [];
+    var notes = [], infos = [], moved = false, stale = false, chain = Promise.resolve(), skipped = 0, toasts = [];
     clicked = { n: 0, changed: false };
     // پیامی که صفحه پس از کارهای دستیار نشان داد (مثلاً «اول خودارزیابی را بزن») به خودِ دستیار هم می‌رسد — وگرنه حدس می‌زد
     var rawToast = A.toast;
@@ -336,6 +340,9 @@
         // امضای فیلدها: کلیکی که «حالت» را عوض کرد (مثلاً مسیرِ سریعِ موقعیت) با همان شمارِ فیلد ولی فیلدهای دیگر هم «رفتن» است (کارزارِ سوم v06)
         var fsig = function () { return Array.prototype.map.call(document.querySelectorAll("#main input,#main textarea,#main select"), function (x) { return x.tagName + ":" + (x.id || x.name || x.getAttribute("aria-label") || x.placeholder || ""); }).join("|"); }, g0 = a.do === "click" || a.do === "fill" ? fsig() : "";
         var r = ""; try { r = DO[a.do](a); } catch (e) { r = e.message; }
+        /* تورِ پولیا دورِ ۲ (rerunB s20): یادداشتِ آگاهی‌دهنده («✓ …»/«ℹ …» یا {info}) شکست نیست — در گفت‌وگو تأیید می‌شود و نوبتِ «انجام نشد» نمی‌سازد */
+        if (r && typeof r === "object") { if (r.info) infos.push(String(r.info)); r = r.note ? String(r.note) : ""; }
+        else if (r && /^[✓ℹ]/.test(String(r))) { infos.push(String(r)); r = ""; }
         if (r) notes.push(r);
         // پرکردنی که فیلدِ شرطیِ تازه آورد (مثلاً «تبیینِ رقیبِ بیرونی»): کلیدهای قدیمی با برچسب/ترتیب هنوز درست می‌نشینند (آزمونِ ۳)،
         // ولی فیلدِ تازه را مدل ندیده ⇒ «فرم تغییر کرد» تا نوبتِ خودکارِ بعد آن را ببیند و پیش از تأیید پر/هایلایت کند (کارزارِ آزمون sc04)
@@ -355,7 +362,8 @@
       // یادداشتِ تکراری یک بار با شمار (کارزارِ آزمونِ دوم c18: «این را خودت پر کن» ۹ بار)
       var cnt = {}, uniq = []; notes.forEach(function (n) { if (cnt[n]) cnt[n]++; else { cnt[n] = 1; uniq.push(n); } });
       notes = uniq.map(function (n) { return cnt[n] > 1 ? n + " (×" + A.fa(cnt[n]) + ")" : n; });
-      return { notes: notes, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
+      var ci = {}; infos = infos.filter(function (n) { if (ci[n]) return false; ci[n] = 1; return true; });
+      return { notes: notes, infos: infos, moved: moved, skipped: skipped, changed: clicked.changed, clicks: clicked.n, toasts: toasts };
     });
   };
 
@@ -429,7 +437,7 @@
   }
   function csvNodes(m) {
     if (!m || !m.csv || !m.csv.length || !A.MIND || typeof A.MIND.csvBlock !== "function") return null;
-    return h("div", { class: "as-csv" }, m.csv.map(function (c) { try { return A.MIND.csvBlock(c.name, String(c.text || "")); } catch (e) { return null; } }));
+    return h("div", { class: "as-csv", dir: "rtl", style: { color: "var(--ink)", background: "var(--surface)", borderRadius: "8px", padding: "4px", marginTop: "6px" } }, m.csv.map(function (c) { try { return A.MIND.csvBlock(c.name, String(c.text || "")); } catch (e) { return null; } }));
   }
   AS.csvNodes = csvNodes;
   /* تاریخچه: هرچه از گفت‌وگو در بودجه جا شود، کامل (تازه‌ترین‌ها اول انتخاب و به ترتیبِ زمان چیده می‌شوند)؛
@@ -659,9 +667,11 @@
             blobs[r.id] = f; m.files.push(info); s.files.push(info); aiIds.push(r.id); noteSent(s, s.id, sig);
           }, function (e) { m.files.push({ name: f.name, mime: f.type || "", err: true }); A.toast("«" + f.name + "» به درایو نرفت: " + errText(e), "bad"); });
         return toSess.then(function () {
-          var rc = s.rec && S.get(s.rec.rid) ? s.rec : null;
+          var rc = s.rec && S.get(s.rec.rid) ? s.rec : boundRec(s);
           if (!rc || sentTo(s, rc.rid, sig)) return;
-          return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function () { noteSent(s, rc.rid, sig); toRec.push(f.name); },
+          return A.HOST.upload(rc.rid, f, { group: rc.group, title: rc.title }).then(function (up) { noteSent(s, rc.rid, sig); toRec.push(f.name);
+              // پیوندِ پیوست به مسئلهٔ زندهٔ بسته‌شده به سشن — با تابعِ خودِ بخشِ مسئله اگر صادر شده باشد (نام‌های نامزد؛ بی آن فقط پوشهٔ همان رکورد)
+              if (rc.pid) { m.lprob = rc.pid; var lf = A.liveAttach || A.liveLinkFile || A.liveAddFile; if (typeof lf === "function") try { lf(rc.pid, { id: (up && up.id) || "", name: f.name, mime: f.type || "", sess: s.id, at: now() }); } catch (e) { } } },
             function (e) { A.toast("«" + f.name + "» به پروندهٔ «" + rc.title + "» نرفت: " + errText(e), "bad"); });
         });
       });
@@ -718,6 +728,7 @@
         }
         return gap.then(function () { return AS.run(acts); }).then(function (res) {
           if (AS.tourAfterTurn) { try { AS.tourAfterTurn(s); S.put(s); paint(); } catch (e) { console.error(e); } }
+          if ((res.infos || []).length) { s.msgs.push({ role: "sys", at: now(), text: res.infos.join(" · ") }); S.put(s); paint(); }
           if (res.notes.length) { s.msgs.push({ role: "sys", at: now(), text: res.notes.join(" · ") }); S.put(s); paint(); }
           // پنجره‌ای (تأییدِ فرستادن به هوش مصنوعی، پرسشِ ایمنی، …) باز شد: تصمیمِ خودِ کاربر است — دستیار کنار می‌رود و صریح می‌گوید
           var ov = Array.prototype.slice.call(document.querySelectorAll(".overlay, [role=dialog][aria-modal=true]")).filter(function (x) { return !x.closest(".as-root") && x.getClientRects().length > 0; })[0];
@@ -783,7 +794,8 @@
     else try { if (text && A.knotSafetyHit && A.knotSafetyHit(text)) { s.safetySeq = m.seq; safe = "\n[سامانه: نشانهٔ پریشانیِ جدی در پیامِ کاربر. اول همدلی و راهِ کمکِ انسانی؛ کاری را تحمیل نکن.]"; s.safetyAt = now(); s.msgs.push({ role: "sys", at: now(), text: "🤝 " + (A.KHELP || "اگر حالت خوب نیست، همین حالا با یک نفرِ مورد اعتماد یا یک متخصص حرف بزن.") }); } } catch (e) { }
     return ups.then(function () {
       if (dupes.length) s.msgs.push({ role: "sys", at: now(), text: "♻ «" + dupes.join("»، «") + "» پیش‌تر در همین سشن فرستاده شده بود؛ دوباره بارگذاری نشد (همان پیوست به کار رفت)." });
-      if (toRec.length && s.rec) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به پروندهٔ جاریِ این سشن («" + clip(s.rec.title, 60) + "») هم پیوست شد." });
+      var rcN = s.rec && S.get(s.rec.rid) ? s.rec : boundRec(s);
+      if (toRec.length && rcN) s.msgs.push({ role: "sys", at: now(), text: "📎 «" + toRec.join("»، «") + "» به " + (rcN.pid ? "مسئلهٔ زندهٔ این سشن" : "پروندهٔ جاریِ این سشن") + " («" + clip(rcN.title, 60) + "») هم پیوست شد." });
       S.put(s); return turn(text || "(فقط فایل فرستادم)", (texts.length ? "\n# متنِ فایل‌ها\n" + texts.join("\n\n") : "") + safe, aiIds, true); })
       .catch(function (e) {
         var fl = e && e.files && e.files.length ? " " + manifestNote(e.files) : "";
@@ -943,13 +955,15 @@
   }
   /* فرمول و عبارتِ لاتین درونِ جملهٔ فارسی (تورِ پولیا s18: «dV/dt = (πy²/9)·dy/dt» در حبابِ راست‌به‌چپ جابه‌جا خوانده می‌شد):
      هر دنبالهٔ پیوستهٔ نشانه‌های لاتین/عدد/عملگر (با فاصله‌های میانش) جدا در <bdi dir="ltr"> می‌نشیند؛ نشانه‌گذاریِ فارسیِ دو سرش بیرون می‌ماند */
-  var RTL_CH = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9π√∑∞=+\-−×÷·\/^<>≤≥²³()\[\]]/;
+  /* تورِ پولیا دورِ ۲ (rerunB s18): پیکان‌ها (→ ⇒ ←)، ≈ ≠ ± ∈، توان‌ها و درصد هم عملگرند — «y→0» و «cm³/s ÷ cm² = cm/s» یک تکهٔ چپ‌به‌راست‌اند */
+  var RTL_CH = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/, LTR_TOK = /[A-Za-z0-9π√∑∞=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ()\[\]→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/,
+    LTR_OP = /[=+\-−×÷·\/^<>≤≥²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ√∑π→←↔⇒⇐⇔≈≠±∈∉⊂∪∩%*|′_]/;
   function bidiNodes(t) {
     var parts = String(t == null ? "" : t).split(/(\s+)/), out = [], buf = "", run = [];
     function flush() {
       if (!run.length) return; var tx = run.join(""); run = [];
       var lead = (tx.match(/^[«"'“]+/) || [""])[0], trail = (tx.match(/[.,،:؛!?؟»"'”…]+$/) || [""])[0], core = tx.slice(lead.length, tx.length - trail.length);
-      if (core && /[A-Za-z0-9]/.test(core) && (/[=+\-−×÷·\/^<>≤≥²³√∑π]/.test(core) || /\s/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr" }, core)); }
+      if (core && /[A-Za-z0-9]/.test(core) && (LTR_OP.test(core) || /\s/.test(core))) { out.push(buf + lead); buf = trail; out.push(h("bdi", { dir: "ltr", class: "as-ltr", style: "unicode-bidi:isolate;direction:ltr" }, core)); }
       else buf += tx;
     }
     parts.forEach(function (p) {

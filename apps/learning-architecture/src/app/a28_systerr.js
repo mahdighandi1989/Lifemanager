@@ -121,7 +121,9 @@
   /* «# دانسته‌های قلمرو»: حوزه‌های مرتبط با پیام (از هر شش سامانه و قلمروِ معرفت‌شناسی) با گزاره‌ها و رده‌شان — دستیار یافتهٔ
      تثبیت‌شده را از همین‌جا می‌گوید، نه از حافظهٔ خودش، و «حکم نمی‌کنم» را با «یافته چیست» اشتباه نمی‌گیرد (کارزارِ آزمون) */
   var STOP = /^(که|را|از|به|با|در|این|آن|برای|است|هست|نیست|می|من|تو|یه|یک|هم|اگر|چرا|چه|چطور|کنم|کنی|کند|بود|شد|شده|دارم|داره|دیگه|خیلی|همه|ولی|اما|تا|رو|اون|این‌ها|باید)$/;
-  function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return w.replace(/(ها|های|هایی|ی|ام|ات|اش)$/, ""); }); }
+  function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return stem(w); }).filter(function (w) { return w.length >= 2; }); }
+  /* ریخت‌شناسیِ کوچک (تورِ پولیا دورِ ۲، R6): پسوندهای جمع/ضمیر/«ای» برداشته می‌شوند؛ «ـه» برداشته نمی‌شود («مقابله» ≠ «مقابل») و تطبیقِ پیشوندی نیست */
+  function stem(w) { var o = w.replace(/(?:هایی|های|ها|ای|ی|ام|ات|اش)$/, ""); return o.length >= 2 ? o : w; }
   /* ربطِ واقعی، نه هم‌واژگیِ تصادفی (تورِ پولیا s11/s13/s16/s32: «مسئله» ⇐ «مثالِ حل‌شده»، «رشد» ⇐ «رشد پس از سختی»): حوزه فقط وقتی می‌آید که
      دست‌کم **دو** واژهٔ معنادارِ متفاوتِ پیام در آن باشد و یکی‌شان در نامِ حوزه (یا سه واژه در هر جای آن)، یا نامِ کاملِ حوزه در پیام آمده باشد
      (پیوندِ صریح؛ know ِ مدل هم صریح است). «معنادار» = نه واژهٔ ایست، و نه واژه‌ای که در بیش از یک‌شانزدهمِ حوزه‌ها هست — چنین واژه‌ای
@@ -142,12 +144,15 @@
     var q = toks(text).filter(meaningful); if (!q.length) return [];
     var qs = {}; q.forEach(function (w) { qs[w] = 1; });
     /* { hits: شمارِ واژه‌های متفاوتِ پیام که در متن آمده، title: چندتا در عنوان } */
-    function match(blob) { var seen = {}; toks(blob).forEach(function (w) { if (qs[w]) { seen[w] = 1; return; } if (w.length >= 5) Object.keys(qs).forEach(function (k) { if (k.length >= 5 && !seen[k] && (w.indexOf(k) === 0 || k.indexOf(w) === 0)) seen[k] = 1; }); }); return Object.keys(seen); }
+    /* فقط هم‌ریشهٔ دقیق پس از ریخت‌شناسی — بی تطبیقِ پیشوندی («مقابل»~«مقابله»، «رشد»~«رشد پس از سختی» نه؛ rerunB/C/D) */
+    function match(blob) { var seen = {}; toks(blob).forEach(function (w) { if (qs[w]) seen[w] = 1; }); return Object.keys(seen); }
     var out = [];
     function consider(a, rest) {
       var tw = match(a.fa + " " + (a.en || "")), all = match(areaBlob(a, rest.epi)), uniq = {}; tw.concat(all).forEach(function (w) { uniq[w] = 1; });
       var hits = Object.keys(uniq).length, ft = toks(a.fa), named = ft.length && ft.every(function (w) { return allq[w]; });
-      if (!named && !(hits >= SYS.relatedMin && (tw.length || hits > SYS.relatedMin))) return;
+      /* نامِ چندواژه‌ای که فقط **بخشی** از آن در پیام است («رشد» از «رشد پس از سختی») شاهدِ نام نیست — همان حالتِ «سه واژه در هر جای حوزه» */
+      var fd = ft.filter(meaningful), partial = tw.length && fd.length > 1 && tw.length < fd.length;
+      if (!named && !(hits >= SYS.relatedMin && ((tw.length && !partial) || hits > SYS.relatedMin))) return;
       out.push(Object.assign({ sc: hits + tw.length + (rest.epi ? 0 : 0.5), hits: hits, words: Object.keys(uniq), a: a }, rest));
     }
     SYS.areas().forEach(function (x) { consider(x.a, { sys: x.sys, epi: false }); });
@@ -163,7 +168,11 @@
     return hit;
   };
   SYS.knowledge = function (s, msg) {
-    var want = ((s && s.know) || []).map(SYS.byId).filter(Boolean);
+    /* پیوندِ صریح (R6): know ِ مدل، حوزهٔ وجه‌های تور، و حوزه‌ای که مسئلهٔ زندهٔ همین سشن به آن وصل است */
+    var ids = ((s && s.know) || []).slice();
+    ((s && s.tour && s.tour.facets) || []).forEach(function (f) { if (f.area && f.status !== "skipped" && ids.indexOf(f.area) < 0) ids.push(f.area); });
+    try { var lr = s && s.lprob && A.liveRec && A.liveRec(s.lprob); [].concat((lr && (lr.areas || lr.p.areas || (lr.area ? [lr.area] : []))) || []).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); } catch (e) { }
+    var want = ids.map(SYS.byId).filter(Boolean);
     var rel = want.concat(SYS.related((msg || "") + " " + ((s && s.pinned) || ""), 3).filter(function (r) { return !want.some(function (w) { return w.a.id === r.a.id; }); })).slice(0, 6);
     if (!rel.length) return "";
     var L = ["# دانسته‌های قلمرو (حوزه‌های مرتبط با همین پیام — از نقشه‌ها، نه از حافظهٔ مدل؛ هر کدام دست‌کم دو واژهٔ معنادارِ مشترک با پیام یا خواستهٔ خودِ تو دارد)",

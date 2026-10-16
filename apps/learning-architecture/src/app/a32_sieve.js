@@ -101,6 +101,8 @@
       if (prev && prev.st === "found" && st === "no") { (prev.hist = prev.hist || []).push({ st: prev.st, why: prev.why, at: prev.at }); }
       // ایمنی: «رد شد» ِ مدل فقط با انکارِ صریحِ خودِ کاربر پس از نشانه و نقلِ عینیِ آن در why؛ وگرنه «باید پرسید» (بازبینیِ متقابلِ ۲۰۲۶-۱۰-۱۵)
       if (L.id === "safety" && st === "no" && s.safetyAt && !AS.safetyClearMsg(s, { st: "no", why: why, at: nowIso(), seq: s.seq })) { st = "ask"; safetyHeld = true; }
+      /* گره‌ای (یکی از ۱۲ خانواده) که در میانهٔ حلِ مسئله پیدا شد ⇒ رویدادِ ناموفقِ همان مرحله در «🧩 چهار مرحلهٔ حل» (R7) — فقط بارِ نخست */
+      if (st === "found" && !(prev && prev.st === "found") && /^F\d+$/.test(L.id) && AS.coachEvent) { var cph = (AS.boundLive && AS.boundLive(s) && !AS.boundLive(s).done && A.livePhase) ? A.livePhase(s.lprob) : (s.coach && s.coach.ph); if (cph && cph !== "done") try { AS.coachEvent(s, cph, "knot", L.id + ":" + why); } catch (e) { } }
       d[L.id] = { st: st, why: clip(why, 500), facet: x.facet ? String(x.facet).slice(0, 12) : (prev && prev.facet) || "", at: nowIso(), seq: s.seq, hist: prev && prev.hist };
       // قابِ مسئلهٔ عملی: جزءها انباشته می‌شوند (هر نوبت یکی؛ پاسخِ پیشین گم نمی‌شود)
       if (L.id === "practical") { var pp = (prev && prev.parts) || {}; if (x.parts && typeof x.parts === "object") PRACT.forEach(function (q) { var v = x.parts[q[0]]; if (typeof v === "string" && v.trim().length >= 2) pp[q[0]] = clip(v.trim(), 300); }); if (Object.keys(pp).length) d[L.id].parts = pp;
@@ -214,6 +216,14 @@
   /* قابِ مسئلهٔ عملی جلوی چشمِ مدل — فقط وقتی لایهٔ practical «پیدا شد» یا «باید پرسید» است (پرامپتِ سامانه دست نمی‌خورد) */
   AS.promptHooks.push(function (s) {
     var x = AS.sieveState(s).practical; if (!x || (x.st !== "found" && x.st !== "ask")) return "";
+    /* یک منبعِ پرسش (تورِ پولیا دورِ ۲، rerunC): وقتی سشن به مسئلهٔ زندهٔ باز بسته است، قابِ صفحهٔ همان مسئله (فهم، داده، شرط، کارتِ عملی) منبع است —
+       غربال فقط آنچه ثبت کرده را یادآوری می‌کند و پرسشِ جداگانه نمی‌پرسد؛ جزءی که صفحه پاسخ داده «هنوز نپرسیده» خوانده نمی‌شود */
+    var bl = AS.boundLive ? AS.boundLive(s) : null;
+    if (bl && !bl.done) {
+      var pp0 = x.parts || {}, had = PRACT.filter(function (q) { return pp0[q[0]]; });
+      return "# قابِ مسئلهٔ عملی (غربال — زیرِ قابِ صفحهٔ «" + clip(bl.r.p.title, 50) + "»)\n- منبعِ پرسشِ این نوبت «مسئلهٔ زندهٔ این سشن» است (همان پرسشِ هم‌گام با صفحه)؛ این‌جا پرسشِ جداگانه نپرس و جزءی را که صفحه یا گفت‌وگو پاسخ داده دوباره نپرس." +
+        (had.length ? "\n- آنچه از حرفِ خودش در غربال ثبت شده: " + had.map(function (q) { return q[1].split(/[:؟—]/)[0] + " «" + clip(pp0[q[0]], 80) + "»"; }).join("؛ ") : "");
+    }
     var pp = x.parts || {}, owed = PRACT.filter(function (q) { return !pp[q[0]] || (q[0] === "measure" && A.measurableCheck && !A.measurableCheck(pp.measure).ok); });   // ریاضی‌کردنِ ناسنجیدنی هنوز بدهکار است
     return "# قابِ مسئلهٔ عملی (لایهٔ «مسئلهٔ عملی»)\n" + PRACT.map(function (q) { return "- " + q[1] + " — " + (pp[q[0]] ? "«" + clip(pp[q[0]], 120) + "»" : "هنوز نپرسیده"); }).join("\n") +
       (owed.length ? "\nپیش از هر پیشنهادِ راه‌حل، **یکی** از مانده‌ها را بپرس (به همین ترتیب؛ بی پیشنهادِ جواب): «" + owed[0][1] + "». پاسخِ خودش را با {\"do\":\"tour_diag\",\"layers\":[{\"id\":\"practical\",\"st\":\"found\",\"why\":\"…\",\"parts\":{\"" + owed[0][0] + "\":\"همان جملهٔ خودش\"}}]} ثبت کن." : "\nقاب کامل است؛ حالا وجه‌ها را از همین قاب بساز.") +

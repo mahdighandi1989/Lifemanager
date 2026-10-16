@@ -162,14 +162,17 @@
       var x = (r.parts || [])[i]; if (!x || x.k !== "assumption") return "مثالِ نقض ثبت نشد: «i» باید شمارهٔ یک فرض (assumption) در «# ایدهٔ این سشن» باشد";
       var t = clip(a && a.t, 400); if (!t) return "مثالِ نقض ثبت نشد: «t» (عینِ حرفِ کاربر) لازم است";
       var as = r.parts.filter(function (y) { return y.k === "assumption"; });
-      if ((r.crits || []).some(function (c) { return c.t === t && +c.pi === i; })) return "";
-      var c = { t: t, target: String(as.indexOf(x)), pi: i, change: clip(a.change || "", 300), at: nowIso(), by: "assistant", counter: true };
-      (r.crits = r.crits || []).push(c);
+      /* تورِ پولیا دورِ ۲ (rerunB s20): همان مثالِ نقض دوباره با «nt» (فرضِ بازنویسی‌شده) می‌آید ⇒ نقدِ پیشین دوباره ثبت نمی‌شود ولی «nt» حتماً اعمال می‌شود
+         (پیش‌تر ضدِ تکرار پیش از nt برمی‌گشت و بازنویسیِ خودِ کاربر گم می‌شد). یادداشتِ آگاهی‌دهنده «✓ …» است، نه شکست (نوبتِ «انجام نشد» نمی‌سازد). */
+      var c = (r.crits || []).filter(function (c0) { return c0.t === t && +c0.pi === i; })[0], dup = !!c;
+      if (!c) { c = { t: t, target: String(as.indexOf(x)), pi: i, change: clip(a.change || "", 300), at: nowIso(), by: "assistant", counter: true }; (r.crits = r.crits || []).push(c); }
+      else if (a.change && !c.change) c.change = clip(a.change, 300);
       var nt = clip(a && a.nt, 300), note = "";
       if (nt && nt !== x.t) {
-        if (I.evFromUser(nt, s)) { (x.hist = x.hist || []).push({ t: x.t, at: nowIso(), why: "مثالِ نقض: " + clip(t, 120) }); x.t = nt; x.revAt = nowIso(); c.revised = true; }
+        if (I.evFromUser(nt, s)) { (x.hist = x.hist || []).push({ t: x.t, at: nowIso(), why: "مثالِ نقض: " + clip(t, 120) }); x.t = nt; x.revAt = nowIso(); c.revised = true; note = "✓ فرض به حرفِ خودت بازنویسی شد: «" + clip(nt, 80) + "» (مثالِ نقض روی آن ثبت است)"; }
         else note = "فرض را عوض نکردم: بازنویسیِ «" + clip(nt, 60) + "» در حرف‌های خودِ کاربر نبود — از او بپرس فرض با این مثالِ نقض چطور عوض می‌شود";
-      } else note = "مثالِ نقض روی فرضِ «" + clip(x.t, 50) + "» ثبت شد (زیرِ نقد)؛ از کاربر بپرس این فرض حالا چطور باید عوض شود";
+      } else if (nt && nt === x.t) note = dup ? "" : "✓ مثالِ نقض روی فرضِ «" + clip(x.t, 50) + "» ثبت شد";
+      else note = dup ? "" : "✓ مثالِ نقض روی فرضِ «" + clip(x.t, 50) + "» ثبت شد (زیرِ نقد) — از کاربر بپرس این فرض حالا چطور باید عوض شود";
       S.put(r); return note;
     };
     /* فرض ⇐ پروندهٔ سنجش در کارخانه (همان مسیرِ «ادعا ⇐ پرونده» ِ مسئلهٔ زنده: A.newCase) و پیوند — یک کلیک، درجه را موتورِ قطعی می‌دهد */

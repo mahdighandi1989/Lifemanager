@@ -863,7 +863,11 @@
     var x = x0.replace(/(?:سال|year)\s*\d{2,4}/gi, " ").replace(/\d{2,4}\s*[\/\-.]\s*\d{1,2}\s*[\/\-.]\s*\d{1,4}/g, " ");
     var num = /[0-9]/.test(x) || NUMWORD.test(x), rel = REL.test(x);
     var why = []; if (!num) why.push("عدد یا مقدار (با واحد) ندارد"); if (!rel) why.push("رابطه‌ای (مثلاً ≥ ، ≤ ، = یا «دست‌کم/بیشتر از») ندارد");
-    return { ok: num && rel, num: num, rel: rel, why: why };
+    /* وارسیِ ابعاد (پولیا: «با ابعاد وارسی کن»؛ تورِ ۱ دورِ ۲، rerunB s16): حاصل‌ضربِ چند عدد با **یک** واحدِ مشتق (لیتر، مکعب، مربع) در پایان —
+       «۲۰۰ × ۱۲۰ × ۱۰۰ لیتر» — واحدِ هر عامل را نمی‌گوید؛ ساختار است، نه آستانه: واحدِ هر عدد را بنویس و ببین دو سو یکی است */
+    var facs = (x.match(/\d+(?:[.,]\d+)?\s*(?:[×x*·]\s*\d+(?:[.,]\d+)?\s*)+/g) || [])[0], units = false;
+    if (facs && /لیتر|مکعب|مربع|liter|litre|m[²³]|cm[²³]/i.test(x) && !/(?:سانت|متر|cm|m)\s*[×x*·]/i.test(x)) { units = true; why.push("واحدها: واحدِ هر عدد را بنویس (مثلاً «۲۰۰ سانتی‌متر × …») و ببین حاصل همان واحدی است که نوشته‌ای (طول × طول × طول ⇒ حجم، نه خودبه‌خود لیتر)"); }
+    return { ok: num && rel && !units, num: num, rel: rel, units: units, why: why };
   };
   A.practicalFrameCheck = function (parts, keys) {
     parts = parts || {}; var missing = keys.filter(function (k) { return !pnorm(parts[k[0]]); }), seen = {}, dup = [];

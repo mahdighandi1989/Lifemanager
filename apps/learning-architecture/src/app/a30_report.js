@@ -49,6 +49,9 @@
   var rawRender = A.render;
   A.render = function () {
     rawRender.apply(this, arguments);
+    /* تورِ پولیا دورِ ۲ (rerunC s22/s26: پس از «✓ پایهٔ وجه برپا شد» ایمیلی نیامد): سقفِ «یک ایمیل در ۳ ساعت» (تصمیمِ پیشین) می‌ماند، ولی ایمیلِ
+       نقطهٔ عطف در صف گم نمی‌شود — زمان‌سنجِ setTimeout با بستنِ صفحه می‌میرد؛ پس هر رسمِ صفحه صفِ معنادار را وارسی می‌کند و پس از مهلت می‌فرستد */
+    try { var s0 = AS.cur(); if (s0 && s0.tour && (s0.tour.mailq || []).some(function (e) { return BIG.test(e.k); }) && !R._pend[s0.id] && !R._busy) R.flush(s0, true); } catch (e) { }
     try {
       var s = AS.cur(); if (!s || !s.tour || s.tour.masteredAt) return;
       var tr = s.trail = s.trail || [], v = A.state.view, key = v + "|" + (A.state.arg || "") + "|" + (A.state.sub || "");

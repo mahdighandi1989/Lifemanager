@@ -279,7 +279,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const AS = APP.ASSIST, S = APP.S, out = {};
     __q.push(R({ reply: 'بازنگری‌ات ثبت شد.', actions: [{ do: 'chat_solved', title: 'بیشینهٔ حاصل‌ضرب', statement: 'بیشترین حاصل‌ضربِ اعدادِ مثبتی که جمعشان ۱۰ است.', kind: 'find', lesson: 'تعدادِ اجزا هم مجهول بود؛ همه را بخوان', check: 'با ۳ و ۵ جزء امتحان کردم', newProb: 'اگر جمع S باشد تعدادِ بهینهٔ اجزا چطور به S بستگی دارد؟' }] }));
     await AS.send('حلش کردم: ۴ تا ۲٫۵؛ درسش اینه که تعداد هم مجهول بود');
-    const s = AS.cur(), pid = s.lprob, r = APP.liveRec(pid), pg = S.get('eprog_' + pid);
+    // دورِ ۲ (R1): سشنی که به مسئلهٔ بازِ دیگری بسته است بی‌صدا جابه‌جا نمی‌شود — مسئلهٔ حل‌شده را از رکوردها پیدا کن
+    const s = AS.cur(), pid = (APP.liveAll().filter(x => x.origin && x.origin.type === 'chat' && x.p.title === 'بیشینهٔ حاصل‌ضرب').pop() || { p: {} }).p.id, r = APP.liveRec(pid), pg = S.get('eprog_' + pid);
     out.rec = !!r && r.origin && r.origin.type === 'chat' && APP.livePhase(pid) === 'done';
     const card = S.all('card', c => c.src === 'chat:solved:' + pid)[0];
     out.card = !!card && card.due === APP.addDays(APP.today(), 1) && /بی‌نگاه/.test(card.q);
@@ -292,18 +293,21 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // بی درس ⇒ ثبت، ولی بازنگری از خودِ کاربر
     __calls.length = 0; __q.push(R({ reply: 'ثبت شد.', actions: [{ do: 'chat_solved', statement: 'کمترین مجموعِ اعدادِ صحیحی که حاصل‌ضربشان ۱۰۰ است.' }] }));
     await AS.send('این یکی هم حل شد');
-    const pid2 = AS.cur().lprob; out.noLessonPhase = APP.livePhase(pid2); out.noLessonNote = AS.cur().msgs.some(m => m.role === 'sys' && /بازنگری هنوز نیست/.test(m.text));
+    const pid2 = (APP.liveAll().filter(x => /حاصل‌ضربشان ۱۰۰/.test(x.p.statement)).pop() || { p: {} }).p.id; out.noLessonPhase = APP.livePhase(pid2); out.noLessonNote = AS.cur().msgs.some(m => m.role === 'sys' && /بازنگری هنوز نیست/.test(m.text));
     out.bad = AS.DO.chat_solved({ statement: 'کوتاه' }); out.badInv = AS.DO.chat_invent({ statement: '' });
     return out;
   });
   chk(info.chat.rec && info.chat.card && info.chat.inv && info.chat.notToday && info.chat.back, '11: a problem solved in chat becomes a live problem with its look-back, a next-day reconstruction card, and the invented problem returns on «امروز» ' + JSON.stringify(info.chat));
   chk(info.chat.noLessonPhase === 'b' && info.chat.noLessonNote && /statement/.test(info.chat.bad) && /statement/.test(info.chat.badInv), '11: without a lesson the page asks the look-back itself; empty statements are refused ' + JSON.stringify(info.chat));
   info.bind = await p.evaluate(() => {
-    const AS = APP.ASSIST, s = AS.cur(); const before = s.lprob;
-    const r = APP.liveCreate('از فرم', 'این مسئله را از فرمِ «🔭» ساختم، نه از دستیار.', 'find');
-    return { linked: AS.cur().lprob === r.p.id && before !== r.p.id };
+    const AS = APP.ASSIST; localStorage.removeItem('lla.assist.cur'); const s = AS.newSession(); s.msgs.push({ role: 'user', text: 'سلام', at: new Date().toISOString() }); APP.S.put(s);
+    const before = s.lprob;
+    const r = APP.liveCreate('از فرم', 'این مسئله را از فرمِ «🔭» ساختم، نه از دستیار.', 'find'); APP.liveBindSession(r.p.id);
+    // دورِ ۲ (R1): مسئلهٔ دومی که از فرم ساخته شد پیوندِ سشنِ بسته به مسئلهٔ باز را عوض نمی‌کند
+    const r2 = APP.liveCreate('دومی از فرم', 'مسئلهٔ دومی که از فرم ساختم و نباید پیوند را عوض کند.', 'find'); APP.liveBindSession(r2.p.id);
+    return { linked: AS.cur().lprob === r.p.id && before !== r.p.id, kept: AS.cur().lprob === r.p.id };
   });
-  chk(info.bind.linked, '11: a live problem created while a session is open binds to it (session ↔ problem) ' + JSON.stringify(info.bind));
+  chk(info.bind.linked && info.bind.kept, '11: a live problem created while a session is open binds to it (session ↔ problem); a second one does not rebind it ' + JSON.stringify(info.bind));
 
   // ---------- 12) ضرب‌المثلِ همان مرحله ----------
   info.prov = await p.evaluate(() => {

@@ -340,17 +340,21 @@
      برآورد = (k+1)/(n+2) (A3 + A4 «هیچ نسبتی مرجح نیست»)؛ «احتمالِ ضعیف‌ترین بودن» = P(p_این < p_سه‌تای دیگر) از پسین‌های بتا — بی آستانه؛
      بی‌داده هر چهار ½ و ¼ (نمی‌دانیم). خروجی برای تور/دستیار: A.MIND.phases(). */
   var PH4 = [["und", "u", "فهمِ مسئله"], ["plan", "p", "طرح‌ریزی"], ["exec", "c", "اجرای طرح"], ["back", "b", "بازنگری"]];
-  var PH_SRC = { ask: "پرسشِ همین لحظه / معلمِ حل (خودداوریِ «کمک کرد؟»)", sim: "شبیه‌ساز (درستیِ بار اولِ گام)", ucard: "کارتِ فهم (خودسنجی در برابرِ صورت)", live: "گام‌های واقعیِ مسئلهٔ زنده", lb: "بازنگری انجام و وارسی شد" };
+  var PH_SRC = { ask: "پرسشِ همین لحظه / معلمِ حل (خودداوریِ «کمک کرد؟»)", sim: "شبیه‌ساز (درستیِ بار اولِ گام)", ucard: "کارتِ فهم (خودسنجی در برابرِ صورت)", live: "گام‌های واقعیِ مسئلهٔ زنده", lb: "بازنگری انجام و وارسی شد",
+    chat: "گیر یا «حل نشد» ِ خودت در گفت‌وگو با مربی", knot: "گره‌ای که هنگامِ حل در غربال پیدا شد" };
   M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
   M.phases = function () {
     var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {} }; });
     var byPh = { u: "und", p: "plan", c: "exec", b: "back" };
     function add(tk, src, ok) { var X = R[tk]; if (!X) return; X.n++; if (ok) X.k++; var s = X.src[src] = X.src[src] || { k: 0, n: 0 }; s.n++; if (ok) s.k++; }
-    function tutOf(T) { if (!T) return; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; add(x[0], "ask", e.self === 2); }); }); }
+    /* تورِ پولیا دورِ ۲ (R7): بازگفتِ دستیار (e.by = assistant، متنی که در پیام‌های خودِ کاربر نیست) شاهدِ موفقیتِ او نیست */
+    function tutOf(T) { if (!T) return; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return; add(x[0], "ask", e.self === 2); }); }); }
     S.all("eprog").forEach(function (pg) { tutOf(pg.tut); });
     S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut); });
     S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut); });
-    S.all("achat").forEach(function (s) { tutOf(s.tut); });
+    S.all("achat").forEach(function (s) { tutOf(s.tut);
+      /* مربیِ گفت‌وگو (a27): گیر/«حل نشد» ِ خودِ کاربر و گره‌ای که در میانهٔ حل پیدا شد ⇒ ناموفق در همان مرحله */
+      (s.coachEv || []).forEach(function (e) { if (e && byPh[e.ph] && (e.src === "chat" || e.src === "knot")) add(byPh[e.ph], e.src, !!e.ok); }); });
     S.all("eprog").forEach(function (pg) {
       var pid = String(pg.id).replace(/^eprog_/, ""), p = A.getProb ? A.getProb(pid) : null, sv = pg.solve || {};
       if (p && Array.isArray(p.stages) && A.stagePhase) Object.keys(pg.lv || {}).forEach(function (lv) {
@@ -360,7 +364,8 @@
       var us = []; Object.keys(sv.u || {}).forEach(function (lv) { if (sv.u[lv]) us.push(sv.u[lv]); }); us = us.concat((sv.live && sv.live.uHist) || []);
       us.forEach(function (u) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2); });
       ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes"); });
-      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
+      /* بازنگری‌ای که دستیار از گفت‌وگو ثبت کرد (chat_solved) فقط وقتی شمرده می‌شود که درسش به قلمِ خودِ کاربر باشد (b.own) — R7 */
+      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own) return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
     });
     var P = A.PSY, G = 241, rows = PH4.map(function (x) { return R[x[0]]; });
     rows.forEach(function (X) { X.p = (X.k + 1) / (X.n + 2); });
@@ -425,15 +430,15 @@
     var s = svgBox(W, H, title || "نمودارِ CSV"), N = P0.n, COLS = ["#1d4ed8", "#b45309", "#0f766e", "#9333ea", "#be123c", "#4d7c0f"];
     function X(i) { return N > 1 ? x0 + (x1 - x0) * i / (N - 1) : (x0 + x1) / 2; }
     function Y(v) { return y0 - (y0 - y1) * (v - lo) / (hi - lo); }
-    [lo, (lo + hi) / 2, hi].forEach(function (v) { s.appendChild(el("line", { x1: x0, x2: x1, y1: Y(v), y2: Y(v), stroke: "#e5e7eb" })); s.appendChild(txt(x0 - 6, Y(v) + 4, fa(+v.toPrecision(4)), { "font-size": 9, "text-anchor": "end", direction: "ltr" })); });
+    [lo, (lo + hi) / 2, hi].forEach(function (v) { s.appendChild(el("line", { x1: x0, x2: x1, y1: Y(v), y2: Y(v), stroke: "#e5e7eb" })); s.appendChild(txt(x0 - 6, Y(v) + 4, fa(+v.toPrecision(4)), { "font-size": 11, "text-anchor": "end", direction: "ltr" })); });
     var step = Math.max(1, Math.ceil(N / 8));
-    for (var i = 0; i < N; i += step) s.appendChild(txt(X(i), H - 22, String(P0.label ? P0.label.raw[i] : fa(i + 1)).slice(0, 10), { "font-size": 9 }));
+    for (var i = 0; i < N; i += step) s.appendChild(txt(X(i), H - 22, String(P0.label ? P0.label.raw[i] : fa(i + 1)).slice(0, 10), { "font-size": 11 }));
     ser.forEach(function (c, k) {
       var seg = [], segs = [];
       c.vals.forEach(function (v, i) { if (v == null || isNaN(v)) { if (seg.length) segs.push(seg); seg = []; return; } seg.push([X(i), Y(v)]); });
       if (seg.length) segs.push(seg);
       segs.forEach(function (sg) { s.appendChild(el("polyline", { points: sg.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), fill: "none", stroke: COLS[k], "stroke-width": 2, "data-col": c.name })); sg.forEach(function (p) { s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 2.5, fill: COLS[k] })); }); });
-      s.appendChild(el("rect", { x: x0 + 110 * k, y: H - 12, width: 10, height: 6, fill: COLS[k] })); s.appendChild(txt(x0 + 110 * k + 14, H - 6, String(c.name).slice(0, 14), { "font-size": 9, "text-anchor": "start" }));
+      s.appendChild(el("rect", { x: x0 + 110 * k, y: H - 12, width: 10, height: 6, fill: COLS[k] })); s.appendChild(txt(x0 + 110 * k + 14, H - 6, String(c.name).slice(0, 14), { "font-size": 11, "text-anchor": "start" }));
     });
     return { svg: s, n: N, series: ser.map(function (c) { return c.name; }), skipped: P0.num.length - ser.length, label: P0.label ? P0.label.name : null };
   };
