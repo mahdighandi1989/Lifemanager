@@ -1,0 +1,16 @@
+{
+ "id": "h20261016230036782177-session-963f",
+ "at": "2026-10-16T23:00:36Z",
+ "by": "session",
+ "area": "lla-sources",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "تورِ پولیا دورِ ۱۱ (K8): پیوندِ صریحِ لحظه ⇐ قلمرو در coverage.json (terr: — B231/C107 ⇒ pr_hypothesis_testing؛ C145/B162/B169/B170 ⇒ a_induction؛ B107 ⇒ md_cognitive_biases، a_confirmation)",
+ "procedure": "AGENTS.md: ثبتِ registry، گراف مشتق",
+ "commit": "10cd5a1",
+ "status": "open"
+}

@@ -1,0 +1,16 @@
+{
+ "id": "h20261016230036851669-session-fef1",
+ "at": "2026-10-16T23:00:36Z",
+ "by": "session",
+ "area": "sys-territory",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "تورِ پولیا دورِ ۱۱ (K8): cues_fa برای sc_negotiation در s_social.json (فقط روی صورت/مجهولِ خودِ مسئله) + a28 knowledge(extra)؛ نامِ داخلِ پرانتز نامِ متمایز نیست (ثانیه)",
+ "procedure": "AGENTS.md: قلمرو از registry؛ قاعدهٔ E6 بی‌تغییر",
+ "commit": "10cd5a1",
+ "status": "open"
+}
