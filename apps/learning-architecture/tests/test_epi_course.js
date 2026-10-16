@@ -1,6 +1,7 @@
 // دورهٔ گام‌به‌گامِ کارخانهٔ معرفت‌شناسی (a13_epi_course.js) — روی نسخهٔ مستقلِ ساخته‌شده (dist/learning-architecture.html)
 const { chromium } = require('playwright');
 const path = require('path');
+const { installWriteSpy, settle, until } = require('./page_sync');
 const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architecture.html');
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = {};
@@ -9,8 +10,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
-  await p.evaluate(() => { window.__puts = []; const o = APP.S.put; APP.S.put = function (r) { window.__puts.push(r.type + ':' + r.id); return o.apply(this, arguments); }; });
-  const putsDuring = async (fn) => { await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); return p.evaluate(() => window.__puts.slice()); };
+  await installWriteSpy(p);
+  // settle before the reset (a debounced write of the previous action must not land in the window) and after the action
+  // (the write it must count may land past the 700 ms observation window under load)
+  const putsDuring = async (fn) => { await settle(p); await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); await settle(p); return p.evaluate(() => window.__puts.slice()); };
   const bad = async (lab) => { if (await p.locator('main .card.bad').count()) errors.push('render ' + lab); };
   const where = () => p.evaluate(() => APP.state.view + ':' + APP.state.arg + ':' + APP.state.sub);
   const cst = () => p.evaluate(() => APP.epiCourseState());
@@ -66,7 +69,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await next(); await p.waitForTimeout(100);
   info.introBlocked = (await where()).endsWith(':s3');
   for (const ta of await p.locator('main .wsform textarea').all()) await ta.fill('ارزش ملک؛ وثیقه؛ ۱۲ میلیون درهم');
-  await p.waitForTimeout(600); await next(); await p.waitForTimeout(150);
+  await settle(p); await next(); await p.waitForTimeout(150);
   info.introS4 = await where();
   await p.fill('main .crs-body textarea', 'تصور یعنی فهمِ بی‌حکم؛ تصدیق یعنی حکم');
   await p.click('main .btn:has-text("مقایسه کن")');
@@ -91,7 +94,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   info.casesOnView = await p.evaluate(() => APP.S.all('case').length);
   await next(); await p.waitForTimeout(100);
   info.wsBlocked = (await where()).endsWith(':s3');
-  await fillReq(); await p.waitForTimeout(800);
+  await fillReq(); await until(p, () => APP.S.all('case').length >= 1); await settle(p);
   info.casesAfterInput = await p.evaluate(() => APP.S.all('case').length);
   info.caseLinked = await p.evaluate(() => { const c = APP.epiCourseState(); const cs = APP.S.get(c.caseId); return !!cs && cs.src && cs.src.t === 'epi_course' && cs.st.st_intake.data.input.indexOf('۱۲ میلیون') >= 0; });
   await next(); await p.waitForTimeout(150);

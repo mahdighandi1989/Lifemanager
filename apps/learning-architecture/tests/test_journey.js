@@ -1,6 +1,7 @@
 // سفرِ گام‌به‌گام روی یک موضوع (a15_journey.js) — روی نسخهٔ مستقلِ ساخته‌شده (dist/learning-architecture.html)
 const { chromium } = require('playwright');
 const path = require('path');
+const { installWriteSpy, settle, until } = require('./page_sync');
 const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architecture.html');
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = {};
@@ -8,9 +9,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   p.on('pageerror', e => errors.push('pageerror: ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
-  const spy = () => p.evaluate(() => { window.__puts = []; const o = APP.S.put; if (o.__spy) return; const f = function (r) { window.__puts.push(r.type + ':' + r.id); return o.apply(this, arguments); }; f.__spy = 1; APP.S.put = f; });
+  const spy = () => installWriteSpy(p);
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300); await spy();
-  const putsDuring = async (fn) => { await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); return p.evaluate(() => window.__puts.slice()); };
+  // settle before the reset (a debounced write of the previous action must not land in the window) and after the action
+  // (the write it must count may land past the 700 ms observation window under load)
+  const putsDuring = async (fn) => { await settle(p); await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); await settle(p); return p.evaluate(() => window.__puts.slice()); };
   const bad = async (lab) => { if (await p.locator('main .card.bad').count()) errors.push('render ' + lab); };
   const fillWS = async (scope) => {
     const S = scope + ' .wsform';
@@ -51,7 +54,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // نوعِ موضوع: یک تغییر = یک نوشتن روی موضوع
   info.puts_kind = await putsDuring(() => p.selectOption('#jrKind', { index: 1 }));
   // کاربرگِ گام: با اولین ورودی فقط یک رکورد
-  await fillWS('main .jr-now'); await p.waitForTimeout(700);
+  await fillWS('main .jr-now'); await until(p, () => APP.S.all('ex', e => e.tid === 33).length >= 1); await settle(p);
   info.exAfterInput = await p.evaluate(() => APP.S.all('ex', e => e.tid === 33).length);
   info.puts_next = await putsDuring(() => p.click('main .jr-next'));
   info.missing = await p.locator('.toast').allTextContents();
@@ -63,7 +66,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await p.locator('main .jr-st').nth(1).locator('.jr-stb').click(); await p.waitForTimeout(150);
   // گامِ ۲: یک فیلد بنویس تا پیش‌نویس ساخته شود
   const firstTA = p.locator('main .jr-now .wsform textarea, main .jr-now .wsform input[type=text]').first();
-  if (await firstTA.count()) { await firstTA.fill('پیش‌نویسِ گامِ دوم'); await p.waitForTimeout(700); }
+  if (await firstTA.count()) { await firstTA.fill('پیش‌نویسِ گامِ دوم'); await until(p, () => APP.S.all().some(r => JSON.stringify(r.data || {}).includes('پیش‌نویسِ گامِ دوم'))); await settle(p); }
   // ۵) ادامه پس از بارگذاریِ دوباره
   await p.reload(); await p.waitForSelector('.nav'); await p.waitForTimeout(300); await spy();
   await p.evaluate(tid => APP.go('topic', tid), tid); await p.waitForTimeout(100);

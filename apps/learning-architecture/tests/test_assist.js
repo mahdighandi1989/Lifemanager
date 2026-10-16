@@ -61,8 +61,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   await p.fill('.as-in', 'یه خبر شنیدم دلار فردا بالا میره، می‌خوام بسنجمش');
   await p.click('.as-send');
-  await p.waitForFunction(() => __calls.length >= 2 && !document.querySelector('.as-typing'), null, { timeout: 8000 });
-  await p.waitForTimeout(200);
+  // the whole turn chain (reply ⇒ go ⇒ automatic second turn ⇒ fill/highlight) is over when the typing bubble is gone (busy=false)
+  await p.waitForFunction(() => __calls.length >= 2 && !document.querySelector('.as-typing'), null, { timeout: 30000 });
   info.t1 = await p.evaluate(() => {
     const s = APP.ASSIST.cur(), f = document.querySelector('#main .as-filled');
     return { view: APP.state.view, task: __calls[0].opts.task, auto: /باز شد/.test(__calls[1].user), filled: f ? f.value : null, hl: !!document.querySelector('#main .as-hl'),
@@ -145,7 +145,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(await p.$$eval('.as-root', xs => xs.length) === 1 && await p.isVisible('.as-panel'), 'one widget survives navigation, still open');
 
   // ۱۰) ۳۹۰px
-  await p.setViewportSize({ width: 390, height: 800 }); await p.waitForTimeout(150);
+  await p.setViewportSize({ width: 390, height: 800 });
+  await p.waitForFunction(() => window.innerWidth === 390 && (() => { const r = document.querySelector('.as-panel').getBoundingClientRect(); return r.width > 0 && r.width <= 391; })(), null, { timeout: 15000 }).catch(() => {});
   const pb = await p.locator('.as-panel').boundingBox();
   chk(pb && pb.width <= 391 && pb.x >= -1, 'panel is a bottom sheet at 390px');
   chk(await p.evaluate(() => document.documentElement.scrollWidth <= 392), 'no horizontal overflow at 390px');

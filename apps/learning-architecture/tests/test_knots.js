@@ -2,6 +2,7 @@
 // روی نسخهٔ مستقلِ ساخته‌شده (dist/learning-architecture.html)
 const { chromium } = require('playwright');
 const path = require('path');
+const { installWriteSpy, settle } = require('./page_sync');
 const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architecture.html');
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = {};
@@ -10,8 +11,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
   await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
-  await p.evaluate(() => { window.__puts = []; const o = APP.S.put; APP.S.put = function (r) { window.__puts.push(r.type + ':' + r.id); return o.apply(this, arguments); }; });
-  const putsDuring = async (fn) => { await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); return p.evaluate(() => window.__puts.slice()); };
+  await installWriteSpy(p);
+  // settle before the reset: a debounced write (kcase «soon», 450 ms) of an earlier action must not land in the viewing window
+  const putsDuring = async (fn) => { const left = await settle(p); if (left.length) console.log('note: writes still pending before a viewing window: ' + left); await p.evaluate(() => { window.__puts = []; }); await fn(); await p.waitForTimeout(700); return p.evaluate(() => window.__puts.slice()); };
   const bad = async (lab) => { if (await p.locator('main .card.bad').count()) errors.push('render ' + lab + ': ' + await p.locator('main .card.bad').first().innerText()); };
   const st = () => p.evaluate(() => APP.state.view + ':' + APP.state.arg + ':' + APP.state.sub);
   const curCase = () => p.evaluate(() => APP.S.get(APP.state.arg));

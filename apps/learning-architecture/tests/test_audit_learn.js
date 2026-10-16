@@ -1,6 +1,7 @@
 // ممیزیِ نیمهٔ یادگیری (۲۰۲۶-۱۰-۱۳): پانزده خطای تأییدشده — هر بند یک بررسی. روی نسخهٔ مستقلِ ساخته‌شده (dist/learning-architecture.html)
 const { chromium } = require('playwright');
 const path = require('path');
+const { installWriteSpy, settle, until } = require('./page_sync');
 const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architecture.html');
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = {};
@@ -11,24 +12,35 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     p.on('pageerror', e => errors.push('pageerror: ' + e.message));
     p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
     await p.route('**/fonts.googleapis.com/**', r => r.abort());
-    await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300);
+    await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(300); await installWriteSpy(p);
     return { p, ctx };
   }
   const startCourse = async (p, topic) => {
     await p.evaluate(() => APP.goRoot('start')); await p.locator('main .door.main .btn').click(); await p.waitForTimeout(150);
     await p.fill('#crsTopic', topic); await p.click('main .btn:has-text("شروعِ درسِ اول")'); await p.waitForTimeout(250);
   };
+  // the text fields are addressed by their id, not by position: a positional nth() locator re-resolves to whatever element sits
+  // at that index when the form redraws (a list «+ افزودن», a lock «باز کردن»), and can then wait on the wrong element
+  const textFields = (T, emptyOnly) => T.p.$$eval(T.q, (els, emptyOnly) => els.map((e, i) => ({ id: e.id, i, show: !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length), ok: !e.disabled && !e.readOnly, empty: !e.value }))
+    .filter(x => x.show && x.ok && (!emptyOnly || x.empty)), emptyOnly);
+  const fillText = async (T, txt, emptyOnly) => {
+    for (const f of await textFields(T, emptyOnly)) {
+      const el = f.id ? T.p.locator('[id="' + f.id + '"]') : T.p.locator(T.q).nth(f.i);
+      if (await el.isVisible() && await el.isEditable() && (!emptyOnly || !(await el.inputValue()))) await el.fill(txt);
+    }
+  };
   const fillWS = async (p, scope) => {
     const S = scope + ' .wsform';
-    for (const el of await p.locator(S + ' textarea, ' + S + ' input[type=text]').all()) { if (await el.isVisible() && await el.isEditable()) await el.fill('پاسخِ آزمایشی'); }
+    const T = { p, q: S + ' textarea, ' + S + ' input[type=text]' };
+    await fillText(T, 'پاسخِ آزمایشی', false);
     for (const sel of await p.locator(S + ' select').all()) { if (!(await sel.isVisible())) continue; const o = await sel.locator('option').count(); if (o > 1) await sel.selectOption({ index: 1 }); }
     for (const cb of await p.locator(S + ' input[type=checkbox]').all()) { if (await cb.isVisible()) await cb.check(); }
     for (const nb of await p.locator(S + ' input[type=number]').all()) { if (await nb.isVisible()) await nb.fill('3'); }
     for (const add of await p.locator(S + ' button:has-text("افزودن")').all()) { if (await add.isVisible()) await add.click(); }
-    for (let k = 0; k < 6; k++) { const ub = p.locator(S + ' button:has-text("باز کردن"):visible').first(); if (!(await ub.count())) break; await ub.click().catch(() => {}); await p.waitForTimeout(60);
-      for (const el of await p.locator(S + ' textarea, ' + S + ' input[type=text]').all()) { if (await el.isVisible() && await el.isEditable() && !(await el.inputValue())) await el.fill('پاسخ'); } }
-    for (const el of await p.locator(S + ' textarea, ' + S + ' input[type=text]').all()) { if (await el.isVisible() && await el.isEditable() && !(await el.inputValue())) await el.fill('پاسخ'); }
-    await p.waitForTimeout(600);
+    for (let k = 0; k < 6; k++) { const ub = p.locator(S + ' button:has-text("باز کردن"):visible').first(); if (!(await ub.count())) break; await ub.click().catch(() => {});
+      await fillText(T, 'پاسخ', true); }
+    await fillText(T, 'پاسخ', true);
+    await settle(p);   // the worksheet's debounced write (400 ms) has landed
   };
 
   // ۱) دکمهٔ «▶ ادامه» در ۳۹۰px تمام‌عرض و خوانا
@@ -100,7 +112,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const prs0 = await p.evaluate(() => APP.S.all('pr', r => r.pid === 'P2').length);
     await p.evaluate(() => APP.goRoot('home')); await p.locator('main .dueb:has-text("قرائت")').click(); await p.waitForTimeout(150);
     const prs1 = await p.evaluate(() => APP.S.all('pr', r => r.pid === 'P2').length);
-    await p.locator('main .wsform textarea, main .wsform input[type=text]').first().fill('قرائتِ امروز'); await p.waitForTimeout(800);
+    await p.locator('main .wsform textarea, main .wsform input[type=text]').first().fill('قرائتِ امروز'); await until(p, n => APP.S.all('pr', r => r.pid === 'P2').length > n, prs0); await settle(p);
     const prs2 = await p.evaluate(() => APP.S.all('pr', r => r.pid === 'P2').length), rid = await p.evaluate(() => APP.state.sub);
     await p.evaluate(() => APP.goRoot('home')); await p.locator('main .dueb:has-text("قرائت")').click(); await p.waitForTimeout(150);
     const prs3 = await p.evaluate(() => APP.S.all('pr', r => r.pid === 'P2').length), rid2 = await p.evaluate(() => APP.state.sub);
@@ -126,12 +138,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // ۵) عوض‌کردنِ موضوع: درسِ نیمه‌کاره روی موضوعِ تازه، کارِ قبلی با موضوعِ قبلی
   { const { p, ctx } = await page();
     await startCourse(p, 'موضوعِ الف');
-    await p.evaluate(() => APP.go('lesson', 37, 's3')); await p.locator('main .wsform input[type=text], main .wsform textarea').first().fill('نوشته روی الف'); await p.waitForTimeout(900);
+    await p.evaluate(() => APP.go('lesson', 37, 's3')); await p.locator('main .wsform input[type=text], main .wsform textarea').first().fill('نوشته روی الف'); await until(p, () => APP.S.all('ex', e => e.tid === 37 && JSON.stringify(e.data).includes('نوشته روی الف')).length > 0); await settle(p);
     await p.evaluate(() => APP.go('course')); await p.click('main .linkish:has-text("(عوض کن)")');
     await p.fill('#crsTopic', 'موضوعِ ب'); await p.click('main .crs-start .btn'); await p.waitForTimeout(200);
     await p.evaluate(() => APP.go('lesson', 37, 's3')); await p.waitForTimeout(100);
     info.tc1 = await p.locator('main .wsform input[type=text], main .wsform textarea').first().inputValue();
-    await p.locator('main .wsform input[type=text], main .wsform textarea').first().fill('نوشته روی ب'); await p.waitForTimeout(900);
+    await p.locator('main .wsform input[type=text], main .wsform textarea').first().fill('نوشته روی ب'); await until(p, () => APP.S.all('ex', e => e.tid === 37 && JSON.stringify(e.data).includes('نوشته روی ب')).length > 0); await settle(p);
     info.tc2 = await p.evaluate(() => APP.S.all('ex', e => e.tid === 37 && e.course).map(e => APP.S.get(e.topic).title + '=' + (JSON.stringify(e.data).match(/نوشته روی [^"]+/) || [''])[0]).sort().join(' | '));
     if (info.tc1 !== '' || !/موضوعِ الف=نوشته روی الف/.test(info.tc2) || !/موضوعِ ب=نوشته روی ب/.test(info.tc2)) errors.push('5 topic change: ' + info.tc1 + ' / ' + info.tc2);
 
