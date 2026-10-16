@@ -1859,6 +1859,8 @@
       var a191 = !auto && !!(Pv && Pv.intro) && wholeMoment(mt) && longStmt(mt) && !(teachMode(s, mt) && !TEACH_PROB_RE.test(mt)) && (function () { var W0 = Cg.whole = Cg.whole || {}, k = Cg.pk || "c:0", mk0 = mkey(mt); if (W0[k] && W0[k] !== mk0) return false; W0[k] = mk0; return true; })();   // هم‌توان در ساختِ چندبارهٔ همان نوبت
       /* دورِ ۸ (I-coach 7، s19): بلوکِ زنده پرسشِ نوبت را از کارت/ردِ صفحه یا کارِ همین نوبت می‌دهد (card-/fail-/turn-) ⇒ «میانهٔ راه» ِ مربی این نوبت نمی‌آید (یک پرسش) و مصرف هم نمی‌شود */
       var cardQ = !!(nq && nq.q && nq.coach && /^(?:card|fail|turn)-/.test(String(nq.coach.src || "")));
+      /* دورِ ۹ (s06 p5): «میانهٔ راه» فقط برای مسئلهٔ باز — در «review/closing/incomplete» (پس از «✅ حل شد») پرسشِ نوبت پرسشِ بازنگری/وارسی ِ صفحه است، نه «به‌جای» آن */
+      if (!cardQ && cpid && A.liveClosure) { try { var stC = (A.liveClosure(cpid) || {}).state; if (stC && stC !== "open") cardQ = true; } catch (e) { } }
       /* … و وقتی کارتِ «میانهٔ راه» ِ خودِ صفحه همین موعد را یک نوبت پرسیده (L.ckHold ِ a38) — همان پرسش دو نوبتِ پیاپی نه */
       if (!cardQ && cpid) { try { var ckH = ((((S.get("eprog_" + cpid) || {}).solve || {}).live) || {}).ckHold; if (ckH && ckH.due && String(ckH.due) <= A.today()) cardQ = true; } catch (e) { } }
       out.push(coachLines({ ph: ph, qs: qs, qsDef: !(cpid && nq && nq.list && nq.list.length), cls: cls, ptype: ptype, s: s, pid: cpid, mt: mt, dry: auto, stuck: sig.stuck, live: !!cpid && liveBlock, claim: claim, teach: teachMode(s, auto ? "" : mt),
