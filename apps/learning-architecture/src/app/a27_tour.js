@@ -990,9 +990,13 @@
       else if (tu.solved) ph = "back";   // پس از «حل شد» تا خودش نگفته «حل نشد/اشتباه بود»، بازنگری می‌ماند
     }
     var T0 = TQ[ph];
-    // پرسشِ این نوبت: همان فهرستِ ثابت، به ترتیب؛ فقط با پیامِ تازهٔ کاربر یک قدم جلو می‌رود (همان چند پرسش در همهٔ مسئله‌ها)
-    if (!auto && tu.lastMsg !== msg) { tu.qi[ph] = tu.lastMsg == null || tu.ph !== ph ? (tu.qi[ph] || 0) : (tu.qi[ph] || 0) + 1; tu.lastMsg = msg; tu.ph = ph; }
-    var qi = (tu.qi[ph] || 0) % T0.qs.length;
+    /* پرسشِ این نوبت (D2، تورِ پولیا دورِ ۳): همان فهرستِ ثابت، از کلی به خاص، بر پایهٔ پلهٔ کاربر در همین مسئله — نخستین پرسشی که هنوز نه در
+       گفت‌وگوی همین مسئله پرسیده و پاسخ گرفته، نه در کارتِ «پرسشِ همین لحظه» ِ صفحه پاسخ داده شده؛ نه با شمارِ پیام (سکوت ⇒ همان پرسش با تغییرِ کوچک) */
+    if (!tu.since) tu.since = nowIso();
+    if (!auto && tu.lastMsg !== msg) { tu.lastMsg = msg; tu.ph = ph; }
+    var pgT = c.kind === "prob" ? ((pgOf(c.pid) || {}).tut || {}) : ((c.rec && (c.rec.tut || (c.rec.data || {}).tut)) || {}), askedP = askedInChat(s, tu.since);
+    var qi = -1; T0.qs.forEach(function (q, i) { if (qi < 0 && !answeredIn(q, askedP) && !(pgT[ph] || []).some(function (e) { return e && !e.skip && e.q === q && e.text; })) qi = i; });
+    if (qi < 0) qi = T0.qs.length - 1;
     var L = ["# معلمِ حلِ مسئله — کاربر همین حالا دارد «" + clip(c.title, 80) + "» را حل می‌کند · مرحله: " + T0.fa,
       "- در این نوبت فقط **یک** پرسش بپرس، از همین فهرستِ ثابت و از کلی به خاص؛ پرسشِ پیشنهادیِ این نوبت: «" + T0.qs[qi] + "». فهرستِ این مرحله: " + T0.qs.map(function (q, i) { return (i + 1) + ") " + q; }).join(" "),
       "- پرسشِ لودهنده ممنوع: نامِ قضیه، حرکت، گزینهٔ درست یا گامِ بعد را نگو («فلان قضیه را به کار ببر» نه؛ «مسئلهٔ آشنایی با همین مجهول می‌شناسی؟» آری). اگر جواب خواست، یک پله کلی‌تر بپرس؛ فقط پس از تلاشِ خودش یک پله خاص‌تر.",
@@ -1134,10 +1138,10 @@
   AS.coachQs = phaseQs; AS.coachClass = qClass;
   /* پرسشی که دستیار در همین سشن پرسید و کاربر پس از آن پاسخ داد ⇒ «پاسخ‌گرفته در گفت‌وگو» — دوباره پیشنهاد نمی‌شود (rerunC/D) */
   function qToks(t) { return String(t || "").replace(/[ً-ٰٟ‌]/g, "").replace(/[^؀-ۿa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !/^(که|را|از|به|با|در|این|آن|است|هست|می|یک|هم|چه|کدام|چیست|کنی|کرد|بود|شد|همین|برای)$/.test(w); }); }
-  function askedInChat(s) {
+  function askedInChat(s, since) {
     var M = (s && s.msgs) || [], out = [];
     M.forEach(function (m, i) {
-      if (!m || m.role !== "ai") return;
+      if (!m || m.role !== "ai" || (since && String(m.at || "") < since)) return;
       var replied = M.slice(i + 1).some(function (x) { return x && x.role === "user" && !/^\[سامانه/.test(String(x.text || "")); }); if (!replied) return;
       String(m.text || "").split(/(?<=[؟?])\s+|\n+/).forEach(function (t) { t = String(t).trim(); if (/[؟?]$/.test(t) && t.length >= 6) out.push(t); });
     });

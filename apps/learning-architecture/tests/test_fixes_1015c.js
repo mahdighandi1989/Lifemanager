@@ -163,7 +163,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const s = AS.newSession(); S.put(s);
     const at = async pid => { A.simState = null; A.go('e_prob', pid, 'sim'); await new Promise(r => setTimeout(r, 150)); };
     const ask = (msg) => { const t = AS.prompt(s, msg, AS.scan()); const m = t.match(/پرسشِ پیشنهادیِ این نوبت: «([^»]+)»/); return { q: m ? m[1] : '', ph: (t.match(/مرحله: ([^\n]+)/) || [])[1] || '' }; };
-    await at(P1.id); ask('الف'); ask('ب'); const a3 = ask('ج'); o.p1 = a3.q === TQ.und.qs[2];
+    // D2 (تورِ پولیا دورِ ۳): پرسشِ بعد به پلهٔ کاربر در همین مسئله (پرسیده و پاسخ‌گرفته)، نه به شمارِ پیام
+    const said = (role, text) => { s.msgs.push({ role, text, at: new Date(Date.now() + s.msgs.length).toISOString() }); };
+    await at(P1.id); ask('الف'); const a2 = ask('ب'); o.noCount = a2.q === TQ.und.qs[0];
+    said('ai', TQ.und.qs[0]); said('user', 'الف'); said('ai', TQ.und.qs[1]); said('user', 'ب');
+    const a3 = ask('ج'); o.p1 = a3.q === TQ.und.qs[2];
     await at(P2.id); const b1 = ask('مسئلهٔ دوم را شروع کنم'); o.p2fresh = b1.q === TQ.und.qs[0];
     await at(P1.id); const a4 = ask('حلش کردم!'); o.back = /بازنگری/.test(a4.ph);
     const a5 = ask('[سامانه: کارهایت انجام شد و صفحه دوباره خوانده شد — کارِ بعدی‌ای را که گفتی همین حالا انجام بده]'); o.autoKeeps = /بازنگری/.test(a5.ph) && a5.q === a4.q;

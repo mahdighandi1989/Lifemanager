@@ -56,8 +56,8 @@ const FILE = 'file://' + DIST;
     const pg = APP.S.get('eprog_' + pid);
     o.undSaved = !!(pg && pg.tut && pg.tut.und && pg.tut.und.length === 1 && pg.tut.und[0].self === 2);
     o.phaseUnd = AS.probPhaseOf(pid).und;
-    // پیامِ تازه ⇒ پرسشِ بعدیِ همان فهرست (همان چند پرسش، به ترتیب) — مرحله حالا «طرح»
-    __calls.length = 0; __q.push(R({})); await AS.send('خب داده‌ها را نوشتم');
+    // پرسشِ پاسخ‌گرفته ⇒ پرسشِ بعدیِ همان فهرست (همان چند پرسش، به ترتیب؛ D2: به پلهٔ کاربر، نه شمارِ پیام) — مرحله حالا «طرح»
+    __calls.length = 0; __q.push(R({ reply: 'پیش‌تر همین را — یا همین را به شکلِ کمی دیگر — دیده‌ای؟' })); await AS.send('خب داده‌ها را نوشتم');
     o.plan = /مرحله: طرح‌ریزی/.test(__calls[0].user) && /پرسشِ پیشنهادیِ این نوبت: «پیش‌تر همین را/.test(__calls[0].user);
     __calls.length = 0; __q.push(R({})); await AS.send('هنوز هیچ ایده‌ای ندارم');
     o.plan2 = /پرسشِ پیشنهادیِ این نوبت: «به مجهول نگاه کن/.test(__calls[0].user);
