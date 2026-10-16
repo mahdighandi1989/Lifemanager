@@ -26,4 +26,4 @@
 - سطرِ نگاشتِ a38 (`H2 دورِ ۷، s24`) برچسبِ درونی دارد (I-live 8).
 
 ## آزمون‌ها
-`test_tour1_r8_coach.js` سبز؛ `test_tour1_r7_coach.js` سبز؛ همهٔ آزمون‌های صفحه از راهِ `tests/test_learning_architecture_graph_browser.py` (کدِ خروج) و `test_learning_architecture_handbook.py`/`integrity` — نتیجه در گزارشِ نهایی.
+`test_tour1_r8_coach.js` و `test_tour1_r7_coach.js` سبز؛ مجموعهٔ صفحه از `tests/test_learning_architecture_graph_browser.py`: ۸۲ گذشت، ۰ شکست؛ handbook + integrity: ۷ گذشت. `test_tour1_r7_live.js` یک الگو عوض کرد: سطرِ ردِ a38 در شکلِ زمینه‌اش («از ردش چه آموخت» بی «بپرس»).
