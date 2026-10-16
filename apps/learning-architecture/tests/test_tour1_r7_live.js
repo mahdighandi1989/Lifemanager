@@ -327,7 +327,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await newSess(); await say('این مسئله رو می‌خوام ثابت کنم، از کجا شروع کنم؟');
       const pl = (coachOf(await lastUser()).match(/[^\n]*کسی که بد می‌فهمد[^\n]*/) || [''])[0];
       info.prov = pl.slice(0, 260);
-      chk(pl && /فرض چیست؟ حکم چیست؟/.test(pl) && !/مجهول چیست/.test(pl), 'H3: the chat proverb of a prove problem asks «فرض چیست؟ حکم چیست؟» (proofLike rewrite, s03) ' + info.prov);
+      // دورِ ۱۰ (J1، DECISIONS_R10): سطرِ ضرب‌المثل هرگز «⇐ همان پرسش» ندارد (یک پرسشِ نوبت) — پس دیگر «مجهول چیست؟» ِ نابجا هم ندارد
+      chk(pl && !/⇐ همان پرسش/.test(pl) && !/مجهول چیست/.test(pl), 'H3 (R10): the chat proverb of a prove problem carries no question of its own — never «مجهول چیست؟» (s03; one turn question) ' + info.prov);
       void PZ;
     });
 

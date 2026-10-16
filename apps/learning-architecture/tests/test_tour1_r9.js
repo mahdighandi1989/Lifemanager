@@ -150,17 +150,20 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     // A073 «فقط جواب» در گشایشی که پیشنهادِ فهرست دارد (s12 p1)
     const ans = lineOf(c1, /«فقط جواب» خواست/);
     r.only = { has: !!ans, ctx: isCtx(ans), sug: sugOf(c1).slice(0, 40) };
-    chk(r.only.has && r.only.sug && r.only.ctx, 'ctx: the A073 «فقط جواب» line is «زمینه (نه پرسشِ دوم)» beside the list suggestion (s12 p1) ' + JSON.stringify(r.only));
+    // دورِ ۱۰ (J1، DECISIONS_R10): «فقط جواب» بی تلاشِ دیدنی («نیم ساعته موندم» تلاش را نشان نمی‌دهد) خودِ پرسشِ نوبت است، نه زمینه (رگرسیونِ s38 p1)
+    chk(r.only.has && /تا کجا رفتی/.test(r.only.sug) && !r.only.ctx, 'ctx (R10): the A073 «فقط جواب» line with no visible attempt is the turn question (s12 p1) ' + JSON.stringify(r.only));
     // A073 «چرا …؟» در گشایش با پیشنهادِ فهرست
     const cw = await first('چرا وقتی بطری آب پر رو تو فریزر گذاشتم ترکید ولی بطری نیمه‌پر سالم موند؟');
     const why = lineOf(cw, /«چرا …؟» پرسید/);
     r.why = { has: !!why, ctx: isCtx(why), sug: sugOf(cw).slice(0, 40) };
-    chk(r.why.has && r.why.sug && r.why.ctx, 'ctx: the A073 «چرا …؟ — حدسِ خودش را بپرس» line is «زمینه (نه پرسشِ دوم)» beside the list suggestion ' + JSON.stringify(r.why));
+    // دورِ ۱۰ (J1): «چرا X؟» بالاتر از پیشنهادِ فهرست است ⇒ پرسشِ نوبت
+    chk(r.why.has && /خودت فکر می‌کنی چرا/.test(r.why.sug) && !r.why.ctx, 'ctx (R10): «چرا X؟» ⇒ the A073 «خودت فکر می‌کنی چرا؟» line is the turn question (above the list suggestion) ' + JSON.stringify(r.why));
     // A191 در معرفیِ مسئله با پیشنهادِ فهرست (s21)
     const c21 = await first('سلام. من بردیا هستم ۱۲ سالمه، تیم شطرنج مدرسه. مسئله: سفید بازی می‌کند و در دو حرکت مات می‌کند. FEN: 5k2/8/5K2/8/8/8/8/R2Q4 w - - 0 1 . من کیش با وزیر رو زدم ولی شاه فرار می‌کنه. یه رخ سفید گوشه‌ی صفحه هست که اصلاً نمی‌دونم چرا اونجاست.');
     const a191 = lineOf(c21, /A191/);
     r.a191 = { has: !!a191, ctx: isCtx(a191), sug: sugOf(c21).slice(0, 40) };
-    chk(r.a191.has && r.a191.sug && r.a191.ctx, 'ctx: A191 «اول کل را ببین» is «زمینه (نه پرسشِ دوم)» beside the list suggestion (s21 p1) ' + JSON.stringify(r.a191));
+    // دورِ ۱۰ (J1): A191 بالاتر از پیشنهادِ فهرست است ⇒ پرسشِ نوبت در لحظهٔ معرفی
+    chk(r.a191.has && /یک جمله/.test(r.a191.sug) && !r.a191.ctx, 'ctx (R10): A191 «اول کل را ببین» is the turn question at the introduction (s21 p1) ' + JSON.stringify(r.a191));
   });
 
   // ================= a129 — نه در پیامِ آغاز =================

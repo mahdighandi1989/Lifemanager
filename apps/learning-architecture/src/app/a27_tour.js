@@ -1156,9 +1156,9 @@
      پیامی که صورت را می‌آورد و بی هیچ پرسشی یک‌راست به جزئیات/تلاش می‌پرد («مسئله: … FEN … من کیش با وزیر رو زدم…») همان لحظهٔ A191 است */
   /* دورِ ۱۰ (J2): A191 فقط پیامی که مسئله‌ای را معرفی می‌کند — نه ادامهٔ گیرِ پیشین («هنوز نمی‌دونم. گیرم…» در سشنِ تازه، s26 p5)، و نه صورتی که کامل
      نقل شده («…») و خودش گزارش می‌دهد رویش کار کرده (s38 p6: «یک ساعت و نیمه روش کار کردم… امتحان کردم») — کل را دیده است */
-  var CONT_RE = /^\s*(?:هنوز|هنوزم|بازم|باز\s*هم|همچنان|همون\s*(?:مسئله|سؤال|سوال))(?![آ-ی])/, WORKED_RE = /روش\s*کار\s*(?:کردم|می[‌\s]?کنم)|کار\s*کردم|روشم(?![آ-ی])/;
+  var CONTMSG_RE = /^\s*(?:هنوز|هنوزم|بازم|باز\s*هم|همچنان|همون\s*(?:مسئله|سؤال|سوال))(?![آ-ی])/, WORKED_RE = /روش\s*کار\s*(?:کردم|می[‌\s]?کنم)|کار\s*کردم|روشم(?![آ-ی])/;
   function wholeMoment(t) { t = String(t || ""); var asked = /[؟?]/.test(ownText(t));
-    if (CONT_RE.test(t) || (/«[^»]{20,}»/.test(t) && (TRIED_RE.test(ownText(t)) || WORKED_RE.test(ownText(t))))) return false;
+    if (CONTMSG_RE.test(t) || (/«[^»]{20,}»/.test(t) && (TRIED_RE.test(ownText(t)) || WORKED_RE.test(ownText(t))))) return false;
     return !solvedSaid(t) && !FAIL_ME.test(t) && !GIVEUP_RE.test(t) && !RETURN_RE.test(t) && !META_RE.test(t) && !ST_LAB.u.test(faDigits(t)) && !TASTE_RE.test(t) && (!asked || (!OWNGUESS_RE.test(t) && !TRIED_RE.test(t) && !ownFormulas(t).length)); }
   /* دورِ ۸ (I-coach 4، s15): در قابِ معلم/پدر، گلایه از یاد دادن («شاگردام ساکت می‌مونن… چیکار کنم؟») معرفیِ مسئله نیست — مگر صورتِ مسئلهٔ یادگیرنده را نقل کند */
   var TEACH_PROB_RE = /«[^»]*(?:[؟?]|[0-9۰-۹])[^»]*»/;
@@ -1926,9 +1926,11 @@
     if (!cardQ && cpid && A.liveClosure) { try { var stC = (A.liveClosure(cpid) || {}).state; if (stC && stC !== "open") cardQ = true; } catch (e) { } }
     /* … و وقتی کارتِ «میانهٔ راه» ِ خودِ صفحه همین موعد را یک نوبت پرسیده (L.ckHold ِ a38) — همان پرسش دو نوبتِ پیاپی نه */
     if (!cardQ && cpid) { try { var ckH = ((((S.get("eprog_" + cpid) || {}).solve || {}).live) || {}).ckHold; if (ckH && ckH.due && String(ckH.due) <= A.today()) cardQ = true; } catch (e) { } }
-    var midI = !hasCoach && cpid && !auto && !cardQ && !AS.notProblem(mt) ? midCheck(s, { pid: cpid, r: A.liveRec(cpid), done: false }, mt) : null;
+    /* … و نه وقتی همین نوبت کارِ خودش را دارد (گیر، شکست، نتیجه، حدس): پاسخ به حرکتِ همین پیام مقدم است؛ «میانهٔ راه» مصرف نمی‌شود و نوبتِ بعد می‌آید */
+    var tnow = (nq && nq.turn) || {}, busyTurn = !!(tnow.stuck || tnow.fail || tnow.result || tnow.guess || tnow.abandon || tnow.related || (nq && nq.stuckData));
+    var midI = !hasCoach && cpid && !auto && !cardQ && !busyTurn && !AS.notProblem(mt) ? midCheck(s, { pid: cpid, r: A.liveRec(cpid), done: false }, mt) : null;
     var MID_Q = "تا این‌جا چه پیشرفتی کردی و دربارهٔ خودت چه آموختی؟", midHead = midI ? "میانهٔ راه (این مسئله " + fa(midI.age) + " روز است باز است؛ پلهٔ " + fa(midI.rung) + " ِ نردبانِ مرور)" : "";
-    if (midI && nq) nq = Object.assign({}, nq, { midLine: "- در این نوبت فقط **یک** پرسش — " + midHead + "، **به‌جای** پرسشِ مرحله: کوتاه بپرس «" + MID_Q + "» — بی حکم؛ پرسشِ مرحله برای نوبتِ بعد." });
+    if (midI && nq) nq = Object.assign({}, nq, { midLine: "- در این نوبت فقط **یک** پرسش (" + midHead + "، **به‌جای** پرسشِ مرحله — کوتاه و بی حکم؛ پرسشِ مرحله برای نوبتِ بعد؛ پرسشی را که کاربر در صفحه یا همین گفت‌وگو پاسخ داده دوباره نپرس): «" + MID_Q + "». اگر با وضعِ همین لحظه نمی‌خواند، پرسشِ مرحله را بپرس." });
     var midL = !midI ? "" : nq ? "- زمینه (نه پرسشِ دوم): " + midHead + " — پرسشِ این نوبت در «مسئلهٔ زندهٔ این سشن» همین است، بی حکم."
       : "- " + midHead + ": در همین نوبت، **به‌جای** پرسشِ مرحله (همچنان فقط یک پرسش)، کوتاه بپرس «" + MID_Q + "» — بی حکم؛ پرسشِ مرحله برای نوبتِ بعد.";
     if (i >= 0 && pid) {
@@ -2175,7 +2177,7 @@
   /* ---------- دورِ ۱۰ (J4، s13، s17، s19): «🔭 مسئله ثبت شد — باز کن» ----------
      live_new ِ گفت‌وگو پیش‌تر بی‌صدا ثبت می‌کرد و کاربر نمی‌دانست مسئله کجاست. حالا پس از کارهای همان نوبت (AS.run): یک پیامِ سامانه در گفت‌وگو با دکمهٔ
      «🔭 باز کن» (همیشه) و — اگر کاربر روی فرمی نیست (فیلدِ متنیِ پرشده در صفحه، یا صفحهٔ مسئلهٔ دیگری) و همین نوبت جای دیگری نرفت — رفتن به صفحهٔ مسئله
-     (res.moved ⇒ همان نوبتِ خودکارِ «… باز شد» که go ِ دستیار هم می‌آورد). */
+     (بی نوبتِ خودکارِ دیگر). */
   function onForm() {
     try { var st = A.state || {}; if (st.view === "lprob") return true;
       return Array.prototype.some.call(document.querySelectorAll("#main textarea, #main input[type=text], #main input:not([type])"), function (x) { return !x.disabled && !x.readOnly && String(x.value || "").trim().length > 0; });
@@ -2193,7 +2195,8 @@
             s.lpNew = []; var last = "", moved = !!(res && res.moved), form = onForm();
             q.forEach(function (pid) { var r = A.liveRec && A.liveRec(pid); if (!r) return; last = pid;
               s.msgs.push({ role: "sys", at: nowIso(), text: "🔭 مسئله ثبت شد — «" + clip(r.p.title, 70) + "» در «🔭 مسئله‌های من»" + (moved || form ? "؛ برای رفتن به صفحه‌اش «باز کن» را بزن." : "؛ صفحه‌اش باز شد."), go: { view: "lprob", arg: pid } }); });
-            if (last && !moved && !form && A.go) { A.go("lprob", last); if (res) res.moved = true; }
+            /* بی نوبتِ خودکارِ «… باز شد» (res.moved دست نمی‌خورد): فیلدهای صفحه به قلمِ خودِ کاربرند (data-own) و پاسخِ همین نوبت پیش‌تر داده شده */
+            if (last && !moved && !form && A.go && !window.__noNav) A.go("lprob", last);
             S.put(s);
           }
         } catch (e) { console.error(e); }
