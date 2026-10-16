@@ -4555,3 +4555,10 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **FINDING → CHANGE:** Skeptic (16 findings) and round-6 auditor (9 bugs) issues all fixed.
 - **FINDING:** Pólya round 6 is 585 / 115 / 79 / 33 (`docs/decisions/2026-10-15-polya-round6.md`).
 - **REVERT-class note (2026-10-15):** `dec85fc` was pushed to `main` with one gate failure unnoticed: `test_supervisor_ownership::test_ledger_is_valid_and_view_in_sync`. The cause was the generated `HANDOFFS.md` view going stale after a merge; there was no runtime effect. It was fixed in `48bd457` (`handoff.py check --fix`), and the ownership + guard tests now pass: 12/12. Lesson: read `GATE_DONE fail=` before pushing, not only the tail.
+
+### 2026-10-16 — Pólya tour batch 1 (sources roadmap stage 7), rounds 3–6
+- **FINDING:** Rounds 2→6 went from 5/29/4 to 33/5/0 (PASS/PARTIAL/FAIL over 38 source-only scenarios, strict rule: only page/prompt-enforced behaviour passes).
+- **DECISION:** The solving coach no longer infers user state from regexes. The model reports `coach_state`; the page validates it against the user's own text. The regex fallback is asymmetric: it never marks a question answered.
+- **DECISION:** There is one question per turn, from one source (`A.liveCoach` priority). Heuristic gates warn instead of blocking. Look-back checks every condition part.
+- **CHANGE:** `a27_tour.js`, `a28_systerr.js`, `a35_idea.js`, `a36_solve.js`, `a38_live.js`, `a26_assist.js`, `a29_mind.js`, plus tests `test_tour1_r3..r5_*.js`.
+- **FINDING (own error):** I ran round 3 against a stale `dist` (no `build.py` after a fast-forward). Fixed by rebuilding; runners now check the build mtime against the merge time.
