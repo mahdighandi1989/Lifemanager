@@ -113,6 +113,16 @@
   /* A5: قلّابِ پرامپت فقط برای حرفی که واقعاً ایده است — «مطرح کردم»، «محصولات لبنی»، «برنامه‌ای که دکتر داد»، «طرحِ درس» نه؛
      «راه بیندازم»، «کانال بزنم»، «یک فکری دارم» آری (واژه با مرزِ حرفِ فارسی، نه زیررشته) */
   I.ideaRe = /(?:^|[^؀-ۿ‌])(?:ایده|استارت[\s‌]?(?:آپ|اپ)|کسب[\s‌]?و[\s‌]?کار|اپلیکیشن)|راه[\s‌]?(?:بیندازم|بندازم|اندازی کنم)|(?:کانال|پیج|سایت|فروشگاه|کارگاه|مغازه|شرکت)[^.؟!?\n]{0,40}?(?:بزنم|بسازم|باز کنم|تأسیس کنم)|(?:یک|یه)?[\s‌]?فکری (?:دارم|به سرم زده)|طرحی دارم|(?:یک|یه) طرح(?:ی)? (?:دارم|برای کسب)|محصولی (?:بسازم|بفروشم|تولید کنم)/;
+  /* تورِ پولیا دورِ ۴ (E8، s20، s34): «ایده» در حلِ مسئله — «یه ایده برای پلان به ذهنم رسید»، «ایده رو با شبیه‌سازی‌ها آزمودم»، بینشی که پس از
+     ته‌نشینی رسید — ایدهٔ حلِ همان مسئله است (مربیِ حل)، نه «ایده» به معنای طرحِ کسب‌وکار/زندگی. در سشنی که مسئله‌ای را حل می‌کند فقط نشانه‌های
+     طرحِ بیرونی (استارت‌آپ، کانال بزنم، …) قلّاب را می‌آورند؛ بیرون از آن، عبارت‌های «ایدهٔ حل» کنار گذاشته می‌شوند. */
+  I.ideaSolveRe = /ایده(?:‌ای|ی|ٔ)?\s*(?:برای\s*(?:پلان|طرح|حل|حلش|گام|اثبات|برهان|این\s*مسئله|مسئله|این\s*معما)|(?:به\s*ذهنم|به\s*فکرم|به\s*سرم)\s*(?:رسید|اومد|آمد|زد))|(?:به\s*ذهنم|به\s*فکرم)\s*(?:رسید|زد)[^.؟!?\n]{0,40}ایده|ایده\s*(?:رو|را)\s*(?:با|روی|در)\s*[^.؟!?\n]{0,40}(?:آزمودم|امتحان\s*کردم|سنجیدم|چک\s*کردم)/g;
+  I.ideaBizRe = new RegExp(I.ideaRe.source.replace("(?:ایده|استارت", "(?:استارت"));
+  I.ideaHookOn = function (s, recent) {
+    var solving = false; try { solving = !!((AS.boundLive && AS.boundLive(s)) || (s && s.coach && s.coach.stmt)); } catch (e) { }
+    var t = String(recent || "").replace(I.ideaSolveRe, " ");
+    return solving ? I.ideaBizRe.test(t) : I.ideaRe.test(t);
+  };
   /* ---------- کارهای دستیار (فقط از حرفِ خودِ کاربر) ---------- */
   if (AS && AS.DO) {
     AS.DO.idea_new = function (a) {
@@ -199,7 +209,7 @@
     ].join("\n");
     /* فقط وقتی به کار است در پرامپت می‌آید — پرامپتِ سامانه سقفِ ۲۰ هزار نویسهٔ سرور را دارد (test_assist) */
     AS.promptHooks = AS.promptHooks || [];
-    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((s && s.idea) || I.ideaRe.test(recent)) ? RULES : ""; });
+    AS.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" "); return ((s && s.idea) || I.ideaHookOn(s, recent)) ? RULES : ""; });
     AS.promptHooks = AS.promptHooks || [];
     AS.promptHooks.push(function (s) {
       var r = s && s.idea ? S.get(s.idea) : null; if (!r) return "";

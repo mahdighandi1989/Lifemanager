@@ -203,6 +203,66 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(info.e7.s31 === 2, 'E7: «… جمعِ ۱۰۰۰» is a different problem from «… جمعِ ۱۰» (changed data) — two records (s31) ' + JSON.stringify(info.e7));
   chk(info.e7.s11 === 0 && info.e7.s25 === 0, 'E7: a paraphrase of the look-back child (same parent, no conflicting data; shared words or the same formula) updates it instead of a second record (s11, s25) ' + JSON.stringify(info.e7));
 
+  // ---------- E8) قلّابِ «💡 ایده» نه برای ایدهٔ حل؛ سطرهای منبع در مرحلهٔ خودشان؛ ضرب‌المثلِ خودِ کاربر؛ میانهٔ راه بی تعارض ----------
+  await newSess();
+  await say('معما: با دو ساعت‌شنیِ ۷ و ۱۱ دقیقه، ۱۵ دقیقه را اندازه بگیر');
+  await say('یه ایده برای پلان به ذهنم رسید: از آخر شروع کنم');
+  info.e8 = { ideaPlan: !/# ایده \(«💡 جایگاهِ ایده»\)/.test(await lastUser()) };
+  await newSess(); await say('یه ایده دارم: یه کانال آموزش آشپزی بزنم'); info.e8.ideaBiz = /# ایده \(«💡 جایگاهِ ایده»\)/.test(await lastUser());
+  info.e8.lines = await p.evaluate(() => { const AS = APP.ASSIST, P = AS.coachLines({ ph: 'p', cls: 'pract', qs: [], dry: true }), C = AS.coachLines({ ph: 'c', cls: 'obj', qs: [], dry: true }), B = AS.coachLines({ ph: 'b', cls: 'obj', qs: [], dry: true }), CP = AS.coachLines({ ph: 'c', cls: 'pract', qs: [], dry: true });
+    return { defLife: /به تعریف‌ها برگرد/.test(P) && /شریکِ جرم/.test(P), inventor: /پارادوکسِ مخترع/.test(P), heur: /ناتمام — اکتشافی/.test(C) && !/ناتمام — اکتشافی/.test(CP), mush: /قارچ‌ها خوشه‌ای/.test(B) }; });
+  info.e8.prov = await p.evaluate(() => { const AS = APP.ASSIST; return { own: /ضرب‌المثل یا قاعدهٔ عامیانهٔ خودش/.test(AS.coachLines({ ph: 'p', cls: 'pract', qs: [], dry: true, mt: 'دیگه آب که از سر گذشت، چه یک وجب چه صد وجب' })), none: !/ضرب‌المثل یا قاعدهٔ عامیانهٔ خودش/.test(AS.coachLines({ ph: 'p', cls: 'pract', qs: [], dry: true, mt: 'طرحم اینه که اول کیسه‌ها رو جدا کنم' })),
+    will: (/ضرب‌المثلِ همین مرحله \(پولیا، «حکمتِ ضرب‌المثل‌ها»\): «([^»]+)»/.exec(AS.coachLines({ ph: 'c', cls: 'pract', qs: [], dry: true, mt: 'خسته شدم، ول می‌کنم' })) || [])[1] || '' }; });
+  chk(info.e8.ideaPlan && info.e8.ideaBiz, 'E8: «یه ایده برای پلان به ذهنم رسید» while solving does not bring the 💡 idea hook; a real business idea still does ' + JSON.stringify(info.e8));
+  chk(Object.values(info.e8.lines).every(Boolean), 'E8: «back to definitions» (every kind), inventor\'s paradox (plan), «label heuristic proof incomplete» (exec/look-back, not practical), «mushrooms grow in clusters» (look-back) from the source items ' + JSON.stringify(info.e8.lines));
+  chk(info.e8.prov.own && info.e8.prov.none && info.e8.prov.will && !/سخت‌کوشی/.test(info.e8.prov.will), 'E8: the user\'s own proverb gets a prompt line; explicit giving-up gets the will proverb before incubation ' + JSON.stringify(info.e8.prov));
+
+  // ================= صفحهٔ «🔭»: E3 فهرستِ کامل و بی‌برش؛ «همهٔ داده‌ها؟» نه در آغازِ طرح؛ E1 شناسهٔ پرسشِ مسئلهٔ زنده؛ میانهٔ راه =================
+  {
+    const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } }); const q = await ctx.newPage();
+    q.on('pageerror', e => errors.push('pageerror(live): ' + e.message));
+    q.on('dialog', d => { errors.push('dialog ' + d.message()); d.dismiss(); });
+    await q.route('**/fonts.googleapis.com/**', r => r.abort());
+    const Wq = (ms) => q.waitForTimeout(ms || 90);
+    const go = async (v, a, s) => { await q.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await Wq(140); };
+    const sel = async (s, v) => { await q.selectOption(s, v); await Wq(120); };
+    const click = async (s) => { await q.click(s); await Wq(160); };
+    const has = (s) => q.locator(s).count();
+    const mk = async (o) => { await go('e_prob', null, 'live'); if (o.title != null) await q.fill('#lpNewT', o.title); await q.fill('#lpNewS', o.st); await Wq(60); if (o.nat) await sel('#lpNewNat', o.nat); await click('main .lp-create'); return q.evaluate(() => APP.state.arg); };
+    const understand = async (o) => {
+      await q.fill('#lpOne', o.one); await q.fill('#lpWhy', 'برایم مهم است و کنجکاوم'); await click('main .lp-onesave');
+      await q.fill('#lpUnk', o.unk);
+      for (let i = 0; i < o.data.length; i++) { if (i >= 2) await click('main .lp-dadd'); await q.fill('#lpD_d' + (i + 1), o.data[i]); }
+      await q.fill('#lpCond', o.cond);
+      if (await has('#lpSat')) await sel('#lpSat', 'yes');
+      await sel('#lpSuff', 'کافی است'); if (await has('#lpSuffW')) await q.fill('#lpSuffW', 'همین‌ها بس است');
+      await q.fill('#lpGuess', 'شدنی است'); await sel('#lpConf', '60'); await q.fill('#lpTest', 'با یک حالتِ خاص می‌آزمایم');
+      await sel('#lpIfRef', 'حدس را کنار می‌گذارم یا اصلاحش می‌کنم');
+      await click('main .lp-usave'); await click('main .lp-u .sv-g2');
+    };
+    const sayQ = async (text, st) => { await q.evaluate(st => { if (st) __q.push({ reply: 'بگو.', status: 'related', memory: 'm', actions: [Object.assign({ do: 'coach_state' }, st)] }); }, st || null); await q.evaluate(() => APP.ASSIST.toggle(true)); await q.fill('.as-panel .as-in', text); await q.click('.as-panel .as-send'); await q.waitForFunction(() => !APP.ASSIST.busy(), null, { timeout: 15000 }); };
+    await q.goto(FILE); await q.waitForSelector('.nav'); await Wq(300);
+    await q.evaluate(() => { APP.S.loaded = true; window.__calls = []; window.__q = [];
+      APP.callAI = async (sys, user, opts) => { __calls.push({ user }); const r = __q.shift(); const t = JSON.stringify(r || { reply: 'باشه.', status: 'related', memory: 'm', actions: [] }); return opts && opts.withMeta ? { text: t, files: [] } : t; }; });
+    const P1 = await mk({ title: 'لوله در بار', st: 'یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟', nat: 'objective' });
+    await understand({ one: 'می‌خواهم بدانم بلندترین پاره‌خطِ درونِ بار از چهار متر بلندتر است یا نه', unk: 'بلندترین پاره‌خطِ درونِ بار', data: ['طول ۳.۲ متر', 'عرض ۱.۸ متر', 'ارتفاع ۱.۶ متر'], cond: 'لوله صاف است و باید کامل درونِ بار باشد' });
+    await q.evaluate(() => { localStorage.removeItem('lla.assist.cur'); APP.ASSIST.newSession(); });
+    await sayQ('خب حالا طرح چی باشه؟', { ph: 'p', said: [], ans: ['p1'], stuck: false, fail: false, role: 'self', nat: 'objective' });
+    const u1 = await q.evaluate(() => __calls[__calls.length - 1].user);
+    const L = await q.evaluate(pid => APP.livePhaseQs(pid, 'p'), P1);
+    const line = (/^- پرسش‌های همین مرحله[^\n]*$/m.exec(u1) || [''])[0];
+    info.e3live = { n: L.length, full: L.every((x, k) => line.indexOf('p' + (k + 1) + ') «' + x + '»') >= 0), dataLine: /^- داده‌هایی که هنوز/m.test(u1) };
+    await sayQ('آره یه چیزی شبیهش دیدم، قطرِ مستطیل');
+    const u2 = await q.evaluate(() => __calls[__calls.length - 1].user);
+    info.e3live.p1Marked = new RegExp('p1\\) «[^»]*» \\[در گفت‌وگو پاسخ گرفته').test(u2);
+    await sayQ('نمی‌دونم، گیر کردم');
+    info.e3live.dataStuck = /^- داده‌هایی که هنوز/m.test(await q.evaluate(() => __calls[__calls.length - 1].user));
+    chk(info.e3live.full, 'E3: the live block lists the WHOLE phase list (not cut at 7, no clipped question), with ids ' + JSON.stringify(info.e3live) + ' ' + line.slice(0, 300));
+    chk(!info.e3live.dataLine && info.e3live.dataStuck, 'E3: «have you used all the data?» is not raised at the start of planning (no plan, not stuck) — only when stuck or once a plan exists ' + JSON.stringify(info.e3live));
+    chk(info.e3live.p1Marked, 'E1: the model\'s «ans: p1» on the live problem\'s list marks that page question answered in chat ' + JSON.stringify(info.e3live));
+    await ctx.close();
+  }
+
   info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);
   chk(info.sys2 <= 20000, 'SYS ≤ 20000 at the end: ' + info.sys2);
   console.log(JSON.stringify(info).slice(0, 8000));

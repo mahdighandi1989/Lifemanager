@@ -774,7 +774,8 @@
       det.appendChild(h("table", { class: "sv-ktab small" }, h("thead", {}, h("tr", {}, h("th", {}, "x"), h("th", {}, "y"))), tb));
       det.appendChild(h("button", { class: "btn ghost sm sv-kaddrow", type: "button", onclick: function () { var last = kit.rows[kit.rows.length - 1], nx = A.knumOf && last ? A.knumOf(last.x) : null; kit.rows.push({ x: nx != null ? String(nx + 1) : "", y: "" }); drawRows(); } }, "+ حالتِ دیگر"));
       /* دورِ ۲ ِ تور (s24): جدولِ مسئلهٔ شمارشی وارسیِ درونی می‌خواهد — «همه را شمردی؟» (کد بی پاسخش «وارسی شد» نمی‌دهد) */
-      if (o.counting || (A.kCountRe && A.kCountRe.test(String(o.problem || "")))) det.appendChild(field(idp + "cnt", "شمارش: در هر حالت همه را شمردی؟ چطور مطمئنی هیچ موردی جا نیفتاده و هیچ موردی دو بار شمرده نشده (فهرستِ منظم)؟", kit.countHow || "", function (v) { kit.countHow = v; }, 0));
+      /* E8 (دورِ ۴، s24): «به چند روش …؟» هم شمارش است (A.kCountRe ِ a17 «روش» را ندارد — این‌جا کنارش، بی دست زدن به a17) */
+      if (o.counting || (A.kCountRe && A.kCountRe.test(String(o.problem || ""))) || /(?:چند|تعداد)\s*(?:روش|شیوه)/.test(String(o.problem || ""))) det.appendChild(field(idp + "cnt", "شمارش: در هر حالت همه را شمردی؟ چطور مطمئنی هیچ موردی جا نیفتاده و هیچ موردی دو بار شمرده نشده (فهرستِ منظم)؟", kit.countHow || "", function (v) { kit.countHow = v; }, 0));
     }
     if (P.indexOf("formula") >= 0) det.appendChild(ltrIn(field(idp + "f", "حدست را دقیق بنویس — به صورتِ فرمولِ n (مثلاً " + LT("n(n+1)/2") + " یا " + LT("2^n − 1") + "، یا رابطهٔ بازگشتی مثلِ " + LT("a(n) = a(n−1) + a(n−2)") + " که کد روی جدولِ خودت می‌سنجد؛ حرفِ فارسی مثلِ «ن» یا «ح» هم همان متغیر است، و کسر مثلِ " + LT("1000/27") + " در جدول خوانده می‌شود)", kit.formula, function (v) { kit.formula = v; }, 0, "فرمول بر حسبِ n")));
     if (P.indexOf("rivals") >= 0) {
