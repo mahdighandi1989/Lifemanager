@@ -120,42 +120,49 @@
   };
   /* «# دانسته‌های قلمرو»: حوزه‌های مرتبط با پیام (از هر شش سامانه و قلمروِ معرفت‌شناسی) با گزاره‌ها و رده‌شان — دستیار یافتهٔ
      تثبیت‌شده را از همین‌جا می‌گوید، نه از حافظهٔ خودش، و «حکم نمی‌کنم» را با «یافته چیست» اشتباه نمی‌گیرد (کارزارِ آزمون) */
-  var STOP = /^(که|را|از|به|با|در|این|آن|برای|است|هست|نیست|می|من|تو|یه|یک|هم|اگر|چرا|چه|چطور|کنم|کنی|کند|بود|شد|شده|دارم|داره|دیگه|خیلی|همه|ولی|اما|تا|رو|اون|این‌ها|باید)$/;
-  function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return stem(w); }).filter(function (w) { return w.length >= 2; }); }
+  var STOP = /^(که|را|از|به|با|در|این|آن|برای|است|هست|نیست|می|من|تو|یه|یک|هم|اگر|چرا|چه|چطور|کنم|کنی|کند|بود|شد|شده|دارم|داره|دیگه|خیلی|همه|ولی|اما|تا|رو|اون|این‌ها|باید|همین|همون|همینو|داشتم|داشت|داشتن|داریم|دارن|کنیم|کنه|کردم|کرد|کردن|کرده|میشه|بشه|باشه|باشم|هستم|بودم|بودن|شاید|گفتم|گفتن|گفت|میگه|قبلا|قبلاً|بعدا|بعداً|اول|دوم|سوم|روی|چون|پس|بعد|حالا|الان|اینجا|اونجا|خودم|خودش|خودت|آیا|چی|چیه|کجا|کجاش|چند|چقدر|یکی|اینه|اینو|اونو|ازش|بهش|باهاش|راستش|مثلا|مثلاً|دیگر|نمی|نمیشه|می‌شه)$/;   // دورِ ۴ (E6): واژه‌های دستوری/گفتاری که «همین/داریم/گفتم/قبلاً» را شاهدِ ربط می‌کردند
+  function toks(t) { return String(t || "").replace(/[\u064B-\u065F\u0670\u0654\u200c]/g, "").replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[\u060C\u061B\u061F\u066B\u066C\u06D4«»]+/g, " ").replace(/[^\u0600-\u06FFa-zA-Z0-9 ]+/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && !STOP.test(w); }).map(function (w) { return stem(w); }).filter(function (w) { return w.length >= 2; }); }
   /* ریخت‌شناسیِ کوچک (تورِ پولیا دورِ ۲، R6): پسوندهای جمع/ضمیر/«ای» برداشته می‌شوند؛ «ـه» برداشته نمی‌شود («مقابله» ≠ «مقابل») و تطبیقِ پیشوندی نیست */
   /* B8 (تورِ پولیا دورِ ۳): «ـات» فقط جمعِ عربی است وقتی ریشه دست‌کم سه حرف بماند و واژه از جملهٔ مفردهای «ـات»‌دار نباشد — «اثبات» ≠ «اثب»، «ثبات»، «نجات»، «حیات» */
   var AT_KEEP = /^(?:اثبات|ثبات|نجات|حیات|زکات|ملاقات|مساوات|صلوات|ممات|برات|نبات|سادات)$/;
   function stem(w) { var o = /ات$/.test(w) && (AT_KEEP.test(w) || w.length - 2 < 3) ? w.replace(/(?:هایی|های|ها)$/, "") : w.replace(/(?:هایی|های|ها|ای|ی|ام|ات|اش)$/, ""); return o.length >= 2 ? o : w; }
-  /* ربطِ واقعی، نه هم‌واژگیِ تصادفی (تورِ پولیا s11/s13/s16/s32: «مسئله» ⇐ «مثالِ حل‌شده»، «رشد» ⇐ «رشد پس از سختی»): حوزه فقط وقتی می‌آید که
-     دست‌کم **دو** واژهٔ معنادارِ متفاوتِ پیام در آن باشد و یکی‌شان در نامِ حوزه (یا سه واژه در هر جای آن)، یا نامِ کاملِ حوزه در پیام آمده باشد
-     (پیوندِ صریح؛ know ِ مدل هم صریح است). «معنادار» = نه واژهٔ ایست، و نه واژه‌ای که در بیش از یک‌شانزدهمِ حوزه‌ها هست — چنین واژه‌ای
-     («مسئله»، «فقط»، «بیشتر»، «خودم») نمی‌گوید کدام حوزه (بسامدِ همان نقشه‌ها). هم‌ریشه فقط با پیشوندِ دست‌کم ۵ حرف. */
+  /* ربطِ واقعی، نه هم‌واژگیِ تصادفی — تورِ پولیا دورِ ۴ (E6، بارِ سوم ِ R6): برای پیامِ کاربر **هیچ تطبیقِ تک‌واژه‌ای** (نه «نامِ» تک‌واژه‌ایِ حوزه،
+     نه واژهٔ عنوان به‌تنهایی). حوزه فقط با پیوندِ صریح (know ِ مدل، وجهِ تور، مسئلهٔ زندهٔ وصل به حوزه — SYS.knowledge) یا با **دست‌کم دو** واژهٔ
+     کامل و **متمایزِ** مشترک می‌آید. «متمایز» از A4: واژه‌ای که میانِ قلمروها (شش سامانه و معرفت‌شناسی) پخش است — هیچ قلمرویی بیش از نیمِ
+     حوزه‌های آن واژه را ندارد — چیزی دربارهٔ این‌که کدام قلمرو نمی‌گوید (پایین: distinctFor) — نه عددِ برازش‌شده؛ و هر واژه فقط با هم‌ریشهٔ دقیق پس از ریخت‌شناسی (بی تطبیقِ پیشوندی). نمونه‌های پرنویزِ
+     دورِ ۴ («امن» ⇐ اجتناب، «دو روز» ⇐ منحنیِ فراموشی، «هفته/روز/ثابت» ⇐ عادت‌ها و شخصیت، «اسناد») در tests/test_tour1_r4_coach.js. */
   function areaBlob(a, epi) { return epi ? [a.fa, a.en || "", a.desc_fa || "", (a.key_questions_fa || []).join(" ")].join(" ") : [a.fa, a.en || "", a.desc_fa || "", (a.key_questions_fa || []).join(" "), (a.claims || []).map(function (c) { return c.fa; }).join(" ")].join(" "); }
   var DF = null;
   function dfOf() {
-    if (DF) return DF; var d = {}, n = 0;
-    function see(b) { n++; var seen = {}; toks(b).forEach(function (w) { if (!seen[w]) { seen[w] = 1; d[w] = (d[w] || 0) + 1; } }); }
-    SYS.areas().forEach(function (x) { see(areaBlob(x.a, false)); });
-    ((window.EPI_TERR || {}).groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { see(areaBlob(a, true)); }); });
-    DF = { d: d, n: n }; return DF;
+    if (DF) return DF; var d = {}, N = {};
+    function see(b, terr) { var seen = {}; N[terr] = (N[terr] || 0) + 1; toks(b).forEach(function (w) { if (seen[w]) return; seen[w] = 1; var x = d[w] = d[w] || { n: 0, t: {} }; x.n++; x.t[terr] = (x.t[terr] || 0) + 1; }); }
+    SYS.areas().forEach(function (x) { see(areaBlob(x.a, false), terrOf(x.sys)); });
+    ((window.EPI_TERR || {}).groups || []).forEach(function (g) { (g.areas || []).forEach(function (a) { see(areaBlob(a, true), "epi"); }); });
+    DF = { d: d, N: N }; return DF;
   }
-  function meaningful(w) { var D0 = dfOf(); return (D0.d[w] || 0) * 16 <= D0.n; }
+  function terrOf(sys) { return sys ? "sys:" + (sys.id || "?") : "epi"; }
+  /* A4 در دو سو: واژه برای حوزه‌ای در قلمروِ T متمایز است اگر (۱) **بیش از نیمی** از حوزه‌هایی که آن واژه را دارند در T باشند (احتمالِ «همین قلمرو» > ½)
+     — واژه‌ای که میانِ قلمروها (شش سامانه و معرفت‌شناسی) پخش است («سال»، «هفته»، «پیدا»، «حرف») به هیچ قلمرویی اشاره نمی‌کند — و (۲) در **بیش از نیمی**
+     از حوزه‌های خودِ T نباشد — واژه‌ای که تقریباً همهٔ حوزه‌های یک قلمرو دارند («تصمیم/انتخاب» در تصمیم، «آیا/داریم» در معرفت‌شناسی) نمی‌گوید کدام حوزه.
+     بی عددِ برازش‌شده. */
+  function distinctFor(w, terr) { var D0 = dfOf(), x = D0.d[w]; if (!x) return false; var k = x.t[terr] || 0; return k * 2 > x.n && k * 2 <= (D0.N[terr] || 0); }
+  function meaningful(w) { var x = dfOf().d[w]; return !!x && Object.keys(x.t).some(function (t) { return distinctFor(w, t); }); }
+  SYS.distinctive = meaningful;
   SYS.relatedMin = 2;
   SYS.related = function (text, n) {
     var allq = {}; toks(text).forEach(function (w) { allq[w] = 1; });
-    var q = toks(text).filter(meaningful); if (!q.length) return [];
+    var q = toks(text).filter(meaningful);
     var qs = {}; q.forEach(function (w) { qs[w] = 1; });
-    /* { hits: شمارِ واژه‌های متفاوتِ پیام که در متن آمده، title: چندتا در عنوان } */
-    /* فقط هم‌ریشهٔ دقیق پس از ریخت‌شناسی — بی تطبیقِ پیشوندی («مقابل»~«مقابله»، «رشد»~«رشد پس از سختی» نه؛ rerunB/C/D) */
-    function match(blob) { var seen = {}; toks(blob).forEach(function (w) { if (qs[w]) seen[w] = 1; }); return Object.keys(seen); }
+    function match(blob, terr) { var seen = {}; toks(blob).forEach(function (w) { if (qs[w] && distinctFor(w, terr)) seen[w] = 1; }); return Object.keys(seen); }
     var out = [];
     function consider(a, rest) {
-      var tw = match(a.fa + " " + (a.en || "")), all = match(areaBlob(a, rest.epi)), uniq = {}; tw.concat(all).forEach(function (w) { uniq[w] = 1; });
-      var hits = Object.keys(uniq).length, ft = toks(a.fa), named = ft.length && ft.every(function (w) { return allq[w]; });
-      /* نامِ چندواژه‌ای که فقط **بخشی** از آن در پیام است («رشد» از «رشد پس از سختی») شاهدِ نام نیست — همان حالتِ «سه واژه در هر جای حوزه» */
-      var fd = ft.filter(meaningful), partial = tw.length && fd.length > 1 && tw.length < fd.length;
-      if (!named && !(hits >= SYS.relatedMin && ((tw.length && !partial) || hits > SYS.relatedMin))) return;
-      out.push(Object.assign({ sc: hits + tw.length + (rest.epi ? 0 : 0.5), hits: hits, words: Object.keys(uniq), a: a }, rest));
+      var terr = rest.epi ? "epi" : terrOf(rest.sys), words = match(areaBlob(a, rest.epi), terr), tw = match(a.fa + " " + (a.en || ""), terr);
+      /* نامِ کاملِ چندواژه‌ایِ حوزه در پیام («استدلالِ جمعی») پیوندِ صریح است؛ نامِ تک‌واژه‌ای («رشد») نه — همان قاعدهٔ «تک‌واژه هرگز» */
+      var ft = toks(a.fa), named = ft.length >= SYS.relatedMin && ft.every(function (w) { return allq[w]; });
+      if (named) ft.forEach(function (w) { if (words.indexOf(w) < 0) words.push(w); });
+      /* دست‌کم دو واژهٔ متمایزِ متفاوت، و یکی‌شان از **نامِ** خودِ حوزه (آنچه حوزه را تعریف می‌کند)؛ دو واژهٔ هم‌زمان در توضیح/گزاره‌ها («گزارش/ثبت» ⇐ هیجانِ مثبت) ربط نیست */
+      if (!named && (words.length < SYS.relatedMin || !tw.length)) return;
+      out.push(Object.assign({ sc: words.length + tw.length + (rest.epi ? 0 : 0.5), hits: words.length, words: words, a: a }, rest));
     }
     SYS.areas().forEach(function (x) { consider(x.a, { sys: x.sys, epi: false }); });
     var T = window.EPI_TERR || {}, EL = ((window.EPI_BT_LEDGER || {}).territory || {}).areas || {};

@@ -135,7 +135,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     __q.push({ reply: 'این‌جا جایش نیست.', status: 'unrelated', title: 'درخواستِ نامربوط', memory: 'm', actions: [] });
     await AS.send('دستور لازانیا بده');
     __q.push({ reply: 'باشه.', status: 'related', title: 'مذاکرهٔ حقوق', memory: 'm', actions: [{ do: 'tour_plan', facets: [{ key: 'f1', kind: 'other', area: 'dc_career_income', title: '' }] }] });
-    await AS.send('می‌خوام سرِ حقوقم مذاکره کنم و از بیکاری می‌ترسم');
+    await AS.send('می‌خوام سرِ حقوقم مذاکره کنم و به توافق برسم؛ از بیکاری می‌ترسم');
     out.title = s.title; const f = s.tour.facets[0];
     out.area = [f.kind, f.area, f.title, f.view, f.arg].join('|');
     out.knowledge = /# دانسته‌های قلمرو/.test(__calls[1].user) && /sc_negotiation/.test(__calls[1].user);

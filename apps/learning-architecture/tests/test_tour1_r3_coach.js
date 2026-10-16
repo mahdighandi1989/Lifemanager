@@ -196,10 +196,11 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const blk = (() => { const i = u.indexOf('# دانسته‌های قلمرو'); if (i < 0) return ''; const j = u.indexOf('\n# ', i + 5); return u.slice(i, j < 0 ? u.length : j); })();
     const fromAuto = APP.SYST.related(txt, 3).map(r => r.a.id), fromUser = APP.SYST.related('ثابت کن قطرهای مستطیل برابرند', 3).map(r => r.a.id);
     const noise = fromAuto.filter(id => fromUser.indexOf(id) < 0);
-    return { auto: true, noise, leaked: noise.filter(id => blk.indexOf(id + ' ') >= 0) };
+    return { auto: true, noise, leaked: noise.filter(id => blk.indexOf(id + ' ') >= 0), fromUser: APP.SYST.userText(APP.ASSIST.cur(), txt) === 'ثابت کن قطرهای مستطیل برابرند' };
   });
   info.b8.stem = await p.evaluate(() => APP.SYST.toks ? { isbat: APP.SYST.toks('اثبات').join(), plural: APP.SYST.toks('اطلاعات').join() } : { missing: true });
-  chk(info.b8.auto && info.b8.noise.length > 0 && info.b8.leaked.length === 0, 'B8: on the automatic turn «دانسته‌های قلمرو» relevance comes from the user\'s own words, not the system instruction text ' + JSON.stringify(info.b8));
+  // دورِ ۴ (E6): با قاعدهٔ «دو واژهٔ متمایز» متنِ دستورِ سامانه دیگر خودش نویز نمی‌سازد — پس خودِ ورودیِ ربط (SYST.userText) سنجیده می‌شود
+  chk(info.b8.auto && info.b8.fromUser && info.b8.leaked.length === 0, 'B8: on the automatic turn «دانسته‌های قلمرو» relevance comes from the user\'s own words, not the system instruction text ' + JSON.stringify(info.b8));
   chk(info.b8.stem.isbat === 'اثبات' && info.b8.stem.plural === 'اطلاع', 'B8: «اثبات» is not stemmed to «اثب» (a real plural «اطلاعات» still is) ' + JSON.stringify(info.b8.stem));
 
   // ---------- B14) ضرب‌المثلِ نوع‌دار و هم‌جا؛ سلیقه و ته‌نشینی در میانه ----------

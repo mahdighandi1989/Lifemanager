@@ -155,6 +155,29 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   { const c = coachOf(await lastUser()); info.e3 = { ph: phOf(c), sug: sugOf(c) };
     chk(info.e3.ph === 'طرح‌ریزی' && /به عقب/.test(info.e3.sug), 'E3: stuck going forward in planning ⇒ «از خواسته به عقب» is the suggested question (s08) ' + JSON.stringify(info.e3)); }
 
+  // ---------- E6) قلمرو (بارِ سوم ِ R6): بی تطبیقِ تک‌واژه؛ دو واژهٔ متمایز (A4 > ½) یا پیوندِ صریح — جفت‌های پرنویزِ گزارش‌های دورِ ۴ ----------
+  const NOISY = [
+    ['هوم... راستش اگه فکر کنم، مهم‌ترینش اینه که پسرم تا هفت سال آینده یه جای امن و ثابت داشته باشه که هی اسباب‌کشی نکنیم، و قسط یا اجاره بیشتر از ۴۰ درصد درآمدمون نشه. سود بیشتر اونقدرا مهم نیست.', ['md_avoidance', 'dc_premortem_redteam']],
+    ['سلام دوباره. دو روز گذشت. راستش ۵ تا ستون جدید هم اضافه کردم: قیمت طلا، قیمت دلار، پیش‌بینی انتخابات، نرخ بهره بانکی، شاخص بورس. فایلمو هم گذاشتم. هنوز حس می‌کنم داده کم دارم که تصمیم بگیرم.', ['ln_forgetting_consolidation']],
+    ['فرض: ۵ نقطه، مربع ضلع ۱، نقطه‌ها داخلش. حکم: دو تا فاصله‌شون ≤ √۲/۲. هفت تا شکل کشیدم با ۵ نقطه، همیشه دو تا نزدیک بودن. پس درسته، ثابت شد دیگه!', ['md_attribution']],
+    ['آهان، دو تا شرطه: یکی معنا — یه چیزی که تو دریا راه میره، یکی املا — کلمه‌ی پنج حرفی که برعکسش هم همونه، پالیندروم. واژه‌های دریایی پنج حرفی: ناخدا، کشتی‌ها نه... لنج؟ نه... آهان ناوبان؟ حرف دومش با عمودی «ا» درمیاد. هنوز پیدا نکردم.', ['ln_dual_coding']],
+    ['سه بار دیدم، فاکتورها دست منه. ولی من فقط یه قاعده می‌خوام. یکی بگه قانون اینه، منم همونو انجام بدم که تقصیرش گردن من نباشه. اگه گزارش ندم شریک جرمم دیگه، نه؟', ['ln_attention']],
+    ['سلام، دو شب گذشته. جالبه: یه روشی رو که هفته‌ی پیش خودم بهش «گفته بودم» (برای مسئله‌ی سن) کاملاً یادش رفته، ولی روش نخ رو یادشه و امروز خودش برای یه مسئله‌ی دیگه نخ آورد. چرا این‌طوریه؟', ['sf_personality']],
+    ['روز سوم. صفحه گیر داده به واحدها، من نوشتم ۲۰۰ مترمربع ضرب در ۰.۱۲ متر میشه ۲۴ مترمکعب ولی باز میگه واحد ۲۰۰ رو بنویس! تازه فکر کردم باید دقیق‌تر بشه: داده‌ی تبخیر ماهانه، شیب بام، کیفیت آب بارون، و قیمت سیمان تا ۵ سال آینده رو هم دربیارم. از کجا پیدا کنم؟', ['dc_premortem_redteam', 'ln_forgetting_consolidation', 'dc_habits']],
+    ['یک جمله... «تحت چه شرایطی شبکه‌ی E-I-PV نوسان گاما می‌سازه؟» ولی خب جزئیات مهمه، مثلاً g_PV-I هم... اوکی. استادم می‌گه شاید مسئله‌ی کلی‌تر رو ببینم، شبکه‌ی دو جمعیتی عمومی. ولی کلی‌تر که سخت‌تره!', ['sf_intelligence_g']],
+    ['دو هفته گذشت. هفته‌ی اول دیوانه‌وار شبیه‌سازی کردم، هیچی. بعد چند روز رفتم سفر. توی اتوبوس یهو به ذهنم رسید: شاید فقط نسبت ثابت‌های زمانی مهمه، یعنی τ_I به τ_E! وقتی بیشتر از یه حدی باشه نوسان میاد. حس می‌کنم درسته.', ['dc_sunk_cost', 'dc_habits']],
+  ];
+  info.e6 = await p.evaluate((NOISY) => {
+    const ids = (t) => APP.SYST.related(t, 4).map(r => r.a.id);
+    const bad = NOISY.map(([t, no]) => [t.slice(0, 30), ids(t).filter(id => no.indexOf(id) >= 0)]).filter(x => x[1].length);
+    const one = ids('یه جای امن می‌خوام');   // تک‌واژه هرگز
+    const pos = { coll: ids('تو جلسه‌ها اطلاعاتِ پنهانِ هر نفر گفته نمی‌شه و استدلالِ جمعی خراب می‌شه'), neg: ids('می‌خوام سرِ حقوقم مذاکره کنم؛ محدودهٔ توافق چیه و بهترین جایگزینم کدومه؟'), ret: ids('بازیابی و یادآوری برای امتحان مرورِ فاصله‌دار و آزمونِ خود') };
+    const link = /sc_collective_reasoning/.test(APP.SYST.knowledge({ know: [], tour: { facets: [{ key: 'f1', kind: 'area', area: 'sc_collective_reasoning', status: 'now' }] } }, 'سلام'));
+    return { bad, one, pos: { coll: pos.coll.includes('sc_collective_reasoning'), neg: pos.neg.includes('sc_negotiation'), ret: pos.ret.includes('ln_retrieval') }, link };
+  }, NOISY);
+  chk(!info.e6.bad.length && !info.e6.one.length, 'E6: no territory from single words or non-distinctive shared words (the round-4 noisy pairs) ' + JSON.stringify(info.e6));
+  chk(info.e6.pos.coll && info.e6.pos.neg && info.e6.pos.ret && info.e6.link, 'E6: a full multi-word area name, two distinctive shared words, or an explicit link still bring the area ' + JSON.stringify(info.e6));
+
   info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);
   chk(info.sys2 <= 20000, 'SYS ≤ 20000 at the end: ' + info.sys2);
   console.log(JSON.stringify(info).slice(0, 8000));

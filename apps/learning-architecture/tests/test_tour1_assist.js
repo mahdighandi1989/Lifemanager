@@ -250,7 +250,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const kb = (__calls[0].user.split('# دانسته‌های قلمرو')[1] || '').split('\n# ')[0];
     out.noWorked = !/pr_worked_examples/.test(kb);
     out.ethics = APP.SYST.related('همکارم فاکتورهای ناهار رو هر بار بیشتر ثبت می‌کنه. اگه گزارش بدم اخراج می‌شه. درستش چیه؟', 4).map(r => r.a.id);
-    out.neg = APP.SYST.related('می‌خوام سرِ حقوقم مذاکره کنم و از بیکاری می‌ترسم', 4).map(r => r.a.id);
+    out.neg = APP.SYST.related('می‌خوام سرِ حقوقم مذاکره کنم و به توافق برسم؛ از بیکاری می‌ترسم', 4).map(r => r.a.id);
     out.ret = APP.SYST.related('بازیابی و یادآوری برای امتحان مرورِ فاصله‌دار و آزمونِ خود', 4).map(r => r.a.id);
     const s = AS.cur(); AS._turnSession = s; AS.DO.tour_plan({ goal: 'g', facets: [{ key: 'f1', kind: 'claim', title: 'سنجیدنِ ادعای «تبلیغ علتِ رشد بود»', why: 'از یافتهٔ «ادعای پنهان» و «راهِ دانستن: قبل/بعد»' }] });
     out.match = AS.tourMatchAreas(s.tour.facets[0]).map(r => r.a.id);
