@@ -1487,9 +1487,10 @@
       h("p", { class: "small" }, "پیش‌بینی: «" + st.pred + "» · آنچه شد: «" + o.what + "». فاصلهٔ این دو جایی است که فهمت از مسئله یا از خودت ناقص بود."),
       h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm lp-toknot", type: "button", onclick: function () { stuck(r, pg, s, st); } }, "🪢 همین غافلگیری را در گره‌گشا بشکاف"),
         h("button", { class: "btn ghost sm lp-reu", type: "button", onclick: function () { live(s).reU = true; S.put(pg); A.go("lprob", r.p.id, "u"); } }, "↺ دوباره فهمِ مسئله"))));
-    if ((o.prog === "نه" || o.done === "no") && A.willHost && A.willCard) {
+    /* B9 (تورِ ۱ دورِ ۳، s19 — ویرایشِ کمینهٔ «coach»): خواستنی که پس از گام «کمتر» شد هم شکست/میلِ رها کردن است ⇒ همان کارتِ «🌱» */
+    if ((o.prog === "نه" || o.done === "no" || o.want === "less") && A.willHost && A.willCard) {
       var hs = A.willHost("prob", r.p.id);
-      if (hs) box.appendChild(A.willCard(hs, "live:" + (o.done === "no" ? "notdone" : "noprog"), o.done === "no" ? "گام انجام نشد — اشکالی ندارد؛ داده است. چقدر می‌خواهی پیشش ببری و کوچک‌ترین گامِ بعد چیست؟" : "پیشرفتی نبود. نه رها کن نه وانمود کن چیزی نشده: کوچک‌ترین گامِ مشخص بعد چیست، کی و چند دقیقه؟"));
+      if (hs) box.appendChild(A.willCard(hs, "live:" + (o.done === "no" ? "notdone" : o.prog === "نه" ? "noprog" : "less"), o.done === "no" ? "گام انجام نشد — اشکالی ندارد؛ داده است. چقدر می‌خواهی پیشش ببری و کوچک‌ترین گامِ بعد چیست؟" : o.prog === "نه" ? "پیشرفتی نبود. نه رها کن نه وانمود کن چیزی نشده: کوچک‌ترین گامِ مشخص بعد چیست، کی و چند دقیقه؟" : "پس از این گام کمتر می‌خواهی حلش کنی. نه رها کن نه وانمود کن چیزی نشده: کوچک‌ترین گامِ مشخص بعد چیست، کی و چند دقیقه؟ (یا آگاهانه، با دلیل، کنارش بگذار)"));
     }
     return box.children.length ? box : null;
   }

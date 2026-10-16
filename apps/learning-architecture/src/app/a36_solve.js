@@ -534,10 +534,32 @@
   function qk(q) { return String(q || "").replace(/\s+/g, " ").trim(); }
   /* روزِ کاربست = روزِ پاسخ، نه روزِ داوری (داوریِ دیرتر نباید فاصله بسازد) */
   function useDay(e) { return e.d || (A.localDay ? A.localDay(e.at) : String(e.at || "").slice(0, 10)); }
+  /* تورِ پولیا دورِ ۳ (B5/B11): کاربست‌های دیگرِ همان پرسش — (۱) بازنگریِ کاملِ خودِ کاربر در صفحهٔ مسئلهٔ زنده یا ثبتِ گفت‌وگو (b[k].done، نه
+     بازنگریِ به قلمِ دستیار): هر پرسشِ بازنگری که خانه‌اش را خودش پر کرد یک کاربست است (۲ = انجام شد؛ «نتوانستم وارسی کنم» ⇒ ۰)؛ (۲) tutor_mark ِ
+     گفت‌وگو با خودداوریِ صریحِ خودش (در eprog یا سشن)؛ (۳) پرسشِ دستیار که در گفت‌وگو پاسخ داد یا بخشِ فهم که خودش گفت (A.ASSIST.chatUses). */
+  var BACK_FIELDS = [[/وارسی کنی|جای‌گذاری|با واقعیت سنجیدی|نتیجه را وارسی/, ["chkHow"]], [/راهِ دیگری|یک نگاه/, ["other", "glance"]], [/دوست داشتی/, ["taste"]],
+    [/هم‌ارز/, ["equiv"]], [/تعریف/, ["def"]], [/فرض/, ["hyp"]], [/همان حکم|دقیقاً همان/, ["concl"]], [/تقریبت/, ["approx"]], [/یکنوایی/, ["mono"]],
+    [/حالتِ? ?(?:خاص یا )?حدی|دامنه|واحد|ابعاد|تقارن/, ["limit", "law", "units", "sym", "chkHow"]], [/چند جواب/, ["multi"]], [/کلِ شرط|همهٔ داده/, ["cond", "chkHow"]],
+    [/عوض می‌کردی|دربارهٔ خودت|چه آموختی|خوب کار کرد/, ["worked"]], [/مسئلهٔ دیگری|مسئلهٔ تازه|کجای دیگر|حکمِ دیگری|به کار ببری|به کار می‌بری/, ["use", "newProb"]]];
+  function backUses(q, k) {
+    if (/استقرا/.test(q)) return [];   // پرسشِ اجرا، نه بازنگری
+    var map = BACK_FIELDS.filter(function (x) { return x[0].test(q); })[0]; if (!map) return [];
+    var out = [];
+    S.all("eprog", function (r) { return r && r.solve && r.solve.b; }).forEach(function (pg) { var B = pg.solve.b; Object.keys(B).forEach(function (lv) {
+      var b = B[lv]; if (!b || !b.done || b.own === false || (b.from !== "live" && b.from !== "chat")) return;
+      var f = map[1].filter(function (n) { var v = b[n]; return v != null && String(v).trim().length > 1; })[0]; if (!f) return;
+      out.push({ q: q, at: b.at, d: A.localDay ? A.localDay(b.at) : String(b.at || "").slice(0, 10), self: f === "chkHow" && b.chkRes === "نتوانستم وارسی کنم" ? 0 : 2, src: "back" });
+    }); });
+    return out;
+  }
   A.qUses = function (q) {
     var k = qk(q), L = [];
     S.all("eprog", function (r) { return r && r.tut; }).forEach(function (pg) { ["und", "plan", "exec", "back"].forEach(function (tk) { (pg.tut[tk] || []).forEach(function (e) {
-      if (e && !e.skip && e.k !== "motive" && (e.src === "sim" || e.src === "live") && qk(e.q) === k) L.push(e); }); }); });
+      if (e && !e.skip && e.k !== "motive" && (e.src === "sim" || e.src === "live" || (!e.src && e.self != null && e.by !== "assistant")) && qk(e.q) === k) L.push(e); }); }); });
+    S.all("achat", function (r) { return r && r.tut; }).forEach(function (se) { ["und", "plan", "exec", "back"].forEach(function (tk) { (se.tut[tk] || []).forEach(function (e) {
+      if (e && e.self != null && e.by !== "assistant" && qk(e.q) === k) L.push(e); }); }); });
+    L = L.concat(backUses(q, k));
+    try { if (A.ASSIST && typeof A.ASSIST.chatUses === "function") L = L.concat(A.ASSIST.chatUses(q)); } catch (e) { }
     return L.sort(function (a, b) { return String(useDay(a)).localeCompare(String(useDay(b))) || String(a.at).localeCompare(String(b.at)); });
   };
   A.qRung = function (q) {
@@ -969,7 +991,7 @@
       var stp = { id: "ws" + w.steps.length, at: at, trig: trig || "", step: txt(d.step), when: txt(d.when), desire: d.desire, hope: d.hope, curious: txt(d.curious), budget: d.budget, iv: iv, due: dd.due, dueFrom: dd.from, checks: [] };
       /* ممیزیِ ۲۰۲۶-۱۰-۱۵ (A4): گام ثبت می‌کند چه چیزی را می‌آزماید (مثلاً کدام نقد و کدام فرضِ ایده — میزبان می‌دهد) */
       if (host.tests) stp.tests = JSON.parse(JSON.stringify(host.tests));
-      w.steps.push(stp); if (w.steps.length > 60) w.steps = w.steps.slice(-60); host.put();
+      w.steps.push(stp); if (w.steps.length > 60) w.steps = w.steps.slice(-60); willRemind(host, stp); host.put();
       var left = A.daysBetween(A.today(), stp.due);
       out.appendChild(h("p", { class: "good sv-willok" }, "ثبت شد. " + (dd.from === "when" ? "وارسی: " + A.fdate(stp.due) + " (" + fa(left) + " روزِ دیگر — از همان «کِی» که نوشتی" + (c.when && c.when.date && c.when.date < stp.due ? "؛ گامِ امروز فردا وارسی می‌شود" : "") + ")"
         : "از «کِی» ِ تو روزی خوانده نشد؛ وارسی " + A.fdate(stp.due) + " (" + fa(left) + " روزِ دیگر، پلهٔ نردبان)") + " همین‌جا و در «امروز» برمی‌گردد و می‌پرسد انجامش دادی یا نه."));
@@ -1031,6 +1053,20 @@
     return box;
   }
   /* کارتِ کامل برای یک میزبان: وارسیِ موعد، یا گامِ جاری، یا فرمِ گامِ تازه؛ و دفترِ پیشرفت */
+  /* B9 (تورِ پولیا دورِ ۳، s34): «🌱» ِ ثبت‌شده هم مثلِ گامِ واقعیِ مسئلهٔ زنده یادآور می‌شود (HOST.remind، ساعتِ «کِی» ِ خودش یا ساعتِ یادآورها) —
+     کسی که صفحه را باز نمی‌کند گامِ کوچکش را گم نکند. یک کلید برای هر گام (تکرار ⇒ همان یادآور). */
+  function willRemind(host, stp) {
+    if (!(A.HOST && typeof A.HOST.remind === "function") || !stp || !stp.due) return;
+    var tz = "UTC"; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch (e) { }
+    var t = A.liveHourOf ? A.liveHourOf(stp.when) : null, n = ((S.settings && S.settings().knots) || {}).notify || {}, hr = t ? Math.max(0, t.m ? t.h : t.h - 1) : (n.hour == null ? 9 : n.hour);
+    var isLive = host.kind === "prob" && A.liveRec && A.liveRec(host.id);
+    var link = host.kind === "idea" ? "?tab=idea&a=" + encodeURIComponent(host.id) : host.kind === "knot" ? "?tab=kcase&a=" + encodeURIComponent(host.id) + "&sub=s4" : isLive ? "?tab=lprob&a=" + encodeURIComponent(host.id) : "?tab=e_prob&a=" + encodeURIComponent(host.id) + "&sub=sim";
+    var pl = { key: "will:" + host.kind + ":" + host.id + ":" + stp.id, due_date: stp.due, tz: tz, hour: hr, title: "معماری یادگیری — 🌱 گامِ کوچک",
+      body: "«" + String(stp.step).slice(0, 80) + "» (" + String(host.title || "").slice(0, 40) + ") — انجامش دادی؟ در صفحه بگو چه شد.", link: link };
+    try { Promise.resolve(A.HOST.remind(pl)).catch(function () { }); } catch (e) { }
+    stp.remind = { hour: hr, at: nowISO() };
+  }
+  A.willRemind = willRemind;
   A.willCard = function (host, trig, intro) {
     var w = willBox(host.box), t = A.today(), open = willOpen(w);
     var box = h("section", own({ class: "card sv-will", "data-host": host.kind }), h("h3", {}, "🌱 کوچک‌ترین گامِ بعد"),
@@ -1101,7 +1137,9 @@
     A.ASSIST.promptHooks.push(function (s, msg) { var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-6).map(function (m) { return m.text; })).join(" ");
       return A.willHookOn(recent) ? WILL_RULES : ""; });
     /* L2: «نقد» و «ترس» فقط به‌صورتِ واژه (نقدم، نقدها، ترسیدم، می‌ترسم)، نه «ترسیم» (کشیدن) یا «نقدی» (پول) */
+    /* B9 (تورِ پولیا دورِ ۳): همان واژه‌نامهٔ مشترکِ دلسردی/خشم/شرم (A.ASSIST.FAIL_ME ِ a27 — «اعصابم خورده»، «خیلی عصبانیم»، «استعدادشو ندارم»، «انصراف بدم»…) هم؛ یک واژه‌نامه */
     A.willHookOn = function (t) { t = String(t || "");
+      if (A.ASSIST && A.ASSIST.FAIL_ME && A.ASSIST.FAIL_ME.test(t)) return true;
       return /ناامید|دلسرد|رها ?کرد|رهاش|ول ?کرد|بی‌خیال|انتقاد|ایراد گرفت|شکست|اخراج|از دست دادنِ? ?کار/.test(t) ||
         /(?:^|[^ء-يپچژکگی])(?:نقد(?:ها|های|هایی|م|ش|ت|و|ِ)?|(?:می‌?\s?|ن)?ترس(?:م|ی|ه|ت|ش|ند|ید|یدم|یدی|یده|ناک|و|ِ)?)(?![ء-يپچژکگی])/.test(t); };
   }
