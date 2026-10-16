@@ -36825,12 +36825,15 @@ APP.goFromURL = function (q) {
   }
   AS.coachPhase = coachPhase;
   /* «میانهٔ راه» روی نردبانِ خودِ سامانه (۱/۳/۷/۲۱/۶۰): مسئلهٔ زندهٔ بازِ دیرپا ⇒ یک بار در هر پله «چه پیشرفتی کردی؟ دربارهٔ خودت چه آموختی؟» (rerunD s34) */
-  function midCheck(s, b) {
+  function midCheck(s, b, mt) {
     if (!b || b.done || !b.r) return "";
     var LAD = (A.solveUI && A.solveUI.LADDER) || [1, 3, 7, 21, 60], born = String(b.r.created || (b.r.p && b.r.p.created) || "").slice(0, 10); if (!born || !A.daysBetween) return "";
     var age = A.daysBetween(born, A.today()), rung = LAD.filter(function (d) { return d >= LAD[2] && age >= d; }).pop(); if (!rung) return "";
-    var C = s.coach = s.coach || {}, M = C.mid = C.mid || {}; if (M[b.pid] === rung) return "";
-    M[b.pid] = rung;
+    /* دورِ ۸ (I-coach 7): هم‌توان در ساختِ چندبارهٔ پرامپتِ همان نوبت (AS.prompt ⇒ userPrompt تا ۴ بار) — پیش‌تر ساختِ نخست پله را مصرف می‌کرد و
+       پرامپتِ نهایی سطر را نداشت؛ حالا همان پیام همان سطر را می‌گیرد و پله فقط یک نوبت را می‌گیرد */
+    var C = s.coach = s.coach || {}, M = C.mid = C.mid || {}, w = M[b.pid], k = mkey(mt || "");
+    if (w && typeof w === "object") { if (w.r === rung && w.k !== k) return ""; } else if (w === rung) return "";
+    M[b.pid] = { r: rung, k: k };
     /* E8 (دورِ ۴، s19): با قاعدهٔ «فقط یک پرسش در نوبت» نمی‌جنگد — این نوبت همین **به‌جای** پرسشِ مرحله است */
     return "- میانهٔ راه (این مسئله " + fa(age) + " روز است باز است؛ پلهٔ " + fa(rung) + " ِ نردبانِ مرور): در همین نوبت، **به‌جای** پرسشِ مرحله (همچنان فقط یک پرسش)، کوتاه بپرس «تا این‌جا چه پیشرفتی کردی و دربارهٔ خودت چه آموختی؟» — بی حکم؛ پرسشِ مرحله برای نوبتِ بعد.";
   }
@@ -36869,6 +36872,8 @@ APP.goFromURL = function (q) {
         if (/^- پاسخِ این مسئله را هیچ‌کس نمی‌داند/.test(ln) || /^- این مسئله پاسخِ عینی دارد/.test(ln)) return AS.liveFrame(kind) || ln;   // یک متنِ واحد برای قابِ نوع‌دار (ادغامِ تورِ ۱)
         /* یک پرسش در نوبت: همان A.liveCoach(pid).q (پرسشِ پاسخ‌گرفته در گفت‌وگو هم کنار) — سطرِ a38 جایگزین می‌شود، دو سطر نمی‌شود */
         if (nq && /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(ln)) return oneQLine(nq);
+        /* دورِ ۸ (I-coach 2، s22): سطرِ ردِ a38 کنارِ پرسشِ نوبتِ دیگر زمینه است — «از ردش چه آموخت» پس از آن، نه پرسشِ دوم */
+        if (nq && nq.q && /^- حدسی که خودش با آزمون رد کرد/.test(ln) && /بپرس از ردش چه آموخت/.test(ln)) return "- زمینه (نه پرسشِ دوم): " + ln.slice(2).replace(/بپرس از ردش چه آموخت و کدام فرضِ پنهان شکست\.?/, "«از ردش چه آموخت و کدام فرضِ پنهان شکست؟» برای پس از پرسشِ این نوبت است، اگر خودش به آن نرسید.");
         /* همان فهرستِ a38، با نشانِ «پاسخ‌گرفته در گفت‌وگو» (فهرستِ دوم در مربی نمی‌آید) */
         if (/^- داده‌هایی که هنوز در کارِ حل نیامده‌اند/.test(ln)) return ln.replace(/\(اگر به کار آمد، یکی را با نامش بپرس: «از … استفاده کردی؟»؛/, "(اگر گیر است، اول کلی بپرس «همهٔ داده‌ها را به کار بردی؟»؛ فقط اگر باز نیافت، یکی را با نامش: «از … استفاده کردی؟»؛");
         /* E3/E8 (دورِ ۴، s11، s25): فهرست بریده نمی‌شود (پرسشِ پیشنهادیِ هشتم هم دیده شود) و پرسش‌ها کامل‌اند (پرسشِ استقرا نیمه نماند)؛ E1: با شناسه */
@@ -36906,9 +36911,11 @@ APP.goFromURL = function (q) {
       var a191 = !auto && !!(Pv && Pv.intro) && wholeMoment(mt) && longStmt(mt) && !(teachMode(s, mt) && !TEACH_PROB_RE.test(mt)) && (function () { var W0 = Cg.whole = Cg.whole || {}, k = Cg.pk || "c:0", mk0 = mkey(mt); if (W0[k] && W0[k] !== mk0) return false; W0[k] = mk0; return true; })();   // هم‌توان در ساختِ چندبارهٔ همان نوبت
       /* دورِ ۸ (I-coach 7، s19): بلوکِ زنده پرسشِ نوبت را از کارت/ردِ صفحه یا کارِ همین نوبت می‌دهد (card-/fail-/turn-) ⇒ «میانهٔ راه» ِ مربی این نوبت نمی‌آید (یک پرسش) و مصرف هم نمی‌شود */
       var cardQ = !!(nq && nq.q && nq.coach && /^(?:card|fail|turn)-/.test(String(nq.coach.src || "")));
+      /* … و وقتی کارتِ «میانهٔ راه» ِ خودِ صفحه همین موعد را یک نوبت پرسیده (L.ckHold ِ a38) — همان پرسش دو نوبتِ پیاپی نه */
+      if (!cardQ && cpid) { try { var ckH = ((((S.get("eprog_" + cpid) || {}).solve || {}).live) || {}).ckHold; if (ckH && ckH.due && String(ckH.due) <= A.today()) cardQ = true; } catch (e) { } }
       out.push(coachLines({ ph: ph, qs: qs, qsDef: !(cpid && nq && nq.list && nq.list.length), cls: cls, ptype: ptype, s: s, pid: cpid, mt: mt, dry: auto, stuck: sig.stuck, live: !!cpid && liveBlock, claim: claim, teach: teachMode(s, auto ? "" : mt),
         sug: cpid && nq ? nq.q : !auto && sig.guess ? GUESS_Q : goal ? "🎯 مجهول هنوز «" + goal + "» است — این گام به آن نزدیک‌ترت کرد؟" : "", tries: cpid ? userTries(s, bb.r.created || "") : userTries(s), seed: userTries(s),
-        closed: !cpid && b && b.done ? b.r.p.title : "", mid: cpid && !auto && !cardQ ? midCheck(s, bb) : "", intro: a191, refuted: !!refNew, refGen: !!refNew && refGeneral(pid), guess: !auto && sig.guess, goal: goal, made: !auto && !!(Pv && Pv.made),
+        closed: !cpid && b && b.done ? b.r.p.title : "", mid: cpid && !auto && !cardQ ? midCheck(s, bb, mt) : "", intro: a191, refuted: !!refNew, refGen: !!refNew && refGeneral(pid), guess: !auto && sig.guess, goal: goal, made: !auto && !!(Pv && Pv.made),
         phShow: cpid && nq && nq.coach && nq.coach.src === "turn-result" && ph !== "b" ? "b" : "" }));
     }
     /* پیگیریِ دورِ ۶ (یک پرسش در هر بلوک، s04، s06، s21): وقتی بلوکِ زنده پرسشِ نوبت را می‌دهد، «🌱 # پس از شکست» زمینه است — «بپرس…» ِ آن پرسشِ رقیب نمی‌شود */
