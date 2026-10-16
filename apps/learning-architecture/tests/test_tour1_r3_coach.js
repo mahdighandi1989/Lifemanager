@@ -197,7 +197,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     const noise = fromAuto.filter(id => fromUser.indexOf(id) < 0);
     return { auto: true, noise, leaked: noise.filter(id => blk.indexOf(id + ' ') >= 0) };
   });
-  info.b8.stem = await p.evaluate(() => ({ isbat: APP.SYST.toks('اثبات').join(), plural: APP.SYST.toks('اطلاعات').join() }));
+  info.b8.stem = await p.evaluate(() => APP.SYST.toks ? { isbat: APP.SYST.toks('اثبات').join(), plural: APP.SYST.toks('اطلاعات').join() } : { missing: true });
   chk(info.b8.auto && info.b8.noise.length > 0 && info.b8.leaked.length === 0, 'B8: on the automatic turn «دانسته‌های قلمرو» relevance comes from the user\'s own words, not the system instruction text ' + JSON.stringify(info.b8));
   chk(info.b8.stem.isbat === 'اثبات' && info.b8.stem.plural === 'اطلاع', 'B8: «اثبات» is not stemmed to «اثب» (a real plural «اطلاعات» still is) ' + JSON.stringify(info.b8.stem));
 
@@ -212,6 +212,102 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   chk(/پله به پله/.test(info.b14.obj) && !/پله به پله/.test(info.b14.pract), 'B14: execution proverb is kind-aware (step-by-step proof for objective; not for a real-world task) ' + JSON.stringify(info.b14));
   chk(!/ماهیگیری/.test(info.b14.start) && /ماهیگیری/.test(info.b14.sw), 'B14: the plan-SWITCH proverb only when the user is switching plans, not at the start of planning ' + JSON.stringify(info.b14));
   chk(/سخت‌کوشی/.test(info.b14.tired) && info.b14.taste && info.b14.incub, 'B14: tired/stuck ⇒ incubation proverb; taste and «بگذار ته‌نشین شود، بعد برگرد» available mid-solve, not only in look-back ' + JSON.stringify(info.b14));
+
+  // ================= صفحهٔ «🔭» (زمینهٔ تازه): B3 گیر + دادهٔ به‌کارنرفته؛ B9 کارتِ «🌱» وقتی خواستن کم شد + یادآور؛ B5 بازنگریِ صفحه ⇒ پله =================
+  {
+    const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } }); const q = await ctx.newPage();
+    q.on('pageerror', e => errors.push('pageerror(live): ' + e.message));
+    q.on('dialog', d => { errors.push('dialog ' + d.message()); d.dismiss(); });
+    await q.route('**/fonts.googleapis.com/**', r => r.abort());
+    const Wq = (ms) => q.waitForTimeout(ms || 90);
+    const go = async (v, a, s) => { await q.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await Wq(140); };
+    const sel = async (s, v) => { await q.selectOption(s, v); await Wq(120); };
+    const click = async (s) => { await q.click(s); await Wq(160); };
+    const has = (s) => q.locator(s).count();
+    const txt = (s) => q.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent : ''; }, s);
+    const D = (n) => { const d = new Date(2026, 10, 2 + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    const day = async (n) => { await q.evaluate(x => { window.__day = x; }, D(n)); };
+    const mk = async (o) => { await go('e_prob', null, 'live'); if (o.title != null) await q.fill('#lpNewT', o.title); await q.fill('#lpNewS', o.st); await Wq(60); if (o.nat) await sel('#lpNewNat', o.nat); await click('main .lp-create'); return q.evaluate(() => APP.state.arg); };
+    const whole = async (one, why) => { await q.fill('#lpOne', one); await q.fill('#lpWhy', why); await click('main .lp-onesave'); };
+    const understand = async (o) => {
+      await whole(o.one, o.why || 'برایم مهم است و کنجکاوم');
+      await q.fill('#lpUnk', o.unk);
+      for (let i = 0; i < o.data.length; i++) { if (i >= 2) await click('main .lp-dadd'); await q.fill('#lpD_d' + (i + 1), o.data[i]); }
+      await q.fill('#lpCond', o.cond);
+      if (await has('#lpSat')) await sel('#lpSat', 'yes');
+      await sel('#lpSuff', o.suff || 'کافی است'); if (await has('#lpSuffW')) await q.fill('#lpSuffW', 'همین‌ها بس است');
+      await q.fill('#lpGuess', o.guess || 'شدنی است'); await sel('#lpConf', '60'); await q.fill('#lpTest', 'با یک حالتِ خاص می‌آزمایم');
+      await sel('#lpIfRef', 'حدس را کنار می‌گذارم یا اصلاحش می‌کنم');
+      await click('main .lp-usave'); await click('main .lp-u .sv-g2');
+    };
+    const sayQ = async (text) => { await q.evaluate(() => APP.ASSIST.toggle(true)); await q.fill('.as-panel .as-in', text); await q.click('.as-panel .as-send'); await q.waitForFunction(() => !APP.ASSIST.busy(), null, { timeout: 15000 }); };
+    await q.goto(FILE); await q.waitForSelector('.nav'); await Wq(300);
+    await q.evaluate(T0 => { window.__day = T0; APP.today = () => window.__day; APP.S.loaded = true; window.__rem = []; window.__calls = [];
+      APP.HOST = Object.assign({}, APP.HOST || {}, { remind: async (pl) => { window.__rem.push(pl); return { ok: true }; }, unremind: async () => ({ ok: true }) });
+      APP.callAI = async (sys, user, opts) => { __calls.push({ user }); const t = JSON.stringify({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }); return opts && opts.withMeta ? { text: t, files: [] } : t; }; }, D(0));
+    // B3 — مسئلهٔ لوله (s02): فهم ثبت شد، طرح هنوز نه، هیچ داده‌ای به کار نرفته؛ کاربر «نمی‌دونم» می‌گوید
+    const P1 = await mk({ title: 'لوله در بار', st: 'یه لوله‌ی صاف ۴ متری دارم، بار وانتم ۳.۲ متر طول، ۱.۸ عرض، ۱.۶ ارتفاع داره. جا میشه یا نه؟', nat: 'objective' });
+    await understand({ one: 'می‌خواهم بدانم بلندترین پاره‌خطِ درونِ بار از چهار متر بلندتر است یا نه', unk: 'بلندترین پاره‌خطِ درونِ بار', data: ['طول ۳.۲ متر', 'عرض ۱.۸ متر', 'ارتفاع ۱.۶ متر'], cond: 'لوله صاف است و باید کامل درونِ بار باشد' });
+    info.b3 = { ph: await q.evaluate(pid => APP.livePhase(pid), P1), unused: await q.evaluate(pid => APP.liveUnused(pid).length, P1) };
+    await q.evaluate(() => { localStorage.removeItem('lla.assist.cur'); APP.ASSIST.newSession(); });
+    await sayQ('خب فکر کنم شبیهِ قطرِ مستطیله ولی ارتفاع هم داره');
+    const one0 = await q.evaluate(() => (/در این نوبت فقط \*\*یک\*\* پرسش[^«]*«([^»]+)»/.exec(__calls[__calls.length - 1].user) || [])[1] || '');
+    await sayQ('آره قطر مستطیل رو دیدم، همینو حساب کردم. باز ۳.۶۷ میشه. نمی‌دونم.');
+    const u3 = await q.evaluate(() => __calls[__calls.length - 1].user);
+    info.b3.one = (/در این نوبت فقط \*\*یک\*\* پرسش[^«]*«([^»]+)»/.exec(u3) || [])[1] || ''; info.b3.one0 = one0;
+    info.b3.order = /اگر گیر است، اول کلی بپرس «همهٔ داده‌ها را به کار بردی؟»/.test(u3);
+    chk(info.b3.ph === 'p' && info.b3.unused === 3 && /همهٔ داده‌ها/.test(info.b3.one) && !/همهٔ داده‌ها/.test(one0) && info.b3.order, 'B3: stuck («نمی‌دونم») with unused data ⇒ the one question is «have you used all the data?» before re-asking «seen it before?»; naming a datum only after the general question ' + JSON.stringify(info.b3));
+
+    // B9 — مسئلهٔ زندگی: گامِ واقعی، نتیجه «کمی» و «کمتر می‌خواهم» ⇒ کارتِ «🌱»؛ ثبتِ گامِ کوچک ⇒ یادآور
+    const P2 = await mk({ title: 'کلاسِ شبانه', st: 'نمی‌دانم کلاسِ شبانهٔ زبان را ثبت‌نام کنم یا نه؛ بعد از کار خیلی خسته‌ام.', nat: 'life' });
+    await understand({ one: 'می‌خواهم ببینم کلاسِ شبانه با خستگی‌ام شدنی است یا نه', unk: 'ثبت‌نام بکنم یا نه', data: ['سه شب در هفته وقت دارم', 'بعد از کار خسته‌ام'], cond: 'خسته‌تر نشوم' });
+    await sel('#lpMv', 'mv_special'); await q.fill('#lpMvWhy', 'یک جلسهٔ آزمایشی حالتِ ساده‌تر است'); await click('main .lp-mvadd');
+    await q.fill('#lpPlan', 'نخست یک جلسهٔ آزمایشی، سپس تصمیم'); await Wq(350);
+    for (const id of await q.evaluate(() => [...document.querySelectorAll('main .lp-plan .lp-un')].map(x => x.getAttribute('data-d')))) { await sel('#lpPU_a_' + id, 'use'); await q.fill('#lpPU_w_' + id, 'در گامِ آزمایشی به کار می‌رود'); }
+    await click('main .lp-plansave');
+    await q.fill('#lpStep', 'در یک جلسهٔ آزمایشیِ کلاس شرکت کنم'); await sel('#lpClear', 'بله'); await q.fill('#lpPred', 'خسته نمی‌شوم'); await sel('#lpConf', '60'); await q.fill('#lpWhen', 'فردا');
+    for (const id of await q.evaluate(() => [...document.querySelectorAll('main select[id^="lpSU_"]')].map(x => x.id))) await sel('#' + id, 'notyet');
+    await click('main .lp-stepsave');
+    if (await has('#lpSwitch')) { await sel('#lpSwitch', 'same'); await click('main .lp-stepsave'); }
+    info.b9 = { steps: await q.evaluate(pid => APP.S.get('eprog_' + pid).solve.live.steps.length, P2), miss: await txt('main .lp-stepmiss') };
+    await day(1); await go('lprob', P2, 'exec');
+    await sel('#lpODone', 'part'); await q.fill('#lpOWhat', 'رفتم ولی خیلی خسته شدم'); await sel('#lpOMatch', 'part'); await sel('#lpOProg', 'کمی'); await sel('#lpOWant', 'less');
+    if (await has('#lpOGuess')) await sel('#lpOGuess', 'none');
+    await click('main .lp-outsave');
+    info.b9.card = await has('main .lp-after .sv-will');
+    if (info.b9.card) {
+      const ids = await q.evaluate(() => [...document.querySelectorAll('main .lp-after .sv-will select, main .lp-after .sv-will input, main .lp-after .sv-will textarea')].map(e => e.id));
+      const Wd = pre => ids.find(id => new RegExp('^wl\\d+_' + pre + '$').test(id));
+      await sel('#' + Wd('des'), 'some'); await sel('#' + Wd('hope'), 'unsure'); await q.fill('#' + Wd('cur'), 'این‌که زبان را دوباره حرف بزنم');
+      await q.fill('#' + Wd('step'), 'برنامهٔ کلاس را ده دقیقه بخوانم و یک جلسهٔ کوتاه‌تر پیدا کنم'); await q.fill('#' + Wd('when'), 'فردا ساعتِ ۸ شب، ده دقیقه'); await sel('#' + Wd('bud'), 'one');
+      await click('main .lp-after .sv-willsave');
+    }
+    info.b9.rem = await q.evaluate(pid => window.__rem.filter(x => x.key && x.key.indexOf('will:prob:' + pid) === 0).map(x => ({ d: x.due_date, h: x.hour, link: x.link })), P2);
+    chk(info.b9.steps === 1 && info.b9.card === 1, 'B9: a real step whose outcome says «I want it less» opens the «🌱 smallest next step» card on the problem page ' + JSON.stringify(info.b9));
+    chk(info.b9.rem.length === 1 && info.b9.rem[0].h === 19 && /lprob/.test(info.b9.rem[0].link), 'B9: the 🌱 step is pushed as a reminder before the user\'s own hour («ساعتِ ۸ شب» ⇒ 19:00), linking to the problem ' + JSON.stringify(info.b9.rem));
+    // B5 — بازنگریِ کاملِ همین مسئله در صفحه ⇒ پلهٔ پرسش‌های بازنگری بالا می‌رود (s30: پس از سه بازنگری همه «پلهٔ ۰» بودند)
+    const QB = await q.evaluate(() => APP.ASSIST.tutorQuestions.back.qs[0]);
+    info.b5 = { before: await q.evaluate(x => APP.qRung(x), QB) };
+    await click('main .lp-solved');
+    await q.fill('#lpBChk', 'با برنامهٔ هفتهٔ بعد سنجیدم که سه شب واقعاً آزاد است'); await sel('#lpBRes', 'نتیجه سالم ماند');
+    await q.fill('#lpBOther', 'با پرسیدن از همکلاسی‌ها هم به همین می‌رسیدم'); await q.fill('#lpBGlance', 'یک جلسهٔ آزمایشی تصمیم را روشن کرد');
+    await q.fill('#lpBWorked', 'آزمودنِ کوچک پیش از تصمیمِ بزرگ'); await q.fill('#lpBUse', 'پیش از تعهدِ بلند، یک نسخهٔ کوچکش را بیازمایم');
+    await q.fill('#lpBNew', 'آیا باشگاهِ ورزشیِ صبح‌ها را با همین خستگی ادامه بدهم؟'); if (await has('#lpBNewS')) await sel('#lpBNewS', 'method'); if (await has('#lpBNewW')) await q.fill('#lpBNewW', 'همان آزمودنِ یک جلسهٔ کوچک پیش از تعهدِ بلند');
+    await q.fill('#lpBTaste', 'بخشِ آزمودن را دوست داشتم، فکرِ زیاد را نه');
+    if (await has('#lpBHit')) await sel('#lpBHit', 'درست بود');
+    if (await has('#lpBWant')) await sel('#lpBWant', 'same');
+    if (await has('#lpBBest')) await sel('#lpBBest', 'none');
+    for (const id of await q.evaluate(() => [...document.querySelectorAll('main select[id^="lpBU_a_"]')].map(x => x.id))) { await sel('#' + id, 'skip'); await q.fill('#' + id.replace('_a_', '_w_'), 'در این تصمیم اثری نداشت'); }
+    await click('main .lp-lbsave');
+    info.b5.done = await q.evaluate(pid => { const b = (APP.S.get('eprog_' + pid).solve.b || {})[1]; return !!(b && b.done); }, P2);
+    info.b5.miss = info.b5.done ? '' : await q.evaluate(() => [...document.querySelectorAll('.toast')].map(t => t.textContent).join(' | '));
+    info.b5.after = await q.evaluate(x => APP.qRung(x), QB);
+    await q.evaluate(() => { localStorage.removeItem('lla.assist.cur'); APP.ASSIST.newSession(); });
+    await sayQ('یه معمای دیگه رو حل کردم؛ جوابش اینه: ۱۲');
+    info.b5.line = await q.evaluate(qb => { const u = __calls[__calls.length - 1].user; return (new RegExp('«' + qb.slice(0, 30).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^»]*» پلهٔ (\\S+)').exec(u) || [])[1] || ''; }, QB);
+    chk(info.b5.done && info.b5.before === 0 && info.b5.after > 0 && info.b5.line && info.b5.line !== '۰', 'B5: a completed look-back on the page raises the rung of the look-back questions the user answered; the chat coach shows it ' + JSON.stringify(info.b5));
+    await ctx.close();
+  }
 
   info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);
   chk(info.sys2 <= 20000, 'SYS ≤ 20000 at the end: ' + info.sys2);
