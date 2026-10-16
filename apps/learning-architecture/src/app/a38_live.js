@@ -1743,7 +1743,10 @@
       h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm lp-toknot", type: "button", onclick: function () { stuck(r, pg, s, st); } }, "🪢 همین غافلگیری را در گره‌گشا بشکاف"),
         h("button", { class: "btn ghost sm lp-reu", type: "button", onclick: function () { live(s).reU = true; S.put(pg); A.go("lprob", r.p.id, "u"); } }, "↺ دوباره فهمِ مسئله"))));
     /* B9 (تورِ ۱ دورِ ۳، s19 — ویرایشِ کمینهٔ «coach»): خواستنی که پس از گام «کمتر» شد هم شکست/میلِ رها کردن است ⇒ همان کارتِ «🌱» */
-    if ((o.prog === "نه" || o.done === "no" || o.want === "less") && A.willHost && A.willCard) {
+    /* E8 (دورِ ۴، s19): پس از ثبتِ گامِ 🌱 برای همین نتیجه، کارت دوباره خالی نمی‌آید — فقط یک سطرِ «ثبت شد» */
+    var wl0 = s.will || {}, wCommit = (wl0.log || []).filter(function (x) { return x && x.kind === "commit" && String(x.at) >= String(o.at || ""); }).pop(), wStep = wCommit && (wl0.steps || []).filter(function (x) { return String(x.at) === String(wCommit.at); })[0];
+    if (wCommit) box.appendChild(h("p", { class: "small good lp-willdone" }, "🌱 " + (wStep ? "گامِ کوچکت ثبت شد: «" + clip(wStep.step, 80) + "» — وارسی: " + A.fdate(wStep.due) : "تصمیمت ثبت شد") + "."));
+    else if ((o.prog === "نه" || o.done === "no" || o.want === "less") && A.willHost && A.willCard) {
       var hs = A.willHost("prob", r.p.id);
       if (hs) box.appendChild(A.willCard(hs, "live:" + (o.done === "no" ? "notdone" : o.prog === "نه" ? "noprog" : "less"), o.done === "no" ? "گام انجام نشد — اشکالی ندارد؛ داده است. چقدر می‌خواهی پیشش ببری و کوچک‌ترین گامِ بعد چیست؟" : o.prog === "نه" ? "پیشرفتی نبود. نه رها کن نه وانمود کن چیزی نشده: کوچک‌ترین گامِ مشخص بعد چیست، کی و چند دقیقه؟" : "پس از این گام کمتر می‌خواهی حلش کنی. نه رها کن نه وانمود کن چیزی نشده: کوچک‌ترین گامِ مشخص بعد چیست، کی و چند دقیقه؟ (یا آگاهانه، با دلیل، کنارش بگذار)"));
     }
@@ -2263,7 +2266,9 @@
       h("div", { class: "row gap wrap" }, h("button", { class: "btn sm lp-wakego", type: "button", onclick: function () { r.woke = nowISO(); delete UD[pid]; S.put(r); A.go("lprob", pid, "u"); } }, "شروع می‌کنم"),
         h("button", { class: "btn ghost sm lp-snooze", type: "button", onclick: function () { var iv = U.nextIv(r.dIv || LADDER[1], true); r.dIv = iv; r.snoozes = (r.snoozes || 0) + 1; r.dormant = A.addDays(t, iv); S.put(r); A.toast("باشد؛ " + A.fdate(r.dormant) + " دوباره می‌پرسد."); A.go("e_prob", null, "live"); } }, "فعلاً نه"))));
     try { var rv = U.reviewPanel(r.p, pg); if (rv) root.appendChild(rv); } catch (e) { console.warn(e); }
-    try { var wd = A.willDue ? A.willDue().filter(function (x) { return x.kind === "prob" && x.id === pid; }) : []; if (wd.length) { var hs = A.willHost("prob", pid); if (hs) root.appendChild(A.willCard(hs, "due")); } } catch (e) { console.warn(e); }
+    /* E8 (دورِ ۴، s19): گامِ 🌱 که همین امروز ثبت شد همین حالا «انجامش دادی؟» نمی‌خواهد (پیش‌تر بلافاصله پس از ثبت، کارتِ 🌱 ِ خالی دوباره می‌آمد) */
+    try { var wOpen = s.will && (s.will.steps || []).filter(function (x) { return !x.closed; }).pop(), wToday = !!(wOpen && A.localDay && A.localDay(wOpen.at) === t);
+      var wd = A.willDue ? A.willDue().filter(function (x) { return x.kind === "prob" && x.id === pid && !(x.what === "step" && wToday); }) : []; if (wd.length) { var hs = A.willHost("prob", pid); if (hs) root.appendChild(A.willCard(hs, "due")); } } catch (e) { console.warn(e); }
     try { var cc = coachCard(r, pg, s, ph); if (cc) root.appendChild(cc); } catch (e) { console.warn(e); }
     try { var ic = incubCard(r, pg, s); if (ic) root.appendChild(ic); } catch (e) { console.warn(e); }
     try { var ck = checkinCard(r, pg, s); if (ck) root.appendChild(ck); } catch (e) { console.warn(e); }
@@ -2390,7 +2395,7 @@
     AS.promptHooks = AS.promptHooks || [];
     /* E5/E8 (دورِ ۴): گیرِ کاربر در همین نوبت؛ ضرب‌المثلِ خودِ کاربر (s35)؛ سطرهای کتاب برای هر مرحله از پوششِ تور (coverage: A263/B188 پارادوکسِ مخترع،
        A038/B051 به تعریف برگرد، C145/B162/A269 اکتشافی را ناتمام برچسب بزن، C168 قارچ‌ها خوشه‌ای) — فقط در قلاب، پرامپتِ سامانه دست نمی‌خورد */
-    var STUCK_L = /گیر\s*کرد|گیر\s*کردم|نمی\s*دونم\s*(?:چی|چه|از\s*کجا)|نمی\s*دانم\s*(?:چه|از\s*کجا)|جلو\s*نمی\s*(?:رم|روم|ره)|به\s*جایی\s*نمی|راهی\s*نیست|هیچ\s*کاری\s*نمی|جور\s*نمی\s*(?:شه|شود)|نمی\s*تونم\s*ادامه/;
+    var STUCK_L = /گیر\s*(?:کرد|افتاد)|نمی\s*(?:دونم|دانم)|جلو\s*نمی\s*(?:رم|روم|ره)|به\s*جایی\s*نمی|راهی\s*نیست|هیچ\s*کاری\s*نمی|جور\s*نمی\s*(?:شه|شود|ده)|نمی\s*تونم\s*ادامه|نتونستم|نتوانستم|باز\s*(?:هم\s*)?نشد|کم\s*آوردم|از\s*پسش\s*بر\s*نمیام/;
     var OWN_PROV = /(?:می\s*گن|میگن|گفته\s*اند|گفتن|به\s*قولِ?|ضرب\s*المثل|مثلِ?\s*معروف)[^.؟?!\n]{3,80}|آب\s*که\s*از\s*سر\s*گذشت[^.؟?!\n]{0,40}|کار\s*از\s*کار\s*گذشت[^.؟?!\n]{0,30}/;
     var BOOK_L = { p: "پارادوکسِ مخترع — گاهی مسئلهٔ کلی‌تر (طرحِ بلندپروازانه‌تر) آسان‌تر است؛ اگر همین را نمی‌توانی، کلی‌ترش را بیازما · به تعریف‌ها برگرد — واژهٔ کلیدیِ مبهم را با تعریفش جایگزین کن؛ عنصرهای تازه از همان می‌آیند.",
       c: "استدلالِ اکتشافی (شهود، قیاس، استقرا) داربست است، نه برهان — هنگامِ اجرا فقط گامِ قطعی را بپذیر و هر گامِ اکتشافی را «ناتمام» برچسب بزن؛ هرگز آن را برهانِ کامل نفروش.",
@@ -2429,7 +2434,8 @@
         /* E3/E8 (دورِ ۴، s11/s25): فهرست کامل و هر پرسش کامل — پرسشِ پیشنهادیِ هشتم یا پرسشِ بلندِ استقرا دیگر بریده نمی‌شود */
         Q.length > 1 ? "- پرسش‌های همین مرحله (برای همین نوعِ مسئله): " + Q.map(function (x) { return "«" + x + "»"; }).join(" · ") : "",
         pv ? "- حکمتِ ضرب‌المثل‌ها برای همین مرحله (فقط اگر به کار آمد، همراهِ پرسشی که پشتیبانی می‌کند؛ قاعدهٔ قطعی نیست): «" + pv.t + "» ⇐ «" + pv.q + "»" : "",
-        un.length && ph !== "u" ? "- داده‌هایی که هنوز در کارِ حل نیامده‌اند (اگر به کار آمد، یکی را با نامش بپرس: «از … استفاده کردی؟»؛ نام بردنش در گفت‌وگو به کار بردن نیست): " + un.map(function (d) { return "«" + clip(d.t, 50) + "»"; }).join("، ") : "",
+        /* E3 (دورِ ۴، s30/s33/s35): «همهٔ داده‌ها؟» پس از وجودِ طرح یا وقتی کاربر گیر کرده — نه در آغازِ طرح‌ریزی که هر داده‌ای هنوز «به‌کارنرفته» است */
+        un.length && (ph === "c" || ph === "b" || (ph === "p" && stuckNow)) ? "- داده‌هایی که هنوز در کارِ حل نیامده‌اند (اگر به کار آمد، یکی را با نامش بپرس: «از … استفاده کردی؟»؛ نام بردنش در گفت‌وگو به کار بردن نیست): " + un.map(function (d) { return "«" + clip(d.t, 50) + "»"; }).join("، ") : "",
         cu.length && (ph === "c" || ph === "b") && nat === "objective" ? "- بخش‌هایی از شرط که هنوز در هیچ گامی نیامده‌اند: " + cu.map(function (x) { return "«" + clip(x.t, 50) + "»"; }).join("، ") : "",
         (suffNow(so) === "متناقض است" || u0.sat === "no") && ph === "p" ? "- کاربر گفته شرط متناقض است یا برآوردنی نیست: بپرس کدام بخشِ شرط را شل کند (فقط بخشی از شرط را نگه دار) — یا ثابت کند که برآوردنِ هم‌زمانِ بخش‌ها ناممکن است." : "",
         cl.state === "incomplete" ? "- بازنگری ایراد یافت و مسئله ناتمام است (" + cl.label + "): «حل شد» نگو و جشن نگیر؛ کمک کن همان ایراد را خودش درست کند." : cl.gate.length ? "- پیش از «حل شد» باز مانده: " + cl.gate.map(function (x) { return (x.k === "aux" ? "پلِ برگشت از مسئلهٔ کمکیِ «" : "گامِ شهودیِ ثابت‌نشدهٔ «") + clip(x.t, 50) + "»"; }).join("، ") + " — مسئلهٔ کمکی حل شد ≠ مسئلهٔ اصلی حل شد." : "",

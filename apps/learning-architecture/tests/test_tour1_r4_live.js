@@ -188,6 +188,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await section('E5a', async () => {
       const PF = await mk({ title: 'ضلع‌ها', st: 'محیطِ مثلثی ۳۰ است؛ a دو برابرِ b و c دو واحد بیشتر از b است. ضلع‌ها چقدرند؟', nat: 'objective' });
       await understand({ one: 'می‌خواهم سه ضلعِ مثلث را بیابم', unk: 'طولِ ضلع‌های a و b و c', data: ['محیط ۳۰ است', 'a دو برابرِ b است', 'c دو واحد بیشتر از b است', 'مثلث روی کاغذِ آبی کشیده شده'], cond: 'a + b + c = 30\nهر سه ضلع مثبت‌اند', depNo: true, guess: 'هر سه ضلع برابرند' });
+      // E3: «همهٔ داده‌ها؟» در آغازِ طرح نه — فقط پس از طرح یا وقتی کاربر گیر کرده
+      info.e3b3 = { start: /داده‌هایی که هنوز در کارِ حل نیامده‌اند/.test(await hookText({ id: 'ach_b3a', lprob: PF, msgs: [] }, 'خب، حالا طرح')), stuck: /داده‌هایی که هنوز در کارِ حل نیامده‌اند/.test(await hookText({ id: 'ach_b3b', lprob: PF, msgs: [] }, 'گیر کردم، نمی‌دونم')) };
+      chk(!info.e3b3.start && info.e3b3.stuck, 'E3: the unused-data line is not sent at the START of planning (every datum is unused then), only when stuck or after a plan ' + JSON.stringify(info.e3b3));
       await addMove('mv_equation', 'هر ضلع را با نماد می‌نویسم تا شرطِ محیط معادله شود');
       await p.fill('#lpPlan', 'نخست هر ضلع را برحسبِ b می‌نویسم سپس در محیط جای‌گذاری می‌کنم'); await W(350);
       for (const id of await p.evaluate(() => [...document.querySelectorAll('main .lp-plan .lp-un')].map(x => x.getAttribute('data-d')))) {
@@ -280,6 +283,116 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await p.evaluate(([pid, full]) => { const se = APP.ASSIST.newSession(); APP.liveBindSession(pid, se, { force: true }); const parts = full.split(/(?<=[؟?])\s+/); se.msgs.push({ role: 'ai', text: 'خوب شروع کردی. ' + full, at: new Date().toISOString() }); APP.S.put(se); }, [PB, full]);
       info.e5chat = await p.evaluate(pid => APP.liveChatQs(pid), PB);
       chk(full && info.e5chat.includes(full) && !info.e5chat.some(q => q !== full && /عنصرِ کمکی لازم است|^خوب شروع کردی/.test(q)), 'E5: chat questions are listed whole (no preamble, a fragment maps to the whole question) ' + JSON.stringify(info.e5chat));
+    });
+
+    /* ===================== E8 — بندهای کوچکِ «live» ===================== */
+    await section('E8-life', async () => {
+      await day(0);
+      const PW = await mk({ title: 'ورزشِ صبح', st: 'صبح‌ها ورزش کنم یا شب‌ها؟ نمی‌دانم کدام برایم بهتر است.', nat: 'life' });
+      await understand({ one: 'می‌خواهم بهترین وقتِ ورزش را بیابم', unk: 'صبح یا شب', data: ['صبح‌ها نیم ساعت وقت دارم', 'شب‌ها خسته‌ام'], cond: 'کار را عقب نیندازد', guess: 'صبح بهتر است' });
+      await addMove('mv_special', 'یک هفته فقط صبح را می‌آزمایم تا ببینم چه می‌شود');
+      // پیامِ ردِ کهنه از «پیام‌های اخیرِ صفحه» ِ دستیار هم می‌رود
+      const rtA = await p.evaluate(() => APP.ASSIST.recentToasts());
+      await p.fill('#lpPlan', ''); await click('main .lp-plansave');
+      const rt0 = (await p.evaluate(() => APP.ASSIST.recentToasts())).filter(t => rtA.indexOf(t) < 0 && /^اول این‌ها|^هنوز نه/.test(t));
+      await savePlan('نخست یک هفته صبح ورزش می‌کنم سپس یک هفته شب');
+      await p.fill('#lpStep', 'فردا صبح نیم ساعت بدوم'); await sel('#lpClear', 'بله'); await p.fill('#lpPred', 'سرِ کار سرحال‌ترم'); await sel('#lpConf', '60'); await p.fill('#lpWhen', 'فردا');
+      await click('main .lp-stepsave');
+      const rt1 = await p.evaluate(() => APP.ASSIST.recentToasts());
+      chk(rt0.length > 0 && !rt1.some(t => rt0.indexOf(t) >= 0), 'E8: a refused-save toast leaves «پیام‌های اخیرِ صفحه» once a later save succeeds ' + JSON.stringify({ rt0, rt1 }));
+      // 🌱 پس از ثبت دوباره خالی نمی‌آید (روزِ صفحه = روزِ واقعیِ ثبت)
+      const real = await p.evaluate(() => APP.localDay(new Date().toISOString()));
+      await p.evaluate(x => { window.__day = x; }, real); await go('lprob', PW, 'exec');
+      await p.evaluate(pid => { const pg = APP.S.get('eprog_' + pid); pg.solve.live.steps.forEach(st => { st.due = APP.today(); }); APP.S.put(pg); }, PW); await go('lprob', PW, 'exec');
+      await sel('#lpODone', 'yes'); await p.fill('#lpOWhat', 'همان‌قدر خسته بودم'); await sel('#lpOMatch', 'no'); await sel('#lpOProg', 'نه'); await sel('#lpOWant', 'same'); await selIf('#lpOGuess', 'none');
+      await click('main .lp-outsave');
+      const uid = await p.evaluate(() => { const s = document.querySelector('main .lp-after .sv-willf select'); return s ? s.id.replace(/des$/, '') : ''; });
+      chk(!!uid, 'E8 setup: the 🌱 card appears after a step without progress');
+      if (uid) {
+        await sel('#' + uid + 'des', await p.evaluate(id => [...document.querySelectorAll('#' + id + 'des option')].map(o => o.value).filter(Boolean)[0], uid));
+        await selIf('#' + uid + 'hope', await p.evaluate(id => ([...document.querySelectorAll('#' + id + 'hope option')].map(o => o.value).filter(Boolean)[0]) || '', uid));
+        await p.fill('#' + uid + 'cur', 'این‌که بدنم با کدام بهتر کنار می‌آید'); await p.fill('#' + uid + 'step', 'امشب کفشِ ورزشی را کنارِ در بگذارم'); await p.fill('#' + uid + 'when', 'امشب ساعتِ ۱۰، پنج دقیقه');
+        await selIf('#' + uid + 'bud', await p.evaluate(id => ([...document.querySelectorAll('#' + id + 'bud option')].map(o => o.value).filter(Boolean)[0]) || '', uid));
+        await click('main .lp-after .sv-willsave');
+        await go('lprob', PW, 'exec');
+        info.e8will = { forms: await has('main .sv-willf'), chk: await has('main .sv-willchk'), done: await txt('main .lp-willdone') };
+        chk(info.e8will.forms === 0 && info.e8will.chk === 0 && /کفشِ ورزشی/.test(info.e8will.done), 'E8: after saving the 🌱 step the card does not render again empty (nor ask «انجامش دادی؟» the same day) ' + JSON.stringify(info.e8will));
+      }
+      await day(0);
+      // دوره‌ی کمون: «دیروز» فقط اگر دیروز بود
+      await go('lprob', PW, 'exec');
+      if (await has('main .lp-incub')) await click('main .lp-incub');
+      chk((await S(PW)).live.incub, 'E8 setup: incubation started');
+      await day(2); await go('lprob', PW, 'exec');
+      info.e8inc = { card: await txt('main .lp-incubback h4'), today: await p.evaluate(() => (APP.dueList() || []).map(x => x.txt).filter(t => /😴/.test(t))) };
+      chk(/۲ روز پیش/.test(info.e8inc.card) && !/دیروز/.test(info.e8inc.card) && info.e8inc.today.some(t => /۲ روز پیش/.test(t)), 'E8: the incubation card says the real day count («۲ روز پیش»), not «دیروز» ' + JSON.stringify(info.e8inc));
+      await p.fill('#lpIncubT', 'شاید مسئله خستگی است نه ساعت'); await click('main .lp-incubgo');
+      // مرورِ میانهٔ راه: پس از ثبتِ دیرهنگام همان روز دوباره نمی‌آید
+      await day(14); await go('lprob', PW, 'exec');
+      chk(await has('main .lp-checkin') === 1, 'E8 setup: mid-course check-in is due');
+      await p.fill('#lpCkP', 'فهمیدم خستگی مهم‌تر از ساعت است'); await p.fill('#lpCkS', 'زود نتیجه می‌گیرم'); await sel('#lpCkW', 'same'); await click('main .lp-ckgo');
+      info.e8ck = { card: await has('main .lp-checkin'), today: await p.evaluate(() => (APP.dueList() || []).some(x => /میانهٔ راهِ «ورزشِ صبح»/.test(x.txt || ''))) };
+      chk(info.e8ck.card === 0 && !info.e8ck.today, 'E8: a saved mid-course check-in is not shown again empty the same day (card and «امروز») ' + JSON.stringify(info.e8ck));
+      // ضرب‌المثلِ خودِ کاربر ⇒ سطرِ C150؛ سطرهای کتاب برای مرحله
+      info.e8prov = await hookText({ id: 'ach_e8p', lprob: PW, msgs: [] }, 'آب که از سر گذشت چه یک وجب چه صد وجب؛ دیگه فایده نداره');
+      chk(/ضرب‌المثلِ خودش را آورد \(«آب که از سر گذشت/.test(info.e8prov) && /ضدِ خود/.test(info.e8prov), 'E8: the user\'s own proverb gets a prompt line (C150: it has its opposite) ' + (info.e8prov.match(/- کاربر ضرب‌المثل[^\n]*/) || ['—'])[0]);
+      chk(/ناتمام/.test((info.e8prov.match(/- از کتاب برای همین مرحله[^\n]*/) || [''])[0]), 'E8: the exec-phase hook carries «label heuristic reasoning incomplete» from the book');
+    });
+
+    await section('E8-obj', async () => {
+      await day(0);
+      const PB = await mk({ title: 'باغچه', st: 'باغچه‌ای مستطیلی دورش ۲۴ متر است و طولش دو برابرِ عرضش؛ طول و عرض چقدر است؟', nat: 'objective' });
+      await understand({ one: 'می‌خواهم طول و عرضِ باغچه را بیابم', unk: 'طول و عرض', data: ['محیط ۲۴ متر است', 'طول دو برابرِ عرض است'], cond: 'محیط = ۲ × (طول + عرض)', depNo: true, guess: 'طول ۸ و عرض ۴', suff: 'کافی است', suffW: 'دو داده دو معادله می‌دهند' });
+      info.e8plan = await hookText({ id: 'ach_e8b', lprob: PB, msgs: [] }, 'ادامه');
+      chk(/پارادوکسِ مخترع/.test(info.e8plan) && /به تعریف‌ها برگرد/.test((info.e8plan.match(/- از کتاب برای همین مرحله[^\n]*/) || [''])[0]), 'E8: the plan-phase hook carries the inventor\'s paradox and «back to definitions» from the book');
+      await addMove('mv_equation', 'طول و عرض را با نماد می‌نویسم تا محیط معادله شود');
+      await savePlan('نخست عرض را x می‌گیرم سپس محیط را برحسبِ x می‌نویسم');
+      info.e8toast = await toasts();
+      chk(!/با پیش‌بینی/.test(info.e8toast) && /روشن می‌بینی/.test(info.e8toast), 'E8: an objective problem gets no «… با پیش‌بینی» life wording after the plan ' + info.e8toast);
+      // «جای‌گذاری در شرط» وارسی است، نه عوض کردنِ طرح
+      info.e8chk = await p.evaluate(pid => APP.liveStepFollowsTag(pid, 'هر دو جواب رو در شرط اصلی گذاشتم: ع=۳ ⇒ درست؛ ع=−۲ ⇒ نادرست'), PB);
+      chk(info.e8chk === 'check', 'E8: «… در شرط اصلی گذاشتم» (substitution) is a checking step ' + info.e8chk);
+      await objStep('عرض x و طول 2x؛ 2(2x + x) = 24 پس x = 4', 'از تعریفِ محیط');
+      await click('main .lp-solved');
+      info.e8dep = { l: await p.evaluate(() => (document.querySelector('label[for="lpBDep"]') || {}).textContent || ''), o: await p.evaluate(() => [...document.querySelectorAll('#lpBDep option')].map(o => o.value + ':' + o.textContent)) };
+      chk(/داده‌ای هست که با مجهول عوض شود؟/.test(info.e8dep.l) && info.e8dep.o.some(x => /^yes:بله/.test(x)) && info.e8dep.o.some(x => /^no:نه/.test(x)), 'E8: lpBDep label and values agree («بله» = yes) ' + JSON.stringify(info.e8dep));
+      await sel('#lpBMulti', 'many');
+      chk(await has('#lpBMultiW') === 1, 'E8: «بیش از یکی» gets the follow-up (all found? restate the condition)');
+      await p.fill('#lpBChk', 'جای‌گذاری کردم'); await sel('#lpBRes', 'ایرادی یافتم'); await selIf('#lpBCP_0', 'yes');
+      await p.fill('#lpBDefW', 'شمارِ جواب‌ها را بد شمردم؛ طرح را عوض می‌کنم'); await sel('#lpBDefTo', 'p'); await sel('#lpBWant', 'same');
+      await click('main .lp-lbsave');
+      info.e8def = await p.evaluate(pid => ({ ph: APP.livePhase(pid), back: APP.liveClosure(pid).back, view: APP.state.sub }), PB);
+      chk(info.e8def.ph === 'p' && info.e8def.back === 'p' && info.e8def.view === 'plan', 'E8: after a defect «back to plan», livePhase, closure.back and the view agree ' + JSON.stringify(info.e8def));
+    });
+
+    await section('E8-misc', async () => {
+      // بیدی: ویرگول/پرسشِ فارسی پس از فرمول
+      info.e8bidi = await p.evaluate(() => APP.ASSIST.bidiNodes('ابعاد: cm³/s ÷ cm² = cm/s، و وقتی y→0، dy/dt چه می‌شود؟').filter(x => x && x.tagName === 'BDI').map(x => x.textContent));
+      chk(info.e8bidi.includes('cm³/s ÷ cm² = cm/s') && info.e8bidi.includes('y→0'), 'E8: «cm³/s ÷ cm² = cm/s،» and «y→0،» each stay whole in one isolate ' + JSON.stringify(info.e8bidi));
+      // گزینه‌های «کافی است؟» با نوع؛ پاسکال در اجرای اثباتی
+      const PV = await mk({ title: 'زوج', st: 'ثابت کنید مجموعِ دو عددِ فرد زوج است.', kind: 'prove' });
+      await whole('می‌خواهم ثابت کنم جمعِ دو فرد زوج است', 'کنجکاوم');
+      info.e8suff = await p.evaluate(() => [...document.querySelectorAll('#lpSuff option')].map(o => o.textContent).filter(Boolean));
+      chk(info.e8suff.some(t => /فرض/.test(t)) && !info.e8suff.some(t => /مجهول/.test(t)), 'E8: the sufficiency options speak of hypothesis for a proof ' + JSON.stringify(info.e8suff));
+      chk((await p.evaluate(pid => APP.livePhaseQs(pid, 'c'), PV)).some(q => /پاسکال/.test(q)), 'E8: Pascal\'s rule is in the prove execution questions');
+      // «کیش نیست»
+      const PC = await mk({ title: 'مات در دو', st: 'سفید در دو حرکت مات می‌کند؛ حرکتِ اول چیست؟', nat: 'objective' });
+      await understand({ one: 'می‌خواهم حرکتِ اولِ مات را بیابم', unk: 'حرکتِ اولِ سفید', data: ['شاهِ سیاه در گوشه است', 'سفید وزیر و رخ دارد'], cond: 'مات در دو حرکت' });
+      await addMove('mv_special', 'اول کیش‌های ممکنِ وزیر را یکی‌یکی می‌سنجم');
+      await savePlan('نخست با وزیر کیشِ دیگری می‌دهم سپس با رخ مات می‌کنم');
+      info.e8kish = await p.evaluate(pid => APP.liveStepFollowsTag(pid, 'حرکتِ اول: وزیر b7 (کیش نیست) و بعد رخ a8 مات'), PC);
+      chk(info.e8kish === '', 'E8: a step that negates the plan\'s move does not follow it through other shared words («وزیر/مات») ' + JSON.stringify(info.e8kish));
+      // «آزمون را نادیده می‌گیرم» دلیلی می‌خواهد که هزینه/خطرِ آزمون را بگوید
+      const PG = await mk({ title: 'باشگاه', st: 'عضوِ باشگاهِ گران‌تر بشوم یا ارزان‌تر؟', nat: 'life' });
+      await whole('می‌خواهم باشگاهِ مناسب را برگزینم', 'سلامتی');
+      await p.fill('#lpUnk', 'کدام باشگاه'); await p.fill('#lpD_d1', 'باشگاهِ اول گران است'); await p.fill('#lpD_d2', 'باشگاهِ دوم دور است'); await p.fill('#lpCond', 'هفته‌ای سه بار بروم');
+      await selIf('#lpSat', 'yes'); await sel('#lpSuff', 'ناکافی است — چیزی کم است'); await p.fill('#lpSuffW', 'هنوز همه را نمی‌دانم');
+      await p.fill('#lpGuess', 'گران‌تر بهتر است'); await sel('#lpConf', '60'); await p.fill('#lpTest', 'یک ماه آزمایشی می‌روم');
+      await sel('#lpIfRef', await p.evaluate(() => [...document.querySelectorAll('#lpIfRef option')].map(o => o.value).find(v => /نادیده/.test(v))));
+      await p.fill('#lpIfRefW', 'حدسم خیلی قوی است و مطمئنم درست است');
+      await click('main .lp-usave');
+      info.e8ifref = await txt('main .lp-umiss');
+      chk(/هزینه یا خطرِ خودِ آزمون/.test(info.e8ifref), 'E8: «آزمون را نادیده می‌گیرم» needs a reason that names a cost/risk of the test ' + info.e8ifref);
     });
   } catch (e) { errors.push('exception: ' + (e && e.stack || e)); }
   console.log(JSON.stringify(info));
