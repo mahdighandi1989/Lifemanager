@@ -7,7 +7,9 @@ This note covers the live tunnel (`apps/learning-architecture/src/app/a38_live.j
 ## Commits (base 522f92d)
 - `c567561`: the G2, G5 and G6 code, plus updates to two older tests (r4 E5, r5 F7).
 - `6c1d051`: `A.liveResult` and the one a27 line, the find look-back wording, and the new `tests/test_tour1_r6_live.js` (sections G2-related, G2-cards, G2-stuck, G2-abandon-aside, G5-kinds, G5-wording, G5-closing, G5-lpod-guess, G6-range, G6-goal-mentions-equiv). Set `ONLY=<section prefix>` to run one section.
-- The last commit adds this note.
+- `19ccdb2`: this note.
+- `ab37b0e`: `turn.guess` and `turn.related` (the coach's new fields); the a38 refuted-guess line now appears only once; two old coach tests (r3 B3, r5 F2 f2b3) are relaxed to R6 G2(3); a new test section, G2-turnfields.
+- Red baseline of G2-turnfields on 522f92d: two failing lines.
 
 ## Red baseline
 Run `LLA_FILE=<522f92d dist html> node tests/test_tour1_r6_live.js`. It exits 1 with 35 failing lines; on the fixed build every check passes («NO ERRORS»).
@@ -15,9 +17,10 @@ Run `LLA_FILE=<522f92d dist html> node tests/test_tour1_r6_live.js`. It exits 1 
 ## G2: the turn question
 `A.liveCoach(pid, {asked, stuck, turn:{analogy, result, stuck, fail, text, related, abandon}})` keeps its old signatures.
 
-**New turn fields** (both optional; liveCoach also reads them from `turn.text`, so the coach does not have to pass them):
-- `related`: the user cannot see how to use a related solved problem.
-- `abandon`: the user wants to drop the whole approach.
+**New turn fields** (all optional):
+- `guess`: the coach's field. «…درسته؟» after a value means a guess, so the turn question is «حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟» (`turn-guess`). It is the first check in priority 1, before `result`.
+- `related`: the coach's field, and also read from `turn.text`. The user cannot see how to use a related solved problem (`turn-related`). It works with `stuck: false`.
+- `abandon`: read from `turn.text`. The user wants to drop the whole approach.
 
 **Priority:**
 1. **This turn.**
@@ -45,6 +48,8 @@ Run `LLA_FILE=<522f92d dist html> node tests/test_tour1_r6_live.js`. It exits 1 
 - `cardWhy`: one of `incub`, `checkin`, `equiv`, `multi`, `presup`, `aside`, `eqfew` or `page`.
 - `samePage`: `q === card`.
 - New `src` values: `turn-related`, `turn-abandon`, `card-incub`, `card-checkin`, `card-equiv`, `card-multi`, `card-eqfew`, `stuck-aside` and `stuck-alldata`. `fail-presup` and `fail-aside` keep their names.
+
+**Refuted guess.** The a38 hook line «حدسی که خودش با آزمون رد کرد … بپرس از ردش چه آموخت» now appears only in the first turn after the refutation, plus a re-prompt of the same message. This is tracked in `s.lpTutor.refK` and `s.lpTutor.refMsg`, as a27 now does.
 
 **One question per block (a38 side).** The a38 hook line about a set-aside datum is gone when that datum is the turn question. Otherwise it is context («زمینه (نه پرسشِ دوم)»), with no «بپرس».
 
@@ -90,6 +95,7 @@ Run `LLA_FILE=<522f92d dist html> node tests/test_tour1_r6_live.js`. It exits 1 
   - E5 aside: the set-aside datum is now the turn question, not a second line.
   - E5/E3: stuck in plan with unused data gives all-data.
 - `tests/test_tour1_r5_live.js`: the F7 new guess fills `lpONewGC` and `lpONewGTest`.
+- `tests/test_tour1_r3_coach.js` (B3) and `tests/test_tour1_r5_coach.js` (F2 f2b3): stuck before a plan with unused data now expects «همهٔ داده‌ها؟». This follows R6 G2(3), which reverses R5 F2.
 
 ## Not done
 - G1, G3, G4 and G7 belong to the coach. Things the coach must do for G2/G5 to reach the chat block completely:
