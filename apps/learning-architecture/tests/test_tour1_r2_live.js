@@ -274,7 +274,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     await p.fill('#lpBkDeadW_1', 'دوست‌ها همسرِ هم‌اند و نمی‌توانند جدا بنشینند'); await click('main .lp-bksave');
     await moveAndPlan('نخست شرطِ دوستان را شل می‌کنم و فقط زوج‌ها را کنارِ هم می‌نشانم');
     chk(!(await S(P3)).live.plan, 'R8: plan cannot be saved before choosing which part to relax');
-    await sel('#lpRelax', '0'); await p.fill('#lpRelaxW', 'دوستی با همسری تداخل دارد پس آن را شل می‌کنم'); await click('main .lp-plansave');
+    await sel('#lpRelax', '0'); await p.fill('#lpRelaxW', 'دوستی با همسری تداخل دارد پس آن را شل می‌کنم'); if (await has('#lpRelaxVary')) await p.fill('#lpRelaxVary', 'بی آن بخش چیدمان‌های زیادی هست و با برگرداندنش کم می‌شوند'); await click('main .lp-plansave');   // F7 (دورِ ۵): «مجهول چگونه تغییر می‌کند؟» لازم است
     chk((await S(P3)).live.plan && (await S(P3)).live.plan.relax.part === 0, 'R8: relaxed part recorded with the plan');
 
     /* ===================== استقرا: حالتِ پایه؛ تبدیل ⇒ هم‌ارزی؛ پرسش‌های نوع‌دار ===================== */

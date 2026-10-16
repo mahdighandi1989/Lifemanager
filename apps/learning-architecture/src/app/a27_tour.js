@@ -1410,7 +1410,7 @@
     var cl = null; try { cl = A.liveClosure ? A.liveClosure(pid) : null; } catch (e) { }
     var last = (L.steps || []).filter(function (x) { return x.closed && x.out && !x.out.auto; }).pop();
     var res = bk.glance || (L.chat && L.chat.solution) || (last ? clip(last.text, 80) + (last.out.what ? " ⇒ " + clip(last.out.what, 80) : "") : "");
-    var out = ["# مسئلهٔ حل‌شدهٔ مرتبط (" + pid + "): «" + clip(r.p.title, 80) + "» · " + (cl && cl.label ? cl.label : "بسته شده") + (L.stateAt ? " · " + String(L.stateAt).slice(0, 10) : "")];
+    var out = ["# مسئلهٔ حل‌شدهٔ مرتبط (" + pid + "): «" + clip(r.p.title, 80) + "» · " + (cl && cl.label ? cl.label : "بسته شده") + (L.stateAt ? " · " + (L.stateD || String(L.stateAt).slice(0, 10)) : "")];
     if (blind) out.push("- اول مرورِ بی‌نگاه: پیش از یادآوری بپرس «یادت هست مجهول و راهت چه بود؟» — بعد از این‌ها برای پیوند استفاده کن (مسئلهٔ مرتبطِ حل‌شده: «نتیجه‌اش را به کار می‌بری؟ روشش را؟»).");
     if (u.u || u.c) out.push("- مجهول «" + clip(u.u || u.one || "", 100) + "»" + (u.c ? " · شرط «" + clip(u.c, 100) + "»" : ""));
     if (L.plan && L.plan.t) out.push("- روش (طرحِ خودش): «" + clip(L.plan.t, 140) + "»");
@@ -1616,7 +1616,7 @@
     if (made) { r = A.liveCreate(ti, st, a && a.kind, { by: "assistant", sess: (s && s.id) || "", origin: { type: "chat", id: (s && s.id) || "" }, nat: a && a.nat, natBy: "assistant" }); }
     var pid = r.p.id, pg = S.get("eprog_" + pid), so = pg.solve = pg.solve || {}, L = so.live = so.live || {}, at = nowIso();
     so.u = so.u || {}; if (!(so.u[1] && so.u[1].done)) so.u[1] = { done: true, from: "chat", at: at, one: st || r.p.statement, u: clip(a.unknown || "", 300), dl: [], c: "", type: so.type || r.p.kind };
-    var was = L.state; L.state = "solved"; L.stateAt = L.stateAt && was === "solved" ? L.stateAt : at; L.chat = { sess: (s && s.id) || "", at: at, solution: clip(a.solution || (L.chat && L.chat.solution) || "", 1500) };
+    var was = L.state; L.state = "solved"; L.stateAt = L.stateAt && was === "solved" ? L.stateAt : at; L.stateD = L.stateD && was === "solved" ? L.stateD : A.today(); L.chat = { sess: (s && s.id) || "", at: at, solution: clip(a.solution || (L.chat && L.chat.solution) || "", 1500) };
     var les = clip(a.lesson || "", 600), own = les.length >= 5 && userWrote(s, les), info = "";
     if (les.length >= 5 && !(so.b && so.b[1] && so.b[1].done && so.b[1].use === les)) {
       so.b = so.b || {}; so.b[1] = { state: "solved", chkHow: clip(a.check || "", 400), chkRes: a.check ? "نتیجه سالم ماند" : "", glance: clip(a.glance || "", 300), use: les, newProb: clip(a.newProb || "", 600), at: at, done: true, from: "chat", own: own,
