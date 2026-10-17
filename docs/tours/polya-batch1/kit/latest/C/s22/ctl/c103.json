@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=document.querySelector('.as-edcancel');if(b)b.click();return 'cancel'})()"}
