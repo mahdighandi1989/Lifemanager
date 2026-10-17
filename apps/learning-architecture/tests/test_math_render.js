@@ -123,7 +123,8 @@ const SHOT = process.env.SHOT_DIR || os.tmpdir();
     });
     info.hook = await p.evaluate(() => { const c = __calls.find(x => /مجموعِ 1\/\(k\(k\+1\)\)/.test(x.user || '')); return !!c && /\$…\$/.test(c.user) && /\\frac/.test(c.user); });
     chk(info.hook, 'a math turn carries the formula line ($…$ with an example) in the assistant prompt');
-    chk(info.chat.uMath === 1 && info.chat.aMath === 3 && info.chat.iso && info.chat.rtl === 'rtl', 'chat bubbles: formulas become <math> in LTR isolates (user 1, assistant 3) ' + JSON.stringify(info.chat));
+    // دورِ ۱۹ (RN4a، بانکِ RN4.run «x=۲»/«xy=۱۰۰»): در پیامی که فرمولِ دیگری دارد «k=1» هم فرمول است ⇒ کاربر ۲ (پیش‌تر ۱)
+    chk(info.chat.uMath === 2 && info.chat.aMath === 3 && info.chat.iso && info.chat.rtl === 'rtl', 'chat bubbles: formulas become <math> in LTR isolates (user 2 incl. k=1, assistant 3) ' + JSON.stringify(info.chat));
     chk(info.chat.src.join('|') === 'S_n = \\frac{n}{n+1}|1/((n+1)(n+2))|S_{n+1}', 'assistant formulas found in order ' + JSON.stringify(info.chat.src));
     chk(info.chat.order, 'Persian sentence order around formulas is kept (head right of first formula, tail left of last) ' + JSON.stringify(info.chat));
     chk(info.chat.nums, 'numbers inside the Persian sentence («۳۰ پله»، «۴۰ درصد») stay text');
@@ -142,7 +143,8 @@ const SHOT = process.env.SHOT_DIR || os.tmpdir();
     await p.fill('#lpNewS', 'در ۳۰ روز ۴۰ درصدِ کارها را تمام کنم'); await W(80);
     info.pv2 = await pv();
     chk(info.pv0 && info.pv0.hidden, 'statement preview exists and is hidden while empty ' + JSON.stringify(info.pv0));
-    chk(info.pv1 && !info.pv1.hidden && info.pv1.math === 3, 'statement preview shows the formulas live ' + JSON.stringify(info.pv1));
+    // دورِ ۱۹ (RN4a): «n ≥ 1» و «k=1» در همین صورتِ ریاضی هم فرمول‌اند ⇒ ۵ (پیش‌تر ۳)
+    chk(info.pv1 && !info.pv1.hidden && info.pv1.math === 5, 'statement preview shows the formulas live ' + JSON.stringify(info.pv1));
     chk(info.pv2 && info.pv2.hidden, 'statement preview hides for plain Persian text with numbers ' + JSON.stringify(info.pv2));
     // گامِ بعد: یک مسئلهٔ اثباتیِ تازه و نمای «اجرا»
     await p.fill('#lpNewT', 'مجموعِ تلسکوپی'); await p.fill('#lpNewS', 'ثابت کن مجموعِ 1/(k(k+1)) از k=1 تا n برابرِ n/(n+1) است'); await W(60);

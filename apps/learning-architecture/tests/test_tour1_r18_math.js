@@ -308,7 +308,8 @@ const of = (rc) => V.filter(e => e.rc === rc);
       APP.ASSIST.toggle(false); APP.ASSIST.toggle(true); await new Promise(r => setTimeout(r, 150));
       const pl = [...document.querySelectorAll('.as-panel .mx-plot')].pop(); return { has: !!pl, px: window.__px, tags: pl ? [...new Set([...pl.querySelectorAll('*')].map(e => e.localName))] : [] };
     });
-    chk(xs.has && xs.px === undefined && xs.tags.every(t => /^(svg|polyline|circle|text|line|title|g|span|div)$/.test(t)), 'plot: escape everything (no injected element/handler) ' + J(xs));
+    // دورِ ۱۹ (INF14): فرمِ «افزودنِ نقطه» (button/input ِ خودِ صفحه، نه از متن) هم مجاز است
+    chk(xs.has && xs.px === undefined && xs.tags.every(t => /^(svg|polyline|circle|text|line|title|g|span|div|button|input)$/.test(t)), 'plot: escape everything (no injected element/handler) ' + J(xs));
     await p.evaluate(() => APP.ASSIST.toggle(false));
   });
 
