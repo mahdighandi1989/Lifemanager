@@ -10,6 +10,7 @@
 //  prov    L6: ضدِ ضرب‌المثل (PROV_OPP) هم نقلی نیست که در همان بلوک آمده (s25 p6، s26 p4)
 //  cert    L6: «معلومه»، «واضحه»، «بدیهیه»، «شکی نیست» ⇒ B107 + md_cognitive_biases (s28 p1)
 //  lesson  L6: پس از بستنِ مسئله، «نمی‌دونم…» ِ کوتاه دربارهٔ همان ⇒ درسِ بازنگریِ خودش پرسشِ نوبت است، نه u1 (s26 p5)
+//  openph  هماهنگی با «live»: بیرون از صفحه، حرفش دربارهٔ مسئلهٔ بازِ تنها در «طرح» ⇒ سرواژه و فهرستِ مربی «طرح‌ریزی»، نه «فهمِ مسئله»
 //  terr    L7: آمار (σ/√n، n−1، «میانگینِ نمونه») ⇒ pr_statistical از نشانهٔ خودِ مسئله (cues_fa)؛ a_induction از B162 فقط برای استقرا از نمونه‌ها (s14 p9)
 // همه از رابطِ واقعی (پنجرهٔ دستیار با مدلِ بدلی، فرم‌های «🔭»)؛ خطا ⇒ کدِ خروجِ غیرصفر. LLA_FILE = ساختِ دیگر (خطِ قرمز: 53d0fc6)؛ ONLY=… ؛ DUMP=1؛
 // LLA_STRUCT_FIX=0 فیکسچرهای دورهای ۷–۱۲ را اجرا نمی‌کند (فقط پرامپت‌های همین آزمون).
@@ -330,6 +331,27 @@ function strictScan(user) {
     const un = await first('امروز هوا خوب بود و یه کم پیاده‌روی کردم، بعد چای خوردم.');
     r.ctl = hasA(un, 'pr_statistical');
     chk(!r.ctl, 'L7 terr: control — an unrelated message gets no pr_statistical ' + JSON.stringify(r.ctl));
+  });
+
+  // ================= openph — بیرون از صفحه: فهرستِ مربی هم‌مرحلهٔ مسئلهٔ باز (هماهنگی با «live») =================
+  await section('openph', async () => {
+    const r = info.openph = {};
+    const hasEl = (s) => p.locator(s).count(), fillIf = async (s, v) => { if (await hasEl(s)) await p.fill(s, v); };
+    const P = await mk({ title: 'باغچهٔ بزرگ', st: 'با ۴۰ متر لبه بزرگ‌ترین باغچهٔ چهارضلعی چه شکلی است؟', nat: 'objective' });
+    await p.fill('#lpOne', 'بزرگ‌ترین مساحت با محیطِ ثابت'); await p.fill('#lpWhy', 'برایم مهم است و کنجکاوم'); await click('main .lp-onesave');
+    await p.fill('#lpUnk', 'شکلِ با بیشترین مساحت'); await p.fill('#lpD_d1', 'محیط ۴۰ متر'); await p.fill('#lpD_d2', 'چهارضلعی'); await p.fill('#lpCond', 'محیط ثابت و مساحت بیشینه');
+    if (await hasEl('#lpSat')) await sel('#lpSat', 'yes');
+    await sel('#lpSuff', 'ناکافی است — چیزی کم است').catch(() => {}); await fillIf('#lpSuffW', 'هنوز همه را نمی‌دانم'); await fillIf('#lpSuffChal', 'همهٔ داده‌ها با هم آن را معین می‌کنند');
+    if (await hasEl('#lpDep')) await sel('#lpDep', 'no');
+    await fillIf('#lpGuess', 'مربع'); if (await hasEl('#lpConf')) await sel('#lpConf', '60'); await fillIf('#lpTest', 'با یک حالتِ خاص می‌آزمایم');
+    if (await hasEl('#lpIfRef')) await sel('#lpIfRef', 'حدس را کنار می‌گذارم یا اصلاحش می‌کنم');
+    await click('main .lp-usave'); if (await hasEl('main .lp-u .sv-g2')) await click('main .lp-u .sv-g2');
+    r.ph = await p.evaluate(pid => APP.livePhase(pid), P);
+    const u = await first('دربارهٔ باغچهٔ بزرگ با ۴۰ متر لبه فکر کردم ولی هنوز راهی برای مساحتِ بیشینه ندارم.');
+    const c = coachOf(u); r.head = (/مرحلهٔ محتمل: ([^·]+)/.exec(c.split('\n')[0]) || [])[1] || ''; r.list = (/^- پرسش‌های «([^»]+)»/m.exec(c) || [])[1] || ''; r.live = !!liveOf(u);
+    chk(r.ph === 'p' && !r.live && /طرح/.test(r.head) && /طرح/.test(r.list), 'openph: off the page, a message about the one open problem (in planning) gets the coach header and list of THAT phase, not «فهمِ مسئله» ' + JSON.stringify(r));
+    strict('openph', u);
+    await sleepP(P);
   });
 
   info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);

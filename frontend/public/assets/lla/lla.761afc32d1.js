@@ -37177,6 +37177,9 @@ APP.goFromURL = function (q) {
     if (!hasCoach && (auto ? !!cpid : !AS.notProblem(mt))) {
       var bb = cpid ? { pid: cpid, r: A.liveRec(cpid), ph: A.livePhase ? A.livePhase(cpid) : "u", done: false } : b;
       var ph = auto ? (PH_OF[bb.ph] || "u") : coachPhase(s, mt, bb), cls = cpid ? liveClass(cpid) : natClass(s, recent) || qClass("", recent);
+      /* دورِ ۱۲ (هماهنگی با «live»): بیرون از صفحه، حرفش آشکارا دربارهٔ همان مسئلهٔ بازِ تنها (openOn) ⇒ مرحله و فهرستِ مربی همان مرحلهٔ صفحهٔ آن مسئله‌اند
+         (نه «فهم» ِ گفت‌وگو کنارِ پرسشِ «طرح» ِ صفحه) */
+      if (!cpid && !auto && openO && openO.on && openO.q && PH_OF[openO.ph]) { ph = PH_OF[openO.ph]; var oc = liveClass(openO.pid); if (oc) cls = oc; }
       /* F4 (دورِ ۵): نوعِ مسئله (find/prove/pod) برای سرواژه — زنده از رکورد، فقط‌درگفت‌وگو از حدسِ همان بخشِ مسئله (A.liveTypeGuess) */
       var ptype = ""; try { ptype = cpid ? ((A.liveKindInfo(cpid) || {}).type || "") : cls === "prove" && A.liveTypeGuess ? (A.liveTypeGuess(recent) || "prove") : ""; } catch (e) { }
       var Pv = s.coach && s.coach.prev && s.coach.prev.key === mkey(mt) ? s.coach.prev : null;
