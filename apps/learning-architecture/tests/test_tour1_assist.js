@@ -339,7 +339,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   });
   chk(info.idea.shape, '13: the idea prompt gives the action shapes (part, t, ev, idea_counter) ' + JSON.stringify(info.idea));
   chk(info.idea.revised && info.idea.case, '13: a counter-case revises the assumption in the user\'s own words (history kept) and the assumption gets a factory case ' + JSON.stringify(info.idea));
-  chk(/بپرس/.test(info.idea.neg) && info.idea.unchanged && /assumption/.test(info.idea.badI), '13: a rewrite not in the user\'s words is not applied — the user is asked ' + JSON.stringify(info.idea));
+    // تورِ پولیا دورِ ۱۲ (L3): یادداشتِ گفت‌وگو برای خودِ کاربر نوشته می‌شود («بازنویسیِ فرض با واژه‌های خودت…») — دستورِ «از او بپرس» به مدل فقط در پرامپت
+  chk(/واژه‌های خودت/.test(info.idea.neg) && !/بپرس/.test(info.idea.neg) && info.idea.unchanged && /assumption/.test(info.idea.badI), '13: a rewrite not in the user\'s words is not applied — the note tells the user the rewrite is his (no «بپرس» leak) ' + JSON.stringify(info.idea));
 
   // ---------- 14) موعدها ----------
   await newSess();
