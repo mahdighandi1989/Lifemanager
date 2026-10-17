@@ -2384,7 +2384,7 @@
   /* دورِ ۱۲ (L5، s29 c23): «کدام پرسش کمک کرد؟» فقط پرسش‌های گفت‌وگو دربارهٔ **همین** مسئله — سشنی که پیش‌تر دربارهٔ چیزِ دیگری بود (مسئلهٔ باغچه) و بعد همین
      مسئله را ساخت (live_new)، فقط از پاسخِ سازنده به بعد؛ سشنی که بعدتر به مسئلهٔ دیگری رفت، فقط تا پیش از آن. لحظهٔ ساخت از خودِ رکورد (r.created، یا زمانِ درونِ شناسه) */
   function bornAt(r) { if (r.created) return String(r.created); var m = /^pb_l_([0-9a-z]+)[0-9a-z]{3}$/.exec(String(r.p.id || "")), n = m ? parseInt(m[1], 36) : NaN; return n > 1e12 && n < 1e14 ? new Date(n).toISOString() : ""; }
-  /* دورِ ۱۳ (M1، s29 c23، s30، s31، s36): یک قاعده برای هر راهی که مسئله موضوعِ سشن می‌شود — پنجرهٔ گفت‌وگوی مسئله از پیامی آغاز می‌شود که همین مسئله
+  /* (دورِ ۱۴: قاعدهٔ آغاز با N1 ِ پایین جایگزین شد؛ این شرح تاریخچه است) دورِ ۱۳ (M1، s29 c23، s30، s31، s36): یک قاعده برای هر راهی که مسئله موضوعِ سشن می‌شود — پنجرهٔ گفت‌وگوی مسئله از پیامی آغاز می‌شود که همین مسئله
      موضوعِ سشن شد و تا جایی است که سشن به موضوعِ دیگری رفت:
      • پاسخِ دستیاری که کنشش آن را ساخت یا با فرم ساخت/باز کرد (live_new، chat_invent، chat_solved، کلیکِ «ساختن» — بستنِ سشن در نوبتِ دستیار، lprobLog.ai)؛
      • رفتنِ سشن به آن (lprobAt / lprobLog بی نوبتِ دستیار) ⇒ نخستین پیامِ پس از آن؛
@@ -2404,29 +2404,39 @@
     return MS.length;
   }
   function creatIdx(MS, t) { var c = -1; if (t) MS.forEach(function (m, i) { if (actsHas(m, CREATE_ACTS) && m.at && String(m.at) <= t) c = i; }); return c; }
+  /* دورِ ۱۴ (N1، s03/s07/s10/s11/s21/s23/s25/s29/s33/s35/s36/s37): یک قاعده، با **مرز** — نه با راهِ ساختن. موضوع‌های سشن = بسته شدن‌هایش (lprobLog؛ سشنِ
+     کهنهٔ بی دفتر: lprobAt و live_new ِ دیگر) و ساختنِ همین مسئله در همین سشن (live_new / chat_solved — مسئلهٔ کنارگذاشتهٔ chat_invent موضوع نشد).
+     پنجرهٔ P = از دیرترینِ {آغازِ سشن، لحظه‌ای که موضوعِ «دیگرِ» پیشین تمام شد} تا لحظه‌ای که سشن از P رفت. «تمام شد» = پیامِ رفتن: نخستین پیامِ کاربر
+     پس از بسته شدنِ سشن به آن موضوعِ دیگر که همین P را نام می‌برد («باغچه تموم شد. حالا حوض: …»)؛ اگر چنین پیامی نیست، خودِ لحظهٔ بسته شدنِ سشن به P
+     (startAt). پایانِ P = آغازِ موضوعِ دیگرِ بعدی با همین تعریف. بی موضوعِ دیگرِ پیشین ⇒ آغازِ سشن (پرسش‌های پیش از ساخت/ثبت، به هر راهی، مالِ همین مسئله‌اند). */
   function msgWin(se, r) {
-    var MS = se.msgs || [], pid = r.p.id, LG = se.lprobLog || [], t0 = bornAt(r), st = [], ev = [], only = {}, pt = toks([r.p.title, r.p.statement].join(" "));   // pt: نام بردنِ مسئله در پیامِ کاربر (chat_solved)
-    var names = function (m) { return !!m && toks(m.text).filter(function (w) { return hit(w, pt); }).length >= 2; };
-    /* پایان‌ها: سشن موضوعِ دیگری گرفت */
-    LG.forEach(function (e) { if (e && e.p !== pid) ev.push(startAt(MS, String(e.at || ""), e.ai)); });
+    var MS = se.msgs || [], pid = r.p.id, LG = (se.lprobLog || []).filter(Boolean), t0 = bornAt(r), only = {}, SUB = [], nmC = {};
+    var namer = function (p) { if (nmC.hasOwnProperty(p)) return nmC[p]; var x = p === pid ? r : p ? rec(p) : null, pt = x && x.p ? toks([x.p.title, x.p.statement].join(" ")) : [];
+      return (nmC[p] = pt.length ? function (m) { return !!m && m.role === "user" && toks(m.text).filter(function (w) { return hit(w, pt); }).length >= 2; } : null); };
+    LG.forEach(function (e) { SUB.push({ p: e.p || "", i: startAt(MS, String(e.at || ""), e.ai) }); });
     if (!LG.length) {
-      if (se.lprob && se.lprob !== pid && se.lprobAt) ev.push(startAt(MS, String(se.lprobAt), null));
-      lives().forEach(function (x) { if (x.p.id !== pid && x.sess === se.id && x.by === "assistant") { var cx = creatIdx(MS, bornAt(x)); if (cx >= 0) ev.push(cx); } });
+      if (se.lprob && se.lprobAt) SUB.push({ p: se.lprob, i: startAt(MS, String(se.lprobAt), null) });
+      else if (se.lprob === pid) SUB.push({ p: pid, i: t0 ? startAt(MS, t0, null) : 0 });
+      lives().forEach(function (x) { if (x.p.id !== pid && x.sess === se.id && x.by === "assistant" && !x.dormant) { var cx = creatIdx(MS, bornAt(x)); if (cx >= 0) SUB.push({ p: x.p.id, i: cx }); } });
     }
-    /* آغازها */
     if (r.sess && se.id === r.sess) {
       var c = creatIdx(MS, t0);
-      if (c < 0) st.push(t0 ? startAt(MS, t0, null) : 0);
-      else if (r.dormant && r.by === "user") only[c] = true;   // chat_invent ِ کنارگذاشته: فقط پاسخِ سازنده، فقط پرسشی که خودِ آن را نام می‌برد
-      else if (actsHas(MS[c], ["chat_solved"]) && r.origin && r.origin.type === "chat") {
-        var pr = ev.filter(function (e) { return e < c; }), b0 = pr.length ? Math.max.apply(null, pr) : -1, s0 = c;
-        if (b0 < 0) s0 = 0; else for (var u = b0; u < c; u++) if (MS[u] && MS[u].role === "user" && names(MS[u])) { s0 = u; break; }
-        st.push(s0);
-      } else st.push(c);
+      if (c >= 0 && r.dormant && r.by === "user") only[c] = true;   // chat_invent ِ کنارگذاشته: فقط پاسخِ سازنده، فقط پرسشی که خودِ آن را نام می‌برد
+      else if (c >= 0) SUB.push({ p: pid, i: c });
+      else if (!SUB.some(function (e) { return e.p === pid; })) SUB.push({ p: pid, i: t0 ? startAt(MS, t0, null) : 0 });
     }
-    LG.forEach(function (e) { if (e && e.p === pid) st.push(startAt(MS, String(e.at || ""), e.ai)); });
-    if (!LG.length && se.lprob === pid) st.push(se.lprobAt ? startAt(MS, String(se.lprobAt), null) : t0 ? startAt(MS, t0, null) : 0);
-    var W = st.map(function (a) { var e = ev.filter(function (x) { return x > a; }); return [a, e.length ? Math.min.apply(null, e) : MS.length]; });
+    SUB.forEach(function (e, n) { e.n = n; });
+    SUB.sort(function (x, y) { return x.i - y.i || x.n - y.n; });
+    var begin = function (k) {
+      var e = SUB[k], prev = null; for (var j = k - 1; j >= 0; j--) if (SUB[j].p !== e.p) { prev = SUB[j]; break; }
+      if (!prev) return 0;
+      var f = e.p ? namer(e.p) : null;
+      if (f) for (var u = prev.i + 1; u <= e.i && u < MS.length; u++) if (f(MS[u])) return u;
+      return e.i;
+    };
+    var W = [];
+    SUB.forEach(function (e, k) { if (e.p !== pid) return; var nx = -1; for (var j = k + 1; j < SUB.length; j++) if (SUB[j].p !== pid) { nx = j; break; }
+      W.push([begin(k), nx < 0 ? MS.length : begin(nx)]); });
     /* پرسشِ پاسخِ سازندهٔ مسئلهٔ کنارگذاشته که خودِ آن را نام می‌برد مالِ همان است، نه موضوعِ جاریِ سشن — «نام بردن» با واژه‌های عنوانش که در عنوانِ
        هم‌زادهای همان پاسخ نیستند (دو مسئلهٔ «… با جمعِ ۱۰» با «جمع» و «۱۰» از هم جدا نمی‌شوند) */
     var DM = lives().filter(function (x) { return x.sess === se.id && x.dormant && x.by === "user"; }).map(function (x) { return { id: x.p.id, c: creatIdx(MS, bornAt(x)), t: toks(x.p.title) }; }).filter(function (x) { return x.c >= 0; });

@@ -149,6 +149,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await day(0); await homeSess();
     await next('این حدس را چطور می‌آزمایی که گلدان‌ها از کم‌آبی زرد شده‌اند؟');
     await say('گلدون‌های باغچه زرد شدن، فکر کنم کم‌آبی باشه.');
+    // DECISIONS_R14 N1: موضوعِ پیشین مرز دارد — در s29 باغچه خودش مسئلهٔ ثبت‌شدهٔ همین سشن بود (این‌جا: حل و ثبت در گفت‌وگو، chat_solved)
+    r.stage = 'garden-solved';
+    await p.evaluate(() => __q.push(R({ reply: 'بازنگری‌ات را ثبت کردم.', actions: [{ do: 'chat_solved', title: 'زرد شدنِ گلدان‌های باغچه', statement: 'گلدان‌های باغچه زرد شده‌اند؛ علتش کم‌آبی است یا چیزِ دیگری؟', kind: 'find', lesson: 'اول ساده‌ترین علت را بیازما', check: 'یک هفته آبِ روزانه و گلدان‌ها سبز شدند' }] })));
+    await say('یه هفته هر روز آب دادم سبز شدن؛ درسم: اول ساده‌ترین علت رو بیازما.');
     r.stage = 'pre'; await next('عمقِ حوضِ حیاط را از کجا می‌دانی؟');
     await say('یه حوضِ حیاط دارم که آبش هر هفته کم میشه و نمی‌دونم نشتی داره یا تبخیره.');
     r.stage = 'create';
@@ -162,8 +166,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(!r.qs.some(t => /گلدان/.test(t)), 'chat: the garden question asked in the same session BEFORE the pond problem existed is not offered for the pond (L5, s29 c23) ' + JSON.stringify(r.qs));
     chk(r.qs.some(t => /سطحِ آب چند سانت/.test(t)), 'chat: control — a question about this problem after it was created is offered ' + JSON.stringify(r.qs));
     chk(r.qs.some(t => /مجهول/.test(t)), 'chat: control — the creating reply\'s own question is about this problem and is offered ' + JSON.stringify(r.qs));
-    // DECISIONS_R13 M1 (یک قاعده): پنجره از پیامی آغاز می‌شود که همین مسئله موضوعِ سشن شد (پاسخِ سازنده) — پیش از آن، حتی نوبتی که نامش را برد، نه (s29 c23: نوبتِ پیش از ساخت حوض را هم نام برده بود و پرسشش دربارهٔ باغچه بود)
-    chk(!r.qs.some(t => /عمقِ حوضِ حیاط/.test(t)), 'chat: a pre-creation turn is outside the window even when its user message names the problem — the window starts at the creating reply (R13 M1, changed from the R12 control) ' + JSON.stringify(r.qs));
+    // DECISIONS_R14 N1 (یک قاعده با مرز): پنجره از پیامِ رفتن از موضوعِ پیشین (نخستین پیامِ کاربر پس از باغچه که حوض را نام می‌برد) — نوبتِ پیش از ساختِ حوض مالِ حوض است
+    chk(r.qs.some(t => /عمقِ حوضِ حیاط/.test(t)), 'chat: a pre-creation turn after the switch message that names the pond keeps its question (R14 N1, restores the R12 control that R13 M1 had inverted) ' + JSON.stringify(r.qs));
   });
 
   // ================= multi — L5: پرسشِ نوبتِ چندجمله‌ای یک گزینه است (s02، s11، s01) =================
