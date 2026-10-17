@@ -13,7 +13,8 @@
    قراردادِ کامل برای ماژول‌های دیگر (پروندهٔ تمرین a41، کارنامه a29): HANDBOOK «زمان‌بندِ واحد» و یادداشتِ دست‌به‌دستِ دورِ ۱۹c. */
 (function (A) {
   var S = A.S, fa = A.fa;
-  var SC = A.SCHED = {};
+  if (A.SCHED && A.SCHED._one) return;   // یک بار (بارِ دوباره ثبت‌گاه را پاک می‌کرد)
+  var SC = A.SCHED = { _one: true };
 
   /* ---------- ۱) نردبانِ عمومی: یک نسخه؛ کپی‌های پیشین قرنطینه ---------- */
   SC.LADDER = Object.freeze([1, 3, 7, 21, 60]);
@@ -155,7 +156,8 @@
       try { L = s.list(day) || []; } catch (e) { console.warn("SCHED " + k, e); L = []; }
       L.forEach(function (e) { e.kind = e.kind || k; norm(e); e.src = k; e.today = !!s.today; if (!seen[e.key]) { seen[e.key] = 1; out.push(e); } });
     });
-    Object.keys(ONE).forEach(function (q) { var e = ONE[q]; if (o.kind && o.kind !== e.kind) return; if (!seen[e.key]) { seen[e.key] = 1; if (e.today == null) e.today = true; out.push(e); } });
+    /* نوعی که منبعِ رکوردمحور دارد (مثلاً practice) از همان رکوردها خوانده می‌شود؛ قلمِ تکیِ درون‌حافظهٔ آن نوع کهنه می‌شود (رکوردِ پاک‌شده، داده‌ی تازه) ⇒ نادیده */
+    Object.keys(ONE).forEach(function (q) { var e = ONE[q]; if (o.kind && o.kind !== e.kind) return; if (SRC[e.kind]) return; if (!seen[e.key]) { seen[e.key] = 1; if (e.today == null) e.today = true; out.push(e); } });
     return out.filter(function (e) { return !(e.dupOf && seen[e.dupOf]) && !e.done && e.open !== false; });
   };
   SC.due = function (day, o) {
@@ -188,7 +190,12 @@
     Object.keys(by).forEach(function (k) {
       var s = SRC[k], es = by[k];
       if (s && typeof s.line === "function") { try { [].concat(s.line(es, day) || []).forEach(function (x) { if (x) items.push(x); }); } catch (err) { console.warn(err); } return; }
-      es.forEach(function (e) { items.push({ k: e.lk || "p", txt: e.txt || e.label || e.key, sub: (e.sub ? e.sub + " · " : "") + SC.dueText(e, day), go: e.go || function () { }, acts: e.acts, sched: e.key }); });
+      es.forEach(function (e) {
+        var go = e.go || (Array.isArray(e.open) && e.open[0] ? function () { A.go(e.open[0], e.open[1] == null ? null : e.open[1], e.open[2] == null ? null : e.open[2]); } : function () { });
+        var it = { k: e.lk || "p", txt: e.txt || e.label || e.key, sub: (e.sub ? e.sub + " · " : "") + SC.dueText(e, day), go: go, acts: e.acts, sched: e.key, kind: e.kind, id: e.id };
+        if (e.kind === "practice") it.prc = e.id;   // همان نشانی که سطرِ پشتیبانِ a41 داشت
+        items.push(it);
+      });
     });
     return items;
   };
@@ -337,6 +344,17 @@
     },
     line: function (es, day) {
       return es.map(function (e) { return { k: "p", txt: "⛓ نتیجهٔ واقعیِ «" + e.txt + "» را ثبت کن", sub: "حسِ اولت " + (e.feel == null ? "—" : fa(e.feel) + "٪") + " بود · " + SC.dueText(e, day), go: function () { A.go("chain", e.id); }, sched: e.key }; });
+    } });
+
+  /* ---------- ۷ب) پل به پروندهٔ تمرین (a41، سهمِ «practice»): پرونده‌ها با A.SCHED.register({kind:"practice", …}) ثبت می‌شوند، ولی آن ثبت
+     درون‌حافظه است و پس از بارگذاریِ دوباره فقط با ذخیرهٔ بعدیِ پرونده برمی‌گردد. این منبع همان قلم‌ها را از خودِ رکوردها می‌خواند (A.PR.entries)
+     تا «امروز» و یادآور پس از بارگذاری هم کامل باشند؛ کلیدِ یکسان (practice:<id>) ⇒ یک قلم، هرگز دو. */
+  SC.register({ kind: "practice", label: "🧪 پروندهٔ تمرین (a41)", today: true, remind: true, types: ["practice"],
+    list: function () {
+      if (!(A.PR && typeof A.PR.entries === "function" && typeof A.PR.all === "function")) return [];
+      var out = [];
+      A.PR.all().forEach(function (c) { try { (A.PR.entries(c) || []).forEach(function (e) { if (e && e.due) out.push(Object.assign({}, e, { body: e.txt, title: "پروندهٔ تمرین" })); }); } catch (err) { } });
+      return out;
     } });
 
   /* ---------- ۸) ساعتِ آزمایشی: نشانِ دیدنی (LT8) ---------- */

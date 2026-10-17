@@ -276,12 +276,13 @@
         h("div", { class: "row gap wrap" }, A.phaseChip(A.phaseOf(id)), A.priChip(id), A.evChip(t), h("span", { class: "chip" }, "تسلط تو: " + A.MLV[m.lvl] + (m.avg != null ? " · " + fa(m.avg) + "٪" : ""))))));
     var tab = (sub || "und").split(":")[0];
     var cont = h("div", { class: "tbody" });
-    root.appendChild(A.tabs([["und", "فهم: چرا کار می‌کند"], ["do", "اجرا: دقیقاً چطور"], ["ws", "کارگاه تمرین"], ["rel", "ارتباطات"], ["hist", "سابقه"]], tab, function (k) { A.go("tech", id, k); }));
+    root.appendChild(A.tabs([["und", "فهم: چرا کار می‌کند"], ["do", "اجرا: دقیقاً چطور"], ["ws", "کارگاه تمرین"], ["rel", "ارتباطات"], ["hist", "سابقه"], ["prc", "🧪 پرونده‌ها"]], tab, function (k) { A.go("tech", id, k); }));
     root.appendChild(cont);
     if (tab === "und") cont.appendChild(understand(t));
     else if (tab === "do") cont.appendChild(doIt(t));
     else if (tab === "rel") cont.appendChild(relations(t));
     else if (tab === "ws") cont.appendChild(A.workshop(t, (sub || "").split(":")[1]));
+    else if (tab === "prc" && A.practiceTab) cont.appendChild(A.practiceTab(t));   /* دورِ ۱۹c: پرونده‌های تمرینِ باز (a41_practice.js) */
     else cont.appendChild(history(t));
     return root;
   };

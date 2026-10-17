@@ -52,3 +52,13 @@ All 37 green. #131 is the server test (pytest). Entries needing the real practic
 A.SCHED contract level with a record of the contract shape («tprac»); the technique-page path (start the cycle from T41, the «آزمون‌های باز» view for #5,
 the stability count for #133) belongs to the practice builder.
 Deviation from the bank (DECISIONS wins): #125 needs `dev=1` together with `?clock=` because #134 forbids an offset outside dev mode.
+
+## After merging the practice branch (worktree-agent-a4b67a4f540f07581)
+- `A.SCHED.unregister` also takes the object form `{kind, id, track?}` (practice's call); string key / kind forms kept.
+- Entries with `open: false` drop out; an `open: [view, arg, sub]` array becomes the Today line's `go`; practice lines carry `prc: <id>`.
+- a42 registers a record-backed `practice` source that reads `A.PR.all()` + `A.PR.entries(c)`, so practice lines and reminders survive a reload
+  (practice's own `register` calls are in-memory). For a kind with a record-backed source, in-memory one-off entries of that kind are ignored
+  (they go stale when records are deleted/changed without a re-register).
+- build.py: a42 is loaded once, right after a1 (the practice branch had also appended it at the end — a double load wiped the registry;
+  a42 now also refuses a second load).
+- Both `test_tour1_r19c_sched.js` and `test_tour1_r19c_practice.js` green on the merged build.

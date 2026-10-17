@@ -1607,7 +1607,7 @@
         var t = A.TM[a.tid]; if (!t) { panel.appendChild(h("p", { class: "bad" }, "این تکنیک پیدا نشد.")); return; }
         var r0 = actRec(kc, x.key), ex = r0 && r0.exId && S.get(r0.exId), data = ex ? ex.data || (ex.data = {}) : {};
         var savef = A.debounce(function () {
-          if (!ex) { ex = A.newEx(a.tid, kc.topic || ""); ex.data = data; ex.kcase = kc.id; S.put(ex); mark({ exId: ex.id }); H.put(); if ((k.status || "open") === "open") setKStatus(k, "working"); }
+          if (!ex) { ex = A.newEx(a.tid, kc.topic || ""); ex.data = data; ex.kcase = kc.id; if (k && k.id) ex.knot = k.id; /* دورِ ۱۹c: گرهِ خودِ این کاربرگ ⇒ پروندهٔ تمرینِ (تکنیک × گره) */ S.put(ex); mark({ exId: ex.id }); H.put(); if ((k.status || "open") === "open") setKStatus(k, "working"); }
           else S.put(ex);
         }, 450);
         panel.appendChild(h("p", { class: "small" }, t.def, " ", A.peekChip ? A.peekChip(a.tid) : null));
@@ -1616,7 +1616,7 @@
         panel.appendChild(h("div", { class: "row gap wrap" }, h("button", { class: "btn sm", onclick: function () {
           var miss = ws._validate();
           if (miss.length) { A.toast("این بخش‌ها هنوز خالی‌اند: " + miss.slice(0, 3).join("، "), "bad"); return; }
-          if (!ex) { ex = A.newEx(a.tid, kc.topic || ""); ex.data = data; ex.kcase = kc.id; mark({ exId: ex.id }); }
+          if (!ex) { ex = A.newEx(a.tid, kc.topic || ""); ex.data = data; ex.kcase = kc.id; if (k && k.id) ex.knot = k.id; /* دورِ ۱۹c: گرهِ خودِ این کاربرگ ⇒ پروندهٔ تمرینِ (تکنیک × گره) */ mark({ exId: ex.id }); }
           ex.status = "done"; S.put(ex); try { if (A.onExDone) A.onExDone(ex); } catch (e) { console.error(e); }
           mark({ done: true, at: now() }); if ((k.status || "open") === "open") setKStatus(k, "working"); H.put(); redraw();
         } }, "کاربرگ کامل شد"), ex ? h("button", { class: "linkish small", onclick: function () { A.go("tech", a.tid, "ws:" + ex.id); } }, "در صفحهٔ تکنیک") : null));
