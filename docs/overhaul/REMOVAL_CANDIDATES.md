@@ -273,3 +273,7 @@ how to revive it.
 - **وضع:** مقدارهای پیشین با جای‌شان در `APP.SCHED_QUARANTINE` نگه داشته شده‌اند؛ رفتارِ نردبان همان است (همان آرایه)، فقط T42 به متنِ خودش برگشت.
   پوششِ `A.dueList` ِ a31 برای 🎯/⛓ نگه داشته شده و فقط وقتی `A.SCHED` نیست به کار می‌رود.
 - **حذفِ واقعی:** فقط با تأییدِ صریحِ مالک.
+
+## 2026-10-17 — `A.masteryCountOnly` (learning-architecture, round-19c practice)
+The count-only mastery rule (six same-day attempts counted as «fluent») is replaced by a distinct-days rule (DECISIONS_R19c LT3).
+The old function is kept reachable as `A.masteryCountOnly` in `a1_base.js`; nothing calls it. Delete only with the owner's approval.

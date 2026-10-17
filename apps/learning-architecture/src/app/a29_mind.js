@@ -476,6 +476,217 @@
   var PH_RADAR = "این جدول روی «نیم‌رخِ سازه‌ها» (رادار) نمی‌نشیند: کارنامه هیچ نگاشتی از مرحله‌های حلِ پولیا به سازه‌های رادار (استدلالِ سیال، دانش، …) ندارد و نمی‌سازد؛ رادار فقط از پاسخ‌های پاسخ‌دقیق (مسئله‌های هم‌ساختار، ورزشِ گره، اطمینانِ پیش از جواب) پر می‌شود. حل و برهانِ وارسی‌شدهٔ مسئلهٔ زنده‌ات این‌جا، در همین جدول، ثبت است.";
   M.PH_RADAR = PH_RADAR;
 
+  /* ---------- 🏋 کارِ تکنیک‌ها (تورِ پولیا دورِ ۱۹c، LT4؛ DECISIONS_R19c) ----------
+     کارنامه کارِ تکنیک‌ها را می‌خواند: پرونده‌های تمرین (`practice` از a41: {id, type, tech, subject, sessions:[{at, done, outcome, score, measured}], state}) و
+     نشست‌هایشان، نمرهٔ روبریکِ برگه‌ها (خودسنجی، نه اندازه)، جدول‌های کالیبراسیونِ برگه‌ها (T24/T32/T33 و هر برگه‌ای با فیلدِ calib)، درصدِ بازیابیِ
+     چرخهٔ ۱-۳-۷ (P3) و برگهٔ سفیدِ هفتگی (P4). هر نشست یک بار (شناسهٔ کار، RN2e)؛ تکرارِ همان روز یک سطر؛ کارِ پس‌گرفته/پیش‌نویس/در انتظارِ داوری
+     شمرده نمی‌شود؛ رکوردِ نمونه/آزمون/تور هرگز. هر سطر در «از کجا؟» (INF17) تاریخ و منبع دارد و رکوردش را باز می‌کند.
+     نگاشت به بُعدها فقط آن‌جا که کارنامه همان منبع را از پیش می‌نگارد (پروندهٔ سنجش ⇒ «داوریِ معرفتی»، دفترِ پیش‌بینی ⇒ بُعدِ خودش)؛ بقیه «بی‌نگاشت» —
+     نگاشتِ ساختگیِ تکنیک ⇒ بُعد ساخته نمی‌شود، و این کارها به عددهای بُعدها هم افزوده نمی‌شوند. نمرهٔ منتقدِ هوش مصنوعی و نتیجهٔ کسی که به او یاد دادی
+     هرگز اندازهٔ خودِ تو نیست. */
+  var UNMAPPED = "بی‌نگاشت";
+  M.UNMAPPED = UNMAPPED;
+  function realRec(r) { return !!r && !(r.sample || r.test || r.tour || r.tourRun || r.sim || r.simulated || r.fixture || r.demo || r.seed || r.tourTest || r.runner); }
+  M.realRec = realRec;
+  function wdx(x) { return !!(x && (x.wd || x.retracted || x.withdrawn)); }
+  function nq(s) { return String(s || "").replace(/[\s‌]+/g, " ").trim().toLowerCase(); }
+  function byAt(a, b) { return String(a.at || "").localeCompare(String(b.at || "")); }
+  function tFa(tid) { return tid ? "T" + String(tid) : "تکنیک"; }
+  function pct01(x, of) { var v = parseFloat(x); if (isNaN(v)) return null; of = parseFloat(of); if (!isNaN(of) && of > 0) return 100 * v / of; return v > 0 && v <= 1 ? 100 * v : v; }
+  var FAIL_RE = /شکست|ناموفق|نتوانستم|یادم نیامد|خراب شد|\bfail/i;
+  var ASSIST_RE = /^(assistant|assist|دستیار)$/;
+  function viaAssist(r) { return [r.by, r.via, r.from, r.origin, r.startedBy, typeof r.src === "string" ? r.src : ""].some(function (x) { return ASSIST_RE.test(String(x || "")); }); }
+  function otherPerson(s) { var w = s.learner || s.student || (s.of && s.of !== "self" && s.of !== "me" ? s.of : "") || (s.who && s.who !== "self" && s.who !== "me" ? s.who : ""); return w ? String(w) : ""; }
+  function subjOf(sb) {
+    if (!sb) return { fa: "" };
+    if (typeof sb === "string") { var r0 = S.get(sb); return r0 ? { fa: r0.title || (r0.p && r0.p.title) || r0.name || sb, id: sb, kind: r0.type } : { fa: sb }; }
+    var id = sb.id || sb.ref || "", rec = id ? S.get(id) : null;
+    return { fa: sb.title || sb.fa || sb.text || sb.t || (rec && (rec.title || (rec.p && rec.p.title) || rec.name)) || "", id: id, kind: sb.kind || sb.k || (rec && rec.type) || "" };
+  }
+  /* اندازهٔ یک نشست: عدد ⇒ درصد (بازیابی و مانند آن)؛ {pred, actual} ⇒ پیش‌بینیِ یادگیری (JOL) در برابرِ واقعی؛ {pre, post, quiz} ⇒ پیش/پس از مطالعه
+     در برابرِ آزمونک؛ {p, ok} ⇒ یک پیش‌بینیِ داوری‌شده. اندازه‌ای که هوش مصنوعی داده (by: ai) اندازهٔ تو نیست ⇒ نادیده. */
+  function measOf(s) {
+    var m = s.measured != null ? s.measured : s.meas; if (m == null || m === "") return null;
+    if (s.measuredBy === "ai" || (m && typeof m === "object" && (m.by === "ai" || m.src === "ai"))) return null;
+    if (typeof m !== "object") { var v = pct01(m); return v == null ? null : { kind: "pct", v: v }; }
+    var at = m.resolvedAt || m.at || "";
+    if (m.pred != null) { var pr = pct01(m.pred, m.of), ac = m.actual == null || m.actual === "" ? null : pct01(m.actual, m.of); return pr == null ? null : ac == null ? { kind: "pending" } : { kind: "jol", pred: pr, actual: ac, gap: pr - ac, at: at }; }
+    if (m.quiz != null && (m.pre != null || m.post != null)) { var q = pct01(m.quiz); if (q == null) return null; var pre = pct01(m.pre), post = pct01(m.post); return { kind: "prepost", pre: pre, post: post, quiz: q, gap: post != null ? post - q : pre - q, at: at }; }
+    if (m.p != null && (m.ok === true || m.ok === false || m.out === "درست" || m.out === "نادرست")) { var p = pct01(m.p); return p == null ? null : { kind: "cal", p: p / 100, ok: m.ok === true || m.out === "درست", at: at }; }
+    var v2 = pct01(m.v != null ? m.v : m.pct != null ? m.pct : m.value, m.of); return v2 == null ? null : { kind: "pct", v: v2, at: at };
+  }
+  function pf0(v) { return fa(Math.round(v)) + "٪"; }
+  function sgn(v) { v = Math.round(v); return (v > 0 ? "+" : v < 0 ? "−" : "±") + fa(Math.abs(v)); }
+  M.techWork = function () {
+    var rows = {}, order = [], LINK = {}, cal = [], calSeen = {}, gaps = [], pending = 0;
+    var fcById = {}, fcByQ = {};
+    var fcByRow = {};
+    S.all("fcast", realRec).forEach(function (x) { fcById[x.id] = x; var q = nq(x.q); if (q) fcByQ[q] = x; if (x.src && x.src.ex != null && x.src.row != null) fcByRow[x.src.ex + "|" + x.src.row] = x; });
+    function fcOf(o, text, exRow) { var id = o && (o.fcast || o.fcastId || o.fcId || (typeof o.fc === "string" ? o.fc : "")); if (id && fcById[id]) return fcById[id]; if (exRow && fcByRow[exRow]) return fcByRow[exRow]; var q = nq(text); return (q && fcByQ[q]) || null; }
+    function row(key, o) { if (!rows[key]) { rows[key] = Object.assign({ key: key, acts: [], ev: [], fcs: {}, pending: 0 }, o); order.push(key); } return rows[key]; }
+    /* یک سطر برای هر (ردیف، روز): نشستِ دیرترِ همان روز می‌ماند و تکرارها رویش شمرده می‌شوند (RN2e) */
+    function push(R, a) {
+      a.day = day(a.at); a.rep = a.rep || 1; a.row = R.key;
+      var prev = R.acts.filter(function (x) { return x.day === a.day; })[0];
+      if (prev) { if (String(a.at) >= String(prev.at)) { a.rep = prev.rep + 1; R.acts[R.acts.indexOf(prev)] = a; return a; } prev.rep++; return prev; }
+      R.acts.push(a); return a;
+    }
+    function addCal(c, key) { if (calSeen[key]) return; calSeen[key] = 1; cal.push(c); }
+    /* ۱) پرونده‌های تمرین */
+    var P3S = {};   // نشستِ a41 که از اجرای P3/P4 آمده (src: "p3") ⇒ همان اجرا دوباره شمرده نمی‌شود
+    S.all("practice", realRec).forEach(function (rec) {
+      if (wdx(rec) || rec.kind === "list") return;
+      var tid = rec.tech != null ? String(rec.tech).replace(/^t/i, "") : rec.tid != null ? String(rec.tid) : "", sb = subjOf(rec.subject || rec.subj), asst = viaAssist(rec);
+      var link = sb.id && (sb.kind === "case") ? { kind: "case", id: sb.id } : null;
+      var R = row("prac:" + rec.id, { tech: tid, subj: sb.fa, rid: rec.id, src: "practice", state: rec.state || "", link: link,
+        go: A.V && A.V.practice ? ["practice", rec.id] : tid ? ["tech", +tid] : null,
+        base: (asst ? "دستیار ← " : "") + "تمرینِ " + tFa(tid) + (sb.fa ? " «" + String(sb.fa).slice(0, 50) + "»" : "") });
+      (rec.history || rec.hist || []).forEach(function (x) { var st = x && (x.state || x.to); if (x && (x.d || x.at) && st && x.ev !== "claim") R.ev.push({ at: x.d || x.at, state: st, why: x.why || x.note || "" }); });
+      (rec.sessions || []).map(function (s, j) { return { s: s, j: j }; }).filter(function (x) { return x.s && (x.s.d || x.s.at); }).sort(function (a, b) { return String(a.s.d || a.s.at).localeCompare(String(b.s.d || b.s.at)) || byAt(a.s, b.s); }).forEach(function (x) {
+        var s = x.s, j = x.j;
+        if (wdx(s) || s.draft || s.status === "draft" || !realRec(s)) return;
+        var sid = "prac:" + rec.id + ":" + (s.id || j);
+        [s.pr, s.src, s.ref, s.rec].concat(Array.isArray(s.ex) ? s.ex : [s.ex]).forEach(function (k) { if (typeof k === "string" && k) LINK[k] = R.key; });
+        var who = otherPerson(s), mz = who ? null : measOf(s), parts = [], ok = null, at = s.resolvedAt || (mz && mz.at) || s.d || s.at;
+        if (s.src === "p3" && mz && mz.kind === "pct") P3S[day(at) + "|" + Math.round(mz.v)] = 1;
+        if (mz && mz.kind === "pending") { R.pending++; pending++; mz = null; }
+        var M0 = s.meas || {}, out = String(s.outcome || M0.obs || "").trim(), did = String(s.done || s.what || "").trim();
+        if (s.why && !(mz && mz.kind === "pct")) parts.push(String(s.why).slice(0, 100));
+        if (who) { parts.push("یاد دادن به «" + who + "»" + (s.measured != null && s.measured !== "" ? " — نتیجهٔ او (" + (typeof s.measured === "object" ? JSON.stringify(s.measured) : fa(String(s.measured))) + ") مالِ خودِ اوست، نه مهارتِ تو" : "")); }
+        if (did && did !== out) parts.push(did.slice(0, 80));
+        if (out) parts.push("نتیجه: " + out.slice(0, 80));
+        if (s.ok === true || s.ok === false) ok = s.ok; else if (out && FAIL_RE.test(out)) ok = false;
+        var a = { id: sid, at: at, src: "practice", kind: who ? "teach" : "session", rid: rec.id, go: R.go, ok: ok, why: out || did };
+        if (mz && mz.kind === "pct") { a.v = mz.v; parts.push("اندازه‌گیری‌شده: " + pf0(mz.v)); }
+        if (mz && (mz.kind === "jol" || mz.kind === "prepost")) {
+          var gtx = mz.kind === "jol" ? "پیش‌بینیِ یادگیری " + pf0(mz.pred) + " ← واقعی " + pf0(mz.actual)
+            : "پیش از مطالعه " + (mz.pre != null ? pf0(mz.pre) : "—") + " · پس از آن " + (mz.post != null ? pf0(mz.post) : "—") + " ← آزمونک " + pf0(mz.quiz);
+          gtx += ": " + (mz.gap > 0 ? "بیش‌اطمینانی " : mz.gap < 0 ? "کم‌اطمینانی " : "هم‌خوان ") + sgn(mz.gap) + " واحد";
+          parts.push(gtx); a.gap = mz.gap;
+        }
+        if (mz && mz.kind === "cal") {
+          var f = fcOf(s, s.q || s.st);
+          if (f) { R.fcs[f.id] = f; parts.push("همان پیش‌بینیِ «" + String(f.q || "").slice(0, 40) + "» در دفترِ 🎯 — آن‌جا یک بار شمرده شد"); }
+          else { a.cal = { p: mz.p, ok: mz.ok }; parts.push("پیش‌بینیِ " + pf0(100 * mz.p) + " — " + (mz.ok ? "درست" : "نادرست")); if (ok == null) ok = mz.ok; }
+        }
+        if (s.src === "card" && a.ok != null && a.cal == null) { a.ok = null; parts.push("نمرهٔ مرور را خودت دادی"); }
+        var sc0 = s.score != null && s.score !== "" ? s.score : s.self; if (sc0 != null && sc0 !== "") parts.push("خودسنجی: " + fa(String(sc0)) + " (خودت دادی، اندازه نیست)");
+        if (!parts.length) return;
+        a.fa = R.base + " — " + parts.join(" · ");
+        var kept = push(R, a);
+        if (kept === a && a.cal) addCal({ id: sid, p: a.cal.p, ok: a.cal.ok, at: at, fa: a.fa, go: R.go, row: R.key }, R.key + "|" + a.day);
+        if (kept === a && a.gap != null) gaps.push(a);
+      });
+    });
+    /* ۲) برگه‌های کامل‌شدهٔ تکنیک (پیش‌نویس هرگز): روبریک = خودسنجی؛ ردیف‌های جدولِ کالیبراسیون = پیش‌بینیِ داوری‌شده (در انتظار ⇒ شمرده نمی‌شود) */
+    S.all("ex", function (e) { return realRec(e) && e.status === "done" && !wdx(e); }).forEach(function (e) {
+      var tid = String(e.tid), t = A.TM && A.TM[e.tid], tp = e.topic && S.get(e.topic), at = e.doneAt || e.updated || e.created; if (!at) return;
+      var lk = LINK[e.id], R = lk ? rows[lk] : row("ex:" + tid + ":" + (e.topic || ""), { tech: tid, subj: tp ? tp.title : "", src: "ws", go: ["tech", +e.tid, "ws:" + e.id],
+        base: "برگهٔ " + tFa(tid) + (t ? " «" + t.fa + "»" : "") + (tp ? " — " + String(tp.title).slice(0, 40) : "") });
+      var cf = null; ((t && t.ws) || []).forEach(function (f) { if (f.t === "calib") cf = f; });
+      var nOk = 0, nRes = 0, nPend = 0, nFc = 0;
+      if (cf) ((e.data || {})[cf.src] || []).forEach(function (rw, i) {
+        if (!rw) return; var txt = rw.st || rw.c || rw.q || rw.claim || "", p = parseFloat(rw[cf.conf]), o = rw[cf.out];
+        if (isNaN(p) || (o !== "درست" && o !== "نادرست")) { if (String(txt).trim() || !isNaN(p)) nPend++; return; }
+        var f = fcOf(rw, txt, e.id + "|" + i); if (f) { R.fcs[f.id] = f; nFc++; return; }
+        var rat = rw.outAt || rw.at || at, key = nq(txt) ? "t|" + nq(txt) + "|" + day(rat) : "r|" + e.id + "|" + i;
+        if (calSeen[key]) return;
+        nRes++; if (o === "درست") nOk++;
+        addCal({ id: "exrow:" + e.id + ":" + i, p: (p > 1 ? p / 100 : p), ok: o === "درست", at: rat, fc: tid === "24", go: ["tech", +e.tid, "ws:" + e.id], row: R.key,
+          fa: tFa(tid) + " «" + String(txt).slice(0, 50) + "» (" + pf0(p > 1 ? p : 100 * p) + ") — " + o }, key);
+      });
+      R.pending += nPend; pending += nPend;
+      if (lk) return;   // نشستِ همین برگه را پروندهٔ تمرین ثبت کرده ⇒ یک بار
+      var rp = A.rubricPct ? A.rubricPct(e) : null, parts = [];
+      if (rp != null) parts.push("روبریکِ خودسنجی " + pf0(rp) + " (خودت دادی، اندازه نیست)");
+      if (nRes) parts.push(fa(nRes) + " پیش‌بینیِ داوری‌شده: " + fa(nOk) + " درست");
+      if (nPend) parts.push(fa(nPend) + " در انتظارِ داوری (شمرده نشد)");
+      if (nFc) parts.push(fa(nFc) + " همان پیش‌بینیِ دفترِ 🎯 (آن‌جا یک بار شمرده شد)");
+      push(R, { id: "ex:" + e.id, at: at, src: "ws", kind: "session", go: ["tech", +e.tid, "ws:" + e.id], ok: null, fa: R.base + " — " + (parts.length ? parts.join(" · ") : "برگهٔ کامل‌شده") });
+    });
+    /* ۳) چرخهٔ ۱-۳-۷ (P3) و برگهٔ سفیدِ هفتگی (P4): درصدِ بازیابی = اندازه */
+    S.all("pr", function (r) { return realRec(r) && !wdx(r) && (r.pid === "P3" || r.pid === "P4") && r.status === "done" && r.data && r.data.pct != null && r.data.pct !== ""; }).forEach(function (r) {
+      if (LINK[r.id]) return;   // پروندهٔ تمرین همین نشست را دارد
+      var v = parseFloat(r.data.pct); if (isNaN(v)) return;
+      if (P3S[day(r.doneAt || r.created || r.updated) + "|" + Math.round(v)]) return;   // a41 همین اجرا را نشستِ T41 کرده
+      var tp = r.topic && S.get(r.topic), subj = (tp && tp.title) || r.data.topic || "", sc = r.sched && S.get(r.sched), at = r.doneAt || r.created || r.updated;
+      var R = row(r.pid + ":" + (r.topic || nq(subj)), { tech: "41", subj: subj, src: r.pid, go: ["proto", r.pid],
+        base: (r.pid === "P3" ? "چرخهٔ ۱-۳-۷" : "برگهٔ سفیدِ هفتگی") + (subj ? " «" + String(subj).slice(0, 50) + "»" : "") });
+      push(R, { id: "pr:" + r.id, at: at, src: r.pid, kind: "session", go: ["proto", r.pid, r.id], ok: null, v: v, fa: R.base + (sc && sc.label ? " (" + sc.label + ")" : "") + " — بازیابیِ اندازه‌گیری‌شده: " + pf0(v) });
+    });
+    /* روند، افت و نگاشت */
+    var out = order.map(function (k) {
+      var R = rows[k]; R.acts.sort(byAt);
+      var prevV = null; R.acts.forEach(function (a) {
+        if (a.v == null) return;
+        if (prevV != null && a.ok == null) { a.ok = a.v > prevV ? true : a.v < prevV ? false : null; if (a.v !== prevV) a.fa += " (از " + pf0(prevV) + ")"; }
+        if (prevV != null && a.v < prevV && !a.why) a.why = "افتِ بازیابی از " + pf0(prevV) + " به " + pf0(a.v);
+        prevV = a.v; });
+      R.acts.forEach(function (a) { if (a.rep > 1) a.fa += " (" + fa(a.rep) + " بار در همین روز — یک بار شمرده شد)"; });
+      var ms = R.acts.filter(function (a) { return a.v != null; });
+      R.last = ms.length ? ms[ms.length - 1].v : null; R.first = ms.length ? ms[0].v : null; R.nm = ms.length;
+      R.days = R.acts.length;
+      var last = R.acts[R.acts.length - 1], stab = R.ev.filter(function (x) { return /^(stable|تثبیت)/.test(x.state); }).sort(byAt).pop();
+      if (last && last.ok === false && ((stab && String(stab.at) <= String(last.at)) || R.acts.slice(0, -1).some(function (a) { return a.ok !== false; })))
+        R.decline = { at: last.at, why: last.why || "", after: stab ? stab.at : "" };
+      R.stableAt = stab ? stab.at : "";
+      var fcl = Object.keys(R.fcs).map(function (i) { return R.fcs[i]; });
+      if (R.link && R.link.kind === "case") { R.dim = "s_epi"; R.dimHow = "از راهِ پروندهٔ سنجش"; R.acts.forEach(function (a) { a.go = ["e_case", R.link.id]; }); }
+      else if (fcl.length) { R.dim = fcl[0].dim || "s_decision"; R.dimHow = "از راهِ دفترِ پیش‌بینی"; }
+      else { R.dim = null; R.dimHow = UNMAPPED; }
+      return R;
+    }).filter(function (R) { return R.acts.length || R.pending; });
+    cal.sort(byAt);
+    var cn = cal.length, B = cn ? cal.reduce(function (t, c) { return t + Math.pow(c.p - (c.ok ? 1 : 0), 2); }, 0) / cn : null;
+    return { rows: out, acts: out.reduce(function (t, R) { return t.concat(R.acts); }, []), cal: { acts: cal, n: cn, brier: B, hit: cn ? cal.filter(function (c) { return c.ok; }).length / cn : null, meanP: cn ? cal.reduce(function (t, c) { return t + c.p; }, 0) / cn : null },
+      gaps: gaps.sort(byAt), pending: pending };
+  };
+  /* فهرستِ «از کجا؟» ِ کارِ تکنیک‌ها — همان قالبِ INF17؛ «◦» = نه موفق نه ناموفق (خودسنجی/نخستین اندازه)؛ ↗ رکوردِ منبع را باز می‌کند */
+  function techList(acts, tag) {
+    acts = (acts || []).slice().sort(function (a, b) { return String(b.at || "").localeCompare(String(a.at || "")); });
+    if (!acts.length) return null;
+    var pos = acts.filter(function (a) { return a.ok === true; }).length, neg = acts.filter(function (a) { return a.ok === false; }).length;
+    return h("details", { class: "mind-from mind-techfrom", "data-row": tag, "data-n": String(acts.length), "data-plus": String(pos) }, h("summary", {}, "از کجا؟ (" + fa(acts.length) + " کار: +" + fa(pos) + " −" + fa(neg) + ")"),
+      h("ol", { class: "small mind-from-list" }, acts.map(function (a) {
+        var g = a.go && A.V && A.V[a.go[0]] ? a.go : null;
+        return h("li", { class: "mind-act", "data-act": a.id, "data-ok": a.ok === true ? "1" : a.ok === false ? "0" : "", "data-at": day(a.at), "data-src": a.src || "", "data-kind": a.kind || "", "data-go": g ? g.join("|") : "" },
+          h("span", { class: a.ok === true ? "good" : a.ok === false ? "warnline" : "muted" }, a.ok === true ? "+ " : a.ok === false ? "− " : "◦ "),
+          A.fdate(day(a.at)) + " · " + a.fa,
+          g ? h("button", { class: "linkish mind-act-go", type: "button", title: "رکوردِ همین کار", onclick: function () { A.go(g[0], g[1] == null ? null : g[1], g[2] == null ? null : g[2]); } }, " ↗") : null);
+      })));
+  }
+  M.techList = techList;
+  function techSection() {
+    var W = M.techWork(), dimFa = {}; M.dims().forEach(function (d) { dimFa[d.id] = d.fa; });
+    var sec = h("section", { class: "card mind-tech", dir: "rtl", "data-n": String(W.acts.length), "data-cal": String(W.cal.n) }, h("h2", {}, "🏋 کارِ تکنیک‌ها"),
+      h("p", { class: "small muted" }, "پرونده‌های تمرین، برگه‌های کامل‌شده، جدول‌های کالیبراسیونِ برگه‌ها، چرخهٔ ۱-۳-۷ و برگهٔ سفیدِ هفتگی — هر نشست یک بار، تکرارِ همان روز یک سطر؛ پیش‌نویس، کارِ پس‌گرفته و پیش‌بینیِ داوری‌نشده شمرده نمی‌شوند. روبریک خودسنجی است، نه اندازه. «" + UNMAPPED + "» یعنی کارنامه نگاشتی از این تکنیک به بُعدهای بالا ندارد و نمی‌سازد؛ پس این کارها فقط این‌جا می‌آیند و عددهای بُعدها را جابه‌جا نمی‌کنند."));
+    if (!W.rows.length && !W.cal.n) { sec.appendChild(h("p", { class: "small muted mind-tech-empty" }, "هنوز کارِ تکنیکیِ کامل‌شده‌ای نیست.")); return sec; }
+    sec.appendChild(h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small mind-techtable" },
+      h("thead", {}, h("tr", {}, ["تکنیک و موضوع", "نشست‌ها (روزهای جدا)", "اندازه (نخست ← آخر)", "بُعد", "از کجا"].map(function (x) { return h("th", {}, x); }))),
+      h("tbody", {}, W.rows.map(function (R) {
+        return h("tr", { "data-row": R.key, "data-tech": R.tech || "", "data-dim": R.dim || "" },
+          h("td", {}, R.base, R.stableAt ? h("div", { class: "small good" }, "تثبیت شد: " + A.fdate(day(R.stableAt))) : null,
+            R.decline ? h("div", { class: "small warnline mind-tech-decline", "data-at": day(R.decline.at) }, "افت در " + A.fdate(day(R.decline.at)) + (R.decline.after ? " (پس از «تثبیت شد» در " + A.fdate(day(R.decline.after)) + ")" : "") + (R.decline.why ? ": " + R.decline.why : "")) : null),
+          h("td", {}, fa(R.days) + (R.pending ? " · " + fa(R.pending) + " در انتظار" : "")),
+          h("td", {}, R.nm ? (R.nm > 1 ? pf0(R.first) + " ← " + pf0(R.last) + " (" + fa(R.nm) + ")" : pf0(R.last) + " (۱)") : "— (اندازه‌ای نیست)"),
+          h("td", { class: "mind-tech-dim" }, R.dim ? (dimFa[R.dim] || R.dim) + " — " + R.dimHow : UNMAPPED),
+          h("td", { class: "small" }, techList(R.acts, "tech:" + R.key)));
+      })))));
+    var C = W.cal;
+    if (C.n) sec.appendChild(h("div", { class: "mind-tech-cal", "data-n": String(C.n), "data-brier": C.brier.toFixed(4) },
+      h("b", {}, "کالیبراسیونِ برگه‌ها و تمرین‌ها: "), fa(C.n) + " پیش‌بینیِ داوری‌شده · Brier " + fa(C.brier.toFixed(3)) + " · درست " + pf0(100 * C.hit) + " در برابرِ میانگینِ اطمینانِ " + pf0(100 * C.meanP) + " (" + (C.meanP > C.hit ? "بیش‌اطمینانی " : C.meanP < C.hit ? "کم‌اطمینانی " : "") + sgn(100 * (C.meanP - C.hit)) + " واحد) — " + UNMAPPED + "؛ پیش‌بینی‌ای که همان پیش‌بینیِ دفترِ 🎯 است فقط آن‌جا شمرده می‌شود.",
+      techList(C.acts.map(function (c) { return { id: c.id, at: c.at, ok: c.ok, fa: c.fa, go: c.go, src: "cal", kind: "cal" }; }), "techcal")));
+    if (W.gaps.length) sec.appendChild(h("div", { class: "mind-tech-gaps", "data-n": String(W.gaps.length) }, h("b", {}, "پیش‌بینی از یادگیریِ خودت در برابرِ واقعی: "), techList(W.gaps, "techgap")));
+    return sec;
+  }
+  M.techSection = techSection;
+  M.techText = function (W) {
+    W = W || M.techWork(); if (!W.rows.length && !W.cal.n) return "";
+    return "کارِ تکنیک‌ها (هر نشست یک بار؛ نگاشت به بُعد فقط از راهِ پرونده/دفترِ پیش‌بینی، وگرنه «" + UNMAPPED + "»): " + W.rows.slice(0, 8).map(function (R) {
+      return R.base + " — " + R.days + " نشست" + (R.nm ? "، اندازه " + Math.round(R.first) + "%→" + Math.round(R.last) + "%" : "") + (R.decline ? "، افت در " + day(R.decline.at) + (R.decline.why ? " (" + R.decline.why + ")" : "") : "");
+    }).join(" · ") + (W.cal.n ? " · کالیبراسیونِ برگه‌ها: " + W.cal.n + " داوری‌شده، Brier " + W.cal.brier.toFixed(3) : "");
+  };
+
   /* ---------- 📈 نمودارِ سادهٔ CSV (فقط داده، بی استنتاج) — تورِ ۱، s32: «حتی اگر مسئله هندسی نیست، شکل بکش» ----------
      ستونی عددی است که همهٔ خانه‌های پرِ آن عدد باشند (بی آستانه)؛ هر ستونِ عددی یک خط، محورِ افقی ترتیبِ سطرها با برچسبِ نخستین ستونِ غیرعددی.
      هیچ روند، میانگین یا خطِ برازشی کشیده نمی‌شود — دیدن و داوری با خودت. */
@@ -587,6 +798,7 @@
     var dimFrom = m.dims.map(function (d) { var A0 = M.dimActs(d); return A0.length ? h("div", { class: "mind-dimfrom", "data-dim": d.id }, h("b", {}, d.fa + ": "), fromList(A0, "dim:" + d.id)) : null; }).filter(Boolean);
     if (dimFrom.length) root.appendChild(h("section", { class: "card mind-dimsfrom" }, h("h2", {}, "از کجا؟ — هر بُعد"), h("p", { class: "small muted" }, "هر پاسخ، حدس یا پیش‌بینیِ سنجیده که عددهای بالا را جابه‌جا کرد، با تاریخ و درست/نادرست؛ کارِ پس‌گرفته (اصلاح‌شده) این‌جا نیست."), dimFrom));
     root.appendChild(phasesSection());
+    root.appendChild(techSection());   // LT4 (دورِ ۱۹c): کارِ تکنیک‌ها با «از کجا؟»
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "🕸 نقشهٔ کاملِ ذهن"), C.mindmap));
@@ -633,6 +845,7 @@
       L.push("- " + (d.fa || d.id) + ": پاسخِ بعدی " + (E.n ? pc(E.next) + " (" + E.k + "/" + E.n + ")" : "—") + (E.calN ? " · احتمالِ بیش‌اطمینانی به پاسخ‌ها " + pc(E.pOver) : "") + (E.fc && E.fc.dirN ? " · پیش‌بینیِ رویدادها: طرفِ محتمل‌تر میانگین " + pc(E.fc.meanQ) + "، " + E.fc.hit + "/" + E.fc.dirN + " رخ داد، احتمالِ بیش‌اطمینانی در پیش‌بینی " + pc(E.fc.pOver) : "") + " · ماندگاری " + d.ret.ok + "/" + d.ret.n + " · گره‌های ورزیده " + (d.knots.practised || 0) + "/" + d.knots.all + (E.progress ? " · احتمالِ پیشرفت " + pc(E.progress.p) : ""));
     });
     if (A.MIND.phasesText) L.push("## " + A.MIND.phasesText());
+    if (A.MIND.techText) { var tt = A.MIND.techText(); if (tt) L.push("## " + tt); }
     if ((M.black || []).length) L.push("نقطه‌های سیاه: " + M.black.slice(0, 6).map(function (b) { return b.fa || b.t || ""; }).join(" · "));
     return L.join("\n");
   });
