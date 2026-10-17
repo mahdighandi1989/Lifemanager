@@ -65,6 +65,28 @@ const BANK = require('./variants/VARIANTS_R19c.json');
     info.unit = 'ok';
   });
 
+  // ================= a41: همان رکوردها به شکلِ واقعیِ سازندهٔ پرونده (tid, subj {k,id,t}, sessions [{d, at, meas, ok, why, src, ex[]}], hist [{d, ev, to}]) =================
+  await section('a41shape', async () => {
+    await wipe(); await put({ id: 'tp_cn', type: 'topic', title: 'قضیهٔ چینی' });
+    await put({ id: 'prc_r41', type: 'practice', kind: 'case', tid: 41, subj: { k: 'topic', id: 'tp_cn', t: 'قضیهٔ چینی' }, src: 'assistant', state: 'stable', start: '2026-10-17',
+      sessions: [{ d: '2026-10-18', at: await D(1), ex: [], meas: { pct: 80 }, ok: true, why: 'بازیابیِ سنجیده ۸۰٪', src: 'p3' }, { d: '2026-10-20', at: await D(3), ex: ['ex_r41'], meas: { pct: 90 }, ok: true, src: 'p3' },
+        { d: '2026-10-31', at: await D(14), ex: [], meas: { pct: 40 }, ok: false, why: 'بازیابیِ سنجیده ۴۰٪ — کمتر از نیم', src: 'p3' }],
+      hist: [{ d: '2026-10-17', at: await D(0), ev: 'start', to: 'open' }, { d: '2026-10-20', at: await D(3), ev: 'state', from: 'stabilising', to: 'stable' }] });
+    await put({ id: 'pr_r41', type: 'pr', pid: 'P3', topic: 'tp_cn', status: 'done', data: { pct: 80 }, created: await D(1) });   // همان اجرا که a41 نشست کرد
+    await put({ id: 'ex_r41', type: 'ex', tid: 41, topic: 'tp_cn', status: 'done', data: {}, rubric: [2, 2], prc: 'prc_r41', created: await D(3), updated: await D(3) });
+    await put({ id: 'prl_x', type: 'practice', kind: 'list', list: 'mistakes', tid: 31, items: [{ text: 'تعمیمِ شتاب‌زده' }], reviews: [], state: 'open' });
+    await put({ id: 'prc_tt', type: 'practice', kind: 'case', tid: 41, subj: { k: 'free', t: 'تور' }, tourTest: true, sessions: [{ d: '2026-10-18', at: await D(1), meas: { pct: 99 } }] });
+    await put({ id: 'ex_r24', type: 'ex', tid: 24, topic: '', status: 'done', data: { preds: [{ st: 'جلسه به فردا می‌افتد', conf: '60', out: 'نادرست', fc: 'fc_r24' }] }, rubric: [], created: await D(0), updated: await D(2) });
+    await put({ id: 'fc_r24', type: 'fcast', q: 'جلسه به فردا می‌افتد', p: 60, dim: 's_decision', outcome: 'نشد', outcomeAt: await D(2), src: { ex: 'ex_r24', row: 0 }, tid: 24 });
+    const w = await W(); const R = w.rows.find(x => x.key === 'prac:prc_r41'); const d = await dom();
+    chk(R && R.acts.length === 3 && R.acts.map(a => a.day).join(',') === '2026-10-18,2026-10-20,2026-10-31' && /دستیار ← تمرینِ T41 «قضیهٔ چینی»/.test(R.acts[0].fa), 'a41: نشست‌های پرونده با d/meas خوانده نشد :: ' + JSON.stringify(R && R.acts).slice(0, 400));
+    chk(!w.rows.some(x => /^P3:|^ex:41/.test(x.key)), 'a41: اجرای P3 یا برگهٔ T41 ِ همان نشست دوباره شمرده شد :: ' + w.rows.map(x => x.key));
+    chk(R && R.decline && /2026-10-31/.test(R.decline.at) && R.stableAt === '2026-10-20' && d.decl.some(x => x.at === '2026-10-31'), 'a41: افت پس از «تثبیت شد» (hist to:stable) دیده نشد :: ' + JSON.stringify(R && { dec: R.decline, st: R.stableAt }));
+    chk(!w.rows.some(x => /prl_x|prc_tt/.test(x.key)) && !/تور|۹۹٪/.test(d.text), 'a41: فهرستِ جاری یا رکوردِ tourTest در کارنامه آمد');
+    chk(w.cal.n === 0 && (w.rows.find(x => x.key.startsWith('ex:24')) || {}).dim === 's_decision', 'a41: ردیفِ T24 با fc همان پیش‌بینیِ 🎯 است و فقط آن‌جا شمرده می‌شود :: ' + w.cal.n);
+    info.a41shape = 'ok';
+  });
+
   // ================= bank =================
   await section('bank', async () => {
     const E = BANK.filter(e => e.rc === 'LT4.mind'); const r = info.bank = { res: [] };

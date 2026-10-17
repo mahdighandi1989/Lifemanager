@@ -29,6 +29,12 @@ only as the fcast). Everything else is «بی‌نگاشت» and stays out of th
 counts spread each technique over 3–6 systems, so they are not a mapping).
 
 ## Contract with the practice builder (a41) — please keep or tell the mind side
+- **Read in both shapes.** The saved 19c practice diff (`docs/tours/polya-batch1/wip/r19c_practice.diff`) uses `tid`, `subj:{k,id,t}`, `kind:"case"|"list"`,
+  `src:"assistant"`, sessions `{d, at, what, self, ok, why, meas:{pct|jargon|correct|status,obs|g|…}, ex:[…], src:"p3"|"card"|…}` and `hist:[{d, ev, to}]`;
+  the card reads that shape too (section `a41shape` of the test): `kind:"list"` is skipped, `s.d` is the session day, `s.ex[]` suppress the worksheet line,
+  a `src:"p3"` session with `meas.pct` suppresses the P3/P4 run of the same day and value, `hist … to:"stable"` marks «تثبیت شد», a41's `s.ok`/`s.why` are used,
+  card-review sessions stay self-graded, a T24 row's `fc` / an fcast's `src:{ex,row}` link to the 🎯 entry, and `seed|tourTest|runner|tourRun` are excluded.
+  The list below is the original contract from the decisions (also read).
 - `practice`: `{id, type:"practice", tech, subject, sessions:[…], state, history?:[{at, state:"stable"|…, why?}]}`; `subject` = string, record id,
   or `{kind, id, title}` (`kind:"case"` links the epistemic case). Started by the assistant ⇒ `by|via|from|origin|startedBy: "assistant"`.
 - session: `{id?, at, done, outcome, score, measured, ok?, resolvedAt?, ex?, pr?, src?, fcast?, learner?, draft?, wd?}`.

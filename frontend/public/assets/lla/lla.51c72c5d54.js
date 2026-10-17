@@ -39310,7 +39310,7 @@ APP.goFromURL = function (q) {
      هرگز اندازهٔ خودِ تو نیست. */
   var UNMAPPED = "بی‌نگاشت";
   M.UNMAPPED = UNMAPPED;
-  function realRec(r) { return !!r && !(r.sample || r.test || r.tour || r.tourRun || r.sim || r.simulated || r.fixture || r.demo); }
+  function realRec(r) { return !!r && !(r.sample || r.test || r.tour || r.tourRun || r.sim || r.simulated || r.fixture || r.demo || r.seed || r.tourTest || r.runner); }
   M.realRec = realRec;
   function wdx(x) { return !!(x && (x.wd || x.retracted || x.withdrawn)); }
   function nq(s) { return String(s || "").replace(/[\s‌]+/g, " ").trim().toLowerCase(); }
@@ -39319,18 +39319,18 @@ APP.goFromURL = function (q) {
   function pct01(x, of) { var v = parseFloat(x); if (isNaN(v)) return null; of = parseFloat(of); if (!isNaN(of) && of > 0) return 100 * v / of; return v > 0 && v <= 1 ? 100 * v : v; }
   var FAIL_RE = /شکست|ناموفق|نتوانستم|یادم نیامد|خراب شد|\bfail/i;
   var ASSIST_RE = /^(assistant|assist|دستیار)$/;
-  function viaAssist(r) { return [r.by, r.via, r.from, r.origin, r.startedBy].some(function (x) { return ASSIST_RE.test(String(x || "")); }); }
+  function viaAssist(r) { return [r.by, r.via, r.from, r.origin, r.startedBy, typeof r.src === "string" ? r.src : ""].some(function (x) { return ASSIST_RE.test(String(x || "")); }); }
   function otherPerson(s) { var w = s.learner || s.student || (s.of && s.of !== "self" && s.of !== "me" ? s.of : "") || (s.who && s.who !== "self" && s.who !== "me" ? s.who : ""); return w ? String(w) : ""; }
   function subjOf(sb) {
     if (!sb) return { fa: "" };
     if (typeof sb === "string") { var r0 = S.get(sb); return r0 ? { fa: r0.title || (r0.p && r0.p.title) || r0.name || sb, id: sb, kind: r0.type } : { fa: sb }; }
     var id = sb.id || sb.ref || "", rec = id ? S.get(id) : null;
-    return { fa: sb.title || sb.fa || sb.text || (rec && (rec.title || (rec.p && rec.p.title) || rec.name)) || "", id: id, kind: sb.kind || (rec && rec.type) || "" };
+    return { fa: sb.title || sb.fa || sb.text || sb.t || (rec && (rec.title || (rec.p && rec.p.title) || rec.name)) || "", id: id, kind: sb.kind || sb.k || (rec && rec.type) || "" };
   }
   /* اندازهٔ یک نشست: عدد ⇒ درصد (بازیابی و مانند آن)؛ {pred, actual} ⇒ پیش‌بینیِ یادگیری (JOL) در برابرِ واقعی؛ {pre, post, quiz} ⇒ پیش/پس از مطالعه
      در برابرِ آزمونک؛ {p, ok} ⇒ یک پیش‌بینیِ داوری‌شده. اندازه‌ای که هوش مصنوعی داده (by: ai) اندازهٔ تو نیست ⇒ نادیده. */
   function measOf(s) {
-    var m = s.measured; if (m == null || m === "") return null;
+    var m = s.measured != null ? s.measured : s.meas; if (m == null || m === "") return null;
     if (s.measuredBy === "ai" || (m && typeof m === "object" && (m.by === "ai" || m.src === "ai"))) return null;
     if (typeof m !== "object") { var v = pct01(m); return v == null ? null : { kind: "pct", v: v }; }
     var at = m.resolvedAt || m.at || "";
@@ -39344,8 +39344,9 @@ APP.goFromURL = function (q) {
   M.techWork = function () {
     var rows = {}, order = [], LINK = {}, cal = [], calSeen = {}, gaps = [], pending = 0;
     var fcById = {}, fcByQ = {};
-    S.all("fcast", realRec).forEach(function (x) { fcById[x.id] = x; var q = nq(x.q); if (q) fcByQ[q] = x; });
-    function fcOf(o, text) { var id = o && (o.fcast || o.fcastId || o.fcId); if (id && fcById[id]) return fcById[id]; var q = nq(text); return (q && fcByQ[q]) || null; }
+    var fcByRow = {};
+    S.all("fcast", realRec).forEach(function (x) { fcById[x.id] = x; var q = nq(x.q); if (q) fcByQ[q] = x; if (x.src && x.src.ex != null && x.src.row != null) fcByRow[x.src.ex + "|" + x.src.row] = x; });
+    function fcOf(o, text, exRow) { var id = o && (o.fcast || o.fcastId || o.fcId || (typeof o.fc === "string" ? o.fc : "")); if (id && fcById[id]) return fcById[id]; if (exRow && fcByRow[exRow]) return fcByRow[exRow]; var q = nq(text); return (q && fcByQ[q]) || null; }
     function row(key, o) { if (!rows[key]) { rows[key] = Object.assign({ key: key, acts: [], ev: [], fcs: {}, pending: 0 }, o); order.push(key); } return rows[key]; }
     /* یک سطر برای هر (ردیف، روز): نشستِ دیرترِ همان روز می‌ماند و تکرارها رویش شمرده می‌شوند (RN2e) */
     function push(R, a) {
@@ -39356,22 +39357,25 @@ APP.goFromURL = function (q) {
     }
     function addCal(c, key) { if (calSeen[key]) return; calSeen[key] = 1; cal.push(c); }
     /* ۱) پرونده‌های تمرین */
+    var P3S = {};   // نشستِ a41 که از اجرای P3/P4 آمده (src: "p3") ⇒ همان اجرا دوباره شمرده نمی‌شود
     S.all("practice", realRec).forEach(function (rec) {
-      if (wdx(rec)) return;
-      var tid = rec.tech != null ? String(rec.tech).replace(/^t/i, "") : "", sb = subjOf(rec.subject), asst = viaAssist(rec);
+      if (wdx(rec) || rec.kind === "list") return;
+      var tid = rec.tech != null ? String(rec.tech).replace(/^t/i, "") : rec.tid != null ? String(rec.tid) : "", sb = subjOf(rec.subject || rec.subj), asst = viaAssist(rec);
       var link = sb.id && (sb.kind === "case") ? { kind: "case", id: sb.id } : null;
       var R = row("prac:" + rec.id, { tech: tid, subj: sb.fa, rid: rec.id, src: "practice", state: rec.state || "", link: link,
         go: A.V && A.V.practice ? ["practice", rec.id] : tid ? ["tech", +tid] : null,
         base: (asst ? "دستیار ← " : "") + "تمرینِ " + tFa(tid) + (sb.fa ? " «" + String(sb.fa).slice(0, 50) + "»" : "") });
-      (rec.history || []).forEach(function (x) { if (x && x.at && x.state) R.ev.push({ at: x.at, state: x.state, why: x.why || x.note || "" }); });
-      (rec.sessions || []).map(function (s, j) { return { s: s, j: j }; }).filter(function (x) { return x.s && x.s.at; }).sort(function (a, b) { return byAt(a.s, b.s); }).forEach(function (x) {
+      (rec.history || rec.hist || []).forEach(function (x) { var st = x && (x.state || x.to); if (x && (x.d || x.at) && st && x.ev !== "claim") R.ev.push({ at: x.d || x.at, state: st, why: x.why || x.note || "" }); });
+      (rec.sessions || []).map(function (s, j) { return { s: s, j: j }; }).filter(function (x) { return x.s && (x.s.d || x.s.at); }).sort(function (a, b) { return String(a.s.d || a.s.at).localeCompare(String(b.s.d || b.s.at)) || byAt(a.s, b.s); }).forEach(function (x) {
         var s = x.s, j = x.j;
         if (wdx(s) || s.draft || s.status === "draft" || !realRec(s)) return;
         var sid = "prac:" + rec.id + ":" + (s.id || j);
-        [s.ex, s.pr, s.src, s.ref, s.rec].forEach(function (k) { if (typeof k === "string" && k) LINK[k] = R.key; });
-        var who = otherPerson(s), mz = who ? null : measOf(s), parts = [], ok = null, at = s.resolvedAt || (mz && mz.at) || s.at;
+        [s.pr, s.src, s.ref, s.rec].concat(Array.isArray(s.ex) ? s.ex : [s.ex]).forEach(function (k) { if (typeof k === "string" && k) LINK[k] = R.key; });
+        var who = otherPerson(s), mz = who ? null : measOf(s), parts = [], ok = null, at = s.resolvedAt || (mz && mz.at) || s.d || s.at;
+        if (s.src === "p3" && mz && mz.kind === "pct") P3S[day(at) + "|" + Math.round(mz.v)] = 1;
         if (mz && mz.kind === "pending") { R.pending++; pending++; mz = null; }
-        var out = String(s.outcome || "").trim(), did = String(s.done || "").trim();
+        var M0 = s.meas || {}, out = String(s.outcome || M0.obs || "").trim(), did = String(s.done || s.what || "").trim();
+        if (s.why && !(mz && mz.kind === "pct")) parts.push(String(s.why).slice(0, 100));
         if (who) { parts.push("یاد دادن به «" + who + "»" + (s.measured != null && s.measured !== "" ? " — نتیجهٔ او (" + (typeof s.measured === "object" ? JSON.stringify(s.measured) : fa(String(s.measured))) + ") مالِ خودِ اوست، نه مهارتِ تو" : "")); }
         if (did && did !== out) parts.push(did.slice(0, 80));
         if (out) parts.push("نتیجه: " + out.slice(0, 80));
@@ -39389,7 +39393,8 @@ APP.goFromURL = function (q) {
           if (f) { R.fcs[f.id] = f; parts.push("همان پیش‌بینیِ «" + String(f.q || "").slice(0, 40) + "» در دفترِ 🎯 — آن‌جا یک بار شمرده شد"); }
           else { a.cal = { p: mz.p, ok: mz.ok }; parts.push("پیش‌بینیِ " + pf0(100 * mz.p) + " — " + (mz.ok ? "درست" : "نادرست")); if (ok == null) ok = mz.ok; }
         }
-        if (s.score != null && s.score !== "") parts.push("خودسنجی: " + fa(String(s.score)) + " (خودت دادی، اندازه نیست)");
+        if (s.src === "card" && a.ok != null && a.cal == null) { a.ok = null; parts.push("نمرهٔ مرور را خودت دادی"); }
+        var sc0 = s.score != null && s.score !== "" ? s.score : s.self; if (sc0 != null && sc0 !== "") parts.push("خودسنجی: " + fa(String(sc0)) + " (خودت دادی، اندازه نیست)");
         if (!parts.length) return;
         a.fa = R.base + " — " + parts.join(" · ");
         var kept = push(R, a);
@@ -39407,7 +39412,7 @@ APP.goFromURL = function (q) {
       if (cf) ((e.data || {})[cf.src] || []).forEach(function (rw, i) {
         if (!rw) return; var txt = rw.st || rw.c || rw.q || rw.claim || "", p = parseFloat(rw[cf.conf]), o = rw[cf.out];
         if (isNaN(p) || (o !== "درست" && o !== "نادرست")) { if (String(txt).trim() || !isNaN(p)) nPend++; return; }
-        var f = fcOf(rw, txt); if (f) { R.fcs[f.id] = f; nFc++; return; }
+        var f = fcOf(rw, txt, e.id + "|" + i); if (f) { R.fcs[f.id] = f; nFc++; return; }
         var rat = rw.outAt || rw.at || at, key = nq(txt) ? "t|" + nq(txt) + "|" + day(rat) : "r|" + e.id + "|" + i;
         if (calSeen[key]) return;
         nRes++; if (o === "درست") nOk++;
@@ -39427,6 +39432,7 @@ APP.goFromURL = function (q) {
     S.all("pr", function (r) { return realRec(r) && !wdx(r) && (r.pid === "P3" || r.pid === "P4") && r.status === "done" && r.data && r.data.pct != null && r.data.pct !== ""; }).forEach(function (r) {
       if (LINK[r.id]) return;   // پروندهٔ تمرین همین نشست را دارد
       var v = parseFloat(r.data.pct); if (isNaN(v)) return;
+      if (P3S[day(r.doneAt || r.created || r.updated) + "|" + Math.round(v)]) return;   // a41 همین اجرا را نشستِ T41 کرده
       var tp = r.topic && S.get(r.topic), subj = (tp && tp.title) || r.data.topic || "", sc = r.sched && S.get(r.sched), at = r.doneAt || r.created || r.updated;
       var R = row(r.pid + ":" + (r.topic || nq(subj)), { tech: "41", subj: subj, src: r.pid, go: ["proto", r.pid],
         base: (r.pid === "P3" ? "چرخهٔ ۱-۳-۷" : "برگهٔ سفیدِ هفتگی") + (subj ? " «" + String(subj).slice(0, 50) + "»" : "") });
@@ -39444,7 +39450,7 @@ APP.goFromURL = function (q) {
       var ms = R.acts.filter(function (a) { return a.v != null; });
       R.last = ms.length ? ms[ms.length - 1].v : null; R.first = ms.length ? ms[0].v : null; R.nm = ms.length;
       R.days = R.acts.length;
-      var last = R.acts[R.acts.length - 1], stab = R.ev.filter(function (x) { return /stable|تثبیت/.test(x.state); }).sort(byAt).pop();
+      var last = R.acts[R.acts.length - 1], stab = R.ev.filter(function (x) { return /^(stable|تثبیت)/.test(x.state); }).sort(byAt).pop();
       if (last && last.ok === false && ((stab && String(stab.at) <= String(last.at)) || R.acts.slice(0, -1).some(function (a) { return a.ok !== false; })))
         R.decline = { at: last.at, why: last.why || "", after: stab ? stab.at : "" };
       R.stableAt = stab ? stab.at : "";
