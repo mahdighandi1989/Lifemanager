@@ -2398,7 +2398,9 @@
   function startAt(MS, t, ai) {
     var k = -1; for (var i = 0; i < MS.length; i++) if (talkM(MS[i]) && MS[i].at && String(MS[i].at) <= t) k = i;   // پیامِ بی زمان (رکوردِ کهنه) با لحظه سنجیده نمی‌شود
     if (k >= 0 && MS[k].role === "ai" && (ai === true || (ai == null && actsHas(MS[k], OPEN_ACTS)))) return k;
-    for (var j = k + 1; j < MS.length; j++) if (talkM(MS[j])) return j;
+    /* بی کنشِ دستیار: نخستین پیامِ هم‌زمان یا پس از آن لحظه (پیامِ هم‌لحظه با رفتن، پس از رفتن نوشته شد) */
+    var k2 = -1; for (var i2 = 0; i2 < MS.length; i2++) if (talkM(MS[i2]) && MS[i2].at && String(MS[i2].at) < t) k2 = i2;
+    for (var j = k2 + 1; j < MS.length; j++) if (talkM(MS[j])) return j;
     return MS.length;
   }
   function creatIdx(MS, t) { var c = -1; if (t) MS.forEach(function (m, i) { if (actsHas(m, CREATE_ACTS) && m.at && String(m.at) <= t) c = i; }); return c; }

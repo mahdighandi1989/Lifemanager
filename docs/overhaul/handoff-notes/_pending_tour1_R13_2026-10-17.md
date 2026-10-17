@@ -22,6 +22,8 @@ The fixed build prints «NO ERRORS».
      subject exists, else from the first user message after that subject that names the problem, else the creating reply.
    - chat_invent problems (put aside, `dormant`) never became the subject ⇒ from their creating reply only the questions that name them
      (title words not shared with siblings created by the same reply); such a question is also removed from every other problem's list.
+   - Messages without `at` (old records, e.g. the `ach_t1` fixture of test_tour1_live.js) are never compared with a bind moment, so such a
+     session starts at its first message (as before).
    - `chatQs` also reads sessions whose `lprobLog` mentions the problem (s36 brine was empty because its session had moved on).
 2. **M2 (a38).** `joinKnown` recognises a known page question by its text: continuation sentences match exactly, or (for a question sentence)
    a paraphrased question that refers back («ردش»، «آن»، «این»، «اش», or a «…ش» word of the page sentence); trailing non-question sentences are
