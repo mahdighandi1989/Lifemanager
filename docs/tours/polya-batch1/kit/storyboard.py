@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""Storyboard of one tour group: every step's screenshot with what happened in it, for the owner to watch and comment.
+usage: storyboard.py <round-group-dir> <out-dir> <title>   (e.g. tour1_polya/round15A /tmp/.../sb15A "دورِ ۱۵ · گروهِ A")"""
+import hashlib, html, json, os, re, sys
+from PIL import Image
+
+src, out, title = sys.argv[1], sys.argv[2], sys.argv[3]
+T = os.path.dirname(os.path.abspath(src.rstrip('/')))
+SC = {s['id']: s for s in json.load(open(os.path.join(T, 'scenarios.json')))['scenarios']} if os.path.exists(os.path.join(T, 'scenarios.json')) else {}
+os.makedirs(os.path.join(out, 'img'), exist_ok=True)
+E = lambda s: html.escape(str(s or ''))
+
+
+def action(ctl):
+    if not ctl: return ''
+    if ctl.get('say'): return ''
+    ev = ' '.join(str(ctl.get(k) or '') for k in ('eval', 'eval0', 'js', 'click'))
+    fills = re.findall(r'F\("(\w+)",\s*"((?:[^"\\]|\\.)*)"\)', ev)
+    sels = re.findall(r'S\("(\w+)",\s*"((?:[^"\\]|\\.)*)"\)', ev)
+    clicks = re.findall(r'(?:click|C)\(\s*["\']([^"\']+)["\']', ev)
+    bits = ['«%s» ← %s' % (f, v.encode().decode('unicode_escape', 'ignore') if '\\u' in v else v) for f, v in fills]
+    bits += ['انتخابِ «%s» = %s' % (f, v) for f, v in sels]
+    bits += ['کلیک روی %s' % c for c in clicks]
+    if not bits and False:
+        bits = ['«%s»' % q for q in re.findall(r'["\']([^"\']*[\u0600-\u06FF][^"\']*)["\']', ev)][:6]
+    return ' · '.join(bits)[:600] or 'کار روی صفحه (فرم/دکمه)'
+
+
+def scen(d):
+    sid = os.path.basename(d.rstrip('/'))
+    outd, ctld = os.path.join(d, 'out'), os.path.join(d, 'ctl')
+    if not os.path.isdir(outd): return ''
+    steps = sorted({int(m.group(1)) for f in os.listdir(outd) for m in [re.match(r's(\d+)\.png$', f)] if m})
+    base = sid.split('_')[0][:3]
+    meta = SC.get(base, {})
+    fnd = os.path.join(d, 'findings.md')
+    plain = ''
+    if os.path.exists(fnd):
+        t = open(fnd).read()
+        m = re.search(r'##\s*خلاصه[^\n]*\n(.*?)(?:\n##|\Z)', t, re.S)
+        res = re.search(r'RESULT:\s*([^\n]+)', t)
+        plain = (m.group(1).strip() if m else '') or ''
+        verdict = res.group(1) if res else ''
+    else:
+        verdict = ''
+    ok = 'PASS' in verdict and 'defect' not in verdict.lower() and 'S3' not in verdict
+    prev, seen, cards = [], set(), []
+    for c in steps:
+        st = {}
+        try: st = json.load(open(os.path.join(outd, 's%d.json' % c))).get('state') or {}
+        except Exception: pass
+        msgs = st.get('msgs') or []
+        new = msgs[len(prev):] if msgs[:len(prev)] == prev else msgs[-2:]
+        prev = msgs
+        ctl = None
+        try: ctl = json.load(open(os.path.join(ctld, 'c%d.json' % c)))
+        except Exception: pass
+        png = os.path.join(outd, 's%d.png' % c)
+        h = hashlib.md5(open(png, 'rb').read()).hexdigest()
+        act = action(ctl)
+        mut = bool(ctl) and (bool(ctl.get('say')) or bool(re.search(r'\b(?:F|S|C|click|fill|APP\.go|selectOption|\.click\(|\.value\s*=)\b', json.dumps(ctl, ensure_ascii=False))))
+        if not new and not mut: continue   # the runner's own inspection probes are not steps of the story
+        if h in seen and not new: continue
+        seen.add(h)
+        name = '%s_%d.jpg' % (sid, c)
+        im = Image.open(png).convert('RGB'); w = 960
+        im.resize((w, int(im.height * w / im.width))).save(os.path.join(out, 'img', name), quality=58, optimize=True)
+        lines = []
+        if act: lines.append('<p class="act">🖱 %s</p>' % E(act))
+        for m in new:
+            who, _, txt = str(m).partition(': ')
+            cls = {'user': 'u', 'ai': 'a', 'sys': 's'}.get(who, 's')
+            lab = {'u': 'کاربر', 'a': 'دستیار', 's': 'صفحه'}[cls]
+            lines.append('<p class="m %s"><b>%s:</b> %s</p>' % (cls, lab, E(txt)))
+        if not lines: lines.append('<p class="s">(بدونِ پیامِ تازه — نمای صفحه)</p>')
+        cards.append('<figure id="%s-%d"><figcaption><span class="n">گام %d</span>%s</figcaption><img loading="lazy" src="img/%s" alt="گام %d"></figure>'
+                     % (sid, c, c, ''.join(lines), name, c))
+    head = '%s — %s' % (sid, meta.get('domain_fa', ''))
+    who = meta.get('persona', '')
+    badge = '<span class="b ok">بی‌ایراد</span>' if ok else ('<span class="b warn">ایراد دارد</span>' if verdict else '')
+    return ('<details class="sc" id="%s"><summary><h2>%s %s</h2><p class="who">%s</p></summary>%s<div class="steps">%s</div></details>'
+            % (sid, E(head), badge, E(who), ('<div class="plain">%s</div>' % E(plain).replace('\n', '<br>')) if plain else '', ''.join(cards)))
+
+
+secs = [scen(os.path.join(src, x)) for x in sorted(os.listdir(src)) if re.match(r's\d\d', x) and os.path.isdir(os.path.join(src, x))]
+CSS = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'storyboard.css')).read()
+page = ('<title>%s</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n'
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap">\n<style>%s</style>\n'
+        '<main dir="rtl"><header><h1>%s</h1><p>هر سناریو را باز کن: گام‌به‌گام همان صفحه‌ای را می‌بینی که آدمِ سناریو دید، با پیامی که نوشت و پاسخی که گرفت. '
+        'هر جا نکته‌ای داشتی، همین‌جا روی صفحه نظر بگذار یا در گفت‌وگو بگو — پیش از دورِ بعد اعمال می‌شود.</p></header>%s</main>') % (E(title), CSS, E(title), ''.join(secs))
+open(os.path.join(out, 'index.html'), 'w').write(page)
+print(out, len(os.listdir(os.path.join(out, 'img'))), 'images')

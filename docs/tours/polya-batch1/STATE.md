@@ -35,3 +35,7 @@
 ## کیت
 
 `kit/` = `savehb.py` (استخراجِ گزارشِ اجراکننده)، `gate_wt.sh` (گیتِ کامل در worktree)، `resolve_bundle.sh` (حلِ تعارضِ باندل)، `checkpoint.sh` (همین کپی). `kit/latest/<گروه>/tools` = harness3.js و ابزارهای بازپخش؛ `kit/latest/<گروه>/<sid>/ctl` = اسکریپت‌های کنترلیِ هر سناریو.
+
+## تصویرنامه‌ها (نشانی‌های ثابت)
+
+- گروهِ A: https://claude.ai/artifact/91WEMispzw9gyGiD4L1n4c (اکنون دورِ ۱۵). گروه‌های B، C و D از دورِ ۱۶ ساخته می‌شوند. ساختن: `python3 kit/storyboard.py <roundNNX> <out> "<عنوان>"` و انتشار با همان file_path / url.

@@ -20,7 +20,7 @@ for g in A B C D; do src="$T/round${last}$g"; [ -d "$src" ] || continue
   mkdir -p "$D/kit/latest/$g"; [ -d "$src/tools" ] && cp -r "$src/tools" "$D/kit/latest/$g/"
   for c in "$src"/*/ctl; do [ -d "$c" ] && { s=$(basename "$(dirname "$c")"); mkdir -p "$D/kit/latest/$g/$s"; cp -r "$c" "$D/kit/latest/$g/$s/"; }; done; done
 echo "$last" > "$D"/kit/latest/ROUND
-cp "$SP"/savehb.py "$SP"/gate_wt.sh "$SP"/resolve_bundle.sh "$SP"/checkpoint.sh "$D"/kit/
+cp "$SP"/storyboard.py "$SP"/storyboard.css "$SP"/savehb.py "$SP"/gate_wt.sh "$SP"/resolve_bundle.sh "$SP"/checkpoint.sh "$D"/kit/
 # never commit the owner's address
 grep -rlI "<owner-email>" "$D" | xargs -r sed -i 's/mohamad\.mahdi1988@gmail\.com/<owner-email>/g'
 du -sh "$D"
