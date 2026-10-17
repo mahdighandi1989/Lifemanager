@@ -150,7 +150,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     // DECISIONS_R15 O1: گزینه = بخشِ پرسشیِ پیام (تا پایانِ آخرین جملهٔ پرسشیِ پیوسته) — جملهٔ خبری/دستوریِ پس از آن («شاید فقط همان یکی…»، «(بعد در صفحه…)») دیگر جزءِ گزینه نیست؛
     // پیش‌درآمدِ پیش از «:» هم نه. هنوز یک گزینه برای هر پیام، و پرسشِ عینِ صفحه یکی (همان «کدام حلقه دقیقاً شکست؟» در دو پیام ⇒ یک گزینه).
     const QPART = (q) => { const S = q.split(/(?<=[؟?.!:])\s+/); let a = S.findIndex(x => /[؟?]$/.test(x)), b = a; while (b + 1 < S.length && /[؟?]$/.test(S[b + 1])) b++; return S.slice(a, b + 1).join(' '); };
-    for (const [k, q] of [['Q_LINK', Q_LINK], ['resultQ', RESQ], ['Q_LINE', Q_LINE], ['EQ_FEW', EQ_FEW]]) chk(r.qs.filter(t => t === QPART(q)).length === 1, 'echo→R15 O1: the page turn question ' + k + ' echoed verbatim is ONE option — its question passage ' + JSON.stringify(QPART(q)) + ' (M2, s06) ' + JSON.stringify(r.qs));
+    // DECISIONS_R16 L1a: سرِ پیش از «:» که برچسبِ تنها نیست («معادله کم است:») جزءِ بخشِ پرسشی است. Q_LINK («پیش از رها کردنِ کلِ راه: …») با بازگفتِ
+    // بعدیِ «کدام حلقه دقیقاً شکست؟» هم‌کلید است ⇒ یک گزینه با تازه‌ترین واژه‌ها (O2) — پس همان QPART ِ بی‌سر می‌ماند.
+    const QPART16 = (q) => { const S = q.split(/(?<=[؟?.!:])\s+/); const a = S.findIndex(x => /[؟?]$/.test(x)); return (a > 0 && /:$/.test(S[a - 1]) && q !== Q_LINK ? S[a - 1] + ' ' : '') + QPART(q); };
+    for (const [k, q] of [['Q_LINK', Q_LINK], ['resultQ', RESQ], ['Q_LINE', Q_LINE], ['EQ_FEW', EQ_FEW]]) chk(r.qs.filter(t => t === QPART16(q)).length === 1, 'echo→R15 O1: the page turn question ' + k + ' echoed verbatim is ONE option — its question passage ' + JSON.stringify(QPART16(q)) + ' (M2, s06; R16 L1a) ' + JSON.stringify(r.qs));
     chk(!r.qs.some(t => /^(?:شاید فقط همان یکی|\(بعد در صفحه|\(در مسئلهٔ عملی|\(برای n مجهول|پیش از رها کردنِ کلِ راه:$)/.test(t)), 'echo: never a non-question fragment of those questions as an option ' + JSON.stringify(r.qs));
     // DECISIONS_R14 N2: گزینه همان جمله‌های پیوستهٔ خودِ دستیار است (نه متنِ عامِ صفحه)؛ پرسشِ صفحه فقط کلیدِ یکی کردن
     const OWN_G = 'حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام ساعت می‌تواند ردش کند — ساعتی که جمعِ دو مسافت در آن به ۶۰ نمی‌رسد؟';

@@ -192,7 +192,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await go('lprob', P, 'exec'); await objStep('a = 2b و c = b + 3 پس 4b + 3 = 36 و b = 8.25', 'از داده‌ها و جای‌گذاری در محیط');
     await click('main .lp-solved');
     const o = await bestOpts(); r.opts = o.map(t => t.slice(0, 90)); delete r.stage;
-    chk(o.filter(t => t === '💬 ' + Q_GUESST).length === 1 && !o.some(t => /^💬 (?:کدام حالتِ خاص یا شاهد|چطور می‌آزمایی‌اش؟$)/.test(t)), 'multi: «کدام پرسش کمک کرد؟» (#lpBBest) offers it once, whole (L5) ' + JSON.stringify(r.opts));
+    // DECISIONS_R16 L1d: «حدسی گفتی — … می‌آزمایی‌اش؟» به حدسِ ثبت‌شدهٔ مسئله برمی‌گردد ⇒ مرجع از رکورد در پرانتز («(حدسِ تو: «…»)»)
+    chk(o.filter(t => t === '💬 ' + Q_GUESST || t.indexOf('💬 ' + Q_GUESST + ' (حدسِ تو: «') === 0).length === 1 && !o.some(t => /^💬 (?:کدام حالتِ خاص یا شاهد|چطور می‌آزمایی‌اش؟$)/.test(t)), 'multi: «کدام پرسش کمک کرد؟» (#lpBBest) offers it once, whole (L5) ' + JSON.stringify(r.opts));
   });
 
   // ================= strict — L2 (سویِ زنده): هر سطرِ پرسش‌دارِ بلوکِ زنده یا سطرِ نوبت است یا زمینه =================

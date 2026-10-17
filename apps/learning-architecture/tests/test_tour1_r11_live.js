@@ -134,7 +134,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     r.stage = 'back'; await click('main .lp-solved');
     const o = await bestOpts(); r.opts = o.map(t => t.slice(0, 80)); delete r.stage;
     // DECISIONS_R14 N2: نگاشت به u5 فقط کلید است (یکی کردن، شناسه)؛ گزینه همان پرسشی است که دستیار پرسید
-    const OWN5 = 'کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟';
+    // DECISIONS_R16 L1a: سرِ «پیش از جزئیات:» برچسبِ تنها نیست ⇒ جزءِ گزینه است (کلید همان Q_WHOLE، از جملهٔ پرسشی بی سر)
+    const OWN5 = 'پیش از جزئیات: کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟';
     const items = await p.evaluate(pid => APP.liveChatQItems(pid), P);
     chk(r.chatQs.includes(OWN5) && !r.chatQs.some(t => /مسئله را به زبانِ خودت دوباره بگو/.test(t)) && items.some(e => e.t === OWN5 && /^اول کل، بعد جزءها: کلِ مسئله/.test(e.k)), 'qword: the coach\'s A191 «کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟» is a chat question (2nd-person «می‌گویی») — shown in its own words; its key is now the best match «اول کل، بعد جزءها: …» (Q_WHOLE), not the first list question sharing «به زبانِ خودت» (u5) (R14 N2 → R15 O2: best match wins, s35/s37) ' + JSON.stringify({ q: r.chatQs, items }));
     // DECISIONS_R15 O2 (C·T1): lpOne همان پرسشِ «اول کل» را در صفحه پاسخ داد ⇒ یک گزینه، گزینهٔ صفحه (پیش‌تر 💬 با واژه‌های دستیار می‌ماند)
@@ -153,7 +154,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await next('آفرین — خوب پیش رفتی — حالا مجهول دقیقاً چیست؟');
     await say('مجهول اینه که کجا زندگی کنیم.');
     r.qs = await p.evaluate(pid => APP.liveChatQs(pid), P); delete r.stage;
-    chk(r.qs.some(t => /^حالا که حدسِ خرید رد شد، قیمتِ متریِ محله‌های نزدیک مهدکودک — که با دلیل کنار گذاشته بودی — هنوز بی‌ربط است؟$/.test(t)) && !r.qs.some(t => /^هنوز بی‌ربط است؟$/.test(t)),
+    // DECISIONS_R16 L1a: «پیش از گامِ بعد، همان پرسش:» خودش فقط برچسب نیست (گروهِ زمانی پیش از برچسب) ⇒ سرِ پرسش است و می‌ماند
+    chk(r.qs.some(t => /^پیش از گامِ بعد، همان پرسش: حالا که حدسِ خرید رد شد، قیمتِ متریِ محله‌های نزدیک مهدکودک — که با دلیل کنار گذاشته بودی — هنوز بی‌ربط است؟$/.test(t)) && !r.qs.some(t => /^هنوز بی‌ربط است؟$/.test(t)),
       'paren: a head with an inner parenthetical «— … —» keeps its referent — the whole question, never the bare «هنوز بی‌ربط است؟» (K4, s01) ' + JSON.stringify(r.qs));
     // DECISIONS_R15 O1: فقط بندِ ستایشیِ آغاز («آفرین —») بریده می‌شود؛ سرِ پیش از «—» («خوب پیش رفتی —») هرگز
     chk(r.qs.some(t => /^خوب پیش رفتی — حالا مجهول دقیقاً چیست؟$/.test(t)), 'paren→R15 O1: control — the leading praise «آفرین —» is cut, the rest of the sentence with «حالا مجهول دقیقاً چیست؟» stays ' + JSON.stringify(r.qs));
