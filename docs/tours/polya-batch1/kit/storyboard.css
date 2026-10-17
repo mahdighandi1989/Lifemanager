@@ -25,3 +25,4 @@ figure img { width:100%; border:1px solid var(--line); border-radius:6px; displa
 .m.u { background:var(--u) } .m.a { background:var(--a) } .m.s, .s { color:var(--mut); font-size:.85rem }
 .act { margin:0 0 6px; color:var(--warn); font-size:.85rem; overflow-wrap:anywhere }
 @media (max-width:760px) { figure { grid-template-columns:minmax(0, 1fr) } }
+.shots { display:grid; gap:8px; min-width:0 }

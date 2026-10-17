@@ -73,8 +73,13 @@ def scen(d):
             lab = {'u': 'کاربر', 'a': 'دستیار', 's': 'صفحه'}[cls]
             lines.append('<p class="m %s"><b>%s:</b> %s</p>' % (cls, lab, E(txt)))
         if not lines: lines.append('<p class="s">(بدونِ پیامِ تازه — نمای صفحه)</p>')
-        cards.append('<figure id="%s-%d"><figcaption><span class="n">گام %d</span>%s</figcaption><img loading="lazy" src="img/%s" alt="گام %d"></figure>'
-                     % (sid, c, c, ''.join(lines), name, c))
+        pg = os.path.join(outd, 's%d_page.png' % c); extra = ''
+        if os.path.exists(pg):
+            n2 = '%s_%d_page.jpg' % (sid, c); im2 = Image.open(pg).convert('RGB')
+            im2.resize((w, int(im2.height * w / im2.width))).save(os.path.join(out, 'img', n2), quality=58, optimize=True)
+            extra = '<img loading="lazy" src="img/%s" alt="گام %d — صفحه">' % (n2, c)
+        cards.append('<figure id="%s-%d"><figcaption><span class="n">گام %d</span>%s</figcaption><div class="shots"><img loading="lazy" src="img/%s" alt="گام %d">%s</div></figure>'
+                     % (sid, c, c, ''.join(lines), name, c, extra))
     head = '%s — %s' % (sid, meta.get('domain_fa', ''))
     who = meta.get('persona', '')
     badge = '<span class="b ok">بی‌ایراد</span>' if ok else ('<span class="b warn">ایراد دارد</span>' if verdict else '')
