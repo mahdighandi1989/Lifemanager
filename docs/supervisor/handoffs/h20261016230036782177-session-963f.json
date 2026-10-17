@@ -12,5 +12,11 @@
  "what": "تورِ پولیا دورِ ۱۱ (K8): پیوندِ صریحِ لحظه ⇐ قلمرو در coverage.json (terr: — B231/C107 ⇒ pr_hypothesis_testing؛ C145/B162/B169/B170 ⇒ a_induction؛ B107 ⇒ md_cognitive_biases، a_confirmation)",
  "procedure": "AGENTS.md: ثبتِ registry، گراف مشتق",
  "commit": "10cd5a1",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-17T03:56:45Z",
+  "note": "بسنجیده: JSON معتبر؛ test_graph و test_mind_report «NO ERRORS»؛ pytest دست‌به‌دست/مالکیت/دفترچه سبز؛ تغییر فقط داده/ثبت‌گاه است",
+  "commit": ""
+ }
 }
