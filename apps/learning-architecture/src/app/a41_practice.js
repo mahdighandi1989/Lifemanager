@@ -400,10 +400,10 @@
   PR.fromEx = function (ex, o) {
     o = o || {}; if (!ex || !ex.tid || !A.TM[ex.tid] || ex.status !== "done") return null;
     var tid = ex.tid, pol = P[tid] || {};
-    if (pol.shape === "list") { var lc = listFromEx(ex); if (lc) { if (ex.prc !== lc.id) { ex.prc = lc.id; S.put(ex); } (lc.sess = lc.sess || []).filter(function (x) { return x.d === today(); }).length || lc.sess.push({ d: today(), ex: ex.id }); listSave(lc); } return lc; }
+    if (pol.shape === "list") { var lc = listFromEx(ex); if (lc) { if (ex.prc !== lc.id) ex.prc = lc.id; (lc.sess = lc.sess || []).filter(function (x) { return x.d === today(); }).length || lc.sess.push({ d: today(), ex: ex.id }); listSave(lc); } return lc; }
     var subj = subjOfEx(ex), c = (ex.prc && S.get(ex.prc)) || PR.start(tid, subj, { src: srcOfEx(ex), sample: !!ex.sample });
     if (!c) return null;
-    if (ex.prc !== c.id) { ex.prc = c.id; S.put(ex); }
+    if (ex.prc !== c.id) ex.prc = c.id;   /* پیوندِ اصلی sessions[].ex ِ پرونده است؛ کاربرگ دوباره نوشته نمی‌شود (یک نوشتن برای هر ثبت — test_journey) */
     var m = measOf(ex), sess = { d: o.d, what: summary(ex), self: A.rubricPct ? A.rubricPct(ex) : null, meas: m, ex: ex.id, src: srcOfEx(ex) };
     if (tid === 24) t24Sync(ex, c);
     if (tid === 9) t9Sync(ex, c);
@@ -876,7 +876,21 @@
   PR.liveSection = liveSection;
   function installViews() {
     wrapView("lprob", function (pid) { return liveSection(pid); });
-    if (A.V.dossier) wrapView("dossier", function (pid) { return liveSection(pid); });
+    /* «📜 پروندهٔ کامل» (a40_dossier.js، فقط‌خواندنی و ساخته از خودِ رکوردها): هر پروندهٔ تمرینِ همین مسئله و هر جلسه‌اش یک رویدادِ تاریخ‌دار
+       (در نما، Markdown و HTML یکسان)؛ پرونده‌ی نمونه/تور هرگز. */
+    var rawDos = A.dossier;
+    if (rawDos && !rawDos._prc) { A.dossier = function (pid) {
+      var D = rawDos.apply(this, arguments); if (!D || !D.events) return D;
+      try {
+        PR.cases({ subj: PR.subj("live", pid) }).forEach(function (c) {
+          var nm = fa(c.tid) + " · " + (A.TM[c.tid] || {}).fa, ev = D.events, gs = c.tid === 21 ? PR.guessStatus(pid) : null;
+          ev.push({ k: "practice", at: (c.hist && c.hist[0] && c.hist[0].at) || "", i: ev.length, title: "🧪 پروندهٔ تمرین — " + nm, lines: [ST_FA[c.state] + " · " + PR.dueText(c)].concat(gs && gs.tests.length ? ["حدس: «" + gs.text + "» — " + gs.label] : []), prc: c.id });
+          (c.sessions || []).filter(function (x) { return !x.draft; }).sort(byD).forEach(function (x) { ev.push({ k: "practice", at: x.at || x.d, i: ev.length, title: "🧪 جلسهٔ تمرین (" + nm + ")", lines: [x.what || "جلسه"], out: x.ok === true ? "شد" : x.ok === false ? "نشد" : "", prc: c.id }); });
+        });
+        D.events.sort(function (a, b2) { var x = String(a.at || "9999"), y = String(b2.at || "9999"); return x < y ? -1 : x > y ? 1 : a.i - b2.i; });   /* همان ترتیبِ خودِ a40 */
+      } catch (e) { console.warn(e); }
+      return D;
+    }; A.dossier._prc = true; }
     wrapView("e_case", function (id, sub) { var cs = id && S.get(id); if (!cs || cs.type !== "case" || sub) return null; return PR.section(PR.subj("case", id), "🧪 پرونده‌های تمرین روی این پرونده"); });
     wrapView("knot", function (id) {
       var k = id && S.get(id); if (!k || k.type !== "knot") return null; var box = PR.section(PR.subj("knot", id), "🧪 پرونده‌های تمرین روی این گره (هر ۴۵ تکنیک)"), sg = PR.knotSuggest(id);
@@ -953,9 +967,10 @@
     AS.promptHooks = AS.promptHooks || [];
     AS.promptHooks.push(function (s, msg) {
       var recent = [String(msg || "")].concat(((s && s.msgs) || []).filter(function (m) { return m.role === "user"; }).slice(-3).map(function (m) { return m.text; })).join(" ");
+      /* فقط وقتی حرفِ کاربر دربارهٔ تمرین/برگشتن است — پرامپت سقف دارد و سشن‌های دیگر نباید این بلوک را بگیرند */
+      if (!/(تمرین|چرخه|بازیابی|یادم می‌ره|یادم میره|فراموش می‌کنم|آزمون بذار|فاینمن|تثبیت|برگه سفید)/.test(recent)) return "";
       var open = PR.cases().filter(function (c) { return c.state !== "closed"; }).slice(0, 6);
-      if (!open.length && !/(تمرین|چرخه|بازیابی|مرور|یادم می‌ره|یادم میره|فراموش|برنامه|آزمون|پیش‌بینی|فاینمن|تثبیت)/.test(recent)) return "";
-      return "# پرونده‌های تمرینِ باز (یک پرونده برای هر تکنیک × موضوع)\n" + (open.length ? open.map(function (c) { return "- " + c.id + ": تکنیکِ " + c.tid + " «" + A.TM[c.tid].fa + "» روی " + PR.subjLabel(c.subj) + " · " + ST_FA[c.state] + (c.due ? " · موعد " + c.due : ""); }).join("\n") + "\n" : "") +
+      return "# پرونده‌های تمرینِ باز (یک پرونده برای هر تکنیک × موضوع)\n" + (open.length ? open.map(function (c) { return "- " + c.id + ": تکنیکِ " + c.tid + " «" + A.TM[c.tid].fa + "» روی «" + PR.subjTitle(c.subj) + "» (" + c.subj.k + (c.subj.id ? ":" + c.subj.id : "") + ") · " + ST_FA[c.state] + (c.due ? " · موعد " + c.due : ""); }).join("\n") + "\n" : "") +
         "- برای شروع یا ادامهٔ پرونده فقط پس از «آری» یا خواستهٔ صریحِ خودش: {\"do\":\"start_practice\",\"tid\":41,\"topic\":\"عنوانِ موضوع\"} (یا \"pid\" مسئلهٔ زنده، \"knot\"، \"case\"). پرونده‌ی باز همان ادامه می‌یابد؛ زمان‌بندی را خودِ پرونده از متنِ تکنیک می‌گیرد — عدد نساز.";
     });
   }

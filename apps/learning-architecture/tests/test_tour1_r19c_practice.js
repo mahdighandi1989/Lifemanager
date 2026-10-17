@@ -502,14 +502,16 @@ const HELPERS = () => {
     const pid = await E(() => { const pid = __live('به چند طریق از ۲۰ پله؟'); __guess(pid, 'فیبوناچی'); APP.PR.startFrom(21, APP.PR.subj('live', pid), 'live', false); return pid; });
     await day(1); await E(() => APP.PR.guessTest(APP.PR.cases({ tid: 21 })[0], 'confirm', 'n=4 ⇒ ۵ راه'));
     await day(2); await E(() => APP.PR.guessTest(APP.PR.cases({ tid: 21 })[0], 'confirm', 'n=5 ⇒ ۸ راه'));
-    r = await E((pid) => { const page = __go('lprob', pid); const dos = APP.V.dossier ? __go('dossier', pid) : null; return { page, dos, gs: APP.PR.guessStatus(pid), id: APP.PR.cases({ tid: 21 })[0].id, row: !!document.querySelector('.prc-sec [data-prc]') }; }, pid);
-    T(0, /تأیید در ۲ آزمون/.test(r.gs.label) && r.gs.tests.map(t => t.d).join() === [ymd(1), ymd(2)].join() && /پرونده‌های تمرین روی این مسئله/.test(r.page) && /تأیید در ۲ آزمون/.test(r.page) && /n=5/.test(r.page) && (r.dos == null || /تأیید در ۲ آزمون/.test(r.dos)), { gs: r.gs, dossier: r.dos != null });
+    r = await E((pid) => { const page = __go('lprob', pid); const dos = APP.V.dossier ? __go('dossier', pid) : null; const md = APP.dossierMd ? APP.dossierMd(pid) : null; return { page, dos, md, gs: APP.PR.guessStatus(pid), id: APP.PR.cases({ tid: 21 })[0].id, row: !!document.querySelector('.prc-sec [data-prc]') }; }, pid);
+    T(0, /تأیید در ۲ آزمون/.test(r.gs.label) && r.gs.tests.map(t => t.d).join() === [ymd(1), ymd(2)].join() && /پرونده‌های تمرین روی این مسئله/.test(r.page) && /تأیید در ۲ آزمون/.test(r.page) && /n=5/.test(r.page) && (r.dos == null || (/تأیید در ۲ آزمون/.test(r.dos) && /جلسهٔ تمرین/.test(r.dos) && /n=5/.test(r.md))), { gs: r.gs, dossier: r.dos != null });
     // 1 — Hoda: «رد شد» updates the problem's guess (dated, linked to the case); problem stays open
     await fresh();
     const pid1 = await E(() => { const pid = __live('مسئلهٔ دایره'); __guess(pid, 'جواب π است'); APP.PR.startFrom(21, APP.PR.subj('live', pid), 'live', false); return pid; });
     await day(2); r = await E((pid) => { const st = APP.PR.guessTest(APP.PR.cases({ tid: 21 })[0], 'refute', 'π درنیامد'); const g = APP.solveUI.sol(APP.solveUI.prog(pid)).g[1]; return { st, g: { refuted: g.refuted, testRes: g.testRes, guess: g.guess }, live: !!APP.liveRec(pid), status: (APP.liveRec(pid) || {}).status, id: APP.PR.cases({ tid: 21 })[0].id }; }, pid1);
     T(1, r.st.refuted && r.g.refuted && r.g.refuted.d === ymd(2) && r.g.refuted.prc === r.id && r.g.testRes === 'حدس رد شد' && r.live, r);
     const st1 = r.status;
+    // 9 — Hoda: after «رد شد» the problem is not solved or closed; on day 3 it is still a live, open problem with its guess history
+    await day(3); const r99 = await E((pid) => { const L = APP.solveUI.sol(APP.solveUI.prog(pid)).live || {}; return { live: !!APP.liveRec(pid), status: (APP.liveRec(pid) || {}).status, solved: L.state === 'solved', closed: L.state === 'abandoned', page: /حدس رد شد/.test(__go('lprob', pid)) }; }, pid1);
     // 2 — Pouya: the epistemic case page lists the practice case and its next due
     await fresh();
     r = await E(() => { const cs = APP.newCase({ title: 'باورِ مهاجرت' }); const c = APP.PR.start(22, APP.PR.subj('case', cs.id), { src: 'case' }); APP.PR.session(c, { what: 'کاربرگ' }); APP.PR.setDue(c, APP.addDays(APP.today(), 8)); return { page: __go('e_case', cs.id), row: !!document.querySelector('.prc-sec [data-prc="' + c.id + '"]') }; });
@@ -544,9 +546,7 @@ const HELPERS = () => {
     // 16 (global 106) — re-saving the same page the same day does not write the outcome twice
     await E((x) => { const ex = APP.S.get(x); APP.onExDone(ex); }, ex8); await fin10();
     const h106 = await E((cs) => APP.S.get(cs).prcHist.length, cs8);
-    // 9 — Hoda: after «رد شد» the problem is not solved or closed; day 3 it still is a live, open problem
-    await day(3); r = await E((pid) => ({ live: !!APP.liveRec(pid), status: (APP.liveRec(pid) || {}).status, solved: !!(APP.solveUI.sol(APP.solveUI.prog(pid)).chk || {}).done }), pid1);
-    T(9, r.live && r.status === st1 && !r.solved, r);
+    T(9, r99.live && r99.status === st1 && !r99.solved && !r99.closed, r99);
     // 10 — Kaveh: wrong link — the case never appears in the other problem's dossier
     await fresh();
     r = await E(() => { const a = __live('۲۰ پله'), b2 = __live('دست‌دادن‌ها'); __guess(a, 'فیبوناچی'); const c = APP.PR.startFrom(21, APP.PR.subj('live', a), 'live', false); APP.PR.session(c, { what: 'نتیجه' }); const pg = __go('lprob', b2); return { inB: !!document.querySelector('.prc-sec [data-prc="' + c.id + '"]'), list: APP.PR.cases({ subj: APP.PR.subj('live', b2) }).length }; });
