@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # sum.py sid — per assist prompt: turn text, SUG, turn-lines, live one-question, A-ids marked as turn
 import sys,json,re,glob,os
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round15D'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round16D'
 s=sys.argv[1]
 for f in sorted(glob.glob(f'{B}/{s}/ai/p*.json'),key=lambda x:int(re.findall(r'\d+',os.path.basename(x))[0])):
     p=json.load(open(f)); u=p['user']; n=os.path.basename(f)[:-5]

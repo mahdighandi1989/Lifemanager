@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvbv2hypynj\",{turn:{text:\"فکر کنم باید خود مسئله رو یه جور دیگه بگم\",fail:true}})).slice(0,400)+\"\\nPLAIN:\"+APP.liveCoach(\"pb_l_mvbv2hypynj\").q+\" src:\"+APP.liveCoach(\"pb_l_mvbv2hypynj\").src"}
+{"eval": "JSON.stringify(APP.liveCoach(\"pb_l_mvc0m6zoo8o\",{turn:{text:\"فکر کنم باید خود مسئله رو یه جور دیگه بگم\",fail:true}})).slice(0,400)+\"\\nPLAIN:\"+APP.liveCoach(\"pb_l_mvc0m6zoo8o\").q+\" src:\"+APP.liveCoach(\"pb_l_mvc0m6zoo8o\").src"}

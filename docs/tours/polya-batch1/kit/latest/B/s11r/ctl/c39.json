@@ -1,0 +1,1 @@
+{"eval": "(()=>{const cl=JSON.stringify(APP.liveClosure(APP.state.arg));const t=__fx.main(8000);return 'sub='+APP.state.sub+' ### '+cl+' ### '+t.slice(0,3000)})()\n"}

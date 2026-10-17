@@ -1,1 +1,1 @@
-{"eval": "APP.state.sub+\" \"+JSON.stringify(APP.liveClosure(\"pb_l_mvbvblx8ctz\"))+\"\\n\"+FL(\"lpB\")"}
+{"eval":"(()=>{C(\".lp-solved\");return APP.state.sub+\" \"+JSON.stringify(APP.liveClosure(\"pb_l_mvc0m57wwqn\"))})()","say":"برهانمو نوشتم: چهار مربع، پنج نقطه، پس دو تا تو یه مربع، فاصله‌شون از قطر کمتره. الان تو بازنگری‌ام. چیزی جا نینداختم؟"}

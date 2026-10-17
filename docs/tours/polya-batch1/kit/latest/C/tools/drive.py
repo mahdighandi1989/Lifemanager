@@ -1,7 +1,7 @@
-# drive.py sid [N]  -> feed round14C ctls until an AI request or out of ctls (or N ctl steps). Prints outs briefly, AI digest+diff.
+# drive.py sid [N]  -> feed round15C ctls until an AI request or out of ctls (or N ctl steps). Prints outs briefly, AI digest+diff.
 import sys, os, json, time, glob, re, difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; D=f'{T}/round15C/{sid}'; S6=f'{T}/round14C/'+os.environ.get('SRC',sid)
+sid=sys.argv[1]; D=f'{T}/round16C/{sid}'; S6=f'{T}/round15C/'+os.environ.get('SRC',sid)
 lim=int(sys.argv[2]) if len(sys.argv)>2 and sys.argv[2].isdigit() else 999
 stf=D+'/drv.json'
 S=json.load(open(stf)) if os.path.exists(stf) else {'ptr':1,'wait':0}

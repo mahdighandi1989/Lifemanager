@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/ساختنِ مسئلهٔ حل‌نشده/);await w(1200);const m=__fx.main(30000);const i=m.indexOf(\"۱) فهم\");return r+\" view=\"+APP.state.view+\" arg=\"+APP.state.arg+\" sub=\"+APP.state.sub+\" ### \"+m.slice(Math.max(0,i),i+5000)+\" ### \"+JSON.stringify(__fx.fields())})()"}

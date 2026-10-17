@@ -27,5 +27,5 @@ for f,L in data:
     if l.startswith('- زمینه (نه پرسشِ دوم)'): continue
     if not DIR.search(l): continue
     hits.append(hd[:25]+' | '+l[:int(os.environ.get('W','170'))])
-  if len(hits)>=int(os.environ.get('MIN','2')): print('##',f.split('round15B/')[-1],len(hits)); [print('   ',h) for h in hits]
+  if len(hits)>=int(os.environ.get('MIN','2')): print('##',f.split('round16B/')[-1],len(hits)); [print('   ',h) for h in hits]
 print('prompts',N,'generic',len(gen))

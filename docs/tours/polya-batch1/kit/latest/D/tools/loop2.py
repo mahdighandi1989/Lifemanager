@@ -3,7 +3,7 @@
 import sys,subprocess,re,os,glob,json
 sys.argv_saved=sys.argv; 
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R=B+'/round15D'; S=sys.argv[1]
+R=B+'/round16D'; S=sys.argv[1]
 src=open(R+'/tools/struct.py').read().split('for s in sys.argv[2:]:')[0].replace("B=sys.argv[1]","")
 exec(src)
 def sig(path):
@@ -21,7 +21,7 @@ def pend():
 while True:
     N=pend()
     if not N: print('NO PENDING'); break
-    SD=os.environ.get('SRCD',f'{B}/round14D/{S}'); old=f'{SD}/ai/p{N}.json'
+    SD=os.environ.get('SRCD',f'{B}/round15D/{S}'); old=f'{SD}/ai/p{N}.json'
     if not os.path.exists(old) or not os.path.exists(f'{SD}/ai/r{N}.txt'): print(f'STOP p{N} (no old)'); break
     a,b=sig(old),sig(f'{R}/{S}/ai/p{N}.json')
     ok=a[:3]==b[:3] and (a[0]=='NA' and a==b or a[0]!='NA' and set(b[3])<=set(a[3]))

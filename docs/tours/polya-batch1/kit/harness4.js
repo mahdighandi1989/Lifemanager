@@ -30,7 +30,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.exposeFunction('__mirror', async (o) => { fs.appendFileSync(path.join(D, 'drive', 'mirror.jsonl'), JSON.stringify({ at: new Date().toISOString(), n: (o.items || []).length, items: (o.items || []).slice(0, 50), deleted: o.deleted }) + NL); return { ok: true }; });
   await p.exposeFunction('__mail', async (r) => { fs.writeFileSync(path.join(D, 'mail', 'm' + (++mc) + '.json'), JSON.stringify(r)); return { status: 'sent' }; });
   await p.route('**/fonts.googleapis.com/**', r => r.abort());
-  await p.goto('file:///tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round15A/build/dist/learning-architecture.html'); await p.waitForSelector('.nav');
+  await p.goto('file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
   const inj = path.join(D, 'inject.js'); if (fs.existsSync(inj)) await p.evaluate(fs.readFileSync(inj, 'utf8'));
   const num0 = Math.max(100, ...fs.readdirSync(path.join(D, 'sheets')).map(f => +((f.match(/^sh(\d+)/) || [])[1] || 0)));
   await p.evaluate((NUM0) => {
@@ -55,14 +55,13 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   for (;;) {
     const cf = path.join(D, 'ctl', 'c' + (c + 1) + '.json');
     if (!fs.existsSync(cf)) { await wait(1000); continue; }
-    c++; let cmd = {}, res = {};
+    c++; let cmd = {}, res = {}; let before = null; const VALS = () => p.evaluate(() => [...document.querySelectorAll('#main input, #main textarea, #main select')].map((e, i) => [i, e.id || e.name || '', e.type === 'checkbox' || e.type === 'radio' ? String(e.checked) : String(e.value)]));
     try { cmd = JSON.parse(fs.readFileSync(cf, 'utf8')); } catch (e) { res.error = 'bad ctl json: ' + e.message; }
     try {
       if (cmd.eval0) res.eval0 = await p.evaluate(cmd.eval0);
       // files: [{name, type, path}] — real files from disk, sent with the message exactly like the paperclip or paste
       const fl = (cmd.files || []).map(f => ({ name: f.name || path.basename(f.path), type: f.type || 'application/octet-stream', b64: fs.readFileSync(f.path).toString('base64') }));
-      const VALS = () => p.evaluate(() => [...document.querySelectorAll('#main input, #main textarea, #main select')].map((e, i) => [i, e.id || e.name || '', e.type === 'checkbox' || e.type === 'radio' ? String(e.checked) : String(e.value)]));
-      const before = cmd.say == null ? await VALS().catch(() => []) : null;
+      before = cmd.say == null ? await VALS().catch(() => []) : null;
       if (cmd.say != null || fl.length) { await p.evaluate(async ([t, fl]) => { const pn = document.querySelector('.as-panel'); if (!pn || pn.hidden) APP.ASSIST.toggle(true);
         const files = fl.map(f => { const bin = atob(f.b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new File([u], f.name, { type: f.type }); });
         await APP.ASSIST.send(t || '', files); }, [cmd.say, fl]); }

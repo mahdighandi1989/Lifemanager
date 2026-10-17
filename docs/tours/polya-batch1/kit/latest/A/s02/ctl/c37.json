@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"ai\").map(m=>m.text))"}

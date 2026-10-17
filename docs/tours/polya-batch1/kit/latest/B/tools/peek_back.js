@@ -1,0 +1,3 @@
+(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const P=Object.values(R).filter(r=>r&&r.type==='eprob'&&r.live);const out=[];
+for(const r of P){const pid=r.p.id;APP.go('lprob',pid);await w(1200);out.push('## '+r.title+' closure='+JSON.stringify(APP.liveClosure(pid)));APP.go('lprob',pid,'back');await w(1500);const sel=document.querySelector('#lpBBest');out.push('sub='+APP.state.sub+' lpBBest='+(sel?[...sel.options].map(o=>o.textContent.slice(0,140)).join(' || '):'NONE'));out.push(document.getElementById('main').innerText.slice(0,1500));}
+return out.join('\n')})()

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\":\"+b.textContent.trim().slice(0,40));return b.join(\" | \").slice(0,2500)})()\n"}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvc0j5jfm4x\",\"back\");const s=document.getElementById(\"lpBBest\");return s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+APP.state.sub})()\n"}

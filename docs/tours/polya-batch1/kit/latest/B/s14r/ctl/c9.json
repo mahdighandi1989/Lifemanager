@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify(APP.MIND.phases().rows.map(r=>r.id+\":\"+r.k+\"/\"+r.n))"}

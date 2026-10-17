@@ -3,7 +3,7 @@ D=sys.argv[1]
 fs=sorted(glob.glob(D+'/out/s*.json'),key=lambda x:int(re.findall(r'\d+',os.path.basename(x))[0]))
 for f in reversed(fs):
     r=json.load(open(f)); e=r.get('eval')
-    if isinstance(e,str) and e.startswith('{"p":') and '"log"' in e: break
+    if isinstance(e,str) and e.startswith('{"p":'): break
 o=json.loads(e)
 for p in o['p']: print('PROB',p['id'],p.get('sess'),p.get('cr'),p['t'])
 for s in o['s']:
@@ -12,6 +12,7 @@ for s in o['s']:
 for f in reversed(fs):
     r=json.load(open(f)); e=r.get('eval')
     if isinstance(e,str) and e.startswith('[{"id":') and '"items"' in e: break
+else: e='[]'
 for p in json.loads(e):
     print('BEST',p['id'],p['t'],p['sub'])
     for b in (p['best'] or []): print('    opt',b)

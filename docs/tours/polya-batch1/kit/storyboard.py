@@ -87,7 +87,7 @@ def scen(d):
             % (sid, E(head), badge, E(who), ('<div class="plain">%s</div>' % E(plain).replace('\n', '<br>')) if plain else '', ''.join(cards)))
 
 
-secs = [scen(os.path.join(src, x)) for x in sorted(os.listdir(src)) if re.match(r's\d\d', x) and os.path.isdir(os.path.join(src, x))]
+secs = [scen(os.path.join(src, x)) for x in sorted(os.listdir(src)) if re.match(r's\d\d$', x) and os.path.isdir(os.path.join(src, x))]
 CSS = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'storyboard.css')).read()
 page = ('<title>%s</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap">\n<style>%s</style>\n'
