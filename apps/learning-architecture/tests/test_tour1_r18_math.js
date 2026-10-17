@@ -172,7 +172,7 @@ const of = (rc) => V.filter(e => e.rc === rc);
     ];
     KNOWN.forEach(k => { const m = k.re.exec(read(k.f)); chk(!!m && /toPlain/.test(m[0]), 'sinks (structural): ' + k.why + ' calls APP.MATH.toPlain — ' + (m ? m[0].slice(0, 200) : 'not found')); });
     // پویشِ کلی: هر سطری از a2x/a3x که خروجیِ liveChatQItems/liveChatQs را به option/select/title/textContent می‌دهد
-    const files = fs.readdirSync(SRC).filter(f => /^a\d+_.*\.js$/.test(f) && f !== 'a38_live.js');   // a38: چاه‌های خودش را سازندهٔ live می‌گذارد (DECISIONS_R18 «Plain sinks in a38 call APP.MATH.toPlain»)
+    const files = fs.readdirSync(SRC).filter(f => /^a\d+_.*\.js$/.test(f));   // a38 ادغام شد: چاه‌های آن هم از toPlain می‌گذرند
     const bad = [];
     files.forEach(f => read(f).split('\n').forEach((l, i) => { if (/(?:liveChatQItems|liveChatQs)\s*\(/.test(l) && !/A\.liveChatQ\w* = function/.test(l) && /option|select|textContent|title|toast|map\(/.test(l) && !/toPlain/.test(l)) bad.push(f + ':' + (i + 1) + ' ' + l.trim().slice(0, 160)); }));
     chk(!bad.length, 'sinks (structural): chat-text feeds into plain sinks without toPlain: ' + J(bad));
@@ -192,7 +192,8 @@ const of = (rc) => V.filter(e => e.rc === rc);
       return { items, opts: sel ? [...sel.options].map(o => o.textContent) : null };
     });
     info.sinks = r;
-    chk(r.items.some(t => /\$/.test(t)), 'sinks setup: the chat items carry the model\'s TeX (source) ' + J(r.items));
+    chk(r.items.some(t => /\$|p₁/.test(t)), 'sinks setup: the chat items carry the formula (raw TeX, or already plain since a38 passes its items through toPlain) ' + J(r.items));
+    chk(r.items.every(t => !/[$\\]/.test(t)), 'sinks a38: liveChatQItems text is plain (a38 sink passes toPlain) ' + J(r.items));
     chk(!!r.opts && r.opts.length >= 3 - (r.items.length < 2 ? 1 : 0), 'sinks setup: #lpRBest card shown ' + J(r));
     if (r.opts) {
       chk(r.opts.every(t => !/[$\\]/.test(t) && !/[a-z]_\d/.test(t)), 'sinks D·D7/A·X1: #lpRBest options are plain Unicode (no $, \\, _) ' + J(r.opts));
