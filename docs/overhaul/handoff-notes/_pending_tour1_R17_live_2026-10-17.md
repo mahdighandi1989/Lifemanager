@@ -9,8 +9,8 @@ coach and math fixers own them). Not done here: WORKLOG/PROGRESS/HANDBOOK, AUDIT
 - 203937fc `test(lla)`: new `tests/test_tour1_r17_live.js` + `tests/variants/VARIANTS_R17.json` (a byte copy of
   `tour1_polya/VARIANTS_R17.json`, so the gate does not depend on the scratchpad; `LLA_VARIANTS=<path>` points at another copy).
   Red on 14988f56: 65 failures (49 bank entries, close 2, guess 5, label 7, meta 1, rep 1).
-- (fix commit) `fix(lla)`: RC2 a–e, the rebuilt bundle, and the R16 expectations that R17 replaces.
-- (this note)
+- 96afbf19 `fix(lla)`: RC2 a–e, the rebuilt bundle, and the R16 expectations that R17 replaces.
+- 5f93abd6 (this note)
 
 ## Test (`tests/test_tour1_r17_live.js`, sections `close,meta,guess,label,rep` + the bank)
 Problems and sessions are written straight into the store in the shape the assistant writes them. Options are read from
