@@ -18,6 +18,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   const day = async (n) => { await p.evaluate(x => { window.__day = x; }, D(n)); };
   const go = async (v, a, s) => { await p.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await W(140); };
   const sel = async (s, v) => { await p.selectOption(s, v); await W(120); };
+  /* دورِ ۱۸ (RM1d/INF6، DECISIONS_R18): «✅ حل شد» با گامِ باز نتیجهٔ هر گام را می‌پرسد (دیگر خودکار «انجام نشد» نیست) — این آزمون «نمی‌دانم» می‌دهد (بی‌اثر بر کالیبراسیون) */
+  const closeSteps = async () => { const ids = await p.evaluate(() => [...document.querySelectorAll('main .lp-close .lp-closestep')].map(x => x.getAttribute('data-step'))); if (!ids.length) return;
+    for (const id of ids) { await p.selectOption('#lpXS_' + id, 'unk'); await p.waitForTimeout(120); }
+    if (!(await p.locator('main .lp-close .lp-closeaux, main .lp-close .lp-closeintu').count())) { await p.click('main .lp-closego'); await p.waitForTimeout(220); } };
   const click = async (s) => { await p.click(s); await W(160); };
   const txt = (s) => p.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent : ''; }, s);
   const has = (s) => p.locator(s).count();
@@ -256,7 +260,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await addMove('mv_equation', 'هر کمیت را با نماد می‌نویسم تا شرط معادله شود');
       await savePlan('نخست هر کمیت را برحسبِ b می‌نویسم سپس در محیط جای‌گذاری می‌کنم');
       await objStep('a = 2b و c = b + 2 پس 4b + 2 = 30 و b = 7', 'از داده‌ها و جای‌گذاری در محیط');
-      await click('main .lp-solved');
+      await click('main .lp-solved'); await closeSteps();
       await fillBack({ chk: 'ضلع‌ها ۷ و ۱۴ و ۹ شد و جمعشان ۳۰ است', newProb: 'چهارضلعی‌ای با محیطِ ۴۰ که هر ضلعش برحسبِ یک ضلع داده شده', share: 'form', map: 'ضلع‌های مثلث ⇐ ضلع‌های چهارضلعی، محیطِ ۳۰ ⇐ محیطِ ۴۰' });
       await setParts('yes'); await selIf('#lpBDefTo', 'c');
       await click('main .lp-lbsave');

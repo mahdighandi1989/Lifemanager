@@ -27,6 +27,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   const day = async (n) => { await p.evaluate(x => { window.__day = x; }, D(n)); };
   const go = async (v, a, s) => { await p.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await W(140); };
   const sel = async (s, v) => { await p.selectOption(s, v); await W(120); };
+  /* دورِ ۱۸ (RM1d/INF6، DECISIONS_R18): «✅ حل شد» با گامِ باز نتیجهٔ هر گام را می‌پرسد (دیگر خودکار «انجام نشد» نیست) — این آزمون «نمی‌دانم» می‌دهد (بی‌اثر بر کالیبراسیون) */
+  const closeSteps = async () => { const ids = await p.evaluate(() => [...document.querySelectorAll('main .lp-close .lp-closestep')].map(x => x.getAttribute('data-step'))); if (!ids.length) return;
+    for (const id of ids) { await p.selectOption('#lpXS_' + id, 'unk'); await p.waitForTimeout(120); }
+    if (!(await p.locator('main .lp-close .lp-closeaux, main .lp-close .lp-closeintu').count())) { await p.click('main .lp-closego'); await p.waitForTimeout(220); } };
   /* E5 (دورِ ۴): بازنگری هر بخشِ ثبت‌شدهٔ شرط را جدا می‌پرسد (lpBCP_*) — این جریان‌ها نتیجه‌ای می‌سازند که شرط را برآورده می‌کند؛ پیش از ثبتِ بازنگری «بله» */ const click = async (s) => { if (/lp-lbsave/.test(s)) await p.evaluate(() => document.querySelectorAll('select[id^="lpBCP_"]').forEach(x => { if (!x.value) { x.value = 'yes'; x.dispatchEvent(new Event('change', { bubbles: true })); } })); await p.click(s); await W(160); };
   const txt = (s) => p.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent : ''; }, s);
   const has = (s) => p.locator(s).count();
@@ -196,7 +200,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(sA.live.switches && sA.live.switches[0].to === 'new' && /میز/.test(sA.live.switches[0].why) && sA.live.steps.length === 2, '13: plan switch recorded with its reason ' + JSON.stringify(sA.live.switches));
     // ۱۲) بازنگری: فضایی + عملی + «کدام پرسش/ابزار/پرسشِ دستیار»
     await p.evaluate(pid => APP.S.put({ id: 'ach_t1', type: 'achat', lprob: pid, msgs: [{ role: 'user', text: 'کمک' }, { role: 'ai', text: 'خوب است. آیا از قطرِ فضای بار استفاده کردی؟' }] }), PA);
-    await click('main .lp-solved');
+    await click('main .lp-solved'); await closeSteps();
     info.lbA = await p.evaluate(() => ({ sym: !!document.getElementById('lpBSym'), units: !!document.getElementById('lpBUnits'), approx: !!document.getElementById('lpBApprox'), aside: (document.querySelector('main .lp-basides') || {}).textContent || '', opts: [...document.querySelectorAll('#lpBBest option')].map(o => o.value), tools: [...document.querySelectorAll('#lpBTool option')].map(o => o.value) }));
     chk(info.lbA.sym && info.lbA.units, '12: spatial look-back asks symmetry and units/dimensions explicitly');
     chk(info.lbA.approx && /رنگِ لوله/.test(info.lbA.aside), '12: practical look-back asks about approximation and what was left out');
@@ -284,7 +288,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     chk(/ثابتش کردی/.test(await txt('main .lp-win')), '17: a proven step is a small win');
     info.hookB = await hookText({ id: 'hB2', lprob: PB, msgs: [] }, 'گامِ بعد را چطور ببینم؟');
     chk(!/هیچ‌کس نمی‌داند/.test(info.hookB) && /پاسخِ عینی دارد/.test(info.hookB) && /روشن می‌بینی که این گام درست است؟/.test(info.hookB) && /داور: مسئلهٔ کامل‌بیان‌شده/.test(info.hookB), '1b: hook for an objective problem: no «nobody knows», step check from TQ.exec');
-    await click('main .lp-solved');
+    await click('main .lp-solved'); await closeSteps();
     chk(await has('#lpBHyp') === 1 && await has('#lpBConcl') === 1 && await has('main .lp-lb .lp-prov[data-prov="C164"]') === 1, '12: proof look-back asks «all hypotheses used? claimed vs rule conclusion?»; second-thoughts proverb');
     await noOverflow('proof look-back'); await bidi('proof look-back');
 
