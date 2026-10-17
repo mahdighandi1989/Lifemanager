@@ -44566,13 +44566,14 @@ APP.goFromURL = function (q) {
   }
   var COND_RE = /^(?:اگه|اگر|چنانچه|در\s*صورتی\s*که)(?=\s)/, PROG_RE = /(?:^|\s)(?:دارم|داریم)\s+(?:\S+\s+){0,2}ن?می[\s\u200c]?\S+/,
     OTHERP_RE = /(?:اون|آن|همون|همان)\s+مسئله|مسئله(?:[\s\u200c]?ی|ٔ)?\s+(?:قبلی|دیگه|دیگر|پیشین)/, ACK_W = ["باشه", "باشد", "اوکی", "اوکیه", "آره", "اره", "بله", "خب", "خوب", "حتما", "حتماً", "چشم", "ok"];
-  /* «چه شد» ِ مدل از حرفِ خودِ اوست؟ — عینِ آن (بی فاصله/نیم‌فاصله) یا دست‌کم سه‌پنجمِ واژه‌های معنادار و همهٔ عددهایش در پیامِ او */
+  /* «چه شد» ِ مدل از حرفِ خودِ اوست؟ — عینِ آن (بی فاصله/نیم‌فاصله)، یا همهٔ عددهایش و دست‌کم یک واژهٔ معنادارش (با ریشهٔ هم‌آغاز: «پخت» ~ «پختمش») در پیامِ او.
+     بازگفتِ مدل («پخت و خوب شد») پذیرفته است؛ ادعایی که هیچ پایه‌ای در پیامش ندارد («قبول کرد» برای «هنوز جواب نداده») نه. */
   function saidIn(w, t) {
     var a = nzq(w), b = nzq(t); if (a && b.indexOf(a) >= 0) return true;
     var nw = norm(w).match(/\d+(?:[.\/]\d+)?/g) || [], nt = norm(t).match(/\d+(?:[.\/]\d+)?/g) || [];
     if (!nw.every(function (n) { return nt.indexOf(n) >= 0; })) return false;
     var tw = toks(w), tt = toks(t); if (!tw.length) return !!nw.length;
-    return tw.filter(function (x) { return hit(x, tt); }).length * 5 >= tw.length * 3;
+    return tw.some(function (x) { return tt.some(function (y) { return y === x || (Math.min(x.length, y.length) >= 3 && (y.indexOf(x) === 0 || x.indexOf(y) === 0)); }); });
   }
   A.liveStepReport = function (pid, rep, sess) {
     var r = rec(pid); if (!r) return "مسئله نیست";
