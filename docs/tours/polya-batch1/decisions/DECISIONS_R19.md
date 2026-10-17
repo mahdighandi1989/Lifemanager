@@ -83,3 +83,13 @@ Each: red-first tests from the runners' quotes + the VARIANT BANK `tour1_polya/V
 who never sees the code; wait for it if absent) + controls (all r10–r18 tests and VARIANTS_R18 green). build.py; the whole page suite;
 before the final commit merge the integration branch head; handoff note `_pending_tour1_R19_<name>_2026-10-17.md`; quarantine, never
 delete (REMOVAL_CANDIDATES).
+
+## Addendum (owner question 2026-10-17) — correcting an earlier message, for round 20
+Today there is no correction path: the model sees the whole chat and memory, so it can follow «اشتباه گفتم، منظورم … بود» in
+conversation, but what the page already stored from the wrong message (validated guess/plan/step/said/ans, promises, mind-card events,
+forms filled by assistant actions, live-problem fields) is not reversed — validation only checks that the quoted text occurs in a
+user message, and the wrong message still does. Round 20 builds INF15: coach_state.retract {msg, what, fix} reported by the model when
+the user corrects an earlier message (any distance back); the page validates (the cited message is hers, the current message corrects
+it) and reverses every record derived from that message (records carry their source message id — RN2e act ids), applies the fix, and
+says what it changed. Mind card: a self-corrected slip is not a failure (self-correction is look-back evidence). Plus «✏️ اصلاح» on her
+own bubbles. Variant bank + runner probes «correct 1, 2, 3 turns back».
