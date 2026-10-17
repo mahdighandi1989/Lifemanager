@@ -8,7 +8,8 @@
 //  multi   L5: پرسشِ نوبتِ چندجمله‌ایِ صفحه («حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟») یک گزینه است — با پیش‌درآمد،
 //          بی سرِ «حدسی گفتی —»، و در #lpBBest (s02 c18، s11 c33/c37، s01 c39)
 //  strict  L2: بلوکِ زندهٔ خامِ a38 (پیش از پالایهٔ مربی) و بلوکِ نهاییِ پرامپت: هر سطری که «؟» یا «بپرس» دارد یا سطرِ پرسشِ نوبت است یا «زمینه (نه پرسشِ دوم)»؛
-//          قابِ مسئلهٔ عینی پرسشِ «روشن می‌بینی…؟ می‌توانی ثابت کنی؟» را بی‌نشان نمی‌آورد؛ سطرِ کتاب («به تعریف‌ها برگرد»، …) زمینه است
+//          قابِ مسئلهٔ عینی پرسشِ «روشن می‌بینی…؟ می‌توانی ثابت کنی؟» را بی‌نشان نمی‌آورد؛ سطرِ کتاب («به تعریف‌ها برگرد»، …) زمینه است؛
+//          سطرِ «# امروز» ِ a26 («… یک بار بپرس») هم زمینه است
 // همه از رابطِ واقعی (پنجرهٔ دستیار با مدلِ بدل، فرم‌های «🔭»)؛ خطا ⇒ کدِ خروجِ غیرصفر. LLA_FILE = ساختِ دیگر (خطِ قرمز: ساختِ 53d0fc6)؛ ONLY=whole,multi.
 const { chromium } = require('playwright');
 const path = require('path');
@@ -226,6 +227,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(!!r.frame && !/[؟?]/.test(r.frame), 'strict: a38\'s objective frame line carries no unmarked question (L2, a38 ~3014) ' + JSON.stringify(r.frame));
     r.book = raws.map(x => (/^- [^\n]*از کتاب برای همین مرحله[^\n]*/m.exec(x.bl) || [''])[0]).filter(Boolean).map(l => l.slice(0, 90));
     chk(r.book.length >= 1 && r.book.every(l => CTX_RE.test(l)), 'strict: the book line («پارادوکسِ مخترع · به تعریف‌ها برگرد …») is «زمینه (نه پرسشِ دوم)», a candidate, not a directive beside the turn question (L2) ' + JSON.stringify(r.book));
+    // a26 (سویِ زنده): بلوکِ «# امروز» ِ پرامپت دستورِ پرسشِ دوم ندارد (L2 — کلِ پرامپت)
+    r.today = (block(await lastUser(), '# امروز').split('\n')[1] || '').slice(0, 200);
+    chk(!!r.today && !/بپرس(?![آ-ی])/.test(r.today), 'strict: the a26 «# امروز» line has no unmarked «بپرس» — the date check is a candidate for the turn question, not a second one (L2, whole prompt) ' + JSON.stringify(r.today));
     chk(finals.every(x => !x.bl.split('\n').some(l => A27_DROP.test(l))), 'strict: the a38 stage-proverb line never reaches the final prompt (the coach filters it) ' + JSON.stringify(finals.map(x => x.tag)));
   });
 
