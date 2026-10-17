@@ -5,9 +5,9 @@ Scope (DECISIONS_R18 «Fixers / coach»): RM1 a b c e, RM4 b (coach_state side) 
 Files changed:
 - `apps/learning-architecture/src/app/a27_tour.js` (coach), `a29_mind.js` (mind card), `a26_assist.js` (only the bubble renderer: `richNodes` for «**…**»), rebuilt bundle.
 - Tests: new `tests/test_tour1_r18_coach.js` + `tests/tour1_variants_r18_coach.js` (the coach mechanisms of VARIANTS_R18.json, 124 entries; named `_coach` so it cannot collide with the other fixers' bank files); `tests/test_tour1_mind_factory.js` updated to RM1c (old assertion «no data ⇒ ½ and ¼ for each phase» contradicted DECISIONS_R18).
-- `docs/overhaul/REMOVAL_CANDIDATES.md` (quarantine entry), `apps/learning-architecture/docs/WORKLOG.md` (68).
+- `docs/overhaul/REMOVAL_CANDIDATES.md` (quarantine entry), `apps/learning-architecture/docs/WORKLOG.md` (70), `PROGRESS.md` row 87.
 
-Not touched: a38, a39. Not done here: PROGRESS row (the WORKLOG entry is marked «بی‌اثر بر نمودار»; the main session should add ONE round-18 PROGRESS row after merging the three fixers and drop that marker), HANDBOOK, AUDIT_LOG, experiences, push, merge.
+Not touched: a38, a39. Not done here: HANDBOOK, AUDIT_LOG, experiences, push, merge to main.
 
 ## Items
 
@@ -31,7 +31,16 @@ Not touched: a38, a39. Not done here: PROGRESS row (the WORKLOG entry is marked 
 | RM2d | a26 `richNodes`: «**…**» in assistant bubbles ⇒ `<strong>` (math/bidi inside each piece); user text untouched. |
 | docs | `# گزارشِ وضع` documents `when:"next-session"`, `same`, `on_guess`, `plan_done`, `guess.q` as context. |
 
-Quarantined (reachable via `APP.ASSIST.R17_QUARANTINE`): `planSeen`, `plan`, `regSigns`, `guessMsg`.
+Quarantined (reachable via `APP.ASSIST.R17_QUARANTINE`): `planSeen`, `plan`, `regSigns`, `guessMsg`, `chkWindow`.
+
+## Live fixer's contract (after merging bfc81b98)
+- `m.guess = {text, q}` — done (RM4b).
+- `coach_state.step {step, done, what?, match?}` ⇒ `APP.liveStepReport(pid, {…, msg: <1-based index of her current message unless given>}, s.id)`; pid = the session's bound live problem (or `s.lprob`). Documented in «# گزارشِ وضع». Test `step`.
+- RM6e (a27 side): `chkWindow` starts at the first user message that states the problem (else the record's creation time in this session); `sameStmt` counts distinct tokens. Test `rm6e` (s31 shape: a later message with repeated variants no longer pushes the window past her check messages).
+- INF7 for `#lpRBest`: «پیامِ کامل» button + `.lp-rfull` box, source `APP.liveChatQItems(pid)[i].src`. Test `inf7`.
+- a38's toPlain on chatItems/stored bestQ and the math fixer's `lbOpts` toPlain kept as merged.
+- Old tests updated to RM6c: `test_tour1_r5_coach.js` (F1 s18 bare «پس v = …», s37), `test_tour1_r6_coach.js` (G3 s38 phase, G4 «پس فقط ۳», G4 head «پس ۵۵ دقیقه») — each now expects «no phase jump; offer line or the model's report».
+- Docs renumbered after the merge: WORKLOG (70), PROGRESS row 87.
 
 ## Variant bank results (VARIANTS_R18, coach mechanisms) — all pass on the fix, red on 204585c1
 - RM1.evidence 19/19 · RM4.guess 16/16 (coach side) · RM5.plan 20/20 · RM5.defer 17/17 · RM6.register 19/19 · RM6.result 16/16 · RM6.leak 17/17 (scanner self-test).

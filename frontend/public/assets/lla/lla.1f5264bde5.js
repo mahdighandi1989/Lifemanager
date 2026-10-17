@@ -37066,7 +37066,9 @@ APP.goFromURL = function (q) {
     return !!C.teach;
   }
   AS.coachTeach = teachMode;
-  function sameStmt(a, b) { var ta = qToks(a), tb = qToks(b); if (ta.length < 3 || tb.length < 3) return false; var n = ta.filter(function (w) { return tb.indexOf(w) >= 0; }).length; return n * 5 >= Math.min(ta.length, tb.length) * 3; }
+  /* تورِ پولیا (RM6e، D·D3 s31): واژه‌های متمایز شمرده می‌شوند — تکرارِ یک واژه در متنِ کوتاه‌تر «همان صورت» را نمی‌سازد */
+  function uniqT(L) { return L.filter(function (w, i) { return L.indexOf(w) === i; }); }
+  function sameStmt(a, b) { var ta = uniqT(qToks(a)), tb = uniqT(qToks(b)); if (ta.length < 3 || tb.length < 3) return false; var n = ta.filter(function (w) { return tb.indexOf(w) >= 0; }).length; return n * 5 >= Math.min(ta.length, tb.length) * 3; }
   function inheritPhase(s, mt) {
     var best = null;
     S.all("achat", function (x) { return x && x.id !== s.id && x.coach && x.coach.ph && x.coach.stmt; }).forEach(function (x) {
@@ -37621,10 +37623,20 @@ APP.goFromURL = function (q) {
     var m = lbMissing(pid); if (!m) return null; var x = m.x, both = m.miss.length > 1, opts = m.miss.indexOf("best") >= 0 ? lbOpts(pid) : [];
     var sel = opts.length ? h("select", { id: "lpRBest", "aria-label": LB_BEST_Q }, h("option", { value: "" }, "— انتخاب کن —"), opts.map(function (t, i) { return h("option", { value: String(i) }, clip(t, 160)); }), h("option", { value: "none" }, "هیچ‌کدام بیشتر از بقیه")) : null;
     var ta = m.miss.indexOf("taste") >= 0 ? h("textarea", { id: "lpRTaste", rows: "2", placeholder: "به حرفِ خودت" }) : null;
+    /* INF7 (A ارتقای ۳ s01): «پیامِ کامل» کنارِ فهرست — پیامِ کاملِ دستیار که گزینهٔ برگزیده از آن آمد (همان منبعِ a38: A.liveChatQItems(pid)[i].src) */
+    var full = sel ? h("div", { class: "card soft small lp-rfull", dir: "rtl", hidden: true }) : null;
+    var showFull = function () { if (!full) return; var v = sel.value, I = []; try { I = A.liveChatQItems ? A.liveChatQItems(pid) : []; } catch (e) { }
+      var e0 = /^\d+$/.test(v) ? I.filter(function (x) { return x && x.t; })[+v] : null; full.innerHTML = "";
+      if (!e0 || !e0.src || !String(e0.src.text || "").trim()) { full.appendChild(h("p", {}, "اول یکی از پرسش‌ها را از فهرست برگزین — پیامِ کاملش این‌جا می‌آید.")); full.hidden = false; return; }
+      var body = h("div", { class: "lp-rfulltext", style: { whiteSpace: "pre-wrap" } });
+      (A.MATH && A.MATH.nodes ? A.MATH.nodes(e0.src.text) : [e0.src.text]).forEach(function (n) { body.appendChild(typeof n === "string" ? document.createTextNode(n) : n); });
+      full.appendChild(h("p", { class: "muted" }, "پیامِ کاملِ دستیار" + (e0.src.at && A.fdate ? " (" + A.fdate(String(e0.src.at).slice(0, 10)) + ")" : "") + ":")); full.appendChild(body); full.hidden = false; };
+    if (sel) sel.addEventListener("change", function () { if (!full.hidden) showFull(); });
     return h("div", { class: "card soft lp-lbrest", dir: "rtl" },
       h("strong", {}, both ? "بازنگری: دو پرسشِ باقی‌مانده" : "بازنگری: یک پرسشِ باقی‌مانده"),
       h("p", { class: "small muted" }, "این مسئله در گفت‌وگو بسته شد؛ " + (both ? "این دو پرسشِ بازنگری" : "این پرسشِ بازنگری") + " هنوز پاسخ نگرفته — " + (both ? "همان‌ها که" : "همان که") + " بازنگریِ صفحه هم می‌پرسد."),
       sel ? h("label", { for: "lpRBest", class: "small" }, LB_BEST_Q) : null, sel,
+      sel ? h("div", { class: "row gap wrap" }, h("button", { class: "btn ghost sm lp-rfullbtn", type: "button", onclick: function () { if (!full.hidden && full.getAttribute("data-for") === sel.value) { full.hidden = true; return; } full.setAttribute("data-for", sel.value); showFull(); } }, "پیامِ کامل")) : null, full,
       ta ? h("label", { for: "lpRTaste", class: "small" }, LB_TASTE_Q + " (سلیقه و خطِ کارِ خودت را بشناس، C120)") : null, ta,
       h("button", { class: "btn sm lp-lbrest-save", type: "button", onclick: function () {
         var o = {}, bad = [];
@@ -37852,10 +37864,18 @@ APP.goFromURL = function (q) {
     return "؛ حدست («" + clip(g, 60) + "») حدسِ همان مسئله ثبت شد — هنوز حدس است تا بیازمایی‌اش";
   }
   /* RC4: پیام‌های وارسی — فقط پیام‌های کاربر در همین سشن، از پیامی که صورتِ همین مسئله را آورد به بعد؛ پیامی که «جواب» ِ دیگری را وارسی کرد پذیرفته نیست */
-  function chkWindow(s, st) {
+  /* قرنطینه (RM6e — REMOVAL_CANDIDATES): پنجره از **آخرین** پیامی که شبیهِ صورت بود — پیامِ بعدیِ «سه تا ساختم…» با گونه‌های مسئله پنجره را پس از پیام‌های وارسی برد (s31) */
+  function chkWindowR17(s, st) {
     var M = ((s && s.msgs) || []).filter(isUser), i0 = 0;
     if (st) for (var i = M.length - 1; i >= 0; i--) { var t = M[i].text; if (quoteIn(st, t) || sameStmt(t, st)) { i0 = i; break; } }
     return M.slice(i0);
+  }
+  /* RM6e: پنجره از پیامی که مسئله را آورد (نخستین پیامِ کاربر با همین صورت؛ اگر نبود، از ساختِ رکوردِ مسئله در همین سشن) */
+  function chkWindow(s, st, rec) {
+    var M = ((s && s.msgs) || []).filter(isUser), i0 = -1;
+    if (st) for (var i = 0; i < M.length; i++) { var t = M[i].text; if (quoteIn(st, t) || sameStmt(t, st)) { i0 = i; break; } }
+    if (i0 < 0 && rec && rec.created && s && rec.sess === s.id) { var c0 = String(rec.created); for (var j = 0; j < M.length; j++) if (String(M[j].at || "") >= c0) { i0 = j; break; } }
+    return M.slice(Math.max(0, i0));
   }
   function chkMsgsOk(s, msgs, st, sol) {
     var W = chkWindow(s, st), all = ((s && s.msgs) || []).filter(isUser), out = [];
@@ -37887,7 +37907,7 @@ APP.goFromURL = function (q) {
   function chkLate(s, ok) {
     var mine = chatClosed().filter(function (x) { return (x.L.chat || {}).sess === s.id; }).pop(); if (!mine || !ok.length) return;
     var b = mine.b; if (b.verdict === "verified") return;
-    var W = chkWindow(s, mine.r.p.statement), ok2 = ok.filter(function (m) { return W.indexOf(m) >= 0; }); if (!ok2.length) return;
+    var W = chkWindow(s, mine.r.p.statement, mine.r), ok2 = ok.filter(function (m) { return W.indexOf(m) >= 0; }); if (!ok2.length) return;
     b.verdict = "verified"; b.chkRes = "نتیجه سالم ماند"; b.chkBy = "msgs"; b.chkMsgs = ok2.map(function (m) { return clip(m.text, 160); }); S.put(mine.pg);
   }
   /* RC5: پرسش‌های بازنگری که خودِ دستیار پرسید (هر صورتی از آن) — جملهٔ پرسشی (با «؟») در پیامِ دستیار */
@@ -37947,6 +37967,11 @@ APP.goFromURL = function (q) {
       if (C.dupPend && C.dupPend.key === key) guessToProblem(s, C.dupPend.pid, gt);
       /* RM4c (C·W6 s24): حدسِ سنجیده دربارهٔ مسئلهٔ زندهٔ بازی که سشن به آن بسته است ⇒ حدسِ همان مسئله (solve.g)، مثلِ مسیرِ chat_invent؛ حدسِ موجودِ صفحه دست نمی‌خورد */
       else { var bl18 = AS.boundLive(s); if (bl18 && !bl18.done && bl18.pid) guessToProblem(s, bl18.pid, gt); } }
+    /* step {step, done, what?, match?} — نتیجهٔ گامِ مسئلهٔ زنده‌ای که در گفت‌وگو گزارش کرد ⇒ A.liveStepReport (a38 می‌سنجد: گامِ باز از همین مسئله، پیامِ خودِ کاربر،
+       نه قصدِ آینده)؛ پیام = همین پیامِ کاربر (شمارهٔ ۱‌پایه) مگر مدل نقلِ عینیِ پیامِ دیگری را داد */
+    if (a.step && typeof a.step === "object" && A.liveStepReport) { var bl19 = AS.boundLive(s), spid = (bl19 && bl19.pid) || s.lprob || "";
+      if (spid) { var nU = (s.msgs || []).filter(function (m) { return m && m.role === "user"; }).length, so19 = Object.assign({}, a.step); if (so19.msg == null || so19.msg === "") so19.msg = nU;
+        try { C.stepRep = { key: key, res: String(A.liveStepReport(spid, so19, s.id) || "") }; } catch (e) { } } }
     // check {msgs:[…]}
     var ck = a.check && typeof a.check === "object" ? a.check.msgs : null;
     if (Array.isArray(ck)) { var mine = chatClosed().filter(function (x) { return (x.L.chat || {}).sess === s.id; }).pop();
@@ -37992,7 +38017,7 @@ APP.goFromURL = function (q) {
   /* سطرِ «گزارشِ وضع ِ همه‌جا»: فیلدهای تازهٔ coach_state در هر نوبت (نه فقط مربی) — در قلاب، نه SYS */
   var STATE_X = "# گزارشِ وضع (همهٔ نوبت‌ها)\n" + CTX17 + "در actions یک {\"do\":\"coach_state\",…} با این فیلدها بده — هر کدام **فقط** وقتی در آخرین پیامِ کاربر هست، و متن را عیناً از حرفِ خودش نقل کن (صفحه با پیامش می‌سنجد؛ نقلِ ساختگی رد می‌شود): " +
     "plan {\"text\":\"…\",\"when\":\"YYYY-MM-DD\"} = کاری که خودش از این پس قصد دارد بکند با زمانش (نه گلایه از عادت، نه موعدی که زیرش است، نه گفتهٔ دیگری)؛ قولِ بی‌تاریخ به خودش («دیگه … نمی‌کنم»، «از این به بعد …») ⇒ \"when\":\"next-session\"؛ اگر همان برنامهٔ پیشین را دوباره گفت ⇒ \"same\":\"plN\"؛ اگر آن کار بر حدسی تکیه دارد که هنوز نیازموده ⇒ \"on_guess\":true؛ plan_done {\"id\":\"plN\",\"done\":true|false} = وقتی خودش گفت برنامه‌اش را انجام داد یا نداد؛ defer {\"what\":\"…\"} = آنچه خودش از تو خواست و تو در همین پاسخ عقب انداختی (نه پرسشِ خودت، نه آنچه همین حالا دادی)؛ " +
-    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن.";
+    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده).";
   AS.COACH_STATE_X = STATE_X;
   AS.promptFilters.push(function (outs, s, msg) {
     var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt);
@@ -38126,7 +38151,7 @@ APP.goFromURL = function (q) {
   function guessMsgR17(s, gt) { for (var gi = (s.msgs || []).length - 1; gi >= 0; gi--) if (s.msgs[gi] && s.msgs[gi].role === "ai") { s.msgs[gi].guess = { text: clip(gt, 300) }; break; } }
   function planR17(s, a, ut, key, at) { var pt = txtOf(a.plan); if (pt && quoteIn(pt, ut)) { var w = a.plan && a.plan.when, td = A.today(), when = realDate(w) && w >= td ? w : planDate(pt);
     var PL = s.plans = s.plans || []; if (!PL.some(function (x) { return qNorm(x.text) === qNorm(pt); })) PL.push({ id: "pl" + (PL.length + 1), text: clip(pt, 300), when: when, at: at, key: key, done: false }); } }
-  AS.R17_QUARANTINE = { planSeen: planSeenR17, plan: planR17, regSigns: regSignsR17, guessMsg: guessMsgR17 };
+  AS.R17_QUARANTINE = { planSeen: planSeenR17, plan: planR17, regSigns: regSignsR17, guessMsg: guessMsgR17, chkWindow: chkWindowR17 };
 
   AS.tourKinds = KIND;
   AS.tourSyncReminder = syncReminder;

@@ -420,8 +420,43 @@ function devScan(sys, user) {
   // ================= docx =================
   await section('docx', async () => {
     const X = await p.evaluate(() => APP.ASSIST.COACH_STATE_X || '');
-    ['next-session', '"same"', 'on_guess', 'plan_done', '"q"'].forEach(f => chk(X.indexOf(f.replace(/"/g, '\\"')) >= 0 || X.indexOf(f) >= 0, 'docx: «# گزارشِ وضع» documents the new field ' + f));
+    ['next-session', '"same"', 'on_guess', 'plan_done', '"q"', 'step {'].forEach(f => chk(X.indexOf(f.replace(/"/g, '\\"')) >= 0 || X.indexOf(f) >= 0, 'docx: «# گزارشِ وضع» documents the new field ' + f));
     chk(/^# گزارشِ وضع/.test(X) && /\n- زمینه \(نه پرسشِ دوم\)/.test(X), 'docx: the state block is context, not a second question');
+  });
+
+  // ================= rm6e — پنجرهٔ وارسی از پیامِ صورتِ مسئله؛ sameStmt با واژه‌های متمایز (D·D3 s31) =================
+  await section('rm6e', async () => {
+    await wipe(); await fresh(); const ST = 'دنبالهٔ a_n = (10/n)^(n/2) را در نظر بگیر: آیا همگراست و حدش چیست؟';
+    await turn(ST, 'خودت؟');
+    await turn('n=5 رو گذاشتم و جمله‌ها رو حساب کردم.', 'خب.');
+    await turn('مثبت بودنِ جمله‌ها رو هم چک کردم، همه‌شون مثبتن.', 'خب.');
+    await turn('سه تا ساختم: دنباله (10/n)^n، دنباله (10/n)^(n/2) و دنباله (10/n)^(n+1) — همگراست و حدش صفره، دنباله دنباله دنباله.', 'ثبت شد.',
+      [{ do: 'chat_solved', title: 'همگراییِ (10/n)^(n/2)', statement: ST, kind: 'find', lesson: 'حالت‌های خاص را جدا بسنجم', check: 'n=5 و مثبت بودن' }, cs({ check: { msgs: ['n=5 رو گذاشتم', 'مثبت بودنِ جمله‌ها رو هم چک کردم'] } })]);
+    const v = await p.evaluate(() => { const pid = __pid('همگراییِ'); return APP.liveClosure(pid).verdict; });
+    chk(v === 'verified', 's31 (D·D3): the check window starts at the message that stated the problem; a later look-alike message (variants, repeated tokens) does not push it past her check messages ' + v);
+  });
+  // ================= step — گزارشِ گامِ مسئلهٔ زنده از گفت‌وگو ⇒ A.liveStepReport =================
+  await section('step', async () => {
+    await wipe(); await fresh();
+    await turn('آره ثبتش کن.', 'ثبت شد.', [{ do: 'live_new', title: 'نانِ فردا', statement: 'نانِ خانگیِ اول را چطور بپزم که خمیرش بیاید؟', nat: 'practical' }]);
+    const pid = await p.evaluate(() => __pid('نانِ فردا'));
+    await p.evaluate(pid => __liveSet(pid, (so, L) => { L.steps.push({ id: 'st1', at: new Date().toISOString(), text: 'خمیر را دو ساعت گرم نگه دارم', pred: 'ور می‌آید', due: APP.today() }); }), pid);
+    await turn('خمیر رو دو ساعت گرم نگه داشتم، خوب ور اومد!', 'آفرین.', [cs({ step: { step: 1, done: 'yes', match: 'yes' } })]);
+    const r1 = await p.evaluate(pid => { const st = APP.S.get('eprog_' + pid).solve.live.steps[0]; return st.chatRep || null; }, pid);
+    await turn('فردا هم نونِ دوم رو می‌پزم.', 'باشه.', [cs({ step: { step: 1, done: 'yes' } })]);
+    chk(r1 && r1.done === 'yes' && /ور اومد/.test(r1.msg), 'step: a coach_state.step about the focused live problem reaches A.liveStepReport (validated there) with her own message ' + JSON.stringify(r1));
+  });
+  // ================= inf7 — «پیامِ کامل» کنارِ #lpRBest =================
+  await section('inf7', async () => {
+    await wipe(); await fresh(); const st = 'معما: با چند بار وزن کردن سکهٔ سبک را از ۱۲ سکه پیدا کن.';
+    await turn(st, 'حالا پیش از گامِ واقعی با گزینهٔ ج: چه پیش‌بینی می‌کنی و چقدر مطمئنی؟');
+    await turn('سه‌تا سه‌تا تقسیم کردم و سه بار بس است. درسم: سه‌تایی تقسیم کنم.', 'درست ثبت شد.', [{ do: 'chat_solved', title: 'دوازده سکه', statement: st, kind: 'find', lesson: 'سه‌تایی تقسیم کنم', check: 'شمردم' }]);
+    const pid = await p.evaluate(() => __pid('دوازده سکه'));
+    const r = await p.evaluate(async pid => { APP.go('lprob', pid); await new Promise(r => setTimeout(r, 300)); const sel = document.querySelector('#main #lpRBest'), btn = document.querySelector('#main .lp-rfullbtn');
+      if (!sel || !btn) return { sel: !!sel, btn: !!btn }; sel.value = '0'; sel.dispatchEvent(new Event('change')); btn.click(); await new Promise(r => setTimeout(r, 50));
+      const f = document.querySelector('#main .lp-rfull'); return { sel: true, btn: true, shown: f && !f.hidden, txt: f ? f.textContent : '' }; }, pid);
+    await p.evaluate(() => APP.go('home'));
+    chk(r.btn && r.shown && /گزینهٔ ج/.test(r.txt), 'INF7: «پیامِ کامل» next to #lpRBest shows the full assistant message of the chosen option ' + JSON.stringify(r).slice(0, 300));
   });
 
   // ================= strict =================
