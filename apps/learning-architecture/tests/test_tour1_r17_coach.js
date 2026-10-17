@@ -374,7 +374,7 @@ function modalityConflicts(text) {
     u = await turn('بعدی؟');
     T('neg4 P2 best is its own (asked now)', bestTurn(u.user) && turnLines(u.user).some(l => /ظرف‌های ۳ و ۵/.test(l)), turnLines(u.user));
     // neg5 — بازگفتِ دیروز، نه پرسش
-    pid = await closeOne('ساعت شنی ۱۳', '', 'ثبت شد. دیروز پرسیده بودم کدوم پرسش کمک کرد و گفتی حالت خاص؛ امروز بریم سراغ تمرین بعدی.'); u = await turn('باشه.');
+    pid = await closeOne('ساعت شنی ۱۳', '', 'ثبت شد. دیروز پرسیده بودم کدوم پرسش کمک کرد و گفتی حالت خاص؛ امروز بریم سراغ تمرین بعدی.'); u = await turn('خب، تمرینِ بعدی چیه؟');
     T('neg5 a recap is not an ask', bestTurn(u.user) && (await miss(pid)).includes('best'), turnLines(u.user));
     // neg6 — تشکر، نه پاسخ
     pid = await closeOne('ساعت شنی ۱۴', '', 'ثبت شد. کدوم پرسش بیشتر کمکت کرد؟'); u = await turn('خیلی کمکم کردی، مرسی!');
