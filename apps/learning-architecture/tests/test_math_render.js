@@ -55,6 +55,10 @@ const SHOT = process.env.SHOT_DIR || os.tmpdir();
       ['«x^2+1» را عامل کن', 'math(mrow(msup(mi:x,mn:2),mo:+,mn:1))', '«» را عامل کن'],
       ['(یعنی x^2)', 'math(msup(mi:x,mn:2))', '(یعنی )'],
       ['$\\text{مساحت} = \\pi r^2$', 'math(mrow(mtext:مساحت,mo:=,mi:π,msup(mi:r,mn:2)))', ''],
+      // دورِ ۱۸ (DECISIONS_R18 RM2b/c، B·D10 s18): «²» ِ تایپ‌شده و dV/dt حالا ریاضی‌اند (در دورِ ۱۷ این دو در فهرستِ «متن می‌ماند» بودند —
+      // تصمیمِ دورِ ۱۸ جای آن را گرفت: همان dV/dt در یک پیام یک‌جا کسر و جای دیگر متن بود)
+      ['dV/dt = (πy²/9)·dy/dt', 'math(mrow(mfrac(mrow(mi:d,mi:V),mrow(mi:d,mi:t)),mo:=,mrow(mo:(,mfrac(mrow(mi:π,msup(mi:y,mn:2)),mn:9),mo:)),mo:⋅,mfrac(mrow(mi:d,mi:y),mrow(mi:d,mi:t))))', ''],
+      ['x² + 1', 'math(mrow(msup(mi:x,mn:2),mo:+,mn:1))', ''],
     ];
     info.render = await p.evaluate((C) => C.map(([t, want, outside]) => {
       const d = __r(t), m = d.querySelector('math'), bd = m && m.parentElement;
@@ -71,7 +75,7 @@ const SHOT = process.env.SHOT_DIR || os.tmpdir();
 
   await section('plain', async () => {
     const P = ['۳۰ پله را در ۴۰ ثانیه بالا رفتم', '۴۰ درصد از کل', 'سهمِ او 40% است', 'تاریخ ۱۴۰۲/۰۵/۱۲ بود', '1402/05/12', 'فایلِ file_name.txt را ببین',
-      'نشانی https://example.com/a_b?x=1 است', 'قیمت $5 and $10 است', '$\\foo{x}$ ناشناخته', 'dV/dt = (πy²/9)·dy/dt', 'x² + 1', 'سلام، چطوری؟', 'Pólya گفت: understand the problem',
+      'نشانی https://example.com/a_b?x=1 است', 'قیمت $5 and $10 است', '$\\foo{x}$ ناشناخته', 'سلام، چطوری؟', 'Pólya گفت: understand the problem',
       'n = ۳۰ و k = 2', '$x^ $', 'C:\\Users\\me', 'a/b'];
     info.plain = await p.evaluate((P) => P.map(t => { const d = __r(t); return { t, math: d.querySelectorAll('math').length, same: d.textContent === t, html: APP.MATH.has(t) }; }), P);
     info.plain.forEach(r => chk(r.math === 0 && r.same && !r.html, 'plain text stays text: ' + JSON.stringify(r)));
