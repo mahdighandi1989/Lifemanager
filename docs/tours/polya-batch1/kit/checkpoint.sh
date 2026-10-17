@@ -25,5 +25,5 @@ for r in "$T"/round*/; do rn=$(basename "$r"); for sd in "$r"s[0-9][0-9]*/; do [
 echo "$last" > "$D"/kit/latest/ROUND
 cp "$SP"/harness5.js "$SP"/storyboard.py "$SP"/storyboard.css "$SP"/savehb.py "$SP"/gate_wt.sh "$SP"/resolve_bundle.sh "$SP"/checkpoint.sh "$D"/kit/
 # never commit the owner's address
-grep -rlI "mohamad.mahdi1988@gmail.com" "$D" | xargs -r sed -i 's/mohamad\.mahdi1988@gmail\.com/<owner-email>/g'
+grep -rlI "<owner-email>" "$D" | xargs -r sed -i 's/mohamad\.mahdi1988@gmail\.com/<owner-email>/g'
 du -sh "$D"
