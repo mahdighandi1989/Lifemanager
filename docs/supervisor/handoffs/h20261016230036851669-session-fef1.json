@@ -12,5 +12,11 @@
  "what": "تورِ پولیا دورِ ۱۱ (K8): cues_fa برای sc_negotiation در s_social.json (فقط روی صورت/مجهولِ خودِ مسئله) + a28 knowledge(extra)؛ نامِ داخلِ پرانتز نامِ متمایز نیست (ثانیه)",
  "procedure": "AGENTS.md: قلمرو از registry؛ قاعدهٔ E6 بی‌تغییر",
  "commit": "10cd5a1",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-17T03:56:45Z",
+  "note": "بسنجیده: JSON معتبر؛ test_graph و test_mind_report «NO ERRORS»؛ pytest دست‌به‌دست/مالکیت/دفترچه سبز؛ تغییر فقط داده/ثبت‌گاه است",
+  "commit": ""
+ }
 }
