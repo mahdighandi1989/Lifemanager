@@ -46052,6 +46052,7 @@ APP.goFromURL = function (q) {
   var BB = { R: "ℝ", N: "ℕ", Z: "ℤ", Q: "ℚ", C: "ℂ", P: "ℙ" };
   var ACC = { overline: "¯", bar: "¯", hat: "^", vec: "→", tilde: "~", dot: "˙" };
   var USUP = { "²": "2", "³": "3", "¹": "1", "⁰": "0", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "ⁿ": "n" };
+  var USUB = { "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4", "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9" };   // دورِ ۱۹ (RN4d): «a₁ + a₂ + …»
   var AOPS = [["<=", "≤"], [">=", "≥"], ["!=", "≠"], ["->", "→"], ["=>", "⇒"], ["+-", "±"], ["...", "…"]];
   var OPCH = "+-−=<>≤≥≠×·⋅÷±∓→←↔⇒⇐⇔≈≡∼∈∉⊂⊆∪∩,;:!/%…⋯∘|*∣∖∠⊥∥°";
   var CLOSE = { "(": ")", "[": "]", "{": "}" };
@@ -46095,6 +46096,7 @@ APP.goFromURL = function (q) {
       }
       if (/[α-ωΑ-Ω∞∂ℓ∅]/.test(c)) { t.push({ y: "id", v: c }); i++; continue; }
       if (USUP[c]) { t.push({ y: "usup", v: USUP[c] }); i++; continue; }
+      if (USUB[c]) { var sb = ""; while (i < n && USUB[s[i]]) sb += USUB[s[i++]]; t.push({ y: "usub", v: sb }); continue; }
       if (c === "√") { t.push({ y: "cmd", v: "sqrt" }); i++; continue; }
       if (c === "∑" || c === "∏" || c === "∫") { t.push({ y: "cmd", v: c === "∑" ? "sum" : c === "∏" ? "prod" : "int" }); i++; continue; }
       if (c === "^") { t.push({ y: "sup" }); i++; continue; }
@@ -46191,8 +46193,9 @@ APP.goFromURL = function (q) {
     function scripts(a) {
       var base = a.n, sub = null, sup = null;
       while (peek() && (peek().y === "prime")) { next(); base = E("msup", [base, E("mo", ["′"])]); }
-      while (peek() && (peek().y === "sup" || peek().y === "sub" || peek().y === "usup")) {
+      while (peek() && (peek().y === "sup" || peek().y === "sub" || peek().y === "usup" || peek().y === "usub")) {
         var k = next();
+        if (k.y === "usub") { if (sub) fail(); sub = E("mn", [k.v]); continue; }
         if (k.y === "usup") { if (sup) fail(); sup = E(/\d/.test(k.v) ? "mn" : "mi", [k.v]); while (peek() && peek().y === "usup") { var u = next(); sup = row([sup, E(/\d/.test(u.v) ? "mn" : "mi", [u.v])]); } }
         else if (k.y === "sup") { if (sup) fail(); sup = arg(); }
         else { if (sub) fail(); sub = arg(); }
@@ -46239,13 +46242,18 @@ APP.goFromURL = function (q) {
   }
 
   /* ---------- یافتنِ تکه‌های ریاضی ---------- */
-  var MC = "A-Za-z0-9۰-۹٠-٩٫α-ωΑ-Ω∞π√∑∏∫^_()\\[\\]{}+\\-−=<>≤≥≠×·⋅÷±→⇒≈\\/*!'′.,|²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ%\\\\:…⋯";
+  var MC = "A-Za-z0-9۰-۹٠-٩٫α-ωΑ-Ω∞π√∑∏∫^_()\\[\\]{}+\\-−=<>≤≥≠×·⋅÷±→⇒≈\\/*!'′.,|²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ%\\\\:…⋯₀-₉";
   var MATHCH = new RegExp("^[" + MC + "]+$"), FACH = new RegExp("^[" + MC + FAL + "]+$");
   var OPW = /^[+\-−=<>≤≥≠×÷·⋅⇒→±\/^*]+$/;   // واژه‌ای که فقط عملگر/رابطه است
   var REL = /<=|>=|!=|=>|->|[=<>≤≥≠⇒⇔≈→]/g;
   var OPND = "A-Za-z0-9۰-۹٠-٩)\\]π" + FAL, OPND2 = "A-Za-z0-9۰-۹٠-٩(√π" + FAL;
   var ARITH = new RegExp("[" + OPND + "²³ⁿ]\\s*[+\\-−*·⋅\\/×÷^]\\s*[" + OPND2 + "−\\-]");
-  var TIMES = new RegExp("[" + OPND + "²³]\\s*[×÷]\\s*[" + OPND2 + "−\\-]");
+  var TIMES = new RegExp("[" + OPND + "²³₀-₉]\\s*[×÷]\\s*[" + OPND2 + "−\\-]|[" + OPND + "²³₀-₉][·⋅][" + OPND2 + "]");   // «·» فقط چسبیده («n·ln»، «1·2·3»)؛ «۵ · ۳» ِ جداکننده نه
+  /* دورِ ۱۹ (RN4d، D·6 s31): ≈ میانِ دو عملوند («n≈3.7»، «e^x ≈ 1 + x»)، تابعِ نام‌دار با آرگومان («ln(10/n)»، «exp(-t/2)»، «sin x»؛ «فایل log» نه)،
+     و حسابِ حرفِ لاتینِ تک با رقم یا اندیس («x+۴+۱+۲»، «a₁ + a₂ + …»؛ «Wi-Fi»، «A-B» نه) */
+  var APPROX = new RegExp("[" + OPND + "²³₀-₉]\\s*≈\\s*[" + OPND2 + "−\\-]");
+  var FNAPP = /(?:^|[^A-Za-z])(?:arcsin|arccos|arctan|sinh|cosh|tanh|sin|cos|tan|cot|sec|csc|log|ln|exp)(?:[²³₀-₉]*\s*\(|[²³₀-₉]*\s*[0-9۰-۹٠-٩]|[²³₀-₉]*\s*[A-Za-zα-ωπ](?![A-Za-z]))/;
+  var LARITH = /(?:^|[^A-Za-z])[A-Za-z][₀-₉²³]*\s*[+\-−*·⋅×÷]\s*[A-Za-z0-9۰-۹٠-٩(](?![A-Za-z])|[0-9۰-۹٠-٩)₀-₉]\s*[+\-−*·⋅×÷]\s*[A-Za-z](?![A-Za-z])/;
   var SUPAFTER = new RegExp("[" + OPND + "α-ω][²³¹⁰⁴⁵⁶⁷⁸⁹ⁿ]");
   var COEF = new RegExp("[0-9۰-۹٠-٩][A-Za-z" + FAL + "]");
   function trigger(s) {
@@ -46254,14 +46262,17 @@ APP.goFromURL = function (q) {
     /* دورِ ۱۸ (RM2b/c): نشانه‌های تایپ‌شده — توانِ یونیکد پس از عملوند (x²، ع²)، ضرب/تقسیمِ ×÷ میانِ دو عملوند، مشتقِ dV/dt (همه‌جا یکسان، B·D10)،
        کسرِ عددیِ تنها (۳/۸ — تاریخِ ۱۴۰۵/۰۷/۲۵ با دو «/» نیست)، و رابطه با حساب یا رابطهٔ دوم یا ضریب («x+y+z=10»، «x ≤ ۵ ⇒ ۲x ≤ ۱۰»، «y = 2x»).
        «n = ۳۰» (یک رابطهٔ تنها، بی حساب)، تلفن، بازهٔ صفحه، ساعت و نسخه ریاضی نیستند. */
-    if (SUPAFTER.test(s) || TIMES.test(s)) return true;
+    if (SUPAFTER.test(s) || TIMES.test(s) || APPROX.test(s) || FNAPP.test(s)) return true;
+    if (LARITH.test(s) && /[0-9۰-۹٠-٩₀-₉²³]/.test(s)) return true;
     if (/(?:^|[^A-Za-z])[d∂][A-Za-zα-ω]\s*\/\s*[d∂][A-Za-zα-ω](?![A-Za-z])/.test(s)) return true;
     if (/(?:^|[^0-9۰-۹٠-٩\/.٫])[0-9۰-۹٠-٩]+\s*\/\s*[0-9۰-۹٠-٩]+(?![0-9۰-۹٠-٩\/.٫:])/.test(s) && !/\d\s*:\s*\d/.test(s)) return true;
     var rel = (s.match(REL) || []).length;
     return rel > 0 && (ARITH.test(s) || rel > 1 || COEF.test(s));
   }
+  var CODE = /^(?:[A-Z]+|[A-Za-z]{2,})-[0-9۰-۹٠-٩]+(?:[\/.\-:][0-9۰-۹٠-٩]+)*$/;
   function mathyWord(w) {
     if (!w || RTLW.test(w) || /:\/\/|^www\.|@/.test(w) || !MATHCH.test(w)) return false;
+    if (CODE.test(w)) return false;   // دورِ ۱۹ (RN4b، C·X6 s26): کد، نه فرمول — «TR-2026/10»، «A-12»، «ISO-9001»
     // واژهٔ لاتینِ سه‌حرفی و بیشتر (جز نامِ تابع و \فرمان) یعنی متن است، نه فرمول («src=x»، «onerror=…»)
     var words = w.replace(/\\[A-Za-z]+/g, " ").match(/[A-Za-z]{3,}/g) || [];
     if (words.some(function (x) { return FUNCS.indexOf(x) < 0 && x !== "sqrt"; })) return false;
@@ -46277,9 +46288,20 @@ APP.goFromURL = function (q) {
   }
   function count(s, ch) { return s.split(ch).length - 1; }
   function depth(s) { var d = 0, lo = 0; for (var k = 0; k < s.length; k++) { if (s[k] === "(") d++; else if (s[k] === ")") { d--; if (d < lo) lo = d; } } return { d: d, lo: lo }; }
-  function tryAscii(run, fa) {   // ⇒ [پیش، فرمول، پس] یا null
+  /* دورِ ۱۹ (RN4a، D·2 s37): عددِ تنهای چسبیده به واژهٔ فارسی که رابطه پس از آن می‌آید از آنِ جمله است — «بر ۸ ⇒ y=۲»: «۸» با «بر» می‌ماند
+     (وگرنه جزیرهٔ LTR از «۸» آغاز می‌شود و در خطِ راست‌به‌چپ «بر ۳ ⇒ x=۲» به «بر ۲ = x ⇒ ۳» وارونه دیده می‌شود). */
+  var LONENUM = /^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?\s*(?:<=|>=|!=|=>|->|[=<>≤≥≠⇒⇔≈→])\s*/;
+  /* دورِ ۱۹ (RN4a، بانکِ RN4.run): رابطهٔ تنها با متغیرِ لاتین («x=۲»، «y=۶»، «xy=۱۰۰») فقط در پیامی ریاضی است که شاهدِ دیگری از ریاضی دارد
+     (فرمولِ دیگری در همان پیام، یا ضریبِ چسبیده «۴۷y»)؛ «n = ۳۰ و k = 2» ِ تنها متن می‌ماند (تصمیمِ دورِ ۱۸). */
+  var WEAKREL = /(?:^|[^A-Za-z])[A-Za-z]{1,2}[₀-₉²³]*\s*(?:<=|>=|!=|[=<>≤≥≠≈])|(?:<=|>=|!=|[=<>≤≥≠≈])\s*[A-Za-z](?![A-Za-z]{2})/;
+  var COEFW = /(?:^|[\s(«])[0-9۰-۹٠-٩]+[a-z](?=$|[\s).,،:؛!?؟»])/;
+  function tryAscii(run, fa, faBefore, weakOK) {   // ⇒ [پیش، فرمول، پس، منبع] یا null
     var lead = (run.match(/^[«"“(]+/) || [""])[0], trail = (run.match(/[.,،:؛!?؟…»"”)]+$/) || [""])[0];
     var core = run.slice(lead.length, run.length - trail.length);
+    /* دورِ ۱۹ (RN4c، C·X5 s25): «…» پس از عملگر بخشی از فرمول است («۱/(1·2·3) + ۱/(2·3·4) + …»)، حتی در پایانِ رشته پیش از متنِ فارسی */
+    var el = /^(?:…|⋯|\.\.\.)/.exec(trail);
+    if (el && /[+\-−=*·⋅×÷,<>≤≥]\s*$/.test(core)) { core += el[0]; trail = trail.slice(el[0].length); }
+    if (faBefore && !lead) { var ln = LONENUM.exec(core); if (ln) { lead = ln[0]; core = core.slice(ln[0].length); } }
     /* دورِ ۱۸ (D·D5 s31): پرانتزِ دو سر به فرمول برمی‌گردد هر گاه فرمول بی آن ناجفت است — «(10/n)^(n/2)» (پیش‌تر: «10/n)^(n/2») */
     for (var guard = 0; guard < 8; guard++) {
       var dp = depth(core);
@@ -46291,17 +46313,17 @@ APP.goFromURL = function (q) {
        جمله می‌نشیند و «!=» خوانده می‌شود */
     var lr = /^(?:=|≤|≥|<|>|≠|⇒|→)\s+/.exec(core); if (lr) { lead += lr[0]; core = core.slice(lr[0].length); }
     var tr = /\s+(?:=|≤|≥|<|>|≠|⇒|→)$/.exec(core); if (tr) { trail = tr[0] + trail; core = core.slice(0, core.length - tr[0].length); }
-    if (!core || !/[A-Za-z0-9۰-۹٠-٩]/.test(core) || !trigger(core)) return null;
+    if (!core || !/[A-Za-z0-9۰-۹٠-٩]/.test(core) || !(trigger(core) || (weakOK && !fa && WEAKREL.test(core)))) return null;
     if (fa && !(/[0-9۰-۹٠-٩]/.test(core) && /[+\-−=<>≤≥≠×÷·⋅\/^⇒²³]/.test(core))) return null;   // حرفِ فارسی فقط در رشتهٔ عملگردارِ رقم‌دار
     try { return [lead, parse(core, !/\\[A-Za-z]/.test(core), fa), trail, core]; } catch (e) { if (e instanceof Bad) return null; throw e; }
   }
-  function asciiSegs(text, out) {
+  function asciiSegs(text, out, weakOK) {
     var parts = String(text).split(/(\s+)/).filter(function (x) { return x !== ""; });
     var bareOf = function (p) { return p.replace(/^[«"“(]+|[.,،:؛!?؟…»"”)]+$/g, ""); };
     // دسته: M ریاضیِ لاتین/رقم، P واژهٔ حرف‌فارسی‌دار، D «…/⋯» ِ تنها، s فاصله، T متن
     var cls = parts.map(function (p) {
       if (/^\s+$/.test(p)) return "s";
-      if (/^(?:…|⋯|\.\.\.)$/.test(p)) return "D";
+      if (/^(?:…|⋯|\.\.\.)[»"”).,،:؛!?؟]*$/.test(p)) return "D";   // دورِ ۱۹ (C·X5): «…»» ِ پایانِ نقل هم
       var bare = bareOf(p);
       if (mathyWord(bare)) return "M";
       var f = faWord(bare); return f === 2 ? "P" : f === 1 ? "P1" : "T";
@@ -46312,15 +46334,15 @@ APP.goFromURL = function (q) {
       var a = nb(k, -1), z = nb(k, 1), okA = a < 0 || OPW.test(bareOf(parts[a])), okZ = z < 0 || OPW.test(bareOf(parts[z]));
       return okA && okZ && (a >= 0 || z >= 0) ? "P" : "T";
     });
-    var buf = "", run = [], fa = false;
+    var buf = "", run = [], fa = false, faB = false;
     function flush() {
       if (!run.length) return;
       var ws = /^\s+$/.test(run[run.length - 1]) ? run.pop() : "";
       flushRun(); buf += ws;
     }
     function flushRun() {
-      var r = run.join(""), f = fa; run = []; fa = false;
-      var got = tryAscii(r, f);
+      var r = run.join(""), f = fa, fb = faB; run = []; fa = false; faB = false;
+      var got = tryAscii(r, f, fb, weakOK);
       if (!got) { buf += r; return; }
       buf += got[0]; if (buf) out.push({ t: buf }); buf = got[2];
       out.push({ m: got[1], src: got[3] });
@@ -46331,6 +46353,7 @@ APP.goFromURL = function (q) {
       if (c === "D" && run.length) { run.push(p); return; }   // «…» درونِ رشته (C·W1 s25) — رشته را نمی‌بُرد
       if (c === "M" || c === "P") {
         if (/^[«"“]/.test(p) && run.length) flush();
+        if (!run.length) { var pv = nb(k, -1); faB = pv >= 0 && cls[pv] === "T" && RTLW.test(parts[pv]) && !/[.,،:؛!?؟…»"”)]$/.test(parts[pv]); }
         run.push(p); if (c === "P") fa = true;
         if (/[.,،:؛!?؟…»"”]$/.test(p)) flush();
         return;
@@ -46341,18 +46364,19 @@ APP.goFromURL = function (q) {
     if (buf) out.push({ t: buf });
   }
   var EXPL = /\$\$([^$]+?)\$\$|\$(?![\s$])([^$\n]*?[^\s$\\])\$(?!\d)|\\\(([\s\S]+?)\\\)/g;
-  function segments(text) {
+  function segments(text, weak) {
     var s = String(text == null ? "" : text), out = [], last = 0, m;
+    if (weak == null) { var first = segments(s, false); weak = first.some(function (x) { return !!x.m; }) || COEFW.test(s); if (!weak) return first; }
     EXPL.lastIndex = 0;
     while ((m = EXPL.exec(s))) {
       var tex = m[1] != null ? m[1] : m[2] != null ? m[2] : m[3], node = null;
       try { node = parse(tex.trim(), false); } catch (e) { if (!(e instanceof Bad)) throw e; }
       if (!node) continue;   // بدشکل ⇒ همان متن (با $ ها) در تکهٔ بعدی می‌ماند
-      if (m.index > last) asciiSegs(s.slice(last, m.index), out);
+      if (m.index > last) asciiSegs(s.slice(last, m.index), out, weak);
       out.push({ m: node, src: tex.trim(), tex: true });
       last = EXPL.lastIndex;
     }
-    if (last < s.length) asciiSegs(s.slice(last), out);
+    if (last < s.length) asciiSegs(s.slice(last), out, weak);
     // تکه‌های متنیِ پیاپی یکی می‌شوند
     var res = [];
     out.forEach(function (x) { if (x.t != null && res.length && res[res.length - 1].t != null) res[res.length - 1].t += x.t; else res.push(x); });
@@ -46467,21 +46491,21 @@ APP.goFromURL = function (q) {
     var out = ""; while (i < n) out += atom();
     return out.replace(SPDROP, "$1");
   }
-  function plainAscii(t) {
-    var segs = []; asciiSegs(t, segs);
+  function plainAscii(t, weak) {
+    var segs = []; asciiSegs(t, segs, weak);
     return segs.map(function (x) { return x.m ? tp(x.src, !/\\[A-Za-z]/.test(x.src)) : x.t; }).join("");
   }
   function toPlain(text) {
     if (text == null) return "";
-    var s = String(text), out = "", last = 0, m, re = new RegExp(EXPL.source, "g");
+    var s = String(text), out = "", last = 0, m, re = new RegExp(EXPL.source, "g"), wk = has(s) || COEFW.test(s);
     while ((m = re.exec(s))) {
       var tex = (m[1] != null ? m[1] : m[2] != null ? m[2] : m[3]).trim(), ok = false;
       try { ok = !!parse(tex, false); } catch (e) { if (!(e instanceof Bad)) throw e; }
       // TeX ِ بدشکل که آشکارا TeX است (فرمانِ \، ^، _) و حرفِ فارسیِ بیرونِ \text ندارد ⇒ باز هم بی $ و بی \ (هرگز TeX ِ خام در <option>)
       if (!ok && !(/\\[A-Za-z]|[\^_]/.test(tex) && !RTL.test(tex.replace(/\\(?:text|mathrm|textrm|mbox|operatorname)\s*\{[^}]*\}/g, "")))) continue;
-      out += plainAscii(s.slice(last, m.index)) + tp(tex, false); last = re.lastIndex;
+      out += plainAscii(s.slice(last, m.index), wk) + tp(tex, false); last = re.lastIndex;
     }
-    return out + plainAscii(s.slice(last));
+    return out + plainAscii(s.slice(last), wk);
   }
 
   /* ---------- پیش‌نمایشِ زنده و نوارِ «∑ فرمول» (INF3) ---------- */
@@ -46495,6 +46519,7 @@ APP.goFromURL = function (q) {
     function up() {
       var v = inp.value || "";
       while (pv.firstChild) pv.removeChild(pv.firstChild);
+      typeDir(inp, v);
       if (!has(v)) { pv.hidden = true; return; }
       pv.hidden = false;
       var lb = document.createElement("span"); lb.className = "muted"; lb.textContent = "نمایشِ فرمول: "; pv.appendChild(lb);
@@ -46504,6 +46529,14 @@ APP.goFromURL = function (q) {
     inp.addEventListener("input", up); inp.addEventListener("change", up); up();
     if (host) host.appendChild(pv); else anchorOf(inp).insertAdjacentElement("afterend", pv);
     return pv;
+  }
+  /* دورِ ۱۹ (INF12، C s25): فیلدی که محتوایش ریاضی است چپ‌به‌راست تایپ می‌شود — هر سطر جهتِ خودش را از نخستین نویسهٔ قوی‌اش می‌گیرد
+     (unicode-bidi:plaintext؛ سطرِ بی‌حرف مثلِ «۱/(1·2·3) + …» چپ‌به‌راست)، پس فرمولِ تایپ‌شده در خودِ فیلد به هم نمی‌ریزد؛ نثرِ فارسی همان راست‌به‌چپ. */
+  function typeDir(inp, v) {
+    var on = has(v);
+    if (on === (inp.getAttribute("data-mxdir") === "1")) return;
+    if (on) { inp.setAttribute("data-mxdir", "1"); inp.style.unicodeBidi = "plaintext"; inp.style.textAlign = "start"; }
+    else { inp.removeAttribute("data-mxdir"); inp.style.unicodeBidi = ""; inp.style.textAlign = ""; }
   }
   function anchorOf(inp) { var par = inp.parentElement; return par && par.classList && (par.classList.contains("as-row") || par.classList.contains("row")) ? par : inp; }
   /* پیش‌نمایشِ زیرِ یک فیلد (فراخوانِ صریحِ a38 برای #lpNewS و #lpStep — همان رفتار) */
@@ -46561,52 +46594,109 @@ APP.goFromURL = function (q) {
     });
     return o;
   }
+  var FADIG = /[۰-۹٠-٩]/;
+  function faDigits(s) { return String(s).replace(/[0-9]/g, function (d) { return String.fromCharCode(0x6F0 + +d); }); }
+  /* دورِ ۱۹ (INF14، A s07، B s20): نامِ محورها از واژه‌های خودِ پیام — سرِ جدول («ساعت | ارتفاع»)، سرِ رشته پیش از «:» («وزن‌هام این هفته:»
+     ⇒ «وزن‌هام»)، یا واحدِ پس از رشته («… ۱۰ ساعت» ⇒ «ساعت»، «… ۱۷ سانت» ⇒ «(سانت)»). واژهٔ ربط یا عدد نام نمی‌شود. */
+  var STOPW = /^(?:و|یا|رو|را|تا|با|از|به|در|که|هم|هست|است|بود|شد|شدن|شده|and|or|the|to)$/;
+  function cleanName(w) { w = String(w || "").replace(/^[\s«"“(]+|[\s.,،:؛!?؟»"”)]+$/g, ""); return w && !STOPW.test(w) && !/^[-−]?[0-9۰-۹٠-٩.٫]+$/.test(w) && w.length <= 24 ? w : ""; }
+  function headCells(l) {
+    var c = String(l || "").replace(/^\s*\|/, "").replace(/\|\s*$/, "").split(/\s*\|\s*|\t+|\s{2,}/).map(function (x) { return x.trim(); }).filter(Boolean);
+    return c.length === 2 && c.every(function (x) { return !/^[-−]?[0-9۰-۹٠-٩.٫]+$/.test(x) && x.length <= 30; }) ? c : null;
+  }
+  function groupName(t, a, z) {   // a = آغازِ نخستین عدد، z = پایانِ آخرین عدد
+    var before = t.slice(0, a), cut = Math.max(before.lastIndexOf("\n"), before.search(/[.!?؟][^.!?؟]*$/));
+    var clause = before.slice(cut + 1), head = "";
+    if (/:\s*$/.test(clause)) head = cleanName((clause.replace(/:\s*$/, "").trim().split(/\s+/) || [])[0]);
+    var unit = cleanName((/^\s*([^\s.,،:؛!?؟0-9۰-۹٠-٩]+)/.exec(t.slice(z)) || [])[1]);
+    return head ? head + (unit ? " (" + unit + ")" : "") : unit;
+  }
   function series(t) {
-    // ۱) جدولِ دوستونی: دست‌کم سه سطرِ پیاپی با دقیقاً دو عدد (و جز جداکننده/واحدِ کوتاه چیزی نه)
-    var lines = String(t).split("\n"), rows = [], best = null;
-    function close() { if (rows.length >= 3 && (!best || rows.length > best.length)) best = rows; rows = []; }
-    lines.forEach(function (l) {
+    // ۱) جدولِ دوستونی: دست‌کم سه سطرِ پیاپی با دقیقاً دو عدد (و جز جداکننده/واحدِ کوتاه چیزی نه)؛ سطرِ پیش از آن اگر دو نام دارد ⇒ نامِ محورها
+    t = String(t);
+    var lines = t.split("\n"), rows = [], best = null, start = -1, bestStart = -1;
+    function close() { if (rows.length >= 3 && (!best || rows.length > best.length)) { best = rows; bestStart = start; } rows = []; start = -1; }
+    lines.forEach(function (l, li) {
       if (/^[\s|:\-–]+$/.test(l) && /-/.test(l)) return;   // خطِ جداکنندهٔ جدولِ markdown
       var ns = l.match(NUMRE) || [], rest = l.replace(NUMRE, "").replace(/[|,،:\t\s→\-–]/g, "");
-      if (ns.length === 2 && rest.length <= 12 && !/[\/]/.test(rest)) rows.push(ns); else close();
+      if (ns.length === 2 && rest.length <= 12 && !/[\/]/.test(rest)) { if (!rows.length) start = li; rows.push(ns); } else close();
     });
     close();
-    if (best) return { xl: best.map(function (r) { return r[0]; }), yl: best.map(function (r) { return r[1]; }) };
+    if (best) {
+      var hl = bestStart - 1; while (hl >= 0 && /^[\s|:\-–]+$/.test(lines[hl]) && /-/.test(lines[hl])) hl--;
+      var hc = hl >= 0 ? headCells(lines[hl]) : null;
+      return { xl: best.map(function (r) { return r[0]; }), yl: best.map(function (r) { return r[1]; }), xn: hc ? hc[0] : "", yn: hc ? hc[1] : "" };
+    }
     // ۲) رشتهٔ عدد: دست‌کم چهار عدد که فقط با «،» / «,» / «و» از هم جدا شده‌اند؛ دو رشتهٔ هم‌طول ⇒ x و y
-    var re = new RegExp(NUMRE.source, "g"), m, groups = [], cur = [], end = -1;
+    var re = new RegExp(NUMRE.source, "g"), m, groups = [], cur = [], end = -1, a0 = -1;
+    function push() { if (cur.length >= 4) groups.push({ v: cur, a: a0, z: end }); }
     while ((m = re.exec(t))) {
       var gap = end < 0 ? null : t.slice(end, m.index);
-      if (cur.length && gap != null && /^\s*(?:[،,]|و)\s*$/.test(gap) && !/^[-−]/.test(m[0])) cur.push(m[0]); else { if (cur.length >= 4) groups.push(cur); cur = [m[0]]; }
+      if (cur.length && gap != null && /^\s*(?:[،,]|و)\s*$/.test(gap) && !/^[-−]/.test(m[0])) cur.push(m[0]); else { push(); cur = [m[0]]; a0 = m.index; }
       end = m.index + m[0].length;
       if (/^[\/:٫.]/.test(t.slice(end)) && /\d|[۰-۹]/.test(t.charAt(end + 1))) { cur = []; end = -1; }   // تاریخ، ساعت، نسخه
     }
-    if (cur.length >= 4) groups.push(cur);
+    push();
     if (!groups.length) return null;
-    for (var a = 0; a < groups.length; a++) for (var z = a + 1; z < groups.length; z++) if (groups[a].length === groups[z].length) return { xl: groups[a], yl: groups[z] };
-    return { xl: null, yl: groups[0] };
+    for (var a = 0; a < groups.length; a++) for (var z = a + 1; z < groups.length; z++) if (groups[a].v.length === groups[z].v.length)
+      return { xl: groups[a].v, yl: groups[z].v, xn: groupName(t, groups[a].a, groups[a].z), yn: groupName(t, groups[z].a, groups[z].z) };
+    return { xl: null, yl: groups[0].v, xn: "", yn: groupName(t, groups[0].a, groups[0].z) };
   }
   function svgEl(tag, at, txt) { var e = document.createElementNS("http://www.w3.org/2000/svg", tag); Object.keys(at || {}).forEach(function (k) { e.setAttribute(k, at[k]); }); if (txt != null) e.textContent = txt; return e; }
-  function plot(d) {
-    var ys = d.yl.map(num), xs = d.xl ? d.xl.map(num) : ys.map(function (_, k) { return k + 1; });
+  /* d = {xl, yl, xn, yn}؛ add = نقطه‌های افزودهٔ خودِ کاربر [[x، y]] (x تهی در رشتهٔ بی‌ستونِ x)؛ onAdd(x، y) ⇒ ذخیره و کشیدنِ دوباره */
+  function plot(d, add, onAdd) {
+    add = add || [];
+    var fa = [].concat(d.yl, d.xl || []).some(function (v) { return FADIG.test(v); });   // دورِ ۱۹ (RN4e، A·D3 B·D8): رقمِ برچسب‌ها همان دستگاهِ پیام
+    var idx = function (k) { var v = String(k + 1); return fa ? faDigits(v) : v; };
+    var xl = d.xl ? d.xl.slice() : d.yl.map(function (_, k) { return idx(k); }), yl = d.yl.slice();
+    add.forEach(function (p) { yl.push(p[1]); xl.push(d.xl ? p[0] : idx(xl.length)); });
+    var ys = yl.map(num), xs = xl.map(num), n0 = d.yl.length;
     if (ys.some(isNaN) || xs.some(isNaN)) return null;
+    var ord = xs.map(function (_, k) { return k; }); if (d.xl) ord.sort(function (a, b) { return xs[a] - xs[b] || a - b; });
     var Wd = 260, Ht = 130, L = 34, R = 10, T = 10, B = 24, x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     var sx = function (v) { return L + (x1 === x0 ? 0.5 : (v - x0) / (x1 - x0)) * (Wd - L - R); }, sy = function (v) { return Ht - B - (y1 === y0 ? 0.5 : (v - y0) / (y1 - y0)) * (Ht - T - B); };
-    var sv = svgEl("svg", { width: String(Wd), height: String(Ht), viewBox: "0 0 " + Wd + " " + Ht, role: "img", "aria-label": "نمودارِ خطیِ داده‌های همین پیام (" + ys.length + " نقطه)", style: "display:block;color:inherit;overflow:visible" });
+    var names = (d.xn ? "افقی: " + d.xn : "") + (d.xn && d.yn ? "، " : "") + (d.yn ? "عمودی: " + d.yn : "");
+    var sv = svgEl("svg", { width: String(Wd), height: String(Ht), viewBox: "0 0 " + Wd + " " + Ht, role: "img", "aria-label": "نمودارِ خطیِ داده‌های همین پیام (" + ys.length + " نقطه)" + (names ? " — " + names : ""), style: "display:block;color:inherit;overflow:visible" });
     sv.appendChild(svgEl("title", {}, "نمودارِ خطیِ داده‌های همین پیام"));
     sv.appendChild(svgEl("line", { x1: String(L), y1: String(Ht - B), x2: String(Wd - R), y2: String(Ht - B), stroke: "currentColor", "stroke-opacity": "0.35" }));
     sv.appendChild(svgEl("line", { x1: String(L), y1: String(T), x2: String(L), y2: String(Ht - B), stroke: "currentColor", "stroke-opacity": "0.35" }));
-    var pts = xs.map(function (x, k) { return sx(x).toFixed(1) + "," + sy(ys[k]).toFixed(1); });
+    var pts = ord.map(function (k) { return sx(xs[k]).toFixed(1) + "," + sy(ys[k]).toFixed(1); });
     sv.appendChild(svgEl("polyline", { points: pts.join(" "), fill: "none", stroke: "currentColor", "stroke-width": "1.6" }));
-    xs.forEach(function (x, k) { sv.appendChild(svgEl("circle", { cx: sx(x).toFixed(1), cy: sy(ys[k]).toFixed(1), r: "2.6", fill: "currentColor" })); });
-    var lab = function (txt, x, y, anc) { sv.appendChild(svgEl("text", { x: String(x), y: String(y), "text-anchor": anc, "font-size": "10", fill: "currentColor", "fill-opacity": "0.75" }, txt)); };
+    xs.forEach(function (x, k) { var mine = k >= n0; sv.appendChild(svgEl("circle", { cx: sx(x).toFixed(1), cy: sy(ys[k]).toFixed(1), r: mine ? "3.2" : "2.6", fill: mine ? "none" : "currentColor", stroke: "currentColor", "stroke-width": mine ? "1.4" : "0", "data-add": mine ? "1" : "0" })); });
+    var lab = function (txt, x, y, anc, cls) { sv.appendChild(svgEl("text", { x: String(x), y: String(y), "text-anchor": anc, "font-size": "10", fill: "currentColor", "fill-opacity": "0.75", "class": cls }, txt)); };
     var iMin = ys.indexOf(y0), iMax = ys.indexOf(y1), xi0 = xs.indexOf(x0), xi1 = xs.indexOf(x1);
-    lab(d.yl[iMax], L - 4, sy(y1) + 3, "end"); if (iMin !== iMax) lab(d.yl[iMin], L - 4, sy(y0) + 3, "end");
-    var xl = d.xl || xs.map(function (v) { return String(v); });
-    lab(xl[xi0], sx(x0), Ht - B + 13, "middle"); if (xi1 !== xi0) lab(xl[xi1], sx(x1), Ht - B + 13, "middle");
+    lab(yl[iMax], L - 4, sy(y1) + 3, "end", "mx-ty"); if (iMin !== iMax) lab(yl[iMin], L - 4, sy(y0) + 3, "end", "mx-ty");
+    lab(xl[xi0], sx(x0), Ht - B + 13, "middle", "mx-tx"); if (xi1 !== xi0) lab(xl[xi1], sx(x1), Ht - B + 13, "middle", "mx-tx");
     var box = document.createElement("div"); box.className = "mx-plot small"; box.setAttribute("dir", "rtl"); box.setAttribute("style", "margin-top:6px;white-space:normal");
-    var cap = document.createElement("span"); cap.setAttribute("style", "opacity:.8"); cap.textContent = "📈 نمودارِ داده‌های همین پیام" + (d.xl ? "" : " (به ترتیب)"); box.appendChild(cap);
+    var cap = document.createElement("span"); cap.setAttribute("style", "opacity:.8"); cap.textContent = "📈 نمودارِ داده‌های همین پیام" + (d.xl ? "" : " (به ترتیب)") + (add.length ? " · " + (fa ? faDigits(add.length) : add.length) + " نقطهٔ افزوده" : ""); box.appendChild(cap);
+    if (names) {   // نامِ محورها بیرونِ svg، در جملهٔ راست‌به‌چپ (واژهٔ فارسی در svg ِ چپ‌به‌راست به هم نمی‌ریزد)
+      var nm = document.createElement("div"); nm.className = "mx-axes"; nm.setAttribute("dir", "rtl"); nm.setAttribute("style", "opacity:.8");
+      if (d.xn) { var ax = document.createElement("span"); ax.className = "mx-xn"; ax.textContent = "↔ " + d.xn; nm.appendChild(ax); }
+      if (d.xn && d.yn) nm.appendChild(document.createTextNode(" · "));
+      if (d.yn) { var ay = document.createElement("span"); ay.className = "mx-yn"; ay.textContent = "↕ " + d.yn; nm.appendChild(ay); }
+      box.appendChild(nm);
+    }
     var hold = document.createElement("div"); hold.setAttribute("dir", "ltr"); hold.appendChild(sv); box.appendChild(hold);
+    if (onAdd) box.appendChild(addForm(d, onAdd));
     return box;
+  }
+  /* دورِ ۱۹ (INF14، A s07 «۲۴ ساعت ⇒ ۱۱ سانت»، B s19 وزنِ تازه): «افزودنِ نقطه» به همان نمودار — نقطهٔ تازه کنارِ دادهٔ خودِ پیام، با رقمِ خودش */
+  function addForm(d, onAdd) {
+    var w = document.createElement("div"); w.className = "mx-addw"; w.setAttribute("dir", "rtl"); w.setAttribute("style", "margin-top:3px");
+    var tog = document.createElement("button"); tog.type = "button"; tog.className = "linkish small mx-add-tog"; tog.textContent = "➕ افزودنِ نقطه";
+    var f = document.createElement("span"); f.className = "mx-addf"; f.hidden = true; f.setAttribute("style", "display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;margin-inline-start:6px");
+    var mk = function (cls, label) { var i = document.createElement("input"); i.type = "text"; i.className = cls; i.setAttribute("inputmode", "decimal"); i.setAttribute("aria-label", label); i.placeholder = label; i.setAttribute("style", "width:7em"); return i; };
+    var ix = d.xl ? mk("mx-add-x", d.xn ? "مقدارِ " + d.xn + " (افقی)" : "مقدارِ افقی") : null, iy = mk("mx-add-y", d.yn ? "مقدارِ " + d.yn + " (عمودی)" : "مقدارِ عمودی");
+    var ok = document.createElement("button"); ok.type = "button"; ok.className = "btn sm mx-add-ok"; ok.textContent = "افزودن";
+    var msg = document.createElement("span"); msg.className = "mx-add-msg muted";
+    ok.addEventListener("click", function () {
+      var xv = ix ? ix.value.trim() : "", yv = iy.value.trim();
+      if ((ix && isNaN(num(xv))) || !yv || isNaN(num(yv))) { msg.textContent = "عدد بنویس."; return; }
+      onAdd(xv, yv);
+    });
+    tog.addEventListener("click", function () { f.hidden = !f.hidden; if (!f.hidden) (ix || iy).focus(); });
+    if (ix) f.appendChild(ix); f.appendChild(iy); f.appendChild(ok); f.appendChild(msg);
+    w.appendChild(tog); w.appendChild(f); return w;
   }
   var PIECE = { K: "♔", Q: "♕", R: "♖", B: "♗", N: "♘", P: "♙", k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
   function fenOf(t) {
@@ -46638,13 +46728,48 @@ APP.goFromURL = function (q) {
     if (f.side) { var p = document.createElement("div"); p.setAttribute("dir", "rtl"); p.setAttribute("style", "opacity:.85"); p.textContent = "نوبتِ " + (f.side === "w" ? "سفید" : "سیاه"); box.appendChild(p); }
     return box;
   }
+  /* دورِ ۱۹ (RN4e، A·D4 s07): نمودار فقط زیرِ پیامی که داده نخستین بار در آن آمد — پاسخی که همان عددها را نقل می‌کند نمودارِ دوم نمی‌گیرد */
+  function numKey(arr) { return arr.map(function (v) { return String(num(v)); }).join(","); }
+  function seenBefore(msg, d) {
+    var key = "," + numKey(d.yl) + ",", prev = msg.previousElementSibling;
+    for (; prev; prev = prev.previousElementSibling) {
+      if (!prev.classList || !prev.classList.contains("as-msg")) continue;
+      var tx = prev.querySelector(".as-tx"); if (!tx) continue;
+      var all = "," + numKey(msgSrc(tx).match(NUMRE) || []) + ",";
+      if (all.indexOf(key) >= 0) return true;
+    }
+    return false;
+  }
+  function msgRec(msg) {   // رکوردِ همین پیام در سشنِ جاریِ دستیار (برای نگه داشتنِ نقطه‌های افزوده)
+    try {
+      var log = msg.parentElement, s = A.ASSIST && A.ASSIST.cur && A.ASSIST.cur(); if (!log || !s || !s.msgs) return null;
+      var list = Array.prototype.filter.call(log.children, function (e) { return e.classList && e.classList.contains("as-msg") && !e.classList.contains("as-typing"); });
+      var i = list.indexOf(msg), m = i >= 0 && list.length === s.msgs.length ? s.msgs[i] : null;
+      return m && msg.classList.contains(m.role) ? { s: s, m: m } : null;
+    } catch (e) { return null; }
+  }
   function decorate(msg) {
     msg.setAttribute("data-mxv", "1");
     if (msg.classList.contains("as-typing")) return;
     var tx = msg.querySelector(".as-tx"); if (!tx) return;
     var t = msgSrc(tx), f = fenOf(t);
     try { if (f) tx.insertAdjacentElement("afterend", board(f)); } catch (e) { }
-    try { var d = !f && series(t), pl = d && plot(d); if (pl) msg.appendChild(pl); } catch (e) { }
+    try {
+      var d = !f && series(t); if (!d || seenBefore(msg, d)) return;
+      var rec = msgRec(msg), extra = (rec && rec.m.plotAdd) || [], pl;
+      var draw = function () {
+        var nw = plot(d, extra, function (x, y) {
+          extra = extra.concat([[x, y]]);
+          if (rec) { rec.m.plotAdd = extra; try { A.S.put(rec.s); } catch (e) { } }
+          draw();
+          var x1 = pl && pl.querySelector(".mx-add-tog"); if (x1) x1.focus();
+        });
+        if (!nw) return;
+        if (pl && pl.parentNode) pl.parentNode.replaceChild(nw, pl); else msg.appendChild(nw);
+        pl = nw;
+      };
+      draw();
+    } catch (e) { }
   }
   /* یک ناظرِ DOM: فیلدهای تازهٔ مسئلهٔ زنده (شناسهٔ lp…) و ورودیِ گفت‌وگو پیش‌نمایش می‌گیرند؛ پیام‌های تازهٔ گفت‌وگو نمودار/صفحه */
   function scan() {
