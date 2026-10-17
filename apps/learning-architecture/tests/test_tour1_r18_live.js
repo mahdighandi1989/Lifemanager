@@ -49,7 +49,7 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
   }, spec);
   /* APP.MATH.toPlain را a39 (رفع‌کنندهٔ ریاضی، موازی) می‌سازد؛ تا ادغام، جانشینِ کمینه فقط برای همین آزمون (و بعد برداشته می‌شود) */
   const STUB = () => { APP.MATH = APP.MATH || {}; APP.MATH.toPlain = (t) => String(t).replace(/\$\\frac\{([^}]*)\}\{([^}]*)\}\$/g, '$1/$2').replace(/\$([^$]*)\$/g, '$1').replace(/_1/g, '₁').replace(/_2/g, '₂').replace(/_3/g, '₃'); };
-  const NOTE = /\(حدسِ تو: «(.*)»\)$/;
+  const NOTE = /\(حدسِ (?:تو|شما): «(.*)»\)$/;   // دورِ ۱۹ (RN6c، DECISIONS_R19): واژهٔ یادداشت از ضمیرِ گفت‌وگوست — بانکِ R18 در گفت‌وگوی «شما» هم «حدسِ تو» نوشته بود
   const notes = (q) => q.map(t => { const m = NOTE.exec(t); return m ? m[1] : null; }).filter(x => x != null);
 
   /* ---------- close: مسئلهٔ زنده در مرحلهٔ اجرا با گام‌های باز، سشنِ گفت‌وگوی بسته به آن، گزارشِ مدل با A.liveStepReport ---------- */
