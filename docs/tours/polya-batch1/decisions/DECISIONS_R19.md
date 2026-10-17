@@ -93,3 +93,18 @@ the user corrects an earlier message (any distance back); the page validates (th
 it) and reverses every record derived from that message (records carry their source message id — RN2e act ids), applies the fix, and
 says what it changed. Mind card: a self-corrected slip is not a failure (self-correction is look-back evidence). Plus «✏️ اصلاح» on her
 own bubbles. Variant bank + runner probes «correct 1, 2, 3 turns back».
+Owner 2026-10-17 (binding for round 20): the correction path must be TRIED in the tour — at least two scenarios (one math, one life
+decision) where the person corrects a message 1, 3 and 5+ turns later; the runner shows before/after of every record derived from
+it (problem fields, guess, plan, step, mind card) and judges whether everything followed the fix. Result reported to the owner.
+
+## Addendum 2 (owner question 2026-10-17) — one place to see everything, and an aggregate mind card
+- Today: the live problem's stages and filled forms are stored on the problem record (not only in chat) and the chat session is
+  linked to it; the mind card's timeline lists headlines. There is no single page that shows a problem's whole journey in order.
+  INF16 «📜 پروندهٔ کامل»: per problem (and per session) one chronological page — every stage with the forms as filled, the chat
+  messages that fed them (with links), guesses/plans/steps with outcomes, corrections (INF15), check verdicts, and the mind-card
+  events each act produced; plus an all-work index across problems, ideas, cases and sessions. Read-only, derived from the records
+  (no second copy), printable/exportable.
+- The mind card is already aggregate: it reads every record type (chats, problems and their progress, ideas, knots and their items,
+  factory cases, cards, forecasts, worry chains, prerequisites, topics), not one topic. Keep it aggregate; add per-source contribution
+  (which work moved which ability/stage) so the aggregate is traceable, and dedupe acts (RN2e). Tour/test data never enters the
+  owner's own card (test profiles only).
