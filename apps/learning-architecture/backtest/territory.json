@@ -254,8 +254,20 @@
    "bookOnly": true
   },
   "a_tripartite_analysis": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 14,
+     "at": "2026-10-17",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده برای «تحلیل سنتی معرفت (باور صادق موجه)»",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «The Analysis of Knowledge» (first published 2001, substantive revision 2026) — https://plato.stanford.edu/entries/knowledge-analysis/",
+    "Stanford Encyclopedia of Philosophy, «Epistemology», §2.3 (first published 2005, substantive revision 2024) — https://plato.stanford.edu/entries/epistemology/"
+   ]
   },
   "a_gettier_problem": {
    "stage": 0,
@@ -1484,7 +1496,15 @@
     "r_istiqra_hidden",
     "r_tajrobe_hidden",
     "r_tajrobe_no_vazraf"
-   ]
+   ],
+   "verify": {
+    "since": 13,
+    "fresh": 1,
+    "ok": 0,
+    "ids": [
+     "r14_kahneman_flight_instructors"
+    ]
+   }
   },
   "a_confirmation": {
    "stage": 4,
@@ -2871,6 +2891,6 @@
    "bookOnly": true
   }
  },
- "round": 13,
- "updated": "2026-10-15"
+ "round": 14,
+ "updated": "2026-10-17"
 }
