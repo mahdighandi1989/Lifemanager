@@ -338,7 +338,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       // ضرب‌المثلِ خودِ کاربر ⇒ سطرِ C150؛ سطرهای کتاب برای مرحله
       info.e8prov = await hookText({ id: 'ach_e8p', lprob: PW, msgs: [] }, 'آب که از سر گذشت چه یک وجب چه صد وجب؛ دیگه فایده نداره');
       chk(/ضرب‌المثلِ خودش را آورد \(«آب که از سر گذشت/.test(info.e8prov) && /ضدِ خود/.test(info.e8prov), 'E8: the user\'s own proverb gets a prompt line (C150: it has its opposite) ' + (info.e8prov.match(/- کاربر ضرب‌المثل[^\n]*/) || ['—'])[0]);
-      chk(/ناتمام/.test((info.e8prov.match(/- از کتاب برای همین مرحله[^\n]*/) || [''])[0]), 'E8: the exec-phase hook carries «label heuristic reasoning incomplete» from the book');
+      chk(/ناتمام/.test((info.e8prov.match(/- (?:زمینه \(نه پرسشِ دوم\): )?از کتاب برای همین مرحله[^\n]*/) || [''])[0]), 'E8: the exec-phase hook carries «label heuristic reasoning incomplete» from the book');
     });
 
     await section('E8-obj', async () => {
@@ -346,7 +346,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       const PB = await mk({ title: 'باغچه', st: 'باغچه‌ای مستطیلی دورش ۲۴ متر است و طولش دو برابرِ عرضش؛ طول و عرض چقدر است؟', nat: 'objective' });
       await understand({ one: 'می‌خواهم طول و عرضِ باغچه را بیابم', unk: 'طول و عرض', data: ['محیط ۲۴ متر است', 'طول دو برابرِ عرض است'], cond: 'محیط = ۲ × (طول + عرض)', depNo: true, guess: 'طول ۸ و عرض ۴', suff: 'کافی است', suffW: 'دو داده دو معادله می‌دهند' });
       info.e8plan = await hookText({ id: 'ach_e8b', lprob: PB, msgs: [] }, 'ادامه');
-      chk(/پارادوکسِ مخترع/.test(info.e8plan) && /به تعریف‌ها برگرد/.test((info.e8plan.match(/- از کتاب برای همین مرحله[^\n]*/) || [''])[0]), 'E8: the plan-phase hook carries the inventor\'s paradox and «back to definitions» from the book');
+      chk(/پارادوکسِ مخترع/.test(info.e8plan) && /به تعریف‌ها برگرد/.test((info.e8plan.match(/- (?:زمینه \(نه پرسشِ دوم\): )?از کتاب برای همین مرحله[^\n]*/) || [''])[0]), 'E8: the plan-phase hook carries the inventor\'s paradox and «back to definitions» from the book');
       await addMove('mv_equation', 'طول و عرض را با نماد می‌نویسم تا محیط معادله شود');
       await savePlan('نخست عرض را x می‌گیرم سپس محیط را برحسبِ x می‌نویسم');
       info.e8toast = await toasts();
