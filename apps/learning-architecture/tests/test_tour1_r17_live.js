@@ -35,7 +35,9 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
     const r = APP.S.get('eprob_' + id); r.created = new Date(t0 - 3600e3).toISOString(); APP.S.put(r, { keepTime: true });
     if (spec.guesses) { const pg = APP.S.get('eprog_' + id) || { id: 'eprog_' + id, type: 'eprog' }; pg.solve = pg.solve || {}; pg.solve.g = {}; Object.keys(spec.guesses).forEach(k => { const g = spec.guesses[k]; pg.solve.g[k] = { guess: g.guess, at: g.at || new Date(t0 - 1800e3).toISOString(), from: 'live' }; }); APP.S.put(pg); }
     const msgs = []; let n = 0;
-    (spec.msgs || []).forEach(m => { const a = { role: 'ai', text: m.text, at: new Date(t0 + (n++) * 60e3).toISOString(), actions: m.actions || [] }; if (m.guess) a.guess = m.guess; msgs.push(a); msgs.push({ role: 'user', text: m.reply || 'باشه، فکر می‌کنم.', at: new Date(t0 + (n++) * 60e3).toISOString() }); });
+    /* دورِ ۱۸ (RM4، DECISIONS_R18): m.guess فقط با q یادداشت می‌گذارد و متنِ حدس باید در پیامِ کاربر آمده باشد — این آزمون همان قراردادِ تازهٔ مربی را می‌سازد:
+       q = همان پیام (پرسشی که حدس را می‌آزماید) و پیامِ کاربرِ پیش از آن که حدس را گفت */
+    (spec.msgs || []).forEach(m => { const a = { role: 'ai', text: m.text, at: new Date(t0 + (n++) * 60e3).toISOString(), actions: m.actions || [] }; if (m.guess) { a.guess = Object.assign({ q: m.text }, m.guess); if (m.guess.text) msgs.push({ role: 'user', text: 'حدسم: ' + m.guess.text, at: new Date(t0 + (n++) * 60e3).toISOString() }); } msgs.push(a); msgs.push({ role: 'user', text: m.reply || 'باشه، فکر می‌کنم.', at: new Date(t0 + (n++) * 60e3).toISOString() }); });
     const se = { id: APP.uid('achat'), type: 'achat', title: 't', msgs, steps: [], files: [], reports: [], lprob: id };
     APP.S.put(se);
     const out = APP.liveChatQItems(id).map(x => x.t);
@@ -80,6 +82,10 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
     const q = await opts({ msgs: [{ text: e.text, guess: pointer ? { g: +pointer[1] } : undefined }], guesses: G });
     if (/^no option/.test(ex)) { if (q.length) bankFail(e, 'no option', q); continue; }
     if (/^option kept/.test(ex)) { if (!(q.length === 1 && q[0] === e.text)) bankFail(e, 'the whole message as the one option', q); continue; }
+    /* دورِ ۱۸ (RM4a، DECISIONS_R18 جانشینِ RC2c): حدسی که فقط **پیامِ دستیار** نقل کرد یادداشت نمی‌سازد (guessQuote/semiSplit قرنطینه) — بی نشانِ coach_state:
+       گزینه بی یادداشت است (یا کلِ پیام، که نقلِ خودش را دارد) و هیچ یادداشتی نیست */
+    const R18 = e.rc === 'RC2.which_guess' && !pointer;
+    if (R18 && /^(?:option|note) «/.test(ex)) { const w0 = /^option «/.test(ex) ? firstQuote(ex).replace(/ \(حدسِ تو: «.*»\)$/, '') : null; if (notes(q).length || (w0 && !(q.includes(w0) || q.includes(e.text)))) bankFail(e, 'R18: no note' + (w0 ? ', option «' + w0 + '» or the whole message' : ''), q); continue; }
     if (/^option «/.test(ex)) { const w = firstQuote(ex); if (/only/.test(ex) ? !(q.length === 1 && q[0] === w) : !q.includes(w)) bankFail(e, 'option «' + w + '»' + (/only/.test(ex) ? ' only' : ''), q); }
     if (/^note «/.test(ex)) {
       const w = firstQuote(ex), ns = notes(q);
@@ -138,13 +144,15 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
   await section('guess', async () => {
     const r = info.guess = {};
     r.s09 = await opts({ guesses: { 1: { guess: 'حدود ۵۰۰ هزار تومن' } }, msgs: [{ text: 'هزینهٔ هر کیک را خودت پیدا کردی — یک دادهٔ واقعی. «۸۰۰ هزار» را درست یا نادرست نمی‌گویم؛ حدسی است که روی «همان ۴۰ تا، حتی با قیمتِ دو برابر» بنا شده. چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟' }] });
-    chk(J(notes(r.s09)) === J(['۸۰۰ هزار']), 'guess A·D2 s09: the note is the guess the message quoted («۸۰۰ هزار»), never the recorded «حدود ۵۰۰ هزار تومن» ' + J(r.s09));
+    // دورِ ۱۸ (RM4a): نقلِ پیامِ دستیار دیگر یادداشت نمی‌سازد — فقط «هرگز حدسِ ثبت‌شدهٔ پیش‌فرض» از دورِ ۱۷ می‌ماند
+    chk(notes(r.s09).length === 0, 'guess A·D2 s09 (R18): no note from the assistant\'s own quote, and never the recorded «حدود ۵۰۰ هزار تومن» ' + J(r.s09));
     r.s01 = await opts({ guesses: { 1: { guess: 'اجارهٔ بلندمدت با سقف افزایش سالانه هر دو شرط را برآورده می‌کند' } }, msgs: [{ text: 'خوب که کارتِ فهم را خودت ثبت کردی. «همهٔ ۴۷ ستون یه جوری ربط دارن» را درست یا غلط نمی‌خوانم؛ حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام ستون می‌تواند ردش کند — ستونی که روی هیچ‌کدام از دو شرطِ خودت (هفت سال ثبات، خرج زیرِ ۴۰٪) اثرِ محسوس ندارد؟' }] });
     chk(r.s01.length === 1 && !/اجارهٔ بلندمدت/.test(r.s01[0]) && /۴۷ ستون/.test(r.s01[0]), 'guess A·D2 s01: the option carries its own quoted guess; the recorded «اجارهٔ بلندمدت…» never appears ' + J(r.s01));
     r.s11d = await opts({ guesses: { 1: { guess: 'پوشش هست؛ فقط کدم کند است' } }, msgs: [{ text: '"اصلاً نمی‌شود" حدسِ تازهٔ توست، و ۲×۲ و ۴×۴ شاهدهای اولش. پیش از اثبات: چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟' }] });
-    chk(J(r.s11d) === J(['چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟ (حدسِ تو: «اصلاً نمی‌شود»)']), 'guess B·D1 s11d: the note names the guess the message quoted, and the verbless head «پیش از اثبات:» goes ' + J(r.s11d));
+    // دورِ ۱۸: بی یادداشت (RM4a)؛ و پرسش ضمیرِ «‌اش» دارد ⇒ سرِ «پیش از اثبات:» می‌ماند (RM6b: «a deictic in the question» ⇒ سر می‌ماند)
+    chk(J(r.s11d) === J(['پیش از اثبات: چطور می‌آزمایی‌اش؟ کدام حالتِ خاص یا شاهد می‌تواند ردش کند؟']), 'guess B·D1 s11d (R18): no note from the assistant\'s quote; the head stays because the question has a deictic ' + J(r.s11d));
     r.s21 = await opts({ guesses: { 1: { guess: 'حرکتِ اول یک کیشِ وزیر است که درست نزده‌ام', at: '2026-10-17T09:30:00.000Z' } }, msgs: [{ text: 'باشه، جواب را نمی‌گویم. «رخ بی‌فایده است» را درست یا غلط نمی‌گویم — فعلاً حدس است. تو را به «🔭 مسئلهٔ حل‌نشدهٔ خودم» می‌برم تا ثبتش کنیم. یک پرسش: این حدس را چطور می‌آزمایی — با کدام وارسی یا حالتِ خاص؟' }] });
-    chk(J(notes(r.s21)) === J(['رخ بی‌فایده است']), 'guess C·V1 s21: «این حدس» names the guess quoted in the same message, not the later queen-check guess ' + J(r.s21));
+    chk(notes(r.s21).length === 0, 'guess C·V1 s21 (R18): no note from the assistant\'s quote, and never the later queen-check guess ' + J(r.s21));
     r.s28 = await opts({ guesses: { 1: { guess: '۱/۲' } }, msgs: [{ text: 'فهرستِ همهٔ حالت‌ها همان آزمونی بود که خودت نوشته بودی، و حدست را خودت با آن رد کردی — این کارِ درستِ کسی است که مسئله را حل می‌کند. «حل شد» را این‌جا تأیید نمی‌کنم؛ یک پرسش: از راهِ دیگری هم به ۱/۳ می‌رسی — مثلاً با حالتی خاص یا شمردنِ دیگری وارسی‌اش کنی؟ بعد در صفحه «✅ حل شد» و بازنگری.' }] });
     chk(r.s28.length === 1 && notes(r.s28).length === 0, 'guess C·V1 s28: «وارسی‌اش» refers to the new result ۱/۳ — no «(حدسِ تو: «۱/۲»)» ' + J(r.s28));
   });

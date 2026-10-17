@@ -18,6 +18,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
   const day = async (n) => { await p.evaluate(x => { window.__day = x; }, D(n)); };
   const go = async (v, a, s) => { await p.evaluate(([v, a, s]) => APP.go(v, a, s), [v, a, s]); await W(140); };
   const sel = async (s, v) => { await p.selectOption(s, v); await W(120); };
+  /* دورِ ۱۸ (RM1d/INF6، DECISIONS_R18): «✅ حل شد» با گامِ باز نتیجهٔ هر گام را می‌پرسد (دیگر خودکار «انجام نشد» نیست) — این آزمون «نمی‌دانم» می‌دهد (بی‌اثر بر کالیبراسیون) */
+  const closeSteps = async () => { const ids = await p.evaluate(() => [...document.querySelectorAll('main .lp-close .lp-closestep')].map(x => x.getAttribute('data-step'))); if (!ids.length) return;
+    for (const id of ids) { await p.selectOption('#lpXS_' + id, 'unk'); await p.waitForTimeout(120); }
+    if (!(await p.locator('main .lp-close .lp-closeaux, main .lp-close .lp-closeintu').count())) { await p.click('main .lp-closego'); await p.waitForTimeout(220); } };
   const click = async (s) => { await p.click(s); await W(160); };
   const txt = (s) => p.evaluate(s => { const e = document.querySelector(s); return e ? e.textContent : ''; }, s);
   const has = (s) => p.locator(s).count();
@@ -303,7 +307,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       const PD = await objSetup({ title: 'ضلع‌ها', st: 'محیطِ مثلثی ۳۰ است؛ a دو برابرِ b و c دو واحد بیشتر از b است. ضلع‌ها؟', u: { one: 'می‌خواهم سه ضلع را بیابم', unk: 'a و b و c', data: ['محیط ۳۰ است', 'a دو برابرِ b است'], cond: 'a + b + c = 30\nهر سه ضلع مثبت‌اند' }, steps: ['a = 2b و c = b + 2 پس 4b + 2 = 30 و b = 7'] });
       // lpBBest: پرسشِ گفت‌وگو که پیش‌درآمدش خودِ پرسش است بریده نمی‌شود (s23/s29)
       await p.evaluate(pid => { APP.S.put({ id: 'ach_g5bb', type: 'achat', lprob: pid, msgs: [{ role: 'ai', text: 'ثابتش می‌کنی یا با یک مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟' }, { role: 'ai', text: 'ولی محیط فقط یک عدد نیست — از همهٔ داده‌ها استفاده کردی؟' }] }); }, PD);
-      await click('main .lp-solved');
+      await click('main .lp-solved'); await closeSteps();
       info.g5bb = await p.evaluate(() => [...document.querySelectorAll('#lpBBest option')].map(o => o.textContent));
       chk(info.g5bb.some(t => /ثابتش می‌کنی یا با یک مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟/.test(t)) && !info.g5bb.some(t => /^💬 کدام را اول امتحان می‌کنی؟/.test(t)) && info.g5bb.some(t => /^💬 محیط فقط یک عدد نیست — از همهٔ داده‌ها استفاده کردی؟/.test(t)),
         // DECISIONS_R15 O1: سرِ خبریِ پیش از «—» دیگر بریده نمی‌شود (پیش‌تر G5 آن را می‌برید) — فقط «ولی» ِ آغاز
@@ -321,7 +325,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await realStep('رابطه‌ام را با صاحبخانهٔ گزینهٔ ج خوب نگه دارم و قرارداد را بپرسم', 'قرارداد ۵ ساله می‌دهد', 'فردا');
       await day(1); await go('lprob', PH, 'exec');
       await outcome({ what: 'صاحبخانه قرارداد ۵ ساله را قبول کرد', match: 'yes', prog: 'بله، روشن' });
-      await click('main .lp-solved');
+      await click('main .lp-solved'); await closeSteps();
       chk(await has('#lpBLaw') === 0, 'G5: a housing choice with an inequality criterion and «رابطه با صاحبخانه» gets no «قانون… حالتِ حدی» (s01)');
       info.g5res = await p.evaluate(pid => APP.liveResult ? APP.liveResult(pid) : '', PH);
       chk(/قرارداد ۵ ساله/.test(info.g5res), 'G5: the related-solved «نتیجه» is the result reached (last real outcome), not the glance sentence (s01) ' + info.g5res);
@@ -337,7 +341,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await realStep('یک هفته زمانِ رسیدنِ هر گزارش را بنویسم', 'بیشترشان دیر می‌رسد', 'فردا');
       await day(1); await go('lprob', PL, 'exec');
       await outcome({ what: 'گزارش‌ها به‌موقع رسید؛ دیرکردِ پیشین از پروژهٔ دیگرش بود', match: 'no', prog: 'بله، روشن' });
-      await click('main .lp-solved');
+      await click('main .lp-solved'); await closeSteps();
       await fillBack({ chk: 'یک هفته زمان‌ها را نوشتم؛ همه به‌موقع بود' }); await setParts('no'); await selIf('#lpBPodL', 'ref');
       await click('main .lp-lbsave');
       info.g5lref = await p.evaluate(pid => APP.liveClosure(pid), PL);
@@ -387,7 +391,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await realStep('این هفته با دو قیمت کیک بفروشم و سود را حساب کنم', 'سود به ۲۰ می‌رسد', 'فردا');
       await day(1); await go('lprob', PK, 'exec');
       await outcome({ what: 'با بالاترین قیمتی که مشتری می‌پذیرد سود ۱۷٫۵ میلیون شد', match: 'no', prog: 'بله، روشن' });
-      await click('main .lp-solved');
+      await click('main .lp-solved'); await closeSteps();
       await fillBack({ chk: 'با ۶۰۰ و ۸۰۰ کیک حساب کردم؛ سود ۱۷٫۵ میلیون شد و به ۲۰ نرسید' });
       info.g6opts = await p.evaluate(() => [...document.querySelectorAll('#lpBCP_0 option')].map(o => o.value));
       chk(info.g6opts.includes('range'), 'G6: a practical problem\'s per-part check offers «the honest answer is a range / unreachable» (s09) ' + JSON.stringify(info.g6opts));
