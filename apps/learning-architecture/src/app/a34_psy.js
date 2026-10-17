@@ -316,18 +316,18 @@
   /* زمانِ بازشدنِ هر معما (ماندگار در تنظیمات؛ M1): بازگشت یا بارگذاریِ دوباره همان ساعت را ادامه می‌دهد؛ زمانِ گذشته ⇒ «وقت تمام شد» (نادرست) */
   function opens() { return (S.settings().psyOpen) || {}; }
   P.openedAt = function (id) { return opens()[id] || null; };
-  function markOpen(id) { var st = S.settings(); st.psyOpen = st.psyOpen || {}; if (!st.psyOpen[id]) { st.psyOpen[id] = new Date().toISOString(); S.saveSettings(st); } return st.psyOpen[id]; }
+  function markOpen(id) { var st = S.settings(); st.psyOpen = st.psyOpen || {}; if (!st.psyOpen[id]) { st.psyOpen[id] = A.nowISO(); S.saveSettings(st); } return st.psyOpen[id]; }
   function clearOpen(id) { var st = S.settings(); if (st.psyOpen && st.psyOpen[id]) { delete st.psyOpen[id]; S.saveSettings(st); } }
   function answeredMap() { var d = {}; S.all("psyans").forEach(function (a) { d[a.item] = 1; }); return d; }
   /* معماهای بازشده و هنوز بی‌پاسخ */
   P.openItems = function () { var o = opens(), d = answeredMap(); return Object.keys(o).filter(function (id) { return !d[id] && P.item(id); }); };
   /* معمای زمان‌داری که باز شد و زمانش گذشت ⇒ همان «وقت تمام شد» ِ اجرای مرجع، با زمانِ پایانِ واقعی */
   P.sweep = function () {
-    var o = opens(), d = answeredMap(), now = Date.now(), n = 0;
+    var o = opens(), d = answeredMap(), now = A.nowMs(), n = 0;
     Object.keys(o).forEach(function (id) {
       var it = P.item(id), t0 = Date.parse(o[id]); if (d[id] || !it || !it.time_limit_s || isNaN(t0)) return;
       var lim = 1000 * +it.time_limit_s; if (now - t0 < lim) return;
-      S.put({ id: A.uid("pa"), type: "psyans", item: id, ok: false, timeout: true, familiar: false, conf: null, ms: lim, at: new Date(t0 + lim).toISOString(), created: new Date().toISOString() }); n++;
+      S.put({ id: A.uid("pa"), type: "psyans", item: id, ok: false, timeout: true, familiar: false, conf: null, ms: lim, at: new Date(t0 + lim).toISOString(), created: A.nowISO() }); n++;
     });
     return n;
   };
@@ -362,7 +362,7 @@
     if (open.length && open.indexOf(it.id) < 0) it = P.item(open[0]);
     /* روزی یکی (M2) */
     if (!P.openedAt(it.id) && P.answeredToday()) { root.appendChild(h("p", { class: "card soft psy-tomorrow" }, "معمای امروز را جواب داده‌ای؛ روزی یک معما — معمای بعدی فردا.")); return root; }
-    var st = { v: "", c: "", fam: false, done: false }, box = h("section", { class: "card psy-q" }), t0 = Date.parse(markOpen(it.id)) || Date.now(), fb = h("div", { class: "small" }), timer = null;
+    var st = { v: "", c: "", fam: false, done: false }, box = h("section", { class: "card psy-q" }), t0 = Date.parse(markOpen(it.id)) || A.nowMs(), fb = h("div", { class: "small" }), timer = null;
     if (it.text) box.appendChild(h("p", { class: "psy-text" }, it.text));
     if (it.img) box.appendChild(h("img", { class: "psy-img", src: P.img(it.img), alt: "تصویرِ معما", style: "max-width:100%;height:auto" }));
     if (it.options && it.options.length) box.appendChild(h("div", { class: "pb-opts psy-opts", role: "radiogroup", "aria-label": "گزینه‌ها" }, it.options.map(function (o, i) {
@@ -378,7 +378,7 @@
       if (S.all("psyans").some(function (a) { return a.item === it.id; })) { A.go("mind"); return; }   // در همین فاصله ثبت شده (مثلاً پایانِ زمان در زبانه‌ای دیگر)
       var ok = !timeout && P.check(it, st.v);
       var cv = confVal(st.c);
-      S.put({ id: A.uid("pa"), type: "psyans", item: it.id, ok: ok, timeout: !!timeout, familiar: st.fam, conf: isNaN(cv) ? null : Math.max(0, Math.min(100, cv)), ms: Date.now() - t0, at: new Date().toISOString(), created: new Date().toISOString() });
+      S.put({ id: A.uid("pa"), type: "psyans", item: it.id, ok: ok, timeout: !!timeout, familiar: st.fam, conf: isNaN(cv) ? null : Math.max(0, Math.min(100, cv)), ms: A.nowMs() - t0, at: A.nowISO(), created: A.nowISO() });
       clearOpen(it.id);
       var msg = timeout ? "وقت تمام شد." : ok ? "درست." : "نادرست.";
       if (it.kind === "descriptive" && it.p != null) {
@@ -391,7 +391,7 @@
     /* زمانِ همان اجرای مرجع (مثلاً ۳۰ ثانیهٔ MaRs-IB) — تا دشواری با دادهٔ جمعیت یکی بماند */
     if (it.time_limit_s) {
       /* ساعت از لحظهٔ نخستین بازشدن می‌شمارد (ماندگار)، نه از هر بار نمایش (M1) */
-      var lim = 1000 * +it.time_limit_s, rem = function () { return Math.max(0, Math.ceil((t0 + lim - Date.now()) / 1000)); };
+      var lim = 1000 * +it.time_limit_s, rem = function () { return Math.max(0, Math.ceil((t0 + lim - A.nowMs()) / 1000)); };
       var tl = h("div", { class: "small psy-timer", "aria-live": "polite" }, "زمان: " + fa(rem()) + " ثانیه");
       box.appendChild(tl);
       timer = setInterval(function () { if (!document.body.contains(tl)) { clearInterval(timer); return; } var left = rem(); tl.textContent = "زمان: " + fa(left) + " ثانیه"; if (left <= 0) save(true); }, 1000);

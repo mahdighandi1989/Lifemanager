@@ -23,7 +23,7 @@
   A.SCHED_QUARANTINE = [
     { where: "a11_course.js · var GAPS (گرم‌کردنِ دوره)", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a11_course')" },
     { where: "a13_epi_course.js · var GAPS (گرم‌کردنِ دورهٔ معرفت)", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a13_epi_course')" },
-    { where: "a17_kpractice.js · var LADDER (ورزشِ گره)", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a17_kpractice')" },
+    { where: "a17_kpractice.js · var LADDER (ورزشِ گره)", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a17_kpractice') (پشتیبانِ بارِ تنها در node vm: همان آرایه)" },
     { where: "a19_moves.js · nextIv() پشتیبانِ L", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a19_moves')" },
     { where: "a27_tour.js · STALL_LADDER و دو LAD (پشتیبان)", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a27_tour')" },
     { where: "a36_solve.js · var LADDER (🌱 و مسئله)", was: [1, 3, 7, 21, 60], now: "A.SCHED.ladder('a36_solve')" },

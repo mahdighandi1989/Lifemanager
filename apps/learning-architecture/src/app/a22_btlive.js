@@ -76,7 +76,7 @@
       h("p", { class: "small muted" }, "ناظر قاعده‌ها را خودش عوض نمی‌کند: پیشنهاد با شاهد این‌جا می‌آید؛ تصمیمت ذخیره می‌شود و دورِ بعد اجرا (و روی وقایعِ تازه آزموده) می‌شود."),
       h("ul", { class: "plain" }, PR.map(function (p) {
         var rec = S.get("ebtp_" + p.id) || {};
-        function decide(d) { S.put({ id: "ebtp_" + p.id, type: "ebtp", decision: d, at: new Date().toISOString() }); A.toast(d === "yes" ? "پذیرفتی — دورِ بعد اعمال و آزموده می‌شود." : "رد شد — همین در دفتر می‌ماند."); A.render(); }
+        function decide(d) { S.put({ id: "ebtp_" + p.id, type: "ebtp", decision: d, at: A.nowISO() }); A.toast(d === "yes" ? "پذیرفتی — دورِ بعد اعمال و آزموده می‌شود." : "رد شد — همین در دفتر می‌ماند."); A.render(); }
         return h("li", { class: "card soft bt-proposal" + (p.supersededBy ? " superseded" : ""), "data-id": p.id }, h("strong", {}, p.title), h("p", { class: "small" }, p.why), p.evidence ? h("p", { class: "small muted" }, p.evidence) : null,
           p.source === "foundation" ? h("button", { class: "linkish small", onclick: function () { A.go("e_bt", null, "found"); } }, "🧱 مبنایش در «مبنای درجه‌ها»") : null,
           p.withdrawn ? h("div", { class: "small bt-withdrawn" }, "◌ پس گرفته شد: " + p.withdrawn) :
@@ -105,7 +105,7 @@
             /* اختیارِ مالک بر پیکره: واقعهٔ نادرست/جعلی را رد کن ⇒ ناظر در دورِ بعد کنارش می‌گذارد (excluded) */
             (function () { var rec = S.get("ebtp_x_" + x.id);
               return rec ? h("p", { class: "small bad" }, "تو این واقعه را رد کرده‌ای — دورِ بعد کنار گذاشته می‌شود.")
-                : h("button", { class: "linkish small bt-reject", onclick: function () { var why = prompt("چرا این واقعه نادرست است؟ (اختیاری)") || ""; S.put({ id: "ebtp_x_" + x.id, type: "ebtp", decision: "exclude", why: why, at: new Date().toISOString() }); A.render(); } }, "✗ این واقعه نادرست/ساختگی است — ردش کن"); })())
+                : h("button", { class: "linkish small bt-reject", onclick: function () { var why = prompt("چرا این واقعه نادرست است؟ (اختیاری)") || ""; S.put({ id: "ebtp_x_" + x.id, type: "ebtp", decision: "exclude", why: why, at: A.nowISO() }); A.render(); } }, "✗ این واقعه نادرست/ساختگی است — ردش کن"); })())
           : h("button", { class: "linkish", onclick: function () { A.go("e_lib", x.id); } }, x.t);
         rows.appendChild(h("tr", { class: x.k !== "ok" ? "warnrow" : "" }, h("td", {}, name), h("td", { class: "small" }, x.d || ""),
           h("td", { class: "small" }, { real: "واقعی", abstract: "انتزاعی", booklet: "مثالِ جزوه", problem: "مسئله" }[x.tier] || x.tier), h("td", {}, x.ok ? "سالم" : "شکست"),
