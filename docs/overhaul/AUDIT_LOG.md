@@ -4568,3 +4568,10 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 ### 2026-10-17 — DECISION: tour state is checkpointed into git (resume after interruption)
 Owner: a session may stop mid-tour (weekly limit) and must resume exactly where it stopped without harming the process. The tour's working state lived only in the session scratchpad (lost with the container). Now `docs/tours/polya-batch1/` holds the resume card `STATE.md` (where we are + exact next step), plan, DECISIONS, runner briefs, reports, every round's findings (the companion book's raw evidence) and the latest replay kit; refreshed and pushed after every runner report / decision / merge (roadmap §5, CLAUDE.md pointer). No model transcripts, no e-mail bodies, owner address scrubbed.
 Also FINDING: routines report `test_tour1_r11_coach.js` red on origin/main; not reproduced here (main, backtest branch, 2 cores, 4 concurrent copies, fresh clone + fresh npm i — all green). Next: make its nested `struct` replay report child exit codes so a routine-side failure is self-explaining.
+
+### 2026-10-17 — CHANGE: the routines' «main gate red» was the hand-off audit misreading a shallow clone
+FINDING: routines clone shallow (depth ~30). `handoff.py audit_history` ran `diff-tree --root` on the boundary commit, whose parent is
+absent, so the whole tree appeared "changed" and an urgent-routine commit (a508a3a) read as 176 cross-area changes ⇒
+`tests/test_supervisor_handoff_guard.py::test_real_history_since_the_baseline_is_clean` failed only in routine runs (full clones were
+green; earlier «origin/main rewritten» notices came from the same shallow artefact). CHANGE: boundary commits from `.git/shallow` are
+skipped (neither passed nor failed; `cmd_audit` says so). Red-first test with a real shallow clone. Hand-off h…f425 (area supervisor).

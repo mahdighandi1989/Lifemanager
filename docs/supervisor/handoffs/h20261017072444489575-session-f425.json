@@ -1,0 +1,16 @@
+{
+ "id": "h20261017072444489575-session-f425",
+ "at": "2026-10-17T07:24:44Z",
+ "by": "session",
+ "area": "supervisor",
+ "owner": [
+  "general",
+  "urgent"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test",
+ "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟",
+ "commit": "4d8d18f2",
+ "status": "open"
+}

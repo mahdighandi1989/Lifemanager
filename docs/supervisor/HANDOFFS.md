@@ -3,10 +3,11 @@
 هر کاری که یک روتین در قلمروِ روتینِ دیگری کرد (یا از او خواست) این‌جاست؛ روتینِ مالک در آغازِ هر دور
 `python3 scripts/supervisor/handoff.py inbox --routine <خودش>` را می‌زند، می‌سنجد و می‌بندد. قواعد: `ownership.json`.
 
-**باز: 8** · کل: 51
+**باز: 9** · کل: 52
 
 | # | زمان | از | قلمرو | نوع | برگه | چه | وضع | بستنِ |
 |---|---|---|---|---|---|---|---|---|
+| h20261017072444489575-session-f425 | 2026-10-17 07:24 | session | دستورهای روتین‌ها و ابزارهای ناظر | did | — | handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test | open |  |
 | h20261017005620515288-session-c533 | 2026-10-17 00:56 | session | قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها | did | — | تورِ پولیا دورِ ۱۲ (L7): cues_fa برای pr_statistical در territory/maps/s_problem.json (فقط روی صورت/مجهولِ خودِ مسئله)؛ قاعدهٔ E6 بی‌تغییر | open |  |
 | h20261016230036851669-session-fef1 | 2026-10-16 23:00 | session | قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها | did | — | تورِ پولیا دورِ ۱۱ (K8): cues_fa برای sc_negotiation در s_social.json (فقط روی صورت/مجهولِ خودِ مسئله) + a28 knowledge(extra)؛ نامِ داخلِ پرانتز نامِ متمایز نیست (ثانیه) | open |  |
 | h20261016230036782177-session-963f | 2026-10-16 23:00 | session | منبع‌های بیرونی و پوششِ آن‌ها در سامانه («📚 منبع‌ها و پوشش»: کتاب‌هایی که مالک می‌فرستد) | did | — | تورِ پولیا دورِ ۱۱ (K8): پیوندِ صریحِ لحظه ⇐ قلمرو در coverage.json (terr: — B231/C107 ⇒ pr_hypothesis_testing؛ C145/B162/B169/B170 ⇒ a_induction؛ B107 ⇒ md_cognitive_biases، a_confirmation) | open |  |
