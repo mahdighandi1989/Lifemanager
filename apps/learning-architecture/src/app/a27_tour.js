@@ -1373,6 +1373,9 @@
     CLAIM_Q = "ثابتش می‌کنی یا با مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟",
     REL_Q = "از نتیجه یا روشِ همان که بلدی، این‌جا می‌توانی استفاده کنی؟",
     PROOF_Q = "در حالت‌هایی که امتحان کردی، چه چیزی هست که نشدن را لازم می‌آورد — و برای هر حالتی، نه فقط این‌ها، برقرار می‌ماند؟",
+    /* دورِ ۱۳ (M4، s38 p6 در برابرِ s11 p3): پرسشِ برهان تابعِ آن است که حالت‌های آزموده چه نشان دادند — «امتحان کردم درسته … چطور ثابت کنم» (حالت‌ها جواب دادند)
+       ⇒ همان ویژگیِ کارساز برای حالتِ کلی؛ «امتحان کردم، نشد … نمیشه» (حالت‌ها شکست خوردند، ادعای ناممکن بودن) ⇒ PROOF_Q ِ بالا (چه چیزی نشدن را لازم می‌آورد) */
+    PROOF_OK_Q = "چرا برای هر حالت؟ در حالت‌هایی که امتحان کردی، کدام ویژگی کار را درست کرد — همان را برای حالتِ کلی نشان بده",
     DEF_Q = function (w) { return "به تعریف‌ها برگرد: «" + (w || "واژهٔ کلیدی") + "» در همین مسئله دقیقاً یعنی کدام — کدام معنا را برمی‌گزینی؟"; },
     TEACH_Q = "یادگیرنده‌ات الان کجای کار است، و پیش از آن کدام پرسش را از او پرسیدی؟";
   /* دورِ ۱۲ (L6، s28 p1): «معلومه»، «واضحه»، «بدیهیه»، «شکی نیست» هم یقینِ بی‌آزمون است (B107) */
@@ -1409,7 +1412,7 @@
     add("guess", !!o.guess, GUESS_Q);
     add("C145", !!x.hc && !o.guess, "برهانش؟ — چرا برای هر حالت، نه فقط این‌ها؟");
     /* دورِ ۱۲ (L1، s11 p3): خودش آزمود («امتحان کردم، نشد») و برهان می‌خواهد ⇒ پرسشِ برهان (خانوادهٔ C145)، نه «چطور می‌آزمایی‌اش؟» */
-    add("C145p", !x.hc && !o.guess && testedProof(mt), PROOF_Q);
+    add("C145p", !x.hc && !o.guess && testedProof(mt), proofQ(mt));
     /* دورِ ۱۲ (L1، s13 p3، s27 p2): معنای واژهٔ کلیدی را می‌جوید (نامزدها/تردید) ⇒ «به تعریف‌ها برگرد» (A038) پرسشِ نوبت است */
     add("A038", !o.guess && defAsk(mt), DEF_Q(defWord(mt)));
     add("check", opt, OPT_Q);
@@ -1799,7 +1802,11 @@
   function liveList(s, nq, asked) {
     var C = s ? (s.coach = s.coach || {}) : null, pre = QID[nq.ph] || "u"; if (C) C.qmap = {};
     var pk = nq.coach && nq.coach.pid ? "l:" + nq.coach.pid : "";
-    return nq.list.map(function (x, k) { var id = pre + (k + 1); if (C) C.qmap[id] = x; return id + ") «" + x + "»" + (ledgerAns(s, x, pk) ? " [در گفت‌وگو پاسخ گرفته — دوباره نپرس]" : ""); }).join(" · ");
+    /* دورِ ۱۳ (M3، s01 p2→p3): تا کارتِ «اول کل، بعد جزءها» باز است، پرسشِ کل‌اول (A191 / A.liveWholeQ) هم شناسه دارد (u0) — مدل با coach_state پاسخ‌گرفتنش را
+       گزارش می‌کند، دفترِ سنجیده (WHOLE_OK) تکرارش را در نوبتِ بعد می‌گیرد؛ کارتِ صفحه تا «ثبتِ کل» می‌ماند */
+    var WQ = A.liveWholeQ, w0 = nq.ph === "u" && WQ && nq.coach && nq.coach.pageQ === WQ && nq.list.indexOf(WQ) < 0;
+    if (C && w0) C.qmap.u0 = WQ;
+    return (w0 ? ["u0) «" + WQ + "»" + (ledgerAns(s, WQ, pk) ? " [در گفت‌وگو پاسخ گرفته — دوباره نپرس]" : "")] : []).concat(nq.list.map(function (x, k) { var id = pre + (k + 1); if (C) C.qmap[id] = x; return id + ") «" + x + "»" + (ledgerAns(s, x, pk) ? " [در گفت‌وگو پاسخ گرفته — دوباره نپرس]" : ""); })).join(" · ");
   }
   function liveExtra(pid, block, dataOk, fresh, tq) { var ph = A.livePhase ? A.livePhase(pid) : ""; return [ph !== "u" && dataOk !== false && !UNUSED_HEAD.test(block) ? unusedLine(pid) : "", /با آزمون رد کرد/.test(block) ? "" : refutedLine(pid, fresh, tq)].filter(Boolean).join("\n"); }
   /* پرسشِ هم‌گام، با کنار گذاشتنِ پرسشِ پاسخ‌گرفته در گفت‌وگو (نه فقط در صفحه) */
@@ -1852,6 +1859,11 @@
   function defAsk(t) { t = ownText(t); return DEF_HEAD.test(t) && DEF_DOUBT.test(t); }
   function defWord(t) { var m = /«([^»]{1,30})»\s*یعنی/.exec(String(t || "")) || /([آ-ی‌]{2,}(?:\s[آ-ی‌]{2,})?)\s*یعنی\s*(?:\.{2,}|…|(?:چی|چه)\s*[؟?])/.exec(String(t || "")); return m ? m[1].replace(/^(?:خب|خوب|پس|اما|ولی|راستش)\s+/, "") : ""; }
   function testedProof(t) { t = ownText(t); return TESTED_RE.test(t) && PROOF_ASK.test(t); }
+  /* M4 (دورِ ۱۳): شکستِ حالت‌های آزموده («نشد»، «نمیشه»، «جور نشد»، «غلط درومد»، «ناممکن») بر «درسته» مقدم است — ادعای ناممکن بودن همان پرسشِ «چه چیزی نشدن را
+     لازم می‌آورد»؛ حالت‌هایی که جواب دادند («درسته»، «جواب داد»، «برقرار بود») ⇒ ویژگیِ کارساز برای حالتِ کلی؛ هیچ‌کدام ⇒ همان پرسشِ پیشین (رفتارِ دورِ ۱۲) */
+  var CASES_FAIL = /(?:^|[\s،,.])(?:نشد|نمی[‌\s]?(?:شه|شود)|نمیشه|جور\s*(?:نشد|نمیشه|درنمیاد|درنیومد)|درنیومد|درنیامد|غلط\s*(?:شد|درومد|درآمد|بود)|ناممکن|غیر\s*ممکن|محال)(?![آ-ی])/,
+    CASES_OK = /(?:^|[\s،,.])(?:درست(?:ه|\s*(?:بود|است|درومد|درآمد|شد))|جواب\s*(?:داد|می[‌\s]?ده)|کار\s*(?:کرد|می[‌\s]?کنه)|برقرار(?:ه|\s*(?:بود|است|شد))|درمیاد|درمی‌آید|درومد|درآمد)(?![آ-ی])/;
+  function proofQ(t) { t = ownText(t); var cut = t.split(PROOF_ASK)[0]; return CASES_FAIL.test(cut) || !CASES_OK.test(cut) ? PROOF_Q : PROOF_OK_Q; }
   function notGuessMsg(t) { return defAsk(t) || (WHICH_DOUBT.test(ownText(t)) && ENUM_RE.test(ownText(t))) || testedProof(t); }
   AS.coachDefAsk = defAsk; AS.coachTestedProof = testedProof;
   function opinionGuess(t) {
@@ -2298,6 +2310,9 @@
     if (/^(?:objective|practical|life)$/.test(String(a.nat || ""))) C.natSug = a.nat;
     /* پرسش‌های پاسخ‌گرفته (شناسه ⇐ متنِ پرسش از فهرستِ همان نوبت) */
     var qm = C.qmap || {}, ids = (Array.isArray(a.ans) ? a.ans : []).map(String), qs = ids.map(function (id) { return qm[id]; }).filter(Boolean);
+    /* M3 (دورِ ۱۳): «کل» (u0) پاسخ گرفته فقط وقتی همین پیام بخش‌های اصلیِ مسئله را با هم گفت (پولیا: مجهول و داده/شرط — said ِ سنجیدهٔ همین پیام)؛
+       ادعای بی آن (مثلاً فقط مجهول) پرسشِ کل‌اول را نمی‌پراند */
+    if (A.liveWholeQ) qs = qs.filter(function (q) { return q !== A.liveWholeQ || (said.indexOf("u") >= 0 && (said.indexOf("c") >= 0 || said.indexOf("d") >= 0)); });
     /* F3 (دورِ ۵): دفترِ همان مسئله‌ای که این پیام درباره‌اش بود (pk ِ نوبت) */
     var pk = (P && P.pk) || C.pk || "c:0"; ledgerOf(s, pk); var AB = C.ansBy = C.ansBy || {}, A0 = AB[pk] = AB[pk] || {}, AL = C.ansLog = C.ansLog || [];
     qs.forEach(function (q) {
