@@ -1,0 +1,1 @@
+{"eval":"(()=>{const pid=APP.liveAll()[0].p.id;const L=((APP.S.get(\"eprog_\"+pid)||{}).solve||{}).live||{};return JSON.stringify({ckHold:L.ckHold||null,keys:Object.keys(L)})})()"}

@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=APP.state.arg;B(/^۲ کامل$/);await W(1000);const ids=IDS();return 'phase='+APP.livePhase(pid)+' GK: '+ids.split(' | ').filter(x=>/GK|Seen|Rel/.test(x)).join(' | ')+' || '+T('همین مجهول',900);})()"}

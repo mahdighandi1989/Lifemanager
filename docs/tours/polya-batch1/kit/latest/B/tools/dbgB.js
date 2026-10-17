@@ -1,0 +1,3 @@
+const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+(async()=>{const D=process.argv[2];console.log('launch');const ctx=await chromium.launchPersistentContext(D+'/profile',{viewport:{width:1360,height:900}});console.log('launched');const p=ctx.pages()[0]||await ctx.newPage();p.on('pageerror',e=>console.log('E',e.message));
+await p.goto('file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html');console.log('goto');await p.waitForSelector('.nav',{timeout:30000}).catch(e=>console.log('nonav',e.message.slice(0,100)));console.log(await p.evaluate(()=>document.body.innerText.slice(0,300)));await ctx.close();})();

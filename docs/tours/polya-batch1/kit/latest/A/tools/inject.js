@@ -1,0 +1,10 @@
+window.F=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOFIELD '+id;e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};
+window.S=(id,v)=>{const e=document.getElementById(id);if(!e)return 'NOSEL '+id;e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}));return 'ok'};
+window.C=(sel)=>{const b=document.querySelector(sel);if(!b)return 'NOBTN '+sel;b.click();return 'clicked'};
+window.CT=(re)=>{const b=[...document.querySelectorAll('#main button')].find(b=>new RegExp(re).test(b.textContent));if(!b)return 'NOBTN '+re;b.click();return 'clicked'};
+window.FL=(re)=>[...document.querySelectorAll('#main input,#main textarea,#main select')].filter(e=>!re||new RegExp(re).test(e.id)).map(e=>e.id+'|'+((document.querySelector('label[for="'+e.id+'"]')||{}).textContent||e.getAttribute('aria-label')||e.placeholder||'').slice(0,90)+(e.tagName=='SELECT'?' OPTS['+[...e.options].map(o=>o.value).join('/')+']':'')+(e.value?' ='+e.value.slice(0,40):'')).join('\n');
+window.BL=()=>[...document.querySelectorAll('#main button')].map(b=>(b.className.split(' ').filter(c=>/^(lp|sv|kp|pb)-/.test(c)).join('.'))+':'+b.textContent.trim().slice(0,45)).join(' | ');
+window.MT=(from,n)=>{const t=document.getElementById('main').innerText;const i=from?t.indexOf(from):0;return t.slice(Math.max(0,i),Math.max(0,i)+(n||1500))};
+window.DUE=()=>(APP.dueList()||[]).map(x=>(x.txt||'')+' / '+(x.sub||'')).join('\n');
+window.__T=[];(function w(){if(!window.APP||!APP.toast){return setTimeout(w,200)};if(APP.toast.__w)return;const o=APP.toast;APP.toast=function(m,k){window.__T.push((k||'')+':'+m);return o.apply(this,arguments)};APP.toast.__w=1;})();
+window.TT=()=>{const t=window.__T.slice(-3).join(' || ');window.__T=[];return t};

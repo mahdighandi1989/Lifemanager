@@ -1,0 +1,6622 @@
+{
+ "meta": {
+  "total_items": 812,
+  "covered": 802,
+  "uncovered": 10,
+  "by_kind": {
+   "principle": {
+    "total": 172,
+    "covered": 171
+   },
+   "attitude": {
+    "total": 30,
+    "covered": 30
+   },
+   "warning": {
+    "total": 74,
+    "covered": 74
+   },
+   "advice-teacher": {
+    "total": 59,
+    "covered": 59
+   },
+   "question": {
+    "total": 101,
+    "covered": 101
+   },
+   "advice-solver": {
+    "total": 87,
+    "covered": 87
+   },
+   "definition": {
+    "total": 58,
+    "covered": 49
+   },
+   "heuristic": {
+    "total": 128,
+    "covered": 128
+   },
+   "example-technique": {
+    "total": 80,
+    "covered": 80
+   },
+   "problem-technique": {
+    "total": 23,
+    "covered": 23
+   }
+  },
+  "note": "Each id → scenarios that must exercise it. Uncovered ids are justified as purely historical/bibliographic/structural."
+ },
+ "matrix": {
+  "A001": {
+   "kind": "principle",
+   "name_en": "A grain of discovery in every problem",
+   "scenarios": [
+    "s30",
+    "s31"
+   ]
+  },
+  "A002": {
+   "kind": "attitude",
+   "name_en": "Solve it by your own means",
+   "scenarios": [
+    "s30",
+    "s31",
+    "s34"
+   ]
+  },
+  "A003": {
+   "kind": "warning",
+   "name_en": "Drilling routine operations kills interest",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "A004": {
+   "kind": "advice-teacher",
+   "name_en": "Challenge curiosity with problems proportionate to knowledge; stimulating questions",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A005": {
+   "kind": "warning",
+   "name_en": "Treating mathematics as a subject to earn credits and forget",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "A006": {
+   "kind": "attitude",
+   "name_en": "Discovering one's tastes by trying",
+   "scenarios": [
+    "s14",
+    "s31",
+    "s34"
+   ]
+  },
+  "A007": {
+   "kind": "question",
+   "name_en": "How could one invent such a solution?",
+   "scenarios": [
+    "s30",
+    "s31"
+   ]
+  },
+  "A008": {
+   "kind": "advice-solver",
+   "name_en": "Understand motives and procedures of the solution",
+   "scenarios": [
+    "s30",
+    "s31"
+   ]
+  },
+  "A009": {
+   "kind": "definition",
+   "name_en": "Heuristic",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "A010": {
+   "kind": "principle",
+   "name_en": "Mathematics in the making vs. finished (Euclidean) mathematics",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "A011": {
+   "kind": "warning",
+   "name_en": "Mathematics as the least popular subject",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "A012": {
+   "kind": "advice-solver",
+   "name_en": "You have to understand the problem",
+   "scenarios": [
+    "s01",
+    "s09",
+    "s14"
+   ]
+  },
+  "A013": {
+   "kind": "question",
+   "name_en": "What is the unknown?",
+   "scenarios": [
+    "s01",
+    "s02",
+    "s14",
+    "s16",
+    "s17",
+    "s28",
+    "s37"
+   ]
+  },
+  "A014": {
+   "kind": "question",
+   "name_en": "What are the data?",
+   "scenarios": [
+    "s01",
+    "s02",
+    "s09",
+    "s37"
+   ]
+  },
+  "A015": {
+   "kind": "question",
+   "name_en": "What is the condition?",
+   "scenarios": [
+    "s01",
+    "s02",
+    "s28",
+    "s37"
+   ]
+  },
+  "A016": {
+   "kind": "question",
+   "name_en": "Is it possible to satisfy the condition?",
+   "scenarios": [
+    "s04",
+    "s09",
+    "s10",
+    "s11",
+    "s22",
+    "s28"
+   ]
+  },
+  "A017": {
+   "kind": "question",
+   "name_en": "Is the condition sufficient to determine the unknown? Or is it insufficient? Or redundant? Or contradictory?",
+   "scenarios": [
+    "s01",
+    "s04",
+    "s09",
+    "s22",
+    "s37"
+   ]
+  },
+  "A018": {
+   "kind": "heuristic",
+   "name_en": "Draw a figure",
+   "scenarios": [
+    "s02",
+    "s12",
+    "s16",
+    "s18",
+    "s29"
+   ]
+  },
+  "A019": {
+   "kind": "heuristic",
+   "name_en": "Introduce suitable notation",
+   "scenarios": [
+    "s02",
+    "s18",
+    "s26",
+    "s36"
+   ]
+  },
+  "A020": {
+   "kind": "heuristic",
+   "name_en": "Separate the various parts of the condition",
+   "scenarios": [
+    "s04",
+    "s12",
+    "s13",
+    "s17",
+    "s26",
+    "s33",
+    "s36",
+    "s37"
+   ]
+  },
+  "A021": {
+   "kind": "question",
+   "name_en": "Can you write them down?",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "A022": {
+   "kind": "heuristic",
+   "name_en": "Find the connection between the data and the unknown",
+   "scenarios": [
+    "s13",
+    "s21",
+    "s37"
+   ]
+  },
+  "A023": {
+   "kind": "heuristic",
+   "name_en": "Consider auxiliary problems if an immediate connection cannot be found",
+   "scenarios": [
+    "s19",
+    "s20"
+   ]
+  },
+  "A024": {
+   "kind": "advice-solver",
+   "name_en": "You should obtain eventually a plan of the solution",
+   "scenarios": [
+    "s19"
+   ]
+  },
+  "A025": {
+   "kind": "question",
+   "name_en": "Have you seen it before?",
+   "scenarios": [
+    "s21"
+   ]
+  },
+  "A026": {
+   "kind": "question",
+   "name_en": "Or have you seen the same problem in a slightly different form?",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s35"
+   ]
+  },
+  "A027": {
+   "kind": "question",
+   "name_en": "Do you know a related problem?",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s35"
+   ]
+  },
+  "A028": {
+   "kind": "question",
+   "name_en": "Do you know a theorem that could be useful?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "A029": {
+   "kind": "heuristic",
+   "name_en": "Look at the unknown!",
+   "scenarios": [
+    "s02",
+    "s06",
+    "s17",
+    "s18",
+    "s21",
+    "s38"
+   ]
+  },
+  "A030": {
+   "kind": "heuristic",
+   "name_en": "Try to think of a familiar problem having the same or a similar unknown",
+   "scenarios": [
+    "s02",
+    "s23"
+   ]
+  },
+  "A031": {
+   "kind": "heuristic",
+   "name_en": "Here is a problem related to yours and solved before",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s35"
+   ]
+  },
+  "A032": {
+   "kind": "question",
+   "name_en": "Could you use it?",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A033": {
+   "kind": "question",
+   "name_en": "Could you use its result?",
+   "scenarios": [
+    "s02",
+    "s23"
+   ]
+  },
+  "A034": {
+   "kind": "question",
+   "name_en": "Could you use its method?",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s35"
+   ]
+  },
+  "A035": {
+   "kind": "question",
+   "name_en": "Should you introduce some auxiliary element in order to make its use possible?",
+   "scenarios": [
+    "s02",
+    "s35"
+   ]
+  },
+  "A036": {
+   "kind": "question",
+   "name_en": "Could you restate the problem?",
+   "scenarios": [
+    "s04",
+    "s09",
+    "s11",
+    "s12",
+    "s13",
+    "s27",
+    "s37"
+   ]
+  },
+  "A037": {
+   "kind": "question",
+   "name_en": "Could you restate it still differently?",
+   "scenarios": [
+    "s04",
+    "s13",
+    "s27",
+    "s37"
+   ]
+  },
+  "A038": {
+   "kind": "heuristic",
+   "name_en": "Go back to definitions",
+   "scenarios": [
+    "s13",
+    "s18",
+    "s27",
+    "s33"
+   ]
+  },
+  "A039": {
+   "kind": "heuristic",
+   "name_en": "If you cannot solve the proposed problem try to solve first some related problem",
+   "scenarios": [
+    "s08",
+    "s19",
+    "s34",
+    "s38"
+   ]
+  },
+  "A040": {
+   "kind": "question",
+   "name_en": "Could you imagine a more accessible related problem?",
+   "scenarios": [
+    "s11",
+    "s24",
+    "s37",
+    "s38"
+   ]
+  },
+  "A041": {
+   "kind": "question",
+   "name_en": "A more general problem?",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "A042": {
+   "kind": "question",
+   "name_en": "A more special problem?",
+   "scenarios": [
+    "s11",
+    "s24",
+    "s28",
+    "s32"
+   ]
+  },
+  "A043": {
+   "kind": "question",
+   "name_en": "An analogous problem?",
+   "scenarios": [
+    "s11",
+    "s23"
+   ]
+  },
+  "A044": {
+   "kind": "question",
+   "name_en": "Could you solve a part of the problem?",
+   "scenarios": [
+    "s04",
+    "s11",
+    "s12",
+    "s17",
+    "s21",
+    "s24",
+    "s26",
+    "s29",
+    "s37",
+    "s38"
+   ]
+  },
+  "A045": {
+   "kind": "heuristic",
+   "name_en": "Keep only a part of the condition, drop the other part",
+   "scenarios": [
+    "s04",
+    "s10",
+    "s12",
+    "s29"
+   ]
+  },
+  "A046": {
+   "kind": "question",
+   "name_en": "How far is the unknown then determined, how can it vary?",
+   "scenarios": [
+    "s04",
+    "s10",
+    "s29"
+   ]
+  },
+  "A047": {
+   "kind": "question",
+   "name_en": "Could you derive something useful from the data?",
+   "scenarios": [
+    "s08",
+    "s37"
+   ]
+  },
+  "A048": {
+   "kind": "question",
+   "name_en": "Could you think of other data appropriate to determine the unknown?",
+   "scenarios": [
+    "s04",
+    "s09",
+    "s37"
+   ]
+  },
+  "A049": {
+   "kind": "question",
+   "name_en": "Could you change the unknown, or the data, or both if necessary, so that the new unknown and the new data are nearer to each other?",
+   "scenarios": [
+    "s04",
+    "s13"
+   ]
+  },
+  "A050": {
+   "kind": "question",
+   "name_en": "Did you use all the data?",
+   "scenarios": [
+    "s02",
+    "s09",
+    "s18",
+    "s21",
+    "s26",
+    "s37"
+   ]
+  },
+  "A051": {
+   "kind": "question",
+   "name_en": "Did you use the whole condition?",
+   "scenarios": [
+    "s21",
+    "s26",
+    "s31"
+   ]
+  },
+  "A052": {
+   "kind": "question",
+   "name_en": "Have you taken into account all essential notions involved in the problem?",
+   "scenarios": [
+    "s01",
+    "s09",
+    "s13",
+    "s17",
+    "s27"
+   ]
+  },
+  "A053": {
+   "kind": "advice-solver",
+   "name_en": "Carry out your plan",
+   "scenarios": [
+    "s02",
+    "s06",
+    "s19"
+   ]
+  },
+  "A054": {
+   "kind": "advice-solver",
+   "name_en": "Check each step",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A055": {
+   "kind": "question",
+   "name_en": "Can you see clearly that the step is correct?",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A056": {
+   "kind": "question",
+   "name_en": "Can you prove that it is correct?",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A057": {
+   "kind": "advice-solver",
+   "name_en": "Examine the solution obtained",
+   "scenarios": [
+    "s02",
+    "s14",
+    "s28",
+    "s35",
+    "s38"
+   ]
+  },
+  "A058": {
+   "kind": "question",
+   "name_en": "Can you check the result?",
+   "scenarios": [
+    "s02",
+    "s09",
+    "s14",
+    "s18",
+    "s23",
+    "s28",
+    "s32",
+    "s36",
+    "s37"
+   ]
+  },
+  "A059": {
+   "kind": "question",
+   "name_en": "Can you check the argument?",
+   "scenarios": [
+    "s03",
+    "s06",
+    "s22",
+    "s33"
+   ]
+  },
+  "A060": {
+   "kind": "question",
+   "name_en": "Can you derive the result differently?",
+   "scenarios": [
+    "s02",
+    "s11",
+    "s24",
+    "s25",
+    "s28",
+    "s31"
+   ]
+  },
+  "A061": {
+   "kind": "question",
+   "name_en": "Can you see it at a glance?",
+   "scenarios": [
+    "s02",
+    "s21",
+    "s25",
+    "s28",
+    "s31"
+   ]
+  },
+  "A062": {
+   "kind": "question",
+   "name_en": "Can you use the result, or the method, for some other problem?",
+   "scenarios": [
+    "s01",
+    "s02",
+    "s16",
+    "s23",
+    "s31",
+    "s37"
+   ]
+  },
+  "A063": {
+   "kind": "principle",
+   "name_en": "Learning should be active; mathematics is not a spectator sport",
+   "scenarios": [
+    "s14",
+    "s30"
+   ]
+  },
+  "A064": {
+   "kind": "advice-teacher",
+   "name_en": "Teacher must know how students misunderstand",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A065": {
+   "kind": "warning",
+   "name_en": "Unconscious misleading assumptions",
+   "scenarios": [
+    "s09",
+    "s22",
+    "s29"
+   ]
+  },
+  "A066": {
+   "kind": "advice-solver",
+   "name_en": "Show your understanding of the statement before attempting",
+   "scenarios": [
+    "s09"
+   ]
+  },
+  "A067": {
+   "kind": "principle",
+   "name_en": "Understanding what the problem says is often the hardest part",
+   "scenarios": [
+    "s09"
+   ]
+  },
+  "A068": {
+   "kind": "heuristic",
+   "name_en": "If you can't solve a problem, there is an easier problem you can't solve: find it",
+   "scenarios": [
+    "s34",
+    "s38"
+   ]
+  },
+  "A069": {
+   "kind": "advice-solver",
+   "name_en": "Imaginary teacher over your shoulder",
+   "scenarios": [
+    "s09",
+    "s30"
+   ]
+  },
+  "A070": {
+   "kind": "advice-solver",
+   "name_en": "Address the questions to yourself / to your student",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "A071": {
+   "kind": "advice-solver",
+   "name_en": "Read the dictionary slowly; consult it from own experience",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "A072": {
+   "kind": "advice-teacher",
+   "name_en": "Problems followed (at a distance) by hints then solutions",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "A073": {
+   "kind": "principle",
+   "name_en": "Student should acquire as much experience of independent work as possible",
+   "scenarios": [
+    "s15",
+    "s38"
+   ]
+  },
+  "A074": {
+   "kind": "advice-teacher",
+   "name_en": "Help, but not too much and not too little",
+   "scenarios": [
+    "s15",
+    "s16",
+    "s38"
+   ]
+  },
+  "A075": {
+   "kind": "advice-teacher",
+   "name_en": "Leave the student at least some illusion of independent work",
+   "scenarios": [
+    "s15",
+    "s16",
+    "s38"
+   ]
+  },
+  "A076": {
+   "kind": "advice-teacher",
+   "name_en": "Help naturally: put yourself in the student's place",
+   "scenarios": [
+    "s15",
+    "s16"
+   ]
+  },
+  "A077": {
+   "kind": "principle",
+   "name_en": "The same questions recur",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "A078": {
+   "kind": "question",
+   "name_en": "What is required? What do you want to find? What are you supposed to seek?",
+   "scenarios": [
+    "s15",
+    "s16"
+   ]
+  },
+  "A079": {
+   "kind": "advice-teacher",
+   "name_en": "A suggestion may achieve the same effect more naturally",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A080": {
+   "kind": "principle",
+   "name_en": "The list enumerates mental operations in the order of likelihood",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "A081": {
+   "kind": "principle",
+   "name_en": "Generality",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "A082": {
+   "kind": "warning",
+   "name_en": "Some questions apply only to problems to find, not to prove",
+   "scenarios": [
+    "s03",
+    "s27"
+   ]
+  },
+  "A083": {
+   "kind": "principle",
+   "name_en": "Common sense",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "A084": {
+   "kind": "principle",
+   "name_en": "The list states common sense in general terms",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "A085": {
+   "kind": "advice-teacher",
+   "name_en": "Two aims: help solve the present problem; develop ability to solve future problems",
+   "scenarios": [
+    "s15",
+    "s16",
+    "s30"
+   ]
+  },
+  "A086": {
+   "kind": "principle",
+   "name_en": "General questions help unobtrusively, leaving room for the student",
+   "scenarios": [
+    "s15",
+    "s16"
+   ]
+  },
+  "A087": {
+   "kind": "principle",
+   "name_en": "Internalising the question through repeated useful use",
+   "scenarios": [
+    "s12",
+    "s15",
+    "s30"
+   ]
+  },
+  "A088": {
+   "kind": "principle",
+   "name_en": "Solving problems is a practical skill, like swimming; acquired by imitation and practice",
+   "scenarios": [
+    "s14",
+    "s30"
+   ]
+  },
+  "A089": {
+   "kind": "advice-teacher",
+   "name_en": "Arouse interest and give plenty of opportunity for imitation and practice",
+   "scenarios": [
+    "s14",
+    "s15",
+    "s30"
+   ]
+  },
+  "A090": {
+   "kind": "advice-teacher",
+   "name_en": "Dramatize your ideas; put to yourself the same questions",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A091": {
+   "kind": "principle",
+   "name_en": "Change of point of view during solving",
+   "scenarios": [
+    "s01",
+    "s04",
+    "s20"
+   ]
+  },
+  "A092": {
+   "kind": "principle",
+   "name_en": "Four phases: understanding, devising a plan, carrying out, looking back",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "A093": {
+   "kind": "warning",
+   "name_en": "A bright idea may skip preparations",
+   "scenarios": [
+    "s20",
+    "s28"
+   ]
+  },
+  "A094": {
+   "kind": "warning",
+   "name_en": "Worst: start calculations or constructions without understanding",
+   "scenarios": [
+    "s01",
+    "s14",
+    "s28"
+   ]
+  },
+  "A095": {
+   "kind": "warning",
+   "name_en": "Working on details without seeing the main connection or plan is useless",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "A096": {
+   "kind": "advice-solver",
+   "name_en": "Many mistakes avoided by checking each step",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A097": {
+   "kind": "warning",
+   "name_en": "Failing to look back loses some of the best effects",
+   "scenarios": [
+    "s14",
+    "s28",
+    "s31",
+    "s35",
+    "s38"
+   ]
+  },
+  "A098": {
+   "kind": "warning",
+   "name_en": "It is foolish to answer a question you do not understand; sad to work for an end you do not desire",
+   "scenarios": [
+    "s01",
+    "s04",
+    "s05",
+    "s09",
+    "s13",
+    "s16",
+    "s22",
+    "s28",
+    "s32",
+    "s33",
+    "s34",
+    "s38"
+   ]
+  },
+  "A099": {
+   "kind": "attitude",
+   "name_en": "The student should desire the solution",
+   "scenarios": [
+    "s04",
+    "s12",
+    "s14",
+    "s16",
+    "s19",
+    "s34"
+   ]
+  },
+  "A100": {
+   "kind": "advice-teacher",
+   "name_en": "Problem well chosen: not too difficult, not too easy, natural, interesting",
+   "scenarios": [
+    "s14",
+    "s15",
+    "s16",
+    "s34"
+   ]
+  },
+  "A101": {
+   "kind": "advice-teacher",
+   "name_en": "Ask the student to repeat the statement fluently",
+   "scenarios": [
+    "s09",
+    "s15",
+    "s16",
+    "s28"
+   ]
+  },
+  "A102": {
+   "kind": "advice-solver",
+   "name_en": "Point out the principal parts",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A103": {
+   "kind": "advice-solver",
+   "name_en": "Consider the principal parts attentively, repeatedly, from various sides",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A104": {
+   "kind": "heuristic",
+   "name_en": "Draw a figure and indicate the unknown and data on it",
+   "scenarios": [
+    "s02",
+    "s18",
+    "s29"
+   ]
+  },
+  "A105": {
+   "kind": "heuristic",
+   "name_en": "Choosing notation forces consideration of the objects",
+   "scenarios": [
+    "s02",
+    "s36"
+   ]
+  },
+  "A106": {
+   "kind": "question",
+   "name_en": "Is it possible to satisfy the condition? — expect only a provisional answer",
+   "scenarios": [
+    "s04",
+    "s10",
+    "s11"
+   ]
+  },
+  "A107": {
+   "kind": "principle",
+   "name_en": "Getting acquainted / Working for better understanding",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "A108": {
+   "kind": "example-technique",
+   "name_en": "Make the problem concrete / interesting",
+   "scenarios": [
+    "s02",
+    "s15",
+    "s16"
+   ]
+  },
+  "A109": {
+   "kind": "example-technique",
+   "name_en": "Dialogue: unknown, data, notation, condition, sufficiency",
+   "scenarios": [
+    "s02",
+    "s15"
+   ]
+  },
+  "A110": {
+   "kind": "definition",
+   "name_en": "Having a plan",
+   "scenarios": [
+    "s02",
+    "s19",
+    "s21"
+   ]
+  },
+  "A111": {
+   "kind": "principle",
+   "name_en": "The main achievement is conceiving the idea of a plan",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A112": {
+   "kind": "advice-teacher",
+   "name_en": "Teacher's best: procure a bright idea by unobtrusive help",
+   "scenarios": [
+    "s15",
+    "s16"
+   ]
+  },
+  "A113": {
+   "kind": "advice-teacher",
+   "name_en": "Teacher should recall his own difficulties and successes",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A114": {
+   "kind": "principle",
+   "name_en": "Good ideas are based on past experience and formerly acquired knowledge",
+   "scenarios": [
+    "s20",
+    "s35"
+   ]
+  },
+  "A115": {
+   "kind": "heuristic",
+   "name_en": "Start with: Do you know a related problem?",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A116": {
+   "kind": "heuristic",
+   "name_en": "Selecting the useful related problem via the unknown",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A117": {
+   "kind": "attitude",
+   "name_en": "Deserve the good luck by exploiting it",
+   "scenarios": [
+    "s16",
+    "s34"
+   ]
+  },
+  "A118": {
+   "kind": "warning",
+   "name_en": "The questions cannot work miracles",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "A119": {
+   "kind": "heuristic",
+   "name_en": "Vary, transform, modify the problem",
+   "scenarios": [
+    "s01",
+    "s04",
+    "s20"
+   ]
+  },
+  "A120": {
+   "kind": "heuristic",
+   "name_en": "Variation may lead to an appropriate auxiliary problem",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A121": {
+   "kind": "warning",
+   "name_en": "Danger of losing the original problem; return via 'Did you use all the data?'",
+   "scenarios": [
+    "s02",
+    "s18",
+    "s21"
+   ]
+  },
+  "A122": {
+   "kind": "advice-teacher",
+   "name_en": "Repeat unanswered questions with slight modification; expect silence",
+   "scenarios": [
+    "s08",
+    "s15",
+    "s38"
+   ]
+  },
+  "A123": {
+   "kind": "example-technique",
+   "name_en": "From same unknown to similar unknown",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A124": {
+   "kind": "example-technique",
+   "name_en": "Introduce auxiliary element to use the related problem",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A125": {
+   "kind": "advice-teacher",
+   "name_en": "A scale of more and more explicit hints",
+   "scenarios": [
+    "s02",
+    "s15",
+    "s38"
+   ]
+  },
+  "A126": {
+   "kind": "advice-teacher",
+   "name_en": "Make sure students foresee enough before calculating",
+   "scenarios": [
+    "s02",
+    "s15",
+    "s38"
+   ]
+  },
+  "A127": {
+   "kind": "principle",
+   "name_en": "Prerequisites for conceiving a plan",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A128": {
+   "kind": "advice-solver",
+   "name_en": "Carrying out the plan needs mainly patience",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A129": {
+   "kind": "warning",
+   "name_en": "Danger: forgetting a plan received on authority",
+   "scenarios": [
+    "s16",
+    "s38"
+   ]
+  },
+  "A130": {
+   "kind": "advice-teacher",
+   "name_en": "Insist that the student check each step",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A131": {
+   "kind": "principle",
+   "name_en": "Intuitive insight vs formal derivation",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A132": {
+   "kind": "advice-teacher",
+   "name_en": "Emphasise difference between seeing and proving",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A133": {
+   "kind": "example-technique",
+   "name_en": "Introduce notation for the auxiliary unknown",
+   "scenarios": [
+    "s02",
+    "s26",
+    "s36"
+   ]
+  },
+  "A134": {
+   "kind": "advice-teacher",
+   "name_en": "Do not interrupt correct work except to warn to check",
+   "scenarios": [
+    "s16"
+   ]
+  },
+  "A135": {
+   "kind": "warning",
+   "name_en": "Suppress the 'can you prove it' question for an unprepared class",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A136": {
+   "kind": "warning",
+   "name_en": "Closing the books after getting the answer",
+   "scenarios": [
+    "s06",
+    "s14",
+    "s28",
+    "s31"
+   ]
+  },
+  "A137": {
+   "kind": "principle",
+   "name_en": "Looking back consolidates knowledge and develops ability",
+   "scenarios": [
+    "s02",
+    "s31"
+   ]
+  },
+  "A138": {
+   "kind": "principle",
+   "name_en": "No problem whatever is completely exhausted",
+   "scenarios": [
+    "s02",
+    "s07",
+    "s20",
+    "s31"
+   ]
+  },
+  "A139": {
+   "kind": "advice-solver",
+   "name_en": "Verifications desirable; quick intuitive test should not be overlooked",
+   "scenarios": [
+    "s02",
+    "s14",
+    "s17",
+    "s28"
+   ]
+  },
+  "A140": {
+   "kind": "principle",
+   "name_en": "Two different derivations like perception through two senses",
+   "scenarios": [
+    "s02",
+    "s25",
+    "s28"
+   ]
+  },
+  "A141": {
+   "kind": "principle",
+   "name_en": "Prefer a short intuitive argument",
+   "scenarios": [
+    "s25"
+   ]
+  },
+  "A142": {
+   "kind": "advice-teacher",
+   "name_en": "Do not give the impression problems are unconnected",
+   "scenarios": [
+    "s02",
+    "s31"
+   ]
+  },
+  "A143": {
+   "kind": "attitude",
+   "name_en": "Looking back is interesting after honest effort",
+   "scenarios": [
+    "s02",
+    "s16",
+    "s28",
+    "s31"
+   ]
+  },
+  "A144": {
+   "kind": "advice-teacher",
+   "name_en": "Encourage imagining cases to reuse method or result",
+   "scenarios": [
+    "s02",
+    "s16",
+    "s31"
+   ]
+  },
+  "A145": {
+   "kind": "principle",
+   "name_en": "Problems 'in letters' allow tests numerical ones do not",
+   "scenarios": [
+    "s02",
+    "s17",
+    "s18",
+    "s25"
+   ]
+  },
+  "A146": {
+   "kind": "example-technique",
+   "name_en": "Questions answerable 'yes'; a 'no' reveals a flaw",
+   "scenarios": [
+    "s02",
+    "s28"
+   ]
+  },
+  "A147": {
+   "kind": "example-technique",
+   "name_en": "Do all the data appear in the formula?",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A148": {
+   "kind": "example-technique",
+   "name_en": "Symmetry test",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s26"
+   ]
+  },
+  "A149": {
+   "kind": "example-technique",
+   "name_en": "Analogy test (plane analogue)",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A150": {
+   "kind": "example-technique",
+   "name_en": "Specialisation / limiting case test",
+   "scenarios": [
+    "s02",
+    "s18",
+    "s23"
+   ]
+  },
+  "A151": {
+   "kind": "example-technique",
+   "name_en": "Monotonicity test (varying the data)",
+   "scenarios": [
+    "s02",
+    "s09",
+    "s18",
+    "s23"
+   ]
+  },
+  "A152": {
+   "kind": "example-technique",
+   "name_en": "Homogeneity and dimension test",
+   "scenarios": [
+    "s02",
+    "s17",
+    "s18",
+    "s23"
+   ]
+  },
+  "A153": {
+   "kind": "principle",
+   "name_en": "Passing many tests gives 'experimental evidence'",
+   "scenarios": [
+    "s02",
+    "s18",
+    "s28"
+   ]
+  },
+  "A154": {
+   "kind": "advice-solver",
+   "name_en": "General ideas: use all relevant data, variation of data, symmetry, analogy",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A155": {
+   "kind": "advice-solver",
+   "name_en": "Check the argument at the 'sensitive' points",
+   "scenarios": [
+    "s03",
+    "s06"
+   ]
+  },
+  "A156": {
+   "kind": "example-technique",
+   "name_en": "Applications by concrete interpretation",
+   "scenarios": [
+    "s02",
+    "s23"
+   ]
+  },
+  "A157": {
+   "kind": "advice-teacher",
+   "name_en": "Teacher proposes a slightly different problem (centre to corner)",
+   "scenarios": [
+    "s02",
+    "s31"
+   ]
+  },
+  "A158": {
+   "kind": "example-technique",
+   "name_en": "Using result vs using method",
+   "scenarios": [
+    "s02",
+    "s24"
+   ]
+  },
+  "A159": {
+   "kind": "example-technique",
+   "name_en": "Approach via analogy instead of via the unknown",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A160": {
+   "kind": "advice-teacher",
+   "name_en": "Prepare slow students by first discussing the analogous problem",
+   "scenarios": [
+    "s02",
+    "s15",
+    "s16"
+   ]
+  },
+  "A161": {
+   "kind": "advice-teacher",
+   "name_en": "Start general, go gradually to more specific and concrete",
+   "scenarios": [
+    "s08",
+    "s15",
+    "s38"
+   ]
+  },
+  "A162": {
+   "kind": "principle",
+   "name_en": "Suggestions simple, natural, general; list short",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "A163": {
+   "kind": "advice-teacher",
+   "name_en": "Descend gradually so the student does as much as possible",
+   "scenarios": [
+    "s08",
+    "s15",
+    "s16",
+    "s38"
+   ]
+  },
+  "A164": {
+   "kind": "warning",
+   "name_en": "Any rigid, mechanical, pedantic procedure is bad",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A165": {
+   "kind": "advice-teacher",
+   "name_en": "Try with caution; prepare examples considering different approaches",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A166": {
+   "kind": "advice-teacher",
+   "name_en": "Begin with a few experiments",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "A167": {
+   "kind": "warning",
+   "name_en": "Bad question: Could you apply the theorem of Pythagoras?",
+   "scenarios": [
+    "s02",
+    "s15",
+    "s38"
+   ]
+  },
+  "A168": {
+   "kind": "principle",
+   "name_en": "Criteria of a good question (by contrast)",
+   "scenarios": [
+    "s15",
+    "s38"
+   ]
+  },
+  "A169": {
+   "kind": "warning",
+   "name_en": "Rabbit out of a hat (unnatural surprise)",
+   "scenarios": [
+    "s03",
+    "s15",
+    "s38"
+   ]
+  },
+  "A170": {
+   "kind": "example-technique",
+   "name_en": "Keep only part of the condition → locus of the fourth vertex",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "A171": {
+   "kind": "heuristic",
+   "name_en": "Experiment empirically: draw more figures, small and large",
+   "scenarios": [
+    "s10",
+    "s29"
+   ]
+  },
+  "A172": {
+   "kind": "question",
+   "name_en": "Which part of the condition is easy to satisfy?",
+   "scenarios": [
+    "s04",
+    "s12",
+    "s29"
+   ]
+  },
+  "A173": {
+   "kind": "question",
+   "name_en": "What is the hypothesis? What is the conclusion?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "A174": {
+   "kind": "heuristic",
+   "name_en": "Look at the conclusion! Try to think of a familiar theorem having the same or a similar conclusion",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "A175": {
+   "kind": "question",
+   "name_en": "Here is a theorem related to yours and proved before. Could you use it?",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A176": {
+   "kind": "example-technique",
+   "name_en": "Chain of new conclusions / subgoals",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A177": {
+   "kind": "question",
+   "name_en": "What kind of auxiliary element do you need for your aim?",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A178": {
+   "kind": "question",
+   "name_en": "Did you use the hypothesis? the whole hypothesis?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "A179": {
+   "kind": "question",
+   "name_en": "Have you seen this configuration before?",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A180": {
+   "kind": "attitude",
+   "name_en": "Distinguish clearly between proof and guess; guesses more or less reasonable",
+   "scenarios": [
+    "s03",
+    "s05",
+    "s22",
+    "s25"
+   ]
+  },
+  "A181": {
+   "kind": "heuristic",
+   "name_en": "Work with letters; substitute numerical values only at the end",
+   "scenarios": [
+    "s02",
+    "s17",
+    "s18",
+    "s23",
+    "s36"
+   ]
+  },
+  "A182": {
+   "kind": "question",
+   "name_en": "What is it? Can you say it in other words?",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A183": {
+   "kind": "example-technique",
+   "name_en": "Go back to the definition",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A184": {
+   "kind": "heuristic",
+   "name_en": "Imagine the quantity varying (ignore its numerical value)",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A185": {
+   "kind": "heuristic",
+   "name_en": "Introduce a simpler relation as a stepping stone",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A186": {
+   "kind": "question",
+   "name_en": "Are these quantities independent of each other?",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A187": {
+   "kind": "heuristic",
+   "name_en": "Name an unknown auxiliary quantity anyway",
+   "scenarios": [
+    "s18",
+    "s26"
+   ]
+  },
+  "A188": {
+   "kind": "advice-solver",
+   "name_en": "Do not forget your aim — what is the unknown?",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A189": {
+   "kind": "example-technique",
+   "name_en": "Relation between y,V given; relation between their rates wanted → differentiate",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "A190": {
+   "kind": "advice-solver",
+   "name_en": "Getting acquainted — start from the statement",
+   "scenarios": [
+    "s14",
+    "s26"
+   ]
+  },
+  "A191": {
+   "kind": "advice-solver",
+   "name_en": "Visualise the problem as a whole, clearly and vividly; no details yet",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "A192": {
+   "kind": "principle",
+   "name_en": "Understand, get familiar, impress its purpose on your mind",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "A193": {
+   "kind": "advice-solver",
+   "name_en": "Working for better understanding — start when the statement is impressed",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A194": {
+   "kind": "heuristic",
+   "name_en": "Isolate the principal parts",
+   "scenarios": [
+    "s20",
+    "s33"
+   ]
+  },
+  "A195": {
+   "kind": "heuristic",
+   "name_en": "Consider parts one by one, in turn, in combinations; relate each detail to others and to the whole",
+   "scenarios": [
+    "s26"
+   ]
+  },
+  "A196": {
+   "kind": "advice-solver",
+   "name_en": "Hunting for the helpful idea — when to start",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A197": {
+   "kind": "heuristic",
+   "name_en": "Consider your problem from various sides",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A198": {
+   "kind": "heuristic",
+   "name_en": "Seek contacts with your formerly acquired knowledge",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A199": {
+   "kind": "definition",
+   "name_en": "Helpful idea; decisive idea",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A200": {
+   "kind": "advice-solver",
+   "name_en": "What to do with an incomplete idea",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A201": {
+   "kind": "attitude",
+   "name_en": "Be thankful for all new ideas, even small, hazy, supplementary",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "A202": {
+   "kind": "attitude",
+   "name_en": "Progress as a more complete, coherent, balanced conception",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "A203": {
+   "kind": "advice-solver",
+   "name_en": "Carrying out — start when sure of the main connection",
+   "scenarios": [
+    "s02",
+    "s06"
+   ]
+  },
+  "A204": {
+   "kind": "advice-solver",
+   "name_en": "Make your grasp quite secure; carry out operations in detail",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A205": {
+   "kind": "advice-solver",
+   "name_en": "Convince yourself of each step by formal reasoning, intuitive insight, or both",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A206": {
+   "kind": "heuristic",
+   "name_en": "Distinguish 'great' steps and 'small' steps; check great first",
+   "scenarios": [
+    "s03",
+    "s06"
+   ]
+  },
+  "A207": {
+   "kind": "advice-solver",
+   "name_en": "Looking back — start from the complete and correct solution",
+   "scenarios": [
+    "s20",
+    "s31"
+   ]
+  },
+  "A208": {
+   "kind": "heuristic",
+   "name_en": "Simplify details; shorten lengthier parts; see whole at a glance",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "A209": {
+   "kind": "heuristic",
+   "name_en": "Improve; make intuitive; fit naturally into prior knowledge",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "A210": {
+   "kind": "heuristic",
+   "name_en": "Scrutinise the method: see its point, use it elsewhere",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "A211": {
+   "kind": "principle",
+   "name_en": "Well-ordered knowledge ready to use",
+   "scenarios": [
+    "s28",
+    "s31"
+   ]
+  },
+  "A212": {
+   "kind": "definition",
+   "name_en": "Analogy",
+   "scenarios": [
+    "s07",
+    "s23"
+   ]
+  },
+  "A213": {
+   "kind": "example-technique",
+   "name_en": "Unify two statements via a common term",
+   "scenarios": [
+    "s07",
+    "s23"
+   ]
+  },
+  "A214": {
+   "kind": "principle",
+   "name_en": "Analogy pervades thinking; neglect no kind",
+   "scenarios": [
+    "s07",
+    "s23",
+    "s27"
+   ]
+  },
+  "A215": {
+   "kind": "heuristic",
+   "name_en": "Find a simpler analogous problem",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s24"
+   ]
+  },
+  "A216": {
+   "kind": "principle",
+   "name_en": "Two questions may be easier than one if cleverly connected",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A217": {
+   "kind": "heuristic",
+   "name_en": "Temporarily set aside the original problem",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A218": {
+   "kind": "example-technique",
+   "name_en": "Use a plausible natural principle",
+   "scenarios": [
+    "s07"
+   ]
+  },
+  "A219": {
+   "kind": "advice-solver",
+   "name_en": "Verify by pure geometry independently of mechanical assumptions",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "A220": {
+   "kind": "heuristic",
+   "name_en": "Use the method of the analogous problem",
+   "scenarios": [
+    "s02",
+    "s23"
+   ]
+  },
+  "A221": {
+   "kind": "heuristic",
+   "name_en": "Use the result of the analogous problem",
+   "scenarios": [
+    "s02",
+    "s23"
+   ]
+  },
+  "A222": {
+   "kind": "principle",
+   "name_en": "Use method, result, or both",
+   "scenarios": [
+    "s02",
+    "s29"
+   ]
+  },
+  "A223": {
+   "kind": "heuristic",
+   "name_en": "Re-examine, vary, modify the analogous solution until one generalises",
+   "scenarios": [
+    "s23"
+   ]
+  },
+  "A224": {
+   "kind": "heuristic",
+   "name_en": "Anticipate the result (or some features) by analogy",
+   "scenarios": [
+    "s07",
+    "s18"
+   ]
+  },
+  "A225": {
+   "kind": "definition",
+   "name_en": "Inference by analogy",
+   "scenarios": [
+    "s07"
+   ]
+  },
+  "A226": {
+   "kind": "warning",
+   "name_en": "Neither treat plausible guesses as certain nor disregard them",
+   "scenarios": [
+    "s05",
+    "s07",
+    "s22",
+    "s23",
+    "s32",
+    "s37"
+   ]
+  },
+  "A227": {
+   "kind": "principle",
+   "name_en": "Strength of analogical conclusion: more cases, but quality over quantity",
+   "scenarios": [
+    "s07",
+    "s32"
+   ]
+  },
+  "A228": {
+   "kind": "heuristic",
+   "name_en": "Strengthen a conjecture by examining another analogous case",
+   "scenarios": [
+    "s07"
+   ]
+  },
+  "A229": {
+   "kind": "example-technique",
+   "name_en": "Tabulate analogous cases to reveal regularity (Pascal's triangle)",
+   "scenarios": [
+    "s07",
+    "s24"
+   ]
+  },
+  "A230": {
+   "kind": "principle",
+   "name_en": "Inference by analogy weighs more for closely connected objects",
+   "scenarios": [
+    "s07",
+    "s32"
+   ]
+  },
+  "A231": {
+   "kind": "principle",
+   "name_en": "Simplex sigillum veri",
+   "scenarios": [
+    "s07"
+   ]
+  },
+  "A232": {
+   "kind": "principle",
+   "name_en": "Inference by induction rests on analogy",
+   "scenarios": [
+    "s07"
+   ]
+  },
+  "A233": {
+   "kind": "definition",
+   "name_en": "Analogy (I): relations governed by the same laws",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "A234": {
+   "kind": "definition",
+   "name_en": "Isomorphism (holoedric)",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "A235": {
+   "kind": "definition",
+   "name_en": "Merohedric isomorphism (homomorphism)",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "A236": {
+   "kind": "definition",
+   "name_en": "Auxiliary element",
+   "scenarios": [
+    "s11",
+    "s18",
+    "s29"
+   ]
+  },
+  "A237": {
+   "kind": "definition",
+   "name_en": "Auxiliary lines, auxiliary unknown, auxiliary theorem",
+   "scenarios": [
+    "s11",
+    "s18",
+    "s29"
+   ]
+  },
+  "A238": {
+   "kind": "heuristic",
+   "name_en": "Introduce an auxiliary element to make use of a related problem",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "A239": {
+   "kind": "heuristic",
+   "name_en": "Going back to definitions introduces auxiliary elements",
+   "scenarios": [
+    "s27",
+    "s29"
+   ]
+  },
+  "A240": {
+   "kind": "heuristic",
+   "name_en": "Add elements to make conception fuller, more suggestive, more familiar",
+   "scenarios": [
+    "s11",
+    "s29"
+   ]
+  },
+  "A241": {
+   "kind": "warning",
+   "name_en": "Do not introduce auxiliary elements without purpose",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "A242": {
+   "kind": "example-technique",
+   "name_en": "Place the missing datum respecting the problem's symmetry",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "A243": {
+   "kind": "heuristic",
+   "name_en": "Clarify to yourself why an attempt looks awkward",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "A244": {
+   "kind": "heuristic",
+   "name_en": "Introduce particularly simple and familiar elements",
+   "scenarios": [
+    "s11",
+    "s29"
+   ]
+  },
+  "A245": {
+   "kind": "advice-teacher",
+   "name_en": "Teachers/authors: explain motive and purpose of steps (esp. auxiliary elements)",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A246": {
+   "kind": "definition",
+   "name_en": "Auxiliary problem",
+   "scenarios": [
+    "s19"
+   ]
+  },
+  "A247": {
+   "kind": "principle",
+   "name_en": "Detour around an obstacle (the fly at the window)",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s34"
+   ]
+  },
+  "A248": {
+   "kind": "principle",
+   "name_en": "Devising an auxiliary problem is an important mental operation",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A249": {
+   "kind": "example-technique",
+   "name_en": "Auxiliary unknown",
+   "scenarios": [
+    "s18",
+    "s36"
+   ]
+  },
+  "A250": {
+   "kind": "principle",
+   "name_en": "Profit: use its result or its method",
+   "scenarios": [
+    "s18",
+    "s19",
+    "s36"
+   ]
+  },
+  "A251": {
+   "kind": "warning",
+   "name_en": "Risk: time taken from the main problem; use judgment",
+   "scenarios": [
+    "s02",
+    "s19"
+   ]
+  },
+  "A252": {
+   "kind": "advice-solver",
+   "name_en": "Good reasons: more accessible, instructive, aesthetic appeal, novelty",
+   "scenarios": [
+    "s19"
+   ]
+  },
+  "A253": {
+   "kind": "warning",
+   "name_en": "No infallible method to find auxiliary problems",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A254": {
+   "kind": "definition",
+   "name_en": "Equivalent problems",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A255": {
+   "kind": "heuristic",
+   "name_en": "Prefer the more homogeneous equivalent problem",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A256": {
+   "kind": "definition",
+   "name_en": "Convertible (bilateral, equivalent) reduction",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A257": {
+   "kind": "heuristic",
+   "name_en": "Chains of equivalent auxiliary problems",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A258": {
+   "kind": "principle",
+   "name_en": "Each transformation should be correct and have a clear purpose",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A259": {
+   "kind": "warning",
+   "name_en": "Narrower condition loses solutions; wider admits extraneous ones",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A260": {
+   "kind": "question",
+   "name_en": "Is the new condition equivalent to the original one?",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "A261": {
+   "kind": "definition",
+   "name_en": "Unilateral reduction: to a more or less ambitious problem",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A262": {
+   "kind": "heuristic",
+   "name_en": "Less ambitious auxiliary problem as stepping stone, combined with supplementary remarks",
+   "scenarios": [
+    "s19",
+    "s20",
+    "s24"
+   ]
+  },
+  "A263": {
+   "kind": "principle",
+   "name_en": "Inventor's paradox",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A264": {
+   "kind": "example-technique",
+   "name_en": "Look for critical values (e.g. sphere through vertices)",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "A265": {
+   "kind": "advice-teacher",
+   "name_en": "Student's experience incomplete without solving a problem of his own invention",
+   "scenarios": [
+    "s08",
+    "s21",
+    "s31"
+   ]
+  },
+  "A266": {
+   "kind": "advice-teacher",
+   "name_en": "Leave part of the invention to the students",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "A267": {
+   "kind": "principle",
+   "name_en": "Conceiving a plan and carrying it out are different",
+   "scenarios": [
+    "s06"
+   ]
+  },
+  "A268": {
+   "kind": "principle",
+   "name_en": "Provisional plausible arguments as scaffolding",
+   "scenarios": [
+    "s06",
+    "s25"
+   ]
+  },
+  "A269": {
+   "kind": "advice-solver",
+   "name_en": "Don't fear heuristic reasoning while devising; accept only conclusive reasoning when carrying out",
+   "scenarios": [
+    "s06",
+    "s25"
+   ]
+  },
+  "A270": {
+   "kind": "principle",
+   "name_en": "The more carefully we check, the more freely we may use heuristic reasoning",
+   "scenarios": [
+    "s06",
+    "s25"
+   ]
+  },
+  "A271": {
+   "kind": "advice-solver",
+   "name_en": "Proper order of working out details",
+   "scenarios": [
+    "s03",
+    "s06"
+   ]
+  },
+  "A272": {
+   "kind": "warning",
+   "name_en": "Check main steps before minor details",
+   "scenarios": [
+    "s03",
+    "s06"
+   ]
+  },
+  "A273": {
+   "kind": "principle",
+   "name_en": "Order of invention vs working out vs final exposition",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A274": {
+   "kind": "heuristic",
+   "name_en": "Euclidean exposition: from data to unknown, hypothesis to conclusion — excellent for checking",
+   "scenarios": [
+    "s03",
+    "s06"
+   ]
+  },
+  "A275": {
+   "kind": "warning",
+   "name_en": "Euclidean exposition hides the main line (synthesis order opposite to invention)",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A276": {
+   "kind": "advice-teacher",
+   "name_en": "Students should check their reasoning in Euclidean order, not too rigidly",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A277": {
+   "kind": "advice-teacher",
+   "name_en": "Present Euclidean proof after guided discovery, or intuitive outline then details",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A278": {
+   "kind": "advice-solver",
+   "name_en": "See intuitively AND prove formally",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A279": {
+   "kind": "principle",
+   "name_en": "Intuition may outrun formal proof and vice versa",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A280": {
+   "kind": "advice-solver",
+   "name_en": "Prove formally what is seen intuitively and see intuitively what is proved",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "A281": {
+   "kind": "definition",
+   "name_en": "Condition — principal part of a problem to find",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "A282": {
+   "kind": "definition",
+   "name_en": "Redundant / contradictory condition",
+   "scenarios": [
+    "s04",
+    "s10"
+   ]
+  },
+  "A283": {
+   "kind": "heuristic",
+   "name_en": "Counting linear equations vs unknowns",
+   "scenarios": [
+    "s10",
+    "s26",
+    "s36"
+   ]
+  },
+  "A284": {
+   "kind": "definition",
+   "name_en": "Corollary",
+   "scenarios": [
+    "s25"
+   ]
+  },
+  "A285": {
+   "kind": "principle",
+   "name_en": "The gap to be bridged from either side",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "A286": {
+   "kind": "heuristic",
+   "name_en": "Look at the data! Work forward",
+   "scenarios": [
+    "s08",
+    "s11",
+    "s21",
+    "s37"
+   ]
+  },
+  "A287": {
+   "kind": "principle",
+   "name_en": "Starting from the unknown is usually preferable",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "A288": {
+   "kind": "example-technique",
+   "name_en": "Figure 'too empty' — data not yet sufficiently used (line through A equidistant from B, C)",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "A289": {
+   "kind": "example-technique",
+   "name_en": "Figure suggested by the definition (distance point-line)",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "A290": {
+   "kind": "heuristic",
+   "name_en": "Restating seeks an appropriate variation of the problem",
+   "scenarios": [
+    "s04",
+    "s27"
+   ]
+  },
+  "A291": {
+   "kind": "definition",
+   "name_en": "Decomposing and recombining",
+   "scenarios": [
+    "s13",
+    "s20"
+   ]
+  },
+  "A292": {
+   "kind": "warning",
+   "name_en": "Getting lost in details",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A293": {
+   "kind": "advice-solver",
+   "name_en": "Understand the whole first; then decompose gradually, not further than needed",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "A294": {
+   "kind": "warning",
+   "name_en": "Bad habit: starting on details before understanding the problem as a whole",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B001": {
+   "kind": "question",
+   "name_en": "Principal parts: unknown, data, condition",
+   "scenarios": [
+    "s01"
+   ]
+  },
+  "B002": {
+   "kind": "heuristic",
+   "name_en": "Consider each datum separately",
+   "scenarios": [
+    "s01",
+    "s37"
+   ]
+  },
+  "B003": {
+   "kind": "heuristic",
+   "name_en": "Separate the various parts of the condition",
+   "scenarios": [
+    "s04",
+    "s12",
+    "s13",
+    "s17",
+    "s26",
+    "s33",
+    "s36"
+   ]
+  },
+  "B004": {
+   "kind": "heuristic",
+   "name_en": "Further decomposition; go back to definitions",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B005": {
+   "kind": "heuristic",
+   "name_en": "Recombine the elements in a new way",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B006": {
+   "kind": "principle",
+   "name_en": "Originality of recombination",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B007": {
+   "kind": "advice-solver",
+   "name_en": "Try the usual simple combinations first",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B008": {
+   "kind": "definition",
+   "name_en": "Classification of new problems (keep unknown / keep data / change both)",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "B009": {
+   "kind": "heuristic",
+   "name_en": "Transform only the form of the condition",
+   "scenarios": [
+    "s04",
+    "s36"
+   ]
+  },
+  "B010": {
+   "kind": "question",
+   "name_en": "Keep the unknown; look at the unknown",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "B011": {
+   "kind": "question",
+   "name_en": "Could you think of other data appropriate to determine the unknown?",
+   "scenarios": [
+    "s04",
+    "s09",
+    "s37"
+   ]
+  },
+  "B012": {
+   "kind": "principle",
+   "name_en": "Closer new problem has better chance",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "B013": {
+   "kind": "heuristic",
+   "name_en": "Drop something without adding anything",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "B014": {
+   "kind": "question",
+   "name_en": "Could you derive something useful from the data?",
+   "scenarios": [
+    "s08",
+    "s37"
+   ]
+  },
+  "B015": {
+   "kind": "principle",
+   "name_en": "New unknown as stepping stone",
+   "scenarios": [
+    "s02",
+    "s18"
+   ]
+  },
+  "B016": {
+   "kind": "advice-solver",
+   "name_en": "Settle for less: plausibly useful or closely related unknown",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B017": {
+   "kind": "example-technique",
+   "name_en": "Face diagonal as new unknown",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B018": {
+   "kind": "question",
+   "name_en": "Could you solve a part of the problem?",
+   "scenarios": [
+    "s04",
+    "s11",
+    "s12",
+    "s17",
+    "s24",
+    "s26",
+    "s29",
+    "s37"
+   ]
+  },
+  "B019": {
+   "kind": "warning",
+   "name_en": "Changing both unknown and data — risk",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B020": {
+   "kind": "question",
+   "name_en": "Change the unknown, or the data, or both, so that they are nearer to each other",
+   "scenarios": [
+    "s04",
+    "s13"
+   ]
+  },
+  "B021": {
+   "kind": "heuristic",
+   "name_en": "Interchange the unknown with one of the data",
+   "scenarios": [
+    "s04",
+    "s31"
+   ]
+  },
+  "B022": {
+   "kind": "example-technique",
+   "name_en": "Reduce construction to construction of a point",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B023": {
+   "kind": "example-technique",
+   "name_en": "Each part of condition gives a locus; intersect",
+   "scenarios": [
+    "s12",
+    "s29"
+   ]
+  },
+  "B024": {
+   "kind": "heuristic",
+   "name_en": "Pattern of two loci",
+   "scenarios": [
+    "s12",
+    "s29"
+   ]
+  },
+  "B025": {
+   "kind": "heuristic",
+   "name_en": "Keep only a part of the condition, drop the other part",
+   "scenarios": [
+    "s04",
+    "s10",
+    "s29"
+   ]
+  },
+  "B026": {
+   "kind": "question",
+   "name_en": "How far is the unknown then determined, how can it vary?",
+   "scenarios": [
+    "s04",
+    "s29"
+   ]
+  },
+  "B027": {
+   "kind": "example-technique",
+   "name_en": "Crossword: interpret a deliberately vague clue",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "B028": {
+   "kind": "example-technique",
+   "name_en": "Crossword locus: concentrate on part (I), test against part (II)",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "B029": {
+   "kind": "principle",
+   "name_en": "Introducing two or more new problems",
+   "scenarios": [
+    "s04",
+    "s20"
+   ]
+  },
+  "B030": {
+   "kind": "principle",
+   "name_en": "Problem to find may depend on a problem to prove",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "B031": {
+   "kind": "question",
+   "name_en": "What is the hypothesis? What is the conclusion?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B032": {
+   "kind": "heuristic",
+   "name_en": "Decompose the problem to prove further and further",
+   "scenarios": [
+    "s03",
+    "s27"
+   ]
+  },
+  "B033": {
+   "kind": "question",
+   "name_en": "Keep the conclusion; look at the conclusion",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B034": {
+   "kind": "question",
+   "name_en": "Could you think of other hypothesis from which you could easily derive the conclusion?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B035": {
+   "kind": "question",
+   "name_en": "Keep only a part of the hypothesis; is the conclusion still valid?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B036": {
+   "kind": "question",
+   "name_en": "Could you derive something useful from the hypothesis?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B037": {
+   "kind": "question",
+   "name_en": "Change the hypothesis, or the conclusion, or both, so that they are nearer to each other",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B038": {
+   "kind": "principle",
+   "name_en": "Several new problems to prove / linking to a problem to find",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B039": {
+   "kind": "definition",
+   "name_en": "Definition of a term",
+   "scenarios": [
+    "s13",
+    "s27"
+   ]
+  },
+  "B040": {
+   "kind": "definition",
+   "name_en": "Primitive and derived terms",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B041": {
+   "kind": "example-technique",
+   "name_en": "Definition of parabola as example",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B042": {
+   "kind": "principle",
+   "name_en": "Dictionary vs mathematical definition",
+   "scenarios": [
+    "s13",
+    "s27"
+   ]
+  },
+  "B043": {
+   "kind": "principle",
+   "name_en": "Approach depends on state of knowledge",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B044": {
+   "kind": "heuristic",
+   "name_en": "Get rid of embarrassing unfamiliar terms",
+   "scenarios": [
+    "s13",
+    "s27"
+   ]
+  },
+  "B045": {
+   "kind": "advice-teacher",
+   "name_en": "Go back to definitions (teacher dialogue)",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "B046": {
+   "kind": "question",
+   "name_en": "Could you restate the condition using the lines just introduced?",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B047": {
+   "kind": "advice-teacher",
+   "name_en": "Say it in words",
+   "scenarios": [
+    "s09",
+    "s13"
+   ]
+  },
+  "B048": {
+   "kind": "advice-teacher",
+   "name_en": "Restate neatly in one complete sentence",
+   "scenarios": [
+    "s09",
+    "s13"
+   ]
+  },
+  "B049": {
+   "kind": "advice-teacher",
+   "name_en": "Point out the progress from original statement to restatement",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "B050": {
+   "kind": "principle",
+   "name_en": "Knowing the definition is not enough; use it",
+   "scenarios": [
+    "s13",
+    "s27"
+   ]
+  },
+  "B051": {
+   "kind": "heuristic",
+   "name_en": "Going back to definitions: introduce elements and relations",
+   "scenarios": [
+    "s13",
+    "s27"
+   ]
+  },
+  "B052": {
+   "kind": "principle",
+   "name_en": "Going back to definitions varies the problem",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B053": {
+   "kind": "principle",
+   "name_en": "Must use either definition or known theorems",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B054": {
+   "kind": "advice-solver",
+   "name_en": "If we know little more than the definition, go back to it",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B055": {
+   "kind": "advice-solver",
+   "name_en": "If we know many theorems, look for a suitable theorem",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B056": {
+   "kind": "heuristic",
+   "name_en": "Choose the definition suited to the problem",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B057": {
+   "kind": "example-technique",
+   "name_en": "Archimedes: rotational definition suggests approximation",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B058": {
+   "kind": "heuristic",
+   "name_en": "Going back to definitions in checking an argument",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B059": {
+   "kind": "question",
+   "name_en": "Did you take into account all essential notions? How did you use this notion?",
+   "scenarios": [
+    "s27",
+    "s33"
+   ]
+  },
+  "B060": {
+   "kind": "principle",
+   "name_en": "Pascal: substitute definitions for the defined terms",
+   "scenarios": [
+    "s27"
+   ]
+  },
+  "B061": {
+   "kind": "principle",
+   "name_en": "Hadamard: definitions matter in invention",
+   "scenarios": [
+    "s19",
+    "s20",
+    "s27"
+   ]
+  },
+  "B062": {
+   "kind": "principle",
+   "name_en": "Words and signs are important for the mind",
+   "scenarios": [
+    "s13",
+    "s20",
+    "s27"
+   ]
+  },
+  "B063": {
+   "kind": "attitude",
+   "name_en": "Seek the facts behind the words; do not be fooled by mere words",
+   "scenarios": [
+    "s13",
+    "s27"
+   ]
+  },
+  "B064": {
+   "kind": "definition",
+   "name_en": "Descartes, Rules for the Direction of the Mind",
+   "scenarios": []
+  },
+  "B065": {
+   "kind": "attitude",
+   "name_en": "Reinvent known inventions yourself",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "B066": {
+   "kind": "principle",
+   "name_en": "Problem solving is not purely intellectual",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "B067": {
+   "kind": "attitude",
+   "name_en": "Will-power needed for serious problems",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "B068": {
+   "kind": "attitude",
+   "name_en": "Determination fluctuates with hope and despondency",
+   "scenarios": [
+    "s04",
+    "s19",
+    "s34"
+   ]
+  },
+  "B069": {
+   "kind": "attitude",
+   "name_en": "Inflexible will without hope is not the scientist’s kind",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "B070": {
+   "kind": "advice-solver",
+   "name_en": "Apportion determination to the outlook",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "B071": {
+   "kind": "advice-solver",
+   "name_en": "Stick to your purpose, but do not make it unnecessarily hard",
+   "scenarios": [
+    "s19",
+    "s34"
+   ]
+  },
+  "B072": {
+   "kind": "advice-solver",
+   "name_en": "Do not despise little successes; seek them",
+   "scenarios": [
+    "s16",
+    "s19",
+    "s34"
+   ]
+  },
+  "B073": {
+   "kind": "warning",
+   "name_en": "Silly mistakes signal lack of desire to solve",
+   "scenarios": [
+    "s14",
+    "s34"
+   ]
+  },
+  "B074": {
+   "kind": "advice-teacher",
+   "name_en": "Arouse curiosity and desire to solve",
+   "scenarios": [
+    "s14",
+    "s16",
+    "s34"
+   ]
+  },
+  "B075": {
+   "kind": "advice-teacher",
+   "name_en": "Give the student time to make up his mind",
+   "scenarios": [
+    "s16",
+    "s34",
+    "s38"
+   ]
+  },
+  "B076": {
+   "kind": "principle",
+   "name_en": "Teaching problem solving is education of the will",
+   "scenarios": [
+    "s14",
+    "s19",
+    "s34"
+   ]
+  },
+  "B077": {
+   "kind": "warning",
+   "name_en": "Failure if the student never tasted the emotions of struggle",
+   "scenarios": [
+    "s14",
+    "s34"
+   ]
+  },
+  "B078": {
+   "kind": "definition",
+   "name_en": "Diagnosis",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "B079": {
+   "kind": "advice-teacher",
+   "name_en": "Use the four phases to characterize performance",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "B080": {
+   "kind": "warning",
+   "name_en": "Incomplete understanding from lack of concentration",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "B081": {
+   "kind": "warning",
+   "name_en": "Rushing into calculations without any plan",
+   "scenarios": [
+    "s06",
+    "s14"
+   ]
+  },
+  "B082": {
+   "kind": "warning",
+   "name_en": "Waiting clumsily for an idea",
+   "scenarios": [
+    "s06",
+    "s14"
+   ]
+  },
+  "B083": {
+   "kind": "warning",
+   "name_en": "Carelessness; impatience in checking each step",
+   "scenarios": [
+    "s06",
+    "s14"
+   ]
+  },
+  "B084": {
+   "kind": "warning",
+   "name_en": "Failure to check the result",
+   "scenarios": [
+    "s14",
+    "s28"
+   ]
+  },
+  "B085": {
+   "kind": "advice-teacher",
+   "name_en": "Cure by insisting on certain questions of the list",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "B086": {
+   "kind": "question",
+   "name_en": "Is our conception adequate? Did you use all the data / the whole condition?",
+   "scenarios": [
+    "s09",
+    "s21",
+    "s26",
+    "s31"
+   ]
+  },
+  "B087": {
+   "kind": "question",
+   "name_en": "Did you use the whole hypothesis?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B088": {
+   "kind": "example-technique",
+   "name_en": "Parallelepiped: bring the unused datum into play",
+   "scenarios": [
+    "s02",
+    "s18"
+   ]
+  },
+  "B089": {
+   "kind": "heuristic",
+   "name_en": "Locate the missing element; it gives a definite line of inquiry",
+   "scenarios": [
+    "s02",
+    "s06",
+    "s21"
+   ]
+  },
+  "B090": {
+   "kind": "heuristic",
+   "name_en": "Checking a proof: where is each part of the hypothesis used?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B091": {
+   "kind": "advice-solver",
+   "name_en": "Such checking is almost necessary for long arguments",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B092": {
+   "kind": "question",
+   "name_en": "Did you take into account all essential notions involved in the problem?",
+   "scenarios": [
+    "s01",
+    "s13",
+    "s27"
+   ]
+  },
+  "B093": {
+   "kind": "warning",
+   "name_en": "Caveat: applies to perfectly stated, reasonable problems",
+   "scenarios": [
+    "s01",
+    "s09",
+    "s21"
+   ]
+  },
+  "B094": {
+   "kind": "definition",
+   "name_en": "Perfectly stated, reasonable problem to find",
+   "scenarios": [
+    "s09",
+    "s21"
+   ]
+  },
+  "B095": {
+   "kind": "definition",
+   "name_en": "Perfectly stated problem to prove",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B096": {
+   "kind": "warning",
+   "name_en": "Do not rely too much on textbook problems being well posed",
+   "scenarios": [
+    "s01",
+    "s09"
+   ]
+  },
+  "B097": {
+   "kind": "warning",
+   "name_en": "Ask these questions unmodified only for reasonable problems",
+   "scenarios": [
+    "s01"
+   ]
+  },
+  "B098": {
+   "kind": "warning",
+   "name_en": "Chess problems are perfectly stated; practical problems are not",
+   "scenarios": [
+    "s01",
+    "s21"
+   ]
+  },
+  "B099": {
+   "kind": "principle",
+   "name_en": "A totally new problem would be insoluble",
+   "scenarios": [
+    "s35"
+   ]
+  },
+  "B100": {
+   "kind": "principle",
+   "name_en": "Profit from solved problems: result, method, experience",
+   "scenarios": [
+    "s01",
+    "s23",
+    "s35"
+   ]
+  },
+  "B101": {
+   "kind": "question",
+   "name_en": "Do you know a related problem?",
+   "scenarios": [
+    "s23",
+    "s35"
+   ]
+  },
+  "B102": {
+   "kind": "heuristic",
+   "name_en": "Look for closely related problems (unknown, generalization, specialization, analogy)",
+   "scenarios": [
+    "s24",
+    "s35"
+   ]
+  },
+  "B103": {
+   "kind": "principle",
+   "name_en": "Aim: mobilization of previously acquired knowledge",
+   "scenarios": [
+    "s35"
+   ]
+  },
+  "B104": {
+   "kind": "question",
+   "name_en": "Do you know a theorem that could be useful?",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "B105": {
+   "kind": "advice-solver",
+   "name_en": "Draw a figure",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B106": {
+   "kind": "advice-solver",
+   "name_en": "Introduce suitable notation",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B107": {
+   "kind": "warning",
+   "name_en": "Do not accept a vivid guess as proven truth",
+   "scenarios": [
+    "s03",
+    "s05",
+    "s12",
+    "s22",
+    "s28",
+    "s32"
+   ]
+  },
+  "B108": {
+   "kind": "warning",
+   "name_en": "Do not disregard a vivid guess altogether",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s32"
+   ]
+  },
+  "B109": {
+   "kind": "principle",
+   "name_en": "Which guesses deserve examination",
+   "scenarios": [
+    "s05",
+    "s22"
+   ]
+  },
+  "B110": {
+   "kind": "attitude",
+   "name_en": "No idea is really bad, unless we are uncritical",
+   "scenarios": [
+    "s05",
+    "s07",
+    "s28"
+   ]
+  },
+  "B111": {
+   "kind": "warning",
+   "name_en": "The John Jones story: blind to contrary signs",
+   "scenarios": [
+    "s05",
+    "s22"
+   ]
+  },
+  "B112": {
+   "kind": "principle",
+   "name_en": "Practical excuse: limited time to doubt",
+   "scenarios": [
+    "s05",
+    "s32"
+   ]
+  },
+  "B113": {
+   "kind": "advice-solver",
+   "name_en": "Do not let a conjecture grow unexamined",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s32"
+   ]
+  },
+  "B114": {
+   "kind": "example-technique",
+   "name_en": "Guess by analogy with a known result (circle → square)",
+   "scenarios": [
+    "s17",
+    "s23",
+    "s29"
+   ]
+  },
+  "B115": {
+   "kind": "advice-solver",
+   "name_en": "Realize what the guess means; have the courage to state it",
+   "scenarios": [
+    "s05",
+    "s29"
+   ]
+  },
+  "B116": {
+   "kind": "heuristic",
+   "name_en": "A stated guess turns a problem to find into a problem to prove",
+   "scenarios": [
+    "s03",
+    "s05",
+    "s10",
+    "s11",
+    "s22",
+    "s27",
+    "s29"
+   ]
+  },
+  "B117": {
+   "kind": "example-technique",
+   "name_en": "Solve a part: weaker but more accessible theorem",
+   "scenarios": [
+    "s11",
+    "s29"
+   ]
+  },
+  "B118": {
+   "kind": "example-technique",
+   "name_en": "State it in algebra; progress by facing guesses squarely",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B119": {
+   "kind": "example-technique",
+   "name_en": "Crossword: guess the beginning of the word",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "B120": {
+   "kind": "heuristic",
+   "name_en": "Check the guess through an intersecting word",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "B121": {
+   "kind": "example-technique",
+   "name_en": "Less obvious guess (palindrome); try all vowels one by one",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "B122": {
+   "kind": "principle",
+   "name_en": "Figures help in all kinds of problems",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B123": {
+   "kind": "advice-solver",
+   "name_en": "Imagine or draw the figure",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B124": {
+   "kind": "principle",
+   "name_en": "Paper preserves details and earlier considerations",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B125": {
+   "kind": "heuristic",
+   "name_en": "Draw a figure with unknown and data assembled as the condition prescribes",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B126": {
+   "kind": "heuristic",
+   "name_en": "Consider each part separately, then reunite and see the condition as a whole",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B127": {
+   "kind": "principle",
+   "name_en": "Drawing the figure is not an unwarranted assumption",
+   "scenarios": [
+    "s22",
+    "s29",
+    "s33"
+   ]
+  },
+  "B128": {
+   "kind": "heuristic",
+   "name_en": "Assume what is required to be done as already done",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s29"
+   ]
+  },
+  "B129": {
+   "kind": "heuristic",
+   "name_en": "Examine the hypothetical situation in which the condition is fully satisfied",
+   "scenarios": [
+    "s06",
+    "s10",
+    "s29"
+   ]
+  },
+  "B130": {
+   "kind": "advice-solver",
+   "name_en": "Exact vs freehand figures",
+   "scenarios": [
+    "s17",
+    "s29"
+   ]
+  },
+  "B131": {
+   "kind": "warning",
+   "name_en": "Figure must not look absurd; protect by varying the figure",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B132": {
+   "kind": "principle",
+   "name_en": "The figure is an aid, not the basis; logical connections are",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B133": {
+   "kind": "advice-solver",
+   "name_en": "Choose the most convenient order of construction",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B134": {
+   "kind": "warning",
+   "name_en": "Avoid unwarranted specialization in the figure",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B135": {
+   "kind": "advice-solver",
+   "name_en": "Emphasize roles of lines with weight, dashes, colours",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B136": {
+   "kind": "advice-teacher",
+   "name_en": "Solid geometry: models, drawings, everyday objects",
+   "scenarios": [
+    "s16",
+    "s17"
+   ]
+  },
+  "B137": {
+   "kind": "heuristic",
+   "name_en": "Find a geometric representation for nongeometric objects",
+   "scenarios": [
+    "s32"
+   ]
+  },
+  "B138": {
+   "kind": "principle",
+   "name_en": "Graphs and diagrams in all sciences",
+   "scenarios": [
+    "s32"
+   ]
+  },
+  "B139": {
+   "kind": "advice-solver",
+   "name_en": "Even if your problem is not geometrical, draw a figure",
+   "scenarios": [
+    "s12",
+    "s32"
+   ]
+  },
+  "B140": {
+   "kind": "definition",
+   "name_en": "Generalization",
+   "scenarios": [
+    "s07",
+    "s24"
+   ]
+  },
+  "B141": {
+   "kind": "example-technique",
+   "name_en": "Lucky generalization from an observation",
+   "scenarios": [
+    "s07",
+    "s25",
+    "s31"
+   ]
+  },
+  "B142": {
+   "kind": "example-technique",
+   "name_en": "Generalize to solve: octahedron → body with centre of symmetry",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B143": {
+   "kind": "principle",
+   "name_en": "Main achievement: inventing the general problem, disentangling the essential property",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B144": {
+   "kind": "principle",
+   "name_en": "The more general problem may be easier to solve",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B145": {
+   "kind": "heuristic",
+   "name_en": "Pass from a numerical to a literal problem",
+   "scenarios": [
+    "s02",
+    "s17",
+    "s23",
+    "s24"
+   ]
+  },
+  "B146": {
+   "kind": "question",
+   "name_en": "Have you seen it before?",
+   "scenarios": [
+    "s21"
+   ]
+  },
+  "B147": {
+   "kind": "question",
+   "name_en": "Or have you seen the same problem in a slightly different form?",
+   "scenarios": [
+    "s23",
+    "s35"
+   ]
+  },
+  "B148": {
+   "kind": "principle",
+   "name_en": "Even a negative answer may mobilize useful knowledge",
+   "scenarios": [
+    "s23",
+    "s35"
+   ]
+  },
+  "B149": {
+   "kind": "heuristic",
+   "name_en": "Recognize important features: What is it? Is it familiar?",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "B150": {
+   "kind": "principle",
+   "name_en": "A related solved problem is good news",
+   "scenarios": [
+    "s35"
+   ]
+  },
+  "B151": {
+   "kind": "principle",
+   "name_en": "Contrast with auxiliary problem: know solution vs know use",
+   "scenarios": [
+    "s20",
+    "s35"
+   ]
+  },
+  "B152": {
+   "kind": "heuristic",
+   "name_en": "Use the result or the method — or both if lucky",
+   "scenarios": [
+    "s02",
+    "s24"
+   ]
+  },
+  "B153": {
+   "kind": "question",
+   "name_en": "Could you use it? Could you use its result? Could you use its method?",
+   "scenarios": [
+    "s23"
+   ]
+  },
+  "B154": {
+   "kind": "example-technique",
+   "name_en": "Introduce elements corresponding to the old problem (analogy plane→space)",
+   "scenarios": [
+    "s23"
+   ]
+  },
+  "B155": {
+   "kind": "question",
+   "name_en": "Should you introduce some auxiliary element in order to make its use possible?",
+   "scenarios": [
+    "s35"
+   ]
+  },
+  "B156": {
+   "kind": "question",
+   "name_en": "Here is a theorem related to yours and proved before",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B157": {
+   "kind": "definition",
+   "name_en": "Heuristic, ars inveniendi",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "B158": {
+   "kind": "definition",
+   "name_en": "History: Euclid’s commentators, Pappus, Descartes, Leibnitz, Bolzano",
+   "scenarios": []
+  },
+  "B159": {
+   "kind": "definition",
+   "name_en": "Heuristic reasoning",
+   "scenarios": [
+    "s05",
+    "s25",
+    "s30"
+   ]
+  },
+  "B160": {
+   "kind": "principle",
+   "name_en": "Provisional reasoning is needed like scaffolding",
+   "scenarios": [
+    "s25"
+   ]
+  },
+  "B161": {
+   "kind": "principle",
+   "name_en": "Heuristic reasoning is often based on induction or analogy",
+   "scenarios": [
+    "s07"
+   ]
+  },
+  "B162": {
+   "kind": "warning",
+   "name_en": "Do not mix heuristic reasoning with rigorous proof; worse to sell it as proof",
+   "scenarios": [
+    "s05",
+    "s25",
+    "s32"
+   ]
+  },
+  "B163": {
+   "kind": "advice-teacher",
+   "name_en": "Teach heuristic arguments openly (e.g. calculus for engineers)",
+   "scenarios": [
+    "s14",
+    "s25"
+   ]
+  },
+  "B164": {
+   "kind": "warning",
+   "name_en": "Present heuristic arguments with taste and frankness",
+   "scenarios": [
+    "s14",
+    "s25"
+   ]
+  },
+  "B165": {
+   "kind": "attitude",
+   "name_en": "Seek consolation in an easier success, then attack again",
+   "scenarios": [
+    "s04",
+    "s19",
+    "s34",
+    "s38"
+   ]
+  },
+  "B166": {
+   "kind": "principle",
+   "name_en": "Human superiority: going around an obstacle",
+   "scenarios": [
+    "s06",
+    "s34"
+   ]
+  },
+  "B167": {
+   "kind": "question",
+   "name_en": "Could you imagine a more accessible related problem?",
+   "scenarios": [
+    "s11",
+    "s37",
+    "s38"
+   ]
+  },
+  "B168": {
+   "kind": "heuristic",
+   "name_en": "Remaining questions of the paragraph aim at variation of the problem",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "B169": {
+   "kind": "definition",
+   "name_en": "Induction",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "B170": {
+   "kind": "definition",
+   "name_en": "Mathematical induction vs induction",
+   "scenarios": [
+    "s07",
+    "s24",
+    "s25"
+   ]
+  },
+  "B171": {
+   "kind": "heuristic",
+   "name_en": "Ask a general question from a curious observation",
+   "scenarios": [
+    "s07",
+    "s24",
+    "s25"
+   ]
+  },
+  "B172": {
+   "kind": "heuristic",
+   "name_en": "Examine other special cases and arrange them in a table",
+   "scenarios": [
+    "s07",
+    "s24",
+    "s25"
+   ]
+  },
+  "B173": {
+   "kind": "principle",
+   "name_en": "Mathematician’s caution: strongly suggested by induction",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "B174": {
+   "kind": "heuristic",
+   "name_en": "Gather more evidence or re-examine facts for deeper regularity",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "B175": {
+   "kind": "example-technique",
+   "name_en": "Look at bases and differences → more precise conjecture",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "B176": {
+   "kind": "principle",
+   "name_en": "Instruments of induction: generalization, specialization, analogy",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "B177": {
+   "kind": "principle",
+   "name_en": "Mathematics in the making is an experimental inductive science",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "B178": {
+   "kind": "advice-solver",
+   "name_en": "After experimental work, become strict: seek rigorous proof",
+   "scenarios": [
+    "s25"
+   ]
+  },
+  "B179": {
+   "kind": "example-technique",
+   "name_en": "Staircase figure proves 1+2+...+n = n(n+1)/2",
+   "scenarios": [
+    "s25"
+   ]
+  },
+  "B180": {
+   "kind": "heuristic",
+   "name_en": "If no idea of proof, at least test the next case",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "B181": {
+   "kind": "heuristic",
+   "name_en": "Test more effectively: does it remain true passing from n to n+1?",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "B182": {
+   "kind": "example-technique",
+   "name_en": "From known cases to all n",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "B183": {
+   "kind": "heuristic",
+   "name_en": "Pattern: statement precisely stated in advance, depending on n, explicit",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "B184": {
+   "kind": "heuristic",
+   "name_en": "Pattern: inductive step from experience of testing, then base case n=1",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "B185": {
+   "kind": "definition",
+   "name_en": "Name: proof from n to n+1 / passage to the next integer",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "B186": {
+   "kind": "heuristic",
+   "name_en": "Passing to the more precise statement is an important preliminary",
+   "scenarios": [
+    "s20",
+    "s25"
+   ]
+  },
+  "B187": {
+   "kind": "principle",
+   "name_en": "The stronger theorem is easier to master",
+   "scenarios": [
+    "s20",
+    "s25"
+   ]
+  },
+  "B188": {
+   "kind": "principle",
+   "name_en": "Inventor’s paradox",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B189": {
+   "kind": "warning",
+   "name_en": "Proviso: based on insight, not mere pretension",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B190": {
+   "kind": "question",
+   "name_en": "Is the condition sufficient? insufficient? redundant? contradictory?",
+   "scenarios": [
+    "s04",
+    "s09",
+    "s10",
+    "s37"
+   ]
+  },
+  "B191": {
+   "kind": "heuristic",
+   "name_en": "Foresee any feature of the result",
+   "scenarios": [
+    "s09",
+    "s18"
+   ]
+  },
+  "B192": {
+   "kind": "question",
+   "name_en": "Number of solutions; is our problem reasonable?",
+   "scenarios": [
+    "s04",
+    "s09",
+    "s10",
+    "s11",
+    "s37"
+   ]
+  },
+  "B193": {
+   "kind": "warning",
+   "name_en": "Do not insist on these questions when the answer is difficult",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "B194": {
+   "kind": "question",
+   "name_en": "Is it likely that the proposition is true? Or rather false?",
+   "scenarios": [
+    "s03",
+    "s25",
+    "s27"
+   ]
+  },
+  "B195": {
+   "kind": "principle",
+   "name_en": "Leibnitz: the sources of invention",
+   "scenarios": []
+  },
+  "B196": {
+   "kind": "definition",
+   "name_en": "Lemma",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B197": {
+   "kind": "heuristic",
+   "name_en": "Assume an auxiliary theorem provisionally, postpone its proof",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B198": {
+   "kind": "heuristic",
+   "name_en": "Look at the end (respice finem)",
+   "scenarios": [
+    "s06",
+    "s13",
+    "s18",
+    "s19",
+    "s21"
+   ]
+  },
+  "B199": {
+   "kind": "question",
+   "name_en": "What is the means to this end? How can you attain your aim?",
+   "scenarios": [
+    "s13"
+   ]
+  },
+  "B200": {
+   "kind": "question",
+   "name_en": "Where have you seen such a result? What do people usually do to obtain it?",
+   "scenarios": [
+    "s13"
+   ]
+  },
+  "B201": {
+   "kind": "question",
+   "name_en": "Try to think of a familiar problem having the same or a similar unknown",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B202": {
+   "kind": "principle",
+   "name_en": "The same-unknown suggestion is more specific than «related problem»",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B203": {
+   "kind": "heuristic",
+   "name_en": "Economy of representation: see the problem schematically via the unknown",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B204": {
+   "kind": "heuristic",
+   "name_en": "Economy of choice: among same-unknown problems, first the most elementary",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B205": {
+   "kind": "example-technique",
+   "name_en": "For a length: is there a triangle, or should we introduce one?",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B206": {
+   "kind": "heuristic",
+   "name_en": "Choose which auxiliary triangle (right triangles simplest)",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B207": {
+   "kind": "principle",
+   "name_en": "Foreseeing that missing parts can be obtained is a plan",
+   "scenarios": [
+    "s21"
+   ]
+  },
+  "B208": {
+   "kind": "heuristic",
+   "name_en": "Nearly all classroom problems to find can be started by this suggestion",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B209": {
+   "kind": "heuristic",
+   "name_en": "Introduce something useful and well-known into the problem",
+   "scenarios": [
+    "s02",
+    "s18",
+    "s37"
+   ]
+  },
+  "B210": {
+   "kind": "example-technique",
+   "name_en": "Plan: unknown as side of a triangle",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B211": {
+   "kind": "example-technique",
+   "name_en": "Plan: unknown as an angle in a triangle",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B212": {
+   "kind": "example-technique",
+   "name_en": "Plan: volume from base area and altitude",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "B213": {
+   "kind": "example-technique",
+   "name_en": "Plan: point as intersection of two loci",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "B214": {
+   "kind": "principle",
+   "name_en": "Having an idea to start with is a great advantage",
+   "scenarios": [
+    "s02",
+    "s20"
+   ]
+  },
+  "B215": {
+   "kind": "principle",
+   "name_en": "When no solved problem with the same unknown exists, the task is much harder",
+   "scenarios": [
+    "s18",
+    "s20",
+    "s27"
+   ]
+  },
+  "B216": {
+   "kind": "example-technique",
+   "name_en": "Knowing a solved problem with the same unknown makes the difference",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "B217": {
+   "kind": "heuristic",
+   "name_en": "If no same unknown, look for a similar unknown",
+   "scenarios": [
+    "s18",
+    "s20"
+   ]
+  },
+  "B218": {
+   "kind": "heuristic",
+   "name_en": "Problems to prove: look at the conclusion, schematically",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B219": {
+   "kind": "example-technique",
+   "name_en": "Plan: prove equal angles via congruent triangles",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "B220": {
+   "kind": "principle",
+   "name_en": "Summary: recalling same-unknown problems gives a good start",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B221": {
+   "kind": "advice-teacher",
+   "name_en": "Students and teachers cannot afford to neglect this suggestion",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B222": {
+   "kind": "definition",
+   "name_en": "Modern heuristic",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "B223": {
+   "kind": "principle",
+   "name_en": "Sources: logic, psychology, older authors, unbiased experience",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "B224": {
+   "kind": "principle",
+   "name_en": "Base heuristic on experience; seek features independent of subject matter",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "B225": {
+   "kind": "principle",
+   "name_en": "Practical aims: influence on teaching",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "B226": {
+   "kind": "definition",
+   "name_en": "The list as list of mental operations; how to look up an item",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "B227": {
+   "kind": "attitude",
+   "name_en": "We feel progress intensely — elated or depressed",
+   "scenarios": [
+    "s19",
+    "s28",
+    "s34"
+   ]
+  },
+  "B228": {
+   "kind": "principle",
+   "name_en": "Variation of the problem is essential; its means",
+   "scenarios": [
+    "s20",
+    "s30"
+   ]
+  },
+  "B229": {
+   "kind": "principle",
+   "name_en": "Distinguish problems to find and to prove; adapt the list",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "B230": {
+   "kind": "principle",
+   "name_en": "Notation and figures are a great, often indispensable help",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "B231": {
+   "kind": "advice-solver",
+   "name_en": "Guess, but examine your guess; heuristic reasoning is not proof",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s25",
+    "s30"
+   ]
+  },
+  "B232": {
+   "kind": "definition",
+   "name_en": "Map: psychological articles (Determination…, Subconscious work); logical patterns",
+   "scenarios": []
+  },
+  "B233": {
+   "kind": "warning",
+   "name_en": "Scope: all kinds of problems; infallible rules of discovery are beyond research",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "B234": {
+   "kind": "principle",
+   "name_en": "Heuristic and the wisdom of proverbs",
+   "scenarios": [
+    "s35"
+   ]
+  },
+  "B235": {
+   "kind": "definition",
+   "name_en": "Methodological articles list",
+   "scenarios": []
+  },
+  "B236": {
+   "kind": "definition",
+   "name_en": "Articles for teachers and for ambitious students",
+   "scenarios": []
+  },
+  "B237": {
+   "kind": "advice-solver",
+   "name_en": "Teacher–student dialogues model the solver’s inner dialogue",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "B238": {
+   "kind": "definition",
+   "name_en": "Other groups: history, technical terms, cross-references (†)",
+   "scenarios": []
+  },
+  "B239": {
+   "kind": "principle",
+   "name_en": "Heuristic aims at generality; limitation of elementary examples",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "B240": {
+   "kind": "definition",
+   "name_en": "Acknowledgments: Mach, Hadamard, James, Köhler; Duncker, Krauss",
+   "scenarios": []
+  },
+  "B241": {
+   "kind": "principle",
+   "name_en": "Value of good notation: try adding Roman numerals",
+   "scenarios": [
+    "s24",
+    "s36"
+   ]
+  },
+  "B242": {
+   "kind": "principle",
+   "name_en": "Signs (words, figures, symbols) assist the mind",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B243": {
+   "kind": "principle",
+   "name_en": "Notation as a well-made language; setting up equations as translation",
+   "scenarios": [
+    "s18",
+    "s26",
+    "s36"
+   ]
+  },
+  "B244": {
+   "kind": "heuristic",
+   "name_en": "Choose symbols for each new problem, as words are chosen",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "B245": {
+   "kind": "heuristic",
+   "name_en": "Careful choice of notation repays and aids understanding",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B246": {
+   "kind": "principle",
+   "name_en": "Properties of good notation",
+   "scenarios": [
+    "s24",
+    "s36"
+   ]
+  },
+  "B247": {
+   "kind": "warning",
+   "name_en": "Unambiguous: one symbol must not denote two objects in one inquiry",
+   "scenarios": [
+    "s24",
+    "s36"
+   ]
+  },
+  "B248": {
+   "kind": "advice-solver",
+   "name_en": "Several signs for one object: allowed but with care; never without necessity",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B249": {
+   "kind": "advice-solver",
+   "name_en": "Easy to remember: use initials",
+   "scenarios": [
+    "s18",
+    "s26",
+    "s36"
+   ]
+  },
+  "B250": {
+   "kind": "advice-solver",
+   "name_en": "Objects close in conception → letters close in the alphabet",
+   "scenarios": [
+    "s24",
+    "s26",
+    "s36"
+   ]
+  },
+  "B251": {
+   "kind": "advice-solver",
+   "name_en": "One alphabet per category; corresponding letters for related objects",
+   "scenarios": [
+    "s24",
+    "s26",
+    "s36"
+   ]
+  },
+  "B252": {
+   "kind": "example-technique",
+   "name_en": "Letters chosen to show nature and connection",
+   "scenarios": [
+    "s18",
+    "s26",
+    "s36"
+   ]
+  },
+  "B253": {
+   "kind": "principle",
+   "name_en": "More pregnant notation permits conclusions without the figure",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "B254": {
+   "kind": "warning",
+   "name_en": "Use traditional symbols (e, i, π) only in their traditional meaning",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B255": {
+   "kind": "heuristic",
+   "name_en": "Useful second meanings: notation used before recalls procedures",
+   "scenarios": [
+    "s24",
+    "s36"
+   ]
+  },
+  "B256": {
+   "kind": "advice-solver",
+   "name_en": "Fixed notation helps recall formulas; beware altered meaning",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B257": {
+   "kind": "advice-solver",
+   "name_en": "Choosing between notations needs experience and taste; have a good reason",
+   "scenarios": [
+    "s24",
+    "s36"
+   ]
+  },
+  "B258": {
+   "kind": "advice-teacher",
+   "name_en": "Help intelligent students experience that symbols help the mind",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "B259": {
+   "kind": "advice-teacher",
+   "name_en": "Examine a formula by discussing its features — instructive exercise",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "B260": {
+   "kind": "definition",
+   "name_en": "Pappus; analyomenos (Treasury of analysis)",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "B261": {
+   "kind": "heuristic",
+   "name_en": "Analysis (solution backwards, regressive reasoning)",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s21"
+   ]
+  },
+  "B262": {
+   "kind": "heuristic",
+   "name_en": "Synthesis (constructive solution, progressive reasoning)",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s24"
+   ]
+  },
+  "B263": {
+   "kind": "definition",
+   "name_en": "Two kinds of analysis: theoretical (to prove) and problematical (to find)",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s33"
+   ]
+  },
+  "B264": {
+   "kind": "heuristic",
+   "name_en": "Analysis of a problem to prove: chain to a known L; reversibility",
+   "scenarios": [
+    "s33"
+   ]
+  },
+  "B265": {
+   "kind": "heuristic",
+   "name_en": "Analysis of a problem to find: chain of unknowns to z found by known method",
+   "scenarios": [
+    "s06",
+    "s08"
+   ]
+  },
+  "B266": {
+   "kind": "principle",
+   "name_en": "Pappus’s procedures are not restricted to geometry, nor to mathematics",
+   "scenarios": [
+    "s06",
+    "s08"
+   ]
+  },
+  "B267": {
+   "kind": "example-technique",
+   "name_en": "Algebraic illustration: repeated reduction by substitutions",
+   "scenarios": [
+    "s08",
+    "s36"
+   ]
+  },
+  "B268": {
+   "kind": "principle",
+   "name_en": "Synthesis: carry out step by step; order reverse of invention",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "B269": {
+   "kind": "example-technique",
+   "name_en": "Non-mathematical illustration: primitive man crossing a creek",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "B270": {
+   "kind": "principle",
+   "name_en": "Analysis consists of thoughts, synthesis of acts; reversed order",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "B271": {
+   "kind": "principle",
+   "name_en": "Analysis is invention / devising a plan; synthesis is execution / carrying out",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "B272": {
+   "kind": "principle",
+   "name_en": "Meaning of «assume the problem solved»",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s29"
+   ]
+  },
+  "B273": {
+   "kind": "principle",
+   "name_en": "To examine the condition we must conceive x as existing",
+   "scenarios": [
+    "s06",
+    "s10"
+   ]
+  },
+  "B274": {
+   "kind": "warning",
+   "name_en": "«Assume A true»: draw consequences from an unproved theorem",
+   "scenarios": [
+    "s03",
+    "s10",
+    "s33"
+   ]
+  },
+  "B275": {
+   "kind": "warning",
+   "name_en": "Proviso: all derivations must be reversible",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s10"
+   ]
+  },
+  "B276": {
+   "kind": "principle",
+   "name_en": "Chain of equivalent auxiliary problems",
+   "scenarios": [
+    "s08",
+    "s36"
+   ]
+  },
+  "B277": {
+   "kind": "warning",
+   "name_en": "Textbook tradition of analysis/synthesis is easily misunderstood",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "B278": {
+   "kind": "warning",
+   "name_en": "Pedantry: applying a rule rigidly to the letter",
+   "scenarios": [
+    "s13",
+    "s15",
+    "s30"
+   ]
+  },
+  "B279": {
+   "kind": "attitude",
+   "name_en": "Mastery: applying a rule with natural ease and judgment",
+   "scenarios": [
+    "s13",
+    "s30"
+   ]
+  },
+  "B280": {
+   "kind": "advice-solver",
+   "name_en": "Understand the list and learn its use by trial and error",
+   "scenarios": [
+    "s15",
+    "s30"
+   ]
+  },
+  "B281": {
+   "kind": "warning",
+   "name_en": "Never ask a question or make a suggestion indiscriminately, by rigid habit",
+   "scenarios": [
+    "s13",
+    "s15",
+    "s30"
+   ]
+  },
+  "B282": {
+   "kind": "advice-solver",
+   "name_en": "Let the next step be suggested by attentive, open-minded consideration",
+   "scenarios": [
+    "s13",
+    "s30"
+   ]
+  },
+  "B283": {
+   "kind": "advice-teacher",
+   "name_en": "Help from sympathetic understanding of the student’s difficulties",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "B284": {
+   "kind": "advice-solver",
+   "name_en": "Always use your own brains first",
+   "scenarios": [
+    "s13",
+    "s30"
+   ]
+  },
+  "B285": {
+   "kind": "principle",
+   "name_en": "Practical problems: same principal motives and procedures",
+   "scenarios": [
+    "s01",
+    "s13",
+    "s17",
+    "s35"
+   ]
+  },
+  "B286": {
+   "kind": "example-technique",
+   "name_en": "Dam example: applying unknown/condition/data to a practical problem",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "B287": {
+   "kind": "principle",
+   "name_en": "Unknowns, data, conditions are more complex and less sharply defined",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "B288": {
+   "kind": "example-technique",
+   "name_en": "Previously acquired knowledge needed; imagine the ancient Egyptian dam builder",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "B289": {
+   "kind": "principle",
+   "name_en": "Modern engineer also uses not-yet-scientific empirical knowledge",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "C001": {
+   "kind": "principle",
+   "name_en": "Practical problems: less precise data/concepts",
+   "scenarios": [
+    "s01",
+    "s13",
+    "s17",
+    "s35"
+   ]
+  },
+  "C002": {
+   "kind": "principle",
+   "name_en": "Same fundamental motives and procedures",
+   "scenarios": [
+    "s01",
+    "s13",
+    "s17",
+    "s35"
+   ]
+  },
+  "C003": {
+   "kind": "principle",
+   "name_en": "Practical problems need more experience",
+   "scenarios": [
+    "s01",
+    "s17",
+    "s35"
+   ]
+  },
+  "C004": {
+   "kind": "heuristic",
+   "name_en": "Rely on experience with similar problems",
+   "scenarios": [
+    "s01",
+    "s17",
+    "s23",
+    "s35"
+   ]
+  },
+  "C005": {
+   "kind": "heuristic",
+   "name_en": "Clarifying vague concepts",
+   "scenarios": [
+    "s01",
+    "s13",
+    "s17",
+    "s27"
+   ]
+  },
+  "C006": {
+   "kind": "question",
+   "name_en": "Have you taken into account all essential notions involved in the problem?",
+   "scenarios": [
+    "s01",
+    "s13",
+    "s17",
+    "s33"
+   ]
+  },
+  "C007": {
+   "kind": "principle",
+   "name_en": "Practical data are inexhaustible; must neglect some",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "C008": {
+   "kind": "question",
+   "name_en": "Did you use all data that could appreciably contribute?",
+   "scenarios": [
+    "s01",
+    "s09",
+    "s17"
+   ]
+  },
+  "C009": {
+   "kind": "advice-solver",
+   "name_en": "Stop collecting; draw a line somewhere",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "C010": {
+   "kind": "principle",
+   "name_en": "Practical problem leads to a mathematical problem",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "C011": {
+   "kind": "principle",
+   "name_en": "Content with approximation; trade precision for simplicity",
+   "scenarios": [
+    "s01",
+    "s17",
+    "s23"
+   ]
+  },
+  "C012": {
+   "kind": "example-technique",
+   "name_en": "Earth as sphere – good practical approximation",
+   "scenarios": [
+    "s01",
+    "s17"
+   ]
+  },
+  "C013": {
+   "kind": "definition",
+   "name_en": "Problem to find; quaesitum",
+   "scenarios": [
+    "s12",
+    "s21",
+    "s22",
+    "s27"
+   ]
+  },
+  "C014": {
+   "kind": "definition",
+   "name_en": "Problem to prove",
+   "scenarios": [
+    "s03",
+    "s05",
+    "s22",
+    "s27",
+    "s33"
+   ]
+  },
+  "C015": {
+   "kind": "advice-teacher",
+   "name_en": "Include possibility of disproving",
+   "scenarios": [
+    "s03",
+    "s09",
+    "s22",
+    "s33"
+   ]
+  },
+  "C016": {
+   "kind": "definition",
+   "name_en": "Principal parts: unknown, data, condition",
+   "scenarios": [
+    "s01",
+    "s09",
+    "s17"
+   ]
+  },
+  "C017": {
+   "kind": "definition",
+   "name_en": "Hypothesis and conclusion",
+   "scenarios": [
+    "s03",
+    "s27",
+    "s33"
+   ]
+  },
+  "C018": {
+   "kind": "warning",
+   "name_en": "Not all theorems split naturally",
+   "scenarios": [
+    "s03",
+    "s27",
+    "s33"
+   ]
+  },
+  "C019": {
+   "kind": "advice-solver",
+   "name_en": "Know principal parts exactly",
+   "scenarios": [
+    "s01"
+   ]
+  },
+  "C020": {
+   "kind": "question",
+   "name_en": "List questions for problems to find",
+   "scenarios": [
+    "s02"
+   ]
+  },
+  "C021": {
+   "kind": "advice-solver",
+   "name_en": "Know hypothesis and conclusion exactly",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "C022": {
+   "kind": "question",
+   "name_en": "Corresponding questions for problems to prove",
+   "scenarios": [
+    "s03",
+    "s27",
+    "s33"
+   ]
+  },
+  "C023": {
+   "kind": "principle",
+   "name_en": "Relative importance",
+   "scenarios": [
+    "s03",
+    "s31"
+   ]
+  },
+  "C024": {
+   "kind": "question",
+   "name_en": "Have you made progress? What was the main achievement?",
+   "scenarios": [
+    "s19",
+    "s20",
+    "s34"
+   ]
+  },
+  "C025": {
+   "kind": "principle",
+   "name_en": "Mobilization",
+   "scenarios": [
+    "s20",
+    "s35"
+   ]
+  },
+  "C026": {
+   "kind": "principle",
+   "name_en": "Organization",
+   "scenarios": [
+    "s20",
+    "s35"
+   ]
+  },
+  "C027": {
+   "kind": "principle",
+   "name_en": "Mobilization and organization inseparable",
+   "scenarios": [
+    "s20",
+    "s35"
+   ]
+  },
+  "C028": {
+   "kind": "principle",
+   "name_en": "Changing conception; variation of the problem",
+   "scenarios": [
+    "s01",
+    "s20"
+   ]
+  },
+  "C029": {
+   "kind": "principle",
+   "name_en": "Increasing prevision of the solution",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C030": {
+   "kind": "principle",
+   "name_en": "Need for provisional plausible reasoning",
+   "scenarios": [
+    "s20",
+    "s25"
+   ]
+  },
+  "C031": {
+   "kind": "definition",
+   "name_en": "What is progress toward solution",
+   "scenarios": [
+    "s19",
+    "s20"
+   ]
+  },
+  "C032": {
+   "kind": "definition",
+   "name_en": "Bright idea",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C033": {
+   "kind": "question",
+   "name_en": "Questions aimed at mobilization",
+   "scenarios": [
+    "s20",
+    "s35"
+   ]
+  },
+  "C034": {
+   "kind": "question",
+   "name_en": "Questions aimed at organization: use related solved problem",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C035": {
+   "kind": "question",
+   "name_en": "What is missing questions",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C036": {
+   "kind": "question",
+   "name_en": "Questions aimed at variation: restate; definition, analogy, generalization, specialization, decomposing, recombining",
+   "scenarios": [
+    "s04",
+    "s20",
+    "s27"
+   ]
+  },
+  "C037": {
+   "kind": "question",
+   "name_en": "Questions forecasting nature of solution",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C038": {
+   "kind": "principle",
+   "name_en": "All list questions relate to bright idea",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C039": {
+   "kind": "principle",
+   "name_en": "List independent of subject-matter, test on puzzles",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "C040": {
+   "kind": "example-technique",
+   "name_en": "Anagram example: unknown, data, condition",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "C041": {
+   "kind": "example-technique",
+   "name_en": "Draw a figure (15 blanks)",
+   "scenarios": [
+    "s12",
+    "s29"
+   ]
+  },
+  "C042": {
+   "kind": "example-technique",
+   "name_en": "Restate: separate vowels and consonants",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "C043": {
+   "kind": "example-technique",
+   "name_en": "Related problem: build shorter words",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "C044": {
+   "kind": "example-technique",
+   "name_en": "Solve part of the problem: common suffix",
+   "scenarios": [
+    "s12"
+   ]
+  },
+  "C045": {
+   "kind": "example-technique",
+   "name_en": "Keep only part of condition (puzzle)",
+   "scenarios": [
+    "s11",
+    "s12"
+   ]
+  },
+  "C046": {
+   "kind": "attitude",
+   "name_en": "Questions keep the ball rolling",
+   "scenarios": [
+    "s08",
+    "s10",
+    "s12",
+    "s34"
+   ]
+  },
+  "C047": {
+   "kind": "definition",
+   "name_en": "Reductio ad absurdum",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C048": {
+   "kind": "definition",
+   "name_en": "Indirect proof",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C049": {
+   "kind": "principle",
+   "name_en": "Effective tools of discovery",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C050": {
+   "kind": "example-technique",
+   "name_en": "Digits summing to 100: trial with part of condition",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C051": {
+   "kind": "heuristic",
+   "name_en": "Conjecture impossibility → prove it",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C052": {
+   "kind": "heuristic",
+   "name_en": "Face the hypothetical situation with open mind",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C053": {
+   "kind": "example-technique",
+   "name_en": "Introduce sum of tens digits t",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C054": {
+   "kind": "principle",
+   "name_en": "Put finger on a definitely wrong point",
+   "scenarios": [
+    "s06",
+    "s10",
+    "s11"
+   ]
+  },
+  "C055": {
+   "kind": "principle",
+   "name_en": "Open-minded procedure: set up equations assuming condition satisfied",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C056": {
+   "kind": "principle",
+   "name_en": "Pappus analysis ending in refutation",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C057": {
+   "kind": "example-technique",
+   "name_en": "Euclid's proof: Q = product + 1",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C058": {
+   "kind": "heuristic",
+   "name_en": "Plausibility motive for conjecture",
+   "scenarios": [
+    "s05"
+   ]
+  },
+  "C059": {
+   "kind": "principle",
+   "name_en": "Combine indirect proof with reductio",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C060": {
+   "kind": "warning",
+   "name_en": "Practical objection",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C061": {
+   "kind": "principle",
+   "name_en": "Distinguish tool of discovery vs means of exposition",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C062": {
+   "kind": "warning",
+   "name_en": "Reductio painful in exposition",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C063": {
+   "kind": "advice-solver",
+   "name_en": "Do not reject reductio as tool of discovery",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C064": {
+   "kind": "advice-solver",
+   "name_en": "Convert indirect to direct proof",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C065": {
+   "kind": "advice-solver",
+   "name_en": "Be familiar with both reductio and indirect proof",
+   "scenarios": [
+    "s10",
+    "s11"
+   ]
+  },
+  "C066": {
+   "kind": "question",
+   "name_en": "Can you derive the result differently?",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C067": {
+   "kind": "example-technique",
+   "name_en": "Rearranging a reductio: isolate positive information",
+   "scenarios": [
+    "s10"
+   ]
+  },
+  "C068": {
+   "kind": "example-technique",
+   "name_en": "Transform indirect proof by returning to meaning",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C069": {
+   "kind": "principle",
+   "name_en": "Restating the problem is the main step",
+   "scenarios": [
+    "s11"
+   ]
+  },
+  "C070": {
+   "kind": "definition",
+   "name_en": "Redundant: see Condition",
+   "scenarios": [
+    "s04"
+   ]
+  },
+  "C071": {
+   "kind": "definition",
+   "name_en": "Routine problem",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C072": {
+   "kind": "principle",
+   "name_en": "Routine problem answers 'Do you know a related problem?'",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C073": {
+   "kind": "advice-teacher",
+   "name_en": "Only routine problems is inexcusable",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C074": {
+   "kind": "principle",
+   "name_en": "Rules of discovery (jest)",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "C075": {
+   "kind": "warning",
+   "name_en": "No infallible rules – no magic",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "C076": {
+   "kind": "principle",
+   "name_en": "Reasonable heuristic studies typically useful procedures",
+   "scenarios": [
+    "s27",
+    "s30"
+   ]
+  },
+  "C077": {
+   "kind": "principle",
+   "name_en": "First rule of style",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C078": {
+   "kind": "principle",
+   "name_en": "Second rule of style",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C079": {
+   "kind": "advice-teacher",
+   "name_en": "First rule of teaching",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C080": {
+   "kind": "advice-teacher",
+   "name_en": "Second rule of teaching",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C081": {
+   "kind": "advice-teacher",
+   "name_en": "Teacher must have the attitude himself",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C082": {
+   "kind": "heuristic",
+   "name_en": "Order of going into detail",
+   "scenarios": [
+    "s13",
+    "s20"
+   ]
+  },
+  "C083": {
+   "kind": "principle",
+   "name_en": "Step of decomposing and recombining",
+   "scenarios": [
+    "s13",
+    "s20"
+   ]
+  },
+  "C084": {
+   "kind": "question",
+   "name_en": "Can you write them down?",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C085": {
+   "kind": "principle",
+   "name_en": "Setting up equations is like translation",
+   "scenarios": [
+    "s18",
+    "s26",
+    "s36"
+   ]
+  },
+  "C086": {
+   "kind": "advice-solver",
+   "name_en": "Two requirements of translation",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C087": {
+   "kind": "heuristic",
+   "name_en": "Difficult cases: rearrange condition, focus on meaning",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C088": {
+   "kind": "advice-solver",
+   "name_en": "Reread after examples",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C089": {
+   "kind": "example-technique",
+   "name_en": "Two-column layout: words vs algebra",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C090": {
+   "kind": "example-technique",
+   "name_en": "Prism example: name unknowns, separate parts",
+   "scenarios": [
+    "s26"
+   ]
+  },
+  "C091": {
+   "kind": "attitude",
+   "name_en": "Trust but keep your eyes open; follow inspiration with a little doubt",
+   "scenarios": [
+    "s04",
+    "s05",
+    "s22"
+   ]
+  },
+  "C092": {
+   "kind": "principle",
+   "name_en": "Aesthetic guiding feelings",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "C093": {
+   "kind": "attitude",
+   "name_en": "How signs help: proceed cautiously watching for signs",
+   "scenarios": [
+    "s05",
+    "s06",
+    "s20"
+   ]
+  },
+  "C094": {
+   "kind": "principle",
+   "name_en": "Signs guide: warn of blind alley, focus effort",
+   "scenarios": [
+    "s05",
+    "s06",
+    "s20",
+    "s32"
+   ]
+  },
+  "C095": {
+   "kind": "warning",
+   "name_en": "Signs may deceive",
+   "scenarios": [
+    "s05",
+    "s06",
+    "s12",
+    "s20",
+    "s32"
+   ]
+  },
+  "C096": {
+   "kind": "attitude",
+   "name_en": "Persistence before abandoning a path",
+   "scenarios": [
+    "s06",
+    "s19",
+    "s20",
+    "s34"
+   ]
+  },
+  "C097": {
+   "kind": "principle",
+   "name_en": "Reading signs requires experience",
+   "scenarios": [
+    "s05",
+    "s20"
+   ]
+  },
+  "C098": {
+   "kind": "definition",
+   "name_en": "Heuristic syllogism",
+   "scenarios": [
+    "s05",
+    "s07",
+    "s22",
+    "s32"
+   ]
+  },
+  "C099": {
+   "kind": "heuristic",
+   "name_en": "Relate every incident to the main question",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s32"
+   ]
+  },
+  "C100": {
+   "kind": "definition",
+   "name_en": "Plausible reasoning",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s25",
+    "s32"
+   ]
+  },
+  "C101": {
+   "kind": "principle",
+   "name_en": "Compare with modus tollens",
+   "scenarios": [
+    "s05",
+    "s07",
+    "s22",
+    "s32"
+   ]
+  },
+  "C102": {
+   "kind": "principle",
+   "name_en": "Heuristic conclusion like a force: direction, not magnitude",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s32"
+   ]
+  },
+  "C103": {
+   "kind": "warning",
+   "name_en": "Visible and invisible base; defeasible",
+   "scenarios": [
+    "s05",
+    "s07",
+    "s22",
+    "s32"
+   ]
+  },
+  "C104": {
+   "kind": "principle",
+   "name_en": "Heuristic reasons important; clarify them",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s32"
+   ]
+  },
+  "C105": {
+   "kind": "definition",
+   "name_en": "Specialization",
+   "scenarios": [
+    "s07",
+    "s24",
+    "s28"
+   ]
+  },
+  "C106": {
+   "kind": "example-technique",
+   "name_en": "Test a special case of unfamiliar statement",
+   "scenarios": [
+    "s07",
+    "s28",
+    "s32"
+   ]
+  },
+  "C107": {
+   "kind": "principle",
+   "name_en": "Counterexample refutes",
+   "scenarios": [
+    "s03",
+    "s07",
+    "s22",
+    "s32"
+   ]
+  },
+  "C108": {
+   "kind": "heuristic",
+   "name_en": "Test simple random case first; extract hints",
+   "scenarios": [
+    "s07",
+    "s11",
+    "s24",
+    "s28",
+    "s32"
+   ]
+  },
+  "C109": {
+   "kind": "heuristic",
+   "name_en": "Extreme cases especially instructive",
+   "scenarios": [
+    "s07",
+    "s18",
+    "s26",
+    "s28",
+    "s32"
+   ]
+  },
+  "C110": {
+   "kind": "example-technique",
+   "name_en": "Two ships closest distance",
+   "scenarios": [
+    "s26"
+   ]
+  },
+  "C111": {
+   "kind": "heuristic",
+   "name_en": "Formulas we remember and guess",
+   "scenarios": [
+    "s17",
+    "s18",
+    "s23"
+   ]
+  },
+  "C112": {
+   "kind": "example-technique",
+   "name_en": "Dimensional analysis to guess form",
+   "scenarios": [
+    "s18"
+   ]
+  },
+  "C113": {
+   "kind": "warning",
+   "name_en": "Limits of dimension test",
+   "scenarios": [
+    "s17",
+    "s18"
+   ]
+  },
+  "C114": {
+   "kind": "advice-solver",
+   "name_en": "Discover what problems suit one's gift",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "C115": {
+   "kind": "advice-solver",
+   "name_en": "Looking back is the most important part",
+   "scenarios": [
+    "s02",
+    "s28",
+    "s31"
+   ]
+  },
+  "C116": {
+   "kind": "advice-solver",
+   "name_en": "Digest solved problems",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "C117": {
+   "kind": "advice-solver",
+   "name_en": "Learn by imitation and practice",
+   "scenarios": [
+    "s30",
+    "s31"
+   ]
+  },
+  "C118": {
+   "kind": "attitude",
+   "name_en": "Enjoy what is simple, instructive, beautiful",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "C119": {
+   "kind": "advice-solver",
+   "name_en": "Solve, choose, reflect, invent problems",
+   "scenarios": [
+    "s31"
+   ]
+  },
+  "C120": {
+   "kind": "attitude",
+   "name_en": "Discover one's own likes, taste, line",
+   "scenarios": [
+    "s31",
+    "s34"
+   ]
+  },
+  "C121": {
+   "kind": "principle",
+   "name_en": "Intelligent solver asks list-like questions",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "C122": {
+   "kind": "principle",
+   "name_en": "Asking the right question calls up the right attitude",
+   "scenarios": [
+    "s12",
+    "s30"
+   ]
+  },
+  "C123": {
+   "kind": "advice-solver",
+   "name_en": "Real understanding of a question comes from own use",
+   "scenarios": [
+    "s30",
+    "s38"
+   ]
+  },
+  "C124": {
+   "kind": "advice-solver",
+   "name_en": "Be ready to ask all questions but none without reason",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "C125": {
+   "kind": "advice-solver",
+   "name_en": "First understand the problem as fully and clearly as possible",
+   "scenarios": [
+    "s01",
+    "s09",
+    "s13"
+   ]
+  },
+  "C126": {
+   "kind": "attitude",
+   "name_en": "Concentrate and desire the solution earnestly",
+   "scenarios": [
+    "s19",
+    "s28",
+    "s34"
+   ]
+  },
+  "C127": {
+   "kind": "attitude",
+   "name_en": "Throw your whole personality into the problem",
+   "scenarios": [
+    "s21",
+    "s34"
+   ]
+  },
+  "C128": {
+   "kind": "principle",
+   "name_en": "Reader wants: step correct, purpose of step",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "C129": {
+   "kind": "advice-teacher",
+   "name_en": "Correctness not enough; show purpose and motivation",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "C130": {
+   "kind": "advice-teacher",
+   "name_en": "Use list questions to show motives",
+   "scenarios": [
+    "s03"
+   ]
+  },
+  "C131": {
+   "kind": "warning",
+   "name_en": "Traditional mathematics professor",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C132": {
+   "kind": "heuristic",
+   "name_en": "Any question that may show a new aspect is welcome",
+   "scenarios": [
+    "s04",
+    "s27",
+    "s30"
+   ]
+  },
+  "C133": {
+   "kind": "question",
+   "name_en": "What is the unknown? What is required? What do you want?",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C134": {
+   "kind": "advice-teacher",
+   "name_en": "Teacher uses them to test understanding",
+   "scenarios": [
+    "s09",
+    "s15"
+   ]
+  },
+  "C135": {
+   "kind": "principle",
+   "name_en": "Repeat often; solution links unknown to data",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C136": {
+   "kind": "question",
+   "name_en": "Variants: unknowns, first datum, first clause",
+   "scenarios": [
+    "s15"
+   ]
+  },
+  "C137": {
+   "kind": "question",
+   "name_en": "Hypothesis/conclusion questions and variants",
+   "scenarios": [
+    "s03",
+    "s33"
+   ]
+  },
+  "C138": {
+   "kind": "principle",
+   "name_en": "Why proofs? None, all, or some?",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C139": {
+   "kind": "advice-teacher",
+   "name_en": "Complete proofs; idea of rigorous reasoning",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C140": {
+   "kind": "principle",
+   "name_en": "Distinguish more and less important",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C141": {
+   "kind": "principle",
+   "name_en": "Logical system",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C142": {
+   "kind": "principle",
+   "name_en": "Mnemotechnic system",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C143": {
+   "kind": "warning",
+   "name_en": "Cookbook system",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C144": {
+   "kind": "advice-teacher",
+   "name_en": "Incomplete proofs",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C145": {
+   "kind": "warning",
+   "name_en": "Never confuse or sell incomplete as complete",
+   "scenarios": [
+    "s14",
+    "s32"
+   ]
+  },
+  "C146": {
+   "kind": "heuristic",
+   "name_en": "Analogy, observation, induction as sources of conjecture",
+   "scenarios": [
+    "s07",
+    "s25"
+   ]
+  },
+  "C147": {
+   "kind": "principle",
+   "name_en": "First idea of a proof is often incomplete; present the gist",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C148": {
+   "kind": "advice-teacher",
+   "name_en": "Two rules for incomplete proofs",
+   "scenarios": [
+    "s14"
+   ]
+  },
+  "C149": {
+   "kind": "principle",
+   "name_en": "Problem solving is a fundamental human activity",
+   "scenarios": [
+    "s30",
+    "s35"
+   ]
+  },
+  "C150": {
+   "kind": "warning",
+   "name_en": "Value and limits of proverbs",
+   "scenarios": [
+    "s13",
+    "s27",
+    "s35"
+   ]
+  },
+  "C151": {
+   "kind": "advice-solver",
+   "name_en": "Who understands ill, answers ill",
+   "scenarios": [
+    "s28",
+    "s35"
+   ]
+  },
+  "C152": {
+   "kind": "advice-solver",
+   "name_en": "Think on the end before you begin",
+   "scenarios": [
+    "s05",
+    "s13",
+    "s19",
+    "s32",
+    "s35"
+   ]
+  },
+  "C153": {
+   "kind": "attitude",
+   "name_en": "Where there's a will there's a way",
+   "scenarios": [
+    "s19",
+    "s34",
+    "s35"
+   ]
+  },
+  "C154": {
+   "kind": "attitude",
+   "name_en": "Conceiving a plan is the main achievement; deserve luck",
+   "scenarios": [
+    "s19",
+    "s20",
+    "s34",
+    "s35"
+   ]
+  },
+  "C155": {
+   "kind": "heuristic",
+   "name_en": "Try all the keys; vary trials",
+   "scenarios": [
+    "s08",
+    "s12",
+    "s35",
+    "s37"
+   ]
+  },
+  "C156": {
+   "kind": "heuristic",
+   "name_en": "Adapt trials to circumstances",
+   "scenarios": [
+    "s12",
+    "s35"
+   ]
+  },
+  "C157": {
+   "kind": "advice-solver",
+   "name_en": "Have two strings to your bow",
+   "scenarios": [
+    "s01",
+    "s17",
+    "s19",
+    "s35"
+   ]
+  },
+  "C158": {
+   "kind": "warning",
+   "name_en": "Don't overdo switching plans; keep aim",
+   "scenarios": [
+    "s19",
+    "s34",
+    "s35"
+   ]
+  },
+  "C159": {
+   "kind": "advice-solver",
+   "name_en": "Appreciate inconspicuous ideas; make opportunities",
+   "scenarios": [
+    "s35"
+   ]
+  },
+  "C160": {
+   "kind": "advice-solver",
+   "name_en": "Start execution at the right moment",
+   "scenarios": [
+    "s01",
+    "s06",
+    "s17",
+    "s34",
+    "s35"
+   ]
+  },
+  "C161": {
+   "kind": "warning",
+   "name_en": "We soon believe what we desire",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s28",
+    "s35"
+   ]
+  },
+  "C162": {
+   "kind": "advice-solver",
+   "name_en": "Check each detail step by step",
+   "scenarios": [
+    "s06",
+    "s35"
+   ]
+  },
+  "C163": {
+   "kind": "principle",
+   "name_en": "Order of execution often reverse of invention",
+   "scenarios": [
+    "s06",
+    "s19",
+    "s35"
+   ]
+  },
+  "C164": {
+   "kind": "advice-solver",
+   "name_en": "Second thoughts are best; two anchors",
+   "scenarios": [
+    "s06",
+    "s28",
+    "s35"
+   ]
+  },
+  "C165": {
+   "kind": "principle",
+   "name_en": "The end suggests the means",
+   "scenarios": [
+    "s13",
+    "s35"
+   ]
+  },
+  "C166": {
+   "kind": "question",
+   "name_en": "Your five friends: What, Why, Where, When, How",
+   "scenarios": [
+    "s01",
+    "s05",
+    "s13",
+    "s35"
+   ]
+  },
+  "C167": {
+   "kind": "attitude",
+   "name_en": "Don't believe anything but doubt only what is worth doubting",
+   "scenarios": [
+    "s05",
+    "s22",
+    "s35"
+   ]
+  },
+  "C168": {
+   "kind": "heuristic",
+   "name_en": "Look around after first discovery",
+   "scenarios": [
+    "s20",
+    "s25",
+    "s31",
+    "s35"
+   ]
+  },
+  "C169": {
+   "kind": "principle",
+   "name_en": "Working backwards illustrated",
+   "scenarios": [
+    "s06",
+    "s08"
+   ]
+  },
+  "C170": {
+   "kind": "example-technique",
+   "name_en": "Visualize the data clearly",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "C171": {
+   "kind": "example-technique",
+   "name_en": "Measure something else; play",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "C172": {
+   "kind": "warning",
+   "name_en": "Working forward by trial",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s21"
+   ]
+  },
+  "C173": {
+   "kind": "heuristic",
+   "name_en": "Visualize final situation; assume what is sought as found",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s19",
+    "s21"
+   ]
+  },
+  "C174": {
+   "kind": "question",
+   "name_en": "From what antecedent could the result be derived?",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s19"
+   ]
+  },
+  "C175": {
+   "kind": "example-technique",
+   "name_en": "Equivalent situations",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "C176": {
+   "kind": "heuristic",
+   "name_en": "Reach something known, then reverse (synthesis)",
+   "scenarios": [
+    "s06",
+    "s08",
+    "s19"
+   ]
+  },
+  "C177": {
+   "kind": "warning",
+   "name_en": "Psychological difficulty of turning away from the goal",
+   "scenarios": [
+    "s06",
+    "s08"
+   ]
+  },
+  "C178": {
+   "kind": "principle",
+   "name_en": "Working backwards needs only common sense",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "C179": {
+   "kind": "principle",
+   "name_en": "Working backwards: common-sense method, generalized statement",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "C180": {
+   "kind": "example-technique",
+   "name_en": "Detour experiment",
+   "scenarios": [
+    "s08"
+   ]
+  },
+  "C181": {
+   "kind": "warning",
+   "name_en": "Don't build big theory on one experiment",
+   "scenarios": [
+    "s06",
+    "s07",
+    "s32"
+   ]
+  },
+  "C182": {
+   "kind": "principle",
+   "name_en": "Going round an obstacle is what we do in any problem",
+   "scenarios": [
+    "s06",
+    "s08"
+   ]
+  },
+  "C183": {
+   "kind": "warning",
+   "name_en": "Difficulty of going away from the goal",
+   "scenarios": [
+    "s06",
+    "s08"
+   ]
+  },
+  "C184": {
+   "kind": "advice-teacher",
+   "name_en": "Intuitive pictures are desirable in teaching",
+   "scenarios": [
+    "s15",
+    "s16"
+   ]
+  },
+  "C185": {
+   "kind": "example-technique",
+   "name_en": "Weighted-average trick (footnote 5)",
+   "scenarios": [
+    "s29"
+   ]
+  },
+  "C186": {
+   "kind": "definition",
+   "name_en": "Footnote references",
+   "scenarios": []
+  },
+  "C187": {
+   "kind": "principle",
+   "name_en": "Part IV purpose",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "C188": {
+   "kind": "advice-solver",
+   "name_en": "How to use hints and solutions",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "C189": {
+   "kind": "problem-technique",
+   "name_en": "What is the unknown? apparent contradiction",
+   "scenarios": [
+    "s09",
+    "s11"
+   ]
+  },
+  "C190": {
+   "kind": "problem-technique",
+   "name_en": "Do you know a related problem?",
+   "scenarios": [
+    "s23",
+    "s38"
+   ]
+  },
+  "C191": {
+   "kind": "problem-technique",
+   "name_en": "Restate: minimum number needed",
+   "scenarios": [
+    "s11",
+    "s37",
+    "s38"
+   ]
+  },
+  "C192": {
+   "kind": "problem-technique",
+   "name_en": "Related simpler problems; preliminary estimate",
+   "scenarios": [
+    "s09",
+    "s24",
+    "s37",
+    "s38"
+   ]
+  },
+  "C193": {
+   "kind": "problem-technique",
+   "name_en": "Restate as divisibility; split 72=8·9",
+   "scenarios": [
+    "s37"
+   ]
+  },
+  "C194": {
+   "kind": "problem-technique",
+   "name_en": "Generalize: centrally symmetric figure",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "C195": {
+   "kind": "problem-technique",
+   "name_en": "Related locus theorem; case splitting",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "C196": {
+   "kind": "problem-technique",
+   "name_en": "Is your list exhaustive? classification principle",
+   "scenarios": [
+    "s24",
+    "s38"
+   ]
+  },
+  "C197": {
+   "kind": "problem-technique",
+   "name_en": "Look at the unknown; accessible part",
+   "scenarios": [
+    "s24",
+    "s38"
+   ]
+  },
+  "C198": {
+   "kind": "problem-technique",
+   "name_en": "Related analogous theorem; use its method",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "C199": {
+   "kind": "problem-technique",
+   "name_en": "Look for a shortcut; relations between equations",
+   "scenarios": [
+    "s38"
+   ]
+  },
+  "C200": {
+   "kind": "problem-technique",
+   "name_en": "Separate parts; write them; extreme cases",
+   "scenarios": [
+    "s26"
+   ]
+  },
+  "C201": {
+   "kind": "problem-technique",
+   "name_en": "Symmetric notation for progressions",
+   "scenarios": [
+    "s36"
+   ]
+  },
+  "C202": {
+   "kind": "problem-technique",
+   "name_en": "Exploit special feature: even powers",
+   "scenarios": [
+    "s36",
+    "s38"
+   ]
+  },
+  "C203": {
+   "kind": "problem-technique",
+   "name_en": "Separate three parts of condition",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C204": {
+   "kind": "problem-technique",
+   "name_en": "Introduce auxiliary unknowns and eliminate",
+   "scenarios": [
+    "s26",
+    "s36"
+   ]
+  },
+  "C205": {
+   "kind": "problem-technique",
+   "name_en": "Recognize denominators; guess; mathematical induction",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "C206": {
+   "kind": "problem-technique",
+   "name_en": "Discovery by induction needs observation",
+   "scenarios": [
+    "s24",
+    "s25"
+   ]
+  },
+  "C207": {
+   "kind": "problem-technique",
+   "name_en": "Draw a figure; n-1→n; double counting; Euler check",
+   "scenarios": [
+    "s25"
+   ]
+  },
+  "C208": {
+   "kind": "problem-technique",
+   "name_en": "Clarify aim; simpler analogous and more general problem",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "C209": {
+   "kind": "problem-technique",
+   "name_en": "Isolated general problem → family of analogous problems",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "C210": {
+   "kind": "problem-technique",
+   "name_en": "Case split yields recursion",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "C211": {
+   "kind": "problem-technique",
+   "name_en": "Boundary conventions; recursive tabulation",
+   "scenarios": [
+    "s24"
+   ]
+  },
+  "C212": {
+   "kind": "definition",
+   "name_en": "Source of problems",
+   "scenarios": []
+  },
+  "D001": {
+   "kind": "principle",
+   "name_en": "Bolzano",
+   "scenarios": [
+    "s30"
+   ]
+  },
+  "D002": {
+   "kind": "attitude",
+   "name_en": "Bright idea",
+   "scenarios": [
+    "s20"
+   ]
+  },
+  "D003": {
+   "kind": "question",
+   "name_en": "Can you check the result?",
+   "scenarios": [
+    "s02",
+    "s09",
+    "s14",
+    "s28",
+    "s32",
+    "s36",
+    "s37"
+   ]
+  },
+  "D004": {
+   "kind": "question",
+   "name_en": "Can you check the argument?",
+   "scenarios": [
+    "s03",
+    "s06",
+    "s22",
+    "s33"
+   ]
+  },
+  "D005": {
+   "kind": "question",
+   "name_en": "Can you derive the result differently?",
+   "scenarios": [
+    "s02",
+    "s11",
+    "s24",
+    "s25",
+    "s28",
+    "s31"
+   ]
+  },
+  "D006": {
+   "kind": "question",
+   "name_en": "Can you see it at a glance?",
+   "scenarios": [
+    "s02",
+    "s21",
+    "s25",
+    "s28",
+    "s31"
+   ]
+  },
+  "D007": {
+   "kind": "question",
+   "name_en": "Can you use the result, or the method, for some other problem?",
+   "scenarios": [
+    "s02",
+    "s23",
+    "s31",
+    "s37"
+   ]
+  },
+  "D008": {
+   "kind": "heuristic",
+   "name_en": "Decomposing and recombining §1",
+   "scenarios": [
+    "s13",
+    "s20"
+   ]
+  },
+  "D009": {
+   "kind": "attitude",
+   "name_en": "Subconscious work",
+   "scenarios": [
+    "s20",
+    "s34"
+   ]
+  },
+  "D010": {
+   "kind": "heuristic",
+   "name_en": "Symmetry",
+   "scenarios": [
+    "s02",
+    "s26",
+    "s29"
+   ]
+  },
+  "D011": {
+   "kind": "definition",
+   "name_en": "Terms, old and new",
+   "scenarios": [
+    "s08",
+    "s27"
+   ]
+  },
+  "D012": {
+   "kind": "heuristic",
+   "name_en": "Test by dimension",
+   "scenarios": [
+    "s02",
+    "s17",
+    "s18",
+    "s23"
+   ]
+  },
+  "D013": {
+   "kind": "principle",
+   "name_en": "Signs of progress",
+   "scenarios": [
+    "s06",
+    "s19",
+    "s20"
+   ]
+  },
+  "D014": {
+   "kind": "heuristic",
+   "name_en": "Setting up equations §4–5",
+   "scenarios": [
+    "s10",
+    "s26",
+    "s36"
+   ]
+  },
+  "D015": {
+   "kind": "heuristic",
+   "name_en": "Specialization (cont.)",
+   "scenarios": [
+    "s07",
+    "s11",
+    "s18",
+    "s26",
+    "s28"
+   ]
+  },
+  "D016": {
+   "kind": "heuristic",
+   "name_en": "Variation of the problem",
+   "scenarios": [
+    "s04",
+    "s20"
+   ]
+  },
+  "D017": {
+   "kind": "warning",
+   "name_en": "Traditional mathematics professor",
+   "scenarios": [
+    "s15"
+   ]
+  }
+ },
+ "uncovered_justified": {
+  "B064": {
+   "name_en": "Descartes, Rules for the Direction of the Mind",
+   "reason": "تاریخی-کتاب‌شناختی: مدخل دکارت و کتاب ناتمام «قواعد هدایت ذهن». روح آن (خودت اختراع‌ها را بازاختراع کن) با B065 در s31 پوشش داده شده است."
+  },
+  "B158": {
+   "name_en": "History: Euclid’s commentators, Pappus, Descartes, Leibnitz, Bolzano",
+   "reason": "تاریخی: فهرست پیشینیان اکتشاف (مفسران اقلیدس، پاپوس، دکارت، لایبنیتس، بولتسانو). رفتار قابل‌آزمونی برای سیستم ایجاد نمی‌کند."
+  },
+  "B195": {
+   "name_en": "Leibnitz: the sources of invention",
+   "reason": "تاریخی: نقل قول لایبنیتس («منابع اختراع جالب‌تر از خود اختراع‌اند»). روحش (علاقه به انگیزه و رویهٔ حل) در A007/A008 (s30, s31) پوشش داده شده."
+  },
+  "B232": {
+   "name_en": "Map: psychological articles (Determination…, Subconscious work); logical patterns",
+   "reason": "نقشهٔ ساختار فرهنگ لغت (کدام مقاله روان‌شناختی است). محتوای آن مقالات (عزم/امید و کار ناخودآگاه) در s19, s20, s34 پوشش دارد."
+  },
+  "B235": {
+   "name_en": "Methodological articles list",
+   "reason": "فهرست مقالات روش‌شناختی فرهنگ لغت (ارجاع ساختاری). خود مقالات (پاپوس، کار به عقب، برهان خلف، استقرا، تشکیل معادله، آزمون ابعاد، چرا اثبات) در s06/s08/s10/s11/s25/s26/s18/s14 پوشش دارند."
+  },
+  "B236": {
+   "name_en": "Articles for teachers and for ambitious students",
+   "reason": "فهرست مقالاتی که برای معلمان و دانشجویان جاه‌طلب نوشته شده (ارجاع ساختاری). محتوا در s14, s15, s30, s31 پوشش دارد."
+  },
+  "B238": {
+   "name_en": "Other groups: history, technical terms, cross-references (†)",
+   "reason": "فهرست گروه‌های دیگر مقالات و علامت خنجر (ارجاع متقابل). صرفاً فهرستی/چاپی."
+  },
+  "B240": {
+   "name_en": "Acknowledgments: Mach, Hadamard, James, Köhler; Duncker, Krauss",
+   "reason": "قدردانی از ماخ، آدامار، جیمز، کوهلر، دانکر، کراوس — کتاب‌شناختی."
+  },
+  "C186": {
+   "name_en": "Footnote references",
+   "reason": "پانوشت‌های کتاب‌شناختی (آدامار و…). محتوای کار ناخودآگاه در s20/s34 پوشش دارد."
+  },
+  "C212": {
+   "name_en": "Source of problems",
+   "reason": "منبع مسائل بخش چهارم (آزمون‌های استنفورد) — کتاب‌شناختی."
+  }
+ }
+}

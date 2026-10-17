@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();return JSON.stringify({ph:s.coach&&s.coach.ph,own:(s.coach&&s.coach.ownLog||[]).slice(-1),coachPage:APP.liveCoach(window.__PID||APP.state.arg).ph});})()\n"}

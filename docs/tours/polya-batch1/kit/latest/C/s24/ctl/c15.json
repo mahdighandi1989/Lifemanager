@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const t=document.querySelector('#main').innerText;return 'map shown on child page: '+(t.indexOf('خانه‌های نوار')>=0)+' | '+(t.indexOf('هم‌ریخت')>=0);})()"}

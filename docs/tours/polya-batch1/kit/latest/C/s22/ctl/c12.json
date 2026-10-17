@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=APP.state.arg;F('lpClaimContra','اگر منشی آن ساعت در کلاس یا بیرونِ مدرسه بوده، یا معاون از دور اشتباه دیده');await W(300);const b=B(/در کارخانه بسنج/);await W(1500);const t=document.querySelector('#main').innerText;const i=t.indexOf('ادعاهای درونِ مسئله');return b+' view='+APP.state.view+' || '+t.slice(i,i+700);})()"}

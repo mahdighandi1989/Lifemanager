@@ -1,0 +1,1 @@
+{"eval": "(()=>{const r=APP.liveAll().find(x=>/1·2·3/.test(x.p.title));return JSON.stringify({st:r.p.statement,kind:r.p.kind,type:r.p.type,from:r.p.from,keys:Object.keys(r.p)}).slice(0,1200)+' || toasts '+JSON.stringify(APP.ASSIST.recentToasts?APP.ASSIST.recentToasts():null).slice(0,400);})()\n"}

@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=APP.state.arg;P('lpSeen',/^بله/);await W(600);const ids=IDS();const sel=[...document.querySelectorAll('#main select')].filter(e=>/lpSeen/.test(e.id)).map(e=>e.id+':'+[...e.options].map(o=>o.text).join('/')).join(' || ');return ids.split(' | ').filter(x=>/Seen/.test(x)).join(' | ')+' ### '+sel;})()"}

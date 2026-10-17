@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();const pid=APP.liveSessionPid?APP.liveSessionPid(s):null;const o=JSON.parse(localStorage.getItem('mla.records.v1'));const r=o['eprob_'+pid];return 'pid='+pid+' view='+APP.state.view+' nat='+(r&&r.p.nat)+' kind='+(r&&r.p.kind)+' msgs='+JSON.stringify(s.msgs.slice(-2).map(m=>m.role+':'+m.text.slice(0,200)))})()\n"}

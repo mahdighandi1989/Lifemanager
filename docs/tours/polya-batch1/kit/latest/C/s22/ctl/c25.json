@@ -1,0 +1,1 @@
+{"eval": "(()=>{const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const v=localStorage.getItem(k)||'';for(const w of ['کارِ سرایدار است','guessHist']){let j=-1;while((j=v.indexOf(w,j+1))>=0&&o.length<10)o.push(k+': '+v.slice(Math.max(0,j-150),j+250));}}return o.join(' ## ');})()\n"}

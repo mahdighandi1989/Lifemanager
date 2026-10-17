@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=APP.state.arg;F('lpOne','می‌خواهم حرکتِ اولِ سفید را پیدا کنم که بعدش هر کاری سیاه بکند، با حرکتِ دوم مات شود.');F('lpWhy','چون مسابقه داریم و کنجکاوم رخ چرا آن‌جاست.');await W(300);const b=B(/ثبتِ کل/);await W(900);return 'kind='+JSON.stringify(APP.liveKindInfo(pid))+' | '+b+' || IDS: '+IDS()+' || '+T('۱) فهمِ مسئله',3500);})()"}

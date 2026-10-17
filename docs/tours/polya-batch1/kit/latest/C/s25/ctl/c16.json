@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=APP.state.arg;const c=B(/✅ حل شد/);await W(1200);const ids=IDS();const t=T('۴) بازنگری',4000);return c+' gate='+JSON.stringify(APP.liveClosure(pid).gate)+' || IDS '+ids.slice(ids.indexOf('lpBWant'))+' || '+t;})()"}

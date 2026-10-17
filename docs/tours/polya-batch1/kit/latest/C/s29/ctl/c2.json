@@ -1,0 +1,1 @@
+{"eval": "(()=>{window.__PID=APP.state.arg;return JSON.stringify(APP.liveKindInfo(APP.state.arg));})()\n"}

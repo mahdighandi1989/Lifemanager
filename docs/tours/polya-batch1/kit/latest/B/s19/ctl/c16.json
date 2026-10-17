@@ -1,0 +1,1 @@
+{"eval": "(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));const r=o[\"eprob_pb_l_mvbvdg3m5hs\"];return JSON.stringify({nat:r.p.nat,natBy:r.p.natBy,g:APP.liveNatGuess(r.p.statement||\"\")})})()\n"}

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const pid=APP.state.arg;const r=APP.liveRec(pid);const s=JSON.stringify(r);let out=[];let i=-1;while((i=s.indexOf('پیش‌فرض است',i+1))>=0&&out.length<4)out.push(s.slice(Math.max(0,i-80),i+40));return out.join(' ## ')||'NOT STORED';})()\n"}

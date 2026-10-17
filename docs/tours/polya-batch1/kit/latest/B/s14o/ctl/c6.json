@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify(APP.MIND&&APP.MIND.phases?APP.MIND.phases().rows.map(r=>r.id+\":\"+r.k+\"/\"+r.n+\" \"+(r.src||\"\")):null)+\" \"+JSON.stringify((window.__rem||[]).map(r=>r.key+\"@\"+r.due_date))"}

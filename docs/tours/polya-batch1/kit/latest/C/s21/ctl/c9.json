@@ -1,0 +1,1 @@
+{"eval":"(()=>{const t=document.querySelector('#main').innerText;const i=t.indexOf('طرحت: نخست');const s=document.getElementById('lpPU_a_d3');return t.slice(i-300,i+2600)+' || OPTS '+(s&&s.options?[...s.options].map(o=>o.value+'='+o.text).join(' / '):s&&s.type);})()"}

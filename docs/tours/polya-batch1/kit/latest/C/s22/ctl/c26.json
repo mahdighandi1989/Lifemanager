@@ -1,0 +1,1 @@
+{"eval": "(()=>{const v=localStorage.getItem('mla.records.v1');const j=v.indexOf('\"from\":\"live:refute\"');return v.slice(Math.max(0,j-600),j+30);})()\n"}

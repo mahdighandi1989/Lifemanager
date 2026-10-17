@@ -1,0 +1,1 @@
+{"eval": "(()=>{const ids=new Set();for(let i=0;i<localStorage.length;i++){const v=localStorage.getItem(localStorage.key(i))||'';(v.match(/pb_l_[a-z0-9]+/g)||[]).forEach(x=>ids.add(x))}const o=[];ids.forEach(p=>{let it=[];try{it=APP.liveChatQItems(p)}catch(e){it=['ERR '+e]}o.push(p+' => '+JSON.stringify(it))});return o.join('\\n')})()"}

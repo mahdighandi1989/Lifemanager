@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify({ans:APP.ASSIST.cur().coach.ansBy||APP.ASSIST.cur().coach.ans, ph:APP.ASSIST.cur().coach.ph})+\"\\n\"+JSON.stringify(APP.liveCoach(\"pb_l_mvbv4zu1inw\"))"}

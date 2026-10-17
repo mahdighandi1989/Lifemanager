@@ -1,0 +1,1 @@
+{"eval": "(()=>{const ss=APP.ASSIST.sessions();return JSON.stringify(ss.map(s=>s.coach&&{ans:s.coach.ans,ansLog:s.coach.ansLog,ph:s.coach.ph})).slice(0,1500);})()\n"}

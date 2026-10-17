@@ -1,0 +1,1 @@
+{"eval":"(()=>{const pid=window.__PID||APP.state.arg;const r=APP.liveRec(pid).p;const L=r.live||{};const o={};for(const k in L){const v=JSON.stringify(L[k]);if(/حدس|guess|refut|رد/.test(v)||/g|guess/.test(k))o[k]=v.slice(0,700);}return Object.keys(L).join(',')+' ### '+JSON.stringify(o);})()"}

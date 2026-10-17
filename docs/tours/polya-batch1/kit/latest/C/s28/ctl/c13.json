@@ -1,0 +1,1 @@
+{"eval":"(async()=>{APP.today=()=>'2026-10-19';const kids=APP.liveAll().map(r=>[r.p.title.slice(0,40),r.p.nat,r.p.natBy]);const child=APP.liveAll().find(r=>/سه‌شنبه/.test(r.p.title));APP.go('lprob',child.p.id);await W(900);return JSON.stringify(kids)+' view='+APP.state.arg;})()"}

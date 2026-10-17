@@ -1,0 +1,1 @@
+{"eval":"(()=>{const p=\"pb_l_mvbv4zu1inw\";const pl=APP.livePlausible(p);C(\".lp-solved\");return JSON.stringify(pl)+\" SUB:\"+APP.state.sub})()"}

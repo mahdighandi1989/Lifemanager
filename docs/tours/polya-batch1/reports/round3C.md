@@ -1,0 +1,14 @@
+ROUND 3 C (s21–s29, own fresh build a53d07c): 2 PASS (s21,s25), 5 PARTIAL, 2 FAIL (s24, s28). Evidence round3C/<sid>/findings.md.
+1 S1 (c) refuted guess shown «اثبات شد» in closing card (a38:1876 checks only b.verdict==="proved", never g.hit); s26 says «حدست رد شد» then «اثبات شد».
+2 S2 (b) aux bridge checked for length only ⇒ non-sequitur «مربع در مستطیل‌ها ⇒ همهٔ چهارضلعی‌ها» accepted, closed «✅ اثبات شد» (closeGateCard/solveClick ⇄ backSummary verdict). Needs real check: user must state the general step and the page must flag special→general without argument (Pólya: specialization proves nothing general).
+3 S2 (b) look-back new problem with share «ساختار — هم‌ریخت» doesn't use APP.liveMapOk («دقیقاً همان مسئله است» accepted); child/hook never mention isomorphism / induction justification.
+4 S2 (b) lpBLimit only when F.spatial (a38:1727-1732) though livePhaseQs lists limit cases for objective non-spatial.
+5 S2 (b) satisfiable/sufficient answers whose reason presupposes the unknown accepted; condition part broken by later result never named (lpSat/lpSuff; step outcome ⇄ condition parts).
+6 S2 (b) no analogy-limits question during execution/chat (a27 coach rule / a38 phaseQs practical exec).
+7 S3 «plan changed?» wrong both ways (stepFollowsTag): base+induction step in declared induction plan flagged; quiet non-check move counted as following «check with the queen».
+8 S3 natGuess misses «چند روش», fraction sums; when kind set:false hook still says «داور: زندگی… هیچ‌کس نمی‌داند», coach «تصمیم/کارِ واقعی»; preselects practical for perfectly-stated word problems with km/m/money.
+9 S3 kCountRe lacks «روش» (a17) ⇒ "did you count them all?" missing.
+10 S3 irrelevant «دانسته‌های قلمرو»: automatic system turns use their own instruction text as relevance msg (a28:177, msg from a26) ⇒ md_help_boundary, dc_sunk_cost…; some user turns too (dc_present_bias, ln_forgetting s22; sc_persuasion s29).
+11 S3 «# پس از شکست…» block never for «خجالت کشیدم»: producer A.willHookOn (a36:1102) lacks G2 lexicon.
+12 S3 eqsOf strips spaces and counts prose as equations ⇒ false «معادله‌ها بیش از مجهول‌هایند» (s26); eq card shows for proof problems (s25).
+13 S3 small: look-back near-copy rejects quadrilateral→pentagon; look-back + chat_invent duplicate problems; any reason accepted for "ignore the test"; «کدام پرسش کمک کرد؟» select missing in one look-back (s28); datum-use false negatives («دو بچه», «هر گام ۱، ۲ یا ۳», «مسیرِ A»); set-aside datum not raised again when stuck on perfectly-stated problem; after defect livePhase "c" while closure.back "p"; induction question truncated in hook; type not suggested for «آیا…؟» statements; Pascal's rule only in look-back not execution; life wording for objective («طرح ثبت شد… با پیش‌بینی»); look-back lacks "restate the condition with the new lines".

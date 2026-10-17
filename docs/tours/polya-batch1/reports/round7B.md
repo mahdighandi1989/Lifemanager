@@ -1,0 +1,1 @@
+ROUND 7 B (s11–s20, dist 10:55:07 after 3c2846b): 8 PASS (s11 s12 s13 s14 s17 s18 s19 s20), 2 PARTIAL (s15, s16 — both regressions from R7 guess/WHY rules on teacher/parent turns), 0 FAIL. Evidence round7B/<sid>/findings.md; 10 e-mails sent.

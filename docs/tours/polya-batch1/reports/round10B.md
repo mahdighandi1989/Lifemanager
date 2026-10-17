@@ -1,0 +1,1 @@
+ROUND 10 B (s11–s20, dist in sync with a2a58b8): 10 PASS, 0 PARTIAL, 0 FAIL. R9 S2 (A044, s17) fixed; R9 S3s (B14/A191/A073 marking, A129 at openings) fixed. coach_state omission exercised in every scenario (s14o/s16o/s19o/s20o extra runs). Evidence round10B/<sid>/findings.md.

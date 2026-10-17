@@ -1,0 +1,1 @@
+{"eval": "(()=>[...document.querySelectorAll('#main select')].filter(e=>/lpB(Pod|CP|Def)/.test(e.id)).map(e=>e.id+':'+[...e.options].map(o=>o.text).join('/')).join(' || ')+' || IDS '+IDS().split(' | ').filter(x=>/lpB/.test(x)).join(' | '))()\n"}

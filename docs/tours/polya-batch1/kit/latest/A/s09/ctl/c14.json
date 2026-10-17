@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"button,a\")].filter(x=>/باز کن/.test(x.textContent)).map(x=>x.className+\":\"+x.textContent.trim());return b.join(\" | \")+\" || msgs:\"+[...document.querySelectorAll(\"[class*=msg]\")].filter(e=>/مسئله ثبت شد/.test(e.textContent)).length})()\n"}

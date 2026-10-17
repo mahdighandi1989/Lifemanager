@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=APP.state.arg;B(/^۲ کامل$/);await W(1000);const r=APP.liveRec(pid);const t=T('۲) طرح',1500);return 'kind='+JSON.stringify(APP.liveKindInfo(pid))+' notation='+JSON.stringify((r.p.u||r.p.sol||{}).nota||null).slice(0,200)+' || '+t;})()"}

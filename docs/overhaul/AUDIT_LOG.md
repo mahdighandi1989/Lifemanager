@@ -4564,3 +4564,7 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **DECISION:** There is one question per turn, from one source (`A.liveCoach` priority). Heuristic gates warn instead of blocking. Look-back checks every condition part.
 - **CHANGE:** `a27_tour.js`, `a28_systerr.js`, `a35_idea.js`, `a36_solve.js`, `a38_live.js`, `a26_assist.js`, `a29_mind.js`, plus tests `test_tour1_r3..r5_*.js`.
 - **FINDING (own error):** I ran round 3 against a stale `dist` (no `build.py` after a fast-forward). Fixed by rebuilding; runners now check the build mtime against the merge time.
+
+### 2026-10-17 — DECISION: tour state is checkpointed into git (resume after interruption)
+Owner: a session may stop mid-tour (weekly limit) and must resume exactly where it stopped without harming the process. The tour's working state lived only in the session scratchpad (lost with the container). Now `docs/tours/polya-batch1/` holds the resume card `STATE.md` (where we are + exact next step), plan, DECISIONS, runner briefs, reports, every round's findings (the companion book's raw evidence) and the latest replay kit; refreshed and pushed after every runner report / decision / merge (roadmap §5, CLAUDE.md pointer). No model transcripts, no e-mail bodies, owner address scrubbed.
+Also FINDING: routines report `test_tour1_r11_coach.js` red on origin/main; not reproduced here (main, backtest branch, 2 cores, 4 concurrent copies, fresh clone + fresh npm i — all green). Next: make its nested `struct` replay report child exit codes so a routine-side failure is self-explaining.

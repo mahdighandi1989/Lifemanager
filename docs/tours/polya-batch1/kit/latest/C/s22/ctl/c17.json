@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const pid=(window.__PID||APP.state.arg);APP.today=()=>'2026-10-17';APP.go('lprob',pid);await W(1000);const b=B(/نتیجه را ثبت|زودتر انجامش دادم|چه شد/);await W(800);const ids=IDS();return b+' || '+ids.slice(ids.indexOf('lpO'),ids.indexOf('lpO')+900)+' || '+T('چه شد',1500);})()"}

@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({as:typeof APP.attachSection, up:!!(APP.HOST&&APP.HOST.upload), ep:String(APP.V.e_prob).slice(0,80)})\n"}

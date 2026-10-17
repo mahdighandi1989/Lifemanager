@@ -1,0 +1,1 @@
+{"eval": "(()=>{const pid=APP.state.arg;const r=APP.liveRec(pid);const s=JSON.stringify(r);const u=(r.p&&r.p.live&&r.p.live.u)||null;let o=[];for(const k of ['soft','softLog','suffCirc','suffW','circ']){let i=s.indexOf('\"'+k);if(i>=0)o.push(s.slice(i,i+220));}return o.join(' ## ')+' || keys '+Object.keys(r.p||{}).join(',');})()\n"}

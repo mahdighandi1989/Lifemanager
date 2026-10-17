@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const pid=APP.state.arg;B(/^۲ کامل$/);await W(1000);const r=JSON.stringify(APP.liveRec(pid));const i=r.indexOf('suffCirc');return 'phase='+APP.livePhase(pid)+' kind='+JSON.stringify(APP.liveKindInfo(pid))+' suffCirc='+(i>=0?r.slice(i,i+150):'none')+' || '+T('۲) طرح',600);})()\n"}

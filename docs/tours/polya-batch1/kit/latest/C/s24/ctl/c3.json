@@ -1,0 +1,1 @@
+{"eval":"(async()=>{const x=document.getElementById('lpGK5_x0');let p=x;for(let i=0;i<8&&p;i++){p=p.parentElement;if(p&&p.tagName==='DETAILS')break;}if(p&&p.tagName==='DETAILS')p.open=true;await W(300);const box=p||x.closest('section,div');return [...box.querySelectorAll('button')].map(b=>b.textContent.trim().slice(0,40)).join(' | ')+' || '+box.innerText.slice(0,2500);})()"}

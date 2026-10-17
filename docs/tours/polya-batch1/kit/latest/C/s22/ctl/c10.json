@@ -1,0 +1,1 @@
+{"eval":"(()=>{let hits=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const v=localStorage.getItem(k);const j=v?v.indexOf('هیچ داده‌ای نمی‌گوید کسی'):-1;if(j>=0)hits.push(k+':'+v.slice(Math.max(0,j-120),j+60));}return hits.join(' ## ').slice(0,900);})()"}

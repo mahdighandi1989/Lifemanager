@@ -1,0 +1,1 @@
+{"eval":"(()=>{const pid=window.__PID||APP.state.arg;const pl=APP.livePlausible(pid);const so=(APP.S.get('eprog_'+pid)||{}).solve||{};return pid+' ## '+JSON.stringify({refutedG:pl&&pl.refutedG,refuted:pl&&pl.refuted,g1:so.g&&so.g[1]}).slice(0,3000);})()"}

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const pid=APP.state.arg;window.__PID=pid;return APP.state.view+' '+JSON.stringify(APP.liveKindInfo(pid));})()\n"}

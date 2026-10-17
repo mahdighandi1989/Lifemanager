@@ -1,0 +1,1 @@
+{"eval":"(()=>{const t=document.querySelector('#main').innerText;const i=t.lastIndexOf('ثبتِ فهم');const toast=[...document.querySelectorAll('.toast,.flash,[class*=toast]')].map(x=>x.innerText).join('|');return 'TOAST:'+toast+' || '+t.slice(i-2500,i+600);})()"}
