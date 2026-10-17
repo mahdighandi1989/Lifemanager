@@ -303,6 +303,17 @@ const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARI
   ];
   await runBank('INF16.dossier', 21, DS, async (e, fn) => fn());
 
+  /* ================= پیوند با مربی (a27 retractApply ⇒ APP.liveRetract ِ بومی) — فقط وقتی مربی هست ================= */
+  {
+    const x = await setup({ chat: 'U: حدسم اینه که جواب ۲^n هست ‖ A: چرا؟ ‖ U: نه اشتباه نوشتم، منظورم ۲^n − ۱ بود', rec: { g: [0, '۲^n'], dl: [[0, 'n پله']] }, title: 'r19b-coach-link' });
+    const r = await p.evaluate((sid) => { const AS = APP.ASSIST; if (typeof AS.retractApply !== 'function') return { skip: true };
+      const o = AS.retractApply(APP.S.get(sid), { msg: 'جواب ۲^n هست', what: 'guess', fix: '۲^n − ۱' }); return { ch: (o && o.ch) || [], err: o && o.err }; }, x.sid);
+    if (!r.skip) { const s = await snap(x.pid, x.sid); const r2 = await p.evaluate(([pid, id]) => APP.liveRetract(pid, id, { what: 'guess', fix: '۲^n − ۱', frag: 'جواب ۲^n هست' }), [x.pid, x.mids[0]]);
+      info.coachLink = { ch: r.ch, g: s.g, again: r2.text };
+      chk(s.g && s.g.t === '۲^n − ۱' && s.g.h === 1 && r.ch.some(t => /حدس/.test(t)), 'coach link: retractApply reverses the live guess through APP.liveRetract and reports it ' + J(info.coachLink));
+      chk(r2.ok && r2.changes.length === 0 && /^چیزی/.test(r2.text), 'coach link: the same correction again changes nothing and says so (no false «changed») ' + J(r2)); }
+    else info.coachLink = 'coach absent (live branch alone)';
+  }
   info.bankRes = Object.fromEntries(Object.entries(bankRes).map(([k, v]) => [k, v.pass + '/' + (v.pass + v.fail.length)]));
   console.log(JSON.stringify(info, null, 1));
   await b.close();

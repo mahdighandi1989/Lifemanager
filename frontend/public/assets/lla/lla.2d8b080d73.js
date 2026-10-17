@@ -37171,7 +37171,9 @@ APP.goFromURL = function (q) {
   var META_Q19 =/(?:^|[\s.،!؛…])(?:بعدی|بعدیش|خب|خوب|ادامه|ادامه\s*بدیم|دیگه|بعدش|و\s*بعد|حالا\s*چی|حالا)\s*[؟?]+[\s!.…]*$/;
   function coachEv(s, ph, src, mt, ok, x) {
     var E = s.coachEv = s.coachEv || [], key = src + (ok ? "|" + ph : "") + "|" + clip(mt, 80); if (E.some(function (e) { return e.key === key; })) return;
-    E.push(Object.assign({ at: nowIso(), ph: ph, ok: !!ok, src: src, key: key }, x || {})); if (E.length > 200) s.coachEv = E.slice(-200);
+    /* تورِ پولیا (INF15/INF17، دورِ ۱۹b): هر رویداد شناسهٔ پیامِ منبعش (msg) و مسئله‌اش (pid) را دارد — تا اصلاحِ آن پیام رویدادهایش را پس بگیرد و «از کجا؟» ِ کارنامه منبع را نشان دهد */
+    var um19b = evSrc19b(s, mt), pid19b = evPid19b(s);
+    E.push(Object.assign({ at: nowIso(), ph: ph, ok: !!ok, src: src, key: key, msg: um19b ? msgId19b(um19b) : undefined, pid: pid19b || undefined }, x || {})); if (E.length > 200) s.coachEv = E.slice(-200);
   }
   AS.coachEvent = coachEv;
   var RULES_HEAD = /^# مسئلهٔ واقعیِ حل‌نشده/;
@@ -37262,7 +37264,7 @@ APP.goFromURL = function (q) {
       /* R7/B7: رویدادِ «ناموفق» فقط گیرِ خودِ حل یا «حل نشد» ِ واقعی — نه خشم/شرم، نه حدسِ ردشده، نه تلاشِ کنارگذاشته‌ای که به جواب رسید */
       /* تورِ پولیا (RN3c، B·D3 s12): «حل نشد/اشتباه بود» ِ الگو (بی گزارشِ مدل) به مرحله‌ای ثبت نمی‌شود — فقط «در انتظار» (pend) تا گزارشِ وضعِ همین نوبت
          جایش را بگیرد؛ حدسِ ردشده در نوبتِ بی گزارش هرگز شکستِ مرحله نیست (نامتقارن). گیرِ صریحِ خودش («گیر کردم») همان رویدادِ پیشین است. */
-      if (!auto && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt, false, STUCK_RE.test(mt) && !solvedSaid(mt) ? undefined : guessRefPat(s, mt) ? { pend: true } : undefined);
+      if (!auto && !CORR19b.test(ownText(mt)) && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt, false, STUCK_RE.test(mt) && !solvedSaid(mt) ? undefined : (guessRefPat(s, mt) || actErrOnly19b(mt)) ? { pend: true } : undefined);
       var sig = sigOf(), claim = cpid && !auto && solvedSaid(mt, { stmt: bb.r && bb.r.p && bb.r.p.statement }) && !unsolvedNow(mt, ph) && !sig.guess ? ((nq && nq.coach && nq.coach.closure && nq.coach.closure.label) || true) : "";
       /* G4 (دورِ ۶، s18): مسئلهٔ فقط‌درگفت‌وگو در میانهٔ کار (رابطهٔ تازه با متغیرها) ⇒ پرسشِ هدف — همتای «🎯 هدف را گم نکن» ِ صفحه؛ مجهول به حرفِ خودش، وگرنه بندِ پرسشیِ صورت */
       var Cg = s.coach || {}, goal = !cpid && !auto && ph === "c" && varEq(mt) && !solvedSaid(mt) ? clip((Cg.unkBy && Cg.unkBy[Cg.pk]) || (String(Cg.stmt || "").match(/[^.!؟?\n]*[؟?]/g) || []).pop() || "", 110).trim() : "";
@@ -38086,7 +38088,8 @@ APP.goFromURL = function (q) {
   /* سطرِ «گزارشِ وضع ِ همه‌جا»: فیلدهای تازهٔ coach_state در هر نوبت (نه فقط مربی) — در قلاب، نه SYS */
   var STATE_X = "# گزارشِ وضع (همهٔ نوبت‌ها)\n" + CTX17 + "در actions یک {\"do\":\"coach_state\",…} با این فیلدها بده — هر کدام **فقط** وقتی در آخرین پیامِ کاربر هست، و متن را عیناً از حرفِ خودش نقل کن (صفحه با پیامش می‌سنجد؛ نقلِ ساختگی رد می‌شود): " +
     "plan {\"text\":\"…\",\"when\":\"YYYY-MM-DD\"} = کاری که خودش از این پس قصد دارد بکند با زمانش (نه گلایه از عادت، نه موعدی که زیرش است، نه گفتهٔ دیگری)؛ قولِ بی‌تاریخ به خودش («دیگه … نمی‌کنم»، «از این به بعد …») ⇒ \"when\":\"next-session\"؛ اگر همان برنامهٔ پیشین را دوباره گفت ⇒ \"same\":\"plN\"؛ اگر آن کار بر حدسی تکیه دارد که هنوز نیازموده ⇒ \"on_guess\":true؛ اگر همان گامی از مسئلهٔ زنده‌اش است ⇒ \"step\":\"شمارهٔ ۱‌پایهٔ گام\"؛ plan_done {\"id\":\"plN\",\"done\":true|false} = وقتی خودش گفت برنامه‌اش را انجام داد یا نداد؛ defer {\"what\":\"…\"} = آنچه خودش از تو خواست و تو در همین پاسخ عقب انداختی (نه پرسشِ خودت، نه آنچه همین حالا دادی)؛ " +
-    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده)؛ result \"…\" = همراهِ said:[\"result\"]، عینِ نتیجه‌ای که در همین پیامش گفت (نتیجه‌ای که در پیامش نیست رد می‌شود)؛ guess_res {\"id\":\"gN\",\"res\":\"refuted|confirmed\"} = وقتی همین پیامش نتیجهٔ آزمودنِ حدسی را می‌گوید که پیش‌تر گفته بود.";
+    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده)؛ result \"…\" = همراهِ said:[\"result\"]، عینِ نتیجه‌ای که در همین پیامش گفت (نتیجه‌ای که در پیامش نیست رد می‌شود)؛ guess_res {\"id\":\"gN\",\"res\":\"refuted|confirmed\"} = وقتی همین پیامش نتیجهٔ آزمودنِ حدسی را می‌گوید که پیش‌تر گفته بود؛ " +
+    "retract {\"msg\":\"تکه‌ای عینی از پیامِ پیشینِ خودش که اصلاح می‌کند\",\"what\":\"guess|plan|step|ans|said|fact|form\",\"fix\":\"عینِ مقدارِ درست از همین پیامش\",\"old\":\"(اختیاری) همان بخشِ نادرست درونِ msg\"} = فقط وقتی خودش حرفِ پیشینِ خودش را اصلاح می‌کند («اشتباه گفتم/نوشتم»، «منظورم … بود»، «نه، … درسته»، «اون … رو اصلاح کن») — نه کارِ بیرونی که اشتباه کرد، نه ایده‌ای تازه، نه اشتباهِ دیگری یا تو؛ صفحه می‌سنجد و هر چه از آن پیام ثبت شده بود برمی‌گرداند و درست را می‌نشاند (پیشین در تاریخچه می‌ماند).";
   AS.COACH_STATE_X = STATE_X;
   AS.promptFilters.push(function (outs, s, msg) {
     var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt);
@@ -38374,6 +38377,213 @@ APP.goFromURL = function (q) {
   AS.R17_QUARANTINE = { planSeen: planSeenR17, plan: planR17, regSigns: regSignsR17, guessMsg: guessMsgR17, chkWindow: chkWindowR17 };
   /* قرنطینه‌های دورِ ۱۹ (تورِ پولیا RN1، RN2d، RN3a، RN6c — REMOVAL_CANDIDATES) */
   AS.R18_QUARANTINE = { deferCand: deferCandR18, sentsOf: sentsOfR18, regIn: regInR18, planDone: planDoneR18, plansDue: plansDueR18, weakPhase: weakPhaseR18 };
+
+  /* ================= دورِ ۱۹b ِ تورِ پولیا (INF15، سهمِ «coach»، DECISIONS_R19b) — اصلاحِ پیامِ پیشین، به هر فاصله =================
+     مدل گزارش می‌دهد (coach_state.retract {msg, what, fix, old?})، صفحه می‌سنجد: تکه در پیامِ **پیشینِ خودِ کاربر** در همین سشن هست، پیامِ کنونی نشانهٔ
+     اصلاحِ حرفِ خودش را دارد (نه کارِ بیرونی، نه اشتباهِ دستیار یا دیگری) و مقدارِ درست را در خودش دارد، و درست ≠ نادرست. آن‌گاه هر رکوردِ لایهٔ مربی که
+     از آن پیام آمده بود (حدس، برنامه، قول، شاهدِ said/ans، فرمی که کنشِ دستیار در آن نوبت پر کرد، رویدادهای کارنامه) برگردانده و درست نشانده می‌شود —
+     هیچ رکوردی پاک نمی‌شود: مقدارِ پیشین با «اصلاح شد ⇐» در تاریخچه می‌ماند؛ رکوردهای مسئلهٔ زنده (صورت، داده، حدس، گام) با A.liveRetract ِ بخشِ مسئله.
+     پشتیبانِ بی‌گزارش فقط می‌پرسد «کدام را اصلاح کنم؟» و هرگز خودش برنمی‌گرداند (experiences/model-reports-state-page-validates.md). */
+  var CORR19b = /^\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]|اشتباه[\s‌]*(?:گفتم|نوشتم|زدم|تایپ|حساب[\s‌]*کردم)(?![آ-ی])|غلط[\s‌]*(?:گفتم|نوشتم)(?![آ-ی])|(?:گفتم|نوشتم)(?![آ-ی])[^.!؟?\n]{0,40}(?:اشتباه|غلط)[\s‌]*(?:بود|ه)(?![آ-ی])|منظورم[\s‌]+[^.!؟?\n]{1,80}?[\s‌]*بود(?![آ-ی])|(?:اصلاح|اصلاحش|درستش)[\s‌]*(?:کن|کنید|کنین)(?![آ-ی])|(?:^|[\s،,.])نه[،,\s]+[^.!؟?\n]{1,60}?[\s‌]*درست(?:ه|ش|ست|\s*است)(?![آ-ی])|درستش[\s‌]*(?:اینه|این\s*است|هست)|صحیح[\s‌]*(?:آن|اش|ش)(?![آ-ی])|اشتباهِ?[\s‌]*تایپی|(?:نوشتم|گفتم)(?![آ-ی])[^.!؟?\n]{1,30}[،,]?[\s‌]*(?:ولی|اما)(?![آ-ی])/;
+  /* اشتباهِ دستیار یا دیگری («تو اشتباه گفتی»، «دوستم گفت اشتباه گفتی») اصلاحِ حرفِ خودش نیست */
+  var OTHER_ERR19b = /(?:^|[\s،])(?:تو|شما)[\s‌]+اشتباه|اشتباه[\s‌]*(?:گفتی|نوشتی|کردی|خوندی|فهمیدی|گفتید|نوشتید|کردید|خوندید)(?![آ-ی])|(?:گفت|نوشت|نوشته\s*بود)(?![آ-یم])[^.!؟?\n]{0,12}اشتباه/;
+  AS.CORR_RE = CORR19b;
+  /* بانکِ R19b (INF15 #15، #16): «اشتباه کردم» ِ تنها (کلید را جا گذاشتم، سرِ امتحان علامت را انداختم) اغلب کارِ بیرونی است، نه شکستِ مرحلهٔ همین حل —
+     الگو آن را فقط «در انتظار» (pend) نگه می‌دارد تا گزارشِ مدل داوری کند (نامتقارن: شکستِ دروغ گران‌تر است)؛ «حل نشد/غلط بود» ِ دیگر مثلِ پیش */
+  function actErrOnly19b(t) { var x = String(t || ""); return /اشتباه[\s‌]*کردم/.test(x) && !UNSOLVED_RE.test(x.replace(/اشتباه[\s‌]*کردم/g, " ")); }
+  function msgId19b(m) { if (!m) return ""; if (m.id) return String(m.id); if (m.seq != null) return "u" + m.seq; return "t" + String(m.at || ""); }
+  AS.msgId = msgId19b;
+  /* پیامِ کاربرِ منبعِ یک رویداد: آخرین پیامِ کاربر با همین متن */
+  function evSrc19b(s, mt) { var M = (s && s.msgs) || [], t = String(mt || "").trim(); if (!t) return null; for (var i = M.length - 1; i >= 0; i--) if (isUser(M[i]) && String(M[i].text || "").trim() === t) return M[i]; return null; }
+  function evPid19b(s) { try { var b = AS.boundLive(s); if (b && b.pid) return b.pid; } catch (e) { } var pk = ((s && s.coach) || {}).pk || ""; return /^l:/.test(pk) ? pk.slice(2) : ""; }
+  AS.msgOf = function (s, id) { return ((s && s.msgs) || []).filter(function (m) { return isUser(m) && msgId19b(m) === id; })[0] || null; };
+  /* ---------- یکسان‌سازیِ تکه برای جست‌وجو در متن: رقمِ فارسی/لاتین، فاصله/نیم‌فاصله، ی/ي ---------- */
+  function rxEsc(c) { return c.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&"); }
+  var DIG19b = ["0۰٠", "1۱١", "2۲٢", "3۳٣", "4۴٤", "5۵٥", "6۶٦", "7۷٧", "8۸٨", "9۹٩"];
+  function fragRe(y) {
+    var t = String(y || "").trim(); if (!t) return null; var out = "", sp = false;
+    for (var i = 0; i < t.length; i++) { var c = t.charAt(i), d = faDigits(c);
+      if (/[\s‌]/.test(c)) { if (!sp) out += "[\\s‌]*"; sp = true; continue; } sp = false;
+      if (/^[0-9]$/.test(d)) out += "[" + DIG19b[+d] + "]";
+      else if (/[یي]/.test(c)) out += "[یي]"; else if (/[کك]/.test(c)) out += "[کك]"; else out += rxEsc(c); }
+    try { return new RegExp(out); } catch (e) { return null; }
+  }
+  function hasFrag(T, y) { var r = fragRe(y); return !!r && r.test(String(T || "")); }
+  function repFrag(T, y, x) { var r = fragRe(y); return r ? String(T).replace(r, function () { return x; }) : T; }
+  function numRe19b(n) { var rf = fragRe(n); return rf ? new RegExp("(^|[^0-9۰-۹٠-٩.٫])" + rf.source + "(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])") : null; }
+  function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
+  function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
+  var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
+  /* مقدارِ درست را در متنِ رکورد بنشان: (الف) «old» ِ مدل یا «نه Y»/«به‌جای Y» ِ پیامِ کنونی، (ب) تنها عددِ عوض‌شده، (پ) روزِ هفته، (ت) پنجره‌ای از تکه که
+     با واژهٔ مشترکِ درست هم‌تراز است، (ث) خودِ تکه درونِ متن؛ متنی که درونِ تکه است ⇒ خودِ درست. هیچ‌کدام ⇒ null (رکورد دست نمی‌خورد، مگر نوعش همان what باشد). */
+  function subst19b(T, frag, fix, cur, old) {
+    T = String(T || ""); var F = String(frag || "").trim(), X = String(fix || "").trim(); if (!X) return null;
+    var Ys = []; if (old && String(old).trim()) Ys.push(String(old).trim());
+    var re = /(?:^|[\s،,.])(?:نه|به[\s‌]*جای|بجای)[\s‌]+([^،,.!؟?\n]{1,50})/g, m, cu = String(cur || "");
+    while ((m = re.exec(cu))) { var w = m[1].replace(/[\s‌]+(?:بود|است|نبود)$/, "").trim().split(/[\s‌]+/); for (var k = w.length; k >= 1; k--) Ys.push(w.slice(0, k).join(" ")); }
+    for (var i = 0; i < Ys.length; i++) { var y = Ys[i]; if (!y || hasFrag(X, y) || !(!F || hasFrag(F, y) || !!old)) continue;
+      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(y)) { var ry = numRe19b(y); if (ry.test(T)) return T.replace(ry, function (a0, p0) { return p0 + X; }); continue; }   // عدد فقط به‌تمامی («۵» درونِ «۱۵» نه)
+      var wy = fragRe(y), ry2 = wy ? new RegExp("(^|[^آ-یa-zA-Z0-9۰-۹‌])" + wy.source + "(?![آ-یa-zA-Z0-9۰-۹‌])") : null;   // واژه به‌تمامی («خسته» درونِ «خسته‌ام» نه)
+      if (ry2 && ry2.test(T)) return T.replace(ry2, function (a1, p1) { return p1 + X; }); }
+    var fo = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
+    if (fo.length === 1 && xo.length === 1) { var r2 = numRe19b(fo[0]); if (r2 && r2.test(T)) return T.replace(r2, function (a, p) { return p + xo[0]; }); }
+    var wf = WD19b.exec(F), wx = WD19b.exec(X); if (wf && wx && hasFrag(T, wf[0]) && X.split(/\s+/).length <= 4) return repFrag(T, wf[0], X);
+    var ft = F.split(/\s+/).filter(Boolean), xt = X.split(/\s+/).filter(Boolean);
+    for (var xi = 0; xi < xt.length; xi++) { if (xt[xi].length < 2 || /^[0-9۰-۹٠-٩=+\-−×*\/^.,]+$/.test(xt[xi])) continue; var fi = ft.indexOf(xt[xi]); if (fi < 0) continue;
+      var s0 = Math.max(0, fi - xi), win = ft.slice(s0, s0 + xt.length).join(" "); if (win && win !== X && hasFrag(T, win)) return repFrag(T, win, X); break; }
+    if (F && hasFrag(T, F)) return repFrag(T, F, X);
+    if (F && T.trim() && hasFrag(F, T.trim())) return X;
+    return null;
+  }
+  AS.retractSubst = subst19b;
+  function rel19b(T, F) { if (!T || !F) return false; if (hasFrag(T, F) || hasFrag(F, String(T).trim())) return true; var a = tokN(T), b = tokN(F); if (a.some(function (w) { return b.indexOf(w) >= 0; })) return true; var na = nums19b(T), nb = nums19b(F); return na.some(function (n) { return nb.indexOf(n) >= 0; }); }
+  function corrPush(r, old, nw, ctx) { r.corr = (r.corr || []).concat([Object.assign({ at: nowIso(), old: old, "new": nw, note: "اصلاح شد ⇐ «" + clip(String(old == null ? "" : old), 120) + "»" }, ctx || {})]); }
+  /* ---------- فرم‌هایی که کنشِ دستیار پر کرد: دفترِ هر پر کردن با شناسهٔ پیامِ کاربرِ آن نوبت (برای برگرداندن) ---------- */
+  function fieldSig(x) { return x ? (x.id || x.name || x.getAttribute("aria-label") || x.placeholder || "") : ""; }
+  function fieldBySig(sg) { if (!sg) return null; var L = document.querySelectorAll("#main input, #main textarea, #main select"); for (var i = 0; i < L.length; i++) if (fieldSig(L[i]) === sg) return L[i]; return null; }
+  if (AS.DO && AS.DO.fill && !AS.DO.fill._r19b) {
+    var rawFill19b = AS.DO.fill;
+    AS.DO.fill = function (a) {
+      var x = null, old = null; try { x = a && a.k ? document.querySelector('#main [data-ai-k="' + a.k + '"]') : null; if (x) old = String(x.value == null ? "" : x.value); } catch (e) { }
+      var r = rawFill19b.apply(this, arguments);
+      try { var s = AS._turnSession; if (!r && x && s && x.type !== "checkbox" && x.type !== "radio" && x.type !== "file") { var um = lastUserMsg(s), st = A.state || {};
+        if (um && String(x.value) !== old) { var F = s.fills = s.fills || []; F.push({ src: msgId19b(um), key: mkey(um.text), at: nowIso(), view: st.view || "", arg: st.arg == null ? null : st.arg, sub: st.sub || null, sig: fieldSig(x), label: clip(x.getAttribute("aria-label") || x.placeholder || x.id || "", 80), old: old, val: String(x.value) }); if (F.length > 120) s.fills = F.slice(-120); S.put(s); } } } catch (e) { }
+      return r;
+    };
+    AS.DO.fill._r19b = true;
+  }
+  function setField19b(x, v) {
+    var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype, d = Object.getOwnPropertyDescriptor(proto, "value");
+    if (d && d.set) d.set.call(x, v); else x.value = v; x.dispatchEvent(new Event("input", { bubbles: true })); x.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  /* ---------- سنجشِ retract ---------- */
+  var WHAT19b = /^(?:guess|plan|step|ans|said|fact|form)$/;
+  function retractCheck(s, x, um) {
+    if (!x || typeof x !== "object") return { err: "retract شیء نیست" };
+    var frag = txtOf(x.msg || x.frag).trim(), what = String(x.what || "").trim(), fix = txtOf(x.fix).trim(), ut = String((um && um.text) || "");
+    if (!um || !isUser(um)) return { err: "پیامِ کاربر نیست" };
+    if (!WHAT19b.test(what)) return { err: "what نامعتبر" };
+    if (frag.length < 1) return { err: "تکهٔ پیامِ پیشین نیامد" };
+    var own = ownText(ut);
+    if (!CORR19b.test(own)) return { err: "پیامِ کنونی نشانهٔ اصلاحِ حرفِ خودش را ندارد" };
+    if (OTHER_ERR19b.test(own) && !/(?:اشتباه|غلط)[\s‌]*(?:گفتم|نوشتم)/.test(own)) return { err: "اصلاحِ اشتباهِ دستیار یا دیگری است، نه حرفِ خودش" };
+    if (!fix || !(quoteIn(fix, ut) || hasFrag(ut, fix))) return { err: "مقدارِ درست در همین پیامِ او نیست" };
+    var M = s.msgs || [], ui = M.indexOf(um), src = null, n = 0;
+    for (var i = ui - 1; i >= 0; i--) if (isUser(M[i]) && (hasFrag(M[i].text, frag) || (frag.length >= 4 && quoteIn(frag, M[i].text)))) { src = M[i]; break; }
+    if (!src) return { err: "تکه در هیچ پیامِ پیشینِ خودِ او در این سشن نیست" };
+    if (hasFrag(frag, fix)) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };
+    for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
+    return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um) };
+  }
+  AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
+  function fromMsg(r, R) { return !!r && (r.src === R.srcId || (!r.src && !!r.key && r.key === mkey(R.src.text))); }
+  /* ---------- برگرداندن و نشاندنِ درست ---------- */
+  function retractApply(s, R) {
+    var C = s.coach = s.coach || {}, ch = [], pend = [], ctx = { by: R.curId, from: R.srcId, what: R.what }, cu = String(R.cur.text || "");
+    var sub = function (T, typed) { var v = subst19b(T, R.frag, R.fix, cu, R.old); if (v == null && typed) v = R.fix; return v; };
+    var hit = function (typed, T) { return typed || rel19b(T, R.frag); };
+    /* حدس‌ها (شناسه‌دار) و حدسِ جاریِ مربی */
+    (C.guesses || []).forEach(function (g) { if (!fromMsg(g, R) || !hit(R.what === "guess", g.text)) return; var v = sub(g.text, R.what === "guess"); if (v == null || v === g.text) return;
+      corrPush(g, g.text, v, ctx); ch.push("حدسِ " + g.id + ": «" + clip(v, 60) + "» (اصلاح شد ⇐ «" + clip(g.text, 50) + "»)"); var o = g.text; g.text = clip(v, 300);
+      if (C.guess && qNorm(C.guess.text) === qNorm(o)) { corrPush(C.guess, C.guess.text, g.text, ctx); C.guess.text = g.text; }
+      (s.msgs || []).forEach(function (m) { if (m && m.role === "ai" && m.guess && qNorm(m.guess.text) === qNorm(o)) { corrPush(m.guess, m.guess.text, g.text, ctx); m.guess.text = g.text; } }); });
+    if (C.guess && fromMsg(C.guess, R) && !(C.guesses || []).some(function (g) { return qNorm(g.text) === qNorm(C.guess.text); }) && hit(R.what === "guess", C.guess.text)) { var gv = sub(C.guess.text, R.what === "guess"); if (gv != null && gv !== C.guess.text) { corrPush(C.guess, C.guess.text, gv, ctx); ch.push("حدس: «" + clip(gv, 60) + "» (اصلاح شد ⇐ «" + clip(C.guess.text, 50) + "»)"); C.guess.text = clip(gv, 300); } }
+    /* برنامه‌ها (+ موعد و یادآورِ پیگیری‌اش) */
+    (s.plans || []).forEach(function (q) { if (!fromMsg(q, R) || !hit(R.what === "plan", q.text)) return; var v = sub(q.text, R.what === "plan"); if (v == null || v === q.text) return;
+      var ow = q.when, nw = ow; if (ow && ow !== "next-session" && WD19b.test(String(v))) { var d = planDate18(v); if (d && d >= A.today() && d !== planDate18(q.text)) nw = d; }
+      corrPush(q, q.text, v, Object.assign({ oldWhen: ow }, ctx)); var oT = q.text; q.text = clip(v, 300);
+      if (nw !== ow) { q.when = nw; delete q.askKey; delete q.gAskKey;
+        try { S.all("deadline", function (x) { return x && !x.done && x.date === ow && (x.sess === s.id || quoteIn(clip(oT, 40), String(x.what || ""))); }).forEach(function (dl) { corrPush(dl, dl.date, nw, ctx); dl.date = nw; S.put(dl); }); } catch (e) { } }
+      ch.push("برنامهٔ " + q.id + ": «" + clip(plainTx(v), 60) + "»" + (nw !== ow ? " (موعد " + nw + ")" : "") + " (اصلاح شد ⇐ «" + clip(plainTx(oT), 50) + "»" + (nw !== ow ? "، " + ow : "") + ")"); });
+    /* قول‌ها (درخواستِ عقب‌افتاده‌ای که از آن پیام آمد) */
+    (s.promises || []).forEach(function (p) { if (p.done || !(p.src === R.srcId || quoteIn(p.ask, R.src.text)) || !rel19b(p.ask, R.frag)) return; var v = sub(p.ask, false); if (v == null || v === p.ask) return;
+      corrPush(p, p.ask, v, ctx); ch.push("درخواستِ " + p.id + ": «" + clip(v, 60) + "» (اصلاح شد ⇐ «" + clip(p.ask, 50) + "»)"); p.ask = clip(v, 200); });
+    /* صورتِ مسئلهٔ گفت‌وگو و مجهول به حرفِ خودش */
+    /* صورتِ گفت‌وگو همیشه پیرو می‌شود (تاریخچه می‌ماند)؛ فقط وقتی واقعاً مسئله است «تغییر» خوانده می‌شود (سلام و حال‌واحوال رکوردی نیست که بگوییم عوض شد) */
+    if (C.stmt && hasFrag(R.src.text, String(C.stmt).slice(0, 40)) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false); if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6); } catch (e) { }
+      C.stmtHist = (C.stmtHist || []).concat([{ at: nowIso(), old: C.stmt, note: "اصلاح شد ⇐ «" + clip(C.stmt, 120) + "»", by: R.curId }]); if (stP) ch.push("صورتِ مسئلهٔ گفت‌وگو: «" + clip(sv, 70) + "»"); C.stmt = clip(sv, 400); } }
+    Object.keys(C.unkBy || {}).forEach(function (k) { var u = C.unkBy[k]; if (!u || !hasFrag(R.src.text, u) || !rel19b(u, R.frag)) return; var v = sub(u, R.what === "said"); if (v == null || v === u) return; C.unkHist = (C.unkHist || []).concat([{ at: nowIso(), pk: k, old: u, note: "اصلاح شد ⇐ «" + clip(u, 120) + "»" }]); C.unkBy[k] = clip(v, 160); ch.push("مجهول به حرفِ خودت: «" + clip(v, 60) + "»"); });
+    /* شاهدِ پاسخ (ans/said): پاسخ‌دادن می‌ماند، محتوایش اصلاح می‌شود؛ حکمِ وارسی‌ای که روی پیامِ نادرست بنا شد «وارسی‌نشده» می‌شود (حکمِ پیشین در تاریخچه) */
+    if (/^(?:ans|said|fact)$/.test(R.what)) { var nA = 0; (C.ansLog || []).forEach(function (e) { if (!fromMsg(e, R)) return; corrPush(e, R.frag, R.fix, ctx); nA++; }); var nO = 0, PN = { u: "مجهول", d: "داده", c: "شرط" }, pn = []; (C.ownLog || []).forEach(function (e) { if (!fromMsg(e, R)) return; corrPush(e, R.frag, R.fix, ctx); nO++; (e.p || []).forEach(function (k) { if (PN[k] && pn.indexOf(PN[k]) < 0) pn.push(PN[k]); }); });
+      if (nO) ch.push((pn.join("/") || "آنچه از مسئله گفتی") + " به حرفِ خودت: «" + clip(R.fix, 60) + "» (اصلاح شد ⇐ «" + clip(R.frag, 50) + "»)");
+      if (nA) ch.push("پاسخ به " + fa(nA) + " پرسش: «" + clip(R.fix, 50) + "» (اصلاح شد ⇐ «" + clip(R.frag, 50) + "»)"); }
+    try { chatClosed().forEach(function (x) { var b = x.b; if (!b || b.verdict !== "verified" || !(b.chkMsgs || []).some(function (t) { return qNorm(t) && qNorm(clip(R.src.text, 160)) === qNorm(t); })) return;
+      b.chkSup = { at: nowIso(), by: R.curId, from: R.srcId, verdictPrev: b.verdict, note: "اصلاح شد ⇐ حکمِ «وارسی شد» روی پیامی بود که خودش اصلاح کرد" }; b.verdict = "unverified"; b.chkBy = "superseded"; S.put(x.pg); ch.push("حکمِ وارسیِ «" + clip(x.r.p.title, 40) + "» دیگر «وارسی شد» نیست (روی پیامِ اصلاح‌شده بود)"); }); } catch (e) { }
+    /* فرم‌هایی که کنشِ دستیار در آن نوبت پر کرد */
+    (s.fills || []).forEach(function (f) { if (!fromMsg(f, R)) return; if (!(R.what === "form" || rel19b(f.val, R.frag))) return; var v = sub(f.val, R.what === "form"); if (v == null || v === f.val) return;
+      var st = A.state || {}, here = st.view === f.view && String(st.arg) === String(f.arg), x = here ? fieldBySig(f.sig) : null, o = f.val;
+      corrPush(f, o, v, ctx);
+      if (x && String(x.value) === o) { setField19b(x, v); f.val = v; delete f.pending; ch.push("فیلدِ «" + clip(f.label, 40) + "»: «" + clip(v, 50) + "» (اصلاح شد ⇐ «" + clip(o, 40) + "»)"); }
+      else { f.pending = v; pend.push("فیلدِ «" + clip(f.label, 40) + "» در «" + f.view + (f.arg != null ? " " + f.arg : "") + "» هنوز «" + clip(o, 40) + "» است ⇒ «" + clip(v, 50) + "»"); } });
+    /* رویدادهای کارنامه که از آن پیام آمدند ⇒ پس گرفته (wd)، نه پاک */
+    var nE = 0, tail = clip(String(R.src.text || ""), 80); (s.coachEv || []).forEach(function (e) { if (!e || e.wd || e.how === "selfcorr") return; var fromE = e.msg ? e.msg === R.srcId : /^chat/.test(String(e.src || "")) && String(e.key || "").slice(-tail.length) === tail;
+      if (fromE) { e.wd = { at: nowIso(), by: R.curId, why: "اصلاحِ پیامِ منبع" }; nE++; } });
+    if (nE) ch.push(fa(nE) + " رویدادِ کارنامه از آن پیام پس گرفته شد");
+    /* رکوردهای مسئلهٔ زنده (صورت، داده، حدس، گام، فیلدها) ⇐ بخشِ مسئله (A.liveRetract) */
+    var pids = {}; try { var bl = AS.boundLive(s); if (bl && bl.pid) pids[bl.pid] = 1; } catch (e) { } if (s.lprob) pids[s.lprob] = 1; (s.lprobLog || []).forEach(function (e) { if (e && e.p) pids[e.p] = 1; });
+    Object.keys(pids).forEach(function (pid) { if (typeof A.liveRetract !== "function") return; try { var lr = A.liveRetract(pid, R.srcId, { what: R.what, fix: R.fix, frag: R.frag, old: R.old, msg: clip(R.src.text, 300), n: R.n, at: R.src.at, sess: s.id, by: R.curId });
+      var lt = typeof lr === "string" ? lr : lr && typeof lr === "object" ? (Array.isArray(lr.changes) ? lr.changes.join("؛ ") : String(lr.text || lr.msg || "")) : "";
+      if (lt && !/^(?:ثبت نشد|چیزی|هیچ)/.test(lt)) ch.push(lt.replace(/^✓\s*/, "")); } catch (e) { console.warn(e); } });
+    if (Object.keys(pids).length && typeof A.liveRetract !== "function") pend.push("رکوردهای مسئلهٔ زنده در این نسخه راهِ برگرداندن ندارند — خودش در صفحهٔ مسئله اصلاح کند");
+    return { ch: ch, pend: pend, nEv: nE };
+  }
+  AS.retractApply = function (s, x) { var R = retractCheck(s, x, lastUserMsg(s)); return R.err ? R : retractApply(s, R); };
+  /* coach_state.retract — پیش از بقیهٔ گزارش (تا حدسِ درستِ همین پیام تکرار نشود)؛ رکوردهای تازهٔ این نوبت شناسهٔ پیامِ منبع را می‌گیرند */
+  function recs19b(s) { var C = s.coach || {}; return [].concat(s.plans || [], C.guesses || [], s.promises || [], s.coachEv || [], C.ansLog || [], C.ownLog || [], C.guess ? [C.guess] : []); }
+  if (!AS.DO.coach_state._r19b) {
+    var rawCS19b = AS.DO.coach_state;
+    AS.DO.coach_state = function (a) {
+      var s = AS._turnSession; if (!s || !a || typeof a !== "object") return rawCS19b.apply(this, arguments);
+      var um = lastUserMsg(s), mid = msgId19b(um), before = recs19b(s), C = s.coach = s.coach || {}, info = "", res = null;
+      if (a.retract && um) { var L = Array.isArray(a.retract) ? a.retract.slice(0, 3) : [a.retract];
+        L.forEach(function (x) { var R = retractCheck(s, x, um), RL = C.retracts = C.retracts || [];
+          if (R.err) { RL.push({ at: nowIso(), key: mkey(um.text), cur: mid, ok: false, err: R.err, x: { msg: clip(txtOf(x && x.msg), 120), what: String((x && x.what) || ""), fix: clip(txtOf(x && x.fix), 120) } }); return; }
+          var o = retractApply(s, R); res = res || { ch: [], pend: [], R: R }; res.ch = res.ch.concat(o.ch); res.pend = res.pend.concat(o.pend);
+          RL.push({ at: nowIso(), key: mkey(um.text), cur: mid, src: R.srcId, n: R.n, ok: true, what: R.what, frag: clip(R.frag, 160), fix: clip(R.fix, 160), changes: o.ch, pending: o.pend }); });
+        if ((C.retracts || []).length > 60) C.retracts = C.retracts.slice(-60); }
+      var a2 = a; if (a.retract) { a2 = Object.assign({}, a); delete a2.retract; }
+      var out = rawCS19b.call(this, a2);
+      try { recs19b(s).forEach(function (r) { if (r && typeof r === "object" && before.indexOf(r) < 0 && !r.src && mid) r.src = mid; });
+        if (res) {
+          /* خود-اصلاح بازنگری است، هرگز شکست: شکست/گیرِ همین پیام پس گرفته می‌شود؛ و اگر چیزی واقعاً برگشت، یک شاهدِ «بازنگری» */
+          (s.coachEv || []).forEach(function (e) { if (e && !e.wd && !e.ok && e.msg === mid) e.wd = { at: nowIso(), by: mid, why: "خود-اصلاح، نه شکست" }; });
+          if (res.ch.length && !C.teach) coachEv(s, "b", "chatok", String(um.text || ""), true, { how: "selfcorr", from: res.R.srcId, pk: C.pk || "" });
+          C.retNote = { key: mkey(um.text), cur: mid, frag: clip(res.R.frag, 120), fix: clip(res.R.fix, 120), ch: res.ch.slice(0, 8), pend: res.pend.slice(0, 4), shown: "" };
+          if (res.ch.length) info = "✓ اصلاح شد: " + res.ch.slice(0, 4).join(" · ");
+        }
+        S.put(s); } catch (e) { console.warn(e); }
+      return info || out;
+    };
+    AS.DO.coach_state._r19b = true;
+  }
+  /* نامزدهای اصلاح (برای پرسشِ «کدام را اصلاح کنم؟»): رکوردهای منبع‌دارِ همین سشن، تازه‌ترین اول */
+  function corrCands(s) {
+    var C = (s && s.coach) || {}, out = [];
+    (C.guesses || []).forEach(function (g) { out.push({ at: g.at, t: "حدسِ " + g.id + " «" + clip(plainTx(g.text), 60).replace(/[«»]/g, "") + "»" }); });
+    (s.plans || []).forEach(function (q) { if (planOpen(q)) out.push({ at: q.at, t: "برنامهٔ " + q.id + " «" + clip(plainTx(q.text), 60).replace(/[«»]/g, "") + "»" }); });
+    (s.fills || []).forEach(function (f) { out.push({ at: f.at, t: "فیلدِ «" + clip(f.label, 30).replace(/[«»]/g, "") + "» = «" + clip(f.val, 40).replace(/[«»]/g, "") + "»" }); });
+    try { var pid = sessPid(s); if (pid) lsteps(pid).forEach(function (st, i) { var o = st && (st.chatRep || (st.out && st.out.from === "chat" ? st.out : null)); if (o) out.push({ at: String(o.at || ""), t: "نتیجهٔ گامِ " + fa(i + 1) + " «" + clip(plainTx(st.text), 40).replace(/[«»]/g, "") + "»" }); }); } catch (e) { }
+    return out.sort(function (a, b) { return String(b.at || "").localeCompare(String(a.at || "")); }).slice(0, 6).map(function (x) { return x.t; });
+  }
+  AS.corrCands = corrCands;
+  AS.promptFilters.push(function (outs, s, msg) {
+    var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt); if (auto || !s) return out;
+    var C = s.coach || {}, k = mkey(mt);
+    /* ۱) اصلاحی که صفحه نوبتِ پیش انجام داد — زمینه، یک بار: دقیقاً چه عوض شد (و چه نشد) */
+    var N = C.retNote; if (N && N.key !== k && (!N.shown || N.shown === k)) { N.shown = k;
+      out.push("# اصلاحی که صفحه انجام داد (نوبتِ پیش)\n" + CTX18 + (N.ch.length ? "پیامِ پیشینش را اصلاح کرد («" + N.frag.replace(/[«»]/g, "") + "» ⇐ «" + N.fix.replace(/[«»]/g, "") + "») و صفحه این‌ها را عوض کرد: " + N.ch.join("؛ ") + "." : "پیامِ پیشینش را اصلاح کرد، ولی از آن پیام هیچ رکوردی ثبت نشده بود — چیزی عوض نشد؛ نگو که چیزی را عوض کردی.") +
+        (N.pend.length ? " مانده: " + N.pend.join("؛ ") + " (اگر به آن‌جا رفتید، همان را درست کن)." : "") + " اگر در پاسخِ پیشین نگفتی، در یک جمله بگو چه عوض شد؛ چیزِ دیگری را عوض‌شده نخوان.");
+      try { S.put(s); } catch (e) { } }
+    var own = ownText(mt);
+    /* ۲) همین پیام نشانهٔ اصلاحِ حرفِ خودش را دارد ⇒ نامزدها و راهِ گزارش (مدل داوری می‌کند؛ صفحه پیش از گزارش چیزی برنمی‌گرداند) */
+    if (CORR19b.test(own) && !OTHER_ERR19b.test(own)) { var cc = corrCands(s);
+      out.push("# اصلاحِ پیامِ پیشین (شاید)\n" + CTX18 + "این پیام شاید حرفِ پیشینِ خودش را اصلاح می‌کند. اگر چنین است و روشن است کدام، {\"do\":\"coach_state\",\"retract\":{\"msg\":\"تکهٔ عینیِ پیامِ پیشینش\",\"what\":\"guess|plan|step|ans|said|fact|form\",\"fix\":\"عینِ مقدارِ درست از همین پیام\"}} بده — صفحه همه را برمی‌گرداند و درست را می‌نشاند؛ " +
+        "اگر روشن نیست کدام یا مقدارِ درست را نگفته، فقط با پرسشِ «کدام را اصلاح کنم؟»" + (cc.length ? " این نامزدها را پیش بگذار: " + cc.join("، ") : " همان را جویا شو") + " و retract نده؛ اگر دربارهٔ کارِ بیرونی، ایدهٔ تازه یا اشتباهِ تو یا دیگری است، retract نده."); }
+    /* ۳) پشتیبان: پیامِ پیشینش نشانهٔ اصلاح داشت و پاسخِ آن گزارشِ وضع نداشت ⇒ فقط پرسش (هرگز برگرداندن) */
+    try { var pp = pairPrev(s, mt); if (pp && CORR19b.test(ownText(pp.u.text)) && !OTHER_ERR19b.test(ownText(pp.u.text)) && (pp.rep.actions || []).indexOf("coach_state") < 0 && !CORR19b.test(own)) { var c2 = corrCands(s);
+      out.push("# اصلاحِ پیامِ پیشین (پشتیبان، فقط پرسش)\n" + CTX18 + "پیامِ پیشینش نشانهٔ اصلاح داشت («" + clip(pp.u.text, 120).replace(/[«»]/g, "") + "») و گزارشِ وضعِ آن نوبت نیامد — صفحه چیزی را برنگرداند. اگر هنوز روشن نشده، فقط با پرسشِ «کدام را اصلاح کنم؟»" + (c2.length ? " این نامزدها را پیش بگذار: " + c2.join("، ") : "") + "؛ وقتی گفت، retract را گزارش کن."); } } catch (e) { }
+    return out;
+  });
 
   AS.tourKinds = KIND;
   AS.tourSyncReminder = syncReminder;
@@ -38665,30 +38875,30 @@ APP.goFromURL = function (q) {
     /* پاسخ‌های پاسخ‌دقیق: ورزشِ گره (وارسی‌شده/کد/خودت با عدد) و مسئله‌های هم‌ساختار */
     var countable = typeof A.kcountable === "function" ? A.kcountable : function (it) { return !it.bad; };
     /* noRet: ماندگاریِ گره‌ها فقط از A.PSY.holds (نخستین پاسخِ پس از موعد) — این‌جا دوباره شمرده نمی‌شود (M5) */
-    function ingest(dim, hist, noRet) {
+    function ingest(dim, hist, noRet, c) {
       var t0 = null;
       (hist || []).forEach(function (x) {
         if (!x || x.self || x.ok == null || x.ok === "") return;
         var ok = x.ok === true || x.ok === 1 || x.ok === "1" || x.ok === "true", at = x.at || x.d || "";
-        put(dim, { at: at, ok: ok });
-        var c = conf01(x.conf); if (c != null) (D[dim] || D.s_mind).cal.push({ p: c, ok: ok, at: at });
+        put(dim, { at: at, ok: ok, src: c });
+        var cf = conf01(x.conf); if (cf != null) (D[dim] || D.s_mind).cal.push({ p: cf, ok: ok, at: at, src: c });
         if (!noRet && t0 && day(at) >= A.addDays(day(t0), HOLD)) { var R = (D[dim] || D.s_mind).ret; R.n++; if (ok) R.ok++; }
         if (ok && !t0) t0 = at;
       });
     }
-    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist, !!(A.PSY && A.PSY.holds)); });
-    S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist); });
+    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist, !!(A.PSY && A.PSY.holds), { id: it.id, fa: "ورزشِ گره «" + String(it.q || it.title || it.prompt || "").slice(0, 50) + "»" }); });
+    S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist, false, { id: it.id, fa: "مسئلهٔ هم‌ساختار «" + String(it.q || it.title || it.prompt || "").slice(0, 50) + "»" }); });
     /* حدسِ پیش از حل (شبیه‌ساز، سطحِ ۳–۴): اطمینان ↔ «درست بود/نادرست بود» با پاسخِ معلومِ مسئله ⇒ فقط کالیبراسیونِ حلِ مسئله، نه دقت («تاحدی» بیرون) */
     S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
-      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
+      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.wd || g.retracted || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // INF17: حدسِ پس‌گرفته (اصلاح) شمرده نمی‌شود   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
         /* حدسِ «🔭 مسئلهٔ حل‌نشدهٔ خودم» با واقعیت داوری می‌شود، نه با پاسخِ معلوم ⇒ پیش‌بینیِ رویداد (fc)، نه اطمینان به پاسخ */
-        var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at, fc: g.from === "live" || undefined }); });
+        var c = conf01(g.conf), pid0 = String(pg.id).replace(/^eprog_/, ""); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at, fc: g.from === "live" || undefined, src: { id: "g:" + pg.id + ":" + lv, pid: pid0, fa: "حدسِ «" + String(g.guess || "").slice(0, 50) + "» (اطمینان " + Math.round(100 * c) + "٪)" } }); });
     });
     /* کارت‌های مرور: نمره را خودِ کاربر می‌دهد ⇒ خودسنجی؛ مثلِ «خودم سنجیدم» ِ گره‌ها بیرون از دقت/اطمینان/ماندگاری، جدا شمرده می‌شود (M6) */
     D.s_learn.cardSelf = { n: 0, k: 0 };
     S.all("card", function (c) { return !c.sample; }).forEach(function (c) { (c.hist || []).forEach(function (x) { if (x.g == null) return; D.s_learn.cardSelf.n++; if (x.g >= 3) D.s_learn.cardSelf.k++; }); });
     /* حرکت‌ها: شمارِ پاسخ‌های درست/نادرستِ هر حرکت (دفترِ حرکت‌ها زمان و حرکت را با هم نگه نمی‌دارد ⇒ در روندِ ماهانه نمی‌آید) */
-    var mp = S.get("moves_prog"); Object.keys((mp && mp.by) || {}).forEach(function (mv) { var b = mp.by[mv], d = M.dimOf("move:" + mv); for (var i = 0; i < (b.n || 0); i++) put(d, { at: "", ok: i < (b.ok || 0) }); });
+    var mp = S.get("moves_prog"); Object.keys((mp && mp.by) || {}).forEach(function (mv) { var b = mp.by[mv], d = M.dimOf("move:" + mv); for (var i = 0; i < (b.n || 0); i++) put(d, { at: "", ok: i < (b.ok || 0), src: { id: "move:" + mv + ":" + i, fa: "حرکتِ «" + mv + "»" } }); });
     /* داوریِ معرفتی: درجهٔ نهاییِ تو ↔ نتیجهٔ واقعیِ ثبت‌شده در بازبینی */
     var cases = S.all("case", function (c) { return !c.sample; });
     cases.forEach(function (cs) {
@@ -38697,19 +38907,20 @@ APP.goFromURL = function (q) {
       fin.forEach(function (r) {
         var o = (cs.outcome || {})[r.c]; if (!r.c || r.p == null || r.p === "" || (o !== "درست" && o !== "نادرست")) return;
         var p = conf01(r.p), ok = o === "درست", at = cs.outcomeAt || cs.updated || cs.created;
-        D.s_epi.cal.push({ p: p, ok: ok, at: at, fc: true });
-        D.s_epi.ans.push({ at: at, ok: (p >= 0.5) === ok });
+        var cs0 = { id: "case:" + cs.id + ":" + r.c, fa: "پروندهٔ «" + String(cs.title || "").slice(0, 40) + "» — درجهٔ پایانی در برابرِ نتیجهٔ واقعی" };
+        D.s_epi.cal.push({ p: p, ok: ok, at: at, fc: true, src: cs0 });
+        D.s_epi.ans.push({ at: at, ok: (p >= 0.5) === ok, src: cs0 });
       });
     });
     /* ⛓ زنجیرهٔ نگرانی (حسِ اول ↔ رخ داد/نداد) و 🎯 دفترِ پیش‌بینی (احتمال ↔ شد/نشد) ⇒ کالیبراسیونِ همان بُعد.
        «fc» = احتمالِ یک رویداد، نه اطمینان به پاسخِ خودم ⇒ با P.forecastEst سنجیده می‌شود، نه با بیش‌اطمینانی به پاسخ (H3) */
     S.all("wchain", function (c) { return c.feel != null && (c.outcome === "رخ داد" || c.outcome === "رخ نداد"); }).forEach(function (c) {
-      var p = c.feel / 100, ok = c.outcome === "رخ داد"; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due, fc: true }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok });
+      var p = c.feel / 100, ok = c.outcome === "رخ داد", w0 = { id: "wchain:" + c.id, fa: "زنجیرهٔ نگرانی «" + String(c.title || "").slice(0, 40) + "»" }; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due, fc: true, src: w0 }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok, src: w0 });
     });
     S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) {
       /* پیش‌بینیِ رویداد فقط کالیبراسیونِ پیش‌بینی است، نه «دقتِ پاسخ» (بازبینیِ ۲۰۲۶-۱۰-۱۵ ِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»): «طرفِ محتمل‌تر رخ داد» پاسخِ
          درست به پرسشی نیست؛ همین برای همهٔ دفترِ پیش‌بینی برقرار است، پس دیگر به X.ans نمی‌رود */
-      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true });
+      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true, src: { id: "fcast:" + x.id, fa: "پیش‌بینیِ «" + String(x.q || x.title || x.what || "").slice(0, 40) + "»" } });
     });
     // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
     S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + (function () { var no = it.filter(function (x) { return x.self === "بلد نیستم"; }).length, half = it.filter(function (x) { return x.self === "نیمه"; }).length; return "از " + it.length + ": " + no + " نبود" + (half ? "، " + half + " نیمه" : ""); })(), st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
@@ -38963,47 +39174,60 @@ APP.goFromURL = function (q) {
   var NO_DATA = "هنوز داده‌ای نیست";
   M.NO_DATA = NO_DATA;
   M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
-  M.phases = function () {
-    var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {} }; });
+  /* تورِ پولیا (INF17، دورِ ۱۹b): هر سطر «از کجا؟» دارد — فهرستِ کارهایی که آن را جابه‌جا کردند (منبع، تاریخ، +/−، مسئله برای «📜 پرونده»)، هر کار یک بار
+     (همان جا که شمرده می‌شود ثبت می‌شود ⇒ شمارِ فهرست = n و جمعِ + = k)؛ کارِ پس‌گرفته (اصلاحِ پیامِ منبع، wd) نه شمرده می‌شود نه فهرست. opt.pid ⇒ فقط کارهای همان مسئله. */
+  function wdOut(o) { return !!(o && (o.wd || o.retracted || o.withdrawn)); }
+  M.phases = function (opt) {
+    var fpid = opt && opt.pid ? String(opt.pid) : "";
+    var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {}, acts: [] }; });
     var byPh = { u: "und", p: "plan", c: "exec", b: "back" };
-    function add(tk, src, ok) { var X = R[tk]; if (!X) return; X.n++; if (ok) X.k++; var s = X.src[src] = X.src[src] || { k: 0, n: 0 }; s.n++; if (ok) s.k++; }
+    function add(tk, src, ok, act) { var X = R[tk]; if (!X) return; act = act || {}; if (fpid && String(act.pid || "") !== fpid) return;
+      X.n++; if (ok) X.k++; var s = X.src[src] = X.src[src] || { k: 0, n: 0 }; s.n++; if (ok) s.k++;
+      X.acts.push({ id: act.id || (src + ":" + X.acts.length), src: src, ok: !!ok, at: act.at || "", fa: act.fa || PH_SRC[src] || src, pid: act.pid || "", sess: act.sess || "", ref: act.ref || "" }); }
     /* تورِ پولیا دورِ ۲ (R7): بازگفتِ دستیار (e.by = assistant، متنی که در پیام‌های خودِ کاربر نیست) شاهدِ موفقیتِ او نیست */
-    function tutOf(T) { if (!T) return; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return; add(x[0], "ask", e.self === 2); }); }); }
-    S.all("eprog").forEach(function (pg) { tutOf(pg.tut); });
+    function tutOf(T, c) { if (!T) return; c = c || {}; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e, j) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return;
+      add(x[0], "ask", e.self === 2, { id: "tut:" + (c.id || "") + ":" + x[0] + ":" + j, at: e.at || "", pid: c.pid || "", fa: "پرسشِ همین لحظه" + (e.q ? " «" + String(e.q).slice(0, 50) + "»" : "") + (c.title ? " — «" + String(c.title).slice(0, 40) + "»" : "") }); }); }); }
+    function pTitle(pid) { try { var r = A.liveRec ? A.liveRec(pid) : null, p = r && r.p ? r.p : A.getProb ? A.getProb(pid) : null; return (p && (p.title || (p.p && p.p.title))) || ""; } catch (e) { return ""; } }
+    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); tutOf(pg.tut, { id: pg.id, pid: pid0, title: pTitle(pid0) }); });
     /* RN2e: شناسهٔ کارهای زنده‌ای که پیامدشان در همین جدول شمرده می‌شود (گامِ بسته با پیامد) */
     var liveActs = {}, seenAct = {};
-    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
-    S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut); });
-    S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut); });
-    S.all("achat").forEach(function (s) { tutOf(s.tut);
+    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done && !wdOut(o)) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
+    S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut, { id: c.id, title: c.title }); });
+    S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut, { id: r.id }); });
+    S.all("achat").forEach(function (s) { tutOf(s.tut, { id: s.id, title: s.title });
       /* مربیِ گفت‌وگو (a27): گیر/«حل نشد» ِ خودِ کاربر و گره‌ای که در میانهٔ حل پیدا شد ⇒ ناموفق در همان مرحله */
       /* تورِ پولیا (RM1a): موفقیتِ سنجیدهٔ گفت‌وگو (src «chatok»، ok:true) هم — هر کدام یک رویداد */
       /* تورِ پولیا (RN3c): رویدادِ «در انتظارِ» الگو (pend، بی گزارشِ مدل) شمرده نمی‌شود؛ (RN2e) هر کار یک بار — رویدادی که شناسه‌اش (act) همان گامِ ثبت‌شدهٔ
          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
-      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend) return;
+      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend || e.wd) return;
         if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
-        add(byPh[e.ph], e.src, !!e.ok); }); });
+        var q0 = String(e.key || "").split("|").pop(), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله" }[e.how] || "";
+        add(byPh[e.ph], e.src, !!e.ok, { id: e.act || ("ev:" + s.id + ":" + (e.msg || "") + ":" + e.key), at: e.at, pid: e.pid || (/^l:/.test(String(e.pk || "")) ? String(e.pk).slice(2) : "") || (/^lstep:([^:]+):/.exec(String(e.act || "")) || [])[1] || "", sess: s.id, ref: e.msg || "",
+          fa: (how || PH_SRC[e.src] || e.src) + (e.src === "knot" ? " " + q0.split(":")[0] : q0 ? " — «" + q0.slice(0, 50) + "»" : "") }); }); });
     S.all("eprog").forEach(function (pg) {
       var pid = String(pg.id).replace(/^eprog_/, ""), p = A.getProb ? A.getProb(pid) : null, sv = pg.solve || {};
       if (p && Array.isArray(p.stages) && A.stagePhase) Object.keys(pg.lv || {}).forEach(function (lv) {
         var L = pg.lv[lv] || {};
-        Object.keys(L).forEach(function (sid) { var e = L[sid], s0 = p.stages.filter(function (x) { return x && x.id === sid; })[0]; if (!s0 || !e || typeof e.first !== "boolean") return; add(byPh[A.stagePhase(p, s0)] || "plan", "sim", e.first); });
+        Object.keys(L).forEach(function (sid) { var e = L[sid], s0 = p.stages.filter(function (x) { return x && x.id === sid; })[0]; if (!s0 || !e || typeof e.first !== "boolean") return; add(byPh[A.stagePhase(p, s0)] || "plan", "sim", e.first, { id: "sim:" + pid + ":" + lv + ":" + sid, at: e.at || "", pid: pid, fa: "شبیه‌ساز — «" + String(p.title || "").slice(0, 40) + "»، گامِ " + sid }); });
       });
       var us = []; Object.keys(sv.u || {}).forEach(function (lv) { if (sv.u[lv]) us.push(sv.u[lv]); }); us = us.concat((sv.live && sv.live.uHist) || []);
-      us.forEach(function (u) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2); });
+      var tt0 = pTitle(pid);
+      us.forEach(function (u, j) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2, { id: "uc:" + pid + ":" + j + ":" + (u.at || ""), at: u.at || u.doneAt || "", pid: pid, fa: "کارتِ فهم — «" + String(tt0).slice(0, 40) + "»" }); });
       /* تورِ پولیا دورِ ۳ (A12/R7، s04): گامی که انجام شد ولی به حل نزدیک نکرد («پیشرفت: نه») شکستِ اجراست، نه موفقیت — موفق = کامل انجام شد و
          دست‌کم کمی پیش برد (پیش‌بینیِ نادرست به‌تنهایی داده است، نه شکست: «غافلگیر شدی — این داده است»). گامِ برهانی «پیشرفت» ندارد و همان رفتارِ پیشین را دارد. */
-      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes" && o.prog !== "نه"); });
+      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done || wdOut(o)) return; add("exec", "live", o.done === "yes" && o.prog !== "نه", { id: "lstep:" + pid + ":" + st.id, at: o.at || "", pid: pid, ref: st.id,
+        fa: "گامِ «" + String(st.text || "").slice(0, 50) + "»" + (o.what ? " — «" + String(o.what).slice(0, 40) + "»" : "") + (o.from === "chat" ? " (از گفت‌وگو)" : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }); });
       /* بازنگری‌ای که دستیار از گفت‌وگو ثبت کرد (chat_solved) فقط وقتی شمرده می‌شود که درسش به قلمِ خودِ کاربر باشد (b.own) — R7 */
       /* تورِ پولیا (RM1a): وارسیِ سنجیده از پیام‌های خودِ کاربر (chkBy: msgs) هم بازنگریِ اوست، حتی اگر درس را دستیار نوشت */
-      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
+      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; var la = { id: "lb:" + pid + ":" + lv, at: b.at || b.doneAt || "", pid: pid, fa: "بازنگری" + (b.chkRes ? " — " + String(b.chkRes).slice(0, 40) : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }; if (b.skipped) add("back", "lb", false, la); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم", la); });
       /* تورِ پولیا (RM1b): تونلِ زنده هم شاهدِ طرح است — هر طرحِ ثبت‌شده (کنونی و پیشین‌ها) یک موفقیت؛ مسئلهٔ کمکی که پلش زده شد موفقیت و آن‌که به کار
          نیامد شکست؛ داده‌ای که تا آن گام بی‌کار بود و در گامی به کار رفت (برد «datum») موفقیت. هیچ وزنی نیست؛ همان رکوردهای a38. */
       var L18 = sv.live || {};
-      if (L18.plan && L18.plan.at) add("plan", "lplan", true);
-      (L18.planHist || []).forEach(function (x) { if (x && x.at) add("plan", "lplan", true); });
-      (L18.aux || []).forEach(function (x) { if (!x) return; if (x.crossed) add("plan", "lplan", true); else if (x.unused) add("plan", "lplan", false); });
-      (L18.wins || []).forEach(function (x) { if (x && x.kind === "datum") add("plan", "lplan", true); });
+      var lp = function (k, x, f) { return { id: "lplan:" + pid + ":" + k + ":" + ((x && x.at) || ""), at: (x && x.at) || "", pid: pid, fa: f + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }; };
+      if (L18.plan && L18.plan.at) add("plan", "lplan", true, lp("plan", L18.plan, "طرحِ ثبت‌شده"));
+      (L18.planHist || []).forEach(function (x, j) { if (x && x.at) add("plan", "lplan", true, lp("ph" + j, x, "طرحِ پیشین")); });
+      (L18.aux || []).forEach(function (x, j) { if (!x) return; if (x.crossed) add("plan", "lplan", true, lp("aux" + j, x, "مسئلهٔ کمکی که پلش زده شد")); else if (x.unused) add("plan", "lplan", false, lp("aux" + j, x, "مسئلهٔ کمکی که به کار نیامد")); });
+      (L18.wins || []).forEach(function (x, j) { if (x && x.kind === "datum") add("plan", "lplan", true, lp("win" + j, x, "داده‌ای که به کار رفت")); });
     });
     var P = A.PSY, G = 241, rows0 = PH4.map(function (x) { return R[x[0]]; });
     rows0.forEach(function (X) { X.p = (X.k + 1) / (X.n + 2); X.none = !X.n; X.pWeak = 0; });
@@ -39046,7 +39270,7 @@ APP.goFromURL = function (q) {
         h("tbody", {}, Q.rows.map(function (X) {
           if (X.none) return h("tr", { "data-ph": X.id, "data-none": "1" }, h("td", {}, X.fa), h("td", { class: "mind-php" }, NO_DATA), h("td", {}, "—"), h("td", { class: "mind-phw" }, "—"), h("td", { class: "small" }, "— (" + NO_DATA + ")"));
           return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, Q.weakest ? pf(X.pWeak) : "—"),
-            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)"));
+            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)", fromList(X.acts, "ph:" + X.id)));
         })))),
       h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
         : Q.n && Q.ranked >= 2 ? M.NO_DISTINCT + " (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای شکستی ندارد یا مرحله‌ها برابرند؛ «ضعیف‌ترین» فقط وقتی نام برده می‌شود که مرحله‌ای شکست دارد و از همهٔ مرحله‌های دیگر به‌روشنی پایین‌تر است."
@@ -39055,6 +39279,24 @@ APP.goFromURL = function (q) {
       h("p", { class: "small muted mind-phradar" }, PH_RADAR));
   }
   M.phasesSection = phasesSection;
+  /* INF17: فهرستِ «از کجا؟» — هر کار یک سطر: تاریخ · منبع · +/− · «📜» به پروندهٔ همان مسئله (اگر نمای پرونده هست) */
+  function fromList(acts, tag) {
+    acts = (acts || []).slice().sort(function (a, b) { return String(b.at || "").localeCompare(String(a.at || "")); });
+    if (!acts.length) return null;
+    var pos = acts.filter(function (a) { return a.ok; }).length;
+    return h("details", { class: "mind-from", "data-row": tag, "data-n": String(acts.length), "data-plus": String(pos) }, h("summary", {}, "از کجا؟ (" + fa(acts.length) + " کار: +" + fa(pos) + " −" + fa(acts.length - pos) + ")"),
+      h("ol", { class: "small mind-from-list" }, acts.map(function (a) {
+        var dv = !!(a.pid && A.V && A.V.dossier);
+        return h("li", { class: "mind-act", "data-act": a.id, "data-ok": a.ok ? "1" : "0", "data-pid": a.pid || "" }, h("span", { class: a.ok ? "good" : "warnline" }, a.ok ? "+ " : "− "),
+          (a.at ? A.fdate(day(a.at)) + " · " : "") + a.fa,
+          dv ? h("button", { class: "linkish mind-act-go", type: "button", title: "پروندهٔ کاملِ همین مسئله", onclick: function () { A.go("dossier", a.pid, a.ref || null); } }, " 📜") : null);
+      })));
+  }
+  M.fromList = fromList;
+  M.dimActs = function (d) { var seen = {}, out = [];
+    (d.ans || []).concat(d.cal || []).forEach(function (a, i) { var sc = a.src || {}, id = (sc.id || ("x" + i)) + "|" + (a.at || ""); if (seen[id]) return; seen[id] = 1;
+      out.push({ id: sc.id || ("x" + i), ok: !!a.ok, at: a.at || "", fa: sc.fa || "پاسخ", pid: sc.pid || "" }); });
+    return out; };
   var PH_RADAR = "این جدول روی «نیم‌رخِ سازه‌ها» (رادار) نمی‌نشیند: کارنامه هیچ نگاشتی از مرحله‌های حلِ پولیا به سازه‌های رادار (استدلالِ سیال، دانش، …) ندارد و نمی‌سازد؛ رادار فقط از پاسخ‌های پاسخ‌دقیق (مسئله‌های هم‌ساختار، ورزشِ گره، اطمینانِ پیش از جواب) پر می‌شود. حل و برهانِ وارسی‌شدهٔ مسئلهٔ زنده‌ات این‌جا، در همین جدول، ثبت است.";
   M.PH_RADAR = PH_RADAR;
 
@@ -39165,6 +39407,9 @@ APP.goFromURL = function (q) {
           h("td", {}, fa(d.ret.ok) + " از " + fa(d.ret.n)), h("td", {}, fa(d.knots.practised || 0) + " از " + fa(d.knots.all)),
           h("td", {}, E.progress ? A.PSY.pctFa(E.progress.p) + " (" + fa(E.progress.from) + " ← " + fa(E.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"));
       })))), (function () { var cs = (m.dims.filter(function (d) { return d.id === "s_learn"; })[0] || {}).cardSelf; return cs && cs.n ? h("p", { class: "small muted mind-cards" }, "کارت‌های مرور خودسنجی‌اند (نمره را خودت می‌دهی)؛ مثلِ پاسخِ «خودم سنجیدم» در گره‌ها در این عددها نمی‌آیند: " + fa(cs.k) + " از " + fa(cs.n) + " مرور را «درست» (۳ تا ۵ ِ SM-2) نمره دادی.") : null; })()));
+    /* INF17: «از کجا؟» ِ هر بُعد — پاسخ‌ها و پیش‌بینی‌هایی که آن را جابه‌جا کردند (هر کار یک بار) */
+    var dimFrom = m.dims.map(function (d) { var A0 = M.dimActs(d); return A0.length ? h("div", { class: "mind-dimfrom", "data-dim": d.id }, h("b", {}, d.fa + ": "), fromList(A0, "dim:" + d.id)) : null; }).filter(Boolean);
+    if (dimFrom.length) root.appendChild(h("section", { class: "card mind-dimsfrom" }, h("h2", {}, "از کجا؟ — هر بُعد"), h("p", { class: "small muted" }, "هر پاسخ، حدس یا پیش‌بینیِ سنجیده که عددهای بالا را جابه‌جا کرد، با تاریخ و درست/نادرست؛ کارِ پس‌گرفته (اصلاح‌شده) این‌جا نیست."), dimFrom));
     root.appendChild(phasesSection());
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
