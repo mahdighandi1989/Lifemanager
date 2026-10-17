@@ -152,7 +152,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(eq(q, 'برهانی گفتی — از راهِ دیگری هم به همین حکم می‌رسی؟'), 'runs A·F2 s03: «… از راهِ دیگری هم به همین حکم می‌رسی؟» is its own option (L1c) ' + J(q));
     chk(eq(q, 'وارسی‌اش کن: هر بخشِ فرض — پنج نقطه، ضلعِ ۱، «داخلِ مربع» — کجا به کار رفت و نتیجه دقیقاً همان حکم است؟'), 'runs A·F2 s03: the hypothesis-use check (the question that found her gap) can be chosen alone, with its head «وارسی‌اش کن:» (L1c + L1a) ' + J(q));
     chk(!q.some(t => t.indexOf('از راهِ دیگری هم به همین حکم') >= 0 && t.indexOf('کجا به کار رفت') >= 0), 'runs A·F2 s03: the two different look-back questions are never glued into one option (L1c) ' + J(q));
-    chk(eq(q, 'چطور می‌آزمایی‌اش؟ با کدام وارسی یا حالتِ خاص؟'), 'runs control: one contiguous run stays ONE option (L1c) ' + J(q));
+    // دورِ ۱۷ (RC2c): همان پیام حدس را نقل کرد («۴ جزء بهترین است» حدس است) ⇒ یادداشتِ مرجع از همان نقل
+    chk(eq(q, 'چطور می‌آزمایی‌اش؟ با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «۴ جزء بهترین است»)'), 'runs control: one contiguous run stays ONE option (L1c) ' + J(q));
     chk(one(q, 'استدلالت غیرمستقیم (خلف) بود — مستقیمش می‌کنی؟', 'یعنی بخشِ مثبتش را جدا بگو: هر چیدمانی حداکثر چند جفت'), 'runs control: a run whose head starts with the connective «یعنی» stays with the previous run (L1c) ' + J(q));
     chk(one(q, 'قطرِ مربعِ کوچک را درست حساب کردی؟', 'و آن را در کدام سطرِ برهانت نوشتی؟') && !starts(q, 'و آن'), 'runs control: a second run that starts with «و آن» (anaphor/connective) joins the first (L1c) ' + J(q));
   });
@@ -176,8 +177,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     r.stage = 'u2'; await go('lprob', G2);
     await understand({ one: 'می‌خواهم مات در سه حرکت را بیابم', unk: 'سه حرکتِ مات', data: ['سفید شروع می‌کند', 'رخ در a1 است'], cond: 'مات در سه حرکت', guess: 'رخِ a1 بی‌فایده است', nat: 'objective' });
     const q1 = r.q1 = await cq(G1), q2 = r.q2 = await cq(G2); delete r.stage;
-    chk(eq(q1, 'چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «زمان ۱٫۷۵ برابر می‌شود»)'), 'ref C s23: «چطور می‌آزمایی‌اش …؟» names its referent, the recorded guess, in parentheses (L1d) ' + J(q1));
-    chk(eq(q2, 'این حدس را چطور می‌آزمایی — با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «رخِ a1 بی‌فایده است»)'), 'ref C s21/s29: «این حدس را …؟» names the recorded guess (L1d) ' + J(q2));
+    // دورِ ۱۷ (RC2c، DECISIONS_R17): مرجع فقط از حدسی که **همان پیام** گفت — نه حدسِ ثبت‌شدهٔ رکورد (که این‌جا پس از پیام ثبت شد)
+    chk(eq(q1, 'چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «۱٫۷۵»)'), 'ref C s23: «چطور می‌آزمایی‌اش …؟» names its referent, the guess the same message named (۱٫۷۵) (L1d → RC2c) ' + J(q1));
+    chk(eq(q2, 'این حدس را چطور می‌آزمایی — با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «رخ بی‌فایده است»)'), 'ref C s21/s29: «این حدس را …؟» names the guess quoted in the same message (L1d → RC2c) ' + J(q2));
     chk(eq(q1, 'زمانِ پخت به کدام جزءِ قالب بند است — مساحتِ کف یا ضخامتِ خمیر؟'), 'ref control: an option without a clitic/demonstrative referent is unchanged (L1d) ' + J(q1));
     chk(!has(q1, /رخ/) && !has(q2, /کیک|۱٫۷۵|ضخامت/), 'ref control: options never cross problems (each problem keeps its own questions and its own guess) ' + J({ q1, q2 }));
   });
@@ -204,9 +206,10 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     for (let i = 0; i < M.length; i++) { await next(M[i]); await say('جواب ' + (i + 1) + ': فکر کردم و نوشتم.'); }
     const q = r.qs = await cq(P); delete r.stage;
     chk(q.filter(t => /همهٔ داده‌ها و کلِ شرط/.test(t)).length === 1 && one(q, 'هر چه صورت گفته — همهٔ داده‌ها و کلِ شرط — در جوابت به کار رفته؟'), 'rep D·D2 s31: the three wordings of «همهٔ داده‌ها و کلِ شرط … در جوابت؟» are ONE option, the most recent wording (L1e) ' + J(q));
-    chk(q.filter(t => /این نوع مسئله/.test(t)).length === 1 && one(q, 'این نوع مسئله را دوست داشتی یا نه؟'), 'rep D·D2 s31: the two taste questions are ONE option, the most recent wording (L1e) ' + J(q));
+    // دورِ ۱۷ (RC2b): پرسشِ سلیقه پرسشِ بازنگریِ خودِ گفت‌وگوست و هرگز گزینه نیست (جای «یک گزینه، تازه‌ترین» ِ L1e)
+    chk(q.filter(t => /این نوع مسئله/.test(t)).length === 0, 'rep D·D2 s31 → R17 RC2b: the taste questions are never options ' + J(q));
     chk(one(q, 'گامِ اولِ حلت را بنویس — آنجا چه چیزی را فرض کردی که صورت نگفته بود؟') && one(q, 'چطور می‌آزمایی‌اش؟ با کدام وارسی یا حالتِ خاص؟') && one(q, 'استدلال را در نقطه‌های حساسش وارسی کن') && one(q, 'می‌توانی همین نتیجه را از راهِ دیگری به دست آوری') && one(q, 'می‌توانی نتیجه یا روش را در مسئلهٔ دیگری به کار ببری'), 'rep control: different questions are never merged (L1e only on content-word subsets) ' + J(q));
-    chk(q.length === 7, 'rep: 11 messages ⇒ 7 options (3 «همهٔ داده‌ها» ⇒ 1, 2 taste ⇒ 1, the repeated «از راهِ دیگری» ⇒ 1) ' + J(q));
+    chk(q.length === 6, 'rep: 11 messages ⇒ 6 options (3 «همهٔ داده‌ها» ⇒ 1, 2 taste ⇒ 0 [R17 RC2b], the repeated «از راهِ دیگری» ⇒ 1) ' + J(q));
   });
 
   // ================= live — L2: پیامِ تازه وقتی بازنگری باز است =================

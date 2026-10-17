@@ -12,7 +12,8 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'dist', 'learning-architecture.html'));
-const BANK = process.env.LLA_VARIANTS || path.join(__dirname, 'variants', 'VARIANTS_R17.json');
+// دروازهٔ pytest فقط tests/*.js را در پوشهٔ موقت کپی می‌کند (src پیوندِ نمادین است) ⇒ بانک از کنارِ همین پرونده، وگرنه از پوشهٔ واقعیِ صفحه
+const BANK = process.env.LLA_VARIANTS || [path.join(__dirname, 'variants', 'VARIANTS_R17.json'), (() => { try { return path.join(fs.realpathSync(path.join(__dirname, '..', 'src')), '..', 'tests', 'variants', 'VARIANTS_R17.json'); } catch (e) { return ''; } })()].find(f => f && fs.existsSync(f)) || path.join(__dirname, 'variants', 'VARIANTS_R17.json');
 (async () => {
   const b = await chromium.launch(); const errors = []; const info = {};
   const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
