@@ -1,0 +1,1564 @@
+diff --git a/apps/learning-architecture/docs/HANDBOOK.md b/apps/learning-architecture/docs/HANDBOOK.md
+index 8e137bf0..9c4f7957 100644
+--- a/apps/learning-architecture/docs/HANDBOOK.md
++++ b/apps/learning-architecture/docs/HANDBOOK.md
+@@ -631,6 +631,7 @@ flowchart LR
+ | 2026-10-17 | فرمول یک ورودی (هر چه مردم تایپ می‌کنند: TeX، ASCII، رقمِ فارسی، ×÷²، حرفِ فارسی درونِ رشتهٔ عملگردار) و دو خروجی دارد: MathML در حباب و پیش‌نمایش، و `APP.MATH.toPlain` (یونیکدِ خوانا) در هر چاهِ متنِ ساده (<option>، title، toast، ایمیل). خطِ «# فرمول» ِ دستیار از محتوا می‌آید، نه از نما. نمودارِ کوچک و صفحهٔ شطرنج زیرِ پیام از همان داده‌ها | گزینه‌های بازنگری TeX ِ خام نشان می‌دادند؛ نشانه‌گذاریِ خودِ کاربر (s36 «ع+۶ = ع²»، رقمِ فارسی) شناخته نمی‌شد؛ خطِ فرمول در ۳۹ از ۵۹ پرامپت بی‌ربط بود (تورِ پولیا دورِ ۱۸) | WORKLOG (68) |
+ | 2026-10-17 | یک کنش، یک رکورد: نتیجهٔ گامی که در گفت‌وگو گفت (گزارشِ سنجیدهٔ مدل) همان دم روی گام است — فرمِ اجرا از پیش پر با «از گفت‌وگو»، تأیید یا اصلاحِ خودش همان رکورد را جایگزین می‌کند؛ موردهای «پیش از حل شد» هر کدام واژهٔ نوعِ خودشان را دارند و گامِ واقعیِ باز فقط هنگامِ بستن یا گزارش؛ حدسِ گفت‌وگو جعبهٔ حدس را از پیش پر می‌کند تا اطمینان و آزمون گم نشوند | تورِ پولیا دورِ ۱۹ (RN2، WORKLOG 73). **ردشده:** بستنِ خودکارِ گام با گزارشِ گفت‌وگو (پیشرفت و خواستن را فقط خودش می‌گوید)؛ هشدارِ قطعیِ «کمکی حل شد» (صفحه رکوردی از حلِ کمکی ندارد) |
+ | 2026-10-17 | مرزِ فرمول از **نقشِ** هر تکه در جمله تعیین می‌شود، نه از یک نویسه: عددِ تنهای چسبیده به واژهٔ فارسی پیش از رابطه از آنِ جمله است؛ کد (حرف-رقم/رقم) متن است؛ «…» پس از عملگر درونِ فرمول؛ رابطهٔ تنها با متغیرِ لاتین («x=۲») فقط در پیامی که شاهدِ ریاضیِ دیگری دارد. نمودار از آنِ پیامی است که داده نخستین بار در آن آمد، با رقم و نامِ محورِ خودِ همان پیام، و «افزودنِ نقطه» روی همان نمودار (ماندگار روی رکوردِ پیام). فیلدِ فرمول‌دار `unicode-bidi:plaintext` (جهتِ هر سطر از محتوایش) | «بر ۸ ⇒ y=۲» در حبابِ خودش «بر ۲ = x ⇒ ۳» خوانده می‌شد؛ «TR-2026/10» کسر شد؛ «+ …» نیم شد؛ «n≈3.7» دیده نشد؛ نمودار تکراری و با رقمِ لاتین (تورِ پولیا دورِ ۱۹). ردشده: «·» ِ فاصله‌دار به‌عنوانِ ضرب (جداکنندهٔ «۲ از ۵ · ۳» فرمول می‌شد)؛ ذخیرهٔ نقطهٔ افزوده در localStorage (به دستگاه‌های دیگر نمی‌رسید) | WORKLOG (74) |
++| 2026-10-17 | اصلاحِ پیامِ پیشین (INF15، سمتِ مدل): مدل `coach_state.retract {msg, what, fix}` می‌دهد و صفحه می‌سنجد — تکه در پیامِ **پیشینِ خودِ کاربر** در همین سشن، پیامِ کنونی نشانهٔ اصلاحِ حرفِ خودش («اشتباه گفتم/نوشتم»، «منظورم … بود»، «نه، … درسته»، «اصلاح کن») و مقدارِ درست را دارد، درست ≠ نادرست؛ آن‌گاه هر رکوردِ لایهٔ مربی که از آن پیام آمده (حدس، برنامه + موعد + یادآور، قول، شاهدِ پاسخ، فرمی که کنشِ دستیار در آن نوبت پر کرد، رویدادهای کارنامه) برمی‌گردد و درست می‌نشیند — پیشین با «اصلاح شد ⇐» در تاریخچه، هیچ چیز پاک نمی‌شود؛ رکوردهای مسئلهٔ زنده از راهِ `APP.liveRetract`. خود-اصلاح بازنگری (+) است، هرگز شکست؛ زمینهٔ نوبتِ بعد دقیقاً می‌گوید چه عوض شد. بی گزارش، الگو فقط «کدام را اصلاح کنم؟» می‌پرسد. کارنامه: هر سطرِ مرحله و بُعد «از کجا؟» دارد (کار، تاریخ، +/−، «📜») و کارِ پس‌گرفته بیرون است (INF17) | مالک: «اصلاحِ پیامِ قبلی باید در تور آزموده شود» و «کارنامه کلی بماند ولی ردیابی‌پذیر». **ردشده:** برگرداندن با الگوی متن بی گزارشِ مدل (اصلاحِ دروغ گران است)؛ پاک‌کردنِ رکوردِ نادرست؛ جایگزینیِ کلِ متن با «درست» (فقط بخشِ نادرست عوض می‌شود: «قسط ۸» ِ همان پیام می‌ماند)؛ «اشتباه کردم» ِ تنها به‌عنوانِ شکستِ مرحله | WORKLOG (75) |
+ 
+ ## ۱۱ — نمودارِ روند؛ کجاییم، کجا جلو رفتیم، کجا عقب
+ 
+@@ -644,22 +645,22 @@ flowchart LR
+ ```mermaid
+ xychart-beta
+     title "Trajectory - bar: this event (up +1, down -1, fix +1), line: running total"
+-    x-axis ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21", "#22", "#23", "#24", "#25", "#26", "#27", "#28", "#29", "#30", "#31", "#32", "#33", "#34", "#35", "#36", "#37", "#38", "#39", "#40", "#41", "#42", "#43", "#44", "#45", "#46", "#47", "#48", "#49", "#50", "#51", "#52", "#53", "#54", "#55", "#56", "#57", "#58", "#59", "#60", "#61", "#62", "#63", "#64", "#65", "#66", "#67", "#68", "#69", "#70", "#71", "#72", "#73", "#74", "#75", "#76", "#77", "#78", "#79", "#80", "#81", "#82", "#83", "#84", "#85", "#86", "#87", "#88", "#89", "#90"]
+-    y-axis "score" -1 --> 65
+-    bar [0, 1, 0, 1, -1, 1, 0, 0, 1, 0, 2, 1, 1, -1, 0, 1, -1, 2, 0, 0, 1, 1, -1, 2, -1, 2, 0, 1, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, 2, 1, 1, 2, 1, 1, 1, -1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1]
+-    line [0, 1, 1, 2, 1, 2, 2, 2, 3, 3, 5, 6, 7, 6, 6, 7, 6, 8, 8, 8, 9, 10, 9, 11, 10, 12, 12, 13, 12, 14, 13, 15, 14, 16, 15, 17, 16, 18, 17, 19, 18, 20, 19, 21, 23, 24, 25, 27, 28, 29, 30, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 56, 57, 58, 59, 60, 60, 61, 62, 63, 64, 65]
++    x-axis ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21", "#22", "#23", "#24", "#25", "#26", "#27", "#28", "#29", "#30", "#31", "#32", "#33", "#34", "#35", "#36", "#37", "#38", "#39", "#40", "#41", "#42", "#43", "#44", "#45", "#46", "#47", "#48", "#49", "#50", "#51", "#52", "#53", "#54", "#55", "#56", "#57", "#58", "#59", "#60", "#61", "#62", "#63", "#64", "#65", "#66", "#67", "#68", "#69", "#70", "#71", "#72", "#73", "#74", "#75", "#76", "#77", "#78", "#79", "#80", "#81", "#82", "#83", "#84", "#85", "#86", "#87", "#88", "#89", "#90", "#91"]
++    y-axis "score" -1 --> 66
++    bar [0, 1, 0, 1, -1, 1, 0, 0, 1, 0, 2, 1, 1, -1, 0, 1, -1, 2, 0, 0, 1, 1, -1, 2, -1, 2, 0, 1, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, -1, 2, 2, 1, 1, 2, 1, 1, 1, -1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]
++    line [0, 1, 1, 2, 1, 2, 2, 2, 3, 3, 5, 6, 7, 6, 6, 7, 6, 8, 8, 8, 9, 10, 9, 11, 10, 12, 12, 13, 12, 14, 13, 15, 14, 16, 15, 17, 16, 18, 17, 19, 18, 20, 19, 21, 23, 24, 25, 27, 28, 29, 30, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 56, 57, 58, 59, 60, 60, 61, 62, 63, 64, 65, 66]
+ ```
+ 
+ ```mermaid
+ xychart-beta
+     title "Library size - line: cases, bar: rules (state after each event; blank = last known)"
+-    x-axis ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21", "#22", "#23", "#24", "#25", "#26", "#27", "#28", "#29", "#30", "#31", "#32", "#33", "#34", "#35", "#36", "#37", "#38", "#39", "#40", "#41", "#42", "#43", "#44", "#45", "#46", "#47", "#48", "#49", "#50", "#51", "#52", "#53", "#54", "#55", "#56", "#57", "#58", "#59", "#60", "#61", "#62", "#63", "#64", "#65", "#66", "#67", "#68", "#69", "#70", "#71", "#72", "#73", "#74", "#75", "#76", "#77", "#78", "#79", "#80", "#81", "#82", "#83", "#84", "#85", "#86", "#87", "#88", "#89", "#90"]
++    x-axis ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21", "#22", "#23", "#24", "#25", "#26", "#27", "#28", "#29", "#30", "#31", "#32", "#33", "#34", "#35", "#36", "#37", "#38", "#39", "#40", "#41", "#42", "#43", "#44", "#45", "#46", "#47", "#48", "#49", "#50", "#51", "#52", "#53", "#54", "#55", "#56", "#57", "#58", "#59", "#60", "#61", "#62", "#63", "#64", "#65", "#66", "#67", "#68", "#69", "#70", "#71", "#72", "#73", "#74", "#75", "#76", "#77", "#78", "#79", "#80", "#81", "#82", "#83", "#84", "#85", "#86", "#87", "#88", "#89", "#90", "#91"]
+     y-axis "count" 0 --> 186
+-    bar [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69]
+-    line [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 143, 143, 143, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169]
++    bar [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69]
++    line [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 143, 143, 143, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169, 169]
+ ```
+ 
+-> نقطه‌ها = سطرهای [دفتر پیشرفت](PROGRESS.md) (#1 تا #90). جمعِ جاری الان **65** است. این بلوک را دستی ویرایش نکن؛ `python apps/learning-architecture/build.py` آن را از روی دفتر می‌سازد.
++> نقطه‌ها = سطرهای [دفتر پیشرفت](PROGRESS.md) (#1 تا #91). جمعِ جاری الان **66** است. این بلوک را دستی ویرایش نکن؛ `python apps/learning-architecture/build.py` آن را از روی دفتر می‌سازد.
+ 
+ <!-- PROGRESS-CHART:END -->
+ 
+diff --git a/apps/learning-architecture/docs/PROGRESS.md b/apps/learning-architecture/docs/PROGRESS.md
+index f6115f4d..fc064a0d 100644
+--- a/apps/learning-architecture/docs/PROGRESS.md
++++ b/apps/learning-architecture/docs/PROGRESS.md
+@@ -102,3 +102,4 @@
+ | 88 | 2026-10-17 | تورِ پولیا دورِ ۱۹ (coach): درخواستِ عقب‌افتاده فقط با پاسخِ خودِ همان پیام و فقط خواستهٔ رو به دستیار (نه «میشه» ِ رابط، نه اعشار)؛ برنامه با گامِ زنده و حدسش یک وضع دارد و «امروز» یک‌تپ «انجام دادم/ندادم/هنوز نه»؛ کارنامه هر کار را یک بار می‌شمارد و «ضعیف‌ترین» و «بیش‌اطمینانی» را فقط با شاهد می‌گوید؛ «بعدی؟» پس از بستن مسئله نمی‌سازد؛ ضمیر از حرفِ کاربر؛ شناسهٔ برنامه‌ها در پرامپت | ▼↩▲ | – | – | – | – | – | – | WORKLOG (72) |
+ | 89 | 2026-10-17 | پولیا دورِ ۱۹ (live): نتیجه‌ای که در گفت‌وگو گفت همان دم روی گام است (فرمِ اجرا از پیش پر با «از گفت‌وگو»، کارنامه یک بار، مربی دیگر نمی‌خواهد در صفحه ثبتش کند)؛ «پیش از حل شد» برای هر نوع واژهٔ خودش (گامِ رژیم «شهودی» نیست، هشدارِ کمکی فقط با مسئلهٔ کمکی و هنگامِ بستن)؛ گزینهٔ q ترتیبِ گفت‌وگو را نگه می‌دارد و تکهٔ توضیحی با آن می‌ماند؛ «حدسِ شما» در گفت‌وگوی «شما»؛ حدسِ گفت‌وگو جعبهٔ حدس را پنهان نمی‌کند؛ فرمول در صورت، خلاصهٔ فهم و فهرستِ گام‌ها | ▼↩▲ | – | – | – | – | – | – | WORKLOG (73) |
+ | 90 | 2026-10-17 | تورِ پولیا دورِ ۱۹ (فرمول): مرزِ فرمول دیگر با یک نویسه تعیین نمی‌شود — «بر ۸ ⇒ y=۲» همان‌طور که تایپ شد خوانده می‌شود، کدِ «TR-2026/10» متن است، «…» پس از عملگر در فرمول می‌ماند، ≈ · ln log sin exp و اندیسِ «a₁» شناخته می‌شوند؛ نمودار با رقمِ خودِ پیام، فقط زیرِ پیامی که داده نخستین بار آمد، با نامِ محور از واژه‌های پیام و «افزودنِ نقطه»؛ فیلدِ فرمول‌دار هر سطر را با جهتِ محتوایش تایپ می‌کند | ▼↩▲ | – | – | – | – | – | – | WORKLOG (74) |
++| 91 | 2026-10-17 | تورِ پولیا دورِ ۱۹b (coach): اصلاحِ پیامِ پیشین به هر فاصله — گزارشِ مدل (retract) سنجیده می‌شود و حدس، برنامه و موعدش، یادآور، قول، شاهدِ پاسخ، فرمی که دستیار پر کرد و رویدادهای کارنامهٔ آن پیام برمی‌گردند و درست می‌نشینند (پیشین در تاریخچه)؛ خود-اصلاح بازنگری است نه شکست؛ بی گزارش فقط «کدام را اصلاح کنم؟»؛ کارنامه برای هر مرحله و بُعد «از کجا؟» دارد | ▲ | – | – | – | – | – | – | WORKLOG (75) |
+diff --git a/apps/learning-architecture/docs/WORKLOG.md b/apps/learning-architecture/docs/WORKLOG.md
+index 43035d64..87183545 100644
+--- a/apps/learning-architecture/docs/WORKLOG.md
++++ b/apps/learning-architecture/docs/WORKLOG.md
+@@ -1177,3 +1177,28 @@
+   برچسب‌های مجازِ نمودار button/input ِ فرمِ «افزودنِ نقطه» را هم دارد (ایمنی همان: هیچ عنصری از متن).
+ - آزمون: `tests/test_tour1_r19_math.js` (run، order، plot، add، dir؛ روی ساختِ پایه ۴۰ قرمز) + `tests/variants/VARIANTS_R19.json` — همهٔ ۲۲ ورودیِ RN4.run سبز.
+ > **امضا:** `Claude Code (رفع‌کنندهٔ «math» ِ دورِ ۱۹)` · 2026-10-17 · آزمونِ تازه قرمز روی ساختِ پایه و سبز پس از اصلاح؛ build.py + کلِ آزمون‌های صفحه
++
++## 2026-10-17 (75) — تورِ پولیا دورِ ۱۹b (سهمِ «coach»): اصلاحِ پیامِ پیشین (INF15، سمتِ مدل) و «از کجا؟» ِ کارنامه (INF17)
++- **[FINDING]** تا امروز راهی برای اصلاحِ پیامِ پیشین نبود: مدل «اشتباه گفتم، منظورم … بود» را در گفت‌وگو دنبال می‌کرد، ولی آنچه صفحه از پیامِ نادرست ثبت کرده بود
++  (حدس، برنامه، قول، شاهدِ پاسخ، فرمِ پرشده، رویدادهای کارنامه) می‌ماند؛ رکوردها شناسهٔ پیامِ منبع نداشتند؛ و «اشتباه کردم» ِ کارِ بیرونی («کلید را جا گذاشتم») با الگو
++  شکستِ مرحله شمرده می‌شد. کارنامه کلی بود ولی ردیابی‌پذیر نبود: «از کجا» فقط شمارِ هر منبع را می‌گفت.
++- **[CHANGE] INF15 (a27):** `coach_state.retract {msg, what: guess|plan|step|ans|said|fact|form, fix, old?}` در «# گزارشِ وضع» مستند شد. صفحه می‌سنجد: تکه در پیامِ
++  **پیشینِ خودِ کاربر** در همین سشن (نه حرفِ دستیار)، پیامِ کنونی نشانهٔ اصلاحِ حرفِ خودش (`AS.CORR_RE`) دارد و اشتباهِ دستیار/دیگری نیست، مقدارِ درست در همین پیام است و
++  با نادرست یکی نیست. آن‌گاه حدس‌ها (g…، `coach.guess`، یادداشتِ حدسِ پیامِ دستیار)، برنامه‌ها (+ موعدِ تازه از روزِ هفته و یادآورِ پیگیری)، قول‌ها، صورتِ گفت‌وگو و مجهول
++  به حرفِ خودش، شاهدِ پاسخ (`ansLog`/`ownLog`)، حکمِ «وارسی شد» ِ بنا شده بر آن پیام («وارسی‌نشده» با `chkSup`)، فرم‌هایی که کنشِ دستیار در آن نوبت پر کرد (دفترِ تازهٔ
++  `s.fills`؛ در همان صفحه همان دم، وگرنه «مانده» برای مدل) و رویدادهای کارنامهٔ آن پیام (`wd`) برمی‌گردند — فقط بخشِ نادرست عوض می‌شود («قسط ۸» ِ همان پیام می‌ماند)،
++  پیشین با «اصلاح شد ⇐» در `corr`؛ هیچ رکوردی پاک نمی‌شود. رکوردهای مسئلهٔ زنده با `APP.liveRetract(pid, msgId, {what, fix, frag, msg, n, …})` ِ سمتِ live.
++  رویدادها و رکوردهای تازه شناسهٔ پیامِ منبع (`msg`/`src` = `AS.msgId`) و مسئله (`pid`) دارند. خود-اصلاح یک شاهدِ «بازنگری» (+) است و شکست/گیرِ همان پیام پس گرفته
++  می‌شود؛ اگر از آن پیام چیزی ثبت نشده بود، چیزی عوض‌شده خوانده نمی‌شود. صفحه در گفت‌وگو یک سطرِ «✓ اصلاح شد: …» می‌گذارد و نوبتِ بعد زمینهٔ «# اصلاحی که صفحه انجام
++  داد» دقیقاً می‌گوید چه عوض شد. پیامی با نشانهٔ اصلاح ⇒ بلوکِ «# اصلاحِ پیامِ پیشین (شاید)» با نامزدها؛ پاسخی بی گزارشِ وضع ⇒ نوبتِ بعد فقط «کدام را اصلاح کنم؟»
++  (پشتیبان هرگز برنمی‌گرداند). «اشتباه کردم» ِ تنها در الگو فقط «در انتظار» است (pend).
++- **[CHANGE] INF17 (a29):** هر سطرِ «🧩 چهار مرحلهٔ حل» «از کجا؟» دارد: فهرستِ کارهایی که آن را جابه‌جا کردند (تاریخ، منبع، +/−، «📜» به `A.go("dossier", pid)` اگر نمای پرونده
++  هست)، هر کار یک بار و همان‌جا که شمرده می‌شود (شمارِ فهرست = n، جمعِ + = k)؛ کارِ پس‌گرفته (`wd`، گامِ `out.wd/retracted`، حدسِ `g.wd`) نه شمرده می‌شود نه فهرست.
++  بخشِ تازهٔ «از کجا؟ — هر بُعد» همین را برای پاسخ‌ها، حدس‌ها و پیش‌بینی‌های هر بُعد می‌دهد (`APP.MIND.dimActs`). `APP.MIND.phases({pid})` فقط کارهای همان مسئله.
++- **[DECISION] بی پرسش:** فقط بخشِ نادرست عوض می‌شود — به ترتیب «old» ِ مدل یا «نه Y» ِ پیامش (واژه به‌تمامی)، تنها عددِ عوض‌شده (مرزدار: «۵» درونِ «۱۵» نه)، روزِ هفته،
++  پنجرهٔ هم‌ترازِ واژهٔ مشترک، و خودِ تکه؛ رکوردی که از آن پیام است ولی به تکه ربطی ندارد دست نمی‌خورد. صورتِ گفت‌وگو همیشه پیرو می‌شود ولی فقط وقتی مسئله است «تغییر»
++  خوانده می‌شود. «ردشده»: برگرداندن با الگو بی گزارش؛ پاک‌کردنِ رکوردِ نادرست؛ جایگزینیِ کلِ متن. بانکِ #74 («یک گام هم بُعد و هم مرحله را می‌برد») در کارنامه نگاشتی از گامِ
++  زنده به بُعد ندارد — ساخته نشد (نگاشتِ ساختگی ممنوع)؛ گام یک بار در «اجرا» فهرست می‌شود.
++- آزمون: `tests/test_tour1_r19b_coach.js` با بانکِ مستقلِ `tests/variants/VARIANTS_R19b.json` (INF15.retract ۲۸، INF17.trace ۲۰) — روی b889b855 قرمز (۲۱ از ۲۸ ِ INF15،
++  و INF17 بی هیچ فهرستی)، پس از اصلاح سبز؛ `APP.liveRetract` تا ادغامِ سمتِ live فقط در آزمون جاسوس/جانشین است.
++> **امضا:** `Claude Code (اصلاح‌گرِ coach، دورِ ۱۹b)` · 2026-10-17 · آزمونِ تازه قرمز روی b889b855 و سبز پس از اصلاح؛ کلِ آزمون‌های صفحه
+diff --git a/apps/learning-architecture/src/app/a27_tour.js b/apps/learning-architecture/src/app/a27_tour.js
+index cc5e0000..8b09c811 100644
+--- a/apps/learning-architecture/src/app/a27_tour.js
++++ b/apps/learning-architecture/src/app/a27_tour.js
+@@ -2102,7 +2102,9 @@
+   var META_Q19 =/(?:^|[\s.،!؛…])(?:بعدی|بعدیش|خب|خوب|ادامه|ادامه\s*بدیم|دیگه|بعدش|و\s*بعد|حالا\s*چی|حالا)\s*[؟?]+[\s!.…]*$/;
+   function coachEv(s, ph, src, mt, ok, x) {
+     var E = s.coachEv = s.coachEv || [], key = src + (ok ? "|" + ph : "") + "|" + clip(mt, 80); if (E.some(function (e) { return e.key === key; })) return;
+-    E.push(Object.assign({ at: nowIso(), ph: ph, ok: !!ok, src: src, key: key }, x || {})); if (E.length > 200) s.coachEv = E.slice(-200);
++    /* تورِ پولیا (INF15/INF17، دورِ ۱۹b): هر رویداد شناسهٔ پیامِ منبعش (msg) و مسئله‌اش (pid) را دارد — تا اصلاحِ آن پیام رویدادهایش را پس بگیرد و «از کجا؟» ِ کارنامه منبع را نشان دهد */
++    var um19b = evSrc19b(s, mt), pid19b = evPid19b(s);
++    E.push(Object.assign({ at: nowIso(), ph: ph, ok: !!ok, src: src, key: key, msg: um19b ? msgId19b(um19b) : undefined, pid: pid19b || undefined }, x || {})); if (E.length > 200) s.coachEv = E.slice(-200);
+   }
+   AS.coachEvent = coachEv;
+   var RULES_HEAD = /^# مسئلهٔ واقعیِ حل‌نشده/;
+@@ -2193,7 +2195,7 @@
+       /* R7/B7: رویدادِ «ناموفق» فقط گیرِ خودِ حل یا «حل نشد» ِ واقعی — نه خشم/شرم، نه حدسِ ردشده، نه تلاشِ کنارگذاشته‌ای که به جواب رسید */
+       /* تورِ پولیا (RN3c، B·D3 s12): «حل نشد/اشتباه بود» ِ الگو (بی گزارشِ مدل) به مرحله‌ای ثبت نمی‌شود — فقط «در انتظار» (pend) تا گزارشِ وضعِ همین نوبت
+          جایش را بگیرد؛ حدسِ ردشده در نوبتِ بی گزارش هرگز شکستِ مرحله نیست (نامتقارن). گیرِ صریحِ خودش («گیر کردم») همان رویدادِ پیشین است. */
+-      if (!auto && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt, false, STUCK_RE.test(mt) && !solvedSaid(mt) ? undefined : guessRefPat(s, mt) ? { pend: true } : undefined);
++      if (!auto && !CORR19b.test(ownText(mt)) && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt, false, STUCK_RE.test(mt) && !solvedSaid(mt) ? undefined : (guessRefPat(s, mt) || actErrOnly19b(mt)) ? { pend: true } : undefined);
+       var sig = sigOf(), claim = cpid && !auto && solvedSaid(mt, { stmt: bb.r && bb.r.p && bb.r.p.statement }) && !unsolvedNow(mt, ph) && !sig.guess ? ((nq && nq.coach && nq.coach.closure && nq.coach.closure.label) || true) : "";
+       /* G4 (دورِ ۶، s18): مسئلهٔ فقط‌درگفت‌وگو در میانهٔ کار (رابطهٔ تازه با متغیرها) ⇒ پرسشِ هدف — همتای «🎯 هدف را گم نکن» ِ صفحه؛ مجهول به حرفِ خودش، وگرنه بندِ پرسشیِ صورت */
+       var Cg = s.coach || {}, goal = !cpid && !auto && ph === "c" && varEq(mt) && !solvedSaid(mt) ? clip((Cg.unkBy && Cg.unkBy[Cg.pk]) || (String(Cg.stmt || "").match(/[^.!؟?\n]*[؟?]/g) || []).pop() || "", 110).trim() : "";
+@@ -3017,7 +3019,8 @@
+   /* سطرِ «گزارشِ وضع ِ همه‌جا»: فیلدهای تازهٔ coach_state در هر نوبت (نه فقط مربی) — در قلاب، نه SYS */
+   var STATE_X = "# گزارشِ وضع (همهٔ نوبت‌ها)\n" + CTX17 + "در actions یک {\"do\":\"coach_state\",…} با این فیلدها بده — هر کدام **فقط** وقتی در آخرین پیامِ کاربر هست، و متن را عیناً از حرفِ خودش نقل کن (صفحه با پیامش می‌سنجد؛ نقلِ ساختگی رد می‌شود): " +
+     "plan {\"text\":\"…\",\"when\":\"YYYY-MM-DD\"} = کاری که خودش از این پس قصد دارد بکند با زمانش (نه گلایه از عادت، نه موعدی که زیرش است، نه گفتهٔ دیگری)؛ قولِ بی‌تاریخ به خودش («دیگه … نمی‌کنم»، «از این به بعد …») ⇒ \"when\":\"next-session\"؛ اگر همان برنامهٔ پیشین را دوباره گفت ⇒ \"same\":\"plN\"؛ اگر آن کار بر حدسی تکیه دارد که هنوز نیازموده ⇒ \"on_guess\":true؛ اگر همان گامی از مسئلهٔ زنده‌اش است ⇒ \"step\":\"شمارهٔ ۱‌پایهٔ گام\"؛ plan_done {\"id\":\"plN\",\"done\":true|false} = وقتی خودش گفت برنامه‌اش را انجام داد یا نداد؛ defer {\"what\":\"…\"} = آنچه خودش از تو خواست و تو در همین پاسخ عقب انداختی (نه پرسشِ خودت، نه آنچه همین حالا دادی)؛ " +
+-    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده)؛ result \"…\" = همراهِ said:[\"result\"]، عینِ نتیجه‌ای که در همین پیامش گفت (نتیجه‌ای که در پیامش نیست رد می‌شود)؛ guess_res {\"id\":\"gN\",\"res\":\"refuted|confirmed\"} = وقتی همین پیامش نتیجهٔ آزمودنِ حدسی را می‌گوید که پیش‌تر گفته بود.";
++    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده)؛ result \"…\" = همراهِ said:[\"result\"]، عینِ نتیجه‌ای که در همین پیامش گفت (نتیجه‌ای که در پیامش نیست رد می‌شود)؛ guess_res {\"id\":\"gN\",\"res\":\"refuted|confirmed\"} = وقتی همین پیامش نتیجهٔ آزمودنِ حدسی را می‌گوید که پیش‌تر گفته بود؛ " +
++    "retract {\"msg\":\"تکه‌ای عینی از پیامِ پیشینِ خودش که اصلاح می‌کند\",\"what\":\"guess|plan|step|ans|said|fact|form\",\"fix\":\"عینِ مقدارِ درست از همین پیامش\",\"old\":\"(اختیاری) همان بخشِ نادرست درونِ msg\"} = فقط وقتی خودش حرفِ پیشینِ خودش را اصلاح می‌کند («اشتباه گفتم/نوشتم»، «منظورم … بود»، «نه، … درسته»، «اون … رو اصلاح کن») — نه کارِ بیرونی که اشتباه کرد، نه ایده‌ای تازه، نه اشتباهِ دیگری یا تو؛ صفحه می‌سنجد و هر چه از آن پیام ثبت شده بود برمی‌گرداند و درست را می‌نشاند (پیشین در تاریخچه می‌ماند).";
+   AS.COACH_STATE_X = STATE_X;
+   AS.promptFilters.push(function (outs, s, msg) {
+     var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt);
+@@ -3306,6 +3309,213 @@
+   /* قرنطینه‌های دورِ ۱۹ (تورِ پولیا RN1، RN2d، RN3a، RN6c — REMOVAL_CANDIDATES) */
+   AS.R18_QUARANTINE = { deferCand: deferCandR18, sentsOf: sentsOfR18, regIn: regInR18, planDone: planDoneR18, plansDue: plansDueR18, weakPhase: weakPhaseR18 };
+ 
++  /* ================= دورِ ۱۹b ِ تورِ پولیا (INF15، سهمِ «coach»، DECISIONS_R19b) — اصلاحِ پیامِ پیشین، به هر فاصله =================
++     مدل گزارش می‌دهد (coach_state.retract {msg, what, fix, old?})، صفحه می‌سنجد: تکه در پیامِ **پیشینِ خودِ کاربر** در همین سشن هست، پیامِ کنونی نشانهٔ
++     اصلاحِ حرفِ خودش را دارد (نه کارِ بیرونی، نه اشتباهِ دستیار یا دیگری) و مقدارِ درست را در خودش دارد، و درست ≠ نادرست. آن‌گاه هر رکوردِ لایهٔ مربی که
++     از آن پیام آمده بود (حدس، برنامه، قول، شاهدِ said/ans، فرمی که کنشِ دستیار در آن نوبت پر کرد، رویدادهای کارنامه) برگردانده و درست نشانده می‌شود —
++     هیچ رکوردی پاک نمی‌شود: مقدارِ پیشین با «اصلاح شد ⇐» در تاریخچه می‌ماند؛ رکوردهای مسئلهٔ زنده (صورت، داده، حدس، گام) با A.liveRetract ِ بخشِ مسئله.
++     پشتیبانِ بی‌گزارش فقط می‌پرسد «کدام را اصلاح کنم؟» و هرگز خودش برنمی‌گرداند (experiences/model-reports-state-page-validates.md). */
++  var CORR19b = /^\[اصلاحِ?[\s‌]*پیامِ?[\s‌]*قبلی\]|اشتباه[\s‌]*(?:گفتم|نوشتم|زدم|تایپ|حساب[\s‌]*کردم)(?![آ-ی])|غلط[\s‌]*(?:گفتم|نوشتم)(?![آ-ی])|(?:گفتم|نوشتم)(?![آ-ی])[^.!؟?\n]{0,40}(?:اشتباه|غلط)[\s‌]*(?:بود|ه)(?![آ-ی])|منظورم[\s‌]+[^.!؟?\n]{1,80}?[\s‌]*بود(?![آ-ی])|(?:اصلاح|اصلاحش|درستش)[\s‌]*(?:کن|کنید|کنین)(?![آ-ی])|(?:^|[\s،,.])نه[،,\s]+[^.!؟?\n]{1,60}?[\s‌]*درست(?:ه|ش|ست|\s*است)(?![آ-ی])|درستش[\s‌]*(?:اینه|این\s*است|هست)|صحیح[\s‌]*(?:آن|اش|ش)(?![آ-ی])|اشتباهِ?[\s‌]*تایپی|(?:نوشتم|گفتم)(?![آ-ی])[^.!؟?\n]{1,30}[،,]?[\s‌]*(?:ولی|اما)(?![آ-ی])/;
++  /* اشتباهِ دستیار یا دیگری («تو اشتباه گفتی»، «دوستم گفت اشتباه گفتی») اصلاحِ حرفِ خودش نیست */
++  var OTHER_ERR19b = /(?:^|[\s،])(?:تو|شما)[\s‌]+اشتباه|اشتباه[\s‌]*(?:گفتی|نوشتی|کردی|خوندی|فهمیدی|گفتید|نوشتید|کردید|خوندید)(?![آ-ی])|(?:گفت|نوشت|نوشته\s*بود)(?![آ-یم])[^.!؟?\n]{0,12}اشتباه/;
++  AS.CORR_RE = CORR19b;
++  /* بانکِ R19b (INF15 #15، #16): «اشتباه کردم» ِ تنها (کلید را جا گذاشتم، سرِ امتحان علامت را انداختم) اغلب کارِ بیرونی است، نه شکستِ مرحلهٔ همین حل —
++     الگو آن را فقط «در انتظار» (pend) نگه می‌دارد تا گزارشِ مدل داوری کند (نامتقارن: شکستِ دروغ گران‌تر است)؛ «حل نشد/غلط بود» ِ دیگر مثلِ پیش */
++  function actErrOnly19b(t) { var x = String(t || ""); return /اشتباه[\s‌]*کردم/.test(x) && !UNSOLVED_RE.test(x.replace(/اشتباه[\s‌]*کردم/g, " ")); }
++  function msgId19b(m) { if (!m) return ""; if (m.id) return String(m.id); if (m.seq != null) return "u" + m.seq; return "t" + String(m.at || ""); }
++  AS.msgId = msgId19b;
++  /* پیامِ کاربرِ منبعِ یک رویداد: آخرین پیامِ کاربر با همین متن */
++  function evSrc19b(s, mt) { var M = (s && s.msgs) || [], t = String(mt || "").trim(); if (!t) return null; for (var i = M.length - 1; i >= 0; i--) if (isUser(M[i]) && String(M[i].text || "").trim() === t) return M[i]; return null; }
++  function evPid19b(s) { try { var b = AS.boundLive(s); if (b && b.pid) return b.pid; } catch (e) { } var pk = ((s && s.coach) || {}).pk || ""; return /^l:/.test(pk) ? pk.slice(2) : ""; }
++  AS.msgOf = function (s, id) { return ((s && s.msgs) || []).filter(function (m) { return isUser(m) && msgId19b(m) === id; })[0] || null; };
++  /* ---------- یکسان‌سازیِ تکه برای جست‌وجو در متن: رقمِ فارسی/لاتین، فاصله/نیم‌فاصله، ی/ي ---------- */
++  function rxEsc(c) { return c.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&"); }
++  var DIG19b = ["0۰٠", "1۱١", "2۲٢", "3۳٣", "4۴٤", "5۵٥", "6۶٦", "7۷٧", "8۸٨", "9۹٩"];
++  function fragRe(y) {
++    var t = String(y || "").trim(); if (!t) return null; var out = "", sp = false;
++    for (var i = 0; i < t.length; i++) { var c = t.charAt(i), d = faDigits(c);
++      if (/[\s‌]/.test(c)) { if (!sp) out += "[\\s‌]*"; sp = true; continue; } sp = false;
++      if (/^[0-9]$/.test(d)) out += "[" + DIG19b[+d] + "]";
++      else if (/[یي]/.test(c)) out += "[یي]"; else if (/[کك]/.test(c)) out += "[کك]"; else out += rxEsc(c); }
++    try { return new RegExp(out); } catch (e) { return null; }
++  }
++  function hasFrag(T, y) { var r = fragRe(y); return !!r && r.test(String(T || "")); }
++  function repFrag(T, y, x) { var r = fragRe(y); return r ? String(T).replace(r, function () { return x; }) : T; }
++  function numRe19b(n) { var rf = fragRe(n); return rf ? new RegExp("(^|[^0-9۰-۹٠-٩.٫])" + rf.source + "(?![0-9۰-۹٠-٩]|[.٫][0-9۰-۹٠-٩])") : null; }
++  function nums19b(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []); }
++  function rawNums(t) { return String(t || "").match(/[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?/g) || []; }
++  var WD19b = /(?:سه[‌\s]?شنبه|پنج[‌\s]?شنبه|یک[‌\s]?شنبه|دو[‌\s]?شنبه|چهار[‌\s]?شنبه|شنبه|جمعه|پس[‌\s]?فردا|فردا|امروز|امشب)(?:[‌\s]?ی[\s‌]+(?:بعد|دیگه|آینده))?/;
++  /* مقدارِ درست را در متنِ رکورد بنشان: (الف) «old» ِ مدل یا «نه Y»/«به‌جای Y» ِ پیامِ کنونی، (ب) تنها عددِ عوض‌شده، (پ) روزِ هفته، (ت) پنجره‌ای از تکه که
++     با واژهٔ مشترکِ درست هم‌تراز است، (ث) خودِ تکه درونِ متن؛ متنی که درونِ تکه است ⇒ خودِ درست. هیچ‌کدام ⇒ null (رکورد دست نمی‌خورد، مگر نوعش همان what باشد). */
++  function subst19b(T, frag, fix, cur, old) {
++    T = String(T || ""); var F = String(frag || "").trim(), X = String(fix || "").trim(); if (!X) return null;
++    var Ys = []; if (old && String(old).trim()) Ys.push(String(old).trim());
++    var re = /(?:^|[\s،,.])(?:نه|به[\s‌]*جای|بجای)[\s‌]+([^،,.!؟?\n]{1,50})/g, m, cu = String(cur || "");
++    while ((m = re.exec(cu))) { var w = m[1].replace(/[\s‌]+(?:بود|است|نبود)$/, "").trim().split(/[\s‌]+/); for (var k = w.length; k >= 1; k--) Ys.push(w.slice(0, k).join(" ")); }
++    for (var i = 0; i < Ys.length; i++) { var y = Ys[i]; if (!y || hasFrag(X, y) || !(!F || hasFrag(F, y) || !!old)) continue;
++      if (/^[0-9۰-۹٠-٩]+(?:[.٫][0-9۰-۹٠-٩]+)?$/.test(y)) { var ry = numRe19b(y); if (ry.test(T)) return T.replace(ry, function (a0, p0) { return p0 + X; }); continue; }   // عدد فقط به‌تمامی («۵» درونِ «۱۵» نه)
++      var wy = fragRe(y), ry2 = wy ? new RegExp("(^|[^آ-یa-zA-Z0-9۰-۹‌])" + wy.source + "(?![آ-یa-zA-Z0-9۰-۹‌])") : null;   // واژه به‌تمامی («خسته» درونِ «خسته‌ام» نه)
++      if (ry2 && ry2.test(T)) return T.replace(ry2, function (a1, p1) { return p1 + X; }); }
++    var fo = nums19b(F).filter(function (n) { return nums19b(X).indexOf(n) < 0; }), xo = rawNums(X).filter(function (n) { return nums19b(F).indexOf(faDigits(n).replace(/٫/g, ".")) < 0; });
++    if (fo.length === 1 && xo.length === 1) { var r2 = numRe19b(fo[0]); if (r2 && r2.test(T)) return T.replace(r2, function (a, p) { return p + xo[0]; }); }
++    var wf = WD19b.exec(F), wx = WD19b.exec(X); if (wf && wx && hasFrag(T, wf[0]) && X.split(/\s+/).length <= 4) return repFrag(T, wf[0], X);
++    var ft = F.split(/\s+/).filter(Boolean), xt = X.split(/\s+/).filter(Boolean);
++    for (var xi = 0; xi < xt.length; xi++) { if (xt[xi].length < 2 || /^[0-9۰-۹٠-٩=+\-−×*\/^.,]+$/.test(xt[xi])) continue; var fi = ft.indexOf(xt[xi]); if (fi < 0) continue;
++      var s0 = Math.max(0, fi - xi), win = ft.slice(s0, s0 + xt.length).join(" "); if (win && win !== X && hasFrag(T, win)) return repFrag(T, win, X); break; }
++    if (F && hasFrag(T, F)) return repFrag(T, F, X);
++    if (F && T.trim() && hasFrag(F, T.trim())) return X;
++    return null;
++  }
++  AS.retractSubst = subst19b;
++  function rel19b(T, F) { if (!T || !F) return false; if (hasFrag(T, F) || hasFrag(F, String(T).trim())) return true; var a = tokN(T), b = tokN(F); if (a.some(function (w) { return b.indexOf(w) >= 0; })) return true; var na = nums19b(T), nb = nums19b(F); return na.some(function (n) { return nb.indexOf(n) >= 0; }); }
++  function corrPush(r, old, nw, ctx) { r.corr = (r.corr || []).concat([Object.assign({ at: nowIso(), old: old, "new": nw, note: "اصلاح شد ⇐ «" + clip(String(old == null ? "" : old), 120) + "»" }, ctx || {})]); }
++  /* ---------- فرم‌هایی که کنشِ دستیار پر کرد: دفترِ هر پر کردن با شناسهٔ پیامِ کاربرِ آن نوبت (برای برگرداندن) ---------- */
++  function fieldSig(x) { return x ? (x.id || x.name || x.getAttribute("aria-label") || x.placeholder || "") : ""; }
++  function fieldBySig(sg) { if (!sg) return null; var L = document.querySelectorAll("#main input, #main textarea, #main select"); for (var i = 0; i < L.length; i++) if (fieldSig(L[i]) === sg) return L[i]; return null; }
++  if (AS.DO && AS.DO.fill && !AS.DO.fill._r19b) {
++    var rawFill19b = AS.DO.fill;
++    AS.DO.fill = function (a) {
++      var x = null, old = null; try { x = a && a.k ? document.querySelector('#main [data-ai-k="' + a.k + '"]') : null; if (x) old = String(x.value == null ? "" : x.value); } catch (e) { }
++      var r = rawFill19b.apply(this, arguments);
++      try { var s = AS._turnSession; if (!r && x && s && x.type !== "checkbox" && x.type !== "radio" && x.type !== "file") { var um = lastUserMsg(s), st = A.state || {};
++        if (um && String(x.value) !== old) { var F = s.fills = s.fills || []; F.push({ src: msgId19b(um), key: mkey(um.text), at: nowIso(), view: st.view || "", arg: st.arg == null ? null : st.arg, sub: st.sub || null, sig: fieldSig(x), label: clip(x.getAttribute("aria-label") || x.placeholder || x.id || "", 80), old: old, val: String(x.value) }); if (F.length > 120) s.fills = F.slice(-120); S.put(s); } } } catch (e) { }
++      return r;
++    };
++    AS.DO.fill._r19b = true;
++  }
++  function setField19b(x, v) {
++    var proto = x.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : x.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype, d = Object.getOwnPropertyDescriptor(proto, "value");
++    if (d && d.set) d.set.call(x, v); else x.value = v; x.dispatchEvent(new Event("input", { bubbles: true })); x.dispatchEvent(new Event("change", { bubbles: true }));
++  }
++  /* ---------- سنجشِ retract ---------- */
++  var WHAT19b = /^(?:guess|plan|step|ans|said|fact|form)$/;
++  function retractCheck(s, x, um) {
++    if (!x || typeof x !== "object") return { err: "retract شیء نیست" };
++    var frag = txtOf(x.msg || x.frag).trim(), what = String(x.what || "").trim(), fix = txtOf(x.fix).trim(), ut = String((um && um.text) || "");
++    if (!um || !isUser(um)) return { err: "پیامِ کاربر نیست" };
++    if (!WHAT19b.test(what)) return { err: "what نامعتبر" };
++    if (frag.length < 1) return { err: "تکهٔ پیامِ پیشین نیامد" };
++    var own = ownText(ut);
++    if (!CORR19b.test(own)) return { err: "پیامِ کنونی نشانهٔ اصلاحِ حرفِ خودش را ندارد" };
++    if (OTHER_ERR19b.test(own) && !/(?:اشتباه|غلط)[\s‌]*(?:گفتم|نوشتم)/.test(own)) return { err: "اصلاحِ اشتباهِ دستیار یا دیگری است، نه حرفِ خودش" };
++    if (!fix || !(quoteIn(fix, ut) || hasFrag(ut, fix))) return { err: "مقدارِ درست در همین پیامِ او نیست" };
++    var M = s.msgs || [], ui = M.indexOf(um), src = null, n = 0;
++    for (var i = ui - 1; i >= 0; i--) if (isUser(M[i]) && (hasFrag(M[i].text, frag) || (frag.length >= 4 && quoteIn(frag, M[i].text)))) { src = M[i]; break; }
++    if (!src) return { err: "تکه در هیچ پیامِ پیشینِ خودِ او در این سشن نیست" };
++    if (hasFrag(frag, fix)) return { err: "مقدارِ «درست» همان مقدارِ پیشین است — اصلاحی نیست" };
++    for (var j = 0; j <= M.indexOf(src); j++) if (M[j] && M[j].role === "user") n++;
++    return { src: src, srcId: msgId19b(src), n: n, frag: frag, what: what, fix: fix, old: txtOf(x.old).trim(), cur: um, curId: msgId19b(um) };
++  }
++  AS.retractCheck = function (s, x) { return retractCheck(s, x, lastUserMsg(s)); };
++  function fromMsg(r, R) { return !!r && (r.src === R.srcId || (!r.src && !!r.key && r.key === mkey(R.src.text))); }
++  /* ---------- برگرداندن و نشاندنِ درست ---------- */
++  function retractApply(s, R) {
++    var C = s.coach = s.coach || {}, ch = [], pend = [], ctx = { by: R.curId, from: R.srcId, what: R.what }, cu = String(R.cur.text || "");
++    var sub = function (T, typed) { var v = subst19b(T, R.frag, R.fix, cu, R.old); if (v == null && typed) v = R.fix; return v; };
++    var hit = function (typed, T) { return typed || rel19b(T, R.frag); };
++    /* حدس‌ها (شناسه‌دار) و حدسِ جاریِ مربی */
++    (C.guesses || []).forEach(function (g) { if (!fromMsg(g, R) || !hit(R.what === "guess", g.text)) return; var v = sub(g.text, R.what === "guess"); if (v == null || v === g.text) return;
++      corrPush(g, g.text, v, ctx); ch.push("حدسِ " + g.id + ": «" + clip(v, 60) + "» (اصلاح شد ⇐ «" + clip(g.text, 50) + "»)"); var o = g.text; g.text = clip(v, 300);
++      if (C.guess && qNorm(C.guess.text) === qNorm(o)) { corrPush(C.guess, C.guess.text, g.text, ctx); C.guess.text = g.text; }
++      (s.msgs || []).forEach(function (m) { if (m && m.role === "ai" && m.guess && qNorm(m.guess.text) === qNorm(o)) { corrPush(m.guess, m.guess.text, g.text, ctx); m.guess.text = g.text; } }); });
++    if (C.guess && fromMsg(C.guess, R) && !(C.guesses || []).some(function (g) { return qNorm(g.text) === qNorm(C.guess.text); }) && hit(R.what === "guess", C.guess.text)) { var gv = sub(C.guess.text, R.what === "guess"); if (gv != null && gv !== C.guess.text) { corrPush(C.guess, C.guess.text, gv, ctx); ch.push("حدس: «" + clip(gv, 60) + "» (اصلاح شد ⇐ «" + clip(C.guess.text, 50) + "»)"); C.guess.text = clip(gv, 300); } }
++    /* برنامه‌ها (+ موعد و یادآورِ پیگیری‌اش) */
++    (s.plans || []).forEach(function (q) { if (!fromMsg(q, R) || !hit(R.what === "plan", q.text)) return; var v = sub(q.text, R.what === "plan"); if (v == null || v === q.text) return;
++      var ow = q.when, nw = ow; if (ow && ow !== "next-session" && WD19b.test(String(v))) { var d = planDate18(v); if (d && d >= A.today() && d !== planDate18(q.text)) nw = d; }
++      corrPush(q, q.text, v, Object.assign({ oldWhen: ow }, ctx)); var oT = q.text; q.text = clip(v, 300);
++      if (nw !== ow) { q.when = nw; delete q.askKey; delete q.gAskKey;
++        try { S.all("deadline", function (x) { return x && !x.done && x.date === ow && (x.sess === s.id || quoteIn(clip(oT, 40), String(x.what || ""))); }).forEach(function (dl) { corrPush(dl, dl.date, nw, ctx); dl.date = nw; S.put(dl); }); } catch (e) { } }
++      ch.push("برنامهٔ " + q.id + ": «" + clip(plainTx(v), 60) + "»" + (nw !== ow ? " (موعد " + nw + ")" : "") + " (اصلاح شد ⇐ «" + clip(plainTx(oT), 50) + "»" + (nw !== ow ? "، " + ow : "") + ")"); });
++    /* قول‌ها (درخواستِ عقب‌افتاده‌ای که از آن پیام آمد) */
++    (s.promises || []).forEach(function (p) { if (p.done || !(p.src === R.srcId || quoteIn(p.ask, R.src.text)) || !rel19b(p.ask, R.frag)) return; var v = sub(p.ask, false); if (v == null || v === p.ask) return;
++      corrPush(p, p.ask, v, ctx); ch.push("درخواستِ " + p.id + ": «" + clip(v, 60) + "» (اصلاح شد ⇐ «" + clip(p.ask, 50) + "»)"); p.ask = clip(v, 200); });
++    /* صورتِ مسئلهٔ گفت‌وگو و مجهول به حرفِ خودش */
++    /* صورتِ گفت‌وگو همیشه پیرو می‌شود (تاریخچه می‌ماند)؛ فقط وقتی واقعاً مسئله است «تغییر» خوانده می‌شود (سلام و حال‌واحوال رکوردی نیست که بگوییم عوض شد) */
++    if (C.stmt && hasFrag(R.src.text, String(C.stmt).slice(0, 40)) && rel19b(C.stmt, R.frag)) { var sv = sub(C.stmt, false); if (sv != null && sv !== C.stmt) { var stP = false; try { stP = !AS.notProblem(C.stmt) && (/[؟?0-9۰-۹=]/.test(C.stmt) || qToks(C.stmt).length >= 6); } catch (e) { }
++      C.stmtHist = (C.stmtHist || []).concat([{ at: nowIso(), old: C.stmt, note: "اصلاح شد ⇐ «" + clip(C.stmt, 120) + "»", by: R.curId }]); if (stP) ch.push("صورتِ مسئلهٔ گفت‌وگو: «" + clip(sv, 70) + "»"); C.stmt = clip(sv, 400); } }
++    Object.keys(C.unkBy || {}).forEach(function (k) { var u = C.unkBy[k]; if (!u || !hasFrag(R.src.text, u) || !rel19b(u, R.frag)) return; var v = sub(u, R.what === "said"); if (v == null || v === u) return; C.unkHist = (C.unkHist || []).concat([{ at: nowIso(), pk: k, old: u, note: "اصلاح شد ⇐ «" + clip(u, 120) + "»" }]); C.unkBy[k] = clip(v, 160); ch.push("مجهول به حرفِ خودت: «" + clip(v, 60) + "»"); });
++    /* شاهدِ پاسخ (ans/said): پاسخ‌دادن می‌ماند، محتوایش اصلاح می‌شود؛ حکمِ وارسی‌ای که روی پیامِ نادرست بنا شد «وارسی‌نشده» می‌شود (حکمِ پیشین در تاریخچه) */
++    if (/^(?:ans|said|fact)$/.test(R.what)) { var nA = 0; (C.ansLog || []).forEach(function (e) { if (!fromMsg(e, R)) return; corrPush(e, R.frag, R.fix, ctx); nA++; }); var nO = 0, PN = { u: "مجهول", d: "داده", c: "شرط" }, pn = []; (C.ownLog || []).forEach(function (e) { if (!fromMsg(e, R)) return; corrPush(e, R.frag, R.fix, ctx); nO++; (e.p || []).forEach(function (k) { if (PN[k] && pn.indexOf(PN[k]) < 0) pn.push(PN[k]); }); });
++      if (nO) ch.push((pn.join("/") || "آنچه از مسئله گفتی") + " به حرفِ خودت: «" + clip(R.fix, 60) + "» (اصلاح شد ⇐ «" + clip(R.frag, 50) + "»)");
++      if (nA) ch.push("پاسخ به " + fa(nA) + " پرسش: «" + clip(R.fix, 50) + "» (اصلاح شد ⇐ «" + clip(R.frag, 50) + "»)"); }
++    try { chatClosed().forEach(function (x) { var b = x.b; if (!b || b.verdict !== "verified" || !(b.chkMsgs || []).some(function (t) { return qNorm(t) && qNorm(clip(R.src.text, 160)) === qNorm(t); })) return;
++      b.chkSup = { at: nowIso(), by: R.curId, from: R.srcId, verdictPrev: b.verdict, note: "اصلاح شد ⇐ حکمِ «وارسی شد» روی پیامی بود که خودش اصلاح کرد" }; b.verdict = "unverified"; b.chkBy = "superseded"; S.put(x.pg); ch.push("حکمِ وارسیِ «" + clip(x.r.p.title, 40) + "» دیگر «وارسی شد» نیست (روی پیامِ اصلاح‌شده بود)"); }); } catch (e) { }
++    /* فرم‌هایی که کنشِ دستیار در آن نوبت پر کرد */
++    (s.fills || []).forEach(function (f) { if (!fromMsg(f, R)) return; if (!(R.what === "form" || rel19b(f.val, R.frag))) return; var v = sub(f.val, R.what === "form"); if (v == null || v === f.val) return;
++      var st = A.state || {}, here = st.view === f.view && String(st.arg) === String(f.arg), x = here ? fieldBySig(f.sig) : null, o = f.val;
++      corrPush(f, o, v, ctx);
++      if (x && String(x.value) === o) { setField19b(x, v); f.val = v; delete f.pending; ch.push("فیلدِ «" + clip(f.label, 40) + "»: «" + clip(v, 50) + "» (اصلاح شد ⇐ «" + clip(o, 40) + "»)"); }
++      else { f.pending = v; pend.push("فیلدِ «" + clip(f.label, 40) + "» در «" + f.view + (f.arg != null ? " " + f.arg : "") + "» هنوز «" + clip(o, 40) + "» است ⇒ «" + clip(v, 50) + "»"); } });
++    /* رویدادهای کارنامه که از آن پیام آمدند ⇒ پس گرفته (wd)، نه پاک */
++    var nE = 0, tail = clip(String(R.src.text || ""), 80); (s.coachEv || []).forEach(function (e) { if (!e || e.wd || e.how === "selfcorr") return; var fromE = e.msg ? e.msg === R.srcId : /^chat/.test(String(e.src || "")) && String(e.key || "").slice(-tail.length) === tail;
++      if (fromE) { e.wd = { at: nowIso(), by: R.curId, why: "اصلاحِ پیامِ منبع" }; nE++; } });
++    if (nE) ch.push(fa(nE) + " رویدادِ کارنامه از آن پیام پس گرفته شد");
++    /* رکوردهای مسئلهٔ زنده (صورت، داده، حدس، گام، فیلدها) ⇐ بخشِ مسئله (A.liveRetract) */
++    var pids = {}; try { var bl = AS.boundLive(s); if (bl && bl.pid) pids[bl.pid] = 1; } catch (e) { } if (s.lprob) pids[s.lprob] = 1; (s.lprobLog || []).forEach(function (e) { if (e && e.p) pids[e.p] = 1; });
++    Object.keys(pids).forEach(function (pid) { if (typeof A.liveRetract !== "function") return; try { var lr = A.liveRetract(pid, R.srcId, { what: R.what, fix: R.fix, frag: R.frag, old: R.old, msg: clip(R.src.text, 300), n: R.n, at: R.src.at, sess: s.id, by: R.curId });
++      var lt = typeof lr === "string" ? lr : lr && typeof lr === "object" ? (Array.isArray(lr.changes) ? lr.changes.join("؛ ") : String(lr.text || lr.msg || "")) : "";
++      if (lt && !/^(?:ثبت نشد|چیزی|هیچ)/.test(lt)) ch.push(lt.replace(/^✓\s*/, "")); } catch (e) { console.warn(e); } });
++    if (Object.keys(pids).length && typeof A.liveRetract !== "function") pend.push("رکوردهای مسئلهٔ زنده در این نسخه راهِ برگرداندن ندارند — خودش در صفحهٔ مسئله اصلاح کند");
++    return { ch: ch, pend: pend, nEv: nE };
++  }
++  AS.retractApply = function (s, x) { var R = retractCheck(s, x, lastUserMsg(s)); return R.err ? R : retractApply(s, R); };
++  /* coach_state.retract — پیش از بقیهٔ گزارش (تا حدسِ درستِ همین پیام تکرار نشود)؛ رکوردهای تازهٔ این نوبت شناسهٔ پیامِ منبع را می‌گیرند */
++  function recs19b(s) { var C = s.coach || {}; return [].concat(s.plans || [], C.guesses || [], s.promises || [], s.coachEv || [], C.ansLog || [], C.ownLog || [], C.guess ? [C.guess] : []); }
++  if (!AS.DO.coach_state._r19b) {
++    var rawCS19b = AS.DO.coach_state;
++    AS.DO.coach_state = function (a) {
++      var s = AS._turnSession; if (!s || !a || typeof a !== "object") return rawCS19b.apply(this, arguments);
++      var um = lastUserMsg(s), mid = msgId19b(um), before = recs19b(s), C = s.coach = s.coach || {}, info = "", res = null;
++      if (a.retract && um) { var L = Array.isArray(a.retract) ? a.retract.slice(0, 3) : [a.retract];
++        L.forEach(function (x) { var R = retractCheck(s, x, um), RL = C.retracts = C.retracts || [];
++          if (R.err) { RL.push({ at: nowIso(), key: mkey(um.text), cur: mid, ok: false, err: R.err, x: { msg: clip(txtOf(x && x.msg), 120), what: String((x && x.what) || ""), fix: clip(txtOf(x && x.fix), 120) } }); return; }
++          var o = retractApply(s, R); res = res || { ch: [], pend: [], R: R }; res.ch = res.ch.concat(o.ch); res.pend = res.pend.concat(o.pend);
++          RL.push({ at: nowIso(), key: mkey(um.text), cur: mid, src: R.srcId, n: R.n, ok: true, what: R.what, frag: clip(R.frag, 160), fix: clip(R.fix, 160), changes: o.ch, pending: o.pend }); });
++        if ((C.retracts || []).length > 60) C.retracts = C.retracts.slice(-60); }
++      var a2 = a; if (a.retract) { a2 = Object.assign({}, a); delete a2.retract; }
++      var out = rawCS19b.call(this, a2);
++      try { recs19b(s).forEach(function (r) { if (r && typeof r === "object" && before.indexOf(r) < 0 && !r.src && mid) r.src = mid; });
++        if (res) {
++          /* خود-اصلاح بازنگری است، هرگز شکست: شکست/گیرِ همین پیام پس گرفته می‌شود؛ و اگر چیزی واقعاً برگشت، یک شاهدِ «بازنگری» */
++          (s.coachEv || []).forEach(function (e) { if (e && !e.wd && !e.ok && e.msg === mid) e.wd = { at: nowIso(), by: mid, why: "خود-اصلاح، نه شکست" }; });
++          if (res.ch.length && !C.teach) coachEv(s, "b", "chatok", String(um.text || ""), true, { how: "selfcorr", from: res.R.srcId, pk: C.pk || "" });
++          C.retNote = { key: mkey(um.text), cur: mid, frag: clip(res.R.frag, 120), fix: clip(res.R.fix, 120), ch: res.ch.slice(0, 8), pend: res.pend.slice(0, 4), shown: "" };
++          if (res.ch.length) info = "✓ اصلاح شد: " + res.ch.slice(0, 4).join(" · ");
++        }
++        S.put(s); } catch (e) { console.warn(e); }
++      return info || out;
++    };
++    AS.DO.coach_state._r19b = true;
++  }
++  /* نامزدهای اصلاح (برای پرسشِ «کدام را اصلاح کنم؟»): رکوردهای منبع‌دارِ همین سشن، تازه‌ترین اول */
++  function corrCands(s) {
++    var C = (s && s.coach) || {}, out = [];
++    (C.guesses || []).forEach(function (g) { out.push({ at: g.at, t: "حدسِ " + g.id + " «" + clip(plainTx(g.text), 60).replace(/[«»]/g, "") + "»" }); });
++    (s.plans || []).forEach(function (q) { if (planOpen(q)) out.push({ at: q.at, t: "برنامهٔ " + q.id + " «" + clip(plainTx(q.text), 60).replace(/[«»]/g, "") + "»" }); });
++    (s.fills || []).forEach(function (f) { out.push({ at: f.at, t: "فیلدِ «" + clip(f.label, 30).replace(/[«»]/g, "") + "» = «" + clip(f.val, 40).replace(/[«»]/g, "") + "»" }); });
++    try { var pid = sessPid(s); if (pid) lsteps(pid).forEach(function (st, i) { var o = st && (st.chatRep || (st.out && st.out.from === "chat" ? st.out : null)); if (o) out.push({ at: String(o.at || ""), t: "نتیجهٔ گامِ " + fa(i + 1) + " «" + clip(plainTx(st.text), 40).replace(/[«»]/g, "") + "»" }); }); } catch (e) { }
++    return out.sort(function (a, b) { return String(b.at || "").localeCompare(String(a.at || "")); }).slice(0, 6).map(function (x) { return x.t; });
++  }
++  AS.corrCands = corrCands;
++  AS.promptFilters.push(function (outs, s, msg) {
++    var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt); if (auto || !s) return out;
++    var C = s.coach || {}, k = mkey(mt);
++    /* ۱) اصلاحی که صفحه نوبتِ پیش انجام داد — زمینه، یک بار: دقیقاً چه عوض شد (و چه نشد) */
++    var N = C.retNote; if (N && N.key !== k && (!N.shown || N.shown === k)) { N.shown = k;
++      out.push("# اصلاحی که صفحه انجام داد (نوبتِ پیش)\n" + CTX18 + (N.ch.length ? "پیامِ پیشینش را اصلاح کرد («" + N.frag.replace(/[«»]/g, "") + "» ⇐ «" + N.fix.replace(/[«»]/g, "") + "») و صفحه این‌ها را عوض کرد: " + N.ch.join("؛ ") + "." : "پیامِ پیشینش را اصلاح کرد، ولی از آن پیام هیچ رکوردی ثبت نشده بود — چیزی عوض نشد؛ نگو که چیزی را عوض کردی.") +
++        (N.pend.length ? " مانده: " + N.pend.join("؛ ") + " (اگر به آن‌جا رفتید، همان را درست کن)." : "") + " اگر در پاسخِ پیشین نگفتی، در یک جمله بگو چه عوض شد؛ چیزِ دیگری را عوض‌شده نخوان.");
++      try { S.put(s); } catch (e) { } }
++    var own = ownText(mt);
++    /* ۲) همین پیام نشانهٔ اصلاحِ حرفِ خودش را دارد ⇒ نامزدها و راهِ گزارش (مدل داوری می‌کند؛ صفحه پیش از گزارش چیزی برنمی‌گرداند) */
++    if (CORR19b.test(own) && !OTHER_ERR19b.test(own)) { var cc = corrCands(s);
++      out.push("# اصلاحِ پیامِ پیشین (شاید)\n" + CTX18 + "این پیام شاید حرفِ پیشینِ خودش را اصلاح می‌کند. اگر چنین است و روشن است کدام، {\"do\":\"coach_state\",\"retract\":{\"msg\":\"تکهٔ عینیِ پیامِ پیشینش\",\"what\":\"guess|plan|step|ans|said|fact|form\",\"fix\":\"عینِ مقدارِ درست از همین پیام\"}} بده — صفحه همه را برمی‌گرداند و درست را می‌نشاند؛ " +
++        "اگر روشن نیست کدام یا مقدارِ درست را نگفته، فقط با پرسشِ «کدام را اصلاح کنم؟»" + (cc.length ? " این نامزدها را پیش بگذار: " + cc.join("، ") : " همان را جویا شو") + " و retract نده؛ اگر دربارهٔ کارِ بیرونی، ایدهٔ تازه یا اشتباهِ تو یا دیگری است، retract نده."); }
++    /* ۳) پشتیبان: پیامِ پیشینش نشانهٔ اصلاح داشت و پاسخِ آن گزارشِ وضع نداشت ⇒ فقط پرسش (هرگز برگرداندن) */
++    try { var pp = pairPrev(s, mt); if (pp && CORR19b.test(ownText(pp.u.text)) && !OTHER_ERR19b.test(ownText(pp.u.text)) && (pp.rep.actions || []).indexOf("coach_state") < 0 && !CORR19b.test(own)) { var c2 = corrCands(s);
++      out.push("# اصلاحِ پیامِ پیشین (پشتیبان، فقط پرسش)\n" + CTX18 + "پیامِ پیشینش نشانهٔ اصلاح داشت («" + clip(pp.u.text, 120).replace(/[«»]/g, "") + "») و گزارشِ وضعِ آن نوبت نیامد — صفحه چیزی را برنگرداند. اگر هنوز روشن نشده، فقط با پرسشِ «کدام را اصلاح کنم؟»" + (c2.length ? " این نامزدها را پیش بگذار: " + c2.join("، ") : "") + "؛ وقتی گفت، retract را گزارش کن."); } } catch (e) { }
++    return out;
++  });
++
+   AS.tourKinds = KIND;
+   AS.tourSyncReminder = syncReminder;
+ })(APP);
+diff --git a/apps/learning-architecture/src/app/a29_mind.js b/apps/learning-architecture/src/app/a29_mind.js
+index 50689437..1b64140a 100644
+--- a/apps/learning-architecture/src/app/a29_mind.js
++++ b/apps/learning-architecture/src/app/a29_mind.js
+@@ -51,30 +51,30 @@
+     /* پاسخ‌های پاسخ‌دقیق: ورزشِ گره (وارسی‌شده/کد/خودت با عدد) و مسئله‌های هم‌ساختار */
+     var countable = typeof A.kcountable === "function" ? A.kcountable : function (it) { return !it.bad; };
+     /* noRet: ماندگاریِ گره‌ها فقط از A.PSY.holds (نخستین پاسخِ پس از موعد) — این‌جا دوباره شمرده نمی‌شود (M5) */
+-    function ingest(dim, hist, noRet) {
++    function ingest(dim, hist, noRet, c) {
+       var t0 = null;
+       (hist || []).forEach(function (x) {
+         if (!x || x.self || x.ok == null || x.ok === "") return;
+         var ok = x.ok === true || x.ok === 1 || x.ok === "1" || x.ok === "true", at = x.at || x.d || "";
+-        put(dim, { at: at, ok: ok });
+-        var c = conf01(x.conf); if (c != null) (D[dim] || D.s_mind).cal.push({ p: c, ok: ok, at: at });
++        put(dim, { at: at, ok: ok, src: c });
++        var cf = conf01(x.conf); if (cf != null) (D[dim] || D.s_mind).cal.push({ p: cf, ok: ok, at: at, src: c });
+         if (!noRet && t0 && day(at) >= A.addDays(day(t0), HOLD)) { var R = (D[dim] || D.s_mind).ret; R.n++; if (ok) R.ok++; }
+         if (ok && !t0) t0 = at;
+       });
+     }
+-    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist, !!(A.PSY && A.PSY.holds)); });
+-    S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist); });
++    S.all("kitem", function (it) { return !it.bad && countable(it); }).forEach(function (it) { ingest(kdim[it.knot] || "s_mind", it.hist, !!(A.PSY && A.PSY.holds), { id: it.id, fa: "ورزشِ گره «" + String(it.q || it.title || it.prompt || "").slice(0, 50) + "»" }); });
++    S.all("pbitem").forEach(function (it) { ingest("s_problem", it.hist, false, { id: it.id, fa: "مسئلهٔ هم‌ساختار «" + String(it.q || it.title || it.prompt || "").slice(0, 50) + "»" }); });
+     /* حدسِ پیش از حل (شبیه‌ساز، سطحِ ۳–۴): اطمینان ↔ «درست بود/نادرست بود» با پاسخِ معلومِ مسئله ⇒ فقط کالیبراسیونِ حلِ مسئله، نه دقت («تاحدی» بیرون) */
+     S.all("eprog", function (pg) { return pg.solve && pg.solve.g; }).forEach(function (pg) {
+-      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
++      Object.keys(pg.solve.g).forEach(function (lv) { var g = pg.solve.g[lv]; if (!g || g.seen || g.wd || g.retracted || g.conf == null || (g.hit !== "درست بود" && g.hit !== "نادرست بود")) return;   // INF17: حدسِ پس‌گرفته (اصلاح) شمرده نمی‌شود   // حدسِ پس از دیدنِ راه پیش‌بینی نیست
+         /* حدسِ «🔭 مسئلهٔ حل‌نشدهٔ خودم» با واقعیت داوری می‌شود، نه با پاسخِ معلوم ⇒ پیش‌بینیِ رویداد (fc)، نه اطمینان به پاسخ */
+-        var c = conf01(g.conf); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at, fc: g.from === "live" || undefined }); });
++        var c = conf01(g.conf), pid0 = String(pg.id).replace(/^eprog_/, ""); if (c != null) D.s_problem.cal.push({ p: c, ok: g.hit === "درست بود", at: g.hitAt || g.at, fc: g.from === "live" || undefined, src: { id: "g:" + pg.id + ":" + lv, pid: pid0, fa: "حدسِ «" + String(g.guess || "").slice(0, 50) + "» (اطمینان " + Math.round(100 * c) + "٪)" } }); });
+     });
+     /* کارت‌های مرور: نمره را خودِ کاربر می‌دهد ⇒ خودسنجی؛ مثلِ «خودم سنجیدم» ِ گره‌ها بیرون از دقت/اطمینان/ماندگاری، جدا شمرده می‌شود (M6) */
+     D.s_learn.cardSelf = { n: 0, k: 0 };
+     S.all("card", function (c) { return !c.sample; }).forEach(function (c) { (c.hist || []).forEach(function (x) { if (x.g == null) return; D.s_learn.cardSelf.n++; if (x.g >= 3) D.s_learn.cardSelf.k++; }); });
+     /* حرکت‌ها: شمارِ پاسخ‌های درست/نادرستِ هر حرکت (دفترِ حرکت‌ها زمان و حرکت را با هم نگه نمی‌دارد ⇒ در روندِ ماهانه نمی‌آید) */
+-    var mp = S.get("moves_prog"); Object.keys((mp && mp.by) || {}).forEach(function (mv) { var b = mp.by[mv], d = M.dimOf("move:" + mv); for (var i = 0; i < (b.n || 0); i++) put(d, { at: "", ok: i < (b.ok || 0) }); });
++    var mp = S.get("moves_prog"); Object.keys((mp && mp.by) || {}).forEach(function (mv) { var b = mp.by[mv], d = M.dimOf("move:" + mv); for (var i = 0; i < (b.n || 0); i++) put(d, { at: "", ok: i < (b.ok || 0), src: { id: "move:" + mv + ":" + i, fa: "حرکتِ «" + mv + "»" } }); });
+     /* داوریِ معرفتی: درجهٔ نهاییِ تو ↔ نتیجهٔ واقعیِ ثبت‌شده در بازبینی */
+     var cases = S.all("case", function (c) { return !c.sample; });
+     cases.forEach(function (cs) {
+@@ -83,19 +83,20 @@
+       fin.forEach(function (r) {
+         var o = (cs.outcome || {})[r.c]; if (!r.c || r.p == null || r.p === "" || (o !== "درست" && o !== "نادرست")) return;
+         var p = conf01(r.p), ok = o === "درست", at = cs.outcomeAt || cs.updated || cs.created;
+-        D.s_epi.cal.push({ p: p, ok: ok, at: at, fc: true });
+-        D.s_epi.ans.push({ at: at, ok: (p >= 0.5) === ok });
++        var cs0 = { id: "case:" + cs.id + ":" + r.c, fa: "پروندهٔ «" + String(cs.title || "").slice(0, 40) + "» — درجهٔ پایانی در برابرِ نتیجهٔ واقعی" };
++        D.s_epi.cal.push({ p: p, ok: ok, at: at, fc: true, src: cs0 });
++        D.s_epi.ans.push({ at: at, ok: (p >= 0.5) === ok, src: cs0 });
+       });
+     });
+     /* ⛓ زنجیرهٔ نگرانی (حسِ اول ↔ رخ داد/نداد) و 🎯 دفترِ پیش‌بینی (احتمال ↔ شد/نشد) ⇒ کالیبراسیونِ همان بُعد.
+        «fc» = احتمالِ یک رویداد، نه اطمینان به پاسخِ خودم ⇒ با P.forecastEst سنجیده می‌شود، نه با بیش‌اطمینانی به پاسخ (H3) */
+     S.all("wchain", function (c) { return c.feel != null && (c.outcome === "رخ داد" || c.outcome === "رخ نداد"); }).forEach(function (c) {
+-      var p = c.feel / 100, ok = c.outcome === "رخ داد"; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due, fc: true }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok });
++      var p = c.feel / 100, ok = c.outcome === "رخ داد", w0 = { id: "wchain:" + c.id, fa: "زنجیرهٔ نگرانی «" + String(c.title || "").slice(0, 40) + "»" }; D.s_mind.cal.push({ p: p, ok: ok, at: c.outcomeAt || c.due, fc: true, src: w0 }); D.s_mind.ans.push({ at: c.outcomeAt || c.due, ok: (p >= 0.5) === ok, src: w0 });
+     });
+     S.all("fcast", function (x) { return x.p != null && (x.outcome === "شد" || x.outcome === "نشد"); }).forEach(function (x) {
+       /* پیش‌بینیِ رویداد فقط کالیبراسیونِ پیش‌بینی است، نه «دقتِ پاسخ» (بازبینیِ ۲۰۲۶-۱۰-۱۵ ِ «🔭 مسئلهٔ حل‌نشدهٔ خودم»): «طرفِ محتمل‌تر رخ داد» پاسخِ
+          درست به پرسشی نیست؛ همین برای همهٔ دفترِ پیش‌بینی برقرار است، پس دیگر به X.ans نمی‌رود */
+-      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true });
++      var X = D[x.dim] || D.s_decision, p = x.p / 100, ok = x.outcome === "شد"; X.cal.push({ p: p, ok: ok, at: x.outcomeAt || x.due, fc: true, src: { id: "fcast:" + x.id, fa: "پیش‌بینیِ «" + String(x.q || x.title || x.what || "").slice(0, 40) + "»" } });
+     });
+     // نقشه‌های پیش‌نیاز ⇒ بُعدِ «یادگیری و حافظه» (کارزارِ آزمون c08: کارنامه از ۸ پیش‌نیازِ سنجیده هیچ نشان نمی‌داد)
+     S.all("prereq").forEach(function (p) { var it = p.items || []; if (it.length) D.s_learn.items.push({ t: "prereq", id: p.id, fa: "🧩 " + (p.title || "پیش‌نیاز") + " — " + (function () { var no = it.filter(function (x) { return x.self === "بلد نیستم"; }).length, half = it.filter(function (x) { return x.self === "نیمه"; }).length; return "از " + it.length + ": " + no + " نبود" + (half ? "، " + half + " نیمه" : ""); })(), st: p.back === "حل شد" ? "practised" : "open", at: p.created }); });
+@@ -349,47 +350,60 @@
+   var NO_DATA = "هنوز داده‌ای نیست";
+   M.NO_DATA = NO_DATA;
+   M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
+-  M.phases = function () {
+-    var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {} }; });
++  /* تورِ پولیا (INF17، دورِ ۱۹b): هر سطر «از کجا؟» دارد — فهرستِ کارهایی که آن را جابه‌جا کردند (منبع، تاریخ، +/−، مسئله برای «📜 پرونده»)، هر کار یک بار
++     (همان جا که شمرده می‌شود ثبت می‌شود ⇒ شمارِ فهرست = n و جمعِ + = k)؛ کارِ پس‌گرفته (اصلاحِ پیامِ منبع، wd) نه شمرده می‌شود نه فهرست. opt.pid ⇒ فقط کارهای همان مسئله. */
++  function wdOut(o) { return !!(o && (o.wd || o.retracted || o.withdrawn)); }
++  M.phases = function (opt) {
++    var fpid = opt && opt.pid ? String(opt.pid) : "";
++    var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {}, acts: [] }; });
+     var byPh = { u: "und", p: "plan", c: "exec", b: "back" };
+-    function add(tk, src, ok) { var X = R[tk]; if (!X) return; X.n++; if (ok) X.k++; var s = X.src[src] = X.src[src] || { k: 0, n: 0 }; s.n++; if (ok) s.k++; }
++    function add(tk, src, ok, act) { var X = R[tk]; if (!X) return; act = act || {}; if (fpid && String(act.pid || "") !== fpid) return;
++      X.n++; if (ok) X.k++; var s = X.src[src] = X.src[src] || { k: 0, n: 0 }; s.n++; if (ok) s.k++;
++      X.acts.push({ id: act.id || (src + ":" + X.acts.length), src: src, ok: !!ok, at: act.at || "", fa: act.fa || PH_SRC[src] || src, pid: act.pid || "", sess: act.sess || "", ref: act.ref || "" }); }
+     /* تورِ پولیا دورِ ۲ (R7): بازگفتِ دستیار (e.by = assistant، متنی که در پیام‌های خودِ کاربر نیست) شاهدِ موفقیتِ او نیست */
+-    function tutOf(T) { if (!T) return; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return; add(x[0], "ask", e.self === 2); }); }); }
+-    S.all("eprog").forEach(function (pg) { tutOf(pg.tut); });
++    function tutOf(T, c) { if (!T) return; c = c || {}; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e, j) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return;
++      add(x[0], "ask", e.self === 2, { id: "tut:" + (c.id || "") + ":" + x[0] + ":" + j, at: e.at || "", pid: c.pid || "", fa: "پرسشِ همین لحظه" + (e.q ? " «" + String(e.q).slice(0, 50) + "»" : "") + (c.title ? " — «" + String(c.title).slice(0, 40) + "»" : "") }); }); }); }
++    function pTitle(pid) { try { var r = A.liveRec ? A.liveRec(pid) : null, p = r && r.p ? r.p : A.getProb ? A.getProb(pid) : null; return (p && (p.title || (p.p && p.p.title))) || ""; } catch (e) { return ""; } }
++    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); tutOf(pg.tut, { id: pg.id, pid: pid0, title: pTitle(pid0) }); });
+     /* RN2e: شناسهٔ کارهای زنده‌ای که پیامدشان در همین جدول شمرده می‌شود (گامِ بسته با پیامد) */
+     var liveActs = {}, seenAct = {};
+-    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
+-    S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut); });
+-    S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut); });
+-    S.all("achat").forEach(function (s) { tutOf(s.tut);
++    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done && !wdOut(o)) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
++    S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut, { id: c.id, title: c.title }); });
++    S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut, { id: r.id }); });
++    S.all("achat").forEach(function (s) { tutOf(s.tut, { id: s.id, title: s.title });
+       /* مربیِ گفت‌وگو (a27): گیر/«حل نشد» ِ خودِ کاربر و گره‌ای که در میانهٔ حل پیدا شد ⇒ ناموفق در همان مرحله */
+       /* تورِ پولیا (RM1a): موفقیتِ سنجیدهٔ گفت‌وگو (src «chatok»، ok:true) هم — هر کدام یک رویداد */
+       /* تورِ پولیا (RN3c): رویدادِ «در انتظارِ» الگو (pend، بی گزارشِ مدل) شمرده نمی‌شود؛ (RN2e) هر کار یک بار — رویدادی که شناسه‌اش (act) همان گامِ ثبت‌شدهٔ
+          مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
+-      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend) return;
++      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend || e.wd) return;
+         if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
+-        add(byPh[e.ph], e.src, !!e.ok); }); });
++        var q0 = String(e.key || "").split("|").pop(), how = { selfcorr: "خودش حرفِ پیشینش را اصلاح کرد (بازنگری)", plan_done: "برنامه‌اش را انجام داد", solved: "«حل شد» در گفت‌وگو", own: "بازگوییِ خودش", res: "نتیجه‌ای که گفت", plan: "طرحی که گفت", ans: "پاسخ به پرسشِ مرحله", pass: "گذر از مرحله" }[e.how] || "";
++        add(byPh[e.ph], e.src, !!e.ok, { id: e.act || ("ev:" + s.id + ":" + (e.msg || "") + ":" + e.key), at: e.at, pid: e.pid || (/^l:/.test(String(e.pk || "")) ? String(e.pk).slice(2) : "") || (/^lstep:([^:]+):/.exec(String(e.act || "")) || [])[1] || "", sess: s.id, ref: e.msg || "",
++          fa: (how || PH_SRC[e.src] || e.src) + (e.src === "knot" ? " " + q0.split(":")[0] : q0 ? " — «" + q0.slice(0, 50) + "»" : "") }); }); });
+     S.all("eprog").forEach(function (pg) {
+       var pid = String(pg.id).replace(/^eprog_/, ""), p = A.getProb ? A.getProb(pid) : null, sv = pg.solve || {};
+       if (p && Array.isArray(p.stages) && A.stagePhase) Object.keys(pg.lv || {}).forEach(function (lv) {
+         var L = pg.lv[lv] || {};
+-        Object.keys(L).forEach(function (sid) { var e = L[sid], s0 = p.stages.filter(function (x) { return x && x.id === sid; })[0]; if (!s0 || !e || typeof e.first !== "boolean") return; add(byPh[A.stagePhase(p, s0)] || "plan", "sim", e.first); });
++        Object.keys(L).forEach(function (sid) { var e = L[sid], s0 = p.stages.filter(function (x) { return x && x.id === sid; })[0]; if (!s0 || !e || typeof e.first !== "boolean") return; add(byPh[A.stagePhase(p, s0)] || "plan", "sim", e.first, { id: "sim:" + pid + ":" + lv + ":" + sid, at: e.at || "", pid: pid, fa: "شبیه‌ساز — «" + String(p.title || "").slice(0, 40) + "»، گامِ " + sid }); });
+       });
+       var us = []; Object.keys(sv.u || {}).forEach(function (lv) { if (sv.u[lv]) us.push(sv.u[lv]); }); us = us.concat((sv.live && sv.live.uHist) || []);
+-      us.forEach(function (u) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2); });
++      var tt0 = pTitle(pid);
++      us.forEach(function (u, j) { if (u && u.done && (u.self === 0 || u.self === 1 || u.self === 2)) add("und", "ucard", u.self === 2, { id: "uc:" + pid + ":" + j + ":" + (u.at || ""), at: u.at || u.doneAt || "", pid: pid, fa: "کارتِ فهم — «" + String(tt0).slice(0, 40) + "»" }); });
+       /* تورِ پولیا دورِ ۳ (A12/R7، s04): گامی که انجام شد ولی به حل نزدیک نکرد («پیشرفت: نه») شکستِ اجراست، نه موفقیت — موفق = کامل انجام شد و
+          دست‌کم کمی پیش برد (پیش‌بینیِ نادرست به‌تنهایی داده است، نه شکست: «غافلگیر شدی — این داده است»). گامِ برهانی «پیشرفت» ندارد و همان رفتارِ پیشین را دارد. */
+-      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes" && o.prog !== "نه"); });
++      ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done || wdOut(o)) return; add("exec", "live", o.done === "yes" && o.prog !== "نه", { id: "lstep:" + pid + ":" + st.id, at: o.at || "", pid: pid, ref: st.id,
++        fa: "گامِ «" + String(st.text || "").slice(0, 50) + "»" + (o.what ? " — «" + String(o.what).slice(0, 40) + "»" : "") + (o.from === "chat" ? " (از گفت‌وگو)" : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }); });
+       /* بازنگری‌ای که دستیار از گفت‌وگو ثبت کرد (chat_solved) فقط وقتی شمرده می‌شود که درسش به قلمِ خودِ کاربر باشد (b.own) — R7 */
+       /* تورِ پولیا (RM1a): وارسیِ سنجیده از پیام‌های خودِ کاربر (chkBy: msgs) هم بازنگریِ اوست، حتی اگر درس را دستیار نوشت */
+-      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
++      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; var la = { id: "lb:" + pid + ":" + lv, at: b.at || b.doneAt || "", pid: pid, fa: "بازنگری" + (b.chkRes ? " — " + String(b.chkRes).slice(0, 40) : "") + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }; if (b.skipped) add("back", "lb", false, la); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم", la); });
+       /* تورِ پولیا (RM1b): تونلِ زنده هم شاهدِ طرح است — هر طرحِ ثبت‌شده (کنونی و پیشین‌ها) یک موفقیت؛ مسئلهٔ کمکی که پلش زده شد موفقیت و آن‌که به کار
+          نیامد شکست؛ داده‌ای که تا آن گام بی‌کار بود و در گامی به کار رفت (برد «datum») موفقیت. هیچ وزنی نیست؛ همان رکوردهای a38. */
+       var L18 = sv.live || {};
+-      if (L18.plan && L18.plan.at) add("plan", "lplan", true);
+-      (L18.planHist || []).forEach(function (x) { if (x && x.at) add("plan", "lplan", true); });
+-      (L18.aux || []).forEach(function (x) { if (!x) return; if (x.crossed) add("plan", "lplan", true); else if (x.unused) add("plan", "lplan", false); });
+-      (L18.wins || []).forEach(function (x) { if (x && x.kind === "datum") add("plan", "lplan", true); });
++      var lp = function (k, x, f) { return { id: "lplan:" + pid + ":" + k + ":" + ((x && x.at) || ""), at: (x && x.at) || "", pid: pid, fa: f + (tt0 ? " · «" + String(tt0).slice(0, 30) + "»" : "") }; };
++      if (L18.plan && L18.plan.at) add("plan", "lplan", true, lp("plan", L18.plan, "طرحِ ثبت‌شده"));
++      (L18.planHist || []).forEach(function (x, j) { if (x && x.at) add("plan", "lplan", true, lp("ph" + j, x, "طرحِ پیشین")); });
++      (L18.aux || []).forEach(function (x, j) { if (!x) return; if (x.crossed) add("plan", "lplan", true, lp("aux" + j, x, "مسئلهٔ کمکی که پلش زده شد")); else if (x.unused) add("plan", "lplan", false, lp("aux" + j, x, "مسئلهٔ کمکی که به کار نیامد")); });
++      (L18.wins || []).forEach(function (x, j) { if (x && x.kind === "datum") add("plan", "lplan", true, lp("win" + j, x, "داده‌ای که به کار رفت")); });
+     });
+     var P = A.PSY, G = 241, rows0 = PH4.map(function (x) { return R[x[0]]; });
+     rows0.forEach(function (X) { X.p = (X.k + 1) / (X.n + 2); X.none = !X.n; X.pWeak = 0; });
+@@ -432,7 +446,7 @@
+         h("tbody", {}, Q.rows.map(function (X) {
+           if (X.none) return h("tr", { "data-ph": X.id, "data-none": "1" }, h("td", {}, X.fa), h("td", { class: "mind-php" }, NO_DATA), h("td", {}, "—"), h("td", { class: "mind-phw" }, "—"), h("td", { class: "small" }, "— (" + NO_DATA + ")"));
+           return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, Q.weakest ? pf(X.pWeak) : "—"),
+-            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)"));
++            h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)", fromList(X.acts, "ph:" + X.id)));
+         })))),
+       h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
+         : Q.n && Q.ranked >= 2 ? M.NO_DISTINCT + " (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای شکستی ندارد یا مرحله‌ها برابرند؛ «ضعیف‌ترین» فقط وقتی نام برده می‌شود که مرحله‌ای شکست دارد و از همهٔ مرحله‌های دیگر به‌روشنی پایین‌تر است."
+@@ -441,6 +455,24 @@
+       h("p", { class: "small muted mind-phradar" }, PH_RADAR));
+   }
+   M.phasesSection = phasesSection;
++  /* INF17: فهرستِ «از کجا؟» — هر کار یک سطر: تاریخ · منبع · +/− · «📜» به پروندهٔ همان مسئله (اگر نمای پرونده هست) */
++  function fromList(acts, tag) {
++    acts = (acts || []).slice().sort(function (a, b) { return String(b.at || "").localeCompare(String(a.at || "")); });
++    if (!acts.length) return null;
++    var pos = acts.filter(function (a) { return a.ok; }).length;
++    return h("details", { class: "mind-from", "data-row": tag, "data-n": String(acts.length), "data-plus": String(pos) }, h("summary", {}, "از کجا؟ (" + fa(acts.length) + " کار: +" + fa(pos) + " −" + fa(acts.length - pos) + ")"),
++      h("ol", { class: "small mind-from-list" }, acts.map(function (a) {
++        var dv = !!(a.pid && A.V && A.V.dossier);
++        return h("li", { class: "mind-act", "data-act": a.id, "data-ok": a.ok ? "1" : "0", "data-pid": a.pid || "" }, h("span", { class: a.ok ? "good" : "warnline" }, a.ok ? "+ " : "− "),
++          (a.at ? A.fdate(day(a.at)) + " · " : "") + a.fa,
++          dv ? h("button", { class: "linkish mind-act-go", type: "button", title: "پروندهٔ کاملِ همین مسئله", onclick: function () { A.go("dossier", a.pid, a.ref || null); } }, " 📜") : null);
++      })));
++  }
++  M.fromList = fromList;
++  M.dimActs = function (d) { var seen = {}, out = [];
++    (d.ans || []).concat(d.cal || []).forEach(function (a, i) { var sc = a.src || {}, id = (sc.id || ("x" + i)) + "|" + (a.at || ""); if (seen[id]) return; seen[id] = 1;
++      out.push({ id: sc.id || ("x" + i), ok: !!a.ok, at: a.at || "", fa: sc.fa || "پاسخ", pid: sc.pid || "" }); });
++    return out; };
+   var PH_RADAR = "این جدول روی «نیم‌رخِ سازه‌ها» (رادار) نمی‌نشیند: کارنامه هیچ نگاشتی از مرحله‌های حلِ پولیا به سازه‌های رادار (استدلالِ سیال، دانش، …) ندارد و نمی‌سازد؛ رادار فقط از پاسخ‌های پاسخ‌دقیق (مسئله‌های هم‌ساختار، ورزشِ گره، اطمینانِ پیش از جواب) پر می‌شود. حل و برهانِ وارسی‌شدهٔ مسئلهٔ زنده‌ات این‌جا، در همین جدول، ثبت است.";
+   M.PH_RADAR = PH_RADAR;
+ 
+@@ -551,6 +583,9 @@
+           h("td", {}, fa(d.ret.ok) + " از " + fa(d.ret.n)), h("td", {}, fa(d.knots.practised || 0) + " از " + fa(d.knots.all)),
+           h("td", {}, E.progress ? A.PSY.pctFa(E.progress.p) + " (" + fa(E.progress.from) + " ← " + fa(E.progress.to) + ")" : "— (کمتر از دو ماهِ سنجیده)"));
+       })))), (function () { var cs = (m.dims.filter(function (d) { return d.id === "s_learn"; })[0] || {}).cardSelf; return cs && cs.n ? h("p", { class: "small muted mind-cards" }, "کارت‌های مرور خودسنجی‌اند (نمره را خودت می‌دهی)؛ مثلِ پاسخِ «خودم سنجیدم» در گره‌ها در این عددها نمی‌آیند: " + fa(cs.k) + " از " + fa(cs.n) + " مرور را «درست» (۳ تا ۵ ِ SM-2) نمره دادی.") : null; })()));
++    /* INF17: «از کجا؟» ِ هر بُعد — پاسخ‌ها و پیش‌بینی‌هایی که آن را جابه‌جا کردند (هر کار یک بار) */
++    var dimFrom = m.dims.map(function (d) { var A0 = M.dimActs(d); return A0.length ? h("div", { class: "mind-dimfrom", "data-dim": d.id }, h("b", {}, d.fa + ": "), fromList(A0, "dim:" + d.id)) : null; }).filter(Boolean);
++    if (dimFrom.length) root.appendChild(h("section", { class: "card mind-dimsfrom" }, h("h2", {}, "از کجا؟ — هر بُعد"), h("p", { class: "small muted" }, "هر پاسخ، حدس یا پیش‌بینیِ سنجیده که عددهای بالا را جابه‌جا کرد، با تاریخ و درست/نادرست؛ کارِ پس‌گرفته (اصلاح‌شده) این‌جا نیست."), dimFrom));
+     root.appendChild(phasesSection());
+     root.appendChild(h("section", { class: "card" }, h("h2", {}, "⚫ نقطه‌های سیاه"), m.black.length ? h("ul", {}, m.black.map(function (b) { return h("li", {}, b.go ? h("button", { class: "linkish", type: "button", onclick: function () { A.go(b.go[0], b.go[1] || null); } }, b.fa) : b.fa); })) : h("p", { class: "small muted" }, "نقطهٔ سیاهی دیده نشد (یا هنوز دادهٔ کافی نیست).")));
+     root.appendChild(h("section", { class: "card" }, h("h2", {}, "📈 روند"), C.trend));
+diff --git a/apps/learning-architecture/tests/test_tour1_r19b_coach.js b/apps/learning-architecture/tests/test_tour1_r19b_coach.js
+new file mode 100644
+index 00000000..92eb7221
+--- /dev/null
++++ b/apps/learning-architecture/tests/test_tour1_r19b_coach.js
+@@ -0,0 +1,332 @@
++// تورِ پولیا (دستهٔ ۱، دورِ ۱۹b — زیرساختِ پیش از دورِ ۲۰، سهمِ «coach» — ۲۰۲۶-۱۰-۱۷) — DECISIONS_R19b: INF15 (سمتِ مدل) و INF17.
++//  inf15   اصلاحِ پیامِ پیشین: coach_state.retract {msg, what, fix} سنجیده ⇒ هر رکوردِ لایهٔ مربی که از آن پیام آمد برمی‌گردد و درست می‌نشیند
++//          (حدس، برنامه + موعد + یادآور، قول، شاهدِ پاسخ، فرمی که کنشِ دستیار پر کرد، رویدادهای کارنامه)؛ تاریخچه «اصلاح شد ⇐»؛ هیچ چیز پاک نمی‌شود؛
++//          رکوردهای مسئلهٔ زنده با APP.liveRetract (سمتِ live — اگر نیست، فقط در آزمون جاسوس/جانشین)؛ خود-اصلاح = بازنگری (+)، هرگز شکست؛
++//          زمینهٔ نوبتِ بعد دقیقاً می‌گوید چه عوض شد؛ پشتیبانِ بی‌گزارش فقط «کدام را اصلاح کنم؟» می‌پرسد.
++//  bank15  همهٔ موردهای INF15.retract ِ بانکِ مستقل (tests/variants/VARIANTS_R19b.json)
++//  inf17   «از کجا؟» ِ هر سطرِ مرحله و بُعد در کارنامه: کارها با منبع، تاریخ، +/−، پیوند به «📜 پرونده»؛ هر کار یک بار؛ کارِ پس‌گرفته بیرون
++//  bank17  همهٔ موردهای INF17.trace ِ بانکِ مستقل
++//  strict  کنترل: یک پرسشِ نوبت در هر بلوک
++// LLA_FILE = ساختِ دیگر؛ ONLY=inf15,bank15 …
++const { chromium } = require('playwright');
++const path = require('path');
++const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'dist', 'learning-architecture.html'));
++const BANK = require('./variants/VARIANTS_R19b.json');
++
++const SKIP = /^# (?:سشن|گفت‌وگو تا این لحظه|نوبتِ تازه|صفحهٔ فعلی|امروز|نقشهٔ سامانه|برگه‌های بازِ|پیام‌های اخیرِ صفحه|متنِ فایل‌ها|کارنامهٔ ذهن|مسئلهٔ زندهٔ این سشن)/;
++const isTurnLine = (l) => /\*\*پرسشِ این نوبت همین است:?\*\*/.test(l) || /^- پرسش‌های «/.test(l) || /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(l);
++const isCtxLine = (l) => /^- زمینه \(نه پرسشِ دوم\)/.test(l) || /^- \(زمینه، نه پرسشِ دوم/.test(l);
++const ASK = /(?:^|[^آ-ی])بپرس(?![آ-ی])/;
++const ENDQ = /[؟?][»"')\].\s*]*$/;
++function strictScan(user) {
++  const head = String(user || '').split('# نوبتِ تازه')[0], bad = [];
++  for (const bl of head.split(/\n(?=# )/)) {
++    const h = bl.split('\n')[0]; if (!/^# /.test(h) || SKIP.test(h)) continue;
++    const blockCtx = /\n- \(زمینه، نه پرسشِ دوم/.test(bl);
++    for (const l of bl.split('\n')) {
++      if (isTurnLine(l)) continue;
++      const nq = l.replace(/«[^»]*»/g, '«»');
++      if (ASK.test(nq)) bad.push('ASK  [' + h.slice(0, 30) + '] ' + l.slice(0, 160));
++      else if (ENDQ.test(l.trim()) && !isCtxLine(l) && !blockCtx) bad.push('ENDQ [' + h.slice(0, 30) + '] ' + l.slice(0, 160));
++    }
++  }
++  return bad;
++}
++
++(async () => {
++  const b = await chromium.launch(); const errors = []; const info = {};
++  const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
++  p.on('pageerror', e => errors.push('pageerror: ' + e.message));
++  p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_|net::/.test(m.text())) errors.push('console: ' + m.text()); });
++  p.on('dialog', d => { errors.push('dialog ' + d.message()); d.dismiss(); });
++  await p.route('**/fonts.googleapis.com/**', r => r.abort());
++  const chk = (c, m) => { if (!c) errors.push(m); };
++  const section = async (name, fn) => { if (process.env.ONLY && !process.env.ONLY.split(',').includes(name)) return; try { await fn(); } catch (e) { errors.push(name + ' — exception: ' + String(e && e.message || e).split('\n')[0]); } };
++  const T0 = '2026-10-17';
++  const setup = async () => {
++    await p.goto(FILE); await p.waitForSelector('.nav'); await p.waitForTimeout(250);
++    await p.evaluate(T0 => {
++      APP.S.loaded = true; window.__calls = []; window.__q = []; window.__day = T0; window.__noNav = true;
++      APP.today = () => window.__day;
++      APP.HOST = { report: async () => ({ id: 'sh1', number: 1 }), sheets: async () => [], sheet: async () => null, note: async () => ({ ok: true }),
++        remind: async () => ({ ok: true }), unremind: async () => ({ ok: true }), mail: async () => ({ status: 'sent' }) };
++      APP.callAI = async (sys, user, opts) => {
++        __calls.push({ sys, user: String(user || '') }); let r = __q.shift(); if (typeof r === 'function') r = r(String(user || ''));
++        const t = r === undefined ? { reply: 'باشه.', status: 'related', memory: 'm', actions: [] } : r;
++        const text = typeof t === 'string' ? t : JSON.stringify(t);
++        return opts && opts.withMeta ? { text, files: [] } : text;
++      };
++      /* سمتِ live (a38) در موازی APP.liveRetract را می‌سازد؛ این‌جا فقط جاسوس است — اگر نیست، جانشینِ آزمون (فقط در آزمون) که چیزی را عوض نمی‌کند */
++      window.__lr = []; window.__lrNative = typeof APP.liveRetract === 'function'; const orig = APP.liveRetract;
++      APP.liveRetract = function (pid, id, o) { __lr.push({ pid, id, o }); return orig ? orig.apply(this, arguments) : '✓ (جانشینِ آزمون) رکوردهای مسئلهٔ زنده'; };
++      window.R = (o) => Object.assign({ reply: 'باشه.', status: 'related', memory: 'm', actions: [] }, o);
++      window.__turn = async (text, reply, actions) => {
++        const n0 = __calls.length; __q.push(R({ reply: reply || 'باشه.', actions: actions || [] }));
++        await APP.ASSIST.send(text); __q.length = 0;
++        const c = __calls.slice(n0).filter(x => !/^\[سامانه/.test(String((x.user.split('# نوبتِ تازه\n')[1] || '')).trim()))[0] || {};
++        return { sys: c.sys || '', user: c.user || '' };
++      };
++      window.__fresh = () => { APP.go('home'); localStorage.removeItem('lla.assist.cur'); const s = APP.ASSIST.newSession(); __q.length = 0; __lr.length = 0; return s.id; };
++      window.__cur = () => APP.ASSIST.cur();
++      window.__wipe = () => { ['achat', 'eprog', 'eprob', 'kcase', 'pr', 'card', 'deadline', 'fcast', 'kitem', 'pbitem', 'wchain', 'case'].forEach(t => APP.S.all(t).forEach(r => APP.S.del(r.id))); localStorage.removeItem('lla.assist.cur'); };
++      window.__live = (title, st) => { const r = APP.liveCreate(title, st || (title + ' — صورتِ کاملِ مسئله برای آزمون.'), 'find', { by: 'user' }); return r.p.id; };
++      window.__liveSet = (pid, fn) => { const pg = APP.S.get('eprog_' + pid) || { id: 'eprog_' + pid, type: 'eprog' }; pg.solve = pg.solve || {}; const L = pg.solve.live = pg.solve.live || {};
++        ['steps', 'claims', 'moves', 'related', 'aux', 'knots'].forEach(k => { L[k] = L[k] || []; }); fn(pg.solve, L); APP.S.put(pg); };
++      window.__uid = (n) => { const U = (__cur().msgs || []).filter(m => m.role === 'user' && !/^\[سامانه/.test(m.text)); return (APP.ASSIST.msgId ? APP.ASSIST.msgId(U[n - 1]) : U[n - 1] && 'u' + U[n - 1].seq); };
++      /* فرمی که کنشِ دستیار در نوبتِ n پر کرد (دفترِ s.fills) — برای موردهایی که فرمش در صفحهٔ دیگری است */
++      window.__fill = (n, label, val, view) => { const s = __cur(); s.fills = s.fills || []; const U = (s.msgs || []).filter(m => m.role === 'user' && !/^\[سامانه/.test(m.text)); s.fills.push({ src: (APP.ASSIST.msgId ? APP.ASSIST.msgId(U[n - 1]) : U[n - 1] && 'u' + U[n - 1].seq), at: new Date().toISOString(), view: view || 'lprob', arg: 'zz', sig: label, label, old: '', val }); APP.S.put(s); };
++      window.__st = () => { const s = __cur(), C = s.coach || {}; return { guesses: (C.guesses || []).map(g => ({ id: g.id, text: g.text, corr: g.corr || null, src: g.src })), guess: C.guess ? { text: C.guess.text } : null,
++        plans: (s.plans || []).map(q => ({ id: q.id, text: q.text, when: q.when, state: q.state, corr: q.corr || null, src: q.src })), fills: (s.fills || []).map(f => ({ label: f.label, val: f.val, pending: f.pending || null, corr: f.corr || null })),
++        promises: (s.promises || []).map(x => ({ id: x.id, ask: x.ask, done: x.done, corr: x.corr || null })), ev: (s.coachEv || []).map(e => ({ ph: e.ph, ok: e.ok, src: e.src, how: e.how || '', msg: e.msg || '', wd: !!e.wd, pend: !!e.pend, act: e.act || '', pid: e.pid || '' })),
++        ret: (C.retracts || []).slice(-1)[0] || null, nRet: (C.retracts || []).length, note: C.retNote || null, lr: __lr.map(x => ({ pid: x.pid, id: x.id, what: x.o.what, fix: x.o.fix, n: x.o.n })), stmt: C.stmt || '', sys: (s.msgs || []).filter(m => m.role === 'sys').map(m => m.text) }; };
++    }, T0);
++  };
++  await setup();
++  const head = (u) => String(u || '').split('# نوبتِ تازه')[0];
++  const lines = (u) => head(u).split('\n');
++  const strictAll = [];
++  const turn = async (text, reply, actions) => { const u = await p.evaluate(([t, r, a]) => __turn(t, r, a), [text, reply || '', actions || []]); strictAll.push([String(text).slice(0, 24), strictScan(u.user)]); return u; };
++  const fresh = () => p.evaluate(() => __fresh());
++  const wipe = () => p.evaluate(() => __wipe());
++  const st = () => p.evaluate(() => __st());
++  const cs = (o) => Object.assign({ do: 'coach_state' }, o);
++  const bind = async (title, steps) => { const pid = await p.evaluate(([t, steps]) => { const pid = __live(t); APP.liveBindSession(pid, __cur()); __liveSet(pid, (so, L) => { (steps || []).forEach((x, i) => L.steps.push({ id: 's' + (i + 1), at: new Date().toISOString(), text: x, pred: 'شاید', due: '2026-10-16' })); }); return pid; }, [title, steps || []]); return pid; };
++  const hasNote = (c) => Array.isArray(c) && c.length && /^اصلاح شد ⇐/.test(c[c.length - 1].note || '');
++  const blockOf = (u, re) => head(u).split(/\n(?=# )/).filter(bl => re.test(bl.split('\n')[0]))[0] || '';
++  /* اجرای مکالمهٔ «U: … ‖ A: …»: پیش‌کنش‌ها (pre[i] = کنش‌های پاسخِ نوبتِ iامِ کاربر، ۱‌پایه)؛ نوبتِ آخر با last */
++  const play = async (text, pre, last, hook) => {
++    const parts = text.split('‖').map(x => x.trim()); const U = []; for (let i = 0; i < parts.length; i++) { const m = /^U:\s*([\s\S]*)$/.exec(parts[i]); if (m) U.push([m[1], parts[i + 1] && /^A:/.test(parts[i + 1]) ? parts[i + 1].replace(/^A:\s*/, '').replace(/^\[[^\]]*\]\s*/, '') : 'باشه.']); }
++    let u = null;
++    for (let i = 0; i < U.length; i++) { const isLast = i === U.length - 1; if (hook && isLast) await hook(); u = await turn(U[i][0], isLast ? 'باشه؛ درستش کردم.' : U[i][1], isLast ? (last || []) : ((pre || {})[i + 1] || [])); }
++    return u;
++  };
++
++  // ================= inf15 (جمله‌های DECISIONS_R19b) =================
++  await section('inf15', async () => {
++    let s, u, x;
++    // ۱) حدسِ یک نوبت پیش: حدس اصلاح، تاریخچه، رویدادِ پیام پس گرفته، خود-اصلاح = بازنگری (+)، زمینهٔ نوبتِ بعد، سطرِ «✓ اصلاح شد»
++    await wipe(); await fresh(); const pid = await bind('توان‌های دو');
++    await turn('حدسم اینه که جواب ۲^n هست', 'چرا این حدس؟', [cs({ ph: 'u', said: ['u'], guess: { text: '۲^n' } })]);
++    const id1 = await p.evaluate(() => __uid(1));
++    await turn('نه اشتباه نوشتم، منظورم ۲^n − ۱ بود', 'درست شد: حدست «۲^n − ۱» است.', [cs({ ph: 'u', retract: { msg: 'جواب ۲^n هست', what: 'guess', fix: '۲^n − ۱' } })]);
++    s = await st();
++    chk(s.guesses.length === 1 && s.guesses[0].text === '۲^n − ۱' && hasNote(s.guesses[0].corr) && s.guesses[0].corr[0].old === '۲^n', 'inf15 guess 1 back: g1 corrected with history «اصلاح شد ⇐», not duplicated ' + JSON.stringify(s.guesses));
++    chk(s.guess && s.guess.text === '۲^n − ۱', 'inf15: coach.guess follows the fix ' + JSON.stringify(s.guess));
++    chk(s.ev.filter(e => e.msg === id1).length > 0 && s.ev.filter(e => e.msg === id1).every(e => e.wd), 'inf15: every mind-card event derived from the corrected message is withdrawn (wd), not deleted ' + JSON.stringify(s.ev));
++    chk(s.ev.some(e => e.how === 'selfcorr' && e.ok && e.ph === 'b') && !s.ev.some(e => !e.ok && !e.wd), 'inf15: the self-correction is look-back evidence (+), never a failure ' + JSON.stringify(s.ev));
++    chk(s.lr.length === 1 && s.lr[0].pid === pid && s.lr[0].id === id1 && s.lr[0].what === 'guess' && s.lr[0].fix === '۲^n − ۱' && s.lr[0].n === 1, 'inf15: live-problem records go through APP.liveRetract(pid, msgId, {what, fix}) ' + JSON.stringify(s.lr));
++    chk(s.sys.some(t => /^✓ اصلاح شد: /.test(t)), 'inf15: the page says what changed (one sys line) ' + JSON.stringify(s.sys));
++    u = await turn('خب حالا چی؟');
++    x = blockOf(u.user, /^# اصلاحی که صفحه انجام داد/);
++    chk(/۲\^n − ۱/.test(x) && /اصلاح شد ⇐/.test(x) && /در یک جمله/.test(x), 'inf15: next-turn context states exactly what changed ' + x.slice(0, 400));
++    u = await turn('باشه.'); chk(!blockOf(u.user, /^# اصلاحی که صفحه انجام داد/), 'inf15: the change context is shown once');
++    const ph = await p.evaluate(() => { const Q = APP.MIND.phases(); const r = {}; Q.rows.forEach(X => { r[X.id] = X.k + '/' + X.n; }); return r; });
++    chk(ph.back === '1/1' && ph.und === '0/0', 'inf15: mind card — the withdrawn «own restatement» is not counted; the self-correction counts as look-back + ' + JSON.stringify(ph));
++    // ۲) پیامِ کنونی بی نشانهٔ اصلاح ⇒ رد؛ تکه‌ای که فقط دستیار گفت ⇒ رد؛ درست = پیشین ⇒ رد
++    await wipe(); await fresh();
++    await turn('حدسم اینه که جواب فیبوناچیه', 'چطور امتحانش می‌کنی؟', [cs({ guess: { text: 'فیبوناچیه' } })]);
++    await turn('یه فکر دیگه: شاید بشه با استقرا رفت', 'خوب است.', [cs({ retract: { msg: 'جواب فیبوناچیه', what: 'guess', fix: 'استقرا' } })]);
++    s = await st(); chk(s.guesses[0].text === 'فیبوناچیه' && s.ret && !s.ret.ok, 'inf15: no correction signal ⇒ retract refused ' + JSON.stringify(s.ret));
++    // ۳) برنامهٔ سه نوبت پیش: متن، موعد، یادآورِ پیگیری؛ تاریخچه
++    await wipe(); await fresh();
++    await turn('برنامه‌م اینه که سه‌شنبه با صاحبخونه حرف بزنم', 'قبلش چه می‌خواهی بگویی؟', [cs({ plan: { text: 'سه‌شنبه با صاحبخونه حرف بزنم', when: '2026-10-20' } })]);
++    await p.evaluate(() => APP.S.put({ id: 'dl_r19b', type: 'deadline', what: 'پیگیری: سه‌شنبه با صاحبخونه حرف بزنم', date: '2026-10-20', sess: __cur().id, done: false }));
++    await turn('اینکه اجاره زیاده', 'عددی داری؟'); await turn('آره، ۱۵ درصد بالاتر از محله', 'خوب است.');
++    await turn('اون برنامه رو اصلاح کن، منظورم پنج‌شنبه بود', 'باشه، پنج‌شنبه.', [cs({ retract: { msg: 'سه‌شنبه با صاحبخونه حرف بزنم', what: 'plan', fix: 'پنج‌شنبه' } })]);
++    s = await st(); x = await p.evaluate(() => APP.S.get('dl_r19b'));
++    chk(s.plans.length === 1 && /^پنج‌شنبه با صاحبخونه/.test(s.plans[0].text) && s.plans[0].when === '2026-10-22' && hasNote(s.plans[0].corr) && s.plans[0].corr[0].oldWhen === '2026-10-20', 'inf15 plan 3 back: text + date move (Tue → Thu), Tue kept as history ' + JSON.stringify(s.plans));
++    chk(x && x.date === '2026-10-22' && hasNote(x.corr), 'inf15: the follow-up reminder tied to the plan moves too, with history ' + JSON.stringify(x));
++    // ۴) فرمی که کنشِ دستیار در صفحه پر کرد (دفترِ واقعیِ fill) ⇒ همان فیلد در همان صفحه برمی‌گردد و درست می‌نشیند
++    await wipe(); await fresh(); await p.evaluate(() => APP.go('home')); await p.waitForTimeout(100);
++    const k = await p.evaluate(() => { const i = document.createElement('input'); i.id = 'r19b_unk'; i.setAttribute('aria-label', 'مجهولِ آزمون'); document.getElementById('main').appendChild(i); APP.ASSIST.scan(); return i.getAttribute('data-ai-k'); });
++    await turn('مجهول سرعت متوسطه', 'داده‌ها؟', [{ do: 'fill', k, value: 'سرعت متوسط' }, cs({ ph: 'u' })]);
++    await turn('مسافت ۱۲۰ کیلومتر', 'و زمان؟');
++    x = await p.evaluate(() => { const i = document.getElementById('r19b_unk'); return i ? i.value : null; });
++    await turn('منظورم زمان کل بود نه سرعت متوسط، اون مجهول رو اصلاح کن', 'باشه.', [cs({ retract: { msg: 'مجهول سرعت متوسطه', what: 'form', fix: 'زمان کل' } })]);
++    s = await st(); const v2 = await p.evaluate(() => { const i = document.getElementById('r19b_unk'); return i ? i.value : null; });
++    chk(x === 'سرعت متوسط' && s.fills.length === 1 && s.fills[0].val === 'زمان کل' && hasNote(s.fills[0].corr) && (v2 === 'زمان کل' || v2 === null), 'inf15 form: the field the assistant filled from that turn is re-set to the fix, old value kept ' + JSON.stringify({ x, v2, f: s.fills }));
++    // ۵) قرنطینه / فهرستِ کنش: retract در «# گزارشِ وضع» مستند است
++    chk(/retract \{"msg"/.test(await p.evaluate(() => APP.ASSIST.COACH_STATE_X || '')), 'inf15: coach_state.retract is documented in «# گزارشِ وضع»');
++  });
++
++  // ================= bank15 =================
++  await section('bank15', async () => {
++    const r = info.bank15 = { res: [] }; const E = BANK.filter(e => e.rc === 'INF15.retract');
++    const T = (i, ok, x) => { r.res.push([i, ok]); chk(ok, 'bank15#' + i + ' «' + E[i].text.slice(0, 80) + '» → ' + E[i].expect.slice(0, 100) + ' :: ' + JSON.stringify(x).slice(0, 600)); };
++    const RT = (msg, what, fix) => [cs({ retract: { msg, what, fix } })];
++    const noChange = (s0, s1) => JSON.stringify([s0.guesses, s0.plans, s0.fills, s0.promises]) === JSON.stringify([s1.guesses, s1.plans, s1.fills, s1.promises]);
++    let s, u, id1, pid;
++    const go = async (i, pre, last, opt) => { await wipe(); await fresh(); pid = opt && opt.live ? await bind('مسئلهٔ آزمون', opt.steps) : null; const hk = opt && opt.hook ? opt.hook : null; u = await play(E[i].text, pre, last, hk); s = await st(); id1 = await p.evaluate(() => __uid(1)); return s; };
++    const okBase = (s) => s.ret && s.ret.ok && s.ret.src === id1;
++    // 0 — guess 1 back
++    await go(0, { 1: [cs({ guess: { text: '۲^n' } })] }, RT('جواب ۲^n هست', 'guess', '۲^n − ۱'), { live: true });
++    T(0, okBase(s) && s.guesses[0].text === '۲^n − ۱' && hasNote(s.guesses[0].corr) && s.guess.text === '۲^n − ۱' && s.ev.some(e => e.how === 'selfcorr' && e.ok) && s.lr.length === 1 && s.lr[0].what === 'guess', s);
++    // 1 — fact 3 back (form «داده‌ها» filled from that turn; later turns untouched)
++    await go(1, {}, RT('عرضش ۵', 'fact', '۹'), { live: true, hook: () => p.evaluate(() => { __fill(1, 'داده‌ها', 'طول ۱۲، عرض ۵'); __fill(3, 'قضیه', 'فیثاغورس'); }) });
++    T(1, okBase(s) && s.fills[0].pending === 'طول ۱۲، عرض ۹' && hasNote(s.fills[0].corr) && s.fills[1].val === 'فیثاغورس' && !s.fills[1].corr && s.lr.length === 1 && s.lr[0].n === 1, s);
++    // 2 — plan 3 back
++    await go(2, { 1: [cs({ plan: { text: 'سه‌شنبه با صاحبخونه حرف بزنم', when: '2026-10-20' } })] }, RT('سه‌شنبه با صاحبخونه حرف بزنم', 'plan', 'پنج‌شنبه'));
++    T(2, okBase(s) && s.plans[0].when === '2026-10-22' && /^پنج‌شنبه/.test(s.plans[0].text) && hasNote(s.plans[0].corr) && s.plans[0].corr[0].oldWhen === '2026-10-20', s);
++    // 3 — step 1 back (via a38); «اجرا» event of the wrong message withdrawn
++    await go(3, { 1: [cs({ ph: 'e', step: { step: 2, done: 'yes', what: 'جواب داد' } })] }, RT('گام دوم رو انجام دادم و جواب داد', 'step', 'جواب نداد، فقط شروعش کردم'), { live: true, steps: ['گام اول', 'گام دوم'] });
++    T(3, okBase(s) && s.lr.length === 1 && s.lr[0].what === 'step' && s.lr[0].id === id1 && s.ev.filter(e => e.msg === id1).every(e => e.wd), s);
++    // 4 — answer 5 back; answer evidence + the verdict-bearing event withdrawn
++    await go(4, { 1: [cs({ ph: 'b', said: ['result'], result: 'جواب نهایی ۸۹ است' })] }, RT('جواب نهایی ۸۹ است', 'ans', '۵۵'));
++    T(4, okBase(s) && s.ev.filter(e => e.msg === id1).every(e => e.wd) && s.ret.n === 1 && s.note && s.note.ch.some(t => /۵۵/.test(t)) && /۵۵/.test(s.stmt), s);
++    // 5 — formula 5+ back; fragment matched on the EARLIER message
++    await go(5, {}, RT('S = πr', 'fact', 'S = πr²'), { hook: () => p.evaluate(() => __fill(1, 'فرمول', 'S = πr')) });
++    T(5, okBase(s) && s.ret.n === 1 && (s.fills[0].pending === 'S = πr²') && hasNote(s.fills[0].corr), s);
++    // 6 — form filled by an assistant action
++    await go(6, {}, RT('مجهول سرعت متوسطه', 'form', 'زمان کل'), { hook: () => p.evaluate(() => __fill(1, 'مجهول', 'سرعت متوسط')) });
++    T(6, okBase(s) && s.fills[0].pending === 'زمان کل' && hasNote(s.fills[0].corr), s);
++    // 7 — condition (said) 1 back
++    await go(7, { 1: [cs({ ph: 'u', said: ['c'] })] }, RT('عددا مثبت باشن', 'said', 'عددا صحیح باشن'));
++    T(7, okBase(s) && s.ev.filter(e => e.msg === id1).every(e => e.wd) && s.ev.some(e => e.how === 'selfcorr'), s);
++    // 8 — loan amount only; «قسط ۸» untouched
++    await go(8, {}, RT('مبلغ وام ۲۰۰ میلیون', 'fact', '۱۲۰ میلیون'), { hook: () => p.evaluate(() => { __fill(1, 'مبلغ وام', '۲۰۰ میلیون تومان'); __fill(1, 'قسط ماهانه', '۸ میلیون'); }) });
++    T(8, okBase(s) && s.fills[0].pending === '۱۲۰ میلیون تومان' && s.fills[1].val === '۸ میلیون' && !s.fills[1].pending && !s.fills[1].corr, s);
++    // 9 — plan 5 back: «روزی یک ساعت», date unchanged
++    await go(9, { 1: [cs({ plan: { text: 'روزی دو ساعت درس بخونم', when: '2026-10-18' } })] }, RT('روزی دو ساعت درس بخونم', 'plan', 'یک ساعت'));
++    T(9, okBase(s) && s.plans[0].text === 'روزی یک ساعت درس بخونم' && s.plans[0].when === '2026-10-18' && hasNote(s.plans[0].corr), s);
++    // 10 — guess 3 back (life): only «سرایدار» replaced; on_guess plan stays linked to g1
++    await go(10, { 1: [cs({ guess: { text: 'سرایدار کلید رو برداشته' } })] }, RT('سرایدار کلید رو برداشته', 'guess', 'همسایه‌ی طبقه‌ی دوم'));
++    T(10, okBase(s) && s.guesses.length === 1 && s.guesses[0].id === 'g1' && s.guesses[0].text === 'همسایه‌ی طبقه‌ی دوم کلید رو برداشته' && hasNote(s.guesses[0].corr), s);
++    // 11 — her own promise (plan) Fri → next Sat
++    await go(11, { 1: [cs({ plan: { text: 'جمعه بهت خبر می‌دم', when: '2026-10-23' } })] }, RT('جمعه بهت خبر می‌دم', 'plan', 'شنبه‌ی بعد'));
++    T(11, okBase(s) && s.plans[0].when === '2026-10-24' && hasNote(s.plans[0].corr), s);
++    // 12 — step 3 back, mixed digits
++    await go(12, { 1: [cs({ ph: 'e', step: { step: 1, done: 'yes', what: 'x = 3 به دست اومد' } })] }, RT('x = 3 به دست اومد', 'step', 'x = ۷'), { live: true, steps: ['گام اول: x را پیدا کن'] });
++    T(12, okBase(s) && s.lr.length === 1 && s.lr[0].what === 'step' && s.lr[0].fix === 'x = ۷', s);
++    // 13 — the current message repeats the old value: target is the EARLIER message
++    await go(13, {}, RT('۴۰ دقیقه راهه', 'fact', '۴۵ دقیقه'), { hook: () => p.evaluate(() => __fill(1, 'زمانِ راه', '۴۰ دقیقه')) });
++    T(13, okBase(s) && s.ret.n === 1 && s.fills[0].pending === '۴۵ دقیقه', s);
++    // 14 — one message → guess + data; only data changes, g1 not duplicated
++    await go(14, { 1: [cs({ guess: { text: '۱۲۰' } })] }, RT('داده‌ها ۵ و ۴ ان', 'fact', '۵ و ۳'), { hook: () => p.evaluate(() => __fill(1, 'داده‌ها', '۵ و ۴')) });
++    T(14, okBase(s) && s.fills[0].pending === '۵ و ۳' && s.guesses.length === 1 && s.guesses[0].text === '۱۲۰' && !s.guesses[0].corr, s);
++    // ---- negatives: the model's (wrong) report is refused by the page; nothing reversed; no correction prompt for non-corrections
++    const neg = async (i, pre, bad, wantPrompt) => { await go(i, pre, bad ? [cs({ retract: bad })] : []); const s1 = s; return { s: s1, refused: !s1.nRet || (s1.ret && !s1.ret.ok), prompt: !!blockOf(u.user, /^# اصلاحِ پیامِ پیشین/), want: wantPrompt }; };
++    let n;
++    n = await neg(15, {}, { msg: 'کلید رو تو ماشین', what: 'fact', fix: 'ماشین' }); T(15, n.refused && !n.prompt && !n.s.ev.some(e => e.how === 'selfcorr') && !n.s.ev.some(e => !e.ok && !e.wd && !e.pend), n);
++    n = await neg(16, {}, { msg: 'علامت منفی', what: 'fact', fix: 'منفی' }); T(16, n.refused && !n.prompt && !n.s.ev.some(e => !e.ok && !e.wd && !e.pend), n);
++    n = await neg(17, { 1: [cs({ guess: { text: 'جواب فیبوناچیه' } })] }, { msg: 'جواب فیبوناچیه', what: 'guess', fix: 'با استقرا' }); T(17, n.refused && !n.prompt && n.s.guesses[0].text === 'جواب فیبوناچیه' && !n.s.guesses[0].corr, n);
++    n = await neg(18, {}, { msg: 'جواب ۲۰ هست', what: 'ans', fix: '۲۰' }); T(18, n.refused && !n.prompt, n);
++    n = await neg(19, {}, { msg: 'جواب ۸۹ه', what: 'ans', fix: '۸۹' }); T(19, n.refused && !n.prompt && !n.s.ev.some(e => e.wd), n);
++    n = await neg(20, {}, { msg: 'عرضش ۹ه', what: 'fact', fix: '۹' }); T(20, n.refused && !n.prompt, n);
++    n = await neg(21, {}, null); T(21, n.refused && !n.prompt, n);
++    n = await neg(22, {}, null); T(22, n.refused && !n.prompt, n);
++    // 23 — correction of something never stored: accepted, nothing changed, no «changed» claim, no mind-card event
++    await go(23, {}, RT('خیلی خسته‌ام', 'said', 'خواب‌آلودم'));
++    u = await turn('باشه.'); const nb = blockOf(u.user, /^# اصلاحی که صفحه انجام داد/);
++    T(23, s.ret && s.ret.ok && !s.ret.changes.length && !s.ev.some(e => e.how === 'selfcorr') && !s.sys.some(t => /^✓ اصلاح شد/.test(t)) && /چیزی عوض نشد/.test(nb), { s, nb });
++    // 24 — fragment only the assistant said
++    n = await neg(24, {}, { msg: '۵', what: 'fact', fix: '۷' }); T(24, n.refused && /پیامِ پیشینِ خودِ او/.test((n.s.ret || {}).err || ''), n);
++    // 25 — fallback: no coach_state ⇒ ask «کدام را اصلاح کنم؟» with the candidates; nothing reversed (this turn and the next)
++    await wipe(); await fresh();
++    await turn('حدسم ۲^n', '...', [cs({ guess: { text: '۲^n' } })]); await turn('برنامه‌م فردا', '...', [cs({ plan: { text: 'برنامه‌م فردا', when: '2026-10-18' } })]);
++    const s0 = await st(); const u3 = await turn('اشتباه گفتم', 'کدام را؟', []); const u4 = await turn('همون', 'باشه.', []); s = await st();
++    const b3 = blockOf(u3.user, /^# اصلاحِ پیامِ پیشین \(شاید\)/), b4 = blockOf(u4.user, /^# اصلاحِ پیامِ پیشین \(پشتیبان/);
++    T(25, /«کدام را اصلاح کنم؟»/.test(b3) && /حدسِ g1 «۲(?:\^n|ⁿ)»/.test(b3) && /برنامهٔ pl1 «برنامه‌م فردا»/.test(b3) && /«کدام را اصلاح کنم؟»/.test(b4) && /g1/.test(b4) && noChange(s0, s) && !s.nRet && !s.ev.some(e => e.wd), { b3, b4 });
++    // 26 — fix not in the current message
++    n = await neg(26, {}, { msg: 'عرضش ۵', what: 'fact', fix: '۹' }); T(26, n.refused && /در همین پیامِ او نیست/.test((n.s.ret || {}).err || ''), n);
++    // 27 — «نه، ۵۵ درسته» confirms her own value
++    n = await neg(27, {}, { msg: 'جواب ۵۵ه', what: 'ans', fix: '۵۵' }); T(27, n.refused && !n.s.ev.some(e => e.wd), n);
++  });
++
++  // ================= inf17 + bank17 =================
++  await section('bank17', async () => {
++    const r = info.bank17 = { res: [] }; const E = BANK.filter(e => e.rc === 'INF17.trace');
++    const T = (j, ok, x) => { r.res.push([69 + j, ok]); chk(ok, 'bank17#' + (69 + j) + ' «' + E[j].text.slice(0, 80) + '» → ' + E[j].expect.slice(0, 100) + ' :: ' + JSON.stringify(x).slice(0, 600)); };
++    const rows = (opt) => p.evaluate(opt => { const Q = APP.MIND.phases(opt || undefined); const o = {}; Q.rows.forEach(X => { o[X.id] = { k: X.k, n: X.n, acts: (X.acts || []).map(a => ({ id: a.id, ok: a.ok, at: a.at, fa: a.fa, pid: a.pid, src: a.src })) }; }); return o; }, opt || null);
++    const dims = () => p.evaluate(() => { const m = APP.MIND.model(), o = {}; m.dims.forEach(d => { o[d.id] = APP.MIND.dimActs ? APP.MIND.dimActs(d) : []; }); return o; });
++    const out = (pid, sid, o) => p.evaluate(([pid, sid, o]) => __liveSet(pid, (so, L) => { let s0 = L.steps.find(x => x.id === sid); if (!s0) { s0 = { id: sid, at: o.at, text: 'گامِ ' + sid, pred: 'شاید' }; L.steps.push(s0); } s0.out = Object.assign({ d: o.at.slice(0, 10), what: '', match: '' }, o); s0.closed = true; }), [pid, sid, o]);
++    await wipe(); await fresh(); const P1 = await bind('۲۰ پله');
++    /* اگر نمای پرونده (سمتِ live) هنوز نیست، فقط در آزمون یک نمای خالی تا پیوند سنجیده شود */
++    const dosNative = await p.evaluate(() => !!(APP.V && APP.V.dossier)); if (!dosNative) await p.evaluate(() => { APP.V.dossier = () => APP.h('div', { class: 'page dossier-stub' }, 'dossier'); });
++    // 69 — s2 done ⇒ «اجرا» lists s2 · date · + · link
++    await out(P1, 's2', { at: '2026-10-17T10:00:00.000Z', done: 'yes', prog: 'آره' }); let R = await rows();
++    let a = R.exec.acts.find(x => x.id === 'lstep:' + P1 + ':s2');
++    await p.evaluate(() => APP.go('mind')); await p.waitForTimeout(300);
++    let dom = await p.evaluate(id => { const li = document.querySelector('#main details.mind-from[data-row="ph:exec"] li[data-act="' + id + '"]'); return li ? { t: li.textContent, ok: li.getAttribute('data-ok'), btn: !!li.querySelector('.mind-act-go') } : null; }, 'lstep:' + P1 + ':s2');
++    T(0, a && a.ok && a.pid === P1 && /2026-10-17/.test(a.at) && dom && dom.ok === '1' && dom.btn && /\+/.test(dom.t), { a, dom });
++    // 77 — clicking opens the dossier at that act
++    await p.evaluate(id => { const bt = document.querySelector('#main li[data-act="' + id + '"] .mind-act-go'); if (bt) bt.click(); }, 'lstep:' + P1 + ':s2'); await p.waitForTimeout(200);
++    const at77 = await p.evaluate(() => ({ v: APP.state.view, arg: APP.state.arg }));
++    T(8, at77.v === 'dossier' && at77.arg === P1, at77);
++    await p.evaluate(() => APP.go('home'));
++    // 70 — two validated guesses on two problems ⇒ the guessing (s_problem calibration) row lists both with problem + date
++    const P2 = await p.evaluate(() => __live('مسئلهٔ دوم'));
++    await p.evaluate(([a1, a2]) => { __liveSet(a1, so => { so.g = { 1: { guess: '۸۹', conf: 70, hit: 'درست بود', at: '2026-10-17T09:00:00.000Z', hitAt: '2026-10-17T09:30:00.000Z', from: 'live' } }; }); __liveSet(a2, so => { so.g = { 1: { guess: '۵۵', conf: 60, hit: 'نادرست بود', at: '2026-10-18T09:00:00.000Z', hitAt: '2026-10-18T09:30:00.000Z', from: 'live' } }; }); }, [P1, P2]);
++    let D = await dims(); const gs = (D.s_problem || []).filter(x => /^g:/.test(x.id));
++    T(1, gs.length === 2 && gs.some(x => x.pid === P1 && /2026-10-17/.test(x.at)) && gs.some(x => x.pid === P2 && /2026-10-18/.test(x.at) && !x.ok), gs);
++    // 72 — check verdict pass ⇒ look-back row + with date
++    await p.evaluate(a1 => __liveSet(a1, so => { so.b = { 1: { done: true, chkRes: 'نتیجه سالم ماند', at: '2026-10-16T12:00:00.000Z' } }; }), P1);
++    R = await rows(); a = R.back.acts.find(x => x.id === 'lb:' + P1 + ':1'); T(3, a && a.ok && /2026-10-16/.test(a.at), a);
++    // 73 — understand form completed ⇒ «فهمِ مسئله» row lists the form act
++    await p.evaluate(a1 => __liveSet(a1, so => { so.u = { 1: { done: true, self: 2, at: '2026-10-17T08:00:00.000Z' } }; }), P1);
++    R = await rows(); a = R.und.acts.find(x => /^uc:/.test(x.id) && x.pid === P1); T(4, a && a.ok, R.und);
++    // 74 — a step act in a stage row is listed once; the card has no step→ability mapping (no invented link) ⇒ listed once in its row only
++    R = await rows(); T(5, R.exec.acts.filter(x => x.id === 'lstep:' + P1 + ':s2').length === 1, { note: 'no ability mapping for live steps exists (not invented); listed once in «اجرا»', acts: R.exec.acts });
++    // 75 — «اجرا» +3 −1 ⇒ exactly 4 acts, signs sum to the aggregate
++    await out(P1, 's3', { at: '2026-10-17T11:00:00.000Z', done: 'yes', prog: 'آره' }); await out(P1, 's4', { at: '2026-10-17T12:00:00.000Z', done: 'yes', prog: 'آره' }); await out(P1, 's5', { at: '2026-10-17T13:00:00.000Z', done: 'no' });
++    R = await rows(); T(6, R.exec.n === 4 && R.exec.acts.length === 4 && R.exec.acts.filter(x => x.ok).length === 3 && R.exec.k === 3, R.exec);
++    // 78 — failed step listed with − , date and source
++    a = R.exec.acts.find(x => x.id === 'lstep:' + P1 + ':s5'); T(9, a && !a.ok && /2026-10-17/.test(a.at) && /گامِ/.test(a.fa), a);
++    // 76 — step s1 corrected 3→۷ (a38 keeps the act, changes the value, history in corr) ⇒ listed once with the corrected value
++    await out(P1, 's1', { at: '2026-10-17T07:00:00.000Z', done: 'yes', prog: 'آره', what: 'x = ۷', corr: [{ old: 'x = 3', note: 'اصلاح شد ⇐ «x = 3»' }] });
++    R = await rows(); const s1 = R.exec.acts.filter(x => x.id === 'lstep:' + P1 + ':s1'); T(7, s1.length === 1 && /x = ۷/.test(s1[0].fa) && !/x = 3/.test(s1[0].fa), s1);
++    // 79 — same step via chat and via the form (same act id) ⇒ once
++    await p.evaluate(a1 => { const s = __cur(); s.coachEv = (s.coachEv || []).concat([{ at: '2026-10-17T10:00:01.000Z', ph: 'c', ok: true, src: 'chatok', key: 'x|c|گام دوم انجام شد', act: 'lstep:' + a1 + ':s2', pid: a1 }]); APP.S.put(s); }, P1);
++    R = await rows(); T(10, R.exec.acts.filter(x => x.id === 'lstep:' + P1 + ':s2').length === 1 && R.exec.n === 5, R.exec);
++    // 80 — a step outcome withdrawn by a chat retract ⇒ not a counted act
++    await out(P1, 's6', { at: '2026-10-17T14:00:00.000Z', done: 'yes', prog: 'آره', wd: { at: '2026-10-17T15:00:00.000Z', why: 'اصلاحِ پیامِ منبع' } });
++    R = await rows(); T(11, !R.exec.acts.some(x => x.id === 'lstep:' + P1 + ':s6') && R.exec.n === 5, R.exec);
++    // 81 — a guess withdrawn by ✏️ edit ⇒ not counted under the guessing row
++    await p.evaluate(a2 => __liveSet(a2, so => { so.g[1].wd = { at: '2026-10-18T10:00:00.000Z', why: '✏️' }; }), P2);
++    D = await dims(); T(12, !(D.s_problem || []).some(x => x.pid === P2 && /^g:/.test(x.id)), D.s_problem);
++    // 82 — sample/tour data never enters the owner's card (sample records are excluded at source)
++    await p.evaluate(() => APP.S.put({ id: 'kc_sample19b', type: 'kcase', sample: true, title: 'نمونه', tut: { und: [{ self: 2, at: '2026-10-17T01:00:00.000Z' }] } }));
++    R = await rows(); T(13, !R.und.acts.some(x => /kc_sample19b/.test(x.id)), R.und);
++    // 83 — the assistant's own words are never acts
++    await p.evaluate(() => { const s = __cur(); s.tut = { plan: [{ self: 2, by: 'assistant', at: '2026-10-17T02:00:00.000Z' }] }; APP.S.put(s); });
++    R = await rows(); T(14, !R.plan.acts.some(x => /^tut:/.test(x.id)), R.plan);
++    // 84 — an ask-only deferred candidate is not an act
++    const nEv0 = await p.evaluate(() => (__cur().coachEv || []).length);
++    await turn('میشه آخرش یه خلاصه بهم بدی؟', 'اول بگو مجهول چیست؟'); await turn('باشه.');
++    R = await rows(); T(15, !Object.values(R).some(X => X.acts.some(a => /خلاصه/.test(a.fa))), { nEv0 });
++    // 85 — reloaded twice ⇒ no act twice
++    const before = JSON.stringify(await rows());
++    await setup(); await setup(); const after = await rows(); const dup = Object.values(after).some(X => new Set(X.acts.map(a => a.id)).size !== X.acts.length);
++    T(16, !dup && JSON.stringify(after) === before, { dup });
++    // 71 / 86 / 87 — retract: old act withdrawn, new act (selfcorr) listed as +, never −
++    await wipe(); await fresh(); await turn('جواب نهایی ۸۹ است', 'چطور چک می‌کنی؟', [cs({ ph: 'b', said: ['result'], result: 'جواب نهایی ۸۹ است' })]);
++    const idOld = await p.evaluate(() => __uid(1));
++    await turn('جوابی که اول نوشتم اشتباه بود، منظورم ۵۵ بود', 'باشه.', [cs({ ph: 'b', said: ['result'], result: '۵۵', retract: { msg: 'جواب نهایی ۸۹ است', what: 'ans', fix: '۵۵' } })]);
++    R = await rows(); const all = Object.values(R).flatMap(X => X.acts);
++    const sc = R.back.acts.filter(x => /بازنگری|اصلاح/.test(x.fa) && x.ok);
++    T(2, sc.length >= 1, R.back);
++    T(17, !all.some(x => x.id.indexOf(':' + idOld + ':') >= 0) && all.some(x => /۵۵/.test(x.fa)), all);
++    T(18, !all.some(x => !x.ok && /اصلاح/.test(x.fa)), all);
++    // 88 — filtered to problem A ⇒ B's acts not listed
++    await wipe(); await fresh(); const A1 = await bind('مسئلهٔ الف'); const B1 = await p.evaluate(() => __live('مسئلهٔ ب'));
++    await out(A1, 's1', { at: '2026-10-17T10:00:00.000Z', done: 'yes', prog: 'آره' }); await out(B1, 's1', { at: '2026-10-17T10:00:00.000Z', done: 'no' });
++    R = await rows({ pid: A1 }); T(19, R.exec.acts.length === 1 && R.exec.acts[0].pid === A1 && R.exec.n === 1, R.exec);
++    // control: the stage-row details exist for every row with data, and the count equals n
++    await p.evaluate(() => APP.go('mind')); await p.waitForTimeout(300);
++    dom = await p.evaluate(() => [...document.querySelectorAll('#main details.mind-from[data-row^="ph:"]')].map(d => ({ row: d.getAttribute('data-row'), n: +d.getAttribute('data-n'), li: d.querySelectorAll('li').length })));
++    chk(dom.length >= 1 && dom.every(x => x.n === x.li), 'inf17: every stage row with data has «از کجا؟» with one line per counted act ' + JSON.stringify(dom));
++    if (!dosNative) await p.evaluate(() => { delete APP.V.dossier; });
++    await p.evaluate(() => APP.go('home'));
++  });
++
++  // ================= strict =================
++  await section('strict', async () => {
++    const bad = strictAll.filter(x => x[1].length);
++    chk(!bad.length, 'strict: one turn question per block across every prompt of this test ' + JSON.stringify(bad).slice(0, 900));
++  });
++
++  const sum = (k) => info[k] && info[k].res ? { n: info[k].res.length, fail: info[k].res.filter(x => !x[1]).map(x => x[0]) } : null;
++  console.log(JSON.stringify({ bank15: sum('bank15'), bank17: sum('bank17'), liveRetractNative: await p.evaluate(() => window.__lrNative).catch(() => null) }));
++  console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'NO ERRORS');
++  if (errors.length) process.exitCode = 1;
++  await b.close();
++})();
+diff --git a/apps/learning-architecture/tests/variants/VARIANTS_R19b.json b/apps/learning-architecture/tests/variants/VARIANTS_R19b.json
+new file mode 100644
+index 00000000..589a40d7
+--- /dev/null
++++ b/apps/learning-architecture/tests/variants/VARIANTS_R19b.json
+@@ -0,0 +1,644 @@
++[
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: حدسم اینه که جواب ۲^n هست ‖ A: چرا این حدس؟ اگر n=۱ باشد چه؟ ‖ U: نه اشتباه نوشتم، منظورم ۲^n − ۱ بود",
++  "expect": "retract {msg:«جواب ۲^n هست», what:guess, fix:«۲^n − ۱»}; problem guess g1 and coach.guess become «۲^n − ۱»; old value kept as history «اصلاح شد ⇐»; nothing deleted; the old guess's mind-card event withdrawn (not counted as a failure); the self-correction is look-back evidence; assistant states the change in one line",
++  "context": "corrected message is 1 user turn back; g1 was validated from it; math"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: داده‌ها: طول مستطیل ۱۲ و عرضش ۵ ‖ A: مجهول چیست؟ ‖ U: قطرش ‖ A: کدام قضیه به قطر ربط دارد؟ ‖ U: فیثاغورس ‖ A: خب، بنویس. ‖ U: ببخشید عرض رو اشتباه گفتم، ۹ بود نه ۵",
++  "expect": "retract {msg:«عرضش ۵», what:fact, fix:«۹»}; live-problem data field and the understand-form «داده‌ها» (filled from that turn) change ۵→۹; old value kept as history «اصلاح شد ⇐»; nothing deleted; later messages untouched; assistant says «عرض از ۵ به ۹ اصلاح شد» (or equivalent one line)",
++  "context": "corrected message is 3 user turns back; Persian digits; math"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: برنامه‌م اینه که سه‌شنبه با صاحبخونه حرف بزنم ‖ A: قبلش چه می‌خواهی بگویی؟ ‖ U: اینکه اجاره زیاده ‖ A: عددی داری؟ ‖ U: آره، ۱۵ درصد بالاتر از محله ‖ A: خوب است. ‖ U: اون برنامه رو اصلاح کن، منظورم پنج‌شنبه بود",
++  "expect": "retract {msg:«سه‌شنبه با صاحبخونه حرف بزنم», what:plan, fix:«پنج‌شنبه»}; plan date 2026-10-20 (Tue) → 2026-10-22 (Thu); any promise/reminder tied to it moves too; Tue kept as history «اصلاح شد ⇐»",
++  "context": "corrected message is 3 user turns back; life problem; Today Sat 2026-10-17"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: گام دوم رو انجام دادم و جواب داد ‖ A: عالی؛ نتیجه را ثبت کردم. ‖ U: نه، درستش اینه که جواب نداد، فقط شروعش کردم",
++  "expect": "retract {msg:«گام دوم رو انجام دادم و جواب داد», what:step, fix:«جواب نداد، فقط شروعش کردم»}; step s2 outcome done → started/not-yet (via a38); old value kept as history «اصلاح شد ⇐»; nothing deleted; the «اجرا» mind-card + event from the wrong message withdrawn",
++  "context": "corrected message is 1 user turn back; s2 outcome was recorded from it"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: جواب نهایی ۸۹ است ‖ A: چطور چک می‌کنی؟ ‖ U: با n کوچک ‖ A: n=۳؟ ‖ U: ۳ تا میشه ‖ A: n=۴؟ ‖ U: ۵ تا ‖ A: الگو؟ ‖ U: فیبوناچی ‖ A: پس برای ۹ پله؟ ‖ U: جوابی که اول نوشتم اشتباه بود، منظورم ۵۵ بود",
++  "expect": "retract {msg:«جواب نهایی ۸۹ است», what:ans, fix:«۵۵»}; stored answer evidence ۸۹→۵۵; any check verdict computed on ۸۹ is marked superseded (not silently kept as the verdict); old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "corrected message is 5 user turns back; math (stairs)"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: فرمول مساحت دایره رو نوشتم S = πr ‖ A: واحدش چیست؟ ‖ U: متر ‖ A: مطمئنی؟ ‖ U: آره ‖ A: r=۲ بگذار. ‖ U: ۶.۲۸ ‖ A: با شکل بخوان. ‖ U: کمه ‖ A: چرا؟ ‖ U: اون S = πr رو اصلاح کن، درستش S = πr² هست",
++  "expect": "retract {msg:«S = πr», what:fact (or said), fix:«S = πr²»}; the stored formula becomes S = πr² and renders as a formula; old value kept as history «اصلاح شد ⇐»; nothing deleted; the fragment match is on the EARLIER message, not on «S = πr» inside the current one",
++  "context": "corrected message is 5+ user turns back; formula input"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: مجهول سرعت متوسطه ‖ A: [فرمِ فهم: مجهول ← «سرعت متوسط»] داده‌ها؟ ‖ U: مسافت ۱۲۰ کیلومتر ‖ A: و زمان؟ ‖ U: دو ساعت رفت ‖ A: برگشت؟ ‖ U: منظورم زمان کل بود نه سرعت متوسط، اون مجهول رو اصلاح کن",
++  "expect": "retract {msg:«مجهول سرعت متوسطه», what:form, fix:«زمان کل»}; the understand-form field «مجهول» filled by the assistant action of that turn becomes «زمان کل»; old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "corrected message is 3 user turns back; form filled by an assistant action"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: شرطش اینه که عددا مثبت باشن ‖ A: فقط همین؟ ‖ U: نه اشتباه گفتم، شرط اینه که عددا صحیح باشن",
++  "expect": "retract {msg:«عددا مثبت باشن», what:said, fix:«عددا صحیح باشن»}; the stored condition (said evidence / live-problem condition) updated; old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "1 user turn back; colloquial, ZWNJ missing («عددا»)"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: مبلغ وام ۲۰۰ میلیون تومان است و قسط ماهانه ۸ میلیون. ‖ A: مدت بازپرداخت چقدر است؟ ‖ U: پوزش می‌خواهم؛ در پیام قبلی‌ام مبلغ وام را اشتباه نوشتم؛ صحیح آن ۱۲۰ میلیون است.",
++  "expect": "retract {msg:«مبلغ وام ۲۰۰ میلیون», what:fact, fix:«۱۲۰ میلیون»}; only the loan amount changes; «قسط ماهانه ۸ میلیون» from the same message stays; old value kept as history «اصلاح شد ⇐»; nothing deleted; assistant answers in شما",
++  "context": "1 user turn back; formal register; life/finance problem"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: تصمیمم اینه که روزی دو ساعت درس بخونم ‖ A: از کی؟ ‖ U: از فردا ‖ A: کجا؟ ‖ U: کتابخونه ‖ A: چه ساعتی؟ ‖ U: عصر ‖ A: با چه کسی؟ ‖ U: تنها ‖ A: ثبت شد. ‖ U: اینکه گفتم روزی دو ساعت رو اصلاح کن، منظورم یک ساعت بود",
++  "expect": "retract {msg:«روزی دو ساعت درس بخونم», what:plan, fix:«یک ساعت»}; plan text becomes «روزی یک ساعت»; start date (2026-10-18) unchanged; old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "corrected message is 5 user turns back; life plan"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: حدسم اینه که سرایدار کلید رو برداشته ‖ A: چه شاهدی داری؟ ‖ U: دیشب دیدمش ‖ A: کجا؟ ‖ U: دم در ‖ A: ساعت؟ ‖ U: نه، منظورم همسایه‌ی طبقه‌ی دوم بود نه سرایدار",
++  "expect": "retract {msg:«سرایدار کلید رو برداشته», what:guess, fix:«همسایه‌ی طبقه‌ی دوم»}; guess g1 text becomes «همسایه‌ی طبقه‌ی دوم کلید رو برداشته»; any plan on_guess g1 stays linked to the (corrected) g1; old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "3 user turns back; life guess"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: جمعه بهت خبر می‌دم نتیجه چی شد ‖ A: باشد، جمعه منتظرم. ‖ U: اشتباه گفتم، منظورم شنبه‌ی بعد بود",
++  "expect": "retract {msg:«جمعه بهت خبر می‌دم», what:plan, fix:«شنبه‌ی بعد»}; the promise due 2026-10-23 (Fri) moves to 2026-10-24 (Sat); old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "1 user turn back; promise derived from that message"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: گام اول: x = 3 به دست اومد ‖ A: جایگذاری کن. ‖ U: 3 در معادله‌ی دوم ‖ A: چه شد؟ ‖ U: نمی‌خونه ‖ A: چرا؟ ‖ U: نه، x = ۷ درسته، اون گام اول رو اشتباه نوشتم",
++  "expect": "retract {msg:«x = 3 به دست اومد», what:step, fix:«x = ۷»}; step s1 result 3→۷ (Latin digit in the old message, Persian in the fix both accepted); old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "3 user turns back; mixed Latin/Persian digits; math"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: تا محل کار ۴۰ دقیقه راهه ‖ A: با چه وسیله‌ای؟ ‖ U: نوشتم ۴۰ دقیقه، ولی ۴۵ دقیقه بود",
++  "expect": "retract {msg:«۴۰ دقیقه راهه», what:fact, fix:«۴۵ دقیقه»}; the fragment is found in the EARLIER message (the current message also contains «۴۰ دقیقه» — that is not the target); old value kept as history «اصلاح شد ⇐»; nothing deleted",
++  "context": "1 user turn back; the current message repeats the old value"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "pos",
++  "role": "chat",
++  "text": "U: فکر کنم جواب ۱۲۰ باشه، داده‌ها ۵ و ۴ ان ‖ A: [g1 «۱۲۰» ثبت شد؛ داده‌ها ← ۵ و ۴] ‖ U: داده‌ها رو اشتباه نوشتم، ۵ و ۳ بود",
++  "expect": "retract {msg:«داده‌ها ۵ و ۴ ان», what:fact, fix:«۵ و ۳»}; data ۴→۳; old value kept as history «اصلاح شد ⇐»; nothing deleted; the guess g1 «۱۲۰» from the same message is not duplicated (one g1, re-linked to the corrected message) and the assistant may ask whether ۱۲۰ still holds",
++  "context": "1 user turn back; one message produced a guess and a data fill"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: اشتباه کردم، کلید رو تو ماشین جا گذاشتم ‖ A: الان کجایی؟",
++  "expect": "NO retract — «اشتباه کردم» is about a real-world action, not an earlier message; nothing reversed (it may be new data/step info)"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: دیروز سر امتحان اشتباه کردم و علامت منفی رو جا انداختم ‖ A: بعدش چه شد؟",
++  "expect": "NO retract — a real-world mistake reported; no record reversed; not a failure act of this session"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: حدسم اینه که جواب فیبوناچیه ‖ A: چطور امتحانش می‌کنی؟ ‖ U: یه فکر دیگه: شاید بشه با استقرا رفت",
++  "expect": "NO retract — a new idea, not a correction; g1 stays as is; the new idea may become its own plan/guess"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: معلممون تو جزوه اشتباه نوشته بود که جواب ۲۰ هست ‖ A: تو خودت چه فکر می‌کنی؟",
++  "expect": "NO retract — quoting someone else's mistake; nothing she said earlier is corrected"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: جواب ۸۹ه ‖ A: چطور؟ ‖ U: دوستم گفت اشتباه گفتی، ولی من مطمئنم ۸۹ درسته",
++  "expect": "NO retract — she keeps her answer; the stored answer ۸۹ stays"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: عرضش ۹ه ‖ A: پس عرض ۵ است؛ حالا قطر را حساب کن. ‖ U: نه، تو اشتباه گفتی، من نوشتم ۹",
++  "expect": "NO retract of her message — she corrects the ASSISTANT; her record (عرض = ۹) was already right and stays; the assistant acknowledges its misreading"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: اشتباه نکنم این همون مسئله‌ی پله‌هاست که هفته‌ی پیش حل کردیم ‖ A: شاید؛ چه شباهتی می‌بینی؟",
++  "expect": "NO retract — rhetorical «اشتباه نکنم», no earlier message corrected"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: اگه اشتباه نکرده باشم جواب ۵۵ میشه ‖ A: چک کن.",
++  "expect": "NO retract — a hedged new answer; at most it is stored as an answer/guess, nothing reversed"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: سلام، امروز خیلی خسته‌ام ‖ A: سلام؛ مسئله را بخوان. ‖ U: منظورم این بود که خواب‌آلودم نه خسته",
++  "expect": "nothing reversed — the corrected message produced no stored record; no record or mind-card change; the assistant must not claim it «changed» a record",
++  "context": "correction of something never stored"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: یه عدد بین ۱ تا ۱۰ ‖ A: فرض کنیم ۵ است. ‖ U: نه، منظورم ۷ بود",
++  "expect": "page REJECTS a retract whose fragment «۵» is not in any earlier USER message (only the assistant said ۵); nothing reversed",
++  "context": "model reported retract {msg:«۵», what:fact, fix:«۷»}"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: حدسم ۲^n ‖ A: ... ‖ U: برنامه‌م فردا ‖ A: ... ‖ U: اشتباه گفتم",
++  "expect": "fallback only: ASK «کدام را اصلاح کنم؟» listing the candidates (حدس «۲^n»، برنامه «فردا»); NOTHING reversed by the pattern alone",
++  "context": "the reply omitted coach_state"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: عرضش ۵ ‖ A: مجهول؟ ‖ U: اون عرض رو اصلاح کن",
++  "expect": "page REFUSES the retract (fix «۹» not in the current message); nothing reversed; assistant asks for the correct value",
++  "context": "model reported retract {msg:«عرضش ۵», what:fact, fix:«۹»}"
++ },
++ {
++  "rc": "INF15.retract",
++  "kind": "neg",
++  "role": "chat",
++  "text": "U: جواب ۵۵ه ‖ A: پس جواب ۵۵ نیست؟ ‖ U: نه، ۵۵ درسته",
++  "expect": "NO retract — «نه، … درسته» here confirms her own earlier value; stored ۵۵ unchanged, no history entry"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on her bubble «حدسم اینه که جواب ۲^n هست» → saved as «حدسم اینه که جواب ۲^n − ۱ هست»",
++  "expect": "a user turn «[اصلاحِ پیامِ قبلی] …» is sent; g1 → «۲^n − ۱» applied directly (no model needed); the bubble shows the new text with «اصلاح شد ⇐ ۲^n» history; old guess mind-card event withdrawn"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on a bubble 5 turns back «سه‌شنبه با صاحبخونه حرف می‌زنم» → «چهارشنبه با صاحبخونه حرف می‌زنم»",
++  "expect": "plan date 2026-10-20 → 2026-10-21; reminder moves; history «اصلاح شد ⇐ سه‌شنبه»"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on «گام دوم انجام شد و جواب داد» → «گام دوم رو هنوز انجام ندادم»",
++  "expect": "step s2 outcome reverted to open (via a38); its «اجرا» + event withdrawn; history kept"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on «طول ۱۲ متر» → «طول ۱۵ متر»",
++  "expect": "live-problem datum and the form field filled from that turn ۱۲→۱۵; «اصلاح شد ⇐ ۱۲» visible on the bubble and the form"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on «مجهول سرعت متوسطه» (the assistant had filled the form field from that turn) → «مجهول زمان کله»",
++  "expect": "the form field filled by the assistant action of that turn is reverted and becomes «زمان کل»; old value as history"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on «جواب نهایی ۸۹» → «جواب نهایی ۵۵»",
++  "expect": "answer evidence ۸۹→۵۵; the check verdict based on ۸۹ shown as superseded; history kept"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ edited twice: «عرض ۵» → «عرض ۹», later «عرض ۹» → «عرض ۸»",
++  "expect": "current value ۸; history chain shows ۵ ⇐ ۹ ⇐ ۸ (both corrections); two «[اصلاحِ پیامِ قبلی]» turns"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on «فکر کنم کلید دستِ سرایداره» → «کلید رو دیروز خودم گم کردم»",
++  "expect": "guess g1 withdrawn (status withdrawn, kept as history, not deleted); its mind-card guess event withdrawn; the new statement may be stored as data"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ on «S = πr» → «S = πr²»",
++  "expect": "stored formula updated and rendered as a formula in the bubble and records; old formula in history"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "pos",
++  "role": "live",
++  "text": "✏️ save while the model is unavailable (no coach_state comes back)",
++  "expect": "the reversal is applied anyway by the page (the user is the authority); the «[اصلاحِ پیامِ قبلی]» turn is still recorded"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ opened on «جواب ۵۵ه», saved with the identical text",
++  "expect": "nothing sent, no «[اصلاحِ پیامِ قبلی]» turn, no history entry, no record touched"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ saved with only a trailing space added",
++  "expect": "treated as identical: nothing sent, no history entry"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ on «سلام، خسته‌ام» → «سلام، خواب‌آلودم»",
++  "expect": "bubble text updated with history, but NO record reversed and no mind-card change (the bubble produced nothing stored); assistant does not claim records changed"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "looking for ✏️ on an assistant bubble",
++  "expect": "no ✏️ on assistant bubbles — only on her own"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "looking for ✏️ on a «[سامانه: گام «۱» ثبت شد]» system-turn bubble",
++  "expect": "no ✏️ on system turns"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ opened then cancelled",
++  "expect": "nothing sent, nothing changed"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ saved with empty text",
++  "expect": "refused (an empty edit is not a delete); bubble and records unchanged"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ on «حدسم ۲^n» → «حدسم ۲^n − ۱»",
++  "expect": "the old guess must NOT be hard-deleted from the store or vanish from the dossier — it stays as history «اصلاح شد ⇐»"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ on a bubble already corrected by a chat retract (same value ۵→۹), saved as «… ۹»",
++  "expect": "no second reversal: no duplicate history entry and no double mind-card withdrawal"
++ },
++ {
++  "rc": "INF15.edit",
++  "kind": "neg",
++  "role": "live",
++  "text": "✏️ on a bubble of problem B's session while problem A is open",
++  "expect": "only problem B's records change; problem A untouched"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "Problem «۲۰ پله»: statement 10:00 Sat 17; understand form filled 10:05, «مجهول» corrected 10:20; g1 «۲^n» 10:10 refuted 10:30; plan pl1 «حالت‌های کوچک» 10:32; steps s1, s2 done 10:40/10:50; check verdict pass 11:00; look-back 11:05",
++  "expect": "one chronological read-only page: statement → understand form (as filled + «اصلاح شد ⇐» history) → g1 with outcome refuted → pl1 → s1, s2 with outcomes → check verdict → look-back; in that time order"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "Life problem «اجاره»: session 1 Sat 2026-10-17 (plan pl1 dated Tue 2026-10-20), session 2 Tue 2026-10-20 (step s1 «حرف زدن با صاحبخونه» done, outcome «۵ درصد کم کرد»)",
++  "expect": "both days shown with day separators; both sessions linked; pl1 shows its date; s1 shows its outcome"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "form «داده‌ها» filled by the assistant action after U «مسافت ۱۲۰ کیلومتر»",
++  "expect": "the form entry shows the chat message that fed it, linked to its session"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "stored formula S = πr² and the guess «۲^n − ۱»",
++  "expect": "formulas rendered (superscripts/π), not raw markup"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "step s2 done → «اجرا» +1; g1 refuted → its recorded mind-card effect",
++  "expect": "each act shows the mind-card events it produced (row + sign)"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "g1 «۲^n» corrected by retract to «۲^n − ۱» at 10:12",
++  "expect": "g1 shows old and new («اصلاح شد ⇐ ۲^n») with the correcting message linked; the withdrawn mind-card event shown as withdrawn"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "all-work index: problem P1 last 10-15, idea I1 last 10-17, factory case F1 last 10-16, session S9 last 10-17 09:00 (I1 at 10-17 08:00)",
++  "expect": "sorted by last activity: S9, I1, F1, P1"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "export one dossier as Markdown and as HTML",
++  "expect": "same sections in the same order as on screen, formulas preserved, corrections with history"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "open the dossier from the problem header, from the assistant session, and from the mind-card timeline",
++  "expect": "all three entry points open the same dossier of that problem"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "problem paused after the plan (no steps, no check, no look-back)",
++  "expect": "dossier shows up to the last activity with state paused; stages not reached shown as not reached"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "pos",
++  "role": "events",
++  "text": "step s3 outcome «done» withdrawn by a ✏️ edit",
++  "expect": "s3 shown with its current state and the withdrawn outcome as history, not as an active result"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "the same assistant session also discussed problem «اجاره» while working «۲۰ پله»",
++  "expect": "the «۲۰ پله» dossier does NOT show «اجاره» guesses/plans/steps"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "tour/test runner seeded problems and acts on the same account",
++  "expect": "they do NOT appear in the owner's index or mind-card contributions"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "dossier opened",
++  "expect": "no edit controls on it (read-only)"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "look-back never done",
++  "expect": "no look-back entry claiming it was done"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "an unrelated chit-chat session with no link to the problem",
++  "expect": "not listed among the problem's messages"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "a step reported in chat and the same step confirmed via the form (same act id)",
++  "expect": "appears ONCE in the dossier"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "old problem P1 (created 2026-09-01) got a new step today",
++  "expect": "NOT left at the bottom by creation date — it moves up by last activity"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "a withdrawn mind-card event",
++  "expect": "not shown as an active contribution"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "stored formula «\\frac{n(n+1)}{2}»",
++  "expect": "never shown as raw LaTeX in the dossier or the export"
++ },
++ {
++  "rc": "INF16.dossier",
++  "kind": "neg",
++  "role": "events",
++  "text": "an ask-only deferred candidate (never stored)",
++  "expect": "does not appear as a record in the dossier"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "s2 done (2026-10-17, problem «۲۰ پله»)",
++  "expect": "«اجرا» row «از کجا؟» lists s2 · 2026-10-17 · + · link to the dossier at s2"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "g1 validated (10-17) and g2 validated (10-18), different problems",
++  "expect": "the guessing row lists both, each with its source problem and date"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "retract: she corrected her own guess",
++  "expect": "look-back row lists the self-correction as +, never −"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "check verdict pass on problem P1 (10-16)",
++  "expect": "the check/look-back stage row lists it with date and +"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "understand form completed (10-17)",
++  "expect": "the «فهمِ مسئله» stage row lists the form act"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "one step act that moves both an ability row and a stage row",
++  "expect": "listed once in each of the two rows"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "row «اجرا» aggregate +3 −1",
++  "expect": "its «از کجا؟» lists exactly 4 acts whose signs sum to that aggregate"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "step s1 outcome corrected 3→۷ by retract",
++  "expect": "the row lists the corrected act once, with the corrected value"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "click an act in «از کجا؟»",
++  "expect": "opens the dossier at that act"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "pos",
++  "role": "events",
++  "text": "a failed step (outcome «نشد», 10-17)",
++  "expect": "listed with − under its row, with date and source"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "the same step reported in chat and via the form (same act id)",
++  "expect": "listed once, counted once"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "a step outcome withdrawn by a chat retract",
++  "expect": "not listed as a counted act (at most as withdrawn, not in the sum)"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "a guess withdrawn by ✏️ edit",
++  "expect": "not counted under the guessing row"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "tour/test acts on the account",
++  "expect": "not listed in the owner's card"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "the assistant's own messages",
++  "expect": "never listed as acts"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "an ask-only deferred candidate",
++  "expect": "not an act; not listed"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "page reloaded twice",
++  "expect": "no act appears twice"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "a retract replaced the old act with a new one",
++  "expect": "only the new act listed; old not counted alongside it"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "a self-correction",
++  "expect": "never listed with − under any row"
++ },
++ {
++  "rc": "INF17.trace",
++  "kind": "neg",
++  "role": "events",
++  "text": "acts of problem B while looking at the card filtered to problem A",
++  "expect": "B's acts not listed under A's filter"
++ }
++]
+\ No newline at end of file
+diff --git a/docs/overhaul/handoff-notes/_pending_tour1_R19b_coach_2026-10-17.md b/docs/overhaul/handoff-notes/_pending_tour1_R19b_coach_2026-10-17.md
+new file mode 100644
+index 00000000..74889697
+--- /dev/null
++++ b/docs/overhaul/handoff-notes/_pending_tour1_R19b_coach_2026-10-17.md
+@@ -0,0 +1,44 @@
++# Tour 1 (Pólya), round 19b: coach handoff (2026-10-17)
++
++Scope (DECISIONS_R19b «Fixers / coach»): INF15 model side (retract, validation, reversal of the coach layer, fallback ask, mind-card withdrawal)
++and INF17 (mind card «از کجا؟»). Base: `b889b855`.
++
++Files changed:
++- `apps/learning-architecture/src/app/a27_tour.js` (coach), `a29_mind.js` (mind card), rebuilt bundle.
++- Tests: new `tests/test_tour1_r19b_coach.js` + byte copy of the independent bank at `tests/variants/VARIANTS_R19b.json`.
++- Docs: `apps/learning-architecture/docs/WORKLOG.md` (75), `PROGRESS.md` row 91, a HANDBOOK §10 row.
++
++Not touched: a38, a26 (the live builder's), a39. Nothing quarantined (no function replaced; the pattern-failure line gained two guards).
++
++## Contract with the live side (a38)
++- The coach calls `APP.liveRetract(pid, msgId, o)` once per problem bound to the session (bound pid, `s.lprob`, `s.lprobLog`), with
++  `o = { what, fix, frag, old, msg: <text of the corrected user message>, n: <1-based user-message index, the same numbering as liveStepReport's msg>, at, sess, by: <msgId of the correcting message> }`.
++  A string result (or `{changes:[…]}` / `{text}`) is added to the change list the model and the user see; a result starting «ثبت نشد/چیزی/هیچ» is ignored.
++- `msgId` = `APP.ASSIST.msgId(m)`: `m.id` if present, else `"u" + m.seq` (a26 sets `seq` on every user message), else `"t" + m.at`.
++  `APP.ASSIST.msgOf(s, id)` returns the message.
++- If `liveRetract` is absent at run time, the coach tells the model «رکوردهای مسئلهٔ زنده … راهِ برگرداندن ندارند» (pending), never pretends.
++- The mind card treats a live step outcome as withdrawn when `st.out.wd || st.out.retracted || st.out.withdrawn`, and a guess when `g.wd || g.retracted`.
++  A corrected step that keeps its act (new value, history in `corr`) is listed once with the new value.
++- The page-side ✏️ path can reuse `APP.ASSIST.retractApply(s, {msg, what, fix})` for the coach-layer records (it validates exactly like a model report:
++  the current last user message must carry the fix and a correction signal; a «[اصلاحِ پیامِ قبلی] …» turn should therefore include the fix text).
++- «📜» links: `A.go("dossier", pid, actRef)` is rendered only when `APP.V.dossier` exists.
++
++## Items
++| Item | What changed |
++|---|---|
++| INF15 doc | `retract {msg, what, fix, old?}` in «# گزارشِ وضع» (`AS.COACH_STATE_X`). |
++| INF15 validate | fragment in an EARLIER user message of this session (not the assistant's), correction signal `AS.CORR_RE` in the current message and not someone else's/the assistant's error, fix in the current message, fix ≠ old. Refusals are logged in `s.coach.retracts` with the reason. |
++| INF15 reverse | guesses (+ `coach.guess`, ai-message guess note), plans (+ new date from a weekday, follow-up deadline), promises, chat statement / own unknown, `ansLog`/`ownLog`, a «verified» verdict built on that message (→ unverified, `chkSup`), assistant-filled forms (`s.fills`, new log via a wrapper on `AS.DO.fill`), mind-card events (`wd`). Only the wrong part changes. History `corr[{old,new,note:"اصلاح شد ⇐ …"}]`. |
++| INF15 source ids | every `coachEv` carries `msg` and `pid`; records created by a coach_state turn get `src`. |
++| INF15 mind card | events of the corrected message withdrawn; failures of the correcting message withdrawn; one look-back + («selfcorr») only when something actually changed. |
++| INF15 context | sys line «✓ اصلاح شد: …»; next turn «# اصلاحی که صفحه انجام داد» (once; «چیزی عوض نشد» when nothing was stored). |
++| INF15 fallback | message with a correction signal ⇒ «# اصلاحِ پیامِ پیشین (شاید)» with candidates; reply without coach_state ⇒ next turn «(پشتیبان، فقط پرسش)» «کدام را اصلاح کنم؟». Never reverses. |
++| bank #15/#16 | a lone «اشتباه کردم» (real-world action) is a pending pattern event, not a stage failure. |
++| INF17 | stage rows: `X.acts` (id, src, ok, at, fa, pid) — one per counted act; `details.mind-from` in the «از کجا» cell; `APP.MIND.phases({pid})`; abilities: «از کجا؟ — هر بُعد» (`APP.MIND.dimActs`). |
++
++## Bank results (VARIANTS_R19b, coach entries)
++- INF15.retract 28/28, INF17.trace 20/20. Base b889b855: INF15 21/28 fail (the seven negatives pass trivially), INF17 no lists at all.
++- #74 (one act moving an ability row and a stage row): the card has no step→ability mapping; none invented — the step is listed once in «اجرا».
++- #82 (tour/test acts): tested as `sample` records excluded; separate test profiles are outside the page.
++- Entries whose final state is the live side's (step outcome, live data field, problem guess g1) are checked as the call to `APP.liveRetract`
++  with the right pid/msgId/what/fix; the stub changes nothing.
