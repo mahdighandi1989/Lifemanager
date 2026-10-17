@@ -416,7 +416,7 @@
       sel0.value = NEW.nat || "";
       natHint.textContent = NEW.natAuto && NEW.nat && (NEW.kind === "prove" || NEW.kind === "pod") ? "پیش‌انتخاب: «" + NAT[NEW.nat].fa.split(" — ")[0] + "» (داورِ حکم برهان است) — اگر فرضیه‌ای دربارهٔ زندگیِ خودت است که برهان ندارد («… برای من درست است؟»)، «زندگی» را برگزین." : NEW.natAuto && NEW.nat ? "پیش‌انتخابِ کد از صورتت: «" + NAT[NEW.nat].fa.split(" — ")[0] + "» — اگر نیست، عوضش کن." : !NEW.nat ? "داور را خودت برگزین (کد از صورت چیزی پیشنهاد نکرد)." : "";
     }
-    box.appendChild(field("lpNewS", "مسئله را همان‌طور که هست بنویس: چه می‌خواهی و چه چیزی آن را سخت می‌کند (پاسخ لازم نیست)", NEW.statement, function (v) { NEW.statement = v; natSync(); }, 4));
+    box.appendChild((A.MATH ? A.MATH.attach : Object)(field("lpNewS", "مسئله را همان‌طور که هست بنویس: چه می‌خواهی و چه چیزی آن را سخت می‌کند (پاسخ لازم نیست)", NEW.statement, function (v) { NEW.statement = v; natSync(); }, 4)));   // INF1: پیش‌نمایشِ فرمول (a39)
     box.appendChild(U.typeSel("lpNewType", NEW.kind, function (v) { NEW.kind = v; NEW.kindSet = true; natSync(); }));
     box.appendChild(selF("lpNewNat", "داورِ این مسئله کیست؟", Object.keys(NAT).map(function (k) { return [k, NAT[k].fa]; }), NEW.nat, function (v) { NEW.nat = v; NEW.natSet = !!v; NEW.natAuto = false; natSync(); }));
     box.appendChild(natHint);
@@ -1955,7 +1955,7 @@
       h("p", { class: "small" }, obj ? "این مسئله پاسخِ عینی دارد: داورِ هر گام برهان است، نه پیش‌بینیِ رویداد. هر گام را وارسی کن — دیدنِ درستیِ گام با ثابت کردنش فرق دارد؛ اگر فقط می‌بینی‌اش، شهودی ثبتش کن تا بعد ثابتش کنی." :
         "اجرا یعنی هر گام را وارسی کنی، نه فقط بنویسی؛ و پیش از انجام بدانی تقریباً به چه می‌رسی. پیش‌بینی‌ات با احتمال در «🎯 دفترِ پیش‌بینی» می‌نشیند و در موعد، خودت می‌گویی چه شد — کالیبراسیونِ پیش‌بینی‌هایت در «🧠 کارنامهٔ ذهن» از همین‌ها ساخته می‌شود."),
       prov(obj ? "cobj" : "c"),
-      field("lpStep", obj ? "گامِ بعد — یک گامِ استدلال، محاسبه یا ساخت (دقیق)" : "گامِ بعد — یک کارِ مشخص در دنیای واقعی (چه چیزی، با چه کسی یا با چه ابزاری)", d.text, function (v) { d.text = v; }, 2),
+      (A.MATH ? A.MATH.attach : Object)(field("lpStep", obj ? "گامِ بعد — یک گامِ استدلال، محاسبه یا ساخت (دقیق)" : "گامِ بعد — یک کارِ مشخص در دنیای واقعی (چه چیزی، با چه کسی یا با چه ابزاری)", d.text, function (v) { d.text = v; }, 2)),
       selF("lpClear", obj ? EQ[0] : lifePod(r, s) ? "روشن می‌بینی که این گام درست است — به آزمودنِ فرضیه نزدیکت می‌کند؟" : "روشن می‌بینی که این گام درست است — به مجهول نزدیکت می‌کند؟", ["بله", "مطمئن نیستم", "نه"], d.clear, function (v) { if (v === "نه") d.was = { text: txt(d.text), at: nowISO() }; d.clear = v; A.render(); }));
     /* A130 (سنجیده، نه تیک): «نه» گام را می‌بندد. یا بنویس کدام بخش روشن نیست، یا گام را کوچک‌تر بازنویسی کن — و بعد «روشن می‌بینی؟» را دوباره
        پاسخ بده. گامِ پیشین و تازه کنارِ هم ثبت می‌شوند */
