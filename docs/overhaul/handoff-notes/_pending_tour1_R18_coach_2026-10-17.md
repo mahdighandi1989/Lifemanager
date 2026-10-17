@@ -36,7 +36,7 @@ Quarantined (reachable via `APP.ASSIST.R17_QUARANTINE`): `planSeen`, `plan`, `re
 ## Live fixer's contract (after merging bfc81b98)
 - `m.guess = {text, q}` — done (RM4b).
 - `coach_state.step {step, done, what?, match?}` ⇒ `APP.liveStepReport(pid, {…, msg: <1-based index of her current message unless given>}, s.id)`; pid = the session's bound live problem (or `s.lprob`). Documented in «# گزارشِ وضع». Test `step`.
-- RM6e (a27 side): `chkWindow` starts at the first user message that states the problem (else the record's creation time in this session); `sameStmt` counts distinct tokens. Test `rm6e` (s31 shape: a later message with repeated variants no longer pushes the window past her check messages).
+- RM6e (a27 side): `chkWindow` starts at the first user message that quotes the problem's statement; failing that, the last restatement by distinct tokens; failing that, the record's creation time in this session (a first-match on loose token overlap was rejected: it let another problem's statement open the window — r17 rc4 «other problem»); `sameStmt` counts distinct tokens. Test `rm6e` (s31 shape: a later message with repeated variants no longer pushes the window past her check messages).
 - INF7 for `#lpRBest`: «پیامِ کامل» button + `.lp-rfull` box, source `APP.liveChatQItems(pid)[i].src`. Test `inf7`.
 - a38's toPlain on chatItems/stored bestQ and the math fixer's `lbOpts` toPlain kept as merged.
 - Old tests updated to RM6c: `test_tour1_r5_coach.js` (F1 s18 bare «پس v = …», s37), `test_tour1_r6_coach.js` (G3 s38 phase, G4 «پس فقط ۳», G4 head «پس ۵۵ دقیقه») — each now expects «no phase jump; offer line or the model's report».

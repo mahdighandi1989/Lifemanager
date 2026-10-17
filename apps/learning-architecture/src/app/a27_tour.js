@@ -2807,7 +2807,8 @@
   /* RM6e: پنجره از پیامی که مسئله را آورد (نخستین پیامِ کاربر با همین صورت؛ اگر نبود، از ساختِ رکوردِ مسئله در همین سشن) */
   function chkWindow(s, st, rec) {
     var M = ((s && s.msgs) || []).filter(isUser), i0 = -1;
-    if (st) for (var i = 0; i < M.length; i++) { var t = M[i].text; if (quoteIn(st, t) || sameStmt(t, st)) { i0 = i; break; } }
+    if (st) for (var i = 0; i < M.length; i++) if (quoteIn(st, M[i].text)) { i0 = i; break; }   // پیامی که خودِ صورت را آورد
+    if (st && i0 < 0) for (var k = M.length - 1; k >= 0; k--) if (sameStmt(M[k].text, st)) { i0 = k; break; }   // وگرنه بازگوییِ آن (واژه‌های متمایز)
     if (i0 < 0 && rec && rec.created && s && rec.sess === s.id) { var c0 = String(rec.created); for (var j = 0; j < M.length; j++) if (String(M[j].at || "") >= c0) { i0 = j; break; } }
     return M.slice(Math.max(0, i0));
   }
