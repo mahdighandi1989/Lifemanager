@@ -133,9 +133,11 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await objStep('a = 2b و c = b + 3 پس 4b + 3 = 36 و b = 8.25', 'از داده‌ها و جای‌گذاری در محیط');
     r.stage = 'back'; await click('main .lp-solved');
     const o = await bestOpts(); r.opts = o.map(t => t.slice(0, 80)); delete r.stage;
-    const U5 = /^💬 شکلی بکش یا نام‌گذاریِ مناسبی بکن؛ مسئله را به زبانِ خودت دوباره بگو\.$/;
-    chk(r.chatQs.some(t => /مسئله را به زبانِ خودت دوباره بگو/.test(t)) && !r.chatQs.some(t => /^کلِ مسئله را در یک جمله/.test(t)), 'qword: the coach\'s A191 «کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟» is a chat question (2nd-person «می‌گویی») and maps to the page\'s u5 «… مسئله را به زبانِ خودت دوباره بگو» (K4) ' + JSON.stringify(r.chatQs));
-    chk(o.some(t => U5.test(t)) && !o.some(t => /کلِ مسئله را در یک جمله/.test(t)), 'qword: «کدام پرسش کمک کرد؟» offers that question once, as Pólya\'s u5 (s21 c18, s23 c13, s24 c11, s28 c11) ' + JSON.stringify(r.opts));
+    // DECISIONS_R14 N2: نگاشت به u5 فقط کلید است (یکی کردن، شناسه)؛ گزینه همان پرسشی است که دستیار پرسید
+    const OWN5 = 'کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟';
+    const items = await p.evaluate(pid => APP.liveChatQItems(pid), P);
+    chk(r.chatQs.includes(OWN5) && !r.chatQs.some(t => /مسئله را به زبانِ خودت دوباره بگو/.test(t)) && items.some(e => e.t === OWN5 && /مسئله را به زبانِ خودت دوباره بگو/.test(e.k)), 'qword: the coach\'s A191 «کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟» is a chat question (2nd-person «می‌گویی») and maps to the page\'s u5 (K4) — shown in its own words, u5 only as its key (R14 N2) ' + JSON.stringify({ q: r.chatQs, items }));
+    chk(o.filter(t => /به زبانِ خودت/.test(t)).length === 1 && o.includes('💬 ' + OWN5), 'qword: «کدام پرسش کمک کرد؟» offers that question once, in the assistant\'s words (s21 c18, s23 c13, s24 c11, s28 c11; R14 N2) ' + JSON.stringify(r.opts));
     chk(o.some(t => /^💬 خوب\. هر ضلع را برحسبِ b می‌نویسی؟$|^💬 هر ضلع را برحسبِ b می‌نویسی؟$/.test(t)), 'qword: another 2nd-person yes/no question («… می‌نویسی؟») is offered as itself ' + JSON.stringify(r.opts));
   });
 
