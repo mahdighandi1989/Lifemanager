@@ -12,5 +12,11 @@
  "what": "handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test",
  "procedure": "docs/supervisor/README.md#چطور دستورِ ناظر را عوض کنم؟",
  "commit": "4d8d18f2",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-17T09:54:55Z",
+  "note": "handoff.py check/audit run on a shallow clone: clean, no false boundary finding",
+  "commit": ""
+ }
 }
