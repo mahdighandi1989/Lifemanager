@@ -334,6 +334,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
     // دورِ ۲ (R5): مسئلهٔ کمکی ≠ مسئلهٔ اصلی — پیش از «حل شد» پلِ برگشت
     chk(await p.locator('main .lp-close .lp-closeaux').count() === 1 && !(await S(P1)).live.state, 'R5: «✅ حل شد» with an auxiliary problem asks for the bridge back first');
     await sel('#lpXC_0', 'crossed'); await p.fill('#lpXCW_0', 'نتیجهٔ سه ماهِ آزمایشی نشان داد دورکاری شدنی است و تصمیمِ دائمی همین شد');
+    // دورِ ۱۸ (RM1d/INF6): گامِ باز هم همین‌جا پرسیده می‌شود — دیگر خودکار «انجام نشد» ثبت نمی‌شود
+    info.closeStep = await p.locator('main .lp-close .lp-closestep').count();
+    chk(info.closeStep === 1, 'R18 RM1d: the open step is asked in the «پیش از حل شد» card ' + info.closeStep);
+    if (info.closeStep) { const sid = await p.locator('main .lp-close .lp-closestep').getAttribute('data-step'); await sel('#lpXS_' + sid, 'unk'); }
     await click('main .lp-closego');
     await ownCheck('main .lp-lb', 'look-back card');
     info.lbun = await p.evaluate(() => [...document.querySelectorAll('main .lp-lb .lp-un')].map(x => x.getAttribute('data-d')));
@@ -363,7 +367,8 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
       return { made: made && { dorm: made.dormant, pid: made.p.id }, cards: cards.length, meta: A2.META.filter(x => x.src === 'eprog').length, fcLive: A2.FC.filter(x => x.src === 'eprog-live').map(x => x.p + ':' + x.ok), st3: st && { closed: st.closed, auto: st.out && st.out.auto, fco: APP.S.get(st.fc).outcome } }; }, P1);
     chk(s1.b[1] && s1.b[1].done && s1.b[1].bestQ === Q[0] && s1.b[1].want === 'same' && s1.rev.b && s1.lessons.length === 1 && info.lb.cards === 1, 'look-back: lesson ⇒ review card, most helpful question, want compared ' + JSON.stringify({ b: s1.b[1] && s1.b[1].bestQ, cards: info.lb.cards }));
     chk(s1.g[1].hit === 'نادرست بود' && info.lb.meta === 0 && info.lb.fcLive.indexOf('0.6:false') >= 0, 'live guess judged against reality ⇒ FORECAST path, not answer-confidence META ' + JSON.stringify(info.lb));
-    chk(info.lb.st3 && info.lb.st3.closed && info.lb.st3.auto === 'solved' && info.lb.st3.fco === 'انجام نشد', 'solving closes the open step and its forecast (out of calibration, not pending) ' + JSON.stringify(info.lb.st3));
+    /* دورِ ۱۸ (RM1d): جای «auto: solved، انجام نشد» ِ پیشین — نتیجه همان است که کاربر در کارتِ بستن گفت («نمی‌دانم») و پیش‌بینی بیرونِ کالیبراسیون می‌ماند */
+    chk(info.lb.st3 && info.lb.st3.closed && !info.lb.st3.auto && info.lb.st3.fco === 'نامعلوم', 'solving closes the open step with HER answer («نمی‌دانم» ⇒ نامعلوم, out of calibration), never auto «انجام نشد» ' + JSON.stringify(info.lb.st3));
     chk(info.lb.made && info.lb.made.dorm === D(10), 'invented problem saved as a live problem, dormant until the ladder rung ' + JSON.stringify(info.lb.made));
     const P3 = info.lb.made && info.lb.made.pid;
     await go('e_prob', null, 'list');

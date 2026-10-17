@@ -1,1 +1,1 @@
-{"eval":"(()=>{const t=document.getElementById(\"main\").innerText;return (t.match(/.{0,60}مجهول.{0,60}/g)||[]).join(\"\\n\")})()"}
+{"eval": "APP.go(\"lprob\",\"pb_l_mvccg97jgl4\",\"plan\");MT(\"۲) طرح\",1200)"}

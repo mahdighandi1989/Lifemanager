@@ -1,1 +1,1 @@
-{"say":"داده: دو رکورد پرداخت با یک order_id، با فاصلهٔ حدود ۳۰ ثانیه، و idempotency-key هاشون متفاوته. نمی‌دونم چی‌کار کنم."}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,APP.liveKindInfo(r.p.id).kind,APP.liveKindInfo(r.p.id).type]))\n"}

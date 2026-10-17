@@ -1,1 +1,0 @@
-{"eval": "(()=>{const t=__fx.main(80000);const i=t.indexOf('\u2754 \u067e\u0631\u0633\u0634\u0650 \u0647\u0645\u06cc\u0646 \u0644\u062d\u0638\u0647');return t.slice(i,i+1200)+' ### '+__fx.btns().join(' | ').slice(0,1500)})()\n"}

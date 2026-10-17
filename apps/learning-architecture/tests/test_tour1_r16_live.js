@@ -153,12 +153,14 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(eq(q, 'وارسی‌اش کن: هر بخشِ فرض — پنج نقطه، ضلعِ ۱، «داخلِ مربع» — کجا به کار رفت و نتیجه دقیقاً همان حکم است؟'), 'runs A·F2 s03: the hypothesis-use check (the question that found her gap) can be chosen alone, with its head «وارسی‌اش کن:» (L1c + L1a) ' + J(q));
     chk(!q.some(t => t.indexOf('از راهِ دیگری هم به همین حکم') >= 0 && t.indexOf('کجا به کار رفت') >= 0), 'runs A·F2 s03: the two different look-back questions are never glued into one option (L1c) ' + J(q));
     // دورِ ۱۷ (RC2c): همان پیام حدس را نقل کرد («۴ جزء بهترین است» حدس است) ⇒ یادداشتِ مرجع از همان نقل
-    chk(eq(q, 'چطور می‌آزمایی‌اش؟ با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «۴ جزء بهترین است»)'), 'runs control: one contiguous run stays ONE option (L1c) ' + J(q));
+    // دورِ ۱۸ (RM4a): نقلِ پیامِ دستیار یادداشت نمی‌سازد — گزینه همان رشتهٔ یک‌پارچه، بی یادداشت
+    chk(eq(q, 'چطور می‌آزمایی‌اش؟ با کدام وارسی یا حالتِ خاص؟'), 'runs control: one contiguous run stays ONE option (L1c; R18 no note from the assistant\'s quote) ' + J(q));
     chk(one(q, 'استدلالت غیرمستقیم (خلف) بود — مستقیمش می‌کنی؟', 'یعنی بخشِ مثبتش را جدا بگو: هر چیدمانی حداکثر چند جفت'), 'runs control: a run whose head starts with the connective «یعنی» stays with the previous run (L1c) ' + J(q));
     chk(one(q, 'قطرِ مربعِ کوچک را درست حساب کردی؟', 'و آن را در کدام سطرِ برهانت نوشتی؟') && !starts(q, 'و آن'), 'runs control: a second run that starts with «و آن» (anaphor/connective) joins the first (L1c) ' + J(q));
   });
 
   // ================= ref — L1d: مرجعِ «…اش»/«این حدس» از رکورد؛ گزینه‌ها از مسئله‌ای به دیگری نمی‌روند =================
+  const notes = (q) => q.map(t => { const m = /\(حدسِ تو: «(.*)»\)$/.exec(t); return m ? m[1] : null; }).filter(x => x != null);
   await section('ref', async () => {
     const r = info.ref = {}; r.stage = 'mk1';
     const G1 = await mk({ title: 'زمانِ پختِ کیکِ بزرگ', st: 'دستورِ کیک برای قالبِ ۲۰ سانتی ۴۰ دقیقه است؛ برای قالبِ بزرگ‌تر زمانِ پخت چقدر است؟', nat: 'objective' });
@@ -178,8 +180,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await understand({ one: 'می‌خواهم مات در سه حرکت را بیابم', unk: 'سه حرکتِ مات', data: ['سفید شروع می‌کند', 'رخ در a1 است'], cond: 'مات در سه حرکت', guess: 'رخِ a1 بی‌فایده است', nat: 'objective' });
     const q1 = r.q1 = await cq(G1), q2 = r.q2 = await cq(G2); delete r.stage;
     // دورِ ۱۷ (RC2c، DECISIONS_R17): مرجع فقط از حدسی که **همان پیام** گفت — نه حدسِ ثبت‌شدهٔ رکورد (که این‌جا پس از پیام ثبت شد)
-    chk(eq(q1, 'چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «۱٫۷۵»)'), 'ref C s23: «چطور می‌آزمایی‌اش …؟» names its referent, the guess the same message named (۱٫۷۵) (L1d → RC2c) ' + J(q1));
-    chk(eq(q2, 'این حدس را چطور می‌آزمایی — با کدام وارسی یا حالتِ خاص؟ (حدسِ تو: «رخ بی‌فایده است»)'), 'ref C s21/s29: «این حدس را …؟» names the guess quoted in the same message (L1d → RC2c) ' + J(q2));
+    // دورِ ۱۸ (RM4، DECISIONS_R18): یادداشت فقط با m.guess.q ِ مربی و حدسی که در پیامِ کاربر آمد — نقلِ خودِ دستیار (و حدسِ ثبت‌شدهٔ پس از پیام) نه
+    chk(eq(q1, 'چطور می‌آزمایی‌اش — با کدام وارسی یا حالتِ خاص؟') && !notes(q1).length, 'ref C s23 (R18): no note from the assistant\'s own words; the meta head «یک پرسش:» still goes ' + J(q1));
+    chk(eq(q2, 'این حدس را چطور می‌آزمایی — با کدام وارسی یا حالتِ خاص؟') && !notes(q2).length, 'ref C s21/s29 (R18): no note from the assistant\'s quote ' + J(q2));
     chk(eq(q1, 'زمانِ پخت به کدام جزءِ قالب بند است — مساحتِ کف یا ضخامتِ خمیر؟'), 'ref control: an option without a clitic/demonstrative referent is unchanged (L1d) ' + J(q1));
     chk(!has(q1, /رخ/) && !has(q2, /کیک|۱٫۷۵|ضخامت/), 'ref control: options never cross problems (each problem keeps its own questions and its own guess) ' + J({ q1, q2 }));
   });

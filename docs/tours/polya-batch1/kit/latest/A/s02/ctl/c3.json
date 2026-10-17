@@ -1,1 +1,1 @@
-{"say":"خب ۳.۲ از ۴ کمتره دیگه، پس جا نمیشه. درسته؟"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,r.p.nat]))\n"}

@@ -1,1 +1,0 @@
-{"eval": "(()=>{const o=JSON.parse(localStorage.getItem('mla.records.v1'));const r=o['eprob_pb_l_mvdg3dl7qrf'];return JSON.stringify({nat:r.p.nat,natBy:r.p.natBy,kind:r.p.kind})})()\n"}

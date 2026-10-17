@@ -1,1 +1,1 @@
-{"say":"خب مجهول قیمته، داده‌م ۲۰ میلیون سوده. همین، دیگه چی لازمه؟"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.id,APP.liveKindInfo(r.p.id).kind]))\n"}

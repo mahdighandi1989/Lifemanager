@@ -1,1 +1,1 @@
-{"eval":"(()=>{C(\".lp-solved\");return APP.state.sub+\" \"+JSON.stringify(APP.liveClosure(\"pb_l_mvc0m57wwqn\"))})()","say":"برهانمو نوشتم: چهار مربع، پنج نقطه، پس دو تا تو یه مربع، فاصله‌شون از قطر کمتره. الان تو بازنگری‌ام. چیزی جا نینداختم؟"}
+{"eval": "(()=>{const b=[...document.querySelectorAll('#main button')].find(b=>/^ثبت$/.test(b.textContent.trim())&&/دوباره: آیا همهٔ فرض/.test((b.closest('section,div')||{}).innerText||''));if(b)b.click();C('.lp-plansave');return (b?'clicked ':'NOB ')+TT()+' SUB:'+APP.state.sub})()\n"}

@@ -1,0 +1,1 @@
+{"eval":"(()=>{const r=APP.liveAll().find(x=>/1·2·3/.test(x.p.title));const pg=APP.S?APP.S.get(\"eprog_\"+r.p.id):\"noS\";let ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.indexOf(r.p.id)>=0)ks.push(k);}}catch(e){ks=[String(e)]}return r.p.id+\" pg=\"+JSON.stringify(pg).slice(0,500)+\" keys=\"+JSON.stringify(ks);})()"}

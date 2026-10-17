@@ -437,10 +437,12 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await say('dV/dt = (πy²/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = …');
   info.bidi = await p.evaluate(() => {
     const msgs = Array.from(document.querySelectorAll('.as-panel .as-msg .as-tx'));
-    const u = msgs.find(x => /πy²/.test(x.textContent)), a = msgs.find(x => /dy\/dt = −5\/\(16π\)/.test(x.textContent) || x.querySelector('bdi.mx[data-src="dy/dt = −5/(16π)"]'));   // دورِ ۱۷ INF1: «−5/(16π)» حالا کسرِ MathML است (a39) — باز درونِ <bdi dir="ltr">
-    const bd = u ? Array.from(u.querySelectorAll('bdi[dir="ltr"]')).map(x => x.textContent) : [];
+    // دورِ ۱۸ (RM2b/c، B·D10): «²» ِ تایپ‌شده و dV/dt حالا فرمولِ MathML اند (a39) — منبعِ هر فرمول در data-src ِ همان <bdi dir="ltr" class="mx">
+    const src = (n) => Array.from(n.childNodes).map(c => c.nodeType === 3 ? c.textContent : c.nodeType === 1 ? (c.localName === 'bdi' && c.classList.contains('mx') ? c.getAttribute('data-src') : src(c)) : '').join('');
+    const u = msgs.find(x => /πy²/.test(src(x))), a =msgs.find(x => /dy\/dt = −5\/\(16π\)/.test(x.textContent) || x.querySelector('bdi.mx[data-src="dy/dt = −5/(16π)"]'));   // دورِ ۱۷ INF1: «−5/(16π)» حالا کسرِ MathML است (a39) — باز درونِ <bdi dir="ltr">
+    const bd = u ? Array.from(u.querySelectorAll('bdi[dir="ltr"]')).map(x => x.classList.contains('mx') ? x.getAttribute('data-src') : x.textContent) : [];
     const plain = Array.from(document.querySelectorAll('.as-panel .as-msg .as-tx')).filter(x => !/[A-Za-z0-9]/.test(x.textContent)).every(x => !x.querySelector('bdi'));
-    return { bd, rtl: u && u.getAttribute('dir') === 'rtl', ai: a ? a.querySelectorAll('bdi').length : 0, plain, same: u && u.textContent === 'dV/dt = (πy²/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = …' };
+    return { bd, rtl: u && u.getAttribute('dir') === 'rtl', ai: a ? a.querySelectorAll('bdi').length : 0, plain, same: u && src(u) === 'dV/dt = (πy²/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = …' };
   });
   chk(info.bidi.rtl && info.bidi.bd.includes('dV/dt = (πy²/9)·dy/dt') && info.bidi.bd.includes('dV/dt = −5') && info.bidi.bd.includes('y = 12') && info.bidi.ai >= 1 && info.bidi.plain && info.bidi.same, '18: LTR formula runs in chat bubbles are isolated in <bdi dir="ltr"> and the text is unchanged ' + JSON.stringify(info.bidi));
 

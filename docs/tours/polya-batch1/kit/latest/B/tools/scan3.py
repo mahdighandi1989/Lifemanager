@@ -32,5 +32,5 @@ for f in files:
         qs.setdefault(key,[]).append(('Q: '+m.group(1)[:90]) if m else 'UNQ: '+hd[:20]+' | '+l[:150])
   # also: a LIVE1 present makes coach LIST irrelevant? keep raw
   if len(qs)>=2:
-    print('##',f.split('round16B/')[-1],len(qs))
+    print('##',f.split('round18B/')[-1],len(qs))
     for k,v in qs.items(): print('    ',v[0], ('x%d'%len(v) if len(v)>1 else ''))

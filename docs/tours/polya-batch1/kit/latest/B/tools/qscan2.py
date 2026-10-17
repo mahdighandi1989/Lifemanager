@@ -14,5 +14,5 @@ for f in sys.argv[1:]:
       if not s or CTX in s[:45] or s.startswith(('- حلی که در همین','- پرسش‌های «')): continue
       q = re.search(r'بپرس(?!د)',s) or s.rstrip('.» ').endswith('؟') or re.search(r'«[^»]*؟»',s)
       if q: out.append((hd[:40], s))
-  print('##',f.split('round16B/')[-1],len(out))
+  print('##',f.split('round18B/')[-1],len(out))
   for h,s in out: print('   [%s] %s'%(h,s[:int(__import__('os').environ.get('W','300'))]))

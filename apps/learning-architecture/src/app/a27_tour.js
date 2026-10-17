@@ -2510,7 +2510,7 @@
     var pg = S.get("eprog_" + pid), so = pg && pg.solve, b = so && so.b && so.b[1];
     return b && b.done ? { r: r, pg: pg, so: so, b: b, L: so.live || {} } : null;
   }
-  function lbOpts(pid) { try { return (A.liveChatQItems ? A.liveChatQItems(pid) : []).map(function (x) { return x && x.t; }).filter(Boolean); } catch (e) { return []; } }
+  function lbOpts(pid) { try { return (A.liveChatQItems ? A.liveChatQItems(pid) : []).map(function (x) { return x && x.t && (A.MATH && A.MATH.toPlain ? A.MATH.toPlain(x.t) : x.t); }).filter(Boolean); } catch (e) { return []; } }   // دورِ ۱۸ (RM2a، D·D7 s38): <option> MathML نمی‌گیرد ⇒ متنِ ساده
   /* آنچه از بازنگریِ «حل شد» ِ گفت‌وگو مانده: best فقط اگر گزینه‌ای هست (پرسشی دربارهٔ همین مسئله پرسیده شده)، taste همیشه — همان قاعدهٔ بازنگریِ صفحه */
   function lbMissing(pid) {
     var x = lbRec(pid); if (!x || x.b.from !== "chat" || x.b.state === "abandoned") return null;

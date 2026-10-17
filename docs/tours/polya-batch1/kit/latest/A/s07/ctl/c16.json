@@ -1,1 +1,1 @@
-{"eval": "APP.livePhase(\"pb_l_mvc0nss786o\")"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

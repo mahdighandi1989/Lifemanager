@@ -1,1 +1,1 @@
-{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button\")].map(b=>b.className+\":\"+b.textContent.trim().slice(0,40));return b.join(\" | \").slice(0,2500)})()\n"}
+{"eval0":"(()=>{APP.today=()=>\"2026-11-05\";APP.go(\"home\");APP.ASSIST.newSession();return 1})()","say":"سلام. یادته در مورد خونه حرف زدیم؟ همکارم هم الان دقیقاً همین سؤال رو داره که بخره یا اجاره کنه. چی بهش بگم؟"}

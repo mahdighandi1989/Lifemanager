@@ -5,8 +5,8 @@ def norm(l):
     l=re.sub(r'[\d۰-۹]','',l)
     return l[:120]
 for s in sys.argv[1:]:
-  for f in sorted(glob.glob(f'{B}/round16D/{s}/ai/p*.json'),key=lambda x:int(re.findall(r'\d+',os.path.basename(x))[0])):
-    n=os.path.basename(f); o=f'{B}/round15D/{s}/ai/{n}'
+  for f in sorted(glob.glob(f'{B}/round18D/{s}/ai/p*.json'),key=lambda x:int(re.findall(r'\d+',os.path.basename(x))[0])):
+    n=os.path.basename(f); o=f'{B}/round17D/{s}/ai/{n}'
     if not os.path.exists(o): print(s,n,'NO OLD'); continue
     a=json.load(open(o))['user'].split('# گفت‌وگو تا این لحظه')[0]; b=json.load(open(f))['user'].split('# گفت‌وگو تا این لحظه')[0]
     A=set(norm(x) for x in a.split('\n')); 
