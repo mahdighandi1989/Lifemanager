@@ -12,5 +12,11 @@
  "what": "تورِ پولیا دورِ ۱۲ (L7): cues_fa برای pr_statistical در territory/maps/s_problem.json (فقط روی صورت/مجهولِ خودِ مسئله)؛ قاعدهٔ E6 بی‌تغییر",
  "procedure": "AGENTS.md: قلمرو از registry",
  "commit": "2214f93",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-17T03:56:46Z",
+  "note": "بسنجیده: JSON معتبر؛ test_graph و test_mind_report «NO ERRORS»؛ pytest دست‌به‌دست/مالکیت/دفترچه سبز؛ تغییر فقط داده/ثبت‌گاه است",
+  "commit": ""
+ }
 }
