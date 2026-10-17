@@ -1,0 +1,1514 @@
+[
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "از فردا صبح هر روز ده دقیقه قبل از صبحونه می‌دوم.",
+  "expect": "plan stored: daily 10-min run, when=2026-10-18 (recurring)"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "تصمیم گرفتم سه‌شنبه با مدیرم درباره‌ی حقوقم حرف بزنم.",
+  "expect": "plan stored: talk to manager about salary, when=2026-10-20"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "پس‌فردا عصر می‌رم کتابخونه و فصل سه رو تموم می‌کنم.",
+  "expect": "plan stored: finish chapter 3 at library, when=2026-10-19"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "اینجانب قصد دارم از ابتدای ماه آینده هفته‌ای دو جلسه در کلاس زبان شرکت کنم.",
+  "expect": "plan stored (formal): language class twice a week, when=2026-11-01"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "آخر هفته می‌خوام بشینم بودجه‌ی ماه بعد رو دربیارم.",
+  "expect": "plan stored: draft next month budget, when=this weekend (2026-10-22/23)"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "امشب قبل از خواب سه تا مسئله‌ی استقرا حل می‌کنم، فردا بهت خبر می‌دم.",
+  "expect": "plan stored: solve 3 induction problems, when=2026-10-17 (tonight)"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "دیروز باشگاه نرفتم، ولی فردا ساعت ۷ حتماً می‌رم.",
+  "expect": "plan stored: gym, when=2026-10-18 07:00; the past clause is ignored"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "قراره از هفته‌ی بعد گوشی رو ساعت ده شب خاموش کنم؛ این دفعه جدی‌ام.",
+  "expect": "plan stored: phone off at 22:00, when=week of 2026-10-24"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "ان‌شاءالله تا جمعه رزومه‌م رو از نو می‌نویسم، خودم این مهلت رو گذاشتم.",
+  "expect": "plan stored: rewrite CV, when=2026-10-23 (self-set, not an external deadline)"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "pos",
+  "role": "user",
+  "text": "از دوشنبه ناهار رو از خونه می‌برم که خرجم کم بشه.",
+  "expect": "plan stored: bring lunch from home, when=2026-10-19"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "هر روز ده دقیقه می‌دوم ولی وزنم هیچ تکونی نمی‌خوره.",
+  "expect": "no plan: present habit + complaint, no future intention"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "هر شب به خودم می‌گم از فردا زود می‌خوابم و باز تا دو بیدارم.",
+  "expect": "no plan: complaint about a repeated failed resolution; at most a question, never a stored follow-up"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "هر روز لپ‌تاپ رو باز می‌کنم، یه ساعت به صفحه زل می‌زنم و می‌بندمش.",
+  "expect": "no plan: procrastination complaint (habit to break), no follow-up offer"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "تا پنجشنبه باید گزارش رو تحویل بدم و هنوز یه خط هم ننوشتم.",
+  "expect": "no plan: external deadline already under (deadline path), not her own plan; no second follow-up for the same day"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "همیشه آخر هفته‌ها سریال می‌بینم و بعدش عذاب وجدان می‌گیرم.",
+  "expect": "no plan: habit complaint with a time word"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "شاید یه روزی برم کلاس پیانو، معلوم نیست.",
+  "expect": "no plan: no real date, vague wish"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "مامانم گفته از فردا هر روز باید بیام مغازه کمکش.",
+  "expect": "no plan: someone else's instruction, not her own intention"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "پارسال هم گفتم از فردا ورزش می‌کنم، دو روز بیشتر دووم نیاورد.",
+  "expect": "no plan: past, retold"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "اگه فردا بارون نیاد، شاید برم کوه.",
+  "expect": "no stored plan: conditional and tentative; may only ask"
+ },
+ {
+  "rc": "RC1.plan",
+  "kind": "neg",
+  "role": "user",
+  "text": "هر روز صبح ساعت شش بیدار می‌شم و تا هشت درس می‌خونم، این برنامه‌ی همیشگیمه.",
+  "expect": "no plan: existing routine described (no new intention), even though it contains «برنامه» and a time"
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "یه متن کوتاه می‌خوام که برای صاحبخونه بفرستم.",
+  "expect": "defer stored: letter to landlord",
+  "context": "assistant: قبل از نوشتنش بگو دقیقاً چی می‌خوای ازش؛ متن رو بعد از این می‌نویسیم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "لطفاً یک جدول خلاصهٔ فرمول‌ها برایم آماده کنید.",
+  "expect": "defer stored: formula summary sheet",
+  "context": "assistant: حتماً؛ ولی اول این تمرین را با هم ببندیم، بعد جدول را می‌دهم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "میشه یه برنامه‌ی تمرینی هفتگی برام بچینی؟",
+  "expect": "defer stored: weekly practice plan",
+  "context": "assistant: می‌چینم، اما اول باید بدونم چند روز در هفته وقت داری."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "دلم یه مثال حل‌شده از همین مدل می‌خواد.",
+  "expect": "defer stored: worked example (request phrased as a wish, not an imperative)",
+  "context": "assistant: مثال رو نگه می‌دارم برای وقتی که خودت یه قدم برداشتی."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "اگه زحمتی نیست یه ایمیل رسمی برای استادم بنویس.",
+  "expect": "defer stored: formal e-mail to professor",
+  "context": "assistant: فعلاً نمی‌نویسمش؛ اول بگو حرف اصلیت چیه."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "راستی جواب نهایی رو هم آخرش بهم بگو.",
+  "expect": "defer stored: final answer at the end",
+  "context": "assistant: باشه، آخرِ کار می‌گم؛ الان بیا با هم جلو بریم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "یه چک‌لیست برای مصاحبه‌ی فردا لازم دارم.",
+  "expect": "defer stored: interview checklist",
+  "context": "assistant: چک‌لیست را بعد از این‌که سه نقطه‌قوتت را گفتی آماده می‌کنم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "یه سؤال دیگه هم دارم: اثبات‌ها اصلاً به چه درد من می‌خورن؟",
+  "expect": "defer stored: answer \"what are proofs good for\"",
+  "context": "assistant: سؤال خوبیه؛ بذار این مسئله تموم بشه، بعد مفصل جوابش رو می‌دم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "pos",
+  "role": "user",
+  "text": "من فقط یه متن قانع‌کننده واسه همکارم لازم دارم، همین.",
+  "expect": "defer stored: persuasive text for colleague (no imperative verb, deferral without «بعداً»)",
+  "context": "assistant: هنوز نمی‌نویسم؛ اول بگو اون مخالفِ چیه."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "یه متن قانع‌کننده می‌خوام.",
+  "expect": "no defer: request fulfilled in the same reply",
+  "context": "assistant: بفرمایید: «همکار عزیز، …» (full text given)"
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "چرا این روش جواب می‌ده؟",
+  "expect": "no defer: question answered now",
+  "context": "assistant: چون هر بار نصف حالت‌ها حذف می‌شود و …"
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "شاید بعداً یه جدول بخوام.",
+  "expect": "no defer: no actual request yet",
+  "context": "assistant: هر وقت خواستی بگو."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "جواب رو نگو، فقط راهنمایی کن.",
+  "expect": "no defer: user asked to withhold; nothing promised",
+  "context": "assistant: باشه، فقط راهنمایی می‌کنم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "می‌خوام خودم حلش کنم.",
+  "expect": "no defer: not a request for something from the assistant",
+  "context": "assistant: عالیه، شروع کن."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "یه رژیم غذایی برای دیابتم بنویس.",
+  "expect": "no defer: refused/redirected, not postponed; no promise",
+  "context": "assistant: نسخهٔ پزشکی نمی‌توانم بدهم؛ با پزشکت هماهنگ کن."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "مثال بزن.",
+  "expect": "no defer: example given now (the word «بعد» does not make it a promise)",
+  "context": "assistant: بعد از این مثال یکی دیگه هم می‌زنم: فرض کن ۳ سیب داری …"
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "امروز دیگه نا ندارم، بقیه‌اش باشه برای فردا.",
+  "expect": "no defer: user pausing the session, no requested item",
+  "context": "assistant: باشه، فردا ادامه می‌دیم."
+ },
+ {
+  "rc": "RC1.defer",
+  "kind": "neg",
+  "role": "user",
+  "text": "نمی‌دونم.",
+  "expect": "no defer: assistant postpones ITS OWN question, not a user request",
+  "context": "assistant: اشکالی نداره، بعداً دوباره می‌پرسم."
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "بیشتر از هندسه، جبر دوست دارم.",
+  "expect": "taste stored: algebra over geometry"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "مسئله‌هایی که شکل دارن برام جذاب‌ترن تا اونایی که فقط عددن.",
+  "expect": "taste stored: visual/geometric problems"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "راستش از اثبات‌های استقرایی خوشم میاد، یه جور نظم داره.",
+  "expect": "taste stored: induction proofs"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "اینجانب به مسائل ترکیبیاتی علاقهٔ بیشتری دارم.",
+  "expect": "taste stored (formal): combinatorics"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "حالا یه کم از آمار خوشم اومده، قبلاً نه.",
+  "expect": "taste stored: statistics (new)"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "اونایی که به زندگی واقعی ربط دارن رو بیشتر دوست دارم، مثل حساب قسط و وام.",
+  "expect": "taste stored: real-life money problems"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "نمی‌دونم چرا، ولی معماهای منطقی رو از همه بیشتر دوست دارم.",
+  "expect": "taste stored: logic puzzles («نمی‌دونم چرا» is not \"don't know my taste\")"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "از هندسه بدم میاد ولی احتمال رو دوست دارم.",
+  "expect": "taste stored: likes probability, dislikes geometry"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "pos",
+  "role": "user",
+  "text": "ترجیحم مسئله‌های کوتاه و سریعه، نه اون طولانی‌ها.",
+  "expect": "taste stored: short problems"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "هنوز مطمئن نیستم چی دوست دارم.",
+  "expect": "taste=\"unknown\": nothing stored, not counted as answered"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "فعلاً نمی‌تونم بگم کدوم مدل برام جذاب‌تره.",
+  "expect": "taste=\"unknown\""
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "والا تا حالا بهش فکر نکرده بودم کدومو بیشتر دوست دارم.",
+  "expect": "taste=\"unknown\""
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "فرقی نمی‌کنه، همه‌شون برام یه جورن.",
+  "expect": "no stored taste (no preference); treated like unknown"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "دوست دارم این فصل زودتر تموم بشه.",
+  "expect": "no taste: «دوست دارم» = a wish, not a taste for a problem kind"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "اگه دوست داری بریم سراغ مسئله‌ی بعدی.",
+  "expect": "no taste: addressed to the assistant"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "معلممون می‌گه هندسه قشنگ‌ترین بخش ریاضیه.",
+  "expect": "no taste: someone else's taste"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "باید بیشتر جبر کار کنم، امتحانش سخت‌تره.",
+  "expect": "no taste: a need, not a liking"
+ },
+ {
+  "rc": "RC1.taste",
+  "kind": "neg",
+  "role": "user",
+  "text": "امروز حوصله‌ی هیچی رو ندارم.",
+  "expect": "no taste: mood"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "تو خودت چی فکر می‌کنی؟ به نظرت راهم درسته؟",
+  "expect": "register=تو"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "ممنون می‌شوم اگر راهنمایی بفرمایید.",
+  "expect": "register=شما"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "شما خودتون این مسئله رو حل کردید؟",
+  "expect": "register=شما"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "بگو ببینم، کجای کارم می‌لنگه؟",
+  "expect": "register=تو (imperative بگو, possessive ـم)"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "ببخشید، می‌شه یه بار دیگه توضیح بدید؟",
+  "expect": "register=شما (verb بدید)"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "داداش یه لحظه وایسا، اینو نگرفتم.",
+  "expect": "register=تو"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "جنابعالی فرمودید شرط اول کافی نیست؛ دلیلش چیست؟",
+  "expect": "register=شما"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "شما که خودت همه‌چی رو می‌دونی، بگو چیکار کنم؟",
+  "expect": "register=تو: colloquial «شما» with تو verbs/possessive (majority تو), no switch to شما"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "pos",
+  "role": "user",
+  "text": "استاد گفت «شما باید فرض‌ها را بنویسید»، تو هم همینو می‌گی؟",
+  "expect": "register=تو: the «شما» is inside a quotation"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "«شما» یا «تو»، برام فرقی نمی‌کنه.",
+  "expect": "no register: meta mention of both pronouns"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "سلام، مسئله‌ی امروز اینه: ۲x+۳=۱۱",
+  "expect": "no register: no address signs; keep whatever is current"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "توی کتاب نوشته «شما می‌توانید از روش حذف استفاده کنید».",
+  "expect": "no register change: «توی» is a preposition and the «شما» is quoted"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "تو این مسئله گیر کردم.",
+  "expect": "no register: «تو» here means \"in\""
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "شمارش حالت‌ها رو بلد نیستم.",
+  "expect": "no register: «شما» only as a substring of «شمارش»"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "به بچه‌ها گفتم شما برید، من می‌مونم.",
+  "expect": "no register: «شما» addressed to third parties in reported speech"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "تویوتا رو فروختم، حالا نمی‌دونم پولش رو چیکار کنم.",
+  "expect": "no register: «تو» substring of «تویوتا»"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "مرسی.",
+  "expect": "no register: nothing to infer"
+ },
+ {
+  "rc": "RC1.register",
+  "kind": "neg",
+  "role": "user",
+  "text": "شماره‌ی تمرین ۷ رو حل کردم.",
+  "expect": "no register: «شما» substring of «شماره»"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "حدسم اینه که جواب میشه n(n+1)/2.",
+  "expect": "guess stored: n(n+1)/2"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "فکر کنم ۱/۴ − ۱/(2(n+1)(n+2)) دربیاد.",
+  "expect": "guess stored: the formula (no \"content words\" needed)"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "۳۶؟",
+  "expect": "guess stored: 36 (a bare number offered as possibly right)"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "احتمالاً حدود ۸۰۰ هزار تومن خرج اضافه داریم.",
+  "expect": "guess stored: about 800k toman"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "x=2 و y=-1 به نظرم.",
+  "expect": "guess stored: x=2, y=-1"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "من می‌گم 2^n − 1 حرکت لازمه.",
+  "expect": "guess stored: 2^n − 1"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "به گمانم مجموع زاویه‌های خارجی همیشه ۳۶۰ درجه است.",
+  "expect": "guess stored (claim): exterior angles sum to 360"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "a_n = 3a_{n-1} + 2 شاید؟",
+  "expect": "guess stored: recurrence a_n = 3a_{n-1}+2"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "pos",
+  "role": "user",
+  "text": "اجاره‌ی بلندمدت به‌صرفه‌تره، فکر کنم.",
+  "expect": "guess stored (non-numeric claim)"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "مسئله اینه: مجموع ۱/(k(k+1)) از ۱ تا n چند میشه؟",
+  "expect": "no guess: problem statement"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "کتاب نوشته جواب ۲/۳ است ولی نفهمیدم چرا.",
+  "expect": "no user guess: a reported answer from the book"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "n=1 رو گذاشتم، شد ۱/۲.",
+  "expect": "no guess: special-case data, not a proposed answer"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "حدس زدن رو بلد نیستم.",
+  "expect": "no guess: mentions «حدس» but offers none"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "دیروز ۸۰۰ هزار تومن خرج کردم.",
+  "expect": "no guess: a past fact"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "فرمول n(n+1)/2 رو از دبیرستان یادمه، ولی اینجا ربطی نداره.",
+  "expect": "no guess: formula mentioned and explicitly not proposed"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "سؤال ۴ صفحه‌ی ۱۲.",
+  "expect": "no guess: reference numbers"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "اون حدسی که دیروز زدم غلط بود.",
+  "expect": "no new guess: retraction only"
+ },
+ {
+  "rc": "RC1.guess",
+  "kind": "neg",
+  "role": "user",
+  "text": "ساعت ۵ کلاس دارم، بعدش ادامه می‌دیم.",
+  "expect": "no guess: schedule numbers"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "خب، این یکی بسته شد. از پرسش‌هایی که امروز پرسیدم، کدومش بیشتر به کارت اومد؟",
+  "expect": "no option (look-back best-question)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "پیش از این‌که بروی: کدام سؤالِ من راه را برایت باز کرد؟",
+  "expect": "no option (best-question, label head)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "یه چیز کوچیک: از این جور مسئله‌ها خوشت میاد یا بریم سراغ یه چیز دیگه؟",
+  "expect": "no option (taste question)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "حالا که تمام شد، بگو کدام نوع مسئله را بیشتر دوست داری: هندسی یا جبری؟",
+  "expect": "no option (taste question)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "آفرین. یک پرسشِ آخر: کدوم پرسشم بیشتر کمک کرد؟ اگه خواستی فردا ادامه می‌دیم.",
+  "expect": "no option (best-question)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "- آخرِ کار: جواب بین ۰ و ۱ است؟ از پرسش‌هایی که این مدت پرسیدم، کدوم بیشتر به دردت خورد؟",
+  "expect": "option «جواب بین ۰ و ۱ است؟» only; the glued look-back question is excluded"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "کدام‌یک از سؤال‌ها برایت مفیدتر بود، اولی درباره‌ی مجهول یا دومی درباره‌ی حالت خاص؟",
+  "expect": "no option (best-question with choices)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "راستی، از کدام شاخهٔ ریاضی بیشتر لذت می‌بری؟",
+  "expect": "no option (taste question)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "پیش از خواب، فقط یک پرسشِ کوتاه: کدام پرسش بیشتر از همه کمکت کرد؟",
+  "expect": "no option (best-question)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "کدام فرض بیشتر به کار آمد، فرض اول یا دوم؟ هر دو را امتحان کن.",
+  "expect": "option «کدام فرض بیشتر به کار آمد، فرض اول یا دوم؟» (about the problem, not meta)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "کدام حالتِ خاص بیشتر کمک می‌کند تا الگو را ببینی؟",
+  "expect": "option kept as is"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "کدوم پرسش رو اول باید جواب بدی: مجهول چیه یا داده‌ها کدومن؟",
+  "expect": "option kept whole (a coaching question about the solving order)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "دوست داری از n=1 شروع کنی یا از n=2؟",
+  "expect": "option kept («دوست داری» but a step choice, not taste)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "کدام روش را می‌خواهی امتحان کنی، کار از آخر یا رسم شکل؟",
+  "expect": "option kept (method choice for this problem)"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "از داده‌هایی که داری، کدام به مجهول نزدیک‌تر است؟",
+  "expect": "option kept"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "کدام قدم از راه‌حلت هنوز وارسی نشده؟",
+  "expect": "option kept"
+ },
+ {
+  "rc": "RC2.meta",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "به نظرت کدام پرسشِ پولیا اینجا به کار می‌آید؟",
+  "expect": "option kept (asks the user to pick a heuristic, not to review helpfulness)"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "گفتی «۸۰۰ هزار تومن کافیه». چطور مطمئن می‌شی این عدد کمه یا زیاد؟",
+  "expect": "option «چطور مطمئن می‌شی این عدد کمه یا زیاد؟ (حدسِ تو: «۸۰۰ هزار تومن کافیه»)», never the recorded one",
+  "context": "recorded guess: «حدود ۵۰۰ هزار»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "«هیچ‌وقت نمی‌شه» حدسِ تازه‌ته. قبل از اثبات: با کدوم حالت خاص می‌آزماییش؟",
+  "expect": "option «با کدوم حالت خاص می‌آزماییش؟ (حدسِ تو: «هیچ‌وقت نمی‌شه»)»",
+  "context": "recorded guess: «پوشش ممکن است، فقط کند است»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "«فیل اضافه است» را حدس زدی؛ این حدس را با کدام حرکت می‌سنجی؟",
+  "expect": "option «این حدس را با کدام حرکت می‌سنجی؟ (حدسِ تو: «فیل اضافه است»)»",
+  "context": "recorded guess: «حرکت اول کیش وزیر است»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "حدست «جواب ۲^n است» جالبه؛ برای n=3 امتحانش کردی؟",
+  "expect": "note «جواب ۲^n است» (quoted in the same sentence)",
+  "context": "no recorded guess"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "این حدس را برای n=4 بیازما — چه می‌شود؟",
+  "expect": "note «n²» (allowed: coach_state.guess this turn points to g2)",
+  "context": "recorded g2: «n²»; model coach_state.guess -> g2 in this turn"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "تو گفتی «خرید خونه بهتره»؛ با چه عددی این حرف رو محک می‌زنی؟",
+  "expect": "note «خرید خونه بهتره»",
+  "context": "recorded guess: «اجارهٔ بلندمدت به‌صرفه‌تر است»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "گفتی «۱/۳ میشه». از یه راه دیگه هم به همین می‌رسی؟",
+  "expect": "note «۱/۳ میشه», never «۱/۲»",
+  "context": "recorded (refuted) guess: «۱/۲»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "اول گفتی «۶» و بعد «۸». این دومی را چطور می‌آزمایی؟",
+  "expect": "note «۸» or no note; never «۶» and never the recorded guess",
+  "context": "recorded guess: «۶»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "گفتی «رخ بی‌فایده است». این حدس را چطور می‌آزمایی؟",
+  "expect": "note «رخ بی‌فایده است»; never «کیش وزیر» (recorded after this message)",
+  "context": "guess «کیش وزیر» recorded at t2 > message time t1"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "حالا جوابت شد ۱/۳ — از راه دیگری هم به آن می‌رسی و وارسی‌اش می‌کنی؟",
+  "expect": "no guess note: «‌اش» refers to the new result, not a guess",
+  "context": "recorded (refuted) guess: «۱/۲»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "همهٔ ۴۷ ستونِ جدولت واقعاً لازمه؟ کدومش رو حذف کنی چیزی از دست نمی‌دی؟",
+  "expect": "no guess note",
+  "context": "recorded guess: «اجارهٔ بلندمدت»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "حدس زدن خوبه. حالا بگو: مهره‌ی سفید کجا ایستاده؟",
+  "expect": "no guess note (question not about a guess); option «مهره‌ی سفید کجا ایستاده؟»",
+  "context": "recorded guess: «کیش وزیر»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "هر حدسی داری، اول روی یه مثال کوچیک امتحانش کن. مثالت چیه؟",
+  "expect": "no guess note (generic advice)",
+  "context": "recorded guess: «۱۲»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "بودجه‌ات رو نوشتی؛ کدوم ردیفش بیشتر از همه بالا پایین می‌شه؟",
+  "expect": "no guess note: «‌ش» refers to the budget",
+  "context": "recorded guess: «۵۰۰ هزار»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "این حدسِ خوبی برای شروع است، اما پرسشِ اصلی این است: مجهول دقیقاً چیست؟",
+  "expect": "no guess note (the question is about the unknown)",
+  "context": "recorded guess: «۱۲»"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "این حدس رو چطور می‌آزمایی؟",
+  "expect": "no guess note: no quote in the message and the only guess was recorded after it",
+  "context": "guess recorded at t2 > message time t1; no coach_state.guess"
+ },
+ {
+  "rc": "RC2.which_guess",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "پرسشم را عوض می‌کنم: بدون حدس، فقط داده‌ها را بشمار. چند تا داری؟",
+  "expect": "no guess note",
+  "context": "recorded guess: «n²»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "یک قدمِ کوچک‌تر: اگر n=2 باشد، جواب چند است؟",
+  "expect": "option «اگر n=2 باشد، جواب چند است؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "نیمه‌ی راه: کدوم داده رو هنوز استفاده نکردی؟",
+  "expect": "option «کدوم داده رو هنوز استفاده نکردی؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "فقط یه نکته: مجهولت دقیقاً چیه؟",
+  "expect": "option «مجهولت دقیقاً چیه؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "و یک سؤالِ دیگر، این بار کوتاه: شکل را کشیدی؟",
+  "expect": "option «شکل را کشیدی؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "هنوز گامی ننوشته‌ای، پس سؤالی دیگر از همان فهرست: برای استقرا، حالت پایه چیست؟",
+  "expect": "option «برای استقرا، حالت پایه چیست؟» (label after «، پس» and its meta-clause dropped)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "پیش از تحویل، یک بررسیِ سریع: واحدها با هم جورند؟",
+  "expect": "option «واحدها با هم جورند؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "پرسشِ امروز — نسخه‌ی ساده‌تر: مجموع سه عددِ اول چند می‌شود؟",
+  "expect": "option «مجموع سه عددِ اول چند می‌شود؟» (dash inside the head)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "گامِ بعدی، با دقتِ بیشتر: کدام شرط را می‌توانی کنار بگذاری؟",
+  "expect": "option «کدام شرط را می‌توانی کنار بگذاری؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "یادآوریِ کوچک – حالتِ خاص: برای مثلثِ متساوی‌الاضلاع چه می‌شود؟",
+  "expect": "option «برای مثلثِ متساوی‌الاضلاع چه می‌شود؟»"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "حالا که گیر کرده‌ای: اگر از آخر شروع کنی، قدمِ یکی مانده به آخر چیست؟",
+  "expect": "option kept whole (head has finite verb «کرده‌ای»)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "قیاس را به کار بردی: مسئلهٔ ساده‌تری که شبیه این است کدام است؟",
+  "expect": "option kept whole (head «به کار بردی» is finite)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "از آخر شروع کن: برای رسیدن به ۱۰۰، یک قدم قبل کجا بودی؟",
+  "expect": "option kept whole (imperative «کن» is finite)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "گفتی حالت خاص را امتحان کرده‌ای: n=1 چه داد؟",
+  "expect": "option kept whole"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "تا اینجا درست آمدی: گامِ سوم از کجا نتیجه می‌شود؟",
+  "expect": "option kept whole"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "مسئله را دوباره بخوان: دقیقاً چه چیزی خواسته شده؟",
+  "expect": "option kept whole"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "ساعت ۱۰:۳۰ شروع کردی؟",
+  "expect": "option kept whole (colon inside a time is not a head separator)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "نسبتِ ۳:۴ را از کجا آوردی؟",
+  "expect": "option kept whole (ratio colon)"
+ },
+ {
+  "rc": "RC2.bare_label",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "شرط‌ها را شمردی و دیدی سه تاست: کدامش را هنوز به کار نبرده‌ای؟",
+  "expect": "option kept whole (head «دیدی سه تاست» has finite verbs)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "وقتی به جواب رسیدی، «حل شد» را بزن. پیش از آن: جوابت را در معادله‌ی اول بگذار — درست درمی‌آید؟",
+  "expect": "option «جوابت را در معادله‌ی اول بگذار — درست درمی‌آید؟» (dangling «پیش از آن» dropped)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "فرمول کلی رو بعداً می‌نویسیم. قبل از اون: برای n=3 چند تا میشه؟",
+  "expect": "option «برای n=3 چند تا میشه؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "نمودار را کشیدی. بعد از این: کدام نقطه بیشترین مقدار را دارد؟",
+  "expect": "option «کدام نقطه بیشترین مقدار را دارد؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "این راه را کنار بگذار. به جای آن، حالتِ n=0 چه می‌دهد؟",
+  "expect": "option «حالتِ n=0 چه می‌دهد؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "حدست را نوشتی. علاوه بر این، آیا شرطِ دوم هم لازم است؟",
+  "expect": "option «آیا شرطِ دوم هم لازم است؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "با همین، سؤال بعدی: مجموع زاویه‌ها چند است؟",
+  "expect": "option «مجموع زاویه‌ها چند است؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "جواب رو با ماشین‌حساب چک کن. پس از آن، کدام گام را باید وارسی کنی؟",
+  "expect": "option «کدام گام را باید وارسی کنی؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "از این گذشته: آیا جواب به واحد بستگی دارد؟",
+  "expect": "option «آیا جواب به واحد بستگی دارد؟»"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "در کنارِ این، بگو داده‌ی سوم به چه کاری می‌آید؟",
+  "expect": "option «داده‌ی سوم به چه کاری می‌آید؟» (anaphoric lead + «بگو» frame dropped)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "آن مثلثی که کشیدی، قائم‌الزاویه است؟",
+  "expect": "option kept whole (demonstrative with its noun inside the option)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "این معادله را چطور ساده می‌کنی؟",
+  "expect": "option kept whole"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "قبل از اینکه جواب بدی، شرط‌ها رو یه بار دیگه بخون — چند تا شرط داره؟",
+  "expect": "option kept whole («قبل از اینکه» is a conjunction, not an anaphor)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "بعد از ضربِ دو طرف در ۲، معادله چه شکلی می‌شود؟",
+  "expect": "option kept whole (preposition with explicit object)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "پیش از آنکه فرمول را بنویسی، برای n=1 چه به دست می‌آید؟",
+  "expect": "option kept whole («پیش از آنکه» conjunction)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "آنچه خواسته شده دقیقاً چیست؟",
+  "expect": "option kept whole (relative «آنچه»)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "بعد از ظهر وقت داری ادامه بدیم؟",
+  "expect": "option kept whole («بعد از ظهر» is a time phrase)"
+ },
+ {
+  "rc": "RC2.anaphora",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "آنتروپی سیستم بیشتر می‌شود یا کمتر؟",
+  "expect": "option kept whole («آن» only as a substring)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: مجهول چیست؟ ‖ A2: همان پرسشِ قبلی را دوباره می‌پرسم: مجهول چیست؟",
+  "expect": "one option «مجهول چیست؟»"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: کدوم داده رو هنوز به کار نبردی؟ ‖ A2: باز هم همون سؤال: کدوم داده هنوز استفاده نشده؟",
+  "expect": "one option (same object, reworded)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: برای n=2 چه می‌شود؟ ‖ A2: بگذار سؤالم را تکرار کنم — اگر n دو باشد، جواب چند است؟",
+  "expect": "one option"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: این حدس را چطور می‌آزمایی؟ ‖ A2: هنوز جواب ندادی، پس همان سؤال: حدست را با چه چیزی می‌آزمایی؟",
+  "expect": "one option (same guess, same act)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: شکل را کشیدی؟ ‖ A2: خب، دوباره: شکلش رو کشیدی یا نه؟",
+  "expect": "one option"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: کدام شرط اضافه است؟ ‖ A2: همان پرسش با بیانی دیگر: کدام شرط را می‌شود حذف کرد بی‌آن‌که چیزی عوض شود؟",
+  "expect": "one option"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: مسئلهٔ مشابهی دیده‌ای؟ ‖ A2: یک بار دیگر می‌پرسم، چون مهم است: آیا مسئلهٔ شبیه این را قبلاً حل کرده‌ای؟",
+  "expect": "one option"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A1: چند تا ستون واقعاً لازمه؟ ‖ A2: سؤالم هنوز سر جاشه: از این ستون‌ها چندتاش لازمه؟",
+  "expect": "one option"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1: مجهول چیست؟ ‖ A2: داده‌ها چیستند؟",
+  "expect": "two options"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1: برای n=2 چه می‌شود؟ ‖ A2: برای n=3 چه می‌شود؟",
+  "expect": "two options (different n)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1 (problem P1): همان پرسشِ قبلی: مجهول چیست؟ ‖ A2 (problem P2): همان پرسشِ قبلی: مجهول چیست؟",
+  "expect": "one option in each problem's list; never merged across problems"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1 (after guess «۶»): این حدس را چطور می‌آزمایی؟ ‖ A2 (after new guess «۸»): این حدس را چطور می‌آزمایی؟",
+  "expect": "two options (same frame, different guesses)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1: شکل را کشیدی؟ ‖ A2: همان شکل را با یک ضلعِ بلندتر بکش — زاویه‌ها عوض می‌شوند؟",
+  "expect": "two options («همان» but a new question)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1: کدام شرط اضافه است؟ ‖ A2: کدام شرط لازم است؟",
+  "expect": "two options (opposite objects)"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1: مجموع را برای ۱۰ جمله حساب کردی؟ ‖ A2: همان کار را برای ۱۰۰ جمله بکن — چه الگویی می‌بینی؟",
+  "expect": "two options"
+ },
+ {
+  "rc": "RC2.repeat",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A1: جوابت ۱/۳ شد؟ ‖ A2: جوابت ۱/۴ شد؟",
+  "expect": "two options (different values)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: n=5 رو گذاشتم، شرط برقرار نیست پس این ادعا رد شد. ‖ U2: مثبت بودنِ جمله‌ها رو هم چک کردم، همه‌شون مثبتن. ‖ U3: یه نگاه کلی هم: چون هر جمله از قبلی کوچیک‌تره، حد وجود داره.",
+  "expect": "verified (coach_state.check.msgs=[U1,U2,U3], all user messages)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: x=3 رو گذاشتم تو معادله‌ی اول: ۲·۳+۱=۷ درسته. ‖ U2: تو دومی هم: ۳−۱=۲، اونم درسته.",
+  "expect": "verified (check spread over two messages)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: واحدها را بررسی کردم؛ هر دو طرف بر حسب متر بر ثانیه‌اند. ‖ U2: همچنین در حالت حدی t=0 نتیجه صفر می‌شود که منطقی است.",
+  "expect": "verified (formal, two checks)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: برای n=1 فرمول ۱ می‌ده، درسته. ‖ U2: n=2 هم ۳، با شمردن دستی می‌خونه. ‖ U3: n=3 هم شش شد. اوکیه.",
+  "expect": "verified (three special cases in three messages)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: جمع ردیف‌ها رو دوباره زدم، ۱۲ میلیون شد. ‖ U2: با صورت‌حساب بانک هم تطبیق دادم، همونه.",
+  "expect": "verified (life/budget check)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: از راه دوم هم رفتم، با مساحت. ‖ U2: همون ۱/۳ دراومد.",
+  "expect": "verified (second method, result in a later message)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: حالت پایه رو نوشتم. ‖ U2: گام استقرا: فرض کردم برای k درسته و برای k+1 نشون دادم. ‖ U3: جایی که از فرض استفاده کردم رو هم علامت زدم.",
+  "expect": "verified (proof check across three messages)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "pos",
+  "role": "user",
+  "text": "U1: با عدد گذاشتن امتحانش کردم، جور درمیاد.",
+  "expect": "verified: model summary «جواب را در معادله جایگذاری کرد و تساوی برقرار بود» has low token overlap but check.msgs=[U1] is valid"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: فکر کنم درسته. ‖ U2: آره دیگه، حتماً درسته.",
+  "expect": "not verified: assertions, no check (model reports no check)"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: بیا جایگذاری کنیم: ۲·۳+۱=۷ ‖ U1: باشه.",
+  "expect": "not verified: check.msgs points to the assistant's message; page rejects it"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: درسته به نظرم.",
+  "expect": "not verified via check: check.msgs=[msg id that does not exist]; page rejects, falls back to \"maybe\" at most"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: می‌خوام وارسی کنم ولی بلد نیستم چطوری.",
+  "expect": "not verified: intention only"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: x=3 رو تو معادله گذاشتم؛ نشد! ۸ درومد نه ۷.",
+  "expect": "not verified: the check refutes the answer"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1 (problem A): جواب رو با ماشین‌حساب چک کردم، درسته.",
+  "expect": "not verified for problem B: the cited message belongs to another problem"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: جواب ۶ رو جایگذاری کردم، جور بود. ‖ (later) U2: نه، جوابم عوض شد، ۸ است.",
+  "expect": "final answer ۸ not verified: the check was of the abandoned answer ۶"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: معادله رو یه بار دیگه از اول حل کردم و همون جواب اومد.",
+  "expect": "no coach_state.check, but ~70% token overlap with model summary: \"maybe\" only (fallback), neither verified nor denied"
+ },
+ {
+  "rc": "RC4",
+  "kind": "neg",
+  "role": "user",
+  "text": "U1: n=4 رو امتحان کردم. ‖ U2: شرط هم برقرار بود. ‖ U3: پس حله.",
+  "expect": "model omits coach_state.check and overlap with any single message is low: page must NOT assert «وارسی نشد» (unknown, no denial)"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "A(p6): از سؤال‌هایی که پرسیدم کدوم بیشتر کمکت کرد؟ ‖ U(p7): همون که گفتی حالت خاص رو امتحان کن.",
+  "expect": "bestQ asked (by assistant) and answered (model chat_lookback bestQ): never asked again"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "A: بیشتر چه جور مسئله‌ای دوست داری؟ ‖ U: هنوز نمی‌دونم.",
+  "expect": "taste counted as asked (unknown, not answered); the next turn line must not make taste the turn question again"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "A(p5): از کدوم نوع مسئله‌ها خوشت میاد؟ ‖ U: (ignores) ‖ A(p9): راستی، کدوم مدل مسئله بیشتر به دلت می‌شینه؟ ‖ U: (ignores)",
+  "expect": "taste counted asked twice (both assistant asks): page must not push it a third time as the turn question"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "U: سؤالِ «مجهول چیه» بیشتر از همه کمکم کرد، راستی.",
+  "expect": "model applies chat_lookback bestQ in THIS turn; turn line computed after it, so no bestQ ask in this turn"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "A: کدوم پرسشم راهگشا بود؟ ‖ U: (changes topic)",
+  "expect": "counts as a bestQ ask (paraphrased wording); no immediate re-ask by the page"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "U: (never asked) راستی من بیشتر از هندسه خوشم میاد.",
+  "expect": "model reports taste; page never asks taste for this problem"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "A: لطفاً بفرمایید کدام پرسش بیشتر یاری‌تان کرد؟ ‖ U: پرسش دربارهٔ حالتِ خاص.",
+  "expect": "asked and answered (formal register); never re-asked"
+ },
+ {
+  "rc": "RC5",
+  "kind": "pos",
+  "role": "user",
+  "text": "A(day 1): کدوم سؤال بیشتر به کارت اومد؟ ‖ U(day 2): راستی جواب سؤال دیروزت: همون که گفتی از آخر شروع کن.",
+  "expect": "answered in the next session (model reports bestQ); no re-ask"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: کدوم پرسش رو اول جواب بدی: مجهول یا داده‌ها؟",
+  "expect": "not a look-back ask: bestQ stays pending (unasked)"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: دوست داری بریم سراغ مسئله‌ی بعدی؟",
+  "expect": "not a taste ask: taste stays pending"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: کدوم پرسش بیشتر کمکت کرد؟ ‖ U: سؤالت چی بود؟ یادم رفت.",
+  "expect": "counted asked but NOT answered"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A (problem P1 closed): کدوم پرسش کمکت کرد؟ ‖ U: حالت خاص. ‖ (later problem P2 closed)",
+  "expect": "P2's bestQ is neither asked nor answered (ledger is per problem)"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: دیروز پرسیده بودم کدوم پرسش کمک کرد و گفتی حالت خاص؛ امروز بریم سراغ تمرین بعدی.",
+  "expect": "not a new ask (a recap), and counts as an answer only if the model reports it"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: کدوم پرسش بیشتر کمکت کرد؟ ‖ U: خیلی کمکم کردی، مرسی!",
+  "expect": "not answered: thanks without naming a question"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: کدوم پرسش بیشتر کمکت کرد؟ ‖ U: من کلاً جبر رو دوست دارم.",
+  "expect": "taste answered (if model reports), bestQ NOT answered"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "A: کدام پرسش از فهرست پولیا را می‌خواهی امتحان کنی؟",
+  "expect": "not a look-back ask"
+ },
+ {
+  "rc": "RC5",
+  "kind": "neg",
+  "role": "user",
+  "text": "U: کدوم سؤال بیشتر توی امتحان میاد؟",
+  "expect": "the user's own question: not an assistant ask, not an answer"
+ }
+]

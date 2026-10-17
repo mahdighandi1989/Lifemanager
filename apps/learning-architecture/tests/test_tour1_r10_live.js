@@ -133,7 +133,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(o.some(t => /^به مجهول نگاه کن: دقیقاً چه می‌خواهی/.test(t)), 'dedupe setup: the page\'s unknown question is an option ' + JSON.stringify(r.opts));
     chk(!o.some(t => /^💬 .*از کجا می‌فهمیدی؟/.test(t)), 'dedupe: the chat paraphrase «دقیقاً چه می‌خواهی — … از کجا می‌فهمیدی؟» of the page question is not a second option (s05) ' + JSON.stringify(r.opts));
     // DECISIONS_R15 O1: پرسشی که با «اگر» آغاز می‌شود جملهٔ خبریِ پیش از خودش را هم می‌آورد (جای مرجع) — پس گزینه با «پیش از وسیله، خودِ هدف — کوتاه‌تر:» آغاز می‌شود
-    chk(o.some(t => /^💬 پیش از وسیله، خودِ هدف — کوتاه‌تر: اگر این ماجرا «حل» شده بود، چه داشتی/.test(t)), 'dedupe: control — a different chat question («… چه داشتی — ترفیع، احترام…؟») keeps its own option ' + JSON.stringify(r.opts));
+    // دورِ ۱۷ (RC2d): سرِ بی‌فعلِ «پیش از وسیله، خودِ هدف — کوتاه‌تر:» برچسب است و می‌رود؛ گزینه همان پرسش است
+    chk(o.some(t => /^💬 اگر این ماجرا «حل» شده بود، چه داشتی/.test(t)), 'dedupe: control — a different chat question («… چه داشتی — ترفیع، احترام…؟») keeps its own option ' + JSON.stringify(r.opts));
   });
 
   // ================= d5 — «دو بچه» ⇄ «دوفرزندی» و دروازهٔ نرمِ «به‌کارنرفته» =================
