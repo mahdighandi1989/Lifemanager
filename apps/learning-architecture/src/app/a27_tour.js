@@ -1339,10 +1339,10 @@
   function pickProverb(ph, s, cls, mt, avoid) {
     var av = provNorm(avoid), seenIn = function (x) { return [x.q, x.id ? provText(x.id) : ""].some(function (t) { var k = provNorm(t).slice(0, 18); return k.length >= 8 && av.indexOf(k) >= 0; }); };
     var pv = proverbs(ph, provKeys(ph, cls, mt)).filter(function (x) { return !av || !seenIn(x); }); if (!pv.length) return null;
-    /* دورِ ۱۲ (L6، s25 p6، s26 p4): ضدِ ضرب‌المثل (PROV_OPP) هم نباید نقلی باشد که همین حالا در بلوک آمده — اول نامزدی که ضدش در بلوک نیست */
+    /* دورِ ۱۲ (L6، s25 p6، s26 p4): ضدِ ضرب‌المثل (PROV_OPP) هم نباید نقلی باشد که همین حالا در بلوک آمده — آن‌گاه ضرب‌المثل بی ضد می‌آید */
     var oppIn = function (x) { var o = x.id && PROV_OPP[x.id]; if (!o || !av) return false; var k = provNorm(provText(o)).slice(0, 18); return k.length >= 8 && av.indexOf(k) >= 0; };
     var used = (s && s.coach && s.coach.prov) || [], fresh = pv.filter(function (x) { return used.indexOf(x.id || x.q) < 0; }), pool = fresh.length ? fresh : pv;
-    var pick = pool.filter(function (x) { return !oppIn(x); })[0] || pool[0];
+    var pick = pool[0];   // ضرب‌المثلِ لحظه (مثلاً ته‌نشینی پس از گیر — B14) عوض نمی‌شود؛ فقط ضدِ تکراری‌اش نمی‌آید
     return oppIn(pick) ? Object.assign({}, pick, { noOpp: true }) : pick;
   }
   /* B2/D2: «پاسخ‌گرفته» = پرسشی که دستیار پرسید و کاربر جواب داد، **یا** بخشی از فهم که کاربر خودش (ناپرسیده) گفت — مجهول/داده/شرط */
