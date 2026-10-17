@@ -147,11 +147,15 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       ['«دو ساعت» را درست یا غلط نمی‌خوانم؛ حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام ساعت می‌تواند ردش کند — ساعتی که جمعِ دو مسافت در آن به ۶۰ نمی‌رسد؟', 'ساعتِ ۱ رو امتحان می‌کنم.'],
       ['کدام حلقه دقیقاً شکست؟', 'همان دومی.'], ['حدسی گفتی — چطور می‌آزمایی‌اش؟ فردا کی وقت داری؟', 'فردا عصر.']]) { await next(q); await say(a); }
     r.qs = await cq(P); delete r.stage;
-    for (const [k, q] of [['Q_LINK', Q_LINK], ['resultQ', RESQ], ['Q_LINE', Q_LINE], ['EQ_FEW', EQ_FEW]]) chk(r.qs.filter(t => t === q).length === 1, 'echo: the page turn question ' + k + ' (no trailing «؟») echoed verbatim is ONE option, recognised by its known text (M2, s06) ' + JSON.stringify(r.qs));
+    // DECISIONS_R15 O1: گزینه = بخشِ پرسشیِ پیام (تا پایانِ آخرین جملهٔ پرسشیِ پیوسته) — جملهٔ خبری/دستوریِ پس از آن («شاید فقط همان یکی…»، «(بعد در صفحه…)») دیگر جزءِ گزینه نیست؛
+    // پیش‌درآمدِ پیش از «:» هم نه. هنوز یک گزینه برای هر پیام، و پرسشِ عینِ صفحه یکی (همان «کدام حلقه دقیقاً شکست؟» در دو پیام ⇒ یک گزینه).
+    const QPART = (q) => { const S = q.split(/(?<=[؟?.!:])\s+/); let a = S.findIndex(x => /[؟?]$/.test(x)), b = a; while (b + 1 < S.length && /[؟?]$/.test(S[b + 1])) b++; return S.slice(a, b + 1).join(' '); };
+    for (const [k, q] of [['Q_LINK', Q_LINK], ['resultQ', RESQ], ['Q_LINE', Q_LINE], ['EQ_FEW', EQ_FEW]]) chk(r.qs.filter(t => t === QPART(q)).length === 1, 'echo→R15 O1: the page turn question ' + k + ' echoed verbatim is ONE option — its question passage ' + JSON.stringify(QPART(q)) + ' (M2, s06) ' + JSON.stringify(r.qs));
     chk(!r.qs.some(t => /^(?:شاید فقط همان یکی|\(بعد در صفحه|\(در مسئلهٔ عملی|\(برای n مجهول|پیش از رها کردنِ کلِ راه:$)/.test(t)), 'echo: never a non-question fragment of those questions as an option ' + JSON.stringify(r.qs));
     // DECISIONS_R14 N2: گزینه همان جمله‌های پیوستهٔ خودِ دستیار است (نه متنِ عامِ صفحه)؛ پرسشِ صفحه فقط کلیدِ یکی کردن
     const OWN_G = 'حدسی گفتی — چطور می‌آزمایی‌اش؟ کدام ساعت می‌تواند ردش کند — ساعتی که جمعِ دو مسافت در آن به ۶۰ نمی‌رسد؟';
-    chk(r.qs.filter(t => /ردش/.test(t)).length === 1 && r.qs.includes(OWN_G) && !r.qs.some(t => /درست یا غلط نمی‌خوانم/.test(t)), 'echo: a paraphrased continuation that refers back («… کدام ساعت می‌تواند ردش کند — …؟») joins the guess-test question — ONE option, in the assistant\'s own words (R14 N2), no preamble (M2, s01 c40) ' + JSON.stringify(r.qs));
+    // DECISIONS_R15 O1: بندِ پیش از «؛» در همان جمله است و می‌ماند (گزینه از آغازِ جمله‌ای که نخستین پرسش در آن است؛ بلندیِ کم بی‌ضرر)
+    chk(r.qs.filter(t => /ردش/.test(t)).length === 1 && r.qs.some(t => t.endsWith(OWN_G)), 'echo→R15 O1: a paraphrased continuation that refers back («… کدام ساعت می‌تواند ردش کند — …؟») is in the same option as the guess-test question — ONE option, in the assistant\'s own words (M2, s01 c40; R14 N2) ' + JSON.stringify(r.qs));
     chk(r.qs.some(t => t === 'کدام حلقه دقیقاً شکست؟'), 'echo: control — the bare «کدام حلقه دقیقاً شکست؟» is still an option ' + JSON.stringify(r.qs));
     chk(r.qs.some(t => /فردا کی وقت داری/.test(t)), 'echo: control — a following question that does not refer back is not swallowed ' + JSON.stringify(r.qs));
   });

@@ -323,7 +323,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       chk(info.f7seen.seen && info.f7seen.qs.some(q => /پیش‌تر[^؟]*دیده/.test(q)), 'F7: «کدام پرسش کمک کرد؟» lists the plan question answered on its own card («پیش‌تر … دیده‌ای؟») ' + JSON.stringify(info.f7seen));
       await p.evaluate(pid => { const se = APP.ASSIST.newSession(); APP.liveBindSession(pid, se, { force: true }); se.msgs.push({ role: 'ai', text: 'ولی بار فقط یک میز نیست — از «یک میزِ گرد» هم استفاده کردی؟', at: new Date().toISOString() }); APP.S.put(se); }, PX);
       info.f7chat = await p.evaluate(pid => APP.liveChatQs(pid), PX);
-      chk(info.f7chat.includes('از «یک میزِ گرد» هم استفاده کردی؟') && !info.f7chat.some(q => /^ولی/.test(q)), 'F7: a chat question is listed without its preamble ' + JSON.stringify(info.f7chat));
+      // DECISIONS_R15 O1 جای F7 را گرفت: سرِ پیش از «—» هرگز بریده نمی‌شود (بلندیِ کم بی‌ضرر است، تکهٔ بی‌مرجع ایراد)؛ فقط واژهٔ گفتمانیِ آغاز («ولی») می‌افتد
+      chk(info.f7chat.includes('بار فقط یک میز نیست — از «یک میزِ گرد» هم استفاده کردی؟') && !info.f7chat.some(q => /^ولی/.test(q)), 'F7→R15 O1: a chat question is listed whole with its head before «—», only the leading discourse word «ولی» dropped ' + JSON.stringify(info.f7chat));
       // mentions: برچسبِ فهرست، عدد کنارِ اسم، نامِ تک‌حرفی (s23/s24/s29)
       info.f7m = await p.evaluate(() => [APP.liveMentions('همهٔ موادِ دستور را دو برابر می‌کنم', 'دستور: ۳ تخم‌مرغ، ۱ پیمانه شکر'), APP.liveMentions('گامِ اول یک یا دو پله، بعد پله‌های باقی‌مانده', '۳۰ پله', ['هر گام ۱، ۲ یا ۳ پله است']), APP.liveMentions('دایره‌ای مماس بر A و B', 'مسیرِ A/B/C'), APP.liveMentions('هیچ ربطی ندارد', 'دستور: ۳ تخم‌مرغ')]);
       chk(info.f7m[0] && info.f7m[1] && info.f7m[2] && !info.f7m[3], 'F7: mentions() matches a list label, number+noun and single-letter names (negation still excluded) ' + JSON.stringify(info.f7m));
