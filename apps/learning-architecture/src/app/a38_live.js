@@ -3710,8 +3710,8 @@
   function wdOf(t) { var x = nz(t); for (var i = 0; i < WD.length; i++) if (new RegExp("(?:^|[^ء-ی])" + WD[i][0] + "(?![ء-ی])").test(x)) return { w: WD[i][1], tok: WD[i][0] }; return null; }
   function tokz(t) { return String(t == null ? "" : t).replace(/[،,؛!؟?«»"“”()]/g, " ").replace(/(\S)[.:](?=\s|$)/g, "$1").split(/\s+/).filter(Boolean); }
   function eqT(a, b) { return nz(a) === nz(b); }
-  var NUMW = ["یک", "یه", "دو", "سه", "چهار", "پنج", "شش", "هفت", "هشت", "ده", "نیم"];
-  function isNum(w) { var x = nz(w); return /^-?\d+(?:[.\/]\d+)?%?$/.test(x) || NUMW.indexOf(x) >= 0; }
+  var RT_NUMW = ["یک", "یه", "دو", "سه", "چهار", "پنج", "شش", "هفت", "هشت", "ده", "نیم"];
+  function isNum(w) { var x = nz(w); return /^-?\d+(?:[.\/]\d+)?%?$/.test(x) || RT_NUMW.indexOf(x) >= 0; }
   function hz(w) { var x = nz(w); return x.length > 3 ? x.replace(/ه$/, "") : x; }
   function affix(F, X) { var p = 0, q = 0; while (p < F.length && p < X.length && eqT(F[p], X[p])) p++; while (q < F.length - p && q < X.length - p && eqT(F[F.length - 1 - q], X[X.length - 1 - q])) q++; return { p: p, q: q }; }
   function cores(F, X) {

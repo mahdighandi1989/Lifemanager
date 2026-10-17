@@ -12,13 +12,14 @@ Files changed:
 
 a27 and a29 were not touched. Nothing was removed, so there is no REMOVAL_CANDIDATES entry.
 
-**Docs numbering:** WORKLOG (76) and PROGRESS 92 assume the coach's (75) and 91 land first. Until then, `build.py`'s documentation gate reports a gap on
-this branch alone. Merge the coach's branch first; the gap then closes without edits.
+**Docs numbering:** the coach's branch (`worktree-agent-ac3b6c9a31d715445`, e76821ee) is already merged into this branch. The coach's WORKLOG (75) and
+PROGRESS 91 come before this branch's (76) and 92, and the bundle was rebuilt. `test_tour1_r19b_coach.js` passes against the native `liveRetract` (INF15 28/28,
+INF17 20/20, `liveRetractNative: true`).
 
 ## Contract for the coach builder (a27/a29)
 
-**Message id.** `APP.liveMsgId(m)` returns `m.id` if it is set, otherwise `"m@" + m.at`. It is stable as long as `m.at` does not change. An edit through ✏️
-keeps `m.at` and moves the old text into `m.textHist`.
+**Message id.** `APP.liveMsgId(m)` returns the same value as the coach's `AS.msgId(m)`: `m.id`, else `"u" + seq`, else `"t" + at`. An edit through ✏️
+keeps the id and moves the old text into `m.textHist`.
 
 **Source tags.** Any record you write from a chat message should carry `src: { sess, mid }`. Records written today without it:
 
@@ -44,7 +45,18 @@ Adding `src` makes the match exact.
 - `msgRef` can be the message object, its id, a 1-based user index, or a text fragment.
 - With `newText` it takes the ✏️ path: the bubble text changes and the diff is computed from the two texts.
 
-**Per-problem call.** `APP.liveRetract(pid, msgRef, {what, fix, frag, sess})`.
+**Per-problem call (the coach's signature).** `APP.liveRetract(pid, msgId, {what, fix, frag, old, msg, n, at, sess, by})`.
+- The message is found by id, then by `n` (1-based user index), then by the text in `msg`.
+- `old`, when it occurs in the message, is the value that gets replaced.
+- `by` is the correcting message. Its text feeds the «… نه Y» rule.
+- It returns `{ok, changed, changes:[text], text}`. `text` is «✓ …», or «چیزی از آن پیام در مسئلهٔ زنده ثبت نشده بود» when nothing changed, or «ثبت نشد: …» when refused.
+- Calling it again with the same correction is a no-op.
+
+**The ✏️ order.** The ✏️ path runs these steps in order:
+1. The page reversal runs (`retractMsg` with `keepText`).
+2. The «[اصلاحِ پیامِ قبلی] «frag» ⇐ «fix» — …» turn is sent.
+3. `AS.retractApply(s, {msg: frag, what, fix})` runs. The old fragment is still in the earlier message at this point.
+4. `APP.liveEditCommit` sets the new bubble text and appends the coach's `ch` to the session's correction log.
 
 **Hooks.** `APP.onRetract(cb)` returns an unsubscribe function.
 - `cb(ev)` runs once per reversal, after the page has reversed its own records. This applies to both ✏️ and model reports.

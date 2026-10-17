@@ -1233,4 +1233,7 @@
 - آزمون: `tests/test_tour1_r19b_live.js` (retract، edit، dossier) + `tests/variants/VARIANTS_R19b.json` — روی ساختِ پایه ۰/۶۹؛ پس از اصلاح INF15.retract ۲۸/۲۸،
   INF15.edit ۲۰/۲۰، INF16.dossier ۲۱/۲۱ (INF17 سهمِ مربی). بخش‌های مربی‌محورِ ورودی‌ها (coach.guess، وعده، برنامهٔ گفت‌وگو، برداشتنِ رویدادِ کارنامهٔ حدس، جملهٔ
   یک‌سطریِ دستیار) تا مرزِ صفحه سنجیده شده‌اند: رویدادِ `onRetract` با frag/fix/what ِ درست، `A.retractShiftDate` و قلابِ پرامپت.
+- **[FIX] پس از ادغامِ شاخهٔ مربی:** `A.liveRetract` با امضای مربی (`pid, msgId, {what, fix, frag, old, msg, n, at, sess, by}`) و خروجیِ `{changes, text}`؛ شناسهٔ
+  پیام همان `AS.msgId`؛ راهِ ✏️ پس از نوبتِ «[اصلاحِ پیامِ قبلی]» `AS.retractApply` ِ مربی را هم می‌راند. فهرستِ عددِ واژه‌ایِ تازه نامِ `NUMW` ِ موجود
+  (تقریب در برابرِ فاصله، F7 ِ دورِ ۵) را می‌پوشاند و `test_tour1_r5_live.js` را سرخ کرد — به `RT_NUMW` تغییر نام یافت.
 > **امضا:** `Claude Code (رفع‌کنندهٔ «live» ِ دورِ ۱۹b)` · 2026-10-17 · آزمونِ تازه قرمز روی ساختِ پایه (۰/۶۹) و سبز پس از اصلاح؛ build.py + کلِ آزمون‌های صفحه
