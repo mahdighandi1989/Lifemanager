@@ -12,5 +12,11 @@
  "what": "تورِ پولیا دورِ ۱۱ (K8): cues_fa برای sc_negotiation در s_social.json (فقط روی صورت/مجهولِ خودِ مسئله) + a28 knowledge(extra)؛ نامِ داخلِ پرانتز نامِ متمایز نیست (ثانیه)",
  "procedure": "AGENTS.md: قلمرو از registry؛ قاعدهٔ E6 بی‌تغییر",
  "commit": "10cd5a1",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-17T09:54:55Z",
+  "note": "sys_territory.py check healthy; s_social.json valid JSON",
+  "commit": ""
+ }
 }
