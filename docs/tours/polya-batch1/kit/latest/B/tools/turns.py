@@ -1,5 +1,5 @@
 import json,re,sys,os
-B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round17B'
+B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round18B'
 for s in sys.argv[1:]:
   d=f'{B}/{s}/ai'; ps=sorted(int(f[1:-5]) for f in os.listdir(d) if re.match(r'p\d+\.json$',f))
   print('########',s)

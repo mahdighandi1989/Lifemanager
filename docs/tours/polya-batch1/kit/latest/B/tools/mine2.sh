@@ -1,6 +1,6 @@
 #!/bin/bash
 # mine2.sh sid srcctl srcans STOPAT : replay ctl from srcctl dir; answer from srcans
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round18B; cd $B; s=$1; C=$2; A=$3
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19B; cd $B; s=$1; C=$2; A=$3
 for i in $(seq 1 80); do
   p=$(python3 -c "
 import os

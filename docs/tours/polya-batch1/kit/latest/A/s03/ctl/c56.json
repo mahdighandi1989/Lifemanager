@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify([...document.querySelectorAll(\".as-msg .mx\")].map(e=>[e.closest(\".as-msg\").className,e.getAttribute(\"data-src\")]))"}

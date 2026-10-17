@@ -1,6 +1,6 @@
 #!/bin/bash
 # nx.sh SID N M [EXTRA] : answer then continue; print compact tail
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round18A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19A
 python3 $R/tools/rx.py $1 $2 $3 "${4:-{\}}" > $R/$1/_rx.txt 2>&1 || { cat $R/$1/_rx.txt; exit 1; }
 grep -m1 ANSWER $R/$1/_rx.txt | cut -c1-300
 L=$(wc -l < $R/$1/auto.log)

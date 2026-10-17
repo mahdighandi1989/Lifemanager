@@ -1,1 +1,1 @@
-{"eval":"FL(\"lpSat|lpRel|lpCond|lpSuff\")"}
+{"eval":"(()=>{APP.today=()=>\"2026-10-20\";APP.go(\"home\");const d=DUE();APP.go(\"lprob\",\"pb_l_mvcivgybhqk\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/شروع می‌کنم/.test(b.textContent));if(b)b.click();return d+\"\\n###\\n\"+FL(\"lpType|lpNat\")+\"\\n\"+MT(\"نوعِ مسئله\",500)})()"}

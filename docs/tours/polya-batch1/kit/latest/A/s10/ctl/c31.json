@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"(()=>{const r=APP.liveAll().find(r=>/۹ مهمان/.test(r.p.title));APP.go(\"lprob\",r.p.id,\"back\");const e=document.getElementById(\"lpBBest\");return e?[...e.options].map(o=>o.textContent).join(\" || \"):\"NOSEL \"+(document.getElementById(\"main\").innerText.match(/پرسشی که بیشتر کمک کرد[^\\n]*/)||[\"\"])[0]})()"}
