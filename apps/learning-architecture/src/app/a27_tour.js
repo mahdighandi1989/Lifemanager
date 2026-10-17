@@ -2826,6 +2826,8 @@
     // guess {text}
     var gt = txtOf(a.guess);
     if (gt && quoteIn(gt, ut)) { C.guess = { text: clip(gt, 300), key: key, at: at };
+      // دورِ ۱۷ (پیوندِ RC1↔RC2c): حدسِ وارسی‌شدهٔ همین نوبت روی پیامِ دستیارِ همین نوبت هم می‌نشیند (m.guess) — a38 «(حدسِ تو: …)» را فقط از آن می‌گیرد
+      for (var gi = (s.msgs || []).length - 1; gi >= 0; gi--) if (s.msgs[gi] && s.msgs[gi].role === "ai") { s.msgs[gi].guess = { text: clip(gt, 300) }; break; }
       if (C.dupPend && C.dupPend.key === key) guessToProblem(s, C.dupPend.pid, gt); }
     // check {msgs:[…]}
     var ck = a.check && typeof a.check === "object" ? a.check.msgs : null;
