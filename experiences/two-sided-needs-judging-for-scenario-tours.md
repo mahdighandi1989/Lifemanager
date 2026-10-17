@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T07:00:00Z"
 created_at: "2026-10-17T07:00:00Z"
-updated_at: "2026-10-17T13:20:00Z"
+updated_at: "2026-10-17T19:00:00Z"
 merged_from: []
 ---
 
@@ -58,3 +58,12 @@ reports them as structured state that the page validates, while patterns may onl
 a variant bank written by an agent who never saw the code: positives AND confusable negatives in several registers. A fix that passes the
 scenario sentence but fails a paraphrase is not a fix. The same need maps also yield infrastructure work (e.g. formula display), which is
 built in the same round, not deferred.
+
+## Update 2026-10-17 (2) — five axes per part, coverage from the registries, and a necessity verdict
+Need maps alone still let whole parts go untested (no scenario ever entered them) and never asked whether a part should exist at all.
+Two additions: (1) the list of parts comes from the system's own registries (view registry, graph), and a coverage matrix built from it
+before each tour forces a scenario through every part — or a written reason why not; (2) every part a scenario passes is judged on five
+axes: purpose/philosophy (from its own design doc), function, quality/gaps, both thirsts, and necessity/overlap («unique role» /
+«merge with X» / «should appear inside flow Y, not as a separate place» / «unused ⇒ quarantine candidate»). A part judged unused or
+overlapping in two consecutive rounds becomes a merge/quarantine proposal to the owner (never a silent deletion). This is what makes
+the review holistic without the owner having to name parts one by one.
