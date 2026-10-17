@@ -56,3 +56,14 @@ a26, a27, a29 and a39 were not touched.
 
 ## Quarantined (REMOVAL_CANDIDATES)
 `qSplitR18` and `gateLineR18` are reachable through `APP.LIVE_R19_QUARANTINE` and are never called.
+
+## Older expectations replaced (marked «دورِ ۱۹»)
+- `tests/test_tour1_r18_live.js`: the note pattern now accepts «حدسِ تو» and «حدسِ شما». One R18 RM4.guess bank entry is a «شما» conversation
+  that still expected «حدسِ تو», and RN6c replaces that expectation.
+- Model `what` check: the text is accepted when it shares at least one content word with her message (same-stem prefix, so «پخت» matches
+  «پختمش») and contains all of its numbers. The R18 s23 paraphrase «پخت و خوب شد» is accepted; «قبول کرد» for «هنوز جواب نداده» is refused.
+
+## Verification
+- Before the final commit, the integration head accec940 was merged and the page rebuilt; the whole page suite then passed 101/101 (`tests/test*.js` +
+  `scan_epi.js`).
+- The pytest handbook gate is red on this branch alone until the integration merge: WORKLOG (72) and PROGRESS 88 belong to the parallel fixers.
