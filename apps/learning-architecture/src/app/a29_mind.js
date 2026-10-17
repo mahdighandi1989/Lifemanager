@@ -341,7 +341,10 @@
      بی‌داده هر چهار ½ و ¼ (نمی‌دانیم). خروجی برای تور/دستیار: A.MIND.phases(). */
   var PH4 = [["und", "u", "فهمِ مسئله"], ["plan", "p", "طرح‌ریزی"], ["exec", "c", "اجرای طرح"], ["back", "b", "بازنگری"]];
   var PH_SRC = { ask: "پرسشِ همین لحظه / معلمِ حل (خودداوریِ «کمک کرد؟»)", sim: "شبیه‌ساز (درستیِ بار اولِ گام)", ucard: "کارتِ فهم (خودسنجی در برابرِ صورت)", live: "گام‌های واقعیِ مسئلهٔ زنده", lb: "بازنگری انجام و وارسی شد",
-    chat: "گیر یا «حل نشد» ِ خودت در گفت‌وگو با مربی", knot: "گره‌ای که هنگامِ حل در غربال پیدا شد" };
+    chat: "گیر یا «حل نشد» ِ خودت در گفت‌وگو با مربی", knot: "گره‌ای که هنگامِ حل در غربال پیدا شد",
+    chatok: "پاسخ، گذر از مرحله یا «حل شد» ِ سنجیده در گفت‌وگو با مربی", lplan: "طرحِ ثبت‌شده، مسئلهٔ کمکی و دادهٔ به‌کاررفته در مسئلهٔ زنده" };
+  var NO_DATA = "هنوز داده‌ای نیست";
+  M.NO_DATA = NO_DATA;
   M.PHASES = PH4.map(function (x) { return { id: x[0], ph: x[1], fa: x[2] }; });
   M.phases = function () {
     var R = {}; PH4.forEach(function (x) { R[x[0]] = { id: x[0], ph: x[1], fa: x[2], k: 0, n: 0, src: {} }; });
@@ -354,7 +357,8 @@
     S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut); });
     S.all("achat").forEach(function (s) { tutOf(s.tut);
       /* مربیِ گفت‌وگو (a27): گیر/«حل نشد» ِ خودِ کاربر و گره‌ای که در میانهٔ حل پیدا شد ⇒ ناموفق در همان مرحله */
-      (s.coachEv || []).forEach(function (e) { if (e && byPh[e.ph] && (e.src === "chat" || e.src === "knot")) add(byPh[e.ph], e.src, !!e.ok); }); });
+      /* تورِ پولیا (RM1a): موفقیتِ سنجیدهٔ گفت‌وگو (src «chatok»، ok:true) هم — هر کدام یک رویداد */
+      (s.coachEv || []).forEach(function (e) { if (e && byPh[e.ph] && (e.src === "chat" || e.src === "knot" || e.src === "chatok")) add(byPh[e.ph], e.src, !!e.ok); }); });
     S.all("eprog").forEach(function (pg) {
       var pid = String(pg.id).replace(/^eprog_/, ""), p = A.getProb ? A.getProb(pid) : null, sv = pg.solve || {};
       if (p && Array.isArray(p.stages) && A.stagePhase) Object.keys(pg.lv || {}).forEach(function (lv) {
@@ -367,22 +371,33 @@
          دست‌کم کمی پیش برد (پیش‌بینیِ نادرست به‌تنهایی داده است، نه شکست: «غافلگیر شدی — این داده است»). گامِ برهانی «پیشرفت» ندارد و همان رفتارِ پیشین را دارد. */
       ((sv.live && sv.live.steps) || []).forEach(function (st) { var o = st && st.out; if (!o || o.auto || !o.done) return; add("exec", "live", o.done === "yes" && o.prog !== "نه"); });
       /* بازنگری‌ای که دستیار از گفت‌وگو ثبت کرد (chat_solved) فقط وقتی شمرده می‌شود که درسش به قلمِ خودِ کاربر باشد (b.own) — R7 */
-      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own) return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
+      /* تورِ پولیا (RM1a): وارسیِ سنجیده از پیام‌های خودِ کاربر (chkBy: msgs) هم بازنگریِ اوست، حتی اگر درس را دستیار نوشت */
+      Object.keys(sv.b || {}).forEach(function (lv) { var b = sv.b[lv]; if (!b) return; if (b.from === "chat" && !b.own && b.chkBy !== "msgs") return; if (b.skipped) add("back", "lb", false); else if (b.done) add("back", "lb", b.chkRes !== "نتوانستم وارسی کنم"); });
+      /* تورِ پولیا (RM1b): تونلِ زنده هم شاهدِ طرح است — هر طرحِ ثبت‌شده (کنونی و پیشین‌ها) یک موفقیت؛ مسئلهٔ کمکی که پلش زده شد موفقیت و آن‌که به کار
+         نیامد شکست؛ داده‌ای که تا آن گام بی‌کار بود و در گامی به کار رفت (برد «datum») موفقیت. هیچ وزنی نیست؛ همان رکوردهای a38. */
+      var L18 = sv.live || {};
+      if (L18.plan && L18.plan.at) add("plan", "lplan", true);
+      (L18.planHist || []).forEach(function (x) { if (x && x.at) add("plan", "lplan", true); });
+      (L18.aux || []).forEach(function (x) { if (!x) return; if (x.crossed) add("plan", "lplan", true); else if (x.unused) add("plan", "lplan", false); });
+      (L18.wins || []).forEach(function (x) { if (x && x.kind === "datum") add("plan", "lplan", true); });
     });
-    var P = A.PSY, G = 241, rows = PH4.map(function (x) { return R[x[0]]; });
-    rows.forEach(function (X) { X.p = (X.k + 1) / (X.n + 2); });
+    var P = A.PSY, G = 241, rows0 = PH4.map(function (x) { return R[x[0]]; });
+    rows0.forEach(function (X) { X.p = (X.k + 1) / (X.n + 2); X.none = !X.n; X.pWeak = 0; });
+    /* تورِ پولیا (RM1c): مرحلهٔ بی رویداد «هنوز داده‌ای نیست» است و هرگز در رتبه‌بندی نمی‌آید (پیشینِ ½ اش با دیگران سنجیده نمی‌شود)؛ «ضعیف‌ترین» فقط
+       میانِ دست‌کم دو مرحلهٔ دارای داده */
+    var rows = rows0.filter(function (X) { return X.n > 0; });
     /* P(این مرحله کمترین احتمالِ موفقیت را دارد) = ∫ f_X(x) Π_{Y≠X} P(p_Y > x) dx — روی شبکه، از همان چگالیِ پسینِ a34 */
     if (P && P.density) {
       var D = rows.map(function (X) { var d = P.density(X.k, X.n, G), s = 0; d.forEach(function (q) { s += q[1]; }); var c = 0; return d.map(function (q) { var w = s ? q[1] / s : 1 / G; c += w; return { w: w, cdf: c }; }); });
       rows.forEach(function (X, i) { var t = 0; for (var g = 0; g < G; g++) { var pr = D[i][g].w; rows.forEach(function (Y, j) { if (j !== i) pr *= 1 - (D[j][g].cdf - D[j][g].w / 2); }); t += pr; } X.pWeak = t; });
       var tot = rows.reduce(function (a, X) { return a + X.pWeak; }, 0); rows.forEach(function (X) { X.pWeak = tot ? X.pWeak / tot : 0.25; });
-    } else rows.forEach(function (X) { X.pWeak = 0.25; });
+    } else rows.forEach(function (X) { X.pWeak = rows.length ? 1 / rows.length : 0; });
     var n = rows.reduce(function (a, X) { return a + X.n; }, 0), weak = rows.slice().sort(function (a, b) { return b.pWeak - a.pWeak; })[0];
-    return { at: new Date().toISOString(), n: n, rows: rows, weakest: n ? { id: weak.id, fa: weak.fa, p: weak.pWeak } : null, src: PH_SRC };
+    return { at: new Date().toISOString(), n: n, rows: rows0, ranked: rows.length, weakest: rows.length >= 2 ? { id: weak.id, fa: weak.fa, p: weak.pWeak } : null, src: PH_SRC };
   };
   M.phasesText = function (Q) {
     Q = Q || M.phases(); var pc = function (p) { return Math.round(100 * p) + "%"; };
-    return "چهار مرحلهٔ حل (پولیا؛ (k+1)/(n+2)، بی آستانه): " + Q.rows.map(function (X) { return X.fa + " " + pc(X.p) + " (" + X.k + "/" + X.n + "، احتمالِ ضعیف‌ترین بودن " + pc(X.pWeak) + ")"; }).join(" · ") +
+    return "چهار مرحلهٔ حل (پولیا؛ (k+1)/(n+2)، بی آستانه): " + Q.rows.map(function (X) { return X.none ? X.fa + " — " + NO_DATA : X.fa + " " + pc(X.p) + " (" + X.k + "/" + X.n + (Q.weakest ? "، احتمالِ ضعیف‌ترین بودن " + pc(X.pWeak) : "") + ")"; }).join(" · ") +
       (Q.n ? "" : " — هنوز هیچ داده‌ای نیست؛ هر چهار «نمی‌دانیم» است.");
   };
   function phasesSection() {
@@ -392,12 +407,18 @@
       h("div", { class: "mind-scroll" }, h("table", { class: "mind-table small mind-phtable" },
         h("thead", {}, h("tr", {}, ["بخشِ حل (پولیا)", "احتمالِ موفقیتِ نوبتِ بعد", "موفق از کل", "احتمالِ ضعیف‌ترین بودن", "از کجا"].map(function (x) { return h("th", {}, x); }))),
         h("tbody", {}, Q.rows.map(function (X) {
-          return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, pf(X.pWeak)),
+          if (X.none) return h("tr", { "data-ph": X.id, "data-none": "1" }, h("td", {}, X.fa), h("td", { class: "mind-php" }, NO_DATA), h("td", {}, "—"), h("td", { class: "mind-phw" }, "—"), h("td", { class: "small" }, "— (" + NO_DATA + ")"));
+          return h("tr", { "data-ph": X.id }, h("td", {}, X.fa), h("td", { class: "mind-php" }, pf(X.p) + " (" + fa(X.n) + ")"), h("td", {}, fa(X.k) + " از " + fa(X.n)), h("td", { class: "mind-phw" }, Q.weakest ? pf(X.pWeak) : "—"),
             h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)"));
         })))),
-      h("p", { class: "small muted" }, Q.n ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود." : "هنوز هیچ رویدادِ سنجیده‌ای نیست — هر چهار مرحله ½ و احتمالِ ضعیف‌ترین بودنِ هر کدام ¼ (نمی‌دانیم)."));
+      h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
+        : Q.n ? "فقط یک مرحله داده دارد (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای «ضعیف‌ترین» نامیده نمی‌شود؛ مرحله‌های بی‌داده با پیشینِ ½ سنجیده نمی‌شوند." : "هنوز هیچ رویدادِ سنجیده‌ای نیست — هیچ مرحله‌ای رتبه نمی‌گیرد (نمی‌دانیم)."),
+      /* تورِ پولیا (RM1e): رادارِ سازه‌ها نگاشتی از مرحله‌های حل ندارد — همین را صادقانه می‌گوییم، نگاشتِ ساختگی نمی‌سازیم */
+      h("p", { class: "small muted mind-phradar" }, PH_RADAR));
   }
   M.phasesSection = phasesSection;
+  var PH_RADAR = "این جدول روی «نیم‌رخِ سازه‌ها» (رادار) نمی‌نشیند: کارنامه هیچ نگاشتی از مرحله‌های حلِ پولیا به سازه‌های رادار (استدلالِ سیال، دانش، …) ندارد و نمی‌سازد؛ رادار فقط از پاسخ‌های پاسخ‌دقیق (مسئله‌های هم‌ساختار، ورزشِ گره، اطمینانِ پیش از جواب) پر می‌شود. حل و برهانِ وارسی‌شدهٔ مسئلهٔ زنده‌ات این‌جا، در همین جدول، ثبت است.";
+  M.PH_RADAR = PH_RADAR;
 
   /* ---------- 📈 نمودارِ سادهٔ CSV (فقط داده، بی استنتاج) — تورِ ۱، s32: «حتی اگر مسئله هندسی نیست، شکل بکش» ----------
      ستونی عددی است که همهٔ خانه‌های پرِ آن عدد باشند (بی آستانه)؛ هر ستونِ عددی یک خط، محورِ افقی ترتیبِ سطرها با برچسبِ نخستین ستونِ غیرعددی.

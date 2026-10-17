@@ -35,7 +35,8 @@ const W = ms => new Promise(r => setTimeout(r, ms));
   await go('mind');
   chk(await p.locator('main .mind-phases').count() === 1, 'mind card has the «چهار مرحلهٔ حل» section');
   let R = await phRows(); info.empty = R;
-  chk(R.length === 4 && R.every(r => /۵۰٪ \(۰\)/.test(r.p) && /۲۵٪/.test(r.w)), 'no data ⇒ ½ (n=0) and ¼ for each phase: ' + JSON.stringify(R));
+  // تورِ پولیا (RM1c، جایگزینِ «½ و ¼» ِ پیشین): مرحلهٔ بی‌داده «هنوز داده‌ای نیست» است و رتبه نمی‌گیرد
+  chk(R.length === 4 && R.every(r => /هنوز داده‌ای نیست/.test(r.p) && !/٪/.test(r.w)), 'no data ⇒ every phase «هنوز داده‌ای نیست», none ranked: ' + JSON.stringify(R));
   chk(await p.locator('main .mind-phases[dir=rtl]').count() === 1, 'phases section is RTL');
 
   // ---------- ۱) با داده: پرسشِ همین لحظه (UI ِ مسئلهٔ زنده) ----------

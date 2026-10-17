@@ -208,7 +208,7 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     g3.b162.s38 = has(c, ['B162']); g3.b162.s38ph = phOf(c);
     chk(g3.b162.s07 && g3.b162.s07claim && g3.b162.s07ph !== 'بازنگری', 'G3: B162 + «برهانش؟» when an inductive/analogical argument is offered as proof, even at understanding (s07) ' + JSON.stringify(g3.b162));
     chk(g3.b162.s14, 'G3: B162 when a plausible «حدسم … پس …» argument is offered, in ANY phase (s14) ' + JSON.stringify(g3.b162));
-    chk(g3.b162.s38ph === 'بازنگری' && !g3.b162.s38, 'G3: B162 is not attached to a real (argued) proof in look-back (s38) ' + JSON.stringify(g3.b162));
+    chk(!g3.b162.s38, 'G3 (phase per RM6c, round 18): B162 is not attached to a real (argued) proof in look-back (s38) ' + JSON.stringify(g3.b162));
     // B162 روی مسئلهٔ زندهٔ بسته هم
     await liveSess('قانونِ رشد', '۵ گلدانِ لوبیا با ۲ تا ۱۰ ساعت نور؛ قانونِ رشد بر حسبِ ساعتِ نور چیست؟', 'find', 'objective');
     await say('تفاضل‌ها ۵، ۴، ۳، ۱ شدن، پس خطی نیست. حدسم اشباعه. یه مقاله هم پیدا کردم. پس ثابت شد دیگه، قانونش اشباعه!');
@@ -265,7 +265,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     g4.r2 = phOf(await hookFor('یه نفر دو بچه داره، حداقل یکیشون پسره. احتمال این‌که هر دو پسر باشن؟', 'فهرست کردم: پپ، پد، دپ، دد. با حداقل یه پسر سه تا می‌مونه. فقط یکیش دوپسره... یعنی ۱/۳!'));
     g4.r3 = phOf(await hookFor('بعد از کمپین تبلیغاتی آبان، فروش ۳۰٪ رفت بالا؛ می‌خوام بدونم اثرِ تبلیغ چقدر بوده.', 'مقایسه کردم: شیراز تبلیغ نداشت، فروش آبانش ۲۶٪ رشد کرد؛ شهرهای دارای تبلیغ ۳۱٪. پس اثر هست ولی کوچیک‌تره، حدود ۵ واحد درصد. پرونده رو بستم. حالا متن کوتاه گزارش به مدیرعامل رو کمکم کن.'));
     g4.r4 = phOf(await hookFor('«۲۰ لیتر آب‌نمک ۱۰٪ داریم؛ چند لیتر ۲۵٪ اضافه کنیم تا ۱۵٪ بشه؟»', 'آها! توان دو جوابای اضافی رو هم قبول می‌کنه. پس فقط ۳.'));
-    chk(g4.r1 === 'بازنگری' && g4.r2 === 'بازنگری' && g4.r3 === 'بازنگری' && g4.r4 === 'بازنگری', 'G4: «⇒ ۱۳/۲۷»، «یعنی ۱/۳!»، «… پرونده رو بستم. حالا …» and «پس فقط ۳» are results ⇒ look-back (s28, s32, s36) ' + JSON.stringify(g4));
+    // دورِ ۱۸ (RM6c): «پس فقط ۳» (RESULT_WEAK) دیگر خودش بازنگری نیست — الگو فقط پیشنهاد می‌کند؛ الگوهای قوی (⇒ عدد، «یعنی …!»، «پرونده رو بستم») همان
+    chk(g4.r1 === 'بازنگری' && g4.r2 === 'بازنگری' && g4.r3 === 'بازنگری' && g4.r4 !== 'بازنگری', 'G4: «⇒ ۱۳/۲۷»، «یعنی ۱/۳!»، «… پرونده رو بستم. حالا …» are results ⇒ look-back; «پس فقط ۳» only offers (RM6c) (s28, s32, s36) ' + JSON.stringify(g4));
     // ... ولی «پس V = … حالا دیگه فقط y داره» هنوز میانی است (F1)
     // «حل کردم و یه مسئلهٔ تازه ساختم: Y» ⇒ Y از فهم، و سطرِ بازنگریِ مسئلهٔ پیشین (s11)
     { const c = await first('سلام دوباره. چند روز پیش مسئله‌ی دومینو رو با رنگ‌آمیزی حل کردم و یه مسئله‌ی تازه ساختم: کدوم دو خونه رو بردارم که بشه پوشوند؟ فکر کنم هر دو خونه‌ای که رنگشون فرق داره کافیه. درسته؟');
@@ -288,7 +289,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     await say('خب، حالا بعدش چی کار کنم');
     const h2 = phOf(coachOf(await lastUser()));
     g4.head = { now: h1, next: h2, page: await p.evaluate(() => APP.livePhase(APP.ASSIST.cur().lprob)) };
-    chk(g4.head.page !== 'b' && g4.head.now === 'بازنگری' && g4.head.next === 'بازنگری', 'G4: when the turn question is look-back (result stated this turn / carried one turn), the coach header phase says «بازنگری» too (s28) ' + JSON.stringify(g4.head));
+    // دورِ ۱۸ (RM6c): «پس ۵۵ دقیقه» ِ الگو در همان نوبت مرحله را عوض نمی‌کند؛ نوبتِ بعد، با گزارشِ مدل (said:result)، بازنگری
+    chk(g4.head.page !== 'b' && g4.head.now !== 'بازنگری' && g4.head.next === 'بازنگری', 'G4: when the turn question is look-back (result stated this turn / carried one turn), the coach header phase says «بازنگری» too (s28) ' + JSON.stringify(g4.head));
   });
 
   // ================= صفحهٔ «🔭»: C107/B231 در نوبتِ پس از ردِ ثبت‌شده (یک بار)؛ G7 «🌱 ثبتِ گامِ کوچک» =================

@@ -70,8 +70,9 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await say('r = y/3. پس V = (π/27)y³. حالا دیگه فقط y داره.');
   info.f1b = { mid: phOf(coachOf(await lastUser())) };
   await say('پس v = ۲/۹ سانتی‌متر بر ثانیه.');
-  info.f1b.fin = phOf(coachOf(await lastUser()));
-  chk(info.f1b.mid !== 'بازنگری' && info.f1b.fin === 'بازنگری', 'F1: «پس X = …» followed by «حالا…» is an intermediate step (not look-back); a bare «پس v = …» still is a result (s18) ' + JSON.stringify(info.f1b));
+  info.f1b.fin = phOf(coachOf(await lastUser())); info.f1b.offer = /شاید نتیجه‌ای گفت/.test(await lastUser());
+  // دورِ ۱۸ (DECISIONS_R18 RM6c): «پس v = …» ِ تنها (RESULT_WEAK) دیگر خودش مرحله را به بازنگری نمی‌برد — فقط پیشنهاد (said:result از مدل)
+  chk(info.f1b.mid !== 'بازنگری' && info.f1b.fin !== 'بازنگری' && info.f1b.offer, 'F1: «پس X = …» followed by «حالا…» is an intermediate step (not look-back); a bare «پس v = …» only OFFERS look-back (RM6c) (s18) ' + JSON.stringify(info.f1b));
 
   // F1-c) «باغچه تموم شد. حالا حوض…» ⇒ مسئلهٔ تازه از «فهم»، و دفترِ پاسخِ مسئلهٔ پیشین به آن نمی‌رسد (s29؛ F3)
   await newSess();
@@ -91,9 +92,10 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await newSess(); await say('تو دفتر حساب کاروانسرا نوشته «۳۶ رأس گوسفند: ؟۴۸۷؟ ریال» — رقم اول و آخر محو شده. می‌خوام بدونم قیمت هر گوسفند چقدر بوده. با این‌همه حالت ممکن، چطور پیدا کنم؟ فکر کنم باید ۱۰۰ حالت رو یکی‌یکی امتحان کنم.');
   info.f1d.s37 = phOf(coachOf(await lastUser()));
   await say('پس قیمت یا ۱۸۰۲ یا ۶۹۱ ریاله');
-  info.f1d.s37res = phOf(coachOf(await lastUser()));
+  info.f1d.s37res = phOf(coachOf(await lastUser())); info.f1d.offer = /شاید نتیجه‌ای گفت/.test(await lastUser());
   chk(info.f1d.s34 === 'فهمِ مسئله' && info.f1d.s37 === 'فهمِ مسئله', 'F1: an opening of discouragement or a brute-force intention does not jump to planning (s34, s37) ' + JSON.stringify(info.f1d));
-  chk(info.f1d.s37res === 'بازنگری', 'F1: «پس قیمت یا ۱۸۰۲ یا ۶۹۱ ریاله» is an unambiguous result (s37) ' + JSON.stringify(info.f1d));
+  // دورِ ۱۸ (RM6c): نتیجهٔ «پس …» ِ الگو پیشنهاد است، نه جابه‌جاییِ مرحله
+  chk(info.f1d.s37res !== 'بازنگری' && info.f1d.offer, 'F1: «پس قیمت یا ۱۸۰۲ یا ۶۹۱ ریاله» offers look-back (RM6c: the model reports the result) (s37) ' + JSON.stringify(info.f1d));
 
   // F1-e) پیامِ نخستی که نتیجهٔ خودش را می‌گوید چسبانده نیست: said:result می‌ماند ⇒ بازنگری؛ سنجش مرحله را به عقب نمی‌برد (s31)
   await newSess();
