@@ -162,7 +162,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     chk(!r.qs.some(t => /گلدان/.test(t)), 'chat: the garden question asked in the same session BEFORE the pond problem existed is not offered for the pond (L5, s29 c23) ' + JSON.stringify(r.qs));
     chk(r.qs.some(t => /سطحِ آب چند سانت/.test(t)), 'chat: control — a question about this problem after it was created is offered ' + JSON.stringify(r.qs));
     chk(r.qs.some(t => /مجهول/.test(t)), 'chat: control — the creating reply\'s own question is about this problem and is offered ' + JSON.stringify(r.qs));
-    chk(r.qs.some(t => /عمقِ حوضِ حیاط/.test(t)), 'chat: control — a pre-creation turn that was already about this problem (its user message names it) keeps its question ' + JSON.stringify(r.qs));
+    // DECISIONS_R13 M1 (یک قاعده): پنجره از پیامی آغاز می‌شود که همین مسئله موضوعِ سشن شد (پاسخِ سازنده) — پیش از آن، حتی نوبتی که نامش را برد، نه (s29 c23: نوبتِ پیش از ساخت حوض را هم نام برده بود و پرسشش دربارهٔ باغچه بود)
+    chk(!r.qs.some(t => /عمقِ حوضِ حیاط/.test(t)), 'chat: a pre-creation turn is outside the window even when its user message names the problem — the window starts at the creating reply (R13 M1, changed from the R12 control) ' + JSON.stringify(r.qs));
   });
 
   // ================= multi — L5: پرسشِ نوبتِ چندجمله‌ای یک گزینه است (s02، s11، s01) =================
