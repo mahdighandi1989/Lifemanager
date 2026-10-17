@@ -33,3 +33,12 @@ NEW — owner oversight (binding from this round on):
    No line numbers, no file names, no ids.
 Never pkill processes you did not start. Keep scratch small (disk is tight: delete browser profiles and copies when done).
 Final message: per scenario RESULT + remaining defects (class a/b/c/d, severity, repro, file:line).
+
+ADDENDUM (owner, binding, applies to this round already) — judge by TWO NEED MAPS, not only by the written criteria
+(docs/decisions/2026-10-15-sources-roadmap.md §9). For every scenario, before the verdict, write in findings.md a section «## نقشهٔ نیاز»:
+(1) for each part of the system the scenario passed through (the live-problem page and its cards, the assistant, any other view it
+touched): what that part is FOR, at which moment it should step in BY ITSELF, and what it must deliver — derived from the part's own design
+(apps/learning-architecture/docs/HANDBOOK.md, AGENTS.md, VIEW_META in a26_assist.js), not from the scenario; (2) what the scenario's person
+needed at each key moment, even if she did not ask. A need of either map that was not met, or met poorly (incomplete, inaccurate, buggy) is a
+defect even if no written criterion mentions it — e.g. a part whose design is to offer practice/simulation at that moment and did not.
+Written criteria are the floor, not the ceiling. Report such defects with class and severity like any other.
