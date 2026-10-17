@@ -118,7 +118,7 @@ def sources():
     techs = [rd(os.path.join(TD, "t_%s.js" % x)) for x in "abcde"]
     techs[0] += "\n" + rd(os.path.join(TD, "src_a.js"))
     techs[1] += "\n" + rd(os.path.join(TD, "src_b.js"))
-    app = systerr_js() + norms_js() + sources_js() + "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
+    app = systerr_js() + norms_js() + sources_js() + "".join(rd(os.path.join(A, f)) for f in ["a1_base.js", "a42_sched.js", "a2_ws.js", "a3_views.js", "a4_views2.js", "a5_farm.js",
                                                    "a6_epi.js", "a7_bt.js", "a8_prob.js", "a9_start.js", "a10_nav.js", "a11_course.js",
                                                    "a12_mirror.js", "a13_epi_course.js", "a14_sims.js", "a15_journey.js",
                                                    "a16_knots.js", "a17_kpractice.js", "a18_kmap.js", "a19_moves.js", "a20_similar.js",

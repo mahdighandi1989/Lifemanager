@@ -590,13 +590,13 @@
   function prog() { var r = S.get("moves_prog"); if (!r) r = { id: "moves_prog", type: "mvprog", by: {}, log: [] }; r.by = r.by || {}; r.log = r.log || []; return r; }
   A.moveAcc = function (mv) { var b = (S.get("moves_prog") || { by: {} }).by[mv]; return b ? { n: b.n || 0, ok: b.ok || 0 } : { n: 0, ok: 0 }; };
   /* فاصله‌گذاری (همان نردبانِ ۱، ۳، ۷، ۲۱، ۶۰ روزهٔ گره‌گشا — A.knextIv): هر پاسخ موعدِ بعدیِ حرکت را می‌چیند؛ پاسخِ غلط ⇒ فردا. */
-  function nextIv(iv, ok) { if (A.knextIv) return A.knextIv(iv, ok); var L = [1, 3, 7, 21, 60]; if (!ok) return 1; for (var i = 0; i < L.length; i++) if (L[i] > (iv || 0)) return L[i]; return 60; }
+  function nextIv(iv, ok) { if (A.knextIv) return A.knextIv(iv, ok); var L = A.SCHED.ladder("a19_moves"); if (!ok) return 1; for (var i = 0; i < L.length; i++) if (L[i] > (iv || 0)) return L[i]; return 60; }
   function space(b, ok) { b.iv = nextIv(b.iv, ok); b.last = A.today(); b.due = A.addDays(b.last, b.iv); }
   A.moveSpace = space;
   function record(item, pick, ok) {
     var r = prog();
     item.mv.forEach(function (t) { var b = r.by[t] = r.by[t] || { n: 0, ok: 0 }; b.n++; if (ok) b.ok++; space(b, ok); });
-    r.log.push({ pid: item.p.id, sid: item.s.id, pick: pick, ok: ok, at: new Date().toISOString() });
+    r.log.push({ pid: item.p.id, sid: item.s.id, pick: pick, ok: ok, at: A.nowISO() });
     if (r.log.length > 300) r.log = r.log.slice(-300);
     S.put(r);  // یک نوشتن برای هر پاسخ
     try { document.querySelectorAll(".mv-accval[data-mv]").forEach(function (el) { el.textContent = accText(el.getAttribute("data-mv")); }); } catch (e) { }
@@ -606,7 +606,7 @@
   A.moveDrillAnswer = function (mv, k, ok) {
     var r = prog(), b = r.by[mv] = r.by[mv] || { n: 0, ok: 0 };
     b.dn = (b.dn || 0) + 1; if (ok) b.dok = (b.dok || 0) + 1; space(b, ok);
-    r.log.push({ mv: mv, drill: k, ok: ok, at: new Date().toISOString() }); if (r.log.length > 300) r.log = r.log.slice(-300);
+    r.log.push({ mv: mv, drill: k, ok: ok, at: A.nowISO() }); if (r.log.length > 300) r.log = r.log.slice(-300);
     S.put(r); return b;
   };
   A.moveNext = function (mv) { var b = ((S.get("moves_prog") || { by: {} }).by || {})[mv]; return b && b.due ? { due: b.due, iv: b.iv } : null; };
@@ -625,7 +625,7 @@
   A.simSpaceRecord = function (pid, key, ok, at) {
     var r = spRec(pid), b = r.by[key] = r.by[key] || {}, d = at ? (A.localDay ? A.localDay(at) : String(at).slice(0, 10)) : A.today();
     var floor = nextIv(0, false);
-    b.iv = ok ? nextIv(Math.max(b.iv || 0, floor), true) : floor; b.ok = !!ok; b.at = at || new Date().toISOString(); b.due = A.addDays(d, b.iv); S.put(r); return b;
+    b.iv = ok ? nextIv(Math.max(b.iv || 0, floor), true) : floor; b.ok = !!ok; b.at = at || A.nowISO(); b.due = A.addDays(d, b.iv); S.put(r); return b;
   };
   function eprogOk(x) { return x.last != null ? x.last === 2 : (x.first === true || x.self === 2); }
   A.simSpaceSync = function () {
@@ -752,7 +752,7 @@
     var lv = A.simState && A.simState.pid === p.id ? A.simState.lv : null;
     var row = h("div", { class: "col gap mv-stuckwrap" });
     if ((lv === 1 || lv === 2) && !A.SIM_HINT_NATIVE && A.moveHintRungs) {
-      var lad = A.moveHintLadder(p, s, { lv: lv, paid: function () { paidHint(row); }, onRung: function (n) { try { var r = prog(); r.log.push({ pid: p.id, sid: s.id, rung: n, lv: lv, at: new Date().toISOString() }); if (r.log.length > 300) r.log = r.log.slice(-300); S.put(r); } catch (e) { } } });
+      var lad = A.moveHintLadder(p, s, { lv: lv, paid: function () { paidHint(row); }, onRung: function (n) { try { var r = prog(); r.log.push({ pid: p.id, sid: s.id, rung: n, lv: lv, at: A.nowISO() }); if (r.log.length > 300) r.log = r.log.slice(-300); S.put(r); } catch (e) { } } });
       /* پله‌های عامِ همان «نردبانِ راهنمایی» ِ گره‌گشا (A.KLADDER ِ a16؛ پله‌های ۰ تا ۳، بی‌نیاز به متنِ مسئله) — از سطحِ ۱ و ۲ در دسترس */
       /* محتوا فقط با باز کردن ساخته می‌شود: بسته، هیچ جایی از کارت نمی‌گیرد (Chromium محتوای details ِ بسته را هم چیدمان می‌کند) */
       var gen = (A.KLADDER || []).filter(function (x) { return x && !x.gen && x.fa; });
@@ -920,7 +920,7 @@
     sec.appendChild(ta);
     sec.appendChild(h("button", { type: "button", class: "btn ghost sm mv-expsave", onclick: function () {
       var t = String(d.t || "").trim(); if (t.length < 3) { A.toast("یک جمله از تجربهٔ خودت بنویس.", "bad"); return; }
-      var r2 = prog(), b2 = r2.by[m.id] = r2.by[m.id] || { n: 0, ok: 0 }; (b2.exp = b2.exp || []).push({ t: t.slice(0, 400), at: new Date().toISOString() }); if (b2.exp.length > 20) b2.exp = b2.exp.slice(-20);
+      var r2 = prog(), b2 = r2.by[m.id] = r2.by[m.id] || { n: 0, ok: 0 }; (b2.exp = b2.exp || []).push({ t: t.slice(0, 400), at: A.nowISO() }); if (b2.exp.length > 20) b2.exp = b2.exp.slice(-20);
       S.put(r2); A.toast("ثبت شد."); A.render();
     } }, "ثبت"));
     return sec;

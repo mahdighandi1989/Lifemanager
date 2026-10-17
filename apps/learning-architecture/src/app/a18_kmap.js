@@ -59,7 +59,7 @@
     opts = opts || {};
     if (!knot || ST.indexOf(status) < 0) return false;
     if (knot.status === status) return false;
-    var at = opts.at || new Date().toISOString();
+    var at = opts.at || A.nowISO();
     var from = ST.indexOf(knot.status) >= 0 ? knot.status : "open";
     (knot.hist = Array.isArray(knot.hist) ? knot.hist : []).push({ at: at, status: status, from: from });
     knot.status = status;
@@ -181,13 +181,13 @@
     var hist = (Array.isArray(k.hist) ? k.hist : []).concat((Array.isArray(k.shist) ? k.shist : []).map(function (x) { return x && { at: x.at, status: x.to, from: x.from }; }))
       .filter(function (x) { return x && x.at && ST.indexOf(x.status) >= 0; })
       .slice().sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
-    var created = k.created || k.updated || new Date().toISOString(), pts = [], approx = false;
+    var created = k.created || k.updated || A.nowISO(), pts = [], approx = false;
     if (!hist.length) { pts.push({ d: dayOf(created), s: kst(k) }); approx = kst(k) !== "open"; }
     else {
       var start = String(hist[0].at) < String(created) ? hist[0].at : created;
       pts.push({ d: dayOf(start), s: ST.indexOf(hist[0].from) >= 0 ? hist[0].from : "open" });
       hist.forEach(function (x) { pts.push({ d: dayOf(x.at), s: x.status }); });
-      if (hist[hist.length - 1].status !== kst(k)) { pts.push({ d: dayOf(k.updated || new Date().toISOString()), s: kst(k) }); approx = true; }
+      if (hist[hist.length - 1].status !== kst(k)) { pts.push({ d: dayOf(k.updated || A.nowISO()), s: kst(k) }); approx = true; }
     }
     return { pts: pts, approx: approx };
   }

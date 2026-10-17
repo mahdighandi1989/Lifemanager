@@ -248,7 +248,7 @@
   };
 
   /* ---------- گرم‌کردن: پرسش‌های کاربردی از دادهٔ خودِ ایستگاه‌ها ---------- */
-  var GAPS = [1, 3, 7, 21, 60];
+  var GAPS = A.SCHED.ladder("a13_epi_course");   // دورِ ۱۹c: یک نسخه در A.SCHED (کپیِ پیشین در APP.SCHED_QUARANTINE)
   function dueWarm(c, except) {
     var t = A.today();
     return Object.keys(c.done).filter(function (id) {

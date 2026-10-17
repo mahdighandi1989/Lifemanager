@@ -19,7 +19,7 @@
   function GE(it, k, n) { var v = N(it[k]); return v != null && v >= n; }
   function TX(it) { return norm([it.claim, it.thoughts, it.what, it.actual].join(" ")); }
   function CL(it) { return norm(it.claim); }
-  function now() { return new Date().toISOString(); }
+  function now() { return A.nowISO(); }
   function r2(x) { return Math.round(x * 100) / 100; }
   function sgn(x) { return (x > 0 ? "+" : x < 0 ? "−" : "") + fa(String(Math.abs(r2(x))).replace(".", "٫")); }
   A.knNorm = norm;
@@ -1375,7 +1375,7 @@
             var rm = kc.ev[i]; kc.ev.splice(i, 1);
             if (rm && /^probe:/.test(rm.src || "") && !kc.ev.some(function (x) { return x.src === rm.src; })) delete kc.pans[rm.src.slice(6)];
             if (rm && rm.src === "ladder" && !kc.ev.some(function (x) { return x.src === "ladder"; })) kc.ladder = {};
-            if (rm && /^sieve:/.test(rm.src || "")) { kc.sieveOff = kc.sieveOff || {}; kc.sieveOff[rm.fam] = new Date().toISOString(); }
+            if (rm && /^sieve:/.test(rm.src || "")) { kc.sieveOff = kc.sieveOff || {}; kc.sieveOff[rm.fam] = A.nowISO(); }
             H.put(); redraw();
           } }, "حذف")));
       })))));

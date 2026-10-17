@@ -11,7 +11,7 @@
 (function (A) {
   var S = A.S, fa = A.fa, h = A.h, AS = A.ASSIST;
   var I = A.IDEA = {};
-  function nowIso() { return new Date().toISOString(); }
+  function nowIso() { return A.nowISO(); }
   function clip(x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
   var PARTS = { strength: "قوت", assumption: "فرضِ لازم", problem: "مسئلهٔ طراحی", outside: "بیرون از این صفحه" };
   I.PARTS = PARTS;

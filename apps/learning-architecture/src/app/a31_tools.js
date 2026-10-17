@@ -61,7 +61,7 @@
         : h("p", { class: "small muted" }, "برای هر حلقه احتمالی (۰ تا ۱۰۰) بنویس.")));
     var due = h("input", { type: "date", "aria-label": "موعدِ وارسیِ نتیجه", value: c.due || "", onchange: function (e) { c.due = e.target.value; S.put(c); } });
     root.appendChild(h("section", { class: "card" }, h("h2", {}, "نتیجهٔ واقعی (در موعد)"), h("div", { class: "row gap wrap" }, h("label", {}, "موعد: "), due,
-      h("select", { "aria-label": "نتیجهٔ واقعی", onchange: function (e) { c.outcome = e.target.value; c.outcomeAt = new Date().toISOString(); save(); } }, ["", "رخ داد", "رخ نداد"].map(function (o) { return h("option", { value: o, selected: (c.outcome || "") === o ? true : null }, o || "— هنوز —"); }))),
+      h("select", { "aria-label": "نتیجهٔ واقعی", onchange: function (e) { c.outcome = e.target.value; c.outcomeAt = A.nowISO(); save(); } }, ["", "رخ داد", "رخ نداد"].map(function (o) { return h("option", { value: o, selected: (c.outcome || "") === o ? true : null }, o || "— هنوز —"); }))),
       h("p", { class: "small muted" }, "نتیجه به کالیبراسیونِ «ذهن و هیجان» در «🧠 کارنامهٔ ذهن» می‌رود: حسِ اولت در برابرِ آنچه واقعاً شد.")));
     root.appendChild(h("button", { class: "linkish", type: "button", onclick: function () { A.go("chain"); } }, "← همهٔ زنجیره‌ها"));
     return root;
@@ -89,7 +89,7 @@
         if (x.live && x.live.pid) return h("li", { class: "row gap wrap fc-live", dir: "rtl" }, h("span", {}, x.q + " — " + fa(x.p) + "٪ · موعد " + A.fdate(x.due)),
           h("span", { class: "chip fc-liveout" }, x.outcome || "— هنوز —"), h("button", { class: "btn ghost sm fc-golive", type: "button", onclick: function () { A.go("lprob", x.live.pid, "exec"); } }, "🔭 نتیجه در گامِ همان مسئله"));
         return h("li", { class: "row gap wrap" }, h("span", {}, x.q + " — " + fa(x.p) + "٪ · موعد " + A.fdate(x.due)),
-          h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = new Date().toISOString(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || "— هنوز —"); })));
+          h("select", { "aria-label": "نتیجهٔ «" + x.q + "»", onchange: function (e) { x.outcome = e.target.value; x.outcomeAt = A.nowISO(); S.put(x); A.render(); } }, ["", "شد", "نشد"].map(function (o) { return h("option", { value: o, selected: (x.outcome || "") === o ? true : null }, o || "— هنوز —"); })));
       })) : h("p", { class: "small muted" }, "هنوز پیش‌بینی‌ای ثبت نشده.")));
     return root;
   };
@@ -150,9 +150,10 @@
     var raw = A.dueList;
     A.dueList = function () {
       var items = raw.apply(this, arguments) || [], t = A.today();
-      S.all("wchain", function (c) { return c.due && c.due <= t && !c.outcome; }).forEach(function (c) { items.push({ k: "p", txt: "⛓ نتیجهٔ واقعیِ «" + c.title + "» را ثبت کن", sub: "حسِ اولت " + (c.feel == null ? "—" : fa(c.feel) + "٪") + " بود", go: function () { A.go("chain", c.id); } }); });
+      /* دورِ ۱۹c: سطرِ زنجیره و پیش‌بینی از زمان‌بندِ واحد می‌آید (A.SCHED، با «عقب‌افتاده از …» و یادآور/لغوِ یادآور)؛ این مسیر فقط پشتیبانِ بی A.SCHED است */
+      if (!(A.SCHED && A.SCHED.todayLines)) S.all("wchain", function (c) { return c.due && c.due <= t && !c.outcome; }).forEach(function (c) { items.push({ k: "p", txt: "⛓ نتیجهٔ واقعیِ «" + c.title + "» را ثبت کن", sub: "حسِ اولت " + (c.feel == null ? "—" : fa(c.feel) + "٪") + " بود", go: function () { A.go("chain", c.id); } }); });
       /* پیش‌بینیِ گامِ «مسئلهٔ حل‌نشدهٔ خودم» (x.live) در سطرِ خودِ همان مسئله می‌آید و همان‌جا نتیجه می‌گیرد — دو بار پرسیده نمی‌شود */
-      var fc = S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome && !x.live; });
+      var fc = A.SCHED && A.SCHED.todayLines ? [] : S.all("fcast", function (x) { return x.due && x.due <= t && !x.outcome && !x.live; });
       if (fc.length) items.push({ k: "p", txt: "🎯 " + fa(fc.length) + " پیش‌بینی به موعد رسیده — شد یا نشد؟", sub: fc.slice(0, 2).map(function (x) { return x.q; }).join(" · "), go: function () { A.go("fcast"); } });
       var lm = S.all("meaning").map(function (m) { return m.date; }).sort().pop();
       if ((S.all("value").length || lm) && (!lm || A.daysBetween(lm, t) >= 30)) items.push({ k: "p", txt: "🧭 وارسیِ ماهانهٔ معنا", sub: lm ? "آخرین بار " + A.fdate(lm) : "نخستین وارسی", go: function () { A.go("vals"); } });

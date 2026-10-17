@@ -14,7 +14,7 @@
      «الان بفرست» ِ مالک (force) همیشه می‌فرستد. */
   R.MIN_GAP_MS = 3 * 3600000;
   var GAP_MS = 5 * 60000, BIG = /^(plan|facet|done|mastered|sheet|reopen|safety)$/;
-  function nowIso() { return new Date().toISOString(); }
+  function nowIso() { return A.nowISO(); }
   /* ایمیل بی کد (مالک ۲۰۲۶-۱۰-۱۴: «جاهایی کدگذاری‌شده حرف می‌زند — f7 و … — نباید باشد»): کلیدِ وجه ⇒ نامِ وجه، خانوادهٔ گره ⇒ نامش،
      شناسهٔ حوزه ⇒ نامِ حوزه، کلید/شناسهٔ رکورد ⇒ حذف، واژه‌های فنیِ برگه ⇒ فارسی */
   var CUR = null, WORDS = { "sys-territory": "قلمروِ سامانه‌ها", "epi-territory": "قلمروِ معرفت‌شناسی", "epi-backtest": "بک‌تستِ معرفت‌شناسی", "epi-engine": "موتورِ داوری", "lla-page": "خودِ صفحه",
@@ -126,14 +126,14 @@
     if (!force && !R.enabled()) return Promise.resolve(null);
     if (!(A.HOST && A.HOST.mail)) return Promise.resolve(null);
     var last = Date.parse(t.mailAt || 0) || 0;
-    if (!force && !urgent && Date.now() - last < GAP_MS) return Promise.resolve(null);
+    if (!force && !urgent && A.nowMs() - last < GAP_MS) return Promise.resolve(null);
     var big = (t.mailq || []).some(function (e) { return BIG.test(e.k); });
     if (!force && !big) return Promise.resolve(null);   // فقط رویدادِ ریز ⇒ با رویدادِ معنادارِ بعدی می‌رود
     // پس از نخستین ایمیل: حداکثر یکی در هر R.MIN_GAP_MS؛ و رویدادهای مهمِ پشتِ‌هم یک ایمیل می‌شوند (کارزارِ آزمون sc15) — جا نمی‌مانند: پس از مهلت خودش می‌فرستد
     var safety = (t.mailq || []).some(function (e) { return e.k === "safety"; });   // تغییرِ وضعِ ایمنی منتظرِ ۳ ساعت نمی‌ماند
     var gap = last && !safety && (t.mails || []).some(function (m) { return m.status === "sent"; }) ? Math.max(R.MIN_GAP_MS, R.URGENT_MS) : last ? R.URGENT_MS : 0;
-    if (!force && Date.now() - last < gap) {
-      if (!R._pend[s.id]) R._pend[s.id] = setTimeout(function () { delete R._pend[s.id]; R.flush(s, true); }, Math.min(gap - (Date.now() - last) + 50, 2147483000));
+    if (!force && A.nowMs() - last < gap) {
+      if (!R._pend[s.id]) R._pend[s.id] = setTimeout(function () { delete R._pend[s.id]; R.flush(s, true); }, Math.min(gap - (A.nowMs() - last) + 50, 2147483000));
       return Promise.resolve(null);
     }   // رویدادهای ریز جمع می‌شوند
     if (R._busy) return Promise.resolve(null); R._busy = true;

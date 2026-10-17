@@ -10,7 +10,7 @@
 (function (A) {
   var S = A.S, fa = A.fa, AS = A.ASSIST;
   if (!AS || !AS.DO) return;
-  function nowIso() { return new Date().toISOString(); }
+  function nowIso() { return A.nowISO(); }
   function clip(x, n) { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n - 1) + "…" : x; }
   var RE_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -103,18 +103,28 @@
   function reconstruct(c) { return /^(tutor:back|chat:solved)/.test(String(c.src || "")) || !!c.pb || /بی‌نگاه|بازسازی/.test(String(c.q || "")); }
   AS.cardsPushSync = function (force) {
     if (!(A.HOST && A.HOST.remind)) return null;
-    var t = A.today(), cs = S.all("card", function (c) { return !c.susp && c.due; }); if (!cs.length) return null;
+    var t = A.today(), cs = S.all("card", function (c) { return !c.susp && c.due; });
+    /* دورِ ۱۹c: آخرین کارتِ فعال بازنشسته شد ⇒ یادآورِ «cards:review» لغو (پیش‌تر کهنه می‌ماند) */
+    if (!cs.length) { if (cardsSig && cardsSig !== "none" && A.HOST.unremind) { try { Promise.resolve(A.HOST.unremind("cards:review")).catch(function () { }); } catch (e) { } } if (cardsSig) cardsSig = "none"; return null; }
     var day = cs.map(function (c) { return c.due < t ? t : c.due; }).sort()[0], on = cs.filter(function (c) { return (c.due < t ? t : c.due) === day; }), rc = on.filter(reconstruct)[0];
+    /* دورِ ۱۹c: کارتِ عقب‌افتاده موعدِ خودش را نگه می‌دارد (نه «امروز») — یک یادآور برای همان موعد؛ هر روزِ بازکردنِ صفحه یادآورِ تازه نمی‌سازد
+       (میزبان فقط با تغییرِ due_date دوباره مسلح می‌کند) */
+    var od = cs.map(function (c) { return c.due; }).sort()[0], late = od < t;
+    if (late) day = od;
     var n0 = ((S.settings().knots || {}).notify) || {}, ch = { telegram: n0.telegram !== false, email: n0.email !== false };
     if (!ch.telegram && !ch.email) return null;
-    var body = fa(on.length) + " کارتِ مرور " + (day === t ? "امروز" : (A.fdate ? A.fdate(day) : day)) + " موعد است." + (rc ? " یکی بازسازی است: «" + clip(rc.q, 90) + "» — اول بی‌نگاه دوباره بسازش، بعد پاسخ را ببین." : "");
+    var body = fa(on.length) + " کارتِ مرور " + (late ? "از " + (A.fdate ? A.fdate(day) : day) : day === t ? "امروز" : (A.fdate ? A.fdate(day) : day)) + " موعد است." + (rc ? " یکی بازسازی است: «" + clip(rc.q, 90) + "» — اول بی‌نگاه دوباره بسازش، بعد پاسخ را ببین." : "");
     var sig = day + "|" + on.length + "|" + (rc ? rc.id : ""); if (!force && sig === cardsSig) return null; cardsSig = sig;
     try { Promise.resolve(A.HOST.remind({ key: "cards:review", due_date: day, tz: tzOf(), hour: hour(), title: "معماری یادگیری — مرور", body: body, link: "?tab=review", channels: ch })).catch(function () { }); } catch (e) { }
     return { day: day, n: on.length, body: body };
   };
   if (A.newCard && !A.newCard._push) { var rawNC = A.newCard; A.newCard = function () { var c = rawNC.apply(this, arguments); try { AS.cardsPushSync(); } catch (e) { } return c; }; A.newCard._push = true; }
+  /* دورِ ۱۹c (ممیزیِ طولی §۳.۲): یادآورِ مرور پس از نمره‌دادن هم تازه می‌شود — پیش‌تر فقط با کارتِ تازه، و تا آن وقت روزِ کهنه را می‌گفت.
+     همین برای بازنشسته/بازگرداندنِ کارت. (srsGrade موعد را روی خودِ همان شیءِ ثبت‌شده عوض می‌کند، پس همگام‌سازی همان دم درست است) */
+  if (A.srsGrade && !A.srsGrade._push) { var rawSG = A.srsGrade; A.srsGrade = function () { var c = rawSG.apply(this, arguments); try { AS.cardsPushSync(); } catch (e) { } return c; }; A.srsGrade._push = true; }
+  if (A.cardSuspend && !A.cardSuspend._push) { var rawCS = A.cardSuspend; A.cardSuspend = function () { var c = rawCS.apply(this, arguments); try { AS.cardsPushSync(); } catch (e) { } return c; }; A.cardSuspend._push = true; }
   var lastCP = 0, rawRenderD = A.render;
-  A.render = function () { rawRenderD.apply(this, arguments); try { if (A.S.loaded && Date.now() - lastCP > 600e3) { lastCP = Date.now(); AS.cardsPushSync(); } } catch (e) { } };
+  A.render = function () { rawRenderD.apply(this, arguments); try { if (A.S.loaded && A.nowMs() - lastCP > 600e3) { lastCP = A.nowMs(); AS.cardsPushSync(); } } catch (e) { } };
   /* «امروز»: موعدهای ۷ روزِ آینده */
   if (typeof A.dueList === "function" && !A.dueList._dl) {
     var raw = A.dueList;

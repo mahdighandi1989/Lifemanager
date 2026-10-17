@@ -127,7 +127,8 @@
   A.dueList = function () {
     var t = A.today(), items = [];
     var cards = A.dueCards();
-    if (cards.length) items.push({ k: "review", txt: fa(cards.length) + " کارت مرور موعد امروز", sub: "بازیابی پیش از نگاه به پاسخ", go: function () { A.go("review"); } });
+    var cod = cards.map(function (c) { return c.due || t; }).sort()[0];   // دورِ ۱۹c: کارتِ عقب‌افتاده «عقب‌افتاده از …» می‌گوید
+    if (cards.length) items.push({ k: "review", txt: fa(cards.length) + " کارت مرور موعد امروز", sub: "بازیابی پیش از نگاه به پاسخ" + (cod < t ? " · عقب‌افتاده از " + A.fdate(cod) : ""), go: function () { A.go("review"); } });
     S.all("sched", function (s) { return !s.done && s.due <= t; }).forEach(function (s) {
       var tp = S.get(s.topic);
       items.push({ k: "sched", txt: "برگه سفید " + s.label + (tp ? " — " + tp.title : s.title ? " — " + s.title : ""), sub: "چرخه ۱-۳-۷ · موعد " + A.fdate(s.due), go: function () { A.startProto("P3", { sched: s.id, topic: s.topic, preset: { topic: s.title || (tp && tp.title) || "" } }); } });
@@ -149,6 +150,8 @@
     var pdue = []; if (A.pbDue) { try { pdue = A.pbDue() || []; } catch (e) { pdue = []; } }
     if (pdue.length) items.push({ k: "knot", txt: fa(pdue.length) + " مسئلهٔ هم‌ساختار موعد است", sub: "همان ساختارِ مسئله‌های خودت در لباسِ تازه", go: function () { A.go("e_prob", pdue[0].pid, "similar"); } });
     if (act > 2) items.unshift({ k: "warn", txt: fa(act) + " منبع فعال هم‌زمان (سقف پیشنهادی ۲)", sub: "بار بیرونی بالاست؛ یکی را به صف یا معدن ببر", go: function () { A.go("protos", null, "queue"); } });
+    /* زمان‌بندِ واحد (دورِ ۱۹c): هر چیزی که با A.SCHED ثبت شده و سطرش را از آن می‌گیرد (پیش‌بینی، زنجیره، پروندهٔ تمرین…) */
+    if (A.SCHED && A.SCHED.todayLines) { try { A.SCHED.todayLines(t).forEach(function (x) { items.push(x); }); } catch (e) { console.warn(e); } }
     return items;
   };
   A.curWeek = function () {

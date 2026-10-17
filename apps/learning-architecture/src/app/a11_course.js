@@ -277,7 +277,7 @@
   }
 
   /* ---------- گرم‌کردن: بازیابی با فاصلهٔ فزاینده ---------- */
-  var GAPS = [1, 3, 7, 21, 60];
+  var GAPS = A.SCHED.ladder("a11_course");   // دورِ ۱۹c: یک نسخه در A.SCHED (کپیِ پیشین در APP.SCHED_QUARANTINE)
   function dueWarm(c, exceptTid) {
     var t = A.today();
     return Object.keys(c.done).map(Number).filter(function (id) {

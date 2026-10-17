@@ -24,7 +24,7 @@
   };
   var ROOT_TYPE = { knot: ["kcase"], claim: ["case"], problem: ["eprob"], learn: ["topic"], territory: ["topic", "case"], area: ["wchain", "fcast", "kexp", "ex", "topic", "case", "value", "meaning"], prereq: ["prereq"] };
   var ST_FA = { todo: "مانده", now: "در جریان", done: "پایه برپا شد", blocked: "منتظرِ ساختِ حوزه", skipped: "کنار گذاشته شد" };
-  function nowIso() { return new Date().toISOString(); }
+  function nowIso() { return A.nowISO(); }
   function get(id) { return id ? S.get(id) : null; }
 
   /* ---------- رکوردهای هر وجه (ریشه + فرزندان، از پیوندهای خودِ رکوردها) ---------- */
@@ -283,7 +283,7 @@
   AS.tourChart = function (s, opt) {
     var pts = AS.tourSeries(s); if (pts.length < 1) return null;
     var W = (opt && opt.w) || 300, H = (opt && opt.h) || 90, P = 18, NS = "http://www.w3.org/2000/svg";
-    var t0 = Date.parse(pts[0].at), t1 = Math.max(Date.parse(pts[pts.length - 1].at), Date.now()), span = Math.max(1, t1 - t0), mx = Math.max.apply(null, pts.map(function (p) { return Math.max(p.all, p.n, 1); }));
+    var t0 = Date.parse(pts[0].at), t1 = Math.max(Date.parse(pts[pts.length - 1].at), A.nowMs()), span = Math.max(1, t1 - t0), mx = Math.max.apply(null, pts.map(function (p) { return Math.max(p.all, p.n, 1); }));
     function X(at) { return P + (W - 2 * P) * (Date.parse(at) - t0) / span; } function Y(n) { return H - P - (H - 2 * P) * n / mx; }
     var d = "", last = null; pts.forEach(function (p) { var x = X(p.at), y = Y(p.n); d += (d ? " L" + x.toFixed(1) + " " + (last == null ? y : last).toFixed(1) + " L" : "M") + x.toFixed(1) + " " + y.toFixed(1); last = y; });
     d += " L" + (W - P).toFixed(1) + " " + last.toFixed(1);
@@ -727,7 +727,7 @@
               f.blocked.checks.push({ at: nowIso(), ok: false, lag: true, reason: clip(o.reason, 500), note: last.id });
               f.blocked.seenNote = ""; f.blocked.reloadAsked = "";
               s.msgs.push({ role: "sys", at: nowIso(), text: "⏳ روتین برای برگهٔ #" + fa(f.blocked.number) + " جواب داده ولی ساخته‌اش هنوز در سامانه دیده نمی‌شود — شاید نسخهٔ تازه هنوز منتشر نشده. کمی بعد صفحه را تازه کن؛ دوباره می‌سنجم." });
-              f.blocked.lagAt = Date.now();   // تا تازه‌کردنِ بعدیِ صفحه دوباره نسنج
+              f.blocked.lagAt = A.nowMs();   // تا تازه‌کردنِ بعدیِ صفحه دوباره نسنج
               return;
             }
             f.blocked.checks.push({ at: nowIso(), ok: !!o.ok, reason: clip(o.reason, 500), note: last.id });
@@ -753,10 +753,10 @@
     return chain.then(function () { S.put(s); });
   };
   /* جاروی دوره‌ای: هنگامِ رسمِ صفحه، حداکثر هر ۲۰ دقیقه، برای همهٔ سشن‌های تور‌دار */
-  A._loadedAt = A._loadedAt || Date.now();
+  A._loadedAt = A._loadedAt || A.nowMs();
   AS.tourSweep = function (force) {
-    if (!force && Date.now() - lastSweep < 20 * 60000) return Promise.resolve();
-    lastSweep = Date.now();
+    if (!force && A.nowMs() - lastSweep < 20 * 60000) return Promise.resolve();
+    lastSweep = A.nowMs();
     var ss = S.all("achat", function (x) { return x.tour && x.tour.facets.some(function (f) { return f.status === "blocked"; }); });
     return ss.reduce(function (p, s) { return p.then(function () { return AS.tourCheckSheets(s); }); }, Promise.resolve()).then(function () { if (ss.length) AS.paint(); });
   };
@@ -845,7 +845,7 @@
      بی آستانهٔ تازه: از آخرین پیشرفتِ همین وجه (نشانهٔ ✓ ِ تازه یا آغازِ وجه) روی همان نردبانِ ۱/۳/۷/۲۱/۶۰ ِ مرورِ فاصله‌دار (A.solveUI.LADDER)؛
      روزی که تمرینِ زمان‌بندی‌شدهٔ خودِ وجه (practice) یا یادآورِ گره دارد، یادآورِ جدا نمی‌گیرد. هر پله یک یادآورِ یک‌باره (کلیدِ جدا) است
      تا حتی اگر کاربر صفحه را باز نکند، پله‌های بعد هم برسند؛ با نخستین پیشرفت همه برداشته و از نو چیده می‌شوند. */
-  var STALL_LADDER = (A.solveUI && A.solveUI.LADDER) || [1, 3, 7, 21, 60];
+  var STALL_LADDER = (A.solveUI && A.solveUI.LADDER) || A.SCHED.ladder("a27_tour");
   function facetProgAt(s, f) {
     var okN = milestones(f).filter(function (m) { return m.ok; }).length, P = f.prog = f.prog || {};
     if (P.n == null) { P.n = okN; P.at = f.startedAt || f.createdAt || nowIso(); }
@@ -883,7 +883,7 @@
     rawRenderT.apply(this, arguments);
     try { if (A.HOST && A.HOST.sheet && A.S.loaded) AS.tourSweep(); } catch (e) { console.error(e); }
     // یک بار در ساعت: یادآورهای وجه‌های ایستاده برای همهٔ تورهای باز
-    try { if (A.HOST && A.HOST.remind && A.S.loaded && Date.now() - lastStall > 3600e3) { lastStall = Date.now(); S.all("achat", function (x) { return x.tour && !x.tour.doneAt; }).forEach(function (x) { AS.tourStallSync(x); S.put(x); }); } } catch (e) { console.error(e); }
+    try { if (A.HOST && A.HOST.remind && A.S.loaded && A.nowMs() - lastStall > 3600e3) { lastStall = A.nowMs(); S.all("achat", function (x) { return x.tour && !x.tour.doneAt; }).forEach(function (x) { AS.tourStallSync(x); S.put(x); }); } } catch (e) { console.error(e); }
   };
 
   /* ---------- معلمِ حلِ مسئله: یک پرسش در هر نوبت، متناسب با مرحله، بی لودادن؛ بازنگری پس از «حل شد»؛ موفقیتِ کوچک ----------
@@ -2079,7 +2079,7 @@
   /* «میانهٔ راه» روی نردبانِ خودِ سامانه (۱/۳/۷/۲۱/۶۰): مسئلهٔ زندهٔ بازِ دیرپا ⇒ یک بار در هر پله «چه پیشرفتی کردی؟ دربارهٔ خودت چه آموختی؟» (rerunD s34) */
   function midCheck(s, b, mt) {
     if (!b || b.done || !b.r) return null;
-    var LAD = (A.solveUI && A.solveUI.LADDER) || [1, 3, 7, 21, 60], born = String(b.r.created || (b.r.p && b.r.p.created) || "").slice(0, 10); if (!born || !A.daysBetween) return null;
+    var LAD = (A.solveUI && A.solveUI.LADDER) || A.SCHED.ladder("a27_tour"), born = String(b.r.created || (b.r.p && b.r.p.created) || "").slice(0, 10); if (!born || !A.daysBetween) return null;
     var age = A.daysBetween(born, A.today()), rung = LAD.filter(function (d) { return d >= LAD[2] && age >= d; }).pop(); if (!rung) return null;
     /* دورِ ۸ (I-coach 7): هم‌توان در ساختِ چندبارهٔ پرامپتِ همان نوبت (AS.prompt ⇒ userPrompt تا ۴ بار) — پیش‌تر ساختِ نخست پله را مصرف می‌کرد و
        پرامپتِ نهایی سطر را نداشت؛ حالا همان پیام همان سطر را می‌گیرد و پله فقط یک نوبت را می‌گیرد */
@@ -2355,7 +2355,7 @@
       if (ty && ty !== twin.p.kind && !(uT && uT.done && uT.from !== "chat")) { twin.p.kind = ty; S.put(twin); if (soT) { soT.type = ty; S.put(pgT); } }
       var lkT = dupLink(s, twin, st);
       return "✓ همین مسئلهٔ تازه پیش‌تر ثبت شده بود («" + clip(twin.p.title, 60) + "»)؛ دوباره نساختم — صورتِ تازه‌ات کنارش ماند" + (ty && twin.p.kind === ty ? " (نوع: " + ((A.SOLVE_TYPES[ty] || {}).fa || ty) + ")" : "") + lkT + "."; }
-    var LAD = (A.solveUI && A.solveUI.LADDER) || [1, 3, 7, 21, 60], due = A.addDays(A.today(), LAD[1]);
+    var LAD = (A.solveUI && A.solveUI.LADDER) || A.SCHED.ladder("a27_tour"), due = A.addDays(A.today(), LAD[1]);
     /* فرزند داور، نوع و فضایی بودنِ پدر را به ارث می‌برد (R2) — درونِ خودِ A.liveCreate از origin {type:"lprob", id} (ادغامِ G1/G2: یک منطقِ ارث؛ این‌جا حدسی نیست).
        نوعِ صریحِ مدل (find/prove/pod، مثلاً «اثبات یا رد کن» برای حدس) پذیرفته است؛ بی پدر (ساخته در گفت‌وگو): داورِ صریحِ مدل با natBy: "assistant" */
     var r = A.liveCreate(clip((a && a.title) || st, 80), st, (a && a.kind) || "", from.type === "lprob" ? { by: "user", sess: (s && s.id) || "", origin: from, dormant: due }

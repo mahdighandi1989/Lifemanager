@@ -15,9 +15,9 @@
 (function (A) {
   if (!A.S || !A.V) return;
   var h = A.h, fa = A.fa, S = A.S;
-  var LADDER = [1, 3, 7, 21, 60];
+  var LADDER = A.SCHED.ladder("a36_solve");   // دورِ ۱۹c: یک نسخه در A.SCHED (کپیِ پیشین در APP.SCHED_QUARANTINE)
   function nextIv(iv, ok) { if (A.knextIv) return A.knextIv(iv, ok); if (!ok) return 1; for (var i = 0; i < LADDER.length; i++) if (LADDER[i] > (iv || 0)) return LADDER[i]; return LADDER[LADDER.length - 1]; }
-  function nowISO() { return new Date().toISOString(); }
+  function nowISO() { return A.nowISO(); }
   function tomorrow() { return A.addDays(A.today(), 1); }
   function prog(pid) { return S.get("eprog_" + pid) || { id: "eprog_" + pid, type: "eprog", lv: {} }; }
   function sol(pg) {
