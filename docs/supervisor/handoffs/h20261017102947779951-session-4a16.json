@@ -12,5 +12,11 @@
  "what": "REMOVAL_CANDIDATES.md: quarantine entry for the round-16 keyword storing paths in a27 (dupLinkR16, promScanR16, regOfR16, verdictR16 — kept, reachable via ASSIST.R16_QUARANTINE; replaced by model-reported coach_state fields)",
  "procedure": "CLAUDE.md#Non-negotiable rules",
  "commit": "57d714f5",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "urgent",
+  "at": "2026-10-17T12:58:25Z",
+  "note": "R16 quarantine entries present in REMOVAL_CANDIDATES.md; capability kept (rule 2)",
+  "commit": ""
+ }
 }
