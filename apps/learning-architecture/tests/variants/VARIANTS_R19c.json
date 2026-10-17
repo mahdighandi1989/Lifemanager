@@ -1,0 +1,1138 @@
+[
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: نگار کارتِ «مشتقِ sin x چیست؟» را از برگهٔ T42 می‌سازد ‖ روز ۱: مرور، نمره «خوب» ‖ روز ۷: مرور، نمره «خوب»",
+  "expect": "Today shows the card on day 1 (2026-10-18 Sun); after the day-1 grade the next due is day 7 (2026-10-24 Sat) — T42's own «۱ روز، ۶ روز» — and the «cards:review» reminder payload is re-synced to 2026-10-24 immediately after grading; after the day-7 grade the next due is ≈×2.5 → 15 days → 2026-11-08 Sun. One A.SCHED entry per card at any time.",
+  "context": "Negar, calculus, T42"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کاوه «قضیهٔ باقیماندهٔ چینی» را می‌خواند و از صفحهٔ T41 «شروع چرخهٔ بازیابی» را می‌زند ‖ روز ۱: بازیابی ۶۰٪ ‖ روز ۳: ۷۵٪ ‖ روز ۷: ۹۰٪ + برگهٔ سفیدِ هفتگی",
+  "expect": "Today has a T41 retrieval line on exactly day 1 (10-18), day 3 (10-20) and day 7 (10-24) — the technique's own 1/3/7 — and the weekly blank page on day 7 (10-24) and again day 14 (10-31); one HOST.remind payload per due date, keyed to the practice case; nothing on days 2, 4, 5, 6",
+  "context": "Kaveh, number theory, T41"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: فرزانه در 🎯 پیش‌بینی می‌کند «تا ۱۰ روز دیگر از شرکت الف پیشنهادِ کار می‌رسد»، ۶۰٪، موعد ۲۰۲۶-۱۰-۲۷ ‖ روز ۱۰: Today را باز می‌کند ‖ روز ۱۲: هنوز نتیجه را ننوشته ‖ روز ۱۲: «نیامد» را ثبت می‌کند",
+  "expect": "The standalone fcast appears in Today on day 10 (2026-10-27) asking for the outcome (a31_tools' promise finally kept); on day 12 it is still there marked overdue since 10-27; after the outcome it leaves Today and its reminder is cancelled",
+  "context": "Farzaneh, job decision, forecast"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: علی زنجیرهٔ نگرانیِ ⛓ «اگر وام دیر بیاید ← اجاره عقب می‌افتد ← …» را با موعدِ بررسی ۵ روز بعد می‌سازد ‖ روز ۵: Today",
+  "expect": "A wchain line is in Today on day 5 (2026-10-22 Thu) with its question; it was not there on days 0–4",
+  "context": "Ali, money worry, wchain"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: رضا راهبردِ تازه «اول حالت‌های کوچک را جدول کن» را در برگهٔ T31 برای مسائلِ شمارشی می‌گذارد ‖ روز ۱: Today ‖ روز ۲: Today ‖ روز ۵: Today",
+  "expect": "T31's own window «۲ تا ۷ روز بعد»: no line on day 1; the «آیا راهبردِ تازه جواب داد؟» line appears from day 2 (10-19 Mon), still present day 5, and is marked overdue only after day 7 (10-24); one reminder at the window start, not one per day",
+  "context": "Reza, combinatorics, T31"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سارا آزمونِ T21 «اگر صبح‌ها ۲۰ دقیقه مسئله حل کنم، تمرکزِ عصرم بهتر می‌شود» را با بازهٔ ۹ روز تعریف می‌کند ‖ روز ۰: از گرهٔ «حواس‌پرتی» یک kexp دیگر هم دارد ‖ روز ۹: Today",
+  "expect": "The T21 test is due on day 9 (2026-10-26 Mon) and shows in Today; the «آزمون‌های باز» view counts 2 open tests across sources (standalone T21 + knot kexp) against T21's own cap «حداکثر دو آزمون باز»",
+  "context": "Sara, habit experiment, T21"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: بهرام جدولِ عواملِ کلیدیِ T3 «کدام ۲۰٪ مشتری‌ها ۸۰٪ درآمد را می‌سازند» را می‌سازد ‖ روز ۷ ‖ روز ۲۱ ‖ روز ۳۰",
+  "expect": "Only one dated line: the monthly review «بازبینیِ ماهانه با داده واقعی» on day 30 (2026-11-16 Mon); nothing on days 7 or 21 (no copied 1/3/7/21/60)",
+  "context": "Bahram, small business, T3"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لیلا آزمونکِ T23 «قواعدِ لگاریتم» را می‌دهد (۶/۱۰) ‖ روز ۱: بازآزمایی ۸/۱۰ ‖ روز ۲: چرخهٔ دوم ‖ روز ۳: بازآزمایی ‖ روز ۴: چرخهٔ سوم ‖ روز ۵: بازآزمایی",
+  "expect": "Each quiz schedules its own retest one day later (day 1 = 10-18, day 3 = 10-20, day 5 = 10-22); after the third completed cycle (day 5) a «مرورِ روند» line appears (T23: every 3–5 cycles) showing 6→8, …",
+  "context": "Leila, logarithms, T23"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: نگار کارتِ «قاعدهٔ زنجیره‌ای» دارد با موعدِ روز ۱ ‖ روزهای ۱ تا ۳: برنامه را باز نمی‌کند ‖ روز ۴: مرور، «خوب»",
+  "expect": "On day 4 (10-21) the card is in Today as overdue since 2026-10-18; exactly one reminder was sent for that due (not one per missed day); after grading, the next due is counted from the actual review day: day 4 + 6 = day 10 (2026-10-27)",
+  "context": "Negar, calculus, T42 late return"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مهسا در گرهٔ «عجله در خواندنِ صورتِ مسئله» یک آزمایشِ kexp با موعدِ ۵ روز می‌گذارد ‖ روز ۵: Today",
+  "expect": "The existing knot scheduler now registers through A.SCHED: Today on day 5 (10-22) shows exactly one line for that kexp, with the knot's name and the reason; its reminder key is the same one A.SCHED holds",
+  "context": "Mahsa, reading-the-problem knot, wrapped scheduler"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: پویا باورِ «بدونِ ارشد پیشرفت نمی‌کنم» را با T22 به‌عنوانِ «باورِ مقدسِ این هفته» می‌آزماید ‖ روز ۷ ‖ روز ۱۴",
+  "expect": "T22 «هفته‌ای یک باور مقدس»: a weekly cue on day 7 (10-24) and day 14 (10-31) for the next belief; the open case's own observation due (if set) is a separate dated line, never merged into the weekly cue",
+  "context": "Pouya, career belief, T22"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کارتِ T42 «انتگرالِ جزءبه‌جزء» ‖ روز ۱: مرور «خوب»",
+  "expect": "Next due must NOT be day 4 (2026-10-21, a 3-day interval); it is day 7 (2026-10-24) per T42's text «۶ روز»",
+  "context": "Negar, T42 text-vs-code mismatch"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: در مسئلهٔ زندهٔ «۲۰ پله» گامِ «اگر n=۳ باشد ۳ راه» با پیش‌بینی ۷۰٪ و موعدِ فردا ثبت می‌شود (که خودش یک fcast هم می‌سازد) ‖ روز ۱: Today",
+  "expect": "Exactly ONE Today line for that step on day 1 — not one from the live-step wrapper and another from the fcast wrapper",
+  "context": "Kaveh, live problem, double wrapper"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: پرونده T22 پویا باز است با مشاهده‌ی موعدِ روز ۵ ‖ روز ۵: مشاهده ثبت و پرونده «بسته — رد شد» ‖ روز ۷",
+  "expect": "No reminder and no Today line for this closed case on day 7 or after (the weekly «new belief» cue may appear, but nothing names the closed case)",
+  "context": "Pouya, closed case"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: مریم برگهٔ T28 «توضیحِ مشتق برای خواهرم» ‖ روز ۱: «مکث — سفر کاری» ‖ روز ۷ ‖ روز ۱۰: «ادامه»",
+  "expect": "No Today line and no reminder on days 1–9 while paused (the day-1 and day-7 rewrites are not shown as overdue); after resume on day 10 the rewrites are rescheduled from day 10 (day 11 = 10-28, day 17 = 11-03)",
+  "context": "Maryam, T28 pause/resume"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: بهرام جدولِ T3 ‖ روز ۱ ‖ روز ۳ ‖ روز ۷",
+  "expect": "No T3 line on days 1, 3, 7 — the generic 1/3/7/21/60 table must not be applied to a monthly technique",
+  "context": "Bahram, T3"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: رضا راهبردِ T31 ‖ روز ۱: Today",
+  "expect": "No «آیا جواب داد؟» line on day 1 (T31's window starts at 2 days)",
+  "context": "Reza, T31 window start"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کارتِ T42 ‖ روز ۱: مرور «خوب» ‖ (همان روز) گوشی را نگاه می‌کند",
+  "expect": "The phone reminder must NOT still say 2026-10-18 after the grade (stale cards:review payload); it now says 2026-10-24",
+  "context": "Negar, stale push reminder"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: فرزانه برگهٔ T9 را دو بار ذخیره می‌کند (ویرایشِ عدد) ‖ روز ۳۰",
+  "expect": "Two saves on the same day create ONE scheduled due, not two Today lines on day 30",
+  "context": "Farzaneh, same-day double save"
+ },
+ {
+  "rc": "LT1.sched",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰ تا ۳۰: آرش هر روز ۳ تا ۵ پیش‌بینیِ T24 می‌نویسد؛ تا روز ۳۰، ۴۱ تا داوری شده",
+  "expect": "No «۵۰ موردِ داوری‌شده ← مرورِ ماهانه» prompt on day 30 (only 41 resolved); it appears the day the 50th is resolved, not on the calendar month alone",
+  "context": "Arash, T24 threshold"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مریم با T28 «مشتق چیست؟» را برای خواهرش می‌نویسد ‖ روز ۱: بازنویسیِ بدونِ منبع ‖ روز ۷: بازنویسیِ دوم",
+  "expect": "ONE practice case (T28 × «مشتق») with 3 dated sessions; each rewrite is a version comparable with the previous (jargon count, length); next due after day 0 = day 1 (10-18), after day 1 = day 7 (10-24) — T28's own «۱ روز و ۱ هفته»; state open → stabilising",
+  "context": "Maryam, calculus, T28"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کاوه در صفحهٔ مسئلهٔ زندهٔ «به چند طریق از ۲۰ پله با گامِ ۱ یا ۲؟» دکمهٔ «تمرینِ T21» را می‌زند و حدس «فیبوناچی است» را آزمونی می‌کند ‖ روز ۱: دوباره از کتابخانه برگهٔ T21 را برای همین مسئله ذخیره می‌کند",
+  "expect": "The case is created on day 0 with subject = that live problem; the day-1 library save CONTINUES the same case (session 2), not a second case",
+  "context": "Kaveh, live problem, T21"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: پویا از پروندهٔ معرفتیِ «مهاجرت یعنی موفقیتِ شغلی» T22 را شروع می‌کند ‖ روز ۸: مشاهده «دو همکارِ مهاجر هنوز کار پیدا نکرده‌اند»",
+  "expect": "Practice case T22 with subject = that epistemic case; session 2 on day 8 (10-25) holds the observation; the case appears inside the epistemic case",
+  "context": "Pouya, emigration belief, T22"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مهسا از گرهٔ «عجله در خواندنِ صورتِ مسئله» T23 را شروع می‌کند ‖ روز ۱: بازآزمایی",
+  "expect": "Case subject = the knot (kind knot); the worksheet's ex carries the case id; day-1 retest is session 2 of the same case",
+  "context": "Mahsa, knot, T23"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "chat+days",
+  "text": "روز ۰: U: بیا برای قضیهٔ فیثاغورس یه برنامهٔ بازیابی بچینیم ‖ A: یک چرخهٔ بازیابیِ ۱، ۳ و ۷ روزه برای «فیثاغورس» شروع کنم؟ ‖ U: آره ‖ [سامانه: start_practice] ‖ روز ۱: Today",
+  "expect": "The assistant action start_practice creates ONE T41 case (subject = topic «فیثاغورس», source = assistant) only after her «آره»; day 1 (10-18) shows its retrieval line",
+  "context": "Hoda, geometry, T41 via assistant"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لیلا درسِ T4 دوره را می‌بندد و نقشهٔ ساختاریِ «تابعِ نمایی» را می‌کشد ‖ روز ۳: بازکشیدن از حافظه ‖ روز ۷: بازکشیدن",
+  "expect": "Case T4 × «تابع نمایی» started from the course; redraws on day 3 (10-20) and day 7 (10-24) — T4's own «پس از ۳ و ۷ روز», not the card's 1-then-3 — stored as versions and diffed against map 1",
+  "context": "Leila, exponentials, T4 via course"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: رضا راهبردِ T31 ‖ روز ۲: «مکث — بیمارستان» ‖ روز ۹: «ادامه»",
+  "expect": "State open → paused (day 2, reason kept) → open (day 9); the return window is recomputed from day 9: line from day 11 (10-28) to day 16 (11-02); history keeps both transitions with dates",
+  "context": "Reza, T31 pause/resume"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: نیما نمودارِ T26 «چرخهٔ آب» را می‌کشد (بازکشیدن موعدِ روز ۱) ‖ روز ۲۰: بالاخره از حافظه می‌کشد",
+  "expect": "Session 2 is logged on its real date (11-06) with «۱۹ روز دیرتر از موعد»; it is NOT recorded as a day+1 redraw; the case stays open",
+  "context": "Nima, science teaching, T26 late return"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: هدی T41 روی «فیثاغورس» و T28 روی «فیثاغورس» ‖ روز ۰: T41 روی «اتحادهای مثلثاتی»",
+  "expect": "Three distinct cases — key is (technique × subject): T41×فیثاغورس, T28×فیثاغورس, T41×اتحادها",
+  "context": "Hoda, case key"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سمیرا یادداشت‌های T30 بعد از جلسهٔ «آمارِ بیزی» (موضوعِ آزاد) ‖ روز ۷: گشت‌وگذارِ ۲۰ دقیقه‌ای ‖ روز ۱۴: گشت‌وگذار",
+  "expect": "One T30 case (subject free/topic) with the weekly 20-min walk due on day 7 (10-24) and day 14 (10-31); each walk is a session",
+  "context": "Samira, Bayesian stats, T30"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: مریم برگهٔ T28 ‖ روز ۱: از صفحهٔ کتابخانه «شروع تمرین» T28 روی «مشتق»",
+  "expect": "NO new unlinked ex/case; it opens the existing case and adds session 2",
+  "context": "Maryam, duplicate case"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "chat+days",
+  "text": "روز ۰: کاوه T21 را از صفحهٔ مسئلهٔ «۲۰ پله» شروع کرده ‖ روز ۲: U: یه آزمون برای حدسِ فیبوناچی بذار ‖ [سامانه: start_practice]",
+  "expect": "No second case — start_practice finds the open T21 case for that problem and continues it",
+  "context": "Kaveh, assistant path duplicate"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: پویا پروندهٔ T22 را بست ‖ روز ۴۰: فقط صفحهٔ T22 را باز می‌کند و می‌خواند",
+  "expect": "Viewing adds no session and does not reopen the closed case",
+  "context": "Pouya, view is not a session"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: لیلا برگهٔ T23 را نیمه‌کاره (پیش‌نویس) رها می‌کند",
+  "expect": "A draft is not a completed session: no outcome, no next-due computed from it, the case (if created) is open with 0 completed sessions",
+  "context": "Leila, draft"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: هدی T41 روی «فیثاغورس» ‖ روز ۱: T41 روی «اتحادهای مثلثاتی»",
+  "expect": "The second subject must NOT be appended as a session to the «فیثاغورس» case",
+  "context": "Hoda, subject merge"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "chat",
+  "text": "روز ۰: U: حس می‌کنم فرمول‌ها یادم می‌ره ‖ A: می‌خواهی برایش یک چرخهٔ بازیابی بگذاریم؟ ‖ U: بعداً",
+  "expect": "No case created (offer only; no start_practice without her yes)",
+  "context": "Hoda, assistant offer declined"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: رضا T31 ‖ روز ۲: مکث ‖ روز ۹: ادامه",
+  "expect": "The paused period must not erase the day-0 session, and no «overdue» badge is shown during days 2–8",
+  "context": "Reza, pause keeps history"
+ },
+ {
+  "rc": "LT2.case",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰ ساعت ۱۰: مریم بازنویسیِ T28 ‖ روز ۰ ساعت ۲۲: دوباره ذخیره با یک تغییرِ کوچک",
+  "expect": "One session for day 0 (the later save updates it), not two sessions",
+  "context": "Maryam, same-day repeat"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کاوه چرخهٔ T41 «قضیهٔ چینی» ‖ روز ۱: ۸۰٪ ‖ روز ۳: ۸۵٪ ‖ روز ۷: ۹۰٪ ‖ روز ۱۴: برگهٔ سفید ۴۰٪",
+  "expect": "«تثبیت شد» on day 7 (10-24) with evidence listed by date (10-18 80%, 10-20 85%, 10-24 90% — success at each longer interval); the day-14 (10-31) check-in catches decay: state back to stabilising, «تثبیت شد» withdrawn with the dated reason, new Today turns",
+  "context": "Kaveh, T41 decay"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مهسا در تمرینِ T23 گره ۳ پاسخِ درستِ پیاپی در ۳ شکل ‖ روز ۴: ۳ پاسخِ درست در شکل‌های دیگر با فریب",
+  "expect": "Stable on day 4 (10-21): ≥2 sessions ≥3 days apart, varied forms, decoys — evidence lists both dates",
+  "context": "Mahsa, knot criterion"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: آرش ۵ پیش‌بینیِ T24 با بازهٔ ۷۰٪ ‖ روز ۴: ۵ تای دیگر ‖ روز ۹: ۵ تای دیگر؛ همه داوری‌شده (۳/۵، ۴/۵، ۴/۵ درست)",
+  "expect": "Calibration stable on day 9 (10-26): hit rate 11/15 = 73% inside the stated 70% band across sessions on three different days; evidence shows each day's tally",
+  "context": "Arash, T24 calibration"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سارا آزمایشِ T21 اول ‖ روز ۶: دوم ‖ روز ۱۵: سوم؛ هر سه کامل (پیش‌بینی، مشاهده، نتیجه)",
+  "expect": "Stable/«آزموده» on day 15 (11-01): ≥3 complete experiments spread over 15 ≥ 14 days",
+  "context": "Sara, T21 experiment criterion"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کارت T42 ‖ روز ۱ «خوب» ‖ روز ۷ «خوب» ‖ روز ۲۲: «یادم نبود»",
+  "expect": "On day 22 (11-08) the lapse resets the interval to 1 day (due 11-09) and any stability mark is revoked with the date; history keeps the earlier successes",
+  "context": "Negar, T42 regression"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: رضا راهبردِ T31 ‖ روز ۴: روی مسئلهٔ «رنگ‌آمیزیِ صفحه» جواب داد ‖ روز ۱۱: روی مسئلهٔ «مسیرهای شبکه» هم جواب داد",
+  "expect": "Stable on day 11 (10-28): the strategy's outcome confirmed on two different problems on dates ≥3 days apart; evidence names both problems",
+  "context": "Reza, T31"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مریم T28 ‖ روز ۱ ‖ روز ۷: «تثبیت شد» (اصطلاحِ فنی ۲ ← ۰) ‖ روز ۱۴: بازنویسی با ۵ اصطلاح و گیر در «حد»",
+  "expect": "Day 14 check-in (next interval after stable) reopens the case to stabilising; the stuck point «حد» is recorded; Today turn returns",
+  "context": "Maryam, T28 decay"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: پویا T22 «مهاجرت یعنی موفقیت» با پیش‌بینیِ ابطال‌پذیر ‖ روز ۱۰: مشاهدهٔ مخالف ‖ روز ۱۷: بازبینی پس از نتیجه",
+  "expect": "Day 10 (10-27): verdict «رد شد» with the dated observation; a re-review after the outcome is scheduled and shows on day 17 (11-03); belief revision is stored as history",
+  "context": "Pouya, T22 verdict"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لادن مدلِ «هزینهٔ فرصت» را در T16 در تصمیمِ خرید خودرو به کار می‌برد ‖ روز ۵: در انتخابِ دوره ‖ روز ۱۲: در قبولِ پروژه",
+  "expect": "Model admitted to the latticework on day 12 (10-29): 3 real uses on 3 different days — T16's «دست‌کم سه بار در موقعیت واقعی»",
+  "context": "Ladan, decisions, T16"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: بهرام مشکلِ «تأخیر در تحویلِ سفارش» ‖ روز ۹: دوباره ‖ روز ۲۰: بارِ سوم",
+  "expect": "On the third recurrence (day 20, 11-06) T39 double-loop is suggested with the three dates; then a monthly governing-variable review is scheduled (day 50)",
+  "context": "Bahram, T39 recurrence"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: نگار شش بار برگهٔ T43 را با ۱۰۰٪ پر می‌کند",
+  "expect": "Counts as ONE session; never «روان»/«تثبیت شد»",
+  "context": "Negar, same-day repeats"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۱: کاوه سه بار بازیابیِ T41 (صبح، ظهر، شب)",
+  "expect": "One day-1 session; the case does not advance to the day-3 or day-7 step",
+  "context": "Kaveh, same-day as spacing"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: لیلا بدونِ هیچ جلسه‌ای دکمهٔ «تثبیت شد» را می‌زند",
+  "expect": "Not stable: no dated evidence; at most shown as her own claim, the case stays open with Today turns",
+  "context": "Leila, unsupported claim"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: آرش ۵۲ پیش‌بینیِ T24 می‌نویسد ‖ روز ۱: همه داوری می‌شوند (۷۲٪ در بازه)",
+  "expect": "Not stable — all from one session/day; hit rate shown but «across days» unmet",
+  "context": "Arash, single-day calibration"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰، ۴، ۱۰: سه آزمایشِ کاملِ T21",
+  "expect": "Not stable on day 10 — span 10 < 14 days",
+  "context": "Sara, short span"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰ T41 ‖ روز ۷: خودارزیابی ۲/۲ ولی بازیابیِ سنجیده ۳۰٪",
+  "expect": "The measured result wins: no «تثبیت شد», the cycle steps back",
+  "context": "Kaveh, self-score vs measured"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۷: T28 «تثبیت شد» ‖ روز ۱۴: بازبینی شکست خورد",
+  "expect": "After the failed check-in the mind card and case must NOT still show «تثبیت شد»",
+  "context": "Maryam, stale stable"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: لادن مدلِ «هزینهٔ فرصت» را ۳ بار در همان روز در سه سؤالِ فرضی به کار می‌برد",
+  "expect": "Not admitted: one day and not real situations — counts as 1 use",
+  "context": "Ladan, T16 same-day uses"
+ },
+ {
+  "rc": "LT3.stable",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کارت T42 ‖ روز ۴ (موعد روز ۱): «یادم نبود»",
+  "expect": "A late failure is not counted as success at a longer interval; interval resets to 1",
+  "context": "Negar, late failure"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۱: کاوه بازیابیِ T41 ۸۰٪ ‖ روز ۳: ۸۵٪ ‖ روز ۷: ۹۰٪",
+  "expect": "Mind card reflects retrieval for «قضیهٔ چینی»; «از کجا؟» lists three dated lines (2026-10-18 80%, 10-20 85%, 10-24 90%, source = practice case T41)",
+  "context": "Kaveh, T41 → card"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰ تا ۹: آرش ۱۵ پیش‌بینیِ T24 در سه روز؛ همه داوری‌شده",
+  "expect": "Calibration on the mind card now includes T24 rows (Brier / hit rate); «از کجا؟» names the T24 sessions by date, alongside any fcast entries",
+  "context": "Arash, T24 → card"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لیلا در T32 پیش‌بینی می‌کند «فردا ۸ از ۱۰ را یادم است» ‖ روز ۱: ۵ از ۱۰",
+  "expect": "The judgement-of-learning prediction is resolved on day 1 and feeds the card as over-confidence (+30 points), with «از کجا؟» → T32 2026-10-18",
+  "context": "Leila, T32 JOL"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۷: کاوه برگهٔ سفیدِ هفتگیِ «نظریهٔ اعداد» ‖ روز ۱۴: دوباره",
+  "expect": "Both weekly blank-page recall % values show on the card with dates 10-24 and 10-31",
+  "context": "Kaveh, weekly blank page"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: نیما برگهٔ T13 روی ادعای «شیرِ گرم برای خواب خوب است» با روبریکِ ۲/۲/۱",
+  "expect": "The rubric score of the completed worksheet reaches the card as one dated session, labelled self-scored (not measured)",
+  "context": "Nima, T13 rubric"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۱۰: پروندهٔ T22 پویا «رد شد»",
+  "expect": "The epistemic part of the card (s_epi) moves; «از کجا؟» shows the case, the observation and the date 2026-10-27",
+  "context": "Pouya, T22 → s_epi"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۷: مریم T28 «تثبیت شد» ‖ روز ۱۴: بازنویسی شکست خورد",
+  "expect": "The card shows the decline on 10-31 and the reason, not only the earlier success",
+  "context": "Maryam, regression visible"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سمیرا در T33 پیش از مطالعه «۴۰٪ می‌دانم» و پس از آن «۸۰٪» با آزمونکِ ۷۰٪",
+  "expect": "The pre/post calib values feed the card once, with source T33 and date 10-17",
+  "context": "Samira, T33 calib"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "pos",
+  "role": "chat+days",
+  "text": "روز ۰: هدی از طریقِ دستیار چرخهٔ T41 را شروع کرد ‖ روز ۱: ۷۰٪",
+  "expect": "The session counts on the card; «از کجا؟» shows source «دستیار ← تمرین T41» and the date",
+  "context": "Hoda, assistant-started"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: آرش یک پیش‌بینی در برگهٔ T24 می‌نویسد که همان fcast است و در کارتِ مرور هم اطمینان دارد",
+  "expect": "Counted ONCE in calibration — not three times (T24 + fcast + card confidence)",
+  "context": "Arash, once per act"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: یک اجرای تور با ?clock=2026-11-01 روی حسابِ مالک پرونده‌ی T41 می‌سازد",
+  "expect": "Nothing from the test/tour record appears in the owner's mind card or «از کجا؟»",
+  "context": "owner card, test record"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۱: کاوه سه بار بازیابیِ T41",
+  "expect": "One line under «از کجا؟» for that day, not three",
+  "context": "Kaveh, same-day"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: آرش ۵ پیش‌بینیِ T24 که هنوز موعدشان نرسیده",
+  "expect": "Unresolved predictions are not counted as hits or misses",
+  "context": "Arash, unresolved"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: لیلا پیش‌نویسِ نیمه‌کارهٔ T23",
+  "expect": "A draft does not reach the card",
+  "context": "Leila, draft"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: منتقدِ هوش مصنوعی به برگهٔ T13 نیما نمرهٔ ۹۰ می‌دهد",
+  "expect": "The AI critic score is never shown as Nima's own measured result",
+  "context": "Nima, AI critic"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: علی با پروندهٔ مسئلهٔ زنده به برادرش (T29) یاد می‌دهد؛ برادر ۳ از ۵",
+  "expect": "The brother's score is not entered as Ali's own skill on Ali's card (it may appear as teaching activity)",
+  "context": "Ali, other person's score"
+ },
+ {
+  "rc": "LT4.mind",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: نیما T13 ‖ روز ۵: T13 دیگر ‖ روز ۵: «از کجا؟» را باز می‌کند",
+  "expect": "Every line under «از کجا؟» carries its date and opens its source record — never an undated aggregate like «تمرین‌ها: ۲»",
+  "context": "Nima, provenance"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: آرش در برگهٔ T24 «برزیل بازی را می‌برد، ۷۰٪، موعد ۲۰۲۶-۱۰-۲۰» ‖ روز ۳: در 🎯 نتیجه «برد»",
+  "expect": "One fcast-ledger record; the T24 page opens that dated record and shows the outcome «برد» on day 3 (10-20)",
+  "context": "Arash, T24 ⇄ fcast"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مهسا از گرهٔ «حواس‌پرتی» T21 را اجرا می‌کند ‖ روز ۵: مشاهده",
+  "expect": "The worksheet is the knot's kexp record; the T21 page opens that kexp with plan/predict/observe/outcome",
+  "context": "Mahsa, T21 ⇄ kexp"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کاوه در مسئلهٔ زنده گامی با پیش‌بینی (T21) ‖ روز ۱: نتیجه",
+  "expect": "The T21 page shows the live-problem step itself (with its fcast), not a copy",
+  "context": "Kaveh, T21 ⇄ live step"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: پویا برگهٔ T22 را در کتابخانه پر می‌کند",
+  "expect": "It creates/attaches to an epistemic case with revdate; the case and T22 page show the same record",
+  "context": "Pouya, T22 ⇄ case"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: فرزانه در T9 تخمینِ نهایی «۴ ماه تا پیدا کردنِ کار» با کلاسِ مرجع ‖ روز ۳۰: مقایسهٔ ماهانه",
+  "expect": "The final estimate becomes ONE fcast with due 2026-11-16 (T9's «ماهانه با نتایج واقعی»); on day 30 the inside-vs-base gap is scored there",
+  "context": "Farzaneh, T9 ⇄ fcast"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۳: آرش نتیجهٔ پیش‌بینی را از صفحهٔ T24 ثبت می‌کند",
+  "expect": "The fcast ledger shows the same outcome immediately (same record)",
+  "context": "Arash, resolve from either side"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کاوه برگهٔ T41 را از صفحهٔ تکنیک شروع می‌کند",
+  "expect": "It starts the existing P3 1/3/7 schedule for that topic (one schedule), the technique page opens it",
+  "context": "Kaveh, T41 ⇄ P3"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: نگار پیش از پاسخِ کارت «۸۰٪ مطمئنم» ‖ درست",
+  "expect": "The card confidence is one calibration point; T24 page lists it once with source «مرور کارت»",
+  "context": "Negar, card confidence ⇄ T24"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: آرش پیش‌بینی در T24 ‖ همان پیش‌بینی را در 🎯 هم وارد می‌کند",
+  "expect": "No second record — the 🎯 form offers the existing one",
+  "context": "Arash, duplicate"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۵: مشاهدهٔ kexp مهسا ثبت شد",
+  "expect": "The T21 page must NOT show an older copy without that outcome",
+  "context": "Mahsa, stale copy"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: فرزانه تخمینِ T9 ‖ روز ۳۰",
+  "expect": "Not two Today lines (T9 + fcast) for one estimate",
+  "context": "Farzaneh, two lines"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: پویا T22 را از پرونده شروع کرد ‖ روز ۲: همان T22 از کتابخانه",
+  "expect": "No second epistemic case",
+  "context": "Pouya, second case"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۳: آرش نتیجه را در 🎯 عوض کرد (برد ← مساوی)",
+  "expect": "The T24 page never keeps the old outcome",
+  "context": "Arash, edit propagation"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کاوه گامِ پیش‌بینی‌دار در مسئلهٔ زنده",
+  "expect": "Not counted twice in calibration (step + fcast)",
+  "context": "Kaveh, double count"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کاوه T41 ‖ روز ۰: P3 برای همان موضوع",
+  "expect": "Not two 1/3/7 cycles for one topic",
+  "context": "Kaveh, two cycles"
+ },
+ {
+  "rc": "LT5.one",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: ثبتِ پیش‌بینی در یک تور",
+  "expect": "Opening T24 from the owner's page does not show the tour's record",
+  "context": "owner, tour record"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: کاوه از مسئلهٔ «۲۰ پله» T21 «حدس: فیبوناچی» ‖ روز ۱: آزمونِ n=۴ (۵ راه) تأیید ‖ روز ۲: n=۵ (۸ راه) تأیید",
+  "expect": "The case shows in the problem's dossier (INF16) with its sessions; the problem's guess shows «تأیید در ۲ آزمون» with dates",
+  "context": "Kaveh, dossier"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: هدی حدس «جوابِ مسئلهٔ دایره π است» را با T21 آزمونی می‌کند ‖ روز ۲: رد شد",
+  "expect": "The case outcome updates the problem's guess to «حدس رد شد» (dated, linked to the case); the problem stays open",
+  "context": "Hoda, guess rejected"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: پویا T22 روی پروندهٔ معرفتی",
+  "expect": "The epistemic case page lists the practice case and its next due",
+  "context": "Pouya, epi link"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: مهسا از گرهٔ «عجله» T2 (تجزیه) را شروع می‌کند",
+  "expect": "Possible now (T2 was unreachable from a knot); the case links to the knot",
+  "context": "Mahsa, T2 from knot"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: بهرام از گرهٔ «تکرار مشکلات تحویل» T39 را شروع می‌کند",
+  "expect": "Possible now; the knot's «returned» status on a new recurrence suggests this T39 case",
+  "context": "Bahram, T39 from knot"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: نیما از گرهٔ «فراموشیِ فرمول‌ها» T42 کارت می‌سازد",
+  "expect": "Possible now; the card's case links to the knot",
+  "context": "Nima, T42 from knot"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سمیرا از گره T30 ‖ روز ۷: گشت‌وگذار",
+  "expect": "Linked; the knot shows the session",
+  "context": "Samira, T30 from knot"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لادن T16 را از گرهٔ «تصمیم‌های عجولانه» شروع می‌کند",
+  "expect": "Possible now; model uses link back to the knot",
+  "context": "Ladan, T16 from knot"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۱۰: پروندهٔ T22 پویا «رد شد»",
+  "expect": "The epistemic case's own state/revdate updates from the outcome (one place to see it)",
+  "context": "Pouya, outcome back"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: هدی حدسِ «π» را با T21 می‌آزماید ‖ روز ۲: رد شد ‖ روز ۳: Today",
+  "expect": "The problem is NOT marked solved or closed; on day 3 the problem still has its own open step line",
+  "context": "Hoda, overreach"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کاوه دو مسئلهٔ زنده دارد («۲۰ پله» و «دست‌دادن‌ها») و T21 را از «۲۰ پله» شروع می‌کند ‖ روز ۱: نتیجه",
+  "expect": "The case and its day-1 outcome never appear in «دست‌دادن‌ها»'s dossier",
+  "context": "Kaveh, wrong link"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: لیلا از گرهٔ «فراموشیِ قواعد لگاریتم» T41 را شروع می‌کند ‖ روز ۷: تثبیت شد و پرونده‌ی تمرین را می‌بندد",
+  "expect": "Closing the practice case does not close the knot (the knot follows its own criterion and 30/90-day holds)",
+  "context": "Leila, cascade"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: سمیرا T30 را با موضوعِ آزاد شروع می‌کند ‖ روز ۷: گشت‌وگذار",
+  "expect": "No fake link to any problem/knot; the case is labelled «آزاد»",
+  "context": "Samira, free subject"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: یک تور (اجراکنندهٔ آزمون) T21 را روی مسئلهٔ نمونه شروع می‌کند ‖ روز ۵: نتیجه",
+  "expect": "Nothing is linked into the owner's live-problem dossier",
+  "context": "tour record"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: کاوه حدسِ فیبوناچی ‖ روز ۲: یک آزمونِ تأییدکننده",
+  "expect": "The problem must not show «اثبات شد» — a confirming test is not a proof; the guess shows «تأیید در ۱ آزمون»",
+  "context": "Kaveh, confirmation ≠ proof"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: مهسا T21 را از گره شروع کرد ‖ روز ۵: گره را تغییرِ نام می‌دهد",
+  "expect": "The case keeps its link (by id) and shows the new name; never an orphan",
+  "context": "Mahsa, island"
+ },
+ {
+  "rc": "LT6.link",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: پویا T22 ‖ روز ۱۰: پیامد ثبت شد ‖ روز ۱۰: همان صفحه را دوباره ذخیره می‌کند",
+  "expect": "The outcome is not written twice into the epistemic case's history",
+  "context": "Pouya, duplicate history"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: بهرام در فهرستِ فرض‌ها (T15) «مشتری‌ها به قیمت حساس نیستند» را باربر علامت می‌زند ‖ روز ۱۲: رویدادِ مهم «رقیب قیمت را ۲۰٪ کم کرد» ‖ روز ۳۰",
+  "expect": "Assumptions register is a practice case of kind list; the day-12 major event triggers an immediate review line (10-29) for load-bearing assumptions; the monthly review is on day 30 (11-16) — T15 «هر ماه یا با هر رویداد مهم»",
+  "context": "Bahram, T15 assumptions register"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لادن مدلِ «هزینهٔ فرصت» را به قفسهٔ مدل‌ها (T16) می‌افزاید (کاربرد ۱) ‖ روز ۵: کاربرد ۲ ‖ روز ۷: مرورِ هفتگی ‖ روز ۱۲: کاربرد ۳",
+  "expect": "Shelf shows a use counter 1→2→3 with dates; weekly review on day 7 (10-24); the model moves from «نامزد» to «پذیرفته» on day 12",
+  "context": "Ladan, T16 shelf"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: رضا اشتباهِ فکریِ «تعمیم از یک نمونه» را در پوشهٔ «اشتباهاتِ فکری من» (T34) ثبت می‌کند ‖ روز ۴: راهبردِ T31 برای آن ‖ روز ۳۰: بازخوانیِ ماهانه",
+  "expect": "Mistakes folder (T31/T34 shared list) has the item with its strategy case linked; monthly reread on day 30 (11-16) — T34 «ماهانه»",
+  "context": "Reza, mistakes folder"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سمیرا ابهامِ «آیا تغییر رشته به آمار درست است؟» با احتمالِ ۵۰٪ در فهرستِ ابهام‌های باز (T35) ‖ روز ۷: مرورِ هفتگی ‖ روز ۹: دادهٔ تازه «پذیرش از دانشگاه ب» ← ۷۰٪ ‖ روز ۱۴: مرور",
+  "expect": "Weekly review lines on day 7 (10-24) and 14 (10-31); the day-9 data arrival logs a probability update 50→70 with date and reason (history kept, not overwritten)",
+  "context": "Samira, T35 open ambiguities, life decision"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: بهرام ردیاب پارتو (T3) «۳ مشتری = ۶۰٪ درآمد» ‖ روز ۳۰: دادهٔ واقعیِ ماه «۳ مشتری = ۴۵٪»",
+  "expect": "Monthly review on day 30 (11-16) records the new shares; a trend of driver shares (60→45) is shown",
+  "context": "Bahram, T3 vital-few tracker"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: علی در دفترِ سیگنال و نویز (T10) ادعای «فروشِ این هفته به‌خاطرِ تبلیغ بالا رفت» را با «دوباره بررسی: ۲۱ روز بعد» ثبت می‌کند ‖ روز ۲۱: دادهٔ خارج از نمونه",
+  "expect": "The recheck date the user wrote becomes a real due: Today line on day 21 (11-07 Sat); the out-of-sample result is stored and gives a verdict (signal/noise)",
+  "context": "Ali, T10 signal-vs-noise log"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: پویا باور «بدونِ ارشد پیشرفت نمی‌کنم» را در T34 ‖ روز ۷: باورِ هفتگی بعدی ‖ روز ۱۴: بازنگری؛ «تا حدی نادرست»",
+  "expect": "Belief revision history kept with dates; weekly cue on day 7 and 14; item linked to the mistakes folder if marked a thinking mistake",
+  "context": "Pouya, T34 belief"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: لادن در قفسهٔ مدل‌ها ‖ روز ۵: از صفحهٔ مسئلهٔ زنده «انتخابِ دوره» مدلِ «هزینهٔ فرصت» را به کار می‌برد",
+  "expect": "The use from the live problem increments the shelf counter (one list, many entry points) and links the use to the problem",
+  "context": "Ladan, use from another path"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "pos",
+  "role": "days",
+  "text": "روز ۰: سمیرا ابهام ‖ روز ۲۰: تصمیم گرفت و ابهام را «بسته» کرد",
+  "expect": "The item leaves the open list with its dated resolution; the list's weekly review continues for the remaining items",
+  "context": "Samira, closing an item"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: علی ادعای T10 را با تاریخ ۲۱ روز ‖ روز ۱۵: داده آمد و حکم داد ‖ روز ۲۱",
+  "expect": "No reminder on day 21 for a claim already decided",
+  "context": "Ali, decided claim"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰، ۱، ۲: لادن مدلِ تازه «اثرِ شبکه» را ۲ بار در موقعیتِ واقعی به کار برد",
+  "expect": "Not admitted — 2 < 3 real uses",
+  "context": "Ladan, T16 threshold"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۵: لادن دو بار در همان روز «هزینهٔ فرصت» را در یک تصمیم به کار برد",
+  "expect": "Counter +1 for that day/decision, not +2",
+  "context": "Ladan, same-day use"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: رضا اشتباه را از برگهٔ T31 و دوباره از T34 ثبت می‌کند",
+  "expect": "One item in the mistakes folder, not two",
+  "context": "Reza, duplicate list item"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: سمیرا فهرستِ ابهام‌ها ‖ روزهای ۱ تا ۶",
+  "expect": "No daily review lines — T35 review is weekly (first on day 7)",
+  "context": "Samira, cadence"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: بهرام فهرستِ فرض‌ها ‖ روز ۱، ۳، ۷",
+  "expect": "No 1/3/7 lines; only the monthly review or an event trigger",
+  "context": "Bahram, cadence"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۹: سمیرا احتمال را ۵۰ ← ۷۰ کرد",
+  "expect": "The 50% is not overwritten without trace (history kept)",
+  "context": "Samira, history"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: یک تور فهرستِ فرض‌ها با دو فرضِ آزمایشی می‌سازد",
+  "expect": "None of those items appear in the owner's register",
+  "context": "tour record"
+ },
+ {
+  "rc": "LT7.list",
+  "kind": "neg",
+  "role": "days",
+  "text": "روز ۰: علی ادعا را بدونِ تاریخ ثبت کرد",
+  "expect": "No invented generic due — the log asks him for the recheck date (T10's own question «چه زمانی دوباره بررسی‌اش می‌کنم؟»)",
+  "context": "Ali, no invented interval"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: تورگردان صفحه را با ?clock=2026-10-20 باز می‌کند",
+  "expect": "A.today() returns 2026-10-20; Today shows day-3 items (e.g. T41 day-3 line of a case started 10-17); a visible dev flag «ساعتِ آزمایشی» is shown",
+  "context": "tour runner, offset"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: پرونده‌ی T41 ‖ APP.clock.advance(7) ‖ reload",
+  "expect": "Day 7 (10-24) line and weekly blank page appear; S.put stamps created/updated with the offset date",
+  "context": "runner, advance"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: کارتِ T42 ‖ گریدِ روزِ ۱ با ساعتِ آزمایشی",
+  "expect": "The A.HOST.remind capture stub records {key: cards:review, due_date: 2026-10-24}; no real phone push",
+  "context": "runner, remind capture"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: تهران، ساعت ۰۰:۳۰ بامدادِ ۲۰۲۶-۱۰-۱۸ (۲۰۲۶-۱۰-۱۷T21:00Z)",
+  "expect": "A.today() = 2026-10-18 (local Tehran day), so a day-1 due shows",
+  "context": "Tehran midnight edge"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: مهسا در kpractice پاسخ ثبت می‌کند با ساعتِ آزمایشی",
+  "expect": "The log's d and at agree (both from A.now()), so the mind card and knot mastery read the same day",
+  "context": "consistent private clocks"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: کارتِ کهنه ‖ «بازنشسته کن»",
+  "expect": "The susp setter retires the card: it leaves the due queue and the cards:review reminder",
+  "context": "susp setter"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "سرور: deliver_due(now=2026-10-24T05:00) با یادآورِ ثبت‌شده برای ۲۰۲۶-۱۰-۲۴",
+  "expect": "The reminder is delivered by the injected senders; with now=10-23 it is not",
+  "context": "server reminder test"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "?clock=2026-11-01 ‖ setSystemTime به ۲۰۲۶-۱۰-۲۰ (عقب) ‖ reload",
+  "expect": "After reload, sweeps run again at the earlier date (throttles reset); Today shows 10-20 state",
+  "context": "backward jump with reload"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "pos",
+  "role": "clock",
+  "text": "روز ۰: پروندهٔ T21 سارا ‖ advance(6) ‖ advance(9)",
+  "expect": "Experiment sessions dated 10-23 and 11-01 by the offset clock; stability check counts the 15-day span",
+  "context": "runner, multi-jump"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: مالک بدونِ حالتِ توسعه نشانیِ ?clock=2027-01-01 را باز می‌کند ‖ کارتی ذخیره می‌کند",
+  "expect": "The offset is NOT applied in production without the dev flag; dates stay real",
+  "context": "owner, prod"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: تور با ?clock پرونده‌ی T24 می‌سازد ‖ روز ۳: داوری ‖ مالک صفحه را بدونِ ساعتِ آزمایشی باز می‌کند",
+  "expect": "Records made under the offset are tagged test and never enter the owner's mind card or Today",
+  "context": "test record in owner card"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰ → ۱۵ (setSystemTime) ‖ روز ۱۵ → ۳ (عقب) بدونِ reload ‖ Today",
+  "expect": "Must not report a stale sweep as a feature result (runner must reload; absence is not a pass)",
+  "context": "backward without reload"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: فقط APP.today به ۲۰۲۶-۱۰-۲۴ وصله می‌شود ‖ پرونده‌ی T41 ذخیره می‌شود",
+  "expect": "Not a valid simulation: created stays real-clock; results are rejected as mixed state",
+  "context": "partial patch"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: کارت با ساعتِ آزمایشی ‖ روز ۱: گرید",
+  "expect": "No real push to the owner's phone — captured by the stub only",
+  "context": "remind leak"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: نگار کارتِ «sin x» را بازنشسته می‌کند ‖ advance(30) ‖ reload",
+  "expect": "Not in the due queue and no reminder",
+  "context": "retired card"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: کارت با موعدِ روز ۱ ‖ تهران ۲۳:۵۰ همان روزِ ۲۰۲۶-۱۰-۱۷ (20:20Z)",
+  "expect": "Still 10-17: a day-1 due (10-18) does not show yet",
+  "context": "Tehran edge neg"
+ },
+ {
+  "rc": "LT8.clock",
+  "kind": "neg",
+  "role": "clock",
+  "text": "روز ۰: پرونده‌ی T41 ‖ advance(7) ‖ advance(7) ‖ reload",
+  "expect": "Each advance moves A.now by 7 days (total 14), never resets to the real day",
+  "context": "offset accumulation"
+ }
+]
