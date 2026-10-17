@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveClosure(\"pb_l_mvcbo78bb45\"))+\"\\n\"+FL(\"lpB\")+\"\\n\"+MT(\"۴) بازنگری\",3000)"}
+{"eval":"(()=>{const p=\"pb_l_mvcig4sq54u\";const pl=APP.livePlausible(p);C(\".lp-solved\");return JSON.stringify(pl)+\" SUB:\"+APP.state.sub})()"}

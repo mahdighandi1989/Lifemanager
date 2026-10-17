@@ -1,0 +1,1075 @@
+[
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: میشه آخرش یه خلاصه از همه‌ی روش‌ها بهم بدی؟ ‖ A: اول بگو مجهول دقیقاً چیست؟",
+  "expect": "CANDIDATE «میشه آخرش یه خلاصه از همه‌ی روش‌ها بهم بدی؟» (ask-only line; nothing stored)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بعداً توضیح بده چرا جذر گرفتیم ‖ A: داده‌ها را یک بار دیگر بشمار. ‖ U: [سامانه: فرمِ فهمِ مسئله ذخیره شد] ‖ A: ثبت شد.",
+  "expect": "CANDIDATE «بعداً توضیح بده چرا جذر گرفتیم» — paired with the FIRST A (its own reply), the system-turn reply is skipped",
+  "context": "first A omitted coach_state; the system-turn reply also has none"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: لطفاً یک مثال ساده‌تر هم بزنید. ‖ A: شرط مسئله را با کلمات خودتان بگویید.",
+  "expect": "CANDIDATE «لطفاً یک مثال ساده‌تر هم بزنید.»",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: قیمت نهایی شد ۳.۶۷ میلیون. می‌شه بگی این منطقیه؟ ‖ A: چه چیزهایی در این قیمت حساب شده؟",
+  "expect": "CANDIDATE exactly «می‌شه بگی این منطقیه؟»; the sentence is not split at «۳.۶۷»; «۶۷ میلیون» / «شد ۳.۶۷ میلیون» never a candidate",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: بگو ببینم شرط دوم اصلاً چرا لازمه ‖ A: اگر شرط دوم را برداری چه می‌شود؟",
+  "expect": "CANDIDATE «بگو ببینم شرط دوم اصلاً چرا لازمه» (the reply asked back, did not explain)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: یه سؤال، توضیح بدین قضیه‌ی فیثاغورس از کجا اومده؟ ‖ A: در این مسئله کدام ضلع را می‌خواهی؟",
+  "expect": "CANDIDATE «توضیح بدین قضیه‌ی فیثاغورس از کجا اومده؟»",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: x=۴ شد. حالا یادم بده چطوری چکش کنم ‖ A: آفرین. حالا مسئلهٔ بعدی را بخوان.",
+  "expect": "CANDIDATE «حالا یادم بده چطوری چکش کنم»; «x=۴ شد» is not a candidate",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: میشه بعدا نحوه ی رسم نمودارشم نشونم بدی؟ ‖ A: فعلاً جدول مقادیر را کامل کن.",
+  "expect": "CANDIDATE «میشه بعدا نحوه ی رسم نمودارشم نشونم بدی؟» (ZWNJ missing still recognised)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: سرعت ۲.۵ برابر میشه. بعداً بگو این چطور با زمان جور درمیاد ‖ A: فاصله چقدر است؟",
+  "expect": "CANDIDATE exactly «بعداً بگو این چطور با زمان جور درمیاد»; «سرعت ۲.۵ برابر میشه» (copula) is not",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: آخر جلسه یادم بنداز درباره‌ی مدیریت وقت سر امتحان حرف بزنیم ‖ A: باشد؛ اکنون داده‌ها چیست؟ ‖ U: [سامانه: گام «۱» ثبت شد] ‖ A: گام ثبت شد.",
+  "expect": "CANDIDATE «آخر جلسه یادم بنداز درباره‌ی مدیریت وقت سر امتحان حرف بزنیم» — never the claim «گزارشِ وضعِ آن نوبت نیامد» for the system-turn reply",
+  "context": "first A omitted coach_state (said «باشد» but did not record a promise)"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اگه سرعت نصف بشه، زمان دو برابر میشه. ‖ A: درست. حالا فاصله را بنویس.",
+  "expect": "NO candidate — «میشه» is the copula («becomes»), no request",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: باز ۴.۲۵ میشه. ‖ A: از کجا به ۴.۲۵ رسیدی؟",
+  "expect": "NO candidate; never the fragment «۲۵ میشه.» (no split at the decimal point)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جمعشون می‌شه ۱۲۰ تا ‖ A: چطور جمع زدی؟",
+  "expect": "NO candidate (copula with a number)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: خب پس به چند روش می‌شه از ۲۰ تا پله بالا رفت؟ ‖ A: اگر فقط ۳ پله بود چند راه داشتی؟",
+  "expect": "NO candidate — this is the live problem's own question (problem: «به چند طریق می‌توان از ۲۰ پله با گام‌های ۱ یا ۲ بالا رفت؟»)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: لطفاً جوابو نگو، فقط راهنمایی کن ‖ A: جواب را نمی‌گویم؛ فقط بپرس: اگر n=۱ باشد چه؟",
+  "expect": "NO candidate — the request was honoured by the reply",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: بیا این گام رو ثبت کنیم ‖ A: باشد. ‖ U: [سامانه: گام «پرسیدن از سرایدار» ثبت شد] ‖ A: ثبت شد.",
+  "expect": "NO candidate — honoured by the page action",
+  "context": "neither A carries coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: مرسی، خیلی خوب بود ‖ A: خوشحالم. وارسی کردی؟",
+  "expect": "NO candidate; the closed promise pr1 («بعداً یه مثال واقعی بزن», closed with promise_done two turns ago) is never offered again",
+  "context": "the reply to this message omitted coach_state; pr1 already closed"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: میشه بدون x هم حلش کرد؟ ‖ A: لازم نیست حتماً متغیر بگذاری؛ با یک شکل ساده هم می‌شود رسید.",
+  "expect": "NO candidate — the reply answered it in different words (no token-overlap test)",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: میشه یه راهنمایی کوچیک بدی؟ ‖ A: (راهنمایی داد) ‖ U: [سامانه: فرمِ طرح ذخیره شد] ‖ A: ذخیره شد.",
+  "expect": "NO candidate and no «گزارشِ وضعِ آن نوبت نیامد» — the reply to her message carried a valid coach_state; the system-turn reply is not her reply",
+  "context": "first A has coach_state; the system-turn reply has none"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: پس شاید تبلیغ فقط یه ذره فروشو بالا برده؟ ‖ A: چطور می‌شود این را آزمود؟",
+  "expect": "NO candidate — a guess about the problem, not a request addressed to the assistant",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN1.defer",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: رمهب‌ستان؟ ‖ A: حروف را بشمار.",
+  "expect": "NO candidate — her own trial word",
+  "context": "the reply to this message omitted coach_state"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step s1 «فردا با صاحبخونه حرف می‌زنم» ‖ U: دیروز باهاش صحبت کردم، قبول کرد ‖ A: coach_state.step={id:s1, done:yes, result:\"قبول کرد\"} (validated)",
+  "expect": "s1 applied AT ONCE: execution form shows done + «قبول کرد» prefilled, tagged «از گفت‌وگو»; prompt never says «نتیجه را خودش در صفحه ثبت می‌کند»; not asked again"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step «این هفته شام سبک» ‖ U: عروسی بود، نیم کیلو اضافه کردم ‖ A: step done:no, result:\"نیم کیلو اضافه\" (validated)",
+  "expect": "step shows not-done with «نیم کیلو اضافه» «از گفت‌وگو»; the form does NOT ask the same step with empty fields; mind card books ONE execution failure"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step «کیک را می‌پزم» ‖ U: دیروز کیک را پختم و خوب درآمد ‖ A: step done:yes (validated)",
+  "expect": "step done immediately (source chat); «✅ حل شد» dialog later does not list it"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step «فرم ثبت نام» ‖ U: فرم ثبت نام رو پر کردم و فرستادمش ‖ A: step done:yes",
+  "expect": "applied at once; prefilled «از گفت‌وگو» (ZWNJ-less text matched)"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step «تمرین‌های فصل ۳» ‖ U: نصفشو حل کردم، بقیه‌ش مونده ‖ A: step done:partial",
+  "expect": "step shows partial with her words prefilled «از گفت‌وگو»; still open for the rest, not asked as if unreported"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step «معادله‌ی دوم رو حل کن» ‖ U: حلش کردم، y=۳ درمیاد ‖ A: step done:yes, result:\"y=۳\"",
+  "expect": "step done; prefilled result renders «y=۳» as math; next coach line treats it as reported"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "after an applied chat report, she opens the execution form and edits the result",
+  "expect": "one record: her edit replaces the chat text (tag changes to her own entry); no second outcome row"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "open step s2 «به مامانم زنگ می‌زنم» ‖ U: به مادرم زنگ زدم، گفت آخر هفته میاد ‖ A: step done:yes (validated) ‖ next turn",
+  "expect": "next prompt lists s2 as reported/closed, not as «گامِ واقعیِ باز»"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "pos",
+  "role": "live",
+  "text": "two open steps s1 s2 ‖ U: دومی رو انجام دادم ‖ A: step={id:s2, done:yes}",
+  "expect": "only s2 applied; s1 untouched and still open"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "open step «با صاحبخونه حرف می‌زنم» ‖ U: فردا می‌خوام باهاش حرف بزنم",
+  "expect": "NOT applied — future intention; step stays open with empty form"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "open step «بانک» ‖ U: قراره شنبه برم بانک",
+  "expect": "NOT applied — plan for later"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "live problem «رژیم» with step «شام سبک» ‖ U: توی اون مسئله‌ی قبلی کیک رو پختم",
+  "expect": "NOT applied to the live problem's steps — report about another problem"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "open step ‖ U: اگه بپزمش احتمالاً خوب درمیاد",
+  "expect": "NOT applied — conditional"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "open step ‖ U: دارم انجامش میدم",
+  "expect": "NOT applied as done — in progress; no outcome recorded"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "open step ‖ U: انجام دادم ‖ A: (no coach_state)",
+  "expect": "NOT applied (no validated report; asymmetric) — the form stays as it was"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "A: coach_state.step result quotes «قبول کرد» but her message says «هنوز جواب نداده»",
+  "expect": "REJECTED — quote not in her message; form stays empty"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "step already closed earlier ‖ U: اون کارو کردم ‖ A: step={id:s1, done:yes}",
+  "expect": "refused («گام پیش‌تر بسته شده»); no duplicate outcome"
+ },
+ {
+  "rc": "RN2.step",
+  "kind": "neg",
+  "role": "live",
+  "text": "open step ‖ A: فرض کن انجامش داده‌ای؛ بعد چه؟ ‖ U: باشه",
+  "expect": "NOT applied — a hypothetical from the assistant"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "auxiliary problem solved, main problem open; she clicks «✅ حل شد» on the main problem",
+  "expect": "gate line names the aux problem and includes «مسئلهٔ کمکی حل شد ≠ مسئلهٔ اصلی حل شد»"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "proof problem with one step marked intuitive and unproved; she says «حل شد» in chat",
+  "expect": "line «گامِ شهودیِ ثابت‌نشدهٔ «…»» for that step; no aux caveat (no aux problem exists)"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "practical problem, open real step «فردا ساعت ۹ به اداره زنگ می‌زنم»; she clicks «✅ حل شد»",
+  "expect": "closing asks the outcome of that real step with real-step wording (e.g. «گامِ باز»); never «شهودی», never «مسئلهٔ کمکی»"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "open real step «پیاده‌روی عصرها»; she writes «امروز پیاده‌روی نرفتم» (report on it)",
+  "expect": "the step is mentioned in this turn as a real open step; no intuitive/aux wording"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "at closing: aux problem solved AND an intuitive unproved step",
+  "expect": "two items, each in its own wording; the aux caveat appears exactly once"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "aux problem added but not solved; she closes the main problem",
+  "expect": "item names the open aux problem; the «حل شد ≠» caveat is not used (aux not solved)"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "open intuitive step in a geometry proof; look-back phase, she says «فکر کنم تمومه»",
+  "expect": "the unproved intuitive step is named before closing"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "at closing: aux solved, real step already reported from chat (RN2a)",
+  "expect": "only the aux item appears; the reported step is not listed"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "practical problem, open real step «فردا ساعت ۱۰ با سرایدار صحبت می‌کنم»; ordinary turn, no report, no closing",
+  "expect": "NO gate line in this turn"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "diet problem, open real step; any turn",
+  "expect": "never «گامِ شهودیِ ثابت‌نشده» for a practical step"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "practical problem with no auxiliary problem; closing",
+  "expect": "never «مسئلهٔ کمکی حل شد ≠ مسئلهٔ اصلی حل شد»"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "all steps closed, no aux, no intuitive step; closing",
+  "expect": "NO gate line"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "open real step whose outcome was already applied from chat",
+  "expect": "never «نتیجه را خودش در صفحه ثبت می‌کند»"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "open real step «شام سبک»; she writes «امروز خیلی خسته‌م»",
+  "expect": "NO gate line (not a report on that step, not closing)"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "intuitive step later marked proved; closing",
+  "expect": "NO intuitive item"
+ },
+ {
+  "rc": "RN2.gate",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "aux solved, main still being worked mid-turn (no closing)",
+  "expect": "NO «حل شد ≠» line in the ordinary turn"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl2 «هر هفته یکی از غذاها رو عوض می‌کنیم» reported same as live step s3; s3 outcome recorded done; problem solved",
+  "expect": "pl2 state = done (shared); no «انجام شد؟» in the prompt; Today shows no «📌» line for it"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl1 «همین امروز باهاش روبه‌رو می‌شم» on_guess g1; g1 refuted (caretaker cleared)",
+  "expect": "pl1 closed for review; prompt never asks «انجام شد یا نه»; Today shows no «📌 … — انجام شد؟»"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl1 on_guess g1; g1 confirmed by her test",
+  "expect": "pl1 closed for review (not left open); no «انجام شد؟»"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl1 same as step s2; s2 outcome done:no from chat",
+  "expect": "pl1 shows not done — one state; no separate ask"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl1 due 2026-10-17; she taps «انجام دادم» on Today's «📌 برنامهٔ خودت» line",
+  "expect": "pl1 done (same state as chat plan_done); the next prompt has no ask; Today line gone"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl1 linked to step s1; validated plan_done:true in chat",
+  "expect": "s1 shows done too; neither asks again"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "model reports plan.same:\"pl1\" for a restated plan",
+  "expect": "one plan (pl1), not two; Today one line at most"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "pos",
+  "role": "events",
+  "text": "plan pl1 due today (۱۴۰۵/۰۷/۲۵); she taps «هنوز نه»",
+  "expect": "pl1 stays open, not duplicated; asked again at most once later"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan pl1 «ورزش صبح» open, unrelated live step «خرید» done",
+  "expect": "pl1 unchanged — still open, its own due ask stays"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan pl1 on_guess g1; g1 still untested",
+  "expect": "pl1 not closed; prompt carries «اول حدس را بیازما», not «انجام شد؟»"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan pl1 on_guess g2; a different guess g1 refuted",
+  "expect": "pl1 unaffected"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan pl1 with no linked step or guess, due date 2026-10-16 passed",
+  "expect": "«انجام شد؟» asked ONCE (legitimate); Today line present"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan «هر ماه یه بار» and step «هر هفته» with no plan.same report",
+  "expect": "not linked; two separate states"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan pl1 already done",
+  "expect": "never asked again in prompt or Today"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan pl1 expired",
+  "expect": "not asked; no Today line"
+ },
+ {
+  "rc": "RN2.link",
+  "kind": "neg",
+  "role": "events",
+  "text": "she taps «انجام ندادم» on Today",
+  "expect": "pl1 recorded not done; no further «انجام شد؟» about it"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "und 1/2, plan 2/2, exec 2/2, back 1/1",
+  "expect": "weakest «فهمِ مسئله» (only stage with a failure, strictly lowest)"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "und 3/3, plan 1/3, exec 2/2, back —",
+  "expect": "weakest «طرح‌ریزی»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "exec 1/2, und 1/1, plan 1/1, back 1/1",
+  "expect": "weakest «اجرای طرح»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "back 0/1, und 2/2, plan 2/2, exec 2/2",
+  "expect": "weakest «بازنگری»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "chat: U «یعنی دنبال کم‌ترین تعداد وزنه‌ایم» ‖ A said:[\"u\"] validated",
+  "expect": "understanding +1 success (her own restatement)"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "chat: U «پس شرطش اینه که هیچ دو تا کنار هم نباشن» ‖ A said:[\"c\"] validated",
+  "expect": "understanding +1 success"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "chat: validated plan_done:true (she did her small step)",
+  "expect": "execution +1 success"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "chat: U «اول جدول کشیدم، شد ۱۴ تا» ‖ A said:[\"plan\",\"result\"] validated",
+  "expect": "planning +1 AND execution +1 success"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "guess with confidence 85% refuted",
+  "expect": "black spot «بیش‌اطمینانی» shown, «۱ بار از ۱»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "pos",
+  "role": "events",
+  "text": "two guesses at 80% and 90%, both refuted",
+  "expect": "black spot «بیش‌اطمینانی», «۲ بار از ۲»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "und 3/3, plan 4/4, exec 4/4, back 2/2 (no failure anywhere)",
+  "expect": "NO weakest; «هنوز تمایزی دیده نشده» on the card AND in the coach line"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "und 2/2, plan 1/2, back 1/2, exec 1/1",
+  "expect": "NO weakest — tie between planning and look-back; «هنوز تمایزی دیده نشده»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "und 2/2, plan 1/1, exec 1/1, back 1/1",
+  "expect": "NO weakest (not decided by table order)"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "one guess at 80% confirmed",
+  "expect": "NO black spot (a correct prediction never produces «بیش‌اطمینانی»)"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "guess refuted in a turn without coach_state",
+  "expect": "not booked to any stage"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "one setback reported in chat (fail) AND the same step's outcome applied to the form",
+  "expect": "ONE execution failure, not two (same act id)"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "A: «پس مجهول همان کم‌ترین وزنه است» ‖ U: «آره»",
+  "expect": "NO understanding success (assistant's restatement)"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "plan 1/1 only (others no data)",
+  "expect": "no weakest named; empty stages «هنوز داده‌ای نیست»"
+ },
+ {
+  "rc": "RN3.label",
+  "kind": "neg",
+  "role": "events",
+  "text": "guess at 30% refuted",
+  "expect": "NO «بیش‌اطمینانی» black spot"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "عدد ۴۷y بر ۸ ⇒ y=۶",
+  "expect": "run contains «y=۶»; «۸» is NOT in any run; the bubble reads exactly as typed (RTL order intact)"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "مجموع ارقام بر ۳: x+۴+۱+۲ بر ۳ ⇒ x=۲، ۵ یا ۸",
+  "expect": "runs «x+۴+۱+۲» and «x=۲»; the «۳» after each «بر» stays in the sentence; never «بر ۲ = x ⇒ ۳»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "پس n≈3.7 درمیاد",
+  "expect": "run «n≈3.7»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "باید بیشینه‌ی n·ln(10/n) رو پیدا کنم",
+  "expect": "run «n·ln(10/n)»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "log(x)+log(y)=۲ پس xy=۱۰۰",
+  "expect": "runs «log(x)+log(y)=۲» and «xy=۱۰۰»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "می‌دونیم sin²x + cos²x = 1 همیشه برقراره",
+  "expect": "run «sin²x + cos²x = 1»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "خودم ساختمش: ۱/(1·2·3) + ۱/(2·3·4) + … و همینطور ادامه",
+  "expect": "run ends with «+ …» (ellipsis kept inside); no dangling «+»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "الگوی a₁ + a₂ + … را با هم بنویسیم",
+  "expect": "run «a₁ + a₂ + …»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "برای x کوچیک e^x ≈ 1 + x",
+  "expect": "run «e^x ≈ 1 + x»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "نمودار exp(-t/2) رو می‌خوام",
+  "expect": "run «exp(-t/2)»"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "وزن‌هام این هفته: ۸۰، ۷۹، ۷۸.۵، ۷۷",
+  "expect": "plot attached to THIS message; x and y tick labels in Persian digits (۱ ۲ ۳ ۴), none Latin"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "times: 5, 4, 3, 1",
+  "expect": "plot with Latin tick digits on both axes"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "pos",
+  "role": "user",
+  "text": "ساعت | ارتفاع\n۱ | ۲۰\n۲ | ۳۵\n۳ | ۴۵",
+  "expect": "plot axis names «ساعت» and «ارتفاع» (from her header); Persian ticks"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "کد رزرو من TR-2026/10 هست",
+  "expect": "NO run; never «TR − 2026/10» nor a fraction"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "شماره‌ی پرونده A-12 رو بفرستید",
+  "expect": "NO run"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "شرکت گواهی ISO-9001 داره",
+  "expect": "NO run"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "این عدد بر ۸ بخش‌پذیره",
+  "expect": "NO run (lone number after a Persian word, no relation)"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "قیمت ۱۲۰٬۰۰۰ تومن، ساعت ۱۴:۳۰",
+  "expect": "NO run"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "صبر کن… یه لحظه",
+  "expect": "NO run («…» with no operator)"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "تاریخ ۱۴۰۵/۰۷/۲۵ جلسه داریم",
+  "expect": "NO run"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "user",
+  "text": "فایل log رو چک کردم",
+  "expect": "NO run («log» without an argument)"
+ },
+ {
+  "rc": "RN4.run",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "(reply quoting her earlier series «۸۰، ۷۹، ۷۸.۵، ۷۷») روند نزولی است.",
+  "expect": "NO plot on this reply — the plot stays only under her message"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: چطور می‌آزمایی‌اش؟ کدام داده را هنوز به کار نبرده‌ای؟",
+  "expect": "options in order: [«چطور می‌آزمایی‌اش؟ (حدسِ تو: …)», «کدام داده را هنوز به کار نبرده‌ای؟»]",
+  "context": "q=«چطور می‌آزمایی‌اش؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: چطور امتحانش می‌کنی؟ با کدام حالتِ خاص؟",
+  "expect": "ONE option «چطور امتحانش می‌کنی؟ با کدام حالتِ خاص؟ (حدسِ تو: …)»; no orphan «با کدام حالتِ خاص؟»",
+  "context": "q=«چطور امتحانش می‌کنی؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: مجهول چیست؟ اگر n=۲ بگذاری چند می‌شود؟ شرط چه می‌گوید؟",
+  "expect": "options in order: [مجهول…, «اگر n=۲ بگذاری چند می‌شود؟ (حدسِ تو: …)», شرط…]",
+  "context": "q=«اگر n=۲ بگذاری چند می‌شود؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: داده‌ها کدام‌اند؟ حدست را با چه مثالی رد می‌کنی؟",
+  "expect": "order kept: [داده‌ها…, «حدست را با چه مثالی رد می‌کنی؟ (حدسِ تو: …)»]",
+  "context": "q=second"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: چگونه آن را می‌آزمایید؟ با کدام مثالِ نقض؟",
+  "expect": "ONE option «چگونه آن را می‌آزمایید؟ با کدام مثالِ نقض؟ (حدسِ شما: …)»",
+  "context": "q=«چگونه آن را می‌آزمایید؟»; register شما"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: کدام حالت ردش می‌کند؟ مثلاً با n=۱؟ و هدف دقیقاً چیست؟",
+  "expect": "[«کدام حالت ردش می‌کند؟ مثلاً با n=۱؟ (حدسِ تو: …)», «و هدف دقیقاً چیست؟»]",
+  "context": "q=«کدام حالت ردش می‌کند؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: اگه ۱۲ باشه، با ۳ پله چند راه داری؟ یعنی دقیقا چندتا؟",
+  "expect": "ONE option including «یعنی دقیقا چندتا؟» with the note",
+  "context": "q=«اگه ۱۲ باشه، با ۳ پله چند راه داری؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "A: شکل را کشیده‌ای؟ حدست را چطور وارسی می‌کنی؟ از کدام وارسی؟",
+  "expect": "[«شکل را کشیده‌ای؟», «حدست را چطور وارسی می‌کنی؟ از کدام وارسی؟ (حدسِ تو: …)»]",
+  "context": "q=«حدست را چطور وارسی می‌کنی؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: مجهول چیست؟ داده‌ها کدام‌اند؟",
+  "expect": "two options, no «حدسِ» note",
+  "context": "no q"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: حدست را چطور می‌آزمایی؟ داده‌ها چه هستند؟",
+  "expect": "two options (two complete questions are split), note only on the first; order kept",
+  "context": "q=first"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: مجهول چیست؟ چه می‌دانی؟",
+  "expect": "no note on any option",
+  "context": "q text not in the message"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: داده‌ها چیست؟ مثلاً طولِ ضلع؟ حدست را چطور می‌آزمایی؟",
+  "expect": "the fragment «مثلاً طولِ ضلع؟» stays with «داده‌ها چیست؟», NOT merged into q; order kept",
+  "context": "q=«حدست را چطور می‌آزمایی؟»"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: حدست را چطور می‌آزمایی؟",
+  "expect": "ONE option with the note (nothing to split)",
+  "context": "q=that question"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: چطور می‌آزمایی‌اش؟ کدام شرط را هنوز استفاده نکرده‌ای؟",
+  "expect": "«کدام شرط…» is a complete question → separate second option, not merged into q",
+  "context": "q=first"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: مجهول چیست؟ اگر n=۲ چه؟",
+  "expect": "no reorder; note on «مجهول چیست؟» only as given, «اگر n=۲ چه؟» kept second",
+  "context": "q=«مجهول چیست؟» (guess.q mis-set)"
+ },
+ {
+  "rc": "RN5.q",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "A: آیا این روش جواب می‌دهد؟ (بدون guess در coach_state)",
+  "expect": "one option, no note",
+  "context": "no q"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "chat",
+  "text": "chat_solved recorded ‖ U: بعدی؟",
+  "expect": "no new problem, no phase card, no «مجهول … چیست؟» suggestion"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "chat",
+  "text": "chat_solved ‖ U: خب؟",
+  "expect": "no new problem, no phase card"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "chat",
+  "text": "chat_solved ‖ U: ادامه؟",
+  "expect": "no new problem, no phase card"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "chat",
+  "text": "chat_solved ‖ U: هنوز نمی‌دونم کدومش بیشتر به دلم میشینه. بعدی؟",
+  "expect": "no new problem statement; session stays bound to the closed problem"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: پس حجم = ۲ × (…) = a²b/6 ‖ A: said:[\"result\"] validated (result text present in her message)",
+  "expect": "phase moves to look-back (next suggestion is a check, not «پیش‌تر همین را … دیده‌ای؟»)"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مساحت ۲۴ سانتی‌متر مربع شد ‖ A: said:[\"result\"] validated",
+  "expect": "phase moves past execution"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: نگو، فقط بپرس ‖ (model gave no register)",
+  "expect": "register fallback = تو"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: باورت میشه بالاخره حلش کردم؟ ‖ (no model register)",
+  "expect": "register = تو"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: صبر کن یه لحظه ‖ A: …می‌پرسید… ‖ (no model register)",
+  "expect": "register stays تو; the assistant's «می‌پرسید» never flips it"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "U: لطفاً بفرمایید از کجا شروع کنم ‖ (no model register)",
+  "expect": "register = شما"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "assistant",
+  "text": "conversation in شما; guess note on q option",
+  "expect": "note reads «(حدسِ شما: …)»"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "pos",
+  "role": "prompt",
+  "text": "two open plans",
+  "expect": "prompt shows «pl1: …» and «pl2: …» (ids visible) in the plan follow-up block"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "chat",
+  "text": "chat_solved ‖ U: بعدی: مثلثی با ضلع‌های ۳ و ۴ و ۵ داریم، مساحتش چنده؟",
+  "expect": "a NEW problem IS created (real statement)"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "chat",
+  "text": "mid-solve (not closed) ‖ U: خب؟",
+  "expect": "no new problem; stays in the current phase"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: فکر کنم تموم شد ‖ A: said:[\"result\"] with result «۲۴» not in her message",
+  "expect": "REJECTED — phase does not move"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جواب ۱۲ (no coach_state)",
+  "expect": "unvalidated pattern — phase does not move"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "A: …می‌پرسید… ; user wrote no register-bearing form; no model register",
+  "expect": "no flip from the assistant's form; default unchanged"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "assistant",
+  "text": "conversation in تو; guess note",
+  "expect": "«(حدسِ تو: …)», never «شما»"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "model register \"sh\" given; user once wrote «نگو»",
+  "expect": "model's register wins (شما)"
+ },
+ {
+  "rc": "RN6.edge",
+  "kind": "neg",
+  "role": "prompt",
+  "text": "plan block",
+  "expect": "never a plan line without its id"
+ }
+]

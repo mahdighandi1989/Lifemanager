@@ -1,1 +1,1 @@
-{"eval": "(()=>{const p=\"pb_l_mvcbo78bb45\";return JSON.stringify(APP.liveCoach(p)).slice(0,700)+\"\\nPH:\"+APP.livePhase(p)+\"\\n\"+MT(\"❔ پرسشِ همین لحظه\",500)+\"\\nBL:\"+BL()})()"}
+{"say":"ثبتش کردم. حالا چی؟"}

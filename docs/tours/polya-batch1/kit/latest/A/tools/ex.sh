@@ -1,5 +1,5 @@
 #!/bin/bash
 # ex.sh SID : graceful exit of my harness
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round18A
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19A
 timeout 60 python3 $R/tools/d.py $1 send "{\"exit\":true}" >/dev/null; sleep 3
-ps aux | grep "round18A/$1" | grep -v grep | wc -l
+ps aux | grep "round19A/$1" | grep -v grep | wc -l

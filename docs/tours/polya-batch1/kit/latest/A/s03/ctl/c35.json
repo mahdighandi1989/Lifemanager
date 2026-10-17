@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"eval":"(()=>{const r=S(\"lpBEquiv\",\"eq\");C(\".lp-lbsave\");return r+\" \"+TT()+\" CLOS:\"+JSON.stringify(APP.liveClosure(APP.state.arg))+\" KIDS:\"+JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title]))})()"}

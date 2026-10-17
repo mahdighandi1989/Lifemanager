@@ -1,0 +1,1 @@
+{"reply":"برهانت را خودت وارسی کن — هر گام را: روشن می‌بینی که این گام درست است؟","memory":"pb_l_mvb75p1r4z6: برهانِ سه‌گامی نوشته شد؛ پرسیدم هر گام را وارسی کند.","status":"related","next":false,"outside":"","know":[],"actions":[{"do":"coach_state","ph":"e","said":["plan"],"ans":[],"stuck":false,"fail":false,"role":"self","nat":"objective"}]}
