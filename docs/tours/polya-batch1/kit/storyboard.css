@@ -26,3 +26,6 @@ figure img { width:100%; border:1px solid var(--line); border-radius:6px; displa
 .act { margin:0 0 6px; color:var(--warn); font-size:.85rem; overflow-wrap:anywhere }
 @media (max-width:760px) { figure { grid-template-columns:minmax(0, 1fr) } }
 .shots { display:grid; gap:8px; min-width:0 }
+.sum { margin-top:10px } .sum ul { list-style:none; padding:0; margin:6px 0 0; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap:4px 14px } .sum a { color:var(--acc); font-weight:700; text-decoration:none }
+.grp { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px } .grp a, .grp b { padding:4px 12px; border:1px solid var(--line); border-radius:99px; font-size:.9rem } .grp a { color:var(--acc); text-decoration:none } .grp b { background:var(--u) }
+.effs { padding:4px 18px 18px; border-top:2px solid var(--line) } .et { font-size:1rem; margin:12px 0 } .eff h3 { font-size:.95rem; margin:10px 0 6px } .pp { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:10px } figure.v { display:block; border:0; padding:0 } figure.v figcaption { color:var(--mut); font-size:.85rem; margin-bottom:4px } figure.v img { max-height:900px; object-fit:cover; object-position:top }

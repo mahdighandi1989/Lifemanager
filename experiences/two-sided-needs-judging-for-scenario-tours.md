@@ -7,7 +7,7 @@ source:
   origin: "claude-code"
   imported_at: "2026-10-17T07:00:00Z"
 created_at: "2026-10-17T07:00:00Z"
-updated_at: "2026-10-17T07:00:00Z"
+updated_at: "2026-10-17T13:20:00Z"
 merged_from: []
 ---
 
@@ -48,3 +48,13 @@ verdict = PASS only if no defect AND all written criteria pass
 
 ## 🔗 References
 - مرتبط: paired-agent-live-campaign-for-an-in-page-ai، holistic-island-audit-with-adversarial-verification
+
+
+## Update 2026-10-17 — root causes and a variant bank, or the fixes breed new defects
+A round that fixed each need-map defect with a new keyword detector (plan / promise / taste / register) produced a fresh crop of
+look-alike defects the next round (a complaint read as a plan, «I don't know» stored as taste, one «شما» flipping the register). Two rules
+stop this: (1) trace every defect to the mechanism that made it and change the mechanism — semantic judgements go to the model, which
+reports them as structured state that the page validates, while patterns may only offer or ask, never store; (2) prove every fix against
+a variant bank written by an agent who never saw the code: positives AND confusable negatives in several registers. A fix that passes the
+scenario sentence but fails a paraphrase is not a fix. The same need maps also yield infrastructure work (e.g. formula display), which is
+built in the same round, not deferred.

@@ -4575,3 +4575,11 @@ absent, so the whole tree appeared "changed" and an urgent-routine commit (a508a
 `tests/test_supervisor_handoff_guard.py::test_real_history_since_the_baseline_is_clean` failed only in routine runs (full clones were
 green; earlier «origin/main rewritten» notices came from the same shallow artefact). CHANGE: boundary commits from `.git/shallow` are
 skipped (neither passed nor failed; `cmd_audit` says so). Red-first test with a real shallow clone. Hand-off h…f425 (area supervisor).
+
+### 2026-10-17 — DECISION: tours fix root mechanisms with a variant bank; need maps drive infrastructure; storyboards show the scenario's effect
+FINDING: round 17 showed the round-16 keyword detectors (plan, promise, taste, register) breeding new look-alike defects — symptom fixing.
+DECISION (roadmap §10): every defect is traced to its mechanism; semantic judgements are model-reported and page-validated; each fix must
+pass an independent variant bank (paraphrases + confusable negatives, written without seeing code). Need maps also produce infrastructure
+work done in the same round — first item: native MathML formula rendering in chat and field previews (INF1). Storyboards: harness5 waits
+for the page to settle before each shot (no half-rendered images) and captures before/after of the scenario user's mind report card,
+maps and «امروز». Storyboard badge bug (PASS «zero defects» shown as ⚠️) and partial image uploads fixed; every group page links the others.

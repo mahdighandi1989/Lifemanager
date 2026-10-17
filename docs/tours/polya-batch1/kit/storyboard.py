@@ -43,7 +43,10 @@ def scen(d):
         verdict = res.group(1) if res else ''
     else:
         verdict = ''
-    ok = 'PASS' in verdict and 'defect' not in verdict.lower() and 'S3' not in verdict
+    v = verdict
+    ok = bool(v) and 'PASS' in v and not re.search(r'FAIL|PARTIAL', v) and (
+        bool(re.search(r'zero defect|no defect|بی.?ایراد', v, re.I)) or not re.search(r'\bS[123]\b|defect|ایراد', v, re.I))
+    STAT.append((sid, meta.get('domain_fa', ''), ok, bool(v)))
     prev, seen, cards = [], set(), []
     for c in steps:
         st = {}
@@ -80,18 +83,38 @@ def scen(d):
             extra = '<img loading="lazy" src="img/%s" alt="گام %d — صفحه">' % (n2, c)
         cards.append('<figure id="%s-%d"><figcaption><span class="n">گام %d</span>%s</figcaption><div class="shots"><img loading="lazy" src="img/%s" alt="گام %d">%s</div></figure>'
                      % (sid, c, c, ''.join(lines), name, c, extra))
+    VN = {'mind': '🧠 کارنامهٔ ذهن (سنجشِ توانایی‌ها، روند، خطِ زمانی)', 'maps': '🗺 نقشه‌ها', 'today': 'امروز'}
+    eff = []
+    for v, lab in VN.items():
+        pair = []
+        for tag, tl in (('pre', 'پیش از سناریو'), ('post', 'پس از سناریو')):
+            f = os.path.join(outd, 'view_%s_%s.png' % (tag, v))
+            if os.path.exists(f):
+                n3 = '%s_view_%s_%s.jpg' % (sid, tag, v); im3 = Image.open(f).convert('RGB'); w3 = 760
+                im3.resize((w3, int(im3.height * w3 / im3.width))).save(os.path.join(out, 'img', n3), quality=55, optimize=True)
+                pair.append('<figure class="v"><figcaption>%s</figcaption><img loading="lazy" src="img/%s" alt="%s — %s"></figure>' % (tl, n3, lab, tl))
+        if pair:
+            eff.append('<div class="eff"><h3>%s</h3><div class="pp">%s</div></div>' % (lab, ''.join(pair)))
+    effh = ('<section class="effs"><h3 class="et">اثرِ این سناریو بر کارنامه، نقشه‌ها و «امروزِ» آدمِ سناریو (دادهٔ ساختگیِ آزمون، نه دادهٔ تو)</h3>%s</section>' % ''.join(eff)) if eff else ''
     head = '%s — %s' % (sid, meta.get('domain_fa', ''))
     who = meta.get('persona', '')
     badge = '<span class="b ok">بی‌ایراد</span>' if ok else ('<span class="b warn">ایراد دارد</span>' if verdict else '')
-    return ('<details class="sc" id="%s"><summary><h2>%s %s</h2><p class="who">%s</p></summary>%s<div class="steps">%s</div></details>'
-            % (sid, E(head), badge, E(who), ('<div class="plain">%s</div>' % E(plain).replace('\n', '<br>')) if plain else '', ''.join(cards)))
+    return ('<details class="sc" id="%s"><summary><h2>%s %s</h2><p class="who">%s</p></summary>%s<div class="steps">%s</div>%s</details>'
+            % (sid, E(head), badge, E(who), ('<div class="plain">%s</div>' % E(plain).replace('\n', '<br>')) if plain else '', ''.join(cards), effh))
 
 
+STAT = []
 secs = [scen(os.path.join(src, x)) for x in sorted(os.listdir(src)) if re.match(r's\d\d$', x) and os.path.isdir(os.path.join(src, x))]
+nok = sum(1 for x in STAT if x[2]); 
+GRP = (re.search(r'گروهِ ([ABCD])', title) or [None, ''])[1]
+NAVL = {'A': ('s01–s10', 'https://claude.ai/artifact/91WEMispzw9gyGiD4L1n4c'), 'B': ('s11–s20', 'https://claude.ai/artifact/5vnriuMia1ma8oLZMZfVja'), 'C': ('s21–s29', 'https://claude.ai/artifact/5YqS7HGgerCJwWmjomWJ4f'), 'D': ('s30–s38', 'https://claude.ai/artifact/89Rq3mP3Vs2CYfJqZPZ75L')}
+navh = ('<nav class="grp">' + ''.join(('<b>گروهِ %s (%s)</b>' % (g, r)) if g == GRP else ('<a href="%s" target="_blank" rel="noopener">گروهِ %s (%s) ↗</a>' % (u, g, r)) for g, (r, u) in NAVL.items()) + '</nav>')
+summary = navh + ('<div class="sum"><p><b>%d از %d سناریو بی‌ایراد</b> · بقیه ایراد دارند (جزئیات در هر سناریو).</p><ul>%s</ul></div>' % (nok, len(STAT),
+    ''.join('<li><a href="#%s">%s</a> %s <span class="b %s">%s</span></li>' % (sid, sid, E(dom), 'ok' if ok else 'warn', 'بی‌ایراد' if ok else ('ایراد دارد' if has else 'بی‌داوری')) for sid, dom, ok, has in STAT)))
 CSS = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'storyboard.css')).read()
 page = ('<title>%s</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap">\n<style>%s</style>\n'
         '<main dir="rtl"><header><h1>%s</h1><p>هر سناریو را باز کن: گام‌به‌گام همان صفحه‌ای را می‌بینی که آدمِ سناریو دید، با پیامی که نوشت و پاسخی که گرفت. '
-        'هر جا نکته‌ای داشتی، همین‌جا روی صفحه نظر بگذار یا در گفت‌وگو بگو — پیش از دورِ بعد اعمال می‌شود.</p></header>%s</main>') % (E(title), CSS, E(title), ''.join(secs))
+        'هر جا نکته‌ای داشتی، همین‌جا روی صفحه نظر بگذار یا در گفت‌وگو بگو — پیش از دورِ بعد اعمال می‌شود.</p>%s</header>%s</main>') % (E(title), CSS, E(title), summary, ''.join(secs))
 open(os.path.join(out, 'index.html'), 'w').write(page)
 print(out, len(os.listdir(os.path.join(out, 'img'))), 'images')
