@@ -4596,3 +4596,16 @@ Independent variant bank VARIANTS_R18 (239 entries): coach 124/124, live 63/64 (
 Quarantined (not deleted): closeOpenR17, guessForR17, guessQuote, semiSplit, transfInR17, planSeenR17, planR17, regSignsR17, guessMsgR17,
 chkWindowR17 (REMOVAL_CANDIDATES). Domain simulators the need maps asked for (probability tree, geometry canvas, isomorphism table,
 crossword grid, rehearsal space, units calculator, related-rates simulator) recorded for batch 2's simulator rule.
+
+## 2026-10-17 — Pólya tour batch 1, round 19 results and fixes; owner items for round 20
+FINDING: round 19 — 13/38 zero-defect (A 8/10, B 4/10, C 1/9, D 0/9), up from 6/38. Six root mechanisms (tour DECISIONS_R19): the
+deferred-request fallback deciding alone; one act in several unlinked records; mind-card labels without enough evidence; math run
+boundaries decided by single characters; question segmentation around q; phase/register/prompt edges.
+CHANGE: coach (a27/a29), live (a38), math (a39) fixes merged; full gate fail=0 (pytest 2077, 102 page tests, build, e2e); main = bf2574a5.
+Independent bank VARIANTS_R19 (148): coach 72/76 real (#16/#19 contradicted standing decisions, followed the decisions), live 52/52,
+math 22/22. Quarantined: deferCand/sentsOf/regIn/planDone/plansDue/weakPhase (R18), weakestR18, qSplitR18, gateLineR18.
+DECISION (owner): the bar only rises; model-tier tour from round 20 (roadmap §11); every part judged on five axes incl. necessity
+(§12); longitudinal techniques stay open until stable and tours advance a simulated clock (§13). FINDING: longitudinal audit — of 45
+library techniques 9 ready, 29 partial, 7 missing; of 16 week-scale ones only spaced repetition is ready (LONGITUDINAL_AUDIT.md);
+round 19b (correction of earlier messages, full-journey dossier, traceable mind card) and 19c (one scheduler, open practice cases,
+dated stability, mind-card feed) under way.
