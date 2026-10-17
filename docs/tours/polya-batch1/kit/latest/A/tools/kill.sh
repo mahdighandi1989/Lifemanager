@@ -1,5 +1,5 @@
 #!/bin/bash
 # kill.sh SID : stop my harness + its chromium for SID
-P="tour1_polya/round18A/$1"
+P="tour1_polya/round19A/$1"
 pkill -f "$P/profile"; pkill -f "harness5.js .*$P$"; sleep 3
 ps aux | grep "$P" | grep -v grep | cut -c1-150

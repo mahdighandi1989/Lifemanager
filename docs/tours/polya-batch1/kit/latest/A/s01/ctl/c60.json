@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify(APP.liveAll().map(r=>{const L=r.p.live||{};return {k:Object.keys(L),steps:(L.steps||[]).map(s=>({t:(s.text||s.t||'').slice(0,60),done:s.done,from:s.from,auto:s.auto,what:(s.what||s.out||'').slice(0,60),chat:s.chat}))}}))"}

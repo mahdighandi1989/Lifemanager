@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"JSON.stringify(APP.ASSIST.sessions().map(s=>({sr:(s.coach||{}).stepRep})))"}
