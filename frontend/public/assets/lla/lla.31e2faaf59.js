@@ -44032,12 +44032,12 @@ APP.goFromURL = function (q) {
   function actsHas(m, L) { return !!m && m.role === "ai" && (m.actions || []).some(function (x) { return L.indexOf(x) >= 0; }); }
   function talkM(m) { return !!m && (m.role === "user" || m.role === "ai"); }
   function startAt(MS, t, ai) {
-    var k = -1; for (var i = 0; i < MS.length; i++) if (talkM(MS[i]) && String(MS[i].at || "") <= t) k = i;
+    var k = -1; for (var i = 0; i < MS.length; i++) if (talkM(MS[i]) && MS[i].at && String(MS[i].at) <= t) k = i;   // پیامِ بی زمان (رکوردِ کهنه) با لحظه سنجیده نمی‌شود
     if (k >= 0 && MS[k].role === "ai" && (ai === true || (ai == null && actsHas(MS[k], OPEN_ACTS)))) return k;
     for (var j = k + 1; j < MS.length; j++) if (talkM(MS[j])) return j;
     return MS.length;
   }
-  function creatIdx(MS, t) { var c = -1; if (t) MS.forEach(function (m, i) { if (actsHas(m, CREATE_ACTS) && String(m.at || "") <= t) c = i; }); return c; }
+  function creatIdx(MS, t) { var c = -1; if (t) MS.forEach(function (m, i) { if (actsHas(m, CREATE_ACTS) && m.at && String(m.at) <= t) c = i; }); return c; }
   function msgWin(se, r) {
     var MS = se.msgs || [], pid = r.p.id, LG = se.lprobLog || [], t0 = bornAt(r), st = [], ev = [], only = {}, pt = toks([r.p.title, r.p.statement].join(" "));   // pt: نام بردنِ مسئله در پیامِ کاربر (chat_solved)
     var names = function (m) { return !!m && toks(m.text).filter(function (w) { return hit(w, pt); }).length >= 2; };
