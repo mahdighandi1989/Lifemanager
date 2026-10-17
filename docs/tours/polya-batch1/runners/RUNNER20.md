@@ -31,3 +31,14 @@ Everything else as RUNNER19: harness5, settle before shots, view_pre/post, ZERO-
 plausibility, strict prompt scan, coach_state omitted ≥1 turn, e-mails «🧭 پولیا · دورِ ۲۰ · …» with storyboard links, round20<X>/<sid>/,
 DONE, never pkill others, delete your profiles. Mark every record you seed as test data (sample/test flag) so it never enters an owner card.
 Final message: per scenario RESULT + defects (class, severity, repro, file:line) + «ارتقای لازم» + the correction-trial verdicts + PARTS.md summary.
+
+ADDENDUM — round 19c is ALSO in this build (main a94614ae; DECISIONS_R19c.md, handoff notes _pending_tour1_R19c_{sched,practice,mind}_*.md):
+one scheduler A.SCHED feeding Today and reminders; one clock A.now — in-page dev offset `?dev=1&clock=…` / `APP.clock.advance(days)` with a
+visible «⏱ ساعتِ آزمایشی» flag (records made under it are tagged simClock), or Playwright's page.clock; open practice cases per
+(technique × subject) in view `practice` and a «🧪 پرونده‌ها» tab on technique pages, with dated sessions, stability from the technique's
+own text, «تثبیت شد» + later check-in, running lists (assumptions, models shelf, mistakes folder, ambiguities, Pareto, signal/noise);
+the mind card «🏋 کارِ تکنیک‌ها» with «از کجا؟». Item 4 (TIME) therefore applies fully: where your scenario's person would use a
+technique over days (spaced retrieval of a proof idea, calibration of their guesses, look-back «use it elsewhere», a plan days later),
+start the practice case from the problem, move the clock (day 1, 3, 7, 21 …, with forgetting / lateness / a regression), and judge what
+the system brought back by itself, whether stability was declared on dated evidence, and the before/after mind card. Add these parts
+(scheduler/Today, practice case, running list) to PARTS.md.
