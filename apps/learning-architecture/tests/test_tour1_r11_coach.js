@@ -337,7 +337,10 @@ function strictScan(user) {
 
   // ================= struct — همهٔ پرامپت‌های فیکسچرهای دورهای ۷ تا ۱۱ =================
   await section('struct', async () => {
-    const S = info.struct = { own: 0, files: {}, bad: [] };
+    const S = info.struct = { own: 0, files: {}, bad: [], kids: {} };
+    /* DECISIONS_R15 O4: هر فرزند (فیکسچرِ زیرِ prompt_tap) کدِ خروج، سیگنال و ۶۰۰ نویسهٔ آخرِ stderr اش را نگه می‌دارد؛ در هر شکست همین‌ها در پیامِ خطاست —
+       تا دروازهٔ قرمز در محیطِ دیگر (روتین‌ها) خودش بگوید چرا. رفتار و بررسی‌ها همان است. */
+    const diag = (only) => { const o = {}; Object.keys(S.kids).forEach(f => { const k = S.kids[f]; if (!only || k.code !== 0 || k.signal || !S.files[f]) o[f] = k; }); return Object.keys(o).length ? ' — children: ' + JSON.stringify(o) : ''; };
     const own = await p.evaluate(() => window.__all.slice());
     S.own = own.length;
     own.forEach((u, i) => { if (!/# نوبتِ تازه/.test(u)) return; const bad = strictScan(u); if (bad.length) S.bad.push(['self#' + i, bad]); });
@@ -345,21 +348,24 @@ function strictScan(user) {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'lla-tap-'));
       const files = fs.readdirSync(__dirname).filter(f => /^test_tour1_r(?:7|8|9|10|11)(?:_[a-z0-9]+)?\.js$/.test(f) && f !== path.basename(__filename)).sort();
       const run = (f) => new Promise((res) => {
-        const out = path.join(dir, f + '.jsonl'), ch = spawn(process.execPath, ['-r', path.join(__dirname, 'prompt_tap.js'), path.join(__dirname, f)], { cwd: path.join(__dirname, '..'), env: Object.assign({}, process.env, { LLA_PROMPT_TAP: out }), stdio: 'ignore' });
+        const out = path.join(dir, f + '.jsonl'), ch = spawn(process.execPath, ['-r', path.join(__dirname, 'prompt_tap.js'), path.join(__dirname, f)], { cwd: path.join(__dirname, '..'), env: Object.assign({}, process.env, { LLA_PROMPT_TAP: out }), stdio: ['ignore', 'ignore', 'pipe'] });
+        let err = '', done = false; const fin = (code, signal, extra) => { if (done) return; done = true; clearTimeout(to); S.kids[f] = { code: code == null ? null : code, signal: signal || null, stderr: (err + (extra || '')).slice(-600) }; res(out); };
+        if (ch.stderr) ch.stderr.on('data', d => { err = (err + String(d)).slice(-600); });
         const to = setTimeout(() => { try { ch.kill('SIGKILL'); } catch (e) { } }, 600000);
-        ch.on('exit', () => { clearTimeout(to); res(out); });
+        ch.on('error', e => fin(null, null, ' [spawn error: ' + String(e && e.message || e) + ']'));
+        ch.on('close', (code, signal) => fin(code, signal));
       });
       const queue = files.slice(), JOBS = Math.max(1, +(process.env.LLA_TAP_JOBS || 2));
       await Promise.all(Array.from({ length: JOBS }, async () => { while (queue.length) { const f = queue.shift(); const out = await run(f); let n = 0;
         try { for (const row of fs.readFileSync(out, 'utf8').split('\n').filter(Boolean)) { const { user } = JSON.parse(row); if (!/# نوبتِ تازه/.test(user)) continue; n++; const bad = strictScan(user); if (bad.length) S.bad.push([f + '#' + n, bad]); } } catch (e) { }
         S.files[f] = n; } }));
       try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { }
-      chk(Object.keys(S.files).length >= 7 && Object.values(S.files).filter(n => n > 0).length >= 6, 'struct: the r7–r11 fixtures were replayed through the prompt tap and produced prompts ' + JSON.stringify(S.files));
+      chk(Object.keys(S.files).length >= 7 && Object.values(S.files).filter(n => n > 0).length >= 6, 'struct: the r7–r11 fixtures were replayed through the prompt tap and produced prompts ' + JSON.stringify(S.files) + diag(false));
     }
     if (process.env.DUMP) S.bad.forEach(x => console.log('## ' + x[0] + '\n  ' + x[1].join('\n  ')));
     const sig = {}; S.bad.forEach(x => x[1].forEach(l => { const k = l.slice(0, 70); sig[k] = (sig[k] || 0) + 1; }));
     S.badN = S.bad.length; S.sig = sig;
-    chk(!S.bad.length, 'struct (K1, strengthened): in ' + (S.own + Object.values(S.files).reduce((a, n) => a + n, 0)) + ' prompts of the r7–r11 fixtures, no line outside the turn line may contain «بپرس» or end with an unmarked «؟» — ' + S.bad.length + ' prompt(s) fail: ' + JSON.stringify(sig).slice(0, 3000));
+    chk(!S.bad.length, 'struct (K1, strengthened): in ' + (S.own + Object.values(S.files).reduce((a, n) => a + n, 0)) + ' prompts of the r7–r11 fixtures, no line outside the turn line may contain «بپرس» or end with an unmarked «؟» — ' + S.bad.length + ' prompt(s) fail: ' + JSON.stringify(sig).slice(0, 3000) + diag(true));
   });
 
   info.sys2 = await p.evaluate(() => APP.ASSIST.SYS.length);

@@ -136,8 +136,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     // DECISIONS_R14 N2: نگاشت به u5 فقط کلید است (یکی کردن، شناسه)؛ گزینه همان پرسشی است که دستیار پرسید
     const OWN5 = 'کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟';
     const items = await p.evaluate(pid => APP.liveChatQItems(pid), P);
-    chk(r.chatQs.includes(OWN5) && !r.chatQs.some(t => /مسئله را به زبانِ خودت دوباره بگو/.test(t)) && items.some(e => e.t === OWN5 && /مسئله را به زبانِ خودت دوباره بگو/.test(e.k)), 'qword: the coach\'s A191 «کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟» is a chat question (2nd-person «می‌گویی») and maps to the page\'s u5 (K4) — shown in its own words, u5 only as its key (R14 N2) ' + JSON.stringify({ q: r.chatQs, items }));
-    chk(o.filter(t => /به زبانِ خودت/.test(t)).length === 1 && o.includes('💬 ' + OWN5), 'qword: «کدام پرسش کمک کرد؟» offers that question once, in the assistant\'s words (s21 c18, s23 c13, s24 c11, s28 c11; R14 N2) ' + JSON.stringify(r.opts));
+    chk(r.chatQs.includes(OWN5) && !r.chatQs.some(t => /مسئله را به زبانِ خودت دوباره بگو/.test(t)) && items.some(e => e.t === OWN5 && /^اول کل، بعد جزءها: کلِ مسئله/.test(e.k)), 'qword: the coach\'s A191 «کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟» is a chat question (2nd-person «می‌گویی») — shown in its own words; its key is now the best match «اول کل، بعد جزءها: …» (Q_WHOLE), not the first list question sharing «به زبانِ خودت» (u5) (R14 N2 → R15 O2: best match wins, s35/s37) ' + JSON.stringify({ q: r.chatQs, items }));
+    // DECISIONS_R15 O2 (C·T1): lpOne همان پرسشِ «اول کل» را در صفحه پاسخ داد ⇒ یک گزینه، گزینهٔ صفحه (پیش‌تر 💬 با واژه‌های دستیار می‌ماند)
+    chk(o.filter(t => /به زبانِ خودت/.test(t)).length === 1 && o.some(t => /^اول کل، بعد جزءها: کلِ مسئله/.test(t)) && !o.includes('💬 ' + OWN5), 'qword→R15 O2: «کدام پرسش کمک کرد؟» offers that question once — answered on the page by its own field (lpOne), so the page option (s21 c18, s23 c13, s24 c11, s28 c11; C·T1) ' + JSON.stringify(r.opts));
     chk(o.some(t => /^💬 خوب\. هر ضلع را برحسبِ b می‌نویسی؟$|^💬 هر ضلع را برحسبِ b می‌نویسی؟$/.test(t)), 'qword: another 2nd-person yes/no question («… می‌نویسی؟») is offered as itself ' + JSON.stringify(r.opts));
   });
 
@@ -154,7 +155,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     r.qs = await p.evaluate(pid => APP.liveChatQs(pid), P); delete r.stage;
     chk(r.qs.some(t => /^حالا که حدسِ خرید رد شد، قیمتِ متریِ محله‌های نزدیک مهدکودک — که با دلیل کنار گذاشته بودی — هنوز بی‌ربط است؟$/.test(t)) && !r.qs.some(t => /^هنوز بی‌ربط است؟$/.test(t)),
       'paren: a head with an inner parenthetical «— … —» keeps its referent — the whole question, never the bare «هنوز بی‌ربط است؟» (K4, s01) ' + JSON.stringify(r.qs));
-    chk(r.qs.some(t => /^حالا مجهول دقیقاً چیست؟$/.test(t)), 'paren: control — praise preambles («آفرین — خوب پیش رفتی —») are cut, the question «حالا مجهول دقیقاً چیست؟» stays ' + JSON.stringify(r.qs));
+    // DECISIONS_R15 O1: فقط بندِ ستایشیِ آغاز («آفرین —») بریده می‌شود؛ سرِ پیش از «—» («خوب پیش رفتی —») هرگز
+    chk(r.qs.some(t => /^خوب پیش رفتی — حالا مجهول دقیقاً چیست؟$/.test(t)), 'paren→R15 O1: control — the leading praise «آفرین —» is cut, the rest of the sentence with «حالا مجهول دقیقاً چیست؟» stays ' + JSON.stringify(r.qs));
     chk(!r.qs.some(t => /^آفرین/.test(t)), 'paren: the praise word itself is cut ' + JSON.stringify(r.qs));
   });
 

@@ -305,8 +305,9 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
       await p.evaluate(pid => { APP.S.put({ id: 'ach_g5bb', type: 'achat', lprob: pid, msgs: [{ role: 'ai', text: 'ثابتش می‌کنی یا با یک مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟' }, { role: 'ai', text: 'ولی محیط فقط یک عدد نیست — از همهٔ داده‌ها استفاده کردی؟' }] }); }, PD);
       await click('main .lp-solved');
       info.g5bb = await p.evaluate(() => [...document.querySelectorAll('#lpBBest option')].map(o => o.textContent));
-      chk(info.g5bb.some(t => /ثابتش می‌کنی یا با یک مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟/.test(t)) && !info.g5bb.some(t => /^💬 کدام را اول امتحان می‌کنی؟/.test(t)) && info.g5bb.some(t => /^💬 از همهٔ داده‌ها استفاده کردی؟/.test(t)),
-        'G5: lpBBest keeps a question whose part before «—» carries its object; a declarative preamble is still stripped (s23/s29) ' + JSON.stringify(info.g5bb.filter(t => /💬/.test(t))));
+      chk(info.g5bb.some(t => /ثابتش می‌کنی یا با یک مثالِ نقض ردش می‌کنی — کدام را اول امتحان می‌کنی؟/.test(t)) && !info.g5bb.some(t => /^💬 کدام را اول امتحان می‌کنی؟/.test(t)) && info.g5bb.some(t => /^💬 محیط فقط یک عدد نیست — از همهٔ داده‌ها استفاده کردی؟/.test(t)),
+        // DECISIONS_R15 O1: سرِ خبریِ پیش از «—» دیگر بریده نمی‌شود (پیش‌تر G5 آن را می‌برید) — فقط «ولی» ِ آغاز
+        'G5→R15 O1: lpBBest keeps a question whose part before «—» carries its object, and keeps a declarative head too (only the leading «ولی» goes) (s23/s29) ' + JSON.stringify(info.g5bb.filter(t => /💬/.test(t))));
       await fillBack({ chk: 'ضلع‌ها ۷ و ۱۴ و ۹ شد و جمعشان ۳۰ است' }); await setParts('yes');
       await click('main .lp-lbsave');
       info.g5find = await p.evaluate(pid => APP.liveClosure(pid), PD);

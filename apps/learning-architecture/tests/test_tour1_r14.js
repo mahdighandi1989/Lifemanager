@@ -251,7 +251,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     r.stage = 'back'; await click('main .lp-solved');
     const o = await p.evaluate(() => [...document.querySelectorAll('#lpBBest option')].map(o => o.textContent));
     r.opts = o.map(t => t.slice(0, 90)); delete r.stage;
-    chk(o.includes('💬 کلِ مسئله را در یک جمله و به زبانِ خودت می‌گویی؟') && !o.some(t => /^💬 شکلی بکش/.test(t)), '#lpBBest: the chat option shows the question the assistant actually asked, not the list\'s u5 wording (N2, s11 r1 / R14B) ' + JSON.stringify(r.opts));
+    // DECISIONS_R15 O2 (C·T1): lpOne در همین بخش پر شد ⇒ پرسشِ «اول کل» در صفحه پاسخ گرفت ⇒ یک گزینه، گزینهٔ صفحه — نه 💬 (پیش‌تر 💬 می‌ماند)؛ هرگز متنِ u5
+    chk(o.filter(t => /کلِ مسئله/.test(t)).length === 1 && o.some(t => /^اول کل، بعد جزءها: کلِ مسئله/.test(t)) && !o.some(t => /^💬 شکلی بکش/.test(t)), '#lpBBest→R15 O2: the whole-first question answered on the page by lpOne is ONE option, the page one, never the list\'s u5 wording (N2, s11 r1 / R14B; C·T1) ' + JSON.stringify(r.opts));
     chk(o.filter(t => /مجهول \(یا حکمی که باید ثابت شود\) چیست؟/.test(t)).length === 1, '#lpBBest: a page question she answered on the page and the assistant also asked verbatim is ONE option (mapping used to dedupe) ' + JSON.stringify(r.opts));
   });
 

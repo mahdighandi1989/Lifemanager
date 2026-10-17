@@ -108,7 +108,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const o = (await bestOpts()).filter(t => /💬/.test(t)); r.chat = o; delete r.stage;
     chk(o.some(t => /^💬 برای استقرا، حالتِ پایه \(کوچک‌ترین n\) را جدا وارسی کرده‌ای — و در گامِ استقرا دقیقاً کجا می‌خواهی از فرضِ استقرا \(درستیِ حکم برای n\) استفاده کنی؟$/.test(t)) && !o.some(t => /^💬 و در/.test(t)),
       'head: lpBBest shows the whole question «… وارسی کرده‌ای — و در گامِ استقرا دقیقاً کجا …؟» — a 2nd-person perfect head and a tail starting «و در» stay one question (s25 c16) ' + JSON.stringify(o));
-    chk(o.some(t => /^💬 بخشِ دومِ شرط را کجا به کار بردی؟$/.test(t)), 'head: control — a praise preamble («آفرین، تا این‌جا خوب پیش رفته‌ای —») is still cut off the question ' + JSON.stringify(o));
+    // DECISIONS_R15 O1: فقط بندِ ستایشیِ آغاز («آفرین،») بریده می‌شود؛ سرِ پیش از «—» هرگز (پیش‌تر کلِ «آفرین، تا این‌جا خوب پیش رفته‌ای —» می‌افتاد)
+    chk(o.some(t => /^💬 تا این‌جا خوب پیش رفته‌ای — بخشِ دومِ شرط را کجا به کار بردی؟$/.test(t)) && !o.some(t => /آفرین/.test(t)), 'head→R15 O1: control — the leading praise «آفرین،» is cut, the head before «—» stays ' + JSON.stringify(o));
   });
 
   // ================= dedupe — پرسشِ صفحه و بازگفتنش در گفت‌وگو یک گزینه =================
@@ -131,7 +132,8 @@ const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'di
     const o = await bestOpts(); r.opts = o.map(t => t.slice(0, 90)); delete r.stage;
     chk(o.some(t => /^به مجهول نگاه کن: دقیقاً چه می‌خواهی/.test(t)), 'dedupe setup: the page\'s unknown question is an option ' + JSON.stringify(r.opts));
     chk(!o.some(t => /^💬 .*از کجا می‌فهمیدی؟/.test(t)), 'dedupe: the chat paraphrase «دقیقاً چه می‌خواهی — … از کجا می‌فهمیدی؟» of the page question is not a second option (s05) ' + JSON.stringify(r.opts));
-    chk(o.some(t => /^💬 اگر این ماجرا «حل» شده بود، چه داشتی/.test(t)), 'dedupe: control — a different chat question («… چه داشتی — ترفیع، احترام…؟») keeps its own option ' + JSON.stringify(r.opts));
+    // DECISIONS_R15 O1: پرسشی که با «اگر» آغاز می‌شود جملهٔ خبریِ پیش از خودش را هم می‌آورد (جای مرجع) — پس گزینه با «پیش از وسیله، خودِ هدف — کوتاه‌تر:» آغاز می‌شود
+    chk(o.some(t => /^💬 پیش از وسیله، خودِ هدف — کوتاه‌تر: اگر این ماجرا «حل» شده بود، چه داشتی/.test(t)), 'dedupe: control — a different chat question («… چه داشتی — ترفیع، احترام…؟») keeps its own option ' + JSON.stringify(r.opts));
   });
 
   // ================= d5 — «دو بچه» ⇄ «دوفرزندی» و دروازهٔ نرمِ «به‌کارنرفته» =================
