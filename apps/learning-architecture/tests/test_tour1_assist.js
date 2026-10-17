@@ -437,7 +437,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   await say('dV/dt = (πy²/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = …');
   info.bidi = await p.evaluate(() => {
     const msgs = Array.from(document.querySelectorAll('.as-panel .as-msg .as-tx'));
-    const u = msgs.find(x => /πy²/.test(x.textContent)), a = msgs.find(x => /dy\/dt = −5\/\(16π\)/.test(x.textContent));
+    const u = msgs.find(x => /πy²/.test(x.textContent)), a = msgs.find(x => /dy\/dt = −5\/\(16π\)/.test(x.textContent) || x.querySelector('bdi.mx[data-src="dy/dt = −5/(16π)"]'));   // دورِ ۱۷ INF1: «−5/(16π)» حالا کسرِ MathML است (a39) — باز درونِ <bdi dir="ltr">
     const bd = u ? Array.from(u.querySelectorAll('bdi[dir="ltr"]')).map(x => x.textContent) : [];
     const plain = Array.from(document.querySelectorAll('.as-panel .as-msg .as-tx')).filter(x => !/[A-Za-z0-9]/.test(x.textContent)).every(x => !x.querySelector('bdi'));
     return { bd, rtl: u && u.getAttribute('dir') === 'rtl', ai: a ? a.querySelectorAll('bdi').length : 0, plain, same: u && u.textContent === 'dV/dt = (πy²/9)·dy/dt. با dV/dt = −5 و y = 12: dy/dt = …' };
