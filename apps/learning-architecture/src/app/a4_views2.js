@@ -176,7 +176,7 @@
     return root;
   };
   A.start137 = function (topicId, title) {
-    [[1, "روز ۱"], [3, "روز ۳"], [7, "روز ۷"]].forEach(function (x) { S.put({ id: A.uid("sc"), type: "sched", proto: "P3", topic: topicId || "", title: title || "", due: A.addDays(A.today(), x[0]), label: x[1], done: false }); });
+    A.SCHED.POLICY.T41.tracks[0].steps.map(function (d) { return [d, "روز " + A.fa(d)]; }).forEach(function (x) { S.put({ id: A.uid("sc"), type: "sched", proto: "P3", topic: topicId || "", title: title || "", due: A.addDays(A.today(), x[0]), label: x[1], done: false }); });
     A.toast("چرخه ۱-۳-۷ زمان‌بندی شد.");
   };
 
@@ -190,7 +190,7 @@
     o = o || {};
     var same = S.all("pr", function (x) { return x.pid === pid && x.status !== "done" && !x.sample && (x.topic || "") === (o.topic || "") && (x.sched || "") === (o.sched || "") && (x.node || "") === (o.node || ""); })[0];
     if (same) { A.go("proto", pid, same.id); return same; }
-    var r = { id: A.uid("pr"), type: "pr", pid: pid, topic: o.topic || "", sched: o.sched || "", node: o.node || "", status: "draft", data: o.preset || {}, created: new Date().toISOString() };
+    var r = { id: A.uid("pr"), type: "pr", pid: pid, topic: o.topic || "", sched: o.sched || "", node: o.node || "", status: "draft", data: o.preset || {}, created: A.nowISO() };
     DRAFTS[r.id] = r;
     A.go("proto", pid, r.id);
     return r;
@@ -368,7 +368,10 @@
       h("tbody", {}, cards.map(function (c) {
         var q = h("textarea", { rows: 2, "aria-label": "پرسش", onchange: function (e) { c.q = e.target.value; S.put(c); } }); q.value = c.q;
         var a = h("textarea", { rows: 2, "aria-label": "پاسخ", onchange: function (e) { c.a = e.target.value; S.put(c); } }); a.value = c.a;
-        return h("tr", {}, h("td", {}, q), h("td", {}, a), h("td", {}, A.fdate(c.due)), h("td", {}, fa(c.iv || 0) + " روز"), h("td", {}, A.confirmBtn("حذف", function () { S.del(c.id); A.render(); })));
+        /* بازنشسته/بازگرداندن (دورِ ۱۹c): کارتِ کهنه از صف و یادآور بیرون می‌رود، بی حذف */
+        var sp = h("button", { class: "btn ghost sm card-susp", type: "button", "data-own": "1", "aria-label": (c.susp ? "بازگرداندنِ کارت: " : "بازنشسته‌کردنِ کارت: ") + String(c.q || "").slice(0, 40),
+          onclick: function () { A.cardSuspend(c, !c.susp); A.toast(c.susp ? "کارت بازنشسته شد؛ از صفِ مرور و یادآور بیرون رفت." : "کارت به صفِ مرور برگشت."); A.render(); } }, c.susp ? "بازگرداندن" : "بازنشسته کن");
+        return h("tr", { class: c.susp ? "card-retired" : null }, h("td", {}, q), h("td", {}, a), h("td", {}, c.susp ? h("span", { class: "chip" }, "بازنشسته") : A.fdate(c.due)), h("td", {}, fa(c.iv || 0) + " روز"), h("td", {}, sp, " ", A.confirmBtn("حذف", function () { S.del(c.id); A.render(); })));
       })))));
     return wrap;
   }

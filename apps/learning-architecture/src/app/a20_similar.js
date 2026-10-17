@@ -15,7 +15,7 @@
   if (!A.S || !A.V) return;
   var h = A.h, fa = A.fa, S = A.S;
   var FORMS = { numeric: "عددی", visual: "تصویری/فضایی", verbal: "کلامی", real: "موقعیتِ واقعیِ زندگی/کار", abstract: "انتزاعی/نمادین" };
-  function nowISO() { return new Date().toISOString(); }
+  function nowISO() { return A.nowISO(); }
   function lat(s) { return String(s == null ? "" : s).replace(/[۰-۹]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); }).replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 0x660); }); }
   function intOf(v) { var s = lat(v).replace(/[\s,٬]/g, "").replace(/[−–]/g, "-"); return /^-?\d+$/.test(s) ? parseInt(s, 10) : null; }
 

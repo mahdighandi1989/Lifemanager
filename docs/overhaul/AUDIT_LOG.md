@@ -4609,3 +4609,14 @@ DECISION (owner): the bar only rises; model-tier tour from round 20 (roadmap §1
 library techniques 9 ready, 29 partial, 7 missing; of 16 week-scale ones only spaced repetition is ready (LONGITUDINAL_AUDIT.md);
 round 19b (correction of earlier messages, full-journey dossier, traceable mind card) and 19c (one scheduler, open practice cases,
 dated stability, mind-card feed) under way.
+
+## 2026-10-17 — CHANGE: round 19c «sched» — one scheduler (A.SCHED) and one clock (A.now) in /apps/learning-architecture
+- New `src/app/a42_sched.js` (loaded right after `a1_base`): one registry for every dated thing, interval policies quoted from each
+  technique's own text (T42 «۱ روز، ۶ روز» — the code's 3-day second interval fixed), the ~12 existing schedulers wrapped as registered
+  sources (their Today lines unchanged), the five copies of [1,3,7,21,60] routed through `A.SCHED.ladder()` and quarantined
+  (`APP.SCHED_QUARANTINE`, REMOVAL_CANDIDATES). Card reminder re-synced after grading; cards can be retired (`A.cardSuspend`).
+- `A.now()` in `a1_base`; every module's private now/throttle goes through it (a29 left to the mind builder). Dev-only day offset
+  (`?dev=1&clock=…`, `APP.clock.advance`), `simClock` tagging, and an `A.HOST.remind` capture stub for multi-day tests.
+- Finding: the longitudinal audit's «standalone forecasts/worry chains never reach Today» was wrong (a31 showed them since 2026-10-14);
+  what was missing (overdue date, reminder, cancel on outcome) is now built. Test: `tests/test_tour1_r19c_sched.js`; bank R19c LT1/LT8 37/37.
+  Docs: lla WORKLOG (77), PROGRESS 93, handoff `docs/overhaul/handoff-notes/_pending_tour1_R19c_sched_2026-10-17.md`.

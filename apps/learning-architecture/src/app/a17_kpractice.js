@@ -129,7 +129,7 @@
   };
 
   /* ================= ۲) سازنده‌های برنامه‌وار ================= */
-  var LADDER = [1, 3, 7, 21, 60];
+  var LADDER = A.SCHED ? A.SCHED.ladder("a17_kpractice") : [1, 3, 7, 21, 60];   // دورِ ۱۹c: یک نسخه در A.SCHED (کپیِ پیشین در APP.SCHED_QUARANTINE)
   /* فاصله‌های تکرار (روز). نامش A.KSPACING است: A.KLADDER نامِ «نردبانِ راهنمایی» ِ a16 است و پیش‌تر این‌جا رونویسی می‌شد (۲۰۲۶-۱۰-۱۵). */
   A.KSPACING = LADDER;
 
@@ -1206,7 +1206,7 @@
   A.kfamName = function (id) { var kf = (A.KF || []).filter(function (f) { return f.id === id; })[0]; return (kf && kf.fa) || FAM_FA[id] || id || "—"; };
   A.kmode = function (k) { return EXP_FAMS.indexOf(famOf(k)) >= 0 ? "exp" : "items"; };
   function txt(v) { return Array.isArray(v) ? v.filter(Boolean).join("؛ ") : v == null ? "" : typeof v === "object" ? Object.keys(v).map(function (x) { return v[x]; }).filter(function (x) { return typeof x === "string"; }).join("؛ ") : String(v); }
-  function nowISO() { return new Date().toISOString(); }
+  function nowISO() { return (A.nowISO ? A.nowISO() : new Date().toISOString()); }
   A.kitemsOf = function (knotId) { return S.all("kitem", function (r) { return r.knot === knotId; }).sort(function (a, b) { return (a.created || "").localeCompare(b.created || ""); }); };
   A.kexpsOf = function (knotId) { return S.all("kexp", function (r) { return r.knot === knotId; }).sort(function (a, b) { return (a.created || "").localeCompare(b.created || ""); }); };
   function kset() { var st = S.settings(); var k = st.knots || {}; var n = k.notify || {}; return { notify: { telegram: n.telegram !== false, email: n.email !== false, detail: !!n.detail, detailTg: n.detailTg !== false, detailEm: n.detailEm !== false, hour: n.hour == null ? 9 : +n.hour }, showUnverified: !!k.showUnverified, tz: k.tz || "" }; }

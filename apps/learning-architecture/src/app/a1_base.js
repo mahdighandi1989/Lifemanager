@@ -52,7 +52,43 @@ var APP = window.APP = {};
   A.HOST = window.LLA_HOST || null;
   A.layer = function () { return A.mountEl || document.body; };
   A.pad = function (n) { return n < 10 ? "0" + n : "" + n; };
-  A.today = function () { var d = new Date(); return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); };
+  /* ---------- ساعتِ واحد (تورِ پولیا دورِ ۱۹c، LT8) ----------
+     هر «اکنون» ِ صفحه (A.today، S.put، ساعت‌های خصوصیِ ماژول‌ها، دریچه‌های Date.now) از A.now() می‌گذرد. بی جابه‌جایی همان new Date() است
+     (رفتار عیناً همان). جابه‌جاییِ روز فقط در حالتِ توسعه: ?dev=1 (یا localStorage «lla.dev»=1 یا window.LLA_DEV) و ?clock=YYYY-MM-DD
+     یا APP.clock.advance(n)/set(day) — برای تورگردان‌هایی که Playwright ندارند؛ در کارِ عادی هرگز اعمال نمی‌شود. رکوردِ ساخته‌شده زیرِ
+     ساعتِ آزمایشی برچسبِ simClock می‌گیرد و بی آن ساعت از S.all (یعنی «امروز» و کارنامه) بیرون می‌ماند. Playwright: page.clock کلِ Date را
+     جابه‌جا می‌کند و همین مسیر را هم‌خوان نگه می‌دارد (راهنما: HANDBOOK «زمان‌بندِ واحد»). */
+  var CLK = A.clock = { off: 0, dev: false, maxSeen: 0, stale: false };
+  function ymd(d) { return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { } }
+  A.now = function () {
+    var d = new Date();
+    if (CLK.off) d.setDate(d.getDate() + CLK.off);
+    var t = d.getTime(); if (t + 6e4 < CLK.maxSeen) CLK.stale = true; else if (t > CLK.maxSeen) CLK.maxSeen = t;
+    return d;
+  };
+  A.nowMs = function () { return A.now().getTime(); };
+  A.nowISO = function () { return A.now().toISOString(); };
+  A.today = function () { return ymd(A.now()); };
+  (function initClock() {
+    var q = null; try { q = new URLSearchParams((window.location && window.location.search) || ""); } catch (e) { q = null; }
+    CLK.dev = !!((q && q.get("dev") === "1") || lsGet("lla.dev") === "1" || window.LLA_DEV === true);
+    if (!CLK.dev) return;   // کارِ عادی: هرگز جابه‌جایی
+    var off = parseInt(lsGet("lla.clockOff") || "0", 10) || 0, c = q && q.get("clock");
+    if (c && /^\d{4}-\d{2}-\d{2}$/.test(c) && lsGet("lla.clockParam") !== c) {
+      var real = ymd(new Date()), pa = real.split("-"), pb = c.split("-");
+      off = Math.round((new Date(+pb[0], +pb[1] - 1, +pb[2]) - new Date(+pa[0], +pa[1] - 1, +pa[2])) / 864e5);
+      lsSet("lla.clockParam", c); lsSet("lla.clockOff", String(off));
+    }
+    CLK.off = off;
+  })();
+  /* تورگردان: APP.clock.advance(n) روی جابه‌جاییِ قبلی جمع می‌شود (هرگز به روزِ واقعی برنمی‌گردد)؛ پس از پرش، صفحه را دوباره بارگذاری کن */
+  CLK.advance = function (n) { if (!CLK.dev) { console.warn("APP.clock: فقط در حالتِ توسعه (?dev=1)"); return null; } CLK.off += (+n || 0); lsSet("lla.clockOff", String(CLK.off)); return A.today(); };
+  CLK.set = function (day) { if (!CLK.dev || !/^\d{4}-\d{2}-\d{2}$/.test(String(day))) return null; CLK.off = 0; var real = A.today(); CLK.off = A.daysBetween(real, day); lsSet("lla.clockOff", String(CLK.off)); return A.today(); };
+  CLK.reset = function () { CLK.off = 0; CLK.maxSeen = 0; CLK.stale = false; lsSet("lla.clockOff", null); lsSet("lla.clockParam", null); return A.today(); };
+  /* سلامتِ شبیه‌سازی: «mixed» = فقط A.today وصله شده (created هنوز ساعتِ واقعی است) ⇒ نتیجه بی‌اعتبار؛ «stale» = پرشِ رو به عقب بی بارگذاری */
+  CLK.check = function () { var real = ymd(A.now()), td = A.today(); return { ok: td === real && !CLK.stale, mixed: td !== real, stale: CLK.stale, off: CLK.off, dev: CLK.dev, today: td }; };
   A.addDays = function (ds, n) { var p = ds.split("-"); var d = new Date(+p[0], +p[1] - 1, +p[2]); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + A.pad(d.getMonth() + 1) + "-" + A.pad(d.getDate()); };
   /* تاریخِ محلیِ یک زمانِ ISO (برای مقایسه با A.today() که محلی است). slice(0,10) روی ISO تاریخِ UTC را می‌دهد و
      در تهران بینِ ۰۰:۰۰ تا ۰۳:۳۰ یک روز عقب است (ممیزی ۲۰۲۶-۱۰-۱۳). رشتهٔ YYYY-MM-DD همان‌طور برمی‌گردد. */
@@ -222,8 +258,8 @@ var APP = window.APP = {};
   } catch (e) { }
   /* o.keepTime: زمانِ «updated» ِ خودِ رکورد حفظ شود (ورودِ پشتیبان؛ ممیزی ۲۰۲۶-۱۰-۱۳) — وگرنه هر نوشتن زمانِ اکنون را می‌گیرد */
   S.put = function (r, o) {
-    if (!(o && o.keepTime && r.updated)) r.updated = new Date().toISOString();
-    if (!r.created) r.created = r.updated;
+    if (!(o && o.keepTime && r.updated)) r.updated = A.nowISO();
+    if (!r.created) { r.created = r.updated; if (CLK.off) r.simClock = A.today(); }   // ساختهٔ ساعتِ آزمایشی (LT8)
     S.recs[r.id] = r;
     if (S.mode === "host") { delete hostDel[r.id]; hostPending[r.id] = r; flushHost(); }
     else if (S.mode === "gas") { pending[r.id] = r; flushGAS(); } else flushLocal();
@@ -242,7 +278,7 @@ var APP = window.APP = {};
   S.get = function (id) { return S.recs[id]; };
   S.all = function (type, pred) {
     var out = [];
-    for (var id in S.recs) { var r = S.recs[id]; if ((!type || r.type === type) && (!pred || pred(r))) out.push(r); }
+    for (var id in S.recs) { var r = S.recs[id]; if (r.simClock && !CLK.off) continue; if ((!type || r.type === type) && (!pred || pred(r))) out.push(r); }
     return out.sort(function (a, b) { return (b.updated || "").localeCompare(a.updated || ""); });
   };
   S.settings = function () { return S.recs.settings || { id: "settings", type: "set", ai: { provider: "gemini", model: "gemini-2.5-flash" }, jargon: [] }; };
@@ -301,8 +337,15 @@ var APP = window.APP = {};
     card.ef = card.ef || 2.5; card.n = card.n || 0; card.iv = card.iv || 0;
     if (g < 3) { card.n = 0; card.iv = 1; }
     else {
+      /* متنِ خودِ T42 (dose/how): «۱ روز، ۶ روز، سپس فاصلهٔ قبلی × ضریب سهولت» (پیش‌تر کد ۱ و ۳ می‌داد — ممیزیِ طولی §۳.۳؛ دورِ ۱۹c).
+         پلهٔ نخست (۱ روز) از ساختِ کارت شمرده می‌شود: کارتی که دست‌کم یک روز پس از ساخت مرور شد، پلهٔ ۱ را گذرانده ⇒ ۶ روز؛ همان روزِ ساخت ⇒ ۱ روز.
+         پس از نمرهٔ زیرِ ۳ (فاصله ۱) پلهٔ بعدی دوباره ۶ است («به ابتدا برمی‌گرداند»). جدولِ پله‌ها: A.SCHED.POLICY.T42 (یک نسخه). */
+      var ST = (A.SCHED && A.SCHED.POLICY && A.SCHED.POLICY.T42 && A.SCHED.POLICY.T42.steps) || [1, 6];
+      var prev = card.iv || 0, born = A.localDay(card.created || "") || A.today();
       card.n += 1;
-      card.iv = card.n === 1 ? 1 : card.n === 2 ? 3 : Math.round(card.iv * card.ef);
+      if (!prev) card.iv = A.daysBetween(born, A.today()) >= ST[0] ? ST[1] : ST[0];
+      else if (prev < ST[1] && card.n <= 2) card.iv = ST[1];
+      else card.iv = Math.round(prev * card.ef);
       if (g === 3) card.iv = Math.max(1, Math.round(card.iv * 0.8));
     }
     card.ef = Math.max(1.3, card.ef + (0.1 - (5 - g) * (0.08 + (5 - g) * 0.02)));
@@ -314,6 +357,13 @@ var APP = window.APP = {};
     var c = { id: A.uid("card"), type: "card", q: q, a: a, ef: 2.5, n: 0, iv: 0, due: A.today(), hist: [] };
     for (var k in (extra || {})) c[k] = extra[k];
     return S.put(c);
+  };
+  /* بازنشسته‌کردنِ کارت (ممیزیِ طولی §۳.۴: «susp» خوانده می‌شد ولی هیچ‌جا گذاشته نمی‌شد). کارتِ بازنشسته از صفِ موعد، «امروز» و یادآورِ
+     «cards:review» بیرون می‌رود؛ تاریخچه‌اش می‌ماند و «بازگرداندن» آن را با همان زمان‌بندی برمی‌گرداند. */
+  A.cardSuspend = function (card, on) {
+    if (!card) return null;
+    if (on) card.susp = A.today(); else delete card.susp;
+    return S.put(card);
   };
   A.dueCards = function () { var t = A.today(); return S.all("card", function (c) { return !c.susp && (c.due || "") <= t; }); };
 

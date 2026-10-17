@@ -11,7 +11,7 @@
   var h = A.h, fa = A.fa, S = A.S, AS = A.ASSIST;
   if (!AS || !A.V) return;
   function clip(s, n) { s = String(s == null ? "" : s); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
-  function nowIso() { return new Date().toISOString(); }
+  function nowIso() { return A.nowISO(); }
 
   /* ---------- لایه‌ها (از ثبت‌گاه؛ خانواده‌های گره از خودِ A.KF) ---------- */
   var BASE = [

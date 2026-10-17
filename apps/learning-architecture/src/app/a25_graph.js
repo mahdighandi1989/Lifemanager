@@ -36,6 +36,8 @@
     { t: "idea", fa: "ایدهٔ تو", sys: "mine" },
     /* «🔭 مسئلهٔ حل‌نشدهٔ خودم» (a38_live): همان رکوردِ eprob با mode: "live" — پیوند به حرکت‌هایی که برگزیدی، موقعیت‌های گره‌گشا، پرونده‌های ادعاها، ایده‌ها و مسئلهٔ تازه‌ای که از آن ساختی */
     { t: "lprob", fa: "مسئلهٔ حل‌نشدهٔ تو", sys: "mine" },
+    /* «🧪 پروندهٔ تمرینِ باز» (a41_practice): یک پرونده برای هر تکنیک × موضوع، و فهرست‌های جاری (kind: list) */
+    { t: "practice", fa: "پروندهٔ تمرینِ تو", sys: "mine" },
     /* «📚 منبع‌ها و پوشش» (a37_sources): کتاب‌های بیرونی و موردهایشان، با پیوند به تونلِ موجودی که هر مورد در آن زندگی می‌کند */
     { t: "src", fa: "منبعِ بیرونی (کتاب)", sys: "learn" }, { t: "srcitem", fa: "موردِ منبع", sys: "learn" }
   ];
@@ -210,6 +212,8 @@
       var o = r.origin; if (o && o.type === "lprob" && o.id) edge(k0, ref("lprob", o.id), "from");
     });
     all("deadline").forEach(function (x) { node("deadline", x.id, "⏰ " + String(x.what || "موعد").slice(0, 50), { go: ["home"] }); if (x.sess && N[ref("tour", x.sess)]) edge(ref("deadline", x.id), ref("tour", x.sess), "in"); });
+    all("practice").forEach(function (c) { node("practice", c.id, "🧪 " + (c.kind === "list" ? ((A.PR && A.PR.LISTS[c.list] || {}).fa || "فهرست") : "تمرینِ " + fa(c.tid) + " — " + ((c.subj && c.subj.t) || "")), { go: ["practice", c.id] }); if (c.tid) edge(ref("practice", c.id), ref("tech", c.tid), "practises");
+      var sj = c.subj || {}, tt = { live: "lprob", "case": "ecase", knot: "knot", kcase: "kcase", topic: "topic" }[sj.k]; if (tt && sj.id) edge(ref("practice", c.id), ref(tt, sj.id), "about"); });
     /* ---------- پل‌ها (فقط آنچه در داده هست) ---------- */
     (W.EPI_ST || []).forEach(function (s) { (s.tech || []).forEach(function (x) { edge(ref("station", s.id), ref("tech", x.id), "bridge", x.why); }); });
     (A.KF || []).forEach(function (f) { (f.epi || []).forEach(function (x) { edge(ref("kfam", f.id), ref("station", x.st), "bridge", x.why); }); });

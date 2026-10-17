@@ -480,7 +480,7 @@
         return h("div", { class: "row gap wrap" }, h("span", {}, fa(r.c) + ". " + (claims[+r.c - 1] || "").slice(0, 80) + " — " + fa(r.p) + "٪"),
           h("select", { "aria-label": "نتیجه ادعای " + r.c, onchange: function (e) {
             /* دفترِ پیش‌رو (آزمون ۳) فقط رمزگذاریِ پیش از نتیجه را می‌پذیرد: لحظهٔ اولین نتیجه ثبت و رمزگذاریِ همان لحظه منجمد می‌شود (ممیزی ۲۰۲۶-۱۰-۱۳) */
-            if (e.target.value && !cs.outcomeAt) { cs.outcomeAt = new Date().toISOString(); if (cs.fwdAt) cs.featFrozen = JSON.parse(JSON.stringify(cs.feat || {})); }
+            if (e.target.value && !cs.outcomeAt) { cs.outcomeAt = A.nowISO(); if (cs.fwdAt) cs.featFrozen = JSON.parse(JSON.stringify(cs.feat || {})); }
             cs.outcome[r.c] = e.target.value; S.put(cs); A.toast("ثبت شد"); } }, ["", "درست", "نادرست", "نامعلوم"].map(function (o) { return h("option", { value: o, selected: (cs.outcome[r.c] || "") === o }, o || "—"); })));
       }));
   }

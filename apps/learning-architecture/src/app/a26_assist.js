@@ -19,7 +19,7 @@
   var ui = null, busy = false;
 
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem("lla.assist." + k) || "null"); localStorage.setItem("lla.assist." + k, JSON.stringify(v)); } catch (e) { return null; } }
-  function now() { return new Date().toISOString(); }
+  function now() { return A.nowISO(); }
   function clip(s, n) { s = String(s == null ? "" : s).replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
 
   /* ---------- اشراف: نقشهٔ سامانه از خودِ ثبت‌گاه‌ها ---------- */
@@ -378,8 +378,8 @@
   var sheetCache = { at: 0, list: [] };
   AS.openSheets = function () {
     if (!(A.HOST && A.HOST.sheets)) return Promise.resolve([]);
-    if (Date.now() - sheetCache.at < 120000) { AS._sheets = sheetCache.list; return Promise.resolve(sheetCache.list); }
-    return Promise.resolve(A.HOST.sheets()).then(function (l) { sheetCache = { at: Date.now(), list: (l || []).filter(function (x) { return x.status !== "filed"; }) }; AS._sheets = sheetCache.list; return sheetCache.list; }, function () { return []; });
+    if (A.nowMs() - sheetCache.at < 120000) { AS._sheets = sheetCache.list; return Promise.resolve(sheetCache.list); }
+    return Promise.resolve(A.HOST.sheets()).then(function (l) { sheetCache = { at: A.nowMs(), list: (l || []).filter(function (x) { return x.status !== "filed"; }) }; AS._sheets = sheetCache.list; return sheetCache.list; }, function () { return []; });
   };
   function sheetsText(l) { return l.length ? l.slice(0, 60).map(function (x) { return "#" + x.number + " «" + clip(x.title, 90) + "» [" + x.status + (x.urgent ? "، فوری" : "") + "]"; }).join(" · ") : "(هیچ برگهٔ بازی نیست)"; }
 
@@ -577,7 +577,7 @@
   };
   AS.fileGap = function (s, g) {
     var key = norm(g.title || s.pinned);
-    var since = Date.now() - 30 * 864e5;   // همان کمبود در ۳۰ روزِ اخیر ثبت شده ⇒ برگهٔ دوم نه (پس از آن، اگر هنوز هست، دوباره)
+    var since = A.nowMs() - 30 * 864e5;   // همان کمبود در ۳۰ روزِ اخیر ثبت شده ⇒ برگهٔ دوم نه (پس از آن، اگر هنوز هست، دوباره)
     var dup = AS.sessions().some(function (x) { return (x.reports || []).some(function (r) { return r.key === key && Date.parse(r.at || 0) > since; }); });
     if (dup) return Promise.resolve({ dup: true });
     var text = AS.reportText(s, g);
@@ -613,7 +613,7 @@
   function holesSkip(g) { var hs = gapHoles(g); return hs.length ? { skip: "برگه ثبت نشد: این بخش‌های برگه خالی ماند — " + hs.map(function (k) { return "«" + k[1] + "» (" + k[0] + ")"; }).join("، ") + ". دستیار باید در نوبتِ بعد gap را با همهٔ این بخش‌ها کامل بفرستد.", holes: hs.map(function (k) { return k[0]; }) } : null; }
   /* تصمیمِ نهایی برای یک «gap»: اطمینانِ کم ⇒ نه؛ برگهٔ باز ⇒ نه؛ نظرِ دوم مخالف ⇒ نه؛ موافق ⇒ با اصلاح‌های مشاور ثبت */
   function isDup(s, g) {
-    var key = norm(g.title || s.pinned), since = Date.now() - 30 * 864e5;
+    var key = norm(g.title || s.pinned), since = A.nowMs() - 30 * 864e5;
     return AS.sessions().concat([s]).some(function (x) { return (x.reports || []).some(function (r) { return r.key === key && Date.parse(r.at || 0) > since; }); });
   }
   AS.triage = function (s, g) {

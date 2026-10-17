@@ -14,7 +14,7 @@
   if (!A.S || !A.V || !A.solveUI) return;
   var h = A.h, fa = A.fa, S = A.S, U = A.solveUI;
   var field = U.field, selF = U.selF, own = U.own, txt = U.txt, clip = U.clip, LADDER = U.LADDER;
-  function nowISO() { return new Date().toISOString(); }
+  function nowISO() { return A.nowISO(); }
   /* A13 (s30/s34/s35): پیامِ «اول این‌ها: …» ِ کهنه پس از ثبتِ موفق یا رفتن به نمای دیگر پاک می‌شود — وگرنه کاربر نمی‌داند ثبت شد یا نه */
   function clearBad() { try { var tb = document.getElementById("toasts"); if (tb) Array.prototype.slice.call(tb.querySelectorAll(".toast.bad")).forEach(function (e) { e.remove(); }); } catch (e) { }
     try { if (A.ASSIST && typeof A.ASSIST.dropBadToasts === "function") A.ASSIST.dropBadToasts(); } catch (e) { } }   // E8 (دورِ ۴): ردِ کهنه از «پیام‌های اخیرِ صفحه» ِ دستیار هم می‌رود
