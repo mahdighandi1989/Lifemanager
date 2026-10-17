@@ -465,13 +465,16 @@ const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'learning-architectu
   // ---------- 6b) مرحلهٔ ضعیف به‌صورتِ احتمال (A.MIND.phases)؛ منفی: بی‌داده هیچ ----------
   info.weak = await p.evaluate(() => {
     const AS = APP.ASSIST, had = APP.MIND;
-    const rows = [['und', 'فهمِ مسئله', .1], ['plan', 'طرح‌ریزی', .6], ['exec', 'اجرای طرح', .2], ['back', 'بازنگری', .1]].map(x => ({ id: x[0], fa: x[1], pWeak: x[2], k: 1, n: 3 }));
-    APP.MIND = Object.assign({}, had || {}, { phases: () => ({ n: 12, rows }) });
+    /* تورِ پولیا RN3a (دورِ ۱۹): نام فقط وقتی مرحله‌ای شکست دارد و اکیداً پایین‌تر است (weakest ِ کارنامه)؛ برابری ⇒ «هنوز تمایزی دیده نشده» */
+    const rows = [['und', 'فهمِ مسئله', .1, 3], ['plan', 'طرح‌ریزی', .6, 0], ['exec', 'اجرای طرح', .2, 2], ['back', 'بازنگری', .1, 3]].map(x => ({ id: x[0], fa: x[1], pWeak: x[2], k: x[3], n: 3 }));
+    APP.MIND = Object.assign({}, had || {}, { phases: () => ({ n: 12, rows, weakest: { id: 'plan', fa: 'طرح‌ریزی', p: .6 } }) });
     const a = AS.coachLines({ ph: 'p', qs: [] });
+    APP.MIND = Object.assign({}, had || {}, { phases: () => ({ n: 12, rows: rows.map(r => Object.assign({}, r, { k: 1 })), weakest: null }) });
+    const tie = AS.coachLines({ ph: 'p', qs: [] });
     APP.MIND = Object.assign({}, had || {}, { phases: () => ({ n: 0, rows: rows.map(r => Object.assign({}, r, { pWeak: .25 })) }) });
     const b = AS.coachLines({ ph: 'p', qs: [] });
     APP.MIND = had;
-    return { prob: /طرح‌ریزی — احتمالِ ضعیف‌ترین بودن ۶۰٪/.test(a), noLabel: /برچسب نزن/.test(a) && !/تو در [^ ]+ ضعیفی/.test(a), empty: !/احتمالِ ضعیف‌ترین بودن/.test(b) };
+    return { prob: /طرح‌ریزی [۰-۹]+\/[۰-۹]+ — احتمالِ ضعیف‌ترین بودن ۶۰٪/.test(a) && /هنوز تمایزی دیده نشده/.test(tie) && !/احتمالِ ضعیف‌ترین بودن/.test(tie), noLabel: /برچسب نزن/.test(a) && !/تو در [^ ]+ ضعیفی/.test(a), empty: !/احتمالِ ضعیف‌ترین بودن/.test(b) };
   });
   chk(info.weak.prob && info.weak.noLabel && info.weak.empty, '6b: the weakest solving phase reaches the coach as a probability from A.MIND.phases, never a label; no data ⇒ nothing ' + JSON.stringify(info.weak));
 

@@ -152,9 +152,12 @@
     dims.forEach(function (dd) {
       // بیش‌اطمینانی: وقتی احتمالِ «درستیِ واقعی کمتر از میانگینِ اطمینانِ اعلام‌شده» از ½ بیشتر است (مرزِ ½ از A4، نه برشِ قراردادیِ ۸۰/۶۵)
       var X = D[dd.id], E = X.est || {};
-      if (E.pOver != null && E.pOver > 0.5) black.push({ k: "overconf", fa: "بیش‌اطمینانی در پاسخ‌های «" + dd.fa + "»: میانگینِ اطمینانت " + fa(Math.round(100 * E.meanConf)) + "٪ بوده و احتمالِ اینکه درستیِ واقعی‌ات کمتر از آن باشد " + fa(Math.round(100 * E.pOver)) + "٪ است (" + fa(E.calN) + " پاسخ)", dim: dd.id });
+      /* تورِ پولیا (RN3b): نقطهٔ سیاهِ بیش‌اطمینانی فقط با دست‌کم یک رویدادِ همان نوع — پاسخِ مطمئن (>½) که نادرست بود / پیش‌بینیِ جهت‌دار که طرفِ محتمل‌ترش رخ نداد؛
+         پیش‌بینیِ درست هرگز (پیشینِ ½ به‌تنهایی برچسب نمی‌سازد) */
+      var missA = X.cal.filter(function (c) { return !c.fc && c.p > 0.5 && !c.ok; }).length, missF = X.cal.filter(function (c) { return c.fc && c.p != null && c.p !== 0.5 && (c.p > 0.5) !== !!c.ok; }).length;
+      if (E.pOver != null && E.pOver > 0.5 && missA >= 1) black.push({ k: "overconf", fa: "بیش‌اطمینانی در پاسخ‌های «" + dd.fa + "»: میانگینِ اطمینانت " + fa(Math.round(100 * E.meanConf)) + "٪ بوده و احتمالِ اینکه درستیِ واقعی‌ات کمتر از آن باشد " + fa(Math.round(100 * E.pOver)) + "٪ است (" + fa(E.calN) + " پاسخ)", dim: dd.id });
       var F = E.fc || {};
-      if (F.pOver != null && F.pOver > 0.5) black.push({ k: "overconf_fc", fa: "بیش‌اطمینانی در پیش‌بینی‌های «" + dd.fa + "»: طرفِ محتمل‌تر را به‌طورِ میانگین " + fa(Math.round(100 * F.meanQ)) + "٪ گفتی، ولی همان طرف " + fa(F.hit) + " بار از " + fa(F.dirN) + " رخ داد؛ احتمالِ اینکه بسامدِ واقعی کمتر از گفته‌ات باشد " + fa(Math.round(100 * F.pOver)) + "٪ است", dim: dd.id });
+      if (F.pOver != null && F.pOver > 0.5 && missF >= 1) black.push({ k: "overconf_fc", fa: "بیش‌اطمینانی در پیش‌بینی‌های «" + dd.fa + "»: طرفِ محتمل‌تر را به‌طورِ میانگین " + fa(Math.round(100 * F.meanQ)) + "٪ گفتی، ولی همان طرف " + fa(F.dirN - F.hit) + " بار از " + fa(F.dirN) + " رخ نداد (" + fa(F.hit) + " بار رخ داد)؛ احتمالِ اینکه بسامدِ واقعی کمتر از گفته‌ات باشد " + fa(Math.round(100 * F.pOver)) + "٪ است", dim: dd.id });
     });
     /* مسیرهای پیشِ رو و «از کجا دوری» (از قلمروِ سامانه‌ها) */
     var far = [], ahead = [];
@@ -353,12 +356,19 @@
     /* تورِ پولیا دورِ ۲ (R7): بازگفتِ دستیار (e.by = assistant، متنی که در پیام‌های خودِ کاربر نیست) شاهدِ موفقیتِ او نیست */
     function tutOf(T) { if (!T) return; PH4.forEach(function (x) { (T[x[0]] || []).forEach(function (e) { if (!e || e.skip || e.k === "motive" || (e.self !== 0 && e.self !== 1 && e.self !== 2)) return; if (e.by === "assistant" && e.self === 2) return; add(x[0], "ask", e.self === 2); }); }); }
     S.all("eprog").forEach(function (pg) { tutOf(pg.tut); });
+    /* RN2e: شناسهٔ کارهای زنده‌ای که پیامدشان در همین جدول شمرده می‌شود (گامِ بسته با پیامد) */
+    var liveActs = {}, seenAct = {};
+    S.all("eprog").forEach(function (pg) { var pid0 = String(pg.id).replace(/^eprog_/, ""); (((pg.solve || {}).live || {}).steps || []).forEach(function (st) { var o = st && st.out; if (o && !o.auto && o.done) liveActs["lstep:" + pid0 + ":" + st.id] = 1; }); });
     S.all("kcase", function (c) { return !c.sample; }).forEach(function (c) { tutOf(c.tut); });
     S.all("pr").forEach(function (r) { tutOf(r.data && r.data.tut); });
     S.all("achat").forEach(function (s) { tutOf(s.tut);
       /* مربیِ گفت‌وگو (a27): گیر/«حل نشد» ِ خودِ کاربر و گره‌ای که در میانهٔ حل پیدا شد ⇒ ناموفق در همان مرحله */
       /* تورِ پولیا (RM1a): موفقیتِ سنجیدهٔ گفت‌وگو (src «chatok»، ok:true) هم — هر کدام یک رویداد */
-      (s.coachEv || []).forEach(function (e) { if (e && byPh[e.ph] && (e.src === "chat" || e.src === "knot" || e.src === "chatok")) add(byPh[e.ph], e.src, !!e.ok); }); });
+      /* تورِ پولیا (RN3c): رویدادِ «در انتظارِ» الگو (pend، بی گزارشِ مدل) شمرده نمی‌شود؛ (RN2e) هر کار یک بار — رویدادی که شناسه‌اش (act) همان گامِ ثبت‌شدهٔ
+         مسئلهٔ زنده است کنار می‌رود (پیامد همان‌جا شمرده می‌شود)، و دو رویدادِ گفت‌وگو با یک شناسه و یک مرحله یکی‌اند */
+      (s.coachEv || []).forEach(function (e) { if (!e || !byPh[e.ph] || !(e.src === "chat" || e.src === "knot" || e.src === "chatok") || e.pend) return;
+        if (e.act) { if (liveActs[e.act]) return; var ak = e.act + "|" + e.ph + "|" + (e.ok ? 1 : 0); if (seenAct[ak]) return; seenAct[ak] = 1; }
+        add(byPh[e.ph], e.src, !!e.ok); }); });
     S.all("eprog").forEach(function (pg) {
       var pid = String(pg.id).replace(/^eprog_/, ""), p = A.getProb ? A.getProb(pid) : null, sv = pg.solve || {};
       if (p && Array.isArray(p.stages) && A.stagePhase) Object.keys(pg.lv || {}).forEach(function (lv) {
@@ -392,13 +402,26 @@
       rows.forEach(function (X, i) { var t = 0; for (var g = 0; g < G; g++) { var pr = D[i][g].w; rows.forEach(function (Y, j) { if (j !== i) pr *= 1 - (D[j][g].cdf - D[j][g].w / 2); }); t += pr; } X.pWeak = t; });
       var tot = rows.reduce(function (a, X) { return a + X.pWeak; }, 0); rows.forEach(function (X) { X.pWeak = tot ? X.pWeak / tot : 0.25; });
     } else rows.forEach(function (X) { X.pWeak = rows.length ? 1 / rows.length : 0; });
-    var n = rows.reduce(function (a, X) { return a + X.n; }, 0), weak = rows.slice().sort(function (a, b) { return b.pWeak - a.pWeak; })[0];
-    return { at: new Date().toISOString(), n: n, rows: rows0, ranked: rows.length, weakest: rows.length >= 2 ? { id: weak.id, fa: weak.fa, p: weak.pWeak } : null, src: PH_SRC };
+    var n = rows.reduce(function (a, X) { return a + X.n; }, 0);
+    /* تورِ پولیا (RN3a، C·X4): «ضعیف‌ترین» فقط وقتی دادهٔ دیده‌شده تمایز می‌دهد — آن مرحله دست‌کم یک شکست دارد و نسبتِ موفقیتِ دیده‌شده‌اش (k/n) از هر مرحلهٔ
+       دیگرِ دارای داده **اکیداً** کمتر است؛ برابری، نبودِ شکست، ترتیبِ جدول یا پیشینِ ½ هرگز نام نمی‌دهد (weakestR18 = قاعدهٔ پیشین، قرنطینه) */
+    var weak = M.weakestOf(rows);
+    return { at: new Date().toISOString(), n: n, rows: rows0, ranked: rows.length, weakest: weak ? { id: weak.id, fa: weak.fa, p: weak.pWeak } : null, distinct: !!weak, src: PH_SRC };
   };
+  M.weakestOf = function (rows) {
+    if (!rows || rows.length < 2) return null;
+    var r = function (X) { return X.k / X.n; }, lo = rows.slice().sort(function (a, b) { return r(a) - r(b); }), w = lo[0];
+    if (w.n - w.k < 1) return null;   // بی شکست ⇒ تمایزی نیست
+    if (rows.some(function (X) { return X !== w && r(X) <= r(w); })) return null;   // برابری ⇒ نامی نیست
+    return w;
+  };
+  /* قرنطینه (RN3a — REMOVAL_CANDIDATES): بیشترین «احتمالِ ضعیف‌ترین بودن» میانِ دست‌کم دو مرحلهٔ دارای داده — بی شکست یا با برابری هم نام می‌برد (ترتیبِ جدول) */
+  M.weakestR18 = function (rows) { return rows && rows.length >= 2 ? rows.slice().sort(function (a, b) { return b.pWeak - a.pWeak; })[0] : null; };
+  M.NO_DISTINCT = "هنوز تمایزی دیده نشده";
   M.phasesText = function (Q) {
     Q = Q || M.phases(); var pc = function (p) { return Math.round(100 * p) + "%"; };
     return "چهار مرحلهٔ حل (پولیا؛ (k+1)/(n+2)، بی آستانه): " + Q.rows.map(function (X) { return X.none ? X.fa + " — " + NO_DATA : X.fa + " " + pc(X.p) + " (" + X.k + "/" + X.n + (Q.weakest ? "، احتمالِ ضعیف‌ترین بودن " + pc(X.pWeak) : "") + ")"; }).join(" · ") +
-      (Q.n ? "" : " — هنوز هیچ داده‌ای نیست؛ هر چهار «نمی‌دانیم» است.");
+      (Q.n ? (Q.weakest ? " — تنها مرحله‌ای که شکست دارد و از همه پایین‌تر است: " + Q.weakest.fa : Q.ranked >= 2 ? " — " + M.NO_DISTINCT : "") : " — هنوز هیچ داده‌ای نیست؛ هر چهار «نمی‌دانیم» است.");
   };
   function phasesSection() {
     var Q = M.phases(), pf = function (p) { return A.PSY && A.PSY.pctFa ? A.PSY.pctFa(p) : fa(Math.round(100 * p)) + "٪"; };
@@ -412,6 +435,7 @@
             h("td", { class: "small" }, Object.keys(X.src).length ? Object.keys(X.src).map(function (s) { return Q.src[s] + ": " + fa(X.src[s].k) + " از " + fa(X.src[s].n); }).join(" · ") : "— (هنوز رویدادی نیست)"));
         })))),
       h("p", { class: "small muted mind-phweak" }, Q.weakest ? "بیشترین احتمالِ ضعیف‌ترین بودن: «" + Q.weakest.fa + "» (" + pf(Q.weakest.p) + ") از " + fa(Q.n) + " رویداد، فقط میانِ مرحله‌هایی که داده دارند. این احتمال است، نه برچسب؛ با هر پاسخ و گامِ تازه جابه‌جا می‌شود."
+        : Q.n && Q.ranked >= 2 ? M.NO_DISTINCT + " (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای شکستی ندارد یا مرحله‌ها برابرند؛ «ضعیف‌ترین» فقط وقتی نام برده می‌شود که مرحله‌ای شکست دارد و از همهٔ مرحله‌های دیگر به‌روشنی پایین‌تر است."
         : Q.n ? "فقط یک مرحله داده دارد (" + fa(Q.n) + " رویداد) — هیچ مرحله‌ای «ضعیف‌ترین» نامیده نمی‌شود؛ مرحله‌های بی‌داده با پیشینِ ½ سنجیده نمی‌شوند." : "هنوز هیچ رویدادِ سنجیده‌ای نیست — هیچ مرحله‌ای رتبه نمی‌گیرد (نمی‌دانیم)."),
       /* تورِ پولیا (RM1e): رادارِ سازه‌ها نگاشتی از مرحله‌های حل ندارد — همین را صادقانه می‌گوییم، نگاشتِ ساختگی نمی‌سازیم */
       h("p", { class: "small muted mind-phradar" }, PH_RADAR));

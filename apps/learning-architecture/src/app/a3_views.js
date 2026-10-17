@@ -182,7 +182,9 @@
     var due = A.dueList();
     root.appendChild(h("section", { class: "grid2" },
       h("div", { class: "card" }, h("h2", {}, "کارهای موعددار"),
-        due.length ? h("ul", { class: "duel" }, due.map(function (d) { return h("li", { class: "due " + d.k }, h("button", { class: "dueb", onclick: d.go }, h("span", { class: "dt" }, d.txt), h("span", { class: "ds" }, d.sub))); }))
+        due.length ? h("ul", { class: "duel" }, due.map(function (d) { return h("li", { class: "due " + d.k }, h("button", { class: "dueb", onclick: d.go }, h("span", { class: "dt" }, d.txt), h("span", { class: "ds" }, d.sub)),
+          /* پاسخِ یک‌تپی (تورِ پولیا INF10): دکمه‌های کنارِ سطر، پاسخِ خودِ کاربر (data-own) — دستیار نمی‌زندشان */
+          d.acts && d.acts.length ? h("div", { class: "row gap wrap dopts due-acts", "data-own": "1", dir: "rtl" }, d.acts.map(function (b) { return h("button", { class: "btn ghost sm " + (b.cls || "dopt"), type: "button", onclick: b.fn }, b.t); })) : null); }))
           : h("p", { class: "muted" }, "چیزی موعد نیست. یک تمرین از هفته جاری برنامه انتخاب کن.")),
       weekCard()));
     root.appendChild(h("section", { class: "stats" },

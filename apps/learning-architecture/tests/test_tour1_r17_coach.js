@@ -197,7 +197,9 @@ function modalityConflicts(text) {
     for (const e of bank('RC1.register', 'pos')) {
       await fresh(); const v = /register=شما/.test(e.expect) ? 'شما' : 'تو';
       const u1 = await turn(e.text, 'باشه.', [{ do: 'coach_state', register: v }]);
-      const fbSh = /با «شما» است/.test(regLine(u1.user));   // پیش از گزارش: پشتیبانِ الگو نباید از یک واژه «شما» کند
+      /* تورِ پولیا RN6c (دورِ ۱۹، جایگزینِ بندِ دورِ ۱۷): بی گزارشِ مدل، پشتیبان صورت‌های **خودِ کاربر** را می‌خواند (نه دستیار) — پس «شما» ِ ساختاریِ پیامِ خودش
+         («بفرمایید»، «حل کردید»، «توضیح بدید») پیش از گزارش هم «شما» است؛ فقط پشتیبانِ «شمای» نادرست (خلافِ ضمیرِ گزارش‌شده) ممنوع است */
+      const fbSh = v !== 'شما' && /با «شما» است/.test(regLine(u1.user));
       const reg = await p.evaluate(() => (__cur().coach || {}).reg || '');
       const u2 = await turn('خب.');
       const want = v === 'شما' ? 'shoma' : 'to';

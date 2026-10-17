@@ -1626,7 +1626,20 @@
   AS.coachLines = coachLines;
   /* مرحلهٔ ضعیف‌ترِ همین کاربر — فقط به‌صورتِ احتمال از کارنامهٔ ذهن (A.MIND.phases ِ a29: (k+1)/(n+2) و «احتمالِ ضعیف‌ترین بودن»)؛
      هرگز برچسب («تو در طرح ضعیفی»)، بی آستانه؛ بی‌داده هیچ نمی‌گوید (هر چهار ¼ یعنی نمی‌دانیم) */
+  /* RN3a: «ضعیف‌ترین» فقط وقتی کارنامه نامش را برد (شکستی هست و آن مرحله به‌روشنی پایین‌تر از همه است)؛ وگرنه «هنوز تمایزی دیده نشده» — بی رتبه */
   function weakPhase() {
+    var M0 = A.MIND; if (!M0 || typeof M0.phases !== "function") return "";
+    var Q = null; try { Q = M0.phases(); } catch (e) { return ""; }
+    if (!Q || !Q.n || !Q.rows || !Q.rows.length) return "";
+    var rk = Q.rows.filter(function (X) { return X && X.n > 0 && !X.none; }); if (rk.length < 2) return "";
+    var cnt = function (X) { return X.fa + " " + fa(X.k) + "/" + fa(X.n); };
+    if (!Q.weakest) return "- زمینه (نه پرسشِ دوم): چهار مرحلهٔ حل در دادهٔ خودِ این کاربر (" + fa(Q.n) + " رویداد؛ " + rk.map(cnt).join("؛ ") + "): هنوز تمایزی دیده نشده — هیچ مرحله‌ای ضعیف‌تر نیست؛ برچسب نزن و مکثِ ویژه‌ای لازم نیست.";
+    var pc = function (p) { return fa(Math.round(100 * p)) + "٪"; };
+    return "- زمینه (نه پرسشِ دوم): چهار مرحلهٔ حل در دادهٔ خودِ این کاربر (احتمال، نه برچسب؛ " + fa(Q.n) + " نمونه؛ فقط مرحله‌های دارای داده): " + rk.map(function (X) { return cnt(X) + " — احتمالِ ضعیف‌ترین بودن " + pc(X.pWeak || 0); }).join("؛ ") +
+      ". تنها مرحله‌ای که شکست دارد و از همه پایین‌تر است: «" + Q.weakest.fa + "». به او برچسب نزن و حکم نده؛ اگر به کار آمد، در همان مرحله کمی بیشتر مکث کن — با همان یک پرسشِ نوبت، نه پرسشی دیگر.";
+  }
+  /* قرنطینه (RN3a — REMOVAL_CANDIDATES): هر دو مرحلهٔ دارای داده را با «احتمالِ ضعیف‌ترین بودن» رتبه می‌داد، حتی بی هیچ شکستی یا با برابری */
+  function weakPhaseR18() {
     var M0 = A.MIND; if (!M0 || typeof M0.phases !== "function") return "";
     var Q = null; try { Q = M0.phases(); } catch (e) { return ""; }
     if (!Q || !Q.n || !Q.rows || !Q.rows.length) return "";
@@ -2030,7 +2043,8 @@
     /* تورِ پولیا (RM6f، D·D4 s31 p13): پس از بستنِ مسئله در گفت‌وگو و بی مسئلهٔ بازی در کار، پیامِ کوتاهِ بعدی (پاسخِ بازنگری، «بعدی؟»، تشکر) مسئلهٔ تازه
        نیست — صورتِ مسئله از آن ساخته نمی‌شود و کارتِ مرحله‌ای («فهم»: «مجهول … چیست؟») پیشنهاد نمی‌شود (C.prev.noPh). مسئلهٔ تازه (صورتِ چندجمله‌ای، پرسش،
        حدس، یا «یه مسئلهٔ تازه دارم: …») همان راهِ پیشین است. */
-    if (b && b.done && !C.stmt && !AS.notProblem(mt) && !guessNow(mt, teachMode(s, mt)) && !/[؟?]/.test(ownText(mt)) && !longStmt(mt) && qToks(mt).length <= 8 && !/حدس|ادعا|فرضیه|فکر\s*(?:کنم|می[‌\s]?کنم)|به\s*نظرم|مسئله|معما/.test(mt)) {
+    /* RN6a (D·4 s31): «بعدی؟»، «خب؟»، «ادامه؟» ِ پایانی پرسشِ مسئله نیست — نشانهٔ پرسشِ همان نوبتِ کوتاه پیش از سنجش کنار می‌رود */
+    if (b && b.done && !C.stmt && !AS.notProblem(mt) && !guessNow(mt, teachMode(s, mt)) && !/[؟?]/.test(ownText(mt).replace(META_Q19, "")) && !longStmt(mt) && qToks(mt).length <= 8 && !/حدس|ادعا|فرضیه|فکر\s*(?:کنم|می[‌\s]?کنم)|به\s*نظرم|مسئله|معما/.test(mt)) {
       C.prev = { key: mkey(mt), ph0: "u", st0: {}, noPh: true, pk: C.pk }; return "u"; }
     if (!C.ph && !C.inh && !(b && b.done)) { var x0 = inheritPhase(s, mt); if (x0) { C.ph = x0.coach.ph; C.st = Object.assign({}, x0.coach.st || {}); C.cls = x0.coach.cls; C.inh = x0.id; } }
     var ph0 = C.ph || "", st0 = Object.assign({}, C.st || {}), teach = teachMode(s, mt);
@@ -2078,6 +2092,14 @@
   /* رویدادِ مرحله برای «🧩 چهار مرحلهٔ حل» (R7): گیر یا «حل نشد» ِ خودِ کاربر در گفت‌وگو ⇒ ناموفق در همان مرحله (موفق فقط از خودداوریِ صریحِ او: tutor_mark) */
   /* تورِ پولیا (RM1a): موفقیتِ سنجیده هم رویداد است (ok = true، src «chatok»: پاسخِ پذیرفته‌شده، گذر از مرحله، «حل شد») — هر کدام یک رویداد، بی وزن؛
      کلیدِ موفقیت مرحله را هم دارد (یک پیام می‌تواند در دو مرحله شاهد باشد) */
+  /* RN3c: «غلط بود/نه» ِ الگو درباره‌ی حدس یا آزمونِ خودش است وقتی همین پیام حدس دارد، پیش از آن واژه‌ای آزمایشی با «؟» آمد («رمهب‌ستان؟ نه. اشتباه بود»)،
+     یا پیامِ پیشینش حدسِ سنجیده بود — حدسِ ردشده داده است، نه شکستِ مرحله */
+  function guessRefPat(s, mt) {
+    var t = String(mt || ""), i = lastAt(UNSOLVED_RE, t); if (guessNow(t, false)) return true;
+    if (i > 0 && /[؟?]/.test(t.slice(0, i))) return true;
+    var C = (s && s.coach) || {}, pu = prevUserMsg(s); return !!(C.guess && pu && C.guess.key === mkey(pu.text));
+  }
+  var META_Q19 =/(?:^|[\s.،!؛…])(?:بعدی|بعدیش|خب|خوب|ادامه|ادامه\s*بدیم|دیگه|بعدش|و\s*بعد|حالا\s*چی|حالا)\s*[؟?]+[\s!.…]*$/;
   function coachEv(s, ph, src, mt, ok, x) {
     var E = s.coachEv = s.coachEv || [], key = src + (ok ? "|" + ph : "") + "|" + clip(mt, 80); if (E.some(function (e) { return e.key === key; })) return;
     E.push(Object.assign({ at: nowIso(), ph: ph, ok: !!ok, src: src, key: key }, x || {})); if (E.length > 200) s.coachEv = E.slice(-200);
@@ -2169,7 +2191,9 @@
       var qs = cpid && nq && nq.list && nq.list.length ? nq.list : phaseQs(ph, cls, cpid);
       if (!cpid && !auto) { var C = s.coach = s.coach || {}; C.ph = ph; C.cls = cls; C.at = nowIso(); }
       /* R7/B7: رویدادِ «ناموفق» فقط گیرِ خودِ حل یا «حل نشد» ِ واقعی — نه خشم/شرم، نه حدسِ ردشده، نه تلاشِ کنارگذاشته‌ای که به جواب رسید */
-      if (!auto && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt);
+      /* تورِ پولیا (RN3c، B·D3 s12): «حل نشد/اشتباه بود» ِ الگو (بی گزارشِ مدل) به مرحله‌ای ثبت نمی‌شود — فقط «در انتظار» (pend) تا گزارشِ وضعِ همین نوبت
+         جایش را بگیرد؛ حدسِ ردشده در نوبتِ بی گزارش هرگز شکستِ مرحله نیست (نامتقارن). گیرِ صریحِ خودش («گیر کردم») همان رویدادِ پیشین است. */
+      if (!auto && ((STUCK_RE.test(mt) && !solvedSaid(mt)) || unsolvedNow(mt, ph))) coachEv(s, ph, "chat", mt, false, STUCK_RE.test(mt) && !solvedSaid(mt) ? undefined : guessRefPat(s, mt) ? { pend: true } : undefined);
       var sig = sigOf(), claim = cpid && !auto && solvedSaid(mt, { stmt: bb.r && bb.r.p && bb.r.p.statement }) && !unsolvedNow(mt, ph) && !sig.guess ? ((nq && nq.coach && nq.coach.closure && nq.coach.closure.label) || true) : "";
       /* G4 (دورِ ۶، s18): مسئلهٔ فقط‌درگفت‌وگو در میانهٔ کار (رابطهٔ تازه با متغیرها) ⇒ پرسشِ هدف — همتای «🎯 هدف را گم نکن» ِ صفحه؛ مجهول به حرفِ خودش، وگرنه بندِ پرسشیِ صورت */
       var Cg = s.coach || {}, goal = !cpid && !auto && ph === "c" && varEq(mt) && !solvedSaid(mt) ? clip((Cg.unkBy && Cg.unkBy[Cg.pk]) || (String(Cg.stmt || "").match(/[^.!؟?\n]*[؟?]/g) || []).pop() || "", 110).trim() : "";
@@ -2363,7 +2387,11 @@
     if (teach && SELF_SOLVED_RE.test(ut)) said = said.filter(function (k) { return k !== "result"; });   // مربی خودش حل کرد؛ یادگیرنده نه
     if (heurClaim(ut) || guessNow(ut, teach)) said = said.filter(function (k) { return k !== "result"; });
     var stB = ""; try { stB = P && P.live ? (A.liveRec(P.live) || { p: {} }).p.statement : C.stmt; } catch (e) { }   // دورِ ۷ (H1، s28): تنها شاهدِ «نتیجه» «پس + عدد» ِ سازندهٔ مسئله/بازگوییِ ادعا ⇒ ادعا، نه نتیجه
-    if (resultNow(ut) && !resultNow(ut, false) && !SOLVED_RE.test(ut) && !weakOk(ut, { intro: !!(P && P.intro), stmt: stB })) said = said.filter(function (k) { return k !== "result"; });   // دورِ ۵ (F1، s03): «ثابت شد» از چند شکل ادعاست، نه نتیجه؛ دورِ ۶ (G1): «…درسته؟» حدس است
+    /* تورِ پولیا (RN6b، D·7 s38): گزارشِ said:result با متنِ نتیجه (result) که عیناً در پیامِ خودش هست سنجیده است و مرحله را می‌برد، حتی اگر الگو فقط «ضعیف» دیدش؛
+       متنی که در پیامش نیست ⇒ رد. بی متن ⇒ همان سنجشِ پیشین. */
+    var rTx19 = txtOf(a.result), resOk19 = !!rTx19 && quoteIn(rTx19, ut);
+    if (rTx19 && !resOk19) said = said.filter(function (k) { return k !== "result"; });
+    if (!resOk19 && resultNow(ut) && !resultNow(ut, false) && !SOLVED_RE.test(ut) && !weakOk(ut, { intro: !!(P && P.intro), stmt: stB })) said = said.filter(function (k) { return k !== "result"; });   // دورِ ۵ (F1، s03): «ثابت شد» از چند شکل ادعاست، نه نتیجه؛ دورِ ۶ (G1): «…درسته؟» حدس است
     /* نقش */
     if (a.role === "teacher") { var rec = M.filter(isUser).slice(-4).map(function (m) { return m.text; }).join(" "); if (LEARNER_RE.test(rec)) { C.teach = true; C.teachBy = "model"; } }
     else if (a.role === "self" && C.teach && C.teachBy === "re" && C.teachKey === key) { C.teach = false; C.teachBy = "model"; }
@@ -2406,7 +2434,9 @@
     if (said.indexOf("u") >= 0 && !pasted) { var UB = C.unkBy = C.unkBy || {}; UB[pk] = clip(unkPhrase(ut), 160); }   // مجهول به حرفِ خودش (برای سطرِ 🎯 ِ میانهٔ کار)
     /* رویدادِ مرحله (R7): خواندنِ مدل جای خواندنِ الگوی همان پیام */
     var ek = "chat|" + clip(ut, 80); s.coachEv = (s.coachEv || []).filter(function (e) { return !(e && e.src === "chat" && e.key === ek); });
-    if ((fail || stuck) && !C.teach) coachEv(s, P && P.live ? (P.ph0 || "u") : (cl || ph0), "chat", ut);
+    /* تورِ پولیا (RN2e): همان نوبت گامی از مسئلهٔ زنده را گزارش کرد ⇒ رویدادِ اجرای این نوبت شناسهٔ همان کار را دارد (کارنامه یک بار می‌شمارد) */
+    var act19 = C.stepRep && C.stepRep.key === key && C.stepRep.act ? C.stepRep.act : "";
+    if ((fail || stuck) && !C.teach) { var fph = P && P.live ? (P.ph0 || "u") : (cl || ph0); coachEv(s, fph, "chat", ut, false, act19 && (fph === "c" || fail) ? { act: act19 } : undefined); }
     /* تورِ پولیا (RM1a): موفقیتِ سنجیدهٔ گفت‌وگو ⇒ ok:true برای همان مرحله — پاسخِ پذیرفته‌شده به پرسشِ یک مرحله (شناسهٔ u/p/e/b)، گذر از مرحله
        با شاهدِ خودش (فهم ⇐ طرح، طرح ⇐ اجرا)، و نتیجه‌ای که گفت (اجرا). گیر/شکست هرگز موفقیت نیست؛ شکستِ پس از «نتیجه» همان موفقیتِ نتیجه را پس می‌گیرد
        (نتیجه غلط بود — یک رویداد، نه دو). */
@@ -2417,8 +2447,14 @@
       } else {
         var okSt = {}, ST4 = { u: "u", p: "p", e: "c", b: "b" };
         if (real) ids.forEach(function (id) { var q = qm[id]; if (q && qs.indexOf(q) >= 0 && ST4[String(id).charAt(0)]) okSt[ST4[String(id).charAt(0)]] = "ans"; });
-        if (!(P && P.live)) { if (said.indexOf("result") >= 0 && ph === "b") okSt.c = "res"; else if (said.indexOf("plan") >= 0 && ph === "c" && ORD[ph0] < ORD.c) okSt.p = "pass"; else if (ORD[ph] > ORD[ph0]) okSt[ph0] = "pass"; }
-        Object.keys(okSt).forEach(function (k) { coachEv(s, k, "chatok", ut, true, { pk: pk, how: okSt[k], res: okSt[k] === "res" || undefined }); });
+        /* تورِ پولیا (RN3c): نتیجه و طرحِ سنجیده هر کدام شاهدِ مرحلهٔ خودند — در یک نوبت هر دو (طرح + نتیجه ⇒ طرح و اجرا)، و در سشنِ بسته به مسئلهٔ زنده هم؛
+           بازگوییِ خودش (said u/c ِ سنجیده، نه صورتِ چسبانده، نه «آره») ⇒ موفقیتِ فهم. گذر از مرحله فقط وقتی هیچ‌کدام نبود (یک موفقیت برای مرحلهٔ تمام‌شده). */
+        var hasRes = said.indexOf("result") >= 0 && (P && P.live ? true : ph === "b"), hasPlan = said.indexOf("plan") >= 0;
+        if (hasRes) okSt.c = "res";
+        if (hasPlan) okSt.p = "plan";
+        if (!hasRes && !hasPlan && !(P && P.live) && ORD[ph] > ORD[ph0]) okSt[ph0] = "pass";
+        if ((said.indexOf("u") >= 0 || said.indexOf("c") >= 0) && !pasted && tokN(ownText(ut)).length >= 2 && !okSt.u) okSt.u = "own";
+        Object.keys(okSt).forEach(function (k) { coachEv(s, k, "chatok", ut, true, Object.assign({ pk: pk, how: okSt[k], res: okSt[k] === "res" || undefined }, act19 && k === "c" ? { act: act19 } : {})); });
       }
     }
     try { S.put(s); } catch (e) { }
@@ -2602,9 +2638,19 @@
   var REG_TO_AI = new RegExp("(?:^|[\\s«(،])(?:ن?می[‌\\s][آ-ی]{2,10}ی|ن?(?:" + PAST_ST + ")ی|(?:" + PAST_ST + ")ه[‌\\s]?ای|داری|هستی|خودت|کنارت|یادت|راهت|حدست|جوابت|برایت|[آ-ی]{2,}‌ات)(?![آ-ی‌])", "g");
   /* دورِ ۱۷ (RC1، C·V4 s27): ضمیرِ کاربر را مدل گزارش می‌دهد (coach_state.register، سنجیده با نشانه‌های خودِ پیام ⇒ s.coach.reg)؛ یک «شما» در پیامِ کاربر دیگر
      گفت‌وگو را «شما» نمی‌کند — پشتیبان فقط صورت‌های خودِ دستیار است (آنچه در گفت‌وگو جاری است). مسیرِ دورِ ۱۶: regInR16/regOfR16 (قرنطینه) */
-  function regIn(se) {
+  /* قرنطینه (تورِ پولیا RN6c، B·D7 s16o — REMOVAL_CANDIDATES): پشتیبان فقط صورت‌های خودِ دستیار را می‌شمرد — یک «می‌پرسید» ِ دستیار گفت‌وگو را «شما» می‌کرد */
+  function regInR18(se) {
     var M = (se && se.msgs) || [], cr = se && se.coach && se.coach.reg; if (cr === "shoma" || cr === "to") return cr;
     var sh = 0, to = 0; M.forEach(function (m) { if (!m || m.role !== "ai") return; var t = ownText(m.text); sh += (t.match(REG_SH_AI) || []).length; to += (t.match(REG_TO_AI) || []).length; });
+    return sh > to ? "shoma" : to > sh ? "to" : "";
+  }
+  /* RN6c: بی گزارشِ مدل، پشتیبان فقط صورت‌های خودِ کاربر را می‌خواند (همان شاهدهای ساختِ واژهٔ regSigns: «نگو»، «بپرس»، «صبر کن»، «باورت»، «بفرمایید»)؛
+     حرفِ دستیار هرگز شاهد نیست. برابر یا بی‌شاهد ⇒ «» (همان که جاری است). */
+  function regIn(se) {
+    var M = (se && se.msgs) || [], cr = se && se.coach && se.coach.reg; if (cr === "shoma" || cr === "to") return cr;
+    /* گفتهٔ نقل‌شده به دیگران («به بچه‌ها گفتم شما برید») شاهدِ ضمیرِ او با دستیار نیست — تا پایانِ همان جمله کنار می‌رود */
+    var sh = 0, to = 0; M.forEach(function (m) { if (!isUser(m)) return; var t = unq18(m.text).replace(/(?:^|[\s،])(?:گفتم|گفت|گفتش|گفتن|گفته|میگه|می[‌\s]گه|می[‌\s]?گفت|بهش\s*گفتم|نوشته)(?![آ-ی‌])[^.!؟?\n]*/g, " ");
+      var g = regSigns(t); if (g.sh && !g.to) sh++; else if (g.to && !g.sh) to++; });
     return sh > to ? "shoma" : to > sh ? "to" : "";
   }
   /* سشنِ تازهٔ بی‌نشانه: فقط سشن‌های پیشینی که به مسئله‌های همین پرامپت پیوند دارند (مسئلهٔ حل‌شدهٔ مرتبط در مرورِ بی‌نگاه، مسئلهٔ باز) — همان گفت‌وگویی که به آن ارجاع می‌شود */
@@ -2658,8 +2704,14 @@
   var DEFER_WEAK = /(?:ولی|اما)\s*اول(?![آ-ی])|(?:^|[\s.،])اول\s+[^.؟?!\n]{2,80}?[\s،](?:بعد|سپس)(?![آ-ی])/;
   var DECLINE_RE = /نمی[‌\s]?خوا(?:م|هم)(?:ش)?(?![آ-ی])|لازم\s*نیست|نیازی\s*نیست|بی[‌\s]?خیال/;
   /* جمله‌ها — مرزِ جمله درونِ گیومه («چی رو می‌خوایم پیدا کنیم؟») نیست */
-  function sentsOf(t) { var x = String(t || ""), out = [], cur = "", d = 0;
+  /* قرنطینه (تورِ پولیا RN1 — REMOVAL_CANDIDATES): جمله را در نقطهٔ اعشار هم می‌برید («باز ۳.۶۷ میشه.» ⇒ «۶۷ میشه.») */
+  function sentsOfR18(t) { var x = String(t || ""), out = [], cur = "", d = 0;
     for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); cur += ch; if (ch === "«") d++; else if (ch === "»" && d > 0) d--; else if (!d && /[.!؟?\n]/.test(ch)) { out.push(cur); cur = ""; } }
+    if (cur) out.push(cur); return out.map(function (y) { return y.trim(); }).filter(Boolean); }
+  /* RN1: نقطهٔ میانِ دو رقم («۳.۶۷»، «3.67») اعشار است، نه مرزِ جمله */
+  function sentsOf(t) { var x = String(t || ""), out = [], cur = "", d = 0, DG = /[0-9۰-۹٠-٩]/;
+    for (var i = 0; i < x.length; i++) { var ch = x.charAt(i); cur += ch; if (ch === "«") d++; else if (ch === "»" && d > 0) d--;
+      else if (!d && /[.!؟?\n]/.test(ch)) { if (ch === "." && i > 0 && DG.test(x.charAt(i - 1)) && DG.test(x.charAt(i + 1))) continue; out.push(cur); cur = ""; } }
     if (cur) out.push(cur); return out.map(function (y) { return y.trim(); }).filter(Boolean); }
   /* دورِ ۱۷ (RC1، D·6 s32، B pr2): «درخواستی که عقب افتاد» را مدل گزارش می‌دهد (coach_state.defer {what}، سنجیده با پیام‌های کاربر ⇒ s.promises)؛
      الگوی «بعداً/ولی اول» + فعلِ امری فقط **می‌پرسد** (promAsk، بی ذخیره). promScanR16 = مسیرِ ذخیره‌کنندهٔ دورِ ۱۶ (قرنطینه). */
@@ -2745,9 +2797,9 @@
     var prG = pr && !pr.onGuess && s && s.coach && s.coach.guess && s.coach.guess.key === pr.key ? s.coach.guess.text : "";
     /* RM5c (C·W5 s22): برنامه‌ای که بر حدسِ هنوز نیازموده تکیه دارد ⇒ پیشنهادِ «اول حدس را بیازما»، نه پیگیریِ همان کار (on_guess ِ مدل)؛ حدس و برنامه در یک پیام
        بی گزارشِ on_guess ⇒ همان، شرطی (پیشنهاد/پرسش، نه حکم) */
-    if (pr && pr.onGuess) out.push("# پیگیریِ برنامهٔ خودش\n" + CTX + "کاری که گفت («" + clip(pr.text, 160).replace(/[«»]/g, "") + "») بر حدسی تکیه دارد که هنوز نیازموده" + (s.coach && s.coach.guess && s.coach.guess.text ? " («" + clip(s.coach.guess.text, 80).replace(/[«»]/g, "") + "»)" : "") + " — پیگیریِ همان کار را پیشنهاد نکن؛ به‌جایش یک بار در یک جملهٔ خبری پیشنهاد کن «اول حدس را بیازما» (کدام مشاهدهٔ ارزان حدس را رد یا تأیید می‌کند)؛ این پیشنهاد پرسشِ دوم نیست.");
-    else if (pr && prG) out.push("# پیگیریِ برنامهٔ خودش\n" + CTX + "برنامه‌اش («" + clip(pr.text, 160).replace(/[«»]/g, "") + "») و حدسش («" + clip(prG, 80).replace(/[«»]/g, "") + "») در یک پیام آمدند — اگر آن کار بر همین حدس تکیه دارد، پیگیری را پیشنهاد نکن و به‌جایش «اول حدس را بیازما» را یک بار در یک جملهٔ خبری پیشنهاد کن؛ وگرنه پیگیری را یک بار پیشنهاد کن (نخستین بار " + pr.when + ")؛ «آری» ِ او موعدِ خودش است: {\"do\":\"deadline\",\"what\":\"پیگیری: …\",\"date\":\"" + pr.when + "\"}؛ این پرسشِ دوم نیست.");
-    else if (pr) out.push("# پیگیریِ برنامهٔ خودش\n" + CTX + "برنامهٔ خودش را گفت («" + clip(pr.text, 160).replace(/[«»]/g, "") + "» — با گزارشِ تو و سنجیده با حرفِ خودش): اگر پیگیری‌اش را هنوز یک بار در یک جملهٔ خبری پیشنهاد نکرده‌ای، پیشنهاد کن در «امروز» بیاید (نخستین بار " + pr.when + (A.fdate ? "، " + A.fdate(pr.when) : "") + ")؛ «آری» ِ او موعدِ خودش است: {\"do\":\"deadline\",\"what\":\"پیگیری: …\",\"date\":\"" + pr.when + "\"}؛ این پیشنهاد پرسشِ دوم نیست.");
+    if (pr && pr.onGuess) out.push("# پیگیریِ برنامهٔ خودش\n" + CTX + "کاری که گفت (" + pr.id + ": «" + clip(pr.text, 160).replace(/[«»]/g, "") + "») بر حدسی تکیه دارد که هنوز نیازموده" + (s.coach && s.coach.guess && s.coach.guess.text ? " («" + clip(s.coach.guess.text, 80).replace(/[«»]/g, "") + "»)" : "") + " — پیگیریِ همان کار را پیشنهاد نکن؛ به‌جایش یک بار در یک جملهٔ خبری پیشنهاد کن «اول حدس را بیازما» (کدام مشاهدهٔ ارزان حدس را رد یا تأیید می‌کند)؛ این پیشنهاد پرسشِ دوم نیست.");
+    else if (pr && prG) out.push("# پیگیریِ برنامهٔ خودش\n" + CTX + "برنامه‌اش (" + pr.id + ": «" + clip(pr.text, 160).replace(/[«»]/g, "") + "») و حدسش («" + clip(prG, 80).replace(/[«»]/g, "") + "») در یک پیام آمدند — اگر آن کار بر همین حدس تکیه دارد، پیگیری را پیشنهاد نکن و به‌جایش «اول حدس را بیازما» را یک بار در یک جملهٔ خبری پیشنهاد کن؛ وگرنه پیگیری را یک بار پیشنهاد کن (نخستین بار " + pr.when + ")؛ «آری» ِ او موعدِ خودش است: {\"do\":\"deadline\",\"what\":\"پیگیری: …\",\"date\":\"" + pr.when + "\"}؛ این پرسشِ دوم نیست.");
+    else if (pr) out.push("# پیگیریِ برنامهٔ خودش\n" + CTX + "برنامهٔ خودش را گفت (" + pr.id + ": «" + clip(pr.text, 160).replace(/[«»]/g, "") + "» — با گزارشِ تو و سنجیده با حرفِ خودش): اگر پیگیری‌اش را هنوز یک بار در یک جملهٔ خبری پیشنهاد نکرده‌ای، پیشنهاد کن در «امروز» بیاید (نخستین بار " + pr.when + (A.fdate ? "، " + A.fdate(pr.when) : "") + ")؛ «آری» ِ او موعدِ خودش است: {\"do\":\"deadline\",\"what\":\"پیگیری: …\",\"date\":\"" + pr.when + "\"}؛ این پیشنهاد پرسشِ دوم نیست.");
     else if (pl) out.push("# پیگیریِ برنامهٔ خودش (پشتیبان، شاید)\n" + CTX + "در پیامش زمان و فعلِ اول‌شخص هست («" + clip(pl.sent, 160) + "») — فقط اگر کاری است که خودش از این پس قصد دارد بکند (نه گلایه از عادت یا شکستِ تکراری، نه موعدی که زیرِ آن است، نه گفتهٔ دیگری یا آرزوی مبهم — این را تو داوری کن): {\"do\":\"coach_state\",\"plan\":{\"text\":\"عینِ حرفش\",\"when\":\"YYYY-MM-DD\"}} را گزارش کن و پیگیری را یک بار در یک جملهٔ خبری پیشنهاد کن (نخستین بار " + pl.date + (A.fdate ? "، " + A.fdate(pl.date) : "") + ")؛ «آری» ِ او موعدِ خودش است: {\"do\":\"deadline\",\"what\":\"پیگیری: …\",\"date\":\"" + pl.date + "\"}. وگرنه دربارهٔ پیگیری چیزی نگو؛ این پرسشِ دوم نیست.");
     if (!auto && s) {
       var pidsIn = (out.join("\n").match(/\((pb_[A-Za-z0-9_]+)\)/g) || []).map(function (x) { return x.slice(1, -1); });
@@ -2873,7 +2925,7 @@
     var um = lastUserMsg(s); if (!um) return; var ut = String(um.text || ""), key = mkey(ut), C = s.coach = s.coach || {}, at = String(um.at || nowIso());
     // plan {text, when}
     var pt = txtOf(a.plan);
-    if (pt && quoteIn(pt, ut)) plan18(s, a.plan, pt, key, at);   // تورِ پولیا (RM5): چرخهٔ عمرِ برنامه — planR17 (قرنطینه) مسیرِ پیشین است
+    if (pt && quoteIn(pt, ut)) plan19(s, a.plan, pt, key, at);   // تورِ پولیا (RM5 + RN2d پیوندِ گام): plan18 درونش؛ RM5): چرخهٔ عمرِ برنامه — planR17 (قرنطینه) مسیرِ پیشین است
     if (a.plan_done) planDone18(s, a.plan_done);
     // defer {what} — خواستهٔ خودِ کاربر در همین سشن، عقب‌افتاده در همین پاسخ
     var dw = txtOf(a.defer);
@@ -2894,7 +2946,7 @@
     if (rk) { var sg = regSigns(ut), own = rk === "shoma" ? sg.sh : sg.to; if (own) { C.reg = rk; C.regAt = at; } }
     // guess {text}
     var gt = txtOf(a.guess);
-    if (gt && quoteIn(gt, ut)) { C.guess = { text: clip(gt, 300), key: key, at: at };
+    if (gt && quoteIn(gt, ut)) { C.guess = { text: clip(gt, 300), key: key, at: at }; guessReg(s, gt, key, at);   // RN2d: شناسهٔ حدس برای پیوندِ on_guess
       /* تورِ پولیا (RM4b): حدس روی پیامِ دستیارِ همین نوبت (m.guess) با «q» — همان پرسشی از همین پیام که حدس را می‌آزماید، عیناً زیررشتهٔ آن پیام؛
          «(حدسِ تو: …)» فقط روی گزینه‌ای که از همان q ساخته شد می‌نشیند (سمتِ a38). q ِ ناموجود یا ساختگی ⇒ m.guess بی q (هیچ یادداشتی). guessMsgR17 = مسیرِ پیشین */
       var gq = a.guess && typeof a.guess === "object" ? String(a.guess.q || "").trim() : "";
@@ -2906,7 +2958,12 @@
        نه قصدِ آینده)؛ پیام = همین پیامِ کاربر (شمارهٔ ۱‌پایه) مگر مدل نقلِ عینیِ پیامِ دیگری را داد */
     if (a.step && typeof a.step === "object" && A.liveStepReport) { var bl19 = AS.boundLive(s), spid = (bl19 && bl19.pid) || s.lprob || "";
       if (spid) { var nU = (s.msgs || []).filter(function (m) { return m && m.role === "user"; }).length, so19 = Object.assign({}, a.step); if (so19.msg == null || so19.msg === "") so19.msg = nU;
-        try { C.stepRep = { key: key, res: String(A.liveStepReport(spid, so19, s.id) || "") }; } catch (e) { } } }
+        try { var t19 = nowIso(); C.stepRep = { key: key, res: String(A.liveStepReport(spid, so19, s.id) || "") };
+          if (/^✓/.test(C.stepRep.res)) { var st19 = stepTouched(spid, t19); if (st19) C.stepRep.act = "lstep:" + spid + ":" + st19.id; } } catch (e) { } } }
+    /* RN2d: guess_res {id|text, res: refuted|confirmed} — سرانجامِ حدسی که پیش‌تر گفت، وقتی همین پیامش نتیجهٔ آزمودنش را می‌گوید (حدسِ ثبت‌شدهٔ همین سشن؛ پیامِ واقعی، نه «آره») */
+    var gr = a.guess_res && typeof a.guess_res === "object" ? a.guess_res : null, grr = gr && /^(?:refuted|confirmed)$/.test(String(gr.res || "")) ? String(gr.res) : "";
+    if (grr && realReply(ut) && tokN(ownText(ut)).length >= 2) { var G19 = C.guesses || [], gx = G19.filter(function (g) { return g.id === String(gr.id || ""); })[0] || G19.filter(function (g) { return gr.text && (quoteIn(String(gr.text), g.text) || quoteIn(g.text, String(gr.text))); })[0];
+      if (gx && gx.key !== key) { gx.res = grr; gx.resAt = at; gx.resKey = key; } }
     // check {msgs:[…]}
     var ck = a.check && typeof a.check === "object" ? a.check.msgs : null;
     if (Array.isArray(ck)) { var mine = chatClosed().filter(function (x) { return (x.L.chat || {}).sess === s.id; }).pop();
@@ -2951,8 +3008,8 @@
   AS.R16_QUARANTINE = { dupLink: dupLinkR16, promScan: promScanR16, regOf: regOfR16, verdict: verdictR16 };
   /* سطرِ «گزارشِ وضع ِ همه‌جا»: فیلدهای تازهٔ coach_state در هر نوبت (نه فقط مربی) — در قلاب، نه SYS */
   var STATE_X = "# گزارشِ وضع (همهٔ نوبت‌ها)\n" + CTX17 + "در actions یک {\"do\":\"coach_state\",…} با این فیلدها بده — هر کدام **فقط** وقتی در آخرین پیامِ کاربر هست، و متن را عیناً از حرفِ خودش نقل کن (صفحه با پیامش می‌سنجد؛ نقلِ ساختگی رد می‌شود): " +
-    "plan {\"text\":\"…\",\"when\":\"YYYY-MM-DD\"} = کاری که خودش از این پس قصد دارد بکند با زمانش (نه گلایه از عادت، نه موعدی که زیرش است، نه گفتهٔ دیگری)؛ قولِ بی‌تاریخ به خودش («دیگه … نمی‌کنم»، «از این به بعد …») ⇒ \"when\":\"next-session\"؛ اگر همان برنامهٔ پیشین را دوباره گفت ⇒ \"same\":\"plN\"؛ اگر آن کار بر حدسی تکیه دارد که هنوز نیازموده ⇒ \"on_guess\":true؛ plan_done {\"id\":\"plN\",\"done\":true|false} = وقتی خودش گفت برنامه‌اش را انجام داد یا نداد؛ defer {\"what\":\"…\"} = آنچه خودش از تو خواست و تو در همین پاسخ عقب انداختی (نه پرسشِ خودت، نه آنچه همین حالا دادی)؛ " +
-    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده).";
+    "plan {\"text\":\"…\",\"when\":\"YYYY-MM-DD\"} = کاری که خودش از این پس قصد دارد بکند با زمانش (نه گلایه از عادت، نه موعدی که زیرش است، نه گفتهٔ دیگری)؛ قولِ بی‌تاریخ به خودش («دیگه … نمی‌کنم»، «از این به بعد …») ⇒ \"when\":\"next-session\"؛ اگر همان برنامهٔ پیشین را دوباره گفت ⇒ \"same\":\"plN\"؛ اگر آن کار بر حدسی تکیه دارد که هنوز نیازموده ⇒ \"on_guess\":true؛ اگر همان گامی از مسئلهٔ زنده‌اش است ⇒ \"step\":\"شمارهٔ ۱‌پایهٔ گام\"؛ plan_done {\"id\":\"plN\",\"done\":true|false} = وقتی خودش گفت برنامه‌اش را انجام داد یا نداد؛ defer {\"what\":\"…\"} = آنچه خودش از تو خواست و تو در همین پاسخ عقب انداختی (نه پرسشِ خودت، نه آنچه همین حالا دادی)؛ " +
+    "taste {\"text\":\"…\"} = سلیقه‌اش دربارهٔ نوعِ مسئله، یا \"unknown\" اگر گفت نمی‌داند؛ register \"تو\"|\"شما\" = ضمیری که خودش با تو به کار برد؛ guess {\"text\":\"…\",\"q\":\"…\"} = مقدار/فرمول/ادعایی که به‌عنوانِ شاید درست پیش گذاشت، و q = همان جمله‌ای از همین پاسخِ خودت که این حدس را می‌آزماید، عیناً (اگر چنین جمله‌ای نیست، q نده)؛ check {\"msgs\":[\"تکه‌ای عینی از هر پیامِ خودش که وارسی در آن است\"]} = هنگامِ بستن؛ step {\"step\":\"شمارهٔ ۱‌پایه یا متنِ گام\",\"done\":\"yes|part|no\",\"what\":\"…\",\"match\":\"yes|part|no\"} = وقتی گفت گامی از مسئلهٔ زنده‌اش را انجام داد، تاحدی، یا نداد (نه قصدِ آینده)؛ result \"…\" = همراهِ said:[\"result\"]، عینِ نتیجه‌ای که در همین پیامش گفت (نتیجه‌ای که در پیامش نیست رد می‌شود)؛ guess_res {\"id\":\"gN\",\"res\":\"refuted|confirmed\"} = وقتی همین پیامش نتیجهٔ آزمودنِ حدسی را می‌گوید که پیش‌تر گفته بود.";
   AS.COACH_STATE_X = STATE_X;
   AS.promptFilters.push(function (outs, s, msg) {
     var out = outs.slice(), mt = String(msg || "").trim(), auto = /^\[سامانه/.test(mt);
@@ -3000,13 +3057,13 @@
     var PL = s.plans = s.plans || [], og = o && typeof o === "object" && (o.on_guess === true || o.on_guess === "true");
     PL.push({ id: "pl" + (AP.length + 1), text: clip(pt, 300), when: when, at: at, d: td, key: key, done: false, state: "open", sess: s.id, onGuess: og || undefined });
   }
-  function planDone18(s, pd) {
+  function planDoneR18(s, pd) {
     var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
     var x = plansAll(s).filter(function (y) { return y.p.id === String(id || "") && !(y.p.state === "done" || y.p.state === "notdone"); })[0]; if (!x) return;
     x.p.done = true; x.p.state = ok ? "done" : "notdone"; x.p.doneAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { }
   }
   /* برنامه‌ای که موعدش گذشت (یا قولِ بی‌تاریخِ سشنِ پیش): یک بار «انجام شد؟»؛ پرسیده و بی پاسخ در نوبتِ بعد ⇒ expired (دیگر پرسیده نمی‌شود) */
-  function plansDue(s, mt) {
+  function plansDueR18(s, mt) {
     var td = A.today(), k0 = mkey(mt), out = [];
     plansAll(s).forEach(function (x) { var q = x.p; if (!planOpen(q)) return;
       if (q.askKey && q.askKey !== k0) { q.state = "expired"; q.expiredAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { } return; }
@@ -3016,24 +3073,165 @@
       out.push(q); });
     return out;
   }
+  /* ---------- RN2d (تورِ پولیا، دورِ ۱۹): یک کار، یک وضع — برنامه ⇄ گامِ زنده و برنامه ⇄ حدس ----------
+     برنامه‌ای که مدل گفت همان گامِ مسئلهٔ زنده است (plan.step، یا plan.same با شناسه/شمارهٔ گام؛ یا متنِ عیناً همان گام) وضعش را از همان گام می‌گیرد (دادهٔ a38، خوانده
+     نه نوشته)؛ برنامه‌ای که بر حدسی تکیه دارد (on_guess) با رد یا تأییدِ همان حدس «برای بازنگری بسته» است (نه «انجام شد؟»). «انجام شد؟» هرگز برای کاری که ثبت شده. */
+  function lsteps(pid) { var L = ((((S.get("eprog_" + pid) || {}).solve) || {}).live) || {}; return L.steps || []; }
+  function stepRef(pid, ref) {
+    var St = lsteps(pid), k = String(ref == null ? "" : ref).trim(); if (!k) return null;
+    var byId = St.filter(function (x) { return x && x.id === k; })[0]; if (byId) return byId;
+    var m = /^(?:s|step|گام\s*)?([0-9۰-۹]+)$/i.exec(k); if (m) return St[+faDigits(m[1]) - 1] || null;
+    if (k.length >= 3) { var nk = qNorm(k); return St.filter(function (x) { var nx = qNorm(x && x.text); return nx && (nx === nk || (nk.length >= 6 && (nx.indexOf(nk) >= 0 || nk.indexOf(nx) >= 0))); })[0] || null; }
+    return null;
+  }
+  function stepTouched(pid, since) { var best = null, bt = ""; lsteps(pid).forEach(function (st) { var t = [String((st.chatRep || {}).at || ""), String((st.out || {}).at || "")].sort().pop(); if (t && t >= since && t > bt) { bt = t; best = st; } }); return best; }
+  function stepDone(st) { var o = st && st.out && !st.out.auto && st.out.done ? st.out : st && st.chatRep && st.chatRep.done ? st.chatRep : null; return o ? o.done : ""; }
+  function sessPid(s) { try { var bl = AS.boundLive(s); if (bl && bl.pid) return bl.pid; } catch (e) { } return (s && s.lprob) || ""; }
+  /* حدس‌های سنجیدهٔ سشن با شناسه (g1، g2…) — برای پیوندِ on_guess */
+  function guessReg(s, gt, key, at) { var C = s.coach = s.coach || {}, G = C.guesses = C.guesses || [], ex = G.filter(function (g) { return qNorm(g.text) === qNorm(gt); })[0];
+    if (ex) return ex; var g = { id: "g" + (G.length + 1), text: clip(gt, 300), key: key, at: at }; G.push(g); return g; }
+  function guessOfPlan(x) { var q = x.p, G = ((x.s.coach || {}).guesses) || []; if (q.guessId) return G.filter(function (g) { return g.id === q.guessId; })[0] || null;
+    var same = G.filter(function (g) { return g.key === q.key; }).pop(); if (same) return same;
+    return G.filter(function (g) { return String(g.at || "") <= String(q.at || "~"); }).pop() || null; }
+  function guessFate(x, g) {
+    if (!g) return ""; if (g.res) return g.res;
+    var s = x.s, pids = {}; [sessPid(s), s.lprob].concat((s.lprobLog || []).map(function (e) { return e && e.p; })).forEach(function (p) { if (p) pids[p] = 1; });
+    try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { if (r && r.sess === s.id) pids[r.p.id] = 1; }); } catch (e) { }
+    var out = "";
+    Object.keys(pids).some(function (pid) { var so = (S.get("eprog_" + pid) || {}).solve || {}, L = so.live || {}, g1 = so.g && so.g[1];
+      return [g1].concat(L.guessHist || []).some(function (c) { if (!c || !c.guess || !(quoteIn(g.text, c.guess) || quoteIn(c.guess, g.text))) return false;
+        if (c.refutedAt || c.refuted || c.hit === "نادرست بود") { out = "refuted"; return true; }
+        if (c.proved || c.hit === "درست بود") { out = "confirmed"; return true; }
+        if (c === g1) { var rel = ""; (L.steps || []).forEach(function (st) { var gg = st && st.out && st.out.guess; if (gg && (!c.since || String(st.out.at) > c.since) && (gg.rel === "refute" || gg.rel === "confirm")) rel = gg.rel; });
+          if (rel) { out = rel === "refute" ? "refuted" : "confirmed"; return true; } }
+        return false; }); });
+    return out;
+  }
+  /* وضعِ مؤثرِ برنامه از پیوندهایش (یک بار نوشته می‌شود تا «امروز»، پرامپت و کارنامه یکی بخوانند) */
+  function planSync(x) {
+    var q = x.p; if (!planOpen(q)) return q.state || "open";
+    if (q.step && q.step.pid) { var d = stepDone(stepRef(q.step.pid, q.step.id)); if (d) { q.done = true; q.state = d === "no" ? "notdone" : "done"; q.doneAt = nowIso(); q.via = "step"; if (x.s) try { S.put(x.s); } catch (e) { } return q.state; } }
+    if (q.onGuess) { var f = guessFate(x, guessOfPlan(x)); if (f) { q.state = "review"; q.guessFate = f; q.reviewAt = nowIso(); if (x.s) try { S.put(x.s); } catch (e) { } return q.state; } }
+    return "open";
+  }
+  AS.planSync = planSync;
+  function plan19(s, o, pt, key, at) {
+    var n0 = (s.plans || []).length; plan18(s, o, pt, key, at);
+    var AP = plansAll(s), q = (s.plans || []).length > n0 ? s.plans[s.plans.length - 1] : (o && o.same ? (AP.filter(function (x) { return x.p.id === String(o.same); })[0] || {}).p : null);
+    var pid = sessPid(s), ref = o && typeof o === "object" ? (o.step != null && o.step !== "" ? o.step : (o.same && !/^pl\d+$/i.test(String(o.same)) ? o.same : null)) : null;
+    if (!q && ref != null && pid) {   // «same» = شناسهٔ گام (نه برنامه): برنامه همان گام است — برنامهٔ تازه با پیوند
+      var st0 = stepRef(pid, ref); if (st0) { var PL = s.plans = s.plans || []; q = { id: "pl" + (AP.length + 1), text: clip(pt, 300), when: "", at: at, d: A.today(), key: key, done: false, state: "open", sess: s.id, step: { pid: pid, id: st0.id } }; PL.push(q); }
+    }
+    if (!q || !pid) return;
+    if (!q.step) { var st = ref != null ? stepRef(pid, ref) : lsteps(pid).filter(function (x) { return x && qNorm(x.text) && qNorm(x.text) === qNorm(q.text); })[0]; if (st) q.step = { pid: pid, id: st.id }; }
+  }
+  function planDone18(s, pd) {
+    var id = typeof pd === "string" ? pd : pd && (pd.id || pd.plan), ok = !(pd && typeof pd === "object" && (pd.done === false || pd.done === "false"));
+    var x = plansAll(s).filter(function (y) { return y.p.id === String(id || "") && !(y.p.state === "done" || y.p.state === "notdone"); })[0]; if (!x) return;
+    x.p.done = true; x.p.state = ok ? "done" : "notdone"; x.p.doneAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { }
+    /* RN2d/RN3c: همان کار ⇒ گامِ پیوسته هم همین وضع (از راهِ a38، با پیامِ خودش)؛ انجام‌شده ⇒ یک موفقیتِ اجرا با شناسهٔ همان کار */
+    var um = lastUserMsg(s), act = x.p.step ? "lstep:" + x.p.step.pid + ":" + x.p.step.id : "pl:" + x.p.id;
+    if (x.p.step && A.liveStepReport && um) { try { var nU = (s.msgs || []).filter(function (m) { return m && m.role === "user"; }).length; A.liveStepReport(x.p.step.pid, { step: x.p.step.id, done: ok ? "yes" : "no", msg: nU }, s.id); } catch (e) { } }
+    if (ok && um && !(s.coach && s.coach.teach)) coachEv(s, "c", "chatok", String(um.text || ""), true, { how: "plan_done", act: act });
+  }
+  /* «انجام شد؟» فقط برای برنامهٔ بازِ بی‌پیوندِ حل‌شده؛ برنامهٔ on_guess با حدسِ هنوز نیازموده ⇒ «اول حدس را بیازما» (نه «انجام شد؟») */
+  function plansDue(s, mt) {
+    var td = A.today(), k0 = mkey(mt), out = [];
+    plansAll(s).forEach(function (x) { var q = x.p; if (planSync(x) !== "open") return;
+      if (q.snooze && String(q.snooze) > td) return;
+      if (q.askKey && q.askKey !== k0) { q.state = "expired"; q.expiredAt = nowIso(); if (x.s !== s) try { S.put(x.s); } catch (e) { } return; }
+      var due = q.when === "next-session" ? q.sess && q.sess !== s.id : !!q.when && String(q.when) < td;
+      if (!due) return;
+      if (q.onGuess) { if (q.gAskKey && q.gAskKey !== k0) return; if (!q.gAskKey) { q.gAskKey = k0; if (x.s !== s) try { S.put(x.s); } catch (e) { } } var g = guessOfPlan(x); out.push(Object.assign({}, q, { guessWait: g ? g.id + ": «" + clip(g.text, 80).replace(/[«»]/g, "") + "»" : "—" })); return; }
+      if (!q.askKey) { q.askKey = k0; q.askD = td; q.askSess = s.id; if (x.s !== s) try { S.put(x.s); } catch (e) { } }
+      out.push(q); });
+    return out;
+  }
   AS.plansDue = plansDue;
+  /* یک تپِ «امروز» (INF10): همان وضعِ برنامه که plan_done ِ گفت‌وگو می‌نویسد؛ «هنوز نه» ⇒ باز می‌ماند، تا فردا پنهان، و دست‌کم یک بارِ دیگر پرسیده می‌شود (نه بیشتر) */
+  function planTap(pid, v) {
+    var x = plansAll(null).filter(function (y) { return y.p.id === pid; })[0]; if (!x || !planOpen(x.p)) return false; var q = x.p;
+    if (v === "notyet") { q.notYet = (q.notYet || 0) + 1; delete q.askKey; delete q.askD; delete q.askSess; q.snooze = A.addDays(A.today(), 1); q.notYetAt = nowIso(); }
+    else { q.done = true; q.state = v === "done" ? "done" : "notdone"; q.doneAt = nowIso(); q.by = "today"; }
+    try { S.put(x.s); } catch (e) { } return true;
+  }
+  AS.planTap = planTap;
   /* ---------- RM5d: درخواستِ عقب‌افتاده‌ای که گزارشِ وضعش نیامد — نامزد فقط پرسیده می‌شود («اگر هنوز پاسخش نداده‌ای…»)، هرگز ذخیره ---------- */
   var REQ18_IMP = new RegExp("(?:^|[\\s،])(?:[بن](?:" + STEMS + "|نداز|فرمایید|فرما)(?:ید|ین|ش)?|(?:معرفی|آماده|درست|خلاصه|تهیه|کمک|توضیح)\\s*(?:کن|کنید|کنین|بکن|بده|بدید|بدین|بفرمایید))(?![آ-ی‌])");
   var REQ18_WANT = /(?:^|[\s،])(?:لطفاً|لطفا|میشه|می[‌\s]شه|می[‌\s]?شود|ممکنه|ممکن\s*است|می[‌\s]?خوام\s*(?:بدونم|بفهمم|یاد\s*بگیرم)|یادم\s*بنداز)(?![آ-ی‌])/;
   var ANS18 = /(?:جواب|پاسخ|راه[‌\s]?حل)\S*\s*(?:نهایی\s*)?(?:رو|را)?\s*(?:هم\s*)?(?:بگو|بده|بنویس|بفرست)(?![آ-ی‌])/;
   var RHET18 = /^(?:آخه|مگه|کی\s*حوصله)|حوصله\s*داره\s*[؟?]/;
-  function deferCand(s) {
+  /* قرنطینه (تورِ پولیا RN1 — REMOVAL_CANDIDATES): آشکارسازی که تنها داوری می‌کرد — آخرین پیامِ دستیار (اغلب پاسخِ نوبتِ «[سامانه: …]») را با پیامِ کاربر جفت
+     می‌کرد، «می‌شه» ِ رابط را درخواست می‌خواند و «پوشش» را با هم‌پوشانیِ واژه می‌سنجید */
+  function deferCandR18(s) {
     var M = (s && s.msgs) || [], ai = -1; for (var i = M.length - 1; i >= 0; i--) if (M[i] && M[i].role === "ai") { ai = i; break; }
     if (ai < 0) return ""; var m = M[ai];
     if ((m.actions || []).indexOf("coach_state") >= 0) return "";   // مدل گزارش داد (با defer یا بی آن) ⇒ داوریِ خودش
     if ((s.promises || []).some(function (x) { return x.at === String(m.at || ""); })) return "";
     var u = null; for (var j = ai - 1; j >= 0; j--) if (isUser(M[j])) { u = M[j]; break; } if (!u) return "";
     var aTok = tokN(m.text);
-    return sentsOf(ownText(u.text)).filter(function (x) { var o = x.replace(/«»/g, " ").trim(), oq = o.replace(/^[\s،:]+/, "");
+    return sentsOfR18(ownText(u.text)).filter(function (x) { var o = x.replace(/«»/g, " ").trim(), oq = o.replace(/^[\s،:]+/, "");
       if (!oq || RHET18.test(oq) || ANS18.test(oq) || ONLY_ANS_RE.test(oq)) return false;   // خواستنِ خودِ جواب درخواستی نیست که مربی بدهکارش باشد
       var req = REQ18_IMP.test(oq) || REQ18_WANT.test(oq) || /[؟?]\s*$/.test(oq); if (!req) return false;
       var tk = tokN(oq); return !(tk.length && tk.filter(function (w) { return aTok.indexOf(w) >= 0; }).length * 2 >= tk.length);   // همان پاسخ به آن پرداخت ⇒ نامزد نیست
     }).map(function (x) { return x.replace(/«»/g, "").trim(); })[0] || "";
+  }
+  /* ---------- RN1 (تورِ پولیا، دورِ ۱۹): نامزدِ درخواستِ عقب‌افتاده — هر پیامِ کاربر با **پاسخِ خودش** (نخستین پیامِ دستیار پس از آن، پیش از پیامِ بعدیِ کاربر؛
+     پاسخِ نوبت‌های «[سامانه: …]» پاسخِ او نیست) جفت می‌شود؛ نامزد فقط وقتی هست که همان پاسخ گزارشِ وضع نداشت؛ و فقط درخواستی رو به دستیار:
+     امر («بگو»، «توضیح بده»، «یادم بده»، «بزنید»)، «لطفاً…»، «یادم بنداز»، یا «میشه/می‌شه … ؟» با فعل یا ضمیرِ خطاب («بهم بدی؟»، «بگی…؟») — نه «میشه» ِ رابط
+     («۲.۵ برابر میشه»، «جمعشون می‌شه ۱۲۰»)، نه «میشه … حلش کرد؟» ِ بی‌خطاب، نه حدس، نه پرسشِ خودِ مسئله، نه شرطِ شیوهٔ پاسخ («جوابو نگو، فقط راهنمایی کن»)،
+     نه درخواستی که کارِ صفحه همان‌جا انجامش داد («بیا ثبتش کنیم» ⇐ «[سامانه: … ثبت شد]»)، نه قولی که هست یا بسته شد. هم‌پوشانیِ واژه با پاسخ «پوشش» نیست
+     (پاسخی که درخواست را نقل کرد و عقب انداخت همان عقب‌انداختن است). همچنان فقط می‌پرسد («اگر هنوز پاسخش نداده‌ای…»)، هرگز ذخیره نمی‌کند. */
+  var REQ19_IMP = new RegExp("(?:^|[\\s،‌])(?:ب(?:" + STEMS + "|نداز|فرمایید|فرما|زن|ده)(?:ید|ین|ش|م|مون)?|(?:معرفی|آماده|درست|خلاصه|تهیه|کمک|توضیح|یاد|نشون|نشان|راهنمایی|مثال|ثبت)(?:م|ش|مون)?\\s*(?:کن|کنید|کنین|بکن|بده|بدید|بدین|بدهید|بفرمایید|بزن|بزنید|بزنین))(?![آ-ی‌])");
+  var REQ19_WANT = /(?:^|[\s،])(?:لطفاً|لطفا|خواهشاً|خواهشا|می[‌\s]?خوام\s*(?:بدونم|بفهمم|یاد\s*بگیرم)|یادم\s*بنداز)(?![آ-ی‌])/;
+  var REQ19_MAY = /(?:^|[\s،])(?:می[‌\s]?شه|میشه|می[‌\s]?شود|ممکنه|امکانش\s*هست)(?![آ-ی‌])/;
+  var ADDR19 = /(?:^|[\s‌])(?:ب[آ-ی]{1,8}(?:ی|ید|ین)|(?:کنی|کنید|کنین|بدی|بدید|بگی|بگید))(?![آ-ی‌])|(?:^|[\s‌])(?:برام|بهم|واسم|بهمون|برامون|برایم|برایمان|به\s*من)(?![آ-ی‌])/;
+  var NEG_IMP19 = new RegExp("(?:^|[\\s،‌])ن(?:" + STEMS + ")(?:ید|ین|ش)?(?![آ-ی‌])");
+  var PAGE_ACT19 = /(?:ثبت|ذخیره|بساز|ساخت|بازش|باز\s*کن)/;
+  /* پرسشِ اطلاعیِ رو به دستیار (چرا/چطور/از کجا/به چه درد…؟) هم خواسته‌ای است که می‌تواند عقب بیفتد (بانکِ دورِ ۱۸ همچنان سبز)؛ پرسشِ بله/نه («میشه … حلش کرد؟»)،
+     واژهٔ آزمایشی («رمهب‌ستان؟»)، حدس («شاید…؟»، «فکر کنم…؟») و پژواکِ پرسشِ خودِ دستیار نه */
+  var WHQ19 = /(?:^|[\s،:‌])(?:چه|چی|چیه|چرا|چطور|چطوری|چگونه|کجا|کجاست|کی|کدام|کدوم|چند|چقدر)(?![آ-ی‌])/;
+  var GUESSQ19 = /^(?:(?:خب|پس|آهان)\s*)*(?:فکر\s*(?:کنم|می[‌\s]?کنم)|شاید|به\s*نظرم|یعنی|احتمالاً|احتمالا|گمونم|گمانم)(?![آ-ی‌])/;
+  function isReq19(o) {
+    if (REQ19_IMP.test(o) || REQ19_WANT.test(o)) return true;
+    return REQ19_MAY.test(o) && /[؟?]\s*$/.test(o) && ADDR19.test(o);
+  }
+  function isAsk19(o) { return /[؟?]\s*$/.test(o) && WHQ19.test(o) && !REQ19_MAY.test(o) && !GUESSQ19.test(o.replace(/^[^:]{0,20}:\s*/, "")) && tokN(o).length >= 3; }
+  function pairPrev(s, mt) {
+    var M = (s && s.msgs) || [], ui = []; M.forEach(function (m, i) { if (isUser(m)) ui.push(i); });
+    if (!ui.length) return null; var last = ui[ui.length - 1];
+    var pu = mt != null && String(M[last].text || "").trim() === String(mt).trim() ? ui[ui.length - 2] : last;
+    if (pu == null || pu < 0) return null;
+    var rep = null, after = [], before = null;
+    for (var j = pu + 1; j < M.length; j++) { var x = M[j]; if (!x) continue; if (isUser(x)) break; if (!rep && x.role === "ai") { rep = x; continue; } if (rep) after.push(x); }
+    for (var k = pu - 1; k >= 0; k--) { if (M[k] && M[k].role === "ai") { before = M[k]; break; } if (isUser(M[k])) break; }
+    return rep ? { u: M[pu], rep: rep, after: after, before: before } : null;
+  }
+  function deferCand(s, mt) {
+    var pp = pairPrev(s, mt); if (!pp) return "";
+    if ((pp.rep.actions || []).indexOf("coach_state") >= 0) return "";   // پاسخِ خودِ آن پیام گزارش داد (با defer یا بی آن) ⇒ داوریِ مدل
+    /* صورتِ مسئلهٔ زندهٔ ثبت‌شده (نه C.stmt ِ گفت‌وگو — آن نخستین پیامِ هر سشن است، حتی وقتی خودش یک درخواست است) */
+    var stm = []; try { var bl = AS.boundLive(s); if (bl && bl.r && bl.r.p) stm.push(bl.r.p.statement || ""); var C0 = s.coach || {}; if (C0.stmt && C0.stmt !== clip(pp.u.text, 400)) stm.push(C0.stmt); } catch (e) { }
+    var bTok = pp.before ? tokN(ownText(pp.before.text)) : [];
+    var afterT = pp.after.map(function (x) { return String(x.text || ""); }).join("\n");
+    var PR = (s.promises || []), teach = false; try { teach = teachMode(s, pp.u.text); } catch (e) { }
+    var outs = [];
+    sentsOf(ownText(pp.u.text)).forEach(function (x) {
+      var o = x.replace(/«»/g, " ").trim(); if (!o) return;
+      if (NEG_IMP19.test(o) || RHET18.test(o) || ANS18.test(o) || ONLY_ANS_RE.test(o)) return;   // شرطِ شیوهٔ پاسخ یا خواستنِ خودِ جواب
+      var parts = o.split(/،\s*/), k = -1; parts.forEach(function (p, i) { if (k < 0 && isReq19(p.trim())) k = i; });
+      if (k < 0) { if (!isReq19(o) && !isAsk19(o)) return; k = 0; }
+      var c = parts.slice(k).join("، ").replace(/^[\s،:]+/, "").trim(); if (!c) return;
+      if (!isReq19(c)) { var ct = tokN(c); if (ct.length && ct.every(function (w) { return bTok.indexOf(w) >= 0; })) return;   // پژواکِ پرسشِ خودِ دستیار
+        /* پرسشِ اطلاعی: پاسخی که با همان واژه‌ها به آن پرداخت و عقبش نینداخت ⇒ داده شد؛ پاسخی که نقلش کرد و عقب انداخت («بگذار برای وقتی…») ⇒ همچنان نامزد */
+        var rt = String(pp.rep.text || ""), rTok = tokN(rt); if (!DEFER_STRONG.test(rt) && !DEFER_WEAK.test(rt) && ct.length && ct.filter(function (w) { return rTok.indexOf(w) >= 0; }).length * 2 >= ct.length) return; }
+      if (guessNow(c, teach)) return;
+      if (stm.some(function (t) { return t && (quoteIn(c, t) || sameStmt(c, t)); })) return;   // پرسشِ خودِ مسئله
+      if (PR.some(function (p) { return p && p.ask && (quoteIn(p.ask, c) || quoteIn(c, p.ask)); })) return;   // قولی که هست یا بسته شد
+      var pa = PAGE_ACT19.exec(c); if (pa && afterT.indexOf(pa[0].replace(/ش$/, "")) >= 0 && /شد|انجام/.test(afterT)) return;   // کارِ صفحه همان‌جا انجامش داد
+      outs.push(c);
+    });
+    return outs[0] || "";
   }
   AS.deferCandidate = deferCand;
   /* ---------- پالایهٔ این دور ---------- */
@@ -3052,11 +3250,17 @@
     /* RM5a/e: برنامه‌ای که موعدش گذشت، یا قولِ بی‌تاریخِ سشنِ پیش — یک بار «انجام شد؟» */
     try { var due = plansDue(s, mt);
       if (due.length) out.push("# برنامهٔ خودش که موعدش رسید\n" + due.map(function (q) {
-        return CTX18 + (q.when === "next-session" ? "در سشنِ پیش به خودش گفت «" + clip(q.text, 160).replace(/[«»]/g, "") + "»" : "برنامهٔ خودش «" + clip(q.text, 160).replace(/[«»]/g, "") + "» (موعد " + q.when + (A.fdate ? "، " + A.fdate(q.when) : "") + ") گذشته است") +
+        if (q.guessWait) return CTX18 + q.id + ": برنامه‌اش «" + clip(q.text, 160).replace(/[«»]/g, "") + "» بر حدسِ " + q.guessWait + " تکیه دارد که هنوز آزموده نشده — پیگیریِ انجامش را پیش نکش؛ اگر به کار آمد، یک بار در یک جملهٔ خبری پیشنهاد کن «اول حدس را بیازما»؛ وقتی نتیجهٔ آزمودنش را گفت ⇒ {\"do\":\"coach_state\",\"guess_res\":{\"id\":\"" + (/^g\d+/.exec(q.guessWait) || ["gN"])[0] + "\",\"res\":\"refuted|confirmed\"}}.";
+        return CTX18 + q.id + ": " + (q.when === "next-session" ? "در سشنِ پیش به خودش گفت «" + clip(q.text, 160).replace(/[«»]/g, "") + "»" : "برنامهٔ خودش «" + clip(q.text, 160).replace(/[«»]/g, "") + "» (موعد " + q.when + (A.fdate ? "، " + A.fdate(q.when) : "") + ") گذشته است") +
           " — اگر هنوز جویا نشده‌ای، یک بار و کوتاه، در یک جملهٔ خبری‌پرسشی کنارِ همان یک پرسشِ نوبت، جویا شو انجام شد یا نه؛ پاسخش ⇒ {\"do\":\"coach_state\",\"plan_done\":{\"id\":\"" + q.id + "\",\"done\":true|false}}؛ اگر نگفت، دیگر پیگیرش نشو."; }).join("\n"));
     } catch (e) { }
+    /* RN6d: برنامه‌های بازِ خودش با شناسه — تا same / plan_done / step بی حدس گزارش شود (هر سطرِ برنامه شناسه دارد) */
+    try { var OP = plansAll(s).filter(function (x) { return planSync(x) === "open"; }).slice(-6);
+      if (OP.length) out.push("# برنامه‌های بازِ خودش (شناسه‌ها)\n" + CTX18 + OP.map(function (x) { var q = x.p; return q.id + ": «" + clip(plainTx(q.text), 100).replace(/[«»]/g, "") + "»" + (q.when === "next-session" ? " (قولِ بی‌تاریخ)" : q.when ? " (موعد " + q.when + ")" : "") + (q.step ? " = گامِ مسئلهٔ زنده" : "") + (q.onGuess ? " (بر حدس)" : ""); }).join(" · ") +
+        " — اگر یکی را دوباره گفت ⇒ plan.same همان شناسه؛ اگر گفت انجامش داد یا نداد ⇒ plan_done با همان شناسه؛ اگر همان گامِ مسئلهٔ زنده است ⇒ plan.step شمارهٔ گام.");
+    } catch (e) { }
     /* RM5d: نامزدِ درخواستِ عقب‌افتاده (گزارشِ وضع نیامد) */
-    try { if (!out.some(function (x) { return /^# درخواستِ عقب‌افتاده/.test(x); })) { var dc = deferCand(s);
+    try { if (!out.some(function (x) { return /^# درخواستِ عقب‌افتاده/.test(x); })) { var dc = deferCand(s, mt);
       if (dc) out.push("# درخواستِ عقب‌افتاده (نامزد، شاید)\n" + CTX18 + "در پیامِ پیشینش خواسته یا پرسشی بود («" + clip(dc, 140).replace(/[«»]/g, "") + "») و گزارشِ وضعِ آن نوبت نیامد — اگر هنوز پاسخش نداده‌ای، گم نشود: {\"do\":\"coach_state\",\"defer\":{\"what\":\"عینِ خواسته‌اش\"}} را گزارش کن و به وقتش بده؛ اگر همان‌جا دادی یا خواسته‌ای نبود، این سطر را نادیده بگیر."); } } catch (e) { }
     return out;
   });
@@ -3075,9 +3279,13 @@
     var rawDueP = A.dueList;
     A.dueList = function () {
       var items = rawDueP.apply(this, arguments) || [], td = A.today();
-      try { plansAll(null).forEach(function (x) { var q = x.p; if (!planOpen(q)) return; if (q.when !== "next-session" && String(q.when) > td) return;
-        items.push({ k: "p", txt: "📌 برنامهٔ خودت: «" + clip(plainTx(q.text), 90) + "»", sub: q.when === "next-session" ? "قولِ بی‌تاریخ به خودت — چطور پیش رفت؟" : "موعد: " + (A.fdate ? A.fdate(q.when) : q.when) + " — انجام شد؟",
-          go: function () { try { localStorage.setItem("lla.assist.cur", x.s.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); }); } catch (e) { }
+      /* RN2d: وضعِ مؤثر (گامِ پیوسته، سرانجامِ حدس) پیش از نمایش؛ INF10: یک‌تپ «انجام دادم / انجام ندادم / هنوز نه» — همان وضعِ plan_done (AS.planTap) */
+      try { plansAll(null).forEach(function (x) { var q = x.p; if (planSync(x) !== "open") return; if (q.when !== "next-session" && (!q.when || String(q.when) > td)) return; if (q.snooze && String(q.snooze) > td) return;
+        var rer = function () { if (A.state && A.state.view === "home" && A.render) A.render(); };
+        var acts = [{ t: "انجام دادم", v: "done" }, { t: "انجام ندادم", v: "notdone" }].concat(q.notYet ? [] : [{ t: "هنوز نه", v: "notyet" }]).map(function (b) {
+          return { t: b.t, cls: "dopt plan-tap plan-" + b.v, fn: function () { if (planTap(q.id, b.v)) { A.toast(b.v === "notyet" ? "باشد — فردا دوباره می‌آید." : "ثبت شد: «" + clip(plainTx(q.text), 40) + "» — " + b.t + "."); rer(); } } }; });
+        items.push({ k: "p", pid: q.id, txt: "📌 برنامهٔ خودت (" + q.id + "): «" + clip(plainTx(q.text), 90) + "»", sub: q.onGuess ? "بر حدسی تکیه دارد که هنوز آزموده نشده — اول حدس را بیازما" : q.when === "next-session" ? "قولِ بی‌تاریخ به خودت — چطور پیش رفت؟" : "موعد: " + (A.fdate ? A.fdate(q.when) : q.when) + " — انجام شد؟",
+          acts: acts, go: function () { try { localStorage.setItem("lla.assist.cur", x.s.id); } catch (e) { } if (AS.toggle) AS.toggle(true); } }); }); } catch (e) { }
       return items;
     };
     A.dueList._plans18 = true;
@@ -3087,6 +3295,8 @@
   function planR17(s, a, ut, key, at) { var pt = txtOf(a.plan); if (pt && quoteIn(pt, ut)) { var w = a.plan && a.plan.when, td = A.today(), when = realDate(w) && w >= td ? w : planDate(pt);
     var PL = s.plans = s.plans || []; if (!PL.some(function (x) { return qNorm(x.text) === qNorm(pt); })) PL.push({ id: "pl" + (PL.length + 1), text: clip(pt, 300), when: when, at: at, key: key, done: false }); } }
   AS.R17_QUARANTINE = { planSeen: planSeenR17, plan: planR17, regSigns: regSignsR17, guessMsg: guessMsgR17, chkWindow: chkWindowR17 };
+  /* قرنطینه‌های دورِ ۱۹ (تورِ پولیا RN1، RN2d، RN3a، RN6c — REMOVAL_CANDIDATES) */
+  AS.R18_QUARANTINE = { deferCand: deferCandR18, sentsOf: sentsOfR18, regIn: regInR18, planDone: planDoneR18, plansDue: plansDueR18, weakPhase: weakPhaseR18 };
 
   AS.tourKinds = KIND;
   AS.tourSyncReminder = syncReminder;
