@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify({items:APP.liveAll().map(r=>[r.p.title,(APP.liveChatQItems(r.p.id)||[]).map(x=>x.t)]),sess:APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,plans:s.plans,prom:s.promises,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>m.guess)})),steps:APP.liveAll().map(r=>JSON.stringify(r.p.stages&&r.p.stages.c||r.p.stages).slice(0,1500))})"}

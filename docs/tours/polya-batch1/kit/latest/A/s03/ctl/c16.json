@@ -1,1 +1,1 @@
-{"eval":"(()=>{F(\"lpOne\",\"باید نشون بدم پنج نقطه توی یه مربع کوچیک همیشه دوتاشون به هم نزدیکن.\");F(\"lpWhy\",\"تمرین کلاس المپیاده و می‌خوام خودم بفهمم چرا.\");C(\".lp-onesave\");return 1})()"}
+{"eval":"(()=>{APP.go(\"lprob\",\"pb_l_mvcitb854je\");S(\"lpType\",\"prove\");return JSON.stringify(APP.liveKindInfo(\"pb_l_mvcitb854je\"))})()"}

@@ -1,1 +1,1 @@
-{"eval": "[...document.querySelectorAll('#lpBBest option')].map(o=>o.value+' = '+o.textContent).join('\\n')\n"}
+{"eval": "(()=>{const p=APP.liveAll()[0].p.id;APP.go(\"lprob\",p,\"back\");const s=document.getElementById(\"lpBBest\");return APP.state.sub+\" \"+(s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+document.getElementById(\"main\").innerText.slice(0,800))})()\n"}

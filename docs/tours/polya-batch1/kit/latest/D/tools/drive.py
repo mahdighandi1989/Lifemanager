@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# drive.py sid [srcdir] — fresh replay of SRC ctl into round18D/sid; each AI call N answered with round18D/sid/ovr/rN.txt if present,
+# drive.py sid [srcdir] — fresh replay of SRC ctl into round19D/sid; each AI call N answered with round19D/sid/ovr/rN.txt if present,
 # else old rN with record ids substituted (subst.py). Stops at the first {"exit":true} ctl after which nothing but probes follow (prints STOP_EXIT k).
 import sys,os,json,glob,re,subprocess,time
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R=B+'/round18D'; s=sys.argv[1]; S=sys.argv[2] if len(sys.argv)>2 else B+'/round17D/'+s
+R=B+'/round19D'; s=sys.argv[1]; S=sys.argv[2] if len(sys.argv)>2 else B+'/round18D/'+s
 D=R+'/'+s; T=R+'/tools'
 N=len(glob.glob(S+'/ctl/c*.json'))
 def pend():

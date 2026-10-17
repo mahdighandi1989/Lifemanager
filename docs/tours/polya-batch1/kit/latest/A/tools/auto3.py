@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# auto2.py SID : replay round17A ctl from pos+1; for each R11 AI prompt find the R10 prompt with same task+«نوبتِ تازه»;
+# auto2.py SID : replay round18A ctl from pos+1; for each R11 AI prompt find the R10 prompt with same task+«نوبتِ تازه»;
 # auto-answer with R10 answer if key blocks equal after dropping context/proverb/figure/definition lines; else stop & diff.
 import sys,os,json,re,subprocess,difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R11=T+'/round18A'; R10=T+'/round17A'; sid=sys.argv[1]; D=R11+'/'+sid
+R11=T+'/round19A'; R10=T+'/round18A'; sid=sys.argv[1]; D=R11+'/'+sid
 PID=re.compile(r'pb_l_[a-z0-9]{8,}')
 KEYS=('# مسئلهٔ','# مربیِ حل','# پس از شکست','# دانسته‌های قلمرو','# معلم','# نوبتِ تازه-NO')
 DROP=('زمینه (نه پرسشِ دوم)','- این مسئله پاسخِ عینی دارد','- از کتاب برای همین مرحله','سکوت، «نمی‌دونم»','حلِ مسئله مهارتی عملی','سطحِ استقلالِ کاربر','چهار مرحلهٔ حل در','این گفت‌وگو به همین مسئله بسته','# دانسته‌های قلمرو (','- یافته‌اند، نه دستور','- می‌خواهد کلِ راه را دور بریزد','- ادعای محلِ بحث','- کار به عقب شاخه می‌دهد','- بازنگری مهم‌ترین بخشِ کار','- قارچ‌ها خوشه‌ای','- فرع «نتیجه','- ضرب‌المثلِ همین مرحله','- شکل «حتی','- به تعریف‌ها برگرد','- مسئلهٔ عملی: داده‌ها بی‌شمار')
@@ -37,13 +37,14 @@ def find10(p):
     for m in nums(R10+'/'+sid+'/ai',r'^p(\d+)\.json$'):
         q=json.load(open(R10+'/'+sid+'/ai/p%d.json'%m))
         if q.get('task')==p.get('task') and turn(q['user'])==t and str(m) not in used.values(): c.append((m,q))
+    c.sort(key=lambda x: (x[0]!=p.get('_n'), x[0]))
     return c
 def handle():
     while True:
         n=pending()
         if not n: return True
         if str(n) in os.environ.get('STOPAT','').split(','): print('##### STOPAT p%d'%n); return False
-        p=json.load(open(D+'/ai/p%d.json'%n)); c=find10(p)
+        p=json.load(open(D+'/ai/p%d.json'%n)); p['_n']=n; c=find10(p)
         if not c: print('##### NO R10 match for p%d (task %s)\n%s'%(n,p.get('task'),turn(p['user'])[:400])); return False
         m,q=c[0]
         STATIC=('# 🔭 مسئلهٔ حل‌نشدهٔ خودم (قاعدهٔ کوتاه)','# گزارشِ وضع (همهٔ نوبت‌ها)')

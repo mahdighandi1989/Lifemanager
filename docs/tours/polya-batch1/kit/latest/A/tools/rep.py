@@ -1,6 +1,6 @@
 import sys,json,os,re
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-D=f'{T}/{sys.argv[2] if len(sys.argv)>2 else "round18A"}/{sys.argv[1]}'
+D=f'{T}/{sys.argv[2] if len(sys.argv)>2 else "round19A"}/{sys.argv[1]}'
 n=1
 while os.path.exists(f'{D}/ai/p{n}.json'):
     p=json.load(open(f'{D}/ai/p{n}.json'))
