@@ -18,3 +18,10 @@ Measure per tier, per scenario and in total:
 Write tour1_polya/models20/<tier>/<sid>/findings.md and a summary table tour1_polya/models20/SUMMARY.md: per tier — rates, the failure
 classes, and for each class whether the PAGE can compensate (validation, shorter/structured prompt, re-ask) or the data says coaching
 turns need a stronger tier. Do NOT judge the tier by guesswork; only by counted evidence.
+
+## Two-agent protocol (sub-agents cannot spawn agents)
+The DRIVER (strong model) runs harness5.js per scenario in tour1_polya/models20/<tier>/<sid>/ and writes the user turns (ctl/) exactly
+as round 19, but it NEVER writes the assistant replies. A separate RESPONDER agent running on the lighter model watches every
+models20/<tier>/*/ai/ directory: for each pN.json with no rN.txt it reads pN.json (the page's exact request: system + messages) and
+writes its own reply to rN.txt — nothing else, no other context. When the driver finishes all scenarios of a tier it writes
+models20/<tier>/DONE_ALL; the responder then stops. Tier 1 = haiku; tier 2 = sonnet (second pass, same protocol).
