@@ -54,3 +54,4 @@
 - **فوری ۲۰۲۶-۱۰-۱۷:** صف خالی. سه دست‌به‌دستِ `did` در قلمروِ supervisor/sys-territory (4d8d18f، 2214f93، 10cd5a1/s_social) بسنجیده و `verified` شد (handoff.py check/audit سالم؛ sys_territory check سالم؛ JSONها معتبر). دست‌به‌دستِ lla-sources (K8، coverage.json) در قلمروِ من نیست و باز ماند. main محلی با origin/main (فورس‌شده) نامرتبط بود ⇒ به origin/main هم‌تراز شد (پشتیبان: backup/stale-local-main-20261017).
 
 ناظرِ خودکار (Claude Code routine)
+- 2026-10-17 فوری: صف خالی؛ سه شاخهٔ supervisor-pending (۱۷، ۱۷b، handoff-close) فقط بستنِ دست‌به‌دستِ تأییدشده بودند ⇒ روی main مرج شدند. سه شاخهٔ قدیمی (run-2026-10-11، run-2026-10-16، backtest-2026-10-16) تاریخچهٔ مشترک با main بازنویسی‌شده ندارند ⇒ دست نخورد.
