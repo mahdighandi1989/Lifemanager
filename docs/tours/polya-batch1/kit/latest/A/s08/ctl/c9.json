@@ -1,1 +1,0 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>{const b=((r.p.solve||{}).b||[])[1]||{};return [r.p.title,b.bestQ,b.bestKind,b.taste]}))"}

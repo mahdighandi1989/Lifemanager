@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"(async()=>{await new Promise(r=>setTimeout(r,800));return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\" | \"+document.getElementById(\"main\").innerText.slice(0,3500)+\" ## cases:\"+JSON.stringify(APP.PR.cases().map(c=>[c.id,c.tid,c.state,c.subj,c.start]))})()"}

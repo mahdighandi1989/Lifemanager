@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify((APP.ASSIST.cur().coach||{}).guesses).slice(0,2500)"}

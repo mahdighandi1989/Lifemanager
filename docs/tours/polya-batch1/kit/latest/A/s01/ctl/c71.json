@@ -1,0 +1,1 @@
+{"eval": "(()=>{const L=APP.dueList()||[];const x=L.find(x=>/مرورِ حلِ مسئله/.test(x.txt||\"\"));if(x&&x.go)x.go();return JSON.stringify(L.map(x=>x.txt))+\"\\n\"+APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,2500)+\"\\nFL:\"+FL()})()"}

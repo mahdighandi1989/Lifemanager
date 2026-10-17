@@ -1,0 +1,1 @@
+{"eval": "(()=>{const R=JSON.parse(localStorage.getItem('mla.records.v1')||'{}');const out=[];for(const k in R){const r=R[k];if(r&&(r.type==='eprob'||r.type==='lprog'||/pb_l_/.test(k)))out.push(k+' type='+r.type+' keys='+Object.keys(r).join(',')+' :: '+JSON.stringify(r).slice(0,1500))}return out.join('\\n')})()\n"}

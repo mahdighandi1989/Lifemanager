@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "(()=>{APP.go('dossier',APP.liveAll()[0].p.id);return document.getElementById('main').innerText.slice(0,2500)})()"}

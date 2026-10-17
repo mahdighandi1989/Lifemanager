@@ -1,6 +1,6 @@
 #!/bin/bash
 # wait until some scenario stopped (no drive running) with a pending prompt, or all idle; max $1 s
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20C
 t0=$(date +%s)
 while [ $(( $(date +%s)-t0 )) -lt ${1:-300} ]; do
   for s in s21 s22 s23 s24 s25 s26 s27 s28 s29; do

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();const c=s.coach||{};return JSON.stringify(Object.keys(c))+' || '+JSON.stringify({plan:c.plan||c.plans||c.pl,guess:c.guess,gres:c.guessRes||c.gres,ev:(c.ev||c.events||[]).slice(-6)}).slice(0,3000)})()"}

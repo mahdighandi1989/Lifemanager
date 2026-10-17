@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(APP.dossier(\"pb_l_mvczmjw8erx\").events.map(e=>[e.at,e.k,e.title]))"}

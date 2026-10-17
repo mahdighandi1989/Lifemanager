@@ -1,1 +1,1 @@
-{"eval":"(()=>{const pid=window.__PID||APP.state.arg;const r=APP.liveRec(pid).p;const s=JSON.stringify(r.live);const out=[];const re=/\"(guess|g|pred|refutedG|newG|text|t)\":\"[^\"]{0,200}\"/g;let m;while((m=re.exec(s))&&out.length<40)out.push(m[0]);return out.join(' ## ');})()"}
+{"say":"نتیجه رو ثبت کردم و حدس تازه رو هم نوشتم. حالا چیکار کنم؟"}

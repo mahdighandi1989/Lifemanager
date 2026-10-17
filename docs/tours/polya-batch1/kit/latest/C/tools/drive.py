@@ -1,7 +1,7 @@
-# drive.py sid [N]  -> feed round18C ctls until an AI request or out of ctls (or N ctl steps). Prints outs briefly, AI digest+diff.
+# drive.py sid [N]  -> feed round19C ctls until an AI request or out of ctls (or N ctl steps). Prints outs briefly, AI digest+diff.
 import sys, os, json, time, glob, re, difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-sid=sys.argv[1]; D=f'{T}/round19C/{sid}'; S6=f'{T}/round18C/'+os.environ.get('SRC',sid)
+sid=sys.argv[1]; D=f'{T}/round20C/{sid}'; S6=f'{T}/round19C/'+os.environ.get('SRC',sid)
 lim=int(sys.argv[2]) if len(sys.argv)>2 and sys.argv[2].isdigit() else 999
 stf=D+'/drv.json'
 S=json.load(open(stf)) if os.path.exists(stf) else {'ptr':1,'wait':0}
@@ -17,7 +17,7 @@ def sect(u):
 AUTO='auto' in sys.argv
 kf=lambda x:[l[:110] for l in x.split('\n') if re.match(r'- k\d+ \|',l)]
 def digest(n):
-    mf=f'{T}/round19C/man/{sid}/r{n}.txt'
+    mf=f'{T}/round20C/man/{sid}/r{n}.txt'
     if os.path.exists(mf):
         open(D+'/ai/r%d.txt'%n,'w').write(open(mf).read()); print('### AI p%d   AUTO-manual r%d'%(n,n)); return True
     j=json.load(open(D+'/ai/p%d.json'%n)); u=j['user']
@@ -44,7 +44,7 @@ def digest(n):
                 L+=[re.sub(r'pb_l_[a-z0-9]+|\d+ دقیقه','X',l).replace('- زمینه (نه پرسشِ دوم): سلیقه و درنگ','- سلیقه و درنگ') for l in pt.split('\n')]
             return L
         d=[l for l in difflib.unified_diff(norm(u6),norm(u),lineterm='',n=0) if l[:1] in '+-' and not l.startswith(('+++','---'))]
-        IGN=('# گزارشِ وضع (همهٔ','- زمینه (نه پرسشِ دوم): اگر فرمول','- زمینه (نه پرسشِ دوم): چهار مرحلهٔ حل','- زمینه (نه پرسشِ دوم): در actions یک {"do":"coach_state"','# فرمول','اگر فرمول می‌نویسی','- زمینه (نه پرسشِ دوم): ضمیرِ گفت‌وگو (شما/تو) را عوض نکن','# 🔭 مسئلهٔ حل‌نشدهٔ خودم (قاعدهٔ کوتاه)','- زمینه (نه پرسشِ دوم): «🔭 مسئلهٔ حل‌نشدهٔ خودم» جای مسئلهٔ واقعیِ','- حلی که در همین گفت‌وگو تمام شد بی بازنگری رها نشود','حافظهٔ سشن','- حلی که در همین گفت‌وگو','- سکوت، «نمی‌دونم» یا پاسخِ بی‌ربط','- سطحِ استقلال','- ضرب‌المثلِ همین','# پیام‌های اخیرِ صفحه')
+        IGN=('# گزارشِ وضع (همهٔ','- زمینه (نه پرسشِ دوم): اگر فرمول','- زمینه (نه پرسشِ دوم): چهار مرحلهٔ حل','- زمینه (نه پرسشِ دوم): در actions یک {"do":"coach_state"','# فرمول','اگر فرمول می‌نویسی','- زمینه (نه پرسشِ دوم): ضمیرِ گفت‌وگو','# 🔭 مسئلهٔ حل‌نشدهٔ خودم (قاعدهٔ کوتاه)','- زمینه (نه پرسشِ دوم): «🔭 مسئلهٔ حل‌نشدهٔ خودم» جای مسئلهٔ واقعیِ','- حلی که در همین گفت‌وگو تمام شد بی بازنگری رها نشود','حافظهٔ سشن','- حلی که در همین گفت‌وگو','- سکوت، «نمی‌دونم» یا پاسخِ بی‌ربط','- سطحِ استقلال','- ضرب‌المثلِ همین','# پیام‌های اخیرِ صفحه')
         dd=[l for l in d if not l[1:].startswith(IGN) and l[1:].strip()]
         conv=re.search(r'# گفت‌وگو تا این لحظه\n(.*?)(?=\n# |\Z)',u,re.S)
         first='قاعدهٔ کوتاه)' in u and not (conv and 'دستیار:' in conv.group(1))
@@ -55,7 +55,7 @@ def digest(n):
         clos='chat_solved' in acts(n) or 'chat_solved' in acts(n-1) or 'chat_invent' in acts(n)
         if first or clos: print('!!! STOP-REVIEW first=%s closure=%s'%(first,clos)); dd=dd or ['(review)']
         sysT=bool(re.search(r'# نوبتِ تازه\n\[سامانه',u))
-        if AUTO and sysT and not dd and kf(u)==kf(u6) and os.path.exists(S6+'/ai/r%d.txt'%n):
+        if AUTO and (sysT or os.environ.get('AUTOU')) and not dd and kf(u)==kf(u6) and os.path.exists(S6+'/ai/r%d.txt'%n):
             open(D+'/ai/r%d.txt'%n,'w').write(open(S6+'/ai/r%d.txt'%n).read()); print('   AUTO-reused r6 r%d'%n); return True
         print('--- DIFF vs r6 p%d (%d lines):'%(n,len(d)))
         for l in d[:40]: print('  ',l[:400])
@@ -65,7 +65,7 @@ def digest(n):
         r6=S6+'/ai/r%d.txt'%n
         if os.path.exists(r6): print('R6 ANSWER:',open(r6).read()[:1500])
     else: print('(no r6 counterpart)')
-ctl6=sorted(glob.glob(f'{T}/round19C/src/{sid}/ctl/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))
+ctl6=sorted(glob.glob(f'{T}/round20C/src/{sid}/ctl/c*.json'),key=lambda x:int(x.split('/c')[-1][:-5]))
 steps=0
 while True:
     p=pend()
@@ -97,7 +97,7 @@ while True:
     lo=D+'/out/s%d.json'%(n-1)
     if n>1 and os.path.exists(lo) and '"exit":true' in open(lo).read():
         import subprocess
-        if subprocess.run("ps aux | grep '[h]arness5.js' | grep -q 'round19C/%s$'"%sid,shell=True).returncode!=0:
-            time.sleep(3); subprocess.run(['bash',T+'/round19C/tools/start.sh',D]); time.sleep(8); print('>> restarted harness')
+        if subprocess.run("ps aux | grep '[h]arness5c*.js' | grep -q 'round20C/%s$'"%sid,shell=True).returncode!=0:
+            time.sleep(3); subprocess.run(['bash',T+'/round20C/tools/start.sh',D]); time.sleep(8); print('>> restarted harness')
     open(D+'/ctl/c%d.json'%n,'w').write(src); print('>> fed r6 c%d as c%d: %s'%(S['ptr'],n,src[:160].replace('\n',' ')))
     S['ptr']+=1; S['wait']=n; json.dump(S,open(stf,'w')); steps+=1

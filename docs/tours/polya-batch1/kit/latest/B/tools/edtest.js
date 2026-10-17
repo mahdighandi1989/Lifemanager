@@ -1,0 +1,13 @@
+const { chromium } = require('/home/user/Lifemanager/apps/learning-architecture/node_modules/playwright');
+const fs = require('fs'), path = require('path');
+(async () => { const D = process.argv[2]; const ctx = await chromium.launchPersistentContext(path.join(D, 'profile'), { viewport: { width: 1360, height: 900 } });
+  const p = ctx.pages()[0] || await ctx.newPage(); await p.route('**/fonts.googleapis.com/**', r => r.abort());
+  await p.goto('file:///home/user/Lifemanager/apps/learning-architecture/dist/learning-architecture.html'); await p.waitForSelector('.nav');
+  await p.evaluate(fs.readFileSync(path.join(D, 'inject.js'), 'utf8')); await p.evaluate(() => { APP.S.loaded = true; APP.ASSIST.toggle(true); });
+  await p.waitForTimeout(1500); await p.click('.as-editb >> nth=5'); await p.waitForTimeout(800);
+  console.log('value0=', await p.evaluate(() => (document.querySelector('.as-edtx') || {}).value));
+  await p.locator('.as-edtx').scrollIntoViewIfNeeded(); await p.screenshot({ path: path.join(D, 'out', 'part_correction_edit_open.png') });
+  await p.fill('.as-edtx', 'تستِ متن'); await p.waitForTimeout(700);
+  console.log('value1=', await p.evaluate(() => (document.querySelector('.as-edtx') || {}).value), 'n=', await p.evaluate(() => document.querySelectorAll('.as-edtx').length));
+  await p.locator('.as-edtx').scrollIntoViewIfNeeded(); await p.screenshot({ path: path.join(D, 'out', 'part_correction_edit_typed.png') });
+  await ctx.close(); })().catch(e => { console.error(e.message); process.exit(1); });

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const s=APP.ASSIST.cur();const c=s.coach||{};return 'coachkeys='+Object.keys(c).join(',')+' | pl='+JSON.stringify(c.pl||c.plan||c.plans||s.plans||null).slice(0,800)+' | rej='+JSON.stringify(c.rej||c.rejects||c.csLog||null).slice(0,1500)})()\n"}

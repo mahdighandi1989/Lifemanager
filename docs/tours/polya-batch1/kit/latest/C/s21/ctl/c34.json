@@ -1,1 +1,1 @@
-{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const i=document.querySelector('textarea.as-in');i.value='این یکی رو ببین: 6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1 ، رخ d8 مات؟';i.dispatchEvent(new Event('input',{bubbles:true}));await W(500);const vis=[...document.querySelectorAll('.as-root .mx-prev')].filter(p=>!p.hidden);const b=document.querySelector('.as-msg .mx-board');if(b)b.scrollIntoView({block:'center'});return 'FENPREV '+vis.map(p=>p.innerText.replace(/\\n/g,'')).join(' | ');})()"}
+{"exit":true}

@@ -1,6 +1,6 @@
 import json,sys
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-def say(s,k): return json.load(open(f'{B}/round18D/{s}/ctl/c{k}.json'))['say']
+def say(s,k): return json.load(open(f'{B}/round20D/{s}/ctl/c{k}.json'))['say']
 DEMO='''(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const A=%s;
 let e;if(A.field){try{APP.ASSIST.toggle(false)}catch(x){};await w(300);e=document.getElementById(A.field);}else{const pn=document.querySelector('.as-panel');if(!pn||pn.hidden)APP.ASSIST.toggle(true);await w(500);e=document.querySelector('textarea.as-in');}
 if(!e)return 'NOFIELD';e.scrollIntoView({block:'center'});e.focus();await w(250);
@@ -26,5 +26,5 @@ specs['s38']={'before':{'4':[demo(t4[:i+1],'sq',t4[i+2:],want=t4)],'12':[demo(t1
 # s36: live step field with Persian-letter equation, ⇒ from the bar; chat input before c21 and c22
 t21,t22=say('s36',21),say('s36',22)
 specs['s36']={'before':{'8':[demo('۰٫۱×۲۰ + ۰٫۲۵×ح = ۰٫۱۵(۲۰+ح) ','imp',' ۰٫۱ح = ۱ ⇒ ح = ۱۰',field='lpStep',want='۰٫۱×۲۰ + ۰٫۲۵×ح = ۰٫۱۵(۲۰+ح) ⇒ ۰٫۱ح = ۱ ⇒ ح = ۱۰')],'21':[demo(t21)],'22':[demo(t22)]},'after':{'21':[{'eval':CLEAR}],'22':[{'eval':CLEAR}]}}
-for s,sp in specs.items(): json.dump(sp,open(f'{B}/round19D/{s}.spec.json','w'),ensure_ascii=False)
+for s,sp in specs.items(): json.dump(sp,open(f'{B}/round20D/{s}.spec.json','w'),ensure_ascii=False)
 print('ok')

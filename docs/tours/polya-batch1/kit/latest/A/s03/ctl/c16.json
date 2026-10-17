@@ -1,1 +1,1 @@
-{"eval":"(()=>{APP.go(\"lprob\",\"pb_l_mvcitb854je\");S(\"lpType\",\"prove\");return JSON.stringify(APP.liveKindInfo(\"pb_l_mvcitb854je\"))})()"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

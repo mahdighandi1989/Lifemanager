@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# run.py SID FROM [TO] : replay round18A ctl cFROM..cTO into round19A with pid mapping; stops at AI request
+# run.py SID FROM [TO] : replay round19A ctl cFROM..cTO into round20A with pid mapping; stops at AI request
 import sys,os,json,re,subprocess,glob
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R9=T+'/round19A'; R8=T+'/round18A'
+R9=T+'/round20A'; R8=T+'/round19A'
 sid=sys.argv[1]; a=int(sys.argv[2]); b=int(sys.argv[3]) if len(sys.argv)>3 else 999
 D=R9+'/'+sid; MP=D+'/pidmap.json'
 PIDRE=re.compile(r'pb_l_[a-z0-9]{8,}')
@@ -25,7 +25,7 @@ OLD=old_all()
 for i in range(a,b+1):
     f=R8+'/'+sid+'/ctl/c%d.json'%i
     if not os.path.exists(f): print('END at',i); break
-    t=open(f).read().replace('round18A','round19A')
+    t=open(f).read().replace('round19A','round20A')
     need=[p for p in set(PIDRE.findall(t)) if p not in mp]
     if need:
         nw=[x for x in newids() if x.startswith('pb_l_')]

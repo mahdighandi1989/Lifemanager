@@ -1,0 +1,1 @@
+{"eval0": "'x'", "eval": "(()=>{const P=APP.S.all('practice');return 'today='+APP.today()+' n='+P.length+' '+JSON.stringify(P.map(r=>({id:r.id,kind:r.kind,tid:r.tid,sample:r.sample,simClock:r.simClock,real:APP.MIND.realRec(r),sess:(r.sessions||[]).length}))) + ' || PRall='+APP.PR.cases().length+' || tw='+JSON.stringify(APP.MIND.techWork().rows.map(r=>r.key))})()"}

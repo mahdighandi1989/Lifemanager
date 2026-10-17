@@ -1,6 +1,6 @@
 import json,sys,os,re
 s=sys.argv[1]; W=int(os.environ.get('W','500'))
-A='../round18B/'+s+'/out'; B=s+'/out'
+A='../round19B/'+s+'/out'; B=s+'/out'
 n=len([f for f in os.listdir(B) if re.match(r's\d+\.json$',f)])
 norm=lambda t: re.sub(r'pb_l_[a-z0-9]+|achat_[a-z0-9]+|\d{4}-\d\d-\d\dT[\d:.]+Z','X',t or '')
 for k in range(1,n+1):

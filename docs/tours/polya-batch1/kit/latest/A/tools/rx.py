@@ -4,11 +4,11 @@
 import sys,json,os,subprocess,re
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 s,n,m=sys.argv[1:4]; ex=json.loads(sys.argv[4]) if len(sys.argv)>4 else {}
-D=f'{T}/round19A/{s}'
+D=f'{T}/round20A/{s}'
 if m!='0':
-    r=subprocess.run(['python3',T+'/round19A/tools/pm.py',s,n,m],capture_output=True,text=True)
+    r=subprocess.run(['python3',T+'/round20A/tools/pm.py',s,n,m],capture_output=True,text=True)
     if r.returncode: print(r.stdout,r.stderr); sys.exit(1)
-    t=open(f'{T}/round18A/{s}/ai/r{m}.txt').read()
+    t=open(f'{T}/round19A/{s}/ai/r{m}.txt').read()
     mp=f'{D}/pidmap.json'
     if os.path.exists(mp):
         for o,nn in json.load(open(mp)).items(): t=t.replace(o,nn)
@@ -31,5 +31,5 @@ if m!='0':
 js=json.dumps(a,ensure_ascii=False)
 open(f'{D}/ans_{n}.json','w').write(js)
 print('ANSWER:',js[:1500])
-o=subprocess.run(['python3',T+'/round19A/tools/d.py',s,'ans',n,'@'+f'{D}/ans_{n}.json'],capture_output=True,text=True,timeout=1200).stdout
-print(subprocess.run(['python3',T+'/round19A/tools/f.py'],input=o,capture_output=True,text=True).stdout[-4000:])
+o=subprocess.run(['python3',T+'/round20A/tools/d.py',s,'ans',n,'@'+f'{D}/ans_{n}.json'],capture_output=True,text=True,timeout=1200).stdout
+print(subprocess.run(['python3',T+'/round20A/tools/f.py'],input=o,capture_output=True,text=True).stdout[-4000:])

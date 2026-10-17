@@ -2,7 +2,7 @@
 # auto.py SID : continue replay from pos+1; auto-answer AI prompts whose key blocks equal round8's; stop otherwise and print diff
 import sys,os,json,re,subprocess,difflib
 T='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-R9=T+'/round19A'; R8=T+'/round18A'; sid=sys.argv[1]; D=R9+'/'+sid
+R9=T+'/round20A'; R8=T+'/round19A'; sid=sys.argv[1]; D=R9+'/'+sid
 PID=re.compile(r'pb_l_[a-z0-9]{8,}')
 KEYS=('# مسئلهٔ زنده','# مربیِ حل','# پس از شکست','# مسئلهٔ حل‌شده','# نوبتِ تازه','# مسئلهٔ واقعیِ')
 def blocks(f):

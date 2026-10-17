@@ -20,5 +20,5 @@ def show(tag,path):
             elif re.search(r'پرسشِ این نوبت همین|فقط \*\*یک\*\* پرسش',l): print('   *',l[:int(os.environ.get('W','420'))])
             elif l.startswith('- ') and 'زمینه (نه پرسشِ دوم)' not in l and not re.search(SKIP,l) and re.search(r'بپرس|؟»|\?»|بخواه',l) and re.search(r'پولیا|[ABC]\d{3}',l):
                 print('   UNMARKED:',l[:300])
-SD=os.environ.get('SRCD',f'{B}/round19D/{s}'); show('OLD',f'{SD}/ai/p{N}.json'); show('NEW',f'{B}/round19D/{s}/ai/p{N}.json')
+SD=os.environ.get('SRCD',f'{B}/round20D/{s}'); show('OLD',f'{SD}/ai/p{N}.json'); show('NEW',f'{B}/round20D/{s}/ai/p{N}.json')
 print('== R10 reply:',open(f'{SD}/ai/r{N}.txt').read()[:int(os.environ.get('R','700'))] if os.path.exists(f'{SD}/ai/r{N}.txt') else 'NONE')

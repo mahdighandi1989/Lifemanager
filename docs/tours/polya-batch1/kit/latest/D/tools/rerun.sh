@@ -1,6 +1,6 @@
 #!/bin/bash
 # rerun.sh newdir srcdir upto  — replay srcdir ctl into newdir, answering pN with srcdir rN for N<upto (stops at p$upto)
-B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19D
+B=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20D
 D=$B/$1; S=$B/$2; U=$3; T=$(ls $S/ctl | wc -l); K=1
 while true; do
   o=$(OL=300 python3 $B/tools/auto.py $D $S $K $T); echo "$o" | grep -a "STOPPED\|ERROR" | cut -c1-200

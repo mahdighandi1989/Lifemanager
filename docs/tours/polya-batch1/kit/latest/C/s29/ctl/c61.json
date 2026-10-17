@@ -1,0 +1,1 @@
+{"eval": "(()=>{const p=window.__PID||APP.state.arg||(APP.liveAll()[0]||{p:{}}).p.id;localStorage.setItem('__PID',p);APP.clock.dev=true;localStorage.setItem('lla.dev','1');return APP.clock.set('2026-11-01')})()"}

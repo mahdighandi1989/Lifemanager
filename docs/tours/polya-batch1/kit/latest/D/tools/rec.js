@@ -1,0 +1,9 @@
+(()=>{const o={};const s=APP.ASSIST.cur();o.today=APP.today();
+o.coach=s&&s.coach?{retracts:s.coach.retracts,plans:s.coach.plans||s.plans,guesses:s.coach.guesses,promises:s.coach.promises,result:s.coach.result}:null;
+o.sessRetracts=s&&s.retracts;o.plans=s&&s.plans;
+o.msgs=s?s.msgs.filter(m=>m.role==='user').map(m=>({id:APP.liveMsgId?APP.liveMsgId(m):'',t:m.text.slice(0,140),corr:m.corr,hist:m.textHist})):[];
+o.lp=APP.liveAll().map(r=>{const e=APP.S.get('eprog_'+r.p.id)||{};const L=(e.live||{});return {id:r.p.id,title:r.p.title,st:(r.p.statement||'').slice(0,200),phase:APP.livePhase(r.p.id),verdict:(APP.liveClosure(r.p.id)||{}).verdict,chat:L.chat,retracts:L.retracts,plan:L.plan,steps:(L.steps||[]).map(x=>({t:x.t,due:x.due,out:x.out,chatRep:x.chatRep,fixHist:x.fixHist})),g1:(e.solve||{}).g,u1:(e.solve||{}).u,b:(e.solve||{}).b,fix:JSON.stringify(e).match(/.{0,80}fixHist.{0,400}/g)}});
+o.rem=(window.__rem||[]).map(x=>x.key+'@'+x.due_date+(x.hour!=null?' h'+x.hour:'')+' '+String(x.body||x.title||'').slice(0,110));
+o.due=APP.dueList().map(d=>d.txt+' / '+(d.sub||''));
+try{o.mind=APP.MIND.phases?JSON.stringify(APP.MIND.phases()).slice(0,1500):null}catch(e){o.mind='ERR '+e.message}
+return JSON.stringify(o)})()

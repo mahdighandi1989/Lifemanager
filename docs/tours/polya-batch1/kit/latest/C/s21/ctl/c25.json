@@ -1,1 +1,1 @@
-{"eval":"(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));APP.today=()=>\"2026-10-20\";APP.go(\"today\");await W(1500);const t=document.querySelector(\"#main\").innerText;const i=t.indexOf(\"🧩 مسئلهٔ تازه\");return i<0?\"NONE\":t.slice(i,i+300);})()"}
+{"exit":true}

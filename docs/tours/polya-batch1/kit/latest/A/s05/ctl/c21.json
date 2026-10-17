@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval": "APP.today()+\" \"+APP.liveAll().map(r=>r.p.id+\":\"+r.p.title).join(\" | \")"}

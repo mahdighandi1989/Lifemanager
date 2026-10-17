@@ -1,0 +1,1 @@
+{"eval": "(()=>{try{return JSON.stringify(APP.MIND.techWork()).slice(0,2500)}catch(e){return 'ERR '+e.message}})()"}

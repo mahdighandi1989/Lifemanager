@@ -1,6 +1,6 @@
 #!/bin/bash
 # start2.sh sid — fresh dir (keeps ovr/), start harness, drive, probe
-R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19D
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20D
 s=$1; mkdir -p $R/$s.ovr; python3 $R/tools/kill1.py $s >/dev/null; rm -rf $R/$s; mkdir -p $R/$s; cp -r $R/$s.ovr $R/$s/ovr
 cd $R/tools && (nohup node harness5.js $R/$s >> $R/$s/harness.log 2>&1 &); sleep 8
 SRC=$R/src/$s; [ -d $SRC ] && python3 $R/tools/drive.py $s $SRC || python3 $R/tools/drive.py $s

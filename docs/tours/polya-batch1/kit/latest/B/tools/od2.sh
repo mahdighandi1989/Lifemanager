@@ -7,4 +7,4 @@ t=re.sub(r'📎\s*پیوست‌ها.*?(?=\n\S*[^\n]{0,3}\n|$)','',t,flags=re.S) 
 t=re.sub(r'📎 ?\n?پیوست‌ها\n[^\n]*\n?(انتخابِ فایل\n?)?','',t)
 t=re.sub(r'\?\|file\|[^\n]*\|\n?','',t)
 print(t)" $1 | tr ' ' '\n'; }
-diff <(g $B/round18B/$1/out/s$2.json) <(g $B/round19B/$1/out/s${3:-$2}.json) | head -${N:-40}
+diff <(g $B/round19B/$1/out/s$2.json) <(g $B/round20B/$1/out/s${3:-$2}.json) | head -${N:-40}

@@ -17,8 +17,8 @@ def lines(f):
   i=u.rfind('# نوبتِ تازه'); out.append('USER: '+u[i+13:i+500].strip() if i>=0 else 'USER?')
   return out
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
-old=lines(f'{B}/round18B/{os.environ.get("SRCS") or s}/ai/p{n}.json') if os.path.exists(f'{B}/round18B/{os.environ.get("SRCS") or s}/ai/p{n}.json') else ['(none)']
-new=lines(f'{B}/round19B/{s}/ai/p{n}.json')
+old=lines(f'{B}/round19B/{os.environ.get("SRCS") or s}/ai/p{n}.json') if os.path.exists(f'{B}/round19B/{os.environ.get("SRCS") or s}/ai/p{n}.json') else ['(none)']
+new=lines(f'{B}/round20B/{s}/ai/p{n}.json')
 print('=== R10'); print('\n'.join(old)); print('=== R11'); print('\n'.join(new))
-r=f'{B}/round18B/{os.environ.get("SRCS") or s}/ai/r{n}.txt'
+r=f'{B}/round19B/{os.environ.get("SRCS") or s}/ai/r{n}.txt'
 print('=== R10 answer'); print(open(r).read()[:int(os.environ.get('RA','1500'))] if os.path.exists(r) else '(none)')

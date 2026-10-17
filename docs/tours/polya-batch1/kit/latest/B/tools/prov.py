@@ -8,4 +8,4 @@ for f in sys.argv[1:]:
     q=m.group(1); rest=blk.replace(m.group(0),'')
     key=q[:14]
     hit=key in rest
-    print(f.split('round19B/')[-1], ('DUP ' if hit else 'ok  '), q[:60])
+    print(f.split('round20B/')[-1], ('DUP ' if hit else 'ok  '), q[:60])

@@ -1,1 +1,1 @@
-{"eval": "(()=>{const s=document.getElementById('lpBBest');return 'COACH '+JSON.stringify(APP.liveCoach(window.__PID).q)+' || BEST '+(s?[...s.options].map(o=>o.text).join(' / '):'none')+' || '+T('۴) بازنگری',3500);})()\n"}
+{"eval0":"(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-18'));'ok'","say":"کیک رو پختم و خوب شد! ولی زمان پختو نمی‌دونستم، دستور مادرم ۳۵ دقیقه بود. زمان پخت هم ۲.۸ برابر میشه؟ یعنی ۱۰۰ دقیقه؟ ۸ تا تخم‌مرغ زدم یا ۹ بهتر بود؟"}

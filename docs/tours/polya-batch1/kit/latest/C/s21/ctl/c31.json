@@ -1,1 +1,1 @@
-{"eval": "(()=>{const i=document.querySelector('textarea.as-in');i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));return 'cleared'})()"}
+{"eval":"(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));(APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-20'));APP.go(\"today\");await W(1500);const t=document.querySelector(\"#main\").innerText;const i=t.indexOf(\"🧩 مسئلهٔ تازه\");return i<0?\"NONE\":t.slice(i,i+300);})()"}

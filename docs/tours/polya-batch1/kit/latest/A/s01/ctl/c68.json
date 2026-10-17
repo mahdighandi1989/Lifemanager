@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"today\");return JSON.stringify(APP.clock.check())+\"\\nFLAG:\"+(document.body.innerText.match(/.{0,40}ساعتِ آزمایشی.{0,60}/)||[\"\"])[0]+\"\\nSCHED:\"+JSON.stringify((APP.SCHED.all(APP.today())||[]).map(e=>[e.kind||e.key,e.due,e.txt]).slice(0,20))+\"\\nMAIN:\"+document.getElementById(\"main\").innerText.slice(0,2500)})()"}

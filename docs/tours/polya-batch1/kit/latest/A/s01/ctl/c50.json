@@ -1,1 +1,1 @@
-{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvcig4sq54u\",\"back\");const s=document.getElementById(\"lpBBest\");return s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+APP.state.sub})()\n"}
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvczjwlwwca\",\"back\");const s=document.getElementById(\"lpBBest\");return s?[...s.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NOSEL \"+APP.state.sub})()\n"}

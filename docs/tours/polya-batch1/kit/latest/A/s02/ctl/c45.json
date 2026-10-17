@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.ASSIST.cur().msgs.filter(m=>m.role==\"ai\").map(m=>m.text))"}
+{"eval":"JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))"}

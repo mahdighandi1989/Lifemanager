@@ -1,0 +1,1 @@
+{"shot": {"name": "part_dossier_s22", "js": "(()=>{const p=window.__PID||localStorage.getItem('__PID');APP.go('dossier',p);return p})()", "full": true}}

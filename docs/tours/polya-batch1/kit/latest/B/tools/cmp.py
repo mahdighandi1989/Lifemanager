@@ -1,6 +1,6 @@
 import json,sys,os,re
 s=sys.argv[1]; off=int(open(f'{s}/off.txt').read()) if os.path.exists(f'{s}/off.txt') else 0
-B='../round18B/'+s
+B='../round19B/'+s
 n=len(os.listdir(B+'/ctl'))
 for k in range(1,n+1):
   def g(d,kk):

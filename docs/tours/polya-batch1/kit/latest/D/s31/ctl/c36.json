@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"(()=>{const t=[...document.querySelectorAll(\"#main table\")];return t.length+\" | \"+t.map(x=>[...x.querySelectorAll(\"tr\")].slice(0,2).map(r=>[...r.querySelectorAll(\"input,textarea,select\")].map(e=>e.tagName+\"#\"+e.id+\"[\"+(e.getAttribute(\"aria-label\")||\"\")+\"]\").join(\",\")).join(\" / \")).join(\" || \")+\" | btns:\"+[...document.querySelectorAll(\"#main button\")].map(b=>b.textContent.trim()).filter(x=>x).slice(0,40).join(\" ; \")})()"}

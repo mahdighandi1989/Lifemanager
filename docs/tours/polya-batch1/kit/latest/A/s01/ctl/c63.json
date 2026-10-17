@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvczjwlwwca\");const b=[...document.querySelectorAll(\"#main button\")].find(b=>/پروندهٔ کامل/.test(b.textContent));if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,6000)})()"}

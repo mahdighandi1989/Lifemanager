@@ -1,1 +1,1 @@
-{"eval": "(()=>{const c=APP.liveCoach(window.__PID||APP.state.arg);return c.src+' | '+c.q;})()\n"}
+{"eval": "(()=>{const pid=(window.__PID||APP.state.arg);const s=JSON.stringify(APP.liveRec(pid));const o=[];for(const k of ['کارِ سرایدار است','کمبود همان برداشت']){let i=-1;while((i=s.indexOf(k,i+1))>=0&&o.length<12)o.push(s.slice(Math.max(0,i-120),i+160));}return o.join(' ## ');})()\n"}

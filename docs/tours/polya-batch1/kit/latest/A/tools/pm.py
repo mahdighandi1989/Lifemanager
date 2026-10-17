@@ -6,12 +6,12 @@ R=re.compile(r'pb_l_[a-z0-9]{8,}')
 def ids(f):
     p=json.load(open(f)); seen=set(R.findall(p['sys']+p['user']))
     return sorted(seen)
-mpf=f'{T}/round19A/{s}/pidmap.json'
+mpf=f'{T}/round20A/{s}/pidmap.json'
 mp=json.load(open(mpf)) if os.path.exists(mpf) else {}
-o=ids(f'{T}/round18A/{s}/ai/p{m}.json'); w=ids(f'{T}/round19A/{s}/ai/p{n}.json')
+o=ids(f'{T}/round19A/{s}/ai/p{m}.json'); w=ids(f'{T}/round20A/{s}/ai/p{n}.json')
 w=[x for x in w if x not in mp.values()] ; o2=[x for x in o if x not in mp]
 for a,b in zip(o2,w): mp[a]=b
 json.dump(mp,open(mpf,'w'))
-ans=open(f'{T}/round18A/{s}/ai/r{m}.txt').read()
+ans=open(f'{T}/round19A/{s}/ai/r{m}.txt').read()
 miss=[x for x in set(R.findall(ans)) if x not in mp]
 if miss: print('UNMAPPED in answer:',miss,'map',mp); sys.exit(1)

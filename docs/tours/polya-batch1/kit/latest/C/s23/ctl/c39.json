@@ -1,0 +1,1 @@
+{"eval": "(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));const c=APP.PR.cases()[0];APP.go('practice',c.id);await W(1200);return document.querySelector('#main').innerText.slice(0,2500)+' || BTNS '+[...document.querySelectorAll('#main button')].map(b=>b.innerText.trim()).filter(Boolean).join(' / ')})()"}

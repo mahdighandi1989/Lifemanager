@@ -1,1 +1,1 @@
-{"eval0":"APP.today=()=>'2026-10-17';'ok'","say":"کیک رو پختم و خوب شد! ولی زمان پختو نمی‌دونستم، دستور مادرم ۳۵ دقیقه بود. زمان پخت هم ۲.۸ برابر میشه؟ یعنی ۱۰۰ دقیقه؟ ۸ تا تخم‌مرغ زدم یا ۹ بهتر بود؟"}
+{"eval": "(()=>{const p=window.__PID||APP.state.arg;if(p)localStorage.setItem('__PID',p);return (APP.clock.dev=true,localStorage.setItem('lla.dev','1'),APP.clock.set('2026-10-18'))+' pid='+p})()"}

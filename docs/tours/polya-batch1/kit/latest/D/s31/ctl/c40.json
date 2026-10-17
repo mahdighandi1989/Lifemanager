@@ -1,1 +1,1 @@
-{"exit":true}
+{"eval":"[...document.querySelectorAll(\"#main textarea,#main input,#main select\")].filter(e=>!/^ex_preds/.test(e.id)&&e.offsetParent).map(e=>e.id+\"[\"+(e.getAttribute(\"aria-label\")||\"\").slice(0,60)+\"]\").join(\" ; \")"}

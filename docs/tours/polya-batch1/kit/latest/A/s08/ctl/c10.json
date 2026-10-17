@@ -1,1 +1,0 @@
-{"eval":"(()=>{const r=APP.liveAll()[0];return JSON.stringify(Object.keys(r))+\" P:\"+JSON.stringify(Object.keys(r.p))+\" \"+JSON.stringify(r.s&&r.s.b||r.solve&&r.solve.b||null).slice(0,800)})()"}

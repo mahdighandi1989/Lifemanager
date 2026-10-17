@@ -1,1 +1,1 @@
-{"eval":"(()=>{const pid=window.__PID;const c=APP.liveCoach(pid);const s=APP.ASSIST.cur();return c.src+\" | \"+c.q.slice(0,120)+\" || ans=\"+JSON.stringify((s.coach&&s.coach.ansLog||[]).slice(-3).map(x=>x.q.slice(0,40)))+\" ph=\"+(s.coach&&s.coach.ph);})()"}
+{"exit":true}

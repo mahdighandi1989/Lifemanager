@@ -1,6 +1,6 @@
 #!/bin/bash
 # loop.sh sid -> reuse manual (man/) or r12 answer while turn question unchanged; stop at first changed one
-cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round19C
+cd /tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round20C
 for k in $(seq 1 30); do
   n=$(ls $1/ai/p*.json 2>/dev/null | sed 's/.*\/p//;s/.json//' | sort -n | tail -1)
   if [ -n "$n" ] && [ ! -f $1/ai/r$n.txt ]; then

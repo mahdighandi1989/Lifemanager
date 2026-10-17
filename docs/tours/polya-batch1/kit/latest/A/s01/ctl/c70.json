@@ -1,0 +1,1 @@
+{"eval": "(()=>{const b=[...document.querySelectorAll(\"#main button, #main a, #main li\")].find(b=>/مرورِ حلِ مسئله موعد/.test(b.textContent)&&b.children.length<6);if(b)b.click();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,3000)+\"\\nFL:\"+FL()})()"}

@@ -1,0 +1,1 @@
+{"eval": "(()=>{const ps=APP.liveAll();APP.go('dossier',ps[ps.length-1].p.id);return ps.map(r=>r.p.title).join(' | ')+' :: '+document.getElementById('main').innerText.slice(0,3000)})()"}

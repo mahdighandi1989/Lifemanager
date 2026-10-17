@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify({v:APP.state.view,a:APP.state.arg,t:APP.today(),dev:APP.clock.dev,live:APP.liveAll().map(r=>[r.p.id,r.p.title])})"}

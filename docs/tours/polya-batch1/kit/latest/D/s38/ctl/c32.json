@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go('dossier');return document.getElementById('main').innerText.slice(0,2000)})()"}

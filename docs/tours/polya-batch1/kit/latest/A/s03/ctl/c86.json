@@ -1,0 +1,1 @@
+{"eval": "(()=>{APP.go(\"lprob\",\"pb_l_mvd06pjmqu4\");const sel=document.querySelector(\".prc-tsel\");sel.value=\"41\";sel.dispatchEvent(new Event(\"change\",{bubbles:true}));document.querySelector(\".prc-start\").click();return APP.state.view+\" \"+APP.state.arg+\" \"+APP.state.sub+\"\\n\"+document.getElementById(\"main\").innerText.slice(0,3000)+\"\\nFL:\"+FL()})()"}
