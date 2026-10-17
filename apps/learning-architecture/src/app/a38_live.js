@@ -2355,6 +2355,11 @@
 
   /* ---------- بازنگری (حل شد یا آگاهانه کنار گذاشتی) ---------- */
   var BKD = {};
+  /* L2 (دورِ ۱۶): تازه‌کنندهٔ فهرستِ «کدام پرسش کمک کرد؟» ِ بازنگریِ باز — با هر ثبتِ سشنِ دستیار (achat) یک بار، پس از همان نوبت */
+  var LB_LIVE = null;
+  (function () { var put0 = S.put, tm = null; S.put = function (x) { var out = put0.apply(this, arguments);
+    try { if (LB_LIVE && x && /^achat_/.test(String(x.id || ""))) { if (tm) clearTimeout(tm); tm = setTimeout(function () { tm = null; if (LB_LIVE) { try { LB_LIVE(); } catch (e) { console.error(e); } } }, 0); } } catch (e) { }
+    return out; }; })();
   var DROPSRC = (A.WILL && A.WILL.DROPSRC) || [["thing", "از خودِ مسئله — دلیلش را دیده‌ام و سنجیده‌ام"], ["crit", "از حسِ پس از نقد یا شکست"], ["tired", "از خستگی"]];
   function usedQs(pg) { var o = []; ((pg.tut || {}).plan || []).forEach(function (e) { if (e && e.src === "live" && !e.skip && e.text && o.indexOf(e.q) < 0) o.push(e.q); }); return o; }
   /* تور ۱ (s11/s30): «کدام پرسش بیشتر کمک کرد؟» — پرسش‌های طرح، کارت‌هایی که واقعاً به کار رفتند، و پرسش‌هایی که دستیار در گفت‌وگوهای همین مسئله
@@ -2449,7 +2454,9 @@
      • بخشِ پرسشی = رشتهٔ پیوستهٔ جمله‌های پرسشی، از آغازِ نخستینشان (سرِ پیش از «—»، «مثلاً»، «و»، «اگر» و معترضه همه در آن)؛ رشتهٔ پرسشیِ جدای دیگری
        در همان پیام به همان گزینه با « … » می‌پیوندد.
      • رشته‌ای که با ضمیر/پیوند/اشاره آغاز می‌شود (آن/این/اش/آنجا/همین/و/یا/مثلاً/اگر/«—»، «از آن»، «به آن») جملهٔ خبریِ پیش از خودش را — جای مرجع — هم می‌آورد.
-     • فقط واژه/بندِ گفتمانی یا ستایشیِ آغاز («ولی»، «اما»، «آفرین،»، «عالی —») و نشانهٔ فهرست بریده می‌شود؛ «مثلاً»، «اگر»، «و» و سرِ پیش از «—» هرگز. */
+     • فقط واژه/بندِ گفتمانی یا ستایشیِ آغاز («ولی»، «اما»، «آفرین،»، «عالی —») و نشانهٔ فهرست بریده می‌شود؛ «مثلاً»، «اگر»، «و» و سرِ پیش از «—» هرگز.
+     دورِ ۱۶ (DECISIONS_R16 L1a–L1e) این را پالود: سرِ پیش از «:» هم می‌ماند مگر برچسبِ تنها باشد؛ «؟» ِ نقاب‌دار («؟۴۸۷؟») مرز نیست؛ رشتهٔ پرسشیِ جدای دوم
+     گزینهٔ خودش است مگر با ضمیر/پیوند آغاز شود (پس «یک گزینه برای هر پیام» دیگر نیست)؛ مرجعِ ضمیرِ حدس/مجهول از رکورد؛ تکرارِ هم‌واژه یکی — پایین، qPassages و chatItems. */
   var QEND = /[؟?][»"')\]]*$/, DISC_HEAD = /^(?:(?:ولی|اما)(?:\s*[،,]|\s)|(?:خب|خوب|آفرین|عالی|باشه|درسته|احسنت)(?:\s*[،,!.]+|\s+[—–]))\s*/, BULLET_HEAD = /^(?:[-•*–—]+|[0-9]+[.)])\s*/;
   var ANA_W = ["آن", "این", "اش", "آنجا", "آن‌جا", "همانجا", "همان‌جا", "همینجا", "همین‌جا", "همین", "و", "یا", "مثلاً", "مثلا", "اگر"];
   /* ضمیرِ اشاره فقط وقتی برگشت است که خودش جای اسم نشسته باشد («آن را»، «به همین می‌رسی»، «از آن،»، پایانِ جمله) — صفتِ اشاره پیش از اسم («این گام …»،
@@ -2460,6 +2467,11 @@
       if (c !== w[i] || i === w.length - 1) return true;
       if (DEM_PRON_NEXT.test(w[i + 1].replace(/[؟?،,.:!»«]+$/, ""))) return true; }
     return false; }
+  /* دورِ ۱۶ (L1b، D·D1 s37): «؟» ِ چسبیده به رقم/حرف («؟۴۸۷؟»، «۳؟۵») نویسهٔ محوشده است، نه پایانِ جمله — واژه‌ای که «؟» ِ درونش پیش از نویسهٔ دیگری
+     (نه فاصله، نه نشانهٔ بستن) آمده، سراسر نقاب است و هیچ «؟» اش جمله را نمی‌بندد */
+  var MASK_RE = /[؟?][^\s»«"')\]،,.:;؛!؟?—–]/;
+  function maskedAt(s, i) { var a = i, z = i; while (a > 0 && !/\s/.test(s.charAt(a - 1))) a--; while (z < s.length && !/\s/.test(s.charAt(z))) z++; return MASK_RE.test(s.slice(a, z)); }
+  function qEnd(x) { var t = txt(x), m = /[؟?][»"')\]]*$/.exec(t); return !!m && !maskedAt(t, m.index); }
   function sentSplit(text) {
     var s = String(text == null ? "" : text), qOk = (s.match(/«/g) || []).length === (s.match(/»/g) || []).length, out = [], cur = "", dep = 0;
     for (var i = 0; i < s.length; i++) {
@@ -2467,11 +2479,45 @@
       if (ch === "\n") { out.push(cur); cur = ""; dep = 0; continue; }
       if (qOk && ch === "«") dep++; else if (qOk && ch === "»" && dep > 0) dep--;
       cur += ch;
-      if (!dep && /[؟?.!:]/.test(ch) && (i + 1 >= s.length || /\s/.test(s.charAt(i + 1)))) { out.push(cur); cur = ""; }
+      if (!dep && /[؟?.!:]/.test(ch) && (i + 1 >= s.length || /\s/.test(s.charAt(i + 1))) && !(/[؟?]/.test(ch) && maskedAt(s, i))) { out.push(cur); cur = ""; }
     }
     out.push(cur);
     return out.map(txt).filter(Boolean);
   }
+  /* دورِ ۱۶ (L1a): واحدهای پیام برای «کدام پرسش کمک کرد؟» — همان مرزهای sentSplit، با نشانِ نوعِ هر واحد: "head" = بندی که به «:» ختم می‌شود (سرِ پرسشِ
+     بعدی، مگر برچسبِ تنها)، "quote" = واحدی که سراسر نقل‌قولِ «…؟» است (فکرِ بلندِ نقل‌شده، پرسشِ دستیار نیست؛ R15 D4 s30)، "" = جملهٔ عادی */
+  function units(text) {
+    var s = String(text == null ? "" : text), qOk = (s.match(/«/g) || []).length === (s.match(/»/g) || []).length, out = [], cur = "", dep = 0;
+    var push = function (k) { var t = txt(cur); cur = ""; if (t) out.push({ t: t, k: k }); };
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charAt(i), closeQ = false;
+      if (ch === "\n") { push(""); dep = 0; continue; }
+      if (qOk && ch === "«") dep++; else if (qOk && ch === "»" && dep > 0) { dep--; closeQ = !dep; }
+      cur += ch;
+      if (dep || !(i + 1 >= s.length || /\s/.test(s.charAt(i + 1)))) continue;
+      if (closeQ && /^«/.test(txt(cur)) && /[؟?.!]»$/.test(cur)) push("quote");
+      else if (/[؟?.!:]/.test(ch) && !(/[؟?]/.test(ch) && maskedAt(s, i))) push(ch === ":" ? "head" : "");
+    }
+    push("");
+    return out;
+  }
+  /* سرِ پیش از «:» = بندِ پیش از آن (پس از آخرین «؛» ِ همان واحد). برچسبِ تنها = فقط واژهٔ گفتمانی («حالا:»)، یا اسمِ «پرسش/سؤال» با تعیین‌گر و زنجیرهٔ
+     اضافه‌اش و گروهِ حرف‌اضافه‌ای پس از آن، بی هیچ فعلی («یک پرسش:»، «اول یک پرسش:»، «یک پرسشِ دیگرِ بازنگری:»، «یک پرسش از همین فهرست:»، «همان پرسش از
+     زاویهٔ دیگر:»، «یک پرسشِ دیگر پیش از سؤالِ بعد:») — هر سرِ دیگر («از آخر شروع کن:»، «پیش از رها کردنِ کلِ راه:»، «وارسی‌اش کن:») جزءِ پرسش است */
+  var LBL_LEAD = ["و", "حالا", "پس", "اکنون", "اول", "خب", "خوب", "ولی", "اما"], LBL_DET = ["یک", "این", "همین", "همان", "دو", "سه", "اولین", "نخستین", "آخرین"],
+    LBL_PREP = ["از", "پیش", "پس", "برای", "در", "درباره", "دربارهٔ", "با"], CONN_W = ["و", "یا", "مثلاً", "مثلا", "اگر", "یعنی"];
+  function headClause(t) { var c = txt(t).replace(/[:：]$/, ""), k = c.lastIndexOf("؛"); return txt(k >= 0 ? c.slice(k + 1) : c); }
+  function bareLabel(hd) {
+    var w = txt(hd).replace(/^(?:[-•*–—]+|[0-9]+[.)])\s*/, "").split(/\s+/).filter(Boolean).map(function (x) { return x.replace(/[،,]+$/, ""); }), i = 0;
+    while (i < w.length && LBL_LEAD.indexOf(w[i]) >= 0) i++;
+    if (i >= w.length) return w.length > 0;
+    if (LBL_DET.indexOf(w[i]) >= 0) i++;
+    if (i >= w.length || !/^(?:پرسش|سؤال|سوال)/.test(w[i])) return false;
+    while (/[ِٔ]$/.test(w[i]) && i + 1 < w.length) i++;
+    i++;
+    return i >= w.length || LBL_PREP.indexOf(w[i]) >= 0;
+  }
+  function connStart(hd) { var t = txt(hd); if (/^[—–]/.test(t)) return true; var f = (t.split(/\s+/)[0] || "").replace(/[،,]+$/, ""); return CONN_W.indexOf(f) >= 0; }
   function cleanHead(t) { var o = txt(t), pv; do { pv = o; o = o.replace(BULLET_HEAD, "").replace(DISC_HEAD, ""); } while (o !== pv); return o; }
   function anaStart(raw) {
     var t = txt(raw); if (/^[—–]/.test(t)) return true;
@@ -2485,20 +2531,33 @@
   /* تنها برچسبِ ستایش/تأییدِ پرسشی («آفرین، خیلی خوب؟»، «درسته؟»، «ادامه بده؟») پرسش نیست — همان استثنای ستایشیِ پیشین (دورِ ۲، s37؛ test_tour1_r2_live R8) */
   var RHET_W = ["خیلی", "خوب", "خوبه", "عالی", "آفرین", "درسته", "درست", "باشه", "احسنت", "ادامه", "بده", "بدی", "نه", "آره", "بله", "دیگه", "هست"];
   function rhetQ(x) { var t = toks(cleanHead(x)); return t.length > 0 && t.every(function (w) { return RHET_W.indexOf(w) >= 0; }); }
-  /* بخشِ پرسشیِ یک پیام: { t: متنِ گزینه، qs: جمله‌های پرسشی‌اش (برای کلید) } یا null */
+  /* دورِ ۱۶ (L1c، جای «یک گزینه برای هر پیام» ِ R15 O1؛ A·F2 s03): بخش‌های پرسشیِ یک پیام — [{ t: متنِ گزینه، qs: جمله‌های پرسشی (برای کلید)، pre: متنِ
+     پیش از آن در همان پیام (برای مرجعِ L1d) }]. رشتهٔ پیوستهٔ پرسش‌ها یک گزینه است؛ رشتهٔ پرسشیِ دیگری که جملهٔ ناپرسشی (یا سرِ «:» ِ خودش) از اولی جدایش
+     کرده گزینهٔ خودش است، مگر با ضمیر/پیوند آغاز شود (بی سر: anaStart ِ همان پرسش؛ با سر: سری که با پیوند آغاز می‌شود — «یعنی …:») — آن‌گاه با « … »
+     به گزینهٔ پیشین می‌پیوندد. سرِ پیش از «:» (L1a) همیشه با پرسشش می‌آید، مگر برچسبِ تنها باشد. */
   /* keep(جملهٔ پرسشی) ⇐ فقط برای پاسخِ سازندهٔ مسئلهٔ کنارگذاشته (قاعدهٔ نام بردن، M1 — همان که بود، جمله‌به‌جمله): جملهٔ نگه‌نداشته رشته را می‌بُرد */
-  function qPassage(text, keep) {
-    var S0 = sentSplit(text), isQ = S0.map(function (x) { return QEND.test(x) && !rhetQ(x) && (!keep || keep(cleanHead(x))); }), runs = [], qs = [];
-    for (var i = 0; i < S0.length; i++) if (isQ[i]) { if (i && isQ[i - 1]) runs[runs.length - 1].push(i); else runs.push([i]); }
-    if (!runs.length) return null;
-    var parts = runs.map(function (rn) {
-      var a = rn[0], seg = rn.map(function (j) { return S0[j]; });
-      if (a > 0 && !isQ[a - 1] && !QEND.test(S0[a - 1]) && anaStart(seg[0])) seg.unshift(S0[a - 1]);
+  function qPassages(text, keep) {
+    var U = units(text), runs = [], out = [];
+    U.forEach(function (u) {
+      if (u.k === "head") { u.h = headClause(u.t); u.lab = bareLabel(cleanHead(u.h)); }
+      u.q = !u.k && qEnd(u.t) && !rhetQ(u.t) && (!keep || keep(cleanHead(u.t)));
+    });
+    for (var i = 0; i < U.length; i++) if (U[i].q) { if (i && U[i - 1].q) runs[runs.length - 1].push(i); else runs.push([i]); }
+    var stmt = function (k) { return k >= 0 && !U[k].q && !U[k].k && !qEnd(U[k].t); };
+    runs.forEach(function (rn) {
+      var a = rn[0], hd = a > 0 && U[a - 1].k === "head" && !U[a - 1].lab ? U[a - 1] : null, b = hd ? a - 1 : a;
+      var seg = rn.map(function (j) { return U[j].t; }), qs = rn.map(function (j) { return cleanHead(U[j].t); }).filter(Boolean);
+      if (hd) seg.unshift(hd.h + ":");
+      var pi = b - 1; if (!hd && pi >= 0 && U[pi].lab) pi--;
+      /* سرِ «:» خودش بندِ کامل است: فقط ضمیر/اشاره در آغازش جملهٔ پیش را می‌آورد، نه پیوندِ شرطی/افزایشی («اگر مسئلهٔ مرتبطی داری:» بسنده است؛ R4 E5d) */
+      if (stmt(pi) && (hd ? anaStart(hd.h) && !connStart(hd.h) : anaStart(U[a].t))) { seg.unshift(U[pi].t); b = pi; }
       seg[0] = cleanHead(seg[0]);
-      rn.forEach(function (j) { var q = cleanHead(S0[j]); if (q) qs.push(q); });
-      return seg.filter(Boolean).join(" ");
-    }).filter(Boolean);
-    return parts.length ? { t: parts.join(" … "), qs: qs } : null;
+      var t = seg.filter(Boolean).join(" ");
+      if (!t) return;
+      if (out.length && (hd ? connStart(hd.h) : anaStart(U[a].t))) { var L = out[out.length - 1]; L.t += " … " + t; L.qs = L.qs.concat(qs); }
+      else out.push({ t: t, qs: qs, pre: U.slice(0, b).map(function (u) { return u.t; }).join(" ") });
+    });
+    return out;
   }
   /* O2 (دورِ ۱۵): کلید = پرسش‌های صفحه/فهرست که هر جملهٔ پرسشیِ گزینه با آن یکی است — فهرست‌های مرحلهٔ همین مسئله، فهرست‌های نوع‌دارِ مربیِ تور (اثباتی،
      عملی، زندگی — همان که پیش از ثبت در کار بود؛ A·E1 s03) و پرسش‌های ثابتِ نوبت. بهترین هم‌خوانی برنده است، نه نخستین («به زبانِ خودت» هم در «اول کل»
@@ -2506,6 +2565,7 @@
   function knownQs(r, s0) {
     var K = [], AS = A.ASSIST || {}, add = function (q) { if (q && typeof q === "string" && K.indexOf(q) < 0) K.push(q); };
     ["u", "p", "c", "b"].forEach(function (k) { try { phaseQs(r, s0, k).forEach(add); } catch (e) { } });
+    cardUQs(r, s0).forEach(add);   // L3: برچسب‌های کارتی که واقعاً دید
     if (typeof AS.coachQs === "function") ["prove", "obj", "pract", "life", "any"].forEach(function (c) { ["u", "p", "c", "b"].forEach(function (k) { try { (AS.coachQs(k, c) || []).forEach(add); } catch (e) { } }); });
     [Q_GUESST, Q_RELUSE, Q_LINK, Q_PARTAUX, Q_ALLD, Q_ONLYANS, Q_LINE, Q_AUXP, Q_BACKW, Q_RESTATE_C, Q_ANALIM, Q_BASE, Q_EQUIV, EQ_FEW, Q_WHOLE, resultQ(r, s0)].forEach(add);
     return K;
@@ -2536,25 +2596,69 @@
       MS.forEach(function (m, mi) { if (!m || m.role !== "ai" || !inW(mi)) return;
         /* H3 (دورِ ۷، s02): پرسشی که کاربر پس از آن پاسخِ واقعی داد (پیامِ بعدیِ او، نه «نمی‌دونم») همیشه در فهرست می‌ماند */
         var nx = MS.slice(mi + 1).filter(function (y) { return y && y.role === "user"; })[0], ansd = !!(nx && txt(nx.text) && !/^\s*(?:نمی\s*(?:دونم|دانم)|نمیدونم|گیر\s*کردم)[.!؟?\s]*$/.test(norm(nx.text)));
-        var P = qPassage(m.text); if (!P) return;
+        var PS = qPassages(m.text); if (!PS.length) return;
         /* M1: از پاسخِ سازندهٔ مسئلهٔ کنارگذاشته فقط پرسشی که خودِ آن را نام می‌برد — جمله‌به‌جمله، مثلِ پیش (O3: قاعده همان می‌ماند) */
-        var inQ = P.qs.map(function (q) { return inW(mi, q); });
+        var inQ = [].concat.apply([], PS.map(function (x) { return x.qs; })).map(function (q) { return inW(mi, q); });
         if (!inQ.some(Boolean)) return;
-        if (!inQ.every(Boolean)) { P = qPassage(m.text, function (q) { return inW(mi, q); }); if (!P) return; }
-        if (P.t.length < 8) return;
-        var ks = [], full = P.qs.length > 0;
-        P.qs.forEach(function (q) { var k = keyOf(q, K); if (!k) full = false; else if (ks.indexOf(k) < 0) ks.push(k); });
-        /* O2: گزینه‌های با مجموعهٔ کلیدِ یکسان (همه کلیددار) یکی می‌شوند — تازه‌ترین واژه‌ها (C·T1: «اول کل» ِ کوتاهِ پیش از ثبت و بلندِ پس از آن) */
-        var sig = full ? ks.slice().sort().join("\n") : "", ix = -1, it = { t: P.t, k: ks[0] || "", ks: ks, full: full, sig: sig, a: ansd };
-        o.forEach(function (e, i) { if (e.t === P.t || (sig && e.sig === sig)) ix = i; });
-        if (ix < 0) o.push(it); else { it.a = it.a || o[ix].a; o[ix] = it; } }); });
+        if (!inQ.every(Boolean)) { PS = qPassages(m.text, function (q) { return inW(mi, q); }); if (!PS.length) return; }
+        var mk = (se.id || "") + "#" + mi;
+        PS.forEach(function (P) {
+          if (P.t.length < 8) return;
+          var ks = [], full = P.qs.length > 0;
+          P.qs.forEach(function (q) { var k = keyOf(q, K); if (!k) full = false; else if (ks.indexOf(k) < 0) ks.push(k); });
+          /* O2: گزینه‌های با مجموعهٔ کلیدِ یکسان (همه کلیددار) یکی می‌شوند — تازه‌ترین واژه‌ها (C·T1: «اول کل» ِ کوتاهِ پیش از ثبت و بلندِ پس از آن).
+             L1e (دورِ ۱۶، D·D2 s31): و دو گزینه‌ای که واژه‌های معنادارِ پرسش‌های یکی زیرمجموعهٔ دیگری است (همان پرسش به واژه‌های دیگر) — هرگز دو بخشِ یک پیام (L1c) */
+          var sig = full ? ks.slice().sort().join("\n") : "", cw = cwSet(P.qs), hits = [], it = { t: P.t, k: ks[0] || "", ks: ks, full: full, sig: sig, a: ansd, mk: mk, cw: cw, pre: P.pre };
+          o.forEach(function (e, i) { if (e.t === P.t || (e.mk !== mk && ((sig && e.sig === sig) || cwSub(e.cw, cw)))) hits.push(i); });
+          if (!hits.length) { o.push(it); return; }
+          it.a = it.a || hits.some(function (i) { return o[i].a; });
+          o[hits[0]] = it; for (var hk = hits.length - 1; hk >= 1; hk--) o.splice(hits[hk], 1);
+        }); }); });
     var tailN = o.length - 8;
-    return o.filter(function (e, i) { return e.a || i >= tailN; }).map(function (e) { return { t: e.t, k: e.k, ks: e.ks.slice(), full: e.full }; });
+    var g1 = s0 && s0.g && s0.g[1], gq = g1 && txt(g1.guess), uq = txt((uOf(s0) || {}).u);
+    return o.filter(function (e, i) { return e.a || i >= tailN; }).map(function (e) { return { t: refNote(e, gq, uq), k: e.k, ks: e.ks.slice(), full: e.full }; });
+  }
+  /* L1e (دورِ ۱۶): واژه‌های معنادارِ جمله‌های پرسشیِ یک گزینه — بی واژه‌های ایست، بی فعل: واژهٔ پس از «می/نمی»، جای فعل در پایانِ هر بند (فارسی فاعل-مفعول-
+     فعل است؛ بند = پاره‌ای میانِ «؟ . ! ؛ —»)، و همکردِ «به X فعل» («به کار رفته»، «به دست آوری»). پارهٔ میانِ دو خطِ تیره بدل/معترضه است و فعل ندارد.
+     ضمیرِ پیوسته («اش») و پرسش‌واژه/قیدِ تکرار (کدام، چند، دوباره، دقیقاً …) واژهٔ نقش‌اند. بی آستانهٔ عددی: یا زیرمجموعه است یا نیست. */
+  var CW_FN = ["اش", "دوباره", "کدام", "کدوم", "چند", "دقیقا", "واقعا", "فقط", "باز", "نیز", "اصلا", "حتی", "چیست", "چیه"];
+  function cwSet(qs) {
+    var o = [], isStop = function (w) { return !w || (w.length < 2 && !/\d/.test(w)) || STOP.indexOf(" " + w + " ") >= 0 || CW_FN.indexOf(w) >= 0; };
+    (qs || []).forEach(function (q) { String(q).split(/[؟?.!؛;\n]+/).forEach(function (sen) {
+      var seg = sen.split(/[—–]/);
+      seg.forEach(function (c, si) {
+        var apo = seg.length > 2 && si > 0 && si < seg.length - 1, raw = norm(dimFix(c)).split(/[^0-9a-zء-يپچژکگی]+/).filter(Boolean), last = -1;
+        raw.forEach(function (w, i) { if (!isStop(w)) last = i; });
+        raw.forEach(function (w, i) {
+          if (isStop(w) || (i > 0 && (raw[i - 1] === "می" || raw[i - 1] === "نمی"))) return;
+          if (!apo && (i === last || (i === last - 1 && raw[i - 1] === "به"))) return;
+          var x = stem(BROKEN[w] || w); x = SYN[x] || x; if (o.indexOf(x) < 0) o.push(x);
+        });
+      });
+    }); });
+    return o;
+  }
+  function cwSub(a, b) { if (!a || !b || !a.length || !b.length) return false; var sub = function (x, y) { return x.every(function (w) { return y.indexOf(w) >= 0; }); }; return sub(a, b) || sub(b, a); }
+  /* L1d (دورِ ۱۶، مشاهدهٔ C: s23، s21/s29): گزینه‌ای که مرجعِ اصلی‌اش ضمیر/اشاره به حدسِ ثبت‌شده یا مجهولِ ثبت‌شدهٔ همین مسئله است — «این/همین حدس»، «حدسی گفتی»،
+     یا ضمیرِ پیوستهٔ «‌اش» وقتی جملهٔ پیش از آن در همان پیام از «حدس» (یا «مجهول») گفت — مرجع را از رکورد در پرانتز می‌گیرد، تا هر گزینه تنها خوانا باشد.
+     اگر خودِ گزینه متنِ حدس/مجهول را دارد، یا رکوردی نیست، دست نمی‌خورد. */
+  var CLITIC_RE = /‌اش(?=[\s؟?،,—–:]|$)/, DEM_GUESS = /(?:^|\s)(?:این|همین|آن|همان)\s+حدس/, DEM_UNK = /(?:^|\s)(?:این|همین|آن|همان)\s+مجهول/;
+  function refNote(e, gq, uq) {
+    var t = e.t, pre = e.pre || "", cl = CLITIC_RE.test(t), tt = toks(t), own = function (x) { var w = toks(x); return w.length > 0 && w.every(function (y) { return hit(y, tt); }); };
+    if (gq && !own(gq) && (DEM_GUESS.test(t) || /حدسی\s+گفتی/.test(t) || (cl && /حدس/.test(pre)))) return t + " (حدسِ تو: «" + clip(gq, 100) + "»)";
+    if (uq && !own(uq) && (DEM_UNK.test(t) || (cl && /مجهول/.test(pre) && !/حدس/.test(pre)))) return t + " (مجهولِ تو: «" + clip(uq, 100) + "»)";
+    return t;
+  }
+  /* L3 (دورِ ۱۶، A·F1 s03/s05/s10): پرسش‌های کارتِ فهم همان که کارت واقعاً نشان داد — برای «اثباتی» و «اثبات یا رد کن» برچسب‌های خودِ نوع
+     (A.SOLVE_TYPES: حکم / فرض / بخش‌های حکم / «آیا همهٔ فرض لازم است؟» — در «اثبات یا رد کن» ِ زندگی هم همین برچسب‌ها، که «مجهول» ندارند)؛ یافتنی همان فهرستِ پیشین */
+  function cardUQs(r, s) {
+    var ty = typeOf(r, s);
+    if (ty === "prove" || ty === "pod") { var T = T0(ty); return [T.u, T.d, T.c, T.suff].filter(function (x) { return typeof x === "string" && x; }); }
+    try { return phaseQs(r, s, "u"); } catch (e) { return []; }
   }
   /* پرسش‌هایی که در صفحه پاسخ گرفتند: پرسش‌های کارتِ فهم (مجهول، داده‌ها، شرط، «کافی است؟» — کارت بی آن‌ها ثبت نمی‌شود) + پرسش‌های طرح که پاسخ دادی */
   function pageQs(r, s, pg) {
-    var o = [], u = uOf(s), U0 = [];
-    try { U0 = phaseQs(r, s, "u"); } catch (e) { U0 = []; }
+    var o = [], u = uOf(s), U0 = cardUQs(r, s);
     usedQs(pg).forEach(function (q) { if (o.indexOf(q) < 0) o.push(q); });
     /* F7 (دورِ ۵، s23): پرسش‌های طرح که در کارت‌های خودشان پاسخ گرفتند هم — «پیش‌تر … دیده‌ای؟» (کارتِ مسئلهٔ مرتبط)، «از خواسته به عقب» (کارتِ کار به عقب)، مسئلهٔ کمکی */
     var L = live(s), PQ = []; try { PQ = phaseQs(r, s, "p"); } catch (e) { PQ = []; }
@@ -2568,8 +2672,7 @@
   /* O2 (دورِ ۱۵): فیلدهای کارتِ فهم از تعریفِ خودِ کارت — برچسب‌های هر فیلد در همهٔ نوع‌ها (A.SOLVE_TYPES: u/d/c/suff) و پرسشِ صفحه‌اش (همان جایگاه در
      فهرستِ فهمِ همین مسئله، همان که pageQs برمی‌دارد)، و «اول کل» (lpOne). پرسشِ فهرست/تور که همهٔ جمله‌هایش را فیلدِ پرشده‌ای پاسخ داده، در صفحه پاسخ گرفته است. */
   function pageFields(r, s) {
-    var u = uOf(s), u1 = u || {}, U0 = [], TY = A.SOLVE_TYPES || {}, d = live(s).uDraft || {};
-    try { U0 = phaseQs(r, s, "u"); } catch (e) { U0 = []; }
+    var u = uOf(s), u1 = u || {}, U0 = cardUQs(r, s), TY = A.SOLVE_TYPES || {}, d = live(s).uDraft || {};
     var lab = function (k) { return Object.keys(TY).map(function (t) { return TY[t] && TY[t][k]; }).filter(function (x) { return typeof x === "string" && x; }); };
     return [
       { on: !wholeOpen(s) && !!(txt(u1.one) || txt(d.one)), q: Q_WHOLE, l: [Q_WHOLE, "کلِ مسئله در یک جملهٔ کامل — بی‌جزئیات"] },
@@ -2819,9 +2922,26 @@
     /* N2 (دورِ ۱۴): گزینهٔ 💬 واژه‌های خودِ دستیار را نشان می‌دهد؛ اگر همان پرسشِ صفحه است (k) که در صفحه پاسخ دادی، یک گزینه می‌ماند (گزینهٔ صفحه) */
     /* O2 (دورِ ۱۵): گزینهٔ 💬 فقط وقتی می‌افتد که همهٔ جمله‌های پرسشی‌اش کلید دارند و هر کلید همین‌جا گزینهٔ 📄 دارد (پاسخِ فهرست یا فیلدِ خودش)؛
        گزینه‌ای با پرسشِ به واژه‌های خودِ دستیار (بی کلید) کامل می‌ماند (A·E1 s01) */
-    var Qs = pageQs(r, s, pg), Cs = cardsUsed(r, s), PF = pageFields(r, s), ChI = chatItems(r).filter(function (e) { return Qs.indexOf(e.t) < 0 && !(e.full && e.ks.length && e.ks.every(function (K) { return keyShown(K, Qs, PF); })); }), Ch = ChI.map(function (e) { return e.t; });
+    var Qs = pageQs(r, s, pg), Cs = cardsUsed(r, s), PF = pageFields(r, s), chOk = function (e) { return Qs.indexOf(e.t) < 0 && !(e.full && e.ks.length && e.ks.every(function (K) { return keyShown(K, Qs, PF); })); }, ChI = chatItems(r).filter(chOk), Ch = ChI.map(function (e) { return e.t; });
     var bestOpts = Qs.map(function (q, i) { return [String(i), q]; }).concat(Ch.map(function (q, i) { return ["chat:" + i, "💬 " + q]; }));   // A13: کلِ پرسش، نه تکهٔ آغازش
     if (!defect && bestOpts.length) box.appendChild(selF("lpBBest", "کدام پرسش بیشتر از همه کمک کرد؟ (پرسش‌هایی که در صفحه پاسخ دادی، و پرسش‌های دستیار در گفت‌وگوی همین مسئله)", bestOpts.concat([["none", "هیچ‌کدام"]]), d.best, function (v) { d.best = v; }));
+    /* L2 (دورِ ۱۶، A·F3 s06/s10): فهرست زنده است — پیامِ تازهٔ دستیار وقتی همین بازنگری باز است گزینه‌های #lpBBest را همان‌جا تازه می‌کند (بی رسمِ دوبارهٔ
+       کارت، تا نوشته‌ها و جای کاربر بمانند)؛ گزینه‌ای که برگزیده بود با همان متن برگزیده می‌ماند */
+    LB_LIVE = defect ? null : function () {
+      if (!document.contains(box)) { LB_LIVE = null; return; }
+      var nI = chatItems(r).filter(chOk), nCh = nI.map(function (e) { return e.t; });
+      if (nCh.join("\n") === Ch.join("\n")) return;
+      var cur = /^chat:/.test(d.best || "") ? Ch[+d.best.slice(5)] : null;
+      ChI = nI; Ch = nCh;
+      bestOpts = Qs.map(function (q, i) { return [String(i), q]; }).concat(Ch.map(function (q, i) { return ["chat:" + i, "💬 " + q]; }));
+      if (cur != null) { var ni = Ch.indexOf(cur); d.best = ni >= 0 ? "chat:" + ni : ""; }
+      var se = document.getElementById("lpBBest");
+      if (!se || !box.contains(se)) { rer(); return; }
+      se.innerHTML = "";
+      [["", "—"]].concat(bestOpts, [["none", "هیچ‌کدام"]]).forEach(function (op) { se.appendChild(h("option", { value: op[0], selected: (d.best || "") === op[0] }, op[1])); });
+      se.value = d.best || "";
+      saveDraft();
+    };
     if (!defect && Cs.length) box.appendChild(selF("lpBTool", "و کدام ابزار؟ (اختیاری)", Cs.map(function (c) { return [c[0], "🧰 " + c[1]]; }).concat([["none", "هیچ‌کدام"]]), d.tool || "", function (v) { d.tool = v; }));
     if (!defect) {
       box.appendChild(field("lpBUse", ab ? "درسِ تو به قلمِ خودت (اختیاری): کجای دیگر به کار می‌آید؟" : "درسِ تو به قلمِ خودت: این روش یا نتیجه کجای دیگر به کار می‌آید؟", d.use, function (v) { d.use = v; }, 2));
