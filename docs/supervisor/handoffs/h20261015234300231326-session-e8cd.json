@@ -11,5 +11,11 @@
  "what": "تورِ ۱ پولیا F3 (s32): epi_engine.js X.locus — نخستین نقطهٔ خطای قاعده‌های «صورتِ غیرقیاسی» (r_aql_nondeductive/conseq/analogy) برای تصدیقی که راهش ایستگاهِ دیگری است (WAYMAP) و بخشِ جزوهٔ مشترک دارد (s50) به ایستگاهِ همان راه می‌رود؛ سقف/قاعده/شرط/سالم‌بودن دست نخورد؛ genSynth همان locus را برای خطای کاشته می‌گیرد. پیش/پس روی ۲۰۳ واقعهٔ پیکره + بذرها: ۰ حکمِ درستِ خراب، تنها تغییر cs_ariane5_501 (پرچمِ اضافیِ st_aql رفت؛ first = st_istiqra مطابقِ truth.fail)؛ کنترل‌ها agree 1، negOk، posDetect 1 (اجرای run در کپیِ موقت با EPI_BT_DIR، دفترِ اصلی دست نخورد). همچنین epi_st_b.js: دو خانهٔ «علت یا هم‌بستگی؟» (rivals، cause) در کاربرگِ st_istiqra ⇒ فقط hidden_ctrl ِ موجود (r_istiqra_hidden) از a7_bt casePrefill. لطفاً در دورِ بعد run --rerun و بازبینی.",
  "procedure": "BACKTEST_PROMPT.md#گام‌ها (پیش/پس روی کلِ پیکره)",
  "commit": "",
- "status": "open"
+ "status": "verified",
+ "closed": {
+  "by": "backtest",
+  "at": "2026-10-16T23:28:59Z",
+  "note": "دورِ ۱۴: پیکرِ ۲۱۸ واقعه، health_alarm=۰، cs_ariane5_501 first=st_istiqra مطابقِ truth.fail، کنترل‌ها negOk/posDetect=1، audit تمیز",
+  "commit": ""
+ }
 }

@@ -199,8 +199,20 @@
    "bookOnly": true
   },
   "a_higher_order_evidence": {
-   "stage": 0,
-   "history": []
+   "stage": 1,
+   "history": [
+    {
+     "round": 14,
+     "at": "2026-10-16",
+     "stage": 1,
+     "what": "منابعِ خوانده‌شده (۲۰۲۶-۱۰-۱۶، باز و خوانده شد): SEP «Epistemic Self-Doubt» (روش، بخش ۳ «Higher-Order Evidence») و SEP «Disagreement» (بخش‌های ۵٫۲٫۴، ۵٫۴ و ۵٫۵٫۲ — نه بخشی جدا)",
+     "by": "ناظرِ بک‌تست"
+    }
+   ],
+   "sources": [
+    "Stanford Encyclopedia of Philosophy, «Epistemic Self-Doubt» (Sherrilyn Roush; first published 2017) — https://plato.stanford.edu/entries/epistemic-self-doubt/",
+    "Stanford Encyclopedia of Philosophy, «Disagreement» (Bryan Frances and Jonathan Matheson; first published 2018, substantive revision 2024) — https://plato.stanford.edu/entries/disagreement/"
+   ]
   },
   "a_kinds_of_knowledge": {
    "stage": 4,
@@ -1484,7 +1496,15 @@
     "r_istiqra_hidden",
     "r_tajrobe_hidden",
     "r_tajrobe_no_vazraf"
-   ]
+   ],
+   "verify": {
+    "since": 13,
+    "fresh": 1,
+    "ok": 1,
+    "ids": [
+     "r14_abs_staffing_threshold"
+    ]
+   }
   },
   "a_confirmation": {
    "stage": 4,
@@ -2871,6 +2891,6 @@
    "bookOnly": true
   }
  },
- "round": 13,
- "updated": "2026-10-15"
+ "round": 14,
+ "updated": "2026-10-16"
 }

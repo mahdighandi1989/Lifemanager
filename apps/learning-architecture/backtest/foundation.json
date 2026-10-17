@@ -1,6 +1,6 @@
 {
- "round": 13,
- "at": "2026-10-15",
+ "round": 14,
+ "at": "2026-10-16",
  "classes": {
   "B": 25,
   "S": 20,
@@ -1136,18 +1136,18 @@
  "modes": {
   "num": {
    "kinds": {
-    "ok": 205,
+    "ok": 210,
     "health_alarm": 0,
-    "missed": 3,
+    "missed": 7,
     "mislocated": 1
    },
    "changed": []
   },
   "deg": {
    "kinds": {
-    "ok": 195,
+    "ok": 199,
     "health_alarm": 0,
-    "missed": 10,
+    "missed": 15,
     "mislocated": 4
    },
    "changed": [
@@ -1210,23 +1210,29 @@
      "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r14_abs_supplier_whistle",
+     "t": "اطلاعِ «کارمندِ پیشینِ تأمین‌کننده» دربارهٔ آلودگیِ مادهٔ اولیه",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   },
   "derived": {
    "kinds": {
-    "ok": 205,
+    "ok": 210,
     "health_alarm": 0,
-    "missed": 3,
+    "missed": 7,
     "mislocated": 1
    },
    "changed": []
   },
   "both": {
    "kinds": {
-    "ok": 195,
+    "ok": 199,
     "health_alarm": 0,
-    "missed": 10,
+    "missed": 15,
     "mislocated": 4
    },
    "changed": [
@@ -1289,6 +1295,12 @@
      "t": "پروندهٔ سالی کلارک و «یک در ۷۳ میلیون» (۱۹۹۹)",
      "from": "ok",
      "to": "mislocated"
+    },
+    {
+     "id": "r14_abs_supplier_whistle",
+     "t": "اطلاعِ «کارمندِ پیشینِ تأمین‌کننده» دربارهٔ آلودگیِ مادهٔ اولیه",
+     "from": "ok",
+     "to": "missed"
     }
    ]
   }
@@ -1451,8 +1463,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 116,
-   "fullAfter": 116
+   "fullBefore": 117,
+   "fullAfter": 117
   },
   "p_found_vazraf": {
    "rules": 1,
@@ -1461,8 +1473,8 @@
    "broken": [],
    "refined": [],
    "extra": [],
-   "fullBefore": 116,
-   "fullAfter": 116
+   "fullBefore": 117,
+   "fullAfter": 117
   },
   "p_found_scope": null
  },

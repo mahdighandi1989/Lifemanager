@@ -4564,3 +4564,6 @@ PDFهای حقوقیِ بی‌ارزشِ XM، و آیتم‌های «test» هن
 - **DECISION:** There is one question per turn, from one source (`A.liveCoach` priority). Heuristic gates warn instead of blocking. Look-back checks every condition part.
 - **CHANGE:** `a27_tour.js`, `a28_systerr.js`, `a35_idea.js`, `a36_solve.js`, `a38_live.js`, `a26_assist.js`, `a29_mind.js`, plus tests `test_tour1_r3..r5_*.js`.
 - **FINDING (own error):** I ran round 3 against a stale `dist` (no `build.py` after a fast-forward). Fixed by rebuilding; runners now check the build mtime against the merge time.
+
+## 2026-10-16 — CHANGE/FINDING (routine: backtest) — دورِ ۱۴ بک‌تستِ معرفت‌شناسی
+`apps/learning-architecture/backtest/` : ۹ واقعهٔ تازه، ۴ یافتهٔ «missed» بی‌`conf` (علتِ نامعلوم؛ پیشنهادِ `p_conf_wording` منتظرِ مالک)، `a_higher_order_evidence` گامِ ۱، دو `did` دست‌به‌دست بسته شد. هیچ قاعده/سقف عوض نشد. جزئیات: `apps/learning-architecture/docs/WORKLOG.md` (68). **نکتهٔ ریپو:** `origin/main` بازنویسی (force-update) شده بود و تاریخچهٔ محلیِ قدیمی با آن بی‌ارتباط؛ کار از `origin/main` شاخه شد.

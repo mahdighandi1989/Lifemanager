@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-15",
- "round": 13,
+ "updated": "2026-10-16",
+ "round": 14,
  "attributions": [
   "اشتباه جزوه (استاد)",
   "بدفهمی یا پیاده‌سازی نادرست سازنده",
@@ -25,7 +25,7 @@
    },
    "retest": {
     "since": 7,
-    "fresh": 8,
+    "fresh": 9,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -35,7 +35,8 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fisher_plateau_1929"
     ]
    },
    "kind": "missed",
@@ -75,8 +76,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 21,
-    "freshOk": 18,
+    "fresh": 27,
+    "freshOk": 21,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_brian_williams_rpg",
@@ -134,8 +135,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 10,
-    "freshOk": 7,
+    "fresh": 13,
+    "freshOk": 8,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -146,7 +147,9 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_reinhart_rogoff_90",
+     "r14_fisher_plateau_1929"
     ]
    },
    "kind": "mislocated",
@@ -175,7 +178,7 @@
    "case": "cs_hrt_observational",
    "opened": "2026-10-13",
    "openedRound": 1,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": "s51 دو شرط برای قانون تجربی می‌گذارد: «از راه روش وضع و رفع شروط و عوامل دخیل را می‌آزماید» و «مشروط به عدم دخالت عوامل پنهان»؛ و صریحاً «تکرار داده‌های حسی به تنهایی قادر به تولید حکم کلی و قانون علمی نیست». اینجا هر دو شرط غایب‌اند (vazraf:false و hidden_ctrl:false)، ولی قواعد فقط کمینهٔ ۷۰ می‌دهند (یادداشت r_tajrobe_hidden: «اگر vazraf:false و hidden_ctrl:false هر دو رمز شوند، کمینه ۷۰ است») و conf=80 دقیقاً روی مرز ۷۰+۱۰ می‌نشیند، پس شکست دیده نمی‌شود؛ اصل نگاشت سرصفحهٔ خود قواعد («شرط اعتبار احراز نشده → ۴۵») برای ادعای علّیِ بی‌هر دو شرط پیاده نشده است. — به‌روز (دورِ ۴): پیشنهادِ p_found_vazraf همین را با قضیهٔ T_null (حداکثر ½) بی عددِ قراردادیِ ۴۵ حل می‌کند و جایگزینِ p_tajrobe_none است.",
    "fix": {
@@ -184,8 +187,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 8,
-    "freshOk": 8,
+    "fresh": 11,
+    "freshOk": 10,
     "ids": [
      "r4_wald_survivorship",
      "r4_kahneman_instructors",
@@ -194,7 +197,10 @@
      "r4_abs_survivor_shops",
      "r4_abs_lab_claim_replic",
      "r5_snow_water_1854",
-     "r13_marshall_pylori_1984"
+     "r13_marshall_pylori_1984",
+     "r14_reinhart_rogoff_90",
+     "r14_bloodsworth_dna_1993",
+     "r14_abs_staffing_threshold"
     ]
    },
    "kind": "missed",
@@ -232,7 +238,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 8,
+    "fresh": 9,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -242,7 +248,8 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fisher_plateau_1929"
     ]
    },
    "kind": "missed",
@@ -278,7 +285,7 @@
    },
    "retest": {
     "since": 6,
-    "fresh": 8,
+    "fresh": 9,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -288,7 +295,8 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fisher_plateau_1929"
     ]
    },
    "kind": "health_alarm",
@@ -323,8 +331,8 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 17,
-    "freshOk": 16,
+    "fresh": 19,
+    "freshOk": 17,
     "ids": [
      "r2_cbs_killian_memos",
      "r2_chamberlain_hitler_face",
@@ -382,7 +390,7 @@
    },
    "retest": {
     "since": 1,
-    "fresh": 8,
+    "fresh": 9,
     "freshOk": 5,
     "ids": [
      "r4_wald_survivorship",
@@ -392,7 +400,8 @@
      "r5_abs_lender_model",
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_fisher_plateau_1929"
     ]
    },
    "kind": "health_alarm",
@@ -493,7 +502,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
   },
   {
    "id": "f_r13_challenger_1986",
@@ -527,7 +536,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
   },
   {
    "id": "f_r13_literary_digest_1936",
@@ -559,7 +568,7 @@
     "s50",
     "s51"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
   },
   {
    "id": "f_r13_willingham_arson_1991",
@@ -592,14 +601,169 @@
     "s40",
     "s49"
    ],
-   "lastSeenRound": 13
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_clinton_bosnia_2008",
+   "case": "r14_clinton_bosnia_2008",
+   "opened": "2026-10-16",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "بازبینِ مستقل: علتْ «خطای رمزگذار» نیست؛ متنِ تصدیق اطمینان نمی‌دهد و موتور بی conf حکمی نمی‌دهد (طراحیِ قاعده‌ها). اینکه چرا این داستان‌ها لفظِ اطمینان نداشتند انتخابِ نویسندهٔ پیکره بود (فقط تونکین و انتزاعی‌ها «قطعی» داشتند). نامعلوم تا آزمونِ وقایعِ تازه با لفظِ اطمینانِ خنثی که پیش از دیدنِ حکم نوشته شود. · رمزگذارِ کور برای «conf» عددی ننوشت: متنِ تصدیق («زیرِ آتش بودیم و دویدیم») با لفظِ قطعی بیان شده ولی درصدی نمی‌دهد؛ سقفِ r_yad_undoc (حافظهٔ بی‌سند) فقط روی conf سنجیده می‌شود، پس بی conf حکمی نیست (s52). همان علتِ یافته‌های دورِ ۱۳؛ مورد را برای قبول‌شدن دست نزدم.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "یادآوریِ «زیرِ آتشِ تک‌تیرانداز در تزار» (۲۰۰۸)",
+   "tier": "real",
+   "expected": [
+    "st_yad"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_yad_orig_t1",
+    "r_yad_orig_t2",
+    "r_yad_orig_t3",
+    "r_yad_orig_t4",
+    "r_yad_orig_t5",
+    "r_yad_undoc",
+    "r_yad_undoc_t4",
+    "r_yad_undoc_t3",
+    "r_yad_undoc_t2",
+    "r_yad_undoc_t1"
+   ],
+   "secs": [
+    "s52"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_curveball_bw_labs",
+   "case": "r14_curveball_bw_labs",
+   "opened": "2026-10-16",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "بازبینِ مستقل: علتْ «خطای رمزگذار» نیست؛ متنِ تصدیق اطمینان نمی‌دهد و موتور بی conf حکمی نمی‌دهد (طراحیِ قاعده‌ها). اینکه چرا این داستان‌ها لفظِ اطمینان نداشتند انتخابِ نویسندهٔ پیکره بود (فقط تونکین و انتزاعی‌ها «قطعی» داشتند). نامعلوم تا آزمونِ وقایعِ تازه با لفظِ اطمینانِ خنثی که پیش از دیدنِ حکم نوشته شود. · conf ننوشته شد (لفظِ «تأیید می‌کنند» عدد نمی‌دهد)؛ رمزگذار هم chain را «تک‌منبع» و narrator را «نامعلوم» گذاشت (درست: متن مستقل‌بودنِ قرینه‌ها را نمی‌گوید، s47/s48). بی conf هیچ سقفی (r_naql_unreliable_corrob/r_naql_narrator_unknown) پرچم نمی‌دهد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "منبعِ «کِرووبال» و آزمایشگاه‌های سیارِ سلاح زیستی عراق (۲۰۰۲–۲۰۰۳)",
+   "tier": "real",
+   "expected": [
+    "st_naql",
+    "st_resp"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_naql_not_issued",
+    "r_naql_unreliable",
+    "r_naql_unreliable_corrob",
+    "r_naql_narrator_unknown",
+    "r_naql_chain_broken",
+    "r_naql_ahad",
+    "r_naql_no_qarina",
+    "r_naql_contra_qarina",
+    "r_naql_nonnass",
+    "r_naql_zahir_noq",
+    "r_naql_mubham_noq",
+    "r_naql_mubham_q",
+    "r_resp_inquiry"
+   ],
+   "secs": [
+    "s47",
+    "s48",
+    "s53",
+    "s6",
+    "s71",
+    "s80",
+    "s86"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_fisher_plateau_1929",
+   "case": "r14_fisher_plateau_1929",
+   "opened": "2026-10-16",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "بازبینِ مستقل: علتْ «خطای رمزگذار» نیست؛ متنِ تصدیق اطمینان نمی‌دهد و موتور بی conf حکمی نمی‌دهد (طراحیِ قاعده‌ها). اینکه چرا این داستان‌ها لفظِ اطمینان نداشتند انتخابِ نویسندهٔ پیکره بود (فقط تونکین و انتزاعی‌ها «قطعی» داشتند). نامعلوم تا آزمونِ وقایعِ تازه با لفظِ اطمینانِ خنثی که پیش از دیدنِ حکم نوشته شود. · conf ننوشته شد؛ لفظِ «دائماً بالا» حکمِ قطعی است ولی رمزگذارِ کور عدد نگذاشت. موتور scope=کلی نامحدود را درست گرفت ولی سقف T_universal فقط با conf سنجیده می‌شود (s50).",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "«فلاتِ دائماً بالا» و ایروینگ فیشر (اکتبر ۱۹۲۹)",
+   "tier": "real",
+   "expected": [
+    "st_istiqra",
+    "st_resp"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_istiqra_incomplete",
+    "r_istiqra_universal",
+    "r_istiqra_finite",
+    "r_istiqra_next",
+    "r_istiqra_small_n",
+    "r_istiqra_hidden",
+    "r_resp_inquiry"
+   ],
+   "secs": [
+    "s40",
+    "s50",
+    "s51",
+    "s6",
+    "s71",
+    "s80",
+    "s86"
+   ],
+   "lastSeenRound": 14
+  },
+  {
+   "id": "f_r14_reinhart_rogoff_90",
+   "case": "r14_reinhart_rogoff_90",
+   "opened": "2026-10-16",
+   "openedRound": 14,
+   "status": "diagnosed",
+   "attribution": "نامعلوم — بررسی بیشتر",
+   "note": "بازبینِ مستقل: علتْ «خطای رمزگذار» نیست؛ متنِ تصدیق اطمینان نمی‌دهد و موتور بی conf حکمی نمی‌دهد (طراحیِ قاعده‌ها). اینکه چرا این داستان‌ها لفظِ اطمینان نداشتند انتخابِ نویسندهٔ پیکره بود (فقط تونکین و انتزاعی‌ها «قطعی» داشتند). نامعلوم تا آزمونِ وقایعِ تازه با لفظِ اطمینانِ خنثی که پیش از دیدنِ حکم نوشته شود. · conf ننوشته شد؛ x_method/x_field نامعلوم ⇒ سقفِ ½ + ½(پایه−½) درست رمزگذاری شده ولی تصدیق conf ندارد. رمزگذار بخشِ «فرو می‌ریزد/باید ریاضت کرد» را عددی نکرد.",
+   "fix": null,
+   "retest": null,
+   "kind": "missed",
+   "title": "آستانهٔ «۹۰٪ بدهی» رینهارت–روگوف و سیاستِ ریاضت (۲۰۱۰–۲۰۱۳)",
+   "tier": "real",
+   "expected": [
+    "st_expert",
+    "st_tajrobe"
+   ],
+   "flagged": [],
+   "rules": [
+    "r_expert_method_weak",
+    "r_expert_out_of_field",
+    "r_expert_comp_unknown",
+    "r_expert_bias",
+    "r_tajrobe_ceiling",
+    "r_tajrobe_no_vazraf",
+    "r_tajrobe_hidden",
+    "r_expert_pop_econ",
+    "r_expert_pop_psych",
+    "r_expert_pop_socsci",
+    "r_expert_pop_unknown"
+   ],
+   "secs": [
+    "s40",
+    "s49",
+    "s50",
+    "s51"
+   ],
+   "lastSeenRound": 14
   },
   {
    "id": "f_r2_nyt_goddard_1920",
    "case": "r2_nyt_goddard_1920",
    "opened": "2026-10-13",
    "openedRound": 3,
-   "status": "verified",
+   "status": "fixed",
    "attribution": "خلأ پیاده‌سازی (ملاک هست، قاعده نیست)",
    "note": " — دورِ ۵: فقط کمینهٔ سقف‌ها مقصر شمرده می‌شد و حکمِ کلی از استقراء سقفِ قضیه‌ای نداشت (s51).",
    "fix": {
@@ -608,8 +772,8 @@
    },
    "retest": {
     "since": 5,
-    "fresh": 11,
-    "freshOk": 11,
+    "fresh": 15,
+    "freshOk": 13,
     "ids": [
      "r4_wald_survivorship",
      "r4_columbia_foam",
@@ -621,7 +785,8 @@
      "r5_madoff_feeders",
      "r5_hitler_diaries_1983",
      "r5_sally_clark_1999",
-     "r5_abs_lender_model"
+     "r5_abs_lender_model",
+     "r14_curveball_bw_labs"
     ]
    },
    "kind": "mislocated",
@@ -666,12 +831,14 @@
    "fix": null,
    "retest": {
     "since": 9,
-    "fresh": 3,
-    "freshOk": 2,
+    "fresh": 5,
+    "freshOk": 3,
     "ids": [
      "r5_hitler_diaries_1983",
      "r5_abs_family_letters",
-     "r13_willingham_arson_1991"
+     "r13_willingham_arson_1991",
+     "r14_reinhart_rogoff_90",
+     "r14_abs_staffing_threshold"
     ]
    },
    "kind": "health_alarm",
@@ -705,12 +872,16 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 3,
-    "freshOk": 0,
+    "fresh": 7,
+    "freshOk": 2,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_curveball_bw_labs",
+     "r14_tonkin_aug4",
+     "r14_fisher_plateau_1929",
+     "r14_abs_supplier_whistle"
     ]
    },
    "kind": "mislocated",
@@ -751,12 +922,16 @@
    },
    "retest": {
     "since": 12,
-    "fresh": 3,
-    "freshOk": 0,
+    "fresh": 7,
+    "freshOk": 2,
     "ids": [
      "r13_challenger_1986",
      "r13_literary_digest_1936",
-     "r13_abs_store_survey"
+     "r13_abs_store_survey",
+     "r14_curveball_bw_labs",
+     "r14_tonkin_aug4",
+     "r14_fisher_plateau_1929",
+     "r14_abs_supplier_whistle"
     ]
    },
    "kind": "mislocated",
