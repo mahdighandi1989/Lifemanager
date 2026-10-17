@@ -1,0 +1,16 @@
+{
+ "id": "h20261017102947779951-session-4a16",
+ "at": "2026-10-17T10:29:47Z",
+ "by": "session",
+ "area": "app",
+ "owner": [
+  "urgent",
+  "general"
+ ],
+ "kind": "did",
+ "sheet": null,
+ "what": "REMOVAL_CANDIDATES.md: quarantine entry for the round-16 keyword storing paths in a27 (dupLinkR16, promScanR16, regOfR16, verdictR16 — kept, reachable via ASSIST.R16_QUARANTINE; replaced by model-reported coach_state fields)",
+ "procedure": "CLAUDE.md#Non-negotiable rules",
+ "commit": "57d714f5",
+ "status": "open"
+}
