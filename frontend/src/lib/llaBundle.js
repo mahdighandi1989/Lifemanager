@@ -8,11 +8,11 @@ export const LLA_BUNDLE = {
   "docs": {
     "HANDBOOK": "docs/HANDBOOK.8afd0eb3b1.md",
     "PROGRESS": "docs/PROGRESS.4909aa348f.md",
-    "TERRITORY": "docs/TERRITORY.93a8f7d5e0.md",
-    "VERIFIED_BOOKLET": "docs/VERIFIED_BOOKLET.f7907917bd.md",
-    "WORKLOG": "docs/WORKLOG.aaf4401cad.md",
-    "progress": "docs/progress.5a98be4125.json"
+    "TERRITORY": "docs/TERRITORY.d48385c96e.md",
+    "VERIFIED_BOOKLET": "docs/VERIFIED_BOOKLET.05fc505bf4.md",
+    "WORKLOG": "docs/WORKLOG.a847a31504.md",
+    "progress": "docs/progress.2b961b4d80.json"
   },
   "github": "https://github.com/mahdighandi1989/Lifemanager/blob/main/apps/learning-architecture/docs/",
-  "js": "lla.cc9cbfa1bc.js"
+  "js": "lla.3b65b771d1.js"
 };
