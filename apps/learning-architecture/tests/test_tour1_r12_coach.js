@@ -215,7 +215,7 @@ function strictScan(user) {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'lla-tap12-'));
       const files = fs.readdirSync(__dirname).filter(f => /^test_tour1_r(?:7|8|9|10|11|12)(?:_[a-z0-9]+)?\.js$/.test(f) && f !== path.basename(__filename)).sort();
       const run = (f) => new Promise((res) => {
-        const out = path.join(dir, f + '.jsonl'), ch = spawn(process.execPath, ['-r', path.join(__dirname, 'prompt_tap.js'), path.join(__dirname, f)], { cwd: path.join(__dirname, '..'), env: Object.assign({}, process.env, { LLA_PROMPT_TAP: out, LLA_STRUCT_FIX: '0' }), stdio: 'ignore' });
+        const out = path.join(dir, f + '.jsonl'), ch = spawn(process.execPath, ['-r', path.join(__dirname, 'prompt_tap.js'), path.join(__dirname, f)], { cwd: path.join(__dirname, '..'), env: Object.assign({}, process.env, { LLA_PROMPT_TAP: out, LLA_STRUCT_FIX: '0', ONLY: '', DUMP: '' }), stdio: 'ignore' });
         const to = setTimeout(() => { try { ch.kill('SIGKILL'); } catch (e) { } }, 600000);
         ch.on('exit', () => { clearTimeout(to); res(out); });
       });
