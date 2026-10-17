@@ -3,12 +3,12 @@
 هر کاری که یک روتین در قلمروِ روتینِ دیگری کرد (یا از او خواست) این‌جاست؛ روتینِ مالک در آغازِ هر دور
 `python3 scripts/supervisor/handoff.py inbox --routine <خودش>` را می‌زند، می‌سنجد و می‌بندد. قواعد: `ownership.json`.
 
-**باز: 10** · کل: 53
+**باز: 8** · کل: 53
 
 | # | زمان | از | قلمرو | نوع | برگه | چه | وضع | بستنِ |
 |---|---|---|---|---|---|---|---|---|
-| h20261017102947779951-session-4a16 | 2026-10-17 10:29 | session | بقیهٔ Lifemanager | did | — | REMOVAL_CANDIDATES.md: quarantine entry for the round-16 keyword storing paths in a27 (dupLinkR16, promScanR16, regOfR16, verdictR16 — kept, reachable via ASSIST.R16_QUARANTINE; replaced by model-reported coach_state fields) | open |  |
-| h20261017072444489575-session-f425 | 2026-10-17 07:24 | session | دستورهای روتین‌ها و ابزارهای ناظر | did | — | handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test | open |  |
+| h20261017102947779951-session-4a16 | 2026-10-17 10:29 | session | بقیهٔ Lifemanager | did | — | REMOVAL_CANDIDATES.md: quarantine entry for the round-16 keyword storing paths in a27 (dupLinkR16, promScanR16, regOfR16, verdictR16 — kept, reachable via ASSIST.R16_QUARANTINE; replaced by model-reported coach_state fields) | verified | صفِ فوریِ «نظارت و سرکشی»: R16 quarantine entries present in REMOVAL_CANDIDATES.md; capability kept (rule 2) |
+| h20261017072444489575-session-f425 | 2026-10-17 07:24 | session | دستورهای روتین‌ها و ابزارهای ناظر | did | — | handoff.py audit: shallow-clone boundary commit skipped (it read as touching every area ⇒ routines saw main's gate red); test_supervisor_handoff_guard shallow test | verified | صفِ فوریِ «نظارت و سرکشی»: audit shallow-boundary test (5 tests in test_supervisor_handoff_guard) green on current main |
 | h20261017005620515288-session-c533 | 2026-10-17 00:56 | session | قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها | did | — | تورِ پولیا دورِ ۱۲ (L7): cues_fa برای pr_statistical در territory/maps/s_problem.json (فقط روی صورت/مجهولِ خودِ مسئله)؛ قاعدهٔ E6 بی‌تغییر | open |  |
 | h20261016230036851669-session-fef1 | 2026-10-16 23:00 | session | قلمروِ سامانه‌ها (یادگیری، ذهن، حلِ مسئله، تصمیم، ارتباط، خودشناسی) — نقشه، گام‌ها و کمبودها | did | — | تورِ پولیا دورِ ۱۱ (K8): cues_fa برای sc_negotiation در s_social.json (فقط روی صورت/مجهولِ خودِ مسئله) + a28 knowledge(extra)؛ نامِ داخلِ پرانتز نامِ متمایز نیست (ثانیه) | open |  |
 **باز: 6** · کل: 52

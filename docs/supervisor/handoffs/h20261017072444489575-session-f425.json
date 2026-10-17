@@ -15,8 +15,8 @@
  "status": "verified",
  "closed": {
   "by": "urgent",
-  "at": "2026-10-17T09:54:55Z",
-  "note": "handoff.py check/audit run on a shallow clone: clean, no false boundary finding",
+  "at": "2026-10-17T12:58:25Z",
+  "note": "audit shallow-boundary test (5 tests in test_supervisor_handoff_guard) green on current main",
   "commit": ""
  }
 }
