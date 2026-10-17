@@ -1,0 +1,1 @@
+{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveClosure(r.p.id).label,APP.liveClosure(r.p.id).verdict,r.origin,APP.liveKindInfo(r.p.id).kind,r.p.from||r.p.parent||\"\"]))\n"}

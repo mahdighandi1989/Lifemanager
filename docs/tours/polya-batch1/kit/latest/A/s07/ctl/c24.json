@@ -1,1 +1,1 @@
-{"eval": "FL('lpB').split('\\n').map(x=>x.slice(0,110)).join('\\n')+'\\n'+JSON.stringify(APP.liveClosure('pb_l_mvc0nss786o'))\n"}
+{"eval":"MT(\"غافلگیر\",900)+\"\\n###\\n\"+MT(\"مثالِ نقض\",400)+\"\\n###\"+MT(\"دامنه\",400)"}

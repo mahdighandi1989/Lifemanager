@@ -1,1 +1,0 @@
-{"eval": "(()=>{const t=__fx.main(200000);const out=[];let i=-1;for(const re of ['\u0645\u0633\u062a\u0642\u06cc\u0645','\u063a\u06cc\u0631\u0645\u0633\u062a\u0642\u06cc\u0645','\u062e\u0644\u0641']){let k=0;while((i=t.indexOf(re,i+1))>=0&&k<6){out.push(re+': '+t.slice(Math.max(0,i-150),i+200).replace(/\\n/g,' | '));k++}}return out.join('\\n\\n')})()\n"}

@@ -1,1 +1,0 @@
-{"eval": "(()=>{const pid=APP.state.arg;const c=APP.liveCoach?APP.liveCoach(pid,{asked:[]}):null;return JSON.stringify(c&&{q:c.q,src:c.src,card:c.card,samePage:c.samePage})})()\n"}

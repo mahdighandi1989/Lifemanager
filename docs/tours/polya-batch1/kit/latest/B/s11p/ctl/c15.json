@@ -1,1 +1,0 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const r=__fx.btn(/^\u06f2 \u06a9\u0627\u0645\u0644/);await w(1500);const m=__fx.main(80000);const i=m.indexOf('\u06f2) \u0637\u0631\u062d');return r+' sub='+APP.state.sub+' ### '+m.slice(i<0?m.length-4000:i,(i<0?m.length:i+5000))+' ### '+__fx.fields().filter(f=>!/^lpGK/.test(f)).join('\\n')})()\n"}

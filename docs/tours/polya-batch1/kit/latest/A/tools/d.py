@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # d.py SID send '<json>' | d.py SID ans N '<text>' | d.py SID show N [full] | d.py SID wait | d.py SID out N
 import sys, os, json, time, re, hashlib
-R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round16A'
+R='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round18A'
 sid=sys.argv[1]; D=os.path.join(R,sid); cmd=sys.argv[2]
 AI=os.path.join(D,'ai'); CTL=os.path.join(D,'ctl'); OUT=os.path.join(D,'out')
 def nums(d,pat):

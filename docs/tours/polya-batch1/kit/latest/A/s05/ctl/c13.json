@@ -1,1 +1,1 @@
-{"eval":"(()=>{const e=document.getElementById(\"lpBBest\");return e?[...e.options].map(o=>o.value+\"=\"+o.textContent).join(\"\\n\"):\"NONE \"+APP.state.view+\" \"+APP.state.sub})()"}
+{"eval":"(()=>{APP.today=()=>\"2026-10-20\";APP.go(\"lprob\",\"pb_l_mvccg97jgl4\",\"exec\");C(\".lp-solved\");return APP.state.sub+\"\\n\"+FL(\"lpB\")+\"\\n\"+MT(\"وارسیِ برهان\",400)})()"}

@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}
+{"eval": "APP.state.sub+\" \"+JSON.stringify(APP.liveClosure(\"pb_l_mvcc4ufoapt\"))+\"\\n\"+FL(\"lpB\")"}

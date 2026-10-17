@@ -1,1 +1,1 @@
-{"eval":"var s=APP.ASSIST.cur();JSON.stringify(APP.ASSIST.coachLedger(s,\"l:\"+APP.state.arg))"}
+{"eval":"JSON.stringify({reg:APP.ASSIST.cur().coach.reg,plans:APP.ASSIST.cur().plans,prom:APP.ASSIST.cur().promises,sig:APP.ASSIST.regSigns(\"فقط بگو بخرم یا نه؟\")})"}

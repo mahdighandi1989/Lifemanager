@@ -1,0 +1,1 @@
+{"eval":"JSON.stringify(APP.ASSIST.sessions().map(s=>({reg:(s.coach||{}).reg,g:(s.coach||{}).guess&&s.coach.guess.text,prom:s.promises,plans:s.plans})))"}

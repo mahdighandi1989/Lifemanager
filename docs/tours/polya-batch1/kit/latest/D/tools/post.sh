@@ -1,0 +1,5 @@
+#!/bin/bash
+# post.sh sid — state + mind/today text after the scenario → sid/post.json
+R=/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya/round18D
+JS='(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const o={};o.sess=APP.S.all("achat",()=>true).map(s=>({id:s.id,n:(s.msgs||[]).length,reg:(s.coach||{}).reg,guess:(s.coach||{}).guess,ck:(s.coach||{}).checkRep,lbUnk:(s.coach||{}).lbUnk,plans:s.plans,prom:s.promises,mg:(s.msgs||[]).filter(m=>m.guess).map(m=>String(m.text).slice(0,60)+" => "+m.guess.text)}));o.live=APP.liveAll().map(r=>{const g=APP.S.get("eprog_"+r.p.id)||{};const so=g.solve||{};const b=(so.b||{})[1]||{};return {t:r.p.title,ph:APP.livePhase(r.p.id),cl:APP.liveClosure(r.p.id),g1:(so.g||{})[1]||null,b:{verdict:b.verdict,chkBy:b.chkBy,chkMsgs:b.chkMsgs,taste:b.taste,bestQ:b.bestQ,bestKind:b.bestKind}}});o.due=APP.dueList().map(d=>d.txt+"/"+(d.sub||""));for(const v of ["mind","today"]){APP.go(v);await w(1500);o[v]=document.getElementById("main").innerText}APP.go("home");return JSON.stringify(o)})()'
+bash $R/tools/ev.sh $1 "$JS" > $R/$1/post.json; ls -la $R/$1/post.json

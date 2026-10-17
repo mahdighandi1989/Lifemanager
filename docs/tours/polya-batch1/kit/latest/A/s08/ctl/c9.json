@@ -1,1 +1,1 @@
-{"say":"آره وارسی کردم: هر دو رو برمی‌گردونم، ۵ تموم شد شروع، ۹ تموم شد (۴ دقیقه) برش می‌گردونم، ۹ دقیقه دیگه: ۱۳. درسم همونه: از آخر به عقب."}
+{"eval":"JSON.stringify(APP.liveAll().map(r=>{const b=((r.p.solve||{}).b||[])[1]||{};return [r.p.title,b.bestQ,b.bestKind,b.taste]}))"}

@@ -1,1 +1,0 @@
-{"eval": "(()=>{const o=JSON.parse(localStorage.getItem(\"mla.records.v1\"));return JSON.stringify(Object.values(o).filter(r=>r&&r.type===\"case\").map(r=>({s:r.status,lr:r.liveResult,o:r.outcome})))})()\n"}

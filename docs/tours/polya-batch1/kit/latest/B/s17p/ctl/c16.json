@@ -1,1 +1,0 @@
-{"eval": "(()=>{const o=JSON.parse(localStorage.getItem('mla.records.v1'));const ks=Object.keys(o).filter(k=>k.indexOf('mvar61h57og')>=0);return ks.map(k=>k+' => '+JSON.stringify(o[k]).slice(0,200)+' ... soft@'+JSON.stringify(o[k]).indexOf('\"soft\"')+' softLog@'+JSON.stringify(o[k]).indexOf('softLog')).join('\\n')})()\n"}

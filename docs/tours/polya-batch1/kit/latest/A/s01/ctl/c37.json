@@ -1,1 +1,1 @@
-{"eval": "BL().split(\" | \").slice(-12).join(\" | \")+\"\\n\"+FL(\"lpB|lpD|lpF\")"}
+{"eval":"JSON.stringify(APP.liveClosure(\"pb_l_mvcbo78bb45\"))+\"\\n\"+FL(\"lpB\")+\"\\n\"+MT(\"۴) بازنگری\",3000)"}

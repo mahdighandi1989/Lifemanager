@@ -1,1 +1,1 @@
-{"eval": "JSON.stringify(APP.liveAll().map(r=>[r.p.title,APP.liveChatQs(r.p.id)]))\n"}
+{"say":"برای خانواده توضیح دادم، با «فرض کنیم ممکنه…» همه گیج شدن. چطوری بگم؟"}

@@ -1,1 +1,1 @@
-{"eval":"(()=>{APP.today=()=>\"2026-10-19\";const d=DUE();APP.go(\"lprob\",\"pb_l_mvc0j5jfm4x\");return d+\"\\n####\\n\"+MT(\"❔ پرسشِ همین لحظه\",700)+\"\\n\"+FL(\"lpA\")})()"}
+{"eval": "(()=>{const out=[];for(const k of Object.keys(localStorage)){const v=localStorage.getItem(k);const i=v.indexOf(\"همه به نظرم ربط\");if(i>=0)out.push(k+\": …\"+v.slice(Math.max(0,i-300),i+80));}C(\".sv-g2\");return out.join(\"\\n\").slice(0,1500)+\"\\nPH:\"+APP.livePhase(\"pb_l_mvcbo78bb45\")+\" SUB:\"+APP.state.sub+\"\\n\"+MT(\"۲) طرح\",1800)})()"}

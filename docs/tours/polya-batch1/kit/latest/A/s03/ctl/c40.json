@@ -1,1 +1,1 @@
-{"eval":"(()=>{S(\"lpSat\",\"yes\");C(\".lp-usave\");C(\".sv-g2\");return TT()+\" SUB:\"+APP.state.sub})()"}
+{"eval": "JSON.stringify(APP.liveAll().map(r=>r.p.id))"}

@@ -1,1 +1,0 @@
-{"eval":"JSON.stringify({d:new Date().toISOString(),t:APP.today(),fx:typeof __fx,adv:typeof __adv})"}

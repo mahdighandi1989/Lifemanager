@@ -1,1 +1,0 @@
-{"eval": "(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const t=__fx.main(80000);const j=t.indexOf('\u0645\u06cc\u0627\u0646\u0647\u0654 \u0631\u0627\u0647');const f=__fx.fields().filter(x=>/Ck|Chk|Mid|chk/i.test(x));return (j>=0?t.slice(j-100,j+700):'NO CARD ON PAGE')+' ### '+f.join('\\n')})()\n"}

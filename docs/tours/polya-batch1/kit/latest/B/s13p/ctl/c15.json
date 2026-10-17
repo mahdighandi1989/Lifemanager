@@ -1,1 +1,0 @@
-{"eval": "(()=>{const t=__fx.main(200000);const out=[];let i=-1,k=0;while((i=t.indexOf('\u062a\u0639\u0631\u06cc\u0641',i+1))>=0&&k<8){out.push(t.slice(Math.max(0,i-150),i+150).replace(/\\n/g,' | '));k++}return out.join('\\n--\\n')})()\n"}

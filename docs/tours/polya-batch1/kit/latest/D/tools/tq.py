@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# tq.py sid N — turn-question lines + unmarked question directives, old (round15D) vs new (round15D)
+# tq.py sid N — turn-question lines + unmarked question directives, old (round16D) vs new (round16D)
 import sys,json,re,os
 B='/tmp/claude-0/-home-user-Lifemanager/4dcd6f42-cccf-526a-8c49-83a147c47cb5/scratchpad/tour1_polya'
 s,N=sys.argv[1],sys.argv[2]
@@ -20,5 +20,5 @@ def show(tag,path):
             elif re.search(r'پرسشِ این نوبت همین|فقط \*\*یک\*\* پرسش',l): print('   *',l[:int(os.environ.get('W','420'))])
             elif l.startswith('- ') and 'زمینه (نه پرسشِ دوم)' not in l and not re.search(SKIP,l) and re.search(r'بپرس|؟»|\?»|بخواه',l) and re.search(r'پولیا|[ABC]\d{3}',l):
                 print('   UNMARKED:',l[:300])
-SD=os.environ.get('SRCD',f'{B}/round15D/{s}'); show('OLD',f'{SD}/ai/p{N}.json'); show('NEW',f'{B}/round16D/{s}/ai/p{N}.json')
+SD=os.environ.get('SRCD',f'{B}/round18D/{s}'); show('OLD',f'{SD}/ai/p{N}.json'); show('NEW',f'{B}/round18D/{s}/ai/p{N}.json')
 print('== R10 reply:',open(f'{SD}/ai/r{N}.txt').read()[:int(os.environ.get('R','700'))] if os.path.exists(f'{SD}/ai/r{N}.txt') else 'NONE')

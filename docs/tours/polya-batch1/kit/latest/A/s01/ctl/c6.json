@@ -1,1 +1,1 @@
-{"eval":"typeof APP.ASSIST.coachLedger+\" \"+JSON.stringify(typeof APP.ASSIST.coachLedger==\"function\"?APP.ASSIST.coachLedger.toString().slice(0,300):APP.ASSIST.coachLedger).slice(0,1500)"}
+{"eval0":"JSON.stringify(APP.liveAll().map(r=>[r.p.id,r.p.title,APP.liveKindInfo(r.p.id)]))","say":"خب معلومه دیگه، بهترین تصمیم مالی. همینو می‌خوام. بخرم یا نه؟"}

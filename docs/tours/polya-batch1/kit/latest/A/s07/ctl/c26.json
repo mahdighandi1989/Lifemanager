@@ -1,1 +1,1 @@
-{"eval":"JSON.stringify(APP.liveAll().map(r=>[r.p.title,r.p.created||r.created,r.sess,APP.liveChatQs(r.p.id)]))"}
+{"eval": "FL('lpB').split('\\n').map(x=>x.slice(0,110)).join('\\n')+'\\n'+JSON.stringify(APP.liveClosure('pb_l_mvccmkhg5ri'))\n"}

@@ -2,9 +2,9 @@ import json,sys,glob,re,os,difflib
 B,s=sys.argv[1],sys.argv[2]
 def norm(x): x=str(x); x=re.sub(r'(?:case|pb_l|achat|lp)_[a-z0-9]+|20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9:.]+Z|[0-9]{10,}','ID',x); return x
 OS=os.environ.get('OLDS',s)
-n=len(glob.glob(f'{B}/round16D/{s}/out/s*.json'))
+n=len(glob.glob(f'{B}/round18D/{s}/out/s*.json'))
 for i in range(1,n+1):
-    try: a=json.load(open(f'{B}/round15D/{OS}/out/s{i}.json')); b=json.load(open(f'{B}/round16D/{s}/out/s{i}.json'))
+    try: a=json.load(open(f'{B}/round18D/{OS}/out/s{i}.json')); b=json.load(open(f'{B}/round18D/{s}/out/s{i}.json'))
     except Exception as e: print(i,'missing',e); continue
     for k in ('eval0','eval','error'):
         if norm(a.get(k))!=norm(b.get(k)):
