@@ -64,3 +64,26 @@ def test_every_prompt_says_ship_sh_only_and_urgent_reads_its_inbox_before_the_qu
         "an empty urgent queue exits with code 0 — the inbox must already have been read"
     ship = open(os.path.join(ROOT, "scripts", "supervisor", "ship.sh"), encoding="utf-8").read()
     assert '--trailer "Routine: ' in ship and "handoff.py overlap" in ship
+
+def test_shallow_clone_boundary_is_not_read_as_touching_every_area(tmp_path):
+    """A routine run clones shallow: the boundary commit has no parent here, so `diff-tree --root` lists the whole tree. The audit
+    must not report that as a cross-area commit (2026-10-17: the urgent routine saw the gate «red» from exactly this)."""
+    import subprocess
+    src, cl = tmp_path / "src", tmp_path / "clone"
+    run = lambda *a, cwd=src: subprocess.run(list(a), cwd=cwd, check=True, capture_output=True, text=True)
+    src.mkdir()
+    run("git", "init", "-q")
+    run("git", "config", "user.email", "t@t"); run("git", "config", "user.name", "t")
+    (src / "apps" / "learning-architecture" / "backtest").mkdir(parents=True)
+    (src / TERR).write_text("{}")
+    (src / "a.txt").write_text("1")
+    run("git", "add", "-A"); run("git", "commit", "-q", "-m", "base")
+    (src / "a.txt").write_text("2")
+    run("git", "add", "-A"); run("git", "commit", "-q", "-m", "chore: x\n\nRoutine: urgent")
+    (src / "a.txt").write_text("3")
+    run("git", "add", "-A"); run("git", "commit", "-q", "-m", "chore: y\n\nRoutine: urgent")
+    subprocess.run(["git", "clone", "-q", "--depth", "2", "file://" + str(src), str(cl)], check=True, capture_output=True)
+    h = _tool()
+    h.ROOT = str(cl)
+    assert h.shallow_boundary(), "the clone is shallow"
+    assert h.audit_history(since="2000-01-01", entries=[]) == [], "the boundary commit must not count as touching the territory"

@@ -472,6 +472,20 @@ def history_available(rev: str = "HEAD") -> bool:
     return bool(git("rev-parse", "--verify", "-q", rev).strip())
 
 
+def shallow_boundary() -> List[str]:
+    """Commits at the cut of a shallow clone (`.git/shallow`). Their parents are missing, so `diff-tree --root` lists the WHOLE tree as
+    "changed" — a routine commit there looks like it touched every area (routine runs clone shallow; 2026-10-17 the urgent routine
+    reported the gate «red» from exactly this). Such a commit's real diff is unknown here, so it is not judged (not passed either)."""
+    f = git("rev-parse", "--git-path", "shallow").strip()
+    if not f:
+        return []
+    f = f if os.path.isabs(f) else os.path.join(ROOT, f)
+    try:
+        return [x.strip() for x in open(f, encoding="utf-8") if x.strip()]
+    except OSError:
+        return []
+
+
 def audit_history(since: str = AUDIT_SINCE, rev: str = "HEAD", own: Optional[Dict[str, Any]] = None,
                   entries: Optional[List[Dict[str, Any]]] = None) -> List[str]:
     """Every non-merge commit since `since` that carries «Routine: <r>» and touched another routine's area must have a `did`
@@ -479,10 +493,13 @@ def audit_history(since: str = AUDIT_SINCE, rev: str = "HEAD", own: Optional[Dic
     own = own or load_own()
     ents = entries if entries is not None else load()["entries"]
     bad: List[str] = []
+    cut = shallow_boundary()
     for c in log_commits("--no-merges", f"--since={since}", rev):
         r = c["routine"]
         if not r or r not in own["routines"] or r == "owner":
             continue
+        if any(x.startswith(c["sha"]) for x in cut):
+            continue   # shallow-clone boundary: its diff against the missing parent cannot be computed here
         paths = [x for x in git("diff-tree", "--no-commit-id", "--name-only", "-r", "--root", c["sha"]).splitlines() if x.strip()]
         t = _ts(c["date"])
         near = [e for e in ents if e.get("by") == r and e.get("kind") == "did" and t and _ts(e.get("at", "")) and
@@ -495,6 +512,8 @@ def audit_history(since: str = AUDIT_SINCE, rev: str = "HEAD", own: Optional[Dic
 def cmd_audit(a) -> int:
     if not history_available(a.rev):
         print("(تاریخچهٔ git در دسترس نیست — بازرسیِ تاریخچه اجرا نشد)"); return 0
+    if shallow_boundary():
+        print("(کلونِ کم‌عمق: کامیت‌های مرزِ برش داوری نمی‌شوند؛ برای داوریِ کامل `git fetch --unshallow`)")
     bad = audit_history(a.since, a.rev)
     if bad:
         print("❌ کامیت‌هایی با «Routine:» که به قلمروِ روتینِ دیگری دست زده‌اند و `did` ِ آن قلمرو را ندارند (احتمالاً `git push` ِ خام، بی ship.sh):")
