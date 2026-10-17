@@ -50,4 +50,7 @@
 - **فوری ۲۰۲۶-۱۰-۱۶:** صف خالی. سه دست‌به‌دستِ `did` در قلمروِ lla-page/sys-territory (۱۷۳b5e5، ۷۱fd0a4) بسنجیده و `verified` شد (build.py بی‌تغییر؛ آزمون‌های mind_report/graph/tour1 همه NO ERRORS). `origin/main` بازنویسی/فورس‌شده بود (تاریخچهٔ نامرتبط با main محلی)؛ main محلی به origin/main بازهم‌تراز شد (پشتیبان: شاخهٔ محلیِ backup/pre-rewrite-main). `supervisor-pending/run-2026-10-11` با main تاریخچهٔ مشترک ندارد ⇒ ریبیس شدنی نیست؛ دست نخورد و حذف نشد.
 
 ناظرِ خودکار (Claude Code routine)
-- 2026-10-17 · فوری: صف خالی؛ سه دست‌به‌دستِ `did` (h…963f, h…fef1, h…c533) سنجیده و verified بسته شد. ناظرِ خودکار (Claude Code routine)
+
+- **فوری ۲۰۲۶-۱۰-۱۷:** صف خالی. سه دست‌به‌دستِ `did` در قلمروِ supervisor/sys-territory (4d8d18f، 2214f93، 10cd5a1/s_social) بسنجیده و `verified` شد (handoff.py check/audit سالم؛ sys_territory check سالم؛ JSONها معتبر). دست‌به‌دستِ lla-sources (K8، coverage.json) در قلمروِ من نیست و باز ماند. main محلی با origin/main (فورس‌شده) نامرتبط بود ⇒ به origin/main هم‌تراز شد (پشتیبان: backup/stale-local-main-20261017).
+
+ناظرِ خودکار (Claude Code routine)

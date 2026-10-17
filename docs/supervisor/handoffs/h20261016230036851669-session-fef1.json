@@ -15,8 +15,8 @@
  "status": "verified",
  "closed": {
   "by": "urgent",
-  "at": "2026-10-17T03:56:45Z",
-  "note": "بسنجیده: JSON معتبر؛ test_graph و test_mind_report «NO ERRORS»؛ pytest دست‌به‌دست/مالکیت/دفترچه سبز؛ تغییر فقط داده/ثبت‌گاه است",
+  "at": "2026-10-17T09:54:55Z",
+  "note": "sys_territory.py check healthy; s_social.json valid JSON",
   "commit": ""
  }
 }
