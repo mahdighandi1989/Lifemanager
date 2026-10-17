@@ -4583,3 +4583,16 @@ pass an independent variant bank (paraphrases + confusable negatives, written wi
 work done in the same round — first item: native MathML formula rendering in chat and field previews (INF1). Storyboards: harness5 waits
 for the page to settle before each shot (no half-rendered images) and captures before/after of the scenario user's mind report card,
 maps and «امروز». Storyboard badge bug (PASS «zero defects» shown as ⚠️) and partial image uploads fixed; every group page links the others.
+
+## 2026-10-17 — Pólya tour batch 1, round 18 results and round-18 fixes
+FINDING: round 18 (harness5, before/after shots of mind card/maps/Today) — 6/38 zero-defect (A 0/10, B 2/10, C 1/9, D 3/9); every written
+criterion passed in all 38; remaining S2/S3 came from the need maps, the new math tool and the new mind-card plausibility check. Six root
+mechanisms (tour DECISIONS_R18): mind card fed only by failures and ranking empty stages; math with one input alphabet and one output;
+formula prompt line triggered by view; guess notes by proximity; plans/requests without lifecycle; text heuristics deciding alone.
+CHANGE: three fixers (coach a27/a29, live a38, math a39) — model-reported coach_state.guess.q / step / plan lifecycle validated by the
+page; success evidence on the mind card, «هنوز داده‌ای نیست» for empty stages; closing asks open steps; APP.MATH.toPlain in every plain
+sink; Persian-notation math; previews under all live fields + symbol bar; content-triggered «# فرمول»; mini plot and FEN board (INF8/9).
+Independent variant bank VARIANTS_R18 (239 entries): coach 124/124, live 63/64 (linear chain deliberately not a transformation), math 67/67.
+Quarantined (not deleted): closeOpenR17, guessForR17, guessQuote, semiSplit, transfInR17, planSeenR17, planR17, regSignsR17, guessMsgR17,
+chkWindowR17 (REMOVAL_CANDIDATES). Domain simulators the need maps asked for (probability tree, geometry canvas, isomorphism table,
+crossword grid, rehearsal space, units calculator, related-rates simulator) recorded for batch 2's simulator rule.
