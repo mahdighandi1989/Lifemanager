@@ -1,0 +1,644 @@
+[
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حدسم اینه که جواب ۲^n هست ‖ A: چرا این حدس؟ اگر n=۱ باشد چه؟ ‖ U: نه اشتباه نوشتم، منظورم ۲^n − ۱ بود",
+  "expect": "retract {msg:«جواب ۲^n هست», what:guess, fix:«۲^n − ۱»}; problem guess g1 and coach.guess become «۲^n − ۱»; old value kept as history «اصلاح شد ⇐»; nothing deleted; the old guess's mind-card event withdrawn (not counted as a failure); the self-correction is look-back evidence; assistant states the change in one line",
+  "context": "corrected message is 1 user turn back; g1 was validated from it; math"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: داده‌ها: طول مستطیل ۱۲ و عرضش ۵ ‖ A: مجهول چیست؟ ‖ U: قطرش ‖ A: کدام قضیه به قطر ربط دارد؟ ‖ U: فیثاغورس ‖ A: خب، بنویس. ‖ U: ببخشید عرض رو اشتباه گفتم، ۹ بود نه ۵",
+  "expect": "retract {msg:«عرضش ۵», what:fact, fix:«۹»}; live-problem data field and the understand-form «داده‌ها» (filled from that turn) change ۵→۹; old value kept as history «اصلاح شد ⇐»; nothing deleted; later messages untouched; assistant says «عرض از ۵ به ۹ اصلاح شد» (or equivalent one line)",
+  "context": "corrected message is 3 user turns back; Persian digits; math"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: برنامه‌م اینه که سه‌شنبه با صاحبخونه حرف بزنم ‖ A: قبلش چه می‌خواهی بگویی؟ ‖ U: اینکه اجاره زیاده ‖ A: عددی داری؟ ‖ U: آره، ۱۵ درصد بالاتر از محله ‖ A: خوب است. ‖ U: اون برنامه رو اصلاح کن، منظورم پنج‌شنبه بود",
+  "expect": "retract {msg:«سه‌شنبه با صاحبخونه حرف بزنم», what:plan, fix:«پنج‌شنبه»}; plan date 2026-10-20 (Tue) → 2026-10-22 (Thu); any promise/reminder tied to it moves too; Tue kept as history «اصلاح شد ⇐»",
+  "context": "corrected message is 3 user turns back; life problem; Today Sat 2026-10-17"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: گام دوم رو انجام دادم و جواب داد ‖ A: عالی؛ نتیجه را ثبت کردم. ‖ U: نه، درستش اینه که جواب نداد، فقط شروعش کردم",
+  "expect": "retract {msg:«گام دوم رو انجام دادم و جواب داد», what:step, fix:«جواب نداد، فقط شروعش کردم»}; step s2 outcome done → started/not-yet (via a38); old value kept as history «اصلاح شد ⇐»; nothing deleted; the «اجرا» mind-card + event from the wrong message withdrawn",
+  "context": "corrected message is 1 user turn back; s2 outcome was recorded from it"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: جواب نهایی ۸۹ است ‖ A: چطور چک می‌کنی؟ ‖ U: با n کوچک ‖ A: n=۳؟ ‖ U: ۳ تا میشه ‖ A: n=۴؟ ‖ U: ۵ تا ‖ A: الگو؟ ‖ U: فیبوناچی ‖ A: پس برای ۹ پله؟ ‖ U: جوابی که اول نوشتم اشتباه بود، منظورم ۵۵ بود",
+  "expect": "retract {msg:«جواب نهایی ۸۹ است», what:ans, fix:«۵۵»}; stored answer evidence ۸۹→۵۵; any check verdict computed on ۸۹ is marked superseded (not silently kept as the verdict); old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "corrected message is 5 user turns back; math (stairs)"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فرمول مساحت دایره رو نوشتم S = πr ‖ A: واحدش چیست؟ ‖ U: متر ‖ A: مطمئنی؟ ‖ U: آره ‖ A: r=۲ بگذار. ‖ U: ۶.۲۸ ‖ A: با شکل بخوان. ‖ U: کمه ‖ A: چرا؟ ‖ U: اون S = πr رو اصلاح کن، درستش S = πr² هست",
+  "expect": "retract {msg:«S = πr», what:fact (or said), fix:«S = πr²»}; the stored formula becomes S = πr² and renders as a formula; old value kept as history «اصلاح شد ⇐»; nothing deleted; the fragment match is on the EARLIER message, not on «S = πr» inside the current one",
+  "context": "corrected message is 5+ user turns back; formula input"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مجهول سرعت متوسطه ‖ A: [فرمِ فهم: مجهول ← «سرعت متوسط»] داده‌ها؟ ‖ U: مسافت ۱۲۰ کیلومتر ‖ A: و زمان؟ ‖ U: دو ساعت رفت ‖ A: برگشت؟ ‖ U: منظورم زمان کل بود نه سرعت متوسط، اون مجهول رو اصلاح کن",
+  "expect": "retract {msg:«مجهول سرعت متوسطه», what:form, fix:«زمان کل»}; the understand-form field «مجهول» filled by the assistant action of that turn becomes «زمان کل»; old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "corrected message is 3 user turns back; form filled by an assistant action"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: شرطش اینه که عددا مثبت باشن ‖ A: فقط همین؟ ‖ U: نه اشتباه گفتم، شرط اینه که عددا صحیح باشن",
+  "expect": "retract {msg:«عددا مثبت باشن», what:said, fix:«عددا صحیح باشن»}; the stored condition (said evidence / live-problem condition) updated; old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "1 user turn back; colloquial, ZWNJ missing («عددا»)"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: مبلغ وام ۲۰۰ میلیون تومان است و قسط ماهانه ۸ میلیون. ‖ A: مدت بازپرداخت چقدر است؟ ‖ U: پوزش می‌خواهم؛ در پیام قبلی‌ام مبلغ وام را اشتباه نوشتم؛ صحیح آن ۱۲۰ میلیون است.",
+  "expect": "retract {msg:«مبلغ وام ۲۰۰ میلیون», what:fact, fix:«۱۲۰ میلیون»}; only the loan amount changes; «قسط ماهانه ۸ میلیون» from the same message stays; old value kept as history «اصلاح شد ⇐»; nothing deleted; assistant answers in شما",
+  "context": "1 user turn back; formal register; life/finance problem"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: تصمیمم اینه که روزی دو ساعت درس بخونم ‖ A: از کی؟ ‖ U: از فردا ‖ A: کجا؟ ‖ U: کتابخونه ‖ A: چه ساعتی؟ ‖ U: عصر ‖ A: با چه کسی؟ ‖ U: تنها ‖ A: ثبت شد. ‖ U: اینکه گفتم روزی دو ساعت رو اصلاح کن، منظورم یک ساعت بود",
+  "expect": "retract {msg:«روزی دو ساعت درس بخونم», what:plan, fix:«یک ساعت»}; plan text becomes «روزی یک ساعت»; start date (2026-10-18) unchanged; old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "corrected message is 5 user turns back; life plan"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: حدسم اینه که سرایدار کلید رو برداشته ‖ A: چه شاهدی داری؟ ‖ U: دیشب دیدمش ‖ A: کجا؟ ‖ U: دم در ‖ A: ساعت؟ ‖ U: نه، منظورم همسایه‌ی طبقه‌ی دوم بود نه سرایدار",
+  "expect": "retract {msg:«سرایدار کلید رو برداشته», what:guess, fix:«همسایه‌ی طبقه‌ی دوم»}; guess g1 text becomes «همسایه‌ی طبقه‌ی دوم کلید رو برداشته»; any plan on_guess g1 stays linked to the (corrected) g1; old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "3 user turns back; life guess"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: جمعه بهت خبر می‌دم نتیجه چی شد ‖ A: باشد، جمعه منتظرم. ‖ U: اشتباه گفتم، منظورم شنبه‌ی بعد بود",
+  "expect": "retract {msg:«جمعه بهت خبر می‌دم», what:plan, fix:«شنبه‌ی بعد»}; the promise due 2026-10-23 (Fri) moves to 2026-10-24 (Sat); old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "1 user turn back; promise derived from that message"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: گام اول: x = 3 به دست اومد ‖ A: جایگذاری کن. ‖ U: 3 در معادله‌ی دوم ‖ A: چه شد؟ ‖ U: نمی‌خونه ‖ A: چرا؟ ‖ U: نه، x = ۷ درسته، اون گام اول رو اشتباه نوشتم",
+  "expect": "retract {msg:«x = 3 به دست اومد», what:step, fix:«x = ۷»}; step s1 result 3→۷ (Latin digit in the old message, Persian in the fix both accepted); old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "3 user turns back; mixed Latin/Persian digits; math"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: تا محل کار ۴۰ دقیقه راهه ‖ A: با چه وسیله‌ای؟ ‖ U: نوشتم ۴۰ دقیقه، ولی ۴۵ دقیقه بود",
+  "expect": "retract {msg:«۴۰ دقیقه راهه», what:fact, fix:«۴۵ دقیقه»}; the fragment is found in the EARLIER message (the current message also contains «۴۰ دقیقه» — that is not the target); old value kept as history «اصلاح شد ⇐»; nothing deleted",
+  "context": "1 user turn back; the current message repeats the old value"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "pos",
+  "role": "chat",
+  "text": "U: فکر کنم جواب ۱۲۰ باشه، داده‌ها ۵ و ۴ ان ‖ A: [g1 «۱۲۰» ثبت شد؛ داده‌ها ← ۵ و ۴] ‖ U: داده‌ها رو اشتباه نوشتم، ۵ و ۳ بود",
+  "expect": "retract {msg:«داده‌ها ۵ و ۴ ان», what:fact, fix:«۵ و ۳»}; data ۴→۳; old value kept as history «اصلاح شد ⇐»; nothing deleted; the guess g1 «۱۲۰» from the same message is not duplicated (one g1, re-linked to the corrected message) and the assistant may ask whether ۱۲۰ still holds",
+  "context": "1 user turn back; one message produced a guess and a data fill"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اشتباه کردم، کلید رو تو ماشین جا گذاشتم ‖ A: الان کجایی؟",
+  "expect": "NO retract — «اشتباه کردم» is about a real-world action, not an earlier message; nothing reversed (it may be new data/step info)"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: دیروز سر امتحان اشتباه کردم و علامت منفی رو جا انداختم ‖ A: بعدش چه شد؟",
+  "expect": "NO retract — a real-world mistake reported; no record reversed; not a failure act of this session"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حدسم اینه که جواب فیبوناچیه ‖ A: چطور امتحانش می‌کنی؟ ‖ U: یه فکر دیگه: شاید بشه با استقرا رفت",
+  "expect": "NO retract — a new idea, not a correction; g1 stays as is; the new idea may become its own plan/guess"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: معلممون تو جزوه اشتباه نوشته بود که جواب ۲۰ هست ‖ A: تو خودت چه فکر می‌کنی؟",
+  "expect": "NO retract — quoting someone else's mistake; nothing she said earlier is corrected"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جواب ۸۹ه ‖ A: چطور؟ ‖ U: دوستم گفت اشتباه گفتی، ولی من مطمئنم ۸۹ درسته",
+  "expect": "NO retract — she keeps her answer; the stored answer ۸۹ stays"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: عرضش ۹ه ‖ A: پس عرض ۵ است؛ حالا قطر را حساب کن. ‖ U: نه، تو اشتباه گفتی، من نوشتم ۹",
+  "expect": "NO retract of her message — she corrects the ASSISTANT; her record (عرض = ۹) was already right and stays; the assistant acknowledges its misreading"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اشتباه نکنم این همون مسئله‌ی پله‌هاست که هفته‌ی پیش حل کردیم ‖ A: شاید؛ چه شباهتی می‌بینی؟",
+  "expect": "NO retract — rhetorical «اشتباه نکنم», no earlier message corrected"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: اگه اشتباه نکرده باشم جواب ۵۵ میشه ‖ A: چک کن.",
+  "expect": "NO retract — a hedged new answer; at most it is stored as an answer/guess, nothing reversed"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: سلام، امروز خیلی خسته‌ام ‖ A: سلام؛ مسئله را بخوان. ‖ U: منظورم این بود که خواب‌آلودم نه خسته",
+  "expect": "nothing reversed — the corrected message produced no stored record; no record or mind-card change; the assistant must not claim it «changed» a record",
+  "context": "correction of something never stored"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: یه عدد بین ۱ تا ۱۰ ‖ A: فرض کنیم ۵ است. ‖ U: نه، منظورم ۷ بود",
+  "expect": "page REJECTS a retract whose fragment «۵» is not in any earlier USER message (only the assistant said ۵); nothing reversed",
+  "context": "model reported retract {msg:«۵», what:fact, fix:«۷»}"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: حدسم ۲^n ‖ A: ... ‖ U: برنامه‌م فردا ‖ A: ... ‖ U: اشتباه گفتم",
+  "expect": "fallback only: ASK «کدام را اصلاح کنم؟» listing the candidates (حدس «۲^n»، برنامه «فردا»); NOTHING reversed by the pattern alone",
+  "context": "the reply omitted coach_state"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: عرضش ۵ ‖ A: مجهول؟ ‖ U: اون عرض رو اصلاح کن",
+  "expect": "page REFUSES the retract (fix «۹» not in the current message); nothing reversed; assistant asks for the correct value",
+  "context": "model reported retract {msg:«عرضش ۵», what:fact, fix:«۹»}"
+ },
+ {
+  "rc": "INF15.retract",
+  "kind": "neg",
+  "role": "chat",
+  "text": "U: جواب ۵۵ه ‖ A: پس جواب ۵۵ نیست؟ ‖ U: نه، ۵۵ درسته",
+  "expect": "NO retract — «نه، … درسته» here confirms her own earlier value; stored ۵۵ unchanged, no history entry"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on her bubble «حدسم اینه که جواب ۲^n هست» → saved as «حدسم اینه که جواب ۲^n − ۱ هست»",
+  "expect": "a user turn «[اصلاحِ پیامِ قبلی] …» is sent; g1 → «۲^n − ۱» applied directly (no model needed); the bubble shows the new text with «اصلاح شد ⇐ ۲^n» history; old guess mind-card event withdrawn"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on a bubble 5 turns back «سه‌شنبه با صاحبخونه حرف می‌زنم» → «چهارشنبه با صاحبخونه حرف می‌زنم»",
+  "expect": "plan date 2026-10-20 → 2026-10-21; reminder moves; history «اصلاح شد ⇐ سه‌شنبه»"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on «گام دوم انجام شد و جواب داد» → «گام دوم رو هنوز انجام ندادم»",
+  "expect": "step s2 outcome reverted to open (via a38); its «اجرا» + event withdrawn; history kept"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on «طول ۱۲ متر» → «طول ۱۵ متر»",
+  "expect": "live-problem datum and the form field filled from that turn ۱۲→۱۵; «اصلاح شد ⇐ ۱۲» visible on the bubble and the form"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on «مجهول سرعت متوسطه» (the assistant had filled the form field from that turn) → «مجهول زمان کله»",
+  "expect": "the form field filled by the assistant action of that turn is reverted and becomes «زمان کل»; old value as history"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on «جواب نهایی ۸۹» → «جواب نهایی ۵۵»",
+  "expect": "answer evidence ۸۹→۵۵; the check verdict based on ۸۹ shown as superseded; history kept"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ edited twice: «عرض ۵» → «عرض ۹», later «عرض ۹» → «عرض ۸»",
+  "expect": "current value ۸; history chain shows ۵ ⇐ ۹ ⇐ ۸ (both corrections); two «[اصلاحِ پیامِ قبلی]» turns"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on «فکر کنم کلید دستِ سرایداره» → «کلید رو دیروز خودم گم کردم»",
+  "expect": "guess g1 withdrawn (status withdrawn, kept as history, not deleted); its mind-card guess event withdrawn; the new statement may be stored as data"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ on «S = πr» → «S = πr²»",
+  "expect": "stored formula updated and rendered as a formula in the bubble and records; old formula in history"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "pos",
+  "role": "live",
+  "text": "✏️ save while the model is unavailable (no coach_state comes back)",
+  "expect": "the reversal is applied anyway by the page (the user is the authority); the «[اصلاحِ پیامِ قبلی]» turn is still recorded"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ opened on «جواب ۵۵ه», saved with the identical text",
+  "expect": "nothing sent, no «[اصلاحِ پیامِ قبلی]» turn, no history entry, no record touched"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ saved with only a trailing space added",
+  "expect": "treated as identical: nothing sent, no history entry"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ on «سلام، خسته‌ام» → «سلام، خواب‌آلودم»",
+  "expect": "bubble text updated with history, but NO record reversed and no mind-card change (the bubble produced nothing stored); assistant does not claim records changed"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "looking for ✏️ on an assistant bubble",
+  "expect": "no ✏️ on assistant bubbles — only on her own"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "looking for ✏️ on a «[سامانه: گام «۱» ثبت شد]» system-turn bubble",
+  "expect": "no ✏️ on system turns"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ opened then cancelled",
+  "expect": "nothing sent, nothing changed"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ saved with empty text",
+  "expect": "refused (an empty edit is not a delete); bubble and records unchanged"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ on «حدسم ۲^n» → «حدسم ۲^n − ۱»",
+  "expect": "the old guess must NOT be hard-deleted from the store or vanish from the dossier — it stays as history «اصلاح شد ⇐»"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ on a bubble already corrected by a chat retract (same value ۵→۹), saved as «… ۹»",
+  "expect": "no second reversal: no duplicate history entry and no double mind-card withdrawal"
+ },
+ {
+  "rc": "INF15.edit",
+  "kind": "neg",
+  "role": "live",
+  "text": "✏️ on a bubble of problem B's session while problem A is open",
+  "expect": "only problem B's records change; problem A untouched"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "Problem «۲۰ پله»: statement 10:00 Sat 17; understand form filled 10:05, «مجهول» corrected 10:20; g1 «۲^n» 10:10 refuted 10:30; plan pl1 «حالت‌های کوچک» 10:32; steps s1, s2 done 10:40/10:50; check verdict pass 11:00; look-back 11:05",
+  "expect": "one chronological read-only page: statement → understand form (as filled + «اصلاح شد ⇐» history) → g1 with outcome refuted → pl1 → s1, s2 with outcomes → check verdict → look-back; in that time order"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "Life problem «اجاره»: session 1 Sat 2026-10-17 (plan pl1 dated Tue 2026-10-20), session 2 Tue 2026-10-20 (step s1 «حرف زدن با صاحبخونه» done, outcome «۵ درصد کم کرد»)",
+  "expect": "both days shown with day separators; both sessions linked; pl1 shows its date; s1 shows its outcome"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "form «داده‌ها» filled by the assistant action after U «مسافت ۱۲۰ کیلومتر»",
+  "expect": "the form entry shows the chat message that fed it, linked to its session"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "stored formula S = πr² and the guess «۲^n − ۱»",
+  "expect": "formulas rendered (superscripts/π), not raw markup"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "step s2 done → «اجرا» +1; g1 refuted → its recorded mind-card effect",
+  "expect": "each act shows the mind-card events it produced (row + sign)"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "g1 «۲^n» corrected by retract to «۲^n − ۱» at 10:12",
+  "expect": "g1 shows old and new («اصلاح شد ⇐ ۲^n») with the correcting message linked; the withdrawn mind-card event shown as withdrawn"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "all-work index: problem P1 last 10-15, idea I1 last 10-17, factory case F1 last 10-16, session S9 last 10-17 09:00 (I1 at 10-17 08:00)",
+  "expect": "sorted by last activity: S9, I1, F1, P1"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "export one dossier as Markdown and as HTML",
+  "expect": "same sections in the same order as on screen, formulas preserved, corrections with history"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "open the dossier from the problem header, from the assistant session, and from the mind-card timeline",
+  "expect": "all three entry points open the same dossier of that problem"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "problem paused after the plan (no steps, no check, no look-back)",
+  "expect": "dossier shows up to the last activity with state paused; stages not reached shown as not reached"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "pos",
+  "role": "events",
+  "text": "step s3 outcome «done» withdrawn by a ✏️ edit",
+  "expect": "s3 shown with its current state and the withdrawn outcome as history, not as an active result"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "the same assistant session also discussed problem «اجاره» while working «۲۰ پله»",
+  "expect": "the «۲۰ پله» dossier does NOT show «اجاره» guesses/plans/steps"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "tour/test runner seeded problems and acts on the same account",
+  "expect": "they do NOT appear in the owner's index or mind-card contributions"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "dossier opened",
+  "expect": "no edit controls on it (read-only)"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "look-back never done",
+  "expect": "no look-back entry claiming it was done"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "an unrelated chit-chat session with no link to the problem",
+  "expect": "not listed among the problem's messages"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "a step reported in chat and the same step confirmed via the form (same act id)",
+  "expect": "appears ONCE in the dossier"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "old problem P1 (created 2026-09-01) got a new step today",
+  "expect": "NOT left at the bottom by creation date — it moves up by last activity"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "a withdrawn mind-card event",
+  "expect": "not shown as an active contribution"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "stored formula «\\frac{n(n+1)}{2}»",
+  "expect": "never shown as raw LaTeX in the dossier or the export"
+ },
+ {
+  "rc": "INF16.dossier",
+  "kind": "neg",
+  "role": "events",
+  "text": "an ask-only deferred candidate (never stored)",
+  "expect": "does not appear as a record in the dossier"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "s2 done (2026-10-17, problem «۲۰ پله»)",
+  "expect": "«اجرا» row «از کجا؟» lists s2 · 2026-10-17 · + · link to the dossier at s2"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "g1 validated (10-17) and g2 validated (10-18), different problems",
+  "expect": "the guessing row lists both, each with its source problem and date"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "retract: she corrected her own guess",
+  "expect": "look-back row lists the self-correction as +, never −"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "check verdict pass on problem P1 (10-16)",
+  "expect": "the check/look-back stage row lists it with date and +"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "understand form completed (10-17)",
+  "expect": "the «فهمِ مسئله» stage row lists the form act"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "one step act that moves both an ability row and a stage row",
+  "expect": "listed once in each of the two rows"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "row «اجرا» aggregate +3 −1",
+  "expect": "its «از کجا؟» lists exactly 4 acts whose signs sum to that aggregate"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "step s1 outcome corrected 3→۷ by retract",
+  "expect": "the row lists the corrected act once, with the corrected value"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "click an act in «از کجا؟»",
+  "expect": "opens the dossier at that act"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "pos",
+  "role": "events",
+  "text": "a failed step (outcome «نشد», 10-17)",
+  "expect": "listed with − under its row, with date and source"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "the same step reported in chat and via the form (same act id)",
+  "expect": "listed once, counted once"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "a step outcome withdrawn by a chat retract",
+  "expect": "not listed as a counted act (at most as withdrawn, not in the sum)"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "a guess withdrawn by ✏️ edit",
+  "expect": "not counted under the guessing row"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "tour/test acts on the account",
+  "expect": "not listed in the owner's card"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "the assistant's own messages",
+  "expect": "never listed as acts"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "an ask-only deferred candidate",
+  "expect": "not an act; not listed"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "page reloaded twice",
+  "expect": "no act appears twice"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "a retract replaced the old act with a new one",
+  "expect": "only the new act listed; old not counted alongside it"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "a self-correction",
+  "expect": "never listed with − under any row"
+ },
+ {
+  "rc": "INF17.trace",
+  "kind": "neg",
+  "role": "events",
+  "text": "acts of problem B while looking at the card filtered to problem A",
+  "expect": "B's acts not listed under A's filter"
+ }
+]
