@@ -11,7 +11,8 @@
 const { chromium } = require('playwright');
 const path = require('path');
 const FILE = 'file://' + (process.env.LLA_FILE || path.join(__dirname, '..', 'dist', 'learning-architecture.html'));
-const BANK = require('./variants/VARIANTS_R19b.json');
+/* بانک: کنارِ همین آزمون، یا (اجرای دروازهٔ pytest از کپیِ موقت) کنارِ منبعِ واقعی از راهِ پیوندِ src */
+const BANK = JSON.parse(require('fs').readFileSync(process.env.LLA_VARIANTS || [require('path').join(__dirname, 'variants', 'VARIANTS_R19b.json'), (() => { try { return require('path').join(require('fs').realpathSync(require('path').join(__dirname, '..', 'src')), '..', 'tests', 'variants', 'VARIANTS_R19b.json'); } catch (e) { return ''; } })()].find(f => f && require('fs').existsSync(f)), 'utf8'));
 
 const SKIP = /^# (?:سشن|گفت‌وگو تا این لحظه|نوبتِ تازه|صفحهٔ فعلی|امروز|نقشهٔ سامانه|برگه‌های بازِ|پیام‌های اخیرِ صفحه|متنِ فایل‌ها|کارنامهٔ ذهن|مسئلهٔ زندهٔ این سشن)/;
 const isTurnLine = (l) => /\*\*پرسشِ این نوبت همین است:?\*\*/.test(l) || /^- پرسش‌های «/.test(l) || /^- در این نوبت فقط \*\*یک\*\* پرسش/.test(l);
