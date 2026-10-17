@@ -136,7 +136,9 @@
     if (typeof x.list === "function") { SRC[x.kind] = x; return x.kind; }
     var e = norm(x); ONE[e.key] = e; return e.key;
   };
+  /* k: کلید («kind:id[:track]»)، نوع (منبع)، یا شیءِ {kind, id, track?} (قراردادِ پروندهٔ تمرین) */
   SC.unregister = function (k) {
+    if (k && typeof k === "object") k = k.kind + (k.id != null ? ":" + k.id : "") + (k.track ? ":" + k.track : "");
     if (!k) return false; var hit = false;
     if (ONE[k]) { delete ONE[k]; hit = true; }
     Object.keys(ONE).forEach(function (q) { if (q.indexOf(k + ":") === 0) { delete ONE[q]; hit = true; } });
@@ -154,7 +156,7 @@
       L.forEach(function (e) { e.kind = e.kind || k; norm(e); e.src = k; e.today = !!s.today; if (!seen[e.key]) { seen[e.key] = 1; out.push(e); } });
     });
     Object.keys(ONE).forEach(function (q) { var e = ONE[q]; if (o.kind && o.kind !== e.kind) return; if (!seen[e.key]) { seen[e.key] = 1; if (e.today == null) e.today = true; out.push(e); } });
-    return out.filter(function (e) { return !(e.dupOf && seen[e.dupOf]) && !e.done; });
+    return out.filter(function (e) { return !(e.dupOf && seen[e.dupOf]) && !e.done && e.open !== false; });
   };
   SC.due = function (day, o) {
     day = day || A.today();
