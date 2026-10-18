@@ -920,7 +920,11 @@
   /* «ثابت شد» از چند شکل/نمونه، بی هیچ استدلالی ⇒ ادعا («برهانش؟»)، نه نتیجه (s03، s14؛ B162، C145) */
   var EVID_RE = /(?:شکل|مثال|حالت|نمونه)(?:‌ها|ها)?\s*(?:رو\s*|را\s*)?(?:کشیدم|امتحان\s*کردم|زدم|چک\s*کردم|دیدم)|برای\s*n\s*=|(?:چند|[0-9۰-۹]+|دو|سه|چهار|پنج|شش|هفت|هشت|نه|ده)\s*تا\s*(?:حالت|مثال|نمونه|شکل)|همیشه\s*[^.!؟?]{0,30}(?:بود|بودن|شد|شدن|درآمد|درست)|درست\s*بود(?:ن)?|[0-9]+\s*تا(?:شو|ش|شون|یی)?\s*(?:رو\s*|را\s*)?(?:چک|امتحان|بررسی|حساب)\s*(?:کردم|کردیم)|مقاله|تفاضل|الگو(?:ش|ی)?\s|شبیهِ?\s/;   // دورِ ۶ (G3، s25، s07): «۱۰ تاشو چک کردم»، شاهدِ قیاسی/استقرایی (مقاله، تفاضل‌ها، الگو)
   var CLAIM_RE = /ثابت\s*شد|اثبات\s*شد|اثباته|ثابت(?:ش)?\s*کردم|پس\s*(?:درسته|درست\s*است|همیشه)/, ARG_RE = /چون|زیرا|بنابراین|به\s*دلیلِ?|طبقِ?\s|برهان|استقرا|خلف|لانه[‌\s]?کبوتر|اصلِ?\s/;
-  function heurClaim(t) { t = faDigits(String(t || "")); return EVID_RE.test(t) && CLAIM_RE.test(t) && !ARG_RE.test(t); }
+  /* دورِ ۲۲ (P8، C22-12، بانکِ R22 #181): ادعای «ثابت شد» فقط حرفِ خودش، اکنون — نه درونِ «…»، نه بازگفتِ گذشته («گفتم/گفتن ثابت شد»، «روزِ اول…»، «ثابت شده بود») */
+  var REPORTED22 = /(?:^|[\s‌،])(?:گفتم|گفتی|گفتن|گفتند|گفت|گفته[\s‌]*(?:بودم|بودن|بود|بودند)?|می[\s‌]?گفتم|می[\s‌]?گفتن|ادعا[\s‌]*(?:کرد|کردم|کردن)|اون[\s‌]*موقع|آن[\s‌]*موقع|روزِ?[\s‌]*اول|قبلاً|قبلا|دیروز|پارسال|اولش)(?![آ-ی])/;
+  function heurClaimR21(t) { t = faDigits(String(t || "")); return EVID_RE.test(t) && CLAIM_RE.test(t) && !ARG_RE.test(t); }
+  function heurClaim(t) { var o = faDigits(ownText(String(t || ""))); if (!(EVID_RE.test(o) && CLAIM_RE.test(o) && !ARG_RE.test(o))) return false;
+    var m = CLAIM_RE.exec(o), pre = o.slice(0, m.index).split(/[.!؟?؛\n]/).pop(); return !REPORTED22.test(pre) && !/ثابت[\s‌]*شده[\s‌]*بود/.test(o); }
   AS.coachHeurClaim = heurClaim;
   /* ctx = {intro}: «پس + عدد» نتیجه نیست در پیامی که مسئله را می‌سازد — گشایش (intro) یا «… ثبتش کن» (s28 «… پس ۱/۲. باشه ثبتش کن» — ادعای او
      پیش از فهمِ مسئله)؛ پس از آن، حاصلِ کارِ خودش نتیجه است (s37 «پس قیمت یا ۱۸۰۲ یا ۶۹۱ ریاله»، «پس x = ۱۰ لیتر»). بی ctx همان رفتارِ پیشین */
@@ -3026,7 +3030,7 @@
     var um = lastUserMsg(s); if (!um) return; var ut = String(um.text || ""), key = mkey(ut), C = s.coach = s.coach || {}, at = String(um.at || nowIso());
     // plan {text, when}
     var pt = txtOf(a.plan);
-    if (pt && quoteIn(pt, ut)) plan19(s, a.plan, pt, key, at);   // تورِ پولیا (RM5 + RN2d پیوندِ گام): plan18 درونش؛ RM5): چرخهٔ عمرِ برنامه — planR17 (قرنطینه) مسیرِ پیشین است
+    if (pt && quoteIn(pt, ut)) { pt = herSpan22(pt, ut); plan19(s, a.plan, pt, key, at); }   // دورِ ۲۲ (P8): متنِ خودش با نیم‌فاصله‌اش   // تورِ پولیا (RM5 + RN2d پیوندِ گام): plan18 درونش؛ RM5): چرخهٔ عمرِ برنامه — planR17 (قرنطینه) مسیرِ پیشین است
     if (a.plan_done) planDone18(s, a.plan_done);
     // defer {what} — خواستهٔ خودِ کاربر در همین سشن، عقب‌افتاده در همین پاسخ
     var dw = txtOf(a.defer);
@@ -4404,15 +4408,16 @@
   AS.oneTurnQ22 = function (outs) {
     try { var out = (outs || []).slice(), at = [];
       out.forEach(function (x, i) { var blk = ""; String(x || "").split("\n").forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (!SKIP22.test(blk) && !CTXL22.test(l) && TQL22.test(l)) at.push({ i: i, j: j, blk: blk, ex: /\*\*پرسشِ این نوبت همین است/.test(l), live: /^# مسئلهٔ زندهٔ این سشن/.test(blk) }); }); });
-      if (!at.length) return out;
       var keep = at.filter(function (a) { return a.ex; })[0] || at.filter(function (a) { return a.live; })[0] || at[0];
       var L = out.map(function (x) { return String(x || "").split("\n"); });
       at.forEach(function (a) { if (a !== keep) L[a.i][a.j] = demote22(L[a.i][a.j]); });
       /* پرسشِ نوبتِ نگه‌داشته: هر «…» ِ پرسشیِ ردهٔ بالا یک پرسش */
-      var kl = L[keep.i][keep.j]; topQuotes22(kl).forEach(function (q) { var j = oneQ22(q); if (j !== q) kl = kl.split("«" + q + "»").join("«" + j + "»"); }); L[keep.i][keep.j] = kl;
+      if (keep) { var kl = L[keep.i][keep.j]; topQuotes22(kl).forEach(function (q) { var j = oneQ22(q); if (j !== q) kl = kl.split("«" + q + "»").join("«" + j + "»"); }); L[keep.i][keep.j] = kl; }
       /* پیشنهادِ پرسشیِ بی‌نشان کنارِ پرسشِ نوبت («… پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)») ⇒ زمینه */
-      L.forEach(function (ls) { var blk = ""; ls.forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (SKIP22.test(blk) || CTXL22.test(l) || TQL22.test(l) || !/^- /.test(l) || /^- پرسش‌های/.test(l)) return;
-        if (/پیشنهاد[\s‌]*(?:بده|کن)\s*\(«[^»]*[؟?]»\)/.test(l)) ls[j] = "- زمینه (نه پرسشِ دوم): " + l.replace(/^-\s*/, ""); }); });
+      L.forEach(function (ls) { var blk = ""; ls.forEach(function (l, j) { if (/^# /.test(l)) blk = l; if (SKIP22.test(blk) || TQL22.test(l) || !/^- /.test(l) || /^- پرسش‌های/.test(l) || /^- داورِ این مسئله هنوز انتخاب نشده/.test(l) || /^- همهٔ پرسش‌های این مرحله/.test(l)) return;
+        if (!CTXL22.test(l) && /پیشنهاد[\s‌]*(?:بده|کن)\s*\(«[^»]*[؟?]»\)/.test(l)) ls[j] = "- زمینه (نه پرسشِ دوم): " + l.replace(/^-\s*/, "");
+        /* «… بپرس» بیرون از سطرِ پرسشِ نوبت (حتی در سطرِ زمینهٔ شرطی، مثلِ قاعدهٔ پیش‌نیاز) فعلِ دستوریِ دومِ پرسیدن است ⇒ «پرسشِ همین پاسخ کن» (بیرونِ «…») */
+        ls[j] = ls[j].replace(/«[^»]*»|((?:^|[^آ-ی‌]))بپرس(?![آ-ی‌])/g, function (m, pre) { return pre === undefined ? m : pre + "پرسشِ همین پاسخ کن"; }); }); });
       return L.map(function (ls) { return ls.join("\n"); }); } catch (e) { return outs; }
   };
   /* P5 — ردبندیِ پیام (C22-4، A22-5، B·D17): درخواستِ تمرین، «این را نگه دار/بمونه تا مرور کنم»، خودسنجی («فکر کنم خوب گفتم»، «شاید ۴۰٪»)، پیامِ اصلاح و
@@ -4436,8 +4441,30 @@
   AS.toPron22 = function (t) { return TO_PRON22.test(String(t || "")); };
   AS.R22_QUARANTINE = Object.assign(AS.R22_QUARANTINE || {}, {
     hasRes21: function (N, s) { return (N.ch || []).some(function (x) { return /حکمِ وارسی|سرانجامِ حدس/.test(x); }) || ((s && s.coachEv) || []).some(function (e) { return e && !e.wd && (e.how === "res" || e.how === "solved"); }) || chatClosed().some(function (x) { return (x.L.chat || {}).sess === (s && s.id); }); },
-    signTo21: SIGN_TO21
+    signTo21: SIGN_TO21, heurClaim21: heurClaimR21
   });
+  /* P8 (بانکِ R22 #177/#183، B·D19): متنی که از حرفِ خودش نگه داشته می‌شود همان نوشتهٔ اوست — نیم‌فاصله و فاصلهٔ خودش؛ نقلِ مدل («هفته ای») فقط برای یافتنِ همان تکه */
+  function herSpan22(q, t) { q = String(q || ""); t = String(t || ""); if (!q || !t) return q;
+    var sk = /[\s‌]/, mp = [], tt = ""; for (var i = 0; i < t.length; i++) { if (!sk.test(t[i])) { tt += faDigits(t[i]).replace(/ي/, "ی").replace(/ك/, "ک"); mp.push(i); } }
+    var qq = faDigits(q.replace(/[\s‌]+/g, "")).replace(/ي/g, "ی").replace(/ك/g, "ک"); if (qq.length < 2) return q;
+    var k = tt.indexOf(qq); if (k < 0) return q; return t.slice(mp[k], mp[k + qq.length - 1] + 1); }
+  AS.herSpan22 = herSpan22;
+  /* P8 (C22-11، بانکِ R22 #172/#185): حدسِ گفت‌وگو سرانجامش را از داوریِ بعدی می‌گیرد — جوابِ بستنِ همان سشن (solution / پیام‌های وارسی) یا نتیجهٔ ثبت‌شده؛
+     با عددِ حدس: همهٔ عددهایش در جواب ⇒ تأیید، هیچ‌کدام ⇒ رد؛ بی عدد یا آمیخته ⇒ همان «هنوز آزموده نشده» (صفحه حکمِ بی‌شاهد نمی‌دهد) */
+  function nums22(t) { return (faDigits(String(t || "")).replace(/٫/g, ".").match(/\d+(?:\.\d+)?/g) || []).map(function (x) { return String(+x); }); }
+  function guessVerdicts22(s) { var C = s.coach || {}, G = (C.guesses || []).filter(function (g) { return g && g.text && !g.res && !g.withdrawn && !g.resRecheck; }); if (!G.length) return false;
+    var V = []; try { (A.liveAll ? A.liveAll() : []).forEach(function (r) { var L = (((S.get("eprog_" + (r && r.p && r.p.id)) || {}).solve || {}).live) || {}, ch = L.chat || {};
+      if (ch.sess === s.id && ch.solution && L.state === "solved") V.push({ t: ch.solution, at: ch.at || "" }); }); } catch (e) { }
+    (s.coachEv || []).forEach(function (e) { if (e && !e.wd && e.ok && e.how === "res" && e.src20 && e.src20.span) V.push({ t: e.src20.span, at: e.at || "" }); });
+    if (!V.length) return false; var dirty = false;
+    G.forEach(function (g) { var gn = nums22(g.text); if (!gn.length) return;
+      V.filter(function (v) { return !g.at || !v.at || String(v.at) >= String(g.at); }).forEach(function (v) { if (g.res) return; var vn = nums22(v.t); if (!vn.length) return;
+        var hitN = gn.filter(function (n) { return vn.indexOf(n) >= 0; }).length;
+        if (hitN === gn.length) { g.res = "confirmed"; } else if (!hitN) { g.res = "refuted"; } else return;
+        g.resAt = nowIso(); g.resBy = "verdict"; g.resFrom = clip(v.t, 160); dirty = true; }); });
+    return dirty; }
+  AS.guessVerdicts22 = guessVerdicts22;
+  AS.afterTurnHooks.push(function (s) { try { if (guessVerdicts22(s)) S.put(s); } catch (e) { } });
   AS.tourKinds = KIND;
   AS.tourSyncReminder = syncReminder;
 })(APP);

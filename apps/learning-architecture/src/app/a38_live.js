@@ -1706,6 +1706,9 @@
     var SC = specCards(r, pg, s), card = (SC[0] && SC[0].q) || pageQ;
     var src = "", pick = function (x, why) { if (!q && ok(x)) { q = x; src = why; } };
     var act = ph === "u" || ph === "p" || ph === "c";
+    /* دورِ ۲۲ (P1، A22-24): پشتهٔ پیش‌نیازِ این مسئله باز است ⇒ پرسشِ نوبت همان پرسشِ تشخیصی/تسلطِ بالای پشته (a44، یک منبع) — پیش از هر لحظهٔ دیگر */
+    var PQ22 = null; try { PQ22 = A.prereqTurnQ ? A.prereqTurnQ(r.p.id) : null; } catch (e) { PQ22 = null; }
+    if (PQ22 && PQ22.q) { q = PQ22.q; src = "prereq-" + PQ22.st; }
     /* (۱) کارِ همین نوبت */
     /* «…درسته؟» پس از یک مقدار حدس است، نه نتیجه (G1/G2 دورِ ۶، s02/s07/s09 — turn.guess از مربی) ⇒ «چطور می‌آزمایی‌اش؟» */
     if (act && onlyAnsNow(r, s, T, tx)) pick(Q_ONLYANS, "turn-onlyans");

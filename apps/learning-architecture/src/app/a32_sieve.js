@@ -322,10 +322,11 @@
   };
   function parseArr(t) { try { var m = String(t || "").match(/\[[\s\S]*\]/); var a = JSON.parse(m ? m[0] : t); return Array.isArray(a) ? a : null; } catch (e) { return null; } }
   function mkTopic(p, x) {
-    var tp = S.put({ id: A.uid("tp"), type: "topic", title: "«" + x.concept + "» (" + [x.sci, x.sub].filter(Boolean).join(" › ") + ") — پیش‌نیازِ «" + clip(p.title, 50) + "»", dom: x.sci || "", src: "🧩 نقشهٔ پیش‌نیازها", kind: "", prereq: p.id });
+    var tp = S.put({ id: A.uid("tp"), type: "topic", title: "«" + x.concept + "»" + ([x.sci, x.sub].filter(Boolean).length ? " (" + [x.sci, x.sub].filter(Boolean).join(" › ") + ")" : "") + " — پیش‌نیازِ «" + clip(p.title, 50) + "»", dom: x.sci || "", src: "🧩 نقشهٔ پیش‌نیازها", kind: "", prereq: p.id });
     if (A.toNursery) try { A.toNursery(tp.title, "concept", { t: "topic", id: tp.id }); } catch (e) { }
     x.topic = tp.id; S.put(p); return tp;
   }
+  A.prereqMkTopic = mkTopic;   // دورِ ۲۲ (P1): لایهٔ پیش‌نیازِ مربی (a44) همان موضوعِ یادگیری را می‌سازد
   A.V.prereq = function (arg) {
     var root = h("div", { class: "page", dir: "rtl" });
     root.appendChild(A.head("حلِ مسئله و یادگیری", "🧩 نقشهٔ پیش‌نیازها", "مسئله یا مطلبی که نفهمیدی: کدام مفهوم، از کدام علم و شاخه، در کدام گامِ حل لازم بود — و کدام را واقعاً نداشتی. هر پیش‌نیازِ نبوده یک موضوعِ یادگیری می‌شود؛ بعد به خودِ مسئله برمی‌گردی."));
@@ -356,7 +357,12 @@
               arr.slice(0, 12).forEach(function (x) { if (!x || !x.concept || have.indexOf(String(x.concept).trim()) >= 0) return; var leak = A.prereqLeaks(x.concept, x.ref); p.items.push({ sci: clip(x.sci, 60), sub: clip(x.sub, 80), concept: clip(A.prereqCleanName(x), 120), renamed: leak || null, why: clip(x.why, 300), q: clip(x.q, 300), ref: clip(x.ref, 500), by: "ai", self: "", ans: "" }); });
               save(); A.toast("پیشنهادها افزوده شد — ساختهٔ هوش مصنوعی و وارسی‌نشده؛ سنجش با خودت است.");
             } });
-        } }, "🤖 پیشنهادِ پیش‌نیازها") : null)));
+        } }, "🤖 پیشنهادِ پیش‌نیازها") : null,
+        /* دورِ ۲۲ (P1، A22-24 «جزیره»): نقشه‌ای که مربی از حینِ حل ساخت به همان مسئله و مسیرش پیوسته است */
+        p.pid && A.liveRec && A.liveRec(p.pid) ? h("button", { class: "btn ghost sm pr-golive", type: "button", onclick: function () { A.go("lprob", p.pid); } }, "🔭 برگرد به مسئله") : null,
+        p.pid && A.V.route ? h("button", { class: "btn ghost sm pr-goroute", type: "button", onclick: function () { A.go("route", p.pid); } }, "🧭 نقشهٔ مسیرِ مسئله") : null,
+        !p.pid && p.sess && S.get(p.sess) && A.V.route ? h("button", { class: "btn ghost sm pr-goroute", type: "button", onclick: function () { A.go("route", p.sess); } }, "🧭 نقشهٔ مسیرِ گفت‌وگو") : null)));
+    var ST22 = { diag: "پرسشِ تشخیصی پرسیده شد", wait: "در نوبت (پس از پیش‌نیازِ قبلیِ همین گام)", teach: "در حالِ یاد گرفتن (حینِ حل)", learned: "آموخته شد ✓", had: "بود — کمبود نبود" };
     var rows = p.items.map(function (x, i) {
       var ans = h("textarea", { rows: 2, "aria-label": "پاسخِ تو به پرسشِ تشخیصیِ «" + clip(x.concept, 40) + "»", placeholder: "پاسخِ خودت، از حافظه", onchange: function (e) { x.ans = e.target.value; S.put(p); } }, x.ans || "");
       // سنجشِ خود و «حل شد» تصمیمِ خودِ کاربر است: دستیار فقط زرد می‌کند، پر نمی‌کند (data-own — کارزارِ آزمون c03)
@@ -364,6 +370,7 @@
       return h("div", { class: "card soft pr-item" },
         h("div", { class: "row gap wrap" }, h("b", {}, fa(i + 1) + ") " + x.concept), h("span", { class: "chip" }, [x.sci, x.sub].filter(Boolean).join(" › ")), x.by === "ai" ? h("span", { class: "small muted" }, "پیشنهادِ هوش مصنوعی — وارسی‌نشده") : null),
         x.why ? h("p", { class: "small" }, "در کدام گام و چرا: " + x.why) : null,
+        x.eid && x.state ? h("p", { class: "small pr-state", "data-state": x.state }, (x.depth ? "تو‌در‌تو · " : "") + (ST22[x.state] || x.state) + (x.learned ? " — " + A.fdate(String(x.learned).slice(0, 10)) : "") + (x.how ? " · " + x.how : "") + (x.role === "teacher" ? " · در نقشِ معلم" : "") + ((x.uses || []).length ? " · کاربست در " + fa(x.uses.length) + " مسئلهٔ دیگر" : "") + (x.quote ? " · از حرفِ خودت: «" + clip(x.quote, 80) + "»" : "") + (x.mastery ? " · وارسیِ تسلط: «" + clip(x.mastery, 80) + "»" : "")) : null,
         x.q ? h("p", {}, "پرسشِ تشخیصی: " + x.q) : null, x.q ? ans : null,
         // «بلدم» بی دلیلِ نوشته (کارزارِ آزمونِ دوم c12: «بدیهیه» با «بلدم» پذیرفته شد و موضوعِ زوجیت ساخته نشد) — فقط هشدار؛ سنجش با خودِ کاربر می‌ماند
         x.self === "بلدم" && x.q && String(x.ans || "").replace(/\s+/g, "").length < 15 ? h("p", { class: "small warn pr-thin" }, "«بلدم» گفتی ولی پاسخِ نوشته‌ات هنوز دلیل ندارد" + (x.ans ? " («" + clip(x.ans, 40) + "»)" : "") + ". پاسخِ مرجع را باز کن و مقایسه کن؛ اگر فقط «بدیهی است» یا «می‌دانم» بود، شاید «نیمه» درست‌تر باشد.") : null,

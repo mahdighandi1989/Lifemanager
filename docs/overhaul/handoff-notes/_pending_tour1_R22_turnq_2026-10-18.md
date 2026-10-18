@@ -2,6 +2,9 @@
 
 > Temporary note for the other round-22 fixers and the integrator. Decisions: tour1_polya/DECISIONS_R22.md P4, P5. WORKLOG (92), PROGRESS 107.
 
+Merged: sibling prereq+route branch (95459379, P1/P2) on top of this work; WORKLOG 91 / PROGRESS 106 (correction fixer) still missing, so the
+handbook/ownership pytest numbering check fails until that branch is merged (verified green with the numbers closed up).
+
 Files changed: `apps/learning-architecture/src/app/a38_live.js` (coachCore successor), `a27_tour.js` (turn signals, re-check, post-check,
 final one-question pass, message classifier, register), `a26_assist.js` (prompt final pass, routing), rebuilt bundle.
 Tests: new `apps/learning-architecture/tests/test_tour1_r22_turnq.js` + byte copy of the bank `tests/variants/VARIANTS_R22.json`.
@@ -13,7 +16,10 @@ Old assertion changed (commented): `tests/test_tour1_r10_coach.js` `nq` treats �
   Every other one becomes `- زمینه (نه پرسشِ دوم؛ پرسشِ این نوبت همان یکی است): …` with «بپرس» neutralised.
 - Inside the kept line every top-level «…» question with several «؟» becomes one sentence (`AS.oneQ22`: «X؟ Y؟» ⇒ «X؛ Y؟»). The page card text is untouched.
 - A `- …` line (not context, not a turn line, not `- پرسش‌های…`) that contains `پیشنهاد بده («…؟»)` becomes context. **practice fixer:** the a41 line
-  «- بازنگری: … پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)» is now demoted by this pass; writing it as context at its source would be cleaner (HANDBOOK §12 #53).
+  «- بازنگری: … پیشنهاد بده («می‌خواهی تمرینش کنیم؟»)» is now demoted by this pass; writing it as context at its source would be cleaner (HANDBOOK §12 #54).
+- Outside the kept turn line, every «بپرس» outside «…» (context lines too) becomes «پرسشِ همین پاسخ کن» — a second imperative "ask" is a second turn
+  question for the strict scans. **prereq fixer:** a44 `RULE` («… فقط همان پرسشِ تشخیصی را بپرس») is rewritten by this pass after the merge of 95459379;
+  writing it without «بپرس» at the source is cleaner.
 - If you add a new turn-question source, use one of the two marker forms above; never a third phrasing — the final pass and the post-check read only these.
 
 ## Contract: turn question after a step outcome (live fixer / prereq fixer)

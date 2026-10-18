@@ -249,8 +249,25 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
     const T = (i, ok, x) => { info.bank[i] = !!ok; chk(ok, 'bank#' + i + ' [' + E[i].rc + '/' + E[i].kind + '] «' + E[i].text.slice(0, 70) + '» → ' + E[i].expect.slice(0, 110) + ' :: ' + JSON.stringify(x).slice(0, 500)); };
     const NC = (i, why) => { info.nc[i] = why; };
     const Uof = (i) => E[i].text.split('‖').map(x => x.trim()).map(x => (/(?:^|\s)U:\s*(.*)$/.exec(x) || [])[1]).filter(Boolean).map(x => x.replace(/^\([^)]*\)\s*/, '').trim());
+    /* P8 ِ سمتِ a27 (پیامِ هماهنگ‌کننده): سرانجامِ حدس از داوریِ بعدی، نیم‌فاصلهٔ خودش، C145 روی «ثابت شد» ِ نقل/گذشته */
+    const P8MINE = /حدسم ۱۲ ـه|هفته‌ای سه روز|هفته ای|گفتن «ثابت شد»/;
+    const p8 = async (e, i) => {
+      if (/حدسم ۱۲ ـه/.test(e.text)) { await wipe(); await fresh(); await turn('یه مسئله: سه عدد فرد متوالی که جمعشون ۳۹ ـه چندن؟ کوچیک‌ترینش رو می‌خوام.', 'مجهول؟');
+        await turn('حدسم ۱۲ ـه', 'چطور می‌آزمایی‌اش؟', [cs({ guess: { text: '۱۲' } })]);
+        if (e.kind === 'pos') await turn('حساب کردم: ۱۱ + ۱۳ + ۱۵ = ۳۹، پس کوچیک‌ترین ۱۱ ـه. با جمع چک کردم درسته.', 'ثبت شد.', [{ do: 'chat_solved', title: 'سه فرد', statement: 'سه عدد فرد متوالی که جمعشون ۳۹ ـه چندن؟ کوچیک‌ترینش رو می‌خوام.', kind: 'find', solution: 'کوچیک‌ترین ۱۱', check: 'با جمع چک کردم', checkMsgs: ['حساب کردم: ۱۱ + ۱۳ + ۱۵ = ۳۹، پس کوچیک‌ترین ۱۱ ـه. با جمع چک کردم درسته.'] }]);
+        else await turn('بذار فکر کنم.', 'باشه.');
+        const x = await p.evaluate(() => { const s = __cur(); const g = ((s.coach || {}).guesses || [])[0] || {}; let dos = ''; try { const el = APP.DOSSIER && APP.DOSSIER.session ? APP.DOSSIER.session(s.id) : null; dos = el ? (el.textContent || String(el)) : ''; } catch (er) { } return { res: g.res || '', text: g.text || '', dos: dos.slice(0, 50) }; });
+        T(i, e.kind === 'pos' ? x.res === 'refuted' : !x.res, x); return; }
+      if (/هفته/.test(e.text)) { const her = e.kind === 'pos' ? 'برنامه‌ی هفته‌ای سه روز می‌دوم، از شنبه' : 'برنامه ی هفته ای سه روز می‌دوم، از شنبه';
+        await wipe(); await fresh(); await turn('یه مسئله دارم: می‌خوام دوندگی رو شروع کنم ولی هر بار ول می‌کنم. چی کار کنم؟', 'چه چیزی ولت می‌کند؟');
+        await turn(her, 'خوب.', [cs({ plan: { text: 'برنامه ی هفته ای سه روز می‌دوم', when: '2026-10-24' } })]);
+        const x = await p.evaluate(() => ((__cur().plans || [])[0] || {}).text || ''); T(i, e.kind === 'pos' ? /هفته‌ای/.test(x) && /برنامه‌ی/.test(x) : /هفته ای/.test(x) && /برنامه ی/.test(x), x); return; }
+      if (/ثابت شد/.test(e.text)) { const x = await p.evaluate(() => ['اون موقع که گفتن «ثابت شد»، من باور نکردم', 'یعنی روز اول اشتباه کردم که با ده تا مثال گفتم ثابت شد؟', 'دو تا چیز می‌خوام نگه دارم: یکی اشتباهم که با چند تا مثال گفتم «ثابت شد».', 'ده تا مثال امتحان کردم، همیشه درست بود، پس ثابت شد'].map(t => APP.ASSIST.coachHeurClaim(t)));
+        T(i, !x[0] && !x[1] && !x[2] && x[3], x); return; }
+    };
     const route = async (msg, newSess) => { await wipe(); await fresh(); const u = await turn(msg); return u.task; };
     for (const [e, i] of BANK.map((e, i) => [e, i])) {
+      if (/^P8\./.test(e.rc) && P8MINE.test(e.text)) { await p8(e, i); continue; }
       if (!/^P[45]\./.test(e.rc)) continue;
       const tx = e.text, ex = e.expect, U = Uof(i);
       try {
@@ -303,7 +320,7 @@ const BANK = BANKF ? JSON.parse(fs.readFileSync(BANKF, 'utf8')) : [];
         NC(i, 'no runnable form in this fixer\'s mechanisms');
       } catch (er) { errors.push('bank#' + i + ' exception: ' + String(er && er.stack || er).split('\n').slice(0, 2).join(' | ')); }
     }
-    const mine = BANK.map((e, i) => [e, i]).filter(([e]) => /^P[45]\./.test(e.rc)).map(([, i]) => i);
+    const mine = BANK.map((e, i) => [e, i]).filter(([e]) => /^P[45]\./.test(e.rc) || (/^P8\./.test(e.rc) && P8MINE.test(e.text))).map(([, i]) => i);
     const miss = mine.filter(i => !(i in info.bank) && !(i in info.nc)); chk(!miss.length, 'bank coverage: every P4/P5 entry judged or given a reason ' + JSON.stringify(miss));
   });
 
