@@ -37,3 +37,9 @@ ADDENDUM — dataset (roadmap §17, docs/decisions/2026-10-18-tour-dataset-for-l
     as the model. Label it in the first line `# author: runner-simulated`.
 (c) Keep the ai/ folders (pN.json + rN.txt) of every scenario. Do not delete them at cleanup. Delete only the browser profiles.
 (d) Each group adds at least one LOOK-BACK-family scenario (Pólya's fourth stage as the main act): the dataset currently has only one.
+ADDENDUM 2 (owner 2026-10-18, roadmap §19): each group adds one scenario whose problem needs a TERRITORY the system does not have (e.g. a
+person turning an invention idea into a plan where a step needs a method no registry covers). Judge: idea → known/unknown map; each sub-problem
+solved or its prerequisite taught; registries / «🗺 قلمروِ سامانه‌ها» checked first; when truly missing, an urgent «[دستیار · کمبودِ سامانه]»
+sheet filed per the AGENTS.md contract (differential diagnosis, second opinion, abstract/missing/where/how, evidence from her words and the
+step), the waiting sub-problem marked, the final summary showing it. The loop «built ⇒ system notices ⇒ checks it answers the step ⇒ resumes»
+does not exist yet: record its absence as S2 with what the person would have needed.
